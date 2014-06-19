@@ -433,47 +433,48 @@ SUBROUTINE twfill_ripken(opt_fun)
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Fill twiss table with Ripken-Mais twiss parameters.              *
-  !     beta11, beta12, beta21, beta22, alfa11, alfa12, alfa21, alfa22   *
+  !     beta11, beta12, beta21, beta22,                                  *
+  !     alfa11, alfa12, alfa21, alfa22,                                  *
+  !     gama11, gama12, gama21, gama22,                                  *
   !----------------------------------------------------------------------*
-  double precision opt_fun(*),kappa,gamx,gamy,beta11,beta12,beta21,beta22,alfa11,alfa12,alfa21,alfa22,&
-       gama11,gama12,gama21,gama22,zero,one
-  parameter(zero=0d0,one=1d0)
 
-  ! parameters
-  !
-  ! opt_fun(3) = betx
-  ! opt_fun(6) = bety
-  ! opt_fun(4) = alfx
-  ! opt_fun(7) = alfy
-  ! opt_fun(29) = r11
-  ! opt_fun(30) = r12
-  ! opt_fun(31) = r21
-  ! opt_fun(32) = r22
-  ! 
+  double precision opt_fun(*)
+  double precision kappa, betx, bety, alfx, alfy, gamx, gamy, r11, r12, r21, r22 
+  double precision beta11, beta12, beta21, beta22, & 
+                   alfa11, alfa12, alfa21, alfa22, &
+                   gama11, gama12, gama21, gama22
 
-  kappa=one/(one+(opt_fun(29)*opt_fun(32)-opt_fun(30)*opt_fun(31)))
-  gamx=(one+opt_fun(4)**2)/opt_fun(3)
-  gamy=(one+opt_fun(7)**2)/opt_fun(6)
+  betx = opt_fun(3)
+  bety = opt_fun(6)
+  alfx = opt_fun(4) 
+  alfy = opt_fun(7) 
+  r11 =  opt_fun(29)
+  r12 =  opt_fun(30)
+  r21 =  opt_fun(31)
+  r22 =  opt_fun(32)
 
-  beta11=kappa*opt_fun(3)
-  beta12=kappa*(opt_fun(32)*(opt_fun(32)*opt_fun(6)+2*opt_fun(30)*opt_fun(7))+opt_fun(30)*opt_fun(30)*gamy)
-  beta21=kappa*(opt_fun(29)*(opt_fun(29)*opt_fun(3)-2*opt_fun(30)*opt_fun(4))+opt_fun(30)*opt_fun(30)*gamx)
-  beta22=kappa*opt_fun(6)
+  kappa = 1./(1. + (r11*r22-r12*r21))
 
-  alfa11=kappa*opt_fun(4)
-  alfa12=kappa*(opt_fun(31)*opt_fun(32)*opt_fun(6)+opt_fun(7)*(opt_fun(30)*opt_fun(31)+&
-       opt_fun(29)*opt_fun(32))+opt_fun(30)*opt_fun(29)*gamy)
-  alfa21=-kappa*(opt_fun(31)*opt_fun(29)*opt_fun(3)-opt_fun(4)*(opt_fun(30)*opt_fun(31)+&
-       opt_fun(29)*opt_fun(32))+opt_fun(30)*opt_fun(32)*gamx)
-  alfa22=kappa*opt_fun(7)
+  gamx = (1.+alfx**2)/betx
+  gamy = (1.+alfy**2)/bety
 
-  gama11=kappa*gamx
-  gama12=zero
-  gama21=zero
-  if(beta12.ne.zero) gama12=((one-kappa)**2+alfa12**2)/beta12
-  if(beta21.ne.zero) gama21=((one-kappa)**2+alfa21**2)/beta21
-  gama22=kappa*gamy
+  beta11 = kappa * betx
+  beta22 = kappa * bety
+  beta12 = kappa * ( r22**2*bety + 2*r12*r22*alfy + r12**2*gamy )
+  beta21 = kappa * ( r11**2*betx - 2*r12*r11*alfx + r12**2*gamx )
   
+  alfa11 =  kappa * alfx
+  alfa22 =  kappa * alfy
+  alfa12 =  kappa * ( r21*r22*bety + (r12*r21 + r11*r22)*alfy + r11*r12*gamy )
+  alfa21 = -kappa * ( r21*r11*betx - (r12*r21 + r11*r22)*alfx + r12*r22*gamx ) 
+
+  gama11 = kappa * gamx
+  gama22 = kappa * gamy
+  gama12 = 0.
+  if (beta12 .ne. 0.) gama12 = ((1. - kappa)**2 + alfa12**2) / beta12
+  gama21 = 0.
+  if (beta21 .ne. 0.) gama21 = ((1. - kappa)**2 + alfa21**2) / beta21
+   
   call double_to_table_curr('twiss ','beta11 ' ,beta11)
   call double_to_table_curr('twiss ','beta12 ' ,beta12)
   call double_to_table_curr('twiss ','beta21 ' ,beta21)
@@ -1900,11 +1901,11 @@ SUBROUTINE twbttk(re,te)
        bx1,bx2,by1,by2,proxim,rep(6,6),t2,ta,tb,temp,tg,fre(6,6),        &
        frep(6,6),curlyh,detl,f,rhoinv,blen,alfx0,alfy0,betx0,bety0,amux0,&
        amuy0,wx0,wy0,dmux0,dmuy0,rmat0(2,2),phix0,phiy0,node_value,eps,  &
-       zero,one,two,sk1
+       zero,one,two
   parameter(eps=1d-8,zero=0d0,one=1d0,two=2d0)
 
-  double precision ka,kl,dispaverage,curlyhaverage,e1,e2
-  double precision an,sax,sbx,sgx,sdx,sdpx,sbx2,sdx2
+  double precision an, e1, e2, sk1
+  double precision syncint(5)
   
   !initialize
   wx0=zero
@@ -1937,143 +1938,26 @@ SUBROUTINE twbttk(re,te)
   endif
 
   !---- Synchrotron integrals before element.
-  if(.not.centre_bttk) then
-     curlyh = disp(1)**2 * (one + alfx**2) / betx  &
-          + two*disp(1)*disp(2)*alfx + disp(2)**2*betx
-     synch_1 = synch_1 + disp(1) * rhoinv * blen/two
-     synch_2 = synch_2 + rhoinv**2 * blen/two
-     synch_3 = synch_3 + abs(rhoinv**3) * blen/two
-     ! 2014-May-15  16:50:36  ghislain: added 
-     synch_4 = synch_4 + disp(1)*rhoinv*(rhoinv**2 + 2*sk1) * blen/two
-     synch_5 = synch_5 + curlyh * abs(rhoinv**3) * blen/two
+  ! if(.not.centre_bttk) then
+  !    curlyh = disp(1)**2 * (one + alfx**2) / betx  &
+  !         + two*disp(1)*disp(2)*alfx + disp(2)**2*betx
+  !    synch_1 = synch_1 + disp(1) * rhoinv * blen/two
+  !    synch_2 = synch_2 + rhoinv**2 * blen/two
+  !    synch_3 = synch_3 + abs(rhoinv**3) * blen/two
+  !    ! 2014-May-15  16:50:36  ghislain: added 
+  !    synch_4 = synch_4 + disp(1)*rhoinv*(rhoinv**2 + 2*sk1) * blen/two
+  !    synch_5 = synch_5 + curlyh * abs(rhoinv**3) * blen/two
+  ! endif
+
+  !---- Synchrotron integrals through element.    
+  if(.not.centre_bttk .and. rhoinv .ne. 0.d0) then
+     call calcsyncint(rhoinv,blen,sk1,e1,e2,betx,alfx,disp(1),disp(2),syncint)
+     synch_1 = synch_1 + syncint(1)
+     synch_2 = synch_2 + syncint(2)
+     synch_3 = synch_3 + syncint(3)
+     synch_4 = synch_4 + syncint(4)
+     synch_5 = synch_5 + syncint(5)
   endif
-
-
-  ! 2014-May-30  18:02:09  ghislain: work in progress
-
-  ! ! alternate take from SLAC-Pub-1193 where integration is done explicitly
-  ! !---- Synchrotron integrals through element.    
-  ! if(.not.centre_bttk .and. rhoinv .ne. 0.d0) then
-  !    sax = alfx
-  !    sbx = betx
-  !    sgx = (1+sax**2)/sbx
-  !    sdx = disp(1)
-  !    sdpx = disp(2)
-    
-  !    if ((rhoinv*rhoinv + 2*sk1) .ge. 0.0d0) then       
-  !       ka = sqrt(rhoinv*rhoinv + 2*sk1)
-  !       kl = ka*blen
-     
-  !       dispaverage = sdx * sin(kl)/kl & 
-  !            + sdpx * (1 - cos(kl))/(ka*kl) & 
-  !            + rhoinv * (kl - sin(kl))/(ka*ka*kl)
-          
-  !       curlyhaverage = sgx*sdx**2 + 2*sax*sdx*sdpx + sbx*sdpx*sdpx & 
-  !                     + 2*rhoinv*blen*( -(sgx*sdx + sax*sdpx)*(kl-sin(kl))/(kl*kl*ka) &
-  !                                      + (sax*sdx + sbx*sdpx)*(1-cos(kl))/(kl*kl)) & 
-  !                     + blen*blen*rhoinv*rhoinv*( & 
-  !                           sgx*(3*kl - 4*sin(kl) + sin(kl)*cos(kl))/(2*ka*ka*kl**3) &
-  !                         - sax*(1-cos(kl))**2/(ka*kl**3) & 
-  !                         + sbx*(kl-cos(kl)*sin(kl))/(2*kl**3))
-  !    else
-  !       ka = sqrt(-rhoinv*rhoinv - 2*sk1) ! * i ; it is an imaginary number really so use sinh and cosh below
-  !       kl = ka*blen
-     
-  !       dispaverage = -sdx * sinh(kl)/kl & 
-  !            - sdpx * (1 - cosh(kl))/(ka*kl) & 
-  !            + rhoinv * (-kl - sinh(kl))/(ka*ka*kl)
-          
-  !       curlyhaverage = sgx*sdx**2 + 2*sax*sdx*sdpx + sbx*sdpx*sdpx & 
-  !                     + 2*rhoinv*blen*( -(sgx*sdx + sax*sdpx)*(-kl-sinh(kl))/(kl*kl*ka) &
-  !                                      - (sax*sdx + sbx*sdpx)*(1-cosh(kl))/(kl*kl)) & 
-  !                     + blen*blen*rhoinv*rhoinv*( & 
-  !                           sgx*(-3*kl - 4*sinh(kl) + sinh(kl)*cosh(kl))/(-2*ka*ka*kl**3) &
-  !                         - sax*(1-cosh(kl))**2/(ka*kl**3) & 
-  !                         + sbx*(-kl-cosh(kl)*sinh(kl))/(2*kl**3))        
-  !    endif
-
-  !    ! print *, 'kl = ',kl
-  !    ! print *, 'dispx = ', sdx, 'dispaverage = ', dispaverage
-  !    ! print *, 'curlyh = ', curlyh, 'curlyhaverage = ', curlyhaverage
-     
-  !    synch_1 = synch_1 + dispaverage * rhoinv * blen
-  !    synch_2 = synch_2 + rhoinv**2 * blen
-  !    synch_3 = synch_3 + abs(rhoinv**3) * blen
-  !    synch_4 = synch_4 + dispaverage*rhoinv*(rhoinv**2 + 2*sk1) * blen
-  !    synch_5 = synch_5 + curlyhaverage * abs(rhoinv**3) * blen
-  ! endif
-
-
-  ! ! alternate take from SLAC-Pub-1193 where integration is done explicitly + poleface rotations
-  ! !---- Synchrotron integrals through element.    
-  ! if(.not.centre_bttk .and. rhoinv .ne. 0.d0) then
-
-  !    sax = alfx
-  !    sbx = betx
-
-  !    ! effect of poleface rotation
-  !    sax = sax - sbx*rhoinv*tan(e1) 
-  !    sgx = (1+sax**2)/sbx
-  !    sdx = disp(1) 
-  !    sdpx = disp(2) + sdx*rhoinv*tan(e1)
-
-  !    if ((rhoinv*rhoinv + 2*sk1) .ge. 0.0d0) then       
-  !       ka = sqrt(rhoinv*rhoinv + 2*sk1)
-  !       kl = ka*blen
-
-  !       ! propagation of dispersion and beta at exit
-  !       sdx2 = sdx*cos(kl) + sdpx*sin(kl)/ka + rhoinv*(1-cos(kl))/(ka*ka)
-
-  !       sbx2 = sbx*cos(kl) - 2*blen*sax*sin(kl)*cos(kl)/kl + sgx*sin(kl)*sin(kl)/(ka*ka)
-          
-  !       dispaverage = sdx * sin(kl)/kl & 
-  !            + sdpx * (1 - cos(kl))/(ka*kl) & 
-  !            + rhoinv * (kl - sin(kl))/(ka*ka*kl)
-          
-  !       curlyhaverage = sgx*sdx**2 + 2*sax*sdx*sdpx + sbx*sdpx*sdpx & 
-  !                       + 2*rhoinv*blen*( -(sgx*sdx + sax*sdpx)*(kl-sin(kl))/(kl*kl*ka) &
-  !                                        + (sax*sdx + sbx*sdpx)*(1-cos(kl))/(kl*kl)) & 
-  !                       + blen*blen*rhoinv*rhoinv*( & 
-  !                            sgx*(3*kl - 4*sin(kl) + sin(kl)*cos(kl))/(2*ka*ka*kl**3) &
-  !                          - sax*(1-cos(kl))**2/(kl**3*ka) & 
-  !                          + sbx*(kl-cos(kl)*sin(kl))/(2*kl**3))
-  !    else
-  !       ka = sqrt(-rhoinv*rhoinv - 2*sk1) ! * i ; it is an imaginary number really so use sinh and cosh below
-  !       kl = ka*blen 
-        
-  !       ! propagation of dispersion and beta at exit
-  !       sdx2 = sdx*cosh(kl) - sdpx*sinh(kl)/ka + rhoinv*(1-cosh(kl))/(ka*ka)
-
-  !       sbx2 = sbx*cosh(kl) + 2*blen*sax*sinh(kl)*cosh(kl)/kl + sgx*sinh(kl)*sinh(kl)/(ka*ka)
-        
-  !       dispaverage = -sdx * sinh(kl)/kl & 
-  !            - sdpx * (1 - cosh(kl))/(ka*kl) & 
-  !            + rhoinv * (-1/(ka*ka) - sinh(kl)/(ka*ka*kl))
-        
-  !       curlyhaverage = sgx*sdx**2 + 2*sax*sdx*sdpx + sbx*sdpx*sdpx & 
-  !                     + 2*rhoinv*blen*( -(sgx*sdx + sax*sdpx)*(-1/(ka*kl) - sinh(kl)/(kl*kl*ka)) &
-  !                                      - (sax*sdx + sbx*sdpx)*(1-cosh(kl))/(kl*kl)) & 
-  !                     + blen*blen*rhoinv*rhoinv*( &   
-  !                        sgx*(-3*kl - 4*sinh(kl) + sinh(kl)*cosh(kl))/(-2*ka**2*kl**3) &
-  !                      - sax*(1-cosh(kl))**2/(kl**3*ka) & 
-  !                      + sbx*(-kl-cosh(kl)*sinh(kl))/(2*kl**3))
-  !    endif
-
-  !    ! print *, "|k| = ", ka, "k*l = ", kl, 'blen = ', blen, 'rhoinv = ', rhoinv, 'sk1 = ', sk1, 'e1 =', e1, 'e2 = ', e2
-  !    ! print *, 'sdx = ', sdx, 'sdx2 = ', sdx2, 'sdpx = ', sdpx, & 
-  !    !     'sbx = ', sbx, 'sbx2 = ', sbx2, 'sax = ', sax, 'sgx = ', sgx
-  !    ! print *, 'dispaverage = ', dispaverage, 'curlyh = ', curlyh, 'curlyhaverage = ', curlyhaverage
-     
-
-  !    synch_1 = synch_1 + dispaverage * rhoinv * blen
-  !    synch_2 = synch_2 + rhoinv*rhoinv * blen
-  !    synch_3 = synch_3 + abs(rhoinv**3) * blen
-  !    synch_4 = synch_4 + dispaverage*rhoinv*(rhoinv**2 + 2*sk1) * blen & 
-  !                      - rhoinv*rhoinv*(sdx*tan(e1) + sdx2*tan(e2))/2 
-  !    synch_5 = synch_5 + curlyhaverage * abs(rhoinv**3) * blen
-  ! endif
-
-
 
   call dzero(aux,6)
   call dzero(auxp,6)
@@ -2206,16 +2090,16 @@ SUBROUTINE twbttk(re,te)
   endif
 
   !---- Synchrotron integrals after element.
-  if(.not.centre_bttk) then
-     curlyh = disp(1)**2 * (one + alfx**2) / betx                    &
-          + two*disp(1)*disp(2)*alfx + disp(2)**2*betx
-     synch_1 = synch_1 + disp(1) * rhoinv * blen/two
-     synch_2 = synch_2 + rhoinv**2 * blen/two
-     synch_3 = synch_3 + abs(rhoinv**3) * blen/two
-     ! 2014-May-15  16:50:36  ghislain: added 
-     synch_4 = synch_4 + disp(1)*rhoinv*(rhoinv**2 + 2*sk1) * blen/two
-     synch_5 = synch_5 + curlyh * abs(rhoinv**3) * blen/two
-  endif
+  ! if(.not.centre_bttk) then
+  !    curlyh = disp(1)**2 * (one + alfx**2) / betx &
+  !         + two*disp(1)*disp(2)*alfx + disp(2)**2*betx
+  !    synch_1 = synch_1 + disp(1) * rhoinv * blen/two
+  !    synch_2 = synch_2 + rhoinv**2 * blen/two
+  !    synch_3 = synch_3 + abs(rhoinv**3) * blen/two
+  !    ! 2014-May-15  16:50:36  ghislain: added 
+  !    synch_4 = synch_4 + disp(1)*rhoinv*(rhoinv**2 + 2*sk1) * blen/two
+  !    synch_5 = synch_5 + curlyh * abs(rhoinv**3) * blen/two
+  ! endif
 
 end SUBROUTINE twbttk
 
@@ -7100,3 +6984,97 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   endif
 
 end SUBROUTINE tmrfmult
+
+
+SUBROUTINE calcsyncint(rrhoinv,rblen,rk1,re1,re2,rbetx,ralfx,rdx,rdpx,I)
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Calculate synchrotron radiation integrals contribution of        *
+  !     single element with parameters passed as input.                  *
+  !     Method is implemented from SLAC-Pub-1193 where integration is    * 
+  !     done explicitly and includes effects of  poleface rotations      *
+  !                                                                      *
+  !     Input:                                                           *
+  !     rrhoinv (double) inverse radius of curvature                     *
+  !     rblen (double) length of element                                 *
+  !     rk1 (double) gradient of element                                 *
+  !     re1, re2 (double) pole face rotations at entrance and exit       *
+  !     rbetx, ralfx, rdx, rdpx (double) twiss parameters in x plane     *
+  !                                                                      *
+  !     Output:                                                          *
+  !     I(5) (double) contributions of element to the 5 radiation integrals
+  !                                                                      *
+  !                                                                      *
+  ! internal calculation is done with complex numbers to cater for both  * 
+  ! focusing and defocusing cases.                                       *
+  !                                                                      *
+  !     Author: Ghislain Roy - June 2014                                 *
+  !----------------------------------------------------------------------*
+
+  double precision rrhoinv, rblen, rk1, re1, re2, rbetx, ralfx, rdx, rdpx
+  double precision I(5)
+
+  integer :: get_option
+
+  complex*16 :: k1, rhoinv, blen, e1, e2
+  complex*16 :: alfx, betx, gamx, dx, dpx, dx2
+  complex*16 :: k, kl, dispaverage, curlyhaverage
+
+  ! initialization by copy to complex numbers
+  k1 = cmplx(rk1)
+  e1 = cmplx(re1)
+  e2 = cmplx(re2)
+  rhoinv = cmplx(rrhoinv)
+  blen = cmplx(rblen)
+
+  alfx = cmplx(ralfx)
+  betx = cmplx(rbetx)
+  dx = cmplx(rdx)
+  dpx = cmplx(rdpx)
+    
+  ! effect of poleface rotation
+  alfx = alfx - betx*rhoinv*tan(e1) 
+  dpx = dpx + dx*rhoinv*tan(e1)
+
+  gamx = (1+alfx**2)/betx
+     
+  ! global gradient combining weak focusing and dipole gradient
+  k = sqrt(rhoinv*rhoinv + 2*k1) ! Could be imaginary
+  kl = k*blen
+
+  ! propagation of dispersion at exit
+  dx2 = dx*cos(kl) + dpx*sin(kl)/k + rhoinv*(1-cos(kl))/(k*k)
+       
+  dispaverage = dx * sin(kl)/kl & 
+             + dpx * (1 - cos(kl))/(k*kl) & 
+             + rhoinv * (kl - sin(kl))/(k*k*kl)
+          
+  curlyhaverage = gamx*dx**2 + 2*alfx*dx*dpx + betx*dpx*dpx & 
+                + 2*rhoinv*blen*( -(gamx*dx + alfx*dpx)*(kl-sin(kl))/(kl*kl*k) &
+                                 + (alfx*dx + betx*dpx)*(1-cos(kl))/(kl*kl)) & 
+                + blen*blen*rhoinv*rhoinv*( & 
+                       gamx*(3*kl - 4*sin(kl) + sin(kl)*cos(kl))/(2*k**2*kl**3) &
+                     - alfx*(1-cos(kl))**2/(k*kl**3) & 
+                     + betx*(kl-cos(kl)*sin(kl))/(2*kl**3))
+
+  I(1) = real(dispaverage) * rrhoinv * rblen
+  I(2) = rrhoinv*rrhoinv * rblen
+  I(3) = abs(rrhoinv**3) * rblen
+  I(4) = real(dispaverage)*rrhoinv*(rrhoinv**2 + 2*rk1) * rblen & 
+           - rrhoinv*rrhoinv*(rdx*tan(re1) + real(dx2)*tan(re2))
+  I(5) = real(curlyhaverage) * abs(rrhoinv**3) * rblen
+ 
+  if (get_option('debug ') .ne. 0) then
+     print *, ' '
+     print *, 'Input:  rhoinv = ', rrhoinv, 'k1 = ', rk1, 'e1 =', re1, 'e2 = ', re2, 'blen = ', rblen
+     print *, '  k = ', k, 'k*l = ', kl
+     print *, '  betx = ', rbetx, 'alfx = ', ralfx, 'gamx = ', real(gamx), & 
+          'dx = ', rdx, 'dpx = ', rdpx, 'dx2 = ', real(dx2)
+     print *, '  dispaverage = ', dispaverage, 'curlyhaverage = ', curlyhaverage  
+     print *, 'Contributions to Radiation Integrals:', I(1), I(2), I(3), I(4), I(5)
+     print *, ' '
+  endif
+
+  return
+END SUBROUTINE calcsyncint
