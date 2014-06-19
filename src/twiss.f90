@@ -7017,14 +7017,12 @@ SUBROUTINE calcsyncint(rrhoinv,rblen,rk1,re1,re2,rbetx,ralfx,rdx,rdpx,I)
 
   integer :: get_option
 
-  complex*16 :: k1, rhoinv, blen, e1, e2
+  complex*16 :: k1, rhoinv, blen
   complex*16 :: alfx, betx, gamx, dx, dpx, dx2
   complex*16 :: k, kl, dispaverage, curlyhaverage
 
   ! initialization by copy to complex numbers
   k1 = cmplx(rk1)
-  e1 = cmplx(re1)
-  e2 = cmplx(re2)
   rhoinv = cmplx(rrhoinv)
   blen = cmplx(rblen)
 
@@ -7034,8 +7032,8 @@ SUBROUTINE calcsyncint(rrhoinv,rblen,rk1,re1,re2,rbetx,ralfx,rdx,rdpx,I)
   dpx = cmplx(rdpx)
     
   ! effect of poleface rotation
-  alfx = alfx - betx*rhoinv*tan(e1) 
-  dpx = dpx + dx*rhoinv*tan(e1)
+  alfx = alfx - betx*rhoinv*tan(re1) 
+  dpx = dpx + dx*rhoinv*tan(re1)
 
   gamx = (1+alfx**2)/betx
      
