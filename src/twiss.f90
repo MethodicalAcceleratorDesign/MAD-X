@@ -4880,11 +4880,11 @@ SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
   st = sin(theta)
   re(1,1) = ct
   re(1,3) = st
-  re(3,1) = - st
+  re(3,1) = -st
   re(3,3) = ct
   re(2,2) = ct
   re(2,4) = st
-  re(4,2) = - st
+  re(4,2) = -st
   re(4,4) = ct
 
   !---- Track orbit.
@@ -4951,6 +4951,7 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
 
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+
   !---- centre option
   if(centre_cptk.or.centre_bttk) then
      call dcopy(orbit,orbit00,6)
@@ -5092,81 +5093,89 @@ SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   logical fsec,ftrk,fmap
   double precision orbit(6),orbit0(6),ek(6),re(6,6),te(6,6,6),      &
        rw(6,6),tw(6,6,6),el,rfv,rff,rfl,dl,omega,vrf,phirf,pc,deltap,c0, &
-       c1,c2,ek0(6),ten6p,clight,node_value,get_value,twopi,get_variable,&
-       zero,one,two,half,ten3m,bvk
+       c1,c2,ek0(6),ten6p,clight,pi,twopi,zero,one,two,half,ten3m,bvk
   double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
+  double precision, external :: get_variable,get_value,node_value
   integer, external :: el_par_vector
   integer elpar_vl
-  parameter(zero=0d0,one=1d0,two=2d0,half=5d-1,ten6p=1d6,           &
-       ten3m=1d-3)
+  parameter(zero=0d0,one=1d0,two=2d0,half=5d-1,ten6p=1d6,ten3m=1d-3)
 
   !---- Initialize.
   call dzero(ek0,6)
   call m66one(rw)
   call dzero(tw,216)
-  clight=get_variable('clight ')
-  twopi=get_variable('twopi ')
   !-- get element parameters
   elpar_vl = el_par_vector(r_freq, g_elpar)
 
   !---- BV flag
   bvk = node_value('other_bv ')
+
   !---- Fetch data.
-  rfv = bvk*g_elpar(r_volt)
-  rff = g_elpar(r_freq)
-  rfl = g_elpar(r_lag)
-  deltap = get_value('probe ','deltap ')
-  pc = get_value('probe ','pc ')
+  rfv = g_elpar(r_volt)
+
   !---- Cavity is excited, use full map.
   if (rfv .ne. zero) then
+    clight=get_variable('clight ')
+    pi=get_variable('pi ')
+    twopi=two*pi
 
-     !---- Set up.
-     omega = rff * ten6p * twopi / clight
-     vrf   = rfv * ten3m / (pc * (one + deltap))
-     phirf = rfl * twopi - omega * orbit(5)
-     c0 =   vrf * sin(phirf)
-     c1 = - vrf * cos(phirf) * omega
-     c2 = - vrf * sin(phirf) * omega**2 * half
-     !---- Transfer map.
-     fmap = .true.
-     if (ftrk) then
-        orbit(6) = orbit(6) + c0
-        ek(6) = c0
-        re(6,5) = c1
-        if (fsec) te(6,5,5) = c2
-     else
-        ek(6) = c0 - c1 * orbit(5) + c2 * orbit(5)**2
-        re(6,5) = c1 - two * c2 * orbit(5)
-        if (fsec) te(6,5,5) = c2
-     endif
+    rff = g_elpar(r_freq)
+    rfl = pi-g_elpar(r_lag)
+    deltap = get_value('probe ','deltap ')
+    pc = get_value('probe ','pc ')
 
-     !---- Sandwich cavity between two drifts.
-     if (el .ne. zero) then
-        dl = el / two
-        call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
-        call tmcat(fsec,re,te,rw,tw,re,te)
-        if(centre_cptk.or.centre_bttk) then
-           call dcopy(orbit,orbit00,6)
-           call dcopy(ek,ek00,6)
-           call dcopy(re,re00,36)
-           call dcopy(te,te00,216)
-           if(centre_cptk) then
-              call dcopy(orbit,orbit0,6)
-              call twcptk(re,orbit0)
-           endif
-           if(centre_bttk) call twbttk(re,te)
-           call dcopy(orbit00,orbit,6)
-           call dcopy(ek00,ek,6)
-           call dcopy(re00,re,36)
-           call dcopy(te00,te,216)
-        endif
-        call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
-        call tmcat(fsec,rw,tw,re,te,re,te)
-     endif
+    !-- LD: 20.6.2014 (bvk=-1: -V -> V, lag -> pi-lag)
+    if (bvk.eq.-1) then
+      rfl = pi-rfl
+    endif
 
-     !---- Cavity not excited, use drift map.
+    !---- Set up.
+    omega = rff * ten6p * twopi / clight
+    vrf   = rfv * ten3m / (pc * (one + deltap))
+    phirf = rfl * twopi - omega * orbit(5)
+    c0 =   vrf * sin(phirf)
+    c1 = - vrf * cos(phirf) * omega
+    c2 = - vrf * sin(phirf) * omega**2 * half
+    !---- Transfer map.
+    fmap = .true.
+    if (ftrk) then
+      orbit(6) = orbit(6) + c0
+      ek(6) = c0
+      re(6,5) = c1
+      if (fsec) te(6,5,5) = c2
+    else
+      ek(6) = c0 - c1 * orbit(5) + c2 * orbit(5)**2
+      re(6,5) = c1 - two * c2 * orbit(5)
+      if (fsec) te(6,5,5) = c2
+    endif
+
+    !---- Sandwich cavity between two drifts.
+    if (el .ne. zero) then
+      dl = el / two
+      call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
+      call tmcat(fsec,re,te,rw,tw,re,te)
+      if(centre_cptk.or.centre_bttk) then
+         call dcopy(orbit,orbit00,6)
+         call dcopy(ek,ek00,6)
+         call dcopy(re,re00,36)
+         call dcopy(te,te00,216)
+         if(centre_cptk) then
+            call dcopy(orbit,orbit0,6)
+            call twcptk(re,orbit0)
+         endif
+         if(centre_bttk) call twbttk(re,te)
+         call dcopy(orbit00,orbit,6)
+         call dcopy(ek00,ek,6)
+         call dcopy(re00,re,36)
+         call dcopy(te00,te,216)
+      endif
+      call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
+      call tmcat(fsec,rw,tw,re,te,re,te)
+    endif
+
+    !---- Cavity not excited, use drift map.
   else
-     call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
+    call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   endif
 
 end SUBROUTINE tmrf
@@ -6770,18 +6779,19 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   logical fsec,ftrk,fmap,dorad
   integer nord,iord,j,nn,ns,node_fd_errors
   double precision orbit(6),ek(6),re(6,6),te(6,6,6),elrad,beta,deltap,  &
-       field(2,0:maxmul),normal(0:maxmul),orbit0(6),    &
-       skew(0:maxmul),node_value,get_value,arad,gammas,rfac,bvk, &
+       field(2,0:maxmul),normal(0:maxmul),orbit0(6),                    &
+       skew(0:maxmul),arad,gammas,rfac,bvk,                             &
        zero,one,two,three, tilt, angle, cangle, sangle, dtmp
   double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
   double precision f_errors(0:maxferr)
   !double precisio vals(2,0:maxmul)
+  double precision, external :: node_value,get_value,get_variable
   integer n_ferr
   
   !--- AL: RF-multipole
   integer dummyi
   double precision pc, krf, vrf
-  double precision twopi, clight, ten3m, get_variable
+  double precision pi, twopi, clight, ten3m
   double precision x, y, z, dpx, dpy, dpt
   double precision freq, volt, lag, harmon
   double precision field_cos(2,0:maxmul)
@@ -6792,9 +6802,6 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   parameter ( zero=0d0, one=1d0, two=2d0, three=3d0, ten3m=1d-3)
   parameter ( ii=(0d0,1d0) )
 
-  twopi=get_variable('twopi ')  
-  clight=get_variable('clight ')
-
   !---- Zero the arrays
   call dzero(normal,maxmul+1)
   call dzero(skew,maxmul+1)
@@ -6804,6 +6811,10 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   call dzero(field,2*(maxmul+1))
   
   !---- Read-in the parameters
+  clight=get_variable('clight ')
+  pi=get_variable('pi ')
+  twopi=pi*two
+
   freq = node_value('freq ');
   volt = node_value('volt ');
   lag = node_value('lag ');
@@ -6827,8 +6838,13 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   fmap = .true.
   
   !---- Set-up some parameters
-  krf = twopi*freq*1d6/clight;
-  vrf = bvk*volt*ten3m/(pc*(one+deltap));
+  !-- LD: 20.6.2014 (bvk=-1: -V -> V, lag -> pi-lag)
+  if (bvk.eq.-1) then
+    lag = pi-lag
+  endif
+
+  krf = 2*pi*freq*1d6/clight;
+  vrf = volt*ten3m/(pc*(one+deltap));
   
   if (n_ferr.gt.0) then
      call dcopy(f_errors,field,n_ferr)
