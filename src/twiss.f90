@@ -5100,85 +5100,87 @@ SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   integer elpar_vl
   parameter(zero=0d0,one=1d0,two=2d0,half=5d-1,ten6p=1d6,ten3m=1d-3)
 
+  !-- get element parameters
+  elpar_vl = el_par_vector(r_freq, g_elpar)
+
+  !---- Fetch voltage.
+  rfv = g_elpar(r_volt)
+
+  !---- Cavity not excited, use drift map.
+  if (rfv .eq. zero) then
+    call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
+    return
+  endif
+
+  !---- Cavity is excited, use full map.
+
   !---- Initialize.
   call dzero(ek0,6)
   call m66one(rw)
   call dzero(tw,216)
-  !-- get element parameters
-  elpar_vl = el_par_vector(r_freq, g_elpar)
 
   !---- BV flag
+  clight=get_variable('clight ')
+  pi=get_variable('pi ')
+  twopi=two*pi
+
+  rff = g_elpar(r_freq)
+  rfl = g_elpar(r_lag)
   bvk = node_value('other_bv ')
+  deltap = get_value('probe ','deltap ')
+  pc = get_value('probe ','pc ')
 
-  !---- Fetch data.
-  rfv = g_elpar(r_volt)
-
-  !---- Cavity is excited, use full map.
-  if (rfv .ne. zero) then
-    clight=get_variable('clight ')
-    pi=get_variable('pi ')
-    twopi=two*pi
-
-    rff = g_elpar(r_freq)
-    rfl = pi-g_elpar(r_lag)
-    deltap = get_value('probe ','deltap ')
-    pc = get_value('probe ','pc ')
-
-    !-- LD: 20.6.2014 (bvk=-1: -V -> V, lag -> pi-lag)
-    if (bvk.eq.-1) then
-      rfl = pi-rfl
-    endif
-
-    !---- Set up.
-    omega = rff * ten6p * twopi / clight
-    vrf   = rfv * ten3m / (pc * (one + deltap))
-    phirf = rfl * twopi - omega * orbit(5)
-    c0 =   vrf * sin(phirf)
-    c1 = - vrf * cos(phirf) * omega
-    c2 = - vrf * sin(phirf) * omega**2 * half
-    !---- Transfer map.
-    fmap = .true.
-    if (ftrk) then
-      orbit(6) = orbit(6) + c0
-      ek(6) = c0
-      re(6,5) = c1
-      if (fsec) te(6,5,5) = c2
-    else
-      ek(6) = c0 - c1 * orbit(5) + c2 * orbit(5)**2
-      re(6,5) = c1 - two * c2 * orbit(5)
-      if (fsec) te(6,5,5) = c2
-    endif
-
-    !---- Sandwich cavity between two drifts.
-    if (el .ne. zero) then
-      dl = el / two
-      call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
-      call tmcat(fsec,re,te,rw,tw,re,te)
-      if(centre_cptk.or.centre_bttk) then
-         call dcopy(orbit,orbit00,6)
-         call dcopy(ek,ek00,6)
-         call dcopy(re,re00,36)
-         call dcopy(te,te00,216)
-         if(centre_cptk) then
-            call dcopy(orbit,orbit0,6)
-            call twcptk(re,orbit0)
-         endif
-         if(centre_bttk) call twbttk(re,te)
-         call dcopy(orbit00,orbit,6)
-         call dcopy(ek00,ek,6)
-         call dcopy(re00,re,36)
-         call dcopy(te00,te,216)
-      endif
-      call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
-      call tmcat(fsec,rw,tw,re,te,re,te)
-    endif
-
-    !---- Cavity not excited, use drift map.
-  else
-    call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
+  !-- LD: 20.6.2014 (bvk=-1: not -V -> V but lag -> pi-lag)
+  if (bvk .eq. -one) then
+    rfl = pi-rfl
   endif
 
+  !---- Set up.
+  omega = rff * ten6p * twopi / clight
+  vrf   = rfv * ten3m / (pc * (one + deltap))
+  phirf = rfl * twopi - omega * orbit(5)
+  c0 =   vrf * sin(phirf)
+  c1 = - vrf * cos(phirf) * omega
+  c2 = - vrf * sin(phirf) * omega**2 * half
+
+  !---- Transfer map.
+  fmap = .true.
+  if (ftrk) then
+    orbit(6) = orbit(6) + c0
+    ek(6) = c0
+    re(6,5) = c1
+    if (fsec) te(6,5,5) = c2
+  else
+    ek(6) = c0 - c1 * orbit(5) + c2 * orbit(5)**2
+    re(6,5) = c1 - two * c2 * orbit(5)
+    if (fsec) te(6,5,5) = c2
+  endif
+
+  !---- Sandwich cavity between two drifts.
+  if (el .ne. zero) then
+    dl = el / two
+    call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
+    call tmcat(fsec,re,te,rw,tw,re,te)
+    if(centre_cptk.or.centre_bttk) then
+      call dcopy(orbit,orbit00,6)
+      call dcopy(ek,ek00,6)
+      call dcopy(re,re00,36)
+      call dcopy(te,te00,216)
+      if(centre_cptk) then
+        call dcopy(orbit,orbit0,6)
+        call twcptk(re,orbit0)
+      endif
+      if(centre_bttk) call twbttk(re,te)
+      call dcopy(orbit00,orbit,6)
+      call dcopy(ek00,ek,6)
+      call dcopy(re00,re,36)
+      call dcopy(te00,te,216)
+    endif
+    call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
+    call tmcat(fsec,rw,tw,re,te,re,te)
+  endif
 end SUBROUTINE tmrf
+
 SUBROUTINE tmcat(fsec,rb,tb,ra,ta,rd,td)
 
   implicit none
@@ -6838,8 +6840,8 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   fmap = .true.
   
   !---- Set-up some parameters
-  !-- LD: 20.6.2014 (bvk=-1: -V -> V, lag -> pi-lag)
-  if (bvk.eq.-1) then
+  !-- LD: 20.6.2014 (bvk=-1: not -V -> V but lag -> pi-lag)
+  if (bvk .eq. -one) then
     lag = pi-lag
   endif
 
