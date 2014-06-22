@@ -3,7 +3,7 @@
   +    MAD-X 5.02.01  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2014.04.25      +
-  + Execution Time Stamp: 11.06.14 17.44.14 +
+  + Execution Time Stamp: 23.06.14 00.34.48 +
   +++++++++++++++++++++++++++++++++++++++++++
 title, 'test of rf-multipole';
 
@@ -16,7 +16,7 @@ enter Twiss module
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   1.000000E+00  1.000000E+00  0.000000E+00  0.000000E+00  1.000000E+00  0.000000E+00
-final orbit vector:     1.000000E+00  3.861154E+00  0.000000E+00 -2.932683E+00  1.000000E+00 -1.153751E-01
+final orbit vector:     1.000000E+00  3.861154E+00  0.000000E+00 -2.932683E+00  1.000000E+00 -7.759551E-02
 
 ++++++ table: summ
 
