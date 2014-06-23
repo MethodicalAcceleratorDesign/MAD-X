@@ -3,160 +3,49 @@
   +    MAD-X 5.02.01  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
   + Code Modification Date: 2014.04.25      +
-  + Execution Time Stamp: 11.06.14 12.32.09 +
+  + Execution Time Stamp: 23.06.14 16.47.25 +
   +++++++++++++++++++++++++++++++++++++++++++
 option, -debug, -echo;
 
-factor_val =       1.00000416667882 ;
-++++++ info: lstraight redefined
-lstraight =      9.999958333385417 ;
-lmb2 := lstraight ;
-enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
-  
-open line - error with deltap:   0.000000E+00
-initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-
-++++++ table: summ
-
-                length                 orbit5                   alfa                gammatr 
-                    30                     -0                      0                      0 
-
-                    q1                    dq1                betxmax                  dxmax 
-     0.244698061669453                      0      900.8037534315873     0.4499437528694692 
-
-                 dxrms                 xcomax                 xcorms                     q2 
-    0.2991284311302208                      0                      0     0.2446970825333285 
-
-                   dq2                betymax                  dymax                  dyrms 
-                     0      900.9323012818124   0.005199484819936078   0.003500027419528692 
-
-                ycomax                 ycorms                 deltap                synch_1 
-                     0                      0                      0                      0 
-
-               synch_2                synch_3                synch_4                synch_5 
-                     0                      0                      0                      0 
-++++++ warning: SAVE makes all previous USE invalid !  
 makethin: style chosen : teapot
 makethin: slicing sequence : myseq
-++++++ warning: SAVE makes all previous USE invalid !  
-mb1.edge_l not found
-;enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
-  
-open line - error with deltap:   0.000000E+00
-initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-
-++++++ table: summ
-
-                length                 orbit5                   alfa                gammatr 
-                    30                     -0                      0                      0 
-
-                    q1                    dq1                betxmax                  dxmax 
-    0.2446980616694529                      0      900.8037534315866     0.4499437528694692 
-
-                 dxrms                 xcomax                 xcorms                     q2 
-    0.2584603244420561                      0                      0     0.2446970825333285 
-
-                   dq2                betymax                  dymax                  dyrms 
-                     0      900.9323012818109   0.005199484819936072   0.003054786882665433 
-
-                ycomax                 ycorms                 deltap                synch_1 
-                     0                      0                      0                      0 
-
-               synch_2                synch_3                synch_4                synch_5 
-                     0                      0                      0                      0 
 enter TRACK module
 one pass is on
 update is on
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
 
 ++++++ table: tracksumm
 
-    number       turn                      x                     px 
-         1          0                  1e-06                      0 
-         2          0                  1e-06                      0 
-         3          0                  1e-06                      0 
-         1         50  3.967941211158177e-07  -7.08726603912319e-10 
-         2         50  3.967941211158177e-07  -7.08726603912319e-10 
-         3         50  3.967941211158177e-07  -7.08726603912319e-10 
+    number       turn                  x                 px 
+         1          0                  0                  0 
+         2          0                  0                  0 
+         3          0                  0                  0 
+         1          1   -0.0005050462538   -9.999831651e-05 
+         2          1                  0                  0 
+         3          1    0.0004950454204    9.999834984e-05 
 
-                     y                     py                      t                     pt 
-                 1e-06                      0                  -0.25                      0 
-                 1e-06                      0                     -1                      0 
-                 1e-06                      0                  -1.75                      0 
- 5.978186411466031e-07 -5.004949499471469e-10                  -0.25                      0 
- 5.978186411466031e-07 -5.004949499471469e-10                     -1                      0 
- 5.978186411466031e-07 -5.004949499471469e-10                  -1.75                      0 
+                 y                 py                  t                 pt 
+             1e-06                  0                  0              -0.01 
+             1e-06                  0                  0                  0 
+             1e-06                  0                  0               0.01 
+             1e-06                  0   -1.700472365e-08              -0.01 
+             1e-06                  0                  0                  0 
+             1e-06                  0   -1.633794451e-08               0.01 
 
-                     s                      e 
-                     0                      0 
-                     0                      0 
-                     0                      0 
-                    30                      0 
-                    30                      0 
-                    30                      0 
+                 s                  e 
+                 0                  0 
+                 0                  0 
+                 0                  0 
+                10                  0 
+                10                  0 
+                10                  0 
 
 *****  end of trrun  *****
 exit TRACK module
 
 
-  Number of warnings: 2
-2 in C and 0 in Fortran
+  Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
   + MAD-X 5.02.01 (64 bit) finished normally +
