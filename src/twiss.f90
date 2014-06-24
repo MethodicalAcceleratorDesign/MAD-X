@@ -5141,7 +5141,7 @@ SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   !-- LD: 20.6.2014 (bvk=-1: not -V -> V but lag -> pi-lag)
   if (bvk .eq. -one) then
-    rfl = pi-rfl
+    rfl = 0.5-rfl
   endif
 
   !---- Set up.
@@ -6851,7 +6851,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   !---- Set-up some parameters
   !-- LD: 20.6.2014 (bvk=-1: not -V -> V but lag -> pi-lag)
   if (bvk .eq. -one) then
-    lag = pi-lag
+    lag = 0.5-lag
   endif
 
   krf = 2*pi*freq*1d6/clight;
