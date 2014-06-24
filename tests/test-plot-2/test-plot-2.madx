@@ -48,7 +48,7 @@ plot, haxis=s, vaxis1=betx,bety, vaxis2=mux,muy, vaxis3=alfx,alfy, vaxis4=dx, co
 title, "non-s horizontal axis";
 plot, haxis=mux, vaxis=betx, colour=100;
 
-title, "should never appaear on plots";
+title, "should never appear on plots";
 
 plot, haxis=s, colour=100 ,title="large # of variables on vaxis", noversion,
       vaxis= s,betx,bety,alfx,alfy,mux,muy,dx,dpx;

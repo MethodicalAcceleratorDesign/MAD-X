@@ -2,8 +2,8 @@
 @ TYPE             %04s "SUMM"
 @ TITLE            %08s "no-title"
 @ ORIGIN           %23s "MAD-X 5.02.01 Darwin 64"
-@ DATE             %08s "19/06/14"
-@ TIME             %08s "17.21.12"
+@ DATE             %08s "24/06/14"
+@ TIME             %08s "18.24.59"
 *             LENGTH             ORBIT5               ALFA            GAMMATR                 Q1                DQ1            BETXMAX              DXMAX              DXRMS             XCOMAX             XCORMS                 Q2                DQ2            BETYMAX              DYMAX              DYRMS             YCOMAX             YCORMS             DELTAP            SYNCH_1            SYNCH_2            SYNCH_3            SYNCH_4            SYNCH_5 
 $                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
-        78.54370266                 -0       0.1241075638        2.838578276        1.820059621       -3.734960651        15.12421277         20.6041956        9.639962105                  0                  0         2.71982919       -7.573740342        20.07025727                  0                  0                  0                  0                  0        19.18957519        1.526297364       0.3728165258       0.9957744621        16.57357949
+        78.54370266                 -0       0.1241075638        2.838578276        1.820059621       -3.734960651        15.12421277         20.6041956        9.639962105                  0                  0         2.71982919       -7.573740341        20.07025727                  0                  0                  0                  0                  0        9.747887059        1.526297364       0.3728165258       0.5042000294        4.147872957

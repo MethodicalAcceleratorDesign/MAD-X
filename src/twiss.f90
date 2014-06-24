@@ -1274,6 +1274,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   i_spch=0
 
 10 continue
+
   sector_sel = node_value('sel_sector ') .ne. zero .and. sectormap
   code = node_value('mad8_type ')
   if(code.eq.39) code=15
@@ -1300,8 +1301,11 @@ SUBROUTINE twcpgo(rt,orbit0)
      centre_cptk = mycentre_cptk
      if (sectormap) call m66mpy(re,srmat,srmat)
   endif
+
   if(centre) centre_cptk=.true.
+
   call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te)
+
   if(centre) then
      pos0=currpos
      currpos=currpos+el/two
@@ -1314,11 +1318,14 @@ SUBROUTINE twcpgo(rt,orbit0)
      opt_fun(74)=alfa
      call twprep(save,1,opt_fun,currpos)
   endif
+
   centre_cptk=.false.
+
   if (fmap) then
      call twcptk(re,orbit)
      if (sectormap) call tmcat(.true.,re,te,srmat,stmat,srmat,stmat)
   endif
+
   if (n_align.ne.0)  then
      call dcopy(orbit,orbit2,6)
      call tmali2(el,orbit2,al_errors,betas,gammas,orbit,re)
@@ -1328,6 +1335,7 @@ SUBROUTINE twcpgo(rt,orbit0)
      centre_cptk = mycentre_cptk
      if (sectormap) call m66mpy(re,srmat,srmat)
   endif
+
   sumloc = sumloc + el
   if (sector_sel) call twwmap(sumloc, orbit)
   sd = rt(5,6)
@@ -1429,6 +1437,7 @@ SUBROUTINE twcpgo(rt,orbit0)
      opt_fun(31)=rmat(2,1)
      opt_fun(32)=rmat(2,2)
   endif
+
   if(advance_node().ne.0) goto 10
 
   !---- Compute summary.
@@ -7003,91 +7012,100 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
 
 end SUBROUTINE tmrfmult
 
-
-SUBROUTINE calcsyncint(rrhoinv,rblen,rk1,re1,re2,rbetx,ralfx,rdx,rdpx,I)
+SUBROUTINE calcsyncint(rhoinv,blen,k1,e1,e2,betxi,alfxi,dxi,dpxi,I)
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Calculate synchrotron radiation integrals contribution of        *
   !     single element with parameters passed as input.                  *
   !     Method is implemented from SLAC-Pub-1193 where integration is    * 
-  !     done explicitly and includes effects of  poleface rotations      *
+  !     done explicitly and includes effect of poleface rotations        *
   !                                                                      *
   !     Input:                                                           *
-  !     rrhoinv (double) inverse radius of curvature                     *
-  !     rblen (double) length of element                                 *
-  !     rk1 (double) gradient of element                                 *
-  !     re1, re2 (double) pole face rotations at entrance and exit       *
-  !     rbetx, ralfx, rdx, rdpx (double) twiss parameters in x plane     *
+  !     rhoinv (double) inverse radius of curvature                      *
+  !     blen (double) length of element                                  *
+  !     k1 (double) gradient of element                                  *
+  !     e1, e2 (double) pole face rotations at entrance and exit         *
+  !     betxi, alfxi, dxi, dpxi (double) twiss parameters in x plane     *
   !                                                                      *
   !     Output:                                                          *
-  !     I(5) (double) contributions of element to the 5 radiation integrals
+  !     I(5) (double) contributions of element to the 5 synchrotron      *
+  !          radiation integrals.                                        *
   !                                                                      *
   !                                                                      *
   ! internal calculation is done with complex numbers to cater for both  * 
-  ! focusing and defocusing cases.                                       *
+  ! globally focusing and defocusing cases.                              *
+  !                                                                      *
+  ! Note: relies on implicit type promotion between real and complex for *
+  !       k2.  dispaverage and curlyhaverage are explicitely converted   *
+  !       to doubles.                                                    *
+  !                                                                      *
   !                                                                      *
   !     Author: Ghislain Roy - June 2014                                 *
   !----------------------------------------------------------------------*
 
-  double precision rrhoinv, rblen, rk1, re1, re2, rbetx, ralfx, rdx, rdpx
-  double precision I(5)
+  double precision :: rhoinv, blen, k1, e1, e2, betxi, alfxi, dxi, dpxi
+  double precision :: I(5)
+
+  ! local variables
+  double precision :: beta, dx2, gamx, dispaverage, curlyhaverage
+  double precision :: betx, alfx, dx, dpx
+
+  complex*16 :: k2, k, kl
 
   integer :: get_option
+  double precision :: get_value
 
-  complex*16 :: k1, rhoinv, blen
-  complex*16 :: alfx, betx, gamx, dx, dpx, dx2
-  complex*16 :: k, kl, dispaverage, curlyhaverage
+  ! because of the choice of canonical variables in MAD-X, (PT instead of DELTAP)
+  ! the internal dispersion and dispersion derivatives must be multiplied by beta 
+  ! to match the functions quoted in litterature.
+  beta = get_value('probe ','beta ')
+ 
+  betx = betxi
+  dx = dxi*beta
 
-  ! initialization by copy to complex numbers
-  k1 = cmplx(rk1)
-  rhoinv = cmplx(rrhoinv)
-  blen = cmplx(rblen)
-
-  alfx = cmplx(ralfx)
-  betx = cmplx(rbetx)
-  dx = cmplx(rdx)
-  dpx = cmplx(rdpx)
-    
   ! effect of poleface rotation
-  alfx = alfx - betx*rhoinv*tan(re1) 
-  dpx = dpx + dx*rhoinv*tan(re1)
+  alfx = alfxi - betxi*rhoinv*tan(e1) 
+  dpx = (dpxi + dxi*rhoinv*tan(e1))*beta
 
   gamx = (1+alfx**2)/betx
      
   ! global gradient combining weak focusing and dipole gradient
-  k = sqrt(rhoinv*rhoinv + 2*k1) ! Could be imaginary
+  ! k2 can be positive or negative and k can be real or imaginary
+  k2 = rhoinv*rhoinv + 2*k1
+  k = sqrt(k2)
   kl = k*blen
 
   ! propagation of dispersion at exit
-  dx2 = dx*cos(kl) + dpx*sin(kl)/k + rhoinv*(1-cos(kl))/(k*k)
+  dx2 = real(dx*cos(kl) + dpx*sin(kl)/k + rhoinv*(1-cos(kl))/(k*k))
        
-  dispaverage = dx * sin(kl)/kl & 
+  dispaverage = real(dx * sin(kl)/kl & 
              + dpx * (1 - cos(kl))/(k*kl) & 
-             + rhoinv * (kl - sin(kl))/(k*k*kl)
+             + rhoinv * (kl - sin(kl))/(k2*kl))
           
-  curlyhaverage = gamx*dx**2 + 2*alfx*dx*dpx + betx*dpx*dpx & 
+  curlyhaverage = real( gamx*dx*dx + 2*alfx*dx*dpx + betx*dpx*dpx & 
                 + 2*rhoinv*blen*( -(gamx*dx + alfx*dpx)*(kl-sin(kl))/(kl*kl*k) &
                                  + (alfx*dx + betx*dpx)*(1-cos(kl))/(kl*kl)) & 
                 + blen*blen*rhoinv*rhoinv*( & 
-                       gamx*(3*kl - 4*sin(kl) + sin(kl)*cos(kl))/(2*k**2*kl**3) &
+                       gamx*(3*kl - 4*sin(kl) + sin(kl)*cos(kl))/(2*k2*kl**3) &
                      - alfx*(1-cos(kl))**2/(k*kl**3) & 
-                     + betx*(kl-cos(kl)*sin(kl))/(2*kl**3))
+                     + betx*(kl-cos(kl)*sin(kl))/(2*kl**3)))
 
-  I(1) = real(dispaverage) * rrhoinv * rblen
-  I(2) = rrhoinv*rrhoinv * rblen
-  I(3) = abs(rrhoinv**3) * rblen
-  I(4) = real(dispaverage)*rrhoinv*(rrhoinv**2 + 2*rk1) * rblen & 
-           - rrhoinv*rrhoinv*(rdx*tan(re1) + real(dx2)*tan(re2))
-  I(5) = real(curlyhaverage) * abs(rrhoinv**3) * rblen
+  I(1) = dispaverage * rhoinv * blen
+  I(2) = rhoinv*rhoinv * blen
+  I(3) = abs(rhoinv)**3 * blen
+  I(4) = dispaverage*rhoinv*(rhoinv**2 + 2*k1) * blen & 
+           - rhoinv*rhoinv*(dx*tan(e1) + dx2*tan(e2))
+  I(5) = curlyhaverage * abs(rhoinv)**3 * blen
  
   if (get_option('debug ') .ne. 0) then
      print *, ' '
-     print *, 'Input:  rhoinv = ', rrhoinv, 'k1 = ', rk1, 'e1 =', re1, 'e2 = ', re2, 'blen = ', rblen
-     print *, '  k = ', k, 'k*l = ', kl
-     print *, '  betx = ', rbetx, 'alfx = ', ralfx, 'gamx = ', real(gamx), & 
-          'dx = ', rdx, 'dpx = ', rdpx, 'dx2 = ', real(dx2)
-     print *, '  dispaverage = ', dispaverage, 'curlyhaverage = ', curlyhaverage  
+     print *, 'Input:  beta = ', beta, 'rhoinv = ', rhoinv, 'k1 = ', k1, 'e1 =', e1, 'e2 = ', e2, 'blen = ', blen
+     print *, '        betxi = ', betxi, 'alfxi = ', alfxi, 'dxi = ', dxi, 'dpxi = ', dpxi
+     print *, ' --> '
+     print *, '        k2 = ', k2, '  k = ', k, 'k*l = ', kl 
+     print *, '        alfx = ', alfx, 'dpx = ', dpx, 'gamx = ', gamx, 'dx2 = ', dx2
+     print *, '        dispaverage = ', dispaverage, 'curlyhaverage = ', curlyhaverage  
      print *, 'Contributions to Radiation Integrals:', I(1), I(2), I(3), I(4), I(5)
      print *, ' '
   endif
