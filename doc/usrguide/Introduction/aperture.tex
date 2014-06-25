@@ -2,76 +2,93 @@
 %  Changed by: Mark HAYES, 19-Sep-2002 
 %  Changed by: Ivar Waarum, 24-Feb-2005 
  
-\chapter{Defining aperture in MAD-X}
+\chapter{APERTURE}
 \label{chap:aperture}
 
-A new feature of MAD-X is the ability to set an aperture for a
-particular  element, or parent of a set of elements. This removes the
-need of placing a collimator next to every element to do aperture
-tracking.  The aperture of any elements can be specified (excepts
-drifts) by the use of the following parameters:  
+\section{Defining aperture}
+\label{sec:def_aper}
+The aperture for a particular element or class of elements can be set in MAD-X 
+at the time of definition or instantiation of the element or class.
 
-\begin{itemize}
-  \item APERTYPE: one of seven text values: 
-    \begin{enumerate} 
-      \item CIRCLE,
-      \item RECTANGLE, 
-      \item ELLIPSE, 
-      \item LHCSCREEN (a superposition of a CIRCLE and
-        a RECTANGLE), 
-      \item MARGUERITE (two LHCSCREENS, one rotated by 90
-        degrees),  
-      \item RECTELLIPSE (a superposition of an ELLIPSE and a
-        RECTANGLE) and 
-      \item RACETRACK.  
-    \end{enumerate}
-  \item APERTURE: an array of values, the number
-    and meaning of which depends on the APERTYPE:  
-\end{itemize}
+During tracking the particle excursion is then checked against the defined aperture and 
+the particle is lost if it is outside the defined aperture.
+
+The aperture can be specified for any element or class of elements, 
+with the exception of drift spaces. 
+
+The definition of the aperture takes the following form and parameters:\\
+{\tt ..., APERTYPE=string,  APERTURE=\{values\}}
+
+%% A new feature of MAD-X is the ability to set an aperture for a
+%% particular  element, or parent of a set of elements. This removes the
+%% need of placing a collimator next to every element to do aperture
+%% tracking.  The aperture of any elements can be specified (excepts
+%% drifts) by the use of the following parameters:  
+
+\begin{madlist}
+  \ttitem{APERTYPE} defines the aperture type from a set of seven
+  preselected types:
+    \begin{madlist}
+      \ttitem{CIRCLE}
+      \ttitem{RECTANGLE} 
+      \ttitem{ELLIPSE} 
+      \ttitem{LHCSCREEN} is a superposition of a CIRCLE and
+        a RECTANGLE 
+      \ttitem{MARGUERITE} is composed of two LHCSCREENS, one rotated by 90
+        degrees  
+      \ttitem{RECTELLIPSE} is a superposition of an ELLIPSE and a
+        RECTANGLE
+      \ttitem{RACETRACK} is a circle exploded in four with
+      quartercircles connected by straight lines.  
+    \end{madlist}
+    or from a provided file.
+  \ttitem{APERTURE} is an array of values, the number and meaning 
+of which depends on the APERTYPE.  
+\end{madlist}
 
 %http://en.wikibooks.org/wiki/LaTeX/Tables#Text_wrapping_in_tables
-\begin{tabular}{l | l | p{9cm}|}
+\begin{tabular}{|l | c | p{9cm}|}
 \hline 
-\textbf{APERTYPE} & \textbf{\# of parameters} & \textbf{meaning of
-  parameters} \\  
+\textbf{APERTYPE} & \textbf{\# of values} & \textbf{meaning of
+  values} \\  
 \hline
-CIRCLE & 1 &  radius \\ 
+CIRCLE & 1 &  radius of circle \\ 
 \hline
-ELLIPSE & 2 & horizontal half axis, vertical half axis \\  
+ELLIPSE & 2 & horizontal an vertical semi-axes of ellipse \\  
 \hline
-RECTANGLE & 2 & half width and half height \\ 
+RECTANGLE & 2 & half width and half height of rectangle\\ 
 \hline
-LHCSCREEN & 3 & half width, half height (of rect.) and radius (of circ.)
-\\  
+LHCSCREEN & 3 & half width and half height of rectangle, radius of circle\\  
 \hline
-MARGUERITE & 3 & half width, half height (of rect.) and radius (of
-circ.) \\  
+MARGUERITE & 3 & half width and half height of rectangle, radius of circle\\  
 \hline
-RECTELLIPSE & 4 & half width, half height (of rectangle), horizontal
-half axis, vertical half axis (of ellipse) \\  
+RECTELLIPSE & 4 & half width and half height of rectangle, horizontal
+and vertical semi-axes of ellipse \\  
 \hline
-RACETRACK & 3 & horizontal [1] and vertical [2] positions of the circle,
-radius [3] of the circle (see s, g, r in the figure below) \\  
+RACETRACK & 3 & horizontal and vertical offsets (g and s) of the circle center,
+radius (r) of the circular part (see figure below)\\  
 \hline
-FILENAME & 0 & where the file contains a list of x and y coordinates
+filename & 0 & where the file contains a list of x and y coordinates
 outlining the shape. This option is only supported by the aperture
 module, see below. \\  
 \hline
 \end{tabular}
 
-Here is an example for setting an ELLIPTICAL aperture for the main
-dipoles for the LHC.  
+{\bf Examples}\\
+The following sets an ELLIPTICAL aperture for the main
+dipoles for the LHC.
 \begin{verbatim}
-MB : SBEND, L := l.MB, APERTYPE=ELLIPSE, APERTURE={0.02202,0.02202};
+MB: SBEND, L=l.MB, APERTYPE=ELLIPSE, APERTURE={0.02202,0.02202};
 \end{verbatim} 
 
-And an example for setting a FILENAME aperture for another
-magnet. Notice that no aperture parameters are needed.  
+When the aperture is specified in a specific file the only aperture
+parameter is the filename: 
 \begin{verbatim}
-MB: SBEND, L := 5, APERTYPE=myfile;
+MB: SBEND, L=l.MB, APERTYPE=myfile;
 \end{verbatim} 
 
-The syntax of myfile should be like this: 
+where "myfile" contains the list of x-y coordinates defining the
+aperture shape:
 \begin{verbatim}
 x0   y0
 xi   yi
@@ -79,27 +96,27 @@ xi   yi
 xn   yn
 \end{verbatim}
 
-Notes concerning the use of aperture: 
+{\bf Notes}
 \begin{itemize}
-   \item There is some inconsistency in the parameter definition for the
-     different APERTYPE. This is historical and has to be kept for
+   \item There are inconsistencies in the parameter definition for the
+     different aperture types. This is historical and is kept for
      backwards compatibility. Pay some attention to the parameters you
      introduce! 
    \item When \href{../makethin/makethin.html}{MAKETHIN} is called all
-     the  thin slices inherit the aperture from their original thick
+     thin slices inherit the aperture of their respective original thick
      lens version.  
    \item When the SIXTRACK command is called (see the SixTrack converter
      module \href{../c6t/c6t.html}{C6T}) the apertures are ignored by
      default. To convert the apertures as well the APERTURE flag has to
-     be set.  
+     be set in C6T.  
    \item  Aperture parameters are like all parameters and are inherited
-     by offspring. Like other parameters they can also be overridden by
-     the offspring elements if necessary.  
+     by derived elements. Like other parameters they can also be overridden by
+     the derived elements if necessary.  
 \end{itemize}
 
 The APERTYPE and the APERTUREs themselves can be conveniently added to
 the TWISS table (see \href{../twiss/twiss.html}{Twiss Module}) by using
-the \href{select.html}{SELECT} command. E.G. the command:   
+the \href{select.html}{SELECT} command. For example the command:   
 \begin{verbatim}
 select, flag=twiss, clear;
 select, flag=twiss, column= name,s,betx,alfx,mux,bety,alfy,muy,
@@ -108,7 +125,7 @@ select, flag=twiss, column= name,s,betx,alfx,mux,bety,alfy,muy,
 and a subsequent TWISS command will put the aperture information
 together with the specified TWISS parameters into the TWISS table.   
 
-\section{Defining tolerances in MAD-X}
+\section{Defining aperture tolerances}
 A parameter closely connected to the aperture is the sum of the
 mechanical and alignment tolerances. The mechanical tolerance is the
 maximal error margin of errors in the element body which causes a
@@ -127,77 +144,86 @@ Syntax: APER_TOL = {r, g, s};
 MB : SBEND, L := l.MB, APER_TOL={1.5, 1.1, 0};
 \end{verbatim}
 
-\section{APERTURE MODULE}
-Computes the n1 values for a piece of machine. Each element is sliced
-into thick subelements at given intervals, and the available aperture is
-computed at the end of each slice. The computation is based on the last
-Twiss table, so it is important to run the
+\section{APERTURE command}
+{\bf The APERTURE module was developped specifically for the LHC.\\ 
+Default parameter values are LHC values and the physics 
+in APERTURE module assumes ultra-relativistic particles (v\(\approx\)c).} 
+
+The APERTURE module computes the n1 values for a piece of machine. 
+Each element is sliced into thick subelements at given intervals, and
+the available aperture is computed at the end of each slice. 
+The computation is based on the last Twiss table, so it is important to
+run the 
 \href{../twiss/twiss.html}{Twiss} and aperture commands on the same
 period or sequence, see the aperture example below. Also showed in the
 example is how n1 values can be \href{../plot/plot.html}{plotted}.   
-
-{\bf Warning: the aperture command makes the assumption of ultrarelativistic
-particles (v\(\approx\)c).}
 
 The minimum n1 for each element is written to the last Twiss table, to
 allow for \href{../match/match.html}{matching} by aperture.   
 	
 \begin{verbatim}
-Aperture,
-    range=range,
-    exn=real, eyn=real, dqf=real, dparx=real, dpary=real, 
-    betaqfx=real, bbeat=real, dp=real, 
-    cor=real,  nco=integer, 
-    halo={real,real,real,real}, halofile=filename,
-    interval=real, spec=real, notsimple=logical, trueprofile=filename,
-    offsetelem=filename, pipefile=filename, 
-    file=filename;  
+APERTURE, RANGE=range,
+          EXN=real, EYN=real, DQF=real, DPARX=real, DPARY=real, 
+          BETAQFX=real, BBEAT=real, DP=real, 
+          COR=real,  NCO=integer, 
+          HALO={real,real,real,real}, HALOFILE=filename,
+          INTERVAL=real, SPEC=real, NOTSIMPLE=logical, 
+          TRUEPROFILE=filename, OFFSETELEM=filename, 
+          FILE=filename;  
 \end{verbatim} 
 where the parameters have the following meaning: 
-\begin{itemize}
-   \item range: \href{../Introduction/ranges.html}{Range} given by
+\begin{madlist}
+   \ttitem{RANGE} \href{../Introduction/ranges.html}{Range} given by
      elements. Default = \#s/\#e  
-   \item exn: Normalised horizontal emittance. Default = 3.75*e-6  
-   \item eyn: Normalised vertical emittance. Default = 3.75*e-6 
-   \item dqf: Peak linear dispersion [m]. Default = 2.086 
-   \item dparx: Fractional horizontal parasitic dispersion. Default = 0.273 
-   \item dpary: Fractional vertical parasitic dispersion. Default = 0.273 
-   \item betaqfx: Beta x in standard qf [m]. Default = 170.25 
-   \item bbeat: Beta beating coefficient applying to beam size. Default = 1.1 
-   \item dp: Bucket edge at the current beam energy. Default = 0.0015 
-   \item cor: Maximum radial closed orbit uncertainty [m]. Default = 0.004 
-   \item nco: Number of azimuth for radial scan. Default = 5 
-   \item halo: Halo parameters: \{n, r, h, v\}. n is the radius of the
+   \ttitem{EXN} Normalised horizontal emittance. Default = 3.75*e-6  
+   \ttitem{EYN} Normalised vertical emittance. Default = 3.75*e-6 
+   \ttitem{DQF} Peak linear dispersion [m]. Default = 2.086 
+   \ttitem{DPARX} Fractional horizontal parasitic dispersion. Default = 0.273 
+   \ttitem{DPARY} Fractional vertical parasitic dispersion. Default = 0.273 
+   \ttitem{BETAQFX} Beta x in standard qf [m]. Default = 170.25 
+   \ttitem{BBEAT} Beta beating coefficient applying to beam size. Default = 1.1 
+   \ttitem{DP} Bucket edge at the current beam energy. Default = 0.0015 
+   \ttitem{COR} Maximum radial closed orbit uncertainty [m]. Default = 0.004 
+   \ttitem{NCO} Number of azimuth for radial scan. Default = 5 
+   \ttitem{HALO} Halo parameters: \{n, r, h, v\}. n is the radius of the
      primary halo,  r is the radial part of the secondary halo, h and v
      is the horizontal and  vertical cuts in the secondary halo. Default
      = \{6, 8.4, 7.3, 7.3\}  
-   \item halofile: Input file with halo polygon coordinates. Will
+   \ttitem{HALOFILE} Input file with halo polygon coordinates. Will
      suppress  an eventual halo parameter. Default = none  
-   \item interval: Approximate length in meters between
+   \ttitem{INTERVAL} Approximate length in meters between
      measurements. Actual value:  nslice = nodelength/interval, nslice
      is rounded down to closest integer,  interval =
      nodelength/nslice. Default = 1.0  
-   \item spec: Aperture spec, for plotting only. Gives the spec line in
+   \ttitem{SPEC} Aperture spec, for plotting only. Gives the spec line in
      the plot. Default = 0.0  
-   \item notsimple: Use only if one or more beamscreens in the range are
+   \ttitem{NOTSIMPLE} Use only if one or more beamscreens in the range are
      considered not to  be a "simply connex". Since all MAD-X apertypes
      are simply connex, this is only possible  if an input file with
      beam screen coordinates are given. See below for a graphical
      example. Default = false.  
-   \item trueprofile: A file containing a list of magnets, and for each
+   \ttitem{TRUEPROFILE} A file containing a list of magnets, and for each
      magnet a list of horizontal and vertical deviations from the ideal
      magnet axis. These values may come from measurements done on the
      magnet. See below for example. Default = none.  
-   \item offsetelem: A file containing a reference point in the machine,
+   \ttitem{OFFSETELEM} A file containing a reference point in the machine,
      and a list of magnets with their offsets from this point described
      as a parabola. See below for example. Default = none. \\
      {\bf Note that the reference point should be within the range of
        elements given for the offsets to be taken into account.}
-   \item file: Output file with aperture table. Default = none 
-\end{itemize}
+   \ttitem{FILE} Output file with aperture table. Default = none 
+\end{madlist}
 
 
-\subsection{Not simply connex beam pipes} 
+{\bf Important note regarding emittances:}\\
+The APERTURE module sets the actual emittances from the normalized values
+given as input using the definition\\
+{\tt ex = exn / gamma}\\
+while the BEAM command in MAD-X uses the definition\\
+{\tt ex = exn / (4 * beta * gamma)}
+
+
+\section{Not simply connex beam pipe profiles} 
 Methodically, the algorithm for finding the largest possible halo is
 fairly simple. The distance from halo centre to the first apex (i = 0)
 in the halo is calculated (l\_i), and the equation for a line going
@@ -239,7 +265,7 @@ notsimple option significantly increases computation time.
 %%\includegraphics{notsimple2.jpg align=center width=420}
 \\
 
-\subsection{Trueprofile file syntax}
+\section{Trueprofile file syntax}
 This file contains magnet names, and their associated displacements of
 the axis for  an arbitrary number of S, where So is the start of the
 magnet and Sn the end. The interval between each S must be regular, and
@@ -287,59 +313,99 @@ mq.22r1.b1
 !This is the end of the file.
 \end{verbatim}
 
-\subsection{Offsetelem file syntax}
-This file contains coordinates describing how certain elements are
-displaced w.r.t. a  given reference point in the machine. It might be
-used with elements in insertions, or other special-purpose elements that
-has a magnet axis which does not coincide with the reference
-trajectory. We operate with two coordinate system, s,x and s,y, where
-the reference point is the origin and the actual element axis is
-described as a parabola with coefficients A, B and C. For each element
-we give two sets of coefficients, one for horizontal displacement and
-one for vertical:  
+\section{OFFSETELEM file syntax}
+This file contains parameters describing how certain elements are
+actually located in space with respect to a given reference element in
+the machine.  
+
+The basis for this file is a pair of coordinate systems, \{s,x\} and \{s,y\} 
+with the origin at the reference point. The units for s, x and y are
+meters.
+
+The actual location of the magnetic axis of a given element can be
+described, in each plane, as a parabola defined with three coefficients: 
 \begin{verbatim}
-X_offs(s) = Ax*s^2 + Bx*s + Cx 
+X_act(s) = DDX_OFF * s^2  +  DX_OFF * s  +  X_OFF
+Y_act(s) = DDY_OFF * s^2  +  DY_OFF * s  +  Y_OFF
+\end{verbatim} 
+
+The reference position for the element, X\_ref(s) and Y\_ref(s), is calculated 
+by MAD-X via an internal call to the \href{../survey/survey.html}{SURVEY}
+module, taking the reference element as the origin. 
+
+The resulting offset, in each plane, which is taken into account in the aperture calculation, 
+is the difference between reference position and actual position: 
+\begin{verbatim}
+X_offset(s) = X_ref(s) - X_act(s) 
+Y_offset(s) = Y_ref(s) - Y_act(s)
+\end{verbatim} 
+
+The offsets are only calculated for elements for which actual positions 
+have been given through the OFFSETELEM file mechanism. 
+
+The file must be given in TFS format according to the following template, 
+with mandatory header and any number of data lines, one per element. 
+
+\begin{verbatim}
+@ NAME             %06s "OFFSET" 
+@ TYPE             %06s "OFFSET" 
+@ REFERENCE        %10s "reference-element-name" 
+* NAME          S_IP       X_OFF     DX_OFF    DDX_OFF    Y_OFF    DY_OFF     DDY_OFF
+$ %s            %le        %le       %le       %le        %le      %le        %le
+"elementname"	real       real      real      real       real     real       real
 \end{verbatim}
-and 
+
+Note that the column S\_IP is actually not used, and the values are ignored, 
+but the column and values are parsed nevertheless and must be present. 
+The absence of this column will trigger an error. 
+
+{\bf Example:}
 \begin{verbatim}
-Y_offs(s) = Ay*s^2 + By*s + Cy
-\end{verbatim}.
-The coordinate systems are in meters. 
-
-{\bf Layout of file: --- FOR MADX VERSION 3.XX AND OLDER ONLY--- }
-\begin{verbatim}
-reference.point
-
-magnet.name1
-Ax   Bx   Cx
-Ay   By   Cy
-
-magnet.name2
-Ax   Bx   Cx
-Ay   By   Cy
-
-etc.
+@ NAME             %06s "OFFSET" 
+@ TYPE             %06s "OFFSET" 
+@ REFERENCE        %10s "mq.12r1.b1" 
+* NAME          S_IP       X_OFF     DX_OFF    DDX_OFF    Y_OFF    DY_OFF     DDY_OFF
+$ %s            %le        %le       %le       %le        %le      %le        %le
+"mq.12r1.b1"	0.0        -3.0      -2.56545   0.0       0.0      -2.3443666 0.0
+"mcbxa.3r2"     0.0        -0.84     32.443355  0.3323    0.0      32.554363  0.2522
 \end{verbatim}
 
-{\bf Example of file:}
+%A python script to convert a file from the old V.3.XX format to the new V4.xx can be found at :
+%/afs/cern.ch/eng/lhc/optics/V6.503/aperture/convert_offsets.py
+%usage : convert_offsets.py filename
+
+As an example we see in the picture below how the horizontal axes of elements m1 and m2 
+does not coincide with the reference trajectory.
+\\
+\includegraphics[width=450px]{Introduction/offsetelem.jpg}
+%%\includegraphics{offsetelem.jpg align=center width=780}
+\\ 
+
+Note that prior to MAD-X version 4, the layout of the file was different and not formatted as TFS file:
+
 \begin{verbatim}
-!This is the start of the file.
-!First we give a reference point. The origin of the 
-!coordinate system will be at the START of this element.
+reference-element-name
+
+elementname
+DDX_OFF   DX_OFF   X_OFF
+DDY_OFF   DY_OFF   Y_OFF
+\end{verbatim} 
+
+{\bf Example:} 
+\begin{verbatim}
+!comment can be given anywhere with an exclamation mark
 
 mq.12r1.b1
 
 !Then we give a list of elements and their displacement 
 !w.r.t. the reference point.
-
 mcbxa.3l2
 0   -2.56545   -3
 0   -2.3443666  0
 
-!The next nodes use the same reference point.
+!The next element use the same reference point.
 !Elements offset w.r.t. another point must be given in another file,
 !together with the new reference point.
-
 mcbxa.3r2
 0.3323  32.443355 -0.84
 0.2522  32.554363 0.0
@@ -347,48 +413,107 @@ mcbxa.3r2
 !This is the end of the file.
 \end{verbatim}
 
-{\bf Layout of file: --- FOR MADX VERSION 4.XX ONWARDS : now TFS format --- }\\ 
-note that variable names changes with : Ax -\textgreater DDX\_OFF,   Bx
--\textgreater DX\_OFF,  Cx -\textgreater X\_OFF, same for Y The column
-S\_IP is useless but mandatory (!). It results from a
-misunderstanding. Content is ignored. In a future version, it will be
-suppressed (but will not induce an error if present).  
 
-% I aligned below lines by hand, do not touch them
-\begin{verbatim}
-@ NAME             %06s "OFFSET" 
-@ TYPE             %06s "OFFSET" 
-@ REFERENCE        %10s "mq.12r1.b1" 
-* NAME         S_IP   X_OFF  DX_OFF     DDX_OFF   Y_OFF  DY_OFF      DDY_OFF
-"mq.12r1.b1"   0.0   -3.0    -2.56545   0.0       0.0    -2.3443666  0.0
-"mcbxa.3r2"    0.0   -0.84   32.443355  0.3323    0.0    32.554363   0.2522
+%% This file contains coordinates describing how certain elements are
+%% displaced w.r.t. a  given reference point in the machine. It might be
+%% used with elements in insertions, or other special-purpose elements that
+%% has a magnet axis which does not coincide with the reference
+%% trajectory. We operate with two coordinate system, s,x and s,y, where
+%% the reference point is the origin and the actual element axis is
+%% described as a parabola with coefficients A, B and C. For each element
+%% we give two sets of coefficients, one for horizontal displacement and
+%% one for vertical:  
+%% \begin{verbatim}
+%% X_offs(s) = Ax*s^2 + Bx*s + Cx 
+%% \end{verbatim}
+%% and 
+%% \begin{verbatim}
+%% Y_offs(s) = Ay*s^2 + By*s + Cy
+%% \end{verbatim}.
+%% The coordinate systems are in meters. 
 
-A python script to convert a file from the old V.3.XX 
-format to the new V4.xx can be found at :
+%% {\bf Layout of file: --- FOR MADX VERSION 3.XX AND OLDER ONLY--- }
+%% \begin{verbatim}
+%% reference.point
 
-/afs/cern.ch/eng/lhc/optics/V6.503/aperture/convert_offsets.py
+%% magnet.name1
+%% Ax   Bx   Cx
+%% Ay   By   Cy
 
-usage : convert_offsets.py filename
-\end{verbatim}
+%% magnet.name2
+%% Ax   Bx   Cx
+%% Ay   By   Cy
 
-As an example we see in the picture below how the horizontal axes of
-elements m1 and m2 does not coincide with the reference trajectory.  
-\\
-\includegraphics[width=450px]{Introduction/offsetelem.jpg}
-%%\includegraphics{offsetelem.jpg align=center width=780}
-\\ 
-The X\_ref(s) and Y\_ref(s) of the reference trajectory are
-calculated via an internal call to the
-\href{../survey/survey.html}{Survey} module. X\_offs(s) and Y\_offs(s)
-are derived from the coefficients given in the file. The resulting  
-\begin{verbatim}
-X_tot(s) = X_ref(s) - X_offs(s)
-\end{verbatim} 
-and 
-\begin{verbatim}
-Y_tot(s) = Y_ref(s) - Y_offs(s)
-\end{verbatim} 
-are taken into account in the aperture calculations.  
+%% etc.
+%% \end{verbatim}
+
+%% {\bf Example of file:}
+%% \begin{verbatim}
+%% !This is the start of the file.
+%% !First we give a reference point. The origin of the 
+%% !coordinate system will be at the START of this element.
+
+%% mq.12r1.b1
+
+%% !Then we give a list of elements and their displacement 
+%% !w.r.t. the reference point.
+
+%% mcbxa.3l2
+%% 0   -2.56545   -3
+%% 0   -2.3443666  0
+
+%% !The next nodes use the same reference point.
+%% !Elements offset w.r.t. another point must be given in another file,
+%% !together with the new reference point.
+
+%% mcbxa.3r2
+%% 0.3323  32.443355 -0.84
+%% 0.2522  32.554363 0.0
+
+%% !This is the end of the file.
+%% \end{verbatim}
+
+%% {\bf Layout of file: --- FOR MADX VERSION 4.XX ONWARDS : now TFS format --- }\\ 
+%% note that variable names changes with : Ax -\textgreater DDX\_OFF,   Bx
+%% -\textgreater DX\_OFF,  Cx -\textgreater X\_OFF, same for Y The column
+%% S\_IP is useless but mandatory (!). It results from a
+%% misunderstanding. Content is ignored. In a future version, it will be
+%% suppressed (but will not induce an error if present).  
+
+%% % I aligned below lines by hand, do not touch them
+%% \begin{verbatim}
+%% @ NAME             %06s "OFFSET" 
+%% @ TYPE             %06s "OFFSET" 
+%% @ REFERENCE        %10s "mq.12r1.b1" 
+%% * NAME         S_IP   X_OFF  DX_OFF     DDX_OFF   Y_OFF  DY_OFF      DDY_OFF
+%% $ %s    %le    %le    %le    %le        %le       %le    %le'
+%% "mq.12r1.b1"   0.0   -3.0    -2.56545   0.0       0.0    -2.3443666  0.0
+%% "mcbxa.3r2"    0.0   -0.84   32.443355  0.3323    0.0    32.554363   0.2522
+%% \end{verbatim}
+
+%% %% A python script to convert a file from the old V.3.XX 
+%% %% format to the new V4.xx can be found at :
+%% %% /afs/cern.ch/eng/lhc/optics/V6.503/aperture/convert_offsets.py
+%% %% usage : convert_offsets.py filename
+
+%% As an example we see in the picture below how the horizontal axes of
+%% elements m1 and m2 does not coincide with the reference trajectory.  
+%% \\
+%% \includegraphics[width=450px]{Introduction/offsetelem.jpg}
+%% %%\includegraphics{offsetelem.jpg align=center width=780}
+%% \\ 
+%% The X\_ref(s) and Y\_ref(s) of the reference trajectory are
+%% calculated via an internal call to the
+%% \href{../survey/survey.html}{Survey} module. X\_offs(s) and Y\_offs(s)
+%% are derived from the coefficients given in the file. The resulting  
+%% \begin{verbatim}
+%% X_tot(s) = X_ref(s) - X_offs(s)
+%% \end{verbatim} 
+%% and 
+%% \begin{verbatim}
+%% Y_tot(s) = Y_ref(s) - Y_offs(s)
+%% \end{verbatim} 
+%% are taken into account in the aperture calculations.  
 
 
 \section{Aperture command example}
