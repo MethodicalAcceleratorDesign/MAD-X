@@ -1218,8 +1218,7 @@ store_savebeta(struct in_cmd* cmd)
   int pos;
   char* name = NULL;
 //  struct command* comm; // not used
-  if (log_val("clear", cmd->clone))
-  {
+  if (log_val("clear", cmd->clone)) {
     delete_command_list(savebeta_list);
     savebeta_list = new_command_list("savebeta_list", 10);
     delete_command_list(beta0_list);
