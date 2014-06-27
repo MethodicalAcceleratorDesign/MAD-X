@@ -3667,6 +3667,36 @@ subroutine trbegn(rt,eigen)
      endif
   endif
 end subroutine trbegn
+subroutine ttdpdg_map(track, ktrack, e1, h, hgap, fint, tilt)
+
+  implicit none
+
+  !----------------------------------------------------------------------*
+  ! Purpose: computes the effect of the dipole edge                      *
+  ! Input/Output:  ktrack , number of surviving trajectories             *
+  !                 track , trajectory coordinates                       *
+  !----------------------------------------------------------------------*
+  integer ktrack,itrack
+  double precision fint,e1,h,hgap,corr,tilt,ek(6),rw(6,6),tw(6,6,6),track(6,*),&
+       node_value
+
+  call dzero(ek,6)
+  call m66one(rw)
+  call dzero(tw, 216)
+
+  corr = (h + h) * hgap * fint
+  !          print*,"------------------------------------------ "
+  !---- Fringe fields effects computed from the TWISS routine tmfrng
+  !     tmfrng returns the matrix elements rw(used) and tw(unused)
+  !     No radiation effects as it is a pure thin lens with no lrad
+  call tmfrng(.false.,h,0d0,e1,0d0,0d0,corr,rw,tw)
+  call tmtilt(.false.,tilt,ek,rw,tw)
+  do itrack = 1, ktrack
+     track(2,itrack) = track(2,itrack) + rw(2,1)*track(1,itrack)
+     track(4,itrack) = track(4,itrack) + rw(4,3)*track(3,itrack)
+  enddo
+  return
+end subroutine ttdpdg_map
 subroutine ttdpdg(track, ktrack)
 
   implicit none
@@ -3689,56 +3719,10 @@ subroutine ttdpdg(track, ktrack)
   hgap = node_value('hgap ')
   fint = node_value('fint ')
   tilt = node_value('tilt ')
-  corr = (h + h) * hgap * fint
-  !          print*,"------------------------------------------ "
-  !---- Fringe fields effects computed from the TWISS routine tmfrng
-  !     tmfrng returns the matrix elements rw(used) and tw(unused)
-  !     No radiation effects as it is a pure thin lens with no lrad
-  call tmfrng(.false.,h,0d0,e1,0d0,0d0,corr,rw,tw)
-  call tmtilt(.false.,tilt,ek,rw,tw)
-  do itrack = 1, ktrack
-     track(2,itrack) = track(2,itrack) + rw(2,1)*track(1,itrack)
-     track(4,itrack) = track(4,itrack) + rw(4,3)*track(3,itrack)
-  enddo
-  return
+
+  call ttdpdg_map(track, ktrack, e1, h, hgap, fint, tilt);
+
 end subroutine ttdpdg
-subroutine ttdpdg_exit(track, ktrack)
-
-  implicit none
-
-  !----------------------------------------------------------------------*
-  ! Purpose: computes the effect of the dipole edge at exit              *
-  !          this is used only when tracking through a thick-dipole      *
-  !          without using MAKETHIN                                      *
-  ! Input/Output:  ktrack , number of surviving trajectories             *
-  !                 track , trajectory coordinates                       *
-  !----------------------------------------------------------------------*
-  integer ktrack,itrack
-  double precision fint,e2,h,hgap,corr,tilt,ek(6),rw(6,6),tw(6,6,6),track(6,*),&
-       node_value
-
-  call dzero(ek,6)
-  call m66one(rw)
-  call dzero(tw, 216)
-
-  e2 = node_value('e2 ')
-  h = node_value('h ')
-  hgap = node_value('hgap ')
-  fint = node_value('fint ')
-  tilt = node_value('tilt ')
-  corr = (h + h) * hgap * fint
-  !          print*,"------------------------------------------ "
-  !---- Fringe fields effects computed from the TWISS routine tmfrng
-  !     tmfrng returns the matrix elements rw(used) and tw(unused)
-  !     No radiation effects as it is a pure thin lens with no lrad
-  call tmfrng(.false.,h,0d0,e2,0d0,0d0,corr,rw,tw)
-  call tmtilt(.false.,tilt,ek,rw,tw)
-  do itrack = 1, ktrack
-     track(2,itrack) = track(2,itrack) + rw(2,1)*track(1,itrack)
-     track(4,itrack) = track(4,itrack) + rw(4,3)*track(3,itrack)
-  enddo
-  return
-end subroutine ttdpdg_exit
 subroutine trsol(track,ktrack)
 
   implicit none
@@ -5162,14 +5146,19 @@ subroutine tttdipole(track, ktrack)
 
   !---- Read-in dipole edges angles
 
-  double precision e1, e2
+  double precision e1, e2, h1, h2, hgap, fint, tilt
   e1 = node_value('e1 ');
   e2 = node_value('e2 ');
+  h1 = node_value('h2 ')
+  h1 = node_value('h2 ')
+  hgap = node_value('hgap ')
+  fint = node_value('fint ')
+  tilt = node_value('tilt ')
 
   !---- Apply entrance dipole edge effect
 
   if (e1.ne.0d0) then
-     call ttdpdg(track,ktrack)
+     call ttdpdg_map(track, ktrack, e1, h1, hgap, fint, tilt)
   endif
   
   !---- Read-in the parameters
@@ -5253,7 +5242,7 @@ subroutine tttdipole(track, ktrack)
   !---- Apply exit dipole edge effect
 
   if (e2.ne.0d0) then
-     call ttdpdg_exit(track,ktrack)
+     call ttdpdg_map(track, ktrack, e2, h2, hgap, fint, tilt)
   endif
      
   enddo
