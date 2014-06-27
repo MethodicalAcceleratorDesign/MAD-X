@@ -3702,7 +3702,43 @@ subroutine ttdpdg(track, ktrack)
   enddo
   return
 end subroutine ttdpdg
+subroutine ttdpdg_exit(track, ktrack)
 
+  implicit none
+
+  !----------------------------------------------------------------------*
+  ! Purpose: computes the effect of the dipole edge at exit              *
+  !          this is used only when tracking through a thick-dipole      *
+  !          without using MAKETHIN                                      *
+  ! Input/Output:  ktrack , number of surviving trajectories             *
+  !                 track , trajectory coordinates                       *
+  !----------------------------------------------------------------------*
+  integer ktrack,itrack
+  double precision fint,e2,h,hgap,corr,tilt,ek(6),rw(6,6),tw(6,6,6),track(6,*),&
+       node_value
+
+  call dzero(ek,6)
+  call m66one(rw)
+  call dzero(tw, 216)
+
+  e2 = node_value('e2 ')
+  h = node_value('h ')
+  hgap = node_value('hgap ')
+  fint = node_value('fint ')
+  tilt = node_value('tilt ')
+  corr = (h + h) * hgap * fint
+  !          print*,"------------------------------------------ "
+  !---- Fringe fields effects computed from the TWISS routine tmfrng
+  !     tmfrng returns the matrix elements rw(used) and tw(unused)
+  !     No radiation effects as it is a pure thin lens with no lrad
+  call tmfrng(.false.,h,0d0,e2,0d0,0d0,corr,rw,tw)
+  call tmtilt(.false.,tilt,ek,rw,tw)
+  do itrack = 1, ktrack
+     track(2,itrack) = track(2,itrack) + rw(2,1)*track(1,itrack)
+     track(4,itrack) = track(4,itrack) + rw(4,3)*track(3,itrack)
+  enddo
+  return
+end subroutine ttdpdg_exit
 subroutine trsol(track,ktrack)
 
   implicit none
@@ -5123,6 +5159,18 @@ subroutine tttdipole(track, ktrack)
   double precision C, S, C_sqr
   double precision bet0sqr
   integer jtrk
+
+  !---- Read-in dipole edges angles
+
+  double precision e1, e2
+  e1 = node_value('e1 ');
+  e2 = node_value('e2 ');
+
+  !---- Apply entrance dipole edge effect
+
+  if (e1.ne.0d0) then
+     call ttdpdg(track,ktrack)
+  endif
   
   !---- Read-in the parameters
   bet0sqr = bet0*bet0;
@@ -5201,6 +5249,12 @@ subroutine tttdipole(track, ktrack)
 !!$      track(4,jtrk) = track(4,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(4,jtrk)
 !!$      track(6,jtrk) = track(6,jtrk) - rfac * (1d0 + track(6,jtrk)) ** 2
 !!$    endif
+
+  !---- Apply exit dipole edge effect
+
+  if (e2.ne.0d0) then
+     call ttdpdg_exit(track,ktrack)
+  endif
      
   enddo
   
