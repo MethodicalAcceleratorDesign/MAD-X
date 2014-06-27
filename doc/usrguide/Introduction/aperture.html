@@ -27,10 +27,11 @@ The definition of the aperture takes the following form and parameters:
 <LI><TT> ..., APERTYPE=string,  APERTURE={values}</TT><p>
 <LI><TT>APERTYPE</TT> defines the aperture type from a set of seven preselected types: <p>
 CIRCLE, RECTANGLE, ELLIPSE, <br>
-LHCSCREEN (a superposition of a CIRCLE and a RECTANGLE), <br>
-MARGUERITE (two LHCSCREENS crossing at right angle), <br>
-RECTELLIPSE (a superposition of an ELLIPSE and a RECTANGLE) <br>
-and RACETRACK.
+RECTCIRCLE, a superposition of an CIRCLE and a RECTANGLE, <br>
+LHCSCREEN, an alias for RECTCIRCLE,
+RECTELLIPSE, a superposition of an ELLIPSE and a RECTANGLE, <br>
+and RACETRACK.<br>
+Note that the MARGUERITE aperture type (two RECTCIRCLEs crossing at right angle) is no longer supported. <br>
 <p>
 <LI><TT>APERTURE</TT> is an array of values, the number and meaning 
 of which depends on the APERTYPE:<p>
@@ -39,8 +40,8 @@ of which depends on the APERTYPE:<p>
 <TR><TD>CIRCLE</TD>     <TD>1</TD> <TD>radius of circle</TD></TR>
 <TR><TD>ELLIPSE</TD>    <TD>2</TD> <TD>horizontal and vertical semi-axes of ellipse</TD></TR>
 <TR><TD>RECTANGLE</TD>  <TD>2</TD> <TD>half width and half height of rectangle</TD></TR>
+<TR><TD>RECTCIRCLE</TD> <TD>3</TD> <TD>half width and half height of rectangle, radius of circle</TD></TR>
 <TR><TD>LHCSCREEN</TD>  <TD>3</TD> <TD>half width and half height of rectangle, radius of circle</TD></TR>
-<TR><TD>MARGUERITE</TD> <TD>3</TD> <TD>half width and half height of rectangle, radius of circle</TD></TR>
 <TR><TD>RECTELLIPSE</TD><TD>4</TD> <TD>half width and half height of rectangle, horizontal and vertical semi-axes of ellipse</TD></TR>
 <TR><TD>RACETRACK</TD>  <TD>3</TD> <TD>horizontal and vertical offsets (g and s) of the circle center, radius (r) of the circular part (see figure below)</TD></TR>
 <TR><TD>filename</TD>   <TD>0</TD> <TD>where the file contains a list of x and y coordinates outlining the shape. This option is only supported by the aperture module, see below.</TD></TR>

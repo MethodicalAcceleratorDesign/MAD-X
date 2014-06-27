@@ -32,19 +32,20 @@ The definition of the aperture takes the following form and parameters:\\
       \ttitem{CIRCLE}
       \ttitem{RECTANGLE} 
       \ttitem{ELLIPSE} 
-      \ttitem{LHCSCREEN} is a superposition of a CIRCLE and
+      \ttitem{RECTCIRCLE}, a superposition of a CIRCLE and
         a RECTANGLE 
-      \ttitem{MARGUERITE} is composed of two LHCSCREENS, one rotated by 90
-        degrees  
-      \ttitem{RECTELLIPSE} is a superposition of an ELLIPSE and a
+      \ttitem{LHCSCREEN}, an alias for RECTCIRCLE
+      \ttitem{RECTELLIPSE}, a superposition of an ELLIPSE and a
         RECTANGLE
-      \ttitem{RACETRACK} is a circle exploded in four with
+      \ttitem{RACETRACK}, a circle exploded in four with
       quartercircles connected by straight lines.  
     \end{madlist}
     or from a provided file.
   \ttitem{APERTURE} is an array of values, the number and meaning 
 of which depends on the APERTYPE.  
 \end{madlist}
+Note that the {\tt MARGUERITE} aperture type (two RECTCIRCLEs crossing
+at right angle) is no longer supported. 
 
 %http://en.wikibooks.org/wiki/LaTeX/Tables#Text_wrapping_in_tables
 \begin{tabular}{|l | c | p{9cm}|}

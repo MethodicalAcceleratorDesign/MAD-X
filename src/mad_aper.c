@@ -569,10 +569,12 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
     *ap2=get_aperture(current_node, "var2"); /*half height rect*/
     *ap3=get_aperture(current_node, "var3"); /*radius circle*/
     
-    // no check for radius at this point, a zero radius should be allowed. 
-    *ap4 = *ap3;
+    *ap4 = *ap3; // curved part is a circle
 
-    if ( (*ap1) <= 0 || (*ap2) <= 0 ) { 
+    // 2014-Jun-27  11:14:27  ghislain: 
+    // change check from ap1 or ap2<=0  to ap1 or ap2 or ap3 < 0
+    // zero horizontal or vertical explosion factors, and zero radius should be allowed.
+    if ( (*ap1) < 0 || (*ap2) < 0 || (*ap3) < 0 ) { 
       if (debug) 
 	printf("+++ aper_build screen, racetrack parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
       return 0;
