@@ -1,0 +1,43 @@
+option, -debug, -echo;
+
+title, "thick-dipole tracking test";
+
+lmb := 10.;
+amb := 0.010;
+
+mb1: sbend, l:=lmb, angle:=amb,e1=0.1,e2=0.2,h1=0.3,h2=0.4,hgap=0.5,fint=0.6,tilt=0.7;
+
+myseq: sequence, l=lmb;
+mb1, at:= lmb/2;
+endsequence;
+
+beam,energy=1.e6; ! default is positron, 1 GeV,  use 1000 TeV to get beta close to 1  and dispersion terms to 1.e-13
+use, sequence=myseq;
+
+tr$macro(turn): macro = {
+}
+
+!---- Track without MAKETHIN
+
+track, onepass, update, dump;
+start, x=0, px=0, y=1e-6, py=0, t=0, pt=-1e-2;
+start, x=0, px=0, y=1e-6, py=0, t=0, pt=0;
+start, x=0, px=0, y=1e-6, py=0, t=0, pt=1e-2;
+run, turns=1;
+endtrack;
+stop;
+
+
+!---- Track with MAKETHIN
+
+select, flag=makethin, class=sbend, thick=true; ! thick slice, with dipedge conversion    with dipedge  perfect  (to e-16)
+makethin, sequence=myseq,style=teapot,makedipedge=true;
+use, sequence=myseq;
+
+track, onepass, update, dump;
+start, x=0, px=0, y=1e-6, py=0, t=0, pt=-1e-2;
+start, x=0, px=0, y=1e-6, py=0, t=0, pt=0;
+start, x=0, px=0, y=1e-6, py=0, t=0, pt=1e-2;
+run, turns=1;
+endtrack;
+stop;

@@ -5149,18 +5149,19 @@ subroutine tttdipole(track, ktrack)
   double precision e1, e2, h1, h2, hgap, fint, tilt
   e1 = node_value('e1 ');
   e2 = node_value('e2 ');
-  h1 = node_value('h2 ')
-  h1 = node_value('h2 ')
+  h1 = node_value('h1 ')
+  h2 = node_value('h2 ')
   hgap = node_value('hgap ')
   fint = node_value('fint ')
   tilt = node_value('tilt ')
+
 
   !---- Apply entrance dipole edge effect
 
   if (e1.ne.0d0) then
      call ttdpdg_map(track, ktrack, e1, h1, hgap, fint, tilt)
   endif
-  
+
   !---- Read-in the parameters
   bet0sqr = bet0*bet0;
   L = node_value('l ');
@@ -5241,11 +5242,11 @@ subroutine tttdipole(track, ktrack)
 
   !---- Apply exit dipole edge effect
 
+  enddo
+
   if (e2.ne.0d0) then
      call ttdpdg_map(track, ktrack, e2, h2, hgap, fint, tilt)
   endif
-     
-  enddo
   
 end subroutine tttdipole
 
