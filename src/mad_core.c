@@ -125,7 +125,7 @@ madx_start(void)
 #ifdef _USEGC
   // init garbage collector
   GC_INIT();
-  GC_enable_incremental();
+  // GC_enable_incremental();
 #endif
 
 // let's gdb find the place of segmentation fault when debugging

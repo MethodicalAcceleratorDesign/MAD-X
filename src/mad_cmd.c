@@ -262,7 +262,7 @@ exec_command(void)
   }
 
   // force garbage collection
-  mycollect();
+  // mycollect();
 }
 
 struct command*
