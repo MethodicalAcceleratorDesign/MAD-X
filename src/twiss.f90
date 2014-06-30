@@ -6850,8 +6850,9 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   
   !---- Set-up some parameters
   !-- LD: 20.6.2014 (bvk=-1: not -V -> V but lag -> pi-lag)
+  !-- AL: 30.6.2014 (bvk=-1: z -> -z)
   if (bvk .eq. -one) then
-    lag = 0.5-lag
+    orbit(5) = -orbit(5);
   endif
 
   krf = 2*pi*freq*1d6/clight;
@@ -6991,6 +6992,11 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
      te(6,5,1) =  te(6,1,5);
      te(6,5,3) =  te(6,3,5);
      te(6,5,5) =  0.5 * (-krf * krf * vrf * sin(lag * twopi - krf * z) + krf * krf * krf * REAL(Sp1));
+  endif
+
+  !-- AL: 30.6.2014 (bvk=-1: z -> -z)
+  if (bvk .eq. -one) then
+    orbit(5) = -orbit(5);
   endif
   
   !---- centre option
