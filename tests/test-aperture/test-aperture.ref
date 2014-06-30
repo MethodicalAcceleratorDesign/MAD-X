@@ -1,11 +1,11 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.03  (64 bit, Darwin)      +
+  +    MAD-X 5.02.02  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.11.05      +
-  + Execution Time Stamp: 18.11.13 14.03.13 +
+  + Code Modification Date: 2014.07.01      +
+  + Execution Time Stamp: 30.06.14 19.21.42 +
   +++++++++++++++++++++++++++++++++++++++++++
-title,'LHC Cell APERTURE exemple, BJ Aug2009';
+title,'LHC Cell APERTURE example, BJ Aug2009';
 
 
 
@@ -66,15 +66,15 @@ LHCCELL: SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
 
   MB1: MB,  at= l.MQ+drift1 ,
 
-	    apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+	    apertype=circle, aperture = {a}, aper_tol = {th,tv,tr};
 
   MB2: MB,  at= l.MQ+drift1+l.mb+drift2,
 
-	    apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+	    apertype=ellipse, aperture = {a,b}, aper_tol = {th,tv,tr};
 
   MB3: MB,  at= l.MQ+drift1+2*(l.mb+drift2),
 
-	    apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+	    apertype=rectangle, aperture = {a,b}, aper_tol = {th,tv,tr};
 
 
 
@@ -84,15 +84,15 @@ LHCCELL: SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
 
   MB4: MB,  at= len_half_cell + l.MQ+drift1 ,
 
-	    apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+	    apertype=rectcircle, aperture = {a,b,h}, aper_tol = {th,tv,tr};
 
   MB5: MB,  at= len_half_cell + l.MQ+drift1+l.mb+drift2,
 
-	    apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+	    apertype=lhcscreen, aperture = {a,b,h}, aper_tol = {th,tv,tr};
 
   MB6: MB,  at= len_half_cell + l.MQ+drift1+2*(l.mb+drift2),
 
-	    apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+	    apertype=racetrack, aperture = {a,b,h/5.}, aper_tol = {th,tv,tr};
 
 
 
@@ -168,8 +168,239 @@ reference node: lhccell$start:1
 APERTURE LIMIT: mq1:1, n1: 4.85602, at: 3.1
 
 
+
+!-----
+
+! and now same test with bad aperture definitions...
+
+
+
+c=-0.022; d=0.; h2=0.0; v2=-0.022;
+
+
+
+LHCCEL2: SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
+
+ 
+
+  MQ11: MQ, k1:= kqf, at= 0., aperture = {c,d,h2,v2};
+
+
+
+  MB11: MB,  at= l.MQ+drift1 ,
+
+	    apertype=circle, aperture = {c}, aper_tol = {th,tv,tr};
+
+  MB21: MB,  at= l.MQ+drift1+l.mb+drift2,
+
+	    apertype=ellipse, aperture = {c,d}, aper_tol = {th,tv,tr};
+
+  MB31: MB,  at= l.MQ+drift1+2*(l.mb+drift2),
+
+	    apertype=rectangle, aperture = {c,d}, aper_tol = {th,tv,tr};
+
+
+
+  MQ21: MQ, k1 := kqd,  at=  len_half_cell, aperture = {c,d,h2,v2};
+
+
+
+  MB41: MB,  at= len_half_cell + l.MQ+drift1 ,
+
+	    apertype=rectcircle, aperture = {c,d,h2}, aper_tol = {th,tv,tr};
+
+  MB51: MB,  at= len_half_cell + l.MQ+drift1+l.mb+drift2,
+
+	    apertype=lhcscreen, aperture = {c,d,h2}, aper_tol = {th,tv,tr};
+
+  MB61: MB,  at= len_half_cell + l.MQ+drift1+2*(l.mb+drift2),
+
+	    apertype=racetrack, aperture = {c,d,h2/5.}, aper_tol = {th,tv,tr};
+
+
+
+endsequence;
+
+
+
+beam,particle=proton,energy=450.0, exn=3.75e-6, eyn=3.75e-6;
+
+
+
+set, format="9.5f";
+
+use,period=LHCCEL2;
+
+select, flag=twiss, clear;
+
+select, flag=twiss, column=name,s,l,betx,bety,alfx,alfy,dx,dpx,mux,muy,n1;
+
+twiss, sequence=LHCCEL2;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+   length    orbit5      alfa   gammatr 
+106.90000  -0.00000   0.00045  47.39218 
+
+       q1       dq1   betxmax     dxmax 
+  0.25000  -0.31791 177.45326   2.18723 
+
+    dxrms    xcomax    xcorms        q2 
+  1.69855   0.00000   0.00000   0.25000 
+
+      dq2   betymax     dymax     dyrms 
+ -0.31804 177.46816   0.00000   0.00000 
+
+   ycomax    ycorms    deltap   synch_1 
+  0.00000   0.00000   0.00000   0.00000 
+
+  synch_2   synch_3   synch_4   synch_5 
+  0.00000   0.00000   0.00000   0.00000 
+
+
+!!! uses default beam and halo data (lhc at injection)
+
+select, flag=aperture, clear;
+
+select, flag=aperture, column=name,s,betx,bety,dx,x,y,n1,apertype,xtol,ytol,rtol;
+
+option, debug;
+
+aperture, dqf=2.086, betaqfx=170.25, dp=0.0015, 
+
+          dparx=0.273, dpary=0.273, cor=0.004, bbeat=1.1, 
+
+          nco=5, interval=1, halo={6., 8.4, 7.3, 7.3};
+
+
+Processing apertures from lhccel2$start:1 to lhccel2$end:1...
++++++++ deltap from TWISS            0
++++ aper_rectellipse:    7.30000     7.30000     8.40000     8.40000 1
+quarterlength : 9
++++ aper_fill_quadrants: quarterlength = 9  0     7.30000     4.15572 
+  1     7.03983     4.58266 
+  2     6.75473     4.99336 
+  3     6.44570     5.38637 
+  4     6.11383     5.76030 
+  5     5.76030     6.11383 
+  6     5.38637     6.44570 
+  7     4.99336     6.75473 
+  8     4.58266     7.03983 
+  9     4.15572     7.30000 
+  10    -4.15572     7.30000 
+  11    -4.58266     7.03983 
+  12    -4.99336     6.75473 
+  13    -5.38637     6.44570 
+  14    -5.76030     6.11383 
+  15    -6.11383     5.76030 
+  16    -6.44570     5.38637 
+  17    -6.75473     4.99336 
+  18    -7.03983     4.58266 
+  19    -7.30000     4.15572 
+  20    -7.30000    -4.15572 
+  21    -7.03983    -4.58266 
+  22    -6.75473    -4.99336 
+  23    -6.44570    -5.38637 
+  24    -6.11383    -5.76030 
+  25    -5.76030    -6.11383 
+  26    -5.38637    -6.44570 
+  27    -4.99336    -6.75473 
+  28    -4.58266    -7.03983 
+  29    -4.15572    -7.30000 
+  30     4.15572    -7.30000 
+  31     4.58266    -7.03983 
+  32     4.99336    -6.75473 
+  33     5.38637    -6.44570 
+  34     5.76030    -6.11383 
+  35     6.11383    -5.76030 
+  36     6.44570    -5.38637 
+  37     6.75473    -4.99336 
+  38     7.03983    -4.58266 
+  39     7.30000    -4.15572 
+  40     7.30000     4.15572 
+
+
+name: lhccel2$start:1, ref: , do_survey: 0, true_flag: 0
++++ aper_build_screen; apertype = 'circle' quarterlength = 0
++++ aper_build screen, circle parameters:    0.00000    0.00000    0.00000    0.00000  -- exiting 0
+
+name: mq11:1, ref: , do_survey: 0, true_flag: 0
++++ aper_build_screen; apertype = 'rectellipse' quarterlength = 0
++++ aper_build screen, rectellipse parameters:   -0.02200    0.00000    0.00000   -0.02200  -- exiting 0
+
+name: drift_0:0, ref: , do_survey: 0, true_flag: 0
++++ aper_build_screen; apertype = '' quarterlength = 0
+
+name: mb11:1, ref: , do_survey: 0, true_flag: 0
++++ aper_build_screen; apertype = 'circle' quarterlength = 0
++++ aper_build screen, circle parameters:    0.00000    0.00000   -0.02200    0.00000  -- exiting 0
+
+name: drift_1:0, ref: , do_survey: 0, true_flag: 0
++++ aper_build_screen; apertype = '' quarterlength = 0
+
+name: mb21:1, ref: , do_survey: 0, true_flag: 0
++++ aper_build_screen; apertype = 'ellipse' quarterlength = 0
++++ aper_build screen, ellipse parameters:    0.00000    0.00000   -0.02200    0.00000  -- exiting 0
+
+name: drift_1:0, ref: , do_survey: 0, true_flag: 0
++++ aper_build_screen; apertype = '' quarterlength = 0
+
+name: mb31:1, ref: , do_survey: 0, true_flag: 0
++++ aper_build_screen; apertype = 'rectangle' quarterlength = 0
++++ aper_build screen, rectangle parameters:   -0.02200    0.00000    0.00000    0.00000  -- exiting 0
+
+name: drift_2:0, ref: , do_survey: 0, true_flag: 0
++++ aper_build_screen; apertype = '' quarterlength = 0
+
+name: mq21:1, ref: , do_survey: 0, true_flag: 0
++++ aper_build_screen; apertype = 'rectellipse' quarterlength = 0
++++ aper_build screen, rectellipse parameters:   -0.02200    0.00000    0.00000   -0.02200  -- exiting 0
+
+name: drift_0:0, ref: , do_survey: 0, true_flag: 0
++++ aper_build_screen; apertype = '' quarterlength = 0
+
+name: mb41:1, ref: , do_survey: 0, true_flag: 0
++++ aper_build_screen; apertype = 'rectcircle' quarterlength = 0
++++ aper_build screen, rectcircle parameters:   -0.02200    0.00000    0.00000    0.00000  -- exiting 0
+
+name: drift_1:0, ref: , do_survey: 0, true_flag: 0
++++ aper_build_screen; apertype = '' quarterlength = 0
+
+name: mb51:1, ref: , do_survey: 0, true_flag: 0
++++ aper_build_screen; apertype = 'lhcscreen' quarterlength = 0
++++ aper_build screen, rectcircle parameters:   -0.02200    0.00000    0.00000    0.00000  -- exiting 0
+
+name: drift_1:0, ref: , do_survey: 0, true_flag: 0
++++ aper_build_screen; apertype = '' quarterlength = 0
+
+name: mb61:1, ref: , do_survey: 0, true_flag: 0
++++ aper_build_screen; apertype = 'racetrack' quarterlength = 0
++++ aper_build screen, racetrack parameters:   -0.02200    0.00000    0.00000    0.00000  -- exiting 0
+
+name: drift_2:0, ref: , do_survey: 0, true_flag: 0
++++ aper_build_screen; apertype = '' quarterlength = 0
+
+name: lhccel2$end:1, ref: , do_survey: 0, true_flag: 0
++++ aper_build_screen; apertype = 'circle' quarterlength = 0
++++ aper_build screen, circle parameters:    0.00000    0.00000    0.00000    0.00000  -- exiting 0
+
+
+APERTURE LIMIT: none, n1: 999999, at: -1
+
+
+
+stop;
+
+
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.03 (64 bit) finished normally +
+  + MAD-X 5.02.02 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

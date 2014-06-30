@@ -1,4 +1,4 @@
-title,'LHC Cell APERTURE exemple, BJ Aug2009';
+title,'LHC Cell APERTURE example, BJ Aug2009';
 
 REAL CONST ANGLE.MB = TWOPI/8/(23*6+2*2*4);
 
@@ -28,20 +28,20 @@ LHCCELL: SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
   MQ1: MQ, k1:= kqf, at= 0.;
 
   MB1: MB,  at= l.MQ+drift1 ,
-	    apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+	    apertype=circle, aperture = {a}, aper_tol = {th,tv,tr};
   MB2: MB,  at= l.MQ+drift1+l.mb+drift2,
-	    apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+	    apertype=ellipse, aperture = {a,b}, aper_tol = {th,tv,tr};
   MB3: MB,  at= l.MQ+drift1+2*(l.mb+drift2),
-	    apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+	    apertype=rectangle, aperture = {a,b}, aper_tol = {th,tv,tr};
 
   MQ2: MQ, k1 := kqd,  at=  len_half_cell;
 
   MB4: MB,  at= len_half_cell + l.MQ+drift1 ,
-	    apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+	    apertype=rectcircle, aperture = {a,b,h}, aper_tol = {th,tv,tr};
   MB5: MB,  at= len_half_cell + l.MQ+drift1+l.mb+drift2,
-	    apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+	    apertype=lhcscreen, aperture = {a,b,h}, aper_tol = {th,tv,tr};
   MB6: MB,  at= len_half_cell + l.MQ+drift1+2*(l.mb+drift2),
-	    apertype=rectellipse, aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+	    apertype=racetrack, aperture = {a,b,h/5.}, aper_tol = {th,tv,tr};
 
 endsequence;
 
@@ -60,3 +60,48 @@ aperture,offsetelem="offset.tfs", file="ap.tfs",
          dqf=2.086, betaqfx=170.25, dp=0.0015, 
          dparx=0.273, dpary=0.273, cor=0.004, bbeat=1.1, 
          nco=5, interval=1, halo={6., 8.4, 7.3, 7.3};
+
+!-----
+! and now same test with bad aperture definitions...
+
+c=-0.022; d=0.; h2=0.0; v2=-0.022;
+
+LHCCEL2: SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
+ 
+  MQ11: MQ, k1:= kqf, at= 0., aperture = {c,d,h2,v2};
+
+  MB11: MB,  at= l.MQ+drift1 ,
+	    apertype=circle, aperture = {c}, aper_tol = {th,tv,tr};
+  MB21: MB,  at= l.MQ+drift1+l.mb+drift2,
+	    apertype=ellipse, aperture = {c,d}, aper_tol = {th,tv,tr};
+  MB31: MB,  at= l.MQ+drift1+2*(l.mb+drift2),
+	    apertype=rectangle, aperture = {c,d}, aper_tol = {th,tv,tr};
+
+  MQ21: MQ, k1 := kqd,  at=  len_half_cell, aperture = {c,d,h2,v2};
+
+  MB41: MB,  at= len_half_cell + l.MQ+drift1 ,
+	    apertype=rectcircle, aperture = {c,d,h2}, aper_tol = {th,tv,tr};
+  MB51: MB,  at= len_half_cell + l.MQ+drift1+l.mb+drift2,
+	    apertype=lhcscreen, aperture = {c,d,h2}, aper_tol = {th,tv,tr};
+  MB61: MB,  at= len_half_cell + l.MQ+drift1+2*(l.mb+drift2),
+	    apertype=racetrack, aperture = {c,d,h2/5.}, aper_tol = {th,tv,tr};
+
+endsequence;
+
+beam,particle=proton,energy=450.0, exn=3.75e-6, eyn=3.75e-6;
+
+set, format="9.5f";
+use,period=LHCCEL2;
+select, flag=twiss, clear;
+select, flag=twiss, column=name,s,l,betx,bety,alfx,alfy,dx,dpx,mux,muy,n1;
+twiss, sequence=LHCCEL2;
+
+!!! uses default beam and halo data (lhc at injection)
+select, flag=aperture, clear;
+select, flag=aperture, column=name,s,betx,bety,dx,x,y,n1,apertype,xtol,ytol,rtol;
+option, debug;
+aperture, dqf=2.086, betaqfx=170.25, dp=0.0015, 
+          dparx=0.273, dpary=0.273, cor=0.004, bbeat=1.1, 
+          nco=5, interval=1, halo={6., 8.4, 7.3, 7.3};
+
+stop;
