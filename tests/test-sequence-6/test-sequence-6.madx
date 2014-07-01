@@ -18,13 +18,14 @@ use, sequence = PS;
 
 aa: HKICKER, KICK:=0.000904455;
 
-!Option, debug; 
+Option, debug; 
 
 SEQEDIT,SEQUENCE=PR.BHT000001;
  FLATTEN;
  REPLACE, element=PR.BHT000001.corr3, by=aa;       
  REMOVE, element=PR.BHT000001.corr1;
  INSTALL, ELEMENT=aa, AT= 2.985726e-01, FROM=pr.bht000001$start;
+ FLATTEN;
 ENDEDIT;
 
 USE, SEQUENCE=PR.BHT000001;
