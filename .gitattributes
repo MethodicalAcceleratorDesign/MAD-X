@@ -1635,6 +1635,9 @@ tests/test-sequence-5/recurs.survey.ref -text
 tests/test-sequence-5/test-sequence-5.cfg -text
 tests/test-sequence-5/test-sequence-5.madx -text
 tests/test-sequence-5/test-sequence-5.ref -text
+tests/test-sequence-6/test-sequence-6.cfg -text
+tests/test-sequence-6/test-sequence-6.madx -text
+tests/test-sequence-6/test-sequence-6.ref -text
 tests/test-sequence/test-sequence.cfg -text
 tests/test-sequence/test-sequence.madx -text
 tests/test-sequence/test-sequence.ref -text

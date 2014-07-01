@@ -285,6 +285,7 @@ extern int scrap_count;            /* running counter to make things unique */
 extern int seqedit_install;        /* counter for seqedit installs */
 extern int seqedit_move;           /* counter for seqedit moves */
 extern int seqedit_remove;         /* counter for seqedit removes */
+extern int seqedit_replace;        /* counter for seqedit replaces -- 2014-Jul-01  13:27:11  ghislain */
 extern int sequ_is_on;             /* != 0 if inside current sequence decl. */
 extern int stamp_flag;             /* checks for extern double delete when != 0 */
 extern int start_cnt;              /* counter for start commands */

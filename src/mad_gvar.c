@@ -280,6 +280,7 @@ int scrap_count = 0;        /* running counter to make things unique */
 int seqedit_install = 0;    /* counter for seqedit installs */
 int seqedit_move = 0;       /* counter for seqedit moves */
 int seqedit_remove = 0;     /* counter for seqedit removes */
+int seqedit_replace = 0;    /* counter for seqedit replaces -- 2014-Jul-01  13:28:05  ghislain */
 int sequ_is_on = 0;         /* != 0 if inside current sequence decl. */
 int stamp_flag = 0;         /* checks for double delete when != 0 */
 int start_cnt = 0;          /* counter for start commands */

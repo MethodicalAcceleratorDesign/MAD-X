@@ -1,33 +1,9 @@
 
-/*****************************************************
- *
- * MADX file for the AD with high energy (HE)
- *
- * Execute with:  >madx < 2010_AD_HE.madx
- * This file is for anti-protons at 3.57 GeV/c
- * i.e. just produced by the 26 GeV/c proton beam
- *****************************************************/
-
-
-
-
-/*****************************************************************************
- * TITLE
- *****************************************************************************/
  title, 'AD HE 2010 optics. Anti-Protons - 3.57 GeV/c';
 
- option, echo;
  option, RBARC=FALSE;
 
-
-
-/*****************************************************************************
- * AD
- * NB! The order of the .ele .str and .seq files matter.
- *     The reason is a >feature< of MADX
- *
- *****************************************************************************/
- option, echo;
+ option, -echo;
  call, file = '../share/AD/ad_quads_3837_ffe.str';
  call, file = '../share/AD/ad.ele';
  call, file = '../share/AD/ad.dbx';

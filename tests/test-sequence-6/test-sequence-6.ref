@@ -1,0 +1,99 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.02.02  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2014.07.01      +
+  + Execution Time Stamp: 01.07.14 14.17.03 +
+  +++++++++++++++++++++++++++++++++++++++++++
+Title, "test sequence manipulations";
+
+
+
+Option, warn, echo, info;
+
+
+
+Option, -echo;
+
+++++++ info: brho redefined
+
+
+b1: BEAM,PARTICLE=PROTON;
+
+
+
+Pc        := 26; !  GeV/c
+
+++++++ info: pc redefined
+
+
+Beam, particle = proton, pc = Pc, BUNCHED;
+
+
+
+use, sequence = PS;
+
+
+
+aa: HKICKER, KICK:=0.000904455;
+
+
+
+!Option, debug; 
+
+
+
+SEQEDIT,SEQUENCE=PR.BHT000001;
+
+ FLATTEN;
+
+ REPLACE, element=PR.BHT000001.corr3, by=aa;       
+
+ REMOVE, element=PR.BHT000001.corr1;
+
+ INSTALL, ELEMENT=aa, AT= 2.985726e-01, FROM=pr.bht000001$start;
+
+ENDEDIT;
+
+++++++ info: seqedit - number of elements installed:  1
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    1
+++++++ info: seqedit - number of elements replaced:   1
+
+
+USE, SEQUENCE=PR.BHT000001;
+
+
+
+select, flag=seqedit, class=HKICKER;
+
+
+
+PRorb: VKICKER,KICK:=0.000879422;
+
+
+
+SEQEDIT,SEQUENCE=PR.bht000009;
+
+ REPLACE,ELEMENT=selected, BY= PRorb ; 
+
+ENDEDIT;
+
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   5
+
+
+USE, SEQUENCE=PR.bht000009;
+
+
+
+stop;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.02.02 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

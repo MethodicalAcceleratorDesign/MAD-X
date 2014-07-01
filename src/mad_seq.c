@@ -298,7 +298,7 @@ seq_edit_ex(struct sequence* seq)
 {
   edit_sequ = seq;
   edit_is_on = 1;
-  seqedit_install = seqedit_move = seqedit_remove = 0;
+  seqedit_install = seqedit_move = seqedit_remove = seqedit_replace = 0;
   if (edit_sequ->ex_start != NULL) {
     edit_sequ->ex_nodes = delete_node_list(edit_sequ->ex_nodes);
     edit_sequ->ex_start = delete_node_ring(edit_sequ->ex_start);
@@ -893,6 +893,8 @@ seq_end(struct in_cmd* cmd)
   put_info("seqedit - number of elements moved:     ", tmp);
   sprintf(tmp, "%d", seqedit_remove);
   put_info("seqedit - number of elements removed:   ", tmp);
+  sprintf(tmp, "%d", seqedit_replace);
+  put_info("seqedit - number of elements replaced:  ", tmp);
   seq_end_ex();
 }
 
@@ -1199,86 +1201,84 @@ seq_replace(struct in_cmd* cmd)
   char* name;
   struct element* el;
   int count = count_nodes(edit_sequ);
-  int any = 0, k, rep_cnt = 0, pos = name_list_pos("element", nl);
-  if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
-  {
-    if (strcmp(name, "selected") == 0)
-    {
-      if (seqedit_select->curr == 0)
-      {
-        warning("no active select commands:", "ignored"); return;
-      }
-      else
-      {
-        pos = name_list_pos("by", nl);
-        if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
-        {
-          if ((el = find_element(name, element_list)) == NULL)
-          {
-            warning("ignoring unknown 'by' element:",name);
-            return;
-          }
-        }
-        else
-        {
-          warning("'by' missing, ","ignored");
-          return;
-        }
-        rep_nodes = mymalloc("seq_replace", count*sizeof *rep_nodes);
-        rep_els = mymalloc("seq_replace", count*sizeof *rep_els);
-        if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges) == 0) any = 1;
-        c_node = edit_sequ->start;
-        while (c_node != NULL)
-        {
-          if (any || name_list_pos(c_node->name, selected_ranges->list) > -1)
-          {
-            name = NULL;
-            for (k = 0; k < seqedit_select->curr; k++)
-            {
-              if (c_node->p_elem != NULL) name = c_node->p_elem->name;
-              if (name != NULL && strchr(name, '$') == NULL &&
-                  pass_select(name,
-                              seqedit_select->commands[k])) break;
-            }
-            if (k < seqedit_select->curr)
-            {
-              rep_els[rep_cnt] = el;
-              rep_nodes[rep_cnt++] = c_node;
-            }
-          }
-          if (c_node == edit_sequ->end) break;
-          c_node = c_node->next;
-        }
-      }
-    }
-    else
-    {
-      rep_nodes = mymalloc("seq_replace", count*sizeof *rep_nodes);
-      rep_els = mymalloc("seq_replace", count*sizeof *rep_els);
-      strcpy(c_dum->c, name);
-      square_to_colon(c_dum->c);
-      if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
-      {
-        node = edit_sequ->nodes->nodes[pos];
-        pos = name_list_pos("by", nl);
-        if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
-        {
-          if ((el = find_element(name, element_list)) != NULL)
-          {
-            rep_els[rep_cnt] = el;
-            rep_nodes[rep_cnt++] = node;
-          }
-          else warning("ignoring unknown 'by' element: ",name);
-        }
-        else warning("'by' missing, ","ignored");
-      }
-      else warning("ignored because of unknown element: ", name);
-    }
-    for (k = 0; k < rep_cnt; k++)  replace_one(rep_nodes[k], rep_els[k]);
-    if (rep_nodes) myfree("seq_replace", rep_nodes);
-    if (rep_els)   myfree("seq_replace", rep_els);
+  int any = 0, k, rep_cnt = 0, pos;
+
+  pos = name_list_pos("element", nl);
+  if ( !(nl->inform[pos]) || (name = pl->parameters[pos]->string) == NULL) {
+    warning("no element specified, ","ignored");
+    return;
   }
-  else  warning("no element specified, ","ignored");
+  
+  if (strcmp(name, "selected") == 0) { // replace selected elements
+    if (seqedit_select->curr == 0) {
+      warning("no active select commands:", "ignored"); 
+      return; 
+    }
+
+    pos = name_list_pos("by", nl);
+    if ( !(nl->inform[pos]) || (name = pl->parameters[pos]->string) == NULL) {
+      warning("'by' missing, ","ignored");
+      return;
+    }
+
+    if ((el = find_element(name, element_list)) == NULL) {
+      warning("ignoring unknown 'by' element:",name);
+      return;
+    }
+ 
+    rep_nodes = mymalloc("seq_replace", count*sizeof *rep_nodes);
+    rep_els = mymalloc("seq_replace", count*sizeof *rep_els);
+
+    if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges) == 0) any = 1;
+
+    c_node = edit_sequ->start;
+    while (c_node != NULL) {
+      if (any || name_list_pos(c_node->name, selected_ranges->list) > -1) {
+	name = NULL;
+	for (k = 0; k < seqedit_select->curr; k++) {
+	  if (c_node->p_elem != NULL) name = c_node->p_elem->name;
+	  if (name != NULL && strchr(name, '$') == NULL &&
+	      pass_select(name, seqedit_select->commands[k]) ) break;
+	}
+	if (k < seqedit_select->curr) {
+	  rep_els[rep_cnt] = el;
+	  rep_nodes[rep_cnt++] = c_node;
+	}
+      }
+      if (c_node == edit_sequ->end) break;
+      c_node = c_node->next;
+    }
+  }  
+
+  else { // replace named elements
+    rep_nodes = mymalloc("seq_replace", count*sizeof *rep_nodes);
+    rep_els = mymalloc("seq_replace", count*sizeof *rep_els);
+
+    strcpy(c_dum->c, name);
+    square_to_colon(c_dum->c);
+
+    if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1) {
+      node = edit_sequ->nodes->nodes[pos];
+      pos = name_list_pos("by", nl);
+      if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL) {
+	if ((el = find_element(name, element_list)) != NULL) {
+	  rep_els[rep_cnt] = el;
+	  rep_nodes[rep_cnt++] = node;
+	}
+	else warning("ignoring unknown 'by' element: ",name);
+      }
+      else warning("'by' missing, ","ignored");
+    }
+    else warning("ignored because of unknown element: ", name);
+  }
+  
+  for (k = 0; k < rep_cnt; k++)  replace_one(rep_nodes[k], rep_els[k]);
+  
+  seqedit_replace = rep_cnt;
+
+  if (rep_nodes) myfree("seq_replace", rep_nodes);
+  if (rep_els)   myfree("seq_replace", rep_els);
+  
 }
 
 #if 0 // not used...
