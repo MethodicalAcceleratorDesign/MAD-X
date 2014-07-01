@@ -497,106 +497,9 @@ Initial Penalty Function =   0.3549501226825657E+02
  exclude parameter:kqtl11.r8b1                                     hit minimum
  Reset system to           14 con,          18 var
  Solve system with           14 con,          18 var
- Rank            14   Condition number    4741.03530671676     
- exclude parameter:kq7.l8b1                                        hit maximum
- exclude parameter:kqt12.r8b1                                      hit minimum
- Reset system to           14 con,          18 var
- Solve system with           14 con,          16 var
- Rank            14   Condition number    11625.9007069066     
- exclude parameter:kq8.l8b1                                        hit minimum
- exclude parameter:kq9.l8b1                                        hit maximum
- exclude parameter:kq10.l8b1                                       hit minimum
- exclude parameter:kqt12.l8b1                                      hit maximum
- Reset system to           14 con,          16 var
- Too var to exclude, set strategy=1
- Step length    235.340691040750     
- Bisec iteration            1
-call:     2 Dx =   0.23534069E+03  Penalty function =  0.3549501226825657E+02
- Solve system with           14 con,          20 var
- Rank            14   Condition number    1766.69353817593     
-reset parameter: kqt13.l8b1              from  0.64035040E-02  to  0.55657143E-02
-reset parameter: kqtl11.r8b1             from -0.57471128E-02  to -0.55657143E-02
- Step length   0.133494752408563     
- Bisec iteration            1
-call:     3 Dx =   0.13339438E+00  Penalty function =  0.2919690546336340E+03
- Solve system with           14 con,          20 var
- Rank            14   Condition number    2768.18449049693     
-reset parameter: kqt13.l8b1              from  0.73272329E-02  to  0.55657143E-02
- Step length   0.118111813682383     
- Bisec iteration            1
-call:     4 Dx =   0.11820783E+00  Penalty function =  0.3056261610838801E+02
- Solve system with           14 con,          20 var
- Rank            14   Condition number    2738.22399265479     
-reset parameter: kqt13.l8b1              from  0.74001107E-02  to  0.55657143E-02
-reset parameter: kqtl11.r8b1             from -0.56322142E-02  to -0.55657143E-02
- Step length   0.100261170978572     
- Bisec iteration            1
-call:     5 Dx =   0.10034019E+00  Penalty function =  0.2329889932570327E+02
- Solve system with           14 con,          20 var
- Rank            14   Condition number    2909.62335097125     
-reset parameter: kqt13.l8b1              from  0.73724318E-02  to  0.55657143E-02
-reset parameter: kqtl11.r8b1             from -0.57058756E-02  to -0.55657143E-02
- Step length   8.917324405392199E-002
-call:     6 Dx =   0.89173244E-01  Penalty function =  0.7119377762978853E+01
- Solve system with           14 con,          20 var
- Rank            14   Condition number    3132.43480926784     
-reset parameter: kqt13.l8b1              from  0.71625833E-02  to  0.55657143E-02
-reset parameter: kqtl11.r8b1             from -0.57706211E-02  to -0.55657143E-02
- Step length   7.171142595419797E-002
-call:     7 Dx =   0.71711426E-01  Penalty function =  0.6767020666958255E+01
- Solve system with           14 con,          20 var
- Rank            14   Condition number    3074.20808352779     
-reset parameter: kqt13.l8b1              from  0.68666636E-02  to  0.55657143E-02
-reset parameter: kqtl11.r8b1             from -0.57705175E-02  to -0.55657143E-02
- Step length   5.993228464243430E-002
-call:     8 Dx =   0.59932285E-01  Penalty function =  0.3701953730996612E+01
- Solve system with           14 con,          20 var
- Rank            14   Condition number    2957.05347109490     
-reset parameter: kqt13.l8b1              from  0.65623953E-02  to  0.55657143E-02
-reset parameter: kqtl11.r8b1             from -0.57507999E-02  to -0.55657143E-02
- Step length   4.738358243599733E-002
-call:     9 Dx =   0.47383582E-01  Penalty function =  0.1829018604392204E+01
- Solve system with           14 con,          20 var
- Rank            14   Condition number    2751.45010270981     
-reset parameter: kqt13.l8b1              from  0.62373759E-02  to  0.55657143E-02
-reset parameter: kqtl11.r8b1             from -0.57068538E-02  to -0.55657143E-02
- Step length   3.385979883133924E-002
-call:    10 Dx =   0.33859799E-01  Penalty function =  0.6404883565732717E+00
- Solve system with           14 con,          20 var
- Rank            14   Condition number    2411.45027221937     
-reset parameter: kqt13.l8b1              from  0.59063166E-02  to  0.55657143E-02
-reset parameter: kqtl11.r8b1             from -0.56393943E-02  to -0.55657143E-02
- Step length   1.933489160945249E-002
-call:    11 Dx =   0.19334892E-01  Penalty function =  0.1063472781265927E+00
- Solve system with           14 con,          20 var
- Rank            14   Condition number    1992.04990304654     
-reset parameter: kqt13.l8b1              from  0.56708376E-02  to  0.55657143E-02
-reset parameter: kqtl11.r8b1             from -0.55842924E-02  to -0.55657143E-02
- Step length   7.212172659908758E-003
-call:    12 Dx =   0.72121727E-02  Penalty function =  0.1067119682029566E-01
- Solve system with           14 con,          20 var
- Rank            14   Condition number    1755.27634778977     
-reset parameter: kqt13.l8b1              from  0.55890469E-02  to  0.55657143E-02
-reset parameter: kqtl11.r8b1             from -0.55678101E-02  to -0.55676185E-02
- Step length   1.837462883596855E-003
-call:    13 Dx =   0.18374629E-02  Penalty function =  0.1345083566928184E-02
- Solve system with           14 con,          20 var
- Rank            14   Condition number    1704.63891048627     
-reset parameter: kqt13.l8b1              from  0.55712916E-02  to  0.55657143E-02
- Step length   4.501325759492830E-004
-call:    14 Dx =   0.45013258E-03  Penalty function =  0.8233927877839709E-04
- Solve system with           14 con,          20 var
- Rank            14   Condition number    1697.04480377848     
- Step length   1.140405287145492E-004
-call:    15 Dx =   0.11404053E-03  Penalty function =  0.1170696196596951E-08
- Solve system with           14 con,          20 var
- Rank            14   Condition number    1695.38201189573     
- Step length   1.519918954874015E-007
-call:    16 Dx =   0.15199190E-06  Penalty function =  0.1666378547064912E-16
- Solve system with           14 con,          20 var
- Rank            14   Condition number    1695.38088232912     
- Step length   5.548242934884387E-012
-call:    17 Dx =   0.55482429E-11  Penalty function =  0.1687182956333263E-22
+
+! Suppressed many lines from output for NUMDIFF goto statements
+
  Solve system with           14 con,          20 var
  Rank            14   Condition number    1695.38088403304     
  Step length   3.942155548255870E-015
@@ -683,34 +586,9 @@ Initial Penalty Function =   0.1151999999999977E+02
  Step length   4.904488596281927E-002
  Bisec iteration            1
 call:     2 Dx =   0.48940709E-01  Penalty function =  0.1206669111372284E+02
- Solve system with           14 con,          20 var
- Rank            14   Condition number    1721.19966761519     
- exclude parameter:kqt13.l8b1                                      hit maximum
- Reset system to           14 con,          19 var
- Solve system with           14 con,          19 var
- Rank            14   Condition number    1800.76851779342     
- Step length   2.405873858763574E-002
-call:     3 Dx =   0.24058739E-01  Penalty function =  0.6766358236468075E+01
- Solve system with           14 con,          20 var
- Rank            14   Condition number    1763.75087130120     
- Step length   4.857364927684006E-003
-call:     4 Dx =   0.48573649E-02  Penalty function =  0.5391147543707091E-01
- Solve system with           14 con,          20 var
- Rank            14   Condition number    1791.66485124935     
- Step length   4.374428072301383E-004
-call:     5 Dx =   0.43744281E-03  Penalty function =  0.1154647950096774E-05
- Solve system with           14 con,          20 var
- Rank            14   Condition number    1789.11481283638     
- Step length   2.116041662141361E-006
-call:     6 Dx =   0.21160417E-05  Penalty function =  0.1541444543358571E-13
- Solve system with           14 con,          20 var
- Rank            14   Condition number    1789.12140278275     
- Step length   4.605739695253554E-010
-call:     7 Dx =   0.46057397E-09  Penalty function =  0.7564415657165528E-20
- Solve system with           14 con,          20 var
- Rank            14   Condition number    1789.12139471534     
- Step length   3.784253219499690E-014
-call:     8 Dx =   0.37842532E-13  Penalty function =  0.1096445892522617E-23
+
+! Suppressed many lines from output for NUMDIFF goto statements
+
  Solve system with           14 con,          20 var
  Rank            14   Condition number    1789.12139649450     
  Step length   1.798193652693877E-015
