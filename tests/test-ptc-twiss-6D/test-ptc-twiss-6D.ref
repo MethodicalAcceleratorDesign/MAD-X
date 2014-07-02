@@ -885,7 +885,6 @@ ptc_create_universe;
      method                   6
      Num. of steps            5
      charge           1.0000000000000000     
- RF frequency    3816881.3591931551       Hz, lag    0.0000000000000000       [radian]
   Length of machine:    78.543702661677713     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
