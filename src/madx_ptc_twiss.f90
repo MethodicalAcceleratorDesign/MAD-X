@@ -485,7 +485,12 @@ contains
 
        
 
-       !print*, "Looking for orbit"
+       if (getdebug() > 2) then
+         print*, "Looking for orbit"
+         call print(default,6)
+       endif
+       
+       
        !w_p = 0
        call find_orbit(my_ring,x,1,default,c_1d_7)
        
@@ -808,7 +813,7 @@ contains
         endif
 
       else
-
+        ! ELEMENT AT ONCE MODE
         if (nda > 0) then
            !         if (getnknobis() > 0) c_%knob = my_true
            !print*, "parametric",i,c_%knob
@@ -844,8 +849,14 @@ contains
            write(mf1,*) "##########################################"
            write(mf1,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
            call print(y,mf1)
+        
+           if (current%mag%kind==kind4) then
+             print*,"CAVITY at s=",suml,"freq ", current%mag%freq,&
+                    	"lag ", current%mag%lag, &
+                    	"volt ", current%mag%volt
+            endif
         endif
-
+        
         suml=suml+current%MAG%P%ld
 
         if (savemaps) then
@@ -1100,13 +1111,17 @@ contains
          endif
       else
 
+         isRing = .true. ! compute momemtum compaction factor, tunes, chromaticies for ring
+
          if (getdebug() > 1) then
             print*,"Initializing map from one turn map: Start Map"
             call print(y,6)
+         
+            print*,"Tracking identity map to get closed solution. STATE:"
+            call print(default,6)
+
          endif
-
-         isRing = .true. ! compute momemtum compaction factor, tunes, chromaticies for ring
-
+         
          call track(my_ring,y,1,default)
          if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
             write(whymsg,*) 'DA got unstable (one turn map production): PTC msg: ',messagelost
@@ -1913,14 +1928,22 @@ contains
       !Performes normal form on a map, and plugs A_ in its place
       implicit none
 
+      if (getdebug() > 2) then
+         print*,"maptoascript: doing normal form"
+      endif
+
       call alloc(normal)
       normal = y
 
       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
          write(whymsg,*) 'DA got unstable during Normal Form: PTC msg: ',messagelost
-         call fort_warn('ptc_twiss: ',whymsg)
-         call seterrorflag(10,"ptc_twiss ",whymsg);
+         call fort_warn('ptc_twiss::maptoascript: ',whymsg)
+         call seterrorflag(10,"ptc_twiss::maptoascript ",whymsg);
          return
+      endif
+
+      if (getdebug() > 2) then
+         print*,"maptoascript: normal form done"
       endif
 
       y = x + normal%a_t
