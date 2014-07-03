@@ -53,8 +53,10 @@
 
 ! RF system (my test) ... for CHARGE=1 ... VOLTAGE should be scale --> devided by 54
 ! Vrf=2.2kV / H=2 / Fsynch = 1.567kHz
-  CAV: RFCAVITY, L=1.0, VOLT=0.0022/54, HARMON=2, LAG=0, no_cavity_totalpath;  
+!  CAV: RFCAVITY, L=1.0, VOLT=0.0022/54, HARMON=2, LAG=0, no_cavity_totalpath;  
+  CAV: RFCAVITY, L=1.0, VOLT=0.0022/54, FREQ=3.816881762, LAG=0, no_cavity_totalpath;  
 
+! 3816881.7619258035
 
 ! Definitions for bending blocks
   ED1 =-0.01157;
