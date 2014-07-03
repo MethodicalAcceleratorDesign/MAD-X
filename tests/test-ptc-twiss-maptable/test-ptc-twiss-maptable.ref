@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.06  (32 bit, Linux)       +
+  +    MAD-X 5.02.02  (64 bit, Linux)       +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.01.17      +
-  + Execution Time Stamp: 28.01.14 12.17.41 +
+  + Code Modification Date: 2014.07.01      +
+  + Execution Time Stamp: 03.07.14 14.59.28 +
   +++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -120,9 +120,13 @@ call, file="../share/LEIR/LEIR.seqx";
 
 ! Vrf=2.2kV / H=2 / Fsynch = 1.567kHz
 
-  CAV: RFCAVITY, L=1.0, VOLT=0.0022/54, HARMON=2, LAG=0, no_cavity_totalpath;  
+!  CAV: RFCAVITY, L=1.0, VOLT=0.0022/54, HARMON=2, LAG=0, no_cavity_totalpath;  
+
+  CAV: RFCAVITY, L=1.0, VOLT=0.0022/54, FREQ=3.816881762, LAG=0, no_cavity_totalpath;  
 
 
+
+! 3816881.7619258035
 
 
 
@@ -811,18 +815,17 @@ ptc_create_universe;
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.541711E+00
  Setting MADx with 
-     energy           1.08342267840000     
+     energy           1.0834226784000001     
      method                   6
      Num. of steps            5
-     charge           1.00000000000000     
-  Length of machine:    78.5437026616777     
+     charge           1.0000000000000000     
+  Length of machine:    78.543702661677713     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After    end:  -4.940492459581947E-015  0.000000000000000E+000  8.437694987151190E-015
-  Bullshitting in MADX with Cavities            2
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -6.2727600891321345E-015   0.0000000000000000        8.4376949871511897E-015
 
 
 
@@ -839,9 +842,9 @@ ptc_create_universe;
 
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
- Closed orbit:   1.068886127458704E-008  2.546139786480519E-009  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
-Deviation from symplecticity  0.3241851231905457E-11 %
-Deviation from symplecticity  0.3241851231905457E-11 %
+ Closed orbit:    1.0688861274587036E-008   2.5461397864805191E-009   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+Deviation from symplecticity  0.3264055692397960E-11 %
+Deviation from symplecticity  0.3264055692397960E-11 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -910,7 +913,7 @@ Deviation from symplecticity  0.3241851231905457E-11 %
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
  Closed orbit specified by the user!
-Deviation from symplecticity  0.3241851231905457E-11 %
+Deviation from symplecticity  0.3264055692397960E-11 %
  Reduced SUMM Table (Inital parameters specified)
 
 ++++++ table: ptc_twiss_summary
@@ -940,7 +943,7 @@ Deviation from symplecticity  0.3241851231905457E-11 %
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0        -10.3020712    0.0005941579859 
+                 0                  0        -10.3020712    0.0005941579858 
 
           disp2min           disp2max           disp3min           disp3max 
        -4.54310719         4.54310719                  0                  0 
@@ -995,5 +998,5 @@ removefile, file='Maxwellian_bend_for_ptc.txt';
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.06 (32 bit) finished normally +
+  + MAD-X 5.02.02 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
