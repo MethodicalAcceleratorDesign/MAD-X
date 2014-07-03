@@ -1456,10 +1456,6 @@ tests/test-ptc-twiss-6D/leir.6D.ptc.summ.twiss.cfg -text
 tests/test-ptc-twiss-6D/leir.6D.ptc.summ.twiss.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-6D/leir.6D.ptc.twiss.cfg -text
 tests/test-ptc-twiss-6D/leir.6D.ptc.twiss.ref -text svneol=unset#application/x-gzip
-tests/test-ptc-twiss-6D/leir.summ.twiss.cfg -text
-tests/test-ptc-twiss-6D/leir.summ.twiss.ref -text svneol=unset#application/x-gzip
-tests/test-ptc-twiss-6D/leir.twiss.cfg -text
-tests/test-ptc-twiss-6D/leir.twiss.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-6D/test-ptc-twiss-6D.cfg -text
 tests/test-ptc-twiss-6D/test-ptc-twiss-6D.madx -text
 tests/test-ptc-twiss-6D/test-ptc-twiss-6D.ref -text svneol=unset#application/x-gzip

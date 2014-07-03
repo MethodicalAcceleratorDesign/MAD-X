@@ -12,27 +12,6 @@ beam, particle = proton, energy = eg;
 
 use, period=LEIR;
 
-
-select,flag=twiss,clear;
-select, flag=twiss, column=name,s,betx,bety,alfx,alfy,mux,muy,dx,dpx,
-	      re11,re12,re13,re14,re15,re16,
-	      re21,re22,re23,re24,re25,re26,
-	      re31,re32,re33,re34,re35,re36,
-	      re41,re42,re43,re44,re45,re46,
-	      re51,re52,re53,re54,re55,re56,
-	      re61,re62,re63,re64,re65,re66;
-
-
-twiss, rmatrix, chrom, save;
-
-write, table=summ, file="leir.summ.twiss";
-write, table=twiss, file="leir.twiss";
-
-!plot, haxis=s, vaxis=betx,bety, colour=100;
-!plot, haxis=s, vaxis=dx,        colour=100;
-
-
-
 select,flag=ptc_twiss,clear;
 select, flag=ptc_twiss, column=name,s,Energy,beta11,beta22,beta33,alfa11,alfa22,mu1,mu2,mu3,disp1,disp2,
                           re11,re12,re13,re14,re15,re16,
