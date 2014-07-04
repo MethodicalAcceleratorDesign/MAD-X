@@ -166,6 +166,7 @@ CONTAINS
     character(name_len) aptype
     type(keywords) key
     character(20)       keymod0,keymod1
+    character(1024)     msg ! warning message buffer
     character(name_len) magnet_name
     logical(lp)         exact0,no_cavity_totalpath
     integer             exact1
@@ -887,14 +888,16 @@ CONTAINS
        key%list%lag=node_value('lag ')*twopi
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
        if(offset_deltap.ne.zero) then
+          
           default = getintstate()
           default=default+totalpath0
           call setintstate(default)
-          freq=freq*((gammatr2-gamma2)*offset_deltap/gammatr2/gamma2+one)
+          freq=freq*((gammatr2-gamma2)*offset_deltap/gammatr2/gamma2+one) !regular twiss values
+          
        endif
        key%list%freq0=freq
        key%list%n_bessel=node_value('n_bessel ')
-       key%list%harmon=one
+       key%list%harmon=one ! it is ignored by PTC because it does not know the circumference
        if(key%list%volt.ne.zero.and.key%list%freq0.ne.zero) icav=1
        !  case(11)
        !     key%magnet="elseparator"
@@ -908,6 +911,13 @@ CONTAINS
        else
           key%list%cavity_totalpath=1
        endif
+
+!       print*,"madx_ptc_module::input volt: ", key%list%volt, &
+!                                    " lag : ", key%list%lag, &
+!                                    " harm: ", key%list%harmon, &
+!                                    " freq: ", key%list%freq0 
+       
+       
     case(12)
        ! actually our SROT element
        key%magnet="CHANGEREF"
@@ -1071,7 +1081,7 @@ CONTAINS
           key%list%ks(i)=bvk*key%list%ks(i)
        enddo
 !    endif
-    call create_fibre(my_ring%end,key,EXCEPTION)
+    call create_fibre(my_ring%end,key,EXCEPTION) !in ../libs/ptc/src/Sp_keywords.f90 
 
     if(advance_node().ne.0)  goto 10
 
@@ -1121,17 +1131,31 @@ CONTAINS
     call setintstate(default)
 
     if(my_ring%HARMONIC_NUMBER>0) then
+       print*,"HARMONIC NUMBER defined in the ring: ", my_ring%HARMONIC_NUMBER
        call get_length(my_ring,l)
+
+       j=restart_sequ()
        p=>my_ring%start
+       
        do i=1,my_ring%n
           if(p%mag%kind==kind4) then
              if(p%mag%freq==zero) then
-                write(6,*) " Bullshitting in MADX with Cavities ",my_ring%HARMONIC_NUMBER
-                p%mag%freq=clight*my_ring%HARMONIC_NUMBER*BETA0/l
+                 
+                tempdp = node_value('harmon ')
+                 
+                p%mag%freq=clight*tempdp*BETA0/l
                 p%magp%freq=p%mag%freq
+                 
+                ! watch the msg buffer is 1024
+                write(msg,*) " Cavity ",p%mag%name," defined with harmonic number ",tempdp,". Using SUM(LD) as ring length: ", l, &
+                             " instead of real orbit length. Obtained freq. = ",p%mag%freq," Hz"
+	         
+                call fort_warn("ptc_input",msg(:len_trim(msg)))
+                icav=1
              endif
           endif
           p=>p%next
+          j = advance_node()
        enddo
     endif
 
@@ -2116,6 +2140,10 @@ CONTAINS
     END SELECT
 
     if (i==6) then
+       if (getdebug()>0) then
+         print*,"icav=",icav," my_ring%closed=",my_ring%closed," getenforce6D()=",getenforce6D()
+       endif
+       
        if ( (icav==0) .and. my_ring%closed .and. (getenforce6D() .eqv. .false.)) then
           default = default - delta0 - only_4d0 + NOCAVITY0
           call fort_warn('return mystate: ',' no cavity - dimensionality reduced 6 -> 5 and 1/2')
