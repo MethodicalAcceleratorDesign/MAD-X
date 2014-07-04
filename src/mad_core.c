@@ -155,7 +155,7 @@ madx_start(void)
   printf("  +    %s  (%s bit, %s) %s    +\n", version_name, version_arch, version_ostype, pad[pad_idx]);
   printf("  +    %s     +\n", version_is_pro ? version_type_pro : version_type_dev);
   printf("  + %s      +\n", version_date_mod);
-  printf("  + Execution Time Stamp: %02d.%02d.%02d %02d.%02d.%02d +\n",
+  printf("  + Execution Time Stamp: %02d.%02d.%02d %02d:%02d:%02d +\n",
          tm->tm_mday, tm->tm_mon+1, tm->tm_year%100,
          tm->tm_hour, tm->tm_min, tm->tm_sec);
   printf("  +++++++++++++++++++++++++++++++++++++++++++\n");
