@@ -1,6 +1,6 @@
 #! /bin/bash
 # run:
-# bash scripts/build-test-macosx.sh [noecho] [cleanall]
+# bash scripts/build-test-macosx.sh [noecho] [cleanall] [notest]
 
 # env settings
 export LC_CTYPE="C"
@@ -74,21 +74,25 @@ echo -e "\n===== Tests pointless files ====="
 make cleantest && make infotestdep
 check_error "make infotestdep failed"
 
-echo -e "\n===== Testing madx-macosx64-intel ====="
-make madx-macosx64-intel && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
-check_error "make tests-all for madx-macosx64-intel failed"
+if [ "$1" != "notest" ] ; then
+	shift
 
-echo -e "\n===== Testing madx-macosx32-intel ====="
-make madx-macosx32-intel && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
-check_error "make tests-all for madx-macosx32-intel failed"
+	echo -e "\n===== Testing madx-macosx64-intel ====="
+	make madx-macosx64-intel && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
+	check_error "make tests-all for madx-macosx64-intel failed"
 
-echo -e "\n===== Testing madx-macosx64-gnu ====="
-make madx-macosx64-gnu && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
-check_error "make tests-all for madx-macosx64-gnu failed"
+	echo -e "\n===== Testing madx-macosx32-intel ====="
+	make madx-macosx32-intel && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
+	check_error "make tests-all for madx-macosx32-intel failed"
 
-echo -e "\n===== Testing madx-macosx32-gnu ====="
-make madx-macosx32-gnu && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
-check_error "make tests-all for madx-macosx32-gnu failed"
+	echo -e "\n===== Testing madx-macosx64-gnu ====="
+	make madx-macosx64-gnu && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
+	check_error "make tests-all for madx-macosx64-gnu failed"
+
+	echo -e "\n===== Testing madx-macosx32-gnu ====="
+	make madx-macosx32-gnu && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
+	check_error "make tests-all for madx-macosx32-gnu failed"
+fi
 
 # restore the default version
 make madx-macosx32 > /dev/null && make madx-macosx64 > /dev/null

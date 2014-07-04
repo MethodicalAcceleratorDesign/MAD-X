@@ -1,6 +1,6 @@
 #! /bin/bash
 # run:
-# bash scripts/build-test-lxplus.sh [noecho] [cleanall]
+# bash scripts/build-test-lxplus.sh [noecho] [cleanall] [notest]
 
 # env settings
 export LC_CTYPE="C"
@@ -90,21 +90,25 @@ echo -e "\n===== Tests pointless files ====="
 make cleantest && make infotestdep
 check_error "make infotestdep failed"
 
-echo -e "\n===== Testing madx-linux64-intel ====="
-make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
-check_error "make tests-all for madx-linux64-intel failed"
+if [ "$1" != "notest" ] ; then
+	shift
 
-echo -e "\n===== Testing madx-linux32-intel ====="
-make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
-check_error "make tests-all for madx-linux32-intel failed"
+	echo -e "\n===== Testing madx-linux64-intel ====="
+	make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
+	check_error "make tests-all for madx-linux64-intel failed"
 
-echo -e "\n===== Testing madx-linux64-gnu ====="
-make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
-check_error "make tests-all for madx-linux64-gnu failed"
+	echo -e "\n===== Testing madx-linux32-intel ====="
+	make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
+	check_error "make tests-all for madx-linux32-intel failed"
 
-echo -e "\n===== Testing madx-linux32-gnu ====="
-make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
-check_error "make tests-all for madx-linux32-gnu failed"
+	echo -e "\n===== Testing madx-linux64-gnu ====="
+	make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
+	check_error "make tests-all for madx-linux64-gnu failed"
+
+	echo -e "\n===== Testing madx-linux32-gnu ====="
+	make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
+	check_error "make tests-all for madx-linux32-gnu failed"
+fi
 
 # restore the default version
 make madx-linux32 > /dev/null && make madx-linux64 > /dev/null

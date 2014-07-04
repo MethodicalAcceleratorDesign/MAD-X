@@ -2,7 +2,7 @@
 setlocal
 
 REM run:
-REM scripts/build-test-win.bat [noecho] [cleanall]
+REM scripts/build-test-win.bat [noecho] [cleanall] [notest]
 
 REM commands
 set CAT=c:\gnuwin32\bin\cat
@@ -50,6 +50,7 @@ if ERRORLEVEL 1 %echo% "ERROR: svn update failed" && exit /B 1
 %echo% -e "\n===== Clean build ====="
 if "%1"=="cleanall" (
 REM cleanall not supported on windows (relies on find)
+  shift
   %make% cleanbuild
 ) else (
   %echo% "Skipped (no explicit request)."
@@ -79,6 +80,9 @@ if ERRORLEVEL 1 %echo% "ERROR: make infobindep failed" && exit /B 1
 %make% cleantest && %make% infotestdep
 if ERRORLEVEL 1 %echo% "ERROR: make infotestdep failed" && exit /B 1
 
+REM skip tests
+if "%1"=="notest" shift & goto finish
+
 %echo% -e "\n===== Testing madx-win64-intel ====="
 %make% madx-win64-intel && %ls% -l madx-win64-intel.exe madx64.exe && %make% cleantest && %make% tests-all ARCH=64 NOCOLOR=yes
 if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win64-intel failed" && exit /B 1
@@ -96,6 +100,7 @@ REM restore the default version
 %make% madx-win32 > tmp.out && %make% madx-win64 > tmp.out && %rm% -f tmp.out
 if ERRORLEVEL 1 %echo% "ERROR: unable to restore the default version" && exit /B 1
 
+:finish
 REM date & end marker
 %date%
 %echo% -e "\n===== End of build and tests ====="
