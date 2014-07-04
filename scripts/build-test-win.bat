@@ -86,7 +86,7 @@ if "%1"=="notest" (
     %echo% "Skipped (explicit request)."
 ) else (
 	%echo% -e "\n"
-	
+
 	%echo% -e "\n===== Testing madx-win64-intel ====="
 	%make% madx-win64-intel && %ls% -l madx-win64-intel.exe madx64.exe && %make% cleantest && %make% tests-all ARCH=64 NOCOLOR=yes
 	if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win64-intel failed" && exit /B 1
@@ -106,5 +106,6 @@ if "%1"=="notest" (
 )
 
 REM date & end marker
+%echo% -e "\nFinish:"
 %date%
 %echo% -e "\n===== End of build and tests ====="

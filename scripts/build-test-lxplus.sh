@@ -122,5 +122,5 @@ check_error "unable to restore the default version"
 rm -f build-test-lxplus.run
 
 # date & end marker
-echo "Finish: `date`"
+echo -e "\nFinish: `date`"
 echo -e "\n===== End of build and tests ====="

@@ -80,7 +80,7 @@ if [ "$1" = "notest" ] ; then
 	echo "Skipped (explicit request)."
 else
 	echo -e "\n"
-	
+
 	echo -e "\n===== Testing madx-macosx64-intel ====="
 	make madx-macosx64-intel && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
 	check_error "make tests-all for madx-macosx64-intel failed"
@@ -103,5 +103,5 @@ make madx-macosx32 > /dev/null && make madx-macosx64 > /dev/null
 check_error "unable to restore the default version"
 
 # date & end marker
-echo "Finish: `date`"
+echo -e "\nFinish: `date`"
 echo -e "\n===== End of build and tests ====="
