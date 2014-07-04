@@ -90,8 +90,12 @@ echo -e "\n===== Tests pointless files ====="
 make cleantest && make infotestdep
 check_error "make infotestdep failed"
 
-if [ "$1" != "notest" ] ; then
+echo -e "\n===== Running tests (long) ====="
+if [ "$1" = "notest" ] ; then
 	shift
+	echo "Skipped (explicit request)."
+else
+	echo -e "\n"
 
 	echo -e "\n===== Testing madx-linux64-intel ====="
 	make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes

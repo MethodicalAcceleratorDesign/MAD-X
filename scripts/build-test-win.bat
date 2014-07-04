@@ -80,27 +80,31 @@ if ERRORLEVEL 1 %echo% "ERROR: make infobindep failed" && exit /B 1
 %make% cleantest && %make% infotestdep
 if ERRORLEVEL 1 %echo% "ERROR: make infotestdep failed" && exit /B 1
 
-REM skip tests
-if "%1"=="notest" shift & goto finish
+%echo% -e "\n===== Running tests (long) ====="
+if "%1"=="notest" (
+	shift
+    %echo% "Skipped (explicit request)."
+) else (
+	%echo% -e "\n"
+	
+	%echo% -e "\n===== Testing madx-win64-intel ====="
+	%make% madx-win64-intel && %ls% -l madx-win64-intel.exe madx64.exe && %make% cleantest && %make% tests-all ARCH=64 NOCOLOR=yes
+	if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win64-intel failed" && exit /B 1
 
-%echo% -e "\n===== Testing madx-win64-intel ====="
-%make% madx-win64-intel && %ls% -l madx-win64-intel.exe madx64.exe && %make% cleantest && %make% tests-all ARCH=64 NOCOLOR=yes
-if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win64-intel failed" && exit /B 1
+	%echo% -e "\n===== Testing madx-win32-intel ====="
+	%make% madx-win32-intel && %ls% -l madx-win32-intel.exe madx32.exe && %make% cleantest && %make% tests-all ARCH=32 NOCOLOR=yes
+	if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win32-intel failed" && exit /B 1
 
-%echo% -e "\n===== Testing madx-win32-intel ====="
-%make% madx-win32-intel && %ls% -l madx-win32-intel.exe madx32.exe && %make% cleantest && %make% tests-all ARCH=32 NOCOLOR=yes
-if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win32-intel failed" && exit /B 1
+	%echo% -e "\n===== Testing madx-win64-gnu ====="
+	set GFORTRAN_UNBUFFERED_PRECONNECTED=y
+	%make% madx-win64-gnu && %ls% -l madx-win64-gnu.exe madx64.exe && %make% cleantest && %make% tests-all ARCH=64 NOCOLOR=yes
+	if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win64-intel failed" && exit /B 1
 
-%echo% -e "\n===== Testing madx-win64-gnu ====="
-set GFORTRAN_UNBUFFERED_PRECONNECTED=y
-%make% madx-win64-gnu && %ls% -l madx-win64-gnu.exe madx64.exe && %make% cleantest && %make% tests-all ARCH=64 NOCOLOR=yes
-if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win64-intel failed" && exit /B 1
+	REM restore the default version
+	%make% madx-win32 > tmp.out && %make% madx-win64 > tmp.out && %rm% -f tmp.out
+	if ERRORLEVEL 1 %echo% "ERROR: unable to restore the default version" && exit /B 1
+)
 
-REM restore the default version
-%make% madx-win32 > tmp.out && %make% madx-win64 > tmp.out && %rm% -f tmp.out
-if ERRORLEVEL 1 %echo% "ERROR: unable to restore the default version" && exit /B 1
-
-:finish
 REM date & end marker
 %date%
 %echo% -e "\n===== End of build and tests ====="
