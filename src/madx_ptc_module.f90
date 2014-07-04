@@ -2140,7 +2140,7 @@ CONTAINS
     END SELECT
 
     if (i==6) then
-       if (getdebug()>0) then
+       if (getdebug()>2) then
          print*,"icav=",icav," my_ring%closed=",my_ring%closed," getenforce6D()=",getenforce6D()
        endif
        
