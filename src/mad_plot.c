@@ -96,15 +96,15 @@ get_version(char* tlt, int* l)
 {
   time_t tmp;
   struct tm* tm;
-  int n = strlen(version_name);
   time(&tmp);
-  tm = localtime(&tmp); /* split system time */
-  strcpy(tlt, version_name);
-  tlt += n;
-  sprintf(tlt, "  %02d/%02d/%02d %02d.%02d.%02d\n",
+  tm = localtime(&tmp);
+  strcpy(tlt, "MAD-X ");
+  strcat(tlt, version_name);
+  sprintf(tlt+strlen(tlt),
+          "  %02d/%02d/%02d %02d.%02d.%02d",
           tm->tm_mday, tm->tm_mon+1, tm->tm_year%100,
           tm->tm_hour, tm->tm_min, tm->tm_sec);
-  *l = n + 19;
+  *l = strlen(tlt);
 }
 
 double
