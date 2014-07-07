@@ -201,7 +201,7 @@ module precision_constants
 
   logical(lp) :: change_sector=my_true
   real(dp) :: xlost(6)=0.0_dp
-  character(255) :: messagelost
+  character(1024) :: messagelost
   
   !  logical(lp) :: fixed_found
   !  lielib_print(1)=1   lieinit prints info
