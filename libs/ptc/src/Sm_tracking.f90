@@ -211,7 +211,10 @@ contains
     DO  WHILE(.not.ASSOCIATED(C,c2))
 
        CALL TRACK(C,X,K)
-       if(.not.check_stable) exit
+       if(.not.check_stable) then
+         write(messagelost,*) "Error in tracking ",c%mag%name," ", messagelost(:len_trim(messagelost))
+         exit
+       endif  
 
        C=>C%NEXT
     ENDDO
@@ -257,7 +260,10 @@ contains
     DO  WHILE(.not.ASSOCIATED(C,c2))
 
        CALL TRACK(C,X,K)
-       if(.not.check_stable) exit
+       if(.not.check_stable) then
+         write(messagelost,*) "Error in tracking ",c%mag%name," ", messagelost(:len_trim(messagelost))
+         exit
+       endif
 
        C=>C%NEXT
     ENDDO
@@ -593,7 +599,11 @@ contains
     !    endif ! new 2010
 
     if(abs(x(1))+abs(x(3))>absolute_aperture) then   !.or.(.not.CHECK_MADX_APERTURE)) then
-       messageLOST="Sm_tracking.f90 TRACK_FIBRE_R : exceed absolute_aperture in TRACK_FIBRE_R"
+       
+       write(messagelost,*) "Error in tracking ",c%mag%name, &
+                            " Sm_tracking.f90 TRACK_FIBRE_R : exceed absolute_aperture in TRACK_FIBRE_R",&
+	        " X=",X(1)," + Y=",X(3)," > absolute_aperture=",absolute_aperture
+       
        xlost=x
        CHECK_STABLE=.false.
     endif
