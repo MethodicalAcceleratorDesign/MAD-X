@@ -107,7 +107,7 @@ module madx_ptc_twiss_module
   real(dp)    :: prevOrbit(6)
   real(dp)    :: prevS(6)
   
-  character(1000), private  :: whymsg
+  character(2000), private  :: whymsg
   
   
   !============================================================================================
@@ -248,8 +248,8 @@ contains
     enddo
 
     if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-       write(whymsg,*) 'DA got unstable: PTC msg: ',messagelost
-       call fort_warn('ptc_twiss: ',whymsg)
+       write(whymsg,*) 'DA got unstable: PTC msg: ',messagelost(:len_trim(messagelost))
+       call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
        call seterrorflag(10,"ptc_twiss ",whymsg);
        return
     endif
@@ -495,8 +495,8 @@ contains
        call find_orbit(my_ring,x,1,default,c_1d_7)
        
        if ( .not. check_stable) then
-          write(whymsg,*) 'DA got unstable during closed orbit search: PTC msg: ',messagelost
-          call fort_warn('ptc_twiss: ',whymsg)
+          write(whymsg,*) 'DA got unstable during closed orbit search: PTC msg: ',messagelost(:len_trim(messagelost))
+          call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
           call seterrorflag(10,"ptc_twiss ",whymsg);
           return
           !          return
@@ -724,8 +724,8 @@ contains
              
              write(whymsg,*) 'DA got unstable in tracking at s= ',s, &
                              ' magnet ',i,' ', current%mag%name,' ', current%mag%vorname, &
-	         ' step ',nodePtr%pos,' PTC msg: ',messagelost
-             call fort_warn('ptc_twiss: ',whymsg)
+	         ' step ',nodePtr%pos,' PTC msg: ',messagelost(:len_trim(messagelost))
+             call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
              call seterrorflag(10,"ptc_twiss ",whymsg);
              
              if (getdebug() > 2) close(mf1)
@@ -736,7 +736,7 @@ contains
           if(flag_index/=0) then
              call ANALYSE_APERTURE_FLAG(flag_index,why)
              write(whymsg,*) 'APERTURE error: ',why,' s=',s,'  element: ',i,' name: ',current%MAG%name
-             call fort_warn('ptc_twiss: ',whymsg)
+             call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
              call seterrorflag(10,"ptc_twiss: ",whymsg);
              !          Write(6,*) why ! See produce aperture flag routine in sd_frame
              goto 100
@@ -829,8 +829,8 @@ contains
            
            write(whymsg,*) 'DA got unstable in tracking at s= ',s, &
                            ' magnet ',i,' ', current%mag%name,' ', current%mag%vorname, &
-	       ' PTC msg: ',messagelost
-           call fort_warn('ptc_twiss: ',whymsg)
+	       ' PTC msg: ',messagelost(:len_trim(messagelost))
+           call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
            call seterrorflag(10,"ptc_twiss ",whymsg);
            if (getdebug() > 2) close(mf1)
            return
@@ -840,7 +840,7 @@ contains
         if(flag_index/=0) then
            call ANALYSE_APERTURE_FLAG(flag_index,why)
            write(whymsg,*) 'APERTURE error: ',why,' s=',s,'  element: ',i,' name: ',current%MAG%name
-           call fort_warn('ptc_twiss: ',whymsg)
+           call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
            call seterrorflag(10,"ptc_twiss: ",whymsg);
            goto 100
         endif
@@ -1124,8 +1124,10 @@ contains
          
          call track(my_ring,y,1,default)
          if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-            write(whymsg,*) 'DA got unstable (one turn map production): PTC msg: ',messagelost
-            call fort_warn('ptc_twiss: ',whymsg)
+            write(whymsg,*) 'DA got unstable (one turn map production) at ', &
+                             lost_fibre%mag%name, &
+                            ' PTC msg: ',messagelost(:len_trim(messagelost))
+            call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
             call seterrorflag(10,"ptc_twiss ",whymsg);
             return
          endif
@@ -1135,7 +1137,7 @@ contains
             call ANALYSE_APERTURE_FLAG(flag_index,why)
 
             write(whymsg,*) 'APERTURE unstable (one turn map production) - programs continues: ',why
-            call fort_warn('ptc_twiss: ',whymsg)
+            call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
             call seterrorflag(10,"ptc_twiss: ",whymsg);
             !          Write(6,*) "ptc_twiss unstable (map production)-programs continues "
             !          Write(6,*) why ! See produce aperture flag routine in sd_frame
@@ -1909,7 +1911,7 @@ contains
          if(checkvalue .gt.c_1d_10) then
             write(whymsg,*) "Provided matrix has eigenvalue more than 1e-10 off the unit circle ! plane = ",i, &
                             " r^2 = ", reval(i)**2+aieval(i)**2, " delta = ",checkvalue 
-            call fort_warn("ptc_twiss",whymsg)
+            call fort_warn("ptc_twiss",whymsg(:len_trim(whymsg)))
    
             if(checkvalue .gt.c_1d_8) then
             
@@ -1936,8 +1938,8 @@ contains
       normal = y
 
       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-         write(whymsg,*) 'DA got unstable during Normal Form: PTC msg: ',messagelost
-         call fort_warn('ptc_twiss::maptoascript: ',whymsg)
+         write(whymsg,*) 'DA got unstable during Normal Form: PTC msg: ',messagelost(:len_trim(messagelost))
+         call fort_warn('ptc_twiss::maptoascript: ',whymsg(:len_trim(whymsg)))
          call seterrorflag(10,"ptc_twiss::maptoascript ",whymsg);
          return
       endif
@@ -2269,8 +2271,8 @@ contains
       theNormalForm = oneTurnMap
 
       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-         write(whymsg,*) 'DA got unstable during Normal Form: PTC msg: ',messagelost
-         call fort_warn('ptc_twiss oneTurnSummary: ',whymsg)
+         write(whymsg,*) 'DA got unstable during Normal Form: PTC msg: ',messagelost(:len_trim(messagelost))
+         call fort_warn('ptc_twiss oneTurnSummary: ',whymsg(:len_trim(whymsg)))
          call seterrorflag(10,"ptc_twiss oneTurnSummary",whymsg)
          call kill(theNormalForm)
          return
