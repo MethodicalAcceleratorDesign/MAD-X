@@ -524,8 +524,8 @@ CONTAINS
              
              xlost=0.0_dp
              xlost=x
-             write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=1 elliptic Aperture", &
-                                   " X=",X(1)," Y=",X(3)," Ap.: DX=",E%DX," DY=",E%DY," R1=",E%R(1)," R2=",E%R(2)
+             write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=1 elliptic aperture.", &
+                                   "Orbit: X=",X(1)," Y=",X(3)," Ap.: DX=",E%DX," DY=",E%DY," R1=",E%R(1)," R2=",E%R(2)
           ENDIF
        CASE(2)  ! rectangle
           IF(ABS(X(1)-E%DX)>E%X.OR.ABS(X(3)-E%DY)>E%Y) THEN
@@ -534,8 +534,8 @@ CONTAINS
              
              xlost=0.0_dp
              xlost=x
-             write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=2 rectangular Aperture", &
-                                   " X=",X(1)," Y=",X(3)," Ap.: DX=",E%DX," DY=",E%DY
+             write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=2 rectangular aperture.", &
+                                   "Orbit: X=",X(1)," Y=",X(3)," Ap.: DX=",E%DX," DY=",E%DY
           ENDIF
        CASE(3)  ! RECTANGLE + ELLIPSE (CIRCLE)
           IF((ABS(X(1)-E%DX)>E%X).OR.(ABS(X(3)-E%DY)>E%Y).OR.  &
@@ -545,8 +545,8 @@ CONTAINS
              
              xlost=0.0_dp
              xlost=x
-             write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=3 rect-ellipse Aperture", &
-                                   " X=",X(1)," Y=",X(3)," Ap.: DX=",E%DX," DY=",E%DY," R1=",E%R(1)," R2=",E%R(2)
+             write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=3 rect-ellipse aperture.", &
+                                   "Orbit: X=",X(1)," Y=",X(3)," Ap.: DX=",E%DX," DY=",E%DY," R1=",E%R(1)," R2=",E%R(2)
              
           ENDIF
        CASE(4) ! MARGUERITE
@@ -557,8 +557,8 @@ CONTAINS
              
              xlost=0.0_dp
              xlost=x
-             write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=4 marguerite Aperture", &
-                                   " X=",X(1)," Y=",X(3)," Ap.: DX=",E%DX," DY=",E%DY," R1=",E%R(1)," R2=",E%R(2)
+             write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=4 marguerite aperture.", &
+                                   "Orbit: X=",X(1)," Y=",X(3)," Ap.: DX=",E%DX," DY=",E%DY," R1=",E%R(1)," R2=",E%R(2)
           ENDIF
        CASE(5) ! RACETRACK
           IF( (abs(x(1)-e%dx)) > (e%r(1)+e%x)                  &
@@ -572,8 +572,8 @@ CONTAINS
              
              xlost=0.0_dp
              xlost=x
-             write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=5 racetrack Aperture", &
-                                   " X=",X(1)," Y=",X(3)," Ap.: DX=",E%DX," DY=",E%DY," R1=",E%R(1)," R2=",E%R(2)
+             write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=5 racetrack aperture.", &
+                                   "Orbit X=",X(1)," Y=",X(3)," Ap.: DX=",E%DX," DY=",E%DY," R1=",E%R(1)," R2=",E%R(2)
              
           ENDIF
 
