@@ -2030,21 +2030,14 @@ vector_to_table_curr(const char* table, const char* name, const double* vals, co
      -3 row    does not exist (need expansion)
   */
 {
+  assert(table);
+  assert(name);
+  assert(vals);
+  assert(nval);
+
   char tbl_s[NAME_L], col_s[NAME_L], buf[5*NAME_L];
   struct table* tbl;
   int pos, col, last, j;
-
-  if (table == NULL)
-   {
-     error("vector_to_table_curr","table is NULL.");
-     return -1;
-   }
-  
-  if (table_register == NULL)
-   {
-     error("vector_to_table_curr","table_register is NULL.");
-     return -1;
-   }
 
   mycpy(tbl_s, table);
   if ((pos = name_list_pos(tbl_s, table_register->names)) < 0 ||
@@ -2053,18 +2046,6 @@ vector_to_table_curr(const char* table, const char* name, const double* vals, co
     return -1;
   }
 
-  if (tbl->name == NULL)
-   {
-     error("vector_to_table_curr","tbl->name is NULL, it is not correct.");
-     return -1;
-   }
-
-  if (tbl->columns == NULL)
-   {
-     error("vector_to_table_curr","tbl->columns is NULL for table named %s. It is not correct.",tbl->name);
-     return -1;
-   }
- 
   mycpy(col_s, name);
   if ((col = name_list_pos(col_s, tbl->columns)) < 0) {
     warning("vector_to_table_curr: column not found:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
