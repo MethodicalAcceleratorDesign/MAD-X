@@ -133,10 +133,20 @@ add_to_name_list(char* name, int inf, struct name_list* vlist)
   /* adds name to alphabetic name list vlist */
   /* inf is an integer kept with name */
 {
-  int j, num, low = 0, mid, high = vlist->curr - 1, pos = 0, ret;
+  int j, num, low = 0, mid, high, pos = 0, ret;
 
-  if (name == NULL) return -1;
-
+  if (name == NULL) 
+   {
+     error("add_to_name_list","name argument is NULL.");
+     return -1;
+   }  
+  if (vlist == NULL)
+   {
+     error("add_to_name_list","vlist argument is NULL.");
+     return -1;
+   }   
+  high = vlist->curr - 1;
+  
   ret = name_list_pos(name, vlist);
   if (ret < 0) {
     while (low <= high) {
@@ -162,7 +172,17 @@ add_to_name_list(char* name, int inf, struct name_list* vlist)
 int
 name_list_pos(const char* p, struct name_list* vlist)
 {
-  int num, mid, low = 0, high = vlist->curr - 1;
+  int num, mid, low = 0, high;
+  
+  if (vlist == NULL)
+   {  
+     /*high = vlist->curr - 1;
+     printf("high %d\n",high);*/
+     error("name_list_pos 2","vlist argument is NULL.");
+     return -1;
+   }   
+  high = vlist->curr - 1;
+  
   while (low <= high) {
     mid = (low + high) / 2;
     if ((num=strcmp(p, vlist->names[vlist->index[mid]])) < 0)  high = mid - 1;
