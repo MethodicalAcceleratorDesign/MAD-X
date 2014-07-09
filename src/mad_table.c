@@ -986,12 +986,12 @@ print_table(struct table* t)
 void
 make_map_table(int* map_table_max_rows)
 {
-  int k, pos;
+  int pos;
   if ((pos = name_list_pos("map_table", table_register->names)) > -1)
   {
     delete_table(table_register->tables[pos]);
-    k = remove_from_name_list(table_register->tables[pos]->name,
-                              table_register->names);
+    int k = remove_from_name_list(table_register->tables[pos]->name,
+                                  table_register->names);
     table_register->tables[k] = table_register->tables[--table_register->curr];
   }
   /* initialise table */

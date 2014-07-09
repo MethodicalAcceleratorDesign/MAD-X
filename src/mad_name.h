@@ -38,7 +38,6 @@ void               dump_name_list(struct name_list*);
 void               copy_name_list(struct name_list* out, struct name_list* in);
 void               grow_name_list(struct name_list*);
 int                add_to_name_list(char* name, int inf, struct name_list*);
-// int                name_list_pos(char* p, struct name_list*);
 
 struct vector_list* new_vector_list(int length);
 struct vector_list* delete_vector_list(struct vector_list*);
@@ -48,6 +47,13 @@ void                grow_vector_list(struct vector_list*);
 #define add_to_name_list(name, inf, list) \
   ((void)(fprintf(stderr, "**** calling add_to_name_list name=%s, %s:%d\n", (name), __FILE__, __LINE__)), \
     add_to_name_list(name, inf, list))
+#endif
+
+#if 0
+#define name_list_pos(var, list) \
+  ((void)(fprintf(stderr, "**** calling name_list_pos name=%s, list=%s from %s:%d\n", \
+   (var), (list)?(list)->name:"null", __FILE__, __LINE__)), \
+    name_list_pos(var, list))
 #endif
 
 #endif // MAD_NAME_H

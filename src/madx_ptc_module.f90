@@ -2302,9 +2302,9 @@ CONTAINS
                                      map_coor(9)=j(5)
                                      map_coor(10)=j(6)
                                      call vector_to_table_curr("map_table ", 'coef ', map_coor(1), i_map_coor)
-	                 write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:c_%npara)
-	                 coeffCode = 'c'//coeffCode(1:8)//CHAR(0)
-	                 call string_to_table_curr( 'map_table ', "name ", coeffCode );
+                  	                 write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:c_%npara)
+                  	                 coeffCode = 'c'//coeffCode(1:8)//CHAR(0)
+                  	                 call string_to_table_curr("map_table ", "name ", coeffCode);
                                      call augment_count("map_table ")
                                   endif
                                   !write(0,*) 'write coef', coef
@@ -2329,21 +2329,21 @@ CONTAINS
                                j(5)=i5
                                coef = y(i)%T.sub.j
                                if (coef.ne.zero) then
-                                  map_coor(1)=coef
-                                  map_coor(2)=i
-                                  map_coor(3)=c_%npara
-                                  map_coor(4)=no
-                                  map_coor(5)=j(1)
-                                  map_coor(6)=j(2)
-                                  map_coor(7)=j(3)
-                                  map_coor(8)=j(4)
-                                  map_coor(9)=j(5)
-                                  map_coor(10) = 0
-                                  call vector_to_table_curr("map_table ", 'coef ', map_coor(1), i_map_coor)
-	              write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:5),0   !anyway fixed above
-                                  coeffCode = 'c'//coeffCode(1:8)//CHAR(0)
-	              call string_to_table_curr( "map_table ", "name ", coeffCode );
-                                  call augment_count("map_table ")
+                                 map_coor(1)=coef
+                                 map_coor(2)=i
+                                 map_coor(3)=c_%npara
+                                 map_coor(4)=no
+                                 map_coor(5)=j(1)
+                                 map_coor(6)=j(2)
+                                 map_coor(7)=j(3)
+                                 map_coor(8)=j(4)
+                                 map_coor(9)=j(5)
+                                 map_coor(10) = 0
+                                 call vector_to_table_curr("map_table ", 'coef ', map_coor(1), i_map_coor)
+	                               write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:5),0   !anyway fixed above
+                                 coeffCode = 'c'//coeffCode(1:8)//CHAR(0)
+	                               call string_to_table_curr("map_table ", "name ", coeffCode);
+                                 call augment_count("map_table ")
                                endif
                             endif
                          enddo
@@ -2374,9 +2374,9 @@ CONTAINS
                                map_coor(9)=0
                                map_coor(10)=0
                                call vector_to_table_curr("map_table ", 'coef ', map_coor(1), i_map_coor)
-	           write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:4),0,0
+	                             write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:4),0,0
                                coeffCode = 'c'//coeffCode(1:8)//CHAR(0)
-	           call string_to_table_curr( "map_table ", "name ", coeffCode );
+	                             call string_to_table_curr( "map_table ", "name ", coeffCode );
                                call augment_count("map_table ")
                             endif
                          endif

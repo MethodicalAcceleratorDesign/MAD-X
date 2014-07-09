@@ -157,10 +157,11 @@ int
 }
 
 int
-name_list_pos(const char* name, struct name_list* vlist)
+(name_list_pos)(const char* name, struct name_list* vlist)
 {
   assert(name);
-  assert(vlist);
+
+  if (!vlist) return -1; // empty vlist
   
   int low = 0, high = vlist->curr - 1;
   
