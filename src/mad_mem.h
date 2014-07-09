@@ -21,8 +21,8 @@
 #else
 
 #define mymalloc(fn, sz)            mytrace(sz,myptrchk(fn, malloc(sz)))
-#define mymalloc_atomic(fn, sz)     mytrace(myptrchk(fn, malloc(sz)))
-#define myrealloc(fn, p, sz)        mytrace(myptrchk(fn, realloc((p),(sz))))
+#define mymalloc_atomic(fn, sz)     mytrace(sz,myptrchk(fn, malloc(sz)))
+#define myrealloc(fn, p, sz)        mytrace(sz,myptrchk(fn, realloc((p),(sz))))
 #define myfree(fn, p)               ((void)(free(p), (void)fn, (p)=0))
 
 #define mycalloc(fn, n, sz)         mytrace(sz,myptrchk(fn, calloc((n),(sz))))
