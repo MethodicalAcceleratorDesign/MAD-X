@@ -129,16 +129,14 @@ grow_vector_list(struct vector_list* p)
 }
 
 int
-add_to_name_list(char* name, int inf, struct name_list* vlist)
+(add_to_name_list)(char* name, int inf, struct name_list* vlist)
   /* adds name to alphabetic name list vlist */
   /* inf is an integer kept with name */
 {
-  int num, ret;
-
   assert(name);
   assert(vlist);
 
-  ret = name_list_pos(name, vlist);
+  int ret = name_list_pos(name, vlist);
   if (ret < 0) {
     int low=0, high = vlist->curr - 1, pos = 0;
     while (low <= high) {

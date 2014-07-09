@@ -44,5 +44,11 @@ struct vector_list* new_vector_list(int length);
 struct vector_list* delete_vector_list(struct vector_list*);
 void                grow_vector_list(struct vector_list*);
 
+#if 0
+#define add_to_name_list(name, inf, list) \
+  ((void)(fprintf(stderr, "**** calling add_to_name_list name=%s, %s:%d\n", (name), __FILE__, __LINE__)), \
+    add_to_name_list(name, inf, list))
+#endif
+
 #endif // MAD_NAME_H
 
