@@ -41,13 +41,15 @@ Bending magnets are defined by the commands:
 label: SBEND, L=real, ANGLE=real, TILT=real,
               K0=real, K1=real, K2=real,
               E1=real, E2=real, FINT=real,FINTX=real, 
-              HGAP=real, H1=real, H2=real;
+              HGAP=real, H1=real, H2=real,
+              THICK = logical;
 
 label: RBEND, L=real, ANGLE=real, TILT=real, 
               K0=real, K1=real, K2=real,
               E1=real, E2=real, FINT=real, FINTX=real, 
               HGAP=real, H1=real, H2=real, 
-              ADD_ANGLE={<i>array_of_max_5_angles</i>};
+              ADD_ANGLE={<i>array_of_max_5_angles</i>},
+              THICK = logical;
 </PRE>
 
 Bending magnets have the following attributes:
@@ -149,6 +151,13 @@ one gets K0 = ANGLE / arclength.
 <!---The default is 0 m<sup>-1</sup>. A positive K0S deflects the closed -->
 <!---orbit to positive y values. -->
 
+    <p><li>THICK: If this logical flag is set to true the bending 
+	magnet will be tracked through as a thick-element, instead of being
+	converted into thin-lenses. <br>
+	(Default: false)
+      </li>
+
+
 </ul>
 
 <p>
@@ -200,6 +209,6 @@ BU: RBEND, L=5.5, ANGLE=+0.001, TILT=-pi/2;
 <a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
 <a href="http://www.cern.ch/Frank.Schmidt/frs_sign.html">frs</a>,
 August 28, 2003 --  
-Ghislain Roy, May 14th, 2014
+Ghislain Roy, July 9th, 2014
 </address>
 </body>

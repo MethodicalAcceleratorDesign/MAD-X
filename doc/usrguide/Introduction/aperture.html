@@ -417,6 +417,13 @@ on_ap, on_elem, spec
 n1 is the maximum beam size in sigma, while n1x_m and n1y_m is the n1 values in SI units 
 in the x- and y-direction.
 <p>
+Note that specifying the <tt>apertype</tt> column automatically selects also the 
+<tt>aper_1, aper_2, aper_3</tt> and <tt>aper_4</tt> columns.
+<br>The statement<br>
+<tt> Select, flag=aperture, column=apertype;</tt>
+<br>is equivalent to<br>
+<tt> Select, flag=aperture, column=apertype, aper_1, aper_2, aper_3, aper_4;</tt>
+<p>
 aper_# means for all apertypes but racetrack:<br>
 aper_1 = half width rectangle<br>
 aper_2 = half heigth rectangle<br>

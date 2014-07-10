@@ -229,7 +229,7 @@ A drift space has one real attribute:
 Examples: 
 \begin{verbatim}
 DR1: DRIFT, L = 1.5;
-DR2: DRIFT, L = DR1[L];
+DR2: DRIFT, L = DR1->L;
 \end{verbatim} 
 
 The length of DR2 will always be equal to the length of DR1. The
@@ -259,13 +259,15 @@ Bendig magnets are defined by the commands:
 label: SBEND, L = real, ANGLE = real, TILT = real, 
               K0 = real, K1 = real, K2 = real, 
               E1 = real, E2 = real, FINT = real, FINTX = real, 
-              HGAP = real, H1 = real, H2 = real;
+              HGAP = real, H1 = real, H2 = real,
+              THICK = logical;
 
 label: RBEND, L = real, ANGLE = real, TILT = real, 
               K0 = real, K1 = real, K2 = real, 
               E1 = real, E2 = real, FINT = real, FINTX = real,
               HGAP = real, H1 = real, H2 = real,
-              ADD_ANGLE='array';
+              ADD_ANGLE='array',
+              THICK = logical;
 \end{verbatim} 
 
 Bending magnets have the following attributes:
@@ -367,6 +369,10 @@ Bending magnets have the following attributes:
 % -The default is 0 m<sup>-1</sup>. A positive K0S deflects the closed 
 % -orbit to positive y values.
 
+   \ttitem{THICK} If this logical flag is set to true the bending 
+   magnet will be tracked through as a thick-element, instead of being
+   converted into thin-lenses. \\
+   (Default: false)
 \end{madlist}
 
 \vskip 5mm
@@ -461,10 +467,11 @@ It has zero length and five attributes.
 \label{sec:quadrupole}
 
 \begin{verbatim}
-label: QUADRUPOLE, L = real, K1 = real, K1S = real, TILT = real;
+label: QUADRUPOLE, L = real, K1 = real, K1S = real, TILT = real, 
+                   THICK = logical;
 \end{verbatim}    
 
-A QUADRUPOLE has four real attributes:     
+A QUADRUPOLE has five attributes:     
 \begin{madlist}
    \ttitem{L} The quadrupole length (default: 0 m). 
    \ttitem{K1} The normal quadrupole coefficient:        
@@ -489,9 +496,10 @@ A QUADRUPOLE has four real attributes:
   about the actual meaning of the TILT attribute for
   various elements. } 
 
-    \ttitem{THICK} If this flag is set to 1 the quadrupole will be tracked
-      through as a thick-element, instead of being converted into
-      thin-lenses.  
+    \ttitem{THICK} If this logical flag is set to true the quadrupole
+    will be tracked through as a thick-element, instead of being
+    converted into thin-lenses.\\
+    (Default: false)
 \end{madlist}
 
 \textbf{ Note also that $K_1$ or $K_{1s}$ can be considered as

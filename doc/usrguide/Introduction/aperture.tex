@@ -546,6 +546,16 @@ on\_elem, spec
 n1 is the maximum beam size in sigma, while n1x\_m and n1y\_m is the n1
 values in si-units in the x- and y-direction.  
 
+Note that specifying the \tt{apertype} column autimatically selects also the
+\tt{aper\_1, aper\_2, aper\_3} and \tt{aper\_4} columns. The statement
+\begin{verbatim}
+Select, flag=aperture, column=apertype;
+\end{verbatim}
+is equivalent to
+\begin{verbatim}
+Select, flag=aperture, column=apertype, aper_1, aper_2, aper_3, aper_4;
+\end{verbatim}
+
 aper\_\# means for all apertypes but racetrack:
 \\ aper\_1 = half width rectangle
 \\ aper\_2 = half heigth rectangle

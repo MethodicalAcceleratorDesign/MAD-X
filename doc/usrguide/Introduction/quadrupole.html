@@ -14,11 +14,12 @@
         src="http://cern.ch/madx/icons/mx7_25.gif" align="right">
       <h2>Quadrupole</h2>
     </center>
-    <pre>label: QUADRUPOLE,L=real,K1=real,K1S=real,TILT=real;
+    <pre>label: QUADRUPOLE,L=real,K1=real,K1S=real,TILT=real, THICK=logical;
 </pre>
-    A QUADRUPOLE has four real attributes:
+    A QUADRUPOLE has five attributes:
     <ul>
-      <li>L: The quadrupole length (default: 0 m). </li>
+      <li>L: The quadrupole length (default: 0 m). 
+      </li>
       <li>K1: The normal quadrupole coefficient
         <p> <i>K</i><sub>1</sub> = 1/(<i>B</i> rho) (ð<i>B<sub>y</sub></i>/ð
           <i>x</i>). </p>
@@ -47,9 +48,10 @@
               MAD8 about the actual meaning of the TILT attribute for
               various elements. </font></b> </p>
       </li>
-      <li>THICK: If this flag is set to 1 the quadrupole will be tracked
-        through as a thick-element, instead of being converted into
-        thin-lenses. </li>
+      <li>THICK: If this logical flag is set to true the quadrupole will 
+	be tracked through as a thick-element, instead of being converted 
+	into thin-lenses. 
+      </li>
     </ul>
     <p><b><font color="#0000ff"> Note also that K<sub>1</sub>/K<sub>1s</sub>
           can be considered as the normal or skew quadrupole components

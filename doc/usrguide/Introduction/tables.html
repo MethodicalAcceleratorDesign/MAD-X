@@ -2,7 +2,8 @@
 <html>
 <head>
   <title>Variables in MAD</title>
-<!-- Changed by: Chris ISELIN, 17-Jul-1997 --><!-- Changed by: Hans Grote, 10-Jun-2002 -->
+<!-- Changed by: Chris ISELIN, 17-Jul-1997 -->
+<!-- Changed by: Hans Grote, 10-Jun-2002 -->
 </head>
 <body bgcolor="#ffffff">
 <center>
@@ -175,12 +176,16 @@ instead of the slopes
 (<i>x</i>', <i>y</i>'),
 their definitions differ slightly from those
 in <a href="bibliography.html#courant">[Courant and Snyder]</a>.
-Notice that in MAD-X PT substitutes DELTAP as longitudinal variable.
+<p>
+Notice that in MAD-X, PT substitutes DELTAP as longitudinal variable.
 Dispersive and chromatic functions are hence derivatives with respects
-to PT. Being PT=BETA*DELTAP, where BETA is the relativistic Lorentz
-factor, those functions must be multiplied by BETA a number of time
-equal to the order of the derivative. The linear lattice functions are
-known to MAD under the following names:
+to PT. 
+<p>
+And since PT=BETA*DELTAP, where BETA is the relativistic Lorentz
+factor, those functions given by MAD-X must be multiplied by BETA a number of time
+equal to the order of the derivative to find the functions given in the litterature.
+<p>
+The linear lattice functions are known to MAD-X under the following names:
 <ul>
   <li>BETX:
 Amplitude function beta<sub><i>x</i></sub>, [m].
@@ -252,7 +257,8 @@ greater then the particle mass.
 </ul>
 <!-- The TWISS table also defines the following expressions which -->
 <!-- can be used in plots:--><!--ul-->
-<!--li--><!-- GAMX = (1 + ALFX*ALFX) / BETX, --><!--li--><!-- GAMY = (1 + ALFY*ALFY) / BETY, -->
+<!--li--><!-- GAMX = (1 + ALFX*ALFX) / BETX, -->
+<!--li--><!-- GAMY = (1 + ALFY*ALFY) / BETY, -->
 <!--li--><!-- SIGX = SQRT(BETX * EX), the vertical r.m.s. half-width of the beam, -->
 <!--li--><!-- SIGY = SQRT(BETY * EY), the vertical r.m.s. half-height of the beam. --><!--/ul-->
 <h3><a name="chrom">Chromatic Functions</a></h3>
@@ -261,12 +267,16 @@ Several MAD commands refer to the chromatic functions.
 (<i>x</i>', <i>y</i>'),
 their definitions differ slightly from those
 in <a href="bibliography.html#montague">[Montague]</a>.
+<p>
 Notice that in MAD-X PT substitutes DELTAP as longitudinal variable.
 Dispersive and chromatic functions are hence derivatives with respects
-to PT. Being PT=BETA*DELTAP, where BETA is the relativistic Lorentz
-factor, those functions must be multiplied by BETA a number of time
-equal to the order of the derivative. The chromatic functions are known
-to MAD under the following names:
+to PT. 
+<p>
+And since PT=BETA*DELTAP, where BETA is the relativistic Lorentz
+factor, those functions given by MAD-X must be multiplied by BETA a number of time
+equal to the order of the derivative to find the functions given in the litterature.
+<p>
+The chromatic functions are known to MAD-X under the following names:
 <p><font color="#ff0000"><i>Please note that this option is needed
 for a proper calculation of the chromaticities in the
 presence of coupling!</i></font></p>
@@ -449,9 +459,12 @@ divided by the reference momentum times the velocity of light, [1]:
 </ul>
 Notice that in MAD-X PT substitutes DELTAP as longitudinal variable.
 Dispersive and chromatic functions are hence derivatives with respects
-to PT. Being PT=BETA*DELTAP, where BETA is the relativistic Lorentz
-factor, those functions must be multiplied by BETA a number of time
-equal to the order of the derivative.
+to PT. 
+<p>
+And since PT=BETA*DELTAP, where BETA is the relativistic Lorentz
+factor, those functions given by MAD-X must be multiplied by BETA a number of time
+equal to the order of the derivative to find the functions given in the litterature.
+
 
 <h3><a name="track">Variables in the TRACK Table</a></h3>
 The command RUN writes tables with the following variables:
@@ -504,6 +517,7 @@ the natural logarithm of the turn number.
 <address>
 <a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
 January 24, 1997. Revised in February 2007.<br>
+Ghislain Roy, Revised in June 2014.
 </address>
 </body>
 </html>
