@@ -238,6 +238,11 @@ add_to_macro_list( /* adds macro to alphabetic macro list */
 int
 remove_from_name_list(char* name, struct name_list* nl)
 {
+  
+  char buf[5*NAME_L];
+  assert(name);
+  assert(nl);
+
   int j, i, k = -1;
   for (i = 0; i < nl->curr; i++)
     if (strcmp(nl->names[nl->index[i]], name) == 0) break;
@@ -255,6 +260,10 @@ remove_from_name_list(char* name, struct name_list* nl)
     nl->index[j] = k;
     nl->inform[k] = nl->inform[nl->curr-1];
     nl->names[k] = nl->names[--nl->curr];
+  }
+  else
+  {
+    warning("remove_from_name_list",(sprintf(buf,"Table %s not found",name),buf));
   }
   
   return k;

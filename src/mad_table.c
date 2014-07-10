@@ -986,20 +986,42 @@ print_table(struct table* t)
 void
 make_map_table(int* map_table_max_rows)
 {
+
+  assert(map_table_max_rows);
+  assert(table_register->names);
+  
   int pos;
   if ((pos = name_list_pos("map_table", table_register->names)) > -1)
   {
-    delete_table(table_register->tables[pos]);
+    /*printf("Found Table in table pos %d register Removing it \n", pos);
+    printf("Name=<<%s>>  \n\n", table_register->tables[pos]->name);
+    */
     int k = remove_from_name_list(table_register->tables[pos]->name,
                                   table_register->names);
+    
+    delete_table(table_register->tables[pos]);
+	              
     table_register->tables[k] = table_register->tables[--table_register->curr];
+    
   }
+  
   /* initialise table */
   map_table = make_table("map_table", "map_tab", map_tab_cols,
                          map_tab_types, *map_table_max_rows);
+  
+  assert(map_table);
+  assert(table_register);
+       
   add_to_table_list(map_table, table_register);
   map_table->dynamic = 1;
   reset_count("map_table");
+  
+  /*
+  printf("Creating map table  Done \n");
+  pos = name_list_pos("map_table", table_register->names);
+  printf("Checking position of the table: pos %d \n", pos);
+  */
+
 }
 
 struct table*
@@ -2048,10 +2070,11 @@ vector_to_table_curr(const char* table, const char* name, const double* vals, co
     warning("vector_to_table_curr: table not found:", tbl_s);
     return -1;
   }
-
+ 
+  
   mycpy(col_s, name);
   if ((col = name_list_pos(col_s, tbl->columns)) < 0) {
-    warning("vector_to_table_curr: column not found:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
+    warning("vector_to_table_curr: column not found: ", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
     return -2;
   }
   if (tbl->curr >= tbl->max) {
@@ -2098,6 +2121,8 @@ string_to_table_curr(const char* table, const char* name, const char* string)
     warning("string_to_table_curr: table not found:", tbl_s);
     return -1;
   }
+  
+  
   mycpy(col_s, name);
   if ((col = name_list_pos(col_s, tbl->columns)) < 0) {
     warning("string_to_table_curr: column not found:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
