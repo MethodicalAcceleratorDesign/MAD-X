@@ -1090,19 +1090,22 @@ void
 out_table(char* tname, struct table* t, char* filename)
   /* output of a table */
 {
-  int j;
-
   struct command_list* scl = find_command_list(tname, table_select);
   struct command_list* dscl = find_command_list(tname, table_deselect);
+
   while (t->num_cols > t->col_out->max)
     grow_int_array(t->col_out);
+
   while (t->curr > t->row_out->max)
     grow_int_array(t->row_out);
+
   t->row_out->curr = t->curr;
   if (par_present("full", NULL, scl))
     put_info("obsolete option 'full'"," ignored on 'select'");
-  for (j = 0; j < t->curr; j++) t->row_out->i[j] = 1;
-  for (j = 0; j < t->num_cols; j++) t->col_out->i[j] = j;
+
+  for (int j = 0; j < t->curr    ; j++) t->row_out->i[j] = 1;
+  for (int j = 0; j < t->num_cols; j++) t->col_out->i[j] = j;
+
   t->col_out->curr = t->num_cols;
   if ((scl != NULL && scl->curr > 0) || (dscl != NULL && dscl->curr > 0))
   {

@@ -303,36 +303,36 @@ void
 exec_dump(struct in_cmd* cmd)
   /* write a table out */
 {
-  struct table* t;
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
   int pos = name_list_pos("table", nl);
   char* name = NULL;
   char *f, filename[FNAME_L];
-  if (nl->inform[pos] == 0)
-  {
+
+  // get "table" command parameter
+  if (pos < 0 || nl->inform[pos] == 0 || (name = pl->parameters[pos]->string) == NULL) {
     warning("dump without table name:", "ignored");
     return;
   }
-  if ((name = pl->parameters[pos]->string) == NULL)
-  {
-    warning("dump without table name:", "ignored");
-    return;
-  }
+
+  // get "file" command parameter
   pos = name_list_pos("file", nl);
-  if (nl->inform[pos] == 0) strcpy(filename, "terminal");
-  else if ((f = pl->parameters[pos]->string) == NULL
-           || *f == '\0') strcpy(filename, name);
-  else strcpy(filename,f);
-  if ((pos = name_list_pos(name, table_register->names)) > -1)
-  {
-    t = table_register->tables[pos];
-    out_table(name, t, filename);
-  }
+  if (nl->inform[pos] == 0)
+    strcpy(filename, "terminal"); // write to console
+  else if ((f = pl->parameters[pos]->string) == NULL || *f == '\0')
+    strcpy(filename, name); // write to file with same name as table
   else
-  {
+    strcpy(filename,f);
+
+
+  // get table from registered tables
+  if ((pos = name_list_pos(name, table_register->names)) < 0) {
     warning("table name not found:", "ignored");
+    return;
   }
+
+  struct table* t = table_register->tables[pos];
+  out_table(name, t, filename);
 }
 
 void

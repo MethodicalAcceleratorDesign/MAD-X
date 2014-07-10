@@ -43,13 +43,13 @@ struct vector_list* new_vector_list(int length);
 struct vector_list* delete_vector_list(struct vector_list*);
 void                grow_vector_list(struct vector_list*);
 
-#if 0
+#if 0 // kept for debugging
 #define add_to_name_list(name, inf, list) \
   ((void)(fprintf(stderr, "**** calling add_to_name_list name=%s, %s:%d\n", (name), __FILE__, __LINE__)), \
     add_to_name_list(name, inf, list))
 #endif
 
-#if 0
+#if 0 // kept for debugging
 #define name_list_pos(var, list) \
   ((void)(fprintf(stderr, "**** calling name_list_pos name=%s, list=%s from %s:%d\n", \
    (var), (list)?(list)->name:"null", __FILE__, __LINE__)), \

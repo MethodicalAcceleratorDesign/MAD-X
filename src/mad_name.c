@@ -128,6 +128,19 @@ grow_vector_list(struct vector_list* p)
   myfree(rout_name, v_loc);
 }
 
+
+#if 0 // kept for debugging
+static void
+show_name_list(const char *from, struct name_list* nl)
+{
+  fprintf(stderr, "**** show name list %s from %s with %d elements\n", nl->name, from, nl->curr);
+  for (int i = 0; i < nl->curr; i++) {
+    fprintf(stderr, "**** [%d]: name[%d]=%-20s, name[%d]=%-20s\n",
+       i, i, nl->names[i], nl->index[i], nl->names[nl->index[i]]);
+  }
+}
+#endif
+
 int
 (add_to_name_list)(char* name, int inf, struct name_list* vlist)
   /* adds name to alphabetic name list vlist */
@@ -135,6 +148,8 @@ int
 {
   assert(name);
   assert(vlist);
+
+//  if (!strcmp(name, "map_table")) show_name_list(__func__,vlist);
 
   int ret = name_list_pos(name, vlist);
   if (ret < 0) {
@@ -163,6 +178,8 @@ int
 
   if (!vlist) return -1; // empty vlist
   
+//  if (!strcmp(name, "map_table")) show_name_list(__func__,vlist);
+
   int low = 0, high = vlist->curr - 1;
   
   while (low <= high) {
