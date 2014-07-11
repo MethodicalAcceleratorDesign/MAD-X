@@ -85,7 +85,7 @@ if "%1"=="notest" (
 	shift
     %echo% "Skipped (explicit request)."
 ) else (
-	%echo% -e "\n"
+	%echo% ""
 
 	%echo% -e "\n===== Testing madx-win64-intel ====="
 	%make% madx-win64-intel && %ls% -l madx-win64-intel.exe madx64.exe && %make% cleantest && %make% tests-all ARCH=64 NOCOLOR=yes

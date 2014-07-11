@@ -19,7 +19,7 @@ check_error ()
 rm -f build-test-macosx.out
 if [ "$1" = "noecho" ] ; then
 	shift
-	exec &> build-test-macosx.out
+	exec > build-test-macosx.out 2>&1
 	check_error "redirection with noecho failed"
 else
 	exec > >(tee build-test-macosx.out) 2> >(tee build-test-macosx.out >&2)
@@ -79,7 +79,7 @@ if [ "$1" = "notest" ] ; then
 	shift
 	echo "Skipped (explicit request)."
 else
-	echo -e "\n"
+	echo ""
 
 	echo -e "\n===== Testing madx-macosx64-intel ====="
 	make madx-macosx64-intel && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes

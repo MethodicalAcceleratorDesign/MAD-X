@@ -6,6 +6,9 @@
 export LC_CTYPE="C"
 export PATH="/afs/cern.ch/user/m/mad/madx/madX:$PATH"
 
+# store lxplus node name in a file
+uname -n > build-test-lxplus.run
+
 # error handler
 check_error ()
 {
@@ -19,13 +22,12 @@ check_error ()
 rm -f build-test-lxplus.out
 if [ "$1" = "noecho" ] ; then
 	shift
-	exec &> build-test-lxplus.out
+	exec > build-test-lxplus.out 2>&1
 	check_error "redirection with noecho failed"
 else
 	exec > >(tee build-test-lxplus.out) 2> >(tee build-test-lxplus.out >&2)
 	check_error "redirection with tee failed"
 fi
-uname -n > build-test-lxplus.run
 
 echo -e "\n===== Start of build and tests ====="
 echo "Date  : `date`"
@@ -95,7 +97,7 @@ if [ "$1" = "notest" ] ; then
 	shift
 	echo "Skipped (explicit request)."
 else
-	echo -e "\n"
+	echo ""
 
 	echo -e "\n===== Testing madx-linux64-intel ====="
 	make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
@@ -118,9 +120,9 @@ fi
 make madx-linux32 > /dev/null && make madx-linux64 > /dev/null
 check_error "unable to restore the default version"
 
-# cleanup lxplus node
-rm -f build-test-lxplus.run
-
 # date & end marker
 echo -e "\nFinish: `date`"
 echo -e "\n===== End of build and tests ====="
+
+# cleanup lxplus node
+rm -f build-test-lxplus.run
