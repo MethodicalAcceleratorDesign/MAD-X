@@ -36,7 +36,12 @@ echo "Script: $0 $@"
 
 echo -e "\n===== SVN update ====="
 svn update
-check_error "svn update failed"
+if [ "$?" != "0" ] ; then
+	echo -e "\n===== SVN cleanup & update ====="
+	svn cleanup
+	svn update
+	check_error "svn update failed"
+fi
 
 echo -e "\n===== Release number ====="
 cat VERSION

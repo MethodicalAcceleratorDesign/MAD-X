@@ -5,18 +5,19 @@ REM run:
 REM scripts/build-test-win.bat [noecho] [cleanall] [notest]
 
 REM commands
-set CAT=c:\gnuwin32\bin\cat
-set DATE=c:\gnuwin32\bin\date
-set ECHO=c:\gnuwin32\bin\echo
-set TEE=c:\gnuwin32\bin\tee
-set LS=c:\gnuwin32\bin\ls
-set MAKE=c:\gnuwin32\bin\make
-set RM=c:\gnuwin32\bin\rm
-set UNAME=c:\gnuwin32\bin\uname
-set SCP=c:\msys\bin\scp
-set GCC=c:\mingw64\bin\gcc
-set GCXX=c:\mingw64\bin\g++
-set GFC=c:\mingw64\bin\gfortran
+set CAT="c:\gnuwin32\bin\cat"
+set DATE="c:\gnuwin32\bin\date"
+set ECHO="c:\gnuwin32\bin\echo"
+set TEE="c:\gnuwin32\bin\tee"
+set LS="c:\gnuwin32\bin\ls"
+set MAKE="c:\gnuwin32\bin\make"
+set RM="c:\gnuwin32\bin\rm"
+set UNAME="c:\gnuwin32\bin\uname"
+set SCP="c:\msys\bin\scp"
+set GCC="c:\mingw64\bin\gcc"
+set GCXX="c:\mingw64\bin\g++"
+set GFC="c:\mingw64\bin\gfortran"
+set SVN="c:\Program Files\TortoiseSVN\bin\svn"
 
 REM settings
 set SSHRSA="c:/users/mad/.ssh/id_rsa"
@@ -41,8 +42,13 @@ if "%1"=="noecho" shift
 %uname% -m -n -r -s
 
 %echo% -e "\n===== SVN update ====="
-"c:\Program Files\TortoiseSVN\bin\svn" update
-if ERRORLEVEL 1 %echo% "ERROR: svn update failed" && exit /B 1
+%svn% update
+if ERRORLEVEL 1 (
+	%echo% -e "\n===== SVN cleanup & update ====="
+	%svn% cleanup
+	%svn% update
+	%echo% "ERROR: svn update failed" && exit /B 1
+)
 
 %echo% -e "\n===== Release number ====="
 %cat% VERSION
