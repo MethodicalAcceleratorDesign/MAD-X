@@ -57,13 +57,7 @@ gcc      --version
 g++      --version
 gfortran --version
 make all-macosx-gnu
-# to handle bad fortran compiler, restart from scratch (only once)
-if [ "$?" != "0" ] ; then
-	make cleanall && make cleanall ARCH=32
-	check_error "make cleanall failed"
-	make all-macosx-gnu
-	check_error "make all-macosx-gnu failed"
-fi
+check_error "make all-macosx-gnu failed"
 
 echo -e "\n===== Intel build ====="
 icc      --version
