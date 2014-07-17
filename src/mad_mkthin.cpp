@@ -1816,6 +1816,7 @@ element* SeqElList::create_sliced_magnet(element* thick_elem, int slice_no,bool 
   //--- now the arguments which are copied from the thick element
   add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("apertype"),thick_elem),const_cast<char*>("apertype"),1);
   add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("aperture"),thick_elem),const_cast<char*>("aperture"),1);
+  add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("aper_tol"),thick_elem),const_cast<char*>("aper_tol"),1);
   add_cmd_parameter_clone(cmd,return_param(        const_cast<char*>("bv"),      thick_elem),const_cast<char*>("bv"),      1);
   add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("tilt"),    thick_elem),const_cast<char*>("tilt"),    1);
   add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("kmax"),    thick_elem),const_cast<char*>("kmax"),    1);
@@ -1904,6 +1905,7 @@ element* SeqElList::create_thin_solenoid(element* thick_elem, int slice_no) // c
   }
   add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("apertype"),thick_elem),const_cast<char*>("apertype"),1);
   add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("aperture"),thick_elem),const_cast<char*>("aperture"),1);
+  add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("aper_tol"),thick_elem),const_cast<char*>("aper_tol"),1);
   add_cmd_parameter_clone(cmd,return_param(const_cast<char*>("bv"),thick_elem),const_cast<char*>("bv"),1);
   add_cmd_parameter_clone(cmd,return_param(const_cast<char*>("tilt"),thick_elem),const_cast<char*>("tilt"),1);
   // create element with this command
@@ -2004,6 +2006,7 @@ element* SeqElList::create_thin_elseparator(element* thick_elem, int slice_no) /
   }
   add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("apertype"),thick_elem),const_cast<char*>("apertype"),1);
   add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("aperture"),thick_elem),const_cast<char*>("aperture"),1);
+  add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("aper_tol"),thick_elem),const_cast<char*>("aper_tol"),1);
   add_cmd_parameter_clone(cmd,return_param(const_cast<char*>("bv"),thick_elem),const_cast<char*>("bv"),1);
   add_cmd_parameter_clone(cmd,return_param(const_cast<char*>("tilt"),thick_elem),const_cast<char*>("tilt"),1);
   // create element with this command
