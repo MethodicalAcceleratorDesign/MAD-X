@@ -401,19 +401,39 @@ is being used.
 PTC_READ_ERRORS, overwrite=logical; 
 \end{verbatim}
 
-The \texttt{"PTC\_READ-ERRORS" }command lets you read any numbers of
+The \texttt{"PTC\_READ\_ERRORS" }command lets you read any numbers of
 \textbf{"errors\_read"} table
 \href{../control/general.html#readmytable}{READMYTABLE}  
 
 {\bf Options} \\ 
-\begin{itemize}
-   \item {\bf OVERWRITE}=logical (Default: .false.) \\ 
+\begin{madlist}
+   \ttitem{OVERWRITE}=logical (Default: .false.) \\ 
      Flag to either OVERWRITE the read-in errors (on request by
      using this flag) or by DEFAULT just add them to multipole
      components already present.
-\end{itemize}
-       
+\end{madlist}
 
+{\bf Remarks}\\
+Because of the way the table is read in memory, a warning will always be
+issued by default in the form:
+\begin{verbatim}
+warning: string_from_table_row: row out of range: errors_read->name[1>=n+1<=n]
+\end{verbatim}
+where n is  the number of records read from the table. 
+This warning has no consequence on the errors read and the following
+calculation. \\
+The warning is purely the result of the way that the reading loop is
+programmed with a break based on the return value of
+string\_from\_table\_row.  
+But if string\_from\_table\_row tries to read in a row (n+1) past the
+last row (n) of the table, it prints a warning before returning a value
+that will effectively break the loop. Of course this will only happen if
+the WARN option is true and this can be turned off with  
+\begin{verbatim}
+Option, -warn;
+\end{verbatim}
+
+       
 \section{PTC\_MOVE\_TO\_LAYOUT}
 
 \begin{verbatim}

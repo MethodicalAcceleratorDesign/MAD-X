@@ -431,8 +431,8 @@ input script.</p>
         <dl> 
          <dt>Description</dt> 
          <dd> 
-              <span lang="EN-US">The </span><var class="command">&quot;PTC_READ-ERRORS&quot; </var> 
-         <span lang="EN-US">command let's you read any numbers of
+              <span lang="EN-US">The </span><var class="command">&quot;PTC_READ_ERRORS&quot; </var> 
+         <span lang="EN-US">command lets you read any numbers of
        <b>"errors_read"</b> tables  <a href="../control/general.html#readmytable">READMYTABLE</a> </span></dd> 
          <dt>Options</dt> 
          <dd> 
@@ -459,7 +459,18 @@ input script.</p>
            <td align="center">logical</td> 
          </table></dd> 
          <dt>Remarks</dt> 
-         <dd></dd> 
+         <dd>
+	  Because of the way the table is read in memory, a warning will always be issued by default in the form: <br>
+	  <pre>warning: string_from_table_row: row out of range: errors_read->name[1>=n+1<=n]</pre>
+          where n is  the number of records read from the table. 
+          This warning has no consequence on the errors read and the following calculation. <br>
+	  The warning is purely the result of the way that the reading loop is programmed with a break based 
+          on the return value of string_from_table_row. 
+          But if string_from_table_row tries to read in a row (n+1) past the last row (n) of the table, 
+          it prints a warning before returning a value that will effectively break the loop. 
+          Of course this will only happen if the WARN option is true and this can be turned off with 
+	  <pre>Option, -warn;</pre>
+	 </dd> 
         </dl></div></dd> 
        <dt class="command"><b>PTC_MOVE_TO_LAYOUT</b>, <b><br> 
 &nbsp;&nbsp;&nbsp; index</b>=integer;</dt> 
