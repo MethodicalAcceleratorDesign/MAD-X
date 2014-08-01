@@ -1270,14 +1270,53 @@ separator is a cartesian coordinate system.
 \subsection{Beam Position Monitors}
 \label{sec:monitors}
 
-A beam monitor acts on the beam like a drift space. In addition it
-serves to record the beam position for closed orbit corrections. Four
-different types of beam position monitors are recognised:  
+A beam monitor has no specific effect on the beam and behaves like a
+drift space. 
+In addition it serves to record the beam position for closed orbit
+correction.
+
+Three different types of beam position monitors are recognised:  
 
 \begin{itemize}
    \item \href{hmon}{HMONITOR}. Monitor for the horizontal beam position, 
    \item \href{vmon}{VMONITOR}. Monitor for the vertical beam position, 
    \item \href{mon}{MONITOR}. Monitor for both horizontal and vertical beam position. 
+\end{itemize}
+
+\begin{verbatim}
+label: HMONITOR,    L = real;
+label: VMONITOR,    L = real;
+label: MONITOR,     L = real;
+\end{verbatim} 
+
+A beam position monitor has one real attribute: 
+\begin{itemize}
+   \item L: The length of the monitor (default: 0 m). 
+     %% If the length is different from zero, the beam position is recorded
+     %% in the centre of the monitor.  
+\end{itemize} 
+
+Examples: 
+\begin{verbatim}
+MH: HMONITOR, L = 1;
+MV: VMONITOR;
+\end{verbatim} 
+
+The \href{local_system.html#straight}{straight reference system} for a
+monitor is a cartesian coordinate system.  
+
+%  Added by: Ghislain Roy, 23-May-2013. Split from subsection on BPM's
+\subsection{Instruments}
+\label{sec:instruments}
+
+An instrument has no specific effect on the beam and behaves like a
+drift space. 
+Instruments are different from beam position monitors and are not used
+for closed orbit correction. 
+
+Two different types of beam position monitors are recognised:  
+
+\begin{itemize}
    \item \href{inst}{INSTRUMENT}. A place holder for any type of beam
      instrumentation. Optically it behaves like a drift space; it
      returns \emph{no beam observation}. It represent a class of
@@ -1290,28 +1329,17 @@ different types of beam position monitors are recognised:
 \end{itemize}
 
 \begin{verbatim}
-label: HMONITOR,    L = real;
-label: VMONITOR,    L = real;
-label: MONITOR,     L = real;
-label: INSTRUMENT,  L = real;
+label: INSTRUMENT,   L = real;
 label: PLACEHOLDER,  L = real;
 \end{verbatim} 
 
-A beam position monitor has one real attribute: 
+An instrumnet has one real attribute: 
 \begin{itemize}
-   \item L: The length of the monitor (default: 0 m). If the length is
-     different from zero, the beam position is recorded in the centre of
-     the monitor.  
+   \item L: The length of the instrument (default: 0 m). 
 \end{itemize} 
 
-Examples: 
-\begin{verbatim}
-MH: HMONITOR, L = 1;
-MV: VMONITOR;
-\end{verbatim} 
-
-The \href{local_system.html#straight}{straight reference system} for a
-monitor is a cartesian coordinate system.  
+The \href{local_system.html#straight}{straight reference system} for an 
+instrument is a cartesian coordinate system.  
 
 
 %\input{Introduction/collimator}

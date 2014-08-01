@@ -672,11 +672,12 @@ static void correct_correct2(struct in_cmd* cmd)
   if ((twism = command_par_value("twissum", cmd->clone)) > 0) {
     if (ftdata == NULL ) {
       if ((ftdata = fopen("twiss.summ", "w")) == NULL )
-	exit(99);
+	fatal_error("Cannot open file twiss.summ with write access", ", MAD-X terminates ");
+        //exit(99);
     }
+
     j = 1;
-    if ((nnnseq = get_variable("n")) == 0) 
-      nnnseq = twism;
+    if ((nnnseq = get_variable("n")) == 0)   nnnseq = twism;
     
     double_from_table_row("summ", "xcomax", &j, &tmp1); // err = not used
     double_from_table_row("summ", "xcorms", &j, &tmp2); // err = not used
@@ -712,15 +713,18 @@ static void correct_correct2(struct in_cmd* cmd)
   if (command_par_value("resout", cmd->clone) > 0) {
     if (fddata == NULL ) {
       if ((fddata = fopen("corr.out", "w")) == NULL )
-	exit(99);
+	fatal_error("Cannot open file corr.out with write access", ", MAD-X terminates ");
+        //exit(99);
     }
     if (fcdata == NULL ) {
       if ((fcdata = fopen("stren.out", "w")) == NULL )
-	exit(99);
+	fatal_error("Cannot open file stren.out with write access", ", MAD-X terminates ");
+        //exit(99);
     }
     if (fgdata == NULL ) {
       if ((fgdata = fopen("plot.orb", "w")) == NULL )
-	exit(99);
+	fatal_error("Cannot open file plot.orb with write access", ", MAD-X terminates ");
+        //exit(99);
     }
   }
 
@@ -761,8 +765,9 @@ static void correct_correct2(struct in_cmd* cmd)
     /* icor and imon used to set up correct matrix size !! */
     dmat = pro_correct2_response_ring(ip, icor, imon);
   } else {
-    printf("INVALID MACHINE TYPE\n");
-    exit(-1);
+    fatal_error("Invalid machine type other than RING with option TWOBEAM", ", MAD-X terminates ");
+    //printf("INVALID MACHINE TYPE\n");
+    //exit(-1);
   }
 
   /* MICADO correction, get desired number of correctors from command */
@@ -1177,6 +1182,11 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
     pro_correct2_make_mon_table();
   }
 
+  // 2013-Jun-24  12:21:49  ghislain: 
+  //following is a kludge to return a single value but has to be decoded on other side.    
+  if( cntc1+cntc2+cntc12 >= 10000) 
+    fatal_error("Found more than 10000 correctors; decoding in mad_orbit.c will fail",
+		"Please report this issue to MAD developpers (mad@cern.ch)");
   return 10000 * (cntm1 + cntm2 + cntm12) + cntc1 + cntc2 + cntc12;
 }
 
@@ -1236,8 +1246,9 @@ static int pro_correct2_getorbit(struct in_cmd* cmd) {
       m->val.before[0] = m->p_node->other_bv * da2[9] [m->id_ttb[1]] * 1000.;
       m->val.before[1] = m->p_node->other_bv * da2[11][m->id_ttb[1]] * 1000.;
     } else {
-      printf("BIG SHIT .... \n");
-      exit(-10);
+      fatal_error("Unforeseen case in pro_correct2_getorbit", ", MAD-X terminates ");
+      // printf("BIG SHIT .... \n");
+      // exit(-10);
     }
 
     pos = name_list_pos("monon", nl);
@@ -1334,6 +1345,13 @@ static int pro_correct2_getactive(int ip, int *nm, int *nx, int *nc,
     icora++;
     c = c->next;
   };
+  
+  // 2013-Jun-24  12:21:49  ghislain: 
+  //following is a kludge to return a single value but has to be decoded on other side.    
+  if(icor >= 10000) 
+    fatal_error("Found more than 10000 correctors; decoding in mad_orbit.c will fail",
+		"Please report this issue to MAD developpers (mad@cern.ch)");
+  
   return (10000 * imon + icor);
 }
 
@@ -1653,15 +1671,15 @@ static void correct_correct1(struct in_cmd* cmd)
   int niter;
   
   int twism;
-  int ifail, sflag;        // , svdflg; // not used
+  int ifail, sflag; 
   float rms;
   double sngcut, sngval;
   double tmp1, tmp2, tmp3, tmp4;
   double sigcut;           /* number of sigmas (normalized) for filter cut */
   char *clist, *mlist;     /* file names for monitor and corrector output */
   double *dmat = { NULL }; /* response matrix, double precision */
-  double *corvec, *monvec; /* vectors to hold measured orbit and correctors */
-  double *resvec;          /* vector to hold corrected orbit */
+  double *monvec, *corvec; /* vectors to hold measured orbit and correctors */
+  double *resvec;          /* vector to hold corrected orbit (result) */
   char *conm;              /* vector to hold corrector names (for MICADO) */
   int *sing;               /* array to store pointer to singular correctors */
   static int *nm, *nx, *nc;
@@ -1674,7 +1692,8 @@ static void correct_correct1(struct in_cmd* cmd)
   if ((twism = command_par_value("twissum", cmd->clone)) > 0) {
     if (ftdata == NULL ) {
       if ((ftdata = fopen("twiss.summ", "w")) == NULL )
-	exit(99);
+	fatal_error("Cannot open file twiss.summ with write access", ", MAD-X terminates ");
+        //exit(99);
     }
     j = 1;
     if ((nnnseq = get_variable("n")) == 0) 
@@ -1707,8 +1726,10 @@ static void correct_correct1(struct in_cmd* cmd)
 
   /* Prepare file descriptors for the output */
   if (command_par_value("resout", cmd->clone) > 0) {
-    if (!fddata && !(fddata = fopen("corr.out" , "w"))) exit(99);
-    if (!fcdata && !(fcdata = fopen("stren.out", "w"))) exit(99);
+    if (!fddata && !(fddata = fopen("corr.out" , "w"))) 
+      fatal_error("Cannot open file corr.out with write access", ", MAD-X terminates "); //exit(99);
+    if (!fcdata && !(fcdata = fopen("stren.out", "w"))) 	
+      fatal_error("Cannot open file stren.out with write access", ", MAD-X terminates "); //exit(99);
   }
 
   // Jun 26, 2013 8:07:01 PM ghislain : **twiss summary** was here
@@ -1729,9 +1750,9 @@ static void correct_correct1(struct in_cmd* cmd)
   /* get input orbit, default is from input Twiss-table */
   /* if flag "extern" is true: can be from external table */
   if (command_par_value("extern", cmd->clone))
-    pro_correct_getorbit_ext(cmd); // it = not used
+    pro_correct_getorbit_ext(cmd); 
   else
-    pro_correct_getorbit(cmd); // it = not used
+    pro_correct_getorbit(cmd); 
 
   /* find and prepare enabled correctors and monitors, may be repeated */
   ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
@@ -1761,7 +1782,7 @@ static void correct_correct1(struct in_cmd* cmd)
     dmat = pro_correct_response_ring(ip, icor, imon);
 	  
     // SVD CONDITIONING 
-    if (command_par_value("cond", cmd->clone) == 1) { // (svdflg = not used
+    if (command_par_value("cond", cmd->clone) == 1) { 
       sngcut = command_par_value("sngcut", cmd->clone);
       sngval = command_par_value("sngval", cmd->clone);
       printf("SVD conditioning requested ...\n");
@@ -1802,7 +1823,7 @@ static void correct_correct1(struct in_cmd* cmd)
     dmat = pro_correct_response_line(ip, icor, imon);
 	  
     // SVD CONDITIONING
-    if (command_par_value("cond", cmd->clone) == 1) { // (svdflg = not used
+    if (command_par_value("cond", cmd->clone) == 1) { 
       sngcut = command_par_value("sngcut", cmd->clone);
       sngval = command_par_value("sngval", cmd->clone);
       printf("SVD conditioning requested ...\n");
@@ -1836,8 +1857,9 @@ static void correct_correct1(struct in_cmd* cmd)
   } //END LINE
 
   else { // neither ring nor line
-    printf("INVALID MACHINE TYPE\n");
-    exit(-1);
+    fatal_error("Invalid machine type in CORRECT command", ", MAD-X terminates ");
+    // printf("INVALID MACHINE TYPE\n");
+    // exit(-1);
   }
 
   if (debug) {
@@ -1913,8 +1935,9 @@ static void correct_correct1(struct in_cmd* cmd)
   }
 
   else { // neither LSQ, nor SVD, nor MICADO correction type
-    printf("INVALID CORRECTION TYPE\n");
-    exit(-1);
+    fatal_error("Invalid correction mode in CORRECT command", ", MAD-X terminates ");
+    //printf("INVALID CORRECTION TYPE\n");
+    //exit(-1);
   }
 
   /* write corrector output to tfs table */
@@ -1945,8 +1968,6 @@ static void correct_correct(struct in_cmd* cmd)
   */
   char *orbtab1, *orbtab2;
 
-  /* Call for one or two ring orbit correction */
-  // Jun 25, 2013 2:51:50 PM ghislain : FIXME - This option is not documented
   if (command_par_value("tworing", cmd->clone)) {
     printf("Want to correct orbit for two rings\n");
 
@@ -1964,21 +1985,11 @@ static void correct_correct(struct in_cmd* cmd)
   } else {
     printf("Want to correct orbit of a single ring\n");
 
-    if ((orbtab1 = command_par_string("beam1tab", cmd->clone)) != NULL ) {
-      //warning(" ", " ");
-      //warning("Single beam correction requested but beam 1 table supplied:", orbtab1);
-      //warning("Specified table ignored:", orbtab1);
-      //warning(" ", " ");
-      warning("Single beam correction requested but beam 1 table supplied; specified table ignore:", orbtab1);
-    }
-
-    if ((orbtab2 = command_par_string("beam2tab", cmd->clone)) != NULL ) {
-      //warning(" ", " ");
-      //warning("Single beam correction requested but beam 2 table supplied:", orbtab2);
-      //warning("Specified table ignored:", orbtab2);
-      //warning(" ", " ");
-      warning("Single beam correction requested but beam 2 table supplied; specified table ignore:", orbtab2);
-    }
+    if ((orbtab1 = command_par_string("beam1tab", cmd->clone)) != NULL ) 
+      warning("Single beam correction requested but beam 1 table supplied; specified table ignored:", orbtab1);
+ 
+    if ((orbtab2 = command_par_string("beam2tab", cmd->clone)) != NULL ) 
+      warning("Single beam correction requested but beam 2 table supplied; specified table ignored:", orbtab2);
     
     correct_correct1(cmd);
   }
@@ -2036,8 +2047,7 @@ static int pro_correct_getcommands(struct in_cmd* cmd) {
     warning("CORRECT, but no active sequence:", "ignored");
     return (-1);
   }
-
-  // Jun 25, 2013 3:29:19 PM ghislain : FIXME - documentation only mentions x and y; add h and v
+  
   strcpy(plane, command_par_string(att[1], cmd->clone));
   if      (strcmp("x", plane) == 0) iplane = 1;
   else if (strcmp("y", plane) == 0) iplane = 2;
@@ -2087,21 +2097,16 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
     if ((pps = name_list_pos(orbtab, table_register->names)) > -1) {
       orbin_table = table_register->tables[pps];
     } else {
-      fatal_error( "ORBIT table for correction requested, but not provided:", orbtab);
+      fatal_error("ORBIT table for correction requested, but not provided:", orbtab);
     }
   } else { // the orbit table is the twiss table
     if ((orbin_table = twiss_table) == NULL ) {
-      printf("FATAL ERROR:\n");
-      printf("You request the ORBIT from a non-existing TWISS table\n");
-      printf("You MUST run TWISS before trying to correct the orbit\n");
-      printf("MAD-X stops\n");
-      exit(81);
+      fatal_error("ORBIT cannot be obtained from non-existing TWISS table",
+		  "You MUST run TWISS before trying to correct the orbit");
     } else {
       if (debug)
 	printf("orbit from TWISS table at address: %p\n", (void*) twiss_table);
     }
-    // 2013-Jun-24  12:00:18  ghislain: commented out; never used.
-    // pps = -1;
   }
 
   if ((tartab = command_par_string("target", cmd->clone)) != NULL ) {
@@ -2109,35 +2114,28 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
     if ((ppt = name_list_pos(tartab, table_register->names)) > -1) {
       target_table = table_register->tables[ppt];
     } else {
-      fatal_error( "TARGET table for correction requested, but not provided:", tartab);
+      fatal_error("TARGET table for correction requested, but not provided:", tartab);
     }
   } else {
     if (debug)
       printf("No target orbit requested\n");
   }
-  // 2013-Jun-24  12:00:18  ghislain: commented out; never used.
-  // ppt = -1;
-
+ 
   if ((modtab = command_par_string("model", cmd->clone)) != NULL ) {
     printf("Want to use model orbit from: %s\n", modtab);
     if ((ppt = name_list_pos(modtab, table_register->names)) > -1) {
       model_table = table_register->tables[ppt];
     } else {
-      fatal_error( "MODEL table for correction requested, but not provided:", modtab);
+      fatal_error("MODEL table for correction requested, but not provided:", modtab);
     }
   } else {
     if ((model_table = twiss_table) == NULL ) {
-      printf("FATAL ERROR:\n");
-      printf("You request the MODEL from a non-existing TWISS table\n");
-      printf("You MUST run TWISS before trying to correct the orbit\n");
-      printf("MAD-X stops\n");
-      exit(81);
+      fatal_error("MODEL cannot be obtained from non-existing TWISS table",
+		  "You MUST run TWISS before trying to correct the orbit");
     } else {
       if (debug)
 	printf("model from TWISS table at address: %p\n", (void*) twiss_table);
     }
-    // 2013-Jun-24  12:00:18  ghislain: commented out; never used.
-    // ppt = -1;
   }
 
   if (debug)
@@ -2169,12 +2167,10 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
   correct_orbit->mon_table = mycalloc("pro_correct_gettables_mon", 5200, sizeof *correct_orbit->mon_table);
   
   /* orbit table available, get units, if defined */
-  //  2013-Jun-24  12:06:03  ghislain: FIXME - units option of correct command is not documented!!!
-  if ((ounits = command_par_value("units", cmd->clone)) > 0) {
-    correct_orbit->units = ounits;
-  } else {
-    correct_orbit->units = 1.0;
-  }
+  //  2013-Jun-24  12:06:03  ghislain: FIXME - units option of CORRECT command is only partially documented!!!
+  if ((ounits = command_par_value("units", cmd->clone)) > 0) 
+       correct_orbit->units = ounits;
+  else correct_orbit->units = 1.0;
 
   ttb = model_table;
   correct_orbit->mon_table->previous = NULL;
@@ -2187,7 +2183,6 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
   mon_l = correct_orbit->mon_table;
   cor_l = correct_orbit->cor_table;
 
-  // 2013-Jun-24  12:09:17  ghislain: FIXME corzero option of correct command is not documented!!!
   corzero = command_par_value("corzero", cmd->clone);
 
   // go through the model table and build chained lists of monitors and correctors
@@ -2230,17 +2225,10 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
   if (debug) printf("done: %d %d\n", cntm, cntc);
 
   // 2013-Jun-24  12:21:49  ghislain: 
-  //following is a kludge to return a single value but has to be decoded on other side.  
-  // this should at the very least check that cntc < 10000
-  
-  /* if(cntc >= 10000) { */
-  /*     printf("FATAL ERROR:\n"); */
-  /*     printf("found more than 10000 correctors; decoding in mad_orbit.c will fail\n"); */
-  /*     printf("report this issue to MAD developpers\n"); */
-  /*     printf("MAD-X stops\n"); */
-  /*     exit(81); */
-  /* } */
-  
+  //following is a kludge to return a single value but has to be decoded on other side.    
+  if(cntc >= 10000) 
+    fatal_error("Found more than 10000 correctors; decoding in mad_orbit.c will fail",
+		"Please report this issue to MAD developpers (mad@cern.ch)");
   return (10000 * cntm + cntc);
 }
 
@@ -2317,20 +2305,14 @@ static int pro_correct_getorbit(struct in_cmd* cmd) {
 
   while (m) {
 
-    /* If correction to target orbit, subtract the wanted orbit ... */
     if (command_par_string("target", cmd->clone) != NULL ) {
-      // 2013-Dec-10  12:30:12  ghislain: suppress dead code
-      // m->val.before[0] = da1[posx][m->id_ttb] - da2[tosx][m->id_ttb];
-      // m->val.before[1] = da1[posy][m->id_ttb] - da2[tosy][m->id_ttb];
+      /* If correction to target orbit, subtract the target orbit to correct only difference... */
       m->val.before[0] = (da1[posx][m->id_ttb] - da2[tosx][m->id_ttb]) * 1000. * correct_orbit->units;
       m->val.before[1] = (da1[posy][m->id_ttb] - da2[tosy][m->id_ttb]) * 1000. * correct_orbit->units;
     } else {
-      // m->val.before[0] = da1[posx][m->id_ttb];
-      // m->val.before[1] = da1[posy][m->id_ttb];
       m->val.before[0] = da1[posx][m->id_ttb] * 1000. * correct_orbit->units;
       m->val.before[1] = da1[posy][m->id_ttb] * 1000. * correct_orbit->units;
     }
-
     
     /* monon=xlimit determines the fraction of available monitors */
     pos = name_list_pos("monon", nl);
@@ -3275,6 +3257,11 @@ static int pro_correct_getactive(int ip, int *nm, int *nx, int *nc,
     c = c->next;
   }
 
+  // 2013-Jun-24  12:21:49  ghislain: 
+  //following is a kludge to return a single value but has to be decoded on other side.    
+  if(icor >= 10000) 
+    fatal_error("Found more than 10000 correctors; decoding in mad_orbit.c will fail",
+		"Please report this issue to MAD developpers (mad@cern.ch)");
   return (10000 * imon + icor);
 }
 
