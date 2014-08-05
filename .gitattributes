@@ -183,14 +183,17 @@ doc/usrguide/Introduction/wildcard.html -text
 doc/usrguide/archives/pres2.ps -text
 doc/usrguide/c6t/c6t.html -text
 doc/usrguide/c6t/c6t.tex -text
+doc/usrguide/control/beams.tex -text
 doc/usrguide/control/control.html -text
 doc/usrguide/control/control.tex -text
+doc/usrguide/control/files.tex -text
 doc/usrguide/control/foot.html -text
 doc/usrguide/control/foot.tex -text
 doc/usrguide/control/general.html -text
 doc/usrguide/control/seqedit.html -text
 doc/usrguide/control/seqedit.tex -text
 doc/usrguide/control/special.html -text
+doc/usrguide/control/tables.tex -text
 doc/usrguide/cororbit/co_activate.html -text
 doc/usrguide/cororbit/co_activate.tex -text
 doc/usrguide/cororbit/co_correct.html -text

@@ -22,6 +22,7 @@ write out in \textit{ MAD-8 } format.
 %% shown here...
 
 \section{SEQEDIT}
+\label{sec:seqedit}
 \begin{verbatim}
 seqedit, sequence=s_name;
 \end{verbatim} 
@@ -30,6 +31,7 @@ non-expanded sequence; after having finished the editing, one has to
 re-expand the sequence if necessary.  
 
 \section{EXTRACT}
+\label{sec:extract}
 \begin{verbatim}
 extract, sequence=s_name, from=MARKER_1, to=MARKER_2, newname=p;
 \end{verbatim} 
@@ -43,7 +45,7 @@ In the case of circular sequences, this can be ensured by performing a CYCLE
 of sequence "s\_name" with {\tt START=MARKER\_1}.
 
 \section{FLATTEN}
-\label{sec:seqedit_flatten}
+\label{sec:flatten}
 \begin{verbatim}
 flatten;
 \end{verbatim} 
@@ -51,6 +53,7 @@ This command includes all sequences in the sequence being edited, if
 any. The resulting sequence contains only elements.  
 
 \section{INSTALL}
+\label{sec:install}
 \begin{verbatim}
 install, element=name, class=class_name, at=real, from=place|selected;
 \end{verbatim} 
@@ -74,6 +77,7 @@ select, flag=seqedit, class=.., pattern=.., range=..;
 \end{itemize}
 
 \section{MOVE}
+\label{sec:move}
 \begin{verbatim}
 move, element=name|selected, by=real, to=real, from=place;
 \end{verbatim}
@@ -92,6 +96,7 @@ move, element=name|selected, by=real, to=real, from=place;
 \end{itemize}
 
 \section{REMOVE}
+\label{sec:remove}
 \begin{verbatim}
 remove, element=name|selected;
 \end{verbatim}
@@ -106,6 +111,7 @@ remove, element=name|selected;
 \end{itemize}
 
 \section{CYCLE}
+\label{sec:cycle}
 \begin{verbatim}
 cycle, start=place;
 \end{verbatim} 
@@ -118,6 +124,7 @@ flatten ; cycle, start=place;
 \end{verbatim}
 
 \section{REFLECT}
+\label{sec:reflect}
 \begin{verbatim}
 reflect;
 \end{verbatim} 
@@ -132,6 +139,7 @@ flatten ; reflect;
 
 
 \section{REPLACE}
+\label{sec:replace}
 \begin{verbatim}
 replace, element=name1|selected, by=name2;
 \end{verbatim} 
@@ -142,6 +150,7 @@ the element name2.
 
 
 \section{ENDEDIT}
+\label{sec:endedit}
 \begin{verbatim}
 endedit;
 \end{verbatim} 
@@ -151,3 +160,97 @@ editing.
 
 
 
+\section{SAVE}
+\label{sec:save}
+\begin{verbatim}
+save, sequence = sequ1, sequ2, ..., file = "file_name", beam, bare;
+\end{verbatim} 
+saves the sequence(s) specified with all variables and elements needed
+for their expansion, onto the file "file\_name". 
+
+{\bf Warning:} If quotes are used for
+the "file\_name", capital and low characters are kept as specified, if they
+are omitted the "filename" will have lower characters only. 
+
+Example:
+\begin{verbatim}
+save, sequence = lhc, file = "Test_One";
+\end{verbatim}
+saves the lhc sequence to a file name Test\_One on disk, while
+\begin{verbatim}
+save, sequence = lhc, file = Test_One;
+\end{verbatim}
+saves the lhc sequence to a file name test\_one on disk.
+
+The optional
+flag can have the value "mad8" (without the quotes), in which case the
+sequence(s) is/are saved in MAD-8 input format.  
+
+The flag "beam" is optional; when given, all beams belonging to the
+sequences specified are saved at the top of the save file.  
+
+The parameter "sequence" is optional; when omitted, all sequences are
+saved.  
+
+However, it is not advisable to use "save" without the "sequence" option
+unless you know what you are doing. This practice will avoid spurious
+saved entries.    Any number of "select,flag=save" commands may precede
+the SAVE command. In that case, the names of elements, variables, and
+sequences must match the pattern(s) if given, and in addition the
+elements must be of the class(es) specified. See here for a
+\href{../Introduction/select.html#save_select}{SAVE with SELECT}
+example.  
+
+It is important to note that the precision of the output of the save
+command depends on the output precision. Details about default
+precisions and how to adjust those precisions can be found at the
+\href{../Introduction/set.html#Format}{SET Format} instruction page.   
+ 
+The attribute 'bare' allows to save just the sequence without the
+element definitions nor beam information. This allows to re-read in a
+sequence with might otherwise create a stop of the program. This is
+particularly useful to turn a line into a sequence to seqedit
+it. 
+
+Example:  
+\begin{verbatim}
+tl3:line=(ldl6,qtl301,mqn,qtl301,ldl7,qtl302,mqn,qtl302,ldl8,ison);
+DLTL3 : LINE=(delay, tl3);
+use, period=dltl3;
+
+save,sequence=dltl3,file=t1,bare; // new parameter "bare": only sequ. saved
+call,file=t1; // sequence is read in and is now a "real" sequence
+// if the two preceding lines are suppressed, seqedit will print a warning
+// and else do nothing
+use, period=dltl3;
+twiss, save, betx=bxa, alfx=alfxa, bety=bya, alfy=alfya;
+plot, vaxis=betx, bety, haxis=s, colour:=100;
+SEQEDIT, SEQUENCE=dltl3;
+  remove,element=cx.bhe0330;
+  remove,element=cd.bhe0330;
+ENDEDIT;
+
+use, period=dltl3;
+twiss, save, betx=bxa, alfx=alfxa, bety=bya, alfy=alfya;
+\end{verbatim}
+
+%% 2013-Jul-11  17:24:21  ghislain: I propose to move DUMPSEQU to the
+%% sequence edition and manipulation part of the manual
+\section{DUMPSEQU}
+\label{sec:dumpsequ}
+\begin{verbatim}
+dumpsequ, sequence = s_name, level = integer;
+\end{verbatim} 
+Actually a debug statement, but it may come handy at certain
+occasions. Here "s\_name" is the name of an expanded (i.e. USEd)
+sequence. The amount of detail is controlled by "level":  
+\begin{verbatim}
+level = 0:    print only the cumulative node length = sequence length
+      > 0:    print all node (element) names except drifts
+      > 2:    print all nodes with their attached parameters
+      > 3:    print all nodes, and their elements with all parameters
+\end{verbatim}
+
+
+
+%% EOF

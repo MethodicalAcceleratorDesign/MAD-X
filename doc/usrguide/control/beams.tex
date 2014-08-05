@@ -1,0 +1,280 @@
+\chapter{Beam Handling Statements} 
+\label{chap:beam}
+
+\section{BEAM}
+\label{sec:beam}
+Many commands in MAD-X require the setting of various quantities related
+to the beam in the machine. Therefore, MAD-X will stop with a fatal
+error if an attempt is made to expand (USE) a sequence for which no BEAM
+command has been issued before.  
+
+The quantities are entered by a BEAM command: 
+\begin{verbatim}
+BEAM, PARTICLE=name, MASS=real, CHARGE=real,
+      ENERGY=real, PC=real, GAMMA=real, BETA=real, BRHO=real,
+      EX=real, EXN=real, EY=real, EYN=real,
+      ET=real, SIGT=real, SIGE=real,
+      KBUNCH=integer, NPART=real, BCURRENT=real,
+      BUNCHED=logical, RADIATE=logical, BV=integer, SEQUENCE=name;
+\end{verbatim} 
+
+The attributes of the BEAM command are: 
+\begin{madlist}
+  \ttitem{PARTICLE} The name of particles in the beam. Default= {\tt POSITRON}\\
+  MAD knows the restmass and the charge for the following particles:
+  \begin{madlist}
+    \ttitem{POSITRON} The particles are positrons (MASS=$m_e$, CHARGE=1)
+    \ttitem{ELECTRON} The particles are electrons (MASS=$m_e$, CHARGE=-1) 
+    \ttitem{PROTON} The particles are protons (MASS=$m_p$, CHARGE=1)
+    \ttitem{ANTIPROTON} The particles are anti-protons (MASS=$m_p$, CHARGE=-1) 
+    \ttitem{POSMUON} The particles are positive muons (MASS=$m_{\mu}$, CHARGE=1) 
+    \ttitem{NEGMUON} The particles are negative muons (MASS=$m_{\mu}$, CHARGE=-1) 
+  \end{madlist}
+  \ttitem{MASS} the restmass of the particles in the beam in GeV. \\
+  (Default=$m_e \approx 0.511 10^{-3}$ GeV).\\
+  Note that a zero mass particle is not allowed in MAD-X.
+  \ttitem{CHARGE}\label{beam_charge} the electrical charge of the
+  particles in the beam [$q_p$]. (Default=1) \\
+  Note that a zero charge particle is not allowed in MAD-X.
+\end{madlist} 
+The order of precedence for arguments is:  {\tt particle->(mass+charge)}\\ 
+If the particle name given is recognized in the list above, the restmass
+and charge are set by MAD-X, and the MASS and CHARGE arguments are
+simply ignored. For other particles, and in particular for ions, any
+combination of name, mass and charge can be entered independently.
+\\
+
+\begin{madlist}
+  \ttitem{ENERGY} \label{beam_energy} Total energy per particle in
+  GeV.\\ If given, it must be greater than the particle
+  restmass. (Default=1 GeV)
+  \ttitem{PC} Particle momentum times the speed of light, in GeV. \\
+  If given, it must be greater than zero. 
+  \ttitem{GAMMA} Relativistic factor, {\sl ie} ratio between total
+  energy and rest energy of the particles: GAMMA = ENERGY/MASS = $E / m_0 c^2$. \\
+  GAMMA must be greater than one.\\ 
+  \ttitem{BETA} Ratio between the speed of the particle
+  and the speed of light: ${\tt BETA} = v / c$.\\
+  BETA must be strictly less than one.
+  \ttitem{BRHO} Magnetic rigidity of the particles in T.m. \\ 
+  BRHO = $P / abs(q)$ = PC / ( abs(CHARGE) * c * 1.e-9). 
+\end{madlist}  
+The order of precedence for arguments is: {\tt energy->pc->gamma->beta->brho}
+
+Note that if the restmass is changed after the energy has been set, ie
+in separate BEAM commands, the energy is left unchanged and the momentum
+PC and relativistic factor GAMMA are recalculated. 
+\\
+
+\begin{madlist}
+  \ttitem{EX} The horizontal emittance $\epsilon_x$ (default: 1 m). 
+  \ttitem{EY} The vertical emittance $\epsilon_y$ (default: 1 m). 
+  \ttitem{ET} The longitudinal emittance $\epsilon_t$ (default: 1 m). 
+  \ttitem{EXN} The normalised horizontal emittance [m]:
+  $\epsilon_{xn} = 4 \sqrt{\gamma^2 - 1} \ \epsilon_x$ \\ 
+  (ignored if EX is given).  
+  \ttitem{EYN} The normalised vertical emittance [m]:
+  $\epsilon_{yn} = 4 \sqrt{\gamma^2 - 1} \ \epsilon_y$ \\ 
+  (ignored if EY is given).  
+  \ttitem{SIGT} The bunch length $c\ \sigma_t$ in [m].  
+  \ttitem{SIGE} The \emph{relative} energy spread
+  $\sigma_E / E$ in [1].  
+\end{madlist} 
+
+The order of precedence for arguments is: {\tt ex->exn}, {\tt ey->eyn} and
+{\tt et->sigt->sige}.
+
+%% 2013-Jul-11  11:19:29  ghislain:  DOC
+%% the factor 4 in the normalised
+%% emittance formula is historical. It might be time we move to the
+%% standard definition of exn = beta gamma ex. It could be that we have
+%% to leave the current definition in MAD-X but move to the new one for
+%% the next MAD...
+
+Certain commands compute the synchrotron tune $Q_s$ taking into account
+the settings of RF cavities. 
+If $Q_s$ is non-zero, the relative energy spread and 
+the bunch length are calculated with
+\begin{align*}
+\sigma_E / p_0 c  &=  \sqrt{\epsilon_t\ \frac{2 \pi Q_s}{\eta\ C}} \\
+  c\ \sigma_t &= \sqrt{\epsilon_t\ \frac{\eta\ C}{2 \pi Q_s}}
+\end{align*}
+where $C$ is the machine circumference, and 
+$\eta = 1/\gamma^2 - 1/\gamma_t^2$.  
+\\
+
+\begin{madlist}
+  \ttitem{KBUNCH} The number of particle bunches in the
+  machine (default: 1).  
+  \ttitem{NPART} \label{beam_npart} The number of particles per bunch (default: 0). 
+  \ttitem{BCURRENT} The bunch current (default: 0 A). 
+  \ttitem{BUNCHED} A logical flag. If set, the beam is
+  treated as bunched whenever this makes sense.  
+  \ttitem{RADIATE} \label{beam_radiate} A logical flag. If set, synchrotron
+  radiation is considered in all dipole magnets.  
+  \ttitem{BV} an integer specifying the direction of the
+  particle movement in a beam line; either +1 (default), or -1. For a
+  detailed explanation see the section below on bv flag.  
+  \ttitem{SEQUENCE} attaches the beam command to a named sequence; if
+  the name is omitted, the BEAM command refers to the default beam
+  which is always present. Sequences without attached beam use this
+  default beam. When updating a beam with a corresponding sequence name,
+  tye sequence name must always be mentioned.    
+\end{madlist} 
+
+{\bf \underline{Order and Precedence:}}\\
+Internally the BEAM command processes the parameters in the following
+order and with the following precedence (left to right): 
+\begin{verbatim}
+    particle -> (mass+charge)
+    energy -> pc -> gamma -> beta -> brho
+    ex -> exn
+    ey -> eyn
+    current -> npart
+    et -> sigt -> sige
+\end{verbatim} 
+
+
+{\bf Warning:} BEAM updates, i.e. it replaces attributes explicitely
+mentioned, may calculate other attributes according to the precedence rules
+given, but does NOT return attributes not specified to default values! 
+In order to reset to reset BEAM attributes to their default values, use
+the {\tt RESBEAM} command.
+
+
+{\bf \underline{Additional variables:}}\\ 
+Some MAD-X modules may also compute and store data into a beam data 
+block. These attributes may NOT be set directly through the BEAM
+command. The corresponding variables are:  
+\begin{madlist}
+  \ttitem{CIRC} total length or circumference of the machine [m]
+  \ttitem{FREQ0} revolution frequency [Hz]
+  \ttitem{DTBYDS} ???
+  \ttitem{DELTAP} momentumn deviation
+  \ttitem{ALFA} momentum compaction factor
+  \ttitem{U0} radiation loss per turn [GeV]
+  \ttitem{QS} synchrotron tune [1]
+  \ttitem{ARAD} classical particle radius [m]
+  \ttitem{PDAMP} damping partition numbers; Default is {1,1,2}
+  \ttitem{N1MIN} minimum available aperture, set by the APERTURE module
+\end{madlist}
+
+
+{\bf \underline{Referring to BEAM data attributes:}}\\ 
+Expressions may refer to data in this beam data block using the
+notation  
+\begin{verbatim}
+BEAM->attribute-name
+\end{verbatim} 
+or 
+\begin{verbatim}
+BEAM%sequence-name->attribute-name.
+\end{verbatim} 
+
+This notation refers to the value of attribute-name found in the default
+BEAM, respectively the beam belonging to the sequence sequence-name. 
+This can be used for receiving or using values, e.g. 
+\begin{verbatim}
+value, beam%lhcb2->bv;
+\end{verbatim} 
+but also for storing values in the beam bank, e.g.  
+\begin{verbatim}
+beam->charge=-1;
+\end{verbatim} 
+Note however that this does NOT trigger an update of dependent variables
+and you are strongly advised against setting BEAM parameters with this method.
+
+The current values in the BEAM bank can be obtained by the command
+\begin{verbatim}
+show, beam;
+\end{verbatim}
+or to obtain the data for a beam linked to a named sequence:
+\begin{verbatim}
+show, beam%sequence-name;
+\end{verbatim}
+
+{\bf \underline{Examples:}}\\ 
+\begin{verbatim}
+! select electrons, set energy and emittances
+BEAM, PARTICLE = ELECTRON, ENERGY = 50, EX = 1.E-6, EY = 1.E-8, SIGE = 1.E-3;
+ ...
+
+! turn on synchrotron radiation
+BEAM, RADIATE;
+ ...
+
+! reset all values to their defaults, 
+! ie positrons, energy = 1GeV, default emittances, no radiation...
+RESBEAM;
+ ...
+
+! select new emittances
+BEAM, EX = 2.E-5, EY = 3.E-7, SIGE = 4.E-3;
+\end{verbatim} 
+
+
+\section{RESBEAM}
+\label{sec:resbeam}
+
+The RESBEAM command resets the default values of the beam belonging to
+the specified sequence, or of the default beam if no sequence is given.  
+
+\begin{verbatim}
+RESBEAM, SEQUENCE=string;
+\end{verbatim} 
+
+The only argument to RESBEAM is a string for the sequence name.
+If the sequence name is omitted, the default beam is reset. 
+
+\begin{table}[h]
+  \caption{Default BEAM data}
+  \begin{center}
+     \begin{tabular}{|l|l|}
+       \hline
+       Quantity                & Default \\
+       \hline
+       PARTICLE      &  POSITRON \\
+       ENERGY        &  1 GeV \\
+       EX            &  1 rad.m \\
+       EY            &  1 rad.m \\
+       ET            &  1 rad.m \\
+       KBUNCH        &  1 \\
+       NPART         &  0 \\
+       BCURRENT      &  0 A \\
+       BUNCHED       &  .TRUE. \\
+       RADIATE       &  .FALSE. \\     
+       \hline
+     \end{tabular}
+  \end{center}
+\end{table}
+
+
+
+\section{BV FLAG}
+\label{sec.bvflag}
+When reversing the direction ($\vec V$) of a particle in a magnetic field
+($\vec B$) while keeping its charge constant, the resulting force $\vec
+V \times \vec B$ changes sign. This is equivalent to flipping the field,
+but not the direction.  
+
+For practical reasons the properties of all elements of the LHC are
+defined in the {\tt MAD-X} input as if they apply to a clockwise proton beam
+("LHC beam 1"). This allows a single definition for elements traversed
+by both beams. Their effects on a beam with identical particle charge
+but running in the opposite direction ("LHC beam 2") must then be
+reversed inside the program.  
+
+In {\tt MAD-X} this may be taken into account by setting the value of
+the BV attribute in the {\tt BEAM} commands. In the case of LHC beam 1
+(clockwise) and beam 2 (counter-clockwise), treated in {\tt MAD-X} both
+as clockwise proton beams, the Beam commands must look as follows:  
+
+\begin{verbatim}
+beam, sequence=lhcb1, particle=proton, pc=450, bv = +1;
+
+beam, sequence=lhcb2, particle=proton, pc=450, bv = -1;
+\end{verbatim}
+
+%% EOF
+
+

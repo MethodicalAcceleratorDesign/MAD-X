@@ -1,0 +1,113 @@
+\chapter{File Handling Statements}
+\label{chap:files}
+
+\section{ASSIGN}
+\label{sec:assign}
+
+\begin{verbatim}
+assign, echo="file_name", truncate;
+\end{verbatim} 
+where "file\_name" is the name of an output file, or "terminal" and
+truncate specifies if the file must be truncated when opened (ignored
+for terminal). This allows switching the echo stream to a file or back,
+but only for the commands value, show, and print. Allows easy
+composition of future MAD-X input files. A real life example (always the
+same) is to be found under \href{foot.html}{footprint example}.  
+
+\section{CALL}
+\label{sec:call}
+\begin{verbatim}
+call, file = "file_name";
+\end{verbatim} 
+where "file\_name"  is the name of an input file. This file will be read
+until a "return;" statement, or until end\_of\_file; it may contain any
+number of calls itself, and so on to any depth.  
+
+
+
+\section{PRINT}
+\label{sec:print}
+\begin{verbatim}
+print, text = "string";
+\end{verbatim} 
+prints the quoted text string to the current output file (see ASSIGN
+above). The text can be edited with the help of a
+\href{special.html#macro}{macro statement}. For more details, see
+there. [TBC]  
+
+
+\section{PRINTF}
+\label{sec:printf}
+\begin{verbatim}
+printf, text = "string", value = expr{,expr};
+\end{verbatim}
+prints the numerical values specified in the value field, formatted
+according to the string format provided in the text field, to the
+current output file.  
+The string format can take numeric C or MAD format specifiers for double
+real values; integer and string formats are not supported. 
+The maximum number of values that can be printed in one
+statement is limited to 100. 
+
+If the number of format specifiers given in the string is higher 
+than the number of values in the value field, undefined values are printed 
+where they are not explicitly provided. 
+If the number of format specifiers given in the string is lower 
+than the number of values in the value field, the values that 
+do not correspond to a format specifier are ignored. 
+
+
+Example:
+\begin{verbatim}
+a = 1.2; b = 3.4/0.3; c := 0.8*a/b;
+printf, text = "String with floats a=%f, b=%.3g, text and MAD float c=%F;", 
+        value = a, b, c;
+printf, text = "More specifiers than values: %f, %.3g, %F", value = a, b;
+printf, text = "More values than specifiers: %f, %.3g"    , value = a, b, c;
+\end{verbatim}
+produces the following output:
+\begin{verbatim}
+String with floats a=1.200000, b=11.3, text and MAD float c=     0.08470588235;
+More specifiers than values: 1.200000, 11.3,   6.953222976e-310
+More values than specifiers: 1.200000, 11.3
+\end{verbatim}
+
+Note that printf, like print, produces output that cannot be read back
+by MAD-X. For output that can be read back by MAD-X, use the command
+{\tt VALUE} or TFS tables.
+
+Note also that a percent sign (\%) can be printed using the format
+\verb|text="%%"|. 
+
+
+\section{REMOVEFILE}
+\label{sec:removefile}
+\begin{verbatim}
+removefile, file = "file_name";
+\end{verbatim} 
+remove the file "file\_name" from disk. It is more portable than  
+\begin{verbatim}
+system("rm filename"); // Unix specific
+\end{verbatim}
+
+\section{RENAMEFILE}
+\label{sec:renamefile}
+\begin{verbatim}
+renamefile, file = "file_name", name = "new_file_name";
+\end{verbatim} 
+rename the file "file\_name" to "new\_file\_name" on the disk. It is more
+portable than  
+\begin{verbatim}
+system("mv file_name new_file_name"); // Unix specific
+\end{verbatim}
+
+
+\section{RETURN}
+\label{Sec:return}
+\begin{verbatim}
+return;
+\end{verbatim} 
+ends reading from a "called" file; if encountered in the standard input
+file, it ends the program execution.  
+
+%% EOF
