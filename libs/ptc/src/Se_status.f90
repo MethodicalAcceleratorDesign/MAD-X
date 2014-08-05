@@ -1315,7 +1315,8 @@ subroutine set_s_b
 
   ALLOCATE(S_B(SECTOR_NMUL_MAX))
            DO I=1,SECTOR_NMUL_MAX
-             call nul_coef(S_B(I))
+             S_B(I)%firsttime = 1  ! skowron 2014.08: added this line
+             call nul_coef(S_B(I)) ! skowron 2014.08: nullifies pointers unless s_b(i).firsttime = -100, then deletes 
              call make_set_coef(S_B(I),I)
              S_B(I)%firsttime=0
           ENDDO
