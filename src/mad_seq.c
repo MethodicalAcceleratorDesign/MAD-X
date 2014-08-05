@@ -327,7 +327,7 @@ expand_line(struct char_p_array* l_buff)
   /* first get all bracket pairs with their level; keep max. level */
   int add=0, i=0, j=0, k=0, n=0, number=0, dummy=0, rep=-1, pos=0;
   int level = 0, l_max = 0, b_cnt = 0;
-  char* p;
+  char* p = blank;
   struct int_array* lbpos = new_int_array(l_buff->curr);
   struct int_array* rbpos = new_int_array(l_buff->curr);
   struct int_array* b_level = new_int_array(l_buff->curr);
@@ -380,7 +380,8 @@ expand_line(struct char_p_array* l_buff)
       }
     }
   }
-  /* loop over buffer, expand simple element repetition */
+
+  /* loop over buffer, expand simple element repetition defined with '*' f.g. 10*myquad  */
   for (pos = 2; pos < l_buff->curr; pos++)
   {
     if (*l_buff->p[pos] == '*')
@@ -393,19 +394,25 @@ expand_line(struct char_p_array* l_buff)
       }
       n = add = rep - 1;
       while (l_buff->curr + n >= l_buff->max) grow_char_p_array(l_buff);
+
       for (j = l_buff->curr; j > pos + 1; j--) /* shift upwards */
         l_buff->p[j+n] = l_buff->p[j];
+
       l_buff->curr += n;
+      
+      
+      j = pos+1;
       for (k = 1; k <= add; k++)
       {
-        j = pos+1;
-        l_buff->p[j+k] = l_buff->p[j];
+        l_buff->p[j+k] = tmpbuff(l_buff->p[j]); 
       }
+
       for (j = 0; j < b_cnt; j++)  /* reset bracket pointers */
       {
         if (lbpos->i[j] > pos + 1) lbpos->i[j] += n;
         if (rbpos->i[j] > pos + 1) rbpos->i[j] += n;
       }
+
       l_buff->p[pos-1] = l_buff->p[pos-2] = blank;
     }
   }
@@ -427,6 +434,7 @@ expand_line(struct char_p_array* l_buff)
     get_bracket_t_range(l_buff->p, '(', ')', lbpos->i[i],
                         l_buff->curr-1, &dummy, &rbpos->i[i]);
   lbpos->curr = rbpos->curr = b_level->curr = b_cnt;
+
   /* now loop over level from highest down to zero, invert if '-' */
   for (level = l_max; level >= 0; level--)
   {
@@ -625,8 +633,10 @@ make_sequ_from_line(char* name)
   line = line_list->macros[pos];
   line->dead = 1;   /* prevent line from further conversion to sequence */
   line_buffer = new_char_p_array(1000);
+  
   replace_lines(line, 0, tmp); /* replaces all referenced lines */
   expand_line(line_buffer); /* act on '-' and rep. count */
+
   current_sequ = new_sequence(name, 0); /* node positions = centre */
   if ((spos = name_list_pos(name, sequences->list)) >= 0)
     old_sequ = sequences->sequs[spos];
@@ -642,7 +652,10 @@ make_sequ_from_line(char* name)
   current_node = NULL;
   make_elem_node(el, 1);
   current_sequ->start = current_node;
+  
+
   current_sequ->length = line_nodes(line_buffer);
+  
   sprintf(c_dum->c, "%s$end", current_sequ->name);
   el = make_element(c_dum->c, "marker", clone, 0);
   make_elem_node(el, 1);
@@ -651,6 +664,7 @@ make_sequ_from_line(char* name)
   current_sequ->start->previous = current_sequ->end;
   current_sequ->end->next = current_sequ->start;
   current_sequ->line = 1; /* remember origin of sequence */
+
   if(line_buffer) delete_char_p_array(line_buffer,1);
 }
 
