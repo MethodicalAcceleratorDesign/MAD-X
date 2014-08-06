@@ -59,7 +59,7 @@ The  attributes of the TWISS command are:
   {\tt DELTAP=0.001:0.007:0.002} define four values. 
 
 
-  \ttitem{CHROM} A logical flag. If set, MAD-X also computes the
+  \ttitem{CHROM} A logical flag. If set, \madx also computes the
   \href{../Introduction/tables.html#chrom}{chromatic
     functions} as well as the radiation synchrotron integrals. \\
   \textit{Please note that this option is needed for a proper
@@ -91,18 +91,18 @@ The  attributes of the TWISS command are:
   change the default value for all subsequent closed orbit search calculations. 
 
   \ttitem{FILE} (Default: ``twiss'') \\
-  causes MAD-X to writes a  \href{../Introduction/select.html#tfs}{TFS Twiss table} 
+  causes \madx to writes a  \href{../Introduction/select.html#tfs}{TFS Twiss table} 
   to the file specified. \\
   The columns of the table can be selected using the {\tt SELECT}
   command with the {\tt flag= twiss} attribute. 
 
-  \ttitem{TABLE} (overrides SAVE): MAD-X creates a full
+  \ttitem{TABLE} (overrides SAVE): \madx creates a full
   \href{../Introduction/tables.html#linear}{Twiss table} in
   memory and gives it the name TWISS, unless TABLE="table\_name"
   appears on the command, then it is called
   \href{../Introduction/label.html}{table\_name}. This table
   includes linear lattice functions as well as the chromatic
-  functions for all positions. An important new feature of MAD-X
+  functions for all positions. An important new feature of \madx
   is the possibility to access entries of tables and in
   particular the twiss table (see
   \href{../Introduction/expression.html#table}{table access}).\\
@@ -144,9 +144,9 @@ The  attributes of the TWISS command are:
   orbit search; the values at the monitors are used by the
   threader.    
 
-  \ttitem{COUPLE} (obsolete) This MAD8 option can no
-  longer be set since TWISS in MAD-X is always calculated in
-  coupled mode. MAD-X computes the coupled functions in the
+  \ttitem{COUPLE} (obsolete) This \madeight option can no
+  longer be set since TWISS in \madx is always calculated in
+  coupled mode. \madx computes the coupled functions in the
   sense of
   \href{../Introduction/bibliography.html#edwards}{[Edwards and
       Teng]}. For the uncoupled cases they reduce to the C and S
@@ -173,12 +173,12 @@ The  attributes of the TWISS command are:
 The tables are suitable for \href{../plot/plot.html}{plot}.   
 
 After a
-successful TWISS run MAD-X creates an implicit
+successful TWISS run \madx creates an implicit
 \href{../Introduction/tables.html#summ}{table of summary parameters}
 named "summ" which includes tunes, chromaticities etc (Please note that
 the \href{../Introduction/tables.html#chrom}{chrom} option is needed
 for a proper calculation of the chromaticities in the presence of
-coupling!) versus the selected values of DELTAP. Notice that in MAD-X
+coupling!) versus the selected values of DELTAP. Notice that in \madx
 DELTAP is converted in PT, which is used as longitudinal
 variable. Dispersive and chromatic functions are hence derivatives with
 respects to PT( see
@@ -234,7 +234,7 @@ TWISS, DELTAP=real{,value}, LINE=beam-line,
        TABLE=table_name;
 \end{verbatim}
 No other attributes should appear in the command. For each value of
-DELTAP MAD-X first searches for the periodic solution for the beam line
+DELTAP, \madx first searches for the periodic solution for the beam line
 mentioned in LINE=beam-line: The result is used as an initial condition
 for the lattice function tracking. 
 
@@ -246,7 +246,7 @@ USE, period=INSERT;
 TWISS, LINE=CELL, DELTAP=0.0:0.003:0.001, CHROM, FILE;
 \end{verbatim}
 
-For four values of DELTAP the following happens: First MAD-X finds the
+For four values of DELTAP the following happens: First \madx finds the
 periodic solution for the beam line CELL: Then it uses this solution as
 initial conditions for tracking the lattice functions of the beam line
 CELL: Output is also written on the file TWISS:  
@@ -317,7 +317,7 @@ TWISS,...;
 \end{verbatim}
 
 When reaching the \href{../control/general.html#place}{place} in the
-sequence "s\_name" during execution of TWISS, MAD-X will save a
+sequence "s\_name" during execution of TWISS, \madx will save a
 \hyperlink{beta0}{beta0} block with the
 \href{../Introduction/label.html}{label} name: This block is filled with
 the values of all lattice parameters in place.  
@@ -525,7 +525,7 @@ in the interface to other programs, such as TRAIN.
 
 In a machine with magnetic and alignment errors it can happen that the
 beam does not circulate and the closed orbit cannot be established and
-measured. This can also happen in MAD-X and the closed orbit finder does
+measured. This can also happen in \madx and the closed orbit finder does
 not converge. 
 
 The \textbf{threader} simulates beam steering through such a machine
@@ -537,7 +537,7 @@ orbit search is carried out by the \href{../twiss/twiss.html}{TWISS}
 module.   
 
 The threader is controlled as an option. 
-The following MAD-X commands enables the threader :
+The following \madx commands enables the threader :
 \begin{verbatim}
 option, threader ;
 \end{verbatim}  
@@ -580,3 +580,5 @@ is applied. \\ Defaults: 0.005, 0.005
 The attenuation factor defines the fraction of the calculated kick that
 is actually applied by the threader.  
 An attenuation factor of 0.5 will apply 50\% of the calculated kicks.
+
+%% EOF

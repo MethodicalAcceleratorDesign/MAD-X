@@ -4,8 +4,9 @@
 %  Changed by: E. T. d'Amico, 20-Oct-2004 
 
 \chapter{PLOT}
+\label{chap:plot}
 
-Values contained in MAD-X tables can be plotted in the form column
+Values contained in \madx tables can be plotted in the form column
 versus column, with up to four differently scaled vertical axes and up
 to 10 different variables in total for all vertical axes.
 
@@ -25,6 +26,7 @@ Note also that for various reasons a sequence must be defined before the
 PLOT command can be invoked. 
 
 \section{PLOT}	
+\label{sec:plot}
 \begin{verbatim}
 plot, haxis=  vname, hmin=real, hmax=real, 
       vaxis=  vname1,vname2,..,vnamen,
@@ -112,14 +114,14 @@ where the parameters have the following meaning:
    \ttitem{zero\_suppr} To be documented (default = false)
 
    \ttitem{noversion} logical, default=false. If noversion=true, the
-     information concerning the version of MAD-X and the date of the run
+     information concerning the version of \madx and the date of the run
      are suppressed from the title.  
      This option frees additional space available for the user specified
      title of the plot.  
 
    \ttitem{noline} logical, default=false. If s is the horizontal
      variable, then a symbolic representation of the beamline is plotted
-     above the plot, except for tables that have been read back into MAD-X. 
+     above the plot, except for tables that have been read back into \madx. 
      In case the horizontal scale is too large and the density of
      beamline elements is too high, this may result in hardly legible
      representation and a thick black block in teh worst case. 
@@ -222,6 +224,7 @@ where the parameters have the following meaning:
 
 
 \section{SETPLOT}
+\label{sec:setplot}
 \begin{verbatim}
 setplot, post= integer, font= integer, lwidth= real, xsize= real, ysize= real,
          ascale= real, lscale= real, sscale= real, rscale= real,
@@ -269,6 +272,7 @@ where the parameters have the following meaning:
 
 
 \section{RESPLOT}
+\label{sec:resplot}
 \begin{verbatim}
 resplot; 
 \end{verbatim} 
@@ -276,8 +280,9 @@ resets all defaults for the setplot command.
 
 
 \section{First example for plots of tracking data}
+\label{sec:plot_example_1}
 
-The following MAD-X code sample defines the tracking of four particles 
+The following \madx code sample defines the tracking of four particles 
 with the generation of a single file with name \textit{basisone} 
 holding the tracking data for all four particles.  
 
@@ -325,7 +330,7 @@ plot 'basisone' using 3:($1==1 ? $4 : NaN) title 'particle 1' with points pointt
      'basisone' using 3:($1==4 ? $4 : NaN) title 'particle 4' with points pointtype 4 
 \end{verbatim}}
 
-MAD-X then calls GNUPLOT as a subprocess to execute this file, which
+\madx then calls GNUPLOT as a subprocess to execute this file, which
 generates the file \textit{tmpplot.ps}.  
 The file \textit{tmpplot.ps} is then {\bf appended} to the file 
 {\textit plot.ps} determined by the attribute \textit{file=plot}.  
@@ -337,8 +342,9 @@ growing file \textit{plot.ps}.
 
 
 \section{Second example for plots of tracking data}
+\label{sec:plot_example_2}
 
-The following MAD-X code sample defines the tracking of four particles 
+The following \madx code sample defines the tracking of four particles 
 with the generation of individual files with name
 \textit{basis.obs0001.p000i} with \textit{i=1..4}  
 holding the tracking data for each of the four particles.  
@@ -389,7 +395,7 @@ plot 'basis.obs0001.p0001' using 3:4 title 'particle 1' with points pointtype 1 
      'basis.obs0001.p0004' using 5:4 title 'particle 4' with points pointtype 4 
 \end{verbatim}}
 
-MAD-X then calls GNUPLOT as a subprocess to execute this file, which
+\madx then calls GNUPLOT as a subprocess to execute this file, which
 generates the file \textit{tmpplot.ps}.  
 The file \textit{tmpplot.ps} is then {\bf appended} to the file
 \textit{plot.ps} determined by the attribute \textit{file=plot}.  

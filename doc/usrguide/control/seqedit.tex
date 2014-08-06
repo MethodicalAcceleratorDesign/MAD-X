@@ -15,7 +15,7 @@ contains only elements. It is good practice to add a \textit{ flatten; }
 statement at the end of a \textit{ seqedit operation } to ensure a fully
 operational sequence. And this is particularly useful for the \textit{
   save } command to properly save \textit{ shared sequences } and to
-write out in \textit{ MAD-8 } format.  
+write out in \madeight format.  
 
 %% 2013-Jul-11  17:35:46  ghislain: need a synopsis paragraph similar to
 %% what PTC offers and a complement of a few examples using all commands
@@ -23,126 +23,130 @@ write out in \textit{ MAD-8 } format.
 
 \section{SEQEDIT}
 \label{sec:seqedit}
-\begin{verbatim}
-seqedit, sequence=s_name;
-\end{verbatim} 
+\madbox{SEQEDIT, SEQUENCE=string;}
 selects the sequence named for editing. The editing is performed on the
 non-expanded sequence; after having finished the editing, one has to
 re-expand the sequence if necessary.  
 
 \section{EXTRACT}
 \label{sec:extract}
-\begin{verbatim}
-extract, sequence=s_name, from=MARKER_1, to=MARKER_2, newname=p;
-\end{verbatim} 
-A new sequence with name "p" is extracted from the existing sequence named "s\_name", 
-starting from MARKER\_1 and ending at MARKER\_2. The new sequence
-"p" can be USEd as any other sequence. It is declared as "shared" and
+\madbox{
+EXTRACT, SEQUENCE=string, FROM=string, TO=string, NEWNAME=string;
+}
+A new sequence with name given by the NEWNAME argument is extracted from
+the existing sequence given by the SEQUENCE argument, 
+starting from the position given by the FROM argument and ending at
+position given by the TO argument. The resulting new sequence
+can be USEd as any other sequence. It is declared as "shared" and
 can therefore be combined e.g. into the cycled original sequence. \\ 
-Note that MARKER\_1 must be located before MARKER\_2 in the existing sequence "s\_name", 
-or MAD-X will fail with a fatal error. 
+Note that the position given by the FROM argument must be located before
+the position given by the TO argument in the original sequence given by
+the SEQUENCE argument, or \mad will fail with a fatal error. 
 In the case of circular sequences, this can be ensured by performing a CYCLE 
-of sequence "s\_name" with {\tt START=MARKER\_1}.
+of the orginal sequence with {\tt START} pointing to the position given
+in the FROM argument. 
 
 \section{FLATTEN}
 \label{sec:flatten}
-\begin{verbatim}
-flatten;
-\end{verbatim} 
-This command includes all sequences in the sequence being edited, if
-any. The resulting sequence contains only elements.  
+\madbox{
+FLATTEN;
+}
+This command recursively includes all sub-sequences within the sequence
+being edited, if any. The resulting sequence contains only elements.  
 
 \section{INSTALL}
 \label{sec:install}
-\begin{verbatim}
-install, element=name, class=class_name, at=real, from=place|selected;
-\end{verbatim} 
+\madbox{
+INSTALL, ELEMENT=string, CLASS=string, AT=real, FROM=string|SELECTED;
+}
 where the parameters have the following meaning: 
-\begin{itemize}
-   \item element: name of the (new) element to be inserted (mandatory) 
-   \item class: class of the new element to be inserted (mandatory) 
-   \item at: position where the element is to be inserted; if no "from"
+\begin{madlist}
+   \ttitem{ELEMENT} name of the (new) element to be inserted (mandatory) 
+   \ttitem{CLASS} class of the new element to be inserted (mandatory) 
+   \ttitem{AT} position where the element is to be inserted; if no "from"
      is given,this is relative to the start of the sequence. If "from"
      is given, it is relative to the position specified there. 
-   \item from:either a place (i.e. the name(+occurrence count) of an
+   \ttitem{FROM} either a place (i.e. the name(+occurrence count) of an
      element already existing in the sequence, e.g. mb[15], or
-     mq.a..i1..4 etc.; or the string "selected"; in this latter case an
+     mq.a..i1..4 etc.; or the string "SELECTED"; in the latter case an
      element of the type specified will be inserted behind all elements
      in the sequence that are currently selected by one or several
      \href{../Introduction/select.html}{SELECT} commands of the type 
 \begin{verbatim}
 select, flag=seqedit, class=.., pattern=.., range=..;
 \end{verbatim} 
-   \item \textit{ Attention: No element definitions inside seqedit. }
-\end{itemize}
+   \item \textit{Attention: No element definition can occur inside SEQEDIT. }
+\end{madlist}
 
 \section{MOVE}
 \label{sec:move}
-\begin{verbatim}
-move, element=name|selected, by=real, to=real, from=place;
-\end{verbatim}
-\begin{itemize}
-   \item element: name of the existing element to be moved, or
-     "selected", in which case all elements from existing
+\madbox{
+MOVE, ELEMENT=string|SELECTED, BY=real, TO=real, FROM=string;
+}
+\begin{madlist}
+   \ttitem{ELEMENT} name of the existing element to be moved, or
+     "SELECTED", in which case all elements from existing
      \href{../Introduction/select.html}{SELECT} commands will be moved;
-     in the latter case, "by" must be given.  
-   \item by: amount by which the element(s) is/are to be moved; no "to"
-     nor "from" in this case.  
-   \item to: position to which the element has to be moved; if no from,
-     then this is relative to the start of the sequence; otherwise, it
-     is relative to the place given in "from".  
-   \item from: place in the sequence with respect to which the element
+     in the latter case, "BY" must be given.  
+   \ttitem{BY} distance by which the element(s) is/are to be moved; no "TO"
+     nor "FROM" attributes should be given in this case.  
+   \ttitem{TO} position to which the element has to be moved; if no FROM
+   attribute is given, the position is relative to the start of the sequence; otherwise, it
+     is relative to the location given in the "FROM" argument  
+   \ttitem{FROM} place in the sequence with respect to which the element
      is to be positioned.  
-\end{itemize}
+\end{madlist}
 
 \section{REMOVE}
 \label{sec:remove}
-\begin{verbatim}
-remove, element=name|selected;
-\end{verbatim}
-\begin{itemize}
-   \item element: name of the existing element to be removed, or
-     "selected", in which case all elements from existing
+\madbox{
+REMOVE, ELEMENT=string|SELECTED;
+}
+\begin{madlist}
+   \ttitem{ELEMENT} name of the existing element to be removed, or
+     "SELECTED", in which case all elements from existing
      \href{../Introduction/select.html}{SELECT} commands will be
      removed. 
-   \item \textit{Attention: It is a bad idea to remove all markers from
-     a sequence! In particular the "start=" marker and the new markers
-     added by "cycle" must never be removed from a sequence.} 
-\end{itemize}
+\end{madlist}
+
+\textit{Attention: It is a bad idea to remove all markers from
+  a sequence! In particular the "start=" marker and the new markers
+  added by "cycle" must never be removed from a sequence.} 
+
 
 \section{CYCLE}
 \label{sec:cycle}
-\begin{verbatim}
-cycle, start=place;
-\end{verbatim} 
-This makes the sequence start at the place given, which must be a
-marker. \\ 
+\madbox{
+CYCLE, START=string;
+}
+This makes the sequence start at the location given with the START
+argument, which must be a marker. \\ 
 In the case there is a shared sequence in the used sequence, the
 command FLATTEN has to be used before the command CYCLE. Example:  
-\begin{verbatim}
+\madxmp{
 flatten ; cycle, start=place; 
-\end{verbatim}
+}
 
 \section{REFLECT}
 \label{sec:reflect}
-\begin{verbatim}
-reflect;
-\end{verbatim} 
+\madbox{
+REFLECT;
+}
 This inverts the order of element in the sequence, starting from the
 last element. \\ 
 If there are shared sequences inside the USEd sequence, the command
 FLATTEN must be used before the command REFLECT.  Alternatively each
 shared sequence must first be reflected. Example:   
-\begin{verbatim}
+\madxmp{
 flatten ; reflect; 
-\end{verbatim}
+}
 
 
 \section{REPLACE}
 \label{sec:replace}
-\begin{verbatim}
-replace, element=name1|selected, by=name2;
-\end{verbatim} 
+\madbox{
+REPLACE, ELEMENT=string|SELECTED, BY=string;
+}
 Element with name1 is replaced by element with name2. 
 If name1 is "selected", then all elements selected by
 \href{../Introduction/select.html}{SELECT} commands will be replaced by
@@ -151,9 +155,9 @@ the element name2.
 
 \section{ENDEDIT}
 \label{sec:endedit}
-\begin{verbatim}
-endedit;
-\end{verbatim} 
+\madbox{
+ENDEDIT;
+}
 terminates the sequence editing process. The nodes in the sequence are
 renumbered according to their occurrence which might have changed during
 editing.  
@@ -162,29 +166,25 @@ editing.
 
 \section{SAVE}
 \label{sec:save}
-\begin{verbatim}
-save, sequence = sequ1, sequ2, ..., file = "file_name", beam, bare;
-\end{verbatim} 
-saves the sequence(s) specified with all variables and elements needed
-for their expansion, onto the file "file\_name". 
+\madbox{
+SAVE, SEQUENCE= string{,string}, FILE=string, BEAM, BARE, MAD8;
+}
+saves the sequence or sequences specified, with all variables and elements needed
+for their expansion, onto the file given with the FILE argument.
 
-{\bf Warning:} If quotes are used for
-the "file\_name", capital and low characters are kept as specified, if they
-are omitted the "filename" will have lower characters only. 
+{\bf Warning:} If double quotes are used to specify
+the "file\_name", upper and lower case characters are kept as specified;
+if single quotes are used or quotes are simply omitted the actual
+"file\_name" consists of only lower case characters. 
 
 Example:
-\begin{verbatim}
-save, sequence = lhc, file = "Test_One";
-\end{verbatim}
-saves the lhc sequence to a file name Test\_One on disk, while
-\begin{verbatim}
-save, sequence = lhc, file = Test_One;
-\end{verbatim}
-saves the lhc sequence to a file name test\_one on disk.
+\madxmp{save, sequence = lhc, file = "Test\_One";}
+saves the lhc sequence to a file named Test\_One on disk, while
+\madxmp{save, sequence = lhc, file = Test\_One;}
+saves the lhc sequence to a file named test\_one on disk.
 
-The optional
-flag can have the value "mad8" (without the quotes), in which case the
-sequence(s) is/are saved in MAD-8 input format.  
+The optional flag can have the value "mad8" (without the quotes), in
+which case the sequence(s) is/are saved in \madeight input format.  
 
 The flag "beam" is optional; when given, all beams belonging to the
 sequences specified are saved at the top of the save file.  
@@ -238,18 +238,19 @@ twiss, save, betx=bxa, alfx=alfxa, bety=bya, alfy=alfya;
 %% sequence edition and manipulation part of the manual
 \section{DUMPSEQU}
 \label{sec:dumpsequ}
-\begin{verbatim}
-dumpsequ, sequence = s_name, level = integer;
-\end{verbatim} 
-Actually a debug statement, but it may come handy at certain
-occasions. Here "s\_name" is the name of an expanded (i.e. USEd)
-sequence. The amount of detail is controlled by "level":  
-\begin{verbatim}
-level = 0:    print only the cumulative node length = sequence length
-      > 0:    print all node (element) names except drifts
-      > 2:    print all nodes with their attached parameters
-      > 3:    print all nodes, and their elements with all parameters
-\end{verbatim}
+\madbox{
+DUMPSEQU, SEQUENCE=string, LEVEL=integer;
+}
+This command is actually more of a debug statement, but it may come handy at certain
+occasions. The argument of the SEQUENCE attribute is the name of an
+already expanded (i.e. USEd) sequence. The amount of detail in the
+output is controlled by the LEVEL argument:
+\begin{itemize}
+\item[$=0$ : ]    print only the cumulative node length = sequence length
+\item[$>0$ : ]    print all node (element) names except drifts
+\item[$>2$ : ]    print all nodes with their attached parameters
+\item[$>3$ : ]    print all nodes, and their elements with all parameters
+\end{itemize}
 
 
 

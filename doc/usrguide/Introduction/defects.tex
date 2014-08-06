@@ -4,72 +4,68 @@
 
 \chapter{Known Differences to Other Programs}
 
-\section{Definitions}
-\label{sec:definitions}
+\section{Definitions in \madeight}
 
-MAD uses full 6-by-6 matrices to allow coupling effects to be treated,
-and the canonical variable set (\textit{x}, \textit{p$_x$ / p$_0$}),
-(\textit{y}, \textit{p$_y$ / p$_0$}), (\textit{-ct}, delta(\textit{E}) /
-\textit{p$_0$ c}), as opposed to other programs most of which use the
-set (\textit{x}, \textit{x}'), (\textit{y}, \textit{y}'),
-(-delta(\textit{s}), delta(\textit{p})/\textit{p$_0$}). Like
-\href{bibliography.html#dragt}{[Dragt]}, MAD uses the relative energy
-error \textit{p$_y$ / p$_0$}, which is equal the relative momentum error
-delta = delta(\textit{p})/\textit{p$_0$} multiplied by beta = v/c.  
-\\ \\ 
-As from Version 8.13, MAD8 uses an additional \textbf{constant} momentum
-error delta$_\textit{s}$ in all optical calculations. The transfer maps
-contain the \textbf{exact} dependence upon this value; therefore the
-tunes for large deviations can be computed with high accuracy as opposed
-to previous versions.  
+\madeight uses full 6-by-6 matrices to allow coupling effects to be treated,
+and the canonical variable set ($x$ , $p_x / p_0$),
+($y$ , $p_y / p_0$), ($-ct$ , $\delta E / p_0 c$), as opposed to other
+programs most of which use the set ($x$, $x'$), ($y$, $y'$),
+($-\delta s$), $\delta p / p_0$). 
 
+Like \href{bibliography.html#dragt}{[Dragt]}, \madeight uses the relative
+energy error $p / p_0$, which is equal the relative momentum error
+${\texttt delta} = \delta p / p_0$ multiplied by $\beta = v/c$.  
+
+As from Version 8.13, \madeight used an additional \textbf{constant}
+momentum error $\texttt{delta}_s$ in all optical calculations. 
+The transfer maps contained the \textbf{exact} dependence upon this
+value; therefore the tunes for large deviations could be computed with
+high accuracy as opposed to previous versions.  
  
-The choice of canonical variables in MAD still leads to slightly
-different definitions of the lattice functions. In MAD the
+The choice of canonical variables in \madx still leads to slightly
+different definitions of the lattice functions. In \madx the
 Courant-Snyder invariants in \href{bibliography.html#courant}{[Courant
-    and Snyder]} take the form  
+    and Snyder]} take the form 
 
-W$_x$ = gamma$_\textit{x}$\textit{x}$^2$ - 2 alpha$_\textit{x}$\textit{x
-  p$_x$} + beta$_\textit{x}$\textit{p$_x$}$^2$ 
+$W_x = \gamma_x x^2 - 2 \alpha_x x p_x + \beta_x  p_x^2$
 
 Comparison to the original form 
 
- W$_x$ = gamma$_\textit{x}$\textit{x}$^2$ - 2
- alpha$_\textit{x}$\textit{x x}' + beta$_\textit{x}$\textit{x}'$^2$ 
+$W_x = \gamma_x x^2 - 2 \alpha_x x x' + \beta_x  {x'}^2$
 
-shows that the orbit functions cannot be the same. A more detailed analysis, using 
+shows that the orbit functions cannot be the same. 
 
-\textit{x}' = \textit{p$_x$} / (1 + delta) 
-
+A more detailed analysis, using 
+$x' = p_x / (1 + \delta)$
 shows that all formulas can be made consistent by defining the MAD orbit
-functions as  
- 
-beta$_\textit{x}M$ = beta$_\textit{x}C$ * (1 + delta),
-alpha$_\textit{x}M$ = alpha$_\textit{x}C$, gammaa$_\textit{x}M$ =
-gamma$_\textit{x}C$ / (1 + delta),  
+functions (index M) wrt. the Courant and Snyder functions (index C) as follows:
 
-For constant delta$_\textit{s}$ along the beam line and delta = 0, the
-lattice functions are the same. In a machine where delta varies along
+$\beta_{xM} = \beta_{xC} \times (1 + \delta)$, \\
+$\alpha_{xM} = \alpha_{xC}$, \\
+$\gamma_{xM} = \gamma_{xC} / (1 + \delta)$
+
+For constant $\delta_s$ along the beam line and $\delta = 0$, the
+lattice functions are the same. In a machine where $\delta$ varies along
 the circumference, e.g. in a linear accelerator or in an
 electron-positron storage ring, the definition of the Courant-Snyder
-invariants must be generalised. The MAD invariants have the advantage
-that they remain invariants along the beam line even for variable delta.  
+invariants must be generalised. The \madeight invariants have the advantage
+that they remain invariants along the beam line even for variable $\delta$.  
 
 With the new method this problem occurs in
-\href{../twiss/twiss.html}{Twiss module} only for non-constant delta.   
+\href{../twiss/twiss.html}{Twiss module} only for non-constant $\delta$.   
 
 \section{Treatment of Energy Error in TWISS} 
 It has been noted in \href{bibliography.html#ruggiero}{[Milutinovic and
-    Ruggiero]} that MAD returned tunes which are too low for non-zero
-delta. The difference was found to be quadratic in delta with a negative
+    Ruggiero]} that \madeight returned tunes which are too low for non-zero
+$\delta$. The difference was found to be quadratic in delta with a negative
 coefficient. This problem has been eliminated thanks to the new
-treatment  of momentum errors from MAD8 Version 8.13 onwards.   
+treatment  of momentum errors from \madeight Version 8.13 onwards.   
 
-\section{Definition of emittance}
+\section{Definition of emittance in \madx}
 This section should explain how natural and normalised emittances are
-defined in MAD-X and why there is a factor 4 in the definition of the
+defined in \madx and why there is a factor 4 in the definition of the
 natural emittance, which is a marked difference with other programs such
 as sixtrack (see the conversion to sixtrack format)
 
-%\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg}, January 24, 1997 
+%% EOF
 

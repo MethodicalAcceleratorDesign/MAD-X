@@ -5,8 +5,8 @@
 \chapter{SXF file format}
 
 An SXF lattice description is an ascii listing that contains one named,
-``flat'', ordered list of ele- ments, delimited as \{\ldots\}, with one
-entry for each element. The list resembles a MAD ``sequence'' describing
+``flat'', ordered list of elements, delimited as \{\ldots\}, with one
+entry for each element. The list resembles a \madx ``sequence'' describing
 the entire machine. The syntax is supposed to be adapted for ease of
 reading by human beings and for ease of parsing by LEX and YACC. 
 
@@ -22,6 +22,8 @@ format onto the file specified. This then represents one "instance" of
 the sequence, where all parameters are given by numbers rather than
 expressions; the file can be read by other programs to get a complete
 picture of the sequence.  
+
+
 
 \section{SXFREAD}
 
@@ -45,7 +47,7 @@ sxfwrite, file = file;
 stop;
 \end{verbatim}
 
-Subsequently the lattice, with errors, can be reloaded in another MAD-X job:
+Subsequently the lattice, with errors, can be reloaded in another \madx job:
 
 \begin{verbatim}
 sxfread, file = file;

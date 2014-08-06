@@ -1,11 +1,12 @@
 \documentclass[11pt,a4paper,twoside]{report}
-
+\usepackage{xspace}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \includeonly{
   Introduction/coverpage,       %MAD-X Cover Page
   Introduction/copyright,	%MAD-X Copyright Statement
+  Introduction/module,          %MAD-X contributors and module keepers
 %
   Introduction/conventions,	%Conventions
 %
@@ -213,15 +214,19 @@
  
 \tabskip=0pt plus 1fill
 
-
 %%% End imported from MAD-8
 
+\newcommand{\madeight}{{\tt MAD-8}\xspace}
+\newcommand{\madnine}{{\tt MAD-9}\xspace}
+\newcommand{\mad}{{\tt MAD-X}\xspace}
+\newcommand{\madx}{{\tt MAD-X}\xspace}
 
 \begin{document}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \include{Introduction/coverpage}        %MAD-X Cover Page
 \include{Introduction/copyright}	%MAD-X Copyright Statement
+\include{Introduction/module}           %MAD-X contributors and module keepers
 
 \tableofcontents
 \printindex

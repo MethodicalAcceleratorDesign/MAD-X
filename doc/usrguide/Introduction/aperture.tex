@@ -7,7 +7,7 @@
 
 \section{Defining aperture}
 \label{sec:def_aper}
-The aperture for a particular element or class of elements can be set in MAD-X 
+The aperture for a particular element or class of elements can be set in \madx
 at the time of definition or instantiation of the element or class.
 
 During tracking the particle excursion is then checked against the defined aperture and 
@@ -138,7 +138,7 @@ like in the picture below.
 \includegraphics[width=450px]{Introduction/tolerance.jpg}
 %\includegraphics{Introduction/tolerance.jpg align=center width=450}
 \\ 
-A tolerance can be assigned to each element in a MAD-X sequence as a vector: 
+A tolerance can be assigned to each element in a \madx sequence as a vector: 
 \begin{verbatim}
 Syntax: APER_TOL = {r, g, s};
 
@@ -199,7 +199,7 @@ where the parameters have the following meaning:
    \ttitem{SPEC} Aperture spec, for plotting only. Gives the spec line in
      the plot. Default = 0.0  
    \ttitem{NOTSIMPLE} Use only if one or more beamscreens in the range are
-     considered not to  be a "simply connex". Since all MAD-X apertypes
+     considered not to  be a "simply connex". Since all \madx apertypes
      are simply connex, this is only possible  if an input file with
      beam screen coordinates are given. See below for a graphical
      example. Default = false.  
@@ -220,7 +220,7 @@ where the parameters have the following meaning:
 The APERTURE module sets the actual emittances from the normalized values
 given as input using the definition\\
 {\tt ex = exn / gamma}\\
-while the BEAM command in MAD-X uses the definition\\
+while the BEAM command in \madx uses the definition\\
 {\tt ex = exn / (4 * beta * gamma)}
 
 
@@ -331,7 +331,7 @@ Y_act(s) = DDY_OFF * s^2  +  DY_OFF * s  +  Y_OFF
 \end{verbatim} 
 
 The reference position for the element, X\_ref(s) and Y\_ref(s), is calculated 
-by MAD-X via an internal call to the \href{../survey/survey.html}{SURVEY}
+by \madx via an internal call to the \href{../survey/survey.html}{SURVEY}
 module, taking the reference element as the origin. 
 
 The resulting offset, in each plane, which is taken into account in the aperture calculation, 
@@ -382,7 +382,8 @@ does not coincide with the reference trajectory.
 %%\includegraphics{offsetelem.jpg align=center width=780}
 \\ 
 
-Note that prior to MAD-X version 4, the layout of the file was different and not formatted as TFS file:
+Note that prior to \madx version 4, the layout of the file was different
+and not formatted as TFS file: 
 
 \begin{verbatim}
 reference-element-name

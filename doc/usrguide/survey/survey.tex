@@ -8,8 +8,8 @@
 \chapter{SURVEY}
 
 \begin{verbatim}
-SURVEY, x0=double, y0=double, z0=double, 
-        theta0=double, phi0=double, psi0=double,
+SURVEY, x0=real, y0=real, z0=real, 
+        theta0=real, phi0=real, psi0=real,
         file=string, table=string, sequence=string;
 \end{verbatim}
 
@@ -38,6 +38,16 @@ calculation. You should use a tilted normal MULTIPOLE or BEND instead.
 \hrule
 
 {\bf Parameters and Options:}
+
+%% \begin{madlist}
+%%    \ttitem{X0} The initial X coordinate [m]. 
+%%    \ttitem{Y0} The initial Y coordinate [m]. 
+%%    \ttitem{Z0} The initial Z coordinate [m]. 
+%%    \ttitem{THETA0} The initial angle theta [rad]. 
+%%    \ttitem{PHI0} The initial angle phi [rad]. 
+%%    \ttitem{PSI0} The initial angle psi [rad]. 
+%% \end{madlist}
+
 \begin{itemize}
 \item {\bf x0, y0, z0}=real (Default: 0.0, 0.0, 0.0)\\
 initial horizontal, vertical and longitudinal coordinates 

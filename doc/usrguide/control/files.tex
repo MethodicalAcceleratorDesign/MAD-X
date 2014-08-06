@@ -11,7 +11,7 @@ where "file\_name" is the name of an output file, or "terminal" and
 truncate specifies if the file must be truncated when opened (ignored
 for terminal). This allows switching the echo stream to a file or back,
 but only for the commands value, show, and print. Allows easy
-composition of future MAD-X input files. A real life example (always the
+composition of future \madx input files. A real life example (always the
 same) is to be found under \href{foot.html}{footprint example}.  
 
 \section{CALL}
@@ -44,8 +44,8 @@ printf, text = "string", value = expr{,expr};
 prints the numerical values specified in the value field, formatted
 according to the string format provided in the text field, to the
 current output file.  
-The string format can take numeric C or MAD format specifiers for double
-real values; integer and string formats are not supported. 
+The string format can take numeric C or \madx format specifiers for
+double real values; integer and string formats are not supported. 
 The maximum number of values that can be printed in one
 statement is limited to 100. 
 
@@ -73,7 +73,7 @@ More values than specifiers: 1.200000, 11.3
 \end{verbatim}
 
 Note that printf, like print, produces output that cannot be read back
-by MAD-X. For output that can be read back by MAD-X, use the command
+by \madx. For output that can be read back by \madx, use the command
 {\tt VALUE} or TFS tables.
 
 Note also that a percent sign (\%) can be printed using the format

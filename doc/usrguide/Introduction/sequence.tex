@@ -4,11 +4,11 @@
 
 \chapter{Beam Line Sequences}
 \label{chap:sequence}
-MAD-X accepts two forms of an accelerator definition: sequences and
+\madx accepts two forms of an accelerator definition: sequences and
 \href{line.html}{lines}. However, the sequence definition is the only
 one used internally; lines are converted into sequences when they are
 USEd. Consequently, only sequences can be saved (written onto a file)
-by MAD-X.  
+by \madx.  
 
 The corresponding sequence of statements defining a sequence is 
 \begin{verbatim}
@@ -101,7 +101,7 @@ elements or sub-sequences are:
 
 
 When the sequence is expanded in a
-\href{../control/general.html#use}{USE}\index{USE} command, MAD-X
+\href{../control/general.html#use}{USE}\index{USE} command, \madx
 generates the missing drift spaces according to the following rules:
 \begin{itemize}
 \item When the distance between the exit of the previous element and the
@@ -118,11 +118,11 @@ generates the missing drift spaces according to the following rules:
     slightly from the declared length. (see second example below)} 
 \item When the distance between the exit of the previous element and the 
   entrance of the next element is negative and less than $-1\mu m$,
-  the elements are considered to be overlapping and MAD-X terminates
+  the elements are considered to be overlapping and \madx terminates
   with a ``{\tt negative drift length}'' fatal error. 
 \end{itemize} 
 
-For efficiency reasons MAD-X imposes an \textbf{important restriction}
+For efficiency reasons \madx imposes an \textbf{important restriction}
 on element lengths and positions: once a sequence is expanded, the
 element positions and lengths are considered as fixed; in order to vary
 a position or element length, a re-expansion of the sequence becomes

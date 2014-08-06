@@ -6,95 +6,85 @@
 \label{chap:parameter}
 
 \section{\href{relation}{Relations between Variable Parameters}}
- A relation is established between variables by the statement 
-\begin{verbatim}
-parameter-name = expression;
-\end{verbatim} 
-or 
-\begin{verbatim}
-parameter-name := expression;
-\end{verbatim} 
-The first form evaluates the expression at the right immediately and
+ A relation is established between variables by one of two statements 
+\madbox{
+parameter-name = \= expression; \\
+parameter-name := \> expression;
+}
+The first form evaluates the expression on the right immediately and
 assigns its value to the parameter. The second form assigns the value by
-evaluating  the expression at right every time the parameter is actually
-used. This holds as well for element parameters - beware ! If you want
+evaluating  the expression on the right every time the parameter is actually
+used. This holds as well for element parameters. 
+
+Attention! If you want
 to modify e.g. the strength of a quadrupole later (e.g. in a match,  or
 by entering a new value for a parameter on which it depends) then the
 defition has to be  
-\begin{verbatim}
-qd:quadrupole,k1:= ak1;
-\end{verbatim} 
+\madxmp{QD: QUADRUPOLE, K1 := ak1;}
 and not 
-\begin{verbatim}
-qd:quadrupole,k1 = ak1;
-\end{verbatim} 
-In the latter case, k1 will be set to the current value of ak1, and will
-not change when ak1 changes.  
+\madxmp{QD: QUADRUPOLE, K1 = ak1;}
+In the latter case, K1 will be set to the current value of ak1 at the
+time of declaration, and will not change when ak1 later changes.  
 
-Parameters not yet defined have the value zero. 
+Parameters not yet defined have a zero value.
 
 Example: 
-\begin{verbatim}
-gev = 100;
-beam,energy=gev;
-\end{verbatim} 
+\madxmp{
+gev = 100; \\
+BEAM, ENERGY=gev;
+}
 the parameter on the left may appear on the right as well: 
-\begin{verbatim}
-x = x+1;
-\end{verbatim} 
-Increases the value of x by 1. As a result, the SET statement of MAD-8
-is no longer necessary and is not implemented.  
+\madxmp{x = x+1;}
+increases the value of x by 1. As a result, the SET statement of
+\madeight is no longer necessary and is not implemented in \madx.  
 
 
-Circular definitions are allowed in the first form:
-\begin{verbatim}
-a = b + 2;
+Circular definitions are allowed in the first form of relations
+\madxmp{
+a = b + 2; \\
 b = a * b;
-\end{verbatim}
-However, circular definitions in the second form are forbidden:
-\begin{verbatim}
-a := b + 2;
+}
+However, circular definitions in the second form or relations are
+forbidden: 
+\madxmp{
+a := b + 2; \\
 b := a * b;
-\end{verbatim}
+}
 will result in an error.
 
 
 \section{\href{par_output}{VALUE: Output of Parameters}}
 The VALUE statement
-\begin{verbatim}
-VALUE = expression;
-\end{verbatim}
-or
-\begin{verbatim}
-VALUE = expression1, expression2, ...;
-\end{verbatim}
-evaluates the current value of "expression" resp. "expression1" etc. and
+\madbox{
+VALUE = expression {, expression2};
+}
+evaluates the current value of all listed expressions, and
 prints the result on the standard output file.
 
 Example:
-\begin{verbatim}
-p1 = 5;
-p2 = 7;
-value,p1*p2-3;
-\end{verbatim}
+\madxmp{
+p1 = 5; \\
+p2 = 7; \\
+VALUE, p1*p2-3;
+}
 After echoing the command, this prints:
-\begin{verbatim}
+\madxmp{
 p1*p2-3 = 32       ;
-\end{verbatim}
+}
 
-Another example:
-\begin{verbatim}
-option,-warn;
-while (x 
-\end{verbatim}
-?????
+%% Another example:
+%% \begin{verbatim}
+%% option,-warn;
+%% while (x 
+%% \end{verbatim}
+%% ?????
 
-After echoing the command, this prints:
-\begin{verbatim}
-x = 100        ;       
-x^2 = 10000      ;       
-log10(x) = 2      ;            
-\end{verbatim}
+%% After echoing the command, this prints:
+%% \begin{verbatim}
+%% x = 100        ;       
+%% x^2 = 10000      ;       
+%% log10(x) = 2      ;            
+%% \end{verbatim}
 
 %\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg} 11.9.2000
 

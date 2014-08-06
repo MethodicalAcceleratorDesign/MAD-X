@@ -7,7 +7,7 @@
 
 \chapter{Thin-Lens Tracking} % Module (thintrack)}
 
-The \textbf{thin-lens tracking module} of MAD-X performs element per
+The \textbf{thin-lens tracking module} of \madx performs element per
 element tracking of one or several particle trajectories in the last
 \href{../control/general.html#use}{\texttt{use}}d sequence.  
  
@@ -22,9 +22,9 @@ lattice can be converted into a "thin element" lattice by invoking the
 Several commands are actually required to complete a tracking run:
 
 \begin{verbatim}
-TRACK, onepass, deltap=double, dump; 
+TRACK, onepass, deltap=real, dump; 
   ...
-  START, x=double, px=double, y=double, py=double, t=double, pt=double;  
+  START, x=real, px=real, y=real, py=real, t=real, pt=real;  
   ...
   RUN, turns=integer;
   ...
@@ -32,12 +32,13 @@ ENDTRACK;
 \end{verbatim}
 
 {\bf Commands:}
+%TRACK, DELTAP=double, ONEPASS, DUMP, ONETABLE, FILE= string;  ! (MAD-X version 1)
+%TRACK, DELTAP=double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE=string; ! (MAD-X version 2)
+%TRACK, DELTAP=double, ONEPASS, DAMP, QUANTUM, DUMP, APERTURE,ONETABLE, RECLOSS, FILE= string; ! (MADX version 3)
 \begin{verbatim}
-TRACK, DELTAP=double, ONEPASS, DUMP, ONETABLE, FILE= string;  ! (MAD-X version 1)
-TRACK, DELTAP=double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE=string; ! (MAD-X version 2)
-TRACK, DELTAP= double, ONEPASS, DAMP, QUANTUM, DUMP, APERTURE, ONETABLE, RECLOSS, FILE= string; ! (MADX version 3)
+TRACK, DELTAP=real, ONEPASS, DAMP, QUANTUM, DUMP, APERTURE, ONETABLE, RECLOSS, FILE= string;
 ...
-START, X=double, PX=double, Y=double, py=double, t=double, pt=double;
+START, X=real, PX=real, Y=real, py=real, t=real, pt=real;
 START, FX=double, PHIX=double, FY=double, PHIY=double, FT=double, PHIT=double;  
 ...
 OBSERVE, PLACE=string;  
@@ -341,7 +342,7 @@ command is used.
 
 \section{Remarks}
 \begin{itemize}
-   \item Plotting is possible in MAD-X, however it can also be done
+   \item Plotting is possible in \madx, however it can also be done
      externally by using the files created by \texttt{TRACK}. 
 
    \item The following internal tables are created while tracking:\\

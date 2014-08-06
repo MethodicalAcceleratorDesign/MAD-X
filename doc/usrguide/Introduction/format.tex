@@ -9,8 +9,8 @@
 \section{Statements and Comments}
 
 \subsection{Input Statements}
-Input for MAD-X follows in broad lines the
-\href{http://cern.ch/mad9}{MAD-9}\index{MAD-9} format, i.e. free format
+Input for \madx follows in broad lines the
+\href{http://cern.ch/mad9}{\madnine}\index{MAD-9} format, i.e. free format
 with commas (,) as separators, although blanks may be used as separators
 outside \{...\} enclosures.  
 Blank input lines do not affect program execution. 
@@ -93,7 +93,7 @@ normally deferred\index{deferred}
 (see \href{expression.html#defer}{deferred expression}), except in the  
 definition of constants where they are evaluated immediately.
 
-When a command has a \href{label.html}{label}, MAD-X keeps this command
+When a command has a \href{label.html}{label}, \madx keeps this command
 in memory. This allows repeated execution of the same command
 by just entering EXEC label. This construct may be nested.
 
@@ -109,7 +109,7 @@ see \href{declarations.html}{declarations}.
 
 A keyword begins with a letter and consists of letters and digits. 
 
-The MAD-X keywords are protected; using one of them as a label results
+The \madx keywords are protected; using one of them as a label results
 in a fatal error.   
 
 %\input{Introduction/declarations}
@@ -587,7 +587,9 @@ are dropped, but should be avoided, and the resulting sequence must be
 unique. 
 
 A label may refer to a keyword, an element, a beam-line, a sequence,
-etc.   The MAD-X keywords are protected; using one of them as a label
+etc.   
+
+The \madx keywords are protected; using one of them as a label
 results in a fatal error.  
 
 
@@ -642,7 +644,7 @@ call, file=MY.FILE;
 call, file="MY.FILE";
 call, file='MY.FILE';
 \end{verbatim} 
-In the first three cases, MAD-X will try to read a file my.file, in the
+In the first three cases, \madx will try to read a file my.file, in the
 last two it will try to read MY.FILE.  
 
 
@@ -665,7 +667,7 @@ system,"ln -fns some-lengthy-directory-name local-link";
 %\input{Introduction/logical}
 \section{Logical Attributes}
 \label{sec:logical}
-Many commands in MAD require the setting of logical values (flags) to
+Many commands in \madx require the setting of logical values (flags) to
 represent the on/off state of an option. A logical value "flag" can be
 set in two ways:  
 \begin{verbatim}
@@ -734,7 +736,7 @@ To facilitate the definition of interdependent quantities, any real
 value and integer value can be entered as an arithmetic expression. When
 a value used in an expression is redefined by the user or changed in a
 matching process, the expression is reevaluated. Expression definitions
-may be entered in any order. MAD evaluates them in the correct order
+may be entered in any order. \madx evaluates them in the correct order
 before it performs any computation. At evaluation time all operands used
 must have values assigned.  
 
@@ -747,69 +749,70 @@ may contain \hyperlink{random}{random generators}.
 An expression can be formed using the following operators: 
 
 \subsubsection{Arithmetic operators}
-\begin{itemize}
-	\item + Addition, 
-	\item - Subtraction, 
-	\item * Multiplication, 
-	\item / Division, 
-	\item \textasciicircum Exponentiation. 
-\end{itemize}
+\begin{madlist}
+  \ttitem{+} Addition, 
+  \ttitem{-} Subtraction, 
+  \ttitem{*} Multiplication, 
+  \ttitem{/} Division, 
+  \ttitem{\^\ } Exponentiation. 
+\end{madlist}
 
 \subsubsection{\href{function}{Ordinary Functions}}
 \label{subsubsec:function}
-\begin{itemize}
-	\item sqrt(x) square root, 
-	\item log(x) natural logarithm, 
-	\item log10(x) logarithm base 10, 
-	\item exp(x) exponential, 
-	\item sin(x) trigonometric sine, 
-	\item cos(x) trigonometric cosine, 
-	\item tan(x) trigonometric tangent, 
-	\item asin(x) arc sine, 
-	\item acos(x) arc cosine, 
-	\item atan(x) arc tangent, 
-	\item sinh(x) hyperbolic sine, 
-	\item cosh(x) hyperbolic cosine, 
-	\item tanh(x) hyperbolic tangent, 
-	\item abs(x) absolute value; 
-\end{itemize}
+\begin{madlist}
+  \ttitem{SQRT(x)} square root, 
+  \ttitem{LOG(x)}  natural logarithm, 
+  \ttitem{LOG10(x)} logarithm base 10, 
+  \ttitem{EXP(x)} exponential, 
+  \ttitem{SIN(x)} trigonometric sine, 
+  \ttitem{COS(x)} trigonometric cosine, 
+  \ttitem{TAN(x)} trigonometric tangent, 
+  \ttitem{ASIN(x)} arc sine, 
+  \ttitem{ACOS(x)} arc cosine, 
+  \ttitem{ATAN(x)} arc tangent, 
+  \ttitem{SINH(x)} hyperbolic sine, 
+  \ttitem{COSH(x)} hyperbolic cosine, 
+  \ttitem{TANH(x)} hyperbolic tangent, 
+  \ttitem{ABS(x)} absolute value; 
+\end{madlist}
 
 \subsubsection{\href{random}{Random Number Generators}}
 \label{subsubsec:random}
-\begin{itemize}
-	\item ranf() random number, uniformly distributed in [0,1], 
-	\item gauss() random number, gaussian distribution with unit standard deviation, 
-	\item tgauss(x) random number, gaussian distribution with unit
-          standard deviation, truncated at x standard deviations;  
-\end{itemize} 
+\begin{madlist}
+  \ttitem{RANF()} random number, uniformly distributed in [0,1], 
+  \ttitem{GAUSS()} random number, gaussian distribution with unit
+  standard deviation,  
+  \ttitem{TGAUSS(x)} random number, gaussian distribution with unit
+  standard deviation, truncated at x standard deviations;  
+\end{madlist}
 
 in the above cases, "x" can be any expression, i.e. contain other
-functions, variable or constant expressions. To initialize the MAD-X
+functions, variable or constant expressions. To initialize the \madx
 random generator use the
 \href{../error/error_option.html#EOPTION}{Eoption command}.  
 
 \subsubsection{\href{table}{Table Access Functions}}
 \label{subsubsec:table}
 
-\begin{itemize}
-	\item table(x,z): accesses value of the named table column "z"
-          of table "x"; example: table(summ,q1) returns the hor. tune of
-          the Twiss summary table "summ".  
-	\item table(x,y,z): accesses value of the named table column "z"
-          for element "y" (first table row with that name) of table "x";
-          example: table(twiss,mb.12,betx) returns the beta\_x at
-          element mb.12 from the Twiss table "twiss".   When the element
-          is called with its proper name, as in the example above, the
-          value is returned at the first occurrence of the element of
-          this name. If the value is needed at a occurrence number: NNN,
-          then "[NNN]" has to be appended to the name, e.g. in the above
-          example one obtains the betx of the 23th occurrence of the
-          element "mb.12" by changing the example to:
-          "table(twiss,mb.12[23],betx)". Mind you that the old, but
-          little known, form: "table(twiss,mb.12-\textgreater 23,betx)"
-          continues to work. Lastly, if NNN exceeds the maximum
-          occurrence number the return value is arbitrarily small.  
-\end{itemize}
+\begin{madlist}
+  \ttitem{table(x,z)} accesses value of the named table column "z"
+  of table "x"; example: table(summ,q1) returns the hor. tune of
+  the Twiss summary table "summ".  
+  \ttitem{table(x,y,z)} accesses value of the named table column "z"
+  for element "y" (first table row with that name) of table "x";
+  example: table(twiss,mb.12,betx) returns the beta\_x at
+  element mb.12 from the Twiss table "twiss".   When the element
+  is called with its proper name, as in the example above, the
+  value is returned at the first occurrence of the element of
+  this name. If the value is needed at a occurrence number: NNN,
+  then "[NNN]" has to be appended to the name, e.g. in the above
+  example one obtains the betx of the 23th occurrence of the
+  element "mb.12" by changing the example to:
+  "table(twiss,mb.12[23],betx)". Mind you that the old, but
+  little known, form: "table(twiss,mb.12-\textgreater 23,betx)"
+  continues to work. Lastly, if NNN exceeds the maximum
+  occurrence number the return value is arbitrarily small.  
+\end{madlist}
 
 Beware: 
 \begin{itemize}
@@ -818,7 +821,7 @@ Beware:
           elements. Therefore, those  unnamed drifts cannot be
           found. However, named drifts can be searched for.  
    \item  Due to the importance of finding elements in the table
-          for a proper functioning of the MAD-X runs, the programs
+          for a proper functioning of the \madx runs, the programs
           throws a "fatal\_error" if an element cannot be found in the
           table.   
 \end{itemize}
@@ -834,7 +837,7 @@ There is a second option of this function with 3 entries
 \end{itemize}
 
 Note that "N\_row" has to be a number and not a  variable. However, the
-\href{../control/special.html#macro}{Macro facility} in MAD-X  allows
+\href{../control/special.html#macro}{Macro facility} in \madx  allows
 one to use a variable instead.   
 
 A typical example could look like this, in fact the square root of betx
@@ -899,48 +902,45 @@ accepted in INTEGER or REAL format. The use of a decimal exponent,
 marked by the letter D or E, is permitted.  
 
 Examples: 
-\begin{verbatim}
+\madxmp{
 1, 10.35, 5E3, 314.1592E-2
-\end{verbatim}
+}
 
 \subsubsection{\href{constant}{Symbolic constants}} 
 \label{subsubsec:symbolic_const}
-MAD recognizes some \hyperlink{constant}{mathematical and physical
+\madx recognizes some \hyperlink{constant}{mathematical and physical
   constants}. Their names must not be used for user-defined labels.  
 
 Additional symbolic constants may be defined to simplify their repeated
 use in statements and expressions.  
-
-\begin{verbatim}
+\madbox{
 CONST name=constant-expression;
-\end{verbatim} 
+}
 defines a real constant with the name given. An existing symbolic
 constant can be redefined, but it cannot change in a matching procedure.  
 
 Example: 
-\begin{verbatim}
-const in = 0.0254;
-\end{verbatim}
+\madxmp{CONST IN = 0.0254;}
 
-%http://en.wikibooks.org/wiki/LaTeX/Tables#Text_wrapping_in_tables
-%\href{constant}{
-\begin{table}
+\begin{table}[ht]
+\caption{Predefined Symbolic Constants in \madx}
+\vspace{1ex}
 \begin{center}
-{\textbf{Table 1:} Predefined Symbolic Constants in MAD}
-\begin{tabular}{l|l|l|l}
-% if you want to use \caption the tabular must be enclosed in
-% table or figure environment
+\begin{tabular}{|l|c|c|c|}
+\hline
 \textbf{mad name} & \textbf{symbol} & \textbf{value used} & \textbf{unit} \\ 
-pi & pi & 4 * atan(1) & 1 \\ 
-twopi & 2 pi & 2 * pi & 1 \\ 
-degrad & 180/pi & 180 / pi & deg/rad \\ 
-raddeg & pi/180 & 180 / pi & rad/deg \\ 
-e & e & exp(1) & 1 \\ 
-emass & m\_e & $0.510998928\times 10^{-3}$& GeV \\ % very old value  .510998902*10(-3)   
-pmass & m\_p & 0.938272046 & GeV \\ % very old value .938271998  
-mumass & m\_mu & 0.1056583715 & GeV \\ % very old value .1056583568 
-clight & c & $2.99792458\times 10^{8}$ & m/s \\ 
-qelect & elem. charge & $1.602176565\times 10^{-19}$ & A.s % very old value 1.602176462e-19 
+\hline
+PI & $\pi$ & 4 * atan(1) & 1 \\ 
+TWOPI & $2\pi$ & 2 * PI & 1 \\ 
+DEGRAD & $180/\pi$ & 180 / PI  & deg/rad \\ 
+RADDEG & $\pi/180$ & PI / 180 & rad/deg \\ 
+E & e & exp(1) & 1 \\ 
+EMASS & $m_e$ & $0.510998928\times 10^{-3}$& GeV \\ % very old value  .510998902*10(-3)   
+PMASS & $m_p$ & 0.938272046 & GeV \\ % very old value .938271998  
+MUMASS & $m_\mu$ & 0.1056583715 & GeV \\ % very old value .1056583568 
+CLIGHT & $c$ & $2.99792458\times 10^{8}$ & m/s \\ 
+QELECT & $e$ & $1.602176565\times 10^{-19}$ & A.s \\ % very old value 1.602176462e-19 
+\hline
 \end{tabular}
 \end{center}
 \end{table}
@@ -978,34 +978,38 @@ x = 0.1;
 x := 0.1;
 \end{verbatim}
 
-When such a parameter is used in an expression, MAD uses the current
+When such a parameter is used in an expression, \madx uses the current
 value of the parameter if the expression is deferred:  
 
 Example: 
-\begin{verbatim}
-
-x := 1.0;
-d1: drift, l=x;
-d2: drift, l:=2.0 - x;
-\end{verbatim} 
+\madxmp{
+x := 1.0; \\
+d1: drift, l =  x; \\
+d2: drift, l := 2.0 - x; \\
+}
 When the value of x is changed, the length of the drift d1 remains
 unchanged, that of d2 is recalculated.   
 
 \subsubsection{Element or Command Attributes} 
 In arithmetic expressions the attributes of physical elements or
 commands can occur as operands. They are named respectively by  
-\begin{verbatim}
-element-name->attribute-name
+\madbox{
+element-name->attribute-name\\
 command-name->attribute-name
-\end{verbatim} 
+}
 
 Values are assigned to attributes in element definitions or commands. 
 
 Example: 
-\begin{verbatim}
-D1: DRIFT, L=1.0;
-D2: DRIFT, L=2.0-D1->L;
-\end{verbatim} 
+\madxmp{
+xxxxxxxx\= \kill
+D1:     \>DRIFT, L= 1.0; \\
+D2:     \>DRIFT, L= 2.0 - D1->L;
+}
+%\begin{verbatim}
+%D1: DRIFT, L=1.0;
+%D2: DRIFT, L=2.0-D1->L;
+%\end{verbatim} 
 D1-\textgreater L refers to the length L of the drift space D1.  
 
 \subsection{\href{defer}{Expressions and Random Values}} 
@@ -1035,42 +1039,55 @@ sampled from a Gaussian distribution with standard deviation sigma.
 \section{Constraints}
 \label{sec:constraints}
 In matching it is desired to specify equality constraints, as well as
-lower and upper limits for a quantity. MAD accepts the following forms
+lower and upper limits for a quantity. \madx accepts the following forms
 of constraints:  
-\begin{verbatim}
-! equality constraint:
-name = expression
+%% \begin{verbatim}
+%% ! equality constraint:
+%% name = expression
 
-! upper limit:
-name < expression
+%% ! upper limit:
+%% name < expression
 
-! lower limit:
-name > expression
+%% ! lower limit:
+%% name > expression
 
-! both upper and lower limit for the same name:
-name < expression, name > expression
-\end{verbatim}
+%% ! both upper and lower limit for the same name:
+%% name < expression, name > expression
+%% \end{verbatim}
 
-
+\madbox{
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
+name = expression                    \>! equality constraint \\
+name < expression                    \>! upper limit \\
+name > expression                    \>! lower limit \\
+name < expression, name > expression \>! both upper and lower limit \\
+                                     \>! for the same name
+}
 
 %\input{Introduction/variable}
 \section{Variable Names}
 \label{sec:variable}
 A variable name can have one of the formats: 
-\begin{verbatim}
-1. parameter-name
-2. element-name->attribute-name
-3. command-name->attribute-name
-4. beam%sequence-name->attribute-name
-5. table(table-name,..,..)
-\end{verbatim} 
+\madbox{
+ parameter-name \\
+ element-name->attribute-name \\
+ command-name->attribute-name \\
+ beam\%sequence-name->attribute-name \\
+ table(table-name,..,..)
+}
 
 The first format refers to the value of the \href{parameter.html}{global
-  parameter} "parameter-name", the second and third formats refer to the
+  parameter} "parameter-name". 
+
+The second and third formats refer to the
 \href{real.html}{real attribute} "attribute-name" of the element
-"element-name", or the command "command-name". NUmber four is specific
+"element-name", or the command "command-name". 
+
+The fourth format is specific
 to beams belonging to a particular sequence (for details see
-\href{sequence.html#beam}{sequences and beams}). Number five allows
+\href{sequence.html#beam}{sequences and beams}). 
+
+The fifth format allows
 extraction of variables from existing tables, as specified in
 \href{expression.html#table}{table access}.  
 
@@ -1081,48 +1098,53 @@ extraction of variables from existing tables, as specified in
 \label{sec:regex}
 Some commands allow selection of items via "regular expression"
 strings. Such a pattern string \textbf{must} be enclosed in single or
-double quotes. MAD-X follows regexp (Unix regular expression patterns)
+double quotes. \madx follows regexp (Unix regular expression patterns)
 for matching. The following features are implemented:  
 
 A "search string" below is the string containing the pattern, a "target
 string" is the string being searched for a possible match with the
 pattern. 
 
-\begin{itemize}
-   \item "\textasciicircum" at the start of the search string: Match
+\begin{madlist}
+   \ttitem{"\textasciicircum"} at the start of the search string: Match
      following search string at the start of the target string;
      otherwise the search string can start anywhere in the target
      string. To search for a  genuine "\textasciicircum" anywhere, use
      "$\backslash$\textasciicircum".  
-   \item "\$" at the end of the search string: Match preceding search
+   \ttitem{"\$"} at the end of the search string: Match preceding search
      string at the end of the target string; otherwise the search string
      can end anywhere in the target string. To search for a  genuine
-     "\$" anywhere, use "$\backslash$\$".  
-   \item ".": Stands for an arbitrary character; to search for a genuine
-     ".", use "$\backslash$." 
-   \item "[xyz]": Stands for one character belonging to the string
+     "\$" anywhere, use "$\backslash$\$".
+   \ttitem{"."} stands for an arbitrary character; to search for a genuine
+     ".", use "$\backslash$."
+   \ttitem{"[xyz]"} stands for one character belonging to the string
      contained in brackets (example: "[abc]" means one of a, b, c).  
-   \item "[a-ex-z]": Stands for ranges of characters (example:
+   \ttitem{"[a-ex-z]"} stands for ranges of characters (example:
      "[a-zA-Z]" means any letter).  
-   \item "[\textasciicircum xyz]" (i.e. a "\textasciicircum" as first
-     character in a square bracket): Stands for exclusion of all
+   \ttitem{"[\textasciicircum xyz]"} (i.e. a "\textasciicircum" as first
+     character in a square bracket) stands for exclusion of all
      characters in the list, i.e. "[\textasciicircum a-z]" means "any
      character but a lower case letter". 
-   \item "*": Allows zero or more repetitions of the preceding
+   \ttitem{"*"} allows zero or more repetitions of the preceding
      character, either specified directly, or from a list. (examples:
      "a*" means zero or more occurrences of "a",  "[A-Z]*" means zero or
      more upper-case letters).  
-   \item "backslash-c" (e.g. "$\backslash$."): Removes the special
+   \ttitem{"$\backslash$c"}  (e.g. "$\backslash$.") removes the special
      meaning of character c.  
-\end{itemize} 
+\end{madlist}
+
 All other characters stand for themselves. 
 
 
 Example: 
-\begin{verbatim}
-select, flag=twiss, pattern="^d..$" ;
-select, flag=twiss, pattern="^k.*qd.*\.r1$" ;
-\end{verbatim}
+%% \begin{verbatim}
+%% select, flag=twiss, pattern="^d..$" ;
+%% select, flag=twiss, pattern="^k.*qd.*\.r1$" ;
+%% \end{verbatim}
+\madxmp{
+SELECT, FLAG=twiss, PATTERN="\textasciicircum d..\$" ; \\
+SELECT, FLAG=twiss, PATTERN="\textasciicircum k.*qd.*$\backslash$.r1\$" ;
+}
  
 The first command selects all elements whose names have exactly three
 characters and begin with the letter "D". The second command selects

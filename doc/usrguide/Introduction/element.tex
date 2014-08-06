@@ -64,20 +64,22 @@
 %\input{Introduction/elm_format}
 \subsection{Element Input Format}
 All physical elements are defined by statements of the form 
-\begin{verbatim}
-label: keyword {,attribute};
-\end{verbatim} 
+\madbox{
+label: keyword \{,attribute\};
+}
 where 
-\begin{itemize}
-  \item \href{label.html}{label} is a name to be given to the element (in the example QF), 
-  \item \href{keyword.html}{keyword} is an element type keyword (in the example QUADRUPOLE). 
-  \item \href{attribute.html}{attribute} normally has the form
+\begin{madlist}
+  \ttitem{\href{label.html}{label}} is a name to be given to the element
+  (in the example QF),  
+  \ttitem{\href{keyword.html}{keyword}} is an element type keyword (in
+  the example QUADRUPOLE).  
+  \ttitem{\href{attribute.html}{attribute}} normally has the form
     "attribute-name = attribute-value" or
     "attribute-name := attribute-value" (except for multipoles).  
-  \item \href{label.html}{attribute-name} selects the attribute,
+  \ttitem{\href{label.html}{attribute-name}} selects the attribute,
     as defined for the element type keyword (in the example L and
     K1).  
-  \item \href{attribute.html}{attribute-value} gives it a value
+  \ttitem{\href{attribute.html}{attribute-value}} gives it a value
     (in the example 1.8 and 0.015832). The value may be specified
     by an expression. The "=" assigns the value on the right to
     the attribute at the time of definition, regardless of any
@@ -85,33 +87,26 @@ where
     the expression at the right every time the attribute is being
     used. For constant right hand sides, "=" and ":=" are of
     course equivalent.  
-\end{itemize} 
+\end{madlist}
 
-%Omitted attributes are assigned a default value, normally zero. 
+Omitted attributes are assigned a default value.
 
 Example: 
-\begin{verbatim}
-QF: QUADRUPOLE, L=1.8, K1=0.015832;
-\end{verbatim} 
+\madxmp{QF: QUADRUPOLE, L=1.8, K1=0.015832;}
 
 A special format is used for a \href{multipole.html}{multipole}\index{multipole}: 
-\begin{verbatim}
-m: multipole, kn= {kn0, kn1, kn2, ..., knmax},
-              ks= {ks0, ks1, ks2, ..., ksmax};
-\end{verbatim} 
+\madxmp{
+m: multipole, \= kn= {kn0, kn1, kn2, ..., knmax},\\
+              \> ks= {ks0, ks1, ks2, ..., ksmax};
+}
 where kn and ks give the integrated normal and skew strengths,
 respectively. The commas are mandatory, each strength can be an
 expression; their position defines the order. example:  
-\begin{verbatim}
-m: multipole, kn={0,0,0,myoct*lrad}, ks={0,0,0,0,-1.e-5};
-\end{verbatim} 
+\madxmp{m: multipole, kn={0,0,0,myoct*lrad}, ks={0,0,0,0,-1.e-5};}
 defines a multipole with a normal octupole, and a skew decapole component. 
 
 To know the current maximum order, enter the command 
-\begin{verbatim}
-help, multipole;
-\end{verbatim} 
-and count. 
+\madxmp{HELP, MULTIPOLE;} and count. 
 
 
 %\input{Introduction/elm_edit}
@@ -126,14 +121,14 @@ An element definition can be changed in two ways:
 \end{itemize} 
 
 This example shows two ways to change the strength of a quadrupole: 
-\begin{verbatim}
-QF: QUADRUPOLE, L = 1, K1 = 0.01;     ! Original definition of QF
-
-QF: QUADRUPOLE, L = 2, K1 = 0.02;     ! Replace whole definition of QF
-
-QF, K1 = 0.03;                        ! Replace value of K1
-\end{verbatim} 
-
+\madxmp{
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
+QF: QUADRUPOLE, L = 1, K1 = 0.01;    \>! Original definition of QF \\
+\\
+QF: QUADRUPOLE, L = 2, K1 = 0.02;    \>! Replace whole definition of QF \\
+\\
+QF, K1 = 0.03;                       \>! Replace value of K1 for QF\\
+}
 When the type of the element remains the same, replacement of an
 attribute is the more efficient way.  
 
@@ -147,46 +142,49 @@ already defined objects which belong to its
 \subsection{Element Classes}  
 \label{sec:element_classes}
 The concept of element classes solves the problem of addressing
-instances of elements in the accelerator in a convenient manner. It will
-first be explained by an example. All the quadrupoles in the accelerator
-form a class QUADRUPOLE. Let us define three subclasses for the
+instances of elements in the accelerator in a convenient manner. 
+
+It will first be explained by an example. All the quadrupoles in the
+accelerator form a class QUADRUPOLE. Let us define three subclasses for the
 focussing quadrupoles, the defocussing quadrupoles, and the skewed
 quadrupoles:  
-\begin{verbatim}
-MQF: QUADRUPOLE, L = LQM, K1 = KQD;     ! Focussing quadrupoles
-MQD: QUADRUPOLE, L = LQM, K1 = KQF;     ! Defocussing quadrupoles
-MQT: QUADRUPOLE, L = LQT;               ! Skewed quadrupoles
-\end{verbatim} 
+\madxmp{
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
+MQF: QUADRUPOLE, L = LQM, K1 = KQD;     \>! Focussing quadrupoles \\
+MQD: QUADRUPOLE, L = LQM, K1 = KQF;     \>! Defocussing quadrupoles \\
+MQT: QUADRUPOLE, L = LQT;               \>! Skewed quadrupoles
+}
 
 These classes can be thought of as new keywords which define elements
-with specified default attributes. We now use theses classes to define
+with specified default attributes. We now use these classes to define
 the real quadrupoles:  
-\begin{verbatim}
-QD1: MQD;           ! Defocussing quadrupoles
-QD2: MQD;
-QD3: MQD;
+\madxmp{
+xxxxxxxxxxxxxxxxxxxxxxx\= \kill
+QD1: MQD;              \>! Defocussing quadrupoles \\
+QD2: MQD; \\
+QD3: MQD; \\
+ ... \\
+QF1: MQF;              \>! Focussing quadrupoles \\
+QF2: MQF; \\
+QF3: MQF; \\
+ ... \\
+QT1: MQT, K1S = KQT1;   \> ! Skewed quadrupoles \\
+QT2: MQT, K1S = KQT2; \\
  ...
-QF1: MQF;           ! Focussing quadrupoles
-QF2: MQF;
-QF3: MQF;
- ...
-QT1: MQT, K1S = KQT1;   ! Skewed quadrupoles
-QT2: MQT, K1S = KQT2;
- ...
-\end{verbatim} 
-
-These quadrupoles inherit all unspecified attributes from their
-class. This allows to build up a hierarchy of objects with a rather
+}
+These quadrupoles inherit from their class all attributes that are not
+explicitly specified at time of declaration. 
+This allows to build up a hierarchy of objects with a rather
 economic input structure.  
 
 The full power of the class concept is revealed when object classes are
 used to select instances of elements for various purposes. Example:  
-\begin{verbatim}
-select, flag = twiss, class = QUADRUPOLE; ! Select all quadrupoles for the
-                                          ! Twiss TFS file
-\end{verbatim}
+\madxmp{
+SELECT, FLAG=twiss, CLASS = QUADRUPOLE; \=! Select all quadrupoles for the\\
+                                        \>! Twiss TFS file
+}
 
-More formally, for each element keyword MAD maintains a class of
+More formally, for each element keyword \madx maintains a class of
 elements with the same name. A defined element becomes itself a class
 which can be used to define new objects, which will become members of
 this class. A new object inherits all attributes from its class; but its
@@ -200,26 +198,24 @@ mechanism to specify positions for matching constraints and printing.
 \subsection{Marker}
 \label{sec:marker}
 
-\begin{verbatim}
+\madbox{
 label: MARKER;
-\end{verbatim} 
+}
 The simplest element which can occur in a beam line is the MARKER. It
 has no effect on the beam, but it allows one to identify a position in
 the beam line, for example to apply a matching constraint.  
 
 Example: 
-\begin{verbatim}
-m27: marker;
-\end{verbatim}
+\madxmp{m27: marker;}
 
 
 %\input{Introduction/drift}
 \subsection{Drift Space}
 \label{sec:drift}
 
-\begin{verbatim}
+\madbox{
 label: DRIFT, L=real;
-\end{verbatim} 
+}
 
 A drift space has one real attribute: 
 \begin{madlist}
@@ -227,10 +223,10 @@ A drift space has one real attribute:
 \end{madlist}
 
 Examples: 
-\begin{verbatim}
-DR1: DRIFT, L = 1.5;
-DR2: DRIFT, L = DR1->L;
-\end{verbatim} 
+\madxmp{
+DR1: \= DRIFT, \= L = 1.5; \\
+DR2: \> DRIFT, \> L = DR1->L;
+}
 
 The length of DR2 will always be equal to the length of DR1. The
 \href{../Introduction/local_system.html#straight}{straight reference
@@ -255,20 +251,20 @@ distinguished only by the reference system used:
 \end{madlist}
 
 Bendig magnets are defined by the commands: 
-\begin{verbatim}
-label: SBEND, L = real, ANGLE = real, TILT = real, 
-              K0 = real, K1 = real, K2 = real, 
-              E1 = real, E2 = real, FINT = real, FINTX = real, 
-              HGAP = real, H1 = real, H2 = real,
-              THICK = logical;
+\madbox{
+label: SBEND, \= L = real, ANGLE = real, TILT = real, \\
+              \> K0 = real, K1 = real, K2 = real, \\
+              \> E1 = real, E2 = real, FINT = real, FINTX = real,\\ 
+              \> HGAP = real, H1 = real, H2 = real,\\
+              \> THICK = logical;\\[5mm]
 
-label: RBEND, L = real, ANGLE = real, TILT = real, 
-              K0 = real, K1 = real, K2 = real, 
-              E1 = real, E2 = real, FINT = real, FINTX = real,
-              HGAP = real, H1 = real, H2 = real,
-              ADD_ANGLE='array',
-              THICK = logical;
-\end{verbatim} 
+label: RBEND, \> L = real, ANGLE = real, TILT = real, \\
+              \> K0 = real, K1 = real, K2 = real, \\
+              \> E1 = real, E2 = real, FINT = real, FINTX = real, \\
+              \> HGAP = real, H1 = real, H2 = real, \\
+              \> ADD\_ANGLE='array', \\
+              \> THICK = logical; 
+}
 
 Bending magnets have the following attributes:
 \begin{madlist}
@@ -278,11 +274,11 @@ Bending magnets have the following attributes:
    For rectangular bends the declared length is normally the length of a
    straight line joining the entry and exit points, as in the
    Figure. \\ 
-   Internally MAD-X only uses the arc length of the reference orbit for
+   Internally \madx only uses the arc length of the reference orbit for
    both bend types.\\ 
    {\bf In order to define RBEND's with a declared length equal to the
      arc length of the reference orbit, the option RBARC must be
-     previously set to FALSE in MAD-X with {\tt Option, RBARC= false;}} 
+     previously set to FALSE in \madx with {\tt Option, RBARC= false;}} 
    
    \ttitem{ANGLE} The bend angle (default: 0 rad). \\ 
    A positive bend angle represents a bend to the right, i.e. towards
@@ -300,9 +296,9 @@ Bending magnets have the following attributes:
    horizontal into a vertical bend, and a positive ANGLE then denotes a
    downwards deflection.
 
-   %% \textbf{ Please note that contrary to MAD8 one has to specify
+   %% \textbf{ Please note that contrary to \madeight one has to specify
    %%   the desired TILT angle, otherwise it is taken as 0 rad. This was
-   %%   needed to avoid the confusion in MAD8 about the actual meaning of
+   %%   needed to avoid the confusion in \madeight about the actual meaning of
    %%   the TILT attribute for various elements. } 
 
    \ttitem{K1} The quadrupole coefficient (Default: $0 mˆ{-2}$)\\
@@ -349,7 +345,7 @@ Bending magnets have the following attributes:
    instead ANGLE and TILT are used exclusively. \\
    %% We believe that this will allow for a clearer and
    %% unambiguous definition, in particular in view of the upcoming
-   %% integration of MAD-X with PTC which will allow a more general
+   %% integration of \madx with PTC which will allow a more general
    %% definition of bends.  
    However, specifying K0 is required in order to be able to assign RELATIVE 
    field errors to a bending magnet because K0 is used for the normalization 
@@ -411,19 +407,28 @@ on one side only, e.g. when slicing a dipole.
 
 
 {\bf \underline {Examples:}}
-\begin{verbatim}
-// rectangular horizontal dipole deflecting to the right
-BR: RBEND, L=5.5, ANGLE=+0.001;    
+%% \begin{verbatim}
+%% // rectangular horizontal dipole deflecting to the right
+%% BR: RBEND, L=5.5, ANGLE=+0.001;    
 
-// sector vertical dipole deflecting downwards
-BD: SBEND, L=5.5, ANGLE=+0.001, TILT=pi/2; 
+%% // sector vertical dipole deflecting downwards
+%% BD: SBEND, L=5.5, ANGLE=+0.001, TILT=pi/2; 
 
-// sector horiziontal dipole deflecting to the left
-BL: SBEND, L=5.5, ANGLE=+0.001, TILT=pi;   
+%% // sector horiziontal dipole deflecting to the left
+%% BL: SBEND, L=5.5, ANGLE=+0.001, TILT=pi;   
 
-// rectangular vertical dipole deflecting upwards
-BU: RBEND, L=5.5, ANGLE=+0.001, TILT=-pi/2; 
-\end{verbatim}
+%% // rectangular vertical dipole deflecting upwards
+%% BU: RBEND, L=5.5, ANGLE=+0.001, TILT=-pi/2; 
+%% \end{verbatim}
+\madxmp{
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
+BR: RBEND, L=5., ANGLE=+0.001;             \>! Deflection to the right \\
+BD: RBEND, L=5., ANGLE=+0.001, TILT=pi/2;  \>! Deflection down \\
+BL: RBEND, L=5., ANGLE=+0.001, TILT=pi;    \>! Deflection to the left \\
+BU: RBEND, L=5., ANGLE=+0.001, TILT=-pi/2; \>! Deflection up
+}
+
+
 
 %\input{Introduction/dipedge}
 \subsection{Dipedge Element}\index{dipedge}
@@ -436,11 +441,11 @@ lenses leaves dipedge untouched and splits correctly the SBENDS's.
 
 It does not make sense to use it alone. It can be specified at the
 entrance and the exit of a SBEND. They are defined by the commands:  
-\begin{verbatim}
+\madbox{
 label: DIPEDGE, H=real, E1=real, FINT=real, HGAP=real, TILT=real;
-\end{verbatim} 
+}
 
-It has zero length and five attributes. 
+A DIPEDGE has zero length and five attributes. 
 \begin{madlist}
    \ttitem{H} Is angle/length or 1/rho (default: 0 m$^{-1}$ - for the
      default the dipedge element has no effect). (must be equal to that
@@ -466,10 +471,11 @@ It has zero length and five attributes.
 \subsection{Quadrupole}\index{quadrupole}
 \label{sec:quadrupole}
 
-\begin{verbatim}
-label: QUADRUPOLE, L = real, K1 = real, K1S = real, TILT = real, 
-                   THICK = logical;
-\end{verbatim}    
+\madbox{
+label: QUADRUPOLE, \= L = real, K1 = real, K1S = real, TILT = real,\\
+                   \> THICK = logical;
+}
+
 
 A QUADRUPOLE has five attributes:     
 \begin{madlist}
@@ -490,9 +496,9 @@ A QUADRUPOLE has five attributes:
      clockwise rotation. A TILT=pi/4 turns a positive normal quadrupole
      into a negative skew quadrupole.          
 
-\textbf{ Please note that contrary to MAD8 one has to
+\textbf{Please note that contrary to \madeight one has to
   specify the desired TILT angle, otherwise it is taken as
-  0 rad. This was needed to avoid the confusion in MAD8
+  0 rad. This was needed to avoid the confusion in \madeight
   about the actual meaning of the TILT attribute for
   various elements. } 
 
@@ -502,7 +508,7 @@ A QUADRUPOLE has five attributes:
     (Default: false)
 \end{madlist}
 
-\textbf{ Note also that $K_1$ or $K_{1s}$ can be considered as
+\textbf{Note also that $K_1$ or $K_{1s}$ can be considered as
   the normal or skew quadrupole components of the magnet on
   the bench, while the TILT attribute can be considered as a
   tilt alignment error in the machine. In fact, a positive
@@ -510,9 +516,9 @@ A QUADRUPOLE has five attributes:
   with positive $\tt{TILT} = +\pi/4$ } 
 
 Example: 
-\begin{verbatim}
+\madxmp{
 QF: QUADRUPOLE, L = 1.5, K1 = 0.001, THICK = 1;
-\end{verbatim}     
+}
 
 The \href{local_system.html#straight}{straight reference system} for
 a quadrupole is a cartesian coordinate system.
@@ -523,9 +529,9 @@ a quadrupole is a cartesian coordinate system.
 \subsection{Sextupole}
 \label{sec:sextupole}
 
-\begin{verbatim}
+\madbox{
 label: SEXTUPOLE, L = real, K2 = real, K2S = real, TILT = real;
-\end{verbatim} 
+}
 
 A SEXTUPOLE has four real attributes: 
 \begin{madlist}
@@ -550,9 +556,9 @@ A SEXTUPOLE has four real attributes:
       clockwise rotation. A $\tt{TILT} = \pi/6$ turns a positive normal sextupole
       into a negative skew sextupole.
       
-      \textbf{  Please note that contrary to MAD8 one has to specify the
+      \textbf{  Please note that contrary to \madeight one has to specify the
         desired TILT angle, otherwise it is taken as 0 rad. This was needed to
-        avoid the confusion in MAD8 about the actual meaning of the TILT
+        avoid the confusion in \madeight about the actual meaning of the TILT
         attribute for various elements. } 
 \end{madlist}
 
@@ -563,9 +569,9 @@ A SEXTUPOLE has four real attributes:
   positive $K_{2s}$ with positive $\tt{TILT} = \pi/6$.} 
 
 Example: 
-\begin{verbatim}
+\madxmp{
 S: SEXTUPOLE, L = 0.4, K2 = 0.00134;
-\end{verbatim} 
+}
 
 The \href{local_system.html#straight}{straight reference system} for a
 sextupole is a cartesian coordinate system.   
@@ -575,22 +581,22 @@ sextupole is a cartesian coordinate system.
 \subsection{Octupole}
 \label{sec:octupole}
 
-\begin{verbatim}
+\madbox{
 label: OCTUPOLE, L = real, K3 = real, K3S = real, TILT = real;
-\end{verbatim} 
+}
 
 An OCTUPOLE has four real attributes: 
-\begin{itemize}
-   \item L: The octupole length (default: 0 m). 
+\begin{madlist}
+   \ttitem{L} The octupole length (default: 0 m). 
 
-   \item K3: The normal octupole coefficient \\
+   \ttitem{K3} The normal octupole coefficient \\
      \textit{K}$_3$ = 1/(\textit{B} rho)
      ($\partial$$^3$\textit{B$_y$}/$\partial$\textit{x}$^3$). \\ 
      (default: 0 m**(-4)). 
 
-   \item K3S: The skew octupole coefficient 
+   \ttitem{K3S} The skew octupole coefficient 
 %% 2013-Jul-05  18:00:59  ghislain: to be checked wrt error reported on
-3%% K2S for sextupoles 
+%% K2S for sextupoles 
      \textit{K}$_3S$ = 1/(2 \textit{B} rho)
      ($\partial$$^3$\textit{B$_x$}/$\partial$\textit{x}$^3$ -
      $\partial$$^3$\textit{B$_y$}/$\partial$\textit{y}$^3$). \\
@@ -600,17 +606,17 @@ An OCTUPOLE has four real attributes:
      charged particles in the (x,s) plane rotated by 22.5$^o$ around s
      (particles in this plane have x $>$ 0, y $>$ 0).  
 
-   \item TILT: The roll angle about the longitudinal axis (default: 0
+   \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
      rad, i.e. a normal octupole). A positive angle represents a
      clockwise rotation. A TILT=pi/8 turns a positive normal octupole
      into a negative skew octupole.  
 
-     \textbf{  Please note that contrary to MAD8 one has to specify the
+     \textbf{  Please note that contrary to \madeight one has to specify the
        desired TILT angle, otherwise it is taken as 0 rad. This was
-       needed to avoid the confusion in MAD8 about the actual meaning of
+       needed to avoid the confusion in \madeight about the actual meaning of
        the TILT attribute for various elements. }
 
-\end{itemize}
+\end{madlist}
 
 \textbf{  Note also that K$_3$/K$_3s$ can be considered as the normal or
   skew quadrupole components of the magnet on the bench, while the TILT
@@ -619,9 +625,9 @@ An OCTUPOLE has four real attributes:
   positive K$_3s$ with positive tilt=+pi/8. } 
 
 Example: 
-\begin{verbatim}
+\madxmp{
 O3: OCTUPOLE, L = 0.3, K3 = 0.543;
-\end{verbatim} 
+}
 
 The \href{local_system.html#straight}{straight reference system} for a
 octupole is a cartesian coordinate system. Octupoles are normally
@@ -633,48 +639,44 @@ treated as thin lenses, except when tracking by Lie-algebraic methods.
 \subsection{General Thin Multipole}
 \label{sec:multipole}
 
-\begin{verbatim}
-label: MULTIPOLE, LRAD = real, TILT = real,
-                  KNL := {..,..,..}, KSL := {..,..,..};
-\end{verbatim} 
+\madbox{
+label: MULTIPOLE, \= LRAD = real, TILT = real, \\
+                  \> KNL = \{..,..,..\}, KSL = \{..,..,..\};
+}
 
 A MULTIPOLE is a thin-lens magnet of arbitrary order, including a dipole: 
-\begin{itemize}
-    \item LRAD: A fictitious length, which was originally just used to
+\begin{madlist}
+    \ttitem{LRAD} A fictitious length, which was originally just used to
       compute synchrotron radiation effects. \\
       A non-zero \textbf{ LRAD } in conjunction  with the
       \href{../control/general.html#option}{OPTION}\textbf{ thin\_foc }
       set to a \textbf{ true } logical value takes into account of the
       weak focussing of bending magnets.  
-    \item TILT: The roll angle about the longitudinal axis (default: 0
+    \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
       rad). A positive angle represents a clockwise rotation of the
       multipole element. \\
-      \textbf{  Please note that contrary to MAD8 one has to specify the
+      \textbf{Please note that contrary to \madeight one has to specify the
         desired TILT angle, otherwise it is taken as 0 rad. We believe
-        that the MAD8 concept of having individual TILT values for each
+        that the \madeight concept of having individual TILT values for each
         component and on top with default values led to considerable
         confusion and allowed for excessive and unphysical
-        freedom. Instead, in MAD-X the KNL/KSL components can be
+        freedom. Instead, in \madx the KNL/KSL components can be
         considered as the normal or skew multipole components of the
         magnet on the bench, while the TILT attribute can be considered
         as an tilt alignment error in the machine. } 
-    \item KNL: The normal multipole coefficients from order zero to the
+    \ttitem{KNL} The normal multipole coefficients from order zero to the
       maximum; the parameters are positional, therefore zeros must be
       filled in for components that do not exist. Example of a thin-lens
       sextupole:  
-\begin{verbatim}
-ms: multipole, knl := {0, 0, k2l};
-\end{verbatim}
+\madxmp{ms: multipole, knl := \{0, 0, k2l\};}
 
-   \item KSL: The skew multipole coefficients from order zero to the
+    \ttitem{KSL} The skew multipole coefficients from order zero to the
      maximum; the parameters are positional, therefore zeros must be
      filled in for components that do not exist. Example of a thin-lens
      skew octupole:  
-\begin{verbatim}
-ms: multipole, ksl := {0, 0, 0, k3sl};
-\end{verbatim}
+\madxmp{ms: multipole, ksl := \{0, 0, 0, k3sl\};}
 
-\end{itemize} 
+\end{madlist}
 
 Both KNL and KSL may be specified for the same multipole. 
 
@@ -687,52 +689,54 @@ K0L, being the first component of KNL above.
 
 % moved from element format above
 A special format is used for a \href{multipole.html}{multipole}\index{multipole}: 
-\begin{verbatim}
-m: multipole, kn= {kn0, kn1, kn2, ..., knmax},
-              ks= {ks0, ks1, ks2, ..., ksmax};
-\end{verbatim} 
+\madxmp{
+m: multipole, \= kn= \{kn0, kn1, kn2, ..., knmax\}, \\
+              \> ks= \{ks0, ks1, ks2, ..., ksmax\};
+}
 where kn and ks give the integrated normal and skew strengths,
 respectively. The commas are mandatory, each strength can be an
 expression; their position defines the order. example:  
-\begin{verbatim}
-m: multipole, kn={0,0,0,myoct*lrad}, ks={0,0,0,0,-1.e-5};
-\end{verbatim} 
+\madxmp{
+m: multipole, kn=\{0,0,0,myoct*lrad\}, ks=\{0,0,0,0,-1.e-5\};
+}
 defines a multipole with a normal octupole, and a skew decapole component. 
 
 To know the current maximum order, enter the command 
-\begin{verbatim}
-help, multipole;
-\end{verbatim} 
-and count.
+\madxmp{HELP, MULTIPOLE;} and count.
 
 %\input{Introduction/solenoid}
 %  Changed by: Alexander Koschik, 16-May-2006 
 \subsection{Solenoid}
 \label{sec:solenoid}
 
-\texttt{label: SOLENOID, L = real, KS = real;           } (\textbf{thick} version) 
-\\
-\texttt{label: SOLENOID, L = 0,    KS = real, KSI=real; } (\textbf{thin} version) 
+Solenoids can be defined in two forms, a thick and a thin version: 
 
-A SOLENOID has two or three real attributes: 
-\begin{itemize}
-   \item L: The length of the solenoid (default: 0 m) 
-   \item KS: The solenoid strength $K_s = B_0 / B\rho$ (default: 0
+\madbox{
+xxxxxxxxxxxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxxx\= \kill
+label: SOLENOID, L = real,  \>KS = real;           \> ! thick version \\ 
+label: SOLENOID, L = 0,     \>KS = real, KSI=real; \> ! thin version 
+}
+
+A SOLENOID has three real attributes: 
+\begin{madlist}
+   \ttitem{L} The length of the solenoid (default: 0 m) 
+   \ttitem{KS} The solenoid strength $K_s = B_0 / B\rho$ (default: 0
      rad/m). For positive KS and positive particle charge, the solenoid
      field points in the direction of increasing $s$.  
-   \item KSI: The solenoid integrated strength $K_s L$
+   \ttitem{KSI} The solenoid integrated strength $K_s L$
      (default: 0 rad).  This additional attribute is needed only when
      using the thin solenoid,  where $L=0$.     
-   \item \textit{ KNL \& KSL:  Take note that one can specify multipole
-     coefficients but they have no effect in MAD-X proper but are used
-     for solenoids with multipoles in PTC.} 
-\end{itemize}
+   \ttitem{KNL, KSL}  Take note that one can specify multipole
+     coefficients for SOLENOID. They have no effect in \madx proper but are used
+     in PTC for solenoid with multipoles.
+\end{madlist}
 
 Example: 
-\begin{verbatim}
-SOLO: SOLENOID, L = 2., KS = 0.001;
-THINSOLO: SOLENOID, L = 0, KS = 0.001, KSI = 0.002;
-\end{verbatim}
+\madxmp{
+xxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxx\= \kill
+SOLO:     \> SOLENOID, L = 2., \> KS = 0.001; \\
+THINSOLO: \> SOLENOID, L = 0,  \> KS = 0.001, KSI = 0.002;
+}
 
 The \href{local_system.html#straight}{straight reference system} for a
 solenoid is a cartesian coordinate system. 
@@ -740,11 +744,10 @@ solenoid is a cartesian coordinate system.
 
 
 %\input{Introduction/nllens}
-\subsection{NLLENS: Nonlinear Lens with Elliptic Potential}
-
-\begin{verbatim}
+\subsection{Nonlinear Lens with Elliptic Potential}
+\madbox{
 label: NLLENS, KNLL = real, CNLL = real;
-\end{verbatim}
+}
 
 The NLLENS element represents a thin nonlinear lens with the potential
 of 'Elliptic' type as specified in [1]. The lens is used to create fully
@@ -754,13 +757,13 @@ module. The quadrupole term of the potential is included in the
 TRANSPORT map and, consequently, effects the calculation of tunes and
 Twiss functions.   
 
-\begin{itemize}
-   \item KNLL: The integrated strength of lens (m). The strength is
-     parametrized so that     the quadrupole term of the multipole
+\begin{madlist}
+   \ttitem{KNLL} The integrated strength of lens (m). The strength is
+     parametrized so that the quadrupole term of the multipole
      expansion is k1=2*KNLL/CNLL\textasciicircum2.      
-   \item CNLL: The dimensional parameter of lens (m). The singularities
-     of the potential are     located at X=-CNLL,+CNLL and Y=0.  
-\end{itemize}
+   \ttitem{CNLL} The dimensional parameter of lens (m). The singularities
+     of the potential are located at X=-CNLL,+CNLL and Y=0.  
+\end{madlist}
 
 The scalar potential function of the element is given by
 \\
@@ -770,7 +773,7 @@ The scalar potential function of the element is given by
 U(x,y)=\frac{k}{c}\frac{\xi\sqrt{\xi^2-1} \, \text{acosh}\xi +  
   \eta\sqrt{1-\eta^2}(\text{acos}\eta-\pi/2)}{\xi^2-\eta^2}
 \]
-\\ where 
+\\ where \textit{k} = KNLL, \textit{c} = CNLL and 
 %%\includegraphics{nllens_xi.png}, 
 %%\includegraphics{nllens_eta.png}, and \textit{k} = KNLL, \textit{c} = CNLL. 
 %nllens_xi
@@ -778,7 +781,7 @@ U(x,y)=\frac{k}{c}\frac{\xi\sqrt{\xi^2-1} \, \text{acosh}\xi +
 \xi = \frac{\sqrt{(x+c)^2+y^2}+\sqrt{(x-c)^2+y^2}}{2c}, 
 \quad \eta = \frac{\sqrt{(x+c)^2+y^2}-\sqrt{(x-c)^2+y^2}}{2c},
 \]
-and \textit{k} = KNLL, \textit{c} = CNLL.
+
 
 Figure below shows the contour plot of the scalar potential: \\
 \includegraphics[width=220px]{Introduction/nllens_potential-2D.png}
@@ -803,7 +806,7 @@ thin lenses:
 \begin{verbatim}
     mu0 = 0.3;  ! phase advance over straight section
     l0 = 2.0;   ! length of the straight section
-    nn = 20;    !number of nonlinear elements
+    nn = 20;    ! number of nonlinear elements
     tn = 0.45;  ! strength of nonlinear lens
     cn = 0.01;  ! dimentional parameter of nonlinear lens
 
@@ -816,18 +819,19 @@ thin lenses:
 
     ncreate(ii,kk,cc): macro = {n.ii: nllens, knll=kk, cnll=cc;};
 
-i=0;
-while(i <  nn)
-  {
-    i = i+1;
-    sn = l0/nn*(i-0.5);
-    bn = l0*(1-sn*(l0-sn)/l0/f0)/sqrt(1.0-(1.0-l0/2.0/f0)^2);
-    knn = l0*tn*cn^2/nn/bn;
-    cnn = cn*sqrt(bn);
-    exec, ncreate($i,knn,cnn);
-    value, i, bn, cnn, knn;
-  };
+    i=0;
+    while(i <  nn)
+      {
+        i = i+1;
+        sn = l0/nn*(i-0.5);
+        bn = l0*(1-sn*(l0-sn)/l0/f0)/sqrt(1.0-(1.0-l0/2.0/f0)^2);
+        knn = l0*tn*cn^2/nn/bn;
+        cnn = cn*sqrt(bn);
+        exec, ncreate($i,knn,cnn);
+        value, i, bn, cnn, knn;
+      };
 \end{verbatim}
+
 
 %% To be moved in References at the end of the document
 References:
@@ -849,37 +853,38 @@ References:
 \subsection{Closed Orbit Correctors}
 \label{sec:closed_orbit_cor}
 Three types of closed orbit correctors are available: 
-\begin{itemize}
-   \item \href{hkick}{HKICKER}, a corrector for the horizontal plane, 
-   \item \href{vkick}{VKICKER}, a corrector for the vertical plane, 
-   \item \href{kick}{KICKER}, a corrector for both planes. 
-\end{itemize}
+\begin{madlist}
+   \ttitem{\href{hkick}{HKICKER}} a corrector for the horizontal plane, 
+   \ttitem{\href{vkick}{VKICKER}} a corrector for the vertical plane, 
+   \ttitem{\href{kick}{KICKER}} a corrector for both planes. 
+\end{madlist}
 
-\begin{verbatim}
-label: HKICKER, L = real, KICK = real, TILT = real;
-label: VKICKER, L = real, KICK = real, TILT = real;
-label:  KICKER, L = real, HKICK = real, VKICK = real, TILT = real;
-\end{verbatim} 
+\madbox{
+xxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxxxxxx\= \kill
+label: HKICKER, \>L = real, KICK = real, \>TILT = real; \\
+label: VKICKER, \>L = real, KICK = real, \>TILT = real; \\
+label: KICKER,  \>L = real, HKICK = real, \>VKICK = real, TILT = real;
+}
 
 {\bf The type KICKER should not be used when an orbit corrector kicks
   only in one plane.}  
 
 The attributes have the following meaning: 
-\begin{itemize}
-   \item L: The length of the closed orbit corrector (default: 0 m). 
-   \item KICK: The momentum change $\delta PX = \delta p_x/p_0$ or 
+\begin{madlist}
+   \ttitem{L} The length of the closed orbit corrector (default: 0 m). 
+   \ttitem{KICK} The momentum change $\delta PX = \delta p_x/p_0$ or 
      $\delta PY = \delta p_y / p_0$ for respectively horizontal or vertical
      correctors. (default: 0).  
-   \item HKICK: The horizontal momentum change 
+   \ttitem{HKICK} The horizontal momentum change 
      $\delta PX = \delta p_x/p_0$ for a corrector acting in both planes
      (default: 0).  
-   \item VKICK: The vertical momentum change 
+   \ttitem{VKICK} The vertical momentum change 
      $\delta PY = \delta p_y/p_0$  for a corrector acting in both planes
      (default: 0).  
-   \item TILT: The roll angle about the longitudinal axis (default: 0
+   \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
      rad). A positive angle represents a clockwise rotation of the
      kicker.  
-\end{itemize} 
+\end{madlist}
 
 A positive kick increases $p_x$ or $p_y$ respectively. This
 means that a positive horizontal kick bends to the left,  i.e. to
@@ -894,20 +899,23 @@ command. Instead the kicks computed by an orbit correction and the
 assigned values are added when the correctors are used.  
 
  Examples: 
-\begin{verbatim}
-HK1:   HKICKER, KICK = 0.001;
-VK3:   VKICKER, KICK = 0.0005;
-VK4:   VKICKER, KICK := AVK4;
-KHV1:  KICKER,  HKICK = 0.001, VKICK = 0.0005;
-KHV2:  KICKER,  HKICK := AKHV2H, VKICK := AKHV2V;
-\end{verbatim} 
+\madxmp{
+xxxxxxx\=xxxxxxxxxx\=xxxxxxxxxxxxxxxxx\= \kill
+HK1:   \>HKICKER, \>KICK = 0.001;  \\
+VK3:   \>VKICKER, \>KICK = 0.0005; \\
+VK4:   \>VKICKER, \>KICK := AVK4; \\
+KHV1:  \>KICKER,  \>HKICK = 0.001,   \>VKICK = 0.0005; \\
+KHV2:  \>KICKER,  \>HKICK := AKHV2H, \>VKICK := AKHV2V;
+}
 
 The assignment in the form of a deferred expression has the advantage
-that the values can be assigned and/or modified at any time (and matched
-!).  
+that the values can be assigned and/or modified at any time (and
+matched!).   
 
 The \href{local_system.html#straight}{straight reference system} for an
 orbit corrector is a Cartesian coordinate s ystem.  
+
+
 
 Please note that there is a new feature introduced by Stefan Sorge from
 GSI. Here his decription:
@@ -915,30 +923,32 @@ GSI. Here his decription:
 The elements KICKER, HKICKER, and VKICKER can also be used as  an
 exciter providing a sinusoidal momentum kick. The usage in this case is   
 
-\begin{verbatim}
-xykick: KICKER,  SINKICK = integer, SINPEAK = real, SINTUNE = real, SINPHASE = real;  
-xkick : HKICKER, SINKICK = integer, SINPEAK = real, SINTUNE = real, SINPHASE = real;  
-ykick : VKICKER, SINKICK = integer, SINPEAK = real, SINTUNE = real, SINPHASE = real;  
-\end{verbatim}
+\madxmp{
+xykick: KICKER,  \= SINKICK=integer, SINPEAK=real, SINTUNE=real, SINPHASE=real;  \\
+xkick : HKICKER, \> SINKICK=integer, SINPEAK=real, SINTUNE=real, SINPHASE=real;  \\
+ykick : VKICKER, \> SINKICK=integer, SINPEAK=real, SINTUNE=real, SINPHASE=real;  
+}
 where a sinusoidal momentum kick dpz as a function of the  revolution
 number n given by\\   
 dpz(n)=SINPEAK * sin(2*PI*SINTUNE*n + SINPHASE), pz=px,py \\ 
 is provided. 
 
+The KICKER element generates synchronous kicks in both horizontal and
+vertical planes. HKICKER generates only a horizontal kick, and VKICKER
+generates only a vertical kick.   
+
 The variables are 
 
-\begin{itemize}
-   \item SINKICK - integer, must be set to 1 to switch on the sinusoidal
+\begin{madlist}
+   \ttitem{SINKICK} must be set to 1 to switch on the sinusoidal
      signal, default: 0.  
-   \item SINPEAK - amplitude of the bending angle (rad), default: 0 rad.  
-   \item SINTUNE - frequency of the signal times the revolution
-     frequency.  Hence, the phase per revolution is 2*PI*SINTUNE,
+   \ttitem{SINPEAK} amplitude of the bending angle (rad); default: 0
+     rad.   
+   \ttitem{SINTUNE} frequency of the signal times the revolution
+     frequency.  Hence, the phase per revolution is 2*PI*SINTUNE;
      default: 0.   
-   \item SINPHASE - initial phase, default: 0 rad.  
-   \item KICKER generates a kick in horizontal and a kick vertical
-     direction,  where both are synchron, HKICKER generates a horizontal
-     kick,  and VKICKER generates a vertical kick.   
-\end{itemize}
+   \ttitem{SINPHASE} initial phase; default: 0 rad.  
+\end{madlist}
 
 The momentum kick of a kicker has only a single frequency. An element
 having a finite bandwidth can approximately created by defining  thin
@@ -946,7 +956,7 @@ kickers with all amplitudes SINPEAK, frequencies SINTUNE, and  initial
 phases SINPHASE desired and putting them at the same position s in  the
 accelerator.   
 
-From S.Sorge@gsi.de  
+%From S.Sorge@gsi.de  
 
 
 %\input{Introduction/tkickers}
@@ -976,143 +986,146 @@ at the documentation of the orbit corrector type
 \subsection{RF Cavity}
 \label{sec:rf_cavity}
 
-\begin{verbatim}
-label: RFCAVITY, L = real, VOLT = real, LAG = real, HARMON = integer, FREQ = real;                  
-\end{verbatim} 
+\madbox{
+label: RFCAVITY, \= L = real, VOLT = real, LAG = real, \\
+                 \> HARMON = integer, FREQ = real, \\    
+                 \> N\_BESSEL = integer, NO\_CAVITY\_TOTALPATH = logical;
+}
 
 %  HARMON=integer, BETRF=real,PG=real,
 %                  FREQ=real,SHUNT=real,TFILL=real; 
 
 
 An RFCAVITY has eight real attributes and one integer attribute: 
-\begin{itemize}
-   \item L: The length of the cavity (DEFAULT: 0 m) 
-   \item VOLT: The peak RF voltage (DEFAULT: 0 MV). The effect of the cavity is \\
+\begin{madlist}
+   \ttitem{L} The length of the cavity (DEFAULT: 0 m) 
+   \ttitem{VOLT} The peak RF voltage (DEFAULT: 0 MV). The effect of the cavity is \\
      delta(\textit{E}) = VOLT * sin(2 pi * (LAG - HARMON * \textit{f$_0$ t})). 
-   \item LAG: The phase lag [2pi] (DEFAULT: 0). 
-   \item FREQ: The frequency [MHz] (no DEFAULT). Note that if the RF
+   \ttitem{LAG} The phase lag [2pi] (DEFAULT: 0). 
+   \ttitem{FREQ} The frequency [MHz] (no DEFAULT). Note that if the RF
      frequency is not given, it is computed from the harmonic number and
      the revolution frequency \textit{f$_0$} as before. However, for
      accelerating structures this makes no sense, and the frequency is
      mandatory.  
-   \item HARMON: The harmonic number \textit{h} (no DEFAULT). Only if
+   \ttitem{HARMON} The harmonic number \textit{h} (no DEFAULT). Only if
      the frequency is not given.  
-   \item \textit{ Please take note, that the following MAD8 attributes:
-     BETRF, PG, SHUNT and TFILL are currently not implemented in MAD-X!}    
+\end{madlist}
+
+\textit{ Please take note, that the following \madeight attributes:
+  BETRF, PG, SHUNT and TFILL are currently not implemented in \madx!}    
 %  \item BETRF: RF coupling factor (DEFAULT: 0).
 %  \item PG: The RF power per cavity (DEFAULT: 0 MW).
 %  \item SHUNT: The relative shunt impedance (DEFAULT: 0 MOhm/m).
 %  \item TFILL: The filling time of the cavity $T_{fill}$ (DEFAULT: 0 microseconds). 
 
-   \item \textit{ Note as well that twiss is 4D only. As a consequence
-     the TWISS parameters in the plane of non-zero dispersion may not
-     close as expected. Therefore, it is best to perform TWISS in 4D
-     only, i.e. with cavities switched off. If 6D is needed one has to
-     use the \href{../ptc_twiss/ptc_twiss.html}{ptc\_twiss} command. } 
-\end{itemize}  
+\textit{ Note as well that twiss is 4D only. As a consequence
+  the TWISS parameters in the plane of non-zero dispersion may not
+  close as expected. Therefore, it is best to perform TWISS in 4D
+  only, i.e. with cavities switched off. If 6D is needed one has to
+  use the \href{../ptc_twiss/ptc_twiss.html}{ptc\_twiss} command. } 
 
-The RFCAVITY has attributes that will only become active in PTC: 
-\begin{itemize}
-   \item n\_bessel (DEFAULT: 0): \\
+The RFCAVITY can also have attributes that will only become active in PTC: 
+\begin{madlist}
+   \ttitem{N\_BESSEL} (DEFAULT: 0): \\
      Transverse focussing effects are typically ignored in the cavity in
-     MAD-X or even PTC. This effect is being calculated to order n\_bessel,
+     \madx or even PTC. This effect is being calculated to order n\_bessel,
      with n\_bessel=0 disregarding this effect and with a correct treatment
      when n\_bessel goes to infinty.
-   \item no\_cavity\_totalpath (DEFAULT: no\_cavity\_totalpath=false): \\
-     flag to choose if in a cavity the transit time factor is considered
-     (no\_cavity\_totalpath=false) or if the particle is kept on the
-     crest of RF voltage (no\_cavity\_totalpath=true).  
-\end{itemize}  
+   \ttitem{NO\_CAVITY\_TOTALPATH} (DEFAULT: no\_cavity\_totalpath=false): \\
+     flag to select whether the transit time factor in the cavity is to be
+     considered (no\_cavity\_totalpath = false) or if the particle is
+     kept on the crest of RF voltage (no\_cavity\_totalpath = true).  
+\end{madlist}
 
 A cavity requires the particle energy (\href{beam.html#energy}{ENERGY})
 and the particle charge (\href{beam.html#charge}{CHARGE}) to be set by a
 \href{beam.html}{BEAM} command before any calculations are performed.  
 
  Example: 
-\begin{verbatim}
-BEAM, PARTICLE = ELECTRON, ENERGY = 50.0;
+\madxmp{
+BEAM, PARTICLE = ELECTRON, ENERGY = 50.0; \\
 CAVITY: RFCAVITY, L = 10.0, VOLT = 150.0, LAG = 0.0, HARMON = 31320;
-\end{verbatim} 
+}
 
 The \href{local_system.html#straight}{straight reference system} for a
 cavity is a cartesian coordinate system.  
 
 
 %\input{Introduction/rfmultipole}
-\subsection{RFMULTIPOLE: Thin Radio-Frequency Multipole}
-\begin{verbatim}
-Label: RFMULTIPOLE, VOLT = real, LAG = real,
-       HARMON = integer, FREQ = real,
-       LRAD = real, TILT = real,
-       KNL := {k0nl, k1nl, k2nl, ... },  ! Normal coefficients
-       KSL := {k0sl, k1sl, k2sl, ... },  ! Skew coefficients
-       PNL := {p0n,  p1n,  p2n,  ... },  ! Normal phases [2pi]
-       PSL := {p0s,  p1s,  p2s,  ... };  ! Skew phases [2pi]
-\end{verbatim} 
+\subsection{Thin Radio-Frequency Multipole}
+\madbox{
+xxxxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
+label: RFMULTIPOLE, \> VOLT = real, LAG = real, \\
+       \> HARMON = integer, FREQ = real, \\
+       \> LRAD = real, TILT = real, \\
+       \> KNL := \{k0nl, k1nl, k2nl, \ldots \}, \>!Normal coefficients \\
+       \> KSL := \{k0sl, k1sl, k2sl, \ldots \}, \>!Skew coefficients \\
+       \> PNL := \{p0n,  p1n,  p2n,  \ldots \}, \>!Normal phases [2pi] \\
+       \> PSL := \{p0s,  p1s,  p2s,  \ldots \}; \>!Skew phases [2pi]
+}
 
 A RFMULTIPOLE is a thin-lens element which exhibits the properties
 of an RF-cavity and of a magnet of arbitrary order oscillating the
 a certain frequency:        
+
+The effect of the cavity is delta(E) = VOLT * sin(2 pi * (LAG - HARMON *
+f0 t)). 
  
-\begin{itemize}
-   \item L: The length of the rfmultipole (DEFAULT: 0 m) 
-   \item LAG: The phase lag [2pi] (DEFAULT: 0) 
-   \item FREQ: The frequency [MHz] (no DEFAULT). Note that if the RF
+\begin{madlist}
+%   \ttitem{L} The length of the rfmultipole (DEFAULT: 0 m) 
+   \ttitem{VOLT} The peak RF voltage (DEFAULT: 0 MV).  
+   \ttitem{LAG} The phase lag [2pi] (DEFAULT: 0) 
+   \ttitem{FREQ} The frequency [MHz] (no DEFAULT). \\ 
+     Note that if the RF
      frequency is not given, it is computed from the harmonic
      number and the revolution frequency f0 as before. However, for
      accelerating structures this makes no sense, and the frequency
      is mandatory.  
-   \item HARMON: The harmonic number h (no DEFAULT). Only if the
+   \ttitem{HARMON} The harmonic number h (no DEFAULT). Only if the
      frequency is not given. 
-   \item LRAD: A fictitious length, which was originally just used to
+   \ttitem{LRAD} A fictitious length, which was originally just used to
      compute synchrotron radiation effects. A non-zero LRAD in
      conjunction with the OPTION thin\_foc set to a true logical value
      takes into account of the weak focussing of bending magnets.  
-   \item TILT: The roll angle about the longitudinal axis (default: 0
+   \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
      rad). A positive angle represents a clockwise rotation of the
      multipole element.            
 
-     \textbf{Please note that contrary to MAD8 one has to specify the
+     \textbf{Please note that contrary to \madeight one has to specify the
        desired TILT angle, otherwise it is taken as 0 rad. We
-       believe that the MAD8 concept of having individual TILT
+       believe that the \madeight concept of having individual TILT
        values for each component and on top with default values
        led to considerable confusion and allowed for excessive
-       and unphysical freedom. Instead, in MAD-X the KNL/KSL
+       and unphysical freedom. Instead, in \madx the KNL/KSL
        components can be considered as the normal or skew
        multipole components of the magnet on the bench, while the
        TILT attribute can be considered as an tilt alignment
        error in the machine.} 
 
-   \item KNL: The normal rfmultipole coefficients from order zero to
+   \ttitem{KNL} The normal rfmultipole coefficients from order zero to
      the maximum; the parameters are positional, therefore zeros
      must be filled in for components that do not exist. Example of
      a thin-lens sextupole: ms:rfmultipole, knl:=\{0, 0, k2l\}; 
-   \item KSL: The skew rfmultipole coefficients from order zero to
+   \ttitem{KSL} The skew rfmultipole coefficients from order zero to
      the maximum; the parameters are positional, therefore zeros
      must be filled in for components that do not exist. Example of
      a thin-lens skew octupole:
-\end{itemize}
 
-\begin{verbatim}
-ms: rfmultipole, ksl := {0, 0, 0, k3sl};
-\end{verbatim}
+   \ttitem{PNL} The phase for each normal rfmultipole coefficients from
+     order zero to the maximum; the parameters are positional,
+     therefore zeros must be filled in for components that do not
+     exist.  
+   \ttitem{PSL} The phase for each skew rfmultipole coefficients from
+     order zero to the maximum; the parameters are positional,
+     therefore zeros must be filled in for components that do not
+     exist.  
+\end{madlist}
+
+
+Example:
+\madxmp{ms: rfmultipole, ksl := \{0, 0, 0, k3sl\};}
 
 Both KNL and KSL may be specified for the same multipole.  
-
-
-\begin{itemize}
-   \item VOLT: The peak RF voltage (DEFAULT: 0 MV). The effect of the
-     cavity is \\ 
-     delta(E) = VOLT * sin(2 pi * (LAG - HARMON * f0 t)). 
-   \item PNL: The phase for each normal rfmultipole coefficients from
-     order zero to the maximum; the parameters are positional,
-     therefore zeros must be filled in for components that do not
-     exist.  
-   \item PSL: The phase for each skew rfmultipole coefficients from
-     order zero to the maximum; the parameters are positional,
-     therefore zeros must be filled in for components that do not
-     exist.  
-\end{itemize}       
 
 A rfmultipole requires the particle energy (ENERGY) and the
 particle charge (CHARGE) to be set by a BEAM command before any
@@ -1132,43 +1145,43 @@ bends also the reference orbit.
 \subsection{Crab Cavity}
 \label{sec:crab_cavity}
 
-\begin{verbatim}
-label: CRABCAVITY, L = real, VOLT = real, LAG = real, FREQ = real,
-                   RV1 = integer, RV2 = integer, RV3 = integer, RV4 = integer, 
-                   RPH1 = integer, RPH2 = integer, 
-                   LAGF = real, HARMON = integer;                 
-\end{verbatim} 
+\madbox{
+label: CRABCAVITY, \=L=real, VOLT=real, LAG=real, FREQ=real, \\
+                   \>RV1=integer, RV2=integer, RV3=integer, RV4=integer, \\
+                   \>RPH1=integer, RPH2=integer, \\
+                   \>LAGF=real, HARMON=integer;
+}
 
 %  BETRF=real, PG=real,
 %  FREQ=real, SHUNT=real, TFILL=real; 
 
 A CRABCAVITY has five real attributes and seven integer attributes: 
 
-\begin{itemize}
-  \item L: The length of the cavity (default: 0 m) 
+\begin{madlist}
+  \ttitem{L} The length of the cavity (default: 0 m) 
 
-  \item VOLT: The peak RF voltage (default: 0 MV). 
+  \ttitem{VOLT} The peak RF voltage (default: 0 MV). 
 
-  \item LAG: The initial phase lag [2pi] (default: 0). 
+  \ttitem{LAG} The initial phase lag [2pi] (default: 0). 
 
-  \item FREQ: The RF frequency [MHz] (no default). \\
+  \ttitem{FREQ} The RF frequency [MHz] (no default). \\
     {\bf Note that if the RF frequency is not given, it is computed from the
     harmonic number and the revolution frequency \textit{f$_0$} as before. 
     However, for deflecting structures this makes no sense, and the 
     frequency is mandatory.} 
 
-  \item RV1: Number of initial turns with zero voltage (default: 0). 
-  \item RV2: Number of turns to ramp voltage from zero to nominal value (default: 0). 
-  \item RV3: Number of turns with nominal voltage (default: 0). 
-  \item RV4: Number of turns to ramp voltage from nominal value to zero (default: 0).  
+  \ttitem{RV1} Number of initial turns with zero voltage (default: 0). 
+  \ttitem{RV2} Number of turns to ramp voltage from zero to nominal value (default: 0). 
+  \ttitem{RV3} Number of turns with nominal voltage (default: 0). 
+  \ttitem{RV4} Number of turns to ramp voltage from nominal value to zero (default: 0).  
 
-  \item LAGF: Value of the final crab RF phase lag [2pi] (default: 0).
+  \ttitem{LAGF} Value of the final crab RF phase lag [2pi] (default: 0).
 
-  \item RPH1: Number of initial turns with nominal phase (default: 0). 
-  \item RPH2: Number of turns to ramp phase [2pi] from nominal to
+  \ttitem{RPH1} Number of initial turns with nominal phase (default: 0). 
+  \ttitem{RPH2} Number of turns to ramp phase [2pi] from nominal to
     specified value \\ (default:~0). 
 
-  \item HARMON: The harmonic number \textit{h} (no default). \\
+  \ttitem{HARMON} The harmonic number \textit{h} (no default). \\
     Only if the frequency is not given. 
 
 % \item BETRF: RF coupling factor (default: 0).
@@ -1176,13 +1189,13 @@ A CRABCAVITY has five real attributes and seven integer attributes:
 % \item SHUNT: The relative shunt impedance (default: 0 MOhm/m).
 % \item TFILL: The filling time of the cavity T<sub>fill</sub> (default: 0 microseconds). 
 %\item EPHASE: Value of the final crab RF phase [2pi] with respect to  nominal value (default: 0). 
-\end{itemize}
+\end{madlist}
 
 
 {\bf Caveats:}
 \begin{itemize}
-   \item \textit{ Please take note, that the following MAD8 attributes:
-     BETRF, PG, SHUNT and TFILL are currently not implemented in MAD-X!}
+   \item \textit{ Please take note, that the following \madeight attributes:
+     BETRF, PG, SHUNT and TFILL are currently not implemented in \madx!}
    \item \textit{ Note that crab cavities are only implemented for
      tracking  purposes. \\ TWISS will ignore any effect of the crab cavity.  
 % as well that twiss is 4D only. As a consequence the TWISS
@@ -1216,12 +1229,13 @@ Then the effect of the CRABCAVITY on particle coordinates during tracking is
 
 
 Example: 
-\begin{verbatim}
-BEAM, PARTICLE = PROTON, ENERGY = 7000.0;
-CAVITY:  CRABCAVITY, L = 10.0, VOLT = 5.0, LAG = 0.0, FREQ = 400,
-         RV1 = 0, RV2 = 50, RV3 = 1000, RV4 = 50, 
-         RPH1 = 100, RPH2 = 500, LAGF = 0.125;
-\end{verbatim} 
+\madxmp{
+xxxxxxxx\= \kill
+BEAM, PARTICLE = PROTON, ENERGY = 7000.0; \\
+CAVITY:  \>CRABCAVITY, L = 10.0, VOLT = 5.0, LAG = 0.0, FREQ = 400, \\
+         \>RV1 = 0, RV2 = 50, RV3 = 1000, RV4 = 50, \\
+         \>RPH1 = 100, RPH2 = 500, LAGF = 0.125;
+}
 
 The \href{local_system.html#straight}{straight reference system} for a
 cavity is a cartesian coordinate system.  
@@ -1231,24 +1245,24 @@ cavity is a cartesian coordinate system.
 
 %\input{Introduction/separator}
 %  Changed by: Frank Schmidt, 28-Aug-2003 
-\subsection{ELSEPARATOR: Electrostatic Separator}
+\subsection{Electrostatic Separator}
 \label{sec:separator}
 
-\begin{verbatim}
+\madbox{
 label: ELSEPARATOR, L = real, EX = real, EY = real, TILT = real;
-\end{verbatim} 
+}
 
-An ELSEPARATOR (electrostatic separator) has four real attributes: 
-\begin{itemize}
-   \item L: The length of the separator (default: 0 m). 
-   \item EX: The horizontal electric field strength (default: 0 MV/m). 
+An ELSEPARATOR has four real attributes: 
+\begin{madlist}
+   \ttitem{L} The length of the separator (default: 0 m). 
+   \ttitem{EX} The horizontal electric field strength (default: 0 MV/m). 
      A positive field increases \textit{p$_x$} for positive particles.  
-   \item EY: The vertical electric field strength (default: 0 MV/m). 
+   \ttitem{EY} The vertical electric field strength (default: 0 MV/m). 
      A positive field increases \textit{p$_y$} for positive particles.  
-   \item TILT: The roll angle about the longitudinal axis (default: 0
+   \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
      rad). A positive angle represents a clockwise of the electrostatic
      separator.  
-\end{itemize} 
+\end{madlist}
 
 A separator requires the particle energy
 (\href{beam.html#energy}{ENERGY}) and the particle charge
@@ -1256,10 +1270,10 @@ A separator requires the particle energy
 command before any calculations are performed.  
 
 Example: 
-\begin{verbatim}
-BEAM,PARTICLE = POSITRON, ENERGY = 50.0;
+\madxmp{
+BEAM, PARTICLE = POSITRON, ENERGY = 50.0;\\
 SEP: ELSEPARATOR, L = 5.0, EY = 0.5;
-\end{verbatim} 
+}
 
 The \href{local_system.html#straight}{straight reference system} for a
 separator is a cartesian coordinate system.   
@@ -1277,30 +1291,30 @@ correction.
 
 Three different types of beam position monitors are recognised:  
 
-\begin{itemize}
-   \item \href{hmon}{HMONITOR}. Monitor for the horizontal beam position, 
-   \item \href{vmon}{VMONITOR}. Monitor for the vertical beam position, 
-   \item \href{mon}{MONITOR}. Monitor for both horizontal and vertical beam position. 
-\end{itemize}
+\begin{madlist}
+   \item{\href{hmon}{HMONITOR}} Monitor for the horizontal beam position, 
+   \item{\href{vmon}{VMONITOR}} Monitor for the vertical beam position, 
+   \item{\href{mon}{MONITOR}} Monitor for both horizontal and vertical beam position. 
+\end{madlist}
 
-\begin{verbatim}
-label: HMONITOR,    L = real;
-label: VMONITOR,    L = real;
-label: MONITOR,     L = real;
-\end{verbatim} 
+\madbox{
+label: HMONITOR, \=   L = real; \\
+label: VMONITOR, \>   L = real; \\
+label: MONITOR,  \>   L = real;
+}
 
 A beam position monitor has one real attribute: 
-\begin{itemize}
-   \item L: The length of the monitor (default: 0 m). 
+\begin{madlist}
+   \ttitem{L} The length of the monitor (default: 0 m). 
      %% If the length is different from zero, the beam position is recorded
      %% in the centre of the monitor.  
-\end{itemize} 
+\end{madlist}
 
 Examples: 
-\begin{verbatim}
-MH: HMONITOR, L = 1;
+\madxmp{
+MH: HMONITOR, L = 1; \\
 MV: VMONITOR;
-\end{verbatim} 
+}
 
 The \href{local_system.html#straight}{straight reference system} for a
 monitor is a cartesian coordinate system.  
@@ -1328,15 +1342,16 @@ Two different types of beam position monitors are recognised:
      drifts and monitors. 
 \end{itemize}
 
-\begin{verbatim}
-label: INSTRUMENT,   L = real;
-label: PLACEHOLDER,  L = real;
-\end{verbatim} 
+\madbox{
+xxxxxxxxxxxxxxxxxxxxx\= \kill
+label: INSTRUMENT,   \>L = real; \\
+label: PLACEHOLDER,  \>L = real;
+}
 
-An instrumnet has one real attribute: 
-\begin{itemize}
-   \item L: The length of the instrument (default: 0 m). 
-\end{itemize} 
+An instrument has one real attribute: 
+\begin{madlist}
+   \ttitem{L} The length of the instrument (default: 0 m). 
+\end{madlist}
 
 The \href{local_system.html#straight}{straight reference system} for an 
 instrument is a cartesian coordinate system.  
@@ -1346,32 +1361,33 @@ instrument is a cartesian coordinate system.
 %  Changed by: Ghislain Roy, 23-May-2013 
 \subsection{Collimators}
  
-The definition of collimators in MAD-X has been inherited from MAD8 and two types of collimators are defined: 
+The definition of collimators in \madx has been inherited from \madeight
+and two types of collimators are defined:  
 \begin{itemize}
    \item \href{ecol}{ECOLLIMATOR}. 
    \item \href{rcol}{RCOLLIMATOR}. 
 \end{itemize}  
 Note that although two types are defined, both behave in exactly the
-same way within MAD-X and the type name does NOT imply elliptic or
+same way within \madx and the type name does NOT imply elliptic or
 rectangular aperture.    
 
-\begin{verbatim}
-label: ECOLLIMATOR, TYPE = name, L = real, XSIZE = real, YSIZE = real;
-label: RCOLLIMATOR, TYPE = name ,L = real, XSIZE = real, YSIZE = real;
-\end{verbatim}  
+\madbox{
+label: ECOLLIMATOR, TYPE = name, L = real, XSIZE = real, YSIZE = real; \\
+label: RCOLLIMATOR, TYPE = name, L = real, XSIZE = real, YSIZE = real;
+}
 
 Either type has several real attributes: 
-\begin{itemize}
-   \item L: The collimator length (default: 0 m). 
-   \item XSIZE: The horizontal half-aperture (default:
+\begin{madlist}
+   \ttitem{L} The collimator length (default: 0 m). 
+   \ttitem{XSIZE} The horizontal half-aperture (default:
      unlimited). \textbf{OBSOLETE : Will be parsed but not used.} 
-   \item YSIZE: The vertical half-aperture (default:
+   \ttitem{YSIZE} The vertical half-aperture (default:
      unlimited). \textbf{OBSOLETE : Will be parsed but not used.} 
-\end{itemize}  
+\end{madlist}
 
 The actual definition of the aperture type and aperture parameters must
 be done in accordance with \href{aperture.html}{Defining aperture in
-  MAD-X}.   
+  \madx}.   
 
 Optically a collimator behaves like a drift space.  However during
 tracking the aperture is checked at the entrance of the collimator,
@@ -1383,9 +1399,9 @@ If the length is not zero, the aperture is also checked at the
 exit. \textbf{ TO BE CHECKED } 
 
 Example: 
-\begin{verbatim}
+\madxmp{
 COLLIM: ECOLLIMATOR, L = 0.5, APERTYPE = ELLIPSE, APERTURE = {0.01,0.005};
-\end{verbatim}
+}
 
 The \href{local_system.html#straight}{straight reference system} for a
 collimator is a cartesian coordinate system.  
@@ -1401,9 +1417,9 @@ with respect to the surrounding beam line.
 
 \paragraph{\href{yrotation}{YROTATION: Rotation About the Vertical Axis}}
 
-\begin{verbatim}
+\madbox{
 label: YROTATION, TYPE = name, ANGLE = real;
-\end{verbatim} 
+}
 
 The element YROTATION rotates the
 \href{local_system.html#straight}{straight reference system} about the
@@ -1413,25 +1429,25 @@ causes the beam to be referred to the new coordinate system  \\
 \textit{y}$_2$=\textit{x}$_1$sin(theta)+\textit{s}$_1$cos(theta).\\
 
 It has one real attribute: 
-\begin{itemize}
-   \item ANGLE: The rotation angle theta (default: 0 rad). It must be a
+\begin{madlist}
+   \ttitem{ANGLE} The rotation angle theta (default: 0 rad). It must be a
      \emph{small} angle, i.e. an angle comparable to the transverse
      angles of the orbit. 
-\end{itemize} 
+\end{madlist}
 
 A positive angle means that the new reference system is rotated
 clockwise about the local \texttt{y}-axis with respect to the old system. 
 
 Example: 
-\begin{verbatim}
+\madxmp{
 KINK: YROTATION, ANGLE = 0.0001;
-\end{verbatim}
+}
 
 \paragraph{\href{srotation}{SROTATION: Rotation Around the Longitudinal Axis}}
 
-\begin{verbatim}
+\madbox{
 label: SROTATION, ANGLE = real;
-\end{verbatim} 
+}
 
 The element SROTATION rotates the
 \href{local_system.html#straight}{straight reference system} about the
@@ -1441,64 +1457,65 @@ it causes the beam to be referred to the new coordinate system \\
 \textit{y}$_2$=\textit{x}$_1$sin(psi)+\textit{y}$_1$cos(psi).\\ 
 
 It has one real attribute: 
-\begin{itemize}
-   \item ANGLE: The rotation angle psi (default: 0 rad) 
-\end{itemize} 
+\begin{madlist}
+   \ttitem{ANGLE} The rotation angle psi (default: 0 rad) 
+\end{madlist}
 
 A positive angle means that the new reference system is rotated
 clockwise about the \texttt{s}-axis with respect to the old system.  
 
 Example: 
-\begin{verbatim}
-ROLL1: SROTATION, ANGLE =  PI/2.;
-ROLL2: SROTATION, ANGLE = -PI/2.;
-HBEND: SBEND, L = 6.0, ANGLE = 0.01;
-VBEND: LINE = (ROLL1,HBEND,ROLL2);
-\end{verbatim} 
-The above is a way to represent a bend down in the vertical plane, it could be defined more simply by 
-\begin{verbatim}
+\madxmp{
+ROLL1: SROTATION, ANGLE =  PI/2.; \\
+ROLL2: SROTATION, ANGLE = -PI/2.; \\
+HBEND: SBEND, L = 6.0, ANGLE = 0.01; \\
+VBEND: LINE = (ROLL1,HBEND,ROLL2); \\
+}
+The VBEND definition above is a way to represent a bend down in the
+vertical plane, it could be defined more simply by  
+\madxmp{
 VBEND: SBEND, L = 6.0, K0S = 0.01/6;
-\end{verbatim}
+}
 
 
 
 %\input{Introduction/beambeam}
 %  Changed by: Stefan Sorge, 2007 
-\subsection{BEAMBEAM: Beam-beam Interaction}
-The command BEAMBEAM may be inserted in a beam line to simulate a
+\subsection{Beam-beam Interaction}
+The BEAMBEAM element may be inserted in a beam line to simulate a
 beam-beam interaction point:  
  
-\begin{verbatim}
-label: BEAMBEAM, SIGX = real, SIGY = real,
-                 XMA = real, YMA = real, CHARGE = real
-                 BBSHAPE = int, WIDTH = real, BBDIR = int;
-\end{verbatim}
+\madbox{
+label: BEAMBEAM, \= SIGX = real, SIGY = real, \\
+                 \> XMA = real, YMA = real, CHARGE = real, \\
+                 \> BBSHAPE = int, WIDTH = real, BBDIR = int;
+}
 
 The beam-beam interaction is represented by a four-dimensional
 interaction with a thin element, i.e. horizontal and vertical non-linear kicks.
 The code for this element has been contributed by J.M. Veuillen (1987)
 and extended by S. Sorge (2007).  
  
-\begin{itemize}
-   \item SIGX:
+\begin{madlist}
+   \ttitem{SIGX}
      The horizontal extent of the opposite beam (default: 1 m).
      Meaning depends on parameter BBSHAPE.
-   \item SIGY:
+   \ttitem{SIGY}
      The vertical extent of the opposite beam (default: 1 m).
      Meaning depends on parameter BBSHAPE.
-   \item XMA:
+   \ttitem{XMA}
      The horizontal displacement of the opposite beam with respect to
      the ideal orbit (default: 0 m).
-   \item YMA:
+   \ttitem{YMA}
      The vertical displacement of the opposite beam with respect to
      the ideal orbit (default: 0 m).
-   \item CHARGE:
+   \ttitem{CHARGE}
      The charge of particles in the opposite beam in elementary charges. 
      It is set by default CHARGE=1. So, if you want to describe collisions 
      between beams containing the same particles having a charge different 
      from 1, you have to set CHARGE explicitly in BEAM and 
      in BEAMBEAM. 
-   \item BBSHAPE: The parameter to choose the radial density shape of the 
+   \ttitem{BBSHAPE} The parameter to choose the radial density shape of the 
      opposite beam (default: 1)
      \begin{itemize}
        \item  BBSHAPE=1: Gaussian shape (default), SIGX/SIGY: standard deviation in 
@@ -1530,6 +1547,7 @@ and extended by S. Sorge (2007).
 %%\includegraphics{beambeam_n_hollowparabol.jpg} 
 %\end{figure}
 \\
+
      \end{itemize}
      
      The restriction to circular opposite beams in the cases BBSHAPE=2,3 
@@ -1537,7 +1555,7 @@ and extended by S. Sorge (2007).
      for the description of the interaction between the particle beam and 
      an electron beam of an electron cooler, which are usually circular. 
      
-   \item  WIDTH: The relative extent of the edge region, absolute value is given by 
+   \ttitem{WIDTH} The relative extent of the edge region, absolute value is given by 
      WIDTH*SIGX and WIDTH*SIGY vertical and horizontal direction, respectively. 
      For 
      \begin{itemize}
@@ -1548,9 +1566,10 @@ and extended by S. Sorge (2007).
           mm. It must be WIDTH \textless   2.0.
 	\item  BBSHAPE=3, WIDTH denotes the full width at half maximum of the parabolic 
           density profile in units of SIGX (or SIGX' and SIGY', respectively, if SIGX 
-          SIGY are not equal. It must be WIDTH \textless   SQRT(2.0).
+          SIGY are not equal. It must be WIDTH \textless SQRT(2.0).
      \end{itemize} 
-   \item  BBDIR: The parameter to choose the direction of motion of the 
+
+   \ttitem{BBDIR} The parameter to choose the direction of motion of the 
      opposite beam relative to the beam considered. It determines 
      the sign of the Lorenz force between the both beams (default: -1): 
      \begin{itemize}
@@ -1576,7 +1595,7 @@ and extended by S. Sorge (2007).
           the cooler. So, the factor 1/2 is inserted only for BBDIR=-1 to calculate 
           correct results. 
      \end{itemize} 
-\end{itemize}
+\end{madlist}
 
 
 A beam-beam element requires the particle energy
@@ -1592,26 +1611,27 @@ before any calculations are performed.
 Examples of a four-dimensional beam-beam element definition:
  
 Collider regime example:
-\begin{verbatim}
-beam,   particle = positron, npart = 1.e12, energy = 50.0;
+\madxmp{
+beam,   particle = positron, npart = 1.e12, energy = 50.0; \\
 bb:     beambeam, sigx = 1.e-3, sigy = 5.e-4, charge = 1.;
-\end{verbatim}
+}
 
 
 Electron cooler example: 
-\begin{verbatim}
-gamma0 = 1.032;                           ! relativistic factors
-beta0 = sqrt(1.0-1.0/gamm0/gamma0);
-
-i_e = 0.2;                                ! electron current
-re_cool = 0.01;                           ! electron beam radius
-l_cool = 5.0;                             ! cooling length
-nelect = i_e*l_cool/beta0/clight/qelect;  ! electron number in e-cooler
-
-beam, particle = antiproton, gamma = gamma0, npart = nelect; 
-bb_ecool: beambeam, sigx = re_cool, sigy = re_cool, bbshape = 2, 
-                    width = 0.01, charge = -1, bbdir = 1;
-\end{verbatim}
+\madxmp{
+gamma0 = 1.032;                          \= ! relativistic factors \\
+beta0 = sqrt(1.0-1.0/gamm0/gamma0);      \>  \\
+\> \\
+i\_e = 0.2;                              \> ! electron current \\
+re\_cool = 0.01;                         \> ! electron beam radius \\
+l\_cool = 5.0;                           \> ! cooling length \\
+\\
+nelect = i\_e*l\_cool/beta0/clight/qelect; ! electron number in e-cooler \\
+\\
+beam, particle = antiproton, gamma = gamma0, npart = nelect;  \\
+bb\_ecool: beambeam, sigx = re\_cool, sigy = re\_cool, bbshape = 2, \\
+\hskip 4.2cm                     width = 0.01, charge = -1, bbdir = 1;
+}
 
 For the definition of the LHC head-on and parasitic beam-beam elements see 
  \href{../control/foot.html#macro}{beam-beam element examples}.
@@ -1620,31 +1640,29 @@ For the definition of the LHC head-on and parasitic beam-beam elements see
 
 %\input{Introduction/matrix}
 %  Changed by: Frank Schmidt, 25-June-2003 
-\subsection{MATRIX: Arbitrary Element}
+\subsection{Arbitrary Matrix Element}
 
-\begin{verbatim}
-label: MATRIX, TYPE = name, L = real, KICK1 = real,..., KICK6 = real,
-               RM11  = real,..., RM66  = real,
-               TM111 = real,..., TM666 = real;
-\end{verbatim} 
+\madbox{
+label: MATRIX, \= TYPE  \= = name, L = real, \= KICK1 = real,..., KICK6 = real, \\
+               \> RM11  \> = real,..., RM66  \> = real, \\
+               \> TM111 \> = real,..., TM666 \> = real;
+}
 
 The MATRIX permits the definition of an arbitrary transfer matrix. 
 It has four real array attributes: 
-\begin{itemize}
-   \item L: Length of the element, which may be zero. 
-   \item KICKi: Defines the kick of the element acting on the six phase
+\begin{madlist}
+   \ttitem{L} Length of the element, which may be zero. 
+   \ttitem{KICKi} Defines the kick of the element acting on the six phase
      space coordinates.  
-   \item RMik: Defines the linear transfer matrix (6*6) of the element.  
-   \item TMikl: Defines the second-order terms (6*6*6) of the element. 
-\end{itemize} 
+   \ttitem{RMik} Defines the linear transfer matrix (6*6) of the element.  
+   \ttitem{TMikl} Defines the second-order terms (6*6*6) of the element. 
+\end{madlist}
 
 Data values not entered are taken from the identity transformation, kick
 and second order terms are zero as default. In the thin-lens tracking
 module the length of an arbitrary matrix is accepted, however no second
 order are allowed to avoid non symplectic tracking runs. In the latter
 case the tracking run will be aborted.
-
-
 
 
 

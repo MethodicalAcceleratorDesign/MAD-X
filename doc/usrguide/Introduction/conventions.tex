@@ -96,7 +96,7 @@ described with respect to the reference orbit, using the local
 reference system (\textit{x, y, s}). It is evaluated including any
 nonlinear effects.  
 
-MAD also computes the betatron and synchrotron oscillations with respect
+\madx also computes the betatron and synchrotron oscillations with respect
 to the closed orbit. Results are given in the local (\textit{x, y,
   s})-system defined by the reference orbit. 
 
@@ -118,7 +118,7 @@ defined by three displacements  (\textit{X$_i$}, \textit{Y$_i$},
 \textit{Z$_i$}) and three angles (\textit{Theta$_i$}, \textit{Phi$_i$},
 \textit{Psi$_i$}) 
 
-\begin{figure}[htb]%                                         1.2
+\begin{figure}[htb]% 1.2
 \centering
 \setlength{\unitlength}{1pt}
 \begin{picture}(400,270)
@@ -272,19 +272,19 @@ periodic with the revolution frequency of the accelerator, while the
 position angles must be periodic (modulo \(2\pi\)) with the revolution
 frequency. If $\psi$ is not periodic (modulo $2\pi$), coupling effects are
 introduced. 
-When advancing through a beam element, MAD computes
-\textit{V$_i$} and \textit{W$_i$} by the recurrence relations  
+When advancing through a beam element, \madx computes
+$V_i$ and $W_i$ by the recurrence relations  
 \[
-   V_{i}=W_{i-1}R_{i}+V_{i-1},
+   V_i=W_{i-1}R_i+V_{i-1},
    \qquad
-   W_{i}=W_{i-1}S_{i}
+   W_i=W_{i-1}S_i
 \]
-The vector \textit{R$_i$} is the displacement and the matrix
-\textit{S$_i$} is the rotation of the local reference system  at the
+The vector $R_i$ is the displacement and the matrix
+$S_i$ is the rotation of the local reference system  at the
 exit of the element \textit{i} with respect to the entrance  of the same
-element. The values of \textit{R$_i$} and \textit{S$_i$} are listed in
-the:   \href{local_system.html#straight}{straight reference system} for
-each physical element type.  
+element. The values of $R_i$ and $S_i$ are listed in the:
+\href{local_system.html#straight}{straight reference system} 
+for each physical element type.  
 
 %% \begin{figure}[h!]
 %%   \centering
@@ -346,47 +346,85 @@ before and after the element cancel.
 %\\\textbf{Figure 1:} Reference System for Straight Beam Elements 
 %\end{figure}
 
-\begin{figure}[htb]
-  \centering
-  \setlength{\unitlength}{1pt}
-  \begin{picture}(200,200)
-    \thinlines
-    % s-axis
-    \put(0,100){\line(1,0){20}}
-    \put(30,100){\line(1,0){140}}
-    \put(180,100){\vector(1,0){20}}
-    \put(200,90){\makebox(0,0){$s$}}
-    % y-axes
-    \put(25,100){\circle{10}}
-    \put(25,100){\circle*{2}}
-    \put(18,110){\makebox(0,0){$y_1$}}
-    \put(175,100){\circle{10}}
-    \put(175,100){\circle*{2}}
-    \put(182,110){\makebox(0,0){$y_2$}}
-    % x-axes
-    \put(25,15){\line(0,1){80}}
-    \put(25,105){\vector(0,1){80}}
-    \put(16,180){\makebox(0,0){$x_1$}}
-    \put(175,15){\line(0,1){80}}
-    \put(175,105){\vector(0,1){80}}
-    \put(184,180){\makebox(0,0){$x_2$}}
-    % length
-    \put(25,30){\vector(1,0){150}}
-    \put(175,30){\vector(-1,0){150}}
-    \put(100,25){\makebox(0,0){$L$}}
-    % element box
-    \thicklines
-    \put(25,50){\line(0,1){45}}
-    \put(25,105){\line(0,1){45}}
-    \put(25,150){\line(1,0){150}}
-    \put(175,150){\line(0,-1){45}}
-    \put(175,95){\line(0,-1){45}}
-    \put(175,50){\line(-1,0){150}}
-  \end{picture}
-  \caption{Reference System for Straight Beam Elements}
-  \label{F-REF2}
-\end{figure}
+%% % picture prepared by ghislain to reproduce the png graphics above.
+%% \begin{figure}[htb]
+%%   \centering
+%%   \setlength{\unitlength}{1pt}
+%%   \begin{picture}(200,200)
+%%     \thinlines
+%%     % s-axis
+%%     \put(0,100){\line(1,0){20}}
+%%     \put(30,100){\line(1,0){140}}
+%%     \put(180,100){\vector(1,0){20}}
+%%     \put(200,90){\makebox(0,0){$s$}}
+%%     % y-axes
+%%     \put(25,100){\circle{10}}
+%%     \put(25,100){\circle*{2}}
+%%     \put(18,110){\makebox(0,0){$y_1$}}
+%%     \put(175,100){\circle{10}}
+%%     \put(175,100){\circle*{2}}
+%%     \put(182,110){\makebox(0,0){$y_2$}}
+%%     % x-axes
+%%     \put(25,15){\line(0,1){80}}
+%%     \put(25,105){\vector(0,1){80}}
+%%     \put(16,180){\makebox(0,0){$x_1$}}
+%%     \put(175,15){\line(0,1){80}}
+%%     \put(175,105){\vector(0,1){80}}
+%%     \put(184,180){\makebox(0,0){$x_2$}}
+%%     % length
+%%     \put(25,30){\vector(1,0){150}}
+%%     \put(175,30){\vector(-1,0){150}}
+%%     \put(100,25){\makebox(0,0){$L$}}
+%%     % element box
+%%     \thicklines
+%%     \put(25,50){\line(0,1){45}}
+%%     \put(25,105){\line(0,1){45}}
+%%     \put(25,150){\line(1,0){150}}
+%%     \put(175,150){\line(0,-1){45}}
+%%     \put(175,95){\line(0,-1){45}}
+%%     \put(175,50){\line(-1,0){150}}
+%%   \end{picture}
+%%   \caption{Reference System for Straight Beam Elements}
+%%   \label{F-REF2}
+%% \end{figure}
 
+%% Original picture from MAD-8 manual 
+\begin{figure}[ht]
+\centering
+\setlength{\unitlength}{1pt}
+\begin{picture}(400,100)
+\thinlines
+% axes
+\put(150,50){\circle{8}}\put(150,50){\circle*{2}}
+\put(140,40){\makebox(0,0){\(y_1\)}}
+\put(250,50){\circle{8}}\put(250,50){\circle*{2}}
+\put(260,40){\makebox(0,0){\(y_2\)}}
+\put(100,50){\line(1,0){46}}
+\put(154,50){\line(1,0){92}}
+\put(254,50){\vector(1,0){46}}
+\put(290,40){\makebox(0,0){\(s\)}}
+\put(150,0){\line(0,1){46}}
+\put(150,54){\vector(0,1){46}}
+\put(140,90){\makebox(0,0){\(x_1\)}}
+\put(250,0){\line(0,1){46}}
+\put(250,54){\vector(0,1){46}}
+\put(260,90){\makebox(0,0){\(x_2\)}}
+% magnet outline
+\thicklines
+\put(150,54){\line(0,1){26}}
+\put(150,46){\line(0,-1){26}}
+\put(250,54){\line(0,1){26}}
+\put(250,46){\line(0,-1){26}}
+\put(150,20){\line(1,0){100}}
+\put(150,80){\line(1,0){100}}
+\put(200,2){\vector(1,0){50}}
+\put(200,2){\vector(-1,0){50}}
+\put(200,10){\makebox(0,0){L}}
+\end{picture}
+\caption{Reference System for Straight Beam Elements}
+\label{F-DRF}
+\end{figure}
+ 
 
 \subsection{\href{rbend}{Reference System for Bending Magnets}}
 \label{subsec:local_rbend}
@@ -432,34 +470,144 @@ T =
 \]
 The special value $\psi = \pi/2$ represents a bend down.  
 
-\begin{figure}[htb]
-  \centering
-	\includegraphics{figures/ref_rbend.png}
-  \caption{Reference System for Rectangular Bends; The signs of the pole-face rotations are positive as shown.}
-\end{figure}
+%% \begin{figure}[htb]
+%%   \centering
+%% 	\includegraphics{figures/ref_rbend.png}
+%%   \caption{Reference System for Rectangular Bends; The signs of the pole-face rotations are positive as shown.}
+%% \end{figure}
+
+%% \begin{figure}[htb]
+%%   \centering
+%% 	\includegraphics{figures/ref_sbend.png}
+%%   \caption{Reference System for Sector Bends; The signs of the pole-face rotations are positive as shown.}
+%% \end{figure}
+%% \label{local_sbend}
 
 \begin{figure}[htb]
-  \centering
-	\includegraphics{figures/ref_sbend.png}
-  \caption{Reference System for Sector Bends; The signs of the pole-face rotations are positive as shown.}
+\centering
+\setlength{\unitlength}{1pt}
+\begin{picture}(400,215)
+% axes
+\thinlines
+\put(150,150){\circle{8}}\put(150,150){\circle*{2}}
+\put(160,140){\makebox(0,0){\(y_1\)}}
+\put(250,150){\circle{8}}\put(250,150){\circle*{2}}
+\put(240,140){\makebox(0,0){\(y_2\)}}
+\put(74,124.7){\vector(3,1){72}}
+\put(84,135){\makebox(0,0){\(s_1\)}}
+\put(254,148.7){\vector(3,-1){72}}
+\put(316,135){\makebox(0,0){\(s_2\)}}
+\put(200,0){\vector(-1,3){48.7}}
+\put(165,75){\makebox(0,0){\(\rho\)}}
+\put(148.7,154){\vector(-1,3){18}}
+\put(118,206){\makebox(0,0){\(x_1\)}}
+\put(200,0){\vector(1,3){48.7}}
+\put(235,75){\makebox(0,0){\(\rho\)}}
+\put(251.3,154){\vector(1,3){18}}
+\put(282,206){\makebox(0,0){\(x_2\)}}
+\bezier{20}(190.5,28.5)(200,31.7)(209.5,28.5)
+\put(200,20){\makebox(0,0){\(\alpha\)}}
+\put(154,150){\line(1,0){92}}
+\put(200,150){\circle*{4}}
+\put(200,150){\vector(0,1){60}}
+\put(210,200){\makebox(0,0){\(x\)}}
+\put(150,154){\line(0,1){44}}
+\put(150,146){\line(0,-1){46}}
+\put(151,154){\line(1,4){11}}
+\put(250,154){\line(0,1){44}}
+\put(250,146){\line(0,-1){46}}
+\put(249,154){\line(-1,4){11}}
+% magnet outline
+\thicklines
+\put(200,102){\vector(-1,0){50}}
+\put(200,102){\vector(1,0){50}}
+\put(200,110){\makebox(0,0){L}}
+\put(151,154){\line(1,4){6}}
+\put(149,146){\line(-1,-4){6}}
+\put(249,154){\line(-1,4){6}}
+\put(251,146){\line(1,-4){6}}
+\put(157,178){\line(1,0){86}}
+\put(143,122){\line(1,0){114}}
+\bezier{10}(150,195)(155.5,195)(160.9,193.7)
+\put(155.5,195){\vector(3,-1){5.4}}
+\put(150,205){\makebox(0,0)[l]{\(e_1\)}}
+\bezier{10}(250,195)(244.5,195)(239.1,193.7)
+\put(244.5,195){\vector(-3,-1){5.4}}
+\put(250,205){\makebox(0,0)[r]{\(e_2\)}}
+\end{picture}
+\caption[Reference System for a Rectangular Bending Magnet]%
+{Reference System for a Rectangular Bending Magnet;
+the signs of pole-face rotations are positive as shown.}
+\label{F-RBND}
 \end{figure}
-\label{local_sbend}
+ 
+\begin{figure}[htb]%                                         3.3
+\centering
+\setlength{\unitlength}{1pt}
+\begin{picture}(400,215)
+% axes
+\thinlines
+\put(150,150){\circle{8}}\put(150,150){\circle*{2}}
+\put(160,140){\makebox(0,0){\(y_1\)}}
+\put(250,150){\circle{8}}\put(250,150){\circle*{2}}
+\put(240,140){\makebox(0,0){\(y_2\)}}
+\put(74,124.7){\vector(3,1){72}}
+\put(84,135){\makebox(0,0){\(s_1\)}}
+\put(254,148.7){\vector(3,-1){72}}
+\put(316,135){\makebox(0,0){\(s_2\)}}
+\put(200,0){\vector(-1,3){48.7}}
+\put(165,75){\makebox(0,0){\(\rho\)}}
+\put(148.7,154){\vector(-1,3){18}}
+\put(118,206){\makebox(0,0){\(x_1\)}}
+\put(200,0){\vector(1,3){48.7}}
+\put(235,75){\makebox(0,0){\(\rho\)}}
+\put(251.3,154){\vector(1,3){18}}
+\put(282,206){\makebox(0,0){\(x_2\)}}
+\bezier{20}(190.5,28.5)(200,31.7)(209.5,28.5)
+\put(200,20){\makebox(0,0){\(\alpha\)}}
+\put(200,158.8){\circle*{4}}
+\put(200,158.8){\vector(0,1){50}}
+\put(210,200){\makebox(0,0){\(r\)}}
+\put(151,154){\line(1,4){10}}
+\put(249,154){\line(-1,4){10}}
+% magnet outline
+\thicklines
+\bezier{100}(154,151.3)(200,166.7)(246,151.3)
+\put(162,154){\vector(-3,-1){8}}
+\put(238,154){\vector(3,-1){8}}
+\put(210,168){\makebox(0,0){L}}
+\put(151,154){\line(1,4){6}}
+\put(149,146){\line(-1,-4){6}}
+\put(249,154){\line(-1,4){6}}
+\put(251,146){\line(1,-4){6}}
+\bezier{90}(157,178)(200,188.4)(243,178)
+\bezier{110}(143,122)(200,148.6)(257,122)
+\bezier{20}(137.4,187.9)(149.1,191.5)(159.7,188.8)
+\put(153.7,190.8){\vector(3,-1){6}}
+\put(150,180){\makebox(0,0){\(e_1\)}}
+\bezier{20}(262.6,187.9)(250.9,191.5)(240.3,188.8)
+\put(246.3,190.8){\vector(-3,-1){6}}
+\put(250,180){\makebox(0,0){\(e_2\)}}
+\end{picture}
+\caption[Reference System for a Sector Bending Magnet]%
+{Reference System for a Sector Bending Magnet;
+the signs of pole-face rotations are positive as shown.}
+\label{F-SBND}
+\end{figure}
 
 
-
-\subsection{Marker Elements}
-\href{marker.html}{MARKER} elements do not  affect the reference orbit. 
-They are ignored for geometry calculations.  
-
+%\subsection{Marker Elements}
+%\href{marker.html}{MARKER} elements do not affect the reference orbit. 
+%They are ignored for geometry calculations.  
 
 
 \section{Sign Conventions for Magnetic Fields}
 \label{sec:sign_convention}
-The MAD program uses the following Taylor expansion for the field on the
-mid-plane \textit{y}=0, described in
+The \madx program uses the following Taylor expansion for the field on the
+mid-plane $y=0$, described in
 \href{bibliography.html#slac75}{SLAC-75}:  
 \[
-B_{y}(x,0)=\sum_{n=0}^{\infty} \frac{B_n\,x^n}{n!}
+B_y(x,0)=\sum_{n=0}^{\infty} \frac{B_n\,x^n}{n!}
 \]
 Note the factorial in the denominator. 
 The field coefficients have the following meaning: 
@@ -520,7 +668,7 @@ coefficients are computed as
 
 \subsection{\href{canon}{Canonical Variables Describing Orbits}} 
 \label{subsec:tables_canon}
-MAD uses the following canonical variables to describe the motion of particles: 
+\madx uses the following canonical variables to describe the motion of particles: 
 \begin{madlist}
    \ttitem{X} Horizontal position $x$ of the (closed) orbit,
      referred to the ideal orbit [m].    
@@ -589,12 +737,13 @@ constant in order to keep the system canonical.
   $\phi_t = - atan ( p_{tn} / t_n ) / 2 \pi$, [1]
 \end{madlist} 
 
-In the above formulas \textit{Z} is the phase space vector
-\textit{Z = ( x, p$_x$, y, p$_y$, t, p$_t$)$^T$}, the vectors
-\textit{E$_i$} are the three complex eigenvectors and  
+In the above formulas \(Z\) is the phase space vector
+\[
+Z = \left(
+\begin{array}{l} x \\ p_x \\ y \\ p_y \\ t \\ p_t
+\end{array} \right),
+\]
 the matrix \textit{S} is the ``symplectic unit matrix'' 
-%%\includegraphics{../equations/S_matrix.gif}
-%S_matrix
 \[
 S =
  \begin{pmatrix}
@@ -606,25 +755,46 @@ S =
   0 & 0 & 0 & 0 & -1 & 0 \\
  \end{pmatrix}
 \]
+and the vectors \(E_i\) are the three complex eigenvectors.
+
+%% In the above formulas \textit{Z} is the phase space vector
+%% \textit{Z = ( x, p$_x$, y, p$_y$, t, p$_t$)$^T$}, the vectors
+%% \textit{E$_i$} are the three complex eigenvectors and  
+%% the matrix \textit{S} is the ``symplectic unit matrix'' 
+%% %%\includegraphics{../equations/S_matrix.gif}
+%% %S_matrix
+%% \[
+%% S =
+%%  \begin{pmatrix}
+%%   0 & 1 & 0 & 0 & 0 & 0 \\
+%%   -1 & 0 & 0 & 0 & 0 & 0 \\
+%%   0 & 0 & 0 & 1 & 0 & 0 \\
+%%   0 & 0 & -1 & 0 & 0 & 0 \\
+%%   0 & 0 & 0 & 0 & 0 & 1 \\
+%%   0 & 0 & 0 & 0 & -1 & 0 \\
+%%  \end{pmatrix}
+%% \]
 
 
 \subsection{\href{linear}{Linear Lattice Functions (Optical Functions)}} 
 \label{subsec:tables_linear}
-Several MAD commands refer to linear lattice functions. Since MAD uses
-the canonical momenta ($p_x$, $p_y$) instead of the slopes ($x'$, 
-$y'$), their definitions differ slightly from those in
-\href{bibliography.html#courant}{[Courant and Snyder]}.
+Several \madx commands refer to linear lattice functions. 
 
-Notice that in MAD-X, PT substitutes DELTAP as longitudinal
+Because \madx uses the canonical momenta ($p_x$, $p_y$) instead of the
+slopes ($x'$, $y'$), the definitions of the linear lattice functions
+differ slightly from those in \href{bibliography.html#courant}{[Courant
+    and Snyder]}. 
+
+Notice that in \madx, PT substitutes DELTAP as longitudinal
 variable. 
 Dispersive and chromatic functions are hence derivatives with
 respects to PT. 
 And since PT=BETA*DELTAP, where BETA is the relativistic Lorentz 
-factor, those functions given by MAD-X must be multiplied by BETA a
+factor, those functions given by \madx must be multiplied by BETA a
 number of time equal to the order of the derivative to find the
 functions given in the litterature. 
 
-The linear lattice functions are known to MAD-X under the following names:
+The linear lattice functions are known to \madx under the following names:
 \begin{madlist}
   \ttitem{BETX} Amplitude function $\beta_x$, [m].   
   \ttitem{ALFX} Correlation function 
@@ -653,22 +823,21 @@ The linear lattice functions are known to MAD-X under the following names:
 
 \subsection{\href{chrom}{Chromatic Functions}} 
 \label{subsec:tables_chrom}
-Several MAD commands refer to the chromatic functions. 
+Several \madx commands refer to the chromatic functions. 
 
-Because MAD-X uses the ($p_x$, $p_y$) coordinates
-instead of the slopes ($x'$, $y'$), the definition of the
-chromatic functions in MAD-X differ slightly from those in
-\href{bibliography.html#montague}{[Montague]}.  
+Because \madx uses the canonical momenta ($p_x$, $p_y$) instead of the
+slopes ($x'$, $y'$), the definitions of the chromatic functions differ
+slightly from those in \href{bibliography.html#montague}{[Montague]}.  
 
-Notice also that in MAD-X, PT substitutes DELTAP as longitudinal
+Notice also that in \madx, PT substitutes DELTAP as longitudinal
 variable. Dispersive and chromatic functions are hence derivatives with
 respects to PT. 
 And since PT=BETA*DELTAP, where BETA is the relativistic Lorentz 
-factor, those functions given by MAD-X must be multiplied by BETA a
+factor, those functions given by \madx must be multiplied by BETA a
 number of time equal to the order of the derivative to find the
 functions given in the litterature. 
 
-The chromatic functions are known to MAD-X under the following names:
+The chromatic functions are known to \madx under the following names:
 
 \begin{madlist}
   \ttitem{WX} Chromatic amplitude function $W_x = \sqrt{a_x^2 + b_x^2}$ ,
@@ -741,11 +910,11 @@ contains the following variables:
   \ttitem{SYNCH\_5} Fifth synchrotron radiation integral  
 \end{madlist} 
 
-Notice that in MAD-X, PT substitutes DELTAP as longitudinal
+Notice that in \madx, PT substitutes DELTAP as longitudinal
 variable. Dispersive and chromatic functions are hence derivatives with
 respects to PT.
 And since PT=BETA*DELTAP, where BETA is the relativistic Lorentz 
-factor, those functions given by MAD-X must be multiplied by BETA a
+factor, those functions given by \madx must be multiplied by BETA a
 number of time equal to the order of the derivative to find the
 functions given in the litterature. 
 
@@ -784,11 +953,11 @@ dependent expressions:
 
 \section{Physical Units}
 \label{sec:units}
-Throughout the computations MAD uses international units from the ``Syst\`eme
+Throughout the computations \madx uses international units from the ``Syst\`eme
 International'' (SI). These units are summarised in the
 \hyperlink{table}{Units table}.  
 \begin{table}[h]
-  \caption{Physical Units used by MAD}
+  \caption{Physical Units used by \madx}
   \begin{center}
     \index{length}
     \index{angle}

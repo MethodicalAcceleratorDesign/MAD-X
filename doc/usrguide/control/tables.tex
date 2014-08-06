@@ -43,7 +43,7 @@ then \hyperlink{write}{write} in TFS format.  See as well the
 \begin{verbatim}
 readtable, file = "file_name";
 \end{verbatim} 
-reads a TFS file containing a MAD-X table back into memory. This table
+reads a TFS file containing a \mad table back into memory. This table
 can then be manipulated as any other table, i.e. its values can be
 accessed, it can be plotted, written out again etc.  
 
@@ -52,7 +52,7 @@ accessed, it can be plotted, written out again etc.
 \begin{verbatim}
 readmytable, file = "file_name", table = internalname;
 \end{verbatim} 
-reads a TFS file containing a MAD-X table back into memory. This table
+reads a TFS file containing a \mad table back into memory. This table
 can then be manipulated as any other table, i.e. its values can be
 accessed, it can be plotted, written out again etc. 
 
@@ -191,7 +191,7 @@ element with name containing "abc" will not be saved.
 
 The elements, or a range of elements, in a sequence can be selected for
 various purposes. Such selections remain valid until cleared (in
-difference to MAD-8); it is therefore recommended to always start with a  
+difference to \madeight); it is therefore recommended to always start with a  
 
 \begin{verbatim}
 select, flag =..., clear;
@@ -233,13 +233,13 @@ but not elements with names containing "abc" since the class "variable"
 does not exist (astucieux, non ?).  
 
 SECTORMAP: A SELECT,FLAG=SECTORMAP statement causes sectormaps to be
-written into the file "sectormap" like in MAD-8. For the file to be
+written into the file "sectormap" like in \madeight. For the file to be
 written, a flag SECTORMAP must be issued on the TWISS command in
 addition.  
 
 TWISS: A SELECT,FLAG=TWISS statement causes the selected rows and
 columns to be written into the Twiss TFS file (former OPTICS command in
-MAD-8). The column selection is done on the same select. See as well
+\madeight). The column selection is done on the same select. See as well
 example 2.  
 
 %% Example 1:  
@@ -584,7 +584,7 @@ example 2.
 \label{sec:selection}
 The elements, or a range of elements, in a sequence can be selected for
 various purposes. Such selections remain valid until cleared (in
-difference to MAD-8); it is therefore recommended to always start with a  
+difference to \madeight); it is therefore recommended to always start with a  
 
 \begin{verbatim}
 select, flag =..., clear;
@@ -626,13 +626,13 @@ but not elements with names containing "abc" since the class "variable"
 does not exist (astucieux, non ?).  
 
 SECTORMAP: A SELECT,FLAG=SECTORMAP statement causes sectormaps to be
-written into the file "sectormap" like in MAD-8. For the file to be
+written into the file "sectormap" like in \madeight. For the file to be
 written, a flag SECTORMAP must be issued on the TWISS command in
 addition.  
 
 TWISS: A SELECT,FLAG=TWISS statement causes the selected rows and
 columns to be written into the Twiss TFS file (former OPTICS command in
-MAD-8). The column selection is done on the same select. See as well
+\madeight). The column selection is done on the same select. See as well
 example 2.  
 
 Example 1:  
@@ -752,7 +752,7 @@ var1 := sqrt(beam->ex*table(twiss,betx));
 in the case of table above being "twiss". The plot command accepts the
 new variables.  
 
-Remark: this replaces the "string" variables of MAD-8. 
+Remark: this replaces the "string" variables of \madeight. 
 
  This example demonstrates as well the usage of a user defined table \label{ucreate}. 
 \begin{verbatim}

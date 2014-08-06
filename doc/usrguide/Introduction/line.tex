@@ -6,12 +6,12 @@
 \chapter{Beam Lines}
 \label{chap:lines}
 
-The accelerator to be studied is known to MAD-X either as a sequence of
+The accelerator to be studied is known to \madx either as a sequence of
 physical elements called \href{sequence.html}{sequence}, or as a
 hierarchically structured list of elements called a \emph{beam line}. A
 beam line is built from simpler beam lines whose definitions can be
 nested to any level. A powerful syntax allows to repeat, to reflect, or
-to replace pieces of beam lines. However, internally MAD-X knows only
+to replace pieces of beam lines. However, internally \madx knows only
 sequences, and lines as shown below are converted into flat sequences
 with the same name when they are expanded. Consequently, only sequences
 can be SAVEd onto a file (see
@@ -44,7 +44,7 @@ Example:
 l:      line=(a,b,c,d,a,d);
         use,period=l;
 \end{verbatim} 
-The \href{../control/general.html#use}{USE} command tells MAD to perform
+The \href{../control/general.html#use}{USE} command tells \madx to perform
 all subsequent calculations on the sequence  
 \begin{verbatim}
 a,b,c,d,a,d
@@ -159,7 +159,7 @@ qf,d,sf1,d,b,d,qd,d,sd1,d,b,d
 \end{verbatim}
 
 \section{\href{Line_Depreciation}{Warning: Line Depreciation}} 
-MADX has been devolopped using sequences, in fact internally the code
+\madx has been developped using sequences, in fact internally the code
 works with sequences only. Consequently, there may exist some
 inconveniences when only lines are used. It is recommended to convert as
 soon as possible lines into sequences (by means of the save command) in
@@ -167,7 +167,7 @@ a design phase and to use only sequences for a finalised machine.
 
 \section{\href{Line_Limits}{ Limits of Construction of Lines}}  
 Since Lines are in fact depreciated there are some limits of how they
-can be constructed. Please find below a running MADX run which shows an
+can be constructed. Please find below a running \madx run which shows an
 example of OK (valid) and WRONG (invalid) cases.   
 
 \begin{verbatim}

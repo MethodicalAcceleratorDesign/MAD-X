@@ -1,26 +1,26 @@
 %%\title{Overview of MAD-X Tracking Modules}
 
-\chapter{Overview of MAD-X Tracking Modules}
+\chapter{Overview of \madx Tracking Modules}
 
 A number of particles with given initial conditions can be tracked
 through a beam-line or a ring. The particles can be tracked either for a
 single passage or for many turns.  
 
 
-While MAD-X [\hyperlink{F._Schmidt}{a}] is keeping most of the
-functionality of  its predecessor \href{http://cern.ch/mad8}{MAD-8}, the
-trajectory tracking in MAD-X is considerably modified comparing to
-MAD-8. 
-The reason is that in MAD8 the thick lens tracking is inherently not
+While \madx [\hyperlink{F._Schmidt}{a}] is keeping most of the
+functionality of  its predecessor \href{http://cern.ch/mad8}{\madeight}, the
+trajectory tracking in \madx is considerably modified comparing to
+\madeight. 
+The reason is that in \madeight the thick lens tracking is inherently not
 symplectic, which implies that the phase space volume is not preserved
 during the tracking, i.e. contrary to the real particle the tracked
 particle amplitude is either growing or decreasing. 
 
 
-The non-symplectic tracking as in MAD-8 has been completely excluded
-from MAD-X by taking out the thick lens part from the tracking
+The non-symplectic tracking as in \madeight has been completely excluded
+from \madx by taking out the thick lens part from the tracking
 modules. Instead two types of tracking modules (both symplectic) are
-implemented into MAD-X. 
+implemented into \madx. 
 
 
 The first part of this design decision is the thin-lens tracking module

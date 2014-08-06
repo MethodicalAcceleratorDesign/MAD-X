@@ -1,27 +1,30 @@
 \chapter{Beam Handling Statements} 
 \label{chap:beam}
 
-\section{BEAM}
-\label{sec:beam}
-Many commands in MAD-X require the setting of various quantities related
-to the beam in the machine. Therefore, MAD-X will stop with a fatal
+Many commands in \mad require the prior setting of various quantities related
+to the beam in the machine. Therefore, \mad will stop with a fatal
 error if an attempt is made to expand (USE) a sequence for which no BEAM
 command has been issued before.  
 
+
+
+\section{BEAM}
+\label{sec:beam}
+
 The quantities are entered by a BEAM command: 
-\begin{verbatim}
-BEAM, PARTICLE=name, MASS=real, CHARGE=real,
-      ENERGY=real, PC=real, GAMMA=real, BETA=real, BRHO=real,
-      EX=real, EXN=real, EY=real, EYN=real,
-      ET=real, SIGT=real, SIGE=real,
-      KBUNCH=integer, NPART=real, BCURRENT=real,
-      BUNCHED=logical, RADIATE=logical, BV=integer, SEQUENCE=name;
-\end{verbatim} 
+\madbox{
+BEAM, \= PARTICLE=string, MASS=real, CHARGE=real,\\
+      \> ENERGY=real, PC=real, GAMMA=real, BETA=real, BRHO=real,\\
+      \> EX=real, EXN=real, EY=real, EYN=real,\\
+      \> ET=real, SIGT=real, SIGE=real,\\
+      \> KBUNCH=integer, NPART=real, BCURRENT=real,\\
+      \> BUNCHED=logical, RADIATE=logical, BV=integer, SEQUENCE=string;
+}
 
 The attributes of the BEAM command are: 
 \begin{madlist}
   \ttitem{PARTICLE} The name of particles in the beam. Default= {\tt POSITRON}\\
-  MAD knows the restmass and the charge for the following particles:
+  \mad knows the restmass and the charge for the following particles:
   \begin{madlist}
     \ttitem{POSITRON} The particles are positrons (MASS=$m_e$, CHARGE=1)
     \ttitem{ELECTRON} The particles are electrons (MASS=$m_e$, CHARGE=-1) 
@@ -32,14 +35,14 @@ The attributes of the BEAM command are:
   \end{madlist}
   \ttitem{MASS} the restmass of the particles in the beam in GeV. \\
   (Default=$m_e \approx 0.511 10^{-3}$ GeV).\\
-  Note that a zero mass particle is not allowed in MAD-X.
+  Note that a zero mass particle is not allowed in \mad.
   \ttitem{CHARGE}\label{beam_charge} the electrical charge of the
   particles in the beam [$q_p$]. (Default=1) \\
-  Note that a zero charge particle is not allowed in MAD-X.
+  Note that a zero charge particle is not allowed in \mad.
 \end{madlist} 
 The order of precedence for arguments is:  {\tt particle->(mass+charge)}\\ 
 If the particle name given is recognized in the list above, the restmass
-and charge are set by MAD-X, and the MASS and CHARGE arguments are
+and charge are set by \mad, and the MASS and CHARGE arguments are
 simply ignored. For other particles, and in particular for ions, any
 combination of name, mass and charge can be entered independently.
 \\
@@ -115,7 +118,7 @@ $\eta = 1/\gamma^2 - 1/\gamma_t^2$.
   \ttitem{BV} an integer specifying the direction of the
   particle movement in a beam line; either +1 (default), or -1. For a
   detailed explanation see the section below on bv flag.  
-  \ttitem{SEQUENCE} attaches the beam command to a named sequence; if
+  \ttitem{SEQUENCE} attaches the defined beam to the named sequence; if
   the name is omitted, the BEAM command refers to the default beam
   which is always present. Sequences without attached beam use this
   default beam. When updating a beam with a corresponding sequence name,
@@ -125,14 +128,14 @@ $\eta = 1/\gamma^2 - 1/\gamma_t^2$.
 {\bf \underline{Order and Precedence:}}\\
 Internally the BEAM command processes the parameters in the following
 order and with the following precedence (left to right): 
-\begin{verbatim}
+\madxmp{
     particle -> (mass+charge)
     energy -> pc -> gamma -> beta -> brho
     ex -> exn
     ey -> eyn
     current -> npart
     et -> sigt -> sige
-\end{verbatim} 
+}
 
 
 {\bf Warning:} BEAM updates, i.e. it replaces attributes explicitely
@@ -143,7 +146,7 @@ the {\tt RESBEAM} command.
 
 
 {\bf \underline{Additional variables:}}\\ 
-Some MAD-X modules may also compute and store data into a beam data 
+Some \mad modules may also compute and store data into a beam data 
 block. These attributes may NOT be set directly through the BEAM
 command. The corresponding variables are:  
 \begin{madlist}
@@ -159,94 +162,86 @@ command. The corresponding variables are:
   \ttitem{N1MIN} minimum available aperture, set by the APERTURE module
 \end{madlist}
 
-
-{\bf \underline{Referring to BEAM data attributes:}}\\ 
-Expressions may refer to data in this beam data block using the
-notation  
-\begin{verbatim}
-BEAM->attribute-name
-\end{verbatim} 
-or 
-\begin{verbatim}
-BEAM%sequence-name->attribute-name.
-\end{verbatim} 
-
-This notation refers to the value of attribute-name found in the default
-BEAM, respectively the beam belonging to the sequence sequence-name. 
-This can be used for receiving or using values, e.g. 
-\begin{verbatim}
-value, beam%lhcb2->bv;
-\end{verbatim} 
-but also for storing values in the beam bank, e.g.  
-\begin{verbatim}
-beam->charge=-1;
-\end{verbatim} 
-Note however that this does NOT trigger an update of dependent variables
-and you are strongly advised against setting BEAM parameters with this method.
-
-The current values in the BEAM bank can be obtained by the command
-\begin{verbatim}
-show, beam;
-\end{verbatim}
-or to obtain the data for a beam linked to a named sequence:
-\begin{verbatim}
-show, beam%sequence-name;
-\end{verbatim}
-
-{\bf \underline{Examples:}}\\ 
-\begin{verbatim}
-! select electrons, set energy and emittances
-BEAM, PARTICLE = ELECTRON, ENERGY = 50, EX = 1.E-6, EY = 1.E-8, SIGE = 1.E-3;
- ...
-
-! turn on synchrotron radiation
-BEAM, RADIATE;
- ...
-
-! reset all values to their defaults, 
-! ie positrons, energy = 1GeV, default emittances, no radiation...
-RESBEAM;
- ...
-
-! select new emittances
-BEAM, EX = 2.E-5, EY = 3.E-7, SIGE = 4.E-3;
-\end{verbatim} 
-
-
 \section{RESBEAM}
 \label{sec:resbeam}
 
 The RESBEAM command resets the default values of the beam belonging to
 the specified sequence, or of the default beam if no sequence is given.  
 
-\begin{verbatim}
+\madbox{
 RESBEAM, SEQUENCE=string;
-\end{verbatim} 
+}
 
 The only argument to RESBEAM is a string for the sequence name.
 If the sequence name is omitted, the default beam is reset. 
 
 \begin{table}[h]
-  \caption{Default BEAM data}
+  \caption{Default Beam Data}
   \begin{center}
-     \begin{tabular}{|l|l|}
+     \begin{tabular}{|l|l|l|}
        \hline
-       Quantity                & Default \\
+       Attribute     &  Value    & Unit  \\
        \hline
-       PARTICLE      &  POSITRON \\
-       ENERGY        &  1 GeV \\
-       EX            &  1 rad.m \\
-       EY            &  1 rad.m \\
-       ET            &  1 rad.m \\
-       KBUNCH        &  1 \\
-       NPART         &  0 \\
-       BCURRENT      &  0 A \\
-       BUNCHED       &  .TRUE. \\
-       RADIATE       &  .FALSE. \\     
+       PARTICLE      &  POSITRON & \\
+       ENERGY        &  1        & GeV \\
+       EX            &  1        & rad.m \\
+       EY            &  1        & rad.m \\
+       ET            &  1        & rad.m \\
+       KBUNCH        &  1        & \\
+       NPART         &  0        & \\
+       BCURRENT      &  0        & A \\
+       BUNCHED       &  .TRUE.   & \\
+       RADIATE       &  .FALSE.  & \\     
        \hline
      \end{tabular}
   \end{center}
 \end{table}
+
+
+\section{Referring to BEAM data attributes}
+ 
+Expressions may refer to data in the beam data block using the
+notation  
+\madbox{
+BEAM->attribute-name
+}
+or 
+\madbox{
+BEAM\%sequence-name->attribute-name.
+}
+
+This notation refers to the value of attribute-name found in the default
+BEAM, respectively the beam belonging to the sequence sequence-name. 
+This can be used for receiving or using values, e.g. 
+\madxmp{value, beam\%lhcb2->bv;}
+but also for storing values in the beam bank, e.g.  
+\madxmp{beam->charge=-1;}
+Note however that this does NOT trigger an update of dependent variables
+and you are strongly advised against setting BEAM parameters with this method.
+
+The current values in the BEAM bank can be obtained by the command
+\madbox{show, beam;}
+or to obtain the data for a beam linked to a named sequence:
+\madbox{show, beam\%sequence-name;}
+
+
+{\bf \underline{Example:}} 
+\madxmp{
+! select electrons, set energy and emittances\\
+BEAM, PARTICLE=ELECTRON, ENERGY=50, EX=1.E-6, EY=1.E-8, SIGE=1.E-3;\\
+ ...\\
+! turn on synchrotron radiation\\
+BEAM, RADIATE;\\
+ ...\\
+! reset all values to their defaults, \\
+! ie positrons, energy = 1GeV, default emittances, no radiation...\\
+RESBEAM;\\
+ ...\\
+! select new emittances\\
+BEAM, EX=2.E-5, EY=3.E-7, SIGE=4.E-3;
+}
+
+
 
 
 
@@ -258,22 +253,22 @@ V \times \vec B$ changes sign. This is equivalent to flipping the field,
 but not the direction.  
 
 For practical reasons the properties of all elements of the LHC are
-defined in the {\tt MAD-X} input as if they apply to a clockwise proton beam
+defined in the \mad input as if they apply to a clockwise proton beam
 ("LHC beam 1"). This allows a single definition for elements traversed
 by both beams. Their effects on a beam with identical particle charge
 but running in the opposite direction ("LHC beam 2") must then be
 reversed inside the program.  
 
-In {\tt MAD-X} this may be taken into account by setting the value of
+In \mad this may be taken into account by setting the value of
 the BV attribute in the {\tt BEAM} commands. In the case of LHC beam 1
-(clockwise) and beam 2 (counter-clockwise), treated in {\tt MAD-X} both
-as clockwise proton beams, the Beam commands must look as follows:  
+(clockwise) and beam 2 (counter-clockwise), that are both treated in
+\mad as clockwise proton beams, the BEAM commands must look as follows:  
 
-\begin{verbatim}
-beam, sequence=lhcb1, particle=proton, pc=450, bv = +1;
+\madxmp{
+beam, sequence=lhcb1, particle=proton, pc=450, bv = +1;\\
+\\
+beam, sequence=lhcb2, particle=proton, pc=450, bv = -1;}
 
-beam, sequence=lhcb2, particle=proton, pc=450, bv = -1;
-\end{verbatim}
 
 %% EOF
 
