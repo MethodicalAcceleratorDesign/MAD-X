@@ -7,9 +7,8 @@ through a beam-line or a ring. The particles can be tracked either for a
 single passage or for many turns.  
 
 
-While \madx [\hyperlink{F._Schmidt}{a}] is keeping most of the
-functionality of  its predecessor \href{http://cern.ch/mad8}{\madeight}, the
-trajectory tracking in \madx is considerably modified comparing to
+While \madx keeps most of the functionality of \madeight, the
+trajectory tracking in \madx is considerably modified compared to
 \madeight. 
 The reason is that in \madeight the thick lens tracking is inherently not
 symplectic, which implies that the phase space volume is not preserved
@@ -28,23 +27,23 @@ The first part of this design decision is the thin-lens tracking module
 symplecticly through drifts and kicks and by replacing the end effects
 by their symplectic part in form of an additional kick on either  end of
 the element. This method demands a preliminary conversion of a sequence
-with thick elements into one composed entirely of thin elements (see the
+with thick elements into one composed of thin elements (see the
 \texttt{\href{../makethin/makethin.html}{MAKETHIN}} command). The
 details of its usage are given on the page
 "\href{../thintrack/thintrack.html}{thintrack}". 
 
 
 The second part of this design decision is to produce a thick lens
-tracking module based on the PTC code [\hyperlink{E._Forest}{b}] that
+tracking module based on the PTC code of E.~Forest that
 allows a symplectic treatment of all accelerator elements giving the
 user full control over the precision (number of steps and integration
 type) and exactness (full or extended Hamiltonian) of the results. 
 
 
 The first PTC thick-lens tracking module is named
-\href{../ptc_track/ptc_track.html}{ptc\_track}. It has the same features
-as the thin-lens tracking code
-(\texttt{\href{../thintrack/thintrack.html}{thintrack}}) except it
+\href{../ptc_track/ptc_track.html}{ptc\_track}. 
+It has the same features as the thin-lens tracking code
+(\texttt{\href{../thintrack/thintrack.html}{thintrack}}) except that it
 treats thick-lenses in a symplectic manner. 
 
 

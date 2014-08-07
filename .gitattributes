@@ -233,17 +233,11 @@ doc/usrguide/error/err1.ht -text
 doc/usrguide/error/error.html -text
 doc/usrguide/error/error.tex -text
 doc/usrguide/error/error_align.html -text
-doc/usrguide/error/error_align.tex -text
 doc/usrguide/error/error_field.html -text
-doc/usrguide/error/error_field.tex -text
 doc/usrguide/error/error_option.html -text
-doc/usrguide/error/error_option.tex -text
 doc/usrguide/error/error_print.html -text
-doc/usrguide/error/error_print.tex -text
 doc/usrguide/error/error_save.html -text
-doc/usrguide/error/error_save.tex -text
 doc/usrguide/error/errors.html -text
-doc/usrguide/error/errors.tex -text
 doc/usrguide/error/monitor_read.gif -text
 doc/usrguide/error/xs_align.gif -text
 doc/usrguide/error/ys_align.gif -text

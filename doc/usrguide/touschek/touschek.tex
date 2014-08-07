@@ -10,18 +10,25 @@ Piwinski, "The Touschek Effect in Strong Focusing Storage Rings," DESY-98-179;
 see also Piwinski's article on Touschek lifetime in the Handbook of Accelerator 
 Physics and Engineering (A. Chao, M. Tigner, eds.), World Scientific, 1999] .
 
-The syntax of the TOUSCHEK command is: 
-\begin{verbatim}
-TOUSCHEK, TOLERANCE=real, FILE=file_name;
-\end{verbatim}
+The syntax of the \texttt{TOUSCHEK} command is: 
+\madbox{
+TOUSCHEK, TOLERANCE=real, FILE=filename;
+}
 
-TOUSCHEK should be called after fully qualified BEAM command and a TWISS
+The arguments have the following meaning: 
+\begin{madlist}
+   \ttitem{TOLERANCE} the tolerance for the numerical integrator
+   DGAUSS. (Default:~1.e-7) 
+   \ttitem{FILE} The name of the output file (Default:~'touschek') 
+\end{madlist}
+
+\texttt{TOUSCHEK} should only be called after fully qualified BEAM command and a TWISS
 command. One or several cavities with rf voltages should be defined
 prior to calling TWISS and TOUSCHEK. 
 
 {\bf Warning:} Calling EMIT between the TWISS and TOUSCHEK commands
 leads to TOUSCHEK using wrong beam parameters, even if the BEAM command
-is reiterated.] 
+is reiterated. 
  
 The momentum acceptance is taken from the bucket size taking into
 account the  energy loss per turn \textit{U0} from synchrotron
@@ -29,37 +36,30 @@ radiation. The value of \textit{U0} is computed from the second
 synchrotron radiation integral \textit{synch\_2} in the TWISS summ table
 (\textit{synch\_2} is calculated only when the TWISS option 'chrom' is
 invoked), using Eq. (3.61) in Matt Sands' report SLAC-121, which was
-generalized to the case of several harmonic rf systems. If
-\textit{synch\_2} is zero, not defined or not calculated, zero energy loss is
-assumed. In the case of several rf systems with nonzero voltages, it is
-assumed that the lowest frequency system defines the phase of the outer
-point on the separatrix when calculating the momentum acceptance, and
-that all higher-harmonic systems are either in phase or in anti-phase to
-the lowest frequency system. (Note: if a storage rings really uses a
-different rf scheme, one would need to change the acceptance function in
-the routine \textit{cavtousch0} for that ring.) 
+generalized to the case of several harmonic rf systems. 
+If \textit{synch\_2} is zero, not defined or not calculated, zero energy
+loss is assumed. In the case of several rf systems with nonzero
+voltages, it is assumed that the lowest frequency system defines the
+phase of the outer point on the separatrix when calculating the momentum
+acceptance, and that all higher-harmonic systems are either in phase or
+in anti-phase to the lowest frequency system. (Note: if a storage rings
+really uses a different rf scheme, one would need to change the
+acceptance function in the routine \textit{cavtousch0} for that ring.) 
 
-The arguments have the following meaning: 
-\begin{itemize}
-   \item TOLERANCE=real: the tolerance for the numerical integrator DGAUSS. (default 1.e-7)
-   \item FILE=file\_name: The name of the output file (default: 'touschek') 
-\end{itemize}
 
 Example: 
-\begin{verbatim}
-BEAM, PARTICLE = PROTON, ENERGY = 450, NPART = 1.15e11, 
-      EX = 7.82E-9, EY = 7.82E-9, ET = 5.302e-5;      
-...
-USE, PERIOD = LHCb1;	
-... 	
-VRF = 400;
-...
-SELECT, FLAG = TWISS, CLEAR;
-TWISS, CHROM, TABLE, FILE;
-...
+\madxmp{
+BEAM, \=PARTICLE = PROTON, ENERGY = 450, NPART = 1.15e11, \\
+      \>EX = 7.82E-9, EY = 7.82E-9, ET = 5.302e-5; \\
+USE, PERIOD = LHCb1; \\
+\ldots \\ 	
+VRF = 400; \\
+\ldots \\
+SELECT, FLAG = TWISS, CLEAR; \\
+TWISS, CHROM, TABLE, FILE; \\
+\ldots \\
 TOUSCHEK, FILE, TOLERANCE=1.e-8;
-...
-\end{verbatim}
+}
 
 The first command defines the beam parameters. It is essential that the
 longitudinal emittance is set. The command
@@ -73,10 +73,10 @@ Touschek lifetime and writes it to the file 'touschek' (default name).
 The results are stored in the \textit{TOUSCHEK} tables, and can be written to a 
 file (with the default name 'touschek' in the example above), or values can be 
 extracted from the table using the value command as follows 
-\begin{verbatim}
-value, table(touschek,name), table(touschek,s), table(touschek,tli),
-       table(touschek,tliw), table(touschek,tlitot); 
-\end{verbatim}
+\madxmp{
+VALUE, \=table(touschek,name), table(touschek,s), table(touschek,tli),\\
+       \>table(touschek,tliw), table(touschek,tlitot); 
+}
 
 where 'name' denotes the name of a beamline element, \textit{S} the
 position of the center of the element, \textit{TLI} the instanteneous
@@ -89,9 +89,7 @@ the end of the beamline is the inverse of the Touschek lifetime in units
 of 1/s. 
 
 All results can also be printed to a file using the command 
-\begin{verbatim}
-write, table = touschek, file;
-\end{verbatim}
+\madxmp{WRITE, TABLE=touschek, FILE;}
 
 The \madx Touschek module was developed by
 \href{mailto:catia.milardi@lnf.infn.it}{Catia Milardi} and 
@@ -140,20 +138,16 @@ parameters at the end of the element or at the centre (CENTRE option of
 TWISS).  
 
 In the first case (calculation at the end of the element, CENTRE=false), 
-the inverse Touschek lifetime is calculated at the end of each element. 
-The weighted contribution of element <i>i</i> to the total inverse
+the inverse Touschek lifetime (TLI) is calculated at the end of each
+element. The weighted contribution of element $i$ to the total inverse
 Touschek lifetime is then given by 
-\begin{verbatim}
-TLIW[i] = 0.5 * (TLI[i] + TLI[i-1]) * L[i] / CIRC
-\end{verbatim}
+\madxmp{TLIW[i] = 0.5 * (TLI[i] + TLI[i-1]) * L[i] / CIRC}
 
 In the second case (calculation at the center of the element,
-CENTRE=true), the inverse Touschek lifetime is also calculated at the
-center of each element. The weighted contribution of element <i>i</i> to
+CENTRE=true), the inverse Touschek lifetime (TLI) is also calculated at
+the center of each element. The weighted contribution of element $i$ to
 the total inverse Touschek lifetime is then given by 
-\begin{verbatim}
-TLIW[i] = TLI[i] * L[i] / CIRC </PRE>
-\end{verbatim}
+\madxmp{TLIW[i] = TLI[i] * L[i] / CIRC}
 
 Another bug that was uncovered in the original algorithm was that the
 vertical dispersion was wrongly taken into account and mostly ignored:

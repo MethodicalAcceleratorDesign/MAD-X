@@ -40,7 +40,7 @@
 % survey/survey_mad8,           %SURVEY_MAD8
   Introduction/aperture,        %APERTURE: defining and calculating apertures 
   makethin/makethin,		%MAKETHIN: Conversion to Thin Lens
-  dynap/dynap,			%DYNAP: Dynamic Aperture
+% dynap/dynap,			%DYNAP: Dynamic Aperture % Now included in thintrack.tex
   emit/emit,			%EMIT
   error/error,			%ERRORS
 % error/errors,                 !! redundant with error.tex !!!
@@ -150,6 +150,7 @@
  
 % automatic indexing of keywords:
 \def\ttitem#1{\item[{\tt #1}]\index{#1@{\tt #1}}}
+\def\ttitemn#1{\item[{\tt #1}]}
 \def\ttindex#1{{\tt #1}\index{#1@{\tt #1}}}
 \def\ttnindex#1{\index{#1@{\tt #1}}}
  
@@ -265,7 +266,7 @@
 %\include{survey/survey_mad8}
 \include{Introduction/aperture}	        %APERTURE: defining and calculating apertures 
 \include{makethin/makethin}		%MAKETHIN: Conversion to Thin Lens
-\include{dynap/dynap}			%DYNAP: Dynamic Aperture
+%\include{dynap/dynap}			%DYNAP: Dynamic Aperture %% Now included in thintrack.tex
 \include{emit/emit}			%EMIT
 \include{error/error}			%ERRORS
 % \include{error/errors}                !! redundant with error.tex !!!
