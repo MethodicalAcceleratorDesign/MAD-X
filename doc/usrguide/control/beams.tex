@@ -177,21 +177,22 @@ If the sequence name is omitted, the default beam is reset.
 
 \begin{table}[h]
   \caption{Default Beam Data}
+  \vspace{1ex}
   \begin{center}
      \begin{tabular}{|l|l|l|}
        \hline
-       Attribute     &  Value    & Unit  \\
+       {\bf Attribute}   &  {\bf Value} & {\bf Unit}  \\
        \hline
-       PARTICLE      &  POSITRON & \\
-       ENERGY        &  1        & GeV \\
-       EX            &  1        & rad.m \\
-       EY            &  1        & rad.m \\
-       ET            &  1        & rad.m \\
-       KBUNCH        &  1        & \\
-       NPART         &  0        & \\
-       BCURRENT      &  0        & A \\
-       BUNCHED       &  .TRUE.   & \\
-       RADIATE       &  .FALSE.  & \\     
+       \texttt{PARTICLE} &  \texttt{POSITRON} & \\
+       \texttt{ENERGY}   &  1           & GeV \\
+       \texttt{EX}       &  1           & rad.m \\
+       \texttt{EY}       &  1           & rad.m \\
+       \texttt{ET}       &  1           & rad.m \\
+       \texttt{KBUNCH}   &  1           & \\
+       \texttt{NPART}    &  0           & \\
+       \texttt{BCURRENT} &  0           & A \\
+       \texttt{BUNCHED}  &  \texttt{TRUE}  & \\
+       \texttt{RADIATE}  &  \texttt{FALSE} & \\     
        \hline
      \end{tabular}
   \end{center}
@@ -220,9 +221,9 @@ Note however that this does NOT trigger an update of dependent variables
 and you are strongly advised against setting BEAM parameters with this method.
 
 The current values in the BEAM bank can be obtained by the command
-\madbox{show, beam;}
+\madbox{SHOW, BEAM;}
 or to obtain the data for a beam linked to a named sequence:
-\madbox{show, beam\%sequence-name;}
+\madbox{SHOW, BEAM\%sequence-name;}
 
 
 {\bf \underline{Example:}} 
@@ -265,9 +266,9 @@ the BV attribute in the {\tt BEAM} commands. In the case of LHC beam 1
 \mad as clockwise proton beams, the BEAM commands must look as follows:  
 
 \madxmp{
-beam, sequence=lhcb1, particle=proton, pc=450, bv = +1;\\
+BEAM, SEQUENCE=lhcb1, PARTICLE=proton, PC=450, BV = +1;\\
 \\
-beam, sequence=lhcb2, particle=proton, pc=450, bv = -1;}
+BEAM, SEQUENCE=lhcb2, PARTICLE=proton, PC=450, BV = -1;}
 
 
 %% EOF

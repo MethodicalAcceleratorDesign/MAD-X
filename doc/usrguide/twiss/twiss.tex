@@ -292,13 +292,36 @@ overwritten by explicitly stated lattice parameters. As entered, the
 initial conditions cannot depend on DELTAP, and can thus be correct only
 for one such value.  
 
-\section{Tolerance}
+%% \section{Tolerance}
 
-This value defines the maximum closed orbit error of all six orbit
-components during the closed orbit search. The default value is
-1.e-6. The value is only valid for the current twiss command; a
-permanent value can be entered via the
-\href{../control/general.html#coguess}{COGUESS} command.  
+%% This value defines the maximum closed orbit error of all six orbit
+%% components during the closed orbit search. The default value is
+%% 1.e-6. The value is only valid for the current twiss command; a
+%% permanent value can be entered via the
+%% \href{../control/general.html#coguess}{COGUESS} command.  
+
+\section{SAVEBETA}
+\label{sec:savebeta}
+\madbox{
+savebeta, label = label, place = place, sequence = sequence\_name;
+}
+marks a place named "place" in an expanded sequence "sequence\_name"; 
+at the next TWISS command execution, a
+\href{../twiss/twiss.html#beta0}{beta0} 
+block will be saved at that place with the label "label". This is done
+only once; in order to get a new beta0 block there, one has to re-issue
+the command. The contents of the beta0 block can then be used in other
+commands, e.g. TWISS and MATCH.  
+
+Example (after sequence expansion): 
+\madxmp{
+savebeta, label = sb1, place = mb[5], sequence = fivecell; \\
+twiss; \\
+show, sb1;
+}
+will save and show the beta0 block parameters at the end (!) of the
+fifth element of type mb in the sequence.  
+
 
 \section{SAVEBETA: Save Lattice Parameters}
 
@@ -580,5 +603,51 @@ is applied. \\ Defaults: 0.005, 0.005
 The attenuation factor defines the fraction of the calculated kick that
 is actually applied by the threader.  
 An attenuation factor of 0.5 will apply 50\% of the calculated kicks.
+
+\section{Closed Orbit Guess}
+\label{subsec:coguess}
+
+In order to help the initial finding of the closed orbit by the
+\texttt{TWISS} module, it is possible to specify an initial guess for
+the coordinates of the fixed point at the start of the lattice.
+
+\madbox{
+COGUESS, \=X=real, PX=real, Y=real, PY=real, T=real, PT=real, \\
+         \>TOLERANCE=real, \\
+         \>CLEAR=logical;
+}
+
+The COGUESS command has the following attributes:
+\begin{madlist}
+  \ttitem{X, PX, Y, PY, T, PT} each parameter specified defines a first guess for all future closed orbit
+  searches in case they are different from zero.  
+  
+  \ttitem{TOLERANCE} sets the required convergence precision in the closed
+  orbit search. \\ (Default: 1.e-6)  
+  
+  \ttitem{CLEAR} a flag to reset the tolerance to its default value and to
+  cancel the effect of a previous \texttt{COGUESS} in defining a first
+  guess for subsequent closed orbit searches. \\ (Default:~false) 
+
+\end{madlist}
+
+
+\textbf{Example}\\
+\madxmp{
+COGUESS, X=1.e-3; \\
+... \\
+TWISS; \\
+... \\
+COGUESS, Y=-2.e-3; \\
+... \\
+TWISS; \\
+... \\
+COGUESS, CLEAR; \\
+... \\
+TWISS; \\
+... \\
+}
+
+
 
 %% EOF

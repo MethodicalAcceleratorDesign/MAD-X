@@ -2,13 +2,12 @@
 %  Changed by: Frank Zimmermann, 18-Jun-2002  
 %  2013-Nov-29  15:32:13  ghislain: update of documentation following extensive changes in the code
 
-\chapter{TOUSCHEK: Touschek Lifetime and Scattering Rates}
+\chapter{Touschek Lifetime and Scattering Rates}
 
-The TOUSCHEK module computes the Touschek lifetime and the scattering rates 
-around a lepton or hadron storage ring, based on the formalism of Piwinski [A. 
-Piwinski, "The Touschek Effect in Strong Focusing Storage Rings," DESY-98-179; 
-see also Piwinski's article on Touschek lifetime in the Handbook of Accelerator 
-Physics and Engineering (A. Chao, M. Tigner, eds.), World Scientific, 1999] .
+The TOUSCHEK module computes the Touschek lifetime and the scattering
+rates around a lepton or hadron storage ring, based on the formalism of
+Piwinski in \cite{Piwinski1998} and his article on Touschek lifetime in
+\cite{chaotigner1999}.
 
 The syntax of the \texttt{TOUSCHEK} command is: 
 \madbox{
@@ -22,20 +21,20 @@ The arguments have the following meaning:
    \ttitem{FILE} The name of the output file (Default:~'touschek') 
 \end{madlist}
 
-\texttt{TOUSCHEK} should only be called after fully qualified BEAM command and a TWISS
-command. One or several cavities with rf voltages should be defined
-prior to calling TWISS and TOUSCHEK. 
+\texttt{TOUSCHEK} should only be called after fully qualified BEAM
+command and a TWISS command. One or several cavities with rf voltages
+should be defined prior to calling TWISS and TOUSCHEK. 
 
 {\bf Warning:} Calling EMIT between the TWISS and TOUSCHEK commands
 leads to TOUSCHEK using wrong beam parameters, even if the BEAM command
-is reiterated. 
+is reiterated.  
  
 The momentum acceptance is taken from the bucket size taking into
 account the  energy loss per turn \textit{U0} from synchrotron
 radiation. The value of \textit{U0} is computed from the second
 synchrotron radiation integral \textit{synch\_2} in the TWISS summ table
 (\textit{synch\_2} is calculated only when the TWISS option 'chrom' is
-invoked), using Eq. (3.61) in Matt Sands' report SLAC-121, which was
+invoked), using Eq. (3.61) in \cite{sands1970}, which was
 generalized to the case of several harmonic rf systems. 
 If \textit{synch\_2} is zero, not defined or not calculated, zero energy
 loss is assumed. In the case of several rf systems with nonzero
@@ -70,23 +69,24 @@ a value to the cavity rf voltage vrf  (example name). The
 for all elements in the ring; the \textit{TOUSCHEK} command computes the
 Touschek lifetime and writes it to the file 'touschek' (default name).   
 
-The results are stored in the \textit{TOUSCHEK} tables, and can be written to a 
-file (with the default name 'touschek' in the example above), or values can be 
-extracted from the table using the value command as follows 
+The results are stored in the \textit{TOUSCHEK} tables, and can be
+written to a file (with the default name 'touschek' in the example
+above), or values can be extracted from the table using the value
+command as follows  
 \madxmp{
 VALUE, \=table(touschek,name), table(touschek,s), table(touschek,tli),\\
        \>table(touschek,tliw), table(touschek,tlitot); 
 }
 
 where 'name' denotes the name of a beamline element, \textit{S} the
-position of the center of the element, \textit{TLI} the instanteneous
+position of the center of the element, \textit{TLI} the instantaneous
 Touschek loss rate within the element, and \textit{TLIW} the
 instantaneous rate weighted by the length of the element divided by the
 circumference (its contribution to the total loss rate), and
-\textit{TLITOT} the accumulated loss rate adding the rates over all beamline
-elements through the present position. The value of \textit{TLITOT} at
-the end of the beamline is the inverse of the Touschek lifetime in units
-of 1/s. 
+\textit{TLITOT} the accumulated loss rate adding the rates over all
+beamline elements through the present position. The value of
+\textit{TLITOT} at the end of the beamline is the inverse of the
+Touschek lifetime in units of 1/s. 
 
 All results can also be printed to a file using the command 
 \madxmp{WRITE, TABLE=touschek, FILE;}
@@ -100,8 +100,7 @@ The \madx Touschek module was partially rewritten in November 2013 by
 after the discovery of a few bugs in the original code:
 
 The first bug concerned a numerical instability in the computation of
-the B2 parameter as listed in Eq. 34 in the paper of Piwinski referred
-above.  
+the B2 parameter as listed in Eq. 34 in \cite{Piwinski1998}.
 
 The initial alogorithm implemented the calculation of square root of the
 difference between two expressions. It turned out that the numerical

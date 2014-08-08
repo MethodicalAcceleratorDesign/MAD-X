@@ -2,7 +2,10 @@
 % * revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
 % * with significant contributions from:
 %   Jens Lippmann, Marek Rouchal, Martin Wilck and others 
-%%\title{ibs}
+
+%Edited:
+% Frank Schmidt 2003-05-23 
+% Ghislain Roy 2014-08-07
 
 
 \chapter{Intra-Beam Scattering}
@@ -12,14 +15,13 @@ The Intra-Beam Scattering command computes the contribution to emittance
 growth rates due to Coulomb scattering of particles within relativistic
 beams. The algorithms in this module have been derived from the formalism
 presented in 1982 by J.D.~Bjorken and S.K.~Mtingwa
-[\href{../Introduction/bibliography.html#bm1}{Bjorken and Mtingwa}], 
-and are also using the expansion of M. Conte and M. Martini
-[\href{../Introduction/bibliography.html#conte}{Conte and Martini}]
-developped in 1985,  generalized to the case of nonzero vertical
-dispersion.  
+\cite{bjorken_mtingwa1982}, and are also using the expansion of M.~Conte
+and M.~Martini \cite{conte_martini1985} developped in 1985, generalized
+to the case of nonzero vertical dispersion.  
 
 The present implementation of the IBS module in \madx is described in a
-forthcoming note  [Antoniou and Zimmermann] (2012).   
+forthcoming note  \cite{antoniou_zimmermann2012}.
+
 
 The syntax of the \texttt{IBS} command is:
 \madbox{
@@ -158,10 +160,9 @@ The two examples provided for the module Intra-Beam Scattering
 illustrate the commands required to run the module. The two examples
 have been selected such as to highlight the differences between a
 computation for protons and that for ions. Both examples compute the IBS
-growth times at injection into the LHC. The examples are located
-\href{http://madx.web.cern.ch/madx/madX/examples/ibs/}{here}.
+growth times at injection into the LHC.\\
+ The examples are located at
+\href{http://madx.web.cern.ch/madx/madX/examples/ibs/}{http://madx.web.cern.ch/madx/madX/examples/ibs/}. 
 
-% Frank Schmidt 2003-05-23 
-% Ghislain Roy 2014-08-07
 
 %% EOF

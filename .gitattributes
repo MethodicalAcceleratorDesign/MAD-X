@@ -69,6 +69,7 @@ doc/usrguide/Introduction/beambeam.html -text
 doc/usrguide/Introduction/beambeam_n_hollowparabol.jpg -text
 doc/usrguide/Introduction/beambeam_n_trapez.jpg -text
 doc/usrguide/Introduction/bend.html -text
+doc/usrguide/Introduction/biblio-mad.bib -text
 doc/usrguide/Introduction/bibliography.html -text
 doc/usrguide/Introduction/bibliography.tex -text
 doc/usrguide/Introduction/bv_flag.html -text
@@ -81,6 +82,7 @@ doc/usrguide/Introduction/conventions.html -text
 doc/usrguide/Introduction/conventions.tex -text
 doc/usrguide/Introduction/copyright.html -text
 doc/usrguide/Introduction/copyright.tex -text
+doc/usrguide/Introduction/coverpage.tex -text
 doc/usrguide/Introduction/crabcavity.html -text
 doc/usrguide/Introduction/declarations.html -text
 doc/usrguide/Introduction/declarations.tex -text

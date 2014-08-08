@@ -12,9 +12,14 @@ parameter-name = \= expression; \\
 parameter-name := \> expression;
 }
 The first form evaluates the expression on the right immediately and
-assigns its value to the parameter. The second form assigns the value by
-evaluating  the expression on the right every time the parameter is actually
-used. This holds as well for element parameters. 
+assigns its value to the parameter. It is an immediate assignment.
+
+The second form assigns the value by evaluating  the expression on the
+right every time the parameter is actually used. It is a deferred
+assignment.  
+
+This mechanism holds as well for element parameters that can be defined
+with either immediate or deferred assignments.
 
 Attention! If you want
 to modify e.g. the strength of a quadrupole later (e.g. in a match,  or
@@ -26,26 +31,31 @@ and not
 In the latter case, K1 will be set to the current value of ak1 at the
 time of declaration, and will not change when ak1 later changes.  
 
-Parameters not yet defined have a zero value.
+Parameters that have not yet been defined at time of evaluation have a
+zero value. 
 
 Example: 
 \madxmp{
 gev = 100; \\
 BEAM, ENERGY=gev;
 }
-the parameter on the left may appear on the right as well: 
+
+The parameter on the left may appear on the right as well in the
+computer science form of assignments: 
 \madxmp{x = x+1;}
-increases the value of x by 1. As a result, the SET statement of
-\madeight is no longer necessary and is not implemented in \madx.  
+increases the value of x by 1. \\
+As a result, the SET statement of \madeight is no longer necessary and
+is not implemented in \madx.   
 
 
-Circular definitions are allowed in the first form of relations
+Successive definitions are allowed in the first form of relations or 
+immediate assignments:
 \madxmp{
 a = b + 2; \\
 b = a * b;
 }
-However, circular definitions in the second form or relations are
-forbidden: 
+But circular definitions in the second form of relations, or
+deferred assignments, are forbidden: 
 \madxmp{
 a := b + 2; \\
 b := a * b;
@@ -54,12 +64,11 @@ will result in an error.
 
 
 \section{\href{par_output}{VALUE: Output of Parameters}}
-The VALUE statement
+The VALUE statement evaluates the current value of all listed expressions, and
+prints the result on the standard output file.
 \madbox{
 VALUE = expression {, expression2};
 }
-evaluates the current value of all listed expressions, and
-prints the result on the standard output file.
 
 Example:
 \madxmp{
