@@ -2,36 +2,33 @@
 %  Changed by: Chris ISELIN, 27-Jan-1997 
 %  Changed by: Hans Grote, 30-Sep-2002 
 
-\chapter{Beam Line Sequences}
+\chapter{Sequences}
 \label{chap:sequence}
+
 \madx accepts two forms of an accelerator definition: sequences and
-\href{line.html}{lines}. However, the sequence definition is the only
-one used internally; lines are converted into sequences when they are
-USEd. Consequently, only sequences can be saved (written onto a file)
-by \madx.  
+beam lines (See \ref{chap:beamlines}). However, the sequence definition is the only
+one used internally by \madx.
 
-The corresponding sequence of statements defining a sequence is 
-\begin{verbatim}
-name: SEQUENCE, L=real, AT=real, FROM=string, REFER=string, REFPOS=string, 
-                ADD_PASS=integer, NEXT_SEQU=string;
-   ...
-   label: class, AT=real{, additonal attributes}; 
-   class, AT=real;
-   sequ_name, AT=real;
-   ...
+A sequence is declared with the following statements:
+\madbox{
+name: \=SEQUENCE, \=L=real, REFER=string, REFPOS=string, \\
+      \>          \>ADD\_PASS=integer, NEXT\_SEQU=string; \\
+      \>\dots \\ 
+xxxxxx\=xxxxxxx\=xxxxxxxx\= \kill
+%      \>label: \>       \>AT=real, FROM=string \{, additional attributes\}; \\
+      \>label: \>class, \>AT=real, FROM=string \{, additional attributes\}; \\
+      \>       \>class, \>AT=real, FROM=string \{, additional attributes\}; \\
+      \>seqname, \>     \>AT=real, FROM=string; \\
+      \>\ldots \\
 ENDSEQUENCE;
-\end{verbatim} 
-where "real" means a real number, variable, or expression. 
+}
 
-The first line declares a sequence with the given name and provides key 
-parameters:
+The first statement declares a sequence, giving it a name in the form of
+a label, and providing some key parameters: 
+
 \begin{madlist}
    \ttitem{L}{\tt = real} (Default: {\tt 0.})\\
      the total length of the sequence in meters. 
-   \ttitem{AT}{\tt = real} (Default: 0)\\
-     ???
-   \ttitem{FROM}{\tt = string} (Default: {\tt none})\\
-     ???
    \ttitem{REFER}{\tt = keyword} in {\tt \{entry, centre, exit\}} (Default:
           {\tt centre}) \\
      specifies which part of the element is taken as the reference point 
@@ -50,35 +47,52 @@ parameters:
      to the end of this sequence. 
 \end{madlist}
  
-Inside the {\tt sequence} \ldots {\tt endsequence} bracketing keywords,
-three types of commands may appear:  
+The \texttt{ENDSEQUENCE} statement terminates the declaration of a
+sequence. 
+
+Inside the \texttt{SEQUENCE \ldots ENDSEQUENCE} bracketing keywords,
+several types of statements may appear:  
 \begin{itemize}
-  \item label: class, AT=real, FROM=string \{, attributes\} ;\\
-    an element declaration as usual, with additional {\tt AT}
-    attribute giving the element position relative to the start of the
-    sequence, and an optional {\tt FROM} attribute; \\
-    CAUTION: an existing definition for an element with the
-    same name will be replaced, however, defining the same element
-    twice inside the same sequence results in a fatal error, since a
-    unique object (this element) would be placed at two different
-    positions. 
-  \item class, AT=real, FROM=string ;\\
-    a class name with a position and optionally a reference position; 
-    this causes an instance of the class to be placed at the position
-    given. For uses inside ranges, instances of the same class can be
-    accessed with an occurrence count.  
-  \item sequ\_name, AT=real, FROM=string ;\\
-    a sequence name with a position and optionally a reference position; 
-    this causes the sequence with that name (inserted sequence) to be
-    placed at the position relative to the start of the current
-    containing sequence. \\ 
-    Depending upon the {\tt REFER} attribute of the current (containing)
-    sequence, the entry, centre, or exit of the inserted sequence is
-    placed at the position specified. \\
-    HOWEVER, if the inserted sequence has a {\tt REFPOS} attribute containing
-    the name of an element in the inserted sequence, the inserted sequence
-    is placed such that the element pointed to by REFPOS is at the location
-    specified in the current sequence.
+%% pending check...
+%% \item An element already declared:
+%%   \madbox{label: AT=real, FROM=string \{, attributes\} ;}
+%%   where label is an already declared element, with additional \texttt{AT}
+%%   attribute giving the relative element position, and an optional
+%%   \texttt{FROM} attribute;   
+
+\item An element declaration with label: 
+  \madbox{label: class, AT=real, FROM=string \{, attributes\} ;}
+  an element declaration as usual, with additional \texttt{AT}
+  attribute giving the relative element position, and an optional
+  \texttt{FROM} attribute; \\ 
+  {\bf CAUTION:} an existing definition for an element with the
+  same name (label) will be replaced, however, defining the same
+  element twice inside the same sequence results in a fatal error,
+  since a unique object (this element) would be placed at two
+  different positions.  
+
+\item An element declaration from class: 
+  \madbox{class, AT=real, FROM=string \{, attributes\} ;;}
+  a class name causing an instance of that class to be created with
+  specified attributes, with additional \texttt{AT} attribute giving the
+  relative element position, and an optional \texttt{FROM} attribute;\\
+  For uses inside ranges, instances of the same class can then be
+  accessed with an occurrence count.  
+
+\item A sub-sequence name:
+  \madbox{seqname, AT=real, FROM=string ;}
+  a sequence name with additional \texttt{AT} attribute giving the
+  relative element position, and an optional \texttt{FROM} attribute;\\ 
+  %this causes the sequence with that name (inserted sequence) to be
+  %placed at the position relative to the start of the current
+  %containing sequence. \\ 
+  Depending upon the {\tt REFER} attribute of the current (containing)
+  sequence, the \texttt{entry}, \texttt{centre}, or \texttt{exit} of
+  the inserted sequence is placed at the position specified. \\
+  HOWEVER, if the inserted sequence has a {\tt REFPOS} attribute containing
+  the name of an element in the inserted sequence, the inserted sequence
+  is placed such that the element pointed to by REFPOS is at the location
+  specified in the current sequence.
 \end{itemize} 
 
 
@@ -86,10 +100,11 @@ The additional arguments that can be given in the declaration of sequence
 elements or sub-sequences are: 
 \begin{madlist}
   \ttitem{AT}{\tt = real} mandatory argument giving the location at
-  which the reference point (entry, centre or exit) of the element is to
-  be placed on the beamline. \\  
+  which the reference point (\texttt{entry, centre} or \texttt{exit}) of
+  the element is to be placed in the sequence. \\  
   The value is absolute with the zero reference at the start of the
   sequence, unless a {\tt FROM} argument is specified. 
+
   \ttitem{FROM}{\tt = name}: optional argument giving the name of an
   element of the same sequence. \\  
   The location given for the current element or sequence in the {\tt AT}
@@ -100,9 +115,9 @@ elements or sub-sequences are:
 \end{madlist}
 
 
-When the sequence is expanded in a
-\href{../control/general.html#use}{USE}\index{USE} command, \madx
-generates the missing drift spaces according to the following rules:
+When the sequence is expanded in a \texttt{USE} (See \ref{sec:use})
+command, \madx generates the drift spaces between elements according to
+the following rules: 
 \begin{itemize}
 \item When the distance between the exit of the previous element and the
   entrance of the next element is positive and greater than a threshold
@@ -121,6 +136,8 @@ generates the missing drift spaces according to the following rules:
   the elements are considered to be overlapping and \madx terminates
   with a ``{\tt negative drift length}'' fatal error. 
 \end{itemize} 
+
+
 
 For efficiency reasons \madx imposes an \textbf{important restriction}
 on element lengths and positions: once a sequence is expanded, the

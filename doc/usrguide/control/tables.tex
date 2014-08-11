@@ -3,14 +3,18 @@
 
 \section{CREATE}
 \label{sec:create}
-\begin{verbatim}
-create, table = table, column = var1, var2,_name,...;
-\end{verbatim} 
-creates a table with the specified variables as columns. This table can
-then be \hyperlink{fill}{fill}ed, and finally one can
-\hyperlink{write}{write} it in TFS format. The attribute "\_name" adds
-the element name to the table at the specified column, this replaces the
-undocumented "withname" attribute that was not always working properly.  
+\madbox{
+CREATE, TABLE=tablename, COLUMN= var\{, var\} \{, \_name\} ;
+}
+creates a table with the specified variables as columns. 
+This table is initially empty and can be subsequently filled, and
+eventually written to file in TFS format.  
+
+The special variable name attribute "\_name" adds
+the element name to the table at the specified column.
+
+%this replaces the
+%undocumented "withname" attribute that was not always working properly.  
 
 See the \href{../Introduction/select.html#ucreate}{user table I}
 example; 
@@ -20,19 +24,19 @@ including the element name:
 
 \section{DELETE}
 \label{sec:delete}
-\begin{verbatim}
-delete, sequence = s_name, table = t_name;
-\end{verbatim} 
-deletes a sequence with name "s\_name" or a table with name "t\_name"
+\madbox{
+DELETE, SEQUENCE=sequencename, TABLE=tablename;
+}
+deletes a sequence with name "sequencename" or a table with name "tablename"
 from memory. The sequence deletion is done without influence on other
-sequences that may have elements that were in the deleted sequence.  
+sequences that may have elements that were in the deleted sequence.   
 
 \section{FILL} 
-\label{Sec:fill}
+\label{sec:fill}
 Every command 
-\begin{verbatim}
-fill, table = table;
-\end{verbatim} 
+\madbox{
+FILL, TABLE=tablename;
+}
 adds a new line with the current values of all column variables into the
 user table \hyperlink{create}{create}d beforehand. This table one can
 then \hyperlink{write}{write} in TFS format.  See as well the
@@ -40,57 +44,61 @@ then \hyperlink{write}{write} in TFS format.  See as well the
 
 \section{READTABLE}
 \label{sec:readtable}
-\begin{verbatim}
-readtable, file = "file_name";
-\end{verbatim} 
-reads a TFS file containing a \mad table back into memory. This table
-can then be manipulated as any other table, i.e. its values can be
-accessed, it can be plotted, written out again etc.  
+\madbox{
+READTABLE, FILE="filename";
+}
+reads the TFS file "filename" containing a \mad table and loads the
+table back into memory. This table can then be manipulated as any other
+table, i.e. its values can be accessed, it can be plotted, written out
+again etc.
 
 \section{READMYTABLE}
 \label{sec:readmytable}
-\begin{verbatim}
-readmytable, file = "file_name", table = internalname;
-\end{verbatim} 
-reads a TFS file containing a \mad table back into memory. This table
+\madbox{
+READMYTABLE, FILE="filename", TABLE=tablename;
+}
+reads a TFS file "filename" containing a \mad table and loads the table
+into memory with the name "tablename". This table
 can then be manipulated as any other table, i.e. its values can be
 accessed, it can be plotted, written out again etc. 
 
-An internal name for
-the table can be freely assigned while for the command READTABLE it is
-taken from the information section of the table itself. This feature
-allows to store multiple tables of the same type in memory without
+An internal name for the table can be freely assigned while for the
+command READTABLE the tablename is taken from the information section of
+the table itself.  
+This feature allows to store multiple tables of the same type in memory without
 overwriting existing ones.   
 
 \section{TABSTRING}
 \label{sec:tabstring}
 Note: this is not a command and should appear in the variables section
-\begin{verbatim}
-tabstring(arg1,arg2,arg3)
-\end{verbatim}  
-The "string function" tabstring(arg1,arg2,arg3) with exactly  three
+\madbox{
+TABSTRING(arg1,arg2,arg3)
+}
+
+The "string function" TABSTRING(arg1,arg2,arg3) with exactly  three
 arguments; arg1 is a table name (string), arg2 is a column name
 (string), arg3 is a row number (integer), count starts at 0. The
 function can be used in any context where a string appears; in case
-there is no match, it returns \_void\_.  
+there is no match, it returns "\_void\_".  
 
 \section{TITLE}
 \label{sec:title}
-\begin{verbatim}
-title, "title";
-\end{verbatim} 
-inserts the string in quotes as title in various tables and plots.  
+\madbox{
+TITLE, "string";
+}
+the string in quotes is inserted as title in various table outputs and
+plot results.  
 
 \section{WRITE}
 \label{sec:write}
-\begin{verbatim}
-write, table = table, file = "file_name";
-\end{verbatim} 
-writes the table "table" onto the file "file\_name"; only the rows and
-columns of a preceding \verb+select, flag = table,...;+ are written. If no select
-has been issued for this table, the file will only contain the
-header. If the FILE argument is omitted, the table is written to
-standard output.  
+\madbox{
+WRITE, TABLE=tablename, FILE="filename";
+}
+writes the table "tablename" onto the file "filename"; only the rows and
+columns of a preceding \texttt{SELECT, FLAG=table,...;} are written. 
+If no \texttt{SELECT} has been issued for this table, only the header is
+written to file.
+If the FILE argument is omitted, the table is written to standard output.  
 
 
 %\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg}, June 17, 2002 

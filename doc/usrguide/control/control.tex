@@ -9,7 +9,8 @@
 %\include{control/special}
 
 
-\chapter{Control Statements} 
+\chapter{General Control Statements} 
+
 \madx consists of a core program, and modules for specific tasks such as
 twiss parameter calculation, matching, thin lens tracking, and so on.  
  
@@ -19,182 +20,6 @@ manipulation, statement flow control (e.g. IF, WHILE), MACRO
 declaration, saving sequences onto files in \madx or \madeight format,
 and so on.  
 
-
-%% \subsection{Program flow control}
-%% \begin{itemize}
-%% 	\item \href{special.html#if}{IF}
-%% 	\item \href{special.html#elseif}{ELSEIF}
-%% 	\item \href{special.html#else}{ELSE}
-%% 	\item \href{special.html#while}{WHILE}
-%% 	\item \href{special.html#macro}{MACRO}
-%% \end{itemize}
-%\input{control/special}
-
-\section{Program Flow Statements}
-
-\subsection{IF}
-\begin{verbatim}
-if (logical_expression) {statement 1; statement 2; ...; statement n; }
-\end{verbatim}
-where \href{logical}{"logical\_expression"} is one of 
-\begin{verbatim}
-expr1  oper expr2
-expr11 oper1 expr12 && expr21 oper2 expr22
-expr11 oper1 expr12 || expr21 oper2 expr22
-\end{verbatim} 
-and \verb+oper+ one of 
-\begin{verbatim}
-==          ! equal
-<>          ! not equal
-<           ! less than
->           ! greater than
-<=          ! less than or equal
->=          ! greater than or equal
-\end{verbatim} 
-The expressions are arithmetic expressions of type real. The statements
-in the curly brackets are executed if the logical expression is true.  
-
-
-\subsection{ELSEIF}
-\begin{verbatim}
-elseif (logical_expression) {statement 1; statement 2; ...; statement n; }
-\end{verbatim} 
-Only possible (in any number) behind an IF, or another ELSEIF; is
-executed if  logical\_expression is true, and if none of the preceding
-IF or ELSEIF logical conditions was true.  
-
-
-\subsection{ELSE}
-\begin{verbatim}
-else {statement 1; statement 2; ...; statement n; }
-\end{verbatim} 
-Only possible (once) behind an IF, or an ELSEIF; is executed if
-logical\_expression is true, and if none of the preceding IF or ELSEIF
-logical conditions was true.  
-
-For a real life example, see \href{foot.html}{ELSE example}. 
-
-
-\subsection{WHILE}
-\begin{verbatim}
-while (logical_condition) {statement 1; statement 2; ...; statement n; }
-\end{verbatim}  
-executes the statements in curly brackets while the logical\_expression
-is true. A simple example (in case you have forgotten the first ten
-factorials) would be  
-\begin{verbatim}
-option, -info;   ! avoids redefiniton warnings
-n = 1; m = 1;
-while (n <= 10)
-{
-  m = m * n;  value, m;
-  n = n + 1;
-};
-\end{verbatim}
-
-For a real life example, see \href{foot.html}{WHILE example}.
-
-\subsection{MACRO}
-\label{subsec:special_macro}
-\begin{verbatim}
-label: macro = {statement 1; statement 2; ...; statement n; };
-label(arg1,...,argn): macro = {statement 1; statement 2; ...; statement n; };
-\end{verbatim} 
-The first form allows the execution of a group of statements via a
-single command,  
-\begin{verbatim}
-exec, label;
-\end{verbatim} 
-that executes the statements in curly brackets exactly once. This command
-can be issued any number of times.  
-
-The second form allows to replace strings anywhere inside the statements
-in curly brackets by other strings, or integer numbers prior to
-execution. This is a powerful construct and should be handled with care.  
-
-Simple example: 
-\begin{verbatim}
-option, -echo, -info;  ! for cleaner output
-simple(xx,yy): macro = { xx = yy^2 + xx; value, xx;};
-a = 3;
-b = 5;
-exec, simple(a,b);
-\end{verbatim}
-
-
-{\bf Passing arguments}\\
-In the following example we use the fact that a "\$" in front of an
-argument means that the truncated integer value of this argument is used
-for replacement, rather than the argument string itself.  
-\begin{verbatim}
-tricky(xx,yy,zz): macro = {mzz.yy: xx, l = 1.yy, kzz = k.yy;};
-n=0;
-while (n < 3)
-{
-  n = n+1;
-  exec, tricky(quadrupole, $n, 1);
-  exec, tricky(sextupole, $n, 2);
-};
-\end{verbatim} 
-Whereas the actual use of the preceding example is NOT recommended,
-a real life example, showing the full power (!) of macros is to be
-found under \href{foot.html}{macro usage} for the usage, and
-under \href{foot.html#macro}{macro definition} for the
-definition.
-
-
-{\bf Beware of the following rules:}
-\begin{itemize}
-   \item Generally speaking: \textit{ special constructs } like IF,
-     WHILE, MACRO will only allow one level of inclusion of another
-     \textit{ special construct }.
-   \item  Macros must not be called with numbers, but with strings
-     (i.e. variable names in case of numerical values), i.e. {\bf NOT }
-\begin{verbatim}
-exec, thismacro($99, $129);
-\end{verbatim}
-{\bf BUT}
-\begin{verbatim}
-n1=99; n2=219;
-exec, thismacro($n1, $n2);
-\end{verbatim}
-\end{itemize}
-
-
-%% \subsection{General control}
-%% \begin{itemize}
-%% 	\item \href{general.html#assign}{ASSIGN}
-%% 	\item \href{general.html#call}{CALL}
-%% 	\item \href{general.html#coguess}{COGUESS}
-%% 	\item \href{general.html#create}{CREATE}
-%% 	\item \href{general.html#dumpsequ}{DUMPSEQU}
-%% 	\item \href{general.html#exec}{EXEC}
-%% 	\item \href{general.html#exit}{EXIT}
-%% 	\item \href{general.html#fill}{FILL}
-%% 	\item \href{general.html#help}{HELP}
-%% 	\item \href{general.html#option}{OPTION}
-%% 	\item \href{general.html#print}{PRINT}
-%% 	\item \href{general.html#quit}{QUIT}
-%% 	\item \href{general.html#readtable}{READTABLE}
-%% 	\item \href{general.html#removefile}{REMOVEFILE}
-%% 	\item \href{general.html#renamefile}{RENAMEFILE}
-%% 	\item \href{general.html#return}{RETURN}
-%% 	\item \href{general.html#save}{SAVE}
-%% 	\item \href{general.html#savebeta}{SAVEBETA}
-%% 	\item \href{../Introduction/select.html}{SELECT}
-%% 	\item \href{../Introduction/set.html}{SET}
-%% 	\item \href{general.html#show}{SHOW}
-%% 	\item \href{general.html#stop}{STOP}
-%% 	\item \href{general.html#system}{SYSTEM}
-%% 	\item \href{general.html#tabstring}{TABSTRING}
-%% 	\item \href{general.html#title}{TITLE}
-%% 	\item \href{general.html#use}{USE}
-%% 	\item \href{general.html#value}{VALUE}
-%% 	\item \href{general.html#write}{WRITE}
-%% \end{itemize}
-
-%\input{control/general}
-\section{General Control Statements}
 
 %% Moved to TWISS chapter
 %% \subsection{COGUESS}
@@ -221,7 +46,8 @@ exec, thismacro($n1, $n2);
 %% Default = false, {\tt clear} alone is equivalent to {\tt clear=true}
 
 
-\subsection{EXIT, QUIT, STOP}
+\section{EXIT, QUIT, STOP}
+\label{sec:exit}\label{sec:quit}\label{sec:stop}
 Any of these three commands ends the execution of \madx:
 \madbox{
 EXIT;
@@ -234,21 +60,24 @@ STOP;
 }
 
 
-\subsection{HELP}
+\section{HELP}
+\label{sec:help}
 The HELP command prints all parameters, and their defaults values, for
 the statement given; this includes basic element types.
 \madbox{
 HELP, statement\_name;
 }
 
-\subsection{SHOW}
+\section{SHOW}
+\label{sec:show}
 The SHOW command prints the "command" (typically "beam", "beam\%sequ",
 or an element name), with the actual value of all its parameters.  
 \madbox{
 SHOW, command;
 }
 
-\subsection{VALUE}
+\section{VALUE}
+\label{sec:value}
 \madbox{
 VALUE, exp1\{, exp2\} ;
 }
@@ -266,8 +95,8 @@ pmass = 0.938272046        ; \\
 exp(sqrt(2)) = 4.113250379        ; \\
 }
 
-\subsection{OPTION}
-\label{subsec:option}
+\section{OPTION}
+\label{sec:option}
 
 The \texttt{OPTION} commands sets the logical value of a number of flags
 that control the behavior of \madx.
@@ -279,13 +108,13 @@ OPTION, flag=logical;
 Because all attributes of \texttt{OPTION} are logical flags, the
 following two statements are identical:
 \madxmp{
-option, flag = true;\\
-option, flag;
+OPTION, flag = true;\\
+OPTION, flag;
 }
 And the following two statements are also identical:
 \madxmp{
-option, flag = false;\\
-option, -flag;
+OPTION, flag = false;\\
+OPTION, -flag;
 }
 
 Several flags can be set in a single \texttt{OPTION} command, e.g.
@@ -375,7 +204,8 @@ pole faces, contrary to the \madeight manual.
 
 
 
-\subsection{EXEC}
+\section{EXEC}
+\label{sec:exec}
 Each statement may be preceded by a label, when parsed and executed the
 statement is then also stored and can be executed again with
 \madbox{
@@ -419,8 +249,8 @@ EXEC, tw; ! second execution of the same TWISS command \\
 
 
 
-\subsection{SET}
-\label{subsec:set}
+\section{SET}
+\label{sec:set}
 The SET command is used in two forms:
 \madbox{
 SET, FORMAT=string \{, string\} ;\\
@@ -483,8 +313,8 @@ commands that do not have the sequence as an argument like "EMIT" or
 
 
 
-\subsection{SYSTEM}
-\label{subsec:system}
+\section{SYSTEM}
+\label{sec:system}
 \madbox{
 SYSTEM, "string";
 }
@@ -504,14 +334,16 @@ collaborators working on other platforms.
 
 
 
-\subsection{USE}
-\label{subsec:general_use}
+\section{USE}
+\label{sec:general_use}
 \madx operates on beamlines that must be loaded and expanded in memory
 before other commands can be invoked. The \texttt{USE} allows this
 loading and expansion.
 
 \madbox{
-USE, PERIOD=sequence\_name, SEQUENCE=sequence\_name, RANGE=range, SURVEY=logical;
+USE, \=PERIOD=sequence\_name, SEQUENCE=sequence\_name, \\
+     \>RANGE=range, \\
+     \>SURVEY=logical;
 }
 
 The attributes to the \texttt{USE} command are:
@@ -535,8 +367,8 @@ A mechanism to select a sequence without this side effect of the
 \texttt{USE} command is provided with the \texttt{SET, SEQUENCE=...} command.
 
 
-\subsection{SELECT} 
-\label{subsec:select}
+\section{SELECT} 
+\label{sec:select}
 
 \begin{verbatim}
 select, flag=string, range=string, class=string, pattern=string,
@@ -1015,8 +847,8 @@ example 2.
 
 
 %\input{Introduction/select}
-\subsection{SELECT}
-\label{subsec:selection}
+\section{SELECT}
+\label{sec:selection}
 The elements, or a range of elements, in a sequence can be selected for
 various purposes. Such selections remain valid until cleared (in
 difference to \madeight); it is therefore recommended to always start with a  

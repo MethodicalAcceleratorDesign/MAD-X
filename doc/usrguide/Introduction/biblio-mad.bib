@@ -1,14 +1,6 @@
 %% Bibliography file for MAD-X in BiBTeX format
 %  2014-Feb-26  16:14:32  ghislain: first version based on bibliography.tex
 
-@book{Ben62,
-    title = "L'Oxydation des m\'etaux",
-    author = "J. B{\'e}nard and J. Bardolle and F. Bouillon and M. Cagnet%
-       and J. Moreau and G. Valensi",
-    publisher = "Gauthier-Villars",
-    year = "1962"
- }
-
 %% Champs:
 
 %% address : L'adresse de l'éditeur
@@ -86,7 +78,7 @@
   title = 	 {A First-and Second-Order Matrix Theory for the Design of Beam Transport Systems and Charged Particle Spectrometers},
   institution =  {SLAC},
   year = 	 1972,
-  key = 	 {SLAC-75},
+  number = 	 {SLAC-75},
   note = 	 {Revision 3}}
 
 
@@ -95,7 +87,7 @@
   title = 	 {TRANSPORT - A Computer Program for Designing Charged Particle Beam Transport Systems},
   institution =  {CERN},
   year = 	 {1980},
-  key = 	 {CERN 73-16, revised as CERN 80-04}}
+  number = 	 {CERN 73-16, revised as CERN 80-04}}
 
 
 @Comment 	\item \href{chao}{\textit{10}} A. Chao. \textit{Evaluation of
@@ -126,10 +118,13 @@
   volume = 	 3,
   pages = 	 {1-48}}
 
-@Comment 	\item \href{tfs}{\textit{14}} Ph. Defert, Ph. Hofmann, and
-@Comment           R. Keyser. \textit{The Table File System, the C
-@Comment             Interfaces}. LAW Note 9, CERN, 1989. 
-@Comment 	\label{bib:tfs}
+
+@TechReport{TFS,
+  author = 	 {Philippe Defert and Ph. Hofmann and R. Keyser},
+  title = 	 {The Table File System, the C Interfaces},
+  institution =  {CERN},
+  year = 	 1989,
+  number = 	 {LAW Note 9}}
 
 @Comment 	\item \href{donald}{\textit{15}} M. Donald and
 @Comment           D. Schofield. \textit{A User's Guide to the \texttt{HARMON}
@@ -154,12 +149,7 @@
   title = 	 {Analysis of the stability domain of planar symplectic maps using invariant manifolds},
   institution =  {CERN},
   year = 	 1996,
-  key = 	 {CERN/PS 96-05}}
-
-@Comment 	\item \href{giovanozzi}{\textit{18}} M. Giovannozzi,
-@Comment           \textit{Analysis of the stability domain of planar symplectic
-@Comment             maps using invariant manifolds}, CERN/PS 96-05 (PA) (1996). 
-
+  number = 	 {CERN/PS 96-05}}
 
 
 @TechReport{grote1988,
@@ -167,11 +157,7 @@
   title = 	 {GXPLOT User's Guide and Reference Manual},
   institution =  {CERN},
   year = 	 1988,
-  key = 	 {LEP-TH Note 57}}
-
-@Comment 	\item \href{gxplot}{\textit{19}} H. Grote. \textit{GXPLOT User's
-@Comment           Guide and Reference Manual}. LEP TH Note 57, CERN, 1988. 
-
+  number = 	 {LEP-TH Note 57}}
 
 
 @TechReport{LEP_DR1979,
@@ -179,12 +165,7 @@
   title = 	 {Design Study of a 22 to 130 GeV electron-positron Colliding Beam Machine (LEP)},
   institution =  {CERN},
   year = 	 1979,
-  key = 	 {CERN/ISR-LEP/79-33}}
-
-@Comment 	\item \href{lep}{\textit{20}} LEP Design Group. \textit{Design
-@Comment           Study of a 22 to 130 GeV electron-positron Colliding Beam
-@Comment           Machine   (LEP)}. CERN/ISR-LEP/79-33, CERN, 1979. 
-
+  number = 	 {CERN/ISR-LEP/79-33}}
 
 
 @TechReport{hanney_jowett_keil1988,
@@ -192,14 +173,7 @@
   title = 	 {BEAMPARAM - A program for computing beam dynamics and performance of electron-positron storage rings},
   institution =  {CERN},
   year = 	 1988,
-  key = 	 {CERN/LEP-TH/88-2}}
-
-@Comment 	\item \href{beamparam<i}{21} M. Hanney, J. M. Jowett, and
-@Comment           E. Keil. \textit{BEAMPARAM - A program for computing beam
-@Comment             dynamics and   performance of electron-positron storage
-@Comment             rings}. CERN/LEP-TH/88-2, CERN, 1988. 
-
-
+  number = 	 {CERN/LEP-TH/88-2}}
 
 
 @Article{helm_lee_morton_sands1973,
@@ -207,12 +181,7 @@
   title = 	 {Evaluation of synchrotron radiation integrals},
   journal = 	 {IEEE Trans. Nucl. Sc.},
   year = 	 1973,
-  key = 	 {NS-20}}
-
-@Comment 	\item \href{helm}{\textit{22}} R. H. Helm, M. J. Lee,
-@Comment           P. L. Morton, and M. Sands. \textit{Evaluation of synchrotron
-@Comment             radiation integrals}. IEEE Trans. Nucl. Sc., NS-20, 1973. 
-
+  number = 	 {NS-20}}
 
 
 
@@ -224,27 +193,13 @@
   year = 	 1978,
   note = 	 {Program Library Code D507}}
 
-@Comment 	\item \href{minuit}{\textit{23}} F. James. \textit{MINUIT, A
-@Comment           package of programs to minimise a function of n   variables,
-@Comment           compute the covariance matrix, and find the true
-@Comment           errors}. program library code D507, CERN, 1978. 
-@Comment 	\label{bib:minuit}
-
-
-
 
 @TechReport{keil1976,
   author = 	 {Eberhard Keil},
   title = 	 {Synchrotron radiation from a large electron-positron storage ring},
   institution =  {CERN},
   year = 	 1976,
-  key = 	 {CERN/ISR-LTD/76-23}}
-
-@Comment 	\item \href{keil}{\textit{24}} E. Keil. \textit{Synchrotron
-@Comment           radiation from a large electron-positron storage
-@Comment           ring}. CERN/ISR-LTD/76-23, CERN, 1976. 
-
-
+  number = 	 {CERN/ISR-LTD/76-23}}
 
 
 @Book{knuth1981,
@@ -256,13 +211,6 @@
   edition = 	 {second edition},
   note = 	 {Semi-numerical Algorithms}}
 
-@Comment 	\item \href{knuth}{\textit{25}} D. E. Knuth. \textit{The Art of
-@Comment           Computer Programming}. Volume 2, Addison-Wesley, second
-@Comment           edition, 1981. Semi-numerical Algorithms. 
-@Comment 	\label{bib:knuth}
-
-
-
 
 @Article{laskar1992,
   author = 	 {J. Laskar and C. Froeschle and A. Celletti},
@@ -272,25 +220,14 @@
   volume = 	 56,
   pages = 	 253}
 
-@Comment 	\item \href{laskar}{\textit{26}} J. Laskar, C. Froeschle and
-@Comment           A. Celletti, \textit{The measure of chaos by the numerical
-@Comment             analysis of the fundamental   frequencies. Application to
-@Comment             the standard mapping}, Physica D 56, 253 (1992). 
-
 
 @TechReport{maisripken1982,
   author = 	 {H. Mais and Gerhard Ripken},
   title = 	 {Theory of Coupled Synchro-Betatron Oscillations},
   institution =  {DESY},
   year = 	 1982,
-  key = 	 {DESY M-82-05},
+  number = 	 {DESY M-82-05},
   type = 	 {DESY Internal Report}}
-
-@Comment 	\item \href{mais}{\textit{27}} H. Mais and G. Ripken,
-@Comment           \textit{Theory of Coupled Synchro-Betatron Oscillations}. DESY
-@Comment           internal Report, DESY M-82-05, 1982. 
-
-
 
 
 @TechReport{meddahi1996,
@@ -298,7 +235,7 @@
   title = 	 {Chromaticity correction for the 108/60 degree lattice},
   institution =  {CERN},
   year = 	 1996,
-  key = 	 {SL/Note 96-19 (AP)}}
+  number = 	 {SL/Note 96-19 (AP)}}
 
 
 @TechReport{milutinovic1988,
@@ -306,7 +243,7 @@
   title = 	 {Comparison of Accelerator Codes for a RHIC Lattice},
   institution =  {BNL},
   year = 	 1988,
-  key = 	 {AD/AP/TN-9}}
+  number = 	 {AD/AP/TN-9}}
 
 
 @TechReport{Montague1979,
@@ -314,14 +251,14 @@
   title = 	 {Linear Optics for Improved Chromaticity Correction},
   institution =  {CERN},
   year = 	 1979,
-  key = 	 {LEP Note 165}}
+  number = 	 {LEP Note 165}}
 
 @TechReport{Ripken1970,
   author = 	 {Gerhard Ripken},
   title = 	 {Untersuchungen zur Strahlf\"uhrung und Stabilit\"at der Teilchenbewegung in Beschleunigern und Storage-Ringen unter strenger Ber\"ucksichtigung einer Kopplung der Betatronschwingungen},
   institution =  {DESY},
   year = 	 1970,
-  key = 	 {DESY Internal Report R1-70/4}}
+  number = 	 {DESY Internal Report R1-70/4}}
 
 
 @TechReport{Ripken1988,
@@ -336,7 +273,7 @@
 @InProceedings{ruggiero1996,
   author = 	 {Francesco Ruggiero},
   title = 	 {Dynamic Aperture for LEP 2 with various optics and tunes},
-  key = 	 {CERN SL/96-05 (DI),1996},
+  number = 	 {CERN SL/96-05 (DI),1996},
   booktitle =    {Proc. Sixth Workshop on LEP Performance, Chamonix},
   year = 	 1996,
   editor = 	 {John Poole},
@@ -350,14 +287,14 @@
   title = 	 {Concerning n-Dimensional Coupled Motion},
   institution =  {FNAL},
   year = 	 1971,
-  key = 	 {FN 229}}
+  number = 	 {FN 229}}
 
 @TechReport{Piwinski1998,
   author = 	 {A. Piwinski},
   title = 	 {The {Touschek} Effect in Strong Focusing Storage Rings},
   institution =  {DESY},
   year = 	 1998,
-  key = 	 {DESY-98-179}}
+  number = 	 {DESY-98-179}}
 
 
 @Book{chaotigner1999,
@@ -372,7 +309,7 @@
   title = 	 {Particle loss by {Touschek} effect in a storage ring},
   institution =  {DESY},
   year = 	 1967,
-  key = 	 {DESY 67-5}}
+  number = 	 {DESY 67-5}}
 
 
 @TechReport{walker1987,
@@ -380,7 +317,7 @@
   title = 	 {Calculation of the {Touschek} lifetime in electron storage rings},
   institution =  {SERC},
   year = 	 1987,
-  key = 	 {DL/SCI/P542A},
+  number = 	 {DL/SCI/P542A},
   type = 	 {SERC Daresbury Laboratory preprint}}
 
 
@@ -389,7 +326,7 @@
   title = 	 {The Physics of Electron Storage Rings},
   institution =  {SLAC, University of California},
   year = 	 1970,
-  key = 	 {SLAC-121, UC-28}}
+  number = 	 {SLAC-121, UC-28}}
 
 @Comment 	\item \href{wilson}{\textit{36}} P. B. Wilson. \textit{Proc. 8th
 @Comment           Int. Conf. on High-Energy Accelerators}. Stanford, 1974. 
@@ -398,30 +335,51 @@
 @Comment           H. Meyer. \textit{Life time due to the beam-beam
 @Comment             bremsstrahlung effect}. PET-75-2, DESY, 1975. 
 
-@Comment 	\item \href{SXF}{\textit{38}}  H. Grote, J. Holt, N. Malitsky,
-@Comment           F. Pilat, R. Talman, C.G. Trahern. \textit{SXF (Standard
-@Comment             eXchange Format): definition, syntax,
-@Comment             examples}. RHIC/AP/155, August, 1998.  
-@Comment 	\label{bib:sxf}
 
-@Comment 	\item \href{SixTrack}{\textit{39}} F. Schmidt. \textit{SixTrack,
-@Comment           User's Reference Manual}. CERN SL/94-56 (AP). 
-@Comment 	\label{bib:sixtrack}
+@TechReport{SXF,
+  author = 	 {Hans Grote and J. Holt and N. Malitsky and Fulvia Pilat and Richard Talmann and C. G. Trahern},
+  title = 	 {SXF (Standard eXchange Format): definition, syntax, examples},
+  institution =  {BNL},
+  year = 	 1998,
+  number = 	 {RHIC/AP/155},
+  month = 	 {August}}
 
-@Comment 	\item \href{SixTrack_Run_Environment}{\textit{40}} M. Hayes and
-@Comment           F. Schmidt. \textit{Run Environment for SixTrack}. Physics
-@Comment           Note 53 (unpublished) \& LHC Project Note 300. 
-@Comment 	\label{bib:sixtrack_run_environment}
 
-@Comment 	\item \href{SODD}{\textit{41}} F. Schmidt. \textit{SODD: A
-@Comment           computer code to calculate detuning and distortion function
-@Comment           terms in first and second order}. CERN SL/Note 99-009 (AP). 
-@Comment 	\label{bib:sodd}
+@TechReport{SixTrack,
+  author = 	 {Frank Schmidt},
+  title = 	 {SixTrack, User's Reference Manual},
+  institution =  {CERN},
+  year = 	 1994,
+  number = 	 {SL/95-56 (AP)}}
 
-@Comment 	\item \href{TEAPOT}{\textit{42}} R.Talman and
-@Comment           L.Schachinger. \textit{TEAPOT. A Thin Element Accelerator
-@Comment             Program for Optics and Tracking}. SSC-52. 
-@Comment 	\label{bib:teapot}
+
+
+@TechReport{SixTrack_RE,
+  author = 	 {Mark Hayes and Frank Schmidt},
+  title = 	 {Run Environment for SixTrack},
+  institution =  {CERN},
+  year = 	 2002,
+  number = 	 {LHC Project Note 300},
+  month = 	 {July}}
+
+
+
+
+@TechReport{SODD,
+  author = 	 {Frank Schmidt},
+  title = 	 {SODD: A computer code to calculate detuning and distortion function terms in first and second order},
+  institution =  {CERN},
+  year = 	 1999,
+  number = 	 {CERN SL/Note 99-009 (AP)}}
+
+
+
+@TechReport{TEAPOT,
+  author = 	 {Richard Talmann and L. Schachinger},
+  title = 	 {TEAPOT: A Thin Element Accelerator Program for Optics and Tracking},
+  institution =  {SSC},
+  year = 	 1987,
+  number = 	 {SSC-52}}
 
 
 @TechReport{bjorken_mtingwa1982,
@@ -429,7 +387,7 @@
   title = 	 {Intrabeam Scattering},
   institution =  {FNAL},
   year = 	 1982,
-  key = 	 {FERMILAB-Pub-82/47-THY},
+  number = 	 {FERMILAB-Pub-82/47-THY},
   month = 	 {July}}
 
 @TechReport{antoniou_zimmermann2012,
@@ -448,10 +406,5 @@
   pages = 	 010001}
 
 
-
-
-@Comment \end{enumerate}
-
-
-@Comment %\href{http://www.cern.ch/Frank.Schmidt/frs_sign.html}{frs}, May 01, 2003 
+%% EOF
 
