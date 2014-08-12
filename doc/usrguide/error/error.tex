@@ -48,8 +48,8 @@ will destroy the assigned errors. Use the
 %  Changed by: Werner Herr, 02-Sep-2002 
 %  Changed by: Hans Grote, 25-Sep-2002 
 
-\section{Alignment Errors} %EALIGN: Define Misalignments} 
-\label{sec:error_align}
+\section{EALIGN: Alignment Errors} %EALIGN: Define Misalignments} 
+\label{sec:ealign}
 
 Alignment errors are defined by the EALIGN command. 
 The misalignments refer to the
@@ -338,15 +338,15 @@ by the monitor}}}
 %%\title{Field Errors}
 %  Changed by: Hans Grote, 19-Jun-2002 
 
-\section{Field Errors}
-\label{sec:field_errors}
+\section{EFCOMP: Field Errors}
+\label{sec:efcomp}
 Field errors can be entered as relative or absolute errors. Different
 multipole components can be specified with different kinds of errors
 (relative or absolute). Relations between absolute and relative field
 errors are listed below.  
 
-In \madeight two commands were used for that purpose: EFIELD \label{efield}
-and EFCOMP \label{efcomp}. 
+In \madeight two commands were used for that purpose: EFIELD 
+and EFCOMP.
 Only EFCOMP was implemented in \madx since it provides the full functionality
 of EFIELD and there was no need for duplication.  
 
@@ -496,8 +496,8 @@ and \href{../Introduction/expression.html#defer}{deferred expressions}.
 %  Changed by: Hans Grote, 13-Sep-2000 
 %  Changed by: Werner Herr, 19-Jun-2002 
 
-\section{Set Options for Error Definition} %EOPTION: Set Error Options}
-\label{sec:error_option}
+\section{EOPTION: Set Options for Error Definition} %EOPTION: Set Error Options}
+\label{sec:eoption}
 The error option command specifies different seeds for random values:  
 
 \vspace{2mm}
@@ -565,11 +565,9 @@ In that case, the SELECT command has no effect.
 %  Changed by: Werner Herr, 19-Jun-2002 
 %  Changed by: Hans Grote, 30-Sep-2002 
 
-\section{Saving and reloading errors to and from tables and files} 
-\label{sec:error_save}
 % ESAVE: Save Machine Imperfections and read back from file}
-
-\subsection{Writing errors to a file}
+\section{ESAVE: Writing errors to a file}
+\label{sec:esave}
 
 \madbox{
 ESAVE, FILE=string;
@@ -599,7 +597,8 @@ ESAVE, FILE = err.file;
 {\bf Please note: in case of field errors, the absolute errors are
   saved and not relative errors. } 
 
-\subsection{Reading errors from a table or file}
+\section{SETERR: Reading errors from a table or file}
+\label{Sec:seterr}
 
 To assign errors from a file is not a priori straightforward. It may be
 required to re-assign existing errors after a \textbf{USE} command was

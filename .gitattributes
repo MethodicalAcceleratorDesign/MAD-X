@@ -194,13 +194,9 @@ doc/usrguide/control/seqedit.tex -text
 doc/usrguide/control/special.html -text
 doc/usrguide/control/tables.tex -text
 doc/usrguide/cororbit/co_activate.html -text
-doc/usrguide/cororbit/co_activate.tex -text
 doc/usrguide/cororbit/co_correct.html -text
-doc/usrguide/cororbit/co_correct.tex -text
 doc/usrguide/cororbit/co_corrsave.html -text
-doc/usrguide/cororbit/co_corrsave.tex -text
 doc/usrguide/cororbit/co_option.html -text
-doc/usrguide/cororbit/co_option.tex -text
 doc/usrguide/cororbit/cororbit.html -text
 doc/usrguide/cororbit/cororbit.tex -text
 doc/usrguide/cororbit/lhct.mad.html -text

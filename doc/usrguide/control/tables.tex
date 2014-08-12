@@ -103,6 +103,39 @@ If the FILE argument is omitted, the table is written to standard output.
 
 %\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg}, June 17, 2002 
 
+\section{SETVARS}
+\label{sec:setvars}
+
+\madbox{
+SETVARS, TABLE=tablename, ROW=integer;
+}
+sets the variables with values extracted
+from the specified row of table "tablename".
+
+
+\section{SETVARS\_LIN}
+\label{sec:setvars_lin}
+
+\madbox{
+SETVARS\_LINE, TABLE=tablename, ROW1=integer, ROW2=integer, PARAM=real;
+}
+sets the variables with values calculated by linear interpolation
+between the values in ROW1 and ROW2 of table "tablename". The string
+given in the PARAM attribute is the interpolation factor between 0 and
+1. 
+
+value = value(row1)*param + value(row2)*(1-param)
+
+
+Internally, \madx constructs this as a deferred expression and evaluates it.
+
+{\bf Example:}
+\madxmp{
+! extracts the position of the centre of each element from a standard
+!  TWISS table giving positions at end of elements:
+
+}
+
 
 
 \section{SELECT} 
