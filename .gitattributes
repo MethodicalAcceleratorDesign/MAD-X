@@ -88,12 +88,13 @@ doc/usrguide/Introduction/declarations.html -text
 doc/usrguide/Introduction/declarations.tex -text
 doc/usrguide/Introduction/defects.html -text
 doc/usrguide/Introduction/defects.tex -text
+doc/usrguide/Introduction/definitions.tex -text
 doc/usrguide/Introduction/dipedge.html -text
 doc/usrguide/Introduction/doc.html -text
 doc/usrguide/Introduction/doc.tex -text
 doc/usrguide/Introduction/drift.html -text
 doc/usrguide/Introduction/element.html -text
-doc/usrguide/Introduction/element.tex -text
+doc/usrguide/Introduction/elements.tex -text
 doc/usrguide/Introduction/elm_class.html -text
 doc/usrguide/Introduction/elm_edit.html -text
 doc/usrguide/Introduction/elm_format.html -text

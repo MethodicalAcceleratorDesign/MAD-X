@@ -1,201 +1,9 @@
 %%\title{Physical Elements and Markers}
-%  Changed by: Chris ISELIN, 24-Jan-1997 
-%  Changed by: Hans Grote, 25-Sep-2002
 
 \chapter{Elements and Markers}
 
-%\begin{itemize}
-%	\item \href{elm_format.html}{Element Input Format}
-%	\item \href{aperture.html}{Aperture, Geometric}
-%	\item \href{marker.html}{MARKER: Marker Definition}
-%	\item \href{drift.html}{DRIFT: Drift Space}
-%	\item \href{bend.html}{Bending Magnet}
-%\begin{itemize}
-%	\item \href{bend.html#rbend}{RBEND: Rectangular Bending Magnet}
-%	\item \href{bend.html#sbend}{SBEND: Sector Bending Magnet}
-%	\item \href{dipedge.html}{Dipedge Element}
-%\end{itemize}
-%	\item \href{quadrupole.html}{QUADRUPOLE}
-%	\item \href{sextupole.html}{SEXTUPOLE}
-%	\item \href{octupole.html}{OCTUPOLE}
-%	\item \href{multipole.html}{MULTIPOLE}
-%	\item \href{solenoid.html}{SOLENOID}
-%	\item \href{nllens.html}{Non-linear lenses: elliptic potential}
-%	\item \href{kickers.html}{Closed Orbit Corrector}
-%\begin{itemize}
-%	\item \href{kickers.html#hkick}{HKICKER: Horizontal Orbit Corrector}
-%	\item \href{kickers.html#vkick}{VKICKER: Vertical Orbit Corrector}
-%	\item \href{kickers.html#kick}{KICKER: Combined Orbit Corrector}
-%\end{itemize}
-%	\item \href{tkickers.html}{Transverse Kicker}
-%	\item \href{cavity.html}{RFCAVITY}
-%	\item \href{rfmultipole.html}{RFMULTIPOLE}
-%	\item \href{crabcavity.html}{CRABCAVITY}
-%	\item \href{separator.html}{ELSEPARATOR: Electrostatic Separator}
-%	\item \href{monitors.html}{Beam Position Monitor}
-%\begin{itemize}
-%	\item \href{monitors.html#hmon}{HMONITOR: Horizontal Monitor}
-%	\item \href{monitors.html#vmon}{VMONITOR: Vertical Monitor}
-%	\item \href{monitors.html#mon}{MONITOR: Combined Monitor}
-%	\item \href{monitors.html#inst}{INSTRUMENT: Other Beam Instrumentation}
-%\end{itemize}
-%	\item \href{collimator.html}{Collimators}
-%\begin{itemize}
-%	\item \href{collimator.html#rcol}{RCOLLIMATOR:Rectangular Collimator}
-%	\item \href{collimator.html#ecol}{ECOLLIMATOR:Elliptic Collimator}
-%\end{itemize}
-%	\item \href{rotation.html}{Coordinate Transformations}
-%\begin{itemize}
-%	\item \href{rotation.html#yrotation}{YROTATION: Rotation About the Vertical Axis}
-%	\item \href{rotation.html#srotation}{SROTATION: Rotation Around the Longitudinal Axis}
-%\end{itemize}
-%	\item \href{beambeam.html}{BEAMBEAM: Beam-Beam Interaction}
-%	\item \href{matrix.html}{MATRIX: Arbitrary Element}
-%	\item \href{elm_edit.html}{Editing Element Definitions}
-%	\item \href{elm_class.html}{Element Class}
-%\end{itemize}
-
-%\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg}, January 24, 1997 
-
-% add other files to the end of this file
-
-\section{Definitions}
-
-%\input{Introduction/elm_format}
-\subsection{Element Input Format}
-All physical elements are defined by statements of the form 
-\madbox{
-label: keyword \{,attribute\};
-}
-where 
-\begin{madlist}
-  \ttitem{\href{label.html}{label}} is a name to be given to the element
-  (in the example QF),  
-  \ttitem{\href{keyword.html}{keyword}} is an element type keyword (in
-  the example QUADRUPOLE).  
-  \ttitem{\href{attribute.html}{attribute}} normally has the form
-    "attribute-name = attribute-value" or
-    "attribute-name := attribute-value" (except for multipoles).  
-  \ttitem{\href{label.html}{attribute-name}} selects the attribute,
-    as defined for the element type keyword (in the example L and
-    K1).  
-  \ttitem{\href{attribute.html}{attribute-value}} gives it a value
-    (in the example 1.8 and 0.015832). The value may be specified
-    by an expression. The "=" assigns the value on the right to
-    the attribute at the time of definition, regardless of any
-    further change of the right hand side; the ":=" re-evaluates
-    the expression at the right every time the attribute is being
-    used. For constant right hand sides, "=" and ":=" are of
-    course equivalent.  
-\end{madlist}
-
-Omitted attributes are assigned a default value.
-
-Example: 
-\madxmp{QF: QUADRUPOLE, L=1.8, K1=0.015832;}
-
-A special format is used for a \href{multipole.html}{multipole}\index{multipole}: 
-\madxmp{
-m: multipole, \= kn= {kn0, kn1, kn2, ..., knmax},\\
-              \> ks= {ks0, ks1, ks2, ..., ksmax};
-}
-where kn and ks give the integrated normal and skew strengths,
-respectively. The commas are mandatory, each strength can be an
-expression; their position defines the order. example:  
-\madxmp{m: multipole, kn={0,0,0,myoct*lrad}, ks={0,0,0,0,-1.e-5};}
-defines a multipole with a normal octupole, and a skew decapole component. 
-
-To know the current maximum order, enter the command 
-\madxmp{HELP, MULTIPOLE;} and count. 
-
-
-%\input{Introduction/elm_edit}
-\subsection{Editing Element Definitions}  
-An element definition can be changed in two ways: 
-\begin{itemize}
-   \item \textbf{Entering a new definition:} The element will be
-     replaced in the main beam line expansion.  
-   \item \textbf{Entering the element name together with new
-     attributes:} The element will be updated in place, and the new
-     attribute values will replace the old ones.  
-\end{itemize} 
-
-This example shows two ways to change the strength of a quadrupole: 
-\madxmp{
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
-QF: QUADRUPOLE, L = 1, K1 = 0.01;    \>! Original definition of QF \\
-\\
-QF: QUADRUPOLE, L = 2, K1 = 0.02;    \>! Replace whole definition of QF \\
-\\
-QF, K1 = 0.03;                       \>! Replace value of K1 for QF\\
-}
-When the type of the element remains the same, replacement of an
-attribute is the more efficient way.  
-
-Element definitions can be edited freely. The changes do not affect
-already defined objects which belong to its
-\href{elm_class.html}{element class}.  
-
-
-
-%\input{Introduction/elm_class}
-\subsection{Element Classes}  
-\label{sec:element_classes}
-The concept of element classes solves the problem of addressing
-instances of elements in the accelerator in a convenient manner. 
-
-It will first be explained by an example. All the quadrupoles in the
-accelerator form a class QUADRUPOLE. Let us define three subclasses for the
-focussing quadrupoles, the defocussing quadrupoles, and the skewed
-quadrupoles:  
-\madxmp{
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
-MQF: QUADRUPOLE, L = LQM, K1 = KQD;     \>! Focussing quadrupoles \\
-MQD: QUADRUPOLE, L = LQM, K1 = KQF;     \>! Defocussing quadrupoles \\
-MQT: QUADRUPOLE, L = LQT;               \>! Skewed quadrupoles
-}
-
-These classes can be thought of as new keywords which define elements
-with specified default attributes. We now use these classes to define
-the real quadrupoles:  
-\madxmp{
-xxxxxxxxxxxxxxxxxxxxxxx\= \kill
-QD1: MQD;              \>! Defocussing quadrupoles \\
-QD2: MQD; \\
-QD3: MQD; \\
- ... \\
-QF1: MQF;              \>! Focussing quadrupoles \\
-QF2: MQF; \\
-QF3: MQF; \\
- ... \\
-QT1: MQT, K1S = KQT1;   \> ! Skewed quadrupoles \\
-QT2: MQT, K1S = KQT2; \\
- ...
-}
-These quadrupoles inherit from their class all attributes that are not
-explicitly specified at time of declaration. 
-This allows to build up a hierarchy of objects with a rather
-economic input structure.  
-
-The full power of the class concept is revealed when object classes are
-used to select instances of elements for various purposes. Example:  
-\madxmp{
-SELECT, FLAG=twiss, CLASS = QUADRUPOLE; \=! Select all quadrupoles for the\\
-                                        \>! Twiss TFS file
-}
-
-More formally, for each element keyword \madx maintains a class of
-elements with the same name. A defined element becomes itself a class
-which can be used to define new objects, which will become members of
-this class. A new object inherits all attributes from its class; but its
-definition may override some of those values by new ones. All class and
-object names can be used in range selections, providing a powerful
-mechanism to specify positions for matching constraints and printing.  
-
-\section{Elements}
-
 %\input{Introduction/marker}
-\subsection{Marker}
+\section{Marker}
 \label{sec:marker}
 
 \madbox{
@@ -210,7 +18,7 @@ Example:
 
 
 %\input{Introduction/drift}
-\subsection{Drift Space}
+\section{Drift Space}
 \label{sec:drift}
 
 \madbox{
@@ -234,7 +42,7 @@ The length of DR2 will always be equal to the length of DR1. The
 
 
 %\input{Introduction/bend}
-\subsection{Bending Magnets}
+\section{Bending Magnets}
 \label{sec:bend}
 Two different type keywords are recognised for bending magnets, they are
 distinguished only by the reference system used:  
@@ -431,7 +239,7 @@ BU: RBEND, L=5., ANGLE=+0.001, TILT=-pi/2; \>! Deflection up
 
 
 %\input{Introduction/dipedge}
-\subsection{Dipedge Element}\index{dipedge}
+\section{Dipedge Element}\index{dipedge}
 A thin element describing the edge focusing of a dipole has been
 introduced in order to make it possible to track trajectories in the
 presence of dipoles with pole face angles. Only linear terms are
@@ -468,7 +276,7 @@ A DIPEDGE has zero length and five attributes.
 %\input{Introduction/quadrupole}
 %  Changed by: Andrea Latina, 6-May-2013 
 
-\subsection{Quadrupole}\index{quadrupole}
+\section{Quadrupole}\index{quadrupole}
 \label{sec:quadrupole}
 
 \madbox{
@@ -526,7 +334,7 @@ a quadrupole is a cartesian coordinate system.
 
 
 %\input{Introduction/sextupole}
-\subsection{Sextupole}
+\section{Sextupole}
 \label{sec:sextupole}
 
 \madbox{
@@ -578,7 +386,7 @@ sextupole is a cartesian coordinate system.
 
 
 %\input{Introduction/octupole}
-\subsection{Octupole}
+\section{Octupole}
 \label{sec:octupole}
 
 \madbox{
@@ -636,7 +444,7 @@ treated as thin lenses, except when tracking by Lie-algebraic methods.
 
 
 %\input{Introduction/multipole}
-\subsection{General Thin Multipole}
+\section{General Thin Multipole}
 \label{sec:multipole}
 
 \madbox{
@@ -706,7 +514,7 @@ To know the current maximum order, enter the command
 
 %\input{Introduction/solenoid}
 %  Changed by: Alexander Koschik, 16-May-2006 
-\subsection{Solenoid}
+\section{Solenoid}
 \label{sec:solenoid}
 
 Solenoids can be defined in two forms, a thick and a thin version: 
@@ -744,7 +552,7 @@ solenoid is a cartesian coordinate system.
 
 
 %\input{Introduction/nllens}
-\subsection{Nonlinear Lens with Elliptic Potential}
+\section{Nonlinear Lens with Elliptic Potential}
 \madbox{
 label: NLLENS, KNLL = real, CNLL = real;
 }
@@ -850,7 +658,7 @@ References:
 %\input{Introduction/kickers}
 %  Changed by: Frank Schmidt, 28-Aug-2003 
 %  Changed by: Werner Herr, 22-May-2007 
-\subsection{Closed Orbit Correctors}
+\section{Closed Orbit Correctors}
 \label{sec:closed_orbit_cor}
 Three types of closed orbit correctors are available: 
 \begin{madlist}
@@ -961,7 +769,7 @@ accelerator.
 
 %\input{Introduction/tkickers}
 %  Created by: Laurent Deniau, 15-Sep-2011 
-\subsection{Transverse Kicker}
+\section{Transverse Kicker}
 The type TKICKER should be used to create horizontal, vertical or
 combined transverse kickers physically equivalent to elements of type
 KICKER, but \textbf{not used} by the closed orbit correction module (see
@@ -983,7 +791,7 @@ at the documentation of the orbit corrector type
 
 
 %\input{Introduction/cavity}
-\subsection{RF Cavity}
+\section{RF Cavity}
 \label{sec:rf_cavity}
 
 \madbox{
@@ -1052,7 +860,7 @@ cavity is a cartesian coordinate system.
 
 
 %\input{Introduction/rfmultipole}
-\subsection{Thin Radio-Frequency Multipole}
+\section{Thin Radio-Frequency Multipole}
 \madbox{
 xxxxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
 label: RFMULTIPOLE, \> VOLT = real, LAG = real, \\
@@ -1142,7 +950,7 @@ bends also the reference orbit.
 %%\title{CRABCAVITY}
 %  Added by: R. Calaga, Sep 2010 
 %  Edited by: A. Latina, Jun 2013
-\subsection{Crab Cavity}
+\section{Crab Cavity}
 \label{sec:crab_cavity}
 
 \madbox{
@@ -1245,7 +1053,7 @@ cavity is a cartesian coordinate system.
 
 %\input{Introduction/separator}
 %  Changed by: Frank Schmidt, 28-Aug-2003 
-\subsection{Electrostatic Separator}
+\section{Electrostatic Separator}
 \label{sec:separator}
 
 \madbox{
@@ -1281,7 +1089,7 @@ separator is a cartesian coordinate system.
 
 %\input{Introduction/monitors}
 %  Changed by: G. Roy, 17 Oct 2013: added PLACEHOLDER
-\subsection{Beam Position Monitors}
+\section{Beam Position Monitors}
 \label{sec:monitors}
 
 A beam monitor has no specific effect on the beam and behaves like a
@@ -1319,8 +1127,8 @@ MV: VMONITOR;
 The \href{local_system.html#straight}{straight reference system} for a
 monitor is a cartesian coordinate system.  
 
-%  Added by: Ghislain Roy, 23-May-2013. Split from subsection on BPM's
-\subsection{Instruments}
+%  Added by: Ghislain Roy, 23-May-2013. Split from section on BPM's
+\section{Instruments}
 \label{sec:instruments}
 
 An instrument has no specific effect on the beam and behaves like a
@@ -1359,7 +1167,7 @@ instrument is a cartesian coordinate system.
 
 %\input{Introduction/collimator}
 %  Changed by: Ghislain Roy, 23-May-2013 
-\subsection{Collimators}
+\section{Collimators}
  
 The definition of collimators in \madx has been inherited from \madeight
 and two types of collimators are defined:  
@@ -1413,7 +1221,7 @@ with respect to the surrounding beam line.
 
 
 %\input{Introduction/rotation}
-\subsection{Coordinate Transformations}
+\section{Coordinate Transformations}
 
 \paragraph{\href{yrotation}{YROTATION: Rotation About the Vertical Axis}}
 
@@ -1481,7 +1289,7 @@ VBEND: SBEND, L = 6.0, K0S = 0.01/6;
 
 %\input{Introduction/beambeam}
 %  Changed by: Stefan Sorge, 2007 
-\subsection{Beam-beam Interaction}
+\section{Beam-beam Interaction}
 The BEAMBEAM element may be inserted in a beam line to simulate a
 beam-beam interaction point:  
  
@@ -1640,7 +1448,7 @@ For the definition of the LHC head-on and parasitic beam-beam elements see
 
 %\input{Introduction/matrix}
 %  Changed by: Frank Schmidt, 25-June-2003 
-\subsection{Arbitrary Matrix Element}
+\section{Arbitrary Matrix Element}
 
 \madbox{
 label: MATRIX, \= TYPE  \= = name, L = real, \= KICK1 = real,..., KICK6 = real, \\
