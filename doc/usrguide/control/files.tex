@@ -26,6 +26,13 @@ until a "RETURN" statement, or until End\_Of\_File; The file being
 "called" may in turn contain any number of \texttt{CALL} statements
 itself, and so on to any depth.  
 
+\section{RETURN}
+\label{Sec:return}
+\madbox{
+RETURN;
+}
+ends reading from a "called" file; if encountered in the standard input
+file, it ends the program execution.  
 
 
 \section{PRINT}
@@ -87,16 +94,6 @@ Note also that a percent sign (\%) can be printed using the format
 \verb|text="%%"|. 
 
 
-\section{REMOVEFILE}
-\label{sec:removefile}
-\madbox{
-REMOVEFILE, FILE="filename";
-}
-removes the file "filename" from disk. It is more portable than  
-\madxmp{
-SYSTEM("rm filename"); ! Unix specific
-}
-
 \section{RENAMEFILE}
 \label{sec:renamefile}
 \madbox{
@@ -108,13 +105,16 @@ portable than
 SYSTEM("mv filename new\_filename"); ! Unix specific
 }
 
-
-\section{RETURN}
-\label{Sec:return}
+\section{REMOVEFILE}
+\label{sec:removefile}
 \madbox{
-RETURN;
+REMOVEFILE, FILE="filename";
 }
-ends reading from a "called" file; if encountered in the standard input
-file, it ends the program execution.  
+removes the file "filename" from disk. It is more portable than  
+\madxmp{
+SYSTEM("rm filename"); ! Unix specific
+}
+
+
 
 %% EOF

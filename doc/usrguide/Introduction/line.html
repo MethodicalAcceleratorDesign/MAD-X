@@ -85,38 +85,51 @@ a,b,c,d,e,b,a,c,d,e,a,b
 <h3><a name=reflect>Reflection and Repetition</a></h3>
 An unsigned repetition count and an asterisk indicate
 repetition of a beam line member.
+A repetition count can be applied to sub-lines as well as elements. 
+
 A minus prefix causes reflection,
-i.e. all elements in the subsequence are taken in reverse order.
-Sub-lines of reflected lines are also reflected,
-but physical elements are not.
+i.e. all elements in the sub-line are taken in reverse order.
+Sub-lines of reflected lines are also reflected.
+Physical elements are not reflected head-to-tail, hence a negative
+repetition count for a single element is treated as positive. 
+
 If both reflection and repetition are desired,
 the minus sign must precede the repetition count.
+
 <p>
 Example:
 <pre>
 r:      line=(g,h);
 s:      line=(c,r,d);
-t:      line=(2*s,2*(e,f),-s,-(a,b));
+t:      line=(2*s,2*(e,f),-s,-(a,b),-2*c);
         use,period=t;
-<font color=ff0000><i>Attention: the repetition "2*s" will only work if
-"s" is itself a line. In case "s" is an element replace by
-"2*(s)". </i></font>
+
+<!-- <font color=ff0000><i>Attention: the repetition "2*s" will only work if -->
+<!-- "s" is itself a line. In case "s" is an element replace by -->
+<!-- "2*(s)". </i></font> -->
+
 </pre>
 Proceeding step by step, this example produces
 <p>1. Replace sub-line S:
 <pre>
-((c,r,d),(c,r,d),(e,f),(e,f),(d,-r,c),(b,a))
+((c,r,d),(c,r,d),(e,f),(e,f),(d,-r,c),(b,a),c,c)
 </pre>
 <p>2. replace sub-line r:
 <pre>
-((c,(g,h),d),(c,(g,h),d),(e,f),(e,f),(d,(h,g),c),(b,a))
+((c,(g,h),d),(c,(g,h),d),(e,f),(e,f),(d,(h,g),c),(b,a),c,c)
 </pre>
 <p>3. omit parentheses:
 <pre>
-c,g,h,d,c,g,h,d,e,f,e,f,d,h,g,c,b,a
+c,g,h,d,c,g,h,d,e,f,e,f,d,h,g,c,b,a,c,c
 </pre>
 Note that the inner sub-line R is reflected together with
 the outer sub-line S.
+
+Note also that "-2*c" at the end of the "t" line is
+equivalent to "2*c" since single elements are not reflected, 
+or "2*(c)" which would first promote "c" as a sub-line of a 
+single element, or "-2*(c)" since reverting a sub-line of a 
+single element gives the same single element. 
 
 <h3><a name=argument>Replaceable Arguments</a></h3>
 A beam line definition may contain a formal argument list,

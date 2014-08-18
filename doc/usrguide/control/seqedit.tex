@@ -28,24 +28,6 @@ selects the sequence named for editing. The editing is performed on the
 non-expanded sequence; after having finished the editing, one has to
 re-expand the sequence if necessary.  
 
-\section{EXTRACT}
-\label{sec:extract}
-\madbox{
-EXTRACT, SEQUENCE=string, FROM=string, TO=string, NEWNAME=string;
-}
-A new sequence with name given by the NEWNAME argument is extracted from
-the existing sequence given by the SEQUENCE argument, 
-starting from the position given by the FROM argument and ending at
-position given by the TO argument. The resulting new sequence
-can be USEd as any other sequence. It is declared as "shared" and
-can therefore be combined e.g. into the cycled original sequence. \\ 
-Note that the position given by the FROM argument must be located before
-the position given by the TO argument in the original sequence given by
-the SEQUENCE argument, or \mad will fail with a fatal error. 
-In the case of circular sequences, this can be ensured by performing a CYCLE 
-of the orginal sequence with {\tt START} pointing to the position given
-in the FROM argument. 
-
 \section{FLATTEN}
 \label{sec:flatten}
 \madbox{
@@ -53,6 +35,34 @@ FLATTEN;
 }
 This command recursively includes all sub-sequences within the sequence
 being edited, if any. The resulting sequence contains only elements.  
+
+\section{CYCLE}
+\label{sec:cycle}
+\madbox{
+CYCLE, START=string;
+}
+This makes the sequence start at the location given with the START
+argument, which must be a marker. \\ 
+In the case there is a shared sequence in the used sequence, the
+command FLATTEN has to be used before the command CYCLE. Example:  
+\madxmp{
+flatten ; cycle, start=place; 
+}
+
+\section{REFLECT}
+\label{sec:reflect}
+\madbox{
+REFLECT;
+}
+This inverts the order of element in the sequence, starting from the
+last element. \\ 
+If there are shared sequences inside the USEd sequence, the command
+FLATTEN must be used before the command REFLECT.  Alternatively each
+shared sequence must first be reflected. Example:   
+\madxmp{
+flatten ; reflect; 
+}
+
 
 \section{INSTALL}
 \label{sec:install}
@@ -114,34 +124,6 @@ REMOVE, ELEMENT=string|SELECTED;
   added by "cycle" must never be removed from a sequence.} 
 
 
-\section{CYCLE}
-\label{sec:cycle}
-\madbox{
-CYCLE, START=string;
-}
-This makes the sequence start at the location given with the START
-argument, which must be a marker. \\ 
-In the case there is a shared sequence in the used sequence, the
-command FLATTEN has to be used before the command CYCLE. Example:  
-\madxmp{
-flatten ; cycle, start=place; 
-}
-
-\section{REFLECT}
-\label{sec:reflect}
-\madbox{
-REFLECT;
-}
-This inverts the order of element in the sequence, starting from the
-last element. \\ 
-If there are shared sequences inside the USEd sequence, the command
-FLATTEN must be used before the command REFLECT.  Alternatively each
-shared sequence must first be reflected. Example:   
-\madxmp{
-flatten ; reflect; 
-}
-
-
 \section{REPLACE}
 \label{sec:replace}
 \madbox{
@@ -151,6 +133,24 @@ Element with name1 is replaced by element with name2.
 If name1 is "selected", then all elements selected by
 \href{../Introduction/select.html}{SELECT} commands will be replaced by
 the element name2.  
+
+\section{EXTRACT}
+\label{sec:extract}
+\madbox{
+EXTRACT, SEQUENCE=string, FROM=string, TO=string, NEWNAME=string;
+}
+A new sequence with name given by the NEWNAME argument is extracted from
+the existing sequence given by the SEQUENCE argument, 
+starting from the position given by the FROM argument and ending at
+position given by the TO argument. The resulting new sequence
+can be USEd as any other sequence. It is declared as "shared" and
+can therefore be combined e.g. into the cycled original sequence. \\ 
+Note that the position given by the FROM argument must be located before
+the position given by the TO argument in the original sequence given by
+the SEQUENCE argument, or \mad will fail with a fatal error. 
+In the case of circular sequences, this can be ensured by performing a CYCLE 
+of the orginal sequence with {\tt START} pointing to the position given
+in the FROM argument. 
 
 
 \section{ENDEDIT}

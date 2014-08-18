@@ -95,11 +95,12 @@ produces the following expansion steps:
 \label{sec:reflect_repeat_lines}
 An unsigned repetition count and an asterisk (multiplication sign)
 indicate repetition of a beam line member. 
+A repetition count can be applied to sub-lines as well as elements. 
 
 A minus prefix causes reflection, i.e. all elements in the sub-line are
-taken in reverse order. 
-Sub-lines of reflected lines are also reflected, but physical elements
-are not. 
+taken in reverse order. Sub-lines of reflected lines are also reflected.
+Physical elements are not reflected head-to-tail, hence a negative
+repetition count for a single element is treated as positive. 
 
 If both reflection and repetition are desired, the minus sign must
 precede the repetition count.  
@@ -109,24 +110,35 @@ Example:
 xxxxx\= \kill
 R:   \>LINE= (g, h); \\
 S:   \>LINE= (c, R, d); \\
-top: \>LINE= (2*S, 2*(e,f), -S, -(a,b)); \\
+top: \>LINE= (2*S, 2*(e,f), -S, -(a,b), -2*c); \\
 USE, \>PERIOD=top;
 }
 produces the following expansion steps:
 \begin{enumerate}
   \item Replace sub-line S: 
-    \madxmp{( (c,R,d), (c,R,d), (e,f), (e,f), (d,-R,c), (b,a))}
+    \madxmp{( (c,R,d), (c,R,d), (e,f), (e,f), (d,-R,c), (b,a), c, c)}
   \item Replace sub-line R: 
-    \madxmp{( (c, (g,h), d), (c, (g,h), d), (e,f), (e,f), (d, (h,g), c), (b,a))}
+    \madxmp{( (c, (g,h), d), (c, (g,h), d), (e,f), (e,f), (d, (h,g), c),
+      (b,a), c, c)}
   \item Omit parentheses: 
-    \madxmp{c, g, h, d, c, g, h, d, e, f, e, f, d, h, g, c, b, a}
+    \madxmp{c, g, h, d, c, g, h, d, e, f, e, f, d, h, g, c, b, a, c, c}
 \end{enumerate}
 
-Note that the inner sub-line R is reflected together with the outer
-sub-line S.   
+Note that the inner sub-line \texttt{R} is reflected together with the
+outer sub-line \texttt{S}.
 
-Attention: the repetition "2*S" only works if "S" is itself a
-line. If "S" is a single element, the repetition syntax should  "2*(S)".
+Note also that \texttt{-2*c} at the end of the \texttt{top} line is
+equivalent to \texttt{2*c} since single elements are not reflected, or
+\texttt{2*(c)} which would first promote \texttt{c} as a sub-line of a
+single element, or \texttt{-2*(c)} since reverting a sub-line of a
+single element gives the same single element.  
+
+%% Fixed in r4932, a single element can now be repeated. 2*S and -2*S
+%% are of course identical, and also equivalent to 2*(S) and -2*(S) if S
+%% is a single element.
+%%{\bf Attention:} the repetition \texttt{2*S} only works if \texttt{S} is
+%%itself a line. If \texttt{S} is a single element, the repetition syntax
+%%should be \texttt{2*(S)}. 
  
 
 

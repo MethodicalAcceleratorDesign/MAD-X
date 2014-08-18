@@ -33,17 +33,57 @@ The CORRECT statement makes a complete closed orbit  or trajectory
 correction using the \textbf{computed} values at the monitors  from the
 Twiss table.   
 
-The CORRECT command has the following format (not all possible options
-included, some options are valid only for special algorithms):  
+The CORRECT command has the following format (some options are valid
+only for special algorithms):   
 
 \madbox{
-CORRECT, \=ORBIT=myorbit, MODEL=mymodel, TARGET=mytarget, \\
-         \>FLAG=ring, MODE=lsq, \\
+CORRECT, \=ORBIT=orbittable, MODEL=modeltable, TARGET=targettable, \\
+         \>SEQUENCE=seqname, \\
+         \>FLAG=string, MODE=string, COND=integer,\\
+         \>TWISSUM=integer, \\
+         \>NCORR=integer, CORRLIM=real, \\
          \>MONERROR=integer, MONON=real, MONSCALE=real, ERROR=real,\\ 
-         \>PLANE=x, COND=integer, RESOUT=integer, \\
-         \>CLIST=file1, MLIST=file2, \\
-         \>TWORING, UNITS=real, CORZERO=integer;  
+         \>PLANE=string,  RESOUT=integer, \\
+         \>CLIST=filename, MLIST=filename, \\
+         \>UNITS=real, CORZERO=integer, \\
+         \>SNGCUT=real, SNGVAL=real \\
+         \>TWORING=logical, BEAM1TAB=tablename, BEAM2TAB=tablename, \\
+         \>NAME\_COL=string, X\_COL=string, Y\_COL=string, \\
+         \>EXTERN=logical;  
 }
+
+%% "correct: correct correct 0 0 "
+%% "error    = [r, 1.e-5], "   v
+%% "ncorr    = [i, 0], "       v
+%% "monerror = [i, 0], "       v 
+%% "monscale = [i, 0], "       v
+%% "monon    = [r, 1], "       v
+%% "moncut   = [r, 0], "       v
+%% "corrlim  = [r, 1], "       v
+%% "resout   = [i, 0], "       v
+%% "sequence = [s, {none}], "  v
+%% "clist    = [s, none], "    v
+%% "mlist    = [s, none], "    v
+%% "plane    = [s, x], "       v
+%% "flag     = [s, ring], "    v
+%% "mode     = [s, micado], "  v
+%% "cond     = [i, 0], "       v
+%% "twissum  = [i, 0], "       v
+%% "orbit    = [s, none], "    v
+%% "model    = [s, none], "    v
+%% "corzero  = [i, 0], "       v
+%% "tworing  = [l, false, true], " v
+%% "beam1tab = [s, none], "    v
+%% "beam2tab = [s, none], "    v
+%% "target   = [s, none], "    v
+%% "name_col = [s, none], "    v
+%% "x_col    = [s, none], "    v
+%% "y_col    = [s, none], "    v
+%% "units    = [r, 1], "       v
+%% "sngcut   = [r, 50], "      v
+%% "sngval   = [r, 2], "       v
+%% "extern   = [l, false, true]; " v
+
 
 The command CORRECT is set up with defaults which should allow a
 reasonable correction for most cases with a minimum of required options

@@ -6,6 +6,7 @@
 \includeonly{
   Introduction/coverpage,       %MAD-X Cover Page
   Introduction/copyright,	%MAD-X Copyright Statement
+  Introduction/changelog,       %MAD-X Change log
   Introduction/module,          %MAD-X contributors and module keepers
 %
   Introduction/conventions,	%Conventions
@@ -229,6 +230,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \include{Introduction/coverpage}        %MAD-X Cover Page
 \include{Introduction/copyright}	%MAD-X Copyright Statement
+\include{Introduction/changelog}        %MAD-X Change log
 \include{Introduction/module}           %MAD-X contributors and module keepers
 
 \tableofcontents
@@ -265,21 +267,21 @@
 
 
 \part{MAD Modules}                      %MAD Modules 
-\include{twiss/twiss}			%TWISS
-%\include{twiss/twiss_mad8}
-\include{match/match}			%MATCHING
 \include{survey/survey}			%SURVEY: geometric layout and survey
-%\include{survey/survey_mad8}
+%\include{survey/survey_mad8} % removed 
+\include{twiss/twiss}			%TWISS
+%\include{twiss/twiss_mad8} % removed
+\include{match/match}			%MATCHING
+\include{emit/emit}			%EMIT
 \include{Introduction/aperture}	        %APERTURE: defining and calculating apertures 
 \include{makethin/makethin}		%MAKETHIN: Conversion to Thin Lens
 %\include{dynap/dynap}			%DYNAP: Dynamic Aperture %% Now included in thintrack.tex
-\include{emit/emit}			%EMIT
 \include{error/error}			%ERRORS
 % \include{error/errors}                !! redundant with error.tex !!!
-\include{ibs/ibs}			%IBS: Intra Beam Scattering
 \include{cororbit/cororbit}		%ORBIT CORRECTION
 \include{sodd/sodd}			%SODD
 \include{touschek/touschek}		%TOUSCHEK
+\include{ibs/ibs}			%IBS: Intra Beam Scattering
 \include{tracking/tracking}		%TRACKING: Overview of MAD-X Tracking Modules
 \include{thintrack/thintrack}		%THINTRACK: Thin-Lens Tracking Module 
 
