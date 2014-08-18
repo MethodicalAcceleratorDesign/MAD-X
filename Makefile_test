@@ -19,6 +19,10 @@
 # 2014-May-23  14:51:22  ghislain: 
 #		 reinstated test-ptc-twiss that had disappeared from this file
 # 	         merged test-twiss-7 with test-emit-2 and suppressed test-emit-2
+# 2014-Aug-18  16:09:41  ghislain: 
+#                added test-line testsuite with first test for repetition count 
+#                for element vs line
+# 
 
 #################################################
 # testsuite
@@ -64,6 +68,7 @@ test-ptc-normal test-ptc-twiss-maptable \
 test-ptc-trackline test-ptc-trackline-2 \
 test-touschek test-touschek-2 \
 test-sequence test-sequence-2 test-sequence-3 test-sequence-4 test-sequence-5 test-sequence-6 \
+test-line \
 test-plot test-plot-2
 
 # same order as tests-all, tests that take +10s
@@ -97,6 +102,7 @@ test-emit:           TESTSUITE := Emit testsuite
 test-error:          TESTSUITE := Error testsuite
 test-ibs:            TESTSUITE := IBS testsuite
 test-jacobian:       TESTSUITE := Jacobian testsuite
+test-line:           TESTSUITE := Line testsuite
 test-makethin:       TESTSUITE := Makethin testsuite
 test-match:          TESTSUITE := Matching testsuite
 test-memory:         TESTSUITE := Memory Management testsuite

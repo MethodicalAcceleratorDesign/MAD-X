@@ -1,0 +1,20 @@
+Title, "test of line expansion in MAD-X"; 
+
+Option, echo, info, warn, debug;
+
+Beam;
+
+D1: drift, L=1;
+D2: drift, L=2;
+Q1: QUADRUPOLE, L=1;
+
+T1: LINE=(D1, 3*Q1, D2);
+T2: LINE=(D1, 3*(Q1), D2);
+
+Use, sequence=T1;
+Survey, sequence=T1;
+
+Use, sequence=T2;
+Survey, sequence=T2;
+
+Exit;
