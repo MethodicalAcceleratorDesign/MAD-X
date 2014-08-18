@@ -74,6 +74,7 @@ doc/usrguide/Introduction/bibliography.html -text
 doc/usrguide/Introduction/bibliography.tex -text
 doc/usrguide/Introduction/bv_flag.html -text
 doc/usrguide/Introduction/cavity.html -text
+doc/usrguide/Introduction/changelog.tex -text
 doc/usrguide/Introduction/closed_orbit.html -text
 doc/usrguide/Introduction/closed_orbit.tex -text
 doc/usrguide/Introduction/collimator.html -text
@@ -190,6 +191,7 @@ doc/usrguide/control/files.tex -text
 doc/usrguide/control/foot.html -text
 doc/usrguide/control/foot.tex -text
 doc/usrguide/control/general.html -text
+doc/usrguide/control/programflow.tex -text
 doc/usrguide/control/seqedit.html -text
 doc/usrguide/control/seqedit.tex -text
 doc/usrguide/control/special.html -text
