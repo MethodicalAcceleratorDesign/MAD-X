@@ -324,7 +324,7 @@ static void
 expand_line(struct char_p_array* l_buff)
   /* expands a beam line, applies rep. count and inversion */
 {
-  /* first get all bracket pairs with their level; keep max. level */
+  
   int add=0, i=0, j=0, k=0, n=0, number=0, dummy=0, rep=-1, pos=0;
   int level = 0, l_max = 0, b_cnt = 0;
   char* p = blank;
@@ -332,10 +332,9 @@ expand_line(struct char_p_array* l_buff)
   struct int_array* rbpos = new_int_array(l_buff->curr);
   struct int_array* b_level = new_int_array(l_buff->curr);
 
-  for (i = 0; i < l_buff->curr; i++)
-  {
-    if (*l_buff->p[i] == '(')
-    {
+  /* first get all bracket pairs with their level; keep max. level */
+  for (i = 0; i < l_buff->curr; i++) {
+    if (*l_buff->p[i] == '(') {
       lbpos->i[b_cnt] = i;
       b_level->i[b_cnt++] = level++;
       if (level > l_max) l_max = level;
@@ -343,38 +342,38 @@ expand_line(struct char_p_array* l_buff)
     else if (*l_buff->p[i] == ')')  level--;
   }
   l_max--;
+
   for (i = 0; i < b_cnt; i++)
     get_bracket_t_range(l_buff->p, '(', ')', lbpos->i[i],
                         l_buff->curr-1, &dummy, &rbpos->i[i]);
   lbpos->curr = rbpos->curr = b_level->curr = b_cnt;
+
   /* now loop over level from highest down to zero, expand '*' in each pair */
-  for (level = l_max; level >=0; level--)
-  {
-    for (i = 0; i < b_cnt; i++)
-    {
-      if (b_level->i[i] == level && (pos = lbpos->i[i]) > 1)
-      {
-        if (*l_buff->p[pos-1] == '*')
-        {
+  for (level = l_max; level >=0; level--) {
+    for (i = 0; i < b_cnt; i++) {
+      if (b_level->i[i] == level && (pos = lbpos->i[i]) > 1) {
+        if (*l_buff->p[pos-1] == '*') {
           sscanf(l_buff->p[pos-2], "%d", &rep);
-          add = rep - 1;
+	  add = rep - 1;
           number = rbpos->i[i] - pos - 1; /* inside bracket */
           n = number * add; /* extra tokens */
-          while (l_buff->curr + n >= l_buff->max)
-            grow_char_p_array(l_buff);
+          while (l_buff->curr + n >= l_buff->max) grow_char_p_array(l_buff);
+
           for (j = l_buff->curr; j > pos + number; j--) /* shift upwards */
             l_buff->p[j+n] = l_buff->p[j];
+
           l_buff->curr += n;
-          for (k = 1; k <= add; k++)
-          {
+
+          for (k = 1; k <= add; k++) {
             for (j = pos+1; j <= pos+number; j++)
               l_buff->p[j+k*number] = tmpbuff(l_buff->p[j]);
           }
-          for (j = 0; j < b_cnt; j++)  /* reset bracket pointers */
-          {
+
+          for (j = 0; j < b_cnt; j++) {  /* reset bracket pointers */
             if (lbpos->i[j] > pos + number) lbpos->i[j] += n;
             if (rbpos->i[j] > pos + number) rbpos->i[j] += n;
           }
+
           l_buff->p[pos-1] = l_buff->p[pos-2] = blank;
         }
       }
@@ -382,16 +381,11 @@ expand_line(struct char_p_array* l_buff)
   }
 
   /* loop over buffer, expand simple element repetition defined with '*' f.g. 10*myquad  */
-  for (pos = 2; pos < l_buff->curr; pos++)
-  {
-    if (*l_buff->p[pos] == '*')
-    {
+  for (pos = 2; pos < l_buff->curr; pos++) {
+    if (*l_buff->p[pos] == '*') {
       rep = -1;
       sscanf(l_buff->p[pos-1], "%d", &rep);
-      if (rep < 0)
-      {
-        fatal_error("expand_line","Problem with reading number of copies");
-      }
+      if (rep < 0) fatal_error("expand_line","Problem with reading number of copies");
       n = add = rep - 1;
       while (l_buff->curr + n >= l_buff->max) grow_char_p_array(l_buff);
 
@@ -400,61 +394,54 @@ expand_line(struct char_p_array* l_buff)
 
       l_buff->curr += n;
       
-      
       j = pos+1;
-      for (k = 1; k <= add; k++)
-      {
-        l_buff->p[j+k] = tmpbuff(l_buff->p[j]); 
-      }
+      for (k = 1; k <= add; k++) l_buff->p[j+k] = tmpbuff(l_buff->p[j]); 
 
-      for (j = 0; j < b_cnt; j++)  /* reset bracket pointers */
-      {
+      for (j = 0; j < b_cnt; j++) {  /* reset bracket pointers */      
         if (lbpos->i[j] > pos + 1) lbpos->i[j] += n;
         if (rbpos->i[j] > pos + 1) rbpos->i[j] += n;
       }
 
-      l_buff->p[pos-1] = l_buff->p[pos-2] = blank;
+      // 2014-Aug-18  19:56:34  ghislain: in case of single element with rep_count, 
+      // l_buff->p[pos-1] points to the rep_count 
+      // and l_buff->p[pos-2] the previous element which is then lost!!!
+      // l_buff->p[pos-1] = l_buff->p[pos-2] = blank;
+      l_buff->p[pos-1] = blank;
     }
   }
+
   /* get bracket pointers including new ones */
   while (b_level->max < l_buff->curr) grow_int_array(b_level);
   while (lbpos->max < l_buff->curr) grow_int_array(lbpos);
   while (rbpos->max < l_buff->curr) grow_int_array(rbpos);
   level = b_cnt = 0;
-  for (i = 0; i < l_buff->curr; i++)
-  {
-    if (*l_buff->p[i] == '(')
-    {
+  for (i = 0; i < l_buff->curr; i++) {
+    if (*l_buff->p[i] == '(') {
       lbpos->i[b_cnt] = i;
       b_level->i[b_cnt++] = level++;
     }
     else if (*l_buff->p[i] == ')')  level--;
   }
+
   for (i = 0; i < b_cnt; i++)
     get_bracket_t_range(l_buff->p, '(', ')', lbpos->i[i],
                         l_buff->curr-1, &dummy, &rbpos->i[i]);
   lbpos->curr = rbpos->curr = b_level->curr = b_cnt;
 
   /* now loop over level from highest down to zero, invert if '-' */
-  for (level = l_max; level >= 0; level--)
-  {
-    for (i = 0; i < b_cnt; i++)
-    {
+  for (level = l_max; level >= 0; level--) {
+    for (i = 0; i < b_cnt; i++) {
       pos = lbpos->i[i];
-      if (b_level->i[i] == level)
-      {
+      if (b_level->i[i] == level) {
         p = blank;
-        for (j = pos - 1; j > 0; j--)
-        {
+        for (j = pos - 1; j > 0; j--) {
           p = l_buff->p[j];
           if (*p != ' ')  break;
         }
-        if (*p == '-')
-        {
-          number = rbpos->i[i] - pos - 1;
+        if (*p == '-') {
+          number = rbpos->i[i] - pos - 1; // length of sequence
           n = number / 2;
-          for (j = 0; j < n; j++)
-          {
+          for (j = 0; j < n; j++) {
             p = l_buff->p[pos+j+1];
             l_buff->p[pos+j+1] = l_buff->p[pos+number-j];
             l_buff->p[pos+number-j] = p;
@@ -463,10 +450,10 @@ expand_line(struct char_p_array* l_buff)
       }
     }
   }
+
   /* finally remove all non-alpha tokens */
   n = 0;
-  for (i = 0; i < l_buff->curr; i++)
-  {
+  for (i = 0; i < l_buff->curr; i++) {
     if (isalpha(*l_buff->p[i])) l_buff->p[n++] = l_buff->p[i];
   }
   l_buff->curr = n;

@@ -9,12 +9,19 @@ D2: drift, L=2;
 Q1: QUADRUPOLE, L=1;
 
 T1: LINE=(D1, 3*Q1, D2);
-T2: LINE=(D1, 3*(Q1), D2);
-
 Use, sequence=T1;
 Survey, sequence=T1;
 
+T2: LINE=(D1, -3*Q1, D2);
 Use, sequence=T2;
 Survey, sequence=T2;
+
+T3: LINE=(D1, 3*(Q1), D2);
+Use, sequence=T3;
+Survey, sequence=T3;
+
+T4: LINE=(D1, -3*(Q1), D2);
+Use, sequence=T4;
+Survey, sequence=T4;
 
 Exit;
