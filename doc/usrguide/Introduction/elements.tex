@@ -179,6 +179,9 @@ Bending magnets have the following attributes:
    (Default: false)
 \end{madlist}
 
+{\bf Note:} Additional attributes can be given to bending magnets that
+are useful for PTC and defined in \ref{sec:add_option_PTC}.
+
 \vskip 5mm
 {\bf \underline{Fringe Fields:}}
 \vskip 3mm
@@ -328,6 +331,9 @@ Example:
 QF: QUADRUPOLE, L = 1.5, K1 = 0.001, THICK = 1;
 }
 
+{\bf Note:} Additional attributes can be given to quadrupoles that
+are useful for PTC and defined in \ref{sec:add_option_PTC}.
+
 The \href{local_system.html#straight}{straight reference system} for
 a quadrupole is a cartesian coordinate system.
 
@@ -377,9 +383,10 @@ A SEXTUPOLE has four real attributes:
   positive $K_{2s}$ with positive $\tt{TILT} = \pi/6$.} 
 
 Example: 
-\madxmp{
-S: SEXTUPOLE, L = 0.4, K2 = 0.00134;
-}
+\madxmp{S: SEXTUPOLE, L = 0.4, K2 = 0.00134;}
+
+{\bf Note:} Additional attributes can be given to sextupoles that
+are useful for PTC and defined in \ref{sec:add_option_PTC}.
 
 The \href{local_system.html#straight}{straight reference system} for a
 sextupole is a cartesian coordinate system.   
@@ -433,9 +440,10 @@ An OCTUPOLE has four real attributes:
   positive K$_3s$ with positive tilt=+pi/8. } 
 
 Example: 
-\madxmp{
-O3: OCTUPOLE, L = 0.3, K3 = 0.543;
-}
+\madxmp{O3: OCTUPOLE, L = 0.3, K3 = 0.543;}
+
+{\bf Note:} Additional attributes can be given to octupoles that
+are useful for PTC and defined in \ref{sec:add_option_PTC}.
 
 The \href{local_system.html#straight}{straight reference system} for a
 octupole is a cartesian coordinate system. Octupoles are normally
@@ -545,6 +553,9 @@ xxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxx\= \kill
 SOLO:     \> SOLENOID, L = 2., \> KS = 0.001; \\
 THINSOLO: \> SOLENOID, L = 0,  \> KS = 0.001, KSI = 0.002;
 }
+
+{\bf Note:} Additional attributes can be given to solenoids that
+are useful for PTC and defined in \ref{sec:add_option_PTC}.
 
 The \href{local_system.html#straight}{straight reference system} for a
 solenoid is a cartesian coordinate system. 
