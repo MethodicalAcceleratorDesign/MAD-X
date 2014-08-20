@@ -12,7 +12,7 @@ and the canonical variable set ($x$ , $p_x / p_0$),
 programs most of which use the set ($x$, $x'$), ($y$, $y'$),
 ($-\delta s$), $\delta p / p_0$). 
 
-Like \href{bibliography.html#dragt}{[Dragt]}, \madeight uses the relative
+Like Dragt \cite{dragt:1982}, \madeight uses the relative
 energy error $p / p_0$, which is equal the relative momentum error
 ${\texttt delta} = \delta p / p_0$ multiplied by $\beta = v/c$.  
 
@@ -24,8 +24,8 @@ high accuracy as opposed to previous versions.
  
 The choice of canonical variables in \madx still leads to slightly
 different definitions of the lattice functions. In \madx the
-Courant-Snyder invariants in \href{bibliography.html#courant}{[Courant
-    and Snyder]} take the form 
+Courant-Snyder invariants mentioned in \cite{Courant_Snyder1958} take
+the form  
 
 $W_x = \gamma_x x^2 - 2 \alpha_x x p_x + \beta_x  p_x^2$
 
@@ -51,12 +51,12 @@ electron-positron storage ring, the definition of the Courant-Snyder
 invariants must be generalised. The \madeight invariants have the advantage
 that they remain invariants along the beam line even for variable $\delta$.  
 
-With the new method this problem occurs in
-\href{../twiss/twiss.html}{Twiss module} only for non-constant $\delta$.   
+With the new method this problem occurs in Twiss module (see
+\ref{chap:twiss}) only for non-constant $\delta$.    
 
 \section{Treatment of Energy Error in TWISS} 
-It has been noted in \href{bibliography.html#ruggiero}{[Milutinovic and
-    Ruggiero]} that \madeight returned tunes which are too low for non-zero
+It has been noted by Milutinovic and Ruggiero \cite{milutinovic1988}
+that \madeight returned tunes which are too low for non-zero
 $\delta$. The difference was found to be quadratic in delta with a negative
 coefficient. This problem has been eliminated thanks to the new
 treatment  of momentum errors from \madeight Version 8.13 onwards.   

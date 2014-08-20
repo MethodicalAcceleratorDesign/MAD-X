@@ -12,7 +12,7 @@
   Introduction/conventions,	%Conventions
 %
   Introduction/format,		%Command and Statement Format
-  Introduction/parameter,       %Parameters
+%  Introduction/parameter,       %Parameters
   control/programflow,          %Program Flow Statements
   control/control,              %Control Statements
   control/files,                %File Handling Statements
@@ -51,7 +51,7 @@
   cororbit/cororbit,		%ORBIT CORRECTION
   sodd/sodd,			%SODD
   touschek/touschek,		%TOUSCHEK
-  tracking/tracking,		%TRACKING: Overview of MAD-X Tracking Modules
+%  tracking/tracking,		%TRACKING: Overview of MAD-X Tracking Modules
   thintrack/thintrack,		%THINTRACK: Thin-Lens Tracking Module 
 %
   %PTC Commands 
@@ -62,9 +62,9 @@
   ptc_normal/ptc_normal,	%PTC_NORMAL: Non-Linear Machine Parameters
   ptc_auxiliaries/ptc_auxiliaries,%PTC Auxiliary Commands
 %
-  sindex,                       %Keyword and Subject Index
-  Introduction/bibliography,    %References
-  match/bibliography,
+%  sindex,                       %Keyword and Subject Index
+%  Introduction/bibliography,    %References
+%  Inlined/match_bibliography_inlined,
 %
 % Annexes
   Introduction/defects,		%Known Differences to Other Programs 
@@ -241,7 +241,7 @@
 \part{Control}
 \include{Introduction/conventions}	%Conventions
 \include{Introduction/format}		%Command and Statement Format
-\include{Introduction/parameter}        %Parameters
+%\include{Introduction/parameter}        %Parameters
 \include{control/programflow}           %Program Flow Statements
 \include{control/control}		%Control Statements
 \include{control/files}		        %File Hanfling Statements
@@ -282,7 +282,7 @@
 \include{sodd/sodd}			%SODD
 \include{touschek/touschek}		%TOUSCHEK
 \include{ibs/ibs}			%IBS: Intra Beam Scattering
-\include{tracking/tracking}		%TRACKING: Overview of MAD-X Tracking Modules
+%\include{tracking/tracking}		%TRACKING: Overview of MAD-X Tracking Modules
 \include{thintrack/thintrack}		%THINTRACK: Thin-Lens Tracking Module 
 
 
@@ -295,20 +295,21 @@
 \include{ptc_auxiliaries/ptc_auxiliaries}%PTC Auxiliary Commands
 
 
-\part{}
+%\part{}
 %\include{sindex}                        %Keyword and Subject Index
-\include{Introduction/bibliography}     %References
-\include{match/bibliography}            %Additional References; should
+%\include{Introduction/bibliography}     %References
+%\include{Inlined/match_bibliography_inlined}
+%\include{match/bibliography}            %Additional References; should
                                         %be merged with the above
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %%% Annexes
-
+\part{Trailing Material}
 \include{Introduction/defects}		%Known Differences to Other Programs 
 \include{Introduction/pitfalls}
 
-\bibliographystyle{alpha}
+\bibliographystyle{unsrt}
 \bibliography{Introduction/biblio-mad}
 
 %%% The rest does not belong to a manual and will be best placed on the

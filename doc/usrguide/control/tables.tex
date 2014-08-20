@@ -95,97 +95,163 @@ If the FILE argument is omitted, the table is written to standard output.
 \section{SETVARS}
 \label{sec:setvars}
 
+The \texttt{SETVARS} command sets the variables with values extracted
+from the row of a table.
+
 \madbox{
 SETVARS, TABLE=tablename, ROW=integer;
 }
-sets the variables with values extracted
-from the specified row of table "tablename".
 
-If \texttt{nrow} is the number of rows in the table, the condition
-\texttt{ROW $>$ nrow}, ie trying to access the table beyond the last row,
-results in access to the last row of the table. 
+The attributes of \texttt{SETVARS} are:
+\begin{madlist}
+  \ttitem{TABLE} the name of the table. (Default: none)
+  \ttitem{ROW} the row number containing the values. (Default: -1)
+\end{madlist}
 
+Negative \texttt{ROW} values are allowed and count the row numbers from
+the last row, allowing access to the table in reverse order of rows:
+\texttt{ROW~=~-1} accesses the last row of the table,
+\texttt{ROW~=~-2} accesses the one before last (penultimate) row,
+etc\ldots  
 
-%% last row, or \texttt{ROW - 1 $<$ -nrow}, ie trying to access the table
-%% backwards before the first row, results in a ``row out of bound''
-%% message and the expression is not constructed or evaluated. 
+%% Note that negative ROW values count the row numbers from the last row,
+%% allowing access to the table in reverse order of rows: \texttt{ROW~=~-1}
+%% accesses the last row of the table, \texttt{ROW~=~-2} accesses the one
+%% before last (penultimate) row, etc\ldots 
 
-%% %% to be implemented
-%% Note that the special value \texttt{ROW~=~0} denotes the last row of
-%% the table. \\
-%% Consequently \texttt{ROW~=~-1} denotes the one before last
-%% (penultimate) row, etc\ldots allowing access to the table in reverse
-%% order of rows. 
+Trying to access the table forward beyond the last row, i.e. \texttt{ROW}
+strictly greater than {\tt nrow} the number of rows in the table, or
+trying to access the table backwards before the first row, i.e. \texttt{ROW}
+strictly lower than {\tt -nrow}, or trying to access the illegal
+\texttt{ROW=0}, all result in a ``row out of bound'' message and no
+variable values are returned and set.  
 
-%% If \texttt{nrow} is the number of rows in the table, the condition
+%% If \texttt{nrow} is the number of rows in the table, the conditions
 %% \texttt{ROW $>$ nrow}, ie trying to access the table forward beyond the
-%% last row, or \texttt{ROW - 1 $<$ -nrow}, ie trying to access the table
-%% backwards before the first row, results in a ``row out of bound''
-%% message and the expression is not constructed or evaluated. 
+%% last row, or \texttt{ROW $<$ -nrow}, ie trying to access the table
+%% backwards before the first row, or \texttt{ROW=0} 
+%% result in a ``row out of bound'' message and no variable values are
+%% returned and set. 
 
 
 \section{SETVARS\_LIN}
 \label{sec:setvars_lin}
 
+The SETVARS\_LIN command sets the variables with values calculated
+by linear interpolation, or extrapolation, between two rows of a table. 
+
 \madbox{
-SETVARS\_LINE, TABLE=tablename, ROW1=integer, ROW2=integer, PARAM=real;
+SETVARS\_LINE, TABLE=tablename, ROW1=integer, ROW2=integer, PARAM=string;
 }
-sets the variables with values calculated by linear interpolation
-between the values in ROW1 and ROW2 of table "tablename". The string
-given in the PARAM attribute is the interpolation factor. For proper
-interpolation, \texttt{PARAM} should be between 0 and 1; \texttt{PARAM}
-below 0 or above 1 will perform extrapolation accordingly. 
 
-\madxmp{value := value(row1)*param + value(row2)*(1-param)}
-but this should be 
-\madxmp{value \=:= value(row1) + param*(value(row2)-value(row1)) \\
-              \>:= value(row2)*param + value(row1)*(1-param) }
+The attributes of \texttt{SETVARS\_LIN} are:
+\begin{madlist}
+  \ttitem{TABLE} the name of the table. (Default: none)
+  \ttitem{ROW1} a first row number with values for interpolation. (Default: 0)
+  \ttitem{ROW2} a second row number with values for interpolation. (Default: 0)
+  \ttitem{PARAM} a string containing the linear interpolation factor or
+  the name of a variable or expression containing the interpolation
+  factor. If the resulting value of \texttt{PARAM} is outside the
+  $[0,1]$ interval, the result is a linear extrapolation. \\
+  (Default: "interp", itself defaulting to a value of 0.0 when evaluated)
+\end{madlist}
 
-Internally, \madx constructs this expression as a deferred expression
-and evaluates it. 
+\texttt{SETVARS\_LIN} sets the variables with values calculated through
+the following formula that \madx constructs internally as a deferred
+expression which is immediately evaluated:
+\madxmp{value := value(row1)*(1-param) + value(row2)*param;}
+Both the expression and the value of the expression are available to the
+user through respectively the commands \texttt{SHOW} (see section
+\ref{sec:show}) and \texttt{VALUE} (see section \ref{sec:value}).
+
+%% was:
+%%\madxmp{value := value(row1)*param + value(row2)*(1-param)}
+%%but this should be 
+%%\madxmp{value \=:= value(row1) + param*(value(row2)-value(row1)) \\
+%%              \>:= value(row2)*param + value(row1)*(1-param) }
+
+
+Negative \texttt{ROWi} values are allowed and count the row numbers from
+the last row, allowing access to the table in reverse order of rows:
+\texttt{ROWi~=~-1} accesses the last row of the table,
+\texttt{ROWi~=~-2} accesses the one before last (penultimate) row,
+etc\ldots  
+
+Trying to access the table forward beyond the last row, i.e. \texttt{ROWi}
+strictly greater than {\tt nrow} the number of rows in the table, or
+trying to access the table backwards before the first row, i.e. \texttt{ROWi}
+strictly lower than {\tt -nrow}, or trying to access the illegal
+\texttt{ROWi=0}, all result in a ``row out of bound'' message and the
+expression is not constructed or evaluated. 
+
+%% If \texttt{nrow} is the number of rows in the table, the conditions
+%% \texttt{ROWi $>$ nrow}, ie trying to access the table forward beyond the
+%% last row, or \texttt{ROWi $<$ -nrow}, ie trying to access the table
+%% backwards before the first row, or \texttt{ROWi=0} result in a ``row out
+%% of bound'' message and the expression is not constructed or evaluated. 
 
 {\bf Example:}
 \madxmp{
 !  extracts the position of the centre of each element from a standard \\
 !  TWISS table giving positions at end of elements: \\
-\\
 len = table(twiss,tablelength); \\
-len = len - 1; \\
-\\
-i = 0;\\
+interpolate = 0.5; \\
+i = 2;\\
 WHILE \=(i < len) \{ \\
-      \>i = i + 1; \\
-      \>SETVARS\_LIN, TABLE=twiss, ROW1=i, ROW2=i+1, PARAM=0.5; \\
+      \>SETVARS\_LIN, TABLE=twiss, ROW1=i-1, ROW2=i, PARAM=interpolate; \\
       \>! now variables are interpolated at the center of the elements. \\
-      \>! In particular the S variable is the position \\
-      \>! of the center of the element  \\
-      \>VALUE, S; \\
-      \>\ldots \\ \};
+      \>! in particular S holds the position of the center of the element. \\
+      \>SHOW, s; VALUE, s; \\
+      \>\ldots \\ 
+      \>i = i + 1; \};
 }
-
-Note that the special value \texttt{ROWi~=~0} denotes the last row of
-the table. \\
-Consequently \texttt{ROWi~=~-1} denotes the one before last
-(penultimate) row, etc\ldots allowing access to the table in reverse
-order of rows. 
-
-If \texttt{nrow} is the number of rows in the table, the condition
-\texttt{ROWi $>$ nrow}, ie trying to access the table forward beyond the
-last row, or \texttt{ROWi - 1 $<$ -nrow}, ie trying to access the table
-backwards before the first row, results in a ``row out of bound''
-message and the expression is not constructed or evaluated. 
-
 
 \section{FILL} 
 \label{sec:fill}
-Every command 
+The FILL command fills a row of a table with the current values of all
+declared column variables of the table.
 \madbox{
-FILL, TABLE=tablename;
+FILL, TABLE=tablename, ROW=integer;
 }
-adds a new line with the current values of all column variables into the
-user table \hyperlink{create}{create}d beforehand. This table one can
-then \hyperlink{write}{write} in TFS format.  See as well the
-\href{../Introduction/select.html#ucreate}{user table} example.  
+
+The FILL command takes two arguments:
+\begin{madlist}
+  \ttitem{TABLE} is the name of the table to be filled. The table must
+  have been created (section \ref{sec:create}) beforehand. 
+  The table can then be written to file (section \ref{sec:write}) in TFS
+  format. 
+
+  \ttitem{ROW} is the row number to be filled with the current values of
+  all column variables. \texttt{ROW=0}, causes \texttt{FILL} to add a row at
+  the end of the table and fill it with the current values of all
+  column variables. \\ (Default: 0) 
+\end{madlist}
+
+Negative \texttt{ROW} values are allowed and count the row numbers from
+the last row, allowing access to the table in reverse order of rows:
+\texttt{ROW~=~-1} accesses the last row of the table,
+\texttt{ROW~=~-2} accesses the one before last (penultimate) row,
+etc\ldots  
+
+%% Note that negative \texttt{ROW} values count the row numbers from the
+%% last row, allowing access to the table in reverse order of rows:
+%% \texttt{ROW~=~-1} accesses the last row of the table, \texttt{ROW~=~-2}
+%% accesses the one before last (penultimate) row, etc\ldots 
+
+Trying to access the table forward beyond the last row, i.e. \texttt{ROW}
+strictly greater than {\tt nrow} the number of rows in the table, or
+trying to access the table backwards before the first row, i.e. \texttt{ROW}
+strictly lower than {\tt -nrow}, both result in a ``row out of bound''
+message and no values are filled in the table.
+
+%% If \texttt{nrow} is the number of rows in the table, the conditions
+%% \texttt{ROW $>$ nrow}, ie trying to access the table forward beyond the
+%% last row, or \texttt{ROW $<$ -nrow}, ie trying to access the table
+%% backwards before the first row, result in a ``row out of bound'' message
+%% and no values are filled in the table.
+
+See as well the \href{../Introduction/select.html#ucreate}{user table}
+example.   
 
 
 

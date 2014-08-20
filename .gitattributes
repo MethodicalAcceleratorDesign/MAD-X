@@ -71,7 +71,6 @@ doc/usrguide/Introduction/beambeam_n_trapez.jpg -text
 doc/usrguide/Introduction/bend.html -text
 doc/usrguide/Introduction/biblio-mad.bib -text
 doc/usrguide/Introduction/bibliography.html -text
-doc/usrguide/Introduction/bibliography.tex -text
 doc/usrguide/Introduction/bv_flag.html -text
 doc/usrguide/Introduction/cavity.html -text
 doc/usrguide/Introduction/changelog.tex -text
@@ -141,7 +140,6 @@ doc/usrguide/Introduction/notsimple2.jpg -text
 doc/usrguide/Introduction/octupole.html -text
 doc/usrguide/Introduction/offsetelem.jpg -text
 doc/usrguide/Introduction/parameter.html -text
-doc/usrguide/Introduction/parameter.tex -text
 doc/usrguide/Introduction/pitfalls.html -text
 doc/usrguide/Introduction/pitfalls.tex -text
 doc/usrguide/Introduction/quadrupole.html -text
@@ -271,21 +269,14 @@ doc/usrguide/ibs/img6.png -text
 doc/usrguide/makethin/makethin.html -text
 doc/usrguide/makethin/makethin.tex -text
 doc/usrguide/match/bibliography.html -text
-doc/usrguide/match/bibliography.tex -text
 doc/usrguide/match/match.html -text
 doc/usrguide/match/match.tex -text
 doc/usrguide/match/match_con.html -text
-doc/usrguide/match/match_con.tex -text
 doc/usrguide/match/match_main.html -text
-doc/usrguide/match/match_main.tex -text
 doc/usrguide/match/match_um.html -text
-doc/usrguide/match/match_um.tex -text
 doc/usrguide/match/match_vary.html -text
-doc/usrguide/match/match_vary.tex -text
 doc/usrguide/match/match_xeq.html -text
-doc/usrguide/match/match_xeq.tex -text
 doc/usrguide/match/match_xmpl.html -text
-doc/usrguide/match/match_xmpl.tex -text
 doc/usrguide/plot/plot.html -text
 doc/usrguide/plot/plot.tex -text
 doc/usrguide/plug-ins/index.html -text
@@ -366,7 +357,6 @@ doc/usrguide/touschek/touschek.html -text
 doc/usrguide/touschek/touschek.tex -text
 doc/usrguide/tracking/madxdoc.css -text
 doc/usrguide/tracking/tracking.html -text
-doc/usrguide/tracking/tracking.tex -text
 doc/usrguide/twiss/madxdoc.css -text
 doc/usrguide/twiss/twiss.html -text
 doc/usrguide/twiss/twiss.tex -text

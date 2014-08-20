@@ -582,11 +582,15 @@ sampled from a Gaussian distribution with standard deviation sigma.
 
 
 %\input{Introduction/constraint}
-\section{Constraints}
-\label{sec:constraints}
+%\section{Constraints}
+%\label{sec:constraints}
+\section{Logical Expressions}
+\label{sec:logicalexpr}
+
 In matching it is desired to specify equality constraints, as well as
 lower and upper limits for a quantity. \madx accepts the following forms
 of constraints:  
+
 %% \begin{verbatim}
 %% ! equality constraint:
 %% name = expression
@@ -696,5 +700,104 @@ an arbitrary number (including zero) of any character, and the
 occurrence "$\backslash$." stands for a literal period.  
 
 
+%%\title{Parameters}
+%  Changed by: Hans Grote, 17-Jun-2002 
+%\chapter{Parameter Statements}
+%\label{chap:parameter}
 
+\section{\href{relation}{Relations between Variable Parameters}}
+ A relation is established between variables by one of two statements 
+\madbox{
+parameter-name = \= expression; \\
+parameter-name := \> expression;
+}
+The first form evaluates the expression on the right immediately and
+assigns its value to the parameter. It is an immediate assignment.
+
+The second form assigns the value by evaluating  the expression on the
+right every time the parameter is actually used. It is a deferred
+assignment.  
+
+This mechanism holds as well for element parameters that can be defined
+with either immediate or deferred assignments.
+
+Attention! If you want
+to modify e.g. the strength of a quadrupole later (e.g. in a match,  or
+by entering a new value for a parameter on which it depends) then the
+defition has to be  
+\madxmp{QD: QUADRUPOLE, K1 := ak1;}
+and not 
+\madxmp{QD: QUADRUPOLE, K1 = ak1;}
+In the latter case, K1 will be set to the current value of ak1 at the
+time of declaration, and will not change when ak1 later changes.  
+
+Parameters that have not yet been defined at time of evaluation have a
+zero value. 
+
+Example: 
+\madxmp{
+gev = 100; \\
+BEAM, ENERGY=gev;
+}
+
+The parameter on the left may appear on the right as well in the
+computer science form of assignments: 
+\madxmp{x = x+1;}
+increases the value of x by 1. \\
+As a result, the SET statement of \madeight is no longer necessary and
+is not implemented in \madx.   
+
+
+Successive definitions are allowed in the first form of relations or 
+immediate assignments:
+\madxmp{
+a = b + 2; \\
+b = a * b;
+}
+But circular definitions in the second form of relations, or
+deferred assignments, are forbidden: 
+\madxmp{
+a := b + 2; \\
+b := a * b;
+}
+will result in an error.
+
+%% Already in control.tex
+%% \section{\href{par_output}{VALUE: Output of Parameters}}
+%% The VALUE statement evaluates the current value of all listed expressions, and
+%% prints the result on the standard output file.
+%% \madbox{
+%% VALUE = expression {, expression2};
+%% }
+
+%% Example:
+%% \madxmp{
+%% p1 = 5; \\
+%% p2 = 7; \\
+%% VALUE, p1*p2-3;
+%% }
+%% After echoing the command, this prints:
+%% \madxmp{
+%% p1*p2-3 = 32       ;
+%% }
+
+%% Another example:
+%% \begin{verbatim}
+%% option,-warn;
+%% while (x 
+%% \end{verbatim}
+%% ?????
+
+%% After echoing the command, this prints:
+%% \begin{verbatim}
+%% x = 100        ;       
+%% x^2 = 10000      ;       
+%% log10(x) = 2      ;            
+%% \end{verbatim}
+
+%\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg} 11.9.2000
+
+
+
+%% EOF
 
