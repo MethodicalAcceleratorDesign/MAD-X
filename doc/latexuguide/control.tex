@@ -334,6 +334,13 @@ Attention: Although this command is very convenient, it is clearly not portable
 across systems and should probably avoid it if you intend to share \madx scripts with
 collaborators working on other platforms. 
 
+\section{TITLE}
+\label{sec:title}
+\madbox{
+TITLE, "string";
+}
+the string in quotes is inserted as title in various table outputs and
+plot results.  
 
 
 \section{USE}
@@ -881,7 +888,7 @@ for all tables and makethin, whereas for ERROR and SEQEDIT the default
 is "nothing selected".  
 
 %\href{save_select}{}
-\label{save_select}
+%\label{save_select}
 SAVE: A SELECT,FLAG=SAVE statement causes the
 selected sequences, elements, and variables to be written into the save
 file. A class (only used for element selection), and a pattern can be

@@ -585,17 +585,11 @@ Twiss functions.
 \end{madlist}
 
 The scalar potential function of the element is given by
-\\
-%%\includegraphics{nllens_potential.png}
-%nllens_potential
 \[
 U(x,y)=\frac{k}{c}\frac{\xi\sqrt{\xi^2-1} \, \text{acosh}\xi +  
   \eta\sqrt{1-\eta^2}(\text{acos}\eta-\pi/2)}{\xi^2-\eta^2}
 \]
 \\ where \textit{k} = KNLL, \textit{c} = CNLL and 
-%%\includegraphics{nllens_xi.png}, 
-%%\includegraphics{nllens_eta.png}, and \textit{k} = KNLL, \textit{c} = CNLL. 
-%nllens_xi
 \[
 \xi = \frac{\sqrt{(x+c)^2+y^2}+\sqrt{(x-c)^2+y^2}}{2c}, 
 \quad \eta = \frac{\sqrt{(x+c)^2+y^2}-\sqrt{(x-c)^2+y^2}}{2c},
@@ -603,11 +597,9 @@ U(x,y)=\frac{k}{c}\frac{\xi\sqrt{\xi^2-1} \, \text{acosh}\xi +
 
 
 Figure below shows the contour plot of the scalar potential: \\
-\includegraphics[width=220px]{Introduction/nllens_potential-2D.png}
+\includegraphics[width=220px]{png/nllens_potential-2D.png}
 
 The multipole expansion of the scalar potential is \\
-%\includegraphics{Introduction/nllens_potential-expansion.png}
-%nllens_potential-expansion
 \[
 U(x,y)=k\cdot Re\left\{ \left(\dfrac{x + i y}{c}\right)^2 + 
 \frac{2}{3}\left(\dfrac{x + i y}{c}\right)^4 +
@@ -1339,32 +1331,27 @@ and extended by S. Sorge (2007).
      \begin{itemize}
        \item  BBSHAPE=1: Gaussian shape (default), SIGX/SIGY: standard deviation in 
          vertical/horizontal direction.
-	\item  BBSHAPE=2: \href{beambeam_n_trapez.jpg}{trapezoidal shape}, 
+	\item  BBSHAPE=2: trapezoidal shape (see fig.\ref{fig:beambeam_n_trapez}), 
           SIGX/SIGY: half width of density profile,
           i.e. distance from the centre to half edge region with linear decrease of 
           density in horizontal/vertical direction. Still only circular opposite beam 
           possible, i.e. in the calculations 
           SIGX'=SIGY'=(SIGX+SIGY)/2 is used, if SIGX and SIGY have
           different values 
-%\\\href{beambeam_n_trapez.jpg}{
 \\
-\includegraphics[width=400px]{Introduction/beambeam_n_trapez.jpg}
+\includegraphics[width=400px]{jpg/beambeam_n_trapez.jpg}
 \label{fig:beambeam_n_trapez}
-%%\includegraphics{beambeam_n_trapez.jpg}}
 \\
-        \item  BBSHAPE=3: \href{beambeam_n_hollowparabol.jpg}{hollow-parabolic shape}, 
+        \item  BBSHAPE=3: hollow-parabolic shape (see
+          fig.\ref{fig:beambeam_n_hollowparabol},  
           SIGX/SIGY: distance from the centre 
           to the maximum of the parabolic density profile in vertical/horizontal 
           direction. Still only circular opposite beam possible, 
           i.e. in the calculations 
           SIGX'=SIGY'=(SIGX+SIGY)/2 is used, if SIGX and SIGY have different values 
 \\
-%\\\href{beambeam_n_hollowparabol.jpg}
-%\begin{figure}[p]
-\includegraphics[width=420px]{Introduction/beambeam_n_hollowparabol.jpg}
+\includegraphics[width=420px]{jpg/beambeam_n_hollowparabol.jpg}
 \label{fig:beambeam_n_hollowparabol}
-%%\includegraphics{beambeam_n_hollowparabol.jpg} 
-%\end{figure}
 \\
 
      \end{itemize}
