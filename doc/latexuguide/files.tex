@@ -69,14 +69,14 @@ than the number of values in the value field, the values that
 do not correspond to a format specifier are ignored. 
 
 
-Example: \\
+{\bf Example:}
 \madxmp{
 xxxxxxx\=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
 a = 1.2; b = 3.4/0.3; c := 0.8*a/b; \\
-PRINTF, \>TEXT = "String with floats a=\%f, b=\%.3g, text and MAD float c=\%F;", \\
-        \>VALUE = a, b, c; \\
-PRINTF, \>TEXT = "More specifiers than values: \%f, \%.3g, \%F", \>VALUE = a, b; \\
-PRINTF, \>TEXT = "More values than specifiers: \%f, \%.3g"    ,  \>VALUE = a, b, c;
+PRINTF, \>TEXT="String with floats a=\%f, b=\%.3g, text and MAD float c=\%F;", \\
+        \>VALUE = a,b,c; \\
+PRINTF, \>TEXT="More specifiers than values: \%f, \%.3g, \%F", \>VALUE = a,b; \\
+PRINTF, \>TEXT="More values than specifiers: \%f, \%.3g",      \>VALUE = a,b,c;
 }
 
 produces the following output:
@@ -99,8 +99,8 @@ Note also that a percent sign (\%) can be printed using the format
 \madbox{
 RENAMEFILE, FILE="filename", NAME = "new\_filename";
 }
-renames the file "filename" to "new\_filename" on the disk. It is more
-portable than  
+renames the file "filename" to "new\_filename" on the disk. \\
+It is more portable than a {\tt SYSTEM} call:
 \madxmp{
 SYSTEM("mv filename new\_filename"); ! Unix specific
 }
@@ -110,7 +110,8 @@ SYSTEM("mv filename new\_filename"); ! Unix specific
 \madbox{
 REMOVEFILE, FILE="filename";
 }
-removes the file "filename" from disk. It is more portable than  
+removes the file "filename" from disk.
+It is more portable than a {\tt SYSTEM} call: 
 \madxmp{
 SYSTEM("rm filename"); ! Unix specific
 }

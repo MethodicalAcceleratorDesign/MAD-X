@@ -17,7 +17,8 @@
 \usepackage{a4wide}		% for better presentation
 \usepackage{amsmath}
 
-\usepackage[pdftex]{graphicx} % Show image: \includegraphics[width=x]{file}.
+%\usepackage[pdftex]{graphicx} % Show image: \includegraphics[width=x]{file}.
+\usepackage{graphicx} % Show image: \includegraphics[width=x]{file}.
 
 \usepackage{multirow}
 \usepackage{longtable}
@@ -25,10 +26,13 @@
 \usepackage{float}
 \usepackage{makeidx}
 
-\usepackage[pdftex]{hyperref} % should come last
+%\usepackage[pdftex]{hyperref} % should come last
+\usepackage{hyperref} % should come last
 \hypersetup{pdfauthor={Ghislain Roy},
 	    pdftitle={MAD-X User's Guide},
-	    colorlinks}
+	    colorlinks,
+            citecolor=blue, pagecolor=blue, linkcolor=blue}
+\hyperbaseurl{http://madx.web.cern.ch/madx/madX/doc/usrguide/}
 
 \usepackage{madstyle}
 

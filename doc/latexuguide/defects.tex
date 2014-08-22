@@ -3,8 +3,10 @@
 %  Changed by: Hans Grote, 25-Sep-2002 
 
 \chapter{Known Differences to Other Programs}
+\label{chap:differences}
 
 \section{Definitions in \madeight}
+\label{sec:mad8_definitions}
 
 \madeight uses full 6-by-6 matrices to allow coupling effects to be treated,
 and the canonical variable set ($x$ , $p_x / p_0$),
@@ -55,6 +57,7 @@ With the new method this problem occurs in Twiss module (see
 \ref{chap:twiss}) only for non-constant $\delta$.    
 
 \section{Treatment of Energy Error in TWISS} 
+\label{sec:twiss_energy_error}
 It has been noted by Milutinovic and Ruggiero \cite{milutinovic1988}
 that \madeight returned tunes which are too low for non-zero
 $\delta$. The difference was found to be quadratic in delta with a negative
@@ -62,6 +65,7 @@ coefficient. This problem has been eliminated thanks to the new
 treatment  of momentum errors from \madeight Version 8.13 onwards.   
 
 \section{Definition of emittance in \madx}
+\label{sec:emittance_definition}
 This section should explain how natural and normalised emittances are
 defined in \madx and why there is a factor 4 in the definition of the
 natural emittance, which is a marked difference with other programs such

@@ -153,8 +153,8 @@ the following formula that \madx constructs internally as a deferred
 expression which is immediately evaluated:
 \madxmp{value := value(row1)*(1-param) + value(row2)*param;}
 Both the expression and the value of the expression are available to the
-user through respectively the commands \texttt{SHOW} (see section
-\ref{sec:show}) and \texttt{VALUE} (see section \ref{sec:value}).
+user through respectively the commands \hyperref[sec:show]{\tt SHOW} 
+and \hyperref[sec:value]{\tt VALUE}.
 
 %% was:
 %%\madxmp{value := value(row1)*param + value(row2)*(1-param)}
@@ -209,8 +209,8 @@ FILL, TABLE=tablename, ROW=integer;
 The FILL command takes two arguments:
 \begin{madlist}
   \ttitem{TABLE} is the name of the table to be filled. The table must
-  have been created (section \ref{sec:create}) beforehand. 
-  The table can then be written to file (section \ref{sec:write}) in TFS
+  have been \hyperref[sec:create]{created} beforehand. 
+  The table can then be \hyperref[sec:write]{written} to file in TFS
   format. 
 
   \ttitem{ROW} is the row number to be filled with the current values of

@@ -13,8 +13,8 @@ The simplest element which can occur in a beam line is the MARKER. It
 has no effect on the beam, but it allows one to identify a position in
 the beam line, for example to apply a matching constraint.  
 
-Example: 
-\madxmp{m27: marker;}
+{\bf Example:}
+\madxmp{M27: MARKER;}
 
 
 %\input{Introduction/drift}
@@ -30,15 +30,15 @@ A drift space has one real attribute:
    \ttitem{L} The drift length (Default: 0 m) 
 \end{madlist}
 
-Examples: 
+{\bf Example: }
 \madxmp{
 DR1: \= DRIFT, \= L = 1.5; \\
 DR2: \> DRIFT, \> L = DR1->L;
 }
 
 The length of DR2 will always be equal to the length of DR1. The
-\href{../Introduction/local_system.html#straight}{straight reference
-  system} for a drift space is a cartesian coordinate system.  
+\hyperref[subsec:local_straight]{straight reference system} for a drift
+space is a cartesian coordinate system.   
 
 
 %\input{Introduction/bend}
@@ -51,14 +51,14 @@ distinguished only by the reference system used:
   The planes of the pole faces intersect at the centre of curvature of
   the curved 
   % Its pole faces meet at the centre of curvature of the curved
-  \href{local_system.html#sbend}{sbend reference system}.  
+  \hyperref[subsec:local_rbend]{sbend reference system}.  
   \ttitem{RBEND}\label{bend_rbend} is a rectangular bending magnet. \\ 
   The pole faces are parallel. The reference system is the curved  
   % It has parallel pole faces and is based on a curved
-  \href{local_system.html#rbend}{rbend reference system}.
+  \hyperref[subsec:local_rbend]{rbend reference system}.
 \end{madlist}
 
-Bendig magnets are defined by the commands: 
+Bendig magnets are defined by the statements: 
 \madbox{
 label: SBEND, \= L = real, ANGLE = real, TILT = real, \\
               \> K0 = real, K1 = real, K2 = real, \\
@@ -70,8 +70,8 @@ label: RBEND, \> L = real, ANGLE = real, TILT = real, \\
               \> K0 = real, K1 = real, K2 = real, \\
               \> E1 = real, E2 = real, FINT = real, FINTX = real, \\
               \> HGAP = real, H1 = real, H2 = real, \\
-              \> ADD\_ANGLE='array', \\
-              \> THICK = logical; 
+              \> THICK = logical, \\
+              \> ADD\_ANGLE='array';
 }
 
 Bending magnets have the following attributes:
@@ -186,12 +186,11 @@ are useful for PTC and defined in \ref{sec:add_option_PTC}.
 {\bf \underline{Fringe Fields:}}
 \vskip 3mm
 The quantities FINT and HGAP specify the finite extent of the fringe
-fields as defined in \href{bibliography.html#slac75}{[SLAC-75]}:
-%%\includegraphics{../equations/fint_hgap.gif}
-\[
-FINT=\int_{-\infty}^\infty \frac{B_y(s)(B_0-B_y(s))}{g \cdot
-  B_0^2}\,\mathrm{d}s ,\quad\quad g=2\cdot HGAP. 
-\]
+fields as defined in SLAC-75 \cite{slac75}:
+\begin{equation}
+\mathrm{FINT}=\int_{-\infty}^\infty \frac{B_y(s)(B_0-B_y(s))}{g \cdot
+  B_0^2}\,\mathrm{d}s ,\quad\quad g=2\cdot \mathrm{HGAP}. 
+\end{equation}
 
 The default values of zero corresponds to the hard-edge approximation,
 i.e. a rectangular field distribution. For other approximations, enter
@@ -378,9 +377,9 @@ A SEXTUPOLE has four real attributes:
 
 \textbf{Note also that $K_2$ or $K_{2s}$ can be considered as the normal
   or skew sextupole components of the magnet on the bench, while the
-  \tt{TILT} attribute can be considered as an tilt alignment error in the
-  machine. In fact, a positive $K_2$ with a $\tt{TILT} = 0$ is equivalent to a
-  positive $K_{2s}$ with positive $\tt{TILT} = \pi/6$.} 
+  {\tt TILT} attribute can be considered as an tilt alignment error in the
+  machine. In fact, a positive $K_2$ with a ${\tt TILT} = 0$ is equivalent to a
+  positive $K_{2s}$ with positive ${\tt TILT} = \pi/6$.} 
 
 Example: 
 \madxmp{S: SEXTUPOLE, L = 0.4, K2 = 0.00134;}
@@ -569,12 +568,12 @@ label: NLLENS, KNLL = real, CNLL = real;
 }
 
 The NLLENS element represents a thin nonlinear lens with the potential
-of 'Elliptic' type as specified in [1]. The lens is used to create fully
-integrable 2D nonlinear accelerator lattice with very large nonlinear
-tune spread/shift. The NLLENS element is recognized by the thin tracking
-module. The quadrupole term of the potential is included in the
-TRANSPORT map and, consequently, effects the calculation of tunes and
-Twiss functions.   
+of 'Elliptic' type as specified in \cite{danilov2010}. The lens is used
+to create fully integrable 2D nonlinear accelerator lattice with very
+large nonlinear tune spread/shift. The NLLENS element is recognized by
+the thin tracking module. The quadrupole term of the potential is
+included in the TRANSPORT map and, consequently, effects the calculation
+of tunes and Twiss functions.   
 
 \begin{madlist}
    \ttitem{KNLL} The integrated strength of lens (m). The strength is
@@ -585,27 +584,33 @@ Twiss functions.
 \end{madlist}
 
 The scalar potential function of the element is given by
-\[
+\begin{equation}
 U(x,y)=\frac{k}{c}\frac{\xi\sqrt{\xi^2-1} \, \text{acosh}\xi +  
   \eta\sqrt{1-\eta^2}(\text{acos}\eta-\pi/2)}{\xi^2-\eta^2}
-\]
+\end{equation}
 \\ where \textit{k} = KNLL, \textit{c} = CNLL and 
-\[
+\begin{equation}
 \xi = \frac{\sqrt{(x+c)^2+y^2}+\sqrt{(x-c)^2+y^2}}{2c}, 
 \quad \eta = \frac{\sqrt{(x+c)^2+y^2}-\sqrt{(x-c)^2+y^2}}{2c},
-\]
-
+\end{equation}
 
 Figure below shows the contour plot of the scalar potential: \\
-\includegraphics[width=220px]{png/nllens_potential-2D.png}
+\begin{figure}
+  \begin{center}    
+    %\includegraphics[width=220px]{png/nllens_potential-2D.png}
+    \includegraphics[width=220px]{jpg/nllens_potential-2D.jpg}
+    \caption{Contour plot of the scalar potential}
+    \label{fig:nllens_potential}
+  \end{center}
+\end{figure}
 
 The multipole expansion of the scalar potential is \\
-\[
+\begin{equation}
 U(x,y)=k\cdot Re\left\{ \left(\dfrac{x + i y}{c}\right)^2 + 
 \frac{2}{3}\left(\dfrac{x + i y}{c}\right)^4 +
 \frac{8}{15}\left(\dfrac{x + i y}{c}\right)^6 + 
 \frac{16}{35}\left(\dfrac{x + i y}{c}\right)^8 + \cdots \right\}
-\]
+\end{equation}
 \\ 
 Note that this expansion is only valid inside the \textit{r=c} circle on
 the x,y plane.    
@@ -645,15 +650,15 @@ thin lenses:
 
 
 %% To be moved in References at the end of the document
-References:
-\begin{enumerate}
-\item V. Danilov, S. Nagaitsev, Phys. Rev. ST Accel. Beams \textbf{13},
-  084002 (2010). 
+%% References:
+%% \begin{enumerate}
+%% \item V. Danilov, S. Nagaitsev, Phys. Rev. ST Accel. Beams \textbf{13},
+%%   084002 (2010). 
   
-\item A. Valishev, S. Nagaitsev, V. Kashikhin, V. Danilov, in
-  Proceedings of 2011 Particle Accelerator Conference, New York, NY,
-  USA, WEP070. 
-\end{enumerate}
+%% \item A. Valishev, S. Nagaitsev, V. Kashikhin, V. Danilov, in
+%%   Proceedings of 2011 Particle Accelerator Conference, New York, NY,
+%%   USA, WEP070. 
+%% \end{enumerate}
 
 %A. Valishev, March 19, 2012
 
@@ -662,7 +667,8 @@ References:
 %  Changed by: Frank Schmidt, 28-Aug-2003 
 %  Changed by: Werner Herr, 22-May-2007 
 \section{Closed Orbit Correctors}
-\label{sec:closed_orbit_cor}
+\label{sec:closed_orbit_cor}\label{sec:kicker}
+
 Three types of closed orbit correctors are available: 
 \begin{madlist}
    \ttitem{\href{hkick}{HKICKER}} a corrector for the horizontal plane, 
@@ -790,8 +796,6 @@ For further information on element type TKICKER and its attributes, look
 at the documentation of the orbit corrector type
 \href{kickers.html#kick}{KICKER}.   
 
-%\href{mailto:mad@cern.ch}{madx team}, September 15, 2011  
-
 
 %\input{Introduction/cavity}
 \section{RF Cavity}
@@ -865,14 +869,14 @@ cavity is a cartesian coordinate system.
 %\input{Introduction/rfmultipole}
 \section{Thin Radio-Frequency Multipole}
 \madbox{
-xxxxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
+xxxxxxxxxxxxxxxxxxxxx\= \kill
 label: RFMULTIPOLE, \> VOLT = real, LAG = real, \\
        \> HARMON = integer, FREQ = real, \\
        \> LRAD = real, TILT = real, \\
-       \> KNL := \{k0nl, k1nl, k2nl, \ldots \}, \>!Normal coefficients \\
-       \> KSL := \{k0sl, k1sl, k2sl, \ldots \}, \>!Skew coefficients \\
-       \> PNL := \{p0n,  p1n,  p2n,  \ldots \}, \>!Normal phases [2pi] \\
-       \> PSL := \{p0s,  p1s,  p2s,  \ldots \}; \>!Skew phases [2pi]
+       \> KNL := \{k0nl, k1nl, k2nl, \ldots \}, \\
+       \> KSL := \{k0sl, k1sl, k2sl, \ldots \}, \\
+       \> PNL := \{p0n,  p1n,  p2n,  \ldots \}, \\
+       \> PSL := \{p0s,  p1s,  p2s,  \ldots \};
 }
 
 A RFMULTIPOLE is a thin-lens element which exhibits the properties
@@ -933,17 +937,18 @@ f0 t)).
 \end{madlist}
 
 
-Example:
-\madxmp{ms: rfmultipole, ksl := \{0, 0, 0, k3sl\};}
+{\bf Example:}
+\madxmp{MS: RFMULTIPOLE, KSL := \{0, 0, 0, k3sl\};}
 
-Both KNL and KSL may be specified for the same multipole.  
+Both {\tt KNL} and {\tt KSL} may be specified for the same multipole.  
 
-A rfmultipole requires the particle energy (ENERGY) and the
-particle charge (CHARGE) to be set by a BEAM command before any
-calculations are performed. Notice that, contrary to the regular
-multipole where the dipole component has no effect on the
-reference orbit, an RF-Multipole that includes a dipole component
-bends also the reference orbit.      
+A {\tt RFMULTIPOLE} requires the particle energy (ENERGY) and the
+particle charge (CHARGE) to be set by a \hyperref[sec:beam]{\tt BEAM}
+command before any calculations are performed. 
+
+Notice that, contrary to the regular multipole where the dipole
+component has no effect on the reference orbit, an RF-Multipole that
+includes a dipole component bends also the reference orbit.      
 
 
 %\href{https://phonebook.cern.ch/foundpub/Phonebook/index.html?search=latina#id=PE525753}{Andrea
@@ -975,7 +980,7 @@ A CRABCAVITY has five real attributes and seven integer attributes:
 
   \ttitem{LAG} The initial phase lag [2pi] (default: 0). 
 
-  \ttitem{FREQ} The RF frequency [MHz] (no default). \\
+  \ttitem{FREQ} The RF frequency [MHz] (no default). \\[3mm]
     {\bf Note that if the RF frequency is not given, it is computed from the
     harmonic number and the revolution frequency \textit{f$_0$} as before. 
     However, for deflecting structures this makes no sense, and the 
@@ -1009,13 +1014,13 @@ A CRABCAVITY has five real attributes and seven integer attributes:
      BETRF, PG, SHUNT and TFILL are currently not implemented in \madx!}
    \item \textit{ Note that crab cavities are only implemented for
      tracking  purposes. \\ TWISS will ignore any effect of the crab cavity.  
-% as well that twiss is 4D only. As a consequence the TWISS
-% parameters in the plane of non-zero dispersion may not close as
-% expected. Therefore, it is best to perform TWISS in 4D only, i.e. with
-% cavities switched off. If 6D is needed one has to use the
-% 
-% <a href="../ptc_twiss/ptc_twiss.html">ptc_twiss</a> command. 
-}
+     % as well that twiss is 4D only. As a consequence the TWISS
+     % parameters in the plane of non-zero dispersion may not close as
+     % expected. Therefore, it is best to perform TWISS in 4D only, i.e. with
+     % cavities switched off. If 6D is needed one has to use the
+     % 
+     % <a href="../ptc_twiss/ptc_twiss.html">ptc_twiss</a> command. 
+   }
 \end{itemize} 
 
 %A cavity requires the particle energy (\href{beam.html#energy}{ENERGY})
@@ -1023,9 +1028,9 @@ A CRABCAVITY has five real attributes and seven integer attributes:
 %a \href{beam.html}{BEAM} command before any calculation is performed. 
 
 Before any calculation is performed with a CRABCAVITY, the particle
-energy (\href{beam.html#energy}{ENERGY}) and the particle charge
-(\href{beam.html#charge}{CHARGE}) must be set by a
-\href{beam.html}{BEAM} command.   
+energy (\hyperref[sec:beam]{ENERGY}) and the particle charge
+(\hyperref[sec:beam]{CHARGE}) must be set by a
+\hyperref[sec:beam]{BEAM} command.   
 
 Then the effect of the CRABCAVITY on particle coordinates during tracking is
 \\
@@ -1093,7 +1098,7 @@ separator is a cartesian coordinate system.
 %\input{Introduction/monitors}
 %  Changed by: G. Roy, 17 Oct 2013: added PLACEHOLDER
 \section{Beam Position Monitors}
-\label{sec:monitors}
+\label{sec:monitor}
 
 A beam monitor has no specific effect on the beam and behaves like a
 drift space. 
@@ -1223,71 +1228,6 @@ reported with respect to the \textbf{displaced} reference system, not
 with respect to the surrounding beam line.  
 
 
-%\input{Introduction/rotation}
-\section{Coordinate Transformations}
-
-\paragraph{\href{yrotation}{YROTATION: Rotation About the Vertical Axis}}
-
-\madbox{
-label: YROTATION, TYPE = name, ANGLE = real;
-}
-
-The element YROTATION rotates the
-\href{local_system.html#straight}{straight reference system} about the
-vertical (\texttt{y}) axis. YROTATION has no effect on the beam, but it
-causes the beam to be referred to the new coordinate system  \\
-\textit{x}$_2$=\textit{x}$_1$cos(theta)-\textit{s}$_1$sin(theta), \\
-\textit{y}$_2$=\textit{x}$_1$sin(theta)+\textit{s}$_1$cos(theta).\\
-
-It has one real attribute: 
-\begin{madlist}
-   \ttitem{ANGLE} The rotation angle theta (default: 0 rad). It must be a
-     \emph{small} angle, i.e. an angle comparable to the transverse
-     angles of the orbit. 
-\end{madlist}
-
-A positive angle means that the new reference system is rotated
-clockwise about the local \texttt{y}-axis with respect to the old system. 
-
-Example: 
-\madxmp{
-KINK: YROTATION, ANGLE = 0.0001;
-}
-
-\paragraph{\href{srotation}{SROTATION: Rotation Around the Longitudinal Axis}}
-
-\madbox{
-label: SROTATION, ANGLE = real;
-}
-
-The element SROTATION rotates the
-\href{local_system.html#straight}{straight reference system} about the
-longitudinal (\texttt{s}) axis. SROTATION has no effect on the beam, but
-it causes the beam to be referred to the new coordinate system \\
-\textit{x}$_2$=\textit{x}$_1$cos(psi)-\textit{y}$_1$sin(psi),\\
-\textit{y}$_2$=\textit{x}$_1$sin(psi)+\textit{y}$_1$cos(psi).\\ 
-
-It has one real attribute: 
-\begin{madlist}
-   \ttitem{ANGLE} The rotation angle psi (default: 0 rad) 
-\end{madlist}
-
-A positive angle means that the new reference system is rotated
-clockwise about the \texttt{s}-axis with respect to the old system.  
-
-Example: 
-\madxmp{
-ROLL1: SROTATION, ANGLE =  PI/2.; \\
-ROLL2: SROTATION, ANGLE = -PI/2.; \\
-HBEND: SBEND, L = 6.0, ANGLE = 0.01; \\
-VBEND: LINE = (ROLL1,HBEND,ROLL2); \\
-}
-The VBEND definition above is a way to represent a bend down in the
-vertical plane, it could be defined more simply by  
-\madxmp{
-VBEND: SBEND, L = 6.0, K0S = 0.01/6;
-}
-
 
 
 %\input{Introduction/beambeam}
@@ -1338,10 +1278,15 @@ and extended by S. Sorge (2007).
           possible, i.e. in the calculations 
           SIGX'=SIGY'=(SIGX+SIGY)/2 is used, if SIGX and SIGY have
           different values 
-\\
-\includegraphics[width=400px]{jpg/beambeam_n_trapez.jpg}
-\label{fig:beambeam_n_trapez}
-\\
+
+\begin{figure}[h]
+  \begin{center}
+    \includegraphics[width=400px]{jpg/beambeam_n_trapez}
+    \caption{Trapezoidal shape of radial density for beam-beam lens.} 
+    \label{fig:beambeam_n_trapez}
+  \end{center}
+\end{figure}
+
         \item  BBSHAPE=3: hollow-parabolic shape (see
           fig.\ref{fig:beambeam_n_hollowparabol},  
           SIGX/SIGY: distance from the centre 
@@ -1349,10 +1294,15 @@ and extended by S. Sorge (2007).
           direction. Still only circular opposite beam possible, 
           i.e. in the calculations 
           SIGX'=SIGY'=(SIGX+SIGY)/2 is used, if SIGX and SIGY have different values 
-\\
-\includegraphics[width=420px]{jpg/beambeam_n_hollowparabol.jpg}
-\label{fig:beambeam_n_hollowparabol}
-\\
+
+\begin{figure}[h]
+  \begin{center}
+    \flushright
+    \includegraphics[width=420px]{jpg/beambeam_n_hollowparabol.jpg}
+    \caption{Hollow parabolic shape of radial density for beam-beam lens.} 
+    \label{fig:beambeam_n_hollowparabol}
+  \end{center}
+\end{figure}
 
      \end{itemize}
      
@@ -1470,6 +1420,77 @@ module the length of an arbitrary matrix is accepted, however no second
 order are allowed to avoid non symplectic tracking runs. In the latter
 case the tracking run will be aborted.
 
+
+%\input{Introduction/rotation}
+%\section{Coordinate Transformations}
+
+\section{Rotation around the vertical axis}
+\label{sec:yrotation}
+
+\madbox{
+label: YROTATION, TYPE = name, ANGLE = real;
+}
+
+The element {\tt YROTATION} rotates the
+\hyperref[subsec:local_straight]{straight reference system} about the
+vertical (\texttt{y}) axis. 
+
+YROTATION has no effect on the beam, but it
+causes the beam to be referred to the new coordinate system  \\
+\textit{x}$_2$=\textit{x}$_1$cos(theta)-\textit{s}$_1$sin(theta), \\
+\textit{y}$_2$=\textit{x}$_1$sin(theta)+\textit{s}$_1$cos(theta).\\
+
+It has one real attribute: 
+\begin{madlist}
+   \ttitem{ANGLE} The rotation angle theta (default: 0 rad). It must be a
+     \emph{small} angle, i.e. an angle comparable to the transverse
+     angles of the orbit. 
+\end{madlist}
+
+A positive angle means that the new reference system is rotated
+clockwise about the local \texttt{y}-axis with respect to the old system. 
+
+Example: 
+\madxmp{
+KINK: YROTATION, ANGLE = 0.0001;
+}
+
+\section{Rotation around the longitudinal axis}
+\label{sec:srotation}
+
+\madbox{
+label: SROTATION, ANGLE = real;
+}
+
+The element {\tt SROTATION} rotates the
+\hyperref[subsec:local_straight]{straight reference system} about the
+longitudinal (\texttt{s}) axis. 
+
+SROTATION has no effect on the beam, but it causes the beam to be
+referred to the new coordinate system \\ 
+\textit{x}$_2$=\textit{x}$_1$cos(psi)-\textit{y}$_1$sin(psi),\\
+\textit{y}$_2$=\textit{x}$_1$sin(psi)+\textit{y}$_1$cos(psi).\\ 
+
+It has one real attribute: 
+\begin{madlist}
+   \ttitem{ANGLE} The rotation angle psi (default: 0 rad) 
+\end{madlist}
+
+A positive angle means that the new reference system is rotated
+clockwise about the \texttt{s}-axis with respect to the old system.  
+
+Example: 
+\madxmp{
+ROLL1: SROTATION, ANGLE =  PI/2.; \\
+ROLL2: SROTATION, ANGLE = -PI/2.; \\
+HBEND: SBEND, L = 6.0, ANGLE = 0.01; \\
+VBEND: LINE = (ROLL1,HBEND,ROLL2); \\
+}
+The VBEND definition above is a way to represent a bend down in the
+vertical plane, it could be defined more simply by  
+\madxmp{
+VBEND: SBEND, L = 6.0, K0S = 0.01/6;
+}
 
 
 %%% END

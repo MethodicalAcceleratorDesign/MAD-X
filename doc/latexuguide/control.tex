@@ -151,7 +151,7 @@ they are set to \texttt{TRUE} are listed in table
                               &       & {\bf Use at your own risk !} \\
      \hline
      \texttt{RBARC}     & true & converts the RBEND straight length into the arc length \\
-     \texttt{THIN\_FOC} & true & enables the 1(rho**2) focusing of thin dipoles \\
+     \texttt{THIN\_FOC} & true & enables the 1/(rho**2) focusing of thin dipoles \\
      \texttt{BBORBIT}   & false & the closed orbit is modified by beam-beam kicks \\
      \texttt{SYMPL}     & false & all element matrices are symplectified in Twiss \\
      \texttt{TWISS\_PRINT} & true & controls whether the twiss command produces output \\
@@ -224,31 +224,6 @@ tw: TWISS, FILE, SAVE; ! first execution of TWISS \\
 ... \\
 EXEC, tw; ! second execution of the same TWISS command \\
 }
-
-
-% Moved to the TWISS chapter
-%% \subsection{SAVEBETA}
-%% \label{subsec:savebeta}
-%% \begin{verbatim}
-%% savebeta, label = label, place = place, sequence = sequence_name;
-%% \end{verbatim} 
-%% marks a place named "place" in an expanded sequence "sequence\_name"; 
-%% at the next TWISS command execution, a
-%% \href{../twiss/twiss.html#beta0}{beta0} 
-%% block will be saved at that place with the label "label". This is done
-%% only once; in order to get a new beta0 block there, one has to re-issue
-%% the command. The contents of the beta0 block can then be used in other
-%% commands, e.g. TWISS and MATCH.  
-
-%% Example (after sequence expansion): 
-%% \begin{verbatim}
-%% savebeta, label = sb1, place = mb[5], sequence = fivecell;
-%% twiss;
-%% show, sb1;
-%% \end{verbatim} 
-%% will save and show the beta0 block parameters at the end (!) of the
-%% fifth element of type mb in the sequence.  
-
 
 
 \section{SET}
@@ -325,7 +300,7 @@ stripped and no check of the return status is performed bt \madx.
 
 {\bf Example:}\\ 
 \madxmp{
-SYSTEM,"ln -s /afs/cern.ch/user/u/user/public/some/directory shortname";
+SYSTEM,"ln -s /afs/cern.ch/user/j/joe/public/some/directory shortname";
 }
 makes a local link to an AFS directory with the name "shortname" on a
 UNIX system. 
@@ -362,11 +337,11 @@ The attributes to the \texttt{USE} command are:
   \texttt{PERIOD} is an alias to \texttt{SEQUENCE} that was kept for
   backwards compatibility with \madeight and only one of them should be
   specified in a \texttt{USE} statement. 
-  \ttitem{RANGE} specifies a \href{../Introduction/ranges.html#range}{range}.   
+  \ttitem{RANGE} specifies a \hyperref[sec:range]{range}.   
   restriction so that only the specified part of the named sequence is
   loaded and  expanded.
   \ttitem{SURVEY} option to plug the survey data into the sequence elements
-  nodes on the first pass (see \href{../survey/survey.html}{survey}).
+  nodes on the first pass (see \hyperref[chap:survey]{\tt SURVEY}).
 \end{madlist}
 
 Note that reloading a sequence with the \texttt{USE} command reloads a
@@ -400,42 +375,43 @@ The "flag" argument allows a determination of the applicability of the
 SELECT statement and can be one of the following: 
 \begin{madlist}
    \ttitem{seqedit} selection of elements for the
-     \href{seqedit.html}{seqedit} module.  
+     \hyperref[sec:seqedit]{seqedit} module.  
    \ttitem{error} selection of elements for the
-     \href{../error/error.html}{error} assignment module.  
+     \hyperref[chap:error]{error} assignment module.  
    \ttitem{makethin} selection of elements for the
-     \href{../makethin/makethin.html}{makethin} module that
+     \hyperref[chap:makethin]{makethin} module that
      converts the sequence into one with thin elements only.  
    \ttitem{sectormap} selection of elements for the
-     \href{../Introduction/sectormap.html}{sectormap} output file
+     \hyperref[sec:sectormap]{sectormap} output file
      from the Twiss module.  
-   \ttitem{save} selection of elements for the {\tt SAVE} command.  
+   \ttitem{save} selection of elements for the \hyperref[sec:save]{\tt
+     SAVE} command.   
    \ttitem{table} is a table name such as {\tt twiss}, {\tt track}
      etc., and the rows and columns to be written are selected.  
 \end{madlist} 
 
 The statement
-\begin{verbatim}
+\madxmp{
 SELECT, FLAG=name, FULL;
-\end{verbatim} 
+}
 selects ALL positions in the sequence for the flag "name". This is the default
 for flags for all tables and {\tt MAKETHIN}.
 
 The statement 
-\begin{verbatim}
+\madxmp{
 SELECT, FLAG=name, CLEAR;
-\end{verbatim} 
+}
 deselects ALL positions in the sequence for the flag "name". This is the default
 for flags {\tt ERROR} and {\tt SEQEDIT}.
 
-"slice" is only used by \href{../makethin/makethin.html}{makethin} and
+"slice" is only used by \hyperref[chap:makethin]{makethin} and
 prescribes the number of slices into which the selected elements have to
 be cut (default = 1).  
 
 "column" is only valid for tables and determines the selection of columns
 to be written into the TFS file. The "name" argument is special in that
 it refers to the actual name of the selected element. For an example,
-see \href{../Introduction/select.html}{SELECT}.  
+see \hyperref[sec:select]{SELECT}.  
 
 "thick" is used to determine whether the selected elements will be
 treated as thick elements by the MAKETHIN command. This only applies to
@@ -444,19 +420,20 @@ derived. (see ...)
 %%2014-Apr-08  17:43:44  ghislain:  A completer.
 
 Example: 
-\begin{verbatim}
+% keep verbatim for now and until ^ is solved
+\begin{verbatim} 
 select, flag = error, class = quadrupole, range = mb[1]/mb[5];
 select, flag = error, pattern = "^mqw.*";
-\end{verbatim} 
+\end{verbatim}
 selects all quadrupoles in the range mb[1] to mb[5], as well as all
 elements (in the whole sequence) with name starting with "mqw", for 
 treatment by the error module.  
 
 Example:  
-\begin{verbatim}
+\madxmp{
 select, flag=save, class=variable, pattern="abc.*";
 save, file=mysave;
-\end{verbatim} 
+}
 will save all variables (and sequences) containing "abc" in their name.
 However note that since the element class "variable" does not exist, any
 element with name containing "abc" will not be saved. 

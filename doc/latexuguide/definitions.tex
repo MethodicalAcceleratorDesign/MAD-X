@@ -3,8 +3,8 @@
 %  Changed by: Hans Grote, 25-Sep-2002
 
 \chapter{Definition of Elements}
+\label{chap:element_definition}
 
-%\input{Introduction/elm_format}
 \section{Element Input Format}
 \label{sec:element_input}
 
@@ -14,19 +14,18 @@ label: keyword \{,attribute\};
 }
 where 
 \begin{madlist}
-  \ttitem{\href{label.html}{label}} is a name to be given to the element
-  (in the example QF),  
-  \ttitem{\href{keyword.html}{keyword}} is an element type keyword (in
-  the example QUADRUPOLE).  
-  \ttitem{\href{attribute.html}{attribute}} normally has the form
-    "attribute-name = attribute-value" or
-    "attribute-name := attribute-value" (except for multipoles).  
-  \ttitem{\href{label.html}{attribute-name}} selects the attribute,
-    as defined for the element type keyword (in the example L and
-    K1).  
-  \ttitem{\href{attribute.html}{attribute-value}} gives it a value
-    (in the example 1.8 and 0.015832). The value may be specified
-    by an expression. The "=" assigns the value on the right to
+  \ttitem{label} is a name to be given to the element.
+  \ttitem{keyword} is an element type keyword.  
+  \ttitem{attribute} normally -- with exception for multipoles -- takes one of the two forms:
+    \madxmp{attribute-name \== attribute-value \\ 
+    attribute-name \>:= attribute-value}
+    \begin{madlist}
+      \ttitem{attribute-name} selects the attribute,
+      as defined for the element type keyword.   
+      \ttitem{attribute-value} provides a value to the {\tt
+        attribute\_name}. The value may be specified by an expression.
+    \end{madlist}
+    The "=" assigns the value on the right to
     the attribute at the time of definition, regardless of any
     further change of the right hand side; the ":=" re-evaluates
     the expression at the right every time the attribute is being
@@ -36,19 +35,20 @@ where
 
 Omitted attributes are assigned a default value.
 
-Example: 
+{\bf Example:} 
 \madxmp{QF: QUADRUPOLE, L=1.8, K1=0.015832;}
 
-A special format is used for a \href{multipole.html}{multipole}\index{multipole}: 
+A special format is used for a \hyperref[sec:multipole]{multipole}\index{multipole}: 
 \madxmp{
-m: multipole, \= kn= {kn0, kn1, kn2, ..., knmax},\\
-              \> ks= {ks0, ks1, ks2, ..., ksmax};
+M: MULTIPOLE, \= KN= {kn0, kn1, kn2, ..., knmax},\\
+              \> KS= {ks0, ks1, ks2, ..., ksmax};
 }
-where kn and ks give the integrated normal and skew strengths,
+where {\tt KN} and {\tt KS} give the integrated normal and skew strengths,
 respectively. The commas are mandatory, each strength can be an
 expression; their position defines the order. example:  
-\madxmp{m: multipole, kn={0,0,0,myoct*lrad}, ks={0,0,0,0,-1.e-5};}
-defines a multipole with a normal octupole, and a skew decapole component. 
+\madxmp{M: MULTIPOLE, KN={0,0,0,myoct*lrad}, KS={0,0,0,0,-1.e-5};}
+defines a multipole with a normal octupole component and a skew decapole
+component.  
 
 To know the current maximum order, enter the command 
 \madxmp{HELP, MULTIPOLE;} and count. 

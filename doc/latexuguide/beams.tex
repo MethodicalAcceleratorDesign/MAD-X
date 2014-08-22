@@ -99,13 +99,14 @@ Certain commands compute the synchrotron tune $Q_s$ taking into account
 the settings of RF cavities. 
 If $Q_s$ is non-zero, the relative energy spread and 
 the bunch length are calculated with
-\begin{align*}
-\sigma_E / p_0 c  &=  \sqrt{\epsilon_t\ \frac{2 \pi Q_s}{\eta\ C}} \\
-  c\ \sigma_t &= \sqrt{\epsilon_t\ \frac{\eta\ C}{2 \pi Q_s}}
-\end{align*}
+\begin{align}
+    \sigma_E / p_0 c  &=  \sqrt{\epsilon_t\ \frac{2 \pi Q_s}{\eta\ C}} \\
+          c\ \sigma_t &= \sqrt{\epsilon_t\ \frac{\eta\ C}{2 \pi Q_s}}
+\end{align}
 where $C$ is the machine circumference, and 
-$\eta = 1/\gamma^2 - 1/\gamma_t^2$.  
-\\
+\begin{equation}
+  \eta = 1/\gamma^2 - 1/\gamma_t^2  
+\end{equation}
 
 \begin{madlist}
   \ttitem{KBUNCH} The number of particle bunches in the
