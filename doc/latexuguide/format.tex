@@ -272,7 +272,7 @@ dddd:  \>drift, l = ddd-\textgreater l-0.3;
 %\input{Introduction/expression}
 %  Changed by: Ghislain Roy, 12-Dec-2013: updated physicial constants
 %  to PDG2012 values; very old values were pre PDG2010.
-\section{\href{expression}{Real Expressions}}
+\section{Real Expressions}
 \label{sec:expression}
 To facilitate the definition of interdependent quantities, any real
 value and integer value can be entered as an arithmetic expression. When
@@ -286,7 +286,7 @@ An expression is built from a combination of
 \hyperlink{operator}{operator} and \hyperlink{operand}{operand}, and it
 may contain \hyperlink{random}{random generators}.   
 
-\subsection{\href{operator}{Operators in Arithmetic Expressions}} 
+\subsection{Operators in Arithmetic Expressions}
 \label{subsec:operator}
 An expression can be formed using the following operators: 
 
@@ -299,7 +299,7 @@ An expression can be formed using the following operators:
   \ttitem{\^\ } Exponentiation. 
 \end{madlist}
 
-\subsubsection{\href{function}{Ordinary Functions}}
+\subsubsection{Ordinary Functions}
 \label{subsubsec:function}
 \begin{madlist}
   \ttitem{SQRT(x)} square root, 
@@ -318,7 +318,7 @@ An expression can be formed using the following operators:
   \ttitem{ABS(x)} absolute value; 
 \end{madlist}
 
-\subsubsection{\href{random}{Random Number Generators}}
+\subsubsection{Random Number Generators}
 \label{subsubsec:random}
 \begin{madlist}
   \ttitem{RANF()} random number, uniformly distributed in [0,1], 
@@ -333,7 +333,7 @@ functions, variable or constant expressions. To initialize the \madx
 random generator use the
 \href{../error/error_option.html#EOPTION}{Eoption command}.  
 
-\subsubsection{\href{table}{Table Access Functions}}
+\subsubsection{Table Access Functions}
 \label{subsubsec:table}
 
 \begin{madlist}
@@ -434,7 +434,7 @@ useful when creating a table from existing ones. See an example at:
 \href{../Introduction/select.html#screate}{user table II} 
 
 
-\subsection{\href{operand}{Operands in Arithmetic Expressions}} 
+\subsection{Operands in Arithmetic Expressions}
 \label{subsec:operand}
 An expression may contain the following operands:  
 
@@ -448,7 +448,7 @@ Examples:
 1, 10.35, 5E3, 314.1592E-2
 }
 
-\subsubsection{\href{constant}{Symbolic constants}} 
+\subsubsection{Symbolic constants}
 \label{subsubsec:symbolic_const}
 \madx recognizes some \hyperlink{constant}{mathematical and physical
   constants}. Their names must not be used for user-defined labels.  
@@ -558,7 +558,7 @@ D2:     \>DRIFT, L= 2.0 - D1->L;
 }
 \texttt{D1-\textgreater L} refers to the length L of the drift space D1.  
 
-\subsection{\href{defer}{Expressions and Random Values}} 
+\subsection{Expressions and Random Values}
 \label{subsec:expr_rnd}
 The definition of random machine imperfections requires evaluation of
 expressions containing random functions. These are evaluated like any
@@ -705,8 +705,9 @@ occurrence "$\backslash$." stands for a literal period.
 %\chapter{Parameter Statements}
 %\label{chap:parameter}
 
-\section{\href{relation}{Relations between Variable Parameters}}
- A relation is established between variables by one of two statements 
+\section{Relations between Variable Parameters}
+\label{sec:relations}
+A relation is established between variables by one of two statements 
 \madbox{
 parameter-name = \= expression; \\
 parameter-name := \> expression;

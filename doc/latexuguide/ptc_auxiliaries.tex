@@ -1,6 +1,7 @@
 %%\title{PTC Set-up Parameters}
 
 \chapter{MAD-X-PTC Auxiliaries}
+\label{chap:ptc_auxiliaries}
 
 This chapter documents the interface between MAD-X and PTC and the
 auxiliary commands available in the PTC library.
@@ -28,45 +29,45 @@ auxiliary commands available in the PTC library.
 %%\title{PTC\_SETSWITCH}
 
 \section{PTC\_SETSWITCH}
+\label{sec:ptc_setswitch}
 
 Routine that sets the internal PTC switches.
 
-\begin{verbatim}
-PTC_SETSWITCH,
-   debuglevel = [i,0], 
-   maxacceleration = [l, true, true],
-   exact_mis = [l, false, true],
-   totalpath = [l, false, true],
-   radiation = [l false, true],
-   fringe = [l, false, true],
-   time = [l, true, true];
-\end{verbatim}
+\madbox{
+PTC\_SETSWITCH, \=DEBUGLEVEL=integer, \\
+                \>MAXACCELERATION=logical,\\
+                \>EXACT\_MIS=logical,\\
+                \>TOTALPATH=logical,\\
+                \>RADIATION=logical,\\
+                \>FRINGE=logical,\\
+                \>TIME=logical;
+}
 
 Using this command the user can set switches of PTC and the MAD-X-PTC
 interface, adapting this way the program behavior to his needs.   
 
 {\bf Command parameters and switches}
-\begin{itemize}
-   \item {\bf debuglevel}=integer (Default: 1)\\
+\begin{madlist}
+   \ttitem{DEBUGLEVEL} (Default: 1)\\
      Sets the level of debugging printout: 0 prints none, 4 prints everything   
 
-   \item {\bf maxacceleration}=logical (Default: .true.)\\
+   \ttitem{MAXACCELERATION} (Default: true)\\
      Switch to set cavities phases so the reference orbit is always on
      the crest, i.e. gains max energy    
 
-   \item {\bf exact\_mis}=logical (Default: .false.)\\
+   \ttitem{EXACT\_MIS} (Default: .false.)\\
      Switch ensures exact misalignment treatment.   
 
-   \item {\bf totalpath}=logical  (Default: .false.)\\
+   \ttitem{TOTALPATH} (Default: .false.)\\
      If true, the 6th variable of PTC, i.e. 5th of MAD-X, is the total
      path.  \\
      If false it is deviation from the reference particle,
      which is normally the closed orbit for closed layouts.    
 
-   \item {\bf radiation}=logical (Default: .false.)\\    
+   \ttitem{RADIATION} (Default: false)\\    
      Sets the radiation switch/internal state of PTC.   
 
-   \item {\bf fringe}=logical (Default: .false.)\\    
+   \ttitem{FRINGE} (Default: false)\\    
      Sets the fringe switch/internal state of PTC. \\ 
      If true the influence of the fringe fields is evaluated for all
      elements. \\       
@@ -76,10 +77,11 @@ interface, adapting this way the program behavior to his needs.
      will be provided later, when the situation in this matter will be
      definitely settled.    
 
-   \item {\bf time}=logical (Default: .true.)\\  
+   \ttitem{TIME} (Default: true)\\  
      If true, Selects time of flight (\textit{cT} to be precise) rather
      than path length as the 6th variable of PTC, i.e. 5th of MAD-X.     
-\end{itemize}
+
+\end{madlist}
 
 
 {\bf PROGRAMMERS MANUAL}   
@@ -103,14 +105,13 @@ routines of the Fortran module to set each of the switches:
 %%\title{PTC\_KNOB}
 
 \section{PTC\_KNOB}
+\label{sec:ptc_knob}
 
-\begin{verbatim}
-PTC_KNOB, 
-    elementname = [s, none] , 
-    kn    = [i, {-1}], 
-    ks    = [i, {-1}], 
-    exactmatch = [l, true, true] ; 
-\end{verbatim}
+\madbox{
+PTC\_KNOB, \=ELEMENTNAME=string, \\
+           \>KN=[i, {-1}], KS=[i, {-1}], \\
+           \>EXACTMATCH=logical;
+}
 
  Sets knobs in PTC calculations (currently ony in PTC\_TWISS,
  PTC\_NORMAL will follow). Knobs appear as the additional parameters of
@@ -134,12 +135,12 @@ Further, the parametric results can be:
 
 
 {\bf Command parameters and switches}
-\begin{itemize}
-   \item {\bf elementname}=string in range format (Default: NULL)\\
+\begin{madlist}
+   \ttitem{ELEMENTNAME} a string in range format (Default: NULL)\\
      Specifies name of the element containing the knob(s) to be set.   
-   \item {\bf kn,ks}=list of integers (Default: ???)\\
-     Defines which order    
-   \item {\bf exactmatch}=logical (Default: .true.)\\
+   \ttitem{KN,KS} list of integers (Default: ???)\\
+     Defines which order 
+   \ttitem{EXACTMATCH} (Default: .true.)\\
      Normally a knob is a property of a single element in a layout.
      The specified name must match 1:1 to an element name. This is the
      case when exactmatch is true.\\  
@@ -147,12 +148,11 @@ Further, the parametric results can be:
      the exactmatch switch must be false. A given order field
      component of all the elements that name starts with the
      name specified by the user become a single knob.
-   \item {\bf initial}
-\end{itemize}
+   \ttitem{INITIAL}
+\end{madlist}
 
 
-{\bf Example}
-
+{\bf Example}\\
 \href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/knobs/knobs.madx}{dog
   leg chicane}: Dipolar components of both rbends and dipolar and
 quadrupolar components of the focusing quads set as knobs. Some first
