@@ -15,7 +15,10 @@ void*   mad_stck;
 #define _POSIX_C_SOURCE 200112L
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 
 void _gfortran_set_args    (int, char *[]);
 void _gfortran_set_options (int, int   []);
