@@ -357,7 +357,7 @@ exec_fill_table(struct in_cmd* cmd)
     return;
   }
 
-  if ((pos = name_list_pos(name, table_register->names)) <= 0) {
+  if ((pos = name_list_pos(name, table_register->names)) < 0) {
     warning("table name not found:", "ignored");
     return;
   }
