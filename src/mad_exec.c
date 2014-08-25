@@ -5,11 +5,9 @@ exec_delete_sequ(char* name)
 {
   struct sequence* keep = current_sequ;
   int spos;
-  if ((spos = name_list_pos(name, sequences->list)) >= 0)
-  {
+  if ((spos = name_list_pos(name, sequences->list)) >= 0) {
     current_sequ = sequences->sequs[spos];
-    if (current_sequ->ex_start != NULL) /* delete expanded */
-    {
+    if (current_sequ->ex_start != NULL) { /* delete expanded */
       current_sequ->ex_nodes = delete_node_list(current_sequ->ex_nodes);
       current_sequ->ex_start = delete_node_ring(current_sequ->ex_start);
       current_sequ->orbits = delete_vector_list(current_sequ->orbits);
@@ -19,6 +17,7 @@ exec_delete_sequ(char* name)
     current_sequ = keep;  
   }
   else warning("sequence to be deleted does not exist:", name);
+  return;
 }
 
 void
@@ -26,11 +25,9 @@ exec_delete_table(char* name)
 {
   struct table_list* tl;
   int j, k, pos;
-  for (j = 0; j < all_table_lists->curr; j++)
-  {
+  for (j = 0; j < all_table_lists->curr; j++) {
     tl = all_table_lists->table_lists[j];
-    if ((pos = name_list_pos(name, tl->names)) >= 0)
-    {
+    if ((pos = name_list_pos(name, tl->names)) >= 0) {
       tl->tables[pos] = delete_table(tl->tables[pos]);
       k = remove_from_name_list(name, tl->names);
       tl->tables[k] = tl->tables[--tl->curr];
@@ -152,8 +149,8 @@ exec_call(struct in_cmd* cmd)
   struct name_list* nl = cmd->clone->par_names;
   int pos = name_list_pos("file", nl);
   int top = in->curr;
-  if (nl->inform[pos])
-  {
+  
+  if (nl->inform[pos]) {
     if (down_unit(pl->parameters[pos]->string)) madx_input(top);
   }
   else warning("call without filename:", "ignored");
@@ -167,15 +164,15 @@ exec_cmd_delete(struct in_cmd* cmd)
   struct command_parameter_list* pl = cmd->clone->par;
   int pos;
   char* name;
+
   pos = name_list_pos("sequence", nl);
-  if (nl->inform[pos])
-  {
+  if (nl->inform[pos]) {
     name = pl->parameters[pos]->string;
     exec_delete_sequ(name);
   }
+
   pos = name_list_pos("table", nl);
-  if (nl->inform[pos])
-  {
+  if (nl->inform[pos]) {
     name = pl->parameters[pos]->string;
     exec_delete_table(name);
   }
@@ -189,13 +186,11 @@ exec_show(struct in_cmd* cmd)
   struct variable* var;
   char** toks = cmd->tok_list->p;
   int i, pos, n = cmd->tok_list->curr;
-  for (i = 1; i < n; i++)
-  {
-    if (strcmp(toks[i],","))
-    {
+
+  for (i = 1; i < n; i++) {
+    if (strcmp(toks[i],",")) {
       if (strncmp(toks[i], "beam", 4) == 0) show_beam(toks[i]);
-      else if ((pos = name_list_pos(toks[i], defined_commands->list)) > -1)
-      {
+      else if ((pos = name_list_pos(toks[i], defined_commands->list)) > -1) {
         if (strcmp(toks[i], "option") == 0) dump_command(options);
         else if (strcmp(toks[i], "eoption") == 0 && current_eopt != NULL)
           dump_command(current_eopt);
@@ -205,14 +200,14 @@ exec_show(struct in_cmd* cmd)
         dump_command(beta0_list->commands[pos]);
       else if ((el = find_element(toks[i], element_list)) != NULL)
         dump_element(el);
-      else if ((var = find_variable(toks[i], variable_list)))
-      {
+      else if ((var = find_variable(toks[i], variable_list))) {
         if (var->expr)  fprintf(prt_file, "%s := %s ;\n", toks[i], var->expr->string);
         else fprintf(prt_file, v_format("%s = %F ;\n"), toks[i], var->value);
       }
       else fprintf(prt_file, "%s not found\n;", toks[i]);
     }
   }
+  return;
 }
 
 void
@@ -230,30 +225,30 @@ exec_create_table(struct in_cmd* cmd)
   char* name = NULL;
   int  ncols = 0;  /*number of columns*/
 
-  if (nl->inform[pos] == 0)
-  {
+  if (nl->inform[pos] == 0) {
     warning("no table name:", "ignored");
     return;
   }
-  if ((name = pl->parameters[pos]->string) == NULL)
-  {
+
+  if ((name = pl->parameters[pos]->string) == NULL) {
     warning("no table name: ", "ignored");
     return;
   }
-  if ((pos = name_list_pos(name, table_register->names)) > -1)
-  {
+
+  if ((pos = name_list_pos(name, table_register->names)) > -1) {
     warning("table already exists: ", "ignored");
     return;
   }
 
   pos = name_list_pos("column", nl);
-  if (nl->inform[pos] == 0)
-  {
+  if (nl->inform[pos] == 0) {
     warning("table without columns: ", "ignored");
     return;
   }
+
   m = pl->parameters[pos]->m_string;
   ncols = m->curr;
+
   /* now make table */
   t_types = mymalloc_atomic(rout_name, ncols * sizeof *t_types);
   t_c = mymalloc(rout_name, (ncols+1) * sizeof *t_c);
@@ -268,12 +263,15 @@ exec_create_table(struct in_cmd* cmd)
       t_c[j] = permbuff(m->p[j]);
     }
   }
+
   t_c[ncols] = blank;
   t = make_table(name, "user", t_c, t_types, USER_TABLE_LENGTH);
   t->org_cols = 0;  /* all entries are "added" */
   add_to_table_list(t, table_register);
   myfree(rout_name, t_c); myfree(rout_name, t_types);
   t->dynamic = 1;
+  
+  return;
 }
 
 void
@@ -297,6 +295,8 @@ exec_store_coguess(struct in_cmd* cmd)
     zero_double(guess_orbit, 6);
     guess_flag=0;
   }
+
+  return;
 }
 
 void
@@ -333,6 +333,8 @@ exec_dump(struct in_cmd* cmd)
 
   struct table* t = table_register->tables[pos];
   out_table(name, t, filename);
+
+  return;
 }
 
 void
@@ -345,37 +347,47 @@ exec_fill_table(struct in_cmd* cmd)
   int pos = name_list_pos("table", nl);
   char* name = NULL;
   int row,curr;
-  if (nl->inform[pos] == 0)
-  {
+  if (nl->inform[pos] == 0) {
     warning("no table name:", "ignored");
     return;
   }
-  if ((name = pl->parameters[pos]->string) == NULL)
-  {
+
+  if ((name = pl->parameters[pos]->string) == NULL) {
     warning("no table name: ", "ignored");
     return;
   }
+
+  if ((pos = name_list_pos(name, table_register->names)) <= 0) {
+    warning("table name not found:", "ignored");
+    return;
+  }
+  t = table_register->tables[pos];
+
   pos=name_list_pos("row", nl);
   row=(int) pl->parameters[pos]->double_value;
-  if ((pos = name_list_pos(name, table_register->names)) > -1)
-  {
-    t = table_register->tables[pos];
-    if (row<0) {
-      add_vars_to_table(t);
-      if (++t->curr == t->max) grow_table(t);
-    } else {
-      row--;
-      curr=t->curr;
-      if (row < t->curr) {
-        t->curr=row;}
-      else {
-        t->curr--;
-      }
-      add_vars_to_table(t);
-      t->curr=curr;
-    }
+
+  // 2014-Aug-18  17:05:33  ghislain: allow for negative row numbers; 
+  // -1 indexes last row and negative numbers count row numbers backwards from end
+  // -2 denoting the one before last and so on
+  if (row<0) row=t->curr + 1 + row; 
+  
+  // printf("\n Using row=%d \n",row);
+
+  if (row<0 || row>t->curr){
+    warning("row index out of bounds:", " ignored");
+    return;
   }
-  else warning("table not found: ", "ignored");
+
+  if (row==0) { // add row to table
+    add_vars_to_table(t);
+    if (++t->curr == t->max) grow_table(t);
+  } else { // fill existing row
+    curr=t->curr;
+    t->curr=row-1;
+    add_vars_to_table(t);
+    t->curr=curr;
+  }
+
   return;
 }
 
@@ -389,40 +401,56 @@ exec_setvars_table(struct in_cmd* cmd)
   int pos = name_list_pos("table", nl);
   char* name = NULL;
   int row,curr;
-  if (nl->inform[pos] == 0)
-  {
+
+  if (nl->inform[pos] == 0) {
     warning("no table name:", "ignored");
     return;
   }
-  if ((name = pl->parameters[pos]->string) == NULL)
-  {
+
+  if ((name = pl->parameters[pos]->string) == NULL) {
     warning("no table name: ", "ignored");
     return;
   }
+
   current_node = NULL; /* to distinguish from other table fills */
+
+  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+    warning("table name not found:", "ignored");
+    return;
+  }
+  t = table_register->tables[pos];
+
   pos=name_list_pos("row", nl);
   row=(int) pl->parameters[pos]->double_value;
-  if ((pos = name_list_pos(name, table_register->names)) > -1)
-  {
-    t = table_register->tables[pos];
-    row--;
-    curr=t->curr;
-    if ((row < t->curr) && (row >-1)) {
-      t->curr=row;}
-    else {
-      t->curr--;
-    }
-    set_vars_from_table(t);
-    t->curr=curr;
+
+  // 2014-Aug-18  17:05:33  ghislain: allow for negative row numbers; 
+  // -1 indexes last row and negative numbers count row numbers backwards from end
+  // -2 denoting the one before last and so on
+  if (row<0) row=t->curr + 1 + row; 
+  
+  //printf("\n Using row=%d \n",row);
+
+  if (row<=0 || row>t->curr){
+    // 2014-Aug-18  17:05:33  ghislain: any invalid row number gave back the 
+    // values for the last row!!!
+    //t->curr--;
+    // changed to not return any value.
+    warning("row index out of bounds:", " ignored");
+    return;
   }
-  else warning("table not found: ", "ignored");
+
+  curr=t->curr;
+  t->curr=row-1;
+  set_vars_from_table(t);
+  t->curr=curr;
+  
   return;
 }
 
 
 void
 exec_setvars_lin_table(struct in_cmd* cmd)
-  /* set variables from a table */
+  /* set variables from a table by linear interpolation between values in two rows */
 {
   struct table* t;
   struct name_list* nl = cmd->clone->par_names;
@@ -436,52 +464,64 @@ exec_setvars_lin_table(struct in_cmd* cmd)
   i=0;
 
   pos = name_list_pos("table", nl);
-  if (nl->inform[pos] == 0)
-  {
+  if (nl->inform[pos] == 0) {
     warning("no table name:", "ignored");
     return;
   }
-  if ((name = pl->parameters[pos]->string) == NULL)
-  {
+
+  if ((name = pl->parameters[pos]->string) == NULL) {
     warning("no table name: ", "ignored");
     return;
   }
+
   /*current_node = NULL;  to distinguish from other table fills ????*/
   pos=name_list_pos("row1", nl);
-  row1=(int) pl->parameters[pos]->double_value-1;
+  row1=(int) pl->parameters[pos]->double_value; 
   pos=name_list_pos("row2", nl);
-  row2=(int) pl->parameters[pos]->double_value-1;
+  row2=(int) pl->parameters[pos]->double_value; 
+
   pos = name_list_pos("param", nl);
   param = pl->parameters[pos]->string;
-  if ((pos = name_list_pos(name, table_register->names)) > -1)
-  {
-    t = table_register->tables[pos];
-    if (row1<0){ row1=t->curr+row1;}
-    if (row2<0){ row2=t->curr+row2;}
-    /*printf("Using row1=%d, row2=%d\n",row1,row2); */
-    if (row1<0 || row1>=t->curr){
-      warning("row1 index out of bounds:", " ignored");
-      return;
-    }
-    if (row2<0 || row2>=t->curr){
-      warning("row2 index out of bounds:", " ignored");
-      return;
-    }
-    /* printf("Using row1=%d, row2=%d\n",row1,row2); */
-    for (i = 0; i < t->num_cols; i++) {
-      if (t->columns->inform[i] <3){
-        colname=t->columns->names[i];
-        val1=t->d_cols[i][row1];
-        val2=t->d_cols[i][row2];
-        sprintf(expr,"%s:=%10.16g*(%s)%+10.16g*(1-(%s));",
-            colname,val1,param,val2,param);
-        /* printf("%s\n",expr); */
-        pro_input(expr);
-      }
+
+  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+    warning("table name not found:", "ignored");
+    return;
+  }
+  t = table_register->tables[pos];
+  
+  /* negative row numbers are counting backwards from last row */
+  /* transform into positive values */
+  if (row1<0) row1=t->curr + 1 + row1; 
+  if (row2<0) row2=t->curr + 1 + row2;
+
+  //printf("\n Using row1=%d, row2=%d\n",row1,row2);
+
+  if (row1<=0 || row1>t->curr){
+    warning("row1 index out of bounds:", " ignored");
+    return;
+  }
+  if (row2<=0 || row2>t->curr){
+    warning("row2 index out of bounds:", " ignored");
+    return;
+  }
+
+  for (i = 0; i < t->num_cols; i++) {
+    if (t->columns->inform[i] <3){
+      colname=t->columns->names[i];
+      val1=t->d_cols[i][row1-1];
+      val2=t->d_cols[i][row2-1];
+      // 2014-Aug-18  17:15:08  ghislain: 
+      // value := val1*param + val2*(1-param) ; 
+      // sprintf(expr,"%s:=%10.16g*(%s)%+10.16g*(1-(%s));", colname,val1,param,val2,param);
+      // is counterintuitve for interpolation between val1 and val2 and should instead be 
+      // value := val1 + param*(val2-val1) = val1*(1-param) + val2*param;
+      sprintf(expr,"%s:=%10.16g*(1-(%s))%+10.16g*(%s);", colname,val1,param,val2,param);
+      //printf(" built expression is %s\n",expr);
+      pro_input(expr);
     }
   }
-  else warning("table not found: ", "ignored");
-  return;
+ 
+ return;
 }
 
 void

@@ -235,7 +235,7 @@ char command_def[] =
 "sequence = [s, none], "
 "table = [s, none]; "
 " "
-"deselect: control none 0 0 "
+"deselect: control none 0 0 "  /* GR: stub exists but not properly implemented */
 "flag     = [s, none, none], "
 "range    = [s, #s/#e, none], "
 "class    = [s, none, none], "
@@ -260,7 +260,7 @@ char command_def[] =
 " "
 "fill: control none 0 0 "
 "table = [s, none], "
-"row = [i, -1]; "
+"row = [i, 0]; "
 " "
 "setvars: control none 0 0 "
 "table = [s, none], "
@@ -2785,6 +2785,6 @@ char command_def[] =
 "table = [s, none], "
 "row1 = [i, 0], "
 "row2 = [i, 0], "
-"param = [s, t]; "
+"param = [s, interp]; " // change default t to interp
 " "
 ;
