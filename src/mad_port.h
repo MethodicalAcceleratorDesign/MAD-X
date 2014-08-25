@@ -1,9 +1,14 @@
 #ifndef MAD_PORT_H
 #define MAD_PORT_H
 
-#if ! defined(_WIN32) || defined(__MINGW32__)
+#if !defined(_WIN32) || defined(__MINGW32__)
 // problem with C99 compliance on Windows
 #include <stdint.h>
+#endif
+
+#ifdef __MINGW32__
+// problem with unistd compliance on Cygwin
+typedef long long off64_t;
 #endif
 
 #ifdef _WIN32
