@@ -3,7 +3,7 @@
   +     MAD-X 5.02.02  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2014.07.04               +
-  + Execution date: 2014.08.25 14:06:56      +
+  + Execution date: 2014.08.27 11:12:46      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option, -info; // avoid redefinition info
 
@@ -17,6 +17,14 @@ create, table=test, column=a,b;
 
 
 
+a=9;    b=9;        fill, table=test, row= 1; // out of bounds
+
+++++++ warning: row index out of bounds:  ignored
+a=9;    b=9;        fill, table=test, row=-1; // out of bounds
+
+++++++ warning: row index out of bounds:  ignored
+
+
 a=9;    b=9;        fill, table=test; // row=0 is default and adds a row to the table
 
 a=9;    b=9;        fill, table=test, row=0; 
@@ -25,14 +33,18 @@ a=5.32; b=-3.2;     fill, table=test, row=0;
 
 
 
-a=2;    b=4;        fill, table=test, row=2; // filling again an already existing row
+a=2;    b=4;        fill, table=test, row= 2; // filling again an already existing row
 
 a=1;    b=2;        fill, table=test, row=-3; // negative row number
 
 
 
+a=9;    b=9;        fill, table=test, row=-4; // out of bounds
 
+++++++ warning: row index out of bounds:  ignored
+a=9;    b=9;        fill, table=test, row= 4; // out of bounds
 
+++++++ warning: row index out of bounds:  ignored
 
 
 // testing setvars
@@ -342,8 +354,8 @@ b =                  8 ;
 exit;
 
 
-  Number of warnings: 8
-8 in C and 0 in Fortran
+  Number of warnings: 12
+12 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   + MAD-X 5.02.02 (64 bit) finished normally +

@@ -366,18 +366,16 @@ exec_fill_table(struct in_cmd* cmd)
   pos=name_list_pos("row", nl);
   row=(int) pl->parameters[pos]->double_value;
 
+  if (abs(row) > t->curr) { // row=0 is allowed
+    warning("row index out of bounds:", " ignored");
+    return;
+  }
+
   // 2014-Aug-18  17:05:33  ghislain: allow for negative row numbers; 
   // -1 indexes last row and negative numbers count row numbers backwards from end
   // -2 denoting the one before last and so on
   if (row<0) row=t->curr + 1 + row; 
   
-  // printf("\n Using row=%d \n",row);
-
-  if (row<0 || row>t->curr){
-    warning("row index out of bounds:", " ignored");
-    return;
-  }
-
   if (row==0) { // add row to table
     add_vars_to_table(t);
     if (++t->curr == t->max) grow_table(t);
@@ -423,22 +421,16 @@ exec_setvars_table(struct in_cmd* cmd)
   pos=name_list_pos("row", nl);
   row=(int) pl->parameters[pos]->double_value;
 
+  if (abs(row) > t->curr || row == 0){
+    warning("row index out of bounds:", " ignored");
+    return;
+  }
+
   // 2014-Aug-18  17:05:33  ghislain: allow for negative row numbers; 
   // -1 indexes last row and negative numbers count row numbers backwards from end
   // -2 denoting the one before last and so on
   if (row<0) row=t->curr + 1 + row; 
   
-  //printf("\n Using row=%d \n",row);
-
-  if (row<=0 || row>t->curr){
-    // 2014-Aug-18  17:05:33  ghislain: any invalid row number gave back the 
-    // values for the last row!!!
-    //t->curr--;
-    // changed to not return any value.
-    warning("row index out of bounds:", " ignored");
-    return;
-  }
-
   curr=t->curr;
   t->curr=row-1;
   set_vars_from_table(t);
@@ -488,22 +480,19 @@ exec_setvars_lin_table(struct in_cmd* cmd)
     return;
   }
   t = table_register->tables[pos];
+
+  if (abs(row1) > t->curr || row1 == 0){
+    warning("row1 index out of bounds:", " ignored");
+    return;
+  } else if (abs(row2) > t->curr || row2 == 0){
+    warning("row2 index out of bounds:", " ignored");
+    return;
+  }
   
   /* negative row numbers are counting backwards from last row */
   /* transform into positive values */
   if (row1<0) row1=t->curr + 1 + row1; 
   if (row2<0) row2=t->curr + 1 + row2;
-
-  //printf("\n Using row1=%d, row2=%d\n",row1,row2);
-
-  if (row1<=0 || row1>t->curr){
-    warning("row1 index out of bounds:", " ignored");
-    return;
-  }
-  if (row2<=0 || row2>t->curr){
-    warning("row2 index out of bounds:", " ignored");
-    return;
-  }
 
   for (i = 0; i < t->num_cols; i++) {
     if (t->columns->inform[i] <3){
@@ -516,7 +505,6 @@ exec_setvars_lin_table(struct in_cmd* cmd)
       // is counterintuitve for interpolation between val1 and val2 and should instead be 
       // value := val1 + param*(val2-val1) = val1*(1-param) + val2*param;
       sprintf(expr,"%s:=%10.16g*(1-(%s))%+10.16g*(%s);", colname,val1,param,val2,param);
-      //printf(" built expression is %s\n",expr);
       pro_input(expr);
     }
   }

@@ -4,14 +4,18 @@ create, table=test, column=a,b;
 
 // testing fill
 
+a=9;    b=9;        fill, table=test, row= 1; // out of bounds
+a=9;    b=9;        fill, table=test, row=-1; // out of bounds
+
 a=9;    b=9;        fill, table=test; // row=0 is default and adds a row to the table
 a=9;    b=9;        fill, table=test, row=0; 
 a=5.32; b=-3.2;     fill, table=test, row=0;
 
-a=2;    b=4;        fill, table=test, row=2; // filling again an already existing row
+a=2;    b=4;        fill, table=test, row= 2; // filling again an already existing row
 a=1;    b=2;        fill, table=test, row=-3; // negative row number
 
-
+a=9;    b=9;        fill, table=test, row=-4; // out of bounds
+a=9;    b=9;        fill, table=test, row= 4; // out of bounds
 
 // testing setvars
 
