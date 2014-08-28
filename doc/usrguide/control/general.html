@@ -226,14 +226,18 @@ can be edited with the help of a
 <a href="special.html#macro">macro statement</a>.
 For more details, see there.
 <p>
-<li><h4><a name=print>PRINTF</a></h4>
+<li><h4><a name=printf>PRINTF</a></h4>
 <pre>
 printf, text = "string", value = expr{,expr};
 </pre>
 prints the numerical values specified in the value field, formatted according to
 the string format provided in the text field, to the current output file. <p>
 The string format can take numeric C or MAD format specifiers for double real values; 
-integer and string formats are not supported.<p> 
+integer and string formats are not supported but 
+can be approximated with the %g in the case of integers, and via
+MACRO statements, which perform string
+substitution, themselves containing a PRINT statement.  
+<p> 
 The maximum number of values that can be printed in one
 statement is limited to 100. <p>
 If the number of format specifiers given in the string is higher 
