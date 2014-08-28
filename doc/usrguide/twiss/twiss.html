@@ -35,7 +35,8 @@ TWISS, SEQUENCE=seq_name, LINE=line_name, RANGE=range,
        CENTRE=logical, TOLERANCE=real,
        FILE=filename,
        TABLE=table_name, NOTABLE=logical,
-       RMATRIX=logical, SECTORMAP=logical, SECTORFILE=logical,
+       RMATRIX=logical, 
+       SECTORMAP=logical, SECTORTABLE=tablename, SECTORFILE=filename,
        KEEPORBIT=name, USEORBIT=name,
        COUPLE=logical,
        RIPKEN=logical;
@@ -157,6 +158,13 @@ flag to trigger the calculation of a sector map as described at: <a
  href="../Introduction/sectormap.html">SECTORMAP</a>.
 <br><br></li>
 
+<li>SECTORTABLE {=string} (Default:"sectortable")
+The name of the table containing the sectormap values can be specified. 
+The elements (lines) and parameters (columns) 
+of the table can be tailored using the SELECT command as specified in 
+<a href="../Introduction/sectormap.html">SECTORMAP</a>
+<br><br></li>
+
 <li>SECTORFILE {=string} (Default: "sectormap")
 <!-- 2013-Jun-27  12:27:38  ghislain:
 <!-- Used to write SECTORMAPs to the file SECTORFILE="file_name", if -->
@@ -168,12 +176,6 @@ The format of the output can be adjusted as specified in
 <br>Default: SECTORFILE="sectormap". 
 <br><br></li>
 
-<li>SECTORTABLE {=string} (Default:"sectortable")
-The name of the table containing the sectormap values can be specified. 
-The elements (lines) and parameters (columns) 
-of the table can be tailored using the SELECT command as specified in 
-<a href="../Introduction/sectormap.html">SECTORMAP</a>
-<br><br></li>
 
 <li>KEEPORBIT {=label} (Default: none)<br>
 The keeporbit attribute (with an optional name, keeporbit="name")

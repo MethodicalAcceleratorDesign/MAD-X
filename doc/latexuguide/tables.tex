@@ -214,7 +214,9 @@ The FILL command takes two arguments:
   format. 
 
   \ttitem{ROW} is the row number to be filled with the current values of
-  all column variables. \texttt{ROW=0}, causes \texttt{FILL} to add a row at
+  all column variables. \\ 
+  \texttt{ROW=0}, or \texttt{ROW=nrow + 1}, where nrow is the current
+  number of rows in the table, causes \texttt{FILL} to add a row at
   the end of the table and fill it with the current values of all
   column variables. \\ (Default: 0) 
 \end{madlist}
@@ -231,16 +233,20 @@ etc\ldots
 %% accesses the one before last (penultimate) row, etc\ldots 
 
 Trying to access the table forward beyond the last row, i.e. \texttt{ROW}
-strictly greater than {\tt nrow} the number of rows in the table, or
-trying to access the table backwards before the first row, i.e. \texttt{ROW}
-strictly lower than {\tt -nrow}, both result in a ``row out of bound''
-message and no values are filled in the table.
+strictly greater than {\tt nrow + 1}, where {\tt nrow} is the number of
+rows in the table, or trying to access the table backwards before the
+first row, i.e. \texttt{ROW} strictly lower than {\tt -nrow}, both
+result in a ``row out of bound'' message and no values are filled in the
+table. 
 
 %% If \texttt{nrow} is the number of rows in the table, the conditions
 %% \texttt{ROW $>$ nrow}, ie trying to access the table forward beyond the
 %% last row, or \texttt{ROW $<$ -nrow}, ie trying to access the table
 %% backwards before the first row, result in a ``row out of bound'' message
 %% and no values are filled in the table.
+
+{\bf Reminder:} One can get access to the current number of rows in a
+table using the variable \madxmp{TABLE(tablenanme, TABLELENGTH)}
 
 See as well the \href{../Introduction/select.html#ucreate}{user table}
 example.   

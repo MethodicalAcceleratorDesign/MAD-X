@@ -24,7 +24,8 @@ TWISS, \=SEQUENCE=seqname, LINE=linename, RANGE=range,  \\
        \>CENTRE=logical, TOLERANCE=real, \\
        \>FILE=filename, \\
        \>TABLE=tablename, NOTABLE=logical,\\
-       \>RMATRIX=logical, SECTORMAP=logical, SECTORFILE=logical,\\
+       \>RMATRIX=logical, 
+       \>SECTORMAP=logical, SECTORTABLE=tablename, SECTORFILE=filename,\\
        \>KEEPORBIT=name, USEORBIT=name,\\
        \>COUPLE=logical,\\
        \>RIPKEN=logical;
@@ -129,10 +130,21 @@ The  attributes of the \texttt{TWISS} command are:
   map as described at:
   \href{../Introduction/sectormap.html}{SECTORMAP}.    
   
-  \ttitem{SECTORFILE} Used to write SECTORMAPs to the file
-  SECTORFILE="file\_name", if missing the output of SECTORMAP
-  will go to the file "sectormap" with the format as found in
-  \href{../Introduction/sectormap.html}{SECTORMAP}.    
+  \ttitem{SECTORTABLE} the name of the table containing the SECTORMAP
+  values. The elements (lines) and parameters (columns) 
+  of the table can be tailored using the SELECT command as specified in 
+  \hyperref[sec:sectormap]{\tt SECTORMAP} \\
+  (Default: sectortable)
+
+  \ttitem{SECTORFILE} the name of the file to which the SECTORMAP will
+  be written. 
+  The format of the output can be adjusted as specified in 
+  \hyperref[sec:sectormap]{\tt SECTORMAP} \\
+  (Default: "sectormap")
+  %% Used to write SECTORMAPs to the file
+  %% SECTORFILE="filename", if missing the output of SECTORMAP
+  %% will go to the file "sectormap" with the format as found in
+  %% \href{../Introduction/sectormap.html}{SECTORMAP}.    
   
   \ttitem{KEEPORBIT} The keeporbit attribute (with an optional name,
   keeporbit="name") stores the orbit under this name at the

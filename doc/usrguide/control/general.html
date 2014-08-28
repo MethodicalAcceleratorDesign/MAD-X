@@ -122,18 +122,35 @@ The FILL command takes two arguments:
   The table can then be <a href="#write">written</a> to file in TFS
   format. 
 <li> ROW gives the row number to be filled with the current values of
-  all column variables. <br> 
-  ROW=0, causes FILL to add a row at
-  the end of the table and to fill it with the current values of all
-  column variables. <br>
+  all column variables. <br>
+
+  <b>Only valid from version 5.02.03 onwards</b> 
+  ROW=0 or ROW=nrow+1, where nrow is the current number of rows in the table,
+  causes FILL to add a row at the end of the table and to fill it with 
+  the current values of all column variables. <br>
   (Default: 0) 
 </ul>
 <p>
+
+<b>Only valid from version 5.02.03 onwards</b> <br>
 Negative ROW values are allowed and count the row numbers from
 the last row, allowing access to the table in reverse order of rows:<br>
 ROW = -1  accesses the last row of the table,<br>
 ROW = -2  accesses the one before last (penultimate) row, etc...
 <p>
+
+<b>Only valid from version 5.02.03 onwards</b> <br>
+Trying to access the table forward beyond the last row, i.e. ROW
+strictly greater than nrow+1, where nrow is the number of rows in the table, or
+trying to access the table backwards before the first row, i.e. ROW
+strictly lower than -nrow, both result in a ``row out of bound'' message and no
+variable values are set in the table.  
+<p>
+
+Reminder: One can get access to the current number of rows in a table using the variable 
+<pre>
+TABLE(tablenanme, TABLELENGTH)
+</pre>
 
 <!-- adds a new line with the current values of all column variables into the -->
 <!-- user table <a href="#create">create</a>d beforehand. This table -->
@@ -435,6 +452,9 @@ see <a href="../Introduction/select.html">SELECT</a>.
 
 
 <li><h4><a name=setvars>SETVARS</a></h4>
+
+<b>Only valid from version 5.02.03 onwards</b> 
+
 The SETVARS command sets the variables with values extracted
 from the row of a table.
 <pre>
@@ -460,6 +480,9 @@ variable values are returned and set.
 
 
 <li><h4><a name=setvars_lin>SETVARS_LIN</a></h4>
+
+<b>Only valid from version 5.02.03 onwards</b> 
+
 The SETVARS_LIN command sets the variables with values calculated
 by linear interpolation, or extrapolation, between two rows of a table.
 <pre>

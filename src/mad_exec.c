@@ -366,7 +366,14 @@ exec_fill_table(struct in_cmd* cmd)
   pos=name_list_pos("row", nl);
   row=(int) pl->parameters[pos]->double_value;
 
-  if (abs(row) > t->curr) { // row=0 is allowed
+  if (row==0 || row == t->curr + 1) { // add row to table and fill
+    add_vars_to_table(t);
+    if (++t->curr == t->max) grow_table(t);
+    return;
+  }
+
+  if (abs(row) > t->curr) { // bounds check
+    // note: cases row=0 and row=t->curr+1 already treated
     warning("row index out of bounds:", " ignored");
     return;
   }
@@ -376,16 +383,11 @@ exec_fill_table(struct in_cmd* cmd)
   // -2 denoting the one before last and so on
   if (row<0) row=t->curr + 1 + row; 
   
-  if (row==0) { // add row to table
-    add_vars_to_table(t);
-    if (++t->curr == t->max) grow_table(t);
-  } else { // fill existing row
-    curr=t->curr;
-    t->curr=row-1;
-    add_vars_to_table(t);
-    t->curr=curr;
-  }
-
+  curr=t->curr;
+  t->curr=row-1;
+  add_vars_to_table(t);
+  t->curr=curr;
+  
   return;
 }
 

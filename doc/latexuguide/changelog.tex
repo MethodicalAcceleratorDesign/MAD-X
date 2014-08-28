@@ -11,7 +11,7 @@ The changes are indexed by the SVN release number.
 
 \begin{madlist}
 
-  \ttitemn{r4932} 2014-Aug-18, version 5.02.02 \\
+  \ttitemn{r4932} 2014-Aug-18, version 5.02.03 \\
   a single element can now be repeated in a beamline expansion:
   \texttt{2*S} and \texttt{-2*S} are of course identical (single
   elements are not reversed head to tail), and also equivalent to
@@ -20,12 +20,18 @@ The changes are indexed by the SVN release number.
   Documentation updated; see \ref{sec:reflect_repeat_lines}
 
 
-  \ttitem{r4942, r4943} 2014-Aug-25, version 5.02.02 \\
+  \ttitem{r4942, r4943} 2014-Aug-25, version 5.02.03 \\
   harmonized the behaviour of \hyperref[sec:fill]{\tt FILL},
   \hyperref[sec:setvars]{\tt SETVARS} and \hyperref[sec:setvars_lin]{\tt
     SETVARS\_LIN} with respect to negative row numbers, and updated the
   default values. Added documentation sections for {\tt SETVARS} and {\tt
     SETVARS\_LIN} that were hitherto undocumented.  
+
+
+  \ttitem{r4947} 2014-Aug-27, version 5.02.03 \\
+  changed the behaviour of \hyperref[sec:fill]{\tt FILL} to accept as
+  parameter a row number equal to the current number of rows in the
+  table plus one, with the effect of creating a new row and filling it. 
 
 \end{madlist}
   
