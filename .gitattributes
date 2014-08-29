@@ -102,7 +102,6 @@ doc/latexuguide/ptc_auxiliaries.tex -text
 doc/latexuguide/ptc_general.tex -text
 doc/latexuguide/ptc_normal.tex -text
 doc/latexuguide/ptc_track.tex -text
-doc/latexuguide/ptc_track_line.tex -text
 doc/latexuguide/ptc_twiss.tex -text
 doc/latexuguide/r.tex -text
 doc/latexuguide/ranges.tex -text

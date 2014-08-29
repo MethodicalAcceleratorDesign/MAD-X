@@ -1,25 +1,26 @@
 %%\title{PTC Set-up Parameters}
 
-\chapter{MAD-X-PTC Auxiliaries}
+\chapter{{\madx}-{\ptc} Auxiliaries}
 \label{chap:ptc_auxiliaries}
 
-This chapter documents the interface between MAD-X and PTC and the
-auxiliary commands available in the PTC library.
+This chapter documents the interface between \madx and \ptc and the
+auxiliary commands available in the \ptc library.
 
 {\bf Available Commands }
 \begin{itemize}
-   \item \href{PTC_SetSwitch.html}{ PTC\_SetSwitch}
-   \item \href{PTC_Knob.html}{ PTC\_Knob}
-   \item \href{PTC_SetKnobValue.html}{ PTC\_SetKnobValue}
-   \item {\bf Under Construction} \href{Match_WithPTCKnobs.html}{ Match\_WithPTCKnobs}
-   \item \href{PTC_PrintParametric.html}{ PTC\_PrintParametric}
-   \item \href{PTC_EPlacement.html}{ PTC\_EPlacement}
-   \item \href{PTC_PrintFrames.html}{ PTC\_PrintFrames}
-   \item \href{PTC_Select.html}{ PTC\_Select}
-   \item \href{PTC_SelectMoment.html}{ PTC\_SelectMoment}
-   \item {\bf Under Construction} \href{PTC_Moments.html}{ PTC\_Moments}
-   \item \href{PTC_DumpMaps.html}{  PTC\_DumpMaps}
-   \item \href{PTC_SetCavities.html}{ PTC\_SetCavities}
+   \item \hyperref[sec:ptc_setswitch]{\tt PTC\_SETSWITCH}
+   \item \hyperref[sec:ptc_knob]{\tt PTC\_KNOB}
+   \item \hyperref[sec:ptc_setknobvalue]{\tt PTC\_SETKNOBVALUE}
+   \item \hyperref[sec:match_withptcknobs]{\tt MATCH\_WITHPTCKNOBS}
+     \qquad {\bf (Under Construction)} 
+   \item \hyperref[sec:ptc_printparametric]{\tt PTC\_PRINTPARAMETRIC}
+   \item \hyperref[sec:ptc_eplacement]{\tt PTC\_EPLACEMENT}
+   \item \hyperref[sec:ptc_printframes]{\tt PTC\_PRINTFRAMES}
+   \item \hyperref[sec:ptc_select]{\tt PTC\_SELECT}
+   \item \hyperref[sec:ptc_selectmoment]{\tt PTC\_SELECTMOMENT}
+   \item \hyperref[sec:ptc_moments]{\tt PTC\_MOMENTS} \qquad {\bf (Under Construction)} 
+   \item \hyperref[sec:ptc_dumpmaps]{\tt PTC\_DUMPMAPS}
+   \item \hyperref[sec:ptc_setcavities]{\tt PTC\_SETCAVITIES}
 \end{itemize}
 
 \newpage
@@ -31,7 +32,7 @@ auxiliary commands available in the PTC library.
 \section{PTC\_SETSWITCH}
 \label{sec:ptc_setswitch}
 
-Routine that sets the internal PTC switches.
+Routine that sets the internal \ptc switches.
 
 \madbox{
 PTC\_SETSWITCH, \=DEBUGLEVEL=integer, \\
@@ -43,7 +44,7 @@ PTC\_SETSWITCH, \=DEBUGLEVEL=integer, \\
                 \>TIME=logical;
 }
 
-Using this command the user can set switches of PTC and the MAD-X-PTC
+Using this command the user can set switches of \ptc and the {\madx}-{\ptc}
 interface, adapting this way the program behavior to his needs.   
 
 {\bf Command parameters and switches}
@@ -109,28 +110,30 @@ routines of the Fortran module to set each of the switches:
 
 \madbox{
 PTC\_KNOB, \=ELEMENTNAME=string, \\
-           \>KN=[i, {-1}], KS=[i, {-1}], \\
+           \>KN=integer\{, integer\}, KS=integer\{, integer\}, \\
            \>EXACTMATCH=logical;
 }
 
- Sets knobs in PTC calculations (currently ony in PTC\_TWISS,
- PTC\_NORMAL will follow). Knobs appear as the additional parameters of
- the phase space. Twiss functions are then obtained  as functions of
- these parameters (Taylor series).  Also map elements might be stored as
- functions of knobs, see  \href{PTC_Select.html}{ ptc\_select} command
- description to lear how to request given element to be stored as a
- Taylor series.  \\
+Sets knobs in \ptc calculations. This is currently valid only in
+{\tt  PTC\_TWISS}, {\tt PTC\_NORMAL} will follow. 
+
+Knobs appear as the additional parameters of
+the phase space. Twiss functions are then obtained  as functions of
+these parameters (Taylor series).  Also map elements might be stored as
+functions of knobs, see \hyperref[sec:ptc_select]{\tt PTC\_SELECT} command
+description to learn how to request given element to be stored as a
+Taylor series.  \\
 
 Further, the parametric results can be: 
 \begin{enumerate}
    \item  written to a file with
-     \href{PTC_PrintParametric.html}{ptc\_printparametric}. 
-   \item  plotted and studied using rviewer command (rplot plugin). 
+     \hyperref[ptc_printparametric]{\tt PTC\_PRINTPARAMETRIC}. 
+   \item  plotted and studied using rviewer command
+     (\hyperref[sec:rplot]{\tt RPLOT} plugin). 
    \item  used to obtain very quickly approximate values of lattice
      functions for given values of knobs
-     (\href{PTC_SetKnobValue.html}{ptc\_setknobvalue}). This
-     feature is the foundation of a fast matching algorithm with
-     PTC.      
+     (\hyperref[sec:ptc_setknobvalue]{\tt PTC\_SETKNOBVALUE}). This
+     feature is the foundation of a fast matching algorithm with \ptc.      
 \end{enumerate}
 
 
@@ -184,39 +187,35 @@ functions.
 
 \section{PTC\_SETKNOBVALUE}
 
-\begin{verbatim}
-PTC_SETKNOBVALUE, 
-     elementname = [s, none] , 
-     kn    = [i, {-1}], 
-     ks    = [i, {-1}], 
-     value = [r] ; 
-\end{verbatim}
+The {\tt PTC\_SETKNOBVALUE} command sets a given knob value.
 
-With this command the user set a given knob value. In its effect all the values in 
-\begin{itemize}
-   \item  the twiss table used by the last ptc\_twiss command 
-   \item  the columns specified with
-     \href{PTC_Select.html}{ptc\_select}, parametric=true; 
-\end{itemize} 
-are reevaluated using the buffered parametric results.  
+\madbox{
+PTC\_SETKNOBVALUE, \=ELEMENTNAME=string, \\
+                   \>KN=integer\{,integer\}, \\
+                   \>KS=integer\{,integer\}, \\
+                   \>VALUE=real;
+}
+
+All values in the twiss table used by the last {\tt PTC\_TWISS} command 
+and the columns specified with \hyperref[ptc_select]{\tt
+  PTC\_SELECT}{\tt, PARAMETRIC=true;}  are reevaluated using the
+buffered parametric results.   
 
 The parameters of the command basically contains the fields that allow
 to identify uniquely the knob and the value to be set.
 
 {\bf Command parameters and switches}
-\begin{itemize}
-   \item {\bf elementname}=string in range format (Default: NULL)\\
-     Specifies name of the element containing the knob to be set.   
+\begin{madlist}
+   \ttitem{ELEMENTNAME} a string in range format that specifies the name
+   of the element containing the knob to be set. \\
+     (Default: none) 
+   \ttitem{KN, KS} are lists of integers that define the knob.\\
+   (Default: -1)   
+   \ttitem{VALUE} specifies the value to which the knob is to be set.\\
+   (Default: 0)\\
+\end{madlist}
 
-   \item {\bf kn,ks}=list of integers (Default: ???)\\
-     Defines the knob   
-
-   \item {\bf value}=real (Default: 0)\\
-     Specifies the value the knob is set to.             
-\end{itemize}
-
-{\bf Example }
-
+{\bf Example:}\\
 \href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/matchknobs/matchknobs.madx}{dog
   leg chicane}: strength of dipole field component in quadrupoles is
 matched to obtain the required R56 value.    
@@ -234,14 +233,37 @@ matched to obtain the required R56 value.
 %\input{ptc_auxiliaries/Match_WithPTCKnobs}
 %%\title{Match using PTC knobs}
 
-\section{PTC\_VARYKNOBS: Matching with PTC knobs}
+\section{PTC\_VARYKNOBS (Under Construction)}
+\label{sec:ptc_varyknobs}
+
+The {\tt PTC\_VARYKNOBS} command allows matching with \ptc knobs.
+
+\madbox{
+PTC\_VARYKNOB, \=INITIAL=string, ELEMENT=string, \\
+               \>KN=integer, \{integer,\} KS=integer, \{integer,\} \\
+               \>EXACTMATCH=logical, TRUSTRANGE=real, \\
+               \>STEP=real, LOWER=real, UPPER=real;
+}
+
+where the attributes are
+\begin{madlist}
+  \ttitem{INITIAL}
+  \ttitem{ELEMENT}
+  \ttitem{KN, KS}
+  \ttitem{EXACTMATCH}
+  \ttitem{TRUSTRANGE} defines the range over which the expansion is
+  trusted \\ (Default:~0.1)
+  \ttitem{STEP}
+  \ttitem{LOWER}
+  \ttitem{UPPER}
+\end{madlist}
 
 This matching procedure takes advantage of the parametric results that
-are accessible with PTC. Namely, parameters occuring in the matching
+are accessible with \ptc. Namely, parameters occuring in the matching
 constrains are obtained as functions (polynomials) of the matching
-variables. In other words, each variable is a knob in PTC
+variables. In other words, each variable is a knob in \ptc
 calculation. Evaluation of the polynomials is relatively fast comparing
-to the regular PTC calculation which makes findinng the minimum with the
+to the regular \ptc calculation which makes finding the minimum with the
 parametrized constraints very fast.  
 
 However, the algorithm is not faster in a general case: 
@@ -285,7 +307,7 @@ the matching.  When the final results are exported back to MAD-X, they
 are converted back to the "normal" state, so the nominal skew compoment
 is zero and tilt and  normal component are modified accordingly.     
 
-trustrange - defines the range the expansion is trusted \\
+
 
 
 
@@ -343,8 +365,9 @@ trustrange - defines the range the expansion is trusted \\
 %%\title{PTC\_KNOB}
 
 \section{PTC\_PRINTPARAMETRIC}
+\label{sec:ptc_printparametric}
 
-This command exists but is not documented. The file
+{\bf Editor's Note:} This command exists but is not documented. The file 
 PTC\_PrintParametric.html contains the same content as PTC\_Knob.html. I
 presume the original file has been lost and overwritten...
 
