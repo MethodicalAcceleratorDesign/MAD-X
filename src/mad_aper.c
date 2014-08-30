@@ -352,12 +352,13 @@ aper_fill_quadrants(double polyx[], double polyy[], int quarterlength, int* halo
      mirrors this data to the other three quadrants across the x and y axes.
      quarterlength is the length of, or number of points in, the first quadrant.*/
 
-  int i=quarterlength+1, j;
+  int i,j;
   int debug = get_option("debug");
 
-  if (debug) printf("+++ aper_fill_quadrants: quarterlength = %d , i = %d", quarterlength, i);
+  if (debug) printf("+++ aper_fill_quadrants: quarterlength = %d", quarterlength);
   
   // The counter i starts at quarterlength+1, ie the first point to be mirrored.
+  i=quarterlength+1;
 
   /*copying first quadrant coordinates to second quadrant*/
   for (j=quarterlength; j>=0; j--) {
@@ -462,12 +463,13 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
 
   // 2013-Apr-18  14:23:40  ghislain: added check for invalid values.
   // 2013-Apr-18  14:25:14  ghislain: added RECTCIRCLE type
+  // 2014-Jun-27  11:14:27  ghislain: fixed bug in check of invalid values for RACETRACK
 
   (*ap1)=(*ap2)=(*ap3)=(*ap4)=0;
 
   int debug = get_option("debug");
   if (debug) 
-    printf("+++ aper_build_screen; apertype = '%s'  %d\n",apertype, quarterlength);
+    printf("+++ aper_build_screen; apertype = '%s' quarterlength = %d\n",apertype, quarterlength);
 
   if (!strcmp(apertype,"circle")) {
     *ap3 = get_aperture(current_node, "var1"); /*radius circle*/
@@ -476,14 +478,12 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
 	printf("+++ aper_build screen, circle parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
       return 0;  
     }
-    else { 
-      // make a square just containing the circle
-      *ap1 = *ap2 = *ap4 = *ap3;
+    // make a square just containing the circle
+    *ap1 = *ap2 = *ap4 = *ap3;
       
-      aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
-      aper_fill_quadrants(pipex, pipey, quarterlength, pipelength); 
-      return 1;
-    }
+    aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+    aper_fill_quadrants(pipex, pipey, quarterlength, pipelength); 
+    return 1;
   }
 
   else if (!strcmp(apertype,"ellipse")) {
@@ -494,14 +494,12 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
 	printf("+++ aper_build screen, ellipse parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
       return 0;
     }
-    else { 
-      // make a rectangle just containing the ellipse
-      *ap1 = *ap3;   *ap2 = *ap4; 
+    // make a rectangle just containing the ellipse
+    *ap1 = *ap3;   *ap2 = *ap4; 
 	  
-      aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
-      aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);      
-      return 1;
-    }
+    aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+    aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);      
+    return 1;
   }
 
   else if (!strcmp(apertype,"rectangle")) {
@@ -512,13 +510,12 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
 	printf("+++ aper_build screen, rectangle parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
       return 0;
     }
-    else { // make a circle containing the rectangle
-      *ap3 = *ap4 = sqrt( (*ap1)*(*ap1) + (*ap2)*(*ap2) ); 
+    // make a circle containing the rectangle
+    *ap3 = *ap4 = sqrt( (*ap1)*(*ap1) + (*ap2)*(*ap2) ); 
       
-      aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
-      aper_fill_quadrants(pipex, pipey, quarterlength, pipelength); 
-      return 1;
-    }
+    aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+    aper_fill_quadrants(pipex, pipey, quarterlength, pipelength); 
+    return 1;
   }
 
   else if (!strcmp(apertype,"lhcscreen") || !strcmp(apertype, "rectcircle")) { 
@@ -532,13 +529,12 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
 	printf("+++ aper_build screen, rectcircle parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
       return 0;
     }
-    else { // ensure the ellipse is a circle
-      *ap4 = *ap3;
-
-      aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
-      aper_fill_quadrants(pipex, pipey, quarterlength, pipelength); 
-      return 1;
-    }
+    // ensure the ellipse is a circle
+    *ap4 = *ap3;
+    
+    aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+    aper_fill_quadrants(pipex, pipey, quarterlength, pipelength); 
+    return 1;
   }
 
   else if (!strcmp(apertype,"marguerite")) {
@@ -557,11 +553,9 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
 	printf("+++ aper_build screen, rectellipse parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
       return 0;
     }
-    else {
-      aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
-      aper_fill_quadrants(pipex, pipey, quarterlength, pipelength); 
-      return 1;
-    }
+    aper_rectellipse(ap1, ap2, ap3, ap4, &quarterlength, pipex, pipey);
+    aper_fill_quadrants(pipex, pipey, quarterlength, pipelength); 
+    return 1;
   }
 
   else if (!strcmp(apertype,"racetrack")) {
@@ -569,27 +563,27 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
     *ap2=get_aperture(current_node, "var2"); /*half height rect*/
     *ap3=get_aperture(current_node, "var3"); /*radius circle*/
     
-    // no check for radius at this point, a zero radius should be allowed. 
-    *ap4 = *ap3;
+    *ap4 = *ap3; // curved part is a circle
 
-    if ( (*ap1) <= 0 || (*ap2) <= 0 ) { 
+    // 2014-Jun-27  11:14:27  ghislain: 
+    // change check from ap1 or ap2<=0  to ap1 or ap2 or ap3 < 0
+    // zero horizontal or vertical explosion factors, and zero radius should be allowed.
+    if ( (*ap1) < 0 || (*ap2) < 0 || (*ap3) < 0 ) { 
       if (debug) 
 	printf("+++ aper_build screen, racetrack parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
       return 0;
     }
-    else { 
-      // special call to build a circle first: note that we cannot invoque ap1 or ap2
-      aper_rectellipse(ap3, ap3, ap3, ap4, &quarterlength, pipex, pipey);
+    // special call to build a circle first: note that we cannot invoque ap1 or ap2
+    aper_rectellipse(ap3, ap3, ap3, ap4, &quarterlength, pipex, pipey);
       
-      /* displace the quartercircle */
-      for (i=0;i<=quarterlength;i++) {
-	pipex[i] += (*ap1); 
-	pipey[i] += (*ap2); 
-      }
+    /* displace the quartercircle */
+    for (i=0;i<=quarterlength;i++) {
+      pipex[i] += (*ap1); 
+      pipey[i] += (*ap2); 
+    }
       
-      aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);      
-      return 1;    
-    }  
+    aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);      
+    return 1;    
   }
   
   else if (strlen(apertype)) { 
@@ -599,11 +593,9 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
     if (*pipelength > -1) return 1; else return 0;
   }
   
-  else {
-    *pipelength = -1;
-    return 0;
-  }
-  
+  *pipelength = -1;
+  return 0;
+    
 }
 
 static int
@@ -1337,7 +1329,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   double pipex[MAXARRAY], pipey[MAXARRAY];
   double parxd,paryd;
   char *halofile, *truefile, *offsfile;
-  char refnode[NAME_L];
+  char refnode[NAME_L]="";
   char *cmd_refnode;
   char apertype[NAME_L];
   char name[NAME_L];
@@ -1425,7 +1417,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       strcpy(refnode, cmd_refnode);
       strcat(refnode, ":1");
   }
-  printf("\nreference node: %s\n",refnode);
+  if (strcmp(refnode,"")) printf("\nreference node: %s\n",refnode);
 
   /* build halo polygon based on input ratio values or coordinates */
   if ((halolength = aper_external_file(halofile, halox, haloy)) > -1)

@@ -1,0 +1,575 @@
+%% TRACKING chapter
+\chapter{Particle Tracking}
+\label{chap:tracking}\label{chap:thintrack}
+
+%%\title{Overview of MAD-X Tracking Modules}
+
+\section{Introduction to \madx Tracking Modules}
+\label{sec:trackintro}
+
+A number of particles with given initial conditions can be tracked
+through a beam-line or a ring. The particles can be tracked either for a
+single passage or for many turns.  
+
+
+While \madx keeps most of the functionality of \madeight, the
+trajectory tracking in \madx is considerably modified compared to
+\madeight. 
+The reason is that in \madeight the thick lens tracking is inherently not
+symplectic, which implies that the phase space volume is not preserved
+during the tracking, i.e. contrary to the real particle the tracked
+particle amplitude is either growing or decreasing. 
+
+
+The non-symplectic tracking as in \madeight has been completely excluded
+from \madx by taking out the thick lens part from the tracking
+modules. Instead two types of tracking modules (both symplectic) are
+implemented into \madx. 
+
+
+The first part of this design decision is the thin-lens tracking module
+(\texttt{\href{../thintrack/thintrack.html}{thintrack}})  which tracks
+symplecticly through drifts and kicks and by replacing the end effects
+by their symplectic part in form of an additional kick on either  end of
+the element. This method demands a preliminary conversion of a sequence
+with thick elements into one composed of thin elements (see the
+\texttt{\href{../makethin/makethin.html}{MAKETHIN}} command). The
+details of its usage are given on the page
+"\href{../thintrack/thintrack.html}{thintrack}". 
+
+
+The second part of this design decision is to produce a thick lens
+tracking module based on the PTC code of E.~Forest that
+allows a symplectic treatment of all accelerator elements giving the
+user full control over the precision (number of steps and integration
+type) and exactness (full or extended Hamiltonian) of the results. 
+
+
+The first PTC thick-lens tracking module is named
+\href{../ptc_track/ptc_track.html}{ptc\_track}. 
+It has the same features as the thin-lens tracking code
+(\texttt{\href{../thintrack/thintrack.html}{thintrack}}) except that it
+treats thick-lenses in a symplectic manner. 
+
+
+There is a second PTC tracking module called the line tracking module
+(\href{../ptc_track_line/ptc_track_line.html}{ptc\_track\_line}). It is
+meant for tracking particles in
+\href{http://clic-study.web.cern.ch/CLIC-Study/}{CLIC}, in fact it
+treats beam-lines containing traveling-wave cavities and includes a beam
+acceleration. 
+
+
+%See Also \href{../ptc_general/ptc_general.html}{PTC Set-up Parameters}
+
+%\href{mailto:kapin@itep.ru}{ V.Kapin}(ITEP) and 
+%\href{mailto:Frank.Schmidt@cern.ch}{ F.Schmidt}, March  2006
+
+
+%%\title{Thin-Lens Tracking Module (thintrack)}
+%  Created by: Andre VERDIER, 21-Jun-2002 
+%  Changed by: Andre Verdier, 26-Jun-2002 
+%  Changed by: Alexander Koschik, 07-Mar-2006 
+%  Changed by: Alexander Koschik, 29-Mar-2006 
+%  Changed by: Alexander Koschik, 02-Feb-2007 
+
+\section{Overview of Thin-Lens Tracking} % Module (thintrack)}
+\label{sec:trackoverview}
+
+The \textbf{thin-lens tracking module} of \madx performs element per
+element tracking of one or several particle trajectories in the last
+\href{../control/general.html#use}{\texttt{use}}d sequence.  
+ 
+%  either for single passage (option <var class="option">onepass</var>)
+%  or for many turns (default option).  
+
+Only thin elements are allowed (apart from the element \texttt{drift}),
+which guarantees the symplecticity of the coordinate transformation. Any
+lattice can be converted into a "thin element" lattice by invoking the
+\href{../makethin/makethin.html}{\texttt{makethin}} command. 
+
+Several commands are actually required to complete a tracking run:
+
+\madbox{
+xxxxxxx\= \kill
+TRACK, \>DELTAP=real, ONEPASS=logical, DAMP=logical; \\
+       \>QUANTUM=logical, DUMP=logical, APERTURE=logical, \\
+       \>ONETABLE=logical, RECLOSS=logical, FILE=filename,\\
+       \>UPDATE=logical;\\
+xxxx\=xxxxxx\= \kill
+  \>\ldots \\
+  \>START, X=real, PX=real, Y=real, PY=real, T=real, PT=real;  \\
+  \>START, FX=real, PHIX=real, FY=real, PHIY=real, FT=real, PHIT=real;\\  
+  \>\ldots \\
+  \>OBSERVE, PLACE=string; \\  
+  \>\ldots \\
+  \>RUN, TURNS=integer, MAXAPER=double\_array, FFILE=integer; \\
+  \>\ldots\\
+  \>DYNAP, \>TURNS=real, FASTUNE=logical, LYAPUNOV=real,\\
+  \>       \>MAXAPER=real\_array, ORBIT=logical;\\
+  \>\ldots \\
+ENDTRACK;
+}
+
+
+%{\bf Commands:}
+%TRACK, DELTAP=double, ONEPASS, DUMP, ONETABLE, FILE= string;  ! (MAD-X version 1)
+%TRACK, DELTAP=double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE=string; ! (MAD-X version 2)
+%TRACK, DELTAP=double, ONEPASS, DAMP, QUANTUM, DUMP, APERTURE,ONETABLE, RECLOSS, FILE= string; ! (MADX version 3)
+%% \begin{verbatim}
+%% TRACK, DELTAP=real, ONEPASS, DAMP, QUANTUM, DUMP, APERTURE, ONETABLE, RECLOSS, FILE= string;
+%% ...
+%% START, X=real, PX=real, Y=real, py=real, t=real, pt=real;
+%% START, FX=double, PHIX=double, FY=double, PHIY=double, FT=double, PHIT=double;  
+%% ...
+%% OBSERVE, PLACE=string;  
+%% ...
+%% RUN, MAXAPER=double_array, TURNS=integer, FFILE=integer;  
+%% ...
+
+%% ENDTRACK;
+%% \end{verbatim}
+
+
+Inside the block \texttt{TRACK}-\texttt{ENDTRACK} a series 
+of initial trajectory coordinates can be specified by the \texttt{START} 
+command (as many commands as trajectories). This will be usually done in a 
+\texttt{while}-loop. \textbf{Note} that the coordinates are either 
+\textbf{canonical} coordinates or \textbf{action-angle} variables!
+
+For usual tracking (single/multi-turn), all coordinates are specified
+with respect to the actual closed orbit (possibly off-momentum, with
+magnet errors) and \textbf{NOT} with respect to the reference orbit. 
+            
+If the option \texttt{onepass} is used, the coordinates are specified
+with respect to the reference orbit. The name "onepass" might be
+misleading: Still tracking can be single- or multi-turn!   
+            
+The tracking is actually started with the \texttt{RUN} command, where
+the option \texttt{turns} defines for how many turns the particles will
+be tracked in the given sequence. 
+          
+If the option \texttt{dump} is used, the particle coordinates are
+written to files at each turn. The output files are named
+automatically. The name given by the user is followed by
+.obsnnnn(observation point), followed by .pnnnn(particle number). Hence
+filenames look like \texttt{track.obs0001.p0001}.  
+
+Tracking creates a number of internal tables and can create files on disk: 
+{\texttt TRACKSUMM, TRACKLOSS}, and \texttt{TRACKONE} or
+\texttt{TRACK.OBS\$\$\$\$.P\$\$\$\$} (depending on the attribute
+\texttt{ONETABLE} of the \texttt{RUN} command).
+
+These internal tables can be accessed via the
+\href{../Introduction/expression.html#table}{\texttt{table}}-access
+functions.      
+
+Plotting of particle coordinates or other data in these tables is
+possible in \madx. Plotting can also be done with external programs by
+using the files created by \texttt{TRACK}.  
+
+{\bf See Also:}\\
+\href{../Introduction/aperture.html}{\texttt{APERTURE}}, 
+\href{../makethin/makethin.html}{\texttt{MAKETHIN}}
+
+
+
+\section{TRACK}
+\label{sec:track}
+
+The \texttt{TRACK} command initiates trajectory tracking by entering the 
+thin-lens tracking module. 
+
+\madbox{
+xxxxxxx\= \kill
+TRACK, \>DELTAP=real, ONEPASS=logical, DAMP=logical; \\
+       \>QUANTUM=logical, DAMP=logical, APERTURE=logical, \\
+       \>ONETABLE=logical, RECLOSS=logical, FILE=filename, \\
+       \>UPDATE=logical;
+}
+
+The attributes of the TRACK command are:
+
+\begin{madlist}
+  \ttitem{DELTAP} relative momentum offset for reference closed orbit (switched
+  off for onepass) \\  
+  Defining a non-zero \texttt{deltap} results in a change of the beam
+  momentum/energy without changing the magnetic properties in the
+  sequence, which leads to an off-momentum closed orbit different from
+  the on-momentum reference orbit. Particle coordinates are then given
+  with respect to this new closed orbit, unless the option
+  \texttt{onepass=true} is used! \\  
+  (Default:~0.0)
+
+  \ttitem{ONEPASS} flag to ensure that no closed orbit search is done,
+  which also means that no stability test is done. This is always the
+  case for transfer lines, but this option can also be enabled for
+  multi-turn tracking of a circular machine. ONEPASS=true does {\bf NOT}
+  restrict tracking to a single turn. \\
+  With ONEPASS=true, the particle coordinates are specified with
+  respect to the reference orbit. \\  
+  With ONEPASS=false, the closed orbit is calculated and the particle
+  coordinates are given with respect to the closed orbit coordinates.\\
+  The name of this attribute is misleading but was kept for backwards
+  compatibility.  \\ 
+  (Default:~false)
+
+  \ttitem{DAMP} flag to introduce synchrotron damping (needs RF cavity
+  and flag RADIATE in the BEAM command). \\ (Default:~false)
+
+  \ttitem{QUANTUM} flag to introduce quantum excitation via random
+  number generator and tables for photon emission. \\ (Default:~false)
+
+  \ttitem{DUMP} flag to write the particle coordinates in files, whose
+  names are generated automatically. \\ (Default:~false)
+
+  \ttitem{APERTURE} flag to trigger particle loss if its trajectory is
+  outside the aperture of the current element. \\ 
+  (Default:~false) \\
+  If the \texttt{aperture} option is applied, the \texttt{apertype} 
+  and \texttt{aperture} information of each element in the sequence
+  is used to check whether the particle is lost or not. For further
+  information on the definition of apertures and different aperture
+  types, see the documentation of the
+  \href{../Introduction/aperture.html}{\texttt{APERTURE}} module. \\  
+  Note that if no aperture information was specified for an element, 
+  the following procedure still takes place:
+  \\
+  $\rightarrow$ No aperture definition for element $\rightarrow$ 
+  Default apertype/aperture assigned (currently this is   
+  \texttt{apertype= circle, aperture = \{0\}}) 
+  \\ $\rightarrow$  
+  If tracking with \texttt{aperture} is used and an
+  element with \texttt{apertype= circle} AND \texttt{aperture= \{0\}}  
+  is encountered, then the first value of the \texttt{maxaper} vector
+  is assigned as the circle's radius (no permanent assignment!). 
+  See option \hyperlink{run}{\texttt{maxaper}} for the default values. 
+  \\ $\Rightarrow$
+  Hence even if no aperture information is specified by the user for
+  certain elements, default values will be used! 
+
+
+  \ttitem{ONETABLE} flag to write all particle coordinates in a single
+  file instead of one file per particle. \\ (Default:~false)
+
+  \ttitem{RECLOSS} flag to create in memory a table named "trackloss"
+  containing the coordinates of lost particles.\\
+  (Default:~false) \\
+  Traditionally, when a particle is lost on the aperture, this information
+  is written to stdout. To allow more flexible tracking studies, the
+  coordinates of lost particles and additional information can also be
+  saved in a table in memory. Usually one would save this table to a
+  file using the \texttt{WRITE} command after the tracking run has
+  finished. The following information is available in the TFS table
+  "trackloss":          
+  \begin{itemize}
+  \item Particle ID (number)
+  \item Turn number
+  \item Particle coordinates (x,px,y,py,t,pt)
+  \item Longitudinal position in the machine (s)
+  \item Beam energy
+  \item Element name, where the particle is lost
+  \end{itemize}
+
+  \ttitem{FILE} name for the track table. The default name is different
+  depending on the value of the ONETABLE attribute. \\ 
+  (Default: "track" if ONETABLE=true, "trackone" if ONETABLE=false)
+
+  \ttitem{UPDATE} flag to trigger parameter update per turn. \\  
+  (Default:~false) \\
+  Specifying UPDATE=true gives access to the following additions:   
+  \begin{madlist}
+  \ttitem{tr\$turni} this special variable contains the turn number;
+  it can be used in expressions like 'KICK := SIN(tr\$turni)' and is
+  updated at each turn during tracking.     
+  \ttitem{tr\$macro}  this special macro can be
+    user-defined and is executed/updated at each turn, during tracking, e.g. \\
+    'tr\$macro(turn): macro=\{commands depending on turnnumber;\};' \\ 
+    A macro structure is necessary to provide for table access.
+  \end{madlist}
+
+
+\end{madlist}
+
+{\bf Remarks}\\
+\emph{IMPORTANT:} If an RF cavity has a non-zero voltage, synchrotron
+oscillations are automatically included. If tracking with constant
+momentum is desired, then the voltage of the RF cavities has to be set
+to zero. If an RF cavity has a no zero voltage and DELTAP is non zero, 
+tracking is done with synchrotron oscillations around an off-momentum
+closed orbit.
+
+
+%% \begin{tabular}{c p{5cm} p{3cm} c}
+%%   \hline 
+%%   \textbf{Option} & \textbf{Meaning} & \textbf{Default Value} &
+%%   \textbf{Value Type} \\  
+%%   \hline
+%%   DELTAP & relative momentum offset for reference closed orbit (switched
+%%   off for onepass) &  0.0 & double \\  
+%%   \hline
+%%   ONEPASS & the sequence is treated as transfer line (no stability test,
+%%   ie. no closed-orbit search) & .FALSE.= closed-orbit search & logical
+%%   \\  
+%%   \hline
+%%   DAMP & introduce synchrotron damping (needs RF cavity, RADIATE in
+%%   BEAM)  & .FALSE.= no damping & logical \\  
+%%   \hline
+%%   QUANTUM & introduce quantum excitation via random number generator and
+%%   tables for photon emission & .FALSE.= no excitation & logical \\  
+%%   \hline
+%%   DUMP & write the particle coordinates in files (names generated
+%%   automatically)  & .FALSE.= no file generated & logical \\  
+%%   \hline
+%%   APERTURE & particle is lost if its trajectory is outside the aperture
+%%   of the current
+%%   element. \hyperlink{track:remarks:aperture:notes}{Notes}. & .FALSE.=
+%%   no aperture check & logical \\  
+%%   \hline
+%%   ONETABLE & write all particle coordinates in a single file & .FALSE.=
+%%   one file per particle & logical \\  
+%%   \hline
+%%   RECLOSS & create a table named "trackloss" in memory with lost
+%%   particles' coordinates & .FALSE.= no table & logical \\  
+%%   \hline
+%%   FILE & name for the track table   & "track", "trackone" & string \\ 
+%%   \hline
+%%   UPDATE & parameter update per turn   & .FALSE.= no update & string \\  
+%%   \hline
+%% \end{tabular}
+
+          
+
+\section{START}          
+\label{sec:start}
+
+After the \texttt{TRACK} command, initial trajectory coordinates must be
+provided for each trajectory or particle to be tracked, with one
+{\texttt START} command per trajectory or particle.
+
+The coordinates can be expressed as either
+\href{../Introduction/tables.html#canon}{\textbf{canonical}}
+or \textbf{action-angle} coordinates.
+
+\madbox{
+START, X=real, PX=real, Y=real, PY=real, T=real, PT=real;  \\
+START, FX=real, PHIX=real, FY=real, PHIY=real, FT=real, PHIT=real;
+}
+          
+For the case of action-angle coordinates, the normalised amplitudes are
+expressed in number of r.m.s. beam size F$_X$, F$_Y$, F$_T$ (the actions being computed with
+the emittances given in the \texttt{BEAM} command) \textbf{in each mode
+  plane}. The phases are PHI$_X$, PHI$_Y$ and PHI$_T$ expressed in
+radian. In the uncoupled case, we have in the plane mode labelled z, and
+with E$_z$ being the r.m.s. emittance in that plane:\\
+\\
+Z = F$_z$ sqrt(E$_z$) cos(PHI$_z$),    \\
+\\
+P$_z$= F$_z$ sqrt(E$_z$) sin(PHI$_z$)
+
+
+The attributes of the START command are:
+\begin{madlist}
+  \ttitem{X, PX, Y, PY, T, PT} canonical coordinates. 
+  \ttitem{FX, FY, FT, PHIX, PHIY, PHIT} action-angle coordinates.
+\end{madlist}
+
+%% {\bf Options}
+%% \begin{tabular}{p{3cm} cccc}
+%%    \hline 
+%%    \textbf{Option} & \textbf{Meaning} & \textbf{Default Value} & \textbf{Value Type} & \textbf{Unit} \\ 
+%%    \hline
+%%    X, PX, Y, PY, T, PT & canonical coordinates & 0.0 & double & m \\ 
+%%    \hline
+%%    FX, PHIX, FY, PHIY, FT, PHIT & action-angle coordinates & 0.0 & double & rad \\ 
+%%    \hline
+%% \end{tabular}
+
+{\bf Remarks} \\
+For usual tracking (single/multi-turn), all coordinates are specified
+with respect to the actual closed orbit (possibly off-momentum, with
+magnet errors) and \textbf{NOT} with respect to the reference orbit.  
+
+If the option \texttt{onepass} of the \texttt{TRACK} is used, the
+coordinates are specified with respect to the reference orbit. 
+            
+
+
+\section{OBSERVE}
+\label{sec:observe}
+
+During the tracking process, particle coordinates at specific named
+locations along the machine can be printed to file(s). The declaration of
+an observation point is with the OBSERVE command: 
+
+\madbox{
+OBSERVE, PLACE=string;  
+}
+
+The single attirbute of \texttt{OBSERVE} is:
+\begin{madlist}
+  \ttitem{PLACE} the name of the observation point. 
+\end{madlist}
+
+     
+%% {\bf Options} 
+%% \begin{tabular}{cccc}
+%%    \hline 
+%%    \textbf{Option} & \textbf{Meaning} & \textbf{Default Value} & \textbf{Value Type} \\ 
+%%    \hline
+%%    PLACE & name of the observation point &  & string \\ 
+%%    \hline   
+%% \end{tabular}
+
+Several \texttt{OBSERVE} commands can be given for the same tracking
+job, one per observation point. 
+
+If no \texttt{OBSERVE} command is given in a tracking job, but the
+\texttt{DUMP} option in the \texttt{TRACK} command is used, the
+trajectory coordinates are still recorded and one observation point is
+provided at the starting point of the sequence. 
+     
+The output files are named automatically. The name given by
+the user (attribute \texttt{FILE} of the \texttt{TRACK} command) is
+followed by ".obsnnnn", where nnnn is the observation point number, and followed by 
+".pnnnn"  wherer nnnn is now the particle number. Hence the default
+filename for the first obseration point and first particle looks like
+\texttt{track.obs0001.p0001}.
+
+
+\section{RUN}
+\label{sec:run}
+
+The actual tracking is triggerred by the \texttt{RUN} command. 
+
+\madbox{
+RUN, TURNS=integer, MAXAPER=real\_array, FFILE=integer;  
+}
+
+The \texttt{RUN} command has three attributes:  
+     
+\begin{madlist}
+  \ttitem{TURNS} number of turns to be tracked.
+  \ttitem{MAXAPER} upper limits for the six coordinates.\\
+  (Default: \{0.1, 0.01, 0.1, 0.01, 1.0, 0.1\} \\
+  The limits defined by the \texttt{maxaper} option are only being taken
+  into account if the \texttt{aperture} option of the \texttt{TRACK}
+  command is used. 
+  \ttitem{FFILE} defines the turn periodicity for printing coordinates at
+   observation points. (Default:~1)\\
+   \texttt{FFILE=n} will print coordinates every n-th turn only. 
+\end{madlist}
+
+
+%%\title{DYNAP}
+%  Changed by: Hans Grote, 17-Jun-2002 
+%  Changed by: Frank Zimmermann, 18-Jun-2002 
+%  Inserted in THINTRACK by ghislain, 2014-Aug-07  14:43:45  
+
+\section{DYNAP}
+
+The \texttt{DYNAP} command calculates tunes, tune footprints, smear and
+Lyapunov exponent from trackin data. \texttt{DYNAP} can be called
+instead of \texttt{RUN} inside a \texttt{TRACK} command environment.
+
+\madbox{
+DYNAP, \=TURNS=integer, FASTUNE=logical, LYAPUNOV=real,\\
+       \>MAXAPER=real\_array, ORBIT=logical;
+}
+ 
+For each previously entered start command, \texttt{DYNAP} tracks two
+close-by particles over a selected number of turns, from which it
+obtains the betatron tunes with error, the action smear, and an estimate
+of the lyapunov exponent. 
+Many such companion particle-pairs can be tracked at the same time,
+which speeds up the calculation. 
+
+The \textit{smear} is 
+defined as  \textit{2.0 (wxy$_{max}$ - wxy$_{min}$) / (wxy$_{max}$ + wxy
+  $_{min}$)}, where the \textit{wxy$_{min,max}$} refer to the  miminum and
+maximum values of the sum of the transverse betatron invariants
+\textit{wx+wy} during the tracking. 
+
+The tunes are computed by using an FFT and either formula (18) or formula (25) of CERN SL/95-84 (AP),
+depending on whether the number of turns is less-equal or larger than 64. 
+ 
+\texttt{DYNAP} has the following attributes: 
+\begin{madlist}
+   \ttitem{TURNS} the number of turns to be tracked (Default:~64,
+   present maximum:~1024). 
+     
+   \ttitem{FASTUNE} a logical flag to compute the tunes. (Default:~false)
+ 
+   \ttitem{MAXAPER} a vector of 6 real numbers defining the maximum
+   aperture beyond which the particle is considered to be lost.\\
+   (Default: \{0.1, 0.01, 0.1, 0.01, 1.0, 0.1\} \\
+     
+   \ttitem{LYAPUNOV} the initial distance which is added to the
+   \textit{x} coordinate of the companion particle of every particle
+   declared with \texttt{START} commands. (Default:~1.e-7~m)
+     
+   \ttitem{ORBIT} A logical flag. If set, the flag \textit{orbit} 
+   is true during the tracking and its initialization
+   (default: true).
+   \textbf{ This flag should be set to be true, if 
+     normalized coordinates are to be entered.}
+\end{madlist}
+
+%% Example:
+%% \begin{verbatim}
+%% BEAM,PARTICLE=ELECTRON,ENERGY=50,EX=1.E-6,EY=1.E-8,ET=0.002,SIGT=1.E-2;
+%% ...
+%% USE,PERIOD=FODO;
+%% ...
+%% TRACK;
+%% START,X=0.0010,Y=0.0017,PT=0.0003;
+%% DYNAP,FASTUNE,TURNS=1024,LYAPUNOV=1.e-7;
+%% ENDTRACK;
+%% ...
+%% \end{verbatim}
+
+The first command defines the beam parameters. It is  essential that the
+longitudinal emittance \textit{ET} is set. The command \textit{use}
+selects the beam line or sequence. The \textit{track} activates the
+tracking module, \textit{start } enters the starting coordinates (more
+than one particle can be defined),  \textit{dynap} finally tracks two
+nearby particles  with an initial distance \textit{lyapunov}  for each
+\textit{start} definition over \textit{ turns } revolutions, and
+\textit{endtrack} terminates the execution of the tracking module. 
+
+The results are stored in the \textit{DYNAP} and \textit{DYNAPTUNE}
+tables, and can be obtained by the two commands  
+ 
+\madxmp{
+VALUE, \=TABLE(dynap,smear); \\
+VALUE, \>TABLE(dynaptune,tunx), \\
+       \>TABLE(dynaptune,tuny), \\
+       \>TABLE(dynaptune,dtune);
+}
+
+More generally, all results can be printed to a file, using the commands 
+\madxmp{
+WRITE, TABLE=dynap, file; \\
+WRITE, TABLE=dynaptune, file;
+}
+The output file 'lyapunov.data' lists the turn number and phase distance
+between the  two Lyapunov partners, respectively, allowing for visual
+inspection of chaoticity.  
+ 
+%\href{http://consult.cern.ch/xwho/people/62690}{frankz} 20.03.2006
+
+
+
+\section{ENDTRACK}
+\label{sec:endtrack}
+
+Tracking is terminated by the command \texttt{ENDTRACK} with no
+attributes. 
+
+\madbox{ENDTRACK;}
+
+
+
+%\href{http://consult.cern.ch/xwho/people/74251}{A. Koschik},  February  2007
+
+%% EOF

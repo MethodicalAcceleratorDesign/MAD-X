@@ -1,0 +1,72 @@
+%%\title{the mad program}
+%  Changed by: Chris ISELIN, 27-Jan-1997 
+%  Changed by: Hans Grote, 10-Jun-2002 
+%\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg}, June 17, 2002 
+
+\chapter{TFS File Format}
+\label{chap:tfs}
+
+\texttt{TFS}\cite{TFS} is a an acronym for the ``Table File
+System''. \texttt{TFS} files have been used in the LEP control
+system. The \mad program knows only coded \texttt{TFS} files. The
+\texttt{TFS} format has been chosen for all table output of
+\madx. \texttt{TFS} formatted tables can be read back into \madx, and
+may then be further processed. 
+ 
+\section{Descriptor Lines}
+\label{sec:tfs_desc}
+
+\madx writes the following descriptors in all tables: 
+\begin{itemize}
+   \item COMMENT: The current title string from the most recent TITLE command. 
+   \item ORIGIN: The version of \madx used. 
+   \item DATE: The date of the \madx run. 
+   \item TIME: The wall clock time of the \madx run. 
+   \item TYPE: The type of the table: e.g. TWISS 
+\end{itemize} 
+
+Additional descriptors exist in the \href{twiss_desc.html}{Twiss table},
+as well as the \href{tables.html#track}{Track tables}.  
+
+
+
+\section{Column Formats}
+\label{sec:tfs_columns}
+
+The column formats used are listed below: 
+%in the  \hyperlink{table}{TFS columns table}.   
+
+\begin{table}[ht]
+  \begin{center}
+    \caption{ Column Formats used in TFS Tables}    
+    \vspace{1ex}
+    \begin{tabular}{|l l l|}
+      \hline
+      \textbf{C format} & \textbf{Meaning} & \textbf{C format} \\ 
+      \hline
+      \%hd & Short integer & (\%8d) \\ 
+      \%le & Long float & (\%-18.10g) \\ 
+      \%ks & String of length k & ("$\backslash$"-18s$\backslash$"")\\
+      \hline
+   \end{tabular}
+  \end{center}
+\end{table}
+
+Control lines begin with the TFS control character, followed by a
+blank. Data lines begin with two blanks. Columns are also separated by
+one blank character. The column width is chosen such as to accommodate
+the largest of the column name and the width of data values of the column.  
+
+
+
+\section{Twiss TFS file header}
+\label{sec:tfs_twiss}
+ 
+The format of the twiss table is best illustrated with an
+\href{select.html#tfs}{TFS file example}.  
+
+\madx gives access to parameters from \texttt{TWISS} and other tables using the
+\href{../Introduction/expression.html#table}{table access} function.  
+
+%% EOF
+

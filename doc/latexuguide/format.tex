@@ -1,0 +1,804 @@
+%%\title{Command Format}
+%  Changed by: Chris ISELIN, 24-Jan-1997 
+%  Changed by: Hans Grote, 25-Sep-2002 
+%  Changed by: Ghislain ROY, 27-Jan-2014 
+
+\chapter{Command Format}
+
+
+\section{Input Statements}
+
+Input for \madx follows in broad lines the
+\href{http://cern.ch/mad9}{\madnine}\index{MAD-9} format, i.e. free
+format with commas (,) as separators, although blanks may be used as
+separators outside \{...\} enclosures. 
+ 
+Blank input lines do not affect program execution. 
+
+The input is not case sensitive except for strings enclosed in double
+quotes (" "). 
+
+The input file consists of a sequence of statements. 
+A statement may occupy any number of input lines. 
+Several statements may be placed on the same line.
+A statement must be terminated by a semicolon (;).
+
+Several statements may be grouped into a block enclosed inside a \{...\}
+enclosure. In this case the terminating semmicolon can be omitted.
+
+\madxmp{if (a $<$ 3) \{ a=b*b; b=2*b+4; \};}
+or
+\madxmp{if (a $<$ 3) \{ a=b*b; b=2*b+4; \}}
+are both valid.
+
+\section{Comments}
+When an exclamation mark ({\tt !}) or double forward slash ({\tt //}) is
+found in the input line, the remaining characters until the end of the
+line are treated as a comment and are skipped. 
+
+A comment spreading over multiple lines starts with a "/*" and ends with a "*/".
+
+\section{Commands}
+The general format for a command is 
+\madbox{
+label: keyword \{,attribute\} ;
+}
+where the  {\tt \{ \}} are not part of the command and the items
+enclosed in {\tt \{ \}} can be omitted or repeated any number of times. 
+
+
+A command contains three parts:
+\begin{madlist}
+   \ttitem{label}\index{label} 
+   A \href{label.html}{label} is required for a definition statement. 
+   It gives a name to the stored command.
+     
+   \ttitem{keyword}\index{keyword} 
+   A \href{keyword.html}{keyword} identifies the action desired.
+     
+   \ttitem{attributes}\index{attribute} 
+   The \href{attribute.html}{attributes} are normally entered in the
+   form \madxmp{attribute-name = attribute-value}
+   and serve to define data for the command, where:
+   \begin{madlist}
+       \ttitem{attribute-name} selects the attribute, and
+       \ttitem{attribute-value} provides its value.       
+   \end{madlist}
+\end{madlist}
+
+If a value is to be assigned to an attribute, the {\tt attribute-name} is
+mandatory.
+
+Whenever an attribute is not explicitely given a value, the default 
+{\tt attribute-value} specified in the command dictionary is assumed. 
+
+%% In the case of attributes taking logical values, it is sufficient to
+%% enter the {\tt attribute-name} only; the attribute is then given the
+%% default {\tt attribute-value} specified in the command dictionary.
+
+\section{Keywords}
+\label{subsec:keyword}
+
+A keyword begins with a letter and consists of letters and digits. 
+
+The \madx keywords are protected; using one of them as a label results
+in a fatal error.   
+
+
+\section{Attribute Types}
+The command attributes can have one of the following types:
+\begin{itemize}
+  \item \href{string.html}{String attribute},
+  \item \href{logical.html}{Logical attribute},
+  \item \href{integer.html}{Integer attribute},
+  \item \href{real.html}{Real attribute},
+  \item \href{expression.html}{Expression},
+  \item \href{select.html}{Range selection},
+\end{itemize}
+
+Any integer or real attribute can be replaced by
+a \href{expression.html}{real expression}; expressions are
+normally deferred\index{deferred} 
+(see \href{expression.html#defer}{deferred expression}), except in the  
+definition of constants where they are evaluated immediately.
+
+When a command has a \href{label.html}{label}, \madx keeps this command
+in memory. This allows repeated execution of the same command
+by just entering EXEC label. This construct may be nested.
+
+For an exhaustive list of valid declarations of constants or variables
+see \href{declarations.html}{declarations}.
+
+
+\section{Variable Declarations}
+\label{subsec:var_declarations}
+
+In the following, "=" means that the variable at the left receives the
+current value of the expression at right, but does not depend on it any
+further, whereas ":=" makes it depend on this expression, i.e. every
+time the expression changes, the variable is re-evaluated, except for
+"const" variables.  
+
+\madxmp{
+var = expression; \\
+var := expression; \\
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
+real var = expression;        \>// identical \\
+real var := expression;       \>// to above \\
+int var = expression;         \>// truncated if expression is real \\
+int var := expression; \\
+const var = expression; \\
+const var := expression; \\
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
+const real var = expression;     \>// identical \\
+const real var := expression;    \>// to above \\
+const int var = expression;      \>// truncated if expression is real \\
+const int var := expression;
+}
+
+
+\section{Identifiers or Labels}
+\label{sec:label}
+A label begins with a letter, followed by up to fifteen letters, digits,
+decimal points (.), or underscores (\_). Characters beyond the sixteenth
+are dropped, but should be avoided, and the resulting sequence must be
+unique. 
+
+A label may refer to a keyword, an element, a beam-line, a sequence,
+etc.   
+
+The \madx keywords are protected; using one of them as a label
+results in a fatal error.  
+
+
+%\input{Introduction/attribute}
+\section{Command Attributes}
+\label{sec:attribute}
+
+\begin{itemize}
+	\item A \href{name.html}{name or string attribute} refers to an object, or a string. 
+	\item A \href{logical.html}{logical attribute} selects or deselects an option. 
+	\item An \href{integer.html}{integer attribute} is a counter, as for repetition in a beam line. 
+        \item A \href{real.html}{real attribute} defines a value stored
+          as double precisiom data.  
+	\item A \href{expression.html}{real expression} defines a datum
+          for a command, it may be varied in matching. An expression is
+          built of a combination of
+          \href{expression.html#operator}{operator} and
+          \href{expression.html#operand}{operand}. 
+	\item A \href{constraint.html}{constraint}, specifies a matching constraint. 
+	\item A \href{variable.html}{variable name} selects a variable to be matched. 
+\end{itemize}
+
+
+%\input{Introduction/name}
+\section{Name or String Attributes}
+\label{sec:name}
+A name or string attribute often selects one of a set of options: 
+\madxmp{
+xxxxxxxxxxxxxxxxxxxx\= \kill
+USE, PERIOD=lhc;    \>// expand the LHC sequence
+}
+
+It may also refer to a user-defined object: 
+\madxmp{
+xxxxxxxxxxxxxxxxxxxxxxx\= \kill
+TWISS, FILE=optics;    \>// specifies the name of the OPTICS output file
+}
+
+It may also define a string: 
+\madxmp{
+TITLE, "LHC version 6.2";
+}
+
+The case of letters is only significant if a string is enclosed in
+quotes, otherwise all characters are converted to lower at reading. On
+the other hand, strings that do not contain blanks do not need to be
+enclosed in quotes. 
+
+Example:
+\madxmp{
+CALL, FILE = "my.file"; \\
+CALL, FILE = my.file; \\
+CALL, FILE = MY.FILE; \\
+CALL, FILE = "MY.FILE"; \\
+CALL, FILE = 'MY.FILE'; 
+} 
+In the first three cases, \madx will try to read a file named my.file, in the
+last two it will try to read the file named MY.FILE.  
+
+
+\section{String Attributes}
+\label{sec:string}
+A string attribute makes alphanumeric information available, e.g. a
+title or a file name. It can contain any characters, enclosed in single
+(') or double (") quotes, except for quotes of the type used as its
+delimiter.  
+
+Examples: 
+\madxmp{
+TITLE, 'This is a title for the program run "test"'; \\
+\\
+SYSTEM, "ln -fns some-lengthy-directory-name local-link";
+}
+
+
+\section{Logical Attributes}
+\label{sec:logical}
+Many commands in \madx require the setting of logical values (flags) to
+represent the on/off state of an option. A logical value "flag" can be
+set in two ways:  
+\madxmp{flag | flag = true}
+
+It can be reset by: 
+\madxmp{-flag | flag=false}
+
+Example: 
+\madxmp{
+OPTION, -ECHO;  // switch off copying the input to the standard output
+}
+
+The default for a logical flag is normally false, but can be found e.g. for options by the command  
+\madxmp{HELP, option;}
+
+
+\section{Integer Attributes}
+\label{sec:integer}
+An integer attribute usually denotes a count. Example: 
+\madxmp{myline: LINE = ( -3 * (a,b,c) );}
+
+In this case, a litteral integer is requested; however, in the following 
+\madxmp{rfc: RFCAVITY, HARMON = 12345;}
+or 
+\madxmp{rfc: RFCAVITY, HARMON = num;}
+"num" may be an integer variable, a real variable, or an expression.  In
+the two latter cases, the value is truncated. 
+
+
+\section{Real Attributes}
+\label{sec:real}
+Most attributes are of type REAL and are treated internally as double
+precision values. They may be set by integer values, real values,  or
+expressions. 
+
+Example:  
+\madxmp{
+xxxxxxx\= \kill
+ddd:   \>drift, l = 1.2345; \\
+dddd:  \>drift, l = ddd-\textgreater l-0.3;
+}
+
+
+%\input{Introduction/expression}
+%  Changed by: Ghislain Roy, 12-Dec-2013: updated physicial constants
+%  to PDG2012 values; very old values were pre PDG2010.
+\section{Real Expressions}
+\label{sec:expression}
+To facilitate the definition of interdependent quantities, any real
+value and integer value can be entered as an arithmetic expression. When
+a value used in an expression is redefined by the user or changed in a
+matching process, the expression is reevaluated. Expression definitions
+may be entered in any order. \madx evaluates them in the correct order
+before it performs any computation. At evaluation time all operands used
+must have values assigned.  
+
+An expression is built from a combination of
+\hyperlink{operator}{operator} and \hyperlink{operand}{operand}, and it
+may contain \hyperlink{random}{random generators}.   
+
+\subsection{Operators in Arithmetic Expressions}
+\label{subsec:operator}
+An expression can be formed using the following operators: 
+
+\subsubsection{Arithmetic operators}
+\begin{madlist}
+  \ttitem{+} Addition, 
+  \ttitem{-} Subtraction, 
+  \ttitem{*} Multiplication, 
+  \ttitem{/} Division, 
+  \ttitem{\^\ } Exponentiation. 
+\end{madlist}
+
+\subsubsection{Ordinary Functions}
+\label{subsubsec:function}
+\begin{madlist}
+  \ttitem{SQRT(x)} square root, 
+  \ttitem{LOG(x)}  natural logarithm, 
+  \ttitem{LOG10(x)} logarithm base 10, 
+  \ttitem{EXP(x)} exponential, 
+  \ttitem{SIN(x)} trigonometric sine, 
+  \ttitem{COS(x)} trigonometric cosine, 
+  \ttitem{TAN(x)} trigonometric tangent, 
+  \ttitem{ASIN(x)} arc sine, 
+  \ttitem{ACOS(x)} arc cosine, 
+  \ttitem{ATAN(x)} arc tangent, 
+  \ttitem{SINH(x)} hyperbolic sine, 
+  \ttitem{COSH(x)} hyperbolic cosine, 
+  \ttitem{TANH(x)} hyperbolic tangent, 
+  \ttitem{ABS(x)} absolute value; 
+\end{madlist}
+
+\subsubsection{Random Number Generators}
+\label{subsubsec:random}
+\begin{madlist}
+  \ttitem{RANF()} random number, uniformly distributed in [0,1], 
+  \ttitem{GAUSS()} random number, gaussian distribution with unit
+  standard deviation,  
+  \ttitem{TGAUSS(x)} random number, gaussian distribution with unit
+  standard deviation, truncated at x standard deviations;  
+\end{madlist}
+
+in the above cases, "x" can be any expression, i.e. contain other
+functions, variable or constant expressions. To initialize the \madx
+random generator use the
+\href{../error/error_option.html#EOPTION}{Eoption command}.  
+
+\subsubsection{Table Access Functions}
+\label{subsubsec:table}
+
+\begin{madlist}
+  \ttitem{table(x,z)} accesses value of the named table column "z"
+  of table "x"; example: table(summ,q1) returns the hor. tune of
+  the Twiss summary table "summ".  
+  \ttitem{table(x,y,z)} accesses value of the named table column "z"
+  for element "y" (first table row with that name) of table "x";
+  example: table(twiss,mb.12,betx) returns the beta\_x at
+  element mb.12 from the Twiss table "twiss".   When the element
+  is called with its proper name, as in the example above, the
+  value is returned at the first occurrence of the element of
+  this name. If the value is needed at a occurrence number: NNN,
+  then "[NNN]" has to be appended to the name, e.g. in the above
+  example one obtains the betx of the 23th occurrence of the
+  element "mb.12" by changing the example to:
+  "table(twiss,mb.12[23],betx)". Mind you that the old, but
+  little known, form: "table(twiss,mb.12-\textgreater 23,betx)"
+  continues to work. Lastly, if NNN exceeds the maximum
+  occurrence number the return value is arbitrarily small.  
+\end{madlist}
+
+Beware: 
+\begin{itemize}
+   \item  Unnamed Drifts are not included in the table name
+          database, so as to speed up the search for "real"
+          elements. Therefore, those  unnamed drifts cannot be
+          found. However, named drifts can be searched for.  
+   \item  Due to the importance of finding elements in the table
+          for a proper functioning of the \madx runs, the programs
+          throws a "fatal\_error" if an element cannot be found in the
+          table.   
+\end{itemize}
+
+There is a second option of this function with 3 entries  
+\begin{itemize}
+    \item table(x,z,N\_row): accesses the value of the named table
+          column  "z" at the "N\_row" number of rows of table "x" (row
+          numbers start at  1); example: table(twiss,betx,370) returns
+          the beta\_x at row number  "370" of the Twiss table
+          "twiss". The return value is zero if "N\_row"  is outside of
+          the allowed range.
+\end{itemize}
+
+Note that "N\_row" has to be a number and not a  variable. However, the
+\href{../control/special.html#macro}{Macro facility} in \madx  allows
+one to use a variable instead.   
+
+A typical example could look like this, in fact the square root of betx
+(user defined variable myvar) is added to the twiss table:  
+\begin{verbatim}
+myvar := sqrt(table(twiss,betx));
+select, flag=twiss, column=name, s, myvar, betx;
+twiss, file;
+\end{verbatim}
+
+Or another arbitrary test case of adding k1l taken from the Twiss table: 
+
+Define macro: 
+\begin{verbatim}
+mycrap(xx,yy,zz): macro = {myval = table(xx,yy,zz);};
+\end{verbatim}
+
+Use macro in loop: 
+\begin{verbatim}
+i = 0;
+incval = 0;
+while (i < 100) {
+value,i;
+exec,mycrap(twiss,k1l,$i);
+incval = incval + myval;
+value,i,myval,incval;                
+i = i + 1;
+}
+\end{verbatim}
+
+\subsubsection{Features as of Version 3\_03\_50}
+
+\begin{itemize}
+  \item  FILL, TABLE=t, ROW=n; \\
+    fill a table row with the present variable values. If ROW is
+    negative or missing a new row is created. If ROW is greater than the
+    number of rows, the last row is selected without creating a new row.  
+
+  \item SETVARS, TABLE=t, ROW=n; \\
+    set variables according to the column names of the given table and
+    the values of the given row. if ROW is negative, missing or greater
+    than the number of rows, the last row is selected. 
+\end{itemize}
+
+An example can be found at:
+\href{http://cern.ch/frs/mad-X_examples/special_features}{Special
+  Features} 
+
+The length of a table can be determined by using the attribute
+"tablelength" via table("your\_table\_name", tablelength). This is
+useful when creating a table from existing ones. See an example at:
+\href{../Introduction/select.html#screate}{user table II} 
+
+
+\subsection{Operands in Arithmetic Expressions}
+\label{subsec:operand}
+An expression may contain the following operands:  
+
+\subsubsection{Literal Constants} 
+Numerical values are entered like FORTRAN constants. Real values are
+accepted in INTEGER or REAL format. The use of a decimal exponent,
+marked by the letter D or E, is permitted.  
+
+Examples: 
+\madxmp{
+1, 10.35, 5E3, 314.1592E-2
+}
+
+\subsubsection{Symbolic constants}
+\label{subsubsec:symbolic_const}
+\madx recognizes some \hyperlink{constant}{mathematical and physical
+  constants}. Their names must not be used for user-defined labels.  
+
+Additional symbolic constants may be defined to simplify their repeated
+use in statements and expressions.  
+\madbox{
+CONST name=constant-expression;
+}
+defines a real constant with the name given. An existing symbolic
+constant can be redefined, but it cannot change in a matching procedure.  
+
+Example: 
+\madxmp{CONST IN = 0.0254;}
+
+A number of predefined symbolic constants exist in \madx and can be used
+in expressions. The values of physical constants are regularly updated
+to reflect the values published by the Particle Data Group \cite{PDGlatest} 
+
+\begin{table}[ht]
+\caption{Predefined Symbolic Constants in \madx}
+\vspace{1ex}
+\begin{center}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{\madx name} & \textbf{symbol} & \textbf{value} & \textbf{unit} \\ 
+\hline
+PI & $\pi$ & 4 * atan(1) & 1 \\ 
+TWOPI & $2\pi$ & 2 * PI & 1 \\ 
+DEGRAD & $180/\pi$ & 180 / PI  & deg/rad \\ 
+RADDEG & $\pi/180$ & PI / 180 & rad/deg \\ 
+E & e & exp(1) & 1 \\ 
+EMASS & $m_e$ & $0.510998928\times 10^{-3}$& GeV \\ 
+PMASS & $m_p$ & 0.938272046 & GeV \\ 
+NMASS & $m_n$ & 0.931494061 & GeV \\
+MUMASS & $m_\mu$ & 0.1056583715 & GeV \\ 
+CLIGHT & $c$ & $2.99792458\times 10^{8}$ & m/s \\ 
+QELECT & $e$ & $1.602176565\times 10^{-19}$ & A.s \\ 
+HBAR & $\hbar$ & $6.58211928\times 10^{-25}$ & MeV.s\\
+ERAD & $r_e$ & $2.8179403267\times 10^{-15}$ & m\\
+PRAD & $r_e (m_e / m_p)$ & ERAD*EMASS/PMASS & m \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\subsubsection{Parameter labels} 
+Often a set of numerical values depends on a common variable
+parameter. Such a parameter must be defined as a
+\href{parameter.html}{global parameter}. A global parameter always has a
+current value; however, this value may be re-evaluated or not, depending
+on the parameter definition:  
+\begin{verbatim}
+x = a;
+\end{verbatim} 
+x is set to the current value of a and not changed, even if a
+changes. This makes assignments such as  
+\begin{verbatim}
+x = x + 1;
+\end{verbatim} 
+perfectly valid (this replaces the old SET instruction). 
+
+The definition of the deferred expression  
+\begin{verbatim}
+x := a;
+\end{verbatim} 
+assign the current value of a to x every time x is used, i.e. it is
+re-evaluated using the latest value of a; therefore,  
+\begin{verbatim}
+x := x + 1;
+\end{verbatim} 
+results in an infinite loop (!) when x is used (error abort). 
+
+Of course, the following definitions are equivalent:  
+\begin{verbatim}
+x = 0.1;
+x := 0.1;
+\end{verbatim}
+
+When such a parameter is used in an expression, \madx uses the current
+value of the parameter if the expression is deferred:  
+
+Example: 
+\madxmp{
+x := 1.0; \\
+d1: drift, l =  x; \\
+d2: drift, l := 2.0 - x; \\
+}
+When the value of x is changed, the length of the drift d1 remains
+unchanged, that of d2 is recalculated.   
+
+\subsubsection{Element or Command Attributes} 
+In arithmetic expressions the attributes of physical elements or
+commands can occur as operands. They are named respectively by  
+\madbox{
+element-name->attribute-name\\
+command-name->attribute-name
+}
+
+Values are assigned to attributes in element definitions or commands. 
+
+Example: 
+\madxmp{
+xxxxxxxx\= \kill
+D1:     \>DRIFT, L= 1.0; \\
+D2:     \>DRIFT, L= 2.0 - D1->L;
+}
+\texttt{D1-\textgreater L} refers to the length L of the drift space D1.  
+
+\subsection{Expressions and Random Values}
+\label{subsec:expr_rnd}
+The definition of random machine imperfections requires evaluation of
+expressions containing random functions. These are evaluated like any
+other expression when the expression is used, i.e. only once if a "="
+assignment refers to it, or every time if the assignment is ":="; this
+latter case is used by the error generation routines.  
+
+Example: 
+\madxmp{
+a := 3*ranf();
+}
+Every time a is used, it gets a random value assigned from a uniform
+distribution between 0 and 3.  
+
+\madxmp{
+error: ealign, range, dx:=sigma*gauss();
+}
+All elements in range are assigned independent random displacements
+sampled from a Gaussian distribution with standard deviation sigma.  
+
+
+
+%\input{Introduction/constraint}
+%\section{Constraints}
+%\label{sec:constraints}
+\section{Logical Expressions}
+\label{sec:logicalexpr}
+
+In matching it is desired to specify equality constraints, as well as
+lower and upper limits for a quantity. \madx accepts the following forms
+of constraints:  
+
+%% \begin{verbatim}
+%% ! equality constraint:
+%% name = expression
+
+%% ! upper limit:
+%% name < expression
+
+%% ! lower limit:
+%% name > expression
+
+%% ! both upper and lower limit for the same name:
+%% name < expression, name > expression
+%% \end{verbatim}
+
+\madbox{
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
+name = expression                    \>! equality constraint \\
+name < expression                    \>! upper limit \\
+name > expression                    \>! lower limit \\
+name < expression, name > expression \>! both upper and lower limit \\
+                                     \>! for the same name
+}
+
+%\input{Introduction/variable}
+\section{Variable Names}
+\label{sec:variable}
+A variable name can have one of the formats: 
+\madbox{
+ parameter-name \\
+ element-name->attribute-name \\
+ command-name->attribute-name \\
+ beam\%sequence-name->attribute-name \\
+ table(table-name,..,..)
+}
+
+The first format refers to the value of the \href{parameter.html}{global
+  parameter} "parameter-name". 
+
+The second and third formats refer to the
+\href{real.html}{real attribute} "attribute-name" of the element
+"element-name", or the command "command-name". 
+
+The fourth format is specific
+to beams belonging to a particular sequence (for details see
+\href{sequence.html#beam}{sequences and beams}). 
+
+The fifth format allows
+extraction of variables from existing tables, as specified in
+\href{expression.html#table}{table access}.  
+
+
+
+%\input{Introduction/wildcard}
+\section{Regular Expressions}
+\label{sec:regex}
+Some commands allow selection of items via "regular expression"
+strings. Such a pattern string \textbf{must} be enclosed in single or
+double quotes. \madx follows regexp (Unix regular expression patterns)
+for matching. The following features are implemented:  
+
+A "search string" below is the string containing the pattern, a "target
+string" is the string being searched for a possible match with the
+pattern. 
+
+\begin{madlist}
+   \ttitem{"\textasciicircum"} at the start of the search string: Match
+     following search string at the start of the target string;
+     otherwise the search string can start anywhere in the target
+     string. To search for a  genuine "\textasciicircum" anywhere, use
+     "$\backslash$\textasciicircum".  
+   \ttitem{"\$"} at the end of the search string: Match preceding search
+     string at the end of the target string; otherwise the search string
+     can end anywhere in the target string. To search for a  genuine
+     "\$" anywhere, use "$\backslash$\$".
+   \ttitem{"."} stands for an arbitrary character; to search for a genuine
+     ".", use "$\backslash$."
+   \ttitem{"[xyz]"} stands for one character belonging to the string
+     contained in brackets (example: "[abc]" means one of a, b, c).  
+   \ttitem{"[a-ex-z]"} stands for ranges of characters (example:
+     "[a-zA-Z]" means any letter).  
+   \ttitem{"[\textasciicircum xyz]"} (i.e. a "\textasciicircum" as first
+     character in a square bracket) stands for exclusion of all
+     characters in the list, i.e. "[\textasciicircum a-z]" means "any
+     character but a lower case letter". 
+   \ttitem{"*"} allows zero or more repetitions of the preceding
+     character, either specified directly, or from a list. (examples:
+     "a*" means zero or more occurrences of "a",  "[A-Z]*" means zero or
+     more upper-case letters).  
+   \ttitem{"$\backslash$c"}  (e.g. "$\backslash$.") removes the special
+     meaning of character c.  
+\end{madlist}
+
+All other characters stand for themselves. 
+
+
+Example: 
+\madxmp{
+SELECT, FLAG=twiss, PATTERN="\textasciicircum d..\$" ; \\
+SELECT, FLAG=twiss, PATTERN="\textasciicircum k.*qd.*$\backslash$.r1\$" ;
+}
+ 
+The first command selects all elements whose names have exactly three
+characters and begin with the letter "D". The second command selects
+elements beginning with the letter "K", containing the string "QD", and
+ending with the string ".R1". The two occurrences of ".*" each stand for
+an arbitrary number (including zero) of any character, and the
+occurrence "$\backslash$." stands for a literal period.  
+
+
+%%\title{Parameters}
+%  Changed by: Hans Grote, 17-Jun-2002 
+%\chapter{Parameter Statements}
+%\label{chap:parameter}
+
+\section{Relations between Variable Parameters}
+\label{sec:relations}
+A relation is established between variables by one of two statements 
+\madbox{
+parameter-name = \= expression; \\
+parameter-name := \> expression;
+}
+The first form evaluates the expression on the right immediately and
+assigns its value to the parameter. It is an immediate assignment.
+
+The second form assigns the value by evaluating  the expression on the
+right every time the parameter is actually used. It is a deferred
+assignment.  
+
+This mechanism holds as well for element parameters that can be defined
+with either immediate or deferred assignments.
+
+Attention! If you want
+to modify e.g. the strength of a quadrupole later (e.g. in a match,  or
+by entering a new value for a parameter on which it depends) then the
+defition has to be  
+\madxmp{QD: QUADRUPOLE, K1 := ak1;}
+and not 
+\madxmp{QD: QUADRUPOLE, K1 = ak1;}
+In the latter case, K1 will be set to the current value of ak1 at the
+time of declaration, and will not change when ak1 later changes.  
+
+Parameters that have not yet been defined at time of evaluation have a
+zero value. 
+
+Example: 
+\madxmp{
+gev = 100; \\
+BEAM, ENERGY=gev;
+}
+
+The parameter on the left may appear on the right as well in the
+computer science form of assignments: 
+\madxmp{x = x+1;}
+increases the value of x by 1. \\
+As a result, the SET statement of \madeight is no longer necessary and
+is not implemented in \madx.   
+
+
+Successive definitions are allowed in the first form of relations or 
+immediate assignments:
+\madxmp{
+a = b + 2; \\
+b = a * b;
+}
+But circular definitions in the second form of relations, or
+deferred assignments, are forbidden: 
+\madxmp{
+a := b + 2; \\
+b := a * b;
+}
+will result in an error.
+
+%% Already in control.tex
+%% \section{\href{par_output}{VALUE: Output of Parameters}}
+%% The VALUE statement evaluates the current value of all listed expressions, and
+%% prints the result on the standard output file.
+%% \madbox{
+%% VALUE = expression {, expression2};
+%% }
+
+%% Example:
+%% \madxmp{
+%% p1 = 5; \\
+%% p2 = 7; \\
+%% VALUE, p1*p2-3;
+%% }
+%% After echoing the command, this prints:
+%% \madxmp{
+%% p1*p2-3 = 32       ;
+%% }
+
+%% Another example:
+%% \begin{verbatim}
+%% option,-warn;
+%% while (x 
+%% \end{verbatim}
+%% ?????
+
+%% After echoing the command, this prints:
+%% \begin{verbatim}
+%% x = 100        ;       
+%% x^2 = 10000      ;       
+%% log10(x) = 2      ;            
+%% \end{verbatim}
+
+%\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg} 11.9.2000
+
+
+
+%% EOF
+

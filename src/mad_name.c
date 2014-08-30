@@ -128,29 +128,41 @@ grow_vector_list(struct vector_list* p)
   myfree(rout_name, v_loc);
 }
 
+
+#if 0 // kept for debugging
+static void
+show_name_list(const char *from, struct name_list* nl)
+{
+  fprintf(stderr, "**** show name list %s from %s with %d elements\n", nl->name, from, nl->curr);
+  for (int i = 0; i < nl->curr; i++) {
+    fprintf(stderr, "**** [%d]: name[%d]=%-20s, name[%d]=%-20s\n",
+       i, i, nl->names[i], nl->index[i], nl->names[nl->index[i]]);
+  }
+}
+#endif
+
 int
-add_to_name_list(char* name, int inf, struct name_list* vlist)
+(add_to_name_list)(char* name, int inf, struct name_list* vlist)
   /* adds name to alphabetic name list vlist */
   /* inf is an integer kept with name */
 {
-  int j, num, low = 0, mid, high = vlist->curr - 1, pos = 0, ret;
+  assert(name);
+  assert(vlist);
 
-  if (name == NULL) return -1;
+//  if (!strcmp(name, "map_table")) show_name_list(__func__,vlist);
 
-  ret = name_list_pos(name, vlist);
+  int ret = name_list_pos(name, vlist);
   if (ret < 0) {
+    int low=0, high = vlist->curr - 1, pos = 0;
     while (low <= high) {
-      mid = (low + high) / 2;
-      if ((num = strcmp(name, vlist->names[vlist->index[mid]])) < 0) {
-        high = mid - 1; pos = mid;
-      }
-      else if (num > 0) {
-        low  = mid + 1; pos = low;
-      }
+      int mid = (low + high) / 2;
+      int num = strcmp(name, vlist->names[vlist->index[mid]]);
+           if (num < 0) high = mid - 1, pos = mid;
+      else if (num > 0) low  = mid + 1, pos = low;
     }
     ret = vlist->curr;
     if (vlist->curr == vlist->max) grow_name_list(vlist);
-    for (j = vlist->curr; j > pos; j--) vlist->index[j] = vlist->index[j-1];
+    for (int j = vlist->curr; j > pos; j--) vlist->index[j] = vlist->index[j-1];
     vlist->index[pos] = vlist->curr;
     vlist->inform[vlist->curr] = inf;
     vlist->names[vlist->curr++] = name;
@@ -160,15 +172,24 @@ add_to_name_list(char* name, int inf, struct name_list* vlist)
 }
 
 int
-name_list_pos(const char* p, struct name_list* vlist)
+(name_list_pos)(const char* name, struct name_list* vlist)
 {
-  int num, mid, low = 0, high = vlist->curr - 1;
+  assert(name);
+
+  if (!vlist) return -1; // empty vlist
+  
+//  if (!strcmp(name, "map_table")) show_name_list(__func__,vlist);
+
+  int low = 0, high = vlist->curr - 1;
+  
   while (low <= high) {
-    mid = (low + high) / 2;
-    if ((num=strcmp(p, vlist->names[vlist->index[mid]])) < 0)  high = mid - 1;
-    else if ( num > 0) low  = mid + 1;
+    int mid = (low + high) / 2;
+    int num = strcmp(name, vlist->names[vlist->index[mid]]);
+         if (num < 0) high = mid - 1;
+    else if (num > 0) low  = mid + 1;
     else return vlist->index[mid];
   }
+  
   return -1;
 }
 

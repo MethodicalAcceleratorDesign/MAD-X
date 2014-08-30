@@ -14,11 +14,12 @@
         src="http://cern.ch/madx/icons/mx7_25.gif" align="right">
       <h2>Quadrupole</h2>
     </center>
-    <pre>label: QUADRUPOLE,L=real,K1=real,K1S=real,TILT=real;
+    <pre>label: QUADRUPOLE,L=real,K1=real,K1S=real,TILT=real, THICK=logical;
 </pre>
-    A QUADRUPOLE has four real attributes:
+    A QUADRUPOLE has five attributes:
     <ul>
-      <li>L: The quadrupole length (default: 0 m). </li>
+      <li>L: The quadrupole length (default: 0 m). 
+      </li>
       <li>K1: The normal quadrupole coefficient
         <p> <i>K</i><sub>1</sub> = 1/(<i>B</i> rho) (ð<i>B<sub>y</sub></i>/ð
           <i>x</i>). </p>
@@ -47,12 +48,13 @@
               MAD8 about the actual meaning of the TILT attribute for
               various elements. </font></b> </p>
       </li>
-      <li>THICK: If this flag is set to 1 the quadrupole will be tracked
-        through as a thick-element, instead of being converted into
-        thin-lenses. </li>
+      <li>THICK: If this logical flag is set to true the quadrupole will 
+	be tracked through as a thick-element, instead of being converted 
+	into thin-lenses. 
+      </li>
     </ul>
-    <p><b><font color="#0000ff"> Note also that K<sub>1</sub>/K<sub>1s</sub>
-          can be considered as the normal or skew quadrupole components
+    <p><b><font color="#0000ff"> Note also that K<sub>1</sub> and K<sub>1s</sub>
+          can be considered as the normal and skew quadrupole components
           of the magnet on the bench, while the TILT attribute can be
           considered as an tilt alignment error in the machine. In fact,
           a positive K<sub>1</sub> with a tilt=0 is equivalent to a
@@ -61,12 +63,19 @@
     <p>Example: </p>
     <pre>QF: QUADRUPOLE,L=1.5,K1=0.001,THICK=1;
 </pre>
-    The <a href="local_system.html#straight">straight reference system</a>
-    for a quadrupole is a cartesian coordinate system.
-    <p> </p>
-    <address> <a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
-      <a href="http://www.cern.ch/Frank.Schmidt/frs_sign.html">frs</a>,
-      <a href="https://phonebook.cern.ch/phonebook/?id=PE525753">al</a>,
-      May 6, 2013 </address>
+
+<p>
+<b>Note:</b> Additional attributes can be given to quadrupoles 
+that are useful for PTC and defined in 
+<a href="../ptc_general/ptc_general.html#additionaloptions">the relevant section</a>
+
+<p>    
+The <a href="local_system.html#straight">straight reference system</a>
+for a quadrupole is a cartesian coordinate system.
+<p> </p>
+<address> <a href="http://www.cern.ch/Hans.Grote/hansg_sign.html">hansg</a>,
+  <a href="http://www.cern.ch/Frank.Schmidt/frs_sign.html">frs</a>,
+  <a href="https://phonebook.cern.ch/phonebook/?id=PE525753">al</a>,
+  May 6, 2013 </address>
   </body>
 </html>

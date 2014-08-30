@@ -986,20 +986,42 @@ print_table(struct table* t)
 void
 make_map_table(int* map_table_max_rows)
 {
-  int k, pos;
+
+  assert(map_table_max_rows);
+  assert(table_register->names);
+  
+  int pos;
   if ((pos = name_list_pos("map_table", table_register->names)) > -1)
   {
+    /*printf("Found Table in table pos %d register Removing it \n", pos);
+    printf("Name=<<%s>>  \n\n", table_register->tables[pos]->name);
+    */
+    int k = remove_from_name_list(table_register->tables[pos]->name,
+                                  table_register->names);
+    
     delete_table(table_register->tables[pos]);
-    k = remove_from_name_list(table_register->tables[pos]->name,
-                              table_register->names);
+	              
     table_register->tables[k] = table_register->tables[--table_register->curr];
+    
   }
+  
   /* initialise table */
   map_table = make_table("map_table", "map_tab", map_tab_cols,
                          map_tab_types, *map_table_max_rows);
+  
+  assert(map_table);
+  assert(table_register);
+       
   add_to_table_list(map_table, table_register);
   map_table->dynamic = 1;
   reset_count("map_table");
+  
+  /*
+  printf("Creating map table  Done \n");
+  pos = name_list_pos("map_table", table_register->names);
+  printf("Checking position of the table: pos %d \n", pos);
+  */
+
 }
 
 struct table*
@@ -1090,19 +1112,22 @@ void
 out_table(char* tname, struct table* t, char* filename)
   /* output of a table */
 {
-  int j;
-
   struct command_list* scl = find_command_list(tname, table_select);
   struct command_list* dscl = find_command_list(tname, table_deselect);
+
   while (t->num_cols > t->col_out->max)
     grow_int_array(t->col_out);
+
   while (t->curr > t->row_out->max)
     grow_int_array(t->row_out);
+
   t->row_out->curr = t->curr;
   if (par_present("full", NULL, scl))
     put_info("obsolete option 'full'"," ignored on 'select'");
-  for (j = 0; j < t->curr; j++) t->row_out->i[j] = 1;
-  for (j = 0; j < t->num_cols; j++) t->col_out->i[j] = j;
+
+  for (int j = 0; j < t->curr    ; j++) t->row_out->i[j] = 1;
+  for (int j = 0; j < t->num_cols; j++) t->col_out->i[j] = j;
+
   t->col_out->curr = t->num_cols;
   if ((scl != NULL && scl->curr > 0) || (dscl != NULL && dscl->curr > 0))
   {
@@ -2030,6 +2055,11 @@ vector_to_table_curr(const char* table, const char* name, const double* vals, co
      -3 row    does not exist (need expansion)
   */
 {
+  assert(table);
+  assert(name);
+  assert(vals);
+  assert(nval);
+
   char tbl_s[NAME_L], col_s[NAME_L], buf[5*NAME_L];
   struct table* tbl;
   int pos, col, last, j;
@@ -2040,9 +2070,11 @@ vector_to_table_curr(const char* table, const char* name, const double* vals, co
     warning("vector_to_table_curr: table not found:", tbl_s);
     return -1;
   }
+ 
+  
   mycpy(col_s, name);
   if ((col = name_list_pos(col_s, tbl->columns)) < 0) {
-    warning("vector_to_table_curr: column not found:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
+    warning("vector_to_table_curr: column not found: ", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
     return -2;
   }
   if (tbl->curr >= tbl->max) {
@@ -2089,6 +2121,8 @@ string_to_table_curr(const char* table, const char* name, const char* string)
     warning("string_to_table_curr: table not found:", tbl_s);
     return -1;
   }
+  
+  
   mycpy(col_s, name);
   if ((col = name_list_pos(col_s, tbl->columns)) < 0) {
     warning("string_to_table_curr: column not found:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));

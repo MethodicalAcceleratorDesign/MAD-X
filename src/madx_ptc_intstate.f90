@@ -238,6 +238,9 @@ contains
        if (getdebug() > 1) then
            print *, "Switching ON totalpath (and switching OFF delta and only_4d)"
        end if
+
+       !intstate = intstate  + totalpath0
+       ! actually this is done automatically by PTC: only_4d can not be together with totalpath, detla can be on exclusively with only_4d
        intstate = intstate - delta0 - only_4d0 + totalpath0
     else
        if (getdebug() > 1) then

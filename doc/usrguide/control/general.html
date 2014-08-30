@@ -109,13 +109,52 @@ exit;
 ends the program execution.
 <p>
 <li><h4><a name=fill>FILL</a></h4>
-Every command
+The FILL command fills a row of a table with the current values of all
+declared column variables of the table.
 <pre>
-fill,table=table;
+fill, table=table, row=integer;
 </pre>
-adds a new line with the current values of all column variables into the
-user table <a href="#create">create</a>d beforehand. This table
-one can then <a href="#write">write</a> in TFS format. 
+<p>
+The FILL command takes two arguments:
+<ul>
+<li> TABLE gives the name of the table to be filled. The table must
+  have been <a href="#create">created</a> beforehand. 
+  The table can then be <a href="#write">written</a> to file in TFS
+  format. 
+<li> ROW gives the row number to be filled with the current values of
+  all column variables. <br>
+
+  <b>Only valid from version 5.02.03 onwards</b> 
+  ROW=0 or ROW=nrow+1, where nrow is the current number of rows in the table,
+  causes FILL to add a row at the end of the table and to fill it with 
+  the current values of all column variables. <br>
+  (Default: 0) 
+</ul>
+<p>
+
+<b>Only valid from version 5.02.03 onwards</b> <br>
+Negative ROW values are allowed and count the row numbers from
+the last row, allowing access to the table in reverse order of rows:<br>
+ROW = -1  accesses the last row of the table,<br>
+ROW = -2  accesses the one before last (penultimate) row, etc...
+<p>
+
+<b>Only valid from version 5.02.03 onwards</b> <br>
+Trying to access the table forward beyond the last row, i.e. ROW
+strictly greater than nrow+1, where nrow is the number of rows in the table, or
+trying to access the table backwards before the first row, i.e. ROW
+strictly lower than -nrow, both result in a ``row out of bound'' message and no
+variable values are set in the table.  
+<p>
+
+Reminder: One can get access to the current number of rows in a table using the variable 
+<pre>
+TABLE(tablenanme, TABLELENGTH)
+</pre>
+
+<!-- adds a new line with the current values of all column variables into the -->
+<!-- user table <a href="#create">create</a>d beforehand. This table -->
+<!-- one can then <a href="#write">write</a> in TFS format.  -->
 See as well the
 <a href="../Introduction/select.html#ucreate">user table</a> example.
 <p>
@@ -187,14 +226,18 @@ can be edited with the help of a
 <a href="special.html#macro">macro statement</a>.
 For more details, see there.
 <p>
-<li><h4><a name=print>PRINTF</a></h4>
+<li><h4><a name=printf>PRINTF</a></h4>
 <pre>
 printf, text = "string", value = expr{,expr};
 </pre>
 prints the numerical values specified in the value field, formatted according to
 the string format provided in the text field, to the current output file. <p>
 The string format can take numeric C or MAD format specifiers for double real values; 
-integer and string formats are not supported.<p> 
+integer and string formats are not supported but 
+can be approximated with the %g in the case of integers, and via
+MACRO statements, which perform string
+substitution, themselves containing a PRINT statement.  
+<p> 
 The maximum number of values that can be printed in one
 statement is limited to 100. <p>
 If the number of format specifiers given in the string is higher 
@@ -410,6 +453,79 @@ to be cut (default = 1).
 written into the TFS file. The "name" argument is special in that it
 refers to the actual name of the selected element. For an example,
 see <a href="../Introduction/select.html">SELECT</a>.
+
+
+<li><h4><a name=setvars>SETVARS</a></h4>
+
+<b>Only valid from version 5.02.03 onwards</b> 
+
+The SETVARS command sets the variables with values extracted
+from the row of a table.
+<pre>
+SETVARS, TABLE=tablename, ROW=integer;
+</pre>
+The attributes of SETVARS are:
+<ul>
+  <li>TABLE gives the name of the table. (Default: none)
+  <li>ROW gives the row number containing the values. (Default: -1)
+</ul>
+<p>
+Negative ROW values are allowed and count the row numbers from
+the last row, allowing access to the table in reverse order of rows:<br>
+ROW = -1 accesses the last row of the table,<br>
+ROW = -2 accesses the one before last (penultimate) row, etc...
+<p>
+Trying to access the table forward beyond the last row, i.e. ROW
+strictly greater than nrow, the number of rows in the table, or
+trying to access the table backwards before the first row, i.e. ROW
+strictly lower than -nrow, or trying to access the illegal
+ROW=0, all result in a ``row out of bound'' message and no
+variable values are returned and set.  
+
+
+<li><h4><a name=setvars_lin>SETVARS_LIN</a></h4>
+
+<b>Only valid from version 5.02.03 onwards</b> 
+
+The SETVARS_LIN command sets the variables with values calculated
+by linear interpolation, or extrapolation, between two rows of a table.
+<pre>
+SETVARS_LIN, TABLE=tablename, ROW1=integer, ROW2=integer, PARAM=string;
+</pre>
+The attributes of SETVARS_LIN are:
+<ul>
+  <li>TABLE gives the name of the table. (Default: none)
+  <li> ROW1 gives a first row number with values for interpolation. (Default: 0)
+  <li> ROW2 gives a second row number with values for interpolation. (Default: 0)
+    <li> PARAM gives a string containing the linear interpolation factor or
+  the name of a variable or expression containing the interpolation
+  factor. If the resulting value of PARAM is outside the
+  [0,1] interval, the result is a linear extrapolation.
+  (Default: "interp", itself defaulting to a value of 0.0 when evaluated)
+</ul>
+<p>
+SETVARS_LIN sets the variables with values calculated through
+the following formula that MAD-X constructs internally as a deferred
+expression which is immediately evaluated:
+<pre>
+value := value(row1)*(1-param) + value(row2)*param;
+</pre>
+Both the expression and the value of the expression are available to the
+user through respectively the commands SHOW and VALUE.
+<p>
+Negative ROWi values are allowed and count the row numbers from
+the last row, allowing access to the table in reverse order of rows:<br>
+ROWi = -1 accesses the last row of the table,<br>
+ROWi = -2 accesses the one before last (penultimate) row, etc...
+<p>
+Trying to access the table forward beyond the last row, i.e. ROWi
+strictly greater than nrow, the number of rows in the table, or
+trying to access the table backwards before the first row, i.e. ROWi
+strictly lower than -nrow, or trying to access the illegal
+ROWi=0, all result in a ``row out of bound'' message and the
+expression is not constructed or evaluated. 
+
+
 <li><h4><a name=show>SHOW</a></h4>
 <pre>
 show,command;

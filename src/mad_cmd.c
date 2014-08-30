@@ -260,6 +260,9 @@ exec_command(void)
       // end PTC commands
     }
   }
+
+  // force garbage collection
+  // mycollect();
 }
 
 struct command*

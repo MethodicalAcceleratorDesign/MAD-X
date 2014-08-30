@@ -1,0 +1,404 @@
+%%%\title{Orbit Correction}
+%  Changed by: Hans Grote, 13-Sep-2000 
+%  Changed by: Werner Herr, 19-Jun-2002 
+%  Changed by: Werner Herr, 02-Sep-2002 
+%  Changed by: Werner Herr, 01-Oct-2002 
+%  Changed by: Werner Herr, 01-May-2003 
+%  Changed by: Werner Herr, 05-April-2004 
+%  Changed by: Werner Herr, 01-Dec-2004 
+%  Changed by: Werner Herr, 22-Oct-2008 
+%  Changed by: Ghislain Roy, 2013-06-26
+%  Changed by: Ghislain Roy, 2014-01-06
+%  Changed by: Ghislain Roy, 2014-03-03
+
+\chapter{Orbit Correction}  
+
+This chapter describes the commands to correct a closed orbit or a
+trajectory. The initial orbit or trajectory to be corrected can be
+obtained  from an internal or external TFS table.   
+
+The purpose of this orbit module is to provide some basic tools to
+assess the performance of an orbit correction system of a machine in the
+design phase.  
+
+Although some interface is available, it cannot and does not provide the
+full functionality expected from a dedicated online orbit correction and
+steering program.  
+
+%\input{cororbit/co_correct}
+\section{CORRECT}  
+\label{sec:correct}
+
+The CORRECT statement makes a complete closed orbit  or trajectory
+correction using the \textbf{computed} values at the monitors  from the
+Twiss table.   
+
+The CORRECT command has the following format (some options are valid
+only for special algorithms):   
+
+\madbox{
+CORRECT, \=ORBIT=orbittable, MODEL=modeltable, TARGET=targettable, \\
+         \>SEQUENCE=seqname, \\
+         \>FLAG=string, MODE=string, COND=integer,\\
+         \>TWISSUM=integer, \\
+         \>NCORR=integer, CORRLIM=real, \\
+         \>MONERROR=integer, MONON=real, MONSCALE=real, ERROR=real,\\ 
+         \>PLANE=string,  RESOUT=integer, \\
+         \>CLIST=filename, MLIST=filename, \\
+         \>UNITS=real, CORZERO=integer, \\
+         \>SNGCUT=real, SNGVAL=real \\
+         \>TWORING=logical, BEAM1TAB=tablename, BEAM2TAB=tablename, \\
+         \>NAME\_COL=string, X\_COL=string, Y\_COL=string, \\
+         \>EXTERN=logical;  
+}
+
+%% "correct: correct correct 0 0 "
+%% "error    = [r, 1.e-5], "   v
+%% "ncorr    = [i, 0], "       v
+%% "monerror = [i, 0], "       v 
+%% "monscale = [i, 0], "       v
+%% "monon    = [r, 1], "       v
+%% "moncut   = [r, 0], "       v
+%% "corrlim  = [r, 1], "       v
+%% "resout   = [i, 0], "       v
+%% "sequence = [s, {none}], "  v
+%% "clist    = [s, none], "    v
+%% "mlist    = [s, none], "    v
+%% "plane    = [s, x], "       v
+%% "flag     = [s, ring], "    v
+%% "mode     = [s, micado], "  v
+%% "cond     = [i, 0], "       v
+%% "twissum  = [i, 0], "       v
+%% "orbit    = [s, none], "    v
+%% "model    = [s, none], "    v
+%% "corzero  = [i, 0], "       v
+%% "tworing  = [l, false, true], " v
+%% "beam1tab = [s, none], "    v
+%% "beam2tab = [s, none], "    v
+%% "target   = [s, none], "    v
+%% "name_col = [s, none], "    v
+%% "x_col    = [s, none], "    v
+%% "y_col    = [s, none], "    v
+%% "units    = [r, 1], "       v
+%% "sngcut   = [r, 50], "      v
+%% "sngval   = [r, 2], "       v
+%% "extern   = [l, false, true]; " v
+
+
+The command CORRECT is set up with defaults which should allow a
+reasonable correction for most cases with a minimum of required options
+(see Example 1 below).  
+
+The orbit correction must always be preceded by TWISS commands  which
+generate Twiss tables. The most recent Twiss table is assumed to contain
+the optical parameters and the distorted orbits. 
+
+The options used in the CORRECT command are: 
+
+\begin{madlist}
+   \ttitem{FLAG} can be "ring" or "line", either a circular machine
+     or a trajectory is corrected.   
+     \\ Default flag is "ring". 
+
+   \ttitem{MODE} defines the method to be used for corrections. 
+     \\ Available modes are LSQ, MICADO and SVD.  The first performs a
+     least squares minimization using all available correctors. The mode
+     SVD uses a Singular Value Decomposition to compute a correction
+     using all available correctors. The latter can also be used to
+     condition the response matrix for the modes LSQ or MICADO (using
+     COND=1). It is highly recommended to precede a LSQ correction by a
+     SVD conditioning (set COND=1).  
+     \\ The mode MICADO is a "best kick" algorithm. Naive use or using
+     it with a large number of correctors (see option NCORR) can give
+     unexpected results. To avoid the creation of local bumps, it is
+     recommended to precede a MICADO correction by a SVD conditioning
+     (set COND=1).  
+     \\ Default mode is MICADO.            
+
+   \ttitem{PLANE} If this attribute is x, only the horizontal correction
+     is made; if it is y, only the vertical correction is made. (This
+     differs from the MAD8 implementation).  
+     \\ Default plane is horizontal. 
+
+   \ttitem{COND} When COND is 1, a Singular Value Decomposition is
+     performed and  the response matrix CONDitioned to avoid linearly
+     dependent correctors. This can be used to avoid creation of
+     artificial bumps during a LSQ or MICADO correction (requires some
+     computing time).  Please note: this option is not robust since it
+     depends on parameters which control the determination of singular
+     values and redundant correctors. These can be set with the commands
+     SNGVAL and SNGCUT. Both parameters depend on the machine and may
+     need adjustment. Default values are adjusted to large machines and
+     "reasonable" performance for smaller machines.  
+     \\
+
+   \ttitem{NCORR} Only used by the MICADO algorithm. Defines the number of
+     correctors to be used, unless set to 0 in which case all available
+     correctors are used.  
+     \\ Default is 0 (all available correctors). 
+
+   \ttitem{SNGVAL}  Used to set the threshold for finding singular values
+     with the COND command. (Hint: smaller number finds fewer singular
+     values).  
+     \\ {\bf Use with care ! }
+     \\ Default is 2.0 
+
+   \ttitem{SNGCUT}  Used to set the threshold for finding redundant
+     correctors with the COND command. (Hint: larger number finds fewer
+     redundant correctors).  
+     \\ {\bf Use with extreme care ! }
+     \\ Default is 50.0 
+
+   \ttitem{MONERROR} When MONERROR is 1, the alignment errors on monitors
+     assigned  by \href{../error/error_align.html}{EALIGN} MREX and MREY
+     are taken into account, otherwise they are ignored.  
+     \\ Default is 0. 
+
+   \ttitem{MONSCALE} When MONSCALE is 1, the scaling errors on monitors
+     assigned  by \href{../error/error_align.html}{EALIGN} MSCALX and
+     MSCALY are taken into account, otherwise they are ignored.  
+     \\ Default is 0. 
+
+   \ttitem{MONON} takes a real number between 0.0 and 1.0. It
+     determines the number of available monitors. If the command is
+     given, each monitor is considered valid with a probability
+     MONON. In the average a fraction (1.0 - MONON) of the monitors will
+     be disabled for the correction, i.e. they are considered  not
+     existing.  This allows to study the effect of missing monitors.  
+     \\ Default is 1.0 (100 \%). 
+
+   \ttitem{CORRLIM}  A limit on the maximum corrector strength can be
+     given and a WARNING is issued if it is exceeded by one or more
+     correctors.  Please note: the strengths computed by the correction
+     algorithms are NOT limited, only a warning is printed ! 
+     \\ Default is 1.0 mrad. \\
+
+   \ttitem{TWORING} When true, the correction will be done on two rings at
+     once. The only correction mode available in this case is
+     MICADO. The parameter ORBIT=table is ignored and BEAM1TAB=table and
+     BEAM2TAB=table are used instead.  
+     \\ Default: false \\
+
+   \ttitem{UNITS} when this parameter is set the value is a multiplier [TO BE COMPLETED] 
+     \\ Default unknown \\
+
+   \ttitem{ERROR} specifies the maximum RMS value of the orbit to
+     be reached by the correction algorithm. The value is specified in
+     meters, e.g. ERROR=1.e-3 for a 1mm RMS target value. \\ Default is
+     1.e-5 m.\\
+
+\end{madlist}
+
+Normally the last active table provides the orbit to be
+corrected and the model for the correction. This can be overwritten
+by the appropriate options. Optionally, these tables can be given
+names like in:  TWISS, TABLE=name; (see documentation on TWISS
+command). To use these named tables, one of the following optional
+parameters must be  used:  
+
+\begin{madlist}
+   \ttitem{ORBIT} When this parameter is given, the orbit to be corrected
+     is taken from a named table. The default is the last (named or
+     unnamed) Twiss table.  
+
+   \ttitem{MODEL} When this parameter is given, the model for the
+     correction is taken from a named Twiss table. The default is the
+     last (named or unnamed) Twiss table.  
+
+   \ttitem{TARGET} When this parameter is given, the correction is made to
+     a named target orbit, pre-computed with a TWISS command. Default is
+     correction to the zero orbit.  
+
+   \ttitem{EXTERN} (default: false): When false, the ORBIT and TARGET table
+     are assumed to be computed by MAD with a previous twiss
+     command. When set to true, that option allows to use twiss tables
+     imported from an external file (with the readmytable command), for
+     example to use measured BPM data. In that case, the imported twiss
+     table is allowed to contain coordinate data only at the location of
+     the monitors.  
+\end{madlist}
+
+Example of use of CORRECT to reproduce a measured orbit: 
+\begin{verbatim}
+! To have a refererence optical model
+twiss, table=twiss_ref;
+
+! The bpm.tsv is a reduced Twiss file containing only lines for the BPMs
+readmytable, file="bpm.tsv", table="twiss_bpm";
+
+! correct orbit using external measurements
+correct, flag=ring, mode=micado, ncorr=5, cond=1 ,plane=x, extern,
+         model=twiss_ref, orbit=twiss_ref, target=twiss_bpm, 
+         error=1.0e-21;
+\end{verbatim}
+
+
+Two attributes affect the printing of tables and results: 
+\begin{madlist}
+   \ttitem{CLIST} =\textbf{file}: Corrector settings (in units of rad)
+     before and after correction printed to \textbf{file} 
+
+   \ttitem{MLIST} =\textbf{file}: Monitor readings (in units of m) before
+     and after correction printed to \textbf{file} 
+
+   \ttitem{RESOUT} This command outputs the results for all monitors and
+     all correctors in a computer readable format if its integer
+     argument is larger than 0. The argument is added to the
+     output. Useful to analyze runs with loops to produce large
+     statistics. \\
+     \textbf{ATTENTION: May produce gigantic outputs for large
+       machines.} 
+     \\
+
+   \ttitem{TWISSUM}  If the argument of twissum is larger than 0, it
+     prints maximum orbit and r.m.s. for both planes taken from the
+     Twiss summary table in computer readable form. Allows to analyze
+     orbits etc. at elements that are not monitors or correctors. The
+     argument is added to the output.  Only for output: no correction is
+     made, all other commands are ignored.  
+\end{madlist}
+
+Obsolete commands or options:
+\begin{verbatim}
+ITERATE, ITERMAX             /* Done with loop feature in MAD commands */
+THREADER, THRTOL, WRORBIT    /* Not part of orbit correction module */
+M1LIST, M2LIST               /* Replaced by MLIST */
+C1LIST, C2LIST               /* Replaced by CLIST */
+GETORBIT, PUTORBIT           /* Replaced by generic TFS access */
+GETKICK, PUTKICK             /* Replaced by generic TFS access */
+\end{verbatim}
+
+{\bf EXAMPLES:}\\ 
+for complete MAD input files see section on examples:
+
+Example 1: correct orbit in horizontal plane, taken from most recent
+Twiss table, using default algorithm (MICADO)
+\begin{verbatim}
+ CORRECT, PLANE = x; 
+\end{verbatim}
+
+Example 2: no correction, only output of Twiss summary 
+\begin{verbatim}
+CORRECT, TWISSUM = 1; 
+\end{verbatim}
+
+Example 3: correct orbit in horizontal plane, corrector and monitor
+output on table 
+\begin{verbatim}
+CORRECT, PLANE = x, MODE = lsq, CLIST = corr.out, MLIST = mon.out;   
+\end{verbatim}
+
+Example 4: correct orbit in horizontal plane, use alignment and scaling
+errors, 15\% of orbit correctors faulty
+\begin{verbatim}
+CORRECT, PLANE = x, MONERROR = 1, MONSCALE = 1, MONON = 0.85; 
+\end{verbatim}
+
+Example 5: correct orbit in horizontal plane for a two-beam machine,
+using MICADO with no SVD conditioning, zeroing correctors before the
+correction. 
+\begin{verbatim}
+CORRECT, FLAG=ring,
+         TWORING, BEAM1TAB=twb1, BEAM2TAB=twb2,
+         MODE=micado, COND=0, NCORR=4, ERROR=1E-6, PLANE=x,
+         MLIST='mx12.tab', CLIST='cx12.tab', RESOUT=1, CORZERO=1;
+\end{verbatim}
+
+
+
+
+%\input{cororbit/co_activate}
+\section{USEMONITOR, USEKICK}
+\label{sec:activate}
+To provide more flexibility with orbit correction two commands are
+provided:  
+
+\madbox{
+USEMONITOR, \=STATUS=flag, SEQUENCE=sequence, RANGE=range, \\
+            \>CLASS=class, PATTERN=regex; \\
+\\
+USEKICK,    \>STATUS=flag, SEQUENCE=sequence, RANGE=range, \\
+            \>CLASS=class, PATTERN=regex;
+}
+
+The command \texttt{USEMONITOR} activates or deactivates a
+selection of beam position monitor. 
+This command affects elements of types \texttt{MONITOR, HMONITOR},
+and \texttt{VMONITOR}.    
+
+The command  \texttt{USEKICK} activates or deactivates a selection
+of orbit correctors. This command
+affects elements of types \texttt{KICKER, HKICKER} and \texttt{VKICKER}. 
+
+
+Both commands have the same attributes: 
+\begin{madlist}
+   \ttitem{STATUS} If this flag is true (on), the selected elements
+     are activated. Active orbit monitor readings will be
+     considered, and active correctors can change their strengths
+     in subsequent correction commands. Inactive elements will be
+     ignored subsequently.  
+   \ttitem{SEQUENCE} The sequence can be specified, otherwise the
+     currect sequence is used for this operation.  
+   \ttitemn{RANGE, CLASS, PATTERN}: The usual selection commands are
+     used to identify the elements for this operation.  
+\end{madlist} 
+
+Example:
+\begin{verbatim}
+USE,...                                ! set working beam line 
+...                                    ! define imperfections 
+USEKICK, STATUS = OFF, RANGE = ...;    ! deactivate selected correctors 
+USEMONITOR, STATUS = OFF, RANGE = ...; ! deactivate selected monitors   
+CORRECT, NCORR = 32;                   ! uses different set of correctors
+USEKICK, STATUS = OFF, RANGE = ...;    ! deactivate different set of correctors 
+CORRECT, NCORR = 32;                   ! uses different set of correctors
+\end{verbatim}
+
+
+%\input{cororbit/co_corrsave}
+\section{CSAVE}
+\label{sec:csave}
+ This section is under construction, options presently only available in
+ MADX development version.  
+
+\section{SETCORR}
+\label{sec:setcorr}
+ This section is under construction, options presently only available in
+ MADX development version.  
+
+
+%\input{cororbit/co_option} 
+\section{COPTION}
+\label{sec:coption}
+
+\madbox{
+COPTION, SEED=integer, PRINT=integer;      
+}
+
+In the orbit program monitors can be randomly disabled and the correct
+option command specifies different seeds for random values:  
+
+\begin{madlist}
+   \ttitem{SEED} Selects a particular sequence of random values. 
+     \\ A SEED value is an integer in the range [0...999999999] (default: 123456789). 
+     \\ SEED alone continues with the current sequence 
+     \\ See also: \href{../Introduction/expression.html#random}{Random values}. 
+     \\ SEED may be an expression. 
+   \ttitem{PRINT} This flag can take integer values and controls the printout. 
+     \\ In general: the higher its value the more printout is produced.  
+     \\ For PRINT=0 no output is produced. 
+     \\ The default value is 1 (Correction summary is given). 
+\end{madlist}
+
+{\bf Example:}
+\madxmp{
+COPTION, SEED=987456321, PRINT=2;
+}
+
+Note that the random generator for MAD is taken from \cite{knuth1981}.
+
+
+
+
+

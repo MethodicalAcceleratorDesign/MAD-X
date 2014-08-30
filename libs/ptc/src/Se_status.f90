@@ -524,8 +524,8 @@ CONTAINS
              
              xlost=0.0_dp
              xlost=x
-             
-             messagelost="Se_status.f90 CHECK_APERTURE_R : Lost in real kind=1 elliptic Aperture"
+             write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=1 elliptic aperture.", &
+                                   "Orbit: X=",X(1)," Y=",X(3)," Ap.: DX=",E%DX," DY=",E%DY," R1=",E%R(1)," R2=",E%R(2)
           ENDIF
        CASE(2)  ! rectangle
           IF(ABS(X(1)-E%DX)>E%X.OR.ABS(X(3)-E%DY)>E%Y) THEN
@@ -534,7 +534,8 @@ CONTAINS
              
              xlost=0.0_dp
              xlost=x
-             messagelost="Se_status.f90 CHECK_APERTURE_R : Lost in real kind=2 rectangular Aperture"
+             write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=2 rectangular aperture.", &
+                                   "Orbit: X=",X(1)," Y=",X(3)," Ap.: DX=",E%DX," DY=",E%DY
           ENDIF
        CASE(3)  ! RECTANGLE + ELLIPSE (CIRCLE)
           IF((ABS(X(1)-E%DX)>E%X).OR.(ABS(X(3)-E%DY)>E%Y).OR.  &
@@ -544,7 +545,9 @@ CONTAINS
              
              xlost=0.0_dp
              xlost=x
-             messagelost="Se_status.f90 CHECK_APERTURE_R : Lost in real kind=3 rect-ellipse Aperture"
+             write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=3 rect-ellipse aperture.", &
+                                   "Orbit: X=",X(1)," Y=",X(3)," Ap.: DX=",E%DX," DY=",E%DY," R1=",E%R(1)," R2=",E%R(2)
+             
           ENDIF
        CASE(4) ! MARGUERITE
           IF(((X(1)-E%DX)**2/E%R(2)**2+(X(3)-E%DY)**2/E%R(1)**2>1.0_dp).OR.  &
@@ -554,7 +557,8 @@ CONTAINS
              
              xlost=0.0_dp
              xlost=x
-             messagelost="Se_status.f90 CHECK_APERTURE_R : Lost in real kind=4 marguerite Aperture"
+             write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=4 marguerite aperture.", &
+                                   "Orbit: X=",X(1)," Y=",X(3)," Ap.: DX=",E%DX," DY=",E%DY," R1=",E%R(1)," R2=",E%R(2)
           ENDIF
        CASE(5) ! RACETRACK
           IF( (abs(x(1)-e%dx)) > (e%r(1)+e%x)                  &
@@ -568,7 +572,8 @@ CONTAINS
              
              xlost=0.0_dp
              xlost=x
-             messagelost="Se_status.f90 CHECK_APERTURE_R : Lost in real kind=5 racetrack Aperture"
+             write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=5 racetrack aperture.", &
+                                   "Orbit X=",X(1)," Y=",X(3)," Ap.: DX=",E%DX," DY=",E%DY," R1=",E%R(1)," R2=",E%R(2)
              
           ENDIF
 
@@ -1310,7 +1315,8 @@ subroutine set_s_b
 
   ALLOCATE(S_B(SECTOR_NMUL_MAX))
            DO I=1,SECTOR_NMUL_MAX
-             call nul_coef(S_B(I))
+             S_B(I)%firsttime = 1  ! skowron 2014.08: added this line
+             call nul_coef(S_B(I)) ! skowron 2014.08: nullifies pointers unless s_b(i).firsttime = -100, then deletes 
              call make_set_coef(S_B(I),I)
              S_B(I)%firsttime=0
           ENDDO

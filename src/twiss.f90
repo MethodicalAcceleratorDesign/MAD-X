@@ -1914,7 +1914,7 @@ SUBROUTINE twbttk(re,te)
   parameter(eps=1d-8,zero=0d0,one=1d0,two=2d0)
 
   double precision an, e1, e2, sk1
-  double precision syncint(5)
+  double precision syncint(5), beta, get_value
   
   !initialize
   wx0=zero
@@ -1946,21 +1946,13 @@ SUBROUTINE twbttk(re,te)
      e2 = e2 + an / two
   endif
 
-  !---- Synchrotron integrals before element.
-  ! if(.not.centre_bttk) then
-  !    curlyh = disp(1)**2 * (one + alfx**2) / betx  &
-  !         + two*disp(1)*disp(2)*alfx + disp(2)**2*betx
-  !    synch_1 = synch_1 + disp(1) * rhoinv * blen/two
-  !    synch_2 = synch_2 + rhoinv**2 * blen/two
-  !    synch_3 = synch_3 + abs(rhoinv**3) * blen/two
-  !    ! 2014-May-15  16:50:36  ghislain: added 
-  !    synch_4 = synch_4 + disp(1)*rhoinv*(rhoinv**2 + 2*sk1) * blen/two
-  !    synch_5 = synch_5 + curlyh * abs(rhoinv**3) * blen/two
-  ! endif
-
-  !---- Synchrotron integrals through element.    
+  !---- Synchrotron radiation integrals through bending magnets.    
   if(.not.centre_bttk .and. rhoinv .ne. 0.d0) then
-     call calcsyncint(rhoinv,blen,sk1,e1,e2,betx,alfx,disp(1),disp(2),syncint)
+     ! Note that calcsyncint expects dx and dpx as derivatives wrt deltap.
+     ! since MAD take disp(1) and disp(2) as derivatives wrt pt, they must be 
+     ! multiplied by beta before the call to calcsyncint.
+     beta = get_value('probe ','beta ')
+     call calcsyncint(rhoinv,blen,sk1,e1,e2,betx,alfx,disp(1)*beta,disp(2)*beta,syncint)
      synch_1 = synch_1 + syncint(1)
      synch_2 = synch_2 + syncint(2)
      synch_3 = synch_3 + syncint(3)
@@ -2097,18 +2089,6 @@ SUBROUTINE twbttk(re,te)
         enddo
      enddo
   endif
-
-  !---- Synchrotron integrals after element.
-  ! if(.not.centre_bttk) then
-  !    curlyh = disp(1)**2 * (one + alfx**2) / betx &
-  !         + two*disp(1)*disp(2)*alfx + disp(2)**2*betx
-  !    synch_1 = synch_1 + disp(1) * rhoinv * blen/two
-  !    synch_2 = synch_2 + rhoinv**2 * blen/two
-  !    synch_3 = synch_3 + abs(rhoinv**3) * blen/two
-  !    ! 2014-May-15  16:50:36  ghislain: added 
-  !    synch_4 = synch_4 + disp(1)*rhoinv*(rhoinv**2 + 2*sk1) * blen/two
-  !    synch_5 = synch_5 + curlyh * abs(rhoinv**3) * blen/two
-  ! endif
 
 end SUBROUTINE twbttk
 
@@ -6850,8 +6830,9 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   
   !---- Set-up some parameters
   !-- LD: 20.6.2014 (bvk=-1: not -V -> V but lag -> pi-lag)
+  !-- AL: 30.6.2014 (bvk=-1: z -> -z)
   if (bvk .eq. -one) then
-    lag = 0.5-lag
+    orbit(5) = -orbit(5);
   endif
 
   krf = 2*pi*freq*1d6/clight;
@@ -6992,6 +6973,11 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
      te(6,5,3) =  te(6,3,5);
      te(6,5,5) =  0.5 * (-krf * krf * vrf * sin(lag * twopi - krf * z) + krf * krf * krf * REAL(Sp1));
   endif
+
+  !-- AL: 30.6.2014 (bvk=-1: z -> -z)
+  if (bvk .eq. -one) then
+    orbit(5) = -orbit(5);
+  endif
   
   !---- centre option
   if(centre_cptk.or.centre_bttk) then
@@ -7027,6 +7013,14 @@ SUBROUTINE calcsyncint(rhoinv,blen,k1,e1,e2,betxi,alfxi,dxi,dpxi,I)
   !     k1 (double) gradient of element                                  *
   !     e1, e2 (double) pole face rotations at entrance and exit         *
   !     betxi, alfxi, dxi, dpxi (double) twiss parameters in x plane     *
+  !                                                                      *  
+  ! ATTENTION:                                                           *
+  ! because of the choice of canonical variables in MAD-X, (PT instead   *
+  ! of DELTAP) the internal dispersion and dispersion derivatives must   *
+  ! be multiplied by beta to match the functions quoted in litterature.  *
+  ! This subroutine expects the dispersion as quoted in litterature and  *
+  ! the calling routine must provide the dispersion and derivatives      *
+  ! accordingly!                                                         *
   !                                                                      *
   !     Output:                                                          *
   !     I(5) (double) contributions of element to the 5 synchrotron      *
@@ -7048,25 +7042,19 @@ SUBROUTINE calcsyncint(rhoinv,blen,k1,e1,e2,betxi,alfxi,dxi,dpxi,I)
   double precision :: I(5)
 
   ! local variables
-  double precision :: beta, dx2, gamx, dispaverage, curlyhaverage
+  double precision :: dx2, gamx, dispaverage, curlyhaverage
   double precision :: betx, alfx, dx, dpx
 
   complex*16 :: k2, k, kl
 
   integer :: get_option
-  double precision :: get_value
-
-  ! because of the choice of canonical variables in MAD-X, (PT instead of DELTAP)
-  ! the internal dispersion and dispersion derivatives must be multiplied by beta 
-  ! to match the functions quoted in litterature.
-  beta = get_value('probe ','beta ')
  
   betx = betxi
-  dx = dxi*beta
+  dx = dxi
 
   ! effect of poleface rotation
   alfx = alfxi - betxi*rhoinv*tan(e1) 
-  dpx = (dpxi + dxi*rhoinv*tan(e1))*beta
+  dpx = dpxi + dxi*rhoinv*tan(e1)
 
   gamx = (1+alfx**2)/betx
      
@@ -7100,7 +7088,7 @@ SUBROUTINE calcsyncint(rhoinv,blen,k1,e1,e2,betxi,alfxi,dxi,dpxi,I)
  
   if (get_option('debug ') .ne. 0) then
      print *, ' '
-     print *, 'Input:  beta = ', beta, 'rhoinv = ', rhoinv, 'k1 = ', k1, 'e1 =', e1, 'e2 = ', e2, 'blen = ', blen
+     print *, 'Input:  rhoinv = ', rhoinv, 'k1 = ', k1, 'e1 =', e1, 'e2 = ', e2, 'blen = ', blen
      print *, '        betxi = ', betxi, 'alfxi = ', alfxi, 'dxi = ', dxi, 'dpxi = ', dpxi
      print *, ' --> '
      print *, '        k2 = ', k2, '  k = ', k, 'k*l = ', kl 

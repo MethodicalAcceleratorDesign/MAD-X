@@ -2,21 +2,22 @@
 setlocal
 
 REM run:
-REM scripts/build-test-win.bat [noecho] [cleanall]
+REM scripts/build-test-win.bat [noecho] [cleanall] [notest]
 
 REM commands
-set CAT=c:\gnuwin32\bin\cat
-set DATE=c:\gnuwin32\bin\date
-set ECHO=c:\gnuwin32\bin\echo
-set TEE=c:\gnuwin32\bin\tee
-set LS=c:\gnuwin32\bin\ls
-set MAKE=c:\gnuwin32\bin\make
-set RM=c:\gnuwin32\bin\rm
-set UNAME=c:\gnuwin32\bin\uname
-set SCP=c:\msys\bin\scp
-set GCC=c:\mingw64\bin\gcc
-set GCXX=c:\mingw64\bin\g++
-set GFC=c:\mingw64\bin\gfortran
+set CAT="c:\gnuwin32\bin\cat"
+set DATE="c:\gnuwin32\bin\date"
+set ECHO="c:\gnuwin32\bin\echo"
+set TEE="c:\gnuwin32\bin\tee"
+set LS="c:\gnuwin32\bin\ls"
+set MAKE="c:\gnuwin32\bin\make"
+set RM="c:\gnuwin32\bin\rm"
+set UNAME="c:\gnuwin32\bin\uname"
+set SCP="c:\msys\bin\scp"
+set GCC="c:\mingw64\bin\gcc"
+set GCXX="c:\mingw64\bin\g++"
+set GFC="c:\mingw64\bin\gfortran"
+set SVN="c:\Program Files\TortoiseSVN\bin\svn"
 
 REM settings
 set SSHRSA="c:/users/mad/.ssh/id_rsa"
@@ -41,8 +42,13 @@ if "%1"=="noecho" shift
 %uname% -m -n -r -s
 
 %echo% -e "\n===== SVN update ====="
-"c:\Program Files\TortoiseSVN\bin\svn" update
-if ERRORLEVEL 1 %echo% "ERROR: svn update failed" && exit /B 1
+%svn% update
+if ERRORLEVEL 1 (
+	%echo% -e "\n===== SVN cleanup & update ====="
+	%svn% cleanup
+	%svn% update
+	%echo% "ERROR: svn update failed" && exit /B 1
+)
 
 %echo% -e "\n===== Release number ====="
 %cat% VERSION
@@ -50,6 +56,7 @@ if ERRORLEVEL 1 %echo% "ERROR: svn update failed" && exit /B 1
 %echo% -e "\n===== Clean build ====="
 if "%1"=="cleanall" (
 REM cleanall not supported on windows (relies on find)
+  shift
   %make% cleanbuild
 ) else (
   %echo% "Skipped (no explicit request)."
@@ -79,23 +86,32 @@ if ERRORLEVEL 1 %echo% "ERROR: make infobindep failed" && exit /B 1
 %make% cleantest && %make% infotestdep
 if ERRORLEVEL 1 %echo% "ERROR: make infotestdep failed" && exit /B 1
 
-%echo% -e "\n===== Testing madx-win64-intel ====="
-%make% madx-win64-intel && %ls% -l madx-win64-intel.exe madx64.exe && %make% cleantest && %make% tests-all ARCH=64 NOCOLOR=yes
-if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win64-intel failed" && exit /B 1
+%echo% -e "\n===== Running tests (long) ====="
+if "%1"=="notest" (
+	shift
+    %echo% "Skipped (explicit request)."
+) else (
+	%echo% ""
 
-%echo% -e "\n===== Testing madx-win32-intel ====="
-%make% madx-win32-intel && %ls% -l madx-win32-intel.exe madx32.exe && %make% cleantest && %make% tests-all ARCH=32 NOCOLOR=yes
-if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win32-intel failed" && exit /B 1
+	%echo% -e "\n===== Testing madx-win64-intel ====="
+	%make% madx-win64-intel && %ls% -l madx-win64-intel.exe madx64.exe && %make% cleantest && %make% tests-all ARCH=64 NOCOLOR=yes
+	if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win64-intel failed" && exit /B 1
 
-%echo% -e "\n===== Testing madx-win64-gnu ====="
-set GFORTRAN_UNBUFFERED_PRECONNECTED=y
-%make% madx-win64-gnu && %ls% -l madx-win64-gnu.exe madx64.exe && %make% cleantest && %make% tests-all ARCH=64 NOCOLOR=yes
-if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win64-intel failed" && exit /B 1
+	%echo% -e "\n===== Testing madx-win32-intel ====="
+	%make% madx-win32-intel && %ls% -l madx-win32-intel.exe madx32.exe && %make% cleantest && %make% tests-all ARCH=32 NOCOLOR=yes
+	if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win32-intel failed" && exit /B 1
 
-REM restore the default version
-%make% madx-win32 > tmp.out && %make% madx-win64 > tmp.out && %rm% -f tmp.out
-if ERRORLEVEL 1 %echo% "ERROR: unable to restore the default version" && exit /B 1
+	%echo% -e "\n===== Testing madx-win64-gnu ====="
+	set GFORTRAN_UNBUFFERED_PRECONNECTED=y
+	%make% madx-win64-gnu && %ls% -l madx-win64-gnu.exe madx64.exe && %make% cleantest && %make% tests-all ARCH=64 NOCOLOR=yes
+	if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win64-intel failed" && exit /B 1
+
+	REM restore the default version
+	%make% madx-win32 > tmp.out && %make% madx-win64 > tmp.out && %rm% -f tmp.out
+	if ERRORLEVEL 1 %echo% "ERROR: unable to restore the default version" && exit /B 1
+)
 
 REM date & end marker
+%echo% -e "\nFinish:"
 %date%
 %echo% -e "\n===== End of build and tests ====="

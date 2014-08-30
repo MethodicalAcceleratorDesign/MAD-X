@@ -1,0 +1,90 @@
+%%%\title{SIXTRACK Convertor}
+%  Changed by: Mark HAYES, 19-Sep-2002 
+
+
+\chapter{Conversion to \textit{SixTrack}}
+\label{chap:sixtrack}
+
+This module produces input files for tracking in \textit{SixTrack}.
+
+In dynamic aperture studies \textit{SixTrack}\cite{SixTrack} is often
+used because of its  speed and controllability. However the input files
+are notoriously difficult to produce by hand. This command may be used
+to produce \textit{SixTrack} input files from a sequence loaded in \madx.
+
+\madbox{
+SIXTRACK, \=CAVALL=logical, MULT\_AUTO\_OFF=logical, MAX\_MULT\_ORD=integer, \\
+          \>SPLIT=logical, APERTURE=logical, RADIUS=real;
+}
+ 
+The parameters are defined as: 
+\begin{madlist}
+   \ttitem{CAVALL} (optional flag) This puts a cavity element
+   (\textit{SixTrack} identifier 12) with Volt, Harmonic Number and Lag
+   attributes at each location in the machine. Since for large hadron
+   machines the cavities are typically all located at one particular
+   spot in the machine and since many cavities slow down the tracking
+   simulations considerably all cavities are lumped into one and located
+   at the first appearance of a cavity. This default is enforced by
+   omitting this flag.  
+
+   \ttitem{MULT\_AUTO\_OFF} (optional flag, default = FALSE) If
+   TRUE, this module does not process zero value multipoles. 
+   Moreover, multipoles are prepared by \texttt{SIXTRACK}
+   (output file fc.3) to be treated up to the order as specified with
+   {\tt MAX\_MULT\_ORD}.  
+
+   \ttitem {MAX\_MULT\_ORD} (optional parameter, default = 11) Process up
+   to this order for {\tt MULT\_AUTO\_OFF = TRUE}.  
+
+   \ttitem{SPLIT} (optional flag) OBSOLETE. This splits all the
+   elements in  two. This is for backward compatibilty only. The user
+   should now use the \hyperref[chap:makethin]{\tt MAKETHIN} command
+   instead.   
+
+   \ttitem{APERTURE} (optional flag) flag to convert the apertures
+   from \madx to \textit{SixTrack}, so \textit{SixTrack} will track
+   with aperture.   
+
+   \ttitem{RADIUS} (optional, default value is 1~m). This sets the
+   reference  radius for the magnets. This argument is optional but
+   should normally be set.  
+\end{madlist}
+
+{\bf Important Notes:}
+\begin{itemize} 
+\item The files contain all information concerning optics, field errors
+ and misalignments. Hence these should all be set and a   
+\madxmp{TWISS, SAVE;}
+command should always be issued before calling the {\tt SIXTRACK} command.
+
+\item The \hyperref[sec:bvflag]{BV flag} is presently ignored by {\tt SIXTRACK}.
+
+\item \textit{SixTrack} and the \madx command {\tt SIXTRACK} are
+  presently set up for names of a maximum of 16 characters!!!!! 
+  Therefore, it is mandatory to respect this limit for \madx names.
+\end{itemize}
+
+
+
+The {\tt SIXTRACK} command always produces at least one output file: 
+\begin{itemize}
+   \item  fc.2 -  the basic structure of the lattice. 
+\end{itemize} 
+It may also produce any or all of the following files, depending on the
+sequence:
+\begin{itemize}
+   \item  fc.3 -   multipole mask(s). 
+   \item  fc.3.aux -  various beam parameters. 
+   \item  fc.8 -   misalignments and tilts. 
+   \item  fc.16 -  field errors and/or combined multipole kicks. 
+   \item  fc.34 -  various optics parameters at various
+     locations \\ This file is not needed by \textit{SixTrack} but may
+     be used as input to the program \textit{SODD}\cite{SODD}.)   
+\end{itemize}  
+
+For a full description of these files, see the \textit{SixTrack} user
+manual\cite{SixTrack}; and for information on running {\textit SixTrack} 
+see the \textit{SixTrack} run environment description\cite{SixTrack_RE}.
+
+%% EOF

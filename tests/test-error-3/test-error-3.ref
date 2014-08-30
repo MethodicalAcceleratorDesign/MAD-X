@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.01  (64 bit, Darwin)      +
+  +    MAD-X 5.02.02  (64 bit, Darwin)      +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.04.25      +
-  + Execution Time Stamp: 18.06.14 16.16.57 +
+  + Code Modification Date: 2014.07.01      +
+  + Execution Time Stamp: 01.07.14 14.21.40 +
   +++++++++++++++++++++++++++++++++++++++++++
 Title, "Compiling Optics for the LHC 6.5 lattice with MADX";
 
@@ -24,6 +24,7 @@ endedit;
 ++++++ info: seqedit - number of elements installed:  0
 ++++++ info: seqedit - number of elements moved:      0
 ++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   0
                                                                                                      
 
 !+++++++++++++++++++++++++ Step 1 +++++++++++++++++++++++
@@ -122,5 +123,5 @@ Esave, file=err.file.out;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.01 (64 bit) finished normally +
+  + MAD-X 5.02.02 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

@@ -156,7 +156,7 @@ module bbfi
   implicit none
   public
   integer bbd_max
-  parameter(bbd_max=2000)
+  parameter(bbd_max=100000)
   integer :: bbd_loc(bbd_max)=0,bbd_cnt=0,bbd_flag=0,bbd_pos=0
   double precision :: bb_kick(2,bbd_max)=0.d0
 end module bbfi

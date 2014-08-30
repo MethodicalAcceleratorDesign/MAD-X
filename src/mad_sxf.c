@@ -767,11 +767,8 @@ void
 get_sxf_names(void)
   /* reads and stores names for SXF I/O from madxl.h */
 {
-  int i = 0;
-  while (sxf_table_names[i][0] != ' ')
-  {
-    add_to_name_list(sxf_table_names[i++], 0, sxf_list);
-  }
+  for (int i=0; sxf_table_names[i][0] != ' '; i++)
+    add_to_name_list(sxf_table_names[i], 0, sxf_list);
 }
 
 void

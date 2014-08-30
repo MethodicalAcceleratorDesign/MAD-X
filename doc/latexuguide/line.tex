@@ -1,0 +1,244 @@
+%%\title{LINE}
+%  Changed by: Chris ISELIN, 27-Jan-1997 
+%  Changed by: Hans Grote, 11-Jun-2002 
+
+
+\chapter{Beam Lines}
+\label{chap:beamlines}
+
+The accelerator to be studied is known to \madx either as a sequence of
+physical elements called \href{sequence.html}{sequence}, or as a
+hierarchically structured list of elements called a \emph{beam line}. 
+A beam line is built from simpler beam lines whose definitions can be
+nested to any level. A powerful syntax allows to repeat, to reflect, or
+to replace pieces of beam lines. However, internally \madx knows only
+sequences, and lines as shown below are converted into flat sequences
+with the same name when they are expanded. Consequently, only sequences
+can be SAVEd onto a file.
+
+Formally a beam line is defined by a LINE command: 
+\madbox{
+label( arg {,arg} ): LINE=( member {,member} );
+}
+\href{label.html}{Label} gives a name to the beam line for later reference. 
+
+The formal argument list (arg\{,arg\}) is optional (see below). Each
+"member" may be one of the following:  
+\begin{itemize}
+\item  Element label, 
+\item  Beam line label, 
+\item  Sub-line, enclosed in parentheses, 
+\item  Formal argument name, 
+\item  Replacement list label. 
+\end{itemize} 
+
+Beam lines may be nested to any level (see \ref{sec:sublines})  
+
+
+{\bf Warning:}\\
+\madx has been developped using sequences and machine description using
+beamlines was kept to a minimal extent to keep backward compatibility
+but also because it is often easier to start from beamlines when
+designing an accelerator from scratch.   
+But since \madx works only with sequences internally, there may exist
+some inconveniences when only beamlines are defined by the user. It is
+therefore recommended to convert beamlines into sequences (e.g. by means
+of the \texttt{SAVE} command) as soon as possible lines in the design
+phase and to use only sequences for a finalised machine.     
+
+Attempting to do sequence edition on a sequence that has
+been expanded in memory from a beam line specified by the user is
+strongly discouraged.
+
+\section{Simple Beam Lines} 
+\label{sec:beamline}
+The simplest beam line consists of single elements: 
+\madbox{
+label: LINE= ( member \{,member\} );
+}
+Example: 
+\madxmp{
+exmp1: \=LINE=(a,b,c,d,a,d); \\
+USE,   \>PERIOD=exmp1;
+}
+
+The \texttt{USE} command causes \madx to load and expand the specified
+beamline. This in particular loads the beamline as a SEQUENCE
+representation in memory. All subsequent calculations are done on this
+sequence in memory.  
+
+\section{Nested Beam Lines}
+\label{sec:sublines}
+
+Instead of referring to an element, a beam line member can refer to
+another beam line defined in a separate command. This provides a
+shorthand notation for sub-lines or nested beam lines which can occur
+several times in a beam line. 
+Lines and sub-lines can be entered in any order, but when a line is
+expanded, all its sub-lines must be known.   
+
+Example: 
+\madxmp{
+top: \=LINE=(a,b,S,b,a,S,a,b); \\
+S:   \>LINE=(c,d,e); \\
+USE, \>PERIOD=top;
+}
+produces the following expansion steps: 
+\begin{enumerate}
+  \item Replace sub-line S: 
+    \madxmp{(a, b, (c,d,e), b, a, (c,d,e), a, b)}
+  \item Omit parentheses: 
+    \madxmp{a, b, c, d, e, b, a, c, d, e, a, b}
+\end{enumerate}
+
+\section{Reflection and Repetition} 
+\label{sec:reflect_repeat_lines}
+An unsigned repetition count and an asterisk (multiplication sign)
+indicate repetition of a beam line member. 
+A repetition count can be applied to sub-lines as well as elements. 
+
+A minus prefix causes reflection, i.e. all elements in the sub-line are
+taken in reverse order. Sub-lines of reflected lines are also reflected.
+Physical elements are not reflected head-to-tail, hence a negative
+repetition count for a single element is treated as positive. 
+
+If both reflection and repetition are desired, the minus sign must
+precede the repetition count.  
+
+Example: 
+\madxmp{
+xxxxx\= \kill
+R:   \>LINE= (g, h); \\
+S:   \>LINE= (c, R, d); \\
+top: \>LINE= (2*S, 2*(e,f), -S, -(a,b), -2*c); \\
+USE, \>PERIOD=top;
+}
+produces the following expansion steps:
+\begin{enumerate}
+  \item Replace sub-line S: 
+    \madxmp{( (c,R,d), (c,R,d), (e,f), (e,f), (d,-R,c), (b,a), c, c)}
+  \item Replace sub-line R: 
+    \madxmp{( (c, (g,h), d), (c, (g,h), d), (e,f), (e,f), (d, (h,g), c),
+      (b,a), c, c)}
+  \item Omit parentheses: 
+    \madxmp{c, g, h, d, c, g, h, d, e, f, e, f, d, h, g, c, b, a, c, c}
+\end{enumerate}
+
+Note that the inner sub-line \texttt{R} is reflected together with the
+outer sub-line \texttt{S}.
+
+Note also that \texttt{-2*c} at the end of the \texttt{top} line is
+equivalent to \texttt{2*c} since single elements are not reflected, or
+\texttt{2*(c)} which would first promote \texttt{c} as a sub-line of a
+single element, or \texttt{-2*(c)} since reverting a sub-line of a
+single element gives the same single element.  
+
+%% Fixed in r4932, a single element can now be repeated. 2*S and -2*S
+%% are of course identical, and also equivalent to 2*(S) and -2*(S) if S
+%% is a single element.
+%%{\bf Attention:} the repetition \texttt{2*S} only works if \texttt{S} is
+%%itself a line. If \texttt{S} is a single element, the repetition syntax
+%%should be \texttt{2*(S)}. 
+ 
+
+
+\section{Replaceable Arguments}
+\label{sec:repl_args}
+
+A beam line definition may contain a formal argument list, consisting of
+labels separated by commas and enclosed in parentheses. 
+
+\madbox{
+label( arg \{,arg\} ): LINE= ( member \{,member\} );
+}
+where \texttt{member} can be one of the \texttt{arg} arguments.
+
+A beam line defined with arguments can be expanded for different values
+of its arguments.  
+The arguments can be beam lines or element names. The number of actual
+arguments given at time of use must agree with the number of formal
+arguments defined at declaration time. All occurrences of a formal
+argument on the right-hand side of the line definition are replaced by
+the corresponding actual argument.  
+
+Example:
+\madxmp{
+fodo(Q1,Q2): \=LINE=(Q1, d, Q2, d);\\
+top: \> LINE = ( fodo(qf12, qd23), fodo(qd34,qf45) );\\
+USE, PERIOD=top;
+}
+expands to 
+\madxmp{qf12, d, qd23, d, qd34, d, qf45, d}
+
+Example showing that arguments can also be beam lines:
+\madxmp{
+xxxxxxxx\= \kill
+s:        \>LINE = (a,b,c); \\
+l(x,y):   \>LINE = (d,x,e,3*y); \\
+l4f:      \>LINE = (4*f); \\
+lm2s:     \>LINE = (-2*s); \\
+res:      \>LINE = l(l4f,lm2s); \\
+}
+
+Proceeding step by step, this example generates the expansion 
+\madxmp{d, f, f, f, f, e, c, b, a, c, b, a, c, b, a, c, b, a, c, b, a, c, b, a}
+
+
+\section{Limits of Construction of Beam Lines}  
+
+Since Lines are in fact depreciated there are some limits of how they
+can be constructed. Please find below a running \madx run which shows an
+example of OK (valid) and WRONG (invalid) cases.   
+
+\begin{verbatim}
+!----------------------------------------------------------------------
+beam, PARTICLE=electron, energy=1;
+
+qf: QUADRUPOLE, L:=1,K1:=1;
+qd: QUADRUPOLE, L:=1,K1:=-1;
+d: DRIFT, l=1;
+m: MARKER;
+
+rpl(a,b): LINE=(a,b);
+sl: LINE=(qf,d,qd);
+test0: LINE=(rpl(sl,sl));          !OK 
+test1: LINE=(rpl((sl),(sl)));      !OK
+test2: LINE=(rpl((sl),(-sl)));     !OK
+test3: LINE=(sl,-sl);              !OK
+
+test4: LINE=(rpl((3*sl),(3*sl)));  ! WRONG
+
+test5: LINE=(3*sl,3*sl);           !OK
+
+test6: LINE=(rpl((3*sl),(-3*sl))); ! WRONG
+
+test7: LINE=(3*sl,-3*sl);          !OK
+
+use, period=test0;
+twiss,BETX=1,bety=1;
+
+use, period=test1;
+twiss,BETX=1,bety=1;
+
+use, period=test2;
+twiss,BETX=1,bety=1;
+
+use, period=test3;
+twiss,BETX=1,bety=1;
+
+use, period=test4;
+twiss,BETX=1,bety=1;
+
+use, period=test5;
+twiss,BETX=1,bety=1;
+
+use, period=test6;
+twiss,BETX=1,bety=1;
+
+use, period=test7;
+twiss,BETX=1,bety=1;
+!----------------------------------------------------------------------
+\end{verbatim}
+
+%\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg}, June 17, 2002 
+

@@ -166,6 +166,7 @@ CONTAINS
     character(name_len) aptype
     type(keywords) key
     character(20)       keymod0,keymod1
+    character(1024)     msg ! warning message buffer
     character(name_len) magnet_name
     logical(lp)         exact0,no_cavity_totalpath
     integer             exact1
@@ -408,6 +409,13 @@ CONTAINS
     errors_out = get_value('ptc_create_layout ','errors_out ').ne.0
     magnet_name=" "
     if(errors_out) mg = get_string('ptc_create_layout ','magnet_name ',magnet_name)
+    
+    ! it is safe for MADX because default for all magnets is 1m
+    ! so if user defines it otherwise it means it knows what he is doing
+    absolute_aperture = 1e6_dp
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!!  ELEMENTS LOOP    !!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 10  continue
     nst1=node_value("nst ")
@@ -483,12 +491,16 @@ CONTAINS
     key%list%kill_ent_fringe=node_value("kill_ent_fringe ") .ne. zero
     key%list%kill_exi_fringe=node_value("kill_exi_fringe ") .ne. zero
     key%list%bend_fringe=node_value("bend_fringe ") .ne. zero
-
+    
     nn=name_len
     call node_string('apertype ',aptype,nn)
     call dzero(aperture,maxnaper)
     call get_node_vector('aperture ',nn,aperture)
+    !print*, name,' Got for aperture nn=',nn, aperture(1), aperture(2) 
+    
     if(.not.((aptype.eq."circle".and.aperture(1).eq.zero).or.aptype.eq." ")) then
+       
+       
        c_%APERTURE_FLAG=.true.
        select case(aptype)
        case("circle")
@@ -530,6 +542,14 @@ CONTAINS
           print*,"General aperture not implemented"
           stop
        end select
+  !  else
+  !   if( .not. ((code.eq.1) .or. (code.eq.4)) ) then
+  !     write(*,'(a10,1x,a16,1x,a14,1x,6f10.6)') 'Aperture: ',aptype(1:16),'aperture pars:', aperture(1:6)
+  !     write(whymsg,*) 'Aperture: ',aptype,' at magnet ',name(:len_trim(name)),' not supported by PTC'       
+  !     call fort_warn('ptc_createlayout: ',whymsg(:len_trim(whymsg)))
+  !     
+  !   endif
+       
     endif
     call append_empty(my_ring)
     
@@ -708,7 +728,12 @@ CONTAINS
        tilt=node_value('tilt ')
        dum1=key%list%k(2)-normal_0123(1)
        dum2=key%list%ks(2)-skew_0123(1)
-
+       
+       !print*,'normal_0123', normal_0123
+       !print*,'skew_0123', skew_0123
+       !print*,'sk1 sk1s dum1 dum2'
+       !print*, sk1, sk1s, dum1, dum2
+       
        if(dum1.ne.zero.or.dum2.ne.zero) then                      !
           sk1= sk1 +dum1                                          !
           sk1s=sk1s+dum2                                          !
@@ -885,16 +910,21 @@ CONTAINS
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
        key%list%lag=node_value('lag ')*twopi
+
+       !print*,"RF frequency " , freq," Hz, lag ", key%list%lag, " [radian]"
+
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
        if(offset_deltap.ne.zero) then
+          
           default = getintstate()
           default=default+totalpath0
           call setintstate(default)
-          freq=freq*((gammatr2-gamma2)*offset_deltap/gammatr2/gamma2+one)
+          freq=freq*((gammatr2-gamma2)*offset_deltap/gammatr2/gamma2+one) !regular twiss values
+          
        endif
        key%list%freq0=freq
        key%list%n_bessel=node_value('n_bessel ')
-       key%list%harmon=one
+       key%list%harmon=one ! it is ignored by PTC because it does not know the circumference
        if(key%list%volt.ne.zero.and.key%list%freq0.ne.zero) icav=1
        !  case(11)
        !     key%magnet="elseparator"
@@ -908,6 +938,13 @@ CONTAINS
        else
           key%list%cavity_totalpath=1
        endif
+
+!       print*,"madx_ptc_module::input volt: ", key%list%volt, &
+!                                    " lag : ", key%list%lag, &
+!                                    " harm: ", key%list%harmon, &
+!                                    " freq: ", key%list%freq0 
+       
+       
     case(12)
        ! actually our SROT element
        key%magnet="CHANGEREF"
@@ -1071,9 +1108,17 @@ CONTAINS
           key%list%ks(i)=bvk*key%list%ks(i)
        enddo
 !    endif
-    call create_fibre(my_ring%end,key,EXCEPTION)
+    call create_fibre(my_ring%end,key,EXCEPTION) !in ../libs/ptc/src/Sp_keywords.f90 
 
     if(advance_node().ne.0)  goto 10
+    
+    
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!! END OF ELEMENTS LOOP    !!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
     if (getdebug() > 0) then
        print*,' Length of machine: ',l_machine
@@ -1121,17 +1166,31 @@ CONTAINS
     call setintstate(default)
 
     if(my_ring%HARMONIC_NUMBER>0) then
+       print*,"HARMONIC NUMBER defined in the ring: ", my_ring%HARMONIC_NUMBER
        call get_length(my_ring,l)
+
+       j=restart_sequ()
        p=>my_ring%start
+       
        do i=1,my_ring%n
           if(p%mag%kind==kind4) then
              if(p%mag%freq==zero) then
-                write(6,*) " Bullshitting in MADX with Cavities ",my_ring%HARMONIC_NUMBER
-                p%mag%freq=clight*my_ring%HARMONIC_NUMBER*BETA0/l
+                 
+                tempdp = node_value('harmon ')
+                 
+                p%mag%freq=clight*tempdp*BETA0/l
                 p%magp%freq=p%mag%freq
+                 
+                ! watch the msg buffer is 1024
+                write(msg,*) " Cavity ",p%mag%name," defined with harmonic number ",tempdp,". Using SUM(LD) as ring length: ", l, &
+                             " instead of real orbit length. Obtained freq. = ",p%mag%freq," Hz"
+	         
+                call fort_warn("ptc_input",msg(:len_trim(msg)))
+                icav=1
              endif
           endif
           p=>p%next
+          j = advance_node()
        enddo
     endif
 
@@ -2116,6 +2175,10 @@ CONTAINS
     END SELECT
 
     if (i==6) then
+       if (getdebug()>2) then
+         print*,"icav=",icav," my_ring%closed=",my_ring%closed," getenforce6D()=",getenforce6D()
+       endif
+       
        if ( (icav==0) .and. my_ring%closed .and. (getenforce6D() .eqv. .false.)) then
           default = default - delta0 - only_4d0 + NOCAVITY0
           call fort_warn('return mystate: ',' no cavity - dimensionality reduced 6 -> 5 and 1/2')
@@ -2274,9 +2337,9 @@ CONTAINS
                                      map_coor(9)=j(5)
                                      map_coor(10)=j(6)
                                      call vector_to_table_curr("map_table ", 'coef ', map_coor(1), i_map_coor)
-	                 write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:c_%npara)
-	                 coeffCode = 'c'//coeffCode(1:8)//CHAR(0)
-	                 call string_to_table_curr( 'map_table ', "name ", coeffCode );
+                  	                 write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:c_%npara)
+                  	                 coeffCode = 'c'//coeffCode(1:8)//CHAR(0)
+                  	                 call string_to_table_curr("map_table ", "name ", coeffCode);
                                      call augment_count("map_table ")
                                   endif
                                   !write(0,*) 'write coef', coef
@@ -2301,21 +2364,21 @@ CONTAINS
                                j(5)=i5
                                coef = y(i)%T.sub.j
                                if (coef.ne.zero) then
-                                  map_coor(1)=coef
-                                  map_coor(2)=i
-                                  map_coor(3)=c_%npara
-                                  map_coor(4)=no
-                                  map_coor(5)=j(1)
-                                  map_coor(6)=j(2)
-                                  map_coor(7)=j(3)
-                                  map_coor(8)=j(4)
-                                  map_coor(9)=j(5)
-                                  map_coor(10) = 0
-                                  call vector_to_table_curr("map_table ", 'coef ', map_coor(1), i_map_coor)
-	              write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:5),0   !anyway fixed above
-                                  coeffCode = 'c'//coeffCode(1:8)//CHAR(0)
-	              call string_to_table_curr( "map_table ", "name ", coeffCode );
-                                  call augment_count("map_table ")
+                                 map_coor(1)=coef
+                                 map_coor(2)=i
+                                 map_coor(3)=c_%npara
+                                 map_coor(4)=no
+                                 map_coor(5)=j(1)
+                                 map_coor(6)=j(2)
+                                 map_coor(7)=j(3)
+                                 map_coor(8)=j(4)
+                                 map_coor(9)=j(5)
+                                 map_coor(10) = 0
+                                 call vector_to_table_curr("map_table ", 'coef ', map_coor(1), i_map_coor)
+	                               write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:5),0   !anyway fixed above
+                                 coeffCode = 'c'//coeffCode(1:8)//CHAR(0)
+	                               call string_to_table_curr("map_table ", "name ", coeffCode);
+                                 call augment_count("map_table ")
                                endif
                             endif
                          enddo
@@ -2346,9 +2409,9 @@ CONTAINS
                                map_coor(9)=0
                                map_coor(10)=0
                                call vector_to_table_curr("map_table ", 'coef ', map_coor(1), i_map_coor)
-	           write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:4),0,0
+	                             write(coeffCode,'(i1,a1,6i1)') i,'_',j(1:4),0,0
                                coeffCode = 'c'//coeffCode(1:8)//CHAR(0)
-	           call string_to_table_curr( "map_table ", "name ", coeffCode );
+	                             call string_to_table_curr( "map_table ", "name ", coeffCode );
                                call augment_count("map_table ")
                             endif
                          endif

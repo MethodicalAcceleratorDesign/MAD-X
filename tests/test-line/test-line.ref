@@ -1,0 +1,135 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.02  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.07.04               +
+  + Execution date: 2014.08.18 20:01:23      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+Title, "test of line expansion in MAD-X"; 
+
+
+
+Option, echo, info, warn, debug;
+
+
+
+Beam;
+
+
+
+D1: drift, L=1;
+
+D2: drift, L=2;
+
+Q1: QUADRUPOLE, L=1;
+
+
+
+T1: LINE=(D1, 3*Q1, D2);
+
+Use, sequence=T1;
+
+   in get_node_pos: name: t1$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: t1$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: d1, pos: 5.000000e-01, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: d1, from: 0.000000e+00			  ---> final pos: 5.000000e-01 
+   in get_node_pos: name: q1, pos: 1.500000e+00, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: q1, from: 0.000000e+00			  ---> final pos: 1.500000e+00 
+   in get_node_pos: name: q1, pos: 2.500000e+00, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: q1, from: 0.000000e+00			  ---> final pos: 2.500000e+00 
+   in get_node_pos: name: q1, pos: 3.500000e+00, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: q1, from: 0.000000e+00			  ---> final pos: 3.500000e+00 
+   in get_node_pos: name: d2, pos: 5.000000e+00, fact: 0.000000e+00, length: 2.000000e+00, from_name: (null)
+	 in get_node_pos: name: d2, from: 0.000000e+00			  ---> final pos: 5.000000e+00 
+   in get_node_pos: name: t1$end, pos: 6.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: t1$end, from: 0.000000e+00			  ---> final pos: 6.000000e+00 
+
+
+TOP Expand_sequence name t1 with length 6.000000e+00, ref_flag 0
+Survey, sequence=T1;
+
+
+
+T2: LINE=(D1, -3*Q1, D2);
+
+Use, sequence=T2;
+
+   in get_node_pos: name: t2$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: t2$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: d1, pos: 5.000000e-01, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: d1, from: 0.000000e+00			  ---> final pos: 5.000000e-01 
+   in get_node_pos: name: q1, pos: 1.500000e+00, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: q1, from: 0.000000e+00			  ---> final pos: 1.500000e+00 
+   in get_node_pos: name: q1, pos: 2.500000e+00, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: q1, from: 0.000000e+00			  ---> final pos: 2.500000e+00 
+   in get_node_pos: name: q1, pos: 3.500000e+00, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: q1, from: 0.000000e+00			  ---> final pos: 3.500000e+00 
+   in get_node_pos: name: d2, pos: 5.000000e+00, fact: 0.000000e+00, length: 2.000000e+00, from_name: (null)
+	 in get_node_pos: name: d2, from: 0.000000e+00			  ---> final pos: 5.000000e+00 
+   in get_node_pos: name: t2$end, pos: 6.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: t2$end, from: 0.000000e+00			  ---> final pos: 6.000000e+00 
+
+
+TOP Expand_sequence name t2 with length 6.000000e+00, ref_flag 0
+Survey, sequence=T2;
+
+
+
+T3: LINE=(D1, 3*(Q1), D2);
+
+Use, sequence=T3;
+
+   in get_node_pos: name: t3$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: t3$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: d1, pos: 5.000000e-01, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: d1, from: 0.000000e+00			  ---> final pos: 5.000000e-01 
+   in get_node_pos: name: q1, pos: 1.500000e+00, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: q1, from: 0.000000e+00			  ---> final pos: 1.500000e+00 
+   in get_node_pos: name: q1, pos: 2.500000e+00, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: q1, from: 0.000000e+00			  ---> final pos: 2.500000e+00 
+   in get_node_pos: name: q1, pos: 3.500000e+00, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: q1, from: 0.000000e+00			  ---> final pos: 3.500000e+00 
+   in get_node_pos: name: d2, pos: 5.000000e+00, fact: 0.000000e+00, length: 2.000000e+00, from_name: (null)
+	 in get_node_pos: name: d2, from: 0.000000e+00			  ---> final pos: 5.000000e+00 
+   in get_node_pos: name: t3$end, pos: 6.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: t3$end, from: 0.000000e+00			  ---> final pos: 6.000000e+00 
+
+
+TOP Expand_sequence name t3 with length 6.000000e+00, ref_flag 0
+Survey, sequence=T3;
+
+
+
+T4: LINE=(D1, -3*(Q1), D2);
+
+Use, sequence=T4;
+
+   in get_node_pos: name: t4$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: t4$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: d1, pos: 5.000000e-01, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: d1, from: 0.000000e+00			  ---> final pos: 5.000000e-01 
+   in get_node_pos: name: q1, pos: 1.500000e+00, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: q1, from: 0.000000e+00			  ---> final pos: 1.500000e+00 
+   in get_node_pos: name: q1, pos: 2.500000e+00, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: q1, from: 0.000000e+00			  ---> final pos: 2.500000e+00 
+   in get_node_pos: name: q1, pos: 3.500000e+00, fact: 0.000000e+00, length: 1.000000e+00, from_name: (null)
+	 in get_node_pos: name: q1, from: 0.000000e+00			  ---> final pos: 3.500000e+00 
+   in get_node_pos: name: d2, pos: 5.000000e+00, fact: 0.000000e+00, length: 2.000000e+00, from_name: (null)
+	 in get_node_pos: name: d2, from: 0.000000e+00			  ---> final pos: 5.000000e+00 
+   in get_node_pos: name: t4$end, pos: 6.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: t4$end, from: 0.000000e+00			  ---> final pos: 6.000000e+00 
+
+
+TOP Expand_sequence name t4 with length 6.000000e+00, ref_flag 0
+Survey, sequence=T4;
+
+
+
+Exit;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.02.02 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

@@ -1,0 +1,369 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.02.02  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2014.07.01      +
+  + Execution Time Stamp: 01.07.14 16.21.27 +
+  +++++++++++++++++++++++++++++++++++++++++++
+Title, "test sequence manipulations";
+
+
+
+Option, warn, echo, info;
+
+
+
+Option, -echo;
+
+++++++ info: brho redefined
+
+
+b1: BEAM,PARTICLE=PROTON;
+
+
+
+Pc        := 26; !  GeV/c
+
+++++++ info: pc redefined
+
+
+Beam, particle = proton, pc = Pc, BUNCHED;
+
+
+
+use, sequence = PS;
+
+
+
+aa: HKICKER, KICK:=0.000904455;
+
+
+
+Option, debug; 
+
+
+
+SEQEDIT,SEQUENCE=PR.BHT000001;
+
+   in get_node_pos: name: pr.bht000001$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: pr.bht000001.c1, pos: 1.492863e-01, fact: 0.000000e+00, length: 2.985727e-01, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.c1, from: 0.000000e+00			  ---> final pos: 1.492863e-01 
+   in get_node_pos: name: pr.bht000001.corr1, pos: 2.985726e-01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.corr1, from: 0.000000e+00			  ---> final pos: 2.985726e-01 
+   in get_node_pos: name: pr.bht000001.mpfi1, pos: 2.985726e-01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpfi1, from: 0.000000e+00			  ---> final pos: 2.985726e-01 
+   in get_node_pos: name: pr.bht000001.finff1, pos: 8.476326e-01, fact: 0.000000e+00, length: 1.098120e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.finff1, from: 0.000000e+00			  ---> final pos: 8.476326e-01 
+   in get_node_pos: name: pr.bht000001.corr2, pos: 1.396693e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.corr2, from: 0.000000e+00			  ---> final pos: 1.396693e+00 
+   in get_node_pos: name: pr.bht000001.mpfm, pos: 1.396693e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpfm, from: 0.000000e+00			  ---> final pos: 1.396693e+00 
+   in get_node_pos: name: pr.bht000001.finff2, pos: 1.945753e+00, fact: 0.000000e+00, length: 1.098120e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.finff2, from: 0.000000e+00			  ---> final pos: 1.945753e+00 
+   in get_node_pos: name: pr.bht000001.mpfi2, pos: 2.494813e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpfi2, from: 0.000000e+00			  ---> final pos: 2.494813e+00 
+   in get_node_pos: name: pr.bht000001.j1, pos: 2.496063e+00, fact: 0.000000e+00, length: 2.500000e-03, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.j1, from: 0.000000e+00			  ---> final pos: 2.496063e+00 
+   in get_node_pos: name: pr.bht000001.corr3, pos: 2.497313e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.corr3, from: 0.000000e+00			  ---> final pos: 2.497313e+00 
+   in get_node_pos: name: pr.bht000001.j2, pos: 2.498563e+00, fact: 0.000000e+00, length: 2.500000e-03, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.j2, from: 0.000000e+00			  ---> final pos: 2.498563e+00 
+   in get_node_pos: name: pr.bht000001.mpdi1, pos: 2.499813e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpdi1, from: 0.000000e+00			  ---> final pos: 2.499813e+00 
+   in get_node_pos: name: pr.bht000001.dindd1, pos: 3.051013e+00, fact: 0.000000e+00, length: 1.102400e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.dindd1, from: 0.000000e+00			  ---> final pos: 3.051013e+00 
+   in get_node_pos: name: pr.bht000001.corr4, pos: 3.602213e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.corr4, from: 0.000000e+00			  ---> final pos: 3.602213e+00 
+   in get_node_pos: name: pr.bht000001.mpdm, pos: 3.602213e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpdm, from: 0.000000e+00			  ---> final pos: 3.602213e+00 
+   in get_node_pos: name: pr.bht000001.dindd2, pos: 4.153413e+00, fact: 0.000000e+00, length: 1.102400e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.dindd2, from: 0.000000e+00			  ---> final pos: 4.153413e+00 
+   in get_node_pos: name: pr.bht000001.corr5, pos: 4.704613e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.corr5, from: 0.000000e+00			  ---> final pos: 4.704613e+00 
+   in get_node_pos: name: pr.bht000001.mpdi2, pos: 4.704613e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpdi2, from: 0.000000e+00			  ---> final pos: 4.704613e+00 
+   in get_node_pos: name: pr.bht000001.c2, pos: 4.853899e+00, fact: 0.000000e+00, length: 2.985727e-01, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.c2, from: 0.000000e+00			  ---> final pos: 4.853899e+00 
+   in get_node_pos: name: pr.bht000001$end, pos: 5.003185e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001$end, from: 0.000000e+00			  ---> final pos: 5.003185e+00 
+ FLATTEN;
+
+   in get_node_pos: name: pr.bht000001$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: pr.bht000001.c1, pos: 1.492863e-01, fact: 0.000000e+00, length: 2.985727e-01, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.c1, from: 0.000000e+00			  ---> final pos: 1.492863e-01 
+   in get_node_pos: name: pr.bht000001.corr1, pos: 2.985726e-01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.corr1, from: 0.000000e+00			  ---> final pos: 2.985726e-01 
+   in get_node_pos: name: pr.bht000001.mpfi1, pos: 2.985726e-01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpfi1, from: 0.000000e+00			  ---> final pos: 2.985726e-01 
+   in get_node_pos: name: pr.bht000001.finff1, pos: 8.476326e-01, fact: 0.000000e+00, length: 1.098120e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.finff1, from: 0.000000e+00			  ---> final pos: 8.476326e-01 
+   in get_node_pos: name: pr.bht000001.corr2, pos: 1.396693e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.corr2, from: 0.000000e+00			  ---> final pos: 1.396693e+00 
+   in get_node_pos: name: pr.bht000001.mpfm, pos: 1.396693e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpfm, from: 0.000000e+00			  ---> final pos: 1.396693e+00 
+   in get_node_pos: name: pr.bht000001.finff2, pos: 1.945753e+00, fact: 0.000000e+00, length: 1.098120e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.finff2, from: 0.000000e+00			  ---> final pos: 1.945753e+00 
+   in get_node_pos: name: pr.bht000001.mpfi2, pos: 2.494813e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpfi2, from: 0.000000e+00			  ---> final pos: 2.494813e+00 
+   in get_node_pos: name: pr.bht000001.j1, pos: 2.496063e+00, fact: 0.000000e+00, length: 2.500000e-03, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.j1, from: 0.000000e+00			  ---> final pos: 2.496063e+00 
+   in get_node_pos: name: pr.bht000001.corr3, pos: 2.497313e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.corr3, from: 0.000000e+00			  ---> final pos: 2.497313e+00 
+   in get_node_pos: name: pr.bht000001.j2, pos: 2.498563e+00, fact: 0.000000e+00, length: 2.500000e-03, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.j2, from: 0.000000e+00			  ---> final pos: 2.498563e+00 
+   in get_node_pos: name: pr.bht000001.mpdi1, pos: 2.499813e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpdi1, from: 0.000000e+00			  ---> final pos: 2.499813e+00 
+   in get_node_pos: name: pr.bht000001.dindd1, pos: 3.051013e+00, fact: 0.000000e+00, length: 1.102400e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.dindd1, from: 0.000000e+00			  ---> final pos: 3.051013e+00 
+   in get_node_pos: name: pr.bht000001.corr4, pos: 3.602213e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.corr4, from: 0.000000e+00			  ---> final pos: 3.602213e+00 
+   in get_node_pos: name: pr.bht000001.mpdm, pos: 3.602213e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpdm, from: 0.000000e+00			  ---> final pos: 3.602213e+00 
+   in get_node_pos: name: pr.bht000001.dindd2, pos: 4.153413e+00, fact: 0.000000e+00, length: 1.102400e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.dindd2, from: 0.000000e+00			  ---> final pos: 4.153413e+00 
+   in get_node_pos: name: pr.bht000001.corr5, pos: 4.704613e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.corr5, from: 0.000000e+00			  ---> final pos: 4.704613e+00 
+   in get_node_pos: name: pr.bht000001.mpdi2, pos: 4.704613e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpdi2, from: 0.000000e+00			  ---> final pos: 4.704613e+00 
+   in get_node_pos: name: pr.bht000001.c2, pos: 4.853899e+00, fact: 0.000000e+00, length: 2.985727e-01, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.c2, from: 0.000000e+00			  ---> final pos: 4.853899e+00 
+   in get_node_pos: name: pr.bht000001$end, pos: 5.003185e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001$end, from: 0.000000e+00			  ---> final pos: 5.003185e+00 
+
+
+TOP Expand_sequence name pr.bht000001 with length 5.003185e+00, ref_flag 0
+ REPLACE, element=PR.BHT000001.corr3, by=aa;       
+
+ REMOVE, element=PR.BHT000001.corr1;
+
+ INSTALL, ELEMENT=aa, AT= 2.985726e-01, FROM=pr.bht000001$start;
+
+   in get_node_pos: name: pr.bht000001$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+ FLATTEN;
+
+   in get_node_pos: name: pr.bht000001$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: pr.bht000001.c1, pos: 1.492863e-01, fact: 0.000000e+00, length: 2.985727e-01, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.c1, from: 0.000000e+00			  ---> final pos: 1.492863e-01 
+   in get_node_pos: name: aa, pos: 2.985726e-01, fact: 0.000000e+00, length: 0.000000e+00, from_name: pr.bht000001$start
+   in get_node_pos: name: pr.bht000001$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+	 in get_node_pos: name: aa, from: 0.000000e+00			  ---> final pos: 2.985726e-01 
+   in get_node_pos: name: pr.bht000001.mpfi1, pos: 2.985726e-01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpfi1, from: 0.000000e+00			  ---> final pos: 2.985726e-01 
+   in get_node_pos: name: pr.bht000001.finff1, pos: 8.476326e-01, fact: 0.000000e+00, length: 1.098120e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.finff1, from: 0.000000e+00			  ---> final pos: 8.476326e-01 
+   in get_node_pos: name: pr.bht000001.corr2, pos: 1.396693e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.corr2, from: 0.000000e+00			  ---> final pos: 1.396693e+00 
+   in get_node_pos: name: pr.bht000001.mpfm, pos: 1.396693e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpfm, from: 0.000000e+00			  ---> final pos: 1.396693e+00 
+   in get_node_pos: name: pr.bht000001.finff2, pos: 1.945753e+00, fact: 0.000000e+00, length: 1.098120e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.finff2, from: 0.000000e+00			  ---> final pos: 1.945753e+00 
+   in get_node_pos: name: pr.bht000001.mpfi2, pos: 2.494813e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpfi2, from: 0.000000e+00			  ---> final pos: 2.494813e+00 
+   in get_node_pos: name: pr.bht000001.j1, pos: 2.496063e+00, fact: 0.000000e+00, length: 2.500000e-03, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.j1, from: 0.000000e+00			  ---> final pos: 2.496063e+00 
+   in get_node_pos: name: aa, pos: 2.497313e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: aa, from: 0.000000e+00			  ---> final pos: 2.497313e+00 
+   in get_node_pos: name: pr.bht000001.j2, pos: 2.498563e+00, fact: 0.000000e+00, length: 2.500000e-03, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.j2, from: 0.000000e+00			  ---> final pos: 2.498563e+00 
+   in get_node_pos: name: pr.bht000001.mpdi1, pos: 2.499813e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpdi1, from: 0.000000e+00			  ---> final pos: 2.499813e+00 
+   in get_node_pos: name: pr.bht000001.dindd1, pos: 3.051013e+00, fact: 0.000000e+00, length: 1.102400e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.dindd1, from: 0.000000e+00			  ---> final pos: 3.051013e+00 
+   in get_node_pos: name: pr.bht000001.corr4, pos: 3.602213e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.corr4, from: 0.000000e+00			  ---> final pos: 3.602213e+00 
+   in get_node_pos: name: pr.bht000001.mpdm, pos: 3.602213e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpdm, from: 0.000000e+00			  ---> final pos: 3.602213e+00 
+   in get_node_pos: name: pr.bht000001.dindd2, pos: 4.153413e+00, fact: 0.000000e+00, length: 1.102400e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.dindd2, from: 0.000000e+00			  ---> final pos: 4.153413e+00 
+   in get_node_pos: name: pr.bht000001.corr5, pos: 4.704613e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.corr5, from: 0.000000e+00			  ---> final pos: 4.704613e+00 
+   in get_node_pos: name: pr.bht000001.mpdi2, pos: 4.704613e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpdi2, from: 0.000000e+00			  ---> final pos: 4.704613e+00 
+   in get_node_pos: name: pr.bht000001.c2, pos: 4.853899e+00, fact: 0.000000e+00, length: 2.985727e-01, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.c2, from: 0.000000e+00			  ---> final pos: 4.853899e+00 
+   in get_node_pos: name: pr.bht000001$end, pos: 5.003185e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001$end, from: 0.000000e+00			  ---> final pos: 5.003185e+00 
+
+
+TOP Expand_sequence name pr.bht000001 with length 5.003185e+00, ref_flag 0
+ENDEDIT;
+
+++++++ info: seqedit - number of elements installed:  1
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    1
+++++++ info: seqedit - number of elements replaced:   1
+
+
+USE, SEQUENCE=PR.BHT000001;
+
+   in get_node_pos: name: pr.bht000001$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: pr.bht000001.c1, pos: 1.492863e-01, fact: 0.000000e+00, length: 2.985727e-01, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.c1, from: 0.000000e+00			  ---> final pos: 1.492863e-01 
+   in get_node_pos: name: aa, pos: 2.985726e-01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: aa, from: 0.000000e+00			  ---> final pos: 2.985726e-01 
+   in get_node_pos: name: pr.bht000001.mpfi1, pos: 2.985726e-01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpfi1, from: 0.000000e+00			  ---> final pos: 2.985726e-01 
+   in get_node_pos: name: pr.bht000001.finff1, pos: 8.476326e-01, fact: 0.000000e+00, length: 1.098120e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.finff1, from: 0.000000e+00			  ---> final pos: 8.476326e-01 
+   in get_node_pos: name: pr.bht000001.corr2, pos: 1.396693e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.corr2, from: 0.000000e+00			  ---> final pos: 1.396693e+00 
+   in get_node_pos: name: pr.bht000001.mpfm, pos: 1.396693e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpfm, from: 0.000000e+00			  ---> final pos: 1.396693e+00 
+   in get_node_pos: name: pr.bht000001.finff2, pos: 1.945753e+00, fact: 0.000000e+00, length: 1.098120e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.finff2, from: 0.000000e+00			  ---> final pos: 1.945753e+00 
+   in get_node_pos: name: pr.bht000001.mpfi2, pos: 2.494813e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpfi2, from: 0.000000e+00			  ---> final pos: 2.494813e+00 
+   in get_node_pos: name: pr.bht000001.j1, pos: 2.496063e+00, fact: 0.000000e+00, length: 2.500000e-03, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.j1, from: 0.000000e+00			  ---> final pos: 2.496063e+00 
+   in get_node_pos: name: aa, pos: 2.497313e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: aa, from: 0.000000e+00			  ---> final pos: 2.497313e+00 
+   in get_node_pos: name: pr.bht000001.j2, pos: 2.498563e+00, fact: 0.000000e+00, length: 2.500000e-03, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.j2, from: 0.000000e+00			  ---> final pos: 2.498563e+00 
+   in get_node_pos: name: pr.bht000001.mpdi1, pos: 2.499813e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpdi1, from: 0.000000e+00			  ---> final pos: 2.499813e+00 
+   in get_node_pos: name: pr.bht000001.dindd1, pos: 3.051013e+00, fact: 0.000000e+00, length: 1.102400e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.dindd1, from: 0.000000e+00			  ---> final pos: 3.051013e+00 
+   in get_node_pos: name: pr.bht000001.corr4, pos: 3.602213e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.corr4, from: 0.000000e+00			  ---> final pos: 3.602213e+00 
+   in get_node_pos: name: pr.bht000001.mpdm, pos: 3.602213e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpdm, from: 0.000000e+00			  ---> final pos: 3.602213e+00 
+   in get_node_pos: name: pr.bht000001.dindd2, pos: 4.153413e+00, fact: 0.000000e+00, length: 1.102400e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.dindd2, from: 0.000000e+00			  ---> final pos: 4.153413e+00 
+   in get_node_pos: name: pr.bht000001.corr5, pos: 4.704613e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.corr5, from: 0.000000e+00			  ---> final pos: 4.704613e+00 
+   in get_node_pos: name: pr.bht000001.mpdi2, pos: 4.704613e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.mpdi2, from: 0.000000e+00			  ---> final pos: 4.704613e+00 
+   in get_node_pos: name: pr.bht000001.c2, pos: 4.853899e+00, fact: 0.000000e+00, length: 2.985727e-01, from_name: (null)
+	 in get_node_pos: name: pr.bht000001.c2, from: 0.000000e+00			  ---> final pos: 4.853899e+00 
+   in get_node_pos: name: pr.bht000001$end, pos: 5.003185e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000001$end, from: 0.000000e+00			  ---> final pos: 5.003185e+00 
+
+
+TOP Expand_sequence name pr.bht000001 with length 5.003185e+00, ref_flag 0
+
+
+select, flag=seqedit, class=HKICKER;
+
+
+
+PRorb: VKICKER,KICK:=0.000879422;
+
+
+
+SEQEDIT,SEQUENCE=PR.bht000009;
+
+   in get_node_pos: name: pr.bht000009$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: pr.bht000009.c1, pos: 1.492863e-01, fact: 0.000000e+00, length: 2.985727e-01, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.c1, from: 0.000000e+00			  ---> final pos: 1.492863e-01 
+   in get_node_pos: name: pr.bht000009.corr1, pos: 2.985726e-01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.corr1, from: 0.000000e+00			  ---> final pos: 2.985726e-01 
+   in get_node_pos: name: pr.bht000009.mpfi1, pos: 2.985726e-01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.mpfi1, from: 0.000000e+00			  ---> final pos: 2.985726e-01 
+   in get_node_pos: name: pr.bht000009.finff1, pos: 8.476326e-01, fact: 0.000000e+00, length: 1.098120e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.finff1, from: 0.000000e+00			  ---> final pos: 8.476326e-01 
+   in get_node_pos: name: pr.bht000009.corr2, pos: 1.396693e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.corr2, from: 0.000000e+00			  ---> final pos: 1.396693e+00 
+   in get_node_pos: name: pr.bht000009.mpfm, pos: 1.396693e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.mpfm, from: 0.000000e+00			  ---> final pos: 1.396693e+00 
+   in get_node_pos: name: pr.bht000009.finff2, pos: 1.945753e+00, fact: 0.000000e+00, length: 1.098120e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.finff2, from: 0.000000e+00			  ---> final pos: 1.945753e+00 
+   in get_node_pos: name: pr.bht000009.mpfi2, pos: 2.494813e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.mpfi2, from: 0.000000e+00			  ---> final pos: 2.494813e+00 
+   in get_node_pos: name: pr.bht000009.j1, pos: 2.496063e+00, fact: 0.000000e+00, length: 2.500000e-03, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.j1, from: 0.000000e+00			  ---> final pos: 2.496063e+00 
+   in get_node_pos: name: pr.bht000009.corr3, pos: 2.497313e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.corr3, from: 0.000000e+00			  ---> final pos: 2.497313e+00 
+   in get_node_pos: name: pr.bht000009.j2, pos: 2.498563e+00, fact: 0.000000e+00, length: 2.500000e-03, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.j2, from: 0.000000e+00			  ---> final pos: 2.498563e+00 
+   in get_node_pos: name: pr.bht000009.mpdi1, pos: 2.499813e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.mpdi1, from: 0.000000e+00			  ---> final pos: 2.499813e+00 
+   in get_node_pos: name: pr.bht000009.dindd1, pos: 3.051013e+00, fact: 0.000000e+00, length: 1.102400e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.dindd1, from: 0.000000e+00			  ---> final pos: 3.051013e+00 
+   in get_node_pos: name: pr.bht000009.corr4, pos: 3.602213e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.corr4, from: 0.000000e+00			  ---> final pos: 3.602213e+00 
+   in get_node_pos: name: pr.bht000009.mpdm, pos: 3.602213e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.mpdm, from: 0.000000e+00			  ---> final pos: 3.602213e+00 
+   in get_node_pos: name: pr.bht000009.dindd2, pos: 4.153413e+00, fact: 0.000000e+00, length: 1.102400e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.dindd2, from: 0.000000e+00			  ---> final pos: 4.153413e+00 
+   in get_node_pos: name: pr.bht000009.corr5, pos: 4.704613e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.corr5, from: 0.000000e+00			  ---> final pos: 4.704613e+00 
+   in get_node_pos: name: pr.bht000009.mpdi2, pos: 4.704613e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.mpdi2, from: 0.000000e+00			  ---> final pos: 4.704613e+00 
+   in get_node_pos: name: pr.bht000009.c2, pos: 4.853899e+00, fact: 0.000000e+00, length: 2.985727e-01, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.c2, from: 0.000000e+00			  ---> final pos: 4.853899e+00 
+   in get_node_pos: name: pr.bht000009$end, pos: 5.003185e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009$end, from: 0.000000e+00			  ---> final pos: 5.003185e+00 
+ REPLACE,ELEMENT=selected, BY= PRorb ; 
+
+ENDEDIT;
+
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   5
+
+
+USE, SEQUENCE=PR.bht000009;
+
+   in get_node_pos: name: pr.bht000009$start, pos: 0.000000e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009$start, from: 0.000000e+00			  ---> final pos: 0.000000e+00 
+   in get_node_pos: name: pr.bht000009.c1, pos: 1.492863e-01, fact: 0.000000e+00, length: 2.985727e-01, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.c1, from: 0.000000e+00			  ---> final pos: 1.492863e-01 
+   in get_node_pos: name: prorb, pos: 2.985726e-01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: prorb, from: 0.000000e+00			  ---> final pos: 2.985726e-01 
+   in get_node_pos: name: pr.bht000009.mpfi1, pos: 2.985726e-01, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.mpfi1, from: 0.000000e+00			  ---> final pos: 2.985726e-01 
+   in get_node_pos: name: pr.bht000009.finff1, pos: 8.476326e-01, fact: 0.000000e+00, length: 1.098120e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.finff1, from: 0.000000e+00			  ---> final pos: 8.476326e-01 
+   in get_node_pos: name: prorb, pos: 1.396693e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: prorb, from: 0.000000e+00			  ---> final pos: 1.396693e+00 
+   in get_node_pos: name: pr.bht000009.mpfm, pos: 1.396693e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.mpfm, from: 0.000000e+00			  ---> final pos: 1.396693e+00 
+   in get_node_pos: name: pr.bht000009.finff2, pos: 1.945753e+00, fact: 0.000000e+00, length: 1.098120e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.finff2, from: 0.000000e+00			  ---> final pos: 1.945753e+00 
+   in get_node_pos: name: pr.bht000009.mpfi2, pos: 2.494813e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.mpfi2, from: 0.000000e+00			  ---> final pos: 2.494813e+00 
+   in get_node_pos: name: pr.bht000009.j1, pos: 2.496063e+00, fact: 0.000000e+00, length: 2.500000e-03, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.j1, from: 0.000000e+00			  ---> final pos: 2.496063e+00 
+   in get_node_pos: name: prorb, pos: 2.497313e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: prorb, from: 0.000000e+00			  ---> final pos: 2.497313e+00 
+   in get_node_pos: name: pr.bht000009.j2, pos: 2.498563e+00, fact: 0.000000e+00, length: 2.500000e-03, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.j2, from: 0.000000e+00			  ---> final pos: 2.498563e+00 
+   in get_node_pos: name: pr.bht000009.mpdi1, pos: 2.499813e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.mpdi1, from: 0.000000e+00			  ---> final pos: 2.499813e+00 
+   in get_node_pos: name: pr.bht000009.dindd1, pos: 3.051013e+00, fact: 0.000000e+00, length: 1.102400e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.dindd1, from: 0.000000e+00			  ---> final pos: 3.051013e+00 
+   in get_node_pos: name: prorb, pos: 3.602213e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: prorb, from: 0.000000e+00			  ---> final pos: 3.602213e+00 
+   in get_node_pos: name: pr.bht000009.mpdm, pos: 3.602213e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.mpdm, from: 0.000000e+00			  ---> final pos: 3.602213e+00 
+   in get_node_pos: name: pr.bht000009.dindd2, pos: 4.153413e+00, fact: 0.000000e+00, length: 1.102400e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.dindd2, from: 0.000000e+00			  ---> final pos: 4.153413e+00 
+   in get_node_pos: name: prorb, pos: 4.704613e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: prorb, from: 0.000000e+00			  ---> final pos: 4.704613e+00 
+   in get_node_pos: name: pr.bht000009.mpdi2, pos: 4.704613e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.mpdi2, from: 0.000000e+00			  ---> final pos: 4.704613e+00 
+   in get_node_pos: name: pr.bht000009.c2, pos: 4.853899e+00, fact: 0.000000e+00, length: 2.985727e-01, from_name: (null)
+	 in get_node_pos: name: pr.bht000009.c2, from: 0.000000e+00			  ---> final pos: 4.853899e+00 
+   in get_node_pos: name: pr.bht000009$end, pos: 5.003185e+00, fact: 0.000000e+00, length: 0.000000e+00, from_name: (null)
+	 in get_node_pos: name: pr.bht000009$end, from: 0.000000e+00			  ---> final pos: 5.003185e+00 
+
+
+TOP Expand_sequence name pr.bht000009 with length 5.003185e+00, ref_flag 0
+
+
+stop;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.02.02 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

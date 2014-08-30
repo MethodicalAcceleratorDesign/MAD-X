@@ -1,0 +1,43 @@
+Title, "test sequence manipulations";
+
+Option, warn, echo, info;
+
+Option, -echo;
+CALL,FILE= "../share/PS/PS.ele";
+CALL,FILE= "../share/PS/PS_new.seq";
+CALL,FILE= "../share/PS/PS_10GeVc_for_OP_group.str";
+Option, echo;
+
+b1: BEAM,PARTICLE=PROTON;
+
+Pc        := 26; !  GeV/c
+
+Beam, particle = proton, pc = Pc, BUNCHED;
+
+use, sequence = PS;
+
+aa: HKICKER, KICK:=0.000904455;
+
+Option, debug; 
+
+SEQEDIT,SEQUENCE=PR.BHT000001;
+ FLATTEN;
+ REPLACE, element=PR.BHT000001.corr3, by=aa;       
+ REMOVE, element=PR.BHT000001.corr1;
+ INSTALL, ELEMENT=aa, AT= 2.985726e-01, FROM=pr.bht000001$start;
+ FLATTEN;
+ENDEDIT;
+
+USE, SEQUENCE=PR.BHT000001;
+
+select, flag=seqedit, class=HKICKER;
+
+PRorb: VKICKER,KICK:=0.000879422;
+
+SEQEDIT,SEQUENCE=PR.bht000009;
+ REPLACE,ELEMENT=selected, BY= PRorb ; 
+ENDEDIT;
+
+USE, SEQUENCE=PR.bht000009;
+
+stop;

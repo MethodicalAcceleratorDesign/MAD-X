@@ -1,10 +1,13 @@
 #! /bin/bash
 # run:
-# bash scripts/build-test-lxplus.sh [noecho] [cleanall]
+# bash scripts/build-test-lxplus.sh [noecho] [cleanall] [notest]
 
 # env settings
 export LC_CTYPE="C"
 export PATH="/afs/cern.ch/user/m/mad/madx/madX:$PATH"
+
+# store lxplus node name in a file
+uname -n > build-test-lxplus.run
 
 # error handler
 check_error ()
@@ -19,13 +22,12 @@ check_error ()
 rm -f build-test-lxplus.out
 if [ "$1" = "noecho" ] ; then
 	shift
-	exec &> build-test-lxplus.out
+	exec > build-test-lxplus.out 2>&1
 	check_error "redirection with noecho failed"
 else
 	exec > >(tee build-test-lxplus.out) 2> >(tee build-test-lxplus.out >&2)
 	check_error "redirection with tee failed"
 fi
-uname -n > build-test-lxplus.run
 
 echo -e "\n===== Start of build and tests ====="
 echo "Date  : `date`"
@@ -34,7 +36,12 @@ echo "Script: $0 $@"
 
 echo -e "\n===== SVN update ====="
 svn update
-check_error "svn update failed"
+if [ "$?" != "0" ] ; then
+	echo -e "\n===== SVN cleanup & update ====="
+	svn cleanup
+	svn update
+	check_error "svn update failed"
+fi
 
 echo -e "\n===== Release number ====="
 cat VERSION
@@ -54,13 +61,7 @@ gcc      --version
 g++      --version
 gfortran --version
 make all-linux32-gnu
-# to handle bad fortran compiler, restart from scratch (only once)
-if [ "$?" != "0" ] ; then 
-	make cleanall && make cleanall ARCH=32
-	check_error "make cleanall failed"
-	make all-linux32-gnu
-	check_error "make all-linux32-gnu failed"
-fi
+check_error "make all-linux32-gnu failed"
 
 source /afs/cern.ch/sw/lcg/contrib/gcc/4.8/x86_64-slc6-gcc48-opt/setup.sh
 gcc      --version
@@ -90,29 +91,37 @@ echo -e "\n===== Tests pointless files ====="
 make cleantest && make infotestdep
 check_error "make infotestdep failed"
 
-echo -e "\n===== Testing madx-linux64-intel ====="
-make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
-check_error "make tests-all for madx-linux64-intel failed"
+echo -e "\n===== Running tests (long) ====="
+if [ "$1" = "notest" ] ; then
+	shift
+	echo "Skipped (explicit request)."
+else
+	echo ""
 
-echo -e "\n===== Testing madx-linux32-intel ====="
-make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
-check_error "make tests-all for madx-linux32-intel failed"
+	echo -e "\n===== Testing madx-linux64-intel ====="
+	make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
+	check_error "make tests-all for madx-linux64-intel failed"
 
-echo -e "\n===== Testing madx-linux64-gnu ====="
-make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
-check_error "make tests-all for madx-linux64-gnu failed"
+	echo -e "\n===== Testing madx-linux32-intel ====="
+	make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
+	check_error "make tests-all for madx-linux32-intel failed"
 
-echo -e "\n===== Testing madx-linux32-gnu ====="
-make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
-check_error "make tests-all for madx-linux32-gnu failed"
+	echo -e "\n===== Testing madx-linux64-gnu ====="
+	make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
+	check_error "make tests-all for madx-linux64-gnu failed"
+
+	echo -e "\n===== Testing madx-linux32-gnu ====="
+	make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
+	check_error "make tests-all for madx-linux32-gnu failed"
+fi
 
 # restore the default version
 make madx-linux32 > /dev/null && make madx-linux64 > /dev/null
 check_error "unable to restore the default version"
 
+# date & end marker
+echo -e "\nFinish: `date`"
+echo -e "\n===== End of build and tests ====="
+
 # cleanup lxplus node
 rm -f build-test-lxplus.run
-
-# date & end marker
-echo "Finish: `date`"
-echo -e "\n===== End of build and tests ====="

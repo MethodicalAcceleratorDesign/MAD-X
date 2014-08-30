@@ -1,0 +1,189 @@
+%%\title{MAKETHIN}
+%  Changed by: Helmut Burkhardt,  7-April-2005 
+%  Changed by: Helmut Burkhardt, Ghislain Roy -  6-Mai-2014 
+ 
+\chapter{MAKETHIN: Slice a sequence into thin lenses}
+\label{chap:makethin}
+
+This module converts a sequence with thick elements into one composed of
+thin (zero length) element slices or simplified thick slices as required
+by \madx tracking or conversion to \texttt{SIXTRACK} input format.
+
+\section{Slicing to thin elements}
+
+The slicing is performed by the command: 
+\madbox{
+MAKETHIN, \=SEQUENCE=seqname, STYLE=slicingstyle, \\
+          \>MAKEDIPEDGE=logical, \\
+          \>MINIMIZEPARENTS=logical, \\
+          \>MAKECONSISTENT=logical; 
+}
+
+The parameters are defined as: 
+\begin{madlist}
+   \ttitem{SEQUENCE} seqname is the name of the sequence to be
+   processed to thin slices. The sequence must be active, i.e. it should
+   have been previously loaded with a USE command.  The sequence must
+   use the default positioning of elements (\texttt{REFER=centre}). 
+
+   \ttitem{STYLE} the slicing\_style provided as argument is optional
+   and selects the slicing style. Available slicing styles are:     
+
+     \begin{madlist}
+     \ttitem{SIMPLE}  produces equal strength slices at equidistant
+     positions with the kick in the middle of each slice. \\ 
+     It is the default if the number of slices is larger than 4. 
+
+     \ttitem{TEAPOT} improves the slice positioning using the algorithm
+     described in \cite{burkhardt2013}.\\
+     It is the default if the number of slice is less or equal to 4.
+
+     \ttitem{COLLIM} is the default slicing for collimators. If only
+     one slice is chosen it is placed in the middle of the old
+     element. If two slices are chosen they are placed at either
+     end. Three slices or more are treated as one slice.      
+
+     \ttitemn{(option not given)} The standard default slicing for all
+     elements (except collimators). It uses \texttt{TEAPOT} if the number
+     of slices is less or equal to 4, and \texttt{SIMPLE} otherwise.
+     \end{madlist}
+ 
+   \textbf{Note:} It is strongly recommended to always specify
+   \texttt{STYLE=teapot} to use the improved slicing for any number of
+   slices. 
+      
+   \ttitem{MAKEDIPEDGE} is a flag that controls the generation of
+   {\tt DIPEDGE} elements at the start and/or end of bending magnets,
+   to conserve edge focusing from pole face angles \texttt{e1, e2}
+   or extra fields described by \texttt{fint, fintx}, in the
+   process of slicing bending magnets to thin multipole slices.   
+   Selection with \texttt{THICK=true} will translate a complex thick 
+   \texttt{RBEND} or \texttt{SBEND}, including edge effects, to a simple
+   thick \texttt{SBEND} with edge focusing transferred to extra 
+   \texttt{DIPEDGE} elements. \\ 
+   (Default:~false) \\
+   Example:
+   \madxmp{
+     ! keep translated rbend as thick sbend \\
+     SELECT, FLAG=makethin, CLASS=rbend, THICK=true;
+   }
+
+   \ttitem{MINIMIZEPARENTS} is a flag that controls the removal of
+   inconsistent numbers of slices for parent elements. \\
+   (Default:~true)
+
+   \ttitem{MAKECONSISTENT} is a flag to ensure an equal number of slices
+   for parent and children elements, using the larger value of the two. \\
+   (Default:~false)
+
+\end{madlist}
+
+\section{Number of slices}
+
+The number of slices can be set individually for elements or groups of
+elements using \texttt{SELECT} commands
+\madxmp{
+SELECT, \=FLAG=makethin, \\
+        \>RANGE=range, CLASS=class, PATTERN=pattern[,FULL][,CLEAR], \\
+        \>THICK=logical, SLICE=integer;
+}
+where the argument to the parameter \texttt{SLICE} stands for the number of
+slices for the selected elements. The default is one slice and
+\texttt{THICK=false} for all elements, i.e. conversion of all thick
+elements to a single thin slice positioned at the centre of the original
+thick element.
+
+Note that \texttt{THICK=true} only applies to dipole or quadrupole magnet
+elements and is ignored otherwise.  
+
+\texttt{MAKETHIN} allows for thick quadrupole slicing with insertion of
+markers between thick slices. Positioning is done with markers between
+slices, here however with thick slice quadrupole piece filling the whole
+length.
+  
+{\bf Examples:}
+\madxmp{
+! slice quadrupoles thick, insert 2 markers per quadrupole \\
+SELECT, FLAG=makethin, CLASS=quadrupole, THICK=true, SLICE=2; \\ 
+\\
+! thick slicing for quadrupoles named mqxa, insert one marker in the middle \\
+SELECT, FLAG=makethin, PATTERN=mqxa$\backslash$., THICK=true, SLICE=1; 
+}
+
+
+Slicing can be turned off for certain elements or classes by specifying
+a number of slices $< 1$. Examples: 
+\madxmp{
+! turn off slicing for sextupoles \\
+SELECT, FLAG=makethin, CLASS=sextupole, SLICE=0;  \\
+\\
+! keep elements unchanged with names starting by mbxw \\
+SELECT, FLAG=makethin, PATTERN=mbxw$\backslash$., SLICE=0; 
+}
+This option allows to introduce slicing step by step and monitor the 
+resulting changes in optics parameters.
+
+Keep in mind however that subsequent tracking generally requires full
+slicing, with possible exception of quadrupoles and bending magents. 
+
+
+\section{Additional information}
+
+The generated thin lens sequence has the following properties: 
+\begin{itemize}
+\item The new sequence has the same name as the original. The original sequence
+  is replaced by the new one in memory. If the original sequence is
+  needed for further processing in \madx, it should be reloaded.
+\item The algorithm also processes any sub-sequence inserted in the main
+  sequence. These sub-sequences are also given the same names as the
+  original ones. 
+\item Any element transformed into a single thin lens element has the
+  same name as the original. 
+\item If an element is sliced into more than one slice, the individual
+  slices have the same basename as the original element plus a suffix 
+  {\tt ..1}, {\tt ..2}, etc. and a marker, with the name of the original
+  element, is placed at the location of the center of the original element.
+\end{itemize}
+
+
+{\bf Hints}
+\begin{enumerate}
+\item Compare the main optics parameters like tunes before and after slicing
+  with \texttt{MAKETHIN}. Rematch tunes and chromaticity as necessary after
+  \texttt{MAKETHIN}. 
+
+\item In tests, turn off slicing for some of the main element classes to
+  identify the main sources of changes. 
+
+\item For sextuples and octupoles, a single slice should always be sufficient.
+
+\item Increase the number of slices for critical elements like mini-beta
+  quadrupoles. Even there, more than four slices should rarely be
+  required. 
+
+\item In case of problems or doubts, consider to
+  \texttt{FLATTEN} the sequence before slicing.  
+
+\item See the
+  \href{http://madx.web.cern.ch/madx/madX/examples/makethin/}{examples}
+  for makethin. \\ 
+  See also the presentations on the upgrade of the makethin module:\\
+  \href{http://ab-dep-abp.web.cern.ch/ab-dep-abp/LCU/LCU_meetings/2012/20120918/LCU_makethin_2012_09_18.pdf}{LCU\_makethin\_2012\_09\_18.pdf}, and \\
+  \href{http://ab-dep-abp.web.cern.ch/ab-dep-abp/LCU/LCU_meetings/2013/20130419/LCU_makethin_2013_04_19.pdf}{LCU\_makethin\_2013\_04\_19.pdf}. \\ 
+  TEAPOT is documented in \href{http://accelconf.web.cern.ch/AccelConf/IPAC2013/papers/mopwo027.pdf}{IPAC'13 MOPWO027}
+
+\end{enumerate}
+
+
+
+%%%%%%%%
+
+
+
+
+
+
+
+
+
+

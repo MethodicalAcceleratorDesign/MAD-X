@@ -298,7 +298,7 @@ seq_edit_ex(struct sequence* seq)
 {
   edit_sequ = seq;
   edit_is_on = 1;
-  seqedit_install = seqedit_move = seqedit_remove = 0;
+  seqedit_install = seqedit_move = seqedit_remove = seqedit_replace = 0;
   if (edit_sequ->ex_start != NULL) {
     edit_sequ->ex_nodes = delete_node_list(edit_sequ->ex_nodes);
     edit_sequ->ex_start = delete_node_ring(edit_sequ->ex_start);
@@ -324,18 +324,17 @@ static void
 expand_line(struct char_p_array* l_buff)
   /* expands a beam line, applies rep. count and inversion */
 {
-  /* first get all bracket pairs with their level; keep max. level */
+  
   int add=0, i=0, j=0, k=0, n=0, number=0, dummy=0, rep=-1, pos=0;
   int level = 0, l_max = 0, b_cnt = 0;
-  char* p;
+  char* p = blank;
   struct int_array* lbpos = new_int_array(l_buff->curr);
   struct int_array* rbpos = new_int_array(l_buff->curr);
   struct int_array* b_level = new_int_array(l_buff->curr);
 
-  for (i = 0; i < l_buff->curr; i++)
-  {
-    if (*l_buff->p[i] == '(')
-    {
+  /* first get all bracket pairs with their level; keep max. level */
+  for (i = 0; i < l_buff->curr; i++) {
+    if (*l_buff->p[i] == '(') {
       lbpos->i[b_cnt] = i;
       b_level->i[b_cnt++] = level++;
       if (level > l_max) l_max = level;
@@ -343,110 +342,106 @@ expand_line(struct char_p_array* l_buff)
     else if (*l_buff->p[i] == ')')  level--;
   }
   l_max--;
+
   for (i = 0; i < b_cnt; i++)
     get_bracket_t_range(l_buff->p, '(', ')', lbpos->i[i],
                         l_buff->curr-1, &dummy, &rbpos->i[i]);
   lbpos->curr = rbpos->curr = b_level->curr = b_cnt;
+
   /* now loop over level from highest down to zero, expand '*' in each pair */
-  for (level = l_max; level >=0; level--)
-  {
-    for (i = 0; i < b_cnt; i++)
-    {
-      if (b_level->i[i] == level && (pos = lbpos->i[i]) > 1)
-      {
-        if (*l_buff->p[pos-1] == '*')
-        {
+  for (level = l_max; level >=0; level--) {
+    for (i = 0; i < b_cnt; i++) {
+      if (b_level->i[i] == level && (pos = lbpos->i[i]) > 1) {
+        if (*l_buff->p[pos-1] == '*') {
           sscanf(l_buff->p[pos-2], "%d", &rep);
-          add = rep - 1;
+	  add = rep - 1;
           number = rbpos->i[i] - pos - 1; /* inside bracket */
           n = number * add; /* extra tokens */
-          while (l_buff->curr + n >= l_buff->max)
-            grow_char_p_array(l_buff);
+          while (l_buff->curr + n >= l_buff->max) grow_char_p_array(l_buff);
+
           for (j = l_buff->curr; j > pos + number; j--) /* shift upwards */
             l_buff->p[j+n] = l_buff->p[j];
+
           l_buff->curr += n;
-          for (k = 1; k <= add; k++)
-          {
+
+          for (k = 1; k <= add; k++) {
             for (j = pos+1; j <= pos+number; j++)
               l_buff->p[j+k*number] = tmpbuff(l_buff->p[j]);
           }
-          for (j = 0; j < b_cnt; j++)  /* reset bracket pointers */
-          {
+
+          for (j = 0; j < b_cnt; j++) {  /* reset bracket pointers */
             if (lbpos->i[j] > pos + number) lbpos->i[j] += n;
             if (rbpos->i[j] > pos + number) rbpos->i[j] += n;
           }
+
           l_buff->p[pos-1] = l_buff->p[pos-2] = blank;
         }
       }
     }
   }
-  /* loop over buffer, expand simple element repetition */
-  for (pos = 2; pos < l_buff->curr; pos++)
-  {
-    if (*l_buff->p[pos] == '*')
-    {
+
+  /* loop over buffer, expand simple element repetition defined with '*' f.g. 10*myquad  */
+  for (pos = 2; pos < l_buff->curr; pos++) {
+    if (*l_buff->p[pos] == '*') {
       rep = -1;
       sscanf(l_buff->p[pos-1], "%d", &rep);
-      if (rep < 0)
-      {
-        fatal_error("expand_line","Problem with reading number of copies");
-      }
+      if (rep < 0) fatal_error("expand_line","Problem with reading number of copies");
       n = add = rep - 1;
       while (l_buff->curr + n >= l_buff->max) grow_char_p_array(l_buff);
+
       for (j = l_buff->curr; j > pos + 1; j--) /* shift upwards */
         l_buff->p[j+n] = l_buff->p[j];
+
       l_buff->curr += n;
-      for (k = 1; k <= add; k++)
-      {
-        j = pos+1;
-        l_buff->p[j+k] = l_buff->p[j];
-      }
-      for (j = 0; j < b_cnt; j++)  /* reset bracket pointers */
-      {
+      
+      j = pos+1;
+      for (k = 1; k <= add; k++) l_buff->p[j+k] = tmpbuff(l_buff->p[j]); 
+
+      for (j = 0; j < b_cnt; j++) {  /* reset bracket pointers */      
         if (lbpos->i[j] > pos + 1) lbpos->i[j] += n;
         if (rbpos->i[j] > pos + 1) rbpos->i[j] += n;
       }
-      l_buff->p[pos-1] = l_buff->p[pos-2] = blank;
+
+      // 2014-Aug-18  19:56:34  ghislain: in case of single element with rep_count, 
+      // l_buff->p[pos-1] points to the rep_count 
+      // and l_buff->p[pos-2] the previous element which is then lost!!!
+      // l_buff->p[pos-1] = l_buff->p[pos-2] = blank;
+      l_buff->p[pos-1] = blank;
     }
   }
+
   /* get bracket pointers including new ones */
   while (b_level->max < l_buff->curr) grow_int_array(b_level);
   while (lbpos->max < l_buff->curr) grow_int_array(lbpos);
   while (rbpos->max < l_buff->curr) grow_int_array(rbpos);
   level = b_cnt = 0;
-  for (i = 0; i < l_buff->curr; i++)
-  {
-    if (*l_buff->p[i] == '(')
-    {
+  for (i = 0; i < l_buff->curr; i++) {
+    if (*l_buff->p[i] == '(') {
       lbpos->i[b_cnt] = i;
       b_level->i[b_cnt++] = level++;
     }
     else if (*l_buff->p[i] == ')')  level--;
   }
+
   for (i = 0; i < b_cnt; i++)
     get_bracket_t_range(l_buff->p, '(', ')', lbpos->i[i],
                         l_buff->curr-1, &dummy, &rbpos->i[i]);
   lbpos->curr = rbpos->curr = b_level->curr = b_cnt;
+
   /* now loop over level from highest down to zero, invert if '-' */
-  for (level = l_max; level >= 0; level--)
-  {
-    for (i = 0; i < b_cnt; i++)
-    {
+  for (level = l_max; level >= 0; level--) {
+    for (i = 0; i < b_cnt; i++) {
       pos = lbpos->i[i];
-      if (b_level->i[i] == level)
-      {
+      if (b_level->i[i] == level) {
         p = blank;
-        for (j = pos - 1; j > 0; j--)
-        {
+        for (j = pos - 1; j > 0; j--) {
           p = l_buff->p[j];
           if (*p != ' ')  break;
         }
-        if (*p == '-')
-        {
-          number = rbpos->i[i] - pos - 1;
+        if (*p == '-') {
+          number = rbpos->i[i] - pos - 1; // length of sequence
           n = number / 2;
-          for (j = 0; j < n; j++)
-          {
+          for (j = 0; j < n; j++) {
             p = l_buff->p[pos+j+1];
             l_buff->p[pos+j+1] = l_buff->p[pos+number-j];
             l_buff->p[pos+number-j] = p;
@@ -455,10 +450,10 @@ expand_line(struct char_p_array* l_buff)
       }
     }
   }
+
   /* finally remove all non-alpha tokens */
   n = 0;
-  for (i = 0; i < l_buff->curr; i++)
-  {
+  for (i = 0; i < l_buff->curr; i++) {
     if (isalpha(*l_buff->p[i])) l_buff->p[n++] = l_buff->p[i];
   }
   l_buff->curr = n;
@@ -625,8 +620,10 @@ make_sequ_from_line(char* name)
   line = line_list->macros[pos];
   line->dead = 1;   /* prevent line from further conversion to sequence */
   line_buffer = new_char_p_array(1000);
+  
   replace_lines(line, 0, tmp); /* replaces all referenced lines */
   expand_line(line_buffer); /* act on '-' and rep. count */
+
   current_sequ = new_sequence(name, 0); /* node positions = centre */
   if ((spos = name_list_pos(name, sequences->list)) >= 0)
     old_sequ = sequences->sequs[spos];
@@ -642,7 +639,10 @@ make_sequ_from_line(char* name)
   current_node = NULL;
   make_elem_node(el, 1);
   current_sequ->start = current_node;
+  
+
   current_sequ->length = line_nodes(line_buffer);
+  
   sprintf(c_dum->c, "%s$end", current_sequ->name);
   el = make_element(c_dum->c, "marker", clone, 0);
   make_elem_node(el, 1);
@@ -651,6 +651,7 @@ make_sequ_from_line(char* name)
   current_sequ->start->previous = current_sequ->end;
   current_sequ->end->next = current_sequ->start;
   current_sequ->line = 1; /* remember origin of sequence */
+
   if(line_buffer) delete_char_p_array(line_buffer,1);
 }
 
@@ -893,6 +894,8 @@ seq_end(struct in_cmd* cmd)
   put_info("seqedit - number of elements moved:     ", tmp);
   sprintf(tmp, "%d", seqedit_remove);
   put_info("seqedit - number of elements removed:   ", tmp);
+  sprintf(tmp, "%d", seqedit_replace);
+  put_info("seqedit - number of elements replaced:  ", tmp);
   seq_end_ex();
 }
 
@@ -1199,86 +1202,84 @@ seq_replace(struct in_cmd* cmd)
   char* name;
   struct element* el;
   int count = count_nodes(edit_sequ);
-  int any = 0, k, rep_cnt = 0, pos = name_list_pos("element", nl);
-  if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
-  {
-    if (strcmp(name, "selected") == 0)
-    {
-      if (seqedit_select->curr == 0)
-      {
-        warning("no active select commands:", "ignored"); return;
-      }
-      else
-      {
-        pos = name_list_pos("by", nl);
-        if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
-        {
-          if ((el = find_element(name, element_list)) == NULL)
-          {
-            warning("ignoring unknown 'by' element:",name);
-            return;
-          }
-        }
-        else
-        {
-          warning("'by' missing, ","ignored");
-          return;
-        }
-        rep_nodes = mymalloc("seq_replace", count*sizeof *rep_nodes);
-        rep_els = mymalloc("seq_replace", count*sizeof *rep_els);
-        if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges) == 0) any = 1;
-        c_node = edit_sequ->start;
-        while (c_node != NULL)
-        {
-          if (any || name_list_pos(c_node->name, selected_ranges->list) > -1)
-          {
-            name = NULL;
-            for (k = 0; k < seqedit_select->curr; k++)
-            {
-              if (c_node->p_elem != NULL) name = c_node->p_elem->name;
-              if (name != NULL && strchr(name, '$') == NULL &&
-                  pass_select(name,
-                              seqedit_select->commands[k])) break;
-            }
-            if (k < seqedit_select->curr)
-            {
-              rep_els[rep_cnt] = el;
-              rep_nodes[rep_cnt++] = c_node;
-            }
-          }
-          if (c_node == edit_sequ->end) break;
-          c_node = c_node->next;
-        }
-      }
-    }
-    else
-    {
-      rep_nodes = mymalloc("seq_replace", count*sizeof *rep_nodes);
-      rep_els = mymalloc("seq_replace", count*sizeof *rep_els);
-      strcpy(c_dum->c, name);
-      square_to_colon(c_dum->c);
-      if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
-      {
-        node = edit_sequ->nodes->nodes[pos];
-        pos = name_list_pos("by", nl);
-        if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
-        {
-          if ((el = find_element(name, element_list)) != NULL)
-          {
-            rep_els[rep_cnt] = el;
-            rep_nodes[rep_cnt++] = node;
-          }
-          else warning("ignoring unknown 'by' element: ",name);
-        }
-        else warning("'by' missing, ","ignored");
-      }
-      else warning("ignored because of unknown element: ", name);
-    }
-    for (k = 0; k < rep_cnt; k++)  replace_one(rep_nodes[k], rep_els[k]);
-    if (rep_nodes) myfree("seq_replace", rep_nodes);
-    if (rep_els)   myfree("seq_replace", rep_els);
+  int any = 0, k, rep_cnt = 0, pos;
+
+  pos = name_list_pos("element", nl);
+  if ( !(nl->inform[pos]) || (name = pl->parameters[pos]->string) == NULL) {
+    warning("no element specified, ","ignored");
+    return;
   }
-  else  warning("no element specified, ","ignored");
+  
+  if (strcmp(name, "selected") == 0) { // replace selected elements
+    if (seqedit_select->curr == 0) {
+      warning("no active select commands:", "ignored"); 
+      return; 
+    }
+
+    pos = name_list_pos("by", nl);
+    if ( !(nl->inform[pos]) || (name = pl->parameters[pos]->string) == NULL) {
+      warning("'by' missing, ","ignored");
+      return;
+    }
+
+    if ((el = find_element(name, element_list)) == NULL) {
+      warning("ignoring unknown 'by' element:",name);
+      return;
+    }
+ 
+    rep_nodes = mymalloc("seq_replace", count*sizeof *rep_nodes);
+    rep_els = mymalloc("seq_replace", count*sizeof *rep_els);
+
+    if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges) == 0) any = 1;
+
+    c_node = edit_sequ->start;
+    while (c_node != NULL) {
+      if (any || name_list_pos(c_node->name, selected_ranges->list) > -1) {
+	name = NULL;
+	for (k = 0; k < seqedit_select->curr; k++) {
+	  if (c_node->p_elem != NULL) name = c_node->p_elem->name;
+	  if (name != NULL && strchr(name, '$') == NULL &&
+	      pass_select(name, seqedit_select->commands[k]) ) break;
+	}
+	if (k < seqedit_select->curr) {
+	  rep_els[rep_cnt] = el;
+	  rep_nodes[rep_cnt++] = c_node;
+	}
+      }
+      if (c_node == edit_sequ->end) break;
+      c_node = c_node->next;
+    }
+  }  
+
+  else { // replace named elements
+    rep_nodes = mymalloc("seq_replace", count*sizeof *rep_nodes);
+    rep_els = mymalloc("seq_replace", count*sizeof *rep_els);
+
+    strcpy(c_dum->c, name);
+    square_to_colon(c_dum->c);
+
+    if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1) {
+      node = edit_sequ->nodes->nodes[pos];
+      pos = name_list_pos("by", nl);
+      if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL) {
+	if ((el = find_element(name, element_list)) != NULL) {
+	  rep_els[rep_cnt] = el;
+	  rep_nodes[rep_cnt++] = node;
+	}
+	else warning("ignoring unknown 'by' element: ",name);
+      }
+      else warning("'by' missing, ","ignored");
+    }
+    else warning("ignored because of unknown element: ", name);
+  }
+  
+  for (k = 0; k < rep_cnt; k++)  replace_one(rep_nodes[k], rep_els[k]);
+  
+  seqedit_replace = rep_cnt;
+
+  if (rep_nodes) myfree("seq_replace", rep_nodes);
+  if (rep_els)   myfree("seq_replace", rep_els);
+  
 }
 
 #if 0 // not used...

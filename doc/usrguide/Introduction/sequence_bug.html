@@ -40,7 +40,7 @@ writing sequence files that do not conform to the rules of sequence expansions.
 Here is one simple example of a sub-sequence in a sequence that was "adapted" to the bug: 
 <pre>
 SEC1 : SEQUENCE, L = 10.00; // sub-sequence
-  …
+  ...
 ENDSEQUENCE;
 </pre>
 
@@ -49,7 +49,7 @@ and later
 <pre>
 MACH : SEQUENCE, L = 100.00; //main sequence
   SEC1,  at =   0.0;
-  …
+  ...
 ENDSEQUENCE;
 </pre>
 
@@ -73,7 +73,7 @@ the MACH sequence could simply be rewritten with an explicit
 <pre>
 MACH : SEQUENCE, REFER=entry, L = 100.00;
   SEC1,  at =   0.0;
-  …
+  ...
 ENDSEQUENCE;
 </pre>
 
@@ -89,7 +89,7 @@ as follows to insert the quadrupole just at the end of sub-sequence SEC1.
 MACH : SEQUENCE, REFER=centre, L = 100.00;
   SEC1,  at =   5.0;
   QD: QUADRUPOLE, L=1, at= 10.5
-  …
+  ...
 ENDSEQUENCE;
 </pre>
  

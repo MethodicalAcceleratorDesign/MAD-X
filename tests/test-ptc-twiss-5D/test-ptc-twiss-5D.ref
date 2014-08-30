@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.01  (64 bit, Darwin)      +
+  +    MAD-X 5.02.02  (64 bit, Linux)       +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.04.25      +
-  + Execution Time Stamp: 24.06.14 18.24.59 +
+  + Code Modification Date: 2014.07.01      +
+  + Execution Time Stamp: 03.07.14 14.59.21 +
   +++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -120,9 +120,13 @@ call, file="../share/LEIR/LEIR.seqx";
 
 ! Vrf=2.2kV / H=2 / Fsynch = 1.567kHz
 
-  CAV: RFCAVITY, L=1.0, VOLT=0.0022/54, HARMON=2, LAG=0, no_cavity_totalpath;  
+!  CAV: RFCAVITY, L=1.0, VOLT=0.0022/54, HARMON=2, LAG=0, no_cavity_totalpath;  
+
+  CAV: RFCAVITY, L=1.0, VOLT=0.0022/54, FREQ=3.816881762, LAG=0, no_cavity_totalpath;  
 
 
+
+! 3816881.7619258035
 
 
 
@@ -799,12 +803,16 @@ select, flag=twiss, column=name,s,betx,bety,alfx,alfy,mux,muy,dx,dpx,
 twiss, rmatrix, chrom, save;
 
 enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
   
-iteration:   1 error:   1.178159E-04 deltap:   1.000000E-06
-orbit:  -7.037258E-06 -1.676362E-06  0.000000E+00  0.000000E+00 -1.960125E-06  3.016100E-07
+iteration:   1 error:   1.178158E-04 deltap:   1.000000E-06
+orbit:  -7.037257E-06 -1.676362E-06  0.000000E+00  0.000000E+00 -1.960125E-06  3.016099E-07
   
-iteration:   2 error:   5.695678E-10 deltap:   1.000000E-06
-orbit:  -7.037392E-06 -1.676328E-06  0.000000E+00  0.000000E+00 -1.508340E-06  3.016137E-07
+iteration:   2 error:   5.695677E-10 deltap:   1.000000E-06
+orbit:  -7.037391E-06 -1.676328E-06  0.000000E+00  0.000000E+00 -1.508340E-06  3.016136E-07
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -815,13 +823,13 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
        78.54370266                 -0       0.1241075638        2.838578276 
 
                 q1                dq1            betxmax              dxmax 
-       1.820059621       -3.734960651        15.12421277         20.6041956 
+       1.820059621       -3.734960278        15.12421277         20.6041956 
 
              dxrms             xcomax             xcorms                 q2 
        9.639962105                  0                  0         2.71982919 
 
                dq2            betymax              dymax              dyrms 
-      -7.573740341        20.07025727                  0                  0 
+      -7.573739492        20.07025727                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0        9.747887059 
@@ -839,6 +847,8 @@ write, table=twiss, file="leir.twiss";
 plot, haxis=s, vaxis=betx,bety, colour=100;
 
 Plot - default table plotted: twiss
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
 
  GXPLOT-X11  1.50 initialized
 
@@ -846,6 +856,8 @@ Plot - default table plotted: twiss
 plot, haxis=s, vaxis=dx,        colour=100;
 
 Plot - default table plotted: twiss
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
  plot number =            2
 
 
@@ -956,9 +968,11 @@ mad_ptc.c: pro_ptc_printframes: format is rootmacro.
 
   ptc_twiss, table=twiss, icase=5, no=2, closed_orbit;
 
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
  Closed orbit:    1.0688861274587036E-008   2.5461397864805191E-009   0.0000000000000000        0.0000000000000000        0.0000000000000000     
-Deviation from symplecticity  0.2686739719592879E-11 %
-Deviation from symplecticity  0.2686739719592879E-11 %
+Deviation from symplecticity  0.3264055692397960E-11 %
+Deviation from symplecticity  0.3264055692397960E-11 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -1042,5 +1056,5 @@ removefile, file='Maxwellian_bend_for_ptc.txt';
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.01 (64 bit) finished normally +
+  + MAD-X 5.02.02 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

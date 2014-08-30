@@ -54,16 +54,17 @@ the 'MATCH' command. The two options can be entered as</li>
 
 <pre>MATCH,sequence='name1','name2',..,'name-n',BETA0='beta01','beta02',..,'beta0n';</pre>
 or
-<pre>MATCH,SEQUENCE='sequence-name', BETX=real,ALFX=real,MUX=real,&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; BETY=real,ALFY=real,MUY=real,
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; X=real,PX=real,Y=real,PY=real,
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DX=real,DY=real,DPX=real,DPY=real,&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; DELTAP=real;</pre>
-> Examples:
-<ul>
-<li>
-Example 1:</li>
+<pre>
+MATCH,SEQUENCE='sequence-name', BETX=real,ALFX=real,MUX=real,
+                                BETY=real,ALFY=real,MUY=real,
+                                X=real,PX=real,Y=real,PY=real,
+                                DX=real,DY=real,DPX=real,DPY=real
+                                DELTAP=real;
+</pre>
 
+Examples:
+<ul>
+<li>Example 1:
 <pre>CELL: SEQUENCE=(...) ;
 INSERT: SEQUENCE=(...) ;
 USE,PERIOD=cell;
@@ -71,25 +72,33 @@ SAVEBETA,LABEL=bini,place=#e;
 TWISS,SEQUENCE=cell;
 USE,PERIOD=insert;
 MATCH,SEQUENCE=insert,BETA0=bini;
-CONSTRAINT,SEQUENCE=insert,RANGE=#e,MUX=9.345,MUY=9.876;</pre>
+CONSTRAINT,SEQUENCE=insert,RANGE=#e,MUX=9.345,MUY=9.876;
+</pre>
 This matches the sequence 'INSERT' with initial conditions to a new phase
 advance. The initial conditions are given by the periodic solution for
-the sequence CELL1.
-<li>
-Example 2:</li>
+the sequence CELL.
+<br><br></li>
 
-<pre>USE,PERIOD=INSERT;&nbsp;
+<li>Example 2:
+<pre>
+USE,PERIOD=INSERT;
 MATCH,SEQUENCE=insert;
-CONSTRAINT,SEQUENCE=insert,RANGE=#e,MUX=9.345,MUY=9.876;</pre>
+CONSTRAINT,SEQUENCE=insert,RANGE=#e,MUX=9.345,MUY=9.876;
+</pre>
 This matches the beam line 'INSERT' with periodic boundary conditions to
-a new phase advance.</ul>
+a new phase advance. 
+<br><br></li>
+</ul>
+
 The initial conditions can also be transmitted by a combination of a <a href="../control/general.html#savebeta">SAVEBETA</a>
 command and explicit optic function specifications:
-<pre>USE,CELL1;
-SAVEBETA,LABEL=bini,PLACE=#E;&nbsp;
+<pre>
+USE,CELL1;
+SAVEBETA,LABEL=bini,PLACE=#E;
 TWISS,SEQUENCE=CELL1;
-USE,PERIOD=LINE1;&nbsp;
-MATCH,SEQUENCE=LINE1,BETA0=bini,MUX=1.234,MUY=4.567;</pre>
+USE,PERIOD=LINE1;
+MATCH,SEQUENCE=LINE1,BETA0=bini,MUX=1.234,MUY=4.567;
+</pre>
 This example transmits all values of the SAVEBETA array 'bini' as initial
 values to the MATCH command and overrides the initial phase values by the
 given values.</ul>

@@ -1,0 +1,859 @@
+%%\title{PTC Set-up Parameters}
+
+\chapter{{\madx}-{\ptc} Auxiliaries}
+\label{chap:ptc_auxiliaries}
+
+This chapter documents the interface between \madx and \ptc and the
+auxiliary commands available in the \ptc library.
+
+{\bf Available Commands }
+\begin{itemize}
+   \item \hyperref[sec:ptc_setswitch]{\tt PTC\_SETSWITCH}
+   \item \hyperref[sec:ptc_knob]{\tt PTC\_KNOB}
+   \item \hyperref[sec:ptc_setknobvalue]{\tt PTC\_SETKNOBVALUE}
+   \item \hyperref[sec:match_withptcknobs]{\tt MATCH\_WITHPTCKNOBS}
+     \qquad {\bf (Under Construction)} 
+   \item \hyperref[sec:ptc_printparametric]{\tt PTC\_PRINTPARAMETRIC}
+   \item \hyperref[sec:ptc_eplacement]{\tt PTC\_EPLACEMENT}
+   \item \hyperref[sec:ptc_printframes]{\tt PTC\_PRINTFRAMES}
+   \item \hyperref[sec:ptc_select]{\tt PTC\_SELECT}
+   \item \hyperref[sec:ptc_selectmoment]{\tt PTC\_SELECTMOMENT}
+   \item \hyperref[sec:ptc_moments]{\tt PTC\_MOMENTS} \qquad {\bf (Under Construction)} 
+   \item \hyperref[sec:ptc_dumpmaps]{\tt PTC\_DUMPMAPS}
+   \item \hyperref[sec:ptc_setcavities]{\tt PTC\_SETCAVITIES}
+\end{itemize}
+
+\newpage
+
+% add other files to the end of this file
+%\input{ptc_auxiliaries/PTC_SetSwitch}
+%%\title{PTC\_SETSWITCH}
+
+\section{PTC\_SETSWITCH}
+\label{sec:ptc_setswitch}
+
+Routine that sets the internal \ptc switches.
+
+\madbox{
+PTC\_SETSWITCH, \=DEBUGLEVEL=integer, \\
+                \>MAXACCELERATION=logical,\\
+                \>EXACT\_MIS=logical,\\
+                \>TOTALPATH=logical,\\
+                \>RADIATION=logical,\\
+                \>FRINGE=logical,\\
+                \>TIME=logical;
+}
+
+Using this command the user can set switches of \ptc and the {\madx}-{\ptc}
+interface, adapting this way the program behavior to his needs.   
+
+{\bf Command parameters and switches}
+\begin{madlist}
+   \ttitem{DEBUGLEVEL} (Default: 1)\\
+     Sets the level of debugging printout: 0 prints none, 4 prints everything   
+
+   \ttitem{MAXACCELERATION} (Default: true)\\
+     Switch to set cavities phases so the reference orbit is always on
+     the crest, i.e. gains max energy    
+
+   \ttitem{EXACT\_MIS} (Default: .false.)\\
+     Switch ensures exact misalignment treatment.   
+
+   \ttitem{TOTALPATH} (Default: .false.)\\
+     If true, the 6th variable of PTC, i.e. 5th of MAD-X, is the total
+     path.  \\
+     If false it is deviation from the reference particle,
+     which is normally the closed orbit for closed layouts.    
+
+   \ttitem{RADIATION} (Default: false)\\    
+     Sets the radiation switch/internal state of PTC.   
+
+   \ttitem{FRINGE} (Default: false)\\    
+     Sets the fringe switch/internal state of PTC. \\ 
+     If true the influence of the fringe fields is evaluated for all
+     elements. \\       
+     Please note that currently fringe fields are always taken into
+     account for some elements (e.g. traveling wave cavities) even if
+     this flag is set to false. The detailed list of elements
+     will be provided later, when the situation in this matter will be
+     definitely settled.    
+
+   \ttitem{TIME} (Default: true)\\  
+     If true, Selects time of flight (\textit{cT} to be precise) rather
+     than path length as the 6th variable of PTC, i.e. 5th of MAD-X.     
+
+\end{madlist}
+
+
+{\bf PROGRAMMERS MANUAL}   
+Values of the switches are stored in Fortran 90 module
+mad\_ptc\_intstate (mad\_ptc\_intstate.f90). The command is processed by
+pro\_ptc\_setswitch C function, in file madxn.c, that calls appropriate
+routines of the Fortran module to set each of the switches:   
+\begin{itemize}
+   \item  ptc\_setdebuglevel 
+   \item  ptc\_setaccel\_method 
+   \item  ptc\_setexactmis 
+   \item  ptc\_setradiation 
+   \item  ptc\_settotalpath 
+   \item  ptc\_settime 
+   \item  ptc\_setfringe  
+\end{itemize}
+
+
+
+%\input{ptc_auxiliaries/PTC_Knob}
+%%\title{PTC\_KNOB}
+
+\section{PTC\_KNOB}
+\label{sec:ptc_knob}
+
+\madbox{
+PTC\_KNOB, \=ELEMENTNAME=string, \\
+           \>KN=integer\{, integer\}, KS=integer\{, integer\}, \\
+           \>EXACTMATCH=logical;
+}
+
+Sets knobs in \ptc calculations. This is currently valid only in
+{\tt  PTC\_TWISS}, {\tt PTC\_NORMAL} will follow. 
+
+Knobs appear as the additional parameters of
+the phase space. Twiss functions are then obtained  as functions of
+these parameters (Taylor series).  Also map elements might be stored as
+functions of knobs, see \hyperref[sec:ptc_select]{\tt PTC\_SELECT} command
+description to learn how to request given element to be stored as a
+Taylor series.  \\
+
+Further, the parametric results can be: 
+\begin{enumerate}
+   \item  written to a file with
+     \hyperref[ptc_printparametric]{\tt PTC\_PRINTPARAMETRIC}. 
+   \item  plotted and studied using rviewer command
+     (\hyperref[sec:rplot]{\tt RPLOT} plugin). 
+   \item  used to obtain very quickly approximate values of lattice
+     functions for given values of knobs
+     (\hyperref[sec:ptc_setknobvalue]{\tt PTC\_SETKNOBVALUE}). This
+     feature is the foundation of a fast matching algorithm with \ptc.      
+\end{enumerate}
+
+
+{\bf Command parameters and switches}
+\begin{madlist}
+   \ttitem{ELEMENTNAME} a string in range format (Default: NULL)\\
+     Specifies name of the element containing the knob(s) to be set.   
+   \ttitem{KN,KS} list of integers (Default: ???)\\
+     Defines which order 
+   \ttitem{EXACTMATCH} (Default: .true.)\\
+     Normally a knob is a property of a single element in a layout.
+     The specified name must match 1:1 to an element name. This is the
+     case when exactmatch is true.\\  
+     Knobs might be also set to all family of elements. In such case
+     the exactmatch switch must be false. A given order field
+     component of all the elements that name starts with the
+     name specified by the user become a single knob.
+   \ttitem{INITIAL}
+\end{madlist}
+
+
+{\bf Example}\\
+\href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/knobs/knobs.madx}{dog
+  leg chicane}: Dipolar components of both rbends and dipolar and
+quadrupolar components of the focusing quads set as knobs. Some first
+and second order map coefficients set to be stored as parametric
+results. ptc\_twiss command is performed and the parametric results are
+written to files in two formats. 
+
+\href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/matchknobs/matchknobs.madx}{dog
+  leg chicane}: Knob values are matched to get requested lattice
+functions.  
+
+
+ 
+% <h3> PROGRAMMERS MANUAL </h3>
+% 
+% <p> 
+% The command is implemented pro_ptc_knob function in madxn.c and 
+% by subroutine xxxx in madx_ptc_xxx.f90.
+% <p>
+% Sopecified range is resolved with help of get_range command. Number of the element in the current sequence
+% is resolved and passed as the parameter to the fortran routine. It allows to resolve uniquely the corresponding
+% element in the PTC layout.
+% <p>
+
+
+
+%\input{ptc_auxiliaries/PTC_SetKnobValue}
+%%\title{PTC\_SETKNOBVALUE}
+
+\section{PTC\_SETKNOBVALUE}
+
+The {\tt PTC\_SETKNOBVALUE} command sets a given knob value.
+
+\madbox{
+PTC\_SETKNOBVALUE, \=ELEMENTNAME=string, \\
+                   \>KN=integer\{,integer\}, \\
+                   \>KS=integer\{,integer\}, \\
+                   \>VALUE=real;
+}
+
+All values in the twiss table used by the last {\tt PTC\_TWISS} command 
+and the columns specified with \hyperref[ptc_select]{\tt
+  PTC\_SELECT}{\tt, PARAMETRIC=true;}  are reevaluated using the
+buffered parametric results.   
+
+The parameters of the command basically contains the fields that allow
+to identify uniquely the knob and the value to be set.
+
+{\bf Command parameters and switches}
+\begin{madlist}
+   \ttitem{ELEMENTNAME} a string in range format that specifies the name
+   of the element containing the knob to be set. \\
+     (Default: none) 
+   \ttitem{KN, KS} are lists of integers that define the knob.\\
+   (Default: -1)   
+   \ttitem{VALUE} specifies the value to which the knob is to be set.\\
+   (Default: 0)\\
+\end{madlist}
+
+{\bf Example:}\\
+\href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/matchknobs/matchknobs.madx}{dog
+  leg chicane}: strength of dipole field component in quadrupoles is
+matched to obtain the required R56 value.    
+
+
+% <h3> PROGRAMMERS MANUAL </h3>
+% 
+% <p> 
+% The command is implemented pro_PTC_SETKNOBVALUE function in madxn.c and 
+
+
+
+
+
+%\input{ptc_auxiliaries/Match_WithPTCKnobs}
+%%\title{Match using PTC knobs}
+
+\section{PTC\_VARYKNOBS (Under Construction)}
+\label{sec:ptc_varyknobs}
+
+The {\tt PTC\_VARYKNOBS} command allows matching with \ptc knobs.
+
+\madbox{
+PTC\_VARYKNOB, \=INITIAL=string, ELEMENT=string, \\
+               \>KN=integer, \{integer,\} KS=integer, \{integer,\} \\
+               \>EXACTMATCH=logical, TRUSTRANGE=real, \\
+               \>STEP=real, LOWER=real, UPPER=real;
+}
+
+where the attributes are
+\begin{madlist}
+  \ttitem{INITIAL}
+  \ttitem{ELEMENT}
+  \ttitem{KN, KS}
+  \ttitem{EXACTMATCH}
+  \ttitem{TRUSTRANGE} defines the range over which the expansion is
+  trusted \\ (Default:~0.1)
+  \ttitem{STEP}
+  \ttitem{LOWER}
+  \ttitem{UPPER}
+\end{madlist}
+
+This matching procedure takes advantage of the parametric results that
+are accessible with \ptc. Namely, parameters occuring in the matching
+constrains are obtained as functions (polynomials) of the matching
+variables. In other words, each variable is a knob in \ptc
+calculation. Evaluation of the polynomials is relatively fast comparing
+to the regular \ptc calculation which makes finding the minimum with the
+parametrized constraints very fast.  
+
+However, the algorithm is not faster in a general case: 
+\begin{enumerate}
+   \item  The calculation time dramatically increases with the number of
+     parameters and at some point penalty rising from this overcomes the
+     gain we get from the fast polynomial evaluation.    
+   \item  A parametric result is an approximation that is valid only
+     around the nominal parameter values.     
+\end{enumerate}
+
+The algorithm is described below. \\
+ 
+\begin{verbatim}
+MATCH, use_ptcknobs=true;
+...
+PTC_VARYKNOB: 
+  initial = [s, none] , 
+  element = [s, none] , 
+  kn    = [i, -1], 
+  ks    = [i, -1], 
+  exactmatch = [l, true, true], 
+  trustrange    = [r, 0.1],  
+  step     = [r, 0.0], 
+  lower    = [r, -1.e20],
+  upper    = [r,  1.e20]; 
+...
+END_MATCH;
+\end{verbatim}
+
+For user convenience the limits are specified in the MAD-X units (k1,k2,
+etc). This also applies to dipolar field where the user must specify
+limits of k0=angle/path\_lengh. This guarantees concistency in
+treatment of normal and skew dipole components.   
+
+Important: Note that inside the code skew magnets are represented only
+by  normal component and tilt, so the nominal skew component is always
+zero.  Inside PTC tilt can not become a knob, while skew component can.
+Remember about this fact when setting the limits of skew components in
+the matching.  When the final results are exported back to MAD-X, they
+are converted back to the "normal" state, so the nominal skew compoment
+is zero and tilt and  normal component are modified accordingly.     
+
+
+
+
+
+{\bf Example}\\
+\href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/matchknobs/.madx}{dog leg chicane}.
+
+
+{\bf Algorithm}\\
+\begin{enumerate}
+   \item Buffer the key commands (ptc\_varyknob, constraint,
+     ptc\_setswitch, ptc\_twiss or ptc\_normal, etc) appearing between 
+     match, useptcknobs=true; and any of matching actions calls
+     (migrad,lmdif,jacobian, etc) 
+   \item  When matching action appears,  
+     \begin{enumerate}
+       \item set "The Current Variables Values" (TCVV) to zero      
+       \item perform THE LOOP, i.e. points 3-17 
+     \end{enumerate}
+   \item Prepare PTC environment (ptc\_createuniverse,
+     ptc\_createlayout)  
+   \item Set the user defined knobs (with ptc\_knob).  
+   \item Set TCVV using ptc\_setfieldcomp command.  
+   \item Run a PTC command (twiss or normal).  
+   \item Run a runtime created script that performs a standard matching;
+     all the user defined knobs are variables of this matching.  
+   \item Evaluate constraints expressions to get the matching function
+     vector (I). 
+   \item Add the matched values to TCVV. 
+   \item End PTC session (run ptc\_end). 
+   \item If the matched values are not close enough to zeroes then goto 3.
+   \item Prepare PTC environment (ptc\_createuniverse,
+     ptc\_createlayout). 
+   \item Set TCVV using ptc\_setfieldcomp command.
+     \\   ( --- please note that knobs are not set in this case  -- )  
+   \item Run a PTC command (twiss or normal).
+   \item Evaluate constraints expressions to get the matching function
+     vector (II). 
+   \item Evaluate a penalty function that compares matching function
+     vectors (I) and (II).\\     See points 7 and 14.
+   \item If the matching function vectors are not similar to each other
+     within requested precision then goto 3. 
+   \item Print TCVV, which are the matched values. 
+\end{enumerate}
+
+
+ 
+% <h3> PROGRAMMERS MANUAL </h3>
+% 
+% <p> 
+% The command is implemented pro_PTC_SETKNOBVALUE function in madxn.c and 
+% 
+
+
+%\input{ptc_auxiliaries/PTC_PrintParametric} 
+%%\title{PTC\_KNOB}
+
+\section{PTC\_PRINTPARAMETRIC}
+\label{sec:ptc_printparametric}
+
+{\bf Editor's Note:} This command exists but is not documented. The file 
+PTC\_PrintParametric.html contains the same content as PTC\_Knob.html. I
+presume the original file has been lost and overwritten...
+
+
+%\input{ptc_auxiliaries/PTC_EPlacement}
+%%\title{PTC\_EPLACEMENT}
+
+\section{PTC\_EPLACEMENT}
+
+\begin{verbatim}
+PTC_EPLACEMENT, 
+   range = [s, none],
+   x     = [r, 0],    y = [r, 0],    z = [r, 0],
+   phi   = [r, 0],    theta = [r, 0], 
+   onlyposition    = [l, false, true] ,
+   onlyorientation = [l, false, true] ,
+   autoplacedownstream = [l, true, true] ,
+   refframe = [s, gcs] ; 
+\end{verbatim}
+
+
+Places a given element at required position and orientation.  All
+rotations are made around the front face of the element.
+
+{\bf  Command parameters and switches }
+\begin{itemize}
+   \item {\bf range}=string in range format (Default: ???)\\
+     Specifies name of the element to be moved.   
+
+   \item {\bf x,y,z}=real (Default: 0.0)\\
+     Coordinate of the front face of the magnet.   
+
+   \item {\bf phi, theta}=real (Default: 0.0)\\
+     polar (in xz plane, around z axis) and azimuthal (around x axis)
+     rotation angles, respectively.   
+     
+   \item {\bf refframe}=string (Default: gcs)\\
+     Defines the coordinate system with respect to which coordinates and
+     angles are specified. \\
+     Possible values are:       
+     \begin{itemize}
+        \item[gcs]  global coordinate system 
+        \item[current]   current position
+        \item[previouselement]  end face of the previous element 
+     \end{itemize}
+
+   \item {\bf onlyposition}=logical (Default: .false.)\\
+     If true, only translation are performed and orientation of the
+     element is not changed.    
+
+   \item {\bf onlyorientation}=logical (Default: .false.)\\
+     If true, only rotations are performed and position of the element
+     is not changed.    
+
+   \item {\bf autoplacedownstream}=logical (Default: .true.)\\
+     if true all elements downstream are placed at default positions
+     with respect to the moved element, \\
+     if false the rest of the layout stays untouched.    
+
+   \item {\bf surveyall}=logical  (Default: .true.)\\
+     If true, survey of all the line is performed after element
+     placement at new position and orientation. It is implemented
+     mainly for the software debugging purposes. If patching was
+     performed correctly, the global survey should not change anything.     
+\end{itemize}
+
+\textbf{Example }\\
+
+\href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/eplacement/chicane.madx}{Dog
+  leg chicane}: postion of quadrupoless is matched to obtain required
+R566 value.   
+
+
+{\bf PROGRAMMER'S MANUAL}
+
+The command is implemented pro\_ptc\_eplacement function in madxn.c and
+by subroutine ptc\_eplacement() in madx\_ptc\_eplacement.f90.  
+
+Specified range is resolved with help of get\_range command. Number of
+the element in the current sequence is resolved and passed as the
+parameter to the fortran routine. It allows to resolve uniquely the
+corresponding element in the PTC layout.  
+
+TRANSLATE\_Fibre and ROTATE\_Fibre routines of ptc are employed to place
+and orient an element in space. These commands adds rotation and
+translation from the current position. Hence, if the specified reference
+frame is other then "current", the element firstly needs to be placed at
+the center of the reference frame and then it is moved about the user
+specified coordinates.   
+
+After element placement at new position and orientation patch needs to
+be recomputed. If autoplacedownstream is false then patch to the next
+element is also recomputed. Otherwise, the layout is surveyed from the
+next element on, what places all the elements downstream with default
+position with respect to the moved element.  
+
+At the end all the layout is surveyed, if surveyall flag is true, what
+normally should always take place.      
+
+
+
+
+%\input{ptc_auxiliaries/PTC_PrintFrames}
+%%\title{PTC\_PRINTFRAMES}
+
+\section{PTC\_PRINTFRAMES}
+
+\begin{verbatim}
+PTC_PRINTFRAMES, 
+    file = [s, none] ,
+    format = [s, text] ; 
+\end{verbatim}
+
+Print the PTC geometry of a layout to a specified file.   \\
+
+{\bf Command parameters and switches}
+\begin{itemize}
+   \item {\bf file}=string (Default: NULL)\\
+     Specifies the name of the file.   
+   \item {\bf format}=string (Default: text)\\
+     Format of geometry.\\
+     Currently two formats are accepted:       
+     \begin{itemize}
+	\item text: Prints a simple text file.           
+	\item rootmacro: Creates \href{http://root.cern.ch}{root} macro
+          that produces 3D display of the geometry.            
+     \end{itemize}
+\end{itemize}
+
+
+{\bf Example }\\
+\href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/eplacement/eplacement.madx}{Dog
+  leg chicane} with some elements displaced with help of
+ptc\_eplacement.
+
+ 
+% <h3> PROGRAMMERS MANUAL </h3>
+% 
+% <p> 
+% The command is implemented pro_ptc_knob function in madxn.c and 
+% by subroutine xxxx in madx_ptc_xxx.f90.
+% <p>
+% Sopecified range is resolved with help of get_range command. Number of the element in the current sequence
+% is resolved and passed as the parameter to the fortran routine. It allows to resolve uniquely the corresponding
+% element in the PTC layout.
+% <p>
+
+
+%\input{ptc_auxiliaries/PTC_Select}
+%%\title{PTC\_SELECT}
+
+\section{PTC\_SELECT}
+
+\begin{verbatim}
+PTC_SELECT, 
+   table      = [s, none, none], 
+   column     = [s, none, none], 
+   polynomial = [i, none] , 
+   monomial   = [s, none] , 
+   parametric = [l, false, true], 
+   quantity   = [s, none] ; "
+\end{verbatim}
+
+
+Selects map elements to be: 
+\begin{enumerate}
+  \item {\bf Stored in a user specified table and column.}
+    \textit{Table} and \textit{column} must be specified then, and such
+    table with such column must exists.  
+
+  \item {\bf Stored as a function (taylor series) of
+    \href{PTC_Knob.html}{knobs}, if any is defined.} Then,
+    \textit{parametric} should be set to true. 
+\end{enumerate}
+Both cases can be joined in one command.   
+
+
+{\bf Command parameters and switches}
+
+\begin{itemize}
+   \item {\bf table}=string (Default: ???)\\
+     Specifies name of the table where values should be stored.   
+   \item {\bf column}=string (Default: ???)\\     
+     Specifies name of the table where values should be stored.   
+   \item {\bf polynomial}=integer (Default: ???)\\
+     Specifies row of the map.   
+   \item {\bf monomial}=string composed of digits (Default: ???)\\
+     Defines monomial of the polynomial in PTC nomenclature. \\
+     Its length should be equal to number of variables. Each digit
+     corresponds to the exponent of a variable. Monomial 'ijklmn'
+     defines x$^i$p$_x$$^j$y$^k$p$_y$$^l$
+     $\Delta$T$^m$($\Delta$p/p)$^n$. For example, element=2 and
+     monomial=1000000 defines coefficient of the second polynomial (that
+     defines p$_x$) close to x, in the other words it is R21.  
+   \item{\bf parametric}=logical (Default: .false.)\\
+     If true, and any \href{PTC_Knob.html}{knobs} are defined, the
+     map element is stored as the parametric result.            
+\end{itemize}
+
+
+{\bf Examples}\\
+
+\href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/ptc_secordmatch/chicane.madx}{dog
+  leg chicane}: strength of quads is matched to obtain required T112
+value.    
+
+\href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/eplacement/chicane.madx}{dog
+  leg chicane}: postion of quads is matched to obtain required T566
+value.   
+
+\href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/matchwithknobs/matchwithknobs.madx}{dog
+  leg chicane}: dipole and quadrupole strengths are matched with the
+help of knobs to obtain required momentum compaction and Twiss
+functions.   
+
+
+{\bf PROGRAMMER'S MANUAL} 
+
+The command is implemented pro\_ptc\_select function in madxn.c and  by
+subroutine addpush in madx\_ptc\_knobs.f90, that is part of
+madx\_ptc\_knobs\_module   
+
+On the very beginning the existance of the table and within column is
+checked. In the case of failure, error message is printed and the
+function is abandoned.   
+
+The command parameters are passed as the arguments of addpush Fortran
+routine.  A selection is stored in a type called tablepush\_poly defined
+madx\_ptc\_knobs.inc. A newly created object is added to array named
+pushes.    
+
+More then one element might be stored in a single table, so the module
+must assure that  each of tables is augmented only ones for each magnet
+(or integration slice).  For that purpose array of tables to be
+augmented (named tables) is stored separately and  we assure that a
+table is listed here only ones. This is simply done by checking  if a
+table name is not already listed before adding a new element to the
+array.   
+
+In case the user requested an element to be stored in the paramteric
+format, and column in the array of parametric results is reserved and
+the index of the column is remembered in index field of tablepush\_poly
+type is filled. In the other case this field is equal to zero.   
+
+The routine ptc\_twiss (defined in file madx\_ptc\_twiss.f90), after
+tracking each of magnets  in the sequence, calls putusertable
+routine. This routine loops over selected elemetns defined in the pushes
+table. For each of them it extracts the requested element from the map
+using .sub.  operator of PTC and stores it in the defined table and
+column.  If index field is not zero and any knob is defined, it extracts
+the polynomial using .par. operator, and stores it in the 2D array
+called results, in the row corresponding to the number of the magnet (or
+integration step) and column defined by the index field.     
+
+
+
+%\input{ptc_auxiliaries/PTC_SelectMoment}
+%%\title{PTC\_SELECT\_MOMENT}
+\section{PTC\_SELECT\_MOMENT}
+
+\begin{verbatim}
+PTC_SELECT_MOMENT, 
+   table      = [s, none, none], 
+   column     = [s, none, none], 
+   moment_s   = [s, none] , 
+   moment     = [i, {0}] , 
+   parametric = [l, false, true], 
+\end{verbatim}
+
+Selects a moment to be: 
+\begin{enumerate}
+  \item {\bf Stored in a user specified table and column.}
+    \textit{Table} and \textit{column} must be specified then, and such
+    table with such column must exists.  
+
+  \item {\bf Stored as a function (taylor series) of
+    \href{PTC_Knob.html}{knobs}, if any is defined.} Then,
+    \textit{parametric} should be set to true. 
+\end{enumerate}
+Both cases can be joined in one command.   
+
+
+{\bf Command parameters and switches}
+\begin{itemize}
+   \item {\bf moment\_s}=list of coma separated strings composed of up
+     to 6 digits (Default: ???)\\
+     Defines moment of the polynomial in PTC nomenclature. String 'ijklmn'
+     (where i,j,k,l,m,n are digits from 0 to 9) defines
+     $<$x$^i$p$_x$$^j$y$^k$p$_y$$^l$ $\Delta$T$^m$($\Delta$p/p)$^n$$>$. 
+     \\ For example, moment\_s=100000 defines $<$x$^1$$>$ 
+
+     Note that for input we always use MAD-X notation where dp/p is always
+     the 6th coordinate. Internally to PTC, dp/p is the 5th coordinate. We
+     perform automatic conversion that is transparent for the user. As the
+     consequence RMS in dp/p is always defined as 000002, even in 5D case.    
+
+     This notations allows to define more then one moment with one
+     command. In this case, the corresponding column names are as the passed
+     strings with "mu" prefix. However, they are always extended to 6 digits,
+     i.e. the trailing 0 are automatically added. For example, if specified
+     moment\_s=2, the column name is mu200000.
+
+     This method does not allow to pass bigger numbers then 9. If you need to
+     define such a moment, use the command switch below.    
+     
+   \item {\bf moment}=list of up to 6 coma separated integers (Default: ???)\\
+     Defines a moment. For example: moment=2 defines $<$x$^2$$>$ ,
+     moment=0,0,2 : $<$y$^2$$>$, moment=0,14,0,2 : $<$px$^{14}$py$^2$$>$,
+     etc. 
+
+   \item {\bf table}=string (Default: moments)\\
+     Specifies the name of the table where the calculated moments are stored.   
+
+   \item {\bf column}=string (Default: ???)\\
+     Ignored if \textit{ moments } is specified. Defines name of the
+     column where values should be stored. If not specified then it
+     is automatically generated from moment the definition
+     $<$x$^i$p$_x$$^j$y$^k$p$_y$$^l$
+     $\Delta$T$^m$($\Delta$p/p)$^n$$>$ =$>$ mu\_i\_j\_k\_l\_m\_n
+     (numbers separated with underscores).                  
+
+   \item {\bf parametric}=logical (Default: .false.)\\
+     If it is true, and any \href{PTC_Knob.html}{knobs} are defined the map
+     element is stored as the parametric result.             
+\end{itemize}
+
+{\bf Examples}\\
+\href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/moments/moments.madx}{ATF2}
+
+ 
+% <h3> PROGRAMMERS MANUAL </h3>
+% 
+% <p> 
+% The command is implemented pro_ptc_SELECT function in madxn.c and 
+% by subroutine xxxx in madx_ptc_xxx.f90.
+% <p>
+% Sopecified range is resolved with help of get_range command. Number of the element in the current sequence
+% is resolved and passed as the parameter to the fortran routine. It allows to resolve uniquely the corresponding
+% element in the PTC layout.
+% <p>
+
+
+
+%\input{ptc_auxiliaries/PTC_Moments}
+%%\title{PTC\_MOMENTS}
+
+\section{PTC\_MOMENTS}
+
+\begin{verbatim}
+PTC_MOMENTS, 
+    no = [i, 1], 
+    xdistr   = [s, gauss, gauss], 
+    ydistr   = [s, gauss, gauss], 
+    zdistr   = [s, gauss, gauss], 
+\end{verbatim}
+
+Calculates moments previously selected with the
+\href{PTC_SelectMoment.html}{ptc\_select\_moment} command.  It uses maps
+saved by the ptc\_twiss command, hence, the savemaps switch of
+ptc\_twiss must be set to true (default) to be able to calculate
+moments.  \\ 
+
+{\bf  Command parameters and switches }
+\begin{itemize}
+   \item {\bf no}=integer (Default: 1)\\
+     order of the calculation, maximally twice the order of the last
+     twiss.
+   
+   \item {\bf xdistr, ydistr, zdistr}=string (Default: gauss)\\  
+     defines the distribution in x, y and z dimension respectively 
+     \begin{enumerate}
+	\item {\bf gauss} - Gaussian
+	\item {\bf flat5} - flat distribution in the first of
+          variables (dp over p) of a given dimension and Delta Dirac in
+          the second one (T)  
+	\item {\bf flat56} - flat rectangular distribution 
+     \end{enumerate}
+\end{itemize}
+
+{\bf Examples}\\
+\href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/moments/moments.madx}{ATF2}
+
+
+% <h3> PROGRAMMERS MANUAL </h3>
+% 
+% <p> 
+% The command is implemented pro_ptc_SELECT function in madxn.c and 
+% by subroutine xxxx in madx_ptc_xxx.f90.
+% <p>
+% Sopecified range is resolved with help of get_range command. Number of the element in the current sequence
+% is resolved and passed as the parameter to the fortran routine. It allows to resolve uniquely the corresponding
+% element in the PTC layout.
+% <p>
+
+
+
+%\input{ptc_auxiliaries/PTC_DumpMaps}
+%%\title{PTC\_DumpMaps}
+
+\section{PTC\_DUMPMAPS}
+
+\begin{verbatim}
+PTC_DUMPMAPS, 
+      file = [s, ptcmaps, ptcmaps];
+\end{verbatim}
+
+PTC\_DUMPMAPS dumps the linear part of the map for each element of the
+layout into the specified file.  
+
+{\bf Command parameters and switches}\\
+\begin{itemize}
+   \item {\bf file}=string  (Default: ptcmaps)\\
+     Specifies the file\_name of the file to which the matrices are dumped to.   
+\end{itemize}
+
+{\bf PROGRAMMERS MANUAL} \\  
+The command is implemented by subroutine ptc\_dumpmaps() in
+madx\_ptc\_module.f90. The matrix for a single element is obtained by
+tracking identity map through an element, that is initialized for each
+element by adding identity map to the reference particle. For the
+elements that change reference momentum (i.e. traveling wave cavity)  it
+is tracked to the end of the following marker, that has updated
+reference momentum. Hence, each cavity must be followed by a marker. If
+it is not, setcavities subroutine detects error and stops the program.   
+ 
+
+
+%\input{ptc_auxiliaries/PTC_SetCavities}
+%%\title{PTC\_SetCavities}
+
+\section{PTC\_SetCavities}
+
+\begin{verbatim}
+PTC_SetCavities;
+\end{verbatim}
+
+This command adjusts cavities and sets appropriate reference momenta for
+a layout containing traveling wave cavities.
+
+This command sets up the properties of a layout and traveling wave
+cavities.  The main goal is to update  reference beam energy for the
+elements  that follow a traveling wave cavity.  It traces the
+synchronous particle, i.e. one that has  all its parameters set to zero
+at the beginning of the layout under study. At the point it arrives to a
+cavity,  the parameters of the latter one are adjusted according to the
+switches  defined by the user. 
+
+There are 2 cases   
+\begin{enumerate}
+   \item \textbf{Leaves all parameters untouched}
+   \item \textbf{Phase of cavity is adjusted so it gives the maximum
+     acceleration} Afterwards to the calculated phase the lag
+     is added. This setting is acquired using set\_switch
+     command, setting maxaccel parameter to true.   
+\end{enumerate} 
+
+Afterwards,  the synchronous particle is tracked through traveling wave
+cavity  and its energy gain is known.  This energy becomes the reference
+one for all the elements downstream of the cavity.  The particle is
+tracked further to the next cavity,  for which the procedure described
+above is repeated.    
+
+Parameters of the cavities are dumped to the file named
+twcavsettings.txt.    
+
+At the end patches at the ends of the cavities are set,  so the
+parameters after them are  calculated taking to the account reference
+energy increase.   
+
+The exact program behavior depends on the  \href{PTC_SetSwitch.html}{
+  PTC switches settings}.   
+
+Please note that in PTC phase velocity of a cavities wave is always
+equal to speed of light.  Hence, if PTC internal state TIME is TRUE,
+what is the most correct setting,  then voltage seen by a particle is
+varying along the structure. If TIME is FALSE,  track is assumed to fly
+with speed of light and in such case a particle moves together with the
+wave front.    
+
+
+{\bf PROGRAMMERS MANUAL}
+
+{\bf CAUTION} For the time being cavities MUST not be placed one after
+another, and at least a marker must be inserted between two neighboring
+accelerating structures. Otherwise, program will stop with the error
+message.    
+
+
+%%\end{document}

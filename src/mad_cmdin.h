@@ -40,13 +40,13 @@ struct in_cmd_list /* contains list of in_cmd pointers sorted by label */
 struct in_cmd* new_in_cmd(int length);            // many uses
 struct in_cmd* delete_in_cmd(struct in_cmd*);     // many uses
 struct in_cmd* buffered_cmd (struct in_cmd*);     // used by mad_cmd.c
+struct in_cmd* buffer_in_cmd(struct in_cmd*);     // used by mad_eval.c
 
 struct in_cmd_list* new_in_cmd_list(int length);  // used by mad_core.c
 void                grow_in_cmd_list(struct in_cmd_list*);
 // missing delete?
 
-void  buffer_in_cmd (struct in_cmd*);
-void  scan_in_cmd   (struct in_cmd*);
-void  dump_in_cmd   (struct in_cmd*); // for debugging
+void  scan_in_cmd (struct in_cmd*);
+void  dump_in_cmd (struct in_cmd*); // for debugging
 
 #endif // MAD_CMDIN_H

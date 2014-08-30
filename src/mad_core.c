@@ -125,6 +125,7 @@ madx_start(void)
 #ifdef _USEGC
   // init garbage collector
   GC_INIT();
+  // GC_enable_incremental();
 #endif
 
 // let's gdb find the place of segmentation fault when debugging
@@ -148,16 +149,16 @@ madx_start(void)
   int pad_idx = strlen("Windows")-strlen(version_ostype);
   if (pad_idx >= pad_sz) pad_idx = pad_sz-1; 
 
-  int version_is_pro = !strcmp(strrchr(version_name, '.'), ".00");
+//  int version_is_pro = !strcmp(strrchr(version_name, '.'), ".00");
 
-  printf("\n  +++++++++++++++++++++++++++++++++++++++++++\n");
-  printf("  +    %s  (%s bit, %s) %s    +\n", version_name, version_arch, version_ostype, pad[pad_idx]);
-  printf("  +    %s     +\n", version_is_pro ? version_type_pro : version_type_dev);
-  printf("  + %s      +\n", version_date_mod);
-  printf("  + Execution Time Stamp: %02d.%02d.%02d %02d.%02d.%02d +\n",
-         tm->tm_mday, tm->tm_mon+1, tm->tm_year%100,
+  printf("\n  ++++++++++++++++++++++++++++++++++++++++++++\n");
+  printf("  +     MAD-X %s  (%s bit, %s) %s    +\n", version_name, version_arch, version_ostype, pad[pad_idx]);
+  printf("  + Support: mad@cern.ch, http://cern.ch/mad +\n");
+  printf("  + Release   date: %s               +\n", version_date);
+  printf("  + Execution date: %04d.%02d.%02d %02d:%02d:%02d      +\n",
+         tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,
          tm->tm_hour, tm->tm_min, tm->tm_sec);
-  printf("  +++++++++++++++++++++++++++++++++++++++++++\n");
+  printf("  ++++++++++++++++++++++++++++++++++++++++++++\n");
 }
 
 void
@@ -241,7 +242,7 @@ madx_finish(void)
 
     printf("\n"
            "  ++++++++++++++++++++++++++++++++++++++++++++\n");
-    printf("  + %s (%s bit) finished normally +\n", version_name, version_arch);
+    printf("  + MAD-X %s (%s bit) finished normally +\n", version_name, version_arch);
     printf("  ++++++++++++++++++++++++++++++++++++++++++++\n");
   }
 }

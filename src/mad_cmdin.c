@@ -27,18 +27,27 @@ buffered_cmd(struct in_cmd* cmd)
   else return cmd;
 }
 
-void
+struct in_cmd*
 buffer_in_cmd(struct in_cmd* cmd)
   /* stores an input command in a buffer */
 {
-  int i;
+  if (cmd->label == NULL) {
+    assert( !strcmp(cmd->name, "in_cmd") ); // new command never used, destroy
+    return delete_in_cmd(cmd);
+  }
+
   if (buffered_cmds->curr == buffered_cmds->max)
     grow_in_cmd_list(buffered_cmds);
+
   cmd->label = permbuff(cmd->label);
+
   add_to_name_list(cmd->label, 0, buffered_cmds->labels);
+
   buffered_cmds->in_cmds[buffered_cmds->curr++] = cmd;
-  for (i = 0; i < cmd->tok_list->curr; i++)
+  for (int i = 0; i < cmd->tok_list->curr; i++)
     cmd->tok_list->p[i] = permbuff(cmd->tok_list->p[i]);
+
+  return cmd;
 }
 
 struct in_cmd*

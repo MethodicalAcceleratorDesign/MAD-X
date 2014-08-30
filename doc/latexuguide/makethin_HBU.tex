@@ -1,0 +1,111 @@
+% ~/tex/makethin/makethin.tex
+%
+% cd ~/tex/makethin/ ; open makethin.tex
+
+\documentclass{article}    % Specifies the document style.
+
+\usepackage{vmargin}
+\setmarginsrb{22mm}{10mm}{20mm}{10mm}{12pt}{11mm}{0pt}{11mm}
+
+\usepackage{color}
+\definecolor{grey}{cmyk}{0,0,0,0.5} 
+\definecolor{darkgreen}{cmyk}{1,0,1,0.25}
+\definecolor{darkblue}{cmyk}{1,1,0,0}
+\usepackage{hyperref}
+\hypersetup{colorlinks, citecolor=darkblue, filecolor=darkblue, linkcolor=darkblue, urlcolor=darkblue}
+
+\title{{\color{red} MAKETHIN: Slice a sequence}}
+\author{ Helmut Burkhardt }
+\date{\today}
+
+\begin{document}           % End of preamble and beginning of text.
+
+\maketitle                 % Produces the title block.
+
+\noindent
+This module converts a sequence with thick elements into one composed of thin (zero length) element slices or simplified thick slices as required by MAD-X tracking or conversion to SIXTRACK input format. \\
+
+\noindent
+The number of slices can be set individually for elements or groups of elements using \href{http://mad.web.cern.ch/mad/madx.old/Introduction/select.html}{select} commands \\ \\
+\textsf{\color{darkgreen}select, FLAG=makethin, RANGE=range, CLASS=class, PATTERN=pattern[,FULL][,CLEAR],THICK=false,}\\
+\textsf{\color{darkgreen} SLICE=$n$;}\\ \\
+where $n$ stands for the number of slices. Default is $n=1$ and THICK=false for all elements, i.e. conversion of all thick elements to a single thin slice positioned at the centre of the original thick element.\\ \\
+
+\noindent
+The slicing is done by the command\\ \\
+\textsf{\color{darkgreen}makethin, Sequence=sequence name, STYLE=slicing style;}\\ \\
+where the sequence must be given by its name and must be active (previously loaded with use).\\ \\
+The \textsf{\color{darkgreen}slicing style} options are:
+\begin{description}
+  \item[\textsf{\color{darkgreen}simple}] (default for $n>4)$: produces equal strength slices at equidistant positions with the kick in the middle of each slice
+  \item[\textsf{\color{darkgreen}teapot}] (default for $n\leq 4)$: improved slice positioning using the algorithm described in \href{http://accelconf.web.cern.ch/AccelConf/IPAC2013/papers/mopwo027.pdf}{IPAC'13 MOPWO027}. It is recommended to always specify \textsf{\color{darkgreen}STYLE=teapot} 
+  to use the improved slicing for any number of slices
+    \item[\textsf{\color{darkgreen}collim}] this is the default slicing for collimators. If only one slice is chosen it is placed in the middle of the old element. If two slices are chosen they are placed at either end. Three slices or more are treated as one slice.
+\end{description}
+
+\noindent
+The created thin lens sequence has the following properties:
+\begin{itemize}
+\item The new sequence has the same name as the original. The original is replaced in memory and has to be reloaded if it is needed again.
+\item The slicer also slices any inserted sequence used in the main sequence. These are also given the same names as the originals.
+\item Any component changed into a single thin lens has the same name as the original.
+\item If a component is sliced into more than one slice, the individual slices have the same name as the original component and a suffix ..1, ..2, etc... and a marker will be placed at the center with the original name of the component.
+\end{itemize}
+
+
+\vspace{0.5cm}
+\noindent
+Restrictions:
+\begin{itemize}
+\item makethin requires default positioning (refer=centre).
+\item \textsf{\color{darkgreen}THICK=true} only applies to bending or quadrupole magnet elements and is ignored otherwise
+\end{itemize}
+
+\vspace{1CM}
+
+\noindent
+{\large{\bf Enhanced options}, implemented in 2013}\\ \\
+Slicing can be turned off for certain elements or classes by specifying a slice number $< 1$. Examples :\\
+\textsf{\color{darkgreen}select, flag=makethin, class=sextupole, slice=0; ! turn off slicing for sextupoles}\\
+\textsf{\color{darkgreen}select, flag=makethin, pattern=mbxw\., slice=0;  ! keep elements unchanged with names starting by mbxw}\\
+This option allows to introduce slicing step by step and monitor the resulting changes in optics parameters.\\
+%Note that subsequent tracking generally requires full slicing, with possible exception of quadrupoles and bending magents.
+
+\noindent
+{\bf Thick quadrupole slices}.\\
+Makethin has been upgraded in 2013 to allow for thick quadrupole slicing with insertion of markers between thick slices.
+Positioning is done with markers between slices, here however with thick slice quadrupole piece filling the whole length.
+ Examples:\\
+\textsf{\color{darkgreen}select, flag=makethin, class=quadrupole, thick=true,slice=2; ! slice quadrupoles thick, insert 2 markers per quad}\\
+\textsf{\color{darkgreen}select, flag=makethin, pattern=mqxa\., slice=1, thick=true; ! thick slicing for quadrupoles named mqxa, insert one marker in the middle}\\
+
+\noindent
+{\bf Automatic dipedge generation for bending magnets.}.\\
+Makethin has been upgraded in 2013 to automatically generated dipedges at the start and/or end of bending magnets, to conserve edge focusing from pole face angles e1, e2 or extra fields described by fint, fintx, in the slicing of bending magnets to thin multipole slices.\\
+Selection with \textsf{\color{darkgreen}THICK=true} will translate a complex thick rbend or sbend including edge effects to a simple thick sbend in which the edge focusing is transferred to extra dipedges. Example :\\
+\textsf{\color{darkgreen}select, flag=makethin, rbend, thick=true; ! keep translated rbend as thick sbend}\\
+
+\noindent
+{\bf Hints}\\
+% Makethin should be considered as a tool to automatically translate a thick sequence as relevant for matching and twiss, into a sequence which can be used as input for tracking. The 
+See the \href{http://madx.web.cern.ch/madx/madX/examples/makethin/}{examples} for makethin.\\
+Compare the main optics parameters like tunes before and after slicing with makethin.
+In tests, turn off slicing for some of the main element classes to identify the main sources of changes.
+For sextuples and octupoles, a single slice should always be sufficient.
+Increase the number of slices for critical elements like mini-beta quadrupoles. Even there, more than four slices should rarely be required.
+Rematch tunes and chromaticity after makethin.
+
+\noindent
+See the presentations on the upgrade of the makethin module,\\
+\href{http://ab-dep-abp.web.cern.ch/ab-dep-abp/LCU/LCU_meetings/2012/20120918/LCU_makethin_2012_09_18.pdf}{LCU\_makethin\_2012\_09\_18.pdf},
+\hspace{0.2cm}
+\href{http://ab-dep-abp.web.cern.ch/ab-dep-abp/LCU/LCU_meetings/2013/20130419/LCU_makethin_2013_04_19.pdf}{LCU\_makethin\_2013\_04\_19.pdf}.
+
+
+\end{document}
+
+
+
+
+cd ~/madX/doc/usrguide/makethin 
+in 06/11/2013 still has my old 2005 help

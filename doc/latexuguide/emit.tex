@@ -1,0 +1,75 @@
+%%\title{EMIT}
+%  Changed by: Chris ISELIN, 27-Jan-1997 
+%  Changed by: Hans Grote, 15-Oct-2002 
+%  Changed by: Ralph Assmann, 02-Sep-2003 
+
+\chapter{EMIT: Equilibrium emittances} 
+\label{chap:emit}
+%Fully Coupled Motion and Radiation}
+
+\texttt{EMIT} calculates the equilibrium emittances: 
+
+\madbox{
+EMIT, DELTAP=real, TOL=real;
+}\vspace{5mm}
+
+The attributes for \texttt{EMIT} command are: 
+
+\begin{madlist}
+  \ttitem{DELTAP} specified average energy error. \\
+  EMIT adjusts the RF frequencies such as to obtain this
+  average energy error. More precisely, the revolution frequency $f_0$
+  is determined for a fictitious particle with constant momentum error  
+  %DELTAP = delta$_\textit{s}$ = delta(\textit{E}) / \textit{p$_s$ c}
+  DELTAP = $\delta_s = \delta(E) / p_s c$ which travels along the design
+  orbit. The RF frequencies are then set to   
+  %\textit{f$_{RF}$ = h f$_0$}. 
+  $f_{RF} = h f_0$. 
+
+  \ttitem{TOL} The tolerance attribute is for the distinction between
+  static and dynamic cases: \\
+  if for the eigenvalues of the one-turn matrix, $|$e\_val\_5$|$ \textless
+  tol and $|$e\_val\_6$|$ \textless tol, then the longitudinal motion is
+  not considered, otherwise it is. \\
+  (Default:~1.000001)  
+\end{madlist}
+
+
+If the machine contains at least one RF cavity, and if synchrotron
+radiation is \href{../Introduction/beam.html#radiate}{ON}, the
+\texttt{EMIT} command computes the equilibrium emittances and other
+electron beam parameters using the method of 
+\href{../Introduction/bibliography.html#chao}{[Chao]}. 
+
+In this calculation the effects of quadrupoles, sextupoles, and
+octupoles along the closed orbit is also considered. Thin multipoles are
+used only if they have a fictitious length \texttt{LRAD} different from zero.  
+
+If the machine contains no RF cavity, if synchrotron radiation is
+\href{../Introduction/beam.html#radiate}{OFF}, or if the longitudinal
+motion is not stable, \texttt{EMIT} only computes the parameters that
+are not related to radiation.  
+
+In the current implementation, the BEAM values of the emittances and
+beam sizes are only updated for deltap = zero.  
+
+{\bf Example:}\\ 
+\madxmp{
+RFC: RFCAVITY, HARMON..., VOLT=...; \\
+\ldots \\
+BEAM, ENERGY = 100.0, RADIATE; \\
+EMIT, DELTAP = 0.01;
+}
+
+{\bf Remark:}\\
+ This module assumes nearly constant lattice functions
+inside elements. This assumption works for many machines, like LEP
+(\href{http://cern.ch/frs/mad-X_examples/emit/LEP/}{see example}), but
+it fails when the lattice functions largely vary inside single
+elements. In the later case it is advised to slice the elements as shown
+in the example pertaining to
+\href{http://cern.ch/frs/mad-X_examples/emit/ALBA/}{ALBA}.     
+
+% \href{Rogelio HREF=http://consult.cern.ch/xwho/people/69118}{R.Tom\'as} 
+% \textbf{Last updated:} 03/13/2013 13:47:20
+

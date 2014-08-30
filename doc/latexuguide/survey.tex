@@ -1,0 +1,77 @@
+%%\title{Geometric Layout}
+%  Created by: Andre VERDIER, 21-Jun-2002 
+%  Changed by: Andre Verdier, 25-Jun-2002 
+%  Changed by: Hans Grote, 30-Sep-2002 
+%  Changed by: Andre Verdier, 14-Jan-2003 
+%  Directory :  /afs/cern.ch/eng/sl/MAD-X/pro/docu/survey/ 
+ 
+\chapter{SURVEY}
+\label{chap:survey}
+
+The \texttt{SURVEY} command computes the geometrical layout, i.e. the
+coordinates of all machine elements in a 
+\href{../Introduction/conventions.html}{global reference system}. These
+coordinates can be used for installation. In order to produce
+coordinates in a particular system, the initial coordinates and angles
+can be specified. 
+
+\madbox{
+SURVEY, \=SEQUENCE=string, FILE= string, \\
+        \>X0=real, Y0=real, Z0=real, \\
+        \>THETA0=real, PHI0=real, PSI0=real;}
+%        \>FILE=string, TABLE=string, SEQUENCE=string;
+
+The command has the following attributes:
+%% \begin{madlist}
+%%    \ttitem{X0} The initial X coordinate [m]. 
+%%    \ttitem{Y0} The initial Y coordinate [m]. 
+%%    \ttitem{Z0} The initial Z coordinate [m]. 
+%%    \ttitem{THETA0} The initial angle theta [rad]. 
+%%    \ttitem{PHI0} The initial angle phi [rad]. 
+%%    \ttitem{PSI0} The initial angle psi [rad]. 
+%% \end{madlist}
+\begin{madlist}
+  \ttitem{SEQUENCE}   name of sequence to be surveyed. By default the
+  last sequence expanded with the \texttt{USE} command will be surveyed.  
+  \ttitem{FILE}   name of external file to which the results are
+  written.\\ (Default:~survey)
+  \ttitem{X0, Y0, Z0} initial horizontal, vertical and longitudinal
+  coordinates.\\ (Default: 0.0, 0.0, 0.0) 
+  \ttitem{THETA0, PHI0, PSI0} initial horizontal and vertical angles and
+  transverse tilt.\\ (Default: 0.0, 0.0, 0.0)
+  %% \ttitem{TABLE}   name of internal table containing survey
+  %% results.\\ (Default: survey) \\
+  %% {\bf NOTE: this parameter is ignored and default value 'survey' is always used.}
+\end{madlist}
+
+
+The computation results are written on the internal
+table with name "survey". Results can also be written on an external
+file. Each line contains the global coordinates of an element taken at
+the end of the element.  
+
+{\bf Example : average LHC ring with CERN coordinates.}
+\madxmp{
+REAL CONST R0 = 1.0; ! to obtain the average ring \\
+USE, SEQUENCE=lhcb1;\\
+SURVEY, \=X0=-2202.21027, Y0=2359.00656, Z0=2710.63882,  \\
+        \>THETA0=-4.315508007, PHI0=0.0124279564, PSI0=-0.0065309236, \\
+        \>FILE=survey.lhcb1;
+}
+
+
+{\bf WARNING :}\\
+In the case a machine geometry is constructed with thick
+lenses, the circumference will change if the structure is converted into
+thin lenses (via the \href{../makethin/makethin.html}{makethin}
+command). This is an unavoidable feature. ONLY the structure with thick
+lenses must be used for practical purposes.
+
+
+{\bf INFORMATION:}\\
+The skew dipole component of a MULTIPOLE element
+(MULTIPOLE, KSL=\{real\}) is NOT taken into account in the \texttt{SURVEY}
+calculation. You should use a tilted normal MULTIPOLE or BEND instead.
+
+
+%\textit{F.Tecker, March 2006}

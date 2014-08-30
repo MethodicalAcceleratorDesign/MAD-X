@@ -9,9 +9,7 @@
 extern const char *version_name;
 extern const char *version_arch;
 extern const char *version_ostype;
-extern const char *version_date_mod;
-extern const char *version_type_dev;
-extern const char *version_type_pro;
+extern const char *version_date;
 
 extern char* const functs[];
 extern const char op_string[];

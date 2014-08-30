@@ -1,0 +1,682 @@
+%%\title{Twiss Module}
+%  Changed by: Chris ISELIN, 27-Jan-1997 
+%  Changed by: Frank Schmidt, 11-Jul-2002 
+%  Changed by: Hans Grote, 15-Jan-2003 
+%  Changed by: Frank Schmidt, 06-APR-2003 
+
+%  Last changed: 2014-Jun-18  09:42:23  ghislain
+
+\chapter{Twiss Module}
+\label{chap:twiss}
+
+The \texttt{TWISS} command calculates the
+\href{../Introduction/tables.html#linear}{linear lattice
+  functions}\cite{Courant_Snyder1958}, and optionally the
+\href{../Introduction/tables.html#chrom}{chromatic functions}. 
+The coupled functions are calculated in the sense of
+Edwards and Teng\cite{edwards1973}. 
+For the uncoupled cases they reduce to the C and S functions. 
+
+\madbox{
+TWISS, \=SEQUENCE=seqname, LINE=linename, RANGE=range,  \\
+       \>DELTAP=real\{,real\}||initial:final:step,\\
+       \>CHROM=logical,\\
+       \>CENTRE=logical, TOLERANCE=real, \\
+       \>FILE=filename, \\
+       \>TABLE=tablename, NOTABLE=logical,\\
+       \>RMATRIX=logical, \\
+       \>SECTORMAP=logical, SECTORTABLE=tablename, SECTORFILE=filename,\\
+       \>KEEPORBIT=name, USEORBIT=name,\\
+       \>COUPLE=logical,\\
+       \>RIPKEN=logical;
+}
+
+The  attributes of the \texttt{TWISS} command are: 
+\begin{madlist}
+  \ttitem{SEQUENCE}  =seqname is the name of a valid sequence for
+  which the calculation of optical functions should be performed. \\ 
+  \texttt{SEQUENCE} and \texttt{LINE} are mutually exclusive.\\
+  (Default: sequence or beam line defined in the latest USE command)
+
+  \ttitem{LINE} =linename is the name of a valid beamline for which
+  the calculation of optical functions should be performed. \\
+  \texttt{SEQUENCE} and \texttt{LINE} are mutually exclusive.\\
+  (Default: sequence or beam line defined in the latest USE command)
+  
+  \ttitem{RANGE}=range (Default: \texttt{\#S/\#E})\\
+  The \texttt{TWISS} calculation is restricted to the specified range.
+  See \href{../Introduction/ranges.html#range}{RANGE}.  
+
+  \ttitem{DELTAP}={\tt real\{,real\}} or {\tt initial:final:step}
+  (Default: 0.0)\\ 
+  The relative energy error \texttt{DELTAP} may be entered in one of the
+  two forms above. \\ 
+  The first form lists several numbers, which may be general expressions,
+  separated by commas. The second form specifies an initial value, a final
+  value, and a step, which must be constant expressions, separated by
+  colons. \\
+  For example, \texttt{DELTAP=0.001} defines a single value, 
+  \texttt{DELTAP=0.001,0.005} define two values and 
+  \texttt{DELTAP=0.001:0.007:0.002} define four values. 
+
+
+  \ttitem{CHROM} A logical flag. If set, \madx also computes the
+  \href{../Introduction/tables.html#chrom}{chromatic
+    functions} as well as the radiation synchrotron integrals. \\
+  \textit{Please note that this option is needed for a proper
+    calculation of the chromaticities in the presence of coupling!}\\
+  \textit{Please note that this option also changes the way that the
+    chromaticities are calculated: The chromaticities are normally
+    calculated from the analysis of the first and second order
+    matrices. With \texttt{CHROM}, the chromaticities are recalculated by
+    explicitely calculating the tunes for the case of the specified momentum
+    deviation \texttt{DELTAP} and for the case of a momentum deviation equal
+    to \texttt{DELTAP}+1.e-6. The tune differences divided by 1.e-6 yield the
+    chromaticities.}
+
+  \ttitem{CENTRE} = logical (Default: false) \\
+  This flag enforces the calculation of the
+  \href{../Introduction/tables.html#linear}{linear lattice
+    functions} at the center of the element instead of the end
+  of the element. The values in the tables and in the output files are
+  affected by this flag. \\ 
+  \textit{ Since the lattice functions are calculated inside the element
+    the closed orbit coordinates in the output also include the misalignment
+    of the element.}  
+
+  \ttitem{TOLERANCE} (Default: 1.e-6) \\
+  The maximum closed orbit error, for all six orbit components, 
+  that can be tolerated during the closed orbit search. 
+  The value given in the \texttt{TWISS} command is only valid for the current calculation; 
+  the \href{../control/general.html#coguess}{\texttt{COGUESS}} command allows to 
+  change the default value for all subsequent closed orbit search calculations. 
+
+  \ttitem{FILE} (Default: ``twiss'') \\
+  causes \madx to writes a  \href{../Introduction/select.html#tfs}{TFS Twiss table} 
+  to the file specified. \\
+  The columns of the table can be selected using the \texttt{SELECT}
+  command with the \texttt{FLAG=twiss} attribute. 
+
+  \ttitem{TABLE} (overrides SAVE): \madx creates a full
+  \href{../Introduction/tables.html#linear}{Twiss table} in
+  memory and gives it the name \texttt{TWISS}, unless \texttt{TABLE=tablename}
+  appears on the command, then it is called
+  \href{../Introduction/label.html}{"tablename"}. This table
+  includes linear lattice functions as well as the chromatic
+  functions for all positions. An important new feature of \madx
+  is the possibility to access entries of tables and in
+  particular the twiss table (see
+  \href{../Introduction/expression.html#table}{table access}).\\
+  If the \texttt{TABLE} option is given the selection of column names via the
+  \texttt{SELECT} command is ignored. Hence if both \texttt{TABLE} and
+  \texttt{FILE} options are given, the table written to file is the full
+  twiss table, containing all elements as rows and all known twiss 
+  parameters as columns. 
+
+  \ttitem{NOTABLE} This flag prevents the creation of the internal twiss
+  table. Consequently no output file can be created either.  \\ 
+  (Default: false)
+  
+
+  \ttitem{RMATRIX} If this flag is used the the one-turn map at the
+  location of every element is calculated and prepared for
+  storage in the twiss table. Using the
+  \href{../Introduction/select.html}{\texttt{SELECT}} command and using
+  the column \texttt{RE, RE11 \ldots RE16 \ldots RE61 \ldots RE66} these
+  components will be added to the twiss table, i.e. with \texttt{"COLUMN, RE"} and
+  \texttt{"COLUMN, REij"} one gets all or the component "ij" respectively.    
+
+  \ttitem{SECTORMAP} This flag initiates the calculation of a sector
+  map as described at:
+  \href{../Introduction/sectormap.html}{SECTORMAP}.    
+  
+  \ttitem{SECTORTABLE} the name of the table containing the SECTORMAP
+  values. The elements (lines) and parameters (columns) 
+  of the table can be tailored using the SELECT command as specified in 
+  \hyperref[sec:sectormap]{\tt SECTORMAP} \\
+  (Default: sectortable)
+
+  \ttitem{SECTORFILE} the name of the file to which the SECTORMAP will
+  be written. 
+  The format of the output can be adjusted as specified in 
+  \hyperref[sec:sectormap]{\tt SECTORMAP} \\
+  (Default: "sectormap")
+  %% Used to write SECTORMAPs to the file
+  %% SECTORFILE="filename", if missing the output of SECTORMAP
+  %% will go to the file "sectormap" with the format as found in
+  %% \href{../Introduction/sectormap.html}{SECTORMAP}.    
+  
+  \ttitem{KEEPORBIT} The keeporbit attribute (with an optional name,
+  keeporbit="name") stores the orbit under this name at the
+  start, and at all monitors.    
+
+  \ttitem{USEORBIT} The useorbit attribute (with an optional name,
+  useorbit="name") uses the start value provided for the closed
+  orbit search; the values at the monitors are used by the
+  threader.    
+
+  \ttitem{COUPLE} (obsolete) This \madeight option can no
+  longer be set since TWISS in \madx is always calculated in
+  coupled mode. \madx computes the coupled functions in the
+  sense of
+  \href{../Introduction/bibliography.html#edwards}{[Edwards and
+      Teng]}. For the uncoupled cases they reduce to the C and S
+  functions.    
+  
+  \textit{ Twiss calculation is 4D only!} : The Twiss
+  command will calculate an approximate 6D closed orbit when the
+  accelerator structure includes an active
+  \href{../Introduction/cavity.html}{cavity}. However, the
+  calcuation of the Twiss parameters are 4D only. This may
+  result in apparently non-closure of the beta values in the
+  plane with non-zero dispersion. The full 6D Twiss parameters
+  can be calculated with the
+  \href{../ptc_twiss/ptc_twiss.html}{ptc\_twiss} command.    
+
+  \ttitem{RIPKEN} This flag will calculate the Ripken-Mais TWISS
+  parameters (beta11, beta12, beta21, beta22, alfa11, alfa12,
+  alfa21, alfa22, gama11, gamma12, gamm21 and gamm22) using
+  betx, bety, alfx, alfy, gamax, gamay, R11, R12, R21 and R22 as
+  input.  
+
+\end{madlist}
+
+The tables are suitable for \texttt{PLOT}.   
+
+After a successful \texttt{TWISS} run \madx creates a 
+table of summary parameters named "SUMM" which includes tunes,
+chromaticities, etc. versus the selected values of \texttt{DELTAP}.
+Please note that the \texttt{CHROM} attribute is needed
+for a proper calculation of the chromaticities in the presence of
+coupling!. 
+
+Notice also that in \madx DELTAP is converted to PT, which is used as
+longitudinal variable. 
+Dispersive and chromatic functions are hence derivatives with
+respects to PT. 
+(see \href{../Introduction/tables.html#summ}{table}). 
+
+These summary parameters can later be accessed via the table access
+functions\ref{chap:tables} using the "SUMM" table.  
+
+\section{Twiss Parameters for a Period}
+\label{sec:twissperiod}
+
+The simplest form of the TWISS command is
+\madbox{
+TWISS;
+}
+which calculates the periodic solution for the last beamline or sequence
+declared in a \texttt{USE} statement, and with zero DELTAP.
+Chromatic functions are not calculated. 
+Standard tables ("TWISS" and "SUMM") are created in memory but no file
+is written to disk. 
+
+The slightly more elaborate version 
+\madbox{
+TWISS, DELTAP=real\{,real\}, CHROM, TABLE=tablename;
+}
+computes the periodic solution, including chromatic functions, for the last beam
+line or sequence declared in a \texttt{USE} statement, for all values of
+DELTAP entered (or for \texttt{DELTAP=0}, if none is entered). 
+The tables "tablename" and "SUMM" are created in memory and no file is
+written to disk. 
+
+{\bf Example:} 
+\madxmp{
+USE, period=OCT; \\
+TWISS, DELTAP=0.001, CHROM;
+}
+computes the periodic solution for the linear lattice and
+chromatic functions for the beam line OCT and for DELTAP=0.001. 
+
+%% Apart from saving computing time, it is equivalent to the command
+%% sequence  
+%% \begin{verbatim}
+%% RING: LINE=(4*(OCT,-OCT));
+%%       USE,period=RING;
+%%       TWISS,DELTAP=0.001,CHROM;
+%% \end{verbatim}
+
+\section{Initial Values from a Periodic Line}
+\label{sec:twissinitial}
+
+It is possible to track the lattice functions starting with the periodic
+solution for another beam line. If this is desired the TWISS command
+takes the form  
+\madbox{
+TWISS, \=DELTAP=real\{,real\}, LINE=beamline, \\
+       \>MUX=real, MUY=real, \\
+       \>TABLE=tablename;
+}
+No other attributes should appear in the command. For each value of
+DELTAP, \madx first searches for the periodic solution for the beam line
+mentioned in LINE=beamline: The result is used as an initial condition
+for the lattice function tracking. 
+
+{\bf Example:} 
+\madxmp{
+xxxxxxxx\= \kill
+CELL:   \>LINE=(...); \\
+INSERT: \>LINE=(...); \\
+USE, period=INSERT; \\
+TWISS, LINE=CELL, DELTAP=0.0:0.003:0.001, CHROM, FILE;
+}
+
+For four values of DELTAP the following happens: First \madx finds the
+periodic solution for the beam line CELL: Then it uses this solution as
+initial conditions for tracking the lattice functions of the beamline
+CELL: Output is also written on the file TWISS:  
+
+If any of the beam lines was defined with formal arguments, actual
+arguments must be provided:  
+\madxmp{
+CELL(SF,SD): \=LINE=(...); \\
+INSERT(X):   \>LINE=(...); \\
+USE, period=INSERT; \\
+TWISS, LINE=CELL(SF1,SD1);
+}
+
+\section{Given Initial Values}
+
+Initial values for \href{../Introduction/tables.html#linear}{linear
+  lattice functions} and
+\href{../Introduction/tables.html#chrom}{chromatic functions} may also
+be numerical. Initial values can be specified on the TWISS command:  
+\madbox{
+TWISS,   \=BETX=real, ALFX=real, MUX=real,\\
+         \>BETY=real, ALFY=real, MUY=real,\\
+         \>DX=real, DPX=real, DY=real, DPY=real,\\
+         \>X=real, PX=real, Y=real, PY=real,\\
+         \>T=real, PT=real,\\
+         \>WX=real, PHIX=real, DMUX=real,\\
+         \>WY=real, PHIY=real, DMUY=real,\\
+         \>DDX=real, DDY=real, DDPX=real, DDPY=real,\\
+         \>R11=real, R12=real, R21=real, R22=real,  !coupling matrix\\
+         \>TABLE=tablename,\\
+         \>TOLERANCE=real,\\
+         \>DELTAP=real:real:real;
+}
+
+All initial values for \href{../Introduction/tables.html#linear}{linear
+  lattice functions} and
+\href{../Introduction/tables.html#chrom}{chromatic functions} are
+permitted, but BETX and BETY are required. Moreover, a
+\href{beta0}{beta0} block can be added as filled by the
+\href{../control/general.html#savebeta}{savebeta} command or see
+below. The lattice parameters are taken from this block, but will be
+overwritten by explicitly stated lattice parameters. As entered, the
+initial conditions cannot depend on DELTAP, and can thus be correct only
+for one such value.  
+
+\section{SAVEBETA}
+\label{sec:savebeta}
+\madbox{
+SAVEBETA, LABEL=string, PLACE=string, SEQUENCE=sequencename;
+}
+marks a location given by attribute \texttt{PLACE} in an expanded sequence "sequence\_name"; 
+at the next \texttt{TWISS} command execution, a
+\href{../twiss/twiss.html#beta0}{beta0} 
+block will be saved at that location with the label given by the
+attribute \texttt{LABEL}. 
+This is done only once; in order to get a new beta0 block at the same
+location in a subsequent \texttt{TWISS} command, the \texttt{SAVEBETA}
+command  must be repeated.
+The content of the beta0 block can then be used in other
+commands, e.g. \texttt{TWISS} and \texttt{MATCH}.  
+
+{\bf Example} (after sequence expansion): 
+\madxmp{
+SAVEBETA, LABEL=sb1, PLACE=mb[5], SEQUENCE=fivecell; \\
+TWISS; \\
+SHOW, sb1;
+}
+will save and show the beta0 block parameters at the end (!) of the
+fifth element of type "mb" in the sequence.  
+
+
+\section{SAVEBETA: Save Lattice Parameters}
+\label{sec:savebeta}
+
+Initial lattice parameters can be transfered for later commands, in
+particular for twiss or the \href{../match/match.html}{match module}, by
+using the \href{../control/general.html#savebeta}{savebeta} command
+sequence.  
+
+Parameters in tables can also be accessed 
+using the \href{../Introduction/expression.html#table}{table access}
+function. 
+\begin{verbatim}
+USE, period=...;
+SAVEBETA, LABEL=name, PLACE=place, SEQUENCE=s_name;
+TWISS,...;
+\end{verbatim}
+
+When reaching the \href{../control/general.html#place}{place} in the
+sequence "s\_name" during execution of TWISS, \madx will save a
+\hyperlink{beta0}{beta0} block with the
+\href{../Introduction/label.html}{label} name: This block is filled with
+the values of all lattice parameters in place.  
+
+Example 1: 
+\begin{verbatim}
+USE, period=CELL;
+SAVEBETA, LABEL=END, PLACE=#E, SEQUENCE=CELL;
+TWISS;
+USE, period=INSERT;
+TWISS, BETA0=END;
+\end{verbatim}
+This first example calculates the \hyperlink{periodic}{periodic
+  solution} of the line CELL, and then track lattice parameters through
+INSERT, using all end conditions (including orbit) in CELL to start.  
+
+Example 2: 
+\begin{verbatim}
+USE, period=CELL;
+SAVEBETA, LABEL=END, PLACE=#E, SEQUENCE=CELL;
+TWISS;
+USE, period=INSERT;
+TWISS, BETX=END-$>$BETY, BETY=END-$>$BETX;
+\end{verbatim}
+This is similar to the first example,but the beta functions are interchanged (overwritten).  
+
+\section{BETA0: Set Initial Lattice Parameters}
+\label{sec:beta0}
+Initial lattice parameters can be set 'manually' for later commands, in
+particular for \texttt{TWISS} or the \href{../match/match.html}{\texttt{MATCH} module}, by
+using the \texttt{BETA0} command attached to a label.  
+
+\madbox{
+label: BETA0, \=BETX=real, ALFX=real, MUX=real,\\
+              \>BETY=real, ALFY=real, MUY=real,\\
+              \>\{etc for linear and chromatic lattice functions\} ;
+}
+
+A \texttt{BETA0} block can be used as a whole with all values declared,
+as a block with overriden values explicitly, or by extracting single
+values as shown in the three examples below:
+
+Example of \texttt{BETA0} block used as a whole in \texttt{TWISS}: 
+\madxmp{
+initial: BETA0, \=BETX=10., ALFX=0.0, MUX=0.0, \\
+                \>BETY=10., ALFY=0.0, MUY=0.0, \\
+                \>DX=1., DPX=0.0;\\
+TWISS, BETA0=initial;}
+
+Example of \texttt{BETA0} block used as a whole but with overriden
+values in the \texttt{TWISS} command:
+\madxmp{
+initial: BETA0, \=BETX=10., ALFX=0.0, MUX=0.0, \\
+                \>BETY=10., ALFY=0.0, MUY=0.0, \\
+                \>DX=1., DPX=0.0;\\
+TWISS, BETA0=initial, ALFX=-0.1, ALFY=0.1;}
+
+Example of using \texttt{BETA0} block by extracting single values in the
+\texttt{TWISS} command:
+\madxmp{
+initial: BETA0, \=BETX=10., ALFX=0.0, MUX=0.0, \\
+                \>BETY=10., ALFY=0.0, MUY=0.0, \\
+                \>DX=1., DPX=0.0;\\
+TWISS, BETX=initial-$>$BETX, BETY=initial-$>$BETY;}
+
+
+%\input{Introduction/sectormap}
+\subsection{Sectormap output}
+\label{subsec:sectormap}
+% Begin New version: Jean-Luc Nougaret, 18-Dec-2008 
+
+The flag "sectormap" on the Twiss command (together with an element
+selection via select,flag=sectormap,...) causes a file "sectormap" to be
+written.   
+
+For each user-selected element, it contains the user-selected coefficients of the kick vector 
+\texttt{K} (6 values), of the first-order map 
+\texttt{R} (6 x 6 values) and of the second-order map 
+\texttt{T} (6 x 6 x 6 values)
+
+The sector file is the output of a standard TFS table, which means that
+the set of columns of interest may be selected through a SELECT command
+as in the following example:  
+
+
+\begin{verbatim}
+select, flag=my_sect_table, column=name, pos, k1, r11, r66, t111;
+\end{verbatim}
+
+
+The sectormap file contains for each selected element, one element per line, the
+set of chosen K, R, and T matrix coefficients: 
+\\
+\\
+\begin{tabular}{l|l|l}
+@ NAME &              \%13s &  "MY\_SECT\_TABLE" \\ 
+@ TYPE &              \%09s &  "SECTORMAP" \\ 
+@ TITLE &             \%08s &  "no-title" \\ 
+@ ORIGIN &           \%19s &  "MAD-X 3.04.62 Linux" \\ 
+@ DATE &              \%08s &  "18/12/08" \\ 
+@ TIME &              \%08s &  "10.33.58"
+\end{tabular}
+\\
+\\
+\begin{tabular}{l | l | l | l | l | l }
+* NAME & POS & K1 & R11 & R66 & T111 \\ 
+\$ \%s & \%le & \%le & \%le  & \%le & \%le \\ 
+ "FIVECELL\$START"  & 0 & 0 & 1 & 1 & 0 \\ 
+ "SEQSTART"  & 0 &  0  &  1 &  1  &  0 \\ 
+ "QF.1"  & 3.1 & -1.305314637e-05 & 1.042224745 & 1 & 0 \\ 
+ "DRIFT\_0" & 3.265 & 7.451656548e-21 & 1 & 1 & 0 \\ 
+ "MSCBH" & 4.365 & -1.686090613e-15 & 0.9999972755 & 1 & 0.006004411526 \\ 
+ "CBH.1" & 4.365 & 0 & 1 & 1 & 0 \\ 
+ "DRIFT\_1" & 5.519992305 & -6.675347543e-21 & 1 & 1 & 0 \\ 
+ "MB" & 19.72000769 & 2.566889547e-18 & 1.000000091 & 1 & -4.135903063e-25 \\ 
+ "DRIFT\_2" & 21.17999231 & -1.757758802e-20 & 1 & 1 & 0 \\ 
+ "MB" & 35.38000769 & 2.822705549e-18 & 1.000000091 & 1 & -4.135903063e-25 \\ 
+ "DRIFT\_2" & 36.83999231 & 2.480880093e-20 & 1 & 1 & 0 \\ 
+ "MB" & 51.04000769 & 3.006954115e-18 & 1.000000091 & 1 & -4.135903063e-25 \\ 
+ "DRIFT\_3" & 52.21 & -4.886652187e-20 & 1 & 1 & 0 \\ 
+... & ... & ... & ... & ... & ... \\ 
+... & ... & ... & ... & ... & ... \\ 
+... & ... & ... & ... & ... & ...
+\end{tabular}
+\\
+\\ 
+Of course, the \texttt{select} statement can be combined with additional
+options to filter-out the list of elements, such as in the following
+statement, which for instance only retains drift-type elements:  
+
+\begin{verbatim}
+select, flag=my_sect_table, class=drift, column=name, pos, k1, r11, r66, t111;
+\end{verbatim}
+
+
+
+\texttt{K} coefficients range: 
+\texttt{K1}... 
+\texttt{K6}
+
+
+\texttt{R} coefficients range: 
+\\
+\begin{tabular}{ccc}
+\texttt{R11} & ... & \texttt{R61} \\ 
+\texttt{R12} & ... & \texttt{R62} \\ 
+... & ... & ... \\ 
+\texttt{R16} & ... & \texttt{R66}
+\end{tabular}
+
+
+\texttt{T} coefficients range: 
+\\
+\begin{tabular}{ccc}
+\texttt{T111} & ... &\texttt{T611} \\ 
+\texttt{T121} & ... & \texttt{T621} \\ 
+... & ... & ... \\ 
+\texttt{T161} & ... & \texttt{T661} \\ 
+\texttt{T112} & ... & \texttt{T612} \\ 
+... & ... & ... \\ 
+\texttt{T166} & ... & \texttt{T666}
+\end{tabular}
+
+ In the above notation, 
+\texttt{Rij} stands for "effect on the 
+\texttt{i}-th coordinate of the 
+\texttt{j}-th coordinate in phase-space", whereas 
+\texttt{Tijk} stands for "combined effect on the 
+\texttt{i}-th coordinate of both the 
+\texttt{j}-th and 
+\texttt{k}-th coordinates in phase-space" along the lattice. 
+% End New Version 
+
+%  Commented by jluc, on 18 December 2008
+% The flag "sectormap" on the Twiss command (together with an element
+% selection via select,flag=sectormap,...) causes a file "sectormap" to
+% be written. This is a fixed format file; per selected element it
+% contains:
+% 
+% <pre>
+% end_position   element_name
+% kick vector (6 values)
+% first order map (6 lines with 6 values each), column-wise
+% second order map (36 lines with 6 columns each, column-column-wise)
+% </pre>
+% 
+% Or more explicitly:
+% 
+% <pre>
+% The first line is:
+% K[1] ... K[6]
+% 
+% Then: 
+% R[1,1] ... R[6,1]
+% R[1,2] ... R[6,2]
+% ...
+% R[1,6] ... R[6,6]
+% 
+% 
+% Then:
+% T[1,1,1] ... T[6,1,1]
+% T[1,2,1] ... T[6,2,1]
+% ...
+% T[1,6,1] ... T[6,6,1]
+% T[1,1,2] ... T[6,1,2]
+% ...
+% T[1,6,6] ... T[6,6,6]
+% </pre>
+% 
+   
+The maps are the accumulated maps between the selected elements. They
+contain both the alignment, and field errors present. Together with the
+starting value of the closed orbit (which can be obtained from the
+standard twiss file) this allows the user to track particles over larger
+sectors, rather than element per element. A typical usage therefore lies
+in the interface to other programs, such as TRAIN.  
+
+
+%\input{threader/threader}
+%%\title{Threader}
+
+\section{Beam Threader}
+\label{sec:threader}
+
+In a machine with magnetic and alignment errors it can happen that the
+beam does not circulate and the closed orbit cannot be established and
+measured. This can also happen in \madx and the closed orbit finder does
+not converge. 
+
+The \texttt{THREADER} simulates beam steering through such a machine
+with repeated measurement of trajectory over a certain number of
+monitors and correction of the trajectory with upstream correctors.   
+
+When enabled, threading is executed whenever a trajectory or closed
+orbit search is carried out by the \href{../twiss/twiss.html}{TWISS}
+module.   
+
+The threader is controlled as an option. 
+The following \madx commands enables the threader :
+\madxmp{OPTION, THREADER;}
+and the threader can be disabled with
+\madxmp{OPTION, -THREADER;}
+
+During the trajectory search in \texttt{TWISS}, or the first turn of the
+orbit search for a closed machine, the threader calculates at each
+monitor the difference between the present trajectory reading and a
+reference value.   
+If the difference exceeds a threshold (see below), the threader searches
+backwards for the first corrector that will efficiently cancel the
+difference and calculates the corresponding kick. The trajectory is then
+recalculated starting again from that corrector and progressing
+forward. The calculated kicks are added to already existing kicks. If
+Twiss is searching for a closed orbit which involves tracking this
+trajectory over many turns, the threader is only active during the first
+turn.  
+
+The reference value for the trajectory difference is zero by default but
+can also be obtained from a previous orbit calculation if the current
+{\tt Twiss} command has the {\tt useorbit} flag enabled and a previous
+{\tt Twiss} command had the {\tt keeporbit} flag enabled. This allows
+for example to thread the beam into a machine with orbit bumps present.  
+
+The threshold values for triggering the threader correction can be set
+with the command  
+\madbox{
+THREADER, VECTOR=\{xmax, ymax, att\};
+}
+where 
+\begin{madlist}
+  \ttitem{xmax, ymax} threshold orbit excursions beyond which the threader
+  is applied. \\ Defaults: 0.005, 0.005
+  \ttitem{att} attenuation factor for the kicks applied by the threader
+  \\ Default: 1.0 
+\end{madlist}
+
+The attenuation factor defines the fraction of the calculated kick that
+is actually applied by the threader.  
+An attenuation factor of 0.5 will apply 50\% of the calculated kicks.
+
+\section{Closed Orbit Guess}
+\label{subsec:coguess}
+
+In order to help the initial finding of the closed orbit by the
+\texttt{TWISS} module, it is possible to specify an initial guess for
+the coordinates of the fixed point at the start of the lattice.
+
+\madbox{
+COGUESS, \=X=real, PX=real, Y=real, PY=real, T=real, PT=real, \\
+         \>TOLERANCE=real, \\
+         \>CLEAR=logical;
+}
+
+The COGUESS command has the following attributes:
+\begin{madlist}
+  \ttitem{X, PX, Y, PY, T, PT} each parameter specified defines a first guess for all future closed orbit
+  searches in case they are different from zero.  
+  
+  \ttitem{TOLERANCE} sets the required convergence precision in the closed
+  orbit search. \\ (Default: 1.e-6)  
+  
+  \ttitem{CLEAR} a flag to reset the tolerance to its default value and to
+  cancel the effect of a previous \texttt{COGUESS} in defining a first
+  guess for subsequent closed orbit searches. \\ (Default:~false) 
+
+\end{madlist}
+
+
+\textbf{Example}\\
+\madxmp{
+COGUESS, X=1.e-3; \\
+... \\
+TWISS; \\
+... \\
+COGUESS, Y=-2.e-3; \\
+... \\
+TWISS; \\
+... \\
+COGUESS, CLEAR; \\
+... \\
+TWISS; \\
+... \\
+}
+
+
+
+%% EOF

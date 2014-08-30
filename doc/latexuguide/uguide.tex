@@ -1,0 +1,135 @@
+\documentclass[11pt,a4paper,twoside]{report}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\includeonly{
+  coverpage, copyright, changelog, contributors,    
+  conventions, format, programflow, control, files, tables, beams, seqedit,
+  definitions, elements, ranges, line, sequence,
+  tfs, c6t, sxf, plot, index, rplot_index,
+  survey, twiss, match, emit, aperture, makethin, error, cororbit, sodd, touschek, ibs, thintrack,	
+  ptc_general, ptc_track, ptc_twiss, ptc_normal, ptc_auxiliaries, 
+  defects, pitfalls
+ }
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{xspace}
+\usepackage[dvipsnames,svgnames]{xcolor}
+\usepackage{a4wide}		% for better presentation
+\usepackage{amsmath}
+
+%\usepackage[pdftex]{graphicx} % Show image: \includegraphics[width=x]{file}.
+\usepackage{graphicx} % Show image: \includegraphics[width=x]{file}.
+
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{parskip}
+\usepackage{float}
+\usepackage{makeidx}
+
+%\usepackage[pdftex]{hyperref} % should come last
+\usepackage{hyperref} % should come last
+\hypersetup{pdfauthor={Ghislain Roy},
+	    pdftitle={MAD-X User's Guide},
+	    colorlinks,
+            citecolor=blue, pagecolor=blue, linkcolor=blue}
+\hyperbaseurl{http://madx.web.cern.ch/madx/madX/doc/usrguide/}
+
+\usepackage{madstyle}
+
+\makeindex        % use \index{keyword}
+%\makeglossary     % use \glossary{concept}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\include{coverpage}        %MAD-X Cover Page
+\include{copyright}        %MAD-X Copyright Statement
+\include{changelog}        %MAD-X Change log
+\include{contributors}     %MAD-X contributors and module keepers
+
+\tableofcontents
+\newpage
+
+%% absolute links work but relative links do not
+%\href{http://www.cern.ch}{CERN}\\ %OK
+%\href{Introduction/conventions.html}{conventions} \\ % not OK
+%\href{http://madx.web.cern.ch/madx/madX/doc/usrguide/Introduction/conventions.html}{conventions}\\ % OK
+%\url{Introduction/conventions.html} \\ 
+%\nolinkurl{Introduction/conventions.html}\\
+%\url{mailto:ghislain.roy@cern.ch}\\
+
+\listoftables
+\listoffigures
+
+\part{Control}
+\include{conventions}   	% Conventions
+\include{format}		% Command and Statement Format
+\include{programflow}           % Program Flow Statements
+\include{control}		% Control Statements
+\include{files}		        % File Hanfling Statements
+\include{tables}		% Table Handling Statements
+\include{beams}		        % Beam Statements
+\include{seqedit}               % Edit beamline sequences
+
+
+\part{Elements, Beamlines and Sequences}
+\include{definitions}           % Element definitions
+\include{elements}		% Physical Elements and Markers
+\include{ranges}                % Ranges and Classes
+\include{line}                  % Beamlines
+\include{sequence}	        % Sequences
+
+\part{Input and Output}                 
+\include{tfs}                   % TFS format        
+\include{c6t}			% Conversion to Sixtrack Input Format
+\include{sxf}			% SXF file input and output
+\include{plot}			
+\include{index}                 % probably material for an appendix
+\include{rplot_index}           % ditto
+
+
+\part{\mad Modules}                      
+\include{survey}		%SURVEY: geometric layout and survey
+\include{twiss}			%TWISS
+\include{match}			%MATCHING
+\include{emit}			%EMIT
+\include{aperture}              %APERTURE: defining and calculating apertures 
+\include{makethin}		%MAKETHIN: Conversion to Thin Lens
+\include{error}			%ERRORS
+\include{cororbit}		%ORBIT CORRECTION
+\include{sodd}			%SODD
+\include{touschek}		%TOUSCHEK
+\include{ibs}			%IBS: Intra Beam Scattering
+\include{thintrack}		%THINTRACK: Thin-Lens Tracking Module 
+
+
+\part{\ptc Commands}
+\include{ptc_general}   	%Set-up Parameters
+\include{ptc_track}		%PTC_TRACK: Thick-Lens Tracking Module
+\include{ptc_twiss}		%PTC_TWISS: Ripken Optics Parameters
+\include{ptc_normal}	        %PTC_NORMAL: Non-Linear Machine Parameters
+\include{ptc_auxiliaries}       %PTC Auxiliary Commands
+
+
+\part{Trailing Material}
+\include{defects}		%Known Differences to Other Programs 
+\include{pitfalls}
+
+\bibliographystyle{unsrt}
+\bibliography{biblio-mad}
+
+\printindex
+
+%%% The rest does not belong to a manual and will be best placed on the
+%%% website or in other documents. 
+%\include{support}
+%\include{source}
+%\include{fortran-rules}
+%\include{foot}
+%\include{module}
+%\include{module_doc}
+%\include{news}
+%\include{cororbit/lhct.mad}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}

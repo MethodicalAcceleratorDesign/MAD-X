@@ -373,81 +373,79 @@ process(void)  /* steering routine: processes one command */
   int pos;
   char* name;
   struct element* el;
-  if (this_cmd != NULL)
-  {
 
-    switch (this_cmd->type)
-    {
-      case 0: /* executable commands */
-        exec_command();
-        if (stop_flag)
-        {
-          if (this_cmd)
-          {
-            if (this_cmd->clone != NULL)
-              this_cmd->clone = delete_command(this_cmd->clone);
-            this_cmd = delete_in_cmd(this_cmd);
-          }
-          return;
-        }
-        break;
-      case 1: /* element definition */
-        enter_element(this_cmd);
-        buffer_in_cmd(this_cmd);
-        break;
-      case 2: /* variable definition */
-        enter_variable(this_cmd);
-        break;
-      case 3: /* sequence start or end */
-        enter_sequence(this_cmd);
-        break;
-      case 4:
-        name = this_cmd->tok_list->p[0];
-        if (sequ_is_on)
-          /* element or sequence reference in sequence */
-        {
-          if ((pos = name_list_pos(name, sequences->list)) < 0)
-            enter_element(this_cmd);
-          else
-          {
-            this_cmd->cmd_def = find_command("sequence", defined_commands);
-            this_cmd->clone = clone_command(this_cmd->cmd_def);
-            strcpy(this_cmd->clone->name, name);
-            scan_in_cmd(this_cmd);
-            enter_sequ_reference(this_cmd, sequences->sequs[pos]);
-          }
-        }
-        else
-          /* element parameter definition */
-        {
-          if ((el = find_element(name, element_list)) == NULL)
-            warning("skipped, command or element unknown:", name);
-          else
-          {
-            this_cmd->cmd_def = el->def;
-            this_cmd->clone = clone_command(this_cmd->cmd_def);
-            strcpy(this_cmd->clone->name, name);
-            scan_in_cmd(this_cmd);
-            update_element(el, this_cmd->clone);
-          }
-        }
-        break;
-      default:
-        warning("unknown command type:",
-                join_b(this_cmd->tok_list->p, this_cmd->tok_list->curr));
-    }
-    if (this_cmd != NULL && (this_cmd->type == 0 || this_cmd->type == 2))
-    {
-      if (this_cmd->clone != NULL)
+  if (this_cmd == NULL) return;
+
+  switch (this_cmd->type)
+  {
+    case 0: /* executable commands */
+      exec_command();
+      if (stop_flag)
       {
-        if (this_cmd->clone_flag == 0)
-          this_cmd->clone = delete_command(this_cmd->clone);
-        else add_to_command_list(this_cmd->clone->name,
-                                 this_cmd->clone, stored_commands, 0);
+        if (this_cmd)
+        {
+          if (this_cmd->clone != NULL)
+            this_cmd->clone = delete_command(this_cmd->clone);
+          this_cmd = delete_in_cmd(this_cmd);
+        }
+        return;
       }
-      if (this_cmd->label != NULL) buffer_in_cmd(this_cmd);
-      else this_cmd = delete_in_cmd(this_cmd);
+      break;
+    case 1: /* element definition */
+      enter_element(this_cmd);
+      this_cmd = buffer_in_cmd(this_cmd);
+      break;
+    case 2: /* variable definition */
+      enter_variable(this_cmd);
+      break;
+    case 3: /* sequence start or end */
+      enter_sequence(this_cmd);
+      break;
+    case 4:
+      name = this_cmd->tok_list->p[0];
+      if (sequ_is_on)
+        /* element or sequence reference in sequence */
+      {
+        if ((pos = name_list_pos(name, sequences->list)) < 0)
+          enter_element(this_cmd);
+        else
+        {
+          this_cmd->cmd_def = find_command("sequence", defined_commands);
+          this_cmd->clone = clone_command(this_cmd->cmd_def);
+          strcpy(this_cmd->clone->name, name);
+          scan_in_cmd(this_cmd);
+          enter_sequ_reference(this_cmd, sequences->sequs[pos]);
+        }
+      }
+      else
+        /* element parameter definition */
+      {
+        if ((el = find_element(name, element_list)) == NULL)
+          warning("skipped, command or element unknown:", name);
+        else
+        {
+          this_cmd->cmd_def = el->def;
+          this_cmd->clone = clone_command(this_cmd->cmd_def);
+          strcpy(this_cmd->clone->name, name);
+          scan_in_cmd(this_cmd);
+          update_element(el, this_cmd->clone);
+        }
+      }
+      break;
+    default:
+      warning("unknown command type:",
+              join_b(this_cmd->tok_list->p, this_cmd->tok_list->curr));
+  }
+  if (this_cmd != NULL && (this_cmd->type == 0 || this_cmd->type == 2))
+  {
+    if (this_cmd->clone != NULL)
+    {
+      if (this_cmd->clone_flag == 0)
+        this_cmd->clone = delete_command(this_cmd->clone);
+      else add_to_command_list(this_cmd->clone->name,
+                               this_cmd->clone, stored_commands, 0);
     }
+    this_cmd = buffer_in_cmd(this_cmd);
   }
 }
 

@@ -1,0 +1,63 @@
+%%\title{SXF}
+%  Changed by: Chris ISELIN, 27-Jan-1997 
+%  Changed by: Hans Grote,  4-Dec-2002 
+
+\chapter{SXF file format}
+\label{chap:sxf}
+
+An \texttt{SXF}\cite{SXF} lattice description is an ASCII listing that contains
+one named, ``flat'', ordered list of elements, delimited as \{\ldots\}, with one
+entry for each element. The list resembles a \madx ``sequence'' describing
+the entire machine. The syntax is supposed to be adapted for ease of
+reading by human beings and for ease of parsing by LEX and YACC. 
+
+\section{SXFWRITE}
+\label{sec:sxfwrite}
+
+The command 
+\madbox{
+SXFWRITE, FILE=filename;
+}
+writes the current  sequence with all alignment and
+field errors in \texttt{SXF}
+format onto the file specified. This then represents one "instance" of
+the sequence, where all parameters are given by numbers rather than
+expressions; the file can be read by other programs to get a complete
+picture of the sequence.  
+
+
+\section{SXFREAD}
+\label{sec:sxfread}
+
+The command 
+\madbox{
+SXFREAD, FILE=filename;
+}
+reads the file "filename" in \texttt{SXF} format, stores the sequence
+away and loads the sequence in memory through the USE mechanism  in
+order to keep the existing errors. 
+
+
+It is therefore possible to write a lattice complete with errors to a
+named file and reload it later in a different \madx job:
+\madxmp{
+! define sequence MYSEQU \\
+USE, mysequ; \\
+\\
+! add alignment errors and field errors \\
+\\
+SXFWRITE, FILE = file; \\
+\\
+STOP;
+}
+and later:
+\madxmp{
+SXFREAD, FILE = file; \\
+! sequence mysequ is now reloaded and active, complete with errors.\\
+\\
+TWISS; \\
+\ldots
+}
+
+%\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg}, January 24, 1997 
+

@@ -1,9 +1,9 @@
 
   +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.06  (64 bit, Linux)       +
+  +    MAD-X 5.02.02  (64 bit, Linux)       +
   +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.01.17      +
-  + Execution Time Stamp: 21.01.14 13.22.35 +
+  + Code Modification Date: 2014.07.01      +
+  + Execution Time Stamp: 03.07.14 14.59.25 +
   +++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -120,9 +120,13 @@ call, file="../share/LEIR/LEIR.seqx";
 
 ! Vrf=2.2kV / H=2 / Fsynch = 1.567kHz
 
-  CAV: RFCAVITY, L=1.0, VOLT=0.0022/54, HARMON=2, LAG=0, no_cavity_totalpath;  
+!  CAV: RFCAVITY, L=1.0, VOLT=0.0022/54, HARMON=2, LAG=0, no_cavity_totalpath;  
+
+  CAV: RFCAVITY, L=1.0, VOLT=0.0022/54, FREQ=3.816881762, LAG=0, no_cavity_totalpath;  
 
 
+
+! 3816881.7619258035
 
 
 
@@ -813,18 +817,17 @@ ptc_create_universe;
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.541711E+00
  Setting MADx with 
-     energy           1.08342267840000     
+     energy           1.0834226784000001     
      method                   6
      Num. of steps            5
-     charge           1.00000000000000     
-  Length of machine:    78.5437026616777     
+     charge           1.0000000000000000     
+  Length of machine:    78.543702661677713     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After    end:  -6.272760089132134E-015  0.000000000000000E+000  8.437694987151190E-015
-  Bullshitting in MADX with Cavities            2
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -6.2727600891321345E-015   0.0000000000000000        8.4376949871511897E-015
 
 
   !!!!!       T I M E   F A L S E,   T O T P A T H  F A L S E
@@ -869,8 +872,8 @@ obs_points pro_ptc_setswitch Done
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
-Deviation from symplecticity  0.7460698725481052E-11 %
-Deviation from symplecticity  0.7460698725481052E-11 %
+Deviation from symplecticity  0.7283063041541027E-11 %
+Deviation from symplecticity  0.7283063041541027E-11 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -965,5 +968,5 @@ Plot - default table plotted: twiss
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.06 (64 bit) finished normally +
+  + MAD-X 5.02.02 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
