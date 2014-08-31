@@ -5202,9 +5202,13 @@ subroutine tttdipole(track, ktrack)
           sqrt_delta_plus_1*sqrt_k0_div_sqrt_h*S+delta_plus_1*sqrt_delta_plus_1*sqrt_h_div_sqrt_k0*S+px*C;
      y_  = y + py * L / delta_plus_1; 
      py_ = py; 
-     z_  = z + pt*L*(1.0-bet0sqr)/bet0sqr + &
-          (-(0.5)*(bet0*pt+1.0)/bet0/(delta_plus_1**3) * &
-          (x*x*delta_plus_1*(h*k0*L-sqrt_delta_plus_1*sqrt_h_sqrt_k0*C*S)*0.5 + &
+     z_ = z - h*((h*k0*sqrt_delta_plus_1*sqrt_h_sqrt_k0*x+(k0-delta_plus_1*h)*&
+          sqrt_delta_plus_1*sqrt_h_sqrt_k0)*sin(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1)&
+          -h*k0*px*cos(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1)+&
+          (delta_plus_1*h-k0)*sqrt_h_sqrt_k0**2*L+h*k0*px)/(h*k0*sqrt_h_sqrt_k0**2) + &
+          pt*L*(1.0-bet0sqr)/bet0sqr + &
+          1.5*(bet0sqr-1.0)/bet0sqr/bet0*pt*pt*L - 0.5/bet0 * &
+          ((x*x*delta_plus_1*(h*k0*L-sqrt_delta_plus_1*sqrt_h_sqrt_k0*C*S)*0.5 + &
           px*px*(sqrt_delta_plus_1*C*S/sqrt_h_sqrt_k0+L)*0.5 + &
           px*(-delta_plus_1_sqr*C_sqr/k0+delta_plus_1*C_sqr/h+delta_plus_1_sqr/k0-delta_plus_1/h) + &
           x*(-delta_plus_1**(3.0*0.5)*sqrt_k0_div_sqrt_h*C*S+ &
