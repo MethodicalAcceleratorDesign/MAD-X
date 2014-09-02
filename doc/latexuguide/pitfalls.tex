@@ -9,24 +9,22 @@ this list.
 
 \begin{description}
 
-\item[Twiss calculation is 4D only!]
-  The Twiss command will calculate an approximate 6D closed orbit when
-  the accelerator structure includes an active
-  \href{../Introduction/cavity.html}{cavity}. However, the calculation
-  of the Twiss parameters are 4D only. This may result in apparently
+\item[Twiss calculation is 4D only!]  The Twiss command will calculate
+  an approximate 6D closed orbit when the accelerator structure includes
+  an active \hyperref[sec:cavity]{cavity}. However, the calculation of
+  the Twiss parameters are 4D only. This may result in apparently
   non-closure of the beta values in the plane with non-zero
   dispersion. The full 6D Twiss parameters can be calculated with the
-  \href{../ptc_twiss/ptc_twiss.html}{ptc\_twiss} command. Presently,
-  the \href{../thintrack/thintrack.html}{Thinlens Tracking} module
-  suffers from this deficiency since it requires the true 6d closed
-  orbit and not the approximate one as calculated by Twiss. In this
-  context one has to mention that the coordinate system for the Twiss
-  module is not x, px in the horizontal plane as the advertised
-  canonical coordinates instead x, x' have been used (same for the
-  vertical plane).  
+  \hyperref[chap:ptc_twiss]{\tt PTC\_TWISS} command.  The
+  \hyperref[chap:thintrack]{Thinlens Tracking} module presently suffers
+  from this deficiency since it requires the true 6d closed orbit and
+  not the approximate one as calculated by Twiss. In this context one
+  has to mention that the coordinate system for the Twiss module is not
+  x, px in the horizontal plane as the advertised canonical coordinates
+  instead x, x' have been used (same for the vertical plane).
   
-  Mind you that for TWISS with the "CENTRE" attribute activated,
-  i.e. looking     inside the element, the closed orbit includes the
+  Be careful that for {\tt TWISS} with the {\tt CENTRE} attribute activated,
+  i.e. looking inside the element, the closed orbit includes the
   misalignment of the element.  
 
 
@@ -38,23 +36,24 @@ this list.
   dispersion being divided by the relativistic beta which is annoying
   for low energy machines. PTC allows to change the coordinate system
   to  delta-p over p with the "time=false" option of the
-  \href{../ptc_general/ptc_general.html#PTC_CREATE_LAYOUT}{PTC\_CREATE\_LAYOUT}
+  \hyperref[sec:ptc_create_layout]{\tt PTC\_CREATE\_LAYOUT}
   command which delivers the proper dispersion with the
-  \href{../ptc_twiss/ptc_twiss.html}{ptc\_twiss} command.  
+  \hyperref{sec:ptc_twiss}{\tt PTC\_TWISS} command.  
 
 
 
 \item[Non-standard definition of DDX, DDPX, DDY, DDPY] 
   The \madx proper defintion of DDX, DDPX, DDY, DDPY is not the second
   order derivative with respect to deltap/p but multiplied by a factor
-  of 2. The corresponding values from ptc\_normal and in ptc\_twiss
-  are the proper derivaties to all orders.  
+  of 2. The corresponding values from \hyperref[chap:ptc_normal]{\tt
+    PTC\_NORMAL} and in \hyperref[chap:ptc_twiss]{\tt PTC\_TWISS} are
+  the proper derivaties to all orders.
   
 
 \item[Chromaticity calculation in presence of coupling] 
-  Chromaticity calculations are typically in order and agree with PTC
+  Chromaticity calculations are typically in order and agree with \ptc
   and other codes. However, it was recently discovered that in
-  presences of coupling MAD-X simply seems to ignore coupling when the
+  presences of coupling \madx simply seems to ignore coupling when the
   chromaticity is calculated. This is surprising since the eigentunes
   Q1, Q2 are properly calculated for a given (small!) dp/p. The issue
   is under investigation.  
@@ -62,12 +61,13 @@ this list.
 
 \item[Field errors in thick elements]
   Only a very limited number of field error components are
-  considered in TWISS calculations for some thick elements. Find below
+  considered in \hyperref[chap:twiss]{\tt TWISS} calculations for some
+  thick elements. Find below 
   a complete list of all those field error components that
   are taking into account for a particular thick element. It
-  should be mentioned that BENDs also allow a skew quadrupole
-  component k1s but NOT in the body of the magnet. It is only
-  active in the edge effect for radiation (expert use only). 
+  should be mentioned that \hyperref[sec:bend]{\tt BEND}s also allow a
+  skew quadrupole component k1s but NOT in the body of the magnet. It is
+  only active in the edge effect for radiation (expert use only). 
 
 
 {\renewcommand{\arraystretch}{2}
@@ -92,36 +92,37 @@ this list.
   \end{tabular}
 }
 
-\item[MAD-X versus PTC] 
-  The user has to understand that PTC exists inside of MAD-X as a
-  library. MAD-X offers the interface to PTC, i.e. the MAD-X input
-  file is used as input for PTC. Internally, both PTC and MAD-X have
+\item[\madx versus \ptc] 
+  The user has to understand that \ptc exists inside of \madx as a
+  library. \madx offers the interface to \ptc, i.e. the \madx input
+  file is used as input for \ptc. Internally, both \ptc and \madx have
   their own independent databases which are linked via the
   interface. With the
-  \href{../ptc_general/ptc_general.html#PTC_CREATE_LAYOUT}{PTC\_CREATE\_LAYOUT}
-  command, only numerical numbers are transferred from the MAD-X
-  database to the PTC database. Any modification to the MAD-X
-  database is ignored in PTC until the next call to
-  \href{../ptc_general/ptc_general.html#PTC_CREATE_LAYOUT}{PTC\_CREATE\_LAYOUT}.
-  For example, a deferred expression of MAD-X after a
-  \href{../ptc_general/ptc_general.html#PTC_CREATE_LAYOUT}{PTC\_CREATE\_LAYOUT}
-  command is ignored within PTC.  
+  \hyperref[sec:ptc_create_layout]{\tt PTC\_CREATE\_LAYOUT}
+  command, only numerical numbers are transferred from the \madx
+  database to the \ptc database. Any modification to the \madx
+  database is ignored in \ptc until the next call to
+  \hyperref[sec:ptc_create_layout]{\tt PTC\_CREATE\_LAYOUT}
+  For example, a deferred expression of \madx after a
+  \hyperref[sec:ptc_create_layout]{\tt PTC\_CREATE\_LAYOUT}
+  command is ignored within \ptc.  
   
-  When introducing a cavity with the "harmon" instead of the "freq"
-  attribute (highly discouraged!) a problem arises for ptc\_twiss due to
-  the fact that internally "harmon" is transferred to "freq" too late. A
-  simple "twiss" command executed before PTC start-up will help. However,
-  avoiding "harmon" is advantageous.  
+  When introducing a cavity with the {\tt HARMON} instead of the {\tt
+    FREQ} attribute (highly discouraged!) a problem arises for
+  \hyperref[sec:ptc_twiss]{\tt PTC\_TWISS} due to the fact that
+  internally {\tt HARMON} is transferred to {\tt FREQ} too late. A
+  simple \hyperref[sec:twiss]{\tt TWISS} command executed before \ptc
+  start-up will help. However, avoiding {\tt HARMON} is advantageous.
     
 
 \item[SLOW attribute in matching] 
-  The "slow" attribute enforces the old matching procedure and is
+  The {\tt SLOW} attribute enforces the old matching procedure and is
   considerably slower. Therefore we did not make it the default
-  option. Recently a number of parameters, like "RE56", have been
+  option. Recently a number of parameters, like {\tt RE56}, have been
   added to the list of matchable parameters in the default and fast
   version. Nevertheless, some parameters are only available when using
-  the "slow" attribute. Therefore it is advisable to check with the
-  "slow" attribute if there are doubts about the matching procedure.  
+  the {\tt SLOW} attribute. Therefore it is advisable to check with the
+  {\tt SLOW} attribute if there are doubts about the matching procedure.  
 
 
 
@@ -130,15 +131,16 @@ this list.
   full coupling: i.e. the "donuts" of linear motion in x-x' and y-y' phase
   space have no hole anymore. This means that all energy is transfered
   from one plane to the other. In this case the Twiss parameters and the
-  coupling matrix (R11, R12, R21, R22) become large or even infinite or
+  coupling matrix ({\tt R11, R12, R21, R22}) become large or even infinite or
   the beta functions might become negative. The Ripken-Mais Twiss
   parameters are always well defined (they are the "average" amplitude
   functions of their proper phase space region), i.e. at full coupling we
-  have: beta11 $\sim$ beta12 and beta21 $\sim$ beta22. Using the "RIPKEN"
-  flag Twiss calculates the Mais-Ripken parameters via a transformation
-  from the Teng-Edwards Twiss parameters. Obviously this fails when the
-  Teng-Edwards Twiss parameters are ill defined. In this case one has to
-  rely on ptc\_twiss.    
+  have: beta11 $\sim$ beta12 and beta21 $\sim$ beta22. Using the {\tt RIPKEN}
+  flag \hyperref[sec:twiss]{\tt TWISS} calculates the Mais-Ripken
+  parameters via a transformation from the Teng-Edwards Twiss
+  parameters. Obviously this fails when the Teng-Edwards Twiss
+  parameters are ill defined. In this case one has to rely on
+  \hyperref[chap:ptc_twiss]{\tt PTC\_TWISS}.    
   
 \end{description}
 

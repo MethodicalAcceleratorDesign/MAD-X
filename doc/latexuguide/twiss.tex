@@ -23,9 +23,9 @@ TWISS, \=SEQUENCE=seqname, LINE=linename, RANGE=range,  \\
        \>CHROM=logical,\\
        \>CENTRE=logical, TOLERANCE=real, \\
        \>FILE=filename, \\
-       \>TABLE=tablename, NOTABLE=logical,\\
+       \>TABLE=tabname, NOTABLE=logical,\\
        \>RMATRIX=logical, \\
-       \>SECTORMAP=logical, SECTORTABLE=tablename, SECTORFILE=filename,\\
+       \>SECTORMAP=logical, SECTORTABLE=tabname, SECTORFILE=filename,\\
        \>KEEPORBIT=name, USEORBIT=name,\\
        \>COUPLE=logical,\\
        \>RIPKEN=logical;
@@ -99,9 +99,9 @@ The  attributes of the \texttt{TWISS} command are:
 
   \ttitem{TABLE} (overrides SAVE): \madx creates a full
   \href{../Introduction/tables.html#linear}{Twiss table} in
-  memory and gives it the name \texttt{TWISS}, unless \texttt{TABLE=tablename}
+  memory and gives it the name \texttt{TWISS}, unless \texttt{TABLE=tabname}
   appears on the command, then it is called
-  \href{../Introduction/label.html}{"tablename"}. This table
+  \href{../Introduction/label.html}{"tabname"}. This table
   includes linear lattice functions as well as the chromatic
   functions for all positions. An important new feature of \madx
   is the possibility to access entries of tables and in
@@ -214,12 +214,12 @@ is written to disk.
 
 The slightly more elaborate version 
 \madbox{
-TWISS, DELTAP=real\{,real\}, CHROM, TABLE=tablename;
+TWISS, DELTAP=real\{,real\}, CHROM, TABLE=tabname;
 }
 computes the periodic solution, including chromatic functions, for the last beam
 line or sequence declared in a \texttt{USE} statement, for all values of
 DELTAP entered (or for \texttt{DELTAP=0}, if none is entered). 
-The tables "tablename" and "SUMM" are created in memory and no file is
+The tables "tabname" and "SUMM" are created in memory and no file is
 written to disk. 
 
 {\bf Example:} 
@@ -247,7 +247,7 @@ takes the form
 \madbox{
 TWISS, \=DELTAP=real\{,real\}, LINE=beamline, \\
        \>MUX=real, MUY=real, \\
-       \>TABLE=tablename;
+       \>TABLE=tabname;
 }
 No other attributes should appear in the command. For each value of
 DELTAP, \madx first searches for the periodic solution for the beam line
@@ -293,7 +293,7 @@ TWISS,   \=BETX=real, ALFX=real, MUX=real,\\
          \>WY=real, PHIY=real, DMUY=real,\\
          \>DDX=real, DDY=real, DDPX=real, DDPY=real,\\
          \>R11=real, R12=real, R21=real, R22=real,  !coupling matrix\\
-         \>TABLE=tablename,\\
+         \>TABLE=tabname,\\
          \>TOLERANCE=real,\\
          \>DELTAP=real:real:real;
 }

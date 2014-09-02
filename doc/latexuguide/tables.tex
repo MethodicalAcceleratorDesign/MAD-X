@@ -4,7 +4,7 @@
 \section{CREATE}
 \label{sec:create}
 \madbox{
-CREATE, TABLE=tablename, COLUMN= var\{, var\} \{, \_name\} ;
+CREATE, TABLE=tabname, COLUMN= var\{, var\} \{, \_name\} ;
 }
 creates a table with the specified variables as columns. 
 This table is initially empty and can be subsequently filled, and
@@ -25,9 +25,9 @@ including the element name:
 \section{DELETE}
 \label{sec:delete}
 \madbox{
-DELETE, SEQUENCE=seqname, TABLE=tablename;
+DELETE, SEQUENCE=seqname, TABLE=tabname;
 }
-deletes a sequence with name "seqname" or a table with name "tablename"
+deletes a sequence with name "seqname" or a table with name "tabname"
 from memory. The sequence deletion is done without influence on other
 sequences that may have elements that were in the deleted sequence.   
 
@@ -44,15 +44,15 @@ again etc.
 \section{READMYTABLE}
 \label{sec:readmytable}
 \madbox{
-READMYTABLE, FILE="filename", TABLE=tablename;
+READMYTABLE, FILE="filename", TABLE=tabname;
 }
 reads a TFS file "filename" containing a \mad table and loads the table
-into memory with the name "tablename". This table
+into memory with the name "tabname". This table
 can then be manipulated as any other table, i.e. its values can be
 accessed, it can be plotted, written out again etc. 
 
 An internal name for the table can be freely assigned while for the
-command READTABLE the tablename is taken from the information section of
+command READTABLE the tabname is taken from the information section of
 the table itself.  
 This feature allows to store multiple tables of the same type in memory without
 overwriting existing ones.   
@@ -73,9 +73,9 @@ there is no match, it returns "\_void\_".
 \section{WRITE}
 \label{sec:write}
 \madbox{
-WRITE, TABLE=tablename, FILE="filename";
+WRITE, TABLE=tabname, FILE="filename";
 }
-writes the table "tablename" onto the file "filename"; only the rows and
+writes the table "tabname" onto the file "filename"; only the rows and
 columns of a preceding \texttt{SELECT, FLAG=table,...;} are written. 
 If no \texttt{SELECT} has been issued for this table, only the header is
 written to file.
@@ -91,7 +91,7 @@ The \texttt{SETVARS} command sets the variables with values extracted
 from the row of a table.
 
 \madbox{
-SETVARS, TABLE=tablename, ROW=integer;
+SETVARS, TABLE=tabname, ROW=integer;
 }
 
 The attributes of \texttt{SETVARS} are:
@@ -133,7 +133,7 @@ The SETVARS\_LIN command sets the variables with values calculated
 by linear interpolation, or extrapolation, between two rows of a table. 
 
 \madbox{
-SETVARS\_LINE, TABLE=tablename, ROW1=integer, ROW2=integer, PARAM=string;
+SETVARS\_LIN, TABLE=tabname, ROW1=integer, ROW2=integer, PARAM=string;
 }
 
 The attributes of \texttt{SETVARS\_LIN} are:
@@ -203,7 +203,7 @@ WHILE \=(i < len) \{ \\
 The FILL command fills a row of a table with the current values of all
 declared column variables of the table.
 \madbox{
-FILL, TABLE=tablename, ROW=integer;
+FILL, TABLE=tabname, ROW=integer;
 }
 
 The FILL command takes two arguments:

@@ -6,13 +6,11 @@
 \chapter{Thick-Lens Tracking Module}
 \label{chap:ptc_track}
 
-The {\tt PTC-TRACK} module \cite{kapin2006} is the
-symplectic thick-lens tracking facility in \madx \cite{schmidt2005}.
-It is based on \ptc library \cite{forest2002} written by
-E.Forest.  
-The commands of this module are
-described below, 
-optional parameters are denoted by square brackets ([]). 
+The {\tt PTC-TRACK} module \cite{kapin2006,schmidt2005} is the
+symplectic thick-lens tracking facility in \madx.  It is based on \ptc
+library \cite{forest2002} written by E.~Forest.  The commands of this
+module are described below, optional parameters are denoted by square
+brackets ([]).
 
 Prior to using this module the active beam line must be selected by
 means of a \hyperref[sec:use]{USE} command.  
@@ -30,17 +28,21 @@ Several examples can be found on the web at
 A typical tracking job in \ptc requires a number of commands to be issued:
 
 \madxmp{
+xxxx\= \kill
 PTC\_CREATE\_UNIVERSE; \\
 PTC\_CREATE\_LAYOUT, MODEL=integer, METHOD=integer, NST=integer, [EXACT];\\
-...\\
-PTC\_START, ... ;\\
-...\\
-PTC\_OBSERVE, ... ;\\
-...\\
-PTC\_TRACK, ... ;\\
-...\\
-PTC\_TRACK\_END;\\
-...\\
+\>\ldots\\
+\>PTC\_START, X=real, PX=real, Y=real, PY=real, T=real, PT=real;\\
+\>PTC\_START, FX=real, PHIX=real, FY=real, PHIY=real, FT=real, PHIT=real;\\
+\>\ldots\\
+\>PTC\_OBSERVE, PLACE=string; \\
+\>\ldots\\
+\>PTC\_TRACK, \ldots ;\\
+\>\ldots\\
+\>PTC\_TRACKLINE, \ldots ;\\
+\>\ldots \\
+\>PTC\_TRACK\_END;\\
+\>\ldots\\
 PTC\_END;
 }
 
@@ -56,18 +58,17 @@ commands as initial trajectories can be given.
 \hyperref[sec:ptc_track]{\tt PTC\_TRACK} command. 
 
 \madbox{  
-PTC\_START, \\
-  X=real, PX=real, Y=real, PY=real, T=real, PT=real,\\
-  FX=real, PHIX=real, FY=real, PHIY=real, FT=real, PHIT=real; 
+PTC\_START, \=X=real, PX=real, Y=real, PY=real, T=real, PT=real,\\
+            \>FX=real, PHIX=real, FY=real, PHIY=real, FT=real, PHIT=real; 
 }
 
 The coordinates can be 
 
 \begin{madlist}
-   \ttitem{X, PX, Y, PY, T, PT} are the standard canonical
+   \ttitem{X, PX, Y, PY, T, PT} i.e. the standard canonical
    coordinates. \\ (Default: 0.0)  
 
-   \ttitem{FX, PHIX, FY, PHIY, FT, PHIT} are the action-angle
+   \ttitem{FX, PHIX, FY, PHIY, FT, PHIT} i.e. the action-angle
    coordinates which are expressed by the normalized amplitude, $F_z$ and
    the phase, $\Phi_z$ for the \textit{z}-th mode plane 
    (\textit{z = x, y, t}).
@@ -114,7 +115,7 @@ command will then record the tracking data on all these observation
 points.  
 
 \madbox{
-PTC\_OBSERVE,  PLACE=string; 
+PTC\_OBSERVE, PLACE=string; 
 }
 
 The only attribute is 
@@ -124,7 +125,6 @@ The only attribute is
 
 
 {\bf Remarks}\\
-
 The first observation point at the beginning of the beam-line is marked
 as {\bf "start"}.  
        
@@ -208,8 +208,8 @@ The attributes are:
    a logical switch to activate the closed orbit calculation.
    This option must be used for closed rings only. This
    option allows to activate the Normal Form analysis, if
-   required. If CLOSED\_ORBIT is off, the sequence is treated as a
-   transfer line. \\ (Default: false)
+   required. With {\tt CLOSED\_ORBIT=false}, the sequence is treated as
+   a transfer line. \\ (Default: false)
      
    \ttitem{ELEMENT\_BY\_ELEMENT}\label{opt:element_by_element}
    a logical switch to activate the element-by-element tracking, from
@@ -236,15 +236,15 @@ The attributes are:
    \ttitem{NORM\_OUT} a logical switch to transform canonical variables
    to action-angle variables. \\ (Default: false) 
 
-    \ttitem{FILE} if FILE is omitted, no output is written to file.\\
-     if FILE is present, track tables are printed, optionally to 
-     files with name constructed from the base filename specified. \\
-     The actual name of the output file is constructed from
-     tyhe baseline given with {\tt FILE} to which are appended the
-     strings ".obsnnnn" (where nnnn is the observation point index) and
-     ".pnnnn" (where nnnn is now the particle number), unless the
-     \hyperref[opt:onetable]{\tt ONETABLE} option is activated.  \\
-     (Default: "track") 
+   \ttitem{FILE} if FILE is omitted, no output is written to file.\\
+   if FILE is present, track tables are printed, optionally to 
+   files with name constructed from the base filename specified. \\
+   The actual name of the output file is constructed from
+   tyhe baseline given with {\tt FILE} to which are appended the
+   strings ".obsnnnn" (where nnnn is the observation point index) and
+   ".pnnnn" (where nnnn is now the particle number), unless the
+   \hyperref[opt:onetable]{\tt ONETABLE} option is activated.  \\
+   (Default: "track") 
 
    \ttitem{EXTENSION} a string providing the filename extension for the
    track table files, e.g., txt, doc...  \\ (Default: nil)
@@ -285,7 +285,6 @@ The attributes are:
      between particles. \\ (Default: false)  
 \end{madlist}
 
-%%\title{PTC\_TRACKLINE}
 
 \section{PTC\_TRACKLINE}
 \label{sec:ptc_trackline}
@@ -298,8 +297,8 @@ i.e. after \hyperref[sec:ptc_create_universe]{\tt PTC\_CREATE\_UNIVERSE}
 and \hyperref[sec:ptc_create_layout]{\tt PTC\_CREATE\_LAYOUT} commands, and before
 corresponding \hyperref[sec:ptc_stop]{\tt PTC\_STOP}. 
 
-All tracks that are spawned with \hyperref[sec:ptc_start]{\tt
-  PTC\_START} commands before {\tt PTC\_TRACKLINE} command is issued are
+All tracks created with \hyperref[sec:ptc_start]{\tt PTC\_START}
+commands before {\tt PTC\_TRACKLINE} command is issued are 
 tracked. Track parameters are dumped at every defined observation point
 (see \hyperref[sec:ptc_observe]{\tt PTC\_OBSERVE} command). 
 
@@ -322,28 +321,27 @@ The attributes are:
      
    \ttitem{ONETABLE}\label{opt:onetable2} a logical switch to write all
    particle coordinates to a single file instead of separate files. \\
-
-   If false one file per track per observation point is written.\\ 
-   File format is filename.obsNNNN.pMMMM, where NNNN and MMMM are
-   respectively the number of the observation point and of the track\\
-   Filename is defined by the switch described below. \\
-   If false, tracking data are written to a single table for each
-   track for each observation point. Table names follow the naming
-   \textit{filename}.obsMMMM.pNNNN, where \textit{filename} is
-   settable prefix with \textbf{file} parameter (see below), MMMM is
-   observation point number and NNNN is track number. \\  
-   If true, all data are written to single table called onetable. 
-   \\ (Default: false) [to be clarified]
+   %% If false one file per track per observation point is written.\\ 
+   %% File format is filename.obsNNNN.pMMMM, where NNNN and MMMM are
+   %% respectively the number of the observation point and of the track\\
+   %% Filename is defined by the switch described below. \\
+   %% If false, tracking data are written to a single table for each
+   %% track for each observation point. Table names follow the naming
+   %% \textit{filename}.obsMMMM.pNNNN, where \textit{filename} is
+   %% settable prefix with \textbf{file} parameter (see below), MMMM is
+   %% observation point number and NNNN is track number. \\  
+   %% If true, all data are written to single table called onetable. \\
+   (Default: false) [to be clarified]
 
    \ttitem{FILE} if FILE is omitted, no output is written to file.\\
-     if FILE is present, track tables are printed, optionally to 
-     files with name constructed from the base filename specified. \\
-     The actual name of the output file is constructed from
-     tyhe baseline given with {\tt FILE} to which are appended the
-     strings ".obsnnnn" (where nnnn is the observation point index) and
-     ".pnnnn" (where nnnn is now the particle number), unless the
-     \hyperref[opt:onetable2]{\tt ONETABLE} option is activated.  \\
-     (Default: "track") 
+   if FILE is present, track tables are printed, optionally to 
+   files with name constructed from the base filename specified. \\
+   The actual name of the output file is constructed from
+   tyhe baseline given with {\tt FILE} to which are appended the
+   strings ".obsnnnn" (where nnnn is the observation point index) and
+   ".pnnnn" (where nnnn is now the particle number), unless the
+   \hyperref[opt:onetable2]{\tt ONETABLE} option is activated.  \\
+   (Default: "track") 
 
    \ttitem{EXTENSION} a string providing the filename extension for the
    track table files, e.g., txt, doc...  \\ (Default: nil)
@@ -375,19 +373,19 @@ The attributes are:
 \end{madlist}
 
 
- Depending on value of {\tt ONETABLE} switch, all output information
-is stored in one table (and also file), or in one table per track per
-observation point is written if the switch is false. 
+%% Depending on value of {\tt ONETABLE} switch, all output information
+%% is stored in one table (and also file), or in one table per track per
+%% observation point is written if the switch is false. 
 
-
-Plotting of track parameters plotting (see \hyperref[sec:plot]{\tt PLOT}
+Plotting of track parameters (see \hyperref[sec:plot]{\tt PLOT}
 command) is only possible if {\tt ONETABLE} switch is set to false (status 
 as for Feb. 2006). This unfortunate solution is the legacy of the
 regular \madx \hyperref[chap:thintrack]{\tt TRACK} command, 
 designed for circular machines where the user usually tracks a few
 particles for many turns rather then many particles for one turn each.
 
-Tracks that do not fit in aperture are immediately stopped. 
+Tracks that do not fit in the defined aperture for elements are
+immediately stopped.  
 
 Behavior of PTC calculations can be adapted with
 \hyperref[sec:ptc_setswitch]{\tt PTC\_SETSWITCH} command 

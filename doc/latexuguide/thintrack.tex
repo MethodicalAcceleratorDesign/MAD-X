@@ -357,33 +357,21 @@ START, FX=real, PHIX=real, FY=real, PHIY=real, FT=real, PHIT=real;
 }
           
 For the case of action-angle coordinates, the normalised amplitudes are
-expressed in number of r.m.s. beam size F$_X$, F$_Y$, F$_T$ (the actions being computed with
-the emittances given in the \texttt{BEAM} command) \textbf{in each mode
-  plane}. The phases are PHI$_X$, PHI$_Y$ and PHI$_T$ expressed in
+expressed in number of r.m.s. beam size $F_X$, $F_Y$, $F_T$ (the actions
+being computed with the emittances given in the \texttt{BEAM} command)
+\textbf{in each mode plane}. 
+The phases are $\Phi_X$, $\Phi_Y$ and $\Phi_T$ expressed in
 radian. In the uncoupled case, we have in the plane mode labelled z, and
-with E$_z$ being the r.m.s. emittance in that plane:\\
-\\
-Z = F$_z$ sqrt(E$_z$) cos(PHI$_z$),    \\
-\\
-P$_z$= F$_z$ sqrt(E$_z$) sin(PHI$_z$)
-
+with $E_z$ being the r.m.s. emittance in that plane:\\
+\begin{equation}
+Z = F_z \sqrt E_z \cos\Phi_z , \qquad P_z= F_z \sqrt E_z \sin\Phi_z
+\end{equation}
 
 The attributes of the START command are:
 \begin{madlist}
   \ttitem{X, PX, Y, PY, T, PT} canonical coordinates. 
-  \ttitem{FX, FY, FT, PHIX, PHIY, PHIT} action-angle coordinates.
+  \ttitem{FX, PHIX, FY, PHIY, FT, PHIT} action-angle coordinates.
 \end{madlist}
-
-%% {\bf Options}
-%% \begin{tabular}{p{3cm} cccc}
-%%    \hline 
-%%    \textbf{Option} & \textbf{Meaning} & \textbf{Default Value} & \textbf{Value Type} & \textbf{Unit} \\ 
-%%    \hline
-%%    X, PX, Y, PY, T, PT & canonical coordinates & 0.0 & double & m \\ 
-%%    \hline
-%%    FX, PHIX, FY, PHIY, FT, PHIT & action-angle coordinates & 0.0 & double & rad \\ 
-%%    \hline
-%% \end{tabular}
 
 {\bf Remarks} \\
 For usual tracking (single/multi-turn), all coordinates are specified
@@ -406,21 +394,11 @@ an observation point is with the OBSERVE command:
 OBSERVE, PLACE=string;  
 }
 
-The single attirbute of \texttt{OBSERVE} is:
+The single attribute of \texttt{OBSERVE} is:
 \begin{madlist}
   \ttitem{PLACE} the name of the observation point. 
 \end{madlist}
-
-     
-%% {\bf Options} 
-%% \begin{tabular}{cccc}
-%%    \hline 
-%%    \textbf{Option} & \textbf{Meaning} & \textbf{Default Value} & \textbf{Value Type} \\ 
-%%    \hline
-%%    PLACE & name of the observation point &  & string \\ 
-%%    \hline   
-%% \end{tabular}
-
+  
 Several \texttt{OBSERVE} commands can be given for the same tracking
 job, one per observation point. 
 
@@ -440,7 +418,7 @@ filename for the first obseration point and first particle looks like
 \section{RUN}
 \label{sec:run}
 
-The actual tracking is triggerred by the \texttt{RUN} command. 
+The actual tracking is triggered by the \texttt{RUN} command. 
 
 \madbox{
 RUN, TURNS=integer, MAXAPER=real\_array, FFILE=integer;  

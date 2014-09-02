@@ -59,6 +59,7 @@ doc/latexuguide/beams.tex -text
 doc/latexuguide/biblio-mad.bib -text
 doc/latexuguide/c6t.tex -text
 doc/latexuguide/changelog.tex -text
+doc/latexuguide/cleanlatexdoc -text
 doc/latexuguide/contributors.tex -text
 doc/latexuguide/control.tex -text
 doc/latexuguide/conventions.tex -text
@@ -88,6 +89,7 @@ doc/latexuguide/jpg/tolerance.jpg -text
 doc/latexuguide/lhct.mad.tex -text
 doc/latexuguide/line.tex -text
 doc/latexuguide/madstyle.sty -text
+doc/latexuguide/makelatexdoc -text
 doc/latexuguide/makethin.tex -text
 doc/latexuguide/makethin_HBU.tex -text
 doc/latexuguide/match.tex -text

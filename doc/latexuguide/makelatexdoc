@@ -1,0 +1,8 @@
+#!/bin/sh
+
+pdflatex uguide.tex
+pdflatex uguide.tex
+makeindex uguide
+bibtex uguide
+pdflatex uguide.tex
+pdflatex uguide.tex
