@@ -554,15 +554,6 @@ contains
 
     call setknobs(my_ring)
 
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    !  INIT Y that is tracked          !
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    call initmap(dt)
-   
-    if (geterrorflag() /= 0) then
-       !if arror occured then return
-       return
-    endif
     
     ring_parameters = get_value('ptc_twiss ','ring_parameters ') .ne. 0
     if (ring_parameters) then
@@ -590,6 +581,19 @@ contains
      call make_node_layout(my_ring) 
      call getBeamBeam()
     endif 
+
+    !############################################################################
+    !############################################################################
+    !############################################################################
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !  INIT Y that is tracked          !
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    call initmap(dt,slice)
+   
+    if (geterrorflag() /= 0) then
+       !if arror occured then return
+       return
+    endif
     
     
     !############################################################################
@@ -982,12 +986,13 @@ contains
   contains  ! what follows are internal subroutines of ptc_twiss
     !____________________________________________________________________________________________
 
-    subroutine initmap(dt)
+    subroutine initmap(dt,slice)
       implicit none
       integer     :: double_from_table_row
       integer     :: mman, mtab, mascr, mdistr !these variable allow to check if the user did not put too many options
       integer     :: mmap
       real(dp)    :: dt
+      logical(lp) :: slice
       
       beta_flg = (get_value('ptc_twiss ','betx ').gt.0) .and. (get_value('ptc_twiss ','bety ').gt.0)
 
@@ -1122,7 +1127,12 @@ contains
 
          endif
          
-         call track(my_ring,y,1,default)
+         if (slice) then
+           call track_probe_x(my_ring,y,default) !, MY_RING%start%t1,MY_RING%end%t2);
+         else
+           call track(my_ring,y,1,default)
+         endif
+                  
          if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
             write(whymsg,*) 'DA got unstable (one turn map production) at ', &
                              lost_fibre%mag%name, &
@@ -1149,6 +1159,7 @@ contains
          if (getdebug() > 1) then
             print*,"Initializing map from one turn map. One Turn Map"
             call print(y,6)
+            
          endif
 
          call maptoascript()
