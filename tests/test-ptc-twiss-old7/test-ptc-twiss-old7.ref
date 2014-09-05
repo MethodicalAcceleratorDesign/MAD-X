@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.06  (64 bit, Linux)       +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.01.17      +
-  + Execution Time Stamp: 21.01.14 22.17.46 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.02  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.07.04               +
+  + Execution date: 2014.09.05 11:34:39      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
 
@@ -396,12 +396,12 @@ ptc_twiss,closed_orbit,icase=5,slice_magnets,file=twiss_ptc_ring_slices,no=4;
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
  Closed orbit:    3.2607158925373049E-004   2.5963462592936979E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
-Deviation from symplecticity  0.5251354906476990E-11 %
   PARENT LAYOUT NAME :No name assigned
   NUMBER OF ORIGINAL LAYOUT ELEMENTS :         146
   NUMBER OF THIN OBJECTS :        1180
   TOTAL IDEAL LENGTH OF STRUCTURE :   534.60000000000196     
   TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   534.60000000000196     
+Deviation from symplecticity  0.5251354906476990E-11 %
 Deviation from symplecticity  0.5251354906476990E-11 %
 
 ++++++ table: ptc_twiss_summary
@@ -613,5 +613,5 @@ call, file = "../share/line_lattice/line.seq";
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.06 (64 bit) finished normally +
+  + MAD-X 5.02.02 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
