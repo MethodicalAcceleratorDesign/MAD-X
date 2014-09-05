@@ -555,13 +555,6 @@ contains
     call setknobs(my_ring)
 
     
-    ring_parameters = get_value('ptc_twiss ','ring_parameters ') .ne. 0
-    if (ring_parameters) then
-      if (getdebug() > 1) then
-        write(6,*) "User forces ring parameters calculation"
-      endif
-      isRing = .true.
-    endif
     
     call alloc(theTransferMap)
     theTransferMap = npara
@@ -599,6 +592,8 @@ contains
     !############################################################################
     !############################################################################
     !############################################################################
+
+
     
     call alloc(tw)
 
@@ -917,6 +912,16 @@ contains
 
        close(mf2)
 
+    endif
+
+   
+    !must be after initmap that sets the isRing
+    ring_parameters = get_value('ptc_twiss ','ring_parameters ') .ne. 0
+    if (ring_parameters) then
+      if (getdebug() > 1) then
+        write(6,*) "User forces ring parameters calculation"
+      endif
+      isRing = .true.
     endif
 
 
