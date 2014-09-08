@@ -66,6 +66,10 @@ ifeq ($(SHARED),yes)
 CFLAGS += -fPIC
 endif
 
+ifeq ($(OPENMP),yes)
+CFLAGS += -openmp
+endif
+
 #
 # extra flags
 #
@@ -112,6 +116,10 @@ endif
 
 ifeq ($(SHARED),yes)
 CXXFLAGS += -fPIC
+endif
+
+ifeq ($(OPENMP),yes)
+CXXFLAGS += -openmp
 endif
 
 #

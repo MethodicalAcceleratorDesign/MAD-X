@@ -37,6 +37,9 @@ PROFILE := no
 # make shared lib: yes/no (default is no)
 SHARED  := no
 
+# activate OpenMP: yes/no (default is no)
+OPENMP  := no
+
 ####################
 # Makefile includes
 

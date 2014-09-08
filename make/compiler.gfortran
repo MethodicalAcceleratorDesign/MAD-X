@@ -55,6 +55,10 @@ ifeq ($(SHARED),yes)
 FFLAGS += -fPIC
 endif
 
+ifeq ($(OPENMP),yes)
+FFLAGS += -fopenmp
+endif
+
 #
 # extra flags
 #
