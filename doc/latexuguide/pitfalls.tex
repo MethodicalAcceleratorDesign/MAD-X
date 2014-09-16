@@ -11,7 +11,7 @@ this list.
 
 \item[Twiss calculation is 4D only!]  The Twiss command will calculate
   an approximate 6D closed orbit when the accelerator structure includes
-  an active \hyperref[sec:cavity]{cavity}. However, the calculation of
+  an active \hyperref[sec:rf_cavity]{cavity}. However, the calculation of
   the Twiss parameters are 4D only. This may result in apparently
   non-closure of the beta values in the plane with non-zero
   dispersion. The full 6D Twiss parameters can be calculated with the
@@ -111,7 +111,7 @@ this list.
     FREQ} attribute (highly discouraged!) a problem arises for
   \hyperref[sec:ptc_twiss]{\tt PTC\_TWISS} due to the fact that
   internally {\tt HARMON} is transferred to {\tt FREQ} too late. A
-  simple \hyperref[sec:twiss]{\tt TWISS} command executed before \ptc
+  simple \hyperref[chap:twiss]{\tt TWISS} command executed before \ptc
   start-up will help. However, avoiding {\tt HARMON} is advantageous.
     
 
@@ -136,7 +136,7 @@ this list.
   parameters are always well defined (they are the "average" amplitude
   functions of their proper phase space region), i.e. at full coupling we
   have: beta11 $\sim$ beta12 and beta21 $\sim$ beta22. Using the {\tt RIPKEN}
-  flag \hyperref[sec:twiss]{\tt TWISS} calculates the Mais-Ripken
+  flag \hyperref[chap:twiss]{\tt TWISS} calculates the Mais-Ripken
   parameters via a transformation from the Teng-Edwards Twiss
   parameters. Obviously this fails when the Teng-Edwards Twiss
   parameters are ill defined. In this case one has to rely on

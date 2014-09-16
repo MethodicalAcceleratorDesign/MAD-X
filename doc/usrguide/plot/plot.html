@@ -193,7 +193,13 @@ attribute <i>ptc_table</i> which is expected to be generated
 previously by the ptc package. The data belong to the column
 identified by one of the names set in the definition of the ptc twiss
 table. Interpolation is not available and the attribute
-<i>interpolate</i> has no effect.  
+<i>interpolate</i> has no effect.  <br>
+This option is highly recommended when plotting data obtained from
+PTC_TWISS since there is no
+mechanism for PLOT to physically interpolate the optical
+functions beyond using splines with no mechanism for constraints
+with derivatives. In most cases the INTERPOLATE option with data
+obtained with PTC_TWISS produces unphysical data representation.
 <li>ptc_table: name of the ptc twiss table to be plotted from (default: ptc_twiss) 
 </ul>
 
