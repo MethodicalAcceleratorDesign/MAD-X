@@ -14,7 +14,7 @@ brackets ([]).
 
 Prior to using this module the active beam line must be selected by
 means of a \hyperref[sec:use]{USE} command.  
-The general \hyperref[chap:ptc_general]{PTC environment} must
+The general \hyperref[chap:ptc_setup]{PTC environment} must
 also be initialized.  
 
 {\bf Examples}\\
@@ -221,8 +221,8 @@ The attributes are:
    to formatted text files. \\
    (Default: false)
 
-   \ttitem{ONETABLE} a logical switch to write all particle coordinates
-   to a single file instead of separate files. \\
+   \ttitem{ONETABLE}\label{opt:onetable} a logical switch to write all 
+	particle coordinates to a single file instead of separate files. \\
    (Default: false)
 
    \ttitem{MAXAPER} an array defining upper limits for particle
@@ -290,12 +290,12 @@ The attributes are:
 \label{sec:ptc_trackline}
 
 The {\tt PTC\_TRACKLINE} command performs particle tracking that takes
-into account acceleration in traveling wave cavities. 
+into account acceleration in travelling wave cavities. 
 It must be invoked in the scope of correctly initialized
-\hyperref[chap:ptc_general]{PTC environment}, 
+\hyperref[chap:ptc_setup]{PTC environment}, 
 i.e. after \hyperref[sec:ptc_create_universe]{\tt PTC\_CREATE\_UNIVERSE}
 and \hyperref[sec:ptc_create_layout]{\tt PTC\_CREATE\_LAYOUT} commands, and before
-corresponding \hyperref[sec:ptc_stop]{\tt PTC\_STOP}. 
+corresponding \hyperref[sec:ptc_end]{\tt PTC\_END}. 
 
 All tracks created with \hyperref[sec:ptc_start]{\tt PTC\_START}
 commands before {\tt PTC\_TRACKLINE} command is issued are 
