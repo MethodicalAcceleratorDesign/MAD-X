@@ -826,13 +826,15 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   if(aperflag) then
      nn=name_len
      call node_string('apertype ',aptype,nn)
+
      call dzero(aperture,maxnaper)
      call get_node_vector('aperture ',nn,aperture)
+
      call dzero(offset,2)
      call get_node_vector('aper_offset ',nn,offset)
-
      offx = offset(1)
      offy = offset(2)
+
      if (optiondebug .ne. 0) then
         print *, " aperture type ",aptype
         print *, "          aperture ", aperture(1),aperture(2),aperture(3),aperture(4)
@@ -3271,66 +3273,6 @@ subroutine trcoll(flag, apx, apy, apr, turn, sum, part_id, last_turn,  &
 
      if(ISNAN(z(1,i)).or.ISNAN(z(3,i))) goto 99
 
-
-     ! 2013-Oct-28  14:02:03  ghislain: commented this section out and replaced with another one with
-     ! cascading tests for flag and particle positions instead of combined tests.
-     ! With Intel compilers on 32 bit architectures the combined test for the racetrack case
-     ! always evaluated to true...
-     !---- Is particle outside aperture?
-
-     !    !*** case of ellipse
-     ! if (flag .eq. 1 .and. &
-     !    ((z(1,i)-al_errors(11)-offx)/apx)**2 + &
-     !    ((z(3,i)-al_errors(12)-offy)/apy)**2 .gt. 1d0) then
-     !    if (optiondebug .ne. 0) then
-     !      print *, "trcoll ellipse: x, al_err_x, offx, apx : ", z(1,i), al_errors(11), offx, apx
-     !      print *, "                y, al_err_y, offy, apy : ", z(3,i), al_errors(12), offy, apy
-     !    endif
-     !    go to 99
-     !      !*** case of rectangle
-     ! else if(flag .eq. 2 .and. &
-     !      (abs(z(1,i)-al_errors(11)-offx) .gt. apx .or. &
-     !       abs(z(3,i)-al_errors(12)-offy) .gt. apy)) then
-     !      if (optiondebug .ne. 0) then
-     !         print *, "trcoll rectangle: x, al_err_x, offx, apx : ", z(1,i), al_errors(11), offx, apx
-     !         print *, "                  y, al_err_y, offy, apy : ", z(3,i), al_errors(12), offy, apy
-     !      endif
-     !      go to 99
-     !      !***  case of marguerite: two ellipses
-     ! else if(flag .eq. 3 .and. &
-     !    ((z(1,i)-al_errors(11)-offx)/apx)**2 + &
-     !    ((z(3,i)-al_errors(12)-offy)/apy)**2 .gt. 1d0 .and. &
-     !    ((z(1,i)-al_errors(11)-offx)/apy)**2 + &
-     !    ((z(3,i)-al_errors(12)-offy)/apx)**2 .gt. 1d0) then
-     !    if (optiondebug .ne. 0) then
-     !      print *, "trcoll marguerite: x, al_err_x, offx, apx : ", z(1,i), al_errors(11), offx, apx
-     !      print *, "                   y, al_err_y, offy, apy : ", z(3,i), al_errors(12), offy, apy
-     !    endif
-     !    go to 99
-     !      !*** case of racetrack
-     ! else if (flag .eq. 4 .and. &
-     !      abs(z(1,i)-al_errors(11)-offx) .gt. (apr+apx) .or. &
-     !      abs(z(3,i)-al_errors(12)-offy) .gt. (apy+apr) .or. &
-     !      ( abs(z(1,i)-al_errors(11)-offx) .gt. apx .and. &
-     !        abs(z(3,i)-al_errors(12)-offy) .gt. apy .and. &
-     !        (abs(z(1,i)-al_errors(11)-offx)-apx)**2 + &
-     !        (abs(z(3,i)-al_errors(12)-offy)-apy)**2 .gt. apr**2 ) ) then
-     !      if (optiondebug .ne. 0) then
-     !         print *, "trcoll racetrack: flag is", flag, "and should be 4"
-     !         print *, "trcoll racetrack: x, al_err_x, offx, apx : ", z(1,i), al_errors(11), offx, apx
-     !         print *, "                  y, al_err_y, offy, apy, apr : ", z(3,i), al_errors(12), offy, apy, apr
-     !      endif
-     !      go to 99
-     ! else if (flag .ne. 1 .and. flag .ne. 2 .and. flag .ne. 3 .and. flag .ne. 4) then
-     !     call aawarn('trcoll:','called with unknown flag option. exit from trcoll')
-     !     return
-     ! endif
-     !
-     ! break if particle is inside aperture and continue the loop
-     ! go to 98
-
-
-     ! 2013-Oct-28  14:04:03  ghislain: this section with cascading tests
      !*** case of ellipse
      if (flag .eq. 1) then
         if ( ((z(1,i)-al_errors(11)-offx)/apx)**2 + &
