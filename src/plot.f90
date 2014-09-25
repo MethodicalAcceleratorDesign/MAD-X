@@ -1,38 +1,3 @@
-! 2014-Apr-25  09:20:22  ghislain: dead code; commented out
-! subroutine pecat1(rb, ra, rd)
-
-!   implicit none
-
-!   !----------------------------------------------------------------------*
-!   ! purpose:
-!   !   concatenate two transport maps
-!   ! input:
-!   !   rb(6,6) second map in beam line order.
-!   !   ra(6,6) first map in beam line order.
-!   ! output:
-!   !   rd(6,6) result map.
-!   !----------------------------------------------------------------------*
-
-!   !--- type definition of the routine arguments
-
-!   double precision rb(6,6), ra(6,6), rd(6,6)
-
-!   !--- type definitions of local variables
-
-!   integer k, j
-
-!   !--- Routine body
-
-!   do k = 1, 6
-!      do j = 1, 6
-!         rd(j,k) = rb(j,1) * ra(1,k) + rb(j,2) * ra(2,k)               &
-!              + rb(j,3) * ra(3,k) + rb(j,4) * ra(4,k)                           &
-!              + rb(j,5) * ra(5,k) + rb(j,6) * ra(6,k)
-!      enddo
-!   enddo
-! end subroutine pecat1
-!***********************************************************************
-
 subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
      np, xval, yval, window, actwin, ierr)
 
@@ -2429,7 +2394,6 @@ subroutine pesopt(ierr)
   !--- Check that STYLE & SYMBOL are both non zero
   call comm_para('style ', nint, ndble, k, plot_style, d_arr, char_a, char_l)
   call comm_para('symbol ', nint, ndble, k, plot_symbol, char_a, char_l)
-!  if (plot_style(1) + plot_symbol(1) .eq. 0) then ! 2014-May-05  13:07:59  ghislain: too dangerous, eg for values -1 and +1 
   if (plot_style(1) .eq. 0 .and. plot_symbol(1) .eq. 0) then
      print *,'Warning: style & symbol attributes will make plot invisible. Thus style is set to 1.'
      plot_style(1) = 1
