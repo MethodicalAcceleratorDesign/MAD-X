@@ -774,7 +774,7 @@ aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
     warning("cannot open file:", e_d_name); return NULL;
   }
 
-  char* sep=" \"\n";
+  const char* sep=" \"\n";
 
   while (fgets(aux_buff->c, aux_buff->max, tab_file))  {
     tempcount++;
