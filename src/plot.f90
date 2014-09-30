@@ -2408,7 +2408,7 @@ subroutine pesopt(ierr)
 
   !--- if ptc_flag is on, no interpolation and check only ptc-related attributes
   if (ptc_flag .and. itbv .eq. 0) return
-
+     
   !--- Spline is obsolete 
   call comm_para('spline ', nint,ndble,k,i,d_arr, char_a,char_l)
   if (i .eq. 1) print *,'SPLINE attribute is obsolete, no action taken, use interpolate attribute instead.'
@@ -2419,8 +2419,12 @@ subroutine pesopt(ierr)
   ipparm(2,1) = plot_option('interpolate ')
   if (ipparm(2,1) .eq. 0) call comm_para('interpolate ', nint, ndble, k, ipparm(2,1), d_arr,char_a, char_l)
 
-  !--- Interpolation is not possible for ptc twiss variables
-  if (ptc_flag) ipparm(2,1) = 0
+  !--- Interpolation is not possible for ptc twiss variables; reset to false
+  ! 2014-Sep-30  17:11:51  ghislain: added warning 
+  if (ptc_flag .and. ipparm(2,1).eq.1) then
+     ipparm(2,1) = 0
+     call aawarn('PLOT: ','Interpolation is not compatible with PTC_TWISS tables; INTERPOLATE ignored')
+  endif
 
   !--- another interpolation flag is used in other subroutines
   interf = ipparm(2,1)
