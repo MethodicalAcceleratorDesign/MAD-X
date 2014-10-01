@@ -436,70 +436,91 @@ treated as thin lenses, except when tracking by Lie-algebraic methods.
 \ttindex{multipole}
 \label{sec:multipole}
 
+A {\tt MULTIPOLE} is a thin-lens magnet of arbitrary order, including a 
+dipole component.
+
 \madbox{
 label: MULTIPOLE, \= LRAD = real, TILT = real, \\
-                  \> KNL = \{..,..,..\}, KSL = \{..,..,..\};
+                              \> KNL = \{real, \ldots \}, KSL = \{real, \ldots \};
 }
 
-A {\tt MULTIPOLE} is a thin-lens magnet of arbitrary order, including a dipole: 
 \begin{madlist}
-    \ttitem{LRAD} A fictitious length, which was originally just used to
+    \ttitem{LRAD} A fictitious length, originally only used to
       compute synchrotron radiation effects. \\
-      A non-zero \textbf{ LRAD } in conjunction  with the
-      \href{../control/general.html#option}{OPTION}\textbf{ thin\_foc }
-      set to a \textbf{ true } logical value takes into account of the
-      weak focussing of bending magnets.  
+      A non-zero {\tt LRAD} in conjunction with
+	\hyperref[sec:option]{\tt OPTION, THIN\_FOC=true}
+      takes into account the
+      weak focussing of bending magnets.
+      
     \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
       rad). A positive angle represents a clockwise rotation of the
-      multipole element. \\
-      \textbf{Please note that contrary to \madeight one has to specify the
-        desired TILT angle, otherwise it is taken as 0 rad. We believe
-        that the \madeight concept of having individual TILT values for each
-        component and on top with default values led to considerable
-        confusion and allowed for excessive and unphysical
-        freedom. Instead, in \madx the KNL/KSL components can be
-        considered as the normal or skew multipole components of the
-        magnet on the bench, while the TILT attribute can be considered
-        as an tilt alignment error in the machine. } 
-    \ttitem{KNL} The normal multipole coefficients from order zero to the
-      maximum; the parameters are positional, therefore zeros must be
-      filled in for components that do not exist. Example of a thin-lens
-      sextupole:  
-\madxmp{ms: multipole, knl := \{0, 0, k2l\};}
-
-    \ttitem{KSL} The skew multipole coefficients from order zero to the
-     maximum; the parameters are positional, therefore zeros must be
-     filled in for components that do not exist. Example of a thin-lens
-     skew octupole:  
-\madxmp{ms: multipole, ksl := \{0, 0, 0, k3sl\};}
+      multipole element. The roll angle affects all components.
+      
+    \ttitem{KNL} An array of the integrated normal multipole coefficients, 
+      starting from order zero and up to the
+      maximum order. The parameters are positional in the array, therefore 
+      zeros must be filled in for components that do not exist. \\
+      The coefficient of rank $i$ in the array corresponds to the integrated 
+      strength $K_i L = B_i . L / (B\rho)$ where the strength is given by 
+      equation \ref{eq:kn}. 
+      Hence the first argument of the array, the argument for a multipole of 
+      order zero, $K_0 L = B_0 . L / (B\rho)$ is equal to the rotation angle of 
+      the thin dipole.
+      
+    \ttitem{KSL} An array of the integrated skew multipole coefficients, 
+     starting from order zero and up to the
+     maximum order. The parameters are positional in the array, therefore 
+     zeros must be filled in for components that do not exist.
 
 \end{madlist}
 
-Both KNL and KSL may be specified for the same multipole. 
+Both {\tt KNL} and {\tt KSL} may be specified for the same multipole. 
+
+Contrary to \madeight the desired {\tt TILT} angle must be explicitly 
+specified, and defaults otherwise to 0 rad. The  roll angle specified with {\tt 
+TILT} is global to all multipolar components. 
+Hence the {\tt KNL} and {\tt KSL} components can be considered as the 
+normal or skew multipole components of the magnet as measured on the 
+bench, while the TILT attribute can be considered as an alignment error as 
+measured in the machine.
+
 
 A multipole with no dipole component has no effect on the reference
 orbit, i.e. the reference system at its exit is the same as at its
 entrance. If it includes a dipole component, it has the same effect on
 the reference orbit as a dipole with zero length and deflection angle
-K0L, being the first component of KNL above.  
+equal to the first component of the array {\tt KNL}.  
+
+%In order to know the current maximum order of a given multipole, use the
+%command {\tt HELP, MULTIPOLE;} and count.
+
+
+{\bf Examples:}\\
+A thin-lens sextupole:  
+\madxmp{ms: MULTIPOLE, KNL=\{0, 0, k2l\};}
+
+A thin-lens skew octupole:  
+\madxmp{mso: MULTIPOLE, KSL=\{0, 0, 0, k3sl\};}
+
+
+A thin-lens multipole with a normal octupole component and a skew decapole
+component:
+\madxmp{mod: MULTIPOLE, KNL=\{0,0,0,myoct*lrad\}, KSL=\{0,0,0,0,-1.e-5\};
+}
+
 
 
 % moved from element format above
-A special format is used for a \href{multipole.html}{multipole}\index{multipole}: 
-\madxmp{
-m: multipole, \= kn= \{kn0, kn1, kn2, ..., knmax\}, \\
-              \> ks= \{ks0, ks1, ks2, ..., ksmax\};
-}
-where kn and ks give the integrated normal and skew strengths,
-respectively. The commas are mandatory, each strength can be an
-expression; their position defines the order. example:  
-\madxmp{
-m: multipole, kn=\{0,0,0,myoct*lrad\}, ks=\{0,0,0,0,-1.e-5\};
-}
-defines a multipole with a normal octupole, and a skew decapole component. 
+% commented by Ghislain on 2014-01-01
+%A special format is used for a \href{multipole.html}{multipole}\index{multipole}: 
+%\madxmp{
+%m: multipole, \= knl= \{kn0, kn1, kn2, ..., knmax\}, \\
+%              \> ksl= \{ks0, ks1, ks2, ..., ksmax\};
+%}
+%where knl and ksl give the integrated normal and skew strengths,
+%respectively. The commas are mandatory, each strength can be an
+%expression; their position defines the order.
 
-To know the current maximum order, enter the command 
-\madxmp{HELP, MULTIPOLE;} and count.
 
 
 %  Changed by: Alexander Koschik, 16-May-2006 
