@@ -135,10 +135,10 @@ Bending magnets have the following attributes:
 
    \ttitem{HGAP} The half gap of the magnet (default: 0 m). 
 
-   \ttitem{K2}\index{K2} The sextupole coefficient. (Default: $0
+   \ttitem{K2} The sextupole coefficient. (Default: $0
    mˆ{-3}$) \\ $K_2 = (1/B\rho) (\partial^2 B_y / \partial x^2)$.   
 
-   \ttitem{H1}\index{H1} The curvature of the entrance pole
+   \ttitem{H1}The curvature of the entrance pole
    face. (Default: $0 m^{-1}$).   
    \ttitem{H2} The curvature of the exit pole face. (Default: $0
    m^{-1}$). \\  
@@ -540,14 +540,11 @@ A SOLENOID has three real attributes:
 \begin{madlist}
    \ttitem{L} The length of the solenoid (default: 0 m) 
    \ttitem{KS} The solenoid strength $K_s = B_0 / B\rho$ (default: 0
-     rad/m). For positive KS and positive particle charge, the solenoid
+     rad/m). For positive {\tt KS} and positive particle charge, the solenoid
      field points in the direction of increasing $s$.  
    \ttitem{KSI} The solenoid integrated strength $K_s L$
      (default: 0 rad).  This additional attribute is needed only when
      using the thin solenoid,  where $L=0$.     
-   \ttitem{KNL, KSL}  Take note that one can specify multipole
-     coefficients for SOLENOID. They have no effect in \madx proper but are used
-     in PTC for solenoid with multipoles.
 \end{madlist}
 
 Example: 
@@ -559,6 +556,9 @@ THINSOLO: \> SOLENOID, L = 0,  \> KS = 0.001, KSI = 0.002;
 
 {\bf Note:} Additional attributes can be given to solenoids that
 are useful for PTC and defined in \ref{sec:add_option_PTC}.
+In particular multipole coefficients KNL and KSL can also be specified for 
+solenoids. They have no effect in \madx proper but are used in PTC for 
+solenoid with multipoles.
 
 The \href{local_system.html#straight}{straight reference system} for a
 solenoid is a cartesian coordinate system. 
@@ -1431,28 +1431,35 @@ case the tracking run will be aborted.
 \section{Rotation around the vertical axis}
 \label{sec:yrotation}
 
-\madbox{
-label: YROTATION, TYPE = name, ANGLE = real;
-}
-
 The element {\tt YROTATION} rotates the
 \hyperref[subsec:local_straight]{straight reference system} about the
-vertical (\texttt{y}) axis. 
+vertical ({\tt y}) axis.
 
-YROTATION has no effect on the beam, but it
+\madbox{
+label: YROTATION, ANGLE = real;
+}
+
+{\tt YROTATION} has no effect on the beam, but it
 causes the beam to be referred to the new coordinate system  \\
-\textit{x}$_2$=\textit{x}$_1$cos(theta)-\textit{s}$_1$sin(theta), \\
-\textit{y}$_2$=\textit{x}$_1$sin(theta)+\textit{s}$_1$cos(theta).\\
+\begin{equation}\begin{split}
+x_2 &= x_1 \cos\theta - s_1 \sin\theta \\
+y_2 &= x_1 \sin\theta + s_1 \cos\theta
+\end{split}\end{equation}
+
+%%\textit{x}$_2$=\textit{x}$_1$cos(theta)-\textit{s}$_1$sin(theta), \\
+%%\textit{y}$_2$=\textit{x}$_1$sin(theta)+\textit{s}$_1$cos(theta).\\
 
 It has one real attribute: 
 \begin{madlist}
-   \ttitem{ANGLE} The rotation angle theta (default: 0 rad). It must be a
-     \emph{small} angle, i.e. an angle comparable to the transverse
-     angles of the orbit. 
+   \ttitem{ANGLE} The rotation angle $\theta$ (default: 0 rad).  
 \end{madlist}
 
 A positive angle means that the new reference system is rotated
 clockwise about the local \texttt{y}-axis with respect to the old system. 
+
+{\bf Important note:} \\
+The rotation angle $\theta$ must be \emph{small}, i.e. it must be at
+most comparable to the transverse angles of the orbit. 
 
 Example: 
 \madxmp{
@@ -1462,26 +1469,31 @@ KINK: YROTATION, ANGLE = 0.0001;
 \section{Rotation around the longitudinal axis}
 \label{sec:srotation}
 
-\madbox{
-label: SROTATION, ANGLE = real;
-}
-
 The element {\tt SROTATION} rotates the
 \hyperref[subsec:local_straight]{straight reference system} about the
 longitudinal (\texttt{s}) axis. 
 
-SROTATION has no effect on the beam, but it causes the beam to be
+\madbox{
+label: SROTATION, ANGLE = real;
+}
+
+{\tt SROTATION} has no effect on the beam, but it causes the beam to be 
 referred to the new coordinate system \\ 
-\textit{x}$_2$=\textit{x}$_1$cos(psi)-\textit{y}$_1$sin(psi),\\
-\textit{y}$_2$=\textit{x}$_1$sin(psi)+\textit{y}$_1$cos(psi).\\ 
+\begin{equation}\begin{split}
+x_2 &= x_1 \cos\psi - y_1 \sin\psi \\
+y_2 &= x_1 \sin\psi + y_1 \cos\psi
+\end{split}\end{equation}
+
+%%\textit{x}$_2$=\textit{x}$_1$cos(psi)-\textit{y}$_1$sin(psi),\\
+%%\textit{y}$_2$=\textit{x}$_1$sin(psi)+\textit{y}$_1$cos(psi).\\ 
 
 It has one real attribute: 
 \begin{madlist}
-   \ttitem{ANGLE} The rotation angle psi (default: 0 rad) 
+   \ttitem{ANGLE} The rotation angle $\psi$ (default: 0 rad) 
 \end{madlist}
 
 A positive angle means that the new reference system is rotated
-clockwise about the \texttt{s}-axis with respect to the old system.  
+clockwise about the {\tt s}-axis with respect to the old system.  
 
 Example: 
 \madxmp{
