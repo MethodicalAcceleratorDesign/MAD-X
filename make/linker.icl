@@ -47,6 +47,10 @@ ifeq ($(PLUGIN),yes)
 LDFLAGS += /MD # todo
 endif
 
+ifeq ($(OPENMP),yes)
+LDFLAGS += /Qopenmp $(if $(call eq,$(STATIC),yes),/Qopenmp-link:static,)
+endif
+
 #
 # command translator
 #

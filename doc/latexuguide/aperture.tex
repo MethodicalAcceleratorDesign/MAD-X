@@ -2,24 +2,43 @@
 %  Changed by: Mark HAYES, 19-Sep-2002 
 %  Changed by: Ivar Waarum, 24-Feb-2005 
  
-\chapter{APERTURE}
+\chapter{Physical Aperture}
 \label{chap:aperture}
+
+Physical apertures can be defined and associated to most elements 
+in \madx. 
+ 
+The \hyperref[sec:aperture]{\tt APERTURE} command calculates 
+the beam stay clear values (n1 values). 
+
+During tracking the particle excursion can be checked against the 
+available aperture, and the particle lost if it falls outside 
+the defined aperture.
+
 
 \section{Defining aperture}
 \label{sec:def_aper}
-The aperture for a particular element or class of elements can be set in \madx
-at the time of definition or instantiation of the element or class.
+The aperture for a particular element or class of elements can be 
+set in \madx at the time of definition or instantiation of the 
+element or class. 
 
-During tracking the particle excursion is then checked against the defined aperture and 
-the particle is lost if it is outside the defined aperture.
+Note that instantiation can also happen at the time of declaration of 
+an element in a \hyperref[chap:sequence]{sequence}.  
+
 
 The aperture can be specified for any element or class of elements, 
 with the exception of drift spaces. 
 
 The definition of the aperture takes the following form and parameters:\\
 \madbox{
- ..., APERTYPE=string,  APERTURE=\{values\}
+ ..., \=APERTYPE=string,  APERTURE=\{values\}, \\
+      \>APER\_OFFSET=\{values\}, APER\_TOL=\{values\},...
 }
+
+where the four specific  attributes are attributes of an element 
+declaration or instantiation. 
+
+The minimum aperture definition uses the following two attributes:
 
 %% A new feature of MAD-X is the ability to set an aperture for a
 %% particular  element, or parent of a set of elements. This removes the
@@ -46,10 +65,11 @@ The definition of the aperture takes the following form and parameters:\\
   \ttitem{APERTURE} is an array of values, the number and meaning 
 of which depends on the APERTYPE.  
 \end{madlist}
-Note that the {\tt MARGUERITE} aperture type (two RECTCIRCLEs crossing
+
+Note that the {\tt MARGUERITE} aperture type (two {\tt RECTCIRCLE}s 
+crossing
 at right angle) is no longer supported. 
 
-%http://en.wikibooks.org/wiki/LaTeX/Tables#Text_wrapping_in_tables
 \begin{tabular}{|l | c | p{9cm}|}
 \hline 
 \textbf{APERTYPE} & \textbf{\# of values} & \textbf{meaning of
@@ -77,27 +97,30 @@ module, see below. \\
 \hline
 \end{tabular}
 
+
 {\bf Examples}\\
 The following sets an ELLIPTICAL aperture for the main
 dipoles for the LHC.
 \madxmp{
-MB: SBEND, L=l.MB, APERTYPE=ELLIPSE, APERTURE=\{0.02202,0.02202\};
+MB: SBEND, L=l.MB, APERTYPE=ellipse, 
+APERTURE=\{0.02202,0.02202\};
 }
 
 When the aperture is specified in a specific file the only aperture
 parameter is the filename: 
 \madxmp{
-MB: SBEND, L=l.MB, APERTYPE=myfile;
+MB: SBEND, L=l.MB, APERTYPE=filename;
 }
 
-where "myfile" contains the list of x-y coordinates defining the
+where "filename" contains the list of x-y coordinates defining the
 aperture shape:
-\begin{verbatim}
-x0   y0
-xi   yi
-...
-xn   yn
-\end{verbatim}
+\madxmp{
+*****\= \kill
+x0   \>y0 \\
+xi   \>yi \\
+\ldots \\
+xn   \>yn
+}
 
 {\bf Notes}
 \begin{itemize}
@@ -108,7 +131,8 @@ xn   yn
    \item When \hyperref[chap:makethin]{\tt MAKETHIN} is called all
      thin slices inherit the aperture of their respective original thick
      lens version.  
-   \item When the SIXTRACK command is called (see the
+   \item When the \hyperref[chap:c6t]{\tt SIXTRACK} command is 
+   called (see the
      \hyperref[chap:sixtrack]{SixTrack converter module}) the apertures are
      ignored by default. To convert the apertures as well the {\tt APERTURE}
      flag has to be set in {\tt C6T}.  
@@ -130,17 +154,17 @@ select, flag=twiss, column= \>name,s,betx,alfx,mux,bety,alfy,muy, \\
                             \>apertype,aper\_1,aper\_2; \\
 }
 and a subsequent TWISS command put the aperture information
-together with the specified TWISS parameters into the TWISS table.   
+together with the specified TWISS parameters into the TWISS table.
 
 \section{Defining aperture tolerances}
 \label{sec:apertol}
 A parameter closely connected to the aperture is the sum of the
-mechanical and alignment tolerances. The mechanical tolerance is the
-maximal error margin of errors in the element body which causes a
-decrease of aperture, and the alignment tolerance is a mislignment of
-the element in the accelerator, which also causes a decrease of
-aperture. The tolerance is given in the transverse plane as a racetrack,
-like in picture \ref{fig:aperture_tol} below. 
+mechanical and alignment tolerances. The mechanical tolerance is 
+the maximal error margin of errors in the element body which 
+causes a decrease of aperture, and the alignment tolerance is a 
+misalignment of the element in the accelerator, which also causes a 
+decrease of aperture. The tolerance is given in the transverse plane 
+as a racetrack, like in picture \ref{fig:aperture_tol} below. 
 
 \begin{figure}[htb]
   \begin{center}
@@ -156,10 +180,24 @@ APER\_TOL = \{r, g, s\};
 }
 {\bf Example:}
 \madxmp{
-MB : SBEND, L := l.MB, APER\_TOL=\{1.5, 1.1, 0\};
+MB: SBEND, L=l.MB, APER\_TOL=\{1.5, 1.1, 0\};
 }
 
-\section{APERTURE command}
+\section{Defining aperture offsets}
+\label{sec:aperoffset}
+
+An aperture offset can be assigned to each element in a \madx sequence as a vector: 
+\madbox{
+APER\_OFFSET = \{real, real\};
+}
+
+where the two real values are respectively the horizontal and vertical
+offsets of the aperture inside the element.
+
+{\bf ATTENTION: to be rewritten following reverse engineering of the
+  code in trrun.f90\\ 17-09-2014 Ghislain Roy}
+
+\section{APERTURE}
 \label{sec:aperture}
 {\bf The APERTURE module was developped specifically for the LHC.\\ 
 Default parameter values are LHC values and the physics 

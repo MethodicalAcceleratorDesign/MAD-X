@@ -2514,8 +2514,6 @@ char command_def[] =
 "slow     = [l, false, true], "  /* makes match use the twiss table */
 "orbit    = [l, false, true]; "
 " "
-"cell: match match 0 0; "
-" "
 "endmatch:  match match 2 0 "
 "knobfile = [s, none, none], "
 "increment = [s, none, increment]; "

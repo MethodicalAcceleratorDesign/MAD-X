@@ -62,6 +62,10 @@ ifeq ($(SHARED),yes)
 FFLAGS += -fPIC
 endif
 
+ifeq ($(OPENMP),yes)
+FFLAGS += -openmp
+endif
+
 #
 # extra flags
 #
@@ -102,6 +106,10 @@ endif
 
 ifeq ($(PROFILE),yes)
 FFLAGS += /Qprof-use
+endif
+
+ifeq ($(OPENMP),yes)
+FFLAGS += /Qopenmp
 endif
 
 #

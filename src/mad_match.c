@@ -998,11 +998,6 @@ pro_match(struct in_cmd* cmd)
   {
     match_match(cmd);
   }
-  else if (strcmp(cmd->tok_list->p[0], "cell") == 0)
-  {
-    warning("CELL command no longer valid, ","use MATCH");
-    return;
-  }
   else if (match_is_on == 0)
   {
     warning("no MATCH command seen,","ignored");

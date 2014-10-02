@@ -7,7 +7,7 @@
 \label{chap:beamlines}
 
 The accelerator to be studied is known to \madx either as a sequence of
-physical elements called \href{sequence.html}{sequence}, or as a
+physical elements called \hyperref[chap:sequence]{sequence}, or as a
 hierarchically structured list of elements called a \emph{beam line}. 
 A beam line is built from simpler beam lines whose definitions can be
 nested to any level. A powerful syntax allows to repeat, to reflect, or
@@ -20,7 +20,7 @@ Formally a beam line is defined by a LINE command:
 \madbox{
 label( arg {,arg} ): LINE=( member {,member} );
 }
-\href{label.html}{Label} gives a name to the beam line for later reference. 
+\hyperref[sec:label]{Label} gives a name to the beam line for later reference. 
 
 The formal argument list (arg\{,arg\}) is optional (see below). Each
 "member" may be one of the following:  
@@ -36,15 +36,15 @@ Beam lines may be nested to any level (see \ref{sec:sublines})
 
 
 {\bf Warning:}\\
-\madx has been developped using sequences and machine description using
-beamlines was kept to a minimal extent to keep backward compatibility
-but also because it is often easier to start from beamlines when
-designing an accelerator from scratch.   
+\madx has been developed using sequences. Machine description using
+beamlines was kept in \madx to a minimal extent to keep backward 
+compatibility but also because it is often easier to start from beamlines 
+when designing an accelerator {\sl ab initio}.
 But since \madx works only with sequences internally, there may exist
 some inconveniences when only beamlines are defined by the user. It is
 therefore recommended to convert beamlines into sequences (e.g. by means
-of the \texttt{SAVE} command) as soon as possible lines in the design
-phase and to use only sequences for a finalised machine.     
+of the \hyperref[sec:save]{\tt SAVE} command) as soon as possible lines in 
+the design phase and to use only sequences for a finalised machine.     
 
 Attempting to do sequence edition on a sequence that has
 been expanded in memory from a beam line specified by the user is
@@ -62,7 +62,7 @@ exmp1: \=LINE=(a,b,c,d,a,d); \\
 USE,   \>PERIOD=exmp1;
 }
 
-The \texttt{USE} command causes \madx to load and expand the specified
+The {\tt USE} command causes \madx to load and expand the specified
 beamline. This in particular loads the beamline as a SEQUENCE
 representation in memory. All subsequent calculations are done on this
 sequence in memory.  

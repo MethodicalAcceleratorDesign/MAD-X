@@ -1,7 +1,7 @@
-%%\title{PLOT}
 %  Changed by: Chris ISELIN, 27-Jan-1997 
 %  Changed by: Hans Grote, 25-Sep-2002 
 %  Changed by: E. T. d'Amico, 20-Oct-2004 
+%  Changed by: G. Roy, 2013-2104
 
 \chapter{Plotting data}
 \label{chap:plot}
@@ -16,14 +16,16 @@ be displayed at the top of the plot.
 
 In certain conditions true interpolation of optical functions and
 parameters inside the element is available through internal slicing of
-the element and a call to the Twiss module for each slice. 
+the element and a call to the \hyperref[chap:twiss]{\tt TWISS} module
+for each slice. 
 
 The basic plot attributes, such as line thickness, annotation size,
 and PostScript format and interpolation can be set with the
-\texttt{SETPLOT}\ref{sec:setplot} command.   
+\hyperref[sec:setplot]{\tt SETPLOT} command and reset with the
+\hyperref[sec:resplot]{\tt RESPLOT} command.
 
 Note also that for various reasons a sequence must be defined before the 
-\texttt{PLOT} command can be invoked. 
+{\tt PLOT} command can be invoked. 
 
 \section{PLOT}	
 \label{sec:plot}
@@ -42,33 +44,12 @@ PLOT, \>HAXIS=  \>hname, HMIN=real, HMAX=real, \\
       \>INTERPOLATE= logical, ZERO\_SUPPR= logical, \\
       \>NOVERSION= logical, NOLINE= logical, NOTITLE= logical, \\
       \>MARKER\_PLOT= logical, RANGE\_PLOT= logical, RANGE= range, \\ 
-      \>TABLE= tablename, PARTICLE= particle1,particle2,\ldots,particlen, \\
-      \>MULTIPLE= logical, FILE= file\_name\_start, TRACKFILE= table\_name, \\
-      \>PTC= logical, PTC\_TABLE= table\_name; 
+      \>TABLE= tabname, PARTICLE= particle1,particle2,\ldots,particlen, \\
+      \>MULTIPLE= logical, FILE= file\_name\_start, TRACKFILE= basename, \\
+      \>PTC= logical, PTC\_TABLE= tabname; 
 }
 
-
-
-%% \begin{verbatim}
-%% plot, haxis=  vname, hmin=real, hmax=real, 
-%%       vaxis=  vname1,vname2,..,vnamen,
-%%       vaxis1= vname1,vname2,..,vnamen, 
-%%       vaxis2= vname1,vname2,..,vnamen,
-%%       vaxis3= vname1,vname2,..,vnamen, 
-%%       vaxis4= vname1,vname2,..,vnamen,
-%%       vmin= reals, vmax= reals, 
-%%       title= string, 
-%%       bars= integer, style= integer, colour= integer, symbol= integer, 
-%%       interpolate= logical, zero_suppr= logical,
-%%       noversion= logical, noline= logical, notitle= logical, 
-%%       marker_plot= logical, range_plot= logical, range= range, 
-%%       table= table_name, particle= particle1,particle2,..,particlen,
-%%       multiple= logical, file= file_name_start, trackfile= table_name, 
-%%       ptc= logical, ptc_table= table_name; 
-%% \end{verbatim} 
-
 where the parameters have the following meaning: 
-
 \begin{madlist}
    \ttitem{HAXIS} name of the horizontal variable 
 
@@ -130,7 +111,8 @@ where the parameters have the following meaning:
      the curves. \\ 
      Note that setting this option is ineffective if the interpolate
      option of the SETOPT command has been set to true; in this case all
-     plots will be interpolated.  
+     plots will be interpolated. \\
+     
 
    \ttitem{ZERO\_SUPPR} To be documented (default = false)
 
@@ -220,10 +202,17 @@ where the parameters have the following meaning:
      the ptc package. The data belong to the column identified by one of
      the names set in the definition of the ptc twiss
      table. Interpolation is not available and the attribute
-     \textit{interpolate} has no effect.   
+     \textit{interpolate} has no effect. \\ 
+     This option is highly recommended when plotting data obtained from
+     \hyperref[chap:ptc_twiss]{\tt PTC\_TWISS} since there is no
+     mechanism for {\tt PLOT} to physically interpolate the optical
+     functions beyond using splines with no mechanism for constraints
+     with derivatives. In most cases the {\tt INTERPOLATE} option with
+     data obtained with {\tt PTC\_TWISS} produces unphysical data
+     representation.
 
-   \ttitem{PTC\_TABLE} name of the ptc twiss table to be plotted from
-     (default: ptc\_twiss)  
+   \ttitem{PTC\_TABLE} name of the ptc twiss table from which data is
+     plotted (default: ptc\_twiss)
 
 \end{madlist}
 
@@ -292,7 +281,7 @@ where the parameters have the following meaning:
 \madbox{
 RESPLOT;
 }
-resets all defaults for the setplot command.  
+resets all defaults for the \hyperref[sec:setplot]{\tt SETPLOT} command.  
 
 
 \section{First example for plots of tracking data}

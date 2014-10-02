@@ -1,38 +1,3 @@
-! 2014-Apr-25  09:20:22  ghislain: dead code; commented out
-! subroutine pecat1(rb, ra, rd)
-
-!   implicit none
-
-!   !----------------------------------------------------------------------*
-!   ! purpose:
-!   !   concatenate two transport maps
-!   ! input:
-!   !   rb(6,6) second map in beam line order.
-!   !   ra(6,6) first map in beam line order.
-!   ! output:
-!   !   rd(6,6) result map.
-!   !----------------------------------------------------------------------*
-
-!   !--- type definition of the routine arguments
-
-!   double precision rb(6,6), ra(6,6), rd(6,6)
-
-!   !--- type definitions of local variables
-
-!   integer k, j
-
-!   !--- Routine body
-
-!   do k = 1, 6
-!      do j = 1, 6
-!         rd(j,k) = rb(j,1) * ra(1,k) + rb(j,2) * ra(2,k)               &
-!              + rb(j,3) * ra(3,k) + rb(j,4) * ra(4,k)                           &
-!              + rb(j,5) * ra(5,k) + rb(j,6) * ra(6,k)
-!      enddo
-!   enddo
-! end subroutine pecat1
-!***********************************************************************
-
 subroutine pecurv (ncc, spname, annh, usex, sych, ippar,          &
      np, xval, yval, window, actwin, ierr)
 
@@ -2429,7 +2394,6 @@ subroutine pesopt(ierr)
   !--- Check that STYLE & SYMBOL are both non zero
   call comm_para('style ', nint, ndble, k, plot_style, d_arr, char_a, char_l)
   call comm_para('symbol ', nint, ndble, k, plot_symbol, char_a, char_l)
-!  if (plot_style(1) + plot_symbol(1) .eq. 0) then ! 2014-May-05  13:07:59  ghislain: too dangerous, eg for values -1 and +1 
   if (plot_style(1) .eq. 0 .and. plot_symbol(1) .eq. 0) then
      print *,'Warning: style & symbol attributes will make plot invisible. Thus style is set to 1.'
      plot_style(1) = 1
@@ -2444,7 +2408,7 @@ subroutine pesopt(ierr)
 
   !--- if ptc_flag is on, no interpolation and check only ptc-related attributes
   if (ptc_flag .and. itbv .eq. 0) return
-
+     
   !--- Spline is obsolete 
   call comm_para('spline ', nint,ndble,k,i,d_arr, char_a,char_l)
   if (i .eq. 1) print *,'SPLINE attribute is obsolete, no action taken, use interpolate attribute instead.'
@@ -2455,8 +2419,12 @@ subroutine pesopt(ierr)
   ipparm(2,1) = plot_option('interpolate ')
   if (ipparm(2,1) .eq. 0) call comm_para('interpolate ', nint, ndble, k, ipparm(2,1), d_arr,char_a, char_l)
 
-  !--- Interpolation is not possible for ptc twiss variables
-  if (ptc_flag) ipparm(2,1) = 0
+  !--- Interpolation is not possible for ptc twiss variables; reset to false
+  ! 2014-Sep-30  17:11:51  ghislain: added warning 
+  if (ptc_flag .and. ipparm(2,1).eq.1) then
+     ipparm(2,1) = 0
+     call aawarn('PLOT: ','Interpolation is not compatible with PTC_TWISS tables; INTERPOLATE ignored')
+  endif
 
   !--- another interpolation flag is used in other subroutines
   interf = ipparm(2,1)

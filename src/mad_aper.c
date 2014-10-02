@@ -774,7 +774,7 @@ aper_e_d_read_tfs(char* e_d_name, int* cnt, char* refnode)
     warning("cannot open file:", e_d_name); return NULL;
   }
 
-  char* sep=" \"\n";
+  const char* sep=" \"\n";
 
   while (fgets(aux_buff->c, aux_buff->max, tab_file))  {
     tempcount++;
@@ -1309,7 +1309,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   int truepos=0, true_cnt=0, offs_cnt=0;
   int halo_q_length=1, halolength, pipelength, namelen=NAME_L, ntol; // nhalopar, not used
   double surv_init[6]={0, 0, 0, 0, 0, 0};
-  double surv_x=zero, surv_y=zero, elem_x=0, elem_y=0;
+  double surv_x=zero, surv_y=zero;
   double xa=0, xb=0, xc=0, ya=0, yb=0, yc=0;
   double on_ap=1, on_elem=0;
   double mass, energy, exn, eyn, dqf, betaqfx, dp, dparx, dpary;
@@ -1334,6 +1334,11 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   char apertype[NAME_L];
   char name[NAME_L];
   char tol_err_mess[80] = "";
+
+  
+  // 2014-Sep-18  17:19:52  ghislain: attempt to read offset values from element attributes...
+  //double aper_offset[2], xoffset, yoffset;
+  //int noffset;
 
   struct node* rng_glob[2];
 // struct aper_node limit_node = {"none", -1, -1, "none", {-1,-1,-1,-1}, {-1,-1,-1}};
@@ -1488,6 +1493,17 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       yshift = aper_tol[2];
     }
     else r=xshift=yshift=0;
+    //if (debug) printf("\nname: %s, x-shift: %f, y-shift: %f\n",name,xshift, yshift);
+
+    // 2014-Sep-18  17:19:52  ghislain: attempt to read offset values from element attributes...
+    /* read data for aper_offset */
+    //get_node_vector("aper_offset",&noffset,aper_offset);
+    //if (noffset == 2) {
+    //  xoffset = aper_offset[0];
+    //  yoffset = aper_offset[1];
+    //}
+    //else xoffset=yoffset=0;
+    //if (debug) printf("\nname: %s, x-offset: %f, y-offset: %f\n",name,xoffset, yoffset);
 
     /*read aperture data and make polygon tables for beam pipe*/
     /* IW 250205 */
@@ -1579,49 +1595,47 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       for (jslice=0; jslice <= nint; jslice++) {
         ratio=999999;
 
-        if (jslice != 0) {
+        if (jslice == 0) {
+          // parameters from previous node will be used
+          s_curr += 1.e-12;     /*to get correct plot at start of elements*/
+          s=0;                  /*used to calculate survey adjustments */
+        } 
+	else {
           aper_read_twiss("embedded_twiss_table", &jslice, &s, &x, &y, &betx, &bety, &dx, &dy);
 	  
 	  if(debug) printf("embedded twiss for slice %d: s= %f betx= %f bety= %f dx= %f dy= %f\n", 
 			   jslice, s, betx, bety, dx, dy);
 
-          s_curr=s_start+s;
+          s_curr = s_start + s;
           aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength, haloxsi, haloysi);
 
           /* calculate normal+parasitic disp.*/
           /* modified 27feb08 BJ */
-          parxd = dparx*sqrt(betx/betaqfx)*dqf;
-          paryd = dpary*sqrt(bety/betaqfx)*dqf;
+          parxd = dparx * sqrt(betx/betaqfx) * dqf;
+          paryd = dpary * sqrt(bety/betaqfx) * dqf;
 
           if (do_survey) {
-            double_from_table_row("survey","x",&jslice, &surv_x);
-            double_from_table_row("survey","y",&jslice, &surv_y);
+            double_from_table_row("survey","x",&jslice,&surv_x);
+            double_from_table_row("survey","y",&jslice,&surv_y);
           }
         }
-        else {
-          ///  jslice==0, parameters from previous node will be used
-          s_curr+=1.e-12;     /*to get correct plot at start of elements*/
-          s=0;                /*used to calc elem_x elem_y) */
-        }
 
+        /* BJ 3 APR 2009 : introduced xeff and yeff in order to avoid
+           interferences with x and y as used for the first slice 
+	         (re-use from end of former node) */
         xeff = x;
         yeff = y;
 	  
         /* survey adjustments */
-        /* BJ 3 APR 2009 : introduced xeff and yeff in order to avoid
-           interferences with x and y as used for the first slice 
-	         (re-use from end of former node) */
         if (offs_node) {
-          elem_x=xa*s*s+xb*s+xc;
-          elem_y=ya*s*s+yb*s+yc;
-          xeff=x+(surv_x-elem_x);
-          yeff=y+(surv_y-elem_y);
+          xeff += surv_x - (xa*s*s + xb*s + xc);
+          yeff += surv_y - (ya*s*s + yb*s + yc); 
         }
 
         /* discrete adjustments */
         if (true_node) {
-          xeff+=true_tab[truepos].tab[jslice][1];
-          yeff+=true_tab[truepos].tab[jslice][2];
+          xeff += true_tab[truepos].tab[jslice][1];
+          yeff += true_tab[truepos].tab[jslice][2];
         }
 
         for (angle=0; angle < twopi; angle += dangle) {

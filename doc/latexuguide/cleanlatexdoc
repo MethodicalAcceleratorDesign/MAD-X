@@ -1,0 +1,6 @@
+#!/bin/sh
+
+for i in `/bin/ls *.dvi *.aux *.log *.los *.bbl *.blg *.glo *.idx *.ilg *.ind *.lof *.lot *.toc *.out 2> /dev/null`
+do
+     rm $i
+done

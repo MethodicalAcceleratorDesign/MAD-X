@@ -1,9 +1,8 @@
-%%\title{Physical Elements and Markers}
 
 \chapter{Elements and Markers}
 
-%\input{Introduction/marker}
 \section{Marker}
+\ttindex{marker}
 \label{sec:marker}
 
 \madbox{
@@ -17,8 +16,8 @@ the beam line, for example to apply a matching constraint.
 \madxmp{M27: MARKER;}
 
 
-%\input{Introduction/drift}
 \section{Drift Space}
+\ttindex{drift}
 \label{sec:drift}
 
 \madbox{
@@ -41,8 +40,8 @@ The length of DR2 will always be equal to the length of DR1. The
 space is a cartesian coordinate system.   
 
 
-%\input{Introduction/bend}
 \section{Bending Magnets}
+\ttindex{bend}
 \label{sec:bend}
 Two different type keywords are recognised for bending magnets, they are
 distinguished only by the reference system used:  
@@ -136,10 +135,10 @@ Bending magnets have the following attributes:
 
    \ttitem{HGAP} The half gap of the magnet (default: 0 m). 
 
-   \ttitem{K2}\index{K2} The sextupole coefficient. (Default: $0
+   \ttitem{K2} The sextupole coefficient. (Default: $0
    mˆ{-3}$) \\ $K_2 = (1/B\rho) (\partial^2 B_y / \partial x^2)$.   
 
-   \ttitem{H1}\index{H1} The curvature of the entrance pole
+   \ttitem{H1}The curvature of the entrance pole
    face. (Default: $0 m^{-1}$).   
    \ttitem{H2} The curvature of the exit pole face. (Default: $0
    m^{-1}$). \\  
@@ -217,19 +216,6 @@ on one side only, e.g. when slicing a dipole.
 
 
 {\bf \underline {Examples:}}
-%% \begin{verbatim}
-%% // rectangular horizontal dipole deflecting to the right
-%% BR: RBEND, L=5.5, ANGLE=+0.001;    
-
-%% // sector vertical dipole deflecting downwards
-%% BD: SBEND, L=5.5, ANGLE=+0.001, TILT=pi/2; 
-
-%% // sector horiziontal dipole deflecting to the left
-%% BL: SBEND, L=5.5, ANGLE=+0.001, TILT=pi;   
-
-%% // rectangular vertical dipole deflecting upwards
-%% BU: RBEND, L=5.5, ANGLE=+0.001, TILT=-pi/2; 
-%% \end{verbatim}
 \madxmp{
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
 BR: RBEND, L=5., ANGLE=+0.001;             \>! Deflection to the right \\
@@ -240,8 +226,10 @@ BU: RBEND, L=5., ANGLE=+0.001, TILT=-pi/2; \>! Deflection up
 
 
 
-%\input{Introduction/dipedge}
-\section{Dipedge Element}\index{dipedge}
+\section{Dipedge Element}
+\ttindex{dipedge}
+\label{sec:dipedge}
+
 A thin element describing the edge focusing of a dipole has been
 introduced in order to make it possible to track trajectories in the
 presence of dipoles with pole face angles. Only linear terms are
@@ -275,10 +263,9 @@ A DIPEDGE has zero length and five attributes.
 
 
 
-%\input{Introduction/quadrupole}
 %  Changed by: Andrea Latina, 6-May-2013 
-
-\section{Quadrupole}\index{quadrupole}
+\section{Quadrupole}
+\ttindex{quadrupole}
 \label{sec:quadrupole}
 
 \madbox{
@@ -326,9 +313,7 @@ A QUADRUPOLE has five attributes:
   with positive $\tt{TILT} = +\pi/4$ } 
 
 Example: 
-\madxmp{
-QF: QUADRUPOLE, L = 1.5, K1 = 0.001, THICK = 1;
-}
+\madxmp{QF: QUADRUPOLE, L = 1.5, K1 = 0.001, THICK = 1;}
 
 {\bf Note:} Additional attributes can be given to quadrupoles that
 are useful for PTC and defined in \ref{sec:add_option_PTC}.
@@ -337,23 +322,22 @@ The \href{local_system.html#straight}{straight reference system} for
 a quadrupole is a cartesian coordinate system.
 
 
-
-%\input{Introduction/sextupole}
 \section{Sextupole}
+\ttindex{sextupole}
 \label{sec:sextupole}
 
 \madbox{
 label: SEXTUPOLE, L = real, K2 = real, K2S = real, TILT = real;
 }
 
-A SEXTUPOLE has four real attributes: 
+A {\tt SEXTUPOLE} has four real attributes: 
 \begin{madlist}
     \ttitem{L} The sextupole length (default: 0 m). 
-    \ttitem{K2} The normal sextupole coefficient $K_2 = 1/(B \rho)
+    \ttitem{K2} The normal sextupole coefficient $K_2 = \frac{1}{B \rho}
       (\partial^2 B_y / \partial x^2)$. \\       
       (default: $0 m^{-3}$). 
     \ttitem{K2S} The skew sextupole coefficient 
-      $K_{2S} = 1/(B \rho) (\partial^2 B_x / \partial x^2)$ \\
+      $K_{2S} = \frac{1}{B \rho} (\partial^2 B_x / \partial x^2)$ \\
 %% 2013-Jul-05  17:58:30  ghislain: error reported by Christian Carli
 %      \textit{K}$_{2S}$ = 1/(2 \textit{B} rho)
 %      ($\partial$$^2$\textit{B$_x$}/$\partial$ \textit{x}$^2$ -
@@ -391,31 +375,29 @@ The \href{local_system.html#straight}{straight reference system} for a
 sextupole is a cartesian coordinate system.   
 
 
-%\input{Introduction/octupole}
 \section{Octupole}
+\ttindex{octupole}
 \label{sec:octupole}
 
 \madbox{
 label: OCTUPOLE, L = real, K3 = real, K3S = real, TILT = real;
 }
 
-An OCTUPOLE has four real attributes: 
+An {\tt OCTUPOLE} has four real attributes: 
 \begin{madlist}
    \ttitem{L} The octupole length (default: 0 m). 
 
-   \ttitem{K3} The normal octupole coefficient \\
-     \textit{K}$_3$ = 1/(\textit{B} rho)
-     ($\partial$$^3$\textit{B$_y$}/$\partial$\textit{x}$^3$). \\ 
+   \ttitem{K3} The normal octupole coefficient 
+     $K_3 = \frac{1}{B \rho} (\partial^3B_y / \partial x^3)$ \\ 
      (default: 0 m**(-4)). 
 
    \ttitem{K3S} The skew octupole coefficient 
 %% 2013-Jul-05  18:00:59  ghislain: to be checked wrt error reported on
 %% K2S for sextupoles 
-     \textit{K}$_3S$ = 1/(2 \textit{B} rho)
-     ($\partial$$^3$\textit{B$_x$}/$\partial$\textit{x}$^3$ -
-     $\partial$$^3$\textit{B$_y$}/$\partial$\textit{y}$^3$). \\
+     $K_{3S} = \frac{1}{2 B\rho} (\partial^3B_x/\partial x^3 -
+   \partial^3B_y/\partial y^3)$ \\
      where (x,y) is now a coordinate system rotated by -22.5$^o$ around
-     s with respect to the normal one. (default: 0 m**(-4)). A positive
+     s with respect to the normal one. (default: $0 m^{-4}$). A positive
      skew octupole strength implies defocussing (!) of positively
      charged particles in the (x,s) plane rotated by 22.5$^o$ around s
      (particles in this plane have x $>$ 0, y $>$ 0).  
@@ -425,18 +407,18 @@ An OCTUPOLE has four real attributes:
      clockwise rotation. A TILT=pi/8 turns a positive normal octupole
      into a negative skew octupole.  
 
-     \textbf{  Please note that contrary to \madeight one has to specify the
+     \textbf{Please note that contrary to \madeight one has to specify the
        desired TILT angle, otherwise it is taken as 0 rad. This was
        needed to avoid the confusion in \madeight about the actual meaning of
        the TILT attribute for various elements. }
 
 \end{madlist}
 
-\textbf{  Note also that K$_3$/K$_3s$ can be considered as the normal or
-  skew quadrupole components of the magnet on the bench, while the TILT
+\textbf{Note also that $K_3$ or $K_{3S}$ can be considered as the normal or
+  skew quadrupole components of the magnet on the bench, while the {\tt TILT}
   attribute can be considered as an tilt alignment error in the
-  machine. In fact, a positive K$_3$ with a tilt=0 is equivalent to a
-  positive K$_3s$ with positive tilt=+pi/8. } 
+  machine. In fact, a positive $K_3$ with a {\tt TILT=0} is equivalent to a
+  positive $K_{3S}$ with positive {\tt TILT=+pi/8}. } 
 
 Example: 
 \madxmp{O3: OCTUPOLE, L = 0.3, K3 = 0.543;}
@@ -450,78 +432,100 @@ treated as thin lenses, except when tracking by Lie-algebraic methods.
 
 
 
-%\input{Introduction/multipole}
 \section{General Thin Multipole}
+\ttindex{multipole}
 \label{sec:multipole}
+
+A {\tt MULTIPOLE} is a thin-lens magnet of arbitrary order, including a 
+dipole component.
 
 \madbox{
 label: MULTIPOLE, \= LRAD = real, TILT = real, \\
-                  \> KNL = \{..,..,..\}, KSL = \{..,..,..\};
+                              \> KNL = \{real, \ldots \}, KSL = \{real, \ldots \};
 }
 
-A MULTIPOLE is a thin-lens magnet of arbitrary order, including a dipole: 
 \begin{madlist}
-    \ttitem{LRAD} A fictitious length, which was originally just used to
+    \ttitem{LRAD} A fictitious length, originally only used to
       compute synchrotron radiation effects. \\
-      A non-zero \textbf{ LRAD } in conjunction  with the
-      \href{../control/general.html#option}{OPTION}\textbf{ thin\_foc }
-      set to a \textbf{ true } logical value takes into account of the
-      weak focussing of bending magnets.  
+      A non-zero {\tt LRAD} in conjunction with
+	\hyperref[sec:option]{\tt OPTION, THIN\_FOC=true}
+      takes into account the
+      weak focussing of bending magnets.
+      
     \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
       rad). A positive angle represents a clockwise rotation of the
-      multipole element. \\
-      \textbf{Please note that contrary to \madeight one has to specify the
-        desired TILT angle, otherwise it is taken as 0 rad. We believe
-        that the \madeight concept of having individual TILT values for each
-        component and on top with default values led to considerable
-        confusion and allowed for excessive and unphysical
-        freedom. Instead, in \madx the KNL/KSL components can be
-        considered as the normal or skew multipole components of the
-        magnet on the bench, while the TILT attribute can be considered
-        as an tilt alignment error in the machine. } 
-    \ttitem{KNL} The normal multipole coefficients from order zero to the
-      maximum; the parameters are positional, therefore zeros must be
-      filled in for components that do not exist. Example of a thin-lens
-      sextupole:  
-\madxmp{ms: multipole, knl := \{0, 0, k2l\};}
-
-    \ttitem{KSL} The skew multipole coefficients from order zero to the
-     maximum; the parameters are positional, therefore zeros must be
-     filled in for components that do not exist. Example of a thin-lens
-     skew octupole:  
-\madxmp{ms: multipole, ksl := \{0, 0, 0, k3sl\};}
+      multipole element. The roll angle affects all components.
+      
+    \ttitem{KNL} An array of the integrated normal multipole coefficients, 
+      starting from order zero and up to the
+      maximum order. The parameters are positional in the array, therefore 
+      zeros must be filled in for components that do not exist. \\
+      The coefficient of rank $i$ in the array corresponds to the integrated 
+      strength $K_i L = B_i . L / (B\rho)$ where the strength is given by 
+      equation \ref{eq:kn}. 
+      Hence the first argument of the array, the argument for a multipole of 
+      order zero, $K_0 L = B_0 . L / (B\rho)$ is equal to the rotation angle of 
+      the thin dipole.
+      
+    \ttitem{KSL} An array of the integrated skew multipole coefficients, 
+     starting from order zero and up to the
+     maximum order. The parameters are positional in the array, therefore 
+     zeros must be filled in for components that do not exist.
 
 \end{madlist}
 
-Both KNL and KSL may be specified for the same multipole. 
+Both {\tt KNL} and {\tt KSL} may be specified for the same multipole. 
+
+Contrary to \madeight the desired {\tt TILT} angle must be explicitly 
+specified, and defaults otherwise to 0 rad. The  roll angle specified with {\tt 
+TILT} is global to all multipolar components. 
+Hence the {\tt KNL} and {\tt KSL} components can be considered as the 
+normal or skew multipole components of the magnet as measured on the 
+bench, while the TILT attribute can be considered as an alignment error as 
+measured in the machine.
+
 
 A multipole with no dipole component has no effect on the reference
 orbit, i.e. the reference system at its exit is the same as at its
 entrance. If it includes a dipole component, it has the same effect on
 the reference orbit as a dipole with zero length and deflection angle
-K0L, being the first component of KNL above.  
+equal to the first component of the array {\tt KNL}.  
+
+%In order to know the current maximum order of a given multipole, use the
+%command {\tt HELP, MULTIPOLE;} and count.
+
+
+{\bf Examples:}\\
+A thin-lens sextupole:  
+\madxmp{ms: MULTIPOLE, KNL=\{0, 0, k2l\};}
+
+A thin-lens skew octupole:  
+\madxmp{mso: MULTIPOLE, KSL=\{0, 0, 0, k3sl\};}
+
+
+A thin-lens multipole with a normal octupole component and a skew decapole
+component:
+\madxmp{mod: MULTIPOLE, KNL=\{0,0,0,myoct*lrad\}, KSL=\{0,0,0,0,-1.e-5\};
+}
+
 
 
 % moved from element format above
-A special format is used for a \href{multipole.html}{multipole}\index{multipole}: 
-\madxmp{
-m: multipole, \= kn= \{kn0, kn1, kn2, ..., knmax\}, \\
-              \> ks= \{ks0, ks1, ks2, ..., ksmax\};
-}
-where kn and ks give the integrated normal and skew strengths,
-respectively. The commas are mandatory, each strength can be an
-expression; their position defines the order. example:  
-\madxmp{
-m: multipole, kn=\{0,0,0,myoct*lrad\}, ks=\{0,0,0,0,-1.e-5\};
-}
-defines a multipole with a normal octupole, and a skew decapole component. 
+% commented by Ghislain on 2014-01-01
+%A special format is used for a \href{multipole.html}{multipole}\index{multipole}: 
+%\madxmp{
+%m: multipole, \= knl= \{kn0, kn1, kn2, ..., knmax\}, \\
+%              \> ksl= \{ks0, ks1, ks2, ..., ksmax\};
+%}
+%where knl and ksl give the integrated normal and skew strengths,
+%respectively. The commas are mandatory, each strength can be an
+%expression; their position defines the order.
 
-To know the current maximum order, enter the command 
-\madxmp{HELP, MULTIPOLE;} and count.
 
-%\input{Introduction/solenoid}
+
 %  Changed by: Alexander Koschik, 16-May-2006 
 \section{Solenoid}
+\ttindex{solenoid}
 \label{sec:solenoid}
 
 Solenoids can be defined in two forms, a thick and a thin version: 
@@ -536,14 +540,11 @@ A SOLENOID has three real attributes:
 \begin{madlist}
    \ttitem{L} The length of the solenoid (default: 0 m) 
    \ttitem{KS} The solenoid strength $K_s = B_0 / B\rho$ (default: 0
-     rad/m). For positive KS and positive particle charge, the solenoid
+     rad/m). For positive {\tt KS} and positive particle charge, the solenoid
      field points in the direction of increasing $s$.  
    \ttitem{KSI} The solenoid integrated strength $K_s L$
      (default: 0 rad).  This additional attribute is needed only when
      using the thin solenoid,  where $L=0$.     
-   \ttitem{KNL, KSL}  Take note that one can specify multipole
-     coefficients for SOLENOID. They have no effect in \madx proper but are used
-     in PTC for solenoid with multipoles.
 \end{madlist}
 
 Example: 
@@ -555,14 +556,19 @@ THINSOLO: \> SOLENOID, L = 0,  \> KS = 0.001, KSI = 0.002;
 
 {\bf Note:} Additional attributes can be given to solenoids that
 are useful for PTC and defined in \ref{sec:add_option_PTC}.
+In particular multipole coefficients KNL and KSL can also be specified for 
+solenoids. They have no effect in \madx proper but are used in PTC for 
+solenoid with multipoles.
 
 The \href{local_system.html#straight}{straight reference system} for a
 solenoid is a cartesian coordinate system. 
  
 
 
-%\input{Introduction/nllens}
 \section{Nonlinear Lens with Elliptic Potential}
+\ttindex{nllens}
+\label{sec:nllens}
+
 \madbox{
 label: NLLENS, KNLL = real, CNLL = real;
 }
@@ -663,17 +669,17 @@ thin lenses:
 %A. Valishev, March 19, 2012
 
 
-%\input{Introduction/kickers}
 %  Changed by: Frank Schmidt, 28-Aug-2003 
 %  Changed by: Werner Herr, 22-May-2007 
 \section{Closed Orbit Correctors}
+\ttindex{kicker}\index{orbit corrector}
 \label{sec:closed_orbit_cor}\label{sec:kicker}
 
 Three types of closed orbit correctors are available: 
 \begin{madlist}
-   \ttitem{\href{hkick}{HKICKER}} a corrector for the horizontal plane, 
-   \ttitem{\href{vkick}{VKICKER}} a corrector for the vertical plane, 
-   \ttitem{\href{kick}{KICKER}} a corrector for both planes. 
+   \ttitem{HKICKER} a corrector for the horizontal plane, 
+   \ttitem{VKICKER} a corrector for the vertical plane, 
+   \ttitem{KICKER} a corrector for both planes. 
 \end{madlist}
 
 \madbox{
@@ -683,8 +689,8 @@ label: VKICKER, \>L = real, KICK = real, \>TILT = real; \\
 label: KICKER,  \>L = real, HKICK = real, \>VKICK = real, TILT = real;
 }
 
-{\bf The type KICKER should not be used when an orbit corrector kicks
-  only in one plane.}  
+{\bf The type {\tt KICKER} should not be used when an orbit corrector
+  kicks only in one plane.}
 
 The attributes have the following meaning: 
 \begin{madlist}
@@ -776,9 +782,11 @@ accelerator.
 %From S.Sorge@gsi.de  
 
 
-%\input{Introduction/tkickers}
 %  Created by: Laurent Deniau, 15-Sep-2011 
 \section{Transverse Kicker}
+\ttindex{tkicker}
+\label{sec:tkicker}
+
 The type TKICKER should be used to create horizontal, vertical or
 combined transverse kickers physically equivalent to elements of type
 KICKER, but \textbf{not used} by the closed orbit correction module (see
@@ -797,8 +805,8 @@ at the documentation of the orbit corrector type
 \href{kickers.html#kick}{KICKER}.   
 
 
-%\input{Introduction/cavity}
 \section{RF Cavity}
+\ttindex{RFcavity}
 \label{sec:rf_cavity}
 
 \madbox{
@@ -811,7 +819,7 @@ label: RFCAVITY, \= L = real, VOLT = real, LAG = real, \\
 %                  FREQ=real,SHUNT=real,TFILL=real; 
 
 
-An RFCAVITY has eight real attributes and one integer attribute: 
+An {\tt RFCAVITY} has eight real attributes and one integer attribute: 
 \begin{madlist}
    \ttitem{L} The length of the cavity (DEFAULT: 0 m) 
    \ttitem{VOLT} The peak RF voltage (DEFAULT: 0 MV). The effect of the cavity is \\
@@ -866,8 +874,10 @@ The \href{local_system.html#straight}{straight reference system} for a
 cavity is a cartesian coordinate system.  
 
 
-%\input{Introduction/rfmultipole}
 \section{Thin Radio-Frequency Multipole}
+\ttindex{rfmultipole}
+\label{sec:rfmultipole}
+
 \madbox{
 xxxxxxxxxxxxxxxxxxxxx\= \kill
 label: RFMULTIPOLE, \> VOLT = real, LAG = real, \\
@@ -879,7 +889,7 @@ label: RFMULTIPOLE, \> VOLT = real, LAG = real, \\
        \> PSL := \{p0s,  p1s,  p2s,  \ldots \};
 }
 
-A RFMULTIPOLE is a thin-lens element which exhibits the properties
+A {\tt RFMULTIPOLE} is a thin-lens element which exhibits the properties
 of an RF-cavity and of a magnet of arbitrary order oscillating the
 a certain frequency:        
 
@@ -954,12 +964,12 @@ includes a dipole component bends also the reference orbit.
 %\href{https://phonebook.cern.ch/foundpub/Phonebook/index.html?search=latina#id=PE525753}{Andrea
 %Latina}, September 28, 2012  
 
-%\input{Introduction/crabcavity}
-%%\title{CRABCAVITY}
+
 %  Added by: R. Calaga, Sep 2010 
 %  Edited by: A. Latina, Jun 2013
 \section{Crab Cavity}
-\label{sec:crab_cavity}
+\ttindex{crabcavity}
+\label{sec:crab_cavity}\label{sec:crabcavity}
 
 \madbox{
 label: CRABCAVITY, \=L=real, VOLT=real, LAG=real, FREQ=real, \\
@@ -971,7 +981,7 @@ label: CRABCAVITY, \=L=real, VOLT=real, LAG=real, FREQ=real, \\
 %  BETRF=real, PG=real,
 %  FREQ=real, SHUNT=real, TFILL=real; 
 
-A CRABCAVITY has five real attributes and seven integer attributes: 
+A {\tt CRABCAVITY} has five real attributes and seven integer attributes: 
 
 \begin{madlist}
   \ttitem{L} The length of the cavity (default: 0 m) 
@@ -1059,9 +1069,9 @@ cavity is a cartesian coordinate system.
 %\href{http://www.cern.ch/rcalaga}{R. Calaga}, September 2010
 
 
-%\input{Introduction/separator}
 %  Changed by: Frank Schmidt, 28-Aug-2003 
 \section{Electrostatic Separator}
+\ttindex{elseparator}
 \label{sec:separator}
 
 \madbox{
@@ -1095,8 +1105,7 @@ The \href{local_system.html#straight}{straight reference system} for a
 separator is a cartesian coordinate system.   
 
 
-%\input{Introduction/monitors}
-%  Changed by: G. Roy, 17 Oct 2013: added PLACEHOLDER
+% Changed by: G. Roy, 17 Oct 2013: added PLACEHOLDER
 \section{Beam Position Monitors}
 \label{sec:monitor}
 
@@ -1173,8 +1182,7 @@ The \href{local_system.html#straight}{straight reference system} for an
 instrument is a cartesian coordinate system.  
 
 
-%\input{Introduction/collimator}
-%  Changed by: Ghislain Roy, 23-May-2013 
+% Changed by: Ghislain Roy, 23-May-2013 
 \section{Collimators}
  
 The definition of collimators in \madx has been inherited from \madeight
@@ -1230,7 +1238,6 @@ with respect to the surrounding beam line.
 
 
 
-%\input{Introduction/beambeam}
 %  Changed by: Stefan Sorge, 2007 
 \section{Beam-beam Interaction}
 The BEAMBEAM element may be inserted in a beam line to simulate a
@@ -1281,7 +1288,7 @@ and extended by S. Sorge (2007).
 
 \begin{figure}[h]
   \begin{center}
-    \includegraphics[width=400px]{jpg/beambeam_n_trapez}
+    \includegraphics[width=400px]{jpg/beambeam_n_trapez.jpg}
     \caption{Trapezoidal shape of radial density for beam-beam lens.} 
     \label{fig:beambeam_n_trapez}
   \end{center}
@@ -1394,7 +1401,6 @@ For the definition of the LHC head-on and parasitic beam-beam elements see
 
  %\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg}, ssorge,  July 13, 2007
 
-%\input{Introduction/matrix}
 %  Changed by: Frank Schmidt, 25-June-2003 
 \section{Arbitrary Matrix Element}
 
@@ -1421,34 +1427,39 @@ order are allowed to avoid non symplectic tracking runs. In the latter
 case the tracking run will be aborted.
 
 
-%\input{Introduction/rotation}
 %\section{Coordinate Transformations}
-
 \section{Rotation around the vertical axis}
 \label{sec:yrotation}
 
-\madbox{
-label: YROTATION, TYPE = name, ANGLE = real;
-}
-
 The element {\tt YROTATION} rotates the
 \hyperref[subsec:local_straight]{straight reference system} about the
-vertical (\texttt{y}) axis. 
+vertical ({\tt y}) axis.
 
-YROTATION has no effect on the beam, but it
+\madbox{
+label: YROTATION, ANGLE = real;
+}
+
+{\tt YROTATION} has no effect on the beam, but it
 causes the beam to be referred to the new coordinate system  \\
-\textit{x}$_2$=\textit{x}$_1$cos(theta)-\textit{s}$_1$sin(theta), \\
-\textit{y}$_2$=\textit{x}$_1$sin(theta)+\textit{s}$_1$cos(theta).\\
+\begin{equation}\begin{split}
+x_2 &= x_1 \cos\theta - s_1 \sin\theta \\
+y_2 &= x_1 \sin\theta + s_1 \cos\theta
+\end{split}\end{equation}
+
+%%\textit{x}$_2$=\textit{x}$_1$cos(theta)-\textit{s}$_1$sin(theta), \\
+%%\textit{y}$_2$=\textit{x}$_1$sin(theta)+\textit{s}$_1$cos(theta).\\
 
 It has one real attribute: 
 \begin{madlist}
-   \ttitem{ANGLE} The rotation angle theta (default: 0 rad). It must be a
-     \emph{small} angle, i.e. an angle comparable to the transverse
-     angles of the orbit. 
+   \ttitem{ANGLE} The rotation angle $\theta$ (default: 0 rad).  
 \end{madlist}
 
 A positive angle means that the new reference system is rotated
 clockwise about the local \texttt{y}-axis with respect to the old system. 
+
+{\bf Important note:} \\
+The rotation angle $\theta$ must be \emph{small}, i.e. it must be at
+most comparable to the transverse angles of the orbit. 
 
 Example: 
 \madxmp{
@@ -1458,26 +1469,31 @@ KINK: YROTATION, ANGLE = 0.0001;
 \section{Rotation around the longitudinal axis}
 \label{sec:srotation}
 
-\madbox{
-label: SROTATION, ANGLE = real;
-}
-
 The element {\tt SROTATION} rotates the
 \hyperref[subsec:local_straight]{straight reference system} about the
 longitudinal (\texttt{s}) axis. 
 
-SROTATION has no effect on the beam, but it causes the beam to be
+\madbox{
+label: SROTATION, ANGLE = real;
+}
+
+{\tt SROTATION} has no effect on the beam, but it causes the beam to be 
 referred to the new coordinate system \\ 
-\textit{x}$_2$=\textit{x}$_1$cos(psi)-\textit{y}$_1$sin(psi),\\
-\textit{y}$_2$=\textit{x}$_1$sin(psi)+\textit{y}$_1$cos(psi).\\ 
+\begin{equation}\begin{split}
+x_2 &= x_1 \cos\psi - y_1 \sin\psi \\
+y_2 &= x_1 \sin\psi + y_1 \cos\psi
+\end{split}\end{equation}
+
+%%\textit{x}$_2$=\textit{x}$_1$cos(psi)-\textit{y}$_1$sin(psi),\\
+%%\textit{y}$_2$=\textit{x}$_1$sin(psi)+\textit{y}$_1$cos(psi).\\ 
 
 It has one real attribute: 
 \begin{madlist}
-   \ttitem{ANGLE} The rotation angle psi (default: 0 rad) 
+   \ttitem{ANGLE} The rotation angle $\psi$ (default: 0 rad) 
 \end{madlist}
 
 A positive angle means that the new reference system is rotated
-clockwise about the \texttt{s}-axis with respect to the old system.  
+clockwise about the {\tt s}-axis with respect to the old system.  
 
 Example: 
 \madxmp{

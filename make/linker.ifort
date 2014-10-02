@@ -54,6 +54,10 @@ LDFLAGS += -Bdynamic
 LDLIBS  += -ldl
 endif
 
+ifeq ($(OPENMP),yes)
+LDFLAGS += -openmp $(if $(call eq,$(STATIC),yes),-openmp-link static,)
+endif
+
 endif # Unix Settings
 
 # |
@@ -90,6 +94,10 @@ endif
 
 ifeq ($(SHARED),yes)
 LDFLAGS += /MD
+endif
+
+ifeq ($(OPENMP),yes)
+LDFLAGS += /Qopenmp $(if $(call eq,$(STATIC),yes),/Qopenmp-link:static,)
 endif
 
 #

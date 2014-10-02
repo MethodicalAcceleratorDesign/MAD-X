@@ -79,6 +79,9 @@ STATIC  := no
 # plugin dynamic loading: yes/no (default is no)
 PLUGIN  := no
 
+# OpenMP activation: yes/no (default is no)
+OPENMP  := no
+
 #############################
 # Compilers, Linkers, Testers settings
 # see make/compiler.* for supported compilers

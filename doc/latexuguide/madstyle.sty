@@ -51,8 +51,10 @@
 % automatic indexing of keywords:
 \def\ttitem#1{\item[{\tt #1}]\index{#1@{\tt #1}}}
 \def\ttitemn#1{\item[{\tt #1}]}
-\def\ttindex#1{{\tt #1}\index{#1@{\tt #1}}}
-\def\ttnindex#1{\index{#1@{\tt #1}}}
+%\def\ttindex#1{{\tt #1}\index{#1@{\tt #1}}}
+\def\ttindex#1{\index{#1@{\uppercase{\tt #1}}}}
+
+\def\madsection#1{\section{#1}\index{#1@{\uppercase{\tt #1}}}\label{sec:#1}}
  
 % MAD command specifications:
 \newcommand{\madbox}[1]{
@@ -122,4 +124,3 @@
 \newcommand{\madnine}{{\tt MAD-9}\xspace}
 \newcommand{\mad}{{\tt MAD-X}\xspace}
 \newcommand{\madx}{{\tt MAD-X}\xspace}
-\newcommand{\ptc}{{\tt PTC}\xspace}

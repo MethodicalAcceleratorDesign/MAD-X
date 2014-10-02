@@ -39,7 +39,7 @@ the following commands:
 \hyperref[chap:ptc_twiss]{\tt PTC\_TWISS},
 \hyperref[chap:ptc_normal]{\tt PTC\_NORMAL},
 \hyperref[chap:ptc_track]{\tt PTC\_TRACK},
-\hyperref[chap:ptc_track_line]{\tt PTC\_TRACK\_LINE}. 
+\hyperref[sec:ptc_trackline]{\tt PTC\_TRACK\_LINE}. 
 
 To perform calculations with these {\madx}-{\ptc} commands, the \ptc
 environment must be initialized, handled and turned off by special
@@ -136,11 +136,11 @@ The attributes are:
   whether the calculation is done in 5D or 6D: 
   \begin{madlist}
     \ttitem{5D} if {\tt TIME} is true, the fifth coordinate is
-    \hyperref[sec:canon]{\tt PT}, $p_t = \Delta E / p_0 c$ \\ 
+    \hyperref[subsec:tables_canon]{\tt PT}, $p_t = \Delta E / p_0 c$ \\ 
     if {\tt TIME} is false, the fifth coordinate is
-    \hyperref[sec:canon]{\tt DELTAP}, $\delta_p = \Delta p / p_0$
+    \hyperref[subsec:tables_canon]{\tt DELTAP}, $\delta_p = \Delta p / p_0$
     
-    \ttitem{6D} if {\tt TIME} is true, the \hyperref[sec:canon]{\madx
+    \ttitem{6D} if {\tt TIME} is true, the \hyperref[subsec:tables_canon]{\madx
       coordinate system} \{$-ct$, $p_t$\} is used. \\   
     if {\tt TIME} is false, the second \ptc coordinate system
     \{-pathlength, $\delta_p$\} is used. 
@@ -324,7 +324,7 @@ SBEND | \=RBEND | QUADRUPOLE | SEXTUPOLE | OCTUPOLE | SOLENOID ,\\
 These attributes are:
 \begin{madlist}
   \ttitem{L} the length of the element. \\ \ptc treats bending magnets
-  (\hyperref[sec:sbend]{\tt SBEND} or \hyperref[sec:rbend]{\tt RBEND})
+  (\hyperref[sec:bend]{\tt SBEND} or \hyperref[sec:bend]{\tt RBEND})
   as \hyperref[sec:marker]{\tt MARKER} if their length is equal to zero. 
      
   \ttitem{NST} gives a specific \hyperref[sec:ptc_twiss]{\tt NST}
@@ -341,8 +341,8 @@ These attributes are:
   \ttitem{KNL, KSL} The full range of  normal and skew multipole
   components on the bench can be  specified for the following physical
   elements: 
-  \hyperref[sec:sbend]{\tt sbend}, 
-  \hyperref[sec:rbend]{\tt rbend},
+  \hyperref[sec:bend]{\tt sbend}, 
+  \hyperref[sec:bend]{\tt rbend},
   \hyperref[sec:quadrupole]{\tt quadrupole},
   \hyperref[sec:sextupole]{\tt sextupole},  
   \hyperref[sec:octupole]{\tt octupole} and 
@@ -363,7 +363,7 @@ These attributes are:
   components for those elements are ignored and must be specified as
   zero: KNL(0)=0, KSL(0)=0. 
    
-  A full range of additional multipole \hyperref[sec:error_field]{field
+  A full range of additional multipole \hyperref[sec:efcomp]{field
     errors} can be additionally specified with the
   \hyperref[sec:efcomp]{\tt EFCOMP} command. Errors are added to the
   above multipole fields on the bench. 

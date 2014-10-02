@@ -72,6 +72,10 @@ ifeq ($(PROFILE),yes)
 CFLAGS += /Qprof-use
 endif
 
+ifeq ($(OPENMP),yes)
+CFLAGS += /Qopenmp
+endif
+
 #
 # extra flags
 #
@@ -123,6 +127,14 @@ endif
 
 ifeq ($(PROFILE),yes)
 CXXFLAGS += /Qprof-use
+endif
+
+ifeq ($(OPENMP),yes)
+CXXFLAGS += /Qopenmp
+endif
+
+ifeq ($(OPENMP),yes)
+CXXFLAGS += /Qopenmp
 endif
 
 #

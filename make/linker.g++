@@ -48,4 +48,8 @@ LDFLAGS += -rdynamic
 LDLIBS  += -ldl
 endif
 
+ifeq ($(OPENMP),yes)
+LDFLAGS += -fopenmp
+endif
+
 # end of makefile
