@@ -1676,14 +1676,25 @@ subroutine pemima
         call gxpnbl (slab, k1, k2) ! extract indices for first and last non-blank characters in string
         s  = '<#>' // slab
         k2 = k2 + 3
+        
 
         do i = 2, ns ! extract the labels for other variables
            call pegetn (1, saxis(i), itbv, idum, sdum, slab)
            call gxpnbl (slab, i1, i2)
+
+           
            if (index(s(:k2),slab(:i2)) .eq. 0)  then
               s(k2 + 1:) = ', ' // slab(:i2)
               k2 = k2 + i2 + 2
            endif
+           
+           if (k2 .gt. mtitl) then
+             print*, "Error k2=",k2," bigger then array s ",mtitl
+             print*, "The array will be read out of its bounds. Piotr."
+             print*, "string is ",slab
+             
+           endif
+
         enddo
         axlabel(iv) = s
      endif
@@ -2311,16 +2322,31 @@ subroutine pesopt(ierr)
 
   !--- ptc flag setting
   call comm_para('ptc ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
-  if (nint .gt. 0 .and. int_arr(1) .eq. 1) ptc_flag = .true.
+  if (nint .gt. 0 .and. int_arr(1) .eq. 1) then
+    ptc_flag = .true.
+    print*, "plot.f90::pesopt : Setting ptc_flag to true"
+  else
+    print*, "plot.f90::pesopt : Setting ptc_flag to false. nint=",nint," int_arr(1)=",int_arr(1)
+  endif  
 
   !--- if ptc flag is on look for the ptc_table
   if(ptc_flag) then
      call comm_para('ptc_table ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
-     if (k .gt. 0) tabname = char_a
+     if (k .gt. 0) then
+       tabname = char_a
+       print*, "plot.f90::pesopt : ptc_flag=true : ptc_table found ", tabname
+     else
+       print*, "plot.f90::pesopt : ptc_flag=true : Did not find ptc_table name, using ", tabname  
+     endif  
   else
      !--- else normal twiss treatment : any table
      call comm_para('table ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
-     if (k .gt. 0) tabname = char_a
+     if (k .gt. 0) then
+       tabname = char_a
+       print*, "plot.f90::pesopt : ptc_flag=false : table found ", tabname
+     else
+       print*, "plot.f90::pesopt : ptc_flag=false : Did not find table name, using ", tabname  
+     endif
   endif
 
   !--- Horizontal variable  - for hor = s plot machine
@@ -2407,8 +2433,10 @@ subroutine pesopt(ierr)
   call comm_para('colour ', nint, ndble, k, ipparm(5,1), d_arr, char_a, char_l)
 
   !--- if ptc_flag is on, no interpolation and check only ptc-related attributes
-  if (ptc_flag .and. itbv .eq. 0) return
-     
+  if (ptc_flag .and. itbv .eq. 0) then
+   call fort_warn("plot","no interpolation available with PTC.")
+   return
+  endif
   !--- Spline is obsolete 
   call comm_para('spline ', nint,ndble,k,i,d_arr, char_a,char_l)
   if (i .eq. 1) print *,'SPLINE attribute is obsolete, no action taken, use interpolate attribute instead.'

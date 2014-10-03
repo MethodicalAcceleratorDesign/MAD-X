@@ -161,7 +161,14 @@ exec_plot(struct in_cmd* cmd)
   
   /* get interpolation */
   pos = name_list_pos("interpolation", nl_plot);
-  nointerp = 1 - nl_plot->inform[pos];
+  if (pos > -1)
+   {
+     nointerp = 1 - nl_plot->inform[pos];
+   }
+  else
+   {
+     nointerp = 1;
+   } 
   
   /* get haxis_name & s_haxis flag */
   pos = name_list_pos("haxis", nl_plot);
