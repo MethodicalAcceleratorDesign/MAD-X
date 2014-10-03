@@ -54,6 +54,10 @@ ifeq ($(OPENMP),yes)
 CXXFLAGS += -fopenmp
 endif
 
+ifeq ($(SANITIZE),yes)
+CXXFLAGS += 
+endif
+
 #
 # extra flags
 #

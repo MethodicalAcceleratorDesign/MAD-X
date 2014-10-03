@@ -59,6 +59,10 @@ ifeq ($(OPENMP),yes)
 FFLAGS += -fopenmp
 endif
 
+ifeq ($(SANITIZE),yes)
+FFLAGS += 
+endif
+
 #
 # extra flags
 #

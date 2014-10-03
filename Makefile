@@ -65,22 +65,25 @@ USEGC    := no
 #
 
 # architecture bit: detect/32/64 (default is detect)
-ARCH    := detect
+ARCH     := detect
 
 # debugging mode: yes/no (default is no)
-DEBUG   := no
+DEBUG    := no
 
 # profiling mode: yes/no (default is no)
-PROFILE := no
+PROFILE  := no
 
 # link with static libs: yes/no (default is no)
-STATIC  := no
+STATIC   := no
 
 # plugin dynamic loading: yes/no (default is no)
-PLUGIN  := no
+PLUGIN   := no
 
-# OpenMP activation: yes/no (default is no)
-OPENMP  := no
+# OpenMP activation: yes/no (default is no, GCC and Intel only)
+OPENMP   := no
+
+# Sanitizer activation: yes/no (default is no, requires GCC >= 4.8)
+SANITIZE := no
 
 #############################
 # Compilers, Linkers, Testers settings
