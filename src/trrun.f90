@@ -5089,21 +5089,20 @@ subroutine tttdipole(track, ktrack)
 
   !---- Read-in dipole edges angles
 
-  double precision e1, e2, h1, h2, hgap, fint, tilt
+  double precision e1, e2, h1, h2, hgap, fint
   e1 = node_value('e1 ');
   e2 = node_value('e2 ');
   h1 = node_value('h1 ')
   h2 = node_value('h2 ')
   hgap = node_value('hgap ')
   fint = node_value('fint ')
-  tilt = node_value('tilt ')
   kill_ent_fringe = node_value('kill_ent_fringe ') .ne. 0d0
   kill_exi_fringe = node_value('kill_exi_fringe ') .ne. 0d0
 
   !---- Apply entrance dipole edge effect
 
   if (.not.kill_ent_fringe) then
-     call ttdpdg_map(track, ktrack, e1, h1, hgap, fint, tilt)
+     call ttdpdg_map(track, ktrack, e1, h1, hgap, fint, 0d0)
   endif
 
   !---- Read-in the parameters
@@ -5193,7 +5192,7 @@ subroutine tttdipole(track, ktrack)
   enddo
 
   if (.not.kill_exi_fringe) then
-     call ttdpdg_map(track, ktrack, e2, h2, hgap, fint, tilt)
+     call ttdpdg_map(track, ktrack, e2, h2, hgap, fint, 0d0)
   endif
   
 end subroutine tttdipole
