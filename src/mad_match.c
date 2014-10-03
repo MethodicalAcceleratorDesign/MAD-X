@@ -330,7 +330,7 @@ match_constraint(struct in_cmd* cmd)
   else
   { /* old match */
     pos = name_list_pos("sequence", nl);
-    if(nl->inform[pos]) { /* sequence specified */
+    if((pos>=0)?nl->inform[pos]:0) { /* sequence specified */
       cp = cmd->clone->par->parameters[pos];
       for (n = 0; n < match_sequs->curr; n++)
         if (strcmp(cp->string, match_sequs->sequs[n]->name) == 0)
@@ -350,7 +350,7 @@ match_constraint(struct in_cmd* cmd)
     for (n = low; n <= up; n++) {
       sequ = match_sequs->sequs[n];
       pos = name_list_pos("range", nl);
-      if (pos > -1 && nl->inform[pos]) { /* parameter has been read */
+      if ((pos>=0)?nl->inform[pos]:0) { /* parameter has been read */
         name = pl->parameters[pos]->string;
         if (get_ex_range(name, sequ, nodes) == 0)  return; // (k = not used
       }
@@ -502,7 +502,7 @@ match_global(struct in_cmd* cmd)
   struct sequence* sequ;
   int pos, n, low, up;
   pos = name_list_pos("sequence", nl);
-  if(nl->inform[pos]) /* sequence specified */
+  if((pos>=0)?nl->inform[pos]:0) /* sequence specified */
   {
     cp = cmd->clone->par->parameters[pos];
     for (n = 0; n < match_sequs->curr; n++)
@@ -580,22 +580,21 @@ match_match(struct in_cmd* cmd)
   set_option("twiss_print", &izero);
 
   pos=name_list_pos("use_macro", nl);
-  if(nl->inform[pos]) {
+  if((pos>=0)?nl->inform[pos]:0) {
     match2_match(cmd);
     return;
   }
-
   pos=name_list_pos("use_ptcknob", nl);
-  if(nl->inform[pos]) {
+  if((pos>=0)?nl->inform[pos]:0) {
     match_is_on = kMatch_PTCknobs;
     madx_mpk_prepare();
     return;
   }
-
   match_is_on = 1;
   pos = name_list_pos("sequence", nl);
   fprintf(prt_file, "START MATCHING\n\n");
-  if(nl->inform[pos]) /* sequence specified */
+  
+  if((pos>=0)?nl->inform[pos]:0) /* sequence specified */
   {
     cp = cmd->clone->par->parameters[pos];
     if ((n = cp->m_string->curr) > match_sequs->max)
@@ -628,13 +627,13 @@ match_match(struct in_cmd* cmd)
   }
   else match_sequs->sequs[match_sequs->curr++] = current_sequ;
   pos = name_list_pos("vlength", nl);
-  if(nl->inform[pos]) i = pl->parameters[pos]->double_value;
+  if((pos>=0)?nl->inform[pos]:0) i = pl->parameters[pos]->double_value;
   else i = 0;
   set_option("varylength", &i);
 
   /* START SLOW-CHECK */
   pos = name_list_pos("slow", nl);
-  if(nl->inform[pos]) slow = pl->parameters[pos]->double_value;
+  if((pos>=0)?nl->inform[pos]:0) slow = pl->parameters[pos]->double_value;
   else slow = 0;
   set_option("slow_match", &slow);
   /* END SLOW-CHECK */
@@ -642,7 +641,7 @@ match_match(struct in_cmd* cmd)
   /* START CHK-SEQ */
   current_match = cmd->clone;
   pos = name_list_pos("sequence", nl);
-  if(nl->inform[pos]) /* sequence specified */
+  if((pos>=0)?nl->inform[pos]:0) /* sequence specified */
   {
     cp = cmd->clone->par->parameters[pos];
     match_num_seqs = cp->m_string->curr;
@@ -663,6 +662,7 @@ match_match(struct in_cmd* cmd)
           = clone_command(find_command("twiss", defined_commands));
         tnl = local_twiss[i]->cmd_def->par_names;
         tpos = name_list_pos("sequence", tnl);
+        
         local_twiss[i]->cmd_def->par->parameters[tpos]->string = match_seqs[i];
         local_twiss[i]->cmd_def->par_names->inform[tpos] = 1;
         if (slow)
@@ -723,7 +723,7 @@ match_match(struct in_cmd* cmd)
   /* START CHK-BETA-INPUT */
   /* START CHK-BETA0 */
   pos = name_list_pos("beta0", nl);
-  if(nl->inform[pos]) /* beta0 specified */
+  if((pos>=0)?nl->inform[pos]:0) /* beta0 specified */
   {
     cp = cmd->clone->par->parameters[pos];
     match_num_beta = cp->m_string->curr;
@@ -744,7 +744,7 @@ match_match(struct in_cmd* cmd)
 
   /* START CHK-RANGE */
   pos = name_list_pos("range", nl);
-  if(nl->inform[pos]) /* range specified */
+  if((pos>=0)?nl->inform[pos]:0) /* range specified */
   {
     cp = cmd->clone->par->parameters[pos];
     match_num_range = cp->m_string->curr;
@@ -764,7 +764,7 @@ match_match(struct in_cmd* cmd)
 
   /* START CHK-USEORBIT */
   pos = name_list_pos("useorbit", nl);
-  if(nl->inform[pos]) /* useorbit specified */
+  if((pos>=0)?nl->inform[pos]:0) /* useorbit specified */
   {
     cp = cmd->clone->par->parameters[pos];
     for (i = 0; i < cp->m_string->curr; i++)
@@ -782,7 +782,7 @@ match_match(struct in_cmd* cmd)
 
   /* START CHK-KEEPORBIT */
   pos = name_list_pos("keeporbit", nl);
-  if(nl->inform[pos]) /* keeporbit specified */
+  if((pos>=0)?nl->inform[pos]:0) /* keeporbit specified */
   {
     cp = cmd->clone->par->parameters[pos];
     for (i = 0; i < cp->m_string->curr; i++)
@@ -800,7 +800,7 @@ match_match(struct in_cmd* cmd)
 
   /* START CHK-R-MATRIX */
   pos = name_list_pos("rmatrix", nl);
-  if(nl->inform[pos]) /* rmatrix specified */
+  if((pos>=0)?nl->inform[pos]:0) /* rmatrix specified */
   {
     cp = cmd->clone->par->parameters[pos];
     for (i = 0; i < match_num_seqs; i++)
@@ -818,7 +818,15 @@ match_match(struct in_cmd* cmd)
 
   /* START CHK-CHROM */
   pos = name_list_pos("chrom", nl);
-  chrom_flg = cmd->clone->par->parameters[pos]->double_value;
+  if (pos > 0)
+   {
+     chrom_flg = cmd->clone->par->parameters[pos]->double_value;
+   }
+  else
+   { 
+     chrom_flg = 0;
+   }
+      
   if(chrom_flg) /* chrom specified */
   {
     for (i = 0; i < match_num_seqs; i++)
@@ -838,7 +846,7 @@ match_match(struct in_cmd* cmd)
 
   /* START CHK-SECTORMAP */
   pos = name_list_pos("sectormap", nl);
-  if(nl->inform[pos]) /* sectormap specified */
+  if((pos>=0)?nl->inform[pos]:0) /* sectormap specified */
   {
     cp = cmd->clone->par->parameters[pos];
     for (i = 0; i < match_num_seqs; i++)
@@ -856,7 +864,7 @@ match_match(struct in_cmd* cmd)
 
   /* START CHK-DELTAP */
   pos = name_list_pos("deltap", nl);
-  if(nl->inform[pos]) /* deltap specified */
+  if((pos>=0)?nl->inform[pos]:0) /* deltap specified */
   {
     cp = cmd->clone->par->parameters[pos];
     for (i = 0; i < match_num_seqs; i++)
@@ -958,7 +966,7 @@ match_vary(struct in_cmd* cmd)
 
   if (stored_match_var == NULL) stored_match_var = new_command_list("vary", 100);
   pos = name_list_pos("name", nl);
-  if (nl->inform[pos])
+  if ((pos>=0)?nl->inform[pos]:0)
   {
     value=get_variable(pl->parameters[pos]->string);
     set_value("vary","init",&value);
@@ -1083,7 +1091,7 @@ next_vary(char* name, int* name_l, double* lower, double* upper, double* step, i
   nl = comm->par_names;
   pl = comm->par;
   pos = name_list_pos("name", nl);
-  v_name = pl->parameters[pos]->string;
+  v_name = (pos>=0)?pl->parameters[pos]->string:"";
   len = strlen(v_name);
   ncp = len < *name_l ? len : *name_l; // min(len, *name_l)
   nbl = *name_l - ncp;
