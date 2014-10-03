@@ -83,6 +83,7 @@ PLUGIN   := no
 OPENMP   := no
 
 # Sanitizer activation: yes/no (default is no, requires GCC >= 4.8)
+# to visualize the ouput, use scripts/asan_symbolize.py
 SANITIZE := no
 
 #############################

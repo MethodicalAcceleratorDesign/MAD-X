@@ -53,7 +53,7 @@ LDFLAGS += -fopenmp
 endif
 
 ifeq ($(SANITIZE),yes)
-LDFLAGS += 
+LDFLAGS += -fsanitize=address -fno-omit-frame-pointer
 endif
 
 # end of makefile

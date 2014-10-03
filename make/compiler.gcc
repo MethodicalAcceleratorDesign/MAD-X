@@ -55,7 +55,7 @@ CFLAGS += -fopenmp
 endif
 
 ifeq ($(SANITIZE),yes)
-CFLAGS += -g -ggdb -fsanitize=address -fno-omit-frame-pointer
+CFLAGS += -fsanitize=address -fno-omit-frame-pointer
 endif
 
 #

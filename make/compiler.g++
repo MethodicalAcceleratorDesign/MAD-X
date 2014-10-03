@@ -55,7 +55,7 @@ CXXFLAGS += -fopenmp
 endif
 
 ifeq ($(SANITIZE),yes)
-CXXFLAGS += 
+CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
 endif
 
 #

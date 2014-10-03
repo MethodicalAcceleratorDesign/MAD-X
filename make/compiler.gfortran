@@ -60,7 +60,7 @@ FFLAGS += -fopenmp
 endif
 
 ifeq ($(SANITIZE),yes)
-FFLAGS += -g -ggdb -fbounds-check -Warray-bounds -fsanitize=address -fno-omit-frame-pointer
+FFLAGS += -fsanitize=address -fno-omit-frame-pointer
 endif
 
 #
