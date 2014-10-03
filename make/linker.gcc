@@ -28,7 +28,7 @@ LDLIBS  =
 #
 
 ifeq ($(DEBUG),yes)
-LDFLAGS += -g -ggdb
+LDFLAGS += -g -ggdb -fsanitize=address -fno-omit-frame-pointer
 endif
 
 ifeq ($(PROFILE),yes)
@@ -53,7 +53,7 @@ LDFLAGS += -fopenmp
 endif
 
 ifeq ($(SANITIZE),yes)
-LDFLAGS += 
+LDFLAGS += -g -ggdb -fsanitize=address -fno-omit-frame-pointer
 endif
 
 # end of makefile

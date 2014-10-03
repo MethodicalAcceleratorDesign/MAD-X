@@ -44,7 +44,7 @@ FFLAGS = -m$(ARCH) -O$(NOPT) -c
 #
 
 ifeq ($(DEBUG),yes)
-FFLAGS += -g -ggdb
+FFLAGS += -g -ggdb -fbounds-check -Warray-bounds
 endif
 
 ifeq ($(PROFILE),yes)
@@ -60,7 +60,7 @@ FFLAGS += -fopenmp
 endif
 
 ifeq ($(SANITIZE),yes)
-FFLAGS += 
+FFLAGS += -g -ggdb -fbounds-check -Warray-bounds -fsanitize=address -fno-omit-frame-pointer
 endif
 
 #

@@ -48,7 +48,7 @@ FFLAGS = -m$(ARCH) -O$(NOPT) -c
 #
 
 ifeq ($(DEBUG),yes)
-FFLAGS += -g
+FFLAGS += -g 
 endif
 
 ifeq ($(PROFILE),yes)

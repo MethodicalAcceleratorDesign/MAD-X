@@ -43,7 +43,7 @@ endif
 #
 
 ifeq ($(DEBUG),yes)
-LDFLAGS += -g
+LDFLAGS += -g 
 endif
 
 ifeq ($(PROFILE),yes)
