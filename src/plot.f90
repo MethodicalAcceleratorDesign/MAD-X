@@ -2324,9 +2324,9 @@ subroutine pesopt(ierr)
   call comm_para('ptc ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
   if (nint .gt. 0 .and. int_arr(1) .eq. 1) then
     ptc_flag = .true.
-    print*, "plot.f90::pesopt : Setting ptc_flag to true"
-  else
-    print*, "plot.f90::pesopt : Setting ptc_flag to false. nint=",nint," int_arr(1)=",int_arr(1)
+   ! print*, "plot.f90::pesopt : Setting ptc_flag to true"
+  !else
+   ! print*, "plot.f90::pesopt : Setting ptc_flag to false. nint=",nint," int_arr(1)=",int_arr(1)
   endif  
 
   !--- if ptc flag is on look for the ptc_table
@@ -2334,18 +2334,18 @@ subroutine pesopt(ierr)
      call comm_para('ptc_table ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
      if (k .gt. 0) then
        tabname = char_a
-       print*, "plot.f90::pesopt : ptc_flag=true : ptc_table found ", tabname
-     else
-       print*, "plot.f90::pesopt : ptc_flag=true : Did not find ptc_table name, using ", tabname  
+       !print*, "plot.f90::pesopt : ptc_flag=true : ptc_table found ", tabname
+     !else
+       !print*, "plot.f90::pesopt : ptc_flag=true : Did not find ptc_table name, using ", tabname  
      endif  
   else
      !--- else normal twiss treatment : any table
      call comm_para('table ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
      if (k .gt. 0) then
        tabname = char_a
-       print*, "plot.f90::pesopt : ptc_flag=false : table found ", tabname
-     else
-       print*, "plot.f90::pesopt : ptc_flag=false : Did not find table name, using ", tabname  
+       !print*, "plot.f90::pesopt : ptc_flag=false : table found ", tabname
+     !else
+       !print*, "plot.f90::pesopt : ptc_flag=false : Did not find table name, using ", tabname  
      endif
   endif
 
