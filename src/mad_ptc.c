@@ -1680,16 +1680,16 @@ pro_ptc_select_moment(struct in_cmd* cmd)
 int
 makemomentstables(void)
 {
-  static const int maxtables = 100;
-  char*             tables[100];           /*tables[maxtables];*/
-  struct name_list* cols[100];  /*cols[maxtables][maxcols];*/
+  enum { MAXTABLES = 100 };
+  char*             tables[MAXTABLES];
+  struct name_list* cols[MAXTABLES];
   struct table*     t;
   char              tabname[20];
   char              colname[17];
   int               nmom;
   int i,j; // ,k; not used
 
-  memset(tables,0x0,maxtables*sizeof(char*));
+  memset(tables, 0, MAXTABLES*sizeof(char*));
 
   nmom = w_ptc_getnmoments_();
   for (i = 1; i <= nmom; i++)
