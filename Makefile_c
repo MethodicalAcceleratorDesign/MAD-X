@@ -44,7 +44,6 @@ mad_gcst.o: VERSION
 # garbage collector (Windows only)
 ifeq ($(USEGC),yes)
 ifeq ($(OSTYPE),Windows)
-GCDIR := gc-7.2f
 vpath %.h libs/gc/$(GCDIR)/include
 vpath %.c libs/gc/$(GCDIR)
 

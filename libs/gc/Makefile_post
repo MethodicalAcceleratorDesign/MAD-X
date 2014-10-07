@@ -21,8 +21,6 @@
 # recursive make defining PRJNAME
 ifeq ($(origin PRJNAME),file)
 
-GCDIR := gc-7.2f
-
 ifeq ($(OSTYPE),Linux)
 include Makefile_lnx
 endif

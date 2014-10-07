@@ -38,7 +38,7 @@ all-macosx64-intel: madx-macosx64-intel libmadx-macosx64-intel libptc-macosx64-i
 cleanarch:
 	$E "** Cleaning binaries and libraries"
 	$_ $(RM) $(wildcard madx32 madx64 numdiff32 numdiff64 libmadx32* libmadx64* libptc32* libptc64*)
-	$_ $(RM) $(wildcard madx-macosx* libmadx-macosx* libptc-macosx* numdiff-macosx*)
+	$_ $(RM) $(wildcard madx-macosx* libmadx-macosx* libptc-macosx* numdiff-macosx* libs/gc/libgc*.a)
 
 #
 # madx
@@ -76,9 +76,17 @@ madx-macosx64-gnu: libs/gc/libgc-macosx64-gnu.a
 #
 libs/gc/libgc-macosx%: MAKE_OPTS = -j9 --no-print-directory -C libs/gc
 
-libs/gc/libgc-macosx32-intel.a:
+# BUG in GC 7.2f or Intel 14.0.4
+# remove this rule and uncomment the one right after when it is solved...
+# to check if it solved, we (still) build libgc32-intel and run the tests...
+libs/gc/libgc-macosx32-intel.a: libs/gc/libgc-macosx32-gnu.a
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) libgc-intel32
+	$_ $(MAKE) $(MAKE_OPTS) libgc-intel32 ; \
+	   cd libs/gc ; ln -sf libgc32-gnu.a libgc32-intel.a
+
+# libs/gc/libgc-macosx32-intel.a:
+#	$E "*** Building $@"
+#	$_ $(MAKE) $(MAKE_OPTS) libgc-intel32
 
 libs/gc/libgc-macosx64-intel.a:
 	$E "*** Building $@"

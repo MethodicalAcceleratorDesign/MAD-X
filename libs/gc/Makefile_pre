@@ -1,7 +1,7 @@
 # |
 # o---------------------------------------------------------------------o
 # |
-# | MAD makefile - C preprocessing settings
+# | MAD GC makefile - pre-makefile customization
 # |
 # o---------------------------------------------------------------------o
 # |
@@ -16,24 +16,6 @@
 # | $Id$
 # |
 
-#
-# defines
-#
-
-ifeq ($(ONLINE),yes)
-CPPFLAGS += -D_ONLINE
-endif
-
-ifeq ($(NTPSA),yes)
-CPPFLAGS += -D_NTPSA
-endif
-
-ifeq ($(USEGC),yes)
-CPPFLAGS += -D_USEGC -DSTATIC=static $(call incdir,libs/gc/$(GCDIR)/include)
-
-ifeq ($(OSTYPE),Windows)
-CPPFLAGS += -DALL_INTERIOR_POINTERS -DGC_NOT_DLL -DDONT_USE_USER32_DLL
-endif
-endif
+GCDIR := gc-7.2f
 
 # end of makefile

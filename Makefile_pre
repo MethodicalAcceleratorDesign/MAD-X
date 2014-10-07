@@ -16,7 +16,11 @@
 # | $Id$
 # |
 
-SED  = sed
-GREP = grep
+SED    = sed
+GREP   = grep
+
+ifeq ($(USEGC),yes)
+GCDIR := gc-7.2f
+endif
 
 # end of makefile

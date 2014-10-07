@@ -38,7 +38,7 @@ all-linux64-intel: madx-linux64-intel libmadx-linux64-intel libptc-linux64-intel
 cleanarch:
 	$E "** Cleaning binaries and libraries"
 	$_ $(RM) $(wildcard madx32 madx64 numdiff32 numdiff64 libmadx32* libmadx64* libptc32* libptc64*)
-	$_ $(RM) $(wildcard madx-linux* libmadx-linux* libptc-linux* numdiff-linux*)
+	$_ $(RM) $(wildcard madx-linux* libmadx-linux* libptc-linux* numdiff-linux* libs/gc/libgc*.a)
 
 #
 # madx
