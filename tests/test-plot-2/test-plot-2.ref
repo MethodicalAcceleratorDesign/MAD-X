@@ -3,7 +3,7 @@
   +     MAD-X 5.02.02  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2014.07.04               +
-  + Execution date: 2014.10.08 12:20:57      +
+  + Execution date: 2014.10.08 14:21:13      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option, -echo;
 
@@ -194,7 +194,7 @@ plot, haxis=s, colour=100 ,title="large # of variables on vaxis", noversion,
 Plot - default table plotted: twiss
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
- ++++++ warning: PLOT: Array index larger than array limit; label ís truncated
+ ++++++ warning: PLOT: Array index larger than array limit; label is truncated
  plot number =           12
 
 
