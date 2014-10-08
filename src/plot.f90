@@ -1680,23 +1680,18 @@ subroutine pemima
 
         do i = 2, ns ! extract the labels for other variables
            call pegetn (1, saxis(i), itbv, idum, sdum, slab)
-           call gxpnbl (slab, i1, i2)
-
-           
+           call gxpnbl (slab, i1, i2)           
+           if (k2 + i2 + 2 .gt. mtitl) then 
+              call aawarn('PLOT: ','Array index larger than array limit; label ís truncated')
+              goto 100 ! stop building label
+           endif
            if (index(s(:k2),slab(:i2)) .eq. 0)  then
               s(k2 + 1:) = ', ' // slab(:i2)
               k2 = k2 + i2 + 2
-           endif
-           
-           if (k2 .gt. mtitl) then
-             print*, "Error k2=",k2," bigger then array s ",mtitl
-             print*, "The array will be read out of its bounds. Piotr."
-             print*, "string is ",slab
-             
-           endif
-
+           endif          
         enddo
-        axlabel(iv) = s
+
+100     axlabel(iv) = s
      endif
   enddo
 end subroutine pemima
