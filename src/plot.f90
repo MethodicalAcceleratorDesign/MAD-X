@@ -1682,7 +1682,7 @@ subroutine pemima
            call pegetn (1, saxis(i), itbv, idum, sdum, slab)
            call gxpnbl (slab, i1, i2)           
            if (k2 + i2 + 2 .gt. mtitl) then 
-              call aawarn('PLOT: ','Array index larger than array limit; label ís truncated')
+              call aawarn('PLOT: ','Array index larger than array limit; label is truncated')
               goto 100 ! stop building label
            endif
            if (index(s(:k2),slab(:i2)) .eq. 0)  then
