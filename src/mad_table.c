@@ -1420,7 +1420,7 @@ table_range(char* table, char* range, int* rows)
   int pos;
   struct table* t;
   char buf[5*NAME_L];
-
+  
   rows[0] = rows[1] = 0;
   stolower(mycpy(buf, table));
 
@@ -1432,7 +1432,7 @@ table_range(char* table, char* range, int* rows)
     get_table_range(buf, t, rows);
     rows[0]++, rows[1]++;
   } else {
-    warning("invalid table name, range ignored (invalid results may occur!) for table", table);
+    warning("invalid table name, range ignored (invalid results may occur!) for table", buf);
   }
 
 //  fprintf(stderr, "table_range: row[0]='%d', row[1]='%d', table->curr=%d\n", rows[0], rows[1], t->curr);
