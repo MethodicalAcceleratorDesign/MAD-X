@@ -1989,6 +1989,11 @@ reset_sector(struct sequence* sequ, int val)
 int
 restart_sequ(void)
 {
+  if (current_sequ == 0x0)
+   {
+     warning("restart_sequ","Current sequence is not set");
+     return -1;
+   }
   current_node = current_sequ->range_start;
   return 1;
 }
