@@ -7,7 +7,8 @@ fill_twiss_header_ptc(struct table* t, double ptc_deltap)
   int i, h_length = 100; /*39+3+1+1+6+4;  change when adding header lines ! - last 6 for the closed orbit */
   double dtmp;
   /*  struct table* s; */
-  char tmp[16];
+  static const int tmplen=16;
+  char tmp[tmplen];
   int row;
   
   static const char * const beampars[] = {"mass", "charge", "energy", "pc",
@@ -45,7 +46,7 @@ fill_twiss_header_ptc(struct table* t, double ptc_deltap)
   if (t == NULL) return;
   /* ATTENTION: if you add header lines, augment h_length accordingly */
   if (t->header == NULL)  t->header = new_char_p_array(h_length);
-  strcpy(tmp, t->org_sequ->name);
+  strncpy(tmp, t->org_sequ->name,tmplen);
   sprintf(c_dum->c, v_format("@ SEQUENCE         %%%02ds \"%s\""),
           strlen(tmp),stoupper(tmp));
   addto_char_p_array(t->header,c_dum);
@@ -58,7 +59,7 @@ fill_twiss_header_ptc(struct table* t, double ptc_deltap)
 
   for (i=0; i<Nbeampars;i++)
    {  
-      strcpy(tmp,beampars[i]);  /*we have to copy for stoupper that can not change a constant string*/
+      strncpy(tmp,beampars[i],tmplen);  /*we have to copy for stoupper that can not change a constant string*/
       dtmp = get_value("beam", tmp);    
       sprintf(c_dum->c, v_format("@ %-16.16s %%le  %F"),stoupper(tmp) ,dtmp);
       addto_char_p_array(t->header,c_dum);
@@ -74,7 +75,7 @@ fill_twiss_header_ptc(struct table* t, double ptc_deltap)
     
     for (i=0; i<Nptcpars;i++)
      {  
-        strcpy(tmp,ptcpars[i]);
+        strncpy(tmp,ptcpars[i],tmplen);
         double_from_table_row("ptc_twiss_summary",tmp,&row,&dtmp);
         sprintf(c_dum->c, v_format("@ %-16.16s %%le  %F"),stoupper(tmp) ,dtmp);
         addto_char_p_array(t->header,c_dum);
@@ -1534,7 +1535,8 @@ pro_ptc_select_moment(struct in_cmd* cmd)
   int i, j;
   int mdefi[6];
   char* mdefin, *pchar;
-  char  tablename[48];
+  static const int tabnamelen = 48;
+  char  tablename[tabnamelen];
   char  colname[9];
   int   clen = 0;
   struct int_array*              tabIA      = 0x0;
@@ -1555,15 +1557,15 @@ pro_ptc_select_moment(struct in_cmd* cmd)
   pchar  = c_parameters->parameters[tablepos]->string;
   if ( pchar == 0x0 )
   {
-    strcpy(tablename,"moments");
+    strncpy(tablename,"moments",tabnamelen);
   }
   else if ( pchar[0] == 0 )
   {
-    strcpy(tablename,"moments");
+    strncpy(tablename,"moments",tabnamelen);
   }
   else
   {
-    strcpy(tablename,pchar);
+    strncpy(tablename,pchar,tabnamelen);
   }
 
   tabIA = new_int_array(1+strlen(tablename));
@@ -1649,7 +1651,7 @@ pro_ptc_select_moment(struct in_cmd* cmd)
     {
       if ( pchar[0] != 0 )
       {
-        strcpy(tablename,pchar);
+        strncpy(tablename,pchar,tabnamelen);
       }
 
     }
@@ -1684,7 +1686,8 @@ makemomentstables(void)
   char*             tables[MAXTABLES];
   struct name_list* cols[MAXTABLES];
   struct table*     t;
-  char              tabname[20];
+  static const int  tabnamelen = 48;
+  char              tabname[tabnamelen];
   char              colname[17];
   int               nmom;
   int i,j; // ,k; not used
