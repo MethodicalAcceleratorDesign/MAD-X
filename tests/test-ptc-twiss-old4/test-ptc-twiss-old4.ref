@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.06  (64 bit, Linux)       +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.01.17      +
-  + Execution Time Stamp: 21.01.14 15.37.34 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.02  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.07.04               +
+  + Execution date: 2014.10.09 11:22:47      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
 
@@ -276,17 +276,17 @@ ptc_create_layout,model=2,method=6,nst=10,exact;
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.999956E+02
  Setting MADx with 
-     energy           100.000000000000     
+     energy           100.00000000000000     
      method                   6
      Num. of steps           10
-     charge           1.00000000000000     
-  Length of machine:    534.600000000000     
+     charge           1.0000000000000000     
+  Length of machine:    534.59999999999991     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After    end:   -40.5807584670258       0.000000000000000E+000   532.533460530797     
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -40.580758467025781        0.0000000000000000        532.53346053079656     
 ptc_align;
 
 
@@ -320,7 +320,7 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   3.260715892537305E-004  2.596346259293698E-006  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Closed orbit:    3.2607158925373049E-004   2.5963462592936979E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
 Deviation from symplecticity  0.5251354906476990E-11 %
 Deviation from symplecticity  0.5251354906476990E-11 %
 
@@ -401,7 +401,7 @@ PTC_NORMAL,closed_orbit,maptable,icase=5,no=2;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   3.260715892537305E-004  2.596346259293698E-006  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Closed orbit:    3.2607158925373049E-004   2.5963462592936979E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
 
 
 ptc_end;
@@ -462,17 +462,17 @@ ptc_create_layout,model=2,method=6,nst=5,exact;
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.999956E+02
  Setting MADx with 
-     energy           100.000000000000     
+     energy           100.00000000000000     
      method                   6
      Num. of steps            5
-     charge           1.00000000000000     
-  Length of machine:    534.600000000000     
+     charge           1.0000000000000000     
+  Length of machine:    534.59999999999991     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After    end:   -40.5807584670258       0.000000000000000E+000   532.533460530797     
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -40.580758467025781        0.0000000000000000        532.53346053079656     
 ptc_align;
 
                                     
@@ -545,21 +545,21 @@ ptc_twiss,icase=5,no=2, initial_matrix_manual,
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
  Closed orbit specified by the user!
-++++++ warning: ptc_twiss  Provided matrix has eigenvalue more than 1e-10 off the unit circle ! plane =            1 r^2 =   0.999999997370445      delta =   2.629555129196604E-009                                              
-++++++ warning: ptc_twiss  Provided matrix has eigenvalue more than 1e-10 off the unit circle ! plane =            2 r^2 =   0.999999997370445      delta =   2.629555129196604E-009                                              
+++++++ warning: ptc_twiss  Provided matrix has eigenvalue more than 1e-10 off the unit circle ! plane =            1  r^2 =   0.99999999737044487       delta =    2.6295551291966035E-009
+++++++ warning: ptc_twiss  Provided matrix has eigenvalue more than 1e-10 off the unit circle ! plane =            2  r^2 =   0.99999999737044487       delta =    2.6295551291966035E-009
 Deviation from symplecticity  0.1343131939002262E-06 %
-Deviation from symplecticity  0.2753353101070388E-11 %
+Deviation from symplecticity  0.9214851104388799E-12 %
 
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-             534.6    0.0004430990925    7.640523364e-05           -1000000 
+             534.6    0.0004431607235    7.716949486e-05           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000    0.0003550636493        47.50612091       0.2546759882 
+          -1000000    0.0003551252802        47.50281742       0.2545782522 
 
                 q2                dq1                dq2                 qs 
-       0.254674956        1.051065649        1.046759443                  0 
+      0.2547040739        1.051445019        1.047115194                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        32.03433144        177.7089536        32.03308004        177.7231017 
@@ -617,5 +617,5 @@ stop;
 0 in C and 2 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.06 (64 bit) finished normally +
+  + MAD-X 5.02.02 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
