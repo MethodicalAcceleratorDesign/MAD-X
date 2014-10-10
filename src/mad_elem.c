@@ -486,22 +486,35 @@ element_value(struct node* node, char* par)
      resp. in el_par_value if any */
 {
   double e_val;
-  if (node == 0x0)
-   { 
+
+  if (node == 0) { 
      error("element_value","node parameter is NULL.");
      return 0.0;
    }
+
   struct element* el = node->p_elem;
 
-  if (el == 0x0)
-   { 
+   if (el == 0) { 
      error("element_value","node has NULL element pointer.");
      return 0.0;
    }
-  
-  
-  if (strcmp(par, "mad8_type") == 0) e_val = el->def->mad8_type;
-  else  e_val = el_par_value(par, el);
+
+   if (strcmp(el->name,"in_cmd") == 0) {
+     error("element_value","node '%.47s' refers to invalid element (improper (re)definition?).", node->name);
+     return 0.0;
+   }
+
+   struct command* def = el->def;
+
+   if (def == 0) { 
+     error("element_value","element has NULL defintion pointer.");
+     return 0.0;
+   }
+
+  if (strcmp(par, "mad8_type") == 0)
+    e_val = el->def->mad8_type;
+  else
+    e_val = el_par_value(par, el);
   return e_val;
 }
 
