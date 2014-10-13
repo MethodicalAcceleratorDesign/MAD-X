@@ -1,5 +1,4 @@
 #include "madx.h"
-
 #ifndef _WIN32
 #include <sys/utsname.h> // for uname
 #endif
@@ -660,36 +659,80 @@ table_value(void)
        toks[1] -> row name
        toks[2] -> col name
     */
-    if (ntok > 1) {
-      if ((pos = name_list_pos(toks[0], table_register->names)) > -1) {
+    if (ntok > 1) 
+     {
+      if ((pos = name_list_pos(toks[0], table_register->names)) > -1) 
+       {
         table = table_register->tables[pos];
-        if ((col = name_list_pos(toks[ntok-1], table->columns)) > -1) {
-          if (ntok > 2) { /* find row - else current (dynamic), or 0 */
+        if ((col = name_list_pos(toks[ntok-1], table->columns)) > -1) 
+         {
+          if (ntok > 2) 
+           { /* find row - else current (dynamic), or 0 */
             /* start mod - HG 26.3.2011 */
-            if (ntok > 5) { /* check for [ count ] and convert to ->count */
-              if (*toks[2] == '[' && *toks[4] == ']') {
-                strcat(toks[1], "->");
-                strcat(toks[1], toks[3]);
-              }
-	          }
-	          /* end mod - HG 26.3.2011 */
+            if (ntok > 5) 
+             { /* check for [ count ] and convert to ->count */
+               if (*toks[2] == '[' && *toks[4] == ']') 
+                {
+                   strcat(toks[1], "->");
+                   strcat(toks[1], toks[3]);
+                 }
+             }
+            /* end mod - HG 26.3.2011 */
             row = table_row(table, toks[1]);
-          }
-          else if (table->dynamic) row = table->curr;
-          else row = 0;
-          val = table->d_cols[col][row];
-        }
-        else if ((ntok == 3) && ((col = name_list_pos(toks[1], table->columns)) > -1)) {
+           }
+          else 
+           {
+             if (table->dynamic) 
+              {
+                row = table->curr;
+              }  
+             else 
+              {
+                row = 0;
+              }  
+           }
+           
+          if (row >= 0) /*in case table_row(table, toks[1]); returns  -1 == row not found*/
+           {
+             if (col >= table->num_cols)
+              {
+                printf("trying to get column %d out of range %d\n",col,table->num_cols);
+                if (get_option("no_fatal_stop ")==0) exit(1);
+                return val;
+              }
+
+             if (row >= table->max)
+              {
+                printf("trying to get row %d of range %d\n",row,table->max);
+                if (get_option("no_fatal_stop ")==0) exit(1);
+                return val;
+              }
+
+             /*printf("val %f         col %d of %d >>>>  row %d of %d ",val, col, table->num_cols, row, table->max);  */
+             val = table->d_cols[col][row];
+           }
+          
+        }/*column found*/
+        else if ((ntok == 3) && ((col = name_list_pos(toks[1], table->columns)) > -1)) 
+         {
           row = atoi(toks[2])-1;
-          if(row < table->curr) val = table->d_cols[col][row];
+          if(row < table->curr) 
+           {
+            val = table->d_cols[col][row];
+           } 
         }
-        else if(ntok == 2) {
+        else if(ntok == 2) 
+         {
           strncpy(temp, toks[1], NAME_L);
-          if (strcmp(stolower(temp), "tablelength") == 0) val = table->curr;
-	      }
-      }
-    }
-  }
+          if (strcmp(stolower(temp), "tablelength") == 0) 
+           {
+             val = table->curr;
+           } 
+         }
+      } /*pos > -1, table name found in the list*/
+    } /*ntok > 0*/
+  }/*current variable*/
+  
   return val;
 }
 
@@ -876,10 +919,14 @@ delete_table(struct table* t)
     for (i = 0; i < t->num_cols; i++) {
       if (t->columns->inform[i] == 3 && t->s_cols[i]) {
         for (j = 0; j < t->curr; j++)
-          if (t->s_cols[i][j]) myfree(rout_name, t->s_cols[i][j]);
+           {
+             /*printf("%d %d %s %#x\n",i,j,t->s_cols[i][j], t->s_cols[i][j]);*/
+             myfree(rout_name, t->s_cols[i][j]);
+           }
         myfree(rout_name, t->s_cols[i]);
       }
     }
+    /*printf("\n\n%d %s %#x\n\n\n",i,t->s_cols[i], t->s_cols[i]);   */
     myfree(rout_name, t->s_cols);
   }
   t->columns = delete_name_list(t->columns);
@@ -1373,7 +1420,7 @@ table_range(char* table, char* range, int* rows)
   int pos;
   struct table* t;
   char buf[5*NAME_L];
-
+  
   rows[0] = rows[1] = 0;
   stolower(mycpy(buf, table));
 
@@ -1385,7 +1432,7 @@ table_range(char* table, char* range, int* rows)
     get_table_range(buf, t, rows);
     rows[0]++, rows[1]++;
   } else {
-    warning("invalid table name, range ignored (invalid results may occur!) for table", table);
+    warning("invalid table name, range ignored (invalid results may occur!) for table", buf);
   }
 
 //  fprintf(stderr, "table_range: row[0]='%d', row[1]='%d', table->curr=%d\n", rows[0], rows[1], t->curr);

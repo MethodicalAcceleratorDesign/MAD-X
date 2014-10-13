@@ -38,7 +38,7 @@ all-win64-intel:  madx-win64-intel  numdiff-win64-intel
 cleanarch:
 	$E "** Cleaning binaries and libraries"
 	$_ $(RM) $(wildcard madx32.exe madx64.exe numdiff32.exe numdiff64.exe)
-	$_ $(RM) $(wildcard madx-win* numdiff-win*)
+	$_ $(RM) $(wildcard madx-win* numdiff-win* libs/gc/libgc*.a)
 
 #
 # madx

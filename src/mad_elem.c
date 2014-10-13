@@ -486,9 +486,35 @@ element_value(struct node* node, char* par)
      resp. in el_par_value if any */
 {
   double e_val;
+
+  if (node == 0) { 
+     error("element_value","node parameter is NULL.");
+     return 0.0;
+   }
+
   struct element* el = node->p_elem;
-  if (strcmp(par, "mad8_type") == 0) e_val = el->def->mad8_type;
-  else  e_val = el_par_value(par, el);
+
+   if (el == 0) { 
+     error("element_value","node has NULL element pointer.");
+     return 0.0;
+   }
+
+   if (strcmp(el->name,"in_cmd") == 0) {
+     error("element_value","node '%.47s' refers to invalid element (improper (re)definition?).", node->name);
+     return 0.0;
+   }
+
+   struct command* def = el->def;
+
+   if (def == 0) { 
+     error("element_value","element has NULL defintion pointer.");
+     return 0.0;
+   }
+
+  if (strcmp(par, "mad8_type") == 0)
+    e_val = el->def->mad8_type;
+  else
+    e_val = el_par_value(par, el);
   return e_val;
 }
 
@@ -508,7 +534,17 @@ element_vector(struct element* el, char* par, double* vector)
       l = da->curr;
       copy_double(da->a, vector, l);
     }
+/*    else
+    {  
+      printf("element_vector:  parameter named %s for element %s is not double array\n",par,el->name);
+    } */
+    
   }
+/*  else
+   {
+     printf("element_vector: can not find parameter named %s for element %s\n",par,el->name);
+   }
+*/   
   return l;
 }
 
@@ -518,6 +554,7 @@ get_node_vector(char* par, int* length, double* vector)
 {
   char lpar[NAME_L];
   mycpy(lpar, par);
+
   if (strcmp(lpar, "orbit0") == 0) copy_double(orbit0, vector, 6);
   else if (strcmp(lpar, "obs_orbit") == 0)
   {
@@ -541,7 +578,18 @@ get_node_vector(char* par, int* length, double* vector)
      copy_double(current_node->surv_data, vector, 7);
      *length = 7;
     }
-  else *length = element_vector(current_node->p_elem, lpar, vector);
+  else
+   { 
+//     printf("get_node_vector: going to element_vector\n");
+     *length = element_vector(current_node->p_elem, lpar, vector);
+/*     printf("get_node_vector: got %d elements\n",*length);
+       int i;
+     for (i =0; i < *length; i++)
+      {
+        printf("%f ",vector[i]);
+      }
+     printf("\n"); */
+   }  
 }
 
 double

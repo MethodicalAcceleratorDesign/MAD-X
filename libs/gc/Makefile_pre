@@ -1,0 +1,21 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD GC makefile - pre-makefile customization
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+GCDIR := gc-7.2f
+
+# end of makefile

@@ -17,17 +17,14 @@
 #
 # MacOSX
 #
-ifneq ($(OSTYPE),Darwin)
-$(error *** garbage collector not supported on $(OSTYPE))
-endif
 
-$(PROJECT):     libgc-intel
+$(PROJECT):   libgc-intel
 
-libgc-intel:    libgc-intel32 libgc-intel64
-libgc-gnu:      libgc-gnu32   libgc-gnu64
+libgc-intel:  libgc-intel32 libgc-intel64
+libgc-gnu:    libgc-gnu32   libgc-gnu64
 
-libgc-%32:      ARCH := 32
-libgc-%64:      ARCH := 64
+libgc-%32:    ARCH := 32
+libgc-%64:    ARCH := 64
 
 cleanarch:
 	$E "** Cleaning binaries and libraries"
@@ -35,20 +32,20 @@ cleanarch:
 
 libgc-intel32 libgc-intel64:
 	$E "*** Building $@"
-	$_ cd gc ; \
+	$_ cd $(GCDIR) ; \
 	env CC="icc -m$(ARCH) -DLARGE_CONFIG" ./configure --enable-static --disable-shared --with-pic \
 	    $(if $(call eq,$(OPENMP),yes),--enable-threads=posix,--disable-threads) ; \
 	make clean ; make ; make check ; cd - ; \
-	cp -f gc/.libs/libgc.a libgc-macosx$(ARCH)-intel.a ; \
+	cp -f $(GCDIR)/.libs/libgc.a libgc-macosx$(ARCH)-intel.a ; \
 	ln -sf libgc-macosx$(ARCH)-intel.a libgc$(ARCH)-intel.a
 
 libgc-gnu32 libgc-gnu64:
 	$E "*** Building $@"
-	$_ cd gc ; \
+	$_ cd $(GCDIR) ; \
 	env CC="gcc -m$(ARCH) -DLARGE_CONFIG" ./configure --enable-static --disable-shared --with-pic \
 	    $(if $(call eq,$(OPENMP),yes),--enable-threads=posix,--disable-threads) ; \
 	make clean ; make ; make check ; cd - ; \
-	cp -f gc/.libs/libgc.a libgc-macosx$(ARCH)-gnu.a ; \
+	cp -f $(GCDIR)/.libs/libgc.a libgc-macosx$(ARCH)-gnu.a ; \
 	ln -sf libgc-macosx$(ARCH)-gnu.a libgc$(ARCH)-gnu.a
 
 # end of makefile

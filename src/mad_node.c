@@ -307,6 +307,13 @@ node_value(char* par)
 {
   double value;
   char lpar[NAME_L];
+  
+  if (current_node == 0x0)
+   {
+     warning("node_value","current_node pointer in NULL. Sequence not set?");
+     return 0.0;
+   }
+  
   mycpy(lpar, par);
   if (strcmp(lpar, "l") == 0) value = current_node->length;
 /*  else if (strcmp(lpar, "dipole_bv") == 0) value = current_node->dipole_bv;*/

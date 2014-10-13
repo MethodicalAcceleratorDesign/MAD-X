@@ -19,38 +19,25 @@ can be specified.
 SURVEY, \=SEQUENCE=string, FILE= string, \\
         \>X0=real, Y0=real, Z0=real, \\
         \>THETA0=real, PHI0=real, PSI0=real;}
-%        \>FILE=string, TABLE=string, SEQUENCE=string;
 
-The command has the following attributes:
-%% \begin{madlist}
-%%    \ttitem{X0} The initial X coordinate [m]. 
-%%    \ttitem{Y0} The initial Y coordinate [m]. 
-%%    \ttitem{Z0} The initial Z coordinate [m]. 
-%%    \ttitem{THETA0} The initial angle theta [rad]. 
-%%    \ttitem{PHI0} The initial angle phi [rad]. 
-%%    \ttitem{PSI0} The initial angle psi [rad]. 
-%% \end{madlist}
+The {\tt SURVEY} command has the following attributes:
 \begin{madlist}
-  \ttitem{SEQUENCE}   name of sequence to be surveyed. By default the
-  last sequence expanded with the \texttt{USE} command will be surveyed.  
-  \ttitem{FILE}   name of external file to which the results are
+  \ttitem{SEQUENCE} the name of sequence to be surveyed. By default the
+  last sequence expanded with the {\tt USE} command will be surveyed.  
+  \ttitem{FILE}  the name of external file to which the results are
   written.\\ (Default:~survey)
-  \ttitem{X0, Y0, Z0} initial horizontal, vertical and longitudinal
-  coordinates.\\ (Default: 0.0, 0.0, 0.0) 
-  \ttitem{THETA0, PHI0, PSI0} initial horizontal and vertical angles and
-  transverse tilt.\\ (Default: 0.0, 0.0, 0.0)
-  %% \ttitem{TABLE}   name of internal table containing survey
-  %% results.\\ (Default: survey) \\
-  %% {\bf NOTE: this parameter is ignored and default value 'survey' is always used.}
+  \ttitem{X0, Y0, Z0} the initial horizontal, vertical and longitudinal
+  coordinates in meters.\\ (Default: 0.0, 0.0, 0.0) 
+  \ttitem{THETA0, PHI0, PSI0} the initial horizontal and vertical angles
+  and transverse tilt in radians.\\ (Default: 0.0, 0.0, 0.0)
 \end{madlist}
 
+The computation results are written on the internal table named
+"survey". Results can also be written on an external file. Each line
+contains the global coordinates of an element taken at the end of the
+element.
 
-The computation results are written on the internal
-table with name "survey". Results can also be written on an external
-file. Each line contains the global coordinates of an element taken at
-the end of the element.  
-
-{\bf Example : average LHC ring with CERN coordinates.}
+{\bf Example:} average LHC ring with CERN coordinates.
 \madxmp{
 REAL CONST R0 = 1.0; ! to obtain the average ring \\
 USE, SEQUENCE=lhcb1;\\
@@ -61,10 +48,10 @@ SURVEY, \=X0=-2202.21027, Y0=2359.00656, Z0=2710.63882,  \\
 
 
 {\bf WARNING :}\\
-In the case a machine geometry is constructed with thick
-lenses, the circumference will change if the structure is converted into
-thin lenses (via the \href{../makethin/makethin.html}{makethin}
-command). This is an unavoidable feature. ONLY the structure with thick
+In the case a machine geometry is constructed with thick lenses, the
+circumference changes when the structure is converted into thin lenses
+via the \hyperref[chap:makethin]{\tt MAKETHIN} command. This is an
+unavoidable feature of {\tt MAKETHIN}. ONLY the structure with thick
 lenses must be used for practical purposes.
 
 

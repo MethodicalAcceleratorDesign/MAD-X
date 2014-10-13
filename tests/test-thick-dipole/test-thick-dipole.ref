@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.01  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.04.25      +
-  + Execution Time Stamp: 23.06.14 16.47.25 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.02  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.07.04               +
+  + Execution date: 2014.10.13 16:36:05      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 option, -debug, -echo;
 
 makethin: style chosen : teapot
@@ -29,9 +29,9 @@ update is on
              1e-06                  0                  0              -0.01 
              1e-06                  0                  0                  0 
              1e-06                  0                  0               0.01 
-             1e-06                  0   -1.700472365e-08              -0.01 
+             1e-06                  0    1.666826851e-06              -0.01 
              1e-06                  0                  0                  0 
-             1e-06                  0   -1.633794451e-08               0.01 
+             1e-06                  0   -1.666823185e-06               0.01 
 
                  s                  e 
                  0                  0 
@@ -48,5 +48,5 @@ exit TRACK module
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.01 (64 bit) finished normally +
+  + MAD-X 5.02.02 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

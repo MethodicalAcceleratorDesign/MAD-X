@@ -5,7 +5,7 @@ title, "thick-dipole tracking test";
 lmb := 10.;
 amb := 0.010;
 
-mb1: sbend, l:=lmb, angle:=amb;
+mb1: sbend, l:=lmb, angle:=amb,kill_ent_fringe=false, kill_exi_fringe=false;
 
 myseq: sequence, l=lmb;
 mb1, at:= lmb/2;

@@ -1,7 +1,7 @@
 %!PS-Adobe-2.0
 %%Title: madx.ps
 %%Creator: gx11 version  1.50
-%%CreationDate: 14/05/07 12:20
+%%CreationDate: 14/10/08 12:20
 %%Orientation: Landscape
 %%BoundingBox:  17  30 573 790
 %%Pages: (atend)
@@ -215,11 +215,11 @@ black  384  825 t    90 r
 (leir)
 show   -90 r  -384  -825 t
 /xs 0 def
-(MAD-X 5.02.01  07/05/14 12.20.58)
+(MAD-X 5.02.02  08/10/14 12.20.57)
 /Times-Italic    77 stwn
 black  384 2878 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     77 sf 0 0 m
-(MAD-X 5.02.01  07/05/14 12.20.58)
+(MAD-X 5.02.02  08/10/14 12.20.57)
 show xs 0 t 0 0 m   -90 r  -384 -2878 t
  3.750 setlinewidth [] 0 sd                 
 black n  1953   825 m  405  825 l
@@ -2312,11 +2312,11 @@ black  384  825 t    90 r
 (sample plot)
 show   -90 r  -384  -825 t
 /xs 0 def
-(MAD-X 5.02.01  07/05/14 12.20.58)
+(MAD-X 5.02.02  08/10/14 12.20.57)
 /Times-Italic    77 stwn
 black  384 2878 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     77 sf 0 0 m
-(MAD-X 5.02.01  07/05/14 12.20.58)
+(MAD-X 5.02.02  08/10/14 12.20.57)
 show xs 0 t 0 0 m   -90 r  -384 -2878 t
  3.750 setlinewidth [] 0 sd                 
 black n  1953   825 m  405  825 l
@@ -4409,11 +4409,11 @@ black  384  825 t    90 r
 (two variables)
 show   -90 r  -384  -825 t
 /xs 0 def
-(MAD-X 5.02.01  07/05/14 12.20.58)
+(MAD-X 5.02.02  08/10/14 12.20.57)
 /Times-Italic    77 stwn
 black  384 2878 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     77 sf 0 0 m
-(MAD-X 5.02.01  07/05/14 12.20.58)
+(MAD-X 5.02.02  08/10/14 12.20.57)
 show xs 0 t 0 0 m   -90 r  -384 -2878 t
  3.750 setlinewidth [] 0 sd                 
 black n  1953   825 m  405  825 l
@@ -6606,11 +6606,11 @@ black  384  825 t    90 r
 (two variables with range)
 show   -90 r  -384  -825 t
 /xs 0 def
-(MAD-X 5.02.01  07/05/14 12.20.58)
+(MAD-X 5.02.02  08/10/14 12.20.57)
 /Times-Italic    77 stwn
 black  384 2835 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     77 sf 0 0 m
-(MAD-X 5.02.01  07/05/14 12.20.58)
+(MAD-X 5.02.02  08/10/14 12.20.57)
 show xs 0 t 0 0 m   -90 r  -384 -2835 t
  3.750 setlinewidth [] 0 sd                 
 black n  1953   825 m  405  825 l
@@ -8454,11 +8454,11 @@ black  384  825 t    90 r
 (two variables on vaxis2)
 show   -90 r  -384  -825 t
 /xs 0 def
-(MAD-X 5.02.01  07/05/14 12.20.58)
+(MAD-X 5.02.02  08/10/14 12.20.57)
 /Times-Italic    77 stwn
 black  384 2878 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     77 sf 0 0 m
-(MAD-X 5.02.01  07/05/14 12.20.58)
+(MAD-X 5.02.02  08/10/14 12.20.57)
 show xs 0 t 0 0 m   -90 r  -384 -2878 t
  3.750 setlinewidth [] 0 sd                 
 black n  1953   825 m  405  825 l
@@ -17852,11 +17852,11 @@ black  192  886 t    90 r
 (non-s horizontal axis)
 show   -90 r  -192  -886 t
 /xs 0 def
-(MAD-X 5.02.01  07/05/14 12.20.59)
+(MAD-X 5.02.02  08/10/14 12.20.58)
 /Times-Italic    85 stwn
 black  192 2864 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     85 sf 0 0 m
-(MAD-X 5.02.01  07/05/14 12.20.59)
+(MAD-X 5.02.02  08/10/14 12.20.58)
 show xs 0 t 0 0 m   -90 r  -192 -2864 t
  3.750 setlinewidth [] 0 sd                 
 black n  1936   886 m  215  886 l
@@ -18518,122 +18518,106 @@ black  428  764 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     87 sf 0 0 m
 (80.)
 show xs 0 t 0 0 m   -90 r  -428  -764 t
-black 1771  445 t   180 r
+black 1667  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 (s)
-show  -180 r -1771  -445 t
-black 1739  445 t   180 r
+show  -180 r -1667  -445 t
+black 1635  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 ()
-show  -180 r -1739  -445 t
-black 1709  445 t   180 r
+show  -180 r -1635  -445 t
+black 1605  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 (\()
-show  -180 r -1709  -445 t
-black 1682  445 t   180 r
+show  -180 r -1605  -445 t
+black 1579  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 (m)
-show  -180 r -1682  -445 t
-black 1626  445 t   180 r
+show  -180 r -1579  -445 t
+black 1522  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 (\))
-show  -180 r -1626  -445 t
-black 1600  445 t   180 r
+show  -180 r -1522  -445 t
+black 1496  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 (,)
-show  -180 r -1600  -445 t
-black 1581  445 t   180 r
+show  -180 r -1496  -445 t
+black 1477  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 ()
-show  -180 r -1581  -445 t
-black 1551  445 t   180 r
+show  -180 r -1477  -445 t
+black 1447  445 t   180 r
 /Symbol fft     75 sf 0 0 m
 (b)
-show  -180 r -1551  -445 t
-black 1515  445 t   180 r
+show  -180 r -1447  -445 t
+black 1411  445 t   180 r
 /Times-Italic fft     38 sf 0 0 m
 (x)
-show  -180 r -1515  -445 t
-black 1499  445 t   180 r
+show  -180 r -1411  -445 t
+black 1395  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 ()
-show  -180 r -1499  -445 t
-black 1469  445 t   180 r
+show  -180 r -1395  -445 t
+black 1365  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 (\()
-show  -180 r -1469  -445 t
-black 1442  445 t   180 r
+show  -180 r -1365  -445 t
+black 1339  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 (m)
-show  -180 r -1442  -445 t
-black 1386  445 t   180 r
+show  -180 r -1339  -445 t
+black 1282  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 (\))
-show  -180 r -1386  -445 t
-black 1359  445 t   180 r
+show  -180 r -1282  -445 t
+black 1256  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 (,)
-show  -180 r -1359  -445 t
-black 1341  445 t   180 r
+show  -180 r -1256  -445 t
+black 1237  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 ()
-show  -180 r -1341  -445 t
-black 1310  445 t   180 r
+show  -180 r -1237  -445 t
+black 1207  445 t   180 r
 /Symbol fft     75 sf 0 0 m
 (b)
-show  -180 r -1310  -445 t
-black 1275  445 t   180 r
+show  -180 r -1207  -445 t
+black 1171  445 t   180 r
 /Times-Italic fft     38 sf 0 0 m
 (y)
-show  -180 r -1275  -445 t
-black 1260  445 t   180 r
+show  -180 r -1171  -445 t
+black 1156  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 ()
-show  -180 r -1260  -445 t
-black 1229  445 t   180 r
+show  -180 r -1156  -445 t
+black 1126  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 (\()
-show  -180 r -1229  -445 t
-black 1203  445 t   180 r
+show  -180 r -1126  -445 t
+black 1100  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 (m)
-show  -180 r -1203  -445 t
-black 1147  445 t   180 r
+show  -180 r -1100  -445 t
+black 1043  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 (\))
-show  -180 r -1147  -445 t
-black 1120  445 t   180 r
+show  -180 r -1043  -445 t
+black 1017  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 (,)
-show  -180 r -1120  -445 t
-black 1101  445 t   180 r
+show  -180 r -1017  -445 t
+black  998  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 ()
-show  -180 r -1101  -445 t
-black 1071  445 t   180 r
+show  -180 r  -998  -445 t
+black  968  445 t   180 r
 /Symbol fft     75 sf 0 0 m
 (a)
-show  -180 r -1071  -445 t
-black 1032  445 t   180 r
+show  -180 r  -968  -445 t
+black  928  445 t   180 r
 /Times-Italic fft     38 sf 0 0 m
 (x)
-show  -180 r -1032  -445 t
-black 1016  445 t   180 r
-/Times-Italic fft     77 sf 0 0 m
-(,)
-show  -180 r -1016  -445 t
-black  997  445 t   180 r
-/Times-Italic fft     77 sf 0 0 m
-()
-show  -180 r  -997  -445 t
-black  967  445 t   180 r
-/Symbol fft     75 sf 0 0 m
-(a)
-show  -180 r  -967  -445 t
-black  927  445 t   180 r
-/Times-Italic fft     38 sf 0 0 m
-(y)
-show  -180 r  -927  -445 t
+show  -180 r  -928  -445 t
 black  912  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 (,)
@@ -18644,64 +18628,64 @@ black  893  445 t   180 r
 show  -180 r  -893  -445 t
 black  863  445 t   180 r
 /Symbol fft     75 sf 0 0 m
-(m)
+(a)
 show  -180 r  -863  -445 t
 black  824  445 t   180 r
 /Times-Italic fft     38 sf 0 0 m
-(x)
+(y)
 show  -180 r  -824  -445 t
-black  808  445 t   180 r
-/Times-Italic fft     77 sf 0 0 m
-()
-show  -180 r  -808  -445 t
-black  777  445 t   180 r
-/Times-Italic fft     77 sf 0 0 m
-(\()
-show  -180 r  -777  -445 t
-black  751  445 t   180 r
-/Times-Italic fft     77 sf 0 0 m
-(r)
-show  -180 r  -751  -445 t
-black  727  445 t   180 r
-/Times-Italic fft     77 sf 0 0 m
-(a)
-show  -180 r  -727  -445 t
-black  691  445 t   180 r
-/Times-Italic fft     77 sf 0 0 m
-(d)
-show  -180 r  -691  -445 t
-black  655  445 t   180 r
-/Times-Italic fft     77 sf 0 0 m
-(/)
-show  -180 r  -655  -445 t
-black  614  445 t   180 r
-/Times-Italic fft     77 sf 0 0 m
-(2)
-show  -180 r  -614  -445 t
-black  576  445 t   180 r
-/Symbol fft     75 sf 0 0 m
-(p)
-show  -180 r  -576  -445 t
-black  535  445 t   180 r
-/Times-Italic fft     77 sf 0 0 m
-(\))
-show  -180 r  -535  -445 t
-black  508  445 t   180 r
+black  809  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 (,)
-show  -180 r  -508  -445 t
-black  489  445 t   180 r
+show  -180 r  -809  -445 t
+black  790  445 t   180 r
 /Times-Italic fft     77 sf 0 0 m
 ()
-show  -180 r  -489  -445 t
-black  459  445 t   180 r
+show  -180 r  -790  -445 t
+black  760  445 t   180 r
 /Symbol fft     75 sf 0 0 m
 (m)
-show  -180 r  -459  -445 t
-black  420  445 t   180 r
+show  -180 r  -760  -445 t
+black  720  445 t   180 r
 /Times-Italic fft     38 sf 0 0 m
-(y)
-show  -180 r  -420  -445 t
+(x)
+show  -180 r  -720  -445 t
+black  704  445 t   180 r
+/Times-Italic fft     77 sf 0 0 m
+()
+show  -180 r  -704  -445 t
+black  674  445 t   180 r
+/Times-Italic fft     77 sf 0 0 m
+(\()
+show  -180 r  -674  -445 t
+black  648  445 t   180 r
+/Times-Italic fft     77 sf 0 0 m
+(r)
+show  -180 r  -648  -445 t
+black  623  445 t   180 r
+/Times-Italic fft     77 sf 0 0 m
+(a)
+show  -180 r  -623  -445 t
+black  587  445 t   180 r
+/Times-Italic fft     77 sf 0 0 m
+(d)
+show  -180 r  -587  -445 t
+black  551  445 t   180 r
+/Times-Italic fft     77 sf 0 0 m
+(/)
+show  -180 r  -551  -445 t
+black  510  445 t   180 r
+/Times-Italic fft     77 sf 0 0 m
+(2)
+show  -180 r  -510  -445 t
+black  472  445 t   180 r
+/Symbol fft     75 sf 0 0 m
+(p)
+show  -180 r  -472  -445 t
+black  431  445 t   180 r
+/Times-Italic fft     77 sf 0 0 m
+(\))
+show  -180 r  -431  -445 t
  3.750 setlinewidth [] 0 sd                 
 black n  1953  2878 m   405  2878 l
 col-1 s                                 
@@ -23386,11 +23370,11 @@ black  384  825 t    90 r
 (overflow in number of variables to be plotted)
 show   -90 r  -384  -825 t
 /xs 0 def
-(MAD-X 5.02.01  07/05/14 12.20.59)
+(MAD-X 5.02.02  08/10/14 12.20.58)
 /Times-Italic    77 stwn
 black  384 2368 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     77 sf 0 0 m
-(MAD-X 5.02.01  07/05/14 12.20.59)
+(MAD-X 5.02.02  08/10/14 12.20.58)
 show xs 0 t 0 0 m   -90 r  -384 -2368 t
  3.750 setlinewidth [] 0 sd                 
 black n  1953   825 m  405  825 l

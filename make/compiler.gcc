@@ -39,7 +39,7 @@ CFLAGS = -m$(ARCH) -O$(NOPT) -std=c99 -Wall -W -Wextra -pedantic -c
 #
 
 ifeq ($(DEBUG),yes)
-CFLAGS += -g -ggdb
+CFLAGS += -g -ggdb 
 endif
 
 ifeq ($(PROFILE),yes)
@@ -52,6 +52,10 @@ endif
 
 ifeq ($(OPENMP),yes)
 CFLAGS += -fopenmp
+endif
+
+ifeq ($(SANITIZE),yes)
+CFLAGS += -fsanitize=address -fno-omit-frame-pointer
 endif
 
 #
