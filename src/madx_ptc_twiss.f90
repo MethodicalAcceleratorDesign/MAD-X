@@ -449,6 +449,24 @@ contains
     
     endif
     
+    !############################################################################
+    !############################################################################
+    !############################################################################
+
+    slice_magnets = get_value('ptc_twiss ','slice_magnets ') .ne. 0
+    center_magnets = get_value('ptc_twiss ','center_magnets ') .ne. 0
+
+    slice = slice_magnets .or. center_magnets
+    
+    if ( slice) then
+     call make_node_layout(my_ring) 
+     call getBeamBeam()
+    endif 
+
+    !############################################################################
+    !############################################################################
+    !############################################################################
+
     
     x(:)=zero
     if(mytime) then
@@ -491,8 +509,11 @@ contains
        endif
        
        
-       !w_p = 0
-       call find_orbit(my_ring,x,1,default,c_1d_7)
+       if ( slice )  then
+         call FIND_ORBIT_x(my_ring,x,default,c_1d_7)
+       else
+         call find_orbit(my_ring,x,1,default,c_1d_7)
+       endif
        
        if ( .not. check_stable) then
           write(whymsg,*) 'DA got unstable during closed orbit search: PTC msg: ',messagelost(:len_trim(messagelost))
@@ -561,19 +582,6 @@ contains
     theTransferMap = X
 
 
-    !############################################################################
-    !############################################################################
-    !############################################################################
-
-    slice_magnets = get_value('ptc_twiss ','slice_magnets ') .ne. 0
-    center_magnets = get_value('ptc_twiss ','center_magnets ') .ne. 0
-
-    slice = slice_magnets .or. center_magnets
-    
-    if ( slice) then
-     call make_node_layout(my_ring) 
-     call getBeamBeam()
-    endif 
 
     !############################################################################
     !############################################################################
