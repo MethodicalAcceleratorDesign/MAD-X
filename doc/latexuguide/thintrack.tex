@@ -28,18 +28,18 @@ implemented into \madx.
 
 
 The first part of this design decision is the thin-lens tracking module
-(\texttt{\href{../thintrack/thintrack.html}{thintrack}})  which tracks
+(\href{../thintrack/thintrack.html}{\tt thintrack})  which tracks
 symplecticly through drifts and kicks and by replacing the end effects
 by their symplectic part in form of an additional kick on either  end of
 the element. This method demands a preliminary conversion of a sequence
 with thick elements into one composed of thin elements (see the
-\texttt{\href{../makethin/makethin.html}{MAKETHIN}} command). The
+\hyperref[chap:makethin]{\tt MAKETHIN} command). The
 details of its usage are given on the page
 "\href{../thintrack/thintrack.html}{thintrack}". 
 
 
 The second part of this design decision is to produce a thick lens
-tracking module based on the PTC code of E.~Forest that
+tracking module based on the \ptc code of E.~Forest that
 allows a symplectic treatment of all accelerator elements giving the
 user full control over the precision (number of steps and integration
 type) and exactness (full or extended Hamiltonian) of the results. 
@@ -168,9 +168,9 @@ Plotting of particle coordinates or other data in these tables is
 possible in \madx. Plotting can also be done with external programs by
 using the files created by \texttt{TRACK}.  
 
-{\bf See Also:}\\
-\href{../Introduction/aperture.html}{\texttt{APERTURE}}, 
-\href{../makethin/makethin.html}{\texttt{MAKETHIN}}
+%{\bf See Also:}\\
+%\href{../Introduction/aperture.html}{\texttt{APERTURE}}, 
+%\href{../makethin/makethin.html}{\texttt{MAKETHIN}}
 
 
 
@@ -231,7 +231,7 @@ The attributes of the TRACK command are:
   is used to check whether the particle is lost or not. For further
   information on the definition of apertures and different aperture
   types, see the documentation of the
-  \href{../Introduction/aperture.html}{\texttt{APERTURE}} module. \\  
+  \hyperref[chap:aperture]{\tt APERTURE} module. \\  
   Note that if no aperture information was specified for an element, 
   the following procedure still takes place:
   \\
@@ -284,7 +284,8 @@ The attributes of the TRACK command are:
   updated at each turn during tracking.     
   \ttitem{tr\$macro}  this special macro can be
     user-defined and is executed/updated at each turn, during tracking, e.g. \\
-    'tr\$macro(turn): macro=\{commands depending on turnnumber;\};' \\ 
+    {\tt tr\$macro(turn): macro=\{commands depending on turnnumber;\};} 
+    \\ 
     A macro structure is necessary to provide for table access.
   \end{madlist}
 
@@ -463,15 +464,17 @@ Many such companion particle-pairs can be tracked at the same time,
 which speeds up the calculation. 
 
 The \textit{smear} is 
-defined as  \textit{2.0 (wxy$_{max}$ - wxy$_{min}$) / (wxy$_{max}$ + wxy
-  $_{min}$)}, where the \textit{wxy$_{min,max}$} refer to the  miminum and
+defined as  
+$2 \times (\ wxy_{max} - wxy_{min}\ ) / (\ wxy_{max} + wxy_{min}\ )$,
+where the $wxy_{min,max}$ refer to the  minimum and
 maximum values of the sum of the transverse betatron invariants
-\textit{wx+wy} during the tracking. 
+$wx+wy$ during the tracking. 
 
-The tunes are computed by using an FFT and either formula (18) or formula (25) of CERN SL/95-84 (AP),
-depending on whether the number of turns is less-equal or larger than 64. 
+The tunes are computed by using an FFT and formula (18) in reference 
+\cite{bartolini1995} if the number of turns is 64 or less, or formula (25) in 
+the same reference if the number of turns is strictly larger than 64.
  
-\texttt{DYNAP} has the following attributes: 
+{\tt DYNAP} has the following attributes: 
 \begin{madlist}
    \ttitem{TURNS} the number of turns to be tracked (Default:~64,
    present maximum:~1024). 
@@ -480,12 +483,12 @@ depending on whether the number of turns is less-equal or larger than 64.
  
    \ttitem{MAXAPER} a vector of 6 real numbers defining the maximum
    aperture beyond which the particle is considered to be lost.\\
-   (Default: \{0.1, 0.01, 0.1, 0.01, 1.0, 0.1\} \\
+   (Default: \{0.1, 0.01, 0.1, 0.01, 1.0, 0.1\}
      
    \ttitem{LYAPUNOV} the initial distance which is added to the
    \textit{x} coordinate of the companion particle of every particle
    declared with \texttt{START} commands. (Default:~1.e-7~m)
-     
+   
    \ttitem{ORBIT} A logical flag. If set, the flag \textit{orbit} 
    is true during the tracking and its initialization
    (default: true).
@@ -507,7 +510,7 @@ depending on whether the number of turns is less-equal or larger than 64.
 %% \end{verbatim}
 
 The first command defines the beam parameters. It is  essential that the
-longitudinal emittance \textit{ET} is set. The command \textit{use}
+longitudinal emittance {\tt ET} is set. The command \textit{use}
 selects the beam line or sequence. The \textit{track} activates the
 tracking module, \textit{start } enters the starting coordinates (more
 than one particle can be defined),  \textit{dynap} finally tracks two
@@ -515,7 +518,7 @@ nearby particles  with an initial distance \textit{lyapunov}  for each
 \textit{start} definition over \textit{ turns } revolutions, and
 \textit{endtrack} terminates the execution of the tracking module. 
 
-The results are stored in the \textit{DYNAP} and \textit{DYNAPTUNE}
+The results are stored in the {\tt DYNAP} and {\tt DYNAPTUNE}
 tables, and can be obtained by the two commands  
  
 \madxmp{
@@ -527,8 +530,8 @@ VALUE, \>TABLE(dynaptune,tunx), \\
 
 More generally, all results can be printed to a file, using the commands 
 \madxmp{
-WRITE, TABLE=dynap, file; \\
-WRITE, TABLE=dynaptune, file;
+WRITE, TABLE=dynap, FILE; \\
+WRITE, TABLE=dynaptune, FILE;
 }
 The output file 'lyapunov.data' lists the turn number and phase distance
 between the  two Lyapunov partners, respectively, allowing for visual

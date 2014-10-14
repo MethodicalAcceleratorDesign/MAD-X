@@ -173,7 +173,7 @@ results in a fatal error.
 
 %\input{Introduction/name}
 \section{Name or String Attributes}
-\label{sec:name}
+\label{sec:name}\label{sec:string}
 A name or string attribute often selects one of a set of options: 
 \madxmp{
 xxxxxxxxxxxxxxxxxxxx\= \kill
@@ -192,9 +192,11 @@ TITLE, "LHC version 6.2";
 }
 
 The case of letters is only significant if a string is enclosed in
-quotes, otherwise all characters are converted to lower at reading. On
-the other hand, strings that do not contain blanks do not need to be
-enclosed in quotes. 
+quotes, otherwise all characters are converted to lowercase at
+reading. 
+
+On the other hand, strings that do not contain blanks do not
+need to be enclosed in quotes.
 
 Example:
 \madxmp{
@@ -208,8 +210,8 @@ In the first three cases, \madx will try to read a file named my.file, in the
 last two it will try to read the file named MY.FILE.  
 
 
-\section{String Attributes}
-\label{sec:string}
+%\section{String Attributes}
+
 A string attribute makes alphanumeric information available, e.g. a
 title or a file name. It can contain any characters, enclosed in single
 (') or double (") quotes, except for quotes of the type used as its
@@ -330,8 +332,7 @@ An expression can be formed using the following operators:
 
 in the above cases, "x" can be any expression, i.e. contain other
 functions, variable or constant expressions. To initialize the \madx
-random generator use the
-\href{../error/error_option.html#EOPTION}{Eoption command}.  
+random generator use the \hyperref[sec:eoption]{\tt EOPTION} command.
 
 \subsubsection{Table Access Functions}
 \label{subsubsec:table}
@@ -379,8 +380,8 @@ There is a second option of this function with 3 entries
 \end{itemize}
 
 Note that "N\_row" has to be a number and not a  variable. However, the
-\href{../control/special.html#macro}{Macro facility} in \madx  allows
-one to use a variable instead.   
+\hyperref[sec:macro]{Macro} facility in \madx allows
+the use of a variable instead.   
 
 A typical example could look like this, in fact the square root of betx
 (user defined variable myvar) is added to the twiss table:  
@@ -402,37 +403,13 @@ Use macro in loop:
 i = 0;
 incval = 0;
 while (i < 100) {
-value,i;
-exec,mycrap(twiss,k1l,$i);
-incval = incval + myval;
-value,i,myval,incval;                
-i = i + 1;
+  value, i;
+  exec, mycrap(twiss,k1l,$i);
+  incval = incval + myval;
+  value, i, myval, incval;                
+  i = i + 1;
 }
 \end{verbatim}
-
-\subsubsection{Features as of Version 3\_03\_50}
-
-\begin{itemize}
-  \item  FILL, TABLE=t, ROW=n; \\
-    fill a table row with the present variable values. If ROW is
-    negative or missing a new row is created. If ROW is greater than the
-    number of rows, the last row is selected without creating a new row.  
-
-  \item SETVARS, TABLE=t, ROW=n; \\
-    set variables according to the column names of the given table and
-    the values of the given row. if ROW is negative, missing or greater
-    than the number of rows, the last row is selected. 
-\end{itemize}
-
-An example can be found at:
-\href{http://cern.ch/frs/mad-X_examples/special_features}{Special
-  Features} 
-
-The length of a table can be determined by using the attribute
-"tablelength" via table("your\_table\_name", tablelength). This is
-useful when creating a table from existing ones. See an example at:
-\href{../Introduction/select.html#screate}{user table II} 
-
 
 \subsection{Operands in Arithmetic Expressions}
 \label{subsec:operand}
