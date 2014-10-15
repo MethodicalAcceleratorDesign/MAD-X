@@ -183,7 +183,7 @@ The following lines are adjusting the pole faces of a "false" \L{rbend} into a t
     e2 = e2 + an / 2
   endif
 \end{lstlisting}
-{\em AL:} I guess the following \L{dh} is how much the curvature change for a particle with momentum difference \L{deltap} is w.r.t. the nominal value. The first branch of this \L{if} takes into account the field errors too.
+{\em AL:} I guess the following \L{dh} is how much the curvature change is for a particle with momentum difference \L{deltap}, w.r.t. the nominal value. The first branch of this \L{if} takes into account the field errors too.
 \begin{lstlisting}[firstnumber=last]
   !---- Apply field errors and change coefficients using DELTAP.
   if (n_ferr .gt. 0) then
@@ -250,7 +250,7 @@ It stores the element's \textit{kick}, \textit{transfer matrix}, and \textit{ten
 \begin{lstlisting}[firstnumber=last]
         call tmsect(.true.,el0,h,dh,sk1,sk2,ek,re,te)
 \end{lstlisting}
-It stores the $R$ and $T$ for the fringing field in \L{rw} and \L{tw} respectively; then it concatenates the transport maps in such that the fringe fields precede the half-bending magnet. The resulting transport map is stored in   \L{ek},  \L{re}, and \L{te}:
+It stores the $R$ and $T$ for the fringing field in \L{rw} and \L{tw} respectively; then it concatenates the transport maps in such a way that the fringe fields precede the half-bending magnet. The resulting transport map is stored in   \L{ek},  \L{re}, and \L{te}:
 \begin{lstlisting}[firstnumber=last]
         !---- Fringe fields.
         corr = (h + h) * hgap * fint
@@ -270,8 +270,14 @@ If the flag \L{ftrk} is set, tracks the orbit through such a halved bend then ze
         !---- Track orbit.
         call dcopy(orbit,orbit0,6)
         if (ftrk) call tmtrak(ek,re,te,orbit0,orbit0)
+\end{lstlisting}
+then it tracks the (coupled) optics functions (depending on the option)
+\begin{lstlisting}[firstnumber=last]
         if(centre_cptk) call twcptk(re,orbit0)
         if(centre_bttk) call twbttk(re,te)
+\end{lstlisting}
+and eventually undoes all the last operations, in order to continue with ``normal'' tracking through the end of the element:
+\begin{lstlisting}[firstnumber=last]
         call dcopy(orbit00,orbit,6)
         call dcopy(ek00,ek,6)
         call dcopy(re00,re,36)
@@ -282,8 +288,7 @@ If the flag \L{ftrk} is set, tracks the orbit through such a halved bend then ze
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{Body of the dipole}
-  It fills  \L{ek},  \L{re}, and \L{te} with kick, matrix and tensor for the sector bend. Then fills  \L{rw}, and \L{tw} with the fringing fields and combines the maps such that the body of the bend is sandwiched between the two fringing fields. Notice that if the option ``centre'' is selected, the initial fringing field has  already been applied, thing which not seems to be correct.  
-   \begin{lstlisting}[firstnumber=last]
+  It fills  \L{ek},  \L{re}, and \L{te} with kick, matrix and tensor for the sector bend. Then fills  \L{rw}, and \L{tw} with the fringing fields and combines the maps such that the body of the bend is sandwiched between the two fringing fields.    \begin{lstlisting}[firstnumber=last]
      call tmsect(.true.,el,h,dh,sk1,sk2,ek,re,te)
 
      !---- Fringe fields.
