@@ -550,7 +550,7 @@ subroutine sufill(suml, v, theta, phi, psi, globaltilt)
   else if(code.eq.8.or.code.eq.43) then ! (rf)multipoles (LD 2014.10.15)
      normal(0)=0d0
      skew(0)=0d0
-     angle=0d0
+     ang=0d0
      call get_node_vector('knl ',nn,normal)
      call get_node_vector('ksl ',ns,skew) ! process ks0l (LD 2014.10.15)
      if (nn.ne.0 .or. ns.ne.0) then
