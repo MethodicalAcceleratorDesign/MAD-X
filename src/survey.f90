@@ -285,7 +285,7 @@ subroutine suelem(el, ve, we,tilt)
   ! Modified: 28-DEC-1998, T. Raubenheimer (SLAC)                        *
   !   Added LCAVITY element at ISP 27                                    *
   !----------------------------------------------------------------------*
-  integer code,nn
+  integer code,nn,ns
   double precision angle,cospsi,costhe,ds,dx,sinpsi,sinthe,tilt,    &
        ve(3),we(3,3),node_value,el,normal(0:maxmul),skew(0:maxmul)       &
        ,zero,one
@@ -296,6 +296,7 @@ subroutine suelem(el, ve, we,tilt)
   code = node_value('mad8_type ')
   if(code.eq.39) code=15
   if(code.eq.38) code=24
+  if(code.eq.43) code=8 ! rfmultipoles->multipoles (LD 2014.10.15)
   go to ( 10,  20,  20,  40,  50,  60,  70,  80,  90, 100,          &
        110, 120, 130, 140, 150, 160, 170, 180, 190, 200,                 &
        210, 220, 230, 240, 250,  20, 270, 280, 290, 300,                 &
@@ -391,19 +392,29 @@ subroutine suelem(el, ve, we,tilt)
   go to 500
   !****** end of straight elements ***************
 
-  !---- multipoles , introduced  17.09.02 / AV
-80 continue
-  call dzero(normal,maxmul+1)
-  call dzero(skew,maxmul+1)
-  call get_node_vector('knl ',nn,normal)
+  !---- (rf)multipoles , introduced  17.09.02 / AV, extended LD 2014.10.15
+  !---- waste of CPU cycles removed
+80  continue
+  normal(0)=0d0
+  skew(0)=0d0
+  angle=0d0
+  tilt=0d0
+
   !-----  dipole_bv introduced to suppress SU in MADX input (AV  7.10.02)
   !      angle = normal(0)*node_value('dipole_bv ')
-  angle = normal(0)*node_value('other_bv ')
-  if (abs(angle) .lt. 1d-13) then
-     tilt = zero
-  else
-     tilt =  node_value('tilt ')
+
+  call get_node_vector('knl ', nn, normal)
+  call get_node_vector('ksl ', ns, skew)
+
+  ! ks0l processing added (LD 15.10.2014)
+  if (nn.ne.0 .or. ns.ne.0) then
+    angle = sqrt(normal(0)**2+skew(0)**2)*node_value('other_bv ')
   endif
+
+  if (abs(angle) .gt. 1d-13) then
+    tilt = node_value('tilt ')-atan2(skew(0),normal(0))
+  endif
+
   ! As el=0, there is no dx and no ds
   dx = zero
   ds = zero
@@ -502,9 +513,9 @@ subroutine sufill(suml, v, theta, phi, psi, globaltilt)
   !   V(3)     (real)    Coordinate at the end of the element            *
   ! theta, phi, psi(real) : the survey angles                            *
   !----------------------------------------------------------------------*
-  integer code,nn, i
+  integer code,nn,ns,i
   double precision ang,el,v(3),theta,phi,psi,node_value,suml,       &
-       normal(0:maxmul),globaltilt,tmp, surv_vect(7)
+       normal(0:maxmul),skew(0:maxmul),globaltilt,tmp, surv_vect(7)
 
   el = node_value('l ')
   call string_to_table_curr('survey ', 'name ', 'name ')
@@ -536,12 +547,14 @@ subroutine sufill(suml, v, theta, phi, psi, globaltilt)
   if(code.eq.38) code=24
   if(code.eq.2.or.code.eq.3) then
      ang = node_value('angle ')*node_value('other_bv ')
-  else if(code.eq.8) then
+  else if(code.eq.8.or.code.eq.43) then ! (rf)multipoles (LD 2014.10.15)
+     normal(0)=0d0
+     skew(0)=0d0
+     angle=0d0
      call get_node_vector('knl ',nn,normal)
-     if (nn .ne. 0) then
-        ang = normal(0)
-     else
-        ang = 0d0
+     call get_node_vector('ksl ',ns,skew) ! process ks0l (LD 2014.10.15)
+     if (nn.ne.0 .or. ns.ne.0) then
+       ang = sqrt(normal(0)**2+skew(0)**2)*node_value('other_bv ')
      endif
   else
      ang = 0d0
