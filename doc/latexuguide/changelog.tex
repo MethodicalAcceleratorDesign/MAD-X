@@ -34,6 +34,18 @@ The changes are indexed by the SVN release number.
   parameter a row number equal to the current number of rows in the
   table plus one, with the effect of creating a new row and filling it. 
 
+
+  \ttitem{r5013} 2014-Oct-14, version 5.02.03\\
+  fixed a documented feature of \hyperref[chap:survey]{\tt SURVEY} where
+  the first {\tt KSL} component of thin \hyperref[sec:multipole]{\tt
+    MULTIPOLE} elements, representing a vertical angle for a thin
+  dipole, was not taken into account. Both {\tt KNL} and {\tt KSL} are
+  now properly taken into account. Another change was to make {\tt
+    SURVEY} take into account the \hyperref[sec:rfmultipole]{\tt
+    RFMULTIPOLE} elements in the same way that it treats {\tt MULTIPOLE}
+  elements.
+  
+
 \end{madlist}
   
 

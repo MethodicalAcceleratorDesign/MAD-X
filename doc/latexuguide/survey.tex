@@ -37,6 +37,14 @@ The computation results are written on the internal table named
 contains the global coordinates of an element taken at the end of the
 element.
 
+The computation takes into account the length of each element, as well
+as the rotation angles defined for \hyperref[bend_sbend]{\tt SBEND},
+\hyperref[bend_rbend]{\tt RBEND}, thin \hyperref[sec:multipole]{\tt
+  MULTIPOLE} and thin \hyperref[sec:rfmultipole]{\tt RFMULTIPOLE}
+elements exclusively.  Rotation angles introduced via the {\tt KNL},
+{\tt KSL} mechanism for other elements are ignored by {\tt
+  SURVEY}, other \madx commands, as well as \ptc commands.
+
 {\bf Example:} average LHC ring with CERN coordinates.
 \madxmp{
 REAL CONST R0 = 1.0; ! to obtain the average ring \\
@@ -55,10 +63,11 @@ unavoidable feature of {\tt MAKETHIN}. ONLY the structure with thick
 lenses must be used for practical purposes.
 
 
-{\bf INFORMATION:}\\
-The skew dipole component of a MULTIPOLE element
-(MULTIPOLE, KSL=\{real\}) is NOT taken into account in the \texttt{SURVEY}
-calculation. You should use a tilted normal MULTIPOLE or BEND instead.
+
+%% {\bf INFORMATION:}\\
+%% The skew dipole component of a MULTIPOLE element
+%% (MULTIPOLE, KSL=\{real\}) is NOT taken into account in the \texttt{SURVEY}
+%% calculation. You should use a tilted normal MULTIPOLE or BEND instead.
 
 
 %\textit{F.Tecker, March 2006}
