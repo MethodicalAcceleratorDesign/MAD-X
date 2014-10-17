@@ -23,8 +23,7 @@ particle amplitude is either growing or decreasing.
 
 The non-symplectic tracking as in \madeight has been completely excluded
 from \madx by taking out the thick lens part from the tracking
-modules. Instead two types of tracking modules (both symplectic) are
-implemented into \madx. 
+modules. Now, three types of tracking modules (symplectic) are implemented into \madx. 
 
 
 The first part of this design decision is the thin-lens tracking module
@@ -59,6 +58,9 @@ meant for tracking particles in
 treats beam-lines containing traveling-wave cavities and includes a beam
 acceleration. 
 
+The third option is direct thick tracking using the TRACK module. Since version 5.00.02, % TO BE VERIFIED
+thick tracking has been reintroduced in MAD-X. The thick maps of quadrupole and sector-bend have bee implemented in a symplecitc manner.
+
 
 %See Also \href{../ptc_general/ptc_general.html}{PTC Set-up Parameters}
 
@@ -73,18 +75,19 @@ acceleration.
 %  Changed by: Alexander Koschik, 29-Mar-2006 
 %  Changed by: Alexander Koschik, 02-Feb-2007 
 
-\section{Overview of Thin-Lens Tracking} % Module (thintrack)}
+\section{Overview of the Thin- and Thick-Lens Tracking} % Module (thintrack)}
 \label{sec:trackoverview}
 
-The \textbf{thin-lens tracking module} of \madx performs element per
-element tracking of one or several particle trajectories in the last
+The \textbf{%thin-lens
+	tracking module} of \madx performs element-per-element tracking of one or several particle trajectories in the last
 \href{../control/general.html#use}{\texttt{use}}d sequence.  
  
 %  either for single passage (option <var class="option">onepass</var>)
 %  or for many turns (default option).  
 
-Only thin elements are allowed (apart from the element \texttt{drift}),
-which guarantees the symplecticity of the coordinate transformation. Any
+Only thin elements are allowed, with some exceptions: the element \texttt{drift}, and the elements \texttt{quadrupole} and \texttt{sbend} when the boolean flag \texttt{THICK} is set to true. The symplecticity of the coordinate transformation is guaranteed.
+
+Any
 lattice can be converted into a "thin element" lattice by invoking the
 \href{../makethin/makethin.html}{\texttt{makethin}} command. 
 
