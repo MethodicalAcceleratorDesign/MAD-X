@@ -377,8 +377,15 @@ contains
           r2 = 2.0_dp * (sx2 - sy2)
           r  = sqrt(r2)
           rk = fk * sqrt(pi) / r
-          xr = xs / r   !
-          yr = ys / r   !
+          xr = xs / r   
+          yr = ys / r   
+          if( (xr.sub.'0') < 0) then
+            xr = -xr
+          endif
+          if( (yr.sub.'0') < 0) then
+            yr = -yr
+          endif
+
           call ccperrf(xr, yr, crx, cry)
           if (tk .gt. explim) then
              phix = rk * cry
@@ -406,8 +413,15 @@ contains
 
           !       xs = x(1) - xm
           !       ys = x(3) - ym
-          xr = xs / r !abs
-          yr = ys / r !abs
+          xr = xs / r 
+          yr = ys / r 
+          if( (xr.sub.'0') < 0 ) then
+            xr = -xr
+          endif
+          if( (yr.sub.'0') < 0 ) then
+            yr = -yr
+          endif
+          
           call ccperrf(yr, xr, cry, crx)
           !       tk = (xs * xs / sx2 + ys * ys / sy2) / two
           if (tk .gt. explim) then
