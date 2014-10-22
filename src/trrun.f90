@@ -5140,7 +5140,7 @@ subroutine tttdipole(track, ktrack)
 !!$      track(6,jtrk) = track(6,jtrk) - rfac * (1d0 + track(6,jtrk)) ** 2
 !!$    endif
      
-     delta_plus_1_sqr = pt*pt+2d0*pt/bet0+1;
+     delta_plus_1_sqr = pt*pt+2d0*pt/bet0+1d0;
      delta_plus_1 = sqrt(delta_plus_1_sqr);
      
      if(.not.geometric) then
