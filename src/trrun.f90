@@ -5087,6 +5087,9 @@ subroutine tttdipole(track, ktrack)
   double precision bet0sqr
   integer jtrk
 
+  logical geometric
+  double precision r, b, ux, uy, m, Bx, By, Cx, Cy, AC, OC, angle_, pz, pz_, xp, yp, xp_, yp_
+
   !---- Read-in dipole edges angles
 
   double precision e1, e2, h1, h2, hgap, fint
@@ -5098,6 +5101,7 @@ subroutine tttdipole(track, ktrack)
   fint = node_value('fint ')
   kill_ent_fringe = node_value('kill_ent_fringe ') .ne. 0d0
   kill_exi_fringe = node_value('kill_exi_fringe ') .ne. 0d0
+  geometric = .true.;
 
   !---- Apply entrance dipole edge effect
 
@@ -5112,6 +5116,11 @@ subroutine tttdipole(track, ktrack)
   rho = abs(L/angle);
   h = angle/L;
   k0 = h;
+
+  if(geometric) then
+     ux=cos(angle);
+     uy=sin(angle);
+  end if
 
   !---- Prepare to calculate the kick and the matrix elements
   do jtrk = 1,ktrack
@@ -5130,41 +5139,69 @@ subroutine tttdipole(track, ktrack)
 !!$      track(4,jtrk) = track(4,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(4,jtrk)
 !!$      track(6,jtrk) = track(6,jtrk) - rfac * (1d0 + track(6,jtrk)) ** 2
 !!$    endif
-
+     
      delta_plus_1_sqr = pt*pt+2.0*pt/bet0+1;
      delta_plus_1 = sqrt(delta_plus_1_sqr);
-     sqrt_delta_plus_1 = sqrt(delta_plus_1);
-     sqrt_h_sqrt_k0 = sign(sqrt(h*k0),k0);
-     sqrt_h_div_sqrt_k0 = sqrt(h/k0);
-     sqrt_k0_div_sqrt_h = sqrt(k0/h);
-     C=cos(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1);
-     S=sin(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1);
-     C_sqr = C*C;
-     x_ = px*S/(sqrt_delta_plus_1*sqrt_h_sqrt_k0)+x*C-delta_plus_1*C/k0+C/h+delta_plus_1/k0-1.0/h;
-     px_ = -sqrt_delta_plus_1*sqrt_h_sqrt_k0*x*S- &
-          sqrt_delta_plus_1*sqrt_k0_div_sqrt_h*S+delta_plus_1*sqrt_delta_plus_1*sqrt_h_div_sqrt_k0*S+px*C;
-     y_  = y + py * L / delta_plus_1; 
-     py_ = py; 
-     z_ = z - h*((h*k0*sqrt_delta_plus_1*sqrt_h_sqrt_k0*x+(k0-delta_plus_1*h)*&
-          sqrt_delta_plus_1*sqrt_h_sqrt_k0)*sin(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1)&
-          -h*k0*px*cos(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1)+&
-          (delta_plus_1*h-k0)*sqrt_h_sqrt_k0**2*L+h*k0*px)/(h*k0*sqrt_h_sqrt_k0**2) + &
-          pt*L*(1.0-bet0sqr)/bet0sqr + &
-          1.5*(bet0sqr-1.0)/bet0sqr/bet0*pt*pt*L - 0.5/bet0 * &
-          ((x*x*delta_plus_1*(h*k0*L-sqrt_delta_plus_1*sqrt_h_sqrt_k0*C*S)*0.5 + &
-          px*px*(sqrt_delta_plus_1*C*S/sqrt_h_sqrt_k0+L)*0.5 + &
-          px*(-delta_plus_1_sqr*C_sqr/k0+delta_plus_1*C_sqr/h+delta_plus_1_sqr/k0-delta_plus_1/h) + &
-          x*(-delta_plus_1**(3.0*0.5)*sqrt_k0_div_sqrt_h*C*S+ &
-          delta_plus_1**(5.0*0.5)*sqrt_h_div_sqrt_k0*C*S+ &
-          delta_plus_1*k0*L-delta_plus_1_sqr*h*L)+ &
-          x*px*delta_plus_1*(C_sqr-1.0) + &
-          py*py*L + &
-          (-delta_plus_1**(3.0*0.5)*sqrt_k0_div_sqrt_h*C*S*0.5/h + &
-          delta_plus_1**(5.0*0.5)*C*S/(sqrt_h_sqrt_k0)+ &
-          (-delta_plus_1**(7.0*0.5)*sqrt_h_div_sqrt_k0*C*S*0.5/k0 + &
-          delta_plus_1*L*(delta_plus_1*(delta_plus_1*h/k0*0.5-1.0)+k0/h*0.5)))));
-     !pt_ = pt; ! unchanged
      
+     if(.not.geometric) then
+        sqrt_delta_plus_1 = sqrt(delta_plus_1);
+        sqrt_h_sqrt_k0 = sign(sqrt(h*k0),k0);
+        sqrt_h_div_sqrt_k0 = sqrt(h/k0);
+        sqrt_k0_div_sqrt_h = sqrt(k0/h);
+        C=cos(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1);
+        S=sin(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1);
+        C_sqr = C*C;
+        x_ = px*S/(sqrt_delta_plus_1*sqrt_h_sqrt_k0)+x*C-delta_plus_1*C/k0+C/h+delta_plus_1/k0-1.0/h;
+        px_ = -sqrt_delta_plus_1*sqrt_h_sqrt_k0*x*S- &
+             sqrt_delta_plus_1*sqrt_k0_div_sqrt_h*S+delta_plus_1*sqrt_delta_plus_1*sqrt_h_div_sqrt_k0*S+px*C;
+        y_  = y + py * L / delta_plus_1; 
+        py_ = py; 
+        z_ = z - h*((h*k0*sqrt_delta_plus_1*sqrt_h_sqrt_k0*x+(k0-delta_plus_1*h)*&
+             sqrt_delta_plus_1*sqrt_h_sqrt_k0)*sin(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1)&
+             -h*k0*px*cos(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1)+&
+             (delta_plus_1*h-k0)*sqrt_h_sqrt_k0**2*L+h*k0*px)/(h*k0*sqrt_h_sqrt_k0**2) + &
+             pt*L*(1.0-bet0sqr)/bet0sqr + &
+             1.5*(bet0sqr-1.0)/bet0sqr/bet0*pt*pt*L - 0.5/bet0 * &
+             ((x*x*delta_plus_1*(h*k0*L-sqrt_delta_plus_1*sqrt_h_sqrt_k0*C*S)*0.5 + &
+             px*px*(sqrt_delta_plus_1*C*S/sqrt_h_sqrt_k0+L)*0.5 + &
+             px*(-delta_plus_1_sqr*C_sqr/k0+delta_plus_1*C_sqr/h+delta_plus_1_sqr/k0-delta_plus_1/h) + &
+             x*(-delta_plus_1**(3.0*0.5)*sqrt_k0_div_sqrt_h*C*S+ &
+             delta_plus_1**(5.0*0.5)*sqrt_h_div_sqrt_k0*C*S+ &
+             delta_plus_1*k0*L-delta_plus_1_sqr*h*L)+ &
+             x*px*delta_plus_1*(C_sqr-1.0) + &
+             py*py*L + &
+             (-delta_plus_1**(3.0*0.5)*sqrt_k0_div_sqrt_h*C*S*0.5/h + &
+             delta_plus_1**(5.0*0.5)*C*S/(sqrt_h_sqrt_k0)+ &
+             (-delta_plus_1**(7.0*0.5)*sqrt_h_div_sqrt_k0*C*S*0.5/k0 + &
+             delta_plus_1*L*(delta_plus_1*(delta_plus_1*h/k0*0.5-1.0)+k0/h*0.5)))));
+        !pt_ = pt; ! unchanged
+     else
+        pz = sqrt(delta_plus_1_sqr - px*px - py*py);
+        xp = px / pz;
+        yp = py / pz;
+        r = rho * delta_plus_1;
+        Bx=rho+x-r*cos(xp);
+        By=r*sin(xp)*sign(1d0, angle);
+        b=ux*Bx+uy*By;
+        c=Bx*Bx+By*By-r*r;
+        if ((b*b-c).lt.0d0) then
+           print*,"This is not an alpha magnet"
+           return
+        end if
+        m = b+sqrt(b*b-c);
+        Cx=m*ux;
+        Cy=m*uy;
+        OC=sqrt(Cx*Cx+Cy*Cy);
+        AC=sqrt((rho+x-Cx)*(rho+x-Cx) + (Cy*Cy));
+        angle_ = 2.*asin(AC/2d0/r)*sign(1d0, angle);
+        x_ = (rho-OC)*sign(1d0, angle);
+        y_  = y + py * L / delta_plus_1; 
+        xp_ = angle_ -(angle+xp);
+        yp_ = yp;
+        pz_ = 1d0 / sqrt(1d0 + xp_*xp_ + yp_*yp_);
+        px_ = xp_ * pz_;
+        py_ = py; 
+     end if
      x = x_;
      y = y_;
      z = z_;
