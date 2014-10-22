@@ -5140,7 +5140,7 @@ subroutine tttdipole(track, ktrack)
 !!$      track(6,jtrk) = track(6,jtrk) - rfac * (1d0 + track(6,jtrk)) ** 2
 !!$    endif
      
-     delta_plus_1_sqr = pt*pt+2.0*pt/bet0+1;
+     delta_plus_1_sqr = pt*pt+2d0*pt/bet0+1;
      delta_plus_1 = sqrt(delta_plus_1_sqr);
      
      if(.not.geometric) then
@@ -5151,7 +5151,7 @@ subroutine tttdipole(track, ktrack)
         C=cos(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1);
         S=sin(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1);
         C_sqr = C*C;
-        x_ = px*S/(sqrt_delta_plus_1*sqrt_h_sqrt_k0)+x*C-delta_plus_1*C/k0+C/h+delta_plus_1/k0-1.0/h;
+        x_ = px*S/(sqrt_delta_plus_1*sqrt_h_sqrt_k0)+x*C-delta_plus_1*C/k0+C/h+delta_plus_1/k0-1d0/h;
         px_ = -sqrt_delta_plus_1*sqrt_h_sqrt_k0*x*S- &
              sqrt_delta_plus_1*sqrt_k0_div_sqrt_h*S+delta_plus_1*sqrt_delta_plus_1*sqrt_h_div_sqrt_k0*S+px*C;
         y_  = y + py * L / delta_plus_1; 
@@ -5160,20 +5160,20 @@ subroutine tttdipole(track, ktrack)
              sqrt_delta_plus_1*sqrt_h_sqrt_k0)*sin(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1)&
              -h*k0*px*cos(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1)+&
              (delta_plus_1*h-k0)*sqrt_h_sqrt_k0**2*L+h*k0*px)/(h*k0*sqrt_h_sqrt_k0**2) + &
-             pt*L*(1.0-bet0sqr)/bet0sqr + &
-             1.5*(bet0sqr-1.0)/bet0sqr/bet0*pt*pt*L - 0.5/bet0 * &
-             ((x*x*delta_plus_1*(h*k0*L-sqrt_delta_plus_1*sqrt_h_sqrt_k0*C*S)*0.5 + &
-             px*px*(sqrt_delta_plus_1*C*S/sqrt_h_sqrt_k0+L)*0.5 + &
+             pt*L*(1d0-bet0sqr)/bet0sqr + &
+             1.5d0*(bet0sqr-1d0)/bet0sqr/bet0*pt*pt*L - 5d-1/bet0 * &
+             ((x*x*delta_plus_1*(h*k0*L-sqrt_delta_plus_1*sqrt_h_sqrt_k0*C*S)*5d-1 + &
+             px*px*(sqrt_delta_plus_1*C*S/sqrt_h_sqrt_k0+L)*5d-1 + &
              px*(-delta_plus_1_sqr*C_sqr/k0+delta_plus_1*C_sqr/h+delta_plus_1_sqr/k0-delta_plus_1/h) + &
-             x*(-delta_plus_1**(3.0*0.5)*sqrt_k0_div_sqrt_h*C*S+ &
-             delta_plus_1**(5.0*0.5)*sqrt_h_div_sqrt_k0*C*S+ &
+             x*(-delta_plus_1**(3d0*(5d-1))*sqrt_k0_div_sqrt_h*C*S+ &
+             delta_plus_1**(5d0*(5d-1))*sqrt_h_div_sqrt_k0*C*S+ &
              delta_plus_1*k0*L-delta_plus_1_sqr*h*L)+ &
-             x*px*delta_plus_1*(C_sqr-1.0) + &
+             x*px*delta_plus_1*(C_sqr-1d0) + &
              py*py*L + &
-             (-delta_plus_1**(3.0*0.5)*sqrt_k0_div_sqrt_h*C*S*0.5/h + &
-             delta_plus_1**(5.0*0.5)*C*S/(sqrt_h_sqrt_k0)+ &
-             (-delta_plus_1**(7.0*0.5)*sqrt_h_div_sqrt_k0*C*S*0.5/k0 + &
-             delta_plus_1*L*(delta_plus_1*(delta_plus_1*h/k0*0.5-1.0)+k0/h*0.5)))));
+             (-delta_plus_1**(3d0*(5d-1))*sqrt_k0_div_sqrt_h*C*S*(5d-1)/h + &
+             delta_plus_1**(5d0*(5d-1))*C*S/(sqrt_h_sqrt_k0)+ &
+             (-delta_plus_1**(7d0*(5d-1))*sqrt_h_div_sqrt_k0*C*S*(5d-1)/k0 + &
+             delta_plus_1*L*(delta_plus_1*(delta_plus_1*h/k0*(5d-1)-1d0)+k0/h*(5d-1))))));
         !pt_ = pt; ! unchanged
      else
         pz = sqrt(delta_plus_1_sqr - px*px - py*py);
@@ -5185,7 +5185,7 @@ subroutine tttdipole(track, ktrack)
         b=ux*Bx+uy*By;
         c=Bx*Bx+By*By-r*r;
         if ((b*b-c).lt.0d0) then
-           print*,"This is not an alpha magnet"
+           print*,"Nonphysical solution in geometric thick-tracking through sector bend"
            return
         end if
         m = b+sqrt(b*b-c);
@@ -5193,12 +5193,12 @@ subroutine tttdipole(track, ktrack)
         Cy=m*uy;
         OC=sqrt(Cx*Cx+Cy*Cy);
         AC=sqrt((rho+x-Cx)*(rho+x-Cx) + (Cy*Cy));
-        angle_ = 2.*asin(AC/2d0/r)*sign(1d0, angle);
+        angle_ = 2d0*asin(AC/2d0/r)*sign(1d0, angle);
         x_ = (rho-OC)*sign(1d0, angle);
         y_  = y + py * L / delta_plus_1; 
         xp_ = angle_ -(angle+xp);
         yp_ = yp;
-        pz_ = 1d0 / sqrt(1d0 + xp_*xp_ + yp_*yp_);
+        pz_ = delta_plus_1 / sqrt(1d0 + xp_*xp_ + yp_*yp_);
         px_ = xp_ * pz_;
         py_ = py; 
      end if
