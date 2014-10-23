@@ -5076,7 +5076,6 @@ subroutine tttdipole(track, ktrack)
   double precision track(6,*)
   integer ktrack
   
-  logical kill_ent_fringe, kill_exi_fringe
   double precision node_value
   double precision L, angle, rho, h, k0
   double precision x, px, y, py, z, pt
@@ -5085,7 +5084,8 @@ subroutine tttdipole(track, ktrack)
   double precision sqrt_h_sqrt_k0, sqrt_h_div_sqrt_k0, sqrt_k0_div_sqrt_h
   double precision C, S, C_sqr
   double precision bet0sqr
-  integer jtrk
+  integer jtrk, get_option, optiondebug
+  logical kill_ent_fringe, kill_exi_fringe
 
   logical geometric
   double precision r, b, ux, uy, m, Bx, By, Cx, Cy, AC, angle_, pz, pz_, xp, yp, xp_, yp_
@@ -5093,6 +5093,7 @@ subroutine tttdipole(track, ktrack)
   !---- Read-in dipole edges angles
 
   double precision e1, e2, h1, h2, hgap, fint
+  optiondebug = get_option('debug ')
   e1 = node_value('e1 ');
   e2 = node_value('e2 ');
   h1 = node_value('h1 ')
@@ -5144,7 +5145,7 @@ subroutine tttdipole(track, ktrack)
      delta_plus_1 = sqrt(delta_plus_1_sqr);
      
      if(.not.geometric) then
-        print *, 'Using Hamiltonian tracking...'
+        if (optiondebug .ne. 0) print *, 'Using Hamiltonian tracking...'
         sqrt_delta_plus_1 = sqrt(delta_plus_1);
         sqrt_h_sqrt_k0 = sign(sqrt(h*k0),k0);
         sqrt_h_div_sqrt_k0 = sqrt(h/k0);
@@ -5177,7 +5178,7 @@ subroutine tttdipole(track, ktrack)
              delta_plus_1*L*(delta_plus_1*(delta_plus_1*h/k0*(5d-1)-1d0)+k0/h*(5d-1))))));
         !pt_ = pt; ! unchanged
      else
-        print *, 'Using geometric tracking...'
+        if (optiondebug .ne. 0) print *, 'Using geometric tracking...'
         pz = sqrt(delta_plus_1_sqr - px*px - py*py);
         xp = px / pz;
         yp = py / pz;
@@ -5187,7 +5188,7 @@ subroutine tttdipole(track, ktrack)
         b=ux*Bx+uy*By;
         c=Bx*Bx+By*By-r*r;
         if (b*b.lt.c) then
-           print*,"Nonphysical solution in geometric thick-tracking through sector bend"
+           print*,"Invalid solution in geometric thick-tracking through sector bend"
            return
         end if
         m=b+sqrt(b*b-c);
