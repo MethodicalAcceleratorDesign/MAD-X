@@ -5088,7 +5088,7 @@ subroutine tttdipole(track, ktrack)
   integer jtrk
 
   logical geometric
-  double precision r, b, ux, uy, m, Bx, By, Cx, Cy, AC, OC, angle_, pz, pz_, xp, yp, xp_, yp_
+  double precision r, b, ux, uy, m, Bx, By, Cx, Cy, AC, angle_, pz, pz_, xp, yp, xp_, yp_
 
   !---- Read-in dipole edges angles
 
@@ -5101,7 +5101,7 @@ subroutine tttdipole(track, ktrack)
   fint = node_value('fint ')
   kill_ent_fringe = node_value('kill_ent_fringe ') .ne. 0d0
   kill_exi_fringe = node_value('kill_exi_fringe ') .ne. 0d0
-  geometric = .true.;
+  geometric = node_value('geometric ') .ne. 0d0
 
   !---- Apply entrance dipole edge effect
 
@@ -5144,6 +5144,7 @@ subroutine tttdipole(track, ktrack)
      delta_plus_1 = sqrt(delta_plus_1_sqr);
      
      if(.not.geometric) then
+        print *, 'Using Hamiltonian tracking...'
         sqrt_delta_plus_1 = sqrt(delta_plus_1);
         sqrt_h_sqrt_k0 = sign(sqrt(h*k0),k0);
         sqrt_h_div_sqrt_k0 = sqrt(h/k0);
@@ -5176,6 +5177,7 @@ subroutine tttdipole(track, ktrack)
              delta_plus_1*L*(delta_plus_1*(delta_plus_1*h/k0*(5d-1)-1d0)+k0/h*(5d-1))))));
         !pt_ = pt; ! unchanged
      else
+        print *, 'Using geometric tracking...'
         pz = sqrt(delta_plus_1_sqr - px*px - py*py);
         xp = px / pz;
         yp = py / pz;
@@ -5184,19 +5186,19 @@ subroutine tttdipole(track, ktrack)
         By=r*sin(xp)*sign(1d0, angle);
         b=ux*Bx+uy*By;
         c=Bx*Bx+By*By-r*r;
-        if ((b*b-c).lt.0d0) then
+        if (b*b.lt.c) then
            print*,"Nonphysical solution in geometric thick-tracking through sector bend"
            return
         end if
-        m = b+sqrt(b*b-c);
+        m=b+sqrt(b*b-c);
         Cx=m*ux;
         Cy=m*uy;
-        OC=sqrt(Cx*Cx+Cy*Cy);
         AC=sqrt((rho+x-Cx)*(rho+x-Cx) + (Cy*Cy));
         angle_ = 2d0*asin(AC/2d0/r)*sign(1d0, angle);
-        x_ = (rho-OC)*sign(1d0, angle);
+        x_ = (m-rho)*sign(1d0, angle);
         y_  = y + py * L / delta_plus_1; 
-        xp_ = angle_ -(angle+xp);
+        z_ = z + bet0i * (L - r * angle_);
+        xp_ = xp + angle - angle_;
         yp_ = yp;
         pz_ = delta_plus_1 / sqrt(1d0 + xp_*xp_ + yp_*yp_);
         px_ = xp_ * pz_;
