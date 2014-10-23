@@ -5188,7 +5188,8 @@ subroutine tttdipole(track, ktrack)
         b=ux*Bx+uy*By;
         c=Bx*Bx+By*By-r*r;
         if (b*b.lt.c) then
-           print*,"Invalid solution in geometric thick-tracking through sector bend"
+           call aafail('TTTDIPOLE: ', &
+             'Invalid solution in geometric thick-tracking through sector bend')
            return
         end if
         m=b+sqrt(b*b-c);
