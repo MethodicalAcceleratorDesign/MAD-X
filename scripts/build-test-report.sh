@@ -155,7 +155,7 @@ build_test_send ()
 
 	echo "===== Tests $status ====="                                           > build-test-report.out
 	date                                                                      >> build-test-report.out
-	svn info https://svn.cern.ch/reps/madx/trunk/madX                         >> build-test-report.out
+	svn info svn+ssh://svn.cern.ch/reps/madx/trunk/madX                       >> build-test-report.out
 	echo "For details, see report files:"                                     >> build-test-report.out
 	echo "$webdir/tests"                                                      >> build-test-report.out
 	echo "$webdir/tests/reports"                                              >> build-test-report.out
