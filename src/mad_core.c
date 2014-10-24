@@ -75,6 +75,7 @@ mad_init_c(void)
   add_to_var_list(var, variable_list, 1);
   title = permbuff("no-title");
   set_defaults("option");
+  if (interactive) { int false = 0; set_option("echo", &false); }
   set_defaults("beam");
   add_to_command_list("default_beam", current_beam, beam_list, 0);
   set_defaults("set");
