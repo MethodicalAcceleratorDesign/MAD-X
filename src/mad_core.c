@@ -168,7 +168,7 @@ madx_input(int top)
 {
   while (in_stop == 0)
   {
-    if (interactive && in->curr == 0) puts("X: ==>");
+    if (interactive && in->curr == 0) fputs("\nX:> ", stdout);
     if (return_flag || get_stmt(in->input_files[in->curr], 0) == 0)
     {
       if (in->input_files[in->curr] != stdin) {
