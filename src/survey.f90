@@ -443,7 +443,7 @@ subroutine suelem(el, ve, we,tilt)
 
   !---- Rotation around S-axis. SPECIAL CASE
 120 continue
-  print *,"SROT"
+!  print *,"SROT"
   tilt = node_value('angle ')
   ve(1) = zero
   ve(2) = zero
@@ -461,9 +461,9 @@ subroutine suelem(el, ve, we,tilt)
 
   !---- Rotation around Y-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!
 130 continue
-  print *,"YROT"
+!  print *,"YROT"
   dx = node_value('angle ')
-  print *,"angle",dx
+!  print *,"angle",dx
   tilt = zero
   ve(1) = zero
   ve(2) = zero
