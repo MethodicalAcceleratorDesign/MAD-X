@@ -2190,6 +2190,8 @@ string_to_table_curr(const char* table, const char* name, const char* string)
   mycpy(buf, string);
   if (strcmp(buf, "name") == 0)
     tbl->s_cols[col][tbl->curr] = tmpbuff(current_node->name);
+  else if (strcmp(buf, "base_name") == 0)
+    tbl->s_cols[col][tbl->curr] = tmpbuff(current_node->base_name);
   else
     tbl->s_cols[col][tbl->curr] = tmpbuff(string);
   return 0;
@@ -2247,6 +2249,7 @@ get_table_row(const struct table* tbl, const char* name)
   return row == tbl->curr ? -1 : row;
 }
 
+#if 0 // not used...
 double
 get_table_value(const char* tbl_s, const char *row_s, const char *col_s)
 {
@@ -2281,4 +2284,4 @@ set_table_value(const char* tbl_s, const char *row_s, const char *col_s, double 
   }   else warning("get_table_value: name of table not found:" , tbl_s);
 }
 
-
+#endif

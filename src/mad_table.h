@@ -107,8 +107,8 @@ int     vector_to_table_curr (const char* table, const char* name, const double*
 int     string_to_table_curr (const char* table, const char* name, const char* string);
 int     comment_to_table_curr(const char* table, const char* comment, const int* length);
 
-double  get_table_value(const char* table_s, const char *row_s, const char *col_s);
-void    set_table_value(const char* table_s, const char *row_s, const char *col_s, double *val);
+// double  get_table_value(const char* table_s, const char *row_s, const char *col_s); // not used
+// void    set_table_value(const char* table_s, const char *row_s, const char *col_s, double *val); // not used
 
 struct column_info{
   void* data;
