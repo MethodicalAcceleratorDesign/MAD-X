@@ -296,7 +296,6 @@ subroutine suelem(el, ve, we,tilt)
   code = node_value('mad8_type ')
   if(code.eq.39) code=15
   if(code.eq.38) code=24
-  if(code.eq.43) code=8 ! rfmultipoles->multipoles (LD 2014.10.15)
   go to ( 10,  20,  20,  40,  50,  60,  70,  80,  90, 100,          &
        110, 120, 130, 140, 150, 160, 170, 180, 190, 200,                 &
        210, 220, 230, 240, 250,  20, 270, 280, 290, 300,                 &
@@ -392,7 +391,7 @@ subroutine suelem(el, ve, we,tilt)
   go to 500
   !****** end of straight elements ***************
 
-  !---- (rf)multipoles , introduced  17.09.02 / AV, extended LD 2014.10.15
+  !---- multipoles , introduced  17.09.02 / AV, extended LD 2014.10.15
   !---- waste of CPU cycles removed
 80  continue
   normal(0)=0d0
@@ -548,7 +547,7 @@ subroutine sufill(suml, v, theta, phi, psi, globaltilt)
   if(code.eq.38) code=24
   if(code.eq.2.or.code.eq.3) then
      ang = node_value('angle ')*node_value('other_bv ')
-  else if(code.eq.8.or.code.eq.43) then ! (rf)multipoles (LD 2014.10.15)
+  else if(code.eq.8) then ! multipoles (LD 2014.10.15)
      normal(0)=0d0
      skew(0)=0d0
      ang=0d0
