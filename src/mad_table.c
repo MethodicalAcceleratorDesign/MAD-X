@@ -2226,6 +2226,7 @@ comment_to_table_curr(const char* table, const char* comment, const int* length)
   return 0;
 }
 
+#if 0 // not used...
 /*
   LD: 2012.11.29
   - These "slow" accessors were added for stable access of "muting" tables
@@ -2249,7 +2250,6 @@ get_table_row(const struct table* tbl, const char* name)
   return row == tbl->curr ? -1 : row;
 }
 
-#if 0 // not used...
 double
 get_table_value(const char* tbl_s, const char *row_s, const char *col_s)
 {
