@@ -5180,13 +5180,16 @@ subroutine tttdipole(track, ktrack)
      else
         if (optiondebug .ne. 0) print *, 'Using geometric tracking...'
         pz = sqrt(delta_plus_1_sqr - px*px - py*py);
+        ! 1/beta = (bet0i + pt) / delta_plus_1
+        ! 1/beta_z = (bet0i + pt) / pz
         xp = px / pz;
         yp = py / pz;
         r = rho * delta_plus_1;
+print *,'rho = ', rho, r
         Bx=rho+x-r*cos(xp);
         By=r*sin(xp)*sign(1d0, angle);
         b=ux*Bx+uy*By;
-        c=Bx*Bx+By*By-r*r;
+        c=Bx**2+By**2-r**2;
         if (b*b.lt.c) then
            call aafail('TTTDIPOLE: ', &
              'Invalid solution in geometric thick-tracking through sector bend')
@@ -5195,11 +5198,14 @@ subroutine tttdipole(track, ktrack)
         m=b+sqrt(b*b-c);
         Cx=m*ux;
         Cy=m*uy;
-        AC=sqrt((rho+x-Cx)*(rho+x-Cx) + (Cy*Cy));
+        AC=sqrt((rho+x-Cx)**2 + Cy**2);
         angle_ = 2d0*asin(AC/2d0/r)*sign(1d0, angle);
         x_ = (m-rho)*sign(1d0, angle);
-        y_  = y + py * L / delta_plus_1; 
-        z_ = z + bet0i * (L - r * angle_);
+        y_  = y + py * L / delta_plus_1;
+        ! z_ = z + bet0i * L - (bet0i + pt) / pz * L; ! += bet0i * L - betzi * L
+        z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * L; ! += bet0i * L - beti * L
+        ! z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * r * abs(angle_);
+        ! z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * sqrt((r * angle_)**2 + (py * L / delta_plus_1)**2);
         xp_ = xp + angle - angle_;
         yp_ = yp;
         pz_ = delta_plus_1 / sqrt(1d0 + xp_*xp_ + yp_*yp_);
@@ -5211,6 +5217,12 @@ subroutine tttdipole(track, ktrack)
      z = z_;
      px = px_;
      py = py_;
+
+print *, 'x_ ', x_
+print *, 'y_ ', y_
+print *, 'z_ ', z_
+print *, 'px_ ', px_
+print *, 'py_ ', py_
      !pt = pt_; ! unchanged
      
      !---- Applies the kick
