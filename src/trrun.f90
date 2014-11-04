@@ -5088,7 +5088,7 @@ subroutine tttdipole(track, ktrack)
   logical kill_ent_fringe, kill_exi_fringe
 
   logical geometric
-  double precision r, b, ux, uy, m, Bx, By, Cx, Cy, AC, angle_, pz, pz_, xp, yp, xp_, yp_
+  double precision r, b, ux, uy, m, Ax, Bx, By, Cx, Cy, AC, angle_, pz, pz_, xp, yp, xp_, yp_
 
   !---- Read-in dipole edges angles
 
@@ -5121,6 +5121,10 @@ subroutine tttdipole(track, ktrack)
   if(geometric) then
      ux=cos(angle);
      uy=sin(angle);
+     if (angle.lt.0d0) then
+        ux=-ux;
+        uy=-uy;
+     end if
   end if
 
   !---- Prepare to calculate the kick and the matrix elements
@@ -5184,26 +5188,26 @@ subroutine tttdipole(track, ktrack)
         ! 1/beta_z = (bet0i + pt) / pz
         xp = px / pz;
         yp = py / pz;
-        r = rho * delta_plus_1;
-print *,'rho = ', rho, r
-        Bx=rho+x-r*cos(xp);
-        By=r*sin(xp)*sign(1d0, angle);
-        b=ux*Bx+uy*By;
-        c=Bx**2+By**2-r**2;
+        r  = rho*delta_plus_1;
+        Ax = rho*sign(1d0, angle) + x;
+        Bx = Ax-r*sign(1d0, angle)*cos(xp);
+        By =    r*sign(1d0, angle)*sin(xp);
+        b = ux*Bx + uy*By;
+        c = Bx**2 + By**2 - r**2;
         if (b*b.lt.c) then
            call aafail('TTTDIPOLE: ', &
              'Invalid solution in geometric thick-tracking through sector bend')
            return
         end if
-        m=b+sqrt(b*b-c);
-        Cx=m*ux;
-        Cy=m*uy;
-        AC=sqrt((rho+x-Cx)**2 + Cy**2);
+        m = b + sqrt(b*b-c);
+        Cx = m*ux;
+        Cy = m*uy;
+        AC = sqrt((Ax-Cx)**2 + Cy**2);
         angle_ = 2d0*asin(AC/2d0/r)*sign(1d0, angle);
         x_ = (m-rho)*sign(1d0, angle);
         y_  = y + py * L / delta_plus_1;
-        ! z_ = z + bet0i * L - (bet0i + pt) / pz * L; ! += bet0i * L - betzi * L
-        z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * L; ! += bet0i * L - beti * L
+        ! z_ = z + bet0i * L - (bet0i + pt) / pz * L; ! equiv to z += bet0i * L - betzi * L
+        z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * L; ! equiv to z += bet0i * L - beti * L
         ! z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * r * abs(angle_);
         ! z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * sqrt((r * angle_)**2 + (py * L / delta_plus_1)**2);
         xp_ = xp + angle - angle_;
