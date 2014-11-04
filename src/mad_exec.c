@@ -204,7 +204,7 @@ exec_show(struct in_cmd* cmd)
         if (var->expr)  fprintf(prt_file, "%s := %s ;\n", toks[i], var->expr->string);
         else fprintf(prt_file, v_format("%s = %F ;\n"), toks[i], var->value);
       }
-      else fprintf(prt_file, "%s not found\n;", toks[i]);
+      else fprintf(prt_file, "%s not found\n", toks[i]);
     }
   }
   return;
