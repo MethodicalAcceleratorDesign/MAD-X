@@ -5207,9 +5207,9 @@ subroutine tttdipole(track, ktrack)
         x_ = (m-rho)*sign(1d0, angle);
         y_  = y + py * L / delta_plus_1;
         ! z_ = z + bet0i * L - (bet0i + pt) / pz * L; ! equiv to z += bet0i * L - betzi * L
-        z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * L; ! equiv to z += bet0i * L - beti * L
+        ! z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * L; ! equiv to z += bet0i * L - beti * L
         ! z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * r * abs(angle_);
-        ! z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * sqrt((r * angle_)**2 + (py * L / delta_plus_1)**2);
+        z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * sqrt((r * angle_)**2 + (py * L / delta_plus_1)**2);
         xp_ = xp + angle - angle_;
         yp_ = yp;
         pz_ = delta_plus_1 / sqrt(1d0 + xp_*xp_ + yp_*yp_);
@@ -5221,12 +5221,6 @@ subroutine tttdipole(track, ktrack)
      z = z_;
      px = px_;
      py = py_;
-
-print *, 'x_ ', x_
-print *, 'y_ ', y_
-print *, 'z_ ', z_
-print *, 'px_ ', px_
-print *, 'py_ ', py_
      !pt = pt_; ! unchanged
      
      !---- Applies the kick
