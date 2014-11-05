@@ -25,7 +25,7 @@ if [ "$1" = "noecho" ] ; then
 	exec > build-test-lxplus.out 2>&1
 	check_error "redirection with noecho failed"
 else
-	exec > >(tee build-test-lxplus.out) 2> >(tee build-test-lxplus.out >&2)
+	exec > >(tee build-test-lxplus.out) 2>&1
 	check_error "redirection with tee failed"
 fi
 
