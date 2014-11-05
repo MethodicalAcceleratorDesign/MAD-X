@@ -112,25 +112,6 @@ ENDTRACK;
 }
 
 
-%{\bf Commands:}
-%TRACK, DELTAP=double, ONEPASS, DUMP, ONETABLE, FILE= string;  ! (MAD-X version 1)
-%TRACK, DELTAP=double, ONEPASS, DAMP, QUANTUM, DUMP, ONETABLE, FILE=string; ! (MAD-X version 2)
-%TRACK, DELTAP=double, ONEPASS, DAMP, QUANTUM, DUMP, APERTURE,ONETABLE, RECLOSS, FILE= string; ! (MADX version 3)
-%% \begin{verbatim}
-%% TRACK, DELTAP=real, ONEPASS, DAMP, QUANTUM, DUMP, APERTURE, ONETABLE, RECLOSS, FILE= string;
-%% ...
-%% START, X=real, PX=real, Y=real, py=real, t=real, pt=real;
-%% START, FX=double, PHIX=double, FY=double, PHIY=double, FT=double, PHIT=double;  
-%% ...
-%% OBSERVE, PLACE=string;  
-%% ...
-%% RUN, MAXAPER=double_array, TURNS=integer, FFILE=integer;  
-%% ...
-
-%% ENDTRACK;
-%% \end{verbatim}
-
-
 Inside the block \texttt{TRACK}-\texttt{ENDTRACK} a series 
 of initial trajectory coordinates can be specified by the \texttt{START} 
 command (as many commands as trajectories). This will be usually done in a 
@@ -167,6 +148,15 @@ functions.
 Plotting of particle coordinates or other data in these tables is
 possible in \madx. Plotting can also be done with external programs by
 using the files created by \texttt{TRACK}.  
+
+\madx also has the capability to treat space-charge during tracking
+runs. There is no space-charge command per se but space charge is
+controlled through several options of \madx (see
+\hyperref[sec:option]{\tt OPTION}) and specific attributes of the
+\hyperref[sec:run]{\tt RUN} command in this {\tt TRACK} environment. A
+section specific to space charge options and particularities appears
+below.
+
 
 %{\bf See Also:}\\
 %\href{../Introduction/aperture.html}{\texttt{APERTURE}}, 
@@ -356,7 +346,7 @@ or \textbf{action-angle} coordinates.
 START, X=real, PX=real, Y=real, PY=real, T=real, PT=real;  \\
 START, FX=real, PHIX=real, FY=real, PHIY=real, FT=real, PHIT=real;
 }
-          
+
 For the case of action-angle coordinates, the normalised amplitudes are
 expressed in number of r.m.s. beam size $F_X$, $F_Y$, $F_T$ (the actions
 being computed with the emittances given in the \texttt{BEAM} command)
@@ -377,11 +367,11 @@ The attributes of the START command are:
 {\bf Remarks} \\
 For usual tracking (single/multi-turn), all coordinates are specified
 with respect to the actual closed orbit (possibly off-momentum, with
-magnet errors) and \textbf{NOT} with respect to the reference orbit.  
+magnet errors) and \textbf{NOT} with respect to the reference orbit.
 
 If the option \texttt{onepass} of the \texttt{TRACK} is used, the
-coordinates are specified with respect to the reference orbit. 
-            
+coordinates are specified with respect to the reference orbit.
+
 
 
 \section{OBSERVE}
@@ -419,21 +409,21 @@ filename for the first obseration point and first particle looks like
 \section{RUN}
 \label{sec:run}
 
-The actual tracking is triggered by the \texttt{RUN} command. 
+The actual tracking is triggered by the {\tt RUN} command.
 
 \madbox{
-RUN, TURNS=integer, MAXAPER=real\_array, FFILE=integer;  
+RUN, TURNS=integer, MAXAPER=real\_array, FFILE=integer;
 }
 
-The \texttt{RUN} command has three attributes:  
-     
+The \texttt{RUN} command has three attributes:
+
 \begin{madlist}
   \ttitem{TURNS} number of turns to be tracked.
   \ttitem{MAXAPER} upper limits for the six coordinates.\\
   (Default: \{0.1, 0.01, 0.1, 0.01, 1.0, 0.1\} \\
-  The limits defined by the \texttt{maxaper} option are only being taken
-  into account if the \texttt{aperture} option of the \texttt{TRACK}
-  command is used. 
+  The limits defined by the {\tt MAXAPER} option are only being taken
+  into account if the {\tt APERTURE} option of the {\tt TRACK}
+  command is used.
   \ttitem{FFILE} defines the turn periodicity for printing coordinates at
    observation points. (Default:~1)\\
    \texttt{FFILE=n} will print coordinates every n-th turn only. 
@@ -535,22 +525,26 @@ WRITE, TABLE=dynaptune, FILE;
 }
 The output file 'lyapunov.data' lists the turn number and phase distance
 between the  two Lyapunov partners, respectively, allowing for visual
-inspection of chaoticity.  
+inspection of chaoticity.
  
 %\href{http://consult.cern.ch/xwho/people/62690}{frankz} 20.03.2006
-
-
 
 \section{ENDTRACK}
 \label{sec:endtrack}
 
-Tracking is terminated by the command \texttt{ENDTRACK} with no
+Tracking is terminated by the command {\tt ENDTRACK} with no
 attributes. 
 
 \madbox{ENDTRACK;}
-
-
-
 %\href{http://consult.cern.ch/xwho/people/74251}{A. Koschik},  February  2007
+
+\section{Space Charge}
+
+\madx can perform tracking using a frozen space charge mode.
+This process is rather involved and requires careful setting of several options 
+and switches as well as the insertion of space-charge kicks inserted within 
+nominal elements. The Space-Charge specifics of \madx are documented in 
+\cite{kapin2013}.
+
 
 %% EOF
