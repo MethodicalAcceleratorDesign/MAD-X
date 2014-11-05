@@ -97,7 +97,7 @@ char* ap_table_cols[] =
 
 int survey_table_types[] =
 {
-  3, 2, 2, 2, 2,
+  3, 3, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2,
   1, 1, 2,
   /*== dealt with the new property v_pos as for mech_sep */
@@ -107,7 +107,7 @@ int survey_table_types[] =
 
 char* survey_table_cols[] =
 {
-  "name", "s", "l", "angle", "x",
+  "name", "keyword", "s", "l", "angle", "x",
   "y", "z", "theta", "phi", "psi", "globaltilt",
   "slot_id", "assembly_id", "mech_sep",
   /*== dealt with the new property v_pos as for mech_sep */

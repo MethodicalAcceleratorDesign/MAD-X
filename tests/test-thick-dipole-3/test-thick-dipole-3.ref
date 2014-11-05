@@ -1,10 +1,10 @@
 
-  ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.02  (64 bit, Darwin)      +
-  + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2014.07.04               +
-  + Execution date: 2014.10.13 16:40:20      +
-  ++++++++++++++++++++++++++++++++++++++++++++
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.02.01  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2014.04.25      +
+  + Execution Time Stamp: 11.06.14 12.32.09 +
+  +++++++++++++++++++++++++++++++++++++++++++
 option, -debug, -echo;
 
 factor_val =       1.00000416667882 ;
@@ -43,7 +43,7 @@ makethin: style chosen : teapot
 makethin: slicing sequence : myseq
 ++++++ warning: SAVE makes all previous USE invalid !  
 mb1.edge_l not found
-;enter Twiss module
+enter Twiss module
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
   
@@ -139,9 +139,9 @@ update is on
                  1e-06                      0                  -0.25                      0 
                  1e-06                      0                     -1                      0 
                  1e-06                      0                  -1.75                      0 
- 5.978186411466031e-07 -5.004949499471469e-10    -0.2500011943999546                      0 
- 5.978186411466031e-07 -5.004949499471469e-10     -1.000001194399954                      0 
- 5.978186411466031e-07 -5.004949499471469e-10     -1.750001194399954                      0 
+ 5.978186411466031e-07 -5.004949499471469e-10                  -0.25                      0 
+ 5.978186411466031e-07 -5.004949499471469e-10                     -1                      0 
+ 5.978186411466031e-07 -5.004949499471469e-10                  -1.75                      0 
 
                      s                      e 
                      0                      0 
@@ -159,5 +159,5 @@ exit TRACK module
 2 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.02 (64 bit) finished normally +
+  + MAD-X 5.02.01 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

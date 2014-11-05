@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.02  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.07.01      +
-  + Execution Time Stamp: 01.07.14 14.26.08 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.03  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.10.16               +
+  + Execution date: 2014.10.27 13:15:19      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 
 
 BEAM, PARTICLE = proton, PC = 450;
@@ -2630,7 +2630,6 @@ inserting a drift of length 9.940000e-01 at position 3.799286e+03
  
 SURVEY, FILE="all_survey";
 
- SROT
 SELECT, FLAG=TWISS, CLEAR;
 
 SELECT, FLAG=TWISS, COLUMN=name,L,s,betx,bety,alfx,alfy,dx,dpx,dy,dpy,x,px,y,py,mux,muy;
@@ -2674,5 +2673,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.02 (64 bit) finished normally +
+  + MAD-X 5.02.03 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

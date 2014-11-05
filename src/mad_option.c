@@ -16,7 +16,7 @@ get_option(char* str)
 void
 set_option(char* str, int* opt)
   /* sets an (old or new) option with name "str",
-     value *opt (0 flase, 1 true) */
+     value *opt (0 false, 1 true) */
 {
   int i, k; //, j not used
   char* bc;

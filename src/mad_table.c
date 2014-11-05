@@ -2190,6 +2190,8 @@ string_to_table_curr(const char* table, const char* name, const char* string)
   mycpy(buf, string);
   if (strcmp(buf, "name") == 0)
     tbl->s_cols[col][tbl->curr] = tmpbuff(current_node->name);
+  else if (strcmp(buf, "base_name") == 0)
+    tbl->s_cols[col][tbl->curr] = tmpbuff(current_node->base_name);
   else
     tbl->s_cols[col][tbl->curr] = tmpbuff(string);
   return 0;
@@ -2224,6 +2226,7 @@ comment_to_table_curr(const char* table, const char* comment, const int* length)
   return 0;
 }
 
+#if 0 // not used...
 /*
   LD: 2012.11.29
   - These "slow" accessors were added for stable access of "muting" tables
@@ -2281,4 +2284,4 @@ set_table_value(const char* tbl_s, const char *row_s, const char *col_s, double 
   }   else warning("get_table_value: name of table not found:" , tbl_s);
 }
 
-
+#endif

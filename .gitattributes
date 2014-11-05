@@ -1585,6 +1585,11 @@ tests/test-rfmultipole-2/sectormap.ref -text
 tests/test-rfmultipole-2/test-rfmultipole-2.cfg -text
 tests/test-rfmultipole-2/test-rfmultipole-2.madx -text
 tests/test-rfmultipole-2/test-rfmultipole-2.ref -text
+tests/test-rfmultipole-3/sectormap.cfg -text
+tests/test-rfmultipole-3/sectormap.ref -text
+tests/test-rfmultipole-3/test-rfmultipole-3.cfg -text
+tests/test-rfmultipole-3/test-rfmultipole-3.madx -text
+tests/test-rfmultipole-3/test-rfmultipole-3.ref -text
 tests/test-rfmultipole-4/sectormap.cfg -text
 tests/test-rfmultipole-4/sectormap.ref -text
 tests/test-rfmultipole-4/test-rfmultipole-4.cfg -text

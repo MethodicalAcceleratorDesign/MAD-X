@@ -75,6 +75,7 @@ mad_init_c(void)
   add_to_var_list(var, variable_list, 1);
   title = permbuff("no-title");
   set_defaults("option");
+  if (interactive) { int false = 0; set_option("echo", &false); }
   set_defaults("beam");
   add_to_command_list("default_beam", current_beam, beam_list, 0);
   set_defaults("set");
@@ -159,6 +160,7 @@ madx_start(void)
          tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday,
          tm->tm_hour, tm->tm_min, tm->tm_sec);
   printf("  ++++++++++++++++++++++++++++++++++++++++++++\n");
+  if (interactive) putchar('\n');
 }
 
 void
@@ -167,7 +169,7 @@ madx_input(int top)
 {
   while (in_stop == 0)
   {
-    if (interactive && in->curr == 0) puts("X: ==>");
+    if (interactive && in->curr == 0) fputs("X:> ", stdout);
     if (return_flag || get_stmt(in->input_files[in->curr], 0) == 0)
     {
       if (in->input_files[in->curr] != stdin) {
