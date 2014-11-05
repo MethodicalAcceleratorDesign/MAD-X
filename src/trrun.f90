@@ -5184,8 +5184,6 @@ subroutine tttdipole(track, ktrack)
      else
         if (optiondebug .ne. 0) print *, 'Using geometric tracking...'
         pz = sqrt(delta_plus_1_sqr - px*px - py*py);
-        ! 1/beta = (bet0i + pt) / delta_plus_1
-        ! 1/beta_z = (bet0i + pt) / pz
         xp = px / pz;
         yp = py / pz;
         r  = rho*delta_plus_1;
@@ -5206,10 +5204,9 @@ subroutine tttdipole(track, ktrack)
         angle_ = 2d0*asin(AC/2d0/r)*sign(1d0, angle);
         x_ = (m-rho)*sign(1d0, angle);
         y_  = y + py * L / delta_plus_1;
-        ! z_ = z + bet0i * L - (bet0i + pt) / pz * L; ! equiv to z += bet0i * L - betzi * L
-        ! z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * L; ! equiv to z += bet0i * L - beti * L
-        ! z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * r * abs(angle_);
-        z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * sqrt((r * angle_)**2 + (py * L / delta_plus_1)**2);
+        ! 1/beta = (bet0i + pt) / delta_plus_1
+        ! 1/beta_z = (bet0i + pt) / pz
+        z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * sqrt((r * angle_)**2 + (yp * L)**2);
         xp_ = xp + angle - angle_;
         yp_ = yp;
         pz_ = delta_plus_1 / sqrt(1d0 + xp_*xp_ + yp_*yp_);
