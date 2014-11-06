@@ -5089,6 +5089,7 @@ subroutine tttdipole(track, ktrack)
 
   logical geometric
   double precision r, b, ux, uy, m, Ax, Bx, By, Cx, Cy, AC, angle_, pz, pz_, xp, yp, xp_, yp_
+  double precision gamma, hx, hy, get_value, rfac
 
   !---- Read-in dipole edges angles
 
@@ -5103,6 +5104,9 @@ subroutine tttdipole(track, ktrack)
   kill_ent_fringe = node_value('kill_ent_fringe ') .ne. 0d0
   kill_exi_fringe = node_value('kill_exi_fringe ') .ne. 0d0
   geometric = node_value('geometric ') .ne. 0d0
+  arad = get_value('probe ','arad ')
+  gamma = get_value('probe ','gamma ')
+  dorad = get_value('probe ','radiate ') .ne. 0d0
 
   !---- Apply entrance dipole edge effect
 
@@ -5137,13 +5141,17 @@ subroutine tttdipole(track, ktrack)
      z  = track(5,jtrk);
      pt = track(6,jtrk);
   
-!!$    !---- Radiation effects at entrance.
-!!$    if (dorad  .and.  elrad .ne. 0d0) then
-!!$      rfac = arad * gammas**3 * (dpx**2+dpy**2) / (3d0*elrad)
-!!$      track(2,jtrk) = track(2,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(2,jtrk)
-!!$      track(4,jtrk) = track(4,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(4,jtrk)
-!!$      track(6,jtrk) = track(6,jtrk) - rfac * (1d0 + track(6,jtrk)) ** 2
-!!$    endif
+     !---- Radiation effects at entrance.
+     if (dorad) then
+        delta_plus_1_sqr = pt*pt+2d0*pt/bet0+1d0;
+        delta_plus_1 = sqrt(delta_plus_1_sqr);
+        hx = 1d0/(rho*delta_plus_1);
+        hy = 0d0;
+        rfac = (arad * gamma**3 * L / 3d0) * (hx**2 + hy**2) * (1d0 + h*x) * (1d0 - tan(e1)*x)
+        px = px - rfac * (1d0 + pt) * px
+        py = py - rfac * (1d0 + pt) * py
+        pt = pt - rfac * (1d0 + pt) ** 2
+     endif
      
      delta_plus_1_sqr = pt*pt+2d0*pt/bet0+1d0;
      delta_plus_1 = sqrt(delta_plus_1_sqr);
@@ -5219,26 +5227,27 @@ subroutine tttdipole(track, ktrack)
      px = px_;
      py = py_;
      !pt = pt_; ! unchanged
-     
+          
+     !---- Radiation effects at exit.
+     if (dorad) then
+        hx = 1d0/(rho*delta_plus_1);
+        rfac = (arad * gamma**3 * L / 3d0) * (hx**2 + hy**2) * (1d0 + h*x) * (1d0 - tan(e1)*x)
+        px = px - rfac * (1d0 + pt) * px
+        py = py - rfac * (1d0 + pt) * py
+        pt = pt - rfac * (1d0 + pt) ** 2
+     endif
+
      !---- Applies the kick
      track(1,jtrk) = x
      track(2,jtrk) = px
      track(3,jtrk) = y
      track(4,jtrk) = py
      track(5,jtrk) = z
-     !track(6,jtrk) = pt ! unchanged
-     
-!!$    !---- Radiation effects at exit.
-!!$    if (dorad  .and.  elrad .ne. 0d0) then
-!!$      track(2,jtrk) = track(2,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(2,jtrk)
-!!$      track(4,jtrk) = track(4,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(4,jtrk)
-!!$      track(6,jtrk) = track(6,jtrk) - rfac * (1d0 + track(6,jtrk)) ** 2
-!!$    endif
-
-  !---- Apply exit dipole edge effect
+     track(6,jtrk) = pt
 
   enddo
 
+  !---- Apply exit dipole edge effect
   if (.not.kill_exi_fringe) then
      call ttdpdg_map(track, ktrack, e2, h2, hgap, fint, 0d0)
   endif
