@@ -5231,7 +5231,7 @@ subroutine tttdipole(track, ktrack)
      !---- Radiation effects at exit.
      if (dorad) then
         hx = 1d0/(rho*delta_plus_1);
-        rfac = (arad * gamma**3 * L / 3d0) * (hx**2 + hy**2) * (1d0 + h*x) * (1d0 - tan(e1)*x)
+        rfac = (arad * gamma**3 * L / 3d0) * (hx**2 + hy**2) * (1d0 + h*x) * (1d0 - tan(e2)*x)
         px = px - rfac * (1d0 + pt) * px
         py = py - rfac * (1d0 + pt) * py
         pt = pt - rfac * (1d0 + pt) ** 2
