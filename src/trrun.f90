@@ -5211,7 +5211,7 @@ subroutine tttdipole(track, ktrack)
         AC = sqrt((Ax-Cx)**2 + Cy**2);
         angle_ = 2d0*asin(AC/2d0/r)*sign(1d0, angle);
         x_ = (m-rho)*sign(1d0, angle);
-        y_  = y + py * L / delta_plus_1;
+        y_  = y + yp * L;
         ! 1/beta = (bet0i + pt) / delta_plus_1
         ! 1/beta_z = (bet0i + pt) / pz
         z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * sqrt((r * angle_)**2 + (yp * L)**2);
