@@ -1,18 +1,24 @@
 /*
  mad_mkthin.cpp
- 
+
  Thick to thin lens converter makethin. Helmut Burkhardt
- 
- Major steps :
+
+ Major steps
  2005 : Standard selection SELECT,FLAG=makethin,RANGE=range,CLASS=class,PATTERN=pattern[,FULL][,CLEAR];
  Implementation of slicing for solenoids
  2012 : Extension of TEAPOT slicing to n>4
  2013 : Keep thick elements if slice number <1, Code now C++,
         Thick slicing for quadrupoles
 	    Automatic generation of dipedge elements for dipoles
- 
+ 2014 : Thick bend slicing, with or without dipedge
+
+ here test version with
+ static const bool dipedge_h1_h2_fl=true;  // normally false to avoid potentially non-simplectic partial higher order in dipedge. Optionally true as requested by Andrea Latina in 10/2014
+ static const bool kill_fringe_fl=true;    // requested by Laurent et al., probably redundant, should be sufficient to check existance of non-default h1,e1; h2,e2 parameters
+ static const bool rbend_to_sbend_fl=true; // translate all rbends to sbends, even if  makedipedge=false
+
  Early versions in 2001, 2002 by Mark Hayes
- 
+
  */
 
 #include <iostream>
@@ -46,12 +52,12 @@ private:
   bool teapot_fl;
 };
 
-class OneElementWithSlices // One Element with Slices
+class OneElementWithSlices // One Element with Slices       used to work on slices, derived from thick_elem which is not modified - declared as constant
 {
 public:
-  OneElementWithSlices(element* thick_elem,element* thin_elem); // constructor
+  OneElementWithSlices(const element* thick_elem,element* thin_elem); // constructor
   ~OneElementWithSlices() {}; // (empty) destructor
-  element* thick_elem; // pointer to the thick element
+  const element* thick_elem; // pointer to the thick element
   std::vector<element*> sliced_elem; // pointer(s) to the one or several slices
 };
 
@@ -61,7 +67,7 @@ public:
   std::vector<OneElementWithSlices*> VecElemWithSlices; // vector of thick elements+slices
   ElementListWithSlices(unsigned int verbose); // constructor
   ~ElementListWithSlices(); // destructor
-  void put_slice(element* thick_elem,element* thin_elem); // add thin_elem to VecElemWithSlices
+  void put_slice(const element* thick_elem, element* thin_elem); // add thin_elem to VecElemWithSlices
   element* find_slice(const element* thick_elem, const int slice); // find address of thin slice by slice number for thick_elem
   element* find_slice(const element* thick_elem, const std::string& name); // find address of thin slice by slice name for thick_elem
   void Print() const;
@@ -87,11 +93,12 @@ private:
   double  collim_at_shift(const int slices, const int slice_no);
   double default_at_shift(const int slices, const int slice_no);
   double at_shift(const int slices, const int slice_no,const std::string& local_thin_style); // return at relative shifts from centre of unsliced magnet
-  int translate_k(command_parameter* *kparam, command_parameter* *ksparam, command_parameter* angle_param, command_parameter* kn_param, command_parameter* ks_param);
-  element* create_sliced_magnet(element* thick_elem, int slice_no,bool ThickSLice);
-  element* create_thin_solenoid(element* thick_elem, int slice_no);
-  element* create_thin_elseparator(element* thick_elem, int slice_no);
-  element* create_thin_obj(element* thick_elem, int slice_no);
+  int translate_k(command_parameter* *kparam, command_parameter* *ksparam,const command_parameter* angle_param, command_parameter* kn_param, command_parameter* ks_param);
+  element* create_thick_slice(element* thick_elem,const int slice_no);
+  element* create_sliced_magnet(const element* thick_elem, int slice_no,bool ThickSLice);
+  element* create_thin_solenoid(const element* thick_elem, int slice_no);
+  element* create_thin_elseparator(const element* thick_elem, int slice_no);
+  element* create_thin_obj(const element* thick_elem, int slice_no);
   void slice_this_node(); // called in loop over nodes which can be sliced, makes slices, adds them to the sliced sequence
   node* copy_thin(node* thick_node);
   ElementListWithSlices *theSliceList, *theBendEdgeList; // Elements, of various types; consider to make separate lists for quadrupoles, sext ..  to speed up search
@@ -124,11 +131,15 @@ static const int  k_double_array=12;
 static const int k_cstring_array=13;
 using namespace std;
 
+static const bool dipedge_h1_h2_fl=true;  // normally false to avoid potentially non-simplectic partial higher order in dipedge. Optionally true as requested by Andrea Latina in 10/2014
+static const bool kill_fringe_fl=true;    // requested by Laurent et al., probably redundant, should be sufficient to check existance of non-default h1,e1; h2,e2 parameters
+static const bool rbend_to_sbend_fl=true; // translate all rbends to sbends, even if  makedipedge=false
+
 // check general options
 inline bool debug_fl()    { return get_option( const_cast<char*>("debug") ); }
 inline bool verbose_fl()  { return get_option( const_cast<char*>("verbose") ); }
 inline bool thin_foc_fl() { return get_option( const_cast<char*>("thin_foc") ); }
-inline bool rbarc_fl()    { return get_option( const_cast<char*>("rbarc") ); } // by default on, then use (reduce) length of rbends
+inline bool rbarc_fl()    { return get_option( const_cast<char*>("rbarc") ); } // by default on, then use (reduced) length of rbends
 
 static char* CopToNewC_String(const string& s) // copy chars of string to a new c-string Stroustrup3 p.590
 {
@@ -138,87 +149,293 @@ static char* CopToNewC_String(const string& s) // copy chars of string to a new 
   return p;
 }
 
-static void ParameterTurnOn(const char* parnam,element* el)
+
+//--------------------  const versions of mad utility routines ---- start
+
+/* returns parameter if it has been modified, otherwise NULL */
+static const command_parameter*
+return_param(const char* par,const element* elem) //hbu const version
 {
-  const int ei=name_list_pos(parnam,el->def->par_names);
-  if(ei>0) el->def->par_names->inform[ei]=1; // Turn on by setting inform to 1
-  else cout << " *** warning *** ParameterTurnOn for parameter " << parnam << " failed for " << el->name << " parameter not in element name_list " << EOL;
+  int index;
+  /* don't return base type definitions */
+  if (elem==elem->parent) return NULL;
+
+  if ((index = name_list_pos(par,elem->def->par_names))>-1
+      && elem->def->par_names->inform[index] > 0)
+    return elem->def->par->parameters[index];
+  return NULL;
 }
 
-static void ParameterRemove(const char* parnam,element* el)
+/* returns parameter if it has been modified, otherwise NULL  - recursively */
+static const command_parameter*
+return_param_recurse(const char* par,const element* elem) //hbu const version
 {
-  const int ei=name_list_pos(parnam,el->def->par_names);
-  if(ei)
+  const command_parameter* param = return_param(par,elem);
+  if (param) return param;
+  if (elem!=elem->parent)
+    return return_param_recurse(par,elem->parent);
+  return NULL;
+}
+
+static command_parameter*
+clone_command_parameter(const command_parameter* p) //hbu const version, also protect that does not crash if NULL
+{
+  if(p==NULL) return NULL; //hbu protect from crashing
+  command_parameter* clone = new_command_parameter(const_cast<char*>(p->name), p->type); //hbu
+  clone->call_def = p->call_def;
+  switch (p->type)
   {
-	el->def->par_names->inform[ei]=0; // Turn off  by setting inform to 0   -- effective in save,  but still used in twiss; so really delete expression and turn value off
-	const int ei_base=name_list_pos(parnam,el->def->par_names);
-	double default_value=0;
-	if(ei_base) default_value=el->base_type->def->par->parameters[ei_base]->double_value;  // el_par_value(parnam,el->base_type) cannot be used here, base element length may be zero
-	command_parameter* cp=el->def->par->parameters[ei];
-	if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " in " << el-> name << " parameter" << setw(12) << parnam
-	  << " value=" << setw(6) << cp->double_value << " set to default=" << setw(6) << default_value
-	  << " for " << setw(12) << parnam << " cp->expr=" << cp->expr << " and set expression to NULL" << EOL;
-	cp->type = k_double;
-	cp->double_value = default_value;
-	cp->expr=NULL; // remove expression, -- without freeing space --  better memory leak than crash
-	// if(cp->expr != NULL ) delete_expression(cp->expr); // delete expression --  resulted in crash in thick_bends/bend.madx  -- madX problem with poorly defined "objects"
+    case 4:
+      clone->c_min = p->c_min;
+      clone->c_max = p->c_max;
+      clone->min_expr = clone_expression(p->min_expr);
+      clone->max_expr = clone_expression(p->max_expr);
+    case 0:
+    case 1:
+    case 2:
+      clone->double_value = p->double_value;
+      clone->expr = clone_expression(p->expr);
+      break;
+    case 3:
+      clone->string = p->string;
+      clone->expr = NULL;
+      break;
+    case 11:
+    case 12:
+      clone->double_array = clone_double_array(p->double_array);
+      clone->expr_list = clone_expr_list(p->expr_list);
+      break;
+    case 13:
+      clone->m_string = clone_char_p_array(p->m_string);
+  }
+  return clone;
+}
+
+static void
+add_cmd_parameter_clone(command* cmd,const command_parameter *param,const char* par_name,const int inf) // hbu add an identical copy (clone) of param to cmd,  here const version
+{
+  if(param)
+  {
+    cmd->par->parameters[cmd->par->curr] = clone_command_parameter(param); /* set current to identical copy (clone) of param */
+    add_to_name_list(const_cast<char*>(par_name),inf,cmd->par_names); //hbu const_cast<char*>(
+    cmd->par->curr++;
   }
 }
 
-static double my_get_int_or_double_value(element* el,const char* parnam,bool &found) // works for integer and double, also useful as   my_get_int_or_double_value(el->base_type,char* parnam);  to get the default values
+static double
+command_par_special(const char* parameter,const element* el) //hbu const version
+/* construct missing tilt from normal and skew  */
+{
+  double val = zero;
+
+  if (strcmp(parameter, "tilt") == 0)
+  {
+    if ((val = command_par_value("tilt", el->def)) == zero)
+    {
+      val = zero;
+    }
+  }
+  else val = command_par_value(parameter, el->def);
+  return val;
+}
+
+static int
+element_vector(const element* el,const char* par,double* vector) //hbu const version
+/* returns length + vector of parameter par for element el */
+{
+  int i, l = 0;
+  double_array* da;
+  expr_list* ell;
+  if ((i = name_list_pos(par, el->def->par_names)) > -1)
+  {
+    if ((da = el->def->par->parameters[i]->double_array) != NULL)
+    {
+      if ((ell = el->def->par->parameters[i]->expr_list) != NULL)
+        update_vector(ell, da);
+      l = da->curr;
+      copy_double(da->a, vector, l);
+    }
+  }
+  return l;
+}
+
+static double
+el_par_value(const char* par,const element* el) //hbu const version
+/* returns an element parameter value */
+{
+  int k = 0; // , n; not used
+  char tmp[8];
+  double val = zero, angle = zero, l, vec[100];
+  double fact = strcmp(el->base_type->name, "rbend") == 0 ? one : zero;
+  int mult = strcmp(el->base_type->name, "multipole") == 0 ? 1 : 0;
+  int mark = strcmp(el->base_type->name, "marker") == 0 ? 1 : 0;
+  if (fact != zero || strcmp(el->base_type->name, "sbend") == 0) /* bend */
+  {
+    if ((l = command_par_value("l", el->def)) == zero)
+      fatal_error("bend with zero length:",el->name);
+    angle = command_par_value("angle", el->def);
+    if (strcmp(par, "angle") == 0)  val = angle;
+    else if (strcmp(par, "tilt") == 0)
+      val = command_par_value("tilt", el->def);
+    else if (strcmp(par, "k0") == 0) val = command_par_value("k0", el->def);
+    else if (strcmp(par, "k0s") == 0) val = command_par_value("k0s", el->def);
+    else if (strcmp(par, "l") == 0)
+    {
+      if (fact != zero && get_option( const_cast<char*>("rbarc") ) && angle != zero) //hbu const_cast
+        val = l * angle / (two * sin(angle/two));
+      else val = l;
+    }
+    else if (strcmp(par, "e1") == 0)
+      val = command_par_value("e1", el->def);/* + fact * angle / two; dipole_bv kill initiative SF TR FS */
+    else if (strcmp(par, "e2") == 0)
+      val = command_par_value("e2", el->def);/* + fact * angle / two; dipole_bv kill initiative SF TR FS */
+    else if (strcmp(par, "rhoinv") == 0) val = angle / l;
+    else if (strcmp(par, "blen") == 0) val = l;
+    else val = command_par_value(par, el->def);
+  }
+  /* all elements except bends */
+  else if (strcmp(par, "rhoinv") == 0) val = zero;
+  else if (strcmp(par, "blen") == 0) val = zero;
+  else if (mark) /* marker */
+  {
+    if ((l = command_par_value("l", el->def)) != zero)
+      fatal_error("marker with nonzero length:",el->name);
+    val = command_par_value(par, el->def);
+  }
+  else if (mult)  /* multipole */
+  {
+    if (strcmp(par, "l") == 0) val = zero;
+    else if (par[0] == 'k' && isdigit(par[1]) && par[strlen(par)-1] == 'l')
+    /* single component requested for multipole */
+    {
+      if (strchr(par, 's')) strcpy(tmp, "ksl");
+      else                  strcpy(tmp, "knl");
+      sscanf(&par[1], "%d", &k);
+      if (element_vector(el, tmp, vec) > k)  val = vec[k]; // n = not used
+    }
+    else val = command_par_value(par, el->def);
+  }
+  else val = command_par_special(par, el);
+  /* extra code for kickers */
+  if (val == zero && strcmp(el->base_type->name, "hkicker") == 0)
+  {
+    if (strcmp(par,"hkick") == 0)
+      val = command_par_value("kick", el->def);
+    else if (strcmp(par,"kick") == 0)
+      val = command_par_value("hkick", el->def);
+  }
+  else if (val == zero && strcmp(el->base_type->name, "vkicker") == 0)
+  {
+    if (strcmp(par,"vkick") == 0)
+      val = command_par_value("kick", el->def);
+    else if (strcmp(par,"kick") == 0)
+      val = command_par_value("vkick", el->def);
+  }
+  return val;
+}
+
+//hbu add_cmd_parameter_new written by me and only used here, no need to mad_cmdpar.c,h version not needed
+static void
+add_cmd_parameter_new(command* cmd,const double par_value,const char* par_name,const int inf) //hbu const version
+{
+  cmd->par->parameters[cmd->par->curr] = new_command_parameter(const_cast<char*>(par_name), 2);
+  cmd->par->parameters[cmd->par->curr]->double_value = par_value;
+  add_to_name_list(const_cast<char*>(par_name),inf,cmd->par_names);
+  cmd->par->curr++;
+}
+
+//--------------------  const versions of mad utility routines ---- end
+
+static bool NameIsInList(const string& Name,const vector<string>& List)
+{
+  bool found=false;
+  for(unsigned int i=0;i < List.size(); ++i)
+  {
+    if(Name==List[i])
+    {
+      found=true;
+      break;
+    }
+  }
+  return found;
+}
+
+static string my_dump_expression(expression* ex) // dump_expression in mad_expr.c only prints the value, here show also the expression and check for NULL
+{
+  ostringstream ostr;
+  ostr << setprecision(15) << "expression ";
+  if(ex==NULL) ostr << " is NULL";
+  else
+  {
+    if(ex->string) ostr << " string=" << left << setw(20) << ex->string << right;
+    ex->value = expression_value(ex, 2);
+    ostr << " value=" << ex->value;
+  }
+  return ostr.str();
+}
+
+static double my_get_int_or_double_value(const element* el,const char* parnam,bool &found) // works for integer and double, also useful as   my_get_int_or_double_value(el->base_type,char* parnam);  to get the default values
 {
   // just returning  el_par_value(parnam,base_el);   or  el_par_value_recurse(parnam,base_el);
   // is not good enough, gets 0 for integer parameters and in some cases too specific - like checks for non-zero length of dipoles  which does not allow to compare with the base type for dipoles
   // rather do all directly here, descending from el / el->def / el->def->par to parameters[i], loop through them and look at integer and double values
-  double default_val=0;
+  // in case of expression uses the expression_value
+  double val=0;
   found=false;
   unsigned int verbose=0;
   if(verbose_fl()) verbose=2;
+  // verbose=3;
   if(el && el->def && el->def->par)
   {
-	command_parameter_list* cmdpar=el->def->par;
-	if(verbose>2) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " el->name=" << setw(15) << left << el->name;
-	for (int i = 0; i < cmdpar->curr; i++)
-	{
-	  if(cmdpar->parameters[i])
-	  {
-		command_parameter* par=cmdpar->parameters[i];
-		if( string(par->name) == string(parnam) )
-		{
-		  switch (par->type)
-		  {
-			case k_int:    //    int value of expression, actually same as double value
-			  if(verbose>2) cout << "    int ";
-			  found=true;
-			  default_val = par->double_value;
-			  break;
-			case k_double: // double value of expression
-			  if(verbose>2) cout << " double ";
-			  found=true;
-			  default_val = par->double_value;
-			  break;
-		  }
-		}
-	  }
-	}
+    command_parameter_list* pl=el->def->par;
+    if(verbose>2) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " el->name=" << setw(15) << left << el->name;
+    for (int i = 0; i < pl->curr; ++i)
+    {
+      if(pl->parameters[i])
+      {
+        command_parameter* cp=pl->parameters[i];
+        if( string(cp->name) == string(parnam) )
+        {
+          if(cp->expr)
+          {
+            val = expression_value(cp->expr,2);
+            if(verbose>2) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " el->name=" << setw(15) << left << el->name << " use the expression_value=" << val << EOL;
+            found=true;
+          }
+          else switch (cp->type)
+          {
+            case k_int:    //    int value of expression, actually same as double value
+              if(verbose>2) cout << "    int ";
+              found=true;
+              val = cp->double_value;
+              break;
+            case k_double: // double value of expression
+              if(verbose>2) cout << " double ";
+              found=true;
+              val = cp->double_value;
+              break;
+          }
+        }
+      }
+    }
   }
   if(verbose>2)
   {
-	cout << " parameter " << setw(15) << parnam;
-	if(found) cout << "     found"; else      cout << "         not found";
-	cout << right << " default_val=" << default_val << EOL;
+    cout << " parameter " << setw(15) << parnam;
+    if(found) cout << "     found"; else      cout << "         not found";
+    cout << right << " val=" << val << EOL;
   }
-  return default_val;
+  return val;
 }
 
 static string my_dump_name_list(const name_list* nl) // name_list defined in mad_name.h
 {
   ostringstream ostr;
-  ostr << setprecision(12) << "my_dump_name_list  name          i   j   inform    max=" << setw(2) << nl->max << " curr=" << setw(2) << nl->curr << " name=" << setw(30) << nl->name << " list address=" << nl << endl; // max typically defined in new_name_list in mad_name.c
+  ostr << setprecision(15) << "my_dump_name_list  name          i   j   inform    max=" << setw(2) << nl->max << " curr=" << setw(2) << nl->curr << " name=" << setw(30) << nl->name << " list address=" << nl << endl; // max typically defined in new_name_list in mad_name.c
   if(nl==NULL) ostr << " is NULL";
   else
   {
-	for (int i = 0; i < nl->curr; i++)
+	for (int i = 0; i < nl->curr; ++i)
 	{
 	  const int j=nl->index[i];
 	  string nl_name="NULL";
@@ -231,20 +448,6 @@ static string my_dump_name_list(const name_list* nl) // name_list defined in mad
 	  << setw(4) << nl->inform[j]
 	  << EOL;
 	}
-  }
-  return ostr.str();
-}
-
-static string my_dump_expression(expression* ex) // dump_expression in mad_expr.c only prints the value, here show also the expression and check for NULL
-{
-  ostringstream ostr;
-  ostr << setprecision(12) << "expression ";
-  if(ex==NULL) ostr << " is NULL";
-  else
-  {
-	if(ex->string) ostr << " string=" << left << setw(20) << ex->string << right;
-	ex->value = expression_value(ex, 2);
-	ostr << " value=" << ex->value;
   }
   return ostr.str();
 }
@@ -262,43 +465,46 @@ static double cmd_par_val(const command_parameter* par) // return the double val
   return result;
 }
 
-static string my_dump_command_parameter(const command_parameter* par) // dump_command_parameter in mad_cmdpar.c only prints the value, here show also the expression by calling my_dump_expression and check for NULL
+static string my_dump_command_parameter(const command_parameter* cp) // dump_command_parameter in mad_cmdpar.c only prints the value, here show also the expression by calling my_dump_expression and check for NULL
 {
   ostringstream ostr;
-  ostr << setprecision(12) << "my_dump_command_parameter ";
-  if(par==NULL) ostr << " is NULL";
+  ostr << setprecision(15) << "my_dump_command_parameter ";
+  if(cp==NULL) ostr << " is NULL";
   else
   {
 	ostr << "parameter:" << left << setw(15) ;
-	if(par->name)  ostr << par->name; else ostr << "name=NULL ";
-	ostr << right << " par->type=" << setw(2) << par->type;
-	ostr << " stamp=" << par->stamp << " ";
+	if(cp->name)  ostr << cp->name; else ostr << "name=NULL ";
+	ostr << right << " cp->type=" << setw(2) << cp->type;
+	ostr << " stamp=" << cp->stamp << " ";
+    double default_val=0;
 	const double eps=1.e-15; // used to check if strength is compatible with zero
-	switch (par->type)
+	switch (cp->type)
 	{
 	  case k_logical:
 		ostr << "logical: ";
-		if( (int) par->double_value) ostr << "true"; else ostr << "false";
+		if( (int) cp->double_value) ostr << "true"; else ostr << "false";
 		ostr << EOL;
 		break;
 	  case k_int:    // int    value of expression, actually same as double value
 	  case k_double: // double value of expression
-		if(par->expr) ostr << my_dump_expression(par->expr); else ostr << " expression=NULL "; // my_dump_expression
-		if(par->expr==NULL && fabs(par->double_value)>eps) ostr << " value=" << setw(10) << par->double_value;
+		if(cp->expr) ostr << my_dump_expression(cp->expr); else ostr << " expression=NULL ";
+        if(cp->call_def) default_val=cp->call_def->double_value;
+ 		if(cp->expr==NULL && fabs(cp->double_value-default_val)>eps)
+          ostr << " value=" << setw(10) << cp->double_value << setw(10) << default_val;
 		ostr << EOL;
 		break;
 	  case k_int_array:    // int array,     expr_list
 	  case k_double_array: // double array,  expr_list, used for example for Aperture, http://mad.web.cern.ch/mad/madx.old/Introduction/aperture.html
-		if (par->double_array != NULL)
+		if (cp->double_array != NULL)
 		{
-		  if (par->expr_list != NULL) // calculate the values
+		  if (cp->expr_list != NULL) // calculate the values
 		  {
-			ostr << "array of " << par->double_array->curr << "  ";
-			for (int i = 0; i < par->double_array->curr; i++)
+			ostr << "array of " << cp->double_array->curr << "  ";
+			for (int ei = 0; ei < cp->double_array->curr; ++ei)
 			{
-			  if (i < par->expr_list->curr && par->expr_list->list[i] != NULL)
+			  if (ei < cp->expr_list->curr && cp->expr_list->list[ei] != NULL)
 			  {
-				ostr << right << setw(3) << i << " :" << left << my_dump_expression(par->expr_list->list[i]) << right; // show expression and value
+				ostr << right << setw(3) << ei << " :" << left << my_dump_expression(cp->expr_list->list[ei]) << right; // show expression and value
 			  }
 			}
 		  }
@@ -307,39 +513,91 @@ static string my_dump_command_parameter(const command_parameter* par) // dump_co
 		break;
 	  case k_cstring:
 		ostr << "cstring:";
-		if(par->string) ostr << par->string; else ostr << " NULL";
+		if(cp->string) ostr << cp->string; else ostr << " NULL";
 		ostr << EOL;
 		break;
 	  case k_cstring_array: // string array
-		dump_char_p_array(par->m_string);
+		dump_char_p_array(cp->m_string);
 	  case '?':
-		ostr << " par->type=" << par->type << " no info dump implemented so far" << EOL;
+		ostr << " cp->type=" << cp->type << " no info dump implemented so far" << EOL;
 	}
   }
   return ostr.str();
 }
 
-static string my_dump_command_parameter_list(command_parameter_list* cmdpar)
+static string my_dump_command_parameter_list(command_parameter_list* pl)
 {
   ostringstream ostr;
-  ostr << setprecision(12) << "my_dump_command_parameter_list";
-  if(cmdpar==NULL) ostr << " is NULL";
+  ostr << setprecision(15) << "my_dump_command_parameter_list";
+  if(pl==NULL) ostr << " is NULL";
   else
   {
-	if(cmdpar->name) ostr << " name=" << cmdpar->name; else ostr << " name=NULL";
-	ostr << " curr=" << cmdpar->curr << " max=" << cmdpar->max << EOL;
-	if(cmdpar->curr > cmdpar->max)
+	if(pl->name) ostr << " name=" << pl->name; else ostr << " name=NULL";
+	ostr << " curr=" << pl->curr << " max=" << pl->max << EOL;
+	if(pl->curr > pl->max)
 	{
-	  ostr << "*** error *** seen in my_dump_command_parameter_list max=" << cmdpar->curr << " > " << " curr" << cmdpar->curr << " set curr back to max" << EOL;
-	  cmdpar->curr = cmdpar->max;
+	  ostr << "*** error *** seen in my_dump_command_parameter_list max=" << pl->curr << " > " << " curr" << pl->curr << " set curr back to max" << EOL;
+	  pl->curr = pl->max;
 	}
-	for (int i = 0; i < cmdpar->curr; i++)
+	for (int i = 0; i < pl->curr; ++i)
 	{
 	  ostr << setw(2) << i << " : ";
-	  if(cmdpar->parameters[i]) ostr << my_dump_command_parameter(cmdpar->parameters[i]); else ostr << " NULL ";
+	  if(pl->parameters[i]) ostr << my_dump_command_parameter(pl->parameters[i]); else ostr << " NULL ";
 	}
   }
   return ostr.str();
+}
+
+static void SetParameterValue(const char* parnam,element* el,const double val,const int type=k_double) // set value and type, by default double
+{
+  const int ei=name_list_pos(parnam,el->def->par_names);
+  if(ei > -1)
+  {
+    command_parameter* cp=el->def->par->parameters[ei];
+    if(cp)
+    {
+      if(verbose_fl())
+      {
+        cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " parameter " << parnam
+        << " was double_value=" << cp->double_value
+        << " and type=" << cp->type;
+        if(cp->expr) cout << " has " << my_dump_expression(cp->expr); else cout << " no expression";
+        cout << " set to val=" << val
+             << " and type=" << type << EOL;
+      }
+      if(cp->expr) cp->expr=NULL; // remove any expression
+      cp->double_value=val; // set the double value
+      cp->type=type; // set the type value
+    }
+  }
+  else cout << " *** warning *** SetParameterValue for parameter " << parnam << " failed for " << el->name << " parameter not in element name_list " << EOL;
+}
+
+static void ParameterTurnOn(const char* parnam,element* el) // request that this parameter is written to output
+{
+  const int ei=name_list_pos(parnam,el->def->par_names);
+  if(ei > -1) el->def->par_names->inform[ei]=1; // Turn on by setting inform to 1
+  else cout << " *** warning *** ParameterTurnOn for parameter " << parnam << " failed for " << el->name << " parameter not in element name_list " << EOL;
+}
+
+static void ParameterRemove(const char* parnam,element* el)
+{
+  const int ei=name_list_pos(parnam,el->def->par_names);
+  if(ei > -1)
+  {
+    el->def->par_names->inform[ei]=0; // Turn off  by setting inform to 0   -- effective in save,  but still used in twiss; so really delete expression and turn value off
+    const int ei_base=name_list_pos(parnam,el->def->par_names);
+    double default_value=0;
+    if(ei_base) default_value=el->base_type->def->par->parameters[ei_base]->double_value;  // el_par_value(parnam,el->base_type) cannot be used here, base element length may be zero
+    command_parameter* cp=el->def->par->parameters[ei];
+    if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " in " << el-> name << " parameter" << setw(12) << parnam
+      << " value=" << setw(6) << cp->double_value << " set to default=" << setw(6) << default_value
+      << " for " << setw(12) << parnam << " cp->expr=" << cp->expr << " and set expression to NULL" << EOL;
+    cp->type = k_double;
+    cp->double_value = default_value;
+    cp->expr=NULL; // remove expression, -- without freeing space --  better memory leak than crash
+    // if(cp->expr != NULL ) delete_expression(cp->expr); // delete expression --  resulted in crash in thick_bends/bend.madx  -- madX problem with poorly defined "objects"
+  }
 }
 
 static string Check_command_parameter_consistence(const command* cmd)
@@ -352,10 +610,10 @@ static string Check_command_parameter_consistence(const command* cmd)
   if(cl->curr<1 || nl->curr<1) return EmptyStr;
   //-- at this point cmdpar and name_list exist and have at least one name,  see if they match
   vector<string> cl_names(cl->curr);
-  for(int i=0;i < cl->curr; i++) cl_names[i]=cl->parameters[i]->name;
-  
+  for(int i=0;i < cl->curr; ++i) cl_names[i]=cl->parameters[i]->name;
+
   vector<string> nl_names(nl->curr);
-  for (int i = 0; i < nl->curr; i++) nl_names[i]=nl->names[i];
+  for (int i = 0; i < nl->curr; ++i) nl_names[i]=nl->names[i];
   unsigned int imax=cl_names.size();
   if(nl_names.size()>imax) imax=nl_names.size();
   int ierr=0;
@@ -363,7 +621,7 @@ static string Check_command_parameter_consistence(const command* cmd)
   ostringstream ostr,ostr2;
   if(verbose_fl() || ierr) ostr2 << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " #cmdpar names=" << cl_names.size() << " #name_list names=" << nl_names.size() << EOL
 	<< "    i         cmdpar name      name_list name" << EOL;
-  for(unsigned int i=0;i<imax;i++)
+  for(unsigned int i=0; i<imax; ++i)
   {
 	if(verbose_fl())
 	{
@@ -405,12 +663,35 @@ static string my_dump_command(const command* cmd)
   return ostr.str();
 }
 
+static bool copy_cmd_par(const char* from_name,const char* to_name,const element* from_el,command* cmd) // copy parameter (expression) from an element to another command used in a new element, possible to change name
+{
+  command_parameter* to_param = clone_command_parameter( return_param(from_name,from_el) ); // clone to allow for changes in copy, uses my const clone_command_parameter which checks for NULL
+  bool done=true,found=false;
+  double value      =my_get_int_or_double_value(from_el           ,from_name,found);
+  double default_val=my_get_int_or_double_value(from_el->base_type,from_name,found);
+  const double eps=1.e-15; // used to check if strength is compatible with zero
+  // if(to_param || found ) // use this to take anyway, even if on default value,  just for test, may result in  memory access outside program range
+  if(to_param || (found && fabs(value-default_val)>eps) ) // expression defined or non-trivial value
+  {
+    if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " from_name=" << from_name << " to_name=" << to_name << " cloned to_param=" << to_param << " before strcpy " << my_dump_command_parameter(to_param);
+    strcpy(to_param->name,to_name); // put to_name  to the cloned   command_parameter*
+    if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " from_name=" << from_name << " to_name=" << to_name << " cloned to_param=" << to_param << " after  strcpy " << my_dump_command_parameter(to_param);
+    add_cmd_parameter_clone(cmd,to_param,(to_name),1);
+  }
+  else
+  {
+    if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " " << from_name << " parameter not defined or on default values, do not copy " << my_dump_command_parameter(to_param) << '\n';
+    done=false;
+  }
+  return done;
+}
+
 static void ParametersActiveOn(element* el) // turn active parameters on so that these values are written by save, where active means the expression exists or value different from default value,
 {
   if(el && el->def && el->def->par)
   {
 	command_parameter_list* cmdpar=el->def->par;
-	for (int i = 0; i < cmdpar->curr; i++)
+	for (int i = 0; i < cmdpar->curr; ++i)
 	{
 	  command_parameter* cmdi=cmdpar->parameters[i];
 	  char* parnam=cmdi->name;
@@ -438,7 +719,7 @@ static void ParametersActiveOn(element* el) // turn active parameters on so that
 static string my_dump_element(const element* el)
 {
   ostringstream ostr;
-  ostr << setprecision(12) << EOL << "my_dump_element";
+  ostr << setprecision(15) << EOL << "my_dump_element";
   if(el==NULL) ostr << " is NULL";
   else
   { // element defined in mad_cmd.h, c-structures based on pointing to pointers
@@ -453,14 +734,42 @@ static string my_dump_element(const element* el)
   return ostr.str();
 }
 
+static void Remove_All_Fringe_Field_Parameters(element* el)
+{
+#if __cplusplus >= 201103L // C++11 on
+  vector<string> FringePar{"e1","e2","fint","fintx","h1","h2","hgap"};
+#else
+  vector<string> FringePar(7);
+  FringePar[0]="e1";
+  FringePar[1]="e2";
+  FringePar[2]="fint";
+  FringePar[3]="fintx";
+  FringePar[4]="h1";
+  FringePar[5]="h2";
+  FringePar[6]="hgap";
+  const char* FringePar_char[]={"e1","e2","fint","fintx","h1","h2","hgap"};
+#endif
+  const char* eltype=el->base_type->name;
+  if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " el name=" << el->name << " type" << eltype << " before remove : " << my_dump_element(el) << EOL;
+  for(unsigned int i=0; i<FringePar.size(); ++i) ParameterRemove(FringePar[i].c_str(),el);
+  if(kill_fringe_fl)
+  {
+    SetParameterValue("kill_ent_fringe",el,true,k_logical);
+    SetParameterValue("kill_exi_fringe",el,true,k_logical);
+    ParameterTurnOn("kill_ent_fringe",el); // turn writing on
+    ParameterTurnOn("kill_exi_fringe",el); // turn writing on
+  }
+  if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " el name=" << el->name << " type" << eltype << " after  remove : " << my_dump_element(el) << EOL;
+}
+
 static string my_dump_node(const node* node)
 {
   ostringstream ostr;
-  ostr << setprecision(12) << EOL << "my_dump_node";
+  ostr << setprecision(15) << EOL << "my_dump_node";
   if(node==NULL) ostr << " is NULL";
   else
   {
-	ostr << setprecision(12) << " node:";
+	ostr << setprecision(15) << " node:";
 	char pname[NAME_L] = "NULL", nname[NAME_L] = "NULL", from_name[NAME_L] = "NULL";
 	if (node->previous != NULL) strcpy(pname, node->previous->name);
 	if (node->next != NULL) strcpy(nname, node->next->name);
@@ -476,7 +785,7 @@ static string my_dump_node(const node* node)
 	<< " at_expr: ";
 	if(node->at_expr) ostr << my_dump_expression(node->at_expr); else ostr << "NULL ";
 	if(node->p_elem) ostr << my_dump_element(node->p_elem);
-	if(node->cl!=NULL) for(int i=0;i< node->cl->curr;i++) dump_constraint(node->cl->constraints[i]);
+	if(node->cl!=NULL) for(int i=0; i< node->cl->curr; ++i) dump_constraint(node->cl->constraints[i]);
   }
   ostr << EOL;
   return ostr.str();
@@ -499,6 +808,8 @@ static string my_dump_sequence(const sequence* c_sequ,const int level)
 	else if(c_sequ->ref_flag==1) ostr << " (entry) ";
 	ostr << " share=" << c_sequ->share << " nested=" << c_sequ->nested << " con_cnt=" << c_sequ->con_cnt << " stamp=" << c_sequ->stamp << " line=" << c_sequ->line << " add_pass=" << c_sequ->add_pass << " length=" << c_sequ->length << EOL;
 	c_node = c_sequ->start;
+    ostr << setprecision(15);
+    double lastvalue=0;
 	while(c_node != NULL)
 	{
 	  suml += c_node->length;
@@ -510,11 +821,12 @@ static string my_dump_sequence(const sequence* c_sequ,const int level)
 	  else if (level > 0 && strcmp(c_node->base_name, "drift") != 0)
 	  {
 		ostr << left << setw(20) << c_node->name << right
-		<< " at_value=" << setw(8) << c_node->at_value
-		<< " position=" << setw(8) << c_node->position
-		<< " length="   << setw(8) << c_node->length;
+		<< " at_value=" <<  setw(8) << c_node->at_value
+		<< " position=" <<  setw(8) << c_node->position
+		<< " length="   << setw(17) << c_node->length;
 		if(c_node->from_name) ostr << " from " << c_node->from_name;
 		if(c_node->at_expr) ostr << " at_expr " << my_dump_expression(c_node->at_expr);
+        if(c_node->at_expr) { double currentvalue=expression_value(c_node->at_expr, 2); ostr << " diff=" << currentvalue-lastvalue; lastvalue=currentvalue; }
 		ostr << EOL;
 	  }
 	  if (c_node == c_sequ->end)  break;
@@ -553,24 +865,26 @@ static string my_get_cmd_expr_str(const command_parameter* cmd) // return the ex
 static expression* my_get_param_expression(const element* el,const char* parnam)// get a new copy of the expression for a parameter from an element, use the value as new expression if the expression was NULL
 {
   const int ipar = name_list_pos(parnam,el->def->par_names);
-  command_parameter* cmdpar = NULL;
-  if(ipar>-1)	cmdpar = el->def->par->parameters[ipar]; // pointer to the original length parameter
-  if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " for element " << setw(20) << el->name << " parameter " << setw(20) << parnam << " my_dump_expression(cmdpar->expr):" << my_dump_expression(cmdpar->expr) << " cmdpar->double_value=" << cmdpar->double_value << EOL;
+  const command_parameter* cmdpar = NULL;
+  if(ipar > -1)	cmdpar = el->def->par->parameters[ipar]; else return NULL; // pointer to the original length parameter
+  if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " for element " << setw(20) << el->name << " parameter " << setw(20) << parnam << " ipar=" << ipar << " my_dump_expression(cmdpar->expr):" << my_dump_expression(cmdpar->expr) << " cmdpar->double_value=" << cmdpar->double_value << EOL;
   command_parameter* cmdpar_copy = clone_command_parameter( cmdpar );  // copy of the original length parameter that can be modified
+  // if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << "clone_command_parameter done" << EOL;
   if(cmdpar_copy->expr==NULL)
   { // use the value as new expression if the expression was NULL
 	ostringstream ostr;
-	ostr << setprecision(12) << cmdpar->double_value; // use the value as string
+	ostr << setprecision(15) << cmdpar->double_value; // use the value as string
 	cmdpar_copy->expr = new_expression(CopToNewC_String(ostr.str()),deco); // where deco is a global.  // cmdpar_copy->expr->value = cmdpar->double_value; // seems to have no effect and this not needed
 	if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " cmdpar_copy->expr was NULL, create new expression from string " << ostr.str() << " now " << my_dump_expression(cmdpar_copy->expr) << EOL;
   }
+  // if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << "done" << EOL;
   return cmdpar_copy->expr;
 }
 
 static bool thick_fl(const element* el) // true if the element has a thick parameter and if the value is positive, 0 otherwise
 {
   const int thick_pos = name_list_pos("thick",el->def->par_names);
-  return (thick_pos>0 && el->def->par->parameters[thick_pos]->double_value>0);
+  return (thick_pos > -1 && el->def->par->parameters[thick_pos]->double_value>0);
 }
 
 static void dump_slices() // Loops over all current elements and prints the number of slices. Used for debug and info, uses global element_list
@@ -583,11 +897,11 @@ static void dump_slices() // Loops over all current elements and prints the numb
   if(verbose>2) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " verbose=" << verbose << " list all elements" << EOL;
   printf("            name  #slices      derived from  #slices\n");
   int n_elem_with_slice=0,n_elem_with_slice_gt_1=0;
-  for(int i=0; i< element_list->curr; i++) // loop over element_list
+  for(int i=0; i< element_list->curr; ++i) // loop over element_list
   {
 	element* el_i = element_list->elem[i];
 	int el_i_slice_pos = name_list_pos("slice",el_i->def->par_names);
-	if(el_i_slice_pos>-1) // element with slice number define
+	if(el_i_slice_pos > -1) // element with slice number defined
 	{
 	  n_elem_with_slice++;
 	  const int slices=el_i->def->par->parameters[el_i_slice_pos]->double_value;
@@ -619,11 +933,11 @@ static void dump_slices() // Loops over all current elements and prints the numb
 
 static void force_consistent_slices() // hbu 10/2005 loop over all elements and check that #slices of child and parent agree,  if not, use the maximum for both
 {
-  for(int i=0; i< element_list->curr; i++) // loop over element_list
+  for(int i=0; i< element_list->curr; ++i) // loop over element_list
   {
 	element* el_i = element_list->elem[i];
 	int el_i_slice_pos = name_list_pos("slice",el_i->def->par_names);
-	if(el_i_slice_pos>-1 && el_i->parent!=NULL && el_i != el_i->parent )
+	if(el_i_slice_pos > -1 && el_i->parent!=NULL && el_i != el_i->parent )
 	{
 	  command_parameter*  child=el_i->def->par->parameters[el_i_slice_pos];
 	  command_parameter* parent=el_i->parent->def->par->parameters[el_i_slice_pos];
@@ -635,7 +949,7 @@ static void force_consistent_slices() // hbu 10/2005 loop over all elements and 
 		child->double_value=slices;
 		parent->double_value=slices_parent;
 		int el_i_thick_pos = name_list_pos("thick",el_i->def->par_names);
-		if(el_i_thick_pos>-1) el_i->parent->def->par->parameters[el_i_thick_pos]->double_value = el_i->def->par->parameters[el_i_thick_pos]->double_value; // copy thick flag from child to parent
+		if(el_i_thick_pos > -1) el_i->parent->def->par->parameters[el_i_thick_pos]->double_value = el_i->def->par->parameters[el_i_thick_pos]->double_value; // copy thick flag from child to parent
 	  }
 	}
   }
@@ -645,7 +959,7 @@ static void force_consistent_slices() // hbu 10/2005 loop over all elements and 
 static int get_slices_from_elem(const element* elem)
 {
   int elem_slice_pos=0,slices=1;
-  if( (elem_slice_pos = name_list_pos("slice",elem->def->par_names)) >-1 ) slices=elem->def->par->parameters[elem_slice_pos]->double_value;
+  if( (elem_slice_pos = name_list_pos("slice",elem->def->par_names)) > -1 ) slices=elem->def->par->parameters[elem_slice_pos]->double_value;
   return slices;
 }
 
@@ -662,8 +976,8 @@ scale_and_slice(command_parameter* kn_param,const command_parameter* length_para
   int last_non_zero=-1;
   if (kn_param == NULL) return NULL;
   const double eps=1.e-15; // used to check if strength is compatible with zero
-  
-  for (int i=0; i<kn_param->expr_list->curr; i++)
+
+  for (int i=0; i<kn_param->expr_list->curr; ++i)
   {
 	expression* kn_i_expr = kn_param->expr_list->list[i];
 	double kn_i_val  = kn_param->double_array->a[i];
@@ -693,12 +1007,12 @@ scale_and_slice(command_parameter* kn_param,const command_parameter* length_para
   return kn_param;
 }
 
-static void add_lrad(command* cmd,command_parameter* length_param,const int slices)
+static void add_lrad(command* cmd,const command_parameter* length_param,const int slices)
 {
   command_parameter* l_par;
   if(length_param)
   {
-	add_cmd_parameter_new(cmd,0.,const_cast<char*>("l"),1); // new parameter l with value of 0
+	add_cmd_parameter_new(cmd,0.,"l",1); // new parameter l with value of 0
 	l_par = cmd->par->parameters[cmd->par->curr] = clone_command_parameter(length_param); // keep what was l
 	strcpy(l_par->name,"lrad"); // but rename to lrad and slice :
 	if (slices > 1) // divide numbers or expressions by the number of slices
@@ -711,28 +1025,36 @@ static void add_lrad(command* cmd,command_parameter* length_param,const int slic
   }
 }
 
-static node* new_marker(node* thick_node,const double at,expression *at_expr) // create a new marker element and node with position given by at_expr
+static node* new_marker(const node* thick_node,const double at,expression *at_expr) // create a new marker element and node with position given by at_expr
 {
+  
+#if __cplusplus >= 201103L // C++11 on
+  vector<const char*> ParList{"at","kmax","kmin","polarity","calib","type","apertype","aperture","aper_tol","mech_sep","mech_sep","v_pos","from"};
+#else // old C++ compiler
+  vector<const char*> ParList(12);
+  ParList[0]="at";
+  ParList[1]="kmax";
+  ParList[2]="kmin";
+  ParList[3]="polarity";
+  ParList[4]="calib";
+  ParList[5]="type";
+  ParList[6]="apertype";
+  ParList[7]="aperture";
+  ParList[8]="aper_tol";
+  ParList[9]="mech_sep";
+  ParList[10]="v_pos";
+  ParList[11]="from";
+#endif
   node* node=NULL;
-  element* elp=thick_node->p_elem;
+        element* elp=thick_node->p_elem;
+  const element* thick_el=thick_node->p_elem;
   if (elp)
   {
 	int imarker_pos = name_list_pos("marker", defined_commands->list);
 	command* p = defined_commands->commands[imarker_pos];
 	const int mx=25; // maximum number of par names and parvalues
 	command* cmd = new_command(p->name, mx, mx, p->module, p->group, p->link_type,p->mad8_type);
-	add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("at"),         thick_node->p_elem),const_cast<char*>("at"),      1);
-    add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("kmax"),       thick_node->p_elem),const_cast<char*>("kmax"),    1);
-    add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("kmin"),       thick_node->p_elem),const_cast<char*>("kmin"),    1);
-    add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("polarity"),   thick_node->p_elem),const_cast<char*>("polarity"),1);
-	add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("calib"),      thick_node->p_elem),const_cast<char*>("calib"),   1);
-	add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("type"),       thick_node->p_elem),const_cast<char*>("type"),    1);
-    add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("apertype"),   thick_node->p_elem),const_cast<char*>("apertype"),1);
-    add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("aperture"),   thick_node->p_elem),const_cast<char*>("aperture"),1);
-    add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("aper_tol"),   thick_node->p_elem),const_cast<char*>("aper_tol"),1);
-    add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("mech_sep"),   thick_node->p_elem),const_cast<char*>("mech_sep"),1);
-	add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("v_pos"),      thick_node->p_elem),const_cast<char*>("v_pos"),   1);
-    add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("from"),       thick_node->p_elem),const_cast<char*>("from"),    1);
+    for(unsigned int i=0; i<ParList.size(); ++i) add_cmd_parameter_clone(cmd,return_param_recurse(ParList[i], thick_el),ParList[i],1);
 	element* elem = make_element(elp->name,const_cast<char*>("marker"), cmd,-1);
 	if ( verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " new marker element " << my_dump_element(elem) << EOL;
 	node = new_elem_node(elem, thick_node->occ_cnt);
@@ -749,28 +1071,32 @@ static node* new_marker(node* thick_node,const double at,expression *at_expr) //
   return node;
 }
 
-static expression* curved_from_straight_length(element* rbend_el)
+static expression* curved_from_straight_length(const element* rbend_el)
 {
-  unsigned int verbose=0;
-  if(debug_fl()) verbose=1;
-  if(verbose_fl()) verbose=2;
-  expression* l_rbend_expr = clone_expression( command_par_expr(const_cast<char*>("l"),rbend_el->def) ); // clone of rbend length expression
+  expression* l_rbend_expr = my_get_param_expression(rbend_el,const_cast<char*>("l")); // get expression or create new from constant
   expression* l_sbend_expr = NULL;
   if(rbarc_fl() && l_rbend_expr ) // increase the straight rbend length to sbend length
-  { // Mad-X very confusing for RBEND,   el_par_value("l","rbend") gives the true arc length   val = l * angle / (two * sin(angle/two));     with rbarc on as done by default
-	// this is also shown in twiss
-	// in going from rbend to sbend, this correction must be applied   if the expression is used,    not for the value
-	const string anglestr    =my_get_cmd_expr_str( return_param_recurse(const_cast<char*>("angle"),rbend_el) );
-	const string rat = "("+anglestr+")*0.5/sin(("+anglestr+")/2)"; // L_sbend / L_rbend
-	expression* rat_expr = new_expression(CopToNewC_String(rat),deco);
-	l_sbend_expr = compound_expr(l_rbend_expr,0,const_cast<char*>("*"),rat_expr,0); // this also updates the value
-	if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " rbarc on, increase rbend straight length expression to sbend length  using anglestr=" << anglestr << " updated l_sbend_expr " << my_dump_expression(l_sbend_expr);
+  { // Mad-X very confusing for RBEND, "l" parameter   el_par_value("l","rbend") is the shorter straight length,   val = l * angle / (two * sin(angle/two));     with rbarc on as done by default
+    // this is also shown in twiss      node and element length give always the curved length
+    // in going from rbend to sbend, this correction must be applied   if the "l" expression is used,    not for the value
+    const string anglestr    =my_get_cmd_expr_str( return_param_recurse(const_cast<char*>("angle"),rbend_el) );
+    const string rat = "("+anglestr+")*0.5/sin(("+anglestr+")/2)"; // L_sbend / L_rbend
+    expression* rat_expr = new_expression(CopToNewC_String(rat),deco);
+    // try status=0 or 1 to update
+    l_sbend_expr = compound_expr(l_rbend_expr,0,const_cast<char*>("*"),rat_expr,0); // this also updates the value
+    if(verbose_fl())
+    {
+      bool found=false;
+      double straight_length=my_get_int_or_double_value(rbend_el,"l",found);
+      cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " " << rbend_el->name << " rbarc on, increase rbend straight length expression of value " << straight_length << " to curved sbend length  using anglestr=" << anglestr
+      << " updated l_sbend_expr " << my_dump_expression(l_sbend_expr) << " value should now be same as the curved rbend_el->length=" << rbend_el->length << EOL;
+    }
   }
   else l_sbend_expr=l_rbend_expr;
   return l_sbend_expr;
 }
 
-static element* sbend_from_rbend(element* rbend_el)
+static element* sbend_from_rbend(const element* rbend_el,const bool MakeDipedge)
 {
   // go from rbend to sbend
   // just changing the base_name did not work - seems also to change all parents, even with clone
@@ -781,9 +1107,9 @@ static element* sbend_from_rbend(element* rbend_el)
   unsigned int verbose=0;
   if(debug_fl()) verbose=1;
   if(verbose_fl()) verbose=2;
-  
+
   const string sbend_name=string(rbend_el->name)+"_sbend";
-  
+
   command* sbend_def = defined_commands->commands[ name_list_pos("sbend", defined_commands->list) ];
   if(verbose>1)
   {
@@ -798,42 +1124,66 @@ static element* sbend_from_rbend(element* rbend_el)
 	<< EOL;
 	if(verbose>2) cout << " where sbend defined :" << my_dump_command(sbend_def) << EOL;   //  count the number of parameters,  seems  47 ?
   }
-  
-  const int mx=sbend_def->par->curr; // maximum number of par names and parvalues -- take from definition
-  command* sbend_cmd = new_command(CopToNewC_String(string(sbend_def->name)+"_cmd"), mx, mx, sbend_def->module, sbend_def->group, sbend_def->link_type,sbend_def->mad8_type); // new command, used here to define sbend
-  
-  if(verbose>1) cout << EOL << EOL << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << "   " << my_dump_command(sbend_cmd) << EOL;
-  element* el=rbend_el;
-  if(el && el->def && el->def->par)
+
+  command* sbend_cmd=NULL;
+  const bool CloneCommand=false; //---  with false  no diff thin and thin2
+  if(CloneCommand)
   {
-	command_parameter_list* cmdpar=el->def->par;
-	for (int i = 0; i < cmdpar->curr; i++)
+    sbend_cmd = clone_command(rbend_el->def); // start from clone of rbend defining command
+    if(verbose>1) cout  << EOL << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << "  CloneCommand=" << CloneCommand << " " << my_dump_command(sbend_cmd) << EOL;
+  }
+  else // also start defining command from scratch -  works, except that difficult to get extra parameters  thick, kill_ent_fringe, kill_exi_fringe turned on
+  {
+    const int mx=sbend_def->par->curr; // maximum number of par names and parvalues -- take from definition,   getting mx=47  1/11/2014
+    sbend_cmd = new_command(CopToNewC_String(string(sbend_def->name)+"_cmd"), mx, mx, sbend_def->module, sbend_def->group, sbend_def->link_type,sbend_def->mad8_type); // new command, used here to define sbend
+    if(verbose>1) cout  << EOL << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " mx=" << mx << " new sbend_cmd " << my_dump_command(sbend_cmd) << EOL;
+  }
+
+#if __cplusplus >= 201103L // C++11 on
+  vector<string> LogParListToCopy{"thick","kill_ent_fringe","kill_exi_fringe"};
+#else // old C++ compiler
+  vector<string> LogParListToCopy(3);
+  LogParListToCopy[0]="thick";
+  LogParListToCopy[1]="kill_ent_fringe";
+  LogParListToCopy[2]="kill_exi_fringe";
+#endif
+
+  if(rbend_el && rbend_el->def && rbend_el->def->par)
+  {
+	command_parameter_list* cmdpar=rbend_el->def->par;
+	for (int i = 0; i < cmdpar->curr; ++i)
 	{
 	  int inform=0; // for  add_cmd_parameter_new/add_to_name_list
 	  command_parameter* cmdi=cmdpar->parameters[i];
+      double value=cmdi->double_value;
 	  char* parnam=cmdi->name;
 	  if( cmdi->expr && (strcmp(cmdi->expr->string, none) != 0) ) // turn on when expression defined and not none
 	  {
-		if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " in " << el-> name << " has expression, use this " << parnam  << EOL;
+		if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " in " << rbend_el-> name << " has expression, use this " << parnam  << EOL;
 		add_cmd_parameter_clone(sbend_cmd, return_param_recurse(parnam,rbend_el),parnam,1);
 	  }
-	  else if(string(parnam)=="thick")
-	  {
-		add_cmd_parameter_clone(sbend_cmd, return_param_recurse(parnam,rbend_el),parnam,1); // copy thick flag
-	  }
-	  else // copy value,   just copying the non-default values enough for save, twiss instead seems to also need require default values
+      else if(NameIsInList(string(parnam),LogParListToCopy)) // in LogParListToCopy   add to list
+      {
+        add_cmd_parameter_new(sbend_cmd,value,parnam,inform); // by default double, use SetParameterValue with k_logical for bool
+      }
+	  else // copy value,   just copying the non-default values enough for save, twiss instead seems to also require default values
 	  {
 		const double eps=1.e-15; // used to check if strength is compatible with zero
 		bool found=false;
 		double default_val=my_get_int_or_double_value(rbend_el->base_type,parnam,found); // return the default values, works for int and double parameters
-		double value=cmdi->double_value;
-		if( string(parnam) == string("l") && rbarc_fl()) value = el_par_value(parnam,rbend_el); // special case rbend with option("rbarc"), get increased arc length value from el_par_value
+        if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " rbend " << rbend_el->name << " parnam " << parnam << " " << sbend_name
+          << " cmdi=" << cmdi << " value=" << value << EOL;
+        if( string(parnam) == string("l") && rbarc_fl())
+        {
+          value = el_par_value(parnam,rbend_el); // special case rbend with option("rbarc"), get increased arc length value from el_par_value
+          if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " rbarc on, use increased length value=" << value << EOL;
+        }
 		if(found) //  && fabs(value-default_val)>eps ) // adding only non-default values ok for save, but not for twiss, make all parameters, even if default value
 		{
 		  if (fabs(value-default_val)>eps ) inform=1; // different from default, mark to be written in safe
 		  if(verbose_fl())
 		  {
-			cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " in " << el-> name
+			cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " in " << rbend_el-> name
 			<< " value=" << setw(6) << value << " default=" << setw(6) << default_val << " use this " << parnam;
 			if(inform) cout << " differs from default, set inform=" << inform;
 			cout << EOL;
@@ -849,13 +1199,22 @@ static element* sbend_from_rbend(element* rbend_el)
   {
 	expression* l_sbend_expr=curved_from_straight_length(rbend_el); // use this modified length expression in sbend_cmd
 	int il=name_list_pos(const_cast<char*>("l"),sbend_cmd->par_names); // parameter 0
-	if(il>-1) sbend_cmd->par->parameters[il]->expr=l_sbend_expr;
-	if( verbose>1 ) cout << EOL << EOL << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " after increase of rbend length now " << my_dump_command(sbend_cmd);
+	if(il > -1) sbend_cmd->par->parameters[il]->expr=l_sbend_expr;
+	if( verbose>1 ) cout << EOL << EOL << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " after increase of rbend length now l_sbend_expr : "
+      << my_dump_expression(l_sbend_expr)
+      << " sbend_cmd : " << my_dump_command(sbend_cmd);
   }
   if(verbose>1) cout << EOL << EOL << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " " << my_dump_command(sbend_cmd) << EOL;
-  if(verbose>1) cout << EOL << EOL << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " just before element *sbend_el=make_element  sbend_name=" << sbend_name << endl;
+  if(verbose>1) cout << EOL << EOL << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " just before element *sbend_el=make_element  sbend_name=" << sbend_name << EOL;
   element *sbend_el=make_element(const_cast<char*>(sbend_name.c_str()),const_cast<char*>("sbend"),sbend_cmd,2);
-  ParameterTurnOn(const_cast<char*>("thick"),sbend_el); //-- so that thick=true is written  to signal this for thick tracking
+
+  for(unsigned int i=0; i<LogParListToCopy.size(); ++i)
+  {
+    const char* parnam=LogParListToCopy[i].c_str();
+    SetParameterValue(parnam,sbend_el,true,k_logical);
+    if(MakeDipedge) ParameterTurnOn(parnam,sbend_el); //-- so that thick=true is written  to signal this for thick tracking
+  }
+
   if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " now sbend_el=" << sbend_el << " " << my_dump_element(sbend_el) << " compare this to the original rbend " << my_dump_element(rbend_el) << EOL;
   return sbend_el;
 } // sbend_from_rbend
@@ -874,9 +1233,9 @@ static void add_node_at_end_of_sequence(node* node,sequence* sequ) // position i
 	node->previous  = sequ->end;
   }
   sequ->end = node;
-  
+
   // node->at_expr=NULL; // use this to only write at values, no expressions
-  
+
   if(verbose_fl())
   {
 	cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " " << left << setw(20) << node->name << " " << setw(20) << node->base_name << right
@@ -889,9 +1248,55 @@ static void add_node_at_end_of_sequence(node* node,sequence* sequ) // position i
   return;
 }
 
+static void add_half_angle_to(const element* rbend_el,element* to_el,const char* to_parm) // get half surface angle of rbend, add to e1 or e2 of dipedge or sbend
+{
+  if(rbend_el && to_el)
+  {
+    expression* half_angle_expr  = scale_expr(my_get_param_expression(rbend_el,"angle"),0.5); // angle*0.5
+    command_parameter* to_param = return_param_recurse(const_cast<char*>(to_parm),to_el); // get param from element, may not exist, use here the non const version of return_param_recurse, to modify to_el
+    if(to_param) // modify the existing parameter in to_el
+    {
+      if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " original to_param " << my_dump_command_parameter(to_param) << EOL;
+      to_param->expr = compound_expr(to_param->expr,0,const_cast<char*>("+"),half_angle_expr,0);
+      if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << "    now  to_param " << my_dump_command_parameter(to_param) << EOL;
+    }
+    else // param not yet in to_el, start from parameter definition
+    {
+      int ipar = name_list_pos(to_parm,to_el->def->par_names);
+      if(ipar > -1) // already in name_list
+      {
+        to_param = clone_command_parameter( to_el->def->par->parameters[ipar] );  // copy of the original length parameter that can be modified
+        to_el->def->par->parameters[ipar]->expr=half_angle_expr;
+        ParameterTurnOn(to_parm,to_el);
+        if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " use existing to_param from ipar= " << ipar
+          << " to_param=" << to_param
+          << " to_el->def->par->parameters[ipar]->expr=" << to_el->def->par->parameters[ipar]->expr << EOL;
+      }
+      else // not in name_list_pos
+      {
+        ipar = name_list_pos(to_parm,to_el->base_type->def->par_names); // parameter in the definition, must always exist
+        if(ipar > -1)
+        {
+          to_param = clone_command_parameter( to_el->base_type->def->par->parameters[ipar] );  // copy of the original length parameter that can be modified
+          if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " for element " << setw(20) << to_el->name << " parameter " << setw(20) << to_parm << " my_dump_expression(to_param->expr):" << my_dump_expression(to_param->expr) << " to_param->double_value=" << to_param->double_value << EOL;
+        }
+        else
+        {
+          if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " *** error ***<  element " << setw(20) << to_el->name << " of type " << to_el->base_type->name << " has no parameter" << to_parm << EOL;
+          return;
+        }
+        to_param->expr=half_angle_expr; // set expression, which is NULL from definition, to half_angle_expr
+        if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << "    now  to_param " << my_dump_command_parameter(to_param) << EOL;
+        add_cmd_parameter_clone(to_el->def,to_param,to_parm,1); // add new parameter to element, increases the name_list
+      }
+    }
+  }
+}
+
 static element* create_bend_dipedge_element(element* thick_elem,const bool Entry) // using Dipedge  http://mad.web.cern.ch/mad/madx.old/Introduction/dipedge.html, also return sbend_el in case of rbend
 {
-  // makes dipedge element for start or end of the dipole	
+  // see also twiss.f90    SUBROUTINE tmbend,   and  SUBROUTINE tmfrng  for fringe fields, and   SUBROUTINE tmdpdg  for dipedge
+  // makes dipedge element for start or end of the dipole
   // example
   // from original thick
   // mb1: sbend,l:=lmb ,angle:=amb ,k1:=kmb ,e1:=ee1 ,e2:=ee2 ;
@@ -899,15 +1304,18 @@ static element* create_bend_dipedge_element(element* thick_elem,const bool Entry
   // mb1_l: dipedge, h:= amb/lmb ; e1:=ee1 ;  !--------- new dipedge at entry
   // mb1: sbend,l:=lmb ,angle:=amb ,k1:=kmb ;      ! modified middle, e1, e2  removed
   // mb1_r: dipedge, h:= amb/lmb ; e1:=ee2 ;  !--------- new dipedge at exit
+  //
+  // request from Laurent Deniau and Andrea Latina in 10/2014   also move any h1, h2  parameters as h parameter to entry, exit dipedge
+  //
   unsigned int verbose=0;
   if(debug_fl()) verbose=1;
   if(verbose_fl()) verbose=2;
   const bool IsRbend= string(thick_elem->base_type->name) == string("rbend");
-  
-  vector<string> CheckParams; //-- parameters which can directly be copied from bend to dipedge if value different from default.  e1, e2, fint, fintx need extra work
+
+  vector<string> CheckParams; //-- parameters which can directly be copied from bend to dipedge if value different from default. Instead e1, e2, fint, fintx, h1, h2 need extra work
   CheckParams.push_back("polarity");
   CheckParams.push_back("tilt");
-  CheckParams.push_back("h");
+  //old CheckParams.push_back("h");
   CheckParams.push_back("hgap");
   CheckParams.push_back("mech_sep");
   CheckParams.push_back("v_pos");
@@ -916,15 +1324,15 @@ static element* create_bend_dipedge_element(element* thick_elem,const bool Entry
   CheckParams.push_back("method");
   CheckParams.push_back("exact");
   CheckParams.push_back("nst");
-  
+
   // verbose=3; // extra debug - print element definitions
-  
+
   element* dipedge=NULL;
   if (thick_elem)
   {
 	string dipedge_name=string(thick_elem->name);
 	command* dipedge_def = defined_commands->commands[ name_list_pos("dipedge", defined_commands->list) ]; // access to dipedge structure as defined in mad_dict.h
-	if(Entry) dipedge_name+="_l"; else dipedge_name+="_r";
+	if(Entry) dipedge_name+="_den"; else dipedge_name+="_dex"; // dipedge entry or exit
 	if(verbose>1)
 	{
 	  cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__;
@@ -943,7 +1351,7 @@ static element* create_bend_dipedge_element(element* thick_elem,const bool Entry
 	if(Entry) dipedge_cmd_name+="_l_"; else dipedge_cmd_name+="_r_";
 	dipedge_cmd_name+="cmd";
 	command* dipedge_cmd = new_command(CopToNewC_String(dipedge_cmd_name), mx, mx, dipedge_def->module, dipedge_def->group, dipedge_def->link_type,dipedge_def->mad8_type); // new command, used here to define dipedge
-	const double eps=1.e-15;	
+	const double eps=1.e-15;
 	const bool generate_h=true;
 	
 	expression* l_par_expr=NULL;
@@ -952,8 +1360,9 @@ static element* create_bend_dipedge_element(element* thick_elem,const bool Entry
 	  char* parnam=const_cast<char*>("l");
 	  const int ipar = name_list_pos(parnam,thick_elem->def->par_names);
 	  command_parameter* cmdpar = NULL;
-	  if(ipar>-1)
-	  {  cmdpar = thick_elem->def->par->parameters[ipar]; // pointer to the original length parameter
+	  if(ipar > -1)
+	  {
+        cmdpar = thick_elem->def->par->parameters[ipar]; // pointer to the original length parameter
 		if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " for element " << setw(20) << thick_elem->name << " parameter " << setw(20) << parnam << " my_dump_expression(cmdpar->expr):" << my_dump_expression(cmdpar->expr) << " cmdpar->double_value=" << cmdpar->double_value << EOL;
 		command_parameter* cmdpar_copy = clone_command_parameter( cmdpar );  // copy of the original length parameter that can be modified
 		l_par_expr=cmdpar_copy->expr;
@@ -964,13 +1373,13 @@ static element* create_bend_dipedge_element(element* thick_elem,const bool Entry
 	  }
 	  else // only length value, use it and put in expression
 	  {
-		double l_par_value=  el_par_value(const_cast<char*>("l"),thick_elem); // also does straight length to curved length conversion if needed
+		double l_par_value= el_par_value(const_cast<char*>("l"),thick_elem); // also does straight length to curved length conversion if needed
 		if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " no length expression, only value=" << l_par_value << EOL;
 		int ipar = name_list_pos(const_cast<char*>("l"),thick_elem->def->par_names);
-		if(ipar>-1)
+		if(ipar > -1)
 		{
 		  ostringstream ostr;
-		  ostr << setprecision(12) << l_par_value; // use the value as string
+		  ostr << setprecision(15) << l_par_value; // use the value as string
 		  l_par_expr = new_expression(CopToNewC_String(ostr.str()),deco); // where deco is a global.
 		}
 	  }
@@ -980,71 +1389,33 @@ static element* create_bend_dipedge_element(element* thick_elem,const bool Entry
 	  hparam->expr=compound_expr(angle_par_expr,0.,const_cast<char*>("/"),l_par_expr,0); // this also updates the value
 	  add_cmd_parameter_clone(dipedge_cmd,hparam,const_cast<char*>("h"),1);
 	}
-	
-	if(IsRbend) // work with values, avoids checks if e1, e2 expressions exist, for rbend add angle/2 to dipedge e1  ------ not bad, but could be improved to get more precision
-	{
-	  double angle = el_par_value_recurse(const_cast<char*>("angle"),thick_elem);
-	  if(Entry) //  e1 + angle/2
-	  {
-		double e1val = el_par_value_recurse(const_cast<char*>("e1"),thick_elem)+angle/2;
-		add_cmd_parameter_new(dipedge_cmd,e1val,const_cast<char*>("e1"),1);
-		if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " rbend add angle=" << angle << "/2 to e1val=" << e1val << EOL;
-	  }
-	  else // End  e2 + angle/2
-	  {
-		double e2val = el_par_value_recurse(const_cast<char*>("e2"),thick_elem)+angle/2;
-		add_cmd_parameter_new(dipedge_cmd,e2val,const_cast<char*>("e1"),1);
-		if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " rbend add angle=" << angle << "/2 to e2val=" << e2val << EOL;
-	  }
-	}
-	else // sbend    use any existing e1, e2 expressions in dipedge
-	{
-	  if(Entry)  // copy e1 from thick bend, for sbend add   angle/2
-	  {
-		// command_parameter* e1param = return_param(const_cast<char*>("e1"),thick_elem);
-		command_parameter* e1param = clone_command_parameter( return_param(const_cast<char*>("e1"),thick_elem) );   // better also clone here
-		if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " cloned e1param=" << e1param << " " << my_dump_command_parameter(e1param) ;
-		if(fabs(cmd_par_val(e1param))<eps) return NULL; // check that it has a nontrivial e1param				
-		// add_cmd_parameter_new(dipedge_cmd,cmd_par_val(e1param),const_cast<char*>("e1"),1); // works
-		add_cmd_parameter_clone(dipedge_cmd,e1param,const_cast<char*>("e1"),1); // better use the expression (or value)
-	  }
-	  else // End   use e1 for e2
-	  {
-		command_parameter* e2param = clone_command_parameter( return_param(const_cast<char*>("e2"),thick_elem) ); // clone, to allow for change e2 -> e1
-		if(fabs(cmd_par_val(e2param))<eps) return NULL;
-		if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " cloned e2param=" << e2param << " before strcpy " << my_dump_command_parameter(e2param);
-		strcpy(e2param->name,"e1"); // change name to e1
-		if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " cloned e2param=" << e2param << " after  strcpy " << my_dump_command_parameter(e2param);
-		// add_cmd_parameter_new(dipedge_cmd,cmd_par_val(e2param),const_cast<char*>("e1"),1); // use e2 from bend as e1 for end dipedge. works
-		add_cmd_parameter_clone(dipedge_cmd,e2param,const_cast<char*>("e1"),1); // better use the expression (or value)
-	  }
-	}
-	
-	if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " " << my_dump_command(dipedge_cmd) << EOL;
-	bool found=false;
-	
-	// if fintx is there, then use fint for start and fintx for end,   otherwise  use fint in both cases
-	int i_fintx = name_list_pos(const_cast<char*>("fintx"),thick_elem->def->par_names);
-	const bool fintx_defined =  i_fintx>0 && thick_elem->def->par_names->inform[i_fintx];
-	if(verbose>2) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " " << thick_elem->name << " has fintx_defined=" << fintx_defined << EOL;
-	
-	command_parameter*   fint_param = return_param(const_cast<char*>("fint") ,thick_elem);
-	command_parameter*  fintx_param = return_param(const_cast<char*>("fintx"),thick_elem);
-	
-	if(fintx_defined && !Entry) // use fintx as fint for right edge
-	{
-	  if(fintx_param) fintx_param = clone_command_parameter( fintx_param ); // better go to clone before any changes, not sure if really needed
-	  if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " " << thick_elem->name << " use fintx as fint for right edge" << EOL;
-	  strcpy(fintx_param->name,"fint"); // change name to fint
-	  add_cmd_parameter_clone(dipedge_cmd,fintx_param,const_cast<char*>("fint"),1); // use fintx as fint for right edge
-	}
-	else
-	{
-	  if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " " << thick_elem->name << " use fint for dipedge Entry=" << Entry << EOL;
-	  add_cmd_parameter_clone(dipedge_cmd,fint_param,const_cast<char*>("fint"),1); // use fint in dipedge
-	}
-	
-	for(unsigned int i=0;i<CheckParams.size();i++) // copy other nontrivial parameters given in CheckParams from thick bend  -- only gets here with nontrivial e1 or e2     -- otherwise already returned NULL before
+
+    if(dipedge_h1_h2_fl)
+    {
+      if(Entry) copy_cmd_par("h1","h1",thick_elem,dipedge_cmd); // at entry, copy h1 from thick bend as dipedge h1
+      else      copy_cmd_par("h2","h2",thick_elem,dipedge_cmd); // at  exit, copy h2 from thick bend as dipedge h2
+    }
+
+    if(Entry) copy_cmd_par("e1","e1",thick_elem,dipedge_cmd); // at entry, copy e1 from thick sbend as dipedge e1
+    else      copy_cmd_par("e2","e1",thick_elem,dipedge_cmd); // at  exit, copy e2 from thick sbend as dipedge e1
+    
+    if(Entry)
+    {
+      copy_cmd_par("fint","fint",thick_elem,dipedge_cmd); // at entry, copy fint from thick bend as dipedge fint
+    }
+    else // Exit
+    {
+      const command_parameter *fintxparam = return_param("fintx",(const element*)thick_elem); // use my const version of return_param to check the presence of fintx in thick_elem
+      if(fintxparam!=NULL) copy_cmd_par("fintx","fint",thick_elem,dipedge_cmd); // use fintx if given, no check on value, allows for fintx=0 to turn off exit
+      else copy_cmd_par("fint" ,"fint",thick_elem,dipedge_cmd); // use fint
+      if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " " << my_dump_command_parameter(fintxparam) << EOL;
+    }
+
+    if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " " << my_dump_command(dipedge_cmd) << EOL;
+
+    bool found=false;
+
+    for(unsigned int i=0; i<CheckParams.size(); ++i) // copy other nontrivial parameters given in CheckParams from thick bend  -- only gets here with nontrivial e1 or e2     -- otherwise already returned NULL before
 	{
 	  const string ParNam=CheckParams[i];
 	  char* parnam=CopToNewC_String(ParNam.c_str()); // use this,    char* parnam=const_cast<char*>(ParNam.c_str());   resulted in name_list corruption
@@ -1053,8 +1424,6 @@ static element* create_bend_dipedge_element(element* thick_elem,const bool Entry
 	  double default_val=my_get_int_or_double_value(thick_elem->base_type,parnam,found);
 	  if(this_param || (found && fabs(value-default_val)>eps) ) // expression defined or non-trivial value
 	  {
-		// add_cmd_parameter_new(dipedge_cmd,cmd_par_val(return_param_recurse(parnam,thick_elem)),parnam,1); // worked ok, value
-		// add_cmd_parameter_new(dipedge_cmd,value,parnam,1); // worked ok, value
 		add_cmd_parameter_clone(dipedge_cmd,this_param,parnam,1); // use this parameter (expression or value) for dipedge
 		if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " " << thick_elem->name << "        use parameter " << setw(12) << parnam << " for dipedge this_param=" << this_param << EOL;
 	  }
@@ -1064,27 +1433,8 @@ static element* create_bend_dipedge_element(element* thick_elem,const bool Entry
 	  }
 	}
 	dipedge=make_element(const_cast<char*>(dipedge_name.c_str()),const_cast<char*>("dipedge"), dipedge_cmd,-1); // make the element and put it in global element_list, using the command dipedge_cmd, -1 means avoid warnings,  1 means delete and warn, 2 means warn and ignore if already present  see  add_to_el_list  mad_elem.c
-	
-	if(verbose>2) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " after make_element dipedge" << my_dump_element(dipedge);
-	if(verbose>2) cout << EOL << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " before remove " << my_dump_element(thick_elem);
-	
-	// remove from body what is now taken care of by dipedges
-	if(Entry)
-	{
-	  ParameterRemove(const_cast<char*>("e1"),thick_elem);
-	  if(verbose>2) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " after ParameterRemove in Entry dipedge" << my_dump_element(dipedge);
-	}
-	else
-	{
-	  ParameterRemove(const_cast<char*>("e2")   ,thick_elem);
-	  ParameterRemove(const_cast<char*>("fint") ,thick_elem);
-	  ParameterRemove(const_cast<char*>("fintx"),thick_elem);
-	  ParameterRemove(const_cast<char*>("hgap") ,thick_elem);
-	  if(verbose>2) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " after ParameterRemove in Exit  dipedge" << my_dump_element(dipedge);
-	}
-	ParameterTurnOn(const_cast<char*>("thick"),thick_elem); //-- so that thick=true is written  to signal this for thick tracking
-	
-	if(verbose>2)
+    
+    if(verbose>2)
 	{
 	  cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " " << setw(12) << thick_elem->name << " after ";
 	  if(Entry) cout << "e1"; else cout << "e2";
@@ -1109,15 +1459,17 @@ static void create_and_place_bend_node(const node* thick_node,expression *at_exp
 	if(slice_elem->base_type && slice_elem->base_type->name && (strcmp(slice_elem->base_type->name,"dipedge") == 0) ) slice_node->length=0; // set dipedge length = 0   (otherwise copied from thick bend)
 
 	if(verbose_fl())
-	{ 
+	{
 	  cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " make node " << slice_elem->name << " " << slice_elem->base_type->name << " original thick " << thick_node->p_elem->name << my_dump_element(slice_elem) << EOL
 	  << " slice_node->from_name=";
 	  if(slice_node->from_name) cout << slice_node->from_name; else cout << "NULL ";
 	  cout << " thick_node->at_value=" << thick_node->at_value;
 	  cout << " slice_node->at_value=" << slice_node->at_value << EOL;
 	}
-	expression* length_param_expr=my_get_param_expression(thick_node->p_elem,const_cast<char*>("l"));
+	expression* length_param_expr=my_get_param_expression(thick_node->p_elem,const_cast<char*>("l")); // get expression or create new from constant
+    if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " length_param_expr " << my_dump_expression(length_param_expr) << EOL;
 	if(IsRbend) length_param_expr = curved_from_straight_length( thick_node->p_elem);
+    if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " length_param_expr " << my_dump_expression(length_param_expr) << EOL;
 	
 	double at = thick_node->at_value;
 	slice_node->at_expr = compound_expr(at_expr, at,const_cast<char*>("+"),  scale_expr(length_param_expr,rel_shift),  0 ); // this also updates the value
@@ -1137,67 +1489,31 @@ static void create_and_place_bend_node(const node* thick_node,expression *at_exp
   }
 }
 
-static element* create_thick_slice(const element* thick_elem,const int i,const string& thin_style) // create quad slice .sq, .bq elements like   mqxa.1r1.sq: quadrupole, l:=l.mqxa   * 1/10, k1:=kqx.r1 + ktqx1.r1;      and add to the sequence
+static void place_thick_slice(element* thick_elem,const node* node, sequence* to_sequ, element* slice_elem, const int i, const string& thin_style) // make nodes for the _s, _b  pieces  and place them in the sequence
 {
   const int n = get_slices_from_elem(thick_elem);
-  
-  string slice_name;
-  if(i==0) slice_name=string(thick_elem->name)+".sq"; // add .sq to end    quad name, start/end slice
-  else     slice_name=string(thick_elem->name)+".bq"; // add .bq to end    quad name, body slice
-  
+  const bool IsRbend= string(thick_elem->base_type->name) == string("rbend");
   SliceDistPos SP(n, thin_style==string("teapot") );
   if(verbose_fl())
   {
-	cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " " << " create " << slice_name << " n=" << n << " based on " << thick_elem->name << " " << my_dump_element(thick_elem); SP.Print();
-	if(thick_elem->parent) cout << " dump also parent " << thick_elem->parent->name << my_dump_element(thick_elem->parent);
+    cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " n=" << n << " start from thick_elem " << thick_elem->name;
+    if(IsRbend) cout << " rbend -- careful thick_elem->length=" << thick_elem->length << " is the curved length, longer than the straight length in element";
+    cout << my_dump_element(thick_elem); SP.Print();
   }
-  
-  expression* length_param_expr=my_get_param_expression(thick_elem,const_cast<char*>("l"));
-  
-  if(length_param_expr==NULL) // compound_expr with scaling will fail   -- should never happen
-  {
-	cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " *** error *** length_param_expr=" << length_param_expr << EOL;
-	exit(1);
-  }
-  
-  if(i==0) length_param_expr = compound_expr(length_param_expr,0,const_cast<char*>("*"), NULL,SP.delta); // the quadrupole start and end slice  length = l*delta
-  else     length_param_expr = compound_expr(length_param_expr,0,const_cast<char*>("*"), NULL,SP.Delta); // the middle quadrupole slices        length = l*Delta
-  
-  command* cmd = clone_command(thick_elem->def); 	// clone existing command to define the new element, result something like  mqxa.1r1.sq: quadrupole,polarity:= 1,k1:=kqx.r1 + ktqx1.r1 ;
-  
-  if(verbose_fl()) cout << EOL<< EOL << "create_thick_slice after clone for " << thick_elem->name << EOL << my_dump_command(cmd) << " use length_param_expr " << my_dump_expression(length_param_expr);
-  const int length_i = name_list_pos(const_cast<char*>("l"),cmd->par_names);
-  cmd->par->parameters[length_i]->expr=length_param_expr; // use the length expression in cmd
-  
-  if (verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " thin_style=\"" << thin_style << "\"" << " i=" << i << my_dump_command(cmd);
-  
-  element* slice_elem = make_element(const_cast<char*>(slice_name.c_str()),const_cast<char*>("quadrupole"),cmd,-1); // make new element (without parent) using the command cmd, -1 means avoid warnings
-  
-  ParametersActiveOn(slice_elem); // Activate attributes, important when derived from parents -- turns also slice number on - not wanted
-  ParameterRemove(const_cast<char*>("slice"),slice_elem); // slicing done, no reason to leave the slice parameter
-  ParameterTurnOn(const_cast<char*>("thick"),slice_elem); //-- so that thick=true is written  to signal this for thick tracking
-  if(verbose_fl()) cout << "done create_thick_slice " << " slice_name=" << slice_name << " from thick element " << thick_elem->name << " n=" << n  << " : " << my_dump_element(slice_elem) << EOL;
-  
-  return slice_elem;
-} // create_thick_slice
 
-static void place_thick_slice(const element* thick_elem,const node* node, sequence* to_sequ, element* slice_elem, const int i, const string& thin_style) // make nodes for the .sq, .bq quadrupole pieces  and place them in the sequence
-{
-  const int n = get_slices_from_elem(thick_elem);
-  SliceDistPos SP(n, thin_style==string("teapot") );
-  if(verbose_fl()) { printf("\nverbose %s %s line %d n=%d  start from thick_elem %s :\n",__FILE__,__FUNCTION__,__LINE__,n,thick_elem->name); cout << my_dump_element(thick_elem); SP.Print(); }
-  
-  expression* length_param_expr=my_get_param_expression(thick_elem,const_cast<char*>("l")); // with this length_param_expr should not be NULL
-  
+  expression* l_par_expr;
+  if(IsRbend  && rbarc_fl() ) l_par_expr=curved_from_straight_length(thick_elem);
+  else l_par_expr=my_get_param_expression(thick_elem,const_cast<char*>("l")); // with this l_par_expr should not be NULL
+
   expression* at_expr = clone_expression(node->at_expr);
   double at = node->at_value;
-  
+
   double rel_shift;	
-  if(i==0)       rel_shift=-0.5 + SP.delta/2.; // 1st  piece .sq
-  else if(i==n)  rel_shift= 0.5 - SP.delta/2.; // last piece .sq
-  else           rel_shift=-0.5 + SP.delta + (i-0.5)*SP.Delta; // middle body pieces .bq
-  
-  at_expr = compound_expr(at_expr,at,const_cast<char*>("+"),  scale_expr(length_param_expr,rel_shift),  0 ); // this also updates the value
+  if(i==0)       rel_shift=-0.5 + SP.delta/2.; // entry
+  else if(i==n)  rel_shift= 0.5 - SP.delta/2.; // exit
+  else           rel_shift=-0.5 + SP.delta + (i-0.5)*SP.Delta; // body
+
+  at_expr = compound_expr(at_expr,at,const_cast<char*>("+"),  scale_expr(l_par_expr,rel_shift),  0 ); // this also updates the value
   struct node* thick_node = new_elem_node(slice_elem, node->occ_cnt);
   thick_node->from_name = buffer(node->from_name);
   thick_node->at_expr   = at_expr;
@@ -1207,20 +1523,21 @@ static void place_thick_slice(const element* thick_elem,const node* node, sequen
   if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " dump_node(thick_node)   :" << EOL << my_dump_node(thick_node) << " done with place_thick_slice " << i << EOL;
 }
 
+
 static sequence* slice_sequence(const string& thin_style,sequence* thick_sequ) // make recursively a sliced sequence out of the thick_seque
 {
   if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " thin_style=\"" << thin_style << "\"" << EOL;
-  
+
   sequence* thin_sequ;
   static SequenceList sliced_seqlist;
   if ((thin_sequ=sliced_seqlist.get_sequ(thick_sequ))) return thin_sequ; // do nothing if the sequence was already sliced
-  
+
   char name[128];
   strcpy(name,thick_sequ->name);
   fprintf(prt_file, "makethin: slicing sequence : %s\n",name);
-  
+
   if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " my_dump_sequence thick_sequ " << my_dump_sequence(thick_sequ,2) << EOL; // dump level 2, without nodes/elements
-  
+
   thin_sequ = new_sequence(name, thick_sequ->ref_flag);
   thin_sequ->start = NULL;
   thin_sequ->share = thick_sequ->share;
@@ -1232,7 +1549,7 @@ static sequence* slice_sequence(const string& thin_style,sequence* thick_sequ) /
   else thin_sequ->cavities = new_el_list(100);
   if (thin_sequ->crabcavities != NULL)  thin_sequ->crabcavities->curr = 0;
   else thin_sequ->crabcavities = new_el_list(100);
-  
+
   SeqElList theSeqElList(name,thin_style,thick_sequ,thin_sequ,thick_sequ->start);
   while(theSeqElList.thick_node != NULL) // loop over current sequence, the nodes are added to the sequence in add_node_at_end_of_sequence()
   {
@@ -1242,9 +1559,9 @@ static sequence* slice_sequence(const string& thin_style,sequence* thick_sequ) /
 	theSeqElList.thick_node = theSeqElList.thick_node->next;
   }
   thin_sequ->end->next = thin_sequ->start;
-  
+
   if(verbose_fl())  cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << EOL << EOL << EOL << " my_dump_sequence thin_sequ " << my_dump_sequence(thin_sequ,2)  << EOL; // dump level 2, without nodes/elements
-  
+
   int pos=0;
   if ((pos = name_list_pos(name, sequences->list)) < 0) // move the pointer in the sequences list to point to our thin sequence
   {
@@ -1268,20 +1585,20 @@ static int set_selected_elements() //  result in global  element_list     used i
   }
   // select, flag=makethin, clear;   only resets the selection commands by  slice_select->curr=0  in mad_select.c
   // the element_list ist not cleared, reset it here, before evaluation of the selection for makethin
-  for(int j=0; j< element_list->curr; j++) // loop over element_list
+  for(int j=0; j< element_list->curr; ++j) // loop over element_list
   {
 	element* el_j = element_list->elem[j];
 	int el_j_slice_pos = name_list_pos("slice",el_j->def->par_names);
 	int el_j_thick_pos = name_list_pos("thick",el_j->def->par_names); // position of thick flag      in element list
-	if(el_j_slice_pos >-1) el_j->def->par->parameters[el_j_slice_pos]->double_value=1; // set all number of slices to 1
-	if(el_j_thick_pos >-1) el_j->def->par->parameters[el_j_thick_pos]->double_value=0; // by default not thick
+	if(el_j_slice_pos > -1) el_j->def->par->parameters[el_j_slice_pos]->double_value=1; // set all number of slices to 1
+	if(el_j_thick_pos > -1) el_j->def->par->parameters[el_j_thick_pos]->double_value=0; // by default not thick
   }
   // now evaluate the selection for makethin
   node* nodes[2];  // for range check,   from nodes[0] to  nodes[1]   default is full sequence from start to end
   nodes[0] = current_sequ->ex_start;
   nodes[1] = current_sequ->ex_end;
   int slice=1; // default
-  for (int i = 0; i < slice_select->curr; i++) // loop over "select,flag=makethin" commands
+  for (int i = 0; i < slice_select->curr; ++i) // loop over "select,flag=makethin" commands
   {
 	name_list* nl = slice_select->commands[i]->par_names;
 	command_parameter_list* pl = slice_select->commands[i]->par;
@@ -1291,11 +1608,11 @@ static int set_selected_elements() //  result in global  element_list     used i
 	const int pos_range  = name_list_pos("range", nl);
 	const bool range_fl  = pos_range > -1 && nl->inform[pos_range]; // selection with range
 	
-	const int pos_slice  = name_list_pos("slice", nl);               // position of slice parameter in select command list
+	const int pos_slice  = name_list_pos("slice", nl);              // position of slice parameter in select command list
 	const bool slice_fl  = pos_slice > -1 && nl->inform[pos_slice]; // selection with slice
 	if (slice_fl) slice  = pl->parameters[pos_slice]->double_value; // Parameter has been read. Slice number from select command, if given overwrites slice number which may have been defined by element definition
 	
-	const int pos_thick  = name_list_pos("thick", nl); // position of thick flag in select command list
+	const int pos_thick  = name_list_pos("thick", nl);              // position of thick flag in select command list
 	const bool thick_fl  = pos_slice > -1 && nl->inform[pos_thick]; // selection with slice
 	
 	if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " i=" << setw(2) << i  << " nl->name=" << nl->name << " full_fl=" << full_fl << " range_fl=" << range_fl
@@ -1330,8 +1647,8 @@ static int set_selected_elements() //  result in global  element_list     used i
 		  const int el_j_thick_pos = name_list_pos("thick",el_j->def->par_names); // position of thick flag      in element list
 		  if (pass_select(el_j->name, slice_select->commands[i]) != 0) // selection on class and pattern done in pass_select. element el_j selected
 		  { // the element el_j passes the selection
-			if(el_j_slice_pos >-1) el_j->def->par->parameters[el_j_slice_pos]->double_value=slice; // Set the element slice number to the number of slices given in the select statement.
-			if(el_j_thick_pos >-1) el_j->def->par->parameters[el_j_thick_pos]->double_value=pl->parameters[pos_thick]->double_value; // Set the element thick flag to what is given in the select statement
+			if(el_j_slice_pos > -1) el_j->def->par->parameters[el_j_slice_pos]->double_value=slice; // Set the element slice number to the number of slices given in the select statement.
+			if(el_j_thick_pos > -1) el_j->def->par->parameters[el_j_thick_pos]->double_value=pl->parameters[pos_thick]->double_value; // Set the element thick flag to what is given in the select statement
 		  } // selection
 		  if (c_node == nodes[1]) break; // done with last node
 		  c_node = c_node->next;
@@ -1339,15 +1656,15 @@ static int set_selected_elements() //  result in global  element_list     used i
 	  } // range_fl
 	  else // no range_fl
 	  {
-		for(int j=0; j< element_list->curr; j++) // loop over element_list
+		for(int j=0; j< element_list->curr; ++j) // loop over element_list
 		{
 		  element* el_j = element_list->elem[j];
 		  const int el_j_slice_pos = name_list_pos("slice",el_j->def->par_names);
 		  const int el_j_thick_pos = name_list_pos("thick",el_j->def->par_names); // position of thick flag      in element list
 		  if (pass_select(el_j->name, slice_select->commands[i]) != 0) // selection on class and pattern done in pass_select. element el_j selected
 		  { // the element el_j passes the selection
-			if(el_j_slice_pos >-1) el_j->def->par->parameters[el_j_slice_pos]->double_value=slice; // Set the element slice number to the number of slices given in the select statement.
-			if(el_j_thick_pos >-1) el_j->def->par->parameters[el_j_thick_pos]->double_value=pl->parameters[pos_thick]->double_value; // Set the element thick flag to what is given in the select statement
+			if(el_j_slice_pos > -1) el_j->def->par->parameters[el_j_slice_pos]->double_value=slice; // Set the element slice number to the number of slices given in the select statement.
+			if(el_j_thick_pos > -1) el_j->def->par->parameters[el_j_thick_pos]->double_value=pl->parameters[pos_thick]->double_value; // Set the element thick flag to what is given in the select statement
 			if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " el_j->name=" << left << setw(15) << el_j->name << right << " el_j_slice_pos=" << el_j_slice_pos << " el_j_thick_pos=" << el_j_thick_pos << EOL;
 		  } // selection
 		} // loop over element_list
@@ -1363,7 +1680,11 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
   double CPU_start=clock();
   name_list* nl = cmd->clone->par_names;
   command_parameter_list* pl = cmd->clone->par;
-  if (debug_fl()) cout << "using the makethin C++ version" << EOL;
+#if __cplusplus >= 201103L // C++11 on
+  if (debug_fl()) cout << "using the makethin C++ version with C++11 enabled" << EOL;
+#else
+  cout << "*** warning *** your compiler/options are not C++11 compatible" << EOL;
+#endif
   const int ipos_style = name_list_pos("style", nl);
   string thin_style;
   if (nl->inform[ipos_style] &&  pl->parameters[ipos_style]->string )
@@ -1371,20 +1692,23 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
 	thin_style = buffer(pl->parameters[ipos_style]->string) ;
 	cout << "makethin: style chosen : " << thin_style << EOL;
   }
-  
+
+  if(debug_fl() && kill_fringe_fl)   cout << "kill_fringe_fl="   << kill_fringe_fl   << " is on. Flags kill_ent_fringe kill_exi_fringe will be set to true for thick bend body slices" << EOL;
+  if(debug_fl() && dipedge_h1_h2_fl) cout << "dipedge_h1_h2_fl=" << dipedge_h1_h2_fl << " is on. Higher order h1, h2 parameters will be kept. Tracking may become non-simplectic" << EOL;
+
   // first check makethin parameters which influence the selection
   const int ipos_mp = name_list_pos("minimizeparents", nl);
   int MinPar=0;  // or =1  to set minimizeparents to true by default
   if( ipos_mp > -1 && nl->inform[ipos_mp]) MinPar=pl->parameters[ipos_mp]->double_value;
   set_option(const_cast<char*>("minimizeparents"), &MinPar);
-  
+
   const int ipos_mk = name_list_pos("makeconsistent", nl);
   if( ipos_mk > -1 && nl->inform[ipos_mk])
   {
 	int MakeCons=pl->parameters[ipos_mk]->double_value;
 	set_option(const_cast<char*>("makeconsistent"), &MakeCons);
   }
-  
+
   const int ipos_md = name_list_pos("makedipedge", nl);
   if( ipos_md > -1 && nl->inform[ipos_md])
   {
@@ -1399,9 +1723,9 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
 	if (debug_fl() && iret) cout << "set_selected_elements iret=" << iret << EOL;
   }
   else  warning("makethin: no selection list,","slicing all to one thin lens.");
-  
+
   if(get_option(const_cast<char*>("makeconsistent"))) force_consistent_slices();
-  
+
   const int ipos_seq = name_list_pos("sequence", nl);
   char* name = NULL;
   if (nl->inform[ipos_seq] && (name = pl->parameters[ipos_seq]->string))
@@ -1445,7 +1769,7 @@ void SliceDistPos::Print() const
 }
 
 //--------  OneElementWithSlices
-OneElementWithSlices::OneElementWithSlices(element* thick_elem,element* thin_elem) // OneElementWithSlices constructor
+OneElementWithSlices::OneElementWithSlices(const element* thick_elem,element* thin_elem) // OneElementWithSlices constructor
 {
   this->thick_elem=thick_elem;      // for each thick
   sliced_elem.push_back(thin_elem); // there can be several slices
@@ -1467,7 +1791,7 @@ ElementListWithSlices::ElementListWithSlices(unsigned int verbose) // OneElement
 ElementListWithSlices::~ElementListWithSlices() // destructor
 {
   if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " ElementListWithSlices destructor called VecElemWithSlices.size()=" << VecElemWithSlices.size() << EOL;
-  for(unsigned int iel=0; iel<VecElemWithSlices.size(); iel++) delete VecElemWithSlices[iel]; // undo the new OneElementWithSlices(thick_elem,thin_elem);
+  for(unsigned int iel=0; iel<VecElemWithSlices.size(); ++iel) delete VecElemWithSlices[iel]; // undo the new OneElementWithSlices(thick_elem,thin_elem);
 }
 
 void ElementListWithSlices::PrintCounter() const
@@ -1483,24 +1807,24 @@ int ElementListWithSlices::find_thick(const element* thick_elem) // find thick_e
   int ifound=-1;
   if(VecElemWithSlices.size()>0)
   {
-	// verbose=3; // CSPE
+	// verbose=3;
 	if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " VecElemWithSlices.size()=" << setw(4) << VecElemWithSlices.size()
 	  << " " << left << setw(20) << thick_elem->name << right;
 	unsigned int isearched=0; // local counter of how many searched
 	// look for the element in the list
-	if(ilast2>-1 && VecElemWithSlices[ilast2]->thick_elem==thick_elem)
+	if(ilast2 > -1 && VecElemWithSlices[ilast2]->thick_elem==thick_elem)
 	{
 	  ifound=ilast2; // same as ilast2, no search needed
 	  if(verbose>2) cout << " same as ilast2";
 	}
-	else if(ilast1>-1 && VecElemWithSlices[ilast1]->thick_elem==thick_elem)
+	else if(ilast1 > -1 && VecElemWithSlices[ilast1]->thick_elem==thick_elem)
 	{
 	  ifound=ilast1; // same as ilast1, no search needed
 	  if(verbose>2) cout << " same as ilast1";
 	}
 	else
 	{
-	  for(unsigned int iel=0; iel<VecElemWithSlices.size(); iel++) // search forward
+	  for(unsigned int iel=0; iel<VecElemWithSlices.size(); ++iel) // search forward
 		// for(int iel=VecElemWithSlices.size()-1; iel>=0; iel--)  // search backward
 	  {
 		get_thin_iteractions++;
@@ -1533,7 +1857,7 @@ int ElementListWithSlices::find_thick(const element* thick_elem) // find thick_e
 element* ElementListWithSlices::find_slice(const element* thick_elem,const int slice) // find address of thin slice by slice number for thick_elem
 {
   element* result=NULL;
-  
+
   const int iel=find_thick(thick_elem);
   if(iel<0)
   {
@@ -1543,7 +1867,7 @@ element* ElementListWithSlices::find_slice(const element* thick_elem,const int s
   // thick element found, now check if slice already defined
   int islice=slice-1;
   int nslices=VecElemWithSlices[iel]->sliced_elem.size();
-  
+
   if(islice < nslices)
   {
 	result=VecElemWithSlices[iel]->sliced_elem[islice]; // already done
@@ -1556,7 +1880,7 @@ element* ElementListWithSlices::find_slice(const element* thick_elem,const int s
 element* ElementListWithSlices::find_slice(const element* thick_elem,const string& name) // find address of thin slice by slice name for thick_elem
 {
   element* result=NULL;
-  
+
   const int iel=find_thick(thick_elem);
   if(iel<0)
   {
@@ -1564,7 +1888,7 @@ element* ElementListWithSlices::find_slice(const element* thick_elem,const strin
 	return NULL;
   }
   const int nslices=VecElemWithSlices[iel]->sliced_elem.size();
-  for(unsigned int i=0;i<(unsigned int)nslices;i++)
+  for(unsigned int i=0; i<(unsigned int)nslices; ++i)
   {
 	if( string(VecElemWithSlices[iel]->sliced_elem[i]->name)==name) // found
 	{
@@ -1577,28 +1901,32 @@ element* ElementListWithSlices::find_slice(const element* thick_elem,const strin
   return result;
 }
 
-void ElementListWithSlices::put_slice(element* thick_elem,element* thin_elem) // add thin_elem to the list
+void ElementListWithSlices::put_slice(const element* thick_elem,element* thin_elem) // add thin_elem to the list
 {
   bool found=false;
-  //verbose=3; // CSPE
-  if(verbose>2) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " VecElemWithSlices.size()=" << setw(4) << VecElemWithSlices.size()
-	<< " thick=" << left << setw(20) << thick_elem->name << setw(20) << " thin=" << thin_elem->name << right << EOL;
-  for(unsigned int iel=0; iel<VecElemWithSlices.size(); iel++)
+  // verbose=3; // CSPE
+  if(thick_elem && thin_elem)
   {
-	if( strcmp(VecElemWithSlices[iel]->thick_elem->name,thick_elem->name) == 0 )
-	{
-	  found=true;
-	  VecElemWithSlices[iel]->sliced_elem.push_back(thin_elem);
-	  if(verbose>1) cout << "put_slice found thick " << setw(20) << thick_elem->name << " in list at iel=" << iel << " #slices=" << VecElemWithSlices[iel]->sliced_elem.size() << EOL;
-	  break;
-	}
+    if(verbose>2) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " VecElemWithSlices.size()=" << setw(4) << VecElemWithSlices.size()
+      << " thick=" << left << setw(20) << thick_elem->name << setw(20) << " thin=" << thin_elem->name << right << EOL;
+    for(unsigned int iel=0; iel<VecElemWithSlices.size(); ++iel)
+    {
+      if( strcmp(VecElemWithSlices[iel]->thick_elem->name,thick_elem->name) == 0 )
+      {
+        found=true;
+        VecElemWithSlices[iel]->sliced_elem.push_back(thin_elem);
+        if(verbose>1) cout << "put_slice found thick name=" << setw(20) << thick_elem->name << " slice name=" << thin_elem->name << " in list at iel=" << iel << " #slices=" << VecElemWithSlices[iel]->sliced_elem.size() << EOL;
+        break;
+      }
+    }
+    if(!found)
+    {
+      OneElementWithSlices* aSliceList= new OneElementWithSlices(thick_elem,thin_elem);
+      VecElemWithSlices.push_back(aSliceList);
+      if(verbose>1) cout << "put_slice add  thick=" << left << setw(20) << thick_elem->name << setw(20) << " thin=" << thin_elem->name << right << " to list, now VecElemWithSlices.size()=" << VecElemWithSlices.size() << EOL;
+    }
   }
-  if(!found)
-  {
-	OneElementWithSlices* aSliceList= new OneElementWithSlices(thick_elem,thin_elem);
-	VecElemWithSlices.push_back(aSliceList);
-	if(verbose>1) cout << "put_slice add  thick=" << left << setw(20) << thick_elem->name << setw(20) << " thin=" << thin_elem->name << right << " to list, now VecElemWithSlices.size()=" << VecElemWithSlices.size() << EOL;
-  }
+  else cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " *** warning *** put_slice called with undefined thick_elem=" << thick_elem << " or thin_elem=" << thin_elem << EOL;
   return;
 }
 
@@ -1606,18 +1934,18 @@ void ElementListWithSlices::Print() const
 {
   if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " VecElemWithSlices.size()=" << VecElemWithSlices.size() << EOL;
   cout << "   iel  #slices   base_type         parent_name   parent->base_type    slice_elem->name   slices" << EOL;
-  for(unsigned int iel=0;iel<VecElemWithSlices.size();iel++) // original
+  for(unsigned int iel=0; iel<VecElemWithSlices.size(); ++iel) // original
   {
 	unsigned int nslices=VecElemWithSlices[iel]->sliced_elem.size();
 	if(verbose>1 || nslices>1) // show only if more than 1 slice,  show all in case of verbose
 	{
-	  element* el_thick=VecElemWithSlices[iel]->thick_elem;
+	  const element* el_thick=VecElemWithSlices[iel]->thick_elem;
 	  cout << setw(4) << iel << setw(8) << nslices << setw(15) << el_thick->base_type->name << setw(20) << el_thick->name;
 	  if(el_thick && el_thick->parent)            cout << setw(20) << el_thick->parent->name; else cout << setw(20) << " ";
 	  if(el_thick && el_thick->parent->base_type) cout << setw(20) << el_thick->parent->base_type->name; else cout << setw(20) << " ";	
-	  for(unsigned int i=0;i<nslices;i++)
+	  for(unsigned int i=0; i<nslices; ++i)
 	  {
-		element* eli=VecElemWithSlices[iel]->sliced_elem[i];
+		const element* eli=VecElemWithSlices[iel]->sliced_elem[i];
 		if(eli) cout << setw(20) << eli->name; else cout << setw(20) << " ";
 		cout << " address "  << setw(12) <<  eli;
 	  }
@@ -1680,10 +2008,10 @@ double SeqElList::default_at_shift(const int slices, const int slice_no)
   return slices>4 ? simple_at_shift(slices, slice_no) : teapot_at_shift(slices, slice_no);
 }
 
-double SeqElList::at_shift(const int slices,const int slice_no,const string& local_thin_style) // return at relative shifts from centre of unsliced magnet
+double SeqElList::at_shift(const int slices,const int slice_no,const string& local_thin_style) // return relative shifts from centre of unsliced magnet
 {
   if(verbose_fl() && local_thin_style!=thin_style) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " local_thin_style=" << local_thin_style << " thin_style=" << thin_style << EOL;
-  
+
   if (!slices || !slice_no) fatal_error("makethin: invalid slicing for zero slices",local_thin_style.c_str());
   if      (local_thin_style==string(""))        return default_at_shift(slices,slice_no);
   else if (local_thin_style==string("simple"))  return simple_at_shift(slices,slice_no);
@@ -1696,21 +2024,21 @@ double SeqElList::at_shift(const int slices,const int slice_no,const string& loc
 void SeqElList::Print() const
 {
   cout << "SeqElList::Print seqname=" << seqname << " theSliceList->VecElemWithSlices.size()=" << theSliceList->VecElemWithSlices.size() << " thin_style=\"" << thin_style << "\"" << EOL;
-  
+
   cout << EOL << "   theSliceList:" << EOL; theSliceList->Print();
   if(verbose) theSliceList->PrintCounter();
-  
+
   cout << EOL << "theBendEdgeList:" << EOL; theBendEdgeList->Print();
   if(verbose) theBendEdgeList->PrintCounter();
 }
 
-int SeqElList::translate_k(command_parameter* *kparam, command_parameter* *ksparam, command_parameter* angle_param, command_parameter* kn_param, command_parameter* ks_param)
+int SeqElList::translate_k(command_parameter* *kparam, command_parameter* *ksparam,const command_parameter* angle_param, command_parameter* kn_param, command_parameter* ks_param)
 // translate k0,k1,k2,k3 & k0s,k1s,k2s,k3s to kn{} and ks{}
 {
   int angle_conversion=0;
-  
+
   if ((kparam == NULL) && (ksparam == NULL)) fatal_error("translate_k: no kparams to convert","");
-  
+
   if (angle_param) // if we have an angle we ignore any given k0
   {
 	kparam[0] =  new_command_parameter(const_cast<char*>("k0"), k_double);
@@ -1718,8 +2046,8 @@ int SeqElList::translate_k(command_parameter* *kparam, command_parameter* *kspar
 	if (angle_param->expr) kparam[0]->expr =  clone_expression(angle_param->expr);
 	kparam[0]->double_value = angle_param->double_value;
   }
-  
-  for(int i=0; i<4; i++) // initialize the parameters with NULL for expression and 0 for the value
+
+  for(int i=0; i<4; ++i) // initialize the parameters with NULL for expression and 0 for the value
   {
 	kn_param->expr_list->list[i] = NULL; kn_param->double_array->a[i] = 0;
 	ks_param->expr_list->list[i] = NULL; ks_param->double_array->a[i] = 0;
@@ -1739,128 +2067,277 @@ int SeqElList::translate_k(command_parameter* *kparam, command_parameter* *kspar
   return angle_conversion;
 }
 
-element* SeqElList::create_sliced_magnet(element* thick_elem, int slice_no,bool ThickSLice) // create the sliced element, recursively for parents
+element* SeqElList::create_thick_slice(element* thick_elem,const int i) // create entry/exit slice _s,  and body _b elements like   mqxa.1r1_s: quadrupole, l:=l.mqxa   * 1/10, k1:=kqx.r1 + ktqx1.r1;      and add to the sequence
+{
+  const int n = get_slices_from_elem(thick_elem);
+  const char* eltype=thick_elem->base_type->name;
+  string slice_name;
+  const bool entry_fl=(i==0);
+  const bool  exit_fl=(i==n);
+  const bool IsBend=(string(eltype).substr(1,4)==string("bend"));
+  const bool IsRbend= string(thick_elem->base_type->name) == string("rbend");
+  if      (entry_fl)  slice_name=string(thick_elem->name)+"_en"; // entry
+  else if (exit_fl)   slice_name=string(thick_elem->name)+"_ex"; // exit
+  else                slice_name=string(thick_elem->name)+"_bo"; // body  slice
+
+  element* slice_elem;
+  if( (slice_elem = theSliceList->find_slice(thick_elem,slice_name)))
+  {
+    if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " slice_name already exists, use it" << EOL;
+    return slice_elem;
+  }
+
+  if(IsRbend)
+  {
+    cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " " << eltype << " create " << slice_name << " based on " << thick_elem->name << " *** warning *** slicing of thick rbends requested -- generates extra fringe fields from the angle at the surface " << EOL;
+  }
+
+  SliceDistPos SP(n, thin_style==string("teapot") );
+  if(verbose>1)
+  {
+    cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " " << eltype << " create " << slice_name << " based on " << thick_elem->name
+    << " i=" << i << " n=" << n
+    << " entry_fl=" << entry_fl
+    << " exit_fl="  << exit_fl
+    << " IsBend=" << IsBend
+    << " IsRbend=" << IsRbend
+    << " " << my_dump_element(thick_elem); SP.Print();
+    if(thick_elem->parent) cout << " dump also parent " << thick_elem->parent->name << my_dump_element(thick_elem->parent);
+  }
+
+  expression* l_par_expr=my_get_param_expression(thick_elem,const_cast<char*>("l")); // get length expression
+  expression* angle_par_expr = my_get_param_expression(thick_elem,const_cast<char*>("angle")); // get angle expressions - relevant for bends
+
+  if(l_par_expr==NULL) // compound_expr with scaling will fail   -- should never happen
+  {
+    cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " *** error *** l_par_expr=" << l_par_expr << EOL;
+    exit(1);
+  }
+
+  double LengthFraction;
+  if(entry_fl || exit_fl) LengthFraction=SP.delta; // start / end slice
+  else                    LengthFraction=SP.Delta; // the middle or body piece
+
+  l_par_expr                        = compound_expr(l_par_expr,    0,const_cast<char*>("*"), NULL,LengthFraction); // multiply length parameter expression with LengthFraction
+  if(angle_par_expr) angle_par_expr = compound_expr(angle_par_expr,0,const_cast<char*>("*"), NULL,LengthFraction); // multiply angle  parameter expression with LengthFraction, only relevant for bends
+
+  command* cmd = clone_command(thick_elem->def); 	// clone existing command to define the new element, result something like  mqxa.1r1_s: quadrupole,polarity:= 1,k1:=kqx.r1 + ktqx1.r1 ;
+
+  if(verbose>1)
+  {
+    cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " create_thick_slice after clone for " << thick_elem->name << " ";
+    SP.Print();
+    cout  << " LengthFraction=" << LengthFraction << " scaled l_par_expr " << my_dump_expression(l_par_expr);
+    if(angle_par_expr) cout << " scaled angle_par_expr " << my_dump_expression(angle_par_expr);
+    cout << EOL;
+  }
+
+  if( IsRbend && rbarc_fl() ) // straight length rbend, needs translation
+  {
+    double angle = expression_value(angle_par_expr, 2);
+    double factor = 2*sin(angle/2) / angle; // <= 1
+    double val=LengthFraction*thick_elem->length*factor; // new reduced straight rbend slice length
+    char** toks = tmp_l_array->p;
+    ostringstream ostr;
+    ostr << setprecision(15) << val; // use the value as string
+    toks[0]=CopToNewC_String(ostr.str());
+    l_par_expr = make_expression(1,toks); // new simple expression
+    if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " thick rbend slicing, scale thick curved length " << thick_elem->length << " by factor=" << setprecision(15) << factor << " to val=" << val << EOL;
+  }
+
+  // now use the scaled length and if relevant angle parameters to set up the new slice_elem via cmd
+  const int length_i = name_list_pos(const_cast<char*>("l"),cmd->par_names);
+  if(length_i > -1)
+  {
+    cmd->par->parameters[length_i]->expr=l_par_expr; // use the length expression in cmd to set up slice_elem
+  }
+  else
+  {
+    cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " *** error *** thick_elem " <<  thick_elem->name << " has no length parameter : " << my_dump_element(thick_elem);
+    return NULL;
+  }
+  const int angle_i = name_list_pos(const_cast<char*>("angle"),cmd->par_names);
+  if(verbose>1) cout << EOL << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " angle_i=" << angle_i << EOL;
+  if(angle_i > -1)
+  {
+    cmd->par->parameters[angle_i]->expr=angle_par_expr; // use the scaled angle_par_expr in cmd to set up slice_elem
+  }
+
+  if (verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " done thin_style=\"" << thin_style << "\"" << " i=" << i << " new cmd for slice_elem : " << my_dump_command(cmd);
+
+  slice_elem = make_element(const_cast<char*>(slice_name.c_str()),const_cast<char*>(eltype),cmd,-1); // make new element (without parent) using the command cmd, -1 means avoid warnings
+  if (verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ <<  my_dump_element(slice_elem) << EOL;
+
+  ParametersActiveOn(slice_elem); // Activate attributes, important when derived from parents -- turns also slice number on - not wanted
+
+  ParameterRemove(const_cast<char*>("slice"),slice_elem); // slicing done, no reason to leave the slice parameter
+
+  SetParameterValue("thick",slice_elem,true,k_logical);
+  ParameterTurnOn("thick",slice_elem); //-- so that thick=true is written  to signal this for thick tracking
+  if (verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " done create_thick_slice slice_name=" << slice_name << " from thick element " << thick_elem->name << " n=" << n  << " : " << my_dump_element(slice_elem) << EOL;
+
+  if(IsBend)
+  {
+    if(entry_fl) // bend entry,  remove/turn off exit parameters
+    {
+      ParameterRemove("e2"    ,slice_elem);
+      ParameterRemove("h2"    ,slice_elem);
+      ParameterTurnOn("fint" ,slice_elem);
+      ParameterTurnOn("fintx",slice_elem);
+      SetParameterValue("fintx",slice_elem,0); // leave with value 0, otherwise taking fint
+    }
+    else if(exit_fl) // bend exit, remove entry parameters
+    {
+      ParameterRemove(const_cast<char*>("e1")   ,slice_elem);
+      int i_fint = name_list_pos(const_cast<char*>("fint"),slice_elem->def->par_names);
+      const bool fint_on =  (i_fint > -1) && slice_elem->def->par_names->inform[i_fint];
+      int i_fintx = name_list_pos(const_cast<char*>("fintx"),slice_elem->def->par_names);
+      const bool fintx_on =  (i_fintx > -1) && slice_elem->def->par_names->inform[i_fintx];
+      if(fintx_on) ParameterRemove("fint",slice_elem); // fintx is on and will be used, just remove any fint on the exit
+      else if(fint_on) // not fintx, use fint as fintx for exit
+      {
+        ParameterTurnOn("fintx",slice_elem);
+        if(i_fintx) // should be there, just inform off
+        {
+          bool found=false;
+          double fint_value=my_get_int_or_double_value(slice_elem,"fint",found);
+          SetParameterValue("fintx",slice_elem,fint_value);
+          if (verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " no fintx, use fint value " << fint_value << " as fintx for exit" << EOL;
+        }
+        ParameterRemove("fint",slice_elem); // remove fint on exit
+      }
+      ParameterRemove("h1",slice_elem);
+    }
+    else Remove_All_Fringe_Field_Parameters(slice_elem); // thick magnet body, remove fringe fields
+  }
+  if (verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ <<  my_dump_element(slice_elem) << EOL;
+  theSliceList->put_slice(thick_elem,slice_elem); //-- store what is done in theSliceList
+  return slice_elem;
+} // create_thick_slice
+
+element* SeqElList::create_sliced_magnet(const element* thick_elem, int slice_no,bool ThickSLice) // create the sliced element, recursively for parents
 {
   element *thin_elem_parent;
   int slices = get_slices_from_elem(thick_elem);
   if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " " << thick_elem->name << " slices=" << slices << " ThickSLice=" << ThickSLice << " slice_no=" << slice_no << EOL;
-  
+
   if (thick_elem == thick_elem->parent) return NULL; // no further parent to consider
   else
   {
-	if(verbose>1) printf("recursively slice parent:");
-	thin_elem_parent = create_sliced_magnet(thick_elem->parent,slice_no,ThickSLice); // recursively slice parent
+    if(verbose>1) printf("recursively slice parent:");
+    thin_elem_parent = create_sliced_magnet(thick_elem->parent,slice_no,ThickSLice); // recursively slice parent
   }
-  
-  command_parameter* at_param = return_param(const_cast<char*>("at"),thick_elem); 	// handle parent with possibly different slice number than child
+  const command_parameter* at_param = return_param(("at"),thick_elem); 	// handle parent with possibly different slice number than child
   const int minimizefl=get_option(const_cast<char*>("minimizeparents")) && !at_param && thick_elem == thick_elem->parent;
   if(minimizefl)
   {
-	slice_no=slices=1; // do not slice this one
+    slice_no=slices=1; // do not slice this one
   }
   if(slice_no > slices && thick_elem!=thick_elem->parent ) slice_no=1; // check, but not for base classes
-  
+  if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " creating new kn_param, ks_param expr_list" << EOL;
+
   element *thin_elem;
   if( (thin_elem = theSliceList->find_slice(thick_elem,slice_no)) ) return thin_elem; // already done
-  command_parameter* length_param = return_param_recurse(const_cast<char*>("l"),thick_elem);
-  command_parameter* angle_param  = return_param_recurse(const_cast<char*>("angle"),thick_elem);
-  command_parameter* kparam[4];
-  kparam[0]    = return_param_recurse(const_cast<char*>("k0"),thick_elem);
-  kparam[1]    = return_param_recurse(const_cast<char*>("k1"),thick_elem);
-  kparam[2]    = return_param_recurse(const_cast<char*>("k2"),thick_elem);
-  kparam[3]    = return_param_recurse(const_cast<char*>("k3"),thick_elem);
+  const command_parameter* length_param = return_param_recurse(("l"),thick_elem);
+  const command_parameter* angle_param  = return_param_recurse(("angle"),thick_elem);
+  command_parameter* kparam[4]; // clone to allow for changes in copy, use my clone version which does not crash if called with NULL
+  kparam[0]    = clone_command_parameter(return_param_recurse(("k0"),thick_elem) );
+  kparam[1]    = clone_command_parameter(return_param_recurse(("k1"),thick_elem) );
+  kparam[2]    = clone_command_parameter(return_param_recurse(("k2"),thick_elem) );
+  kparam[3]    = clone_command_parameter(return_param_recurse(("k3"),thick_elem) );
   command_parameter* ksparam[4];
-  ksparam[0]   = return_param_recurse(const_cast<char*>("k0s"),thick_elem);
-  ksparam[1]   = return_param_recurse(const_cast<char*>("k1s"),thick_elem);
-  ksparam[2]   = return_param_recurse(const_cast<char*>("k2s"),thick_elem);
-  ksparam[3]   = return_param_recurse(const_cast<char*>("k3s"),thick_elem);
-  command_parameter* kn_param     = return_param_recurse(const_cast<char*>("knl"),thick_elem);
-  command_parameter* ks_param     = return_param_recurse(const_cast<char*>("ksl"),thick_elem);
-  
+  ksparam[0]   = clone_command_parameter(return_param_recurse(("k0s"),thick_elem) );
+  ksparam[1]   = clone_command_parameter(return_param_recurse(("k1s"),thick_elem) );
+  ksparam[2]   = clone_command_parameter(return_param_recurse(("k2s"),thick_elem) );
+  ksparam[3]   = clone_command_parameter(return_param_recurse(("k3s"),thick_elem) );
+  command_parameter* kn_param = clone_command_parameter( return_param_recurse(("knl"),thick_elem) );
+  command_parameter* ks_param = clone_command_parameter( return_param_recurse(("ksl"),thick_elem) );
+
   int knl_flag = 0,ksl_flag = 0;
   if (kn_param) {kn_param = clone_command_parameter(kn_param); knl_flag++;}
   if (ks_param) {ks_param = clone_command_parameter(ks_param); ksl_flag++;}
-  
+
   int angle_conversion = 0;
-  
+
   if ((kparam[0] || kparam[1] || kparam[2] || kparam[3] || angle_param || ksparam[0] || ksparam[1] || ksparam[2] || ksparam[3])
-	  && (kn_param==NULL && ks_param==NULL)) 	// translate k0,k1,k2,k3,angles
+      && (kn_param==NULL && ks_param==NULL)) 	// translate k0,k1,k2,k3,angles
   {
-	if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " creating new kn_param, ks_param expr_list" << EOL;
-	kn_param = new_command_parameter(const_cast<char*>("knl"), k_double_array);
-	kn_param->expr_list = new_expr_list(10);
-	kn_param->double_array = new_double_array(10);
-	ks_param = new_command_parameter(const_cast<char*>("ksl"), k_double_array);
-	ks_param->expr_list = new_expr_list(10);
-	ks_param->double_array = new_double_array(10);
-	angle_conversion = translate_k(kparam,ksparam,angle_param,kn_param,ks_param);
+    if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " creating new kn_param, ks_param expr_list" << EOL;
+    kn_param = new_command_parameter(const_cast<char*>("knl"), k_double_array);
+    kn_param->expr_list = new_expr_list(10);
+    kn_param->double_array = new_double_array(10);
+    ks_param = new_command_parameter(const_cast<char*>("ksl"), k_double_array);
+    ks_param->expr_list = new_expr_list(10);
+    ks_param->double_array = new_double_array(10);
+    angle_conversion = translate_k(kparam,ksparam,angle_param,kn_param,ks_param);
   }
-  
+
   kn_param = scale_and_slice(kn_param,length_param,slices,angle_conversion,knl_flag+ksl_flag);
   ks_param = scale_and_slice(ks_param,length_param,slices,angle_conversion,knl_flag+ksl_flag);
-  
+  if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " " << thick_elem->name << EOL;
+
   if(ThickSLice)
   { // from  knl:={amb ,( kmb ) * ( lmb ) };   to
-	if(verbose>1) printf("debug %s %s line %d ThickSLice=%d set kn, ks to zero\n",__FILE__,__FUNCTION__,__LINE__,ThickSLice);
-	kn_param=NULL;
-	ks_param=NULL;
+    if(verbose>1) printf("debug %s %s line %d ThickSLice=%d set kn, ks to zero\n",__FILE__,__FUNCTION__,__LINE__,ThickSLice);
+    kn_param=NULL;
+    ks_param=NULL;
   }
-  
+
   // set up new multipole command
-  struct command* cmd = new_command( CopToNewC_String("thin_multipole"), 20, 20, CopToNewC_String("element"), CopToNewC_String("none"), 0, 8); // 0 is link, multipole is 8, see "multipole: element none 0 8 " in mad_dict.c
-  add_cmd_parameter_new(cmd,1.,const_cast<char*>("magnet"),0); // parameter magnet with value of 1 and inf=0         not really needed ?   is the default, see mad_dict.c
+  command* cmd = new_command( CopToNewC_String("thin_multipole"), 20, 20, CopToNewC_String("element"), CopToNewC_String("none"), 0, 8); // 0 is link, multipole is 8, see "multipole: element none 0 8 " in mad_dict.c
+  add_cmd_parameter_new(cmd,1.,"magnet",0); // parameter magnet with value of 1 and inf=0         not really needed ?   is the default, see mad_dict.c
   if(!minimizefl)
   {
-	add_cmd_parameter_clone(cmd,return_param(const_cast<char*>("at")  ,thick_elem),const_cast<char*>("at")  ,1);
-	add_cmd_parameter_clone(cmd,return_param(const_cast<char*>("from"),thick_elem),const_cast<char*>("from"),1);
-	add_lrad(cmd,length_param,slices); // add l, lrad
-	add_cmd_parameter_clone(cmd,kn_param,const_cast<char*>("knl"),1);
-	add_cmd_parameter_clone(cmd,ks_param,const_cast<char*>("ksl"),1);
+    add_cmd_parameter_clone(cmd,return_param("at"  ,thick_elem),"at"  ,1);
+    add_cmd_parameter_clone(cmd,return_param("from",thick_elem),"from",1);
+    add_lrad(cmd,length_param,slices); // add l, lrad
+    add_cmd_parameter_clone(cmd,(const command_parameter*)kn_param,"knl",1);
+    add_cmd_parameter_clone(cmd,(const command_parameter*)ks_param,"ksl",1);
   }
-  if(verbose_fl()) cout << my_dump_command(cmd) << EOL; // magnet, l, lrad defined
+  if(verbose>1) cout << my_dump_command(cmd) << EOL; // magnet, l, lrad defined
   //--- now the arguments which are copied from the thick element
-  add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("apertype"),thick_elem),const_cast<char*>("apertype"),1);
-  add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("aperture"),thick_elem),const_cast<char*>("aperture"),1);
-  add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("aper_tol"),thick_elem),const_cast<char*>("aper_tol"),1);
-  add_cmd_parameter_clone(cmd,return_param(        const_cast<char*>("bv"),      thick_elem),const_cast<char*>("bv"),      1);
-  add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("tilt"),    thick_elem),const_cast<char*>("tilt"),    1);
-  add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("kmax"),    thick_elem),const_cast<char*>("kmax"),    1);
-  add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("kmin"),    thick_elem),const_cast<char*>("kmin"),    1);
-  add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("calib"),   thick_elem),const_cast<char*>("calib"),   1);
-  add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("polarity"),thick_elem),const_cast<char*>("polarity"),1);
-  add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("mech_sep"),thick_elem),const_cast<char*>("mech_sep"),1);
-  add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("v_pos"),   thick_elem),const_cast<char*>("v_pos"),   1);
-  if(verbose_fl()) cout << my_dump_command(cmd) << EOL;
+  add_cmd_parameter_clone(cmd,return_param_recurse(("apertype"),thick_elem),("apertype"),1);
+  add_cmd_parameter_clone(cmd,return_param_recurse(("aperture"),thick_elem),("aperture"),1);
+  add_cmd_parameter_clone(cmd,return_param_recurse(("aper_tol"),thick_elem),("aper_tol"),1);
+  add_cmd_parameter_clone(cmd,return_param(        ("bv"),      thick_elem),("bv"),      1);
+  add_cmd_parameter_clone(cmd,return_param_recurse(("tilt"),    thick_elem),("tilt"),    1);
+  add_cmd_parameter_clone(cmd,return_param_recurse(("kmax"),    thick_elem),("kmax"),    1);
+  add_cmd_parameter_clone(cmd,return_param_recurse(("kmin"),    thick_elem),("kmin"),    1);
+  add_cmd_parameter_clone(cmd,return_param_recurse(("calib"),   thick_elem),("calib"),   1);
+  add_cmd_parameter_clone(cmd,return_param_recurse(("polarity"),thick_elem),("polarity"),1);
+  add_cmd_parameter_clone(cmd,return_param_recurse(("mech_sep"),thick_elem),("mech_sep"),1);
+  add_cmd_parameter_clone(cmd,return_param_recurse(("v_pos"),   thick_elem),("v_pos"),   1);
+  if(verbose>1) cout << my_dump_command(cmd) << EOL;
   // create element with this command
   char* thin_name;
-  if (slices==1 && slice_no==1) thin_name=buffer(thick_elem->name);
+  if (slices==1 && slice_no==1) thin_name=buffer(CopToNewC_String(thick_elem->name));
   else
   {
-	thin_name = make_thin_name(thick_elem->name,slice_no);
-	if(verbose>1) printf("verbose %s %s line %d make_thin_name(%s,%d)=%s\n",__FILE__,__FUNCTION__,__LINE__,thick_elem->name,slice_no,thin_name);
+    thin_name = make_thin_name(thick_elem->name,slice_no);
+    if(verbose>1) printf("verbose %s %s line %d make_thin_name(%s,%d)=%s\n",__FILE__,__FUNCTION__,__LINE__,thick_elem->name,slice_no,thin_name);
   }
   if (thin_elem_parent)
   {
-	if(verbose>1) printf("verbose %s %s line %d make_element(%s,%s,cmd,-1);\n",__FILE__,__FUNCTION__,__LINE__,thin_name,thin_elem_parent->name);
-	thin_elem = make_element(thin_name,thin_elem_parent->name,cmd,-1);
+    if(verbose>1) printf("verbose %s %s line %d make_element(%s,%s,cmd,-1);\n",__FILE__,__FUNCTION__,__LINE__,thin_name,thin_elem_parent->name);
+    thin_elem = make_element(thin_name,thin_elem_parent->name,cmd,-1);
   }
   else
   {
-	if(verbose>1) printf("verbose %s %s line %d make_element(%s,\"multipole\",cmd,-1);\n",__FILE__,__FUNCTION__,__LINE__,thin_name);
-	thin_elem = make_element(thin_name,const_cast<char*>("multipole"),cmd,-1);
+    if(verbose>1) printf("verbose %s %s line %d make_element(%s,\"multipole\",cmd,-1);\n",__FILE__,__FUNCTION__,__LINE__,thin_name);
+    thin_elem = make_element(thin_name,const_cast<char*>("multipole"),cmd,-1);
   }
   thin_elem->length = 0;
   thin_elem->bv = el_par_value(const_cast<char*>("bv"),thin_elem);
   if (thin_elem_parent && thin_elem_parent->bv)
   {
-	thin_elem->bv = thin_elem_parent->bv;
+    thin_elem->bv = thin_elem_parent->bv;
   }
   if(verbose>1) printf("verbose %s %s line %d put_slice(thick_elem %s, thin_elem %s,%d);\n",__FILE__,__FUNCTION__,__LINE__,thick_elem->name,thin_elem->name,slice_no);
   theSliceList->put_slice(thick_elem,thin_elem);
   return thin_elem;
 }
 
-element* SeqElList::create_thin_solenoid(element* thick_elem, int slice_no) // create thin solenoid element, similar to create_sliced_magnet
+element* SeqElList::create_thin_solenoid(const element* thick_elem, int slice_no) // create thin solenoid element, similar to create_sliced_magnet
 {
   element *thin_elem_parent;
   if (thick_elem == thick_elem->parent) return NULL;
@@ -1868,26 +2345,26 @@ element* SeqElList::create_thin_solenoid(element* thick_elem, int slice_no) // c
   element *thin_elem;
   if((thin_elem = theSliceList->find_slice(thick_elem,slice_no))) return thin_elem; // check to see if we've already done this one
   // get parameters from the thick solenoid element
-  command_parameter* length_param  = return_param_recurse(const_cast<char*>("l"),thick_elem);
-  command_parameter* ks_param      = return_param_recurse(const_cast<char*>("ks"),thick_elem);
-  command_parameter* at_param      = return_param(const_cast<char*>("at"),thick_elem);
-  
+  const command_parameter* length_param  = return_param_recurse(("l"),thick_elem);
+  const command_parameter* ks_param      = return_param_recurse(("ks"),thick_elem);
+  const command_parameter* at_param      = return_param(("at"),thick_elem);
+
   int slices = get_slices_from_elem(thick_elem);
   const int minimizefl=get_option(const_cast<char*>("minimizeparents")) && !at_param && thick_elem == thick_elem->parent;
   if(minimizefl) slice_no=slices=1; // do not slice this one
-  
+
   // set up new solenoid command
-  struct command* cmd = new_command(buffer(const_cast<char*>("thin_solenoid")), 20, 20, // max num names, max num param
-									buffer(const_cast<char*>("element")), buffer(const_cast<char*>("none")), 0, 9); // 0 is link, solenoid is 9
-  add_cmd_parameter_new(cmd,1.,const_cast<char*>("magnet"),0); // parameter magnet with value of 1 and inf=0
-  
+  command* cmd = new_command(buffer(const_cast<char*>("thin_solenoid")), 20, 20, // max num names, max num param
+                             buffer(const_cast<char*>("element")), buffer(const_cast<char*>("none")), 0, 9); // 0 is link, solenoid is 9
+  add_cmd_parameter_new(cmd,1.,"magnet",0); // parameter magnet with value of 1 and inf=0
+
   if(!minimizefl)
   {
-	add_cmd_parameter_clone(cmd,return_param(const_cast<char*>("at")  ,thick_elem),const_cast<char*>("at")  ,1);
-	add_cmd_parameter_clone(cmd,return_param(const_cast<char*>("from"),thick_elem),const_cast<char*>("from"),1);
+	add_cmd_parameter_clone(cmd,return_param(("at")  ,thick_elem),("at")  ,1);
+	add_cmd_parameter_clone(cmd,return_param(("from"),thick_elem),("from"),1);
 	add_lrad(cmd,length_param,slices);
   }
-  add_cmd_parameter_clone(cmd,ks_param,const_cast<char*>("ks"),1); // keep ks
+  add_cmd_parameter_clone(cmd,ks_param,("ks"),1); // keep ks
   if(!minimizefl)
   {
 	if (length_param && ks_param) /* in addition provide   ksi = ks * l /slices */
@@ -1908,14 +2385,14 @@ element* SeqElList::create_thin_solenoid(element* thick_elem, int slice_no) // c
 	  cmd->par->curr++;
 	}
   }
-  add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("apertype"),thick_elem),const_cast<char*>("apertype"),1);
-  add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("aperture"),thick_elem),const_cast<char*>("aperture"),1);
-  add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("aper_tol"),thick_elem),const_cast<char*>("aper_tol"),1);
-  add_cmd_parameter_clone(cmd,return_param(const_cast<char*>("bv"),thick_elem),const_cast<char*>("bv"),1);
-  add_cmd_parameter_clone(cmd,return_param(const_cast<char*>("tilt"),thick_elem),const_cast<char*>("tilt"),1);
+  add_cmd_parameter_clone(cmd,return_param_recurse(("apertype"),thick_elem),("apertype"),1);
+  add_cmd_parameter_clone(cmd,return_param_recurse(("aperture"),thick_elem),("aperture"),1);
+  add_cmd_parameter_clone(cmd,return_param_recurse(("aper_tol"),thick_elem),("aper_tol"),1);
+  add_cmd_parameter_clone(cmd,return_param(("bv"),thick_elem),("bv"),1);
+  add_cmd_parameter_clone(cmd,return_param(("tilt"),thick_elem),("tilt"),1);
   // create element with this command
   char* thin_name;
-  if (slices==1 && slice_no==1) thin_name=buffer(thick_elem->name);
+  if (slices==1 && slice_no==1) thin_name=buffer(CopToNewC_String(thick_elem->name)); //old buffer(thick_elem->name);
   else thin_name = make_thin_name(thick_elem->name,slice_no);
   if (thin_elem_parent)
   {
@@ -1935,42 +2412,42 @@ element* SeqElList::create_thin_solenoid(element* thick_elem, int slice_no) // c
   return thin_elem;
 }
 
-element* SeqElList::create_thin_elseparator(element* thick_elem, int slice_no) // create thin elseparator element, similar to create_thin_solenoid
+element* SeqElList::create_thin_elseparator(const element* thick_elem, int slice_no) // create thin elseparator element, similar to create_thin_solenoid
 {
   element *thin_elem_parent;
   if (thick_elem == thick_elem->parent) return NULL;
   else thin_elem_parent = create_thin_elseparator(thick_elem->parent,slice_no); // recursively slice parent
   element *thin_elem;
   if((thin_elem = theSliceList->find_slice(thick_elem,slice_no))) return thin_elem; // check to see if we've already done this one
-  
+
   // get parameters from the thick elseparator element
-  command_parameter* length_param  = return_param_recurse(const_cast<char*>("l"),thick_elem);
-  command_parameter* ex_param      = return_param_recurse(const_cast<char*>("ex"),thick_elem);
-  command_parameter* ey_param      = return_param_recurse(const_cast<char*>("ey"),thick_elem);
-  command_parameter* tilt_param    = return_param_recurse(const_cast<char*>("tilt"),thick_elem);
-  command_parameter* at_param      = return_param(const_cast<char*>("at"),thick_elem);
-  
+  const command_parameter* length_param  = return_param_recurse(("l"),thick_elem);
+  const command_parameter* ex_param      = return_param_recurse(("ex"),thick_elem);
+  const command_parameter* ey_param      = return_param_recurse(("ey"),thick_elem);
+  const command_parameter* tilt_param    = return_param_recurse(("tilt"),thick_elem);
+  const command_parameter* at_param      = return_param(("at"),thick_elem);
+
   int slices = get_slices_from_elem(thick_elem);
   const int minimizefl=get_option(const_cast<char*>("minimizeparents")) && !at_param && thick_elem == thick_elem->parent;
   if(minimizefl)
   {
 	slice_no=slices=1; /* do not slice this one */
   }
-  
+
   // set up new elseparator command
-  struct command* cmd = new_command(buffer(const_cast<char*>("thin_elseparator")), 20, 20, // max num names, max num param
-									buffer(const_cast<char*>("element")), buffer(const_cast<char*>("none")), 0, 11); // 0 is link, elseparator is 11
-  add_cmd_parameter_new(cmd,1.,const_cast<char*>("magnet"),0); // parameter magnet with value of 1 and inf=0
-  
+  command* cmd = new_command(buffer(const_cast<char*>("thin_elseparator")), 20, 20, // max num names, max num param
+                             buffer(const_cast<char*>("element")), buffer(const_cast<char*>("none")), 0, 11); // 0 is link, elseparator is 11
+  add_cmd_parameter_new(cmd,1.,"magnet",0); // parameter magnet with value of 1 and inf=0
+
   if(!minimizefl)
   {
-	add_cmd_parameter_clone(cmd,return_param(const_cast<char*>("at")  ,thick_elem),const_cast<char*>("at")  ,1);
-	add_cmd_parameter_clone(cmd,return_param(const_cast<char*>("from"),thick_elem),const_cast<char*>("from"),1);
+	add_cmd_parameter_clone(cmd,return_param(("at")  ,thick_elem),("at")  ,1);
+	add_cmd_parameter_clone(cmd,return_param(("from"),thick_elem),("from"),1);
 	add_lrad(cmd,length_param,slices);
   }
-  add_cmd_parameter_clone(cmd,ex_param,const_cast<char*>("ex"),1); // keep ex
-  add_cmd_parameter_clone(cmd,ey_param,const_cast<char*>("ey"),1); // keep ey
-  add_cmd_parameter_clone(cmd,tilt_param,const_cast<char*>("tilt"),1); // keep tilt
+  add_cmd_parameter_clone(cmd,ex_param,("ex"),1); // keep ex
+  add_cmd_parameter_clone(cmd,ey_param,("ey"),1); // keep ey
+  add_cmd_parameter_clone(cmd,tilt_param,("tilt"),1); // keep tilt
   if(!minimizefl)
   { // create ex_l from ex
 	if (length_param && ex_param) // in addition provide ex_l = ex * l /slices
@@ -2009,14 +2486,14 @@ element* SeqElList::create_thin_elseparator(element* thick_elem, int slice_no) /
 	  cmd->par->curr++;
 	}
   }
-  add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("apertype"),thick_elem),const_cast<char*>("apertype"),1);
-  add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("aperture"),thick_elem),const_cast<char*>("aperture"),1);
-  add_cmd_parameter_clone(cmd,return_param_recurse(const_cast<char*>("aper_tol"),thick_elem),const_cast<char*>("aper_tol"),1);
-  add_cmd_parameter_clone(cmd,return_param(const_cast<char*>("bv"),thick_elem),const_cast<char*>("bv"),1);
-  add_cmd_parameter_clone(cmd,return_param(const_cast<char*>("tilt"),thick_elem),const_cast<char*>("tilt"),1);
+  add_cmd_parameter_clone(cmd,return_param_recurse(("apertype"),thick_elem),("apertype"),1);
+  add_cmd_parameter_clone(cmd,return_param_recurse(("aperture"),thick_elem),("aperture"),1);
+  add_cmd_parameter_clone(cmd,return_param_recurse(("aper_tol"),thick_elem),("aper_tol"),1);
+  add_cmd_parameter_clone(cmd,return_param(("bv"),thick_elem),("bv"),1);
+  add_cmd_parameter_clone(cmd,return_param(("tilt"),thick_elem),("tilt"),1);
   // create element with this command
   char* thin_name;
-  if (slices==1 && slice_no==1) thin_name=buffer(thick_elem->name);
+  if (slices==1 && slice_no==1) thin_name=buffer(CopToNewC_String(thick_elem->name));
   else thin_name = make_thin_name(thick_elem->name,slice_no);
   if (thin_elem_parent) thin_elem = make_element(thin_name,thin_elem_parent->name,cmd,-1);
   else thin_elem = make_element(thin_name,const_cast<char*>("elseparator"),cmd,-1);
@@ -2029,10 +2506,11 @@ element* SeqElList::create_thin_elseparator(element* thick_elem, int slice_no) /
 
 void SeqElList::slice_this_node() // main stearing what to do.   called in loop over nodes which can be sliced, makes slices, adds them to  thin_sequ
 {
-  
-  bool UseDipedges=true; // Normally true.   For tests set false, to see the result without dipedges,  will then be created but not written
-  
-  element* thick_elem=thick_node->p_elem; // work on this element	
+  bool UseDipedges=true; // Normally true.   For tests set false, to see the result without dipedges, dipedges will then be created but not written
+
+  element* thick_elem=thick_node->p_elem; // work directly on this element  --  to do translaton only once, element maybe used several times in sequence
+  // element* thick_elem=clone_element(thick_node->p_elem); // work on clone of this element, --  no
+
   int nslices=get_slices_from_elem(thick_elem);
   if(nslices<1)
   {
@@ -2040,218 +2518,220 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
 	add_node_at_end_of_sequence(thick_node,thin_sequ); // straight copy
 	return;
   }
-  
+
+  // verbose=3; // CSPE enable to get extra debug info
   const bool IsQuad =   string(thick_node->base_name) == string("quadrupole");
   const bool IsRbend=   string(thick_node->base_name) == string("rbend");
   const bool IsBend = ( string(thick_node->base_name) == string("sbend") || IsRbend );
   const bool ThickSLice=thick_fl(thick_elem);
-  const bool ThickQuad= ThickSLice && IsQuad;
-  
+
   if(verbose>1)
   {
 	cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " " << thick_elem->name << " " << thick_node->base_name << " thin_style=\"" << thin_style << "\""
-	<< " nslices=" << nslices
-	<< " IsQuad=" << IsQuad << " IsBend=" << IsBend
-	<< " ThickSLice=" << ThickSLice
-	<< " at_value=" << setw(10) << thick_node->at_value
-	<< " from_name=";
+	<< " nslices=" << nslices << " IsQuad=" << IsQuad << " IsBend=" << IsBend << " ThickSLice=" << ThickSLice << " at_value=" << setw(10) << thick_node->at_value << " from_name=";
 	if(thick_node->from_name) cout << thick_node->from_name; else cout << "NULL ";
 	cout << EOL << my_dump_element(thick_elem) << EOL;
   }
-  
-  if(ThickSLice && nslices>1 && !IsQuad)
+
+  if(ThickSLice && nslices>1 && !IsQuad && !IsBend)
   {
-	if(nslices>1) cout << "++++++ warning: " << thick_elem->name << " is a " << thick_node->base_name << " nslices=" << nslices << " thick slicing with nslices>1 only implemented for quadrupoles. Set nslices=1" << EOL;
-	nslices=1;
+	if(nslices>1) cout << "++++++ warning: " << thick_elem->name << " is a " << thick_node->base_name << " nslices=" << nslices << " thick slicing with nslices>1 for " << thick_node->base_name << ". Set nslices=1" << EOL;
+    nslices=1;
   }
-  
-  element *EntryEdgeElem=NULL, *ExitEdgeElem=NULL, *sbend_el=NULL;
-  
-  if( IsBend && MakeDipedge) // dipedge EntryEdgeElem, ExitEdgeElem     find existing or generate new
+
+  element *EntryDipedge=NULL, *ExitDipedge=NULL, *sbend_el=NULL;
+  element *en = NULL, *bo = NULL, *ex = NULL; // pointers to thick  entry, body, exit
+
+  if( IsBend && MakeDipedge) // find any existing EntryDipedge, sbend_el, ExitDipedge    and use them
   {	
-	EntryEdgeElem=theBendEdgeList->find_slice(thick_elem,string(thick_elem->name)+"_l"); // NULL if not yet known or e1=0
-	ExitEdgeElem =theBendEdgeList->find_slice(thick_elem,string(thick_elem->name)+"_r"); // NULL if not yet known or e2=0
+	EntryDipedge=theBendEdgeList->find_slice(thick_elem,string(thick_elem->name)+"_den"); // dipedge entry, NULL if not yet known or e1=0
+	ExitDipedge =theBendEdgeList->find_slice(thick_elem,string(thick_elem->name)+"_dex"); // dipedge exit,  BULL if not yet known or e2=0
 	if(IsRbend) sbend_el=theBendEdgeList->find_slice(thick_elem,string(thick_elem->name)+"_sbend");
-	
-	if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " " << setw(20) << thick_elem->name << " MakeDipedge EntryEdgeElem=" << EntryEdgeElem << " ExitEdgeElem=" << ExitEdgeElem << " sbend_el=" << sbend_el << EOL; //  has_e1=" << has_e1 << " has_e2=" << has_e2 << EOL;
-	
-	if(EntryEdgeElem)
-	{
-	  if(verbose>1) cout << " use existing EntryEdgeElem=" << setw(20) << EntryEdgeElem->name << " " << EntryEdgeElem << my_dump_element(EntryEdgeElem) << EOL;
-	}
-	else // create new EntryEdgeElem for this bend
-	{
-	  command_parameter* e1param = return_param(const_cast<char*>("e1"),thick_elem);
-	  if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " e1param=" << e1param << " cmd_par_val(e1param)=" << cmd_par_val(e1param) << EOL;
-	  if( (fabs(cmd_par_val(e1param))>eps) || IsRbend) // has a non-zero e1 or Rbend
-	  {
-		EntryEdgeElem=create_bend_dipedge_element(thick_elem,true); // make new StartEdge element and remove e1 from thick_elem, change rbend to sbend
-		theBendEdgeList->put_slice(thick_elem,EntryEdgeElem); // to remember this has been translated
-	  }
-	}
-	
-	if(ThickSLice && IsRbend)
-	{
-	  if(sbend_el)
-	  {
-		if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " use existing sbend_el=" << setw(20) << sbend_el->name << " " << sbend_el << EOL;
-	  }
-	  else // create new sbend body sbend_el
-	  {
-		if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " sbend_el=" << string(thick_elem->name)+"_sbend" << " does not (yet) exist, make it"<< EOL;
-		sbend_el=sbend_from_rbend(thick_elem); // sbend_el for rbend not yet existing, make the element and put it in global element_list
-		// sbend_el=thick_elem;  //CSPE test, do not use rbend -> sbend, dipedge still there unless  MakeDipedge = false;
-		theBendEdgeList->put_slice(thick_elem,sbend_el); // to remember this has been translated
-	  }
-	  if(verbose>2) dump_slices();
-	}
-	
-	if(ExitEdgeElem)
-	{
-	  if(verbose>1) cout << " use existing  ExitEdgeElem=" << setw(20) << ExitEdgeElem->name   << " " << ExitEdgeElem << EOL;
-	}
-	else // create new ExitEdgeElem for this bend
-	{
-	  command_parameter *e2param = return_param(const_cast<char*>("e2"),thick_elem);
-	  if((fabs(cmd_par_val(e2param))>eps) || IsRbend) // has a non-zero e2 or Rbend
-	  {
-		ExitEdgeElem=create_bend_dipedge_element(thick_elem,false); // make new ExitEdgeElem element and remove e2 from thick_elem,  change rbend to sbend
-		if(sbend_el) // in this case not the thick_elem, but sbend_el will be written, so make sure to kill the fringe fields for sbend_el
-		{
-		  ParameterRemove(const_cast<char*>("e2")   ,sbend_el);
-		  ParameterRemove(const_cast<char*>("fint") ,sbend_el);
-		  ParameterRemove(const_cast<char*>("fintx"),sbend_el);
-		  ParameterRemove(const_cast<char*>("hgap") ,sbend_el);
-		  if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " now sbend_el=" << sbend_el << EOL;
-		}
-		theBendEdgeList->put_slice(thick_elem,ExitEdgeElem);   // to remember this has been translated
-	  }
+    if(verbose>1)
+    {
+      if(verbose>1)    cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << "              " << setw(20) <<   thick_elem->name << " " << thick_node->base_name << EOL;
+      if(EntryDipedge) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " EntryDipedge=" << setw(20) << EntryDipedge->name << " already exists " << EntryDipedge << EOL;
+      if(ExitDipedge)  cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << "  ExitDipedge=" << setw(20) <<  ExitDipedge->name << " already exists " << EntryDipedge << EOL;
+      if(sbend_el)     cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << "     sbend_el=" << setw(20) <<     sbend_el->name << " already exists " << EntryDipedge << EOL;
+    }
+  }
+
+  if(IsRbend && ThickSLice && sbend_el==NULL && (rbend_to_sbend_fl || MakeDipedge) ) // create new thick sbend_el for this rbend,  translate all thick rbends
+  {
+    if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " sbend_el=" << string(thick_elem->name)+"_sbend" << " does not (yet) exist, make it"<< EOL;
+    sbend_el=sbend_from_rbend(thick_elem,MakeDipedge); // sbend_el for rbend not yet existing, make the element and put it in global element_list
+    theBendEdgeList->put_slice(thick_elem,sbend_el); // to remember this has been translated
+    if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " sbend_el created sbend_el=" << sbend_el << EOL;
+    if(verbose>2) dump_slices();
+  } // ThickSLice && IsRbend
+
+  if( IsBend && MakeDipedge && EntryDipedge==NULL) // create new EntryDipedge for this bend
+  { // first look if e1 or h1 are there
+    const command_parameter   *e1param = return_param(("e1")  ,(const element*) thick_elem);
+    const command_parameter   *h1param = return_param(("h1")  ,(const element*) thick_elem);
+    const command_parameter *fintparam = return_param(("fint"),(const element*) thick_elem);
+    if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " e1param=" << e1param << " cmd_par_val(e1param)=" << cmd_par_val(e1param) << EOL;
+    if((fabs(cmd_par_val(e1param))>eps) || (fabs(cmd_par_val(h1param))>eps) || (fabs(cmd_par_val(fintparam))>eps) || IsRbend) // has entrance fringe fields
+    {
+      EntryDipedge=create_bend_dipedge_element(thick_elem,true); // make new StartEdge element and remove e1 from thick_elem, change rbend to sbend
+      if(IsRbend) add_half_angle_to(thick_elem,EntryDipedge,"e1");
+      theBendEdgeList->put_slice(thick_elem,EntryDipedge);       // to remember this has been translated
+      if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " now EntryDipedge=" << EntryDipedge << EOL;
 	}
   }
-  
-  node* bend_node_copy = NULL; // work with copy of the thick node, in case the thick node needs modification, used for dipole dipedge EntryEdgeElem, ExitEdgeElem to allow to change e1, e2
-  expression* bend_at_expr = NULL;	// used for dipole dipedge EntryEdgeElem, ExitEdgeElem
-  
+
+  if( IsBend && MakeDipedge && ExitDipedge==NULL) // create new ExitDipedge for this bend
+  { // first look if e2 or h2 are there
+    const command_parameter *e2param    = return_param(("e2"),(const element*) thick_elem);
+    const command_parameter *h2param    = return_param(("h2"),(const element*) thick_elem);
+    const command_parameter *fintparam  = return_param(("fint"),(const element*) thick_elem);
+    const command_parameter *fintxparam = return_param(("fintx"),(const element*) thick_elem);
+    if((fabs(cmd_par_val(e2param))>eps) || (fabs(cmd_par_val(h2param))>eps) || (fabs(cmd_par_val(fintparam))>eps) || (cmd_par_val(fintxparam)>eps) || IsRbend)  // has exit fringe fields
+    {
+      ExitDipedge=create_bend_dipedge_element(thick_elem,false); // make new ExitDipedge element and remove e2 from thick_elem,  change rbend to sbend
+      if(IsRbend) add_half_angle_to(thick_elem,ExitDipedge,"e1");
+      theBendEdgeList->put_slice(thick_elem,ExitDipedge);   // to remember this has been translated
+      if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " now  ExitDipedge=" << EntryDipedge << " " << my_dump_element(ExitDipedge) << EOL;
+    }
+  } // new ExitDipedge
+
+  if(sbend_el) thick_elem=sbend_el; // in case of rbend -> sbend translation, continue with the translated sbend
+  if(EntryDipedge || ExitDipedge) Remove_All_Fringe_Field_Parameters(thick_elem); // remove from body what is now taken care of by dipedges
+
+  // prepare for slicing
+  element *sliced_elem=NULL;                  // pointer to new sliced element
+
+  string local_thin_style=thin_style; // work here with a copy of thin_style that can be modified for collim
+  if (strstr(thick_node->base_name,"collimator"))
+  {
+    local_thin_style = "collim"; // for collimators change slice style to "collim"  --  currently collimators have no slice number stored, so not too meaningful
+    sliced_elem = create_thin_obj(thick_elem,1);
+  }
+  else if (strstr(thick_node->base_name,"solenoid"))    sliced_elem = create_thin_solenoid(thick_elem,1);    // create the first thin solenoid slice
+  else if (strstr(thick_node->base_name,"elseparator")) sliced_elem = create_thin_elseparator(thick_elem,1); // create the first thin elseparator slice
+  else // magnet which can be sliced to multipole
+  {
+    if(verbose>2) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << EOL;
+    sliced_elem = create_sliced_magnet(thick_elem,1,ThickSLice); // get info from first slice
+    if(ThickSLice) // create entry, body, exit pieces,  for bends or quadrupoles   --- if not yet existing
+    {
+      if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " ThickSLice, nslices=" << nslices << " create thick slices _en, _bo, _ex sliced_elem->name=" << sliced_elem->name << EOL;
+      en =               create_thick_slice(thick_elem,0); // entry slice
+      if(IsRbend && !MakeDipedge) add_half_angle_to(thick_elem,en,"e1");
+      if(nslices>1) bo = create_thick_slice(thick_elem,1); // body slices,   last parameter = 1     since there will be only one type of body
+      if(ThickSLice && IsQuad) ex=en; // for quad entry/exit are the same
+      else ex =          create_thick_slice(thick_elem,nslices); // exit slice
+      if(IsRbend && !MakeDipedge) add_half_angle_to(thick_elem,ex,"e2");
+    }
+  } // done with create_thin or create_thick.  Next is positioning slices as node
+
+  if(verbose>1)
+  {
+    cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ <<  " thick " << thick_elem->name  << " of type " << thick_node->base_name << " done with element slice generation ";
+    if(sliced_elem) cout << " sliced_elem->name=" << sliced_elem->name;
+    if(en)          cout << " en->name=" << en->name; else cout << " en=" << en;
+    if(bo)          cout << " bo->name=" << bo->name; else cout << " bo=" << bo;
+    if(ex)          cout << " ex->name=" << ex->name; else cout << " ex=" << ex;
+    cout << EOL;
+  }
+
+  if(verbose>2) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << EOL;
+  command_parameter* length_param = return_param_recurse(const_cast<char*>("l"),thick_elem); // get original length, value or expression
+
+  expression* at_expr = thick_node->at_expr;
+  double at = thick_node->at_value;
+  double length = thick_node->length; // direct curved thick_elem->length, for rbend longer than straight l
+
+  if(verbose>2) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << EOL;
+  double l_expr_val=length;
+  expression* l_expr = NULL;
+  if (length_param)
+  {
+    l_expr  = length_param->expr;
+    if(l_expr) l_expr_val = expression_value(l_expr, 2);
+  }
+
+  if(verbose>2) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << EOL;
+  double at_centre = get_node_pos(thick_node,thick_sequ); // for the moment just check - same with refer = center
+
+  int middle=-1;
+  if (nslices>1) middle = nslices/2; // used to determine after which slide to place the central marker
+
+  if(verbose>1)
+  {
+    if(IsRbend &&ThickSLice) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " position sliced rbend, careful l_expr_val=" << l_expr_val << " " << my_dump_expression(l_expr) << EOL;
+    cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " sliced_elem=" << left << setw(20) << sliced_elem->name << right
+    << " thick_node->at_value=" << setw(8) << thick_node->at_value
+    << " nslices=" << setw(2) << nslices << " at=" << setw(8) << at << " at_centre=" << setw(8) << at_centre << " length=" << setw(8) << length << " " << my_dump_element(sliced_elem) << " node:" << my_dump_node(thick_node);
+  }
+
   if(IsBend)
   {
-	bend_at_expr   = thick_node->at_expr;
-	bend_node_copy = clone_node(thick_node, 0);
-	if(EntryEdgeElem) // write start dipedge for dipoles --    for s - positions use the full curved length,  after rbend to sbend conversion, the sbend will be slightly longer and the start/end just outside the original rbend
-	  // make sure to write with enough precision, good choice is   set,format="20.14g";
-	{
-	  if(UseDipedges) create_and_place_bend_node(bend_node_copy,bend_at_expr,EntryEdgeElem,thin_sequ,-0.5,IsRbend); // subtract half of the length to be at start
-	}
-	
-	if(ThickSLice)
-	{
-	  if(sbend_el) // place the rbend body, converted to sbend --  only relevant for thick bend slicing
-	  {
-		create_and_place_bend_node(bend_node_copy,bend_at_expr,sbend_el,thin_sequ,0,IsRbend); // in middle
-	  }
-	  else
-	  {
-		if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " place  bend_node_copy " << bend_node_copy->name << EOL;
-		add_node_at_end_of_sequence(bend_node_copy,thin_sequ); // this changes the bend_node_copy, leaves the original thick_node  --- and continue to end to write  ExitEdgeElem
-	  }
-	}
+    if(EntryDipedge) // write start dipedge for dipoles --    for s - positions use the full curved length,  after rbend to sbend conversion, the sbend will be slightly longer and the start/end just outside the original rbend
+      // make sure to write with enough precision, good choice is   set,format="20.14g";
+    {
+      if(UseDipedges) create_and_place_bend_node(thick_node,thick_node->at_expr,EntryDipedge,thin_sequ,-0.5,IsRbend); // subtract half of the length to be at start
+    }
   }
- 
-  if( !(ThickSLice&&IsBend) ) // slice all, except thick bends
+
+  for (int i=0; i<nslices; ++i) // loop to place the nslices in the sequence
   {
-	// prepare for slicing
-	element *sq = NULL, *bq = NULL; // pointer to thick quad slices
-	element *sliced_elem=NULL; // pointer to new sliced element
-	
-	string local_thin_style=thin_style; // work here with a copy of thin_style that can be modified for collim
-	if (strstr(thick_node->base_name,"collimator"))
-	{
-	  local_thin_style = "collim"; // for collimators change slice style to "collim"  --  currently collimators have no slice number stored, so not too meaningful
-	  sliced_elem = create_thin_obj(thick_elem,1);
-	}
-	else if (strstr(thick_node->base_name,"solenoid"))    sliced_elem = create_thin_solenoid(thick_elem,1);    // create the first thin solenoid slice
-	else if (strstr(thick_node->base_name,"elseparator")) sliced_elem = create_thin_elseparator(thick_elem,1); // create the first thin elseparator slice
-	else // magnet which can be sliced to multipole
-	{
-	  sliced_elem = create_sliced_magnet(thick_elem,1,ThickSLice); // get info from first slice
-	  if(ThickQuad)
-	  {
-		if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " ThickSLice, nslices=" << nslices << " create two thick quadrupole types  .sq  .bq sliced_elem->name=" << sliced_elem->name << EOL;
-		// no check yet if .sq, .bq pieces where already generated for thick_elem --  could then re-use them and save a bit of memory
-		sq=create_thick_slice(thick_elem,0,thin_style); // thick start/end slice with "name".sq
-		bq=create_thick_slice(thick_elem,1,thin_style); // thick middle    slice with "name".bq
-	  }
-	}
-	
-	command_parameter* length_param = return_param_recurse(const_cast<char*>("l"),thick_elem); // get original length
-	expression* l_expr = NULL;
-	if (length_param)  l_expr  = length_param->expr;	
-	
-	expression* at_expr = thick_node->at_expr;
-	double at = thick_node->at_value;
-	double length = thick_node->length;
-	
-	double at_centre = get_node_pos(thick_node,thick_sequ); // for the moment just check - same with refer = center
-	
-	int middle=-1;
-	if (nslices>1) middle = nslices/2; // used to determine after which slide to place the central marker
-	
-	if(verbose>1) { cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " sliced_elem=" << left << setw(20) << sliced_elem->name << right
-	  << " thick_node->at_value=" << setw(8) << thick_node->at_value
-	  << " nslices=" << setw(2) << nslices << " at=" << setw(8) << at << " at_centre=" << setw(8) << at_centre << " length=" << setw(8) << length << " " << my_dump_element(sliced_elem) << " node:" << my_dump_node(thick_node); }
-	
-	for (int i=0; i<nslices; i++) // place the sliced elements in the sequence
-	{
-	  if (strstr(thick_node->base_name,"collimator")) sliced_elem = create_thin_obj(thick_elem,i+1);
-	  else if (strstr(thick_node->base_name,"solenoid")) sliced_elem = create_thin_solenoid(thick_elem,i+1);
-	  else if (strstr(thick_node->base_name,"elseparator")) sliced_elem = create_thin_elseparator(thick_elem,i+1);
-	  else // magnet which can be sliced to multipole
-	  {
-		sliced_elem = create_sliced_magnet(thick_elem,i+1,ThickSLice); // create and place the multipole pieces
-	    if(ThickQuad) // fill space between multipoles with thick quad pieces
-	    {
-		  if(i==0) place_thick_slice(thick_elem,thick_node,thin_sequ,sq,0,thin_style); // place initial quad
-		  else     place_thick_slice(thick_elem,thick_node,thin_sequ,bq,i,thin_style); // place middle quad
-	    }
-	  }
-	  node* thin_node = new_elem_node(sliced_elem, thick_node->occ_cnt);
-	  thin_node->length   = 0.0;
-	  thin_node->from_name = buffer(thick_node->from_name);
-	  if (fabs(at_shift(nslices,i+1,local_thin_style))>0.0)
-	  {
-		if (at_expr || l_expr)
-		{
-		  thin_node->at_expr =
-		  compound_expr(at_expr,at,const_cast<char*>("+"),scale_expr(l_expr,at_shift(nslices,i+1,local_thin_style)),length*at_shift(nslices,i+1,local_thin_style));
-		}
-	  }
-	  else
-	  {
-		if (at_expr) thin_node->at_expr = clone_expression(at_expr);
-	  }
-	  thin_node->at_value = at + length*at_shift(nslices,i+1,local_thin_style);
-	  if (i==middle && !ThickSLice)
-	  {
-		if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " place thick_node " << thick_node->name << EOL;
-		node* middle_marker_node=new_marker(thick_node,at,at_expr);
-		add_node_at_end_of_sequence(middle_marker_node,thin_sequ);  // add a marker in the middle, except for thick nslices
-	  }
-	  if(verbose>1) { printf("\nverbose %s %s line %d nslices=%d dump_node(thin_node):\n",__FILE__,__FUNCTION__,__LINE__,nslices); cout << my_dump_node(thin_node); }
-	  add_node_at_end_of_sequence(thin_node,thin_sequ); // place thin slices
-	}
-	if(ThickQuad) place_thick_slice(thick_elem,thick_node,thin_sequ,sq,nslices,thin_style); // place last quad piece
-  } // done with slicing
-  
-  if(ExitEdgeElem) // write end dipedge for dipoles
-  {
-	if(bend_node_copy==NULL) bend_node_copy = clone_node(thick_node, 0); // work with copy, do not change the original thick_node
-	if(UseDipedges) create_and_place_bend_node(bend_node_copy,bend_at_expr,ExitEdgeElem,thin_sequ,0.5,IsRbend); // at end
+    element *slice_i=NULL;
+    if      (strstr(thick_node->base_name,"collimator"))  slice_i = create_thin_obj(thick_elem,i+1);
+    else if (strstr(thick_node->base_name,"solenoid"))    slice_i = create_thin_solenoid(thick_elem,i+1);
+    else if (strstr(thick_node->base_name,"elseparator")) slice_i = create_thin_elseparator(thick_elem,i+1);
+    else // magnet which can be sliced to multipole
+    {
+      slice_i = create_sliced_magnet(thick_elem,i+1,ThickSLice); // create and place the multipole pieces
+      if(ThickSLice) // fill space between slices
+      {
+        if(i==0) place_thick_slice(thick_elem,thick_node,thin_sequ,en,0,thin_style); // place entry  slice
+        else     place_thick_slice(thick_elem,thick_node,thin_sequ,bo,i,thin_style); // place body/middle slice
+        // place exit body after loop
+      }
+    }
+
+    if(verbose>2) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " thick_node->base_name=" << thick_node->base_name << " i=" << i << " middle=" << middle << " nslices=" << nslices << " slice_i->name=" << slice_i->name << EOL;
+    node* thin_node = new_elem_node(slice_i, thick_node->occ_cnt);
+    thin_node->length   = 0.0;
+    thin_node->from_name = buffer(thick_node->from_name);
+    if (fabs(at_shift(nslices,i+1,local_thin_style))>0.0)
+    {
+      if (at_expr || l_expr)
+      {
+        thin_node->at_expr =
+        compound_expr(at_expr,at,const_cast<char*>("+"),scale_expr(l_expr,at_shift(nslices,i+1,local_thin_style)),length*at_shift(nslices,i+1,local_thin_style));
+      }
+    }
+    else
+    {
+      if (at_expr) thin_node->at_expr = clone_expression(at_expr);
+    }
+    thin_node->at_value = at + length*at_shift(nslices,i+1,local_thin_style);
+    if (i==middle && !ThickSLice)
+    {
+      node* middle_marker_node=new_marker(thick_node,at,at_expr);
+      add_node_at_end_of_sequence(middle_marker_node,thin_sequ);  // add a marker in the middle, except for thick nslices
+      if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " thick_node " << thick_node->name << " place middle marker" << EOL;
+    }
+
+    if(verbose>1) { cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " nslices=" << nslices << " dump_node(thin_node):"; cout << my_dump_node(thin_node); }
+    if(slice_i && !ThickSLice) add_node_at_end_of_sequence(thin_node,thin_sequ); // place thin multipole slices
   }
+
+  if(ThickSLice)
+  {
+    place_thick_slice(thick_elem,thick_node,thin_sequ,ex,nslices,thin_style); // place exit slice
+  }
+
+  if(ExitDipedge && UseDipedges) if(UseDipedges) create_and_place_bend_node(thick_node,thick_node->at_expr,ExitDipedge,thin_sequ,0.5,IsRbend);  // write end dipedge for dipoles
+
 } // SeqElList::slice_this_node()
 
-element* SeqElList::create_thin_obj(element* thick_elem, int slice_no) // creates the thin non-magnetic element - recursively, keeps original l as lrad
+element* SeqElList::create_thin_obj(const element* thick_elem, int slice_no) // creates the thin non-magnetic element - recursively, keeps original l as lrad
 {
   element *thin_elem_parent = NULL;
-  
+
   if (thick_elem == thick_elem->parent)
   {
 	return NULL;
@@ -2260,12 +2740,12 @@ element* SeqElList::create_thin_obj(element* thick_elem, int slice_no) // create
   {
 	thin_elem_parent = create_thin_obj(thick_elem->parent,slice_no);
   }
-  
+
   element *thin_elem;
   if( (thin_elem = theSliceList->find_slice(thick_elem,slice_no)) ) return thin_elem; // check to see if we've already done this one
-  
+
   command* cmd = clone_command(thick_elem->def); // set up new multipole command
-  command_parameter* length_param = return_param_recurse(const_cast<char*>("l"),thick_elem);
+  const command_parameter* length_param = return_param_recurse(("l"),thick_elem);
   const int length_i = name_list_pos(const_cast<char*>("l"),thick_elem->def->par_names);
   const int lrad_i   = name_list_pos("lrad",thick_elem->def->par_names);
   if (length_param)
@@ -2283,7 +2763,7 @@ element* SeqElList::create_thin_obj(element* thick_elem, int slice_no) // create
 	}
 	else // lrad does not yet exist
 	{
-	  if (name_list_pos("lrad",thick_elem->base_type->def->par_names)>-1)
+	  if (name_list_pos("lrad",thick_elem->base_type->def->par_names) > -1)
 	  { // add lrad only if allowed by element
 		if (cmd->par->curr == cmd->par->max) grow_command_parameter_list(cmd->par);
 		if (cmd->par_names->curr == cmd->par_names->max)
@@ -2296,7 +2776,7 @@ element* SeqElList::create_thin_obj(element* thick_elem, int slice_no) // create
 	  }
 	}
   }
-  
+
   if (length_i > -1)
   {
 	cmd->par->parameters[length_i]->double_value = 0;
@@ -2305,15 +2785,15 @@ element* SeqElList::create_thin_obj(element* thick_elem, int slice_no) // create
   int slices=1;
   if (strstr(thick_elem->base_type->name,"collimator")) slices = get_slices_from_elem(thick_elem);
   char* thin_name = NULL;
-  if (slices==1 && slice_no==1) thin_name=buffer(thick_elem->name);
+  if (slices==1 && slice_no==1) thin_name=buffer(CopToNewC_String(thick_elem->name));
   else thin_name=make_thin_name(thick_elem->name,slice_no);
-  
+
   if (thin_elem_parent) thin_elem = make_element(thin_name,thin_elem_parent->name,cmd,-1);
   else  thin_elem = make_element(thin_name,thick_elem->base_type->name,cmd,-1);
-  
+
   thin_elem->length = 0;
   thin_elem->bv = el_par_value(const_cast<char*>("bv"),thin_elem);
-  
+
   theSliceList->put_slice(thick_elem,thin_elem);
   return thin_elem;
 }
@@ -2408,7 +2888,7 @@ void SeqElList::slice_node() // this decides how to split an individual node and
 sequence* SequenceList::get_sequ(sequence* thick_sequ) // check if thick_sequ is already in my_sequ_list_vec
 {
   if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " my_sequ_list_vec.size()=" << my_sequ_list_vec.size() << EOL;
-  for(unsigned int i=0;i<my_sequ_list_vec.size();i++)
+  for(unsigned int i=0; i<my_sequ_list_vec.size(); ++i)
   {
 	if ( my_sequ_list_vec[i] == thick_sequ )
 	{
