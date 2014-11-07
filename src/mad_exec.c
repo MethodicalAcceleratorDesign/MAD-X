@@ -109,6 +109,11 @@ exec_assign(struct in_cmd* cmd)
         prt_file = fopen(p, "a");
       else
         prt_file = fopen(p, "w");
+  
+      if (!ptr_file) {
+        warning("unable to open assigned file: ", p);
+        ptr_file = stdout;
+      }
     }
   }
   else prt_file = stdout;
