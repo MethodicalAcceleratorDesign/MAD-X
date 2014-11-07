@@ -5077,11 +5077,12 @@ subroutine tttdipole(track, ktrack)
   integer ktrack
   
   double precision node_value
-  double precision L, angle, rho, h, k0
+  double precision L, angle, rho, h, k0, k
   double precision x, px, y, py, z, pt
   double precision x_, px_, y_, py_, z_, pt_
   double precision delta_plus_1, delta_plus_1_sqr, sqrt_delta_plus_1
   double precision sqrt_h_sqrt_k0, sqrt_h_div_sqrt_k0, sqrt_k0_div_sqrt_h
+  double precision sqrt_h_sqrt_k, sqrt_h_div_sqrt_k, sqrt_k_div_sqrt_h
   double precision C, S, C_sqr
   double precision bet0sqr
   integer jtrk, get_option, optiondebug
@@ -5158,21 +5159,27 @@ subroutine tttdipole(track, ktrack)
      
      if(.not.geometric) then
         if (optiondebug .ne. 0) print *, 'Using Hamiltonian tracking...'
+        pz = sqrt(delta_plus_1_sqr - px*px - py*py);
+        xp = px / pz;
+        yp = py / pz;
+        k = k0 / delta_plus_1;
         sqrt_delta_plus_1 = sqrt(delta_plus_1);
         sqrt_h_sqrt_k0 = sign(sqrt(h*k0),k0);
         sqrt_h_div_sqrt_k0 = sqrt(h/k0);
         sqrt_k0_div_sqrt_h = sqrt(k0/h);
-        C=cos(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1);
-        S=sin(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1);
+        sqrt_h_sqrt_k = sign(sqrt(h*k),k);
+        sqrt_h_div_sqrt_k = sqrt(h/k);
+        sqrt_k_div_sqrt_h = sqrt(k/h);
+        C=cos(sqrt_h_sqrt_k*L);
+        S=sin(sqrt_h_sqrt_k*L);
         C_sqr = C*C;
-        x_ = px*S/(sqrt_delta_plus_1*sqrt_h_sqrt_k0)+x*C-delta_plus_1*C/k0+C/h+delta_plus_1/k0-1d0/h;
-        px_ = -sqrt_delta_plus_1*sqrt_h_sqrt_k0*x*S- &
-             sqrt_delta_plus_1*sqrt_k0_div_sqrt_h*S+delta_plus_1*sqrt_delta_plus_1*sqrt_h_div_sqrt_k0*S+px*C;
-        y_  = y + py * L / delta_plus_1; 
-        py_ = py; 
+        x_ = x*C + xp*S/sqrt_h_sqrt_k + (C-1d0)*(1d0/h-1d0/k);
+        px_ = (-sqrt_h_sqrt_k*x*S - sqrt_k_div_sqrt_h*S+sqrt_h_div_sqrt_k*S) * pz + px * C;
+        y_  = y + yp * L; 
+        py_ = py;
         z_ = z - h*((h*k0*sqrt_delta_plus_1*sqrt_h_sqrt_k0*x+(k0-delta_plus_1*h)*&
-             sqrt_delta_plus_1*sqrt_h_sqrt_k0)*sin(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1)&
-             -h*k0*px*cos(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1)+&
+             sqrt_delta_plus_1*sqrt_h_sqrt_k0)*S&
+             -h*k0*px*C+&
              (delta_plus_1*h-k0)*sqrt_h_sqrt_k0**2*L+h*k0*px)/(h*k0*sqrt_h_sqrt_k0**2) + &
              pt*L*(1d0-bet0sqr)/bet0sqr + &
              1.5d0*(bet0sqr-1d0)/bet0sqr/bet0*pt*pt*L - 5d-1/bet0 * &
