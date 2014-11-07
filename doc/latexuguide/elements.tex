@@ -83,24 +83,24 @@ Bending magnets have the following attributes:
    Figure. \\ 
    Internally \madx only uses the arc length of the reference orbit for
    both bend types.\\ 
-   {\bf In order to define RBEND's with a declared length equal to the
-     arc length of the reference orbit, the option RBARC must be
+   {\bf In order to define {\tt RBEND}'s with a declared length equal to the
+     arc length of the reference orbit, the option {\tt RBARC} must be
      previously set to FALSE in \madx with {\tt Option, RBARC= false;}} 
    
    \ttitem{ANGLE} The bend angle (default: 0 rad). \\ 
    A positive bend angle represents a bend to the right, i.e. towards
-   negative \texttt{x} values.  
+   negative {\tt x} values.  
    
    \ttitem{ADD\_ANGLE} An array of (maximum 5) bending angles for
-   multiple passes. See \texttt{add\_pass} option of the
-   \href{sequence.html}{sequence} command. This is only allowed for
-   RBEND elements and is ignored for SBEND elements. 
+   multiple passes. See {\tt ADD\_PASS} option of the
+   \href{sequence.html}{\tt SEQUENCE} command. This is only allowed for
+   {\tt RBEND} elements and is ignored for {\tt SBEND} elements. 
  
    \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
    rad, i.e. a horizontal bend). \\ 
    A positive angle represents a clockwise rotation. \\ 
-   An attribute TILT=pi/2 turns a
-   horizontal into a vertical bend, and a positive ANGLE then denotes a
+   An attribute {\tt TILT=pi/2} turns a
+   horizontal into a vertical bend, and a positive {\tt ANGLE} then denotes a
    downwards deflection.
 
    %% \textbf{ Please note that contrary to \madeight one has to specify
@@ -108,7 +108,7 @@ Bending magnets have the following attributes:
    %%   needed to avoid the confusion in \madeight about the actual meaning of
    %%   the TILT attribute for various elements. } 
 
-   \ttitem{K1} The quadrupole coefficient (Default: $0 mˆ{-2}$)\\
+   \ttitem{K1} The quadrupole coefficient (Default: $0\ m^{-2}$)\\
      $K_1 = (1/B\rho) (\partial B_y / \partial x)$. \\
      A positive quadrupole strength implies horizontal focussing of
      positively charged particles.  
@@ -133,21 +133,20 @@ Bending magnets have the following attributes:
    This allows to set different fringe field integrals at entrance
    (FINT) and exit (FINTX) of the element.  
 
-   \ttitem{HGAP} The half gap of the magnet (default: 0 m). 
+   \ttitem{HGAP} The half gap of the magnet (default: $0\ m$). 
 
-   \ttitem{K2} The sextupole coefficient. (Default: $0
-   mˆ{-3}$) \\ $K_2 = (1/B\rho) (\partial^2 B_y / \partial x^2)$.   
+   \ttitem{K2} The sextupole coefficient. (Default: $0\ m^{-3}$) \\ 
+   $K_2 = (1/B\rho) (\partial^2 B_y / \partial x^2)$.   
 
-   \ttitem{H1}The curvature of the entrance pole
-   face. (Default: $0 m^{-1}$).   
-   \ttitem{H2} The curvature of the exit pole face. (Default: $0
-   m^{-1}$). \\  
+   \ttitem{H1}The curvature of the entrance pole face. 
+   (Default: $0\ m^{-1}$).   
+   \ttitem{H2} The curvature of the exit pole face. (Default: $0\ m^{-1}$) \\
    A positive pole face curvature induces a negative sextupole
    component; i.e. for positive H1 and H2 the centres of curvature of
    the pole faces are placed inside the magnet. 
 
    \ttitem{K0} {\bf OBSOLETE} \\
-   Please take note that K$_0$ and K$_0s$ are left in the
+   Please take note that $K_0$ and $K_0s$ are left in the
    data base but are no longer used for the MAP of the bends,
    instead ANGLE and TILT are used exclusively. \\
    %% We believe that this will allow for a clearer and
@@ -1482,7 +1481,7 @@ It has one real attribute:
 \end{madlist}
 
 A positive angle means that the new reference system is rotated
-clockwise about the local \texttt{y}-axis with respect to the old system. 
+clockwise about the local {\tt y}-axis with respect to the old system. 
 
 {\bf Important note:} \\
 The rotation angle $\theta$ must be \emph{small}, i.e. it must be at
@@ -1498,7 +1497,7 @@ KINK: YROTATION, ANGLE = 0.0001;
 
 The element {\tt SROTATION} rotates the
 \hyperref[subsec:local_straight]{straight reference system} about the
-longitudinal (\texttt{s}) axis. 
+longitudinal ({\tt s}) axis. 
 
 \madbox{
 label: SROTATION, ANGLE = real;

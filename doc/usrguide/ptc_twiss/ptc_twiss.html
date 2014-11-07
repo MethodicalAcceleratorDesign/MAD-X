@@ -553,9 +553,9 @@ one-turn characteristics such as the tunes (Q1,Q2 and if icase=6 with cavity Qs)
          Initial conditions can be supplied in different ways. 
 	 Naturally only one of the methods below can be used at a time, and they can not be mixed.
          In this mode it is assumed that the lattice is a line and no ring parameters are evaluated (their values are set to -1000000),
-         unless parameter RING_PARAMETERS is set to true. 
-	 It forces computation of closed solution for the resulting map. 
-	 If such solution does not exist, the routine shall report an error and exit.
+         unless parameter RING_PARAMETERS is set to true, which 
+	 forces computation of closed solution for the resulting map; then
+	 if such solution does not exist, the routine shall report an error and exit.
 
   <dl>
     <dd>
@@ -565,7 +565,7 @@ one-turn characteristics such as the tunes (Q1,Q2 and if icase=6 with cavity Qs)
         <font color="#FF0000">
         <a name="Given_Twiss">Given Twiss</a></font> Parameters</b></i></u><var><strong><b><u><i>:</i></u>
         <br>&nbsp;&nbsp;&nbsp; PTC_TWISS,
-        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; icase=</b>integer, </strong></var><strong><var class="option">deltap</var>=double, <b>closed_orbit</b>,
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; icase=</b>integer, </strong></var><strong><var class="option">deltap</var>=double, <!-- <b>closed_orbit</b>, -->
         <b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; range=string, file[=</b>string<b>],table[=</b>string<b>],
         <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </b><b>betx=</b>double,<b> alfx=</b>double<b>,mux=</b>double<b>, 
         <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; bety=</b>double,<b> alfy=</b>double<b>,muy=</b>double<b>, 
@@ -602,7 +602,7 @@ one-turn characteristics such as the tunes (Q1,Q2 and if icase=6 with cavity Qs)
           <var><strong><b><u><i>command)</i></u></b></strong><b><i><strong><u>:<br>
           </u></strong></i><strong>&nbsp;&nbsp;&nbsp; PTC_TWISS,<br> icase=</b>integer,
           </strong></var><strong><var class="option">deltap</var>=double,
-          <b>closed_orbit</b>,&nbsp; <b><br> range=string, file[=</b>string<b>],
+          <!-- <b>closed_orbit</b>, -->&nbsp; <b><br> range=string, file[=</b>string<b>],
           table[=</b>string<b>],<br> initial_matrix_table</b>;
           </strong><var><strong>&nbsp; </strong></var></dt>
           <dd>
@@ -643,7 +643,7 @@ one-turn characteristics such as the tunes (Q1,Q2 and if icase=6 with cavity Qs)
           </i></b><var><strong><b><u><i>command)</i></u></b></strong><b><i><strong><u>:<br>
           </u></strong></i><strong>&nbsp;&nbsp;&nbsp; PTC_TWISS,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; icase=</b>integer,
           </strong></var><strong><var class="option">deltap</var>=double,
-          <b>closed_orbit</b>,&nbsp; <b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; range=string, file[=</b>string<b>],
+          <!-- <b>closed_orbit</b>, -->&nbsp; <b><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; range=string, file[=</b>string<b>],
           table[=</b>string<b>],<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; initial_map_manual</b>;
           </strong><var><strong>&nbsp; </strong></var></dt>
           <dd>
@@ -682,7 +682,7 @@ one-turn characteristics such as the tunes (Q1,Q2 and if icase=6 with cavity Qs)
         Given Matrix</a></font></b></i></u><var><strong><b><u><i>:</i></u><br>
 &nbsp;&nbsp;&nbsp; PTC_TWISS,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; icase=</b>integer, </strong></var>
-        <strong><var class="option">deltap</var>=double, <b>closed_orbit</b>,
+        <strong><var class="option">deltap</var>=double, <!-- <b>closed_orbit</b>, -->
         <b><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; range=string, file=</b>string<b>,
         table=</b>string<b>,<br>
@@ -717,7 +717,7 @@ one-turn characteristics such as the tunes (Q1,Q2 and if icase=6 with cavity Qs)
         <a name="BETA0-block">BETA0-block</a></font></b></i></u><var><strong><b><u><i>:</i></u><br>
 &nbsp;&nbsp;&nbsp; PTC_TWISS,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; icase=</b>integer, </strong></var>
-        <strong><var class="option">deltap</var>=double, <b>closed_orbit</b>,
+        <strong><var class="option">deltap</var>=double, <!-- <b>closed_orbit</b>, -->
         <b><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; range=string, file[=</b>string<b>],
         table[=</b>string<b>],<br>
@@ -798,7 +798,7 @@ one-turn characteristics such as the tunes (Q1,Q2 and if icase=6 with cavity Qs)
   <a style="color: blue; text-decoration: underline; text-underline: single" href="mailto:mad@cern.ch">
     P.&nbsp;Skowronski</a> and 
   <a style="color: blue; text-decoration: underline; text-underline: single" href="mailto:mad@cern.ch">
-    G.&nbsp;Roy</a>, January 2014
+    G.&nbsp;Roy</a>, January 2014, November 2014
 </address>
 </body>
 </html>
