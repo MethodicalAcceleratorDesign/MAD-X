@@ -5080,16 +5080,16 @@ subroutine tttdipole(track, ktrack)
   double precision L, angle, rho, h, k0, k
   double precision x, px, y, py, z, pt
   double precision x_, px_, y_, py_, z_, pt_
-  double precision delta_plus_1, delta_plus_1_sqr, sqrt_delta_plus_1
-  double precision sqrt_h_sqrt_k0, sqrt_h_div_sqrt_k0, sqrt_k0_div_sqrt_h
-  double precision sqrt_h_sqrt_k, sqrt_h_div_sqrt_k, sqrt_k_div_sqrt_h
-  double precision C, S, C_sqr
+  double precision delta_plus_1, delta_plus_1_sqr
+  double precision C, S, S2, DL
   double precision bet0sqr
   integer jtrk, get_option, optiondebug
   logical kill_ent_fringe, kill_exi_fringe
 
   logical geometric
-  double precision r, b, ux, uy, m, Ax, Bx, By, Cx, Cy, AC, angle_, pz, pz_, xp, yp, xp_, yp_
+  double precision r, b, ux, uy, m, Ax, Bx, By, Cx, Cy, AC, angle_, pz, pz_, xa !, ya
+  double precision xp, yp, xp_, yp_
+  double precision KK, D, E, F, P, O
   double precision gamma, hx, hy, get_value, rfac
 
   !---- Read-in dipole edges angles
@@ -5162,49 +5162,55 @@ subroutine tttdipole(track, ktrack)
         pz = sqrt(delta_plus_1_sqr - px*px - py*py);
         xp = px / pz;
         yp = py / pz;
-        k = k0 / delta_plus_1;
-        sqrt_delta_plus_1 = sqrt(delta_plus_1);
-        sqrt_h_sqrt_k0 = sign(sqrt(h*k0),k0);
-        sqrt_h_div_sqrt_k0 = sqrt(h/k0);
-        sqrt_k0_div_sqrt_h = sqrt(k0/h);
-        sqrt_h_sqrt_k = sign(sqrt(h*k),k);
-        sqrt_h_div_sqrt_k = sqrt(h/k);
-        sqrt_k_div_sqrt_h = sqrt(k/h);
-        C=cos(sqrt_h_sqrt_k*L);
-        S=sin(sqrt_h_sqrt_k*L);
-        C_sqr = C*C;
-        x_ = x*C + xp*S/sqrt_h_sqrt_k + (C-1d0)*(1d0/h-1d0/k);
-        px_ = (-sqrt_h_sqrt_k*x*S - sqrt_k_div_sqrt_h*S+sqrt_h_div_sqrt_k*S) * pz + px * C;
+	k = k0/delta_plus_1;
+        KK = sign(sqrt(h*k0/pz),k);
+
+        C = cos(KK*L);
+        S = sin(KK*L);
+        S2 = sin(2d0*KK*L);
+
+        D = xp / KK;
+        ! E = x+(k-h)/KK**2;
+        ! F =  -(k-h)/KK**2;
+        ! rewrite (k-h) as (k**2-h**2)/(k+h) to avoid cancellation
+        E = x+(k**2-h**2)/((k+h)*(h*k));
+        F =  -(k**2-h**2)/((k+h)*(h*k));
+
+        ! O = -delta_plus_1 * (h*k*x+k-h) / KK / pz 
+        O = -delta_plus_1 * (h*k*x+(k**2-h**2)/(k+h)) / KK / pz;
+        P = xp;
+
+        ! path-length difference
+        DL =  S2*P**2/KK/8.0+L*P**2/4.0&
+             -S2*O**2/KK/8.0+L*O**2/4.0-C**2*O*P/KK/2.0&
+             +O*P/KK/2.0+h*E*S/KK-h*D*C/KK+h*F*L+yp**2*L/2.0+h*D/KK;
+
+        ! 1/beta = (bet0i + pt) / delta_plus_1
+        ! z_ = z + L * bet0i - (L + DL) * (bet0i + pt) / delta_plus_1;
+        ! z_ = z + pt*L*(1d0-bet0sqr)/bet0sqr - DL * (bet0i + pt) / delta_plus_1  ! this is the taylor expansion of the expression below
+        ! which is exact, as long as DL is exact
+
+        x_  = D*S + E*C + F;
+        xp_ = O*S + P*C;
         y_  = y + yp * L; 
-        py_ = py;
-        z_ = z - h*((h*k0*sqrt_delta_plus_1*sqrt_h_sqrt_k0*x+(k0-delta_plus_1*h)*&
-             sqrt_delta_plus_1*sqrt_h_sqrt_k0)*S&
-             -h*k0*px*C+&
-             (delta_plus_1*h-k0)*sqrt_h_sqrt_k0**2*L+h*k0*px)/(h*k0*sqrt_h_sqrt_k0**2) + &
-             pt*L*(1d0-bet0sqr)/bet0sqr + &
-             1.5d0*(bet0sqr-1d0)/bet0sqr/bet0*pt*pt*L - 5d-1/bet0 * &
-             ((x*x*delta_plus_1*(h*k0*L-sqrt_delta_plus_1*sqrt_h_sqrt_k0*C*S)*5d-1 + &
-             px*px*(sqrt_delta_plus_1*C*S/sqrt_h_sqrt_k0+L)*5d-1 + &
-             px*(-delta_plus_1_sqr*C_sqr/k0+delta_plus_1*C_sqr/h+delta_plus_1_sqr/k0-delta_plus_1/h) + &
-             x*(-delta_plus_1**(3d0*(5d-1))*sqrt_k0_div_sqrt_h*C*S+ &
-             delta_plus_1**(5d0*(5d-1))*sqrt_h_div_sqrt_k0*C*S+ &
-             delta_plus_1*k0*L-delta_plus_1_sqr*h*L)+ &
-             x*px*delta_plus_1*(C_sqr-1d0) + &
-             py*py*L + &
-             (-delta_plus_1**(3d0*(5d-1))*sqrt_k0_div_sqrt_h*C*S*(5d-1)/h + &
-             delta_plus_1**(5d0*(5d-1))*C*S/(sqrt_h_sqrt_k0)+ &
-             (-delta_plus_1**(7d0*(5d-1))*sqrt_h_div_sqrt_k0*C*S*(5d-1)/k0 + &
-             delta_plus_1*L*(delta_plus_1*(delta_plus_1*h/k0*(5d-1)-1d0)+k0/h*(5d-1))))));
-        !pt_ = pt; ! unchanged
+        yp_ = yp;
+        z_  = z + ((bet0i*delta_plus_1-pt-bet0i)*L - DL * (bet0i + pt)) / delta_plus_1
+
+        pz_ = 0.5 * (pz + delta_plus_1 / sqrt(1d0 + xp_*xp_ + yp_*yp_));
+        px_ = xp_ * pz_;
+        py_ = yp_ * pz_;
+        pt_ = pt; ! unchanged
+
      else
+
         if (optiondebug .ne. 0) print *, 'Using geometric tracking...'
         pz = sqrt(delta_plus_1_sqr - px*px - py*py);
-        xp = px / pz;
-        yp = py / pz;
+        xa = atan2(px, pz);
+        !ya = atan2(py, pz);
         r  = rho*delta_plus_1;
         Ax = rho*sign(1d0, angle) + x;
-        Bx = Ax-r*sign(1d0, angle)*cos(xp);
-        By =    r*sign(1d0, angle)*sin(xp);
+        Bx = Ax-r*sign(1d0, angle)*cos(xa);
+        By =    r*sign(1d0, angle)*sin(xa);
         b = ux*Bx + uy*By;
         c = Bx**2 + By**2 - r**2;
         if (b*b.lt.c) then
@@ -5215,18 +5221,20 @@ subroutine tttdipole(track, ktrack)
         m = b + sqrt(b*b-c);
         Cx = m*ux;
         Cy = m*uy;
-        AC = sqrt((Ax-Cx)**2 + Cy**2);
+        !AC = sqrt((Ax-Cx)**2 + Cy**2);
+        AC = sqrt(Ax**2 + m**2 -2*Ax*Cx);
         angle_ = 2d0*asin(AC/2d0/r)*sign(1d0, angle);
-        x_ = (m-rho)*sign(1d0, angle);
-        y_  = y + yp * L;
+        xp_ = tan(xa + (angle**2 - angle_**2)/(angle + angle_));
+        yp_ = py / pz; !tan(ya);
+        x_ = (m**2-rho**2)/(m+rho)*sign(1d0, angle);
+        y_ = y + yp_ * L;
         ! 1/beta = (bet0i + pt) / delta_plus_1
         ! 1/beta_z = (bet0i + pt) / pz
-        z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * sqrt((r * angle_)**2 + (yp * L)**2);
-        xp_ = xp + angle - angle_;
-        yp_ = yp;
-        pz_ = delta_plus_1 / sqrt(1d0 + xp_*xp_ + yp_*yp_);
+        z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * sqrt((r * angle_)**2 + (yp_ * L)**2);
+        pz_ = 0.5 * (pz + delta_plus_1 / sqrt(1d0 + xp_*xp_ + yp_*yp_));
         px_ = xp_ * pz_;
-        py_ = py; 
+        py_ = yp_ * pz_;
+!        py_ = py;
      end if
      x = x_;
      y = y_;
