@@ -5163,7 +5163,7 @@ subroutine tttdipole(track, ktrack)
         xp = px / pz;
         yp = py / pz;
 	k = k0/delta_plus_1;
-        KK = sign(sqrt(h*k0/pz),k);
+        KK = sign(sqrt(h*k0/pz),k0);
 
         C = cos(KK*L);
         S = sin(KK*L);
@@ -5196,7 +5196,8 @@ subroutine tttdipole(track, ktrack)
         yp_ = yp;
         z_  = z + ((bet0i*delta_plus_1-pt-bet0i)*L - DL * (bet0i + pt)) / delta_plus_1
 
-        pz_ = 0.5 * (pz + delta_plus_1 / sqrt(1d0 + xp_*xp_ + yp_*yp_));
+        !pz_ = delta_plus_1 / sqrt(1d0 + xp_*xp_ + yp_*yp_);
+        pz_ = pz;
         px_ = xp_ * pz_;
         py_ = yp_ * pz_;
         pt_ = pt; ! unchanged
@@ -5231,7 +5232,8 @@ subroutine tttdipole(track, ktrack)
         ! 1/beta = (bet0i + pt) / delta_plus_1
         ! 1/beta_z = (bet0i + pt) / pz
         z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * sqrt((r * angle_)**2 + (yp_ * L)**2);
-        pz_ = 0.5 * (pz + delta_plus_1 / sqrt(1d0 + xp_*xp_ + yp_*yp_));
+        !pz_ = 0.5 * (pz + delta_plus_1 / sqrt(1d0 + xp_*xp_ + yp_*yp_));
+        pz_ = pz;
         px_ = xp_ * pz_;
         py_ = yp_ * pz_;
 !        py_ = py;
