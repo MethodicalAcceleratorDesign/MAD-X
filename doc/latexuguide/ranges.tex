@@ -23,8 +23,8 @@ position2 in the sequence.
 count in the sequence: \label{range_position}
 \madxmp{
 xxxxxxxxxxxxxx\= \kill
-mq.ir5.l6..1          \> ! no occurrence count given\\
-mb[17]                 \> ! occurrence count given
+mq.ir5.l6..1  \> ! no occurrence count given\\
+mb[17]        \> ! occurrence count given
 }
 
 There are two predefined indices in \madx: 
@@ -43,14 +43,14 @@ range expanded by the {\tt USE} statement .
  Examples for ranges: 
 \madxmp{
 xxxxxxxxxxxxxxxxxxxxxxxx\= \kill
-.., RANGE=\#S;               \>! first element \\
-.., RANGE=\#S/\#E;          \>! full expansion range \\
-.., RANGE=mb[5]/\#E;     \> ! from mb 5 to end \\
+.., RANGE=\#S;          \>! first element \\
+.., RANGE=\#S/\#E;      \>! full expansion range \\
+.., RANGE=mb[5]/\#E;    \>! from mb 5 to end \\
 .., RANGE=mq.ir5.l6..1; \>! first occurrence of element mq.ir5.l6..1
 }
 
 \section{CLASS}
-\label{sec:range_class} 
+\label{sec:class} 
 The single name of a class (no occurrence counts). A class is the name
 of an element (or basic type) from which other elements have been
 derived. 
@@ -58,10 +58,10 @@ derived.
 Example: 
 \madxmp{
 MQ: quadrupole;   \= ! makes the element MQ \\
-Q1: MQ;                 \> ! makes the element Q1 from class MQ \\
-Q2: MQ;                 \> ! makes the element Q2 from class MQ \\
-Q1..A: Q1;              \> ! makes an element from class Q1 \\
-Q2..B: Q2;              \> ! makes an element from class Q2 
+Q1: MQ;           \> ! makes the element Q1 from class MQ \\
+Q2: MQ;           \> ! makes the element Q2 from class MQ \\
+Q1..A: Q1;        \> ! makes an element from class Q1 \\
+Q2..B: Q2;        \> ! makes an element from class Q2 
 }
 
 Subsequent selection with criterion {\tt CLASS="MQ"} will actually select 

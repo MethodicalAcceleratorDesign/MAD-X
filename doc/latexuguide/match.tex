@@ -7,12 +7,12 @@
 \label{chap:match}
 
 Before a match operation at least one sequence must be selected by means
-of a \href{../control/general.html#use}{USE} command. Matching is 
-initiated by the \href{match_main.html}{MATCH} command. The matching
+of a \hyperref[sec:use]{\tt USE} command. Matching is 
+initiated by the \hyperref[sec:match]{\tt MATCH} command. The matching
 module can act on more than one sequence simultaneously by  specifying
-more than one sequence when  \href{match_main.html#match}{initiating}
-the matching mode.  From this command to the corresponding
-\href{match_main.html#endmatch}{ENDMATCH} command MAD accepts the
+more than one sequence when initiating the matching mode.  
+From this command to the corresponding
+\hyperref[sec:endmatch]{\tt ENDMATCH} command \madx accepts the
 matching commands listed below. For a mathematical description of the
 minimisation procedures see \cite{MINUIT}. 
 
@@ -29,32 +29,31 @@ The matching commands are described in detail below. Some other commands
 can also be issued during matching.  
 
 \begin{itemize}
-\item \href{match_main.html}{Enter and Leave Matching Mode}
+\item Enter and Leave Matching Mode
   \begin{itemize}
-  \item \href{match_main.html#match}{MATCH: Initiating the Matching Mode}
-  \item \href{match_main.html#endmatch}{ENDMATCH: Leave Matching Mode}
+  \item \hyperref[sec:match]{\tt MATCH}: Initiate Matching Mode
+  \item \hyperref[sec:endmatch]{\tt ENDMATCH}: Leave Matching Mode
   \end{itemize}
-\item \href{match_vary.html}{Define Variable Parameter}
+\item Define Variable Parameter
   \begin{itemize}
-  \item \href{match_vary.html#vary}{VARY: Set Parameter to Vary}
+  \item \hyperref[sec:vary]{\tt VARY}: Set Parameter to Vary
   \end{itemize}
-\item \href{match_con.html}{Constraint}
+\item Define Constraint
   \begin{itemize}
-  \item \href{match_con.html#constraint}{CONSTRAINT}: Simple Constraint 
-  \item \href{match_con.html#user-var}{CONSTRAINT}: User Defined Variables 
-  \item \href{match_con.html#weight}{WEIGHT: Matching Weights}
-  \item \href{match_con.html#global}{GLOBAL: Global Constraints}
-  \item \href{match_con.html#global}{GWEIGHT: Weights for Global Constraints}
+  \item \hyperref[sec:constraint]{\tt CONSTRAINT}: Simple Constraint 
+  \item \hyperref[sec:userconstraint]{\tt CONSTRAINT}: User Defined Variables 
+  \item \hyperref[sec:weight]{\tt WEIGHT}: Matching Weights
+  \item \hyperref[sec:global]{\tt GLOBAL}: Global Constraints
+  \item \hyperref[sec:gweight]{\tt GWEIGHT}: Weights for Global Constraints
   \end{itemize}
-\item \href{match_xeq.html}{Matching Methods}
+\item \hyperref[sec:match_methods]{Matching Methods}
   \begin{itemize}
-  \item \href{match_xeq.html#lmdif}{LMDIF: Fast Gradient Minimisation}
-  \item \href{match_xeq.html#migrad}{MIGRAD: Gradient Minimisation}
-  \item \href{match_xeq.html#simplex}{SIMPLEX: Simplex Minimisation}
-  \item \href{match_xeq.html#jacobian}{JACOBIAN: Newton Minimisation}
+  \item \hyperref[subsec:match_lmdif]{\tt LMDIF}: Fast Gradient Minimisation
+  \item \hyperref[subsec:match_migrad]{\tt MIGRAD}: Gradient Minimisation
+  \item \hyperref[subsec:match_simplex]{\tt SIMPLEX}: Simplex Minimisation
+  \item \hyperref[subsec:match_jacobian]{\tt JACOBIAN}: Newton Minimisation
   \end{itemize}
-\item \href{match_um.html}{Expression Matching with USE\_MACRO}
-\item \href{match_xmpl.html}{Matching Examples}
+\item Expression Matching with \hyperref[sec:use_macro]{\tt USE\_MACRO}
 \end{itemize}
 
 %\line(1,0){300}
@@ -73,12 +72,12 @@ can also be issued during matching.
 %  Changed by: Riccardo de Maria, 9-Jan-2008 
 
 
-Before matching at least one
-\href{../Introduction/sequence.html}{SEQUENCE} must be selected by means
-of a \href{../control/general.html#use}{USE} command. The matching
-module can act on more than one sequence simultaneously by specifying
-more than one sequence in the \texttt{MATCH} command.
- 
+%% Before matching at least one
+%% \href{../Introduction/sequence.html}{SEQUENCE} must be selected by means
+%% of a \href{../control/general.html#use}{USE} command. The matching
+%% module can act on more than one sequence simultaneously by specifying
+%% more than one sequence in the \texttt{MATCH} command.
+
 
 \section{MATCH \ldots ENDMATCH}
 \label{sec:match}\label{sec:endmatch}
@@ -271,7 +270,7 @@ ENDMATCH;
 %  Changed by: Oliver Bruning, 19-Jun-2002 
  
 \section{VARY}
-\label{sec:match_vary}
+\label{sec:vary}
 A parameter to be varied is specified by the command 
 
 \madbox{
@@ -340,10 +339,10 @@ the set of variables and a new solution is searched.
 % Changed by: Ghislain Roy, 11 Dec 2013: removed duplicate paragraph in user defined matching constraint 
 
 \section{CONSTRAINT}
-\label{sec:constaint}
+\label{sec:constraint}
 
-Simple constraints are imposed by the CONSTRAINT command. The CONSTRAINT
-command has three attributes:   
+Simple constraints are imposed by the {\tt CONSTRAINT} command. 
+The {\tt CONSTRAINT} command has three attributes:   
 \begin{itemize}
  \item  the SEQUENCE entry specifies the sequence for which the
    constraint applies.  
