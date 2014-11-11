@@ -5087,7 +5087,7 @@ subroutine tttdipole(track, ktrack)
   logical kill_ent_fringe, kill_exi_fringe
 
   logical geometric
-  double precision r, b, ux, uy, m, Ax, Bx, By, Cx, Cy, AC, angle_, pz, pz_, xa !, ya
+  double precision r, b, ux, uy, m, Ax, Bx, By, Cx, AC, angle_, pz, pz_, xa !, ya, Cy
   double precision xp, yp, xp_, yp_
   double precision KK, D, E, F, P, O
   double precision gamma, hx, hy, get_value, rfac
@@ -5119,7 +5119,7 @@ subroutine tttdipole(track, ktrack)
   bet0sqr = bet0*bet0;
   L = node_value('l ');
   angle = node_value('angle ');
-  rho = abs(L/angle);
+  rho = L/angle;
   h = angle/L;
   k0 = h;
 
@@ -5209,9 +5209,9 @@ subroutine tttdipole(track, ktrack)
         xa = atan2(px, pz);
         !ya = atan2(py, pz);
         r  = rho*delta_plus_1;
-        Ax = rho*sign(1d0, angle) + x;
-        Bx = Ax-r*sign(1d0, angle)*cos(xa);
-        By =    r*sign(1d0, angle)*sin(xa);
+        Ax = rho + x;
+        Bx = Ax-r*cos(xa);
+        By =    r*sin(xa);
         b = ux*Bx + uy*By;
         c = Bx**2 + By**2 - r**2;
         if (b*b.lt.c) then
@@ -5221,22 +5221,21 @@ subroutine tttdipole(track, ktrack)
         end if
         m = b + sqrt(b*b-c);
         Cx = m*ux;
-        Cy = m*uy;
+        !Cy = m*uy;
         !AC = sqrt((Ax-Cx)**2 + Cy**2);
-        AC = sqrt(Ax**2 + m**2 -2*Ax*Cx);
-        angle_ = 2d0*asin(AC/2d0/r)*sign(1d0, angle);
+        AC = sqrt(Ax**2 + m**2 -2d0*Ax*Cx);
+        angle_ = 2d0*asin(AC/2d0/r);
         xp_ = tan(xa + (angle**2 - angle_**2)/(angle + angle_));
         yp_ = py / pz; !tan(ya);
-        x_ = (m**2-rho**2)/(m+rho)*sign(1d0, angle);
+        x_ = (m**2-rho**2)/(m+abs(rho))*sign(1d0, angle);
         y_ = y + yp_ * L;
         ! 1/beta = (bet0i + pt) / delta_plus_1
         ! 1/beta_z = (bet0i + pt) / pz
         z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * sqrt((r * angle_)**2 + (yp_ * L)**2);
-        !pz_ = 0.5 * (pz + delta_plus_1 / sqrt(1d0 + xp_*xp_ + yp_*yp_));
+        !pz_ = delta_plus_1 / sqrt(1d0 + xp_*xp_ + yp_*yp_);
         pz_ = pz;
         px_ = xp_ * pz_;
         py_ = yp_ * pz_;
-!        py_ = py;
      end if
      x = x_;
      y = y_;
