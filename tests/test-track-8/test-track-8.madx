@@ -4,7 +4,7 @@
 option, -echo,-warn,-info;
 
 ! ********** Define sequence
-call, file="../test-makethin-2/V6.5.thin.b1.seq";
+call, file="../share/LHC/LHCRing/V6.503/V6.5.thin.b1.seq";
 option, warn;
 call, file="../share/LHC/LHCRing/V6.503/V6.5.thin.inj.str";
 

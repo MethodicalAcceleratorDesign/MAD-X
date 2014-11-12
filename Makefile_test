@@ -83,10 +83,10 @@ $(if $(call eq,$(OSTYPE),Windows),,test-ptc-twiss-old6) test-ptc-twiss-old7 \
 test-touschek test-touschek-2
 
 # tests dependencies
-test-c6t:     test-makethin-2
-test-track-2: test-makethin-2
-test-track-7: test-makethin-2
-test-track-8: test-makethin-2
+#test-c6t:     test-makethin-2
+#test-track-2: test-makethin-2
+#test-track-7: test-makethin-2
+#test-track-8: test-makethin-2
 
 # lexicographical order
 tests-to-setup := \
