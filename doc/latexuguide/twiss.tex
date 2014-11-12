@@ -376,7 +376,7 @@ USE, period=CELL;
 SAVEBETA, LABEL=END, PLACE=#E, SEQUENCE=CELL;
 TWISS;
 USE, period=INSERT;
-TWISS, BETX=END-$>$BETY, BETY=END-$>$BETX;
+TWISS, BETX=END->BETY, BETY=END->BETX;
 \end{verbatim}
 This is similar to the first example,but the beta functions are interchanged (overwritten).  
 
