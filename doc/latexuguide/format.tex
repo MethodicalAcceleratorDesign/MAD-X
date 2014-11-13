@@ -686,8 +686,9 @@ occurrence "$\backslash$." stands for a literal period.
 \label{sec:relations}\label{sec:defer}
 A relation is established between variables by one of two statements 
 \madbox{
-parameter-name = \= expression; \\
-parameter-name := \> expression;
+xxxxxxxxxxxxxxxx\= \kill
+parameter-name \>=  expression; \\
+parameter-name :\>=  expression;
 }
 The first form evaluates the expression on the right immediately and
 assigns its value to the parameter. It is an immediate assignment.
@@ -722,8 +723,8 @@ The parameter on the left may appear on the right as well in the
 computer science form of assignments: 
 \madxmp{x = x+1;}
 increases the value of x by 1. \\
-As a result, the SET statement of \madeight is no longer necessary and
-is not implemented in \madx.   
+%As a result, the SET statement of \madeight is no longer necessary and
+%is not implemented in \madx.   
 
 
 Successive definitions are allowed in the first form of relations or 
@@ -738,40 +739,7 @@ deferred assignments, are forbidden:
 a := b + 2; \\
 b := a * b;
 }
-will result in an error.
-
-%% Already in control.tex
-%% \section{\href{par_output}{VALUE: Output of Parameters}}
-%% The VALUE statement evaluates the current value of all listed expressions, and
-%% prints the result on the standard output file.
-%% \madbox{
-%% VALUE = expression {, expression2};
-%% }
-
-%% Example:
-%% \madxmp{
-%% p1 = 5; \\
-%% p2 = 7; \\
-%% VALUE, p1*p2-3;
-%% }
-%% After echoing the command, this prints:
-%% \madxmp{
-%% p1*p2-3 = 32       ;
-%% }
-
-%% Another example:
-%% \begin{verbatim}
-%% option,-warn;
-%% while (x 
-%% \end{verbatim}
-%% ?????
-
-%% After echoing the command, this prints:
-%% \begin{verbatim}
-%% x = 100        ;       
-%% x^2 = 10000      ;       
-%% log10(x) = 2      ;            
-%% \end{verbatim}
+results in an error.
 
 %\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg} 11.9.2000
 

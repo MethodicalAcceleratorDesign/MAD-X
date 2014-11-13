@@ -19,7 +19,7 @@ sequence of beam elements placed sequentially along a reference
 orbit. 
 The reference orbit is the path of a charged particle having the
 central design momentum of the accelerator through idealised magnets
-with no fringe fields (see Figure~\ref{F-REF}). 
+witrwh no fringe fields (see Figure~\ref{F-REF}). 
 
 \begin{figure}[htb]
 \centering
@@ -74,10 +74,10 @@ with no fringe fields (see Figure~\ref{F-REF}).
 The reference orbit consists of a series of straight line segments and
 circular arcs. It is defined under the assumption that all elements are
 perfectly aligned. The accompanying tripod of the reference orbit spans
-a local curvilinear right handed coordinate system \textit{(x,y,s)} The
-local \textit{s}-axis is the tangent to the reference orbit. The two
+a local curvilinear right handed coordinate system {\it (x,y,s)} The
+local {\it s}-axis is the tangent to the reference orbit. The two
 other axes are perpendicular to the reference orbit and are labelled
-\textit{x} (in the bend plane) and \textit{y} (perpendicular to the bend
+{\it x} (in the bend plane) and {\it y} (perpendicular to the bend
 plane).  
 
 
@@ -88,11 +88,11 @@ Due to various errors like misalignment errors, field errors, fringe
 fields etc., the closed orbit does not coincide with the reference
 orbit. The closed orbit also changes with the momentum error. 
 The closed orbit is described with respect to the reference orbit, using
-the local reference system (\textit{x, y, s}). It is evaluated including
+the local reference system ({\it x, y, s}). It is evaluated including
 any nonlinear effects.  
 
 \madx also computes the betatron and synchrotron oscillations with respect
-to the closed orbit. Results are given in the local (\textit{x, y,
+to the closed orbit. Results are given in the local ({\it x, y,
   s})-system defined by the reference orbit. 
 
 
@@ -102,13 +102,13 @@ to the closed orbit. Results are given in the local (\textit{x, y,
 
 The global reference orbit of the accelerator is
 uniquely defined by the sequence of physical elements. The local
-reference system (\textit{x}, \textit{y}, \textit{s}) may thus be
-referred to a global Cartesian coordinate system (\textit{X},
-\textit{Y}, \textit{Z}) (see Figure~\ref{F-GLOB}). 
+reference system ({\it x}, {\it y}, {\it s}) may thus be
+referred to a global Cartesian coordinate system ({\it X},
+{\it Y}, {\it Z}) (see Figure~\ref{F-GLOB}). 
 The positions between beam elements are numbered 0,\ldots,i,\ldots,n. 
-The local reference system  (\textit{x$_i$, y$_i$, s$_i$}) at position
-\textit{i}, i.e. the displacement and direction of the reference orbit
-with respect to the system (\textit{X}, \textit{Y}, \textit{Z}) are
+The local reference system  ({\it x$_i$, y$_i$, s$_i$}) at position
+{\it i}, i.e. the displacement and direction of the reference orbit
+with respect to the system ({\it X}, {\it Y}, {\it Z}) are
 defined by three displacements  ($X_i$, $Y_i$, $Z_i$) and three angles
 ($\Theta_i$, $\Phi_i$, $Psi_i$) 
 
@@ -190,39 +190,39 @@ onto \(ZX\)-plane}}}
 
 The above quantities are defined more precisely as follows:  
 \begin{madlist}
-   \ttitem{X} Displacement of the local origin in \textit{X}-direction. 
-   \ttitem{Y} Displacement of the local origin in \textit{Y}-direction. 
-   \ttitem{Z} Displacement of the local origin in \textit{Z}-direction. 
+   \ttitem{X} Displacement of the local origin in {\it X}-direction. 
+   \ttitem{Y} Displacement of the local origin in {\it Y}-direction. 
+   \ttitem{Z} Displacement of the local origin in {\it Z}-direction. 
    \ttitem{THETA} $\theta$ is the angle of rotation (azimuth) about the
-     global \textit{Y}-axis, between the global \textit{Z}-axis and the
-     projection of the reference orbit onto the (\textit{Z},
-     \textit{X})-plane. A positive angle THETA forms a right-hand screw
-     with the \textit{Y}-axis. 
+     global {\it Y}-axis, between the global {\it Z}-axis and the
+     projection of the reference orbit onto the ({\it Z},
+     {\it X})-plane. A positive angle THETA forms a right-hand screw
+     with the {\it Y}-axis. 
    \ttitem{PHI} $\phi$ is the elevation angle, i.e. the angle between the
-     reference orbit and its projection onto the (\textit{Z},
-     \textit{X})-plane. A positive angle PHI correspond to increasing
-     \textit{Y}. If only horizontal bends are present, the reference
-     orbit remains in the (\textit{Z}, \textit{X})-plane. In this case
+     reference orbit and its projection onto the ({\it Z},
+     {\it X})-plane. A positive angle PHI correspond to increasing
+     {\it Y}. If only horizontal bends are present, the reference
+     orbit remains in the ({\it Z}, {\it X})-plane. In this case
      PHI is always zero. 
-   \ttitem{PSI} $\psi$ is the roll angle about the local \textit{s}-axis,
-     i.e. the angle between the intersection (\textit{x}, \textit{y})-
-     and (\textit{Z}, \textit{X})-planes and the local
-     \textit{x}-axis. A positive angle PSI forms a right-hand screw with
-     the \textit{s}-axis. 
+   \ttitem{PSI} $\psi$ is the roll angle about the local {\it s}-axis,
+     i.e. the angle between the intersection ({\it x}, {\it y})-
+     and ({\it Z}, {\it X})-planes and the local
+     {\it x}-axis. A positive angle PSI forms a right-hand screw with
+     the {\it s}-axis. 
 \end{madlist} 
 
-The angles ($\theta$, $\phi$, $\psi$) are \textbf{not} the Euler
+The angles ($\theta$, $\phi$, $\psi$) are {\bf not} the Euler
 angles. The reference orbit starts at the origin and points by default
-in the direction of the positive \textit{Z}-axis. The initial local axes
-(\textit{x}, \textit{y}, \textit{s})  coincide with the global axes
-(\textit{X}, \textit{Y}, \textit{Z}) in this order. The initial values
+in the direction of the positive {\it Z}-axis. The initial local axes
+({\it x}, {\it y}, {\it s})  coincide with the global axes
+({\it X}, {\it Y}, {\it Z}) in this order. The initial values
 ($X_0$, $Y_0$, $Z_0$, $\theta_0$, $\phi_0$, $\psi_0$) are therefore all zero
 unless the user specifies different initial conditions.  
 
-Internally the displacement is described by a vector \textit{V} and the
-orientation by a unitary matrix \textit{W}. The column vectors of
-\textit{W} are the unit vectors spanning  the local coordinate axes in
-the order (\textit{x, y, s}). \textit{V} and \textit{W} have the values:  
+Internally the displacement is described by a vector {\it V} and the
+orientation by a unitary matrix {\it W}. The column vectors of
+{\it W} are the unit vectors spanning  the local coordinate axes in
+the order ({\it x, y, s}). {\it V} and {\it W} have the values:  
 
 \begin{equation}
 V =
@@ -273,7 +273,7 @@ $V_i$ and $W_i$ by the recurrence relations
 \end{equation}
 The vector $R_i$ is the displacement and the matrix
 $S_i$ is the rotation of the local reference system  at the
-exit of the element \textit{i} with respect to the entrance  of the same
+exit of the element {\it i} with respect to the entrance  of the same
 element. The values of $R_i$ and $S_i$ are listed below
 for different physical element types.  
 
@@ -284,7 +284,7 @@ for different physical element types.
 \subsection{Reference System for Straight Beam Elements} 
 \label{subsec:local_straight}
 In straight elements the local reference system is simply translated by
-the length of the element along the local \textit{s}-axis. 
+the length of the element along the local {\it s}-axis. 
 This is true for  
 \hyperref[sec:drift]{Drift spaces},\ttindex{drift} 
 \hyperref[sec:quadrupole]{Quadrupoles},\ttindex{quadrupole} 
@@ -298,7 +298,7 @@ This is true for
 \hyperref[sec:monitor]{Beam position monitors}\ttindex{monitor}.
 
 
-The corresponding \textit{R}, \textit{S} are 
+The corresponding {\it R}, {\it S} are 
 \begin{equation}
 R =
  \begin{pmatrix}
@@ -315,8 +315,8 @@ S =
  \end{pmatrix}
 .
 \end{equation}
-A rotation of the element about the \textit{S}-axis has no effect on
-\textit{R} and \textit{S}, since the rotations of the reference system
+A rotation of the element about the {\it S}-axis has no effect on
+{\it R} and {\it S}, since the rotations of the reference system
 before and after the element cancel.  
 
 %% % picture prepared by ghislain to reproduce the png graphics in html.
@@ -402,8 +402,8 @@ before and after the element cancel.
 \subsection{Reference System for Bending Magnets}
 \label{subsec:local_rbend}
 \hyperref[sec:bend]{Bending magnets} have a curved reference orbit. 
-For both rectangular and sector bending magnets, the \textit{R} and
-\textit{S} are expressed as function the bend angle $\alpha$: 
+For both rectangular and sector bending magnets, the {\it R} and
+{\it S} are expressed as function the bend angle $\alpha$: 
 \begin{equation}
 R =
  \begin{pmatrix}
@@ -421,17 +421,17 @@ S =
 \end{equation}
  
 A positive bend angle represents a bend to the right, i.e. towards
-negative \textit{x} values. 
+negative {\it x} values. 
 For sector bending magnets, the bend radius is given by $\rho$, and for
 rectangular bending magnets it has the value $\rho = L / (2 \sin(\alpha/2))$. 
-If the magnet is rotated about the \textit{s}-axis by an angle $\psi$,
-\textit{R} and \textit{S} are transformed by  
+If the magnet is rotated about the {\it s}-axis by an angle $\psi$,
+{\it R} and {\it S} are transformed by  
 \begin{equation}
    \overline{R}=TR,
    \qquad
    \overline{S}=TST^{-1}
 \end{equation}
-where \textit{T} is the orthogonal rotation matrix 
+where {\it T} is the orthogonal rotation matrix 
 \begin{equation}
 T =
  \begin{pmatrix}
@@ -587,7 +587,7 @@ The field coefficients have the following meaning:
    \item[\ldots] etc.
 \end{madlist} 
 
-Using this expansion and the curvature \textit{h} of the reference
+Using this expansion and the curvature {\it h} of the reference
 orbit, the longitudinal component of the vector potential to order 4 is:  
 \begin{equation}
 \begin{aligned}
@@ -658,7 +658,8 @@ between square brackets, where [1] denotes a dimensionless variable.
 
 The independent variable is: 
 \begin{madlist}
-  \ttitem{S} \index{arc length} Arc length \textit{s} along the reference orbit, [m].   
+  \ttitem{S} \index{arc length} Arc length {\it s} along the reference orbit, 
+  [m].   
 \end{madlist} 
 
 In the limit of fully relativistic particles ($\gamma \gg 1$, $v = c$,
@@ -698,7 +699,7 @@ constant in order to keep the system canonical.
 \end{madlist} 
 
 In the above formulas the vectors \(E_i\) are the three complex
-eigenvectors, \(Z\) is the phase space vector, and the matrix \textit{S}
+eigenvectors, \(Z\) is the phase space vector, and the matrix {\it S}
 is the ``symplectic unit matrix'':   
 
 \begin{equation}
