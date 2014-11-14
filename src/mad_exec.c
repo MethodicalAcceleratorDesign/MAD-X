@@ -138,11 +138,51 @@ exec_renamefile(struct in_cmd* cmd)
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
   int pos = name_list_pos("file", nl);
-  int new = name_list_pos("name", nl);
+  int new = name_list_pos("to", nl);
 
   if (nl->inform[pos] && nl->inform[new]) {
     if (rename(pl->parameters[pos]->string, pl->parameters[new]->string))
       warning("unable to rename file: ", pl->parameters[pos]->string);
+  }
+}
+
+void
+exec_copyfile(struct in_cmd* cmd)
+{
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  int pos = name_list_pos("file", nl);
+  int new = name_list_pos("to", nl);
+  int flg = name_list_pos("append", nl);
+
+  if (nl->inform[pos] && nl->inform[new]) {
+    char *src_s = pl->parameters[pos]->string;
+    char *dst_s = pl->parameters[new]->string;
+
+    FILE *src = fopen(src_s, "r");
+    if (!src) {
+      warning("unable to open in read mode file: ", src_s);
+      return;
+    }
+
+    const char *mode = "w";
+    if (pl->parameters[flg]->double_value) mode = "a";
+
+    FILE *dst = fopen(dst_s, mode);
+    if (!dst) {
+      warning("unable to open in write mode file: ", dst_s);
+      fclose(src);
+      return;
+    }
+
+    int c;
+    while ((c = fgetc(src)) != EOF) fputc(c, dst);
+
+    if (!feof(src))
+      warning("unable to copy entirely file: ", src_s);
+
+    fclose(src);
+    fclose(dst);
   }
 }
 
