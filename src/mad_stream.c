@@ -48,6 +48,8 @@ down_unit(char* file_name)
   /* makes a called file the current input unit */
 {
   FILE* new;
+  file_name = str2path(file_name);
+  
   if ((new = fopen(file_name, "r")) == NULL)
   {
     if (interactive) warning("cannot open input file:", file_name);

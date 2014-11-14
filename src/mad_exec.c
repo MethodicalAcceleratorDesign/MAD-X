@@ -101,6 +101,7 @@ exec_assign(struct in_cmd* cmd)
     if (strcmp(stolower(tmp), "terminal") == 0)
       prt_file = stdout;
     else {
+      p = str2path(p);
       if (assign_start == 0) {
         assign_start = 1;
         prt_file = fopen(p, "w");

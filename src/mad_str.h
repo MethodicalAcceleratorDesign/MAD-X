@@ -148,6 +148,9 @@ str2path(char *path)
 #ifdef _WIN32
   for (int i = 0; path[i]; i++)
     if (path[i] == '/') path[i] = '\\';
+#else // UNIXES
+  for (int i = 0; path[i]; i++)
+    if (path[i] == '\\') path[i] = '/';  
 #endif
   return path;
 }
