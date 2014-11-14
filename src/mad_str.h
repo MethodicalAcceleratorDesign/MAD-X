@@ -142,5 +142,15 @@ all_blank(char* s)
   return 1;
 }
 
+static inline char*
+str2path(char *path)
+{
+#ifdef _WIN32
+  for (int i = 0; path[i]; i++)
+    if (path[i] == '/') path[i] = '\\';
+#endif
+  return path;
+}
+
 #endif // MAD_STR_H
 

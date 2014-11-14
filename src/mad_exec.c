@@ -127,7 +127,8 @@ exec_removefile(struct in_cmd* cmd)
   int pos = name_list_pos("file", nl);
 
   if (nl->inform[pos]) {
-    if (remove(pl->parameters[pos]->string))
+    char *src = str2path(pl->parameters[pos]->string); 
+    if (remove(src))
       warning("unable to remove file: ", pl->parameters[pos]->string);
   }
 }
@@ -141,8 +142,9 @@ exec_renamefile(struct in_cmd* cmd)
   int new = name_list_pos("to", nl);
 
   if (nl->inform[pos] && nl->inform[new]) {
-    if (rename(pl->parameters[pos]->string, pl->parameters[new]->string))
-      warning("unable to rename file: ", pl->parameters[pos]->string);
+    char *src = str2path(pl->parameters[pos]->string);
+    char *dst = str2path(pl->parameters[new]->string);
+    if (rename(src,dst)) warning("unable to rename file: ", src);
   }
 }
 
@@ -156,8 +158,8 @@ exec_copyfile(struct in_cmd* cmd)
   int flg = name_list_pos("append", nl);
 
   if (nl->inform[pos] && nl->inform[new]) {
-    char *src_s = pl->parameters[pos]->string;
-    char *dst_s = pl->parameters[new]->string;
+    char *src_s = str2path(pl->parameters[pos]->string);
+    char *dst_s = str2path(pl->parameters[new]->string);
 
     FILE *src = fopen(src_s, "r");
     if (!src) {
@@ -166,7 +168,8 @@ exec_copyfile(struct in_cmd* cmd)
     }
 
     const char *mode = "w";
-    if (pl->parameters[flg]->double_value) mode = "a";
+    if (nl->inform[flg] && pl->parameters[flg]->double_value)
+      mode = "a";
 
     FILE *dst = fopen(dst_s, mode);
     if (!dst) {
