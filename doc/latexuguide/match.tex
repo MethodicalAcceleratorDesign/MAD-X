@@ -76,16 +76,16 @@ can also be issued during matching.
 %% \href{../Introduction/sequence.html}{SEQUENCE} must be selected by means
 %% of a \href{../control/general.html#use}{USE} command. The matching
 %% module can act on more than one sequence simultaneously by specifying
-%% more than one sequence in the \texttt{MATCH} command.
+%% more than one sequence in the {\tt MATCH} command.
 
 
 \section{MATCH \ldots ENDMATCH}
 \label{sec:match}\label{sec:endmatch}
 
-The \texttt{MATCH} command is used for matching either a periodic cell
+The {\tt MATCH} command is used for matching either a periodic cell
 or an insertion to another part of the machine. 
 
-Both matching modes are initiated by the \texttt{MATCH} command using
+Both matching modes are initiated by the {\tt MATCH} command using
 one of several forms:
 
 \madbox{
@@ -305,22 +305,21 @@ VARY, \=NAME=variable, STEP=real, LOWER=real, UPPER=real \\
 
 It has six attributes: 
 \begin{madlist}
-  \ttitem{NAME} The \href{../Introduction/variable.html}{name of the
-    parameter or attribute} to be varied,  
+  \ttitem{NAME} The name of the parameter or attribute to be varied,  
 
   \ttitem{STEP} The approximate initial step size for varying the
-  parameter. If the step is not entered, MAD tries to find a
+  parameter. If the step is not entered, \madx tries to find a
   reasonable step, but this may not always work.  
 
   \ttitem{LOWER} Lower limit for the parameter (optional), 
   \ttitem{UPPER} Upper limit for the parameter (optional). 
 
   \ttitem{SLOPE} allowed change rate (optional, available only using
-  \href{match_xeq.html#jacobian}{JACOBIAN} routine). Limit the
-  parameter to increase (SLOPE=1) decrease (SLOPE=-1) only.  
+  \hyperref[sec:jacobian]{JACOBIAN} routine). Limit the
+  parameter to increase ({\tt SLOPE=1}) or decrease ({\tt SLOPE=-1}) only.
 
   \ttitem{OPT} optimal value for the parameter (optional, available
-  only using \href{match_xeq.html#jacobian}{JACOBIAN} routine).  
+  only using \hyperref[sec:jacobian]{JACOBIAN} routine).  
 \end{madlist}
 
 {\bf Examples:}
@@ -346,7 +345,7 @@ process.
 
 After a matching operation all varied attributes retain their
 value after the last successful matching iteration. Using
-\href{match_xeq.html#jacobian}{JACOBIAN} routine, STRATEGY=3, in case
+\hyperref[sec:jacobian]{JACOBIAN} routine, {\tt STRATEGY=3}, in case
 the number of parameters is greater than the number of constraint, if a
 parameter comes outside the limits, it is excluded automatically from
 the set of variables and a new solution is searched.  
@@ -369,24 +368,24 @@ the set of variables and a new solution is searched.
 Simple constraints are imposed by the {\tt CONSTRAINT} command. 
 The {\tt CONSTRAINT} command has three attributes:   
 \begin{itemize}
- \item  the SEQUENCE entry specifies the sequence for which the
+ \item  the {\tt SEQUENCE} entry specifies the sequence for which the
    constraint applies.  
  \item  the RANGE entry specifies the position where the
-   constraint must be satisfied. The RANGE can either be the name
+   constraint must be satisfied. The {\tt RANGE} can either be the name
    of a single element in the sequence or a range between two
    elements. In the later case the two element names must be
-   separated by a '/': RANGE=nam1/name2  
+   separated by a '/': {\tt RANGE=name1/name2}  
  \item the optics functions to be constrained. 
 \end{itemize} 
 
 The optic functions can be constrained in four different ways: 
-\begin{itemize}
- \item lower limits: 'BETX $>$ value' -\textgreater type1 
- \item upper limits: 'BETX $<$ value' -\textgreater type2 
- \item lower and upper limits: 'BETX $<$ value1, 
-   BETX $>$ value2' -\textgreater type3  
- \item target value: BETX=value -\textgreater type 4 
-\end{itemize} 
+\begin{enumerate}
+ \item lower limit: {\tt BETX $>$ value}
+ \item upper limit: {\tt BETX $<$ value}
+ \item lower and upper limits: {\tt BETX $<$ value1, 
+   BETX $>$ value2} 
+ \item target value: {\tt BETX=value}
+\end{enumerate} 
 
 In case one element is affected by more than one constraint command the
 last CONSTRAINT will be chosen. For example, one can specify the
@@ -413,7 +412,7 @@ and NOT constrained to 100 meter!
 
 The CONSTRAINTS can either be specified with explicit values for the
 constraints of the optic functions or via a pre-calculated
-\href{../control/general.html#savebeta}{SAVEBETA} module. The first
+\hyperref[sec:savebeta]{\tt SAVEBETA} module. The first
 options has the form: 
 \madbox{
 CONSTRAINT, \=SEQUENCE=seqname, RANGE=position,\\
@@ -435,43 +434,41 @@ CONSTRAINT, \=SEQUENCE=seqname, RANGE=position, \\
             \>BETA0=beta0-name, MUX=real, MUY=real;
 }
 
-Here all of (BETX, BETY, ALFX, ALFY, MUX, MUY, DX, DY, DPX, DPY)
+Here all of ({\tt BETX, BETY, ALFX, ALFY, MUX, MUY, DX, DY, DPX, DPY})
 are constrained in the selected points to the corresponding values
-of a pre-calculated \href{../control/general.html#savebeta}{SAVEBETA} module.
-In the above example
-the phases (MUX, MUY) are overridden by the numerical values specified via
-'MUX=real' and 'MUY=real'.
-Normally ``RANGE'' refers to a single
-\href{../Introduction/ranges.html#position}{position}.
+of a pre-calculated \hyperref[sec:savebeta]{\tt SAVEBETA} module.
+In the above example the phases ({\tt MUX, MUY}) are overridden by the 
+numerical values specified via {\tt MUX=real} and {\tt MUY=real}.
+Normally \hyperref[sec:range]{\tt RANGE} refers to a single position.
 
 \section{User Defined Matching Constraints}
 \label{sec:userconstraint}
 
-In addition to the nominal TWISS variables the user can define a limited
+In addition to the nominal \hyperref[chap:twiss]{\tt TWISS} variables, 
+the user can define a limited
 set of 'user-defined' variables in the constraint statement. This
 allows, for example, the matching of the normalized dispersion or the
-mechanical aperture. The MATCH module allows four user defined variables
-called: mvar1, mvar2, mvar3 and mvar4. 
+mechanical aperture. The {\tt MATCH} module allows four user defined variables
+called: {\tt MVAR1, MVAR2, MVAR3} and {\tt MVAR4}. 
 The variables can be defined according to the general variable
 declaration rules of \hyperref[sec:defer]{deferred expressions}.
 For example, in order to match the normalized dispersion at a certain
 location in the sequence one would first define a variable:
 
 \madxmp{
-mvar1 := table(twiss,dx)/sqrt(table(twiss,betx));
+MVAR1 := table(twiss,dx)/sqrt(table(twiss,betx));
 }
 
 After that the user has to select the variable for output in the TWISS
-statement (see \href{../twiss/twiss.html}{TWISS module} and
-\href{../Introduction/select.html}{SELECT} for more
-details on the TWISS module and SELECTION statements):
+statement (see details in the \hyperref[chap:twiss]{TWISS module} and 
+\hyperref[sec:select]{SELECT} statement):
 \madxmp{
 SELECT, FLAG=twiss, CLEAR; \\
 SELECT, FLAG=twiss, COLUMN=keyword, name, s, betx, dx, mvar1; \\
 TWISS, SEQUENCE=seqname, FILE=twissfile;
 }
 
-The variable can now be referenced like any other TWISS variable
+The variable can now be referenced like any other {\tt TWISS} variable
 in the constraint command:
 \madxmp{
 CONSTRAINT, SEQUENCE=seqname, RANGE=range, MVAR1=targetvalue;
@@ -484,10 +481,10 @@ In addition to conventional matching constraints that specify the optics
 functions at a certain position in the sequence the user can also constrain 
 global optics parameters such as, for example, the overall machine tune
 and the machine chromaticity. Such global optics parameters can be
-constraint via the  GLOBAL command, having the following syntax:
+constraint via the {\tt GLOBAL} command, having the following syntax:
 
 \madbox{
-GLOBAL, \=SEQUENCE=sename, \\
+GLOBAL, \=SEQUENCE=seqname, \\
         \>Q1=real, dQ1=real, ddQ1=real, \\
         \>Q2=real, dQ2=real, ddQ2=real;
 }
@@ -495,6 +492,7 @@ GLOBAL, \=SEQUENCE=sename, \\
 
 All attributes are optional and have the following meaning:
 \begin{madlist}
+  \ttitem{SEQUENCE} the name of the sequence on which to operate the matching.
   \ttitem{Q1, Q2} enable a correction of tunes in presence of
   magnetic imperfections or misalignments, 
   \ttitem{dQ1, dQ2}
@@ -510,21 +508,20 @@ All attributes are optional and have the following meaning:
 The matching procedures try to fulfil the constraints
 in a least square sense.
 A penalty function is constructed which is the sum of the
-squares of all errors,
-each multiplied by the specified weight.
+squares of all errors, each multiplied by the specified weight.
 The larger the weight, the more important a constraint becomes.
 The weights are taken from a table of current values.
 These are initially set to default values listed in the table below,
 and may be reset at any time to different values.
 Values set in this way remain valid until changed again.
 
-The \texttt{WEIGHT} command changes the weights for subsequent
+The {\tt WEIGHT} command changes the weights for subsequent
 constraints: 
 \madbox{
-WEIGHT, \=BETX=real,ALFX=real,MUX=real, \\
-        \>BETY=real,ALFY=real,MUY=real, \\
-        \>X=real,PX=real,Y=real,PY=real, \\
-        \>DX=real,DPX=real,DY=real,DPY=real;
+WEIGHT, \=BETX=real, ALFX=real, MUX=real, \\
+        \>BETY=real, ALFY=real, MUY=real, \\
+        \>X=real, PX=real, Y=real, PY=real, \\
+        \>DX=real, DPX=real, DY=real, DPY=real;
 }
 
 The weights are entered with the same name as the
@@ -536,8 +533,8 @@ set of functions to be matched.
 
 
 Matching weights for global matching constraints can be set by the 
-\texttt{GWEIGHT} command, having attributes identical to those of
-\texttt{GLOBAL}.
+{\tt GWEIGHT} command, having attributes identical to those of
+{\tt GLOBAL}.
 
 \madbox{
 GWEIGHT, \=Q1=real, dQ1=real, ddQ1=real, \\
@@ -597,13 +594,14 @@ Default values for matching weights are given in the table below.
 \section{Matching Methods}
 \label{sec:match_methods}
 
-MADX currently supports four different matching algorithms: 
+\madx currently supports four different matching algorithms each associated to 
+a command with its own attributes. 
 
 \subsection{LMDIF: Fast Gradient Minimisation}
 \label{subsec:match_lmdif}
-The LMDIF command minimises the sum of squares of the constraint
+The {\tt LMDIF} command minimises the sum of squares of the constraint
 functions using their numerical derivatives. It is the fastest
-minimisation method available in \madx.    
+minimisation method available in \madx.
  
 \madbox{
 LMDIF, CALLS=integer, TOLERANCE=real;
@@ -619,7 +617,7 @@ The command has two attributes:
 
 \subsection{MIGRAD: Gradient Minimisation}
 \label{subsec:match_migrad}
-The MIGRAD command minimises the penalty function using the numerical
+The {\tt MIGRAD} command minimises the penalty function using the numerical
 derivatives of the sum of squares.  
 
 \madbox{
@@ -638,7 +636,7 @@ The command has three attributes:
 
 \subsection{SIMPLEX: Simplex Minimisation}
 \label{subsec:match_simplex}
-The SIMPLEX command minimises the penalty function by the simplex
+The {\tt SIMPLEX} command minimises the penalty function by the simplex
 method. Details are given in \cite{MINUIT}.
 
 \madbox{
@@ -655,11 +653,11 @@ The command has two attributes:
 
 \subsection{JACOBIAN: Newton Minimisation}
 \label{subsec:match_jacobian}
-The JACOBIAN command minimises the penalty function calculating the
+The {\tt JACOBIAN} command minimises the penalty function calculating the
 Jacobian and solving the linear problem. A $Q R$ or $L Q$  decomposition is
 performed when the system is over or under-determined. Before starting
-the matching routine two optional transformations (COOL and RANDOM) are
-performed. 
+the matching routine two optional transformations ({\tt COOL} and {\tt RANDOM}) 
+are performed. 
 
 \madbox{
 JACOBIAN, \=CALLS=integer, TOLERANCE=real, REPEAT=integer, \\
@@ -674,10 +672,10 @@ The command has the folowing attributes:
   \ttitem{TOLERANCE} The desired tolerance for the minimum. 
   (Default:~1E-6)
 
-  \ttitem{REPEAT} The number of call of the JACOBIAN routine. 
+  \ttitem{REPEAT} The number of calls of the JACOBIAN routine. 
   (Default:~1) 
 
-  \ttitem{BISEC} Selects the maximum number of iteratation used to
+  \ttitem{BISEC} Selects the maximum number of iteration used to
   determine the step length which reduces the penalty function during
   the main iteration. A large number (i.e. 6) reduces the probability
   to diverge from the solution, but increases the probability of being
@@ -700,15 +698,15 @@ The command has the folowing attributes:
    else \\
       \>newval = (1-cool)*oldval + cool*optval
   }
-  where \texttt{newval} is the new value after the transformation,
-  \texttt{oldval} is the previous value, \texttt{maxval, minval,
+  where {\tt newval} is the new value after the transformation,
+  {\tt oldval} is the previous value, {\tt maxval, minval,
     optval} are the maximum, minimum and optimal value of
-   the variable specified in the \texttt{VARY} command. 
+   the variable specified in the {\tt VARY} command. 
 
    \ttitem{RANDOM} The factors which specify the following transformation:
    \madxmp{newval = ( 1 + random * rand() ) * oldval}
-   where \texttt{newval} is the new value after the transformation,
-   \texttt{oldval} is the previous value, \texttt{rand()} is a stochastic
+   where {\tt newval} is the new value after the transformation,
+   {\tt oldval} is the previous value, {\tt rand()} is a stochastic
    variable with a uniform (-0.5,0.5) distribution.   
 \end{madlist} 
 
@@ -727,9 +725,9 @@ The command has the folowing attributes:
 \label{sec:use_macro}
  
 It is possible to match user defined expressions with the
-\texttt{USE\_MACRO} keyword. 
+{\tt USE\_MACRO} keyword. 
 
-The general input structure for a \texttt{MACTH} command is the following:
+The general input structure for a {\tt MATCH} command is the following:
 
 \begin{verbatim}
 MATCH,USE_MACRO;
@@ -753,7 +751,7 @@ The algorithm for evaluating the penalty function is the following:
 \begin{itemize}
    \item  execute the first macro,
    \item  evaluate and compute the difference between the left hand side
-     (lhs) and the righ hand side (rhs) of the first set of expressions, 
+     (lhs) and the right hand side (rhs) of the first set of expressions, 
    \item in case of other macros, evaluates in order the macro and the
      expressions 
    \item  the set of differences are  minimized by the selected method
@@ -764,9 +762,9 @@ The algorithm for evaluating the penalty function is the following:
  
 With:
 \madxmp{
-   MATCH, USE\_MACRO;
+MATCH, USE\_MACRO;
 }
-the 'match' command can be used for matching any expression which can be
+the {\tt MATCH} command can be used for matching any expression which can be
 defined through expression. It requires a slightly different syntax.
 
 \subsection{VARY statements}
@@ -785,23 +783,22 @@ The macro to be used in the matching routine can be defined in two ways:
 \end{itemize}
  
 After a macro definition a set of constraints should be defined, with
-the following syntax for the \texttt{CONSTRAINT} command:
+the following syntax for the {\tt CONSTRAINT} command:
  
 \madxmp{
- CONSTRAINT, expr=  "lhs = rhs"; \\
- CONSTRAINT, expr=  "lhs < rhs"; \\
- CONSTRAINT, expr=  "lhs > rhs"; 
+CONSTRAINT, expr = "lhs = rhs"; \\
+CONSTRAINT, expr = "lhs < rhs"; \\
+CONSTRAINT, expr = "lhs > rhs"; 
 }
 
 where "lhs" and "rhs" are well defined \madx expressions. 
 Another set of macro and constraints can be defined afterwards. 
 
 \subsection{Examples}
-The following example the USE\_MACRO mode can emulate a matching script
+The {\tt USE\_MACRO} mode can emulate a matching script
 which uses the normal syntax. 
 
 Normal syntax:
-
 \begin{verbatim}
 MATCH,SEQUENCE=LHCB1,LHCB2;
     VARY, NAME=KSF.B1, STEP=0.00001;

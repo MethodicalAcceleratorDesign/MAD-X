@@ -102,14 +102,34 @@ Note also that a percent sign (\%) can be printed using the format
 
 \section{RENAMEFILE}
 \label{sec:renamefile}
+%\madbox{RENAMEFILE, FILE="filename", NAME = "new\_filename";}
 \madbox{
-RENAMEFILE, FILE="filename", NAME = "new\_filename";
+	RENAMEFILE, FILE="filename", TO = "new\_filename"; % TO
 }
 renames the file "filename" to "new\_filename" on disk. \\
+\textbf{includes path}
 It is more portable than an equivalent \hyperref[sec:system]{\tt SYSTEM} call:
 \madxmp{
 SYSTEM("mv filename new\_filename"); ! Unix specific
 }
+
+\section{COPYFILE}
+\label{sec:copyfile}
+\madbox{
+	COPYFILE, FILE="filename", TO = "new\_filename", APPEND=logical;
+}
+copies the file "filename" to the file "new\_filename" on disk.
+
+The attribute {\tt APPEND=true} causes {\tt COPYFILE} to append the content of 
+"filename" at the end of the file "new\_filename", instead of replacing the 
+content of "new\_filename" with the content of "filename", ie a straight copy 
+with the default {\tt APPEND=false}.
+
+It is more portable than an equivalent \hyperref[sec:system]{\tt SYSTEM} call:
+\madxmp{
+	SYSTEM("copy /y filename new\_filename"); ! Windows specific
+}
+
 
 \section{REMOVEFILE}
 \label{sec:removefile}
