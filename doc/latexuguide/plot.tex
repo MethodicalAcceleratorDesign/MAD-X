@@ -71,8 +71,8 @@ where the parameters have the following meaning:
      \textit{Important: VAXIS and VAXIS{1..4} are exclusive in their
        application! if VAXIS is given, VAXIS{1..4} will be simply ignored.} 
 
-   \ttitem{VMIN, VMAX} lower and upper edge(s) for vertical axis or axes, up to four
-     numbers separated by commas.\\
+   \ttitem{VMIN, VMAX} lower and upper edge(s) for vertical axis or axes, up to
+     four numbers separated by commas.\\
      Note that both vmin and vmax must be given for an axis to be effective.   
 
    \ttitem{TITLE} plot title string; if absent, the last overall title is
@@ -102,17 +102,22 @@ where the parameters have the following meaning:
      invisible. 
 
    \ttitem{INTERPOLATE} logical, default=false. The data points are
-     normally connected by straight lines; if "interpolate" is
+     normally connected by straight lines; if {\tt INTERPOLATE} is
      specified, the following on-momentum Twiss parameters are
      interpolated with calls to the Twiss module inside 
      each element: beta, sqrt(beta), alfa, phase advance, orbit, angle,
      dispersion and its first derivative, for both planes. \\ 
      For all other variables splines are used to smooth
      the curves. \\ 
-     Note that setting this option is ineffective if the interpolate
-     option of the SETOPT command has been set to true; in this case all
-     plots will be interpolated. \\
-     
+     {\bf Note} that setting this option is ineffective if the {\tt INTERPOLATE}
+     option of the \hyperref[sec:setopt]{\tt SETOPT} command has been set to 
+     true; in this case all plots will be interpolated. \\
+     {\bf Note} also that because the {\tt INTERPOLATE} option causes {\tt 
+     TWISS} to be called internally with a range, any range that might have 
+     been defined in a previous \hyperref[sec:use]{\tt USE} command is lost. In 
+     this case the {\tt USE} statement must be reiterated with the range, which 
+     in turn could cause assigned errors to be lost.
+
 
    \ttitem{ZERO\_SUPPR} To be documented (default = false)
 
@@ -191,7 +196,10 @@ where the parameters have the following meaning:
      attribute is track.  Depending on the format (.ps or .eps, see
      below) the plots will either all be written into one file
      file\_name.ps, or one per plot into file\_name01.eps,
-     file\_name02.eps, etc.   
+     file\_name02.eps, etc. \\
+     {\bf Note:} in the case of several {\tt PLOT} commands in a single \madx 
+     job, the first {\tt FILE} argument determines the basename and other {\tt 
+     FILE} arguments in subsequent {\tt PLOT} commands are ignored.
 
    \ttitem{TRACKFILE} basename of the files containing
      tracking data for each particle (default: track)  
