@@ -104,10 +104,9 @@ Note also that a percent sign (\%) can be printed using the format
 \label{sec:renamefile}
 %\madbox{RENAMEFILE, FILE="filename", NAME = "new\_filename";}
 \madbox{
-RENAMEFILE, FILE="filename", TO = "new\_filename"; % TO
+RENAMEFILE, FILE="filename", TO="new\_filename";
 }
 renames the file "filename" to "new\_filename" on disk. \\
-\textbf{includes path}
 It is more portable than an equivalent \hyperref[sec:system]{\tt SYSTEM} call:
 \madxmp{
 SYSTEM("mv filename new\_filename"); ! Unix specific
@@ -116,7 +115,7 @@ SYSTEM("mv filename new\_filename"); ! Unix specific
 \section{COPYFILE}
 \label{sec:copyfile}
 \madbox{
-	COPYFILE, FILE="filename", TO = "new\_filename", APPEND=logical;
+	COPYFILE, FILE="filename", TO="new\_filename", APPEND=logical;
 }
 copies the file "filename" to the file "new\_filename" on disk.
 
