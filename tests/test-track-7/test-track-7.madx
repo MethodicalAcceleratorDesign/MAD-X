@@ -43,14 +43,11 @@ makethin, sequence= lhcb1;
 
 
 ! ********** Track three particles
-option, echo,warn,info;
 use, sequence= lhcb1;
 vrf400= 8.0;   !   Qs=0.0057
 track, dump;
-  start, pt= 0.0001;
-  start, pt= 0.001002; ! edge of bucket
-  start, pt= 0.001004; ! just outside of bucket
-  run,   turns= 320; !,tolerance={.1,.1,.1,.1,100.,.1};!175=1 synchr. period
+  start, x=-1e-4,y=4e-4, t=1e-4, pt=1e-4;
+  run,   turns= 400, ffile=20; !,tolerance={.1,.1,.1,.1,100.,.1};!175=1 synchr. period
 endtrack; 
 
 return;

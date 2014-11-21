@@ -19,5 +19,6 @@
  select, flag=makethin, pattern=mqml\.,   slice=2;
  select, flag=makethin, pattern=mqtlh\.,  slice=2;
  select, flag=makethin, pattern=mqtli\.,  slice=2;
+ select, flag=makethin, class=sbend, thick=true;
 
 return;

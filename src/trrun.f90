@@ -5087,7 +5087,7 @@ subroutine tttdipole(track, ktrack)
   logical kill_ent_fringe, kill_exi_fringe
 
   logical geometric
-  double precision r, b, ux, uy, m, Ax, Bx, By, Cx, AC, angle_, pz, pz_, xa !, ya, Cy
+  double precision r, b, ux, uy, m, Ax, Bx, By, Cx, Cy, AC, angle_, pz, pz_, xa !, ya
   double precision xp, yp, xp_, yp_
   double precision KK, D, E, F, P, O
   double precision gamma, hx, hy, get_value, rfac
@@ -5142,6 +5142,7 @@ subroutine tttdipole(track, ktrack)
      z  = track(5,jtrk);
      pt = track(6,jtrk);
   
+
      !---- Radiation effects at entrance.
      if (dorad) then
         delta_plus_1_sqr = pt*pt+2d0*pt/bet0+1d0;
@@ -5156,6 +5157,12 @@ subroutine tttdipole(track, ktrack)
      
      delta_plus_1_sqr = pt*pt+2d0*pt/bet0+1d0;
      delta_plus_1 = sqrt(delta_plus_1_sqr);
+
+     print *,'bet0 = ', bet0
+     print *, 'px = ', px
+     print *, 'pz = ', sqrt(delta_plus_1_sqr - px*px - py*py);
+
+
      
      if(.not.geometric) then
         if (optiondebug .ne. 0) print *, 'Using Hamiltonian tracking...'
@@ -5181,9 +5188,8 @@ subroutine tttdipole(track, ktrack)
         P = xp;
 
         ! path-length difference
-        DL =  S2*P**2/KK/8.0+L*P**2/4.0&
-             -S2*O**2/KK/8.0+L*O**2/4.0-C**2*O*P/KK/2.0&
-             +O*P/KK/2.0+h*E*S/KK-h*D*C/KK+h*F*L+yp**2*L/2.0+h*D/KK;
+	DL = ((P**2-O**2)*S2+8*h*E*S+2*KK*L*P**2+4*S**2*O*P+2*KK*L*O*&
+      &*2+(8*h*KK*F+4*KK*yp**2)*L+8*h*(1d0-C)*D)/KK/8.0;
 
         ! 1/beta = (bet0i + pt) / delta_plus_1
         ! z_ = z + L * bet0i - (L + DL) * (bet0i + pt) / delta_plus_1;
@@ -5208,7 +5214,7 @@ subroutine tttdipole(track, ktrack)
         pz = sqrt(delta_plus_1_sqr - px*px - py*py);
         xa = atan2(px, pz);
         !ya = atan2(py, pz);
-        r  = rho*delta_plus_1;
+        r  = rho * sqrt(pz**2 + px**2);
         Ax = rho + x;
         Bx = Ax-r*cos(xa);
         By =    r*sin(xa);
@@ -5221,19 +5227,18 @@ subroutine tttdipole(track, ktrack)
         end if
         m = b + sqrt(b*b-c);
         Cx = m*ux;
-        !Cy = m*uy;
+        Cy = m*uy;
         !AC = sqrt((Ax-Cx)**2 + Cy**2);
         AC = sqrt(Ax**2 + m**2 -2d0*Ax*Cx);
         angle_ = 2d0*asin(AC/2d0/r);
-        xp_ = tan(xa + (angle**2 - angle_**2)/(angle + angle_));
+        xp_ = tan(asin(((Cx-Bx)*uy - (Cy-By)*ux)/abs(r)));
         yp_ = py / pz; !tan(ya);
         x_ = (m**2-rho**2)/(m+abs(rho))*sign(1d0, angle);
         y_ = y + yp_ * L;
         ! 1/beta = (bet0i + pt) / delta_plus_1
         ! 1/beta_z = (bet0i + pt) / pz
         z_ = z + bet0i * L - (bet0i + pt) / delta_plus_1 * sqrt((r * angle_)**2 + (yp_ * L)**2);
-        !pz_ = delta_plus_1 / sqrt(1d0 + xp_*xp_ + yp_*yp_);
-        pz_ = pz;
+        pz_ = delta_plus_1 / sqrt(1d0 + xp_*xp_ + yp_*yp_);
         px_ = xp_ * pz_;
         py_ = yp_ * pz_;
      end if
