@@ -485,8 +485,10 @@ constraint via the {\tt GLOBAL} command, having the following syntax:
 
 \madbox{
 GLOBAL, \=SEQUENCE=seqname, \\
-        \>Q1=real, dQ1=real, ddQ1=real, \\
-        \>Q2=real, dQ2=real, ddQ2=real;
+        \>Q1=real, DQ1=real, \\ %, DDQ1=real, \\
+        \>Q2=real, DQ2=real;    %, DDQ2=real, \\
+%       \>DQ1DE1=real, DQ2DE2=real, DQ1DE2=real, \\
+%       \>GAMMATR=real, ALFA=real;
 }
 
 
@@ -494,11 +496,16 @@ All attributes are optional and have the following meaning:
 \begin{madlist}
   \ttitem{SEQUENCE} the name of the sequence on which to operate the matching.
   \ttitem{Q1, Q2} enable a correction of tunes in presence of
-  magnetic imperfections or misalignments, 
-  \ttitem{dQ1, dQ2}
+  magnetic imperfections or misalignments
+  \ttitem{DQ1, DQ2}
   enable a correction of chromaticities in presence of
-  magnetic imperfections or misalignments, 
-  \ttitem {ddQ1, ddQ2} enable a correction of nonlinear chromaticities
+  magnetic imperfections or misalignments
+%  \ttitem {DDQ1, DDQ2} enable a correction of nonlinear chromaticities
+%  \ttitem {DQ1DE1, DQ2DE2, DQ1DE2} enable a correction of anharmonicities,   
+%{\sl ie} the detuning with amplitudes
+%  \ttitem {GAMMATR} enable a correction of the transition energy of the lattice
+%  \ttitem {ALFA} enable a correction of the momentum compaction factor of the  
+%lattice.
 \end{madlist}
 
 
@@ -537,8 +544,10 @@ Matching weights for global matching constraints can be set by the
 {\tt GLOBAL}.
 
 \madbox{
-GWEIGHT, \=Q1=real, dQ1=real, ddQ1=real, \\
-         \>Q2=real, dQ2=real, ddQ2=real;
+GWEIGHT, \=Q1=real, DQ1=real, \\ %DDQ1=real, \\
+         \>Q2=real, DQ2=real;  % DDQ2=real, \\
+%        \>DQ1DE1=real, DQ2DE2=real, DQ1DE2=real, \\
+%        \>GAMMATR=real, ALFA=real;
 }
 
 
@@ -567,8 +576,10 @@ Default values for matching weights are given in the table below.
       DDX    &   1.0  & DDPX   &   1.0  &  & \\
       DDY    &   1.0  & DDPY   &   1.0  &  & \\ 
       MVAR{\it i}  &  10.0  & & & & \\
-      Q1   &   10.0  & dQ1   &  1.0  & ddQ1    &  0.1  \\
-      Q2   &   10.0  & dQ2   &  1.0  & ddQ2    &  0.1  \\
+      Q1     &  10.0  & DQ1    &   1.0  &  & \\ %& DDQ1    &  0.1  \\
+      Q2     &  10.0  & DQ2    &   1.0  &  & \\ %& DDQ2    &  0.1  \\
+%      DQ1DE1 &    ??  & DQ2DE2 &    ??  & DQ1DE2  &   ??  \\
+%      GAMMATR&    ??  & ALFA   &    ??  &  & \\
       \hline
       %% name   & weight & name   & weight & name   & weight & name   & weight & name   & weight & name   & weight \\ 
       %% BETX   &   1.0  & ALFX   &  10.0  & MUX    &  10.0  & BETY   &   1.0  & ALFY   &  10.0  & MUY    &  10.0  \\ 
