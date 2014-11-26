@@ -41,20 +41,22 @@ will destroy the assigned errors. Use the
 
 Alignment errors are defined by the {\tt EALIGN} command. 
 The misalignments refer to the
-\href{../Introduction/local_system.html}{local reference system} for a
+\hyperref[sec:reference]{local reference system} for a
 perfectly aligned machine.  
-Possible misalignments are displacements along the three coordinate
+Misalignments are defined as displacements along the three coordinate
 axes, and rotations about the coordinate axes. 
 Alignment errors can be assigned to all beam elements except drift
 spaces. 
 The effect of misalignments is treated in a linear
-approximation. 
-A \hyperref[sec:monitor]{Beam Position Monitor} can be given read errors in 
-both horizontal and vertical planes. 
-Monitor errors ({\tt MREX, MREY, MSCALX} and {\tt MSCALY}) are
-ignored for all other elements. Each new {\tt EALIGN} statement replaces the
-misalignment errors for all elements in its range, unless {\tt EOPTION,
-ADD=true;} has been specified.   
+approximation.
+
+\hyperref[sec:monitor]{Beam Position Monitors} can be given readout errors in 
+both horizontal and vertical planes. Monitor readout errors are
+ignored for all elements other than \hyperref[sec:monitor]{monitors}. 
+
+Each new {\tt EALIGN} statement replaces the misalignment errors for all 
+elements in its range, unless the logical {\tt ADD} attribute of 
+\hyperref[sec:eoption]{\tt EOPTION} has been specified.
 
 Alignment errors are defined by the statement 
 
@@ -67,159 +69,105 @@ EALIGN, \>DX=real, DY=real, DS=real, \\
         \>MSCALX=real, MSCALY=real,\\
         \>AREX=real, AREY=real;
 }
-and elements are now selected by the
+for elements selected by the
 \hyperref[sec:select]{\tt SELECT} command. 
 
-The attributes are: 
-\begin{madlist}
-  \ttitem{DX} The misalignment in the {\it x}-direction for the entry of
-  the beam element. (Default:~0~m).  \\ 
-  DX$>$0 displaces the element in the positive {\it x}-direction 
-  
-  \ttitem{DY} The misalignment in the {\it y}-direction for the entry of
-  the beam element. (Default:~0~m). \\ 
-  DY$>$0 displaces the element in the positive {\it y}-direction 
-
-  \ttitem{DS} The misalignment in the {\it s}-direction for the entry of
-  the beam element. (Default:~0~m). \\
-  DS$>$0 displaces the element in the positive {\it s}-direction 
-  
-  \ttitem{DPHI} The rotation around the {\it x}-axis. (Default:~0~rad). \\ 
-  A positive angle gives a greater {\it y}-coordinate for the exit
-  than for the entry. 
-
-  \ttitem{DTHETA} The rotation around the {\it y}-axis according to the
-  right hand rule. (Default:~0~rad).  
-
-  \ttitem{DPSI} The rotation around the {\it s}-axis according to the
-  right hand rule. (Default:~0~rad).  
-
-  \ttitem{MREX} The horizontal read error for a monitor. This is ignored if
-  the element is not a monitor. \\
-  If MREX$>$0 the reading for {\it x} is too high (default: 0 m). 
-
-  \ttitem{MREY} The vertical read error for a monitor. This is ignored if
-  the element is not a monitor. \\  
-  If MREY$>$0, the reading for {\it y} is too high (default: 0 m). 
-
-  \ttitem{AREX} The misalignment in the {\it x}-direction for the entry
-  of an aperture limit (default: 0 m). \\ 
-  AREX$>$0 displaces the element in the positive {\it x}-direction 
-
-  \ttitem{AREY} The misalignment in the {\it y}-direction for the entry
-  of an aperture limit (default: 0 m). \\ 
-  AREY$>$0 displaces the element in the positive {\it y}-direction 
-
-  \ttitem{MSCALX} The relative horizontal scaling error for a monitor. This
-  is ignored if the element is not a monitor. \\ 
-  If MSCALX$>$0 the reading for {\it x} is too high (default: 0). A
-  value of 0.5 implies that the actual reading is multiplied by 1.5.  
-
-  \ttitem{MSCALY} The relative vertical scaling error for a monitor. This is
-  ignored if the element is not a monitor. \\  
-  If MSCALY$>$0 the reading for {\it y} is too high (default: 0). A
-  value of -0.3 implies that the actual reading is multiplied by 0.7.  
-\end{madlist}
-
-Examples: 
-\madxmp{
-SELECT, FLAG = ERROR, CLASS = MQ; \\
-EALIGN, DX = 0.002, DY = 0.0004*RANF(), DPHI = 0.0002*GAUSS();
-}
-Assigns alignment errors to all elements of class MQ.           
-
-
-
-\madxmp{
-SELECT, FLAG = ERROR, PATTERN = "QF.*"; \\
-EALIGN, DX = 0.001*TGAUSS(2.5), DY = 0.0001*RANF();
-}
-Assigns alignment errors to all elements starting with "QF". TGAUSS(2.5)
-means a Gaussian distribution cut at 2.5 sigma.  
-
 \begin{figure}[ht]
-\centering
-\setlength{\unitlength}{1pt}
-\begin{picture}(400,140)(0,30)
-\thinlines
-\put(50,75){\line(1,0){96}}
-\put(154,75){\vector(1,0){246}}
-\put(50,75){\makebox(0,0)[r]{\shortstack{original \\beam line}}}
-\put(390,65){\makebox(0,0)[r]{s}}
-\put(150,75){\circle{8}}
-\put(150,75){\circle*{2}}
-\put(140,85){\makebox(0,0){y}}
-\put(150,30){\line(0,1){41}}
-\put(150,79){\vector(0,1){91}}
-\put(140,160){\makebox(0,0){x}}
-\put(130,55){\vector(1,1){15}}
-\put(130,55){\makebox(0,0)[tr]{\shortstack{original entrance \\
-of the magnet}}}
-\thicklines
-\put(150,55){\vector(1,0){50}}
-\put(175,45){\makebox(0,0){DS}}
-\put(130,75){\vector(0,1){50}}
-\put(125,100){\makebox(0,0)[r]{DX}}
-\thinlines
-\put(125,125){\line(1,0){185}}
-\put(200,50){\line(0,1){120}}
-\put(200,125){\circle*{4}}
-\thicklines
-\put(168,117){\vector(4,1){144}}
-\put(210,85){\vector(-1,4){20}}
-\bezier{30}(300,125)(300,137)(297,149)
-\put(299,140){\vector(-1,4){2}}
-\put(305,137){\makebox(0,0)[l]{DTHETA}}
-\put(282,137){\line(-1,4){4}}
-\put(202,117){\line(-1,4){4}}
-\put(198,133){\line(4,1){80}}
-\put(202,117){\line(4,1){80}}
-\put(150,67){\line(1,0){80}}
-\put(150,83){\line(1,0){80}}
-\put(150,67){\line(0,1){4}}
-\put(150,79){\line(0,1){4}}
-\put(230,67){\line(0,1){16}}
-\end{picture}
-\caption{Example of Misplacement in the $(x,s)$-plane}
-\label{F-XSDISP}
+	\centering
+	\setlength{\unitlength}{1pt}
+	\begin{picture}(400,140)(0,30)
+	\thinlines
+	\put(50,75){\line(1,0){96}}
+	\put(154,75){\vector(1,0){246}}
+	\put(50,75){\makebox(0,0)[r]{\shortstack{
+		\footnotesize original \\
+		\footnotesize beam line}}}
+	\put(395,67){\makebox(0,0)[r]{$s$}}
+	\put(150,75){\circle{8}}
+	\put(150,75){\circle*{2}}
+	\put(142,83){\makebox(0,0){$y$}}
+	\put(150,30){\line(0,1){41}}
+	\put(150,79){\vector(0,1){91}}
+	\put(142,163){\makebox(0,0){$x$}}
+	\put(130,55){\vector(1,1){15}}
+	\put(130,55){\makebox(0,0)[tr]{\shortstack{
+		\footnotesize original entrance \\
+		\footnotesize of the magnet}}}
+	\thicklines
+	\put(150,55){\vector(1,0){50}}
+	\put(175,45){\makebox(0,0){\tt DS}}
+	\put(130,75){\vector(0,1){50}}
+	\put(125,100){\makebox(0,0)[r]{\tt DX}}
+	\thinlines
+	\put(125,125){\line(1,0){185}}
+	\put(200,50){\line(0,1){120}}
+	\put(200,125){\circle*{4}}
+	\thicklines
+	\color{blue}
+	\put(168,117){\vector(4,1){144}}
+	\put(210,85){\vector(-1,4){20}}
+
+	\put(282,137){\line(-1,4){4}}
+	\put(202,117){\line(-1,4){4}}
+	\put(198,133){\line(4,1){80}}
+	\put(202,117){\line(4,1){80}}
+	\color{black}
+	\bezier{30}(300,125)(300,137)(297,149)
+	\put(299,140){\vector(-1,4){2}}
+	\put(305,137){\makebox(0,0)[l]{\tt DTHETA}}
+
+	\put(150,67){\line(1,0){80}}
+	\put(150,83){\line(1,0){80}}
+	\put(150,67){\line(0,1){4}}
+	\put(150,79){\line(0,1){4}}
+	\put(230,67){\line(0,1){16}}
+	\end{picture}
+	\caption{Alignment errors in the $(x,s)$-plane}
+	\label{F-XSDISP}
 \end{figure}
 
-
-\begin{figure}[ht]
-\centering
-\setlength{\unitlength}{1pt}
-\begin{picture}(400,150)
-\thinlines
-\put(204,75){\line(1,0){96}}
-\put(196,75){\vector(-1,0){96}}
-\put(305,75){\makebox(0,0)[l]{\shortstack{horizontal \\plane}}}
-\put(110,65){\makebox(0,0)[l]{x}}
-\put(200,75){\circle{8}}
-\put(200,75){\makebox(0,0){\(\times\)}}
-\put(210,65){\makebox(0,0){s}}
-\put(200,0){\line(0,1){71}}
-\put(200,79){\vector(0,1){71}}
-\put(190,140){\makebox(0,0){y}}
-\thicklines
-\put(196,76.3){\vector(-3,1){70}}
-\put(204,73.7){\line(3,-1){70}}
-\put(198.7,72){\line(-1,-3){23.3}}
-\put(201.3,78){\vector(1,3){23.3}}
-\bezier{20}(260,75)(260,65)(257,56)
-\put(259,62){\vector(-1,-3){2}}
-\put(265,67){\makebox(0,0)[l]{DPSI}}
-\put(160,55){\line(3,-1){60}}
-\put(180,115){\line(3,-1){60}}
-\put(160,55){\line(1,3){20}}
-\put(220,35){\line(1,3){20}}
-\put(202.8,77.8){\line(1,1){50}}
-\put(197.2,72.2){\line(-1,-1){50}}
-\bezier{20}(213,114)(222,111)(229,104)
-\put(227,106){\vector(1,-1){2}}
-\put(233,125){\makebox(0,0){ROT}}
-\end{picture}
-\caption{Example of Misplacement in the $(x,y)$-plane}
-\label{F-XYDISP}
+\begin{figure}[htb]
+	\centering
+	\setlength{\unitlength}{1pt}
+	\begin{picture}(400,150)
+	\thinlines
+	\put(204,75){\line(1,0){96}}
+	\put(196,75){\vector(-1,0){96}}
+	\put(305,75){\makebox(0,0)[l]{\shortstack{
+		\footnotesize horizontal \\
+		\footnotesize plane}}}
+	\put(106,68){\makebox(0,0)[l]{$x$}}
+	\put(200,75){\circle{8}}
+	\put(200,75){\makebox(0,0){\(\times\)}}
+	\put(208,66){\makebox(0,0){$s$}}
+	\put(200,0){\line(0,1){71}}
+	\put(200,79){\vector(0,1){71}}
+	\put(193,142){\makebox(0,0){$y$}}
+	\thicklines
+	\color{blue}
+	\put(196,76.3){\vector(-3,1){70}}
+	\put(204,73.7){\line(3,-1){70}}
+	\put(198.7,72){\line(-1,-3){23.3}}
+	\put(201.3,78){\vector(1,3){23.3}}
+	
+	\put(160,55){\line(3,-1){60}}
+	\put(180,115){\line(3,-1){60}}
+	\put(160,55){\line(1,3){20}}
+	\put(220,35){\line(1,3){20}}
+	\color{black}
+	\bezier{20}(260,75)(260,65)(257,56)
+	\put(259,62){\vector(-1,-3){2}}
+	\put(265,67){\makebox(0,0)[l]{\tt DPSI}}
+	
+	\bezier{20}(213,114)(222,111)(229,104)
+	\put(233,125){\makebox(0,0){\tt ROT}}
+	\put(227,106){\vector(1,-1){2}}
+	\color{magenta}
+	\put(197.2,72.2){\line(-1,-1){50}}
+	\put(202.8,77.8){\line(1,1){50}}
+	\end{picture}
+	\caption{Alignment errors in the $(x,y)$-plane}
+	\label{F-XYDISP}
 \end{figure}
 
 
@@ -270,84 +218,166 @@ of the magnet}}}
 %% \label{F-YSDISP}
 %% \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[h!]
 	\centering
 	\setlength{\unitlength}{1pt}
 	\begin{picture}(400,140)(0,30)
 	\thinlines
 	\put(50,75){\line(1,0){96}}
 	\put(154,75){\vector(1,0){246}}
-	\put(50,75){\makebox(0,0)[r]{\shortstack{original \\beam line}}}
-	\put(390,65){\makebox(0,0)[r]{s}}
+	\put(50,75){\makebox(0,0)[r]{\shortstack{
+		\footnotesize original \\
+		\footnotesize beam line}}}
+	\put(395,67){\makebox(0,0)[r]{$s$}}
 	\put(150,75){\circle{8}}
 	\put(150,75){\makebox(0,0){\(\times\)}}
-	\put(140,85){\makebox(0,0){x}}
+	\put(142,83){\makebox(0,0){$x$}}
 	\put(150,30){\line(0,1){41}}
 	\put(150,79){\vector(0,1){91}}
-	\put(140,160){\makebox(0,0){y}}
+	\put(142,163){\makebox(0,0){$y$}}
 	\put(130,55){\vector(1,1){15}}
-	\put(130,55){\makebox(0,0)[tr]{\shortstack{original entrance \\
-				of the magnet}}}
+	\put(130,55){\makebox(0,0)[tr]{\shortstack{
+		\footnotesize original entrance \\
+		\footnotesize of the magnet}}}
 	\thicklines
 	\put(150,55){\vector(1,0){50}}
-	\put(175,45){\makebox(0,0){DS}}
+	\put(175,45){\makebox(0,0){\tt DS}}
 	\put(130,75){\vector(0,1){50}}
-	\put(125,100){\makebox(0,0)[r]{DY}}
+	\put(125,100){\makebox(0,0)[r]{\tt DY}}
 	\thinlines
 	\put(125,125){\line(1,0){185}}
 	\put(200,50){\line(0,1){120}}
 	\put(200,125){\circle*{4}}
 	\thicklines
+	\color{blue}
 	\put(168,117){\vector(4,1){144}}
 	\put(211,81){\vector(-1,4){22}}
-	\bezier{30}(300,125)(300,137)(297,149)
-	\put(299,141){\vector(-1,4){2}}
-	\put(305,137){\makebox(0,0)[l]{DPHI}}
 	\put(278,153){\line(1,-4){4}}
 	\put(202,117){\line(-1,4){4}}
 	\put(198,133){\line(4,1){80}}
 	\put(202,117){\line(4,1){80}}
-        \put(150,67){\line(1,0){80}}
+	\color{black}
+	\bezier{30}(300,125)(300,137)(297,149)
+	\put(299,141){\vector(-1,4){2}}
+	\put(305,137){\makebox(0,0)[l]{\tt DPHI}}
+		
+	\put(150,67){\line(1,0){80}}
 	\put(150,83){\line(1,0){80}}
 	\put(150,67){\line(0,1){4}}
 	\put(150,79){\line(0,1){4}}
 	\put(230,67){\line(0,1){16}}
 	\end{picture}
-	\caption{Example of Misplacement in the $(y,s)$-plane}
+	\caption{Alignment errors in the $(y,s)$-plane}
 	\label{F-YSDISP}
 \end{figure}
 
-\begin{figure}[ht]
-\centering
-\setlength{\unitlength}{1pt}
-\begin{picture}(400,150)(0,20)
-\thinlines
-\put(204,75){\line(1,0){96}}
-\put(196,75){\vector(-1,0){196}}
-\put(305,75){\makebox(0,0)[l]{\shortstack{horizontal \\plane}}}
-\put(10,65){\makebox(0,0)[l]{x}}
-\put(200,75){\circle{8}}\put(200,75){\makebox(0,0){\(\times\)}}
-\put(220,55){\vector(-1,1){15}}
-\put(220,55){\makebox(0,0)[tl]{\shortstack{true beam \\position}}}
-\put(210,85){\makebox(0,0){s}}
-\put(200,30){\line(0,1){41}}
-\put(200,79){\vector(0,1){101}}
-\put(190,170){\makebox(0,0){y}}
-\put(100,50){\vector(0,1){125}}
-\put(150,125){\vector(-1,0){100}}
-\put(100,125){\circle*{4}}
-\put(80,145){\vector(1,-1){15}}
-\put(80,145){\makebox(0,0)[br]{\shortstack{beam position given \\
-by the monitor}}}
-\thicklines
-\put(200,55){\vector(-1,0){100}}
-\put(150,45){\makebox(0,0){MREX}}
-\put(80,75){\vector(0,1){50}}
-\put(70,100){\makebox(0,0)[r]{MREY}}
-\end{picture}
-\caption{Example of Read Errors in a monitor}
-\label{F-ERMONI}
+\begin{figure}[htb]
+	\centering
+	\setlength{\unitlength}{1pt}
+	\begin{picture}(400,150)(0,20)
+	\thinlines
+	\put(204,75){\line(1,0){96}}
+	\put(196,75){\vector(-1,0){196}}
+	\put(305,75){\makebox(0,0)[l]{\shortstack{
+		\footnotesize horizontal \\
+		\footnotesize plane}}}
+	\put(8,68){\makebox(0,0)[l]{$x$}}
+	\put(200,75){\circle{8}}\put(200,75){\makebox(0,0){\(\times\)}}
+	\put(220,55){\vector(-1,1){15}}
+	\put(220,55){\makebox(0,0)[tl]{\shortstack{
+		\footnotesize true beam \\
+		\footnotesize position}}}
+	\put(208,83){\makebox(0,0){$s$}}
+	\put(200,30){\line(0,1){41}}
+	\put(200,79){\vector(0,1){101}}
+	\put(193,172){\makebox(0,0){$y$}}
+	\color{blue}
+	\put(100,50){\vector(0,1){125}}
+	\put(150,125){\vector(-1,0){100}}
+	\put(100,125){\circle*{4}}
+	\color{black}
+	\put(80,145){\vector(1,-1){15}}
+	\put(80,145){\makebox(0,0)[br]{\shortstack{
+		\footnotesize beam position given \\
+		\footnotesize by the monitor}}}
+	\thicklines
+	\put(200,55){\vector(-1,0){100}}
+	\put(150,45){\makebox(0,0){\tt MREX}}
+	\put(80,75){\vector(0,1){50}}
+	\put(70,100){\makebox(0,0)[r]{\tt MREY}}
+	\end{picture}
+	\caption{Example of Read Errors in a monitor}
+	\label{F-ERMONI}
 \end{figure}
+
+
+The attributes are: 
+\begin{madlist}
+  \ttitem{DX} The misalignment in the {\it x}-direction for the entry of
+  the beam element. (Default:~0~m).  \\ 
+  {\tt DX}$>$0 displaces the element in the positive {\it x}-direction 
+  
+  \ttitem{DY} The misalignment in the {\it y}-direction for the entry of
+  the beam element. (Default:~0~m). \\
+  {\tt DY}$>$0 displaces the element in the positive {\it y}-direction 
+
+  \ttitem{DS} The misalignment in the {\it s}-direction for the entry of
+  the beam element. (Default:~0~m). \\
+  {\tt DS}$>$0 displaces the element in the positive {\it s}-direction 
+  
+  \ttitem{DPHI} The rotation around the {\it x}-axis. (Default:~0~rad). \\ 
+  A positive angle gives a greater {\it y}-coordinate for the exit
+  than for the entry. 
+
+  \ttitem{DTHETA} The rotation around the {\it y}-axis according to the
+  right hand rule. (Default:~0~rad).  
+
+  \ttitem{DPSI} The rotation around the {\it s}-axis according to the
+  right hand rule. (Default:~0~rad).  
+
+  \ttitem{MREX} The horizontal read error for a monitor. This is ignored if
+  the element is not a monitor. \\
+  If {\tt MREX}$>$0 the reading for {\it x} is too high (default: 0 m). 
+
+  \ttitem{MREY} The vertical read error for a monitor. This is ignored if
+  the element is not a monitor. \\  
+  If {\tt MREY}$>$0, the reading for {\it y} is too high (default: 0 m). 
+
+  \ttitem{AREX} The misalignment in the {\it x}-direction for the entry
+  of an aperture limit (default: 0 m). \\ 
+  {\tt AREX}$>$0 displaces the element in the positive {\it x}-direction 
+
+  \ttitem{AREY} The misalignment in the {\it y}-direction for the entry
+  of an aperture limit (default: 0 m). \\ 
+  {\tt AREY}$>$0 displaces the element in the positive {\it y}-direction 
+
+  \ttitem{MSCALX} The relative horizontal scaling error for a monitor. This
+  is ignored if the element is not a monitor. \\ 
+  If {\tt MSCALX}$>$0 the reading for {\it x} is too high (default: 0). A
+  value of 0.5 implies that the actual reading is multiplied by 1.5.  
+
+  \ttitem{MSCALY} The relative vertical scaling error for a monitor. This is
+  ignored if the element is not a monitor. \\  
+  If {\tt MSCALY}$>$0 the reading for {\it y} is too high (default: 0). A
+  value of -0.3 implies that the actual reading is multiplied by 0.7.  
+\end{madlist}
+
+{\bf Examples:}
+\madxmp{
+SELECT, FLAG = ERROR, CLASS = MQ; \\
+EALIGN, DX = 0.002, DY = 0.0004*RANF(), DPHI = 0.0002*GAUSS();
+}
+Assigns alignment errors to all elements of class {\tt MQ}.
+
+
+
+\madxmp{
+SELECT, FLAG = ERROR, PATTERN = "QF.*"; \\
+EALIGN, DX = 0.001*TGAUSS(2.5), DY = 0.0001*RANF();
+}
+Assigns alignment errors to all elements starting with {\tt "QF"}. {\tt 
+TGAUSS(2.5)} specifies a Gaussian distribution cut at 2.5 sigma.
+
 
 
 %\href{http://consult.cern.ch/xwho/people/1808} {Last updated:} 02.9.2002 \\ 
