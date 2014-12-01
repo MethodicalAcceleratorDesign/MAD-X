@@ -51,10 +51,10 @@ ifeq ($(STATIC),yes)
 	LIBS  += $(call libdir,/usr/X11/lib) -lX11
 	endif
 
-	# C++
-	G++LIBS := $(wildcard $(call GNULIB,libstdc++.a) $(call GNULIB,libgcc_eh.a))
-	ifneq ($(G++LIBS),)
-	LDLIBS  += $(G++LIBS)
+	# C/C++
+	GNULIBS := $(wildcard $(call GNULIB,libstdc++.a) $(call GNULIB,libgcc_eh.a) $(call GNULIB,crt1.o))
+	ifneq ($(GNULIBS),)
+	LDLIBS  += $(GNULIBS)
 	else
 	LDLIBS  += -lstdc++ -lm
 	endif
