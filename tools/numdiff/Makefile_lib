@@ -23,22 +23,4 @@ endif
 LDLIBS += -lm
 endif
 
-# Libraries on MacOSX
-
-ifeq ($(OSTYPE),Darwin)
-ifeq ($(STATIC),yes)
-
-# C++
-G++LIBS := $(wildcard $(call GNULIB,libstdc++.a) $(call GNULIB,libgcc_eh.a))
-ifneq ($(G++LIBS),)
-	LDLIBS += $(G++LIBS)
-else
-	LDLIBS += -lstdc++ -lm
-endif
-
-else
-LDLIBS  += -lstdc++ -lm
-endif
-endif
-
 # end of makefile
