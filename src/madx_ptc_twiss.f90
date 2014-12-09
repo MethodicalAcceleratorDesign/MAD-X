@@ -655,6 +655,7 @@ contains
     do i=1,MY_RING%n
 
       if (getdebug() > 1) then
+         write(6,*) ""
          write(6,*) "##########################################"
          write(6,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
          write(6,'(a1,a,a1)') ">",current%mag%vorname,"<"
@@ -1962,9 +1963,16 @@ contains
       normal = y
 
       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-         write(whymsg,*) 'DA got unstable during Normal Form: PTC msg: ',messagelost(:len_trim(messagelost))
+         write(whymsg,*) 'DA got unstable during Normal Form: The closed solution does not exist. PTC msg: ',messagelost(:len_trim(messagelost))
          call fort_warn('ptc_twiss::maptoascript: ',whymsg(:len_trim(whymsg)))
+         if (icase == 6) then
+           print*,""
+           print*,"6D closed solution does not exist, you may try 4D or 5D (case = 4 or 5)"
+           print*,"and if it works check setting of the cavities (LAG and VOLT)"
+         endif
+
          call seterrorflag(10,"ptc_twiss::maptoascript ",whymsg);
+         
          return
       endif
 
@@ -2295,9 +2303,17 @@ contains
       theNormalForm = oneTurnMap
 
       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-         write(whymsg,*) 'DA got unstable during Normal Form: PTC msg: ',messagelost(:len_trim(messagelost))
+         write(whymsg,*) 'DA got unstable during Normal Form: The closed solution does not exist. PTC msg: ',messagelost(:len_trim(messagelost))
          call fort_warn('ptc_twiss oneTurnSummary: ',whymsg(:len_trim(whymsg)))
+
+         if (icase == 6) then
+           print*,""
+           print*,"6D closed solution does not exist, you may try 4D or 5D (case = 4 or 5)"
+           print*,"and if it works check setting of the cavities (LAG and VOLT)"
+         endif
+
          call seterrorflag(10,"ptc_twiss oneTurnSummary",whymsg)
+
          call kill(theNormalForm)
          return
       endif
