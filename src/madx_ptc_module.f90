@@ -1186,7 +1186,7 @@ CONTAINS
                              " instead of real orbit length. Obtained freq. = ",p%mag%freq," Hz"
 	         
                 call fort_warn("ptc_input",msg(:len_trim(msg)))
-                icav=1
+                if (p%mag%volt .ne. zero) icav=1
              endif
           endif
           p=>p%next
