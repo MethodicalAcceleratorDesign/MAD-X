@@ -1963,7 +1963,8 @@ contains
       normal = y
 
       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-         write(whymsg,*) 'DA got unstable during Normal Form: The closed solution does not exist. PTC msg: ',messagelost(:len_trim(messagelost))
+         write(whymsg,*) 'DA got unstable during Normal Form: The closed solution does not exist. PTC msg: ', &
+              messagelost(:len_trim(messagelost))
          call fort_warn('ptc_twiss::maptoascript: ',whymsg(:len_trim(whymsg)))
          if (icase == 6) then
            print*,""
@@ -2303,7 +2304,8 @@ contains
       theNormalForm = oneTurnMap
 
       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-         write(whymsg,*) 'DA got unstable during Normal Form: The closed solution does not exist. PTC msg: ',messagelost(:len_trim(messagelost))
+         write(whymsg,*) 'DA got unstable during Normal Form: The closed solution does not exist. PTC msg: ', &
+              messagelost(:len_trim(messagelost))
          call fort_warn('ptc_twiss oneTurnSummary: ',whymsg(:len_trim(whymsg)))
 
          if (icase == 6) then
