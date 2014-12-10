@@ -198,6 +198,7 @@ defined by three displacements  ($X_i$, $Y_i$, $Z_i$) and three angles
 \begin{picture}(400,270)
 
 % global axes
+\color{black}
 \thicklines
 \put(20,150){\vector(2,-1){280}}
 \put(300,20){\makebox(0,0){\(Z\)}}
@@ -216,19 +217,6 @@ defined by three displacements  ($X_i$, $Y_i$, $Z_i$) and three angles
 \put(0,100){\vector(2,1){270}}
 \put(260,240){\makebox(0,0){\(s\)}}
 
-% projection of s onto ZX
-\color{blue}
-\thinlines
-%\put(80,120){\circle*{4}}
-%\put(200,200){\circle*{4}}
-%\put(0,110){\line(1,0){290}}
-\multiput(0,110)(2,0){180}{\line(1,0){1}}
-\put(300,110){\makebox(0,0)[l]{\shortstack{projection of \(s\) \\
-onto \(ZX\)-plane}}}
-\put(20,110){\circle*{4}}
-\put(50,110){\circle*{4}}
-\put(100,110){\circle*{4}}
-
 % displacement of local system
 \color{black}
 \put(140,140){\line(2,-1){60}}
@@ -237,54 +225,94 @@ onto \(ZX\)-plane}}}
 \put(180,100){\makebox(0,0)[tl]{\(X_i\)}}
 \put(200,110){\line(0,1){90}}
 \put(205,140){\makebox(0,0)[l]{\(Y_i\)}}
-\put(140,90){\circle*{4}}
-\put(140,140){\circle*{4}}
-\put(200,110){\circle*{4}}
-
-% intersection of xy and ZX
-\color{blue}
-%\put(130,0){\line(1,1){230}}
-\multiput(130,0)(2,2){115}{\line(0,1){1}}
-\put(135,5){\circle*{4}}
-\put(193.3,63.3){\circle*{4}}
-\put(240,110){\circle*{4}}
-\put(286.7,156.7){\circle*{4}}
-\put(335,205){\circle*{4}}
-\thicklines
-\put(180,20){\vector(-1,1){12}}
-\put(180,20){\makebox(0,0)[tl]{\shortstack{intersection of \\
-\(xy\) and \(ZX\) planes}}}
-
-% reference orbit
-\color{black}
-\thicklines
-\bezier{80}(140,150)(170,185)(200,200)
-\bezier{80}(200,200)(230,215)(260,220)
-\put(260,210){\makebox(0,0)[l]{\shortstack{reference \\orbit}}}
 
 % roll angle
 \bezier{30}(160,30)(160,40)(150,50)
 \put(151,49){\vector(-1,1){1}}
 \put(150,30){\makebox(0,0){\(\psi_i\)}}
-%\put(140,30){\makebox(0,0)[br]{roll angle}}
 
 % pitch angle
 \bezier{20}(60,110)(60,120)(55,125)
 \put(57,123){\vector(-1,2){2}}
 \put(50,118){\makebox(0,0){\(\phi_i\)}}
-%put(40,125){\makebox(0,0)[br]{pitch angle}}
 
-% azimuth
+% azimuth angle
 \bezier{20}(130,95)(140,100)(140,110)
 \put(140,105){\vector(0,1){5}}
 \put(130,103){\makebox(0,0){\(\theta_i\)}}
-%\put(115,95){\makebox(0,0)[t]{azimuth}}
+
+% reference orbit
+\color{black}
+\thicklines
+\bezier{80}(140,155)(170,185)(200,200)
+\bezier{80}(200,200)(230,215)(260,210)
+\put(260,213){\makebox(0,0)[l]{\shortstack{reference \\orbit}}}
+
+% intersections of planes
+\color{green}
+\thinlines
+\multiput(130,0)(2,2){115}{\line(0,1){1}}
+\thicklines
+\put(180,20){\vector(-1,1){12}}
+\put(172,20){\makebox(0,0)[tl]{\shortstack{intersection of \\
+\(xy\) and \(ZX\) planes}}}
+
+\thinlines
+\multiput(0,128)(2,-1.8){73}{\line(0,-1){1}}
+\thicklines
+\put(60,50){\vector(1,1){12}}
+\put(0,50){\makebox(0,0)[tl]{\shortstack{intersection of \\
+			\(xs\) and \(ZX\) \\ planes}}}
+
+\thinlines
+\multiput(0,107)(3,0.522){120}{\line(0,1){1}}
+\thicklines
+\put(318,149){\vector(-1,1){12}}
+\put(320,150){\makebox(0,0)[tl]{\shortstack{intersection of \\
+			\(ys\) and \(ZX\) \\ planes}}}
+
+% projection of axes onto ZX (horizontal plane)
+\color{blue}
+\thinlines
+\multiput(0,110)(2,0){180}{\line(1,0){1}}
+\put(300,95){\makebox(0,0)[l]{\shortstack{projection of \(s\) \\
+onto \(ZX\)-plane}}}
+
+\put(50,110){\circle*{4}}
+\put(100,110){\circle*{4}}
+
+\multiput(131,0)(1,1.6){123}{\line(1,0){1}}
+\put(177,71){\circle*{4}}
+\put(240,173){\circle*{4}}
+
+\multiput(147,80)(1.79,1){100}{\line(1,0){1}}
+\put(154,83){\circle*{4}}
+
+% dots for intersections of planes
+\color{green}
+\put(20,110){\circle*{4}}
+\put(28,102){\circle*{4}}
+\put(135,5){\circle*{4}}
+\put(193.3,63.3){\circle*{4}}
+\put(240,110){\circle*{4}}
+\put(286.7,156.7){\circle*{4}}
+\put(335,205){\circle*{4}}
+
+% dots for displacements
+\color{black}
+\put(140,90){\circle*{4}}
+\put(140,140){\circle*{4}}
+\put(200,110){\circle*{4}}
 
 \end{picture}
 \caption[Global Reference System]{Global Reference System showing the global 
 Cartesian system ($X, Y, Z$) in black and the local reference system ($x, y, 
 s$) in red after translation ($X_i , Y_i, Z_i$) and rotation ($\theta_i, 
-\phi_i, \psi_i$)}
+\phi_i, \psi_i$). The projections of the local reference system axes onto the 
+horizontal $ZX$ plane of the Cartesian system are figured with blue dashed 
+lines. The intersections of planes $ys$, $xy$ and $xs$ of the local reference 
+system with the horizontal $ZX$ plane of the Cartesian system are figured in 
+green dashed lines. }
 \label{F-GLOB}
 \end{figure}
 
