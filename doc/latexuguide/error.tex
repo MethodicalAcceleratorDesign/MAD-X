@@ -50,9 +50,10 @@ spaces.
 The effect of misalignments is treated in a linear
 approximation.
 
-\hyperref[sec:monitor]{Beam Position Monitors} can be given readout errors in 
-both horizontal and vertical planes. Monitor readout errors are
-ignored for all elements other than \hyperref[sec:monitor]{monitors}. 
+\hyperref[sec:monitor]{Beam Position Monitors} can be given readout errors as 
+well as readout scaling errors in both horizontal and vertical planes. 
+Monitor readout and scaling errors are ignored for all elements other than 
+\hyperref[sec:monitor]{monitors}.
 
 Each new {\tt EALIGN} statement replaces the misalignment errors for all 
 elements in its range, unless the logical {\tt ADD} attribute of 
@@ -306,7 +307,7 @@ for elements selected by the
 	\put(80,75){\vector(0,1){50}}
 	\put(70,100){\makebox(0,0)[r]{\tt MREY}}
 	\end{picture}
-	\caption{Example of Read Errors in a monitor}
+	\caption{Readout errors in a monitor}
 	\label{F-ERMONI}
 \end{figure}
 
@@ -343,14 +344,6 @@ The attributes are:
   the element is not a monitor. \\  
   If {\tt MREY}$>$0, the reading for {\it y} is too high (default: 0 m). 
 
-  \ttitem{AREX} The misalignment in the {\it x}-direction for the entry
-  of an aperture limit (default: 0 m). \\ 
-  {\tt AREX}$>$0 displaces the element in the positive {\it x}-direction 
-
-  \ttitem{AREY} The misalignment in the {\it y}-direction for the entry
-  of an aperture limit (default: 0 m). \\ 
-  {\tt AREY}$>$0 displaces the element in the positive {\it y}-direction 
-
   \ttitem{MSCALX} The relative horizontal scaling error for a monitor. This
   is ignored if the element is not a monitor. \\ 
   If {\tt MSCALX}$>$0 the reading for {\it x} is too high (default: 0). A
@@ -360,6 +353,15 @@ The attributes are:
   ignored if the element is not a monitor. \\  
   If {\tt MSCALY}$>$0 the reading for {\it y} is too high (default: 0). A
   value of -0.3 implies that the actual reading is multiplied by 0.7.  
+
+  \ttitem{AREX} The misalignment in the {\it x}-direction for the entry
+  of an aperture limit (default: 0 m). \\ 
+  {\tt AREX}$>$0 displaces the element in the positive {\it x}-direction 
+
+  \ttitem{AREY} The misalignment in the {\it y}-direction for the entry
+  of an aperture limit (default: 0 m). \\ 
+  {\tt AREY}$>$0 displaces the element in the positive {\it y}-direction 
+
 \end{madlist}
 
 {\bf Examples:}
@@ -429,8 +431,8 @@ xxxxxxxx\=xxxxxx\=xxxxxxxxxx\=xxxxxxxxx\= \kill
         \>DKNR=\>\{dknr(0), \>dknr(1), \>dknr(2),\ldots\}, \\
         \>DKSR=\>\{dksr(0), \>dksr(1), \>dksr(2),\ldots\};
 }
-and elements are now selected by the
-\hyperref[sec:select]{\tt SELECT} command. 
+for elements selected by the
+\hyperref[sec:select]{\tt SELECT} command.
 
 Each new {\tt EFCOMP} statement replaces the field errors for all
 elements in its range(s). Previous field errors present in the range are
