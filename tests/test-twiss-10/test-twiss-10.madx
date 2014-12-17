@@ -1,0 +1,93 @@
+! Test for MADX to calculate chromatic functions
+
+ Option, -echo, -info;
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! TITLE,"FCC-ee Version 14, 100km";       !
+! author: Bastian Harer, CERN ABP-BE-LAT, bastian.harer@cern.ch
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+ Call, file = "../share/FCCe/fcc-ee_v14_elements.def";
+ Call, file = "../share/FCCe/fcc-ee_v14.seq";
+ Call, file = "../share/FCCe/fcc-ee_v14.str";
+
+ k2sf = 0;
+ k2sd = 0;
+
+ VRF1   :=  0;
+ VRFIR  :=  0;
+ LGRF1  :=  0.5;
+ LGRFIR :=  LGRF1;
+
+ k1hilff1 := k1qfsc2;
+ k1hilff2 := k1qfsc2;
+ k1hilfd1 := k1qdsc2;
+ k1hilfd2 := k1qdsc2;
+
+ Option, echo, warn, info;
+
+ Beam, particle=electron, energy=175., radiate=false;
+ betarel = beam->beta;
+
+ SEQEDIT, sequence= TLEPminibeta;
+     Cycle, start=IP1;
+ ENDEDIT;
+
+ Use, sequence = TLEPminibeta;
+
+! Calculate chromatic functions from two TWISS, CHROM command
+ Select, flag = twiss, clear;
+ Select, flag = twiss, column=name, s, betx, bety, alfx, alfy, mux, muy, wx, wy, phix, phiy, dmux, dmuy;
+
+ Twiss, betx=1, bety=0.001, deltap=0.0, file=twiss, chrom;
+
+! Calculate chromatic functions from two twiss tables
+ const deltapval = 1.e-6;
+
+ Twiss, betx=1, bety=0.001, deltap=deltapval, file=twiss2;
+ Twiss, betx=1, bety=0.001, deltap=0.0,       file=twiss1;
+
+ Readmytable, table=twiss1, file=twiss1;
+ Readmytable, table=twiss2, file=twiss2;
+
+ Create, table=chromatic, column=_name, s, wx, wy, phix, phiy, chromax, chrombx, chromay, chromby, dmux, dmuy;
+ Select, flag=chromatic,  column= name, s, wx, wy, phix, phiy, chromax, chrombx, chromay, chromby, dmux, dmuy;
+
+ nrows = table(twiss1,tablelength);
+
+ n=0;
+ wx=0; wy=0; phix=0; phiy=0; dmux=0; dmuy=0;
+
+ Option, -info; ! avoid many redefinition info statements
+ While (n<nrows) {
+      n = n+1;
+
+      Setvars, table=twiss1, row=n;
+      bx1=betx; by1=bety; ax1=alfx; ay1=alfy; mux1=mux; muy1=muy; 
+
+      Setvars, table=twiss2, row=n;
+      bx2=betx; by2=bety; ax2=alfx; ay2=alfy; mux2=mux; muy2=muy; 
+
+      dpt = deltapval * betarel;
+
+      chromax = (ax2-ax1)/dpt - (ax1/bx1)*(bx2-bx1)/dpt;
+      chrombx = (bx2-bx1)/(bx1*dpt);
+      wx = sqrt(chromax^2 + chrombx^2); 
+      phix = atan(chromax/chrombx);
+      dmux = (mux2-mux1)/dpt;
+
+      chromay = (ay2-ay1)/dpt - (ay1/by1)*(by2-by1)/dpt;
+      chromby = (by2-by1)/(by1*dpt);
+      wy = sqrt(chromay^2 + chromby^2);
+      phiy = atan(chromay/chromby);
+      dmuy = (muy2-muy1)/dpt; 
+
+      Fill, table=chromatic;      
+    }
+ Option, info;
+
+ Write, table=chromatic, file=chromatic.tfs;
+
+Stop;
+
+
+

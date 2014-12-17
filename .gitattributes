@@ -1805,6 +1805,17 @@ tests/test-track/out_test-track_ap_collimatorone.ref -text
 tests/test-track/test-track.cfg -text
 tests/test-track/test-track.madx -text
 tests/test-track/test-track.ref -text
+tests/test-twiss-10/chromatic.tfs.cfg -text
+tests/test-twiss-10/chromatic.tfs.ref -text
+tests/test-twiss-10/test-twiss-10.cfg -text
+tests/test-twiss-10/test-twiss-10.madx -text
+tests/test-twiss-10/test-twiss-10.ref -text
+tests/test-twiss-10/twiss.cfg -text
+tests/test-twiss-10/twiss.ref -text
+tests/test-twiss-10/twiss1.cfg -text
+tests/test-twiss-10/twiss1.ref -text
+tests/test-twiss-10/twiss2.cfg -text
+tests/test-twiss-10/twiss2.ref -text
 tests/test-twiss-2/README -text
 tests/test-twiss-2/my_sect_file.cfg -text
 tests/test-twiss-2/my_sect_file.ref -text

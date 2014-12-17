@@ -1,0 +1,245 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.11.14               +
+  + Execution date: 2014.12.17 17:49:09      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+! Test for MADX to calculate chromatic functions
+
+
+
+ Option, -echo, -info;
+
+
+
+ Beam, particle=electron, energy=175., radiate=false;
+
+ betarel = beam->beta;
+
+
+
+ SEQEDIT, sequence= TLEPminibeta;
+
+     Cycle, start=IP1;
+
+ ENDEDIT;
+
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   0
+
+
+ Use, sequence = TLEPminibeta;
+
+
+
+! Calculate chromatic functions from two TWISS, CHROM command
+
+ Select, flag = twiss, clear;
+
+ Select, flag = twiss, column=name, s, betx, bety, alfx, alfy, mux, muy, wx, wy, phix, phiy, dmux, dmuy;
+
+
+
+ Twiss, betx=1, bety=0.001, deltap=0.0, file=twiss, chrom;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+open line - error with deltap:   1.000000E-06
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:    -1.509663E-14 -4.707473E-14  0.000000E+00  0.000000E+00 -3.966376E-13  0.000000E+00
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+           24870.1                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       125.1051288       -160.5331747        463.5085624       0.1243141861 
+
+             dxrms             xcomax             xcorms                 q2 
+     0.09023644519                  0                  0        83.96129539 
+
+               dq2            betymax              dymax              dyrms 
+      -1023.677096        10371.94162                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0       0.1402165232 
+
+           synch_2            synch_3            synch_4            synch_5 
+   0.0001450478358     1.34437375e-08    1.206791679e-09    3.072304096e-12 
+
+
+! Calculate chromatic functions from two twiss tables
+
+ const deltapval = 1.e-6;
+
+
+
+ Twiss, betx=1, bety=0.001, deltap=deltapval, file=twiss2;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+open line - error with deltap:   1.000000E-06
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:    -1.509663E-14 -4.707473E-14  0.000000E+00  0.000000E+00 -3.966376E-13  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+           24870.1                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       125.1049682                  0        463.5343811       0.1243148766 
+
+             dxrms             xcomax             xcorms                 q2 
+     0.09023666765    1.243144691e-07     9.02365113e-08        83.96027172 
+
+               dq2            betymax              dymax              dyrms 
+                 0         10372.2296                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0              1e-06                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+ Twiss, betx=1, bety=0.001, deltap=0.0,       file=twiss1;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+           24870.1                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       125.1051288                  0        463.5085624       0.1243141861 
+
+             dxrms             xcomax             xcorms                 q2 
+     0.09023644519                  0                  0        83.96129539 
+
+               dq2            betymax              dymax              dyrms 
+                 0        10371.94162                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+ Readmytable, table=twiss1, file=twiss1;
+
+Want to make named table: twiss1
+ Readmytable, table=twiss2, file=twiss2;
+
+Want to make named table: twiss2
+
+
+ Create, table=chromatic, column=_name, s, wx, wy, phix, phiy, chromax, chrombx, chromay, chromby, dmux, dmuy;
+
+ Select, flag=chromatic,  column= name, s, wx, wy, phix, phiy, chromax, chrombx, chromay, chromby, dmux, dmuy;
+
+
+
+ nrows = table(twiss1,tablelength);
+
+
+
+ n=0;
+
+ wx=0; wy=0; phix=0; phiy=0; dmux=0; dmuy=0;
+
+
+
+ Option, -info; ! avoid many redefinition info statements
+
+ While (n<nrows) {
+
+      n = n+1;
+
+
+
+      Setvars, table=twiss1, row=n;
+
+      bx1=betx; by1=bety; ax1=alfx; ay1=alfy; mux1=mux; muy1=muy; 
+
+
+
+      Setvars, table=twiss2, row=n;
+
+      bx2=betx; by2=bety; ax2=alfx; ay2=alfy; mux2=mux; muy2=muy; 
+
+
+
+      dpt = deltapval * betarel;
+
+
+
+      chromax = (ax2-ax1)/dpt - (ax1/bx1)*(bx2-bx1)/dpt;
+
+      chrombx = (bx2-bx1)/(bx1*dpt);
+
+      wx = sqrt(chromax^2 + chrombx^2); 
+
+      phix = atan(chromax/chrombx);
+
+      dmux = (mux2-mux1)/dpt;
+
+
+
+      chromay = (ay2-ay1)/dpt - (ay1/by1)*(by2-by1)/dpt;
+
+      chromby = (by2-by1)/(by1*dpt);
+
+      wy = sqrt(chromay^2 + chromby^2);
+
+      phiy = atan(chromay/chromby);
+
+      dmuy = (muy2-muy1)/dpt; 
+
+
+
+      Fill, table=chromatic;      
+
+    }
+
+++++++ warning: division by zero, result set to zero, expr: atan(chromax/chrombx)
+++++++ warning: division by zero, result set to zero, expr: atan(chromay/chromby)
+++++++ warning: division by zero, result set to zero, expr: atan(chromax/chrombx)
+++++++ warning: division by zero, result set to zero, expr: atan(chromay/chromby)
+ Option, info;
+
+
+
+ Write, table=chromatic, file=chromatic.tfs;
+
+
+
+Stop;
+
+
+  Number of warnings: 4
+4 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.02.04 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++
