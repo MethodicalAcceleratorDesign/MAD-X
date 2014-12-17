@@ -1018,6 +1018,9 @@ tests/share/AD/ad_quads_3837_ffe.str -text
 tests/share/ALBA/ALBA-25.4th.seq -text
 tests/share/ALBA/ALBA-25.4th_v2.seq -text
 tests/share/CLIC-DR/clicdr.madx -text
+tests/share/FCCe/fcc-ee_v14.seq -text
+tests/share/FCCe/fcc-ee_v14.str -text
+tests/share/FCCe/fcc-ee_v14_elements.def -text
 tests/share/FCCe/madx_elements_v11.in -text
 tests/share/FCCe/madx_sequence_v11_matching.in -text
 tests/share/FCCe/madx_sequence_v11_rb.in -text

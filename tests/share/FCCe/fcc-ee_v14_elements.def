@@ -1,0 +1,218 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! TITLE: "fcc-ee_v14_elements.def";
+! author: Bastian Harer, CERN BE-ABP-LAT, bastian.harer@cern.ch
+! date:   Fri Nov  7 10:30:23 2014
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! This file contains the definition of the elements used in FCC-ee (TLEP) Version 13.
+! It has to be used as an input file for the main FCC-ee MADX program.
+! -----------------
+! L* = 2 m
+! -----------------
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+! Definiton of basic lengths
+! --------------------------
+LB    = 10.5;
+LQ    = 1.5;
+LQIR1 = 0.75;
+LQIR2 = 0.1;
+LS    = 0.5;
+LCAV  = 1;
+LCOR  = 0;
+LBPM  = 0.2;
+!--------------------------------------------------------------------
+
+
+! Arc fodo cell
+! -------------
+! Cell length: 50 m
+
+NBends = 6432;		! = # in arcs + 0.5 * # in disp. surp.
+THB    = 2*pi/NBends;		! THB = 0.976863387310259 mrad
+
+k1qf   =   0.0367454293;
+k1qd   =  -0.0300649075;
+k1qf1  :=  k1qf;
+k1qd1  :=  k1qf;
+
+k2sf   =   2.5868795;
+k2sd   =  -11.1501887;
+k2sf1  :=  k2sf;
+k2sf2  :=  k2sf;
+k2sd1  :=  k2sf;
+k2sd2  :=  k2sf;
+k2sd3  :=  k2sf;
+
+!--------------------------------------------------------------------
+MB    :  SBEND,      L:=LB,   ANGLE:=THB;
+
+MQF1  :  QUADRUPOLE, L:=LQ/2, K1:=k1qf1;
+MQD1  :  QUADRUPOLE, L:=LQ,   K1:=k1qd1;
+
+MSF1  :  SEXTUPOLE,  L:=LS,   K2:=k2sf1;
+MSF2  :  SEXTUPOLE,  L:=LS,   K2:=k2sf2;
+MSD1  :  SEXTUPOLE,  L:=LS,   K2:=k2sd1;
+MSD2  :  SEXTUPOLE,  L:=LS,   K2:=k2sd2;
+MSD3  :  SEXTUPOLE,  L:=LS,   K2:=k2sd3;
+
+BBPMH :  HMONITOR,   L:=LBPM;
+BBPMV :  VMONITOR,   L:=LBPM;
+
+MCH   :  HKICKER,    L:=LCOR;
+MCV   :  VKICKER,    L:=LCOR;
+!--------------------------------------------------------------------
+
+
+! Dispersion Surpressor
+! ---------------------
+! (2 cells)
+
+THBDS1 =  THB/2;	!=THB/2
+THBDS2 =  THB/2;	!=THB/2
+K1QFDS1  := K1QF;
+K1QFDS2  := K1QF;
+K1QDDS1  := K1QD;
+K1QDDS2  := K1QD;
+K1QFDSL1 := K1QFDS1;
+K1QFDSL2 := K1QFDS2;
+K1QDDSL1 := K1QDDS1;
+K1QDDSL2 := K1QDDS2;
+K1QFDSR1 := K1QFDS1;
+K1QFDSR2 := K1QFDS2;
+K1QDDSR1 := K1QDDS1;
+K1QDDSR2 := K1QDDS2;
+
+!--------------------------------------------------------------------
+MBDS1    :  SBEND,      L:=LB,   ANGLE:=THBDS1;
+MBDS2    :  SBEND,      L:=LB,   ANGLE:=THBDS2;
+
+MQDDSL1  :  QUADRUPOLE, L:=LQ,   K1:=K1QDDSL1;
+MQFDSL1  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFDSL1;
+MQDDSL2  :  QUADRUPOLE, L:=LQ,   K1:=K1QDDSL2;
+MQFDSL2  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFDSL2;
+MQDDSR1  :  QUADRUPOLE, L:=LQ,   K1:=K1QDDSR1;
+MQFDSR1  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFDSR1;
+MQDDSR2  :  QUADRUPOLE, L:=LQ,   K1:=K1QDDSR2;
+MQFDSR2  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFDSR2;
+!--------------------------------------------------------------------
+
+
+! Straight fodo cells
+! -------------------
+
+K1QFSC1  = K1QF;
+K1QDSC1  = K1QD;
+
+K1QFSC2 := K1QFSC1;
+K1QDSC2 := K1QDSC1;
+
+VRF1     = 15;
+LGRF1    = 0.5;
+VRF2    := VRF1;
+LGRF2   := LGRF1;
+
+!--------------------------------------------------------------------
+MQFSC1  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFSC1;
+MQDSC1  :  QUADRUPOLE, L:=LQ,   K1:=K1QDSC1;
+MQFSC2  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFSC2;
+MQDSC2  :  QUADRUPOLE, L:=LQ,   K1:=K1QDSC2;
+
+CAV1    :  RFCAVITY, L:=LCAV, VOLT:=VRF1, HARMON=201000, LAG:=LGRF1;
+CAV2    :  RFCAVITY, L:=LCAV, VOLT:=VRF2, HARMON=201000, LAG:=LGRF2;
+!--------------------------------------------------------------------
+
+
+! Straight matching section
+! -------------------------
+! (4 cells)
+
+K1QDMS11  =  K1QD;
+K1QDMS12  =  K1QD;
+K1QDMS13  =  K1QD;
+K1QFMS11  =  K1QF;
+K1QFMS12  =  K1QF;
+K1QFMS13  =  K1QF;
+K1QDMS21  := K1QDMS11;
+K1QDMS22  := K1QDMS12;
+K1QDMS23  := K1QDMS13;
+K1QFMS21  := K1QFMS11;
+K1QFMS22  := K1QFMS12;
+K1QFMS23  := K1QFMS13;
+K1QDMSL11 := K1QDMS11;
+K1QDMSL12 := K1QDMS12;
+K1QDMSL13 := K1QDMS13;
+K1QFMSL11 := K1QFMS11;
+K1QFMSL12 := K1QFMS12;
+K1QFMSL13 := K1QFMS13;
+K1QDMSR11 := K1QDMS11;
+K1QDMSR12 := K1QDMS12;
+K1QDMSR13 := K1QDMS13;
+K1QFMSR11 := K1QFMS11;
+K1QFMSR12 := K1QFMS12;
+K1QFMSR13 := K1QFMS13;
+K1QDMSL21 := K1QDMS21;
+K1QDMSL22 := K1QDMS22;
+K1QDMSL23 := K1QDMS23;
+K1QFMSL21 := K1QFMS21;
+K1QFMSL22 := K1QFMS22;
+K1QFMSL23 := K1QFMS23;
+K1QDMSR21 := K1QDMS21;
+K1QDMSR22 := K1QDMS22;
+K1QDMSR23 := K1QDMS23;
+K1QFMSR21 := K1QFMS21;
+K1QFMSR22 := K1QFMS22;
+K1QFMSR23 := K1QFMS23;
+
+!--------------------------------------------------------------------
+MQDMSL11  :  QUADRUPOLE, L:=LQ,   K1:=K1QDMSL11;
+MQDMSL12  :  QUADRUPOLE, L:=LQ,   K1:=K1QDMSL12;
+MQDMSL13  :  QUADRUPOLE, L:=LQ,   K1:=K1QDMSL13;
+MQFMSL11  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFMSL11;
+MQFMSL12  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFMSL12;
+MQFMSL13  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFMSL13;
+MQDMSR11  :  QUADRUPOLE, L:=LQ,   K1:=K1QDMSR11;
+MQDMSR12  :  QUADRUPOLE, L:=LQ,   K1:=K1QDMSR12;
+MQDMSR13  :  QUADRUPOLE, L:=LQ,   K1:=K1QDMSR13;
+MQFMSR11  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFMSR11;
+MQFMSR12  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFMSR12;
+MQFMSR13  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFMSR13;
+
+MQDMSL21  :  QUADRUPOLE, L:=LQ,   K1:=K1QDMSL21;
+MQDMSL22  :  QUADRUPOLE, L:=LQ,   K1:=K1QDMSL22;
+MQDMSL23  :  QUADRUPOLE, L:=LQ,   K1:=K1QDMSL23;
+MQFMSL21  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFMSL21;
+MQFMSL22  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFMSL22;
+MQFMSL23  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFMSL23;
+MQDMSR21  :  QUADRUPOLE, L:=LQ,   K1:=K1QDMSR21;
+MQDMSR22  :  QUADRUPOLE, L:=LQ,   K1:=K1QDMSR22;
+MQDMSR23  :  QUADRUPOLE, L:=LQ,   K1:=K1QDMSR23;
+MQFMSR21  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFMSR21;
+MQFMSR22  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFMSR22;
+MQFMSR23  :  QUADRUPOLE, L:=LQ/2, K1:=K1QFMSR23;
+!--------------------------------------------------------------------
+
+
+! Mini-beta insertion
+! -------------------
+! Length: 170.1 m
+
+K1QFIR1 :=  0.21476053;
+K1QFIR2 :=  1.00313719;
+K1QDIR1 := -0.40334448;
+K1QDIR2 := -0.63554804;
+K1QDIR3 := -2.11311929;
+
+VRFIR  := 14.06;
+LGRFIR := 0.5;
+
+!--------------------------------------------------------------------
+MQDIR1  :  QUADRUPOLE, L:=LQIR1, K1:=K1QDIR1;
+MQDIR2  :  QUADRUPOLE, L:=LQIR2, K1:=K1QDIR2;
+MQDIR3  :  QUADRUPOLE, L:=LQIR2, K1:=K1QDIR3;
+MQFIR1  :  QUADRUPOLE, L:=LQIR1, K1:=K1QFIR1;
+MQFIR2  :  QUADRUPOLE, L:=LQIR2, K1:=K1QFIR2;
+  
+CAVIR   :  RFCAVITY, L:=LCAV, VOLT:=VRFIR, HARMON:=201000, LAG:=LGRFIR;
+!--------------------------------------------------------------------
+
