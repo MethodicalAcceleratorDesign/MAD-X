@@ -3,7 +3,7 @@
   +     MAD-X 5.02.04  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2014.11.14               +
-  + Execution date: 2014.12.17 17:49:09      +
+  + Execution date: 2014.12.18 11:33:56      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! Test for MADX to calculate chromatic functions
 
@@ -31,7 +31,7 @@
 ++++++ info: seqedit - number of elements replaced:   0
 
 
- Use, sequence = TLEPminibeta;
+ Use, sequence = TLEPminibeta, range=IP1/MQF13.A1C6;
 
 
 
@@ -51,7 +51,7 @@ enter Twiss module
   
 open line - error with deltap:   1.000000E-06
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:    -1.509663E-14 -4.707473E-14  0.000000E+00  0.000000E+00 -3.966376E-13  0.000000E+00
+final orbit vector:     1.243142E-07  2.961373E-11  0.000000E+00  0.000000E+00 -1.515577E-09  0.000000E+00
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
   
@@ -62,22 +62,22 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-           24870.1                 -0                  0                  0 
+           1035.05                 -0                  0                  0 
 
                 q1                dq1            betxmax              dxmax 
-       125.1051288       -160.5331747        463.5085624       0.1243141861 
+       5.558626833       -16.86696428        463.5082533        0.124314186 
 
              dxrms             xcomax             xcorms                 q2 
-     0.09023644519                  0                  0        83.96129539 
+     0.05241712459                  0                  0        3.980584493 
 
                dq2            betymax              dymax              dyrms 
-      -1023.677096        10371.94162                  0                  0 
+      -466.3538992        10371.94162                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
-                 0                  0                  0       0.1402165232 
+                 0                  0                  0     0.001581388973 
 
            synch_2            synch_3            synch_4            synch_5 
-   0.0001450478358     1.34437375e-08    1.206791679e-09    3.072304096e-12 
+   1.635877847e-06    1.437380739e-10    1.254698259e-11    3.188233667e-14 
 
 
 ! Calculate chromatic functions from two twiss tables
@@ -94,18 +94,18 @@ enter Twiss module
   
 open line - error with deltap:   1.000000E-06
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:    -1.509663E-14 -4.707473E-14  0.000000E+00  0.000000E+00 -3.966376E-13  0.000000E+00
+final orbit vector:     1.243142E-07  2.961373E-11  0.000000E+00  0.000000E+00 -1.515577E-09  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-           24870.1                 -0                  0                  0 
+           1035.05                 -0                  0                  0 
 
                 q1                dq1            betxmax              dxmax 
-       125.1049682                  0        463.5343811       0.1243148766 
+       5.558609966                  0        463.4997642       0.1243148766 
 
              dxrms             xcomax             xcorms                 q2 
-     0.09023666765    1.243144691e-07     9.02365113e-08        83.96027172 
+     0.05241724401    1.243144691e-07    5.241715809e-08         3.98011814 
 
                dq2            betymax              dymax              dyrms 
                  0         10372.2296                  0                  0 
@@ -128,13 +128,13 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-           24870.1                 -0                  0                  0 
+           1035.05                 -0                  0                  0 
 
                 q1                dq1            betxmax              dxmax 
-       125.1051288                  0        463.5085624       0.1243141861 
+       5.558626833                  0        463.5082533        0.124314186 
 
              dxrms             xcomax             xcorms                 q2 
-     0.09023644519                  0                  0        83.96129539 
+     0.05241712459                  0                  0        3.980584493 
 
                dq2            betymax              dymax              dyrms 
                  0        10371.94162                  0                  0 

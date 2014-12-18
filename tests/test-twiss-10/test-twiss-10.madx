@@ -32,7 +32,7 @@
      Cycle, start=IP1;
  ENDEDIT;
 
- Use, sequence = TLEPminibeta;
+ Use, sequence = TLEPminibeta, range=IP1/MQF13.A1C6;
 
 ! Calculate chromatic functions from two TWISS, CHROM command
  Select, flag = twiss, clear;
