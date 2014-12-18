@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.02  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.07.01      +
-  + Execution Time Stamp: 30.06.14 19.21.42 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.11.14               +
+  + Execution date: 2014.12.18 15:01:30      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 title,'LHC Cell APERTURE example, BJ Aug2009';
 
 
@@ -167,6 +167,13 @@ reference node: lhccell$start:1
 
 APERTURE LIMIT: mq1:1, n1: 4.85602, at: 3.1
 
+
+
+!! One can then access the minimum n1 as a variable of the BEAM command:
+
+Value, beam->n1min;
+
+beam->n1min =   4.85602 ;
 
 
 !-----
@@ -402,5 +409,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.02 (64 bit) finished normally +
+  + MAD-X 5.02.04 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

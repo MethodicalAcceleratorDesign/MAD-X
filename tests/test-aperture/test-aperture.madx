@@ -61,6 +61,9 @@ aperture,offsetelem="offset.tfs", file="ap.tfs",
          dparx=0.273, dpary=0.273, cor=0.004, bbeat=1.1, 
          nco=5, interval=1, halo={6., 8.4, 7.3, 7.3};
 
+!! One can then access the minimum n1 as a variable of the BEAM command:
+Value, beam->n1min;
+
 !-----
 ! and now same test with bad aperture definitions...
 
