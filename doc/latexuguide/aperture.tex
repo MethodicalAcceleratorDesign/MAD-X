@@ -25,7 +25,6 @@ element or class.
 Note that instantiation can also happen at the time of declaration of 
 an element in a \hyperref[chap:sequence]{sequence}.  
 
-
 The aperture can be specified for any element or class of elements, 
 with the exception of drift spaces. 
 
@@ -128,33 +127,41 @@ xn   \>yn
      different aperture types. This is historical and is kept for
      backwards compatibility. Pay some attention to the parameters you
      introduce! 
+
    \item When \hyperref[chap:makethin]{\tt MAKETHIN} is called all
      thin slices inherit the aperture of their respective original thick
      lens version.  
-   \item When the \hyperref[chap:c6t]{\tt SIXTRACK} command is 
-   called (see the
+
+   \item When the \hyperref[chap:c6t]{\tt SIXTRACK} command is called (see the
      \hyperref[chap:sixtrack]{SixTrack converter module}) the apertures are
      ignored by default. To convert the apertures as well the {\tt APERTURE}
      flag has to be set in {\tt C6T}.  
+
    \item  Aperture parameters are like all parameters and are inherited
      by derived elements. Like other parameters they can also be overridden by
      the derived elements if necessary.  
-\end{itemize}
 
-The \texttt{APERTYPE} and the \texttt{APERTURE}s themselves can be
-conveniently added to the \hyperref[chap:twiss]{\texttt{TWISS}}
-(\autoref{chap:twiss}) table by 
-using the 
-\hyperref[sec:select]{\tt SELECT} command (\autoref{sec:select}). 
-For example the command:    
+   \item The \texttt{APERTYPE} and the \texttt{APERTURE}s themselves can be
+     conveniently added to the \hyperref[chap:twiss]{\texttt{TWISS}} 
+     (\autoref{chap:twiss}) table by using the \hyperref[sec:select]{\tt 
+     SELECT} command (\autoref{sec:select}). For example the command:    
 \madxmp{
 xxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
-select, flag=twiss, clear; \\
-select, flag=twiss, column= \>name,s,betx,alfx,mux,bety,alfy,muy, \\
+Select, flag=twiss, clear; \\
+Select, flag=twiss, column= \>name,s,betx,alfx,mux,bety,alfy,muy, \\
                             \>apertype,aper\_1,aper\_2; \\
 }
-and a subsequent TWISS command put the aperture information
-together with the specified TWISS parameters into the TWISS table.
+     and a subsequent TWISS command put the aperture information together with 
+     the specified TWISS parameters into the TWISS table.
+
+   \item The minimum beam stay-clear value (n1 value) computed along the 
+     beamline is printed to standard out and is also available as an output 
+     variable of the \hyperref[sec:beam]{\tt BEAM} command: 
+\madxmp{
+Value, beam->n1min;\\
+nmin = beam->n1min;}
+
+\end{itemize}
 
 \section{Defining aperture tolerances}
 \label{sec:apertol}
