@@ -317,7 +317,12 @@ An expression can be formed using the following operators:
   \ttitem{SINH(x)} hyperbolic sine, 
   \ttitem{COSH(x)} hyperbolic cosine, 
   \ttitem{TANH(x)} hyperbolic tangent, 
-  \ttitem{ABS(x)} absolute value; 
+  \ttitem{ABS(x)} absolute value, 
+  \ttitem{ERF(x)} Gauss error,
+  \ttitem{ERFC(x)} complementary error,
+  \ttitem{FLOOR(x)} floor, largest previous integer,
+  \ttitem{CEIL(x)} ceiling, smallest next integer,
+  \ttitem{ROUND(x)} round, closest integer;
 \end{madlist}
 
 \subsubsection{Random Number Generators}
@@ -338,10 +343,11 @@ random generator use the \hyperref[sec:eoption]{\tt EOPTION} command.
 \label{subsubsec:table}
 
 \begin{madlist}
-  \ttitem{table(x,z)} accesses value of the named table column "z"
+  \ttitem{TABLE(x,z)} accesses value of the named table column "z"
   of table "x"; example: table(summ,q1) returns the hor. tune of
   the Twiss summary table "summ".  
-  \ttitem{table(x,y,z)} accesses value of the named table column "z"
+
+  \ttitem{TABLE(x,y,z)} accesses value of the named table column "z"
   for element "y" (first table row with that name) of table "x";
   example: table(twiss,mb.12,betx) returns the beta\_x at
   element mb.12 from the Twiss table "twiss".   When the element
