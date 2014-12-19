@@ -683,6 +683,12 @@ polish_value(struct int_array* deco, char* expr_string)
               double int_part;
               stack[c_stack] = modf(stack[c_stack], &int_part);
               } break;
+            case 23:
+              stack[c_stack] = erf(stack[c_stack]);
+              break;
+            case 24:
+              stack[c_stack] = erfc(stack[c_stack]);
+              break;
             default:
               fatal_error("polish_value: illegal function in expr:",
                           expr_string);
