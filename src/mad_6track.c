@@ -963,22 +963,19 @@ att_rfdipole(struct c6t_element* el)
   /*
   ** based on att_crabcavity()
   */
-  double lag = el->value[16];
+  double lag = 0.5 - el->value[16];
   double tilt = el->value[6];
   if (fabs(tilt - M_PI/2)<eps_9)
     el->out_1 = -23;
   else
     el->out_1 = 23;
-  if (cavall_flag == 0)
-  {
+  if (cavall_flag == 0) {
     el->out_2 = total_voltage;
     strcpy(el->name, "CAV");
-  }
-  else el->out_2 = el->value[15];
+  } else
+    el->out_2 = el->value[15];
   el->out_3 = el->value[2]; // freq = // not used
-  if (lag < -0.5) lag +=1.;
-  else if (lag > 0.5) lag -=1.;
-  el->out_4 = 360. * lag;
+  el->out_4 = 2.0 * M_PI * lag;
 }
 
 static void
@@ -992,6 +989,8 @@ att_rfquadrupole(struct c6t_element* el)
   ** out_5 = tilt
   */
 
+  double lag = 0.5 - el->value[1];
+
   if (fabs(el->value[3])>eps_9) {
     el->out_1 = 26;
     el->out_2 = el->value[3];
@@ -1000,7 +999,7 @@ att_rfquadrupole(struct c6t_element* el)
     el->out_2 = el->value[9];
   }
   el->out_3 = el->value[2];
-  el->out_4 = el->value[1];
+  el->out_4 = 2.0 * M_PI * lag;
   el->out_5 = el->value[6];
 }
 
@@ -1014,6 +1013,8 @@ att_rfsextupole(struct c6t_element* el)
   ** out_4 = phase
   ** out_5 = tilt
   */
+ 
+  double lag = 0.5 - el->value[7];
 
   if (fabs(el->value[4])>eps_9) {
     el->out_1 = 27;
@@ -1023,7 +1024,7 @@ att_rfsextupole(struct c6t_element* el)
     el->out_2 = el->value[10];
   }
   el->out_3 = el->value[2];
-  el->out_4 = el->value[7];
+  el->out_4 = 2.0 * M_PI * lag;
   el->out_5 = el->value[6];
 }
 
@@ -1038,6 +1039,8 @@ att_rfoctupole(struct c6t_element* el)
   ** out_5 = tilt
   */
 
+  double lag = 0.5 - el->value[8];
+
   if (fabs(el->value[5])>eps_9) {
     el->out_1 = 28;
     el->out_2 = el->value[5];
@@ -1046,7 +1049,7 @@ att_rfoctupole(struct c6t_element* el)
     el->out_2 = el->value[11];
   }
   el->out_3 = el->value[2];
-  el->out_4 = el->value[8];
+  el->out_4 = 2.0 * M_PI * lag;
   el->out_5 = el->value[6];
 }
 
@@ -1543,17 +1546,17 @@ convert_madx_to_c6t(struct node* p)
     c6t_elem->value[3]  = maxkn>1?(-kn_param->double_array->a[1]/1.0):0.0;
     c6t_elem->value[4]  = maxkn>2?(-kn_param->double_array->a[2]/2.0):0.0;
     c6t_elem->value[5]  = maxkn>3?(-kn_param->double_array->a[3]/6.0):0.0;
-    c6t_elem->value[16] = maxpn>1?(pn_param->double_array->a[0]*2*M_PI):0.0;
-    c6t_elem->value[1]  = maxpn>1?(pn_param->double_array->a[1]*2*M_PI):0.0;
-    c6t_elem->value[7]  = maxpn>2?(pn_param->double_array->a[2]*2*M_PI):0.0;
-    c6t_elem->value[8]  = maxpn>3?(pn_param->double_array->a[3]*2*M_PI):0.0;
+    c6t_elem->value[16] = maxpn>0?(pn_param->double_array->a[0]):0.0;
+    c6t_elem->value[1]  = maxpn>1?(pn_param->double_array->a[1]):0.0;
+    c6t_elem->value[7]  = maxpn>2?(pn_param->double_array->a[2]):0.0;
+    c6t_elem->value[8]  = maxpn>3?(pn_param->double_array->a[3]):0.0;
     // skew component
-    c6t_elem->value[9]  = maxks>1?(-ks_param->double_array->a[1]/1.0):0.0;
-    c6t_elem->value[10] = maxks>2?(-ks_param->double_array->a[2]/2.0):0.0;
-    c6t_elem->value[11] = maxks>3?(-ks_param->double_array->a[3]/6.0):0.0;
-    c6t_elem->value[12] = maxps>1?(ps_param->double_array->a[1]*2*M_PI):0.0;
-    c6t_elem->value[13] = maxps>2?(ps_param->double_array->a[2]*2*M_PI):0.0;
-    c6t_elem->value[14] = maxps>3?(ps_param->double_array->a[3]*2*M_PI):0.0;
+    c6t_elem->value[9]  = maxks>1?(ks_param->double_array->a[1]/1.0):0.0;
+    c6t_elem->value[10] = maxks>2?(ks_param->double_array->a[2]/2.0):0.0;
+    c6t_elem->value[11] = maxks>3?(ks_param->double_array->a[3]/6.0):0.0;
+    c6t_elem->value[12] = maxps>1?(ps_param->double_array->a[1]):0.0;
+    c6t_elem->value[13] = maxps>2?(ps_param->double_array->a[2]):0.0;
+    c6t_elem->value[14] = maxps>3?(ps_param->double_array->a[3]):0.0;
   }
   else
   {
@@ -3417,5 +3420,3 @@ conv_sixtrack(struct in_cmd* mycmd) /* writes sixtrack input files from MAD-X */
   printf("                          sequence length: %f [m]\n", sequ_length);
   c6t_finish();
 }
-
-
