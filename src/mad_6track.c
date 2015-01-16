@@ -857,7 +857,7 @@ att_crabcavity(struct c6t_element* el)
   el->out_3 = el->value[4]; // freq = // not used
   if (lag < -0.5) lag +=1.;
   else if (lag > 0.5) lag -=1.;
-  el->out_4 = 360. * lag;
+  el->out_4 = 2 * M_PI * lag;
 }
 
 static void
@@ -963,17 +963,13 @@ att_rfdipole(struct c6t_element* el)
   /*
   ** based on att_crabcavity()
   */
-  double lag = 0.5 - el->value[16];
+  double lag = el->value[16];
   double tilt = el->value[6];
   if (fabs(tilt - M_PI/2)<eps_9)
     el->out_1 = -23;
   else
     el->out_1 = 23;
-  if (cavall_flag == 0) {
-    el->out_2 = total_voltage;
-    strcpy(el->name, "CAV");
-  } else
-    el->out_2 = el->value[15];
+  el->out_2 = el->value[15];
   el->out_3 = el->value[2]; // freq = // not used
   el->out_4 = 2.0 * M_PI * lag;
 }
