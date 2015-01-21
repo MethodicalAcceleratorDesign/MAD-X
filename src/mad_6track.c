@@ -965,11 +965,12 @@ att_rfdipole(struct c6t_element* el)
   */
   double lag = el->value[16];
   double tilt = el->value[6];
+  double pc0 = get_value("beam", "pc"); // GeV/c
   if (fabs(tilt - M_PI/2)<eps_9)
     el->out_1 = -23;
   else
     el->out_1 = 23;
-  el->out_2 = el->value[15];
+  el->out_2 = el->value[15] * pc0 * 1e3; // rad * GeV/c * 1e3 == rad * MeV/c
   el->out_3 = el->value[2]; // freq = // not used
   el->out_4 = 2.0 * M_PI * lag;
 }
