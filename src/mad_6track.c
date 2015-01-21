@@ -842,7 +842,7 @@ att_rfcavity(struct c6t_element* el)
 static void
 att_crabcavity(struct c6t_element* el)
 {
-  double lag = el->value[5];
+  double lag = -el->value[5];
   double tilt = el->value[12];
   if (fabs(tilt - M_PI/2)<eps_9)
     el->out_1 = -23;
@@ -963,7 +963,7 @@ att_rfdipole(struct c6t_element* el)
   /*
   ** based on att_crabcavity()
   */
-  double lag = el->value[16];
+  double lag = 0.25 - el->value[16];
   double tilt = el->value[6];
   double pc0 = get_value("beam", "pc"); // GeV/c
   if (fabs(tilt - M_PI/2)<eps_9)
