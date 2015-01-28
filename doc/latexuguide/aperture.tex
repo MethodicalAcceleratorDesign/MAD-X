@@ -372,23 +372,16 @@ etc.
 
 {\bf Example of file:}
 \begin{verbatim}
-!This is the start of the file.
-!Comments are made with exclamation marks.
-
 mb.a14r1.b1
 0        0.0002        0.000004
 7.15     1.4e-5        0.3e-3
 14.3     0.0000000032  4e-6
-
-!further comments can of course be added
 
 mq.22r1.b1
 0      0.3e-5     1.332e-4
 1.033  0.00034    0.3e-9
 2.066  0          0.00e-2
 3.1    4.232e-4   0.00000003
-
-!This is the end of the file.
 \end{verbatim}
 
 \section{OFFSETELEM file syntax}
@@ -468,35 +461,32 @@ does not coincide with the reference trajectory.
 Note that prior to \madx version 4, the layout of the file was different
 and not formatted as TFS file: 
 
-\begin{verbatim}
-reference-element-name
+\madxmp{
+reference-element-name \\
+\\
+elementname \\
+DDX\_OFF   \=DX\_OFF   \=X\_OFF \\
+DDY\_OFF   \>DY\_OFF   \>Y\_OFF 
+} 
 
-elementname
-DDX_OFF   DX_OFF   X_OFF
-DDY_OFF   DY_OFF   Y_OFF
-\end{verbatim} 
 
 {\bf Example:} 
-\begin{verbatim}
-!comment can be given anywhere with an exclamation mark
-
-mq.12r1.b1
-
-!Then we give a list of elements and their displacement 
-!w.r.t. the reference point.
-mcbxa.3l2
-0   -2.56545   -3
-0   -2.3443666  0
-
-!The next element use the same reference point.
-!Elements offset w.r.t. another point must be given in another file,
-!together with the new reference point.
-mcbxa.3r2
-0.3323  32.443355 -0.84
-0.2522  32.554363 0.0
-
-!This is the end of the file.
-\end{verbatim}
+\madxmp{
+! Reference point \\
+mq.12r1.b1 \\
+\\
+! List of elements and their displacement w.r.t. reference point. \\
+mcbxa.3l2 \\
+0   -2.5654500 -3 \\
+0   -2.3443666  0 \\
+\\
+! The next element uses the same reference point. \\
+! Elements offset w.r.t. another point must be given in another file, \\
+! together with the new reference point. \\
+mcbxa.3r2 \\
+0.3323  32.443355 -0.84 \\
+0.2522  32.554363  0.0
+}
 
 
 %% This file contains coordinates describing how certain elements are

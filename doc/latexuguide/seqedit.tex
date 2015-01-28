@@ -4,18 +4,22 @@
 
 \chapter{Sequence Editor}
 \label{chap:seqedit}
-With the help of the commands explained below, a sequence may be
-modified in many ways: the starting point can be moved to another place;
+With the help of a few commands, an existing sequence may be
+modified in many ways: in the case of a circular machine, the starting point of 
+the sequence can be moved to another place;
 the order of elements can be inverted; elements can be inserted one by
 one, or as a whole group with one single command; single elements, or
 classes thereof can be removed; elements can be replaced by others;
 finally, the sequence can be "flattened", i.e. all inserted sequences
 are replaced by their actual elements, such that a flattened sequence
-contains only elements. It is good practice to add a \textit{ flatten; }
-statement at the end of a \textit{ seqedit operation } to ensure a fully
-operational sequence. And this is particularly useful for the \textit{
-  save } command to properly save \textit{ shared sequences } and to
-write out in \madeight format.  
+contains only elements. 
+
+It is good practice to add a \hyperref[sec:flatten]{\tt FLATTEN}
+statement at the end of a {\tt SEQEDIT} operation to ensure a fully
+operational sequence. This is particularly useful for the 
+\hyperref[sec:save]{\tt SAVE} command to properly save {\it shared sequences} 
+and to write them out in \madeight format. 
+
 
 %% 2013-Jul-11  17:35:46  ghislain: need a synopsis paragraph similar to
 %% what PTC offers and a complement of a few examples using all commands
@@ -23,18 +27,51 @@ write out in \madeight format.
 
 \section{SEQEDIT}
 \label{sec:seqedit}
+\madx provides an environment for the edition of sequences that is invoked with 
+the command:
 \madbox{SEQEDIT, SEQUENCE=string;}
-selects the sequence named for editing. The editing is performed on the
-non-expanded sequence; after having finished the editing, one has to
-re-expand the sequence if necessary.  
+The only attribute is the name of the sequence to be edited. 
+
+The editing is performed on the sequence as provided by the user and before it 
+is expanded with the \hyperref[sec:use]{\tt USE} command. 
+At the end of sequence edition, the resulting sequence must be expanded through 
+the \hyperref[sec:use]{\tt USE} command as necessary.
 
 \section{FLATTEN}
 \label{sec:flatten}
+Sequences can be built from elements but also sub-sequences resulting in a 
+nested structure (see chapter \ref{chap:sequence} on sequence definition). 
+The positioning of elements within a sequence can also be specified with values 
+or expressions, and by reference to other elements.
+
+\madx provides a command to resolve these dependencies and transform a complex 
+sequence into a simple list of elements with positioning values referring to 
+the start of the sequence, discarding the user-specified expressions for the 
+positioning.
+
+This command takes no argument: 
 \madbox{
 FLATTEN;
 }
-This command recursively includes all sub-sequences within the sequence
-being edited, if any. The resulting sequence contains only elements.  
+
+If the sequence being edited contains sub-sequences, {\tt FLATTEN} recursively 
+includes all sub-sequences until the sequence is only composed of a simple list 
+of elements. 
+
+{\tt FLATTEN} also resolves the positioning of each element within the sequence 
+to a single value with reference to the start of the sequence and updates the 
+{\tt AT} attribute of that element while also discarding the user-specified 
+expression if present.
+
+The {\tt FLATTEN} command is recommended at the beginning of sequence edition 
+as well as at the very end as in
+\madxmp{
+SEQEDIT, \=SEQUENCE=name; \\
+	\>FLATTEN; \\
+	\>\ldots commands to edit the named sequence\ldots \\
+	\>FLATTEN; \\
+ENDEDIT;
+}
 
 \section{CYCLE}
 \label{sec:cycle}
@@ -44,23 +81,25 @@ CYCLE, START=string;
 This makes the sequence start at the location given with the START
 argument, which must be a marker. \\ 
 In the case there is a shared sequence in the used sequence, the
-command FLATTEN has to be used before the command CYCLE. Example:  
+command {\tt FLATTEN} has to be used before the command {\tt CYCLE}. 
+Example:  
 \madxmp{
-flatten ; cycle, start=place; 
+FLATTEN; \\
+CYCLE, START=place; 
 }
 
 \section{REFLECT}
 \label{sec:reflect}
-\madbox{
-REFLECT;
-}
+\madbox{REFLECT;}
 This inverts the order of element in the sequence, starting from the
 last element. \\ 
-If there are shared sequences inside the USEd sequence, the command
-FLATTEN must be used before the command REFLECT.  Alternatively each
-shared sequence must first be reflected. Example:   
+If there are shared sequences inside the \hyperref[sec:use]{\tt USE}d sequence, 
+the command
+{\tt FLATTEN} must be used before the command {\tt REFLECT}.  
+Alternatively each shared sequence must first be reflected. Example:   
 \madxmp{
-flatten ; reflect; 
+FLATTEN;\\
+REFLECT; 
 }
 
 
@@ -181,12 +220,11 @@ EXTRACT} command.
 
 \section{ENDEDIT}
 \label{sec:endedit}
-\madbox{
-ENDEDIT;
-}
-terminates the sequence editing process. The nodes in the sequence are
-renumbered according to their occurrence which might have changed during
-editing.  
+The sequence editing environment is closed with the command
+\madbox{ENDEDIT;}
+The nodes in the sequence are finally renumbered according to their occurrence 
+which might have changed during editing.
+
 
 
 

@@ -8,11 +8,100 @@
 The following changes have been made to the code and documentation since
 August 15th, 2014 in version 5.02.02
 
-The changes are indexed by the SVN release number. 
+The changes are indexed by date (most recent first) and provide the \madx 
+version number where the change applies as well as the SVN 
+release number for the change. 
 
 \begin{madlist}
 
-  \ttitemn{r4932} 2014-Aug-18, version 5.02.03 \\
+  \ttitem{2015-Jan-28} version 5.02.05, r5118\\
+  clarified in the \hyperref[chap:elements]{definition of magnetic elements} 
+  that the effect of defined magnetic strengths is always the same, 
+  irrespective of the \hyperref[sec:beam]{\tt CHARGE} of the particles declared 
+  in the \hyperref[sec:beam]{\tt BEAM} command. It is agreed in the literature 
+  that a positive quadrupole (positive $K_1$) focuses positive particles in the 
+  horizontal plane and defocuses negative particles in the same horizontal 
+  plane, for the same direction of propagation. \\ 
+  Currently \mad ignores the \hyperref[sec:beam]{\tt CHARGE} attribute and 
+  focuses both positive and negative particles in the horizontal plane when 
+  going through a quadrupole with positive $K_1$. \\
+  {\bf THIS MAY CHANGE IN THE FUTURE TO CONFORM TO EXISTING CONVENTIONS}\\
+  Electrostatic elements (\hyperref[sec:elseparator]{\tt ELSEPARATOR}, 
+  \hyperref[sec:rfcavity]{\tt RFCAVITY}, \hyperref[sec:crabcavity]{\tt 
+  CRABCAVITY}, and the RF part of the \hyperref[sec:rfmultipole]{\tt 
+  RFMULTIPOLE}) handle the \hyperref[sec:beam]{\tt CHARGE} attribute 
+  appropriately and provide 
+  opposite effects for opposite charges travelling in the same direction. 
+
+
+  \ttitem{2014-Dec-19} version 5.02.05, r5111\\
+  added the Gauss error function {\tt ERF} and the complementary error function 
+  {\tt ERFC} to the list of \hyperref[subsec:operator]{available operators in 
+  arithmetic expressions}. Added documentation in the same section for the 
+  {\tt FLOOR}, {\tt CEIL} and {\tt ROUND} functions that were already 
+  implemented. 
+  
+  
+  \ttitem{2014-Dec-10} version 5.02.04, r5093 and r5101\\
+  clarified the global coordinate system figure~\ref{F-GLOB} with colors and 
+  representations of projections of planes onto the horizontal Cartesian 
+  plane as well as intersections of local coordinate planes with horizontal 
+  Cartesian plane. 
+  
+  
+  \ttitem{2014-Nov-25} version 5.02.04, r5092\\
+  removed the \hyperref[sec:global]{\tt GLOBAL} matching constraints {\tt DDQ1, 
+  	DDQ2} from the documentation since they are not implemented in the code. 
+  
+  
+  \ttitem{2014-Nov-14} version 5.02.04, r5081\\
+  added a \hyperref[sec:copyfile]{\tt COPYFILE} command. Changed the attribute 
+  name for the destination for the \hyperref[sec:renamefile]{\tt RENAMEFILE} 
+  command from {\tt NAME} to {\tt TO}.
+  
+  
+  \ttitem{2014-Nov-13} version 5.02.04, r5078\\
+  fixed figure \ref{F-YSDISP} where the {\it x}-axis was pointing in
+  the wrong direction and the orientation of the element for positive
+  {\tt DPHI} was also not conforming to the text for the
+  \hyperref[sec:ealign]{\tt EALIGN} command.
+  
+  
+  \ttitem{2014-Nov-13}  version 5.02.04, r5080\\
+  documented a bug occurring when \hyperref[sec:line]{\tt 
+  LINE} or \hyperref[sec:macro]{\tt MACRO} 
+  constructs appear within a \hyperref[sec:if]{\tt IF ... ELSEIF ... ELSE} or a 
+  \hyperref[sec:while]{\tt WHILE} construct. This bug will not be fixed now. \\ 
+  Clarified also that {\tt IF ... ELSEIF ... ELSE} and {\tt WHILE} constructs 
+  can be nested to at least six levels deep.
+  
+  
+  \ttitem{2014-Oct-14} version 5.02.03, r5013\\
+  fixed a documented feature of \hyperref[chap:survey]{\tt SURVEY} where
+  the first {\tt KSL} component of thin \hyperref[sec:multipole]{\tt
+  	MULTIPOLE} elements, representing a vertical angle for a thin
+  dipole, was not taken into account. Both {\tt KNL} and {\tt KSL} are
+  now properly taken into account. Another change was to make {\tt
+  	SURVEY} take into account the \hyperref[sec:rfmultipole]{\tt
+  	RFMULTIPOLE} elements in the same way that it treats {\tt MULTIPOLE}
+  elements.
+  
+  
+  \ttitem{2014-Aug-27} version 5.02.03, r4947 \\
+  changed the behaviour of \hyperref[sec:fill]{\tt FILL} to accept as
+  parameter a row number equal to the current number of rows in the
+  table plus one, with the effect of creating a new row and filling it. 
+  
+  
+  \ttitem{2014-Aug-25} version 5.02.03, r4942 and r4943\\
+  harmonized the behaviour of \hyperref[sec:fill]{\tt FILL},
+  \hyperref[sec:setvars]{\tt SETVARS} and \hyperref[sec:setvars_lin]{\tt
+  	SETVARS\_LIN} with respect to negative row numbers, and updated the
+  default values. Added documentation sections for {\tt SETVARS} and {\tt
+  	SETVARS\_LIN} that were hitherto undocumented.  
+  
+  
+  \ttitemn{2014-Aug-18} version 5.02.03, r4932 \\
   a single element can now be repeated in a beamline expansion:
   \texttt{2*S} and \texttt{-2*S} are of course identical (single
   elements are not reversed head to tail), and also equivalent to
@@ -20,71 +109,6 @@ The changes are indexed by the SVN release number.
   element.\\
   Documentation updated; see \ref{sec:reflect_repeat_lines}
 
-
-  \ttitem{r4942, r4943} 2014-Aug-25, version 5.02.03 \\
-  harmonized the behaviour of \hyperref[sec:fill]{\tt FILL},
-  \hyperref[sec:setvars]{\tt SETVARS} and \hyperref[sec:setvars_lin]{\tt
-    SETVARS\_LIN} with respect to negative row numbers, and updated the
-  default values. Added documentation sections for {\tt SETVARS} and {\tt
-    SETVARS\_LIN} that were hitherto undocumented.  
-
-
-  \ttitem{r4947} 2014-Aug-27, version 5.02.03 \\
-  changed the behaviour of \hyperref[sec:fill]{\tt FILL} to accept as
-  parameter a row number equal to the current number of rows in the
-  table plus one, with the effect of creating a new row and filling it. 
-
-
-  \ttitem{r5013} 2014-Oct-14, version 5.02.03\\
-  fixed a documented feature of \hyperref[chap:survey]{\tt SURVEY} where
-  the first {\tt KSL} component of thin \hyperref[sec:multipole]{\tt
-    MULTIPOLE} elements, representing a vertical angle for a thin
-  dipole, was not taken into account. Both {\tt KNL} and {\tt KSL} are
-  now properly taken into account. Another change was to make {\tt
-    SURVEY} take into account the \hyperref[sec:rfmultipole]{\tt
-    RFMULTIPOLE} elements in the same way that it treats {\tt MULTIPOLE}
-  elements.
-  
-
-  \ttitem{r5078} 2014-Nov-13, version 5.02.04\\
-  fixed figure \ref{F-YSDISP} where the {\it x}-axis was pointing in
-  the wrong direction and the orientation of the element for positive
-  {\tt DPHI} was also not conforming to the text for the
-  \hyperref[sec:ealign]{\tt EALIGN} command.
-
-
-  \ttitem{r5080} 2014-Nov-13, version 5.02.04\\
-  documented a bug occurring when \hyperref[sec:line]{\tt 
-  LINE} or \hyperref[sec:macro]{\tt MACRO} 
-  constructs appear within a \hyperref[sec:if]{\tt IF ... ELSEIF ... ELSE} or a 
-  \hyperref[sec:while]{\tt WHILE} construct. This bug will not be fixed now. \\ 
-  Clarified also that {\tt IF ... ELSEIF ... ELSE} and {\tt WHILE} constructs 
-  can be nested to at least six levels deep.
-
-
-  \ttitem{r5081} 2014-Nov-14, version 5.02.04\\
-  added a \hyperref[sec:copyfile]{\tt COPYFILE} command. Changed the attribute 
-  name for the destination for the \hyperref[sec:renamefile]{\tt RENAMEFILE} 
-  command from {\tt NAME} to {\tt TO}.
-
-
-  \ttitem{r5092} 2014-Nov-25, version 5.02.04\\
-  removed the \hyperref[sec:global]{\tt GLOBAL} matching constraints {\tt DDQ1, 
-  DDQ2} from the documentation since they are not implemented in the code. 
-
-
-  \ttitem{r5093, r5101} 2014-Dec-10, version 5.02.04\\
-  clarified the global coordinate system figure~\ref{F-GLOB} with colors and 
-  representations of projections of planes onto the horizontal cartesian plane 
-  as well as intersections of local coordinate planes with horizontal cartesian 
-  plane. 
-
-
-  \ttitem{r5111} 2014-Dec-19, version 5.02.05\\
-  added the Gauss error function {\tt ERF} and the complementary error function 
-  {\tt ERFC} to the list of \hyperref[subsec:operator]{available operators in 
-  arithmetic expressions}. Added documentation in the same section for the {\tt 
-  FLOOR}, {\tt CEIL} and {\tt ROUND} functions that were already implemented. 
 
 \end{madlist}
   
