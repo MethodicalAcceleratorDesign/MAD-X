@@ -59,7 +59,7 @@ test-match-5 test-match-6 test-match-7 test-match-8 \
 test-aperture \
 test-beam \
 \
-test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 \
+test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 test-rfmultipole-5 test-rfmultipole-6 \
 \
 test-ptc-twiss test-ptc-twiss-1 test-ptc-twiss-2 \
 test-ptc-twiss-old1 test-ptc-twiss-old2 test-ptc-twiss-old3 test-ptc-twiss-old4 test-ptc-twiss-old5 $(if $(call eq,$(OSTYPE),Windows),,test-ptc-twiss-old6) test-ptc-twiss-old7 \
