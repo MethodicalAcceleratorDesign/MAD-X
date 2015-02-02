@@ -1,0 +1,57 @@
+title, 'test of rf-multipole';
+option, -debug, -echo;
+
+bunchcharge := 2.e10;
+
+twss_ebc1 : beta0, 
+            betx=3.3999, bety=3.7645,
+            alfx=-1.0879, alfy= 1.1907;
+
+beam, energy=5, npart=bunchcharge, 
+            sige=1.5e-3, sigt=6e-03, 
+            ex=8e-6 * emass/5, ey=20e-9 * emass/5;
+
+!!!
+!!! it creates a sequence with an RF-Multipole and multipole that cancel each other
+!!!
+
+k:=(pi);
+rfm1 : rfmultipole, l=0.0, knl:={0,  (2), (3)}, ksl:={0, -(5), -(7) }, tilt=0.456,  freq=12, pnl:={ 0, 0, 0,0,0,0,0,0,0 }, psl:={0,0,0,0,0,0,0,0};
+m1   : multipole, l=0.0, knl:={0,  (2), (3)}, ksl:={0, -(5), -(7) }, tilt=0.123;
+
+test_line: sequence, refer=entry, l=1.0;
+rfm1: rfm1, at=0.0;
+m1: m1, at=1.0;
+endsequence;
+
+!!! 
+!!! TEST 1: prints some of the RF-Multipole attributes
+!!!
+
+value, rfm1->l;
+value, rfm1->freq;
+value, rfm1->knl;
+value, rfm1->pnl;
+
+!!! creeates the twiss table
+
+use, period=test_line;
+select, flag = twiss, column=name,s,betx,alfx,mux, bety, alfy,muy,dx,dy;
+twiss, save, centre, file=twiss2c.out, betx=1, bety=0.5;
+!plot, haxis=s, vaxis=betx,bety,dx,colour=100;
+
+!!! 
+!!! the misaligment and tilt associatated to rfmultipole are converted
+!!!
+
+SELECT, flag=ERROR, CLEAR = true;
+select, flag=error,pattern=".*";
+ealign dx:=0.001,dy:=-0.002,ds:=0.003,dphi:=0.004,dtheta:=0.005,dpsi:=0.006,mrex:=0.007,mrey:=0.008,mredx:=0.009,mredy:=0.010,arex:=0.011,arey:=tgauss(0.3)*0.1e-3,mscalx=0.0130,mscaly=0.9999;
+esave, file=error.tab;
+
+!!!
+!!! save the lattice in Six-Track format
+!!!
+
+use, period=test_line;
+sixtrack, radius=0.017;

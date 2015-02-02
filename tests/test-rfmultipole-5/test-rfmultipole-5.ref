@@ -1,0 +1,63 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.11.14               +
+  + Execution date: 2015.02.02 15:34:55      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+title, 'test of rf-multipole';
+
+option, -debug, -echo;
+
+rfm1->l =                  0 ;
+rfm1->freq =                 12 ;
+rfm1->knl =                  0 ;
+rfm1->pnl =                  0 ;
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                 1                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.0416958303                  0        14.90780697                  0 
+
+             dxrms             xcomax             xcorms                 q2 
+                 0                  0                  0       0.3634683751 
+
+               dq2            betymax              dymax              dyrms 
+                 0        3.495269034                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+Assigned alignment errors to 4 elements
+  ++++++++++++++++++++++++++++
+  +   c6t version 2.0        +
+  ++++++++++++++++++++++++++++
+
+max_mult_ord set to : 11
+Reference radius set to : 0.017000
+++++++ info: MADX sequence converted to c6t internal. 
+
+total block length: 1.000000
+
+c6t terminated - total number of elements: 3
+                    field errors    MAD-X: 0
+                    field errors SixTrack: 1
+                 alignment errors   MAD-X: 2
+                alignment errors SixTrack: 2
+                          sequence length: 1.000000 [m]
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.02.04 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++
