@@ -1606,7 +1606,7 @@ tests/test-rfmultipole-5/fc.2.ref -text
 tests/test-rfmultipole-5/test-rfmultipole-5.cfg -text
 tests/test-rfmultipole-5/test-rfmultipole-5.madx -text
 tests/test-rfmultipole-5/test-rfmultipole-5.ref -text
-tests/test-rfmultipole-5/test1_flat.seq.ref -text
+tests/test-rfmultipole-5/twiss2c.cfg -text
 tests/test-rfmultipole-5/twiss2c.ref -text
 tests/test-rfmultipole/fc.16.ref -text
 tests/test-rfmultipole/fc.2.ref -text
