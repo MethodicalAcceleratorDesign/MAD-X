@@ -1608,7 +1608,6 @@ tests/test-rfmultipole-5/test-rfmultipole-5.madx -text
 tests/test-rfmultipole-5/test-rfmultipole-5.ref -text
 tests/test-rfmultipole-5/twiss2c.cfg -text
 tests/test-rfmultipole-5/twiss2c.ref -text
-tests/test-rfmultipole-6/fc.2.ref -text
 tests/test-rfmultipole-6/test-rfmultipole-6.cfg -text
 tests/test-rfmultipole-6/test-rfmultipole-6.madx -text
 tests/test-rfmultipole-6/test-rfmultipole-6.ref -text
