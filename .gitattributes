@@ -120,6 +120,7 @@ doc/latexuguide/tables.tex -text
 doc/latexuguide/tfs.tex -text
 doc/latexuguide/thintrack.tex -text
 doc/latexuguide/touschek.tex -text
+doc/latexuguide/trackchanges.sty -text
 doc/latexuguide/twiss.tex -text
 doc/latexuguide/twiss_mad8.tex -text
 doc/latexuguide/uguide.tex -text
