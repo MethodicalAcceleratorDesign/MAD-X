@@ -1891,6 +1891,7 @@ tests/test-twiss/test-twiss.madx -text
 tests/test-twiss/test-twiss.ref -text
 tools/CMakeLists.txt -text
 tools/numdiff/CMakeLists.txt -text
+tools/numdiff/LICENSE -text
 tools/numdiff/Makefile -text
 tools/numdiff/Makefile_c -text
 tools/numdiff/Makefile_lib -text
