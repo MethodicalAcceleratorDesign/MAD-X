@@ -46,72 +46,117 @@ The minimum aperture definition uses the following two attributes:
 %% drifts) by the use of the following parameters:  
 
 \begin{madlist}
-  \ttitem{APERTYPE} defines the aperture type from a set of seven
+  \ttitem{APERTYPE} defines the aperture type from a set of
   preselected types:
     \begin{madlist}
       \ttitem{CIRCLE}
       \ttitem{RECTANGLE} 
       \ttitem{ELLIPSE} 
-      \ttitem{RECTCIRCLE} a superposition of a CIRCLE and
-        a RECTANGLE 
-      \ttitem{LHCSCREEN} an alias for RECTCIRCLE
-      \ttitem{RECTELLIPSE} a superposition of an ELLIPSE and a
-        RECTANGLE
-      \ttitem{RACETRACK} a circle exploded in four with
-      quartercircles connected by straight lines.  
+      \ttitem{RECTCIRCLE} a superposition of a {\tt CIRCLE} and
+        a {\tt RECTANGLE} 
+      \ttitem{LHCSCREEN} an alias for {\tt RECTCIRCLE}
+      \ttitem{RECTELLIPSE} a superposition of an {\tt ELLIPSE} and a
+        {\tt RECTANGLE}
+      \ttitem{RACETRACK} a circle separated in four
+      quartercircles, one per quadrant, and connected by straight lines.
+      \begin{5.02.05}
+      \ttitem{OCTAGON} a simply connex octagon\note[GR]{This is an addition in 
+      5.02.05 per request \# 324 in TRAC}
+      \end{5.02.05}
     \end{madlist}
-    or from a provided file.
+    or from a file if a filename is provided as argument. The file contains a 
+    list of x and y coordinates outlining the complete aperture shape and no 
+    symmetry is assumed. This option is only 
+    supported by the aperture module, see below. In this case the {\tt 
+    APERTURE} attribute is ignored.\\
+\\
+Note that the {\tt MARGUERITE} aperture type (two {\tt RECTCIRCLE}s 
+crossing at right angle) is no longer supported. 
+\\
   \ttitem{APERTURE} is an array of values, the number and meaning 
-of which depends on the APERTYPE.  
+of which depends on the {\tt APERTYPE}.  
 \end{madlist}
 
-Note that the {\tt MARGUERITE} aperture type (two {\tt RECTCIRCLE}s 
-crossing
-at right angle) is no longer supported. 
 
+\begin{5.02.04}
 \begin{tabular}{|l | c | p{9cm}|}
 \hline 
-\textbf{APERTYPE} & \textbf{\# of values} & \textbf{meaning of
-  values} \\  
+{\bf APERTYPE} & {\bf \# of values} & {\bf meaning of values}\\
 \hline
-CIRCLE & 1 &  radius of circle \\ 
+{\tt CIRCLE} & 1 &  radius of circle \\ 
 \hline
-ELLIPSE & 2 & horizontal an vertical semi-axes of ellipse \\  
+{\tt RECTANGLE} & 2 & half width and half height of rectangle\\ 
 \hline
-RECTANGLE & 2 & half width and half height of rectangle\\ 
+{\tt ELLIPSE} & 2 & horizontal an vertical semi-axes of ellipse \\  
 \hline
-LHCSCREEN & 3 & half width and half height of rectangle, radius of circle\\  
+{\tt RECTCIRCLE} or {\tt LHCSCREEN} & 3 & half width and half height of 
+rectangle, radius of 
+circle\\
 \hline
-MARGUERITE & 3 & half width and half height of rectangle, radius of circle\\  
-\hline
-RECTELLIPSE & 4 & half width and half height of rectangle, horizontal
+%MARGUERITE & 3 & half width and half height of rectangle, radius of circle\\  
+%\hline
+{\tt RECTELLIPSE} & 4 & half width and half height of rectangle, horizontal
 and vertical semi-axes of ellipse \\  
 \hline
-RACETRACK & 3 & horizontal and vertical offsets (g and s) of the circle center,
-radius (r) of the circular part (see figure below)\\  
-\hline
-filename & 0 & where the file contains a list of x and y coordinates
-outlining the shape. This option is only supported by the aperture
-module, see below. \\  
+{\tt RACETRACK} & 3 & horizontal and vertical offsets (g and s) of the circle 
+center, radius (r) of the circular part (see figure below)\\  
 \hline
 \end{tabular}
+\end{5.02.04}
+
+\begin{5.02.05}
+\\
+\begin{tabular}{|l | c | p{9cm}|}
+	\hline 
+	{\bf APERTYPE} & {\bf \# of values} & {\bf meaning of values}\\
+	\hline
+	{\tt CIRCLE} & 1 &  radius of circle \\ 
+	\hline
+	{\tt RECTANGLE} & 2 & half width and half height of rectangle\\ 
+	\hline
+	{\tt ELLIPSE} & 2 & horizontal an vertical semi-axes of ellipse \\  
+	\hline
+	{\tt RECTCIRCLE} or {\tt LHCSCREEN} & 3 & half width and half height of 
+	rectangle, radius of 
+	circle\\  
+	\hline
+%	MARGUERITE & 3 & half width and half height of rectangle, radius of 
+%	circle\\  
+%	\hline
+	{\tt RECTELLIPSE} & 4 & half width and half height of rectangle, horizontal
+	and vertical semi-axes of ellipse \\
+	\hline
+	{\tt RACETRACK} & 3 & horizontal and vertical offsets (g and s) of the 
+	circle center, radius (r) of the circular part (see figure below)\\
+	\hline
+	{\tt OCTAGON} & 4 & horizontal and vertical extents along axes, two angles 
+	sustaining the cut corner. \note[GR]{This is an addition in 5.02.05 per 
+	request \# 324 in TRAC}\\
+	\hline
+	{\tt OCTAGON} (var.) & 4 & horizontal and vertical positions of the two 
+	points in the 
+	first quadrant. \note[GR]{This is a variant for the addition in 5.02.05 per 
+	request \# 324 in TRAC}\\
+	\hline
+\end{tabular}
+\\
+\end{5.02.05}
+\vskip 5mm
 
 
 {\bf Examples}\\
-The following sets an ELLIPTICAL aperture for the main
+The following sets an {\tt ELLIPTICAL} aperture for the main
 dipoles for the LHC.
 \madxmp{
-MB: SBEND, L=l.MB, APERTYPE=ellipse, 
-APERTURE=\{0.02202,0.02202\};
-}
+MB: SBEND, L=l.MB, APERTYPE=ellipse, APERTURE=\{0.02202,0.02202\};
+}\note[GR]{This is in fact a circular aperture; need to check the LHC data}
 
-When the aperture is specified in a specific file the only aperture
-parameter is the filename: 
+When the aperture is described in a file, the only parameter to be provided is 
+a filename given as value to the {\tt APERTYPE} attribute:
 \madxmp{
-MB: SBEND, L=l.MB, APERTYPE=filename;
+MB: SBEND, L=l.MB, APERTYPE="MB-aper.txt";
 }
-
-where "filename" contains the list of x-y coordinates defining the
+where {\tt "MB-aper.txt"} contains the list of x-y coordinates defining the
 aperture shape:
 \madxmp{
 *****\= \kill
@@ -141,7 +186,7 @@ xn   \>yn
      by derived elements. Like other parameters they can also be overridden by
      the derived elements if necessary.  
 
-   \item The \texttt{APERTYPE} and the \texttt{APERTURE}s themselves can be
+   \item The {\tt APERTYPE} and the {\tt APERTURE}s themselves can be
      conveniently added to the \hyperref[chap:twiss]{\texttt{TWISS}} 
      (\autoref{chap:twiss}) table by using the \hyperref[sec:select]{\tt 
      SELECT} command (\autoref{sec:select}). For example the command:    
@@ -151,12 +196,12 @@ Select, flag=twiss, clear; \\
 Select, flag=twiss, column= \>name,s,betx,alfx,mux,bety,alfy,muy, \\
                             \>apertype,aper\_1,aper\_2; \\
 }
-     and a subsequent TWISS command put the aperture information together with 
-     the specified TWISS parameters into the TWISS table.
+     and a subsequent {\tt TWISS} command put the aperture information together 
+     with the specified {\tt TWISS} parameters into the {\tt TWISS} table.
 
    \item The minimum beam stay-clear value (n1 value) computed along the 
      beamline is printed to standard out and is also available as an output 
-     variable of the \hyperref[sec:beam]{\tt BEAM} command: 
+     variable {\tt N1MIN} of the \hyperref[sec:beam]{\tt BEAM} command: 
 \madxmp{
 Value, beam->n1min;\\
 nmin = beam->n1min;}
@@ -420,29 +465,29 @@ have been given through the {\tt OFFSETELEM} file mechanism.
 The file must be given in {\tt TFS} format according to the following
 template, with mandatory header and any number of data lines, one per element. 
 
-\begin{verbatim}
+{\small \begin{verbatim}
 @ NAME             %06s "OFFSET" 
 @ TYPE             %06s "OFFSET" 
 @ REFERENCE        %10s "reference-element-name" 
 * NAME          S_IP       X_OFF     DX_OFF    DDX_OFF    Y_OFF    DY_OFF     DDY_OFF
 $ %s            %le        %le       %le       %le        %le      %le        %le
-"elementname"	real       real      real      real       real     real       real
-\end{verbatim}
+"elementname"   real       real      real      real       real     real       real
+\end{verbatim}}
 
 Note that the column S\_IP is actually not used, and the values are ignored, 
 but the column and values are parsed nevertheless and must be present. 
 The absence of this column will trigger an error. 
 
 {\bf Example:}
-\begin{verbatim}
+{\small \begin{verbatim}
 @ NAME             %06s "OFFSET" 
 @ TYPE             %06s "OFFSET" 
 @ REFERENCE        %10s "mq.12r1.b1" 
 * NAME          S_IP       X_OFF     DX_OFF    DDX_OFF    Y_OFF    DY_OFF     DDY_OFF
 $ %s            %le        %le       %le       %le        %le      %le        %le
-"mq.12r1.b1"	0.0        -3.0      -2.56545   0.0       0.0      -2.3443666 0.0
+"mq.12r1.b1"    0.0        -3.0      -2.56545   0.0       0.0      -2.344366  0.0
 "mcbxa.3r2"     0.0        -0.84     32.443355  0.3323    0.0      32.554363  0.2522
-\end{verbatim}
+\end{verbatim}}
 
 %A python script to convert a file from the old V.3.XX format to the new V4.xx can be found at :
 %/afs/cern.ch/eng/lhc/optics/V6.503/aperture/convert_offsets.py
@@ -646,7 +691,7 @@ tolerances:
 
 {\tt ON\_ELEM} indicates whether the node is an element or a drift, and
 {\tt ON\_AP} whether it has a valid aperture. The Twiss parameters are the
-interpolated  values used for aperture computation.  
+interpolated values used for aperture computation.  
 
 When one wants to plot the aperture, the {\tt TABLE=aperture} parameter
 is necessary. The normal line of hardware symbols along the top is not

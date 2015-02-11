@@ -30,17 +30,30 @@
 \usepackage{makeidx}
 \usepackage{color}
 
+
+% package trackchanges is good for plain text but is fragile inside other 
+%environments including tables and lists. 
 %\usepackage[finalold]{trackchanges}
-\usepackage[inline]{trackchanges}
-%\usepackage[finalnew]{trackchanges}
+%\usepackage[inline]{trackchanges}
+\usepackage[finalold]{trackchanges}
 \addeditor{GR}
+
+\usepackage{versions}
+\includeversion{5.02.04}
+\excludeversion{5.02.05}
+% following tags the version with their name in the printout
+% and effectively overrides excludeversion !
+%\markversion{5.02.04}
+%\markversion{5.02.05}
+
+%\usepackage{comment}
 
 %\usepackage[pdftex]{hyperref} % should come last
 \usepackage{hyperref} % should come last
 \hypersetup{pdfauthor={Ghislain Roy},
-	    pdftitle={MAD-X User's Guide},
-	    colorlinks,
-        citecolor=blue, pagecolor=blue, linkcolor=blue}
+        pdftitle={MAD-X User's Guide},
+        colorlinks,
+        citecolor=blue, linkcolor=blue}
 \hyperbaseurl{http://madx.web.cern.ch/madx/madX/doc/usrguide/}
 
 \usepackage{madstyle}
@@ -69,57 +82,57 @@
 \listoffigures
 
 \part{Control}
-\include{conventions}   	% Conventions
-\include{format}		% Command and Statement Format
-\include{programflow}           % Program Flow Statements
-\include{control}		% Control Statements
-\include{files}		        % File Handling Statements
-\include{tables}		% Table Handling Statements
-\include{beams}		        % Beam Statements
-\include{seqedit}               % Edit beamline sequences
+\include{conventions}   % Conventions
+\include{format}        % Command and Statement Format
+\include{programflow}   % Program Flow Statements
+\include{control}       % Control Statements
+\include{files}         % File Handling Statements
+\include{tables}        % Table Handling Statements
+\include{beams}         % Beam Statements
+\include{seqedit}       % Edit beamline sequences
 
 
 \part{Elements, Beamlines and Sequences}
-\include{definitions}           % Element definitions
-\include{elements}		% Physical Elements and Markers
-\include{ranges}                % Ranges and Classes
-\include{line}                  % Beamlines
-\include{sequence}	        % Sequences
+\include{definitions}   % Element definitions
+\include{elements}      % Physical Elements and Markers
+\include{ranges}        % Ranges and Classes
+\include{line}          % Beamlines
+\include{sequence}      % Sequences
 
-\part{Input and Output}                 
-\include{tfs}                   % TFS format        
-\include{c6t}			% Conversion to Sixtrack Input Format
-\include{sxf}			% SXF file input and output
-\include{plot}			
-\include{index}                 % probably material for an appendix
-\include{rplot_index}           % ditto
+\part{Input and Output}
+\include{tfs}           % TFS format
+\include{c6t}           % Conversion to Sixtrack Input Format
+\include{sxf}           % SXF file input and output
+\include{plot}
+\include{index}         % probably material for an appendix
+\include{rplot_index}   % ditto
 
 
-\part{\mad Modules}                      
-\include{survey}		%SURVEY: geometric layout and survey
-\include{twiss}                 %TWISS
-\include{match}	                %MATCH: general matching process
-\include{emit}	                %EMIT: calculation of equilibrium values
-\include{aperture}              %APERTURE: defining and calculating apertures 
-\include{makethin}		%MAKETHIN: Conversion to Thin Lens
-\include{error}	                %EFCOMP, EALIGN: Field and alignment errors
-\include{cororbit}              %CORRECT: Orbit correction
-\include{sodd}	                %SODD: Second Order Detuning 
-\include{touschek}              %Touschek effect
-\include{ibs}			%IBS: Intra Beam Scattering
-\include{thintrack}		%THINTRACK: Thin-Lens Tracking Module 
+\part{\mad Modules}
+\include{survey}        % SURVEY: geometric layout and survey
+\include{twiss}         % TWISS
+\include{match}         % MATCH: general matching process
+\include{emit}          % EMIT: calculation of equilibrium values
+\include{aperture}      % APERTURE: defining and calculating apertures 
+\include{makethin}      % MAKETHIN: Conversion to Thin Lens
+\include{error}         % EFCOMP, EALIGN: Field and alignment errors
+\include{cororbit}      % CORRECT: Orbit correction
+\include{sodd}          % SODD: Second Order Detuning 
+\include{touschek}      % Touschek effect
+\include{ibs}           % IBS: Intra Beam Scattering
+\include{thintrack}     % THINTRACK: Thin-Lens Tracking Module 
 
 
 \part{\ptc Commands}
-\include{ptc_general}   	%Set-up Parameters
-\include{ptc_track}		%PTC_TRACK: Thick-Lens Tracking Module
-\include{ptc_twiss}		%PTC_TWISS: Ripken Optics Parameters
-\include{ptc_normal}	        %PTC_NORMAL: Non-Linear Machine Parameters
-\include{ptc_auxiliaries}       %PTC Auxiliary Commands
+\include{ptc_general}     % Set-up Parameters
+\include{ptc_track}       % PTC_TRACK: Thick-Lens Tracking Module
+\include{ptc_twiss}       % PTC_TWISS: Ripken Optics Parameters
+\include{ptc_normal}      % PTC_NORMAL: Non-Linear Machine Parameters
+\include{ptc_auxiliaries} % PTC Auxiliary Commands
 
 
 \part{Trailing Material}
-\include{defects}		%Known Differences to Other Programs 
+\include{defects}       % Known Differences to Other Programs 
 \include{pitfalls}
 \include{contributors}
 \include{changelog}

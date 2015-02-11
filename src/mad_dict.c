@@ -19,8 +19,8 @@
 "const erad = 2.8179402894e-15; "  
 "const prad = erad*emass/pmass; "; */
 
-
 /*  J. Beringer et al. (Particle Data Group), Phys. Rev. D86, 010001 (2012). = PDG 2012 */
+/*  K.A. Olive et al. (Particle Data Group), Chin. Phys. C, 38, 090001 (2014). = PDG2014 */
 char constant_def[] =
 "const pi = 4 * atan(1.); "
 "const twopi = 2 * pi; "
@@ -37,9 +37,7 @@ char constant_def[] =
 "const hbar = 6.58211928e-25; "
 "const erad = 2.8179403267e-15; " 
 "const prad = erad*emass/pmass; ";
-
-
-
+x
 /* mods HG090508 - speed-up twiss
    all new elements must start with at, l, kmax, kmin, calib, polarity
    exactly as the existing ones. Existing elements can only be extended 

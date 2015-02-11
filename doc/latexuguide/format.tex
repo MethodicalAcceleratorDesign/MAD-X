@@ -449,7 +449,9 @@ Example:
 
 A number of predefined symbolic constants exist in \madx and can be used
 in expressions. The values of physical constants are regularly updated
-to reflect the values published by the Particle Data Group \cite{PDGlatest} 
+to reflect the values published by the Particle Data Group \cite{PDG2014} 
+The values published in 2014 (\cite{PDG2014}) have not changed with respect to 
+the values published in 2012 (\cite{PDG2012}).
 
 \begin{table}[ht]
 \caption{Predefined Symbolic Constants in \madx}
@@ -466,7 +468,7 @@ RADDEG & $\pi/180$ & PI / 180 & rad/deg \\
 E & e & exp(1) & 1 \\ 
 EMASS & $m_e$ & $0.510998928\times 10^{-3}$& GeV \\ 
 PMASS & $m_p$ & 0.938272046 & GeV \\ 
-NMASS & $m_n$ & 0.931494061 & GeV \\
+NMASS & $u$ & 0.931494061 & GeV \\
 MUMASS & $m_\mu$ & 0.1056583715 & GeV \\ 
 CLIGHT & $c$ & $2.99792458\times 10^{8}$ & m/s \\ 
 QELECT & $e$ & $1.602176565\times 10^{-19}$ & A.s \\ 
@@ -477,6 +479,9 @@ PRAD & $r_e (m_e / m_p)$ & ERAD*EMASS/PMASS & m \\
 \end{tabular}
 \end{center}
 \end{table}
+
+Note that the {\tt NMASS} constant in \madx is the unified atomic mass unit and 
+not the neutron mass.
 
 \subsubsection{Parameter labels} 
 Often a set of numerical values depends on a common variable
