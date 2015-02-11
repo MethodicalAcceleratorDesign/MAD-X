@@ -37,7 +37,7 @@ char constant_def[] =
 "const hbar = 6.58211928e-25; "
 "const erad = 2.8179403267e-15; " 
 "const prad = erad*emass/pmass; ";
-x
+
 /* mods HG090508 - speed-up twiss
    all new elements must start with at, l, kmax, kmin, calib, polarity
    exactly as the existing ones. Existing elements can only be extended 
