@@ -986,7 +986,7 @@ att_rfquadrupole(struct c6t_element* el)
   ** out_5 = tilt
   */
 
-  double lag = 0.5 - el->value[1];
+  double lag = -el->value[1];
 
   if (fabs(el->value[3])>eps_9) {
     el->out_1 = 26;
@@ -1011,7 +1011,7 @@ att_rfsextupole(struct c6t_element* el)
   ** out_5 = tilt
   */
  
-  double lag = 0.5 - el->value[7];
+  double lag = -el->value[7];
 
   if (fabs(el->value[4])>eps_9) {
     el->out_1 = 27;
@@ -1036,7 +1036,7 @@ att_rfoctupole(struct c6t_element* el)
   ** out_5 = tilt
   */
 
-  double lag = 0.5 - el->value[8];
+  double lag = -el->value[8];
 
   if (fabs(el->value[5])>eps_9) {
     el->out_1 = 28;
