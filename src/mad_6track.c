@@ -298,6 +298,7 @@ static void att_vacdipole(struct c6t_element*);
 static void att_sbend(struct c6t_element*);
 static void att_sextupole(struct c6t_element*);
 static void att_vkicker(struct c6t_element*);
+static void att_rfmultipole(struct c6t_element*);
 static void att_rfdipole(struct c6t_element*);
 static void att_rfquadrupole(struct c6t_element*);
 static void att_rfsextupole(struct c6t_element*);
@@ -603,14 +604,14 @@ assign_att(void)
 {
   struct c6t_element *el;
   int i, j;
-
+  
   for (i = 0; i < types.curr; i++)  /* loop over base types */
   {
     for (j = 0; j < types.member[i]->curr; j++) /* loop over el. in type */
     {
       el = types.member[i]->elem[j];
       if (el->flag > 0 && el->equiv == el)  /* all others ignored */
-      {
+      {	
         if (strcmp(el->base_name, "aperture") == 0) att_aperture(el);
         else if (strcmp(el->base_name, "beambeam") == 0) att_beambeam(el);
         else if (strcmp(el->base_name, "decapole") == 0) att_decapole(el);
@@ -636,10 +637,11 @@ assign_att(void)
         else if (strcmp(el->base_name, "sbend") == 0) att_sbend(el);
         else if (strcmp(el->base_name, "sextupole") == 0) att_sextupole(el);
         else if (strcmp(el->base_name, "vkicker") == 0) att_vkicker(el);
-        else if (strcmp(el->base_name, "rfdipole") == 0) att_rfdipole(el);
-        else if (strcmp(el->base_name, "rfquadrupole") == 0) att_rfquadrupole(el);
-        else if (strcmp(el->base_name, "rfsextupole") == 0) att_rfsextupole(el);
-        else if (strcmp(el->base_name, "rfoctupole") == 0) att_rfoctupole(el);
+        else if (strcmp(el->base_name, "rfdipole") == 0) att_rfmultipole(el);
+        /* else if (strcmp(el->base_name, "rfdipole") == 0) att_rfdipole(el); */
+        /* else if (strcmp(el->base_name, "rfquadrupole") == 0) att_rfquadrupole(el); */
+        /* else if (strcmp(el->base_name, "rfsextupole") == 0) att_rfsextupole(el); */
+        /* else if (strcmp(el->base_name, "rfoctupole") == 0) att_rfoctupole(el); */
         else att_undefined(el);
       }
     }
@@ -958,6 +960,11 @@ att_undefined(struct c6t_element* el)
 }
 
 static void
+att_rfmultipole(struct c6t_element* el)
+{
+}
+
+static void
 att_rfdipole(struct c6t_element* el)
 {
   /*
@@ -986,14 +993,19 @@ att_rfquadrupole(struct c6t_element* el)
   ** out_5 = tilt
   */
 
-  double lag = -el->value[1];
+  double lag;
 
   if (fabs(el->value[3])>eps_9) {
     el->out_1 = 26;
     el->out_2 = el->value[3];
-  } else if (fabs(el->value[9])>eps_9) {
+    el->value[3] = 0.0;
+    lag = -el->value[1];
+  }
+  if (fabs(el->value[9])>eps_9) {
     el->out_1 = -26;
     el->out_2 = el->value[9];
+    el->value[9] = 0.0;
+    lag = -el->value[12];
   }
   el->out_3 = el->value[2];
   el->out_4 = 2.0 * M_PI * lag;
@@ -1011,14 +1023,19 @@ att_rfsextupole(struct c6t_element* el)
   ** out_5 = tilt
   */
  
-  double lag = -el->value[7];
+  double lag;
 
   if (fabs(el->value[4])>eps_9) {
     el->out_1 = 27;
     el->out_2 = el->value[4];
-  } else if (fabs(el->value[10])>eps_9) {
+    el->value[4] = 0.0;
+    lag = -el->value[7];
+  }
+  if (fabs(el->value[10])>eps_9) {
     el->out_1 = -27;
     el->out_2 = el->value[10];
+    el->value[10] = 0.0;
+    lag = -el->value[13];
   }
   el->out_3 = el->value[2];
   el->out_4 = 2.0 * M_PI * lag;
@@ -1036,14 +1053,19 @@ att_rfoctupole(struct c6t_element* el)
   ** out_5 = tilt
   */
 
-  double lag = -el->value[8];
+  double lag;
 
   if (fabs(el->value[5])>eps_9) {
     el->out_1 = 28;
     el->out_2 = el->value[5];
-  } else if (fabs(el->value[11])>eps_9) {
+    el->value[5] = 0.0;
+    lag = -el->value[8];
+  }
+  if (fabs(el->value[11])>eps_9) {
     el->out_1 = -28;
     el->out_2 = el->value[11];
+    el->value[11] = 0.0;
+    lag = -el->value[14];
   }
   el->out_3 = el->value[2];
   el->out_4 = 2.0 * M_PI * lag;
@@ -2747,53 +2769,53 @@ static void write_rfmultipole(struct c6t_element* el)
 {
   char name[48];
   if (fabs(el->value[15])>eps_9) {
-    /* att_rfdipole(el); */
+    att_rfdipole(el);
     strcpy(name, el->name);
     strcat(name, "_d");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(el->value[3])>eps_9) {
-    /* att_rfquadrupole(el); */
+    att_rfquadrupole(el);
     strcpy(name, el->name);
     strcat(name, "_q");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, 26, el->value[3], el->value[2], el->value[1], el->value[6], 0.0, 0.0);
+	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(el->value[4])>eps_9) {
-    /* att_rfsextupole(el); */
+    att_rfsextupole(el);
     strcpy(name, el->name);
     strcat(name, "_s");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, 27, el->value[4], el->value[2], el->value[7], el->value[6], 0.0, 0.0);
+	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(el->value[5])>eps_9) {
-    /* att_rfoctupole(el); */
+    att_rfoctupole(el);
     strcpy(name, el->name);
     strcat(name, "_o");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, 28, el->value[5], el->value[2], el->value[8], el->value[6], 0.0, 0.0);
+	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(el->value[9])>eps_9) {
-    /* att_rfquadrupole(el); */
+    att_rfquadrupole(el);
     strcpy(name, el->name);
     strcat(name, "_q");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, -26, el->value[9], el->value[2], el->value[12], el->value[6], 0.0, 0.0);
+	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(el->value[10])>eps_9) {
-    /* att_rfsextupole(el); */
+    att_rfsextupole(el);
     strcpy(name, el->name);
     strcat(name, "_s");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, -27, el->value[10], el->value[2], el->value[13], el->value[6], 0.0, 0.0);
+	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(el->value[11])>eps_9) {
-    /* att_rfoctupole(el); */
+    att_rfoctupole(el);
     strcpy(name, el->name);
     strcat(name, "_o");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	    name, -28, el->value[11], el->value[2], el->value[14], el->value[6], 0.0, 0.0);
+	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
 }
 
