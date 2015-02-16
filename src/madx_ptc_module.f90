@@ -968,6 +968,7 @@ CONTAINS
           key%list%t(i)=patch_trans(i)
        enddo
     case(14,15,16) ! PTC accepts mults
+       ! kickers (corrector magnets)
        call dzero(f_errors,maxferr+1)
        n_ferr = node_fd_errors(f_errors)
        do i=1,NMAX
