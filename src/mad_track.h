@@ -12,6 +12,7 @@ void  pro_track(struct in_cmd*);
 void  track_pteigen(double* eigen);
 void  track_tables_dump(void);
 void  track_tables_create(struct in_cmd*);
+void  track_tables_delete(void);
 void  track_start(struct command*);
 
 /**

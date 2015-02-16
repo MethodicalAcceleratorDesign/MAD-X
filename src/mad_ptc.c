@@ -209,6 +209,8 @@ ptc_track_end(void)
     stored_track_start->commands[i] =
       delete_command(stored_track_start->commands[i]);
   stored_track_start->curr = 0;
+  
+  
   c_node = current_sequ->ex_start;
   while(c_node != NULL) /* clean observation points */
   {
@@ -778,7 +780,8 @@ pro_ptc_trackline(struct in_cmd* cmd)
   probe_beam = clone_command(current_beam);
   adjust_rfc(); /* sets freq in rf-cavities from probe */
 
-
+  track_tables_delete(); /* deleting all track related tables*/
+  
   track_tables_create(cmd);
   
   
@@ -1846,7 +1849,6 @@ pro_ptc_track(struct in_cmd* cmd)
 /*  int turns = command_par_value("turns", cmd->clone); */
 
   track_is_on = 1;
-  puts("enter PTC_TRACK module");
   if (current_sequ == NULL || current_sequ->ex_start == NULL)
   {
     warning("sequence not active,", "TRACK ignored");
@@ -1900,12 +1902,24 @@ pro_ptc_track(struct in_cmd* cmd)
     warning("track_run: no START command seen yet", "ignored");
     return;
   }
+  
+
+  track_tables_delete(); /* deleting all track related tables*/
+ 
   track_tables_create(cmd);
-  printf("obs_points ptc_track: %d \n",curr_obs_points);
+  if (debuglevel > 2) 
+   {
+     printf("obs_points ptc_track: %d \n",curr_obs_points);
+   }
+  
   w_ptc_track_(&curr_obs_points);
   t = table_register->tables[name_list_pos("tracksumm", table_register->names)];
   if (get_option("info"))  print_table(t);
   if (get_option("track_dump")) track_tables_dump();
-  fprintf(prt_file, "\n*****  end of ptc_run  *****\n");
+  
+ if (debuglevel > 1) 
+  {
+    fprintf(prt_file, "\n*****  end of ptc_run  *****\n");
+  }  
 }
 
