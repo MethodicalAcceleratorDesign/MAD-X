@@ -3176,8 +3176,6 @@ write_struct(void)
     char name[256] = "";
 
     if (p->flag == 0) {
-      printf("DBG1 = %s\n", p->first->equiv->base_name);
-      printf("DBG2 = %s\n", p->first->equiv->name);
       if (strcmp(p->first->equiv->base_name,"rfmultipole") == 0)
         rfmultipole_name(name, p->first->equiv);
       else
