@@ -954,6 +954,7 @@ att_undefined(struct c6t_element* el)
 static void
 att_rfmultipole(struct c6t_element* el)
 {
+  (void)el;
 }
 
 static void
@@ -1446,18 +1447,18 @@ convert_madx_to_c6t(struct node* p)
     c6t_elem->value[2] = el_par_value_recurse("tilt",p->p_elem);
     c6t_elem->value[3] = el_par_value_recurse("freq",p->p_elem);
     // normal components
-    c6t_elem->value[4] = maxkn>0?(-kn_param->double_array->a[0]/1.0):0.0;
-    c6t_elem->value[5] = maxkn>1?(-kn_param->double_array->a[1]/1.0):0.0;
-    c6t_elem->value[6] = maxkn>2?(-kn_param->double_array->a[2]/2.0):0.0;
-    c6t_elem->value[7] = maxkn>3?(-kn_param->double_array->a[3]/6.0):0.0;
+    c6t_elem->value[4] = maxkn>0?(kn_param->double_array->a[0]):0.0;
+    c6t_elem->value[5] = maxkn>1?(kn_param->double_array->a[1]):0.0;
+    c6t_elem->value[6] = maxkn>2?(kn_param->double_array->a[2]):0.0;
+    c6t_elem->value[7] = maxkn>3?(kn_param->double_array->a[3]):0.0;
     c6t_elem->value[8] = maxpn>0?(pn_param->double_array->a[0]):0.0;
     c6t_elem->value[9] = maxpn>1?(pn_param->double_array->a[1]):0.0;
     c6t_elem->value[10] = maxpn>2?(pn_param->double_array->a[2]):0.0;
     c6t_elem->value[11] = maxpn>3?(pn_param->double_array->a[3]):0.0;
     // skew component
-    c6t_elem->value[12] = maxks>1?(ks_param->double_array->a[1]/1.0):0.0;
-    c6t_elem->value[13] = maxks>2?(ks_param->double_array->a[2]/2.0):0.0;
-    c6t_elem->value[14] = maxks>3?(ks_param->double_array->a[3]/6.0):0.0;
+    c6t_elem->value[12] = maxks>1?(ks_param->double_array->a[1]):0.0;
+    c6t_elem->value[13] = maxks>2?(ks_param->double_array->a[2]):0.0;
+    c6t_elem->value[14] = maxks>3?(ks_param->double_array->a[3]):0.0;
     c6t_elem->value[15] = maxps>1?(ps_param->double_array->a[1]):0.0;
     c6t_elem->value[16] = maxps>2?(ps_param->double_array->a[2]):0.0;
     c6t_elem->value[17] = maxps>3?(ps_param->double_array->a[3]):0.0;
@@ -2652,13 +2653,13 @@ write_all_el(void)
 
 static void write_rfmultipole(struct c6t_element* el)
 {
-  double knl[] = {
+  const double knl[] = {
     el->value[4],
     el->value[5],
     el->value[6],
     el->value[7]
   };
-  double ksl[] = {
+  const double ksl[] = {
     0.0,
     el->value[12],
     el->value[13],
@@ -2667,7 +2668,7 @@ static void write_rfmultipole(struct c6t_element* el)
   double tilt = el->value[2];
   double freq = el->value[3];
   char name[48];
-  if (fabs(knl[0])) {
+  if (fabs(knl[0])>eps_9) {
     double lag = 0.25-el->value[8];
     double pc0 = get_value("beam", "pc"); // GeV/c
     el->out_1 = fabs(tilt - M_PI/2)<eps_9 ? -23 : 23; // ID
@@ -2679,10 +2680,10 @@ static void write_rfmultipole(struct c6t_element* el)
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
-  if (fabs(knl[1])) {
+  if (fabs(knl[1])>eps_9) {
     double lag = -el->value[9];
     el->out_1 = 26; // ID
-    el->out_2 = knl[1]; // rad * GeV/c * 1e3 == rad * MeV/c
+    el->out_2 = -knl[1]; // rad * GeV/c * 1e3 == rad * MeV/c
     el->out_3 = freq; // freq
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
@@ -2690,10 +2691,10 @@ static void write_rfmultipole(struct c6t_element* el)
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
-  if (fabs(knl[2])) {
+  if (fabs(knl[2])>eps_9) {
     double lag = -el->value[10];
     el->out_1 = 27; // ID
-    el->out_2 = knl[2]; // rad * GeV/c * 1e3 == rad * MeV/c
+    el->out_2 = -knl[2] / 2.0; // rad * GeV/c * 1e3 == rad * MeV/c
     el->out_3 = freq; // freq
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
@@ -2701,10 +2702,10 @@ static void write_rfmultipole(struct c6t_element* el)
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
-  if (fabs(knl[3])) {
+  if (fabs(knl[3])>eps_9) {
     double lag = -el->value[11];
     el->out_1 = 28; // ID
-    el->out_2 = knl[3]; // rad * GeV/c * 1e3 == rad * MeV/c
+    el->out_2 = -knl[3] / 6.0; // rad * GeV/c * 1e3 == rad * MeV/c
     el->out_3 = freq; // freq
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
@@ -2712,7 +2713,7 @@ static void write_rfmultipole(struct c6t_element* el)
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
-  if (fabs(ksl[1])) {
+  if (fabs(ksl[1])>eps_9) {
     double lag = -el->value[15];
     el->out_1 = -26; // ID
     el->out_2 = ksl[1]; // rad * GeV/c * 1e3 == rad * MeV/c
@@ -2723,10 +2724,10 @@ static void write_rfmultipole(struct c6t_element* el)
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
-  if (fabs(ksl[2])) {
+  if (fabs(ksl[2])>eps_9) {
     double lag = -el->value[16];
     el->out_1 = -27; // ID
-    el->out_2 = ksl[2]; // rad * GeV/c * 1e3 == rad * MeV/c
+    el->out_2 = ksl[2] / 2.0; // rad * GeV/c * 1e3 == rad * MeV/c
     el->out_3 = freq; // freq
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
@@ -2734,10 +2735,10 @@ static void write_rfmultipole(struct c6t_element* el)
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
-  if (fabs(ksl[3])) {
+  if (fabs(ksl[3])>eps_9) {
     double lag = -el->value[17];
     el->out_1 = -28; // ID
-    el->out_2 = ksl[3]; // rad * GeV/c * 1e3 == rad * MeV/c
+    el->out_2 = ksl[3] / 6.0; // rad * GeV/c * 1e3 == rad * MeV/c
     el->out_3 = freq; // freq
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
@@ -3110,52 +3111,51 @@ write_f3_mult(struct c6t_element* el)
 static void
 rfmultipole_name(char *name, struct c6t_element* el)
 {
-  char tmp[256] = "";
-  int n = 0;
-
-  double knl[] = {
+  const double knl[] = {
     el->value[4],
     el->value[5],
     el->value[6],
     el->value[7]
   };
-  double ksl[] = {
+  const double ksl[] = {
     0.0,
     el->value[12],
     el->value[13],
     el->value[14]
   };
-  if (fabs(knl[0])) {
+  char tmp[256] = "";
+  int n = 0;
+  if (fabs(knl[0])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "_d");
     n += sprintf(name+n, "%-18s", tmp);
   }
-  if (fabs(knl[1])) {
+  if (fabs(knl[1])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "_q");
     n += sprintf(name+n, "%-18s", tmp);
   }
-  if (fabs(knl[2])) {
+  if (fabs(knl[2])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "_s");
     n += sprintf(name+n, "%-18s", tmp);	
   }
-  if (fabs(knl[3])) {
+  if (fabs(knl[3])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "_o");
     n += sprintf(name+n, "%-18s", tmp);
   }
-  if (fabs(ksl[1])) {
+  if (fabs(ksl[1])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "_q");
     n += sprintf(name+n, "%-18s", tmp);	
   }
-  if (fabs(ksl[2])) {
+  if (fabs(ksl[2])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "_s");
     n += sprintf(name+n, "%-18s", tmp);
   }
-  if (fabs(ksl[3])) {
+  if (fabs(ksl[3])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "_o");
     n += sprintf(name+n, "%-18s", tmp);
