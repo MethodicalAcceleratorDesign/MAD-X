@@ -2672,7 +2672,7 @@ static void write_rfmultipole(struct c6t_element* el)
     double lag = 0.25-el->value[8];
     double pc0 = get_value("beam", "pc"); // GeV/c
     el->out_1 = fabs(tilt - M_PI/2)<eps_9 ? -23 : 23; // ID
-    el->out_2 = knl[0] * pc0 * 1e3; // rad * GeV/c * 1e3 == rad * MeV/c
+    el->out_2 = knl[0] * pc0 * 1e3; // rad * GeV/c * 1e3 == rad * MeV/c => MV
     el->out_3 = freq; // freq
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
@@ -2683,7 +2683,7 @@ static void write_rfmultipole(struct c6t_element* el)
   if (fabs(knl[1])>eps_9) {
     double lag = -el->value[9];
     el->out_1 = 26; // ID
-    el->out_2 = -knl[1]; // rad * GeV/c * 1e3 == rad * MeV/c
+    el->out_2 = -knl[1]; // 1/m
     el->out_3 = freq; // freq
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
@@ -2694,7 +2694,7 @@ static void write_rfmultipole(struct c6t_element* el)
   if (fabs(knl[2])>eps_9) {
     double lag = -el->value[10];
     el->out_1 = 27; // ID
-    el->out_2 = -knl[2] / 2.0; // rad * GeV/c * 1e3 == rad * MeV/c
+    el->out_2 = -knl[2] / 2.0; // 1/m^2
     el->out_3 = freq; // freq
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
@@ -2705,7 +2705,7 @@ static void write_rfmultipole(struct c6t_element* el)
   if (fabs(knl[3])>eps_9) {
     double lag = -el->value[11];
     el->out_1 = 28; // ID
-    el->out_2 = -knl[3] / 6.0; // rad * GeV/c * 1e3 == rad * MeV/c
+    el->out_2 = -knl[3] / 6.0; // 1/m^3
     el->out_3 = freq; // freq
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
@@ -2716,7 +2716,7 @@ static void write_rfmultipole(struct c6t_element* el)
   if (fabs(ksl[1])>eps_9) {
     double lag = -el->value[15];
     el->out_1 = -26; // ID
-    el->out_2 = ksl[1]; // rad * GeV/c * 1e3 == rad * MeV/c
+    el->out_2 = ksl[1]; // 1/m
     el->out_3 = freq; // freq
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
@@ -2727,7 +2727,7 @@ static void write_rfmultipole(struct c6t_element* el)
   if (fabs(ksl[2])>eps_9) {
     double lag = -el->value[16];
     el->out_1 = -27; // ID
-    el->out_2 = ksl[2] / 2.0; // rad * GeV/c * 1e3 == rad * MeV/c
+    el->out_2 = ksl[2] / 2.0; // 1/m^2
     el->out_3 = freq; // freq
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
@@ -2738,7 +2738,7 @@ static void write_rfmultipole(struct c6t_element* el)
   if (fabs(ksl[3])>eps_9) {
     double lag = -el->value[17];
     el->out_1 = -28; // ID
-    el->out_2 = ksl[3] / 6.0; // rad * GeV/c * 1e3 == rad * MeV/c
+    el->out_2 = ksl[3] / 6.0; // 1/m^3
     el->out_3 = freq; // freq
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
