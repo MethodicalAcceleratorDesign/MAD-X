@@ -60,6 +60,4 @@ plot, file=plot2, table=tracktwo, trackfile=plot2, noversion, multiple,
 plot, file=plot2, table=tracktwo, trackfile=plot2, noversion, multiple, 
       haxis=y, vaxis=py, particle=1,2,3,4;
 
-removefile,file=plot2one;
-
 exit;
