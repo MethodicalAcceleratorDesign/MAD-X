@@ -2676,7 +2676,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_3 = freq; // freq
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
-    strcat(name, "_d");
+    strcat(name, "d");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
@@ -2687,7 +2687,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_3 = freq; // freq
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
-    strcat(name, "_q");
+    strcat(name, "q");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
@@ -2698,7 +2698,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_3 = freq; // freq
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
-    strcat(name, "_s");
+    strcat(name, "s");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
@@ -2709,7 +2709,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_3 = freq; // freq
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
-    strcat(name, "_o");
+    strcat(name, "o");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
@@ -2720,7 +2720,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_3 = freq; // freq
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
-    strcat(name, "_q");
+    strcat(name, "qs");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
@@ -2731,7 +2731,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_3 = freq; // freq
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
-    strcat(name, "_s");
+    strcat(name, "ss");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
@@ -2742,7 +2742,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_3 = freq; // freq
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
-    strcat(name, "_o");
+    strcat(name, "os");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
@@ -3127,37 +3127,37 @@ rfmultipole_name(char *name, struct c6t_element* el)
   int n = 0;
   if (fabs(knl[0])>eps_9) {
     strcpy(tmp, el->name);
-    strcat(tmp, "_d");
+    strcat(tmp, "d");
     n += sprintf(name+n, "%-18s", tmp);
   }
   if (fabs(knl[1])>eps_9) {
     strcpy(tmp, el->name);
-    strcat(tmp, "_q");
+    strcat(tmp, "q");
     n += sprintf(name+n, "%-18s", tmp);
   }
   if (fabs(knl[2])>eps_9) {
     strcpy(tmp, el->name);
-    strcat(tmp, "_s");
+    strcat(tmp, "s");
     n += sprintf(name+n, "%-18s", tmp);	
   }
   if (fabs(knl[3])>eps_9) {
     strcpy(tmp, el->name);
-    strcat(tmp, "_o");
+    strcat(tmp, "o");
     n += sprintf(name+n, "%-18s", tmp);
   }
   if (fabs(ksl[1])>eps_9) {
     strcpy(tmp, el->name);
-    strcat(tmp, "_q");
+    strcat(tmp, "qs");
     n += sprintf(name+n, "%-18s", tmp);	
   }
   if (fabs(ksl[2])>eps_9) {
     strcpy(tmp, el->name);
-    strcat(tmp, "_s");
+    strcat(tmp, "ss");
     n += sprintf(name+n, "%-18s", tmp);
   }
   if (fabs(ksl[3])>eps_9) {
     strcpy(tmp, el->name);
-    strcat(tmp, "_o");
+    strcat(tmp, "os");
     n += sprintf(name+n, "%-18s", tmp);
   }
 }
