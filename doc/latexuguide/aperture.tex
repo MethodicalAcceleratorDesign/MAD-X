@@ -59,10 +59,7 @@ The minimum aperture definition uses the following two attributes:
         {\tt RECTANGLE}
       \ttitem{RACETRACK} a circle separated in four
       quartercircles, one per quadrant, and connected by straight lines.
-      \begin{5.02.05}
-      \ttitem{OCTAGON} a simply connex octagon\note[GR]{This is an addition in 
-      5.02.05 per request \# 324 in TRAC}
-      \end{5.02.05}
+      \ttitem{OCTAGON} a simply connex octagon
     \end{madlist}
     or from a file if a filename is provided as argument. The file contains a 
     list of x and y coordinates outlining the complete aperture shape and no 
@@ -77,35 +74,6 @@ crossing at right angle) is no longer supported.
 of which depends on the {\tt APERTYPE}.  
 \end{madlist}
 
-
-\begin{5.02.04}
-\begin{tabular}{|l | c | p{9cm}|}
-\hline 
-{\bf APERTYPE} & {\bf \# of values} & {\bf meaning of values}\\
-\hline
-{\tt CIRCLE} & 1 &  radius of circle \\ 
-\hline
-{\tt RECTANGLE} & 2 & half width and half height of rectangle\\ 
-\hline
-{\tt ELLIPSE} & 2 & horizontal an vertical semi-axes of ellipse \\  
-\hline
-{\tt RECTCIRCLE} or {\tt LHCSCREEN} & 3 & half width and half height of 
-rectangle, radius of 
-circle\\
-\hline
-%MARGUERITE & 3 & half width and half height of rectangle, radius of circle\\  
-%\hline
-{\tt RECTELLIPSE} & 4 & half width and half height of rectangle, horizontal
-and vertical semi-axes of ellipse \\  
-\hline
-{\tt RACETRACK} & 3 & horizontal and vertical offsets (g and s) of the circle 
-center, radius (r) of the circular part (see figure below)\\  
-\hline
-\end{tabular}
-\end{5.02.04}
-
-\begin{5.02.05}
-\\
 \begin{tabular}{|l | c | p{9cm}|}
 	\hline 
 	{\bf APERTYPE} & {\bf \# of values} & {\bf meaning of values}\\
@@ -117,30 +85,19 @@ center, radius (r) of the circular part (see figure below)\\
 	{\tt ELLIPSE} & 2 & horizontal an vertical semi-axes of ellipse \\  
 	\hline
 	{\tt RECTCIRCLE} or {\tt LHCSCREEN} & 3 & half width and half height of 
-	rectangle, radius of 
-	circle\\  
+	rectangle, radius of circle\\  
 	\hline
-%	MARGUERITE & 3 & half width and half height of rectangle, radius of 
-%	circle\\  
-%	\hline
 	{\tt RECTELLIPSE} & 4 & half width and half height of rectangle, horizontal
 	and vertical semi-axes of ellipse \\
 	\hline
 	{\tt RACETRACK} & 3 & horizontal and vertical offsets (g and s) of the 
 	circle center, radius (r) of the circular part (see figure below)\\
 	\hline
-	{\tt OCTAGON} & 4 & horizontal and vertical extents along axes, two angles 
-	sustaining the cut corner. \note[GR]{This is an addition in 5.02.05 per 
-	request \# 324 in TRAC}\\
-	\hline
-	{\tt OCTAGON} (var.) & 4 & horizontal and vertical positions of the two 
-	points in the 
-	first quadrant. \note[GR]{This is a variant for the addition in 5.02.05 per 
-	request \# 324 in TRAC}\\
+	{\tt OCTAGON} & 4 & half width and half height along main axes,
+        two angles sustaining the cut corner in the first quadrant,
+        given in radians and in order of increasing values. \\   
 	\hline
 \end{tabular}
-\\
-\end{5.02.05}
 \vskip 5mm
 
 

@@ -355,7 +355,7 @@ aper_fill_quadrants(double polyx[], double polyy[], int quarterlength, int* halo
   int i,j;
   int debug = get_option("debug");
 
-  if (debug) printf("+++ aper_fill_quadrants: quarterlength = %d", quarterlength);
+  if (debug) printf("+++ aper_fill_quadrants: quarterlength = %d\n", quarterlength);
   
   // The counter i starts at quarterlength+1, ie the first point to be mirrored.
   i=quarterlength+1;
@@ -586,6 +586,27 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
     return 1;    
   }
   
+  // 2015-Feb-05  18:35:01  ghislain: adding octagon aperture type
+  else if (!strcmp(apertype,"octagon")) {
+    *ap1=get_aperture(current_node, "var1"); /*half width rect ; >= 0 */
+    *ap2=get_aperture(current_node, "var2"); /*half height rect ; >=0 */
+    *ap3=get_aperture(current_node, "var3"); /*first angle ; >=0, <=pi/2 */
+    *ap4=get_aperture(current_node, "var4"); /*second angle ; >=0, <=pi/2, >= *ap3*/
+    
+    if ( (*ap1) < 0 || (*ap2) < 0 || (*ap3) < 0 || (*ap4) < 0 || (*ap3) > pi/2 || (*ap4) > pi/2 || (*ap4) < (*ap3))  { 
+      if (debug) 
+	printf("+++ aper_build screen, octagon parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
+      return 0;
+    }
+
+    quarterlength = 1;
+    pipex[0] = (*ap1); pipey[0] = (*ap1)*tan((*ap3));
+    pipex[1] = (*ap2)*tan(pi/2 - (*ap4)); pipey[1] = (*ap2);
+
+    aper_fill_quadrants(pipex, pipey, quarterlength, pipelength); 
+    return 1;    
+  }
+
   else if (strlen(apertype)) { 
     // general case, assume the given type is a filename
     *pipelength = aper_external_file(apertype, pipex, pipey);

@@ -1042,6 +1042,19 @@ A {\tt CRABCAVITY} has five real attributes and seven integer attributes:
     However, for deflecting structures this makes no sense, and the 
     frequency is mandatory.} 
 
+  \ttitem{HARMON} The harmonic number \textit{h} (no default). \\
+  Only if the frequency is not given. 
+
+% \item BETRF: RF coupling factor (default: 0).
+% \item PG: The RF power per cavity (default: 0 MW).
+% \item SHUNT: The relative shunt impedance (default: 0 MOhm/m).
+% \item TFILL: The filling time of the cavity T<sub>fill</sub> (default: 0 microseconds). 
+%\item EPHASE: Value of the final crab RF phase [2pi] with respect to  nominal value (default: 0). 
+\end{madlist}
+
+The other attributes describe the time evolution of a {\tt CRABCAVITY} behavior:
+
+{\begin{madlist}  
   \ttitem{RV1} Number of initial turns with zero voltage (default: 0). 
   \ttitem{RV2} Number of turns to ramp voltage from zero to nominal value (default: 0). 
   \ttitem{RV3} Number of turns with nominal voltage (default: 0). 
@@ -1053,32 +1066,21 @@ A {\tt CRABCAVITY} has five real attributes and seven integer attributes:
   \ttitem{RPH2} Number of turns to ramp phase [2pi] from nominal to
     specified value \\ (default:~0). 
 
-  \ttitem{HARMON} The harmonic number \textit{h} (no default). \\
-    Only if the frequency is not given. 
-
-% \item BETRF: RF coupling factor (default: 0).
-% \item PG: The RF power per cavity (default: 0 MW).
-% \item SHUNT: The relative shunt impedance (default: 0 MOhm/m).
-% \item TFILL: The filling time of the cavity T<sub>fill</sub> (default: 0 microseconds). 
-%\item EPHASE: Value of the final crab RF phase [2pi] with respect to  nominal value (default: 0). 
 \end{madlist}
-
 
 {\bf Caveats:}
 \begin{itemize}
-   \item \textit{ Please take note, that the following \madeight attributes:
+   \item Please take note, that the following \madeight attributes:
      {\tt BETRF, PG, SHUNT} and {\tt TFILL} are currently not implemented in 
-     \madx!}
-   \item \textit{ Note that crab cavities are only implemented for
+     \madx!
+   \item Note that crab cavities are only implemented for
      tracking  purposes. \\ \hyperref[chap:twiss]{\tt TWISS} ignores any effect 
      of the crab cavity.  
      % as well that twiss is 4D only. As a consequence the TWISS
      % parameters in the plane of non-zero dispersion may not close as
      % expected. Therefore, it is best to perform TWISS in 4D only, i.e. with
      % cavities switched off. If 6D is needed one has to use the
-     % 
      % <a href="../ptc_twiss/ptc_twiss.html">ptc_twiss</a> command. 
-   }
 \end{itemize} 
 
 %A cavity requires the particle energy (\href{beam.html#energy}{ENERGY})
@@ -1086,18 +1088,16 @@ A {\tt CRABCAVITY} has five real attributes and seven integer attributes:
 %a \href{beam.html}{BEAM} command before any calculation is performed. 
 
 Before any calculation is performed with a {\tt CRABCAVITY}, the particle
-energy (\hyperref[sec:beam]{ENERGY}) and the particle charge
-(\hyperref[sec:beam]{CHARGE}) must be set with  a
-\hyperref[sec:beam]{BEAM} command.   
+\hyperref[sec:beam]{\tt ENERGY} and the particle \hyperref[sec:beam]{\tt CHARGE} 
+must be set with the \hyperref[sec:beam]{\tt BEAM} command.   
 
-Then the effect of the {\tt CRABCAVITY} on particle coordinates during tracking 
-is
+The effect of a {\tt CRABCAVITY} on particle coordinates during tracking is
 \\
-\\ delta(\textit{px})  = VOLT * sin( PHI - OMEGA * t) 
-\\ delta(\textit{E})  = -  VOLT * OMEGA * x * cos(PHI - OMEGA * t) 
+\\ $\delta p_x$  = {\tt VOLT * }$\sin${\tt(PHI - OMEGA * t)} 
+\\ $\delta E$  = {\tt- VOLT * OMEGA * x * }$\cos${\tt(PHI - OMEGA * t)} 
 \\ 
-\\ where PHI =  2 $\pi$ * (LAG - HARMON * \textit{f$_0$ t}), 
-\\ and OMEGA = 2 $\pi$ * FREQ / \textit{c}
+\\ where {\tt PHI =  $2\pi$ * (LAG - HARMON * $f_0$ t)}, 
+\\ and {\tt OMEGA = $2\pi$ * FREQ / $c$}
 \\
 % delta(<i>E</i>) = VOLT * 
 % sin(2 pi * (LAG - HARMON * <i>f<sub>0</sub> t</i>)). 

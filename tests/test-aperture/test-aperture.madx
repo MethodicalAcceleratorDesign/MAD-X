@@ -1,4 +1,4 @@
-title,'LHC Cell APERTURE example, BJ Aug2009';
+title,'LHC Cell APERTURE example';
 
 REAL CONST ANGLE.MB = TWOPI/8/(23*6+2*2*4);
 
@@ -10,39 +10,41 @@ REAL CONST drift2 = 1.02;
 REAL CONST drift3 = 1.74;
 
 len_half_cell = l.MQ+drift1+3*l.MB+2*drift2+drift3;
-value, len_half_cell;
+Value, len_half_cell;
 
 !!!! apertures
-a=0.022; b=0.018; h=0.022; v=0.022;
+a=0.022; b=0.018; h=0.022; v=0.022; an1=pi/6; an2=pi/3;
 !!!! tolerances
 th=0.001; tv=0.0005; tr=0.001;
 
-MB: SBEND, L := l.MB, angle = ANGLE.MB;
-MQ: QUADRUPOLE, L := l.MQ, apertype=rectellipse,aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+offset=1.e-3;
+off3 := 1.e-3*l.MQ*l.MQ;
+off2 := 2.e-3 * l.MQ;
+off1 = 3.e-3;
+
+MB: SBEND, L=l.MB, angle=ANGLE.MB;
+MQ: QUADRUPOLE, L=l.MQ, apertype=rectellipse,aperture = {a,b,h,v}, aper_tol = {th,tv,tr}
+                aper_offset={off1, off2, off3, offset*l.MQ, 0.005-l.MQ, 0.006+l.MQ};
 
 kqf =  0.008703550815;
 kqd = -0.008705002933;
 
-LHCCELL: SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
- 
-  MQ1: MQ, k1:= kqf, at= 0.;
-
+LHCCELL: SEQUENCE, refer = ENTRY, L = 2*len_half_cell; 
+  MQ1: MQ,  at= 0., k1=kqf;
   MB1: MB,  at= l.MQ+drift1 ,
 	    apertype=circle, aperture = {a}, aper_tol = {th,tv,tr};
   MB2: MB,  at= l.MQ+drift1+l.mb+drift2,
 	    apertype=ellipse, aperture = {a,b}, aper_tol = {th,tv,tr};
   MB3: MB,  at= l.MQ+drift1+2*(l.mb+drift2),
 	    apertype=rectangle, aperture = {a,b}, aper_tol = {th,tv,tr};
-
-  MQ2: MQ, k1 := kqd,  at=  len_half_cell;
-
+  MQ2: MQ,  at=  len_half_cell, k1 := kqd,
+            apertype=octagon, aperture={a,b,an1,an2}, aper_tol = {th,tv,tr};
   MB4: MB,  at= len_half_cell + l.MQ+drift1 ,
 	    apertype=rectcircle, aperture = {a,b,h}, aper_tol = {th,tv,tr};
   MB5: MB,  at= len_half_cell + l.MQ+drift1+l.mb+drift2,
 	    apertype=lhcscreen, aperture = {a,b,h}, aper_tol = {th,tv,tr};
   MB6: MB,  at= len_half_cell + l.MQ+drift1+2*(l.mb+drift2),
 	    apertype=racetrack, aperture = {a,b,h/5.}, aper_tol = {th,tv,tr};
-
 endsequence;
 
 beam,particle=proton,energy=450.0, exn=3.75e-6, eyn=3.75e-6;
@@ -69,26 +71,23 @@ Value, beam->n1min;
 
 c=-0.022; d=0.; h2=0.0; v2=-0.022;
 
-LHCCEL2: SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
- 
-  MQ11: MQ, k1:= kqf, at= 0., aperture = {c,d,h2,v2};
-
+LHCCEL2: SEQUENCE, refer = ENTRY, L = 2*len_half_cell; 
+  MQ11: MQ, k1= kqf, at= 0., aperture = {c,d,h2,v2},
+           aper_offset={off1, off2, off3, offset*l.MQ, 0.005-l.MQ, 0.0};
   MB11: MB,  at= l.MQ+drift1 ,
 	    apertype=circle, aperture = {c}, aper_tol = {th,tv,tr};
   MB21: MB,  at= l.MQ+drift1+l.mb+drift2,
 	    apertype=ellipse, aperture = {c,d}, aper_tol = {th,tv,tr};
   MB31: MB,  at= l.MQ+drift1+2*(l.mb+drift2),
 	    apertype=rectangle, aperture = {c,d}, aper_tol = {th,tv,tr};
-
-  MQ21: MQ, k1 := kqd,  at=  len_half_cell, aperture = {c,d,h2,v2};
-
+  MQ21: MQ, k1= kqd,  at=  len_half_cell, 
+            apertype=octagon, aperture = {c,d,an2,an1}, aper_tol = {th,tv,tr};
   MB41: MB,  at= len_half_cell + l.MQ+drift1 ,
 	    apertype=rectcircle, aperture = {c,d,h2}, aper_tol = {th,tv,tr};
   MB51: MB,  at= len_half_cell + l.MQ+drift1+l.mb+drift2,
 	    apertype=lhcscreen, aperture = {c,d,h2}, aper_tol = {th,tv,tr};
   MB61: MB,  at= len_half_cell + l.MQ+drift1+2*(l.mb+drift2),
 	    apertype=racetrack, aperture = {c,d,h2/5.}, aper_tol = {th,tv,tr};
-
 endsequence;
 
 beam,particle=proton,energy=450.0, exn=3.75e-6, eyn=3.75e-6;
@@ -102,9 +101,13 @@ twiss, sequence=LHCCEL2;
 !!! uses default beam and halo data (lhc at injection)
 select, flag=aperture, clear;
 select, flag=aperture, column=name,s,betx,bety,dx,x,y,n1,apertype,xtol,ytol,rtol;
-option, debug;
+option, debug=true;
 aperture, dqf=2.086, betaqfx=170.25, dp=0.0015, 
           dparx=0.273, dpary=0.273, cor=0.004, bbeat=1.1, 
           nco=5, interval=1, halo={6., 8.4, 7.3, 7.3};
+option, debug=false;
+
+value, aperture->nco;
+value, beam->n1min;
 
 stop;
