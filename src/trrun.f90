@@ -3336,8 +3336,10 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
      case("octagon")
         ! 2015-Feb-20  18:42:26  ghislain: added octagon shape           
         !*** case of octagon: test outer rectangle (ap1,ap2) then test cut corner.
-        if ( x .gt. ap1 .or. y .gt. ap2 ) lost = .true.
-        
+        if ( x .gt. ap1 .or. y .gt. ap2 .or. & 
+             (ap2*tan(pi/2 - ap4) - ap1)*(y - ap1*tan(ap3)) - (ap2 - ap1*tan(ap3))*(x - ap1) .lt. 0) & 
+             lost = .true.
+
      case default
         
      end select
