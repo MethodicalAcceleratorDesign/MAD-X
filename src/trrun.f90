@@ -4070,6 +4070,7 @@ subroutine ixy_fitting()
   double precision get_value
   double precision ce10
   double precision c_sumx, y_sumx, t_sumx, c_sumy, y_sumy, t_sumy, a_sum
+  double precision :: J0x=0d0, J0y=0d0, Sum_Jx=0d0, Sum_Jy=0d0 
   parameter(ce10=1d10)
   integer i_for_I
 
@@ -4165,6 +4166,29 @@ subroutine ixy_fitting()
      Iy_min_last=Iy_min
   ENDDO iii_loop_y
 
+!New normalisation of the emittance calculation to exclude artificial collapses
+!R.Wasef
+  J0x=0d0
+  J0y=0d0
+  jjj_loop_ray: DO jjj=1,N_for_I
+           J0x=J0x+Ix_sorted(jjj)
+           J0y=J0y+Iy_sorted(jjj)
+  ENDDO jjj_loop_ray
+  J0x=J0x/(N_for_I_dble*N_for_I_dble)
+  J0y=J0y/(N_for_I_dble*N_for_I_dble)
+  J0x=J0x*J0x
+  J0y=J0y*J0y
+  
+  Sum_Jx=0d0
+  Sum_Jy=0d0
+  jjj_loop_ray2: DO jjj=1,N_for_I
+          Sum_Jx=Sum_Jx+( (Ix_sorted(jjj)*Ix_sorted(jjj)) /( J0x+(Ix_sorted(jjj)*Ix_sorted(jjj)) ) )
+          Sum_Jy=Sum_Jy+( (Iy_sorted(jjj)*Iy_sorted(jjj)) /( J0y+(Iy_sorted(jjj)*Iy_sorted(jjj)) ) )
+  ENDDO jjj_loop_ray2
+
+
+
+
 
   !     Summ of step-function for Ex/Ey evaluation
   !     Kahan summation algorithm
@@ -4175,10 +4199,10 @@ subroutine ixy_fitting()
   alpha = get_value('run ', 'alpha ')
 !!!!!$OMP PARALLEL PRIVATE(iii,a_sum,c_sumx,c_sumy,y_sumx,y_sumy,t_sumx,t_sumy)
 !!!!!$OMP DO REDUCTION(+:Summ_x,Summ_y)
-  Summ_loop: DO iii=1,N_for_I
+  Summ_loop: DO iii=1,N_for_I    !!! the first particle is shifted
      a_sum=Log(1d0-(alpha+dble(iii-1))/N_for_I_dble)
-     y_sumx=a_sum/Ix_sorted(iii)-c_sumx
-     y_sumy=a_sum/Iy_sorted(iii)-c_sumy
+     y_sumx=(Ix_sorted(iii)/(Ix_sorted(iii)*Ix_sorted(iii)+J0x))*a_sum/Sum_Jx-c_sumx
+     y_sumy=(Iy_sorted(iii)/(Iy_sorted(iii)*Iy_sorted(iii)+J0y))*a_sum/Sum_Jy-c_sumy
      t_sumx=Summ_x+y_sumx
      t_sumy=Summ_y+y_sumy
      c_sumx=(t_sumx-Summ_x)-y_sumx
@@ -4188,9 +4212,8 @@ subroutine ixy_fitting()
   ENDDO Summ_loop
 !!!!!$OMP END DO
 !!!!!$OMP END PARALLEL
-  Ex_rms=-N_for_I_dble
-  Ey_rms=Ex_rms/Summ_y
-  Ex_rms=Ex_rms/Summ_x
+  Ey_rms=-1d0/Summ_y
+  Ex_rms=-1d0/Summ_x
 
   return
 
