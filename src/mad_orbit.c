@@ -670,11 +670,9 @@ static void correct_correct2(struct in_cmd* cmd)
   /* If only Twiss summary is required prepare and write it */
   // Jun 26, 2013 8:06:33 PM ghislain : moved up from **twiss summary**
   if ((twism = command_par_value("twissum", cmd->clone)) > 0) {
-    if (ftdata == NULL ) {
-      if ((ftdata = fopen("twiss.summ", "w")) == NULL )
-	fatal_error("Cannot open file twiss.summ with write access", ", MAD-X terminates ");
-        //exit(99);
-    }
+
+    if (!ftdata && !(ftdata = fopen("twiss.sum" , "w"))) 
+      fatal_error("Cannot open file twiss.sum with write access", ", MAD-X terminates ");
 
     j = 1;
     if ((nnnseq = get_variable("n")) == 0)   nnnseq = twism;
@@ -685,6 +683,7 @@ static void correct_correct2(struct in_cmd* cmd)
     double_from_table_row("summ", "ycorms", &j, &tmp4); // err = not used
     fprintf(ftdata, " T: %d %e %e %e %e\n", nnnseq, tmp1, tmp2, tmp3, tmp4);
     printf("TWISSUM: Data from twiss summary written to twiss.summ; aborting correction\n");
+    fflush(ftdata);
     return; // abort the correction here
   }
 
@@ -711,23 +710,13 @@ static void correct_correct2(struct in_cmd* cmd)
 
   /* Prepare file descriptors for the output */
   if (command_par_value("resout", cmd->clone) > 0) {
-    if (fddata == NULL ) {
-      if ((fddata = fopen("corr.out", "w")) == NULL )
-	fatal_error("Cannot open file corr.out with write access", ", MAD-X terminates ");
-        //exit(99);
-    }
-    if (fcdata == NULL ) {
-      if ((fcdata = fopen("stren.out", "w")) == NULL )
-	fatal_error("Cannot open file stren.out with write access", ", MAD-X terminates ");
-        //exit(99);
-    }
-    if (fgdata == NULL ) {
-      if ((fgdata = fopen("plot.orb", "w")) == NULL )
-	fatal_error("Cannot open file plot.orb with write access", ", MAD-X terminates ");
-        //exit(99);
-    }
+    if (!fddata && !(fddata = fopen("corr.out" , "w"))) 
+      fatal_error("Cannot open file corr.out with write access", ", MAD-X terminates ");
+    if (!fcdata && !(fcdata = fopen("stren.out", "w"))) 	
+      fatal_error("Cannot open file stren.out with write access", ", MAD-X terminates ");
+    if (!fgdata && !(fgdata = fopen("plot.orb", "w"))) 	
+      fatal_error("Cannot open file plot.orb with write access", ", MAD-X terminates ");
   }
-
 
   /* allocate vectors used by correction algorithms */
   nx =     mycalloc_atomic("correct_correct2_nx",     ncorr,    sizeof *nx);
@@ -816,6 +805,7 @@ static void correct_correct2(struct in_cmd* cmd)
       for (i = 0; i < nmon; i++) {
 	fprintf(fgdata, "%e %e \n", monvec[i], resvec[i]);
       }
+      fflush(fgdata);
     }
 
     /*
@@ -1658,6 +1648,10 @@ static void pro_correct2_write_results(double *monvec, double *resvec,
     }
 
   } /* end loop over correctors */
+
+  if (fcdata != NULL ) fflush(fcdata);
+  if (fddata != NULL ) fflush(fddata);  
+
 }
 
 static void correct_correct1(struct in_cmd* cmd)
@@ -1705,6 +1699,7 @@ static void correct_correct1(struct in_cmd* cmd)
     double_from_table_row("summ", "ycorms", &j, &tmp4); // err = not used
     fprintf(ftdata, " T: %d %e %e %e %e\n", nnnseq, tmp1, tmp2, tmp3, tmp4);
     printf("TWISSUM: Data from twiss summary written to twiss.summ; aborting correction\n");
+    fflush(ftdata);
     return; // abort the correction here
   }
 
@@ -1727,9 +1722,9 @@ static void correct_correct1(struct in_cmd* cmd)
   /* Prepare file descriptors for the output */
   if (command_par_value("resout", cmd->clone) > 0) {
     if (!fddata && !(fddata = fopen("corr.out" , "w"))) 
-      fatal_error("Cannot open file corr.out with write access", ", MAD-X terminates "); //exit(99);
+      fatal_error("Cannot open file corr.out with write access", ", MAD-X terminates ");
     if (!fcdata && !(fcdata = fopen("stren.out", "w"))) 	
-      fatal_error("Cannot open file stren.out with write access", ", MAD-X terminates "); //exit(99);
+      fatal_error("Cannot open file stren.out with write access", ", MAD-X terminates ");
   }
 
   // Jun 26, 2013 8:07:01 PM ghislain : **twiss summary** was here
@@ -3210,6 +3205,10 @@ static void pro_correct_write_results(double *monvec, double *resvec,
       }
     }
   } /* end of loop over correctors */
+  
+  if (fcdata != NULL ) fflush(fcdata);
+  if (fddata != NULL ) fflush(fddata);
+
 }
 
 static int pro_correct_getactive(int ip, int *nm, int *nx, int *nc,
