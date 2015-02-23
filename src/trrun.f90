@@ -149,9 +149,10 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
 
   if(switch.eq.1) then
      bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
-!FRS open unit 90 filename=checkpoint_restart.dat to prolong run
-     open(90,file='checkpoint_restart.dat',form='unformatted',status='unknown')
      checkpnt_restart = get_value('run ', 'checkpnt_restart ') .ne. 0d0
+     ! 2015-Feb-23  16:20:19  ghislain: open file only when necessary
+     if (checkpnt_restart) &
+          open(90,file='checkpoint_restart.dat',form='unformatted',status='unknown')
   else
      bb_sxy_update = .false.
      checkpnt_restart = .false.
@@ -876,9 +877,11 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      call get_node_vector('aper_offset ',nn,offset)
 
      if (optiondebug .ne. 0) then
-        print *, " aperture type ", aptype
+        print *, " aperture type       ", aptype
         print *, "          parameters ", (aperture(i),i=1,4)
-        print *, "          offsets  ", (offset(i),i=1,2)
+        print *, "          offsets    ", (offset(i),i=1,2)
+        print *, " alignment errors    ", (al_errors(i),i=11,12)
+        print *, " maximum aperture    ", (offset(i),i=1,2)
         print *, " "
      endif
      
@@ -3153,9 +3156,6 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
 
   optiondebug = get_option('debug ')
 
-  if (optiondebug .ne. 0) print *, "trcoll2 called with parameters: apertype, aperture, offset, al_errors, maxaper : ", &
-       apertype, (aperture(i), i=1,4), (offset(i),i=1,2), (al_errors(i),i=11,12),(maxaper(i),i=1,6)
-
   !--- First check aperture parameters  
      ap1 = zero
      ap2 = zero
@@ -3287,7 +3287,8 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
         endif
         
      case default
-        ! add error case for un-identified aperture type
+        ! add error case for un-identified aperture type; 
+        ! this INCLUDES the case of aperture data given in file with input APERTYPE=filename!
         call aawarn('trcoll:','called with unknown aperture type. Ignored')
         
      end select
@@ -3321,24 +3322,23 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
         lost =  x .gt. ap1 .or. y .gt. ap2
         
      case("lhcscreen", "rectcircle")
-        lost = (x/ap3)**2 + (y/ap3)**2 .gt. 1d0  .or. x .gt. ap1 .or. y .gt. ap2
+        lost = x .gt. ap1 .or. y .gt. ap2 .or. (x/ap3)**2 + (y/ap3)**2 .gt. 1d0 
 
      case("marguerite")
   
      case("rectellipse")
-       if ( (x/ap3)**2 + (y/ap4)**2 .gt. 1d0  .or. x .gt. ap1 .or. y .gt. ap2 ) lost = .true. 
+       lost =  x .gt. ap1 .or. y .gt. ap2 .or. (x/ap3)**2 + (y/ap4)**2 .gt. 1d0 
  
      case("racetrack")
         !*** case of racetrack: test outer rectangle (ap1+ap3,ap2+ap3) then test radius for rounded corners.
-        if ( x .gt. ap1+ap3 .or. y .gt. ap2+ap3 .or. &
-             ( x .gt. ap1 .and. y .gt. ap2 .and. (x-ap1)**2 + (y-ap2)**2 .gt. ap3**2 ) ) lost = .true.
+        lost =  x .gt. ap1+ap3 .or. y .gt. ap2+ap3 .or. &
+             ( x .gt. ap1 .and. y .gt. ap2 .and. (x-ap1)**2 + (y-ap2)**2 .gt. ap3**2 )
         
      case("octagon")
         ! 2015-Feb-20  18:42:26  ghislain: added octagon shape           
         !*** case of octagon: test outer rectangle (ap1,ap2) then test cut corner.
-        if ( x .gt. ap1 .or. y .gt. ap2 .or. & 
-             (ap2*tan(pi/2 - ap4) - ap1)*(y - ap1*tan(ap3)) - (ap2 - ap1*tan(ap3))*(x - ap1) .lt. 0) & 
-             lost = .true.
+        lost =  x .gt. ap1 .or. y .gt. ap2 .or. & 
+             (ap2*tan(pi/2 - ap4) - ap1)*(y - ap1*tan(ap3)) - (ap2 - ap1*tan(ap3))*(x - ap1) .lt. 0 
 
      case default
         
