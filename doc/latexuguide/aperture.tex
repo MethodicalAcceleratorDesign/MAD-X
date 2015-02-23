@@ -16,7 +16,7 @@ available aperture, and the particle lost if it falls outside
 the defined aperture.
 
 
-\section{Defining aperture}
+\section{Aperture definition}
 \label{sec:def_aper}
 The aperture for a particular element or class of elements can be 
 set in \madx at the time of definition or instantiation of the 
@@ -47,7 +47,8 @@ The minimum aperture definition uses the following two attributes:
 
 \begin{madlist}
   \ttitem{APERTYPE} defines the aperture type from a set of
-  preselected types:
+  preselected types, or from a file if a filename is provided as argument.
+  The preselected types are:
     \begin{madlist}
       \ttitem{CIRCLE}
       \ttitem{RECTANGLE} 
@@ -61,11 +62,12 @@ The minimum aperture definition uses the following two attributes:
       quartercircles, one per quadrant, and connected by straight lines.
       \ttitem{OCTAGON} a simply connex octagon
     \end{madlist}
-    or from a file if a filename is provided as argument. The file contains a 
-    list of x and y coordinates outlining the complete aperture shape and no 
-    symmetry is assumed. This option is only 
-    supported by the aperture module, see below. In this case the {\tt 
-    APERTURE} attribute is ignored.\\
+    If a filename is provided as argument, the file must contain a 
+    list of x and y coordinates, one pair per line, outlining the complete aperture shape, 
+    i.e. no symmetry is assumed. This option is only supported by the 
+    \hyperref[chap:aperture]{\tt APERTURE} module and an aperture thus defined is 
+    ignored in the \hyperref[chap:thintrack]{\tt TRACK} module.
+    When a filename is provided as argument, the {\tt APERTURE} attribute is ignored.\\
 \\
 Note that the {\tt MARGUERITE} aperture type (two {\tt RECTCIRCLE}s 
 crossing at right angle) is no longer supported. 
@@ -74,30 +76,35 @@ crossing at right angle) is no longer supported.
 of which depends on the {\tt APERTYPE}.  
 \end{madlist}
 
-\begin{tabular}{|l | c | p{9cm}|}
-	\hline 
-	{\bf APERTYPE} & {\bf \# of values} & {\bf meaning of values}\\
-	\hline
-	{\tt CIRCLE} & 1 &  radius of circle \\ 
-	\hline
-	{\tt RECTANGLE} & 2 & half width and half height of rectangle\\ 
-	\hline
-	{\tt ELLIPSE} & 2 & horizontal an vertical semi-axes of ellipse \\  
-	\hline
-	{\tt RECTCIRCLE} or {\tt LHCSCREEN} & 3 & half width and half height of 
-	rectangle, radius of circle\\  
-	\hline
-	{\tt RECTELLIPSE} & 4 & half width and half height of rectangle, horizontal
-	and vertical semi-axes of ellipse \\
-	\hline
-	{\tt RACETRACK} & 3 & horizontal and vertical offsets (g and s) of the 
-	circle center, radius (r) of the circular part (see figure below)\\
-	\hline
-	{\tt OCTAGON} & 4 & half width and half height along main axes,
-        two angles sustaining the cut corner in the first quadrant,
-        given in radians and in order of increasing values. \\   
-	\hline
-\end{tabular}
+\begin{table}[ht]
+	\caption{Predefined aperture types}
+	\vspace{1ex}
+	\begin{tabular}{|l | c | p{8cm}|}
+		\hline 
+		{\bf APERTYPE} & {\bf \# of values} & {\bf meaning of values}\\
+		\hline
+		{\tt CIRCLE} & 1 &  radius of circle \\ 
+		\hline
+		{\tt RECTANGLE} & 2 & half width and half height of rectangle\\ 
+		\hline
+		{\tt ELLIPSE} & 2 & horizontal and vertical semi-axes of ellipse \\  
+		\hline
+		{\tt RECTCIRCLE} or {\tt LHCSCREEN} & 3 & half width and half height of 
+		rectangle, radius of circle\\  
+		\hline
+		{\tt RECTELLIPSE} & 4 & half width and half height of rectangle, 
+		horizontal and vertical semi-axes of ellipse \\
+		\hline
+		{\tt RACETRACK} & 3 & horizontal and vertical offsets (g and s) of the 
+		circle center, radius (r) of the circular part (see figure below)\\
+		\hline
+		{\tt OCTAGON} & 4 & half width and half height along main axes, 
+		two angles sustaining the cut corner in the first quadrant, 
+		given in radians and in order of increasing values. \\   
+		\hline
+	\end{tabular}
+\end{table}
+
 \vskip 5mm
 
 
@@ -165,7 +172,7 @@ nmin = beam->n1min;}
 
 \end{itemize}
 
-\section{Defining aperture tolerances}
+\section{Aperture tolerance definition}
 \label{sec:apertol}
 A parameter closely connected to the aperture is the sum of the
 mechanical and alignment tolerances. The mechanical tolerance is 
@@ -192,7 +199,7 @@ APER\_TOL = \{r, g, s\};
 MB: SBEND, L=l.MB, APER\_TOL=\{1.5, 1.1, 0\};
 }
 
-\section{Defining aperture offsets}
+\section{Aperture offset definition}
 \label{sec:aperoffset}
 
 An aperture offset can be assigned to each element in a \madx sequence as a vector: 
@@ -203,8 +210,6 @@ APER\_OFFSET = \{real, real\};
 where the two real values are respectively the horizontal and vertical
 offsets of the aperture inside the element.
 
-{\bf ATTENTION: to be rewritten following reverse engineering of the
-  code in trrun.f90\\ 17-09-2014 Ghislain Roy}
 
 \section{APERTURE}
 \label{sec:aperture}
@@ -386,7 +391,7 @@ mq.22r1.b1
 3.1    4.232e-4   0.00000003
 \end{verbatim}
 
-\section{OFFSETELEM file syntax}
+\section{Offsetelem file syntax}
 \label{sec:offsetelem}
 This file contains parameters describing how certain elements are
 actually located in space with respect to a given reference element in

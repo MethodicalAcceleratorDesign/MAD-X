@@ -212,15 +212,19 @@ The attributes of the TRACK command are:
   \ttitem{DUMP} flag to write the particle coordinates in files, whose
   names are generated automatically. \\ (Default:~false)
 
-  \ttitem{APERTURE} flag to trigger particle loss if its trajectory is
-  outside the aperture of the current element. \\ 
+  \ttitem{APERTURE} a logical flag to trigger aperture check at the entrance 
+  of each element (except {\tt DRIFT}s). A particle is lost from the table of 
+  tracked particles if its position lies outside the aperture of the current 
+  element at the entrance of this element. \\ 
   (Default:~false) \\
-  If the {\tt APERTURE} option is applied, the {\tt APERTYPE} 
-  and {\tt APERTURE} information of each element in the sequence
-  is used to check whether the particle is lost or not. For further
-  information on the definition of apertures and different aperture
-  types, see the documentation of the
-  \hyperref[chap:aperture]{\tt APERTURE} module. \\  
+  
+  The \hyperref[chap:aperture]{\tt APERTYPE} and 
+  \hyperref[chap:aperture]{\tt APERTURE} information of each element 
+  in the sequence is used to assess the particle loss. 
+  However {\tt TRACK} only takes into account the predefined aperture 
+  types listed in table \ref{T-apertype}
+  \\
+  
   Note that if no aperture information was specified for an element, 
   the following procedure still takes place:
   \\
@@ -328,9 +332,9 @@ closed orbit.
 %%   \hline
 %% \end{tabular}
 
-          
 
-\section{START}          
+
+\section{START}
 \label{sec:start}
 
 After the {\tt TRACK} command, initial trajectory coordinates must be
@@ -451,7 +455,7 @@ The {\tt RUN} command has three attributes:
 \section{DYNAP}
 
 The {\tt DYNAP} command calculates tunes, tune footprints, smear and
-Lyapunov exponent from trackin data. {\tt DYNAP} can be called
+Lyapunov exponent from tracking data. {\tt DYNAP} can be called
 instead of {\tt RUN} inside a {\tt TRACK} command environment.
 
 \madbox{
