@@ -1300,6 +1300,14 @@ tests/test-makethin-2/test-makethin-2.madx -text
 tests/test-makethin-2/test-makethin-2.ref -text
 tests/test-makethin/fivecell_thin.seq.cfg -text
 tests/test-makethin/fivecell_thin.seq.ref -text
+tests/test-makethin/fivecell_thin_collim.seq.cfg -text
+tests/test-makethin/fivecell_thin_collim.seq.ref -text
+tests/test-makethin/fivecell_thin_options.seq.cfg -text
+tests/test-makethin/fivecell_thin_options.seq.ref -text
+tests/test-makethin/fivecell_thin_simple.seq.cfg -text
+tests/test-makethin/fivecell_thin_simple.seq.ref -text
+tests/test-makethin/fivecell_thin_teapot.seq.cfg -text
+tests/test-makethin/fivecell_thin_teapot.seq.ref -text
 tests/test-makethin/test-makethin.cfg -text
 tests/test-makethin/test-makethin.madx -text
 tests/test-makethin/test-makethin.ref -text
