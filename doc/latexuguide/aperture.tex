@@ -213,11 +213,11 @@ offsets of the aperture inside the element.
 
 \section{APERTURE}
 \label{sec:aperture}
-{\bf The APERTURE module was developped specifically for the LHC.\\ 
-Default parameter values are LHC values and the physics 
-in APERTURE module assumes ultra-relativistic particles (v\(\approx\)c).} 
+{\bf The APERTURE module was developed specifically for the LHC.\\ 
+Default parameter values are LHC values\begin{5.02.04} and the physics 
+in APERTURE module assumes ultra-relativistic particles (v\(\approx\)c)\end{5.02.04}.} 
 
-The APERTURE module computes the n1 values for a piece of machine. 
+The APERTURE module computes the {\tt n1} values for a piece of machine. 
 Each element is sliced into thick subelements at given intervals, and
 the available aperture is computed at the end of each slice. 
 The computation is based on the last Twiss table, so it is important to
@@ -227,7 +227,8 @@ example is how {\tt n1} values can be \hyperref[chap:plot]{plotted}.
 
 The minimum {\tt n1} for each element is written to the last Twiss table, to
 allow for \hyperref[chap:match]{matching by aperture}.   
-	
+
+\begin{5.02.04}
 \madbox{
 APERTURE, \=RANGE=range, \\
           \>EXN=real, EYN=real, DQF=real, DPARX=real, DPARY=real, \\
@@ -238,7 +239,23 @@ APERTURE, \=RANGE=range, \\
           \>TRUEPROFILE=filename, OFFSETELEM=filename, \\
           \>FILE=filename;  
 }
+\end{5.02.04}
+
+\begin{5.02.05}
+	\madbox{
+		APERTURE, \=RANGE=range, \\
+		\>DQF=real, DPARX=real, DPARY=real, \\
+		\>BETAQFX=real, BBEAT=real, DP=real, \\
+		\>COR=real,  NCO=integer, \\
+		\>HALO=\{real,real,real,real\}, HALOFILE=filename,\\
+		\>INTERVAL=real, SPEC=real, NOTSIMPLE=logical, \\
+		\>TRUEPROFILE=filename, OFFSETELEM=filename, \\
+		\>FILE=filename;  
+	}
+\end{5.02.05}
+
 where the parameters have the following meaning: 
+\begin{5.02.04}
 \begin{madlist}
    \ttitem{RANGE} \hyperref[sec:range]{Range} given by
      elements. Default = {\tt \#s/\#e}  
@@ -280,14 +297,62 @@ where the parameters have the following meaning:
        elements given for the offsets to be taken into account.}
    \ttitem{FILE} Output file with aperture table. Default = none 
 \end{madlist}
+\end{5.02.04}
 
+\begin{5.02.05}
+\begin{madlist}
+	\ttitem{RANGE} \hyperref[sec:range]{Range} given by
+	elements. Default = {\tt \#s/\#e}  
+	\ttitem{DQF} Peak linear dispersion [m]. Default = 2.086 
+	\ttitem{DPARX} Fractional horizontal parasitic dispersion. Default = 0.273 
+	\ttitem{DPARY} Fractional vertical parasitic dispersion. Default = 0.273 
+	\ttitem{BETAQFX} Beta x in standard qf [m]. Default = 170.25 
+	\ttitem{BBEAT} Beta beating coefficient applying to beam size. Default = 1.1 
+	\ttitem{DP} Bucket edge at the current beam energy. Default = 0.0015 
+	\ttitem{COR} Maximum radial closed orbit uncertainty [m]. Default = 0.004 
+	\ttitem{NCO} Number of azimuth for radial scan. Default = 5 
+	\ttitem{HALO} Halo parameters: \{n, r, h, v\}. n is the radius of the
+	primary halo,  r is the radial part of the secondary halo, h and v
+	is the horizontal and  vertical cuts in the secondary halo. Default
+	= \{6, 8.4, 7.3, 7.3\}  
+	\ttitem{HALOFILE} Input file with halo polygon coordinates. Will
+	suppress  an eventual halo parameter. Default = none  
+	\ttitem{INTERVAL} Approximate length in meters between
+	measurements. Actual value:  nslice = nodelength/interval, nslice
+	is rounded down to closest integer,  interval =
+	nodelength/nslice. Default = 1.0  
+	\ttitem{SPEC} Aperture spec, for plotting only. Gives the spec line in
+	the plot. Default = 0.0  
+	\ttitem{NOTSIMPLE} Use only if one or more beamscreens in the range are
+	considered not to  be a "simply connex". Since all \madx apertypes
+	are simply connex, this is only possible  if an input file with
+	beam screen coordinates are given. See below for a graphical
+	example. Default = false.  
+	\ttitem{TRUEPROFILE} A file containing a list of magnets, and for each
+	magnet a list of horizontal and vertical deviations from the ideal
+	magnet axis. These values may come from measurements done on the
+	magnet. See below for example. Default = none.  
+	\ttitem{OFFSETELEM} A file containing a reference point in the machine,
+	and a list of magnets with their offsets from this point described
+	as a parabola. See below for example. Default = none. \\
+	{\bf Note that the reference point should be within the range of
+	elements given for the offsets to be taken into account.}
+	\ttitem{FILE} Output file with aperture table. Default = none 
+	\end{madlist}
+\end{5.02.05}
 
+\begin{5.02.04}
 {\bf Important note regarding emittances:}\\
-The APERTURE module sets the actual emittances from the normalized values
+The {\tt APERTURE} module sets the actual emittances from the normalized values
 given as input using the definition \madxmp{ EX = EXN / GAMMA }
 while the \hyperref[chap:beam]{\tt BEAM} command in \madx uses the definition 
 \madxmp{ EX = EXN / (4 * BETA * GAMMA) } 
+\end{5.02.04}
 
+\begin{5.02.05}
+The {\tt APERTURE} module gets the geometric emittances from the values given 
+or calculated in the \hyperref[chap:beam]{\tt BEAM} command. 
+\end{5.02.05}
 
 \section{Not simply connex beam pipe profiles} 
 \label{sec:notconnex}

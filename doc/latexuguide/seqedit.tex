@@ -288,6 +288,11 @@ output precision for \madx, which can be adjusted with the
 %\href{../Introduction/set.html#Format}{SET Format} instruction page.   
  
 
+Note that with {\tt BARE=false} the saved sequence may contain redundant 
+efinitions of elements, ie the same element is defined in the declaration 
+of elements in the form {\tt label:\ type...} and in the sequence itself 
+in the form {\tt label:\ type, at=...}. This is flagged by \madx as implicit 
+element redefinition and is ignored but a warning is issued. 
 
 Example:  
 \begin{verbatim}

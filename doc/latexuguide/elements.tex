@@ -1196,33 +1196,32 @@ monitor is a Cartesian coordinate system.
 %  Added by: Ghislain Roy, 23-May-2013. Split from section on BPM's
 \section{Instrument}
 \label{sec:instrument}
-
 An instrument has no specific effect on the beam and behaves like a
 drift space. 
 Instruments are different from beam position monitors and are not used
 for closed orbit correction. 
 
-Two different types of beam position monitors are recognised:  
+Two different types of instruments are recognised:  
 
-\begin{itemize}
-   \item \href{inst}{INSTRUMENT}. A place holder for any type of beam
+\begin{madlist}
+   \ttitem{INSTRUMENT} A place holder for any type of beam
      instrumentation. Optically it behaves like a drift space; it
      returns \emph{no beam observation}. It represent a class of
      elements which is completely independent from drifts and monitors.  
-   \item \href{plac}{PLACEHOLDER}. A place holder for any type of
-     element. Internally it is equivalent to an INSTRUMENT: optically it
-     behaves as a drift space, it returns \emph{no beam observation}. It
-     represent a class of elements which is completely independent from
-     drifts and monitors. 
-\end{itemize}
+   \ttitem{PLACEHOLDER} A place holder for any type of
+     element. Internally it is equivalent to an {\tt INSTRUMENT}: 
+     optically it behaves as a drift space, it returns 
+     \emph{no beam observation}. It represent a class of elements 
+     which is completely independent from drifts and monitors. 
+\end{madlist}
 
 \madbox{
 xxxxxxxxxxxxxxxxxxxxx\= \kill
-label: INSTRUMENT,   \>L = real; \\
-label: PLACEHOLDER,  \>L = real;
+label: INSTRUMENT,   \>L=real; \\
+label: PLACEHOLDER,  \>L=real;
 }
 
-An instrument has one real attribute: 
+An instrument or placeholder has one real attribute: 
 \begin{madlist}
    \ttitem{L} The length of the instrument (default: 0 m). 
 \end{madlist}
@@ -1235,18 +1234,13 @@ instrument is a Cartesian coordinate system.
 \section{Collimator}
  
 The definition of collimator in \madx has been inherited from \madeight
-and two types of collimators are defined:  
-\begin{itemize}
-   \item \href{ecol}{ECOLLIMATOR}. 
-   \item \href{rcol}{RCOLLIMATOR}. 
-\end{itemize}  
-Note that although two types are defined, both behave in exactly the
-same way within \madx and the type name does NOT imply elliptic or
-rectangular aperture.    
+and two types of collimators are defined: {\tt ECOLLIMATOR} and {\tt RCOLLIMATOR} \\
+However, both behave in exactly the same way within \madx and 
+the element name does NOT imply elliptic or rectangular aperture.
 
 \madbox{
-label: ECOLLIMATOR, TYPE = name, L = real, XSIZE = real, YSIZE = real; \\
-label: RCOLLIMATOR, TYPE = name, L = real, XSIZE = real, YSIZE = real;
+label: ECOLLIMATOR, L=real, XSIZE=real, YSIZE=real; \\
+label: RCOLLIMATOR, L=real, XSIZE=real, YSIZE=real;
 }
 
 Either type has several real attributes: 
