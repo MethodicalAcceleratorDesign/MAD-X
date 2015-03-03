@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.01  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.04.25      +
-  + Execution Time Stamp: 18.06.14 16.55.08 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.11.14               +
+  + Execution date: 2015.03.03 18:57:49      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 option,debug;
 
 TITLE, s='Elettra - Sincrotrone Trieste';
@@ -73,6 +73,7 @@ parameter: charge   double value:                 -1
 parameter: energy   double value:                 10
 parameter: pc   double value:        9.999999987
 parameter: gamma   double value:        19569.51268
+parameter: beta   double value:       0.9999999987
 parameter: brho   double value:        33.35640948
 parameter: ex   double value:    3.515672629e-10
 parameter: exn   double value:          2.752e-05
@@ -88,7 +89,6 @@ parameter: freq0   double value:                  0
 parameter: circ   double value:                  0
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: beta   double value:       0.9999999987
 parameter: alfa   double value:    2.611199044e-09
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
@@ -113,5 +113,5 @@ Added field errors to 24 elements
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.01 (64 bit) finished normally +
+  + MAD-X 5.02.04 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
