@@ -900,7 +900,7 @@ static void
 aper_header(struct table* aper_t, struct aper_node *lim)
   /* puts beam and aperture parameters at start of the aperture table */
 {
-  int i, h_length = 25; // not used, nint=1;
+  int i, h_length = 26; // not used, nint=1;
   double dtmp, vtmp[4]; // not used, deltap_twiss;
   char tmp[NAME_L], name[NAME_L], *stmp;
 
@@ -941,19 +941,29 @@ aper_header(struct table* aper_t, struct aper_node *lim)
   dtmp = get_value("beam", "gamma");
   sprintf(c_dum->c, v_format("@ GAMMA            %%le  %F"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-
+  // 2015-Mar-03  12:05:58  ghislain: added
+  dtmp = get_value("beam", "beta");
+  sprintf(c_dum->c, v_format("@ BETA             %%le  %F"), dtmp);
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+  /* dtmp = get_value("beam", "exn"); */
+  /* sprintf(c_dum->c, v_format("@ EXN              %%le  %G"), dtmp); */
+  /* aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c); */
+  /* dtmp = get_value("beam", "eyn"); */
+  /* sprintf(c_dum->c, v_format("@ EYN              %%le  %G"), dtmp); */
+  /* aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c); */
+  // end addition
 
   /* aperture command properties */
 
   /* 2013-Nov-14  15:45:23  ghislain: The global parameters that have a default in the 
-     dictionary or can be input from other commands like BEAM, should be obtained adequately, not 
-     from the cmd input.
- */
+     dictionary or can be input from other commands like BEAM, should be obtained adequately, 
+     not from the cmd input.
+  */
   dtmp = command_par_value("exn", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ EXN              %%le  %F"), dtmp);
+  sprintf(c_dum->c, v_format("@ EXN              %%le  %G"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("eyn", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ EYN              %%le  %F"), dtmp);
+  sprintf(c_dum->c, v_format("@ EYN              %%le  %G"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("dqf", this_cmd->clone);
   sprintf(c_dum->c, v_format("@ DQF              %%le  %F"), dtmp);
@@ -962,10 +972,10 @@ aper_header(struct table* aper_t, struct aper_node *lim)
   sprintf(c_dum->c, v_format("@ BETAQFX          %%le  %F"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("dparx", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ PARAS_DX         %%le       %g"), dtmp);
+  sprintf(c_dum->c, v_format("@ PARAS_DX         %%le    %g"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("dpary", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ PARAS_DY         %%le       %g"), dtmp);
+  sprintf(c_dum->c, v_format("@ PARAS_DY         %%le    %g"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("dp", this_cmd->clone);
   sprintf(c_dum->c, v_format("@ DP_BUCKET_SIZE   %%le  %F"), dtmp);
@@ -983,7 +993,7 @@ aper_header(struct table* aper_t, struct aper_node *lim)
   sprintf(c_dum->c, v_format("@ BETA_BEATING     %%le  %F"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("nco", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ NB_OF_ANGLES     %%d   %g"), dtmp*4);
+  sprintf(c_dum->c, v_format("@ NB_OF_ANGLES     %%d       %g"), dtmp*4);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
 
   /* if a filename with halo coordinates is given, need not show halo */
@@ -1333,8 +1343,10 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   double surv_x=zero, surv_y=zero;
   double xa=0, xb=0, xc=0, ya=0, yb=0, yc=0;
   double on_ap=1, on_elem=0;
-  double mass, energy, exn, eyn, dqf, betaqfx, dp, dparx, dpary;
-  double cor, bbeat, nco, halo[4], interval, spec, ex, ey, notsimple;
+  //double mass, energy, exn, eyn, ex, ey;
+  double gamma, beta, exn, eyn, ex, ey;
+  double dqf, betaqfx, dp, dparx, dpary;
+  double cor, bbeat, nco, halo[4], interval, spec, notsimple;
   double s=0, x=0, y=0, betx=0, bety=0, dx=0, dy=0, ratio, n1, nr, length;
   double xeff=0,yeff=0;
   double n1x_m, n1y_m;
@@ -1384,6 +1396,12 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
  
   exn = command_par_value("exn", this_cmd->clone);
   eyn = command_par_value("eyn", this_cmd->clone);
+  
+  // 2015-Mar-03  17:25:49  ghislain: should get geometric emittances from BEAM command
+  /// however see below comment on emittance definition.
+  //ex = get_value("beam","ex");
+  //ey = get_value("beam","ey");
+
   dqf = command_par_value("dqf", this_cmd->clone);
   betaqfx = command_par_value("betaqfx", this_cmd->clone);
   dp = command_par_value("dp", this_cmd->clone);
@@ -1401,16 +1419,26 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
   cmd_refnode = command_par_string("refnode", this_cmd->clone);
 
-  mass = get_value("beam", "mass");
-  energy = get_value("beam", "energy");
+  //mass = get_value("beam", "mass");
+  //energy = get_value("beam", "energy");
+  gamma = get_value("beam","gamma");
+  beta = get_value("beam","beta");
+
+  /* calculate emittance and delta angle */
+  /* Warning: mad_beam.c uses a different definition for emittance */
+  /* mad_beam.c says :     ex = exn / (4 * beta * gamma); */
+
+  // ex = mass*exn/energy; ey = mass*eyn/energy; // assumes beta=1 
+  // 2015-Mar-03  11:43:01  ghislain: use beta explicitly but keep local emittance definition
+  ex = exn/(beta*gamma); ey = eyn/(beta*gamma); 
+
+  dangle = twopi/(nco*4);
+
 
   /* 2013-Nov-13  16:20:29  ghislain: attempt to extract relevant parameters 
      from BEAM command instead of internal parameters. 
      This works but needs a bit more thoughts, in conjuction with fetching other parameters 
      from Twiss table
-
-  // exn = get_value("beam", "exn");
-  // eyn = get_value("beam", "eyn");
 
   // and attempt to extract maximum parameters from twiss summary table
   // double_from_table_row("summ","dxmax",&nint,&dqf);
@@ -1427,13 +1455,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   }
   else printf ("+++++++ deltap from TWISS %12.6g\n",lim_pt->deltap_twiss);
 
-  /* calculate emittance and delta angle */
-  /* mad_beam.c says :     ex = exn / (4 * beta * gamma); */
-  /* Warning: 1- MAD uses a different definition for emittance
-              2- This assumes beta = 1, explicitly ultra-relativistic particles */
-  ex = mass*exn/energy; ey = mass*eyn/energy;
-  dangle = twopi/(nco*4);
-
+  
   /* check if trueprofile and offsetelem files exist */
   true_flag = aper_e_d_read(truefile, &true_tab, &true_cnt, refnode);
   /* offs_flag = aper_e_d_read(offsfile, &offs_tab, &offs_cnt, refnode);*/

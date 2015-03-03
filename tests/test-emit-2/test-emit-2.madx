@@ -6,8 +6,10 @@ Call, file= "../share/ALBA/ALBA-25.4th_v2.seq";
 OPTION, ECHO, WARN, INFO;
 
 Use, period=Machine;
+Show, beam%machine;
 Twiss;
 Emit, DELTAP=0.0 ;
+Show, beam%machine;
 
 !The result of H emittance computed this way is: 0.11212603E-02 [pi micro m] 
 !But it is wrong due to the fact that the variations of the twiss functions inside
@@ -17,11 +19,13 @@ Emit, DELTAP=0.0 ;
 Beam, SEQUENCE=Machine2, PARTICLE=electron, energy=3, RADIATE=True;
 
 Use, period=Machine2;
+Show, beam%machine2;
 Twiss;
 Emit, DELTAP=0.0 ;
 !
 !Now the emittance is correct: 0.44845315E-02 
 !
+Show, beam%machine2;
 
 SELECT, FLAG=TWISS, CLEAR;
 SELECT, FLAG=TWISS, CLASS=QUADRUPOLE, COLUMN=NAME,S,BETX,BETY;

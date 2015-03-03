@@ -682,15 +682,17 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   endif
 
 !--- Write checkpoint_restart data
-  rewind 90
-  write(90) jmax
-  write(90) Ex_rms
-  write(90) Ey_rms
-  do i = 1, jmax
-     do j=1,6
-        write(90) z(j,i)
+  if (checkpnt_restart) then
+     rewind 90
+     write(90) jmax
+     write(90) Ex_rms
+     write(90) Ey_rms
+     do i = 1, jmax
+        do j=1,6
+           write(90) z(j,i)
+        enddo
      enddo
-  enddo
+  endif
 
   !--- enter last turn in summary table
   do  i = 1,j_tot

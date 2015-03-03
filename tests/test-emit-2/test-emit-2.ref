@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.01  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.04.25      +
-  + Execution Time Stamp: 23.05.14 14.35.46 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.11.14               +
+  + Execution date: 2015.03.03 18:15:58      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 Beam, SEQUENCE=Machine, PARTICLE=electron, energy=3, RADIATE=True;
 
 Option, RBARC=FALSE;
@@ -17,6 +17,41 @@ OPTION, -ECHO, -WARN, INFO;
 
 Use, period=Machine;
 
+Show, beam%machine;
+
+command: beam  module: control
+parameter: particle   string: electron
+parameter: sequence   string: machine
+parameter: bunched   logical: true
+parameter: radiate   logical: true
+parameter: mass   double value:     0.000510998928
+parameter: charge   double value:                 -1
+parameter: energy   double value:                  3
+parameter: pc   double value:        2.999999956
+parameter: gamma   double value:        5870.853803
+parameter: beta   double value:       0.9999999855
+parameter: brho   double value:        10.00692271
+parameter: ex   double value:                  1
+parameter: exn   double value:        23483.41487
+parameter: ey   double value:                  1
+parameter: eyn   double value:        23483.41487
+parameter: et   double value:                  1
+parameter: sigt   double value:                  0
+parameter: sige   double value:                  0
+parameter: kbunch   double value:                  1
+parameter: npart   double value:                  0
+parameter: bcurrent   double value:                  0
+parameter: freq0   double value:                  0
+parameter: circ   double value:                  0
+parameter: dtbyds   double value:                  0
+parameter: deltap   double value:                  0
+parameter: alfa   double value:    2.901332271e-08
+parameter: u0   double value:                  0
+parameter: qs   double value:                  0
+parameter: arad   double value:    2.817940325e-15
+parameter: bv   double value:                  1
+parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
+parameter: n1min   double value:                 -1
 Twiss;
 
 enter Twiss module
@@ -90,6 +125,41 @@ guess:          0                  0                  0
  RF system: 
  Cavity                      length[m]        voltage[MV]                lag          freq[MHz]             harmon
  rfc                               0.5                3.6               0.48        1998.614157                448
+Show, beam%machine;
+
+command: beam  module: control
+parameter: particle   string: electron
+parameter: sequence   string: machine
+parameter: bunched   logical: true
+parameter: radiate   logical: true
+parameter: mass   double value:     0.000510998928
+parameter: charge   double value:                 -1
+parameter: energy   double value:                  3
+parameter: pc   double value:        2.999999956
+parameter: gamma   double value:        5870.853803
+parameter: beta   double value:       0.9999999855
+parameter: brho   double value:        10.00692271
+parameter: ex   double value:    1.125932308e-09
+parameter: exn   double value:    2.644073551e-05
+parameter: ey   double value:    1.031488532e-36
+parameter: eyn   double value:    2.422287312e-32
+parameter: et   double value:    9.569042574e-07
+parameter: sigt   double value:      0.00085783974
+parameter: sige   double value:     0.001115467837
+parameter: kbunch   double value:                  1
+parameter: npart   double value:                  0
+parameter: bcurrent   double value:                  0
+parameter: freq0   double value:        4.461192314
+parameter: circ   double value:          67.200074
+parameter: dtbyds   double value:                  0
+parameter: deltap   double value:                  0
+parameter: alfa   double value:    2.901332271e-08
+parameter: u0   double value:    0.0002542030271
+parameter: qs   double value:      0.01229083022
+parameter: arad   double value:    2.817940325e-15
+parameter: bv   double value:                  1
+parameter: pdamp   double array: 1.495329e+00 9.999981e-01 1.504670e+00 
+parameter: n1min   double value:                 -1
 
 
 !The result of H emittance computed this way is: 0.11212603E-02 [pi micro m] 
@@ -108,6 +178,41 @@ Beam, SEQUENCE=Machine2, PARTICLE=electron, energy=3, RADIATE=True;
 
 Use, period=Machine2;
 
+Show, beam%machine2;
+
+command: beam  module: control
+parameter: particle   string: electron
+parameter: sequence   string: machine2
+parameter: bunched   logical: true
+parameter: radiate   logical: true
+parameter: mass   double value:     0.000510998928
+parameter: charge   double value:                 -1
+parameter: energy   double value:                  3
+parameter: pc   double value:        2.999999956
+parameter: gamma   double value:        5870.853803
+parameter: beta   double value:       0.9999999855
+parameter: brho   double value:        10.00692271
+parameter: ex   double value:                  1
+parameter: exn   double value:        23483.41487
+parameter: ey   double value:                  1
+parameter: eyn   double value:        23483.41487
+parameter: et   double value:                  1
+parameter: sigt   double value:                  0
+parameter: sige   double value:                  0
+parameter: kbunch   double value:                  1
+parameter: npart   double value:                  0
+parameter: bcurrent   double value:                  0
+parameter: freq0   double value:                  0
+parameter: circ   double value:                  0
+parameter: dtbyds   double value:                  0
+parameter: deltap   double value:                  0
+parameter: alfa   double value:    2.901332271e-08
+parameter: u0   double value:                  0
+parameter: qs   double value:                  0
+parameter: arad   double value:    2.817940325e-15
+parameter: bv   double value:                  1
+parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
+parameter: n1min   double value:                 -1
 Twiss;
 
 enter Twiss module
@@ -187,6 +292,41 @@ guess:          0                  0                  0
 
 !
 
+Show, beam%machine2;
+
+command: beam  module: control
+parameter: particle   string: electron
+parameter: sequence   string: machine2
+parameter: bunched   logical: true
+parameter: radiate   logical: true
+parameter: mass   double value:     0.000510998928
+parameter: charge   double value:                 -1
+parameter: energy   double value:                  3
+parameter: pc   double value:        2.999999956
+parameter: gamma   double value:        5870.853803
+parameter: beta   double value:       0.9999999855
+parameter: brho   double value:        10.00692271
+parameter: ex   double value:    4.484531043e-09
+parameter: exn   double value:     0.000105312103
+parameter: ey   double value:    8.468424244e-38
+parameter: eyn   double value:    1.988675199e-33
+parameter: et   double value:    8.450986418e-07
+parameter: sigt   double value:    0.0008061722633
+parameter: sige   double value:     0.001048278097
+parameter: kbunch   double value:                  1
+parameter: npart   double value:                  0
+parameter: bcurrent   double value:                  0
+parameter: freq0   double value:        4.461192314
+parameter: circ   double value:          67.200074
+parameter: dtbyds   double value:                  0
+parameter: deltap   double value:                  0
+parameter: alfa   double value:    2.901332271e-08
+parameter: u0   double value:     0.000254201707
+parameter: qs   double value:      0.01229083027
+parameter: arad   double value:    2.817940325e-15
+parameter: bv   double value:                  1
+parameter: pdamp   double array: 1.296242e+00 1.000001e+00 1.703761e+00 
+parameter: n1min   double value:                 -1
 
 
 SELECT, FLAG=TWISS, CLEAR;
@@ -236,5 +376,5 @@ stop;
 0 in C and 3 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.01 (64 bit) finished normally +
+  + MAD-X 5.02.04 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

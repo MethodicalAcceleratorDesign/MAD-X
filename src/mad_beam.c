@@ -317,6 +317,7 @@ update_beam(struct command* comm)
   store_comm_par_value("energy", energy, current_beam);
   store_comm_par_value("pc", pc, current_beam);
   store_comm_par_value("gamma", gamma, current_beam);
+  store_comm_par_value("beta", beta, current_beam);
   store_comm_par_value("brho", brho, current_beam);
   store_comm_par_value("ex", ex, current_beam);
   store_comm_par_value("exn", exn, current_beam);
@@ -327,7 +328,6 @@ update_beam(struct command* comm)
   // 2014-Apr-09  15:44:57  ghislain: update of freq0 and circ is done above
   //store_comm_par_value("freq0", freq0, current_beam);
   //store_comm_par_value("circ", circ, current_beam);
-  store_comm_par_value("beta", beta, current_beam);
   store_comm_par_value("alfa", alfa, current_beam);
   store_comm_par_value("arad", arad, current_beam);
 }
