@@ -103,6 +103,8 @@ private:
   bool MakeDipedge; // translate dipoles   to    dipedge, dipole without edge effects, dipedge
 };
 
+/* Note used anymore, see comment at the end of the file.
+   To remove later
 class SequenceList
 {
 public:
@@ -111,6 +113,7 @@ public:
 private:
   std::vector<sequence*> my_sequ_list_vec; // list of sequences
 };
+*/
 
 //------------------------------- source code --------------
 
@@ -1212,8 +1215,8 @@ static sequence* slice_sequence(const string& thin_style,sequence* thick_sequ) /
   if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " thin_style=\"" << thin_style << "\"" << EOL;
   
   sequence* thin_sequ;
-  static SequenceList sliced_seqlist;
-  if ((thin_sequ=sliced_seqlist.get_sequ(thick_sequ))) return thin_sequ; // do nothing if the sequence was already sliced
+//  static SequenceList sliced_seqlist;
+//  if ((thin_sequ=sliced_seqlist.get_sequ(thick_sequ))) return thin_sequ; // do nothing if the sequence was already sliced
   
   char name[128];
   strcpy(name,thick_sequ->name);
@@ -1254,7 +1257,7 @@ static sequence* slice_sequence(const string& thin_style,sequence* thick_sequ) /
   {
 	sequences->sequs[pos]= thin_sequ; // pointer moved ok, delete_sequence(thick_sequ)
   }
-  sliced_seqlist.put_sequ(thick_sequ); // Slicing done for this sequence. Add to list of sequences sliced
+//  sliced_seqlist.put_sequ(thick_sequ); // Slicing done for this sequence. Add to list of sequences sliced
   if(debug_fl()) theSeqElList.Print(); // final list
   return thin_sequ;
 } // slice_sequence
@@ -1595,6 +1598,7 @@ void ElementListWithSlices::put_slice(element* thick_elem,element* thin_elem) //
   }
   if(!found)
   {
+    // memory leak: new operator
 	OneElementWithSlices* aSliceList= new OneElementWithSlices(thick_elem,thin_elem);
 	VecElemWithSlices.push_back(aSliceList);
 	if(verbose>1) cout << "put_slice add  thick=" << left << setw(20) << thick_elem->name << setw(20) << " thin=" << thin_elem->name << right << " to list, now VecElemWithSlices.size()=" << VecElemWithSlices.size() << EOL;
@@ -1637,6 +1641,7 @@ SeqElList::SeqElList(const string& seqname,const string& thin_style,sequence* th
   this->thick_node=thick_node;
   if(debug_fl())   verbose=1;
   if(verbose_fl()) verbose=2;
+      // memory leak: new operator
   theSliceList=new ElementListWithSlices(verbose);
   theBendEdgeList =new ElementListWithSlices(verbose);
   // verbose=3; // -- special for code development ---   turn on extra debugging within SeqElList
@@ -2404,6 +2409,8 @@ void SeqElList::slice_node() // this decides how to split an individual node and
   else fatal_error("node is not element or sequence",thick_node->base_name); // completely unknown, error
 }
 
+/* Note: pointers cannot refer to supposedly known sequence...
+         another mechanism must be used if it is really needed...
 //--------  SequenceList
 sequence* SequenceList::get_sequ(sequence* thick_sequ) // check if thick_sequ is already in my_sequ_list_vec
 {
@@ -2413,6 +2420,7 @@ sequence* SequenceList::get_sequ(sequence* thick_sequ) // check if thick_sequ is
 	if ( my_sequ_list_vec[i] == thick_sequ )
 	{
 	  if ( verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " found at i=" << i << EOL; // debug
+    fprintf(stdout, "sequence already sliced %p == %p, name = '%s'\n", (void*)my_sequ_list_vec[i], (void*)thick_sequ, thick_sequ->name);
 	  return thick_sequ;
 	}
   }
@@ -2425,3 +2433,4 @@ void SequenceList::put_sequ(sequence* thick_sequ)
   if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " my_sequ_list_vec.size()=" << my_sequ_list_vec.size() << EOL;
   return;
 }
+*/
