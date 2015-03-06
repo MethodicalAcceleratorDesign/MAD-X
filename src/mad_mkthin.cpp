@@ -2380,8 +2380,7 @@ void SeqElList::slice_node() // this decides how to split an individual node and
 			   strcmp(thick_node->base_name,"octupole") == 0    ||
 			   strcmp(thick_node->base_name,"solenoid") == 0    ||
 			   strcmp(thick_node->base_name,"multipole") == 0   ||
-			   strcmp(thick_node->base_name,"rcollimator") == 0 ||  // rcollimator has no slice  number, so will always be sliced to 1 slice
-			   strcmp(thick_node->base_name,"ecollimator") == 0 ||  // ecollimator has no slice  number, so will always be sliced to 1 slice
+			   strcmp(thick_node->base_name,"collimator") == 0  ||  // collimator has no slice  number, so will always be sliced to 1 slice
 			   strcmp(thick_node->base_name,"elseparator") == 0
 			   )
 	  {

@@ -161,7 +161,7 @@ install_ir15_b12(ENAME,SPOS): macro={
 posTAS  =20.15;  !from V6.503
 l.TASC  =1.8;
 
-TASC: RCOLLIMATOR,  L := l.TASC; ! new TAS
+TASC: COLLIMATOR,  L := l.TASC, APERTYPE=rectangle; ! new TAS
 
 TASC.1R1: TASC; TASC.1L1: TASC;
 TASC.1R5: TASC; TASC.1L5: TASC;

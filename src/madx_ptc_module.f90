@@ -1016,6 +1016,8 @@ CONTAINS
        key%magnet="monitor"
     case(19)
        key%magnet="vmonitor"
+       !  2015-Mar-05  13:13:35  ghislain: Warning !
+       !                         ecollimator and rcollimator replaced by collimator in MAD-X, with code 20
        !  case(20)
        !     key%magnet="ecollimator"
        !     key%list%x_col=node_value('xsize ')

@@ -459,7 +459,7 @@ omk: marker,l:=l.omk ;
 ip1: omk;
 mbas2: solenoid,l:= 0.000000000000000,lrad:=l.mbas2 ;
 mbas2.1r1: mbas2,l:= 0.000000000000000,lrad:=l.mbas2 ,ks:=abas ,ksi:=( abas ) * ( l.mbas2 ) ;
-tas: rcollimator,l:= 0.000000000000000;
+tas: collimator,l:= 0.000000000000000;
 tas.1r1: tas,slot_id:= 102103,mech_sep:= 0.000000000000000;
 bpmsw: monitor,l:=l.bpmsw ;
 bpmsw.1r1.b2: bpmsw,slot_id:= 104594,mech_sep:= 0.000000000000000;
@@ -502,7 +502,7 @@ mqxb.b2r1..3: mqxb,lrad:=( l.mqxb ) / ( 4 ) ,knl:={ 0.000000000000000,( ( 0 - kq
  0.000000000000000;
 mqxb.b2r1..4: mqxb,lrad:=( l.mqxb ) / ( 4 ) ,knl:={ 0.000000000000000,( ( 0 - kqx.r1 - ktqx2.r1 ) * ( l.mqxb ) ) * ( 0.25 ) },kmax:=kmax_mqxb ,kmin:=kmin_mqxb ,calib:=kmax_mqxb / imax_mqxb ,polarity:= -1.000000000000000,mech_sep:=
  0.000000000000000;
-tasb: rcollimator,l:= 0.000000000000000;
+tasb: collimator,l:= 0.000000000000000;
 tasb.3r1: tasb,slot_id:= 241893,assembly_id:= 102106,mech_sep:= 0.000000000000000;
 mqsx: multipole,lrad:=l.mqsx ,kmax:=kmax_mqsx ,kmin:=kmin_mqsx ,calib:=kmax_mqsx / imax_mqsx ;
 mqsx.3r1: mqsx,lrad:=l.mqsx ,ksl:={ 0.000000000000000,( kqsx3.r1 ) * ( l.mqsx ) },kmax:=kmax_mqsx ,kmin:=kmin_mqsx ,calib:=kmax_mqsx / imax_mqsx ,polarity:= 1.000000000000000,mech_sep:= 0.000000000000000;
@@ -540,11 +540,11 @@ brana: instrument,l:=l.brana ;
 brana.4r1: brana,slot_id:= 883446,assembly_id:= 102108,mech_sep:= 0.000000000000000;
 x1zdc001: instrument,l:= 0.000000000000000;
 x1zdc.a4r1: x1zdc001,slot_id:= 2019586,assembly_id:= 102108,mech_sep:= 0.000000000000000;
-tanar: rcollimator,l:=l.tanar ;
+tanar: collimator,l:=l.tanar ;
 tanar.4r1: tanar,slot_id:= 102108,mech_sep:= 0.000000000000000;
-tctva: rcollimator,l:=l.tctva ;
+tctva: collimator,l:=l.tctva ;
 tctva.4r1.b2: tctva,slot_id:= 377589,mech_sep:= -0.166700000000000;
-tcth: rcollimator,l:= 0.000000000000000;
+tcth: collimator,l:= 0.000000000000000;
 tcth.4r1.b2: tcth,slot_id:= 377590,mech_sep:= -0.170500000000000;
 bpmwb: monitor,l:=l.bpmwb ;
 bpmwb.4r1.b2: bpmwb,slot_id:= 104596,mech_sep:= -0.174000000000000;
@@ -1449,9 +1449,9 @@ branb: instrument,l:=l.branb ;
 branb.4l2: branb,slot_id:= 377595,mech_sep:= 0.000000000000000;
 btvst065: monitor,l:=l.btvst065 ;
 btvst.a4l2: btvst065,slot_id:= 181617,mech_sep:= -0.080000000000000;
-tctvb: rcollimator,l:= 0.000000000000000;
+tctvb: collimator,l:= 0.000000000000000;
 tctvb.4l2: tctvb,slot_id:= 357144;
-tcdd: rcollimator,l:= 0.000000000000000;
+tcdd: collimator,l:= 0.000000000000000;
 tcdd.4l2: tcdd,slot_id:= 102334,mech_sep:= 0.000000000000000;
 bpmsx: monitor,l:=l.bpmsx ;
 bpmsx.4l2.b2: bpmsx,slot_id:= 104598,mech_sep:= 0.000000000000000;
@@ -1575,7 +1575,7 @@ mbx.4r2..3: mbx,lrad:=( l.mbx ) / ( 4 ) ,knl:={( ad1.r2 ) * ( 0.25 ) },kmax:=kma
 mbx.4r2..4: mbx,lrad:=( l.mbx ) / ( 4 ) ,knl:={( ad1.r2 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000000000000,mech_sep:= 0.000000000000000;
 bpmsx.4r2.b2: bpmsx,slot_id:= 104601,mech_sep:= 0.000000000000000;
 tctvb.4r2: tctvb,slot_id:= 357145;
-tclia: rcollimator,l:= 0.000000000000000;
+tclia: collimator,l:= 0.000000000000000;
 tclia.4r2: tclia,slot_id:= 357146;
 branb.4r2: branb,slot_id:= 377596,mech_sep:= 0.000000000000000;
 x2zdc002: instrument,l:= 0.000000000000000;
@@ -1616,7 +1616,7 @@ mqm.b5r2.b2: marker,kmax:=kmax_mqm_4.5k ,kmin:=kmin_mqm_4.5k ,calib:=kmax_mqm / 
 mqm.b5r2.b2..2: mqm,lrad:=( l.mqm ) / ( 2 ) ,knl:={ 0.000000000000000,( ( 0 - kq5.r2b2 ) * ( l.mqm ) ) * ( 0.5 ) },kmax:=kmax_mqm_4.5k ,kmin:=kmin_mqm_4.5k ,calib:=kmax_mqm / imax_mqm ,polarity:= 1.000000000000000,mech_sep:=
  0.194000000000000;
 bpm.5r2.b2: bpm,slot_id:= 298148,assembly_id:= 102346,mech_sep:= 0.194000000000000;
-tclim: rcollimator,l:= 0.000000000000000;
+tclim: collimator,l:= 0.000000000000000;
 tclim.6r2.b2: tclim,slot_id:= 357147,mech_sep:= 0.194000000000000;
 mcbcv.6r2.b2: mcbcv,kmax:=kmax_mcbcv_4.5k ,kmin:=kmin_mcbcv_4.5k ,polarity:= 1.000000000000000,lrad:=l.mcbcv ,kick:=- acbcv6.r2b2 ,slot_id:= 250032,assembly_id:= 102348,mech_sep:= 0.194000000000000;
 mqml.6r2.b2..1: mqml,lrad:=( l.mqml ) / ( 2 ) ,knl:={ 0.000000000000000,( ( 0 - kq6.r2b2 ) * ( l.mqml ) ) * ( 0.5 ) },kmax:=kmax_mqml_4.5k ,kmin:=kmin_mqml_4.5k ,calib:=kmax_mqml / imax_mqml ,polarity:= -1.000000000000000,mech_sep:=
@@ -2419,7 +2419,7 @@ mqtli.7l3.b2..2: mqtli,lrad:=( l.mqtli ) / ( 2 ) ,knl:={ 0.000000000000000,( ( 0
 mcbch.7l3.b2: mcbch,polarity:= 1.000000000000000,lrad:=l.mcbch ,kick:=- acbch7.l3b2 ,slot_id:= 250544,assembly_id:= 102560,mech_sep:= 0.194000000000000;
 dfbae: placeholder,l:= 0.000000000000000,lrad:=l.dfbae ;
 dfbae.7l3.b2: dfbae,lrad:=l.dfbae ,slot_id:= 104678,mech_sep:= 0.194000000000000;
-tcla: rcollimator,l:= 0.000000000000000;
+tcla: collimator,l:= 0.000000000000000;
 tcla.7l3.b2: tcla,slot_id:= 479332,mech_sep:= 0.194000000000000;
 btvm: monitor,l:=l.btvm ;
 btvm.7l3.b2: btvm,slot_id:= 357148,mech_sep:= 0.194000000000000;
@@ -2492,9 +2492,9 @@ mcbwh: hcorrector,l:= 0.000000000000000,kmax:=kmax_mcbwh ,kmin:=kmin_mcbwh ,cali
 mcbwh.5l3.b2: mcbwh,polarity:= 1.000000000000000,lrad:=l.mcbwh ,kick:=- acbwh5.l3b2 ,slot_id:= 297845,mech_sep:= 0.224000000000000;
 tcla.b5l3.b2: tcla,slot_id:= 479335,mech_sep:= 0.224000000000000;
 tcla.a5l3.b2: tcla,slot_id:= 479336,mech_sep:= 0.224000000000000;
-tcsm: rcollimator,l:= 0.000000000000000;
+tcsm: collimator,l:= 0.000000000000000;
 tcsm.b5l3.b2: tcsm,slot_id:= 102566,mech_sep:= 0.224000000000000;
-tcsg: rcollimator,l:= 0.000000000000000;
+tcsg: collimator,l:= 0.000000000000000;
 tcsg.b5l3.b2: tcsg,slot_id:= 102567,mech_sep:= 0.224000000000000;
 tcsm.a5l3.b2: tcsm,slot_id:= 102568,mech_sep:= 0.224000000000000;
 tcsg.a5l3.b2: tcsg,slot_id:= 281846,mech_sep:= 0.224000000000000;
@@ -2586,11 +2586,11 @@ bpmwe.5r3.b2: bpmwe008,slot_id:= 182515,mech_sep:= 0.224000000000000;
 mbw.a6r3.b2: mbw,lrad:=l.mbw ,knl:={- ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000000000000,mech_sep:= 0.224000000000000;
 mbw.b6r3.b2: mbw,lrad:=l.mbw ,knl:={- ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000000000000,mech_sep:= 0.224000000000000;
 mbw.c6r3.b2: mbw,lrad:=l.mbw ,knl:={- ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000000000000,mech_sep:= 0.224000000000000;
-tcapa020: rcollimator,l:= 0.000000000000000;
+tcapa020: collimator,l:= 0.000000000000000;
 tcapa.6r3.b2: tcapa020,slot_id:= 691019,mech_sep:= 0.221000000000000;
-tchsh: rcollimator,l:= 0.000000000000000;
+tchsh: collimator,l:= 0.000000000000000;
 tchsh.6r3.b2: tchsh,slot_id:= 102576;
-tcp: rcollimator,l:= 0.000000000000000;
+tcp: collimator,l:= 0.000000000000000;
 tcp.6r3.b2: tcp,slot_id:= 281848,mech_sep:= 0.205400000000000;
 mbw.d6r3.b2: mbw,lrad:=l.mbw ,knl:={ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000000000000,mech_sep:= 0.194000000000000;
 mbw.e6r3.b2: mbw,lrad:=l.mbw ,knl:={ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000000000000,mech_sep:= 0.194000000000000;
@@ -4324,9 +4324,9 @@ mqml.6l5.b2..2: mqml,lrad:=( l.mqml ) / ( 2 ) ,knl:={ 0.000000000000000,( ( 0 - 
 mcbcv.6l5.b2: mcbcv,kmax:=kmax_mcbcv_4.5k ,kmin:=kmin_mcbcv_4.5k ,polarity:= 1.000000000000000,lrad:=l.mcbcv ,kick:=- acbcv6.l5b2 ,slot_id:= 251583,assembly_id:= 103033,mech_sep:= 0.194000000000000;
 bpmwt: monitor,l:=l.bpmwt ;
 bpmwt.b6l5.b2: bpmwt,slot_id:= 826595,assembly_id:= 825708,mech_sep:= 0.194000000000000;
-xrpv: rcollimator,l:=l.xrpv ;
+xrpv: collimator,l:=l.xrpv ;
 xrpv.b6l5.b2: xrpv,slot_id:= 826619,assembly_id:= 825708,mech_sep:= 0.194000000000000;
-xrph: rcollimator,l:=l.xrph ;
+xrph: collimator,l:=l.xrph ;
 xrph.b6l5.b2: xrph,slot_id:= 826607,assembly_id:= 825708,mech_sep:= 0.194000000000000;
 xrph.a6l5.b2: xrph,slot_id:= 826643,assembly_id:= 825709,mech_sep:= 0.194000000000000;
 xrpv.a6l5.b2: xrpv,slot_id:= 826655,assembly_id:= 825709,mech_sep:= 0.194000000000000;
@@ -4338,7 +4338,7 @@ mqml.5l5.b2: marker,kmax:=kmax_mqml_4.5k ,kmin:=kmin_mqml_4.5k ,calib:=kmax_mqml
 mqml.5l5.b2..2: mqml,lrad:=( l.mqml ) / ( 2 ) ,knl:={ 0.000000000000000,( ( 0 - kq5.l5b2 ) * ( l.mqml ) ) * ( 0.5 ) },kmax:=kmax_mqml_4.5k ,kmin:=kmin_mqml_4.5k ,calib:=kmax_mqml / imax_mqml ,polarity:= 1.000000000000000,mech_sep:=
  0.194000000000000;
 mcbch.5l5.b2: mcbch,kmax:=kmax_mcbch_4.5k ,kmin:=kmin_mcbch_4.5k ,polarity:= 1.000000000000000,lrad:=l.mcbch ,kick:=- acbch5.l5b2 ,slot_id:= 251585,assembly_id:= 103035,mech_sep:= 0.194000000000000;
-tcl: rcollimator,l:= 0.000000000000000;
+tcl: collimator,l:= 0.000000000000000;
 tcl.5l5.b2: tcl,slot_id:= 103036,mech_sep:= 0.194000000000000;
 bpmya.4l5.b2: bpmya,slot_id:= 245651,assembly_id:= 103038,mech_sep:= 0.194000000000000;
 mqy.4l5.b2..1: mqy,lrad:=( l.mqy ) / ( 2 ) ,knl:={ 0.000000000000000,( ( 0 - kq4.l5b2 ) * ( l.mqy ) ) * ( 0.5 ) },kmax:=kmax_mqy_4.5k ,kmin:=kmin_mqy_4.5k ,calib:=kmax_mqy_4.5k / imax_mqy_4.5k ,polarity:= -1.000000000000000,mech_sep:=
@@ -4361,7 +4361,7 @@ xrph.b4l5.b2: xrph,slot_id:= 826611,assembly_id:= 825712,mech_sep:= 0.1940000000
 xrph.a4l5.b2: xrph,slot_id:= 826647,assembly_id:= 825713,mech_sep:= 0.194000000000000;
 xrpv.a4l5.b2: xrpv,slot_id:= 826659,assembly_id:= 825713,mech_sep:= 0.194000000000000;
 bpmwt.a4l5.b2: bpmwt,slot_id:= 826635,assembly_id:= 825713,mech_sep:= 0.175200000000000;
-tanc: rcollimator,l:=l.tanc ;
+tanc: collimator,l:=l.tanc ;
 tanc.4l5: tanc,slot_id:= 103042,mech_sep:= 0.000000000000000;
 x5zdc001: instrument,l:= 0.000000000000000;
 x5zdc.b4l5: x5zdc001,slot_id:= 2019606,assembly_id:= 103042,mech_sep:= 0.000000000000000;
@@ -5314,11 +5314,11 @@ mqy.4l6.b2: marker,kmax:=kmax_mqy_4.5k ,kmin:=kmin_mqy_4.5k ,calib:=kmax_mqy_4.5
 mqy.4l6.b2..2: mqy,lrad:=( l.mqy ) / ( 2 ) ,knl:={ 0.000000000000000,( ( 0 - kq4.l6b2 ) * ( l.mqy ) ) * ( 0.5 ) },kmax:=kmax_mqy_4.5k ,kmin:=kmin_mqy_4.5k ,calib:=kmax_mqy_4.5k / imax_mqy_4.5k ,polarity:= 1.000000000000000,mech_sep:= 
 -0.194000000000000;
 mcbyh.4l6.b2: mcbyh,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,polarity:= 1.000000000000000,lrad:=l.mcbyh ,kick:=- acbyh4.l6b2 ,slot_id:= 252138,assembly_id:= 103275,mech_sep:= -0.194000000000000;
-tcdqm: rcollimator,l:= 0.000000000000000;
+tcdqm: collimator,l:= 0.000000000000000;
 tcdqm.b4l6.b2: tcdqm,slot_id:= 377626,mech_sep:= -0.194000000000000;
 tcdqm.a4l6.b2: tcdqm,slot_id:= 829888,mech_sep:= -0.194000000000000;
 tcsg.4l6.b2: tcsg,slot_id:= 377627,mech_sep:= -0.194000000000000;
-tcdqa: rcollimator,l:=l.tcdqa ;
+tcdqa: collimator,l:=l.tcdqa ;
 tcdqa.b4l6.b2: tcdqa,slot_id:= 629257,assembly_id:= 103278,mech_sep:= -0.214000000000000;
 tcdqa.a4l6.b2: tcdqa,slot_id:= 629263,assembly_id:= 616959,mech_sep:= -0.214000000000000;
 bpmsb: monitor,l:=l.bpmsb ;
@@ -5347,9 +5347,9 @@ msda.b4r6.b2: msda,polarity:= 1.000000000000000,lrad:=l.msda ,vkick:=kmsd.lr6b2 
 msda.c4r6.b2: msda,polarity:= 1.000000000000000,lrad:=l.msda ,vkick:=kmsd.lr6b2 ,slot_id:= 134616,mech_sep:= -0.194100000000000;
 msda.d4r6.b2: msda,polarity:= 1.000000000000000,lrad:=l.msda ,vkick:=kmsd.lr6b2 ,slot_id:= 134618,mech_sep:= -0.192200000000000;
 msda.e4r6.b2: msda,polarity:= 1.000000000000000,lrad:=l.msda ,vkick:=kmsd.lr6b2 ,slot_id:= 134619,mech_sep:= -0.190200000000000;
-tcdsb: rcollimator,l:=l.tcdsb ;
+tcdsb: collimator,l:=l.tcdsb ;
 tcdsb.4r6.b2: tcdsb,slot_id:= 631494,assembly_id:= 103281,mech_sep:= -0.246100000000000;
-tcdsa: rcollimator,l:=l.tcdsa ;
+tcdsa: collimator,l:=l.tcdsa ;
 tcdsa.4r6.b2: tcdsa,slot_id:= 631490,assembly_id:= 616849,mech_sep:= -0.245000000000000;
 btvse: monitor,l:=l.btvse ;
 btvse.a4r6.b2: btvse,slot_id:= 181627,mech_sep:= -0.244000000000000;
@@ -6351,22 +6351,22 @@ mqwa.e5r7.b2: marker,kmax:=kmax_mqwa ,kmin:=kmin_mqwa ,calib:=kmax_mqwa / imax_m
 mqwa.e5r7.b2..2: mqwa,lrad:=( l.mqwa ) / ( 2 ) ,knl:={ 0.000000000000000,( ( 0 - kq5.lr7 ) * ( l.mqwa ) ) * ( 0.5 ) },kmax:=kmax_mqwa ,kmin:=kmin_mqwa ,calib:=kmax_mqwa / imax_mqwa ,polarity:= -1.000000000000000,mech_sep:= 
 -0.224000000000000;
 bpmwe.5r7.b2: bpmwe007,slot_id:= 134751,mech_sep:= -0.224000000000000;
-tcapc: rcollimator,l:= 0.000000000000000;
+tcapc: collimator,l:= 0.000000000000000;
 tcapc.6r7.b2: tcapc,slot_id:= 820155,mech_sep:= -0.224000000000000;
 tcsm.a6r7.b2: tcsm,slot_id:= 281889,mech_sep:= -0.224000000000000;
 tcsg.a6r7.b2: tcsg,slot_id:= 103528,mech_sep:= -0.224000000000000;
 tcsm.b6r7.b2: tcsm,slot_id:= 103529,mech_sep:= -0.224000000000000;
 tcsg.b6r7.b2: tcsg,slot_id:= 103530,mech_sep:= -0.224000000000000;
 mbw.a6r7.b2: mbw,lrad:=l.mbw ,knl:={ad34.lr7 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000000000000,mech_sep:= -0.224000000000000;
-tcapb: rcollimator,l:= 0.000000000000000;
+tcapb: collimator,l:= 0.000000000000000;
 tcapb.6r7.b2: tcapb,slot_id:= 820121,mech_sep:= -0.224000000000000;
 mbw.b6r7.b2: mbw,lrad:=l.mbw ,knl:={ad34.lr7 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000000000000,mech_sep:= -0.224000000000000;
-tcapa019: rcollimator,l:= 0.000000000000000;
+tcapa019: collimator,l:= 0.000000000000000;
 tcapa.6r7.b2: tcapa019,slot_id:= 820101,mech_sep:= -0.223600000000000;
-tchss: rcollimator,l:= 0.000000000000000;
+tchss: collimator,l:= 0.000000000000000;
 tchss.6r7.b2: tchss,slot_id:= 103532;
 tchsh.6r7.b2: tchsh,slot_id:= 103533;
-tchsv: rcollimator,l:= 0.000000000000000;
+tchsv: collimator,l:= 0.000000000000000;
 tchsv.6r7.b2: tchsv,slot_id:= 103534;
 tcp.a6r7.b2: tcp,slot_id:= 103535,mech_sep:= -0.194000000000000;
 tcp.b6r7.b2: tcp,slot_id:= 281890,mech_sep:= -0.202500000000000;
@@ -7210,7 +7210,7 @@ mqm.6l8.b2..2: mqm,lrad:=( l.mqm ) / ( 2 ) ,knl:={ 0.000000000000000,( ( 0 - kq6
 -0.194000000000000;
 bpm.6l8.b2: bpm,slot_id:= 298291,assembly_id:= 103750,mech_sep:= -0.194000000000000;
 tclim.6l8.b2: tclim,slot_id:= 357149,mech_sep:= -0.194000000000000;
-tclib: rcollimator,l:= 0.000000000000000;
+tclib: collimator,l:= 0.000000000000000;
 tclib.6l8.b2: tclib,slot_id:= 103751,mech_sep:= -0.194000000000000;
 mcbcv.b5l8.b2: mcbcv,kmax:=kmax_mcbcv_4.5k ,kmin:=kmin_mcbcv_4.5k ,polarity:= 1.000000000000000,lrad:=l.mcbcv ,kick:=- acbcvs5.l8b2 ,slot_id:= 298447,assembly_id:= 103752,mech_sep:= -0.194000000000000;
 mcbch.5l8.b2: mcbch,kmax:=kmax_mcbch_4.5k ,kmin:=kmin_mcbch_4.5k ,polarity:= 1.000000000000000,lrad:=l.mcbch ,kick:=- acbchs5.l8b2 ,slot_id:= 298450,assembly_id:= 103752,mech_sep:= -0.194000000000000;
@@ -7365,10 +7365,10 @@ mbx.4r8: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,pola
 mbx.4r8..3: mbx,lrad:=( l.mbx ) / ( 4 ) ,knl:={( ad1.r8 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000000000000,mech_sep:= 0.000000000000000;
 mbx.4r8..4: mbx,lrad:=( l.mbx ) / ( 4 ) ,knl:={( ad1.r8 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000000000000,mech_sep:= 0.000000000000000;
 bpmsx.4r8.b2: bpmsx,slot_id:= 104619,mech_sep:= 0.000000000000000;
-tcddm: rcollimator,l:= 0.000000000000000;
+tcddm: collimator,l:= 0.000000000000000;
 tcddm.4r8: tcddm,slot_id:= 103763,mech_sep:= 0.000000000000000;
 tctvb.4r8: tctvb,slot_id:= 357152;
-tdi: rcollimator,l:= 0.000000000000000;
+tdi: collimator,l:= 0.000000000000000;
 tdi.4r8.b2: tdi,slot_id:= 248510,mech_sep:= 0.076000000000000;
 btvst064: monitor,l:=l.btvst064 ;
 btvst.a4r8: btvst064,slot_id:= 181630,mech_sep:= -0.080000000000000;
@@ -8248,9 +8248,9 @@ mbrc.4l1.b2: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc
 mbrc.4l1.b2..3: mbrc,lrad:=( l.mbrc ) / ( 4 ) ,knl:={( 0 - ad2.l1 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000000000000,mech_sep:= 0.188000000000000;
 mbrc.4l1.b2..4: mbrc,lrad:=( l.mbrc ) / ( 4 ) ,knl:={( 0 - ad2.l1 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000000000000,mech_sep:= 0.188000000000000;
 bpmwb.4l1.b2: bpmwb,slot_id:= 181647,mech_sep:= 0.174000000000000;
-tclp: rcollimator,l:= 0.000000000000000;
+tclp: collimator,l:= 0.000000000000000;
 tclp.4l1.b2: tclp,slot_id:= 103987;
-tanal: rcollimator,l:=l.tanal ;
+tanal: collimator,l:=l.tanal ;
 tanal.4l1: tanal,slot_id:= 103988,mech_sep:= 0.000000000000000;
 x1zdc.a4l1: x1zdc001,slot_id:= 2019579,assembly_id:= 103988,mech_sep:= 0.000000000000000;
 brana.4l1: brana,slot_id:= 883499,assembly_id:= 103988,mech_sep:= 0.000000000000000;

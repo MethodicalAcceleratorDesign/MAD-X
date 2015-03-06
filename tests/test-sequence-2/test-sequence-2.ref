@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.02  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.05.24      +
-  + Execution Time Stamp: 26.07.13 16.29.52 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.11.14               +
+  + Execution date: 2015.03.05 19:58:33      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 
 
 /******************************************************************************************
@@ -193,15 +193,21 @@
 
 //---------------------- ECOLLIMATOR    ---------------------------------------------
 
-SPSCRAP   : ECOLLIMATOR , L := 0;         ! PSB Special scraper injection & extraction bump, 128mm X 59mm. Thickness 2mm or 3mm (not yet known)
+SPSCRAP   : COLLIMATOR , L := 0, APERTYPE=ellipse;  
+
+	    		       	          ! PSB Special scraper injection & extraction bump, 128mm X 59mm. Thickness 2mm or 3mm (not yet known)
 
                                           ! //cern.ch/dfs/Departments/TS/Services/Old%20Drawings/Complexe_PS/BOOSTER/49/PS-SI-3-49-1420.TIF
 
-SPSCRAP014: ECOLLIMATOR , L := 0;         ! PSB Special scraper for extraction in P142. Thickness not known. Offset 9mm to the outside.
+SPSCRAP014: COLLIMATOR , L := 0, APERTYPE=ellipse;
+
+	    		       		  ! PSB Special scraper for extraction in P142. Thickness not known. Offset 9mm to the outside.
 
                                           ! //cern.ch/dfs/Departments/TS/Services/Old%20Drawings/Complexe_PS/BOOSTER/49/PS-SI-3-49-1421.TIF
 
-STSCRAP   : ECOLLIMATOR , L := 0;         ! PSB Standard scraper, 122mm X 59mm. Thickness 2mm.
+STSCRAP   : COLLIMATOR , L := 0, APERTYPE=ellipse;
+
+					  ! PSB Standard scraper, 122mm X 59mm. Thickness 2mm.
 
                                           ! //cern.ch/dfs/Departments/TS/Services/Old%20Drawings/Complexe_PS/BOOSTER/49/PS-SI-3-49-1419.TIF
 
@@ -303,7 +309,7 @@ MDBAB     : RBEND       , L := .565;      ! BSW Dipole ejection bump (slow), Dip
 
 //---------------------- RCOLLIMATOR    ---------------------------------------------
 
-WBS       : RCOLLIMATOR , L := .04;       ! Collimator, window beamscope
+WBS       : COLLIMATOR  , L := .04, APERTYPE=rectangle;       ! Collimator, window beamscope
 
 //---------------------- RFCAVITY       ---------------------------------------------
 
@@ -6009,5 +6015,5 @@ Stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.02 (64 bit) finished normally +
+  + MAD-X 5.02.04 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
