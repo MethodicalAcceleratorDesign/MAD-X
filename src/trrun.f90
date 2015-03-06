@@ -180,7 +180,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      return
   endif
  
-  aperflag = .false.
+  aperflag = get_option('aperture ') .ne. 0
   e_flag = 0
   ! flag to avoid double entry of last line
   last_out = .false.
@@ -795,79 +795,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      go to 500
   endif
 
-! !  ---- Special colllimator aperture check taken out AK 20071211
-! !  ---- Collimator with elliptic aperture.
-!        if(code.eq.20) then
-!          ap1 = node_value('xsize ')
-!          ap2 = node_value('ysize ')
-!
-!          if(ap1.eq.0d0) ap1=maxaper(1)
-!          if(ap2.eq.0d0) ap2=maxaper(3)
-!
-!          call trcoll(1, ap1, ap2, ap3, ap4, turn, sum, part_id, last_turn,    &
-!               last_pos, last_orbit, track, ktrack,al_errors,offx,offy)
-!          go to 500
-!        endif
-! !  ---- Collimator with rectangular aperture.
-!        if(code.eq.21) then
-!          ap1 = node_value('xsize ')
-!          ap2 = node_value('ysize ')
-!
-!          if(ap1.eq.0d0) ap1=maxaper(1)
-!          if(ap2.eq.0d0) ap2=maxaper(3)
-!
-!          call trcoll(2, ap1, ap2, ap3, ap4, turn, sum, part_id, last_turn,    &
-!               last_pos, last_orbit, track, ktrack,al_errors,offx,offy)
-!          go to 500
-!        endif
-
-     !  ---- 2013-May-22  11:35:54  ghislain: this section for backward compatibility
-     !       with the MAD8 style definition of R/ECOLLIMATOR with xsize and ysize parameters,
-     !       but ONLY IF apertype and aperture parameters were not specified.
-     !
-     !       The case where apertype and aperture were specified was
-     !       already taken into account in preceding section under if(aperflag) where
-     !       the eventual xsize and ysize parameters were simply ignored.
-
-     !       Hence the new style definition of collimators
-     !       COLL : RCOLLIMATOR, apertype=rectangle, aperture={1.e-3,1.e-3} ;
-     !       has precedence over the apertype/aperture old style definition
-     !       COLL : RCOLLIMATOR, xsize=1.e-3, ysize=1.e-3 ;
-
-     !  NOTE: this calls for redefinition of the COLLIMATOR element...
-     !        and eventually the demise of the old xsize/ysize syntax
-
-     !!---- Collimator with elliptic aperture.
-     ! if(code.eq.20) then
-     !    ap1 = node_value('xsize ')
-     !    ap2 = node_value('ysize ')
-     !    if(ap1.eq.0d0) then
-     !       ap1=maxaper(1)
-     !    endif
-     !    if(ap2.eq.0d0) then
-     !       ap2=maxaper(3)
-     !    endif
-     !    call trcoll(1, ap1, ap2, ap3, ap4, turn, sum, part_id, last_turn,    &
-     !         last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
-     ! endif
-
-     !!---- Collimator with rectangular aperture.
-     ! if(code.eq.21) then
-     !    ap1 = node_value('xsize ')
-     !    ap2 = node_value('ysize ')
-     !    if(ap1.eq.0d0) then
-     !       ap1=maxaper(1)
-     !    endif
-     !    if(ap2.eq.0d0) then
-     !       ap2=maxaper(3)
-     !    endif
-     !    call trcoll(2, ap1, ap2, ap3, ap4, turn, sum, part_id, last_turn,    &
-     !         last_pos, last_orbit, track,ktrack,al_errors,offx,offy)
-     ! endif
-
-
   !---- Test aperture. ALL ELEMENTS BUT DRIFTS
-  aperflag = get_option('aperture ') .ne. 0
   if(aperflag) then
      nn=name_len
      call node_string('apertype ',aptype,nn)
@@ -1027,6 +955,10 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
 
 
 500 continue
+
+  ! This is where we should Test Aperture at exit of elements
+  ! by calling trcoll again
+
 
   !---- Rotate trajectory at exit
   if (theta .ne. 0d0)  then
