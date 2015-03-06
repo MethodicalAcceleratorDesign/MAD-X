@@ -1229,7 +1229,7 @@ An instrument or placeholder has one real attribute:
 The \hyperref[subsec:local_straight]{straight reference system} for an 
 instrument is a Cartesian coordinate system.  
 
-
+\begin{5.02.04}
 % Changed by: Ghislain Roy, 23-May-2013 
 \section{Collimator}
  
@@ -1277,8 +1277,61 @@ collimator is a Cartesian coordinate system.
 \textbf{NOTE:} When a collimator is displaced transversally in order to
 model an asymmetric collimator, particle losses in tracking are
 reported with respect to the \textbf{displaced} reference system, not
-with respect to the surrounding beam line.  
+with respect to the surrounding beam line.
 
+\end{5.02.04}
+
+\begin{5.02.05}
+\section{Collimator}
+\label{sec:collimator}
+
+A {\tt COLLIMATOR} has no specific effect on beam optics and behaves like a
+\hyperref[sec:drift]{drift space}. 
+
+\madbox{
+label: COLLIMATOR, \=L=real, \\
+                   \>APERTYPE=string,  APERTURE=\{values\}, \\
+                   \>APER\_OFFSET=\{values\}, APER\_TOL=\{values\};
+
+}
+
+
+A {\tt COLLIMATOR} has one specific real attribute: 
+\begin{madlist}
+	\ttitem{L} The collimator length (default: 0 m). 
+\end{madlist}
+
+Additionally, like any other element, except {\tt DRIFT} space, 
+a {\tt COLLIMATOR} can have specific aperture related attributes 
+as defined in the related section \hyperref[sec:def_aper]{Defining 
+aperture in \madx}
+
+
+During \hyperref[chap:thin_track]{tracking} in \madx, particle loss 
+is checked at the entrance of the element by comparing particle coordinates 
+and defined aperture, provided that the {\tt APERTURE} flag is {\tt true} 
+in the \hyperref[sec:track]{\tt TRACK} command, 
+and that the {\tt APERTYPE} attribute value of the element is one of the 
+predefined types. 
+An aperture model defined in an external file ({\tt APERTYPE=filename})
+is not used to check particle loss during tracking. 
+
+
+Example: 
+\madxmp{
+COLLIM: COLLIMATOR, L=0.5, APERTYPE=ellipse, APERTURE={0.01,0.005};
+}
+
+The \hyperref[subsec:local_straight]{straight reference system} for a
+collimator is a Cartesian coordinate system.  
+
+\textbf{NOTE:} A collimator can be displaced transversally in order to
+model an asymmetric collimator by means of the {\tt APER\_OFFSET} attributes; 
+During tracking particle losses are then reported with coordinates with respect 
+to the \textbf{displaced} reference system, not with respect to the surrounding 
+beam line.
+
+\end{5.02.05}
 
 
 
