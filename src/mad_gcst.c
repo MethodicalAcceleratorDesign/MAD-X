@@ -62,17 +62,15 @@ const char* cmd_match_base[] =
 
 char* aperture_types[] =
 {
-  "circle", "ellipse", "rectangle", "lhcscreen",
-  "marguerite", "rectellipse", "racetrack",
+  "circle", "ellipse", "rectangle", "lhcscreen", "rectcircle",
+  "rectellipse", "racetrack", "octagon",
   " "  /* blank terminates */
 };
 
-/*added 4, 3 and "racetrack" here */
-
 int aperture_npar[] =
 {
-  1, 2, 2, 3,
-  2, 4, 3
+  1, 2, 2, 3, 3,
+  4, 4, 4
 };
 
 /* table descriptors: type 1 = int, type 2 = double, type 3 = string;
@@ -640,12 +638,22 @@ int summ_table_types[] =
 char* summ_table_cols[] =
 {
   "length", "orbit5", "alfa", "gammatr", "q1",
-  "dq1", "betxmax", "dxmax", "dxrms", "xcomax",
-  "xcorms", "q2", "dq2", "betymax", "dymax",
-  "dyrms", "ycomax", "ycorms", "deltap",
+  "dq1", "betxmax", "dxmax", "dxrms", "xcomax", 
+  "xcorms", "q2", "dq2", "betymax", "dymax", 
+  "dyrms", "ycomax", "ycorms", "deltap", 
   "synch_1","synch_2","synch_3","synch_4","synch_5",
   " "  /* blank terminates */
 };
+
+// different layout for SUMM table columns
+// char* summ_table_cols[] =
+// {
+//   "length", "orbit5", "alfa", "gammatr", "deltap",
+//   "q1", "dq1", "betxmax", "dxmax", "dxrms", "xcomax", "xcorms",
+//   "q2", "dq2", "betymax", "dymax", "dyrms", "ycomax", "ycorms",
+//   "synch_1","synch_2","synch_3","synch_4","synch_5",
+//   " "  /* blank terminates */
+// }; 
 
 int trackone_table_types[] =
 {

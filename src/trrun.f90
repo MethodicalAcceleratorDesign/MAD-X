@@ -3047,6 +3047,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
   implicit none
 
   ! 2015-Feb-20  18:46:05  ghislain: rewrite of trcoll
+  ! 2015-Mar-09  14:50:37  ghislain: adapted to new racetrack parameter definition
 
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -3147,10 +3148,6 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            if (optiondebug .ne. 0) print *, " zero or negative vertical extent ", ap2, " replaced by default ", maxaper(3)
            ap2 = maxaper(3)
         endif
-
-     case("marguerite")
-        ! 2015-Feb-20  18:41:44  ghislain: marguerite type is deprecated
-        print *, "Apertype marguerite is not supported." 
            
      case("rectellipse")
         !*****         test ellipse
@@ -3180,6 +3177,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
         ap1 = aperture(1)
         ap2 = aperture(2)
         ap3 = aperture(3)
+        ap4 = aperture(4)        
         if (ap1.lt.min_double) then
            if (optiondebug .ne. 0) print *, " zero or negative horizontal extent ", ap1, " replaced by default ", maxaper(1)
            ap1 = maxaper(1)
@@ -3188,9 +3186,25 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            if (optiondebug .ne. 0) print *, " zero or negative vertical extent ", ap2, " replaced by default ", maxaper(3)
            ap2 = maxaper(3)
         endif
-        if (ap3.lt.min_double) then
-           if (optiondebug .ne. 0) print *, " zero or negative corner radius ", ap3, " replaced by default ", maxaper(1)
-           ap3 = maxaper(1)
+        if (ap3.lt.0.d0) then ! zero extent of rounded corned is allowed
+           if (optiondebug .ne. 0) print *, " negative horizontal semi-axis ", ap3, & 
+                "; horizontal semi-axis reset to horizontal extent", ap1
+           ap3 = ap1
+        endif
+        if (ap4.lt.0.d0) then ! zero extent of rounded corner is allowed
+           if (optiondebug .ne. 0) print *, " negative vertical semi-axis ", ap4, & 
+                "; horizontal semi-axis reset to horizontal extent", ap2
+           ap4 = ap2
+        endif
+        if (ap3.gt.ap1) then
+           if (optiondebug .ne. 0) print *, " horizontal semi-axis ", ap3, " is larger than horizontal extent ", ap1, &
+                "; horizontal semi-axis reset to horizontal extent"
+           ap3 = ap1
+        endif
+        if (ap4.gt.ap2) then
+           if (optiondebug .ne. 0) print *, " vertical semi-axis", ap4, " is larger than vertical extent ", ap2, &
+                "; vertical semi-axis reset to vertical extent"           
+           ap4 = ap2
         endif
         
      case("octagon")
@@ -3257,16 +3271,17 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
         
      case("lhcscreen", "rectcircle")
         lost = x .gt. ap1 .or. y .gt. ap2 .or. (x/ap3)**2 + (y/ap3)**2 .gt. 1d0 
-
-     case("marguerite")
   
      case("rectellipse")
        lost =  x .gt. ap1 .or. y .gt. ap2 .or. (x/ap3)**2 + (y/ap4)**2 .gt. 1d0 
  
      case("racetrack")
-        !*** case of racetrack: test outer rectangle (ap1+ap3,ap2+ap3) then test radius for rounded corners.
-        lost =  x .gt. ap1+ap3 .or. y .gt. ap2+ap3 .or. &
-             ( x .gt. ap1 .and. y .gt. ap2 .and. (x-ap1)**2 + (y-ap2)**2 .gt. ap3**2 )
+        ! 2015-Mar-09  15:05:39  ghislain: adapted to new racetrack parameter definition
+        !*** case of racetrack: test outer rectangle (ap1,ap2) first
+        !    then test ellipse for corner part.
+        lost =  x .gt. ap1 .or. y .gt. ap2 .or. &
+             ( x .gt. ap1-ap3 .and. y .gt. ap2-ap3 .and. & 
+               ((x-(ap1-ap3)) / ap3)**2 + ((y-(ap2-ap3)) / ap4)**2 .gt. 1.d0 )
         
      case("octagon")
         ! 2015-Feb-20  18:42:26  ghislain: added octagon shape           

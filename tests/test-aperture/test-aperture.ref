@@ -3,7 +3,7 @@
   +     MAD-X 5.02.04  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2014.11.14               +
-  + Execution date: 2015.03.03 12:20:02      +
+  + Execution date: 2015.03.10 10:39:48      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title,'LHC Cell APERTURE example';
 
@@ -98,7 +98,7 @@ LHCCELL: SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
 
   MB6: MB,  at= len_half_cell + l.MQ+drift1+2*(l.mb+drift2),
 
-	    apertype=racetrack, aperture = {a,b,h/5.}, aper_tol = {th,tv,tr};
+	    apertype=racetrack, aperture = {a+h/5.,b+h/10.,h/5.,h/10.}, aper_tol = {th,tv,tr};
 
 endsequence;
 
@@ -222,7 +222,7 @@ LHCCEL2: SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
 
   MB61: MB,  at= len_half_cell + l.MQ+drift1+2*(l.mb+drift2),
 
-	    apertype=racetrack, aperture = {c,d,h2/5.}, aper_tol = {th,tv,tr};
+	    apertype=racetrack, aperture = {c+h2/5.,d+h2/10.,h2/5.,h2/10.}, aper_tol = {th,tv,tr};
 
 endsequence;
 

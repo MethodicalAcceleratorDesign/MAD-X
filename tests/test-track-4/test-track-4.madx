@@ -4,8 +4,8 @@
 option,-echo,-info,warn;
 
 ! **********  Apertures introduced **********
-qd:multipole, knl={0,-0.0}, apertype= racetrack, aperture={0.002,0.0005,0.001};! H
-!--------------------------------------------  syntax : hlimit,vlimit,radius
+qd:multipole, knl={0,-0.0}, apertype= racetrack, aperture={0.002+0.001,0.0005+.001,0.001,0.001};! H
+!--------------------------------------------  syntax : hlimit,vlimit,h-semi-axis,v-semi-axis
 endmk:marker;
 
 ! ********** Define sequences

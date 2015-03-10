@@ -14,6 +14,24 @@ release number for the change.
 
 \begin{madlist}
 
+  \ttitemn{20156-Mar-10} version 5.02.05, r5161\\
+  Major change to definition of {\tt RACETRACK} 
+  \hyperref[sec:def_aper]{aperture type}. 
+  The {\tt RACETRACK} aperture now refers to a generalized shape 
+  with rounding of corner with ellipse instead of circle. 
+  The {\tt APERTURE} array now takes four arguments for the 
+  {\tt RACETRACK} shape: maximum horizontal extent, maximum 
+  vertical extent, horizontal semi-axis and vertical semi-axis 
+  of ellipse for rounding the corner. \\
+  {\bf Note also that the definition of the first two arguments 
+  has changed from horizontal and vertical offsets to horizontal 
+  and vertical maximum extensions.} \\
+
+  Removed also all references in the code and the manual to the 
+  {\tt MARGUERITE} aperture type (two {\tt RECTCIRCLE}s 
+  crossing at right angle) that has been deprecated for some 
+  time already.
+
   \ttitemn{2015-Mar-06} version 5.02.05, r5158\\
   Major change to collimator elements: the {\tt RCOLLIMATOR} and {\tt ECOLLIMATOR} 
   elements are no longer defined in \madx and replaced by a generic 

@@ -537,11 +537,6 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
     return 1;
   }
 
-  else if (!strcmp(apertype,"marguerite")) {
-    printf("\nApertype %s not supported.", apertype);
-    return 0;
-  }
-
   else if (!strcmp(apertype,"rectellipse")) {
     *ap1=get_aperture(current_node, "var1"); /*half width rect*/
     *ap2=get_aperture(current_node, "var2"); /*half height rect*/
@@ -559,27 +554,28 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
   }
 
   else if (!strcmp(apertype,"racetrack")) {
-    *ap1=get_aperture(current_node, "var1"); /*half width rect*/
-    *ap2=get_aperture(current_node, "var2"); /*half height rect*/
-    *ap3=get_aperture(current_node, "var3"); /*radius circle*/
+    *ap1=get_aperture(current_node, "var1"); /*half width extension*/
+    *ap2=get_aperture(current_node, "var2"); /*half height extension*/
+    *ap3=get_aperture(current_node, "var3"); /*horizontal semi-axis*/
+    *ap4=get_aperture(current_node, "var4"); /*vertical semi-axis*/
     
-    *ap4 = *ap3; // curved part is a circle
-
     // 2014-Jun-27  11:14:27  ghislain: 
     // change check from ap1 or ap2<=0  to ap1 or ap2 or ap3 < 0
     // zero horizontal or vertical explosion factors, and zero radius should be allowed.
-    if ( (*ap1) < 0 || (*ap2) < 0 || (*ap3) < 0 ) { 
+    // 2015-Mar-09  14:43:33  ghislain: change meaning of parameters: ap1 and ap2 are now full rectangle extension, 
+    // 2015-Mar-10  10:18:46  ghislain: change rounded corners from circular to generalized elliptical shape
+    if ( (*ap1) < 0 || (*ap2) < 0 || (*ap3) < 0 || (*ap4) < 0 || (*ap1) < (*ap3) || (*ap2) < (*ap4)) { 
       if (debug) 
 	printf("+++ aper_build screen, racetrack parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
       return 0;
     }
-    // special call to build a circle first: note that we cannot invoque ap1 or ap2
-    aper_rectellipse(ap3, ap3, ap3, ap4, &quarterlength, pipex, pipey);
+    // special call to build an ellipse first: note that we cannot invoque ap1 or ap2
+    aper_rectellipse(ap3, ap4, ap3, ap4, &quarterlength, pipex, pipey);
       
     /* displace the quartercircle */
     for (i=0;i<=quarterlength;i++) {
-      pipex[i] += (*ap1); 
-      pipey[i] += (*ap2); 
+      pipex[i] += (*ap1) - (*ap3); 
+      pipey[i] += (*ap2) - (*ap4); 
     }
       
     aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);      

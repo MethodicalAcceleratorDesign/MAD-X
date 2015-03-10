@@ -44,7 +44,7 @@ LHCCELL: SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
   MB5: MB,  at= len_half_cell + l.MQ+drift1+l.mb+drift2,
 	    apertype=lhcscreen, aperture = {a,b,h}, aper_tol = {th,tv,tr};
   MB6: MB,  at= len_half_cell + l.MQ+drift1+2*(l.mb+drift2),
-	    apertype=racetrack, aperture = {a,b,h/5.}, aper_tol = {th,tv,tr};
+	    apertype=racetrack, aperture = {a+h/5.,b+h/10.,h/5.,h/10.}, aper_tol = {th,tv,tr};
 endsequence;
 
 beam,particle=proton,energy=450.0, exn=3.75e-6, eyn=3.75e-6;
@@ -87,7 +87,7 @@ LHCCEL2: SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
   MB51: MB,  at= len_half_cell + l.MQ+drift1+l.mb+drift2,
 	    apertype=lhcscreen, aperture = {c,d,h2}, aper_tol = {th,tv,tr};
   MB61: MB,  at= len_half_cell + l.MQ+drift1+2*(l.mb+drift2),
-	    apertype=racetrack, aperture = {c,d,h2/5.}, aper_tol = {th,tv,tr};
+	    apertype=racetrack, aperture = {c+h2/5.,d+h2/10.,h2/5.,h2/10.}, aper_tol = {th,tv,tr};
 endsequence;
 
 beam,particle=proton,energy=450.0, exn=3.75e-6, eyn=3.75e-6;

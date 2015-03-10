@@ -518,27 +518,43 @@ CONTAINS
           key%list%aperture_kind=2
           key%list%aperture_x=aperture(1)
           key%list%aperture_y=aperture(2)
-          !       case("lhcscreen")
-       case("rectellipse")
+       case("lhcscreen") ! 2015-Mar-10  14:28:41  ghislain: added 
+          key%list%aperture_on=.true.
+          key%list%aperture_kind=3
+          key%list%aperture_x=aperture(1)
+          key%list%aperture_y=aperture(2)
+          key%list%aperture_r(1)=aperture(3)
+          key%list%aperture_r(2)=aperture(3)
+       case("rectcircle") ! 2015-Mar-10  14:28:41  ghislain: added
+          key%list%aperture_on=.true.
+          key%list%aperture_kind=3
+          key%list%aperture_x=aperture(1)
+          key%list%aperture_y=aperture(2)
+          key%list%aperture_r(1)=aperture(3)
+          key%list%aperture_r(2)=aperture(3)
+        case("rectellipse")
           key%list%aperture_on=.true.
           key%list%aperture_kind=3
           key%list%aperture_x=aperture(1)
           key%list%aperture_y=aperture(2)
           key%list%aperture_r(1)=aperture(3)
           key%list%aperture_r(2)=aperture(4)
-       case("marguerite")
-          key%list%aperture_on=.true.
-          key%list%aperture_kind=4
-          key%list%aperture_r(1)=aperture(1)
-          key%list%aperture_r(2)=aperture(2)
-       case("racetrack")
+       case("racetrack") ! 2015-Mar-10  14:25:24  ghislain: generalized racetrack
           key%list%aperture_on=.true.
           key%list%aperture_kind=5
           key%list%aperture_x=aperture(1)
           key%list%aperture_y=aperture(2)
           key%list%aperture_r(1)=aperture(3)
-       case("general")
+          key%list%aperture_r(2)=aperture(4)
+       case("octagon") ! 2015-Mar-10  14:25:37  ghislain: added octagon
+          key%list%aperture_on=.true.
           key%list%aperture_kind=6
+          key%list%aperture_x=aperture(1)
+          key%list%aperture_y=aperture(2)
+          key%list%aperture_r(1)=aperture(3)          
+          key%list%aperture_r(2)=aperture(4)
+       case("general") ! 2015-Mar-10  14:25:48  ghislain: kind was 6
+          key%list%aperture_kind=7
           print*,"General aperture not implemented"
           stop
        end select
