@@ -3,7 +3,7 @@
   +     MAD-X 5.02.04  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2014.11.14               +
-  + Execution date: 2015.03.03 18:58:56      +
+  + Execution date: 2015.03.11 12:28:04      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Title, "Compiling Optics for the LHC 6.5 lattice with MADX";
 
@@ -82,9 +82,9 @@ parameter: gamma   double value:        7460.522809
 parameter: beta   double value:        0.999999991
 parameter: brho   double value:        23349.48645
 parameter: ex   double value:    5.026457389e-10
-parameter: exn   double value:    1.499999987e-05
+parameter: exn   double value:    3.749999966e-06
 parameter: ey   double value:    5.026457389e-10
-parameter: eyn   double value:    1.499999987e-05
+parameter: eyn   double value:    3.749999966e-06
 parameter: et   double value:                  1
 parameter: sigt   double value:              0.075
 parameter: sige   double value:            0.00011

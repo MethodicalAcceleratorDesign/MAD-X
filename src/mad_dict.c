@@ -117,8 +117,6 @@ char command_def[] =
 "halofile = [s, none, none], "       /* input file w/halo polygon coordinates */
 /* "pipefile = [s, none, none], " */     /* input file w/pipe polygon coordinates */
 "range    = [s, #s/#e, none], "      /* range */
-"exn      = [r, 3.75e-6], "          /* norm. emit */
-"eyn      = [r, 3.75e-6], "          /* norm. emit */
 "dqf      = [r, 2.086], "                /* peak linear dispersion */
 "betaqfx  = [r, 170.25], "               /* beta x in standard qf */
 "dp       = [r, 0.0015], "       /* bucket edge at injection */
@@ -137,8 +135,6 @@ char command_def[] =
 " "
 /* "aperture: aperture none 0 0 " */
 /* "range    = [s, #s/#e, none], " /\* range *\/ */
-/* "exn      = [r, 0.], "          /\* norm. emit *\/ */
-/* "eyn      = [r, 0.], "          /\* norm. emit *\/ */
 /* "dqf      = [r, 0.], "          /\* peak linear dispersion *\/ */
 /* "dparx    = [r, 0.], "          /\* fractional parasitic dispersion - horizontal *\/ */
 /* "dpary    = [r, 0.], "          /\* fractional parasitic dispersion - vertical *\/ */

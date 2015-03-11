@@ -14,8 +14,27 @@ release number for the change.
 
 \begin{madlist}
 
-  \ttitemn{20156-Mar-10} version 5.02.05, r5161\\
-  Major change to definition of {\tt RACETRACK} 
+  \ttitemn{2015-Mar-11} versions 5.02.06, r5162\\
+  {\bf Major change} to the definition of emittances in the 
+  \hyperref[chap:beam]{\tt BEAM} command. For historical reasons, 
+  there was a factor 4 in the relation between normalised emittance 
+  $\epsilon_n$ and geometric emittance $\epsilon$: 
+  $\epsilon_n = 4 \beta \gamma \ \epsilon$, where $\beta$ and 
+  $\gamma$ are the usual relativistic factors. \\
+  The common definition $\epsilon_n = \beta \gamma \ \epsilon$ 
+  is now used across all \madx modules. \\
+  
+  The \hyperref[sec:aperture]{\tt APERTURE} command now gets the 
+  geometric emittances from values input or calculated in the 
+  \hyperref[chap:beam]{\tt BEAM} command; the attributes {\tt EXN} 
+  and {\tt EYN} of the {\tt APERTURE} command have been removed 
+  together with their default value of {\tt EXN=2.75E-6} and 
+  {\tt EYN = 2.75E-6} corresponding to the standard normalized 
+  emittances for LHC beams in collisions. 
+  
+
+  \ttitemn{2015-Mar-10} version 5.02.05, r5161\\
+  {\bf Major change} to definition of {\tt RACETRACK} 
   \hyperref[sec:def_aper]{aperture type}. 
   The {\tt RACETRACK} aperture now refers to a generalized shape 
   with rounding of corner with ellipse instead of circle. 
@@ -33,9 +52,9 @@ release number for the change.
   time already.
 
   \ttitemn{2015-Mar-06} version 5.02.05, r5158\\
-  Major change to collimator elements: the {\tt RCOLLIMATOR} and {\tt ECOLLIMATOR} 
-  elements are no longer defined in \madx and replaced by a generic 
-  \hyperref[sec:collimator]{\tt COLLIMATOR} element. \\
+  {\bf Major change} to collimator elements: the {\tt RCOLLIMATOR} 
+  and {\tt ECOLLIMATOR} elements are no longer defined in \madx and 
+  replaced by a generic \hyperref[sec:collimator]{\tt COLLIMATOR} element.\\
   {\bf (give reference to web page giving details for translation...)}
 
   \ttitemn{2015-Feb-19} version 5.02.05, r5143\\

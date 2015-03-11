@@ -20,7 +20,7 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v,       &
   ! Output:
   !   u0         (real)   Radiation loss per turn in GeV
   !   emit_v     (real)   ex, ey, et (emittances)
-  !   nemit_v    (real)   exn, eyn, etn (normalised emitt., MAD style)
+  !   nemit_v    (real)   exn, eyn, etn (normalised emittances)
   !   bmax       (real)   Maximum extents of modes.
   !   gmax       (real)   Maximum divergences of modes.
   !   dismax     (real)   Maximum dispersion.
@@ -199,7 +199,7 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,   &
   ! Output:
   !   u0         (real)   Radiation loss per turn in GeV
   !   emit_v     (real)   ex, ey, et (emittances)
-  !   nemit_v    (real)   exn, eyn, etn (normalised emitt., MAD style)
+  !   nemit_v    (real)   exn, eyn, etn (normalised emittances)
   !   tunes      (real)   qx, qy, qs
   !   pdamp      (real)   damping partition numbers
   !   sig_v      (real)   sigx, sigy, sigt, sige
@@ -287,8 +287,9 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,   &
      enddo
   enddo
 
-  exn = ex * four * betas * gammas
-  eyn = ey * four * betas * gammas
+  exn = ex * betas * gammas
+  eyn = ey * betas * gammas
+
   sigx = sqrt(abs(sigma(1,1)))
   sigy = sqrt(abs(sigma(3,3)))
   if (sigma(5,5) .gt. zero .or. sigma(6,6) .gt. zero)  then

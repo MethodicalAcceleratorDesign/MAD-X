@@ -3,7 +3,7 @@
   +     MAD-X 5.02.04  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2014.11.14               +
-  + Execution date: 2015.03.03 19:02:54      +
+  + Execution date: 2015.03.11 12:31:35      +
   ++++++++++++++++++++++++++++++++++++++++++++
    !                     FODO for MAD-X
 
@@ -96,9 +96,9 @@ parameter: gamma   double value:        5328.944863
 parameter: beta   double value:       0.9999999824
 parameter: brho   double value:        16678.20447
 parameter: ex   double value:                  1
-parameter: exn   double value:        21315.77908
+parameter: exn   double value:         5328.94477
 parameter: ey   double value:                  1
-parameter: eyn   double value:        21315.77908
+parameter: eyn   double value:         5328.94477
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
 parameter: sige   double value:                  0
@@ -225,17 +225,17 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.500000E+04
  Setting MADx with 
-     energy           5000.0000000000000     
+     energy           5000.00000000000     
      method                   2
      Num. of steps            1
-     charge           1.0000000000000000     
-  Length of machine:    19.099987755982863     
+     charge           1.00000000000000     
+  Length of machine:    19.0999877559829     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    0.0000000000000000        0.0000000000000000        19.099987755983108     
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:   0.000000000000000E+000  0.000000000000000E+000   19.0999877559831     
 !	select_ptc_normal, dx=1, dpx=1;
 
 !	select_ptc_normal, dy=1, dpy=1;	
@@ -299,7 +299,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Closed orbit:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
  Normal Form Type 1
 Deviation from symplecticity  0.6217248937900877E-12 %
    ptc_end;

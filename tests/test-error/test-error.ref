@@ -3,7 +3,7 @@
   +     MAD-X 5.02.04  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2014.11.14               +
-  + Execution date: 2015.03.03 18:57:49      +
+  + Execution date: 2015.03.11 13:56:43      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option,debug;
 
@@ -59,7 +59,7 @@ s3t:multipole, ksl:={0,0,0,6.e-5};
 
 Beam, particle=electron, energy:=10.0, 
 
- exn:=6.88E-6*4, eyn:=3.75E-6*4, NPART:=1.05E11, sige:=4.5e-4; //<<<<
+ exn:=6.88E-6, eyn:=3.75E-6, NPART:=1.05E11, sige:=4.5e-4; //<<<<
 
 show, beam;
 
@@ -76,9 +76,9 @@ parameter: gamma   double value:        19569.51268
 parameter: beta   double value:       0.9999999987
 parameter: brho   double value:        33.35640948
 parameter: ex   double value:    3.515672629e-10
-parameter: exn   double value:          2.752e-05
+parameter: exn   double value:           6.88e-06
 parameter: ey   double value:    1.916245983e-10
-parameter: eyn   double value:            1.5e-05
+parameter: eyn   double value:           3.75e-06
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
 parameter: sige   double value:            0.00045

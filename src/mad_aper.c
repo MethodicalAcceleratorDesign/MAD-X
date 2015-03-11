@@ -941,24 +941,12 @@ aper_header(struct table* aper_t, struct aper_node *lim)
   dtmp = get_value("beam", "beta");
   sprintf(c_dum->c, v_format("@ BETA             %%le  %F"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  /* dtmp = get_value("beam", "exn"); */
-  /* sprintf(c_dum->c, v_format("@ EXN              %%le  %G"), dtmp); */
-  /* aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c); */
-  /* dtmp = get_value("beam", "eyn"); */
-  /* sprintf(c_dum->c, v_format("@ EYN              %%le  %G"), dtmp); */
-  /* aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c); */
   // end addition
-
-  /* aperture command properties */
-
-  /* 2013-Nov-14  15:45:23  ghislain: The global parameters that have a default in the 
-     dictionary or can be input from other commands like BEAM, should be obtained adequately, 
-     not from the cmd input.
-  */
-  dtmp = command_par_value("exn", this_cmd->clone);
+  // 2015-Mar-11  15:30:15  ghislain: changed to get emittances from BEAM command, not from input parameters.
+  dtmp = get_value("beam", "exn");
   sprintf(c_dum->c, v_format("@ EXN              %%le  %G"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = command_par_value("eyn", this_cmd->clone);
+  dtmp = get_value("beam", "eyn");
   sprintf(c_dum->c, v_format("@ EYN              %%le  %G"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("dqf", this_cmd->clone);
@@ -1331,16 +1319,15 @@ pro_aperture(struct in_cmd* cmd)
 static struct aper_node*
 aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt, struct aper_node *lim_pt)
 {
-  int stop=0, nint=1, jslice=1, first, ap=1; // , err not used
+  int stop=0, nint=1, jslice=1, first, ap=1; 
   int true_flag, true_node=0, offs_node=0, do_survey=0;
   int truepos=0, true_cnt=0, offs_cnt=0;
-  int halo_q_length=1, halolength, pipelength, namelen=NAME_L, ntol; // nhalopar, not used
+  int halo_q_length=1, halolength, pipelength, namelen=NAME_L, ntol; 
   double surv_init[6]={0, 0, 0, 0, 0, 0};
   double surv_x=zero, surv_y=zero;
   double xa=0, xb=0, xc=0, ya=0, yb=0, yc=0;
   double on_ap=1, on_elem=0;
-  //double mass, energy, exn, eyn, ex, ey;
-  double gamma, beta, exn, eyn, ex, ey;
+  double ex, ey;
   double dqf, betaqfx, dp, dparx, dpary;
   double cor, bbeat, nco, halo[4], interval, spec, notsimple;
   double s=0, x=0, y=0, betx=0, bety=0, dx=0, dy=0, ratio, n1, nr, length;
@@ -1390,13 +1377,9 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   /* removed IW 240205 */
   /*  pipefile = command_par_string("pipefile", this_cmd->clone); */
  
-  exn = command_par_value("exn", this_cmd->clone);
-  eyn = command_par_value("eyn", this_cmd->clone);
-  
-  // 2015-Mar-03  17:25:49  ghislain: should get geometric emittances from BEAM command
-  /// however see below comment on emittance definition.
-  //ex = get_value("beam","ex");
-  //ey = get_value("beam","ey");
+  // 2015-Mar-03  17:25:49  ghislain: get geometric emittances from BEAM command
+  ex = get_value("beam","ex");
+  ey = get_value("beam","ey");
 
   dqf = command_par_value("dqf", this_cmd->clone);
   betaqfx = command_par_value("betaqfx", this_cmd->clone);
@@ -1415,33 +1398,14 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
   cmd_refnode = command_par_string("refnode", this_cmd->clone);
 
-  //mass = get_value("beam", "mass");
-  //energy = get_value("beam", "energy");
-  gamma = get_value("beam","gamma");
-  beta = get_value("beam","beta");
-
-  /* calculate emittance and delta angle */
-  /* Warning: mad_beam.c uses a different definition for emittance */
-  /* mad_beam.c says :     ex = exn / (4 * beta * gamma); */
-
-  // ex = mass*exn/energy; ey = mass*eyn/energy; // assumes beta=1 
-  // 2015-Mar-03  11:43:01  ghislain: use beta explicitly but keep local emittance definition
-  ex = exn/(beta*gamma); ey = eyn/(beta*gamma); 
-
+  /* calculate delta angle */
   dangle = twopi/(nco*4);
 
-
-  /* 2013-Nov-13  16:20:29  ghislain: attempt to extract relevant parameters 
-     from BEAM command instead of internal parameters. 
-     This works but needs a bit more thoughts, in conjuction with fetching other parameters 
-     from Twiss table
-
-  // and attempt to extract maximum parameters from twiss summary table
+  // 2013-Nov-13  16:20:29  ghislain: 
+  // attempt to extract maximum parameters from twiss summary table
   // double_from_table_row("summ","dxmax",&nint,&dqf);
   // printf ("+++++++ dqf from TWISS %12.6g\n",dqf);
   // TODO:  add some error checking.
-
-   end of ghislain: attempt... */
 
   /* fetch deltap as set by user in the former TWISS command */
   /* will be used below for displacement associated to parasitic dipersion */

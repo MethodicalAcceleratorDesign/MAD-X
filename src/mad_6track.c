@@ -3003,8 +3003,8 @@ write_f3_aux(void)
     fprintf(f3aux, "BEAM\n");
     fprintf(f3aux, "%12.4e%14.6g%14.6g%12.4e%12.4e  1  0\n",
             command_par_value("npart", current_beam),
-            0.25e6*command_par_value("exn", current_beam),
-            0.25e6*command_par_value("eyn", current_beam),
+	    1e6*command_par_value("exn", current_beam), // um.rad in sixtrack
+	    1e6*command_par_value("eyn", current_beam),
             command_par_value("sigt", current_beam),
             command_par_value("sige", current_beam));
     fprintf(f3aux, "NEXT\n");

@@ -57,7 +57,7 @@ select, flag=twiss, clear;
 select, flag=twiss, column=name,s,l,betx,bety,alfx,alfy,dx,dpx,mux,muy,n1;
 twiss, sequence=LHCCELL;
 
-beam,particle=proton,energy=450.0, ex=1.954737678e-09, ey=1.954737678e-09;
+beam,particle=proton,energy=450.0, ex=7.818950713e-09, ey=7.818950713e-09;
 show, beam;
 
 use,period=LHCCELL;

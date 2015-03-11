@@ -315,24 +315,41 @@ APER\_OFFSET = \{real, real\};
 }
 
 where the two real values are respectively the horizontal and vertical
-offsets of the aperture inside the element.
+offsets of the aperture inside the element. 
+
+The offsets are only used in the \hyperref[chap:thintrack]{\tt tracking} 
+module of \madx and are ignored by the {\tt APERTURE} command and by 
+\hyperref[sec:ptc_track]{\tt PTC\_TRACK}.
 
 
 \section{APERTURE}
 \label{sec:aperture}
 {\bf The APERTURE module was developed specifically for the LHC.\\ 
 Default parameter values are LHC values\begin{5.02.04} and the physics 
-in APERTURE module assumes ultra-relativistic particles (v\(\approx\)c)\end{5.02.04}.} 
+in {\tt APERTURE} module assumes ultra-relativistic particles (v\(\approx\)c)\end{5.02.04}.} 
 
-The APERTURE module computes the {\tt n1} values for a piece of machine. 
-Each element is sliced into thick subelements at given intervals, and
+The {\tt APERTURE} module computes the {\tt n1} values for a piece of machine. 
+Each element is sliced into thick sub-elements at given intervals, and
 the available aperture is computed at the end of each slice. 
+\begin{5.02.04}
 The computation is based on the last Twiss table, so it is important to
 run the \hyperref[chap:twiss]{\tt TWISS} and \texttt{APERTURE} commands
-on the same period or sequence, see the aperture example below. Also showed in the
-example is how {\tt n1} values can be \hyperref[chap:plot]{plotted}.
+on the same period or sequence, see the aperture example below. 
+\end{5.02.04}
+\begin{5.02.05}
+The {\tt APERTURE} module gets the geometric emittances from the values given 
+or calculated in the \hyperref[chap:beam]{\tt BEAM} command. 
+The computation is based on the last Twiss table computed by the 
+\hyperref[chap:twiss]{\tt TWISS} command. 
+It is important to properly define a {\tt BEAM}, and run 
+\hyperref[chap:twiss]{\tt TWISS} and \texttt{APERTURE} commands 
+on the same period or sequence.
+\end{5.02.05}
 
-The minimum {\tt n1} for each element is written to the last Twiss table, to
+The {\tt APERTURE} example below also shows how to \hyperref[chap:plot]{plot} 
+the resulting {\tt n1} values.
+
+The minimum {\tt n1} value is written to the last Twiss table, to
 allow for \hyperref[chap:match]{matching by aperture}.   
 
 \begin{5.02.04}
@@ -456,10 +473,6 @@ while the \hyperref[chap:beam]{\tt BEAM} command in \madx uses the definition
 \madxmp{ EX = EXN / (4 * BETA * GAMMA) } 
 \end{5.02.04}
 
-\begin{5.02.05}
-The {\tt APERTURE} module gets the geometric emittances from the values given 
-or calculated in the \hyperref[chap:beam]{\tt BEAM} command. 
-\end{5.02.05}
 
 \section{Not simply connex beam pipe profiles} 
 \label{sec:notconnex}

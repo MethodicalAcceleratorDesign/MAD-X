@@ -3,7 +3,7 @@
   +     MAD-X 5.02.04  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2014.11.14               +
-  + Execution date: 2015.03.03 14:34:57      +
+  + Execution date: 2015.03.11 15:01:38      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title,'testing BEAM definitions in MADX';
 
@@ -30,9 +30,9 @@ parameter: pc   double value:        449.9990218
 parameter: gamma   double value:        479.6050377
 parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.035166
-parameter: ex   double value:    1.954737678e-09
+parameter: ex   double value:    7.818950713e-09
 parameter: exn   double value:           3.75e-06
-parameter: ey   double value:    1.954737678e-09
+parameter: ey   double value:    7.818950713e-09
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
@@ -89,7 +89,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0                  0                  0                  0 
 
 
-beam,particle=proton,energy=450.0, ex=1.954737678e-09, ey=1.954737678e-09;
+beam,particle=proton,energy=450.0, ex=7.818950713e-09, ey=7.818950713e-09;
 
 show, beam;
 
@@ -105,9 +105,9 @@ parameter: pc   double value:        449.9990218
 parameter: gamma   double value:        479.6050377
 parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.035166
-parameter: ex   double value:    1.954737678e-09
+parameter: ex   double value:    7.818950713e-09
 parameter: exn   double value:           3.75e-06
-parameter: ey   double value:    1.954737678e-09
+parameter: ey   double value:    7.818950713e-09
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
@@ -180,9 +180,9 @@ parameter: pc   double value:        450.0007826
 parameter: gamma   double value:        479.6069143
 parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.041039
-parameter: ex   double value:     1.95473003e-09
+parameter: ex   double value:    7.818920119e-09
 parameter: exn   double value:           3.75e-06
-parameter: ey   double value:     1.95473003e-09
+parameter: ey   double value:    7.818920119e-09
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
@@ -255,9 +255,9 @@ parameter: pc   double value:        449.9990218
 parameter: gamma   double value:        479.6050377
 parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.035165
-parameter: ex   double value:    1.954737678e-09
+parameter: ex   double value:    7.818950713e-09
 parameter: exn   double value:           3.75e-06
-parameter: ey   double value:    1.954737678e-09
+parameter: ey   double value:    7.818950713e-09
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
@@ -330,9 +330,9 @@ parameter: pc   double value:        449.9990218
 parameter: gamma   double value:        479.6050377
 parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.035166
-parameter: ex   double value:    1.954737678e-09
+parameter: ex   double value:    7.818950713e-09
 parameter: exn   double value:           3.75e-06
-parameter: ey   double value:    1.954737678e-09
+parameter: ey   double value:    7.818950713e-09
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
@@ -405,9 +405,9 @@ parameter: pc   double value:        449.9990218
 parameter: gamma   double value:        479.6050377
 parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.035166
-parameter: ex   double value:    1.954737678e-09
+parameter: ex   double value:    7.818950713e-09
 parameter: exn   double value:           3.75e-06
-parameter: ey   double value:    1.954737678e-09
+parameter: ey   double value:    7.818950713e-09
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
@@ -480,9 +480,9 @@ parameter: pc   double value:        449.9990218
 parameter: gamma   double value:        479.6050377
 parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.035166
-parameter: ex   double value:    1.954737678e-09
+parameter: ex   double value:    7.818950713e-09
 parameter: exn   double value:           3.75e-06
-parameter: ey   double value:    1.954737678e-09
+parameter: ey   double value:    7.818950713e-09
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
@@ -555,9 +555,9 @@ parameter: pc   double value:         449.999022
 parameter: gamma   double value:        479.6050378
 parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.035166
-parameter: ex   double value:    1.954737678e-09
+parameter: ex   double value:    7.818950711e-09
 parameter: exn   double value:           3.75e-06
-parameter: ey   double value:    1.954737678e-09
+parameter: ey   double value:    7.818950711e-09
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
