@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.04  (64 bit, Linux)       +
+  +     MAD-X 5.02.04  (32 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2014.11.14               +
-  + Execution date: 2015.02.02 16:06:26      +
+  + Execution date: 2015.03.12 17:29:48      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, 'RF-Dipole example';
 
@@ -108,24 +108,24 @@ use, sequence = my_seq;
 
 select, flag = twiss, column=name,s,betx,alfx,mux, bety, alfy,muy,dx,dy;
 
-twiss, save, centre, file=twiss2c.out;
+twiss, save, centre; ! file=twiss2c.out;
 
 enter Twiss module
 ++++++ info: Zero value of SIGT replaced by 1.
   
-iteration:   1 error:   1.119506E-19 deltap:   0.000000E+00
-orbit:   3.742138E-37  7.003572E-35  0.000000E+00  0.000000E+00 -2.434591E-16 -4.701231E-34
+iteration:   1 error:   1.119543E-19 deltap:   0.000000E+00
+orbit:   2.023900E-36 -8.175075E-35  0.000000E+00  0.000000E+00 -2.434672E-16 -4.704045E-34
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-                48    2.434591499e-16       0.2468380022        2.012769249 
+                48    2.434671907e-16       0.2468380022        2.012769249 
 
                 q1                dq1            betxmax              dxmax 
        2.052693212       -2.555597869        5.632895932        6.547613635 
 
              dxrms             xcomax             xcorms                 q2 
-       5.582047442    3.340972914e-19    1.995520258e-19        1.457312433 
+       5.582047442    3.341083257e-19    1.995586164e-19        1.457312433 
 
                dq2            betymax              dymax              dyrms 
       -3.033796246        7.843106404                  0                  0 
@@ -135,14 +135,8 @@ orbit:   3.742138E-37  7.003572E-35  0.000000E+00  0.000000E+00 -2.434591E-16 -4
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
-	plot, haxis=s, vaxis=betx,bety,dx,colour=100;
+!	plot, haxis=s, vaxis=betx,bety,dx,colour=100;
 
-Plot - default table plotted: twiss
-++++++ info: Zero value of SIGT replaced by 1.
-
- GXPLOT-X11  1.50 initialized
-
- plot number =            1
 
 
 !!!!! track
@@ -185,16 +179,16 @@ run, turns=10;
          1          0                  0                  0 
          2          0                  0                  0 
          3          0                  0                  0 
-         1         10    8.276056109e-05   -3.798865354e-06 
-         2         10   -1.549589821e-20   -2.895017995e-20 
-         3         10   -8.276087594e-05    3.798671694e-06 
+         1         10     8.27605611e-05   -3.798865354e-06 
+         2         10      -1.549641e-20    -2.89511361e-20 
+         3         10   -8.276087595e-05    3.798671694e-06 
 
                  y                 py                  t                 pt 
                  0                  0              -0.01                  0 
                  0                  0                  0                  0 
                  0                  0               0.01                  0 
                  0                  0     -0.01013913893   -1.119491826e-07 
-                 0                  0    3.987429477e-20     3.34326435e-23 
+                 0                  0    3.987561171e-20    3.343374769e-23 
                  0                  0      0.01013891452    1.119490074e-07 
 
                  s                  e 
@@ -216,26 +210,10 @@ exit TRACK module
 
 
 
-use, period=my_seq;
+!use, period=my_seq;
 
-sixtrack, radius=0.017;
+!sixtrack, radius=0.017;
 
-  ++++++++++++++++++++++++++++
-  +   c6t version 2.0        +
-  ++++++++++++++++++++++++++++
-
-max_mult_ord set to : 11
-Reference radius set to : 0.017000
-++++++ info: MADX sequence converted to c6t internal. 
-
-total block length: 48.000000
-
-c6t terminated - total number of elements: 98
-                    field errors    MAD-X: 0
-                    field errors SixTrack: 0
-                 alignment errors   MAD-X: 0
-                alignment errors SixTrack: 0
-                          sequence length: 48.000000 [m]
 
 
 stop;
@@ -244,5 +222,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.04 (64 bit) finished normally +
+  + MAD-X 5.02.04 (32 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

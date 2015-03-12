@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.02  (64 bit, Linux)       +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.07.01      +
-  + Execution Time Stamp: 03.07.14 14.59.21 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.04  (32 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.11.14               +
+  + Execution date: 2015.03.12 17:17:38      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 
 
 call, file="../share/LEIR/LEIR.seqx";
@@ -823,13 +823,13 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
        78.54370266                 -0       0.1241075638        2.838578276 
 
                 q1                dq1            betxmax              dxmax 
-       1.820059621       -3.734960278        15.12421277         20.6041956 
+       1.820059621       -3.734960277        15.12421277         20.6041956 
 
              dxrms             xcomax             xcorms                 q2 
        9.639962105                  0                  0         2.71982919 
 
                dq2            betymax              dymax              dyrms 
-      -7.573739492        20.07025727                  0                  0 
+      -7.573739494        20.07025727                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0        9.747887059 
@@ -844,21 +844,10 @@ write, table=twiss, file="leir.twiss";
 
 
 
-plot, haxis=s, vaxis=betx,bety, colour=100;
+!plot, haxis=s, vaxis=betx,bety, colour=100;
 
-Plot - default table plotted: twiss
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
+!plot, haxis=s, vaxis=dx,        colour=100;
 
- GXPLOT-X11  1.50 initialized
-
- plot number =            1
-plot, haxis=s, vaxis=dx,        colour=100;
-
-Plot - default table plotted: twiss
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
- plot number =            2
 
 
 
@@ -898,17 +887,17 @@ ptc_create_universe;
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.541711E+00
  Setting MADx with 
-     energy           1.0834226784000001     
+     energy           1.08342267840000     
      method                   6
      Num. of steps            5
-     charge           1.0000000000000000     
-  Length of machine:    78.543702661677713     
+     charge           1.00000000000000     
+  Length of machine:    78.5437026616777     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -6.2727600891321345E-015   0.0000000000000000        8.4376949871511897E-015
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:  -4.940492459581947E-015  0.000000000000000E+000  8.437694987151190E-015
 
 
 
@@ -919,13 +908,13 @@ mad_ptc.c: pro_ptc_printframes: format is rootmacro.
           38 BA1HO.1                 All three reference frames are inline. DRAWING AS RBEND
           41 BA1HI.1                 All three reference frames are inline. DRAWING AS RBEND
           43 BI1PO.1                 All three reference frames are inline. DRAWING AS RBEND
-          45 BI1PM.1                 SBEND curvature is almost null. DRAWING AS RBEND
+          45 BI1PM.1                 All three reference frames are inline. DRAWING AS RBEND
           47 BI1PI.1                 All three reference frames are inline. DRAWING AS RBEND
-          51 BI2PI.1                 All three reference frames are inline. DRAWING AS RBEND
+          51 BI2PI.1                 SBEND curvature is almost null. DRAWING AS RBEND
           53 BI2PM.1                 All three reference frames are inline. DRAWING AS RBEND
           55 BI2PO.1                 All three reference frames are inline. DRAWING AS RBEND
           57 BA2HI.1                 All three reference frames are inline. DRAWING AS RBEND
-          60 BA2HO.1                 All three reference frames are inline. DRAWING AS RBEND
+          60 BA2HO.1                 SBEND curvature is almost null. DRAWING AS RBEND
          114 BA1HO.2                 All three reference frames are inline. DRAWING AS RBEND
          117 BA1HI.2                 All three reference frames are inline. DRAWING AS RBEND
          119 BI1PO.2                 All three reference frames are inline. DRAWING AS RBEND
@@ -970,9 +959,9 @@ mad_ptc.c: pro_ptc_printframes: format is rootmacro.
 
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
- Closed orbit:    1.0688861274587036E-008   2.5461397864805191E-009   0.0000000000000000        0.0000000000000000        0.0000000000000000     
-Deviation from symplecticity  0.3264055692397960E-11 %
-Deviation from symplecticity  0.3264055692397960E-11 %
+ Closed orbit:   1.068886127458704E-008  2.546139786480519E-009  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+Deviation from symplecticity  0.3241851231905457E-11 %
+Deviation from symplecticity  0.3241851231905457E-11 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -1053,8 +1042,12 @@ removefile, file='leir.C';
 removefile, file='Maxwellian_bend_for_ptc.txt';
 
 
+
+stop;
+
+
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.02 (64 bit) finished normally +
+  + MAD-X 5.02.04 (32 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

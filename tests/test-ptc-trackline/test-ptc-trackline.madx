@@ -103,6 +103,9 @@ ptc_track_end;
 
 
 ptc_end;
+
+removefile, file="Maxwellian_bend_for_ptc.txt";
+
 stop;
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  SSSSS  TTTTT   OOO   PPP

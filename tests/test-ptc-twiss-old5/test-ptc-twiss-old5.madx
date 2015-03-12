@@ -2,7 +2,7 @@ Title " Diamond Light Source Lattice 8.1.1";
 !assign echo="diamond.lis";
 
 option,echo = false;
-call,file='dls811.seq';
+call,file='../share/DIAMOND/dls811.seq';
 
 option, echo = true;
 beam, particle = electron, energy = 3.0;!, radiate;

@@ -27,8 +27,8 @@ twiss, rmatrix, chrom, save;
 write, table=summ, file="leir.summ.twiss";
 write, table=twiss, file="leir.twiss";
 
-plot, haxis=s, vaxis=betx,bety, colour=100;
-plot, haxis=s, vaxis=dx,        colour=100;
+!plot, haxis=s, vaxis=betx,bety, colour=100;
+!plot, haxis=s, vaxis=dx,        colour=100;
 
 
 
@@ -66,3 +66,5 @@ ptc_end;
 
 removefile, file='leir.C';
 removefile, file='Maxwellian_bend_for_ptc.txt';
+
+stop;

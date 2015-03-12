@@ -44,8 +44,8 @@ beam, particle = proton, sequence = my_seq, energy = 1,
 !!!!! twiss
 use, sequence = my_seq;
 select, flag = twiss, column=name,s,betx,alfx,mux, bety, alfy,muy,dx,dy;
-twiss, save, centre, file=twiss2c.out;
-	plot, haxis=s, vaxis=betx,bety,dx,colour=100;
+twiss, save, centre; ! file=twiss2c.out;
+!	plot, haxis=s, vaxis=betx,bety,dx,colour=100;
 
 !!!!! track
 use, sequence=my_seq;
@@ -61,7 +61,7 @@ endtrack;
 
 !!!!! Convert to SixTrack
 
-use, period=my_seq;
-sixtrack, radius=0.017;
+!use, period=my_seq;
+!sixtrack, radius=0.017;
 
 stop;

@@ -55,3 +55,5 @@ esave, file=error.tab;
 
 use, period=test_line;
 sixtrack, radius=0.017;
+
+stop;

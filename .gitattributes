@@ -1019,6 +1019,7 @@ tests/share/AD/ad_quads_3837_ffe.str -text
 tests/share/ALBA/ALBA-25.4th.seq -text
 tests/share/ALBA/ALBA-25.4th_v2.seq -text
 tests/share/CLIC-DR/clicdr.madx -text
+tests/share/DIAMOND/dls811.seq -text
 tests/share/FCCe/fcc-ee_v14.seq -text
 tests/share/FCCe/fcc-ee_v14.str -text
 tests/share/FCCe/fcc-ee_v14_elements.def -text
@@ -1529,7 +1530,6 @@ tests/test-ptc-twiss-old4/twiss_ptc_line.ref -text
 tests/test-ptc-twiss-old4/twiss_ptc_ring.cfg -text
 tests/test-ptc-twiss-old4/twiss_ptc_ring.ref -text
 tests/test-ptc-twiss-old5/README -text
-tests/test-ptc-twiss-old5/dls811.seq -text
 tests/test-ptc-twiss-old5/fort.18.cfg -text
 tests/test-ptc-twiss-old5/fort.18.ref -text
 tests/test-ptc-twiss-old5/normal_results.cfg -text
@@ -1608,10 +1608,16 @@ tests/test-rfmultipole-4/sectormap.ref -text
 tests/test-rfmultipole-4/test-rfmultipole-4.cfg -text
 tests/test-rfmultipole-4/test-rfmultipole-4.madx -text
 tests/test-rfmultipole-4/test-rfmultipole-4.ref -text
+tests/test-rfmultipole-5/error.tab.cfg -text
+tests/test-rfmultipole-5/error.tab.ref -text
 tests/test-rfmultipole-5/fc.16.cfg -text
 tests/test-rfmultipole-5/fc.16.ref -text
 tests/test-rfmultipole-5/fc.2.cfg -text
 tests/test-rfmultipole-5/fc.2.ref -text
+tests/test-rfmultipole-5/fc.3.aux.ref -text
+tests/test-rfmultipole-5/fc.3.ref -text
+tests/test-rfmultipole-5/fc.34.ref -text
+tests/test-rfmultipole-5/fc.8.ref -text
 tests/test-rfmultipole-5/test-rfmultipole-5.cfg -text
 tests/test-rfmultipole-5/test-rfmultipole-5.madx -text
 tests/test-rfmultipole-5/test-rfmultipole-5.ref -text
@@ -1631,6 +1637,7 @@ tests/test-rfmultipole/fc.2.ref -text
 tests/test-rfmultipole/fc.3.aux.ref -text
 tests/test-rfmultipole/fc.3.ref -text
 tests/test-rfmultipole/fc.34.ref -text
+tests/test-rfmultipole/fc.8.ref -text
 tests/test-rfmultipole/test-rfmultipole.cfg -text
 tests/test-rfmultipole/test-rfmultipole.madx -text
 tests/test-rfmultipole/test-rfmultipole.ref -text

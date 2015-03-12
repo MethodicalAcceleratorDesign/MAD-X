@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.02  (64 bit, Linux)       +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.07.01      +
-  + Execution Time Stamp: 03.07.14 14.59.22 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.04  (32 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.11.14               +
+  + Execution date: 2015.03.12 17:07:39      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 
 
 call, file="../share/LEIR/LEIR.seqx";
@@ -817,17 +817,17 @@ ptc_create_universe;
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.541711E+00
  Setting MADx with 
-     energy           1.0834226784000001     
+     energy           1.08342267840000     
      method                   6
      Num. of steps            5
-     charge           1.0000000000000000     
-  Length of machine:    78.543702661677713     
+     charge           1.00000000000000     
+  Length of machine:    78.5437026616777     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -6.2727600891321345E-015   0.0000000000000000        8.4376949871511897E-015
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:  -4.940492459581947E-015  0.000000000000000E+000  8.437694987151190E-015
 
 
   !!!!!       T I M E   F A L S E,   T O T P A T H  F A L S E
@@ -842,8 +842,8 @@ ptc_create_universe;
 
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
-Deviation from symplecticity  0.4871759178730201E-11 %
-Deviation from symplecticity  0.4871759178730201E-11 %
+Deviation from symplecticity  0.9510910577622175E-11 %
+Deviation from symplecticity  0.9510910577622175E-11 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -909,34 +909,15 @@ ptc_end;
  Layout killed 
 
 
+removefile, file="Maxwellian_bend_for_ptc.txt";
 
 
-plot, haxis=s, vaxis=beta11,beta22, colour=100;
 
-Plot - default table plotted: twiss
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
-
- GXPLOT-X11  1.50 initialized
-
- plot number =            1
-plot, haxis=s, vaxis=disp1, colour=100;
-
-Plot - default table plotted: twiss
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
- plot number =            2
-plot, haxis=s, vaxis=x, colour=100;
-
-Plot - default table plotted: twiss
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
- plot number =            3
-
+stop;
 
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.02 (64 bit) finished normally +
+  + MAD-X 5.02.04 (32 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
