@@ -550,7 +550,17 @@ CONTAINS
              
           ENDIF
 
-       ! CASE(4) ! MARGUERITE ! 2015-Mar-10  14:33:08  ghislain: suppressed
+       CASE(4) ! MARGUERITE 
+          IF(((X(1)-E%DX)**2/E%R(2)**2+(X(3)-E%DY)**2/E%R(1)**2>1.0_dp).OR.  & 
+               ((X(1)-E%DX)**2/E%R(1)**2+(X(3)-E%DY)**2/E%R(2)**2>1.0_dp)) THEN 
+             CHECK_STABLE=.FALSE. 
+             STABLE_DA=.false. 
+             
+             xlost=0.0_dp 
+             xlost=x 
+             write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=4 marguerite aperture.", & 
+                  "Orbit: X=",X(1)," Y=",X(3)," Ap.: DX=",E%DX," DY=",E%DY," R1=",E%R(1)," R2=",E%R(2) 
+          ENDIF
 
        CASE(5) ! RACETRACK ! 2015-Mar-10  14:33:08  ghislain: modified to account for generalized racetrack with elliptic corners
           IF( (abs(x(1)-e%dx)) .gt. e%x .or. abs(x(3)-e%dy) .gt. e%y .or. &
