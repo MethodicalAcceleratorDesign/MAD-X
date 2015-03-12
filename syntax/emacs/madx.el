@@ -219,7 +219,7 @@
   (kill-all-local-variables)
   (setq mode-name "MAD-X")
   (setq major-mode 'madx-mode)
-  (setq comment-start "!")
+;  (setq comment-start "!")
 ;  (use-local-map madx-mode-map)
   (set-syntax-table madx-mode-syntax-table)
   (make-local-variable 'font-lock-defaults)

@@ -1061,10 +1061,7 @@ pro_twiss(void)
   }
 
   if (get_option("twiss_sector")){
-    // 2014-Aug-26  16:50:42  ghislain: 
-    // printf("\n\n triggering out_table for sectormap '%s'", sector_table_name);
     out_table( sector_table_name, twiss_sector_table, sector_name );
-    //out_sectortable( sector_table_name, twiss_sector_table, sector_name );
   }
 
   tarr = delete_int_array(tarr);
