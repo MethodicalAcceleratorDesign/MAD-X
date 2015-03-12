@@ -732,7 +732,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
 
   el = node_value('l ')
   nobs = node_value('obs_point ')
-  
+
   n_align = node_al_errors(al_errors)
   if (n_align.ne.0)  then
      call dcopy(orbit,orbit2,6)
@@ -755,7 +755,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      call tmali2(el,orbit2,al_errors,betas,gammas,orbit,re)
      call m66mpy(re,rt,rt)
   endif
-  
+
   if (kobs.gt.0.and.kobs.eq.nobs) return
   
   if (code .ge. ccode-1 .and. code .le. ccode+1)  then !---  kickers (code 14 to 16)
@@ -1818,6 +1818,7 @@ SUBROUTINE twchgo
      call twbttk(re,te)
      centre_bttk = mycentre_bttk
   endif
+
   if(centre) centre_bttk=.true.
   call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te)
   if(centre) then
@@ -1829,6 +1830,7 @@ SUBROUTINE twchgo
   if (fmap) then
      call twbttk(re,te)
   endif
+
   if (n_align.ne.0)  then
      call dcopy(orbit,orbit2,6)
      call tmali2(el,orbit2,al_errors,betas,gammas,orbit,re)
@@ -1837,6 +1839,7 @@ SUBROUTINE twchgo
      call twbttk(re,te)
      centre_bttk = mycentre_bttk
   endif
+
   if(.not.centre) call twprep(save,2,opt_fun,zero)
   if(centre) then
      currpos=pos0+el
@@ -1872,6 +1875,7 @@ SUBROUTINE twchgo
      opt_fun(31)=rmat(2,1)
      opt_fun(32)=rmat(2,2)
   endif
+
   if (advance_node().ne.0)  goto 10
 
   !---- Warning, if system is coupled.
@@ -1941,7 +1945,7 @@ SUBROUTINE twbttk(re,te)
   e2 = node_value('e2 ')
   
   an = node_value('angle ')
-  if(node_value('mad8_type ').eq.2) then
+  if(node_value('mad8_type ').eq.2) then ! rbend -> sbend
      e1 = e1 + an / two
      e2 = e2 + an / two
   endif
@@ -1962,17 +1966,36 @@ SUBROUTINE twbttk(re,te)
 
   call dzero(aux,6)
   call dzero(auxp,6)
+
+  !--- Calculate derivative of RE matrix wrt pt: 
+  !    REP = 2 * TE * DISP
+  !    transformation of dispersion and first derivative across the element
+  !    D2 = R * D1
+  !    DD2 = R * DD1 + REP * D1
+
+  !    REP = 2. * MATMUL(TE,DISP) ! matmul intrinsic does not handle matrices of rank 3
+  !     would have to use BLAS. 
+ 
   do i = 1, 6
      do k = 1, 6
         temp = zero
         do j = 1, 6
            temp = temp + te(i,j,k)*disp(j)
-        enddo
-        aux(i) = aux(i) + re(i,k)*disp(k)
-        auxp(i) = auxp(i) + temp*disp(k) + re(i,k)*ddisp(k)
+         enddo
+        !aux(i) = aux(i) + re(i,k)*disp(k)
+        !auxp(i) = auxp(i) + temp*disp(k) + re(i,k)*ddisp(k)
+        ! according to MAD8 physics guide, eq 6.17 this should be
+        ! auxp(i) = auxp(i) + rep(i,k)*disp(k) + re(i,k)*ddisp(k)
+        ! and there is a factor two difference in the middle term, 
+        ! taking the next line into account.
         rep(i,k) = two*temp
+        !print *, 'i, k, aux, auxp, rep(i,k): ',i,k,aux(i),auxp(i),rep(i,k) 
      enddo
   enddo
+
+  AUX = MATMUL(RE,DISP)
+  AUXP = MATMUL(RE,DDISP) + MATMUL(REP,DISP)
+    
   if(.not.centre_bttk) then
      call dcopy(aux,disp,6)
      call dcopy(auxp,ddisp,6)
@@ -2003,8 +2026,8 @@ SUBROUTINE twbttk(re,te)
   !     longitudinal 2x2 part of the R-matrix
   detl = re(5,5)*re(6,6) - re(5,6)*re(6,5)
   f = one / sqrt(detl)
-  call m66scl(f,re,fre)
-  call m66scl(f,rep,frep)
+  call m66scl(f,re,fre)   ! FRE  = f * RE
+  call m66scl(f,rep,frep) ! FREP = f * REP
 
   !---- Track horizontal functions including energy scaling.
   tb = fre(1,1)*betx - fre(1,2)*alfx
@@ -2016,16 +2039,17 @@ SUBROUTINE twbttk(re,te)
   alfx = - (tb*ta + fre(1,2)*fre(2,2)) / betx
   betx = t2 / betx
   if(fre(1,2).ne.zero.or.tb.ne.zero) amux=amux+atan2(fre(1,2),tb)
+
   bx1 = wx*cos(phix)
   ax1 = wx*sin(phix)
-  bx2 = ((tb**2 - fre(1,2)**2)*bx1                                  &
-       - two*tb*fre(1,2)*ax1) / t2                                       &
-       + two*(tb*frep(1,1) - tg*frep(1,2)) / betx
-  ax2 = ((tb**2 - fre(1,2)**2)*ax1                                  &
-       + two*tb*fre(1,2)*bx1) / t2                                       &
-       - (tb*(frep(1,1)*alfx + frep(2,1)*betx)                           &
-       - tg*(frep(1,2)*alfx + frep(2,2)*betx)                            &
-       + fre(1,1)*frep(1,2) - fre(1,2)*frep(1,1)) / betx
+
+  bx2 = ((tb**2 - fre(1,2)**2)*bx1 - two*tb*fre(1,2)*ax1) / t2 &
+       + two*(tb*frep(1,1) - tg*frep(1,2)) / betx 
+
+  ax2 = ((tb**2 - fre(1,2)**2)*ax1 + two*tb*fre(1,2)*bx1) / t2 &
+       - (tb*(frep(1,1)*alfx + frep(2,1)*betx) - tg*(frep(1,2)*alfx + frep(2,2)*betx) &
+           + fre(1,1)*frep(1,2) - fre(1,2)*frep(1,1)) / betx
+
   wx = sqrt(ax2**2 + bx2**2)
   if (wx.gt.eps) phix = proxim(atan2(ax2, bx2), phix)
   dmux = dmux + fre(1,2)*(fre(1,2)*ax1 - tb*bx1) / t2               &
@@ -2057,6 +2081,10 @@ SUBROUTINE twbttk(re,te)
   dmuy = dmuy + fre(3,4)*(fre(3,4)*ay1 - tb*by1) / t2               &
        + (fre(3,3)*frep(3,4) - fre(3,4)*frep(3,3)) / bety
 
+
+  ! 2014-Dec-15  15:15:09  ghislain: 
+  ! write(6,*) '.. in twbttk: ax, bx, ay, by = ', ax2, bx2, ay2, by2
+  
   !---- Fill optics function array
   if(.not.centre.or.centre_bttk) then
      opt_fun(19)=wx
@@ -4699,7 +4727,7 @@ SUBROUTINE tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
        el,el0,zero,two
   double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
   parameter(zero=0d0,two=2d0)
-
+  
   if(el.eq.zero) then
      call tmsol_th(ftrk,orbit,fmap,ek,re,te)
   else
@@ -4747,7 +4775,7 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
        sk,gamma,skl,beta,co,si,sibk,temp,dtbyds,node_value,get_value,bvk,&
        zero,one,two,three,six,ten5m
   parameter(zero=0d0,one=1d0,two=2d0,three=3d0,six=6d0,ten5m=1d-5)
-
+ 
   !---- Initialize.
   fmap = el .ne. zero
   if (.not. fmap) return
@@ -4761,7 +4789,7 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   if (sks .ne. zero) then
      cplxy = .true.
   endif
-
+  
   !---- BV flag
   bvk = node_value('other_bv ')
   sks = sks * bvk
@@ -4829,7 +4857,7 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
      te(5,6,6) = - three * re(5,6) / (two * beta)
      call tmsymm(te)
   endif
-
+  
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
@@ -4982,6 +5010,7 @@ SUBROUTINE tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   double precision dl,beta,gamma,dtbyds,orbit(6),ek(6),re(6,6),     &
        te(6,6,6),get_value,zero,two,three
   parameter(zero=0d0,two=2d0,three=3d0)
+  integer i,j,k
 
   !---- Initialize.
   call dzero(ek, 6)
@@ -5010,7 +5039,7 @@ SUBROUTINE tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   endif
 
   !---- Track orbit.
-  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+  if (ftrk) call tmtrak(ek,re,te,orbit,orbit)  
 
 end SUBROUTINE tmdrf0
 SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
@@ -5317,7 +5346,7 @@ SUBROUTINE tmsymp(r)
 100 continue
   call m66symp(r,nrm)
   if (nrm .gt. zero) then
-    print *," Singular matrix occurred during simplectification of R (left unchanged)."
+    print *," Singular matrix occurred during symplectification of R (left unchanged)."
     print *," The column norm of R'*J*R-J is ",nrm
   endif
 
@@ -5342,6 +5371,10 @@ SUBROUTINE tmali1(orb1, errors, betas, gammas, orb2, rm)
   double precision ds,dx,dy,phi,psi,rm(6,6),s2,the,betas, gammas,   &
        w(3,3),orb1(6),orb2(6),orbt(6),errors(align_max)
 
+  ! integer i,j
+  ! print *, ''
+  ! print *, ' in TMALI1 '
+
   !---- Build rotation matrix and compute additional drift length.
   dx  = errors(1)
   dy  = errors(2)
@@ -5352,6 +5385,13 @@ SUBROUTINE tmali1(orb1, errors, betas, gammas, orb2, rm)
   call sumtrx(the, phi, psi, w)
   s2 = (w(1,3) * dx + w(2,3) * dy + w(3,3) * ds) / w(3,3)
 
+  ! print *, "Dx, Dy, Ds, Theta, Phi, Psi: ", dx,dy,ds,the,phi,psi
+  ! print *, "rotation matrix W: "
+  ! do i =1,3
+  !    print *,(w(i,j), j=1,3)
+  ! enddo
+  ! print *, "additional drift s2:", s2 
+  
   !---- F2 terms (transfer matrix).
   call m66one(rm)
   rm(2,2) = w(1,1)
@@ -5375,6 +5415,11 @@ SUBROUTINE tmali1(orb1, errors, betas, gammas, orb2, rm)
   rm(5,4) = rm(5,3) * s2
   rm(5,6) = - s2 / (betas * gammas)**2
 
+  ! print *, "transformation matrix RM: "
+  ! do i =1,6
+  !    print *,(rm(i,j), j=1,6)
+  ! enddo
+  
   !---- Track orbit.
   call m66byv(rm, orb1, orbt)
   orb2(1) = orbt(1) - (w(2,2) * dx - w(1,2) * dy) / w(3,3)
@@ -5383,6 +5428,10 @@ SUBROUTINE tmali1(orb1, errors, betas, gammas, orb2, rm)
   orb2(4) = orbt(4) + w(3,2)
   orb2(5) = orbt(5) - s2 / betas
   orb2(6) = orbt(6)
+
+  ! print *,"orbit transformation: Orb1, Orb2:"
+  ! print *, orb1
+  ! print *, orb2
 
 end SUBROUTINE tmali1
 SUBROUTINE tmali2(el, orb1, errors, betas, gammas, orb2, rm)
@@ -5394,6 +5443,7 @@ SUBROUTINE tmali2(el, orb1, errors, betas, gammas, orb2, rm)
   !     Purpose:                                                         *
   !     TRANSPORT map for orbit displacement at exit of an element.      *
   !     Input:                                                           *
+  !     el        (real)    element length
   !     orb1(6)   (real)    Orbit before misalignment.                   *
   !     errors(align_max) (real)    alignment errors                     *
   !     betas     (real)    current beam beta                            *
@@ -5407,6 +5457,10 @@ SUBROUTINE tmali2(el, orb1, errors, betas, gammas, orb2, rm)
        gammas,zero
   parameter(zero=0d0)
 
+  ! integer i,j
+  ! print *, ''
+  ! print *, ' in TMALI2 '
+
   !---- Misalignment rotation matrix w.r.t. entrance system.
   dx  = errors(1)
   dy  = errors(2)
@@ -5414,18 +5468,43 @@ SUBROUTINE tmali2(el, orb1, errors, betas, gammas, orb2, rm)
   the = errors(5)
   phi = errors(4)
   psi = errors(6)
-  tilt=zero
+  tilt= zero
+
+
+  ! print *, "Dx, Dy, Ds, Theta, Phi, Psi: ", dx,dy,ds,the,phi,psi
+
   call sumtrx(the, phi, psi, w)
   !---- VE and WE represent the change of reference.
   call suelem(el, ve, we, tilt)
+  ! print *, "element transform VE, WE: ", ve
+  ! do i =1,3
+  !    print *,(we(i,j), j=1,3)
+  ! enddo
+ 
   !---- Misalignment displacements at exit w.r.t. entrance system.
   v(1) = dx + w(1,1)*ve(1)+w(1,2)*ve(2)+w(1,3)*ve(3)-ve(1)
   v(2) = dy + w(2,1)*ve(1)+w(2,2)*ve(2)+w(2,3)*ve(3)-ve(2)
   v(3) = ds + w(3,1)*ve(1)+w(3,2)*ve(2)+w(3,3)*ve(3)-ve(3)
 
   !---- Convert all references to exit, build additional drift.
+  ! print *, "rotation matrix W before WE transform: "
+  ! do i =1,3
+  !    print *,(w(i,j), j=1,3)
+  ! enddo
+  ! print *, "misalignment displacement V before WE transform:", V
+
   call sutran(w, v, we)
+
+  ! print *, "rotation matrix W after WE transform: "
+  ! do i =1,3
+  !    print *,(w(i,j), j=1,3)
+  ! enddo
+  ! print *, "misalignment displacement V after WE transform:", V
+
+
   s2 = - (w(1,3) * v(1) + w(2,3) * v(2) + w(3,3) * v(3)) / w(3,3)
+  ! print *, "additional drift s2:", s2 
+ 
 
   !---- Transfer matrix.
   call m66one(rm)
@@ -5450,6 +5529,11 @@ SUBROUTINE tmali2(el, orb1, errors, betas, gammas, orb2, rm)
   rm(3,6) = rm(4,6) * s2
   rm(5,6) = - s2 / (betas * gammas)**2
 
+  ! print *, "transformation matrix RM: "
+  ! do i =1,6
+  !    print *,(rm(i,j), j=1,6)
+  ! enddo
+
   !---- Track orbit.
   orbt(1) = orb1(1) + (w(2,2) * v(1) - w(1,2) * v(2)) / w(3,3)
   orbt(2) = orb1(2) - w(3,1)
@@ -5458,6 +5542,10 @@ SUBROUTINE tmali2(el, orb1, errors, betas, gammas, orb2, rm)
   orbt(5) = orb1(5) - s2 / betas
   orbt(6) = orb1(6)
   call m66byv(rm, orbt, orb2)
+
+  ! print *,"orbit transformation: Orb1, Orb2:"
+  ! print *, orb1
+  ! print *, orb2
 
 end SUBROUTINE tmali2
 SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
@@ -5525,11 +5613,10 @@ SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
      endif
   endif
   if(beamshape.eq.1) call tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
-  if(beamshape.eq.2) call tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,  &
-       fk)
-  if(beamshape.eq.3) call tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,&
-       re,te,fk)
+  if(beamshape.eq.2) call tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
+  if(beamshape.eq.3) call tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
 end SUBROUTINE tmbb
+
 SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
 
   use bbfi

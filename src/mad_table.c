@@ -105,30 +105,31 @@ add_table_vars(struct name_list* cols, struct command_list* select)
   char tmp[12];
   struct name_list* nl;
   struct command_parameter_list* pl;
-  for (i = 0; i < select->curr; i++)
-  {
+
+  for (i = 0; i < select->curr; i++) {
     nl = select->commands[i]->par_names;
     pl = select->commands[i]->par;
     pos = name_list_pos("column", nl);
-    if (nl->inform[pos])
-    {
-      for (j = 0; j < pl->parameters[pos]->m_string->curr; j++)
-      {
+    if (nl->inform[pos]) {
+      for (j = 0; j < pl->parameters[pos]->m_string->curr; j++) {
         var_name = pl->parameters[pos]->m_string->p[j];
-        if (strcmp(var_name, "apertype") == 0)
-        {
-          if ((n = aperture_count(current_sequ)) > 0)
-          {
+
+	// 2014-Aug-25  20:02:35  ghislain: 
+	// printf("\n adding tablevar '%s'\n",var_name);
+
+        if (strcmp(var_name, "apertype") == 0) {
+          if ((n = aperture_count(current_sequ)) > 0) {
             add_to_name_list(permbuff("apertype"), 3, cols);
-            for (k = 0; k < n; k++)
-            {
+            for (k = 0; k < n; k++) {
               sprintf(tmp, "aper_%d", k+1);
               add_to_name_list(permbuff(tmp), 2, cols);
             }
           }
         }
+
         else if (name_list_pos(var_name, cols) < 0) /* not yet in list */
           add_to_name_list(permbuff(var_name), 2, cols);
+
       }
     }
   }
@@ -197,113 +198,115 @@ write_table(struct table* t, char* filename)
 
   time(&now);    /* get system time */
   tm = localtime(&now); /* split system time */
+
   if (strcmp(filename, "terminal") == 0) out_file = stdout;
-  else if ((out_file = fopen(filename, "w")) == NULL)
-  {
+  else if ((out_file = fopen(filename, "w")) == NULL) {
     warning("cannot open output file:", filename); return;
   }
-  if (t != NULL)
-  {
-    strcpy(l_name, t->name);
-    n = strlen(t->name);
-    fprintf(out_file,
-            "@ NAME             %%%02ds \"%s\"\n", n,
-            stoupper(l_name));
 
-    strcpy(l_name, t->type);
-    n = strlen(t->type);
-    fprintf(out_file,
-            "@ TYPE             %%%02ds \"%s\"\n", n,
-            stoupper(l_name));
+  if (t == NULL) return;
 
-    if (t->header != NULL)
-    {
-      for (j = 0; j < t->header->curr; j++)
-        fprintf(out_file, "%s\n", t->header->p[j]);
-    }
-    if (title != NULL)
-    {
-      n = strlen(title);
-      fprintf(out_file,
-              "@ TITLE            %%%02ds \"%s\"\n", n, title);
-    }
+  // if (t != NULL)
+  //{
+  strcpy(l_name, t->name);
+  n = strlen(t->name);
+  fprintf(out_file,
+	  "@ NAME             %%%02ds \"%s\"\n", n,
+	  stoupper(l_name));
 
-    n = strlen(version_name)+strlen(version_ostype)+strlen(version_arch)+2;
-    fprintf(out_file,
-            "@ ORIGIN           %%%02ds \"%s %s %s\"\n",
-            n, version_name, version_ostype, version_arch);
+  strcpy(l_name, t->type);
+  n = strlen(t->type);
+  fprintf(out_file,
+	  "@ TYPE             %%%02ds \"%s\"\n", n,
+	  stoupper(l_name));
 
-    fprintf(out_file,
-            "@ DATE             %%08s \"%02d/%02d/%02d\"\n",
-            tm->tm_mday, tm->tm_mon+1, tm->tm_year%100);
-
-    fprintf(out_file,
-            "@ TIME             %%08s \"%02d.%02d.%02d\"\n",
-            tm->tm_hour, tm->tm_min, tm->tm_sec);
-    fprintf(out_file, "* ");
-
-    for (i = 0; i < col->curr; i++)
-    {
-      strcpy(l_name, t->columns->names[col->i[i]]);
-      if (t->columns->inform[col->i[i]] == 1)
-        fprintf(out_file, v_format("%NIs "), stoupper(l_name));
-      else if (t->columns->inform[col->i[i]] == 2)
-        fprintf(out_file, v_format("%NFs "), stoupper(l_name));
-      else if (t->columns->inform[col->i[i]] == 3)
-        fprintf(out_file, v_format("%S "), stoupper(l_name));
-    }
-    fprintf(out_file, "\n");
-
-    fprintf(out_file, "$ ");
-    for (i = 0; i < col->curr; i++)
-    {
-      if (t->columns->inform[col->i[i]] == 1)
-        fprintf(out_file, v_format("%NIs "),"%d");
-      else if (t->columns->inform[col->i[i]] == 2)
-        fprintf(out_file, v_format("%NFs "),"%le");
-      else if (t->columns->inform[col->i[i]] == 3)
-        fprintf(out_file, v_format("%S "),"%s");
-    }
-    fprintf(out_file, "\n");
-
-    for (j = 0; j < row->curr; j++)
-    {
-      if (row->i[j])
-      {
-        if (t->l_head[j] != NULL)
-        {
-          for (k = 0; k < t->l_head[j]->curr; k++)
-            fprintf(out_file, "%s\n", t->l_head[j]->p[k]);
-        }
-        for (i = 0; i < col->curr; i++)
-        {
-/*          printf("row %d col %d datatype %d \n",j,i, t->columns->inform[col->i[i]] );*/
-          if (t->columns->inform[col->i[i]] == 1) {
-            tmp = t->d_cols[col->i[i]][j];
-            fprintf(out_file, v_format(" %I"), tmp);
-          }
-          else if (t->columns->inform[col->i[i]] == 2) {
-            fprintf(out_file, v_format(" %F"), t->d_cols[col->i[i]][j]);
-            /*printf("%s[%2d,%2d]=%+8.5f    ",t->name,col->i[i],j,t->d_cols[col->i[i]][j]);*/
-          }
-          else if (t->columns->inform[col->i[i]] == 3) {
-            pc[0] = c_dum->c[0] = '\"';
-            if (t->s_cols[col->i[i]][j] != NULL) {
-              strcpy(&c_dum->c[1], t->s_cols[col->i[i]][j]);
-              stoupper(c_dum->c);
-              pc = strip(c_dum->c); /* remove :<occ_count> */
-              k = strlen(pc);
-            }
-            else k = 1;
-            pc[k++] = '\"'; pc[k] = '\0';
-            fprintf(out_file, v_format(" %S "), pc);
-          }
-        }
-        fprintf(out_file, "\n");
-      }
-    }
-    if (strcmp(filename, "terminal") != 0) fclose(out_file);
+  if (t->header != NULL) {
+    for (j = 0; j < t->header->curr; j++)
+      fprintf(out_file, "%s\n", t->header->p[j]);
   }
+
+  if (title != NULL) {
+    n = strlen(title);
+    fprintf(out_file,
+	    "@ TITLE            %%%02ds \"%s\"\n", n, title);
+  }
+
+  n = strlen(version_name)+strlen(version_ostype)+strlen(version_arch)+2;
+  fprintf(out_file,
+	  "@ ORIGIN           %%%02ds \"%s %s %s\"\n",
+	  n, version_name, version_ostype, version_arch);
+
+  fprintf(out_file,
+	  "@ DATE             %%08s \"%02d/%02d/%02d\"\n",
+	  tm->tm_mday, tm->tm_mon+1, tm->tm_year%100);
+
+  fprintf(out_file,
+	  "@ TIME             %%08s \"%02d.%02d.%02d\"\n",
+	  tm->tm_hour, tm->tm_min, tm->tm_sec);
+  fprintf(out_file, "* ");
+
+  for (i = 0; i < col->curr; i++) {
+    strcpy(l_name, t->columns->names[col->i[i]]);
+    if (t->columns->inform[col->i[i]] == 1)
+      fprintf(out_file, v_format("%NIs "), stoupper(l_name));
+    else if (t->columns->inform[col->i[i]] == 2)
+      fprintf(out_file, v_format("%NFs "), stoupper(l_name));
+    else if (t->columns->inform[col->i[i]] == 3)
+      fprintf(out_file, v_format("%S "), stoupper(l_name));
+  }
+  fprintf(out_file, "\n");
+
+  fprintf(out_file, "$ ");
+  for (i = 0; i < col->curr; i++) {
+    if (t->columns->inform[col->i[i]] == 1)
+      fprintf(out_file, v_format("%NIs "),"%d");
+    else if (t->columns->inform[col->i[i]] == 2)
+      fprintf(out_file, v_format("%NFs "),"%le");
+    else if (t->columns->inform[col->i[i]] == 3)
+      fprintf(out_file, v_format("%S "),"%s");
+  }
+  fprintf(out_file, "\n");
+
+  for (j = 0; j < row->curr; j++) {
+    // 2014-Aug-26  16:31:09  ghislain: 
+    // printf("row %d and logical %d\n", j, row->i[j]);
+    if (row->i[j]) {
+      if (t->l_head[j] != NULL) {
+	for (k = 0; k < t->l_head[j]->curr; k++)
+	  fprintf(out_file, "%s\n", t->l_head[j]->p[k]);
+      }
+      for (i = 0; i < col->curr; i++) {
+	// printf("row %d col %d datatype %d \n",j,i, t->columns->inform[col->i[i]] );
+
+	if (t->columns->inform[col->i[i]] == 1) { // data type 
+	  tmp = t->d_cols[col->i[i]][j];
+	  fprintf(out_file, v_format(" %I"), tmp);
+	}
+	else if (t->columns->inform[col->i[i]] == 2) { // data type real
+	  fprintf(out_file, v_format(" %F"), t->d_cols[col->i[i]][j]);
+	  /*printf("%s[%2d,%2d]=%+8.5f    ",t->name,col->i[i],j,t->d_cols[col->i[i]][j]);*/
+	}
+	else if (t->columns->inform[col->i[i]] == 3) { // data type string
+	  pc[0] = c_dum->c[0] = '\"';
+	  if (t->s_cols[col->i[i]][j] != NULL) {
+	    strcpy(&c_dum->c[1], t->s_cols[col->i[i]][j]);
+	    stoupper(c_dum->c);
+	    pc = strip(c_dum->c); /* remove :<occ_count> */
+	    k = strlen(pc);
+	  }
+	  else k = 1;
+	  pc[k++] = '\"'; pc[k] = '\0';
+	  // 2014-Aug-26  16:44:48  ghislain: 
+	  // printf("\n string found: '%s'\n", pc);
+	  fprintf(out_file, v_format(" %S "), pc);
+	}
+      }
+      fprintf(out_file, "\n");
+    }
+  }
+
+  if (strcmp(filename, "terminal") != 0) fclose(out_file);
+  //}
 }
 
 #if 0 // not used...
@@ -495,18 +498,21 @@ set_selected_rows(struct table* t, struct command_list* select, struct command_l
   get_select_t_ranges(select, deselect, t);
   if (select != 0)
   {
+    // 2014-Aug-25  19:46:17  ghislain: 
+    // printf("\n\n selecting rows \n\n");
     for (j = 0; j < t->curr; j++)  t->row_out->i[j] = 0;
-    for (i = 0; i < select->curr; i++)
-    {
-      for (j = s_range->i[i]; j <= e_range->i[i]; j++)
-      {
-        if (t->row_out->i[j] == 0) t->row_out->i[j]
-                                     = pass_select(t->s_cols[0][j], select->commands[i]);
+
+    for (i = 0; i < select->curr; i++) {
+      for (j = s_range->i[i]; j <= e_range->i[i]; j++) {
+        if (t->row_out->i[j] == 0) 
+	  t->row_out->i[j] = pass_select(t->s_cols[0][j], select->commands[i]);
       }
     }
   }
   if (deselect != NULL)
   {
+    // 2014-Aug-25  19:46:17  ghislain: 
+    // printf("\n\n deselecting rows \n\n");
     for (i = 0; i < deselect->curr; i++)
     {
       for (j = sd_range->i[i]; j <= ed_range->i[i]; j++)
@@ -875,16 +881,11 @@ set_vars_from_table(struct table* t)
 {
   int i;
 
-  for (i = 0; i < t->num_cols; i++)
-  {
-    if (t->columns->inform[i] ==2)
-    {
+  for (i = 0; i < t->num_cols; i++) {
+    if (t->columns->inform[i] == 2)
       set_variable(t->columns->names[i],&t->d_cols[i][t->curr]) ;
-    }
-    else if (t->columns->inform[i] ==3)
-    {
+    else if (t->columns->inform[i] == 3)
       set_stringvar(t->columns->names[i],t->s_cols[i][t->curr]) ;
-    }
   }
 }
 
@@ -1030,6 +1031,118 @@ print_table(struct table* t)
   }
 }
 
+#if 0 // not used...
+void
+print_table_summ(struct table* t)
+{
+  int i, j, tmp;
+  if (t != NULL)
+  {
+    fprintf(prt_file, "\n");
+    fprintf(prt_file, "++++++ table: %s\n", t->name);
+    fprintf(prt_file, "\n");
+
+    // first line of global parameters
+    for (i = 0; i < 5; i++) {
+      if (t->columns->inform[i] == 1)
+	fprintf(prt_file, v_format("%NIs "), t->columns->names[i]);
+      else if (t->columns->inform[i] == 2)
+	fprintf(prt_file, v_format("%NFs "), t->columns->names[i]);
+      else if (t->columns->inform[i] == 3)
+	fprintf(prt_file, v_format("%S "), t->columns->names[i]);
+    }
+    fprintf(prt_file, "\n");
+    for (j = 0; j < t->curr; j++) {
+      for (i = 0; i < 5; i++) {
+	if (t->columns->inform[i] == 1) {
+	  tmp = t->d_cols[i][j];
+	  fprintf(prt_file, v_format("%I "), tmp);
+	}
+	else if (t->columns->inform[i] == 2)
+	  fprintf(prt_file, v_format("%F "), t->d_cols[i][j]);
+	else if (t->columns->inform[i] == 3)
+	  fprintf(prt_file, v_format("%S "), t->s_cols[i][j]);
+      }
+      fprintf(prt_file, "\n");
+    }
+    fprintf(prt_file, "\n");
+
+    // two lines of twiss and global parameters, one per plane
+    for (i = 5; i < 12; i++) {
+      if (t->columns->inform[i] == 1)
+	fprintf(prt_file, v_format("%NIs "), t->columns->names[i]);
+      else if (t->columns->inform[i] == 2)
+	fprintf(prt_file, v_format("%NFs "), t->columns->names[i]);
+      else if (t->columns->inform[i] == 3)
+	fprintf(prt_file, v_format("%S "), t->columns->names[i]);
+    }
+    fprintf(prt_file, "\n");
+    for (j = 0; j < t->curr; j++) {
+      for (i = 5; i < 12; i++) {
+	if (t->columns->inform[i] == 1) {
+	  tmp = t->d_cols[i][j];
+	  fprintf(prt_file, v_format("%I "), tmp);
+	}
+	else if (t->columns->inform[i] == 2)
+	  fprintf(prt_file, v_format("%F "), t->d_cols[i][j]);
+	else if (t->columns->inform[i] == 3)
+	  fprintf(prt_file, v_format("%S "), t->s_cols[i][j]);
+      }
+      fprintf(prt_file, "\n");
+    }
+    fprintf(prt_file, "\n"); 
+
+    for (i = 12; i < 19; i++) {
+      if (t->columns->inform[i] == 1)
+	fprintf(prt_file, v_format("%NIs "), t->columns->names[i]);
+      else if (t->columns->inform[i] == 2)
+	fprintf(prt_file, v_format("%NFs "), t->columns->names[i]);
+      else if (t->columns->inform[i] == 3)
+	fprintf(prt_file, v_format("%S "), t->columns->names[i]);
+    }
+    fprintf(prt_file, "\n");
+    for (j = 0; j < t->curr; j++) {
+      for (i = 12; i < 19; i++) {
+	if (t->columns->inform[i] == 1) {
+	  tmp = t->d_cols[i][j];
+	  fprintf(prt_file, v_format("%I "), tmp);
+	}
+	else if (t->columns->inform[i] == 2)
+	  fprintf(prt_file, v_format("%F "), t->d_cols[i][j]);
+	else if (t->columns->inform[i] == 3)
+	  fprintf(prt_file, v_format("%S "), t->s_cols[i][j]);
+      }
+      fprintf(prt_file, "\n");
+    }
+    fprintf(prt_file, "\n");
+
+    // finally one line for synchrotron radiation integrals
+    for (i = 19; i < 24; i++) {
+      if (t->columns->inform[i] == 1)
+	fprintf(prt_file, v_format("%NIs "), t->columns->names[i]);
+      else if (t->columns->inform[i] == 2)
+	fprintf(prt_file, v_format("%NFs "), t->columns->names[i]);
+      else if (t->columns->inform[i] == 3)
+	fprintf(prt_file, v_format("%S "), t->columns->names[i]);
+    }
+    fprintf(prt_file, "\n");
+    for (j = 0; j < t->curr; j++) {
+      for (i = 19; i < 24; i++) {
+	if (t->columns->inform[i] == 1) {
+	  tmp = t->d_cols[i][j];
+	  fprintf(prt_file, v_format("%I "), tmp);
+	}
+	else if (t->columns->inform[i] == 2)
+	  fprintf(prt_file, v_format("%F "), t->d_cols[i][j]);
+	else if (t->columns->inform[i] == 3)
+	  fprintf(prt_file, v_format("%S "), t->s_cols[i][j]);
+      }
+      fprintf(prt_file, "\n");
+    }
+  }
+}
+#endif
+
 void
 make_map_table(int* map_table_max_rows)
 {
@@ -1078,16 +1191,25 @@ make_table(char* name, char* type, char** table_cols, int* table_types, int rows
   struct name_list *cols;
   struct command_list* scl;
   int i, n = 0;
-  while (*table_cols[n] != ' ')
-  {
-/*     printf("make table %s col %d %s\n",name, n, table_cols[n]);*/
-    n++;
-  }
+
+  while (*table_cols[n] != ' ')   n++;
+ 
+  // 2014-Aug-25  19:57:24  ghislain: 
+  // printf("\n\n make table '%s' with %d columns \n",name, n);
+ 
   cols = new_name_list("columns", n);
-  for (i = 0; i < n; i++)
+  for (i = 0; i < n; i++) {
     add_to_name_list(table_cols[i], table_types[i], cols);
-  if ((scl = find_command_list(name, table_select)) != NULL && scl->curr > 0)
+    // 2014-Aug-25  19:57:24  ghislain: 
+    // printf(" '%s' ",table_cols[i]);
+  }
+
+  if ((scl = find_command_list(name, table_select)) != NULL && scl->curr > 0) {
+    // 2014-Aug-25  20:00:50  ghislain: 
+    // printf("\n found %d column selections for this table...\n",scl->curr);
     add_table_vars(cols, scl);
+  }
+
   t = new_table(name, type, rows, cols);
   t->org_cols = n;
   return t;
@@ -1162,6 +1284,9 @@ out_table(char* tname, struct table* t, char* filename)
   struct command_list* scl = find_command_list(tname, table_select);
   struct command_list* dscl = find_command_list(tname, table_deselect);
 
+  // 2014-Aug-25  19:39:15  ghislain: 
+  // printf("\n outputting table '%s' \n",tname);
+  
   while (t->num_cols > t->col_out->max)
     grow_int_array(t->col_out);
 
@@ -1176,13 +1301,52 @@ out_table(char* tname, struct table* t, char* filename)
   for (int j = 0; j < t->num_cols; j++) t->col_out->i[j] = j;
 
   t->col_out->curr = t->num_cols;
-  if ((scl != NULL && scl->curr > 0) || (dscl != NULL && dscl->curr > 0))
-  {
+
+  if ((scl != NULL && scl->curr > 0) || (dscl != NULL && dscl->curr > 0)) {
+    // 2014-Aug-25  19:39:15  ghislain: 
+    // printf("\n outputting only selected columns for table '%s' \n",tname);
     set_selected_columns(t, scl);
     set_selected_rows(t, scl, dscl);
   }
+
   write_table(t, filename);
 }
+
+void
+out_sectortable(char* tname, struct table* t, char* filename)
+/* output of a sectomap table */
+// 2014-Aug-25  19:39:15  ghislain: based on out_table but specific for sectormaps
+
+{
+  // 2014-Aug-25  19:39:15  ghislain: 
+  // printf("\n outputting sectormap table '%s' \n",tname);
+  
+  while (t->num_cols > t->col_out->max)
+    grow_int_array(t->col_out);
+
+  while (t->curr > t->row_out->max)
+    grow_int_array(t->row_out);
+
+  t->row_out->curr = t->curr;
+
+  //printf("\n Found %d lines in sectormap %s\n",t->curr,tname);
+  
+  for (int j = 0; j < t->curr    ; j++) t->row_out->i[j] = 1;
+  for (int j = 0; j < t->num_cols; j++) t->col_out->i[j] = j;
+
+  t->col_out->curr = t->num_cols;
+
+  if (sector_select != NULL && sector_select->curr > 0) {
+    // printf("\n outputting only selected columns for sectormap table '%s' \n",tname);
+    set_selected_columns(t, sector_select);
+    // there is no deselect structure yet for sectormap.
+    struct command_list* deselect = NULL;
+    set_selected_rows(t, sector_select, deselect);
+  }
+
+  write_table(t, filename);
+}
+
 
 struct table*
 read_table(struct in_cmd* cmd)
@@ -1589,64 +1753,51 @@ set_selected_columns(struct table* t, struct command_list* select)
   char* p;
   struct name_list* nl;
   struct command_parameter_list* pl;
-  if (select && par_present("column", NULL, select))
-  {
+
+  if (select && par_present("column", NULL, select)) {
     for (j = 0; j < t->num_cols; j++)  /* deselect all columns */
       t->col_out->i[j] = 0;
+
     t->col_out->curr = 0;
-    for (i = 0; i < select->curr; i++)
-    {
+    for (i = 0; i < select->curr; i++) {
       nl = select->commands[i]->par_names;
       pl = select->commands[i]->par;
       pos = name_list_pos("column", nl);
-      if (nl->inform[pos])
-      {
-        for (j = 0; j < pl->parameters[pos]->m_string->curr; j++)
-        {
-          if (strcmp(pl->parameters[pos]->m_string->p[j], "re") == 0)
-          {
-            for (k = 0; k < t->num_cols; k++)
-            {
-              if (strncmp("re", t->columns->names[k], 2) == 0)
-              {
+      if (nl->inform[pos]) {
+        for (j = 0; j < pl->parameters[pos]->m_string->curr; j++) {
+	  
+          if (strcmp(pl->parameters[pos]->m_string->p[j], "re") == 0) {
+            for (k = 0; k < t->num_cols; k++) {
+              if (strncmp("re", t->columns->names[k], 2) == 0) {
                 if (k <  t->num_cols
                     && int_in_array(k, n, t->col_out->i) == 0)
                   t->col_out->i[n++] = k;
               }
             }
           }
-          else if (strcmp(pl->parameters[pos]->m_string->p[j], "eign") == 0)
-          {
-            for (k = 0; k < t->num_cols; k++)
-            {
-              if (strncmp("eign", t->columns->names[k], 2) == 0)
-              {
-                if (k <  t->num_cols
-                    && int_in_array(k, n, t->col_out->i) == 0)
+
+          else if (strcmp(pl->parameters[pos]->m_string->p[j], "eign") == 0) {
+            for (k = 0; k < t->num_cols; k++) {
+              if (strncmp("eign", t->columns->names[k], 2) == 0) {
+                if (k <  t->num_cols && int_in_array(k, n, t->col_out->i) == 0)
                   t->col_out->i[n++] = k;
               }
             }
           }
-          else if (strcmp(pl->parameters[pos]->m_string->p[j],
-                          "apertype") == 0)
-          {
-            for (k = 0; k < t->num_cols; k++)
-            {
-              if (strncmp("aper", t->columns->names[k], 4) == 0)
-              {
-                if (k <  t->num_cols
-                    && int_in_array(k, n, t->col_out->i) == 0)
+
+          else if (strcmp(pl->parameters[pos]->m_string->p[j], "apertype") == 0) {
+            for (k = 0; k < t->num_cols; k++) {
+              if (strncmp("aper", t->columns->names[k], 4) == 0) {
+                if (k <  t->num_cols && int_in_array(k, n, t->col_out->i) == 0)
                   t->col_out->i[n++] = k;
               }
             }
-          }
-          else
-          {
+          } 
+
+	  else {
             p = pl->parameters[pos]->m_string->p[j];
-            if ((k = name_list_pos(p, t->columns)) > -1)
-            {
-              if (k <  t->num_cols
-                  && int_in_array(k, n, t->col_out->i) == 0)
+            if ((k = name_list_pos(p, t->columns)) > -1) {
+              if (k <  t->num_cols && int_in_array(k, n, t->col_out->i) == 0)
                 t->col_out->i[n++] = k;
             }
           }
