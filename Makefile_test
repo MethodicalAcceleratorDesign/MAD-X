@@ -63,7 +63,7 @@ test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 test-r
 \
 test-ptc-twiss test-ptc-twiss-1 test-ptc-twiss-2 \
 test-ptc-twiss-old1 test-ptc-twiss-old2 test-ptc-twiss-old3 test-ptc-twiss-old4 test-ptc-twiss-old5 $(if $(call eq,$(OSTYPE),Windows),,test-ptc-twiss-old6) test-ptc-twiss-old7 \
-test-ptc-twiss-5D test-ptc-twiss-56D test-ptc-twiss-56Dt test-ptc-twiss-56Dl test-ptc-twiss-56Dtl test-ptc-twiss-6D \
+test-ptc-twiss-5D test-ptc-twiss-5Dt test-ptc-twiss-56D test-ptc-twiss-56Dt test-ptc-twiss-56Dl test-ptc-twiss-56Dtl test-ptc-twiss-6D \
 test-ptc-normal test-ptc-twiss-maptable \
 test-ptc-trackline test-ptc-trackline-2 \
 test-touschek test-touschek-2 \
