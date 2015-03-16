@@ -141,8 +141,7 @@ show_name_list(const char *from, struct name_list* nl)
 }
 #endif
 
-int
-(add_to_name_list)(char* name, int inf, struct name_list* vlist)
+int add_to_name_list(char* name, int inf, struct name_list* vlist)
   /* adds name to alphabetic name list vlist */
   /* inf is an integer kept with name */
 {
@@ -171,8 +170,7 @@ int
   return ret;
 }
 
-int
-(name_list_pos)(const char* name, struct name_list* vlist)
+int name_list_pos(const char* name, struct name_list* vlist)
 {
   assert(name);
 
