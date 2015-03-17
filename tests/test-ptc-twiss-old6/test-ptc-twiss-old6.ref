@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.00  (64 bit, Darwin)      +
-  +           Production Version            +
-  + Code Modification Date: 2014.03.05      +
-  + Execution Time Stamp: 20.03.14 09.17.56 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.11.14               +
+  + Execution date: 2015.03.17 16:11:17      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8
 
 !Option,  warn,info,echo,thin_foc=false;
@@ -641,7 +641,6 @@ enter EMIT module
  Bcurrent     0.0001891809845 A/bunch    Kbunch             1 
  Npart               1.05e+11 /bunch     Energy                   450 GeV 
  gamma            479.6050377            beta            0.9999978263
-guess:          0                  0                  0
  
                                                   M o d e   1         M o d e   2         M o d e   3
  Fractional tunes            undamped              0.28000176          0.31000176          0.00794101
@@ -661,6 +660,7 @@ guess:          0                  0                  0
  gamma(max) [1/m]            px                0.76031389E+00      0.36592074E-09      0.13247068E-11
                              py                0.36127937E-09      0.76030719E+00      0.10146536E-11
                              pt                0.14836525E-04      0.90040124E-07      0.59883574E-02
+++++++ warning: EMIT: beam not updated, RADIATE is false or longitudinal stability not ensured. 
 
  RF system: 
  Cavity                      length[m]        voltage[MV]                lag          freq[MHz]             harmon
@@ -713,7 +713,6 @@ SELECT, flag=ptc_twiss, column=name,s,beta11,mu1,mu2,mu3;
 ptc_twiss,closed_orbit,icase=6,file="twiss_lhc",summary_file="summaryMomentumCompaction"; ! jluc
 
 ++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
   Rectangular Bend: input arc length (rho alpha) 
@@ -834,8 +833,9 @@ System,"rm -rf temp";
 stop;
 
 
-  Number of warnings: 0
+  Number of warnings: 1
+1 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.00 (64 bit) finished normally +
+  + MAD-X 5.02.04 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

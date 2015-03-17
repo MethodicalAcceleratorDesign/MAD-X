@@ -12,6 +12,7 @@ pro_emit(struct in_cmd* cmd)
   double emit_v[3], nemit_v[3], bmax[9], gmax[9], dismax[4], tunes[3],
     sig_v[4], pdamp[3], r0mat[4];
   char tmp[100];
+  int updatebeam;
 
   if (current_sequ == NULL || current_sequ->ex_start == NULL) {
     warning("sequence not active,", "EMIT ignored");
@@ -36,15 +37,23 @@ pro_emit(struct in_cmd* cmd)
   adjust_probe(e_deltap); /* sets correct gamma, beta, etc. */
   print_global(e_deltap);
   adjust_rfc(); /* sets freq in rf-cavities from probe */
-  printf(v_format("guess: %I %F %F\n"), guess_flag, guess_orbit[0], guess_orbit[1]);
+
+  // guess_flag is set by COGUESS command
+  //printf(v_format("guess: %I %F %F\n"), guess_flag, guess_orbit[0], guess_orbit[1]);
   if (guess_flag) copy_double(guess_orbit, orbit0, 6);
   getclor_(orbit0, oneturnmat, tt, &error); /* closed orbit */
   myfree(rout_name, tt);
+
   if (error == 0) {
     current_node = current_sequ->ex_start;
     emit_(&e_deltap, &e_tol, orbit0, disp0, oneturnmat, &u0, emit_v, nemit_v,
-          bmax, gmax, dismax, tunes, sig_v, pdamp);
-    if (e_deltap == zero) {
+          bmax, gmax, dismax, tunes, sig_v, pdamp, &updatebeam);
+
+    if (e_deltap != zero) { 
+      sprintf(tmp, v_format("%F"), e_deltap);
+      warning("EMIT: beam not updated, non-zero deltap: ", tmp);
+    }
+    else if (updatebeam) {      
       store_comm_par_value("ex", emit_v[0], current_beam);
       store_comm_par_value("exn", nemit_v[0], current_beam);
       store_comm_par_value("ey", emit_v[1], current_beam);
@@ -55,11 +64,10 @@ pro_emit(struct in_cmd* cmd)
       store_comm_par_value("u0", u0, current_beam);
       store_comm_par_value("qs", tunes[2], current_beam);
       store_comm_par_vector("pdamp", pdamp, current_beam);
+      printf("\n EMIT: beam parameters have been updated.\n"); 
     }
-    else {
-      sprintf(tmp, v_format("%F"), e_deltap);
-      warning("EMIT: beam not updated, non-zero deltap: ", tmp);
-    }
+    else warning("EMIT: beam not updated, RADIATE is false or longitudinal stability not ensured.", ""); 
+
     print_rfc();
   }
   set_option("twiss_print", &keep);

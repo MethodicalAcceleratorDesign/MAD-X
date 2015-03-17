@@ -4,7 +4,9 @@ Call, file= "../share/ALBA/ALBA-25.4th.seq";
 
 Use, period=Machine;
 Twiss;
+Show, beam%Machine;
 Emit, DELTAP=0.0 ;
+Show, beam%Machine;
 
 Stop;
 

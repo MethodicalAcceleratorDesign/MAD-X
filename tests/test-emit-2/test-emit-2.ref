@@ -3,7 +3,7 @@
   +     MAD-X 5.02.04  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2014.11.14               +
-  + Execution date: 2015.03.11 12:27:58      +
+  + Execution date: 2015.03.17 15:51:54      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Beam, SEQUENCE=Machine, PARTICLE=electron, energy=3, RADIATE=True;
 
@@ -94,7 +94,6 @@ enter EMIT module
  Bcurrent                   0 A/bunch    Kbunch             1 
  Npart                      0 /bunch     Energy                     3 GeV 
  gamma            5870.853803            beta            0.9999999855
-guess:          0                  0                  0
      U0              0.254203 [MeV/turn]
  
                                                   M o d e   1         M o d e   2         M o d e   3
@@ -121,6 +120,8 @@ guess:          0                  0                  0
  Damping constants [1/s]                           0.28262937E+03      0.18900774E+03      0.28439484E+03
  Damping times [s]                                 0.35382026E-02      0.52907887E-02      0.35162382E-02
  Emittances [pi micro m]                       0.11259323E-02      0.45031560E-30      0.95690426E+00
+
+ EMIT: beam parameters have been updated.
 
  RF system: 
  Cavity                      length[m]        voltage[MV]                lag          freq[MHz]             harmon
@@ -255,7 +256,6 @@ enter EMIT module
  Bcurrent                   0 A/bunch    Kbunch             1 
  Npart                      0 /bunch     Energy                     3 GeV 
  gamma            5870.853803            beta            0.9999999855
-guess:          0                  0                  0
      U0              0.254202 [MeV/turn]
  
                                                   M o d e   1         M o d e   2         M o d e   3
@@ -282,6 +282,8 @@ guess:          0                  0                  0
  Damping constants [1/s]                           0.24499889E+03      0.18900725E+03      0.32202291E+03
  Damping times [s]                                 0.40816512E-02      0.52908022E-02      0.31053691E-02
  Emittances [pi micro m]                       0.44845310E-02      0.47836164E-31      0.84509864E+00
+
+ EMIT: beam parameters have been updated.
 
  RF system: 
  Cavity                      length[m]        voltage[MV]                lag          freq[MHz]             harmon

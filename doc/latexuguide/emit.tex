@@ -39,7 +39,6 @@ If the machine contains at least one RF cavity, and if synchrotron
 radiation is enabled with \hyperref[sec:beam]{\tt BEAM, RADIATE=true;}, the
 {\tt EMIT} command computes the equilibrium emittances and other
 electron beam parameters using the method in \cite{chao1979}.
-%\href{../Introduction/bibliography.html#chao}{[Chao]}. 
 
 In this calculation the effects of quadrupoles, sextupoles and
 octupoles along the closed orbit are also considered. Thin multipoles are
@@ -48,10 +47,15 @@ used only if they have a fictitious length {\tt LRAD} different from zero.
 If the machine does not contain any RF cavity, if synchrotron radiation is
 turned off (\hyperref[sec:beam]{\tt BEAM, RADIATE=false;}, or if the longitudinal
 motion is not stable, {\tt EMIT} only computes the parameters that
-are not related to radiation.  
+are not related to radiation and does not update the {\tt BEAM} values.
 
-In the current implementation, the {\tt BEAM} values of the emittances and
-beam sizes are only updated for zero {\tt DELTAP}.  
+If synchrotron radiation is enabled (\hyperref[sec:beam]{\tt BEAM, RADIATE=true;}, 
+and the {\tt DELTAP} attribute is zero, and the longitudinal motion is stable, 
+{\tt EMIT} calculates and updates the following values for the {\tt BEAM} attached 
+to the current sequence: both geometric and normalized transverse emittances, 
+longitudinal emittance and beam sizes ($\sigma_E$ and $\sigma_t$), 
+damping partition numbers, energy loss per turn and synchrotron tune.
+
 
 {\bf Example:}
 \madxmp{

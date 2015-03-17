@@ -181,7 +181,7 @@ void dynap_(F_DOUBLE eigen, F_DOUBLE coords, F_INTEGER turns, F_INTEGER npart, F
 // from emit.f90
 void emit_(F_DOUBLE deltap, F_DOUBLE tol, F_DOUBLE orbit0, F_DOUBLE disp0, F_DOUBLE rt,
 	   F_DOUBLE u0, F_DOUBLE emit_v, F_DOUBLE nemit_v, F_DOUBLE bmax, F_DOUBLE gmax,
-	   F_DOUBLE dismax, F_DOUBLE tunes, F_DOUBLE sig_v, F_DOUBLE pdamp);
+	   F_DOUBLE dismax, F_DOUBLE tunes, F_DOUBLE sig_v, F_DOUBLE pdamp, F_LOGICAL updatebeam);
 
 // from gxx11.f90(Unix)
 // or gxx11ps.f90(Windows)

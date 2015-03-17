@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.03  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.10.14      +
-  + Execution Time Stamp: 15.10.13 17.45.57 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.11.14               +
+  + Execution date: 2015.03.17 15:51:54      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 !! **************************************************************************************
 
 !! 										
@@ -2616,7 +2616,6 @@ enter EMIT module
  Bcurrent       0.05554261601 A/bunch    Kbunch           312 
  Npart                4.5e+11 /bunch     Energy                  2.86 GeV 
  gamma            5596.880626            beta             0.999999984
-guess:          0                  0                  0
      U0              2.749529 [MeV/turn]
  
                                                   M o d e   1         M o d e   2         M o d e   3
@@ -2643,6 +2642,8 @@ guess:          0                  0                  0
  Damping constants [1/s]                           0.36775525E+03      0.37017979E+03      0.74278444E+03
  Damping times [s]                                 0.27191998E-02      0.27013900E-02      0.13462856E-02
  Emittances [pi micro m]                       0.96281687E-02      0.80193490E-30      0.48347403E+01
+
+ EMIT: beam parameters have been updated.
 
  RF system: 
  Cavity                      length[m]        voltage[MV]                lag          freq[MHz]             harmon
@@ -2748,5 +2749,5 @@ rf  0.100000E-04   10.0000       999.950      0.500000       0.00000
 0 in C and 2 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.03 (64 bit) finished normally +
+  + MAD-X 5.02.04 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
