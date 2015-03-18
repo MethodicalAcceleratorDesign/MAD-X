@@ -2283,9 +2283,10 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
        110, 120, 130, 140, 150, 160, 170, 180, 190, 200,        &
        210, 220, 230, 240, 250, 260,  10, 280, 290, 310,        &
        310, 310, 300, 310, 310, 310, 310, 310, 310, 310,	&
-       310, 420, 430), code  ! Enable non-linear thin lens and RF-Multipole  
+       310, 420, 430, 440), code  ! Enable non-linear thin lens and RF-Multipole  
   !     310, 310, 310), ! Disable non-linear thin lens and RF-Multipole
-   
+  ! 2015-Mar-18  14:04:54  ghislain: code 44 is temporary for collimators different from ecoll (code 20) and rcoll (code 21)
+
   !---- Drift space, monitor, collimator, or beam instrument.
 10 continue
 170 continue
@@ -2294,6 +2295,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
 200 continue
 210 continue
 240 continue
+440 continue
   call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   go to 500
 

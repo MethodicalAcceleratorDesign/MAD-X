@@ -1,0 +1,62 @@
+TITLE, "LHC Version 6.503 -  July 2009 - version with RCOLLIMATORs" ;
+
+option, -echo, warn, -info;
+
+real const l.tanal = 0;
+real const l.tanar = 0;
+real const l.tanc = 0;
+real const l.tcdqa = 0;
+real const l.tcp   = 0.0;
+
+real const l.mbxwt = 0.0;
+real const l.mbls2 = 0.0;
+real const l.tasb  = 0.0;
+real const l.btvss075 = 0.0;
+real const l.mblw = 0.0;
+
+real const l.tctvb = 0;
+real const l.x5zdc002 = 0;
+real const l.tcddm = 0;
+
+option, -echo, -warn, -info;
+call, file="../share/LHC/LHCRing/V6.503/V6.5_rcoll.seq";
+call, file="../share/LHC/LHCRing/V6.503/V6.5.inj.str";
+option, echo, warn, info;
+
+beam, sequence=lhcb1, particle=proton, pc=450, exn=3.75e-6, eyn=3.75e-6;
+
+on_x1:=1;
+on_sep1:=1;
+on_atlas:=0;
+
+on_x2:=1;
+on_sep2:=1;
+on_alice:=0;
+
+on_x5:=1;
+on_sep5:=1;
+on_cms  :=0;
+
+on_x8:=1;
+on_sep8:=1;
+on_lhcb :=0;
+
+option, warn, info;
+
+use, sequence=lhcb1;
+select, flag=twiss, clear;
+select, flag=twiss, column=name,s,betx,bety,x,px,y,py,apertype,on_elem, class=rcollimator;
+twiss, sequence=lhcb1, file="twiss-table.out";
+
+! Initialize PTC
+ptc_create_universe;
+ptc_create_layout, model=2, method=2, nst=2, exact;
+
+select, flag=ptc_twiss, column=name,s,betx,bety,x,px,y,py,apertype,on_elem, class=rcollimator;
+ptc_twiss,  closed_orbit, icase=6, no=3, file="ptc-twiss-table.out";
+
+ptc_end;
+
+removefile, file="Maxwellian_bend_for_ptc.txt";
+
+stop;

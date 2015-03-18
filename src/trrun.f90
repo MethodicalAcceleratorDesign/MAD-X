@@ -795,6 +795,16 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      go to 500
   endif
 
+
+  !---- Warning for deprecated ECOLLIMATOR and RCOLLIMATOR elements
+  if(code.eq.20) then 
+     call aawarn('trrun: found ECOLLIMATOR element;',' should be replaced by COLLIMATOR')
+  endif
+  if(code.eq.21) then 
+     call aawarn('trrun: found ECOLLIMATOR element;',' should be replaced by COLLIMATOR')
+  endif
+     
+
   !---- Test aperture. ALL ELEMENTS BUT DRIFTS
   if(aperflag) then
      nn=name_len
@@ -824,14 +834,16 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   !-- 500 has been specified at the relevant places in go to below
   !-- code =1 for drift, treated above, go to 500 directly
   !      print *,"   CODE    ",code
-  go to ( 500,  20,  30,  40,  50,  60,  70,  80,  90, 100,         &
-       110, 120, 130, 140, 150, 160, 170, 180, 190, 500,                 &
-       500, 500, 230, 240, 250, 260, 270, 280, 290, 300,   310, 320,     &
+  go to ( 500,  20,  30,  40,  50,  60,  70,  80,  90, 100, &
+          110, 120, 130, 140, 150, 160, 170, 180, 190, 500,    &
+          500, 500, 230, 240, 250, 260, 270, 280, 290, 300,    &
+          310, 320,     &
   !     330, 500, 350, 360, 370,500,500,400,410,      500, 500, 500, 500), code
   ! Use this line to enable non-linear thin lens
   !     330, 500, 350, 360, 370,500,500,400,410, 420, 500, 500, 500, 500), code
   ! Enable non-linear thin lens and RF-Multipole
-        330, 500, 350, 360, 370,500,500,400,410, 420, 430, 500, 500, 500), code
+          330, 500, 350, 360, 370, 500, 500, 400, &
+          410, 420, 430, 500, 500, 500), code
   !
   !---- Make sure that nothing is executed if element is not known
   go to 500

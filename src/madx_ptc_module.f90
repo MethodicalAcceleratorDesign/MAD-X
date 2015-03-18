@@ -569,7 +569,7 @@ CONTAINS
     endif
     call append_empty(my_ring)
     
-    !print *,'Element code is ',code
+   ! print *,'Element code is ',code
     
     select case(code)
     case(0,4,25)
@@ -577,7 +577,7 @@ CONTAINS
     case(22)
        call fort_warn('ptc_input: ','Element Beam-Beam, must use slice tracking to get effect')
        key%magnet="marker"
-    case(1,11,20,21)
+    case(1,11,20,21,44)
        key%magnet="drift"
        CALL CONTEXT(key%list%name)
 
@@ -1033,7 +1033,7 @@ CONTAINS
     case(19)
        key%magnet="vmonitor"
        !  2015-Mar-05  13:13:35  ghislain: Warning !
-       !                         ecollimator and rcollimator replaced by collimator in MAD-X, with code 20
+       !                         ecollimator and rcollimator replaced by collimator in MAD-X, with code 44
        !  case(20)
        !     key%magnet="ecollimator"
        !     key%list%x_col=node_value('xsize ')

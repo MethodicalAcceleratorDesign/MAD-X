@@ -1041,6 +1041,7 @@ tests/share/LHC/LHCRing/V6.503/V6.5.thin.b1.seq -text
 tests/share/LHC/LHCRing/V6.503/V6.5.thin.coll.str -text
 tests/share/LHC/LHCRing/V6.503/V6.5.thin.inj.str -text
 tests/share/LHC/LHCRing/V6.503/V6.5.thin.seq -text
+tests/share/LHC/LHCRing/V6.503/V6.5_rcoll.seq -text
 tests/share/LHC/LHCRing/V6.503/toolkit/select.ir8.b1.madx -text
 tests/share/LHC/LHCRing/V6.503/toolkit/slice.madx -text
 tests/share/LHC/LHCRing/V6.503/toolkit/twissini.ir8.b1.madx -text
@@ -1074,6 +1075,13 @@ tests/share/ring_lattice/fv9_rbend.opt -text
 tests/share/ring_lattice/ring.seq -text
 tests/share/ring_lattice_alt/fv9.opt -text
 tests/share/ring_lattice_alt/fv9.seq -text
+tests/test-aperture-2/ptc-twiss-table.cfg -text
+tests/test-aperture-2/ptc-twiss-table.ref -text
+tests/test-aperture-2/test-aperture-2.cfg -text
+tests/test-aperture-2/test-aperture-2.madx -text
+tests/test-aperture-2/test-aperture-2.ref -text
+tests/test-aperture-2/twiss-table.cfg -text
+tests/test-aperture-2/twiss-table.ref -text
 tests/test-aperture/ap.tfs.cfg -text
 tests/test-aperture/ap.tfs.ref -text
 tests/test-aperture/offset.tfs -text

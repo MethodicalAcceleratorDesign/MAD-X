@@ -191,7 +191,9 @@ par_out_flag(char* base_name, char* par_name)
   if (strcmp(par_name,"at") == 0 || strcmp(par_name,"from") == 0) return 0;
   if (strcmp(base_name, "multipole") == 0
       && strcmp(par_name,"l") == 0) return 0;
-  if (strcmp(base_name, "collimator") == 0
+  if ( (strcmp(base_name, "collimator") == 0 || 
+	strcmp(base_name, "ecollimator") == 0 || 
+	strcmp(base_name, "rcollimator") == 0) 
       && strcmp(par_name,"lrad") == 0) return 0;
   return 1;
 }

@@ -262,7 +262,7 @@ struct object
 /*#define FIELD_MAX 40*/        /* field error array length */
 #define KEY_LENGTH 48       /* from DOOM */
 #define MM_KEEP 2           /* no. of element name starts to keep */
-#define N_TYPES 37          /* no. of valid element types */
+#define N_TYPES 39          /* no. of valid element types */
 #define MULTI_MAX 24        /* element array length for multipoles */
 #define NT34 5              /* no. of element types in special fort.34 */
 #define LINES_MAX 3         /* structure output line max. names */
@@ -406,6 +406,7 @@ static char el_info[N_TYPES][60] = /* see type_info definition */
  "collimator   2       1       1       0       0       0",
  "drift        0       1       1       0       0       0",
  "decapole     2       2       2       0       1       2",
+ "ecollimator  2       1       1       0       0       0",
  "elseparator  0       1       1       1       0       0",
  "gbend        1       1       1       2       1       1",
  "hkicker      5       5       5       1       0       3",
@@ -422,6 +423,7 @@ static char el_info[N_TYPES][60] = /* see type_info definition */
  "octupole     2       2       2       0       1       2",
  "quadrupole   2       1       2       0       1       1",
  "rbend        2       1       1       0       1       1",
+ "rcollimator  2       1       1       0       0       0",
  "rfcavity     3       3       3       0       0       2",
  "sbend        2       1       1       0       1       1",
  "sextupole    2       2       2       0       1       2",
@@ -612,6 +614,7 @@ assign_att(void)
         else if (strcmp(el->base_name, "collimator") == 0) att_colli(el);
         else if (strcmp(el->base_name, "decapole") == 0) att_decapole(el);
         else if (strcmp(el->base_name, "drift") == 0) att_drift(el);
+        else if (strcmp(el->base_name, "ecollimator") == 0) att_colli(el);
         else if (strcmp(el->base_name, "hkicker") == 0) att_hkicker(el);
         else if (strcmp(el->base_name, "kicker") == 0) att_kicker(el);
         else if (strcmp(el->base_name, "tkicker") == 0) att_kicker(el);
@@ -622,6 +625,7 @@ assign_att(void)
         else if (strcmp(el->base_name, "octupole") == 0) att_octupole(el);
         else if (strcmp(el->base_name, "quadrupole") == 0) att_quadrupole(el);
         else if (strcmp(el->base_name, "rbend") == 0) att_rbend(el);
+        else if (strcmp(el->base_name, "rcollimator") == 0) att_colli(el);
         else if (strcmp(el->base_name, "rfcavity") == 0) att_rfcavity(el);
         else if (strcmp(el->base_name, "crabcavity") == 0) att_crabcavity(el);
         else if (strcmp(el->base_name, "dipedge") == 0) att_dipedge(el);
@@ -669,7 +673,7 @@ att_beambeam(struct c6t_element* el)
 
 static void
 att_colli(struct c6t_element* el)
-/* collim. (was ecollim. + rcollim.) - make drift, do not concatenate */
+/* collimator, ecollimator, rcollimator - make drift, do not concatenate */
 {
   el->out_1 = 0; el->out_4 = el->value[0];
 }
@@ -1340,6 +1344,14 @@ convert_madx_to_c6t(struct node* p)
     c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
   }
   else if ((strcmp(p->base_name,"collimator") == 0))
+  {
+    c6t_elem = new_c6t_element(13,t_name,p->base_name);
+    clean_c6t_element(c6t_elem);
+    strcpy(c6t_elem->org_name,t_name);
+    c6t_elem->value[0] = el_par_value_recurse("l",p->p_elem);
+  }
+  else if ((strcmp(p->base_name,"ecollimator") == 0) ||
+	   (strcmp(p->base_name,"rcollimator") == 0))
   {
     c6t_elem = new_c6t_element(13,t_name,p->base_name);
     clean_c6t_element(c6t_elem);

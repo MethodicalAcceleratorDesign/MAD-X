@@ -1306,7 +1306,6 @@ a {\tt COLLIMATOR} can have specific aperture related attributes
 as defined in the related section \hyperref[sec:def_aper]{Defining 
 aperture in \madx}
 
-
 During \hyperref[chap:thin_track]{tracking} in \madx, particle loss 
 is checked at the entrance of the element by comparing particle coordinates 
 and defined aperture, provided that the {\tt APERTURE} flag is {\tt true} 
@@ -1330,6 +1329,37 @@ model an asymmetric collimator by means of the {\tt APER\_OFFSET} attributes;
 During tracking particle losses are then reported with coordinates with respect 
 to the \textbf{displaced} reference system, not with respect to the surrounding 
 beam line.
+
+
+Other collimator elements have been inherited from \madeight and still exist 
+in \madx for backward compatibility.
+{\tt ECOLLIMATOR} (elliptic aperture collimator) and {\tt RCOLLIMATOR} 
+(rectangular aperture collimator)behave both as drift spaces in \madx 
+They are declared with
+
+\madbox{
+	label: ECOLLIMATOR, L=real, XSIZE=real, YSIZE=real; \\
+	label: RCOLLIMATOR, L=real, XSIZE=real, YSIZE=real;
+}
+
+Either type has several real attributes: 
+\begin{madlist}
+	\ttitem{L} The collimator length (default: 0 m). 
+	\ttitem{XSIZE} The horizontal half-aperture (default:
+	unlimited). \\ \textbf{OBSOLETE : parsed and stored but not used.} 
+	\ttitem{YSIZE} The vertical half-aperture (default:
+	unlimited). \\ \textbf{OBSOLETE : parsed and stored but not used.} 
+\end{madlist}
+
+It is STRONGLY advised to replaced all instances of {\tt RCOLLIMATOR} 
+and {\tt ECOLLIMATOR} in input files with appropriate {\tt COLLIMATOR} 
+elements. The {\tt RCOLLIMATOR} and {\tt ECOLLIMATOR} elements are only
+kept for the time being for backward compatibility and will be removed in 
+the near future. 
+
+Note also that the {\tt XSIZE} and {\tt YSIZE} parameters can be declared 
+but are simply ignored both in the \hyperref[chap:aperture]{\tt APERTURE}
+command an in \hyperref[chap:thintrack]{tracking}. 
 
 \end{5.02.05}
 
