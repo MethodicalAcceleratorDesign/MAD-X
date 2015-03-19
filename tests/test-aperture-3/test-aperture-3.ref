@@ -1,0 +1,334 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.11.14               +
+  + Execution date: 2015.03.19 09:47:16      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+
+
+ title, 'AD HE 2010 optics. Anti-Protons - 3.57 GeV/c';
+
+
+
+ option, RBARC=FALSE;
+
+
+
+ option, -echo;
+
+++++++ info: fe redefined
+++++++ warning: implicit element re-definition ignored: qfn29.1
+++++++ warning: implicit element re-definition ignored: qfn29.2
+++++++ info: element redefined: kfe.e
+++++++ info: element redefined: kfe.d
+
+
+ !set,  format="-21s";
+
+ !set,  format="13.11f";
+
+
+
+
+
+/*****************************************************************************
+
+ * store initial parameters in memory block
+
+ *****************************************************************************/
+
+INITBETA0: BETA0,
+
+  BETX=   3.85095118133,
+
+  ALFX=  -0.200025813081E-05,
+
+  MUX=MUX0,
+
+  BETY=1.,
+
+  ALFY=ALFY0,
+
+  MUY=MUY0,
+
+  X=X0,
+
+  PX=PX0,
+
+  Y=Y0,
+
+  PY=PY0,
+
+  T=T0,
+
+  PT=PT0,
+
+  DX=0.115194401814,
+
+  DPX=DPX0,
+
+  DY=DY0,
+
+  DPY=DPY0;
+
+
+
+
+
+ Beam, particle=POSITRON, ENERGY=1.0, EX=1.e-8, EY=1.e-8;
+
+ Use, sequence=AD;
+
+
+
+ Select flag=twiss,column=name, s, l, alfx, betx,dx, alfy, bety;
+
+ Twiss, centre, beta0=initbeta0;
+
+enter Twiss module
+ Found 6 initial orbit vector values from twiss command. 
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+          182.4328                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       5.384980535                  0        16.46003564        3.813103342 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.757663967                  0                  0         5.26231043 
+
+               dq2            betymax              dymax              dyrms 
+                 0        202.9671524                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+
+
+!!! uses default beam and halo data (lhc at injection)
+
+select, flag=aperture, clear;
+
+select, flag=aperture, column=name,s,betx,bety,dx,x,y,n1,apertype,xtol,ytol,rtol;
+
+aperture, offsetelem="offset.tfs", file="ap.tfs", 
+
+          dqf=2.086, betaqfx=16.25, dp=0.0015, 
+
+          dparx=0.273, dpary=0.273, cor=0.004, bbeat=1.1, 
+
+          nco=5, interval=1, halo={6., 8.4, 7.3, 7.3};
+
+
+Processing apertures from ad$start:1 to ad$end:1...
++++++++ deltap from TWISS            0
+
+ Reading offsets from tfs "offset.tfs"
+++++++ warning: cannot open file: offset.tfs
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated ECOLLIMATOR element;  Should be replaced by COLLIMATOR
+
+
+APERTURE LIMIT: col.pu_qf4:2, n1: 28.4063, at: 42.0422
+
+
+
+!! One can then access the minimum n1 as a variable of the BEAM command:
+
+Value, beam->n1min;
+
+beam->n1min =        28.40633601 ;
+
+
+
+
+stop;
+
+
+  Number of warnings: 173
+173 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.02.04 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

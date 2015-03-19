@@ -1350,7 +1350,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   char apertype[NAME_L];
   char name[NAME_L];
   char tol_err_mess[80] = "";
-
+  int code;
   
   // 2014-Sep-18  17:19:52  ghislain: attempt to read offset values from element attributes...
   //double aper_offset[2], xoffset, yoffset;
@@ -1487,6 +1487,14 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
     if ( (offs_tab != NULL) && (strcmp(refnode, name) == 0)) do_survey=1; // current name is refnode; switch survey on.
 
     if (debug) printf("\nname: %s, ref: %s, do_survey: %d, true_flag: %d\n",name,refnode,do_survey,true_flag);
+
+    // 2015-Mar-19  09:07:37  ghislain: 
+    code = node_value("mad8_type");
+    if (code==20) 
+      warning("Found deprecated ECOLLIMATOR element;"," Should be replaced by COLLIMATOR");
+    if (code==21)
+      warning("Found deprecated RCOLLIMATOR element;"," Should be replaced by COLLIMATOR");
+
 
     /* read data for tol displacement of halo */
     get_node_vector("aper_tol",&ntol,aper_tol);

@@ -1014,6 +1014,7 @@ testing/underConstruction.gif -text svneol=unset#unset
 tests/.htaccess -text
 tests/share/AD/ad.dbx -text
 tests/share/AD/ad.ele -text
+tests/share/AD/ad_ERCOLL.ele -text
 tests/share/AD/ad_new.seq -text
 tests/share/AD/ad_quads_3837_ffe.str -text
 tests/share/ALBA/ALBA-25.4th.seq -text
@@ -1082,6 +1083,11 @@ tests/test-aperture-2/test-aperture-2.madx -text
 tests/test-aperture-2/test-aperture-2.ref -text
 tests/test-aperture-2/twiss-table.cfg -text
 tests/test-aperture-2/twiss-table.ref -text
+tests/test-aperture-3/ap.tfs.cfg -text
+tests/test-aperture-3/ap.tfs.ref -text
+tests/test-aperture-3/test-aperture-3.cfg -text
+tests/test-aperture-3/test-aperture-3.madx -text
+tests/test-aperture-3/test-aperture-3.ref -text
 tests/test-aperture/ap.tfs.cfg -text
 tests/test-aperture/ap.tfs.ref -text
 tests/test-aperture/offset.tfs -text

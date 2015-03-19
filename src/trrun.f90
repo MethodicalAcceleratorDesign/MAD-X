@@ -796,12 +796,12 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   endif
 
 
-  !---- Warning for deprecated ECOLLIMATOR and RCOLLIMATOR elements
+  !---- 2015-Mar-19  09:07:37  ghislain: 
   if(code.eq.20) then 
-     call aawarn('trrun: found ECOLLIMATOR element;',' should be replaced by COLLIMATOR')
+     call aawarn('trrun: found deprecated ECOLLIMATOR element;',' should be replaced by COLLIMATOR')
   endif
   if(code.eq.21) then 
-     call aawarn('trrun: found ECOLLIMATOR element;',' should be replaced by COLLIMATOR')
+     call aawarn('trrun: found deprecated RCOLLIMATOR element;',' should be replaced by COLLIMATOR')
   endif
      
 

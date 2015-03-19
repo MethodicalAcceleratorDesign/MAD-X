@@ -56,7 +56,7 @@ test-thick-dipole test-thick-dipole-3 \
 test-jacobian test-jacobian-2 test-jacobian-knobs \
 test-match test-match-2 test-match-3 test-match-4 \
 test-match-5 test-match-6 test-match-7 test-match-8 \
-test-aperture test-aperture-2 \
+test-aperture test-aperture-2 test-aperture-3 \
 test-beam \
 \
 test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 test-rfmultipole-5 test-rfmultipole-6 \
