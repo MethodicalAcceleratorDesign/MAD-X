@@ -412,8 +412,8 @@ exec_fill_table(struct in_cmd* cmd)
   }
   t = table_register->tables[pos];
 
-  pos=name_list_pos("row", nl);
-  row=(int) pl->parameters[pos]->double_value;
+  pos = name_list_pos("row", nl);
+  row = pos >=0 ? pl->parameters[pos]->double_value : t->curr + 1;
 
   if (row==0 || row == t->curr + 1) { // add row to table and fill
     add_vars_to_table(t);
@@ -430,12 +430,12 @@ exec_fill_table(struct in_cmd* cmd)
   // 2014-Aug-18  17:05:33  ghislain: allow for negative row numbers; 
   // -1 indexes last row and negative numbers count row numbers backwards from end
   // -2 denoting the one before last and so on
-  if (row<0) row=t->curr + 1 + row; 
+  if (row<0) row = t->curr + 1 + row; 
   
-  curr=t->curr;
-  t->curr=row-1;
+  curr = t->curr;
+  t->curr = row-1;
   add_vars_to_table(t);
-  t->curr=curr;
+  t->curr = curr;
   
   return;
 }
