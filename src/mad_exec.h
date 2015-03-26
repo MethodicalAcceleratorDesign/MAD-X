@@ -16,6 +16,7 @@ void exec_print(struct in_cmd*);
 void exec_printf(struct in_cmd*);
 void exec_show(struct in_cmd*);
 void exec_dump(struct in_cmd*);
+void exec_shrink_table(struct in_cmd* cmd);
 void exec_fill_table(struct in_cmd*);
 void exec_create_table(struct in_cmd*);
 void exec_removefile(struct in_cmd*);

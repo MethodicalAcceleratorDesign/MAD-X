@@ -78,6 +78,7 @@ control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "exit")        == 0) ;
   else if (strcmp(toks[k], "extract")     == 0) exec_extract(cmd);
   else if (strcmp(toks[k], "fill")        == 0) exec_fill_table(cmd);
+  else if (strcmp(toks[k], "shrink")      == 0) exec_shrink_table(cmd);
   else if (strcmp(toks[k], "setvars")     == 0) exec_setvars_table(cmd);
   else if (strcmp(toks[k], "setvars_lin") == 0) exec_setvars_lin_table(cmd);
   else if (strcmp(toks[k], "help")        == 0) ;

@@ -387,6 +387,44 @@ exec_dump(struct in_cmd* cmd)
 }
 
 void
+exec_shrink_table(struct in_cmd* cmd)
+  /* adds variables to a table */
+{
+  struct table* t;
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  int pos = name_list_pos("table", nl);
+  char* name = NULL;
+  int row;
+
+  if (nl->inform[pos] == 0) {
+    warning("no table name:", "ignored");
+    return;
+  }
+
+  if ((name = pl->parameters[pos]->string) == NULL) {
+    warning("no table name: ", "ignored");
+    return;
+  }
+
+  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+    warning("table name not found:", "ignored");
+    return;
+  }
+
+  t = table_register->tables[pos];
+  pos = name_list_pos("row", nl);
+  row = pos >= 0 ? pl->parameters[pos]->double_value : t->curr - 1;
+
+  if (row < 0) row = t->curr + row;
+  if (row < 0 || row > t->curr) {
+    warning("row index out of bounds:", " ignored");
+    return;
+  }
+  t->curr = row;
+}
+
+void
 exec_fill_table(struct in_cmd* cmd)
   /* adds variables to a table */
 {
