@@ -395,7 +395,7 @@ exec_fill_table(struct in_cmd* cmd)
   struct command_parameter_list* pl = cmd->clone->par;
   int pos = name_list_pos("table", nl);
   char* name = NULL;
-  int row,curr;
+  int row;
   if (nl->inform[pos] == 0) {
     warning("no table name:", "ignored");
     return;
@@ -416,7 +416,9 @@ exec_fill_table(struct in_cmd* cmd)
   row = pos >=0 ? pl->parameters[pos]->double_value : t->curr + 1;
 
   if (row==0 || row == t->curr + 1) { // add row to table and fill
+    int cols = t->org_cols ; t->org_cols = 0;
     add_vars_to_table(t);
+    t->org_cols = cols;
     if (++t->curr == t->max) grow_table(t);
     return;
   }
@@ -430,14 +432,14 @@ exec_fill_table(struct in_cmd* cmd)
   // 2014-Aug-18  17:05:33  ghislain: allow for negative row numbers; 
   // -1 indexes last row and negative numbers count row numbers backwards from end
   // -2 denoting the one before last and so on
-  if (row<0) row = t->curr + 1 + row; 
+  if (row < 0) row = t->curr + 1 + row; 
   
-  curr = t->curr;
-  t->curr = row-1;
-  add_vars_to_table(t);
-  t->curr = curr;
-  
-  return;
+  { int cols = t->org_cols ; t->org_cols = 0;
+    int curr = t->curr; t->curr = row - 1;
+    add_vars_to_table(t);
+    t->curr = curr;
+    t->org_cols = cols;
+  }
 }
 
 void
@@ -449,7 +451,7 @@ exec_setvars_table(struct in_cmd* cmd)
   struct command_parameter_list* pl = cmd->clone->par;
   int pos = name_list_pos("table", nl);
   char* name = NULL;
-  int row,curr;
+  int row;
 
   if (nl->inform[pos] == 0) {
     warning("no table name:", "ignored");
@@ -480,14 +482,11 @@ exec_setvars_table(struct in_cmd* cmd)
   // 2014-Aug-18  17:05:33  ghislain: allow for negative row numbers; 
   // -1 indexes last row and negative numbers count row numbers backwards from end
   // -2 denoting the one before last and so on
-  if (row<0) row=t->curr + 1 + row; 
+  if (row < 0) row = t->curr + 1 + row; 
   
-  curr=t->curr;
-  t->curr=row-1;
+  int curr = t->curr; t->curr = row - 1;
   set_vars_from_table(t);
-  t->curr=curr;
-  
-  return;
+  t->curr = curr;
 }
 
 

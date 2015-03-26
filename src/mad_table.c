@@ -844,7 +844,7 @@ add_vars_to_table(struct table* t)
   /* fills user-defined variables into current table_row) */
 {
 
-  for (int i = 0; i < t->num_cols; i++)
+  for (int i = t->org_cols; i < t->num_cols; i++)
   {
     if (t->columns->inform[i] < 3)
     {
