@@ -1703,9 +1703,6 @@ tests/test-sequence/test-sequence.madx -text
 tests/test-sequence/test-sequence.ref -text
 tests/test-sequence/test-sequence.tfs.cfg -text
 tests/test-sequence/test-sequence.tfs.ref -text
-tests/test-setvars_lin/test-setvars_lin.cfg -text
-tests/test-setvars_lin/test-setvars_lin.madx -text
-tests/test-setvars_lin/test-setvars_lin.ref -text
 tests/test-survey-2/test-survey-2.cfg -text
 tests/test-survey-2/test-survey-2.madx -text
 tests/test-survey-2/test-survey-2.ref -text
@@ -1718,6 +1715,9 @@ tests/test-survey/test-survey_1.tfs.cfg -text
 tests/test-survey/test-survey_1.tfs.ref -text
 tests/test-survey/test-survey_2.tfs.cfg -text
 tests/test-survey/test-survey_2.tfs.ref -text
+tests/test-table/test-table.cfg -text
+tests/test-table/test-table.madx -text
+tests/test-table/test-table.ref -text
 tests/test-thick-dipole-3/test-thick-dipole-3.cfg -text
 tests/test-thick-dipole-3/test-thick-dipole-3.madx -text
 tests/test-thick-dipole-3/test-thick-dipole-3.ref -text

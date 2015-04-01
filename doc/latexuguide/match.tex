@@ -244,7 +244,7 @@ command are:
  
   Target values for the matrix elements at certain positions in the
   sequence can be specified with the help of the
-  \hyperref[sec:constraint]{\tt CONSTRAINT} command and the keywords:
+  \hyperref[sec:constraint]{\tt CONSTRAINT} command and the keywords:\\
   \textbf{RE, RE11...RE16...RE61...RE66}, where \textbf{REij} refers to
   the "ij" matrix component.
   
@@ -268,21 +268,18 @@ command are:
 \end{madlist}
 
 
-{\bf  Examples:}
+{\bf Examples:}
 
 \begin{verbatim}
-     MATCH, RMATRIX, SEQUENCE='name', BETA0='beta-block-name';
-     CONSTRAINT, SEQUENCE=insert, RANGE=#e, RE11=-2.808, RE22=2.748;
-     VARY, NAME=kqf, STEP=1.0e-6;
-     VARY, NAME=kqd, STEP=1.0e-6;
+MATCH, RMATRIX, SEQUENCE='name', BETA0='beta-block-name';
+CONSTRAINT, SEQUENCE=insert, RANGE=#e, RE11=-2.808, RE22=2.748;
+VARY, NAME=kqf, STEP=1.0e-6;
+VARY, NAME=kqd, STEP=1.0e-6;
 \end{verbatim}
 
-  This matches the sequence 'name' with initial conditions to new values
-  for the matrix elements {\tt RE11} and {\tt RE22} by varying the
-  strength of the main quadrupole circuits.
-
- 
-
+This matches the sequence 'name' with initial conditions to new values
+for the matrix elements {\tt RE11} and {\tt RE22} by varying the
+strength of the main quadrupole circuits.
 
 
 %\href{http://bruening.home.cern.ch/bruening/}{Oliver Br\"uning}, October, 2003;

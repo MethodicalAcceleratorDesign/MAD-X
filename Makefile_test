@@ -23,6 +23,8 @@
 #                added test-line testsuite with first test for repetition count 
 #                for element vs line
 # 
+# 2015-Apr-01  17:47:56  ghislain:
+#                added shrink tests in test-setvars_lin and renamed to test-table 
 
 #################################################
 # testsuite
@@ -37,7 +39,7 @@
 
 # tests order
 tests-all := \
-test-setvars_lin \
+test-table \
 test-memory \
 \
 test-makethin test-makethin-2 \
@@ -112,8 +114,8 @@ test-ptc-trackline:  TESTSUITE := PTC Trackline testsuite
 test-ptc-twiss:      TESTSUITE := PTC Twiss testsuite
 test-rfmultipole:    TESTSUITE := RF Multipole testsuite
 test-sequence:	     TESTSUITE := Sequence testsuite
-test-setvars_lin:    TESTSUITE := Special features
 test-survey:         TESTSUITE := Survey testsuite
+test-table:	     TESTSUITE := Table testsuite
 test-thick-quad:     TESTSUITE := Thick Quadrupole testsuite
 test-touschek:       TESTSUITE := Touschek testsuite
 test-track:          TESTSUITE := Track testsuite

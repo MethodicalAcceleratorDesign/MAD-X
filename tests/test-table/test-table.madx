@@ -1,384 +1,160 @@
-
-  ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.02  (64 bit, Darwin)      +
-  + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2014.07.04               +
-  + Execution date: 2014.08.28 15:20:57      +
-  ++++++++++++++++++++++++++++++++++++++++++++
 Option, -info; // avoid redefinition info
-
-
 
 create, table=test, column=a,b;
 
-
-
 // testing fill
 
-
-
 a=9;    b=9;        fill, table=test, row= 2; // out of bounds
-
-++++++ warning: row index out of bounds:  ignored
 a=9;    b=9;        fill, table=test, row=-1; // out of bounds
-
-++++++ warning: row index out of bounds:  ignored
-
 
 a=9;    b=9;        fill, table=test, row=1; // adds row since number of rows is still 0 and fills 
 
-
-
 a=9;    b=9;        fill, table=test; // row=0 is default and adds a row to the table
-
 a=5.32; b=-3.2;     fill, table=test, row=0;
 
-
-
 a=2;    b=4;        fill, table=test, row= 2; // filling again an already existing row
-
 a=1;    b=2;        fill, table=test, row=-3; // negative row number
 
-
-
 a=9;    b=9;        fill, table=test, row=-4; // out of bounds
-
-++++++ warning: row index out of bounds:  ignored
 a=9;    b=9;        fill, table=test, row= 4; // out of bounds
 
 
-
-
-
 // testing fill at row=len+1
-
 create table=fill, column=a,b;
-
 len = table(fill, tablelength); value, len;
-
-len =                  0 ;
 fill, table=fill, row=len+1; 
-
 fill, table=fill, row=len+2;
-
 fill, table=fill, row=len+3;
-
 fill, table=fill, row=len+4;
-
 lenf = table(fill, tablelength); value, lenf, len+4;
-
-lenf =                  4 ;
-len+4 =                  4 ;
-
-
 
 
 // testing setvars
 
-
-
 a=0; b=0;
-
 setvars, table=test, row=1;
-
 value, a,b;
 
-a =                  1 ;
-b =                  2 ;
-
-
 a=0; b=0;
-
 setvars, table=test, row=4; // should be out of bounds
-
 value, a,b;
 
-a =                  9 ;
-b =                  9 ;
-
-
 a=0; b=0;
-
 setvars, table=test, row=-1; // should be values for last row
-
 value, a,b;
 
-a =                  9 ;
-b =                  9 ;
-
-
 a=0; b=0;
-
 setvars, table=test, row=-2; // should be values for penultimate row
-
 value, a,b;
 
-a =               5.32 ;
-b =               -3.2 ;
-
-
 a=0; b=0;
-
 setvars, table=test, row=-4; // should be out of bound
-
 value, a,b;
 
-a =                  1 ;
-b =                  2 ;
-
-
 a=0; b=0;
-
 setvars, table=test; // use default row=-1, should be values for last row
-
 value, a,b;
-
-a =                  9 ;
-b =                  9 ;
-
 
 a=0; b=0;
-
 setvars, table=test, row=0; // should be out of bound
-
-++++++ warning: row index out of bounds:  ignored
 value, a,b;
-
-a =                  0 ;
-b =                  0 ;
-
-
-
 
 
 
 // testing setvars_lin with linear interpolation
 
-
-
 t=0.37;
 
-
-
 a=0; b=0;
-
 setvars_lin, table=test, row1=1, row2=1, param=t;
-
 show, a,b; value, a,b;
 
-a := 1*(1-(t))+1*(t) ;
-b := 2*(1-(t))+2*(t) ;
-a =                  1 ;
-b =                  2 ;
-
-
 a=0; b=0;
-
 setvars_lin, table=test, row1=1, row2=2, param=t;
-
 show, a,b; value, a,b;
 
-a := 1*(1-(t))+2*(t) ;
-b := 2*(1-(t))+4*(t) ;
-a =               1.37 ;
-b =               2.74 ;
-
-
 a=0; b=0;
-
 setvars_lin, table=test, row1=1, row2=3, param=t;
-
 show, a,b; value, a,b;
-
-a := 1*(1-(t))+5.32*(t) ;
-b := 2*(1-(t))-3.2*(t) ;
-a =             2.5984 ;
-b =              0.076 ;
-
 
 a=0; b=0;
-
 setvars_lin, table=test, row1=1, row2=4, param=t; // out of bounds
-
 show, a,b; value, a,b;
-
-a := 1*(1-(t))+9*(t) ;
-b := 2*(1-(t))+9*(t) ;
-a =               3.96 ;
-b =               4.59 ;
-
 
 // testing negative row number to access tables from last row in reverse order
 
-
-
 a=0; b=0;
-
 setvars_lin, table=test, row1=1, row2=-1, param=t; // row2 is last row
-
 show, a,b; value, a,b;
 
-a := 1*(1-(t))+9*(t) ;
-b := 2*(1-(t))+9*(t) ;
-a =               3.96 ;
-b =               4.59 ;
-
-
 a=0; b=0;
-
 setvars_lin, table=test, row1=1, row2=-2, param=t; // row2 is penultimate row
-
 show, a,b; value, a,b;
 
-a := 1*(1-(t))+5.32*(t) ;
-b := 2*(1-(t))-3.2*(t) ;
-a =             2.5984 ;
-b =              0.076 ;
-
-
 a=0; b=0;
-
 setvars_lin, table=test, row1=1, row2=-3, param=t; // row2 is antepenultimate row (first row)
-
 show, a,b; value, a,b;
-
-a := 1*(1-(t))+2*(t) ;
-b := 2*(1-(t))+4*(t) ;
-a =               1.37 ;
-b =               2.74 ;
-
 
 a=0; b=0;
-
 setvars_lin, table=test, row1=1, row2=-4, param=t; // out of bounds
-
 show, a,b; value, a,b;
-
-a := 1*(1-(t))+1*(t) ;
-b := 2*(1-(t))+2*(t) ;
-a =                  1 ;
-b =                  2 ;
-
 
 // testing zero row number and default values 
 
-
-
 a=0; b=0;
-
 setvars_lin, table=test, row1=0, row2=2, param=t; // out of bounds row1
-
-++++++ warning: row1 index out of bounds:  ignored
 show, a,b; value, a,b;
-
-a =                  0 ;
-b =                  0 ;
-a =                  0 ;
-b =                  0 ;
-
 
 a=0; b=0;
-
 setvars_lin, table=test, row1=1, row2=0, param=t; // out of bounds row2
-
-++++++ warning: row2 index out of bounds:  ignored
 show, a,b; value, a,b;
-
-a =                  0 ;
-b =                  0 ;
-a =                  0 ;
-b =                  0 ;
-
 
 interp=0.37; // interp as value
-
 a=0; b=0;
-
 setvars_lin, table=test, row1=1, row2=2; // default param is interp
-
 show, a,b; value, a,b;
-
-a := 1*(1-(interp))+2*(interp) ;
-b := 2*(1-(interp))+4*(interp) ;
-a =               1.37 ;
-b =               2.74 ;
-
 
 interp := t; // interp as expression
-
 a=0; b=0;
-
 setvars_lin, table=test, row1=1, row2=2; // default param is interp
-
 show, a,b; value, a,b;
 
-a := 1*(1-(interp))+2*(interp) ;
-b := 2*(1-(interp))+4*(interp) ;
-a =               1.37 ;
-b =               2.74 ;
-
-
 a=0; b=0;
-
 setvars_lin, table=test, param=t; // default rows are 0 and 0
-
-++++++ warning: row1 index out of bounds:  ignored
 show, a,b; value, a,b;
-
-a =                  0 ;
-b =                  0 ;
-a =                  0 ;
-b =                  0 ;
-
 
 a=0; b=0;
-
 setvars_lin, table=test, row1=1, row2=2, param=-0.37; // explicit param
-
 show, a,b; value, a,b;
-
-a := 1*(1-(0-0.37))+2*(0-0.37) ;
-b := 2*(1-(0-0.37))+4*(0-0.37) ;
-a =               0.63 ;
-b =               1.26 ;
-
 
 // testing extrapolation with param outside of [0,1]
 
-
-
 t2=-2; a=0; b=0;
-
 setvars_lin, table=test, row1=1, row2=2, param=t2;
-
 show, a,b; value, a,b;
-
-a := 1*(1-(t2))+2*(t2) ;
-b := 2*(1-(t2))+4*(t2) ;
-a =                 -1 ;
-b =                 -2 ;
-
 
 t3=3; a=0; b=0;
-
 setvars_lin, table=test, row1=1, row2=2, param=t3;
-
 show, a,b; value, a,b;
 
-a := 1*(1-(t3))+2*(t3) ;
-b := 2*(1-(t3))+4*(t3) ;
-a =                  4 ;
-b =                  8 ;
 
+// testing table shrinking
 
+lenf = table(fill, tablelength); value, lenf;
+shrink, table=fill, row=lenf; // remove everything beyond last row !!
+lenf = table(fill, tablelength); value, lenf;
+shrink, table=fill, row=lenf-1; // shrink by 1 row
+lenf = table(fill, tablelength); value, lenf;
+shrink, table=fill, row=1; // shrink all but 1 row
+lenf = table(fill, tablelength); value, lenf;
 
+// default ROW value is -1
+len = table(test, tablelength); value, len;
+shrink, table=test;
+len = table(test, tablelength); value, len;
+
+// error cases
+shrink, table=test, row=-len-1;
+shrink, table=fill, row=lenf+1;
 
 exit;
-
-
-  Number of warnings: 7
-7 in C and 0 in Fortran
-
-  ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.02 (64 bit) finished normally +
-  ++++++++++++++++++++++++++++++++++++++++++++

@@ -388,7 +388,7 @@ exec_dump(struct in_cmd* cmd)
 
 void
 exec_shrink_table(struct in_cmd* cmd)
-  /* adds variables to a table */
+  /* removes rows from a table */
 {
   struct table* t;
   struct name_list* nl = cmd->clone->par_names;

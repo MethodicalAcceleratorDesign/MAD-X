@@ -200,8 +200,8 @@ WHILE \=(i < len) \{ \\
 
 \section{FILL} 
 \label{sec:fill}
-The FILL command fills a row of a table with the current values of all
-declared column variables of the table.
+The {\tt FILL} command fills a row of a table with the current values 
+of all declared column variables of the table.
 \madbox{
 FILL, TABLE=tabname, ROW=integer;
 }
@@ -210,21 +210,21 @@ The FILL command takes two arguments:
 \begin{madlist}
   \ttitem{TABLE} is the name of the table to be filled. The table must
   have been \hyperref[sec:create]{created} beforehand. 
-  The table can then be \hyperref[sec:write]{written} to file in TFS
+  The table can then be \hyperref[sec:write]{written} to file in {\tt TFS}
   format. 
 
   \ttitem{ROW} is the row number to be filled with the current values of
   all column variables. \\ 
-  \texttt{ROW=0}, or \texttt{ROW=nrow + 1}, where nrow is the current
-  number of rows in the table, causes \texttt{FILL} to add a row at
+  {\tt ROW=0}, or {\tt ROW=nrow + 1}, where {\tt nrow} is the current
+  number of rows in the table, causes {\tt FILL} to add a row at
   the end of the table and fill it with the current values of all
   column variables. \\ (Default: 0) 
 \end{madlist}
 
-Negative \texttt{ROW} values are allowed and count the row numbers from
+Negative {\tt ROW} values are allowed and count the row numbers from
 the last row, allowing access to the table in reverse order of rows:
-\texttt{ROW~=~-1} accesses the last row of the table,
-\texttt{ROW~=~-2} accesses the one before last (penultimate) row,
+{\tt ROW = -1} accesses the last row of the table,
+{\tt ROW = -2} accesses the penultimate (one before last) row,
 etc\ldots  
 
 %% Note that negative \texttt{ROW} values count the row numbers from the
@@ -251,6 +251,36 @@ table using the variable \madxmp{TABLE(tablenanme, TABLELENGTH)}
 See as well the \href{../Introduction/select.html#ucreate}{user table}
 example.   
 
+\section{SHRINK} 
+\label{sec:shrink}
+The {\tt SHRINK} command removes a number of rows at the end of a table.
+\madbox{
+SHRINK, TABLE=tabname, ROW=integer;
+}
+
+The {\tt SHRINK} command takes two arguments:
+\begin{madlist}
+	\ttitem{TABLE} is the name of the table from which rows should be removed. 
+	The table must have been previously \hyperref[sec:create]{created} and 
+	\hyperref[sec:fill]{filled} or read from file with \hyperref[sec:readtable]
+	{\tt READTABLE} or \hyperref[sec:readmytable]{\tt READMYTABLE}.
+	
+	\ttitem{ROW} is the number of the last row to be kept in the table. 
+	All rows beyond the given row number are removed. \\
+	Negative values are allowed and count the row numbers from
+	the last row, allowing access to the table in reverse order of rows:
+	\texttt{ROW~=~-1} removes the last row of the table,
+	\texttt{ROW~=~-2} removes the last two rows of the table,
+	etc\ldots  \\ 
+	(Default: -1) 
+\end{madlist}
+
+Trying to access the table forward beyond the last row, i.e. \texttt{ROW}
+strictly greater than {\tt nrow}, where {\tt nrow} is the number of
+rows in the table, or trying to access the table backwards before the
+first row, i.e. {\tt ROW} strictly lower than {\tt -nrow}, both
+result in a ``row out of bound'' message and no values are filled in the
+table. 
 
 
 %% \section{SELECT} 
