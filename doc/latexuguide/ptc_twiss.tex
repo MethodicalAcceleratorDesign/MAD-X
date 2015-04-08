@@ -145,7 +145,7 @@ PTC\_TWISS, \=ICASE=integer, DELTAP=real, \\
             \>CLOSED\_ORBIT=logical, SLICE\_MAGNETS=logical, \\ 
             \>RANGE=string, FILE[=filename], TABLE[=tabname], \\
             \>INITIAL\_MATRIX\_TABLE=logical, INITIAL\_MATRIX\_MANUAL=logical,  \\
-            \>INITIAL\_MAP\_MANUAL=logical, BETA0=string, MAP\_TABLE=logical, \\  
+            \>INITIAL\_MAP\_MANUAL=logical, BETA0=string, MAPTABLE=logical, \\  
             \>IGNORE\_MAP\_ORBIT=logical, RING\_PARAMETERS=logical, \\
             \>BETX=real, ALFX=real, MUX=real, \\   
             \>BETY=real, ALFY=real, MUY=real, \\    
@@ -291,7 +291,7 @@ The attributes are:
     PTC\_TWISS} command line. \\
   (Default: beta0)
 
-  \ttitem{MAP\_TABLE} 
+  \ttitem{MAPTABLE} 
   a logical flag to save the one-turn-map to table
   "map\_table". The one-turn-map can then be used as starting condition
   for a subsequent {\tt PTC\_TWISS}, see {\tt INITIAL\_MATRIX\_TABLE}
