@@ -535,15 +535,13 @@ exec_setvars_lin_table(struct in_cmd* cmd)
   struct table* t;
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
-  int pos,row1,row2,i;
+  int pos = name_list_pos("table", nl);
   char* name = NULL;
   char* param = NULL;
   char* colname = NULL;
-  double val1,val2;
   char expr[10*NAME_L];
-  i=0;
+  int row1, row2;
 
-  pos = name_list_pos("table", nl);
   if (nl->inform[pos] == 0) {
     warning("no table name:", "ignored");
     return;
@@ -554,14 +552,7 @@ exec_setvars_lin_table(struct in_cmd* cmd)
     return;
   }
 
-  /*current_node = NULL;  to distinguish from other table fills ????*/
-  pos=name_list_pos("row1", nl);
-  row1=(int) pl->parameters[pos]->double_value; 
-  pos=name_list_pos("row2", nl);
-  row2=(int) pl->parameters[pos]->double_value; 
-
-  pos = name_list_pos("param", nl);
-  param = pl->parameters[pos]->string;
+  current_node = NULL; /* to distinguish from other table fills */
 
   if ((pos = name_list_pos(name, table_register->names)) < 0) {
     warning("table name not found:", "ignored");
@@ -569,10 +560,18 @@ exec_setvars_lin_table(struct in_cmd* cmd)
   }
   t = table_register->tables[pos];
 
+  pos=name_list_pos("row1", nl);
+  row1=(int) pl->parameters[pos]->double_value;
+  pos=name_list_pos("row2", nl);
+  row2=(int) pl->parameters[pos]->double_value;
+  pos = name_list_pos("param", nl);
+  param = pl->parameters[pos]->string;
+
   if (abs(row1) > t->curr || row1 == 0){
     warning("row1 index out of bounds:", " ignored");
     return;
-  } else if (abs(row2) > t->curr || row2 == 0){
+  }
+  if (abs(row2) > t->curr || row2 == 0){
     warning("row2 index out of bounds:", " ignored");
     return;
   }
@@ -583,21 +582,21 @@ exec_setvars_lin_table(struct in_cmd* cmd)
   if (row2<0) row2=t->curr + 1 + row2;
 
   for (i = 0; i < t->num_cols; i++) {
-    if (t->columns->inform[i] <3){
-      colname=t->columns->names[i];
-      val1=t->d_cols[i][row1-1];
-      val2=t->d_cols[i][row2-1];
+    if (t->columns->inform[i] < 3) {
+      colname = t->columns->names[i];
+      double val1 = t->d_cols[i][row1-1];
+      double val2 = t->d_cols[i][row2-1];
       // 2014-Aug-18  17:15:08  ghislain: 
       // value := val1*param + val2*(1-param) ; 
       // sprintf(expr,"%s:=%10.16g*(%s)%+10.16g*(1-(%s));", colname,val1,param,val2,param);
       // is counterintuitve for interpolation between val1 and val2 and should instead be 
       // value := val1 + param*(val2-val1) = val1*(1-param) + val2*param;
-      sprintf(expr,"%s:=%10.16g*(1-(%s))%+10.16g*(%s);", colname,val1,param,val2,param);
+      sprintf(expr, "%s:=%10.16g*(1-(%s))%+10.16g*(%s);", colname, val1, param, val2, param);
       pro_input(expr);
+    } else if (t->columns->inform[i] == 3) {
+      set_stringvar(t->columns->names[i],t->s_cols[i][t->curr]) ;
     }
   }
- 
- return;
 }
 
 void
