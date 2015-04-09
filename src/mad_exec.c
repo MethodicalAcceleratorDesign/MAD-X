@@ -538,7 +538,6 @@ exec_setvars_lin_table(struct in_cmd* cmd)
   int pos = name_list_pos("table", nl);
   char* name = NULL;
   char* param = NULL;
-  char* colname = NULL;
   char expr[10*NAME_L];
   int row1, row2;
 
@@ -581,9 +580,9 @@ exec_setvars_lin_table(struct in_cmd* cmd)
   if (row1<0) row1=t->curr + 1 + row1; 
   if (row2<0) row2=t->curr + 1 + row2;
 
-  for (i = 0; i < t->num_cols; i++) {
+  for (int i = 0; i < t->num_cols; i++) {
     if (t->columns->inform[i] < 3) {
-      colname = t->columns->names[i];
+      char *colname = t->columns->names[i];
       double val1 = t->d_cols[i][row1-1];
       double val2 = t->d_cols[i][row2-1];
       // 2014-Aug-18  17:15:08  ghislain: 
