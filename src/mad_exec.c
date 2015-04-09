@@ -593,7 +593,7 @@ exec_setvars_lin_table(struct in_cmd* cmd)
       sprintf(expr, "%s:=%10.16g*(1-(%s))%+10.16g*(%s);", colname, val1, param, val2, param);
       pro_input(expr);
     } else if (t->columns->inform[i] == 3) {
-      set_stringvar(t->columns->names[i],t->s_cols[i][t->curr]) ;
+      set_stringvar(t->columns->names[i],t->s_cols[i][row1-1]) ;
     }
   }
 }
