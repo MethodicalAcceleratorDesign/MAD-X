@@ -253,7 +253,7 @@ A {\tt DIPEDGE} has zero length and five attributes.
    \ttitem{H} Is angle/length or 1/rho (default: 0 m$^{-1}$ - for the
      default the dipedge element has no effect). (must be equal to that
      of the associated {\tt SBEND})  
-   \ttitem{E1} The rotation angle for the pole face.The sign convention is
+   \ttitem{E1} The rotation angle for the pole face. The sign convention is
      as for a SBEND \href{bend.html}{Bending Magnet}. Note that it is
      different for an entrance and an exit. (default: 0 rad).  
    \ttitem{FINT} field integral as for {\tt SBEND}
@@ -1164,11 +1164,10 @@ In addition it serves to record the beam position for closed orbit
 correction.
 
 Three different types of beam position monitors are recognised:  
-
 \begin{madlist}
-   \item{\href{hmon}{HMONITOR}} Monitor for the horizontal beam position, 
-   \item{\href{vmon}{VMONITOR}} Monitor for the vertical beam position, 
-   \item{\href{mon}{MONITOR}} Monitor for both horizontal and vertical beam position. 
+   \ttitem{HMONITOR} Monitor for the horizontal beam position, 
+   \ttitem{VMONITOR} Monitor for the vertical beam position, 
+   \ttitem{MONITOR} Monitor for both horizontal and vertical beam position. 
 \end{madlist}
 
 \madbox{

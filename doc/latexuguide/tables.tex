@@ -103,13 +103,8 @@ The attributes of \texttt{SETVARS} are:
 Negative \texttt{ROW} values are allowed and count the row numbers from
 the last row, allowing access to the table in reverse order of rows:
 \texttt{ROW~=~-1} accesses the last row of the table,
-\texttt{ROW~=~-2} accesses the one before last (penultimate) row,
+\texttt{ROW~=~-2} accesses the penultimate (one before last) row,
 etc\ldots  
-
-%% Note that negative ROW values count the row numbers from the last row,
-%% allowing access to the table in reverse order of rows: \texttt{ROW~=~-1}
-%% accesses the last row of the table, \texttt{ROW~=~-2} accesses the one
-%% before last (penultimate) row, etc\ldots 
 
 Trying to access the table forward beyond the last row, i.e. \texttt{ROW}
 strictly greater than {\tt nrow} the number of rows in the table, or
@@ -129,7 +124,7 @@ variable values are returned and set.
 \section{SETVARS\_LIN}
 \label{sec:setvars_lin}
 
-The SETVARS\_LIN command sets the variables with values calculated
+The {\tt SETVARS\_LIN} command sets the variables with values calculated
 by linear interpolation, or extrapolation, between two rows of a table. 
 
 \madbox{
@@ -143,12 +138,12 @@ The attributes of \texttt{SETVARS\_LIN} are:
   \ttitem{ROW2} a second row number with values for interpolation. (Default: 0)
   \ttitem{PARAM} a string containing the linear interpolation factor or
   the name of a variable or expression containing the interpolation
-  factor. If the resulting value of \texttt{PARAM} is outside the
+  factor. If the resulting value of {\tt PARAM} is outside the
   $[0,1]$ interval, the result is a linear extrapolation. \\
   (Default: "interp", itself defaulting to a value of 0.0 when evaluated)
 \end{madlist}
 
-\texttt{SETVARS\_LIN} sets the variables with values calculated through
+{\tt SETVARS\_LIN} sets the variables with values calculated through
 the following formula that \madx constructs internally as a deferred
 expression which is immediately evaluated:
 \madxmp{value := value(row1)*(1-param) + value(row2)*param;}
@@ -156,31 +151,21 @@ Both the expression and the value of the expression are available to the
 user through respectively the commands \hyperref[sec:show]{\tt SHOW} 
 and \hyperref[sec:value]{\tt VALUE}.
 
-%% was:
-%%\madxmp{value := value(row1)*param + value(row2)*(1-param)}
-%%but this should be 
-%%\madxmp{value \=:= value(row1) + param*(value(row2)-value(row1)) \\
-%%              \>:= value(row2)*param + value(row1)*(1-param) }
+When the values are represented as strings, e.g. the name or 
+keyword of elements, the resulting value is the string in {\tt ROW1}.
 
-
-Negative \texttt{ROWi} values are allowed and count the row numbers from
+Negative {\tt ROWi} values are allowed and count the row numbers from
 the last row, allowing access to the table in reverse order of rows:
-\texttt{ROWi~=~-1} accesses the last row of the table,
-\texttt{ROWi~=~-2} accesses the one before last (penultimate) row,
+{\tt ROWi~=~-1} accesses the last row of the table,
+{\tt ROWi~=~-2} accesses the penultimate (one before last) row,
 etc\ldots  
 
-Trying to access the table forward beyond the last row, i.e. \texttt{ROWi}
+Trying to access the table forward beyond the last row, i.e. {\tt ROWi}
 strictly greater than {\tt nrow} the number of rows in the table, or
-trying to access the table backwards before the first row, i.e. \texttt{ROWi}
+trying to access the table backwards before the first row, i.e. {\tt ROWi}
 strictly lower than {\tt -nrow}, or trying to access the illegal
-\texttt{ROWi=0}, all result in a ``row out of bound'' message and the
+{\tt ROWi=0}, all result in a ``row out of bound'' message and the
 expression is not constructed or evaluated. 
-
-%% If \texttt{nrow} is the number of rows in the table, the conditions
-%% \texttt{ROWi $>$ nrow}, ie trying to access the table forward beyond the
-%% last row, or \texttt{ROWi $<$ -nrow}, ie trying to access the table
-%% backwards before the first row, or \texttt{ROWi=0} result in a ``row out
-%% of bound'' message and the expression is not constructed or evaluated. 
 
 {\bf Example:}
 \madxmp{
@@ -226,11 +211,6 @@ the last row, allowing access to the table in reverse order of rows:
 {\tt ROW = -1} accesses the last row of the table,
 {\tt ROW = -2} accesses the penultimate (one before last) row,
 etc\ldots  
-
-%% Note that negative \texttt{ROW} values count the row numbers from the
-%% last row, allowing access to the table in reverse order of rows:
-%% \texttt{ROW~=~-1} accesses the last row of the table, \texttt{ROW~=~-2}
-%% accesses the one before last (penultimate) row, etc\ldots 
 
 Trying to access the table forward beyond the last row, i.e. \texttt{ROW}
 strictly greater than {\tt nrow + 1}, where {\tt nrow} is the number of
