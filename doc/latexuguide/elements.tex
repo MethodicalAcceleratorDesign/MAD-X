@@ -1228,59 +1228,7 @@ An instrument or placeholder has one real attribute:
 The \hyperref[subsec:local_straight]{straight reference system} for an 
 instrument is a Cartesian coordinate system.  
 
-\begin{5.02.04}
-% Changed by: Ghislain Roy, 23-May-2013 
-\section{Collimator}
- 
-The definition of collimator in \madx has been inherited from \madeight
-and two types of collimators are defined: {\tt ECOLLIMATOR} and {\tt RCOLLIMATOR} \\
-However, both behave in exactly the same way within \madx and 
-the element name does NOT imply elliptic or rectangular aperture.
 
-\madbox{
-label: ECOLLIMATOR, L=real, XSIZE=real, YSIZE=real; \\
-label: RCOLLIMATOR, L=real, XSIZE=real, YSIZE=real;
-}
-
-Either type has several real attributes: 
-\begin{madlist}
-   \ttitem{L} The collimator length (default: 0 m). 
-   \ttitem{XSIZE} The horizontal half-aperture (default:
-     unlimited). \textbf{OBSOLETE : Will be parsed but not used.} 
-   \ttitem{YSIZE} The vertical half-aperture (default:
-     unlimited). \textbf{OBSOLETE : Will be parsed but not used.} 
-\end{madlist}
-
-The actual definition of the aperture type and aperture parameters must
-be done in accordance with \hyperref[chap:aperture]{Defining aperture in
-  \madx}.   
-
-Optically a {\tt COLLIMATOR} behaves like a \hyperref[sec:drift]{drift space}.  
-However during
-tracking the aperture is checked at the entrance of the collimator,
-provided that the aperture type is one of the predefined {\tt RECTANGLE,
-ELLIPSE, RECTELLIPSE} or {\tt LHCSCREEN} types.  In particular an aperture
-model defined in an external file will not be used during tracking.  
-
-If the length is not zero, the aperture is also checked at the
-exit. \textbf{ TO BE CHECKED } 
-
-Example: 
-\madxmp{
-COLLIM: ECOLLIMATOR, L = 0.5, APERTYPE = ELLIPSE, APERTURE = {0.01,0.005};
-}
-
-The \hyperref[subsec:local_straight]{straight reference system} for a
-collimator is a Cartesian coordinate system.  
-
-\textbf{NOTE:} When a collimator is displaced transversally in order to
-model an asymmetric collimator, particle losses in tracking are
-reported with respect to the \textbf{displaced} reference system, not
-with respect to the surrounding beam line.
-
-\end{5.02.04}
-
-\begin{5.02.05}
 \section{Collimator}
 \label{sec:collimator}
 
@@ -1291,9 +1239,7 @@ A {\tt COLLIMATOR} has no specific effect on beam optics and behaves like a
 label: COLLIMATOR, \=L=real, \\
                    \>APERTYPE=string,  APERTURE=\{values\}, \\
                    \>APER\_OFFSET=\{values\}, APER\_TOL=\{values\};
-
 }
-
 
 A {\tt COLLIMATOR} has one specific real attribute: 
 \begin{madlist}
@@ -1314,7 +1260,6 @@ predefined types.
 An aperture model defined in an external file ({\tt APERTYPE=filename})
 is not used to check particle loss during tracking. 
 
-
 Example: 
 \madxmp{
 COLLIM: COLLIMATOR, L=0.5, APERTYPE=ellipse, APERTURE={0.01,0.005};
@@ -1328,7 +1273,6 @@ model an asymmetric collimator by means of the {\tt APER\_OFFSET} attributes;
 During tracking particle losses are then reported with coordinates with respect 
 to the \textbf{displaced} reference system, not with respect to the surrounding 
 beam line.
-
 
 Other collimator elements have been inherited from \madeight and still exist 
 in \madx for backward compatibility.
@@ -1358,10 +1302,7 @@ the near future.
 
 Note also that the {\tt XSIZE} and {\tt YSIZE} parameters can be declared 
 but are simply ignored both in the \hyperref[chap:aperture]{\tt APERTURE}
-command an in \hyperref[chap:thintrack]{tracking}. 
-
-\end{5.02.05}
-
+command an in \hyperref[chap:thintrack]{tracking}.
 
 
 %  Changed by: Stefan Sorge, 2007 

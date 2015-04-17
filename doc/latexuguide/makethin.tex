@@ -14,20 +14,9 @@ by \madx tracking or conversion to {\tt SIXTRACK} input format.
 \label{sec:makethin}
 
 The slicing is performed by the command: 
-\begin{5.02.04}
-\madbox{
-MAKETHIN, \=SEQUENCE=seqname, STYLE=string, \\
-          \>MAKEDIPEDGE=logical, \\
-          \>MINIMIZEPARENTS=logical, \\
-          \>MAKECONSISTENT=logical; 
-}
-\end{5.02.04}
-
-\begin{5.02.05}
 \madbox{
 MAKETHIN, SEQUENCE=seqname, STYLE=string, MAKEDIPEDGE=logical;
 }
-\end{5.02.05}
 
 The parameters are defined as: 
 \begin{madlist}
@@ -40,49 +29,20 @@ The parameters are defined as:
    Note that this argument is optional and adequate defaults are provided.\\
    Available slicing styles are: 
 
-\begin{5.02.04}
-     \begin{madlist}
-     \ttitem{SIMPLE}  produces equal strength slices at equidistant
-     positions with the kick in the middle of each slice. \\ 
-     It is the default if the number of slices is larger than 4. 
-
-     \ttitem{TEAPOT} improves the slice positioning using the algorithm
-     described in \cite{burkhardt2013}.\\
-     It is the default if the number of slice is less or equal to 4.
-
-     \ttitem{COLLIM} is the default slicing for collimators. If only
-     one slice is chosen it is placed in the middle of the old
-     element. If two slices are chosen they are placed at either
-     end. Three slices or more are treated as one slice.      
-
-     \ttitemn{(option not given)} The standard default slicing for all
-     elements (except collimators). It uses {\tt TEAPOT} if the number
-     of slices is less or equal to 4, and {\tt SIMPLE} otherwise.
-     \end{madlist}
-\end{5.02.04}
-
-\begin{5.02.05}
-     \begin{madlist}
-     	\ttitem{SIMPLE} produces slices of equal strength and length at equidistant
-     	positions.
-     	
-     	\ttitem{TEAPOT} is the default slicing algorithm for all elements 
-     	except collimators and is described in \cite{burkhardt2013}. 
-     	{\tt TEAPOT} is a clear improvement over the {\tt SIMPLE} algorithm.
-     	
-     	\ttitem{COLLIM} is the default slicing algorithm for collimators. 
-     	If only one slice is chosen it is placed in the middle of the old
-     	element. If two slices are chosen they are placed at either
-     	end. Three slices or more are treated as one slice. 
-     \end{madlist}
-\end{5.02.05}
-
-\begin{5.02.04}
-   \textbf{Note:} It is strongly recommended to always specify
-   {\tt STYLE=teapot} to use the improved slicing for any number of
-   slices. 
-\end{5.02.04}
-      
+   \begin{madlist}
+   	\ttitem{SIMPLE} produces slices of equal strength and length at equidistant
+   	positions.
+   	
+   	\ttitem{TEAPOT} is the default slicing algorithm for all elements 
+   	except collimators and is described in \cite{burkhardt2013}. 
+   	{\tt TEAPOT} is a clear improvement over the {\tt SIMPLE} algorithm.
+   	
+   	\ttitem{COLLIM} is the default slicing algorithm for collimators. 
+   	If only one slice is chosen it is placed in the middle of the old
+   	element. If two slices are chosen they are placed at either
+   	end. Three slices or more are treated as one slice. 
+   \end{madlist}
+   
    \ttitem{MAKEDIPEDGE} is a logical flag to control the generation of
    {\tt DIPEDGE} elements at the start and/or end of bending magnets,
    to conserve edge focusing from pole face angles {\tt E1, E2}
@@ -92,28 +52,14 @@ The parameters are defined as:
    {\tt RBEND} or {\tt SBEND}, including edge effects, to a simple
    thick {\tt SBEND} with edge focusing transferred to extra 
    {\tt DIPEDGE} elements. \\ 
-   \change[GR]{(Default:~false)}{(Default:~true)}
-
-
-\begin{5.02.04}
-   \ttitem{MINIMIZEPARENTS} is a logical flag to control the removal of
-   inconsistent numbers of slices for parent elements. \\
    (Default:~true)
-
-   \ttitem{MAKECONSISTENT} is a logical flag to ensure an equal number of slices
-   for parent and children elements, using the larger value of the two. \\
-   (Default:~false)
-\end{5.02.04}
 \end{madlist}
 
-
-   Example:
-   \madxmp{
-   	! keep translated rbend as thick sbend \\
-   	SELECT, FLAG=makethin, CLASS=rbend, THICK=true;
-   }
-   
-   
+Example:
+\madxmp{
+! keep translated rbend as thick sbend \\
+SELECT, FLAG=makethin, CLASS=rbend, THICK=true;
+}
 
 \section{Controlling the number of slices}
 
@@ -138,18 +84,7 @@ thin {\tt MULTIPOLE} elements between thick slices.
 Positioning is done with markers between
 slices, here however with thick slice quadrupole piece filling the whole
 length.
-  
-\begin{5.02.04}
-{\bf Examples:}
-\madxmp{
-! slice quadrupoles thick, insert 2 markers per quadrupole \\
-SELECT, FLAG=makethin, CLASS=quadrupole, THICK=true, SLICE=2; \\ 
-\\
-! thick slicing for quadrupoles named mqxa, insert one marker in the middle \\
-SELECT, FLAG=makethin, PATTERN=mqxa$\backslash$., THICK=true, SLICE=1; 
-}
-\end{5.02.04}
-\begin{5.02.05}
+
 {\bf Examples:}
 \madxmp{
 ! slice quadrupoles in three thick slices, insert 2 markers per quadrupole \\
@@ -158,8 +93,6 @@ SELECT, FLAG=makethin, CLASS=quadrupole, THICK=true, SLICE=3; \\
 ! thick slicing for quadrupoles named mqxa, insert one marker in the middle \\
 SELECT, FLAG=makethin, PATTERN=mqxa$\backslash$., THICK=true, SLICE=2; 
 }
-\end{5.02.05}
-
 
 Slicing can be turned off for certain elements or classes by specifying
 a number of slices $< 1$. Examples: 

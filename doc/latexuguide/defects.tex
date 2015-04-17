@@ -12,22 +12,22 @@
 and the canonical variable set ($x$ , $p_x / p_0$),
 ($y$ , $p_y / p_0$), ($-ct$ , $\delta E / p_0 c$), as opposed to other
 programs most of which use the set ($x$, $x'$), ($y$, $y'$),
-($-\delta s$), $\delta p / p_0$). 
+($-\delta s$), $\delta p / p_0$).
 
 Like Dragt \cite{dragt1982}, \madeight uses the relative
 energy error $p / p_0$, which is equal the relative momentum error
-${\tt delta} = \delta p / p_0$ multiplied by $\beta = v/c$.  
+${\tt delta} = \delta p / p_0$ multiplied by $\beta = v/c$.
 
 As from Version 8.13, \madeight used an additional \textbf{constant}
 momentum error $\texttt{delta}_s$ in all optical calculations. 
 The transfer maps contained the \textbf{exact} dependence upon this
 value; therefore the tunes for large deviations could be computed with
-high accuracy as opposed to previous versions.  
- 
+high accuracy as opposed to previous versions.
+
 The choice of canonical variables in \madx still leads to slightly
 different definitions of the lattice functions. In \madx the
 Courant-Snyder invariants mentioned in \cite{Courant_Snyder1958} take
-the form  
+the form
 
 $W_x = \gamma_x x^2 - 2 \alpha_x x p_x + \beta_x  p_x^2$
 
@@ -35,7 +35,7 @@ Comparison to the original form
 
 $W_x = \gamma_x x^2 - 2 \alpha_x x x' + \beta_x  {x'}^2$
 
-shows that the orbit functions cannot be the same. 
+shows that the orbit functions cannot be the same.
 
 A more detailed analysis, using 
 $x' = p_x / (1 + \delta)$
@@ -51,7 +51,7 @@ lattice functions are the same. In a machine where $\delta$ varies along
 the circumference, e.g. in a linear accelerator or in an
 electron-positron storage ring, the definition of the Courant-Snyder
 invariants must be generalised. The \madeight invariants have the advantage
-that they remain invariants along the beam line even for variable $\delta$.  
+that they remain invariants along the beam line even for variable $\delta$.
 
 With the new method this problem occurs in Twiss module (see
 \ref{chap:twiss}) only for non-constant $\delta$.    
@@ -62,17 +62,7 @@ It has been noted by Milutinovic and Ruggiero \cite{milutinovic1988}
 that \madeight returned tunes which are too low for non-zero
 $\delta$. The difference was found to be quadratic in delta with a negative
 coefficient. This problem has been eliminated thanks to the new
-treatment  of momentum errors from \madeight Version 8.13 onwards.   
-
-\begin{5.02.04}
-\section{Definition of emittance in \madx}
-\label{sec:emittance_definition}
-This section should explain how natural and normalised emittances are
-defined in \madx and why there is a factor 4 in the definition of the
-natural emittance, which is a marked difference with other programs such
-as sixtrack (see the conversion to sixtrack format)
-
-\end{5.02.04}
+treatment  of momentum errors from \madeight Version 8.13 onwards.
 
 %% EOF
 

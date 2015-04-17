@@ -76,22 +76,6 @@ in separate {\tt BEAM} commands, the energy is left unchanged and the momentum
 {\tt PC} and relativistic factor {\tt GAMMA} are recalculated. 
 \\
 
-\begin{5.02.04}
-\begin{madlist}
-  \ttitem{EX} The horizontal emittance $\epsilon_x$ (default: 1 m). 
-  \ttitem{EY} The vertical emittance $\epsilon_y$ (default: 1 m). 
-  \ttitem{ET} The longitudinal emittance $\epsilon_t$ (default: 1 m). 
-  \ttitem{EXN} The normalised horizontal emittance [m]:
-  $\epsilon_{xn} = 4 \sqrt{\gamma^2 - 1} \ \epsilon_x = 4 \beta \gamma\ \epsilon_x$
-  \ttitem{EYN} The normalised vertical emittance [m]:
-  $\epsilon_{yn} = 4 \sqrt{\gamma^2 - 1} \ \epsilon_y = 4 \beta \gamma\ \epsilon_y$
-  \ttitem{SIGT} The bunch length $c\ \sigma_t$ in [m].  
-  \ttitem{SIGE} The \emph{relative} energy spread
-  $\sigma_E / E$ in [1].  
-\end{madlist} 
-\end{5.02.04}
-
-\begin{5.02.05}
 \begin{madlist}
 	\ttitem{EX} The horizontal emittance $\epsilon_x$ (default: 1 m). 
 	\ttitem{EY} The vertical emittance $\epsilon_y$ (default: 1 m). 
@@ -104,33 +88,16 @@ in separate {\tt BEAM} commands, the energy is left unchanged and the momentum
 	\ttitem{SIGE} The \emph{relative} energy spread
 	$\sigma_E / E$ in [1].  
 \end{madlist} 
-\end{5.02.05}
 
 The order of precedence for arguments is: {\tt ex->exn}, {\tt ey->eyn} and
 {\tt et->sigt->sige}.
 
-%% 2013-Jul-11  11:19:29  ghislain:  DOC
-%% the factor 4 in the normalised
-%% emittance formula is historical. It might be time we move to the
-%% standard definition of exn = beta gamma ex. It could be that we have
-%% to leave the current definition in MAD-X but move to the new one for
-%% the next MAD...
-
-\begin{5.02.04}
-\note[GR]{the factor 4 in the normalised emittance formula is historical. It 
-might be time we move to the standard definition of exn = beta gamma ex. It 
-could be that we have to leave the current definition in MAD-X but move to the 
-new one for the next MAD...}
-\end{5.02.04}
-
-\begin{5.02.05}
 Note that up to version 5.02.04 the definition of normalised emittance used in 
 \madx was referring to the so-called 2-sigma geometric emittance:
 $\epsilon_{n} = 4 \sqrt{\gamma^2 - 1} \ \epsilon = 4 \beta \gamma\ \epsilon$ 
 This definition was different from the definition usually found in literature 
 and used for example in the \hyperref[chap:aperture]{\tt APERTURE} module.\\
 The standard one sigma definition is now used across all \madx modules. 
-\end{5.02.05}
 
 Certain commands compute the synchrotron tune $Q_s$ taking into account
 the settings of RF cavities. 
