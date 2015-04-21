@@ -142,13 +142,14 @@ The {\tt PTC\_TWIS}S can be applied to two basic tasks. It can calculate either 
 
 \madbox{
 PTC\_TWISS, \=ICASE=integer, DELTAP=real, \\
-            \>CLOSED\_ORBIT=logical, SLICE\_MAGNETS=logical, \\ 
+            \>CLOSED\_ORBIT=logical, DELTAP\_DEPENDENCY=logical, \\
+            \>SLICE\_MAGNETS=logical, \\
             \>RANGE=string, FILE[=filename], TABLE[=tabname], \\
             \>INITIAL\_MATRIX\_TABLE=logical, INITIAL\_MATRIX\_MANUAL=logical,  \\
-            \>INITIAL\_MAP\_MANUAL=logical, BETA0=string, MAPTABLE=logical, \\  
+            \>INITIAL\_MAP\_MANUAL=logical, BETA0=string, MAPTABLE=logical, \\
             \>IGNORE\_MAP\_ORBIT=logical, RING\_PARAMETERS=logical, \\
-            \>BETX=real, ALFX=real, MUX=real, \\   
-            \>BETY=real, ALFY=real, MUY=real, \\    
+            \>BETX=real, ALFX=real, MUX=real, \\
+            \>BETY=real, ALFY=real, MUY=real, \\
             \>DX=real,  DPX=real, DY=real, DPY=real, \\
             \>X=real, PX=real, Y=real, PY=real, T=real, PT=real, \\
             \>RE11=real, RE12=real, \ldots , RE16=real, \\
@@ -183,7 +184,7 @@ The attributes are:
   \ttitem{DELTAP\_DEPENDENCY}  
   a logical switch to trigger the computation of the Twiss and
   dispersion derivatives w.r.t. deltap/p. Derivation formula assume that
-  {\tt ICASE=5}, so that deltap/p is supplied as a parameter. \\
+  {\tt ICASE $\ge$ 5}, so that deltap/p is supplied as a parameter. \\
   (Default: false)
 
   \ttitem{SLICE\_MAGNETS}
