@@ -78,15 +78,19 @@ ENDEDIT;
 \madbox{
 CYCLE, START=string;
 }
-This makes the sequence start at the location given with the START
-argument, which must be a marker. \\ 
+This makes the sequence start at the location given as attribute value of the {\tt START} 
+attribute. The element named by the {\tt START} attribute must be a marker. \\ 
 In the case there is a shared sequence in the used sequence, the
-command {\tt FLATTEN} has to be used before the command {\tt CYCLE}. 
+command {\tt FLATTEN} has to be used before the command {\tt CYCLE}. \\
 Example:  
 \madxmp{
 FLATTEN; \\
 CYCLE, START=place; 
 }
+
+Note that the {\tt FLATTEN} command inserts another marker before the start location, 
+with a name composed of the name of the sequence being edited, followed by the 
+start location name and the string "\_P\_". 
 
 \section{REFLECT}
 \label{sec:reflect}

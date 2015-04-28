@@ -1,6 +1,11 @@
 \chapter{File Handling Statements}
 \label{chap:files}
 
+Note that the filenames given as attribute values in File Handling statements 
+must be explicit names and should not contain wildcard characters since the 
+filename strings are not passed to the underlying Operating System for evaluation.
+
+
 \section{ASSIGN}
 \label{sec:assign}
 
@@ -115,20 +120,19 @@ SYSTEM("mv filename new\_filename"); ! Unix specific
 \section{COPYFILE}
 \label{sec:copyfile}
 \madbox{
-	COPYFILE, FILE="filename", TO="new\_filename", APPEND=logical;
+COPYFILE, FILE="filename", TO="new\_filename", APPEND=logical;
 }
 copies the file "filename" to the file "new\_filename" on disk.
 
 The attribute {\tt APPEND=true} causes {\tt COPYFILE} to append the content of 
-"filename" at the end of the file "new\_filename", instead of replacing the 
-content of "new\_filename" with the content of "filename", ie a straight copy 
-with the default {\tt APPEND=false}.
+"filename" at the end of the file "new\_filename".\\
+The default value {\tt APPEND=false} causes the 
+replacement of the content of "new\_filename" with the content of "filename".
 
-It is more portable than an equivalent \hyperref[sec:system]{\tt SYSTEM} call:
+{\tt COPYFILE, APPEND=true...} is more portable than an equivalent \hyperref[sec:system]{\tt SYSTEM} call:
 \madxmp{
-	SYSTEM("copy /y filename new\_filename"); ! Windows specific
+SYSTEM("copy /y filename new\_filename"); ! Windows specific
 }
-
 
 \section{REMOVEFILE}
 \label{sec:removefile}
