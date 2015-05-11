@@ -755,7 +755,39 @@ coefficients are computed as
 K_n = q B_n / p_s  =  B_n / B \rho 
 \end{equation}
 
+\begin{5.02.06}
+\section{Generalisation to normal and skew components}
+\label{sec:normalskew}
+The previous section assumed an expansion at the mid-plane ($y=0$), 
+symmetry around the mid-plane and considered only the vertical 
+component of the field. 
 
+An extension using complex notation for the position ($x + i y$) 
+and the field is given as
+
+\begin{equation}
+B_y +  i B_x =\sum_{n=0}^{\infty} (b_n\,+ia_n) \frac{(x+iy)^n}{n^{n-1}}
+\end{equation}
+
+By introducing the normal and skew multipole coefficients 
+$KN$ and $KS$ at order $n$ as
+\begin{equation}\label{eq:knn}
+KN_n = q\,b_n / p_s  =  b_n / B \rho 
+\end{equation}
+and
+\begin{equation}\label{eq:kns}
+KS_n = q\,a_n / p_s  =  a_n / B \rho 
+\end{equation}
+the kicks received in each plane can be expressed as the summation 
+over all components
+\begin{equation}
+\Delta P_x - i \Delta P_y = \sum_{n=0}^{\infty} -(KN_n + i KS_n) \frac{(x+iy)^n}{n!}
+\end{equation}
+
+{\bf Remark:} need to add references to the $(a_n,b_n)$ field conventions 
+in the magnet world. 
+
+\end{5.02.06}
 
 \section{Variables}
 \label{sec:variables}
