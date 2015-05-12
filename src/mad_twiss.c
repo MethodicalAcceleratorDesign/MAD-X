@@ -1,5 +1,5 @@
 #include "madx.h"
-#include <unistd.h>
+
 // private functions
 
 static void
@@ -230,14 +230,17 @@ pro_embedded_twiss(struct command* current_global_twiss)
   struct command* keep_twiss;
   struct name_list* nl = current_twiss->par_names;
   struct command_parameter_list* pl = current_twiss->par;
+  struct int_array* tarr;
+  struct int_array* dummy_arr; /* for the new signature of the twiss() Fortran function*/
   struct table* twiss_tb;
   struct table* keep_table = NULL;
-  char *filename = NULL, *name, *sector_name;
+  char *filename = NULL, *name, *table_name, *sector_name;
+  char *table_embedded_name;
   double tol,tol_keep;
   double betx,bety,alfx,mux,alfy,muy,x,px,y,py,t,pt,dx,dpx,dy,dpy,wx,
     phix,dmux,wy,phiy,dmuy,ddx,ddpx,ddy,ddpy,
     r11,r12,r21,r22,s;
-  int i, jt=0, lp, k_orb = 0, u_orb = 0, pos, k = 1;
+  int i, jt=0, l, lp, k_orb = 0, u_orb = 0, pos, k = 1;
   int w_file, beta_def, inval = 1, chrom_flg; // ks, err not used
   int keep_info;
   int orbit_input = 0; // counter of number of elements of initial orbit given on command line
@@ -280,8 +283,9 @@ pro_embedded_twiss(struct command* current_global_twiss)
     return;
   }
 
-  char *table_name = current_sequ->tw_table->name;
-  
+  table_name = current_sequ->tw_table->name;
+  table_embedded_name = "embedded_twiss_table";
+
   if (get_value(current_command->name,"sectormap") != 0) { // (ks = not used
     set_option("twiss_sector", &k);
     pos = name_list_pos("sectorfile", nl);
@@ -455,6 +459,12 @@ pro_embedded_twiss(struct command* current_global_twiss)
     summ_table = make_table("summ", "summ", summ_table_cols, summ_table_types, twiss_deltas->curr+1);
     add_to_table_list(summ_table, table_register);
 
+    l = strlen(table_embedded_name);
+    tarr = new_int_array(l+1);
+    conv_char(table_embedded_name, tarr);
+    dummy_arr = new_int_array(5+1);
+    conv_char("dummy",dummy_arr);
+
     if (get_option("twiss_sector")) {
       reset_sector(current_sequ, 0);
       set_sector();
@@ -507,23 +517,7 @@ pro_embedded_twiss(struct command* current_global_twiss)
     if(twiss_deltas->curr <= 0)
       fatal_error("PRO_TWISS_EMBEDDED "," - No twiss deltas");
 
-    //  printf("DEBUG: VOILA\n");
-
-    
     for (i = 0; i < twiss_deltas->curr; i++) {
-
-      char *table_embedded_name = "embedded_twiss_table";
-      struct int_array* tarr;
-      struct int_array* dummy_arr; /* for the new signature of the twiss() Fortran function*/
-      {
-        int l = strlen(table_embedded_name);
-        tarr = new_int_array(l+1);
-        conv_char(table_embedded_name, tarr);
-        dummy_arr = new_int_array(5+1);
-        conv_char("dummy",dummy_arr);
-      }
-
-      
       twiss_table = make_table(table_embedded_name, "twiss", twiss_table_cols,
                                twiss_table_types, current_sequ->n_nodes);
       twiss_table->dynamic = 1; /* flag for table row access to current row */
@@ -550,9 +544,6 @@ pro_embedded_twiss(struct command* current_global_twiss)
         if (w_file) out_table(table_embedded_name, twiss_table, filename);
       }
       else warning("Twiss failed: ", "MAD-X continues");
-
-      tarr = delete_int_array(tarr);
-      dummy_arr = delete_int_array(dummy_arr);
     }
 
     if (sec_file) { 
@@ -560,6 +551,8 @@ pro_embedded_twiss(struct command* current_global_twiss)
       sec_file = NULL;
     }
 
+    tarr = delete_int_array(tarr);
+    dummy_arr = delete_int_array(dummy_arr);
     if (twiss_success && get_option("twiss_print")) print_table(summ_table);
   }
 
@@ -746,14 +739,14 @@ pro_twiss(void)
   struct command* keep_beam = current_beam;
   struct name_list* nl;
   struct command_parameter_list* pl;
-//  struct int_array* tarr;
-//  struct int_array* tarr_sector;
+  struct int_array* tarr;
+  struct int_array* tarr_sector;
   struct node *nodes[2], *use_range[2];
   char *filename = NULL, *name, *table_name, *sector_name = NULL;
-  char dummy[NAME_L] = "dummy", *sector_table_name = dummy; /* second string required by) */
+  char dummy[NAME_L] = "dummy", *sector_table_name = dummy; /* second string required by twiss() */
   /* will be set to a proper string in case twiss_sector option selected */
   double tol,tol_keep, q1_val_p = 0, q2_val_p = 0, q1_val, q2_val, dq1, dq2;
-  int i, j, lp, k_orb = 0, u_orb = 0, pos, k_save = 1, k = 1, k_sect, 
+  int i, j, l, lp, k_orb = 0, u_orb = 0, pos, k_save = 1, k = 1, k_sect, 
       w_file, beta_def;
   int chrom_flg;
   int orbit_input = 0; // counter of number of elements of initial orbit given on command line
@@ -942,13 +935,13 @@ pro_twiss(void)
   summ_table = make_table("summ", "summ", summ_table_cols, summ_table_types, twiss_deltas->curr+1);
   add_to_table_list(summ_table, table_register);
 
+  l = strlen(table_name);
+  tarr = new_int_array(l+1);
+  conv_char(table_name, tarr);
   /* now create the sector table */
-  struct int_array* tarr_sector;
-  {
-    int l = strlen(sector_table_name);
-    tarr_sector = new_int_array(l+1);
-    conv_char(sector_table_name, tarr_sector);
-  }
+  l = strlen(sector_table_name);
+  tarr_sector = new_int_array(l+1);
+  conv_char(sector_table_name, tarr_sector);
 
   if (get_option("twiss_sector")) {
     reset_sector(current_sequ, 0);
@@ -960,6 +953,7 @@ pro_twiss(void)
     twiss_sector_table->dynamic = 1; /* flag for access to current row */
     add_to_table_list(twiss_sector_table, table_register);
   }
+
 
   // 2014-May-30  12:33:48  ghislain: suppressed
   /* if (get_option("useorbit")) */
@@ -1006,13 +1000,6 @@ pro_twiss(void)
   // 2014-May-30  12:33:48  ghislain: end of modifications
 
   for (i = 0; i < twiss_deltas->curr; i++) {
-    struct int_array* tarr;
-    {
-      int l = strlen(table_name);
-      tarr = new_int_array(l+1);
-      conv_char(table_name, tarr);
-    }
-
     if (chrom_flg) { /* calculate chromaticity from tune difference - HG 6.2.09*/
       twiss_table = make_table(table_name, "twiss", twiss_table_cols, twiss_table_types, current_sequ->n_nodes);
       twiss_table->dynamic = 1; /* flag for table row access to current row */
@@ -1044,12 +1031,12 @@ pro_twiss(void)
     adjust_rfc(); /* sets freq in rf-cavities from probe */
     current_node = current_sequ->ex_start;
 
+    // CALL TWISS
     twiss_(oneturnmat, disp0, tarr->i,tarr_sector->i);
 
     augment_count("summ ");
 
     if ((twiss_success = get_option("twiss_success"))) {
-  ///////    printf("DEBUG TWISS SUCCESS! %d, %s\n", i, filename);
       if (chrom_flg) { /* calculate chromaticity from tune difference - HG 6.2.09*/
         pos = name_list_pos("q1", summ_table->columns);
         q1_val = summ_table->d_cols[pos][i];
@@ -1065,30 +1052,19 @@ pro_twiss(void)
       if (get_option("keeporbit"))  copy_double(orbit0, current_sequ->orbits->vectors[k_orb]->a, 6);
       if (k_save) fill_twiss_header(twiss_table);
       if (i == 0) exec_savebeta(); /* fill beta0 at first delta_p only */
-        if (k_save && w_file) {
-        out_table(table_name, twiss_table, filename);
-      }
-      if ((twiss_deltas->curr>1)&&(i<twiss_deltas->curr-1)) {
-        struct table *t = detach_table_from_table_list(table_name, table_register);
-        if (t) {
-          char new_table_name[NAME_L];
-          sprintf(new_table_name, "%s_%d", table_name, i+1);
-          rename_table(t, new_table_name);
-          add_to_table_list(t, table_register);
-        }
-      }
+      if (k_save && w_file) out_table(table_name, twiss_table, filename);
     }
     else {
       seterrorflag(1,"pro_twiss","TWISS failed");
       warning("Twiss failed: ", "MAD-X continues");
     }
-    tarr = delete_int_array(tarr);
   }
 
   if (get_option("twiss_sector")){
     out_table( sector_table_name, twiss_sector_table, sector_name );
   }
 
+  tarr = delete_int_array(tarr);
   tarr_sector = delete_int_array(tarr_sector);
 
   if (twiss_success && get_option("twiss_print")) print_table(summ_table);

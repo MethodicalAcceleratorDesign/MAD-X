@@ -839,37 +839,6 @@ add_to_table_list(struct table* t, struct table_list* tl)
   }
 }
 
-struct table *
-detach_table_from_table_list(const char *name, struct table_list* tl)
-  /* detaches table named 'name' from table list 'tl' */
-  /* returns NULL if the table isn't found in table list 'tl' */
-{
-  struct table *retval = NULL;
-  int pos;
-  if ((pos = name_list_pos(name, tl->names)) > -1)
-  {
-    int k = remove_from_name_list(tl->tables[pos]->name,
-                                  tl->names);
-    
-    retval = tl->tables[pos];
-                
-    tl->tables[k] = tl->tables[--tl->curr];
-  }
-  return retval;
-}
-
-int
-remove_table_from_table_list(const char *name, struct table_list* tl)
-  /* removes table named 'name' from table list 'tl' */
-  /* returns -1 if the table isn't found in table list 'tl' */
-{
-  struct table *t = NULL;
-  if ((t = detach_table_from_table_list(name, tl))) {
-    delete_table(t);
-  }
-  return t ? 0 : -1;
-}
-
 void
 add_vars_to_table(struct table* t)
   /* fills user-defined variables into current table_row) */
@@ -1064,8 +1033,21 @@ make_map_table(int* map_table_max_rows)
   assert(map_table_max_rows);
   assert(table_register->names);
   
-  remove_table_from_table_list("map_table", table_register);
-
+  int pos;
+  if ((pos = name_list_pos("map_table", table_register->names)) > -1)
+  {
+    /*printf("Found Table in table pos %d register Removing it \n", pos);
+    printf("Name=<<%s>>  \n\n", table_register->tables[pos]->name);
+    */
+    int k = remove_from_name_list(table_register->tables[pos]->name,
+                                  table_register->names);
+    
+    delete_table(table_register->tables[pos]);
+	              
+    table_register->tables[k] = table_register->tables[--table_register->curr];
+    
+  }
+  
   /* initialise table */
   map_table = make_table("map_table", "map_tab", map_tab_cols,
                          map_tab_types, *map_table_max_rows);
@@ -2238,13 +2220,6 @@ comment_to_table_curr(const char* table, const char* comment, const int* length)
     grow_char_p_array(tbl->l_head[tbl->curr]);
   tbl->l_head[tbl->curr]->p[tbl->l_head[tbl->curr]->curr++] = tmpbuff(c_dum->c);
   return 0;
-}
-
-void
-rename_table(struct table *tbl, const char *name )
-{
-  strncpy(tbl->name, name, NAME_L-1);
-  tbl->name[NAME_L-1] = '\0';
 }
 
 #if 0 // not used...
