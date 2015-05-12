@@ -81,6 +81,10 @@ void    reset_count(char* table); /* resets table counter to zero */
 void    sector_out(char* sector_table_name, double* pos, double* kick, double* rmatrix, double* tmatrix);
 void    table_range(char* table, char* range, int* rows);
 
+void    rename_table(struct table *tbl, const char *name );
+int     remove_table_from_table_list(const char *name, struct table_list* tl);
+struct table *detach_table_from_table_list(const char *name, struct table_list* tl);
+
 void    augment_count(char* table);
 void    augmentcountonly(char* table);
 

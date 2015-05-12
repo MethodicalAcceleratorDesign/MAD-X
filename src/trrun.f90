@@ -1678,7 +1678,7 @@ subroutine ttcrabrf(track,ktrack,turn)
   !----------------------------------------------------------------------*
   ! Added: R. Calaga/F. Zimmermann (10/06, 11/07, 09/10)                 *
   !----------------------------------------------------------------------*
-  integer itrack,ktrack,turn,t1,t2,t3,t4,p1,p2
+  integer itrack,ktrack,turn,t1,t2,t3,t4,p1,p2,bvk
   double precision omega,phirf,pt,rff,rfl,rfv,eph,track(6,*),clight,twopi,vrf,pc0,  &
        get_variable,node_value,get_value,ten3m,ten6p,px
   !      double precision px,py,ttt,beti,el1
@@ -1687,9 +1687,10 @@ subroutine ttcrabrf(track,ktrack,turn)
   !---- Initialize
   clight=get_variable('clight ')
   twopi=get_variable('twopi ')
+  bvk = node_value('other_bv ')
 
   !---- Fetch data.
-  rfv = node_value('volt ')
+  rfv = bvk * node_value('volt ')
   rff = node_value('freq ')
   rfl = node_value('lag ')
   pc0 = get_value('beam ','pc ')
@@ -1734,10 +1735,10 @@ subroutine ttcrabrf(track,ktrack,turn)
 
   do itrack = 1, ktrack
      px  = track(2,itrack)                                           &
-          + vrf * sin(phirf - omega * track(5,itrack))
+          + vrf * sin(phirf - bvk * omega * track(5,itrack))
      pt = track(6,itrack)                                            &
           - omega* vrf * track(1,itrack) *                                  &
-          cos(phirf - omega * track(5,itrack))
+          cos(phirf - bvk * omega * track(5,itrack))
 
      !---- track(2,jtrk) = track(2,jtrk)
      !        pt = track(6,itrack)
