@@ -1732,7 +1732,6 @@ subroutine ttcrabrf(track,ktrack,turn)
 
   !  print*," turn: ",turn, " phase: ", phirf*360/twopi
 
-
   do itrack = 1, ktrack
      px  = track(2,itrack)                                           &
           + vrf * sin(phirf - bvk * omega * track(5,itrack))
@@ -4689,6 +4688,8 @@ subroutine ttrfmult(track, ktrack, turn)
   double precision f_errors(0:maxferr)
   integer n_ferr, jtrk, iord, nord
 
+  ! BV-flag is applied as: P o inverse(M) o P
+
   !--- AL: RF-multipole
   integer dummyi, nn, ns, node_fd_errors, turn, ktrack
   double precision normal(0:maxmul), skew(0:maxmul)
@@ -4697,7 +4698,7 @@ subroutine ttrfmult(track, ktrack, turn)
   double precision field_sin(2,0:maxmul)
   double precision pc, krf, rfac
   double precision twopi, clight, ten3m, get_variable
-  double precision x, y, z, dpx, dpy, dpt
+  double precision x, y, z, px, py, pt, dpx, dpy, dpt
   double precision freq, volt, lag, harmon
   double precision pnl(0:maxmul), psl(0:maxmul)
   complex*16 ii, Cm2, Sm2, Cm1, Sm1, Cp0, Sp0, Cp1, Sp1
@@ -4747,9 +4748,14 @@ subroutine ttrfmult(track, ktrack, turn)
 
   !---- Prepare to calculate the kick and the matrix elements
   do jtrk = 1,ktrack
-    x = track(1,jtrk);
-    y = track(3,jtrk);
-    z = track(5,jtrk);
+    ! apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
+    x  = bvk * track(1,jtrk);
+    px =       track(2,jtrk);
+    y  =       track(3,jtrk);
+    py = bvk * track(4,jtrk);
+    z  = bvk * track(5,jtrk);
+    pt =       track(6,jtrk);
+
     !---- Vector with strengths + field errors
     do iord = 0, nord;
       field_cos(1,iord) = bvk * (normal(iord) * cos(pnl(iord) * twopi - krf * z) + field(1,iord));
@@ -4783,6 +4789,7 @@ subroutine ttrfmult(track, ktrack, turn)
     Cp1 = Cp1 * (x+ii*y);
 
     !---- The kick
+    ! apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
     dpx = -REAL(Cp0);
     dpy = AIMAG(Cp0);
     dpt = (volt * ten3m * sin(lag * twopi - krf * z) / pc - krf * REAL(Sp1));
@@ -4790,22 +4797,31 @@ subroutine ttrfmult(track, ktrack, turn)
     !---- Radiation effects at entrance.
     if (dorad  .and.  elrad .ne. 0d0) then
       rfac = arad * gammas**3 * (dpx**2+dpy**2) / (3d0*elrad)
-      track(2,jtrk) = track(2,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(2,jtrk)
-      track(4,jtrk) = track(4,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(4,jtrk)
-      track(6,jtrk) = track(6,jtrk) - rfac * (1d0 + track(6,jtrk)) ** 2
+      px = px - rfac * (1d0 + pt) * px
+      py = py - rfac * (1d0 + pt) * py
+      pt = pt - rfac * (1d0 + pt) ** 2
     endif
 
     !---- Apply the kick
-    track(2,jtrk) = track(2,jtrk) + dpx
-    track(4,jtrk) = track(4,jtrk) + dpy
-    track(6,jtrk) = track(6,jtrk) + dpt
+    px = px + dpx
+    py = py + dpy
+    pt = pt + dpt
 
     !---- Radiation effects at exit.
     if (dorad  .and.  elrad .ne. 0d0) then
-      track(2,jtrk) = track(2,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(2,jtrk)
-      track(4,jtrk) = track(4,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(4,jtrk)
-      track(6,jtrk) = track(6,jtrk) - rfac * (1d0 + track(6,jtrk)) ** 2
+      px = px - rfac * (1d0 + pt) * px
+      py = py - rfac * (1d0 + pt) * py
+      pt = pt - rfac * (1d0 + pt) ** 2
     endif
+
+    ! apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
+    track(1,jtrk) = bvk * x;
+    track(2,jtrk) =       px;
+    track(3,jtrk) =       y;
+    track(4,jtrk) = bvk * py;
+    track(5,jtrk) = bvk * z;
+    track(6,jtrk) =       pt;
+
   enddo
 
 end subroutine ttrfmult
