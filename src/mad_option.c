@@ -1,7 +1,7 @@
 #include "madx.h"
 
 int
-get_option(char* str)
+get_option(const char* str)
 {
 /* This function is called by fortran to get option of a command */
   int i; // , k; not used
@@ -14,7 +14,7 @@ get_option(char* str)
 }
 
 void
-set_option(char* str, int* opt)
+set_option(const char* str, int* opt)
   /* sets an (old or new) option with name "str",
      value *opt (0 false, 1 true) */
 {
@@ -33,31 +33,31 @@ set_option(char* str, int* opt)
 }
 
 void
-set_defaults(char* string) /* reset options, beam etc. to defaults */
+set_defaults(const char* str) /* reset options, beam etc. to defaults */
 {
   int i, pos;
   struct command* beam_clone;
 
-  if ((pos = name_list_pos(string, defined_commands->list)) > -1)
+  if ((pos = name_list_pos(str, defined_commands->list)) > -1)
   {
-    if (strcmp(string, "option") == 0)
+    if (strcmp(str, "option") == 0)
     {
       if (options != NULL) delete_command(options);
       options = clone_command(defined_commands->commands[pos]);
     }
-    else if (strcmp(string, "set") == 0)
+    else if (strcmp(str, "set") == 0)
       store_set(defined_commands->commands[pos], 0);
-    else if (strcmp(string, "setplot") == 0)
+    else if (strcmp(str, "setplot") == 0)
     {
       if (plot_options != NULL) delete_command(plot_options);
       plot_options = clone_command(defined_commands->commands[pos]);
     }
-    else if (strcmp(string, "threader") == 0)
+    else if (strcmp(str, "threader") == 0)
     {
       if (threader_par != NULL)  delete_command(threader_par);
       threader_par = clone_command(defined_commands->commands[pos]);
     }
-    else if (strcmp(string, "beam") == 0)
+    else if (strcmp(str, "beam") == 0)
     {
       if (current_beam == NULL)
         current_beam = clone_command(defined_commands->commands[pos]);

@@ -302,7 +302,7 @@ get_refpos(struct sequence* sequ)
 
 
 double
-node_value(char* par)
+node_value(const char* par)
   /* returns value for parameter par of current element */
 {
   double value;

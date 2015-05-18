@@ -14,7 +14,7 @@ struct name_list /* contains list of index sorted names plus int inform. */
   int* index;                   /* index for alphabetic access */
   int* inform;                  /* array parallel to names with integer */
   int stamp;
-  char** names;                 /* element names for sort */
+  const char** names;           /* element names for sort */
 };
 
 struct vector_list              /* contains named vectors */
@@ -27,7 +27,6 @@ struct vector_list              /* contains named vectors */
 // interface
 
 char*   get_new_name(void);
-int     add_to_name_list(char* name, int inf, struct name_list* vlist);
 // double  find_value(char* name, int ntok, char** toks);
 int     name_list_pos(const char* p, struct name_list* vlist);
 
@@ -37,7 +36,8 @@ struct name_list*  delete_name_list(struct name_list*);
 void               dump_name_list(struct name_list*);
 void               copy_name_list(struct name_list* out, struct name_list* in);
 void               grow_name_list(struct name_list*);
-int                add_to_name_list(char* name, int inf, struct name_list*);
+int                add_to_name_list(const char* name, int inf, struct name_list*);
+int                remove_from_name_list(const char* name, struct name_list* nl);
 
 struct vector_list* new_vector_list(int length);
 struct vector_list* delete_vector_list(struct vector_list*);

@@ -268,7 +268,7 @@ exec_command(void)
 }
 
 struct command*
-find_command(char* name, struct command_list* cl)
+find_command(const char* name, struct command_list* cl)
 {
   int pos;
   if ((pos = name_list_pos(name, cl->list)) < 0)
@@ -277,7 +277,7 @@ find_command(char* name, struct command_list* cl)
 }
 
 struct command_list*
-find_command_list(char* name, struct command_list_list* sl)
+find_command_list(const char* name, struct command_list_list* sl)
 {
   int pos;
   if ((pos = name_list_pos(name, sl->list)) < 0)
@@ -531,7 +531,7 @@ clone_command(struct command* p)
 }
 
 struct command*
-new_command(char* name, int nl_length, int pl_length, char* module, char* group, int link, int mad_8)
+new_command(const char* name, int nl_length, int pl_length, char* module, char* group, int link, int mad_8)
 {
   const char *rout_name = "new_command";
   char loc_name[2*NAME_L];
@@ -551,7 +551,7 @@ new_command(char* name, int nl_length, int pl_length, char* module, char* group,
 }
 
 struct command_list*
-new_command_list(char* l_name, int length)
+new_command_list(const char* l_name, int length)
 {
   const char *rout_name = "new_command_list";
   struct command_list* il = mycalloc(rout_name, 1, sizeof *il);

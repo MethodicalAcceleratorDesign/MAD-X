@@ -25,6 +25,6 @@ void exec_copyfile(struct in_cmd* cmd);
 void exec_setvars_table(struct in_cmd*);
 void exec_setvars_lin_table(struct in_cmd*);
 void exec_store_coguess(struct in_cmd*);
-void exec_delete_table(char* name);
+void exec_delete_table(const char* name);
 
 #endif // MAD_EXEC_H

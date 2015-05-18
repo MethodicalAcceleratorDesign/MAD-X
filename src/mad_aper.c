@@ -1211,7 +1211,7 @@ aper_calc(double p, double q, double* minhl, double halox[], double haloy[],
 // public interface
 
 double
-get_apertol(struct node* node, char* par)
+get_apertol(struct node* node, const char* par)
   /* returns aper_tol parameter 'i' where i is integer at the end of par;
      e.g. aptol_1 gives i = 1 etc. (count starts at 1) */
 {
@@ -1225,7 +1225,7 @@ get_apertol(struct node* node, char* par)
 }
 
 double 
-get_aperture(struct node* node, char* par)
+get_aperture(struct node* node, const char* par)
   /* returns aperture parameter 'i' where i is integer at the end of par;
      e.g. aper_1 gives i = 1 etc. (count starts at 1) */
 {

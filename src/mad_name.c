@@ -48,7 +48,7 @@ delete_name_list(struct name_list* l)
   if (stamp_flag && l->stamp != 123456)
     fprintf(stamp_file, "d_n_l double delete --> %s\n", l->name);
   if (watch_flag) fprintf(debug_file, "deleting --> %s\n", l->name);
-  if (l->index != NULL)  myfree(rout_name, l->index);
+  if (l->index != NULL)   myfree(rout_name, l->index);
   if (l->inform != NULL)  myfree(rout_name, l->inform);
   if (l->names != NULL)   myfree(rout_name, l->names);
   myfree(rout_name, l);
@@ -141,7 +141,7 @@ show_name_list(const char *from, struct name_list* nl)
 }
 #endif
 
-int add_to_name_list(char* name, int inf, struct name_list* vlist)
+int add_to_name_list(const char* name, int inf, struct name_list* vlist)
   /* adds name to alphabetic name list vlist */
   /* inf is an integer kept with name */
 {
@@ -164,7 +164,7 @@ int add_to_name_list(char* name, int inf, struct name_list* vlist)
     for (int j = vlist->curr; j > pos; j--) vlist->index[j] = vlist->index[j-1];
     vlist->index[pos] = vlist->curr;
     vlist->inform[vlist->curr] = inf;
-    vlist->names[vlist->curr++] = name;
+    vlist->names[vlist->curr++] = name; // only string literal accepted!
   }
   else  vlist->inform[ret] = inf;
   return ret;
@@ -191,4 +191,37 @@ int name_list_pos(const char* name, struct name_list* vlist)
   return -1;
 }
 
+int
+remove_from_name_list(const char* name, struct name_list* nl)
+{
+  
+  char buf[5*NAME_L];
+  assert(name);
+  assert(nl);
+
+  int j, i, k = -1;
+  for (i = 0; i < nl->curr; i++)
+    if (strcmp(nl->names[nl->index[i]], name) == 0) break;
+  
+  
+  if (i < nl->curr)
+  {
+   
+    k = nl->index[i];
+    for (j = i+1; j < nl->curr; j++) nl->index[j-1] = nl->index[j];
+    
+    for (j = 0; j < nl->curr-1; j++)
+      if(nl->index[j] == nl->curr-1) break;
+      
+    nl->index[j] = k;
+    nl->inform[k] = nl->inform[nl->curr-1];
+    nl->names[k] = nl->names[--nl->curr];
+  }
+  else
+  {
+    warning("remove_from_name_list",(sprintf(buf,"Table %s not found",name),buf));
+  }
+  
+  return k;
+}
 

@@ -145,7 +145,7 @@ fill_dump(FILE* out, int flag, char* label, double* values, int count, int inc)
 }
 
 static int
-kl_trans(char* name, char* out_name, double* val, int* flag)
+kl_trans(const char* name, char* out_name, double* val, int* flag)
 {
   int j, length, rep;
   double corr;

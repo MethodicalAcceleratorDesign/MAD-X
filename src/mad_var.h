@@ -41,23 +41,23 @@ struct var_list         /* contains list of variable pointers sorted by name */
 // interface
 
 void             enter_variable(struct in_cmd*); /* stores variable contained in cmd */
-struct variable* new_variable(char* name, double val, int val_type, int type, struct expression*, char* string);
+struct variable* new_variable(const char* name, double val, int val_type, int type, struct expression*, char* string);
 double           variable_value(struct variable*);
 
 struct var_list* new_var_list(int length);
 struct var_list* clone_var_list(struct var_list*);
 struct var_list* delete_var_list(struct var_list*);
 void             add_to_var_list(struct variable*, struct var_list*, int flag);
-struct variable* find_variable(char* name, struct var_list*);
+struct variable* find_variable(const char* name, struct var_list*);
 
 char*   make_string_variable(char* string);
 void    print_global(double delta);
 void    write_vars(struct var_list*, struct command_list*, FILE*);
 void    write_vars_8(struct var_list*, struct command_list*, FILE*);
-void    set_variable(char* name, double* value);
-void    set_stringvar(char* name, char* string);
-double  get_variable(char* name);
-char*   get_varstring(char* name);
+void    set_variable(const char* name, double* value);
+void    set_stringvar(const char* name, char* string);
+double  get_variable(const char* name);
+char*   get_varstring(const char* name);
 void    get_defined_constants(void);
 
 #endif // MAD_VAR_H

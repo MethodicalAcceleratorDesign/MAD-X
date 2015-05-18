@@ -163,7 +163,7 @@ delete_var_list(struct var_list* varl)
 }
 
 struct variable*
-find_variable(char* name, struct var_list* varl)
+find_variable(const char* name, struct var_list* varl)
 {
   int pos;
   if ((pos = name_list_pos(name, varl->list)) < 0)
@@ -204,7 +204,7 @@ clone_var_list(struct var_list* vl)
 }
 
 struct variable*
-new_variable(char* name, double val, int val_type, int type, struct expression* expr, char* string)
+new_variable(const char* name, double val, int val_type, int type, struct expression* expr, char* string)
 {
   const char *rout_name = "new_variable";
   struct variable* var = mycalloc(rout_name, 1, sizeof *var);
@@ -234,7 +234,7 @@ new_var_list(int length)
 }
 
 char*
-get_varstring(char* name)
+get_varstring(const char* name)
 {
   struct variable* var;
   char *ret; // *p, not used
@@ -445,7 +445,7 @@ add_to_var_list( /* adds variable to alphabetic variable list */
 }
 
 void
-set_stringvar(char* name, char* string)
+set_stringvar(const char* name, char* string)
 {
   /* sets variable name->string to string */
 //  char* p;
@@ -562,7 +562,7 @@ sss_variable(char* name)
 // public interface (used by Fortran)
 
 double
-get_variable(char* name)
+get_variable(const char* name)
 {
   char comm[NAME_L];
   char par[NAME_L];
@@ -597,7 +597,7 @@ get_variable(char* name)
 }
 
 void
-set_variable(char* name, double* value)
+set_variable(const char* name, double* value)
 {
   /* sets variable name to value */
   char comm[NAME_L];

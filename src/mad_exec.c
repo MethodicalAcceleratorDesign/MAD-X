@@ -21,7 +21,7 @@ exec_delete_sequ(char* name)
 }
 
 void
-exec_delete_table(char* name)
+exec_delete_table(const char* name)
 {
   struct table_list* tl;
   int j, k, pos;
@@ -582,7 +582,7 @@ exec_setvars_lin_table(struct in_cmd* cmd)
 
   for (int i = 0; i < t->num_cols; i++) {
     if (t->columns->inform[i] < 3) {
-      char *colname = t->columns->names[i];
+      const char *colname = t->columns->names[i];
       double val1 = t->d_cols[i][row1-1];
       double val2 = t->d_cols[i][row2-1];
       // 2014-Aug-18  17:15:08  ghislain: 
