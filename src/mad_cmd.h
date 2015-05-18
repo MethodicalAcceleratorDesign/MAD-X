@@ -41,7 +41,7 @@ struct command_list_list /* contains list of command lists */
 
 // interface
 
-struct command* new_command(const char* name, int nl_length, int pl_length, char* module, char* group, int link, int mad_8);
+struct command* new_command(const char* name, int nl_length, int pl_length, const char* module, const char* group, int link, int mad_8);
 struct command* delete_command(struct command*);
 struct command* clone_command(struct command*);
 struct command* find_command(const char* name, struct command_list*);

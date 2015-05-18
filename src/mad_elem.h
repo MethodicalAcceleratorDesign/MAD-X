@@ -36,7 +36,7 @@ struct el_list /* contains list of element pointers sorted by name */
 
 // interface
 
-struct element* make_element(char* name, char* parent, struct command*, int flag);
+struct element* make_element(const char* name, const char* parent, struct command*, int flag);
 struct element* clone_element(struct element*);
 struct element* delete_element(struct element*);
 void            update_element(struct element*, struct command* update);
@@ -46,7 +46,7 @@ void            export_el_def_8(struct element*, char* string);
 
 struct el_list* new_el_list(int length);
 struct el_list* delete_el_list(struct el_list*);
-struct element* find_element(char* name, struct el_list*);
+struct element* find_element(const char* name, struct el_list*);
 void            write_elems(struct el_list*, struct command_list*, FILE*);
 void            write_elems_8(struct el_list*, struct command_list*, FILE*);
 

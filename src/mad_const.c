@@ -428,6 +428,3 @@ update_sequ_constraints(struct sequence* sequ, struct constraint_list* cl)
     else sequ->cl->constraints[k] = cl->constraints[j];
   }
 }
-
-
-

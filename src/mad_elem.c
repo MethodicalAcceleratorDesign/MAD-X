@@ -247,7 +247,7 @@ clone_element(struct element* el)
 }
 
 struct element*
-make_element(char* name, char* parent, struct command* def, int flag)
+make_element(const char* name, const char* parent, struct command* def, int flag)
   /* makes a new element from declaration, stores in list */
 {
 /*  double length; */
@@ -771,7 +771,7 @@ fill_elem_var_list(struct element* el, struct el_list* ell, struct var_list* var
 }
 
 struct element*
-find_element(char* name, struct el_list* ell)
+find_element(const char* name, struct el_list* ell)
 {
   int pos;
   if ((pos = name_list_pos(name, ell->list)) < 0)

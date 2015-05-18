@@ -344,7 +344,7 @@ static void mod_crabcavity(struct c6t_element*);
 // static void mod_vacdipole(struct c6t_element*); // not defined
 static void mod_sextupole(struct c6t_element*);
 static void multi_loop(void);
-static struct c6t_element* new_c6t_element(int, char*, char*);
+static struct c6t_element* new_c6t_element(int, const char*, const char*);
 static struct block* new_block(void);
 static void post_multipoles(void);
 static double power_of(double, int);
@@ -2091,7 +2091,7 @@ new_block(void)
 }
 
 static struct c6t_element*
-new_c6t_element(int size, char* name, char* base)
+new_c6t_element(int size, const char* name, const char* base)
 {
   struct c6t_element* p;
   const char *rout_name = "c6t:new_c6t_element";

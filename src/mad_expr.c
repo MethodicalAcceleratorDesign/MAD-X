@@ -25,7 +25,7 @@ comb_param(struct command_parameter* param1, char* op, struct command_parameter*
 #endif
 
 static double
-combine_expr_expr(struct expression* exp1, char* oper, 
+combine_expr_expr(struct expression* exp1, const char* oper, 
                   struct expression* exp2, struct expression** comb_exp)
 {
   strcpy(c_dum->c, exp1->string);
@@ -37,7 +37,7 @@ combine_expr_expr(struct expression* exp1, char* oper,
 }
 
 static double
-combine_expr_val(struct expression* exp1, char* oper, double val2, struct expression** comb_exp)
+combine_expr_val(struct expression* exp1, const char* oper, double val2, struct expression** comb_exp)
 {
   strcpy(c_dum->c, exp1->string);
   sprintf(aux_buff->c, "%.12g", val2);
@@ -49,7 +49,7 @@ combine_expr_val(struct expression* exp1, char* oper, double val2, struct expres
 }
 
 static double
-combine_val_expr(double val1, char* oper, struct expression* exp2, struct expression** comb_exp)
+combine_val_expr(double val1, const char* oper, struct expression* exp2, struct expression** comb_exp)
 {
   sprintf(c_dum->c, "%.12g", val1);
   strcat(c_dum->c, oper);
@@ -74,7 +74,7 @@ make_expression(int n, char** toks)
 }
 
 struct expression*
-new_expression(char* in_string, struct int_array* polish)
+new_expression(const char* in_string, struct int_array* polish)
 {
   const char *rout_name = "new_expression";
   struct expression* ex = mycalloc(rout_name, 1, sizeof *ex);
@@ -195,7 +195,7 @@ dump_expression(struct expression* ex)
 }
 
 double
-expr_combine(struct expression* exp1, double val1, char* oper, 
+expr_combine(struct expression* exp1, double val1, const char* oper, 
              struct expression*  exp2, double val2, 
              struct expression** exp_comb)
 {
@@ -436,16 +436,17 @@ scan_expr(int c_item, char** item)   /* split input */
 }
 
 struct expression*
-compound_expr(struct expression* e1, double v1, char* oper, struct expression* e2, double v2)
+compound_expr(struct expression* e1, double v1, const char* oper, struct expression* e2, double v2)
 /* make one out of two expressions, using oper to connect them
  hbu 9/2005 moved from madxn.c to makethin.c as only used here
  and increased precision   sprintf(tmp, "%e"  ->   sprintf(tmp, "%.14g" */
 {
+  static char lb[] = "(", rb[] = ")";
   char** toks = tmp_l_array->p;
   struct expression* expr = NULL;
-  char tmp[30];
+  char tmp[30], op[30];
   int n;
-  char lb[] = "(", rb[] = ")";
+  strcpy(op, oper);
   if (e1 != NULL || e2 != NULL)
   {
     if (e1 != NULL)
@@ -453,14 +454,14 @@ compound_expr(struct expression* e1, double v1, char* oper, struct expression* e
       if (e2 != NULL)
       {
         toks[0] = lb; toks[1] = e1->string; toks[2] = rb;
-        toks[3] = oper;
+        toks[3] = op;
         toks[4] = lb; toks[5] = e2->string; toks[6] = rb;
       }
       else
       {
         sprintf(tmp, "%.14g", v2); /* hbu */
         toks[0] = lb; toks[1] = e1->string; toks[2] = rb;
-        toks[3] = oper;
+        toks[3] = op;
         toks[4] = lb; toks[5] = tmp; toks[6] = rb;
       }
     }
@@ -468,7 +469,7 @@ compound_expr(struct expression* e1, double v1, char* oper, struct expression* e
     {
       sprintf(tmp, "%.14g", v1);  /* hbu */
       toks[0] = lb; toks[1] = tmp; toks[2] = rb;
-      toks[3] = oper;
+      toks[3] = op;
       toks[4] = lb; toks[5] = e2->string; toks[6] = rb;
     }
     join(toks, 7);

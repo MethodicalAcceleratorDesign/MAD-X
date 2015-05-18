@@ -531,7 +531,7 @@ clone_command(struct command* p)
 }
 
 struct command*
-new_command(const char* name, int nl_length, int pl_length, char* module, char* group, int link, int mad_8)
+new_command(const char* name, int nl_length, int pl_length, const char* module, const char* group, int link, int mad_8)
 {
   const char *rout_name = "new_command";
   char loc_name[2*NAME_L];
