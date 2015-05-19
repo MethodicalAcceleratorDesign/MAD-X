@@ -1395,7 +1395,7 @@ set_sequence(char* name)
 // public interface
 
 struct sequence*
-new_sequence(char* name, int ref)
+new_sequence(const char* name, int ref)
 {
   const char *rout_name = "new_sequence";
   struct sequence* s = mycalloc(rout_name, 1, sizeof *s);
