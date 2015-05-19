@@ -2843,7 +2843,7 @@ contains
        w_p%nc=1
        w_p%fc='((1X,A120))'
        !     write(w_p%c(1),'(a29,g23.16,a2)') 'Deviation from symplecticity ',c_100*(xsu)/ND2, ' %'
-       write(6,'(a29,g23.16,a2)') 'Deviation from symplecticity ',100.0_dp*(xsu)/ND2, ' %'
+       if(lielib_print(9)==1) write(6,'(a29,g23.16,a2)') 'Deviation from symplecticity ',100.0_dp*(xsu)/ND2, ' %'
        !CALL !WRITE_a
     endif
     call eig6(cr,rr,ri,vr,vi)

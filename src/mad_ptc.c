@@ -435,7 +435,7 @@ pro_ptc_twiss(void)
   delete_int_array(summary_tarr);
   /* --- */
 
-  /* For the time-being, summary data are only available in case of a closed machine */
+  
   ptc_twiss_summary = get_option("ptc_twiss_summary");
   if (ptc_twiss_summary) {
     print_table(ptc_twiss_summary_table);

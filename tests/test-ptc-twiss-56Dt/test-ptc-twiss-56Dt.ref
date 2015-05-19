@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.04  (32 bit, Darwin)      +
+  +     MAD-X 5.02.05  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2014.11.14               +
-  + Execution date: 2015.03.12 17:13:33      +
+  + Release   date: 2015.04.06               +
+  + Execution date: 2015.05.19 17:03:43      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -808,7 +808,6 @@ select, flag=twiss, column=name,s,beta11,beta22,alfa11,alfa22,mu1,mu2,disp1,disp
 
 ptc_create_universe;
 
- Now PTC
   ptc_create_layout, model=1, method=6, nst=5, exact=true, closed_layout=true;
 
  MAD-X Beam Parameters
@@ -817,17 +816,17 @@ ptc_create_universe;
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.541711E+00
  Setting MADx with 
-     energy           1.08342267840000     
+     energy           1.0834226784000001     
      method                   6
      Num. of steps            5
-     charge           1.00000000000000     
-  Length of machine:    78.5437026616777     
+     charge           1.0000000000000000     
+  Length of machine:    78.543702661677713     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After    end:  -4.940492459581947E-015  0.000000000000000E+000  8.437694987151190E-015
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -6.2727600891321345E-015   0.0000000000000000        8.4376949871511897E-015
 
 
   !!!!!       T I M E   F A L S E,   T O T P A T H  F A L S E
@@ -842,8 +841,6 @@ ptc_create_universe;
 
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
-Deviation from symplecticity  0.1986176147433658E-10 %
-Deviation from symplecticity  0.1986176147433658E-10 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -905,8 +902,6 @@ Deviation from symplecticity  0.1986176147433658E-10 %
 
 ptc_end;
 
- Killing LayoutNo name assigned                                                                                                        
- Layout killed 
 
 
 removefile, file="Maxwellian_bend_for_ptc.txt";
@@ -919,5 +914,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.04 (32 bit) finished normally +
+  + MAD-X 5.02.05 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

@@ -64,9 +64,30 @@ CONTAINS
     nullify(maps)
 
     if (getdebug()==0) global_verbose = .false.
+
+    lielib_print =  (/0,0,0,0,0,0,0,0,0,0,0,0/)
+	 !  lielib_print(1)=1   lieinit prints info
+	 !  lielib_print(2)=1   expflo warning if no convergence
+	 !  lielib_print(3)=1   Shows details in flofacg
+	 !  lielib_print(4)=1   tunes and damping
+	 !  lielib_print(5)=1  order in orbital normal form
+	 !  lielib_print(6)=1  symplectic condition
+	 !  lielib_print(7)=-1  go manual in normal form  (use auto command in fpp)
+	 !  lielib_print(8)=-1  To use nplane from FPP normalform%plane
+	 !  lielib_print(9)=1  print in checksymp(s1,norm) in j_tpsalie.f90
+	 !  lielib_print(10)=1  print lingyun's checks
+	 !  lielib_print(11)=1  print warning about Teng-Edwards
+	 !  lielib_print(12)=1  print info in make_node_layout
+
     if (getdebug()>0) then
-        print*,"Now PTC"
+        lielib_print(9)=1 !prints symplecticity deviation
     endif
+
+    if (getdebug()>1) then
+        print*,"Now PTC"
+        lielib_print =  (/1,1,1,1,1,1,1,1,1,1,1,1/)
+    endif
+
     sector_nmul_max = get_value('ptc_create_universe ','sector_nmul_max ')
 
     !    print*,">>ss1<< old sector_nmul",sector_nmul

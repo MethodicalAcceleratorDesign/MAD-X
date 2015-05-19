@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.02  (64 bit, Darwin)      +
+  +     MAD-X 5.02.05  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2014.07.04               +
-  + Execution date: 2014.10.09 11:22:47      +
+  + Release   date: 2015.04.06               +
+  + Execution date: 2015.05.19 17:03:34      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
@@ -267,7 +267,6 @@ parameter: energy   double value:                100
 
 ptc_create_universe;
 
- Now PTC
 ptc_create_layout,model=2,method=6,nst=10,exact;
 
  MAD-X Beam Parameters
@@ -320,9 +319,6 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    3.2607158925373049E-004   2.5963462592936979E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
-Deviation from symplecticity  0.5251354906476990E-11 %
-Deviation from symplecticity  0.5251354906476990E-11 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -406,8 +402,6 @@ PTC_NORMAL,closed_orbit,maptable,icase=5,no=2;
 
 ptc_end;
 
- Killing LayoutNo name assigned                                                                                                        
- Layout killed 
 
 
 !write,table="map_table",file="map_table";
@@ -453,7 +447,6 @@ beam, particle = proton, energy =   eg        ,
 
 ptc_create_universe;
 
- Now PTC
 ptc_create_layout,model=2,method=6,nst=5,exact;
 
  MAD-X Beam Parameters
@@ -544,11 +537,8 @@ ptc_twiss,icase=5,no=2, initial_matrix_manual,
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit specified by the user!
 ++++++ warning: ptc_twiss  Provided matrix has eigenvalue more than 1e-10 off the unit circle ! plane =            1  r^2 =   0.99999999737044487       delta =    2.6295551291966035E-009
 ++++++ warning: ptc_twiss  Provided matrix has eigenvalue more than 1e-10 off the unit circle ! plane =            2  r^2 =   0.99999999737044487       delta =    2.6295551291966035E-009
-Deviation from symplecticity  0.1343131939002262E-06 %
-Deviation from symplecticity  0.9214851104388799E-12 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -604,8 +594,6 @@ Deviation from symplecticity  0.9214851104388799E-12 %
                  0                  0                  0 
 ptc_end;
 
- Killing LayoutNo name assigned                                                                                                        
- Layout killed 
 
 
 removefile, file='Maxwellian_bend_for_ptc.txt';
@@ -617,5 +605,5 @@ stop;
 0 in C and 2 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.02 (64 bit) finished normally +
+  + MAD-X 5.02.05 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

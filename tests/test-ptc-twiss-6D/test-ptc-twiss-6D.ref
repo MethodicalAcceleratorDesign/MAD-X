@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.02  (64 bit, Linux)       +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.07.01      +
-  + Execution Time Stamp: 03.07.14 14.12.54 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.05  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2015.04.06               +
+  + Execution date: 2015.05.19 17:03:46      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 
 
 call, file="../share/LEIR/LEIR.seqx";
@@ -804,7 +804,6 @@ select, flag=ptc_twiss, column=name,s,Energy,beta11,beta22,beta33,alfa11,alfa22,
 
 ptc_create_universe;
 
- Now PTC
   ptc_create_layout, model=1, method=6, nst=5, exact=true, closed_layout=true;
 
  MAD-X Beam Parameters
@@ -840,9 +839,6 @@ ptc_create_universe;
 
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
- Closed orbit:    9.0592014616392228E-009   2.1579454481145028E-009   0.0000000000000000        0.0000000000000000       -2.3892613109242766E-009   1.8563101740137359E-010
-Deviation from symplecticity  0.1104477840133842E-10 %
-Deviation from symplecticity  0.1104477840133842E-10 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -916,8 +912,6 @@ Deviation from symplecticity  0.1104477840133842E-10 %
 
 ptc_end;
 
- Killing LayoutNo name assigned                                                                                                        
- Layout killed 
 
 
 
@@ -938,5 +932,5 @@ removefile, file='Maxwellian_bend_for_ptc.txt';
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.02 (64 bit) finished normally +
+  + MAD-X 5.02.05 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

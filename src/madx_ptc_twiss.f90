@@ -531,9 +531,11 @@ contains
       !   enddo
       ! endif    
        
-       CALL write_closed_orbit(icase,x)
+      if (getdebug() > 1) then
+         CALL write_closed_orbit(icase,x)
+      endif
 
-    elseif(my_ring%closed .eqv. .true.) then
+    elseif((my_ring%closed .eqv. .true.) .and. (getdebug() > 1)) then
        print*, "Closed orbit specified by the user!"
        !CALL write_closed_orbit(icase,x) at this position it isn't read
     endif
@@ -949,14 +951,7 @@ contains
 
 
     call set_option('ptc_twiss_summary ',1)
-    ! 26 november 2009: comment the following and replace by the above
-    !    if ( (momentumCompactionToggle .eqv. .true.)  .and. (getenforce6D() .eqv. .false.)) then
-    !       ! only makes sense if the lattice is a ring (skipped for a line lattice)
-    !       call oneTurnSummary()
-    !       call set_option('ptc_twiss_summary ', 1)
-    !    else
-    !       call set_option('ptc_twiss_summary ',0) ! for time-being, do not support lines
-    !    endif
+    
 
     if (getdebug() > 1) then
        write(6,*) "##########################################"

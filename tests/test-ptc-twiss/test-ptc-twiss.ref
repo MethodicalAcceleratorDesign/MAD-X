@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.06  (64 bit, Linux)       +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.01.15      +
-  + Execution Time Stamp: 20.01.14 18.51.37 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.05  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2015.04.06               +
+  + Execution date: 2015.05.19 17:03:19      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS ';
 
 
@@ -73,7 +73,6 @@ parameter: r12   double value:                  0
 parameter: r21   double value:                 -0
 parameter: r22   double value:                  0
 parameter: energy   double value:                100
- Now PTC
  MAD-X Beam Parameters
                   Energy : 0.100000E+03
           Kinetic Energy : 0.990617E+02
@@ -112,9 +111,6 @@ parameter: energy   double value:                100
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    8.8928289333262345E-005   7.2772925727354185E-007   0.0000000000000000        0.0000000000000000        0.0000000000000000     
-Deviation from symplecticity  0.5251354906476990E-11 %
-Deviation from symplecticity  0.5251354906476990E-11 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -191,12 +187,9 @@ Deviation from symplecticity  0.5251354906476990E-11 %
        ACCELERATE  =  FALSE
  Closed orbit:    8.8928289333262345E-005   7.2772925727354185E-007   0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Normal Form Type 1
-Deviation from symplecticity  0.5251354906476990E-11 %
- Killing LayoutNo name assigned                                                                                                        
- Layout killed 
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.06 (64 bit) finished normally +
+  + MAD-X 5.02.05 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
