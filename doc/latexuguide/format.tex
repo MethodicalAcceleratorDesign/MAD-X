@@ -401,7 +401,7 @@ Or another arbitrary test case of adding k1l taken from the Twiss table:
 
 Define macro: 
 \begin{verbatim}
-mycrap(xx,yy,zz): macro = {myval = table(xx,yy,zz);};
+mymacro(xx,yy,zz): macro = {myval = table(xx,yy,zz);};
 \end{verbatim}
 
 Use macro in loop: 
@@ -410,7 +410,7 @@ i = 0;
 incval = 0;
 while (i < 100) {
   value, i;
-  exec, mycrap(twiss,k1l,$i);
+  exec, mymacro(twiss,k1l,$i);
   incval = incval + myval;
   value, i, myval, incval;                
   i = i + 1;
