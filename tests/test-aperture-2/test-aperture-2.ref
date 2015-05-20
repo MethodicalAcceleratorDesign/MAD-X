@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  +     MAD-X 5.02.05  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2014.11.14               +
-  + Execution date: 2015.03.18 17:51:15      +
+  + Release   date: 2015.04.06               +
+  + Execution date: 2015.05.20 18:13:46      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, "LHC Version 6.503 -  July 2009 - version with RCOLLIMATORs" ;
 
@@ -111,7 +111,6 @@ orbit:  -2.000000E-03  1.739113E-11  3.774323E-11  1.700000E-04  0.000000E+00  0
 
 ptc_create_universe;
 
- Now PTC
 ptc_create_layout, model=2, method=2, nst=2, exact;
 
  MAD-X Beam Parameters
@@ -164,8 +163,6 @@ ptc_twiss,  closed_orbit, icase=6, no=3, file="ptc-twiss-table.out";
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
-Deviation from symplecticity  0.2653004716917602E-09 %
-Deviation from symplecticity  0.2653004716917602E-09 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -223,8 +220,6 @@ Deviation from symplecticity  0.2653004716917602E-09 %
 
 ptc_end;
 
- Killing LayoutNo name assigned                                                                                                        
- Layout killed 
 
 
 removefile, file="Maxwellian_bend_for_ptc.txt";
@@ -238,5 +233,5 @@ stop;
 0 in C and 1 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.04 (64 bit) finished normally +
+  + MAD-X 5.02.05 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
