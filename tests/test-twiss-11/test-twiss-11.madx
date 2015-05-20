@@ -1,0 +1,27 @@
+option,-echo,-warn;
+
+!-- Define triplet lattice for gantry
+call,file="dec17c.sav";
+title,"Triplet lattice for gantry - dec17i";
+
+twiss0: beta0, betx=beta, bety=beta;
+
+!-- Analyse matching result
+beam,ex=3.6692e-6,ey=3.6692e-6,sige=0.03;
+use,period=gantry;
+dpp:=-0.3;
+maxdpp:=+0.305;
+select,flag=twiss,clear;
+select,flag=twiss,range=#e,column=name,s,betx,alfx,mux,dx,dpx,x,px, 
+bety,alfy,muy,dy,dpy,y,py,t,pt,alfa;
+twiss,beta0=twiss0,file="dec17i.lis",deltap=-0.3:+0.31:0.1;
+
+select,flag=twiss_1,column=name,s,betx,alfx,mux,dx,dpx,bety,alfy,muy;
+select,flag=twiss_2,column=name,s,betx,alfx,mux,dx,dpx,bety,alfy,muy;
+select,flag=twiss_3,column=name,s,betx,alfx,mux,dx,dpx,bety,alfy,muy;
+
+write, file = twiss_1, table = twiss_1 ;
+write, file = twiss_2, table = twiss_2 ;
+write, file = twiss_3, table = twiss_3 ;
+
+stop;

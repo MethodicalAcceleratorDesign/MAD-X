@@ -1,0 +1,48 @@
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %06s "GANTRY"
+@ PARTICLE         %08s "POSITRON"
+@ MASS             %le      0.000510998928
+@ CHARGE           %le                   1
+@ ENERGY           %le                   1
+@ PC               %le        0.9999998694
+@ GAMMA            %le         1956.951268
+@ KBUNCH           %le                   1
+@ BCURRENT         %le                   0
+@ SIGE             %le                0.03
+@ SIGT             %le                   0
+@ NPART            %le                   0
+@ EX               %le          3.6692e-06
+@ EY               %le          3.6692e-06
+@ ET               %le                   1
+@ LENGTH           %le         23.30217314
+@ ALFA             %le                   0
+@ ORBIT5           %le                  -0
+@ GAMMATR          %le                   0
+@ Q1               %le          9.94624502
+@ Q2               %le          7.32830118
+@ DQ1              %le                   0
+@ DQ2              %le                   0
+@ DXMAX            %le         4.361256185
+@ DYMAX            %le                   0
+@ XCOMAX           %le       0.06669974562
+@ YCOMAX           %le                   0
+@ BETXMAX          %le         18.28710528
+@ BETYMAX          %le          3.66329732
+@ XCORMS           %le       0.02979929303
+@ YCORMS           %le                   0
+@ DXRMS            %le         1.346739078
+@ DYRMS            %le                   0
+@ DELTAP           %le                -0.3
+@ SYNCH_1          %le                   0
+@ SYNCH_2          %le                   0
+@ SYNCH_3          %le                   0
+@ SYNCH_4          %le                   0
+@ SYNCH_5          %le                   0
+@ TITLE            %35s "Triplet lattice for gantry - dec17i"
+@ ORIGIN           %17s "5.02.05 Darwin 64"
+@ DATE             %08s "20/05/15"
+@ TIME             %08s "17.58.01"
+* NAME                                S               BETX               ALFX                MUX                 DX                DPX                  X                 PX               BETY               ALFY                MUY                 DY                DPY                  Y                 PY                  T                 PT               ALFA 
+$ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
+ "GANTRY$END"               23.30217314       0.4467235597       0.7231963951        4.696800831       0.5077073753     -0.09393917737    -0.002077855285     -0.03853374364        5.986161395      -0.4703396224        2.728259712                  0                  0                  0                  0      0.02758938113                  0    -0.006603708662
