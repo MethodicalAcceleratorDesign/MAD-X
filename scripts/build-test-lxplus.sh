@@ -56,14 +56,14 @@ else
 fi 
 
 echo -e "\n===== Gnu build ====="
-source /afs/cern.ch/sw/lcg/contrib/gcc/4.8/i686-slc6-gcc48-opt/setup.sh
+source /afs/cern.ch/sw/lcg/contrib/gcc/max/i686-slc6/setup.sh
 gcc      --version
 g++      --version
 gfortran --version
 make all-linux32-gnu
 check_error "make all-linux32-gnu failed"
 
-source /afs/cern.ch/sw/lcg/contrib/gcc/4.8/x86_64-slc6-gcc48-opt/setup.sh
+source /afs/cern.ch/sw/lcg/contrib/gcc/max/x86_64-slc6/setup.sh
 gcc      --version
 g++      --version
 gfortran --version
@@ -71,12 +71,14 @@ make all-linux64-gnu
 check_error "make all-linux64-gnu failed"
 
 echo -e "\n===== Intel build ====="
+source /afs/cern.ch/sw/lcg/contrib/gcc/max/i686-slc6/setup.sh
 source /afs/cern.ch/sw/IntelSoftware/linux/all-setup.sh ia32
 icc      --version
 ifort    --version
 make all-linux32-intel all-linux32
 check_error "make all-linux32-intel failed"
 
+source /afs/cern.ch/sw/lcg/contrib/gcc/max/x86_64-slc6/setup.sh
 source /afs/cern.ch/sw/IntelSoftware/linux/all-setup.sh intel64
 icc      --version
 ifort    --version
