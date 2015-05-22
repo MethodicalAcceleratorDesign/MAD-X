@@ -582,7 +582,8 @@ epicsShareFuncSDDS extern int32_t SDDS_DefineParameter1(SDDS_DATASET *SDDS_datas
                            char *format_string, int32_t type, void *fixed_value);
 epicsShareFuncSDDS extern int32_t SDDS_DefineColumn(SDDS_DATASET *SDDS_dataset, char *name, char *symbol, char *units, char *description, 
                         char *format_string, int32_t type, int32_t field_length);
-epicsShareFuncSDDS extern int32_t SDDS_DefineArray(SDDS_DATASET *SDDS_dataset, char *name, char *symbol, char *units, char *description, 
+// epicsShareFuncSDDS extern int32_t SDDS_DefineArray(SDDS_DATASET *SDDS_dataset, char *name, char *symbol, char *units, char *description, 
+epicsShareFuncSDDS extern int32_t SDDS_DefineArray(SDDS_DATASET *SDDS_dataset, const char *name, char *symbol, char *units, char *description, 
                         char *format_string, int32_t type, int32_t field_length, int32_t dimensions, char *group_name);
 epicsShareFuncSDDS extern int32_t SDDS_DefineAssociate(SDDS_DATASET *SDDS_dataset, char *name,
                                  char *filename, char *path, char *description, char *contents, int32_t sdds);
@@ -771,7 +772,8 @@ epicsShareFuncSDDS extern SDDS_ARRAY *SDDS_GetArray(SDDS_DATASET *SDDS_dataset, 
 #define SDDS_POINTER_ARRAY 1
 #define SDDS_CONTIGUOUS_DATA 2
 epicsShareFuncSDDS extern double *SDDS_GetArrayInDoubles(SDDS_DATASET *SDDS_dataset, char *array_name, int32_t *values);
-epicsShareFuncSDDS extern int32_t SDDS_SetArrayVararg(SDDS_DATASET *SDDS_dataset, char *array_name, int32_t mode, void *data_pointer, ...);
+// epicsShareFuncSDDS extern int32_t SDDS_SetArrayVararg(SDDS_DATASET *SDDS_dataset, char *array_name, int32_t mode, void *data_pointer, ...);
+epicsShareFuncSDDS extern int32_t SDDS_SetArrayVararg(SDDS_DATASET *SDDS_dataset, const char *array_name, int32_t mode, void *data_pointer, ...);
 epicsShareFuncSDDS extern int32_t SDDS_SetArray(SDDS_DATASET *SDDS_dataset, char *array_name, int32_t mode, void *data_pointer, int32_t *dimension);
 epicsShareFuncSDDS extern int32_t SDDS_AppendToArrayVararg(SDDS_DATASET *SDDS_dataset, char *array_name, int32_t mode, void *data_pointer, int32_t elements, ...);
 

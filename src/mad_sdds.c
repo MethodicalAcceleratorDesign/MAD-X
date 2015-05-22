@@ -422,7 +422,7 @@ sdds_writet_sel(char *filename, struct table *tfstab)
 
     for(j1=0; j1<col->curr; j1++) {
        /* define data arrays from TFS columns*/
-       if (SDDS_DefineArray(&SDDS_table, (char*)tfstab->columns->names[col->i[j1]], 
+       if (SDDS_DefineArray(&SDDS_table, tfstab->columns->names[col->i[j1]], 
                             NULL, NULL, NULL, NULL, 
                             sdds_tfs_types[tfstab->columns->inform[col->i[j1]]], 0, 1, NULL)<0)   { 
          SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
@@ -475,7 +475,7 @@ sdds_writet_sel(char *filename, struct table *tfstab)
             pl[j2] = da1[pos[j1]][j2];
             if (get_option("debug")) printf(" %ld\n",pl[j2]);
           }
-          if (!SDDS_SetArrayVararg(&SDDS_table, (char*)tfstab->columns->names[col->i[j1]], 
+          if (!SDDS_SetArrayVararg(&SDDS_table, tfstab->columns->names[col->i[j1]], 
                SDDS_POINTER_ARRAY, pl,tfstab->curr)) {
                SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
                exit(1);
@@ -492,7 +492,7 @@ sdds_writet_sel(char *filename, struct table *tfstab)
             }
             /* for row->i[j2] == 1  ==> row is selected, not implemented */
           }
-          if (!SDDS_SetArrayVararg(&SDDS_table, (char*)tfstab->columns->names[col->i[j1]], 
+          if (!SDDS_SetArrayVararg(&SDDS_table, tfstab->columns->names[col->i[j1]], 
                SDDS_POINTER_ARRAY, &da1[pos[j1]][0],tfstab->curr)) {
                SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
                exit(1);
@@ -503,7 +503,7 @@ sdds_writet_sel(char *filename, struct table *tfstab)
           for(j2=0;j2<tfstab->curr; j2++) {
             if (get_option("debug")) printf(" %s\n",tfstab->s_cols[pos[j1]][j2]);
           }
-          if (!SDDS_SetArrayVararg(&SDDS_table, (char*)tfstab->columns->names[col->i[j1]], 
+          if (!SDDS_SetArrayVararg(&SDDS_table, tfstab->columns->names[col->i[j1]], 
                SDDS_POINTER_ARRAY, &sa1[pos[j1]][0],tfstab->curr)) {
                SDDS_PrintErrors(stderr, SDDS_VERBOSE_PrintErrors);
                exit(1);
