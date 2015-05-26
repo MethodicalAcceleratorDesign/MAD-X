@@ -2956,9 +2956,33 @@ static void pro_correct_make_corr_table(void) {
   */
   
   ttb = model_table;
-
-  for (j = 0; j < ttb->curr; j++) {
-    if (!ttb->p_nodes[j]->base_name) continue;
+  
+  if(model_table == 0x0)
+   {
+     fatal_error("pro_correct_make_corr_table "," Model table does not exist");
+   }
+/*   else
+   {
+     printf("pro_correct_make_corr_table model table OK \n");
+     printf("pro_correct_make_corr_table model table name %s\n",model_table->name);
+     printf("pro_correct_make_corr_table model table type %s\n",model_table->type);
+     printf("pro_correct_make_corr_table model table curr %d\n",model_table->curr);
+     
+   }
+ */
+  for (j = 0; j < ttb->curr; j++) 
+   {
+/* 
+    printf("pro_correct_make_corr_table node %d \n",j);
+    printf("                         node_addr %#x\n",ttb->p_nodes[j]);
+    printf("                         base_name %#x\n",ttb->p_nodes[j]->base_name);
+    
+ */    
+    if (!ttb->p_nodes[j]->base_name) 
+     {
+       continue;
+     }
+     
     if ( (strncmp(atc[0], ttb->p_nodes[j]->base_name, 4) == 0)
       || (strncmp(atc[1], ttb->p_nodes[j]->base_name, 4) == 0)
       || (strncmp(atc[2], ttb->p_nodes[j]->base_name, 4) == 0)) {

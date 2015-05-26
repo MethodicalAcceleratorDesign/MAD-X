@@ -46,7 +46,10 @@ clone_node(struct node* p, int flag)
      this is needed for SXF input  */
   struct node* clone = new_node(p->name);
   strcpy(clone->name,p->name);
-  clone->base_name = p->base_name;
+  
+  /*clone->base_name = p->base_name;*/
+  clone->base_name = permbuff(p->base_name);
+  
   clone->occ_cnt = p->occ_cnt;
   clone->sel_err = p->sel_err;
   clone->position = p->position;
@@ -131,9 +134,14 @@ delete_node_ring(struct node* start)
   q = start->next;
   while (q != NULL && q != start)
   {
-    p = q; q = q->next; delete_node(p);
+    p = q; q = q->next; 
+    /*printf("delete_node_ring deleting node %#x %s\n",p,p->base_name);*/
+    delete_node(p);
   }
-  delete_node(start);
+  
+  /*printf("delete_node_ring deleting start node %#x %s\n",start,start->base_name);*/
+  start = delete_node(start);
+  
   return NULL;
 }
 
@@ -740,7 +748,10 @@ replace_one(struct node* node, struct element* el)
   strcpy(node->name, compound(el->name, k));
   add_to_node_list(node, 0, edit_sequ->nodes);
   node->p_elem = el;
-  node->base_name = el->base_type->name;
+  
+  /*node->base_name = el->base_type->name;*/
+  strcpy(node->base_name, el->base_type->name);
+   
   node->length = el->length;
   if (strcmp(el->base_type->name, "rfcavity") == 0 &&
       find_element(el->name, edit_sequ->cavities) == NULL)

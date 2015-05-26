@@ -888,11 +888,14 @@ add_vars_to_table(struct table* t)
       }
     }
     else if (current_node)
-    {
-      char* p = command_par_string(t->columns->names[i], current_node->p_elem->def) ;
-      t->s_cols[i][t->curr] = tmpbuff(p ? p : "none");
-    }
-    else t->s_cols[i][t->curr] = get_varstring(t->columns->names[i]);
+     {
+       char* p = command_par_string(t->columns->names[i], current_node->p_elem->def) ;
+       t->s_cols[i][t->curr] = tmpbuff(p ? p : "none");
+     }
+    else 
+     {
+       t->s_cols[i][t->curr] = tmpbuff(get_varstring(t->columns->names[i]));
+     }
   }
 }
 
@@ -943,15 +946,19 @@ delete_table(struct table* t)
   }
 
   if (t->s_cols) {
-    for (i = 0; i < t->num_cols; i++) {
-      if (t->columns->inform[i] == 3 && t->s_cols[i]) {
-        for (j = 0; j < t->curr; j++)
+    for (i = 0; i < t->num_cols; i++) 
+     {
+       if (t->columns->inform[i] == 3 && t->s_cols[i]) 
+       {
+         for (j = 0; j < t->curr; j++)
            {
-             /*printf("%d %d %s %#x\n",i,j,t->s_cols[i][j], t->s_cols[i][j]);*/
-             myfree(rout_name, t->s_cols[i][j]);
+              /*printf("%d %d %s %#x\n",i,j,t->s_cols[i][j], t->s_cols[i][j]); */  
+              myfree(rout_name, t->s_cols[i][j]);
            }
-        myfree(rout_name, t->s_cols[i]);
-      }
+         /*printf("Deleting column  %d %#x\n",i,t->s_cols[i]);*/
+        
+         myfree(rout_name, t->s_cols[i]);
+       }
     }
     /*printf("\n\n%d %s %#x\n\n\n",i,t->s_cols[i], t->s_cols[i]);   */
     myfree(rout_name, t->s_cols);
@@ -1568,7 +1575,11 @@ read_my_table(struct in_cmd* cmd)
         {
          if (t->curr == t->max) grow_table(t);
          tmp = tcpa->p[i];
-           if (strcmp(tmp,"%s") == 0) t->s_cols[i][t->curr] = stolower(tmpbuff(cc));
+           if (strcmp(tmp,"%s") == 0) 
+            {
+              t->s_cols[i][t->curr] = stolower(tmpbuff(cc));
+              /*printf("read_my_table coln [%d %d]=%s\n",i,t->curr,t->s_cols[i][t->curr]);*/
+            } 
            else if (strcmp(tmp,"%d") == 0 )
            {
             sscanf(cc, tmp, &k); t->d_cols[i][t->curr] = k;
