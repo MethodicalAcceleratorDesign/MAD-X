@@ -1489,24 +1489,24 @@ subroutine ttdrf(el,track,ktrack)
   !   EL        (double)    Length of drift.                             *
   !----------------------------------------------------------------------*
   integer itrack,ktrack
-  double precision el,pt,px,py,track(6,*),ttt
+  double precision el,pt,px,py,track(6,*),l_pz
 
   ! picked from trturn in madx.ss
-!$OMP PARALLEL PRIVATE(itrack, px, py, pt, ttt)
+!$OMP PARALLEL PRIVATE(itrack, px, py, pt, l_pz)
 !$OMP DO
   do  itrack = 1, ktrack
      px = track(2,itrack)
      py = track(4,itrack)
      pt = track(6,itrack)
-     ttt = el/sqrt(1d0+2d0*pt*bet0i+pt**2 - px**2 - py**2)
-     track(1,itrack) = track(1,itrack) + ttt*px
-     track(3,itrack) = track(3,itrack) + ttt*py
+     ! L/pz
+     l_pz = el/sqrt(1d0+2d0*pt*bet0i+pt**2 - px**2 - py**2)
+     track(1,itrack) = track(1,itrack) + l_pz*px
+     track(3,itrack) = track(3,itrack) + l_pz*py
      !        track(5,itrack) = track(5,itrack)                               &
-     !     + el*(beti + pt * dtbyds) - (beti+pt)*ttt
+     !     + el*(beti + pt * dtbyds) - (beti+pt)*l_pz
      !---- AK 20060413
      !---- Ripken DESY-95-189 p.36
-     track(5,itrack) = track(5,itrack)                               &
-          + bet0i*(el - (1d0 + bet0*pt) * ttt)
+     track(5,itrack) = track(5,itrack) + bet0i*(el - (1d0 + bet0*pt) * l_pz)
   enddo
 !$OMP END DO
 !$OMP END PARALLEL
