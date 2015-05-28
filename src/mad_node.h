@@ -14,7 +14,7 @@ struct name_list;
 struct node                /* the sequence is a linked list of nodes */
 {
   char name[NAME_L];
-  const char* base_name;   /* basic type */
+  char* base_name;         /* basic type */
   struct node* previous;
   struct node* next;
   int share;               /* 0 normal, 1 if shared */

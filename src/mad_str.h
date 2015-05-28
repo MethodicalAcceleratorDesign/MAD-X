@@ -23,8 +23,8 @@ int   supp_lt(char* inbuf, int flag);
 void  supp_mul_char(char c, char* string);
 char* supp_tb(char* string);      /* suppress trailing blanks in string */
 int   zero_string(char* string);  /* returns 1 if string defaults to '0', else 0 */
-char* buffer(char* string);       /* obsolete, replaced by permbuff */
-char* permbuff(char* string);     /* copy string to permanent buffer */
+char* buffer(const char* string);       /* obsolete, replaced by permbuff */
+char* permbuff(const char* string);     /* copy string to permanent buffer */
 char* tmpbuff(const char* string);      /* copy string to temporary allocated buffer */
 // int   compare_no_case(char* string_1, char* string_2); // replaced by string_icmp
 int   is_token(char* pb, char* string, int slen);

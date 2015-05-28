@@ -127,13 +127,13 @@ mysplit(char* buf, struct char_p_array* list)
 }
 
 char*
-buffer(char* string)  /* replaced by permbuff */
+buffer(const char* string)  /* replaced by permbuff */
 {
   return permbuff(string);
 }
 
 char*
-permbuff(char* string)  /* string -> general buffer, returns address */
+permbuff(const char* string)  /* string -> general buffer, returns address */
 {
   int n, k = char_buff->ca[char_buff->curr-1]->curr;
   if (string == NULL)  return NULL;
