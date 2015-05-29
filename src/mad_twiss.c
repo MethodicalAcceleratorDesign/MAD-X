@@ -1,5 +1,5 @@
 #include "madx.h"
-#include <unistd.h>
+
 // private functions
 
 static void
