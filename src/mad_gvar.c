@@ -233,7 +233,6 @@ int add_error_opt = 0;      /* ADD error option, set with eoption */
 int embedded_flag = 0;      /* flag (= 1 when entering routine pro_embedded_twiss, 0 at exit) */
 int min_order = 1;          /* minimum required order */
 int print_correct_opt = 1;  /* PRINT options for orbit correction */
-int debug_correct_opt = 0;  /* DEBUG options for orbit correction */
 int assign_start = 0;       /* flag for multiple assign statements */
 int aux_count = 0;          /* for debug purposes */
 int beam_info = -1;         /* flag to print beam information once */

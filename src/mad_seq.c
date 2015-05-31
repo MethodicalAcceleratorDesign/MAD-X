@@ -841,13 +841,11 @@ seq_cycle(struct in_cmd* cmd)
         strcpy(clone->p_elem->name, c_dum->c);
 
         /* IA 29.11.07 : fixes a bug with aperture module */
-/* Removed HG 11.10.2009 */
+	/* Removed HG 11.10.2009 */
         /* sprintf(c_dum->c, " ");
            set_command_par_string("apertype", clone->p_elem->def,c_dum->c); */
 
-
-        add_to_el_list(&clone->p_elem, node->p_elem->def->mad8_type,
-                       element_list, 1);
+        add_to_el_list(&clone->p_elem, node->p_elem->def->mad8_type,element_list,1);
         link_in_front(clone, node);
       }
       edit_sequ->start = node;

@@ -335,7 +335,7 @@ char command_def[] =
 "table = [s, none], "
 "file = [s, none]; "
 " "
-"readmytable: correct correct 0 0 "
+"readmytable: correct correct 0 0 " /* ghislain ???? */
 "table = [s, none], "
 "file  = [s, none]; "
 " "
@@ -844,8 +844,7 @@ char command_def[] =
 " "
 "coption: correct none 0 0 "
 "seed     = [i, 123456789], "
-"print    = [i, 1],  "
-"debug    = [i, 0];  "
+"print    = [i, 1];"
 " "
 "seqedit: edit edit 1 0 "
 "sequence = [s, none, none]; "

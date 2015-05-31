@@ -491,6 +491,8 @@ print_global(double delta)
   eta = alfa - one / (gamma*gamma);
   puts(" ");
   printf(" Global parameters for %ss, radiate = %s:\n\n", tmp, trad);
+  // 2015-Apr-15  15:27:15  ghislain: proposal for more elegant statement avoiding the strcopy to extra variable
+  // printf(" Global parameters for %ss, radiate = %s:\n\n", tmp, rad ? "true" : "false"); 
   printf(v_format(" C         %F m          f0        %F MHz\n"),circ, freq0);
   printf(v_format(" T0        %F musecs     alfa      %F \n"), t0, alfa);
   printf(v_format(" eta       %F            gamma(tr) %F \n"), eta, gamtr);

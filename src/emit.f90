@@ -1,5 +1,5 @@
-subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v,       &
-     nemit_v, bmax, gmax, dismax, tunes, sig_v, pdamp, updatebeam)
+subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
+                bmax, gmax, dismax, tunes, sig_v, pdamp, updatebeam)
   use bbfi
   use twiss0fi
   use emitfi
@@ -46,18 +46,17 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v,       &
   parameter (zero = 0.0d0, one = 1.d0, three = 3.0d0)
 
   twopi = get_variable('twopi ')
-  do i = 1, 6
-     orbit(i) = orbit0(i)
-     disp(i) = disp0(i)
-  enddo
-  call dzero(emit_v, 3)
-  call dzero(nemit_v, 3)
-  call dzero(bmax, 9)
-  call dzero(gmax, 9)
-  call dzero(dismax, 4)
-  call dzero(tunes, 3)
-  call dzero(sig_v, 4)
-  call dzero(pdamp, 3)
+
+  ORBIT = ORBIT0
+  DISP = DISP0
+  EMIT_V = zero
+  NEMIT_V = zero
+  BMAX  = zero
+  GMAX  = zero
+  DISMAX = zero
+  TUNES = zero
+  SIG_V = zero
+  PDAMP = zero
   u0 = zero
 
   !---- Find eigenvectors at initial position.
@@ -114,6 +113,7 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v,       &
   bbd_flag=1
 
   i = restart_sequ()
+
 10 continue
   bbd_pos=i
   code = node_value('mad8_type ')
