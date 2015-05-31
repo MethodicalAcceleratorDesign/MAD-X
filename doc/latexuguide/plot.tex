@@ -110,7 +110,7 @@ where the parameters have the following meaning:
      For all other variables splines are used to smooth
      the curves. \\ 
      {\bf Note} that setting this option is ineffective if the {\tt INTERPOLATE}
-     option of the \hyperref[sec:setopt]{\tt SETOPT} command has been set to 
+     option of the \hyperref[sec:setplot]{\tt SETPLOT} command has been set to 
      true; in this case all plots will be interpolated. \\
      {\bf Note} also that because the {\tt INTERPOLATE} option causes {\tt 
      TWISS} to be called internally with a range, any range that might have 
@@ -121,20 +121,20 @@ where the parameters have the following meaning:
 
    \ttitem{ZERO\_SUPPR} To be documented (default = false)
 
-   \ttitem{NOVERSION} logical, default=false. If noversion=true, the
+   \ttitem{NOVERSION} logical, default=false. If {\tt NOVERSION=true}, the
      information concerning the version of \madx and the date of the run
      are suppressed from the title.  
      This option frees additional space available for the user specified
      title of the plot.  
 
-   \ttitem{NOLINE} logical, default=false. If s is the horizontal
+   \ttitem{NOLINE} logical, default=false. If {\tt s} is the horizontal
      variable, then a symbolic representation of the beamline is plotted
      above the plot, except for tables that have been read back into \madx. 
      In case the horizontal scale is too large and the density of
      beamline elements is too high, this may result in hardly legible
-     representation and a thick black block in teh worst case. 
-     The "noline" option suppresses this symbolic representation of the
-     beamline. 
+     representation and a thick black block in the worst case. 
+     The {\tt NOLINE=true} option suppresses this symbolic representation 
+     of the beamline. 
 
    \ttitem{NOTITLE} logical, default=false. If true, suppresses the title
      line, including the information on the version and date.  
@@ -268,19 +268,18 @@ where the parameters have the following meaning:
    \ttitem{SSCALE} curve symbol (see above) scale factor, default=1.  
    \ttitem{RSCALE} axis text character height scale factor, default=1.  
 
-   \ttitem{INTERPOLATE} logical, default=false. The data points are
-     normally connected by straight lines; if "interpolate" is
+   \ttitem{INTERPOLATE} (default=false) The data points are
+     normally connected by straight lines; if {\tt INTERPOLATE} is
      specified, the following on-momentum Twiss parameters are
      interpolated with calls to the Twiss module inside 
      each element:  beta, sqrt(beta), alfa, phase advance, orbit, angle,
      dispersion and its first derivative, for both planes. \\ 
      For all other variables splines are used to smooth the curves. \\  
-     Note that if the interpolate option is set to true by \texttt{SETOPT},
-     subsequent plots use interpolation, irrespective of the
-     setting of the option in the \texttt{PLOT} commands. If the interpolate
-     option is set to false in \texttt{SETOPT} (default), the interpolate
-     option of subsequent \texttt{PLOT} command is respected.
-
+     Note that if {\tt INTERPOLATE=true}, all subsequent {\tt PLOT} 
+     commands use interpolation, irrespective of the setting of their 
+     {\tt INTERPOLATE} attribute; 
+     If {\tt INTERPOLATE=false} (default), all subsequent {\tt PLOT} 
+     commands respect the setting of their {\tt INTERPOLATE} attribute.
 \end{madlist}
 
 
