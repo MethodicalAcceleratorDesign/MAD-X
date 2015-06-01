@@ -856,7 +856,7 @@ static element* new_element(const char* el_type, const char* el_name,
 static element* new_marker_element(const char* el_type,const char* el_name,const element* thick_el)
 {
   const char *ParList[] = { 
-    "at","kmax","kmin","polarity","calib","type","apertype","aper_tol","mech_sep","v_pos","from"
+    "at","kmax","kmin","polarity","calib","type","apertype","aperture","aper_tol","mech_sep","v_pos","from"
   };
 
   return new_element(el_type, el_name, ARRSIZE(ParList), ParList, thick_el);
@@ -1819,7 +1819,7 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el, const bool MakeDip
         if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " in " << rbend_el-> name << " has expression, use this " << parnam  << EOL;
         add_cmd_parameter_clone(sbend_cmd, return_param_recurse(parnam,rbend_el),parnam,1);
       }
-      else if( string(parnam) == string("aperture") || string(parnam) == string("apertype") ) // check also aperture and apertype
+      else if( !strcmp(parnam,"aperture") || !strcmp(parnam,"apertype") ) // check also aperture and apertype
       {
         if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " parnam " << parnam << " cmdi->expr=" << cmdi->expr << " cmdi " << my_dump_command_parameter(cmdi) << EOL;
         add_cmd_parameter_clone(sbend_cmd,return_param_recurse(parnam,rbend_el),parnam,1);
@@ -2617,7 +2617,7 @@ void SeqElList::slice_node() // this decides how to split an individual node and
         "marker", "instrument", "placeholder", "hmonitor", "vmonitor", "monitor", "vkicker", "hkicker", "kicker", "tkicker", "rfcavity", "crabcavity"
       };
       static const char* name_elist2[] = {
-        "rbend", "sbend", "quadrupole", "sextupole", "octupole", "solenoid", "multipole", "rcollimator", "ecollimator", "elseparator"
+        "rbend", "sbend", "quadrupole", "sextupole", "octupole", "solenoid", "multipole", "rcollimator", "ecollimator", "collimator", "elseparator"
       };
 
       if (NameIsInList(thick_node->base_name, ARRSIZE(name_elist1), name_elist1))
