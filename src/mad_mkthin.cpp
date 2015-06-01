@@ -2050,10 +2050,10 @@ element* SeqElList::create_sliced_magnet(const element* thick_elem, int slice_no
   kparam[2]    = (p=return_param_recurse("k2",thick_elem)) ? clone_command_parameter(p) : 0;
   kparam[3]    = (p=return_param_recurse("k3",thick_elem)) ? clone_command_parameter(p) : 0;
   command_parameter* ksparam[4];
-  ksparam[0]   = (p=return_param_recurse("ks0",thick_elem)) ? clone_command_parameter(p) : 0;
-  ksparam[1]   = (p=return_param_recurse("ks1",thick_elem)) ? clone_command_parameter(p) : 0;
-  ksparam[2]   = (p=return_param_recurse("ks2",thick_elem)) ? clone_command_parameter(p) : 0;
-  ksparam[3]   = (p=return_param_recurse("ks3",thick_elem)) ? clone_command_parameter(p) : 0;
+  ksparam[0]   = (p=return_param_recurse("k0s",thick_elem)) ? clone_command_parameter(p) : 0;
+  ksparam[1]   = (p=return_param_recurse("k1s",thick_elem)) ? clone_command_parameter(p) : 0;
+  ksparam[2]   = (p=return_param_recurse("k2s",thick_elem)) ? clone_command_parameter(p) : 0;
+  ksparam[3]   = (p=return_param_recurse("k3s",thick_elem)) ? clone_command_parameter(p) : 0;
   command_parameter* kn_param = return_param_recurse("knl",thick_elem);
   command_parameter* ks_param = return_param_recurse("ksl",thick_elem);
 
@@ -2640,7 +2640,8 @@ void SeqElList::slice_node() // this decides how to split an individual node and
       else if (strcmp(thick_node->base_name,"drift") == 0) ; // do nothing for drift
       else // new elements not yet implemented for slicing - write a message and do a reasonable default action
       {
-        fprintf(prt_file, "Found unknown basename %s, place copy with length set to zero.\n",thick_node->base_name);
+        warningnew("Element not yet supported for slicing", "copy type '%s' with length set to zero.\n",thick_node->base_name);
+//        fprintf(prt_file, "Element not yet supported for slicing, copy type '%s' with length set to zero.\n",thick_node->base_name);
         add_node_at_end_of_sequence(copy_thin(thick_node),sliced_seq);
       }
     }
