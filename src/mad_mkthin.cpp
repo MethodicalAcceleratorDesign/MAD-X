@@ -856,7 +856,7 @@ static element* new_element(const char* el_type, const char* el_name,
 static element* new_marker_element(const char* el_type,const char* el_name,const element* thick_el)
 {
   const char *ParList[] = { 
-    "at","kmax","kmin","polarity","calib","type","apertype","aperture","aper_tol","mech_sep","mech_sep","v_pos","from"
+    "at","kmax","kmin","polarity","calib","type","apertype","aper_tol","mech_sep","v_pos","from"
   };
 
   return new_element(el_type, el_name, ARRSIZE(ParList), ParList, thick_el);
