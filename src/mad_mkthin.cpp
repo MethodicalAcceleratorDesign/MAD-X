@@ -984,7 +984,8 @@ static element* create_bend_dipedge_element2(element* thick_elem,const bool Entr
   if(verbose_fl()) verbose=2;
   */
 
-  //-- parameters which can directly be copied from bend to dipedge if value different from default. Instead e1, e2, fint, fintx, h1, h2 need extra work
+  //-- parameters which can directly be copied from bend to dipedge if value different from default.
+  //-- NOTE from LD: "Instead e1, e2, fint, fintx, h1, h2 need extra work" no they don't, now kill_..._fringe is used to activate or cancel fringe field
 
   element* dipedge=NULL;
 
@@ -2384,9 +2385,9 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
 //    if((fabs(cmd_par_val(e1param))>eps) || (fabs(cmd_par_val(h1param))>eps) || (fabs(cmd_par_val(fintparam))>eps)) // has entrance fringe fields
     if (command_par_value("kill_ent_fringe",thick_elem->def) == false)
     {
-
-      EntryDipedge=create_bend_dipedge_element2(thick_elem,true); // new verion not yet fully implemented
-      if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " after create_bend_dipedge_element2 now EntryDipedge=" << EntryDipedge << " " << my_dump_element(EntryDipedge) << EOL;
+// NOTE: one of the two create_bend_dipedge_element below should not be there...
+//      EntryDipedge=create_bend_dipedge_element2(thick_elem,true); // new verion not yet fully implemented
+//      if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " after create_bend_dipedge_element2 now EntryDipedge=" << EntryDipedge << " " << my_dump_element(EntryDipedge) << EOL;
 
       EntryDipedge=create_bend_dipedge_element(thick_elem,true); // make new StartEdge element and remove e1 from thick_elem
       theBendEdgeList->put_slice(thick_elem,EntryDipedge);       // to remember this has been translated
