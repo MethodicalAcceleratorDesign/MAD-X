@@ -3531,6 +3531,36 @@ subroutine trbegn(rt,eigen)
      endif
   endif
 end subroutine trbegn
+subroutine ttdpdg_map(track, ktrack, e1, h, hgap, fint, tilt)
+
+  implicit none
+
+  !----------------------------------------------------------------------*
+  ! Purpose: computes the effect of the dipole edge                      *
+  ! Input/Output:  ktrack , number of surviving trajectories             *
+  !                 track , trajectory coordinates                       *
+  !----------------------------------------------------------------------*
+  integer ktrack,itrack
+  double precision fint,e1,h,hgap,corr,tilt,ek(6),rw(6,6),tw(6,6,6),track(6,*),&
+       node_value
+
+  call dzero(ek,6)
+  call m66one(rw)
+  call dzero(tw, 216)
+
+  corr = (h + h) * hgap * fint
+  !          print*,"------------------------------------------ "
+  !---- Fringe fields effects computed from the TWISS routine tmfrng
+  !     tmfrng returns the matrix elements rw(used) and tw(unused)
+  !     No radiation effects as it is a pure thin lens with no lrad
+  call tmfrng(.false.,h,0d0,e1,0d0,0d0,corr,rw,tw)
+  call tmtilt(.false.,tilt,ek,rw,tw)
+  do itrack = 1, ktrack
+     track(2,itrack) = track(2,itrack) + rw(2,1)*track(1,itrack)
+     track(4,itrack) = track(4,itrack) + rw(4,3)*track(3,itrack)
+  enddo
+  return
+end subroutine ttdpdg_map
 subroutine ttdpdg(track, ktrack)
 
   implicit none
@@ -3553,20 +3583,10 @@ subroutine ttdpdg(track, ktrack)
   hgap = node_value('hgap ')
   fint = node_value('fint ')
   tilt = node_value('tilt ')
-  corr = (h + h) * hgap * fint
-  !          print*,"------------------------------------------ "
-  !---- Fringe fields effects computed from the TWISS routine tmfrng
-  !     tmfrng returns the matrix elements rw(used) and tw(unused)
-  !     No radiation effects as it is a pure thin lens with no lrad
-  call tmfrng(.false.,h,0d0,e1,0d0,0d0,corr,rw,tw)
-  call tmtilt(.false.,tilt,ek,rw,tw)
-  do itrack = 1, ktrack
-     track(2,itrack) = track(2,itrack) + rw(2,1)*track(1,itrack)
-     track(4,itrack) = track(4,itrack) + rw(4,3)*track(3,itrack)
-  enddo
-  return
-end subroutine ttdpdg
 
+  call ttdpdg_map(track, ktrack, e1, h, hgap, fint, tilt);
+
+end subroutine ttdpdg
 subroutine trsol(track,ktrack)
 
   implicit none
@@ -5024,8 +5044,33 @@ subroutine tttdipole(track, ktrack)
   double precision delta_plus_1, delta_plus_1_sqr, sqrt_delta_plus_1
   double precision sqrt_h_sqrt_k0, sqrt_h_div_sqrt_k0, sqrt_k0_div_sqrt_h
   double precision C, S, C_sqr
+  double precision gamma, hx, hy, get_value, rfac
+
   double precision bet0sqr
-  integer jtrk
+  integer jtrk, get_option, optiondebug
+  logical kill_ent_fringe, kill_exi_fringe
+
+  !---- Read-in dipole edges angles
+
+  double precision e1, e2, h1, h2, hgap, fint
+  optiondebug = get_option('debug ')
+  e1 = node_value('e1 ');
+  e2 = node_value('e2 ');
+  h1 = node_value('h1 ')
+  h2 = node_value('h2 ')
+  hgap = node_value('hgap ')
+  fint = node_value('fint ')
+  kill_ent_fringe = node_value('kill_ent_fringe ') .ne. 0d0
+  kill_exi_fringe = node_value('kill_exi_fringe ') .ne. 0d0
+  arad = get_value('probe ','arad ')
+  gamma = get_value('probe ','gamma ')
+  dorad = get_value('probe ','radiate ') .ne. 0d0
+
+  !---- Apply entrance dipole edge effect
+
+  if (.not.kill_ent_fringe) then
+     call ttdpdg_map(track, ktrack, e1, h1, hgap, fint, 0d0)
+  endif
   
   !---- Read-in the parameters
   bet0sqr = bet0*bet0;
@@ -5034,7 +5079,7 @@ subroutine tttdipole(track, ktrack)
   rho = abs(L/angle);
   h = angle/L;
   k0 = h;
-
+  
   !---- Prepare to calculate the kick and the matrix elements
   do jtrk = 1,ktrack
      !---- The particle position
@@ -5045,13 +5090,17 @@ subroutine tttdipole(track, ktrack)
      z  = track(5,jtrk);
      pt = track(6,jtrk);
   
-!!$    !---- Radiation effects at entrance.
-!!$    if (dorad  .and.  elrad .ne. 0d0) then
-!!$      rfac = arad * gammas**3 * (dpx**2+dpy**2) / (3d0*elrad)
-!!$      track(2,jtrk) = track(2,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(2,jtrk)
-!!$      track(4,jtrk) = track(4,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(4,jtrk)
-!!$      track(6,jtrk) = track(6,jtrk) - rfac * (1d0 + track(6,jtrk)) ** 2
-!!$    endif
+     !---- Radiation effects at entrance.
+     if (dorad) then
+        delta_plus_1_sqr = pt*pt+2d0*pt/bet0+1d0;
+        delta_plus_1 = sqrt(delta_plus_1_sqr);
+        hx = 1d0/(rho*delta_plus_1);
+        hy = 0d0;
+        rfac = (arad * gamma**3 * L / 3d0) * (hx**2 + hy**2) * (1d0 + h*x) * (1d0 - tan(e1)*x)
+        px = px - rfac * (1d0 + pt) * px
+        py = py - rfac * (1d0 + pt) * py
+        pt = pt - rfac * (1d0 + pt) ** 2
+     endif
 
      delta_plus_1_sqr = pt*pt+2.0*pt/bet0+1;
      delta_plus_1 = sqrt(delta_plus_1_sqr);
@@ -5098,14 +5147,20 @@ subroutine tttdipole(track, ktrack)
      track(5,jtrk) = z
      !track(6,jtrk) = pt ! unchanged
      
-!!$    !---- Radiation effects at exit.
-!!$    if (dorad  .and.  elrad .ne. 0d0) then
-!!$      track(2,jtrk) = track(2,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(2,jtrk)
-!!$      track(4,jtrk) = track(4,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(4,jtrk)
-!!$      track(6,jtrk) = track(6,jtrk) - rfac * (1d0 + track(6,jtrk)) ** 2
-!!$    endif
-     
+     !---- Radiation effects at exit.
+     if (dorad) then
+        hx = 1d0/(rho*delta_plus_1);
+        rfac = (arad * gamma**3 * L / 3d0) * (hx**2 + hy**2) * (1d0 + h*x) * (1d0 - tan(e2)*x)
+        px = px - rfac * (1d0 + pt) * px
+        py = py - rfac * (1d0 + pt) * py
+        pt = pt - rfac * (1d0 + pt) ** 2
+     endif
   enddo
+  
+  !---- Apply exit dipole edge effect
+  if (.not.kill_exi_fringe) then
+     call ttdpdg_map(track, ktrack, e2, h2, hgap, fint, 0d0)
+  endif
   
 end subroutine tttdipole
 
