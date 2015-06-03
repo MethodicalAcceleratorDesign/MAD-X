@@ -964,6 +964,7 @@ static void add_half_angle_to(const element* rbend_el,element* to_el,const char*
 static const char *CheckBendParams[] = {
     "polarity", "tilt", "hgap", "mech_sep", "v_pos", "magnet", "model", "method", "exact", "nst" };
 
+#if 0
 static element* create_bend_dipedge_element2(element* thick_elem,const bool Entry) // using Dipedge  http://mad.web.cern.ch/mad/madx.old/Introduction/dipedge.html
 {
   // see also twiss.f90    SUBROUTINE tmbend,   and  SUBROUTINE tmfrng  for fringe fields, and   SUBROUTINE tmdpdg  for dipedge
@@ -995,6 +996,7 @@ static element* create_bend_dipedge_element2(element* thick_elem,const bool Entr
   dipedge = new_element("dipedge", dipedge_name.c_str(), ARRSIZE(CheckBendParams), CheckBendParams, thick_elem);
   return dipedge;
 }
+#endif
 
 static element* create_bend_dipedge_element(element* thick_elem,const bool Entry) // using Dipedge  http://mad.web.cern.ch/mad/madx.old/Introduction/dipedge.html
 {
@@ -2385,7 +2387,7 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
 //    if((fabs(cmd_par_val(e1param))>eps) || (fabs(cmd_par_val(h1param))>eps) || (fabs(cmd_par_val(fintparam))>eps)) // has entrance fringe fields
     if (command_par_value("kill_ent_fringe",thick_elem->def) == false)
     {
-// NOTE: one of the two create_bend_dipedge_element below should not be there...
+// NOTE: one of the two create_bend_dipedge_element(2) below should not be there...
 //      EntryDipedge=create_bend_dipedge_element2(thick_elem,true); // new verion not yet fully implemented
 //      if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " after create_bend_dipedge_element2 now EntryDipedge=" << EntryDipedge << " " << my_dump_element(EntryDipedge) << EOL;
 
