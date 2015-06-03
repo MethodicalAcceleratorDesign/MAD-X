@@ -103,7 +103,7 @@ private:
   double default_at_shift(const int slices, const int slice_no);
   double at_shift(const int slices, const int slice_no,const std::string& local_slice_style); // return at relative shifts from centre of unsliced magnet
   int translate_k(command_parameter* *kparam, command_parameter* *ksparam,const command_parameter* angle_param, command_parameter* kn_param, command_parameter* ks_param);
-  element* sbend_from_rbend(const element* rbend_el,const bool MakeDipedge);
+  element* sbend_from_rbend(const element* rbend_el);
   element* create_thick_slice(element* thick_elem,const int slice_type);
   element* create_sliced_magnet(const element* thick_elem, int slice_no,bool ThickSLice);
   element* create_thin_solenoid(const element* thick_elem, int slice_no);
@@ -207,7 +207,7 @@ static double my_get_int_or_double_value(const element* el,const char* parnam,bo
       if(pl->parameters[i])
       {
         command_parameter* cp=pl->parameters[i];
-        if( string(cp->name) == string(parnam) )
+        if( !strcmp(cp->name, parnam) )
         {
           if(cp->expr)
           {
@@ -1385,7 +1385,7 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
   {
     int iMakeDipedge=pl->parameters[ipos_md]->double_value;
     if (verbose_fl()) cout << "makethin makedipedge flag ipos_md=" << ipos_md << " iMakeDipedge=" << iMakeDipedge << EOL;
-    set_option("makedipedge", &iMakeDipedge);
+    set_option("makedipedge", &iMakeDipedge); // Why does this set the global flag?
   }
 
   if (slice_select->curr > 0)
@@ -1753,10 +1753,8 @@ int SeqElList::translate_k(command_parameter* *kparam, command_parameter* *kspar
   return angle_conversion;
 }
 
-element* SeqElList::sbend_from_rbend(const element* rbend_el, const bool MakeDipedge)
+element* SeqElList::sbend_from_rbend(const element* rbend_el)
 {
-  (void)MakeDipedge; // MakeDipedge unused
-
   // go from rbend to sbend
   // just changing the base_name did not work - seems also to change all parents, even with clone
   // if done on parent, then the next child will think it is already sbend and stop conversion
@@ -1979,19 +1977,22 @@ element* SeqElList::create_thick_slice(element* thick_elem,const int slice_type)
   ParameterTurnOn("thick", sliced_elem); //-- so that thick=true is written  to signal this for thick tracking
   if (verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " done create_thick_slice slice_name=" << slice_name << " from thick element " << thick_elem->name << " n=" << n  << " : " << my_dump_element(sliced_elem) << EOL;
 
-  if(IsBend)
-  {
-    if(entry_fl) // bend entry,  remove/turn off exit parameters
-    {
-      ParameterRemove("e2"    ,sliced_elem);
-      ParameterRemove("h2"    ,sliced_elem);
-      ParameterTurnOn("fint" ,sliced_elem);
-      ParameterTurnOn("fintx",sliced_elem);
-      SetParameterValue("fintx",sliced_elem,0); // leave with value 0, otherwise taking fint
+  if(IsBend) {
+    if(entry_fl) { // bend entry,  remove/turn off exit parameters
+      ParameterRemove("e2"   ,sliced_elem);
+      ParameterRemove("h2"   ,sliced_elem);
+      SetParameterValue("kill_exi_fringe",sliced_elem,true,k_logical);
+      ParameterTurnOn("kill_exi_fringe"  ,sliced_elem); // turn writing on
     }
-    else if(exit_fl) // bend exit, remove entry parameters
-    {
-      ParameterRemove("e1", sliced_elem);
+    else if(exit_fl) { // bend exit, remove entry parameters
+      ParameterRemove("e1",sliced_elem);
+      ParameterRemove("h1",sliced_elem);
+      SetParameterValue("kill_ent_fringe",sliced_elem,true,k_logical);
+      ParameterTurnOn("kill_ent_fringe"  ,sliced_elem); // turn writing on
+    }
+#if 0
+    else if (exit_fl) {
+      ParameterRemove("e1",sliced_elem);
       int i_fint = name_list_pos("fint", sliced_elem->def->par_names);
       const bool fint_on =  (i_fint > -1) && sliced_elem->def->par_names->inform[i_fint];
       int i_fintx = name_list_pos("fintx", sliced_elem->def->par_names);
@@ -2009,8 +2010,8 @@ element* SeqElList::create_thick_slice(element* thick_elem,const int slice_type)
         }
         ParameterRemove("fint",sliced_elem); // remove fint on exit
       }
-      ParameterRemove("h1",sliced_elem);
     }
+#endif
     else Remove_All_Fringe_Field_Parameters(sliced_elem); // thick magnet body, remove fringe fields
   }
   if (verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ <<  my_dump_element(sliced_elem) << EOL;
@@ -2318,7 +2319,7 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
 
   if(strcmp(thick_node->base_name, "rbend") == 0 && nslices>0 ) // rbend translation to sbend
   {
-    thick_elem=sbend_from_rbend(thick_elem,MakeDipedge); // translate any rbend to sbend right away --  then no need to deal any more with rbend in rest of makethin
+    thick_elem=sbend_from_rbend(thick_elem); // translate any rbend to sbend right away --  then no need to deal any more with rbend in rest of makethin
     thick_node->p_elem=thick_elem;
     thick_node->base_name=permbuff("sbend");
   } // done with any rbend, for the rest all bends will be sbend
@@ -2376,10 +2377,12 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
   if( IsBend && MakeDipedge && EntryDipedge==NULL) // create new EntryDipedge for this bend
   { // first look if e1 or h1 are there
     const command_parameter   *e1param = return_param("e1"  ,(const element*) thick_elem);
-    const command_parameter   *h1param = return_param("h1"  ,(const element*) thick_elem);
-    const command_parameter *fintparam = return_param("fint",(const element*) thick_elem);
+//    const command_parameter   *h1param = return_param("h1"  ,(const element*) thick_elem);
+//    const command_parameter *fintparam = return_param("fint",(const element*) thick_elem);
     if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " e1param=" << e1param << " cmd_par_val(e1param)=" << cmd_par_val(e1param) << EOL;
-    if((fabs(cmd_par_val(e1param))>eps) || (fabs(cmd_par_val(h1param))>eps) || (fabs(cmd_par_val(fintparam))>eps)) // has entrance fringe fields
+
+//    if((fabs(cmd_par_val(e1param))>eps) || (fabs(cmd_par_val(h1param))>eps) || (fabs(cmd_par_val(fintparam))>eps)) // has entrance fringe fields
+    if (command_par_value("kill_ent_fringe",thick_elem->def) == false)
     {
 
       EntryDipedge=create_bend_dipedge_element2(thick_elem,true); // new verion not yet fully implemented
@@ -2393,12 +2396,14 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
 
   if( IsBend && MakeDipedge && ExitDipedge==NULL) // create new ExitDipedge for this bend
   { // first look if e2 or h2 are there
-    const command_parameter *e2param    = return_param("e2",(const element*) thick_elem);
-    const command_parameter *h2param    = return_param("h2",(const element*) thick_elem);
-    const command_parameter *fintparam  = return_param("fint",(const element*) thick_elem);
-    const command_parameter *fintxparam = return_param("fintx",(const element*) thick_elem);
-    if((fabs(cmd_par_val(e2param))>eps) || (fabs(cmd_par_val(h2param))>eps) || (fabs(cmd_par_val(fintparam))>eps) || (cmd_par_val(fintxparam)>eps))  // has exit fringe fields
-    {
+//    const command_parameter *e2param    = return_param("e2",(const element*) thick_elem);
+//    const command_parameter *h2param    = return_param("h2",(const element*) thick_elem);
+//    const command_parameter *fintparam  = return_param("fint",(const element*) thick_elem);
+//    const command_parameter *fintxparam = return_param("fintx",(const element*) thick_elem);
+
+//    if((fabs(cmd_par_val(e2param))>eps) || (fabs(cmd_par_val(h2param))>eps) || (fabs(cmd_par_val(fintparam))>eps) || (cmd_par_val(fintxparam)>eps))  // has exit fringe fields
+   if (command_par_value("kill_exi_fringe",thick_elem->def) == false)
+   {
       ExitDipedge=create_bend_dipedge_element(thick_elem,false); // make new ExitDipedge element and remove e2 from thick_elem
       theBendEdgeList->put_slice(thick_elem,ExitDipedge);   // to remember this has been translated
       if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " now  ExitDipedge=" << EntryDipedge << " " << my_dump_element(ExitDipedge) << EOL;
