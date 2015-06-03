@@ -1,5 +1,4 @@
 * text=auto !eol
-/.htaccess -text
 /CMakeLists.txt -text
 /CTestConfig.cmake -text
 /License.txt -text
