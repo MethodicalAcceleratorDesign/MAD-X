@@ -1,7 +1,7 @@
 #include "madx.h"
 
 static int
-find_index_in_table(char *cols[], const char *name )
+find_index_in_table(const char * const cols[], const char *name )
 {
   for (int i = 0; strcmp(cols[i], " "); i++)
     if (string_icmp(cols[i], name) == 0)

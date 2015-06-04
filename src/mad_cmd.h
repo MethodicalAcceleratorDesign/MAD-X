@@ -50,7 +50,7 @@ struct command_list* new_command_list(const char* l_name, int length);
 struct command_list* delete_command_list(struct command_list* cl);
 struct command_list* find_command_list(const char* name, struct command_list_list*);
 void                 grow_command_list(struct command_list*);
-void                 add_to_command_list(char* label, struct command*, struct command_list*, int flag);
+void                 add_to_command_list(const char* label, struct command*, struct command_list*, int flag);
 
 struct command_list_list* new_command_list_list(int length);
 //struct command_list_list* delete_command_list_list(struct command_list_list*); // never used...

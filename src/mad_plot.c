@@ -2,7 +2,7 @@
 
 
 static void
-gnuplot_append(char *gplfilename, char *psfilename)
+gnuplot_append(const char *gplfilename, char *psfilename)
 /* Append the gnuplot ps file to the main ps file */
 {
   char line[1000];
@@ -129,12 +129,13 @@ exec_plot(struct in_cmd* cmd)
   int part_idx[100], curr, track_cols_length, haxis_idx = 0, vaxis_idx = 0;
   int size_plot_title = tsm1, size_version = tsm1;
   int *title_length = &size_plot_title, *version_length = &size_version;
-  char* pt = title, *haxis_name = NULL, *vaxis_name = NULL, *file_name = NULL;
+  char* pt = title, *haxis_name = NULL, *vaxis_name = NULL;
   char* particle_list;
   struct name_list* nl_plot = NULL;
   struct command_parameter_list* pl_plot = NULL;
   struct table* p_table = NULL;
-  char *table_name, *last_twiss_table, *trackfile;
+  const char *table_name = NULL, *file_name = NULL;
+  char *last_twiss_table, *trackfile;
   char track_file_name[NAME_L], ps_file_name[NAME_L];
   char plot_title[TITLE_SIZE], version[TITLE_SIZE];
   FILE *gpu;

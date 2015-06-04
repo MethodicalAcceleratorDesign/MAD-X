@@ -1079,7 +1079,7 @@ next_vary(char* name, int* name_l, double* lower, double* upper, double* step, i
 {
   int i, pos, ncp, nbl, len;
   double l_step;
-  char* v_name;
+  const char* v_name;
   struct name_list* nl;
   struct command* comm;
   struct command_parameter_list* pl;

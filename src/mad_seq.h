@@ -84,7 +84,7 @@ void    reset_errors(struct sequence*);
 void    reset_sector(struct sequence*, int val);
 int     restart_sequ(void);
 void    seq_edit_main(struct in_cmd*);
-int     set_enable(char* type, struct in_cmd*);
+int     set_enable(const char* type, struct in_cmd*);
 void    set_sequence(char* name);
 int     set_cont_sequence(void);
 int     sequ_check_valid_twiss(struct sequence*);

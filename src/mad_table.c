@@ -521,7 +521,7 @@ set_selected_rows(struct table* t, struct command_list* select, struct command_l
 // public interface
 
 struct table*
-new_table(char* name, char* type, int rows, struct name_list* cols)
+new_table(const char* name, const char* type, int rows, struct name_list* cols)
 {
   const char *rout_name = "new_table";
   int i, n = cols->curr;
@@ -776,7 +776,7 @@ table_get_header(char* table_name)
 }
 
 void
-augment_count(char* table) /* increase table occ. by 1, fill missing */
+augment_count(const char* table) /* increase table occ. by 1, fill missing */
 {
   int pos;
   struct table* t;
@@ -803,7 +803,7 @@ augment_count(char* table) /* increase table occ. by 1, fill missing */
 }
 
 void
-augmentcountonly(char* table) /* increase table occ. by 1 */
+augmentcountonly(const char* table) /* increase table occ. by 1 */
 {
   int pos;
   struct table* t;
@@ -1067,7 +1067,6 @@ print_table(struct table* t)
 void
 make_map_table(int* map_table_max_rows)
 {
-
   assert(map_table_max_rows);
   assert(table_register->names);
   
@@ -1093,7 +1092,7 @@ make_map_table(int* map_table_max_rows)
 }
 
 struct table*
-make_table(char* name, char* type, char** table_cols, int* table_types, int rows)
+make_table(const char* name, const char* type, const char* const* table_cols, const int* table_types, int rows)
 {
   struct table* t;
   struct name_list *cols;
@@ -1115,7 +1114,7 @@ make_table(char* name, char* type, char** table_cols, int* table_types, int rows
 }
 
 void
-reset_count(char* table) /* resets table counter to zero */
+reset_count(const char* table) /* resets table counter to zero */
 {
   int pos;
   struct table* t;
@@ -1177,7 +1176,7 @@ sector_out(char* sector_table_name, double* pos, double* kick, double* rmatrix, 
 }
 
 void
-out_table(char* tname, struct table* t, char* filename)
+out_table(const char* tname, struct table* t, char* filename)
   /* output of a table */
 {
   struct command_list* scl = find_command_list(tname, table_select);

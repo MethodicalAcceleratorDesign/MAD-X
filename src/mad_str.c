@@ -30,7 +30,7 @@ mycpy(char* out, const char* in)
 }
 
 char*
-mystrstr(char* string, char* s)
+mystrstr(char* string, const char* s)
   /* returns strstr for s, but only outside strings included
      in single or double quotes */
 {
@@ -54,7 +54,7 @@ mystrstr(char* string, char* s)
 }
 
 void
-myrepl(char* in, char* out, char* string_in, char* string_out)
+myrepl(const char* in, const char* out, char* string_in, char* string_out)
   /* replaces all occurrences of "in" in string_in by "out"
      in output string string_out */
 {

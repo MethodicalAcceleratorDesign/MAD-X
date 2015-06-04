@@ -282,8 +282,8 @@ pro_ptc_twiss(void)
   struct int_array* summary_tarr; /* to pass summary-table name to Fortran */
   struct node *nodes[2], *use_range[2];
   double ptc_deltap;
-  char *filename = NULL, *table_name;
-  char *summary_filename = NULL, *summary_table_name; /* for summary table */
+  const char *table_name = NULL, *summary_table_name = NULL;
+  char *filename = NULL, *summary_filename = NULL; /* for summary table */
   int j,l ,pos, w_file,beta_def;
   int w_file_summary; /* toggle to write the summary table into a file */
   /*

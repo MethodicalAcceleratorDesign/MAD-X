@@ -57,8 +57,8 @@ struct table_list_list
 
 // interface
 
-struct table*           make_table(char* name, char* type, char** table_cols, int* table_types, int rows);
-struct table*           new_table(char* name, char* type, int rows, struct name_list* cols);
+struct table*           make_table(const char* name, const char* type, const char* const *table_cols, const int* table_types, int rows);
+struct table*           new_table(const char* name, const char* type, int rows, struct name_list* cols);
 struct table_list*      new_table_list(int size);
 struct table_list_list* new_table_list_list(int size);
 struct table*           delete_table(struct table*);
@@ -76,8 +76,8 @@ void    grow_table(struct table*); /* doubles number of rows */
 void    print_table(struct table*);
 void    make_map_table(int* map_table_max_rows);
 int     get_table_range(char* range, struct table*, int* rows);
-void    out_table(char* tname, struct table*, char* filename);
-void    reset_count(char* table); /* resets table counter to zero */
+void    out_table(const char* tname, struct table*, char* filename);
+void    reset_count(const char* table); /* resets table counter to zero */
 void    sector_out(char* sector_table_name, double* pos, double* kick, double* rmatrix, double* tmatrix);
 void    table_range(char* table, char* range, int* rows);
 
@@ -85,8 +85,8 @@ void    rename_table(struct table *tbl, const char *name );
 int     remove_table_from_table_list(const char *name, struct table_list* tl);
 struct table *detach_table_from_table_list(const char *name, struct table_list* tl);
 
-void    augment_count(char* table);
-void    augmentcountonly(char* table);
+void    augment_count(const char* table);
+void    augmentcountonly(const char* table);
 
 //int     str_from_table     (const char* table, const char* name, int* row, char* val);
 //int     str_from_tablet    (struct table *tbl, const char* name, int* row, char* val);

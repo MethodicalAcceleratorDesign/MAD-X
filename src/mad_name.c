@@ -26,7 +26,7 @@ clone_name_list(struct name_list* p)
 }
 
 struct name_list*
-new_name_list(char* list_name, int length)
+new_name_list(const char* list_name, int length)
 {
   const char *rout_name = "new_name_list";
   struct name_list* il = mycalloc(rout_name, 1, sizeof *il);

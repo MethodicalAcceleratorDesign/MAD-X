@@ -52,7 +52,7 @@ get_bracket_t_range(char* toks[], char lb, char rb, int start, int end, int* rs,
 }
 
 void
-remove_range(char* string, char* s1, char* s2)
+remove_range(char* string, const char* s1, const char* s2)
   /* remove portion s1...s2 (included) in string */
 {
   char* ps1 = strstr(string, s1);
@@ -66,7 +66,7 @@ remove_range(char* string, char* s1, char* s2)
 }
 
 void
-remove_upto(char* string, char* s1)
+remove_upto(char* string, const char* s1)
   /* removes portion from start up to s2 (included) in string */
 {
   char* ps1 = strstr(string, s1);

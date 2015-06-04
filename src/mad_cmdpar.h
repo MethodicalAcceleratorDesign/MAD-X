@@ -63,7 +63,7 @@ struct double_array* command_par_array(const char* parameter, struct command*);
 int     command_par_vector(const char* parameter, struct command*, double* vector);
 void    set_command_par_value(const char* parameter, struct command*, double val);
 void    store_comm_par_value(const char* parameter, double val, struct command*);
-char*   alias(char* par_string);
+const char*   alias(char* par_string);
 void    fill_par_var_list(struct el_list*, struct command_parameter*, struct var_list*);
 int     decode_par(struct in_cmd* cmd, int start, int number, int pos, int log);
 void    store_set(struct command*, int flag);
@@ -71,12 +71,12 @@ void    dump_command_parameter(struct command_parameter*);
 void    export_comm_par(struct command_parameter*, char* string);
 void    grow_command_parameter_list(struct command_parameter_list*);
 void    print_command_parameter(struct command_parameter*);
-int     par_present(char* par, struct command*, struct command_list*);
+int     par_present(const char* par, struct command*, struct command_list*);
 void    store_comm_par_vector(const char* parameter, double* val, struct command*);
 void    add_cmd_parameter_clone(struct command*, const struct command_parameter*, const char* par_name, int inf);
 void    add_cmd_parameter_new(struct command*,double par_value, const char* par_name, int inf);
-void    comm_para(char* name, int* n_int, int* n_double, int* n_string, int* int_array, double* double_array, char* strings, int* string_lengths);
-int     log_val(char* name, struct command*);
+void    comm_para(const char* name, int* n_int, int* n_double, int* n_string, int* int_array, double* double_array, char* strings, int* string_lengths);
+int     log_val(const char* name, struct command*);
 
 // void    set_command_par_string(char* parameter, struct command*, char* val); // not used...
 

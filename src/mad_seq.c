@@ -2017,7 +2017,7 @@ seq_edit_main(struct in_cmd* cmd)
 }
 
 int
-set_enable(char* type, struct in_cmd* cmd)
+set_enable(const char* type, struct in_cmd* cmd)
 {
   char* name;
   struct command_parameter* cp;

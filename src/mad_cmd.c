@@ -695,7 +695,7 @@ store_command_def(char* cmd_string)  /* processes command definition */
 }
 
 void
-add_to_command_list(char* label, struct command* comm, struct command_list* cl, int flag)
+add_to_command_list(const char* label, struct command* comm, struct command_list* cl, int flag)
   /* adds command comm to the command list cl */
   /* flag for printing a warning */
 {

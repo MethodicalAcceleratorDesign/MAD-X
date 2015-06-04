@@ -50,7 +50,7 @@ clone_command_parameter(const struct command_parameter* p)
       clone->expr = clone_expression(p->expr);
       break;
     case 3:
-      clone->string = p->string;
+      clone->string = permbuff(p->string);
       clone->expr = NULL;
       break;
     case 11:
@@ -648,7 +648,7 @@ fill_par_var_list(struct el_list* ell, struct command_parameter* par, struct var
 }
 
 int
-par_present(char* par, struct command* cmd, struct command_list* c_list)
+par_present(const char* par, struct command* cmd, struct command_list* c_list)
   /* returns 1 if in cmd or in c_list par is read, else returns 0 */
 {
   struct name_list* nl;
@@ -672,7 +672,7 @@ par_present(char* par, struct command* cmd, struct command_list* c_list)
 }
 
 void
-comm_para(char* name, int* n_int, int* n_double, int* n_string, int* int_array, double* double_array, char* strings, int* string_lengths)
+comm_para(const char* name, int* n_int, int* n_double, int* n_string, int* int_array, double* double_array, char* strings, int* string_lengths)
   /* returns the value for command parameter "name" being either
      one or several integers (including logicals),
      one or several doubles,
@@ -1028,7 +1028,7 @@ decode_par(struct in_cmd* cmd, int start, int number, int pos, int log)
   return tot_end;
 }
 
-char*
+const char*
 alias(char* par_string) /* returns main parameter for alias */
 {
   if (strcmp(par_string, "filename") == 0)  return file_string;
@@ -1038,7 +1038,7 @@ alias(char* par_string) /* returns main parameter for alias */
 }
 
 int
-log_val(char* name, struct command* cmd)
+log_val(const char* name, struct command* cmd)
   /* returns 0 = false, 1 = true for a logical command parameter */
 {
   struct name_list* nl = cmd->par_names;

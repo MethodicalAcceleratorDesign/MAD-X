@@ -269,7 +269,7 @@ exec_create_table(struct in_cmd* cmd)
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
   struct char_p_array* m;
-  char** t_c;
+  const char**t_c;
   int j, pos = name_list_pos("table", nl);
   char* name = NULL;
   int  ncols = 0;  /*number of columns*/

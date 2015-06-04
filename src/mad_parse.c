@@ -1,7 +1,7 @@
 #include "madx.h"
 
 static int
-v_length(char* form)
+v_length(const char* form)
 {
   int ret = 0;
   if      (form[1] == 'I') sscanf(int_format, "%d", &ret);
@@ -44,14 +44,14 @@ get_val_num(char* in_string, int start, int end)
 // public interface
 
 char*
-v_format(char* string)
+v_format(const char* string)
   /* copies string to gloval variable var_form
      replacing  %S, %I, and %F by the user defined formats;
      %NF and %NI are replaced by the field lengths (!) of the defined formats */
 {
   static char var_form[1000];
 
-  char *p, *q = string, *s = string, *t;
+  const char *p, *q = string, *s = string, *t;
   char c;
   *var_form = '\0';
   while ((p = strpbrk(s, "NIFS")))

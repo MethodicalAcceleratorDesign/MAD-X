@@ -8,7 +8,7 @@
 #endif
 
 void
-time_stamp(char* place)
+time_stamp(const char* place)
 {
   time_t now;
   int k, l;

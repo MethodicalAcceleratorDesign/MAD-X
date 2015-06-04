@@ -415,7 +415,7 @@ retreat_node(void)
 }
 
 void
-store_node_value(char* par, double* value)
+store_node_value(const char* par, double* value)
   /* stores value for parameter par at current node */
 {
   char lpar[NAME_L];
@@ -700,7 +700,7 @@ line_nodes(struct char_p_array* flat)
 }
 
 void
-node_string(char* key, char* string, int* l)
+node_string(const char* key, char* string, int* l)
   /* returns current node string value for "key" in Fortran format */
   /* l is max. allowed length in string */
 {

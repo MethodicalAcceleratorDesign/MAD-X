@@ -301,7 +301,7 @@ static void att_vkicker(struct c6t_element*);
 static void att_rfmultipole(struct c6t_element*);
 static void att_undefined(struct c6t_element*);
 static void clean_c6t_element(struct c6t_element*);
-static struct c6t_element* create_aperture(char* ,char* ,double , double , struct double_array*);
+static struct c6t_element* create_aperture(const char* ,const char* ,double , double , struct double_array*);
 static void concat_drifts(void);
 static void conv_elem(void);
 static void c6t_finish(void);
@@ -328,7 +328,7 @@ static void invert_normal(int, double*);
 static void link_behind(struct c6t_element*, struct c6t_element*);
 static void link_c6t_in_front(struct c6t_element*, struct c6t_element*);
 static struct c6t_element* make_c6t_element(struct node*);
-static struct object* make_obj(char*, int, int, int, int);
+static struct object* make_obj(const char*, int, int, int, int);
 static void make_multipole(struct c6t_element*);
 static void mod_errors(void);
 static void mod_lcavity(struct c6t_element*);
@@ -370,7 +370,7 @@ static void write_f8_errors(void);
 static void write_f3_aper(void);
 static void write_f3_aux(void);
 static void write_f3_matrix(void);
-static void write_f3_entry(char*, struct c6t_element*);
+static void write_f3_entry(const char*, struct c6t_element*);
 static void write_f3_mult(struct c6t_element*);
 static void write_f34_special(void);
 static void write_struct(void);
@@ -1102,7 +1102,7 @@ clean_c6t_element(struct c6t_element* cleanme)
 }
 
 static struct c6t_element*
-create_aperture(char* name,char* type,double a, double b, struct double_array* p_al_err)
+create_aperture(const char* name, const char* type, double a, double b, struct double_array* p_al_err)
 {
   struct c6t_element* aper_element;
   aper_element = new_c6t_element(4,name,"aperture");
@@ -1947,7 +1947,7 @@ make_c6t_element(struct node* p)
    it in */
 static struct object*
 make_obj(   /* creates a new object */
-  char* key,
+  const char* key,
   int vlint,       /* length of integer array */
   int vldble,      /* length of double array */
   int vlchar,      /* length of char array */
@@ -3063,7 +3063,7 @@ write_f3_matrix(void)
 }
 
 static void
-write_f3_entry(char* option, struct c6t_element* el)
+write_f3_entry(const char* option, struct c6t_element* el)
 {
   if (f3_cnt++ == 0) f3 = fopen("fc.3", "w");
   if (strcmp(option, "multipole") == 0) write_f3_mult(el);

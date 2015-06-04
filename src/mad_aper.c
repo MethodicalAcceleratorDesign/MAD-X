@@ -397,7 +397,7 @@ aper_fill_quadrants(double polyx[], double polyy[], int quarterlength, int* halo
 }
 
 static void
-aper_read_twiss(char* table, int* jslice, double* s, double* x, double* y,
+aper_read_twiss(const char* table, int* jslice, double* s, double* x, double* y,
                 double* betx, double* bety, double* dx, double* dy)
 {
   double_from_table_row(table, "s", jslice, s);
@@ -1035,7 +1035,7 @@ aper_surv(double init[], int nint)
   aper_survey->clone = aper_survey->cmd_def = clone_command(find_command("survey",defined_commands));
   asnl = aper_survey->cmd_def->par_names;
   aspos = name_list_pos("table", asnl);
-  aper_survey->cmd_def->par->parameters[aspos]->string = "survey";
+  aper_survey->cmd_def->par->parameters[aspos]->string = permbuff("survey");
   aper_survey->cmd_def->par_names->inform[aspos] = 1;
 
   aspos = name_list_pos("x0", asnl);

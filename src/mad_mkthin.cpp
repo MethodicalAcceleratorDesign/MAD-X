@@ -964,40 +964,6 @@ static void add_half_angle_to(const element* rbend_el,element* to_el,const char*
 static const char *CheckBendParams[] = {
     "polarity", "tilt", "hgap", "mech_sep", "v_pos", "magnet", "model", "method", "exact", "nst" };
 
-#if 0
-static element* create_bend_dipedge_element2(element* thick_elem,const bool Entry) // using Dipedge  http://mad.web.cern.ch/mad/madx.old/Introduction/dipedge.html
-{
-  // see also twiss.f90    SUBROUTINE tmbend,   and  SUBROUTINE tmfrng  for fringe fields, and   SUBROUTINE tmdpdg  for dipedge
-  // makes dipedge element for start or end of the dipole
-  // example
-  // from original thick
-  // mb1: sbend,l:=lmb ,angle:=amb ,k1:=kmb ,e1:=ee1 ,e2:=ee2 ;
-  // to
-  // mb1_l: dipedge, h:= amb/lmb ; e1:=ee1 ;  !--------- new dipedge at entry
-  // mb1: sbend,l:=lmb ,angle:=amb ,k1:=kmb ;      ! modified middle, e1, e2  removed
-  // mb1_r: dipedge, h:= amb/lmb ; e1:=ee2 ;  !--------- new dipedge at exit
-  //
-  // request from Laurent Deniau and Andrea Latina in 10/2014   also move any h1, h2  parameters as h parameter to entry, exit dipedge
-  //
-  /* unused...
-  unsigned int verbose=0;
-  if(debug_fl()) verbose=1;
-  if(verbose_fl()) verbose=2;
-  */
-
-  //-- parameters which can directly be copied from bend to dipedge if value different from default.
-  //-- NOTE from LD: "Instead e1, e2, fint, fintx, h1, h2 need extra work" no they don't, now kill_..._fringe is used to activate or cancel fringe field
-
-  element* dipedge=NULL;
-
-  string dipedge_name=string(thick_elem->name);
-  if(Entry) dipedge_name+="_den"; else dipedge_name+="_dex"; // dipedge entry or exit
-
-  dipedge = new_element("dipedge", dipedge_name.c_str(), ARRSIZE(CheckBendParams), CheckBendParams, thick_elem);
-  return dipedge;
-}
-#endif
-
 static element* create_bend_dipedge_element(element* thick_elem,const bool Entry) // using Dipedge  http://mad.web.cern.ch/mad/madx.old/Introduction/dipedge.html
 {
   // see also twiss.f90    SUBROUTINE tmbend,   and  SUBROUTINE tmfrng  for fringe fields, and   SUBROUTINE tmdpdg  for dipedge
@@ -2387,10 +2353,6 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
 //    if((fabs(cmd_par_val(e1param))>eps) || (fabs(cmd_par_val(h1param))>eps) || (fabs(cmd_par_val(fintparam))>eps)) // has entrance fringe fields
     if (command_par_value("kill_ent_fringe",thick_elem->def) == false)
     {
-// NOTE: one of the two create_bend_dipedge_element(2) below should not be there...
-//      EntryDipedge=create_bend_dipedge_element2(thick_elem,true); // new verion not yet fully implemented
-//      if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " after create_bend_dipedge_element2 now EntryDipedge=" << EntryDipedge << " " << my_dump_element(EntryDipedge) << EOL;
-
       EntryDipedge=create_bend_dipedge_element(thick_elem,true); // make new StartEdge element and remove e1 from thick_elem
       theBendEdgeList->put_slice(thick_elem,EntryDipedge);       // to remember this has been translated
       if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " now EntryDipedge=" << EntryDipedge << EOL;

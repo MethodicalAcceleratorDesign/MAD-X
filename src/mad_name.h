@@ -30,7 +30,7 @@ char*   get_new_name(void);
 // double  find_value(char* name, int ntok, char** toks);
 int     name_list_pos(const char* p, struct name_list* vlist);
 
-struct name_list*  new_name_list(char* list_name, int length);
+struct name_list*  new_name_list(const char* list_name, int length);
 struct name_list*  clone_name_list(struct name_list*);
 struct name_list*  delete_name_list(struct name_list*);
 void               dump_name_list(struct name_list*);

@@ -11,35 +11,37 @@
 #define mkstr(a)  mkstr_(a)
 #define mkstr_(a) #a
 
-const char *version_name   = mkstr(_VERSION);
-const char *version_arch   = sizeof(void*) == 4 ? "32" : sizeof(void*) == 8 ? "64" : "??";
-const char *version_ostype = mkstr(_VERSION_OSTYPE);
-const char *version_date   = mkstr(_VERSION_DATE);
+const char * const version_name   = mkstr(_VERSION);
+const char * const version_arch   = sizeof(void*) == 4 ? "32" : sizeof(void*) == 8 ? "64" : "??";
+const char * const version_ostype = mkstr(_VERSION_OSTYPE);
+const char * const version_date   = mkstr(_VERSION_DATE);
 
 #undef mkstr
 #undef mkstr_
 
 // madx constants
 
-char* const functs[] = {"dummyfunction", "abs", "sqrt", "exp", "log", "log10",
-                        "sin", "cos", "tan", "asin", "acos",
-                        "atan", "sinh", "cosh", "tanh",
-                        "ranf", "gauss", "tgauss", "table", "exist",
-                        "floor", "ceil", "round", "frac",
-                        "erf", "erfc",
-                        ""}; /* keep "" ! */
+const char* const functs[] = {
+  "dummyfunction", "abs", "sqrt", "exp", "log", "log10",
+  "sin", "cos", "tan", "asin", "acos",
+  "atan", "sinh", "cosh", "tanh",
+  "ranf", "gauss", "tgauss", "table", "exist",
+  "floor", "ceil", "round", "frac",
+  "erf", "erfc",
+  ""}; /* keep "" ! */
 
-const char op_string[] = "-+*/^";
-char file_string[] = "file"; /* to avoid local in routine alias */
-char vrai[] = "true";        /* to avoid local in routine alias */
-char faux[] = "false";       /* to avoid local in routine alias */
-const int n_match = 17; /* # of match token lists in cmd_match_base */
-const int s_match[] = /* position of first token of command below */
+const char* const op_string = "-+*/^";
+const char* const file_string = "file"; /* to avoid local in routine alias */
+const char* const vrai = "true";        /* to avoid local in routine alias */
+const char* const faux = "false";       /* to avoid local in routine alias */
+const int n_match = 17;                 /* # of match token lists in cmd_match_base */
+const int s_match[] =              /* position of first token of command below */
 {0, 1, 4, 8, 13, 17, 22, 25, 29, 32, 36, 39, 43, 45, 48, 50, 52, 56};
 
 const int t_match[] = /* order in which the commands are matched */
 {0, 1, 16, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-const char* cmd_match_base[] =
+
+const char* const cmd_match_base[] =
 { /*  0 */ "@cmd",
   /*  1 */ "@name", ":", "@cmd",
   /*  2 */ "int", "const", "@name", "=",
@@ -60,14 +62,14 @@ const char* cmd_match_base[] =
 
 /* aperture types and # of parameters, needed for twiss table */
 
-char* aperture_types[] =
+const char* const aperture_types[] =
 {
   "circle", "ellipse", "rectangle", "lhcscreen", "rectcircle",
   "rectellipse", "racetrack", "octagon",
   " "  /* blank terminates */
 };
 
-int aperture_npar[] =
+const int aperture_npar[] =
 {
   1, 2, 2, 3, 3,
   4, 4, 4
@@ -76,7 +78,7 @@ int aperture_npar[] =
 /* table descriptors: type 1 = int, type 2 = double, type 3 = string;
    internally, however, int are stored as double */
 
-int ap_table_types[] =
+const int ap_table_types[] =
 {
   3, 2, 2, 2, 3,
   2, 2, 2, 2,
@@ -85,7 +87,7 @@ int ap_table_types[] =
   2, 2, 2
 };
 
-char* ap_table_cols[] =
+const char* const ap_table_cols[] =
 {
   "name", "n1", "n1x_m", "n1y_m", "apertype",
   "aper_1", "aper_2", "aper_3", "aper_4",
@@ -95,7 +97,7 @@ char* ap_table_cols[] =
   " "  /* blank terminates */
 };
 
-int survey_table_types[] =
+const int survey_table_types[] =
 {
   3, 3, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2,
@@ -105,7 +107,7 @@ int survey_table_types[] =
   /*==*/
 };
 
-char* survey_table_cols[] =
+const char* const survey_table_cols[] =
 {
   "name", "keyword", "s", "l", "angle", "x",
   "y", "z", "theta", "phi", "psi", "globaltilt",
@@ -116,7 +118,7 @@ char* survey_table_cols[] =
   " "  /* blank terminates */
 };
 
-int efield_table_types[] =
+const int efield_table_types[] =
 {
   3, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
@@ -141,7 +143,7 @@ int efield_table_types[] =
   2, 2, 2, 2, 2, 2
 };
 
-char* efield_table_cols[] =
+const char* const efield_table_cols[] =
 {
   "name",
   "k0l", "k0sl", "k1l", "k1sl",
@@ -171,7 +173,7 @@ char* efield_table_cols[] =
 };
 
 
-char* sxf_table_names[] =
+const char* const sxf_table_names[] =
 {
   "l","angle", "k0","k0s","k1","k1s",
   "e1","e2","k2","k2s","h1",
@@ -184,15 +186,15 @@ char* sxf_table_names[] =
   " " /* blank terminates */
 };
 
-int twiss_opt_end = 33; /* last column filled by twiss module */
-int twiss_mult_end = 78; /* last multipole column filled
+const int twiss_opt_end = 33; /* last column filled by twiss module */
+const int twiss_mult_end = 78; /* last multipole column filled
                             by complete_twiss_table */
-int twiss_fill_end = 97; /* last standard column filled
+const int twiss_fill_end = 97; /* last standard column filled
                             by complete_twiss_table */
 /*== increased twiss_fill_end from 96 to 97 to accomodate for v_pos */
 
 /* warning: modify routine complete_twiss_table in case of changes */
-int twiss_table_types[] =
+const int twiss_table_types[] =
 {
   3, 3, 2, 2, 2,
   2, 2, 2, 2, 2,
@@ -260,7 +262,7 @@ int twiss_table_types[] =
   2
 };
 
-char* twiss_table_cols[] =
+const char* const twiss_table_cols[] =
 {
   "name", "keyword", "s", "betx", "alfx",
   "mux", "bety", "alfy", "muy", "x",
@@ -331,7 +333,7 @@ char* twiss_table_cols[] =
   " "  /* blank terminates */
 };
 
-int twiss_sector_table_types[] = {
+const int twiss_sector_table_types[] = {
   3, 2,
   2, 2, 2, 2, 2, 2,
   /* 36 elements for the R-matrix */
@@ -380,7 +382,7 @@ int twiss_sector_table_types[] = {
   2, 2, 2, 2, 2, 2
 };
 
-char* twiss_sector_table_cols[] = {
+const char* const twiss_sector_table_cols[] = {
   "name", "pos",
   "k1", "k2", "k3", "k4", "k5", "k6",
   "r11", "r21", "r31", "r41", "r51", "r61",
@@ -429,7 +431,7 @@ char* twiss_sector_table_cols[] = {
 };
 
 
-int ptc_twiss_summary_table_types[] =
+const int ptc_twiss_summary_table_types[] =
   {
     2, 2, 2, 2, 2, 2, 2,/* "length", "alpha_c", "alpha_c_p", "alpha_c_p2", "alpha_c_p3", "eta_c", "gamma_tr", */
     2, 2, 2, 2, 2,	    /* "q1", "q2", "dq1", "dq2", "qs", */
@@ -455,7 +457,7 @@ int ptc_twiss_summary_table_types[] =
     2,2,2,2,2,2,	    /* "xcomax","ycomax","pxcomax","pycomax","tcomax","ptcomax", */
     2,2,2,2,2,2	    /* "xcomin","ycomin","pxcomin","pycomin","tcomin","ptcomin", */ 
   }; 
-char* ptc_twiss_summary_table_cols[] = {
+const char* const ptc_twiss_summary_table_cols[] = {
   "length", "alpha_c", "alpha_c_p", "alpha_c_p2", "alpha_c_p3", "eta_c", "gamma_tr", 
   "q1", "q2", "dq1", "dq2", "qs",
   "beta_x_min","beta_x_max",
@@ -482,151 +484,151 @@ char* ptc_twiss_summary_table_cols[] = {
   " " /* blank terminates */
 };
 
-int ibs_table_types[] =
+const int ibs_table_types[] =
 {
   3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
 };
 
-char* ibs_table_cols[] =
+const char* const ibs_table_cols[] =
 {
   "name", "s", "dels", "tli", "txi", "tyi", "betx","alfx","dx","dpx", "bety","alfy","dy","dpy",
   " "  /* blank terminates */
 };
 
-int bb6d_ixy_types[]=
+const int bb6d_ixy_types[]=
 {
   2,2,2,2,2,2,2
 };
 
-char* bb6d_ixy_cols[]=
+const char* const bb6d_ixy_cols[]=
 {
   "turn","n_macro_surv","n_for_i","ex_rms","ey_rms","sigma_p","sigma_z",
   " "  /* blank terminates */
 };
 
-int map_tab_types[]=
+const int map_tab_types[]=
 {
   3,2,1,1,1,1,1,1,1,1,1
 };
 
-char* map_tab_cols[]=
+const char* const map_tab_cols[]=
 {
   "name","coef","n_vector","nv","order","nx","nxp","ny","nyp","ndeltap","nt",
   " "  /* blank terminates */
 };
 
-int normal_res_types[] =
+const int normal_res_types[] =
 {
   3, 1, 1, 1, 1, 2
 };
 
-char* normal_res_cols[] =
+const char* const normal_res_cols[] =
 {
   "name", "order1", "order2", "order3", "order4", "value",
   " "  /* blank terminates */
 };
 
-int sodd_detune_5_types[] =
+const int sodd_detune_5_types[] =
 {
   1, 1, 2, 1, 1
 };
 
-char* sodd_detune_5_cols[] =
+const char* const sodd_detune_5_cols[] =
 {
   "multipoleorder", "plane", "detuning", "h_inv_order", "v_inv_order",
   " "  /* blank terminates */
 };
 
-int sodd_distort1_8_types[] =
+const int sodd_distort1_8_types[] =
 {
   2, 2, 2, 2, 2, 2, 2, 2
 };
 
-char* sodd_distort1_8_cols[] =
+const char* const sodd_distort1_8_cols[] =
 {
   "multipoleorder", "cosine", "sine", "amplitude", "j", "k", "l", "m",
   " "  /* blank terminates */
 };
 
-int sodd_distort1_11_types[] =
+const int sodd_distort1_11_types[] =
 {
   1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1
 };
 
-char* sodd_distort1_11_cols[] =
+const char* const sodd_distort1_11_cols[] =
 {
   "multipoleorder", "location", "resonance", "position[m]", "cosine", "sine", "amplitude", "j", "k", "l", "m",
   " "  /* blank terminates */
 };
 
-int sodd_distort2_9_types[] =
+const int sodd_distort2_9_types[] =
 {
   1, 1, 2, 2, 2, 1, 1, 1, 1
 };
 
-char* sodd_distort2_9_cols[] =
+const char* const sodd_distort2_9_cols[] =
 {
   "multipoleorder1", "multipoleorder2", "cosine", "sine", "amplitude", "j", "k", "l", "m",
   " "  /* blank terminates */
 };
 
-int touschek_table_types[] =
+const int touschek_table_types[] =
 {
   3, 2, 2, 2, 2
 };
 
-char* touschek_table_cols[] =
+const char* const touschek_table_cols[] =
 {
   "name", "s", "tli", "tliw", "tlitot",
   " "  /* blank terminates */
 };
 
-int mon_table_types[] =
+const int mon_table_types[] =
 {
   3, 2, 2, 2, 2
 };
 
-char* mon_table_cols[] =
+const char* const mon_table_cols[] =
 {
   "name", "x.old", "y.old", "x", "y",
   " "  /* blank terminates */
 };
 
-int corr_table_types[] =
+const int corr_table_types[] =
 {
   3, 2, 2, 2, 2
 };
 
-char* corr_table_cols[] =
+const char* const corr_table_cols[] =
 {
   "name", "px.old", "py.old", "px.correction", "py.correction",
   " "  /* blank terminates */
 };
 
-int orbit_table_types[] =
+const int orbit_table_types[] =
 {
   3, 2, 2, 1,
 };
 
-char* orbit_table_cols[] =
+const char* const orbit_table_cols[] =
 {
   "name", "x", "y", "status",
   " "  /* blank terminates */
 };
 
-int special_comm_cnt[] =
+const int special_comm_cnt[] =
 {
   3, 5, 7, 6, 5, 4,
   0
 };
 
-char* special_comm_desc[] = /* ">?" = skip from start including char. at ? */
+const char* const special_comm_desc[] = /* ">?" = skip from start including char. at ? */
 {
   "if(", "else{", "elseif(", "while(", ">:macro", ">:line",
   " "  /* blank terminates , line must remain last */
 };
 
-int summ_table_types[] =
+const int summ_table_types[] =
 {
   2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
@@ -635,7 +637,7 @@ int summ_table_types[] =
   2, 2, 2, 2,
 };
 
-char* summ_table_cols[] =
+const char* const summ_table_cols[] =
 {
   "length", "orbit5", "alfa", "gammatr", "q1",
   "dq1", "betxmax", "dxmax", "dxrms", "xcomax", 
@@ -655,69 +657,68 @@ char* summ_table_cols[] =
 //   " "  /* blank terminates */
 // }; 
 
-int trackone_table_types[] =
+const int trackone_table_types[] =
 {
   1, 1, 2, 2, 2, 2, 2, 2, 2, 2
 };
 
-char* trackone_table_cols[] =
+const char* const trackone_table_cols[] =
 {
   "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e",
   " "  /* blank terminates */
 };
 
-int track_table_types[] =
+const int track_table_types[] =
 {
   1, 1, 2, 2, 2, 2, 2, 2, 2, 2
 };
 
-char* track_table_cols[] =
-{
-  "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e",
-  " "  /* blank terminates */
-};
-int track_table_cols_len = sizeof track_table_cols / sizeof track_table_cols[0];
-
-int tracksumm_table_types[] =
-{
-  1, 1, 2, 2, 2, 2, 2, 2, 2, 2
-};
-
-char* tracksumm_table_cols[] =
+const char* const track_table_cols[] =
 {
   "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e",
   " "  /* blank terminates */
 };
 
+const int track_table_cols_len = sizeof track_table_cols / sizeof track_table_cols[0];
 
-int ptcnodetrack_table_types[] =
+const int tracksumm_table_types[] =
+{
+  1, 1, 2, 2, 2, 2, 2, 2, 2, 2
+};
+
+const char* const tracksumm_table_cols[] =
+{
+  "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e",
+  " "  /* blank terminates */
+};
+
+const int ptcnodetrack_table_types[] =
 {  1,        3,      1,         1,           1,      2,       2,   2,   2,    2,   2,    2,   2,    2 };
 
-char* ptcnodetrack_table_cols[] =
+const char* const ptcnodetrack_table_cols[] =
 {"number", "name", "elnumber","trnumber" , "turn","s_slice", "s", "x", "px", "y", "py", "t", "pt", "s",
  " "  /* blank terminates */
 };
 
-
-int trackloss_table_types[] =
+const int trackloss_table_types[] =
 {
   1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3
 };
 
-char* trackloss_table_cols[] =
+const char* const trackloss_table_cols[] =
 {
   "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e", "element",
   " "  /* blank terminates */
 };
 
-int dynap_table_types[] =
+const int dynap_table_types[] =
 {
   2,2,2,2,2,
   2,2,2,2,2,
   2,2,2,2,2
 };
 
-char* dynap_table_cols[] =
+const char* const dynap_table_cols[] =
 {
   "dynapfrac", "dktrturns", "xend", "pxend", "yend",
   "pyend", "tend", "wxmin", "wxmax", "wymin", "wymax",
@@ -725,36 +726,36 @@ char* dynap_table_cols[] =
   " "  /* blank terminates */
 };
 
-int dynaptune_table_types[] =
+const int dynaptune_table_types[] =
 {
   2,2,2,2,2
 };
 
-char* dynaptune_table_cols[] =
+const char* const dynaptune_table_cols[] =
 {
   "x", "y", "tunx", "tuny", "dtune",
   " "  /* blank terminates */
 };
 
 /* Definition of "select_ptc_normal" parameters for "ptc_normal" */
-char names[PTC_NAMES_L][5]=
+const char* const names[]=
 {
-  "dx","dpx","dy","dpy","q1","q2","dq1","dq2","anhx","anhy","haml","gnfu","eign"
+  "dx","dpx","dy","dpy","q1","q2","dq1","dq2","anhx","anhy","haml","gnfu","eign"," "
 };
 
-char atm[3][4] = 
+const char* const atm[] = 
 {
- "hmon","vmon","moni"
+ "hmon","vmon","moni"," "
 };
 
-char atc[3][4] = 
+const char* const atc[] = 
 {
- "hkic","vkic","kick"
+ "hkic","vkic","kick"," "
 };
 
-char* atc_type = 0;
+const char* atc_type = 0;
 int   atc_flag = 0;
 
-char* atm_type = 0;
+const char* atm_type = 0;
 int   atm_flag = 0;
 

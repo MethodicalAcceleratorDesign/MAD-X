@@ -13,7 +13,7 @@ static void sxf_fill_command(struct command*, int ntok, char** toks);
 
 // private functions
 
-static void put_line(FILE* out, char* s);
+static void put_line(FILE* out, const char* s);
 
 static void
 r_indent(void)
@@ -41,7 +41,7 @@ tag_spec(char* intype)
 #endif
 
 static int
-join_prefix(char* prefix, int ntok, char** toks)
+join_prefix(const char* prefix, int ntok, char** toks)
   /* joins two tokens into one if the first is the "prefix" */
 {
   int j, k;
@@ -101,7 +101,7 @@ reset_line(FILE* out)
 }
 
 static void
-put_line(FILE* out, char* s)
+put_line(FILE* out, const char* s)
 {
   char tline[2*MADX_LINE_MAX];
   int i;
@@ -120,14 +120,14 @@ s_indent(int i)
 }
 
 static void
-accu_line(FILE* out, char* s)
+accu_line(FILE* out, const char* s)
 {
   if (strlen(line) + strlen(s) + indent > MADX_LINE_MAX)  reset_line(out);
   strcpy(&line[strlen(line)], s);
 }
 
 static void
-fill_dump(FILE* out, int flag, char* label, double* values, int count, int inc)
+fill_dump(FILE* out, int flag, const char* label, double* values, int count, int inc)
 {
   int j;
 
@@ -422,7 +422,7 @@ sxf_write(struct command* cmd, FILE* out)
 }
 
 static double
-find_value(char* name, int ntok, char** toks)
+find_value(const char* name, int ntok, char** toks)
   /* returns value found in construct "name = value", or INVALID */
 {
   double val = INVALID;
