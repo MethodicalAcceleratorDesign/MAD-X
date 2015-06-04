@@ -5052,7 +5052,7 @@ subroutine tttdipole(track, ktrack)
 
   !---- Read-in dipole edges angles
 
-  double precision e1, e2, h1, h2, hgap, fint
+  double precision e1, e2, h1, h2, hgap, fint, fintx
   optiondebug = get_option('debug ')
   e1 = node_value('e1 ');
   e2 = node_value('e2 ');
@@ -5060,6 +5060,7 @@ subroutine tttdipole(track, ktrack)
   h2 = node_value('h2 ')
   hgap = node_value('hgap ')
   fint = node_value('fint ')
+  fintx = node_value('fintx ')
   kill_ent_fringe = node_value('kill_ent_fringe ') .ne. 0d0
   kill_exi_fringe = node_value('kill_exi_fringe ') .ne. 0d0
   arad = get_value('probe ','arad ')
@@ -5159,7 +5160,10 @@ subroutine tttdipole(track, ktrack)
   
   !---- Apply exit dipole edge effect
   if (.not.kill_exi_fringe) then
-     call ttdpdg_map(track, ktrack, e2, h2, hgap, fint, 0d0)
+     if (fintx.eq.-1d0) then
+        fintx = fint;
+     endif
+     call ttdpdg_map(track, ktrack, e2, h2, hgap, fintx, 0d0)
   endif
   
 end subroutine tttdipole
