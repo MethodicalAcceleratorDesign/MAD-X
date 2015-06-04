@@ -5160,7 +5160,7 @@ subroutine tttdipole(track, ktrack)
   
   !---- Apply exit dipole edge effect
   if (.not.kill_exi_fringe) then
-     if (fintx.eq.-1d0) then
+     if (fintx.lt.0d0) then
         fintx = fint;
      endif
      call ttdpdg_map(track, ktrack, e2, h2, hgap, fintx, 0d0)
