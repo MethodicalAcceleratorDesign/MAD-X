@@ -37,23 +37,4 @@ mad_mkthin.o:   madx.h
 
 endif
 
-#######################
-# check for g++ version >= 4.4
-#
-
-ifneq ($(filter $(BUILDGOALS),$(MAKECMDGOALS)),)
-ifeq ($(CXXNAME),g++)
-CCVER  := $(strip $(shell $(CXX) -dumpversion))
-CCVERL := $(subst ., ,$(CCVER))
-CCVER1 := $(findstring $(word 1,$(CCVERL)),"456789")
-CCVER2 := 0
-  ifeq ($(CCVER1),4)
-  CCVER2 := $(findstring $(word 2,$(CCVERL)),"456789")
-  endif
-ifeq ($(and $(CCVER1),$(CCVER2)),)
-$(error MAD-X requires g++ >= 4.4 ($(if $(CCVER),$(CCVER),none) detected))
-endif # version
-endif # g++
-endif # cmdgoal
-
 # end of makefile
