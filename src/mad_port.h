@@ -15,6 +15,8 @@ typedef long long off64_t;
 // problem with C99 compliance on Windows
 #if !__STDC__ || __STDC_VERSION__ < 199901L
 extern double rint(double);
+extern double erf (double);
+extern double erfc(double);
 #endif
 #endif
 
