@@ -871,7 +871,8 @@ static expression* curved_from_straight_length(const element* rbend_el)
     // this is also shown in twiss      node and element length give always the curved length
     // in going from rbend to sbend, this correction must be applied   if the "l" expression is used,    not for the value
     const string anglestr    =my_get_cmd_expr_str( return_param_recurse("angle",rbend_el) );
-    const string rat = "("+anglestr+")*0.5/sin(("+anglestr+")/2)"; // L_sbend / L_rbend
+    // const string rat = "("+anglestr+")*0.5/sin(("+anglestr+")/2)"; // L_sbend / L_rbend
+    const string rat = "invsinc("+anglestr+"*0.5)"; // L_sbend / L_rbend
     expression* rat_expr = new_expression(rat.c_str(),deco);
     // try status=0 or 1 to update
     l_sbend_expr = compound_expr(l_rbend_expr,0,"*",rat_expr,0); // this also updates the value

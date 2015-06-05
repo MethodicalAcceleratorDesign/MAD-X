@@ -27,7 +27,7 @@ const char* const functs[] = {
   "atan", "sinh", "cosh", "tanh",
   "ranf", "gauss", "tgauss", "table", "exist",
   "floor", "ceil", "round", "frac",
-  "erf", "erfc",
+  "erf", "erfc", "sinc", "invsinc",
   ""}; /* keep "" ! */
 
 const char* const op_string = "-+*/^";
@@ -58,7 +58,7 @@ const char* const cmd_match_base[] =
   /* 13 */ "@name", ":", "=",
   /* 14 */ "@name", ":",
   /* 15 */ "@name", "@name",
-  /* 16 */ "shared", "@name", ":", "@cmd"};
+  /* 16 */ "shared", "@name", ":", "@cmd" };
 
 /* aperture types and # of parameters, needed for twiss table */
 

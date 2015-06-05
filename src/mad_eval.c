@@ -690,6 +690,27 @@ polish_value(struct int_array* deco, char* expr_string)
             case 24:
               stack[c_stack] = erfc(stack[c_stack]);
               break;
+            case 25: {
+              // sin(x)/x = 1 - 1/6 x^2 + 1/120 x^4 + ...
+              double x = stack[c_stack];
+              if (fabs(x) < 1e-5) {
+                double x2 = x*x;
+                stack[c_stack] = 1 - 1.0/6.0*x2 + 1.0/120.0*x2*x2;
+              } else
+                stack[c_stack] = sin(x)/x;
+              }
+              break;
+            case 26: {
+              // x/sin(x) = 1 + 1/6 x^2 + 7/360 x^4 + ...
+              double x = stack[c_stack];
+              if (fabs(x) < 1e-5) {
+                double x2 = x*x;
+                stack[c_stack] = 1 + 1.0/6.0*x2 + 7.0/360.0*x2*x2;
+              } else
+                stack[c_stack] = x/sin(x);
+              }
+              break;
+
             default:
               fatal_error("polish_value: illegal function in expr:",
                           expr_string);
