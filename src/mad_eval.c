@@ -695,7 +695,7 @@ polish_value(struct int_array* deco, char* expr_string)
               double x = stack[c_stack];
               if (fabs(x) < 1e-5) {
                 double x2 = x*x;
-                stack[c_stack] = 1 - 1.0/6.0*x2 + 1.0/120.0*x2*x2;
+                stack[c_stack] = 1 - (1.0/6.0 + 1.0/120.0*x2)*x2;
               } else
                 stack[c_stack] = sin(x)/x;
               }
@@ -705,7 +705,7 @@ polish_value(struct int_array* deco, char* expr_string)
               double x = stack[c_stack];
               if (fabs(x) < 1e-5) {
                 double x2 = x*x;
-                stack[c_stack] = 1 + 1.0/6.0*x2 + 7.0/360.0*x2*x2;
+                stack[c_stack] = 1 + (1.0/6.0 + 7.0/360.0*x2)*x2;
               } else
                 stack[c_stack] = x/sin(x);
               }
