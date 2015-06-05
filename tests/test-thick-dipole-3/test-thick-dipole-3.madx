@@ -63,7 +63,7 @@ use, sequence=myseq;
 !  option,debug=true;    ! list elements with 2 or more slices
 !  option,verbose=true;  !  with verbose on, all elements will be listed
 
-  select, flag=makethin, class=sbend, thick=true; ! thick slice, with dipedge conversion    with dipedge  perfect  (to e-16)
+  select, flag=makethin, class=sbend, thick=true, slice=1; ! thick slice, with dipedge conversion    with dipedge  perfect  (to e-16)
   select, flag=makethin, class=rbend, thick=true, slice=1; ! thick slice, with dipedge conversion    with dipedge  perfect  (to e-16)
 
   makethin, sequence=myseq,style=teapot,makedipedge=true;
