@@ -1,0 +1,91 @@
+option, -debug, -echo;
+
+title, "thin_foc with edge effects";
+
+set,format="22.16g"; ! format with many digits
+
+! option, thin_foc; !--- turn   thin_foc  on      --  by default is on
+
+!-----  careful, MAD-X has a confusing convention in which rbends are defined with the reduced straight length, and not with the real path length as was the case in MAD-X
+!   and which is still the case with option    option,rbarc=false;
+!   by default now input gives the reduced length, stored also as expression,   the length value used internally and printed in twiss is always the "correct" arc length
+
+lmb := 10.; !--- arc length of dipole
+  amb := 0.010; ! normally use this
+! amb := 0.5;   ! to test rbarc true/false
+factor :=amb / (2*sin(amb/2) ); factor_val =factor ; show factor_val;  ! arc length / straight length
+  lstraight := lmb/factor;
+  lstraight  = lmb/factor; ! try with value, no change
+show,lstraight;
+
+  kmb = 0; ee1 = 0.001; ee2 = 0.0001; ! 10 m long dipole, bending 10 mrad, so that rho = 1000 meter
+
+!--- test fintx,  if given, use different fint at entry and exit.  fintx=0  turns fint off at exit        only active when e1 nonzero
+  mb1: sbend, l:=lmb, angle:=amb; ! values of expressions for hgap and tilt
+
+
+!---- the real reference for bend length should be always the arc length
+! the shorter straight length can also be given, and is then increased (internally by el_par_value) to  l * angle / (two * sin(angle/two))
+!  switch between the next two lines
+
+
+
+myseq: sequence, l=3*lmb;
+mb1, at:= lmb/2;
+mb1, at:=1.5*lmb;
+endsequence;
+
+beam,energy=1.e6; ! default is positron, 1 GeV,  use 1000 TeV to get beta close to 1  and dispersion terms to 1.e-13
+use, sequence=myseq;
+
+
+
+select, flag=twiss, clear;
+select, flag=twiss, column= name, s, l, x, px, hkick, betx, alfx, mux, dx, dpx, bety, alfy, dy, dpy, muy, angle, k0l, k1l, k2l, tilt, x, y, px, py, RE11,RE12,RE13,RE14,RE15,RE16,RE21,RE22,RE23,RE24,RE25,RE26,RE31,RE32,RE33,RE34,RE35,RE36,RE41,RE42,RE43,RE44,RE45,RE46,RE51,RE52,RE53,RE54,RE55,RE56,RE61,RE62,RE63,RE64,RE65,RE66;
+twiss,rmatrix,betx=1,bety=1,file="twiss_thick.tfs"; ! with rmatrix to get values like   RE11
+
+save,     sequence=myseq, file="thick.seq";
+use, sequence=myseq;
+
+!  option,debug=true;    ! list elements with 2 or more slices
+!  option,verbose=true;  !  with verbose on, all elements will be listed
+
+  select, flag=makethin, class=sbend, thick=true; ! thick slice, with dipedge conversion    with dipedge  perfect  (to e-16)
+
+  makethin, sequence=myseq,style=teapot,makedipedge=true;
+
+save,     sequence=myseq, file="thin.seq";
+
+!option,  debug=false;
+!option,verbose=false;
+
+use, sequence=myseq;
+show,mb1.edge_l;
+twiss,rmatrix, betx=1,bety=1,file="twiss_thin.tfs";
+
+! show,beam;
+
+tr$macro(turn): macro = {
+}
+
+track, onepass, update, dump;
+start, x=1e-6, px=0, y=1e-6, py=0, t=-0.25;
+start, x=1e-6, px=0, y=1e-6, py=0, t=-1.0;
+start, x=1e-6, px=0, y=1e-6, py=0, t=-1.75;
+run, turns=50, ffile=1;
+endtrack;
+stop;
+
+
+
+
+!---  read back the thin sequence;
+option, -echo, -info;
+call, file = "thin.seq";
+option, echo, info;
+use, sequence=myseq;
+show,mb1.edge_l;
+twiss,rmatrix, betx=1,bety=1,file="twiss_thin2.tfs";
+
+
+stop; !---------------------------------------------------------------
