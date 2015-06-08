@@ -55,8 +55,6 @@ die ()
 
 # general settings
 readonly thedate=`date "+%Y-%m-%d"`
-readonly olddate=`date -d "-50 days" "+%Y-%m-%d"` 	# linux
-# readonly olddate=`date -v-50d "+%Y-%m-%d"` 		# macosx
 readonly srvdir="mad@macserv15865.cern.ch:Projects/madX"
 readonly webdir="http://cern.ch/madx/madX"
 
@@ -75,7 +73,8 @@ clean_tmp ()
 # clear reports older than 51 days
 clear_old_reports ()
 {
-	find tests/reports -ctime +51 -name '*_build-test-[lmw][aix]*.out' -exec rm {} \;
+	find tests/reports -ctime +51  -name '*_build-test-[lmw][aix]*.out' -exec rm {} \;
+	find tests/reports -ctime +501 -name '*_build-test-report.out' -exec rm {} \;
 }
 
 # check for completed jobs [lxplus | macosx | win]
@@ -106,7 +105,7 @@ build_test_remote ()
 		scp -q -p "$srvdir/build-test-$arch.out" build-test-$arch.out
 		check_error "unable to retrieve $arch remote report (scp)"
 		if [ ! -s build-test-$arch.out ] ; then
-			cat build-test-$arch.out | tr -d '\r' > build-test-$arch.out.tr
+			cat build-test-$arch.out | tr -d "\\r" > build-test-$arch.out.tr
 			mv -f build-test-$arch.out.tr build-test-$arch.out
 		fi
 	done
@@ -125,7 +124,6 @@ build_test_report ()
 		if [ ! -s build-test-$arch.out ] ; then
 			echo "ERROR: report build-test-$arch.out not found (or empty) for platform $arch"
 		else
-			rm -f tests/reports/${olddate}_build-test-$arch.out
 			cp -f build-test-$arch.out tests/reports/${thedate}_build-test-$arch.out
 			check_error "backup of build-test-$arch.out failed (cp)"
 
