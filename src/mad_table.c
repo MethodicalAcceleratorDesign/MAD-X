@@ -173,7 +173,7 @@ add_to_table_list_list(struct table_list* table_list, struct table_list_list* tl
 }
 
 static void
-write_table(struct table* t, char* filename)
+write_table(struct table* t, const char* filename)
   /* writes rows with columns listed in row and col */
 {
   char l_name[NAME_L];
@@ -1176,7 +1176,7 @@ sector_out(char* sector_table_name, double* pos, double* kick, double* rmatrix, 
 }
 
 void
-out_table(const char* tname, struct table* t, char* filename)
+out_table(const char* tname, struct table* t, const char* filename)
   /* output of a table */
 {
   struct command_list* scl = find_command_list(tname, table_select);

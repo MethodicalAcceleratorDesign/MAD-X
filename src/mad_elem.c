@@ -592,17 +592,19 @@ el_par_value(const char* par, const struct element* el)
   double fact = strcmp(el->base_type->name, "rbend") == 0 ? one : zero;
   int mult = strcmp(el->base_type->name, "multipole") == 0 ? 1 : 0;
   int mark = strcmp(el->base_type->name, "marker") == 0 ? 1 : 0;
-  if (fact != zero || strcmp(el->base_type->name, "sbend") == 0) /* bend */
+  if (fact != zero || !strcmp(el->base_type->name, "sbend")) /* bend */
   {
-    if ((l = command_par_value("l", el->def)) == zero)
-      fatal_error("bend with zero length:",el->name);
+    if ((l = command_par_value("l", el->def)) == zero) {
+//      printf("*** el_par_value(mad_elem): %s, %s, %s, %g\n", el->name, el->def->name, el->base_type->name, l);
+      fatal_error("bend with zero length:",el->name);      
+    }
+
     angle = command_par_value("angle", el->def);
-    if (strcmp(par, "angle") == 0)  val = angle;
-    else if (strcmp(par, "tilt") == 0)
-      val = command_par_value("tilt", el->def);
-    else if (strcmp(par, "k0") == 0) val = command_par_value("k0", el->def);
-    else if (strcmp(par, "k0s") == 0) val = command_par_value("k0s", el->def);
-    else if (strcmp(par, "l") == 0)
+         if (!strcmp(par, "angle")) val = angle;
+    else if (!strcmp(par, "tilt") ) val = command_par_value("tilt", el->def);
+    else if (!strcmp(par, "k0")   ) val = command_par_value("k0"  , el->def);
+    else if (!strcmp(par, "k0s")  ) val = command_par_value("k0s" , el->def);
+    else if (!strcmp(par, "l")    )
     {
       if (fact != zero && get_option("rbarc") && angle != zero)
         val = l * angle / (two * sin(angle/two));

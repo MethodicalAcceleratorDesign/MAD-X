@@ -112,12 +112,11 @@ sdds_readt(char *filename, char *tfsname)
   char    **c0;
   char    *c1[MAX_TFS_COL];
 
-
   SDDS_TABLE SDDS_table;
 
   SDDS_ARRAY *arr=0;
 
-  char*   tfs_table_cols[500];
+  char*   tfs_table_cols[MAX_TFS_COL];
 
   int     tfs_table_types[MAX_TFS_COL];
 
@@ -237,7 +236,8 @@ sdds_readt(char *filename, char *tfsname)
         tfs_table_types[i1] = tfs_sdds_types[arrtyp[i1]];
        }
 
-       c1[narr] = " ";
+       char c1_tmp[] = " ";
+       c1[narr] = c1_tmp;
        tfs_table_cols[narr] = c1[narr];
   /*
        c1[3] = " ";
@@ -245,7 +245,7 @@ sdds_readt(char *filename, char *tfsname)
        strcpy(&tfs_table_cols[narr]," ");
   */
         
-       tfstab = make_table(tfsname, tfsname, tfs_table_cols, tfs_table_types, 5000);
+       tfstab = make_table(tfsname, tfsname, (const char* const*)tfs_table_cols, tfs_table_types, 5000);
        add_to_table_list(tfstab, table_register);
 
        sdds_get_parm(&SDDS_table, tfstab); // i5 = not used

@@ -12,7 +12,6 @@
  2014 : Thick bend slicing, with or without dipedge
 
  Early versions in 2001, 2002 by Mark Hayes
-
  */
 
 #include <iostream>
@@ -28,6 +27,9 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
+
+// #define el_par_value(a,b) 
+// (fprintf(stderr,"el_par_value: %s:%d %s, %g, %s, %s\n", __FILE__, __LINE__, (b)->name, (b)->length, (b)->def->name, (a)), el_par_value(a,b))
 
 // --- macros helper
 
@@ -1782,7 +1784,7 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
       double value=cmdi->double_value;
       char* parnam = cmdi->name;
       
-      if( cmdi->expr && (strcmp(cmdi->expr->string, none) != 0) ) // turn on when expression defined and not none
+      if( cmdi->expr && !strcmp(cmdi->expr->string, none) ) // turn on when expression defined and not none
       {
         if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " in " << rbend_el-> name << " has expression, use this " << parnam  << EOL;
         add_cmd_parameter_clone(sbend_cmd, return_param_recurse(parnam,rbend_el),parnam,1);
@@ -1804,7 +1806,7 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
 
         if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " rbend " << rbend_el->name << " parnam " << parnam << " " << sbend_name
           << " cmdi=" << cmdi << " value=" << value << EOL;
-        if( string(parnam) == string("l") && rbarc_fl())
+        if( !strcmp(parnam, "l") && rbarc_fl() )
         {
           value = el_par_value(parnam,rbend_el); // special case rbend with option("rbarc"), get increased arc length value from el_par_value
           if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " rbarc on, use increased length value=" << value << EOL;
@@ -1820,6 +1822,7 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
             if(inform) cout << " differs from default, set inform=" << inform;
             cout << EOL;
           }
+
           add_cmd_parameter_new(sbend_cmd,value,parnam,inform);
         }
       }
@@ -1839,7 +1842,11 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
   if(verbose>2) cout << EOL << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " " << my_dump_command(sbend_cmd) << EOL;
   if(verbose>2) cout << EOL << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " just before element *sbend_el=make_element  sbend_name=" << sbend_name << " sbend_el=" << sbend_el << EOL;
   // now define sbend element using the sbend_cmd, and add the half surface angle to e1, e2
+
+  // WARNING: crash test-track-10: +=+=+= fatal: bend with zero length: ik1p.qf19.r1_s
+//  fprintf(stderr, "calling make_element (%d) %s, %s\n", __LINE__, sbend_name.c_str(), sbend_cmd->name);
   sbend_el=make_element(sbend_name.c_str(), "sbend", sbend_cmd,-1);
+//  fprintf(stderr, "calling make_element (%d) done\n", __LINE__);
   if(verbose>2) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " just after  element *sbend_el=make_element sbend_name=" << sbend_name << " sbend_el=" << sbend_el << EOL;
   add_half_angle_to(rbend_el,sbend_el,"e1");
   add_half_angle_to(rbend_el,sbend_el,"e2");

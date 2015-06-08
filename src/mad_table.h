@@ -76,7 +76,7 @@ void    grow_table(struct table*); /* doubles number of rows */
 void    print_table(struct table*);
 void    make_map_table(int* map_table_max_rows);
 int     get_table_range(char* range, struct table*, int* rows);
-void    out_table(const char* tname, struct table*, char* filename);
+void    out_table(const char* tname, struct table*, const char* filename);
 void    reset_count(const char* table); /* resets table counter to zero */
 void    sector_out(char* sector_table_name, double* pos, double* kick, double* rmatrix, double* tmatrix);
 void    table_range(char* table, char* range, int* rows);
