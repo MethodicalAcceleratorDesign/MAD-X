@@ -942,3 +942,8 @@ SUBROUTINE CJYDBB(ZR,ZI,BJOR,BJOI,BJIR,BJII,                      &
 END SUBROUTINE CJYDBB
 !   ____________
 !
+subroutine abend
+    implicit none
+    write(*,*) 'Abnormal end ...'
+    stop 888
+end subroutine abend

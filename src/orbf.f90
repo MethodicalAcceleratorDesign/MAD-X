@@ -1101,7 +1101,7 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
        !
        !     (PARAMETERS AS FOR DEQINV.)
        !
-       !     CALLS ... DFACT, DFINV, F010PR, ABEND.
+       !     CALLS ... DFACT, DFINV, F010PR.
        !
        !******************************************************************
        integer n,idim,ifail,jfail
@@ -1874,8 +1874,3 @@ double precision function pythag(a,b)
      return
    end subroutine prdmat
 
-subroutine abend
-    implicit none
-    write(*,*) 'Abnormal end ...'
-    stop 888
-end subroutine abend
