@@ -824,8 +824,6 @@ src/mad_dynap.c -text
 src/mad_dynap.h -text
 src/mad_elem.c -text
 src/mad_elem.h -text
-src/mad_elemdrift.c -text
-src/mad_elemdrift.h -text
 src/mad_elemerr.c -text
 src/mad_elemerr.h -text
 src/mad_elemmultp.c -text
