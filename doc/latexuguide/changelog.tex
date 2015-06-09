@@ -15,6 +15,18 @@ release number for the change.
 
 \begin{madlist}
 
+  \ttitem{2015-Jun-09} version 5.02.06, r5250\\
+  added a guard against negative sequence length and negative 
+  element lengths at the time of sequence expansion triggered 
+  by a \hyperref[sec:use]{\tt USE} command, with \madx then 
+  finishing with fatal error. No checks were performed so far 
+  on these attributes, assuming that all length were positive.
+
+  \ttitem{2015-Jun-05} version 5.02.06, r5247\\
+  added the cardinal sine {\tt SINC(x)} and inverse cardinal sine 
+  {\tt 1/SINC(x)} to the list of \hyperref[subsec:operator]{available 
+  operators in arithmetic expressions}. 
+
   \ttitemn{2015-Mar-31} version 5.02.05, r5181\\
   added a \hyperref[sec:shrink]{\tt SHRINK} command to remove 
   rows at the end of an existing table.
