@@ -105,8 +105,8 @@ build_test_remote ()
 		scp -q -p "$srvdir/build-test-$arch.out" build-test-$arch.out
 		check_error "unable to retrieve $arch remote report (scp)"
 		if [ ! -s build-test-$arch.out ] ; then
-			cat build-test-$arch.out | tr -d "\\r" > build-test-$arch.out.tr
-			mv -f build-test-$arch.out.tr build-test-$arch.out
+			cat build-test-$arch.out | tr -d '\r' > build-test-$arch.tr
+			mv -f build-test-$arch.tr build-test-$arch.out
 		fi
 	done
 	return 0
