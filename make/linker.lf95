@@ -43,7 +43,7 @@ ifeq ($(STATIC),yes)
     # Hence, ld groups do not work and required symbols must be specified beforehand...
     REQSYM := __divdi3 __udivdi3 __moddi3 __umoddi3
     REQCMD := -Wl,--undefined=
-    LDLIBS += $(addprefix $(REQCMD),$(REQSYM)) -lc -lgcc_eh -lgcc
+    LDLIBS += $(addprefix $(REQCMD),$(REQSYM)) -lpthread -lc -lgcc_eh -lgcc
   endif
 endif
 
