@@ -2706,7 +2706,7 @@ CONTAINS
     totch=node_value('charge ') * get_value('probe ', 'npart ')
     
     if (getdebug()>1) then
-      print*, 'charge npart ',node_value('probe ','charge '), get_value('probe ', 'npart ')
+      print*, 'charge npart ',node_value('charge '), get_value('probe ', 'npart ')
       print*, 'gamma0, arad, totch ',gamma0, arad, totch
     endif
 
