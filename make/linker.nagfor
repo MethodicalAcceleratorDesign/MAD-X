@@ -27,10 +27,6 @@ ifeq ($(ARCH),32)
 LDFLAGS += -Wl,-m32 -abi=32
 endif
 
-ifneq ($(CXXNAME),)
-LDLIBS += -lstdc++
-endif
-
 #
 # options flags
 #
@@ -51,5 +47,11 @@ ifeq ($(PLUGIN),yes)
 LDFLAGS += -rdynamic
 LDLIBS  += -ldl
 endif
+
+#
+# extra libs
+#
+
+LDLIBS  += -lpthread
 
 # end of makefile
