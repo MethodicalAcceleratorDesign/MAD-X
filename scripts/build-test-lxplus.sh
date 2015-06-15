@@ -14,7 +14,7 @@ check_error ()
 {
 	if [ "$?" != "0" ] ; then
 		echo "ERROR: $1"
-		exit 1
+		[ "$2" != "no-exit" ] && exit 1
 	fi
 }
 
@@ -84,6 +84,19 @@ icc      --version
 ifort    --version
 make all-linux64-intel all-linux64
 check_error "make all-linux64-intel failed"
+
+echo -e "\n===== NagFor build ====="
+export PATH="${PATH}:/afs/cern.ch/sw/fortran/nag2010/bin"
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/afs/cern.ch/sw/fortran/nag2010/lib"
+export NAG_KUSARI_FILE="/afs/cern.ch/sw/fortran/nag2010/lib/nag.licence,lxlic04.cern.ch:"
+make madx-linux-nagfor
+check_error "make madx-linux-nagfor failed" "no-exit"
+
+echo -e "\n===== Lahey 32 build ====="
+export PATH="${PATH}:/afs/cern.ch/sw/fortran/lahey/lf9562e/bin"
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/afs/cern.ch/sw/fortran/lahey/lf9562e/lib"
+make madx-linux32-lahey
+check_error "make madx-linux32-lahey failed" "no-exit"
 
 echo -e "\n===== Binaries dependencies ====="
 make infobindep
