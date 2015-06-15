@@ -2412,9 +2412,12 @@ subroutine pesopt(ierr)
      vrange(2,i) = d_arr(i)
   enddo
 
+!comm_para(const char* name, int* n_int, int* n_double, int* n_string, int* int_array, double* double_array, char* strings, int* string_lengths);
+
+
   !--- Check that STYLE & SYMBOL are both non zero
   call comm_para('style ', nint, ndble, k, plot_style, d_arr, char_a, char_l)
-  call comm_para('symbol ', nint, ndble, k, plot_symbol, char_a, char_l)
+  call comm_para('symbol ', nint, ndble, k, plot_symbol, d_arr, char_a, char_l)
   if (plot_style(1) .eq. 0 .and. plot_symbol(1) .eq. 0) then
      print *,'Warning: style & symbol attributes will make plot invisible. Thus style is set to 1.'
      plot_style(1) = 1
@@ -2433,8 +2436,8 @@ subroutine pesopt(ierr)
    return
   endif
   !--- Spline is obsolete 
-  call comm_para('spline ', nint,ndble,k,i,d_arr, char_a,char_l)
-  if (i .eq. 1) print *,'SPLINE attribute is obsolete, no action taken, use interpolate attribute instead.'
+  call comm_para('spline ', nint,ndble,k,int_arr,d_arr, char_a,char_l)
+  if (int_arr(1) .eq. 1) print *,'SPLINE attribute is obsolete, no action taken, use interpolate attribute instead.'
 
   !--- Interpolate: priority is given to the SETOPT option. 
   !  If False, the option of the PLOT command will be considered.
