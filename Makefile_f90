@@ -46,7 +46,7 @@ FC_SRC_RM  += c_tpsa_interface.F90 c_dabnew_berz.o
 endif
 
 # set dirs and files, remove unwanted files
-FC_DIR := src libs/ptc/src
+FC_DIR := $(FC_DIR_MAD) $(FC_DIR_PTC)
 FC_SRC := $(filter-out $(FC_SRC_RM),$(FC_SRC_MAD) $(FC_SRC_PTC))
 
 # files specific compiler flag (i.e. "internal compiler error" message)

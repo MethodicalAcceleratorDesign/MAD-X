@@ -54,6 +54,7 @@ endif
 # extra flags
 #
 
-FFLAGS += -gline -maxcontin=100 -ieee=full -mdir $(OBJDIR) -I$(OBJDIR)
+FFLAGS += -gline -maxcontin=100 -ieee=full -mdir $(OBJDIR) -I$(OBJDIR) \
+			$(addprefix -I,$(FC_DIR))
 
 # end of makefile

@@ -51,6 +51,7 @@ setenv LSERVRC /afs/cern.ch/sw/fortran/lahey/lf6481/bin/lservrc
 
 Nag Fortran compiler: FC=nagfor
 ---------------------
+manual: http://www.nag.co.uk/nagware/np/r52_doc/nagfor.html
 for ARCH=32 and ARCH=64
 setenv PATH "${PATH}:/afs/cern.ch/sw/fortran/nag2010/bin"
 setenv LD_LIBRARY_PATH "${LD_LIBRARY_PATH}:/afs/cern.ch/sw/fortran/nag2010/lib"
