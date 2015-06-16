@@ -658,7 +658,7 @@ static string my_get_cmd_expr_str(const command_parameter* cmd) // return the ex
   if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " " << my_dump_command_parameter(cmd);
   if(cmd)
   {
-    if(cmd->expr  && cmd->expr->string) result=cmd->expr->string; // the expression is define as string, use this
+    if(cmd->expr && cmd->expr->string) result=cmd->expr->string; // the expression is define as string, use this
     else // look for a value
     {
       const double eps=1.e-15; // used to check if strength is compatible with zero
@@ -697,8 +697,8 @@ static expression* my_get_param_expression(const element* el,const char* parnam)
 
 static bool thick_fl(const element* el) // true if the element has a thick parameter and if the value is positive, 0 otherwise
 {
-  const int thick_pos = name_list_pos("thick",el->def->par_names);
-  return (thick_pos > -1 && el->def->par->parameters[thick_pos]->double_value>0);
+  const int thick_pos = name_list_pos("thick", el->def->par_names);
+  return (thick_pos > -1 && el->def->par->parameters[thick_pos]->double_value > 0);
 }
 
 static void dump_slices() // Loops over all current elements and prints the number of slices. Used for debug and info, uses global element_list
@@ -731,8 +731,8 @@ static void dump_slices() // Loops over all current elements and prints the numb
       {
         printf(" %15s %2d",el_i->name,slices);
         if(thick_fl(el_i)) printf(" thick"); else printf(" thin ");
-        if(el_i != el_i->parent)
-        {
+
+        if(el_i != el_i->parent) {
           printf("%18s %2d",parent_name,slices_parent); // show also parent if not same as child
           if(thick_fl(el_i->parent)) printf(" thick"); else printf(" thin ");
         }
@@ -872,8 +872,11 @@ static expression* curved_from_straight_length(const element* rbend_el)
   { // Mad-X very confusing for RBEND, "l" parameter   el_par_value("l","rbend") is the shorter straight length,   val = l * angle / (two * sin(angle/two));     with rbarc on as done by default
     // this is also shown in twiss      node and element length give always the curved length
     // in going from rbend to sbend, this correction must be applied   if the "l" expression is used,    not for the value
-    const string anglestr    =my_get_cmd_expr_str( return_param_recurse("angle",rbend_el) );
+    string anglestr = my_get_cmd_expr_str( return_param_recurse("angle", rbend_el) );
     // const string rat = "("+anglestr+")*0.5/sin(("+anglestr+")/2)"; // L_sbend / L_rbend
+    // LD (16.06.2015): quick and dirty fix to broken inheritance of atributes,
+    //                  set angle to 0 (default) when the returned string is empty
+    if (anglestr == "") anglestr = "0";
     const string rat = "invsinc("+anglestr+"*0.5)"; // L_sbend / L_rbend
     expression* rat_expr = new_expression(rat.c_str(),deco);
     // try status=0 or 1 to update
