@@ -29,10 +29,11 @@ ifeq ($(ARCH),32)
 endif
 
 ifneq ($(CXXNAME),)
-  ifeq ($(ARCH),32)
+  # ifeq ($(ARCH),32)
     # required by __constructor/__destructor attributes
-    LDLIBS += $(wildcard $(addprefix $(GNULIBDIR)$/,crt*S.o))
-  endif
+    # Obsolete, kept for history or resurrection
+    # LDLIBS += $(wildcard $(addprefix $(GNULIBDIR)$/,crt*S.o))
+  # endif
   LDLIBS += -lstdc++
 endif
 
