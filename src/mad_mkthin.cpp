@@ -780,8 +780,11 @@ static int get_slices_from_elem(const element* elem)
 
 static char* make_thin_name(const char* e_name,const int slice) // make a node name from element name and slice number
 { // example     e_name=mqxa.1r1 slice=1 result=mqxa.1r1..1
-  char name[NAME_L+2+10];
-  sprintf(name, "%s..%d", e_name, slice); name[NAME_L-1] = '\0';
+  char name[2*NAME_L];
+  assert(strlen(e_name) < NAME_L);
+  if (sprintf(name, "%s..%d", e_name, slice) >= NAME_L)
+    warning("slice name is too long, truncated at " mkstring(NAME_L) " characters", name);
+  name[NAME_L-1] = '\0';
   return permbuff(name);
 }
 
@@ -1846,10 +1849,7 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
   if(verbose>2) cout << EOL << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " just before element *sbend_el=make_element  sbend_name=" << sbend_name << " sbend_el=" << sbend_el << EOL;
   // now define sbend element using the sbend_cmd, and add the half surface angle to e1, e2
 
-  // WARNING: crash test-track-10: +=+=+= fatal: bend with zero length: ik1p.qf19.r1_s
-//  fprintf(stderr, "calling make_element (%d) %s, %s\n", __LINE__, sbend_name.c_str(), sbend_cmd->name);
   sbend_el=make_element(sbend_name.c_str(), "sbend", sbend_cmd,-1);
-//  fprintf(stderr, "calling make_element (%d) done\n", __LINE__);
   if(verbose>2) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " just after  element *sbend_el=make_element sbend_name=" << sbend_name << " sbend_el=" << sbend_el << EOL;
   add_half_angle_to(rbend_el,sbend_el,"e1");
   add_half_angle_to(rbend_el,sbend_el,"e2");
@@ -1971,6 +1971,7 @@ element* SeqElList::create_thick_slice(element* thick_elem,const int slice_type)
       ParameterTurnOn("kill_ent_fringe"  ,sliced_elem); // turn writing on
     }
 #if 0
+    // old code kept for Xchecking the logic
     else if (exit_fl) {
       ParameterRemove("e1",sliced_elem);
       int i_fint = name_list_pos("fint", sliced_elem->def->par_names);
