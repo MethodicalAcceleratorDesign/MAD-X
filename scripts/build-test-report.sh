@@ -109,7 +109,8 @@ build_test_remote ()
             mv -f build-test-$arch.tr build-test-$arch.out
             # retrieve binaries for download of last builds
             scp -q -p "$srvdir/madx-macosx64-*" .
-            scp -q -p "$srvdir/madx-win64.exe" .
+            scp -q -p "$srvdir/madx-macosx32-*" .
+            scp -q -p "$srvdir/madx-win*.exe"   .
         fi
     done
     return 0
