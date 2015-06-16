@@ -31,7 +31,7 @@ endif
 ifneq ($(CXXNAME),)
   ifeq ($(ARCH),32)
     # required by __constructor/__destructor attributes
-    LDLIBS += $(wildcard $(GNULIBDIR)$/crt*S.o)
+    LDLIBS += $(wildcard $(addprefix $(GNULIBDIR)$/,crt*S.o))
   endif
   LDLIBS += -lstdc++
 endif

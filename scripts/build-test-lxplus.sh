@@ -93,6 +93,7 @@ make madx-linux-nagfor
 check_error "make madx-linux-nagfor failed" "no-exit"
 
 echo -e "\n===== Lahey 32 build ====="
+source /afs/cern.ch/sw/lcg/contrib/gcc/max/i686-slc6/setup.sh
 export PATH="${PATH}:/afs/cern.ch/sw/fortran/lahey/lf9562e/bin"
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/afs/cern.ch/sw/fortran/lahey/lf9562e/lib"
 make madx-linux32-lahey
