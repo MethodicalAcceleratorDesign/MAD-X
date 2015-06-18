@@ -1790,7 +1790,7 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
       double value=cmdi->double_value;
       char* parnam = cmdi->name;
       
-      if( cmdi->expr && !strcmp(cmdi->expr->string, none) ) // turn on when expression defined and not none
+      if( cmdi->expr && strcmp(cmdi->expr->string, none) != 0) // turn on when expression defined and not none
       {
         if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " in " << rbend_el-> name << " has expression, use this " << parnam  << EOL;
         add_cmd_parameter_clone(sbend_cmd, return_param_recurse(parnam,rbend_el),parnam,1);
