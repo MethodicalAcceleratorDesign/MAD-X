@@ -9,4 +9,5 @@ select, flag=twiss, clear;
 select, flag=twiss, columns=name, s, betx, bety, mux, muy;
 twiss;
 sixtrack,split;
+removefile file="fc.3"
 stop;

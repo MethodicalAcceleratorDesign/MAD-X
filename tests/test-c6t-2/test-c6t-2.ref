@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 14.02.13 22.19.42 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.05  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2015.04.06               +
+  + Execution date: 2015.06.19 16:45:30      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 TITLE;
 
 option,-echo,-warn;
@@ -38,7 +38,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
         1.07347826                  0                  0        29.17999998 
 
                dq2            betymax              dymax              dyrms 
-      -2.999999737        146.0782497                  0                  0 
+      -2.999999737        146.0782497                 -0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -64,11 +64,13 @@ c6t terminated - total number of elements: 5839
                  alignment errors   MAD-X: 0
                 alignment errors SixTrack: 0
                           sequence length: 3833.845181 [m]
+removefile file="fc.3"
+
 stop;
 
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (64 bit) finished normally +
+  + MAD-X 5.02.05 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
