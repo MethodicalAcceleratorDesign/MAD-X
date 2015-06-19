@@ -22,19 +22,19 @@ time_stamp(const char* place)
 }
 
 #if 0 // not used... (commented in micado)
-static float
+static double
 fextim(void)
 {
-   float mytime;
+   double mytime;
 
    #ifndef _WIN32 /* gettimeofday available */
      struct timeval tp;
      gettimeofday(&tp,0);
-     mytime = (float)(tp.tv_sec%10000) + 1.e-6 * tp.tv_usec; /* seconds from epoch, modulo 10 000 */
+     mytime = (double)(tp.tv_sec%10000) + 1.e-6 * tp.tv_usec; /* seconds from epoch, modulo 10 000 */
    #else /* use old ftime */
      struct timeb tp;
      ftime(&tp);
-     mytime = (float)(tp.time%10000) + 0.001*tp.millitm;
+     mytime = (double)(tp.time%10000) + 0.001*tp.millitm;
    #endif
 
    /* printf("Time now:  %-6.3f\n",mytime);    */

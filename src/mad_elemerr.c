@@ -213,7 +213,7 @@ error_ealign(struct in_cmd* cmd)
   int i;
   int chcount[3] = {0,0,0};
   double val[ALIGN_MAX] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-  static char att[ALIGN_MAX][7] = {"dx","dy","ds","dphi","dtheta","dpsi","mrex","mrey","mredx","mredy","arex","arey","mscalx","mscaly"};
+  static const char* att[ALIGN_MAX] = {"dx","dy","ds","dphi","dtheta","dpsi","mrex","mrey","mredx","mredy","arex","arey","mscalx","mscaly"};
 
   struct command_parameter_list* pl = current_error->par;
   struct sequence* mysequ = current_sequ;
@@ -269,8 +269,8 @@ error_eprint(struct in_cmd* cmd)
 {
   struct node *ndexe;
   struct node *nextnode;
-  static char pln_alig[ALIGN_MAX][7] = {"dx","dy","ds","dphi","dtheta","dpsi","mrex","mrey","mredx","mredy","arex","arey","mscalx","mscaly"};
-  static float alig_fact[ALIGN_MAX] = {1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1.0,1.0};
+  static const char* pln_alig[ALIGN_MAX]  = {"dx","dy","ds","dphi","dtheta","dpsi","mrex","mrey","mredx","mredy","arex","arey","mscalx","mscaly"};
+  static const float alig_fact[ALIGN_MAX] = {1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1000,1.0,1.0};
 
   int i;
   struct sequence* mysequ = current_sequ;
@@ -372,8 +372,8 @@ error_efcomp(struct in_cmd* cmd)
   //  double nlength;
   //  double nvec0, nvec1, nvec2, nvec3;
   //  double val[4] = {0, 0, 0, 0};
-  static const char *atts[6] = {"order","radius","hyster","rfm_freq", "rfm_harmon", "rfm_lag"};
-  static const char *attv[6] = {"dkn","dks","dknr","dksr","dpn","dps"};
+  static const char *atts[] = {"order","radius","hyster","rfm_freq", "rfm_harmon", "rfm_lag"};
+  static const char *attv[] = {"dkn","dks","dknr","dksr","dpn","dps"};
   const size_t attv_len = sizeof attv/sizeof *attv;
   const size_t atts_len = sizeof atts/sizeof *atts;
   int iattv[attv_len];
