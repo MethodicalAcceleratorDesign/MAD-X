@@ -1088,7 +1088,7 @@ tests/test-aperture-3/test-aperture-3.madx -text
 tests/test-aperture-3/test-aperture-3.ref -text
 tests/test-aperture/ap.tfs.cfg -text
 tests/test-aperture/ap.tfs.ref -text
-tests/test-aperture/offset.tfs -text
+tests/test-aperture/input/offset.tfs -text
 tests/test-aperture/test-aperture.cfg -text
 tests/test-aperture/test-aperture.madx -text
 tests/test-aperture/test-aperture.ref -text

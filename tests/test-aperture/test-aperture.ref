@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  +     MAD-X 5.02.05  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2014.11.14               +
-  + Execution date: 2015.03.10 10:39:48      +
+  + Release   date: 2015.04.06               +
+  + Execution date: 2015.06.19 16:36:35      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title,'LHC Cell APERTURE example';
 
@@ -152,7 +152,7 @@ select, flag=aperture, clear;
 
 select, flag=aperture, column=name,s,betx,bety,dx,x,y,n1,apertype,xtol,ytol,rtol;
 
-aperture,offsetelem="offset.tfs", file="ap.tfs", 
+aperture,offsetelem="input/offset.tfs", file="ap.tfs", 
 
          dqf=2.086, betaqfx=170.25, dp=0.0015, 
 
@@ -164,7 +164,7 @@ aperture,offsetelem="offset.tfs", file="ap.tfs",
 Processing apertures from lhccell$start:1 to lhccell$end:1...
 +++++++ deltap from TWISS            0
 
- Reading offsets from tfs "offset.tfs"
+ Reading offsets from tfs "input/offset.tfs"
 
 reference node: lhccell$start:1
 
@@ -418,5 +418,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.04 (64 bit) finished normally +
+  + MAD-X 5.02.05 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

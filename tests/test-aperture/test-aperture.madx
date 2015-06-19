@@ -58,7 +58,7 @@ twiss, sequence=LHCCELL;
 !!! uses default beam and halo data (lhc at injection)
 select, flag=aperture, clear;
 select, flag=aperture, column=name,s,betx,bety,dx,x,y,n1,apertype,xtol,ytol,rtol;
-aperture,offsetelem="offset.tfs", file="ap.tfs", 
+aperture,offsetelem="input/offset.tfs", file="ap.tfs", 
          dqf=2.086, betaqfx=170.25, dp=0.0015, 
          dparx=0.273, dpary=0.273, cor=0.004, bbeat=1.1, 
          nco=5, interval=1, halo={6., 8.4, 7.3, 7.3};
