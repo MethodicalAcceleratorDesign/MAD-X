@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  +     MAD-X 5.02.05  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2014.11.14               +
-  + Execution date: 2015.03.12 17:40:56      +
+  + Release   date: 2015.04.06               +
+  + Execution date: 2015.06.19 08:19:47      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -96,16 +96,16 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-             534.6                 -0    0.0004400727603        47.66918823 
+             534.6                 -0     0.000440081111        47.66873596 
 
                 q1                dq1            betxmax              dxmax 
-       1.248721108        1.051938623        187.7556724        2.204130363 
+       1.248720743         1.05196186        183.8495747        2.181088528 
 
              dxrms             xcomax             xcorms                 q2 
-        1.63755085                  0                  0        1.260063062 
+       1.625896503                  0                  0        1.260063428 
 
                dq2            betymax              dymax              dyrms 
-       1.049588969        181.5689562      0.09030658513      0.06646342865 
+       1.049632698        177.9026247       0.0901173768      0.06594194064 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -136,73 +136,4 @@ sixtrack, aperture;
 max_mult_ord set to : 11
 Reference radius set to : 1.000000
 ++++++ info: MADX sequence converted to c6t internal. 
-
-total block length: 534.600000
-
-c6t terminated - total number of elements: 232
-                    field errors    MAD-X: 0
-                    field errors SixTrack: 0
-                 alignment errors   MAD-X: 3
-                alignment errors SixTrack: 2
-                          sequence length: 534.600000 [m]
-
-
-!--- test MAD-X tracking   http://mad.web.cern.ch/mad/madx.old/thintrack/thintrack.html
-
-track, onepass, dump; ! onepass=true no closed orbit computed before tracking
-
-enter TRACK module
-one pass is on
-  start, x= 0.001, px= 0.002, y= 0, py= 0, t= 0.001, pt= 0.003;
-
-  run,   turns= 1;
-
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
-
-++++++ table: tracksumm
-
-    number       turn                  x                 px 
-         1          0              0.001              0.002 
-         1          1       0.4664294384     0.006531804738 
-
-                 y                 py                  t                 pt 
-                 0                  0              0.001              0.003 
-     0.00629975399    0.0001216692402    -0.002711649774              0.003 
-
-                 s                  e 
-                 0                  0 
-             534.6                  0 
-
-*****  end of trrun  *****
-endtrack;
-
-exit TRACK module
-
-
-
-!--- cleanup after sixtrack
-
-removefile, file="fc.2";
-
-removefile, file="fc.3";
-
-removefile, file="fc.3.aper";
-
-removefile, file="fc.3.aux";
-
-removefile, file="fc.8";
-
-removefile, file="fc.34";
-
-
-
-stop;
-
-
-  Number of warnings: 2
-2 in C and 0 in Fortran
-
-  ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.04 (64 bit) finished normally +
-  ++++++++++++++++++++++++++++++++++++++++++++
++=+=+= c6t fatal - negative drift in front of qf.1_AP, length -1.550000
