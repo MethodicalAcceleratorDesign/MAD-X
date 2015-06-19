@@ -743,6 +743,7 @@ libs/ptc/src/ptcinterface.f90 -text
 make/README -text
 make/README.lxplus -text
 make/README.windows -text
+make/README_DEV.doc -text
 make/clean.rules -text
 make/compiler.cl -text
 make/compiler.g++ -text
@@ -1985,6 +1986,8 @@ tools/numdiff/src/utest.h -text
 tools/numdiff/src/utils.c -text
 tools/numdiff/src/utils.h -text
 tools/numdiff/tests/test-constraint-2/twiss_madx.ref -text
+tools/numdiff/tests/test-constraint/test-constraint.nd.lhs -text
+tools/numdiff/tests/test-constraint/test-constraint.nd.rhs -text
 tools/numdiff/tests/test-goto-2/test-goto-2.nd.cfg -text
 tools/numdiff/tests/test-goto-2/test-goto-2.nd.lhs -text
 tools/numdiff/tests/test-goto-2/test-goto-2.nd.rhs -text

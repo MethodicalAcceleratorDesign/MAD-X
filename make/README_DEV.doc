@@ -1,0 +1,102 @@
+===== VARIABLES =====
+
+CC  		-- C compiler
+CXX 		-- C++ compiler
+FC  		-- fortran compiler
+LD  		-- linker
+AR  		-- archiver
+ND			-- numerical diff
+
+CDEP 		-- C dependencies
+CXXDEP 		-- C++ dependencies
+FDEP 		-- fortran dependencies
+
+CFLAGS 		-- C flags
+CXXFLAGS	-- C++ flags
+FFLAGS		-- fortran flags
+LDFLAGS		-- linker flags
+ARFLAGS 	-- archiver flags
+NDFLAGS     -- numerical diff flags
+
+CC_HDR		-- C includes
+CC_SRC		-- C files 
+CXX_HDR		-- C++ includes
+CXX_SRC		-- C++ files
+FC_INC		-- fortran includes
+FC_SRC		-- fortran files
+
+LIBS        -- project libs
+LDLIBS      -- system libs (come last)
+
+ARCH 		-- architecture [ 32 | 64 | detect ]
+COMP 		-- compiler suite [ gnu | intel ]
+DEBUG       -- generate code for debugging [ yes | no ]
+DESTDIR     -- build directory [ build ]
+OBJDIR      -- directory to object files [ $(DESTDIR)/$(OSTYPE)$(ARCH) ]
+PLUGIN		-- loadable compilation/linking [ yes | no ]
+PROFILE     -- generate code for profiling [ yes | no ]
+PROJECT     -- project name
+SHARED      -- dynamic compilation/linking [ yes | no ]
+SHOW        -- display running command [ yes | no ]
+STATIC      -- static compilation/linking [ yes | no ]
+TESTS		-- list of specific tests to run [ detect ]
+
+NDDEBUG		-- numerical diff debug [ yes | no ]
+NDTRACE     -- numerical diff trace [ yes | no ]
+
+===== TRANSLATORS =====
+
+CC_tr  		-- C options trans.
+CXX_tr		-- CXX options trans.
+FC_tr		-- fortran options trans.
+LD_tr		-- linker options trans.
+AR_tr		-- archiver options trans.
+ND_tr		-- numerical diff options trans.
+
+===== PACKAGE =====
+
+%.ar 		-- default archiver
+%.cl        -- Microsoft C/C++
+%.g95       -- fortran f95 
+%.gcc		-- gnu C
+%.g++		-- gnu C++
+%.gfortran	-- gnu fortran
+%.icc		-- intel C/C++ (Unixes)
+%.icl		-- intel C/C++ (Windows)
+%.ifort		-- intel fortran
+%.ld 		-- linker
+%.lf95 		-- lahey compiler
+%.nagfor	-- nagfor compiler
+
+===== PLATFORMS =====
+
+OSARCH      -- [ i386 | i686 | x86 | x86_64 | amd64 | ia64 ]
+OSTYPE      -- [ Cygwin | Darwin | Linux | Windows ]
+
+===== MAKEFILES =====
+
+Makefile
+Makefile_c
+Makefile_cpp
+Makefile_cxx
+Makefile_f90
+Makefile_post -> Makefile_$(sys)
+Makefile_pre
+Makefile_sys
+Makefile_test
+
+-- $(sys) post dispatch
+Makefile_cyg
+Makefile_lnx
+Makefile_mac
+Makefile_win
+
+-- special makefile
+Makefile_local
+
+
+
+
+
+
+
