@@ -27,8 +27,8 @@ SU=1.0;
 
 !call, file = "../share/LHC/LHCRing/V6.503/V6.5.seq";
 !call, file = "../share/LHC/LHCRing/V6.503/V6.5.thin.inj.str";
-call, file = "V6.5.seq";
-call, file = "V6.5.thin.inj.str";
+call, file = "input/V6.5.seq";
+call, file = "input/V6.5.thin.inj.str";
 
 call, file = "slice_new.madx";
 
@@ -53,7 +53,7 @@ SEEDSYS = 1;
 SEEDRAN = 1;
 
 option, -echo;
-call, file = '0507';
+call, file = 'input/0507';
 call, file = "Esubroutines.madx";
 option, echo;
 
