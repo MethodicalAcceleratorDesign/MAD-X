@@ -1705,8 +1705,8 @@ tests/test-sequence/test-sequence.tfs.ref -text
 tests/test-survey-2/test-survey-2.cfg -text
 tests/test-survey-2/test-survey-2.madx -text
 tests/test-survey-2/test-survey-2.ref -text
-tests/test-survey-2/ti8_ted.out.cfg -text
-tests/test-survey-2/ti8_ted.out.ref -text
+tests/test-survey-2/ti8_ted.cfg -text
+tests/test-survey-2/ti8_ted.ref -text
 tests/test-survey/test-survey.cfg -text
 tests/test-survey/test-survey.madx -text
 tests/test-survey/test-survey.ref -text

@@ -74,7 +74,7 @@ test-sequence test-sequence-2 test-sequence-3 test-sequence-4 test-sequence-5 te
 test-line \
 test-plot test-plot-2
 
-# same order as tests-all, tests that take +10s
+# same order as tests-all, tests that take +10 seconds
 # to know the timing: make tests-all TIMER=time (on Unixes)
 tests-long := \
 test-memory \
@@ -92,8 +92,7 @@ test-touschek test-touschek-2
 #test-track-8: test-makethin-2
 
 # lexicographical order
-tests-to-setup := \
-test-error-3__needs_generated_error_file_from_Riccardo
+tests-to-setup := 
 
 # testsuite titles (attached to first test of the suite, lex. order)
 test-aperture:       TESTSUITE := Aperture testsuite
@@ -116,7 +115,7 @@ test-ptc-twiss:      TESTSUITE := PTC Twiss testsuite
 test-rfmultipole:    TESTSUITE := RF Multipole testsuite
 test-sequence:	     TESTSUITE := Sequence testsuite
 test-survey:         TESTSUITE := Survey testsuite
-test-table:	     TESTSUITE := Table testsuite
+test-table:	     	 TESTSUITE := Table testsuite
 test-thick-quad:     TESTSUITE := Thick Quadrupole testsuite
 test-touschek:       TESTSUITE := Touschek testsuite
 test-track:          TESTSUITE := Track testsuite

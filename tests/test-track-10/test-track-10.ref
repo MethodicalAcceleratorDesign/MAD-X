@@ -3,7 +3,7 @@
   +     MAD-X 5.02.05  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2015.04.06               +
-  + Execution date: 2015.06.19 10:23:47      +
+  + Execution date: 2015.06.19 14:14:08      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! based on examples/emit/LEP/
 
@@ -104,11 +104,11 @@ orbit:   4.954688E-05 -3.462812E-07  0.000000E+00  0.000000E+00  1.525359E-01  7
   
   Full 6D closed orbit search.
   Initial value of 6-D closed orbit from Twiss: 
-  orbit0    4.9546879566648725E-005  -3.4628120925387573E-007   0.0000000000000000        0.0000000000000000       0.15253590951780999        7.1694287121548239E-004
+  orbit0   4.954687956664036E-005 -3.462812092538950E-007  0.000000000000000E+000  0.000000000000000E+000  0.152535909517810       7.169428712154854E-004
   
  6D closed orbit found by subroutine trclor 
-iteration:  11 error:   1.436106E-06 deltap:   0.000000E+00
-orbit:   4.962471E-05 -3.415771E-07  0.000000E+00  0.000000E+00  1.525357E-01  7.165082E-04
+iteration:  11 error:   1.679851E-06 deltap:   0.000000E+00
+orbit:   4.962732E-05 -3.420737E-07  0.000000E+00  0.000000E+00  1.525355E-01  7.165204E-04
 
 *****  end of trrun  *****
 exit TRACK module
