@@ -1884,9 +1884,9 @@ tests/test-twiss-10/twiss1.cfg -text
 tests/test-twiss-10/twiss1.ref -text
 tests/test-twiss-10/twiss2.cfg -text
 tests/test-twiss-10/twiss2.ref -text
-tests/test-twiss-11/dec17c.sav -text
 tests/test-twiss-11/dec17i.lis.cfg -text
 tests/test-twiss-11/dec17i.lis.ref -text
+tests/test-twiss-11/input/dec17c.sav -text
 tests/test-twiss-11/test-twiss-11.cfg -text
 tests/test-twiss-11/test-twiss-11.madx -text
 tests/test-twiss-11/test-twiss-11.ref -text

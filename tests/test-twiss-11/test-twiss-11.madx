@@ -1,7 +1,7 @@
 option,-echo,-warn;
 
 !-- Define triplet lattice for gantry
-call,file="dec17c.sav";
+call,file="input/dec17c.sav";
 title,"Triplet lattice for gantry - dec17i";
 
 twiss0: beta0, betx=beta, bety=beta;
