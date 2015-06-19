@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.02  (64 bit, Darwin)      +
+  +     MAD-X 5.02.05  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2014.07.04               +
-  + Execution date: 2014.10.15 16:35:43      +
+  + Release   date: 2015.04.06               +
+  + Execution date: 2015.06.19 12:02:10      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
@@ -259,7 +259,6 @@ parameter: energy   double value:                100
 
 ptc_create_universe;
 
- Now PTC
 ptc_create_layout,model=2,method=6,nst=10,exact;
 
  MAD-X Beam Parameters
@@ -268,17 +267,17 @@ ptc_create_layout,model=2,method=6,nst=10,exact;
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.999956E+02
  Setting MADx with 
-     energy           100.000000000000     
+     energy           100.00000000000000     
      method                   6
      Num. of steps           10
-     charge           1.00000000000000     
-  Length of machine:    534.600000000000     
+     charge           1.0000000000000000     
+  Length of machine:    534.59999999999991     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After    end:   -40.5807584670258       0.000000000000000E+000   532.533460530797     
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -40.580758467025781        0.0000000000000000        532.53346053079656     
 !ptc_create_layout,model=2,method=6,nst=1,exact; ! steps pb more apparent
 
 !ptc_create_layout,model=2,method=6,nst=4,exact; ! looks like 2 is minimum to split the element at the middle...
@@ -316,9 +315,6 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,summary_file=twiss_ptc_summar
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   3.260715892537305E-004  2.596346259293698E-006  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
-Deviation from symplecticity  0.5251354906476990E-11 %
-Deviation from symplecticity  0.5251354906476990E-11 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -395,14 +391,6 @@ ptc_twiss,closed_orbit,icase=5,slice_magnets,file=twiss_ptc_ring_slices,no=4;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
-  PARENT LAYOUT NAME :No name assigned
-  NUMBER OF ORIGINAL LAYOUT ELEMENTS :         146
-  NUMBER OF THIN OBJECTS :        1180
-  TOTAL IDEAL LENGTH OF STRUCTURE :   534.600000000002     
-  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   534.600000000002     
- Closed orbit:   3.260715892537305E-004  2.596346259293698E-006  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
-Deviation from symplecticity  0.5251354906476990E-11 %
-Deviation from symplecticity  0.5251354906476990E-11 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -481,14 +469,11 @@ PTC_NORMAL,closed_orbit,maptable,icase=5,no=4;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   3.260715892537305E-004  2.596346259293698E-006  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Closed orbit:    3.2607158925373049E-004   2.5963462592936979E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
 
 
 ptc_end;
 
- Killing LayoutNo name assigned                                                                                                        
-  NODE LAYOUT HAS BEEN KILLED 
- Layout killed 
 
 
 !write,table="map_table",file="map_table";
@@ -512,24 +497,23 @@ call, file = "../share/line_lattice/line.seq";
 ++++++ info: ygapsp3 redefined
 ++++++ info: ygapsp4 redefined
 ++++++ info: ygapsp5 redefined
- Now PTC
  MAD-X Beam Parameters
                   Energy : 0.250000E+03
           Kinetic Energy : 0.249999E+03
       Particle Rest Mass : 0.510999E-03
                 Momentum : 0.250000E+03
  Setting MADx with 
-     energy           250.000000000000     
+     energy           250.00000000000000     
      method                   6
      Num. of steps            5
-     charge          -1.00000000000000     
-  Length of machine:    534.600000000000     
+     charge          -1.0000000000000000     
+  Length of machine:    534.59999999999991     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After    end:   -40.5807584670258       0.000000000000000E+000   532.533460530797     
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -40.580758467025781        0.0000000000000000        532.53346053079656     
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
   Rectangular Bend: input arc length (rho alpha) 
@@ -551,8 +535,7 @@ call, file = "../share/line_lattice/line.seq";
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit specified by the user!
- Closed orbit:   8.897806712109201E-005  7.283918352660537E-007  5.216050332314255E-005 -6.748041062611771E-007  0.000000000000000E+000
+ Closed orbit:    8.8978067121092011E-005   7.2839183526605370E-007   5.2160503323142552E-005  -6.7480410626117705E-007   0.0000000000000000     
  Reduced SUMM Table (Inital parameters specified)
 
 ++++++ table: ptc_twiss_summary
@@ -607,11 +590,9 @@ call, file = "../share/line_lattice/line.seq";
 
            pycomin             tcomin            ptcomin 
   -1.674289292e-06                  0                  0 
- Killing LayoutNo name assigned                                                                                                        
- Layout killed 
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.02 (64 bit) finished normally +
+  + MAD-X 5.02.05 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
