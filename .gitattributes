@@ -1213,7 +1213,7 @@ tests/test-cororbit/stren.ref -text
 tests/test-cororbit/test-cororbit.cfg -text
 tests/test-cororbit/test-cororbit.madx -text
 tests/test-cororbit/test-cororbit.ref -text
-tests/test-dynap/bb.macros -text
+tests/test-dynap/bb.macros.madx -text
 tests/test-dynap/dynap.cfg -text
 tests/test-dynap/dynap.ref -text
 tests/test-dynap/dynaptune.cfg -text

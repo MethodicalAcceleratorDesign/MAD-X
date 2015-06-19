@@ -108,7 +108,7 @@ bbmarker: marker;  /* for subsequent remove */
 !
 !===========================================================
 ! read macro definitions
-call,file="bb.macros";
+call,file="bb.macros.madx";
 
 !
 !===========================================================
