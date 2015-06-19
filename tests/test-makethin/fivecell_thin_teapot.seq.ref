@@ -29,7 +29,7 @@ qf.1..5: mq..5,lrad:= 0.62,knl:={ 0,( ( kqf ) * ( 3.1 ) ) * ( 0.2 ) },apertype=e
 mscbh: multipole,lrad:= 1.1,knl:={ 0, 0,( ksf ) * ( 1.1 ) };
 cbh: hkicker;
 cbh.1: cbh,kick:=acbh1 ;
-mb_s: multipole,lrad:=( 14.2 ) * ( ( bang ) * 0.5 / sin ( ( bang ) / 2 ) ) ,knl:={bang },apertype=circle,aperture:={ 0.01};
+mb_s: multipole,lrad:=( 14.2 ) * ( invsinc ( bang * 0.5 ) ) ,knl:={bang },apertype=circle,aperture:={ 0.01};
 bpv: vmonitor,l:= 0;
 bpv.1: bpv;
 qd.1..1: mq..1,lrad:= 0.62,knl:={ 0,( ( kqd ) * ( 3.1 ) ) * ( 0.2 ) },apertype=ellipse,aperture:={ 0.02, 0.01};
