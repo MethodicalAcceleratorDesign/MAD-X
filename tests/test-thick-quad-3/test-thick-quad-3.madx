@@ -33,7 +33,7 @@ use,sequence=fivecell;
 
 !--- check that the sliced sequence is quitable for SIXTRACK translation  http://mad.web.cern.ch/mad/madx.old/c6t/c6t.html
 
-sixtrack, aperture;
+sixtrack;
 
 !--- test MAD-X tracking   http://mad.web.cern.ch/mad/madx.old/thintrack/thintrack.html
 track, onepass, dump; ! onepass=true no closed orbit computed before tracking

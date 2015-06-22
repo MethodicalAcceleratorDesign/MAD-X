@@ -3,7 +3,7 @@
   +     MAD-X 5.02.05  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2015.04.06               +
-  + Execution date: 2015.06.19 08:19:47      +
+  + Execution date: 2015.06.22 17:31:16      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -126,14 +126,83 @@ use,sequence=fivecell;
 
 
 
-sixtrack, aperture;
+sixtrack;
 
   ++++++++++++++++++++++++++++
   +   c6t version 2.0        +
   ++++++++++++++++++++++++++++
 
-++++++ info: c6t - aperture flag selected 
 max_mult_ord set to : 11
 Reference radius set to : 1.000000
 ++++++ info: MADX sequence converted to c6t internal. 
-+=+=+= c6t fatal - negative drift in front of qf.1_AP, length -1.550000
+
+total block length: 534.600000
+
+c6t terminated - total number of elements: 272
+                    field errors    MAD-X: 0
+                    field errors SixTrack: 0
+                 alignment errors   MAD-X: 1
+                alignment errors SixTrack: 1
+                          sequence length: 534.600000 [m]
+
+
+!--- test MAD-X tracking   http://mad.web.cern.ch/mad/madx.old/thintrack/thintrack.html
+
+track, onepass, dump; ! onepass=true no closed orbit computed before tracking
+
+enter TRACK module
+one pass is on
+  start, x= 0.001, px= 0.002, y= 0, py= 0, t= 0.001, pt= 0.003;
+
+  run,   turns= 1;
+
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+
+++++++ table: tracksumm
+
+    number       turn                  x                 px 
+         1          0              0.001              0.002 
+         1          1       0.4664211384     0.006531778054 
+
+                 y                 py                  t                 pt 
+                 0                  0              0.001              0.003 
+     0.00629954028    0.0001216644721      -0.0027115156              0.003 
+
+                 s                  e 
+                 0                  0 
+             534.6                  0 
+
+*****  end of trrun  *****
+endtrack;
+
+exit TRACK module
+
+
+
+!--- cleanup after sixtrack
+
+removefile, file="fc.2";
+
+removefile, file="fc.3";
+
+removefile, file="fc.3.aper";
+
+++++++ warning: unable to remove file:  fc.3.aper
+removefile, file="fc.3.aux";
+
+removefile, file="fc.8";
+
+removefile, file="fc.34";
+
+
+
+stop;
+
+
+  Number of warnings: 3
+3 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.02.05 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++
