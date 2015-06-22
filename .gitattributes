@@ -1105,6 +1105,12 @@ tests/test-c6t-2/fc.34.ref -text
 tests/test-c6t-2/test-c6t-2.cfg -text
 tests/test-c6t-2/test-c6t-2.madx -text
 tests/test-c6t-2/test-c6t-2.ref -text
+tests/test-c6t-3/fc.2.ref -text
+tests/test-c6t-3/fc.3.aux.ref -text
+tests/test-c6t-3/fc.34.ref -text
+tests/test-c6t-3/fc.8.ref -text
+tests/test-c6t-3/test-c6t-3.madx -text
+tests/test-c6t-3/test-c6t-3.ref -text
 tests/test-c6t/fc.2.cfg -text
 tests/test-c6t/fc.2.ref -text
 tests/test-c6t/fc.3.aux.cfg -text

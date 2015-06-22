@@ -1,0 +1,13 @@
+TITLE;
+option,-echo,-warn;
+beam;
+
+option,-echo;
+call,file="../share/fivecell/fivecell.seq"; 
+
+use,period=fivecell;   ! use needed for twiss (not necessarily needed before makethin)
+twiss;
+
+sixtrack, aperture;
+removefile file="fc.3"
+stop;
