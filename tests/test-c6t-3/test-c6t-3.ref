@@ -3,7 +3,7 @@
   +     MAD-X 5.02.05  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2015.04.06               +
-  + Execution date: 2015.06.22 17:39:20      +
+  + Execution date: 2015.06.22 17:57:13      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE;
 
@@ -13,26 +13,9 @@ enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-
-++++++ table: summ
-
-            length             orbit5               alfa            gammatr 
-             534.6                 -0     0.000443530778        47.48299658 
-
-                q1                dq1            betxmax              dxmax 
-       1.248722214        1.053600864        183.8515851        2.181076135 
-
-             dxrms             xcomax             xcorms                 q2 
-       1.660602214                  0                  0        1.260064776 
-
-               dq2            betymax              dymax              dyrms 
-       1.050583704        177.9027092      0.09011673644      0.06712058421 
-
-            ycomax             ycorms             deltap            synch_1 
-                 0                  0                  0                  0 
-
-           synch_2            synch_3            synch_4            synch_5 
-                 0                  0                  0                  0 
+ ++++++ warning: TWCPIN: Mode 2 is unstable for delta(p)/p =    0.000000, cosmux =     0.866330, cosmuy =     1.136865                           
+++++++ Error: seterrorflag : Errorcode: 1   Reported from pro_twiss:
+++++++ Error: seterrorflag : Description: TWISS failed
   ++++++++++++++++++++++++++++
   +   c6t version 2.0        +
   ++++++++++++++++++++++++++++
@@ -40,16 +23,17 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 max_mult_ord set to : 11
 Reference radius set to : 1.000000
 
-total block length: 534.600000
+total block length: 10.000000
 
-c6t terminated - total number of elements: 142
+c6t terminated - total number of elements: 5
                     field errors    MAD-X: 0
                     field errors SixTrack: 0
-                 alignment errors   MAD-X: 1
-                alignment errors SixTrack: 1
-                          sequence length: 534.600000 [m]
+                 alignment errors   MAD-X: 0
+                alignment errors SixTrack: 0
+                          sequence length: 10.000000 [m]
 
-  Number of warnings: 0
+  Number of warnings: 3
+2 in C and 1 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   + MAD-X 5.02.05 (64 bit) finished normally +
