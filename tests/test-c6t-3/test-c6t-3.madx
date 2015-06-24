@@ -1,20 +1,17 @@
 TITLE;
 option,-echo,-warn;
 beam;
-
-kqf =  .872651312e-2;
-kqd = -.872651312e-2;
-mq: quadrupole, l=3, apertype=ellipse,aperture={0.02,0.01};
-
-fivecell: sequence, refer=centre, l=10;
-   qf.1: mq, k1:=kqf, at=3;
-   qd.1: mq, k1:=kqd, at=7;
-end_fivecell: marker at=10;
-endsequence;
+	
+call,file="../share/fivecell/fivecell.seq";
 
 use,period=fivecell;   ! use needed for twiss (not necessarily needed before makethin)
 twiss;
 
-sixtrack;
+makethin,sequence=fivecell,style=teapot,makedipedge=true;
+
+use,period=fivecell;
+twiss;
+
+sixtrack, aperture;
 removefile file="fc.3"
 stop;
