@@ -100,15 +100,16 @@ USEKICK,RANGE=mcbxa.3r2,     status=OFF;
 USEKICK,RANGE=mcbx.2l2,      status=OFF;
 
 Correct, FLAG=ring, orbit=my_orbit, target=my_target2, model=my_model,
-         MODE=micado, cond=0, NCORR=300, ERROR=1E-6, PLANE=x,
+         MODE=micado, cond=1, NCORR=300, ERROR=1E-6, PLANE=x,
          mlist=mx3.tab, clist=cx3.tab, RESOUT=1, CORZERO=1;
 
 Correct, FLAG=ring, orbit=my_orbit, target=my_target2, model=my_model,
-         MODE=micado, cond=0, NCORR=300, ERROR=1E-6, PLANE=y,
+         MODE=micado, cond=1, NCORR=300, ERROR=1E-6, PLANE=y,
          mlist=my3.tab, clist=cy3.tab, RESOUT=1, CORZERO=1;
 
 TWISS,file=result3.file;
 
 !******************************************************************
 removefile, file='fort.61';
-removefile, file='fort.69';
+
+Stop;

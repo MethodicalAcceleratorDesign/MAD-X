@@ -39,7 +39,7 @@ subroutine setupi(resp,a,im,ic,nm,nc)
 end subroutine setupi
 
 subroutine micit(a,conm,xin,cin,res,nx,rms,im,ic,iter,ny,ax,cinx, &
-    &xinx,resx,rho,ptop,rmss,xrms,xptp,xiter,ifail)
+                 xinx,resx,rho,ptop,rmss,xrms,xptp,xiter,ifail)
     ! ****************************************************
     !                                                    *
     !    Driving routine for MICADO correction           *
@@ -51,40 +51,38 @@ subroutine micit(a,conm,xin,cin,res,nx,rms,im,ic,iter,ny,ax,cinx, &
 
     implicit none
 
-    integer :: im, ic, iter, i, j
-    integer :: nx(ic),ny(ic)
-    real ax(im,ic), cinx(ic), xinx(im), resx(im), rho(3*ic), ptop(ic)
-    real rmss(ic), xrms(ic), xptp(ic), xiter(ic)
-
-    real rms, rzero, pt, rm
-    parameter(rzero=0e0)
-
-    double precision a(im,ic),xin(im),cin(ic),res(im)
+    double precision :: a(im,ic), xin(im), cin(ic), res(im)
     character(16) :: conm(ic)
+    integer :: im, ic, iter
+    integer :: nx(ic)
+    double precision :: ax(im,ic), cinx(ic), xinx(im), resx(im), rho(3*ic), ptop(ic)
+    double precision :: rmss(ic), xrms(ic), xptp(ic), xiter(ic)
+    integer :: ifail
 
-    integer      n
-    integer      ifail
-    real         calrms
+    integer :: n, i, j
+    integer :: ny(ic)
+    double precision :: rms, pt, rm
+    double precision :: calrms
+    double precision, parameter :: rzero=0d0
 
     ! translate corrector names to fortran strings
     do  j = 1,ic
        call f_ctof(n, conm(j), 16)
     enddo
 
-    AX  = A
-    CINX = rzero
+    AX(1:im,1:ic) = A(1:im,1:ic)
+    CINX(1:ic) = rzero
 
     NY(1:ic) = (/ (i, i = 1, ic) /) ! NY(i) = i 
 
-    XINX = XIN
-    RESX = rzero
+    XINX(1:im) = XIN(1:im)
+    RESX(1:im) = rzero
 
     write(*,*) ' '
     write(*,*) 'start MICADO correction with ',iter,' correctors'
     write(*,*) ' '
 
-    rm = calrms(xinx,im)
-
+    rm = calrms(XINX,im)
     if(rm.le.rms) then
        write(*,*) '++++++ WARNING: RMS already smaller than desired '
        write(*,*) '++++++ WARNING: no correction is done            '
@@ -92,14 +90,14 @@ subroutine micit(a,conm,xin,cin,res,nx,rms,im,ic,iter,ny,ax,cinx, &
        iter = 0
        ifail = -2
     else
-       open(61,file='fort.61')     
+       open(61,file='fort.61')
        call htls(ax,conm,xinx,im,ic,cinx,ny,resx,rms,3,iter,rho,ptop,rmss,&
-            &xrms,xptp,xiter,ifail)
+            xrms,xptp,xiter,ifail)
        close(61)
     endif
 
-    CIN = CINX
-    RES = RESX
+    CIN(1:ic) = CINX(1:ic)
+    RES(1:im) = RESX(1:im)
     NX(NY(1:ic)) = (/ (i, i = 1, ic) /) ! NX(NY(i)) = i 
     
     return
@@ -128,25 +126,25 @@ subroutine haveit(a,xin,cin,res,nx,im,ic,cb,xmeas,xres,y,z,xd)
     write(*,*) 'start LEAST SQUARES correction with all correctors'
     write(*,*) ' '
 
-    RES = zero
+    RES(1:im) = zero
 
-    XMEAS = XIN
-    XRES = zero
-    Y = TRANSPOSE(A) 
-    Z = MATMUL(Y, A) 
+    XMEAS(:im) = XIN(:im)
+    XRES(:im) = zero
+    Y(:ic,:im) = TRANSPOSE(A(:im,:ic)) 
+    Z(:ic,:ic) = MATMUL(Y(:ic,:im), A(:im,:ic)) 
 
     call dinv(ic,Z,ic,w,ifail)
     if ( ifail .ne. 0 ) then
        write(*,*) 'IFAIL from dinv: ',ifail
     endif
     
-    XD = MATMUL(Y, XMEAS) 
-    CB = MATMUL(Z, XD)
-    CB = -CB 
-    XRES = MATMUL(A, CB)
+    XD(:ic) = MATMUL(Y(:ic,:im), XMEAS(:im)) 
+    CB(:ic) = MATMUL(Z(:ic,:ic), XD(:ic))
+    CB(:ic) = -CB(:ic) 
+    XRES(:im) = MATMUL(A(:im,:ic), CB(:ic))
  
-    CIN = CB
-    RES = XRES + XMEAS
+    CIN(:ic) = CB(:ic)
+    RES(:im) = XRES(:im) + XMEAS(:im)
     NX(1:ic) = (/ (i, i = 1, ic) /) ! NX(i) = i 
 
     write(*,*) ' '
@@ -157,7 +155,7 @@ subroutine haveit(a,xin,cin,res,nx,im,ic,cb,xmeas,xres,y,z,xd)
 end subroutine haveit
       
 subroutine svddec_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
-    &ws,wvec,sortw,sngcut,sngval,im,ic,iflag,sing,dbg)
+     ws,wvec,sortw,sngcut,sngval,im,ic,iflag,sing,dbg)
     ! ****************************************************
     !                                                    *
     !    Performs SVD and analysis for matrix with more  *
@@ -167,23 +165,24 @@ subroutine svddec_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
     !                                                    *
     ! ****************************************************
     implicit none
-    integer im,ic,i,j,jj,ii
-    integer iflag,sing(2,ic)
-    double precision a(im,ic)
-    double precision svdmat(im,ic)
-    double precision umat(im,ic), utmat(ic,im)
-    double precision vmat(im,ic), vtmat(ic,im)
-    double precision wmat(im,ic), wtmat(ic,im)
-    double precision wvec(ic)
-    double precision rat, zero, sngval, sngcut
-    double precision ws(ic)
-    integer amater, svdmx, svdnx, svdnm
-    integer sortw(ic)
-    integer nsing
-    logical matu, matv
-    integer dbg
-    parameter(zero = 0d0)
-    parameter(nsing = 5)
+
+    double precision :: a(im,ic), svdmat(im,ic)
+    double precision :: umat(im,ic), utmat(ic,im)
+    double precision :: vmat(im,ic), vtmat(ic,im)
+    double precision :: wmat(im,ic), wtmat(ic,im)
+    double precision :: ws(ic), wvec(ic)
+    integer :: sortw(ic)
+    double precision :: sngval, sngcut
+    integer :: im, ic
+    integer :: iflag, sing(2,ic)
+    integer :: dbg
+
+    integer :: i, j, jj, ii
+    integer :: amater, svdmx, svdnx, svdnm
+    integer, parameter ::  nsing=5
+    logical :: matu, matv
+    double precision :: rat
+    double precision, parameter :: zero=0d0
 
     ! 2013-Dec-19  09:46:02  ghislain: explicit opening of fort.61 for Windows
     if(dbg.gt.0) then
@@ -202,7 +201,7 @@ subroutine svddec_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
     svdmx = im
     svdnx = ic
 
-    SVDMAT = A
+    SVDMAT(:im,:ic) = A(:im,:ic)
 
     if(dbg.gt.0) then
        write(*,*) 'A0:'
@@ -308,23 +307,24 @@ subroutine svddec_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
     !                                                    *
     ! ****************************************************
     implicit none
-    integer im,ic,i,j,jj,ii
-    integer iflag,sing(2,ic)
-    double precision a(im,ic)
-    double precision svdmat(ic,im)
-    double precision umat(ic,im), utmat(im,ic)
-    double precision vmat(ic,im), vtmat(im,ic)
-    double precision wmat(ic,im), wtmat(im,ic)
-    double precision wvec(ic)
-    double precision rat, zero, sngcut, sngval
-    double precision ws(ic)
-    integer sortw(ic)
-    integer amater, svdmx, svdnx, svdnm
-    integer nsing
-    logical matu, matv
-    integer dbg
-    parameter(zero = 0d0)
-    parameter(nsing = 5)
+
+    double precision :: a(im,ic), svdmat(ic,im)
+    double precision :: umat(ic,im), utmat(im,ic)
+    double precision :: vmat(ic,im), vtmat(im,ic)
+    double precision :: wmat(ic,im), wtmat(im,ic)
+    double precision :: ws(ic), wvec(ic)
+    integer :: sortw(ic)
+    double precision :: sngcut, sngval
+    integer :: im, ic
+    integer :: iflag, sing(2,ic)
+    integer :: dbg
+
+    integer :: i, j, jj, ii
+    integer :: amater, svdmx, svdnx, svdnm
+    integer, parameter ::  nsing=5
+    logical :: matu, matv
+    double precision :: rat
+    double precision, parameter :: zero=0d0
 
     ! 2013-Dec-19  09:46:02  ghislain: explicit opening of fort.61 for Windows.
     if(dbg.gt.0) then
@@ -343,7 +343,7 @@ subroutine svddec_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
     svdmx = ic
     svdnx = im
 
-    SVDMAT = transpose(A)
+    SVDMAT(:ic,:im) = transpose(A(:im,:ic))
     
     if(dbg.gt.0) then
        write(*,*) 'A0:'
@@ -410,7 +410,7 @@ subroutine svddec_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
                        if(iflag.lt.ic) then
                           iflag = iflag + 1
                           sing(1,iflag) =  j - 1
-                           sing(2,iflag) = jj - 1
+                          sing(2,iflag) = jj - 1
                         endif
                      endif
                   endif
@@ -435,7 +435,7 @@ subroutine svddec_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
 end subroutine svddec_c
 
 subroutine svdcorr_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
-    &xin,xc,xout,xa,xb,xpred,ws,wvec,sortw,nx,im,ic,iflag,dbg)
+     xin,xc,xout,xa,xb,xpred,ws,wvec,sortw,nx,im,ic,iflag,dbg)
     ! ******************************************************
     !                                                      *
     !    Performs SVD and correction for matrix with more  *
@@ -445,19 +445,21 @@ subroutine svdcorr_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
     !                                                      *
     ! ******************************************************
     implicit none
-    integer im,ic,nx(ic),i,j
-    integer iflag
-    double precision a(im,ic)
-    double precision svdmat(im,ic)
-    double precision umat(im,ic), utmat(ic,im)
-    double precision vmat(im,ic), vtmat(ic,im)
-    double precision wmat(im,ic), wtmat(ic,im)
-    double precision xin(im),xout(im),xc(ic)
-    double precision xa(im),xb(im),xpred(im),ws(ic),wvec(ic)
-    integer sortw(ic)
-    integer amater, svdmx, svdnx, svdnm
-    logical matu, matv
-    integer dbg
+
+    double precision :: a(im,ic), svdmat(im,ic)
+    double precision :: umat(im,ic), utmat(ic,im)
+    double precision :: vmat(im,ic), vtmat(ic,im)
+    double precision :: wmat(im,ic), wtmat(ic,im)
+    double precision :: xin(im), xout(im), xc(ic)
+    double precision :: xa(im), xb(im), xpred(im) 
+    double precision :: ws(ic), wvec(ic)
+    integer :: sortw(ic), nx(ic)
+    integer :: im, ic
+    integer :: iflag, dbg
+
+    integer :: i, j
+    integer :: amater, svdmx, svdnx, svdnm
+    logical :: matu, matv
 
     matu = .TRUE.
     matv = .TRUE.
@@ -475,7 +477,7 @@ subroutine svdcorr_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
         nx(i) = i
     enddo
 
-    SVDMAT = A
+    SVDMAT(:im,:ic) = A(:im,:ic)
 
     if(dbg.gt.0) then
        write(*,*) 'A0:'
@@ -509,8 +511,8 @@ subroutine svdcorr_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
        enddo
     endif
 
-    VTMAT = transpose(VMAT)
-    UTMAT = transpose(UMAT)
+    VTMAT(:ic,:im) = transpose(VMAT(:im,:ic))
+    UTMAT(:ic,:im) = transpose(UMAT(:im,:ic))
 
     if(dbg.gt.0) then
        write(*,*) 'A1:'
@@ -544,7 +546,7 @@ subroutine svdcorr_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
        enddo
     endif
 
-    XA(:im) = matmul(UTMAT(:im,:im), XIN(:im))
+    XA(:im) = matmul(UTMAT(:im,:im), XIN(:im)) ! take submatrix of UTMAT
     XB(:ic) = matmul(WTMAT(:ic,:im), XA(:im))
     XC(:ic) = matmul(VMAT(:ic,:ic), XB(:ic))
     XPRED(:im) = matmul(SVDMAT(:im,:ic), XC(:ic))
@@ -554,14 +556,14 @@ subroutine svdcorr_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
        write(*,*) "monitors:   ", xpred
     endif
 
-    XOUT = XIN - XPRED    
-    XC = - XC
+    XOUT(:im) = XIN(:im) - XPRED(:im)
+    XC(:ic) = - XC(:ic)
 
     return
 end subroutine svdcorr_m
 
 subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
-    &xin,xc,xout,xa,xb,xpred,ws,wvec,sortw,nx,im,ic,iflag,dbg)
+     xin,xc,xout,xa,xb,xpred,ws,wvec,sortw,nx,im,ic,iflag,dbg)
     ! ******************************************************
     !                                                      *
     !    Performs SVD and correction for matrix with more  *
@@ -571,19 +573,21 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
     !                                                      *
     ! ******************************************************
     implicit none
-    integer im,ic,nx(ic),i,j
-    integer iflag
-    double precision a(im,ic)
-    double precision svdmat(ic,im)
-    double precision umat(ic,im), utmat(im,ic)
-    double precision vmat(ic,im), vtmat(im,ic)
-    double precision wmat(ic,im), wtmat(im,ic)
-    double precision xin(im),xout(im),xc(ic)
-    double precision xa(im),xb(im),xpred(im),ws(ic),wvec(ic)
-    integer sortw(ic)
-    integer amater, svdmx, svdnx, svdnm
-    logical matu, matv
-    integer dbg
+
+    double precision :: a(im,ic), svdmat(ic,im)
+    double precision :: umat(ic,im), utmat(im,ic)
+    double precision :: vmat(ic,im), vtmat(im,ic)
+    double precision :: wmat(ic,im), wtmat(im,ic)
+    double precision :: xin(im), xout(im), xc(ic)
+    double precision :: xa(im), xb(im), xpred(im)
+    double precision :: ws(ic), wvec(ic)
+    integer :: sortw(ic), nx(ic)
+    integer :: im, ic
+    integer :: iflag, dbg
+
+    integer :: i,j
+    integer :: amater, svdmx, svdnx, svdnm
+    logical :: matu, matv
     
     matu = .TRUE.
     matv = .TRUE.
@@ -601,7 +605,7 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
         nx(i) = i
     enddo
 
-    SVDMAT = transpose(A)
+    SVDMAT(:ic,:im) = transpose(A(:im,:ic))
 
     if(dbg.gt.0) then
        write(*,*) 'A0:'
@@ -635,8 +639,8 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
          enddo
      endif
 
-     VTMAT = transpose(VMAT)
-     UTMAT = transpose(UMAT)
+     VTMAT(:im,:ic) = transpose(VMAT(:ic,:im))
+     UTMAT(:im,:ic) = transpose(UMAT(:ic,:im))
 
      if(dbg.gt.0) then
         write(*,*) 'A1:'
@@ -670,7 +674,7 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
         enddo
      endif
       
-     XA(:im) = matmul(VTMAT(:im,:im), XIN(:im))
+     XA(:im) = matmul(VTMAT(:im,:im), XIN(:im)) ! take submatrix of VTMAT
      XB(:im) = matmul(WTMAT(:im,:im), XA(:im))
      XC(:ic) = matmul(UMAT(:ic,:im),XB(:im))
      XPRED(:im) = matmul(A(:im,:ic), XC(:ic))
@@ -680,14 +684,14 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
         write(*,*) "monitors:   ", xpred
      endif
 
-     XOUT = XIN - XPRED
-     XC = -XC
+     XOUT(:im) = XIN(:im) - XPRED(:im)
+     XC(:ic) = -XC(:ic)
 
      return
- end subroutine svdcorr_c
+end subroutine svdcorr_c
 
- subroutine htls(a,conm,b,m,n,x,ipiv,r,rms,prtlev,iter,rho,ptop,   &
-     &rmss,xrms,xptp,xiter,ifail)
+subroutine htls(a, conm, b, m, n, x, ipiv, r, rms, prtlev, iter, rho, ptop, &
+                 rmss, xrms, xptp, xiter, ifail)
      implicit none
      !*********************************************************************
      !     Subroutine HTLS to make Householder transform                  *
@@ -698,111 +702,105 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
      !     dimension of array RHO should be 3*N
      !     M  = NMTOT nr available monitors
      !     N  = NCTOT nr available independent correctors
-     integer m,n,ipiv(n),prtlev,iter,ij1,k2,k,i,kpiv,k3,j,ip,j1,kk,ki, &
-         &iii,kkk
-     real a(m,n),b(m),x(n),r(m),rms,rho(3*n),ptop(n),rmss(n),xrms(n),  &
-         &xptp(n),xiter(n),xxcal,ptp,g,h,sig,beta,piv,pivt,rm,pt
 
-     real rzero, reps7
-     parameter(rzero=0e0,reps7=1e-7)
-
-     character(4) :: units
+     double precision :: a(m,n), b(m), x(n), r(m)
      character(16) :: conm(n)
-     integer      ifail
-     real calrms
+     integer :: m, n, prtlev, iter
+     integer :: ipiv(n)
+     double precision :: rms 
+     double precision :: rho(3*n), ptop(n), rmss(n), xrms(n), xptp(n), xiter(n)
+     integer :: ifail
 
-     integer k1, kn, kl, lv
+     integer :: ij1, k2, k, i, kpiv, k3, j, j1, kk, ki, iii,kkk
+     integer :: k1, kn, kl
+     double precision ::  ptp, g, h, sig, beta, piv, pivt, rm, pt, temp
+
+     double precision, parameter ::  rzero=0.d0, reps7=1.d-7
+     character(4) :: units='mrad'
+     double precision :: calrms
 
      ifail = 0
-     units = 'mrad'
      ptp = rzero
 
-     rm = calrms(b,m)
-     pt = MAXVAL(B)-MINVAL(B)
+     rm = calrms(B(:m),m)
+     pt = MAXVAL(B(:m))-MINVAL(B(:m))
 
      ! --- calculate first pivot
      !==========================
 
-     RHO = rzero
+     RHO(:3*n) = rzero
 
-     k2=n + 1
-     piv=rzero
+     k2 = n + 1
+     piv = rzero
       
-     do k=1,n
-        ipiv(k)=k
-        h=rzero
-        g=rzero
-        do i=1,m
-           h=h+a(i,k)*a(i,k)
-           g=g+a(i,k)*b(i)
+     do k = 1, n ! initialisation loop over correctors
+        !ipiv(k) = k ! ipiv is initialized in micit
+        h = rzero
+        g = rzero
+        do i= 1, m
+           h = h + a(i,k)*a(i,k)
+           g = g + a(i,k)*b(i)
         enddo
-        rho(k)=h
+        rho(k) = h
         rho(k2) = g
-        if(h.ne.rzero) then
+        if (h.ne.rzero) then
            pivt = g*g/h
         else
            pivt = rzero
         endif
-        if(pivt-piv.gt.rzero) then
+        if(pivt-piv .gt. rzero) then
            piv = pivt
-           kpiv=k
+           kpiv = k
         endif
         k2 = k2 + 1
      enddo
 
      ! --- boucle pour chaque iteration
-     
-     do k=1,iter
-        
-        if (kpiv.eq.k) go to 8
+     do k = 1,iter
 
-        ! --- on echange les K et KPIV si KPIV plus grand que K
-        h=rho(k)
-        rho(k)=rho(kpiv)
-        rho(kpiv)=h
-        k2=n+k
-        k3=n+kpiv
-        g = rho(k2)
-        rho(k2) = rho(k3)
-        rho(k3) = g
-        do i=1,m
-           h=a(i,k)
-           a(i,k)=a(i,kpiv)
-           a(i,kpiv)=h
-        enddo
-        
+        if (kpiv .ne. k) then
+           ! --- on echange les K et KPIV si KPIV plus grand que K
+           temp = rho(k) ; rho(k) = rho(kpiv) ; rho(kpiv) = temp
+           k2 = n + k
+           k3 = n + kpiv
+           g = rho(k2)
+           rho(k2) = rho(k3)
+           rho(k3) = g
+           do i=1,m ! swap a(i,k) and a(i,kpiv)
+              temp = a(i,k) ; a(i,k) = a(i,kpiv) ; a(i,kpiv) = temp
+           enddo
+        endif
+
         ! --- calcul de beta,sigma et uk dans htul
-8       continue
         call htul(a,m,n,k,sig,beta)
         
         ! --- on garde SIGMA dans RHO(N+K)
-        j=n+k
-        rho(j)=-sig
-        ip=ipiv(kpiv)
-        ipiv(kpiv)=ipiv(k)
-        ipiv(k)=ip
-        if(k.eq.n) go to 13
+        j = n + k
+        rho(j) = -sig
 
-        ! --- transformation de A dans HTAL
-        call htal(a,m,n,k,beta)
-        
+        !--- swap ipiv(k) and ipiv(kpiv)
+        i = ipiv(kpiv) ; ipiv(kpiv) = ipiv(k) ; ipiv(k) = i 
+
+        if (k .ne. n) then
+           ! --- transformation de A dans HTAL
+           call htal(a,m,n,k,beta)
+        endif
         ! --- transformation de B dans HTBL
-13      continue
         call htbl(a,b,m,n,k,beta)
-
+       
         ! --- recherche du pivot (K+1)
         !=============================
+        rho(k) = sqrt(piv)
 
-        rho(k)=sqrt(piv)
-        if(k.eq.n) go to 11
+        if (k.eq.n) go to 11
 
-        piv=rzero
+        piv = rzero
         kpiv = k + 1
         j1 = kpiv
-        k2=n + j1
+        k2 = n + j1
 
-        do j=j1,n
-           h=rho(j)-(a(k,j))*(a(k,j))
+        do j = j1, n
+           h = rho(j) - (a(k,j))*(a(k,j))
 
            if(abs(h).lt.reps7) then
               write(*,*) 'Correction process aborted'
@@ -817,114 +815,94 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
               return
            endif
 
-           rho(j)=h
-           g=rho(k2)-(a(k,j))*(b(k))
+           rho(j) = h
+           g = rho(k2) - (a(k,j))*(b(k))
            rho(k2) = g
-           if(h.ne.rzero) then
+           if (h .ne. rzero) then
               pivt = g*g/h
            else
               pivt = rzero
            endif
 
-           if(pivt.lt.piv)go to 18
+           if (pivt .ge. piv) then
+              kpiv=j
+              piv=pivt
+           endif
 
-           kpiv=j
-           piv=pivt
-
-18         continue
            k2 = k2 + 1
         enddo
 
         ! --- calcul des x
-11      x(k)=b(k)/rho(n+k)
-        if(k.eq.1)go to 27
-        do i=2,k
-           kk=k-i+1
-           x(kk)=b(kk)
-           ki=kk+1
-           do j=ki,k
-              x(kk)=x(kk)-a(kk,j)*x(j)
-           enddo
-           x(kk)=x(kk)/rho(n+kk)
-        enddo
+11      x(k) = b(k)/rho(n+k)
 
-27      continue
+        if (k .ne. 1) then
+           do i = 2,k
+              kk = k - i + 1
+              x(kk) = b(kk)
+              ki = kk + 1
+              do j = ki, k
+                 x(kk) = x(kk) - a(kk,j)*x(j)
+              enddo
+              x(kk) = x(kk) / rho(n+kk)
+           enddo
+        endif
         
         ! --- save residual orbit and inverse sign of corrections (convention!)
-        do iii= 1,m
-           r(iii) = b(iii)
-        enddo
-        do iii= 1,k
-           x(iii) =-x(iii)
-        enddo
+        R(:m) = B(:m)
+        X(:m) = -X(:m)
         
         ! --- calcul du vecteur residuel dans htrl
-        !=========================================
-        
+        !=========================================        
         !     transform orbit R back to "normal space"
-        !     write(*,*) 'transform back to normal space'
         call htrl(a,r,m,n,k,rho)
 
         rmss(k) = calrms(r,m)
-        ptop(k)=MAXVAL(R)-MINVAL(R)
+        ptop(k) = MAXVAL(R)-MINVAL(R)
 
-        if(k.lt.n) then
+        if (k.lt.n) then
            xiter(k+1) = k
            xrms(k+1)  = rmss(k)
            xptp(k+1)  = ptop(k)
         endif
-        
-        ! --- write intermediate results to 61 files
-        if(k.eq.1) then
-           if (prtlev .ge. 2) then
-              write(61,52)
-52            FORMAT(/' ***********    start MICADO    ***********'/)
+
+        ! --- write intermediate results to fort.61 file
+        if (prtlev .ge. 2) then
+           if (k.eq.1) then
+              write(61,'(/" ***********    start MICADO    ***********"/)')
               write(61,54) units
-54            FORMAT(' iter',5X,'corrector',13X,A4,6X,'mrad', 5X,"  rms",10X," ptop",/)
-              write(61,'(4x,"0",42x,f12.8,f15.8)')rm,pt
+54            FORMAT(' iter',5X,'corrector',13X,A4,6X,'mrad', 5X,'  rms',10X,' ptop',/)
+              write(61,'(4x,"0",42x,f12.8,f15.8)') rm, pt
            endif
-        endif
 
-        if (prtlev .ge. 2) then
-           write(61,'(/,1x,72("-"),/,1x,i4,3x,38(" "),1x,f12.8,f15.8)') k,rmss(k),ptop(k)
-        endif
+           write(61,'(/,1x,72("-"),/)')
+           write(61, '(1x,i4,3x,38(" "),1x,f12.8,f15.8)') k,rmss(k),ptop(k)
 
-        do kkk = 1,k
-           xxcal=x(kkk)
-           if (prtlev .ge. 2) then
-              write(61,'(I3,1X,A16,9x,F8.4,2X,F8.4)') kkk,conm(ipiv(kkk)),x(kkk),xxcal
-           endif
-        enddo
+           write(61,'(I3,1X,A16,9X,F18.14)') (i, conm(ipiv(i)), x(i), i=1,k)
         
-        if (prtlev .ge. 2) then
-           write(61,58) k
-58         format(/,' residual orbit after iteration ',i4,':')
-           write(61,'(1x,8f9.3)')(r(kkk),kkk=1,m)
-        endif
+           write(61,'(/," residual orbit after iteration ",i4,":")') k
+           write(61,'(1x,8f9.3)') (r(i),i=1,m)
         
-        if(k.eq.iter) then
-           if (prtlev .ge. 2) then
-              write(61,53)
-53            format(/' ***********    end   MICADO    ***********'/)
+           if (k.eq.iter) then
+              write(61,'(/" ***********    end   MICADO    ***********"/)')
            endif
         endif
 
-        if(ptop(k).le.ptp)go to 202
-        if(rmss(k).le.rms)go to 202
+        if (ptop(k).le.ptp .or. rmss(k).le.rms ) then
+           ! --- correction is already good enough:
+           !=======================================
+           ptp = ptop(k)
+           rms = rmss(k)
+           iter = k
+           return
+        endif
+
      enddo
-     return
-     
-     ! --- correction is already good enough:
-     !=======================================
-     
-202  ptp=ptop(k)
-     rms=rmss(k)
-     iter=k
-     return
-   end subroutine htls
+
+     return     
+end subroutine htls
 
 
-   subroutine htal(a,m,n,k,beta)
+subroutine htal(a,m,n,k,beta)
        implicit none
        !*********************************************************************
        !     Subroutine HTAL to make Householder transform                  *
@@ -933,29 +911,31 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
        !                                                                    *
        !*********************************************************************
        !     Householder transform of matrix A
-       integer m,n,nc,k,j,k1
-       real beta,a(m,n),h,rzero
-       parameter(rzero=0e0)
+       double precision :: a(m,n)
+       integer :: m, n, k 
+       double precision :: beta
 
-       nc=n-k
+       integer :: j, i
+       double precision :: h
+       double precision, parameter :: rzero=0d0
 
-       do j=1,nc
-           h=rzero
+       do j = 1, n-k
+           h = rzero
          
-           do k1=k,m
-               h=h+a(k1,k)*a(k1,k+j)
+           do i = k, m
+               h = h + a(i,k)*a(i,k+j)
            enddo
          
-           h=beta*h
-           do k1=k,m
-               a(k1,k+j)=a(k1,k+j)-a(k1,k)*h
+           h = beta * h
+
+           do i = k,m
+               a(i,k+j) = a(i,k+j) - a(i,k)*h
            enddo
        enddo
       
-   end subroutine htal
+end subroutine htal
 
-
-   subroutine htbl(a,b,m,n,k,beta)
+subroutine htbl(a,b,m,n,k,beta)
        implicit none
        !*********************************************************************
        !     Subroutine HTBL to make Householder transform                  *
@@ -964,26 +944,29 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
        !                                                                    *
        !*********************************************************************
        !     Householder transform of vector B
-       integer m,n,k,k1
-       real beta,a(m,n),b(m),h,rzero
-       parameter(rzero=0e0)
+       double precision :: a(m,n), b(m)
+       integer :: m, n, k 
+       double precision :: beta
 
-       h=rzero
+       integer :: i
+       double precision :: h
+       double precision, parameter :: rzero=0d0
 
-       do k1=k,m
-           h=h+a(k1,k)*b(k1)
+       h = rzero
+
+       do i = k,m
+           h = h + a(i,k)*b(i)
        enddo
       
-       h=beta*h
+       h = beta * h
       
-       do k1=k,m
-           b(k1)=b(k1)-a(k1,k)*h
+       do i = k,m
+           b(i) = b(i) - a(i,k)*h
        enddo
 
-   end subroutine htbl
+end subroutine htbl
 
-
-   subroutine htrl(a,b,m,n,k,rho)
+subroutine htrl(a,b,m,n,k,rho)
        implicit none
        !*********************************************************************
        !     Subroutine HTRL to make Householder transform                  *
@@ -992,26 +975,26 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
        !                                                                    *
        !*********************************************************************
        !     calculate residual orbit vector
-       integer m,n,k,kk,kl,i,lv,kn
-       real beta,a(m,n),b(m),rho(3*n),rzero
-       parameter(rzero=0e0)
+       double precision ::  a(m,n), b(m), rho(3*n)
+       integer :: m, n, k
 
-       do i= 1,k,1
-           b(i)=rzero
-       enddo
+       integer ::  i, kl, kn
+       double precision :: beta
+       double precision, parameter :: rzero=0d0
 
-       do kk=1,k
-           lv=m-k+kk
-           kn=n+k-kk+1
-           kl=k-kk+1
+       B(1:k) = rzero
+
+       do i = 1, k
+           kl = k - i + 1
+           kn = k - i + 1 + n
          
-           beta=-1d0/(rho(kn)*a(kl,kl))
+           beta = -1d0 / (rho(kn)*a(kl,kl))
            call htbl(a,b,m,n,kl,beta)
        enddo
 
-   end subroutine htrl
+end subroutine htrl
 
-   subroutine htul(a,m,n,k,sig,beta)
+subroutine htul(a,m,n,k,sig,beta)
        implicit none
        !*********************************************************************
        !     Subroutine HTUL to make Householder transform                  *
@@ -1020,54 +1003,59 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
        !                                                                    *
        !*********************************************************************
        !     calculate vector U
-       integer m,n,k,i
-       real beta,sig,a(m,n),h,rzero
-       parameter(rzero=0e0)
+       double precision ::  a(m,n)
+       integer :: m, n, k
+       double precision ::  sig, beta
 
-       sig=rzero
+       integer :: i
+       double precision :: h
+       double precision, parameter :: rzero=0d0
 
-       do i=k,m
-           sig=sig+a(i,k)*a(i,k)
+       sig = rzero
+
+       do i = k,m
+           sig = sig + a(i,k)*a(i,k)
        enddo
       
-       sig=sqrt(sig)
+       sig = sqrt(sig)
        !     on choisit le signe correct pour sig:
-       h=a(k,k)
-       if (h.lt.rzero) sig=-sig
-       beta=h + sig
-       a(k,k)=beta
-       beta=1d0/(sig*beta)
-   end subroutine htul
+       h = a(k,k)
+       if (h .lt. rzero) sig = -sig
+       beta = h + sig
+       a(k,k) = beta
+       beta = 1d0/(sig*beta)
 
-   subroutine lequ2(a,ifail,b)
-       implicit none
-       !*********************************************************************
-       !     Subroutine LEQU2 to solve X * A = b                            *
-       !     for 2 dimensions                                               *
-       !                                                                    *
-       !     Authors:     WFH                 Date:  26.02.1992             *
-       !                                                                    *
-       !*********************************************************************
-       integer ifail
-       real a(2,2),b(2),x(2),det,reps6
-       parameter(reps6=1e-6)
+end subroutine htul
 
-       det = a(2,2)*a(1,1) - a(1,2)*a(2,1)
-       if(abs(det).lt.reps6) then
-           ifail = -1
-           return
-       endif
+   ! subroutine lequ2(a,ifail,b)
+   !     implicit none
+   !     !*********************************************************************
+   !     !     Subroutine LEQU2 to solve X * A = b                            *
+   !     !     for 2 dimensions                                               *
+   !     !                                                                    *
+   !     !     Authors:     WFH                 Date:  26.02.1992             *
+   !     !                                                                    *
+   !     !*********************************************************************
+   !     integer ifail
+   !     real a(2,2),b(2),x(2),det,reps6
+   !     parameter(reps6=1e-6)
 
-       x(1) = (b(1)*a(2,2) - b(2)*a(1,2))/det
-       x(2) = (b(2) - a(2,1)*x(1))/a(2,2)
+   !     det = a(2,2)*a(1,1) - a(1,2)*a(2,1)
+   !     if(abs(det).lt.reps6) then
+   !         ifail = -1
+   !         return
+   !     endif
+
+   !     x(1) = (b(1)*a(2,2) - b(2)*a(1,2))/det
+   !     x(2) = (b(2) - a(2,1)*x(1))/a(2,2)
       
-       b(1) = x(1)
-       b(2) = x(2)
-       ifail = 0
-       return
-   end subroutine lequ2
+   !     b(1) = x(1)
+   !     b(2) = x(2)
+   !     ifail = 0
+   !     return
+   ! end subroutine lequ2
 
-  function calrms(r,m)
+double precision function calrms(r,m)
        implicit none
        !*********************************************************************
        !     Function CALRMS to calculate rms of double precision values    *
@@ -1077,23 +1065,22 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
        !     Date:        2014-Feb-28                                       *
        !                                                                    *
        !*********************************************************************
+       double precision :: r(m)
+       integer :: m
 
-       real calrms
-       integer m,i
-       real r(m), rzero
-       parameter(rzero=0e0)
+       integer :: i
 
-       calrms = rzero
-      
-       do i=1,m
+       calrms = 0.d0
+       
+       do i = 1, m
            calrms = calrms + (r(i)*r(i))
        enddo
       
        calrms = sqrt(calrms / float(m))       
        return
-   end function calrms
+end function calrms
 
-   subroutine dinv(n,a,idim,r,ifail)
+subroutine dinv(n,a,idim,r,ifail)
        implicit none
        !******************************************************************
        !
@@ -1104,11 +1091,14 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
        !     CALLS ... DFACT, DFINV, F010PR.
        !
        !******************************************************************
-       integer n,idim,ifail,jfail
-       integer r(n),t1,t2,t3
-       double precision a(idim,n),det,temp,s,c11,c12,c13,c21,c22,c23,c31,&
-           &c32,c33,zero
-       parameter(zero=0d0)
+       integer :: n, idim, ifail
+       double precision :: a(idim,n)
+       integer :: r(n)
+
+       integer :: jfail, t1, t2, t3
+       double precision :: det, temp, s
+       double precision :: c11, c12, c13, c21, c22, c23, c31, c32, c33
+       double precision, parameter :: zero=0d0
 
        !
        !  TEST FOR PARAMETER ERRORS.
@@ -1124,18 +1114,18 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
        !  N=3 CASE.
        !
        !     COMPUTE COFACTORS.
-       c11=a(2,2)*a(3,3)-a(2,3)*a(3,2)
-       c12=a(2,3)*a(3,1)-a(2,1)*a(3,3)
-       c13=a(2,1)*a(3,2)-a(2,2)*a(3,1)
-       c21=a(3,2)*a(1,3)-a(3,3)*a(1,2)
-       c22=a(3,3)*a(1,1)-a(3,1)*a(1,3)
-       c23=a(3,1)*a(1,2)-a(3,2)*a(1,1)
-       c31=a(1,2)*a(2,3)-a(1,3)*a(2,2)
-       c32=a(1,3)*a(2,1)-a(1,1)*a(2,3)
-       c33=a(1,1)*a(2,2)-a(1,2)*a(2,1)
-       t1=abs(sngl(a(1,1)))
-       t2=abs(sngl(a(2,1)))
-       t3=abs(sngl(a(3,1)))
+       c11 = a(2,2)*a(3,3) - a(2,3)*a(3,2)
+       c12 = a(2,3)*a(3,1) - a(2,1)*a(3,3)
+       c13 = a(2,1)*a(3,2) - a(2,2)*a(3,1)
+       c21 = a(3,2)*a(1,3) - a(3,3)*a(1,2)
+       c22 = a(3,3)*a(1,1) - a(3,1)*a(1,3)
+       c23 = a(3,1)*a(1,2) - a(3,2)*a(1,1)
+       c31 = a(1,2)*a(2,3) - a(1,3)*a(2,2)
+       c32 = a(1,3)*a(2,1) - a(1,1)*a(2,3)
+       c33 = a(1,1)*a(2,2) - a(1,2)*a(2,1)
+       t1 = abs(int(a(1,1)))
+       t2 = abs(int(a(2,1)))
+       t3 = abs(int(a(3,1)))
        !
        !     (SET TEMP=PIVOT AND DET=PIVOT*DET.)
        if(t1.ge.t2) go to 1
@@ -1203,18 +1193,21 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
        !
 8      ifail=-1
        return
-   !
-   end subroutine dinv
 
-   subroutine dfact(n,a,idim,ir,ifail,det,jfail)
+end subroutine dinv
+
+subroutine dfact(n,a,idim,ir,ifail,det,jfail)
        implicit none
-       integer idim,j,k,n,ifail,nxch,jp1,i,l,jm1,jfail,ir(*),normal,     &
-           &imposs,jrange,jover,junder
-       parameter(normal=0,imposs=-1,jrange=0,jover=1,junder=-1)
-       real p,q,t,g1,g2
-       parameter(g1=1e-19,g2=1e19)
-       double precision a(idim,*),det,tf,s11,s12,zero,one
-       parameter(zero=0d0,one=1d0)
+
+       integer :: n, idim, ir(*), ifail, jfail 
+       double precision :: a(idim,*), det
+
+       integer ::  i,j,k,l, nxch, jp1, jm1
+       double precision :: tf, s11, s12, p, q, t
+
+       integer, parameter :: normal=0, imposs=-1, jrange=0, jover=1, junder=-1
+       double precision, parameter :: g1=1e-19, g2=1e19
+       double precision, parameter :: zero=0.d0, one=1.d0
 
        if(idim .lt. n  .or.  n .lt. 1)  then
 1001      FORMAT(7X," PARAMETER ERROR IN SUBROUTINE ", A6, &
@@ -1229,19 +1222,19 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
        nxch   =  0
        det    =  one
        do    j  =  1, n
-120        k  =  j
-           p  =  abs(sngl(a(j,j)))
-           if(j .eq. n)  goto 122
+120       k  =  j
+          p  =  abs(a(j,j))
+          if (j .eq. n)  goto 122
            jp1  =  j+1
            do    i  =  jp1, n
-               q  =  abs(sngl(a(i,j)))
-               if(q .le. p)  goto 121
+               q  =  abs(a(i,j))
+               if (q .le. p)  goto 121
                k  =  i
                p  =  q
 121        continue
            enddo
-           if(k .ne. j)  goto 123
-122        if(p .gt. zero)  goto 130
+           if (k .ne. j)  goto 123
+122        if (p .gt. zero)  goto 130
            det    =  zero
            ifail  =  imposs
            jfail  =  jrange
@@ -1255,7 +1248,7 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
            ir(nxch)  =  j*2**12 + k
 130        det     =  det * a(j,j)
            a(j,j)  =  one / a(j,j)
-           t  =  abs(sngl(det))
+           t  =  abs(det)
            if(t .lt. g1)  then
                det    =  zero
                if(jfail .eq. jrange)  jfail  =  junder
@@ -1283,12 +1276,15 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
        if(jfail .ne. jrange)   det  =  zero
        ir(n)  =  nxch
        return
-   end subroutine dfact
+end subroutine dfact
 
-   subroutine dfeqn(n,a,idim,ir,k,b)
+subroutine dfeqn(n,a,idim,ir,k,b)
      implicit none
-     integer idim,i,j,k,n,m,nxch,ij,l,im1,nm1,nmi,nmjp1,ir(*)
-     double precision a(idim,*),b(idim,*),te,s21, s22
+     integer :: n, idim, ir(*), k
+     double precision :: a(idim,*), b(idim,*)
+
+     integer :: i, j, m, nxch, ij, l, im1, nm1, nmi, nmjp1
+     double precision :: te, s21, s22
      
      if (idim .lt. n  .or.  n .lt. 1  .or.  k .lt. 1)  then
 1002    FORMAT(7X," PARAMETER ERROR IN SUBROUTINE ", A6, &
@@ -1300,7 +1296,7 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
      
      nxch  =  ir(n)
      
-     if(nxch .eq. 0)  goto 220
+     if (nxch .eq. 0)  goto 220
      
      do    m  =  1, nxch
         ij  =  ir(m)
@@ -1317,7 +1313,7 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
         b(1,l)  =  a(1,1)*b(1,l)
      enddo
      
-     if(n .eq. 1)  return
+     if (n .eq. 1)  return
      
      do    l  =  1, k
         do   i  =  2, n
@@ -1345,9 +1341,13 @@ end subroutine dfeqn
 
 subroutine dfinv(n,a,idim,ir)
     implicit none
-    integer idim,i,j,k,n,m,nxch,ij,nm1,nmi,im2,ir(*)
-    double precision a(idim,*),ti,s31,s32,s33,s34,zero
-    parameter(zero=0d0)
+
+    integer n, idim, ir(*)
+    double precision a(idim,*)
+ 
+    integer :: i, j, k, m, nxch, ij, nm1, nmi, im2
+    double precision :: ti, s31, s32, s33, s34
+    double precision, parameter :: zero=0d0
     
     if (idim < n  .or.  n < 1 )  then   
 1001   FORMAT(7X," PARAMETER ERROR IN SUBROUTINE ", A6, &
@@ -1796,15 +1796,16 @@ end subroutine svd
 
 double precision function pythag(a,b)
     implicit  none
-    double precision a,b
+    double precision :: a, b
     !
     !     finds dsqrt(a**2+b**2) without overflow or destructive underflow
     !
-    double precision p,r,s,t,u
-    p = dmax1(dabs(a),dabs(b))
+    double precision :: p, r, s, t, u
+
+    p = max(dabs(a),dabs(b))
     if (p .eq. 0.0d0) go to 20
 
-    r = (dmin1(dabs(a),dabs(b))/p)**2
+    r = (min(dabs(a),dabs(b))/p)**2
 
 10  continue
     t = 4.0d0 + r
@@ -1820,57 +1821,60 @@ double precision function pythag(a,b)
    return
    end function pythag
 
-   subroutine rvord(inv,outv,ws,n)
+subroutine rvord(inv,outv,ws,n)
+     implicit   none
      ! 2015-Apr-28  15:45:16  ghislain: analysis
      ! subroutine to sort the indexes of elements stored in input vector INV 
      ! in reverse order in output vector OUTV.
      ! WS is a workspace vector, N is the dimension of the vectors.
      ! Supposition that INV contains positive numbers only!
-       implicit   none
-       integer    n
-       double precision   inv(n), ws(n)
-       integer  i,j,jmax
-       integer  outv(n)
+     double precision  ::  inv(n), ws(n)
+     integer  :: outv(n)
+     integer  :: n
+     
+     integer  :: i, j, jmax
+     
+     WS(:n) = INV(:n)
+     
+     do  j = 1,n
+        jmax = 1
+        do  i = 1,n
+           if(ws(i).gt.ws(jmax)) then
+              jmax = i
+           endif
+        enddo
+        outv(n-j+1) = jmax
+        ws(jmax) = 0.0
+     enddo
+     
+     return
+end subroutine rvord
 
-       WS = INV
-
-       do  j = 1,n
-           jmax = 1
-           do  i = 1,n
-               if(ws(i).gt.ws(jmax)) then
-                   jmax = i
-               endif
-           enddo
-           outv(n-j+1) = jmax
-           ws(jmax) = 0.0
-       enddo
-      
-       return
-   end subroutine rvord
-
-   subroutine primat(a,nc,nm)
+subroutine primat(a,nc,nm) 
      implicit   none
-     integer i, j
-     integer nm,nc
-     integer a(nc, nm)
+     integer :: nm,nc
+     integer :: a(nc, nm)
+     
+     integer :: i, j
      
      do i = 1,nc
         write(*,*) (a(i,j),j=1,nm)
      enddo
      
      return
-   end subroutine primat
+end subroutine primat
    
-   subroutine prdmat(a,nc,nm)
+subroutine prdmat(a,nc,nm)
      implicit   none
-     integer i, j
-     integer nm,nc
-     double precision a(nc, nm)
+     integer :: nm,nc
+     double precision :: a(nc, nm)
+     
+     integer :: i, j
      
      do i = 1,nc
         write(*,*) (a(i,j),j=1,nm)
      enddo
      
      return
-   end subroutine prdmat
+end subroutine prdmat
 

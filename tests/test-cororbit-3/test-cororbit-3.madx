@@ -15,33 +15,51 @@ Twiss,table=my_model;
 
 Readmytable,file="input/orbps.in",table=orbint;
 
-coption, print=2;
+Coption, print=2;
 
-Correct, flag=ring, model=my_model, orbit=orbint, extern, 
+! MICADO without SVD conditioning
+Correct, flag=ring, model=my_model, orbit=orbint, extern, corzero=1,
 	 mode=micado, cond=0, error=1.0e-7, ncorr=5, plane=x, 
 	 clist=c1.tab, mlist=m1.tab;
 
 Twiss, file=result1;
 
-Correct, flag=ring, model=my_model, orbit=orbint, extern, 
+! MICADO with SVD conditioning
+Correct, flag=ring, model=my_model, orbit=orbint, extern, corzero=1,
 	 mode=micado, cond=1, error=1.0e-7, ncorr=5, plane=x, 
 	 clist=c2.tab, mlist=m2.tab;
 
 Twiss, file=result2;
 
-Correct, flag=ring, model=my_model, orbit=orbint, extern, 
-	 mode=svd, cond=1, error=1.0e-7, ncorr=5, plane=x, 
+! SVD without SVD conditioning
+Correct, flag=ring, model=my_model, orbit=orbint, extern, corzero=1,
+	 mode=svd, cond=0, error=1.0e-7, ncorr=5, plane=x, 
 	 clist=c3.tab, mlist=m3.tab;
 
 Twiss, file=result3;
 
-Correct, flag=ring, model=my_model, orbit=orbint, extern, 
-	 mode=lsq, cond=1, error=1.0e-7, ncorr=5, plane=x, 
+! SVD with SVD conditioning
+Correct, flag=ring, model=my_model, orbit=orbint, extern, corzero=1,
+	 mode=svd, cond=1, error=1.0e-7, ncorr=5, plane=x, 
 	 clist=c4.tab, mlist=m4.tab;
 
 Twiss, file=result4;
 
+! LSQ without SVD conditioning
+Correct, flag=ring, model=my_model, orbit=orbint, extern, corzero=1,
+	 mode=lsq, cond=0, error=1.0e-7, ncorr=5, plane=x, 
+	 clist=c5.tab, mlist=m5.tab;
+
+Twiss, file=result5;
+
+! LSQ with SVD conditioning
+Correct, flag=ring, model=my_model, orbit=orbint, extern, corzero=1,
+	 mode=lsq, cond=1, error=1.0e-7, ncorr=5, plane=x, 
+	 clist=c6.tab, mlist=m6.tab;
+
+Twiss, file=result6;
+
 
 removefile, file='fort.61';
-removefile, file='fort.65';
-removefile, file='fort.66';
+
+Stop;

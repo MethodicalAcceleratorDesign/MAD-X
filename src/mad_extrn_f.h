@@ -224,9 +224,9 @@ void setupi_(F_INTEGER resp, F_INTEGER a, F_INTEGER im, F_INTEGER ic, F_INTEGER 
 void prdmat_(F_DOUBLE a, F_INTEGER nc, F_INTEGER nm);
 void primat_(F_INTEGER a, F_INTEGER nc, F_INTEGER nm);
 void micit_(F_DOUBLE a, F_CHARACTER conm, F_DOUBLE xin, F_DOUBLE cin, F_DOUBLE res, F_INTEGER nx,
-	    F_REAL rms, F_INTEGER im, F_INTEGER ic, F_INTEGER iter, F_INTEGER ny, F_REAL ax,
-	    F_REAL cinx, F_REAL xinx, F_REAL resx, F_REAL rho, F_REAL ptop, F_REAL rmss, F_REAL xrms,
-	    F_REAL xptp, F_REAL xiter, F_INTEGER ifail);
+	    F_DOUBLE rms, F_INTEGER im, F_INTEGER ic, F_INTEGER iter, F_INTEGER ny, F_DOUBLE ax,
+	    F_DOUBLE cinx, F_DOUBLE xinx, F_DOUBLE resx, F_DOUBLE rho, F_DOUBLE ptop, F_DOUBLE rmss, F_DOUBLE xrms,
+	    F_DOUBLE xptp, F_DOUBLE xiter, F_INTEGER ifail);
 void haveit_(F_DOUBLE a, F_DOUBLE xin, F_DOUBLE cin, F_DOUBLE res, F_INTEGER nx, F_INTEGER im,
 	     F_INTEGER ic, F_DOUBLE cb, F_DOUBLE xmeas, F_DOUBLE xres, F_DOUBLE y, F_DOUBLE z,
 	     F_DOUBLE xd);

@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.00  (64 bit, Darwin)      +
-  +           Production Version            +
-  + Code Modification Date: 2014.03.05      +
-  + Execution Time Stamp: 12.03.14 14.34.35 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.05  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2015.04.06               +
+  + Execution date: 2015.06.16 11:22:57      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 Option,  warn,info,echo;
 
 Title, "LHC 6.503 with errors and two beam orbit correction using MADX";
@@ -334,17 +334,17 @@ enter MICADO correction ...
  start MICADO correction with            4  correctors
   
 RMS before 9.588756e-01
-RMS after  9.004521e-02
+RMS after  9.004522e-02
 mcbxh.1r1:1 -1.115765e-03
 mcbxh.2r1:1 0.000000e+00
 mcbxh.3r1:1 0.000000e+00
 mcbxh.3l5:1 0.000000e+00
 mcbxh.2l5:1 0.000000e+00
-mcbxh.1l5:1 5.766483e-04
+mcbxh.1l5:1 5.766484e-04
 mcbxh.1r5:1 -1.084434e-03
 mcbxh.3l1:1 0.000000e+00
 mcbxh.2l1:1 0.000000e+00
-mcbxh.1l1:1 2.271659e-03
+mcbxh.1l1:1 2.271658e-03
 
 CORRECTION SUMMARY:   
 
@@ -354,7 +354,7 @@ before correction: 0.004136        0.958867          0.958876        10.060801
 after correction:  0.003368        0.089982          0.090045        2.637795 
 
 
-Max strength: 2.271659e-03 is below corrector strength limit: 1.000000e+00
+Max strength: 2.271658e-03 is below corrector strength limit: 1.000000e+00
 
 
 TWISS, file=resultb1, sequence=lhcb1;
@@ -362,10 +362,10 @@ TWISS, file=resultb1, sequence=lhcb1;
 enter Twiss module
   
 iteration:   1 error:   1.295291E-04 deltap:   0.000000E+00
-orbit:  -2.731998E-05 -7.415126E-07  7.386753E-05  5.793822E-06  0.000000E+00  0.000000E+00
+orbit:  -2.732002E-05 -7.414963E-07  7.386753E-05  5.793822E-06  0.000000E+00  0.000000E+00
   
 iteration:   2 error:   1.924924E-07 deltap:   0.000000E+00
-orbit:  -2.742854E-05 -6.552875E-07  7.390359E-05  5.661291E-06  0.000000E+00  0.000000E+00
+orbit:  -2.742858E-05 -6.552713E-07  7.390359E-05  5.661291E-06  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -373,16 +373,16 @@ orbit:  -2.742854E-05 -6.552875E-07  7.390359E-05  5.661291E-06  0.000000E+00  0
         26658.8832                 -0    0.0003213813328         55.7814342 
 
                 q1                dq1            betxmax              dxmax 
-       64.30993506        2.001003829        4403.339372        2.858350735 
+       64.30993506        2.001003816        4403.339355        2.858350725 
 
              dxrms             xcomax             xcorms                 q2 
-       1.398919814    9.324377601e-05    9.689405509e-06        59.32005551 
+       1.398919813      9.3243422e-05     9.68932155e-06        59.32005551 
 
                dq2            betymax              dymax              dyrms 
-       1.999882205        4404.179411         0.52015192      0.07282880219 
+       1.999882244        4404.179409       0.5201519214      0.07282880229 
 
             ycomax             ycorms             deltap            synch_1 
-    0.005045837468    0.0007529500667                  0                  0 
+    0.005045837466    0.0007529500666                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -391,10 +391,10 @@ TWISS, file=resultb2, sequence=lhcb2;
 enter Twiss module
   
 iteration:   1 error:   8.988769E-05 deltap:   0.000000E+00
-orbit:   3.930653E-05 -8.982999E-07 -5.419899E-05  2.550666E-05  0.000000E+00  0.000000E+00
+orbit:   3.930656E-05 -8.982908E-07 -5.419899E-05  2.550666E-05  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   2.080341E-07 deltap:   0.000000E+00
-orbit:   3.932110E-05 -8.382999E-07 -5.420823E-05  2.537128E-05  0.000000E+00  0.000000E+00
+iteration:   2 error:   2.080342E-07 deltap:   0.000000E+00
+orbit:   3.932112E-05 -8.382908E-07 -5.420823E-05  2.537128E-05  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -402,16 +402,16 @@ orbit:   3.932110E-05 -8.382999E-07 -5.420823E-05  2.537128E-05  0.000000E+00  0
         26658.8832                 -0    0.0003209217334        55.82136285 
 
                 q1                dq1            betxmax              dxmax 
-       64.30994132        1.996885918        4403.835848        2.886331755 
+       64.30994132         1.99688595        4403.835851        2.886331789 
 
              dxrms             xcomax             xcorms                 q2 
-       1.398792227    0.0001242991045    1.235064602e-05        59.32005207 
+       1.398792228    0.0001242987283    1.235063679e-05        59.32005207 
 
                dq2            betymax              dymax              dyrms 
-       2.002444267        4403.828262       0.7037915936       0.1103657192 
+       2.002444255        4403.828259       0.7037915927       0.1103657192 
 
             ycomax             ycorms             deltap            synch_1 
-    0.004716170502    0.0008584970928                  0                  0 
+    0.004716170497    0.0008584970924                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -423,5 +423,5 @@ removefile, file='fort.61';
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.00 (64 bit) finished normally +
+  + MAD-X 5.02.05 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

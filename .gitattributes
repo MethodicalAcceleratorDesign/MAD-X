@@ -1146,6 +1146,10 @@ tests/test-cororbit-3/c3.tab.cfg -text
 tests/test-cororbit-3/c3.tab.ref -text
 tests/test-cororbit-3/c4.tab.cfg -text
 tests/test-cororbit-3/c4.tab.ref -text
+tests/test-cororbit-3/c5.tab.cfg -text
+tests/test-cororbit-3/c5.tab.ref -text
+tests/test-cororbit-3/c6.tab.cfg -text
+tests/test-cororbit-3/c6.tab.ref -text
 tests/test-cororbit-3/input/coc4.opt -text
 tests/test-cororbit-3/input/coc4.seq -text
 tests/test-cororbit-3/input/orbps.in -text
@@ -1157,6 +1161,10 @@ tests/test-cororbit-3/m3.tab.cfg -text
 tests/test-cororbit-3/m3.tab.ref -text
 tests/test-cororbit-3/m4.tab.cfg -text
 tests/test-cororbit-3/m4.tab.ref -text
+tests/test-cororbit-3/m5.tab.cfg -text
+tests/test-cororbit-3/m5.tab.ref -text
+tests/test-cororbit-3/m6.tab.cfg -text
+tests/test-cororbit-3/m6.tab.ref -text
 tests/test-cororbit-3/result1.cfg -text
 tests/test-cororbit-3/result1.ref -text
 tests/test-cororbit-3/result2.cfg -text
@@ -1165,6 +1173,10 @@ tests/test-cororbit-3/result3.cfg -text
 tests/test-cororbit-3/result3.ref -text
 tests/test-cororbit-3/result4.cfg -text
 tests/test-cororbit-3/result4.ref -text
+tests/test-cororbit-3/result5.cfg -text
+tests/test-cororbit-3/result5.ref -text
+tests/test-cororbit-3/result6.cfg -text
+tests/test-cororbit-3/result6.ref -text
 tests/test-cororbit-3/test-cororbit-3.cfg -text
 tests/test-cororbit-3/test-cororbit-3.madx -text
 tests/test-cororbit-3/test-cororbit-3.ref -text
