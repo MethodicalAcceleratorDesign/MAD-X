@@ -1312,6 +1312,7 @@ tests/test-jacobian/test-jacobian.ref -text
 tests/test-line/test-line.cfg -text
 tests/test-line/test-line.madx -text
 tests/test-line/test-line.ref -text
+tests/test-makethin-2/V6.5.thin.b1.seq.cfg -text
 tests/test-makethin-2/V6.5.thin.b1.seq.ref -text svneol=unset#unset
 tests/test-makethin-2/lhc_twiss_b1.before.dat.cfg -text
 tests/test-makethin-2/lhc_twiss_b1.before.dat.ref -text
