@@ -1129,6 +1129,7 @@ tests/test-cororbit-2/cx12.tab_2.cfg -text
 tests/test-cororbit-2/cx12.tab_2.ref -text
 tests/test-cororbit-2/mx12.tab.cfg -text
 tests/test-cororbit-2/mx12.tab.ref -text
+tests/test-cororbit-2/plot.orb.cfg -text
 tests/test-cororbit-2/plot.orb.ref -text
 tests/test-cororbit-2/resultb1.cfg -text
 tests/test-cororbit-2/resultb1.ref -text
