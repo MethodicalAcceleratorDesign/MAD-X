@@ -37,6 +37,7 @@ endif
 
 ifeq ($(STATIC),yes)
 LDFLAGS += $(if $(call eq,$(OSTYPE),Darwin),-static-libgfortran -static-libstdc++ -static-libgcc,-static) -pthread
+LDFLAGS += $(if $(call eq,$(OSTYPE),Darwin),-lgfortran -lstdc++ -lgcc -lgcc_eh -lSystem -nodefaultlibs,)
 endif
 
 ifeq ($(SHARED),yes)
