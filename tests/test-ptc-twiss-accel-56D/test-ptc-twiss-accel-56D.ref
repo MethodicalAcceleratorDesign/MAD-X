@@ -1,0 +1,164 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.05  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2015.04.06               +
+  + Execution date: 2015.06.26 11:38:16      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+PTCNSTEPS=3;
+
+
+
+d1: drift, l=0.1;
+
+m1: marker;
+
+cav: twcavity, l=1, volt=10, freq=3000;
+
+m2: marker;
+
+d2: drift, l=0.1;
+
+
+
+beam, energy=0.02*1e1;
+
+
+
+l: line=(d1,m1,cav,m2,d2);
+
+
+
+use, period=l;
+
+
+
+select,flag=twiss,clear;
+
+select, flag=twiss, column=name,s,energy,
+
+                           beta11,beta22,beta33,
+
+	       alfa11,alfa22,beta33,
+
+	       mu1,mu2,
+
+	       disp1,disp2,
+
+	       re11,re12,re13,re14,re15,re16,
+
+	       re21,re22,re23,re24,re25,re26,
+
+	       re31,re32,re33,re34,re35,re36,
+
+	       re41,re42,re43,re44,re45,re46,
+
+	       re51,re52,re53,re54,re55,re56,
+
+	       re61,re62,re63,re64,re65,re66;
+
+
+
+
+
+ptc_create_universe;
+
+   ptc_create_layout,resplit,xbend, model=2, method=6, nst=PTCNSTEPS, exact=true, closed_layout=false;
+
+ MAD-X Beam Parameters
+                  Energy : 0.200000E+00
+          Kinetic Energy : 0.199489E+00
+      Particle Rest Mass : 0.510999E-03
+                Momentum : 0.199999E+00
+ Setting MADx with 
+     energy          0.20000000000000001     
+     method                   6
+     Num. of steps            3
+     charge           1.0000000000000000     
+  Length of machine:    1.2000000000000002     
+ The machine is a LINE
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        1.2000000000000002     
+   ptc_setswitch, debuglevel=0, nocavity=false, 
+
+                  maxacceleration=true, fringe=true, exact_mis=true, time=true, totalpath=true;
+
+
+
+ PTC_TWISS, table=twiss, icase=56, no=2, betz=1.0, betx=10, bety=10;
+
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+ Reduced SUMM Table (Inital parameters specified)
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+               1.2           -1000000           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000           -1000000           -1000000      0.01901193552 
+
+                q2                dq1                dq2                 qs 
+     0.01901193552           -1000000           -1000000           -1000000 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+                10        10.13672095                 10        10.13672095 
+
+         beta11min          beta11max          beta12min          beta12max 
+                10        10.13672095                  0                  0 
+
+         beta13min          beta13max          beta21min          beta21max 
+                 0                  0                  0                  0 
+
+         beta22min          beta22max          beta23min          beta23max 
+                10        10.13672095                  0                  0 
+
+         beta31min          beta31max          beta32min          beta32max 
+                 0                  0                  0                  0 
+
+         beta33min          beta33max           disp1min           disp1max 
+                 1        1.050000001                  0                  0 
+
+          disp2min           disp2max           disp3min           disp3max 
+                 0                  0                  0                  0 
+
+          disp4min           disp4max             deltap            orbit_x 
+                 0                  0                  0                  0 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+                 0                  0                  0                  0 
+
+         orbit_-cT             xcorms             ycorms            pxcorms 
+                 0                  0                  0                  0 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0       0.8717825051    1.678494472e-16                  0 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0                  0                  0        1.200003731 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+                 0                  0                  0                  0 
+
+           pycomin             tcomin            ptcomin 
+                 0                  0   -2.220439476e-16 
+
+
+ write, table=twiss, file="ptc.twiss";
+
+
+
+ptc_end;
+
+
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.02.05 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

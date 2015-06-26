@@ -1,18 +1,14 @@
-PTCNSTEPS=20;
+PTCNSTEPS=3;
 
 d1: drift, l=0.1;
 m1: marker;
 cav: twcavity, l=1, volt=10, freq=3000;
 m2: marker;
 d2: drift, l=0.1;
-d1m:drift, l=1;
 
 beam, energy=0.02*1e1;
 
 l: line=(d1,m1,cav,m2,d2);
-ldrif: line=(d1,m1,d1m,m2,d2);
-
-ll: line=(10*l);
 
 use, period=l;
 
@@ -21,19 +17,13 @@ select, flag=twiss, column=name,s,energy,
                            beta11,beta22,beta33,
 	       alfa11,alfa22,beta33,
 	       mu1,mu2,
-	       disp1,disp2;
-
-
-ptc_create_universe;
-   ptc_create_layout,resplit,xbend, model=2, method=6, nst=PTCNSTEPS, exact=true, closed_layout=false;
-   ptc_setswitch, debuglevel=3, nocavity=false, 
-                  maxacceleration=true, fringe=true, exact_mis=true, time=true, totalpath=true;
- 
- PTC_TWISS, table=twiss, icase=6, no=2, betz=1.0, betx=10, bety=10;
-
- write, table=twiss, file="6D.ptctwiss";
-
-ptc_end;
+	       disp1,disp2,
+	       re11,re12,re13,re14,re15,re16,
+	       re21,re22,re23,re24,re25,re26,
+	       re31,re32,re33,re34,re35,re36,
+	       re41,re42,re43,re44,re45,re46,
+	       re51,re52,re53,re54,re55,re56,
+	       re61,re62,re63,re64,re65,re66;
 
 
 ptc_create_universe;
@@ -43,21 +33,7 @@ ptc_create_universe;
 
  PTC_TWISS, table=twiss, icase=56, no=2, betz=1.0, betx=10, bety=10;
 
- write, table=twiss, file="56D.ptctwiss";
-
-ptc_end;
-
-use, period=ldrif;
-
-
-ptc_create_universe;
-   ptc_create_layout,resplit,xbend, model=2, method=6, nst=PTCNSTEPS, exact=true, closed_layout=false;
-   ptc_setswitch, debuglevel=0, nocavity=false, 
-                  maxacceleration=true, fringe=true, exact_mis=true, time=true, totalpath=true;
- 
- PTC_TWISS, table=twiss, icase=6, no=2, betz=1.0, betx=10, bety=10;
-
- write, table=twiss, file="d.ptctwiss";
+ write, table=twiss, file="ptc.twiss";
 
 ptc_end;
 
