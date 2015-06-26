@@ -37,6 +37,7 @@ endif
 
 ifeq ($(STATIC),yes)
 LDFLAGS += $(if $(call eq,$(OSTYPE),Darwin),-static-intel,-static)
+LDLIBS  += $(if $(call eq,$(OSTYPE),Darwin),$(wildcard $(call INTELIB,libirc.a)) -lSystem -nodefaultlibs,)
 endif
 
 ifeq ($(SHARED),yes)

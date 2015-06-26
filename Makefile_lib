@@ -51,12 +51,17 @@ ifeq ($(STATIC),yes)
 	LIBS  += $(call libdir,/usr/X11/lib) -lX11
 	endif
 
-	# F90 (gfortran has weird order requirements, see make/linker.gfortran)
-	LIBS  += $(wildcard $(call GNULIB,libquadmath.a))
+    # C/C++
+    GNULIBS := $(wildcard $(call GNULIB,libstdc++.a) $(call GNULIB,libgcc_eh.a))
+    ifneq ($(GNULIBS),)
+      LDLIBS += $(GNULIBS)
+    else
+      LDLIBS += -lstdc++ -lm
+    endif
 
 else
-	LIBS    += $(call libdir,/usr/X11/lib) -lX11
-	LDLIBS  += -lstdc++ -lm
+    LIBS   += $(call libdir,/usr/X11/lib) -lX11
+    LDLIBS += -lstdc++ -lm
 endif
 endif
 
