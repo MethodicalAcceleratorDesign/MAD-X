@@ -10,8 +10,8 @@ subroutine setup(resp,a,im,ic,nm,nc)
     ! ****************************************************
     implicit none
 
-    integer im,ic,nm,nc 
-    double precision resp,a(nm, nc)
+    integer :: im, ic, nm, nc 
+    double precision :: resp, a(nm, nc)
 
     a(im+1,ic+1) = resp
 
@@ -30,8 +30,8 @@ subroutine setupi(resp,a,im,ic,nm,nc)
     ! ****************************************************
     implicit none
 
-    integer im,ic,nm,nc
-    integer resp,a(nm, nc)
+    integer :: im, ic, nm, nc
+    integer :: resp, a(nm, nc)
 
     a(im+1,ic+1) = resp
  
@@ -51,9 +51,10 @@ subroutine micit(a,conm,xin,cin,res,nx,rms,im,ic,iter,ny,ax,cinx, &
 
     implicit none
 
+    integer :: im, ic, iter
     double precision :: a(im,ic), xin(im), cin(ic), res(im)
     character(16) :: conm(ic)
-    integer :: im, ic, iter
+
     integer :: nx(ic)
     double precision :: ax(im,ic), cinx(ic), xinx(im), resx(im), rho(3*ic), ptop(ic)
     double precision :: rmss(ic), xrms(ic), xptp(ic), xiter(ic)
@@ -113,14 +114,14 @@ subroutine haveit(a,xin,cin,res,nx,im,ic,cb,xmeas,xres,y,z,xd)
     ! ****************************************************
     implicit none
 
-    integer im, ic, nx(ic), i, j, ifail
-    double precision a(im,ic), xin(im), cin(ic), res(im), cb(ic)
-    double precision xmeas(im), xres(im), y(ic,im), z(ic,ic), xd(ic)
+    integer :: im, ic
+    integer :: nx(ic)
+    double precision :: a(im,ic), xin(im), cin(ic), res(im), cb(ic)
+    double precision :: xmeas(im), xres(im), y(ic,im), z(ic,ic), xd(ic)
 
-    double precision zero
-    parameter(zero=0d0)
-
-    integer w(ic)
+    integer :: i, j, ifail
+    integer :: w(ic)
+    double precision, parameter :: zero=0d0
       
     write(*,*) ' '
     write(*,*) 'start LEAST SQUARES correction with all correctors'
@@ -166,6 +167,7 @@ subroutine svddec_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
     ! ****************************************************
     implicit none
 
+    integer :: im, ic
     double precision :: a(im,ic), svdmat(im,ic)
     double precision :: umat(im,ic), utmat(ic,im)
     double precision :: vmat(im,ic), vtmat(ic,im)
@@ -173,13 +175,12 @@ subroutine svddec_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
     double precision :: ws(ic), wvec(ic)
     integer :: sortw(ic)
     double precision :: sngval, sngcut
-    integer :: im, ic
     integer :: iflag, sing(2,ic)
     integer :: dbg
 
     integer :: i, j, jj, ii
     integer :: amater, svdmx, svdnx, svdnm
-    integer, parameter ::  nsing=5
+    integer, parameter :: nsing=5
     logical :: matu, matv
     double precision :: rat
     double precision, parameter :: zero=0d0
@@ -308,6 +309,7 @@ subroutine svddec_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
     ! ****************************************************
     implicit none
 
+    integer :: im, ic
     double precision :: a(im,ic), svdmat(ic,im)
     double precision :: umat(ic,im), utmat(im,ic)
     double precision :: vmat(ic,im), vtmat(im,ic)
@@ -315,13 +317,12 @@ subroutine svddec_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
     double precision :: ws(ic), wvec(ic)
     integer :: sortw(ic)
     double precision :: sngcut, sngval
-    integer :: im, ic
     integer :: iflag, sing(2,ic)
     integer :: dbg
 
     integer :: i, j, jj, ii
     integer :: amater, svdmx, svdnx, svdnm
-    integer, parameter ::  nsing=5
+    integer, parameter :: nsing=5
     logical :: matu, matv
     double precision :: rat
     double precision, parameter :: zero=0d0
@@ -446,6 +447,7 @@ subroutine svdcorr_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
     ! ******************************************************
     implicit none
 
+    integer :: im, ic
     double precision :: a(im,ic), svdmat(im,ic)
     double precision :: umat(im,ic), utmat(ic,im)
     double precision :: vmat(im,ic), vtmat(ic,im)
@@ -454,7 +456,6 @@ subroutine svdcorr_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
     double precision :: xa(im), xb(im), xpred(im) 
     double precision :: ws(ic), wvec(ic)
     integer :: sortw(ic), nx(ic)
-    integer :: im, ic
     integer :: iflag, dbg
 
     integer :: i, j
@@ -564,6 +565,7 @@ end subroutine svdcorr_m
 
 subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
      xin,xc,xout,xa,xb,xpred,ws,wvec,sortw,nx,im,ic,iflag,dbg)
+    implicit none
     ! ******************************************************
     !                                                      *
     !    Performs SVD and correction for matrix with more  *
@@ -572,8 +574,8 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
     !     Author: WFH  12.09.02                            *
     !                                                      *
     ! ******************************************************
-    implicit none
 
+    integer :: im, ic
     double precision :: a(im,ic), svdmat(ic,im)
     double precision :: umat(ic,im), utmat(im,ic)
     double precision :: vmat(ic,im), vtmat(im,ic)
@@ -581,8 +583,7 @@ subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
     double precision :: xin(im), xout(im), xc(ic)
     double precision :: xa(im), xb(im), xpred(im)
     double precision :: ws(ic), wvec(ic)
-    integer :: sortw(ic), nx(ic)
-    integer :: im, ic
+    integer :: sortw(ic), nx(ic)    
     integer :: iflag, dbg
 
     integer :: i,j
@@ -703,9 +704,9 @@ subroutine htls(a, conm, b, m, n, x, ipiv, r, rms, prtlev, iter, rho, ptop, &
      !     M  = NMTOT nr available monitors
      !     N  = NCTOT nr available independent correctors
 
-     double precision :: a(m,n), b(m), x(n), r(m)
-     character(16) :: conm(n)
      integer :: m, n, prtlev, iter
+     double precision :: a(m,n), b(m), x(n), r(m)
+     character(16) :: conm(n)     
      integer :: ipiv(n)
      double precision :: rms 
      double precision :: rho(3*n), ptop(n), rmss(n), xrms(n), xptp(n), xiter(n)
@@ -713,9 +714,9 @@ subroutine htls(a, conm, b, m, n, x, ipiv, r, rms, prtlev, iter, rho, ptop, &
 
      integer :: ij1, k2, k, i, kpiv, k3, j, j1, kk, ki, iii,kkk
      integer :: k1, kn, kl
-     double precision ::  ptp, g, h, sig, beta, piv, pivt, rm, pt, temp
+     double precision :: ptp, g, h, sig, beta, piv, pivt, rm, pt, temp
 
-     double precision, parameter ::  rzero=0.d0, reps7=1.d-7
+     double precision, parameter :: rzero=0.d0, reps7=1.d-7
      character(4) :: units='mrad'
      double precision :: calrms
 
@@ -911,11 +912,11 @@ subroutine htal(a,m,n,k,beta)
        !                                                                    *
        !*********************************************************************
        !     Householder transform of matrix A
-       double precision :: a(m,n)
        integer :: m, n, k 
+       double precision :: a(m,n)       
        double precision :: beta
 
-       integer :: j, i
+       integer :: i, j
        double precision :: h
        double precision, parameter :: rzero=0d0
 
@@ -944,8 +945,8 @@ subroutine htbl(a,b,m,n,k,beta)
        !                                                                    *
        !*********************************************************************
        !     Householder transform of vector B
-       double precision :: a(m,n), b(m)
        integer :: m, n, k 
+       double precision :: a(m,n), b(m)       
        double precision :: beta
 
        integer :: i
@@ -975,10 +976,10 @@ subroutine htrl(a,b,m,n,k,rho)
        !                                                                    *
        !*********************************************************************
        !     calculate residual orbit vector
-       double precision ::  a(m,n), b(m), rho(3*n)
        integer :: m, n, k
-
-       integer ::  i, kl, kn
+       double precision :: a(m,n), b(m), rho(3*n)
+       
+       integer :: i, kl, kn
        double precision :: beta
        double precision, parameter :: rzero=0d0
 
@@ -1003,9 +1004,9 @@ subroutine htul(a,m,n,k,sig,beta)
        !                                                                    *
        !*********************************************************************
        !     calculate vector U
-       double precision ::  a(m,n)
        integer :: m, n, k
-       double precision ::  sig, beta
+       double precision :: a(m,n)
+       double precision :: sig, beta
 
        integer :: i
        double precision :: h
@@ -1065,9 +1066,9 @@ double precision function calrms(r,m)
        !     Date:        2014-Feb-28                                       *
        !                                                                    *
        !*********************************************************************
-       double precision :: r(m)
        integer :: m
-
+       double precision :: r(m)
+       
        integer :: i
 
        calrms = 0.d0
@@ -1202,7 +1203,7 @@ subroutine dfact(n,a,idim,ir,ifail,det,jfail)
        integer :: n, idim, ir(*), ifail, jfail 
        double precision :: a(idim,*), det
 
-       integer ::  i,j,k,l, nxch, jp1, jm1
+       integer ::  i, j, k, l, nxch, jp1, jm1
        double precision :: tf, s11, s12, p, q, t
 
        integer, parameter :: normal=0, imposs=-1, jrange=0, jover=1, junder=-1
@@ -1342,8 +1343,8 @@ end subroutine dfeqn
 subroutine dfinv(n,a,idim,ir)
     implicit none
 
-    integer n, idim, ir(*)
-    double precision a(idim,*)
+    integer :: n, idim, ir(*)
+    double precision :: a(idim,*)
  
     integer :: i, j, k, m, nxch, ij, nm1, nmi, im2
     double precision :: ti, s31, s32, s33, s34
@@ -1415,10 +1416,6 @@ end subroutine dfinv
 
 subroutine svd(nm,m,n,a,w,matu,u,matv,v,ierr,rv1)
     implicit  none
-    integer i,j,k,l,m,n,ii,i1,kk,k1,ll,l1,mn,nm,its,ierr
-    double precision a(nm,n),w(n),u(nm,n),v(nm,n),rv1(n)
-    double precision c,f,g,h,s,x,y,z,tst1,tst2,scale,pythag
-    logical matu,matv
     ! ------------------------------------------------------------------
     !     this subroutine is a translation of the algol procedure svd,
     !     NUM. MATH. 14, 403-420(1970) by golub and reinsch.
@@ -1483,9 +1480,16 @@ subroutine svd(nm,m,n,a,w,matu,u,matv,v,ierr,rv1)
     !
     !     this version dated august 1983.
     ! ------------------------------------------------------------------
-    !
+    integer :: nm, m, n
+    double precision :: a(nm,n), w(n), u(nm,n), v(nm,n), rv1(n)
+    logical :: matu, matv
+
+    integer :: i, j, k, l, ii, i1, kk, k1, ll, l1, mn, its, ierr
+    double precision :: c, f, g, h, s, x, y, z, tst1, tst2, scale
+    double precision :: pythag
+
     ierr = 0
-    !
+
     do i = 1, m
         do j = 1, n
             u(i,j) = a(i,j)
@@ -1495,7 +1499,7 @@ subroutine svd(nm,m,n,a,w,matu,u,matv,v,ierr,rv1)
     g = 0.0d0
     scale = 0.0d0
     x = 0.0d0
-    !
+
     do i = 1, n
         l = i + 1
         rv1(i) = scale * g
@@ -1796,10 +1800,11 @@ end subroutine svd
 
 double precision function pythag(a,b)
     implicit  none
-    double precision :: a, b
     !
     !     finds dsqrt(a**2+b**2) without overflow or destructive underflow
     !
+    double precision :: a, b
+
     double precision :: p, r, s, t, u
 
     p = max(dabs(a),dabs(b))
@@ -1828,9 +1833,9 @@ subroutine rvord(inv,outv,ws,n)
      ! in reverse order in output vector OUTV.
      ! WS is a workspace vector, N is the dimension of the vectors.
      ! Supposition that INV contains positive numbers only!
+     integer  :: n
      double precision  ::  inv(n), ws(n)
      integer  :: outv(n)
-     integer  :: n
      
      integer  :: i, j, jmax
      
@@ -1852,7 +1857,7 @@ end subroutine rvord
 
 subroutine primat(a,nc,nm) 
      implicit   none
-     integer :: nm,nc
+     integer :: nm, nc
      integer :: a(nc, nm)
      
      integer :: i, j
@@ -1866,7 +1871,7 @@ end subroutine primat
    
 subroutine prdmat(a,nc,nm)
      implicit   none
-     integer :: nm,nc
+     integer :: nm, nc
      double precision :: a(nc, nm)
      
      integer :: i, j
