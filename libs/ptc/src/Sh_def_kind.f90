@@ -12077,18 +12077,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     TYPE(CAV_TRAVP),INTENT(INOUT):: EL
     INTEGER I
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
-
-    !    IF(k%FRINGE)
+    
     CALL FRINGE_CAV_TRAV(EL,X,k,1)
-
 
     DO I=1,EL%P%NST
        call track_slice(el,x,k,i)
     ENDDO
 
     CALL FRINGE_CAV_TRAV(EL,X,k,2)
-
-
     call ADJUST_TIME_CAV_TRAV_OUT(EL,X,k,2)
 
   END SUBROUTINE CAVEP_TRAV
@@ -12102,11 +12098,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     integer eps1,eps2
     real(dp) dv
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    
+    ! skworon 20150625
+    ! sensless to skip it, cavity body is tracked as usual and fringe is skipped 
+    !IF(k%NOCAVITY) RETURN
 
-    IF(k%NOCAVITY) RETURN
-
-        IF(I==1.AND.EL%P%KILL_ENT_FRINGE) RETURN
-        IF(I==-1.AND.EL%P%KILL_EXI_FRINGE) RETURN
+    IF(I==1.AND.EL%P%KILL_ENT_FRINGE) RETURN
+    IF(I==-1.AND.EL%P%KILL_EXI_FRINGE) RETURN
+    
     eps1=1
     eps2=-1
     if(EL%P%DIR*I==1) then
@@ -12144,11 +12143,13 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     integer eps1,eps2
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
-
-    IF(k%NOCAVITY) RETURN
-
-        IF(I==1.AND.EL%P%KILL_ENT_FRINGE) RETURN
-        IF(I==-1.AND.EL%P%KILL_EXI_FRINGE) RETURN
+    
+    ! skworon 20150625
+    ! sensless to skip it, cavity body is tracked as usual and fringe is skipped 
+    !IF(k%NOCAVITY) RETURN
+    
+    IF(I==1.AND.EL%P%KILL_ENT_FRINGE) RETURN
+    IF(I==-1.AND.EL%P%KILL_EXI_FRINGE) RETURN
 
     CALL ALLOC(C1,S1,C2,S2,V,O,Z0,F,CPSI,SPSI)
     call alloc(dv)
@@ -12175,7 +12176,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     ! REMOVE FRINGE IN OPPOSITE DIRECTION   ULTRA RELATIVISTIC
     V=I*EL%P%CHARGE*(EL%volt-dv)*1e-3_dp/EL%P%P0C
 
-
+    
     X(2)=X(2)+V*(CPSI*S1+SPSI*S2)*X(1)
     X(4)=X(4)+V*(CPSI*S1+SPSI*S2)*X(3)
     x(5)=x(5)-0.5_dp*(X(1)**2+X(3)**2)*V*(CPSI*C1+SPSI*C2)*O
@@ -14481,7 +14482,10 @@ SUBROUTINE ZEROr_teapot(EL,I)
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     !    IF(k%NOCAVITY.OR.(.NOT.k%FRINGE)) RETURN
-    IF(k%NOCAVITY) RETURN
+
+    ! skworon 20150625
+    ! sensless to skip it, cavity body is tracked as usual and fringe is skipped 
+    !IF(k%NOCAVITY) RETURN
 
     O=EL%freq*twopi/CLIGHT
     C1=COS(O*(x(6)-Z0)+EL%PHAS+EL%phase0)
@@ -14509,7 +14513,10 @@ SUBROUTINE ZEROr_teapot(EL,I)
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     !    IF(k%NOCAVITY.OR.(.NOT.k%FRINGE)) RETURN
-    IF(k%NOCAVITY) RETURN
+    
+    ! skworon 20150625
+    ! sensless to skip it, cavity body is tracked as usual and fringe is skipped 
+    !IF(k%NOCAVITY) RETURN  
 
     CALL ALLOC(C1,S1,C2,S2,V,O)
     O=EL%freq*twopi/CLIGHT
