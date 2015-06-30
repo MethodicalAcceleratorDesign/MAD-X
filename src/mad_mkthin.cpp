@@ -880,7 +880,7 @@ static expression* curved_from_straight_length(const element* rbend_el)
     // LD (16.06.2015): quick and dirty fix to broken inheritance of atributes,
     //                  set angle to 0 (default) when the returned string is empty
     if (anglestr == "") anglestr = "0";
-    const string rat = "(1.0 / sinc("+anglestr+"*0.5))"; // L_sbend / L_rbend
+    const string rat = "1.0/sinc("+anglestr+"*0.5)"; // L_sbend / L_rbend
     expression* rat_expr = new_expression(rat.c_str(),deco);
     // try status=0 or 1 to update
     l_sbend_expr = compound_expr(l_rbend_expr,0,"*",rat_expr,0); // this also updates the value

@@ -7,7 +7,7 @@ none = 0;
 lmb2 := lstraight;
 lstraight = 9.999958333385417;
 mb1: sbend,l:=lmb ,angle:=amb ,tilt:= 0.013,k1:=kmb ,e1:=ee1 ,e2:=ee2 ,hgap:= 0.12,fint:= 0.5,fintx:= 0.6;
-mb2_s: sbend,l:=( lmb2 ) * ( invsinc ( amb * 0.5 ) ) ,angle:=amb ,k1:=kmb ,e1:=( amb ) * ( 0.5 ) ,e2:=( ee2 ) + ( ( amb ) * ( 0.5 ) ) ,hgap:= 0.12,fint:= 0.7,thick=true;
+mb2_s: sbend,l:=( lmb2 ) * ( 1.0 / sinc ( amb * 0.5 ) ) ,angle:=amb ,k1:=kmb ,e1:=( amb ) * ( 0.5 ) ,e2:=( ee2 ) + ( ( amb ) * ( 0.5 ) ) ,hgap:= 0.12,fint:= 0.7,thick=true;
 myseq: sequence, l = 30;
 mb1, at = lmb / 2 ;
 mb1, at = 1.5 * lmb ;
