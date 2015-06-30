@@ -850,7 +850,7 @@ subroutine htls(a, conm, b, m, n, x, ipiv, r, rms, prtlev, iter, rho, ptop, &
         
         ! --- save residual orbit and inverse sign of corrections (convention!)
         R(:m) = B(:m)
-        X(:m) = -X(:m)
+        X(:k) = -X(:k)
         
         ! --- calcul du vecteur residuel dans htrl
         !=========================================        
