@@ -27,7 +27,7 @@ const char* const functs[] = {
   "atan", "sinh", "cosh", "tanh",
   "ranf", "gauss", "tgauss", "table", "exist",
   "floor", "ceil", "round", "frac",
-  "erf", "erfc", "sinc", "invsinc",
+  "erf", "erfc", "sinc",
   ""}; /* keep "" ! */
 
 const char* const op_string = "-+*/^";
