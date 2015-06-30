@@ -798,6 +798,7 @@ between square brackets, where [1] denotes a dimensionless variable.
 \subsection{Canonical Variables Describing Orbits}
 \label{subsec:tables_canon}
 \madx uses the following canonical variables to describe the motion of particles: 
+\begin{5.02.05}
 \begin{madlist}
    \ttitem{X} Horizontal position $x$ of the (closed) orbit,
      referred to the ideal orbit [m].    
@@ -823,6 +824,36 @@ between square brackets, where [1] denotes a dimensionless variable.
      $\Delta p / p_0$, [1]. This quantity is used to
      \hyperref[chap:differences]{normalize} all element strengths.   
 \end{madlist} 
+\end{5.02.05}
+
+\begin{5.02.06}
+\begin{madlist}
+	\ttitem{X} Horizontal position $x$ of the (closed) orbit,
+	referred to the ideal orbit [m].    
+	\ttitem{PX} Horizontal canonical momentum $p_x$ of the
+	(closed) orbit referred to the ideal orbit, divided by the
+	reference momentum: $\textrm{PX} = p_x / p_0$, [1].   
+	\ttitem{Y} Vertical position $y$ of the (closed) orbit, referred
+	to the ideal orbit [m].   
+	\ttitem{PY} Vertical canonical momentum $p_y$ of the (closed)
+	orbit referred to the ideal orbit, divided by the reference
+	momentum: $\textrm{PY} = p_y / p_0$, [1].   
+	\ttitem{T} Velocity of light times the negative time difference with
+	respect to the reference particle: $\textrm{T} =  - c t$, [m]. A
+	positive T means that the particle arrives ahead of the reference
+	particle.   
+	\ttitem{PT} Energy error, divided by the reference momentum times the
+	velocity of light: $\textrm{PT} = \Delta E / p_s c$, [1]. 
+	This value is only non-zero when synchrotron motion is
+	present. It describes the deviation of the particle from the orbit
+	of a particle with the momentum error DELTAP.   
+	\ttitem{DELTAP} {\bf Difference between the reference momentum and the design
+	momentum, divided by the design momentum: DELTAP =
+	$\Delta p / p_0$, [1].} This quantity is used to
+	\hyperref[chap:differences]{normalize} all element strengths.   
+\end{madlist} 
+\end{5.02.06}
+
 
 The independent variable is: 
 \begin{madlist}
@@ -992,6 +1023,8 @@ The chromatic functions are known to \madx under the following names:
 \label{subsec:tables_summ}
 After a successful TWISS command a summary table, with name SUMM, is created which
 contains the following variables:  
+
+\begin{5.02.05}
 \begin{madlist}
   \ttitem{LENGTH} The length of the machine, [m].     
   \ttitem{ORBIT5} The T ($= c t$, [m]) component of the closed orbit.     
@@ -1019,6 +1052,37 @@ contains the following variables:
   \ttitem{SYNCH\_4} Fourth synchrotron radiation integral  
   \ttitem{SYNCH\_5} Fifth synchrotron radiation integral  
 \end{madlist} 
+\end{5.02.05}
+
+\begin{5.02.06}
+\begin{madlist}
+	\ttitem{LENGTH} The length of the machine, [m].     
+	\ttitem{ORBIT5} The T ($= c t$, [m]) component of the closed orbit.     
+	\ttitem{ALFA} The momentum compaction factor $\alpha_c$, [1].     
+	\ttitem{GAMMATR} The transition energy $\gamma_{tr}$, [1].     
+	\ttitem{Q1} The horizontal tune $Q_1$ [1].     
+	\ttitem{DQ1} The horizontal chromaticity $dq_1 = \partial Q_1 / \partial p_t$, [1]
+	\ttitem{BETXMAX} The largest horizontal $\beta_x$, [m].     
+	\ttitem{DXMAX} The maximum of the absolute horizontal dispersion $D_x$, [m].     
+	\ttitem{DXRMS} The r.m.s. of the horizontal dispersion $D_x$, [m].     
+	\ttitem{XCOMAX} The maximum of the absolute horizontal closed orbit deviation [m].     
+	\ttitem{XRMS} The r.m.s. of the horizontal closed orbit deviation [m].     
+	\ttitem{Q2} The vertical tune $Q_2$ [1].     
+	\ttitem{DQ2} The vertical chromaticity $dq_2 = \partial Q_2 / \partial p_t$, [1]
+	\ttitem{BETYMAX} The largest vertical $\beta_y$, [m].     
+	\ttitem{DYMAX} The maximum of the absolute vertical dispersion $D_y$, [m].     
+	\ttitem{DYRMS} The r.m.s. of the vertical dispersion $D_y$, [m].     
+	\ttitem{YCOMAX} The maximum of the absolute vertical closed orbit deviation [m].     
+	\ttitem{YCORMS} The r.m.s. of the vertical closed orbit deviation [m].     
+	\ttitem{DELTAP} {\bf Momentum difference, divided by the reference
+	momentum: DELTAP = $\Delta p / p_0$ [1].}
+	\ttitem{SYNCH\_1} First synchrotron radiation integral  
+	\ttitem{SYNCH\_2} Second synchrotron radiation integral  
+	\ttitem{SYNCH\_3} Third synchrotron radiation integral  
+	\ttitem{SYNCH\_4} Fourth synchrotron radiation integral  
+	\ttitem{SYNCH\_5} Fifth synchrotron radiation integral  
+\end{madlist}
+\end{5.02.06}
 
 Notice that in \madx, PT substitutes DELTAP as longitudinal
 variable. Dispersive and chromatic functions are hence derivatives with

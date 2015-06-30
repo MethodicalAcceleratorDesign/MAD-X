@@ -469,8 +469,8 @@ label: MULTIPOLE, \= LRAD = real, TILT = real, \\
       multipole element. The roll angle affects all components.
       
     \ttitem{KNL} An array of the integrated normal multipole coefficients, 
-      starting from order zero and up to the
-      maximum order. The parameters are positional in the array, therefore 
+      starting from order zero and up to the maximum order (currently 20). 
+      The parameters are positional in the array, therefore 
       zeros must be filled in for components that do not exist. \\
       The coefficient of rank $i$ in the array corresponds to the integrated 
       strength $K_i L = B_i . L / (B\rho)$ where the strength is given by 
@@ -480,7 +480,7 @@ label: MULTIPOLE, \= LRAD = real, TILT = real, \\
       the normal horizontal rotation angle of the thin dipole.
       
     \ttitem{KSL} An array of the integrated skew multipole coefficients, 
-     starting from order zero and up to the maximum order. The
+     starting from order zero and up to the maximum order (currently 20). The
      parameters are positional in the array, therefore zeros must be
      filled in for components that do not exist. 
      Hence the first argument of the array, the argument for a skew
@@ -916,10 +916,8 @@ xxxxxxxxxxxxxxxxxxxxx\= \kill
 label: RFMULTIPOLE, \> VOLT = real, LAG = real, \\
        \> HARMON = integer, FREQ = real, \\
        \> LRAD = real, TILT = real, \\
-       \> KNL := \{k0nl, k1nl, k2nl, \ldots \}, \\
-       \> KSL := \{k0sl, k1sl, k2sl, \ldots \}, \\
-       \> PNL := \{p0n,  p1n,  p2n,  \ldots \}, \\
-       \> PSL := \{p0s,  p1s,  p2s,  \ldots \};
+       \> KNL = \{real, \ldots \}, KSL = \{real, \ldots \}, \\
+       \> PNL = \{real, \ldots \}, PSL = \{real, \ldots \};
 }
 
 A {\tt RFMULTIPOLE} is a thin-lens element which exhibits the properties
@@ -953,7 +951,7 @@ f0 t))}.
        believe that the \madeight concept of having individual {\tt TILT}
        values for each component and on top with default values
        led to considerable confusion and allowed for excessive
-       and unphysical freedom. Instead, in \madx the {\tt KNL/KSL}
+       and unphysical freedom. Instead, in \madx the {\tt KNL, KSL}
        components can be considered as the normal or skew
        multipole components of the magnet on the bench, while the
        {\tt TILT} attribute can be considered as an tilt alignment
@@ -961,34 +959,35 @@ f0 t))}.
 
    \ttitem{KNL} An array of the integrated normal rfmultipole
      coefficients, starting from order zero and up to the maximum
-     order. The parameters are positional in the array, therefore zeros
-     must be filled in for components that do not exist. \\ 
+     order (currently 20). 
+     The parameters are positional in the array, therefore leading 
+     zeros must be filled in for components that do not exist. 
 %     The normal rfmultipole coefficients from order zero to
 %     the maximum; the parameters are positional, therefore zeros
 %     must be filled in for components that do not exist. Example of
 %     a thin-lens sextupole: ms:rfmultipole, knl:=\{0, 0, k2l\}; 
    \ttitem{KSL} An array of the integrated skew rfmultipole
      coefficients, starting from order zero and up to the maximum
-     order. The parameters are positional in the array, therefore zeros
-     must be filled in for components that do not exist.\\ 
+     order (currently 20). 
+     The parameters are positional in the array, therefore leading 
+     zeros must be filled in for components that do not exist. 
 %     The skew rfmultipole coefficients from order zero to
 %     the maximum; the parameters are positional, therefore zeros
 %     must be filled in for components that do not exist. Example of
 %     a thin-lens skew octupole:
-
    \ttitem{PNL} The phase for each normal rfmultipole coefficients from
      order zero to the maximum; the parameters are positional,
-     therefore zeros must be filled in for components that do not
+     therefore leading zeros must be filled in for components that do not
      exist.  
    \ttitem{PSL} The phase for each skew rfmultipole coefficients from
      order zero to the maximum; the parameters are positional,
-     therefore zeros must be filled in for components that do not
+     therefore leading zeros must be filled in for components that do not
      exist.  
 \end{madlist}
 
 
 {\bf Example:}
-\madxmp{MS: RFMULTIPOLE, KSL := \{0, 0, 0, k3sl\};}
+\madxmp{MS: RFMULTIPOLE, KSL = \{0, 0, 0, k3sl\};}
 
 Both {\tt KNL} and {\tt KSL} may be specified for the same multipole.  
 
@@ -1580,5 +1579,43 @@ vertical plane, it could be defined more simply by
 VBEND: SBEND, L = 6.0, K0S = 0.01/6;
 }
 
+\section{Coordinate translation}
+\label{sec:translation}
+
+The element {\tt TRANSLATION} changes the
+\hyperref[subsec:local_straight]{reference system} 
+by applying a translation of the reference system.
+
+\madbox{
+label: TRANSLATION, \= X=real,  \= Y=real,  \= T=real, \\
+                    \> PX=real, \> PY=real, \> PT=real;
+}
+
+{\tt TRANSLATION} has no effect on the beam, but it causes the beam to be 
+referred to the new coordinate system \\ 
+\begin{equation}\begin{split}
+		x_2 &= x_1 \cos\psi - y_1 \sin\psi \\
+		y_2 &= x_1 \sin\psi + y_1 \cos\psi
+	\end{split}\end{equation}
+
+
+\section{Change of reference system}
+\label{sec:changeref}
+
+The element {\tt CHANGEREF} changes the
+\hyperref[subsec:local_straight]{reference system} 
+by applying both translations and rotations.
+
+\madbox{
+label: CHANGEREF, \= PATCH\_ANG = {real, real, real}, \\
+                  \> PATCH\_TRANS = {real, real, real};
+}
+
+{\tt CHANGEREF} has no effect on the beam, but it causes the beam to be 
+referred to the new coordinate system \\ 
+\begin{equation}\begin{split}
+x_2 &= x_1 \cos\psi - y_1 \sin\psi \\
+y_2 &= x_1 \sin\psi + y_1 \cos\psi
+\end{split}\end{equation}
 
 %%% END

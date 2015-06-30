@@ -43,8 +43,8 @@ CORRECT, \=ORBIT=orbittable, MODEL=modeltable, TARGET=targettable, \\
          \>TWISSUM=integer, \\
          \>NCORR=integer, CORRLIM=real, \\
          \>MONERROR=integer, MONON=real, MONSCALE=real, ERROR=real,\\ 
-         \>PLANE=string,  RESOUT=integer, \\
-         \>CLIST=filename, MLIST=filename, \\
+         \>PLANE=string, RESOUT=integer, \\
+         \>CLIST=filename,MLIST=filename, \\
          \>UNITS=real, CORZERO=integer, \\
          \>SNGCUT=real, SNGVAL=real \\
          \>TWORING=logical, BEAM1TAB=tabname, BEAM2TAB=tabname, \\
@@ -98,7 +98,7 @@ The options used in the {\tt CORRECT} command are:
 \begin{madlist}
    \ttitem{FLAG} can be "ring" or "line", either a circular machine
      or a trajectory is corrected.   
-     \\ Default flag is "ring". 
+     \\ (Default: ring) 
 
    \ttitem{MODE} defines the method to be used for corrections. 
      \\ Available modes are {\tt LSQ, MICADO} and {\tt SVD}.  
@@ -114,51 +114,51 @@ The options used in the {\tt CORRECT} command are:
      unexpected results. To avoid the creation of local bumps, it is
      recommended to precede a {\tt MICADO} correction by a {\tt SVD} conditioning
      (set {\tt COND=1}).  
-     \\ Default mode is {\tt MICADO}.            
+     \\ (Default: {\tt MICADO})
 
-   \ttitem{PLANE} If this attribute is {\tt x}, only the horizontal correction
-     is made; if it is {\tt y}, only the vertical correction is made. (This
+   \ttitem{PLANE} With {\tt PLANE=x}, the orbit correction
+     is performed for the horizontal plane; With {\tt PLANE=y}, 
+     the correction is performed for the vertical plane. made. (This
      differs from the \madeight implementation).  
-     \\ Default plane is horizontal. 
+     \\ (Default: X for horizontal plane) 
 
-   \ttitem{COND} When {\tt COND} is 1, a Singular Value Decomposition is
-     performed and  the response matrix CONDitioned to avoid linearly
+   \ttitem{COND} When {\tt COND=1}, a Singular Value Decomposition is
+     performed and  the response matrix is conditioned to avoid linearly
      dependent correctors. This can be used to avoid creation of
-     artificial bumps during a {\tt LSQ} or {\tt MICADO} correction (requires some
-     computing time).  Please note: this option is not robust since it
+     artificial bumps during a {\tt LSQ} or {\tt MICADO} correction.  
+     Please note: this option is not robust since it
      depends on parameters which control the determination of singular
      values and redundant correctors. These can be set with the attributes
      {\tt SNGVAL} and {\tt SNGCUT}. Both parameters depend on the machine and may
-     need adjustment. Default values are adjusted to large machines and
-     "reasonable" performance for smaller machines.  
-     \\
+     need adjustment. Default values are adjusted to large machines and give
+     "reasonable" performance for smaller machines.
 
-   \ttitem{NCORR} Only used by the {\tt MICADO} algorithm. Defines the number of
-     correctors to be used, unless set to 0 in which case all available
-     correctors are used.  
-     \\ Default is 0 (all available correctors). 
+   \ttitem{NCORR} Defines the number of correctors to be used by the 
+     {\tt MICADO} algorithm. If {\tt NCORR=0} all available
+     correctors are used. Only used by the {\tt MICADO} algorithm.
+     \\ (Default: 0 i.e. all available correctors)
 
    \ttitem{SNGVAL}  Used to set the threshold for finding singular values
      with the {\tt COND} attribute. (Hint: smaller number finds fewer singular
      values).  
      \\ {\bf Use with care ! }
-     \\ Default is 2.0 
+     \\ (Default: 2.0)
 
    \ttitem{SNGCUT}  Used to set the threshold for finding redundant
      correctors with the {\tt COND} attribute. (Hint: larger number finds fewer
      redundant correctors).  
      \\ {\bf Use with extreme care ! }
-     \\ Default is 50.0 
+     \\ (Default: 50.0) 
 
    \ttitem{MONERROR} When {\tt MONERROR} is 1, the {\tt MREX} and {\tt MREY} 
      alignment errors on monitors assigned  by \hyperref[sec:ealign]{EALIGN} 
      are taken into account, otherwise they are ignored.
-     \\ Default is 0. 
+     \\ (Default: 0)
 
    \ttitem{MONSCALE} When {\tt MONSCALE} is 1, the MSCALX and
      MSCALY scaling errors on monitors assigned  by \hyperref[sec:ealign]{EALIGN}  
      are taken into account, otherwise they are ignored.
-     \\ Default is 0. 
+     \\ (Default: 0)
 
    \ttitem{MONON} takes a real number between 0.0 and 1.0. It
      determines the number of available monitors. If the command is
@@ -166,27 +166,33 @@ The options used in the {\tt CORRECT} command are:
      {\tt MONON}. In the average a fraction $(1.0 - \texttt{MONON})$ 
      of the monitors will be disabled for the correction, i.e. they are 
      considered not existing.  This allows to study the effect of missing monitors.
-     \\ Default is 1.0 (100 \%). 
+     \\ (Default: 1.0 i.e. 100 \%) 
 
    \ttitem{CORRLIM}  A limit on the maximum corrector strength can be
      given and a WARNING is issued if it is exceeded by one or more
      correctors.  Please note: the strengths computed by the correction
      algorithms are NOT limited, only a warning is printed ! 
-     \\ Default is 1.0 mrad. \\
+     \\ (Default: 1.0 mrad)
 
    \ttitem{TWORING} When true, the correction will be done on two rings at
      once. The only correction mode available in this case is
      {\tt MICADO}. The attribute {\tt ORBIT=table} is ignored and {\tt BEAM1TAB=table} and
      {\tt BEAM2TAB=table} are used instead.  
-     \\ Default: false \\
+     \\ (Default: false)
 
    \ttitem{UNITS} when this parameter is set the value is a multiplier [TO BE COMPLETED] 
-     \\ Default unknown \\
+     \\ Default unknown
 
-   \ttitem{ERROR} specifies the maximum RMS value of the orbit to
-     be reached by the correction algorithm. The value is specified in
-     meters, e.g. {\tt ERROR=1.e-3} for a 1~mm RMS target value. 
-     \\ Default is 1.e-5 m.\\
+   \ttitem{CORZERO} an integer value to specify whether corrector settings 
+     should be all reset to zero before starting the orbit correction 
+     ({\tt CORZERO}$>0$) 
+     or corrector settings calculated by the orbit correction should be added to 
+     existing corrector settings ({\tt CORZERO}$=0$, Default).
+
+   \ttitem{ERROR} specifies the maximum RMS value, in meters, of the 
+     orbit to be reached by the correction algorithm, 
+     e.g. {\tt ERROR=1.e-3} for a 1~mm RMS target value. 
+     \\ (Default: 1.e-5 m)
 
 \end{madlist}
 
