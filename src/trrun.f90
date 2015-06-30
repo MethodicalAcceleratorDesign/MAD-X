@@ -147,9 +147,14 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      fasterror_on = .true.
   endif
 
+  !---- get options for space charge variables
+  exit_loss_turn = get_option('exit_loss_turn ') .ne. 0
+  bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
+  checkpnt_restart = get_value('run ', 'checkpnt_restart ') .ne. 0d0
+  emittance_update = get_option('emittance_update ') .ne. 0
+  virgin_state = get_value('run ', 'virgin_state ') .ne. 0d0
+
   if(switch.eq.1) then
-     bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
-     checkpnt_restart = get_value('run ', 'checkpnt_restart ') .ne. 0d0
      ! 2015-Feb-23  16:20:19  ghislain: open file only when necessary
      if (checkpnt_restart) &
           open(90,file='checkpoint_restart.dat',form='unformatted',status='unknown')
@@ -158,8 +163,6 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      checkpnt_restart = .false.
   endif
   if(bb_sxy_update) then
-     emittance_update = get_option('emittance_update ') .ne. 0
-     virgin_state = get_value('run ', 'virgin_state ') .ne. 0d0
      if(virgin_state) first=.true.
 
      call table_input(                                 &
@@ -170,7 +173,6 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
           dy_start,    dpy_start)
 
      if(first) call make_bb6d_ixy(turns)
-     exit_loss_turn = get_option('exit_loss_turn ') .ne. 0
   endif
 
   if(fsecarb) then
