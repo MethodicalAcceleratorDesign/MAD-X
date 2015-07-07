@@ -1,6 +1,4 @@
-!     FS 15.03.2004: correcting warning printout
 SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
-
   use twiss0fi
   use twissafi
   use twisslfi
@@ -8,24 +6,28 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   use twissotmfi
   use trackfi
   use fasterror
+  use matrices, only : EYE
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TWISS command: Track linear lattice parameters.                  *
   !----------------------------------------------------------------------*
-  logical fast_error_func
-  integer i,ithr_on
-  integer tab_name(*),chrom,eflag,get_option,izero,ione
-  double precision rt(6,6),disp0(6),orbit0(6),orbit(6),tt(6,6,6), &
-       ddisp0(6),r0mat(2,2),zero,one,two,get_value
-  integer sector_tab_name(*) ! holds sectormap data
-  character(48) charconv
+  double precision :: rt(6,6), disp0(6)
+  integer :: tab_name(*)
+  integer :: sector_tab_name(*) ! holds sectormap data
 
-  parameter (zero=0d0, one=1d0, two=2d0)
+  integer :: i, ithr_on
+  integer :: chrom, eflag 
+  double precision :: orbit0(6), orbit(6), tt(6,6,6), ddisp0(6), r0mat(2,2)
+  character(len=48) :: charconv
+  logical :: fast_error_func
 
-  data izero, ione / 0, 1 /
+  double precision, external :: get_value
+  integer, external :: get_option
 
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0
+  integer, parameter :: izero=0, ione=1
+ 
   !---- Initialization
   table_name = charconv(tab_name)
   sectorTableName = charconv(sector_tab_name)
@@ -33,83 +35,52 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   eflag=0
   ithr_on=0
   fsecarb=.false.
-  i = 6
 
-  call dzero(orbit0,6)
-  call get_node_vector('orbit0 ', i, orbit0)
-  call m66one(rt)
-  call m66one(rw)
-  call dzero(tt,216)
+  ORBIT0 = zero 
+  call get_node_vector('orbit0 ', 6, orbit0)
+  RT = EYE ! call m66one(rt)
+  RT = EYE ! call m66one(rw)
+  TT = zero 
   call get_disp0(disp0)
-  call dzero(ddisp0,6)
-  call dzero(r0mat,4)
-  call dzero(opt_fun0,fundim)
-  call dzero(opt_fun,fundim)
-  call dzero(disp,6)
-  call dzero(ddisp,6)
-  call dzero(rmat,4)
+  DDISP0 = zero 
+  R0MAT = zero 
+  OPT_FUN0 = zero 
+  OPT_FUN = zero 
+  DISP = zero 
+  DDISP = zero 
+  RMAT = zero 
 
-  betx=zero
-  alfx=zero
-  amux=zero
-  bety=zero
-  alfy=zero
-  amuy=zero
-  bxmax=zero
-  dxmax=zero
-  bymax=zero
-  dymax=zero
-  xcomax=zero
-  ycomax=zero
-  sigxco=zero
-  sigyco=zero
-  sigdx=zero
-  sigdy=zero
-  wgt=zero
-  cosmux=zero
-  cosmuy=zero
-  wx=zero
-  phix=zero
-  dmux=zero
-  wy=zero
-  phiy=zero
-  dmuy=zero
-  synch_1=zero
-  synch_2=zero
-  synch_3=zero
-  synch_4=zero
-  synch_5=zero
-  suml=zero
-  circ=zero
-  eta=zero
-  alfa=zero
-  gamtr=zero
-  qx=zero
-  qy=zero
-  sinmux=zero
-  sinmuy=zero
-  xix=zero
-  xiy =zero
+  betx=zero; alfx=zero; amux=zero; bxmax=zero; dxmax=zero; xcomax=zero
+  sigxco=zero; sigdx=zero; cosmux=zero; wx=zero; phix=zero; dmux=zero
+  qx=zero; sinmux=zero; xix=zero
+  
+  bety=zero; alfy=zero; amuy=zero; bymax=zero; dymax=zero; ycomax=zero
+  sigyco=zero; sigdy=zero; cosmuy=zero; wy=zero; phiy=zero; dmuy=zero
+  qy=zero; sinmuy=zero; xiy=zero
+
+  synch_1=zero;  synch_2=zero;  synch_3=zero;  synch_4=zero;  synch_5=zero
+
+  suml=zero; circ=zero; eta=zero; alfa=zero; gamtr=zero; wgt=zero
 
   !---- Track chromatic functions
-  chrom=get_option('twiss_chrom ')
+  chrom = get_option('twiss_chrom ')
   
   !---- flag if called from match process
   !---- get match flag for storing variables in nodes
   match_is_on = get_option('match_is_on ') .ne. 0
 
   !---- flags for writing cumulative or lumped matrices
-  rmatrix=get_value('twiss ','rmatrix ').ne.zero
-  sectormap=get_option('twiss_sector ').ne.zero
+  rmatrix = get_value('twiss ','rmatrix ').ne.zero
+  sectormap = get_option('twiss_sector ').ne.zero
 
   !---- Get circumference
-  circ=get_value('probe ','circ ')
-  if (circ.eq.zero) call aafail('TWISS: ', 'Zero length sequence.')
+  circ = get_value('probe ','circ ')
+  if (circ .eq. zero) call aafail('TWISS: ', 'Zero length sequence.')
 
   !---- Set fast_error_func flag to use faster error function
   !---- including tables. Thanks to late G. Erskine
   fast_error_func = get_option('fast_error_func ') .ne. 0
-  if(fast_error_func.and..not.fasterror_on) then
+  if (fast_error_func .and. .not.fasterror_on) then
      call wzset
      fasterror_on = .true.
   endif
@@ -123,43 +94,38 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
         print '(''initial orbit vector: '', 1p,6e14.6)', orbit0
      endif
      call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on)
-     if(eflag.ne.0) go to 900
-     if (get_option('twiss_print ') .ne. 0)  then
+     if (eflag.ne.0) go to 900
+     if (get_option('twiss_print ') .ne. 0)  &
         print '(''final orbit vector:   '', 1p,6e14.6)', orbit
-     endif
   else 
      !---- Initial values from periodic solution.
-     call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
-     if(eflag.ne.0) go to 900
-     call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on)
-     if(eflag.ne.0) go to 900
-     call twcpin(rt,disp0,r0mat,eflag)
-     if(eflag.ne.0) go to 900
+     call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag);          if (eflag.ne.0) go to 900
+     call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on); if (eflag.ne.0) go to 900
+     call twcpin(rt,disp0,r0mat,eflag);                               if (eflag.ne.0) go to 900
      !---- Initialize opt_fun0
      call twinifun(opt_fun0,rt)
   endif
 
   if (sectormap)  then
-     call dcopy(orbit0, sorb, 6)
-     call m66one(srmat)
-     call dzero(stmat, 216)
+     SORB = ORBIT0 
+     SRMAT = EYE !call m66one(srmat)
+     STMAT = zero 
   endif
 
   !---- Build table of lattice functions, coupled.
   call twcpgo(rt,orbit0)
 
   !---- List chromatic functions.
-  if (chrom.ne.0) then
+  if (chrom .ne. 0) then
      call twbtin(rt,tt)
      call twchgo
   endif
 
   !---- Print summary
-  if(get_option('twiss_summ ') .ne. 0) call tw_summ(rt,tt)
+  if (get_option('twiss_summ ') .ne. 0) call tw_summ(rt,tt)
 
   if (get_option('keeporbit ') .ne. 0)  then
-     i = 6
-     call store_node_vector('orbit0 ', i, opt_fun0(9))
+     call store_node_vector('orbit0 ', 6, opt_fun0(9))
   endif
 
   call set_option('twiss_success ', ione)
@@ -169,12 +135,8 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
 
  end SUBROUTINE twiss
 
-
-
 SUBROUTINE tmrefe(rt)
-
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Transfer matrix w.r.t. ideal orbit for one period.               *
@@ -182,17 +144,19 @@ SUBROUTINE tmrefe(rt)
   !     Output:                                                          *
   !     rt(6,6) (double) transfer matrix.                                *
   !----------------------------------------------------------------------*
-  integer eflag,ithr_on
-  double precision orbit0(6),orbit(6),rt(6,6),tt(6,6,6)
+  double precision :: rt(6,6)
 
-  ithr_on=0
-  call dzero(orbit0,6)
+  integer :: eflag, ithr_on
+  double precision :: orbit0(6), orbit(6), tt(6,6,6)
+
+  ithr_on = 0
+  ORBIT0 = 0.d0 ; ORBIT = 0.d0 ; TT = 0.d0 
   !---- Get transfer matrix.
   call tmfrst(orbit0,orbit,.false.,.false.,rt,tt,eflag,0,0,ithr_on)
+
 end SUBROUTINE tmrefe
+
 SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
-
-
   use twiss0fi
   implicit none
   !----------------------------------------------------------------------*
@@ -205,25 +169,28 @@ SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
   !     orbit(6)  (double) closed orbit at obs. point kobs, or at end    *
   !     rt(6,6) (double) transfer matrix.                                *
   !----------------------------------------------------------------------*
-  integer eflag,kobs,izero,ione,ithr_on
-  double precision opt_fun0(fundim),orbit0(6),orbit(6),rt(6,6),     &
-       tt(6,6,6)
-  data izero, ione / 0, 1 /
+  integer :: kobs
+  double precision :: orbit0(6), orbit(6), rt(6,6)
+  
+  integer :: eflag, ithr_on
+  double precision :: opt_fun0(fundim), tt(6,6,6)
+  
+  integer, parameter :: izero=0, ione=1
 
-  ithr_on=0
-  call dzero(orbit0,6)
+  ithr_on = izero
+  ORBIT0 = 0.d0 
   !---- Get closed orbit and coupled transfer matrix.
   call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
   call set_option('bbd_flag ', ione)
   call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,kobs,0,ithr_on)
   call set_option('bbd_flag ', izero)
-end SUBROUTINE tmrefo
-SUBROUTINE twinifun(opt_fun0,rt)
 
+end SUBROUTINE tmrefo
+
+SUBROUTINE twinifun(opt_fun0,rt)
   use twiss0fi
   use twisslfi
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Initial twiss parameters put to opt_fun0.                        *
@@ -231,21 +198,26 @@ SUBROUTINE twinifun(opt_fun0,rt)
   !     opt_fun0(fundim) (double) initial optical values:                *
   !     betx0,alfx0,amux0,bety0,alfy0,amuy0, etc.                        *
   !----------------------------------------------------------------------*
-  integer i1,i2
-  double precision opt_fun0(*),rt(6,6),betx,alfx,mux,bety,alfy,muy, &
-       x,px,y,py,t,pt,dx,dpx,dy,dpy,wx,phix,dmux,wy,phiy,dmuy,ddx,ddpx,  &
-       ddy,ddpy,r(2,2),energy,get_value,zero,twopi,get_variable
-  parameter(zero=0d0)
+  double precision :: opt_fun0(*), rt(6,6)
+
+  integer :: i1, i2
+  double precision :: betx, alfx, mux, bety, alfy, muy, dx, dpx, dy, dpy
+  double precision :: x, px, y, py, t, pt 
+  double precision :: wx, phix, dmux, wy, phiy, dmuy, ddx, ddpx, ddy, ddpy
+  double precision :: r(2,2), energy, twopi
+
+  double precision, external :: get_value, get_variable
+  double precision, parameter :: zero=0d0
 
   !---- Initialize
-  twopi=get_variable('twopi ')
-  betx=get_value('twiss ','betx ')
-  bety=get_value('twiss ','bety ')
+  twopi = get_variable('twopi ')
+  betx = get_value('twiss ','betx ')
+  bety = get_value('twiss ','bety ')
 
-  if(betx.gt.zero) opt_fun0(3)=betx
-  if(bety.gt.zero) opt_fun0(6)=bety
+  if (betx.gt.zero) opt_fun0(3) = betx
+  if (bety.gt.zero) opt_fun0(6) = bety
 
-  if(opt_fun0(3).le.zero .or. opt_fun0(6).le.zero) &
+  if (opt_fun0(3).le.zero .or. opt_fun0(6).le.zero) &
        call aafail('TWINIFUN: ', 'BETX and BETY must be both larger than zero.')
 
   alfx=  get_value('twiss ','alfx ')
@@ -272,57 +244,56 @@ SUBROUTINE twinifun(opt_fun0,rt)
   ddpx=  get_value('twiss ','ddpx ')
   ddy=   get_value('twiss ','ddy ')
   ddpy=  get_value('twiss ','ddpy ')
-  r(1,1)=get_value('twiss ','r11 ')
-  r(1,2)=get_value('twiss ','r12 ')
-  r(2,1)=get_value('twiss ','r21 ')
-  r(2,2)=get_value('twiss ','r22 ')
-  energy=get_value('probe ','energy ')
+  r(1,1) = get_value('twiss ','r11 ')
+  r(1,2) = get_value('twiss ','r12 ')
+  r(2,1) = get_value('twiss ','r21 ')
+  r(2,2) = get_value('twiss ','r22 ')
+  energy = get_value('probe ','energy ')
 
-  if(alfx  .ne.zero) opt_fun0(4 )=alfx
-  if(mux   .ne.zero) opt_fun0(5 )=mux * twopi
-  if(alfy  .ne.zero) opt_fun0(7 )=alfy
-  if(muy   .ne.zero) opt_fun0(8 )=muy * twopi
-  if(x     .ne.zero) opt_fun0(9 )=x
-  if(px    .ne.zero) opt_fun0(10)=px
-  if(y     .ne.zero) opt_fun0(11)=y
-  if(py    .ne.zero) opt_fun0(12)=py
-  if(t     .ne.zero) opt_fun0(13)=t
-  if(pt    .ne.zero) opt_fun0(14)=pt
-  if(dx    .ne.zero) opt_fun0(15)=dx
-  if(dpx   .ne.zero) opt_fun0(16)=dpx
-  if(dy    .ne.zero) opt_fun0(17)=dy
-  if(dpy   .ne.zero) opt_fun0(18)=dpy
-  if(wx    .ne.zero) opt_fun0(19)=wx
-  if(phix  .ne.zero) opt_fun0(20)=phix * twopi
-  if(dmux  .ne.zero) opt_fun0(21)=dmux * twopi
-  if(wy    .ne.zero) opt_fun0(22)=wy
-  if(phiy  .ne.zero) opt_fun0(23)=phiy * twopi
-  if(dmuy  .ne.zero) opt_fun0(24)=dmuy * twopi
-  if(ddx   .ne.zero) opt_fun0(25)=ddx
-  if(ddpx  .ne.zero) opt_fun0(26)=ddpx
-  if(ddy   .ne.zero) opt_fun0(27)=ddy
-  if(ddpy  .ne.zero) opt_fun0(28)=ddpy
-  if(r(1,1).ne.zero) opt_fun0(29)=r(1,1)
-  if(r(1,2).ne.zero) opt_fun0(30)=r(1,2)
-  if(r(2,1).ne.zero) opt_fun0(31)=r(2,1)
-  if(r(2,2).ne.zero) opt_fun0(32)=r(2,2)
-  if(energy.ne.zero) opt_fun0(33)=energy
-  if(rmatrix) then
-     do i1=1,6
-        do i2=1,6
-           opt_fun0(33+(i1-1)*6+i2)=rt(i1,i2)
+  if (alfx  .ne.zero) opt_fun0(4 ) = alfx
+  if (mux   .ne.zero) opt_fun0(5 ) = mux * twopi
+  if (alfy  .ne.zero) opt_fun0(7 ) = alfy
+  if (muy   .ne.zero) opt_fun0(8 ) = muy * twopi
+  if (x     .ne.zero) opt_fun0(9 ) = x
+  if (px    .ne.zero) opt_fun0(10) = px
+  if (y     .ne.zero) opt_fun0(11) = y
+  if (py    .ne.zero) opt_fun0(12) = py
+  if (t     .ne.zero) opt_fun0(13) = t
+  if (pt    .ne.zero) opt_fun0(14) = pt
+  if (dx    .ne.zero) opt_fun0(15) = dx
+  if (dpx   .ne.zero) opt_fun0(16) = dpx
+  if (dy    .ne.zero) opt_fun0(17) = dy
+  if (dpy   .ne.zero) opt_fun0(18) = dpy
+  if (wx    .ne.zero) opt_fun0(19) = wx
+  if (phix  .ne.zero) opt_fun0(20) = phix * twopi
+  if (dmux  .ne.zero) opt_fun0(21) = dmux * twopi
+  if (wy    .ne.zero) opt_fun0(22) = wy
+  if (phiy  .ne.zero) opt_fun0(23) = phiy * twopi
+  if (dmuy  .ne.zero) opt_fun0(24) = dmuy * twopi
+  if (ddx   .ne.zero) opt_fun0(25) = ddx
+  if (ddpx  .ne.zero) opt_fun0(26) = ddpx
+  if (ddy   .ne.zero) opt_fun0(27) = ddy
+  if (ddpy  .ne.zero) opt_fun0(28) = ddpy
+  if (r(1,1).ne.zero) opt_fun0(29) = r(1,1)
+  if (r(1,2).ne.zero) opt_fun0(30) = r(1,2)
+  if (r(2,1).ne.zero) opt_fun0(31) = r(2,1)
+  if (r(2,2).ne.zero) opt_fun0(32) = r(2,2)
+  if (energy.ne.zero) opt_fun0(33) = energy
+  if (rmatrix) then
+     do i1= 1,6
+        do i2= 1,6
+           opt_fun0(33+(i1-1)*6+i2) = rt(i1,i2)
         enddo
      enddo
   endif
 
 end SUBROUTINE twinifun
-SUBROUTINE twprep(save,case,opt_fun,position)
 
+SUBROUTINE twprep(save,case,opt_fun,position)
   use twissafi
   use twisslfi
   use twissotmfi
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Finalize twiss parameters, if save flag fill                     *
@@ -334,56 +305,49 @@ SUBROUTINE twprep(save,case,opt_fun,position)
   !     opt_fun(fundim) (double) optical values:                         *
   !     betx,alfx,amux,bety,alfy,amuy, etc.                              *
   !----------------------------------------------------------------------*
+  integer :: save, case
+  double precision opt_fun(*), position
 
-  ! 2014-May-15  15:40:41  ghislain: suppressed flag
-  !     that was always set to 1 in calling functions and never modified.
-  !     flag        (integer) fill flag: 0 no, !=0 yes                   *
+  integer :: i 
+  double precision :: opt5, opt8, opt20, opt21, opt23, opt24
+  double precision :: twopi
 
-
-  integer save,case,i
-  double precision opt_fun(*),position,twopi,opt5,opt8,opt20,opt21, &
-       opt23,opt24,get_variable,zero
-  parameter(zero=0d0)
+  double precision, external :: get_variable
+  double precision, parameter :: zero=0d0
 
   !---- Initialize
   twopi=get_variable('twopi ')
 
-  if(case.eq.1) then
+  if (case.eq.1) then
      !--- fill with data from twcpgo (Twiss Couple)
-     opt_fun(2)=position
-     opt5 = opt_fun(5)
-     opt_fun(5)= opt_fun(5) / twopi
-     opt8 = opt_fun(8)
-     opt_fun(8)= opt_fun(8) / twopi
-     if(save.ne.0) call twfill(case,opt_fun,position)
-     if (match_is_on)  call copy_twiss_data(opt_fun)
-     opt_fun(5)= opt5
-     opt_fun(8)= opt8
-  elseif(case.eq.2) then
+     opt_fun(2) = position
+     opt5 = opt_fun(5) ; opt_fun(5) = opt_fun(5) / twopi
+     opt8 = opt_fun(8) ; opt_fun(8) = opt_fun(8) / twopi
+     if (save.ne.0) call twfill(case,opt_fun,position)
+     if (match_is_on) call copy_twiss_data(opt_fun)
+     opt_fun(5) = opt5
+     opt_fun(8) = opt8
+
+  elseif (case.eq.2) then
      !--- fill with data from twchgo (Twiss Chrom)
-     opt20 = opt_fun(20)
-     opt_fun(20)= opt_fun(20) / twopi
-     opt21 = opt_fun(21)
-     opt_fun(21)= opt_fun(21) / twopi
-     opt23 = opt_fun(23)
-     opt_fun(23)= opt_fun(23) / twopi
-     opt24 = opt_fun(24)
-     opt_fun(24)= opt_fun(24) / twopi
-     if(save.ne.0) call twfill(case,opt_fun,position)
-     if (match_is_on)  call copy_twiss_data(opt_fun)
-     opt_fun(20)= opt20
-     opt_fun(21)= opt21
-     opt_fun(23)= opt23
-     opt_fun(24)= opt24
+     opt20 = opt_fun(20) ; opt_fun(20) = opt_fun(20) / twopi
+     opt21 = opt_fun(21) ; opt_fun(21) = opt_fun(21) / twopi
+     opt23 = opt_fun(23) ; opt_fun(23) = opt_fun(23) / twopi
+     opt24 = opt_fun(24) ; opt_fun(24) = opt_fun(24) / twopi
+     if (save.ne.0) call twfill(case,opt_fun,position)
+     if (match_is_on) call copy_twiss_data(opt_fun)
+     opt_fun(20) = opt20
+     opt_fun(21) = opt21
+     opt_fun(23) = opt23
+     opt_fun(24) = opt24
   endif
 end SUBROUTINE twprep
-SUBROUTINE twfill(case,opt_fun,position)
 
+SUBROUTINE twfill(case,opt_fun,position)
   use twissafi
   use twisslfi
   use twissotmfi
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Fill twiss table with twiss parameters.                          *
@@ -394,42 +358,35 @@ SUBROUTINE twfill(case,opt_fun,position)
   !     opt_fun(fundim) (double) optical values:                         *
   !     betx,alfx,amux,bety,alfy,amuy, etc.                              *
   !----------------------------------------------------------------------*
+  integer case
+  double precision :: opt_fun(*), position
 
-  ! 2014-May-15  15:40:41  ghislain: suppressed flag
-  !     that was always set to 1 in calling functions and never modified.
-  !     flag        (integer) fill flag: 0 no, !=0 yes                   *
+  integer :: i
+  double precision :: opt5, opt8, opt20, opt21, opt23, opt24
+  double precision :: twopi
 
-  integer case,i
-  double precision opt_fun(*),position,twopi,opt5,opt8,opt20,opt21,opt23,opt24,zero,get_value
-  parameter(zero=0d0)
+  double precision, external :: get_value
+  double precision, parameter :: zero=0d0
 
   ripken=get_value('twiss ','ripken ').ne.zero
 
-  if(case.eq.1) then
-     i = 17
-     call vector_to_table_curr(table_name, 's ', opt_fun(2), i)
-     i = 5
-     call vector_to_table_curr(table_name, 'r11 ', opt_fun(29), i)
-     i = 5
-     call vector_to_table_curr(table_name, 'kmax ', opt_fun(70), i)
-     if(rmatrix) then
-        i = 36
-        call vector_to_table_curr(table_name, 're11 ', opt_fun(34), i)
-     endif
-     if(ripken) call twfill_ripken(opt_fun)
-  elseif(case.eq.2) then
-     i = 10
-     call vector_to_table_curr(table_name, 'wx ', opt_fun(19), i)
+  if (case.eq.1) then
+     call vector_to_table_curr(table_name, 's ',    opt_fun(2), 17) ! fill 17 values starting with s
+     call vector_to_table_curr(table_name, 'r11 ',  opt_fun(29), 5) ! fill 5 values starting with r11
+     call vector_to_table_curr(table_name, 'kmax ', opt_fun(70), 5) ! fill 5 values starting with kmax
+     if (rmatrix) call vector_to_table_curr(table_name, 're11 ', opt_fun(34), 36) ! fill Rmatrix
+     if (ripken)  call twfill_ripken(opt_fun)
+  elseif (case.eq.2) then
+     call vector_to_table_curr(table_name, 'wx ', opt_fun(19), 10) ! fill 10 values starting with wx
   endif
 
   !---- Augment table twiss
   call augment_count(table_name)
 
 end SUBROUTINE twfill
+
 SUBROUTINE twfill_ripken(opt_fun)
-
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Fill twiss table with Ripken-Mais twiss parameters.              *
@@ -437,31 +394,26 @@ SUBROUTINE twfill_ripken(opt_fun)
   !     alfa11, alfa12, alfa21, alfa22,                                  *
   !     gama11, gama12, gama21, gama22,                                  *
   !----------------------------------------------------------------------*
+  double precision :: opt_fun(*)
 
-  double precision opt_fun(*)
-  double precision kappa, betx, bety, alfx, alfy, gamx, gamy, r11, r12, r21, r22 
-  double precision beta11, beta12, beta21, beta22, & 
-                   alfa11, alfa12, alfa21, alfa22, &
-                   gama11, gama12, gama21, gama22
+  double precision :: kappa, betx, bety, alfx, alfy, gamx, gamy, r11, r12, r21, r22 
+  double precision :: beta11, beta12, beta21, beta22, & 
+                      alfa11, alfa12, alfa21, alfa22, &
+                      gama11, gama12, gama21, gama22
+  
+  double precision, parameter :: zero=0.d0, one=1.d0, two=2.d0
 
-  betx = opt_fun(3)
-  bety = opt_fun(6)
-  alfx = opt_fun(4) 
-  alfy = opt_fun(7) 
-  r11 =  opt_fun(29)
-  r12 =  opt_fun(30)
-  r21 =  opt_fun(31)
-  r22 =  opt_fun(32)
+  betx = opt_fun(3);   bety = opt_fun(6);   alfx = opt_fun(4);   alfy = opt_fun(7) 
+  r11 =  opt_fun(29);  r12 =  opt_fun(30);  r21 =  opt_fun(31);  r22 =  opt_fun(32)
 
-  kappa = 1./(1. + (r11*r22-r12*r21))
+  kappa = one/(one + (r11*r22-r12*r21))
 
-  gamx = (1.+alfx**2)/betx
-  gamy = (1.+alfy**2)/bety
+  gamx = (one + alfx**2) / betx;  gamy = (one + alfy**2) / bety
 
   beta11 = kappa * betx
   beta22 = kappa * bety
-  beta12 = kappa * ( r22**2*bety + 2*r12*r22*alfy + r12**2*gamy )
-  beta21 = kappa * ( r11**2*betx - 2*r12*r11*alfx + r12**2*gamx )
+  beta12 = kappa * ( r22**2*bety + two*r12*r22*alfy + r12**2*gamy )
+  beta21 = kappa * ( r11**2*betx - two*r12*r11*alfx + r12**2*gamx )
   
   alfa11 =  kappa * alfx
   alfa22 =  kappa * alfy
@@ -470,10 +422,8 @@ SUBROUTINE twfill_ripken(opt_fun)
 
   gama11 = kappa * gamx
   gama22 = kappa * gamy
-  gama12 = 0.
-  if (beta12 .ne. 0.) gama12 = ((1. - kappa)**2 + alfa12**2) / beta12
-  gama21 = 0.
-  if (beta21 .ne. 0.) gama21 = ((1. - kappa)**2 + alfa21**2) / beta21
+  gama12 = zero;  if (beta12 .ne. 0.) gama12 = ((one-kappa)**2 + alfa12**2) / beta12
+  gama21 = zero;  if (beta21 .ne. 0.) gama21 = ((one-kappa)**2 + alfa21**2) / beta21
    
   call double_to_table_curr('twiss ','beta11 ' ,beta11)
   call double_to_table_curr('twiss ','beta12 ' ,beta12)
@@ -491,9 +441,8 @@ SUBROUTINE twfill_ripken(opt_fun)
 end SUBROUTINE twfill_ripken
 
 SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
-
+  use matrices, only : EYE
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Find closed orbit for a beam line sequence.                      *
@@ -509,24 +458,33 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
   !     tt(6,6,6)    (double)  second order terms.                       *
   !     eflag        (integer) error flag (0: OK, else != 0)             *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk,m66sta,pflag
-  integer eflag,i,k,irank,itra,itmax,get_option,save_opt,thr_on,ithr_on
-  parameter(itmax=20)
-  double precision guess(6),opt_fun0(*),rt(6,6),tt(6,6,6),cotol,err,&
-       orbit0(6),orbit(6),a(6,7),b(4,5),as(3,4),bs(2,3),deltap,get_value,&
-       zero,one,get_variable
-  parameter(zero=0d0,one=1d0)
-  equivalence(a(1,1),b(1,1),as(1,1),bs(1,1))
+  double precision :: guess(6), opt_fun0(*), rt(6,6), tt(6,6,6) 
+  logical :: fsec, ftrk
+  integer :: eflag
+
+  logical :: pflag
+  integer :: i, k, irank, itra, thr_on, ithr_on, save_opt
+  double precision :: cotol, err, deltap
+  double precision :: orbit0(6), orbit(6), a(6,7), b(4,5), as(3,4), bs(2,3)
+
+  integer, external :: get_option
+  double precision, external :: get_value, get_variable 
+  logical, external :: m66sta  
+  double precision, parameter:: zero=0d0, one=1d0
+  integer, parameter :: itmax=20
+
+  equivalence(a(1,1),b(1,1),as(1,1),bs(1,1)) ! 2015-Jul-02  13:20:19  ghislain: to be clarified
 
   !---- Initialize.
-  ithr_on=0
+  ithr_on = 0
   thr_on = get_option('threader ')
   pflag = get_option('twiss_print ') .ne. 0
   deltap = get_value('probe ','deltap ')
   cotol = get_variable('twiss_tol ')
   eflag = 0
+
   !---- Initialize guess.
-  call dcopy(guess,orbit0,6)
+  ORBIT0 = GUESS 
 
   !---- Iteration for closed orbit.
   iterate: do itra = 1, itmax
@@ -535,52 +493,50 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
      call tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,0,0,thr_on)
      if (eflag.ne.0)  return
 
-     ! 2014-Mar-28  20:41:21  ghislain: turn off the threader immediately after first iteration, ie first turn
+     ! turn off threader immediately after first iteration, ie after first turn
      thr_on = 0
 
      if (.not.m66sta(rt)) then 
         !---- Solve for dynamic case.
         err = zero
-        call dcopy(rt,a,36)
-        do i = 1, 6
-           a(i,i) = a(i,i) - one
-           a(i,7) = orbit(i) - orbit0(i)
-           err = max(abs(a(i,7)), err)
-        enddo
+        A(:,:6) = RT(:,:6) - EYE
+        !A(:6,:6) = RT(:6,:6) 
+        !do i = 1, 6
+        !   a(i,i) = a(i,i) - one
+        !enddo
+        A(1:6,7) = ORBIT(1:6) - ORBIT0(1:6)
+        err = maxval(abs(A(1:6,7)))
+        
         call solver(a,6,1,irank)
         if (irank.lt.6) then
            print *, 'Singular matrix occurred during closed orbit search.'
            eflag = 1
            return
         endif
-        do i = 1, 6
-           orbit0(i) = orbit0(i) - a(i,7)
-        enddo
+        ORBIT0(1:6) = ORBIT0(1:6) - A(1:6,7)
         
      else                      
         !---- Solve for static case.
         err = zero
-        do i = 1, 4
-           do k = 1, 4
-              b(i,k) = rt(i,k)
-           enddo
-           b(i,i) = b(i,i) - one
-           b(i,5) = orbit(i) - orbit0(i)
-           err = max(abs(b(i,5)), err)
-        enddo
+        B(:4,:4) = RT(:4,:4) - EYE(:4,:4)
+        !B(1:4,1:4) = RT(1:4,1:4)
+        !do i = 1, 4
+        !   b(i,i) = b(i,i) - one
+        !enddo
+        B(1:4,5) = ORBIT(1:4) - ORBIT0(1:4)
+        err = maxval(abs(B(1:4,5)))
+        
         call solver(b,4,1,irank)
         if (irank.lt.4) then
            print *, 'Singular matrix occurred during closed orbit search.'
            eflag = 1
            return
         endif
-        do i = 1, 4
-           orbit0(i) = orbit0(i) - b(i,5)
-        enddo
+        ORBIT0(1:4) = ORBIT0(1:4) - B(1:4,5)
+
      endif
 
      !---- Message and convergence test.
-
      if (pflag)  then
         print *, ' '
         print '(''iteration: '',i3,'' error: '',1p,e14.6,'' deltap: '',1p,e14.6)',itra,err,deltap
@@ -588,20 +544,10 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
      endif
 
      if (err.lt.cotol) then
-        save_opt=get_option('keeporbit ')
+        save_opt = get_option('keeporbit ')
         call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,save_opt,ithr_on)
-        opt_fun0(9 )=orbit0(1)
-        opt_fun0(10)=orbit0(2)
-        opt_fun0(11)=orbit0(3)
-        opt_fun0(12)=orbit0(4)
-        opt_fun0(13)=orbit0(5)
-        opt_fun0(14)=orbit0(6)
-        guess(1)=orbit0(1)
-        guess(2)=orbit0(2)
-        guess(3)=orbit0(3)
-        guess(4)=orbit0(4)
-        guess(5)=orbit0(5)
-        guess(6)=orbit0(6)
+        OPT_FUN0(9:14) = ORBIT0(1:6)
+        GUESS = ORBIT0
         return ! normal exit
      endif
 
@@ -609,12 +555,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
 
   !---- No convergence.
   print '(''Closed orbit did not converge in '', i3, '' iterations'')', itmax
-  opt_fun0(9 )=zero
-  opt_fun0(10)=zero
-  opt_fun0(11)=zero
-  opt_fun0(12)=zero
-  opt_fun0(13)=zero
-  opt_fun0(14)=zero
+  OPT_FUN0(9:14) = zero
   return
 
 end SUBROUTINE tmclor
@@ -625,8 +566,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   use name_lenfi
   use twisscfi
   use spch_bbfi
+  use matrices, only : EYE
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Transfer matrix w.r.t. actual orbit for one (half) superperiod.  *
@@ -644,22 +585,29 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   !     save      (integer) if > 0, save orbit at all BPMs               *
   !     thr_on    (integer) if > 0, use threader                         *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk,fmap
-  character(28) tmptxt1, tmptxt2, tmptxt3
-  character(2) ptxt(2)
-  character(name_len) c_name(2), p_name
-  integer eflag,j,code,restart_sequ,advance_node,node_al_errors,    &
-       n_align,kobs,nobs,node,save,thr_on,ccode,pcode,get_vector,err,old,&
-       kpro,corr_pick(2),enable,coc_cnt(2),lastnb,rep_cnt(2),max_rep,    &
-       poc_cnt,get_option,debug
-  double precision orbit0(6),orbit(6),orbit2(6),rt(6,6),tt(6,6,6),el,ek(6),   &
-       re(6,6),te(6,6,6),al_errors(align_max),betas,gammas,node_value,   &
-       get_value,parvec(26),orb_limit,zero,vector(10),reforb(6),         &
-       restsum(2),restorb(6,2),restm(6,6,2),restt(6,6,6,2),cmatr(6,6,2), &
-       pmatr(6,6),dorb(6),cick
-  parameter(orb_limit=1d1,zero=0d0,ccode=15,pcode=18)
-  parameter(max_rep=100)
-  data ptxt / 'x-','y-'/
+  double precision :: orbit0(6), orbit(6)
+  logical :: fsec, ftrk
+  double precision :: rt(6,6), tt(6,6,6)
+  integer :: eflag, kobs, save, thr_on
+
+  logical :: fmap
+  character(len=28) :: tmptxt1, tmptxt2, tmptxt3
+  character(len=name_len) :: c_name(2), p_name
+  character(len=2) :: ptxt(2)=(/'x-','y-'/)
+  integer :: j, code, n_align, nobs, node, old, poc_cnt, debug
+  integer :: kpro, corr_pick(2), enable, coc_cnt(2), lastnb, rep_cnt(2)
+  double precision :: orbit2(6), ek(6), re(6,6), te(6,6,6)
+  double precision :: al_errors(align_max) 
+  double precision :: el, betas, gammas, cick, err
+  double precision :: parvec(26),  vector(10), reforb(6)
+  double precision :: restsum(2), restorb(6,2), restm(6,6,2), restt(6,6,6,2)
+  double precision :: cmatr(6,6,2), pmatr(6,6), dorb(6)
+
+  integer, external :: restart_sequ, advance_node, node_al_errors, get_vector, get_option
+  double precision,external :: node_value, get_value
+  double precision, parameter :: zero=0d0 
+  double precision, parameter :: orb_limit=1d1 
+  integer, parameter :: ccode=15, pcode=18, max_rep=100
 
   debug = get_option('debug ')
 
@@ -668,14 +616,12 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   !     threader in order to avoid corrections in front of it when
   !     restarting.
 
-  do j = 1, 2
-     corr_pick(j) = 0
-     rep_cnt(j) = 0
-     restsum(j) = zero
-  enddo
+  CORR_PICK = 0
+  REP_CNT = 0
+  RESTSUM = zero
 
   if (thr_on .gt. 0)  then
-     call dzero(vector,10)
+     VECTOR = zero 
      j = get_vector('threader ', 'vector ', vector)
      if (j .lt. 3) thr_on = 0
   endif
@@ -683,111 +629,161 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   betas = get_value('probe ','beta ')
   gammas= get_value('probe ','gamma ')
 
-  call dzero(tt,216)
-  call m66one(rt)
+  TT = zero 
+  RT  = EYE  !call m66one(rt)
 
   eflag = 0
   suml = zero
 
-  call dcopy(orbit0,orbit,6)
+  ORBIT = ORBIT0 
   
-  parvec(5)=get_value('probe ', 'arad ')
-  parvec(6)=get_value('probe ', 'charge ') * get_value('probe ', 'npart ')
-  parvec(7)=get_value('probe ', 'gamma ')
-  bbd_cnt=0
-  bbd_flag=1
-  i_spch=0
-
+  parvec(5) = get_value('probe ', 'arad ')
+  parvec(6) = get_value('probe ', 'charge ') * get_value('probe ', 'npart ')
+  parvec(7) = get_value('probe ', 'gamma ')
+  bbd_cnt = 0
+  bbd_flag = 1
+  i_spch = 0
+  
   !---  start
   node = restart_sequ()
 
   !---  loop over nodes
 10 continue
 
-  bbd_pos=node !--- for space charge 
+  bbd_pos = node !--- for space charge 
 
   code = node_value('mad8_type ')
   
-  if(code.eq.39) code=15 ! tkicker treated as kicker
-  if(code.eq.38) code=24 ! placeholder treated as instrument
+  if (code.eq.39) code=15 ! TKICKER treated as KICKER
+  if (code.eq.38) code=24 ! PLACEHOLDER treated as INSTRUMENT
   
-  if (code .ge. ccode-1 .and. code .le. ccode+1)  then
-     !---  kicker (code 14 to 16: hkicker, kicker, vkicker)
-     if (thr_on .gt. 0)  then
-        !---  threader is on - keep position,orbit,matrix,and tensor for restart
-        if (code .le. ccode) then !--- kicker or hkicker
-           restsum(1) = suml
-           call dcopy(orbit,restorb(1,1),6)
-           call dcopy(rt,restm(1,1,1),36)
-           call dcopy(tt,restt(1,1,1,1),216)
-        endif
-        if (code .ge. ccode) then !--- kicker or vkicker
-           restsum(2) = suml
-           call dcopy(orbit,restorb(1,2),6)
-           call dcopy(rt,restm(1,1,2),36)
-           call dcopy(tt,restt(1,1,1,2),216)
-        endif
-     endif
+  if (thr_on .gt. 0)  then
+     !---  threader is on - keep position,orbit,matrix,and tensor for restart
+     select case (code)
+     case (14) ! HKICKER
+            restsum(1) = suml
+            RESTORB(:,1) = ORBIT(:) 
+            RESTM(:,:,1) = RT(:,:)    
+            RESTT(:,:,:,1) = TT(:,:,:)  
+        
+     case (15) ! KICKER or TKICKER
+            restsum(1) = suml
+            RESTORB(:,1) = ORBIT(:) 
+            RESTM(:,:,1) = RT(:,:)    
+            RESTT(:,:,:,1) = TT(:,:,:)  
+
+            restsum(2) = suml
+            RESTORB(:,2) = ORBIT(:) 
+            RESTM(:,:,2) = RT(:,:)   
+            RESTT(:,:,:,2) = TT(:,:,:)  
+
+     case (16) ! VKICKER
+            restsum(2) = suml
+            RESTORB(:,2) = ORBIT(:) 
+            RESTM(:,:,2) = RT(:,:)   
+            RESTT(:,:,:,2) = TT(:,:,:)  
+            
+     end select
   endif
 
+  ! if (code .ge. ccode-1 .and. code .le. ccode+1)  then
+  !    !---  kicker (code 14 to 16: hkicker, kicker, vkicker)
+  !    if (thr_on .gt. 0)  then
+  !       !---  threader is on - keep position,orbit,matrix,and tensor for restart
+  !       if (code .le. ccode) then !--- kicker (15) or hkicker (14)
+  !          restsum(1) = suml
+  !          RESTORB(1:6,1) = ORBIT(1:6) 
+  !          RESTM(1:6,1:6,1) = RT(1:6,1:6)    
+  !          RESTT(1:6,1:6,1:6,1) = TT(1:6,1:6,1:6)  
+  !       endif
+  !       if (code .ge. ccode) then !--- kicker (15) or vkicker (16)
+  !          restsum(2) = suml
+  !          RESTORB(1:6,2) = ORBIT(1:6) 
+  !          RESTM(1:6,1:6,2) = RT(1:6,1:6)   
+  !          RESTT(1:6,1:6,1:6,2) = TT(1:6,1:6,1:6)  
+  !       endif
+  !    endif
+  ! endif
+
+  !---- Element length.
   el = node_value('l ')
+
   nobs = node_value('obs_point ')
-  
+
   n_align = node_al_errors(al_errors)
-  if (n_align.ne.0)  then
-     call dcopy(orbit,orbit2,6)
+  if (n_align .ne. 0)  then
+     ORBIT2 = ORBIT 
      call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
-     call m66mpy(re,rt,rt)
+     RT = matmul(RE,RT) 
   endif
   
-  !---- Element matrix and length.
+  !---- Element matrix
   call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
   
-  !--- if element has a map
+  !--- if element has a map, concatenate
   if (fmap) then 
-     !---- call m66mpy(re,rt,rt)
      call tmcat(.true.,re,te,rt,tt,rt,tt)
      suml = suml + el
   endif
-
-  if (n_align.ne.0)  then
-     call dcopy(orbit,orbit2,6)
+  
+  if (n_align .ne. 0)  then
+     ORBIT2 = ORBIT 
      call tmali2(el,orbit2,al_errors,betas,gammas,orbit,re)
-     call m66mpy(re,rt,rt)
+     RT = matmul(RE,RT)
   endif
+    
+  if (kobs.gt.0 .and. kobs.eq.nobs) return
   
-  if (kobs.gt.0.and.kobs.eq.nobs) return
+  if (thr_on .gt. 0)  then !---  threader is on;  keep matrix  
+     select case (code)
+     case (14) ! HKICKER
+            CMATR(1:6,1:6,1) = RT(1:6,1:6) 
+            j = name_len
+            call element_name(c_name(1),j)
+            coc_cnt(1) = node_value('occ_cnt ')
+     case (15) ! KICKER or TKICKER
+            CMATR(1:6,1:6,1) = RT(1:6,1:6) 
+            CMATR(1:6,1:6,2) = RT(1:6,1:6) 
+            j = name_len
+            call element_name(c_name(1),j)
+            coc_cnt(1) = node_value('occ_cnt ')
+            call element_name(c_name(2),j)
+            coc_cnt(2) = node_value('occ_cnt ')
+     case (16) ! VKICKER
+            CMATR(1:6,1:6,2) = RT(1:6,1:6) 
+            j = name_len
+            call element_name(c_name(2),j)
+            coc_cnt(2) = node_value('occ_cnt ')
+     end select
+  endif
+
+  ! if (code .ge. ccode-1 .and. code .le. ccode+1)  then !---  kickers (code 14 to 16)
+  !    if (thr_on .gt. 0)  then !---  threader is on;  keep matrix
+  !       if (code .le. ccode) then !--- kicker (15) or hkicker (14)
+  !          CMATR(1:6,1:6,1) = RT(1:6,1:6) 
+  !          j = name_len
+  !          call element_name(c_name(1),j)
+  !          coc_cnt(1) = node_value('occ_cnt ')
+  !       endif
+  !       if (code .ge. ccode) then !--- kicker (15) or vkicker (16)
+  !          CMATR(1:6,1:6,2) = RT(1:6,1:6) 
+  !          j = name_len
+  !          call element_name(c_name(2),j)
+  !          coc_cnt(2) = node_value('occ_cnt ')
+  !       endif
+  !    endif
+     
+  !elseif (code .ge. pcode-1 .and. code .le. pcode+1)  then !---  monitors (code 17 to 19)
   
-  if (code .ge. ccode-1 .and. code .le. ccode+1)  then !---  kickers (code 14 to 16)
-     
-     if (thr_on .gt. 0)  then !---  threader is on;  keep matrix
-        if (code .le. ccode) then !--- kicker (15) or hkicker (14)
-           call dcopy(rt,cmatr(1,1,1),36)
-           j = name_len
-           call element_name(c_name(1),j)
-           coc_cnt(1) = node_value('occ_cnt ')
-        endif
-        if (code .ge. ccode) then !--- kicker (15) or vkicker (16)
-           call dcopy(rt,cmatr(1,1,2),36)
-           j = name_len
-           call element_name(c_name(2),j)
-           coc_cnt(2) = node_value('occ_cnt ')
-        endif
-     endif
-     
-  elseif (code .ge. pcode-1 .and. code .le. pcode+1)  then !---  monitors (code 18 to 19)
-     
+if (code .ge. pcode-1 .and. code .le. pcode+1)  then !---  monitors (code 17 to 19)  
      enable = node_value('enable ')
-     if (save .gt. 0 .and. enable .gt. 0) then
-        j = 6
-        call store_node_vector('orbit_ref ', j, orbit)
-     endif
+     if (save .gt. 0 .and. enable .gt. 0) &
+          call store_node_vector('orbit_ref ', 6, orbit)
 
      if (thr_on .gt. 0 .and. enable .gt. 0) then 
         !--- threader is on; test for overflow w.r.t. stored orbit
-        call dzero(reforb,6)
-        j = 6
-        call get_node_vector('orbit_ref ', j, reforb)
+        REFORB = zero 
+        call get_node_vector('orbit_ref ', 6, reforb)
         
         do kpro = 1, 2 ! projection plane: x or y
            if (      kpro .eq. 1 .and. code .le. pcode &        !--- plane is x and monitor or hmonitor 
@@ -798,24 +794,23 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
               
               if (abs(dorb(j)) .gt. vector(kpro) .and. node .ge. corr_pick(kpro))  then
 
-                 if (debug .ne. 0) then
-                    print *,' node = ',node,' kpro = ',kpro,' code = ',code,' dorb = ',dorb(j)
-                 endif                    
+                 if (debug .ne. 0) & 
+                      print *,' node = ',node,' kpro = ',kpro,' code = ',code,' dorb = ',dorb(j)
 
                  !---  reset count if new pickup
                  if (node .gt. corr_pick(kpro)) rep_cnt(kpro) = 0
 
                  !---  check for max. repetition
                  rep_cnt(kpro) = rep_cnt(kpro) + 1                 
+
                  if (rep_cnt(kpro) .gt. max_rep)  then
                     write(tmptxt1, '(i6)') max_rep
-                    call fort_warn('threader: pickup skipped after',      &
-                         tmptxt1(:6)//' correction attempts')
+                    call fort_warn('threader: pickup skipped after', tmptxt1(:6)//' correction attempts')
                     goto 20
                  endif
                  
                  !---  keep matrix
-                 call dcopy(rt,pmatr,36)
+                 PMATR = RT 
                  old = node
                  j = name_len
                  call element_name(p_name,j)
@@ -825,29 +820,28 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
                  if (err .eq. 1)  then
                     write(tmptxt1, '(i6)') old
                     call fort_warn( 'threader: no corrector before pickup at node ', tmptxt1)
-                    ! no return ? 
+
                  elseif (err .eq. 2)  then
                     call fort_warn('threader: kicker is at start', 'of sequence')
-                    ! no return ? 
+
                  elseif (err .eq. 0)  then
                     corr_pick(kpro) = old
                     write(tmptxt1, '(1p,6g14.6)') cick
                     tmptxt2 = c_name(kpro)
-                    write(tmptxt2(lastnb(c_name(kpro))+1:),               &
-                         '(''['',i2,'']'')') coc_cnt(kpro)
+                    write(tmptxt2(lastnb(c_name(kpro))+1:), '(''['',i2,'']'')') coc_cnt(kpro)
                     tmptxt3 = p_name
-                    write(tmptxt3(lastnb(p_name)+1:),                     &
-                         '(''['',i2,'']'')') poc_cnt
-                    call fort_info(                                       &
-                         '-threader- pickup: ' //tmptxt3(:lastnb(tmptxt3))                 &
-                         // '  kicker: '//tmptxt2(:lastnb(tmptxt2))//' total '             &
+                    write(tmptxt3(lastnb(p_name)+1:), '(''['',i2,'']'')') poc_cnt
+                    call fort_info( &
+                         '-threader- pickup: ' //tmptxt3(:lastnb(tmptxt3))     &
+                         // '  kicker: '//tmptxt2(:lastnb(tmptxt2))//' total ' &
                          //ptxt(kpro)//'kick:', tmptxt1)
+
                     !---  restore restart values
                     suml = restsum(kpro)
-                    call dcopy(restorb(1,kpro),orbit,6)
-                    call dcopy(restm(1,1,kpro),rt,36)
-                    call dcopy(restt(1,1,1,kpro),tt,216)
-                    goto 20 ! bad! this breaks the loop and kpro=2 might not be treated. 
+                    ORBIT = RESTORB(:,kpro) 
+                    RT = RESTM(:,:,kpro) 
+                    TT = RESTT(:,:,:,kpro) 
+                    goto 20 ! break the kpro loop
                  endif
 
               endif
@@ -859,12 +853,10 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
 20 continue
   
   !---- Test for overflow.
-  do j = 1, 6
-     if (abs(orbit(j)).ge.orb_limit) then
-        eflag = 1
-        return
-     endif
-  enddo
+  if (maxval(abs(ORBIT)) .ge. orb_limit) then
+     eflag=1
+     return
+  endif
 
   if (advance_node().ne.0) then
      node=node+1
@@ -872,12 +864,11 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   endif
   
   bbd_flag=0
+  
 end SUBROUTINE tmfrst
 
 SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
-
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Correct orbit position at bpm in first pass (threader)           *
@@ -893,22 +884,26 @@ SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
   !     cick         (d.p.)    kick value applied                        *
   !     error        (integer) 0: OK, else aborted                       *
   !----------------------------------------------------------------------*
-  integer error,node,kpro
-  integer i,j,npick,advance_node,ccode
-  integer both,code,itp,lc,lc1,lc2,retreat_node,ncorr
-  double precision thrvec(3),dorb(6),cmatr(6,6),pmatr(6,6)
-  double precision cick,tol1min,node_value,atemp(6,6)
-  parameter (tol1min=1.d-2 , ccode=15)
+  integer :: kpro, node
+  double precision ::  dorb(6), cmatr(6,6), pmatr(6,6), thrvec(3)
+  double precision :: cick, error
+
+  integer :: i, j, itp, lc, lc1, lc2, npick, code, ncorr
+  double precision :: atemp(6,6)
+
+  integer, external :: advance_node, retreat_node
+  double precision, external :: node_value
+  double precision, parameter :: tol1min=1.d-2 
+  integer, parameter :: ccode=15
 
   error = 0
   
   !---  keep position of current pickup
   npick = node
 
-  both = ccode            ! 15
-  itp = both + (-1)**kpro ! 14 or 16
+  itp = ccode + (-1)**kpro ! 14 or 16
  
-  lc = 2 * (kpro - 1)
+  lc  = 2 * (kpro - 1)
   lc1 = lc + 1
   lc2 = lc + 2
 
@@ -916,7 +911,7 @@ SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
 10 continue
 
   if (retreat_node() .eq. 0)  then !--- we are at start already
-     do i = node+1,npick
+     do i = node+1, npick
         j = advance_node()
      enddo
      node = npick
@@ -927,18 +922,18 @@ SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
   node = node - 1
   code = node_value('mad8_type ')
 
-  if(code.eq.39) code=15
-  if(code.eq.38) code=24
+  if (code.eq.39) code=15 ! TKICKER is a KICKER
+  if (code.eq.38) code=24 ! PLACEHOLDE is an INSTRUMENT
 
   !-- if wrong corrector or not a corrector, loop
-  if (code .ne. itp .and. code .ne. both) goto 10 
+  if (code .ne. itp .and. code .ne. ccode) goto 10 
 
   !--- corrector found for the projection plane
   ncorr = node
 
   !---  transport matrix from kicker to pickup
   call m66inv(cmatr,atemp)
-  call m66mpy(pmatr,atemp,atemp)
+  ATEMP = matmul(PMATR,ATEMP) 
 
   !--- if kicker is not efficient enough - loop
   if (abs(atemp(lc1,lc2)) .lt. tol1min) goto 10 
@@ -950,14 +945,14 @@ SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
   if (kpro .eq. 1)  then
      cick = node_value('other_bv ') * cick + node_value('chkick ')
      call store_node_value('chkick ', cick)
-  else
+  else if (kpro .eq. 2) then
      cick = node_value('other_bv ') * cick + node_value('cvkick ')
      call store_node_value('cvkick ', cick)
   endif
 
   !---  set node for restart in front of kicker
   if (retreat_node() .eq. 0)  then !--- we are at start already
-     do i = node+1,npick
+     do i = node+1, npick
         j = advance_node()
      enddo
      node = npick
@@ -968,13 +963,11 @@ SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
 
 end SUBROUTINE tmthrd
 
-
 SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
-
   use twiss0fi
   use twisscfi
+  use matrices, only : EYE
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Initial values for linear coupling parameters.                   *
@@ -985,25 +978,30 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   !     r0mat(2,2)   (double)  coupling matrix                           *
   !     eflag        (integer) error flag.                               *
   !----------------------------------------------------------------------*
-  integer eflag,stabx,staby,get_option
-  double precision rt(6,6),disp0(6),r0mat(2,2),a(2,2),arg,aux(2,2), &
-       d(2,2),den,det,dtr,sinmu2,betx0,alfx0,amux0,bety0,alfy0,amuy0,    &
-       deltap,get_value,eps,zero,one,two,fourth
-  parameter(eps=1d-8,zero=0d0,one=1d0,two=2d0,fourth=0.25d0)
-  character(120) msg
+  double precision, intent(IN)  :: rt(6,6)
+  double precision, intent(OUT) :: disp0(6), r0mat(2,2)
+  integer, intent(OUT) :: eflag
+  
+  logical :: stabx=.false., staby=.false.
+  double precision :: a(2,2), aux(2,2), d(2,2)
+  double precision :: arg, den, det, dtr, sinmu2, deltap
+  double precision :: betx0=0.d0, alfx0=0.d0, amux0=0.d0
+  double precision :: bety0=0.d0, alfy0=0.d0, amuy0=0.d0
+  character(len=120) :: msg
+
+  integer, external :: get_option
+  double precision, external :: get_value
+  double precision, parameter :: eps=1d-8, zero=0d0, one=1d0, two=2d0, fourth=0.25d0
 
   !---- Initialization
-  betx0=zero
-  bety0=zero
-  alfx0=zero
-  alfy0=zero
   deltap = get_value('probe ','deltap ')
+  eflag=0
 
   !---- Initial dispersion.
   if (get_option('twiss_inval ') .eq. 0) then
      call twdisp(rt,rt(1,6),disp0)
   else
-     call dcopy(opt_fun0(15), disp0, 4)
+     DISP0(1:4) = OPT_FUN(15:18) 
   endif
   disp0(5) = zero
   disp0(6) = one
@@ -1018,18 +1016,19 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   !---- Coupling matrix.
   dtr = (rt(1,1) + rt(2,2) - rt(3,3) - rt(4,4)) / two
   arg = det + dtr**2
-  if (arg.ge.zero) then
+
+  if (arg .lt. zero) then
+     !---- Unstable due to coupling.
+     stabx = .false. ; staby = .false.
+  
+  else
      if (arg .eq. zero) then
-        r0mat(1,1) = one
-        r0mat(2,2) = one
-        r0mat(1,2) = zero
-        r0mat(2,1) = zero
+        R0MAT(:2,:2) = EYE(:2,:2)
+        !r0mat(1,1) = one;  r0mat(1,2) = zero  
+        !r0mat(2,1) = zero; r0mat(2,2) = one
      else
         den = - (dtr + sign(sqrt(arg),dtr))
-        r0mat(1,1) = aux(1,1) / den
-        r0mat(1,2) = aux(1,2) / den
-        r0mat(2,1) = aux(2,1) / den
-        r0mat(2,2) = aux(2,2) / den
+        R0MAT = AUX / den
      endif
 
      !---- Decouple: Find diagonal blocks.
@@ -1037,6 +1036,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
      a(1,2) = rt(1,2) - rt(1,3)*r0mat(1,2) - rt(1,4)*r0mat(2,2)
      a(2,1) = rt(2,1) - rt(2,3)*r0mat(1,1) - rt(2,4)*r0mat(2,1)
      a(2,2) = rt(2,2) - rt(2,3)*r0mat(1,2) - rt(2,4)*r0mat(2,2)
+
      d(1,1) = rt(3,3) + r0mat(1,1)*rt(1,3) + r0mat(1,2)*rt(2,3)
      d(1,2) = rt(3,4) + r0mat(1,1)*rt(1,4) + r0mat(1,2)*rt(2,4)
      d(2,1) = rt(4,3) + r0mat(2,1)*rt(1,3) + r0mat(2,2)*rt(2,3)
@@ -1044,9 +1044,8 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
 
      !---- First mode.
      cosmux = (a(1,1) + a(2,2)) / two
-     stabx=0
-     if(abs(cosmux).lt.one) stabx=1
-     if (stabx.ne.0) then
+     stabx = abs(cosmux).lt.one
+     if (stabx) then
         sinmu2 = - a(1,2)*a(2,1) - fourth*(a(1,1) - a(2,2))**2
         if (sinmu2.lt.zero) sinmu2 = eps
         sinmux = sign(sqrt(sinmu2), a(1,2))
@@ -1059,9 +1058,8 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
 
      !---- Second mode.
      cosmuy = (d(1,1) + d(2,2)) / two
-     staby=0
-     if(abs(cosmuy).lt.one) staby=1
-     if (staby.ne.0) then
+     staby = abs(cosmuy).lt.one
+     if (staby) then
         sinmu2 = - d(1,2)*d(2,1) - fourth*(d(1,1) - d(2,2))**2
         if (sinmu2.lt.zero) sinmu2 = eps
         sinmuy = sign(sqrt(sinmu2), d(1,2))
@@ -1072,55 +1070,43 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
         alfy0 = zero
      endif
 
-     !---- Unstable due to coupling.
-  else
-     stabx = 0
-     staby = 0
   endif
-
-  !---- Initial phase angles.
-  amux0 = zero
-  amuy0 = zero
 
   !---- Give message, if unstable.
-  eflag = 0
-  if (stabx+staby.lt.2) then
-     eflag = 1
-     if (staby.ne.0) then
-        write (msg, 910) 1,deltap,cosmux,cosmuy
-        call aawarn('TWCPIN: ',msg)
-     else if (stabx.ne.0) then
-        write (msg, 910) 2,deltap,cosmux,cosmuy
-        call aawarn('TWCPIN: ',msg)
+  if (.not.stabx .or. .not.staby) then
+     if (.not.stabx) then 
+        write (msg, '("Mode 1 is unstable for delta(p)/p = ",f12.6,", cosmux = ",f12.6,", cosmuy = ",f12.6)') &
+             deltap, cosmux, cosmuy
+     else if (.not.staby) then
+        write (msg, '("Mode 2 is unstable for delta(p)/p = ",f12.6,", cosmux = ",f12.6,", cosmuy = ",f12.6)') &
+             deltap, cosmux, cosmuy
      else
-        write (msg, 920) deltap,cosmux,cosmuy
-        call aawarn('TWCPIN: ',msg)
+        write (msg, '("Both modes are unstable for delta(p)/p = ",f12.6,", cosmux = ",f12.6,", cosmuy = ",f12.6)') &
+             deltap, cosmux, cosmuy
      endif
-  endif
+     call aawarn('TWCPIN: ',msg)
+     eflag = 1
+ endif
+
   opt_fun0(3)=betx0
   opt_fun0(4)=alfx0
   opt_fun0(5)=amux0
   opt_fun0(6)=bety0
   opt_fun0(7)=alfy0
   opt_fun0(8)=amuy0
-  opt_fun0(15)=disp0(1)
-  opt_fun0(16)=disp0(2)
-  opt_fun0(17)=disp0(3)
-  opt_fun0(18)=disp0(4)
+
+  OPT_FUN0(15:18) = DISP0(1:4)
+
   opt_fun0(29)=r0mat(1,1)
   opt_fun0(30)=r0mat(1,2)
   opt_fun0(31)=r0mat(2,1)
   opt_fun0(32)=r0mat(2,2)
 
-910 format('Mode ',i1,' is unstable for delta(p)/p =',f12.6,          &
-       ', cosmux = ',f12.6,', cosmuy = ',f12.6)
-920 format('Both modes are unstable for delta(p)/p = ',f12.6,         &
-       ', cosmux = ',f12.6,', cosmuy = ',f12.6)
 end SUBROUTINE twcpin
+
 SUBROUTINE twdisp(rt,vect,disp)
-
+  use matrices, only : EYE
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Initial values for dispersion or its first derivative by delta.  *
@@ -1133,43 +1119,39 @@ SUBROUTINE twdisp(rt,vect,disp)
   !     Output:                                                          *
   !     disp(6)   (double)    dispersion vector.                         *
   !----------------------------------------------------------------------*
-  integer i,j,irank
-  double precision rt(6,6),vect(6),disp(6),a(4,5),zero,one
-  parameter(zero=0d0,one=1d0)
+  double precision :: rt(6,6), vect(6), disp(6) 
+  
+  integer :: i, j, irank
+  double precision :: a(4,5)
+  double precision, parameter :: zero=0d0, one=1d0
 
-  do i = 1, 4
-     do j = 1, 4
-        a(i,j) = rt(i,j)
-     enddo
-     a(i,i) = a(i,i) - one
-     a(i,5) = - vect(i)
-  enddo
+  A(:4,:4) = RT(:4,:4) - EYE(:4,:4)
+  !do i = 1, 4
+  !   a(i,i) = a(i,i) - one
+  !enddo
+  A(1:4,5) = -VECT(1:4)
 
   call solver(a,4,1,irank)
 
   if (irank.ge.4) then
-     do i = 1, 4
-        disp(i) = a(i,5)
-     enddo
+     DISP(1:4) = A(1:4,5)
   else
-     call aawarn('TWDISP: ',                                         &
-          'Unable to compute dispersion --- dispersion set to zero.')
-     call dzero(disp,4)
+     call aawarn('TWDISP: ', 'Unable to compute dispersion --- dispersion set to zero.')
+     DISP(1:4) = zero 
   endif
 
 end SUBROUTINE twdisp
-SUBROUTINE twcpgo(rt,orbit0)
 
+SUBROUTINE twcpgo(rt,orbit0)
   use twiss0fi
   use twisslfi
   use twisscfi
   use twiss_elpfi
   use twissotmfi
   use spch_bbfi
-
   use name_lenfi
+  use matrices, only: EYE
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Track Twiss parameters with optional output, version with        *
@@ -1179,106 +1161,88 @@ SUBROUTINE twcpgo(rt,orbit0)
   ! 2014-Jun-11  11:10:37  ghislain: added:                              *
   !     orbit0(6) (double)  initial orbit vector                         *
   !----------------------------------------------------------------------*
-  logical fmap,cplxy,cplxt,dorad,sector_sel,mycentre_cptk
-  integer i,iecnt,code,save,advance_node,restart_sequ,get_option,   &
-       node_al_errors,n_align
-  double precision rt(6,6),ek(6),re(6,6),rwi(6,6),rc(6,6),  &
-       te(6,6,6),el,orbit(6),orbit2(6),betas,gammas,                 &
-       al_errors(align_max),bvk,sumloc,pos0,node_value,get_value,sd,zero,&
-       one,two
-  integer, external :: el_par_vector
-  integer elpar_vl
-  parameter(zero=0d0,one=1d0,two=2d0)
-  character(130) msg
+  double precision :: rt(6,6), orbit0(6)
 
-  !--- 2013-Nov-14  10:36:35  ghislain: adding name of element for output of name
-  character*(name_len) el_name, bxmax_name, bymax_name, dxmax_name, dymax_name, xcomax_name, ycomax_name
+  logical :: fmap, cplxy=.false., cplxt=.false., dorad, sector_sel, mycentre_cptk
+  integer :: i, iecnt, code, save, n_align, elpar_vl
+  double precision :: ek(6), re(6,6), rwi(6,6), rc(6,6), te(6,6,6)
+  double precision :: orbit(6), orbit2(6)
+  double precision :: betas, gammas, bvk, sumloc=0.d0, pos0=0.d0, sd, el
+  double precision :: al_errors(align_max)
+  character(len=name_len) :: bxmax_name='nil ', bymax_name='nil '
+  character(len=name_len) :: dxmax_name='nil ', dymax_name='nil '
+  character(len=name_len) :: xcomax_name='nil ', ycomax_name='nil ', el_name
+  character(len=130) :: msg
 
-  double precision orbit0(6)
-  
+  integer, external :: el_par_vector, advance_node, restart_sequ, get_option, node_al_errors
+  double precision, external :: node_value, get_value
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0
+
   !---- Initialization
-  pos0=zero
   amux=zero
   amuy=zero
   currpos=zero
-  sumloc = zero
   dorad = get_value('probe ','radiate ').ne.zero
   centre = get_value('twiss ','centre ').ne.zero
-  call m66one(rwi)
-  call m66one(rc)
+  RWI = EYE !call m66one(rwi)
+  RC = EYE !call m66one(rc)
 
   !---- Store one-turn-map
-  call dcopy(rt,rotm,36)
+  ROTM = RT 
 
   !---- Create internal table for lattice functions if requested
-  save=get_option('twiss_save ')
-  call dcopy(opt_fun0,opt_fun,fundim)
+  save = get_option('twiss_save ')
+  OPT_FUN(:fundim) = OPT_FUN0(:fundim)
 
   !---- Initial values for lattice functions.
-  betx    =opt_fun(3 )
-  alfx    =opt_fun(4 )
-  amux    =opt_fun(5 )
-  bety    =opt_fun(6 )
-  alfy    =opt_fun(7 )
-  amuy    =opt_fun(8 )
-  orbit(1)=opt_fun(9 )
-  orbit(2)=opt_fun(10)
-  orbit(3)=opt_fun(11)
-  orbit(4)=opt_fun(12)
-  orbit(5)=opt_fun(13)
-  orbit(6)=opt_fun(14)
-  disp(1) =opt_fun(15)
-  disp(2) =opt_fun(16)
-  disp(3) =opt_fun(17)
-  disp(4) =opt_fun(18)
-  disp(5) =zero
-  disp(6) =one
-  rmat(1,1)=opt_fun(29)
-  rmat(1,2)=opt_fun(30)
-  rmat(2,1)=opt_fun(31)
-  rmat(2,2)=opt_fun(32)
+  betx    = opt_fun(3)
+  alfx    = opt_fun(4)
+  amux    = opt_fun(5)
+  bety    = opt_fun(6)
+  alfy    = opt_fun(7)
+  amuy    = opt_fun(8)
+
+  ORBIT     = OPT_FUN(9:14)
+  DISP(1:4) = OPT_FUN(15:18)
+  disp(5) = zero
+  disp(6) = one
+
+  rmat(1,1) = opt_fun(29)
+  rmat(1,2) = opt_fun(30)
+  rmat(2,1) = opt_fun(31)
+  rmat(2,2) = opt_fun(32)
 
   !--- 2014-May-30  15:19:52  ghislain: if initial values are provided, copy the initial orbit
   !                 because opt_fun contains only the values given on the twiss command itself
   !                 but does not know the values coming from COGUESS or USEORBIT
-  if (get_option('twiss_inval ') .ne. 0) orbit=orbit0
+  if (get_option('twiss_inval ') .ne. 0) ORBIT = ORBIT0
 
   !---- Maximum and r.m.s. values.
-  bxmax =betx
-  dxmax =disp(1)
-  bymax =bety
-  dymax =disp(3)
-  xcomax=zero
-  ycomax=zero
-  sigxco=zero
-  sigyco=zero
-  sigdx =zero
-  sigdy =zero
-
-  !--- 2013-Nov-14  10:42:16  ghislain: need to initialize names of elements where maxima occur
-  bxmax_name = 'nil '
-  bymax_name = 'nil ' 
-  dxmax_name = 'nil '
-  dymax_name = 'nil ' 
-  xcomax_name = 'nil '
-  ycomax_name = 'nil '
+  bxmax = betx
+  dxmax = disp(1)
+  bymax = bety
+  dymax = disp(3)
+  xcomax= zero
+  ycomax= zero
+  sigxco= zero
+  sigyco= zero
+  sigdx = zero
+  sigdy = zero
 
   !---- Loop over positions.
-  cplxy = .false.
-  cplxt = .false.
-  iecnt=0
-  betas = get_value('probe ','beta ')
-  gammas= get_value('probe ','gamma ')
-  centre_cptk=.false.
+  iecnt = 0
+  betas  = get_value('probe ','beta ')
+  gammas = get_value('probe ','gamma ')
+  centre_cptk = .false.
   i = restart_sequ()
-  i_spch=0
+  i_spch = 0
 
 10 continue
 
   sector_sel = node_value('sel_sector ') .ne. zero .and. sectormap
   code = node_value('mad8_type ')
-  if(code.eq.39) code=15
-  if(code.eq.38) code=24
+  if (code.eq.39) code=15 ! TKICKER is a KICKER
+  if (code.eq.38) code=24 ! PLACEHOLDER is an INSTRUMENT
   bvk = node_value('other_bv ')
   elpar_vl = el_par_vector(g_polarity, g_elpar)
   el = node_value('l ')
@@ -1293,20 +1257,20 @@ SUBROUTINE twcpgo(rt,orbit0)
 
   n_align = node_al_errors(al_errors)
   if (n_align.ne.0)  then
-     call dcopy(orbit,orbit2,6)
+     ORBIT2 = ORBIT 
      call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
      mycentre_cptk = centre_cptk
      centre_cptk = .false.
      call twcptk(re,orbit)
      centre_cptk = mycentre_cptk
-     if (sectormap) call m66mpy(re,srmat,srmat)
+     if (sectormap) SRMAT = matmul(RE,SRMAT)
   endif
 
-  if(centre) centre_cptk=.true.
+  if (centre) centre_cptk=.true.
 
   call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te)
 
-  if(centre) then
+  if (centre) then
      pos0=currpos
      currpos=currpos+el/two
      sd = rt(5,6)
@@ -1327,137 +1291,92 @@ SUBROUTINE twcpgo(rt,orbit0)
   endif
 
   if (n_align.ne.0)  then
-     call dcopy(orbit,orbit2,6)
+     ORBIT2 = ORBIT 
      call tmali2(el,orbit2,al_errors,betas,gammas,orbit,re)
      mycentre_cptk = centre_cptk
      centre_cptk = .false.
      call twcptk(re,orbit)
      centre_cptk = mycentre_cptk
-     if (sectormap) call m66mpy(re,srmat,srmat)
+     if (sectormap) SRMAT = matmul(RE,SRMAT) 
   endif
 
   sumloc = sumloc + el
   if (sector_sel) call twwmap(sumloc, orbit)
-  sd = rt(5,6)
-  do i = 1, 4
-     sd = sd + rt(5,i) * disp(i)
-  enddo
+  sd = rt(5,6) + dot_product(RT(5,1:4),DISP(1:4))
+  !do i = 1, 4
+  !   sd = sd + rt(5,i) * disp(i)
+  !enddo
   eta = - sd * betas**2 / circ
   alfa = one / gammas**2 + eta
   opt_fun(74)=alfa
-  if(centre) then
-     bxmax =max(opt_fun(3)      ,bxmax)
-     bymax =max(opt_fun(6)      ,bymax)
-     dxmax =max(abs(opt_fun(15)),dxmax)
-     dymax =max(abs(opt_fun(17)),dymax)
-     xcomax=max(abs(opt_fun(9 )),xcomax)
-     ycomax=max(abs(opt_fun(11)),ycomax)
+  if (centre) then
+     bxmax  = max(opt_fun(3)      ,bxmax)
+     bymax  = max(opt_fun(6)      ,bymax)
+     dxmax  = max(abs(opt_fun(15)),dxmax)
+     dymax  = max(abs(opt_fun(17)),dymax)
+     xcomax = max(abs(opt_fun(9 )),xcomax)
+     ycomax = max(abs(opt_fun(11)),ycomax)
   else
-     opt_fun(9 )=orbit(1)
-     opt_fun(10)=orbit(2)
-     opt_fun(11)=orbit(3)
-     opt_fun(12)=orbit(4)
-     opt_fun(13)=orbit(5)
-     opt_fun(14)=orbit(6)
+     OPT_FUN(9:14) = ORBIT
      currpos=currpos+el
   endif
   iecnt=iecnt+1
 
-  !--- 2013-Nov-14  10:41:42  ghislain: change to save name of element where max is happening
-  ! bxmax =max(betx         ,bxmax)
-  ! bymax =max(bety         ,bymax)
-  ! dxmax =max(abs(disp(1)) ,dxmax)
-  ! dymax =max(abs(disp(3)) ,dymax)
-  ! xcomax=max(abs(orbit(1)),xcomax)
-  ! ycomax=max(abs(orbit(3)),ycomax)
-  !
-  if (betx .gt. bxmax) then
-     bxmax = betx
-     bxmax_name = el_name
-  endif
-  if (bety .gt. bymax) then
-     bymax = bety
-     bymax_name = el_name
-  endif
-  if (abs(disp(1)) .gt. dxmax) then
-     dxmax = abs(disp(1))
-     dxmax_name = el_name
-  endif
-  if (abs(disp(3)) .gt. dymax) then
-     dymax = abs(disp(3))
-     dymax_name = el_name
-  endif
-  if (abs(orbit(1)) .gt. xcomax) then
-     xcomax = abs(orbit(1))
-     xcomax_name = el_name
-  endif
-  if (abs(orbit(3)) .gt. ycomax) then
-     ycomax = abs(orbit(3))
-     ycomax_name = el_name
-  endif
-  !--- 2013-Nov-14  10:41:42  ghislain: end of change
+  !--- save maxima and name of elements where they occur
+  if (betx .gt. bxmax) bxmax = betx; bxmax_name = el_name
+  if (bety .gt. bymax) bymax = bety; bymax_name = el_name
+  if (abs(disp(1)) .gt. dxmax) dxmax = abs(disp(1)); dxmax_name = el_name
+  if (abs(disp(3)) .gt. dymax) dymax = abs(disp(3)); dymax_name = el_name
+  if (abs(orbit(1)) .gt. xcomax) xcomax = abs(orbit(1)); xcomax_name = el_name
+  if (abs(orbit(3)) .gt. ycomax) ycomax = abs(orbit(3)); ycomax_name = el_name
+
 
   !--- 2013-Nov-14  14:18:07  ghislain: should only calculate the RMS values for active elements, 
   !                           skipping markers(25), beambeam(22), changeref(35), translation(36),
   !                           srotation(12), yrotation(13) etc...
   !                           But leave drifts(1) in for now. They are the most numerous elements in machines
-  ! if ( & ! code .ne. 1 .and. & 
-  !      code .ne. 22 .and. & 
-  !      code .ne. 25 .and. & 
-  !      code .ne. 35 .and. code .ne. 36 .and. &
-  !      code .ne. 12 .and. code .ne. 13) then
-     sigxco=sigxco+orbit(1)**2
-     sigyco=sigyco+orbit(3)**2
-     sigdx =sigdx + disp(1)**2
-     sigdy =sigdy + disp(3)**2
-  !endif
+  sigxco = sigxco + orbit(1)**2
+  sigyco = sigyco + orbit(3)**2
+  sigdx  = sigdx  + disp(1)**2
+  sigdy  = sigdy  + disp(3)**2
 
-  if(.not.centre) call twprep(save,1,opt_fun,currpos)
-  if(centre) then
+  if (.not.centre) then
+     call twprep(save,1,opt_fun,currpos)
+  else
      currpos=pos0+el
-     opt_fun(2 )=currpos
-     opt_fun(3 )=betx
-     opt_fun(4 )=alfx
-     opt_fun(5 )=amux
-     opt_fun(6 )=bety
-     opt_fun(7 )=alfy
-     opt_fun(8 )=amuy
-     opt_fun(9 )=orbit(1)
-     opt_fun(10)=orbit(2)
-     opt_fun(11)=orbit(3)
-     opt_fun(12)=orbit(4)
-     opt_fun(13)=orbit(5)
-     opt_fun(14)=orbit(6)
-     opt_fun(15)=disp(1)
-     opt_fun(16)=disp(2)
-     opt_fun(17)=disp(3)
-     opt_fun(18)=disp(4)
-     opt_fun(29)=rmat(1,1)
-     opt_fun(30)=rmat(1,2)
-     opt_fun(31)=rmat(2,1)
-     opt_fun(32)=rmat(2,2)
+
+     opt_fun(2) = currpos
+     opt_fun(3) = betx
+     opt_fun(4) = alfx
+     opt_fun(5) = amux
+     opt_fun(6) = bety
+     opt_fun(7) = alfy
+     opt_fun(8) = amuy
+
+     OPT_FUN(9:14) = ORBIT
+     OPT_FUN(15:18) = DISP(1:4)
+
+     opt_fun(29) = rmat(1,1)
+     opt_fun(30) = rmat(1,2)
+     opt_fun(31) = rmat(2,1)
+     opt_fun(32) = rmat(2,2)
   endif
 
-  if(advance_node().ne.0) goto 10
+  if (advance_node().ne.0) goto 10
 
   !---- Compute summary.
-  wgt = max(iecnt, 1)
-  sigxco=sqrt(sigxco / wgt)
-  sigyco=sqrt(sigyco / wgt)
-  sigdx =sqrt(sigdx / wgt)
-  sigdy =sqrt(sigdy / wgt)
-  cosmux=(rt(1,1) + rt(2,2)) / two
-  cosmuy=(rt(3,3) + rt(4,4)) / two
+  wgt    = max(iecnt, 1)
+  sigxco = sqrt(sigxco / wgt)
+  sigyco = sqrt(sigyco / wgt)
+  sigdx  = sqrt(sigdx / wgt)
+  sigdy  = sqrt(sigdy / wgt)
+  cosmux = (rt(1,1) + rt(2,2)) / two
+  cosmuy = (rt(3,3) + rt(4,4)) / two
 
   !---- Warning messages.
-  if (cplxt.or.dorad) then
-     write (msg, 910)
-     call aawarn('TWCPGO: ',msg)
-  endif
-
-910 format('TWISS uses the RF system or synchrotron radiation ',      &
-       'only to find the closed orbit, for optical calculations it ',    &
-       'ignores both.')
+  if (cplxt .or. dorad) & 
+       call aawarn('TWCPGO: ','TWISS uses the RF system or synchrotron radiation only & 
+                  & to find the closed orbit, for optical calculations it ignores both.')
 
   ! write (6,*) bxmax, bxmax_name
   ! write (6,*) bymax, bymax_name
@@ -1466,15 +1385,14 @@ SUBROUTINE twcpgo(rt,orbit0)
   ! write (6,*) xcomax, xcomax_name
   ! write (6,*) ycomax, ycomax_name
 
-
 end SUBROUTINE twcpgo
+
 SUBROUTINE twcptk(re,orbit)
   use twiss0fi
   use twisslfi
   use twisscfi
   use twissotmfi
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Track coupled lattice functions.                                 *
@@ -1482,44 +1400,37 @@ SUBROUTINE twcptk(re,orbit)
   !     re(6,6)  (double)   transfer matrix of element.                  *
   !     orbit(6) (double)   closed orbit                                 *
   !----------------------------------------------------------------------*
-  integer i,i1,i2,j,get_option
-  double precision re(6,6),orbit(6),rw0(6,6),rwi(6,6),rc(6,6),      &
-       rmat0(2,2),a(2,2),adet,b(2,2),c(2,2),dt(6),tempa,tempb,alfx0,     &
-       alfy0,betx0,bety0,amux0,amuy0,zero,one,eps
-  parameter(zero=0d0,one=1d0,eps=1d-36)
+  double precision :: re(6,6), orbit(6)
 
-  !initialize
-  bety0=zero
-  betx0=zero
-  amux0=zero
-  amuy0=zero
-  alfy0=zero
-  alfx0=zero
+  integer :: i, i1, i2, j
+  double precision :: rw0(6,6), rwi(6,6), rc(6,6), dt(6)
+  double precision :: rmat0(2,2), a(2,2), b(2,2), c(2,2)
+  double precision :: adet, tempa, tempb
+  double precision :: alfx0=0.d0, alfy0=0.d0, betx0=0.d0, bety0=0.d0
+  double precision :: amux0=0.d0, amuy0=0.d0
+
+  integer, external :: get_option
+  double precision, parameter :: zero=0d0, one=1d0, eps=1d-36
 
   !---- Dispersion.
-  call dzero(dt,6)
+  DT = zero 
   do i = 1, 6
-     do j = 1, 6
-        dt(i) = dt(i) + re(i,j) * disp(j)
-     enddo
+     DT(i) = dot_product(RE(i,:6),DISP(:6))
   enddo
-  if(.not.centre.or.centre_cptk) then
-     opt_fun(15)=dt(1)
-     opt_fun(16)=dt(2)
-     opt_fun(17)=dt(3)
-     opt_fun(18)=dt(4)
-  endif
-  if(centre_cptk) then
-     alfx0=alfx
-     alfy0=alfy
-     betx0=betx
-     bety0=bety
-     amux0=amux
-     amuy0=amuy
-     call dcopy(rmat,rmat0,4)
-     if(rmatrix) call dcopy(rw,rw0,36)
+
+  if (.not.centre .or. centre_cptk) OPT_FUN(15:18) = DT(1:4)
+
+  if (centre_cptk) then
+     alfx0 = alfx
+     alfy0 = alfy
+     betx0 = betx
+     bety0 = bety
+     amux0 = amux
+     amuy0 = amuy
+     RMAT0 = RMAT 
+     if (rmatrix) RW0 = RW 
   else
-     call dcopy(dt,disp,6)
+     DISP = DT 
      disp(5) = zero
      disp(6) = one
   endif
@@ -1540,7 +1451,7 @@ SUBROUTINE twcptk(re,orbit)
 
   !---- Track R matrix.
   adet = a(1,1) * a(2,2) - a(1,2) * a(2,1)
-  if (abs(adet).gt.eps) then
+  if (abs(adet) .gt. eps) then
      rmat(1,1) = - (b(1,1) * a(2,2) - b(1,2) * a(2,1)) / adet
      rmat(1,2) =   (b(1,1) * a(1,2) - b(1,2) * a(1,1)) / adet
      rmat(2,1) = - (b(2,1) * a(2,2) - b(2,2) * a(2,1)) / adet
@@ -1551,71 +1462,68 @@ SUBROUTINE twcptk(re,orbit)
      tempa = a(2,1) * betx - a(2,2) * alfx
      alfx = - (tempa * tempb + a(1,2) * a(2,2)) / (adet * betx)
      betx =   (tempb * tempb + a(1,2) * a(1,2)) / (adet * betx)
-     if(abs(a(1,2)).gt.eps) amux=amux+atan2(a(1,2),tempb)
+     if (abs(a(1,2)) .gt. eps) amux = amux + atan2(a(1,2),tempb)
      
      !---- Mode 2.
      tempb = c(1,1) * bety - c(1,2) * alfy
      tempa = c(2,1) * bety - c(2,2) * alfy
      alfy = - (tempa * tempb + c(1,2) * c(2,2)) / (adet * bety)
      bety =   (tempb * tempb + c(1,2) * c(1,2)) / (adet * bety)
-     if(abs(c(1,2)).gt.eps) amuy=amuy+atan2(c(1,2),tempb)
+     if (abs(c(1,2)) .gt. eps) amuy = amuy + atan2(c(1,2),tempb)
   endif
   
   !---- Cummulative R matrix and one-turn map at element location.
-  if(rmatrix) then
-     call m66mpy(re,rw,rw)
+  if (rmatrix) then
+     RW = matmul(RE,RW) 
      if (get_option('twiss_inval ') .ne. 0) then
-        call dcopy(rw,rc,36)
+        RC = RW 
      else
         call m66inv(rw,rwi)
-        call m66mpy(rotm,rwi,rc)
-        call m66mpy(rw,rc,rc)
+        RC = matmul(ROTM,RWI)
+        RC = matmul(RW,RC) 
      endif
   endif
   
-  if(.not.centre.or.centre_cptk) then
-     opt_fun(3 )=betx
-     opt_fun(4 )=alfx
-     opt_fun(5 )=amux
-     opt_fun(6 )=bety
-     opt_fun(7 )=alfy
-     opt_fun(8 )=amuy
-     opt_fun(29)=rmat(1,1)
-     opt_fun(30)=rmat(1,2)
-     opt_fun(31)=rmat(2,1)
-     opt_fun(32)=rmat(2,2)
+  if (.not.centre.or.centre_cptk) then
+     opt_fun(3) = betx
+     opt_fun(4) = alfx
+     opt_fun(5) = amux
+     opt_fun(6) = bety
+     opt_fun(7) = alfy
+     opt_fun(8) = amuy
+
+     opt_fun(29) = rmat(1,1)
+     opt_fun(30) = rmat(1,2)
+     opt_fun(31) = rmat(2,1)
+     opt_fun(32) = rmat(2,2)
   endif
-  if(rmatrix) then
+
+  if (rmatrix) then
      do i1=1,6
         do i2=1,6
-           opt_fun(33+(i1-1)*6+i2)=rc(i1,i2)
+           opt_fun(33+(i1-1)*6+i2) = rc(i1,i2)
         enddo
      enddo
   endif
-  if(centre_cptk) then
-     opt_fun(9 )=orbit(1)
-     opt_fun(10)=orbit(2)
-     opt_fun(11)=orbit(3)
-     opt_fun(12)=orbit(4)
-     opt_fun(13)=orbit(5)
-     opt_fun(14)=orbit(6)
-     alfx=alfx0
-     alfy=alfy0
-     betx=betx0
-     bety=bety0
-     amux=amux0
-     amuy=amuy0
-     call dcopy(rmat0,rmat,4)
-     if(rmatrix) call dcopy(rw0,rw,36)
+
+  if (centre_cptk) then
+     OPT_FUN(9:14) = ORBIT
+     alfx = alfx0
+     alfy = alfy0
+     betx = betx0
+     bety = bety0
+     amux = amux0
+     amuy = amuy0
+     RMAT = RMAT0 
+     if (rmatrix) RW = RW0
   endif
 
 end SUBROUTINE twcptk
-SUBROUTINE twbtin(rt,tt)
 
+SUBROUTINE twbtin(rt,tt)
   use twiss0fi
   use twisscfi
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Initial values of Chromatic functions.                           *
@@ -1623,46 +1531,47 @@ SUBROUTINE twbtin(rt,tt)
   !     rt(6,6)   (double)  transfer matrix.                             *
   !     tt(6,6,6) (double)  second order terms.                          *
   !----------------------------------------------------------------------*
-  logical stabx,staby
-  integer i,k,j,get_option
-  double precision rt(6,6),tt(6,6,6),disp0(6),ddisp0(6),rtp(6,6),   &
-       sinmu2,bx,ax,by,ay,eps,temp,aux(6),zero,one,two,fourth,           &
-       get_variable,twopi
-  parameter(eps=1d-8,zero=0d0,one=1d0,two=2d0,fourth=0.25d0)
+  double precision :: rt(6,6), tt(6,6,6)
+  
+  logical :: stabx, staby
+  integer :: i, j, k
+  double precision :: disp0(6), ddisp0(6), rtp(6,6), aux(6)
+  double precision :: twopi, sinmu2, bx, ax, by, ay, temp
+
+  integer :: get_option
+  double precision :: get_variable
+  double precision, parameter :: eps=1d-8, zero=0d0, one=1d0, two=2d0, fourth=0.25d0
 
   !---- Initialization
-  twopi=get_variable('twopi ')
-  betx   =opt_fun0(3 )
-  alfx   =opt_fun0(4 )
-  amux   =opt_fun0(5 )
-  bety   =opt_fun0(6 )
-  alfy   =opt_fun0(7 )
-  amuy   =opt_fun0(8 )
-  wx     =opt_fun0(19)
-  phix   =opt_fun0(20)
-  dmux   =opt_fun0(21)
-  wy     =opt_fun0(22)
-  phiy   =opt_fun0(23)
-  dmuy   =opt_fun0(24)
+  twopi = get_variable('twopi ')
+  betx   = opt_fun0(3 )
+  alfx   = opt_fun0(4 )
+  amux   = opt_fun0(5 )
+  bety   = opt_fun0(6 )
+  alfy   = opt_fun0(7 )
+  amuy   = opt_fun0(8 )
+  wx     = opt_fun0(19)
+  phix   = opt_fun0(20)
+  dmux   = opt_fun0(21)
+  wy     = opt_fun0(22)
+  phiy   = opt_fun0(23)
+  dmuy   = opt_fun0(24)
 
   !---- Initial value flag.
   if (get_option('twiss_inval ') .ne. 0) then
-     call dcopy(opt_fun0(15),disp,4)
-     call dcopy(opt_fun0(25),ddisp,4)
-     disp(5) = zero
-     disp(6) = one
-     ddisp(5) = zero
-     ddisp(6) = zero
+     DISP(:4) = OPT_FUN0(15:18) 
+     DDISP(:4) = OPT_FUN0(25:28) 
+     disp(5)  = zero ; disp(6)  = one
+     ddisp(5) = zero ; ddisp(6) = zero
      return
   endif
 
   !---- Initial dispersion.
   call twdisp(rt,rt(1,6),disp0)
-  disp0(5) = zero
-  disp0(6) = one
+  disp0(5) = zero ;  disp0(6) = one
 
   !---- Derivative of transfer matrix w.r.t. delta(p)/p.
-  call dzero(aux,6)
+  AUX = zero 
   do i = 1, 6
      do k = 1, 6
         temp = zero
@@ -1679,22 +1588,21 @@ SUBROUTINE twbtin(rt,tt)
 
   ddisp0(5) = zero
   ddisp0(6) = zero
-  call dcopy(disp0,disp,6)
-  call dcopy(ddisp0,ddisp,6)
+  DISP  = DISP0 
+  DDISP = DDISP0 
 
   !---- Horizontal motion.
   cosmux = (rt(1,1) + rt(2,2)) / two
   stabx = abs(cosmux) .lt. one
+
   if (stabx) then
      sinmu2 = - rt(1,2)*rt(2,1) - fourth*(rt(1,1) - rt(2,2))**2
      if (sinmu2.lt.0) sinmu2 = eps
      sinmux = sign(sqrt(sinmu2), rt(1,2))
      betx = rt(1,2) / sinmux
      alfx = (rt(1,1) - rt(2,2)) / (two * sinmux)
-     bx = rtp(1,2) / rt(1,2) +                                       &
-          (rtp(1,1) + rtp(2,2)) * cosmux / (two * sinmu2)
-     ax = (rtp(1,1) - rtp(2,2)) / (two * sinmux) -                   &
-          alfx * rtp(1,2) / rt(1,2)
+     bx = rtp(1,2) / rt(1,2) + (rtp(1,1) + rtp(2,2)) * cosmux / (two * sinmu2)
+     ax = (rtp(1,1) - rtp(2,2)) / (two * sinmux) - alfx * rtp(1,2) / rt(1,2)
      wx = sqrt(bx**2 + ax**2)
      if (wx.gt.eps) phix = atan2(ax,bx)
   endif
@@ -1702,202 +1610,185 @@ SUBROUTINE twbtin(rt,tt)
   !---- Vertical motion.
   cosmuy = (rt(3,3) + rt(4,4)) / two
   staby = abs(cosmuy) .lt. one
+
   if (staby) then
      sinmu2 = - rt(3,4)*rt(4,3) - fourth*(rt(3,3) - rt(4,4))**2
      if (sinmu2.lt.0) sinmu2 = eps
      sinmuy = sign(sqrt(sinmu2), rt(3,4))
      bety = rt(3,4) / sinmuy
      alfy = (rt(3,3) - rt(4,4)) / (two * sinmuy)
-     by = rtp(3,4) / rt(3,4) +                                       &
-          (rtp(3,3) + rtp(4,4)) * cosmuy / (two * sinmu2)
-     ay = (rtp(3,3) - rtp(4,4)) / (two * sinmuy) -                   &
-          alfy * rtp(3,4) / rt(3,4)
+     by = rtp(3,4) / rt(3,4) + (rtp(3,3) + rtp(4,4)) * cosmuy / (two * sinmu2)
+     ay = (rtp(3,3) - rtp(4,4)) / (two * sinmuy) - alfy * rtp(3,4) / rt(3,4)
      wy = sqrt(by**2 + ay**2)
      if (wy.gt.eps) phiy = atan2(ay,by)
   endif
 
   !---- Fill optics function array
-  opt_fun0(19)=wx
-  opt_fun0(20)=phix
-  opt_fun0(22)=wy
-  opt_fun0(23)=phiy
-  opt_fun0(25)=ddisp(1)
-  opt_fun0(26)=ddisp(2)
-  opt_fun0(27)=ddisp(3)
-  opt_fun0(28)=ddisp(4)
+  opt_fun0(19) = wx
+  opt_fun0(20) = phix
+  opt_fun0(22) = wy
+  opt_fun0(23) = phiy
+  opt_fun0(25) = ddisp(1)
+  opt_fun0(26) = ddisp(2)
+  opt_fun0(27) = ddisp(3)
+  opt_fun0(28) = ddisp(4)
 
 end SUBROUTINE twbtin
-SUBROUTINE twchgo
 
+SUBROUTINE twchgo
   use twiss0fi
   use twisslfi
   use twissafi
   use twisscfi
   use spch_bbfi
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Track Chromatic functions.                                       *
   !----------------------------------------------------------------------*
-  logical fmap,cplxy,cplxt,dorad,mycentre_bttk
-  integer i,code,save,restart_sequ,advance_node,get_option,n_align, &
-       node_al_errors
-  double precision orbit(6),orbit2(6),ek(6),re(6,6),        &
-       te(6,6,6),al_errors(align_max),deltap,el,betas,gammas,  &
-       node_value,get_value,pos0,zero,one,two
-  parameter(zero=0d0,one=1d0,two=2d0)
-  character(130) msg
+  logical :: fmap, cplxy=.false., cplxt=.false., dorad, mycentre_bttk
+  integer :: i, code, save, n_align
+  double precision :: orbit(6), orbit2(6), ek(6), re(6,6), te(6,6,6)
+  double precision :: al_errors(align_max), deltap, el, betas, gammas, pos0
+  character(len=130) :: msg
+
+  integer :: restart_sequ, advance_node, get_option, node_al_errors
+  double precision :: node_value, get_value
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0
 
   !---- If save requested reset table
   save=get_option('twiss_save ')
-  if(save.ne.0) call reset_count(table_name)
+  if (save.ne.0) call reset_count(table_name)
+
   deltap = get_value('probe ','deltap ')
   dorad = get_value('probe ','radiate ').ne.zero
   centre = get_value('twiss ','centre ').ne.zero
 
   !---- Initial values for lattice functions.
-  pos0=zero
-  amux=zero
-  amuy=zero
-  orbit(1) =opt_fun0(9 )
-  orbit(2) =opt_fun0(10)
-  orbit(3) =opt_fun0(11)
-  orbit(4) =opt_fun0(12)
-  orbit(5) =opt_fun0(13)
-  orbit(6) =opt_fun0(14)
-  disp(1)  =opt_fun0(15)
-  disp(2)  =opt_fun0(16)
-  disp(3)  =opt_fun0(17)
-  disp(4)  =opt_fun0(18)
-  disp(5)  =zero
-  disp(6)  =one
-  call dzero(te,216)
+  pos0 = zero
+  amux = zero
+  amuy = zero
+  ORBIT = OPT_FUN(9:14)
+  DISP(1:4) = OPT_FUN(15:18)
+  disp(5) = zero
+  disp(6) = one
+  TE = zero 
 
   !---- Initial values for chromatic functions.
-  opt_fun(19)=wx
-  opt_fun(20)=phix
-  opt_fun(21)=dmux
-  opt_fun(22)=wy
-  opt_fun(23)=phiy
-  opt_fun(24)=dmuy
-  opt_fun(25)=ddisp(1)
-  opt_fun(26)=ddisp(2)
-  opt_fun(27)=ddisp(3)
-  opt_fun(28)=ddisp(4)
-  synch_1 = zero
-  synch_2 = zero
-  synch_3 = zero
-  synch_4 = zero
-  synch_5 = zero
+  opt_fun(19) = wx
+  opt_fun(20) = phix
+  opt_fun(21) = dmux
+  opt_fun(22) = wy
+  opt_fun(23) = phiy
+  opt_fun(24) = dmuy
+  
+  OPT_FUN(25:28) = DDISP(1:4)
+
+  !---- and synchrotron radiation integrals
+  synch_1 = zero; synch_2 = zero; synch_3 = zero; synch_4 = zero; synch_5 = zero
 
   !---- Loop over positions.
-  cplxy = .false.
-  cplxt = .false.
-
   betas = get_value('probe ','beta ')
   gammas= get_value('probe ','gamma ')
   centre_bttk=.false.
   i = restart_sequ()
-  if(centre) currpos = zero
+  if (centre) currpos = zero
   i_spch=0
 
 10 continue
+
   el = node_value('l ')
+
   code = node_value('mad8_type ')
-  if(code.eq.39) code=15
-  if(code.eq.38) code=24
+  if (code.eq.39) code=15 ! TKICKER is a KICKER
+  if (code.eq.38) code=24 ! PLACEHOLDER is an INSTRUMENT
 
   !---- Physical element.
   n_align = node_al_errors(al_errors)
   if (n_align.ne.0)  then
-     call dcopy(orbit,orbit2,6)
+     ORBIT2 = ORBIT 
      call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
      mycentre_bttk = centre_bttk
      centre_bttk = .false.
      call twbttk(re,te)
      centre_bttk = mycentre_bttk
   endif
-  if(centre) centre_bttk=.true.
+
+  if (centre) centre_bttk=.true.
+
   call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te)
-  if(centre) then
+
+  if (centre) then
      pos0=currpos
      currpos=currpos+el/two
      call twprep(save,2,opt_fun,currpos)
   endif
+
   centre_bttk=.false.
-  if (fmap) then
-     call twbttk(re,te)
-  endif
+
+  if (fmap) call twbttk(re,te)
+
   if (n_align.ne.0)  then
-     call dcopy(orbit,orbit2,6)
+     ORBIT2 = ORBIT 
      call tmali2(el,orbit2,al_errors,betas,gammas,orbit,re)
      mycentre_bttk = centre_bttk
      centre_bttk = .false.
      call twbttk(re,te)
      centre_bttk = mycentre_bttk
   endif
-  if(.not.centre) call twprep(save,2,opt_fun,zero)
-  if(centre) then
-     currpos=pos0+el
-     opt_fun(2 )=currpos
-     opt_fun(3 )=betx
-     opt_fun(4 )=alfx
-     opt_fun(5 )=amux
-     opt_fun(6 )=bety
-     opt_fun(7 )=alfy
-     opt_fun(8 )=amuy
-     opt_fun(9 )=orbit(1)
-     opt_fun(10)=orbit(2)
-     opt_fun(11)=orbit(3)
-     opt_fun(12)=orbit(4)
-     opt_fun(13)=orbit(5)
-     opt_fun(14)=orbit(6)
-     opt_fun(15)=disp(1)
-     opt_fun(16)=disp(2)
-     opt_fun(17)=disp(3)
-     opt_fun(18)=disp(4)
-     opt_fun(19)=wx
-     opt_fun(20)=phix
-     opt_fun(21)=dmux
-     opt_fun(22)=wy
-     opt_fun(23)=phiy
-     opt_fun(24)=dmuy
-     opt_fun(25)=ddisp(1)
-     opt_fun(26)=ddisp(2)
-     opt_fun(27)=ddisp(3)
-     opt_fun(28)=ddisp(4)
+
+  if (.not.centre) then
+     call twprep(save,2,opt_fun,zero)
+  else
+     currpos = pos0 + el
+
+     opt_fun(2) = currpos
+     opt_fun(3) = betx
+     opt_fun(4) = alfx
+     opt_fun(5) = amux
+     opt_fun(6) = bety
+     opt_fun(7) = alfy
+     opt_fun(8) = amuy
+
+     OPT_FUN(9:14) = ORBIT
+     OPT_FUN(15:18) = DISP(1:4)
+
+     opt_fun(19) = wx
+     opt_fun(20) = phix
+     opt_fun(21) = dmux
+     opt_fun(22) = wy
+     opt_fun(23) = phiy
+     opt_fun(24) = dmuy
+
+     OPT_FUN(25:28) = DDISP(1:4)
+
      opt_fun(29)=rmat(1,1)
      opt_fun(30)=rmat(1,2)
      opt_fun(31)=rmat(2,1)
      opt_fun(32)=rmat(2,2)
   endif
+
   if (advance_node().ne.0)  goto 10
 
   !---- Warning, if system is coupled.
   if (cplxy) then
-     write (msg, 910) deltap
+     write (msg, '("TWISS found transverse coupling for delta(p)/p =",f12.6,'// &
+                 '"chromatic functions may be wrong.")') deltap
      call aawarn('TWCHGO: ',msg)
   endif
-  if (cplxt.or.dorad) then
-     write (msg, 920)
-     call aawarn('TWCHGO: ',msg)
+  if (cplxt .or. dorad) then
+     call aawarn('TWCHGO: ','TWISS uses the RF system or synchrotron radiation '// &
+                 'only to find the closed orbit, for optical calculations it '// &
+                 'ignores both.')
   endif
-
-910 format('TWISS found transverse coupling for delta(p)/p =',f12.6,  &
-       'chromatic functions may be wrong.')
-920 format('TWISS uses the RF system or synchrotron radiation ',      &
-       'only to find the closed orbit, for optical calculations it ',    &
-       'ignores both.')
 
 end SUBROUTINE twchgo
-SUBROUTINE twbttk(re,te)
 
+SUBROUTINE twbttk(re,te)
   use twiss0fi
   use twisslfi
   use twisscfi
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Track lattice functions, including chromatic effects.            *
@@ -1905,49 +1796,39 @@ SUBROUTINE twbttk(re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second order terms.                          *
   !----------------------------------------------------------------------*
-  integer save,i,j,k,get_option
-  double precision re(6,6),te(6,6,6),aux(6),auxp(6),ax1,ax2,ay1,ay2,&
-       bx1,bx2,by1,by2,proxim,rep(6,6),t2,ta,tb,temp,tg,fre(6,6),        &
-       frep(6,6),curlyh,detl,f,rhoinv,blen,alfx0,alfy0,betx0,bety0,amux0,&
-       amuy0,wx0,wy0,dmux0,dmuy0,rmat0(2,2),phix0,phiy0,node_value,eps,  &
-       zero,one,two
-  parameter(eps=1d-8,zero=0d0,one=1d0,two=2d0)
+  double precision :: re(6,6), te(6,6,6)
 
-  double precision an, e1, e2, sk1
-  double precision syncint(5), beta, get_value
+  integer :: i,j,k,save
+  double precision :: aux(6), auxp(6), rep(6,6), fre(6,6), frep(6,6)
+  double precision :: rmat0(2,2)
+  double precision :: ax1, ax2, ay1, ay2, bx1, bx2, by1, by2 
+  double precision :: t2, ta, tb, temp, tg
+  double precision :: alfx0=0.d0, alfy0=0.d0, betx0=0.d0, bety0=0.d0, amux0=0.d0, amuy0=0.d0
+  double precision :: wx0=0.d0, wy0=0.d0, dmux0=0.d0, dmuy0=0.d0, phix0=0.d0, phiy0=0.d0
+  double precision :: an, e1, e2, sk1, curlyh, detl, f, rhoinv, blen, beta
+  double precision :: syncint(5)
+
+  integer, external :: get_option
+  double precision, external :: proxim, node_value, get_value
+  double precision, parameter :: eps=1d-8, zero=0d0, one=1d0, two=2d0
   
-  !initialize
-  wx0=zero
-  wy0=zero
-  phiy0=zero
-  phix0=zero
-  dmuy0=zero
-  dmux0=zero
-  betx0=zero
-  bety0=zero
-  amuy0=zero
-  amux0=zero
-  alfx0=zero
-  alfy0=zero
   !---- Create internal table for lattice functions if requested
-  save=get_option('twiss_save ')
+  save = get_option('twiss_save ')
 
-  !---- Tor: needed for synchrotron integrals
-  blen=node_value('blen ')
-  rhoinv=node_value('rhoinv ')
-  ! 2014-May-15  16:50:36  ghislain: added 
+  !---- Initialisation
+  blen = node_value('blen ')
+  rhoinv = node_value('rhoinv ')
   sk1 = node_value('k1 ')
   e1 = node_value('e1 ')
   e2 = node_value('e2 ')
-  
   an = node_value('angle ')
-  if(node_value('mad8_type ').eq.2) then
+  if (node_value('mad8_type ') .eq. 2) then ! RBEND
      e1 = e1 + an / two
      e2 = e2 + an / two
   endif
 
   !---- Synchrotron radiation integrals through bending magnets.    
-  if(.not.centre_bttk .and. rhoinv .ne. 0.d0) then
+  if (.not.centre_bttk .and. rhoinv .ne. 0.d0) then
      ! Note that calcsyncint expects dx and dpx as derivatives wrt deltap.
      ! since MAD take disp(1) and disp(2) as derivatives wrt pt, they must be 
      ! multiplied by beta before the call to calcsyncint.
@@ -1960,40 +1841,38 @@ SUBROUTINE twbttk(re,te)
      synch_5 = synch_5 + syncint(5)
   endif
 
-  call dzero(aux,6)
-  call dzero(auxp,6)
+  AUX = zero
+  AUXP = zero
   do i = 1, 6
      do k = 1, 6
-        temp = zero
-        do j = 1, 6
-           temp = temp + te(i,j,k)*disp(j)
-        enddo
+        temp = dot_product(TE(i,:,k),DISP(:))
+        !temp = zero        
+        !do j = 1, 6
+        !   temp = temp + te(i,j,k)*disp(j)
+        !enddo
         aux(i) = aux(i) + re(i,k)*disp(k)
         auxp(i) = auxp(i) + temp*disp(k) + re(i,k)*ddisp(k)
         rep(i,k) = two*temp
      enddo
   enddo
-  if(.not.centre_bttk) then
-     call dcopy(aux,disp,6)
-     call dcopy(auxp,ddisp,6)
+
+  if (.not.centre_bttk) then
+     DISP = AUX 
+     DDISP = AUXP 
   else
-     alfx0=alfx
-     alfy0=alfy
-     betx0=betx
-     bety0=bety
-     amux0=amux
-     amuy0=amuy
-     wx0=wx
-     wy0=wy
-     dmux0=dmux
-     dmuy0=dmuy
-     phix0=phix
-     phiy0=phiy
-     do i=1,2
-        do j=1,2
-           rmat0(i,j)=rmat(i,j)
-        enddo
-     enddo
+     alfx0 = alfx
+     alfy0 = alfy
+     betx0 = betx
+     bety0 = bety
+     amux0 = amux
+     amuy0 = amuy
+     wx0 = wx
+     wy0 = wy
+     dmux0 = dmux
+     dmuy0 = dmuy
+     phix0 = phix
+     phiy0 = phiy
+     RMAT0(:2,:2) = RMAT(:2,:2)
   endif
 
   !---- Tor: modified to cancel energy change
@@ -2003,8 +1882,8 @@ SUBROUTINE twbttk(re,te)
   !     longitudinal 2x2 part of the R-matrix
   detl = re(5,5)*re(6,6) - re(5,6)*re(6,5)
   f = one / sqrt(detl)
-  call m66scl(f,re,fre)
-  call m66scl(f,rep,frep)
+  FRE  = f * RE  !call m66scl(f,re,fre)
+  FREP = f * REP !call m66scl(f,rep,frep)
 
   !---- Track horizontal functions including energy scaling.
   tb = fre(1,1)*betx - fre(1,2)*alfx
@@ -2015,16 +1894,16 @@ SUBROUTINE twbttk(re,te)
   !---- Linear functions.
   alfx = - (tb*ta + fre(1,2)*fre(2,2)) / betx
   betx = t2 / betx
-  if(fre(1,2).ne.zero.or.tb.ne.zero) amux=amux+atan2(fre(1,2),tb)
+  if (fre(1,2).ne.zero .or. tb.ne.zero) amux = amux + atan2(fre(1,2),tb)
   bx1 = wx*cos(phix)
   ax1 = wx*sin(phix)
   bx2 = ((tb**2 - fre(1,2)**2)*bx1                                  &
-       - two*tb*fre(1,2)*ax1) / t2                                       &
+       - two*tb*fre(1,2)*ax1) / t2                                  &
        + two*(tb*frep(1,1) - tg*frep(1,2)) / betx
   ax2 = ((tb**2 - fre(1,2)**2)*ax1                                  &
-       + two*tb*fre(1,2)*bx1) / t2                                       &
-       - (tb*(frep(1,1)*alfx + frep(2,1)*betx)                           &
-       - tg*(frep(1,2)*alfx + frep(2,2)*betx)                            &
+       + two*tb*fre(1,2)*bx1) / t2                                  &
+       - (tb*(frep(1,1)*alfx + frep(2,1)*betx)                      &
+       - tg*(frep(1,2)*alfx + frep(2,2)*betx)                       &
        + fre(1,1)*frep(1,2) - fre(1,2)*frep(1,1)) / betx
   wx = sqrt(ax2**2 + bx2**2)
   if (wx.gt.eps) phix = proxim(atan2(ax2, bx2), phix)
@@ -2040,17 +1919,17 @@ SUBROUTINE twbttk(re,te)
   !---- Linear functions.
   alfy = - (tb*ta + fre(3,4)*fre(4,4)) / bety
   bety = t2 / bety
-  if(fre(3,4).ne.zero.or.tb.ne.zero) amuy=amuy+atan2(fre(3,4),tb)
+  if (fre(3,4).ne.zero .or. tb.ne.zero) amuy = amuy + atan2(fre(3,4),tb)
 
   by1 = wy*cos(phiy)
   ay1 = wy*sin(phiy)
   by2 = ((tb**2 - fre(3,4)**2)*by1                                  &
-       - two*tb*fre(3,4)*ay1) / t2                                       &
+       - two*tb*fre(3,4)*ay1) / t2                                  &
        + two*(tb*frep(3,3) - tg*frep(3,4)) / bety
   ay2 = ((tb**2 - fre(3,4)**2)*ay1                                  &
-       + two*tb*fre(3,4)*by1) / t2                                       &
-       - (tb*(frep(3,3)*alfy + frep(4,3)*bety)                           &
-       - tg*(frep(3,4)*alfy + frep(4,4)*bety)                            &
+       + two*tb*fre(3,4)*by1) / t2                                  &
+       - (tb*(frep(3,3)*alfy + frep(4,3)*bety)                      &
+       - tg*(frep(3,4)*alfy + frep(4,4)*bety)                       &
        + fre(3,3)*frep(3,4) - fre(3,4)*frep(3,3)) / bety
   wy = sqrt(ay2**2 + by2**2)
   if (wy.gt.eps) phiy = proxim(atan2(ay2, by2), phiy)
@@ -2058,47 +1937,39 @@ SUBROUTINE twbttk(re,te)
        + (fre(3,3)*frep(3,4) - fre(3,4)*frep(3,3)) / bety
 
   !---- Fill optics function array
-  if(.not.centre.or.centre_bttk) then
-     opt_fun(19)=wx
-     opt_fun(20)=phix
-     opt_fun(21)=dmux
-     opt_fun(22)=wy
-     opt_fun(23)=phiy
-     opt_fun(24)=dmuy
-     opt_fun(25)=auxp(1)
-     opt_fun(26)=auxp(2)
-     opt_fun(27)=auxp(3)
-     opt_fun(28)=auxp(4)
+  if (.not.centre .or. centre_bttk) then
+     opt_fun(19) = wx
+     opt_fun(20) = phix
+     opt_fun(21) = dmux
+     opt_fun(22) = wy
+     opt_fun(23) = phiy
+     opt_fun(24) = dmuy
+
+     OPT_FUN(25:28) = AUXP(1:4)
   endif
-  if(centre_bttk) then
-     alfx=alfx0
-     alfy=alfy0
-     betx=betx0
-     bety=bety0
-     amux=amux0
-     amuy=amuy0
-     wx=wx0
-     wy=wy0
-     dmux=dmux0
-     dmuy=dmuy0
-     phix=phix0
-     phiy=phiy0
-     do i=1,2
-        do j=1,2
-           rmat(i,j)=rmat0(i,j)
-        enddo
-     enddo
+
+  if (centre_bttk) then
+     alfx = alfx0
+     alfy = alfy0
+     betx = betx0
+     bety = bety0
+     amux = amux0
+     amuy = amuy0
+     wx = wx0
+     wy = wy0
+     dmux = dmux0
+     dmuy = dmuy0
+     phix = phix0
+     phiy = phiy0
+     RMAT(:2,:2) = RMAT0(:2,:2)
   endif
 
 end SUBROUTINE twbttk
 
-
 SUBROUTINE tw_summ(rt,tt)
-
   use twiss0fi
   use twisscfi
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Compute summary data for TWISS and OPTICS commands.              *
@@ -2106,41 +1977,43 @@ SUBROUTINE tw_summ(rt,tt)
   !     rt(6,6)   (double)  one turn transfer matrix.                    *
   !     tt(6,6,6) (double)  second order terms.                          *
   !----------------------------------------------------------------------*
-  integer i,get_option
-  double precision rt(6,6),tt(6,6,6),deltap,sd,betas,gammas,        &
-       disp0(6),detl,f,tb,frt(6,6),frtp(6,6),rtp(6,6),t2,bx0,ax0,by0,ay0,&
-       sx,sy,orbit5,twopi,get_variable,get_value,zero,one,two
-  parameter(zero=0d0,one=1d0,two=2d0)
+  double precision :: rt(6,6), tt(6,6,6)
+
+  integer :: i
+  double precision :: deltap, sd, betas, gammas, detl, f, tb, t2
+  double precision :: disp0(6), frt(6,6), frtp(6,6), rtp(6,6)
+  double precision :: bx0, ax0, by0, ay0, sx, sy, orbit5, twopi
+
+  integer, external :: get_option
+  double precision, external :: get_variable, get_value
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0
 
   !---- Initialization chromatic part
-  twopi=get_variable('twopi ')
-  call dzero(rtp,36)
-  call dzero(frt,36)
-  call dzero(frtp,36)
+  twopi = get_variable('twopi ')
+  RTP = zero 
+  FRT = zero 
+  FRTP = zero 
   deltap = get_value('probe ','deltap ')
   betas = get_value('probe ','beta ')
   gammas= get_value('probe ','gamma ')
-  disp0(1)=opt_fun0(15)
-  disp0(2)=opt_fun0(16)
-  disp0(3)=opt_fun0(17)
-  disp0(4)=opt_fun0(18)
-  wx      =opt_fun(19)
-  phix    =opt_fun(20)
-  dmux    =opt_fun(21)
-  wy      =opt_fun(22)
-  phiy    =opt_fun(23)
-  dmuy    =opt_fun(24)
-  ddisp(1)=opt_fun(25)
-  ddisp(2)=opt_fun(26)
-  ddisp(3)=opt_fun(27)
-  ddisp(4)=opt_fun(28)
+
+  DISP0(1:4) = OPT_FUN0(15:18)
+
+  wx      = opt_fun(19)
+  phix    = opt_fun(20)
+  dmux    = opt_fun(21)
+  wy      = opt_fun(22)
+  phiy    = opt_fun(23)
+  dmuy    = opt_fun(24)
+
+  DDISP(1:4) = OPT_FUN(25:28)
 
   !---- Summary data for non-periodic case.
-  if(get_option('twiss_inval ') .ne. 0) then
+  if (get_option('twiss_inval ') .ne. 0) then
      detl = rt(5,5) * rt(6,6) - rt(5,6) * rt(6,5)
      f = one / sqrt(detl)
-     call m66scl(f,rt,frt)
-     call m66scl(f,rtp,frtp)
+     FRT  = f * RT  
+     FRTP = f * RTP 
      tb = frt(1,1) * betx - frt(1,2) * alfx
      t2 = tb**2 + frt(1,2)**2
      bx0 = wx * cos(phix)
@@ -2155,10 +2028,10 @@ SUBROUTINE tw_summ(rt,tt)
      xiy = dmuy + frt(3,4) * (frt(3,4) * ay0 - tb * by0) / t2        &
           + (frt(3,3) * frtp(3,4) - frt(3,4) * frtp(3,3)) / bety
      xiy = xiy / twopi
-     alfa  =zero
-     gamtr =zero
-     cosmux=zero
-     cosmuy=zero
+     alfa  = zero
+     gamtr = zero
+     cosmux = zero
+     cosmuy = zero
 
      !---- Summary data for periodic case.
   else
@@ -2170,30 +2043,33 @@ SUBROUTINE tw_summ(rt,tt)
         sx = sx + (tt(1,1,i) + tt(2,2,i)) * disp0(i)
         sy = sy + (tt(3,3,i) + tt(4,4,i)) * disp0(i)
      enddo
+
      xix = - sx / (twopi * sinmux)
      xiy = - sy / (twopi * sinmuy)
      eta = - sd * betas**2 / suml
+
      alfa = one / gammas**2 + eta
-     if (alfa.gt.zero) then
+     if (alfa .gt. zero) then
         gamtr = sqrt(one / alfa)
-     else if (alfa .eq. zero) then
-        gamtr = zero
-     else
+     else if (alfa .lt. zero) then
         gamtr = - sqrt(- one / alfa)
+     else
+        gamtr = zero
      endif
   endif
 
   !---- Initialization transverse part
-  !---  fix length problem - HG 14.4.08
   suml    = currpos
-  !     suml    = currpos-get_value('sequence ','range_start ')
-  !---  end of fix length problem - HG 14.4.08
   betx    = opt_fun0(3)
   alfx    = opt_fun0(4)
+
   amux    = opt_fun(5)
+
   bety    = opt_fun0(6)
   alfy    = opt_fun0(7)
+
   amuy    = opt_fun(8)
+
   qx = amux / twopi
   qy = amuy / twopi
 
@@ -2204,13 +2080,13 @@ SUBROUTINE tw_summ(rt,tt)
   ycomax = ycomax
   sigyco = sigyco
 
-  !     if(opt_fun0(29).ne.zero.or.opt_fun0(30).ne.zero.or.             &
-  !      opt_fun0(31).ne.zero.or.opt_fun0(32).ne.zero) then
+  ! if (opt_fun0(29).ne.zero.or.opt_fun0(30).ne.zero.or.             &
+  !     opt_fun0(31).ne.zero.or.opt_fun0(32).ne.zero) then
   !     call fort_warn('Chromaticity calculation wrong due to coupling',&
-  !      'use manual derivative or madxp')
-  !     frs         xix=zero ! The punishment was too harsh!!!!
+  !       'use manual derivative or madxp')
+  !     xix=zero ! frs : The punishment was too harsh!!!!
   !     xiy=zero
-  !     endif
+  ! endif
 
   !---- Fill summary table
   call double_to_table_curr('summ ','length ' ,suml)
@@ -2245,8 +2121,8 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
   use twtrrfi
   use name_lenfi
   use time_varfi
+  use matrices, only: EYE
   implicit none
-
   !----------------------------------------------------------------------*
   !     purpose:                                                         *
   !     transport map for a complete element.                            *
@@ -2265,154 +2141,90 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  integer code
-  logical fsec, ftrk, fmap
-  double precision node_value,el,orbit(6),ek(6),re(6,6),te(6,6,6)
-  double precision plot_tilt,zero
-  parameter (zero = 0.d0)
+  integer :: code
+  logical :: fsec, ftrk, fmap
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+  double precision :: plot_tilt, el
+  double precision :: node_value
+  double precision, parameter :: zero = 0.d0
+
   !---- Initialization
-  time_var_p=.false.     
-  call dzero(ek,6)
-  call m66one(re)
-  call dzero(te,216)
-  plot_tilt=zero
-  fmap=.false.
+  EK = zero 
+  RE = EYE !call m66one(re)
+  TE = zero 
+  plot_tilt = zero
+  fmap = .false.
+  time_var_p = .false.     
+
   el = node_value('l ')
+
   !---- Select element type.
-  go to ( 10,  20,  30,  40,  50,  60,  70,  80,  90, 100,      &
-       110, 120, 130, 140, 150, 160, 170, 180, 190, 200,        &
-       210, 220, 230, 240, 250, 260,  10, 280, 290, 310,        &
-       310, 310, 300, 310, 310, 310, 310, 310, 310, 310,	&
-       310, 420, 430, 440), code  ! Enable non-linear thin lens and RF-Multipole  
-  !     310, 310, 310), ! Disable non-linear thin lens and RF-Multipole
-  ! 2015-Mar-18  14:04:54  ghislain: code 44 is temporary for collimators different from ecoll (code 20) and rcoll (code 21)
+  select case (code)
+     
+     case (1, 17:21, 24, 27, 44) !---- Drift space, monitor, collimator, or beam instrument.
+        call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
+        
+     case (2, 3) !---- Bending magnet.
+        call tmbend(ftrk,orbit,fmap,el,ek,re,te)
 
-  !---- Drift space, monitor, collimator, or beam instrument.
-10 continue
-170 continue
-180 continue
-190 continue
-200 continue
-210 continue
-240 continue
-440 continue
-  call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
-  go to 500
+     case (4) !---- Arbitrary matrix.
+        call tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
 
-  !---- Bending magnet.
-20 continue
-30 continue
-  call tmbend(ftrk,orbit,fmap,el,ek,re,te)
-  go to 500
+     case (5) !---- Quadrupole.
+        call tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)   
 
-  !---- Arbitrary matrix.
-40 continue
-  call tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
-  go to 500
+     case (6) !---- Sextupole.
+        call tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
-  !---- Quadrupole.
-50 continue
-  call tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
-  go to 500
+     case (7) !---- Octupole.
+        call tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
-  !---- Sextupole.
-60 continue
-  call tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
-  go to 500
+     case (8) !---- Multipole.
+        call tmmult(fsec,ftrk,orbit,fmap,re,te)
 
-  !---- Octupole.
-70 continue
-  call tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
-  go to 500
+     case (9) !---- Solenoid.
+        call tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
-  !---- Multipole.
-80 continue
-  call tmmult(fsec,ftrk,orbit,fmap,re,te)
-  go to 500
+     case (10) !---- RF cavity.
+        call tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
-  !---- Solenoid.
-90 continue
-  call tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
-  go to 500
+     case (11) !---- Electrostatic separator.
+        call tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
-  !---- RF cavity.
-100 continue
-  call tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
-  go to 500
+     case (12) !---- Rotation around s-axis.
+        call tmsrot(ftrk,orbit,fmap,ek,re,te)
 
-  !---- Electrostatic separator.
-110 continue
-  call tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
-  go to 500
+     case (13) !---- Rotation around y-axis.
+        call tmyrot(ftrk,orbit,fmap,ek,re,te)
 
-  !---- Rotation around s-axis.
-120 continue
-  call tmsrot(ftrk,orbit,fmap,ek,re,te)
-  go to 500
+     case (14:16) !---- Correctors.
+        call tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
-  !---- Rotation around y-axis.
-130 continue
-  call tmyrot(ftrk,orbit,fmap,ek,re,te)
-  go to 500
+     case (22) !---- Beam-beam. (Particles/bunch taken for the opposite beam).
+        call tmbb(fsec,ftrk,orbit,fmap,re,te)
 
-  !---- Correctors.
-140 continue
-150 continue
-160 continue
-  call tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
-  go to 500
+     case (33) !--- Dipedge
+        call tmdpdg(ftrk,orbit,fmap,ek,re,te)
 
-  !---- Beam-beam.
-220 continue
-  !     (Particles/bunch taken for the opposite beam).
-  call tmbb(fsec,ftrk,orbit,fmap,re,te)
-  go to 500
+     case (42) !---- non-linear thin lens
+        call tmnll(fsec,ftrk,orbit,fmap,ek,re,te)
 
-  !---- Lump.
-230 continue
-  go to 500
+     case (43) !---- RF-Multipole.
+        call tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
 
-  !---- Marker.
-250 continue
-  go to 500
+     case default !--- anything else
+        
+     end select
 
-  !---- General bend (dipole, quadrupole, and skew quadrupole).
-260 continue
-  go to 500
-
-  !---- LCAV cavity.
-  continue
-
-  !---- Reserved.
-280 continue
-290 continue
-  go to 500
-300 call tmdpdg(ftrk,orbit,fmap,ek,re,te)
-  go to 500
-
-  !---- non-linear thin lens
-420 continue
-  call tmnll(fsec,ftrk,orbit,fmap,ek,re,te)
-  go to 500
-
-  !---- RF-Multipole.
-430 continue
-  call tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
-  go to 500
-
-  !---- User-defined elements.
-310 continue
-
-  !---- End of element calculation;
-500 continue
 end SUBROUTINE tmmap
 
 SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
+  use matrices
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for sector bending magnets                         *
@@ -2427,35 +2239,35 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical ftrk,fmap,cplxy,dorad
-  integer nd,n_ferr,node_fd_errors,code
-  double precision orbit(6),f_errors(0:maxferr),ek(6),re(6,6),      &
-       te(6,6,6),rw(6,6),tw(6,6,6),x,y,deltap,field(2,0:maxmul),fintx,   &
-       el,tilt,e1,e2,sk1,sk2,h1,h2,hgap,fint,sks,an,h,dh,corr,ek0(6),ct, &
-       st,hx,hy,rfac,arad,gamma,pt,rhoinv,blen,node_value,get_value,bvk, &
-       el0,orbit0(6),zero,one,two,three
-  double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
-  integer, external :: el_par_vector
-  integer elpar_vl
-  parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
+  logical :: ftrk, fmap
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6), el
+
+  logical :: cplxy, dorad
+  integer :: elpar_vl
+  integer :: nd, n_ferr, code
+  double precision :: f_errors(0:maxferr)
+  double precision :: field(2,0:maxmul)
+  double precision :: rw(6,6), tw(6,6,6), ek0(6), orbit0(6)
+  double precision :: x, y, deltap=0.d0
+  double precision :: an, sk1, sk2, sks, tilt, e1, e2, h, h1, h2, hgap, fint, fintx, rhoinv, blen, bvk
+  double precision :: dh, corr, ct=0.d0, st=0.d0, hx, hy, rfac, arad, gamma, pt, el0
+  double precision :: orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
+
+  integer, external :: el_par_vector, node_fd_errors
+  double precision, external :: node_value, get_value
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0
 
   !---- Initialize.
-  ct=zero
-  st=zero
+  EK0 = zero 
+  RW = EYE !call m66one(rw)
+  TW = zero 
+
   code = node_value('mad8_type ')
-  if(code.eq.39) code=15
-  if(code.eq.38) code=24
-  deltap=zero
-  call dzero(ek0,6)
-  call m66one(rw)
-  call dzero(tw,216)
 
   !---- Test for non-zero length.
-
   fmap = el .ne. zero
+
   if (fmap) then
-     call dzero(f_errors,maxferr+1)
-     n_ferr = node_fd_errors(f_errors)
      !-- get element parameters
      elpar_vl = el_par_vector(b_k3s, g_elpar)
      bvk = node_value('other_bv ')
@@ -2468,13 +2280,12 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
      e1 = g_elpar(b_e1)
      e2 = g_elpar(b_e2)
 
-     if(code.eq.2) then
+     if (code.eq.2) then ! RBEND
         e1 = e1 + an / two
         e2 = e2 + an / two
      endif
 
      !---  bvk also applied further down
-
      sk1 = g_elpar(b_k1)
      sk2 = g_elpar(b_k2)
      h1 = g_elpar(b_h1)
@@ -2485,24 +2296,13 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
      sks = g_elpar(b_k1s)
      h = an / el
 
-      !---- Apply field errors and change coefficients using DELTAP.
-     if (n_ferr .gt. 0) then
-        nd = n_ferr
-        call dzero(field,nd)
-        call dcopy(f_errors,field,n_ferr)
-        dh = (- h * deltap + bvk * field(1,0) / el) / (one + deltap)
-        sk1 = (sk1 + field(1,1) / el) / (one + deltap)
-        sk2 = (sk2 + field(1,2) / el) / (one + deltap)
-        sks = (sks + field(2,1) / el) / (one + deltap)
-     else
-        dh = - h * deltap / (one + deltap)
-        sk1 = sk1 / (one + deltap)
-        sk2 = sk2 / (one + deltap)
-        sks = sks / (one + deltap)
-     endif
-     sk1 = bvk * sk1
-     sk2 = bvk * sk2
-     sks = bvk * sks
+     !---- Apply field errors and change coefficients using DELTAP.
+     F_ERRORS = zero 
+     n_ferr = node_fd_errors(f_errors)
+     dh = (- h * deltap + bvk * f_errors(0) / el) / (one + deltap)
+     sk1 = bvk * (sk1 + f_errors(2) / el) / (one + deltap)
+     sk2 = bvk * (sk2 + f_errors(4) / el) / (one + deltap)
+     sks = bvk * (sks + f_errors(3) / el) / (one + deltap)        
 
      !---- Half radiation effects at entrance.
      if (ftrk .and. dorad) then
@@ -2510,11 +2310,10 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
         st = sin(tilt)
         x =   orbit(1) * ct + orbit(3) * st
         y = - orbit(1) * st + orbit(3) * ct
-        hx = h + dh + sk1*(x - h*y**2/two) + sks*y +                  &
-             sk2*(x**2 - y**2)/two
+        hx = h + dh + sk1*(x - h*y**2/two) + sks*y + sk2*(x**2 - y**2)/two
         hy = sks * x - sk1*y - sk2*x*y
-        rfac = (arad * gamma**3 * el / three)                         &
-             * (hx**2 + hy**2) * (one + h*x) * (one - tan(e1)*x)
+        rfac = (arad * gamma**3 * el / three) * & 
+             (hx**2 + hy**2) * (one + h*x) * (one - tan(e1)*x)
         pt = orbit(6)
         orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
         orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
@@ -2523,11 +2322,11 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
 
      !---- Body of the dipole.
      !---- centre option
-     if(centre_cptk.or.centre_bttk) then
-        call dcopy(orbit,orbit00,6)
-        call dcopy(ek,ek00,6)
-        call dcopy(re,re00,36)
-        call dcopy(te,te00,216)
+     if (centre_cptk .or. centre_bttk) then
+        ORBIT00 = ORBIT 
+        EK00 = EK 
+        RE00 = RE 
+        TE00 = TE 
         el0=el/two
         call tmsect(.true.,el0,h,dh,sk1,sk2,ek,re,te)
         !---- Fringe fields.
@@ -2540,14 +2339,14 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
            cplxy = .true.
         endif
         !---- Track orbit.
-        call dcopy(orbit,orbit0,6)
+        ORBIT0 = ORBIT 
         if (ftrk) call tmtrak(ek,re,te,orbit0,orbit0)
-        if(centre_cptk) call twcptk(re,orbit0)
-        if(centre_bttk) call twbttk(re,te)
-        call dcopy(orbit00,orbit,6)
-        call dcopy(ek00,ek,6)
-        call dcopy(re00,re,36)
-        call dcopy(te00,te,216)
+        if (centre_cptk) call twcptk(re,orbit0)
+        if (centre_bttk) call twbttk(re,te)
+        ORBIT = ORBIT00 
+        EK = EK00
+        RE = RE00 
+        TE = TE00 
      endif
      !---- End
 
@@ -2557,12 +2356,10 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
      corr = (h + h) * hgap * fint
      call tmfrng(.true.,h,sk1,e1,h1,one,corr,rw,tw)
      call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
-     !---- Tor: use FINTX if set
-     if (fintx .ge. 0) then
-        corr = (h + h) * hgap * fintx
-     else
-        corr = (h + h) * hgap * fint
-     endif
+     
+     if (fintx .lt. 0) fintx = fint
+
+     corr = (h + h) * hgap * fintx
      call tmfrng(.true.,h,sk1,e2,h2,-one,corr,rw,tw)
      call tmcat1(.true.,ek0,rw,tw,ek,re,te,ek,re,te)
 
@@ -2580,11 +2377,10 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
         if (ftrk .and. dorad) then
            x =   orbit(1) * ct + orbit(3) * st
            y = - orbit(1) * st + orbit(3) * ct
-           hx = h + dh + sk1*(x - h*y**2/two) + sks*y +                &
-                sk2*(x**2 - y**2)/two
+           hx = h + dh + sk1*(x - h*y**2/two) + sks*y + sk2*(x**2 - y**2)/two
            hy = sks * x - sk1*y - sk2*x*y
-           rfac = (arad * gamma**3 * el / three)                       &
-                * (hx**2 + hy**2) * (one + h*x) * (one - tan(e2)*x)
+           rfac = (arad * gamma**3 * el / three) * &
+                (hx**2 + hy**2) * (one + h*x) * (one - tan(e2)*x)
            pt = orbit(6)
            orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
            orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
@@ -2593,15 +2389,11 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
      endif
   endif
 
-  !---- Tor: set parameters for sychrotron integral calculations
-!  rhoinv = h
-!  blen = el
-
 end SUBROUTINE tmbend
+
 SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
-
+  use matrices, only: EYE
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for a sector dipole without fringe fields.         *
@@ -2617,26 +2409,35 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec
-  double precision beta,gamma,dtbyds,bi,bi2,bi2gi2,cm,cp,cx,cy,cyy, &
-       dd,dh,difsq,dm,dp,dx,dyy,ek(6),el,fm,fp,fx,fyy,gx,h,h2,hx,re(6,6),&
-       sk1,sk2,sm,sp,sumsq,sx,sy,syy,t1,t116,t126,t166,t2,t216,t226,t266,&
-       t336,t346,t436,t446,t5,t516,t526,t566,te(6,6,6),xk,xkl,xklsq,xksq,&
-       xs6,y0,y1,y2,y2klsq,y2ksq,yk,ykl,yklsq,yksq,ys2,zc,zd,zf,zs,      &
-       get_value,zero,one,two,three,four,six,nine,twelve,fifteen,twty,   &
-       twty2,twty4,thty,foty2,fvty6,svty2,httwty,c1,c2,c3,c4,s1,s2,s3,s4,&
-       cg0,cg1,cg2,ch0,ch1,ch2
-  parameter(zero=0d0,one=1d0,two=2d0,three=3d0,four=4d0,six=6d0,    &
-       nine=9d0,twelve=12d0,fifteen=15d0,twty=20d0,twty2=22d0,twty4=24d0,&
-       thty=30d0,foty2=42d0,fvty6=56d0,svty2=72d0,httwty=120d0,c1=one,   &
-       c2=one/two,c3=one/twty4,c4=one/720d0,s1=one,s2=one/six,           &
-       s3=one/httwty,s4=one/5040d0,cg0=one/twty,cg1=5d0/840d0,           &
-       cg2=21d0/60480d0,ch0=one/fvty6,ch1=14d0/4032d0,ch2=147d0/443520d0)
+  logical, intent(IN) :: fsec
+  double precision :: el, h, dh, sk1, sk2
+  double precision :: ek(6), re(6,6), te(6,6,6)
+
+  double precision :: beta, gamma, dtbyds
+  double precision :: bi, bi2, bi2gi2
+  double precision :: cm, cp, cx, cy, cyy, dd, difsq, dm, dp, dx, dyy
+  double precision :: fm, fp, fx, fyy, gx, h2, hx, sm, sp, sumsq, sx, sy, syy
+  double precision :: t1, t116, t126, t166, t2, t216, t226, t266
+  double precision :: t336, t346, t436, t446, t5, t516, t526, t566
+  double precision :: xk, xkl, xklsq, xksq, xs6 
+  double precision :: y0, y1, y2, y2klsq, y2ksq, yk, ykl, yklsq, yksq, ys2
+  double precision :: zc, zd, zf, zs      
+
+  double precision, external :: get_value
+
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0, four=4d0
+  double precision, parameter :: six=6d0, nine=9d0, twelve=12d0, fifteen=15d0
+  double precision, parameter :: twty=20d0, twty2=22d0, twty4=24d0, thty=30d0
+  double precision, parameter :: foty2=42d0, fvty6=56d0, svty2=72d0, httwty=120d0
+  double precision, parameter :: c1=one, c2=one/two, c3=one/twty4, c4=one/720d0
+  double precision, parameter :: s1=one, s2=one/six, s3=one/httwty, s4=one/5040d0
+  double precision, parameter :: cg0=one/twty, cg1=5d0/840d0, cg2=21d0/60480d0
+  double precision, parameter :: ch0=one/fvty6, ch1=14d0/4032d0, ch2=147d0/443520d0
 
   !---- Initialize.
-  call dzero(ek, 6)
-  call m66one(re)
-  if (fsec) call dzero(te, 216)
+  EK = zero 
+  RE = EYE !call m66one(re)
+  if (fsec) TE = zero 
   beta = get_value('probe ','beta ')
   gamma = get_value('probe ','gamma ')
   dtbyds = get_value('probe ','dtbyds ')
@@ -2649,6 +2450,7 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
   xk = sqrt(abs(xksq))
   xkl = xk * el
   xklsq = xksq * el**2
+
   if (abs(xklsq) .lt. 1e-2) then
      cx = (c1 - xklsq * (c2 - xklsq*c3))
      sx = (s1 - xklsq * (s2 - xklsq*s3)) * el
@@ -2669,6 +2471,7 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
      gx = (three*el - sx*(four-cx)) / (two*xksq**2)
      hx = (fifteen*el - sx*(twty2-nine*cx+two*cx**2)) / (six*xksq**3)
   endif
+
   re(1,1) = cx
   re(1,2) = sx
   re(1,6) = h * dx * bi
@@ -2678,6 +2481,7 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
   re(5,2) = - re(1,6)
   re(5,1) = - re(2,6)
   re(5,6) = el*bi2gi2 - h**2*fx*bi2
+
   ek(1) = - dh*dx
   ek(2) = - dh*sx
   ek(5) =   h*dh*fx*bi + el*dtbyds
@@ -2687,6 +2491,7 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
   yk = sqrt(abs(yksq))
   ykl = yk*el
   yklsq = yksq*el**2
+
   if (abs(yklsq) .lt. 1e-2) then
      cy = (c1 - yklsq * (c2 - yklsq*c3))
      sy = (s1 - yklsq * (s2 - yklsq*s3)) * el
@@ -2697,10 +2502,12 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
      cy = cosh(ykl)
      sy = sinh(ykl) / yk
   endif
+ 
   re(3,3) = cy
   re(3,4) = sy
   re(4,3) = - yksq * sy
   re(4,4) = cy
+
   ek(3)   = zero
   ek(4)   = zero
 
@@ -2710,20 +2517,21 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
      xs6 = (sk2 + two*h*sk1) / six
      ys2 = (sk2 +     h*sk1) / two
      h2 = h / two
+
      t116 = xs6 * (three*sx*fx - dx**2) - h * sx**2
      t126 = xs6 * (sx*dx**2 - two*cx*gx) - h * sx * dx
      t166 = xs6 * (dx**3 - two*sx*gx) - h2 * dx**2
      t216 = xs6 * (three*cx*fx + sx*dx)
      t226 = xs6 * (three*sx*fx + dx**2)
      t266 = xs6 * (sx*dx**2 - two*cx*gx)
-     t516 = h * xs6 * (three*dx*fx - four*gx) +                      &
-          (sk1/two) * (fx + sx*dx)
+     t516 = h * xs6 * (three*dx*fx - four*gx) + (sk1/two) * (fx + sx*dx)
      t526 = h * xs6 * (dx**3 - two*sx*gx) + (sk1/two) * dx**2
-     t566 = h * xs6 * (three*hx - two*dx*gx) +                       &
-          (sk1/two) * gx - fx
+     t566 = h * xs6 * (three*hx - two*dx*gx) + (sk1/two) * gx - fx
+
      t1 = (sk1/two) * (dx**2 - sx*fx) - dx
      t2 = (sk1/two) * (el*dx - fx)
      t5 = fx - sk1 * (gx - fx*dx / two)
+
      te(1,1,1) = - xs6 * (sx**2 + dx) - h2*xksq*sx**2
      te(1,1,2) = (- xs6*dx + h2*cx) * sx
      te(1,2,2) = (- xs6*dx + h2*cx) * dx
@@ -2736,21 +2544,18 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
      te(2,1,6) = (- h2*t216 - (sk1/four) * (sx - el*cx)) * bi
      te(2,2,6) = (- h2*t226 + (sk1/four) * el * sx) * bi
      te(2,6,6) = (- h**2*t266 + h*t2) * bi2 - h2 * sx * bi2gi2
-     te(5,1,1) = (h2*xs6 * (sx*dx + three*fx) -                      &
-          (sk1/four) * (el - cx*sx)) * bi
+     te(5,1,1) = (h2*xs6 * (sx*dx + three*fx) - (sk1/four) * (el - cx*sx)) * bi
      te(5,1,2) = (h2*xs6*dx**2 + (sk1/four)*sx**2) * bi
      te(5,2,2) = (h*xs6*gx - sk1 * (fx - sx*dx) / four - sx/two) * bi
-     te(5,1,6) = h2 * ((t516 - sk1 * (el*dx - fx) / two) * bi2 +     &
-          sx * bi2gi2)
-     te(5,2,6) = h2 * ((t526 - sk1 * (dx**2 - sx*fx) / two) * bi2 +  &
-          dx * bi2gi2)
-     te(5,6,6) = (h**2 * (t566 + t5) * bi2 +                         &
-          (three/two) * (h**2*fx - el) * bi2gi2) * bi
+     te(5,1,6) = h2 * ((t516 - sk1 * (el*dx - fx) / two) * bi2 + sx * bi2gi2)
+     te(5,2,6) = h2 * ((t526 - sk1 * (dx**2 - sx*fx) / two) * bi2 + dx * bi2gi2)
+     te(5,6,6) = (h**2 * (t566 + t5) * bi2 + (three/two) * (h**2*fx - el) * bi2gi2) * bi
 
      !---- Mixed terms.
      y2ksq = four * yksq
      call tmfoc(el,y2ksq,cyy,syy,dyy,fyy)
      y2klsq = y2ksq * el**2
+
      if (max(abs(y2klsq),abs(xklsq)) .le. 1e-2) then
         y0 = one
         y1 = xklsq + y2klsq
@@ -2780,10 +2585,12 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
            zf = (fx - zs) / y2ksq
         endif
      endif
+
      t336 = sk2 * (cy*zd - two*sk1*sy*zf) + h * sk1 * fx * sy
      t346 = sk2 * (sy*zd - two*cy*zf) + h * fx * cy
      t436 = two * ys2 * fx * cy - sk2 * sk1 * (sy*zd - two*cy*zf)
      t446 = two * ys2 * fx * sy - sk2 * (cy*zd - two*sk1*sy*zf)
+
      te(1,3,3) = + sk2*sk1*zd + ys2*dx
      te(1,3,4) = + sk2*zs/two
      te(1,4,4) = + sk2*zd - h2*dx
@@ -2817,12 +2624,12 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
         re(2,6) = re(2,6) + dh * (two*h*t266 - t2) * bi
         re(5,1) = re(5,1) - dh * t516 * bi
         re(5,2) = re(5,2) - dh * (t526 - dx) * bi
-        re(5,6) = re(5,6) -                                           &
-             dh * h * ((two*t566 + t5) * bi2 + fx * bi2gi2)
+        re(5,6) = re(5,6) - dh * h * ((two*t566 + t5) * bi2 + fx * bi2gi2)
         re(3,3) = re(3,3) - dh * t336
         re(3,4) = re(3,4) - dh * t346
         re(4,3) = re(4,3) - dh * t436
         re(4,4) = re(4,4) - dh * t446
+
         ek(1) = ek(1) - dh**2 * t166
         ek(2) = ek(2) - dh**2 * t266
         ek(5) = ek(5) + dh**2 * t566 * bi
@@ -2830,10 +2637,9 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
   endif
 
 end SUBROUTINE tmsect
+
 SUBROUTINE tmsymm(t)
-
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Symmetrize second-order array T.                                 *
@@ -2842,8 +2648,9 @@ SUBROUTINE tmsymm(t)
   !     Output:                                                          *
   !     t(6,6,6)  (double)  symmetrized array.                           *
   !----------------------------------------------------------------------*
-  integer i,k,l
-  double precision t(6,6,6)
+  double precision :: t(6,6,6)
+
+  integer :: i, k, l
 
   do k = 1, 5
      do l = k+1, 6
@@ -2854,10 +2661,10 @@ SUBROUTINE tmsymm(t)
   enddo
 
 end SUBROUTINE tmsymm
+
 SUBROUTINE tmfrng(fsec,h,sk1,edge,he,sig,corr,re,te)
-
+  use matrices, only : EYE
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for fringe field of a dipole.                      *
@@ -2873,14 +2680,16 @@ SUBROUTINE tmfrng(fsec,h,sk1,edge,he,sig,corr,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec
-  double precision corr,edge,h,he,hh,psip,re(6,6),secedg,sig,sk1,   &
-       tanedg,te(6,6,6),zero,one
-  parameter(zero=0d0,one=1d0)
+  logical :: fsec
+  double precision h, sk1, edge, he, sig, corr 
+  double precision :: re(6,6), te(6,6,6)
 
-  call m66one(re)
-  if (fsec) call dzero(te, 216)
+  double precision :: hh, psip, secedg, tanedg
+
+  double precision, parameter :: zero=0d0, one=1d0
+
   !---- Linear terms.
+  RE = EYE !call m66one(re)
   tanedg = tan(edge)
   secedg = one / cos(edge)
   psip = edge - corr * secedg * (one + sin(edge)**2)
@@ -2889,6 +2698,7 @@ SUBROUTINE tmfrng(fsec,h,sk1,edge,he,sig,corr,re,te)
 
   !---- Second-order terms.
   if (fsec) then
+     TE = zero
      hh = sig * (h/2)
      te(1,1,1) = - hh * tanedg**2
      te(1,3,3) = + hh * secedg**2
@@ -2910,10 +2720,9 @@ SUBROUTINE tmfrng(fsec,h,sk1,edge,he,sig,corr,re,te)
   endif
 
 end SUBROUTINE tmfrng
+
 SUBROUTINE tmcat1(fsec,eb,rb,tb,ea,ra,ta,ed,rd,td)
-
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Concatenate two TRANSPORT maps including zero-order terms.       *
@@ -2925,31 +2734,51 @@ SUBROUTINE tmcat1(fsec,eb,rb,tb,ea,ra,ta,ed,rd,td)
   !     Output:                                                          *
   !     ed(6), rd(6,6), td(6,6,6)  result map.                           *
   !----------------------------------------------------------------------*
-  logical fsec
-  integer i,ij,j,k
-  double precision ea(6),eb(6),ed(6),ew(6),es(6,6),ra(6,6),rb(6,6), &
-       rd(6,6),rw(6,6),ta(6,6,6),td(6,6,6),tw(6,6,6),tb(36,6),ts(36,6),  &
-       two
-  parameter(two=2d0)
+  logical :: fsec
+  double precision, intent(IN)  :: ea(6), ra(6,6), ta(6,6,6)
+  double precision, intent(IN)  :: eb(6), rb(6,6), tb(36,6)
+  double precision, intent(OUT) :: ed(6), rd(6,6), td(6,6,6)
 
-  !---- Second order terms.
-  if (fsec) then
+  integer :: i, ij, j, k
+  double precision :: ew(6), rw(6,6), tw(6,6,6), es(6,6), ts(36,6)
+  
+  double precision, parameter :: two=2d0
+
+  
+  if ( .not. fsec) then
+     !---- First order only
+     do k = 1, 6
+        !---- Zero-order terms.
+        ew(k) = eb(k) + rb(k,1) * ea(1) + rb(k,2) * ea(2) &
+                      + rb(k,3) * ea(3) + rb(k,4) * ea(4) &
+                      + rb(k,5) * ea(5) + rb(k,6) * ea(6) 
+
+        !---- First-order terms.
+        do j = 1, 6
+           rw(j,k) = rb(j,1) * ra(1,k) + rb(j,2) * ra(2,k) &
+                   + rb(j,3) * ra(3,k) + rb(j,4) * ra(4,k) &
+                   + rb(j,5) * ra(5,k) + rb(j,6) * ra(6,k)
+        enddo
+     enddo
+
+  else
+     !---- Second order terms.
 
      !---- Auxiliary terms.
      do k = 1, 6
 
         !---- Sum over S of TB(I,S,K) * EA(S).
         do i = 1, 6
-           es(i,k) = tb(i   ,k) * ea(1) + tb(i+ 6,k) * ea(2)           &
-                + tb(i+12,k) * ea(3) + tb(i+18,k) * ea(4)                         &
-                + tb(i+24,k) * ea(5) + tb(i+30,k) * ea(6)
+           es(i,k) = tb(i   ,k) * ea(1) + tb(i+ 6,k) * ea(2) &
+                   + tb(i+12,k) * ea(3) + tb(i+18,k) * ea(4) &
+                   + tb(i+24,k) * ea(5) + tb(i+30,k) * ea(6) 
         enddo
 
         !---- Sum over S of TB(I,J,S) * RA(S,K).
         do ij = 1, 36
-           ts(ij,k) = tb(ij,1) * ra(1,k) + tb(ij,2) * ra(2,k)          &
-                + tb(ij,3) * ra(3,k) + tb(ij,4) * ra(4,k)                         &
-                + tb(ij,5) * ra(5,k) + tb(ij,6) * ra(6,k)
+           ts(ij,k) = tb(ij,1) * ra(1,k) + tb(ij,2) * ra(2,k) &
+                    + tb(ij,3) * ra(3,k) + tb(ij,4) * ra(4,k) &
+                    + tb(ij,5) * ra(5,k) + tb(ij,6) * ra(6,k)
         enddo
      enddo
 
@@ -2957,68 +2786,50 @@ SUBROUTINE tmcat1(fsec,eb,rb,tb,ea,ra,ta,ed,rd,td)
      do k = 1, 6
 
         !---- Zero-order terms.
-        ew(k) = eb(k) + (rb(k,1) + es(k,1)) * ea(1)                   &
-             + (rb(k,2) + es(k,2)) * ea(2)                                     &
-             + (rb(k,3) + es(k,3)) * ea(3)                                     &
-             + (rb(k,4) + es(k,4)) * ea(4)                                     &
-             + (rb(k,5) + es(k,5)) * ea(5)                                     &
-             + (rb(k,6) + es(k,6)) * ea(6)
+        ew(k) = eb(k) + (rb(k,1) + es(k,1)) * ea(1) &
+                      + (rb(k,2) + es(k,2)) * ea(2) &
+                      + (rb(k,3) + es(k,3)) * ea(3) &
+                      + (rb(k,4) + es(k,4)) * ea(4) &
+                      + (rb(k,5) + es(k,5)) * ea(5) &
+                      + (rb(k,6) + es(k,6)) * ea(6)
 
         !---- First-order terms.
         do j = 1, 6
-           rw(j,k) = (rb(j,1) + two * es(j,1)) * ra(1,k)               &
-                + (rb(j,2) + two * es(j,2)) * ra(2,k)                             &
-                + (rb(j,3) + two * es(j,3)) * ra(3,k)                             &
-                + (rb(j,4) + two * es(j,4)) * ra(4,k)                             &
-                + (rb(j,5) + two * es(j,5)) * ra(5,k)                             &
-                + (rb(j,6) + two * es(j,6)) * ra(6,k)
+           rw(j,k) = (rb(j,1) + two * es(j,1)) * ra(1,k) &
+                   + (rb(j,2) + two * es(j,2)) * ra(2,k) &
+                   + (rb(j,3) + two * es(j,3)) * ra(3,k) &
+                   + (rb(j,4) + two * es(j,4)) * ra(4,k) &
+                   + (rb(j,5) + two * es(j,5)) * ra(5,k) &
+                   + (rb(j,6) + two * es(j,6)) * ra(6,k)
         enddo
 
         !---- Second-order terms.
         do j = k, 6
            do i = 1, 6
-              tw(i,j,k) =                                               &
-                   + (rb(i,1)+two*es(i,1))*ta(1,j,k) + ts(i   ,j)*ra(1,k)            &
-                   + (rb(i,2)+two*es(i,2))*ta(2,j,k) + ts(i+ 6,j)*ra(2,k)            &
-                   + (rb(i,3)+two*es(i,3))*ta(3,j,k) + ts(i+12,j)*ra(3,k)            &
-                   + (rb(i,4)+two*es(i,4))*ta(4,j,k) + ts(i+18,j)*ra(4,k)            &
-                   + (rb(i,5)+two*es(i,5))*ta(5,j,k) + ts(i+24,j)*ra(5,k)            &
-                   + (rb(i,6)+two*es(i,6))*ta(6,j,k) + ts(i+30,j)*ra(6,k)
+              tw(i,j,k) = + (rb(i,1)+two*es(i,1))*ta(1,j,k) + ts(i   ,j)*ra(1,k) &
+                          + (rb(i,2)+two*es(i,2))*ta(2,j,k) + ts(i+ 6,j)*ra(2,k) &
+                          + (rb(i,3)+two*es(i,3))*ta(3,j,k) + ts(i+12,j)*ra(3,k) &
+                          + (rb(i,4)+two*es(i,4))*ta(4,j,k) + ts(i+18,j)*ra(4,k) &
+                          + (rb(i,5)+two*es(i,5))*ta(5,j,k) + ts(i+24,j)*ra(5,k) &
+                          + (rb(i,6)+two*es(i,6))*ta(6,j,k) + ts(i+30,j)*ra(6,k)
               tw(i,k,j) = tw(i,j,k)
            enddo
         enddo
      enddo
 
      !---- Copy second-order terms.
-     call dcopy(tw,td,216)
+     TD = TW 
 
-     !---- Second-order not desired.
-  else
-     do k = 1, 6
-
-        !---- Zero-order terms.
-        ew(k) = eb(k) + rb(k,1) * ea(1) + rb(k,2) * ea(2)             &
-             + rb(k,3) * ea(3) + rb(k,4) * ea(4)                               &
-             + rb(k,5) * ea(5) + rb(k,6) * ea(6)
-
-        !---- First-order terms.
-        do j = 1, 6
-           rw(j,k) = rb(j,1) * ra(1,k) + rb(j,2) * ra(2,k)             &
-                + rb(j,3) * ra(3,k) + rb(j,4) * ra(4,k)                           &
-                + rb(j,5) * ra(5,k) + rb(j,6) * ra(6,k)
-        enddo
-     enddo
   endif
 
   !---- Copy zero- and first-order terms.
-  call dcopy(ew,ed,6)
-  call dcopy(rw,rd,36)
+  ED = EW 
+  RD = RW 
 
 end SUBROUTINE tmcat1
+
 SUBROUTINE tmtilt(fsec,tilt,ek,r,t)
-
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Apply TILT to a TRANSPORT map.                                   *
@@ -3034,12 +2845,15 @@ SUBROUTINE tmtilt(fsec,tilt,ek,r,t)
   !     r(6,6)    (double)  transfer matrix, rotated.                    *
   !     t(6,6,6)  (double)  second order terms, rotated.                 *
   !----------------------------------------------------------------------*
-  logical fsec
-  integer i,j,k
-  double precision c,ek(6),r(6,6),r1j,r2j,ri1,ri2,s,t(6,6,6),t1jk,  &
-       t2jk,ti1k,ti2k,tij1,tij2,tilt,xx
+  logical :: fsec
+  double precision :: tilt
+  double precision, intent(IN OUT) :: ek(6), r(6,6), t(6,6,6)
 
-  !YIL13: make sure we don't bother tilting by 0 degrees..
+  integer :: i, j, k
+  double precision :: c, s, r1j, r2j, ri1, ri2, xx
+  double precision :: t1jk, t2jk, ti1k, ti2k, tij1, tij2
+
+  !---- don't bother tilting by 0 degrees..
   if (tilt.eq.0) return
 
   c = cos(tilt)
@@ -3102,11 +2916,10 @@ SUBROUTINE tmtilt(fsec,tilt,ek,r,t)
   enddo
 
 end SUBROUTINE tmtilt
-SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
+SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twtrrfi
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for orbit correctors.                              *
@@ -3122,58 +2935,66 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk,fmap,cplxy,dorad
-  integer i, n_ferr,code,node_fd_errors
-  double precision orbit(6),f_errors(0:maxferr),ek(6),re(6,6),      &
-       te(6,6,6),deltap,gamma,arad,el,rfac,pt,xkick,ykick,dpx,dpy,       &
-       node_value,get_value,bvk,field(2),tilt,xau,div,zero,one,three,half
-  parameter(zero=0d0,one=1d0,three=3d0,half=5d-1)
+  logical, intent(IN) :: fsec, ftrk
+  logical, intent(OUT) :: fmap 
+  double precision, intent(IN OUT) :: orbit(6), el
+  double precision, intent(OUT) :: ek(6), re(6,6), te(6,6,6)
+  
+  logical :: cplxy, dorad
+  integer :: i, code, n_ferr
+  double precision :: f_errors(0:maxferr)
+  double precision :: deltap, gamma, arad, rfac=0.d0, pt, bvk, tilt
+  double precision :: xkick, ykick, dpx, dpy, xau, div, field(2)
 
-  !---- Initialize.
-  rfac=zero
-  call dzero(f_errors,maxferr+1)
-  n_ferr = node_fd_errors(f_errors)
-  if (el .eq. zero)  then
-     div = one
+  integer, external :: node_fd_errors
+  double precision, external :: node_value, get_value
+  double precision, parameter :: zero=0d0, one=1d0, three=3d0, half=5d-1
+
+  if ( .not. ftrk) then
+     !---- No orbit track desired, use drift map.
+     call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
+
   else
-     div = el
-  endif
-  bvk = node_value('other_bv ')
-  deltap = get_value('probe ','deltap ')
-  arad = get_value('probe ','arad ')
-  arad = get_value('probe ','arad ')
-  gamma = get_value('probe ','gamma ')
-  dorad = get_value('probe ','radiate ') .ne. zero
-  tilt = -node_value('tilt ')
+     !---- Tracking desired, use corrector map.
+     !---- Initialize.
+     div = el ; if (el .eq. zero) div = one
+     bvk = node_value('other_bv ')
+     deltap = get_value('probe ','deltap ')
+     arad = get_value('probe ','arad ')
+     arad = get_value('probe ','arad ')
+     gamma = get_value('probe ','gamma ')
+     dorad = get_value('probe ','radiate ') .ne. zero
+     tilt = -node_value('tilt ')
 
-  !---- Tracking desired, use corrector map.
-  if (ftrk) then
-     do i = 1, 2
-        field(i) = zero
-     enddo
-     if (n_ferr .gt. 0) call dcopy(f_errors, field, min(2, n_ferr))
+     F_ERRORS = zero 
+     n_ferr = node_fd_errors(f_errors)
+     
      !---- Original setting.
      code = node_value('mad8_type ')
+     select case (code)
 
-     if(code.eq.39) code=15
-     if(code.eq.38) code=24
+     case (14)
+        xkick=bvk*(node_value('kick ')+node_value('chkick ')+f_errors(0)/div)
+        ykick=zero
+        
+     case (15)
+        xkick=bvk*(node_value('hkick ')+node_value('chkick ')+f_errors(0)/div)
+        ykick=bvk*(node_value('vkick ')+node_value('cvkick ')+f_errors(1)/div)
 
-     if(code.eq.14) then
-        xkick=bvk*(node_value('kick ')+node_value('chkick ')+field(1)/div)
-        ykick=zero
-     else if(code.eq.15) then
-        xkick=bvk*(node_value('hkick ')+node_value('chkick ')+field(1)/div)
-        ykick=bvk*(node_value('vkick ')+node_value('cvkick ')+field(2)/div)
-     else if(code.eq.16) then
+     case(16)
         xkick=zero
-        ykick=bvk*(node_value('kick ')+node_value('cvkick ')+field(2)/div)
-     else
+        ykick=bvk*(node_value('kick ')+node_value('cvkick ')+f_errors(1)/div)
+
+     case default
         xkick=zero
         ykick=zero
-     endif
-     xau=xkick
-     xkick= xkick*cos(tilt)+ykick*sin(tilt)
-     ykick=-xau*sin(tilt)+ykick*cos(tilt)
+
+     end select
+
+     xau = xkick
+     xkick = xkick*cos(tilt)+ykick*sin(tilt)
+     ykick =  -xau*sin(tilt)+ykick*cos(tilt)
+
      !---- Sum up total kicks.
      dpx = xkick / (one + deltap)
      dpy = ykick / (one + deltap)
@@ -3184,7 +3005,7 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
      orbit(4) = orbit(4) + half * dpy
 
      !---- Half radiation effects at entrance.
-     if (dorad  .and.  el .ne. zero) then
+     if (dorad  .and.  el.ne.zero) then
         rfac = arad * gamma**3 * (dpx**2 + dpy**2) / (three * el)
         pt = orbit(6)
         orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
@@ -3193,13 +3014,10 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
      endif
 
      !---- Drift to end.
-     if (el .ne. zero) then
-        call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
-     endif
-     fmap = .true.
+     if (el .ne. zero) call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
      !---- Half radiation effects at exit.
-     if (dorad  .and.  el .ne. zero) then
+     if (dorad  .and.  el.ne.zero) then
         pt = orbit(6)
         orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
         orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
@@ -3210,18 +3028,15 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
      orbit(2) = orbit(2) + half * dpx
      orbit(4) = orbit(4) + half * dpy
 
-     !---- No orbit track desired, use drift map.
-  else
-     call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
+     fmap = .true.
   endif
 
 end SUBROUTINE tmcorr
-SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
 
+SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   use twtrrfi
   use twisslfi
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for thin multipole.                                *
@@ -3235,21 +3050,29 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk,fmap,dorad
-  integer n_ferr,nord,iord,j,nd,nn,ns,node_fd_errors,get_option
-  double precision orbit(6),f_errors(0:maxferr),re(6,6),te(6,6,6),x,&
-       y,dbr,dbi,dipr,dipi,dr,di,drt,dpx,dpy,elrad,beta,bi,deltap,       &
-       vals(2,0:maxmul),field(2,0:maxmul),normal(0:maxmul),orbit0(6),    &
-       skew(0:maxmul),node_value,get_value,pt,arad,gammas,rfac,bvk,dpxr, &
-       dpyr,zero,one,two,three, tilt, angle, dtmp
-  double precision orbit00(6),re00(6,6),te00(6,6,6)
-  parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
+  logical :: fsec, ftrk, fmap
+  double precision orbit(6), re(6,6), te(6,6,6)
+
+  logical :: dorad
+  integer :: n_ferr, nord, iord, j, nd, nn, ns
+  double precision :: f_errors(0:maxferr)
+!  double precision :: field(2,0:maxmul)
+!  double precision :: vals(2,0:maxmul), 
+  double precision :: normal(0:maxmul), skew(0:maxmul)
+  double precision :: beta, bi, deltap, pt, arad, gammas, rfac, bvk, elrad, tilt, angle
+  double precision :: x, y, dbr, dbi, dipr, dipi, dr, di, drt, dpx, dpy, dpxr, dpyr, dtmp
+  double precision :: orbit0(6), orbit00(6), re00(6,6), te00(6,6,6)
+
+  integer :: get_option, node_fd_errors 
+  double precision :: node_value, get_value
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0
 
   !---- Initialize
   rfac=zero
-  call dzero(f_errors,maxferr+1)
+  F_ERRORS(0:maxferr) = zero 
   n_ferr = node_fd_errors(f_errors)
   bvk = node_value('other_bv ')
+
   !---- Multipole length for radiation.
   elrad = node_value('lrad ')
   dorad = get_value('probe ','radiate ') .ne. zero
@@ -3261,35 +3084,42 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   bi = one / beta
 
   !---- Multipole components.
-  call dzero(normal,maxmul+1)
-  call dzero(skew,maxmul+1)
+  NORMAL = zero 
+  SKEW = zero 
   call get_node_vector('knl ',nn,normal)
   call get_node_vector('ksl ',ns,skew)
   tilt = node_value('tilt ')
-  call dzero(vals,2*(maxmul+1))
-  do iord = 0, nn
-     vals(1,iord) = normal(iord)
-  enddo
-  do iord = 0, ns
-     vals(2,iord) = skew(iord)
-  enddo
+  !VALS = zero 
+  !VALS(1,0:nn) = NORMAL(0:nn)
+  !do iord = 0, nn
+  !   vals(1,iord) = normal(iord)
+  !enddo
+  !VALS(2,0:ns) = SKEW(0:ns)
+  !do iord = 0, ns
+  !   vals(2,iord) = skew(iord)
+  !enddo
+
   !---- Field error vals.
-  call dzero(field,2*(maxmul+1))
-  if (n_ferr .gt. 0) then
-     call dcopy(f_errors,field,n_ferr)
-  endif
+  !FIELD = zero 
+  !if (n_ferr .gt. 0) then
+  !   call dcopy(f_errors,field,n_ferr)
+  !endif
   nd = 2 * max(nn, ns, n_ferr/2-1)
 
   !---- Dipole error.
-  dbr = field(1,0) / (one + deltap)
-  dbi = field(2,0) / (one + deltap)
+  dbr = f_errors(0) / (one + deltap)
+  dbi = f_errors(1) / (one + deltap)
+  !dbr = field(1,0) / (one + deltap)
+  !dbi = field(2,0) / (one + deltap)
 
   !---- Nominal dipole strength.
-  dipr = vals(1,0) / (one + deltap)
-  dipi = vals(2,0) / (one + deltap)
+  dipr = normal(0) / (one + deltap)
+  dipi = skew(0)   / (one + deltap)
+  !dipr = vals(1,0) / (one + deltap)
+  !dipi = vals(2,0) / (one + deltap)
 
   if (tilt .ne. zero)  then
-     if(dipi.ne.zero.or.dipr.ne.zero) then
+     if (dipi.ne.zero.or.dipr.ne.zero) then
         angle = atan2(dipi, dipr) - tilt
      else
         angle = -tilt
@@ -3309,51 +3139,84 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
 
   !---- Other components and errors.
   nord = 0
-  do iord = 1, nd/2
-     do j = 1, 2
-        if (field(j,iord) .ne. zero)  nord = iord
-        if (vals(j,iord) .ne. zero)  nord = iord
-     enddo
+  ! that loop should start at one since nominal dipole strength already taken into account above
+  do iord = 0, max(nn, ns, n_ferr/2-1) 
+     ! get the maximum effective order; loop runs over maximum of user given values
+     if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero .or. normal(iord).ne.zero .or. skew(iord).ne.zero)  & 
+          nord = iord     
   enddo
+
+  !print *, 'Multipole order found ', nord
+
+  !do iord = 1, nd/2
+  !   do j = 1, 2
+  !      if (field(j,iord) .ne. zero)  nord = iord
+  !      if (vals(j,iord) .ne. zero)  nord = iord
+  !   enddo
+  !enddo
+
   do iord = 1, nord
-     do j = 1, 2
-        field(j,iord) = (vals(j,iord) + field(j,iord))                &
-             / (one + deltap)
-     enddo
-     if (tilt .ne. zero)  then
-        if(field(2,iord).ne.zero.or.field(1,iord).ne.zero) then
-           angle = atan2(field(2,iord), field(1,iord))/(iord+1) - tilt
+     f_errors(2*iord)   = (normal(iord) + f_errors(2*iord))   / (one + deltap)
+     f_errors(2*iord+1) = (skew(iord)   + f_errors(2*iord+1)) / (one + deltap)
+     if (tilt .ne. zero) then
+        if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero) then
+           angle = atan2(f_errors(2*iord+1), f_errors(2*iord)) / (iord+1) - tilt
         else
            angle = -tilt
         endif
-        dtmp = sqrt(field(1,iord)**2+field(2,iord)**2)
         angle = (iord+1) * angle
-        field(1,iord) = dtmp * cos(angle)
-        field(2,iord) = dtmp * sin(angle)
+        dtmp = sqrt(f_errors(2*iord)**2 + f_errors(2*iord+1)**2)
+        f_errors(2*iord)   = dtmp * cos(angle)
+        f_errors(2*iord+1) = dtmp * sin(angle)
      endif
-     do j = 1, 2
-        field(j,iord) = bvk * field(j,iord)
-     enddo
+     f_errors(2*iord)   = bvk * f_errors(2*iord)
+     f_errors(2*iord+1) = bvk * f_errors(2*iord+1)
   enddo
-  !---- Track orbit.
-  if (ftrk) then
+     
+!  do iord = 1, nord
+!     do j = 1, 2
+!        field(j,iord) = (vals(j,iord) + field(j,iord)) / (one + deltap)
+!     enddo
+!     if (tilt .ne. zero)  then
+!        if (field(2,iord).ne.zero.or.field(1,iord).ne.zero) then
+!           angle = atan2(field(2,iord), field(1,iord))/(iord+1) - tilt
+!        else
+!           angle = -tilt
+!        endif
+!        dtmp = sqrt(field(1,iord)**2+field(2,iord)**2)
+!        angle = (iord+1) * angle
+!        field(1,iord) = dtmp * cos(angle)
+!        field(2,iord) = dtmp * sin(angle)
+!     endif
+!     do j = 1, 2
+!        field(j,iord) = bvk * field(j,iord)
+!     enddo
+!  enddo
+
+  if (ftrk) then !---- Track orbit.
      x = orbit(1)
      y = orbit(3)
 
      !---- Multipole kick.
      dr = zero
      di = zero
+     
      do iord = nord, 1, -1
-        drt = (dr * x - di * y) / (iord+1) + field(1,iord)
-        di  = (dr * y + di * x) / (iord+1) + field(2,iord)
+        drt = (dr * x - di * y) / (iord+1) + f_errors(2*iord)
+        di  = (dr * y + di * x) / (iord+1) + f_errors(2*iord+1)
         dr  = drt
      enddo
+ !    do iord = nord, 1, -1
+ !       drt = (dr * x - di * y) / (iord+1) + field(1,iord)
+ !       di  = (dr * y + di * x) / (iord+1) + field(2,iord)
+ !       dr  = drt
+ !    enddo
      dpx = dbr + (dr * x - di * y)
      dpy = dbi + (di * x + dr * y)
 
 
      !---- Radiation effects at entrance.
-     if (dorad  .and.  elrad .ne. zero) then
+     if (dorad  .and.  elrad.ne.zero) then
         dpxr = dpx + dipr
         dpyr = dpy + dipi
         rfac = arad * gammas**3 * (dpxr**2+dpyr**2) / (three*elrad)
@@ -3367,22 +3230,22 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
      orbit(2) = orbit(2) - dpx + dipr * (deltap + bi*orbit(6))
      orbit(4) = orbit(4) + dpy - dipi * (deltap + bi*orbit(6))
      orbit(5) = orbit(5) - (dipr*x + dipi*y) * bi
+
      !---- Add the missing focussing component of thin dipoles for co
-     if(elrad.gt.zero.and.get_option('thin_foc ').eq.1) then
-        orbit(2) = orbit(2)-dipr*dipr/elrad*x
-        orbit(4) = orbit(4)-dipi*dipi/elrad*y
+     if (elrad.gt.zero .and. get_option('thin_foc ').eq.1) then
+        orbit(2) = orbit(2) - dipr*dipr/elrad * x
+        orbit(4) = orbit(4) - dipi*dipi/elrad * y
      endif
 
      !---- Radiation effects at exit.
-     if (dorad  .and.  elrad .ne. zero) then
+     if (dorad  .and.  elrad.ne.zero) then
         pt = orbit(6)
         orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
         orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
         orbit(6) = orbit(6) - rfac * (one + pt) ** 2
      endif
 
-     !---- Orbit not wanted.
-  else
+  else !---- Orbit not wanted.
      x = zero
      y = zero
      nord = min(nord, 2)
@@ -3392,9 +3255,14 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   if (nord .ge. 1) then
      dr = zero
      di = zero
+!     do iord = nord, 1, -1
+!        drt = (dr * x - di * y) / (iord) + field(1,iord)
+!        di  = (dr * y + di * x) / (iord) + field(2,iord)
+!        dr  = drt
+!     enddo
      do iord = nord, 1, -1
-        drt = (dr * x - di * y) / (iord) + field(1,iord)
-        di  = (dr * y + di * x) / (iord) + field(2,iord)
+        drt = (dr * x - di * y) / (iord) + f_errors(2*iord)
+        di  = (dr * y + di * x) / (iord) + f_errors(2*iord+1)
         dr  = drt
      enddo
      re(2,1) = - dr
@@ -3402,10 +3270,11 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
      re(4,1) = + di
      re(4,3) = + dr
   endif
+
   !---- Add the missing focussing component of thin dipoles
-  if(elrad.gt.zero.and.get_option('thin_foc ').eq.1) then
-     re(2,1)=re(2,1)-dipr*dipr/elrad
-     re(4,3)=re(4,3)-dipi*dipi/elrad
+  if (elrad.gt.zero.and.get_option('thin_foc ').eq.1) then
+     re(2,1) = re(2,1) - dipr*dipr/elrad
+     re(4,3) = re(4,3) - dipi*dipi/elrad
   endif
   re(2,6) = + dipr * bi
   re(4,6) = - dipi * bi
@@ -3418,10 +3287,15 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
         dr = zero
         di = zero
         do iord = nord, 2, -1
-           drt = (dr * x - di * y) / (iord-1) + field(1,iord)
-           di  = (dr * y + di * x) / (iord-1) + field(2,iord)
+           drt = (dr * x - di * y) / (iord-1) + f_errors(2*iord)
+           di  = (dr * y + di * x) / (iord-1) + f_errors(2*iord+1)
            dr  = drt
         enddo
+!        do iord = nord, 2, -1
+!           drt = (dr * x - di * y) / (iord-1) + field(1,iord)
+!           di  = (dr * y + di * x) / (iord-1) + field(2,iord)
+!           dr  = drt
+!        enddo
         dr = dr / two
         di = di / two
         te(2,1,1) = - dr
@@ -3434,29 +3308,26 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
         te(4,3,3) = - di
      endif
   endif
+
   !---- centre option
-  if(centre_cptk.or.centre_bttk) then
-     call dcopy(orbit,orbit00,6)
-     call dcopy(re,re00,36)
-     call dcopy(te,te00,216)
-     if(centre_cptk) then
-        call dcopy(orbit,orbit0,6)
+  if (centre_cptk.or.centre_bttk) then
+     ORBIT00 = ORBIT ; RE00 = RE ; TE00 = TE 
+     if (centre_cptk) then
+        ORBIT0 = ORBIT 
         call twcptk(re,orbit0)
      endif
-     if(centre_bttk) call twbttk(re,te)
-     call dcopy(orbit00,orbit,6)
-     call dcopy(re00,re,36)
-     call dcopy(te00,te,216)
+     if (centre_bttk) call twbttk(re,te)
+     ORBIT = ORBIT00 ; RE = RE00 ; TE = TE00 
   endif
 
 end SUBROUTINE tmmult
-SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
+SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
+  use matrices, only : EYE
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for octupole element.                              *
@@ -3473,177 +3344,187 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk,fmap,cplxy,dorad
-  integer i,j,n_ferr,node_fd_errors
-  double precision orbit(6),f_errors(0:maxferr),ek(6),re(6,6),      &
-       te(6,6,6),rw(6,6),tw(6,6,6),deltap,el,sk3,sk3l,rfac,arad,gamma,pt,&
-       octr,octi,posr,posi,cr,ci,tilt4,node_value,get_value,sk3s,bvk,    &
-       field(2,0:3),el0,orbit0(6),zero,one,two,three,four,six
-  double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
-  integer, external :: el_par_vector
-  integer elpar_vl
-  parameter(zero=0d0,one=1d0,two=2d0,three=3d0,four=4d0,six=6d0)
+  logical, intent(IN) :: fsec, ftrk
+  logical, intent(OUT) :: fmap 
+  double precision, intent(IN OUT) :: orbit(6), el
+  double precision, intent(OUT) :: ek(6), re(6,6), te(6,6,6)
+  
+  logical :: cplxy, dorad
+  integer :: i, code, n_ferr, elpar_vl
+  double precision :: f_errors(0:maxferr)
+  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
+  double precision :: rw(6,6), tw(6,6,6) 
+  double precision :: sk3, sk3l, sk3s, octr, octi, posr, posi, cr, ci, el0 
+  double precision :: deltap=0.d0, gamma, arad, rfac=0.d0, pt, bvk, tilt4  
+  
+  integer, external :: node_fd_errors, el_par_vector
+  double precision, external :: node_value, get_value
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0, four=4d0, six=6d0
 
+  if ( .not. ftrk) then
+     !---- No orbit track requested, use drift map and return
+     call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
+     return
+  endif
+  
   !---- Initialize.
-  deltap = zero
   fmap = el .ne. zero
   if (.not. fmap) return
-  call dzero(f_errors,maxferr+1)
-  n_ferr = node_fd_errors(f_errors)
-  bvk = node_value('other_bv ')
+  
   !-- get element parameters
+  bvk = node_value('other_bv ')
   elpar_vl = el_par_vector(o_k3s, g_elpar)
-  !---- Set up half octupole strength.
-  if (ftrk) then
-     !---- Field error.
-     do i = 0,3
-        do j = 1, 2
-           field(j,i) = zero
-        enddo
-     enddo
-     if (n_ferr .gt. 0) call dcopy(f_errors, field, min(8, n_ferr))
-     arad = get_value('probe ','arad ')
-     gamma = get_value('probe ','gamma ')
-     deltap = get_value('probe ','deltap ')
-     dorad = get_value('probe ','radiate ') .ne. zero
-     sk3 = bvk * g_elpar(o_k3)
-     sk3s = bvk * g_elpar(o_k3s)
-     sk3 = sk3 + bvk * field(1,3)/el
-     sk3s = sk3s + bvk * field(2,3)/el
-     tilt4 = -4*node_value('tilt ')
-     if(sk3s.ne.zero) then
-        tilt4 = atan2(sk3s, sk3) + tilt4
-        sk3 = sqrt(sk3**2 + sk3s**2)
-     endif
-     sk3l = (el * sk3) / (one + deltap)
-
-     !---- Normal and skew components of octupole.
-     octr = sk3l * cos(tilt4)
-     octi = sk3l * sin(tilt4)
-     !---- Half kick at entrance.
-     posr = orbit(1) * (orbit(1)**2 - three*orbit(3)**2) / six
-     posi = orbit(3) * (three*orbit(1)**2 - orbit(3)**2) / six
-     cr = octr * posr - octi * posi
-     ci = octr * posi + octi * posr
-     orbit(2) = orbit(2) - cr / two
-     orbit(4) = orbit(4) + ci / two
-
-     !---- Half radiation effects at entrance.
-     if (dorad) then
-        rfac = arad * gamma**3 * (cr**2 + ci**2) / (three * el)
-        pt = orbit(6)
-        orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
-        orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
-        orbit(6) = orbit(6) - rfac * (one + pt) ** 2
-     endif
-
-     !---- First-order terms w.r.t. orbit.
-     call m66one(rw)
-     posr = (orbit(1)**2 - orbit(3)**2) / four
-     posi = orbit(1) * orbit(3) / two
-     cr = octr * posr - octi * posi
-     ci = octr * posi + octi * posr
-     rw(2,1) = - cr
-     rw(2,3) = + ci
-     rw(4,1) = + ci
-     rw(4,3) = + cr
-     if (ci .ne. zero) cplxy = .true.
-
-     !---- Second-order terms w.r.t. orbit.
-     call dzero(tw,216)
-     if (fsec) then
-        cr = (octr * orbit(1) - octi * orbit(3)) / four
-        ci = (octr * orbit(3) + octi * orbit(1)) / four
-        tw(2,1,1) = - cr
-        tw(2,1,3) = + ci
-        tw(2,3,1) = + ci
-        tw(2,3,3) = + cr
-        tw(4,1,1) = + ci
-        tw(4,1,3) = + cr
-        tw(4,3,1) = + cr
-        tw(4,3,3) = - ci
-     endif
-
-     !---- Concatenate with drift map.
-     !---- centre option
-     if(centre_cptk.or.centre_bttk) then
-        call dcopy(orbit,orbit00,6)
-        call dcopy(ek,ek00,6)
-        call dcopy(re,re00,36)
-        call dcopy(te,te00,216)
-        el0=el/two
-        call dcopy(orbit,orbit0,6)
-        call tmdrf0(fsec,ftrk,orbit0,fmap,el0,ek,re,te)
-        call tmcat(fsec,re,te,rw,tw,re,te)
-        if(centre_cptk) call twcptk(re,orbit0)
-        if(centre_bttk) call twbttk(re,te)
-        call dcopy(orbit00,orbit,6)
-        call dcopy(ek00,ek,6)
-        call dcopy(re00,re,36)
-        call dcopy(te00,te,216)
-     endif
-     call tmdrf0(fsec,ftrk,orbit,fmap,el,ek,re,te)
-     call tmcat(fsec,re,te,rw,tw,re,te)
-
-     !---- Half kick at exit.
-     posr = orbit(1) * (orbit(1)**2 - three*orbit(3)**2) / six
-     posi = orbit(3) * (three*orbit(1)**2 - orbit(3)**2) / six
-     cr = octr * posr - octi * posi
-     ci = octr * posi + octi * posr
-     orbit(2) = orbit(2) - cr / two
-     orbit(4) = orbit(4) + ci / two
-
-     !---- Half radiation effects.
-     if (dorad) then
-        rfac = arad * gamma**3 * (cr**2 + ci**2) / (three * el)
-        pt = orbit(6)
-        orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
-        orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
-        orbit(6) = orbit(6) - rfac * (one + pt) ** 2
-     endif
-
-     !---- First-order terms w.r.t. orbit.
-     call m66one(rw)
-     posr = (orbit(1)**2 - orbit(3)**2) / four
-     posi = orbit(1) * orbit(3) / two
-     cr = octr * posr - octi * posi
-     ci = octr * posi + octi * posr
-     rw(2,1) = - cr
-     rw(2,3) = + ci
-     rw(4,1) = + ci
-     rw(4,3) = + cr
-     if (ci .ne. zero) cplxy = .true.
-
-     !---- Second-order terms w.r.t. orbit.
-     call dzero(tw,216)
-     if (fsec) then
-        cr = (octr * orbit(1) - octi * orbit(3)) / four
-        ci = (octr * orbit(3) + octi * orbit(1)) / four
-        tw(2,1,1) = - cr
-        tw(2,1,3) = + ci
-        tw(2,3,1) = + ci
-        tw(2,3,3) = + cr
-        tw(4,1,1) = + ci
-        tw(4,1,3) = + cr
-        tw(4,3,1) = + cr
-        tw(4,3,3) = - ci
-     endif
-     call tmcat(fsec,rw,tw,re,te,re,te)
-
-     !---- No orbit track requested, use drift map.
-  else
-     call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
+  
+  !---- Field error.
+  F_ERRORS = zero 
+  n_ferr = node_fd_errors(f_errors)
+  
+  !---- Set up octupole strength.
+  sk3  = bvk * ( g_elpar(o_k3)  + f_errors(6)/el)
+  sk3s = bvk * ( g_elpar(o_k3s) + f_errors(7)/el)
+  tilt4 = -four * node_value('tilt ')
+  
+  if (sk3s.ne.zero) then
+     tilt4 = atan2(sk3s, sk3) + tilt4
+     sk3 = sqrt(sk3**2 + sk3s**2)
+  endif
+  sk3l = (el * sk3) / (one + deltap)
+  
+  !---- Normal and skew components of octupole.
+  octr = sk3l * cos(tilt4)
+  octi = sk3l * sin(tilt4)
+  
+  !---- Half kick at entrance.
+  posr = orbit(1) * (orbit(1)**2 - three*orbit(3)**2) / six
+  posi = orbit(3) * (three*orbit(1)**2 - orbit(3)**2) / six
+  cr = octr * posr - octi * posi
+  ci = octr * posi + octi * posr
+  orbit(2) = orbit(2) - cr / two
+  orbit(4) = orbit(4) + ci / two
+  
+  arad = get_value('probe ','arad ')
+  gamma = get_value('probe ','gamma ')
+  deltap = get_value('probe ','deltap ')
+  dorad = get_value('probe ','radiate ') .ne. zero
+  
+  !---- Half radiation effects at entrance.
+  if (dorad) then
+     rfac = arad * gamma**3 * (cr**2 + ci**2) / (three * el)
+     pt = orbit(6)
+     orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
+     orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
+     orbit(6) = orbit(6) - rfac * (one + pt) ** 2
   endif
 
-end SUBROUTINE tmoct
-SUBROUTINE tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
+  !---- First-order terms w.r.t. orbit.
+  RW = EYE !call m66one(rw)
+  posr = (orbit(1)**2 - orbit(3)**2) / four
+  posi = orbit(1) * orbit(3) / two
+  cr = octr * posr - octi * posi
+  ci = octr * posi + octi * posr
 
+  rw(2,1) = - cr
+  rw(2,3) = + ci
+  rw(4,1) = + ci
+  rw(4,3) = + cr
+
+  if (ci .ne. zero) cplxy = .true.
+  
+  TW = zero 
+  !---- Second-order terms w.r.t. orbit.
+  if (fsec) then
+     cr = (octr * orbit(1) - octi * orbit(3)) / four
+     ci = (octr * orbit(3) + octi * orbit(1)) / four
+
+     tw(2,1,1) = - cr
+     tw(2,1,3) = + ci
+     tw(2,3,1) = + ci
+     tw(2,3,3) = + cr
+
+     tw(4,1,1) = + ci
+     tw(4,1,3) = + cr
+     tw(4,3,1) = + cr
+     tw(4,3,3) = - ci
+  endif
+
+  !---- Concatenate with drift map.
+  !---- centre option
+  if (centre_cptk.or.centre_bttk) then
+     ORBIT00 = ORBIT 
+     EK00 = EK 
+     RE00 = RE 
+     TE00 = TE 
+     el0=el/two
+     ORBIT0 = ORBIT 
+     call tmdrf0(fsec,ftrk,orbit0,fmap,el0,ek,re,te)
+     call tmcat(fsec,re,te,rw,tw,re,te)
+     if (centre_cptk) call twcptk(re,orbit0)
+     if (centre_bttk) call twbttk(re,te)
+     ORBIT = ORBIT00 
+     EK = EK00 
+     RE = RE00 
+     TE = TE00 
+  endif
+  call tmdrf0(fsec,ftrk,orbit,fmap,el,ek,re,te)
+  call tmcat(fsec,re,te,rw,tw,re,te)
+
+  !---- Half kick at exit.
+  posr = orbit(1) * (orbit(1)**2 - three*orbit(3)**2) / six
+  posi = orbit(3) * (three*orbit(1)**2 - orbit(3)**2) / six
+  cr = octr * posr - octi * posi
+  ci = octr * posi + octi * posr
+  orbit(2) = orbit(2) - cr / two
+  orbit(4) = orbit(4) + ci / two
+
+  !---- Half radiation effects.
+  if (dorad) then
+     rfac = arad * gamma**3 * (cr**2 + ci**2) / (three * el)
+     pt = orbit(6)
+     orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
+     orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
+     orbit(6) = orbit(6) - rfac * (one + pt) ** 2
+  endif
+
+  !---- First-order terms w.r.t. orbit.
+  RW = EYE !call m66one(rw)
+  posr = (orbit(1)**2 - orbit(3)**2) / four
+  posi = orbit(1) * orbit(3) / two
+  cr = octr * posr - octi * posi
+  ci = octr * posi + octi * posr
+
+  rw(2,1) = - cr
+  rw(2,3) = + ci
+  rw(4,1) = + ci
+  rw(4,3) = + cr
+
+  if (ci .ne. zero) cplxy = .true.
+  
+  !---- Second-order terms w.r.t. orbit.
+  TW = zero 
+  if (fsec) then
+     cr = (octr * orbit(1) - octi * orbit(3)) / four
+     ci = (octr * orbit(3) + octi * orbit(1)) / four
+
+     tw(2,1,1) = - cr
+     tw(2,1,3) = + ci
+     tw(2,3,1) = + ci
+     tw(2,3,3) = + cr
+
+     tw(4,1,1) = + ci
+     tw(4,1,3) = + cr
+     tw(4,3,1) = + cr
+     tw(4,3,3) = - ci
+  endif
+  call tmcat(fsec,rw,tw,re,te,re,te)
+
+end SUBROUTINE tmoct
+
+SUBROUTINE tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
   use trackfi
   use twtrrfi
   use name_lenfi
   use time_varfi  
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for arbitrary element.                             *
@@ -3658,12 +3539,18 @@ SUBROUTINE tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
   !     RE(6,6)   (real)    Transfer matrix.                             *
   !     TE(6,6,6) (real)    Second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk,fmap,time_var
-  integer i1,i2,i3,mylen
-  double precision orbit(6),ek(6),re(6,6),te(6,6,6),node_value,     &
-       test,zero
-  character(name_len) name
-  parameter(zero=0d0)
+  logical, intent(IN) :: fsec, ftrk
+  logical, intent(OUT) :: fmap 
+  double precision, intent(IN OUT) :: orbit(6)
+  double precision, intent(OUT) :: ek(6), re(6,6), te(6,6,6)
+
+  logical :: time_var
+  integer :: i1, i2, i3, mylen
+  double precision :: temp
+  character(len=name_len) :: name
+
+  double precision, external :: node_value
+  double precision, parameter :: zero=0d0
 
   !---- Element Kick
   ek(1)=node_value('kick1 ')
@@ -3712,16 +3599,18 @@ SUBROUTINE tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
   re(6,6)=node_value('rm66 ')
 
   time_var = node_value('time_var ') .ne. zero
-  if(time_var.and.time_var_p) then
-     time_var_p_cnt=time_var_p_cnt+1
-     time_var_p_lnt=time_var_p_lnt+1
-     if(idnint(time_var_p_ind(time_var_p_cnt)).ne.time_var_p_lnt)    &
+
+  timevar:    if (time_var.and.time_var_p) then
+     time_var_p_cnt = time_var_p_cnt+1
+     time_var_p_lnt = time_var_p_lnt+1
+
+     if (idnint(time_var_p_ind(time_var_p_cnt)) .ne. time_var_p_lnt)    &
           call aafail('TMARB: ', 'wrong index in Table: time_var_pha')
      call element_name(name,len(name))
      mylen=len_trim(name)
-     if(time_var_p_ch(time_var_p_cnt)(:mylen).ne.name(:mylen))       & 
-          call aafail('TMARB: ', 'wrong element name in Table: '//   &
-          'time_var_pha')
+     if (time_var_p_ch(time_var_p_cnt)(:mylen) .ne. name(:mylen))       & 
+          call aafail('TMARB: ', 'wrong element name in Table: time_var_pha')
+
 !---- Matrix
      re(1,1)=phase_tromb(time_var_p_cnt,1)
      re(1,2)=phase_tromb(time_var_p_cnt,2)
@@ -3759,6 +3648,7 @@ SUBROUTINE tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
      re(6,4)=phase_tromb(time_var_p_cnt,34)
      re(6,5)=phase_tromb(time_var_p_cnt,35)
      re(6,6)=phase_tromb(time_var_p_cnt,36)
+
 !---- Matrix
      call store_node_value('rm11 ',re(1,1))
      call store_node_value('rm12 ',re(1,2))
@@ -3796,7 +3686,7 @@ SUBROUTINE tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
      call store_node_value('rm64 ',re(6,4))
      call store_node_value('rm65 ',re(6,5))
      call store_node_value('rm66 ',re(6,6))
-  endif
+  endif timevar
 
   !---- Second Order Terms
   if (fsec) then
@@ -4016,15 +3906,29 @@ SUBROUTINE tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
      te(6,6,4)=node_value('tm664 ')
      te(6,6,5)=node_value('tm665 ')
      te(6,6,6)=node_value('tm666 ')
-     test=zero
-     do i1=1,6
-        do i2=1,6
-           do i3=1,6
-              test=test+abs(te(i1,i2,i3))
+
+     do i3 = 1,6
+        do i2 = 1,6
+           do i1 = 1,6
+              if (te(i1,i2,i3) .ne. zero) then
+                 fsecarb = .true.
+                 go to 10
+              endif
            enddo
         enddo
      enddo
-     if(test.ne.zero) fsecarb=.true.
+10   continue
+
+     ! temp = zero
+     ! do i3 = 1,6
+     !    do i2 = 1,6
+     !       do i1 = 1,6
+     !          temp = temp + abs(te(i1,i2,i3))
+     !       enddo
+     !    enddo
+     ! enddo
+     ! if (temp.ne.zero) fsecarb=.true.
+
   endif
 
   !---- Track orbit.
@@ -4032,13 +3936,12 @@ SUBROUTINE tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmarb
-SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
 
+SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for quadrupole element.                            *
@@ -4057,32 +3960,36 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk,fmap,cplxy,dorad
-  integer i,j,n_ferr,node_fd_errors
-  double precision ct, st, tmp
-  double precision orbit(6),orbit0(6),f_errors(0:maxferr),ek(6),    &
-       re(6,6),te(6,6,6),deltap,el,el0,tilt,sk1,rfac,arad,gamma,pt,sk1s, &
-       bvk,field(2,0:1),node_value,get_value,plot_tilt,zero,one,two,three
-  double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
+  logical :: fsec, ftrk, fmap
+  double precision :: plot_tilt, el
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+  
+  logical :: cplxy, dorad
+  integer :: i, j, n_ferr, elpar_vl
+  double precision :: ct, st, tmp
+  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
+  double precision :: f_errors(0:maxferr), field(2,0:1)
+  double precision :: deltap, el0, tilt, sk1, pt, sk1s, bvk 
+  double precision :: rfac, arad, gamma
+
+  integer, external :: node_fd_errors
   integer, external :: el_par_vector
-  integer elpar_vl
-  parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
+  double precision, external :: node_value, get_value
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0
 
   !---- Initialize.
-  st=zero
-  ct=zero
-  cplxy=.false.
+  st = zero
+  ct = zero
+  cplxy = .false.
   fmap = el .ne. zero
   if (.not. fmap) return
+
   !---- Field error.
-  call dzero(f_errors,maxferr+1)
+  F_ERRORS = zero 
   n_ferr = node_fd_errors(f_errors)
-  do i = 0, 1
-     do j = 1, 2
-        field(j,i) = zero
-     enddo
-  enddo
+  FIELD = zero
   if (n_ferr .gt. 0) call dcopy(f_errors, field, min(4,n_ferr))
+
   !-- element paramters
   elpar_vl = el_par_vector(q_k1s, g_elpar)
   bvk = node_value('other_bv ')
@@ -4091,7 +3998,7 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
   sk1 = sk1 + bvk * field(1,1)/el
   sk1s = sk1s + bvk * field(2,1)/el
   tilt = g_elpar(q_tilt)
-  if(sk1s.ne.zero) then
+  if (sk1s.ne.zero) then
      tilt = -atan2(sk1s, sk1)/two + tilt
      sk1 = sqrt(sk1**2 + sk1s**2)
   endif
@@ -4106,18 +4013,20 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
      orbit(2) = ct * tmp + st * orbit(4)
      orbit(4) = ct * orbit(4) - st * tmp
   endif
+
   cplxy = cplxy .or. tilt .ne. zero
-  tilt=tilt+plot_tilt
+  tilt = tilt + plot_tilt
+
   arad = get_value('probe ','arad ')
   gamma = get_value('probe ','gamma ')
   deltap = get_value('probe ','deltap ')
   dorad = get_value('probe ','radiate ') .ne. zero
+
   sk1 = sk1 / (one + deltap)
 
   !---- Half radiation effect at entry.
-  if (dorad.and.ftrk) then
-     rfac = (arad * gamma**3 * sk1**2 * el / three) * (orbit(1)**2 + &
-          orbit(3)**2)
+  if (dorad .and. ftrk) then
+     rfac = (arad * gamma**3 * sk1**2 * el / three) * (orbit(1)**2 + orbit(3)**2)
      pt = orbit(6)
      orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
      orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
@@ -4125,32 +4034,26 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
   endif
 
   !---- centre option
-  if(centre_cptk.or.centre_bttk) then
-     call dcopy(orbit,orbit00,6)
-     call dcopy(ek,ek00,6)
-     call dcopy(re,re00,36)
-     call dcopy(te,te00,216)
-     el0=el/two
-     call dcopy(orbit,orbit0,6)
+  if (centre_cptk .or. centre_bttk) then
+     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE 
+     el0 = el/two
+     ORBIT0 = ORBIT 
      call qdbody(fsec,ftrk,tilt,sk1,orbit0,el0,ek,re,te)
-     if(centre_cptk) call twcptk(re,orbit0)
-     if(centre_bttk) call twbttk(re,te)
-     call dcopy(orbit00,orbit,6)
-     call dcopy(ek00,ek,6)
-     call dcopy(re00,re,36)
-     call dcopy(te00,te,216)
+     if (centre_cptk) call twcptk(re,orbit0)
+     if (centre_bttk) call twbttk(re,te)
+     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00 
   endif
   call qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
 
   !---- Half radiation effect at exit.
-  if (dorad.and.ftrk) then
-     rfac = (arad * gamma**3 * sk1**2 * el / three) * (orbit(1)**2 + &
-          orbit(3)**2)
+  if (dorad .and. ftrk) then
+     rfac = (arad * gamma**3 * sk1**2 * el / three) * (orbit(1)**2 + orbit(3)**2)
      pt = orbit(6)
      orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
      orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
      orbit(6) = orbit(6) - rfac * (one + pt) ** 2
   endif
+
   if (tilt .ne. zero)  then
      !---  rotate orbit at exit
      tmp = orbit(1)
@@ -4162,10 +4065,9 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
   endif
 
 end SUBROUTINE tmquad
+
 SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
-
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for quadrupole element.                            *
@@ -4182,11 +4084,16 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk
-  double precision orbit(6),ek(6),re(6,6),te(6,6,6),el,tilt,sk1,    &
-       gamma,beta,dtbyds,qk,qkl,qkl2,cx,sx,cy,sy,biby4,get_value,zero,   &
-       one,two,four,six,ten3m
-  parameter(zero=0d0,one=1d0,two=2d0,four=4d0,six=6d0,ten3m=1d-3)
+  logical :: fsec, ftrk
+  double precision :: tilt, sk1, el
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+  double precision :: gamma, beta, dtbyds, qk, qkl, qkl2
+  double precision :: cx, sx, cy, sy, biby4
+
+  double precision, external :: get_value
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0, four=4d0, six=6d0, ten3m=1d-3
+
   !---- Initialize.
   beta = get_value('probe ','beta ')
   gamma = get_value('probe ','gamma ')
@@ -4223,10 +4130,13 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
   re(4,3) = + sk1 * sy
   re(4,4) = cy
   re(5,6) = el/(beta*gamma)**2
+
   ek(5) = el*dtbyds
+
   !---- Second-order terms.
   if (fsec) then
      biby4 = one / (four * beta)
+
      te(1,1,6) = + sk1 * el * sx * biby4
      te(1,6,1) = te(1,1,6)
      te(2,2,6) = te(1,1,6)
@@ -4262,12 +4172,11 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
   if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
 
 end SUBROUTINE qdbody
-SUBROUTINE tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
+SUBROUTINE tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twisslfi
   use twiss_elpfi
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for electrostatic separator.                       *
@@ -4285,26 +4194,32 @@ SUBROUTINE tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk,fmap,cplxy
-  double precision ct, st, tmp
-  double precision orbit(6),orbit0(6),ek(6),re(6,6),te(6,6,6),      &
-       deltap,el,el0,tilt,ekick,charge,pc,efield,exfld,eyfld,node_value, &
-       get_value,zero,one,two,ten3m
-  double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
+  logical :: fsec, ftrk, fmap
+  double precision :: el
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+
+  logical :: cplxy
+  integer :: elpar_vl
+  double precision :: deltap, el0, tilt, ekick, charge, pc, efield, exfld, eyfld
+  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
+  double precision :: ct, st, tmp
+
   integer, external :: el_par_vector
-  integer elpar_vl
-  parameter(zero=0d0,one=1d0,two=2d0,ten3m=1d-3)
+  double precision, external :: get_value, node_value
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0, ten3m=1d-3
 
   !---- Initialize.
-  st=zero
-  ct=zero
-  cplxy=.false.
+  st = zero
+  ct = zero
+  cplxy = .false.
   charge = get_value('probe ','charge ')
   pc = get_value('probe ','pc ')
   deltap = get_value('probe ','deltap ')
 
   fmap = el .ne. zero
   if (.not. fmap) return
+
   if (ftrk) then
      !-- get element parameters
      elpar_vl = el_par_vector(e_ey, g_elpar)
@@ -4312,9 +4227,10 @@ SUBROUTINE tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
      exfld = g_elpar(e_ex)
      eyfld = g_elpar(e_ey)
      tilt = g_elpar(e_tilt)
-     if(eyfld.ne.zero) then
+     if (eyfld.ne.zero) then
         tilt = -atan2(eyfld, exfld) + tilt
      endif
+
      if (tilt .ne. zero)  then
         !---  rotate orbit before entry
         st = sin(tilt)
@@ -4326,33 +4242,33 @@ SUBROUTINE tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
         orbit(2) = ct * tmp + st * orbit(4)
         orbit(4) = ct * orbit(4) - st * tmp
      endif
+
      efield = sqrt(exfld**2 + eyfld**2)
+
   else
      exfld = zero
      eyfld = zero
      efield = zero
      tilt = zero
   endif
+
   cplxy = cplxy .or. tilt .ne. zero
 
   ekick  = efield * ten3m * charge / (pc * (one + deltap))
+
   !---- centre option
-  if(centre_cptk.or.centre_bttk) then
-     call dcopy(orbit,orbit00,6)
-     call dcopy(ek,ek00,6)
-     call dcopy(re,re00,36)
-     call dcopy(te,te00,216)
-     el0=el/two
-     call dcopy(orbit,orbit0,6)
+  if (centre_cptk .or. centre_bttk) then
+     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE 
+     el0 = el/two
+     ORBIT0 = ORBIT 
      call spbody(fsec,ftrk,tilt,ekick,orbit0,el0,ek,re,te)
-     if(centre_cptk) call twcptk(re,orbit0)
-     if(centre_bttk) call twbttk(re,te)
-     call dcopy(orbit00,orbit,6)
-     call dcopy(ek00,ek,6)
-     call dcopy(re00,re,36)
-     call dcopy(te00,te,216)
+     if (centre_cptk) call twcptk(re,orbit0)
+     if (centre_bttk) call twbttk(re,te)
+     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00 
   endif
+
   call spbody(fsec,ftrk,tilt,ekick,orbit,el,ek,re,te)
+
   if (tilt .ne. zero)  then
      !---  rotate orbit at exit
      tmp = orbit(1)
@@ -4364,10 +4280,9 @@ SUBROUTINE tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
   endif
 
 end SUBROUTINE tmsep
+
 SUBROUTINE spbody(fsec,ftrk,tilt,ekick,orbit,el,ek,re,te)
-
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for electrostatic separator.                       *
@@ -4384,12 +4299,15 @@ SUBROUTINE spbody(fsec,ftrk,tilt,ekick,orbit,el,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk
-  double precision orbit(6),ek(6),re(6,6),te(6,6,6),el,tilt,ekl,ch, &
-       sh,sy,ekick,beta,gamma,dtbyds,dy,fact,get_value,zero,one,two,     &
-       three,by2,by24,by6,eps
-  parameter(zero=0d0,one=1d0,two=2d0,three=3d0,by2=1d0/2d0,         &
-       by6=1d0/6d0,by24=1d0/24d0,eps=1d-4)
+  logical :: fsec, ftrk
+  double precision :: el, tilt, ekick 
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+  double precision :: beta, gamma, dtbyds, ekl, ch, sh, sy, dy, fact
+
+  double precision, external :: get_value
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0
+  double precision, parameter :: by2=1d0/2d0, by6=1d0/6d0, by24=1d0/24d0, eps=1d-4
 
   !---- Initialize.
   dtbyds = get_value('probe ','dtbyds ')
@@ -4467,13 +4385,12 @@ SUBROUTINE spbody(fsec,ftrk,tilt,ekick,orbit,el,ek,re,te)
   if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
 
 end SUBROUTINE spbody
-SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
+SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for sextupole element.                             *
@@ -4491,32 +4408,36 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk,fmap,cplxy,dorad
-  integer i,j,n_ferr,node_fd_errors
-  double precision ct, st, tmp
-  double precision orbit(6),orbit0(6),f_errors(0:maxferr),ek(6),    &
-       re(6,6),te(6,6,6),deltap,el,el0,tilt,sk2,rfac,arad,gamma,pt,sk2s, &
-       bvk,field(2,0:2),node_value,get_value,zero,one,two,three,twelve
-  double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
-  integer, external :: el_par_vector
-  integer elpar_vl
-  parameter(zero=0d0,one=1d0,two=2d0,three=3d0,twelve=12d0)
+  logical :: fsec, ftrk, fmap 
+  double precision :: el
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+  logical :: cplxy, dorad
+  integer :: i, j, n_ferr, elpar_vl
+  double precision :: ct, st, tmp
+  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
+  double precision :: f_errors(0:maxferr)
+  double precision :: field(2,0:2)
+  double precision :: deltap, el0, tilt, sk2, pt,sk2s, bvk
+  double precision :: rfac, arad, gamma 
+
+  integer, external :: el_par_vector, node_fd_errors
+  double precision, external :: node_value, get_value
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0, twelve=12d0
 
   !---- Initialize.
-  st=zero
-  ct=zero
-  cplxy=.false.
+  st = zero
+  ct = zero
+  cplxy = .false.
   fmap = el .ne. zero
   if (.not. fmap) return
+
   !---- Field error.
-  call dzero(f_errors,maxferr+1)
+  F_ERRORS = zero 
   n_ferr = node_fd_errors(f_errors)
-  do i = 0, 2
-     do j = 1,2
-        field(j,i) = zero
-     enddo
-  enddo
+  FIELD = zero
   if (n_ferr .gt. 0) call dcopy(f_errors, field, min(6,n_ferr))
+
   !-- get element parameters
   elpar_vl = el_par_vector(s_k2s, g_elpar)
   bvk = node_value('other_bv ')
@@ -4529,6 +4450,7 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
      tilt = -atan2(sk2s, sk2)/three + tilt
      sk2 = sqrt(sk2**2 + sk2s**2)
   endif
+
   if (tilt .ne. zero)  then
      !---  rotate orbit before entry
      st = sin(tilt)
@@ -4549,8 +4471,7 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   !---- Half radiation effects at entrance.
   if (ftrk .and. dorad) then
-     rfac = arad * gamma**3 * sk2**2 * el * (orbit(1)**2 + orbit(3)  &
-          **2)**2 / twelve
+     rfac = arad * gamma**3 * sk2**2 * el * (orbit(1)**2 + orbit(3)**2)**2 / twelve
      pt = orbit(6)
      orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
      orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
@@ -4558,34 +4479,29 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
   endif
 
   !---- centre option
-  if(centre_cptk.or.centre_bttk) then
-     call dcopy(orbit,orbit00,6)
-     call dcopy(ek,ek00,6)
-     call dcopy(re,re00,36)
-     call dcopy(te,te00,216)
-     el0=el/two
-     call dcopy(orbit,orbit0,6)
+  if (centre_cptk.or.centre_bttk) then
+     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE 
+     el0 = el/two
+     ORBIT0 = ORBIT 
      call sxbody(fsec,ftrk,tilt,sk2,orbit0,el0,ek,re,te)
-     if(centre_cptk) call twcptk(re,orbit0)
-     if(centre_bttk) call twbttk(re,te)
-     call dcopy(orbit00,orbit,6)
-     call dcopy(ek00,ek,6)
-     call dcopy(re00,re,36)
-     call dcopy(te00,te,216)
+     if (centre_cptk) call twcptk(re,orbit0)
+     if (centre_bttk) call twbttk(re,te)
+     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00 
   endif
+
   call sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
 
   !---- Half radiation effects at exit.
   if (ftrk) then
      if (dorad) then
-        rfac = arad * gamma**3 * sk2**2 * el * (orbit(1)**2 + orbit   &
-             (3)**2)**2 / twelve
+        rfac = arad * gamma**3 * sk2**2 * el * (orbit(1)**2 + orbit(3)**2)**2 / twelve
         pt = orbit(6)
         orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
         orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
         orbit(6) = orbit(6) - rfac * (one + pt) ** 2
      endif
   endif
+
   if (tilt .ne. zero)  then
      !---  rotate orbit at exit
      tmp = orbit(1)
@@ -4597,10 +4513,9 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
   endif
 
 end SUBROUTINE tmsext
+
 SUBROUTINE sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
-
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for sextupole element.                             *
@@ -4617,10 +4532,14 @@ SUBROUTINE sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk
-  double precision orbit(6),ek(6),re(6,6),te(6,6,6),el,tilt,sk2,skl,&
-       gamma,dtbyds,beta,s1,s2,s3,s4,get_value,zero,two,three,four
-  parameter(zero=0d0,two=2d0,three=3d0,four=4d0)
+  logical :: fsec, ftrk
+  double precision :: tilt, sk2, el
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+  double precision :: skl, gamma, dtbyds, beta, s1, s2, s3, s4
+
+  double precision, external :: get_value
+  double precision, parameter :: zero=0d0, two=2d0, three=3d0, four=4d0
 
   !---- Initialize.
   beta = get_value('probe ','beta ')
@@ -4676,11 +4595,10 @@ SUBROUTINE sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
   if (tilt .ne. zero) call tmtilt(fsec,tilt,ek,re,te)
 
 end SUBROUTINE sxbody
-SUBROUTINE tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
+SUBROUTINE tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twisslfi
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for solenoid element, with centre option.          *
@@ -4696,39 +4614,36 @@ SUBROUTINE tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk,fmap
-  double precision orbit(6),orbit0(6),ek(6),re(6,6),te(6,6,6),      &
-       el,el0,zero,two
-  double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
-  parameter(zero=0d0,two=2d0)
+  logical :: fsec, ftrk, fmap
+  double precision :: el
+  double precision :: orbit(6), ek(6),re(6,6),te(6,6,6)
 
-  if(el.eq.zero) then
+  double precision :: el0       
+  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
+
+  double precision, parameter :: zero=0d0, two=2d0 
+
+  if (el.eq.zero) then
      call tmsol_th(ftrk,orbit,fmap,ek,re,te)
-  else
-     !---- centre option
-     if(centre_cptk.or.centre_bttk) then
-        call dcopy(orbit,orbit00,6)
-        call dcopy(ek,ek00,6)
-        call dcopy(re,re00,36)
-        call dcopy(te,te00,216)
-        el0=el/two
-        call dcopy(orbit,orbit0,6)
-        call tmsol0(fsec,ftrk,orbit0,fmap,el0,ek,re,te)
-        if(centre_cptk) call twcptk(re,orbit0)
-        if(centre_bttk) call twbttk(re,te)
-        call dcopy(orbit00,orbit,6)
-        call dcopy(ek00,ek,6)
-        call dcopy(re00,re,36)
-        call dcopy(te00,te,216)
-     endif
-     call tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
+     return
   endif
 
+  !---- centre option
+  if (centre_cptk.or.centre_bttk) then
+     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE 
+     el0 = el/two
+     ORBIT0 = ORBIT 
+     call tmsol0(fsec,ftrk,orbit0,fmap,el0,ek,re,te)
+     if (centre_cptk) call twcptk(re,orbit0)
+     if (centre_bttk) call twbttk(re,te)
+     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00 
+  endif
+  call tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
+
 end SUBROUTINE tmsol
+
 SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
-
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for solenoid element, no centre option.            *
@@ -4744,11 +4659,16 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk,fmap,cplxy
-  double precision orbit(6),ek(6),re(6,6),te(6,6,6),deltap,el,sks,  &
-       sk,gamma,skl,beta,co,si,sibk,temp,dtbyds,node_value,get_value,bvk,&
-       zero,one,two,three,six,ten5m
-  parameter(zero=0d0,one=1d0,two=2d0,three=3d0,six=6d0,ten5m=1d-5)
+  logical :: fsec, ftrk, fmap
+  double precision :: el
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+  logical :: cplxy
+  double precision :: deltap, sks, sk, gamma, skl, beta, dtbyds, bvk
+  double precision :: co, si, sibk, temp
+  
+  double precision, external :: node_value, get_value
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0, six=6d0, ten5m=1d-5
 
   !---- Initialize.
   fmap = el .ne. zero
@@ -4760,9 +4680,7 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   !---- Strength.
   sks = node_value('ks ')
-  if (sks .ne. zero) then
-     cplxy = .true.
-  endif
+  if (sks .ne. zero) cplxy = .true.
 
   !---- BV flag
   bvk = node_value('other_bv ')
@@ -4784,6 +4702,7 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   re(2,2) = re(1,1)
   re(3,3) = re(1,1)
   re(4,4) = re(1,1)
+
   re(1,2) = co * sibk
   re(3,4) = re(1,2)
   re(1,3) = co * si
@@ -4797,6 +4716,7 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   re(4,1) = sk * si**2
   re(2,3) = - re(4,1)
   re(5,6) = el/(beta*gamma)**2
+
   ek(5) = el*dtbyds
 
   !---- Second-order terms.
@@ -4836,11 +4756,10 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmsol0
-SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
 
+SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
   use twisslfi
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for rotation about S-axis.                         *
@@ -4854,11 +4773,15 @@ SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical ftrk,fmap,cplxy
-  double precision orbit(6),ek(6),re(6,6),te(6,6,6),theta,ct,st,    &
-       orbit0(6),node_value,zero
-  double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
-  parameter(zero=0d0)
+  logical :: ftrk, fmap
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+  logical :: cplxy
+  double precision :: theta, ct, st 
+  double precision :: orbit0(6), orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
+
+  double precision, external :: node_value
+  double precision, parameter :: zero=0d0
 
   !---- Initialize.
   theta = node_value('angle ')
@@ -4869,6 +4792,7 @@ SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
   cplxy = .true.
   ct = cos(theta)
   st = sin(theta)
+
   re(1,1) = ct
   re(1,3) = st
   re(3,1) = -st
@@ -4880,28 +4804,22 @@ SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
 
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+
   !---- centre option
-  if(centre_cptk.or.centre_bttk) then
-     call dcopy(orbit,orbit00,6)
-     call dcopy(ek,ek00,6)
-     call dcopy(re,re00,36)
-     call dcopy(te,te00,216)
-     if(centre_cptk) then
-        call dcopy(orbit,orbit0,6)
+  if (centre_cptk.or.centre_bttk) then
+     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE 
+     if (centre_cptk) then
+        ORBIT0 = ORBIT
         call twcptk(re,orbit0)
      endif
-     if(centre_bttk) call twbttk(re,te)
-     call dcopy(orbit00,orbit,6)
-     call dcopy(ek00,ek,6)
-     call dcopy(re00,re,36)
-     call dcopy(te00,te,216)
+     if (centre_bttk) call twbttk(re,te)
+     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00 
   endif
 end SUBROUTINE tmsrot
-SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
 
+SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   use twisslfi
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for rotation about Y-axis.                         *
@@ -4916,11 +4834,14 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical ftrk,fmap
-  double precision orbit(6),ek(6),re(6,6),te(6,6,6),phi,cosphi,     &
-       orbit0(6),sinphi,tanphi,beta,node_value,get_value,zero,one
-  double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
-  parameter(zero=0d0,one=1d0)
+  logical :: ftrk, fmap
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+  double precision :: phi, cosphi, sinphi, tanphi, beta
+  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
+  double precision, parameter :: zero=0d0, one=1d0
+
+  double precision, external :: node_value, get_value
 
   !---- Initialize.
   phi = node_value('angle ')
@@ -4944,27 +4865,21 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
   !---- centre option
-  if(centre_cptk.or.centre_bttk) then
-     call dcopy(orbit,orbit00,6)
-     call dcopy(ek,ek00,6)
-     call dcopy(re,re00,36)
-     call dcopy(te,te00,216)
-     if(centre_cptk) then
-        call dcopy(orbit,orbit0,6)
+  if (centre_cptk.or.centre_bttk) then
+     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE 
+     if (centre_cptk) then
+        ORBIT0 = ORBIT
         call twcptk(re,orbit0)
      endif
-     if(centre_bttk) call twbttk(re,te)
-     call dcopy(orbit00,orbit,6)
-     call dcopy(ek00,ek,6)
-     call dcopy(re00,re,36)
-     call dcopy(te00,te,216)
+     if (centre_bttk) call twbttk(re,te)
+     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00 
   endif
 
 end SUBROUTINE tmyrot
+
 SUBROUTINE tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
-
+  use matrices, only : EYE
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for drift space, no centre option.                 *
@@ -4980,15 +4895,19 @@ SUBROUTINE tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk,fmap
-  double precision dl,beta,gamma,dtbyds,orbit(6),ek(6),re(6,6),     &
-       te(6,6,6),get_value,zero,two,three
-  parameter(zero=0d0,two=2d0,three=3d0)
+  logical :: fsec, ftrk, fmap
+  double precision :: dl
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+  double precision :: beta, gamma, dtbyds
+  
+  double precision, external :: get_value
+  double precision, parameter :: zero=0d0, two=2d0, three=3d0
 
   !---- Initialize.
-  call dzero(ek, 6)
-  call m66one(re)
-  if (fsec) call dzero(te, 216)
+  EK = zero 
+  RE = EYE !call m66one(re)
+  if (fsec) TE = zero 
   fmap = dl .ne. zero
   dtbyds = get_value('probe ', 'dtbyds ')
   gamma = get_value('probe ', 'gamma ')
@@ -4998,6 +4917,7 @@ SUBROUTINE tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   re(1,2) = dl
   re(3,4) = dl
   re(5,6) = dl/(beta*gamma)**2
+
   ek(5) = dl*dtbyds
 
   !---- Second-order terms.
@@ -5015,11 +4935,10 @@ SUBROUTINE tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmdrf0
-SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
+SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   use twisslfi
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for drift space, with centre option.               *
@@ -5035,37 +4954,34 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk,fmap
-  double precision dl,dl0,orbit(6),orbit0(6),ek(6),re(6,6),         &
-       te(6,6,6),two
-  double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
-  parameter(two=2d0)
+  logical :: fsec, ftrk, fmap
+  double precision :: dl
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+  double precision :: dl0 
+  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
+
+  double precision, parameter :: two=2d0
 
   !---- centre option
-  if(centre_cptk.or.centre_bttk) then
-     call dcopy(orbit,orbit00,6)
-     call dcopy(ek,ek00,6)
-     call dcopy(re,re00,36)
-     call dcopy(te,te00,216)
+  if (centre_cptk .or. centre_bttk) then
+     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
      dl0=dl/two
-     call dcopy(orbit,orbit0,6)
+     ORBIT0 = ORBIT
      call tmdrf0(fsec,ftrk,orbit0,fmap,dl0,ek,re,te)
-     if(centre_cptk) call twcptk(re,orbit0)
-     if(centre_bttk) call twbttk(re,te)
-     call dcopy(orbit00,orbit,6)
-     call dcopy(ek00,ek,6)
-     call dcopy(re00,re,36)
-     call dcopy(te00,te,216)
+     if (centre_cptk) call twcptk(re,orbit0)
+     if (centre_bttk) call twbttk(re,te)
+     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00 
   endif
   call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
 end SUBROUTINE tmdrf
-SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
+SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twisslfi
   use twiss_elpfi
+  use matrices, only : EYE
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for RF cavity.                                     *
@@ -5081,15 +4997,21 @@ SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk,fmap
-  double precision orbit(6),orbit0(6),ek(6),re(6,6),te(6,6,6),      &
-       rw(6,6),tw(6,6,6),el,rfv,rff,rfl,dl,omega,vrf,phirf,pc,deltap,c0, &
-       c1,c2,ek0(6),ten6p,clight,pi,twopi,zero,one,two,half,ten3m,bvk
-  double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
-  double precision, external :: get_variable,get_value,node_value
-  integer, external :: el_par_vector
+  logical :: fsec, ftrk, fmap
+  double precision :: el
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
   integer elpar_vl
-  parameter(zero=0d0,one=1d0,two=2d0,half=5d-1,ten6p=1d6,ten3m=1d-3)
+  double precision :: rfv, rff, rfl, dl, omega, vrf, phirf, pc, deltap, bvk
+  double precision :: clight, pi, twopi
+  double precision :: ek0(6), rw(6,6), tw(6,6,6)
+  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
+  double precision :: c0, c1, c2
+
+  double precision, external :: get_variable, get_value, node_value
+  integer, external :: el_par_vector
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0, half=5d-1
+  double precision, parameter :: ten6p=1d6, ten3m=1d-3
 
   !-- get element parameters
   elpar_vl = el_par_vector(r_freq, g_elpar)
@@ -5106,14 +5028,14 @@ SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !---- Cavity is excited, use full map.
 
   !---- Initialize.
-  call dzero(ek0,6)
-  call m66one(rw)
-  call dzero(tw,216)
+  EK0 = zero 
+  RW = EYE !call m66one(rw)
+  TW = zero 
 
   !---- BV flag
-  clight=get_variable('clight ')
-  pi=get_variable('pi ')
-  twopi=two*pi
+  clight = get_variable('clight ')
+  pi = get_variable('pi ')
+  twopi = two*pi
 
   rff = g_elpar(r_freq)
   rfl = g_elpar(r_lag)
@@ -5152,30 +5074,23 @@ SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
     dl = el / two
     call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
     call tmcat(fsec,re,te,rw,tw,re,te)
-    if(centre_cptk.or.centre_bttk) then
-      call dcopy(orbit,orbit00,6)
-      call dcopy(ek,ek00,6)
-      call dcopy(re,re00,36)
-      call dcopy(te,te00,216)
-      if(centre_cptk) then
-        call dcopy(orbit,orbit0,6)
-        call twcptk(re,orbit0)
-      endif
-      if(centre_bttk) call twbttk(re,te)
-      call dcopy(orbit00,orbit,6)
-      call dcopy(ek00,ek,6)
-      call dcopy(re00,re,36)
-      call dcopy(te00,te,216)
+    if (centre_cptk .or. centre_bttk) then
+       ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE 
+       if (centre_cptk) then
+          ORBIT0 = ORBIT
+          call twcptk(re,orbit0)
+       endif
+       if (centre_bttk) call twbttk(re,te)
+       ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00 
     endif
     call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
     call tmcat(fsec,rw,tw,re,te,re,te)
   endif
+
 end SUBROUTINE tmrf
 
 SUBROUTINE tmcat(fsec,rb,tb,ra,ta,rd,td)
-
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Concatenate two TRANSPORT maps.                                  *
@@ -5187,19 +5102,24 @@ SUBROUTINE tmcat(fsec,rb,tb,ra,ta,rd,td)
   !     Output:                                                          *
   !     rd(6,6), td(6,6,6)  result map.                                  *
   !----------------------------------------------------------------------*
-  logical fsec
-  integer i1,i2,i3
-  double precision ra(6,6),rb(6,6),rd(6,6),rw(6,6),ta(6,6,6),       &
-       tb(36,6),td(6,6,6),ts(36,6),tw(6,6,6)
+  logical :: fsec
+  double precision :: ra(6,6), rb(6,6), rd(6,6)
+  double precision :: ta(6,6,6), tb(36,6), td(6,6,6)
+
+  double precision :: rw(6,6)
+  double precision :: tw(6,6,6), ts(36,6)
+  integer :: i1, i2, i3
+
+  double precision, parameter :: zero=0.d0
 
   !---- Initialization
-  call dzero(tw,216)
+  TW = zero 
 
   !---- Transfer matrix.
   do i2 = 1, 6
      do i1 = 1, 6
         rw(i1,i2) = rb(i1,1) * ra(1,i2) + rb(i1,2) * ra(2,i2)         &
-             + rb(i1,3) * ra(3,i2) + rb(i1,4) * ra(4,i2)                       &
+             + rb(i1,3) * ra(3,i2) + rb(i1,4) * ra(4,i2)              &
              + rb(i1,5) * ra(5,i2) + rb(i1,6) * ra(6,i2)
      enddo
   enddo
@@ -5209,7 +5129,7 @@ SUBROUTINE tmcat(fsec,rb,tb,ra,ta,rd,td)
      do i3 = 1, 6
         do i1 = 1, 36
            ts(i1,i3) = tb(i1,1) * ra(1,i3) + tb(i1,2) * ra(2,i3)       &
-                + tb(i1,3) * ra(3,i3) + tb(i1,4) * ra(4,i3)                       &
+                + tb(i1,3) * ra(3,i3) + tb(i1,4) * ra(4,i3)            &
                 + tb(i1,5) * ra(5,i3) + tb(i1,6) * ra(6,i3)
         enddo
      enddo
@@ -5217,11 +5137,11 @@ SUBROUTINE tmcat(fsec,rb,tb,ra,ta,rd,td)
         do i3 = i2, 6
            do i1 = 1, 6
               tw(i1,i2,i3) =                                            &
-                   rb(i1,1) * ta(1,i2,i3) + rb(i1,2) * ta(2,i2,i3)                   &
-                   + rb(i1,3) * ta(3,i2,i3) + rb(i1,4) * ta(4,i2,i3)                 &
-                   + rb(i1,5) * ta(5,i2,i3) + rb(i1,6) * ta(6,i2,i3)                 &
-                   + ts(i1,   i2) * ra(1,i3) + ts(i1+ 6,i2) * ra(2,i3)               &
-                   + ts(i1+12,i2) * ra(3,i3) + ts(i1+18,i2) * ra(4,i3)               &
+                   rb(i1,1) * ta(1,i2,i3) + rb(i1,2) * ta(2,i2,i3)      &
+                   + rb(i1,3) * ta(3,i2,i3) + rb(i1,4) * ta(4,i2,i3)    &
+                   + rb(i1,5) * ta(5,i2,i3) + rb(i1,6) * ta(6,i2,i3)    &
+                   + ts(i1,   i2) * ra(1,i3) + ts(i1+ 6,i2) * ra(2,i3)  &
+                   + ts(i1+12,i2) * ra(3,i3) + ts(i1+18,i2) * ra(4,i3)  &
                    + ts(i1+24,i2) * ra(5,i3) + ts(i1+30,i2) * ra(6,i3)
               tw(i1,i3,i2) = tw(i1,i2,i3)
            enddo
@@ -5230,14 +5150,13 @@ SUBROUTINE tmcat(fsec,rb,tb,ra,ta,rd,td)
   endif
 
   !---- Copy result.
-  call dcopy(rw,rd,36)
-  call dcopy(tw,td,216)
+  RD = RW 
+  TD = TW 
 
 end SUBROUTINE tmcat
+
 SUBROUTINE tmtrak(ek,re,te,orb1,orb2)
-
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Track orbit and change reference for RE matrix.                  *
@@ -5250,12 +5169,16 @@ SUBROUTINE tmtrak(ek,re,te,orb1,orb2)
   !     orb2(6)   (double)  orbit after element.                         *
   !     re(6,6)   (double)  transfer matrix after update.                *
   !----------------------------------------------------------------------*
-  integer i,k,l,get_option
-  double precision sum1,sum2,ek(6),re(6,6),te(6,6,6),orb1(6),       &
-       orb2(6),temp(6),zero
-  parameter(zero=0d0)
+  double precision, intent(IN)     :: ek(6), te(6,6,6), orb1(6)
+  double precision, intent(IN OUT) :: re(6,6)
+  double precision, intent(OUT)    :: orb2(6)
 
-  !---- initialize.
+  integer :: i, k, l
+  double precision :: sum1, sum2, temp(6)
+  
+  integer, external :: get_option
+  double precision, parameter :: zero=0d0
+
   do i = 1, 6
      sum2 = ek(i)
      do k = 1, 6
@@ -5268,16 +5191,17 @@ SUBROUTINE tmtrak(ek,re,te,orb1,orb2)
      enddo
      temp(i) = sum2
   enddo
-  call dcopy(temp,orb2,6)
+
+  ORB2(1:6) = TEMP(1:6) 
 
   !---- Symplectify transfer matrix.
-  if(get_option('sympl ').ne.0) call tmsymp(re)
+  if (get_option('sympl ') .ne. 0) call tmsymp(re)
 
 end SUBROUTINE tmtrak
+
 SUBROUTINE tmsymp(r)
-
+  use matrices, only : EYE
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Symplectify a 6 by 6 matrix R.                                   *
@@ -5287,48 +5211,63 @@ SUBROUTINE tmsymp(r)
   !     Output:                                                          *
   !     r(6,6)    (double)  the symplectified matrix.                    *
   !----------------------------------------------------------------------*
-  logical eflag
-  integer i,j
-  double precision a(6,6),b(6,6),r(6,6),v(6,6),zero,one,two,nrm
-  parameter(zero=0d0,one=1d0,two=2d0)
+  double precision, intent(IN OUT) :: r(6,6)
 
-  do i = 1, 6
-     do j = 1, 6
-        a(i,j) = - r(i,j)
-        b(i,j) = + r(i,j)
-     enddo
-     a(i,i) = a(i,i) + one
-     b(i,i) = b(i,i) + one
-  enddo
-  call m66div(a,b,v,eflag)
+  logical :: eflag
+  integer :: i, j
+  double precision :: a(6,6), b(6,6), v(6,6), nrm
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0
+
+  A = -R + EYE
+  B =  R + EYE
+  
+  ! do i = 1, 6
+  !    do j = 1, 6
+  !       a(i,j) = - r(i,j)
+  !       b(i,j) = + r(i,j)
+  !    enddo
+  !    a(i,i) = a(i,i) + one
+  !    b(i,i) = b(i,i) + one
+  ! enddo
+ 
+  call m66div(a,b,v,eflag) ! V = A * B-1
   if (eflag) goto 100
-  call m66inv(v,a)
-  do i = 1, 6
-     do j = 1, 6
-        a(i,j) = (a(i,j) - v(i,j)) / two
-        b(i,j) = - a(i,j)
-     enddo
-     b(i,i) = b(i,i) + one
-     a(i,i) = a(i,i) + one
-  enddo
-  call m66div(a,b,v,eflag)
+
+  call m66inv(v,a) ! A = V-1
+
+  A = ( A - V ) / two 
+  B = -A
+  A = A + EYE
+  B = B + EYE
+
+  ! do i = 1, 6
+  !    do j = 1, 6
+  !       a(i,j) = (a(i,j) - v(i,j)) / two
+  !       b(i,j) = - a(i,j)
+  !    enddo
+  !    a(i,i) = a(i,i) + one
+  !    b(i,i) = b(i,i) + one
+  ! enddo
+
+  call m66div(a,b,v,eflag) ! V = A * B-1
   if (eflag) goto 100
-  call dcopy(v,r,36)
-  goto 999
+
+  R = V 
+  return
 
 100 continue
-  call m66symp(r,nrm)
-  if (nrm .gt. zero) then
-    print *," Singular matrix occurred during simplectification of R (left unchanged)."
-    print *," The column norm of R'*J*R-J is ",nrm
-  endif
+    call m66symp(r,nrm)
+    if (nrm .gt. zero) then
+       print *," Singular matrix occurred during symplectification of R (left unchanged)."
+       print *," The column norm of R'*J*R-J is ",nrm
+    endif
 
-999 end SUBROUTINE tmsymp
+end SUBROUTINE tmsymp
+
 SUBROUTINE tmali1(orb1, errors, betas, gammas, orb2, rm)
-
   use twiss0fi
+  use matrices, only : EYE
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for orbit displacement at entry of an element.     *
@@ -5341,8 +5280,11 @@ SUBROUTINE tmali1(orb1, errors, betas, gammas, orb2, rm)
   !     orb2(6)   (real)    Orbit after misalignment.                    *
   !     rm(6,6)   (real)    First order transfer matrix w.r.t. orbit.    *
   !----------------------------------------------------------------------*
-  double precision ds,dx,dy,phi,psi,rm(6,6),s2,the,betas, gammas,   &
-       w(3,3),orb1(6),orb2(6),orbt(6),errors(align_max)
+  double precision, intent(IN)  :: orb1(6), errors(align_max), betas, gammas
+  double precision, intent(OUT) :: orb2(6),  rm(6,6)
+
+  double precision :: orbt(6), w(3,3)
+  double precision :: ds, dx, dy, the, phi, psi, s2
 
   !---- Build rotation matrix and compute additional drift length.
   dx  = errors(1)
@@ -5355,7 +5297,7 @@ SUBROUTINE tmali1(orb1, errors, betas, gammas, orb2, rm)
   s2 = (w(1,3) * dx + w(2,3) * dy + w(3,3) * ds) / w(3,3)
 
   !---- F2 terms (transfer matrix).
-  call m66one(rm)
+  RM = EYE !call m66one(rm)
   rm(2,2) = w(1,1)
   rm(2,4) = w(2,1)
   rm(2,6) = w(3,1) / betas
@@ -5378,7 +5320,7 @@ SUBROUTINE tmali1(orb1, errors, betas, gammas, orb2, rm)
   rm(5,6) = - s2 / (betas * gammas)**2
 
   !---- Track orbit.
-  call m66byv(rm, orb1, orbt)
+  ORBT = matmul(RM,ORB1) 
   orb2(1) = orbt(1) - (w(2,2) * dx - w(1,2) * dy) / w(3,3)
   orb2(2) = orbt(2) + w(3,1)
   orb2(3) = orbt(3) - (w(1,1) * dy - w(2,1) * dx) / w(3,3)
@@ -5387,11 +5329,11 @@ SUBROUTINE tmali1(orb1, errors, betas, gammas, orb2, rm)
   orb2(6) = orbt(6)
 
 end SUBROUTINE tmali1
+
 SUBROUTINE tmali2(el, orb1, errors, betas, gammas, orb2, rm)
-
   use twiss0fi
+  use matrices, only : EYE
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for orbit displacement at exit of an element.      *
@@ -5404,10 +5346,13 @@ SUBROUTINE tmali2(el, orb1, errors, betas, gammas, orb2, rm)
   !     orb2(6)   (real)    Orbit after misalignment.                    *
   !     rm(6,6)   (real)    First order transfer matrix w.r.t. orbit.    *
   !----------------------------------------------------------------------*
-  double precision ds,dx,dy,el,phi,psi,s2,the,tilt,orb1(6),orb2(6), &
-       rm(6,6),v(3),ve(3),w(3,3),we(3,3),orbt(6),errors(align_max),betas,&
-       gammas,zero
-  parameter(zero=0d0)
+  double precision, intent(IN)  :: orb1(6), errors(align_max), betas, gammas
+  double precision, intent(OUT) :: orb2(6),  rm(6,6)
+
+  double precision :: orbt(6), v(3), ve(3), w(3,3), we(3,3)
+  double precision :: ds, dx, dy, the, phi, psi, s2, el, tilt
+
+  double precision, parameter :: zero=0d0
 
   !---- Misalignment rotation matrix w.r.t. entrance system.
   dx  = errors(1)
@@ -5416,10 +5361,12 @@ SUBROUTINE tmali2(el, orb1, errors, betas, gammas, orb2, rm)
   the = errors(5)
   phi = errors(4)
   psi = errors(6)
-  tilt=zero
+  tilt = zero
   call sumtrx(the, phi, psi, w)
+
   !---- VE and WE represent the change of reference.
   call suelem(el, ve, we, tilt)
+
   !---- Misalignment displacements at exit w.r.t. entrance system.
   v(1) = dx + w(1,1)*ve(1)+w(1,2)*ve(2)+w(1,3)*ve(3)-ve(1)
   v(2) = dy + w(2,1)*ve(1)+w(2,2)*ve(2)+w(2,3)*ve(3)-ve(2)
@@ -5430,7 +5377,7 @@ SUBROUTINE tmali2(el, orb1, errors, betas, gammas, orb2, rm)
   s2 = - (w(1,3) * v(1) + w(2,3) * v(2) + w(3,3) * v(3)) / w(3,3)
 
   !---- Transfer matrix.
-  call m66one(rm)
+  RM = EYE !call m66one(rm)
   rm(1,1) = w(1,1)
   rm(3,1) = w(2,1)
   rm(5,1) = w(3,1) / betas
@@ -5459,14 +5406,13 @@ SUBROUTINE tmali2(el, orb1, errors, betas, gammas, orb2, rm)
   orbt(4) = orb1(4) - w(3,2)
   orbt(5) = orb1(5) - s2 / betas
   orbt(6) = orb1(6)
-  call m66byv(rm, orbt, orb2)
+  ORB2 = matmul(RM,ORBT) 
 
 end SUBROUTINE tmali2
-SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
 
+SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
   use trackfi
   implicit none
-
   !----------------------------------------------------------------------*
   !     purpose:                                                         *
   !     transport map for beam-beam element.                             *
@@ -5481,23 +5427,28 @@ SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  integer beamshape, b_dir_int,get_option
-  logical fsec,ftrk,fmap,first,bb_ultra_relati
-  double precision orbit(6),re(6,6),te(6,6,6),node_value,get_value
-  double precision fk,parvec(26),q,q_prime,dp,get_variable
-  double precision gamma0,beta0,beta_dp,ptot,b_dir
-  double precision zero,one,two
-  parameter(zero=0.0d0,one=1.0d0,two=2.0d0)
-  save first
-  data first / .true. /
-  !     if x > explim, exp(-x) is outside machine limits.
+  logical, intent(IN)  :: fsec, ftrk
+  logical, intent(OUT) :: fmap
+  double precision, intent(IN OUT) :: orbit(6)
+  double precision, intent(OUT) :: re(6,6), te(6,6,6)
+
+  integer :: beamshape, b_dir_int
+  logical, save :: first=.true.
+  logical :: bb_ultra_relati
+  double precision :: parvec(26), fk, q, q_prime, dp
+  double precision :: gamma0, beta0, beta_dp, ptot, b_dir
+
+  integer, external :: get_option
+  double precision, external :: node_value, get_value, get_variable
+  double precision, parameter :: zero=0.0d0, one=1.0d0, two=2.0d0
 
   !---  standard 4D
-  q=get_value('probe ','charge ')
-  q_prime=node_value('charge ')
-  parvec(5)=get_value('probe ', 'arad ')
-  parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
-  parvec(7)=get_value('probe ','gamma ')
+  q = get_value('probe ','charge ')
+  q_prime = node_value('charge ')
+  parvec(5) = get_value('probe ', 'arad ')
+  parvec(6) = node_value('charge ') * get_value('probe ', 'npart ')
+  parvec(7) = get_value('probe ','gamma ')
+
   !---- Calculate momentum deviation and according changes
   !     of the relativistic factor beta0
   dp  = get_variable('track_deltap ')
@@ -5508,55 +5459,66 @@ SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
   b_dir_int = node_value('bbdir ')
   b_dir = dble(b_dir_int)
   b_dir = b_dir/sqrt(b_dir*b_dir + 1.0d-32)
-  !
+
   bb_ultra_relati=get_option('bb_ultra_relati ').ne.0
-  if(bb_ultra_relati) then
+
+  if (bb_ultra_relati) then
      fk = two * parvec(5) * parvec(6) / parvec(7)
   else
      fk = two*parvec(5)*parvec(6)/parvec(7)/beta0/(one+dp)/q*          &
        (one-beta0*beta_dp*b_dir)/(beta_dp+0.5*(b_dir-one)*b_dir*beta0)
   endif
+
   !---- chose beamshape
   beamshape = node_value('bbshape ')
-  if(beamshape.lt.1.or.beamshape.gt.3) then
-     beamshape=1
-     if(first) then
-        first = .false.
-        call aawarn('TMBB: ',                                         &
-             'beamshape out of range, set to default=1')
-     endif
-  endif
-  if(beamshape.eq.1) call tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
-  if(beamshape.eq.2) call tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,  &
-       fk)
-  if(beamshape.eq.3) call tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,&
-       re,te,fk)
-end SUBROUTINE tmbb
-SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
 
+  select case (beamshape)
+  case (1)
+     call tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
+  case (2)
+     call tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
+  case (3)
+     call tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
+  case default
+     if (first) then
+        first = .false.
+        call aawarn('TMBB: ', 'beamshape out of range, set to default=1')
+     endif
+     beamshape=1
+     call tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
+  end select
+        
+end SUBROUTINE tmbb
+
+SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
   use bbfi
   use twisslfi
   use spch_bbfi
   use fasterror
   implicit none
 
-  logical fsec,ftrk,fmap,bborbit,bb_sxy_update
-  integer get_option,mylen
-  double precision orbit(6),re(6,6),te(6,6,6),pi,sx,sy,  &
-       xm,ym,sx2,sy2,xs,ys,rho2,fk,tk,exk,phix,phiy,rho4,phixx,phixy,    &
-       phiyy,rho6,rk,exkc,xb,yb,phixxx,phixxy,phixyy,phiyyy,crx,cry,xr,  &
-       yr,r,r2,cbx,cby,get_variable,node_value,zero,one,two,   &
-       orbit0(6),three,ten3m,explim
-  double precision orbit00(6),re00(6,6),te00(6,6,6)
-  character*20 text
-  character*(name_len) name
-  parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
-       explim=150d0)
-  !     if x > explim, exp(-x) is outside machine limits.
+  logical :: fsec, ftrk, fmap
+  double precision :: orbit(6), re(6,6), te(6,6,6)
+
+  logical :: bborbit, bb_sxy_update
+  integer :: mylen
+  double precision :: pi,sx,sy, xm, ym, sx2, sy2, xs, ys, rho2, fk, tk, exk 
+  double precision :: phix, phiy, rho4, phixx, phixy, phiyy, rho6, rk, exkc 
+  double precision :: xb, yb, phixxx, phixxy, phixyy, phiyyy, crx, cry, xr
+  double precision :: yr, r, r2, cbx, cby
+  double precision :: orbit0(6), orbit00(6), re00(6,6), te00(6,6,6)
+  character(len=20) :: text
+  character(len=name_len) :: name
+
+  integer, external ::  get_option
+  double precision, external :: get_variable, node_value
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0
+  double precision, parameter :: ten3m=1d-3, explim=150d0
+  ! if x > explim, exp(-x) is outside machine limits.
 
   !---- initialize.
   bborbit = get_option('bborbit ') .ne. 0
-  if (bbd_flag .ne. 0 .and. .not. bborbit)  then
+  if (bbd_flag.ne.0 .and. .not.bborbit)  then
      if (bbd_cnt .eq. bbd_max)  then
         call aawarn('TMBB_GAUSS: ','maximum bb number reached')
      else
@@ -5566,34 +5528,36 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
         bb_kick(2,bbd_cnt) = zero
      endif
   endif
+
   pi=get_variable('pi ')
   fmap = .true.
+
   bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
-  if(bb_sxy_update) then
+  if (bb_sxy_update) then
      fk = fk * rat_bb_n_ions !Ratio_for_bb_N_ions
      name=' '
      call element_name(name,len(name))
-     mylen=len_trim(name)
-     i_spch=i_spch+1
+     mylen = len_trim(name)
+     i_spch = i_spch + 1
      
-     if(i_spch.gt.N_spch) then
+     if (i_spch .gt. N_spch) then
         write(text, '(1p,i8)') i_spch
-        call aafail('TMBB: ', 'Table with too few BB elements: '//  &
-             text)
-     endif
-     if(spch_bb_name(i_spch)(:mylen).ne.name(:mylen)) then
-        call aafail('TMBB: ', 'wrong element name in Table: '//     &
-             'spch_bb')
+        call aafail('TMBB: ', 'Table with too few BB elements: '//text)
      endif
 
-     sx=sqrt(betx_bb(i_spch)*Ex_rms+(dx_bb(i_spch)*sigma_p)**2)
-     sy=sqrt(bety_bb(i_spch)*Ey_rms+(dy_bb(i_spch)*sigma_p)**2)
+     if (spch_bb_name(i_spch)(:mylen) .ne. name(:mylen)) & 
+        call aafail('TMBB: ', 'wrong element name in Table: spch_bb')
+
+     sx = sqrt(betx_bb(i_spch)*Ex_rms + (dx_bb(i_spch)*sigma_p)**2)
+     sy = sqrt(bety_bb(i_spch)*Ey_rms + (dy_bb(i_spch)*sigma_p)**2)
   else
      sx = node_value('sigx ')
      sy = node_value('sigy ')
   endif
+
   xm = node_value('xma ')
   ym = node_value('yma ')
+
   if (fk .ne. zero)  then
      !---- if tracking is desired ...
      if (ftrk) then
@@ -5637,12 +5601,11 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
               endif
               !---- first-order effects.
               rho4 = rho2 * rho2
-              phixx = fk * (- exkc * (xs*xs - ys*ys) / rho4             &
-                   + exk * xs*xs / (rho2 * sx2))
-              phixy = fk * (- exkc * two * xs * ys / rho4               &
-                   + exk * xs*ys / (rho2 * sx2))
-              phiyy = fk * (+ exkc * (xs*xs - ys*ys) / rho4             &
-                   + exk * ys*ys / (rho2 * sx2))
+
+              phixx = fk * (- exkc * (xs*xs - ys*ys) / rho4 + exk * xs*xs / (rho2 * sx2))
+              phixy = fk * (- exkc * two * xs * ys   / rho4 + exk * xs*ys / (rho2 * sx2))
+              phiyy = fk * (+ exkc * (xs*xs - ys*ys) / rho4 + exk * ys*ys / (rho2 * sx2))
+
               re(2,1) = phixx
               re(2,3) = phixy
               re(4,1) = phixy
@@ -5651,18 +5614,20 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
               !---- second-order effects.
               if (fsec) then
                  rho6 = rho4 * rho2
+
                  phixxx = fk*xs * (+ exkc * (xs*xs - three*ys*ys) / rho6 &
-                      - exk * (xs*xs - three*ys*ys) / (two * rho4 * sx2)                &
+                      - exk * (xs*xs - three*ys*ys) / (two * rho4 * sx2) &
                       - exk * xs*xs / (two * rho2 * sx2**2))
                  phixxy = fk*ys * (+ exkc * (three*xs*xs - ys*ys) / rho6 &
-                      - exk * (three*xs*xs - ys*ys) / (two * rho4 * sx2)                &
+                      - exk * (three*xs*xs - ys*ys) / (two * rho4 * sx2) &
                       - exk * xs*xs / (two * rho2 * sx2**2))
                  phixyy = fk*xs * (- exkc * (xs*xs - three*ys*ys) / rho6 &
-                      + exk * (xs*xs - three*ys*ys) / (two * rho4 * sx2)                &
+                      + exk * (xs*xs - three*ys*ys) / (two * rho4 * sx2) &
                       - exk * ys*ys / (two * rho2 * sx2**2))
                  phiyyy = fk*ys * (- exkc * (three*xs*xs - ys*ys) / rho6 &
-                      + exk * (three*xs*xs - ys*ys) / (two * rho4 * sx2)                &
+                      + exk * (three*xs*xs - ys*ys) / (two * rho4 * sx2) &
                       - exk * ys*ys / (two * rho2 * sx2**2))
+
                  te(2,1,1) = phixxx
                  te(2,1,3) = phixxy
                  te(2,3,1) = phixxy
@@ -5683,7 +5648,7 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
               xr = abs(xs) / r
               yr = abs(ys) / r
 
-              if(fasterror_on) then
+              if (fasterror_on) then
                  call wzsub(xr, yr, crx, cry)
               else
                  call ccperrf(xr, yr, crx, cry)
@@ -5699,7 +5664,7 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
                  xb  = (sy / sx) * xr
                  yb  = (sx / sy) * yr
 
-                 if(fasterror_on) then
+                 if (fasterror_on) then
                     call wzsub(xb, yb, cbx, cby)
                  else
                     call ccperrf(xb, yb, cbx, cby)
@@ -5714,7 +5679,7 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
               xr = abs(xs) / r
               yr = abs(ys) / r
 
-              if(fasterror_on) then
+              if (fasterror_on) then
                  call wzsub(yr, xr, cry, crx)
               else
                  call ccperrf(yr, xr, cry, crx)
@@ -5730,7 +5695,7 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
                  xb  = (sy / sx) * xr
                  yb  = (sx / sy) * yr
 
-                 if(fasterror_on) then
+                 if (fasterror_on) then
                     call wzsub(yb, xb, cby, cbx)
                  else
                     call ccperrf(yb, xb, cby, cbx)
@@ -5741,6 +5706,7 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
 
            phix = rk * (cry - exk * cby) * sign(one, xs)
            phiy = rk * (crx - exk * cbx) * sign(one, ys)
+
            !---- orbit kick - only applied if option bborbit (HG 5/12/01),
            !     else stored
            if (bborbit) then
@@ -5752,11 +5718,10 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
            endif
 
            !---- first-order effects.
-           phixx = (two / r2) * (- (xs * phix + ys * phiy)             &
-                + fk * (one - (sy / sx) * exk))
+           phixx = (two / r2) * (- (xs * phix + ys * phiy) + fk * (one - (sy / sx) * exk))
            phixy = (two / r2) * (- (xs * phiy - ys * phix))
-           phiyy = (two / r2) * (+ (xs * phix + ys * phiy)             &
-                - fk * (one - (sx / sy) * exk))
+           phiyy = (two / r2) * (+ (xs * phix + ys * phiy) - fk * (one - (sx / sy) * exk))
+
            re(2,1) = phixx
            re(2,3) = phixy
            re(4,1) = phixy
@@ -5764,12 +5729,11 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
 
            !---- second-order effects.
            if (fsec) then
-              phixxx = (- phix - (xs * phixx + ys * phixy)              &
-                   + fk * xs * sy * exk / sx**3) / r2
+              phixxx = (- phix - (xs * phixx + ys * phixy) + fk * xs * sy * exk / sx**3) / r2
               phixxy = (- phiy - (xs * phixy - ys * phixx)) / r2
               phixyy = (+ phix - (xs * phiyy - ys * phixy)) / r2
-              phiyyy = (+ phiy + (xs * phixy + ys * phiyy)              &
-                   - fk * ys * sx * exk / sy**3) / r2
+              phiyyy = (+ phiy + (xs * phixy + ys * phiyy) - fk * ys * sx * exk / sy**3) / r2
+
               te(2,1,1) = phixxx
               te(2,1,3) = phixxy
               te(2,3,1) = phixxy
@@ -5786,47 +5750,50 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
         re(2,1) = fk / (sx * (sx + sy))
         re(4,3) = fk / (sy * (sx + sy))
      endif
+
      !---- centre option
-     if(centre_cptk.or.centre_bttk) then
-        call dcopy(orbit,orbit00,6)
-        call dcopy(re,re00,36)
-        call dcopy(te,te00,216)
-        if(centre_cptk) then
-           call dcopy(orbit,orbit0,6)
+     if (centre_cptk.or.centre_bttk) then
+        ORBIT00 = ORBIT ; RE00 = RE ; TE00 = TE 
+        if (centre_cptk) then
+           ORBIT0 = ORBIT 
            call twcptk(re,orbit0)
         endif
-        if(centre_bttk) call twbttk(re,te)
-        call dcopy(orbit00,orbit,6)
-        call dcopy(re00,re,36)
-        call dcopy(te00,te,216)
+        if (centre_bttk) call twbttk(re,te)
+        ORBIT = ORBIT00 ; RE = RE00 ; TE = TE00 
      endif
   endif
 
 end SUBROUTINE tmbb_gauss
-SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
 
+SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
   use bbfi
   use twisslfi
   implicit none
 
-  logical fsec,ftrk,fmap,bborbit,firstflag
-  integer get_option
-  double precision orbit(6),re(6,6),te(6,6,6),pi,r0x,r0y,&
-       xm,ym,r0x2,r0y2,xs,ys,rho2,fk,phix,phiy,phixx,phixy,phiyy,phixxx, &
-       phixxy,phixyy,phiyyy,get_variable,node_value,zero,one,  &
-       two,three,ten3m,explim,wi,rho,wx,wy,norm,phir,phirr,phirrr,zz
-  double precision orbit0(6),orbit00(6),re00(6,6),te00(6,6,6)
-  parameter(zero=0.0d0,one=1.0d0,two=2.0d0,three=3.0d0,ten3m=1.0d-3,&
-       explim=150.0d0)
-  save firstflag
-  data firstflag / .true. /
-  !     if x > explim, exp(-x) is outside machine limits.
+  logical :: fsec, ftrk, fmap
+  double precision :: fk
+  double precision :: orbit(6), re(6,6), te(6,6,6)
+  
+  logical :: bborbit
+  logical, save :: firstflag=.true.
+  double precision :: pi
+  double precision :: orbit0(6), orbit00(6), re00(6,6), te00(6,6,6)
+  double precision :: r0x, r0y, xm, ym, r0x2, r0y2, xs, ys, rho2
+  double precision :: phix, phiy, phixx, phixy, phiyy, phixxx, phixxy, phixyy, phiyyy
+  double precision :: wi, rho, wx, wy, norm, phir, phirr, phirrr, zz
+
+  integer, external ::  get_option
+  double precision, external :: get_variable, node_value
+  double precision, parameter :: zero=0.0d0, one=1.0d0, two=2.0d0, three=3.0d0
+  double precision, parameter :: ten3m=1.0d-3, explim=150.0d0
+  ! if x > explim, exp(-x) is outside machine limits.
 
   !---- initialize.
-  phix=zero
-  phiy=zero
+  phix = zero
+  phiy = zero
+
   bborbit = get_option('bborbit ') .ne. 0
-  if (bbd_flag .ne. 0 .and. .not. bborbit)  then
+  if (bbd_flag.ne.0 .and. .not.bborbit)  then
      if (bbd_cnt .eq. bbd_max)  then
         call aawarn('TMBB_FLATTOP: ','maximum bb number reached')
      else
@@ -5836,6 +5803,7 @@ SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
         bb_kick(2,bbd_cnt) = zero
      endif
   endif
+
   pi=get_variable('pi ')
   fmap = .true.
   r0x = node_value('sigx ')
@@ -5843,6 +5811,7 @@ SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
   wi = node_value('width ')
   xm = node_value('xma ')
   ym = node_value('yma ')
+
   if (fk .ne. zero)  then
      r0x2 = r0x * r0x
      r0y2 = r0y * r0y
@@ -5854,33 +5823,36 @@ SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
      !-----preliminary the only case considered.
      if (dabs(r0x2 - r0y2) .gt. ten3m * (r0x2 + r0y2)) then
         zz = 0.5*(r0x + r0y)
-        r0x=zz
-        r0y=zz
-        r0x2=r0x*r0x
-        r0y2=r0y*r0y
-        if(firstflag) then
+        r0x = zz
+        r0y = zz
+        r0x2 = r0x*r0x
+        r0y2 = r0y*r0y
+        if (firstflag) then
            firstflag=.false.
-           call aawarn('TMBB_FLATTOP: ',                               &
-                'beam is assumed to be circular')
+           call aawarn('TMBB_FLATTOP: ', 'beam is assumed to be circular')
         endif
      endif
-     norm = (12.0*r0x**2+wx**2)/24.0
+
+     norm = (12.0*r0x**2 + wx**2)/24.0
+
      !---- if tracking is desired ...
      if (ftrk) then
         rho2 = xs * xs + ys * ys
         rho  = sqrt(rho2)
-        if(rho.le.r0x-wx/2.0) then
-           phir=0.5/norm
-           phix=phir*xs
-           phiy=phir*ys
-           phixx=0.5/norm
-           phixy=zero
-           phiyy=0.5/norm
+        if (rho.le.r0x-wx/2.0) then
+           phir = 0.5/norm
+           phix = phir*xs
+           phiy = phir*ys
+           phixx = 0.5/norm
+           phixy = zero
+           phiyy = 0.5/norm
+
            re(2,1) = phixx*fk
            re(2,3) = phixy*fk
            re(4,1) = phixy*fk
            re(4,3) = phiyy*fk
-           if(fsec) then
+
+           if (fsec) then
               te(2,1,1) = zero
               te(2,1,3) = zero
               te(2,3,1) = zero
@@ -5890,10 +5862,10 @@ SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
               te(4,3,1) = zero
               te(4,3,3) = zero
            endif
-        else if(rho.gt.r0x-wx/2.0.and.rho.lt.r0x+wx/2.0) then
-           phir = ((r0x**2/4.0 - r0x**3/6.0/wx - r0x*wx/8.0 +          &
-                wx**2/48.0)/rho2 + 0.25 + 0.5*r0x/wx -                            &
-                rho/3.0/wx)/norm
+
+        else if (rho.gt.r0x-wx/2.0 .and. rho.lt.r0x+wx/2.0) then
+           phir = ((r0x**2/4.0 - r0x**3/6.0/wx - r0x*wx/8.0 + &
+                wx**2/48.0)/rho2 + 0.25 + 0.5*r0x/wx - rho/3.0/wx)/norm
            phix = phir*xs
            phiy = phir*ys
            phirr = - (2.0*(r0x**2/4.0 - r0x**3/6.0/wx - r0x*wx/8.0 +   &
@@ -5901,18 +5873,22 @@ SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
            phixx = phir + xs*xs*phirr
            phixy = xs*ys*phirr
            phiyy = phir + ys*ys*phirr
+
            re(2,1) = phixx*fk
            re(2,3) = phixy*fk
            re(4,1) = phixy*fk
            re(4,3) = phiyy*fk
+
            !     2nd order effects
-           if(fsec) then
+           if (fsec) then
               phirrr =  (8.0*(r0x**2/4.0 - r0x**3/6.0/wx - r0x*wx/8.0   &
                    + wx**2/48.0)/rho2**3 + 1.0/3.0/wx/rho**3)/norm
+
               phixxx = 3.0*xs*phirr + xs**3*phirrr
               phixxy = ys*phirr + xs*xs*ys*phirrr
               phixyy = xs*phirr + xs*ys*ys*phirrr
               phiyyy = 3.0*ys*phirr + ys**3*phirrr
+
               te(2,1,1) = phixxx*fk
               te(2,1,3) = phixxy*fk
               te(2,3,1) = phixxy*fk
@@ -5922,7 +5898,8 @@ SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
               te(4,3,1) = phixyy*fk
               te(4,3,3) = phiyyy*fk
            endif
-        else if(rho.ge.r0x+wx/2.0) then
+
+        else if (rho .ge. r0x+wx/2.0) then
            phir = 1.0/rho2
            phix = xs*phir
            phiy = ys*phir
@@ -5930,17 +5907,20 @@ SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
            phixx = phir+xs*xs*phirr
            phixy = xs*ys*phirr
            phiyy = phir+ys*ys*phirr
+
            re(2,1) = phixx*fk
            re(2,3) = phixy*fk
            re(4,1) = phixy*fk
            re(4,3) = phiyy*fk
+
            !     2nd order effects
-           if(fsec) then
+           if (fsec) then
               phirrr = 8.0/rho2**3
               phixxx = 3.0*xs*phirr + xs**3*phirrr
               phixxy = ys*phirr + xs*xs*ys*phirrr
               phixyy = xs*phirr + xs*ys*ys*phirrr
               phiyyy = 3.0*ys*phirr + ys**3*phirrr
+
               te(2,1,1) = phixxx*fk
               te(2,1,3) = phixxy*fk
               te(2,3,1) = phixxy*fk
@@ -5951,6 +5931,7 @@ SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
               te(4,3,3) = phiyyy*fk
            end if
         endif
+
         !---- orbit kick - only applied if option bborbit (HG 5/12/01),
         !     else stored
         if (bborbit) then
@@ -5960,57 +5941,59 @@ SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
            bb_kick(1,bbd_cnt) = phix*fk
            bb_kick(2,bbd_cnt) = phiy*fk
         endif
-        !---- no tracking desired.
+
      else
+        !---- no tracking desired.
         phixx=0.5/norm
         phiyy=0.5/norm
         re(2,1) = phixx*fk
         re(4,3) = phiyy*fk
      endif
+
      !---- centre option
-     if(centre_cptk.or.centre_bttk) then
-        call dcopy(orbit,orbit00,6)
-        call dcopy(re,re00,36)
-        call dcopy(te,te00,216)
-        if(centre_cptk) then
-           call dcopy(orbit,orbit0,6)
+     if (centre_cptk.or.centre_bttk) then
+        ORBIT00 = ORBIT ; RE00 = RE ; TE00 = TE 
+        if (centre_cptk) then
+           ORBIT0 = ORBIT 
            call twcptk(re,orbit0)
         endif
-        if(centre_bttk) call twbttk(re,te)
-        call dcopy(orbit00,orbit,6)
-        call dcopy(re00,re,36)
-        call dcopy(te00,te,216)
+        if (centre_bttk) call twbttk(re,te)
+        ORBIT = ORBIT00 ; RE = RE00 ; TE = TE00 
      endif
   endif
-  !
-end SUBROUTINE tmbb_flattop
-SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
 
+end SUBROUTINE tmbb_flattop
+
+SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
   use bbfi
   use twisslfi
   implicit none
 
-  logical fsec,ftrk,fmap,bborbit,firstflag
-  integer get_option
-  double precision orbit(6),re(6,6),te(6,6,6),pi,r0x,r0y,&
-       xm,ym,r0x2,r0y2,xs,ys,rho2,fk,phix,phiy,phixx,phixy,phiyy,phixxx, &
-       phixxy,phixyy,phiyyy,get_variable,node_value,zero,one,  &
-       two,orbit0(6),three,ten3m,explim,wi,rho,wx,wy,phir,phirr,phirrr,zz
-  double precision orbit00(6),re00(6,6),te00(6,6,6)
-  parameter(zero=0.0d0,one=1.0d0,two=2.0d0,three=3.0d0,ten3m=1.0d-3,&
-       explim=150.0d0)
-  save firstflag
-  data firstflag / .true. /
-  !     if x > explim, exp(-x) is outside machine limits.
+  logical :: fsec, ftrk, fmap
+  double precision :: fk
+  double precision :: orbit(6), re(6,6), te(6,6,6)
+
+  logical :: bborbit
+  logical, save :: firstflag=.true.
+  double precision :: pi
+  double precision :: orbit0(6), orbit00(6), re00(6,6), te00(6,6,6)
+  double precision :: r0x, r0y, xm, ym, r0x2, r0y2, xs, ys, rho2
+  double precision :: phix, phiy, phixx, phixy, phiyy, phixxx, phixxy, phixyy, phiyyy
+  double precision :: wi, rho, wx, wy, phir, phirr, phirrr, zz
+
+  integer, external :: get_option
+  double precision, external :: get_variable, node_value
+  double precision, parameter :: zero=0.0d0, one=1.0d0, two=2.0d0, three=3.0d0
+  double precision :: ten3m=1.0d-3, explim=150.0d0
+  ! if x > explim, exp(-x) is outside machine limits.
 
   !---- initialize.
-  phix=zero
-  phiy=zero
+  phix = zero
+  phiy = zero
   bborbit = get_option('bborbit ') .ne. 0
-  if (bbd_flag .ne. 0 .and. .not. bborbit)  then
+  if (bbd_flag.ne.0 .and. .not.bborbit)  then
      if (bbd_cnt .eq. bbd_max)  then
-        call aawarn('TMBB_HOLLOWPARABOLIC: ',                         &
-             'maximum bb number reached')
+        call aawarn('TMBB_HOLLOWPARABOLIC: ', 'maximum bb number reached')
      else
         bbd_cnt = bbd_cnt + 1
         bbd_loc(bbd_cnt) = bbd_pos
@@ -6018,6 +6001,7 @@ SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
         bb_kick(2,bbd_cnt) = zero
      endif
   endif
+
   pi=get_variable('pi ')
   fmap = .true.
   r0x = node_value('sigx ')
@@ -6029,6 +6013,7 @@ SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
   wi = wi/sqrt(2.0)
   xm = node_value('xma ')
   ym = node_value('yma ')
+
   if (fk .ne. zero)  then
      !---- if tracking is desired ...
      if (ftrk) then
@@ -6046,20 +6031,22 @@ SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
            r0y=zz
            r0x2=r0x*r0x
            r0y2=r0y*r0y
-           if(firstflag) then
+           if (firstflag) then
               firstflag=.false.
-              call aawarn('TMBB_HOLLOWPARABOLIC: ',                     &
-                   'beam is assumed to be circular')
+              call aawarn('TMBB_HOLLOWPARABOLIC: ', 'beam is assumed to be circular')
            endif
         endif
+
         rho2 = xs * xs + ys * ys
         rho  = sqrt(rho2)
-        if(rho.le.r0x-wx) then
+
+        if (rho.le.r0x-wx) then
            re(2,1) = zero
            re(4,3) = zero
            re(2,3) = zero
            re(4,1) = zero
-           if(fsec) then
+
+           if (fsec) then
               te(2,1,1) = zero
               te(2,1,3) = zero
               te(2,3,1) = zero
@@ -6069,25 +6056,28 @@ SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
               te(4,3,1) = zero
               te(4,3,3) = zero
            end if
-        else if(rho.gt.r0x-wx.and.rho.lt.r0x+wx) then
-           phir=0.75/wx/r0x/rho2*(r0x**4/12.0/wx**2 - r0x**2/2.0+      &
-                2.0*r0x*wx/3.0 - wx**2/4.0 + rho2/2.0*(1.0 -                      &
-                r0x**2/wx**2) + rho**3/3.0*2.0*r0x/wx**2 -                        &
+
+        else if (rho.gt.r0x-wx .and. rho.lt.r0x+wx) then
+           phir=0.75/wx/r0x/rho2*(r0x**4/12.0/wx**2 - r0x**2/2.0 + &
+                2.0*r0x*wx/3.0 - wx**2/4.0 + rho2/2.0*(1.0 -       &
+                r0x**2/wx**2) + rho**3/3.0*2.0*r0x/wx**2 -         &
                 rho**4/4.0/wx**2)
            phix = phir*xs
            phiy = phir*ys
-           phirr = 0.75/wx/r0x*(-2.0/rho**4*(r0x**4/12.0/wx**2-        &
-                r0x**2/2.0+2.0*r0x*wx/3.0-wx**2/4.0)+                             &
+           phirr = 0.75/wx/r0x*(-2.0/rho**4*(r0x**4/12.0/wx**2 -   &
+                r0x**2/2.0+2.0*r0x*wx/3.0-wx**2/4.0) +             &
                 2.0*r0x/wx**2/3.0/rho-0.5/wx**2)
            phixx = phir+xs*xs*phirr
            phixy = xs*ys*phirr
            phiyy = phir+ys*ys*phirr
+
            re(2,1) = phixx*fk
            re(2,3) = phixy*fk
            re(4,1) = phixy*fk
            re(4,3) = phiyy*fk
+
            ! 2nd order effects
-           if(fsec) then
+           if (fsec) then
               phirrr = 0.75/wx/r0x*(8.0/rho2**3*(r0x**4/12.0/           &
                    wx**2-r0x**2/2.0+2.0*r0x*wx/3.0-wx**2/4.0) -                      &
                    2.0*r0x/3.0/wx**2/rho**3)
@@ -6095,6 +6085,7 @@ SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
               phixxy = ys*phirr + xs*xs*ys*phirrr
               phixyy = xs*phirr + xs*ys*ys*phirrr
               phiyyy = 3.0*ys*phirr + ys**3*phirrr
+
               te(2,1,1) = phixxx*fk
               te(2,1,3) = phixxy*fk
               te(2,3,1) = phixxy*fk
@@ -6104,7 +6095,8 @@ SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
               te(4,3,1) = phixyy*fk
               te(4,3,3) = phiyyy*fk
            end if
-        else if(rho.ge.r0x+wx) then
+
+        else if (rho .ge. r0x+wx) then
            phir = 1.0/rho2
            phix = xs*phir
            phiy = ys*phir
@@ -6112,17 +6104,20 @@ SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
            phixx = phir+xs*xs*phirr
            phixy = xs*ys*phirr
            phiyy = phir+ys*ys*phirr
+
            re(2,1) = phixx*fk
            re(2,3) = phixy*fk
            re(4,1) = phixy*fk
            re(4,3) = phiyy*fk
-           !     2nd order effects
-           if(fsec) then
+
+           ! 2nd order effects
+           if (fsec) then
               phirrr = 8.0/rho2**3
               phixxx = 3.0*xs*phirr + xs**3*phirrr
               phixxy = ys*phirr + xs*xs*ys*phirrr
               phixyy = xs*phirr + xs*ys*ys*phirrr
               phiyyy = 3.0*ys*phirr + ys**3*phirrr
+
               te(2,1,1) = phixxx*fk
               te(2,1,3) = phixxy*fk
               te(2,3,1) = phixxy*fk
@@ -6142,272 +6137,30 @@ SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
            bb_kick(1,bbd_cnt) = phix*fk
            bb_kick(2,bbd_cnt) = phiy*fk
         endif
-        !---- no tracking desired.
+
+
      else
+        !---- no tracking desired.
         re(2,1) = zero
         re(4,3) = zero
      endif
+
      !---- centre option
-     if(centre_cptk.or.centre_bttk) then
-        call dcopy(orbit,orbit00,6)
-        call dcopy(re,re00,36)
-        call dcopy(te,te00,216)
-        if(centre_cptk) then
-           call dcopy(orbit,orbit0,6)
+     if (centre_cptk.or.centre_bttk) then
+        ORBIT00 = ORBIT ; RE00 = RE ; TE00 = TE 
+        if (centre_cptk) then
+           ORBIT0 = ORBIT 
            call twcptk(re,orbit0)
         endif
-        if(centre_bttk) call twbttk(re,te)
-        call dcopy(orbit00,orbit,6)
-        call dcopy(re00,re,36)
-        call dcopy(te00,te,216)
+        if (centre_bttk) call twbttk(re,te)
+        ORBIT = ORBIT00 ; RE = RE00 ; TE = TE00 
      endif
   endif
-  !
+
 end SUBROUTINE tmbb_hollowparabolic
-!!$SUBROUTINE tmbb_old(fsec,ftrk,orbit,fmap,re,te)
-!!$
-!!$  use bbfi
-!!$  use twisslfi
-!!$  implicit none
-!!$
-!!$  !----------------------------------------------------------------------*
-!!$  !     purpose:                                                         *
-!!$  !     transport map for beam-beam element.                             *
-!!$  !     input:                                                           *
-!!$  !     fsec      (logical) must be .true. for this purpose              *
-!!$  !     ftrk      (logical) must be true for this purpose                *
-!!$  !     input/output:                                                    *
-!!$  !     orbit(6)  (double)  closed orbit (only kick is added             *
-!!$  !     since BB thin)                                                   *
-!!$  !     output:                                                          *
-!!$  !     fmap      (logical) if map has been calculated correctly         *
-!!$  !     re(6,6)   (double)  transfer matrix.                             *
-!!$  !     te(6,6,6) (double)  second-order terms.                          *
-!!$  !----------------------------------------------------------------------*
-!!$  logical fsec,ftrk,fmap,bborbit
-!!$  integer get_option
-!!$  double precision parvec(26),orbit(6),re(6,6),te(6,6,6),pi,sx,sy,  &
-!!$       xm,ym,sx2,sy2,xs,ys,rho2,fk,tk,exk,phix,phiy,rho4,phixx,phixy,    &
-!!$       phiyy,rho6,rk,exkc,xb,yb,phixxx,phixxy,phixyy,phiyyy,crx,cry,xr,  &
-!!$       yr,r,r2,cbx,cby,get_variable,get_value,node_value,zero,one,two,   &
-!!$       orbit0(6),three,ten3m,explim
-!!$  double precision orbit00(6),re00(6,6),te00(6,6,6)
-!!$  parameter(zero=0d0,one=1d0,two=2d0,three=3d0,ten3m=1d-3,          &
-!!$       explim=150d0)
-!!$  !     if x > explim, exp(-x) is outside machine limits.
-!!$
-!!$  !---- initialize.
-!!$  bborbit = get_option('bborbit ') .ne. 0
-!!$  if (bbd_flag .ne. 0 .and. .not. bborbit)  then
-!!$     if (bbd_cnt .eq. bbd_max)  then
-!!$        call aawarn('TMBB: ','maximum bb number reached')
-!!$     else
-!!$        bbd_cnt = bbd_cnt + 1
-!!$        bbd_loc(bbd_cnt) = bbd_pos
-!!$        bb_kick(1,bbd_cnt) = zero
-!!$        bb_kick(2,bbd_cnt) = zero
-!!$     endif
-!!$  endif
-!!$  pi=get_variable('pi ')
-!!$  fmap = .true.
-!!$  sx = node_value('sigx ')
-!!$  sy = node_value('sigy ')
-!!$  xm = node_value('xma ')
-!!$  ym = node_value('yma ')
-!!$  !---  standard 4D
-!!$  parvec(5)=get_value('probe ', 'arad ')
-!!$  parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
-!!$  parvec(7)=get_value('probe ','gamma ')
-!!$  fk = two * parvec(5) * parvec(6) / parvec(7)
-!!$  if (fk .ne. zero)  then
-!!$     !---- if tracking is desired ...
-!!$     if (ftrk) then
-!!$        sx2 = sx * sx
-!!$        sy2 = sy * sy
-!!$        xs  = orbit(1) - xm
-!!$        ys  = orbit(3) - ym
-!!$
-!!$        !---- limit formulas for sigma(x) = sigma(y).
-!!$        if (abs(sx2 - sy2) .le. ten3m * (sx2 + sy2)) then
-!!$           rho2 = xs * xs + ys * ys
-!!$
-!!$           !---- limit case for xs = ys = 0.
-!!$           if (rho2 .eq. zero) then
-!!$              re(2,1) = fk / (two * sx2)
-!!$              re(4,3) = fk / (two * sx2)
-!!$
-!!$              !---- general case.
-!!$           else
-!!$              tk = rho2 / (two * sx2)
-!!$              if (tk .gt. explim) then
-!!$                 exk  = zero
-!!$                 exkc = one
-!!$                 phix = xs * fk / rho2
-!!$                 phiy = ys * fk / rho2
-!!$              else
-!!$                 exk  = exp(-tk)
-!!$                 exkc = one - exk
-!!$                 phix = xs * fk / rho2 * exkc
-!!$                 phiy = ys * fk / rho2 * exkc
-!!$              endif
-!!$
-!!$              !---- orbit kick - only applied if option bborbit (HG 5/12/01),
-!!$              !     else stored
-!!$              if (bborbit) then
-!!$                 orbit(2) = orbit(2) + phix
-!!$                 orbit(4) = orbit(4) + phiy
-!!$              elseif (bbd_flag .ne. 0)  then
-!!$                 bb_kick(1,bbd_cnt) = phix
-!!$                 bb_kick(2,bbd_cnt) = phiy
-!!$              endif
-!!$              !---- first-order effects.
-!!$              rho4 = rho2 * rho2
-!!$              phixx = fk * (- exkc * (xs*xs - ys*ys) / rho4             &
-!!$                   + exk * xs*xs / (rho2 * sx2))
-!!$              phixy = fk * (- exkc * two * xs * ys / rho4               &
-!!$                   + exk * xs*ys / (rho2 * sx2))
-!!$              phiyy = fk * (+ exkc * (xs*xs - ys*ys) / rho4             &
-!!$                   + exk * ys*ys / (rho2 * sx2))
-!!$              re(2,1) = phixx
-!!$              re(2,3) = phixy
-!!$              re(4,1) = phixy
-!!$              re(4,3) = phiyy
-!!$
-!!$              !---- second-order effects.
-!!$              if (fsec) then
-!!$                 rho6 = rho4 * rho2
-!!$                 phixxx = fk*xs * (+ exkc * (xs*xs - three*ys*ys) / rho6 &
-!!$                      - exk * (xs*xs - three*ys*ys) / (two * rho4 * sx2)                &
-!!$                      - exk * xs*xs / (two * rho2 * sx2**2))
-!!$                 phixxy = fk*ys * (+ exkc * (three*xs*xs - ys*ys) / rho6 &
-!!$                      - exk * (three*xs*xs - ys*ys) / (two * rho4 * sx2)                &
-!!$                      - exk * xs*xs / (two * rho2 * sx2**2))
-!!$                 phixyy = fk*xs * (- exkc * (xs*xs - three*ys*ys) / rho6 &
-!!$                      + exk * (xs*xs - three*ys*ys) / (two * rho4 * sx2)                &
-!!$                      - exk * ys*ys / (two * rho2 * sx2**2))
-!!$                 phiyyy = fk*ys * (- exkc * (three*xs*xs - ys*ys) / rho6 &
-!!$                      + exk * (three*xs*xs - ys*ys) / (two * rho4 * sx2)                &
-!!$                      - exk * ys*ys / (two * rho2 * sx2**2))
-!!$                 te(2,1,1) = phixxx
-!!$                 te(2,1,3) = phixxy
-!!$                 te(2,3,1) = phixxy
-!!$                 te(4,1,1) = phixxy
-!!$                 te(2,3,3) = phixyy
-!!$                 te(4,1,3) = phixyy
-!!$                 te(4,3,1) = phixyy
-!!$                 te(4,3,3) = phiyyy
-!!$              endif
-!!$           endif
-!!$
-!!$           !---- case sigma(x) > sigma(y).
-!!$        else
-!!$           r2 = two * (sx2 - sy2)
-!!$           if (sx2 .gt. sy2) then
-!!$              r  = sqrt(r2)
-!!$              rk = fk * sqrt(pi) / r
-!!$              xr = abs(xs) / r
-!!$              yr = abs(ys) / r
-!!$              call ccperrf(xr, yr, crx, cry)
-!!$              tk = (xs * xs / sx2 + ys * ys / sy2) / two
-!!$              if (tk .gt. explim) then
-!!$                 exk = zero
-!!$                 cbx = zero
-!!$                 cby = zero
-!!$              else
-!!$                 exk = exp(-tk)
-!!$                 xb  = (sy / sx) * xr
-!!$                 yb  = (sx / sy) * yr
-!!$                 call ccperrf(xb, yb, cbx, cby)
-!!$              endif
-!!$
-!!$              !---- case sigma(x) < sigma(y).
-!!$           else
-!!$              r  = sqrt(-r2)
-!!$              rk = fk * sqrt(pi) / r
-!!$              xr = abs(xs) / r
-!!$              yr = abs(ys) / r
-!!$              call ccperrf(yr, xr, cry, crx)
-!!$              tk = (xs * xs / sx2 + ys * ys / sy2) / two
-!!$              if (tk .gt. explim) then
-!!$                 exk = zero
-!!$                 cbx = zero
-!!$                 cby = zero
-!!$              else
-!!$                 exk = exp(-tk)
-!!$                 xb  = (sy / sx) * xr
-!!$                 yb  = (sx / sy) * yr
-!!$                 call ccperrf(yb, xb, cby, cbx)
-!!$              endif
-!!$           endif
-!!$
-!!$           phix = rk * (cry - exk * cby) * sign(one, xs)
-!!$           phiy = rk * (crx - exk * cbx) * sign(one, ys)
-!!$           !---- orbit kick - only applied if option bborbit (HG 5/12/01),
-!!$           !     else stored
-!!$           if (bborbit) then
-!!$              orbit(2) = orbit(2) + phix
-!!$              orbit(4) = orbit(4) + phiy
-!!$           elseif (bbd_flag .ne. 0)  then
-!!$              bb_kick(1,bbd_cnt) = phix
-!!$              bb_kick(2,bbd_cnt) = phiy
-!!$           endif
-!!$
-!!$           !---- first-order effects.
-!!$           phixx = (two / r2) * (- (xs * phix + ys * phiy)             &
-!!$                + fk * (one - (sy / sx) * exk))
-!!$           phixy = (two / r2) * (- (xs * phiy - ys * phix))
-!!$           phiyy = (two / r2) * (+ (xs * phix + ys * phiy)             &
-!!$                - fk * (one - (sx / sy) * exk))
-!!$           re(2,1) = phixx
-!!$           re(2,3) = phixy
-!!$           re(4,1) = phixy
-!!$           re(4,3) = phiyy
-!!$
-!!$           !---- second-order effects.
-!!$           if (fsec) then
-!!$              phixxx = (- phix - (xs * phixx + ys * phixy)              &
-!!$                   + fk * xs * sy * exk / sx**3) / r2
-!!$              phixxy = (- phiy - (xs * phixy - ys * phixx)) / r2
-!!$              phixyy = (+ phix - (xs * phiyy - ys * phixy)) / r2
-!!$              phiyyy = (+ phiy + (xs * phixy + ys * phiyy)              &
-!!$                   - fk * ys * sx * exk / sy**3) / r2
-!!$              te(2,1,1) = phixxx
-!!$              te(2,1,3) = phixxy
-!!$              te(2,3,1) = phixxy
-!!$              te(4,1,1) = phixxy
-!!$              te(2,3,3) = phixyy
-!!$              te(4,1,3) = phixyy
-!!$              te(4,3,1) = phixyy
-!!$              te(4,3,3) = phiyyy
-!!$           endif
-!!$        endif
-!!$
-!!$        !---- no tracking desired.
-!!$     else
-!!$        re(2,1) = fk / (sx * (sx + sy))
-!!$        re(4,3) = fk / (sy * (sx + sy))
-!!$     endif
-!!$     !---- centre option
-!!$     if(centre_cptk.or.centre_bttk) then
-!!$        call dcopy(orbit,orbit00,6)
-!!$        call dcopy(re,re00,36)
-!!$        call dcopy(te,te00,216)
-!!$        if(centre_cptk) then
-!!$           call dcopy(orbit,orbit0,6)
-!!$           call twcptk(re,orbit0)
-!!$        endif
-!!$        if(centre_bttk) call twbttk(re,te)
-!!$        call dcopy(orbit00,orbit,6)
-!!$        call dcopy(re00,re,36)
-!!$        call dcopy(te00,te,216)
-!!$     endif
-!!$  endif
-!!$
-!!$end SUBROUTINE tmbb_old
+
 SUBROUTINE ccperrf(xx, yy, wx, wy)
-
   implicit none
-
   !----------------------------------------------------------------------*
   !     purpose:                                                         *
   !     modification of wwerf, double precision complex error function,  *
@@ -6417,11 +6170,15 @@ SUBROUTINE ccperrf(xx, yy, wx, wy)
   !     output:                                                          *
   !     wx, wy    (double)    real + imag function result                *
   !----------------------------------------------------------------------*
-  integer n,nc,nu
-  double precision xx,yy,wx,wy,x,y,q,h,xl,xh,yh,tx,ty,tn,sx,sy,saux,&
-       rx(33),ry(33),cc,zero,one,two,half,xlim,ylim,fac1,fac2,fac3
-  parameter(cc=1.12837916709551d0,zero=0d0,one=1d0,two=2d0,         &
-       half=5d-1,xlim=5.33d0,ylim=4.29d0,fac1=3.2d0,fac2=23d0,fac3=21d0)
+  double precision :: xx, yy, wx, wy
+
+  integer :: n, nc, nu
+  double precision :: x, y, q, h, xl, xh, yh, tx, ty, tn, sx, sy, saux
+  double precision :: rx(33), ry(33)
+
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0, half=5d-1
+  double precision, parameter :: xlim=5.33d0, ylim=4.29d0, fac1=3.2d0, fac2=23d0, fac3=21d0
+  double precision, parameter :: cc=1.12837916709551d0
 
   x = abs(xx)
   y = abs(yy)
@@ -6475,35 +6232,38 @@ SUBROUTINE ccperrf(xx, yy, wx, wy)
      wy = cc * ry(1)
   endif
 
-  !     if(y .eq. zero) wx = exp(-x**2)
-  if(yy .lt. zero) then
+  !     if (y .eq. zero) wx = exp(-x**2)
+  if (yy .lt. zero) then
      wx =   two * exp(y*y-x*x) * cos(two*x*y) - wx
      wy = - two * exp(y*y-x*x) * sin(two*x*y) - wy
-     if(xx .gt. zero) wy = -wy
+     if (xx .gt. zero) wy = -wy
   else
-     if(xx .lt. zero) wy = -wy
+     if (xx .lt. zero) wy = -wy
   endif
 
 end SUBROUTINE ccperrf
+
 double precision function gauss_erf(x)
-
   implicit none
-
   !---- returns the value of the Gauss error integral:
   !     1/sqrt(2*pi) Int[-inf, x] exp(-x**2/2) dx
-  double precision x,xx,re,im,zero,one,two,half
-  parameter(zero=0d0,one=1d0,two=2d0,half=5d-1)
+  double precision :: x
+
+  double precision :: xx, re, im
+
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0, half=5d-1
 
   xx = x / sqrt(two)
   call ccperrf(zero,xx,re,im)
   gauss_erf = one - half * exp(-xx**2) * re
-end function gauss_erf
-SUBROUTINE twwmap(pos, orbit)
 
+end function gauss_erf
+
+SUBROUTINE twwmap(pos, orbit)
   use twissotmfi
   use twissafi
+  use matrices, only : EYE
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Save concatenated sectormap (kick, rmatrix, tmatrix)             *
@@ -6512,11 +6272,12 @@ SUBROUTINE twwmap(pos, orbit)
   !     orbit (double)  current orbit                                    *
   !     Further input in twissotm.fi                                     *
   !----------------------------------------------------------------------*
-  integer i, k, l
-  double precision sum1, sum2, pos, orbit(6)
-  double precision ek(6)
-  double precision zero,two
-  parameter(zero=0d0,two=2d0)
+  double precision, intent(IN) :: pos, orbit(6)
+
+  integer :: i, k, l
+  double precision :: sum1, sum2, ek(6)
+
+  double precision, parameter :: zero=0d0, two=2d0
 
   !---- Track ORBIT0 using zero kick.
   do i = 1, 6
@@ -6531,7 +6292,7 @@ SUBROUTINE twwmap(pos, orbit)
      enddo
      ek(i) = sum2
   enddo
-  call dcopy(orbit, sorb, 6)
+  SORB = ORBIT 
 
   !---  jluc: note that twiss can be called through madxn.c's (1)
   !     pro_twiss or (2) pro_embedded_twiss
@@ -6551,15 +6312,16 @@ SUBROUTINE twwmap(pos, orbit)
   !     write (99, '(6e16.8)') ek
   !     write (99, '(6e16.8)') srmat
   !     write (99, '(6e16.8)') stmat
+
   !---- re-initialize map.
-  call m66one(srmat)
-  call dzero(stmat, 216)
+  SRMAT = EYE !call m66one(srmat)
+  STMAT = zero 
 
 end SUBROUTINE twwmap
+
 SUBROUTINE tmdpdg(ftrk,orbit,fmap,ek,re,te)
-
+  use matrices, only : EYE
   implicit none
-
   !----------------------------------------------------------------------*
   !     dipedge element                                                  *
   !     Purpose: computes the effect of the dipole edge                  *
@@ -6569,49 +6331,51 @@ SUBROUTINE tmdpdg(ftrk,orbit,fmap,ek,re,te)
   !     fmap         (logical) if true, element has a map.               *
   !     re(6,6)      (double)  transfer matrix.                          *
   !----------------------------------------------------------------------*
-  logical ftrk,fmap
-  double precision fint,tilt,e1,h,hgap,corr,ek0(6),rw(6,6),tw(6,6,6),orbit(6),  &
-       ek(6),re(6,6),te(6,6,6),bvk,node_value,zero,one
-  parameter(zero=0d0,one=1d0)
+  logical, intent(IN)  :: ftrk
+  logical, intent(OUT) :: fmap
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+  double precision :: bvk, e1, h, hgap, fint, tilt, corr
+  double precision :: ek0(6), rw(6,6), tw(6,6,6)
+
+  double precision, external :: node_value
+  double precision, parameter :: zero=0d0, one=1d0 
 
   !-- LD: modified to include corrections from Frank.
-  call dzero(ek0,6)
-  call m66one(rw)
-  call dzero(tw,216)
+  EK0 = zero 
+  RW = EYE !call m66one(rw)
+  TW = zero 
 
-  e1 = node_value('e1 ')
-  h = node_value('h ')
-  bvk = node_value('other_bv ')
-  h = bvk * h
+  bvk  = node_value('other_bv ')
+  e1   = node_value('e1 ')
+  h    = bvk * node_value('h ')
   hgap = node_value('hgap ')
   fint = node_value('fint ')
   tilt = node_value('tilt ')
   corr = (h + h) * hgap * fint
+
   fmap = h .ne. zero .and. ( e1 .ne. zero .or. corr .ne. zero )
   if (.not. fmap) return
-  !     print *,"------------------------------------------ "
+
   !---- Fringe fields effects computed from the TWISS routine tmfrng
   !     tmfrng returns the matrix elements rw(used) and tw(unused)
   !     No radiation effects as it is a pure thin lens with no lrad
   call tmfrng(.false.,h,zero,e1,zero,zero,corr,rw,tw)
   call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
+
   !---- Apply tilt.
   if (tilt .ne. zero) then
      call tmtilt(.false.,tilt,ek,re,te)
   endif
+
   if (ftrk) then
      call tmtrak(ek,re,te,orbit,orbit)
   endif
-!  if (ftrk) then
-!     orbit(2) = orbit(2) + rw(2,1) * orbit(1)
-!     orbit(4) = orbit(4) + rw(4,3) * orbit(3)
-!  endif
-  return
+
 end SUBROUTINE tmdpdg
+
 SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
-
   implicit none
-
   !     Stolen from trrun.F courtesy Alex Koschick
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -6626,17 +6390,19 @@ SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical ftrk,fmap
-  double precision orbit(6),ek(6),re(6,6),te(6,6,6),deltap,bvk,     &
-       get_value,node_value,sk,skl,sks,sksl,cosTh,sinTh,Q0,Q,zero,one,two
-  parameter(zero=0d0,one=1d0,two=2d0)
+  logical :: ftrk, fmap
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
-  fmap=.true.
+  double precision :: deltap, bvk, sk, skl, sks, sksl, cosTh, sinTh, Q0, Q
+   
+  double precision, external :: get_value, node_value
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0
 
-  !
+  fmap = .true.
+
   !---- Initialize.
   deltap  = get_value('probe ','deltap ')
-  !
+
   !---- Get solenoid parameters
   sksl    = node_value('ksi ')
   sks     = node_value('ks ')
@@ -6678,9 +6444,7 @@ SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
 end SUBROUTINE tmsol_th
 
 SUBROUTINE tmnll(fsec,ftrk,orbit,fmap,ek,re,te)
-
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for elliptical lens A.Valishev Oct.19,2010         *
@@ -6695,66 +6459,73 @@ SUBROUTINE tmnll(fsec,ftrk,orbit,fmap,ek,re,te)
   !     RE(6,6)   (real)    Transfer matrix.                             *
   !     TE(6,6,6) (real)    Second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk,fmap
-  double precision orbit(6),ek(6),re(6,6),te(6,6,6),node_value,get_variable,&
-       pi,zero,one,two,knll,cnll,k1, &
-       dd, u, v, dUu, dUv, dux, duy, dvx, dvy, x, y
-  parameter(zero=0d0,one=1d0,two=2d0)
+  logical :: fsec, ftrk, fmap
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6) 
+
+  double precision :: pi, knll, cnll, k1, dd, u, v, dUu, dUv, dux, duy, dvx, dvy, x, y
+
+  double precision, external :: node_value, get_variable
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0
 
   !---- Matrix
   fmap = .true.
   cnll=node_value('cnll ')
   knll=node_value('knll ')/cnll
-  k1=knll/cnll
-  re(1,1)=one
-  re(2,1)=-two*k1
-  re(2,2)=one
-  re(3,3)=one
-  re(4,3)=two*k1
-  re(4,4)=one
-  re(5,5)=one
-  re(6,6)=one
+  k1 = knll/cnll
+  re(1,1) = one
+  re(2,1) =-two*k1
+  re(2,2) = one
+  re(3,3) = one
+  re(4,3) = two*k1
+  re(4,4) = one
+  re(5,5) = one
+  re(6,6) = one
 
   !---- Second Order Terms
-!  if (fsec) then
-!  endif
+  !  if (fsec) then
+  ! no second order terms
+  !  endif
 
-  !---- Track orbit.
-  if (ftrk) then
-    pi=get_variable('pi ')
-    x = orbit(1)/cnll
-    y = orbit(3)/cnll
-    u=0.5*sqrt((x-1)**2+y**2)+0.5*sqrt((x+1)**2+y**2)
-    v=0.5*sqrt((x+1)**2+y**2)-0.5*sqrt((x-1)**2+y**2)
-    if (u.eq.1d0) then 
-       dd=0 
-    else 
-       dd=u**2*log(u+sqrt(u*u-1))/sqrt(u**2-1)
-    endif
-    dUu=(u+log(u+sqrt(u*u-1))*sqrt(u**2-1)+dd)/(u**2-v**2) &
-     -2*u*(u*log(u+sqrt(u*u-1))*sqrt(u**2-1) &
-     +v*(acos(v)-0.5*pi)*sqrt(1-v**2)) /(u**2-v**2)**2
-    dUv=2*v*(u*log(u+sqrt(u*u-1))*sqrt(u**2-1) &
-         +v*(acos(v)-0.5*pi)*sqrt(1-v**2)) /(u**2-v**2)**2 &
-         -(v-(acos(v)-0.5*pi)*sqrt(1-v**2)+v**2*(acos(v)-0.5*pi)/sqrt(1-v**2))&
-         /(u**2-v**2)
-    dux=0.5*(x-1)/sqrt((x-1)**2+y**2) +0.5*(x+1)/sqrt((x+1)**2+y**2)
-    duy=0.5*y/sqrt((x-1)**2+y**2) +0.5*y/sqrt((x+1)**2+y**2)
-    dvx=0.5*(x+1)/sqrt((x+1)**2+y**2) -0.5*(x-1)/sqrt((x-1)**2+y**2)
-    dvy=0.5*y/sqrt((x+1)**2+y**2) -0.5*y/sqrt((x-1)**2+y**2)
+  if (.not.ftrk) return
 
-    orbit(2)=orbit(2)+knll*(dUu*dux+dUv*dvx)
-    orbit(4)=orbit(4)+knll*(dUu*duy+dUv*dvy)
+  pi = get_variable('pi ')
+  
+  !---- Track orbit.    
+  x = orbit(1)/cnll
+  y = orbit(3)/cnll
+  
+  u = 0.5*sqrt((x-1)**2+y**2)+0.5*sqrt((x+1)**2+y**2)
+  v = 0.5*sqrt((x+1)**2+y**2)-0.5*sqrt((x-1)**2+y**2)
+  
+  if (u .eq. 1d0) then 
+     dd=0 
+  else 
+     dd=u**2*log(u+sqrt(u*u-1))/sqrt(u**2-1)
   endif
+  
+  dUu = (u+log(u+sqrt(u*u-1))*sqrt(u**2-1)+dd)/(u**2-v**2) &
+       -2*u*(u*log(u+sqrt(u*u-1))*sqrt(u**2-1) &
+       +v*(acos(v)-0.5*pi)*sqrt(1-v**2)) /(u**2-v**2)**2
+  
+  dUv = 2*v*(u*log(u+sqrt(u*u-1))*sqrt(u**2-1) &
+       +v*(acos(v)-0.5*pi)*sqrt(1-v**2)) /(u**2-v**2)**2 &
+       -(v-(acos(v)-0.5*pi)*sqrt(1-v**2)+v**2*(acos(v)-0.5*pi)/sqrt(1-v**2)) &
+       /(u**2-v**2)
+  
+  dux = 0.5*(x-1)/sqrt((x-1)**2+y**2) +0.5*(x+1)/sqrt((x+1)**2+y**2)
+  duy = 0.5*y/sqrt((x-1)**2+y**2) +0.5*y/sqrt((x+1)**2+y**2)
+  dvx = 0.5*(x+1)/sqrt((x+1)**2+y**2) -0.5*(x-1)/sqrt((x-1)**2+y**2)
+  dvy = 0.5*y/sqrt((x+1)**2+y**2) -0.5*y/sqrt((x-1)**2+y**2)
+  
+  orbit(2) = orbit(2) + knll*(dUu*dux+dUv*dvx)
+  orbit(4) = orbit(4) + knll*(dUu*duy+dUv*dvy)
 
 end SUBROUTINE tmnll
 
 SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
-
   use twtrrfi
   use twisslfi
   implicit none
-
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for thin rf-multipole.                             *
@@ -6769,52 +6540,51 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk,fmap,dorad
-  integer nord,iord,j,nn,ns,node_fd_errors
-  double precision orbit(6),ek(6),re(6,6),te(6,6,6),elrad,beta,deltap,  &
-       field(2,0:maxmul),normal(0:maxmul),orbit0(6),                    &
-       skew(0:maxmul),arad,gammas,rfac,bvk,                             &
-       zero,one,two,three, tilt, angle, cangle, sangle, dtmp
-  double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
-  double precision f_errors(0:maxferr)
-  !double precisio vals(2,0:maxmul)
-  double precision, external :: node_value,get_value,get_variable
-  integer n_ferr
-  
   ! Strategy to implement BV-flag
   ! 0) apply bv-flag to voltage and multipole strengths (the inverse map has V = -V; K?N|S = -K?N|S)
   ! 1) track orbit(6) : just as in track: P o inverse(M) * P
   ! 2) ek, re, te : create the vector / matrix / tensor elements for 
   !    the inverse map (see 0), then apply transformation P to each element
 
-  !--- AL: RF-multipole
-  integer dummyi
-  double precision pc, krf, vrf
-  double precision pi, twopi, clight, ten3m
-  double precision x, y, z, px, py, pt, dpx, dpy, dpt
-  double precision freq, volt, lag, harmon
-  double precision field_cos(2,0:maxmul)
-  double precision field_sin(2,0:maxmul)
-  double precision pnl(0:maxmul), psl(0:maxmul)
-  complex*16 icomp, Cm2, Sm2, Cm1, Sm1, Cp0, Sp0, Cp1, Sp1
-  integer ii,jj,kk
-  double precision P(6)
-  
-  parameter ( zero=0d0, one=1d0, two=2d0, three=3d0, ten3m=1d-3)
-  parameter ( icomp=(0d0,1d0) )
+  logical :: fsec, ftrk, fmap
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+  logical :: dorad
+  integer :: nord, iord, j, nn, ns, n_ferr, dummyi, ii, jj, kk
+  double precision :: elrad, beta, deltap, arad, gammas, rfac, bvk, tilt, angle 
+  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
+  double precision :: f_errors(0:maxferr)
+  !double precision vals(2,0:maxmul)
+  double precision :: field(2,0:maxmul), normal(0:maxmul), skew(0:maxmul)
+  double precision :: cangle, sangle, dtmp
+
+  double precision :: pc, krf, vrf
+  double precision :: pi, twopi, clight
+  double precision :: x, y, z, px, py, pt, dpx, dpy, dpt
+  double precision :: freq, volt, lag, harmon
+  double precision :: field_cos(2,0:maxmul)
+  double precision :: field_sin(2,0:maxmul)
+  double precision :: pnl(0:maxmul), psl(0:maxmul)
+  double precision :: P(6)
+  double complex :: Cm2, Sm2, Cm1, Sm1, Cp0, Sp0, Cp1, Sp1
+
+  integer, external :: node_fd_errors
+  double precision, external :: node_value,get_value,get_variable
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0, ten3m=1d-3
+  double complex, parameter :: icomp=(0d0,1d0) 
 
   !---- Zero the arrays
-  call dzero(normal,maxmul+1)
-  call dzero(skew,maxmul+1)
-  call dzero(pnl,maxmul+1)
-  call dzero(psl,maxmul+1)
-  call dzero(f_errors,maxferr+1)
-  call dzero(field,2*(maxmul+1))
+  NORMAL = zero 
+  SKEW = zero 
+  PNL = zero 
+  PSL = zero 
+  F_ERRORS = zero 
+  FIELD = zero 
   
   !---- Read-in the parameters
-  clight=get_variable('clight ')
-  pi=get_variable('pi ')
-  twopi=pi*two
+  clight = get_variable('clight ')
+  pi = get_variable('pi ')
+  twopi = two * pi
 
   freq = node_value('freq ');
   volt = node_value('volt ');
@@ -6871,6 +6641,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
      field_sin(1,iord) = bvk * (normal(iord) * sin(pnl(iord) * twopi - krf * z))                 / (one + deltap);
      field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * twopi - krf * z) + field(2,iord)) / (one + deltap);
      field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * twopi - krf * z))                 / (one + deltap);
+
      if (tilt.ne.zero)  then
         angle = (iord+1) * (-tilt);
         cangle = cos(angle);
@@ -6893,25 +6664,30 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   Sp0 = 0d0;
   Cp1 = 0d0;
   Sp1 = 0d0;
+
   do iord = nord, 0, -1
     if (iord.ge.2) then
       Cm2 = Cm2 * (x+icomp*y) / (iord-1) + field_cos(1,iord)+icomp*field_cos(2,iord);
       Sm2 = Sm2 * (x+icomp*y) / (iord-1) + field_sin(1,iord)+icomp*field_sin(2,iord);
     endif
+
     if (iord.ge.1) then
       Cm1 = Cm1 * (x+icomp*y) / (iord)   + field_cos(1,iord)+icomp*field_cos(2,iord);
       Sm1 = Sm1 * (x+icomp*y) / (iord)   + field_sin(1,iord)+icomp*field_sin(2,iord);
     endif
+
     Cp0 = Cp0 * (x+icomp*y) / (iord+1)   + field_cos(1,iord)+icomp*field_cos(2,iord);
     Sp0 = Sp0 * (x+icomp*y) / (iord+1)   + field_sin(1,iord)+icomp*field_sin(2,iord);
     Cp1 = Cp1 * (x+icomp*y) / (iord+2)   + field_cos(1,iord)+icomp*field_cos(2,iord);
     Sp1 = Sp1 * (x+icomp*y) / (iord+2)   + field_sin(1,iord)+icomp*field_sin(2,iord);
   enddo
+
   Sp1 = Sp1 * (x+icomp*y);
   Cp1 = Cp1 * (x+icomp*y);
   
   !---- Track orbit.
   if (ftrk) then
+
      !---- The kick
      dpx = -REAL(Cp0);
      dpy = AIMAG(Cp0);
@@ -7014,20 +6790,14 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   endif
 
   !---- centre option
-  if(centre_cptk.or.centre_bttk) then
-     call dcopy(orbit,orbit00,6)
-     call dcopy(ek,ek00,6)
-     call dcopy(re,re00,36)
-     call dcopy(te,te00,216)
-     if(centre_cptk) then
-        call dcopy(orbit,orbit0,6)
+  if (centre_cptk .or. centre_bttk) then
+     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE 
+     if (centre_cptk) then
+        ORBIT0 = ORBIT 
         call twcptk(re,orbit0)
      endif
-     if(centre_bttk) call twbttk(re,te)
-     call dcopy(orbit00,orbit,6)
-     call dcopy(ek00,ek,6)
-     call dcopy(re00,re,36)
-     call dcopy(te00,te,216)
+     if (centre_bttk) call twbttk(re,te)
+     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00 
   endif
 
 end SUBROUTINE tmrfmult
@@ -7072,16 +6842,15 @@ SUBROUTINE calcsyncint(rhoinv,blen,k1,e1,e2,betxi,alfxi,dxi,dpxi,I)
   !     Author: Ghislain Roy - June 2014                                 *
   !----------------------------------------------------------------------*
 
-  double precision :: rhoinv, blen, k1, e1, e2, betxi, alfxi, dxi, dpxi
-  double precision :: I(5)
+  double precision, intent(IN) :: rhoinv, blen, k1, e1, e2, betxi, alfxi, dxi, dpxi
+  double precision, intent(OUT) :: I(5)
 
   ! local variables
   double precision :: dx2, gamx, dispaverage, curlyhaverage
   double precision :: betx, alfx, dx, dpx
+  double complex :: k2, k, kl
 
-  complex*16 :: k2, k, kl
-
-  integer :: get_option
+  integer, external :: get_option
  
   betx = betxi
   dx = dxi
@@ -7132,5 +6901,50 @@ SUBROUTINE calcsyncint(rhoinv,blen,k1,e1,e2,betxi,alfxi,dxi,dpxi,I)
      print *, ' '
   endif
 
-  return
 END SUBROUTINE calcsyncint
+
+subroutine tmfoc(el,sk1,c,s,d,f)
+  implicit none
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   Compute linear focussing functions.                                *
+  ! Input:                                                               *
+  !   el        (double)  element length.                                *
+  !   sk1       (double)  quadrupole strength.                           *
+  ! Output:                                                              *
+  !   c         (double)  cosine-like function.             c(k,l)       *
+  !   s         (double)  sine-like function.               s(k,l)       *
+  !   d         (double)  dispersion function.              d(k,l)       *
+  !   f         (double)  integral of dispersion function.  f(k,l)       *
+  !----------------------------------------------------------------------*
+  double precision, intent(IN)  :: el, sk1
+  double precision, intent(OUT) :: c, s, d, f 
+
+  double precision :: qk, qkl, qkl2
+
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0, six=6d0
+  double precision, parameter :: twelve=12d0, twty=20d0, thty=30d0, foty2=42d0
+
+  qk = sqrt(abs(sk1))
+  qkl = qk * el
+  qkl2 = sk1 * el**2
+
+  if (abs(qkl2) .le. 1e-2) then
+     c = (one - qkl2 * (one - qkl2 / twelve) /  two)
+     s = (one - qkl2 * (one - qkl2 / twty) /  six) * el
+     d = (one - qkl2 * (one - qkl2 / thty) / twelve) * el**2 / two
+     f = (one - qkl2 * (one - qkl2 / foty2) / twty) * el**3 / six
+  else
+     if (qkl2 .gt. zero) then
+        c = cos(qkl)
+        s = sin(qkl) / qk
+     else
+        c = cosh(qkl)
+        s = sinh(qkl) / qk
+     endif
+
+     d = (one - c) / sk1
+     f = (el  - s) / sk1
+  endif
+
+end subroutine tmfoc

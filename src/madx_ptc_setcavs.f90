@@ -152,7 +152,7 @@ contains
              write(6,*) "!!! Plese insert a marker between them. !!!"
              write(6,*) "!!!                                     !!!"
              write(6,*) "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-             stop
+             call aafail('setcavities:','Found consecutive cavities; insert a marker. Program stops')
           endif
        endif
 
@@ -353,7 +353,7 @@ contains
 
       if( (f%mag%kind/=kind21) .and. (f%mag%kind/=kind4) ) then
          write(6,*) " fatal error: not a Cavity "
-         stop
+         call aafail('setcavity', 'fatal error: not a Cavity. Program stops')
       endif
 
       if ( f%mag%kind==kind21) then

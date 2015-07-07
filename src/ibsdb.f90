@@ -555,8 +555,8 @@ subroutine ibs
   enddo
   goto 101
 102 continue
-  call aawarn('IBS ', 'table value not found, rest skipped ')
-  stop
+  call aafail('IBS ', 'table value not found, rest skipped, program stops ')
+
 101 continue
 
 
@@ -834,8 +834,8 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
   write (*, 910) maxdec
 910 format('Bjorken/Mtingwa integrals did not converge in ',          &
        i3,' decades.')
-  call aawarn('TWSINT: ', 'Problem with TWSINT, program stopped ')
-  stop
+  call aafail('TWSINT: ', 'Problem with TWSINT, program stopped ')
+
 100 continue
 
   !---- Divide answers by cprime to account for scaling.

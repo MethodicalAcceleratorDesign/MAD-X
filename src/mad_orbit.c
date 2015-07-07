@@ -230,41 +230,71 @@ static void c_haveit(double *dmat, double *monvec, double *corvec,
   myfree(rout_name, xd);
 }
 
-static int c_svddec(double *dmat, int imon, int icor, int *sing, double *sngcut,
-        double *sngval) {
-  const char *rout_name = "c_svddev";
+/* static int c_svddec(double *dmat, int imon, int icor, int *sing, double *sngcut, */
+/*         double *sngval) { */
+/*   const char *rout_name = "c_svddev"; */
+/*   int flag; */
+/*   int debug = get_option("debug"); */
+
+/*   double *s, *u, *v, *w, *ut, *vt, *wt; */
+/*   double *ws, *wv; */
+/*   int *sw; */
+
+/*   s  = mycalloc_atomic("c_svddec_s" , icor*imon, sizeof *s); */
+/*   u  = mycalloc_atomic("c_svddec_u" , icor*imon, sizeof *u); */
+/*   v  = mycalloc_atomic("c_svddec_v" , icor*imon, sizeof *v); */
+/*   w  = mycalloc_atomic("c_svddec_w" , icor*imon, sizeof *w); */
+/*   ut = mycalloc_atomic("c_svddec_ut", icor*imon, sizeof *ut); */
+/*   vt = mycalloc_atomic("c_svddec_vt", icor*imon, sizeof *vt); */
+/*   wt = mycalloc_atomic("c_svddec_wt", icor*imon, sizeof *wt); */
+/*   ws = mycalloc_atomic("c_svddec_ws", icor , sizeof *ws); */
+/*   wv = mycalloc_atomic("c_svddec_wv", icor , sizeof *wv); */
+/*   sw = mycalloc_atomic("c_svddec_sw", icor , sizeof *sw); */
+
+/*   if (imon >= icor) */
+/*     svddec_m_(dmat, s, u, v, w, ut, vt, wt, ws, wv, sw, sngcut, sngval, */
+/*         &imon, &icor, &flag, sing, &debug); */
+/*   else */
+/*     svddec_c_(dmat, s, u, v, w, ut, vt, wt, ws, wv, sw, sngcut, sngval, */
+/*         &imon, &icor, &flag, sing, &debug); */
+
+/*   myfree(rout_name, s); */
+/*   myfree(rout_name, u); */
+/*   myfree(rout_name, v); */
+/*   myfree(rout_name, w); */
+/*   myfree(rout_name, ut); */
+/*   myfree(rout_name, vt); */
+/*   myfree(rout_name, wt); */
+/*   myfree(rout_name, ws); */
+/*   myfree(rout_name, wv); */
+/*   myfree(rout_name, sw); */
+
+/*   return flag; */
+/* } */
+
+static int c_svddec(double *dmat, int imon, int icor, int *sing, 
+		     double *sngcut, double *sngval) {
+  const char *rout_name = "c_svddec";
   int flag;
   int debug = get_option("debug");
 
-  double *s, *u, *v, *w, *ut, *vt, *wt;
+  double *s, *u, *v;
   double *ws, *wv;
   int *sw;
 
   s  = mycalloc_atomic("c_svddec_s" , icor*imon, sizeof *s);
   u  = mycalloc_atomic("c_svddec_u" , icor*imon, sizeof *u);
   v  = mycalloc_atomic("c_svddec_v" , icor*imon, sizeof *v);
-  w  = mycalloc_atomic("c_svddec_w" , icor*imon, sizeof *w);
-  ut = mycalloc_atomic("c_svddec_ut", icor*imon, sizeof *ut);
-  vt = mycalloc_atomic("c_svddec_vt", icor*imon, sizeof *vt);
-  wt = mycalloc_atomic("c_svddec_wt", icor*imon, sizeof *wt);
   ws = mycalloc_atomic("c_svddec_ws", icor , sizeof *ws);
   wv = mycalloc_atomic("c_svddec_wv", icor , sizeof *wv);
   sw = mycalloc_atomic("c_svddec_sw", icor , sizeof *sw);
 
-  if (imon >= icor)
-    svddec_m_(dmat, s, u, v, w, ut, vt, wt, ws, wv, sw, sngcut, sngval,
-        &imon, &icor, &flag, sing, &debug);
-  else
-    svddec_c_(dmat, s, u, v, w, ut, vt, wt, ws, wv, sw, sngcut, sngval,
-        &imon, &icor, &flag, sing, &debug);
+  svddec_(dmat, s, u, v, ws, wv, sw, sngcut, sngval, 
+	  &imon, &icor, &flag, sing, &debug);
 
   myfree(rout_name, s);
   myfree(rout_name, u);
   myfree(rout_name, v);
-  myfree(rout_name, w);
-  myfree(rout_name, ut);
-  myfree(rout_name, vt);
-  myfree(rout_name, wt);
   myfree(rout_name, ws);
   myfree(rout_name, wv);
   myfree(rout_name, sw);
@@ -272,41 +302,86 @@ static int c_svddec(double *dmat, int imon, int icor, int *sing, double *sngcut,
   return flag;
 }
 
+/* static int c_svdcorr(double *dmat, double *xin, double *cor, double *res, */
+/* 		     int *nx, int imon, int icor) { */
+/*   const char *rout_name = "c_svdcorr"; */
+/*   int flag; */
+/*   int debug; */
+
+/*   double *s, *u, *v, *w, *ut, *vt, *wt; */
+/*   double *xa, *xb, *xp, *wv, *ws; */
+/*   int *sw; */
+
+/*   s  = mycalloc_atomic("c_svdcorr_s" , icor*imon, sizeof *s); */
+/*   u  = mycalloc_atomic("c_svdcorr_u" , icor*imon, sizeof *u); */
+/*   v  = mycalloc_atomic("c_svdcorr_v" , icor*imon, sizeof *v); */
+/*   w  = mycalloc_atomic("c_svdcorr_w" , icor*imon, sizeof *w); */
+/*   ut = mycalloc_atomic("c_svdcorr_ut", icor*imon, sizeof *ut); */
+/*   vt = mycalloc_atomic("c_svdcorr_vt", icor*imon, sizeof *vt); */
+/*   wt = mycalloc_atomic("c_svdcorr_wt", icor*imon, sizeof *wt); */
+
+/*   xa = mycalloc_atomic("c_svdcorr_xa", imon, sizeof *xa); */
+/*   xb = mycalloc_atomic("c_svdcorr_xb", imon, sizeof *xb); */
+/*   xp = mycalloc_atomic("c_svdcorr_xp", imon, sizeof *xp); */
+/*   ws = mycalloc_atomic("c_svdcorr_xp", icor, sizeof *ws); */
+/*   wv = mycalloc_atomic("c_svdcorr_xp", icor, sizeof *wv); */
+
+/*   sw = mycalloc_atomic("c_svdcorr_sw", icor, sizeof *sw); */
+
+/*   debug = get_option("debug"); */
+
+/*   if (imon >= icor) */
+/*     svdcorr_m_(dmat, s, u, v, w, ut, vt, wt, xin, cor, res, xa, xb, xp, ws, */
+/* 	       wv, sw, nx, &imon, &icor, &flag, &debug); */
+/*   else */
+/*     svdcorr_c_(dmat, s, u, v, w, ut, vt, wt, xin, cor, res, xa, xb, xp, ws, */
+/* 	       wv, sw, nx, &imon, &icor, &flag, &debug); */
+  
+/*   myfree(rout_name, s); */
+/*   myfree(rout_name, u); */
+/*   myfree(rout_name, v); */
+/*   myfree(rout_name, w); */
+/*   myfree(rout_name, ut); */
+/*   myfree(rout_name, vt); */
+/*   myfree(rout_name, wt); */
+/*   myfree(rout_name, sw); */
+/*   myfree(rout_name, xa); */
+/*   myfree(rout_name, xb); */
+/*   myfree(rout_name, xp); */
+/*   myfree(rout_name, ws); */
+/*   myfree(rout_name, wv); */
+  
+/*   return flag; */
+/* } */
+
+
 static int c_svdcorr(double *dmat, double *xin, double *cor, double *res,
-         int *nx, int imon, int icor) {
+		      int *nx, int imon, int icor) {
   const char *rout_name = "c_svdcorr";
   int flag;
-  int debug;
+  int debug = get_option("debug");
 
   double *s, *u, *v, *w, *ut, *vt, *wt;
-  double *xa, *xb, *xp, *wv, *ws;
+  double *xp, *wv, *ws;
   int *sw;
 
-  s  = mycalloc_atomic("c_svdcorr_s" , icor*imon, sizeof *s);
-  u  = mycalloc_atomic("c_svdcorr_u" , icor*imon, sizeof *u);
-  v  = mycalloc_atomic("c_svdcorr_v" , icor*imon, sizeof *v);
-  w  = mycalloc_atomic("c_svdcorr_w" , icor*imon, sizeof *w);
+  s  = mycalloc_atomic("c_svdcorr_s" , imon*icor, sizeof *s);
+  u  = mycalloc_atomic("c_svdcorr_u" , imon*icor, sizeof *u);
+  v  = mycalloc_atomic("c_svdcorr_v" , icor*icor, sizeof *v);
+  w  = mycalloc_atomic("c_svdcorr_w" , icor*icor, sizeof *w);
   ut = mycalloc_atomic("c_svdcorr_ut", icor*imon, sizeof *ut);
-  vt = mycalloc_atomic("c_svdcorr_vt", icor*imon, sizeof *vt);
-  wt = mycalloc_atomic("c_svdcorr_wt", icor*imon, sizeof *wt);
+  vt = mycalloc_atomic("c_svdcorr_vt", icor*icor, sizeof *vt);
+  wt = mycalloc_atomic("c_svdcorr_wt", icor*icor, sizeof *wt);
 
-  xa = mycalloc_atomic("c_svdcorr_xa", imon, sizeof *xa);
-  xb = mycalloc_atomic("c_svdcorr_xb", imon, sizeof *xb);
   xp = mycalloc_atomic("c_svdcorr_xp", imon, sizeof *xp);
   ws = mycalloc_atomic("c_svdcorr_xp", icor, sizeof *ws);
   wv = mycalloc_atomic("c_svdcorr_xp", icor, sizeof *wv);
 
   sw = mycalloc_atomic("c_svdcorr_sw", icor, sizeof *sw);
 
-  debug = get_option("debug");
+  svdcorr_(dmat, s, u, v, w, ut, vt, wt, xin, cor, res, xp, ws,
+	   wv, sw, nx, &imon, &icor, &flag, &debug);
 
-  if (imon >= icor)
-    svdcorr_m_(dmat, s, u, v, w, ut, vt, wt, xin, cor, res, xa, xb, xp, ws,
-         wv, sw, nx, &imon, &icor, &flag, &debug);
-  else
-    svdcorr_c_(dmat, s, u, v, w, ut, vt, wt, xin, cor, res, xa, xb, xp, ws,
-         wv, sw, nx, &imon, &icor, &flag, &debug);
-  
   myfree(rout_name, s);
   myfree(rout_name, u);
   myfree(rout_name, v);
@@ -315,8 +390,6 @@ static int c_svdcorr(double *dmat, double *xin, double *cor, double *res,
   myfree(rout_name, vt);
   myfree(rout_name, wt);
   myfree(rout_name, sw);
-  myfree(rout_name, xa);
-  myfree(rout_name, xb);
   myfree(rout_name, xp);
   myfree(rout_name, ws);
   myfree(rout_name, wv);
@@ -1430,10 +1503,10 @@ static double* pro_correct2_response_ring(int ip, int nc, int nm) {
 		}
 		
 		if ((fabs(respy) > 0.000006) || (fabs(respx) > 0.000006)) {
-		  if (debug) printf("true %d %d", ic, im);
+		  if (debug) printf("true %d %d\n", ic, im);
 		  setupi_(&i_one, imat, &im, &ic, &nm, &nc);
 		} else {
-		  if (debug) printf("false ");
+		  if (debug) printf("false \n");
 		  setupi_(&i_zero, imat, &im, &ic, &nm, &nc);
 		}
 		
@@ -1452,7 +1525,9 @@ static double* pro_correct2_response_ring(int ip, int nc, int nm) {
   }
   
   if (debug) {
+    printf("\n");
     primat_(imat, &nm, &nc);
+    printf("\n");
     prdmat_(dmat, &nm, &nc);
     printf("\n");
     printf("\n");

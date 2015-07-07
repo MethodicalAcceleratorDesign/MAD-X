@@ -201,6 +201,9 @@ CONTAINS
     character(nlp) heli(100)
     integer mheli,helit,ihelit
     type(fibre), pointer :: p
+    
+    double precision, parameter :: zero=0.d0
+    
     !---------------------------------------------------------------
     !---------------------------------------------------------------
     if (getdebug() > 1) then
@@ -515,12 +518,11 @@ CONTAINS
     
     nn=name_len
     call node_string('apertype ',aptype,nn)
-    call dzero(aperture,maxnaper)
+    APERTURE = zero 
     call get_node_vector('aperture ',nn,aperture)
     !print*, name,' Got for aperture nn=',nn, aperture(1), aperture(2) 
     
-    if(.not.((aptype.eq."circle".and.aperture(1).eq.zero).or.aptype.eq." ")) then
-       
+    if(.not.((aptype.eq."circle".and.aperture(1).eq.zero).or.aptype.eq." ")) then       
        
        c_%APERTURE_FLAG=.true.
        select case(aptype)
@@ -577,7 +579,7 @@ CONTAINS
        case("general") ! 2015-Mar-10  14:25:48  ghislain: kind was 6
           key%list%aperture_kind=7
           print*,"General aperture not implemented"
-          stop
+          call aafail('ptc_input:','General aperture not implemented. Program stops')
        end select
   !  else
   !   if( .not. ((code.eq.1) .or. (code.eq.4)) ) then
@@ -646,7 +648,7 @@ CONTAINS
           fintx=node_value('fintx ')
           if((fintx.ne.fint).and.(fintx.gt.zero.and.fint.gt.zero)) then
              print*," The fint and fintx must be the same at each end or each might be zero"
-             stop
+             call aafail('ptc_input:','The fint and fintx must be the same at each end or each might be zero. Program stops')
           endif
           if(fint.gt.zero) then
              key%list%fint=fint
@@ -726,7 +728,7 @@ CONTAINS
        fintx=node_value('fintx ')
        if((fintx.ne.fint).and.(fintx.gt.zero.and.fint.gt.zero)) then
           print*," The fint and fintx must be the same at each end or each might be zero"
-          stop
+          call aafail('ptc_input:','The fint and fintx must be the same at each end or each might be zero. Program stops')
        endif
        if(fint.gt.zero) then
           key%list%fint=fint
@@ -857,10 +859,10 @@ CONTAINS
     case(8)
        key%magnet="multipole"
        !---- Multipole components.
-       call dzero(f_errors,maxferr+1)
+       F_ERRORS = zero 
        n_ferr = node_fd_errors(f_errors)
-       call dzero(normal,maxmul+1)
-       call dzero(skew,maxmul+1)
+       NORMAL = zero 
+       SKEW = zero 
        call get_node_vector('knl ',nn,normal)
        call get_node_vector('ksl ',ns,skew)
        if(nn.ge.NMAX) nn=NMAX-1
@@ -887,7 +889,7 @@ CONTAINS
              key%list%ks(i+1)=skew(i)
           enddo
        endif
-       call dzero(field,2*(maxmul+1))
+       FIELD = zero 
        if (n_ferr .gt. 0) then
           call dcopy(f_errors,field,n_ferr)
        endif
@@ -941,7 +943,7 @@ CONTAINS
        endif
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
-
+ 
     case(10)
        key%magnet="rfcavity"
        key%list%volt=bvk*node_value('volt ')
@@ -985,8 +987,8 @@ CONTAINS
     case(12)
        ! actually our SROT element
        key%magnet="CHANGEREF"
-       call dzero(patch_ang,3)
-       call dzero(patch_trans,3)
+       PATCH_ANG = zero 
+       PATCH_TRANS = zero 
        patch_ang(3)=node_value('angle ')
        key%list%patchg=2
        do i=1,3
@@ -996,8 +998,8 @@ CONTAINS
     case(13)
        ! actually our YROT element
        key%magnet="CHANGEREF"
-       call dzero(patch_ang,3)
-       call dzero(patch_trans,3)
+       PATCH_ANG = zero 
+       PATCH_TRANS = zero 
        patch_ang(2)=-node_value('angle ')
        key%list%patchg=2
        do i=1,3
@@ -1006,7 +1008,7 @@ CONTAINS
        enddo
     case(14,15,16) ! PTC accepts mults
        ! kickers (corrector magnets)
-       call dzero(f_errors,maxferr+1)
+       F_ERRORS = zero 
        n_ferr = node_fd_errors(f_errors)
        do i=1,NMAX
           key%list%k(i)=zero
@@ -1102,8 +1104,8 @@ CONTAINS
        if(key%list%volt.ne.zero.and.key%list%freq0.ne.zero) icav=1
     case(35)
        key%magnet="CHANGEREF"
-       call dzero(patch_ang,3)
-       call dzero(patch_trans,3)
+       PATCH_ANG = zero 
+       PATCH_TRANS = zero 
        call get_node_vector('patch_ang ',3,patch_ang)
        call get_node_vector('patch_trans ',3,patch_trans)
        key%list%patchg=2
@@ -1139,7 +1141,7 @@ CONTAINS
        if(key%list%k(1).ne.zero.and.key%list%freq0.ne.zero) icav=1
     case default
        print*,"Element: ",name," not implemented in PTC"
-       stop
+       call aafail('ptc_input:','Element not implemented in PTC. Program stops')
     end select
 100 continue
 !    if(code.ne.14.and.code.ne.15.and.code.ne.16) then
@@ -1261,6 +1263,8 @@ CONTAINS
     INTEGER :: node_fd_errors ! function
     integer :: i, i_count, n_dim_mult_err, ord_max
 
+    double precision, parameter :: zero=0.d0
+
     !initialization
     normal_0123(:)=zero
     skew_0123(:)=zero
@@ -1271,8 +1275,8 @@ CONTAINS
 
     ! real(dp) f_errors(0:maxferr),normal(0:maxmul),skew(0:maxmul)
     ! Get multipole components on bench !-----------------------!
-    call dzero(normal,maxmul+1) ! make zero "normal"            !
-    call dzero(skew,maxmul+1)   ! make zero "skew"              !
+    NORMAL = zero ! make zero "normal"                          !
+    SKEW = zero   ! make zero "skew"                            !
     !                                                           !
     ! madxdict.h: "knl = [r, {0}], "                            !
     !             "ksl = [r, {0}], "                            !
@@ -1287,14 +1291,12 @@ CONTAINS
     ! /* returns vector for parameter par of current element */ !
     !                                                           !
     ! get errors                                                !
-    call dzero(f_errors,maxferr+1)                              !
+    F_ERRORS = zero                                             !
     n_ferr = node_fd_errors(f_errors) !                         !
     ! /* returns the field errors of a node */                  !
-    call dzero(field,2*(maxmul+1)) ! array to be zeroed.        !
+    FIELD = zero ! array to be zeroed.                          !
     if (n_ferr .gt. 0) then                                     !
        call dcopy(f_errors,field,n_ferr)                        !
-       ! subroutine dcopy(in,out,n)                             !
-       ! Purpose:   Copy arrays.                                !
     endif                                                       !
     !-----------------------------------------------------------!
 
@@ -1375,14 +1377,16 @@ CONTAINS
     INTEGER :: node_fd_errors ! function
     integer :: i, i_count, n_dim_mult_err, ord_max
 
+    double precision, parameter :: zero=0.d0
+
     !initialization
     normal_0123(:)=zero
     skew_0123(:)=zero
 
     ! real(dp) f_errors(0:maxferr),normal(0:maxmul),skew(0:maxmul)
     ! Get multipole components on bench !-----------------------!
-    call dzero(normal,maxmul+1) ! make zero "normal"            !
-    call dzero(skew,maxmul+1)   ! make zero "skew"              !
+    NORMAL = zero ! make zero "normal"                          !
+    SKEW = zero   ! make zero "skew"                            !
     !                                                           !
     ! madxdict.h: "knl = [r, {0}], "                            !
     !             "ksl = [r, {0}], "                            !
@@ -1394,21 +1398,25 @@ CONTAINS
     if(n_skew.ge.maxmul) n_skew=maxmul-1                        !
     ord_max=max(n_norm,n_skew)                                  !
     if(l.ne.zero) then                            !
-       do i=0,maxmul
-          normal(i)=normal(i)/l  
-          skew(i)=skew(i)/l
-       enddo
+       NORMAL = NORMAL / l
+       SKEW = SKEW / l
+       !do i=0,maxmul
+       !   normal(i)=normal(i)/l  
+       !   skew(i)=skew(i)/l
+       !enddo
     endif
-    do i=0,3
-       normal_0123(i)=normal(i)
-       skew_0123(i)=skew(i)
-    enddo
+    NORMAL_0123(0:3) = NORMAL(0:3)
+    SKEW_0123(0:3) = SKEW(0:3)
+    !do i=0,3
+    !   normal_0123(i)=normal(i)
+    !   skew_0123(i)=skew(i)
+    !enddo
     
     ! get errors                                                !
-    call dzero(f_errors,maxferr+1)                              !
+    F_ERRORS = zero                                             !
     n_ferr = node_fd_errors(f_errors) !                         !
     ! /* returns the field errors of a node */                  !
-    call dzero(field,2*(maxmul+1)) ! array to be zeroed.        !
+    FIELD = zero ! array to be zeroed.                          !
     if (n_ferr .gt. 0) then                                     !
        call dcopy(f_errors,field,n_ferr)                        !
     endif                                                       !

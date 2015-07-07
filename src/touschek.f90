@@ -17,8 +17,7 @@ subroutine cavtouschek (um,uloss,iflag)
 
 
   character(name_len) sequ_name,el_name
-  parameter(zero=0d0,one=1d0,two=2d0,half=5d-1,ten6p=1d6,           &
-       ten3m=1d-3)
+  parameter(zero=0d0,one=1d0,two=2d0,half=5d-1,ten6p=1d6,ten3m=1d-3)
 
   !---- Initialize.
   qover = zero
@@ -54,7 +53,7 @@ subroutine cavtouschek (um,uloss,iflag)
      if (rff.eq.zero.or.rfv.eq.zero) goto 11
      rfl = node_value('lag ')
 
-     harmonl = 1.E+06*rff*circ/clight
+     harmonl = ten6p * rff * circ/clight
 
      pc = get_value('probe ','pc ')
 
@@ -627,22 +626,21 @@ SUBROUTINE KERSET(ERCODE,LGFILE,LIMITM,LIMITR)
 1002 FORMAT(/' ***** CERN LIBRARY ERROR CONDITION ',A6)
 END SUBROUTINE KERSET
 
+
+SUBROUTINE CJYDBB(ZR,ZI,BJOR,BJOI,BJIR,BJII,BYOR,BYOI,BYIR,BYII,IFLAG)
 !_________________________________________________
 !
-!     THE CJYDBB  ROUTINE
-!         given the arguments:  (Re=ZR, Im=ZI),  ZI can be .GT. 150
-!         returns the modified Bessel functions:
-!                J0 (Re=BJOR,Im= BJOI), J1(Re=BJIR, Im=BJII)
-!       Y0 (Re=BYOR,Im= BYOI), Y1(Re=BYIR, Im=BYII)
-!         if ZI .GT. 150 then iflag = 1 and   BJOR = BJOR/cosh(ZI)
+!  given the arguments:  (Re=ZR, Im=ZI),  ZI can be .GT. 150
+!  returns the modified Bessel functions:
+!  J0 (Re=BJOR,Im= BJOI), J1(Re=BJIR, Im=BJII)
+!  Y0 (Re=BYOR,Im= BYOI), Y1(Re=BYIR, Im=BYII)
+!  if ZI .GT. 150 then iflag = 1 and   BJOR = BJOR/cosh(ZI)
 !_________________________________________________
-
-SUBROUTINE CJYDBB(ZR,ZI,BJOR,BJOI,BJIR,BJII,                      &
-     BYOR,BYOI,BYIR,BYII,IFLAG)
 
   IMPLICIT NONE
 
-  INTEGER iflag,k,j,l,n,m
+  INTEGER :: iflag, k, j, l, n, m
+
   DOUBLE PRECISION ZR,ZI,BJOR,BJOI,BJIR,BJII,                       &
        BYOR,BYOI,BYIR,BYII,zmag,angz,cang,                               &
        cangz,sang,sangz,aabs,cterm0,cterm2,                              &
@@ -657,33 +655,39 @@ SUBROUTINE CJYDBB(ZR,ZI,BJOR,BJOI,BJIR,BJII,                      &
        sii,sir,cii,cir,soi,sor,coi,cor,z1,qii,                           &
        bjirt,rl,angs,tr,pir,qor,qoi,qir,sink
 
-  DOUBLE PRECISION CJOR(18),CJOI(18),CJIR(18),CJII(18),             &
-       CYOR(18),CYOI(18),CYIR(18),CYII(18),CPO(12),                      &
-       CPI(12),CQO(12),CQI(12),CPOR(12),CPOI(12),                        &
-       CPIR(12),CPII(12),CQOR(12),CQOI(12),                              &
-       CQIR(12),CQII(12)
+  DOUBLE PRECISION, DIMENSION(18) :: CJOR, CJOI, CJIR, CJII
+  DOUBLE PRECISION, DIMENSION(18) :: CYOR, CYOI, CYIR, CYII
+
+  DOUBLE PRECISION, DIMENSION(12) :: CPO, CPI, CPOR, CPOI, CPIR, CPII 
+  DOUBLE PRECISION, DIMENSION(12) :: CQO, CQI, CQOR, CQOI, CQIR, CQII
+
+  DOUBLE PRECISION, PARAMETER :: zero=0.d0
 
   !---- Initialize.
-  call dzero(CJOR,18)
-  call dzero(CJOI,18)
-  call dzero(CJIR,18)
-  call dzero(CJII,18)
-  call dzero(CYOR,18)
-  call dzero(CYOI,18)
-  call dzero(CYIR,18)
-  call dzero(CYII,18)
-  call dzero(CPO,12)
-  call dzero(CPI,12)
-  call dzero(CQO,12)
-  call dzero(CQI,12)
-  call dzero(CPOR,12)
-  call dzero(CPOI,12)
-  call dzero(CPIR,12)
-  call dzero(CPII,12)
-  call dzero(CQOR,12)
-  call dzero(CQOI,12)
-  call dzero(CQIR,12)
-  call dzero(CQII,12)
+  CJOR = zero 
+  CJOI = zero 
+  CJIR = zero 
+  CJII = zero 
+
+  CYOR = zero 
+  CYOI = zero 
+  CYIR = zero 
+  CYII = zero 
+
+  CPO  = zero 
+  CPI  = zero 
+  CPOR = zero 
+  CPOI = zero 
+  CPIR = zero 
+  CPII = zero 
+
+  CQO  = zero 
+  CQI  = zero 
+  CQOR = zero 
+  CQOI = zero 
+  CQIR = zero 
+  CQII = zero 
+
   iflag = 0
 
   Z2MAG=ZR*ZR+ZI*ZI
@@ -940,8 +944,7 @@ SUBROUTINE CJYDBB(ZR,ZI,BJOR,BJOI,BJIR,BJII,                      &
 
   RETURN
 END SUBROUTINE CJYDBB
-!   ____________
-!
+
 subroutine abend
     implicit none
     write(*,*) 'Abnormal end ...'
