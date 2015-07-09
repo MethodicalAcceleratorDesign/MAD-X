@@ -1,155 +1,40 @@
-!----------------------------------------------------------------------*
-subroutine dynap(eigen, coords, turns, npart, distvect, zn,dq,    &
-     onelog, turnnumber)
-  use deltrafi
-  implicit none
-
-
-
-  integer turns,npart
-  double precision eigen(6,6),coords(6,0:turns,*),get_value
-  double precision zn(turns,6), distvect(turns),dq(2*turns),        &
-       onelog(turns), turnnumber(turns)
-
-  write(*,*) ' entered dynap '
-
-  !      print *, 'eigenvectors'
-  !      do i = 1, 6
-  !        print '(1p,6e12.4)', (eigen(i,j), j=1,6)
-  !      enddo
-  !      do k = 1, 2
-  !        print *, 'particle: ', k
-  !        do i = 1, turns
-  !          print '(1p,6e12.4)', (coords(j,i,k), j = 1, 6)
-  !        enddo
-  !      enddo
-
-  fastune = get_value('dynap ','fastune ') .ne. 0
-  deltax = get_value('dynap ','lyapunov ')
-
-  call trdynrun (eigen,coords,turns,npart,distvect,zn,onelog,       &
-       turnnumber,dq)
-  !      call dynapfill()
-
-  write(*,*) ' end dynap '
-
-end subroutine dynap
-
-!**********************************************************************
-subroutine dynapfill()
-  use dyntabfi
-  use wmaxmin0fi
-  implicit none
-
-
-  !----------------------------------------------------------------------*
-  ! Purpose:                                                             *
-  !   writes the dynap output in the table "dynap"                       *
-  ! Output:                                                              *
-  !   dynapfrac (real)    : fractional dynamic aperture                  *
-  !   dktrturns (real)    : number of turns after tracking               *
-  !   xend      (real)    : final x position w.r.t. closed orbit         *
-  !   pxend     (real)    : final x momentum w.r.t. closed orbit         *
-  !   yend      (real)    : final y position w.r.t. closed orbit         *
-  !   pyend     (real)    : final y momentum w.r.t. closed orbit         *
-  !   tend      (real)    : final longit. position w.r.t. closed orbit   *
-  !   ptend     (real)    : final longit. momentum  w.r.t. closed orbit  *
-  !   wxmin     (real)    : minimum x betatron invariant during tracking *
-  !   wxmax     (real)    : maximum x betatron invariant during tracking *
-  !   wymin     (real)    : minimum y betatron invariant during tracking *
-  !   wymax     (real)    : maximum y betatron invariant during tracking *
-  !   wxymin    (real)    : minimum of (wx + wy) during tracking         *
-  !   wxymax    (real)    : maximum of (wx + wy) during tracking         *
-  !   smear     (real)    : 2.0 * (wxymax - wxymin) / (wxymax + wxymin)  *
-  !   yapunov   (real)    : interpolated Lyapunov exponent               *
-  !----------------------------------------------------------------------*
-
-  call double_to_table_curr('dynap ', 'dynapfrac ', dynapfrac)
-  call double_to_table_curr('dynap ', 'dktrturns ', dktrturns)
-  call double_to_table_curr('dynap ', 'xend ', xend )
-  call double_to_table_curr('dynap ', 'pxend ', pxend )
-  call double_to_table_curr('dynap ', 'yend ', yend )
-  call double_to_table_curr('dynap ', 'pyend ',pyend )
-  call double_to_table_curr('dynap ', 'tend ', ptend )
-  call double_to_table_curr('dynap ', 'wxmin ', wxmin )
-  call double_to_table_curr('dynap ', 'wxmax ', wxmax )
-  call double_to_table_curr('dynap ', 'wymin ', wymin )
-  call double_to_table_curr('dynap ', 'wymax ', wymax )
-  call double_to_table_curr('dynap ', 'wxymin ', wxymin )
-  call double_to_table_curr('dynap ', 'wxymax ', wxymax )
-  call double_to_table_curr('dynap ', 'smear ', smear )
-  call double_to_table_curr('dynap ', 'yapunov ', yapunov )
-
-  write(*,*) ' yapunov = ', yapunov
-
-  call augment_count('dynap ')
-end subroutine dynapfill
-!-----------------  end of dynapfill subroutine --------------------------
-!**********************************************************************
-subroutine dynaptunefill
-  use tunesfi
-  implicit none
-
-
-  !----------------------------------------------------------------------*
-  ! Purpose:                                                             *
-  !   writes the dynap tunes in the table "dynaptune"                    *
-  ! Output:                                                              *
-  !   tunx      (real)    : x tune from FFT                              *
-  !   tuny      (real)    : y tune from FFT                              *
-  !   dtune     (real)    : tune error                                   *
-  !----------------------------------------------------------------------*
-  double precision tx_tmp, ty_tmp
-  tx_tmp = tunx
-  if (tunx .gt. 0.5d0)  tx_tmp = 1.d0 - tunx
-  ty_tmp = tuny
-  if (tuny .gt. 0.5d0)  ty_tmp = 1.d0 - tuny
-  call double_to_table_curr('dynaptune ', 'x '    , x0)
-  call double_to_table_curr('dynaptune ', 'y '    , y0)
-  call double_to_table_curr('dynaptune ', 'tunx ', tx_tmp)
-  call double_to_table_curr('dynaptune ', 'tuny ', ty_tmp)
-  call double_to_table_curr('dynaptune ', 'dtune ', dtune )
-
-  write(*,*) ' tunes = ', tunx, tuny, dtune
-
-  call augment_count('dynaptune ')
-end subroutine dynaptunefill
-!-----------------  end of dynaptunefill subroutine --------------------------
-
-
-!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog, &
-     turnnumber,dq)
-
+subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog,turnnumber,dq)
   use deltrafi
   use wmaxmin0fi
   use dyntabfi
   use tunesfi
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !
   !----------------------------------------------------------------------*
-  integer k,ix,iy,initt,turns,ktrturns,nturnhalf,i,j,npart
-  double precision eigen(6,6),coords(6,0:turns,*),distvect(turns),  &
-       zn(turns,6),znt(6),track(6),fitlyap,     &
-       templyap,tunx1,tunx2,tuny1,tuny2,tuneabt,tuneabt2,zero,one,two,   &
-       onelog(turns), turnnumber(turns),dq(2*turns),dphi(3),dphi1,dphi2, &
-       get_variable,pi,twopi
-  parameter(zero=0d0,one=1d0,two=2d0)
+  integer :: turns, npart
+  double precision :: eigen(6,6), coords(6,0:turns,*), distvect(turns)
+  double precision :: zn(turns,6), onelog(turns), turnnumber(turns), dq(2*turns)
 
-  pi=get_variable('pi ')
-  twopi=get_variable('twopi ')
+  integer i, j, k, ix, iy, initt, ktrturns, nturnhalf
+  double precision :: znt(6), track(6)
+  double precision :: fitlyap, templyap
+  double precision :: tunx1, tunx2, tuny1, tuny2, tuneabt, tuneabt2
+  double precision :: dphi(3),dphi1,dphi2
+  double precision :: pi, twopi
+
+  double precision, external :: get_variable, get_value
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0
+
+  write(*,*) ' entered dynap '
+
+  fastune = get_value('dynap ','fastune ') .ne. 0
+  deltax  = get_value('dynap ','lyapunov ')
+
+  pi = get_variable('pi ')
+  twopi = get_variable('twopi ')
   dktrturns = turns
 
   !---- Initialize max and min betatron invariants.
-  wxmax = zero
-  wymax = zero
-  wxymax = zero
-  wxmin = zero
-  wymin = zero
-  wxymin = zero
+  wxmax = zero ;  wymax = zero ;  wxymax = zero
+  ! min should be initialized to huge value, not zero
+  wxmin = 1.d20 ; wymin = 1.d20 ; wxymin = 1.d20
 
   !--- distance for second particle with x add-on
   !        deltax = get_value('dynap ', 'lyapunov ')
@@ -166,21 +51,14 @@ subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog, &
      x0 = coords(1,0,k)
      y0 = coords(3,0,k)
      do i = 1, turns
-        do j = 1, 6
-           track(j) = coords(j,i,k)
-           !          write(*,*) track(j)
-        end do
+        TRACK = COORDS(:,i,k)
         call wmaxmin(track,eigen,znt)
-        do j = 1, 6
-           zn(i,j)=znt(j)
-           !          write(*,*) zn(i,j)
-        end do
+        ZN(i,:) = ZNT
      end do
 
      !---- compute 'smear'
      smear = two * (wxymax - wxymin) / (wxymax + wxymin)
-
-     !      write(*,*)' smear = ', smear
+     write(69,*) 'smear: ', smear
 
      !---- Fast tune calculation by interpolated FFT.
      if (fastune) then
@@ -188,8 +66,9 @@ subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog, &
         ktrturns = turns
 
         ix = 1
-        iy =3
+        iy = 3 
         initt = 0
+
         if (ktrturns .le. 64) then
            tunx = tuneabt(zn, ix, initt, ktrturns, turns, dq)
            tuny = tuneabt(zn, iy, initt, ktrturns, turns, dq)
@@ -215,12 +94,15 @@ subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog, &
            tunx2 = tuneabt2(zn, ix, initt, nturnhalf, turns, dq)
            tuny2 = tuneabt2(zn, iy, initt, nturnhalf, turns, dq)
         endif
-        if (abs(tunx1-tunx).gt.0.4) tunx1 = 1-tunx1
-        if (abs(tunx2-tunx).gt.0.4) tunx2 = 1-tunx2
-        if (abs(tuny1-tuny).gt.0.4) tuny1 = 1-tuny1
-        if (abs(tuny2-tuny).gt.0.4) tuny2 = 1-tuny2
+
+        if (abs(tunx1-tunx) .gt. 0.4) tunx1 = 1-tunx1
+        if (abs(tunx2-tunx) .gt. 0.4) tunx2 = 1-tunx2
+        if (abs(tuny1-tuny) .gt. 0.4) tuny1 = 1-tuny1
+        if (abs(tuny2-tuny) .gt. 0.4) tuny2 = 1-tuny2
+
         dtune = sqrt((tunx2 - tunx1)**2 + (tuny2 - tuny1)**2)
-        write(*,*) tunx1,tunx2, ' ',tuny1,tuny2
+
+        write(69,*) 'X: ',tunx1,tunx2, 'Y: ',tuny1,tuny2, 'DTUNE:',dtune
         call dynaptunefill
      endif
 
@@ -229,44 +111,106 @@ subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog, &
      open(50,file="lyapunov.data")
 
      do i = 1, turns
-        do j = 1, 6
-           track(j) = coords(j,i,k+1)
-           !          write(*,*) track(j)
-        end do
-        call wmaxmin(track,eigen,znt)
-        templyap = zero
+        TRACK = COORDS(:,i,k+1) 
+        call wmaxmin(track,eigen,znt) 
         do j = 1, 3
-           if(znt(2*j).eq.zero.and.znt(2*j-1).eq.zero) then
-              dphi1=zero
-           else
-              dphi1=atan2(znt(2*j),znt(2*j-1))
-           endif
-           if(zn(i,2*j).eq.zero.and.zn(i,2*j-1).eq.zero) then
-              dphi2=zero
-           else
-              dphi2=atan2(zn(i,2*j),zn(i,2*j-1))
-           endif
-           dphi(j) =  dphi1-dphi2
-           if (dphi(j).gt.pi) dphi(j)=dphi(j)-twopi
-           if (dphi(j).lt.-pi) dphi(j)=dphi(j)+twopi
-           templyap = templyap + (dphi(j))**2
+           dphi1 = zero ; dphi2 = zero
+           if (znt(2*j).ne.zero .or. znt(2*j-1).ne.zero) & 
+                dphi1 = atan2(znt(2*j),znt(2*j-1))
+           if (zn(i,2*j).ne.zero .or. zn(i,2*j-1).ne.zero) & 
+                dphi2 = atan2(zn(i,2*j),zn(i,2*j-1))           
+
+           dphi(j) =  dphi1 - dphi2
+           if (dphi(j) .gt.  pi) dphi(j) = dphi(j) - twopi
+           if (dphi(j) .lt. -pi) dphi(j) = dphi(j) + twopi
         end do
-        distvect(i) = sqrt(templyap)
-        write(50,*) i,distvect(i)
-        !            write(*,*) distvect(i)
+        distvect(i) = sqrt(dot_product(dphi, dphi))
+        write(50,*) i, distvect(i)
      end do
-     !        write(*,*) ' templyap =', templyap
-     yapunov = fitlyap(distvect,onelog,turnnumber,turns)
+
+     lyapunov = fitlyap(distvect,onelog,turnnumber,turns)
      call dynapfill()
 
   enddo
+
+  write(*,*) ' end dynap '
+
 end subroutine trdynrun
 
-!-----------------  end of trdynrun subroutine --------------------------
+subroutine dynapfill()
+  use dyntabfi
+  use wmaxmin0fi
+  implicit none
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   writes the dynap output in the table "dynap"                       *
+  ! Output:                                                              *
+  !   dynapfrac (real)    : fractional dynamic aperture                  *
+  !   dktrturns (real)    : number of turns after tracking               *
+  !   xend      (real)    : final x position w.r.t. closed orbit         *
+  !   pxend     (real)    : final x momentum w.r.t. closed orbit         *
+  !   yend      (real)    : final y position w.r.t. closed orbit         *
+  !   pyend     (real)    : final y momentum w.r.t. closed orbit         *
+  !   tend      (real)    : final longit. position w.r.t. closed orbit   *
+  !   ptend     (real)    : final longit. momentum  w.r.t. closed orbit  *
+  !   wxmin     (real)    : minimum x betatron invariant during tracking *
+  !   wxmax     (real)    : maximum x betatron invariant during tracking *
+  !   wymin     (real)    : minimum y betatron invariant during tracking *
+  !   wymax     (real)    : maximum y betatron invariant during tracking *
+  !   wxymin    (real)    : minimum of (wx + wy) during tracking         *
+  !   wxymax    (real)    : maximum of (wx + wy) during tracking         *
+  !   smear     (real)    : 2.0 * (wxymax - wxymin) / (wxymax + wxymin)  *
+  !   lyapunov   (real)    : interpolated Lyapunov exponent               * ghislain
+  !----------------------------------------------------------------------*
 
-!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+  call double_to_table_curr('dynap ', 'dynapfrac ', dynapfrac)
+  call double_to_table_curr('dynap ', 'dktrturns ', dktrturns)
+  call double_to_table_curr('dynap ', 'xend ', xend )
+  call double_to_table_curr('dynap ', 'pxend ', pxend )
+  call double_to_table_curr('dynap ', 'yend ', yend )
+  call double_to_table_curr('dynap ', 'pyend ',pyend )
+  call double_to_table_curr('dynap ', 'tend ', ptend )
+  call double_to_table_curr('dynap ', 'wxmin ', wxmin )
+  call double_to_table_curr('dynap ', 'wxmax ', wxmax )
+  call double_to_table_curr('dynap ', 'wymin ', wymin )
+  call double_to_table_curr('dynap ', 'wymax ', wymax )
+  call double_to_table_curr('dynap ', 'wxymin ', wxymin )
+  call double_to_table_curr('dynap ', 'wxymax ', wxymax )
+  call double_to_table_curr('dynap ', 'smear ', smear )
+  !call double_to_table_curr('dynap ', 'yapunov ', yapunov )
+  call double_to_table_curr('dynap ', 'lyapunov ', lyapunov )
+
+  !write(*,*) ' lyapunov = ', lyapunov
+
+  call augment_count('dynap ')
+end subroutine dynapfill
+
+subroutine dynaptunefill
+  use tunesfi
+  implicit none
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   writes the dynap tunes in the table "dynaptune"                    *
+  ! Output:                                                              *
+  !   tunx      (real)    : x tune from FFT                              *
+  !   tuny      (real)    : y tune from FFT                              *
+  !   dtune     (real)    : tune error                                   *
+  !----------------------------------------------------------------------*
+  double precision :: tx_tmp, ty_tmp
+
+  tx_tmp = tunx ; ty_tmp = tuny
+  if (tx_tmp .gt. 0.5d0)  tx_tmp = 1.d0 - tx_tmp
+  if (ty_tmp .gt. 0.5d0)  ty_tmp = 1.d0 - ty_tmp
+  call double_to_table_curr('dynaptune ', 'x '    , x0)
+  call double_to_table_curr('dynaptune ', 'y '    , y0)
+  call double_to_table_curr('dynaptune ', 'tunx ' , tx_tmp)
+  call double_to_table_curr('dynaptune ', 'tuny ' , ty_tmp)
+  call double_to_table_curr('dynaptune ', 'dtune ', dtune )
+
+  call augment_count('dynaptune ')
+end subroutine dynaptunefill
+
 subroutine fft(data, nn, isign)
-
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -282,13 +226,18 @@ subroutine fft(data, nn, isign)
   !             unchanged
   !
   !---- Double precision version.
-  integer i,isign,istep,j,m,mmax,n,nn
-  double precision data(*),tempi,tempr,theta,wi,wpi,wpr,wr,wtemp,   &
-       get_variable,zero,half,one,two,twopi
-  parameter(zero=0d0,half=0.5d0,one=1d0,two=2d0)
+  integer :: nn,isign
+  double precision :: data(*)
+
+  integer :: i, j, m, n, istep, mmax
+  double precision :: tempi, tempr, theta, wi, wpi, wpr, wr, wtemp
+  double precision :: twopi
+
+  double precision, external :: get_variable
+  double precision, parameter :: zero=0d0, half=0.5d0, one=1d0, two=2d0
 
   !---- Initialize
-  twopi=get_variable('twopi ')
+  twopi = get_variable('twopi ')
 
   !---- Rearrange the data points.
   n = 2 * nn
@@ -338,13 +287,8 @@ subroutine fft(data, nn, isign)
 
 end subroutine fft
 
-!-----------------  end of fft subroutine --------------------------
-
-!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 double precision function tuneabt(zn, ixy, initt, maxn, turns, dq)
-
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Computes the tune using formula (18) of CERN SL/95-84 (AP).        *
@@ -356,14 +300,18 @@ double precision function tuneabt(zn, ixy, initt, maxn, turns, dq)
   !   R. Bartolini - CERN and Bologna University,                        *
   !   E. TODESCO   - INFN and CERN.                                      *
   !----------------------------------------------------------------------*
-  integer mft,nft,ixy,initt,maxn,nftmax,npoint,mf,turns
-  !     choose dimensions for now
-  double precision zn(turns,6),dq(2*turns),ftmax,temp,cf1,cf2,cf3,  &
-       arg,assk,pi,get_variable,zero,one,two
-  parameter(zero=0d0,one=1d0,two=2d0)
+  integer :: ixy, initt, maxn, turns
+  double precision :: zn(turns,6), dq(2*turns)
+
+  integer :: mft, nft, nftmax, npoint, mf
+  double precision :: ftmax, temp, cf1, cf2, cf3, arg, assk
+  double precision :: pi
+
+  double precision, external :: get_variable
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0
 
   !---- Initialize
-  pi=get_variable('pi ')
+  pi = get_variable('pi ')
 
   !---- Use first NPOINT points.
   mft = int(log(float(maxn)) / log(two))
@@ -401,13 +349,9 @@ double precision function tuneabt(zn, ixy, initt, maxn, turns, dq)
   tuneabt = one - (assk - one) / float(npoint)
 
 end function tuneabt
-!-----------------  end of tuneabt function --------------------------
 
-!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 double precision function tuneabt2(zn, ixy, initt, maxn, turns,dq)
-
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Computes the tune using the interpolated FFT with Hanning filter.  *
@@ -419,16 +363,20 @@ double precision function tuneabt2(zn, ixy, initt, maxn, turns,dq)
   !   R. Bartolini - CERN and Bologna University,                        *
   !   E. TODESCO   - INFN and CERN.                                      *
   !----------------------------------------------------------------------*
-  integer mft,nft,mf,ixy,initt,maxn,nftmax,npoint,nn,turns
-  !     need dimensions?
-  double precision zn(turns,6),dq(2*turns),ftmax,temp,step,cf1,cf2, &
-       scra1,scra2,scra3,scra4,assk,co,si,p1,p2,pi,twopi,get_variable,   &
-       zero,one,two,cf3
-  parameter(zero=0d0,one=1d0,two=2d0)
+  integer :: ixy, initt, maxn, turns
+  double precision :: zn(turns,6), dq(2*turns)
+
+  integer :: mft, nft, mf, nftmax, npoint, nn
+  double precision :: cf1, cf2, cf3, scra1, scra2, scra3, scra4
+  double precision :: ftmax, temp, step, assk, co, si, p1, p2
+  double precision :: pi, twopi
+
+  double precision, external :: get_variable
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0
 
   !---- Initialize
-  pi=get_variable('pi ')
-  twopi=get_variable('twopi ')
+  pi = get_variable('pi ')
+  twopi = get_variable('twopi ')
 
   !---- Use first NPOINT points.
   mft = int(log(float(maxn)) / log(two))
@@ -477,167 +425,142 @@ double precision function tuneabt2(zn, ixy, initt, maxn, turns,dq)
   tuneabt2 = one - (assk - one) / float(npoint)
 
 end function tuneabt2
-!-----------------  end of tuneabt2 function --------------------------
 
-!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-double precision function fitlyap(distvect, onelog, turnnumber,   &
-     nturn)
+double precision function fitlyap(distvect, onelog, turnnumber, nturn)
   implicit none
-
-
   !----------------------------------------------------------------------*
   ! Purpose:
   !   Computes interpolated Lyapunov exponent.
   !   DISTVECT (normalized) distance between two companion particles
   !   NTURN is the number of turns.
   !----------------------------------------------------------------------*
-  !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-  !     needs:
-  !      slopexy
-  !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-  integer mf,n1,n2,n3,npoint,nturn
-  double precision onelog(*),turnnumber(*),fitlyap1,fitlyap2,       &
-       fitlyap3,deltalog1,deltalog2,deltalog3,distvect(*),slopexy,zero,  &
-       one,dlmax
-  parameter(zero=0d0,one=1d0,dlmax=1d-5)
+  integer :: nturn
+  double precision :: distvect(*), onelog(*), turnnumber(*)
 
-  do mf = 1, nturn
-     !        dq(ilogd+mf) = log(distvect(mf))
-     !        dq(in+mf)    = mf
-     !        dq(ilogn+mf) = log(dq(in+mf))
-     if(distvect(mf).eq.zero) then
-        onelog(mf) = zero
-     else
-        onelog(mf) = log(distvect(mf))
-     endif
-     turnnumber(mf)    = real(mf)
-     !        turnlog(mf) = log(dble(turnnumber(mf)))
+  integer :: i
+  double precision :: deltalog1, deltalog2, deltalog3
+  
+  double precision, external :: slopexy
+  double precision, parameter :: zero=0d0, one=1d0, dlmax=1d-5
+
+  TURNNUMBER(:nturn) = (/ (real(i), i = 1, nturn) /)
+  ONELOG(:nturn) = zero
+  do i = 1, nturn
+     if (distvect(i) .eq. zero) cycle
+     onelog(i) = log(distvect(i))
   enddo
 
-  !---- Loglog fit over 3 subsequent periods of NPOINT = NTURN/4 TURNS
-  !     starting at N1 = NPOINT + 1, i.e. at the second fourth
-  npoint = int(nturn / 4)
-  n1 = npoint + 1
-  n2 = n1 + npoint
-  n3 = n2 + npoint
+  !---- Loglog fit over 3 subsequent periods of i = NTURN/4 turns
+  !     starting at turn i + 1, i.e. at the second fourth
+  i = int(nturn / 4)
 
-  !---- DELTALOG = deviation from 1 of loglog slope.
-  !
-  deltalog1 = slopexy(turnnumber(n1), onelog(n1), npoint) - one
-  deltalog2 = slopexy(turnnumber(n2), onelog(n2), npoint) - one
-  deltalog3 = slopexy(turnnumber(n3), onelog(n3), npoint) - one
+  !---- DELTALOG = loglog slope for the last three periods
+  deltalog1 = slopexy(turnnumber(  i + 1), onelog(  i + 1), i)
+  deltalog2 = slopexy(turnnumber(2*i + 1), onelog(2*i + 1), i)
+  deltalog3 = slopexy(turnnumber(3*i + 1), onelog(3*i + 1), i)
 
-  if (deltalog1 .lt. dlmax  .and.  deltalog2 .lt. dlmax  .and.      &
-       deltalog3 .lt. dlmax) then
-     fitlyap = zero
-  else
-     fitlyap1 = slopexy(turnnumber(n1), onelog(n1), npoint)
-     fitlyap2 = slopexy(turnnumber(n2), onelog(n2), npoint)
-     fitlyap3 = slopexy(turnnumber(n3), onelog(n3), npoint)
+  fitlyap = zero
+  !---- if loglog slope is significantly different from 1 anywhere
+  ! 2015-Jul-08  17:43:28  ghislain: that should be compared to zero, not to one !!!
+  !if ( max(deltalog1, deltalog2, deltalog3) - one .ge. dlmax ) & 
+  if ( max(deltalog1, deltalog2, deltalog3) .ge. dlmax ) & 
+       fitlyap = max(deltalog1, deltalog2, deltalog3)
 
-     if (fitlyap1 .lt. fitlyap2) then
-        fitlyap = fitlyap2
-     else
-        fitlyap = fitlyap1
-     endif
-     if (fitlyap .lt. fitlyap3) then
-        fitlyap = fitlyap3
-     endif
-  endif
-
+  write(69,*) 'deltalogs: ', deltalog1, deltalog2, deltalog3,'fitlyap: ', fitlyap, ' nturn and i:', nturn, i
+  
 end function fitlyap
-!-----------------  end of fitlyap function --------------------------
 
-!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 subroutine wmaxmin(track,eigen,znt)
-
   use wmaxmin0fi
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Computes maximum and minimum betatron invariants during tracking.  *
   ! Input:                                                               *
   !   TRACK(6,*)(real)    Track coordinates: (X, PX, Y, PY, T, PT).      *
   !----------------------------------------------------------------------*
-  integer kp,kq
-  double precision track(6),wx,wxy,wy,znt(6),eigen(6,6),zero
-  parameter(zero=0d0)
+  double precision, intent(IN)  :: track(6), eigen(6,6)
+  double precision, intent(OUT) :: znt(6)
 
-  !---- Copy track coordinates.
-  !      do 10 i = 1, 6
-  !        z(i) = track(i)
-  !   10 continue
+  integer :: i
+  double precision :: wx, wy, wxy
 
   !---- Convert to normalized values.
-  do kq = 1, 5, 2
-     kp = kq + 1
-     znt(kq) = eigen(2,kp) * track(1) - eigen(1,kp) * track(2)       &
-          + eigen(4,kp) * track(3) - eigen(3,kp) * track(4)                 &
-          + eigen(6,kp) * track(5) - eigen(5,kp) * track(6)
-     znt(kp) = eigen(1,kq) * track(2) - eigen(2,kq) * track(1)       &
-          + eigen(3,kq) * track(4) - eigen(4,kq) * track(3)                 &
-          + eigen(5,kq) * track(6) - eigen(6,kq) * track(5)
+  do i = 1, 3 
+     znt(2*i-1) = eigen(2,2*i) * track(1) - eigen(1,2*i) * track(2) &
+                + eigen(4,2*i) * track(3) - eigen(3,2*i) * track(4) &
+                + eigen(6,2*i) * track(5) - eigen(5,2*i) * track(6)
+     znt(2*i)   = eigen(1,2*i-1) * track(2) - eigen(2,2*i-1) * track(1) &
+                + eigen(3,2*i-1) * track(4) - eigen(4,2*i-1) * track(3) &
+                + eigen(5,2*i-1) * track(6) - eigen(6,2*i-1) * track(5)
   enddo
 
   !---- Convert to amplitudes (and phases: not computed).
-  wx = znt(1)**2 + znt(2)**2
-  wy = znt(3)**2 + znt(4)**2
+  wx = znt(1)*znt(1) + znt(2)*znt(2)
+  wy = znt(3)*znt(3) + znt(4)*znt(4)
   wxy = wx + wy
 
   !---- Compare to and redefine WMIN and WMAX in TRDYNAP.
-  if (wx.gt.wxmax) then
-     wxmax = wx
-  else if (wx.lt.wxmin.or.wxmin.eq.zero) then
-     wxmin = wx
-  endif
-  if (wy.gt.wymax) then
-     wymax = wy
-  else if (wy.lt.wymin.or.wymin.eq.zero) then
-     wymin = wy
-  endif
-  if (wxy.gt.wxymax) then
-     wxymax = wxy
-  else if (wxy.lt.wxymin.or.wxymin.eq.zero) then
-     wxymin = wxy
-  endif
+  wxmax  = max(wx,  wxmax)  ;  wxmin  = min(wx,  wxmin)
+  wymax  = max(wy,  wymax)  ;  wymin  = min(wy,  wymin)
+  wxymax = max(wxy, wxymax) ;  wxymin = min(wxy, wxymin)
+
+  !write (66,*) wx, wy, wxy, wxmax, wxmin, wymax, wymin, wxymax, wxymin
 
 end subroutine wmaxmin
-!-----------------  end of wmaxmin subroutine --------------------------
 
-!ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 double precision function slopexy(vectorx, vectory, nturn)
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Computes slope a for linear fit of Y = a X + b.                    *
   ! VECTORX  is the array of abscissas X,                                *
-  ! VECTORX  is the array of ordinates Y to interpolate,                 *
+  ! VECTORY  is the array of ordinates Y to interpolate,                 *
   ! NTURN    is their dimension.                                         *
   !----------------------------------------------------------------------*
-  integer mf,nturn
-  double precision vectorx(*),vectory(*),x2mean,xmean,xymean,ymean, &
-       zero
-  parameter(zero=0d0)
+  integer, intent(IN) :: nturn
+  double precision, intent(IN) :: vectorx(nturn), vectory(nturn)
 
-  xmean  = zero
-  ymean  = zero
-  x2mean = zero
-  xymean = zero
+  double precision :: x2mean, xmean, xymean, ymean
 
-  do mf = 1, nturn
-     xmean  = xmean + vectorx(mf)
-     ymean  = ymean + vectory(mf)
-     x2mean = x2mean + vectorx(mf)**2
-     xymean = xymean + vectorx(mf) * vectory(mf)
-  enddo
-
-  xmean  = xmean / nturn
-  ymean  = ymean / nturn
-  x2mean = x2mean / nturn
-  xymean = xymean / nturn
+  xmean = sum(vectorx) / nturn
+  ymean = sum(vectory) / nturn
+  x2mean = dot_product(vectorx, vectorx) / nturn
+  xymean = dot_product(vectorx, vectory) / nturn
 
   slopexy = (xymean - xmean * ymean) / (x2mean - xmean**2)
 
 end function slopexy
-!-----------------  end of slopexy function --------------------------
+
+! subroutine dynap(eigen, coords, turns, npart, distvect, zn, dq, onelog, turnnumber)
+!   use deltrafi
+!   implicit none
+
+!   integer :: turns, npart
+!   double precision :: eigen(6,6), coords(6,0:turns,*), distvect(turns)
+!   double precision :: zn(turns,6), dq(2*turns), onelog(turns), turnnumber(turns)
+  
+!   double precision, external :: get_value
+
+!   write(*,*) ' entered dynap '
+
+!   !      print *, 'eigenvectors'
+!   !      do i = 1, 6
+!   !        print '(1p,6e12.4)', (eigen(i,j), j=1,6)
+!   !      enddo
+!   !      do k = 1, 2
+!   !        print *, 'particle: ', k
+!   !        do i = 1, turns
+!   !          print '(1p,6e12.4)', (coords(j,i,k), j = 1, 6)
+!   !        enddo
+!   !      enddo
+
+!   fastune = get_value('dynap ','fastune ') .ne. 0
+!   deltax  = get_value('dynap ','lyapunov ')
+
+!   call trdynrun (eigen,coords,turns,npart,distvect,zn,onelog,turnnumber,dq)
+ 
+!   write(*,*) ' end dynap '
+
+! end subroutine dynap
+

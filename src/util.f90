@@ -170,7 +170,8 @@ module dyntabfi
   public
   double precision :: dynapfrac=0.d0, dktrturns=0.d0, xend=0.d0, pxend=0.d0
   double precision :: yend=0.d0, pyend=0.d0, tend=0.d0, ptend=0.d0
-  double precision :: smear=0.d0, yapunov=0.d0
+  !double precision :: smear=0.d0, yapunov=0.d0
+  double precision :: smear=0.d0, lyapunov=0.d0
 end module dyntabfi
 
 module wmaxmin0fi
@@ -614,7 +615,8 @@ module matrices
                                                      0d0,0d0,-1d0,0d0,0d0,0d0, &
                                                      0d0,0d0,0d0,0d0,0d0,1d0, &
                                                      0d0,0d0,0d0,0d0,-1d0,0d0 /), shape(JMAT))
-
+  double precision, parameter :: JMATINV(6,6) = -JMAT
+  double precision, parameter :: JMATT(6,6) = -JMAT
 end module matrices
 
 
@@ -660,77 +662,10 @@ subroutine getclor(orbit0, rt, tt, error)
 
   double precision :: opt(fundim)
 
-  RT  = EYE !call m66one(rt)
+  RT  = EYE 
   OPT(:fundim) = 0.d0 
   call tmclor(orbit0, .true., .true., opt, rt, tt, error)
 end subroutine getclor
-
-! subroutine m66add(term1,term2,target)
-!   implicit none
-!   !----------------------------------------------------------------------*
-!   ! Purpose:
-!   !   Add two matrices.
-!   ! Input:
-!   !   TERM1(6,6)  (real)  First term.
-!   !   TERM2(6,6)  (real)  Second term.
-!   ! Output:
-!   !   TARGET(6,6) (real)  Sum: TARGET = TERM1 + TERM2.
-!   !----------------------------------------------------------------------*
-!   integer i,j
-!   double precision target(6,6),term1(6,6),term2(6,6)
-
-!   do i = 1, 6
-!      do j = 1, 6
-!         target(i,j) = term1(i,j) + term2(i,j)
-!      enddo
-!   enddo
-
-! end subroutine m66add
-
-! subroutine m66byv(amat,avec,target)
-!   implicit none
-!   !----------------------------------------------------------------------*
-!   ! Purpose:
-!   !   Multiply matrix times vector.
-!   ! Input:
-!   !   AMAT(6,6)   (real)  Input matrix.
-!   !   AVEC(6)     (real)  Input vector.
-!   ! Output:
-!   !   TARGET(6)   (real)  Output vector: TARGET = AMAT * AVEC.
-!   !----------------------------------------------------------------------*
-!   ! 2015-Jun-10  17:14:44  ghislain: called by emit.f90 and twiss.f90; replace by MATMUL intrisic
-!   integer i,j
-!   double precision amat(6,6),avec(6),target(6),temp(6)
-
-!   call dzero(temp,6)
-!   do i = 1, 6
-!      do j = 1, 6
-!         temp(i) = temp(i) + amat(i,j) * avec(j)
-!      enddo
-!   enddo
-!   call dcopy(temp,target,6)
-! end subroutine m66byv
-
-! subroutine m66cpy(source,target)
-!   implicit none
-!   !----------------------------------------------------------------------*
-!   ! Purpose:
-!   !   Copy matrix.
-!   ! Input:
-!   !   SOURCE(6,6) (real)  Input matrix.
-!   ! Output:
-!   !   TARGET(6,6) (real)  Output matrix: TARGET = SOURCE.
-!   !----------------------------------------------------------------------*
-!   integer i,j
-!   double precision source(6,6),target(6,6)
-!
-!   do i = 1, 6
-!      do j = 1, 6
-!         target(i,j) = source(i,j)
-!      enddo
-!   enddo
-!
-! end subroutine m66cpy
 
 subroutine m66div(anum,aden,target,eflag)
   implicit none
@@ -754,100 +689,34 @@ subroutine m66div(anum,aden,target,eflag)
   AUGMAT(:,1:6) = ADEN
   AUGMAT(:,7:12) = ANUM
   
-  !do i = 1, 6
-  !   do j = 1, 6
-  !      augmat(i,j)   = aden(i,j)
-  !      augmat(i,j+6) = anum(i,j)
-  !   enddo
-  !enddo
-
   !---- Solve resulting system.
   call solver(augmat,6,6,irank)
   if (irank .lt. 6) then
      eflag = .true.
-
-     !---- Copy result.
   else
+     !---- Copy result.
      eflag = .false.
      TARGET = AUGMAT(:,7:12)     
-     !do i = 1, 6
-     !   do j = 1, 6
-     !      target(i,j) = augmat(i,j+6)
-     !   enddo
-     !enddo
   endif
 
 end subroutine m66div
 
-! subroutine m66exp(source,target,eflag)
+! subroutine m66inv(source,target) ! can be eradicated
+!   use matrices, only : JMAT
 !   implicit none
 !   !----------------------------------------------------------------------*
 !   ! Purpose:
-!   !   "Exponentiate" matrix.
-!   !   Original author:    Liam Healy.
+!   !   Invert symplectic matrix.
 !   ! Input:
 !   !   SOURCE(6,6) (real)  Input matrix.
 !   ! Output:
-!   !   TARGET(6,6) (real)  Output matrix: TARGET = exp(SOURCE).
-!   !   EFLAG     (logical) Error flag.
+!   !   TARGET(6,6) (real)  Output matrix: TARGET = tr(J) * tr(SOURCE) * J.
 !   !----------------------------------------------------------------------*
-!   logical eflag
-!   integer i,j
-!   double precision b(6,6),c(6,6),source(6,6),target(6,6),one,two,twelve
-!   parameter(one=1d0,two=2d0,twelve=12d0)
+!   double precision :: source(6,6), target(6,6)
 
-!   call m66mpy(source,source,b)
-!   call m66mpy(source,b,c)
-!   do j = 1, 6
-!      do i = 1, 6
-!         b(i,j) = (source(i,j) - c(i,j) / twelve) / two
-!         c(i,j) = - b(i,j)
-!      enddo
-!      b(j,j) = b(j,j) + one
-!      c(j,j) = c(j,j) + one
-!   enddo
-!   call m66div(b,c,target,eflag)
-! end subroutine m66exp
+!   TARGET = matmul(transpose(JMAT), matmul(transpose(SOURCE),JMAT))
 
-subroutine m66inv(source,target) ! can be eradicated
-  use matrices, only : JMAT
-  implicit none
-  !----------------------------------------------------------------------*
-  ! Purpose:
-  !   Invert symplectic matrix.
-  ! Input:
-  !   SOURCE(6,6) (real)  Input matrix.
-  ! Output:
-  !   TARGET(6,6) (real)  Output matrix: TARGET = tr(J) * tr(SOURCE) * J.
-  !----------------------------------------------------------------------*
-  double precision :: source(6,6), target(6,6)
-
-  !double precision :: temp(6,6)
-  !integer :: i
-
-  TARGET = matmul(transpose(JMAT), matmul(transpose(SOURCE),JMAT))
-
-  ! !---- TEMP = transpose(SOURCE) * J.
-  ! do i = 1, 6
-  !    temp(i,1) = - source(2,i)
-  !    temp(i,2) = + source(1,i)
-  !    temp(i,3) = - source(4,i)
-  !    temp(i,4) = + source(3,i)
-  !    temp(i,5) = - source(6,i)
-  !    temp(i,6) = + source(5,i)
-  ! enddo
-
-  ! !---- TARGET = transpose(J) * TEMP.
-  ! do i = 1, 6
-  !    target(1,i) = - temp(2,i)
-  !    target(2,i) = + temp(1,i)
-  !    target(3,i) = - temp(4,i)
-  !    target(4,i) = + temp(3,i)
-  !    target(5,i) = - temp(6,i)
-  !    target(6,i) = + temp(5,i)
-  ! enddo
-
-end subroutine m66inv
+! end subroutine m66inv
 
 subroutine m66symp(r,nrm) ! can be moved to twiss.f90
   use matrices, only : JMAT
@@ -867,22 +736,10 @@ subroutine m66symp(r,nrm) ! can be moved to twiss.f90
   double precision, parameter :: zero=0d0
   integer :: i, j
 
-  !double precision, parameter :: z=0d0, o=1d0, n=-1d0
-  !J = reshape((/ z, o, z, z, z, z, &
-  !             & n, z, z, z, z, z, &
-  !             & z, z, z, o, z, z, &
-  !             & z, z, n, z, z, z, &
-  !             & z, z, z, z, z, o, &
-  !             & z, z, z, z, n, z /), shape(J))
-
   ! calculate norm( (Rt J R) - J)
 
   T = matmul( matmul(transpose(R), JMAT), R) - JMAT 
-  !T = matmul(transpose(R),J) !call m66trm(R,J,T)
-  !T = matmul(T,R) !call m66mpy(T,R,T)
-  !T = T - J !call m66sub(T,J,T)
  
-  !call m66nrm(T,nrm)
   nrm = zero
   do j = 1, 6
      sum = zero
@@ -892,220 +749,7 @@ subroutine m66symp(r,nrm) ! can be moved to twiss.f90
      nrm = max(nrm,sum)
   enddo
 
-
 end subroutine m66symp
-
-! subroutine m66mak(f2,target)
-!   implicit none
-!   !----------------------------------------------------------------------*
-!   ! Purpose:
-!   !   Compute matrix TARGET corresponding to Lie polynomial F2.
-!   !   Original author:    Liam Healy.
-!   ! Input:
-!   !   F2          (poly)  Polynomial of order 2.
-!   ! Output:
-!   !   TARGET(6,6) (real)  Output matrix: TARGET * v = - [J,v].
-!   !----------------------------------------------------------------------*
-!   double precision :: f2(*), target(6,6)
-
-!   double precision, parameter :: two=2d0
-
-!   target(1,1) = - f2(8)
-!   target(1,2) = - two * f2(13)
-!   target(1,3) = - f2(14)
-!   target(1,4) = - f2(15)
-!   target(1,5) = - f2(16)
-!   target(1,6) = - f2(17)
-!   target(2,1) = two * f2(7)
-!   target(2,2) = f2(8)
-!   target(2,3) = f2(9)
-!   target(2,4) = f2(10)
-!   target(2,5) = f2(11)
-!   target(2,6) = f2(12)
-!   target(3,1) = - f2(10)
-!   target(3,2) = - f2(15)
-!   target(3,3) = - f2(19)
-!   target(3,4) = - two * f2(22)
-!   target(3,5) = - f2(23)
-!   target(3,6) = - f2(24)
-!   target(4,1) = f2(9)
-!   target(4,2) = f2(14)
-!   target(4,3) = two * f2(18)
-!   target(4,4) = f2(19)
-!   target(4,5) = f2(20)
-!   target(4,6) = f2(21)
-!   target(5,1) = - f2(12)
-!   target(5,2) = - f2(17)
-!   target(5,3) = - f2(21)
-!   target(5,4) = - f2(24)
-!   target(5,5) = - f2(26)
-!   target(5,6) = - two * f2(27)
-!   target(6,1) = f2(11)
-!   target(6,2) = f2(16)
-!   target(6,3) = f2(20)
-!   target(6,4) = f2(23)
-!   target(6,5) = two * f2(25)
-!   target(6,6) = f2(26)
-
-! end subroutine m66mak
-
-! subroutine m66mpy(fact1,fact2,target)
-!   implicit none
-!   !----------------------------------------------------------------------*
-!   ! Purpose:
-!   !   Multiply two matrices.
-!   !   TARGET may coincide with one of the factors.
-!   ! Input:
-!   !   FACT1(6,6)  (real)  First factor.
-!   !   FACT2(6,6)  (real)  Second factor.
-!   ! Output:
-!   !   TARGET(6,6) (real)  Product matrix: TARGET = FACT1 * FACT2.
-!   !----------------------------------------------------------------------*
-!   integer i,j,k
-!   double precision fact1(6,6),fact2(6,6),target(6,6),temp(6,6)
-!
-!   call dzero(temp,36)
-!   do k = 1, 6
-!      do j = 1, 6
-!         do i = 1, 6
-!            temp(i,k) = temp(i,k) + fact1(i,j) * fact2(j,k)
-!         enddo
-!      enddo
-!   enddo
-!   call dcopy(temp,target,36)
-!
-! end subroutine m66mpy
-
-! subroutine m66mtr(fact1,fact2,target)
-!   implicit none
-!   !----------------------------------------------------------------------*
-!   ! Purpose:
-!   !   Multiply a matrix with the transpose of another matrix.
-!   !   TARGET must not coincide with either factor.
-!   ! Input:
-!   !   FACT1(6,6)  (real)  First factor.
-!   !   FACT2(6,6)  (real)  Second factor (will be transposed).
-!   ! Output:
-!   !   TARGET(6,6) (real)  Product: TARGET = FACT1 * tr(FACT2).
-!   !----------------------------------------------------------------------*
-!   integer i,j,k
-!   double precision fact1(6,6),fact2(6,6),target(6,6)
-!
-!   call dzero(target,36)
-!   do j = 1, 6
-!      do k = 1, 6
-!         do i = 1, 6
-!            target(i,j) = target(i,j) + fact1(i,k) * fact2(j,k)
-!         enddo
-!      enddo
-!   enddo
-!
-! end subroutine m66mtr
-
-! subroutine m66nrm(fm,res)
-!   implicit none
-!   !----------------------------------------------------------------------*
-!   ! Purpose:
-!   !   Computes the norm of a matrix.
-!   !   Reference:          L. Collatz,
-!   !                       Functional Analysis & Numerical Mathematics.
-!   !   Source:             MARYLIE, Version 3.0.
-!   ! Input:
-!   !   FM(6,6)     (real)  Input matrix.
-!   ! Output:
-!   !   RES         (real)  Norm of FM: RES = max abs column sum.
-!   !----------------------------------------------------------------------*
-!   double precision :: fm(6,6), res
-
-!   integer :: i, j
-!   double precision :: sum
-
-!   double precision, parameter :: zero=0d0
-
-!   res = zero
-!   do j = 1, 6
-!      sum = zero
-!      do i = 1, 6
-!         sum = sum + abs(fm(i,j))
-!      enddo
-!      res = max(res,sum)
-!   enddo
-
-! end subroutine m66nrm
-
-! subroutine m66one(target)
-!   implicit none
-!   !----------------------------------------------------------------------*
-!   ! Purpose:
-!   !   Set matrix to unity.
-!   ! Output:
-!   !   TARGET(6,6) (real)  Unit matrix: TARGET = I.
-!   !----------------------------------------------------------------------*
-!   double precision, dimension(6,6):: TARGET
-
-!   integer :: j
-
-!   TARGET = 0.d0 
-!   forall(j = 1:6) TARGET(j,j) = 1.d0    
-
-!end subroutine m66one
-
-! subroutine m66ref(source,target)
-!   implicit none
-!   !----------------------------------------------------------------------*
-!   ! Purpose:
-!   !   Reflect symplectic first order transform.
-!   ! Input:
-!   !   SOURCE(6,6) (real)  Input matrix.
-!   ! Output:
-!   !   TARGET(6,6) (real)  Reflected matrix.
-!   !----------------------------------------------------------------------*
-!   integer i
-!   double precision source(6,6),target(6,6),temp(6,6)
-
-!   !---- TEMP = transpose(SOURCE) * J * signs.
-!   do i = 1, 6
-!      temp(i,1) =   source(2,i)
-!      temp(i,2) =   source(1,i)
-!      temp(i,3) =   source(4,i)
-!      temp(i,4) =   source(3,i)
-!      temp(i,5) = - source(6,i)
-!      temp(i,6) = - source(5,i)
-!   enddo
-
-!   !---- TARGET = signs * transpose(J) * TEMP.
-!   do i = 1, 6
-!      target(1,i) =   temp(2,i)
-!      target(2,i) =   temp(1,i)
-!      target(3,i) =   temp(4,i)
-!      target(4,i) =   temp(3,i)
-!      target(5,i) = - temp(6,i)
-!      target(6,i) = - temp(5,i)
-!   enddo
-
-! end subroutine m66ref
-
-! subroutine m66scl(scalar,source,target)
-!   implicit none
-!   !----------------------------------------------------------------------*
-!   ! Purpose:
-!   !   Multiply matrix by scalar.
-!   ! Input:
-!   !   SCALAR      (real)  Scale factor.
-!   !   SOURCE(6,6) (real)  Input matrix.
-!   ! Output:
-!   !   TARGET(6,6) (real)  Scaled matrix: TARGET = SCALAR * SOURCE.
-!   !----------------------------------------------------------------------*
-!   integer i,j
-!   double precision scalar,source(6,6),target(6,6)
-!
-!   do i = 1, 6
-!      do j = 1, 6
-!         target(i,j) = scalar * source(i,j)
-!      enddo
-!   enddo
-!
-! end subroutine m66scl
 
 logical function m66sta(amat)
   implicit none
@@ -1129,89 +773,6 @@ logical function m66sta(amat)
   enddo
 
 end function m66sta
-
-! subroutine m66sub(term1,term2,target)
-!   implicit none
-!   !----------------------------------------------------------------------*
-!   ! Purpose:
-!   !   Subtract two matrices.
-!   ! Input:
-!   !   TERM1(6,6)  (real)  Minuend matrix.
-!   !   TERM2(6,6)  (real)  Subtrahend matrix.
-!   ! Output:
-!   !   TARGET(6,6) (real)  Difference matrix: TARGET = TERM1 - TERM2.
-!   !----------------------------------------------------------------------*
-!   integer i,j
-!   double precision target(6,6),term1(6,6),term2(6,6)
-!
-!   do j = 1, 6
-!      do i = 1, 6
-!         target(i,j) = term1(i,j) - term2(i,j)
-!      enddo
-!   enddo
-!
-! end subroutine m66sub
-
-! subroutine m66trm(fact1,fact2,target)
-!   implicit none
-!   !----------------------------------------------------------------------*
-!   ! Purpose:
-!   !   Multiply the transpose of a matrix with another matrix.
-!   !   TARGET must not coincide with either factor.
-!   ! Input:
-!   !   FACT1(6,6)  (real)  First factor (will be transposed).
-!   !   FACT2(6,6)  (real)  Second factor.
-!   ! Output:
-!   !   TARGET(6,6) (real)  Product: TARGET = tr(FACT1) * FACT2.
-!   !----------------------------------------------------------------------*
-!   integer i,j,k
-!   double precision fact1(6,6),fact2(6,6),target(6,6)
-!
-!   call dzero(target,36)
-!   do j = 1, 6
-!      do k = 1, 6
-!         do i = 1, 6
-!            target(i,j) = target(i,j) + fact1(k,i) * fact2(k,j)
-!         enddo
-!      enddo
-!   enddo
-!
-! end subroutine m66trm
-
-! subroutine m66tp(source,target)
-!   implicit none
-!   !----------------------------------------------------------------------*
-!   ! Purpose:
-!   !   Transpose a matrix.
-!   !   TARGET and SOURCE may overlap.
-!   ! Input:
-!   !   SOURCE(6,6) (real)  Input matrix.
-!   ! Output:
-!   !   TARGET(6,6) (real)  Transposed matrix: TARGET = tr(SOURCE).
-!   !----------------------------------------------------------------------*
-!   integer i,j
-!   double precision source(6,6),target(6,6),temp(6,6)
-
-!   do i = 1, 6
-!      do j = 1, 6
-!         temp(j,i) = source(i,j)
-!      enddo
-!   enddo
-!   call m66cpy(temp,target)
-! end subroutine m66tp
-! subroutine m66zro(target)
-!   implicit none
-!   !----------------------------------------------------------------------*
-!   ! Purpose:
-!   !   Clear a matrix to zero.
-!   ! Output:
-!   !   TARGET(6,6) (real)  Zero matrix: TARGET = 0.
-!   !----------------------------------------------------------------------*
-!   double precision target(6,6)
-!
-!   call dzero(target,36)
-!
-! end subroutine m66zro
 
 subroutine solver(augmat,ndim,mdim,irank)
   implicit none
@@ -1501,26 +1062,6 @@ subroutine dcopy(in,out,n)
 
 end subroutine dcopy
 
-! subroutine dzero(vector,n)
-!   !----------------------------------------------------------------------*
-!   ! Purpose:                                                             *
-!   !   Zero an array.                                                     *
-!   ! Input:                                                               *
-!   !   n      (integer) array length.                                     *
-!   ! Input/output:                                                        *
-!   !   vector (double)  array to be zeroed.                               *
-!   !----------------------------------------------------------------------*
-!   implicit none
-!   integer n, i
-!   double precision vector(*),zero
-!   parameter(zero=0d0)
-
-!   do i = 1, n
-!      vector(i) = zero
-!   enddo
-
-! end subroutine dzero
-
 subroutine aawarn(rout,text)
   implicit none
   !----------------------------------------------------------------------*
@@ -1626,11 +1167,12 @@ subroutine laseig(fm,reeig,aieig,am)
   integer, parameter :: ilo=1, ihi=4, mdim=6, nn=4
 
   !---- Compute eigenvalues and vectors.
-  TM(:6,:6) = FM(:6,:6) !call m66cpy(fm,tm)
-  AM = EYE !call m66one(am)
+  TM = FM
+  AM = EYE 
   call orthes(mdim,nn,ilo,ihi,tm,d)
   call ortran(mdim,nn,ilo,ihi,tm,d,am)
   call hqr2(mdim,nn,ilo,ihi,tm,reval,aival,am,info)
+
   if (info .ne. 0) then
      write (6, 910) ((fm(i,k), k = 1, 6), i = 1, 6)
 910  format('Unable to find eigenvalues for matrix:'/(6f12.6))
@@ -1657,7 +1199,7 @@ subroutine laseig(fm,reeig,aieig,am)
   enddo
 
   !---- Sort these eigenvectors.
-  TM(:6,:6) = AM(:6,:6) !call m66cpy(am,tm)
+  TM = AM
   !---- Find the eigenvectors with the largest vertical component.
   big = zero
   kpnt(3) = 1
@@ -1690,7 +1232,7 @@ subroutine laseig(fm,reeig,aieig,am)
   aieig(6) = zero
 
   !---- Rephase the result.
-  TM = EYE !call m66one(tm)
+  TM = EYE 
   dx = sqrt(am(1,1)**2 + am(1,2)**2)
   tm(1,1) = am(1,1) / dx
   tm(2,1) = am(1,2) / dx
@@ -1702,7 +1244,7 @@ subroutine laseig(fm,reeig,aieig,am)
   tm(3,4) = - tm(4,3)
   tm(4,4) = tm(3,3)
 
-  AM(:6,:6) = matmul(AM(:6,:6),TM(:6,:6)) !call m66mpy(am,tm,am)
+  AM = matmul(AM,TM) 
 
 999 end subroutine laseig
 
@@ -1729,7 +1271,7 @@ subroutine ladeig(fm,reeig,aieig,am)
   integer, parameter :: ilo=1, ihi=6, mdim=6, nn=6
 
   !---- Compute eigenvalues and eigenvectors.
-  TM(:6,:6) = FM(:6,:6) !call m66cpy(fm,tm)
+  TM = FM
   call orthes(mdim,nn,ilo,ihi,tm,d)
   call ortran(mdim,nn,ilo,ihi,tm,d,am)
   call hqr2(mdim,nn,ilo,ihi,tm,reval,aival,am,info)
@@ -1758,7 +1300,7 @@ subroutine ladeig(fm,reeig,aieig,am)
   enddo
 
   !---- Copy vectors to temporary array.
-  TM(:6,:6) = AM(:6,:6) !call m66cpy(am,tm)
+  TM = AM
   !---- Find the vector with the largest vertical component.
   big = zero
   kpnt(3) = 1
@@ -1798,7 +1340,7 @@ subroutine ladeig(fm,reeig,aieig,am)
      enddo
   enddo
   !---- Rephase the result.
-  TM = EYE !call m66one(tm)
+  TM = EYE 
   dx = sqrt(am(1,1)**2 + am(1,2)**2)
   tm(1,1) = am(1,1) / dx
   tm(2,1) = am(1,2) / dx
@@ -1814,7 +1356,8 @@ subroutine ladeig(fm,reeig,aieig,am)
   tm(6,5) = am(5,6) / dt
   tm(5,6) = - tm(6,5)
   tm(6,6) = tm(5,5)
-  AM = matmul(AM,TM) !call m66mpy(am,tm,am)
+  AM = matmul(AM,TM) 
+
 9999 end subroutine ladeig
 
 subroutine orthes(ndim,n,ilow,iupp,a,d)
@@ -2344,7 +1887,6 @@ subroutine f77flush(i,option)
   inquire(err=6,iostat=ios,unit=i,access=faccess,form=fform,name=fname)
 
   close (unit=i,err=7,iostat=ios)
-  !     write (*,*) 'Re-opening ',i,' ',faccess,fform,fname
 
   open(err=8,iostat=ios,unit=i,access=faccess,form=fform,file=fname,status='old')
 

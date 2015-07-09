@@ -58,6 +58,7 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
 
   ORBIT(:6) = ORBIT0(:6)
   DISP(:6) = DISP0(:6)
+
   EMIT_V(:3) = zero
   NEMIT_V(:3) = zero
   BMAX(:3,:3)  = zero
@@ -104,10 +105,12 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   if (frad .and. stabt) then
      SUM(:3) = zero
      sumu0 = zero
-     RD = EYE !call m66one(rd)
+     RD = EYE 
   endif
-  TT(:6,:6,:6) = zero
-  RT = EYE !call m66one(RT(:6,:6))
+
+  TT = zero
+  RT = EYE 
+
   eflag = 0
   suml = zero
   bbd_cnt=0
@@ -125,17 +128,15 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
 
    n_align = node_al_errors(al_errors)
    if (n_align .ne. 0)  then
-      ORBIT2(:6) = ORBIT(:6)
+      ORBIT2 = ORBIT
       call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
-      if (.not. stabt) & 
-           DISP(:6) = matmul(RE(:6,:6),DISP(:6))
-      EM(:6,:6) = matmul(RE(:6,:6),EM(:6,:6)) 
-      if (frad .and. stabt) & 
-           RD(:6,:6) = matmul(RE(:6,:6),RD(:6,:6)) 
+      if (.not. stabt) DISP = matmul(RE,DISP)
+      EM = matmul(RE,EM) 
+      if (frad .and. stabt) RD = matmul(RE,RD) 
    endif
 
   !---- Keep orbit at entrance.
-  ORBIT1(:6) = ORBIT(:6) 
+  ORBIT1 = ORBIT 
 
   !---- Element matrix and length.
   call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te)
@@ -143,19 +144,19 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   if (fmap) then
      !---- Advance dispersion.
      if (.not. stabt) then
-        DISP(:6) = matmul(RE(:6,:6),DISP(:6))
+        DISP = matmul(RE,DISP)        
         do j = 1, 4
            dismax(j) = max(abs(disp(j)),dismax(j))
         enddo
      endif
 
      !---- Radiation damping.
-     EM2(:6,:6) = matmul(RE(:6,:6),EM(:6,:6)) 
+     EM2 = matmul(RE,EM) 
      if (frad .and. stabt) then
         call emdamp(code, deltap, em, em2, orbit1, orbit, re)
-        RD(:6,:6) = matmul(RE(:6,:6),RD(:6,:6)) 
+        RD = matmul(RE,RD) 
      endif
-     EM(:6,:6) = EM2(:6,:6) 
+     EM = EM2
 
      !---- Compute beta and gamma.
      do j = 1, 3
@@ -174,13 +175,11 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   endif
 
   if (n_align.ne.0)  then
-     ORBIT2(:6) = ORBIT(:6) 
+     ORBIT2 = ORBIT 
      call tmali2(el,orbit2,al_errors,betas,gammas,orbit,re)
-     if (.not. stabt) & 
-          DISP(:6) = matmul(RE(:6,:6),DISP(:6)) 
-     EM(:6,:6) = matmul(RE(:6,:6),EM(:6,:6)) 
-     if (frad .and. stabt) & 
-          RD(:6,:6) = matmul(RE(:6,:6),RD(:6,:6)) 
+     if (.not. stabt) DISP = matmul(RE,DISP) 
+     EM = matmul(RE,EM) 
+     if (frad .and. stabt) RD = matmul(RE,RD) 
   endif
 
   if (advance_node().ne.0)  then
@@ -191,7 +190,7 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   bbd_flag=0
 
   !---- Undamped tunes and beam extents.
-  qx = atan2(aival(1), reval(1)) / twopi ; if (qx .lt. zero) qx = qx + one
+  qx = atan2(aival(1), reval(1)) / twopi ; if (qx .lt. zero) qx = qx + one 
   qy = atan2(aival(3), reval(3)) / twopi ; if (qy .lt. zero) qy = qy + one
   qs = atan2(aival(5), reval(5)) / twopi ; if (qs .lt. zero) qs = - qs
 
@@ -202,7 +201,7 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
 
 end subroutine emit
 
-subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,   &
+subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v, &
                   tunes,sig_v,pdamp)
   use emitfi
   implicit none
@@ -400,7 +399,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   use twiss0fi
   use emitfi
   use twtrrfi
-  use matrices, only : EYE
+  use matrices
   implicit none
   !---------------------------------------------------------------------*
   ! Purpose:                                                            *
@@ -425,9 +424,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
 
   double precision :: e1(6,6), e2(6,6)
   double precision :: normal(0:maxmul), skew(0:maxmul)
-!  double precision :: vals(2,0:maxmul)
   double precision :: f_errors(0:maxferr)
-!  double precision :: field(2,0:maxmul)
   
   double precision :: o1(6), o2(6)
   double precision :: x1, y1, t1, px1, py1, pt1
@@ -497,7 +494,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         !      sk0s = bvk * sk0s
         ! FRS 16.11.2004 here the correction
         
-        an = bvk * node_value('angle ') * el/node_value('l ') ! ??? why normalise by 1? 
+        an = bvk * node_value('angle ') * el/node_value('l ') 
         tilt = -node_value('tilt ')  
         edg1 = bvk * node_value('e1 ')
         edg2 = bvk * node_value('e2 ')
@@ -541,16 +538,18 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         !---- Move through orbit through fringing field;
         !     Requested components of eigenvectors are not affected.
         corr = (h + h) * hgap * fint
-        RW = EYE !call m66one(rw)
-        TW(:6,:6,:6) = zero 
+        RW = EYE 
+        TW = zero 
         call tmfrng(.false.,h,sk1,edg1,zero,+one,corr,rw,tw)
-        O1(:6) = matmul(RW(:6,:6),O1(:6)) 
-        RW = EYE !call m66one(rw)
-        TW(:6,:6,:6) = zero 
+        O1 = matmul(RW,O1) 
+
+        RW = EYE 
+        TW = zero 
         call tmfrng(.false.,h,sk1,edg2,zero,-one,corr,rw,tw)
-        RW0(:6,:6) = RW(:6,:6) 
-        call m66inv(rw0,rw)
-        O2(:6) = matmul(RW(:6,:6),O2(:6)) 
+        RW0 = RW 
+        !call m66inv(rw0,rw)
+        RW = matmul(JMATT, matmul(transpose(RW0),JMAT)) !invert symplectic matrix
+        O2 = matmul(RW,O2) 
         
         !---- Local curvature and its derivatives,
         !     Coefficients for damping matrix.
@@ -615,7 +614,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         
         !---- Damping matrices.
         !     Code common to bending magnet and pure multipoles.
-        RW = EYE !call m66one(rw)
+        RW = EYE 
         rw(2,1) =     - rfac1x * (one + pt1) * px1
         rw(2,2) = one - rfac1  * (one + pt1)
         rw(2,3) =     - rfac1y * (one + pt1) * px1
@@ -627,9 +626,9 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,1) =     - rfac1x * (one + pt1)**2
         rw(6,3) =     - rfac1y * (one + pt1)**2
         rw(6,6) = one - two * rfac1 * (one + pt1)
-        RE(:6,:6) = matmul(RE(:6,:6),RW(:6,:6)) !call m66mpy(re, rw, re)
+        RE = matmul(RE,RW) 
 
-        RW = EYE !call m66one(rw)
+        RW = EYE 
         rw(2,1) =     - rfac2x * (one + pt2) * px2
         rw(2,2) = one - rfac2  * (one + pt2)
         rw(2,3) =     - rfac2y * (one + pt2) * px2
@@ -641,7 +640,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,1) =     - rfac2x * (one + pt2)**2
         rw(6,3) =     - rfac2y * (one + pt2)**2
         rw(6,6) = one - two * rfac2 * (one + pt2)
-        RE(:6,:6) = matmul(RW(:6,:6),RE(:6,:6)) !call m66mpy(rw, re, re)
+        RE = matmul(RW,RE) ! ghislain ?? 
 
      case (5,6,7) !---- Common to all pure multipoles.
         select case (code)
@@ -662,10 +661,10 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
            twon = six
         end select
 
-        O1(:6) = ORB1(:6) 
-        O2(:6) = ORB2(:6) 
-        E1(:6,:6) = EM1(:6,:6) 
-        E2(:6,:6) = EM2(:6,:6) 
+        O1 = ORB1
+        O2 = ORB2
+        E1 = EM1
+        E2 = EM2
         
         !---- Local curvature.
         r1sq = orb1(1)**2 + orb1(3)**2
@@ -692,7 +691,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
 
         !---- Damping matrices.
         !     Code common to bending magnet and pure multipoles.
-        RW = EYE !call m66one(rw)
+        RW = EYE 
         rw(2,1) =     - rfac1x * (one + pt1) * px1
         rw(2,2) = one - rfac1  * (one + pt1)
         rw(2,3) =     - rfac1y * (one + pt1) * px1
@@ -704,9 +703,9 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,1) =     - rfac1x * (one + pt1)**2
         rw(6,3) =     - rfac1y * (one + pt1)**2
         rw(6,6) = one - two * rfac1 * (one + pt1)
-        RE(:6,:6) = matmul(RE(:6,:6),RW(:6,:6)) !call m66mpy(re, rw, re)
+        RE = matmul(RE,RW) 
         
-        RW = EYE !call m66one(rw)
+        RW = EYE 
         rw(2,1) =     - rfac2x * (one + pt2) * px2
         rw(2,2) = one - rfac2  * (one + pt2)
         rw(2,3) =     - rfac2y * (one + pt2) * px2
@@ -718,40 +717,19 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,1) =     - rfac2x * (one + pt2)**2
         rw(6,3) =     - rfac2y * (one + pt2)**2
         rw(6,6) = one - two * rfac2 * (one + pt2)
-        RE(:6,:6) = matmul(RW(:6,:6),RE(:6,:6)) !call m66mpy(rw, re, re)
+        RE = matmul(RW,RE) 
 
         
      case (8) !---- Thin multipoles
         ! EL is ELRAD, the fictitious length for radiation.         
         !---- Multipole components.
-        F_ERRORS(0:maxferr) = zero 
-        n_ferr = node_fd_errors(F_ERRORS)
+        F_ERRORS(0:maxferr) = zero ; n_ferr = node_fd_errors(F_ERRORS)
         
-        NORMAL(0:maxmul) = zero 
-        SKEW(0:maxmul) = zero 
-        call get_node_vector('knl ',nn,normal)
-        call get_node_vector('ksl ',ns,skew)
-        
-        !VALS(:2,0:maxmul) = zero 
-        !VALS(1,0:maxmul) = NORMAL
-        !VALS(2,0:maxmul) = SKEW
-        
-        !---- Field error vals.
-        !FIELD(:2,0:maxmul) = zero 
-        !if (n_ferr .gt. 0) call dcopy(f_errors,field,n_ferr)
-
-        !--- Max order from Normal, Skew or Error components
-        !nd = 2 * max(nn, ns, n_ferr/2-1)
+        NORMAL(0:maxmul) = zero ; call get_node_vector('knl ',nn,normal)
+        SKEW(0:maxmul) = zero   ; call get_node_vector('ksl ',ns,skew)
         
         !---- Other components and errors.
         nord = 0
-        !do iord = 0, nd/2
-        !   do j = 1, 2
-        !      field(j,iord) = bvk * (vals(j,iord) + field(j,iord)) / (one + deltap)
-        !      if (field(j,iord) .ne. zero)  nord = iord
-        !   enddo
-        !enddo
-
         do i = 0, max(nn, ns, n_ferr/2-1) 
            f_errors(2*i)   = bvk * (normal(i) + f_errors(2*i))   / (one + deltap)
            f_errors(2*i+1) = bvk * (skew(i)   + f_errors(2*i+1)) / (one + deltap)
@@ -766,12 +744,6 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         !---- Multipole kick.
         dr = zero
         di = zero
-        !do iord = nord, 0, -1
-        !   drt = (dr * x - di * y) / float(iord+1) + field(1,iord)
-        !   di  = (dr * y + di * x) / float(iord+1) + field(2,iord)
-        !   dr  = drt
-        !enddo
-
         do i = nord, 0, -1
            drt = (dr * x - di * y) / float(i+1) + f_errors(2*i)
            di  = (dr * y + di * x) / float(i+1) + f_errors(2*i+1)
@@ -789,7 +761,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rfacx = cg * (- dr * re(2,1) + di * re(4,1)) / el
         rfacy = cg * (- dr * re(2,3) + di * re(4,3)) / el
         
-        RW = EYE !call m66one(rw) ! RW = I
+        RW = EYE 
         rw(2,1) = - rfacx * (one + orb1(6)) * orb1(2)
         rw(2,2) = one - rfac * (one + orb1(6))
         rw(2,3) = - rfacy * (one + orb1(6)) * orb1(2)
@@ -803,8 +775,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,6) = one - two * rfac * (one + orb1(6))
         
         ! RE = RW * RE *  RW
-        RE(:6,:6) = matmul(RE(:6,:6),RW(:6,:6)) !call m66mpy(re, rw, re)
-        RE(:6,:6) = matmul(RW(:6,:6),RE(:6,:6)) !call m66mpy(rw, re, re)
+        RE = matmul(RW, matmul(RE,RW)) 
 
 
      case (10) !---- RF cavities.
@@ -862,21 +833,21 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
              (em1(5,5)**2 + em1(5,6)**2 + em2(5,5)**2 + em2(5,6)**2)
 
         !---- Damping matrices.
-        RW = EYE !call m66one(rw)
+        RW = EYE 
         rw(2,2) = one - rfac * (one + orb1(6))
         rw(2,6) = - rfac * orb1(2)
         rw(4,4) = one - rfac * (one + orb1(6))
         rw(4,6) = - rfac * orb1(4)
         rw(6,6) = one - two * rfac * (one + orb1(6))
-        RE(:6,:6) = matmul(RE(:6,:6),RW(:6,:6)) !call m66mpy(re, rw, re)
+        RE = matmul(RE,RW) 
         
-        RW = EYE !call m66one(rw)
+        RW = EYE 
         rw(2,2) = one - rfac * (one + orb2(6))
         rw(2,6) = - rfac * orb2(2)
         rw(4,4) = one - rfac * (one + orb2(6))
         rw(4,6) = - rfac * orb2(4)
         rw(6,6) = one - two * rfac * (one + orb2(6))
-        RE(:6,:6) = matmul(RW(:6,:6),RE(:6,:6)) !call m66mpy(rw, re, re)
+        RE = matmul(RW,RE) 
 
      case (43)  !---- thin RF multipole        
         ! should provide a combination of damping as for thin multipole and

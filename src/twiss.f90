@@ -38,8 +38,8 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
 
   ORBIT0 = zero 
   call get_node_vector('orbit0 ', 6, orbit0)
-  RT = EYE ! call m66one(rt)
-  RT = EYE ! call m66one(rw)
+  RT = EYE 
+  RT = EYE 
   TT = zero 
   call get_disp0(disp0)
   DDISP0 = zero 
@@ -108,7 +108,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
 
   if (sectormap)  then
      SORB = ORBIT0 
-     SRMAT = EYE !call m66one(srmat)
+     SRMAT = EYE 
      STMAT = zero 
   endif
 
@@ -630,7 +630,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   gammas= get_value('probe ','gamma ')
 
   TT = zero 
-  RT  = EYE  !call m66one(rt)
+  RT  = EYE  
 
   eflag = 0
   suml = zero
@@ -868,6 +868,7 @@ if (code .ge. pcode-1 .and. code .le. pcode+1)  then !---  monitors (code 17 to 
 end SUBROUTINE tmfrst
 
 SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
+  use matrices
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -932,7 +933,8 @@ SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
   ncorr = node
 
   !---  transport matrix from kicker to pickup
-  call m66inv(cmatr,atemp)
+  !call m66inv(cmatr,atemp)
+  ATEMP = matmul(JMATT, matmul(transpose(CMATR),JMAT)) ! invert symplectic matrix
   ATEMP = matmul(PMATR,ATEMP) 
 
   !--- if kicker is not efficient enough - loop
@@ -1184,8 +1186,8 @@ SUBROUTINE twcpgo(rt,orbit0)
   currpos=zero
   dorad = get_value('probe ','radiate ').ne.zero
   centre = get_value('twiss ','centre ').ne.zero
-  RWI = EYE !call m66one(rwi)
-  RC = EYE !call m66one(rc)
+  RWI = EYE 
+  RC = EYE 
 
   !---- Store one-turn-map
   ROTM = RT 
@@ -1376,7 +1378,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   !---- Warning messages.
   if (cplxt .or. dorad) & 
        call aawarn('TWCPGO: ','TWISS uses the RF system or synchrotron radiation only & 
-                  & to find the closed orbit, for optical calculations it ignores both.')
+                  &to find the closed orbit, for optical calculations it ignores both.')
 
   ! write (6,*) bxmax, bxmax_name
   ! write (6,*) bymax, bymax_name
@@ -1392,6 +1394,7 @@ SUBROUTINE twcptk(re,orbit)
   use twisslfi
   use twisscfi
   use twissotmfi
+  use matrices, only : JMAT, JMATT
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -1478,7 +1481,8 @@ SUBROUTINE twcptk(re,orbit)
      if (get_option('twiss_inval ') .ne. 0) then
         RC = RW 
      else
-        call m66inv(rw,rwi)
+        !call m66inv(rw,rwi)
+        RWI = matmul(JMATT, matmul(transpose(RW),JMAT)) ! invert symplectic matrix
         RC = matmul(ROTM,RWI)
         RC = matmul(RW,RC) 
      endif
@@ -1882,8 +1886,8 @@ SUBROUTINE twbttk(re,te)
   !     longitudinal 2x2 part of the R-matrix
   detl = re(5,5)*re(6,6) - re(5,6)*re(6,5)
   f = one / sqrt(detl)
-  FRE  = f * RE  !call m66scl(f,re,fre)
-  FREP = f * REP !call m66scl(f,rep,frep)
+  FRE  = f * RE  
+  FREP = f * REP 
 
   !---- Track horizontal functions including energy scaling.
   tb = fre(1,1)*betx - fre(1,2)*alfx
@@ -2151,7 +2155,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
 
   !---- Initialization
   EK = zero 
-  RE = EYE !call m66one(re)
+  RE = EYE 
   TE = zero 
   plot_tilt = zero
   fmap = .false.
@@ -2246,7 +2250,7 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   integer :: elpar_vl
   integer :: nd, n_ferr, code
   double precision :: f_errors(0:maxferr)
-  double precision :: field(2,0:maxmul)
+  !double precision :: field(2,0:maxmul)
   double precision :: rw(6,6), tw(6,6,6), ek0(6), orbit0(6)
   double precision :: x, y, deltap=0.d0
   double precision :: an, sk1, sk2, sks, tilt, e1, e2, h, h1, h2, hgap, fint, fintx, rhoinv, blen, bvk
@@ -2259,7 +2263,7 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
 
   !---- Initialize.
   EK0 = zero 
-  RW = EYE !call m66one(rw)
+  RW = EYE 
   TW = zero 
 
   code = node_value('mad8_type ')
@@ -2299,10 +2303,10 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
      !---- Apply field errors and change coefficients using DELTAP.
      F_ERRORS = zero 
      n_ferr = node_fd_errors(f_errors)
-     dh = (- h * deltap + bvk * f_errors(0) / el) / (one + deltap)
-     sk1 = bvk * (sk1 + f_errors(2) / el) / (one + deltap)
-     sk2 = bvk * (sk2 + f_errors(4) / el) / (one + deltap)
-     sks = bvk * (sks + f_errors(3) / el) / (one + deltap)        
+     dh = (- h * deltap + bvk * f_errors(0) / el) / (one + deltap) ! dipole term
+     sk1 = bvk * (sk1 + f_errors(2) / el) / (one + deltap) ! quad term
+     sk2 = bvk * (sk2 + f_errors(4) / el) / (one + deltap) ! sext term
+     sks = bvk * (sks + f_errors(3) / el) / (one + deltap) ! skew quad term       
 
      !---- Half radiation effects at entrance.
      if (ftrk .and. dorad) then
@@ -2436,7 +2440,7 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
 
   !---- Initialize.
   EK = zero 
-  RE = EYE !call m66one(re)
+  RE = EYE 
   if (fsec) TE = zero 
   beta = get_value('probe ','beta ')
   gamma = get_value('probe ','gamma ')
@@ -2689,7 +2693,7 @@ SUBROUTINE tmfrng(fsec,h,sk1,edge,he,sig,corr,re,te)
   double precision, parameter :: zero=0d0, one=1d0
 
   !---- Linear terms.
-  RE = EYE !call m66one(re)
+  RE = EYE 
   tanedg = tan(edge)
   secedg = one / cos(edge)
   psip = edge - corr * secedg * (one + sin(edge)**2)
@@ -2944,7 +2948,7 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
   integer :: i, code, n_ferr
   double precision :: f_errors(0:maxferr)
   double precision :: deltap, gamma, arad, rfac=0.d0, pt, bvk, tilt
-  double precision :: xkick, ykick, dpx, dpy, xau, div, field(2)
+  double precision :: xkick, ykick, dpx, dpy, xau, div !, field(2)
 
   integer, external :: node_fd_errors
   double precision, external :: node_value, get_value
@@ -2973,22 +2977,22 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
      code = node_value('mad8_type ')
      select case (code)
 
-     case (14)
-        xkick=bvk*(node_value('kick ')+node_value('chkick ')+f_errors(0)/div)
-        ykick=zero
+       case (14)
+          xkick=bvk*(node_value('kick ')+node_value('chkick ')+f_errors(0)/div)
+          ykick=zero
         
-     case (15)
-        xkick=bvk*(node_value('hkick ')+node_value('chkick ')+f_errors(0)/div)
-        ykick=bvk*(node_value('vkick ')+node_value('cvkick ')+f_errors(1)/div)
+       case (15)
+          xkick=bvk*(node_value('hkick ')+node_value('chkick ')+f_errors(0)/div)
+          ykick=bvk*(node_value('vkick ')+node_value('cvkick ')+f_errors(1)/div)
 
-     case(16)
-        xkick=zero
-        ykick=bvk*(node_value('kick ')+node_value('cvkick ')+f_errors(1)/div)
-
-     case default
-        xkick=zero
-        ykick=zero
-
+       case(16)
+          xkick=zero
+          ykick=bvk*(node_value('kick ')+node_value('cvkick ')+f_errors(1)/div)
+          
+       case default
+          xkick=zero
+          ykick=zero
+          
      end select
 
      xau = xkick
@@ -3068,7 +3072,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0
 
   !---- Initialize
-  rfac=zero
+  rfac = zero
   F_ERRORS(0:maxferr) = zero 
   n_ferr = node_fd_errors(f_errors)
   bvk = node_value('other_bv ')
@@ -3077,18 +3081,18 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   elrad = node_value('lrad ')
   dorad = get_value('probe ','radiate ') .ne. zero
   arad = get_value('probe ','arad ')
-  gammas= get_value('probe ','gamma ')
+  gammas = get_value('probe ','gamma ')
   deltap = get_value('probe ', 'deltap ')
   beta = get_value('probe ','beta ')
-  fmap = .true.
   bi = one / beta
 
+  fmap = .true.
+
   !---- Multipole components.
-  NORMAL = zero 
-  SKEW = zero 
-  call get_node_vector('knl ',nn,normal)
-  call get_node_vector('ksl ',ns,skew)
+  NORMAL = zero ; call get_node_vector('knl ',nn,normal)
+  SKEW = zero   ; call get_node_vector('ksl ',ns,skew)
   tilt = node_value('tilt ')
+
   !VALS = zero 
   !VALS(1,0:nn) = NORMAL(0:nn)
   !do iord = 0, nn
@@ -3119,15 +3123,15 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   !dipi = vals(2,0) / (one + deltap)
 
   if (tilt .ne. zero)  then
-     if (dipi.ne.zero.or.dipr.ne.zero) then
+     if (dipi.ne.zero .or. dipr.ne.zero) then
         angle = atan2(dipi, dipr) - tilt
      else
         angle = -tilt
      endif
-     dtmp = sqrt(dipi**2+dipr**2)
+     dtmp = sqrt(dipi**2 + dipr**2)
      dipr = dtmp * cos(angle)
      dipi = dtmp * sin(angle)
-     dtmp = sqrt(dbi**2+dbr**2)
+     dtmp = sqrt(dbi**2 + dbr**2)
      dbr = dtmp * cos(angle)
      dbi = dtmp * sin(angle)
   endif
@@ -3142,11 +3146,9 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   ! that loop should start at one since nominal dipole strength already taken into account above
   do iord = 0, max(nn, ns, n_ferr/2-1) 
      ! get the maximum effective order; loop runs over maximum of user given values
-     if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero .or. normal(iord).ne.zero .or. skew(iord).ne.zero)  & 
-          nord = iord     
+     if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero .or. & 
+          normal(iord).ne.zero .or. skew(iord).ne.zero) nord = iord     
   enddo
-
-  !print *, 'Multipole order found ', nord
 
   !do iord = 1, nd/2
   !   do j = 1, 2
@@ -3310,7 +3312,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   endif
 
   !---- centre option
-  if (centre_cptk.or.centre_bttk) then
+  if (centre_cptk .or. centre_bttk) then
      ORBIT00 = ORBIT ; RE00 = RE ; TE00 = TE 
      if (centre_cptk) then
         ORBIT0 = ORBIT 
@@ -3417,7 +3419,7 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
   endif
 
   !---- First-order terms w.r.t. orbit.
-  RW = EYE !call m66one(rw)
+  RW = EYE 
   posr = (orbit(1)**2 - orbit(3)**2) / four
   posi = orbit(1) * orbit(3) / two
   cr = octr * posr - octi * posi
@@ -3449,21 +3451,15 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   !---- Concatenate with drift map.
   !---- centre option
-  if (centre_cptk.or.centre_bttk) then
-     ORBIT00 = ORBIT 
-     EK00 = EK 
-     RE00 = RE 
-     TE00 = TE 
-     el0=el/two
+  if (centre_cptk .or. centre_bttk) then
+     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE 
+     el0 = el/two
      ORBIT0 = ORBIT 
      call tmdrf0(fsec,ftrk,orbit0,fmap,el0,ek,re,te)
      call tmcat(fsec,re,te,rw,tw,re,te)
      if (centre_cptk) call twcptk(re,orbit0)
      if (centre_bttk) call twbttk(re,te)
-     ORBIT = ORBIT00 
-     EK = EK00 
-     RE = RE00 
-     TE = TE00 
+     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00 
   endif
   call tmdrf0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   call tmcat(fsec,re,te,rw,tw,re,te)
@@ -3486,7 +3482,7 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
   endif
 
   !---- First-order terms w.r.t. orbit.
-  RW = EYE !call m66one(rw)
+  RW = EYE 
   posr = (orbit(1)**2 - orbit(3)**2) / four
   posi = orbit(1) * orbit(3) / two
   cr = octr * posr - octi * posi
@@ -3907,18 +3903,7 @@ SUBROUTINE tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
      te(6,6,5)=node_value('tm665 ')
      te(6,6,6)=node_value('tm666 ')
 
-     do i3 = 1,6
-        do i2 = 1,6
-           do i1 = 1,6
-              if (te(i1,i2,i3) .ne. zero) then
-                 fsecarb = .true.
-                 go to 10
-              endif
-           enddo
-        enddo
-     enddo
-10   continue
-
+     if (maxval(abs(TE)) .gt. zero) fsecarb = .true. 
      ! temp = zero
      ! do i3 = 1,6
      !    do i2 = 1,6
@@ -3968,7 +3953,7 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
   integer :: i, j, n_ferr, elpar_vl
   double precision :: ct, st, tmp
   double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
-  double precision :: f_errors(0:maxferr), field(2,0:1)
+  double precision :: f_errors(0:maxferr)
   double precision :: deltap, el0, tilt, sk1, pt, sk1s, bvk 
   double precision :: rfac, arad, gamma
 
@@ -3987,18 +3972,14 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
   !---- Field error.
   F_ERRORS = zero 
   n_ferr = node_fd_errors(f_errors)
-  FIELD = zero
-  if (n_ferr .gt. 0) call dcopy(f_errors, field, min(4,n_ferr))
 
   !-- element paramters
   elpar_vl = el_par_vector(q_k1s, g_elpar)
   bvk = node_value('other_bv ')
-  sk1 = bvk * g_elpar(q_k1)
-  sk1s = bvk * g_elpar(q_k1s)
-  sk1 = sk1 + bvk * field(1,1)/el
-  sk1s = sk1s + bvk * field(2,1)/el
+  sk1  = bvk * ( g_elpar(q_k1)  + f_errors(2)/el)
+  sk1s = bvk * ( g_elpar(q_k1s) + f_errors(3)/el)
   tilt = g_elpar(q_tilt)
-  if (sk1s.ne.zero) then
+  if (sk1s .ne. zero) then
      tilt = -atan2(sk1s, sk1)/two + tilt
      sk1 = sqrt(sk1**2 + sk1s**2)
   endif
@@ -4417,7 +4398,6 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision :: ct, st, tmp
   double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   double precision :: f_errors(0:maxferr)
-  double precision :: field(2,0:2)
   double precision :: deltap, el0, tilt, sk2, pt,sk2s, bvk
   double precision :: rfac, arad, gamma 
 
@@ -4435,16 +4415,12 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !---- Field error.
   F_ERRORS = zero 
   n_ferr = node_fd_errors(f_errors)
-  FIELD = zero
-  if (n_ferr .gt. 0) call dcopy(f_errors, field, min(6,n_ferr))
 
   !-- get element parameters
   elpar_vl = el_par_vector(s_k2s, g_elpar)
   bvk = node_value('other_bv ')
-  sk2 = bvk * g_elpar(s_k2)
-  sk2s = bvk * g_elpar(s_k2s)
-  sk2 = sk2 + bvk * field(1,2)/el
-  sk2s = sk2s + bvk * field(2,2)/el
+  sk2  = bvk * ( g_elpar(s_k2)  + f_errors(4)/el )
+  sk2s = bvk * ( g_elpar(s_k2s) + f_errors(5)/el ) 
   tilt = node_value('tilt ')
   if (sk2s .ne. zero) then
      tilt = -atan2(sk2s, sk2)/three + tilt
@@ -4462,7 +4438,8 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
      orbit(2) = ct * tmp + st * orbit(4)
      orbit(4) = ct * orbit(4) - st * tmp
   endif
-  cplxy = cplxy .or. tilt .ne. zero
+  cplxy = cplxy .or. (tilt .ne. zero)
+
   arad = get_value('probe ','arad ')
   gamma = get_value('probe ','gamma ')
   deltap = get_value('probe ','deltap ')
@@ -4906,7 +4883,7 @@ SUBROUTINE tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
   !---- Initialize.
   EK = zero 
-  RE = EYE !call m66one(re)
+  RE = EYE 
   if (fsec) TE = zero 
   fmap = dl .ne. zero
   dtbyds = get_value('probe ', 'dtbyds ')
@@ -5029,7 +5006,7 @@ SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   !---- Initialize.
   EK0 = zero 
-  RW = EYE !call m66one(rw)
+  RW = EYE 
   TW = zero 
 
   !---- BV flag
@@ -5200,7 +5177,7 @@ SUBROUTINE tmtrak(ek,re,te,orb1,orb2)
 end SUBROUTINE tmtrak
 
 SUBROUTINE tmsymp(r)
-  use matrices, only : EYE
+  use matrices
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -5221,33 +5198,16 @@ SUBROUTINE tmsymp(r)
   A = -R + EYE
   B =  R + EYE
   
-  ! do i = 1, 6
-  !    do j = 1, 6
-  !       a(i,j) = - r(i,j)
-  !       b(i,j) = + r(i,j)
-  !    enddo
-  !    a(i,i) = a(i,i) + one
-  !    b(i,i) = b(i,i) + one
-  ! enddo
- 
   call m66div(a,b,v,eflag) ! V = A * B-1
   if (eflag) goto 100
 
-  call m66inv(v,a) ! A = V-1
-
+  !call m66inv(v,a) ! A = V-1
+  A = matmul(JMATT, matmul(transpose(V),JMAT)) ! invert symplectic matrix
+  
   A = ( A - V ) / two 
   B = -A
   A = A + EYE
   B = B + EYE
-
-  ! do i = 1, 6
-  !    do j = 1, 6
-  !       a(i,j) = (a(i,j) - v(i,j)) / two
-  !       b(i,j) = - a(i,j)
-  !    enddo
-  !    a(i,i) = a(i,i) + one
-  !    b(i,i) = b(i,i) + one
-  ! enddo
 
   call m66div(a,b,v,eflag) ! V = A * B-1
   if (eflag) goto 100
@@ -5297,7 +5257,7 @@ SUBROUTINE tmali1(orb1, errors, betas, gammas, orb2, rm)
   s2 = (w(1,3) * dx + w(2,3) * dy + w(3,3) * ds) / w(3,3)
 
   !---- F2 terms (transfer matrix).
-  RM = EYE !call m66one(rm)
+  RM = EYE 
   rm(2,2) = w(1,1)
   rm(2,4) = w(2,1)
   rm(2,6) = w(3,1) / betas
@@ -5377,7 +5337,7 @@ SUBROUTINE tmali2(el, orb1, errors, betas, gammas, orb2, rm)
   s2 = - (w(1,3) * v(1) + w(2,3) * v(2) + w(3,3) * v(3)) / w(3,3)
 
   !---- Transfer matrix.
-  RM = EYE !call m66one(rm)
+  RM = EYE 
   rm(1,1) = w(1,1)
   rm(3,1) = w(2,1)
   rm(5,1) = w(3,1) / betas
@@ -6314,7 +6274,7 @@ SUBROUTINE twwmap(pos, orbit)
   !     write (99, '(6e16.8)') stmat
 
   !---- re-initialize map.
-  SRMAT = EYE !call m66one(srmat)
+  SRMAT = EYE 
   STMAT = zero 
 
 end SUBROUTINE twwmap
@@ -6343,7 +6303,7 @@ SUBROUTINE tmdpdg(ftrk,orbit,fmap,ek,re,te)
 
   !-- LD: modified to include corrections from Frank.
   EK0 = zero 
-  RW = EYE !call m66one(rw)
+  RW = EYE 
   TW = zero 
 
   bvk  = node_value('other_bv ')
@@ -6550,12 +6510,11 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
   logical :: dorad
-  integer :: nord, iord, j, nn, ns, n_ferr, dummyi, ii, jj, kk
+  integer :: nord, i, j, nn, ns, n_ferr, dummyi, ii, jj, kk
   double precision :: elrad, beta, deltap, arad, gammas, rfac, bvk, tilt, angle 
   double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   double precision :: f_errors(0:maxferr)
-  !double precision vals(2,0:maxmul)
-  double precision :: field(2,0:maxmul), normal(0:maxmul), skew(0:maxmul)
+  double precision :: normal(0:maxmul), skew(0:maxmul)
   double precision :: cangle, sangle, dtmp
 
   double precision :: pc, krf, vrf
@@ -6571,7 +6530,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   integer, external :: node_fd_errors
   double precision, external :: node_value,get_value,get_variable
   double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0, ten3m=1d-3
-  double complex, parameter :: icomp=(0d0,1d0) 
+  double complex, parameter :: icomp=(0d0,1d0) ! imaginary 
 
   !---- Zero the arrays
   NORMAL = zero 
@@ -6579,7 +6538,6 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   PNL = zero 
   PSL = zero 
   F_ERRORS = zero 
-  FIELD = zero 
   
   !---- Read-in the parameters
   clight = get_variable('clight ')
@@ -6599,9 +6557,12 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   beta = get_value('probe ','beta ')
   pc = get_value('probe ','pc ')
   tilt = node_value('tilt ')
+  
   n_ferr = node_fd_errors(f_errors);
   call get_node_vector('knl ', nn, normal)
   call get_node_vector('ksl ', ns, skew)
+  nord = max(nn, ns, n_ferr/2-1);
+
   call get_node_vector('pnl ', dummyi, pnl); ! NOTE !!!!! THIS DOES NOT MAKE USE OF NODE->PNL and NODE->PSL
   call get_node_vector('psl ', dummyi, psl);
  
@@ -6609,24 +6570,19 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   fmap = .true.
   
   !---- Set-up some parameters
-  krf = 2*pi*freq*1d6/clight;
-  vrf = bvk*volt*ten3m/(pc*(one+deltap));
-  
-  if (n_ferr.gt.0) then
-     call dcopy(f_errors,field,n_ferr)
-  endif
-  nord = max(nn, ns, n_ferr/2-1);
+  krf = 2 * pi * freq * 1d6/clight;
+  vrf = bvk * volt * ten3m / ( pc * (one+deltap) );
   
   !---- Particle's coordinates
   if (ftrk) then
-    ! apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
+    ! if bvk = -1 apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
     x  = orbit(1) * bvk;
     px = orbit(2);
     y  = orbit(3);
     py = orbit(4) * bvk;
     z  = orbit(5) * bvk;
     pt = orbit(6);
-  else
+  else ! why not take orbit components ?? 
     x  = zero;
     px = zero;
     y  = zero;
@@ -6636,22 +6592,22 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   endif
   
   !---- Vector with strengths + field errors
-  do iord = 0, nord;
-     field_cos(1,iord) = bvk * (normal(iord) * cos(pnl(iord) * twopi - krf * z) + field(1,iord)) / (one + deltap);
-     field_sin(1,iord) = bvk * (normal(iord) * sin(pnl(iord) * twopi - krf * z))                 / (one + deltap);
-     field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * twopi - krf * z) + field(2,iord)) / (one + deltap);
-     field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * twopi - krf * z))                 / (one + deltap);
+  do i = 0, nord;
+     field_cos(1,i) = bvk * (normal(i) * cos( pnl(i)*twopi - krf * z ) + f_errors(2*i))   / (one + deltap);
+     field_sin(1,i) = bvk * (normal(i) * sin( pnl(i)*twopi - krf * z ) )                  / (one + deltap);
+     field_cos(2,i) = bvk * (skew(i)   * cos( psl(i)*twopi - krf * z ) + f_errors(2*i+1)) / (one + deltap);
+     field_sin(2,i) = bvk * (skew(i)   * sin( psl(i)*twopi - krf * z ) )                  / (one + deltap);
 
      if (tilt.ne.zero)  then
-        angle = (iord+1) * (-tilt);
+        angle = (i+1) * (-tilt);
         cangle = cos(angle);
         sangle = sin(angle);
-        dtmp              = field_cos(1,iord) * cangle - field_cos(2,iord) * sangle;
-        field_cos(2,iord) = field_cos(1,iord) * sangle + field_cos(2,iord) * cangle;
-        field_cos(1,iord) = dtmp;
-        dtmp              = field_sin(1,iord) * cangle - field_sin(2,iord) * sangle;
-        field_sin(2,iord) = field_sin(1,iord) * sangle + field_sin(2,iord) * cangle;
-        field_sin(1,iord) = dtmp;
+        dtmp           = field_cos(1,i) * cangle - field_cos(2,i) * sangle;
+        field_cos(2,i) = field_cos(1,i) * sangle + field_cos(2,i) * cangle;
+        field_cos(1,i) = dtmp;
+        dtmp           = field_sin(1,i) * cangle - field_sin(2,i) * sangle;
+        field_sin(2,i) = field_sin(1,i) * sangle + field_sin(2,i) * cangle;
+        field_sin(1,i) = dtmp;
      endif
   enddo
       
@@ -6665,21 +6621,21 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   Cp1 = 0d0;
   Sp1 = 0d0;
 
-  do iord = nord, 0, -1
-    if (iord.ge.2) then
-      Cm2 = Cm2 * (x+icomp*y) / (iord-1) + field_cos(1,iord)+icomp*field_cos(2,iord);
-      Sm2 = Sm2 * (x+icomp*y) / (iord-1) + field_sin(1,iord)+icomp*field_sin(2,iord);
+  do i = nord, 0, -1
+    if (i .ge. 2) then
+      Cm2 = Cm2 * (x+icomp*y) / (i-1) + field_cos(1,i)+icomp*field_cos(2,i);
+      Sm2 = Sm2 * (x+icomp*y) / (i-1) + field_sin(1,i)+icomp*field_sin(2,i);
     endif
 
-    if (iord.ge.1) then
-      Cm1 = Cm1 * (x+icomp*y) / (iord)   + field_cos(1,iord)+icomp*field_cos(2,iord);
-      Sm1 = Sm1 * (x+icomp*y) / (iord)   + field_sin(1,iord)+icomp*field_sin(2,iord);
+    if (i .ge. 1) then
+      Cm1 = Cm1 * (x+icomp*y) / i   + field_cos(1,i)+icomp*field_cos(2,i);
+      Sm1 = Sm1 * (x+icomp*y) / i   + field_sin(1,i)+icomp*field_sin(2,i);
     endif
 
-    Cp0 = Cp0 * (x+icomp*y) / (iord+1)   + field_cos(1,iord)+icomp*field_cos(2,iord);
-    Sp0 = Sp0 * (x+icomp*y) / (iord+1)   + field_sin(1,iord)+icomp*field_sin(2,iord);
-    Cp1 = Cp1 * (x+icomp*y) / (iord+2)   + field_cos(1,iord)+icomp*field_cos(2,iord);
-    Sp1 = Sp1 * (x+icomp*y) / (iord+2)   + field_sin(1,iord)+icomp*field_sin(2,iord);
+    Cp0 = Cp0 * (x+icomp*y) / (i+1)   + field_cos(1,i)+icomp*field_cos(2,i);
+    Sp0 = Sp0 * (x+icomp*y) / (i+1)   + field_sin(1,i)+icomp*field_sin(2,i);
+    Cp1 = Cp1 * (x+icomp*y) / (i+2)   + field_cos(1,i)+icomp*field_cos(2,i);
+    Sp1 = Sp1 * (x+icomp*y) / (i+2)   + field_sin(1,i)+icomp*field_sin(2,i);
   enddo
 
   Sp1 = Sp1 * (x+icomp*y);

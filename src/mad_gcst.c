@@ -722,7 +722,8 @@ const char* const dynap_table_cols[] =
 {
   "dynapfrac", "dktrturns", "xend", "pxend", "yend",
   "pyend", "tend", "wxmin", "wxmax", "wymin", "wymax",
-  "wxymin", "wxymax", "smear", "yapunov",
+  //"wxymin", "wxymax", "smear", "yapunov",
+  "wxymin", "wxymax", "smear", "lyapunov",
   " "  /* blank terminates */
 };
 

@@ -175,8 +175,10 @@
 void mad_init_f_(void);
 
 // from dynap.f90
-void dynap_(F_DOUBLE eigen, F_DOUBLE coords, F_INTEGER turns, F_INTEGER npart, F_DOUBLE distvect,
-	    F_DOUBLE zn, F_DOUBLE dq, F_DOUBLE onelog, F_DOUBLE turnnumber);
+//void dynap_(F_DOUBLE eigen, F_DOUBLE coords, F_INTEGER turns, F_INTEGER npart, F_DOUBLE distvect,
+//	    F_DOUBLE zn, F_DOUBLE dq, F_DOUBLE onelog, F_DOUBLE turnnumber);
+void trdynrun_(F_DOUBLE eigen, F_DOUBLE coords, F_INTEGER turns, F_INTEGER npart, F_DOUBLE distvect,
+	       F_DOUBLE zn, F_DOUBLE onelog, F_DOUBLE turnnumber, F_DOUBLE dq);
 
 // from emit.f90
 void emit_(F_DOUBLE deltap, F_DOUBLE tol, F_DOUBLE orbit0, F_DOUBLE disp0, F_DOUBLE rt,
