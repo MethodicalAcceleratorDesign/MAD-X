@@ -464,11 +464,11 @@ DYNAP, \=TURNS=integer, FASTUNE=logical, LYAPUNOV=real,\\
 }
  
 For each previously entered start command, {\tt DYNAP} tracks two
-close-by particles over a selected number of turns, from which it
-obtains the betatron tunes with error, the action smear, and an estimate
-of the lyapunov exponent. 
+close-by particles over a selected number of turns (minimum 64 and 
+maximum 1024), from which it obtains the betatron tunes with error, 
+the action smear, and an estimate of the lyapunov exponent. 
 Many such companion particle-pairs can be tracked at the same time,
-which speeds up the calculation. 
+which speeds up the calculation.
 
 The {\it smear} is defined as  
 $2 \times (\ wxy_{max} - wxy_{min}\ ) / (\ wxy_{max} + wxy_{min}\ )$,
@@ -483,7 +483,7 @@ the same reference if the number of turns is strictly larger than 64.
 {\tt DYNAP} has the following attributes: 
 \begin{madlist}
    \ttitem{TURNS} the number of turns to be tracked (Default:~64,
-   present maximum:~1024). 
+   minimum:~64 and maximum:~1024). 
      
    \ttitem{FASTUNE} a logical flag to compute the tunes. (Default:~false)
  
