@@ -39,7 +39,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   ORBIT0 = zero 
   call get_node_vector('orbit0 ', 6, orbit0)
   RT = EYE 
-  RT = EYE 
+  RW = EYE 
   TT = zero 
   call get_disp0(disp0)
   DDISP0 = zero 
@@ -200,7 +200,7 @@ SUBROUTINE twinifun(opt_fun0,rt)
   !----------------------------------------------------------------------*
   double precision :: opt_fun0(*), rt(6,6)
 
-  integer :: i1, i2
+  integer :: i, j
   double precision :: betx, alfx, mux, bety, alfy, muy, dx, dpx, dy, dpy
   double precision :: x, px, y, py, t, pt 
   double precision :: wx, phix, dmux, wy, phiy, dmuy, ddx, ddpx, ddy, ddpy
@@ -280,9 +280,9 @@ SUBROUTINE twinifun(opt_fun0,rt)
   if (r(2,2).ne.zero) opt_fun0(32) = r(2,2)
   if (energy.ne.zero) opt_fun0(33) = energy
   if (rmatrix) then
-     do i1= 1,6
-        do i2= 1,6
-           opt_fun0(33+(i1-1)*6+i2) = rt(i1,i2)
+     do i= 1,6
+        do j= 1,6
+           opt_fun0(33 + (i-1)*6 + j) = rt(i,j)
         enddo
      enddo
   endif
@@ -316,14 +316,14 @@ SUBROUTINE twprep(save,case,opt_fun,position)
   double precision, parameter :: zero=0d0
 
   !---- Initialize
-  twopi=get_variable('twopi ')
+  twopi = get_variable('twopi ')
 
-  if (case.eq.1) then
+  if (case .eq. 1) then
      !--- fill with data from twcpgo (Twiss Couple)
      opt_fun(2) = position
      opt5 = opt_fun(5) ; opt_fun(5) = opt_fun(5) / twopi
      opt8 = opt_fun(8) ; opt_fun(8) = opt_fun(8) / twopi
-     if (save.ne.0) call twfill(case,opt_fun,position)
+     if (save .ne. 0) call twfill(case,opt_fun,position)
      if (match_is_on) call copy_twiss_data(opt_fun)
      opt_fun(5) = opt5
      opt_fun(8) = opt8
@@ -334,7 +334,7 @@ SUBROUTINE twprep(save,case,opt_fun,position)
      opt21 = opt_fun(21) ; opt_fun(21) = opt_fun(21) / twopi
      opt23 = opt_fun(23) ; opt_fun(23) = opt_fun(23) / twopi
      opt24 = opt_fun(24) ; opt_fun(24) = opt_fun(24) / twopi
-     if (save.ne.0) call twfill(case,opt_fun,position)
+     if (save .ne. 0) call twfill(case,opt_fun,position)
      if (match_is_on) call copy_twiss_data(opt_fun)
      opt_fun(20) = opt20
      opt_fun(21) = opt21
@@ -358,25 +358,21 @@ SUBROUTINE twfill(case,opt_fun,position)
   !     opt_fun(fundim) (double) optical values:                         *
   !     betx,alfx,amux,bety,alfy,amuy, etc.                              *
   !----------------------------------------------------------------------*
-  integer case
+  integer :: case
   double precision :: opt_fun(*), position
-
-  integer :: i
-  double precision :: opt5, opt8, opt20, opt21, opt23, opt24
-  double precision :: twopi
 
   double precision, external :: get_value
   double precision, parameter :: zero=0d0
 
-  ripken=get_value('twiss ','ripken ').ne.zero
+  ripken = get_value('twiss ','ripken ') .ne. zero
 
-  if (case.eq.1) then
+  if (case .eq. 1) then
      call vector_to_table_curr(table_name, 's ',    opt_fun(2), 17) ! fill 17 values starting with s
      call vector_to_table_curr(table_name, 'r11 ',  opt_fun(29), 5) ! fill 5 values starting with r11
      call vector_to_table_curr(table_name, 'kmax ', opt_fun(70), 5) ! fill 5 values starting with kmax
      if (rmatrix) call vector_to_table_curr(table_name, 're11 ', opt_fun(34), 36) ! fill Rmatrix
      if (ripken)  call twfill_ripken(opt_fun)
-  elseif (case.eq.2) then
+  elseif (case .eq. 2) then
      call vector_to_table_curr(table_name, 'wx ', opt_fun(19), 10) ! fill 10 values starting with wx
   endif
 
@@ -406,7 +402,7 @@ SUBROUTINE twfill_ripken(opt_fun)
   betx = opt_fun(3);   bety = opt_fun(6);   alfx = opt_fun(4);   alfy = opt_fun(7) 
   r11 =  opt_fun(29);  r12 =  opt_fun(30);  r21 =  opt_fun(31);  r22 =  opt_fun(32)
 
-  kappa = one/(one + (r11*r22-r12*r21))
+  kappa = one/(one + (r11*r22 - r12*r21))
 
   gamx = (one + alfx**2) / betx;  gamy = (one + alfy**2) / bety
 
@@ -500,10 +496,6 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
         !---- Solve for dynamic case.
         err = zero
         A(:,:6) = RT(:,:6) - EYE
-        !A(:6,:6) = RT(:6,:6) 
-        !do i = 1, 6
-        !   a(i,i) = a(i,i) - one
-        !enddo
         A(1:6,7) = ORBIT(1:6) - ORBIT0(1:6)
         err = maxval(abs(A(1:6,7)))
         
@@ -519,10 +511,6 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
         !---- Solve for static case.
         err = zero
         B(:4,:4) = RT(:4,:4) - EYE(:4,:4)
-        !B(1:4,1:4) = RT(1:4,1:4)
-        !do i = 1, 4
-        !   b(i,i) = b(i,i) - one
-        !enddo
         B(1:4,5) = ORBIT(1:4) - ORBIT0(1:4)
         err = maxval(abs(B(1:4,5)))
         
@@ -686,25 +674,6 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      end select
   endif
 
-  ! if (code .ge. ccode-1 .and. code .le. ccode+1)  then
-  !    !---  kicker (code 14 to 16: hkicker, kicker, vkicker)
-  !    if (thr_on .gt. 0)  then
-  !       !---  threader is on - keep position,orbit,matrix,and tensor for restart
-  !       if (code .le. ccode) then !--- kicker (15) or hkicker (14)
-  !          restsum(1) = suml
-  !          RESTORB(1:6,1) = ORBIT(1:6) 
-  !          RESTM(1:6,1:6,1) = RT(1:6,1:6)    
-  !          RESTT(1:6,1:6,1:6,1) = TT(1:6,1:6,1:6)  
-  !       endif
-  !       if (code .ge. ccode) then !--- kicker (15) or vkicker (16)
-  !          restsum(2) = suml
-  !          RESTORB(1:6,2) = ORBIT(1:6) 
-  !          RESTM(1:6,1:6,2) = RT(1:6,1:6)   
-  !          RESTT(1:6,1:6,1:6,2) = TT(1:6,1:6,1:6)  
-  !       endif
-  !    endif
-  ! endif
-
   !---- Element length.
   el = node_value('l ')
 
@@ -756,26 +725,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
             coc_cnt(2) = node_value('occ_cnt ')
      end select
   endif
-
-  ! if (code .ge. ccode-1 .and. code .le. ccode+1)  then !---  kickers (code 14 to 16)
-  !    if (thr_on .gt. 0)  then !---  threader is on;  keep matrix
-  !       if (code .le. ccode) then !--- kicker (15) or hkicker (14)
-  !          CMATR(1:6,1:6,1) = RT(1:6,1:6) 
-  !          j = name_len
-  !          call element_name(c_name(1),j)
-  !          coc_cnt(1) = node_value('occ_cnt ')
-  !       endif
-  !       if (code .ge. ccode) then !--- kicker (15) or vkicker (16)
-  !          CMATR(1:6,1:6,2) = RT(1:6,1:6) 
-  !          j = name_len
-  !          call element_name(c_name(2),j)
-  !          coc_cnt(2) = node_value('occ_cnt ')
-  !       endif
-  !    endif
-     
-  !elseif (code .ge. pcode-1 .and. code .le. pcode+1)  then !---  monitors (code 17 to 19)
   
-if (code .ge. pcode-1 .and. code .le. pcode+1)  then !---  monitors (code 17 to 19)  
+  if (code .ge. pcode-1 .and. code .le. pcode+1)  then !---  monitors (code 17 to 19)  
      enable = node_value('enable ')
      if (save .gt. 0 .and. enable .gt. 0) &
           call store_node_vector('orbit_ref ', 6, orbit)
@@ -933,7 +884,6 @@ SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
   ncorr = node
 
   !---  transport matrix from kicker to pickup
-  !call m66inv(cmatr,atemp)
   ATEMP = matmul(JMATT, matmul(transpose(CMATR),JMAT)) ! invert symplectic matrix
   ATEMP = matmul(PMATR,ATEMP) 
 
@@ -1026,8 +976,6 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   else
      if (arg .eq. zero) then
         R0MAT(:2,:2) = EYE(:2,:2)
-        !r0mat(1,1) = one;  r0mat(1,2) = zero  
-        !r0mat(2,1) = zero; r0mat(2,2) = one
      else
         den = - (dtr + sign(sqrt(arg),dtr))
         R0MAT = AUX / den
@@ -1128,9 +1076,6 @@ SUBROUTINE twdisp(rt,vect,disp)
   double precision, parameter :: zero=0d0, one=1d0
 
   A(:4,:4) = RT(:4,:4) - EYE(:4,:4)
-  !do i = 1, 4
-  !   a(i,i) = a(i,i) - one
-  !enddo
   A(1:4,5) = -VECT(1:4)
 
   call solver(a,4,1,irank)
@@ -1258,7 +1203,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   opt_fun(73) = g_elpar(g_polarity)
 
   n_align = node_al_errors(al_errors)
-  if (n_align.ne.0)  then
+  if (n_align .ne. 0)  then
      ORBIT2 = ORBIT 
      call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
      mycentre_cptk = centre_cptk
@@ -1268,31 +1213,32 @@ SUBROUTINE twcpgo(rt,orbit0)
      if (sectormap) SRMAT = matmul(RE,SRMAT)
   endif
 
-  if (centre) centre_cptk=.true.
-
+  if (centre) centre_cptk = .true.
+  
   call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te)
-
+  
   if (centre) then
-     pos0=currpos
-     currpos=currpos+el/two
-     sd = rt(5,6)
-     do i = 1, 4
-        sd = sd + rt(5,i) * disp(i)
-     enddo
+     pos0 = currpos
+     currpos = currpos + el/two
+     sd = rt(5,6) + dot_product(rt(5,1:4), disp(1:4))
+     !sd = rt(5,6)
+     !do i = 1, 4
+     !   sd = sd + rt(5,i) * disp(i)
+     !enddo
      eta = - sd * betas**2 / circ
      alfa = one / gammas**2 + eta
-     opt_fun(74)=alfa
+     opt_fun(74) = alfa
      call twprep(save,1,opt_fun,currpos)
   endif
 
-  centre_cptk=.false.
+  centre_cptk = .false.
 
   if (fmap) then
      call twcptk(re,orbit)
      if (sectormap) call tmcat(.true.,re,te,srmat,stmat,srmat,stmat)
   endif
 
-  if (n_align.ne.0)  then
+  if (n_align .ne. 0)  then
      ORBIT2 = ORBIT 
      call tmali2(el,orbit2,al_errors,betas,gammas,orbit,re)
      mycentre_cptk = centre_cptk
@@ -1305,12 +1251,13 @@ SUBROUTINE twcpgo(rt,orbit0)
   sumloc = sumloc + el
   if (sector_sel) call twwmap(sumloc, orbit)
   sd = rt(5,6) + dot_product(RT(5,1:4),DISP(1:4))
+  !sd = rt(5,6)
   !do i = 1, 4
   !   sd = sd + rt(5,i) * disp(i)
   !enddo
   eta = - sd * betas**2 / circ
   alfa = one / gammas**2 + eta
-  opt_fun(74)=alfa
+  opt_fun(74) = alfa
   if (centre) then
      bxmax  = max(opt_fun(3)      ,bxmax)
      bymax  = max(opt_fun(6)      ,bymax)
@@ -1342,10 +1289,10 @@ SUBROUTINE twcpgo(rt,orbit0)
   sigdx  = sigdx  + disp(1)**2
   sigdy  = sigdy  + disp(3)**2
 
-  if (.not.centre) then
+  if (.not. centre) then
      call twprep(save,1,opt_fun,currpos)
   else
-     currpos=pos0+el
+     currpos = pos0 + el
 
      opt_fun(2) = currpos
      opt_fun(3) = betx
@@ -1364,7 +1311,7 @@ SUBROUTINE twcpgo(rt,orbit0)
      opt_fun(32) = rmat(2,2)
   endif
 
-  if (advance_node().ne.0) goto 10
+  if (advance_node() .ne. 0) goto 10
 
   !---- Compute summary.
   wgt    = max(iecnt, 1)
@@ -1416,10 +1363,7 @@ SUBROUTINE twcptk(re,orbit)
   double precision, parameter :: zero=0d0, one=1d0, eps=1d-36
 
   !---- Dispersion.
-  DT = zero 
-  do i = 1, 6
-     DT(i) = dot_product(RE(i,:6),DISP(:6))
-  enddo
+  DT = matmul(RE, DISP)
 
   if (.not.centre .or. centre_cptk) OPT_FUN(15:18) = DT(1:4)
 
@@ -1433,7 +1377,7 @@ SUBROUTINE twcptk(re,orbit)
      RMAT0 = RMAT 
      if (rmatrix) RW0 = RW 
   else
-     DISP = DT 
+     DISP(1:4) = DT(1:4) 
      disp(5) = zero
      disp(6) = one
   endif
@@ -1481,10 +1425,8 @@ SUBROUTINE twcptk(re,orbit)
      if (get_option('twiss_inval ') .ne. 0) then
         RC = RW 
      else
-        !call m66inv(rw,rwi)
         RWI = matmul(JMATT, matmul(transpose(RW),JMAT)) ! invert symplectic matrix
-        RC = matmul(ROTM,RWI)
-        RC = matmul(RW,RC) 
+        RC = matmul(RW,matmul(ROTM,RWI))
      endif
   endif
   
@@ -1505,7 +1447,7 @@ SUBROUTINE twcptk(re,orbit)
   if (rmatrix) then
      do i1=1,6
         do i2=1,6
-           opt_fun(33+(i1-1)*6+i2) = rc(i1,i2)
+           opt_fun(33 + (i1-1)*6 + i2) = rc(i1,i2)
         enddo
      enddo
   endif
@@ -1542,8 +1484,8 @@ SUBROUTINE twbtin(rt,tt)
   double precision :: disp0(6), ddisp0(6), rtp(6,6), aux(6)
   double precision :: twopi, sinmu2, bx, ax, by, ay, temp
 
-  integer :: get_option
-  double precision :: get_variable
+  integer, external :: get_option
+  double precision, external :: get_variable
   double precision, parameter :: eps=1d-8, zero=0d0, one=1d0, two=2d0, fourth=0.25d0
 
   !---- Initialization
@@ -1563,7 +1505,7 @@ SUBROUTINE twbtin(rt,tt)
 
   !---- Initial value flag.
   if (get_option('twiss_inval ') .ne. 0) then
-     DISP(:4) = OPT_FUN0(15:18) 
+     DISP(:4)  = OPT_FUN0(15:18) 
      DDISP(:4) = OPT_FUN0(25:28) 
      disp(5)  = zero ; disp(6)  = one
      ddisp(5) = zero ; ddisp(6) = zero
@@ -1578,10 +1520,11 @@ SUBROUTINE twbtin(rt,tt)
   AUX = zero 
   do i = 1, 6
      do k = 1, 6
-        temp = zero
-        do j = 1, 6
-           temp = temp + tt(i,j,k) * disp0(j)
-        enddo
+        temp = dot_product(TT(i,:,k),DISP0)
+!        temp = zero
+!        do j = 1, 6
+!           temp = temp + tt(i,j,k) * disp0(j)
+!        enddo
         aux(i) = aux(i) + temp * disp0(k)
         rtp(i,k) = two * temp
      enddo
@@ -1661,8 +1604,8 @@ SUBROUTINE twchgo
   double precision, parameter :: zero=0d0, one=1d0, two=2d0
 
   !---- If save requested reset table
-  save=get_option('twiss_save ')
-  if (save.ne.0) call reset_count(table_name)
+  save = get_option('twiss_save ')
+  if (save .ne. 0) call reset_count(table_name)
 
   deltap = get_value('probe ','deltap ')
   dorad = get_value('probe ','radiate ').ne.zero
@@ -1672,8 +1615,8 @@ SUBROUTINE twchgo
   pos0 = zero
   amux = zero
   amuy = zero
-  ORBIT = OPT_FUN(9:14)
-  DISP(1:4) = OPT_FUN(15:18)
+  ORBIT = OPT_FUN0(9:14)
+  DISP(1:4) = OPT_FUN0(15:18)
   disp(5) = zero
   disp(6) = one
   TE = zero 
@@ -1692,9 +1635,9 @@ SUBROUTINE twchgo
   synch_1 = zero; synch_2 = zero; synch_3 = zero; synch_4 = zero; synch_5 = zero
 
   !---- Loop over positions.
-  betas = get_value('probe ','beta ')
-  gammas= get_value('probe ','gamma ')
-  centre_bttk=.false.
+  betas  = get_value('probe ','beta ')
+  gammas = get_value('probe ','gamma ')
+  centre_bttk = .false.
   i = restart_sequ()
   if (centre) currpos = zero
   i_spch=0
@@ -1709,7 +1652,7 @@ SUBROUTINE twchgo
 
   !---- Physical element.
   n_align = node_al_errors(al_errors)
-  if (n_align.ne.0)  then
+  if (n_align .ne. 0)  then
      ORBIT2 = ORBIT 
      call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
      mycentre_bttk = centre_bttk
@@ -1718,17 +1661,17 @@ SUBROUTINE twchgo
      centre_bttk = mycentre_bttk
   endif
 
-  if (centre) centre_bttk=.true.
+  if (centre) centre_bttk = .true.
 
   call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te)
 
   if (centre) then
-     pos0=currpos
-     currpos=currpos+el/two
+     pos0 = currpos
+     currpos = currpos + el/two
      call twprep(save,2,opt_fun,currpos)
   endif
 
-  centre_bttk=.false.
+  centre_bttk = .false.
 
   if (fmap) call twbttk(re,te)
 
@@ -1754,7 +1697,7 @@ SUBROUTINE twchgo
      opt_fun(7) = alfy
      opt_fun(8) = amuy
 
-     OPT_FUN(9:14) = ORBIT
+     OPT_FUN(9:14)  = ORBIT
      OPT_FUN(15:18) = DISP(1:4)
 
      opt_fun(19) = wx
@@ -1766,13 +1709,13 @@ SUBROUTINE twchgo
 
      OPT_FUN(25:28) = DDISP(1:4)
 
-     opt_fun(29)=rmat(1,1)
-     opt_fun(30)=rmat(1,2)
-     opt_fun(31)=rmat(2,1)
-     opt_fun(32)=rmat(2,2)
+     opt_fun(29) = rmat(1,1)
+     opt_fun(30) = rmat(1,2)
+     opt_fun(31) = rmat(2,1)
+     opt_fun(32) = rmat(2,2)
   endif
 
-  if (advance_node().ne.0)  goto 10
+  if (advance_node() .ne. 0)  goto 10
 
   !---- Warning, if system is coupled.
   if (cplxy) then
@@ -2042,6 +1985,7 @@ SUBROUTINE tw_summ(rt,tt)
      sd = rt(5,6)
      sx = tt(1,1,6) + tt(2,2,6)
      sy = tt(3,3,6) + tt(4,4,6)
+
      do i = 1, 4
         sd = sd + rt(5,i) * disp(i)
         sx = sx + (tt(1,1,i) + tt(2,2,i)) * disp0(i)
@@ -2053,17 +1997,17 @@ SUBROUTINE tw_summ(rt,tt)
      eta = - sd * betas**2 / suml
 
      alfa = one / gammas**2 + eta
-     if (alfa .gt. zero) then
-        gamtr = sqrt(one / alfa)
-     else if (alfa .lt. zero) then
-        gamtr = - sqrt(- one / alfa)
-     else
+     if (alfa .eq. zero) then
         gamtr = zero
+     else
+        gamtr = sign(one,alfa) * sqrt( one / abs(alfa))
      endif
+
   endif
 
-  !---- Initialization transverse part
-  suml    = currpos
+  !---- Initialization transverse 
+  !---  fix length problem - HG 14.4.08 ! ghislain : ???
+  suml    = currpos  ! ??? 
   betx    = opt_fun0(3)
   alfx    = opt_fun0(4)
 
@@ -2079,10 +2023,11 @@ SUBROUTINE tw_summ(rt,tt)
 
   !---- Adjust values
   orbit5 = -opt_fun0(13)
-  xcomax = xcomax
-  sigxco = sigxco
-  ycomax = ycomax
-  sigyco = sigyco
+  ! ghislain : ???
+  xcomax = xcomax 
+  sigxco = sigxco 
+  ycomax = ycomax 
+  sigyco = sigyco 
 
   ! if (opt_fun0(29).ne.zero.or.opt_fun0(30).ne.zero.or.             &
   !     opt_fun0(31).ne.zero.or.opt_fun0(32).ne.zero) then
@@ -2654,12 +2599,12 @@ SUBROUTINE tmsymm(t)
   !----------------------------------------------------------------------*
   double precision :: t(6,6,6)
 
-  integer :: i, k, l
+  integer :: i, j, k
 
   do k = 1, 5
-     do l = k+1, 6
+     do j = k+1, 6
         do i = 1, 6
-           t(i,l,k) = t(i,k,l)
+           t(i,j,k) = t(i,k,j)
         enddo
      enddo
   enddo
@@ -2724,113 +2669,6 @@ SUBROUTINE tmfrng(fsec,h,sk1,edge,he,sig,corr,re,te)
   endif
 
 end SUBROUTINE tmfrng
-
-SUBROUTINE tmcat1(fsec,eb,rb,tb,ea,ra,ta,ed,rd,td)
-  implicit none
-  !----------------------------------------------------------------------*
-  !     Purpose:                                                         *
-  !     Concatenate two TRANSPORT maps including zero-order terms.       *
-  !     This routine is time-critical and is carefully optimized.        *
-  !     Input:                                                           *
-  !     fsec      (logical) if true, return second order terms.          *
-  !     eb(6), rb(6,6), tb(6,6,6)  second map in beam line order.        *
-  !     ea(6), ra(6,6), ta(6,6,6)  first map in beam line order.         *
-  !     Output:                                                          *
-  !     ed(6), rd(6,6), td(6,6,6)  result map.                           *
-  !----------------------------------------------------------------------*
-  logical :: fsec
-  double precision, intent(IN)  :: ea(6), ra(6,6), ta(6,6,6)
-  double precision, intent(IN)  :: eb(6), rb(6,6), tb(36,6)
-  double precision, intent(OUT) :: ed(6), rd(6,6), td(6,6,6)
-
-  integer :: i, ij, j, k
-  double precision :: ew(6), rw(6,6), tw(6,6,6), es(6,6), ts(36,6)
-  
-  double precision, parameter :: two=2d0
-
-  
-  if ( .not. fsec) then
-     !---- First order only
-     do k = 1, 6
-        !---- Zero-order terms.
-        ew(k) = eb(k) + rb(k,1) * ea(1) + rb(k,2) * ea(2) &
-                      + rb(k,3) * ea(3) + rb(k,4) * ea(4) &
-                      + rb(k,5) * ea(5) + rb(k,6) * ea(6) 
-
-        !---- First-order terms.
-        do j = 1, 6
-           rw(j,k) = rb(j,1) * ra(1,k) + rb(j,2) * ra(2,k) &
-                   + rb(j,3) * ra(3,k) + rb(j,4) * ra(4,k) &
-                   + rb(j,5) * ra(5,k) + rb(j,6) * ra(6,k)
-        enddo
-     enddo
-
-  else
-     !---- Second order terms.
-
-     !---- Auxiliary terms.
-     do k = 1, 6
-
-        !---- Sum over S of TB(I,S,K) * EA(S).
-        do i = 1, 6
-           es(i,k) = tb(i   ,k) * ea(1) + tb(i+ 6,k) * ea(2) &
-                   + tb(i+12,k) * ea(3) + tb(i+18,k) * ea(4) &
-                   + tb(i+24,k) * ea(5) + tb(i+30,k) * ea(6) 
-        enddo
-
-        !---- Sum over S of TB(I,J,S) * RA(S,K).
-        do ij = 1, 36
-           ts(ij,k) = tb(ij,1) * ra(1,k) + tb(ij,2) * ra(2,k) &
-                    + tb(ij,3) * ra(3,k) + tb(ij,4) * ra(4,k) &
-                    + tb(ij,5) * ra(5,k) + tb(ij,6) * ra(6,k)
-        enddo
-     enddo
-
-     !---- Final values.
-     do k = 1, 6
-
-        !---- Zero-order terms.
-        ew(k) = eb(k) + (rb(k,1) + es(k,1)) * ea(1) &
-                      + (rb(k,2) + es(k,2)) * ea(2) &
-                      + (rb(k,3) + es(k,3)) * ea(3) &
-                      + (rb(k,4) + es(k,4)) * ea(4) &
-                      + (rb(k,5) + es(k,5)) * ea(5) &
-                      + (rb(k,6) + es(k,6)) * ea(6)
-
-        !---- First-order terms.
-        do j = 1, 6
-           rw(j,k) = (rb(j,1) + two * es(j,1)) * ra(1,k) &
-                   + (rb(j,2) + two * es(j,2)) * ra(2,k) &
-                   + (rb(j,3) + two * es(j,3)) * ra(3,k) &
-                   + (rb(j,4) + two * es(j,4)) * ra(4,k) &
-                   + (rb(j,5) + two * es(j,5)) * ra(5,k) &
-                   + (rb(j,6) + two * es(j,6)) * ra(6,k)
-        enddo
-
-        !---- Second-order terms.
-        do j = k, 6
-           do i = 1, 6
-              tw(i,j,k) = + (rb(i,1)+two*es(i,1))*ta(1,j,k) + ts(i   ,j)*ra(1,k) &
-                          + (rb(i,2)+two*es(i,2))*ta(2,j,k) + ts(i+ 6,j)*ra(2,k) &
-                          + (rb(i,3)+two*es(i,3))*ta(3,j,k) + ts(i+12,j)*ra(3,k) &
-                          + (rb(i,4)+two*es(i,4))*ta(4,j,k) + ts(i+18,j)*ra(4,k) &
-                          + (rb(i,5)+two*es(i,5))*ta(5,j,k) + ts(i+24,j)*ra(5,k) &
-                          + (rb(i,6)+two*es(i,6))*ta(6,j,k) + ts(i+30,j)*ra(6,k)
-              tw(i,k,j) = tw(i,j,k)
-           enddo
-        enddo
-     enddo
-
-     !---- Copy second-order terms.
-     TD = TW 
-
-  endif
-
-  !---- Copy zero- and first-order terms.
-  ED = EW 
-  RD = RW 
-
-end SUBROUTINE tmcat1
 
 SUBROUTINE tmtilt(fsec,tilt,ek,r,t)
   implicit none
@@ -5080,11 +4918,11 @@ SUBROUTINE tmcat(fsec,rb,tb,ra,ta,rd,td)
   !     rd(6,6), td(6,6,6)  result map.                                  *
   !----------------------------------------------------------------------*
   logical :: fsec
-  double precision :: ra(6,6), rb(6,6), rd(6,6)
-  double precision :: ta(6,6,6), tb(36,6), td(6,6,6)
+  double precision, intent(IN)  :: ra(6,6), ta(6,6,6) 
+  double precision, intent(IN)  :: rb(6,6), tb(36,6)
+  double precision, intent(OUT) :: rd(6,6), td(6,6,6)
 
-  double precision :: rw(6,6)
-  double precision :: tw(6,6,6), ts(36,6)
+  double precision :: rw(6,6), tw(6,6,6), ts(36,6)
   integer :: i1, i2, i3
 
   double precision, parameter :: zero=0.d0
@@ -5131,6 +4969,113 @@ SUBROUTINE tmcat(fsec,rb,tb,ra,ta,rd,td)
   TD = TW 
 
 end SUBROUTINE tmcat
+
+SUBROUTINE tmcat1(fsec,eb,rb,tb,ea,ra,ta,ed,rd,td)
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Concatenate two TRANSPORT maps including zero-order terms.       *
+  !     This routine is time-critical and is carefully optimized.        *
+  !     Input:                                                           *
+  !     fsec      (logical) if true, return second order terms.          *
+  !     eb(6), rb(6,6), tb(6,6,6)  second map in beam line order.        *
+  !     ea(6), ra(6,6), ta(6,6,6)  first map in beam line order.         *
+  !     Output:                                                          *
+  !     ed(6), rd(6,6), td(6,6,6)  result map.                           *
+  !----------------------------------------------------------------------*
+  logical :: fsec
+  double precision, intent(IN)  :: ea(6), ra(6,6), ta(6,6,6)
+  double precision, intent(IN)  :: eb(6), rb(6,6), tb(36,6)
+  double precision, intent(OUT) :: ed(6), rd(6,6), td(6,6,6)
+
+  integer :: i, ij, j, k
+  double precision :: ew(6), rw(6,6), tw(6,6,6), es(6,6), ts(36,6)
+  
+  double precision, parameter :: two=2d0
+
+  
+  if ( .not. fsec) then
+     !---- First order only
+     do k = 1, 6
+        !---- Zero-order terms.
+        ew(k) = eb(k) + rb(k,1) * ea(1) + rb(k,2) * ea(2) &
+                      + rb(k,3) * ea(3) + rb(k,4) * ea(4) &
+                      + rb(k,5) * ea(5) + rb(k,6) * ea(6) 
+
+        !---- First-order terms.
+        do j = 1, 6
+           rw(j,k) = rb(j,1) * ra(1,k) + rb(j,2) * ra(2,k) &
+                   + rb(j,3) * ra(3,k) + rb(j,4) * ra(4,k) &
+                   + rb(j,5) * ra(5,k) + rb(j,6) * ra(6,k)
+        enddo
+     enddo
+
+  else
+     !---- Second order terms.
+
+     !---- Auxiliary terms.
+     do k = 1, 6
+
+        !---- Sum over S of TB(I,S,K) * EA(S).
+        do i = 1, 6
+           es(i,k) = tb(i   ,k) * ea(1) + tb(i+ 6,k) * ea(2) &
+                   + tb(i+12,k) * ea(3) + tb(i+18,k) * ea(4) &
+                   + tb(i+24,k) * ea(5) + tb(i+30,k) * ea(6) 
+        enddo
+
+        !---- Sum over S of TB(I,J,S) * RA(S,K).
+        do ij = 1, 36
+           ts(ij,k) = tb(ij,1) * ra(1,k) + tb(ij,2) * ra(2,k) &
+                    + tb(ij,3) * ra(3,k) + tb(ij,4) * ra(4,k) &
+                    + tb(ij,5) * ra(5,k) + tb(ij,6) * ra(6,k)
+        enddo
+     enddo
+
+     !---- Final values.
+     do k = 1, 6
+
+        !---- Zero-order terms.
+        ew(k) = eb(k) + (rb(k,1) + es(k,1)) * ea(1) &
+                      + (rb(k,2) + es(k,2)) * ea(2) &
+                      + (rb(k,3) + es(k,3)) * ea(3) &
+                      + (rb(k,4) + es(k,4)) * ea(4) &
+                      + (rb(k,5) + es(k,5)) * ea(5) &
+                      + (rb(k,6) + es(k,6)) * ea(6)
+
+        !---- First-order terms.
+        do j = 1, 6
+           rw(j,k) = (rb(j,1) + two * es(j,1)) * ra(1,k) &
+                   + (rb(j,2) + two * es(j,2)) * ra(2,k) &
+                   + (rb(j,3) + two * es(j,3)) * ra(3,k) &
+                   + (rb(j,4) + two * es(j,4)) * ra(4,k) &
+                   + (rb(j,5) + two * es(j,5)) * ra(5,k) &
+                   + (rb(j,6) + two * es(j,6)) * ra(6,k)
+        enddo
+
+        !---- Second-order terms.
+        do j = k, 6
+           do i = 1, 6
+              tw(i,j,k) = + (rb(i,1)+two*es(i,1))*ta(1,j,k) + ts(i   ,j)*ra(1,k) &
+                          + (rb(i,2)+two*es(i,2))*ta(2,j,k) + ts(i+ 6,j)*ra(2,k) &
+                          + (rb(i,3)+two*es(i,3))*ta(3,j,k) + ts(i+12,j)*ra(3,k) &
+                          + (rb(i,4)+two*es(i,4))*ta(4,j,k) + ts(i+18,j)*ra(4,k) &
+                          + (rb(i,5)+two*es(i,5))*ta(5,j,k) + ts(i+24,j)*ra(5,k) &
+                          + (rb(i,6)+two*es(i,6))*ta(6,j,k) + ts(i+30,j)*ra(6,k)
+              tw(i,k,j) = tw(i,j,k)
+           enddo
+        enddo
+     enddo
+
+     !---- Copy second-order terms.
+     TD = TW 
+
+  endif
+
+  !---- Copy zero- and first-order terms.
+  ED = EW 
+  RD = RW 
+
+end SUBROUTINE tmcat1
 
 SUBROUTINE tmtrak(ek,re,te,orb1,orb2)
   implicit none
@@ -5201,7 +5146,6 @@ SUBROUTINE tmsymp(r)
   call m66div(a,b,v,eflag) ! V = A * B-1
   if (eflag) goto 100
 
-  !call m66inv(v,a) ! A = V-1
   A = matmul(JMATT, matmul(transpose(V),JMAT)) ! invert symplectic matrix
   
   A = ( A - V ) / two 

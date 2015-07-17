@@ -701,23 +701,6 @@ subroutine m66div(anum,aden,target,eflag)
 
 end subroutine m66div
 
-! subroutine m66inv(source,target) ! can be eradicated
-!   use matrices, only : JMAT
-!   implicit none
-!   !----------------------------------------------------------------------*
-!   ! Purpose:
-!   !   Invert symplectic matrix.
-!   ! Input:
-!   !   SOURCE(6,6) (real)  Input matrix.
-!   ! Output:
-!   !   TARGET(6,6) (real)  Output matrix: TARGET = tr(J) * tr(SOURCE) * J.
-!   !----------------------------------------------------------------------*
-!   double precision :: source(6,6), target(6,6)
-
-!   TARGET = matmul(transpose(JMAT), matmul(transpose(SOURCE),JMAT))
-
-! end subroutine m66inv
-
 subroutine m66symp(r,nrm) ! can be moved to twiss.f90
   use matrices, only : JMAT
   implicit none
