@@ -58,7 +58,6 @@ subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog,turnnumber,dq)
 
      !---- compute 'smear'
      smear = two * (wxymax - wxymin) / (wxymax + wxymin)
-     write(69,*) 'smear: ', smear
 
      !---- Fast tune calculation by interpolated FFT.
      if (fastune) then
@@ -102,7 +101,6 @@ subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog,turnnumber,dq)
 
         dtune = sqrt((tunx2 - tunx1)**2 + (tuny2 - tuny1)**2)
 
-        write(69,*) 'X: ',tunx1,tunx2, 'Y: ',tuny1,tuny2, 'DTUNE:',dtune
         call dynaptunefill
      endif
 
@@ -177,10 +175,7 @@ subroutine dynapfill()
   call double_to_table_curr('dynap ', 'wxymin ', wxymin )
   call double_to_table_curr('dynap ', 'wxymax ', wxymax )
   call double_to_table_curr('dynap ', 'smear ', smear )
-  !call double_to_table_curr('dynap ', 'yapunov ', yapunov )
   call double_to_table_curr('dynap ', 'lyapunov ', lyapunov )
-
-  !write(*,*) ' lyapunov = ', lyapunov
 
   call augment_count('dynap ')
 end subroutine dynapfill
@@ -443,7 +438,7 @@ double precision function fitlyap(distvect, onelog, turnnumber, nturn)
   double precision, external :: slopexy
   double precision, parameter :: zero=0d0, one=1d0, dlmax=1d-5
 
-  TURNNUMBER(:nturn) = (/ (real(i), i = 1, nturn) /)
+  TURNNUMBER(:nturn) = (/ (dble(i), i = 1, nturn) /)
   ONELOG(:nturn) = zero
   do i = 1, nturn
      if (distvect(i) .eq. zero) cycle
@@ -462,8 +457,8 @@ double precision function fitlyap(distvect, onelog, turnnumber, nturn)
   fitlyap = zero
   !---- if loglog slope is significantly different from 1 anywhere
   ! 2015-Jul-08  17:43:28  ghislain: that should be compared to zero, not to one !!!
-  !if ( max(deltalog1, deltalog2, deltalog3) - one .ge. dlmax ) & 
-  if ( max(deltalog1, deltalog2, deltalog3) .ge. dlmax ) & 
+  if ( max(deltalog1, deltalog2, deltalog3) - one .ge. dlmax ) & 
+  !if ( max(deltalog1, deltalog2, deltalog3) .ge. dlmax ) & 
        fitlyap = max(deltalog1, deltalog2, deltalog3)
 
   write(69,*) 'deltalogs: ', deltalog1, deltalog2, deltalog3,'fitlyap: ', fitlyap, ' nturn and i:', nturn, i
@@ -505,8 +500,6 @@ subroutine wmaxmin(track,eigen,znt)
   wymax  = max(wy,  wymax)  ;  wymin  = min(wy,  wymin)
   wxymax = max(wxy, wxymax) ;  wxymin = min(wxy, wxymin)
 
-  !write (66,*) wx, wy, wxy, wxmax, wxmin, wymax, wymin, wxymax, wxymin
-
 end subroutine wmaxmin
 
 double precision function slopexy(vectorx, vectory, nturn)
@@ -531,36 +524,4 @@ double precision function slopexy(vectorx, vectory, nturn)
   slopexy = (xymean - xmean * ymean) / (x2mean - xmean**2)
 
 end function slopexy
-
-! subroutine dynap(eigen, coords, turns, npart, distvect, zn, dq, onelog, turnnumber)
-!   use deltrafi
-!   implicit none
-
-!   integer :: turns, npart
-!   double precision :: eigen(6,6), coords(6,0:turns,*), distvect(turns)
-!   double precision :: zn(turns,6), dq(2*turns), onelog(turns), turnnumber(turns)
-  
-!   double precision, external :: get_value
-
-!   write(*,*) ' entered dynap '
-
-!   !      print *, 'eigenvectors'
-!   !      do i = 1, 6
-!   !        print '(1p,6e12.4)', (eigen(i,j), j=1,6)
-!   !      enddo
-!   !      do k = 1, 2
-!   !        print *, 'particle: ', k
-!   !        do i = 1, turns
-!   !          print '(1p,6e12.4)', (coords(j,i,k), j = 1, 6)
-!   !        enddo
-!   !      enddo
-
-!   fastune = get_value('dynap ','fastune ') .ne. 0
-!   deltax  = get_value('dynap ','lyapunov ')
-
-!   call trdynrun (eigen,coords,turns,npart,distvect,zn,onelog,turnnumber,dq)
- 
-!   write(*,*) ' end dynap '
-
-! end subroutine dynap
 

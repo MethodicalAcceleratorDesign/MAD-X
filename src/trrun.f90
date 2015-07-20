@@ -90,7 +90,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 
   if (deltap .eq. 0d0) then
      onepass = get_option('onepass ') .ne. 0
-     if (.not.onepass) call trclor(switch,orbit0)
+     if (.not.onepass) call trclor(switch, orbit0)
   endif
 
   !---- Set fast_error_func flag to use faster error function
@@ -108,9 +108,8 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   emittance_update = get_option('emittance_update ') .ne. 0
   virgin_state = get_value('run ', 'virgin_state ') .ne. 0d0
 
-  if (run) then
-     if (checkpnt_restart) &
-          open(90,file='checkpoint_restart.dat',form='unformatted',status='unknown')
+  if (run .and. checkpnt_restart) then
+     open(90,file='checkpoint_restart.dat',form='unformatted',status='unknown')
   else if (dynap) then
      bb_sxy_update = .false.
      checkpnt_restart = .false.
@@ -253,11 +252,11 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         if (first) then
            call track_pteigen(eigen)
            call tt_putone(jmax, tot_turn, tot_segm, segment, part_id, &
-                z, orbit0,spos,nlm,el_name)
+                z, orbit0, spos, nlm, el_name)
         endif
      else
         do i = 1, jmax
-           call tt_puttab(part_id(i), 0, 1, z(1,i), orbit0,spos)
+           call tt_puttab(part_id(i), 0, 1, z(1,i), orbit0, spos)
         enddo
      endif
   endif
@@ -463,8 +462,8 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         endif
 
         !-------- Track through element  // suppress dxt 13.12.04
-        call ttmap(switch,code,el,z,jmax,dxt,dyt,sum,tot_turn+turn,part_id, &
-             last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass)
+        call ttmap(switch, code, el, z, jmax, dxt, dyt, sum, tot_turn+turn, part_id, &
+             last_turn, last_pos, last_orbit, aperflag, maxaper, al_errors, onepass)
 
         !-------- Space Charge update
         if (bb_sxy_update .and. emittance_update .and. is_lost) then
@@ -497,7 +496,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            if (onetable)  then
               spos = sum
               call element_name(el_name,len(el_name))
-              call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id,      &
+              call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id, &
                    z, obs_orb,spos,nlm,el_name)
            else
               if (mod(turn, ffile) .eq. 0)  then
@@ -519,11 +518,11 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            if (onetable)  then
               spos=sum
               call element_name(el_name,len(el_name))
-              call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id,    &
+              call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id, &
                    z, orbit0,spos,nlm,el_name)
            else
               do i = 1, jmax
-                 call tt_puttab(part_id(i), turn, 1, z(1,i), orbit0,spos)
+                 call tt_puttab(part_id(i), turn, 1, z(1,i), orbit0, spos)
               enddo
            endif
         endif
@@ -2504,8 +2503,8 @@ subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
   !    orbit  (double array)  particle orbit                             *
   !    orbit0 (double array)  reference orbit                            *
   !----------------------------------------------------------------------*
-  integer :: npart, turn, nobs
-  double precision :: orbit(6), orbit0(6), spos 
+  integer, intent(IN) :: npart, turn, nobs
+  double precision, intent(IN) :: orbit(6), orbit0(6), spos 
 
   integer :: i
   double precision :: energy, tmp, tt, tn
@@ -3236,6 +3235,7 @@ subroutine trclor(switch,orbit0)
   use twiss0fi
   use name_lenfi
   use trackfi
+  use matrices, only : EYE
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -3250,7 +3250,7 @@ subroutine trclor(switch,orbit0)
   integer :: switch
   double precision :: orbit0(6)
 
-  logical :: aperflag = .false. , onepass = .true.
+  logical :: aperflag = .false. , onepass = .true. ! ???
   integer :: itra 
 
   integer :: i, j, k, bbd_pos, j_tot, code, irank, n_align
@@ -3271,45 +3271,45 @@ subroutine trclor(switch,orbit0)
   double precision, parameter :: zero=0.d0
   integer, parameter :: itmax=10
 
-  print *," "
-  print *," Full 6D closed orbit search."
-  print *," Initial value of 6-D closed orbit from Twiss: "
-  print *," orbit0 ",orbit0
+  print *, " "
+  print *, "Full 6D closed orbit search."
+  print *, "Initial value of 6-D closed orbit from Twiss: "
+  print *, "orbit0 ", ORBIT0
 
   do k = 1, 7
-     Z(:,k) = ORBIT0(:) 
+     Z(:,k) = ORBIT0 
   enddo
   
-  ! DDD = ORBIT0 / 100000
-
+  ! DDD = ORBIT0 / 100000 ! ??? 
   ! for on momentum pt =0
   DDD = 1d-15
-
   ! do k=1,6
   !    z(k,k+1) = z(k,k+1) + ddd(k)
   ! enddo
 
-  Z0(1,:) = Z(1,:)
-  Z00(1,:) = Z(1,:)
+  do k = 1, 7
+     Z0(:,k)  = Z(:,k)
+     Z00(:,k) = Z(:,k)
+  enddo
 
   !--- jmax may be reduced by particle loss - keep number in j_tot
   j_tot = pmax
   !--- get vector of six coordinate maxapers (both RUN and DYNAP)
-  call comm_para('maxaper ',nint,ndble,nchar,int_arr,maxaper, char_a, char_l)
+  call comm_para('maxaper ', nint, ndble, nchar, int_arr, maxaper, char_a, char_l)
 
   cotol = get_variable('twiss_tol ')
 
   !---- Initialize kinematics and orbit
-  bet0  = get_value('beam ','beta ')
-  betas = get_value('probe ','beta ')
-  gammas= get_value('probe ','gamma ')
-  bet0i = 1d0 / bet0
+  bet0   = get_value('beam ','beta ')
+  betas  = get_value('probe ','beta ')
+  gammas = get_value('probe ','gamma ')
+  bet0i  = 1d0 / bet0
   beti   = 1d0 / betas
   dtbyds = get_value('probe ','dtbyds ')
   deltas = get_variable('track_deltap ')
   deltap = get_value('probe ','deltap ')
-  arad = get_value('probe ','arad ')
-  dorad = get_value('probe ','radiate ') .ne. 0d0
+  arad   = get_value('probe ','arad ')
+  dorad  = get_value('probe ','radiate ') .ne. 0d0
   dodamp = get_option('damp ') .ne. 0
   dorand = get_option('quantum ') .ne. 0
 
@@ -3346,7 +3346,7 @@ subroutine trclor(switch,orbit0)
            n_align = node_al_errors(al_errors)
            if (n_align .ne. 0)  then
               do i = 1, pmax
-                 ZZ(:) = Z(:,i) 
+                 ZZ = Z(:,i) 
                  call tmali1(zz,al_errors, betas, gammas,z(1,i), re)
               enddo
            endif
@@ -3360,7 +3360,7 @@ subroutine trclor(switch,orbit0)
         if (code .ne. 1)  then
            if (n_align .ne. 0)  then
               do i = 1, pmax
-                 ZZ(:) = Z(:,i) 
+                 ZZ = Z(:,i) 
                  call tmali2(el,zz, al_errors, betas, gammas,z(1,i), re)
               enddo
            endif
@@ -3374,24 +3374,27 @@ subroutine trclor(switch,orbit0)
 
      !---- construct one-turn map
      do k=1,6
-        A(1:6,k) = ( Z(1:6,k+1) - Z(1:6,k) ) / ddd(1:6)
+        A(:,k) = ( Z(:,k+1) - Z(:,1) ) / DDD(:)
         !do i=1,6
         !   a(i,k) = (z(i,k+1) - z(i,1))/ddd(i)
         !enddo
      enddo
 
      !---- Solve for dynamic case.
-     err = 0d0
-     do i= 1,6
-        a(i,i) = a(i,i) - 1d0
-        a(i,7) = z(i,1) - z0(i,1)
-        err = max(abs(a(i,7)), err)
-     enddo
+     A(:6,:6) = A(:6,:6) - EYE
+     A(:6,7)  = Z(:6,1) - Z0(:6,1)
+     err = maxval(abs(A(:,7)))
+     !err = 0d0
+     !do i= 1,6
+     !   a(i,i) = a(i,i) - 1d0
+     !   a(i,7) = z(i,1) - z0(i,1)
+     !   err = max(abs(a(i,7)), err)
+     !enddo
 
      call solver(a,6,1,irank)
-     if (irank.lt.6) go to 100
+     if (irank .lt. 6) go to 100
 
-     Z0(:,1) = Z0(:,1) - A(:,7)
+     Z0(:,1)  = Z0(:,1)  - A(:,7)
      Z00(:,1) = Z00(:,1) - A(:,7)
 
      do k = 2, 7
