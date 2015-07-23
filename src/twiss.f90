@@ -2437,12 +2437,16 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
   integer, external :: el_par_vector
   integer elpar_vl
+  logical kill_ent_fringe, kill_exi_fringe
   parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 
   !---- Initialize.
   ct=zero
   st=zero
   code = node_value('mad8_type ')
+  kill_ent_fringe = node_value('kill_ent_fringe ') .ne. 0d0
+  kill_exi_fringe = node_value('kill_exi_fringe ') .ne. 0d0
+
   if(code.eq.39) code=15
   if(code.eq.38) code=24
   deltap=zero
@@ -2531,9 +2535,11 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
         el0=el/two
         call tmsect(.true.,el0,h,dh,sk1,sk2,ek,re,te)
         !---- Fringe fields.
-        corr = (h + h) * hgap * fint
-        call tmfrng(.true.,h,sk1,e1,h1,one,corr,rw,tw)
-        call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
+        if (.not.kill_ent_fringe) then
+           corr = (h + h) * hgap * fint
+           call tmfrng(.true.,h,sk1,e1,h1,one,corr,rw,tw)
+           call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
+        endif
         !---- Apply tilt.
         if (tilt .ne. zero) then
            call tmtilt(.true.,tilt,ek,re,te)
@@ -2554,17 +2560,21 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
      call tmsect(.true.,el,h,dh,sk1,sk2,ek,re,te)
 
      !---- Fringe fields.
-     corr = (h + h) * hgap * fint
-     call tmfrng(.true.,h,sk1,e1,h1,one,corr,rw,tw)
-     call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
-     !---- Tor: use FINTX if set
-     if (fintx .ge. 0) then
-        corr = (h + h) * hgap * fintx
-     else
+     if (.not.kill_ent_fringe) then
         corr = (h + h) * hgap * fint
+        call tmfrng(.true.,h,sk1,e1,h1,one,corr,rw,tw)
+        call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
      endif
-     call tmfrng(.true.,h,sk1,e2,h2,-one,corr,rw,tw)
-     call tmcat1(.true.,ek0,rw,tw,ek,re,te,ek,re,te)
+     !---- Tor: use FINTX if set
+     if (.not.kill_exi_fringe) then
+        if (fintx .ge. 0) then
+           corr = (h + h) * hgap * fintx
+        else
+           corr = (h + h) * hgap * fint
+        endif
+        call tmfrng(.true.,h,sk1,e2,h2,-one,corr,rw,tw)
+        call tmcat1(.true.,ek0,rw,tw,ek,re,te,ek,re,te)
+     endif
 
      !---- Apply tilt.
      if (tilt .ne. zero) then
