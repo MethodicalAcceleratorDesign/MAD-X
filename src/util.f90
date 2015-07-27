@@ -177,8 +177,8 @@ end module dyntabfi
 module wmaxmin0fi
   implicit none
   public
-  double precision :: wxmax=0.d0, wxmin=0.d0, wymax=0.d0, wymin=0.d0
-  double precision :: wxymax=0.d0, wxymin=0.d0
+  double precision :: wxmax=0.d0,  wymax=0.d0,  wxymax=0.d0
+  double precision :: wxmin=1.d20, wymin=1.d20, wxymin=1.d20
 end module wmaxmin0fi
 
 module tunesfi

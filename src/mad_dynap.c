@@ -98,14 +98,11 @@ track_dynap(struct in_cmd* cmd)
     return;
   }
   
-  //dynap_(buf4, buf5, &turns, &npart, buf7, buf8, buf9, buf10, buf11);
   trdynrun_(buf4, buf5, &turns, &npart, buf7, buf8, buf10, buf11, buf9);
 
-  /*
-    table_register->tables[name_list_pos("dynapsumm", table_register->names)];
-    print_table(t);
-    if (get_option("dynap_dump")) dynap_tables_dump();
-  */
+  /* table_register->tables[name_list_pos("dynapsumm", table_register->names)];
+     print_table(t);
+     if (get_option("dynap_dump")) dynap_tables_dump();  */
 
   /* free buffers */
   myfree(rout_name, ibuf1);   myfree(rout_name, ibuf2);   myfree(rout_name, ibuf3);

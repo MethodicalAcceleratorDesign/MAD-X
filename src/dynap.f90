@@ -36,18 +36,8 @@ subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog,turnnumber,dq)
   ! min should be initialized to huge value, not zero
   wxmin = 1.d20 ; wymin = 1.d20 ; wxymin = 1.d20
 
-  !--- distance for second particle with x add-on
-  !        deltax = get_value('dynap ', 'lyapunov ')
-  !        jend = 2
-  !        z(1,jend) = z(1,1) + deltax
-  !        do k = 2, 6
-  !          z(k,jend) = z(k,1)
-  !        enddo
-
-  !---- compute minimum and maximum amplitudes
-  !     and normalized coordinates
-  !     for all particles
-  do k = 1, npart, 2
+  !---- compute minimum and maximum amplitudes and normalized coordinates
+  do k = 1, npart, 2 ! select only main particles, not their evaluation partner
      x0 = coords(1,0,k)
      y0 = coords(3,0,k)
      do i = 1, turns
@@ -63,9 +53,7 @@ subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog,turnnumber,dq)
      if (fastune) then
 
         ktrturns = turns
-
-        ix = 1
-        iy = 3 
+        ix = 1 ; iy = 3 
         initt = 0
 
         if (ktrturns .le. 64) then
@@ -126,7 +114,7 @@ subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog,turnnumber,dq)
         write(50,*) i, distvect(i)
      end do
 
-     lyapunov = fitlyap(distvect,onelog,turnnumber,turns)
+     lyapunov = fitlyap(distvect,onelog,turnnumber,turns,deltax)
      call dynapfill()
 
   enddo
@@ -158,7 +146,7 @@ subroutine dynapfill()
   !   wxymin    (real)    : minimum of (wx + wy) during tracking         *
   !   wxymax    (real)    : maximum of (wx + wy) during tracking         *
   !   smear     (real)    : 2.0 * (wxymax - wxymin) / (wxymax + wxymin)  *
-  !   lyapunov   (real)    : interpolated Lyapunov exponent               * ghislain
+  !   lyapunov  (real)    : interpolated Lyapunov exponent               * ghislain
   !----------------------------------------------------------------------*
 
   call double_to_table_curr('dynap ', 'dynapfrac ', dynapfrac)
@@ -421,7 +409,7 @@ double precision function tuneabt2(zn, ixy, initt, maxn, turns,dq)
 
 end function tuneabt2
 
-double precision function fitlyap(distvect, onelog, turnnumber, nturn)
+double precision function fitlyap(distvect, onelog, turnnumber, nturn, deltax)
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:
@@ -430,19 +418,21 @@ double precision function fitlyap(distvect, onelog, turnnumber, nturn)
   !   NTURN is the number of turns.
   !----------------------------------------------------------------------*
   integer :: nturn
-  double precision :: distvect(*), onelog(*), turnnumber(*)
+  double precision :: distvect(*), onelog(*), turnnumber(*), deltax
 
   integer :: i
-  double precision :: deltalog1, deltalog2, deltalog3
-  
+  double precision :: deltalog(6)
+  double precision :: turnlog(nturn), test(nturn)
+  double precision :: fitlyap2, fitlyap3
+
   double precision, external :: slopexy
   double precision, parameter :: zero=0d0, one=1d0, dlmax=1d-5
 
   TURNNUMBER(:nturn) = (/ (dble(i), i = 1, nturn) /)
+  TURNLOG(:nturn) = (/ (log(dble(i)), i = 1, nturn) /)
   ONELOG(:nturn) = zero
   do i = 1, nturn
-     if (distvect(i) .eq. zero) cycle
-     onelog(i) = log(distvect(i))
+     if (distvect(i) .ne. zero) onelog(i) = log(distvect(i))
   enddo
 
   !---- Loglog fit over 3 subsequent periods of i = NTURN/4 turns
@@ -450,19 +440,30 @@ double precision function fitlyap(distvect, onelog, turnnumber, nturn)
   i = int(nturn / 4)
 
   !---- DELTALOG = loglog slope for the last three periods
-  deltalog1 = slopexy(turnnumber(  i + 1), onelog(  i + 1), i)
-  deltalog2 = slopexy(turnnumber(2*i + 1), onelog(2*i + 1), i)
-  deltalog3 = slopexy(turnnumber(3*i + 1), onelog(3*i + 1), i)
+  deltalog(1) = slopexy(turnnumber(  i + 1), onelog(  i + 1), i)
+  deltalog(2) = slopexy(turnnumber(2*i + 1), onelog(2*i + 1), i)
+  deltalog(3) = slopexy(turnnumber(3*i + 1), onelog(3*i + 1), i)
+
+
+  ! 1/turnnumber ln (distvec(i)/distvec(0))
 
   fitlyap = zero
-  !---- if loglog slope is significantly different from 1 anywhere
-  ! 2015-Jul-08  17:43:28  ghislain: that should be compared to zero, not to one !!!
-  if ( max(deltalog1, deltalog2, deltalog3) - one .ge. dlmax ) & 
-  !if ( max(deltalog1, deltalog2, deltalog3) .ge. dlmax ) & 
-       fitlyap = max(deltalog1, deltalog2, deltalog3)
-
-  write(69,*) 'deltalogs: ', deltalog1, deltalog2, deltalog3,'fitlyap: ', fitlyap, ' nturn and i:', nturn, i
+  !---- if loglog slope is significantly different from zero anywhere
+  if ( maxval(DELTALOG(1:3)) .ge. dlmax ) & 
+       fitlyap = maxval(DELTALOG(1:3))
   
+  !--- DELTALOG = loglog slope for the last three periods
+  deltalog(4) = slopexy(turnlog(  i + 1), onelog(  i + 1), i)
+  deltalog(5) = slopexy(turnlog(2*i + 1), onelog(2*i + 1), i)
+  deltalog(6) = slopexy(turnlog(3*i + 1), onelog(3*i + 1), i)
+
+  fitlyap2 = zero
+  !---- if loglog slope is significantly different from zero anywhere
+  if ( maxval(DELTALOG(4:6)) + 1.d0 .ge. dlmax ) & 
+       fitlyap2 = maxval(DELTALOG(4:6))
+  
+  write(69,*) 'deltalogs: ', deltalog(1:6), 'fitlyaps: ', fitlyap, fitlyap2, & 
+       ' nturn and i:', nturn, i
 end function fitlyap
 
 subroutine wmaxmin(track,eigen,znt)
