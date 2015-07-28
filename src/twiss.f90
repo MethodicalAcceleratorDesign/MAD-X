@@ -2557,21 +2557,20 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
      endif
      !---- End
 
+     !---- Get map for body section
      call tmsect(.true.,el,h,dh,sk1,sk2,ek,re,te)
 
-     !---- Fringe fields.
+     !---- Get map for entrance fringe field and concatenate
      if (.not.kill_ent_fringe) then
         corr = (h + h) * hgap * fint
         call tmfrng(.true.,h,sk1,e1,h1,one,corr,rw,tw)
         call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
      endif
-     !---- Tor: use FINTX if set
+  
+   !---- Get map for exit fringe fields and concatenate
      if (.not.kill_exi_fringe) then
-        if (fintx .ge. 0) then
-           corr = (h + h) * hgap * fintx
-        else
-           corr = (h + h) * hgap * fint
-        endif
+        if (fintx .lt. 0) fintx = fint
+        corr = (h + h) * hgap * fintx
         call tmfrng(.true.,h,sk1,e2,h2,-one,corr,rw,tw)
         call tmcat1(.true.,ek0,rw,tw,ek,re,te,ek,re,te)
      endif
