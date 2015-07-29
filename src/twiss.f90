@@ -2111,7 +2111,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
   !---- Select element type.
   select case (code)
      
-     case (1, 17:21, 24, 27, 44) !---- Drift space, monitor, collimator, or beam instrument.
+     case (1, 17:21, 24, 27, 37, 44) !---- Drift space, monitor, collimator, instrument or crabcavity
         call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
         
      case (2, 3) !---- Bending magnet.
@@ -2192,6 +2192,7 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6), el
 
   logical :: cplxy, dorad
+  logical :: kill_ent_fringe, kill_exi_fringe
   integer :: elpar_vl
   integer :: nd, n_ferr, code
   double precision :: f_errors(0:maxferr)
@@ -2212,6 +2213,8 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   TW = zero 
 
   code = node_value('mad8_type ')
+  kill_ent_fringe = node_value('kill_ent_fringe ') .ne. 0d0
+  kill_exi_fringe = node_value('kill_exi_fringe ') .ne. 0d0
 
   !---- Test for non-zero length.
   fmap = el .ne. zero
@@ -2279,9 +2282,11 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
         el0=el/two
         call tmsect(.true.,el0,h,dh,sk1,sk2,ek,re,te)
         !---- Fringe fields.
-        corr = (h + h) * hgap * fint
-        call tmfrng(.true.,h,sk1,e1,h1,one,corr,rw,tw)
-        call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
+        if (.not.kill_ent_fringe) then
+           corr = (h + h) * hgap * fint
+           call tmfrng(.true.,h,sk1,e1,h1,one,corr,rw,tw)
+           call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
+        endif
         !---- Apply tilt.
         if (tilt .ne. zero) then
            call tmtilt(.true.,tilt,ek,re,te)
@@ -2299,18 +2304,23 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
      endif
      !---- End
 
+     !---- Get map for body section
      call tmsect(.true.,el,h,dh,sk1,sk2,ek,re,te)
 
-     !---- Fringe fields.
-     corr = (h + h) * hgap * fint
-     call tmfrng(.true.,h,sk1,e1,h1,one,corr,rw,tw)
-     call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
-     
-     if (fintx .lt. 0) fintx = fint
-
-     corr = (h + h) * hgap * fintx
-     call tmfrng(.true.,h,sk1,e2,h2,-one,corr,rw,tw)
-     call tmcat1(.true.,ek0,rw,tw,ek,re,te,ek,re,te)
+     !---- Get map for entrance fringe field and concatenate
+     if (.not.kill_ent_fringe) then
+        corr = (h + h) * hgap * fint
+        call tmfrng(.true.,h,sk1,e1,h1,one,corr,rw,tw)
+        call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
+     endif
+  
+   !---- Get map for exit fringe fields and concatenate
+     if (.not.kill_exi_fringe) then
+        if (fintx .lt. 0) fintx = fint
+        corr = (h + h) * hgap * fintx
+        call tmfrng(.true.,h,sk1,e2,h2,-one,corr,rw,tw)
+        call tmcat1(.true.,ek0,rw,tw,ek,re,te,ek,re,te)
+     endif
 
      !---- Apply tilt.
      if (tilt .ne. zero) then
@@ -3742,15 +3752,6 @@ SUBROUTINE tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
      te(6,6,6)=node_value('tm666 ')
 
      if (maxval(abs(TE)) .gt. zero) fsecarb = .true. 
-     ! temp = zero
-     ! do i3 = 1,6
-     !    do i2 = 1,6
-     !       do i1 = 1,6
-     !          temp = temp + abs(te(i1,i2,i3))
-     !       enddo
-     !    enddo
-     ! enddo
-     ! if (temp.ne.zero) fsecarb=.true.
 
   endif
 
