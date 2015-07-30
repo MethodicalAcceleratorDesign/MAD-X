@@ -268,12 +268,6 @@ char command_def[] =
 "dummy    = [s, 0]; "
 " "
 "option: control none 0 0 "
-"bborbit          = [l, false, true], " /* frs */
-"bb_ultra_relati  = [l, false, true], " /* frs */
-"bb_sxy_update    = [l, false, true], " /* frs */
-"emittance_update = [l, true,  true], " /* frs */
-"fast_error_func  = [l, false, true], " /* frs */
-"exit_loss_turn   = [l, false, true], " /* frs */
 "echo      = [l, true, true], "
 "echomacro = [l, false, true], " /* ld */
 "info      = [l, true, true], "
@@ -289,7 +283,14 @@ char command_def[] =
 "verify    = [l, false, true], "
 "no_fatal_stop= [l, false, true], "
 "twiss_print  = [l, true, true], "
-"warn     = [l, true, true]; "
+"warn     = [l, true, true], "
+  /* BB and SPCH related options */
+"bborbit          = [l, false, true], " /* frs */
+"bb_ultra_relati  = [l, false, true], " /* frs */
+"bb_sxy_update    = [l, false, true], " /* frs */
+"emittance_update = [l, true,  true], " /* frs */
+"fast_error_func  = [l, false, true], " /* frs */
+"exit_loss_turn   = [l, false, true]; " /* frs */
 " "
 "plot: control none 0 0 "
 "vaxis    = [s, {none}], "
