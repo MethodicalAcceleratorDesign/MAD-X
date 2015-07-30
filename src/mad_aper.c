@@ -56,10 +56,6 @@ aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4, int* quarte
   // the horizontal rectangle extent is larger than the ellipse
   // the curved part starts at angle 0 
   else { 
-    // 2013-Apr-16  15:38:43  ghislain: following formula is correct but can be rewritten
-    // y=sqrt((*ap3)*(*ap3)-(*ap1)*(*ap1));
-    // alfa=atan2(y,*ap1);
-    // 2013-Apr-23  12:15:51 ghislain --
     y = (*ap3)*sqrt(1-((*ap1)*(*ap1))/((*ap3)*(*ap3)));
     
     if (y > (*ap2)) // the rectangle is contained within the ellipse; there is no curved part.
@@ -72,15 +68,10 @@ aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4, int* quarte
   // the vertical rectangle extent is larger than the ellipse
   // the curved part extends all the way to pi/2
   else { 
-    // 2013-Apr-16  15:41:13  ghislain: following formula is correct but can be rewritten
-    // x=sqrt(((*ap3)*(*ap3)) * (1 - ((*ap2)*(*ap2)) / ((*ap4)*(*ap4))));
-    // y=sqrt((*ap3)*(*ap3)-x*x);
-    // theta=atan2(x,y);
-    // 2013-Apr-23  12:15:51 ghislain --
-    x = (*ap4)*sqrt(1-((*ap2)*(*ap2))/((*ap4)*(*ap4)));
+    x = (*ap4) * sqrt(1 - ((*ap2)*(*ap2))/((*ap4)*(*ap4)));
     
     if (x > (*ap1)) // the rectangle is contained within the ellipse; there is no curved part.
-      theta=atan2((*ap1),(*ap2)); 
+      theta = atan2((*ap1),(*ap2)); 
     else            // the rectangle extends beyond the ellipse; there is a curved part
       theta = atan2(x,*ap2); // this angle is not the geometrical angle
   }
@@ -89,22 +80,18 @@ aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4, int* quarte
   // we can calculate the number of apexes (napex+1) and the interval depending on the shape
   
   if (*quarterlength) { 
-    napex=9 ; 
-    dangle=((pi/2)-(alfa+theta))/napex; 
+    napex = 9 ; 
+    dangle = ((pi/2) - (alfa+theta)) / napex; 
   } 
 
   else if (fabs(alfa+theta-pi/2) < MIN_DOUBLE * 1.e10) { //rectangle, single point, zero interval  
-    napex=0 ; 
-    dangle=0.; 
+    napex = 0 ; 
+    dangle = 0.; 
   }
-  // following case is useless and covered by the general rectellipse. 
-  //  else if (fabs(alfa+theta) < MIN_DOUBLE * 1.e10) // ellipse, 20 points, 19 intervals            
-  //  { napex=19 ; 
-  //    dangle=(pi/2)/napex; } 
-
+  
   else { // general rectellipse,  1 <= napex <= 19 intervals
     napex = 1 + floor(18 * fabs(1-(alfa+theta)/(pi/2))) ; 
-    dangle=((pi/2)-(alfa+theta))/napex; 
+    dangle = ((pi/2)-(alfa+theta))/napex; 
   } 
 
   /*write coordinates for first quadrant*/
@@ -119,8 +106,8 @@ aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4, int* quarte
   else { // there is a curved part.
     for ( i=0 ; i<=napex; i++ )	{
       angle = alfa + i*dangle; // this angle is not the geometrical angle
-      tablex[i]=(*ap3)*cos(angle);
-      tabley[i]=(*ap4)*sin(angle);
+      tablex[i] = (*ap3)*cos(angle);
+      tabley[i] = (*ap4)*sin(angle);
       
       // the geometrical angle alfag is such that tan(alfag) = tabley[i]/tablex[i] = ap4/ap3 * tan(alfa)
       
@@ -136,110 +123,47 @@ aper_rectellipse(double* ap1, double* ap2, double* ap3, double* ap4, int* quarte
   return 0;
 }
 
-
-static void
-aper_adj_quad(double angle, double x, double y, double* xquad, double* yquad)
-{
-  int quadrant;
-  quadrant=angle/(pi/2)+1;
-  switch (quadrant) 
-    {
-    case 1: *xquad=x; *yquad=y; break;
-    case 2: *xquad=-x; *yquad=y; break;
-    case 3: *xquad=-x; *yquad=-y; break;
-    case 4: *xquad=x; *yquad=-y; break;
-    }
-}
-
-static void
-aper_adj_halo_si(double ex, double ey, double betx, double bety, double bbeat, double halox[], double haloy[], int halolength, double haloxsi[], double haloysi[])
-{
-  int j;
-
-  for (j=0;j<=halolength+1;j++) {
-    haloxsi[j]=halox[j]*bbeat*sqrt(ex*betx);
-    haloysi[j]=haloy[j]*bbeat*sqrt(ey*bety);
-  }
-}
-
-static double
-aper_online(double xm, double ym, double startx, double starty,
-            double endx, double endy, double dist_limit)
-
-/* BJ 13.02.2009.
-   - added check |x-e| < dist_limit
-   - removed useless calculations of sqrt
-   - made consistent use of dist_limit and min_double */
-/* BJ 13.02.2009
-   check if point x = (xm,ym) is in the segment [s,e] with
-   s = (startx,starty) and e = (endx,endy) by computing 
-   cosfi = (x-s).(x-e) / |x-s||x-e|. cosfi = -1 : x is in
-   first check if |x-s| and |x-e| are not too small.If yes for one of them : in
-   if OK , the zero divide check must be superfluous. But keep it anyway.
-*/
-
-{
-  double cosfi=1 , aaa, sss, eee;
-
-  sss = sqrt((xm-startx)*(xm-startx)+ (ym-starty)*(ym-starty));
-  eee = sqrt((xm-endx)*(xm-endx)    + (ym-endy)*(ym-endy));
-
-  if ( sss <= dist_limit)      cosfi=-1;
-  else if ( eee <= dist_limit) cosfi=-1;
-  else {
-    aaa = sss * eee ;
-    if ( aaa < MIN_DOUBLE )
-	fatal_error("Attempt to zero divide ", "In aper_online");
-    cosfi=  ((xm-startx)*(xm-endx)+(ym-starty)*(ym-endy)) / aaa;
-  }
-
-  if (cosfi <= -1+dist_limit) cosfi=-1;
-  
-  return cosfi;
-}
-
 static void
 aper_race(double xshift, double yshift, double r, double angle, double* x, double* y)
 {
+  /* this function calculates the displacement of the beam centre
+     due to tolerance uncertainty for every angle */
   /* NEW VERSION of aper_race, 20feb08 BJ, potential zero-divide issues cleared */
 
   double angle0, angle1, angle2, alfa, gamma, theta;
   int quadrant;
-
-  /* this function calculates the displacement of the beam centre
-     due to tolerance uncertainty for every angle */
 
   if (xshift==0 && yshift==0 && r==0) {
     *x=0; *y=0;
     return;
   }
   
-  quadrant=angle/(pi/2)+1;
+  quadrant = angle/(pi/2) + 1;
   
   switch (quadrant) /*adjusting angle to first quadrant*/
     {
-    case 1: angle=angle; break;
-    case 2: angle=pi-angle; break;
-    case 3: angle=angle-pi; break;
-    case 4: angle=twopi-angle; break;
+    case 1: angle = angle; break;
+    case 2: angle = pi - angle; break;
+    case 3: angle = angle - pi; break;
+    case 4: angle = twopi - angle; break;
     }
 
-  if (angle==pi/2) {
+  if (angle == pi/2) {
     *x=0;
     *y=yshift+r;
   }
 
   else {
     /*finding where arc starts and ends*/
-    angle0=atan2( yshift , xshift+r );
-    angle1=atan2( r+yshift , xshift );
+    angle0 = atan2( yshift , xshift + r );
+    angle1 = atan2( r + yshift , xshift );
     
     /*different methods is needed, depending on angle*/
     if (angle <= angle0 + MIN_DOUBLE * 1.e10 ) {
-      *x=xshift+r;
-      *y=tan(angle)*(xshift+r);
+      *x = xshift + r;
+      *y = tan(angle) * (xshift+r);
     }
-    else if (angle<angle1) {
+    else if (angle < angle1) {
       /* if this is a circle, angle2 useless */
       if (!xshift && !yshift)  angle2 = 0;
       else angle2 = atan2( yshift , xshift );
@@ -247,102 +171,119 @@ aper_race(double xshift, double yshift, double r, double angle, double* x, doubl
       alfa = fabs(angle-angle2);
       if (alfa < MIN_DOUBLE * 1.e10) {
 	/* alfa==0 is a simpler case */
-        *x=cos(angle)*(r+sqrt(xshift*xshift+yshift*yshift));
-        *y=sin(angle)*(r+sqrt(xshift*xshift+yshift*yshift));
+        *x = cos(angle) * (r + sqrt(xshift*xshift + yshift*yshift));
+        *y = sin(angle) * (r + sqrt(xshift*xshift + yshift*yshift));
       }
       else {
 	/* solving sine rule w.r.t. gamma */
-        gamma=asin(sqrt(xshift*xshift+yshift*yshift)/r*sin(alfa));
+        gamma = asin(sqrt(xshift*xshift + yshift*yshift)/r*sin(alfa));
 	/*theta is the last corner in the triangle*/
-        theta=pi-(alfa+gamma);
-        *x=cos(angle)*r*sin(theta)/sin(alfa);
-        *y=sin(angle)*r*sin(theta)/sin(alfa);
+        theta = pi - (alfa+gamma);
+        *x = cos(angle) * r * sin(theta)/sin(alfa);
+        *y = sin(angle) * r * sin(theta)/sin(alfa);
       }
     }
     /* upper flat part */
     else {
-      *y=r+yshift;
-      *x=(r+yshift)*tan(pi/2-angle);
+      *y = r + yshift;
+      *x = (r+yshift) * tan(pi/2-angle);
     }
   }
 
   return;
 }
 
-static int
-aper_chk_inside(double p, double q, double pipex[], double pipey[], double dist_limit, int pipelength)
+static void
+aper_adj_quad(double angle, double x, double y, double* xquad, double* yquad)
 {
-  int i;
-  double n12, salfa, calfa, alfa=0;
-
-  /*checks first whether p,q is exact on a pipe coordinate*/
-  for (i=0;i<=pipelength;i++) {
-    if (-1 == aper_online(p, q, pipex[i], pipey[i], pipex[i+1], pipey[i+1], dist_limit))
-      return 0; 
-  }
-
-  /*calculates and adds up angle from centre between all coordinates*/
-  for (i=0;i<=pipelength;i++) {
-    n12=sqrt(((pipex[i]-p)*(pipex[i]-p) + (pipey[i]-q)*(pipey[i]-q))
-             * ((pipex[i+1]-p)*(pipex[i+1]-p) + (pipey[i+1]-q)*(pipey[i+1]-q)));
-
-    salfa=((pipex[i]-p)*(pipey[i+1]-q) - (pipey[i]-q)*(pipex[i+1]-p))/n12;
-
-    calfa=((pipex[i]-p)*(pipex[i+1]-p) + (pipey[i]-q)*(pipey[i+1]-q))/n12;
-    
-    alfa += atan2(salfa, calfa);
-  }
-
-  /*returns yes to main if total angle is at least twopi*/
-  if (sqrt(alfa*alfa)>=(twopi-dist_limit)) return 1;
-
-  return 0;
+  int quadrant;
+  quadrant = angle / (pi/2) + 1;
+  switch (quadrant) 
+    {
+    case 1: *xquad=x;  *yquad=y;  break;
+    case 2: *xquad=-x; *yquad=y;  break;
+    case 3: *xquad=-x; *yquad=-y; break;
+    case 4: *xquad=x;  *yquad=-y; break;
+    }
 }
 
 static void
-aper_intersect(double a1, double b1, double a2, double b2, double x1, double y1, double x2, double y2,
-               int ver1, int ver2, double *xm, double *ym)
+aper_adj_halo_si(double ex, double ey, double betx, double bety, double bbeat, 
+		 double halox[], double haloy[], int halolength, double haloxsi[], double haloysi[])
 {
-  (void)y1;
-  
-  if (ver1 && ver2 && x1==x2) {
-    *xm=x2;
-    *ym=y2;
-  }
+  int j;
 
-  else if (ver1) {
-    *xm=x1;
-    *ym=a2*x1+b2;
+  for (j=0; j <= halolength + 1; j++) {
+    haloxsi[j] = halox[j] * bbeat * sqrt(ex*betx);
+    haloysi[j] = haloy[j] * bbeat * sqrt(ey*bety);
   }
+}
 
-  else if (ver2) {
-    *xm=x2;
-    *ym=a1*x2+b1;
-  }
+static int
+aper_chk_inside(double p, double q, double pipex[], double pipey[], int pipelength )
+{
+// winding number test for a point in a polygon
+// Input:   p,q = a point,
+//          pipex[], pipey[] = vertex points of the polygon with pipe[len]=pipe[0]
+// Return:  wn = the winding number (=0 only when point is outside polygon)
+// source : wn_PnInPoly() at http://geomalgorithms.com/a03-_inclusion.html
+ int    wn = 0;    // the  winding number counter
 
-  else {
-    *xm=(b1-b2)/(a2-a1);
-    *ym=a1*(*xm)+b1;
-  }
+ // loop through all edges of the polygon
+ for (int i=0; i<=pipelength; i++) { // edge from V[i] to  V[i+1]
+   if (pipey[i] <= q  &&  pipey[i+1]  > q) { 
+     // first vertex is below point; second vertex is above; upward crossing
+     if ( (pipex[i+1] - pipex[i]) * (q - pipey[i]) - (p - pipex[i]) * (pipey[i+1] - pipey[i])  > 0 ) { 
+       // Point left of  edge
+       ++wn;
+       continue;
+     }
+   }
+   if (pipey[i] > q  &&  pipey[i+1]  <= q) { 
+     // first vertex is above point; second vertex is below; downward crossing
+     if ( (pipex[i+1] - pipex[i]) * (q - pipey[i]) - (p - pipex[i]) * (pipey[i+1] - pipey[i])  < 0) { 
+       // Point right of  edge
+       --wn;
+       continue;
+     }
+   }
+ }
 
+ return wn;
+}
+
+static int
+aper_intersect(double a1, double b1, double c1, double a2, double b2, double c2, 
+		double *xm, double *ym)
+{ // calculates the intersection point between two general equation lines
+  // returns 0 if lines are parallel, 1 otherwise
+      
+  if (fabs(a2*b1 - a1*b2) < MIN_DOUBLE*1.e10) return 0;
+
+  *xm = (b2*c1 - b1*c2) / (a2*b1 - a1*b2);
+  *ym = (a1*c2 - a2*c1) / (a2*b1 - a1*b2);
+  return 1;
+}
+
+static void
+aper_linepar(double x1,double y1,double x2,double y2,double *a,double *b,double *c)
+{ // general line equation, non reduced:  a*x + b*y + c = 0  
+  *a = y1 - y2;
+  *b = x2 - x1;
+  *c = (x1-x2)*y1 + (y2-y1)*x1;
   return;
 }
 
 static int
-aper_linepar(double x1,double y1,double x2,double y2,double *a,double *b)
-{
-  if ( fabs(x1-x2)< MIN_DOUBLE) { 
-    // line is vertical
-    *a=0;
-    *b=y1-(*a)*x1;
-    return 1;
-  } 
-  else {
-    // general line equation
-    *a=(y1-y2)/(x1-x2);
-    *b=y1-(*a)*x1;
-    return 0;
-  }
+aper_on_line(double xm, double ym, double x1, double y1,
+	      double x2, double y2, double dist_limit)
+{ 
+  // first check colinearity of (p1,p2) and (p1,M); return 0 if false
+  if ( fabs((x2-x1)*(ym-y1) - (xm-x1)*(y2-y1)) > dist_limit ) return 0;
+  // check M is between p1 and p2, with tolerance for point overlap
+  if ( xm <= fmax(x1,x2)+dist_limit && xm >= fmin(x1,x2)-dist_limit && 
+       ym <= fmax(y1,y2)+dist_limit && ym >= fmin(y1,y2)-dist_limit ) return 1;
+  return 0; // outside of (p1,p2)
 }
 
 static void
@@ -352,44 +293,67 @@ aper_fill_quadrants(double polyx[], double polyy[], int quarterlength, int* halo
      mirrors this data to the other three quadrants across the x and y axes.
      quarterlength is the length of, or number of points in, the first quadrant.*/
 
+ /* 2015-Jul-21 ghislain: added guards to avoid duplicate points close to the axes. 
+     These duplicate points could cause problems in aper_calc since such a pair of 
+     points does not define a line segment to check intersection. This fixed a bug 
+     reported by R. De Maria (https://svnweb.cern.ch/trac/madx/ticket/346) where aperture 
+     calculations were wrong when halor == halov exactly. Changing halor by a very small 
+     amount was enough to get back to proper results because it pulled the pair of points 
+     slighlty apart.
+     As implemented the check is for proximity to the axis within 1e-10 mm  which 
+     should be good enough. On top of this if proximity is detected the value is reset 
+     to exactly zero. */
+
+
   int i,j;
   int debug = get_option("debug");
 
   if (debug) printf("+++ aper_fill_quadrants: quarterlength = %d\n", quarterlength);
   
   // The counter i starts at quarterlength+1, ie the first point to be mirrored.
-  i=quarterlength+1;
+  i = quarterlength + 1;
 
   /*copying first quadrant coordinates to second quadrant*/
   for (j=quarterlength; j>=0; j--) {
-    polyx[i]= -polyx[j];
-    polyy[i]=  polyy[j];
+    // 2015-Jul-21  16:45:36  ghislain: avoid duplicate points on axes
+    if (polyx[j] < 1.e-10) {polyx[j] = 0. ; continue;} // do not mirror a point at x = 0
+    polyx[i] = -polyx[j]; 
+    polyy[i] =  polyy[j];
     i++;
   }
 
   /*copying first quadrant coordinates to third quadrant*/
   for (j=0; j<=quarterlength; j++) {
-    polyx[i]= -polyx[j];
-    polyy[i]= -polyy[j];
+    // 2015-Jul-21  16:45:36  ghislain: avoid duplicate points on axes
+    if (polyy[j] < 1.e-10) {polyy[j] = 0. ; continue;} // do not mirror a point at y = 0
+    polyx[i] = -polyx[j];
+    polyy[i] = -polyy[j];
     i++;
   }
 
   /*copying first quadrant coordinates to fourth quadrant*/
   for (j=quarterlength; j>=0; j--) {
-    polyx[i]=  polyx[j];
-    polyy[i]= -polyy[j];
+    // 2015-Jul-21  16:45:36  ghislain: avoid duplicate points on axes
+    if (polyx[j] < 1.e-10) {polyx[j] = 0. ; continue;} // do not mirror a point at x = 0
+    polyx[i] =  polyx[j];
+    polyy[i] = -polyy[j];
     i++;
   }
 
   /*sets the last point equal to the first, to complete the shape.
     Necessary for compatibility with aper_calc function*/
-  polyx[i]=polyx[0];
-  polyy[i]=polyy[0];
+  // 2015-Jul-21  16:45:36  ghislain: avoid duplicate points on axes
+  if ( polyy[0] < 1.e-10) { // do not mirror a point at y = 0
+    i--; 
+  } else {
+    polyx[i] = polyx[0];
+    polyy[i] = polyy[0];
+  } 
 
   *halolength=i-1;
   
   if (debug) {
-    for (j=0;j<=i;j++) printf("  %d  %10.5f  %10.5f \n", j, polyx[j], polyy[j]);
+    for (j=0; j<=i; j++) printf("  %d  %10.5e  %10.5e \n", j, polyx[j], polyy[j]);
     printf("\n");
   }
 
@@ -451,7 +415,8 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
 {
   int i, quarterlength=0;
 
-  /* 2013-03-21 -- ghislain: changed name from aper_bs; the same function is referenced as build_pipe in the documentation of Ivar Waarum */
+  /* 2013-03-21 -- ghislain: changed name from aper_bs; 
+     the same function is referenced as build_pipe in the documentation of Ivar Waarum */
 
   /* "var1 .. 4" represents values in the aperture array of each element  */
   /*  After they are read:                                                */
@@ -465,7 +430,7 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
   // 2013-Apr-18  14:25:14  ghislain: added RECTCIRCLE type
   // 2014-Jun-27  11:14:27  ghislain: fixed bug in check of invalid values for RACETRACK
 
-  (*ap1)=(*ap2)=(*ap3)=(*ap4)=0;
+  (*ap1) = (*ap2) = (*ap3) = (*ap4) = 0;
 
   int debug = get_option("debug");
   if (debug) 
@@ -596,8 +561,8 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
     }
 
     quarterlength = 1;
-    pipex[0] = (*ap1); pipey[0] = (*ap1)*tan((*ap3));
-    pipex[1] = (*ap2)*tan(pi/2 - (*ap4)); pipey[1] = (*ap2);
+    pipex[0] = (*ap1);                      pipey[0] = (*ap1) * tan((*ap3));
+    pipex[1] = (*ap2) * tan(pi/2 - (*ap4)); pipey[1] = (*ap2);
 
     aper_fill_quadrants(pipex, pipey, quarterlength, pipelength); 
     return 1;    
@@ -1127,86 +1092,110 @@ aper_write_table(char* name, double* n1, double* n1x_m, double* n1y_m,
   augment_count(table);
 }
 
+
 static double
-aper_calc(double p, double q, double* minhl, double halox[], double haloy[],
-          int halolength,double haloxadj[],double haloyadj[],
-          double newhalox[], double newhaloy[], double pipex[], double pipey[],
-          int pipelength, double notsimple)
-{
-  int i=0, j=0, c=0, ver1, ver2;
-  double dist_limit=0.0000000001; // 1.e-10
-  double a1, b1, a2, b2, xm, ym, h, l;
+aper_calc(double p, double q, double* minhl, 
+	  double halox[], double haloy[], int halolength, double haloxadj[],double haloyadj[], 
+	  double pipex[], double pipey[], int pipelength, double notsimple)
+{ // 2015-Jul-30  ghislain: partially rewritten from original to limit number of calculations 
+  // in loop to find ratios.
+  int i=0, j=0, c=0;
+  double dist_limit = 1.e-10;
+  double a1, b1, c1, a2, b2, c2;
+  double xm, ym, h, l;
 
-  for (c=0; c<=halolength+1; c++) {
-    haloxadj[c]=halox[c]+p;
-    haloyadj[c]=haloy[c]+q;
+  double tmphalox[MAXARRAY], tmphaloy[MAXARRAY];
+  
+  double bbxmax, bbymax, bbxmin, bbymin; // rectangular bounding box for aperture
+
+  for (c=0; c <= halolength + 1; c++) {
+    haloxadj[c] = halox[c] + p;
+    haloyadj[c] = haloy[c] + q;
   }
 
-  c=0;
-
-  /* if halo centre is inside beam pipe, calculate smallest H/L ratio */
-  if (aper_chk_inside(p, q, pipex, pipey, dist_limit, pipelength)) {
-    if (notsimple) {
-      /* Add extra apexes first:*/
-      for (j=0; j<=halolength; j++) {
-        newhalox[c]=haloxadj[j];
-        newhaloy[c]=haloyadj[j];
-        c++;
-
-        for (i=0;i<=pipelength;i++) {
-          /*Find a and b parameters for line*/
-          ver1=aper_linepar(p, q, pipex[i], pipey[i], &a1, &b1);
-          ver2=aper_linepar(haloxadj[j], haloyadj[j], haloxadj[j+1], haloyadj[j+1], &a2, &b2);
-
-          /*find meeting coordinates for infinitely long lines*/
-          aper_intersect(a1, b1, a2, b2, pipex[i], pipey[i], haloxadj[j], haloyadj[j], ver1, ver2, &xm, &ym);
-
-          /*eliminate intersection points not between line limits*/
-          if (-1 == aper_online(xm, ym, haloxadj[j], haloyadj[j], haloxadj[j+1], haloyadj[j+1], dist_limit)) { /*halo line*/
-            if (-1 != aper_online(p, q, pipex[i], pipey[i], xm, ym, dist_limit)) { /*test line*/
-              newhalox[c]=xm;
-              newhaloy[c]=ym;
-              c++;
-            }
-          }
-        }
-      }
-
-      halolength=c-1;
-      for (j=0; j<=halolength; j++) {
-        haloxadj[j]=newhalox[j];
-        haloyadj[j]=newhaloy[j];
-      }
-    }
-
-    /*Calculate smallest ratio:*/
-    for (i=0; i<=pipelength; i++) {
-      for (j=0; j<=halolength; j++) {
-        /*Find a and b parameters for line*/
-        ver1 = aper_linepar(p, q, haloxadj[j], haloyadj[j], &a1, &b1);
-        ver2 = aper_linepar(pipex[i], pipey[i], pipex[i+1], pipey[i+1], &a2, &b2);
-
-        /*find meeting coordinates for infinitely long lines*/
-        aper_intersect(a1, b1, a2, b2, haloxadj[j], haloyadj[j], pipex[i], pipey[i], ver1, ver2, &xm, &ym);
-
-        /*eliminate intersection points not between line limits*/
-        if (-1 == aper_online(xm, ym, pipex[i], pipey[i], pipex[i+1], pipey[i+1], dist_limit)) { /*pipe line*/
-          if (-1 != aper_online(p, q, haloxadj[j], haloyadj[j], xm, ym, dist_limit)) {  /*test line*/
-            h=sqrt((xm-p)*(xm-p)+(ym-q)*(ym-q));
-            l=sqrt((haloxadj[j]-p)*(haloxadj[j]-p) + (haloyadj[j]-q)*(haloyadj[j]-q));
-            if (h/l < *minhl) *minhl=h/l;            
-          }
-        }
-      }
-    }
-  }
-  else { /*if halo centre is outside of beam pipe*/    
-    *minhl=0;
+  /* if halo centre is outside of beam pipe : zero aperture! */    
+  if (!aper_chk_inside(p, q, pipex, pipey, pipelength)) {
+    *minhl = 0;
     return -1;
   }
 
+  /* determine a rectangular bounding box for the beampipe */
+  bbxmin=pipex[0]; bbymin=pipey[0]; bbxmax=pipex[0]; bbymax=pipey[0]; 
+  for (j=1; j<=pipelength; j++) {
+    bbxmin = fmin(bbxmin,pipex[j]); bbxmax = fmax(bbxmax,pipex[j]);
+    bbymin = fmin(bbymin,pipey[j]); bbymax = fmax(bbymax,pipey[j]);
+  }
+  bbxmax *= 1.01; bbymax *= 1.01; bbxmin *= 1.01; bbymin *= 1.01; // 1% clearance       
+  
+
+  /* not simply connex beampipes... adding apexes to the halo */
+  c = 0;
+  if (notsimple) { 
+    for (j=0; j<=halolength; j++) {
+      tmphalox[c] = haloxadj[j];
+      tmphaloy[c] = haloyadj[j];
+      c++;
+
+      /* Find general line equation for line joining two consecutive halo apex points*/
+      aper_linepar(haloxadj[j], haloyadj[j], haloxadj[j+1], haloyadj[j+1], &a2, &b2, &c2);
+ 
+      for (i=0; i<=pipelength; i++) {
+	/* Find general line equation for line joining halo centre to pipe apex point*/
+	aper_linepar(p, q, pipex[i], pipey[i], &a1, &b1, &c1);
+
+	/* find intersection coordinates; cycle if lines are parallel */
+	if (0 == aper_intersect(a1, b1, c1, a2, b2, c2, &xm, &ym)) continue; // parallel lines	
+	/* intersection point must be on halo line segment */
+	if (0 == aper_on_line(xm, ym, haloxadj[j], haloyadj[j], haloxadj[j+1], haloyadj[j+1], dist_limit)) continue; 	
+	/* pipe apex must be between halo center and intersection point */
+	if (0 == aper_on_line(pipex[i], pipey[i], p, q, xm, ym, dist_limit)) continue; 
+
+	tmphalox[c] = xm;
+	tmphaloy[c] = ym;
+	c++;
+      }
+    }  
+    
+    halolength = c - 1;
+    for (j=0; j <= halolength; j++) {
+      haloxadj[j] = tmphalox[j];
+      haloyadj[j] = tmphaloy[j];
+    }
+  } // notsimple
+
+  /*Calculate smallest ratio:*/  
+  i=0; // start from first pipeline apex
+  
+  for (j=0; j <= halolength; j++) { // loop over all halo apexes
+
+    /* Find general line equation for line joining halo centre to halo apex point*/
+    aper_linepar(p, q, haloxadj[j], haloyadj[j], &a1, &b1, &c1);
+
+    for (;;) { // infinite loop 
+      /* find general equation of current pipeline segement */
+      aper_linepar(pipex[i], pipey[i], pipex[i+1], pipey[i+1], &a2, &b2, &c2);
+      
+      if ( // not parallel lines
+	  0 != aper_intersect(a1, b1, c1, a2, b2, c2, &xm, &ym) 
+	  // intersection point is inside the bounding box 
+	  &&  ( xm < bbxmax && xm > bbxmin && ym < bbymax && ym > bbymin) 
+	  // intersection point is inside pipe line segment 
+	  && 0 != aper_on_line(xm, ym, pipex[i], pipey[i], pipex[i+1], pipey[i+1], dist_limit) 
+	  // halo center is not inside segement defined by halo apex and intersection point
+	  && 0 != aper_on_line(p,q,haloxadj[j],haloyadj[j],xm,ym,dist_limit) ) 
+	      break; // valid point is found
+
+      if (++i == pipelength + 1) i = 0; // cycle through the pipeline    
+    }
+      
+    h = sqrt((xm-p)*(xm-p) + (ym-q)*(ym-q));
+    l = sqrt((haloxadj[j]-p)*(haloxadj[j]-p) + (haloyadj[j]-q)*(haloyadj[j]-q));
+    if (h/l < *minhl) *minhl = h/l; 
+  }
+ 
   return 0;
 }
+
 
 // public interface
 
@@ -1217,7 +1206,7 @@ get_apertol(struct node* node, const char* par)
 {
   int i, k, n = strlen(par);
   double val = zero, vec[100];
-  for (i = 0; i < n; i++)  if(isdigit(par[i])) break;
+  for (i = 0; i < n; i++)  if (isdigit(par[i])) break;
   if (i == n) return val;
   sscanf(&par[i], "%d", &k); k--;
   if ((n = element_vector(node->p_elem, "aper_tol", vec)) > k)  val = vec[k];
@@ -1231,7 +1220,7 @@ get_aperture(struct node* node, const char* par)
 {
   int i, k, n = strlen(par);
   double val = zero, vec[100];
-  for (i = 0; i < n; i++)  if(isdigit(par[i])) break;
+  for (i = 0; i < n; i++)  if (isdigit(par[i])) break;
   if (i == n) return val;
   sscanf(&par[i], "%d", &k); k--;
   if ((n = element_vector(node->p_elem, "aperture", vec)) > k)  val = vec[k];
@@ -1330,7 +1319,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   double ex, ey;
   double dqf, betaqfx, dp, dparx, dpary;
   double cor, bbeat, nco, halo[4], interval, spec, notsimple;
-  double s=0, x=0, y=0, betx=0, bety=0, dx=0, dy=0, ratio, n1, nr, length;
+  double s=0, x=0, y=0, betx=0, bety=0, dx=0, dy=0, ratio, n1, length; // nr not used
   double xeff=0,yeff=0;
   double n1x_m, n1y_m;
   double s_start, s_curr, s_end;
@@ -1341,7 +1330,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   double angle, dangle, deltax, deltay;
   double xshift, yshift, r;
   double halox[MAXARRAY], haloy[MAXARRAY], haloxsi[MAXARRAY], haloysi[MAXARRAY];
-  double haloxadj[MAXARRAY], haloyadj[MAXARRAY], newhalox[MAXARRAY], newhaloy[MAXARRAY];
+  double haloxadj[MAXARRAY], haloyadj[MAXARRAY]; 
   double pipex[MAXARRAY], pipey[MAXARRAY];
   double parxd,paryd;
   char *halofile, *truefile, *offsfile;
@@ -1353,19 +1342,19 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   int code;
   
   // 2014-Sep-18  17:19:52  ghislain: attempt to read offset values from element attributes...
-  //double aper_offset[2], xoffset, yoffset;
-  //int noffset;
-
+  // double aper_offset[2], xoffset, yoffset;
+  // int noffset;
+  
   struct node* rng_glob[2];
-// struct aper_node limit_node = {"none", -1, -1, "none", {-1,-1,-1,-1}, {-1,-1,-1}};
-// struct aper_node* lim_pt = &limit_node;
+  // struct aper_node limit_node = {"none", -1, -1, "none", {-1,-1,-1,-1}, {-1,-1,-1}};
+  // struct aper_node* lim_pt = &limit_node;
 
   int is_zero_len;
-
+  
   int debug = get_option("debug");
 
   int rc_deltap=0;
-
+  
   true_tab = mycalloc("Aperture", E_D_LIST_CHUNK, sizeof *true_tab);
   /* offs_tab = mycalloc("Aperture",E_D_LIST_CHUNK,sizeof *offs_tab); */
 
@@ -1428,8 +1417,9 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   if (strcmp(refnode,"")) printf("\nreference node: %s\n",refnode);
 
   /* build halo polygon based on input ratio values or coordinates */
-  if ((halolength = aper_external_file(halofile, halox, haloy)) > -1)
-    ;
+  if ((halolength = aper_external_file(halofile, halox, haloy)) > -1) {
+    printf("\n Reading halo from file \"%s\"\n",halofile);
+  }
   else if (aper_rectellipse(&halo[2], &halo[3], &halo[1], &halo[1], &halo_q_length, halox, haloy)) {
     warning("Not valid parameters for halo. ", "Unable to make polygon.");
 
@@ -1454,15 +1444,15 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
   /* calculate initial normal+parasitic disp. */
   /* modified 27feb08 BJ */
-  parxd = dparx*sqrt(betx/betaqfx)*dqf;
-  paryd = dpary*sqrt(bety/betaqfx)*dqf;
+  parxd = dparx * sqrt(betx/betaqfx) * dqf;
+  paryd = dpary * sqrt(bety/betaqfx) * dqf;
 
   /* Initialize n1 limit value */
   lim_pt->n1=999999;
 
   int n = 0;
 
-  while (!stop) {
+  while (!stop) { // loop over nodes
     ++n;
 
     strcpy(name,current_node->name);
@@ -1473,10 +1463,10 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
     /* the first node in a sequence can not be sliced, hence: */
     if (current_sequ->range_start == current_node) first=1; else first=0;
 
-    length=node_value("l");
     double_from_table_row(tw_cp->name, "s", tw_cnt, &s_end);
-    s_start=s_end-length;
-    s_curr=s_start;
+    length  = node_value("l");
+    s_start = s_end - length;
+    s_curr  = s_start;
 
     node_string("apertype", apertype, &namelen);
     aper_trim_ws(apertype, NAME_L);
@@ -1490,11 +1480,10 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
     // 2015-Mar-19  09:07:37  ghislain: 
     code = node_value("mad8_type");
-    if (code==20) 
+    if (code == 20) 
       warning("Found deprecated ECOLLIMATOR element;"," Should be replaced by COLLIMATOR");
-    if (code==21)
+    if (code == 21)
       warning("Found deprecated RCOLLIMATOR element;"," Should be replaced by COLLIMATOR");
-
 
     /* read data for tol displacement of halo */
     get_node_vector("aper_tol",&ntol,aper_tol);
@@ -1503,7 +1492,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       xshift = aper_tol[1];
       yshift = aper_tol[2];
     }
-    else r=xshift=yshift=0;
+    else r = xshift = yshift = 0.;
     //if (debug) printf("\nname: %s, x-shift: %f, y-shift: %f\n",name,xshift, yshift);
 
     // 2014-Sep-18  17:19:52  ghislain: attempt to read offset values from element attributes...
@@ -1519,7 +1508,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
     /*read aperture data and make polygon tables for beam pipe*/
     /* IW 250205 */
     /*  if (ext_pipe == 0) */
-    ap=aper_build_screen(apertype, &ap1, &ap2, &ap3, &ap4, &pipelength, pipex, pipey);
+    ap = aper_build_screen(apertype, &ap1, &ap2, &ap3, &ap4, &pipelength, pipex, pipey);
 
     if (ap == 0 || first == 1) {
       /* if no pipe can be built, the n1 is set to inf and Twiss parms read for reference*/
@@ -1537,8 +1526,8 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
       /* calc disp and adj halo to have ready for next node */
       /* modified 27feb08 BJ */
-      parxd = dparx*sqrt(betx/betaqfx)*dqf;
-      paryd = dpary*sqrt(bety/betaqfx)*dqf;
+      parxd = dparx * sqrt(betx/betaqfx) * dqf;
+      paryd = dpary * sqrt(bety/betaqfx) * dqf;
 
       aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength, haloxsi, haloysi);
 
@@ -1556,22 +1545,22 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
     }    /* end loop 'if no pipe ' */
 
     else {
-      node_n1=999999;
-      true_node=0;
-      offs_node=0;
+      node_n1   = 999999;
+      true_node = 0;
+      offs_node = 0;
 
       /* calculate the number of slices per node */
       if (true_flag == 0)
-        nint=length/interval;
+        nint = length / interval;
       else {
-        true_node=aper_tab_search(true_cnt, true_tab, name, &truepos);
-        if (true_node) nint=true_tab[truepos].curr;
-        else nint=length/interval;
+        true_node = aper_tab_search(true_cnt, true_tab, name, &truepos);
+        if (true_node) nint = true_tab[truepos].curr;
+        else nint = length / interval;
       }
 
       if (debug) printf("name: %s, nint: %d, length: %f\n", name, nint, length);
 
-      if (!nint) nint=1;
+      if (!nint) nint = 1;
 
       /* do not interpolate 0-length elements*/
       if (fabs(length) < MIN_DOUBLE ) is_zero_len = 1;
@@ -1609,7 +1598,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
         if (jslice == 0) {
           // parameters from previous node will be used
           s_curr += 1.e-12;     /*to get correct plot at start of elements*/
-          s=0;                  /*used to calculate survey adjustments */
+          s = 0;                /*used to calculate survey adjustments */
         } 
 	else {
           aper_read_twiss("embedded_twiss_table", &jslice, &s, &x, &y, &betx, &bety, &dx, &dy);
@@ -1649,16 +1638,18 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
           yeff += true_tab[truepos].tab[jslice][2];
         }
 
-        for (angle=0; angle < twopi; angle += dangle) {
+	if (debug) printf("\n adjustments xeff: %f, yeff: %f\n",xeff,yeff); 
+
+        for (angle=0; angle<twopi; angle+=dangle) {
           /* new 27feb08 BJ */
-          dispx = bbeat*(fabs(dx)*dp + parxd*(fabs(lim_pt->deltap_twiss)+dp) );
-          dispy = bbeat*(fabs(dy)*dp + paryd*(fabs(lim_pt->deltap_twiss)+dp) );
+          dispx = bbeat * (fabs(dx)*dp + parxd*(fabs(lim_pt->deltap_twiss)+dp) );
+          dispy = bbeat * (fabs(dy)*dp + paryd*(fabs(lim_pt->deltap_twiss)+dp) );
 
           /*adjust dispersion to worst-case for quadrant*/
           aper_adj_quad(angle, dispx, dispy, &dispxadj, &dispyadj);
 
           /*calculate displacement co+tol for each angle*/
-          coxadj=cor*cos(angle); coyadj=cor*sin(angle);
+          coxadj = cor * cos(angle); coyadj = cor * sin(angle);
 
           /* Error check added 20feb08 BJ */
           if ( xshift < 0 || yshift < 0 || r < 0 ) {
@@ -1666,7 +1657,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
             fatal_error("Illegal negative tolerance",tol_err_mess);
           }
 
-          aper_race(xshift,yshift,r,angle,&tolx,&toly);
+          aper_race(xshift, yshift, r, angle, &tolx, &toly);
           aper_adj_quad(angle, tolx, toly, &tolxadj, &tolyadj);
 
           /* add all displacements */
@@ -1674,16 +1665,21 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
           deltay = coyadj + tolyadj + yeff + dispyadj;
 
           /* send beta adjusted halo and its displacement to aperture calculation */
-          aper_calc(deltax,deltay,&ratio,haloxsi,haloysi,
-                    halolength,haloxadj,haloyadj,newhalox,newhaloy,
-                    pipex,pipey,pipelength,notsimple);
+          aper_calc(deltax, deltay, &ratio, haloxsi, haloysi, halolength, haloxadj, haloyadj, 
+                    pipex, pipey, pipelength, notsimple); 
+
+	  if (debug) printf("\n Angle: %f deltax: %f deltay: %f minratio: %f\n", angle, deltax, deltay, ratio);
         }
 
-        nr=ratio*halo[1];
-        n1=nr/(halo[1]/halo[0]); /* ratio r/n = 1.4 */
+        //nr = ratio * halo[1];
+        //n1 = nr / (halo[1]/halo[0]); /* ratio r/n = 1.4 */
+	n1 = ratio * halo[0]; // 2015-Jul-30  17:23:26  ghislain: replaced above two lines. 
+	
 
-        n1x_m=n1*bbeat*sqrt(betx*ex);
-        n1y_m=n1*bbeat*sqrt(bety*ey);
+	if (debug) printf("\n Found ratio: %f n1: %f \n",ratio,n1);
+
+        n1x_m = n1 * bbeat * sqrt(betx*ex);
+        n1y_m = n1 * bbeat * sqrt(bety*ey);
 
 	/* Change below, BJ 23oct2008                              */
 	/* test block 'if (n1 < node_n1)' included in test block   */
@@ -1695,8 +1691,8 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
 	  /* save node minimum n1 */
           if (n1 < node_n1) {
-              node_n1=n1;
-              node_s=s_curr;
+              node_n1 = n1;
+              node_s = s_curr;
           }
 	} // if is_zero_len
       } // for jslice
@@ -1710,16 +1706,16 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       /* save range minimum n1 */
       if (node_n1 < lim_pt->n1) {
         strcpy(lim_pt->name,name);
-        lim_pt->n1=node_n1;
-        lim_pt->s=node_s;
+        lim_pt->n1 = node_n1;
+        lim_pt->s = node_s;
         strcpy(lim_pt->apertype,apertype);
-        lim_pt->aperture[0]=ap1;
-        lim_pt->aperture[1]=ap2;
-        lim_pt->aperture[2]=ap3;
-        lim_pt->aperture[3]=ap4;
-        lim_pt->aper_tol[0]=r;
-        lim_pt->aper_tol[1]=xshift;
-        lim_pt->aper_tol[2]=yshift;
+        lim_pt->aperture[0] = ap1;
+        lim_pt->aperture[1] = ap2;
+        lim_pt->aperture[2] = ap3;
+        lim_pt->aperture[3] = ap4;
+        lim_pt->aper_tol[0] = r;
+        lim_pt->aper_tol[1] = xshift;
+        lim_pt->aper_tol[2] = yshift;
       }
     } // if !(ap == 0 || first == 1)
 
@@ -1727,14 +1723,12 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
     if (!advance_node()) stop=1;
   } // while !stop
 
-  // 2013-Sep-17  16:45:34  ghislain: 
   // if an offset table was provided and the do_survey flag is still not set, 
   // the reference node was certainly not found within the range given; hence no offset could be treated.
   if ( (offs_tab != NULL) && (do_survey == 0)) {
-    printf("\nWarning: Offset reference node %s was not found in the active range %s to %s.",
-	    refnode,use_range[0]->name,use_range[1]->name); 
-    printf("\nOffsets were not used.");
-    printf("\nThe active range must contain the reference node for offsets to be taken into account.\n"); 
+    warning("Offset reference node was not found in the active range", "Offsets were not used.");    
+    printf("\nOffset reference node: %s active range: %s / %s\n",
+	    refnode, use_range[0]->name, use_range[1]->name); 
   }  
 
   myfree("Aperture",true_tab);
