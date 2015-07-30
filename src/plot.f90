@@ -353,12 +353,11 @@ subroutine pefill(ierr)
   double precision node_value
 
   !--- codes see in peschm
-
-  data ilist /                                                      &
-       0, 21, 1, 0, 2, 10, 12, 8, 0, 9,                                  &
-       6, 0, 0, 0, 0,  0,  4, 4, 4, 0,                                   &
-       0, 0, 0, 0, 0,  0, 14, 0, 0, 0,                                   &
-       20 * 0 /
+  data ilist / 0, 21, 1, 0, 2, 10, 12, 8, 0, 9,  &
+               6, 0, 0, 0, 0,  0,  4, 4, 4, 0,   &
+               0, 0, 0, 0, 0,  0, 14, 0, 0, 0,   &
+               0, 0, 0, 0, 0,  0,  9, 0, 0, 0,   &
+               10 * 0 /
 
   ! Initialize marker_plot logical
 
@@ -2091,6 +2090,7 @@ subroutine peschm (nel, ityp, hr, es, ee, actwin)
   !                       14: lcavity                                    *
   !                       21: rbend, zero tilt                           *
   !                       27: rbend, non-zero tilt                       *
+  !                       37: crab cavity                                *
   !   hr          (real)  horizontal range (lower and upper)
   !   es          (real)  array with element start position
   !   ee          (real)  array with element end position
