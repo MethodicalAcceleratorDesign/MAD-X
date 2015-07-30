@@ -290,7 +290,7 @@ where the parameters have the following meaning:
 	\ttitem{BBEAT} Beta beating coefficient applying to beam size. Default = 1.1 
 	\ttitem{DP} Bucket edge at the current beam energy. Default = 0.0015 
 	\ttitem{COR} Maximum radial closed orbit uncertainty [m]. Default = 0.004 
-	\ttitem{NCO} Number of azimuth for radial scan. Default = 5 
+	\ttitem{NCO} Number of azimuth per quadrant for halo radial scan. Default = 5 
 	\ttitem{HALO} Halo parameters: \{n, r, h, v\}. n is the radius of the
 	primary halo,  r is the radial part of the secondary halo, h and v
 	is the horizontal and  vertical cuts in the secondary halo. Default
@@ -303,9 +303,9 @@ where the parameters have the following meaning:
 	nodelength/nslice. Default = 1.0  
 	\ttitem{SPEC} Aperture spec, for plotting only. Gives the spec line in
 	the plot. Default = 0.0  
-	\ttitem{NOTSIMPLE} Use only if one or more beamscreens in the range are
-	considered not to  be a "simply connex". Since all \madx apertypes
-	are simply connex, this is only possible  if an input file with
+	\ttitem{NOTSIMPLE} Use only if one or more beam-screens in the range are
+	considered not to  be a "simply connex". Since all predefined \madx aperture 
+	types are simply connex, this is only possible  if an input file with
 	beam screen coordinates are given. See below for a graphical
 	example. Default = false.  
 	\ttitem{TRUEPROFILE} A file containing a list of magnets, and for each
