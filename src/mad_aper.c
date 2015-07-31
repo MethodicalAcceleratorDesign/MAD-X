@@ -1259,8 +1259,8 @@ pro_aperture(struct in_cmd* cmd)
   current_node = use_range[0];
 
   /* navigate to starting point in Twiss table */
-  tw_cp=current_sequ->tw_table;
-  tw_cnt=1; /* table starts at 1 */
+  tw_cp = current_sequ->tw_table;
+  tw_cnt = 1; /* table starts at 1 */
 
   while (1) {
     string_from_table_row(tw_cp->name, "name", &tw_cnt, tw_name);
@@ -1279,8 +1279,8 @@ pro_aperture(struct in_cmd* cmd)
   rows = current_sequ->n_nodes + 2 * (sequence_length(current_sequ)/interval);
   
   /* make empty aperture table */
-  aperture_table=make_table(table, table, ap_table_cols, ap_table_types, rows);
-  aperture_table->dynamic=1;
+  aperture_table = make_table(table, table, ap_table_cols, ap_table_types, rows);
+  aperture_table->dynamic = 1;
   add_to_table_list(aperture_table, table_register);
 
   /* calculate apertures and fill table */
@@ -1297,7 +1297,8 @@ pro_aperture(struct in_cmd* cmd)
     file = command_par_string("file", this_cmd->clone);
     if (file != NULL) out_table(table, aperture_table, file);
     
-    if (strcmp(aptwfile,"dummy")) out_table(tw_cp->name, tw_cp, aptwfile);
+    // 2015-Jul-31  11:41:59  ghislain: aperture twiss file for output of twiss table ! not needed
+    //if (strcmp(aptwfile,"dummy")) out_table(tw_cp->name, tw_cp, aptwfile);
   }
   else warning("Could not run aperture command.","Aperture command ignored");
 

@@ -894,7 +894,8 @@ pro_twiss(void)
     }
     if (filename == NULL) filename = permbuff("dummy");
     w_file = 1;
-    strcpy(aptwfile,filename); /* IW 02.12.2004 */
+    // 2015-Jul-31  11:41:59  ghislain: aperture twiss file for output of twiss table ! not needed
+    //strcpy(aptwfile,filename); /* IW 02.12.2004 */
   }
   else w_file = 0;
 
