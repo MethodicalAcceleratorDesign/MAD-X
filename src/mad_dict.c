@@ -2457,9 +2457,11 @@ char command_def[] =
 "makethin: makethin none 0 0 "
 "style    = [s, teapot, teapot], "
 "sequence = [s, none, none], "
+"makedipedge = [l, true, true], "
+  /* "verbose = [l, false, true], " will replace the "option, verbose" used only by makethin */
 "makeconsistent = [l, false, true],  " /*hbu */
-"minimizeparents = [l, true, false], " /*hbu */
-"makedipedge = [l, true, true]; "     /*hbu, 07/2012, in future by default on */
+"minimizeparents = [l, true, false]; " /*hbu */
+
 " "
 "survey: survey none 0 0 "
 "x0       = [r, 0],   y0     = [r, 0], z0       = [r, 0], "

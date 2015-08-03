@@ -861,7 +861,7 @@ static element* new_element(const char* el_type, const char* el_name,
 static element* new_marker_element(const char* el_type,const char* el_name,const element* thick_el)
 {
   const char *ParList[] = { 
-    "at","kmax","kmin","polarity","calib","type","apertype","aperture","aper_tol","mech_sep","v_pos","from"
+    "at","kmax","kmin","polarity","calib","type","apertype","aperture","aper_offset","aper_tol","mech_sep","v_pos","from"
   };
 
   return new_element(el_type, el_name, ARRSIZE(ParList), ParList, thick_el);
@@ -2084,6 +2084,7 @@ element* SeqElList::create_sliced_magnet(const element* thick_elem, int slice_no
   //--- now the arguments which are copied from the thick element
   add_cmd_parameter_clone(cmd,return_param_recurse("apertype",thick_elem),"apertype",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("aperture",thick_elem),"aperture",1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("aper_offset",thick_elem),"aper_offset",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("aper_tol",thick_elem),"aper_tol",1);
   add_cmd_parameter_clone(cmd,return_param(        "bv",      thick_elem),"bv",      1);
   add_cmd_parameter_clone(cmd,return_param_recurse("tilt",    thick_elem),"tilt",    1);
@@ -2173,6 +2174,7 @@ element* SeqElList::create_thin_solenoid(const element* thick_elem, int slice_no
   }
   add_cmd_parameter_clone(cmd,return_param_recurse("apertype",thick_elem),"apertype",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("aperture",thick_elem),"aperture",1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("aper_offset",thick_elem),"aper_offset",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("aper_tol",thick_elem),"aper_tol",1);
   add_cmd_parameter_clone(cmd,return_param("bv",thick_elem),"bv",1);
   add_cmd_parameter_clone(cmd,return_param("tilt",thick_elem),"tilt",1);
@@ -2274,6 +2276,7 @@ element* SeqElList::create_thin_elseparator(const element* thick_elem, int slice
   }
   add_cmd_parameter_clone(cmd,return_param_recurse("apertype",thick_elem),"apertype",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("aperture",thick_elem),"aperture",1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("aper_offset",thick_elem),"aper_offset",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("aper_tol",thick_elem),"aper_tol",1);
   add_cmd_parameter_clone(cmd,return_param("bv",thick_elem),"bv",1);
   add_cmd_parameter_clone(cmd,return_param("tilt",thick_elem),"tilt",1);
