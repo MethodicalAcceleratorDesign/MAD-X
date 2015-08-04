@@ -781,6 +781,11 @@ make/system.Linux -text
 make/system.Windows -text
 make/tester.numdiff -text
 make/tester.rules -text
+name_mangler/Makefile -text
+name_mangler/name_mangler.cc -text
+name_mangler/name_mangler.h -text
+name_mangler/name_mangler.hh -text
+name_mangler/name_mangler_c.c -text
 scripts/asan_symbolize.py -text
 scripts/build-test-lxplus.sh -text
 scripts/build-test-macosx.sh -text
