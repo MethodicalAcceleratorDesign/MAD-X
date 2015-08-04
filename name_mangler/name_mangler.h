@@ -1,5 +1,9 @@
-#ifndef name_mangler_h
-#define name_mangler_h
+#ifndef name_mangler_hh
+#define name_mangler_hh
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define NAME_MANGLER_BASE 4
 #define NAME_MANGLER_SUFFIX 2
@@ -11,4 +15,9 @@ extern const char    *NameMangler_mangle(NameMangler_t *mangler, const char *str
 extern const char    *NameMangler_demangle(NameMangler_t *mangler, const char *str, char *dest );
 extern void           NameMangler_free(NameMangler_t *mangler );
 
-#endif /* name_mangler_h */
+
+#ifdef __cplusplus
+};
+#endif
+
+#endif /* name_mangler_hh */

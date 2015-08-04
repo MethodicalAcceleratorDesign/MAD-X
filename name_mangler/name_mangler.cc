@@ -4,7 +4,7 @@
 #include <string>
 #include <map>
 
-#include "name_mangler.hh"
+#include "name_mangler.h"
 
 class NameMangler {
 
