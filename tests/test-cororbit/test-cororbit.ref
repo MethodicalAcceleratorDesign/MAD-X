@@ -1159,7 +1159,7 @@ CORRECT, FLAG=ring,orbit=my_orbit,model=my_model,
 
          MODE=micado,cond=1,NCORR=300,ERROR=1E-6,PLANE=x,
 
-         mlist=mx.tab,clist='cx.tab', RESOUT=1,corzero=1;
+         mlist=mx.tab,clist='cx.tab', RESOUT=2,corzero=1;
 
 Want to correct orbit of a single ring
 Want to use orbit from: my_orbit
@@ -2084,7 +2084,7 @@ CORRECT, FLAG=ring,orbit=my_orbit,target=my_target1,model=my_model,
 
          MODE=micado,cond=1,NCORR=300,ERROR=1E-6,PLANE=y,
 
-         mlist=my.tab,clist='cy.tab', RESOUT=1,corzero=1;
+         mlist=my.tab,clist='cy.tab', RESOUT=3,corzero=1;
 
 Want to correct orbit of a single ring
 Want to use orbit from: my_orbit
@@ -2945,7 +2945,7 @@ CORRECT, FLAG=ring,orbit=my_orbit,target=my_target1,model=my_model,
 
          MODE=micado,cond=1,NCORR=300,ERROR=1E-6,PLANE=x,
 
-         mlist=mx.tab,clist='cx.tab', RESOUT=1,corzero=1;
+         mlist=mx.tab,clist='cx.tab', RESOUT=4,corzero=1;
 
 Want to correct orbit of a single ring
 Want to use orbit from: my_orbit
@@ -3910,7 +3910,7 @@ CORRECT, FLAG=ring,orbit=my_orbit,target=my_target2,model=my_model,
 
          MODE=micado,cond=1,NCORR=300,ERROR=1E-6,PLANE=x,
 
-         mlist=mx.tab,clist='cx.tab',RESOUT=1,corzero=1;
+         mlist=mx.tab,clist='cx.tab', RESOUT=5,corzero=1;
 
 Want to correct orbit of a single ring
 Want to use orbit from: my_orbit
@@ -4769,7 +4769,7 @@ CORRECT, FLAG=ring,orbit=my_orbit,target=my_target2,model=my_model,
 
          MODE=micado,cond=1,NCORR=300,ERROR=1E-6,PLANE=y,
 
-         mlist=my.tab,clist='cy.tab', RESOUT=1,corzero=1;
+         mlist=my.tab,clist='cy.tab', RESOUT=6,corzero=1;
 
 Want to correct orbit of a single ring
 Want to use orbit from: my_orbit

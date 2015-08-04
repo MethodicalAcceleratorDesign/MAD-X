@@ -57,13 +57,12 @@ static void correct_setcorr(struct in_cmd*);
 
 static void correct_correct1(struct in_cmd*);
 static int pro_correct_getactive(int ip, int *nm, int *nx, int *nc,
-    double *corvec, double *monvec, char *conm);
-static void pro_correct_write_results(double *monvec, double *resvec,
-    double *corvec, int *nx, int *nc, int *nm, int imon, int icor, int ip);
-static void pro_correct_fill_mon_table(int ip, char *name, double old,
-    double new_);
-static void pro_correct_fill_corr_table(int ip, char *name, double old,
-    double new_);
+				 double *corvec, double *monvec, char *conm);
+static void pro_correct_write_results(double *monvec, double *resvec, double *corvec, 
+				      int *nx, int *nc, int *nm, int imon, int icor, int ip, 
+				      int resout);
+static void pro_correct_fill_mon_table(int ip, char *name, double old, double new_);
+static void pro_correct_fill_corr_table(int ip, char *name, double old, double new_);
 static void pro_correct_make_mon_table(void);
 static void pro_correct_make_corr_table(void);
 static double* pro_correct_response_line(int ip, int nc, int nm);
@@ -79,20 +78,19 @@ static int pro_correct_getcommands(struct in_cmd*);
 // static void    pro_correct_option(struct in_cmd*);
 
 static void correct_correct2(struct in_cmd*);
-static void pro_correct2_fill_mon_table(int ip, char *name, double old,
-    double new_);
-static void pro_correct2_fill_corr_table(int b, int ip, char *name, double old,
-    double new_);
+static void pro_correct2_fill_mon_table(int ip, char *name, double old, double new_);
+static void pro_correct2_fill_corr_table(int b, int ip, char *name, double old, double new_);
 static void pro_correct2_make_mon_table(void);
 static void pro_correct2_make_corr_table(void);
 static double* pro_correct2_response_ring(int ip, int nc, int nm);
 static int pro_correct2_getactive(int ip, int *nm, int *nx, int *nc,
-    double *corvec, double *monvec, char *conm);
+				  double *corvec, double *monvec, char *conm);
 static int pro_correct2_getcorrs(struct in_cmd*);
 static int pro_correct2_getorbit(struct in_cmd*);
 static int pro_correct2_gettables(int iplane, struct in_cmd*);
-static void pro_correct2_write_results(double *monvec, double *resvec,
-    double *corvec, int *nx, int *nc, int *nm, int imon, int icor, int ip);
+static void pro_correct2_write_results(double *monvec, double *resvec, double *corvec, 
+				       int *nx, int *nc, int *nm, int imon, int icor, int ip,
+				       int resout);
 
 static void fill_orbit_table(struct table* t_out, struct table* t_in);
 
@@ -645,6 +643,7 @@ static void correct_correct2(struct in_cmd* cmd)
   int imon, icor;
   int ncorr, nmon;
   int niter;
+  int resout;
 
   int twism;
   int ifail;
@@ -705,7 +704,8 @@ static void correct_correct2(struct in_cmd* cmd)
   }
 
   /* Prepare file descriptors for the output */
-  if (command_par_value("resout", cmd->clone) > 0) {
+  resout = command_par_value("resout", cmd->clone);
+  if (resout > 0) {
     if (!fddata && !(fddata = fopen("corr.out" , "w"))) 
       fatal_error("Cannot open file corr.out with write access", ", MAD-X terminates ");
     if (!fcdata && !(fcdata = fopen("stren.out", "w")))   
@@ -808,7 +808,7 @@ static void correct_correct2(struct in_cmd* cmd)
     }
     if (ifail == 0) {
       pro_correct2_write_results(monvec, resvec, corvec, nx, nc, nm, imon,
-         icor, ip);
+				 icor, ip, resout);
     }
   }
 
@@ -1463,8 +1463,10 @@ static double* pro_correct2_response_ring(int ip, int nc, int nm) {
   return dmat;
 }
 
-static void pro_correct2_write_results(double *monvec, double *resvec,
-               double *corvec, int *nx, int *nc, int *nm, int imon, int icor, int ip) {
+static void pro_correct2_write_results(double *monvec, double *resvec, double *corvec, 
+				       int *nx, int *nc, int *nm, int imon, int icor, int ip, 
+				       int resout) 
+{
   /*                                              */
   /* Writes a summary of the correction           */
   /* Writes correctors strengths into sequences   */
@@ -1545,8 +1547,8 @@ static void pro_correct2_write_results(double *monvec, double *resvec,
 				     c[nc[i]].p_node_s1->chkick);
 	/* ??? c[nc[i]].p_node_s1->other_bv*0.001*corvec[nx[i]-1]); */
 	if (fcdata != NULL ) {
-	  fprintf(fcdata, "[1] %s = %e;\n", c[nc[i]].p_node->name,
-		  c[nc[i]].p_node_s1->other_bv * 0.001 * corvec[nx[i] - 1]);
+	  fprintf(fcdata, "%s->hkick = %e; \t! [1] %d\n", strip(c[nc[i]].p_node->name),
+		  c[nc[i]].p_node_s1->other_bv * 0.001 * corvec[nx[i] - 1], resout);
 	}
       }
       /* Fill horizontal corrections for beam 2  */
@@ -1556,7 +1558,8 @@ static void pro_correct2_write_results(double *monvec, double *resvec,
 				     c[nc[i]].p_node_s2->chkick);
 	/* ??? c[nc[i]].p_node_s2->other_bv*0.001*corvec[nx[i]-1]); */
 	if (fcdata != NULL ) {
-	  fprintf(fcdata, "[2] %s = %e;\n", c[nc[i]].p_node->name, 0.001 * corvec[nx[i] - 1]);
+	  fprintf(fcdata, "%s->hkick = %e; \t! [2] %d\n", strip(c[nc[i]].p_node->name), 
+		  0.001 * corvec[nx[i] - 1], resout);
 	}
       }
 
@@ -1568,8 +1571,8 @@ static void pro_correct2_write_results(double *monvec, double *resvec,
 				     c[nc[i]].p_node_s1->cvkick);
 	/* ??? c[nc[i]].p_node_s1->other_bv*0.001*corvec[nx[i]-1]); */
 	if (fcdata != NULL ) {
-	  fprintf(fcdata, "[1] %s = %e;\n", c[nc[i]].p_node->name,
-		  c[nc[i]].p_node_s1->other_bv * 0.001 * corvec[nx[i] - 1]);
+	  fprintf(fcdata, "%s->vkick = %e; \t! [1] %d\n", strip(c[nc[i]].p_node->name),
+		  c[nc[i]].p_node_s1->other_bv * 0.001 * corvec[nx[i] - 1], resout);
 	}
       }
       if (c[nc[i]].id_ttb[1] > 0) {
@@ -1579,7 +1582,8 @@ static void pro_correct2_write_results(double *monvec, double *resvec,
 				     c[nc[i]].p_node_s2->cvkick);
 	/* ??? c[nc[i]].p_node_s2->other_bv*0.001*corvec[nx[i]-1]); */
 	if (fcdata != NULL ) {
-	  fprintf(fcdata, "[2] %s = %e;\n", c[nc[i]].p_node->name, 0.001 * corvec[nx[i] - 1]);
+	  fprintf(fcdata, "%s->vkick = %e; \t! [2] %d\n", strip(c[nc[i]].p_node->name), 
+		  0.001 * corvec[nx[i] - 1], resout);
 	}
       }
     }
@@ -1600,7 +1604,8 @@ static void correct_correct1(struct in_cmd* cmd)
   int imon, icor;
   int ncorr, nmon;
   int niter;
-  
+  int resout;
+
   int twism;
   int ifail, sflag; 
   double rms;
@@ -1655,7 +1660,8 @@ static void correct_correct1(struct in_cmd* cmd)
   }
 
   /* Prepare file descriptors for the output */
-  if (command_par_value("resout", cmd->clone) > 0) {
+  resout = command_par_value("resout", cmd->clone);
+  if (resout > 0) {
     if (!fddata && !(fddata = fopen("corr.out" , "w"))) 
       fatal_error("Cannot open file corr.out with write access", ", MAD-X terminates ");
     if (!fcdata && !(fcdata = fopen("stren.out", "w")))   
@@ -1796,13 +1802,13 @@ static void correct_correct1(struct in_cmd* cmd)
   /* LSQ correction, use all available correctors */
   if (strcmp("lsq", command_par_string("mode", cmd->clone)) == 0) {
     c_haveit(dmat, monvec, corvec, resvec, nx, imon, icor);
-    pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon, icor, ip);
+    pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon, icor, ip, resout);
   }
 
   /* SVD correction, use all available correctors */
   else if (strcmp("svd", command_par_string("mode", cmd->clone)) == 0) {
     sflag = c_svdcorr(dmat, monvec, corvec, resvec, nx, imon, icor);
-    pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon, icor, ip);
+    pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon, icor, ip, resout);
   }
 
   /* MICADO correction, get desired number of correctors from command */
@@ -1829,7 +1835,7 @@ static void correct_correct1(struct in_cmd* cmd)
     ifail = c_micit(dmat, conm, monvec, corvec, resvec, nx, rms, imon, icor, niter);
 
     if (ifail == 0)
-      pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon, icor, ip);
+      pro_correct_write_results(monvec, resvec, corvec, nx, nc, nm, imon, icor, ip, resout);
     else {
       printf("MICADO correction completed with error code %d\n\n", ifail);
       warning("MICADO back with error", ", no correction done");
@@ -3017,8 +3023,9 @@ static void pro_correct2_fill_mon_table(int ip, char *name, double old, double n
   }
 }
 
-static void pro_correct_write_results(double *monvec, double *resvec,
-              double *corvec, int *nx, int *nc, int *nm, int imon, int icor, int ip)
+static void pro_correct_write_results(double *monvec, double *resvec, double *corvec, 
+				      int *nx, int *nc, int *nm, int imon, int icor, int ip, 
+				      int resout)
 /*                                              */
 /* Writes a summary of the correction           */
 /* Writes correctors strengths into sequences   */
@@ -3082,6 +3089,8 @@ static void pro_correct_write_results(double *monvec, double *resvec,
     printf("             (mrad)     (mrad)       (mrad)  \n");
   }
 
+  if (fcdata != NULL ) fprintf(fcdata, "\n! RESOUT = %d\n", resout);
+
   for (i = 0; i < icor; i++) { /* loop over all correctors */
 
     if (print_correct_opt > 1) {
@@ -3099,8 +3108,8 @@ static void pro_correct_write_results(double *monvec, double *resvec,
 				  c[nc[i]].p_node->chkick);
       /*                          c[nc[i]].p_node->other_bv*0.001*corvec[nx[i]-1]); */
       if (fcdata != NULL ) {
-	fprintf(fcdata, "%s = %e;\n", c[nc[i]].p_node->name,
-		c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1]);
+	fprintf(fcdata, "%s->hkick = %e; \t! %d\n", strip(c[nc[i]].p_node->name),
+		c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1], resout);
       }
     } else if (ip == 2) {
       c[nc[i]].p_node->cvkick += c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1];
@@ -3109,8 +3118,8 @@ static void pro_correct_write_results(double *monvec, double *resvec,
 				  c[nc[i]].p_node->cvkick);
       /*                          c[nc[i]].p_node->other_bv*0.001*corvec[nx[i]-1]); */
       if (fcdata != NULL ) {
-	fprintf(fcdata, "%s = %e;\n", c[nc[i]].p_node->name,
-		c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1]);
+	fprintf(fcdata, "%s->vkick = %e; \t! %d\n", strip(c[nc[i]].p_node->name),	
+		c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1], resout);
       }
     }
   } /* end of loop over correctors */
