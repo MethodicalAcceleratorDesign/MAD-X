@@ -191,7 +191,8 @@ char  int_format[20],             /* current integer format */
 char  blank[] = "    ";
 char  none[] = "none";
 char  one_string[] = "1";
-char  aptwfile[FNAME_L] = "dummy";
+// 2015-Jul-31  11:41:59  ghislain: aperture twiss file for output of twiss table ! not needed
+//char  aptwfile[FNAME_L] = "dummy";
 char* aux_char_pt;               /* for debug purposes */
 char* exx;
 char* current_link_group;

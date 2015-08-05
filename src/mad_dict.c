@@ -268,12 +268,6 @@ char command_def[] =
 "dummy    = [s, 0]; "
 " "
 "option: control none 0 0 "
-"bborbit          = [l, false, true], " /* frs */
-"bb_ultra_relati  = [l, false, true], " /* frs */
-"bb_sxy_update    = [l, false, true], " /* frs */
-"emittance_update = [l, true,  true], " /* frs */
-"fast_error_func  = [l, false, true], " /* frs */
-"exit_loss_turn   = [l, false, true], " /* frs */
 "echo      = [l, true, true], "
 "echomacro = [l, false, true], " /* ld */
 "info      = [l, true, true], "
@@ -289,7 +283,14 @@ char command_def[] =
 "verify    = [l, false, true], "
 "no_fatal_stop= [l, false, true], "
 "twiss_print  = [l, true, true], "
-"warn     = [l, true, true]; "
+"warn     = [l, true, true], "
+  /* BB and SPCH related options */
+"bborbit          = [l, false, true], " /* frs */
+"bb_ultra_relati  = [l, false, true], " /* frs */
+"bb_sxy_update    = [l, false, true], " /* frs */
+"emittance_update = [l, true,  true], " /* frs */
+"fast_error_func  = [l, false, true], " /* frs */
+"exit_loss_turn   = [l, false, true]; " /* frs */
 " "
 "plot: control none 0 0 "
 "vaxis    = [s, {none}], "
@@ -2456,9 +2457,11 @@ char command_def[] =
 "makethin: makethin none 0 0 "
 "style    = [s, teapot, teapot], "
 "sequence = [s, none, none], "
+"makedipedge = [l, true, true], "
+  /* "verbose = [l, false, true], " will replace the "option, verbose" used only by makethin */
 "makeconsistent = [l, false, true],  " /*hbu */
-"minimizeparents = [l, true, false], " /*hbu */
-"makedipedge = [l, true, true]; "     /*hbu, 07/2012, in future by default on */
+"minimizeparents = [l, true, false]; " /*hbu */
+
 " "
 "survey: survey none 0 0 "
 "x0       = [r, 0],   y0     = [r, 0], z0       = [r, 0], "
