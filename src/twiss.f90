@@ -2282,12 +2282,12 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
   go to ( 10,  20,  30,  40,  50,  60,  70,  80,  90, 100,      &
        110, 120, 130, 140, 150, 160, 170, 180, 190, 200,        &
        210, 220, 230, 240, 250, 260,  10, 280, 290, 310,        &
-       310, 310, 300, 310, 310, 310, 310, 310, 310, 310,	&
+       310, 310, 300, 310, 310, 310, 370, 310, 310, 310,	&
        310, 420, 430, 440), code  ! Enable non-linear thin lens and RF-Multipole  
   !     310, 310, 310), ! Disable non-linear thin lens and RF-Multipole
   ! 2015-Mar-18  14:04:54  ghislain: code 44 is temporary for collimators different from ecoll (code 20) and rcoll (code 21)
 
-  !---- Drift space, monitor, collimator, or beam instrument.
+  !---- Drift space, monitor, collimator, or beam instrument, or crab-cavity
 10 continue
 170 continue
 180 continue
@@ -2295,6 +2295,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
 200 continue
 210 continue
 240 continue
+370 continue
 440 continue
   call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   go to 500
@@ -2381,7 +2382,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
   go to 500
 
   !---- LCAV cavity.
-  continue
+270 continue
 
   !---- Reserved.
 280 continue
@@ -2437,12 +2438,16 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
   integer, external :: el_par_vector
   integer elpar_vl
+  logical kill_ent_fringe, kill_exi_fringe
   parameter(zero=0d0,one=1d0,two=2d0,three=3d0)
 
   !---- Initialize.
   ct=zero
   st=zero
   code = node_value('mad8_type ')
+  kill_ent_fringe = node_value('kill_ent_fringe ') .ne. 0d0
+  kill_exi_fringe = node_value('kill_exi_fringe ') .ne. 0d0
+
   if(code.eq.39) code=15
   if(code.eq.38) code=24
   deltap=zero
@@ -2531,9 +2536,11 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
         el0=el/two
         call tmsect(.true.,el0,h,dh,sk1,sk2,ek,re,te)
         !---- Fringe fields.
-        corr = (h + h) * hgap * fint
-        call tmfrng(.true.,h,sk1,e1,h1,one,corr,rw,tw)
-        call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
+        if (.not.kill_ent_fringe) then
+           corr = (h + h) * hgap * fint
+           call tmfrng(.true.,h,sk1,e1,h1,one,corr,rw,tw)
+           call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
+        endif
         !---- Apply tilt.
         if (tilt .ne. zero) then
            call tmtilt(.true.,tilt,ek,re,te)
@@ -2551,20 +2558,23 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
      endif
      !---- End
 
+     !---- Get map for body section
      call tmsect(.true.,el,h,dh,sk1,sk2,ek,re,te)
 
-     !---- Fringe fields.
-     corr = (h + h) * hgap * fint
-     call tmfrng(.true.,h,sk1,e1,h1,one,corr,rw,tw)
-     call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
-     !---- Tor: use FINTX if set
-     if (fintx .ge. 0) then
-        corr = (h + h) * hgap * fintx
-     else
+     !---- Get map for entrance fringe field and concatenate
+     if (.not.kill_ent_fringe) then
         corr = (h + h) * hgap * fint
+        call tmfrng(.true.,h,sk1,e1,h1,one,corr,rw,tw)
+        call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
      endif
-     call tmfrng(.true.,h,sk1,e2,h2,-one,corr,rw,tw)
-     call tmcat1(.true.,ek0,rw,tw,ek,re,te,ek,re,te)
+  
+   !---- Get map for exit fringe fields and concatenate
+     if (.not.kill_exi_fringe) then
+        if (fintx .lt. 0) fintx = fint
+        corr = (h + h) * hgap * fintx
+        call tmfrng(.true.,h,sk1,e2,h2,-one,corr,rw,tw)
+        call tmcat1(.true.,ek0,rw,tw,ek,re,te,ek,re,te)
+     endif
 
      !---- Apply tilt.
      if (tilt .ne. zero) then

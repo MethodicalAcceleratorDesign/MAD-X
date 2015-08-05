@@ -82,3 +82,8 @@ if ctest_missing:
         else:
             print('numdiff_test('+test+' 0)')
 
+# Print tests that don't exist:
+for test in ctest_all:
+    path=os.path.join('..','tests',test,test+'.madx')
+    if not os.path.exists(path):
+        print("{} is missing".format(test))

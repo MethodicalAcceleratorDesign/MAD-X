@@ -1,7 +1,7 @@
 %%\title{Conventions}
 %  Changed by: Chris ISELIN, 27-Mar-1997 
 %  Changed by: Hans Grote, 25-Sep-2002 
-%  Changed by: Ghislain ROY, 24-Jan-2014
+%  Changed by: Ghislain ROY, 30-Jul-2015
 
 \chapter{Conventions}
 \label{chap:conventions}
@@ -736,10 +736,10 @@ A_s =
 \end{equation}
 Taking \(\vec{B} = \nabla \times \vec{A}\) in curvilinear coordinates,
 the field components can be computed as  
-\begin{equation}
+\begin{equation}\label{eq:field_components}
 \begin{aligned}
 B_x(x,y) = &+ B_1\,\Big(y+\frac{h^2}{6}y^3+\cdots\Big)  &  \\
-           &+ B_2\,\Big(xy - \frac{h^3}{6}y^3+\cdots \Big) &+ B_3\,\Big(\frac{1}{6}(3x^2y-y^3)+ \cdots \Big)+\cdots\\
+           &+ B_2\,\Big(xy - \frac{h}{6}y^3+\cdots \Big) &+ B_3\,\Big(\frac{1}{6}(3x^2y-y^3)+ \cdots \Big)+\cdots\\
 B_y(x,y)=  &+ B_0   &+ B_1\,\Big(x-\frac{h}{2}y^2+\frac{h^2}{2}xy^2+\cdots \Big)\\
            &+ B_2\,\Big(\frac{1}{2}(x^2-y^2)-\frac{h}{2}xy^2+\cdots \Big) &+ B_3\,\Big(\frac{1}{6}(x^3-3xy^2)+ \cdots \Big)+\cdots
 \end{aligned}
