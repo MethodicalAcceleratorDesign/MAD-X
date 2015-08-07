@@ -1,97 +1,3 @@
-! *********************************************************************
-subroutine cavtouschek (um,uloss,iflag)
-
-  use name_lenfi
-  use touschekfi
-  implicit none
-
-  integer i,lg,code,get_string,restart_sequ,advance_node,           &
-       double_from_table_row,flag,iflag
-  double precision get_value,node_value,el,rfv,rff,rfl,             &
-       um,harmonl,get_variable,pi,                                       &
-       phirf, c0, vrf, pc, omega, orbit5,                                &
-       twopi, ten3m,                                                     &
-       ten6p, zero, one, two, half, eta,                                 &
-       qover, fq, uloss, vrfsum, harmonlm,                               &
-       umt,synch_2
-
-
-  character(name_len) sequ_name,el_name
-  parameter(zero=0d0,one=1d0,two=2d0,half=5d-1,ten6p=1d6,ten3m=1d-3)
-
-  !---- Initialize.
-  qover = zero
-  vrfsum = zero
-  harmonlm = ten6p
-  umt = 0.d0
-  iflag = 0
-
-  flag = double_from_table_row('summ ','synch_2 ',1,synch_2)
-  if (synch_2 .eq. 0) then
-     iflag = 1
-     uloss = 0d0
-  else
-     uloss = 2d0/3d0*arad*en0**4*beta**3*synch_2*1d3/(amass)**3
-  endif
-  twopi=get_variable('twopi ')
-  pi=get_variable('pi ')
-  um=0.d0
-
-  lg = get_string('sequence ', 'name ', sequ_name)
-
-  i = restart_sequ()
-10 continue
-  code = node_value('mad8_type ')
-  if(code.eq.39) code=15
-  if(code.eq.38) code=24
-  ! cavity
-  if (code .eq. 10) then
-     lg = get_string('element ', 'name ', el_name)
-     el = node_value('l ')
-     rfv = node_value('volt ')
-     rff = node_value('freq ')
-     if (rff.eq.zero.or.rfv.eq.zero) goto 11
-     rfl = node_value('lag ')
-
-     harmonl = ten6p * rff * circ/clight
-
-     pc = get_value('probe ','pc ')
-
-     omega = rff * ten6p * twopi / clight
-     vrf   = rfv * ten3m / (pc * (one + deltap))
-
-     flag = double_from_table_row('twiss ','t ',1,orbit5)
-     phirf = rfl * twopi - omega * orbit5
-     c0 =   vrf*charge
-     if (cos(phirf).lt.0) vrf=-vrf
-     eta = alfa - one / gammas**2
-     if (uloss.ne.zero) then
-        qover = qover+rfv/uloss*charge
-        vrfsum = vrfsum+rfv/harmonl*charge
-        harmonlm=min(harmonl,harmonlm)
-     else
-        umt = umt+2d0/(harmonl*eta*pi)*c0
-     endif
-     
-  endif
-11 continue
-
-  if (advance_node().ne.0)  goto 10
-
-  if (uloss.ne.zero) then
-     fq = two*(sqrt(one-one/qover**2)*vrfsum*harmonlm                &
-          -uloss*acos(one/qover))
-     um = ten3m/(harmonlm*eta*pi)*fq/(pc*(one+deltap))
-  else
-     um = umt
-  endif
-
-  um=abs(um)*beta**2
-  
-  RETURN
-END subroutine cavtouschek
-
-! *********************************************************************
 subroutine touschek
   !--- 2013-Nov-26  15:41:21  ghislain: 
   !    rewrite of the original touschek routine (F.Zimmermann, C. Milardi) with different logic:
@@ -106,12 +12,11 @@ subroutine touschek
   !    The integration of the inverse lifetime along the elememt is then performed 
   !      considering a constant inverse lifetime along the element (see above) 
   !      and the length of the element
-
   use name_lenfi
   use physconsfi
   use touschekfi
+  use math_constfi, only : zero, one, two, four, eight, half
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   TOUSCHEK SCATTERING, TOUSCHEK Command                              *
@@ -120,19 +25,16 @@ subroutine touschek
   ! Attribute:                                                           *
   !   TABLE     (name)    Name of Twiss table.                           *
   !----------------------------------------------------------------------*
-  integer i, j, flag, iflag, range(2), table_output, lp, centre 
-  integer get_option, double_from_table_row, restart_sequ, &
-          string_from_table_row, advance_to_pos, get_string
-  double precision get_value, get_variable, DGAUSS, ftousch
-  double precision ccost, fact, rr, beta2, gamma2, tolerance, pi, pi2, &
-       uloss, km, um, &
-       bx, by, ax, ay, dx, dpx, dy, dpy, l, s, &
-       sigx2, sigy2, ddx2, ddy2, sigh2
-  double precision litousch, litouschp, tlitouschek, litouschw, tltouschek
+  integer :: i, j, flag, iflag, range(2), table_output, lp, centre 
+  double precision :: ccost, fact, rr, beta2, gamma2, tolerance, pi, pi2
+  double precision :: uloss, km, um, bx, by, ax, ay, dx, dpx, dy, dpy, l, s
+  double precision :: sigx2, sigy2, ddx2, ddy2, sigh2
+  double precision :: litousch, litouschp, tlitouschek, litouschw, tltouschek
+  character(len=name_len) :: name, sequ_name
 
-  external ftousch,dgauss
-
-  character(name_len) name,sequ_name
+  integer, external :: get_option, double_from_table_row, restart_sequ
+  integer, external :: string_from_table_row, advance_to_pos, get_string
+  double precision, external ::  get_value, get_variable, DGAUSS, ftousch
 
   pi=get_variable('pi ')
 
@@ -193,7 +95,7 @@ subroutine touschek
   
   beta2  = beta*beta
   gamma2 = gamma*gamma
-  ccost  = arad*arad * clight * parnum / (8d0*sqrt(pi) * gamma2*gamma2 * beta2)
+  ccost  = arad*arad * clight * parnum / (eight*sqrt(pi) * gamma2*gamma2 * beta2)
 
   tolerance    = get_value('touschek ', 'tolerance ')
   table_output = get_option('touschek_table ')
@@ -210,7 +112,7 @@ subroutine touschek
   um1 = um
   !--- setup boundaries for numerical integration
   km = ATAN(sqrt(um1))
-  pi2 = pi/2.d0
+  pi2 = pi/two
 
   if (um1.eq.0) then
      call aawarn('TOUSCHEK ', '  rf voltage = 0, rest skipped ')
@@ -234,10 +136,10 @@ subroutine touschek
   !    A zero value for previous inverse lifetime here does not matter because 
   !    first element in sequence is always a marker of zero length whose 
   !    contribution will be zero by integration over the length.
-  tlitouschek = 0.d0
-  litousch  = 0.d0
-  litouschp = 0.d0
-  litouschw = 0.d0
+  tlitouschek = zero
+  litousch  = zero
+  litouschp = zero
+  litouschw = zero
   
   !--- Start loop over elements in range
   do i = range(1), range(2)
@@ -262,7 +164,7 @@ subroutine touschek
      ddx2 = (dpx*bx+dx*ax)**2
      ddy2 = (dpy*by+dy*ay)**2
 
-     sigh2 = 1.d0 / ((1.d0/sige**2)+((dx**2+ddx2)/sigx2)+((dy**2+ddy2)/sigy2))
+     sigh2 = one / ((one/sige**2)+((dx**2+ddx2)/sigx2)+((dy**2+ddy2)/sigy2))
 
      fact = sqrt(sigh2)/(sigt*sige*ex*ey)
      
@@ -270,12 +172,12 @@ subroutine touschek
      !    They will be used inside the ftousch routine that will be integrated numerically
 
      fb1 = ( (sigx2-sigh2*ddx2) / ex**2 + (sigy2-sigh2*ddy2) / ey**2 )  &
-            / (2d0*beta2*gamma2)
+            / (two*beta2*gamma2)
 
      fb2 = sqrt( & 
           ( ( (sigx2-sigh2*ddx2) / ex**2 - (sigy2-sigh2*ddy2) / ey**2 )**2 &
-            + (4.d0 * sigh2**2 * ddx2 * ddy2) / (ex**2 * ey**2) ) &
-            / (4.d0 * beta2**2 * gamma2**2) )
+            + (four * sigh2**2 * ddx2 * ddy2) / (ex**2 * ey**2) ) &
+            / (four * beta2**2 * gamma2**2) )
 
      if ( get_option('debug ') .ne. 0 ) &
           write (10,*) s, sigx2, sigy2, ddx2, ddy2, sigh2, fact, fb1, fb2
@@ -289,13 +191,13 @@ subroutine touschek
         !    over total length of beamline
         litouschw = litousch * l / circ        
         if ( get_option('debug ') .ne. 0 ) &
-             write (7,*)  s, litousch, 0.d0, l, litouschw * circ, fb1, fb2
+             write (7,*)  s, litousch, zero, l, litouschw * circ, fb1, fb2
      else
         !--- Calculate contribution of current element by averaging Loss Rate 
         !    between exit of current element and entrance of current element, 
         !    or end of previous element, and normalising by element length
         !    over total length of beamline
-        litouschw = 0.5d0*(litousch + litouschp) * l / circ        
+        litouschw = half*(litousch + litouschp) * l / circ        
         if ( get_option('debug ') .ne. 0 ) &
              write (8,*)  s, litousch, litouschp, l, litouschw * circ, fb1, fb2
      endif
@@ -334,40 +236,119 @@ subroutine touschek
   return
   
 end subroutine touschek
-! ***************************************************************
 
-
-double precision function ftousch(k)
-
-  use physconsfi
+subroutine cavtouschek (um,uloss,iflag)
+  use name_lenfi
   use touschekfi
+  use math_constfi, only : zero, one, two, three, half, ten6p, ten3m
   implicit none
 
-  double precision  k, pi, get_variable,z,aftoush
-  double precision ZR,ZI,BJOR,BJOI,BJIR,BJII,                       &
-       BYOR,BYOI,BYIR,BYII
+  integer :: i, lg, code, flag, iflag
+  double precision :: el, rfv, rff, rfl, um, harmonl, phirf, c0, vrf, pc, omega, orbit5
+  double precision :: pi, twopi, eta, qover, fq, uloss, vrfsum, harmonlm, umt, synch_2
+  character(len=name_len) :: sequ_name, el_name
 
-  integer  iflag
+  integer, external :: get_string, restart_sequ, advance_node, double_from_table_row
+  double precision, external :: get_value, node_value, get_variable
+
+  !---- Initialize.
+  qover = zero
+  vrfsum = zero
+  harmonlm = ten6p
+  umt = zero
+  iflag = 0
+
+  flag = double_from_table_row('summ ','synch_2 ',1,synch_2)
+  if (synch_2 .eq. 0) then
+     iflag = 1
+     uloss = zero
+  else
+     uloss = two/three*arad*en0**4*beta**3*synch_2*1d3/(amass)**3
+  endif
+  twopi = get_variable('twopi ')
+  pi = get_variable('pi ')
+  um = zero
+
+  lg = get_string('sequence ', 'name ', sequ_name)
+
+  i = restart_sequ()
+10 continue
+  code = node_value('mad8_type ')
+  if(code.eq.39) code=15
+  if(code.eq.38) code=24
+  ! cavity
+  if (code .eq. 10) then
+     lg = get_string('element ', 'name ', el_name)
+     el = node_value('l ')
+     rfv = node_value('volt ')
+     rff = node_value('freq ')
+     if (rff.eq.zero.or.rfv.eq.zero) goto 11
+     rfl = node_value('lag ')
+
+     harmonl = ten6p * rff * circ/clight
+
+     pc = get_value('probe ','pc ')
+
+     omega = rff * ten6p * twopi / clight
+     vrf   = rfv * ten3m / (pc * (one + deltap))
+
+     flag = double_from_table_row('twiss ','t ',1,orbit5)
+     phirf = rfl * twopi - omega * orbit5
+     c0 =   vrf*charge
+     if (cos(phirf).lt.0) vrf=-vrf
+     eta = alfa - one / gammas**2
+     if (uloss.ne.zero) then
+        qover = qover+rfv/uloss*charge
+        vrfsum = vrfsum+rfv/harmonl*charge
+        harmonlm = min(harmonl,harmonlm)
+     else
+        umt = umt + two/(harmonl*eta*pi)*c0
+     endif
+     
+  endif
+11 continue
+
+  if (advance_node().ne.0)  goto 10
+
+  if (uloss.ne.zero) then
+     fq = two*(sqrt(one-one/qover**2)*vrfsum*harmonlm - uloss*acos(one/qover))
+     um = ten3m/(harmonlm*eta*pi) * fq/(pc*(one+deltap))
+  else
+     um = umt
+  endif
+
+  um = abs(um) * beta**2
+  
+  RETURN
+END subroutine cavtouschek
+
+double precision function ftousch(k)
+  use physconsfi
+  use touschekfi
+  use math_constfi, only : zero, one, two
+  implicit none
+
+  double precision, intent(IN) :: k
+
+  integer :: iflag
+  double precision :: z, aftoush
+  double precision :: ZR, ZI, BJOR, BJOI, BJIR, BJII, BYOR, BYOI, BYIR, BYII
 
   z = TAN(k)**2
-  !-- 2013-Nov-25  18:25:55  ghislain: commented since not used
-  ! pi=get_variable('pi ')
 
-  ZI = fb2*z
-  ZR = 0.
+  ZI = fb2 * z
+  ZR = zero
 
-  call CJYDBB(ZR,ZI,BJOR,BJOI,BJIR,BJII,                            &
-       BYOR,BYOI,BYIR,BYII,IFLAG)
+  call CJYDBB(ZR, ZI, BJOR, BJOI, BJIR, BJII, BYOR, BYOI, BYIR, BYII, IFLAG)
 
-  aftoush = 2d0*( ((2d0*z+1d0)**2*(z/um1/(1d0+z)-1d0)/z)+z-         &
-       sqrt(z*um1*(1d0+z))-(2d0+1d0/(2d0*z))*log(z/um1/(1d0+z)) )        &
-       *sqrt(1d0+z)
+  aftoush = two * sqrt(one+z) * & 
+       ( ((two*z+one)**2 * (z/um1/(one+z) - one)/z) + z - &
+       sqrt(z*um1*(one+z)) - (two + one/(two*z))*log(z/um1/(one+z)) ) 
 
-  if (iflag.eq.0) then
-     ftousch = aftoush*exp(-fb1*z)*BJOR
+  if (iflag .eq. 0) then
+     ftousch = aftoush * exp(-fb1*z) * BJOR
   else
-     ftousch = aftoush*BJOR*(exp(-(fb1-fb2)*z)+                      &
-          exp(-(fb1+fb2)*z))/2.d0
+     ftousch = aftoush * BJOR * (exp(-(fb1-fb2)*z) + exp(-(fb1+fb2)*z))/two
   end if
   
   return
@@ -412,11 +393,12 @@ end function ftousch
 !#include "kernnum/pilot.h"
 DOUBLE PRECISION FUNCTION DGAUSS(F,A,B,EPS)
   implicit none
-  integer i,LGFILE
-  DOUBLE PRECISION F,A,B,EPS
-  DOUBLE PRECISION W(12),X(12),AA,BB,C1,C2,U,S8,S16,CONST
-  LOGICAL MFLAG,RFLAG
+  DOUBLE PRECISION :: F, A, B, EPS
   EXTERNAL F
+
+  integer :: i, LGFILE
+  DOUBLE PRECISION :: W(12), X(12), AA, BB, C1, C2, U, S8, S16, CONST
+  LOGICAL :: MFLAG, RFLAG
   !
   !     ******************************************************************
   !

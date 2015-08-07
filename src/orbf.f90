@@ -1,5 +1,6 @@
 subroutine micit(a, conm, xin, cin, res, nx, rms, im, ic, iter, ny, ax, cinx, &
                  xinx, resx, rho, ptop, rmss, xrms, xptp, xiter, ifail)
+    use math_constfi, only : zero
     implicit none
     ! ****************************************************
     !                                                    *
@@ -20,9 +21,6 @@ subroutine micit(a, conm, xin, cin, res, nx, rms, im, ic, iter, ny, ax, cinx, &
     integer :: ny(ic)
     double precision :: rms, pt, rm
  
-    double precision :: calrms
-    double precision, parameter :: rzero=0d0
-
     write (*,'(/A, I5, A/)') 'start MICADO correction with ',iter,' correctors'
 
     ! translate corrector names to fortran strings
@@ -31,14 +29,14 @@ subroutine micit(a, conm, xin, cin, res, nx, rms, im, ic, iter, ny, ax, cinx, &
     enddo
 
     AX(:im,:ic) = A(:im,:ic)
-    CINX(:ic) = rzero
+    CINX(:ic) = zero
 
     NY(1:ic) = (/ (i, i = 1, ic) /) ! NY(i) = i 
 
     XINX(:im) = XIN(:im)
-    RESX(:im) = rzero
+    RESX(:im) = zero
 
-    rm = calrms(XINX,im)
+    rm = sqrt(dot_product(XINX,XINX)/float(im))
     if(rm.le.rms) then
        write(*,*) '++++++ WARNING: RMS already smaller than desired '
        write(*,*) '++++++ WARNING: no correction is done            '
@@ -67,6 +65,7 @@ subroutine haveit(a,xin,cin,res,nx,im,ic,cb,xmeas,xres,y,z,xd)
     !     Author: WFH  05.02.02                          *
     !                                                    *
     ! ****************************************************
+    use math_constfi, only : zero
     implicit none
 
     integer :: im, ic
@@ -78,8 +77,7 @@ subroutine haveit(a,xin,cin,res,nx,im,ic,cb,xmeas,xres,y,z,xd)
 
     integer :: i, j, ifail
     integer :: w(ic)
-    double precision, parameter :: zero=0d0
-      
+          
     write (*,'(/A/)') 'start LEAST SQUARES correction with all correctors'
 
     RES(:im) = zero
@@ -114,273 +112,10 @@ subroutine haveit(a,xin,cin,res,nx,im,ic,cb,xmeas,xres,y,z,xd)
 
     return
 end subroutine haveit
-      
-! subroutine svddec_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
-!                     ws,wvec,sortw,sngcut,sngval,im,ic,iflag,sing,dbg)
-!     ! ****************************************************
-!     !                                                    *
-!     !    Performs SVD and analysis for matrix with more  *
-!     !    monitors than correctors.                       *
-!     !                                                    *
-!     !     Author: WFH  12.09.02                          *
-!     !                                                    *
-!     ! ****************************************************
-!     implicit none
-
-!     integer :: im, ic
-!     double precision :: a(im,ic), svdmat(im,ic)
-!     double precision :: umat(im,ic), utmat(ic,im)
-!     double precision :: vmat(im,ic), vtmat(ic,im)
-!     double precision :: wmat(im,ic), wtmat(ic,im)
-!     double precision :: ws(ic), wvec(ic)
-!     integer :: sortw(ic)
-!     double precision :: sngval, sngcut
-!     integer :: iflag, sing(2,ic)
-!     integer :: dbg
-
-!     integer :: i, j, jj, ii
-!     integer :: amater, svdmx, svdnx, svdnm
-!     integer, parameter :: nsing=5
-!     logical :: matu, matv
-!     double precision :: rat
-!     double precision, parameter :: zero=0d0
-
-!      if(dbg.gt.0) then
-!        open(61,file='fort.61')
-       
-!        write(*,*) 'SVD parameters: '
-!        write(*,*) 'SNGCUT:         ',sngcut
-!        write(*,*) 'SNGVAL:         ',sngval
-!     endif
-
-!     matu = .TRUE.
-!     matv = .TRUE.
-!     iflag = 0
-
-!     svdnm = max(ic,im)
-!     svdmx = im
-!     svdnx = ic
-
-!     SVDMAT(:im,:ic) = A(:im,:ic)
-
-!     if(dbg.gt.0) then
-!        write(*,*) 'A0:'
-!        do  j = 1,im
-!           write(*,'(16(2X,F7.2))') (svdmat(j,i),i=1,ic)
-!        enddo
-!     endif
-
-!     call svd(svdnm,svdmx,svdnx,svdmat,wvec,matu,umat,matv,vmat,amater,ws)
-
-!     if(amater.ne.0) write(*,*) 'end SVD with error code: ',amater
-
-!     if(dbg.gt.0) then
-!        do  i = 1,ic
-!           write(*,'(1X,"Corrector: ",I4,"   sing: ",F12.4)') i,wvec(i)
-!           wmat(i,i) = wvec(i) 
-!        enddo
-!     endif
-
-!     call rvord(wvec,sortw,ws,ic)
-
-!     if(dbg.gt.0) then
-!        do  i = 1,ic
-!           write(*,*) i,sortw(i),wvec(sortw(i))
-!        enddo
-!     endif
-
-!     do  ii = 1,min(nsing,ic)
-!        i = sortw(ii)
-       
-!        if(dbg.gt.0) write(61,*) wvec(i)
-
-!        if(abs(wvec(i)).lt.sngval) then
-          
-!           if(dbg.gt.0) then
-!               do  j = 1,ic
-!                  write(*,'(A7,2I4,5X,2(F12.6,2X))') 'VMAT: ',i,j,vmat(j,i)
-!                  ! ghislain: strange we print the transpose here!!
-!               enddo
-!            endif
-
-!            do  j = 1,ic-1
-!               do  jj = j+1,ic
-
-!                  if(abs(vmat(j,i)).gt.1.0E-4) then
-!                     rat = abs(vmat(j,i)) + abs(vmat(jj,i))
-!                     ! rat = abs(vmat(j,i) - vmat(jj,i))
-!                     ! rat = abs(vmat(j,i) + vmat(jj,i))
-!                     rat = rat/abs(abs(vmat(j,i)) - abs(vmat(jj,i)))
-
-!                     if(dbg.eq.1) write(62,*) wvec(i),rat
-        
-!                     if(rat.gt.sngcut) then
-
-!                        if(dbg.gt.0) then
-!                           write(*,*)  'dependent pair: ',i,j,jj,rat
-!                           write(65,*) 'dependent pair: ',i,j,jj,rat
-!                        endif
-                       
-!                        ! Ghislain : was  "if(iflag.lt.(ic*ic*ic)) then"
-!                        ! triggered a bug on MICADO with ncond=1
-!                        if(iflag.lt.ic) then
-!                           iflag = iflag + 1
-!                           sing(1,iflag) =  j - 1
-!                           sing(2,iflag) = jj - 1
-!                        endif
-
-!                     endif
-
-!                  endif                 
-!               enddo
-!            enddo
-
-!         endif
-
-!      enddo
-
-!      if(dbg.gt.0) then
-!         do  j=1,iflag
-!            write(66,*) j,sing(1,j),sing(2,j)
-!         enddo
-
-!         close(61)
-!      endif
-    
-!     return
-! end subroutine svddec_m
-
-! subroutine svddec_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,    &
-!     &ws,wvec,sortw,sngcut,sngval,im,ic,iflag,sing,dbg)
-!     ! ****************************************************
-!     !                                                    *
-!     !    Performs SVD and analysis for matrix with more  *
-!     !    correctors than monitors.                       *
-!     !                                                    *
-!     !     Author: WFH  12.09.02                          *
-!     !                                                    *
-!     ! ****************************************************
-!     implicit none
-
-!     integer :: im, ic
-!     double precision :: a(im,ic), svdmat(ic,im)
-!     double precision :: umat(ic,im), utmat(im,ic)
-!     double precision :: vmat(ic,im), vtmat(im,ic)
-!     double precision :: wmat(ic,im), wtmat(im,ic)
-!     double precision :: ws(ic), wvec(ic)
-!     integer :: sortw(ic)
-!     double precision :: sngcut, sngval
-!     integer :: iflag, sing(2,ic)
-!     integer :: dbg
-
-!     integer :: i, j, ii, jj
-!     integer :: amater, svdmx, svdnx, svdnm
-!     integer, parameter :: nsing=5
-!     logical :: matu, matv
-!     double precision :: rat
-!     double precision, parameter :: zero=0d0
-
-!     if(dbg.gt.0) then
-!        open(61,file='fort.61')
-
-!         write(*,*) 'SVD parameters: '
-!         write(*,*) 'SNGCUT:         ',sngcut
-!         write(*,*) 'SNGVAL:         ',sngval
-!     endif
-
-!     matu = .TRUE.
-!     matv = .TRUE.
-!     iflag = 0
-
-!     svdnm = max(ic,im)
-!     svdmx = ic
-!     svdnx = im
-
-!     SVDMAT(:ic,:im) = transpose(A(:im,:ic))
-    
-!     if(dbg.gt.0) then
-!        write(*,*) 'A0:'
-!        do  j = 1,ic
-!           write(*,'(16(2X,F7.2))') (svdmat(j,i),i=1,im)
-!        enddo
-!     endif
-
-!     call svd(svdnm,svdmx,svdnx,svdmat,wvec,matu,umat,matv,vmat,amater,ws)
-
-!     if(amater.ne.0) write(*,*) 'end SVD with error code: ',amater
-
-!     if(dbg.gt.0) then
-!        do  i = 1,im
-!           write(*,'(1X,"Corrector: ",I4,"   sing: ",F12.4)') i,wvec(i)
-!           wmat(i,i) = wvec(i) 
-!        enddo
-!     endif
-
-!     call rvord(wvec,sortw,ws,im)
-
-!     if(dbg.gt.0) then
-!         do  i = 1,im
-!             write(*,*) i,sortw(i),wvec(sortw(i))
-!         enddo
-!     endif
-
-!     do  ii = 1,min(nsing,im)
-!         i = sortw(ii)
-
-!         if(dbg.gt.0) write(61,*) wvec(i)
-
-!         if(abs(wvec(i)).lt.sngval) then
-           
-!            if(dbg.gt.0) then
-!               do  j = 1,ic
-!                  write(*,'(A7,2I4,5X,2(F12.6,2X))') 'UMAT: ',i,j,umat(j,i)
-!               enddo
-!            endif
-
-!            do  j = 1,ic-1
-!               do  jj = j+1,ic
-
-!                  if(abs(umat(j,i)).gt.1.0E-4) then
-!                     ! rat = abs(umat(j,i) - umat(jj,i))
-!                     rat = abs(umat(j,i)) +  abs(umat(jj,i))
-!                     rat = rat/abs(abs(umat(j,i)) - abs(umat(jj,i)))
-                    
-!                     if(dbg.gt.0) write(62,*) wvec(i),rat
-                    
-!                     if(rat.gt.sngcut) then
-!                        if(dbg.gt.0) then
-!                           write(*,*)  'dependent pair: ',j,jj,rat
-!                           write(65,*) 'dependent pair: ',j,jj,rat
-!                        endif
-                        
-!                        if(iflag.lt.ic) then
-!                           iflag = iflag + 1
-!                           sing(1,iflag) =  j - 1
-!                           sing(2,iflag) = jj - 1
-!                         endif
-!                      endif
-!                   endif
- 
-!                enddo
-!             enddo
-            
-!         endif
-
-!     enddo
-
-!     if(dbg.gt.0) then
-!        do  j=1,iflag
-!           write(66,*) j,sing(1,j),sing(2,j)
-!        enddo
-       
-!        close(61)
-!     endif
-
-!     return
-! end subroutine svddec_c
 
 subroutine svddec(a, svdmat, umat, vmat, ws, wvec, sortw, &
                   sngcut, sngval, im, ic, iflag, sing, dbg)
+    use math_constfi, only : zero
     implicit none
     ! ****************************************************
     !                                                    *
@@ -403,8 +138,6 @@ subroutine svddec(a, svdmat, umat, vmat, ws, wvec, sortw, &
     integer :: i, j, jj, ii, errflag
     integer, parameter :: nsing=5
     double precision :: rat
-
-    double precision, parameter :: zero=0d0
 
     SVDMAT(:im,:ic) = A(:im,:ic)
 
@@ -441,279 +174,9 @@ subroutine svddec(a, svdmat, umat, vmat, ws, wvec, sortw, &
 
 end subroutine svddec
 
-! subroutine svdcorr_m(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
-!      xin,xc,xout,xa,xb,xpred,ws,wvec,sortw,nx,im,ic,iflag,dbg)
-!     implicit none
-!     ! ******************************************************
-!     !                                                      *
-!     !    Performs SVD and correction for matrix with more  *
-!     !    monitors than correctors.                         *
-!     !                                                      *
-!     !     Author: WFH  12.09.02                            *
-!     !                                                      *
-!     ! ******************************************************
-!     integer :: im, ic ! im > ic    
-!     double precision :: a(im,ic), svdmat(im,ic)
-!     double precision :: umat(im,ic), utmat(ic,im) ! 
-!     !double precision :: vmat(im,ic), vtmat(ic,im) ! should be sized (ic,ic) but svd routine needs (im,ic)
-!     double precision :: vmat(im,ic), vtmat(ic,ic) ! vmat should be sized (ic,ic) but svd routine needs (im,ic)
-!     !double precision :: wmat(im,ic), wtmat(ic,im) ! should be sized (ic,ic) 
-!     double precision :: wmat(ic,ic), wtmat(ic,ic)  ! correct sizing
-!     double precision :: xin(im), xout(im), xc(ic)
-!     !double precision :: xa(im), xb(im), xpred(im) 
-!     double precision :: xa(ic), xb(im), xpred(im) 
-!     double precision :: ws(ic), wvec(ic)
-!     integer :: sortw(ic), nx(ic)
-!     integer :: iflag, dbg
-
-!     integer :: i, j
-!     double precision :: ainv(ic,im)
-!     !logical :: matu, matv
-!     !matu = .TRUE. ; matv = .TRUE.
-!     !iflag = 0 
- 
-!     write(*,*) ' '
-!     write(*,*) 'start SVD correction using ',ic,' correctors'
-!     write(*,*) ' '
-    
-!     if(dbg.gt.0) then
-!        write(*,*) 'A0:'
-!        do  j = 1, im
-!           write(*,'(16(2X,F7.2))') (A(j,i),i=1,ic)
-!        enddo
-!     endif
-
-!     SVDMAT(:im,:ic) = A(:im,:ic) ! copy of input array because SVD could modify it
-
-!     call svd(im,im,ic,svdmat,wvec,.true.,umat,.true.,vmat,iflag,ws)
-!     if (iflag.ne.0) call aawarn('svdcorr_m: ','end SVD with error code: '//char(iflag)) 
-
-!     WMAT = 0.d0 ; WTMAT = 0.d0
-!     do  i = 1,ic
-!        ! convert vector of singular value to diagonal matrix
-!        wmat(i,i) = wvec(i) 
-!        ! build transpose with filter on singular values
-!        if(abs(wvec(i)).gt.1.0001) wtmat(i,i) = 1/wvec(i) 
-!     enddo
-
-!     ! reshape VMAT before making final calculations
-!     VMAT = reshape(VMAT,(/ic,ic/))
-    
-!     VTMAT = transpose(VMAT)
-!     UTMAT = transpose(UMAT)
-
-!     ! 2015-Jun-30  14:49:17  ghislain: the following statement can lead to memory
-!     ! error since im > ic and UTMAT is dimensioned UTMAT(ic, im)
-!     !XA(:im) = matmul(UTMAT(:im,:im), XIN(:im)) ! take submatrix of UTMAT
-!     !XA(:ic) = matmul(UTMAT(:ic,:im), XIN(:im)) 
-!     !XB(:ic) = matmul(WTMAT(:ic,:ic), XA(:ic))
-!     !XC(:ic) = matmul(VMAT(:ic,:ic), XB(:ic))
-
-
-!     ! AINV = matmul(VMAT, matmul(WTMAT,UTMAT))
-!     AINV(:ic,:im) = matmul(VMAT(:ic,:ic),matmul(WTMAT(:ic,:ic),UTMAT(:ic,:im)))
-
-!     XC = matmul(AINV,XIN)
-!     XPRED = matmul(SVDMAT, XC)
-
-!     ! as coded (can crash memoy...)
-!     ! XPRED(im) = SVDMAT(im,ic) * VMAT(ic,ic) * WTMAT(ic,im) * UTMAT(im,im) * XIN(im)
-
-!     ! as dimensioned (does not compile)
-!     ! XPRED(im) = SVDNAT(im,ic) * VMAT(im,ic) * WTMAT(ic,im) * UTMAT(ic,im) * XIN(im)
-
-!     ! should be
-!     ! XPRED(im) = SVDMAT(im,ic) * VTMAT(ic,im) * WMAT(im,ic) * UTMAT(ic,im) * XIN(im)
-
-!     XOUT(:im) = XIN(:im) - XPRED(:im)
-!     XC(:ic) = - XC(:ic)
-
-!     if(dbg.gt.0) then
-!        do i =1, ic
-!           write(*,'(1X,"Corrector: ",I4,"   sing: ",F12.4)') i,wvec(i)
-!        enddo
-!        call rvord(wvec,sortw,ws,ic)
-!        write (*,*) 'Sorted vector of singular values: i sortw(i) wvec(sortw(i)) '
-!        do  i = 1,ic
-!           write(*,*) i,sortw(i),wvec(sortw(i))
-!        enddo
-!        write(*,*) 'A1:'
-!        do  j = 1,im
-!           write(*,'(16(2X,F7.2))') (svdmat(j,i),i=1,ic)
-!        enddo
-!        write(*,*) ' '       
-!        write(*,*) 'Va:'
-!        do  j = 1,ic
-!           write(*,'(16(2X,F7.2))') (vmat(j,i),i=1,ic)
-!        enddo
-!        write(*,*) 'Vt:'
-!        do  j = 1,ic
-!           write(*,'(16(2X,F7.2))') (vtmat(j,i),i=1,ic)
-!        enddo
-!        write(*,*) 'W:'
-!        do  j = 1,im
-!           write(*,'(16(2X,F7.2))') (wmat(j,i),i=1,ic)
-!        enddo
-!        write(*,*) 'Wt:'
-!        do  j = 1,ic
-!           write(*,'(16(2X,F7.2))') (wtmat(j,i),i=1,im)
-!        enddo
-!        write(*,*) 'U:'
-!        do  j = 1,im
-!           write(*,'(16(2X,F7.2))') (umat(j,i),i=1,im)
-!        enddo
-!        write(*,*) 'Ut:'
-!        do  j = 1,im
-!           write(*,'(16(2X,F7.2))') (utmat(j,i),i=1,im)
-!        enddo
-!        write(*,*) ' '             
-!        write(*,*) "correctors: ", xc
-!        write(*,*) ' '       
-!        write(*,*) "monitors:   ", xpred
-!     endif
-
-!     return
-! end subroutine svdcorr_m
-
-! subroutine svdcorr_c(a,svdmat,umat,vmat,wmat,utmat,vtmat,wtmat,   &
-!      xin,xc,xout,xa,xb,xpred,ws,wvec,sortw,nx,im,ic,iflag,dbg)
-!     implicit none
-!     ! ******************************************************
-!     !                                                      *
-!     !    Performs SVD and correction for matrix with more  *
-!     !    correctors than monitors.                         *
-!     !                                                      *
-!     !     Author: WFH  12.09.02                            *
-!     !                                                      *
-!     ! ******************************************************
-!     integer :: im, ic ! ic > im
-!     double precision :: a(im,ic), svdmat(ic,im)
-!     double precision :: umat(ic,im), utmat(im,ic)
-!     !double precision :: vmat(ic,im), vtmat(im,ic)
-!     double precision :: vmat(ic,ic), vtmat(ic,ic)
-!     !double precision :: wmat(ic,im), wtmat(im,ic)
-!     double precision :: wmat(ic,ic), wtmat(ic,ic)
-!     double precision :: xin(im), xout(im), xc(ic)
-!     !double precision :: xa(im), xb(im), xpred(im)
-!     double precision :: xa(ic), xb(im), xpred(im)
-!     double precision :: ws(ic), wvec(ic)
-!     integer :: sortw(ic), nx(ic)    
-!     integer :: iflag, dbg
-
-!     integer :: i, j
-!     !integer :: amater, svdmx, svdnx, svdnm
-!     !logical :: matu, matv
-    
-!     !matu = .TRUE.
-!     !matv = .TRUE.
-!     !iflag = 0
-
-!     write(*,*) ' '
-!     write(*,*) 'start SVD correction using ',ic,' correctors'
-!     write(*,*) ' '
-
-!     !svdnm = max(ic,im)
-!     !svdmx = ic
-!     !svdnx = im
-
-!     NX(1:ic) = (/ (i, i = 1, ic) /) ! NX(i) = i  
-
-!     if(dbg.gt.0) then
-!        write(*,*) 'A0:'
-!        do  j = 1,ic
-!           write(*,'(16(2X,F7.2))') (svdmat(j,i),i=1,im)
-!        enddo
-!     endif
-
-!     SVDMAT(:ic,:im) = transpose(A(:im,:ic))
-
-!     !call svd(svdnm,svdmx,svdnx,svdmat,wvec,matu,umat,matv,vmat,amater,ws)
-!     call svd(ic,im,ic,svdmat,wvec,.true.,umat,.true.,vmat,iflag,ws)
-!     if (iflag.ne.0) call aawarn('svdcorr_c: ','end SVD with error code: '//char(iflag)) 
-
-!     !if(amater.ne.0) write(*,*) 'end SVD with error code: ',amater
-
-!     WMAT = 0.d0 ; WTMAT = 0.d0
-!     do  i = 1,im
-!        ! convert vector of singular value to diagonal matrix
-!        wmat(i,i) = wvec(i)
-!        ! build transpose with filter on singular values
-!        if(abs(wvec(i)).gt.1.0001) wtmat(i,i) = 1/wvec(i) 
-!     enddo
-
-
-!     !VTMAT(:im,:ic) = transpose(VMAT(:ic,:im))
-!     VTMAT(:ic,:ic) = transpose(VMAT(:ic,:ic))
-!     UTMAT(:im,:ic) = transpose(UMAT(:ic,:im))
-
-!     ! XC = UMAT * WTMAT * VTMAT 
-!     XA(:im) = matmul(VTMAT(:im,:im), XIN(:im)) ! take submatrix of VTMAT
-!     XB(:im) = matmul(WTMAT(:im,:im), XA(:im))
-!     XC(:ic) = matmul(UMAT(:ic,:im),XB(:im))
-
-!     XPRED(:im) = matmul(A(:im,:ic), XC(:ic))
-    
-!     ! as coded (requires redimensioning of arrays)
-!     ! XPRED(im) = A(im,ic) * UMAT(ic,im) * WTMAT(im,im) * VTMAT(im,im) * XIN(im)
-    
-!     ! as dimensioned (does not compile)
-!     ! XPRED(im) = A(im,ic) * UMAT(ic,im) * WTMAT(im,ic) * VTMAT(im,ic) * XIN(im)
-    
-!     ! as intended 
-!     ! XPRED(im) = A(im,ic) * UTMAT(ic,im) * WTMAT(im,ic) * VTMAT(ic,im) * XIN(im)
-
-!     XOUT(:im) = XIN(:im) - XPRED(:im)
-!     XC(:ic) = -XC(:ic)
-    
-!     if(dbg.gt.0) then
-!        do  i = 1,im
-!           if(dbg.gt.0) write(*,'(1X,"Corrector: ",I4,"   sing: ",F12.4)') i,wvec(i)
-!        enddo
-       
-!        call rvord(wvec,sortw,ws,im)
-!        do  i = 1,im
-!           write(*,*) i,sortw(i),wvec(sortw(i))
-!        enddo
-       
-!        write(*,*) 'A1:'
-!        do  j = 1,ic
-!           write(*,'(16(2X,F7.2))') (svdmat(j,i),i=1,im)
-!        enddo
-!        write(*,*) ' '        
-!        write(*,*) 'Va:'
-!        do  j = 1,im
-!           write(*,'(16(2X,F7.2))') (vmat(j,i),i=1,im)
-!        enddo
-!        write(*,*) 'Vt:'
-!        do  j = 1,im
-!           write(*,'(16(2X,F7.2))') (vtmat(j,i),i=1,im)
-!        enddo
-!        write(*,*) 'W:'
-!        do  j = 1,ic
-!           write(*,'(16(2X,F7.2))') (wmat(j,i),i=1,im)
-!        enddo
-!        write(*,*) 'Wt:'
-!        do  j = 1,im
-!           write(*,'(16(2X,F7.2))') (wtmat(j,i),i=1,ic)
-!        enddo
-!        write(*,*) 'U:'
-!        do  j = 1,ic
-!           write(*,'(16(2X,F7.2))') (umat(j,i),i=1,ic)
-!        enddo
-!        write(*,*) 'Ut:'
-!        do  j = 1,ic
-!           write(*,'(16(2X,F7.2))') (utmat(j,i),i=1,ic)
-!        enddo
-       
-!        write(*,*) "correctors: ", xc
-!        write(*,*) "monitors:   ", xpred
-              
-!     endif
-    
-! end subroutine svdcorr_c
-
 subroutine svdcorr(a, svdmat, umat, vmat, wmat, utmat, vtmat, wtmat, &
      xin, xc, xout, xpred, ws, wvec, sortw, nx, im, ic, iflag, dbg)
+    use math_constfi, only : zero
     implicit none
     ! ******************************************************
     !                                                      *
@@ -741,7 +204,7 @@ subroutine svdcorr(a, svdmat, umat, vmat, wmat, utmat, vtmat, wtmat, &
 
     call prepsvd(im, ic, svdmat, wvec, umat, vmat, iflag, ws)
 
-    WMAT = 0.d0 ; WTMAT = 0.d0
+    WMAT = zero ; WTMAT = zero
     do  i = 1,ic
        wmat(i,i) = wvec(i) 
        if(abs(wvec(i)).gt.1.0001) wtmat(i,i) = 1/wvec(i) 
@@ -784,6 +247,7 @@ subroutine svdcorr(a, svdmat, umat, vmat, wmat, utmat, vtmat, wtmat, &
 end subroutine svdcorr
 
 subroutine prepsvd(im, ic, svdmat, wvec, umat, vmat, iflag, ws)
+    use math_constfi, only : zero
     implicit none
     ! ******************************************************
     !                                                      *
@@ -801,7 +265,6 @@ subroutine prepsvd(im, ic, svdmat, wvec, umat, vmat, iflag, ws)
 
     double precision :: vmat2(im,ic) 
     double precision :: umat2(ic,ic), svdmat2(ic,ic)
-    double precision, parameter :: zero=0d0
 
     if (im .ge. ic) then
        VMAT2 = zero ; UMAT = zero
@@ -822,6 +285,7 @@ end subroutine prepsvd
 
 subroutine htls(a, conm, b, m, n, x, ipiv, r, rms, prtlev, iter, rho, ptop, &
                 rmss, xrms, xptp, xiter, ifail)
+     use math_constfi, only : zero, one
      implicit none
      !*********************************************************************
      !     Subroutine HTLS to make Householder transform                  *
@@ -845,33 +309,32 @@ subroutine htls(a, conm, b, m, n, x, ipiv, r, rms, prtlev, iter, rho, ptop, &
      integer :: k1, kn, kl
      double precision :: ptp, g, h, h2, h3, sig, beta, piv, pivt, rm, pt, temp
 
-     double precision, parameter :: rzero=0.d0, reps7=1.d-7
+     double precision, parameter :: reps7=1.d-7
      character(len=4) :: units='mrad'
-     double precision :: calrms
 
      ifail = 0
-     ptp = rzero
+     ptp = zero
 
-     rm = calrms(B(:m),m)
+     rm = sqrt(dot_product(B(:m),B(:m))/float(m))
      pt = MAXVAL(B(:m))-MINVAL(B(:m))
 
      ! --- calculate first pivot
      !==========================
 
-     RHO(:3*n) = rzero
+     RHO(:3*n) = zero
 
      k2 = n + 1
-     piv = rzero
+     piv = zero
       
      do k = 1, n ! initialisation loop over correctors
         h = dot_product(A(1:m,k),A(1:m,k)) ; rho(k)  = h
         g = dot_product(A(1:m,k),B(1:m))   ; rho(k2) = g
-        if (h .ne. rzero) then
+        if (h .ne. zero) then
            pivt = g*g/h
         else
-           pivt = rzero
+           pivt = zero
         endif
-        if(pivt-piv .gt. rzero) then
+        if(pivt-piv .gt. zero) then
            piv = pivt
            kpiv = k
         endif
@@ -897,7 +360,7 @@ subroutine htls(a, conm, b, m, n, x, ipiv, r, rms, prtlev, iter, rho, ptop, &
         sig = sign(sig,h2)
         beta = h2 + sig
         a(k,k) = beta
-        beta = 1d0/(sig*beta)
+        beta = one/(sig*beta)
         
         ! --- on garde SIGMA dans RHO(N+K)
         j = n + k
@@ -923,7 +386,7 @@ subroutine htls(a, conm, b, m, n, x, ipiv, r, rms, prtlev, iter, rho, ptop, &
 
         if (k .eq. n) go to 11
 
-        piv = rzero
+        piv = zero
         kpiv = k + 1
         j1 = kpiv
         k2 = n + j1
@@ -947,10 +410,10 @@ subroutine htls(a, conm, b, m, n, x, ipiv, r, rms, prtlev, iter, rho, ptop, &
            rho(j) = h
            g = rho(k2) - a(k,j)*b(k)
            rho(k2) = g
-           if (h .ne. rzero) then
+           if (h .ne. zero) then
               pivt = g*g/h
            else
-              pivt = rzero
+              pivt = zero
            endif
 
            if (pivt .ge. piv) then
@@ -983,16 +446,16 @@ subroutine htls(a, conm, b, m, n, x, ipiv, r, rms, prtlev, iter, rho, ptop, &
         ! --- calcul du vecteur residuel
         !===============================
         !     transform orbit R back to "normal space"
-        R(1:k) = rzero
+        R(1:k) = zero
         do i = 1, k
            kl = k - i + 1
            kn = k - i + 1 + n           
-           beta = -1d0 / (rho(kn)*a(kl,kl))           
+           beta = -one / (rho(kn)*a(kl,kl))           
            h = beta * dot_product(A(kl:m,kl),R(kl:m))           
            R(kl:m) = R(kl:m) - A(kl:m,kl)*h            
         enddo
 
-        rmss(k) = calrms(r,m)
+        rmss(k) = sqrt(dot_product(R,R)/float(m))    
         ptop(k) = MAXVAL(R) - MINVAL(R)
 
         if (k .lt. n) then
@@ -1036,33 +499,8 @@ subroutine htls(a, conm, b, m, n, x, ipiv, r, rms, prtlev, iter, rho, ptop, &
      return     
 end subroutine htls
 
-double precision function calrms(r,m)
-       implicit none
-       !*********************************************************************
-       !     Function CALRMS to calculate rms of double precision values    *
-       !     in array R of size m                                           *
-       !                                                                    *
-       !     Authors:     GJR adapted from subroutine calrms by WFH         * 
-       !     Date:        2014-Feb-28                                       *
-       !                                                                    *
-       !*********************************************************************
-       integer :: m
-       double precision :: r(m)
-       
-       integer :: i
-
-       calrms = 0.d0
-       
-       ! calrms = dot_product(R,R) ?
-       do i = 1, m
-           calrms = calrms + (r(i)*r(i))
-       enddo
-      
-       calrms = sqrt(calrms / float(m))       
-       return
-end function calrms
-
 subroutine dinv(n,a,idim,r,ifail)
+       use math_constfi, only : zero, one
        implicit none
        !******************************************************************
        !
@@ -1080,8 +518,7 @@ subroutine dinv(n,a,idim,r,ifail)
        integer :: jfail, t1, t2, t3
        double precision :: det, temp, s
        double precision :: c11, c12, c13, c21, c22, c23, c31, c32, c33
-       double precision, parameter :: zero=0d0
-
+       
        !
        !  TEST FOR PARAMETER ERRORS.
        !
@@ -1147,7 +584,7 @@ subroutine dinv(n,a,idim,r,ifail)
        !
        det=a(1,1)*a(2,2)-a(1,2)*a(2,1)
        if(det.eq.zero) go to 8
-       s=1d0/det
+       s=one/det
        c11   =s*a(2,2)
        a(1,2)=-s*a(1,2)
        a(2,1)=-s*a(2,1)
@@ -1158,7 +595,7 @@ subroutine dinv(n,a,idim,r,ifail)
        !  N=1 CASE.
        !
 5      if(a(1,1).eq.zero) go to 8
-       a(1,1)=1d0/a(1,1)
+       a(1,1)=one/a(1,1)
        return
        !
        !  N.GT.3 CASES.  FACTORIZE MATRIX AND INVERT.
@@ -1179,6 +616,7 @@ subroutine dinv(n,a,idim,r,ifail)
 end subroutine dinv
 
 subroutine dfact(n,a,idim,ir,ifail,det,jfail)
+       use math_constfi, only : zero, one
        implicit none
 
        integer :: n, idim, ir(*), ifail, jfail 
@@ -1188,8 +626,7 @@ subroutine dfact(n,a,idim,ir,ifail,det,jfail)
        double precision :: tf, s11, s12, p, q, t
 
        integer, parameter :: normal=0, imposs=-1, jrange=0, jover=1, junder=-1
-       double precision, parameter :: g1=1e-19, g2=1e19
-       double precision, parameter :: zero=0.d0, one=1.d0
+       double precision, parameter :: g1=1e-19, g2=1e19       
 
        if(idim .lt. n  .or.  n .lt. 1)  then
 1001      FORMAT(7X," PARAMETER ERROR IN SUBROUTINE ", A6, &
@@ -1322,6 +759,7 @@ subroutine dfeqn(n,a,idim,ir,k,b)
 end subroutine dfeqn
 
 subroutine dfinv(n,a,idim,ir)
+    use math_constfi, only : zero
     implicit none
 
     integer :: n, idim, ir(*)
@@ -1329,8 +767,7 @@ subroutine dfinv(n,a,idim,ir)
  
     integer :: i, j, k, m, nxch, ij, nm1, nmi, im2
     double precision :: ti, s31, s32, s33, s34
-    double precision, parameter :: zero=0d0
-    
+        
     if (idim < n  .or.  n < 1 )  then   
 1001   FORMAT(7X," PARAMETER ERROR IN SUBROUTINE ", A6, &
             &" ... (N.LT.1 OR IDIM.LT.N).", &

@@ -7,6 +7,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   use trackfi
   use fasterror
   use matrices, only : EYE
+  use math_constfi, only : zero, one, two
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -25,7 +26,6 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   double precision, external :: get_value
   integer, external :: get_option
 
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0
   integer, parameter :: izero=0, ione=1
  
   !---- Initialization
@@ -190,6 +190,7 @@ end SUBROUTINE tmrefo
 SUBROUTINE twinifun(opt_fun0,rt)
   use twiss0fi
   use twisslfi
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -207,7 +208,6 @@ SUBROUTINE twinifun(opt_fun0,rt)
   double precision :: r(2,2), energy, twopi
 
   double precision, external :: get_value, get_variable
-  double precision, parameter :: zero=0d0
 
   !---- Initialize
   twopi = get_variable('twopi ')
@@ -293,6 +293,7 @@ SUBROUTINE twprep(save,case,opt_fun,position)
   use twissafi
   use twisslfi
   use twissotmfi
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -313,7 +314,6 @@ SUBROUTINE twprep(save,case,opt_fun,position)
   double precision :: twopi
 
   double precision, external :: get_variable
-  double precision, parameter :: zero=0d0
 
   !---- Initialize
   twopi = get_variable('twopi ')
@@ -347,6 +347,7 @@ SUBROUTINE twfill(case,opt_fun,position)
   use twissafi
   use twisslfi
   use twissotmfi
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -362,7 +363,6 @@ SUBROUTINE twfill(case,opt_fun,position)
   double precision :: opt_fun(*), position
 
   double precision, external :: get_value
-  double precision, parameter :: zero=0d0
 
   ripken = get_value('twiss ','ripken ') .ne. zero
 
@@ -382,6 +382,7 @@ SUBROUTINE twfill(case,opt_fun,position)
 end SUBROUTINE twfill
 
 SUBROUTINE twfill_ripken(opt_fun)
+  use math_constfi, only : zero, one, two
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -397,8 +398,6 @@ SUBROUTINE twfill_ripken(opt_fun)
                       alfa11, alfa12, alfa21, alfa22, &
                       gama11, gama12, gama21, gama22
   
-  double precision, parameter :: zero=0.d0, one=1.d0, two=2.d0
-
   betx = opt_fun(3);   bety = opt_fun(6);   alfx = opt_fun(4);   alfy = opt_fun(7) 
   r11 =  opt_fun(29);  r12 =  opt_fun(30);  r21 =  opt_fun(31);  r22 =  opt_fun(32)
 
@@ -418,8 +417,8 @@ SUBROUTINE twfill_ripken(opt_fun)
 
   gama11 = kappa * gamx
   gama22 = kappa * gamy
-  gama12 = zero;  if (beta12 .ne. 0.) gama12 = ((one-kappa)**2 + alfa12**2) / beta12
-  gama21 = zero;  if (beta21 .ne. 0.) gama21 = ((one-kappa)**2 + alfa21**2) / beta21
+  gama12 = zero;  if (beta12 .ne. zero) gama12 = ((one-kappa)**2 + alfa12**2) / beta12
+  gama21 = zero;  if (beta21 .ne. zero) gama21 = ((one-kappa)**2 + alfa21**2) / beta21
    
   call double_to_table_curr('twiss ','beta11 ' ,beta11)
   call double_to_table_curr('twiss ','beta12 ' ,beta12)
@@ -438,6 +437,7 @@ end SUBROUTINE twfill_ripken
 
 SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
   use matrices, only : EYE
+  use math_constfi, only : zero, one
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -466,7 +466,6 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
   integer, external :: get_option
   double precision, external :: get_value, get_variable 
   logical, external :: m66sta  
-  double precision, parameter:: zero=0d0, one=1d0
   integer, parameter :: itmax=20
 
   equivalence(a(1,1),b(1,1),as(1,1),bs(1,1)) ! 2015-Jul-02  13:20:19  ghislain: to be clarified
@@ -555,6 +554,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   use twisscfi
   use spch_bbfi
   use matrices, only : EYE
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -593,7 +593,6 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
 
   integer, external :: restart_sequ, advance_node, node_al_errors, get_vector, get_option
   double precision,external :: node_value, get_value
-  double precision, parameter :: zero=0d0 
   double precision, parameter :: orb_limit=1d1 
   integer, parameter :: ccode=15, pcode=18, max_rep=100
 
@@ -919,6 +918,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   use twiss0fi
   use twisscfi
   use matrices, only : EYE
+  use math_constfi, only : zero, one, two, four
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -937,13 +937,13 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   logical :: stabx=.false., staby=.false.
   double precision :: a(2,2), aux(2,2), d(2,2)
   double precision :: arg, den, det, dtr, sinmu2, deltap
-  double precision :: betx0=0.d0, alfx0=0.d0, amux0=0.d0
-  double precision :: bety0=0.d0, alfy0=0.d0, amuy0=0.d0
+  double precision :: betx0=zero, alfx0=zero, amux0=zero
+  double precision :: bety0=zero, alfy0=zero, amuy0=zero
   character(len=120) :: msg
 
   integer, external :: get_option
   double precision, external :: get_value
-  double precision, parameter :: eps=1d-8, zero=0d0, one=1d0, two=2d0, fourth=0.25d0
+  double precision, parameter :: eps=1d-8
 
   !---- Initialization
   deltap = get_value('probe ','deltap ')
@@ -996,7 +996,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
      cosmux = (a(1,1) + a(2,2)) / two
      stabx = abs(cosmux).lt.one
      if (stabx) then
-        sinmu2 = - a(1,2)*a(2,1) - fourth*(a(1,1) - a(2,2))**2
+        sinmu2 = - a(1,2)*a(2,1) - (one/four)*(a(1,1) - a(2,2))**2
         if (sinmu2.lt.zero) sinmu2 = eps
         sinmux = sign(sqrt(sinmu2), a(1,2))
         betx0 = a(1,2) / sinmux
@@ -1010,7 +1010,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
      cosmuy = (d(1,1) + d(2,2)) / two
      staby = abs(cosmuy).lt.one
      if (staby) then
-        sinmu2 = - d(1,2)*d(2,1) - fourth*(d(1,1) - d(2,2))**2
+        sinmu2 = - d(1,2)*d(2,1) - (one/four)*(d(1,1) - d(2,2))**2
         if (sinmu2.lt.zero) sinmu2 = eps
         sinmuy = sign(sqrt(sinmu2), d(1,2))
         bety0 = d(1,2) / sinmuy
@@ -1056,6 +1056,7 @@ end SUBROUTINE twcpin
 
 SUBROUTINE twdisp(rt,vect,disp)
   use matrices, only : EYE
+  use math_constfi, only : zero, one
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -1073,8 +1074,7 @@ SUBROUTINE twdisp(rt,vect,disp)
   
   integer :: i, j, irank
   double precision :: a(4,5)
-  double precision, parameter :: zero=0d0, one=1d0
-
+  
   A(:4,:4) = RT(:4,:4) - EYE(:4,:4)
   A(1:4,5) = -VECT(1:4)
 
@@ -1098,6 +1098,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   use spch_bbfi
   use name_lenfi
   use matrices, only: EYE
+  use math_constfi, only : zero, one, two
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -1123,8 +1124,7 @@ SUBROUTINE twcpgo(rt,orbit0)
 
   integer, external :: el_par_vector, advance_node, restart_sequ, get_option, node_al_errors
   double precision, external :: node_value, get_value
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0
-
+  
   !---- Initialization
   amux=zero
   amuy=zero
@@ -1220,11 +1220,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   if (centre) then
      pos0 = currpos
      currpos = currpos + el/two
-     sd = rt(5,6) + dot_product(rt(5,1:4), disp(1:4))
-     !sd = rt(5,6)
-     !do i = 1, 4
-     !   sd = sd + rt(5,i) * disp(i)
-     !enddo
+     sd = rt(5,6) + dot_product(RT(5,1:4), DISP(1:4))
      eta = - sd * betas**2 / circ
      alfa = one / gammas**2 + eta
      opt_fun(74) = alfa
@@ -1251,10 +1247,6 @@ SUBROUTINE twcpgo(rt,orbit0)
   sumloc = sumloc + el
   if (sector_sel) call twwmap(sumloc, orbit)
   sd = rt(5,6) + dot_product(RT(5,1:4),DISP(1:4))
-  !sd = rt(5,6)
-  !do i = 1, 4
-  !   sd = sd + rt(5,i) * disp(i)
-  !enddo
   eta = - sd * betas**2 / circ
   alfa = one / gammas**2 + eta
   opt_fun(74) = alfa
@@ -1342,6 +1334,7 @@ SUBROUTINE twcptk(re,orbit)
   use twisscfi
   use twissotmfi
   use matrices, only : JMAT, JMATT
+  use math_constfi, only : zero, one
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -1356,11 +1349,11 @@ SUBROUTINE twcptk(re,orbit)
   double precision :: rw0(6,6), rwi(6,6), rc(6,6), dt(6)
   double precision :: rmat0(2,2), a(2,2), b(2,2), c(2,2)
   double precision :: adet, tempa, tempb
-  double precision :: alfx0=0.d0, alfy0=0.d0, betx0=0.d0, bety0=0.d0
-  double precision :: amux0=0.d0, amuy0=0.d0
+  double precision :: alfx0=zero, alfy0=zero, betx0=zero, bety0=zero
+  double precision :: amux0=zero, amuy0=zero
 
   integer, external :: get_option
-  double precision, parameter :: zero=0d0, one=1d0, eps=1d-36
+  double precision, parameter :: eps=1d-36
 
   !---- Dispersion.
   DT = matmul(RE, DISP)
@@ -1469,6 +1462,7 @@ end SUBROUTINE twcptk
 SUBROUTINE twbtin(rt,tt)
   use twiss0fi
   use twisscfi
+  use math_constfi, only : zero, one, two, four
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -1486,7 +1480,7 @@ SUBROUTINE twbtin(rt,tt)
 
   integer, external :: get_option
   double precision, external :: get_variable
-  double precision, parameter :: eps=1d-8, zero=0d0, one=1d0, two=2d0, fourth=0.25d0
+  double precision, parameter :: eps=1d-8
 
   !---- Initialization
   twopi = get_variable('twopi ')
@@ -1521,10 +1515,6 @@ SUBROUTINE twbtin(rt,tt)
   do i = 1, 6
      do k = 1, 6
         temp = dot_product(TT(i,:,k),DISP0)
-!        temp = zero
-!        do j = 1, 6
-!           temp = temp + tt(i,j,k) * disp0(j)
-!        enddo
         aux(i) = aux(i) + temp * disp0(k)
         rtp(i,k) = two * temp
      enddo
@@ -1543,7 +1533,7 @@ SUBROUTINE twbtin(rt,tt)
   stabx = abs(cosmux) .lt. one
 
   if (stabx) then
-     sinmu2 = - rt(1,2)*rt(2,1) - fourth*(rt(1,1) - rt(2,2))**2
+     sinmu2 = - rt(1,2)*rt(2,1) - (one/four)*(rt(1,1) - rt(2,2))**2
      if (sinmu2.lt.0) sinmu2 = eps
      sinmux = sign(sqrt(sinmu2), rt(1,2))
      betx = rt(1,2) / sinmux
@@ -1559,7 +1549,7 @@ SUBROUTINE twbtin(rt,tt)
   staby = abs(cosmuy) .lt. one
 
   if (staby) then
-     sinmu2 = - rt(3,4)*rt(4,3) - fourth*(rt(3,3) - rt(4,4))**2
+     sinmu2 = - rt(3,4)*rt(4,3) - (one/four)*(rt(3,3) - rt(4,4))**2
      if (sinmu2.lt.0) sinmu2 = eps
      sinmuy = sign(sqrt(sinmu2), rt(3,4))
      bety = rt(3,4) / sinmuy
@@ -1588,6 +1578,7 @@ SUBROUTINE twchgo
   use twissafi
   use twisscfi
   use spch_bbfi
+  use math_constfi, only : zero, one, two
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -1601,8 +1592,7 @@ SUBROUTINE twchgo
 
   integer :: restart_sequ, advance_node, get_option, node_al_errors
   double precision :: node_value, get_value
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0
-
+ 
   !---- If save requested reset table
   save = get_option('twiss_save ')
   if (save .ne. 0) call reset_count(table_name)
@@ -1735,6 +1725,7 @@ SUBROUTINE twbttk(re,te)
   use twiss0fi
   use twisslfi
   use twisscfi
+  use math_constfi, only : zero, one, two
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -1757,7 +1748,7 @@ SUBROUTINE twbttk(re,te)
 
   integer, external :: get_option
   double precision, external :: proxim, node_value, get_value
-  double precision, parameter :: eps=1d-8, zero=0d0, one=1d0, two=2d0
+  double precision, parameter :: eps=1d-8
   
   !---- Create internal table for lattice functions if requested
   save = get_option('twiss_save ')
@@ -1916,6 +1907,7 @@ end SUBROUTINE twbttk
 SUBROUTINE tw_summ(rt,tt)
   use twiss0fi
   use twisscfi
+  use math_constfi, only : zero, one, two
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -1933,8 +1925,7 @@ SUBROUTINE tw_summ(rt,tt)
 
   integer, external :: get_option
   double precision, external :: get_variable, get_value
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0
-
+  
   !---- Initialization chromatic part
   twopi = get_variable('twopi ')
   RTP = zero 
@@ -2071,6 +2062,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
   use name_lenfi
   use time_varfi
   use matrices, only: EYE
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   !     purpose:                                                         *
@@ -2096,8 +2088,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
 
   double precision :: plot_tilt, el
   double precision :: node_value
-  double precision, parameter :: zero = 0.d0
-
+  
   !---- Initialization
   EK = zero 
   RE = EYE 
@@ -2173,6 +2164,7 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   use twisslfi
   use twiss_elpfi
   use matrices
+  use math_constfi, only : zero, one, two, three
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -2205,8 +2197,7 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
 
   integer, external :: el_par_vector, node_fd_errors
   double precision, external :: node_value, get_value
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0
-
+  
   !---- Initialize.
   EK0 = zero 
   RW = EYE 
@@ -2352,6 +2343,7 @@ end SUBROUTINE tmbend
 
 SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
   use matrices, only: EYE
+  use math_constfi, only : zero, one, two, three, four, six, nine, twelve, fifteen
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -2384,8 +2376,6 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
 
   double precision, external :: get_value
 
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0, four=4d0
-  double precision, parameter :: six=6d0, nine=9d0, twelve=12d0, fifteen=15d0
   double precision, parameter :: twty=20d0, twty2=22d0, twty4=24d0, thty=30d0
   double precision, parameter :: foty2=42d0, fvty6=56d0, svty2=72d0, httwty=120d0
   double precision, parameter :: c1=one, c2=one/two, c3=one/twty4, c4=one/720d0
@@ -2623,6 +2613,7 @@ end SUBROUTINE tmsymm
 
 SUBROUTINE tmfrng(fsec,h,sk1,edge,he,sig,corr,re,te)
   use matrices, only : EYE
+  use math_constfi, only : zero, one
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -2644,8 +2635,6 @@ SUBROUTINE tmfrng(fsec,h,sk1,edge,he,sig,corr,re,te)
   double precision :: re(6,6), te(6,6,6)
 
   double precision :: hh, psip, secedg, tanedg
-
-  double precision, parameter :: zero=0d0, one=1d0
 
   !---- Linear terms.
   RE = EYE 
@@ -2771,6 +2760,7 @@ end SUBROUTINE tmtilt
 
 SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twtrrfi
+  use math_constfi, only : zero, one, three, half
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -2800,7 +2790,6 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   integer, external :: node_fd_errors
   double precision, external :: node_value, get_value
-  double precision, parameter :: zero=0d0, one=1d0, three=3d0, half=5d-1
 
   if ( .not. ftrk) then
      !---- No orbit track desired, use drift map.
@@ -2888,6 +2877,7 @@ end SUBROUTINE tmcorr
 SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   use twtrrfi
   use twisslfi
+  use math_constfi, only : zero, one, two, three
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -2917,7 +2907,6 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
 
   integer :: get_option, node_fd_errors 
   double precision :: node_value, get_value
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0
 
   !---- Initialize
   rfac = zero
@@ -3177,6 +3166,7 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twisslfi
   use twiss_elpfi
   use matrices, only : EYE
+  use math_constfi, only : zero, one, two, three, four, six
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -3209,8 +3199,7 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
   
   integer, external :: node_fd_errors, el_par_vector
   double precision, external :: node_value, get_value
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0, four=4d0, six=6d0
-
+  
   if ( .not. ftrk) then
      !---- No orbit track requested, use drift map and return
      call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
@@ -3368,6 +3357,7 @@ SUBROUTINE tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
   use twtrrfi
   use name_lenfi
   use time_varfi  
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -3394,8 +3384,7 @@ SUBROUTINE tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
   character(len=name_len) :: name
 
   double precision, external :: node_value
-  double precision, parameter :: zero=0d0
-
+  
   !---- Element Kick
   ek(1)=node_value('kick1 ')
   ek(2)=node_value('kick2 ')
@@ -3765,6 +3754,7 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
+  use math_constfi, only : zero, one, two, three
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -3799,8 +3789,7 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
   integer, external :: node_fd_errors
   integer, external :: el_par_vector
   double precision, external :: node_value, get_value
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0
-
+  
   !---- Initialize.
   st = zero
   ct = zero
@@ -3887,6 +3876,7 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
 end SUBROUTINE tmquad
 
 SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
+  use math_constfi, only : zero, one, two, four, six, ten3m
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -3912,7 +3902,6 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
   double precision :: cx, sx, cy, sy, biby4
 
   double precision, external :: get_value
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0, four=4d0, six=6d0, ten3m=1d-3
 
   !---- Initialize.
   beta = get_value('probe ','beta ')
@@ -3996,6 +3985,7 @@ end SUBROUTINE qdbody
 SUBROUTINE tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twisslfi
   use twiss_elpfi
+  use math_constfi, only : zero, one, two, ten3m
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -4018,7 +4008,6 @@ SUBROUTINE tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision :: el
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
-
   logical :: cplxy
   integer :: elpar_vl
   double precision :: deltap, el0, tilt, ekick, charge, pc, efield, exfld, eyfld
@@ -4027,7 +4016,6 @@ SUBROUTINE tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   integer, external :: el_par_vector
   double precision, external :: get_value, node_value
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0, ten3m=1d-3
 
   !---- Initialize.
   st = zero
@@ -4102,6 +4090,7 @@ SUBROUTINE tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
 end SUBROUTINE tmsep
 
 SUBROUTINE spbody(fsec,ftrk,tilt,ekick,orbit,el,ek,re,te)
+  use math_constfi, only : zero, one, two, three
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -4126,7 +4115,6 @@ SUBROUTINE spbody(fsec,ftrk,tilt,ekick,orbit,el,ek,re,te)
   double precision :: beta, gamma, dtbyds, ekl, ch, sh, sy, dy, fact
 
   double precision, external :: get_value
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0
   double precision, parameter :: by2=1d0/2d0, by6=1d0/6d0, by24=1d0/24d0, eps=1d-4
 
   !---- Initialize.
@@ -4210,6 +4198,7 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
+  use math_constfi, only : zero, one, two, three, twelve
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -4242,8 +4231,7 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   integer, external :: el_par_vector, node_fd_errors
   double precision, external :: node_value, get_value
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0, twelve=12d0
-
+  
   !---- Initialize.
   st = zero
   ct = zero
@@ -4331,6 +4319,7 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
 end SUBROUTINE tmsext
 
 SUBROUTINE sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
+  use math_constfi, only : zero, two, three, four
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -4355,8 +4344,7 @@ SUBROUTINE sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
   double precision :: skl, gamma, dtbyds, beta, s1, s2, s3, s4
 
   double precision, external :: get_value
-  double precision, parameter :: zero=0d0, two=2d0, three=3d0, four=4d0
-
+  
   !---- Initialize.
   beta = get_value('probe ','beta ')
   gamma = get_value('probe ','gamma ')
@@ -4414,6 +4402,7 @@ end SUBROUTINE sxbody
 
 SUBROUTINE tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twisslfi
+  use math_constfi, only : zero, two
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -4437,8 +4426,6 @@ SUBROUTINE tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision :: el0       
   double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
 
-  double precision, parameter :: zero=0d0, two=2d0 
-
   if (el.eq.zero) then
      call tmsol_th(ftrk,orbit,fmap,ek,re,te)
      return
@@ -4459,6 +4446,7 @@ SUBROUTINE tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
 end SUBROUTINE tmsol
 
 SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
+  use math_constfi, only : zero, one, two, three, six
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -4484,7 +4472,7 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision :: co, si, sibk, temp
   
   double precision, external :: node_value, get_value
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0, six=6d0, ten5m=1d-5
+  double precision, parameter :: ten5m=1d-5
 
   !---- Initialize.
   fmap = el .ne. zero
@@ -4575,6 +4563,7 @@ end SUBROUTINE tmsol0
 
 SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
   use twisslfi
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -4597,7 +4586,6 @@ SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
   double precision :: orbit0(6), orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
 
   double precision, external :: node_value
-  double precision, parameter :: zero=0d0
 
   !---- Initialize.
   theta = node_value('angle ')
@@ -4635,6 +4623,7 @@ end SUBROUTINE tmsrot
 
 SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   use twisslfi
+  use math_constfi, only : zero, one
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -4655,8 +4644,7 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
 
   double precision :: phi, cosphi, sinphi, tanphi, beta
   double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
-  double precision, parameter :: zero=0d0, one=1d0
-
+  
   double precision, external :: node_value, get_value
 
   !---- Initialize.
@@ -4695,6 +4683,7 @@ end SUBROUTINE tmyrot
 
 SUBROUTINE tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   use matrices, only : EYE
+  use math_constfi, only : zero, two, three
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -4718,8 +4707,7 @@ SUBROUTINE tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   double precision :: beta, gamma, dtbyds
   
   double precision, external :: get_value
-  double precision, parameter :: zero=0d0, two=2d0, three=3d0
-
+  
   !---- Initialize.
   EK = zero 
   RE = EYE 
@@ -4754,6 +4742,7 @@ end SUBROUTINE tmdrf0
 
 SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   use twisslfi
+  use math_constfi, only : two
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -4777,8 +4766,6 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   double precision :: dl0 
   double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
 
-  double precision, parameter :: two=2d0
-
   !---- centre option
   if (centre_cptk .or. centre_bttk) then
      ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
@@ -4797,6 +4784,7 @@ SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twisslfi
   use twiss_elpfi
   use matrices, only : EYE
+  use math_constfi, only : zero, one, two, half, ten6p, ten3m
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -4826,8 +4814,6 @@ SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   double precision, external :: get_variable, get_value, node_value
   integer, external :: el_par_vector
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0, half=5d-1
-  double precision, parameter :: ten6p=1d6, ten3m=1d-3
 
   !-- get element parameters
   elpar_vl = el_par_vector(r_freq, g_elpar)
@@ -4906,6 +4892,7 @@ SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
 end SUBROUTINE tmrf
 
 SUBROUTINE tmcat(fsec,rb,tb,ra,ta,rd,td)
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -4925,8 +4912,6 @@ SUBROUTINE tmcat(fsec,rb,tb,ra,ta,rd,td)
 
   double precision :: rw(6,6), tw(6,6,6), ts(36,6)
   integer :: i1, i2, i3
-
-  double precision, parameter :: zero=0.d0
 
   !---- Initialization
   TW = zero 
@@ -4972,6 +4957,7 @@ SUBROUTINE tmcat(fsec,rb,tb,ra,ta,rd,td)
 end SUBROUTINE tmcat
 
 SUBROUTINE tmcat1(fsec,eb,rb,tb,ea,ra,ta,ed,rd,td)
+  use math_constfi, only : two
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -4991,9 +4977,6 @@ SUBROUTINE tmcat1(fsec,eb,rb,tb,ea,ra,ta,ed,rd,td)
 
   integer :: i, ij, j, k
   double precision :: ew(6), rw(6,6), tw(6,6,6), es(6,6), ts(36,6)
-  
-  double precision, parameter :: two=2d0
-
   
   if ( .not. fsec) then
      !---- First order only
@@ -5079,6 +5062,7 @@ SUBROUTINE tmcat1(fsec,eb,rb,tb,ea,ra,ta,ed,rd,td)
 end SUBROUTINE tmcat1
 
 SUBROUTINE tmtrak(ek,re,te,orb1,orb2)
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -5100,8 +5084,7 @@ SUBROUTINE tmtrak(ek,re,te,orb1,orb2)
   double precision :: sum1, sum2, temp(6)
   
   integer, external :: get_option
-  double precision, parameter :: zero=0d0
-
+ 
   do i = 1, 6
      sum2 = ek(i)
      do k = 1, 6
@@ -5124,6 +5107,7 @@ end SUBROUTINE tmtrak
 
 SUBROUTINE tmsymp(r)
   use matrices
+  use math_constfi, only : zero, one, two
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -5139,7 +5123,6 @@ SUBROUTINE tmsymp(r)
   logical :: eflag
   integer :: i, j
   double precision :: a(6,6), b(6,6), v(6,6), nrm
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0
 
   A = -R + EYE
   B =  R + EYE
@@ -5238,6 +5221,7 @@ end SUBROUTINE tmali1
 SUBROUTINE tmali2(el, orb1, errors, betas, gammas, orb2, rm)
   use twiss0fi
   use matrices, only : EYE
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -5256,8 +5240,6 @@ SUBROUTINE tmali2(el, orb1, errors, betas, gammas, orb2, rm)
 
   double precision :: orbt(6), v(3), ve(3), w(3,3), we(3,3)
   double precision :: ds, dx, dy, the, phi, psi, s2, el, tilt
-
-  double precision, parameter :: zero=0d0
 
   !---- Misalignment rotation matrix w.r.t. entrance system.
   dx  = errors(1)
@@ -5278,7 +5260,9 @@ SUBROUTINE tmali2(el, orb1, errors, betas, gammas, orb2, rm)
   v(3) = ds + w(3,1)*ve(1)+w(3,2)*ve(2)+w(3,3)*ve(3)-ve(3)
 
   !---- Convert all references to exit, build additional drift.
-  call sutran(w, v, we)
+  !call sutran(w, v, we)
+  V = matmul(transpose(WE),V)
+  W = matmul(matmul(transpose(WE),W),WE)
   s2 = - (w(1,3) * v(1) + w(2,3) * v(2) + w(3,3) * v(3)) / w(3,3)
 
   !---- Transfer matrix.
@@ -5317,6 +5301,7 @@ end SUBROUTINE tmali2
 
 SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
   use trackfi
+  use math_constfi, only : zero, one, two
   implicit none
   !----------------------------------------------------------------------*
   !     purpose:                                                         *
@@ -5345,8 +5330,7 @@ SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
 
   integer, external :: get_option
   double precision, external :: node_value, get_value, get_variable
-  double precision, parameter :: zero=0.0d0, one=1.0d0, two=2.0d0
-
+  
   !---  standard 4D
   q = get_value('probe ','charge ')
   q_prime = node_value('charge ')
@@ -5400,6 +5384,7 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
   use twisslfi
   use spch_bbfi
   use fasterror
+  use math_constfi, only : zero, one, two, three, ten3m
   implicit none
 
   logical :: fsec, ftrk, fmap
@@ -5417,9 +5402,7 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
 
   integer, external ::  get_option
   double precision, external :: get_variable, node_value
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0
-  double precision, parameter :: ten3m=1d-3, explim=150d0
-  ! if x > explim, exp(-x) is outside machine limits.
+
 
   !---- initialize.
   bborbit = get_option('bborbit ') .ne. 0
@@ -5484,6 +5467,7 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
            else
               tk = rho2 / (two * sx2)
               if (tk .gt. explim) then
+                 ! if x > explim, exp(-x) is outside machine limits.
                  exk  = zero
                  exkc = one
                  phix = xs * fk / rho2
@@ -5561,6 +5545,7 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
            
               tk = (xs * xs / sx2 + ys * ys / sy2) / two
               if (tk .gt. explim) then
+                 ! if x > explim, exp(-x) is outside machine limits.
                  exk = zero
                  cbx = zero
                  cby = zero
@@ -5592,6 +5577,7 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
            
               tk = (xs * xs / sx2 + ys * ys / sy2) / two
               if (tk .gt. explim) then
+                 ! if x > explim, exp(-x) is outside machine limits.
                  exk = zero
                  cbx = zero
                  cby = zero
@@ -5673,6 +5659,7 @@ end SUBROUTINE tmbb_gauss
 SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
   use bbfi
   use twisslfi
+  use math_constfi, only : zero, one, two, three, ten3m
   implicit none
 
   logical :: fsec, ftrk, fmap
@@ -5689,9 +5676,6 @@ SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
 
   integer, external ::  get_option
   double precision, external :: get_variable, node_value
-  double precision, parameter :: zero=0.0d0, one=1.0d0, two=2.0d0, three=3.0d0
-  double precision, parameter :: ten3m=1.0d-3, explim=150.0d0
-  ! if x > explim, exp(-x) is outside machine limits.
 
   !---- initialize.
   phix = zero
@@ -5872,6 +5856,7 @@ end SUBROUTINE tmbb_flattop
 SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
   use bbfi
   use twisslfi
+  use math_constfi, only : zero, one, two, three, ten3m
   implicit none
 
   logical :: fsec, ftrk, fmap
@@ -5888,9 +5873,6 @@ SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
 
   integer, external :: get_option
   double precision, external :: get_variable, node_value
-  double precision, parameter :: zero=0.0d0, one=1.0d0, two=2.0d0, three=3.0d0
-  double precision :: ten3m=1.0d-3, explim=150.0d0
-  ! if x > explim, exp(-x) is outside machine limits.
 
   !---- initialize.
   phix = zero
@@ -6065,6 +6047,7 @@ SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
 end SUBROUTINE tmbb_hollowparabolic
 
 SUBROUTINE ccperrf(xx, yy, wx, wy)
+  use math_constfi, only : zero, one, two, half
   implicit none
   !----------------------------------------------------------------------*
   !     purpose:                                                         *
@@ -6081,7 +6064,6 @@ SUBROUTINE ccperrf(xx, yy, wx, wy)
   double precision :: x, y, q, h, xl, xh, yh, tx, ty, tn, sx, sy, saux
   double precision :: rx(33), ry(33)
 
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0, half=5d-1
   double precision, parameter :: xlim=5.33d0, ylim=4.29d0, fac1=3.2d0, fac2=23d0, fac3=21d0
   double precision, parameter :: cc=1.12837916709551d0
 
@@ -6149,14 +6131,13 @@ SUBROUTINE ccperrf(xx, yy, wx, wy)
 end SUBROUTINE ccperrf
 
 double precision function gauss_erf(x)
+  use math_constfi, only : zero, one, two, half
   implicit none
   !---- returns the value of the Gauss error integral:
   !     1/sqrt(2*pi) Int[-inf, x] exp(-x**2/2) dx
-  double precision :: x
+  double precision, intent(IN) :: x
 
   double precision :: xx, re, im
-
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0, half=5d-1
 
   xx = x / sqrt(two)
   call ccperrf(zero,xx,re,im)
@@ -6168,6 +6149,7 @@ SUBROUTINE twwmap(pos, orbit)
   use twissotmfi
   use twissafi
   use matrices, only : EYE
+  use math_constfi, only : zero, two
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -6181,8 +6163,6 @@ SUBROUTINE twwmap(pos, orbit)
 
   integer :: i, k, l
   double precision :: sum1, sum2, ek(6)
-
-  double precision, parameter :: zero=0d0, two=2d0
 
   !---- Track ORBIT0 using zero kick.
   do i = 1, 6
@@ -6226,6 +6206,7 @@ end SUBROUTINE twwmap
 
 SUBROUTINE tmdpdg(ftrk,orbit,fmap,ek,re,te)
   use matrices, only : EYE
+  use math_constfi, only : zero, one
   implicit none
   !----------------------------------------------------------------------*
   !     dipedge element                                                  *
@@ -6244,8 +6225,7 @@ SUBROUTINE tmdpdg(ftrk,orbit,fmap,ek,re,te)
   double precision :: ek0(6), rw(6,6), tw(6,6,6)
 
   double precision, external :: node_value
-  double precision, parameter :: zero=0d0, one=1d0 
-
+  
   !-- LD: modified to include corrections from Frank.
   EK0 = zero 
   RW = EYE 
@@ -6280,6 +6260,7 @@ SUBROUTINE tmdpdg(ftrk,orbit,fmap,ek,re,te)
 end SUBROUTINE tmdpdg
 
 SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
+  use math_constfi, only : zero, one, two
   implicit none
   !     Stolen from trrun.F courtesy Alex Koschick
   !----------------------------------------------------------------------*
@@ -6301,7 +6282,6 @@ SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
   double precision :: deltap, bvk, sk, skl, sks, sksl, cosTh, sinTh, Q0, Q
    
   double precision, external :: get_value, node_value
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0
 
   fmap = .true.
 
@@ -6349,6 +6329,7 @@ SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
 end SUBROUTINE tmsol_th
 
 SUBROUTINE tmnll(fsec,ftrk,orbit,fmap,ek,re,te)
+  use math_constfi, only : zero, one, two
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -6370,7 +6351,6 @@ SUBROUTINE tmnll(fsec,ftrk,orbit,fmap,ek,re,te)
   double precision :: pi, knll, cnll, k1, dd, u, v, dUu, dUv, dux, duy, dvx, dvy, x, y
 
   double precision, external :: node_value, get_variable
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0
 
   !---- Matrix
   fmap = .true.
@@ -6430,6 +6410,7 @@ end SUBROUTINE tmnll
 SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   use twtrrfi
   use twisslfi
+  use math_constfi, only : zero, one, two, three, ten3m
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -6474,7 +6455,6 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
 
   integer, external :: node_fd_errors
   double precision, external :: node_value,get_value,get_variable
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0, ten3m=1d-3
   double complex, parameter :: icomp=(0d0,1d0) ! imaginary 
 
   !---- Zero the arrays
@@ -6805,6 +6785,7 @@ SUBROUTINE calcsyncint(rhoinv,blen,k1,e1,e2,betxi,alfxi,dxi,dpxi,I)
 END SUBROUTINE calcsyncint
 
 subroutine tmfoc(el,sk1,c,s,d,f)
+  use math_constfi, only : zero, one, two, six, twelve
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -6823,8 +6804,7 @@ subroutine tmfoc(el,sk1,c,s,d,f)
 
   double precision :: qk, qkl, qkl2
 
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0, six=6d0
-  double precision, parameter :: twelve=12d0, twty=20d0, thty=30d0, foty2=42d0
+  double precision, parameter :: twty=20d0, thty=30d0, foty2=42d0
 
   qk = sqrt(abs(sk1))
   qkl = qk * el

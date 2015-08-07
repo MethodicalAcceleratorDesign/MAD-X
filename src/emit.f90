@@ -4,6 +4,7 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   use twiss0fi
   use emitfi
   use matrices, only : EYE
+  use math_constfi, only : zero, one, three
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -51,9 +52,7 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   integer :: restart_sequ, node_al_errors, code, advance_node
   logical :: m66sta, fmap, stabx, staby, stabt, frad
 
-  double precision, parameter :: zero=0.d0, one=1.d0, three=3.d0
   double precision :: twopi
-
   twopi = get_variable('twopi ')
 
   ORBIT(:6) = ORBIT0(:6)
@@ -204,6 +203,7 @@ end subroutine emit
 subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v, &
                   tunes,sig_v,pdamp)
   use emitfi
+  use math_constfi, only : zero, one, two, three, four
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -234,11 +234,9 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v, &
   double precision :: ex, ey, et, exn, eyn, sigx, sigy, sige, sigt  
   double precision :: reval(6), aival(6), alj(3), tau(3), tune(3)
   double precision :: sigma(6,6), bstar(3,3), gstar(3,3), dummy(6,6)
-
-  double precision :: get_variable, get_value
   double precision :: twopi
 
-  double precision, parameter :: zero=0.d0, one=1.d0, two=2.d0, three=3.d0, four=4.d0
+  double precision, external :: get_variable, get_value
   integer, parameter :: iqpr2 = 6
   double precision, parameter :: ten3p=1.0d3, tenp6=1.0d6, tenp9=1.0d9
 
@@ -400,6 +398,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   use emitfi
   use twtrrfi
   use matrices
+  use math_constfi, only : zero, one, two, three, four, six
   implicit none
   !---------------------------------------------------------------------*
   ! Purpose:                                                            *
@@ -451,11 +450,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
 
   double precision  :: get_variable, node_value, get_value
   double precision, parameter :: ten3m = 1.0d-3, ten6p = 1.0d+6
-  double precision, parameter :: zero  = 0.0d0,  half  = 0.5d0
-  double precision, parameter :: one   = 1.0d0,  two   = 2.0d0
-  double precision, parameter :: three = 3.0d0,  twelve = 12.d0
-  double precision, parameter :: four  = 4.0d0,  six   = 6.0d0
-
+  double precision, parameter :: half  = 0.5d0, twelve = 12.d0
 
   !if (code .eq. 8)  then !--- thin multipole ; what about RF multipole ? 
   if (code .eq. 8 .or. code .eq. 43)  then !--- thin multipole and thin RF multipole

@@ -156,6 +156,7 @@ module bbfi
   integer, parameter :: bbd_max=100000
   integer :: bbd_loc(bbd_max)=0, bbd_cnt=0, bbd_flag=0, bbd_pos=0
   double precision :: bb_kick(2,bbd_max)=0.d0
+  double precision, parameter :: explim=150.0d0   ! if x > explim, exp(-x) is outside machine limits.
 end module bbfi
 
 module deltrafi
@@ -505,6 +506,19 @@ module plot_mathfi
   double precision, parameter :: zero = 0.d0, half = 0.5d0, eps = 1.d-5
   double precision, parameter :: one = 1.d0, two = 2.d0, twopi = two * pi
 end module plot_mathfi
+
+module math_constfi ! 2015-Aug-06 Ghislain 
+  implicit none
+  public
+  !--- Definition of useful mathematical constants
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0, four=4d0, five=5d0
+  double precision, parameter :: six=6d0, seven=7d0, eight=8d0, nine=9d0, ten=10d0
+  double precision, parameter :: eleven=11d0, twelve=12d0, thirteen=13d0, fourteen=14d0, fifteen=15d0
+  double precision, parameter :: sixteen=16d0, seventeen=17d0, eighteen=18d0, nineteen=19d0, twenty=20d0
+  double precision, parameter :: half=0.5d0
+  double precision, parameter :: ten3m=1d-3, ten6m=1d-6, ten9m=1d-9
+  double precision, parameter :: ten3p=1d3,  ten6p=1d6,  ten9p=1d9
+end module math_constfi
 
 module resindexfi
   implicit none

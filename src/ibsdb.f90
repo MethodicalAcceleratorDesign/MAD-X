@@ -29,6 +29,7 @@ end subroutine enprem
 
 subroutine enprgl
   use ibsdbfi
+  use math_constfi, only : zero, one
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -38,8 +39,7 @@ subroutine enprgl
   double precision :: eta, gamtr, t0
 
   double precision, external :: get_value
-  double precision, parameter :: zero=0d0, one=1d0
-
+  
   frad = get_value('probe ','radiate ') .ne. 0
 
   !---- Global parameters.
@@ -99,6 +99,7 @@ end subroutine cavprt
 subroutine twclog(bxbar, bybar, dxbar, dybar, const)
   use ibsdbfi
   use physconsfi
+  use math_constfi, only : zero, two, four, eight
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -121,7 +122,6 @@ subroutine twclog(bxbar, bybar, dxbar, dybar, const)
 
   double precision, external :: get_variable, get_value
 
-  double precision, parameter :: zero=0d0, two=2d0, four=4d0, eight=8d0
   double precision, parameter :: ot2=1d2, ft8=5d8, ot5=1d5, ttm3=2d-3
   double precision, parameter :: fac1=743.4d0, fac2=1.44d-7
 
@@ -207,6 +207,7 @@ subroutine ibs
   use ibsdbfi
   use physconsfi
   use name_lenfi
+  use math_constfi, only : zero, one, two
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -232,7 +233,7 @@ subroutine ibs
 
   integer, external :: get_option, double_from_table_row, restart_sequ, advance_to_pos
   double precision, external :: get_value, get_variable  
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0, half=0.5d0
+  double precision, parameter :: half=0.5d0
   
   !---- Universal physical constants.
   amu0 = get_variable('amu0 ')      !     Permeability of vacuum [V*s/A*m]
@@ -556,6 +557,7 @@ end subroutine ibs
 subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy, txi, tyi, tli)
   use ibsdbfi
   use physconsfi
+  use math_constfi, only : zero, one, two, three, four, six, ten
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -607,8 +609,7 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy, txi, tyi, tli)
   double precision :: term, func, polyl, polyx, polyy, suml, sumx, sumy
   double precision :: cof, f, alam, phi, phiy, tmpl, tmpx, tmpy
 
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0, four=4d0, six=6d0
-  double precision, parameter :: ten=1d1, onetominus20=1d-20
+  double precision, parameter :: onetominus20=1d-20
   double precision, parameter :: tstlog=74d0, power=-two/three, test=1d-7
 
   double precision :: coeff(2)

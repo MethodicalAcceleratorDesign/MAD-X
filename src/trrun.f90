@@ -9,6 +9,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   use trackfi
   use fasterror
   use matrices, only : EYE
+  use math_constfi, only : zero, one, two
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -54,12 +55,12 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   double precision :: orbit(6), el, re(6,6), deltap, sum, spos
   double precision :: al_errors(align_max), zz(6), maxaper(6), obs_orb(6)
 
-  double precision, save :: betx_start=1.d0, bety_start=1.d0 
-  double precision, save :: alfx_start=0.d0, alfy_start=0.d0
-  double precision, save :: gamx_start=0.d0, gamy_start=0.d0 
-  double precision, save :: dx_start=0.d0,   dpx_start=0.d0 
-  double precision, save :: dy_start=0.d0,   dpy_start=0.d0 
-  double precision, save :: ex_rms0=0.d0, ey_rms0=0.d0, sigma_p0=0.d0, sigma_z0=0.d0
+  double precision, save :: betx_start=one, bety_start=one 
+  double precision, save :: alfx_start=zero, alfy_start=zero
+  double precision, save :: gamx_start=zero, gamy_start=zero 
+  double precision, save :: dx_start=zero,   dpx_start=zero
+  double precision, save :: dy_start=zero,   dpy_start=zero 
+  double precision, save :: ex_rms0=zero, ey_rms0=zero, sigma_p0=zero, sigma_z0=zero
   double precision, save :: N_ions_in_beam, Npart_gain, N_ions_ini, n_ions_macro, N_ions_for_bb
   double precision, save :: sigma_z_ini, z_factor, t_rms, pt_rms, z_keep(6,max_part)
 
@@ -79,8 +80,6 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   double precision, external :: node_value, get_variable, get_value
   logical, external :: is_drift, is_thin, is_quad, is_matrix, is_dipole
 
-  double precision, parameter :: zero=0.d0
-
   ! 2015-Jul-08  19:16:53  ghislain: make code more readable
   run   = switch .eq. 1
   dynap = switch .eq. 2
@@ -88,7 +87,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   !-------added by Yipeng SUN 01-12-2008--------------
   deltap = get_value('probe ','deltap ')
 
-  if (deltap .eq. 0d0) then
+  if (deltap .eq. zero) then
      onepass = get_option('onepass ') .ne. 0
      if (.not.onepass) call trclor(switch, orbit0)
   endif
@@ -104,9 +103,9 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   !---- get options for space charge variables
   exit_loss_turn = get_option('exit_loss_turn ') .ne. 0
   bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
-  checkpnt_restart = get_value('run ', 'checkpnt_restart ') .ne. 0d0
+  checkpnt_restart = get_value('run ', 'checkpnt_restart ') .ne. zero
   emittance_update = get_option('emittance_update ') .ne. 0
-  virgin_state = get_value('run ', 'virgin_state ') .ne. 0d0
+  virgin_state = get_value('run ', 'virgin_state ') .ne. zero
 
   if (run .and. checkpnt_restart) then
      open(90,file='checkpoint_restart.dat',form='unformatted',status='unknown')
@@ -207,12 +206,12 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   bet0  =  get_value('beam ','beta ')
   betas  = get_value('probe ','beta ')
   gammas = get_value('probe ','gamma ')
-  bet0i  = 1d0 / bet0
-  beti   = 1d0 / betas
+  bet0i  = one / bet0
+  beti   = one / betas
   dtbyds = get_value('probe ','dtbyds ')
   deltas = get_variable('track_deltap ')
   arad   = get_value('probe ','arad ')
-  dorad  = get_value('probe ','radiate ') .ne. 0d0
+  dorad  = get_value('probe ','radiate ') .ne. zero
   dodamp = get_option('damp ') .ne. 0
   dorand = get_option('quantum ') .ne. 0
 
@@ -221,7 +220,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
      if (run) then
         t_max = get_value('probe ','circ ') / get_value('run ', 'track_harmon ') / betas
         pt_max = get_value('run ', 'deltap_max ')
-        pt_max = (sqrt( (betas*(pt_max + 1d0))**2 + 1d0/gammas**2) - 1d0) * beti
+        pt_max = (sqrt( (betas*(pt_max + one))**2 + one/gammas**2) - one) * beti
      else if (dynap) then
         t_max  = 1d20
         pt_max = 1d20
@@ -275,7 +274,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         time_var_m_cnt = 0 ; time_var_p_cnt = 0 ; time_var_c_cnt = 0
         ! <<N_macro_part_ini = N_macro_surv + N_macro_lost>>
         N_ions_in_beam = get_value('probe ', 'npart ') !BEAM->NPART
-        if (N_ions_in_beam .lt. 0d0) call aafail('TRRUN: ','N_ions_in_beam .lt. 0.0')
+        if (N_ions_in_beam .lt. zero) call aafail('TRRUN: ','N_ions_in_beam .lt. zero')
         Npart_gain = get_value('run ', 'n_part_gain ')
         N_ions_ini = Npart_gain * N_ions_in_beam
         N_macro_surv = jmax    ! = number of START lines submitted
@@ -291,11 +290,11 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 
         t_rms = get_value('run ', 'sigma_z ') * beti
         pt_rms = get_value('run ', 'deltap_rms ')
-        pt_rms = (sqrt((betas * (pt_rms + 1d0))**2 + 1d0/gammas**2) - 1d0) * beti
+        pt_rms = (sqrt((betas * (pt_rms + one))**2 + one/gammas**2) - one) * beti
         sigma_z_ini = t_rms !betas: BEAM->BETA
         sigma_z = sigma_z_ini !at start (to be redefined in Ixy)
         sigma_p = pt_rms       !default
-        z_factor = 1d0 !at start sigma_z_ini/sigma_z
+        z_factor = one !at start sigma_z_ini/sigma_z
         Ex_rms = get_value('probe ', 'ex ') !BEAM->Ex
         Ey_rms = get_value('probe ', 'ey ') !BEAM->Ey
         if (checkpnt_restart) then
@@ -357,7 +356,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            call double_to_table_curr('bb6d_ixy ', 'sigma_z ', sigma_z)
            call augment_count('bb6d_ixy ')
            
-           if (sigma_p0 .eq. 0d0) sigma_p0 = sigma_p
+           if (sigma_p0 .eq. zero) sigma_p0 = sigma_p
            !new on 3/31/14:
         endif
 
@@ -368,12 +367,12 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            sigma_p = sigma_p0
         endif
 
-        z_factor = 1d0
-        if ( sigma_z.gt.0d0 .and. sigma_z_ini.gt.0d0) z_factor = sigma_z_ini/sigma_z
+        z_factor = one
+        if ( sigma_z.gt.zero .and. sigma_z_ini.gt.zero) z_factor = sigma_z_ini/sigma_z
         
         N_ions_for_bb = n_ions_macro * N_for_I * z_factor
-        if (N_ions_in_beam .le. 0d0) then
-           rat_bb_n_ions = 0d0
+        if (N_ions_in_beam .le. zero) then
+           rat_bb_n_ions = zero
         else
            rat_bb_n_ions = N_ions_for_bb/N_ions_in_beam
         endif
@@ -385,14 +384,14 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
      endif ! bb_sxy_update
      
      nlm = 0
-     sum = 0d0
+     sum = zero
      
-     if ( bb_sxy_update .and. (sigma_t.eq.0d0 .or. emittance_update) ) then
+     if ( bb_sxy_update .and. (sigma_t.eq.zero .or. emittance_update) ) then
         !VVK 20100321 -------- Find RMS-value of t ----------------------
         ! if we do 1-turn tracking, orbit0(5)=0 always
-        Summ_t_mean = 0d0
+        Summ_t_mean = zero
         do i_part = 1, jmax
-           if (abs(z(5,i_part)) .ge. 0d0) then
+           if (abs(z(5,i_part)) .ge. zero) then
               Summ_t_mean = Summ_t_mean + z(5,i_part)
            else
               print *, 'NaN z(5,i) ? :', i_part, z(5,i_part)
@@ -400,15 +399,15 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         enddo
         mean_t = Summ_t_mean/dble(jmax)
         
-        Summ_t_square = 0d0
+        Summ_t_square = zero
         do i_part = 1, jmax
-           if (abs(z(5,i_part)) .ge. 0d0) &
+           if (abs(z(5,i_part)) .ge. zero) &
                 Summ_t_square = Summ_t_square + (z(5,i_part) - mean_t)**2
         enddo
         sigma_t = sqrt(Summ_t_square/dble(jmax))
 
-        if (abs(sigma_t) .eq. 0d0) then
-           sigma_t=t_max/2d0
+        if (abs(sigma_t) .eq. zero) then
+           sigma_t=t_max/two
            call aawarn('TTRUN Frozen SC: sigma_t = zero: ','sigma_t set to L/track_harmon/betas/2')
         endif
         !-----------------------------------------------------------------
@@ -628,6 +627,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   use twtrrfi
   use twiss0fi
   use name_lenfi
+  use math_constfi, only : zero, one
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -661,7 +661,6 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   integer, external :: get_option
   double precision, external :: get_value, node_value
 
-  double precision, parameter :: zero=0.d0, one=1.d0
   double precision, parameter :: min_double = 1.e-36
 
   ! 2015-Jul-08  19:16:53  ghislain: make code more readable
@@ -685,7 +684,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
 
   !---- Rotate trajectory before entry
   theta = node_value('tilt ')
-  if (theta .ne. 0d0)  then
+  if (theta .ne. zero)  then
      st = sin(theta)
      ct = cos(theta)
      do jtrk = 1,ktrack
@@ -697,24 +696,6 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
         track(4,jtrk) = ct * track(4,jtrk) - st * tmp
      enddo
   endif
-
-  !---- TRANSLATION element for translation of particles // AK 23.02.2006
-  !---- useful for combination of different transfer lines or rings
-  ! if (code .eq. 36) then 
-  !    if (onepass) then
-  !       call tttrans(track,ktrack)
-  !       go to 500
-  !    endif
-  ! endif
-
-  ! !---- Beam-beam,  standard 4D, no aperture
-  ! if (code .eq. 22) then
-  !    parvec(5)=get_value('probe ', 'arad ')
-  !    parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
-  !    parvec(7)=get_value('probe ','gamma ')
-  !    call ttbb(track, ktrack, parvec)
-  !    go to 500
-  ! endif
 
   !---- Test aperture. ALL ELEMENTS BUT DRIFTS and BEAMBEAM (code 22)
   if (aperflag .and. code.ne.22) then
@@ -820,7 +801,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   ! by calling trcoll again
 
   !---- Rotate trajectory at exit
-  if (theta .ne. 0d0)  then
+  if (theta .ne. zero)  then
      do jtrk = 1,ktrack
         tmp = track(1,jtrk)
         track(1,jtrk) = ct * tmp - st * track(3,jtrk)
@@ -842,6 +823,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   use name_lenfi
   use trackfi
   use time_varfi
+  use math_constfi, only : zero, one, two, three
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -870,14 +852,13 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   character(len=name_len) name
 
   integer :: node_fd_errors, store_no_fd_err, get_option
-  double precision, parameter :: zero=0.d0
 
   !---- Precompute reciprocals of orders and radiation constant
   if (first) then
      do iord = 1, maxmul
-        ordinv(iord) = 1d0 / dble(iord)
+        ordinv(iord) = one / dble(iord)
      enddo
-     const = arad * gammas**3 / 3d0
+     const = arad * gammas**3 / three
      first = .false.
   endif
 
@@ -911,11 +892,10 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
      NORMAL(:nn) = NORMAL(:nn) * (1+temp)
      SKEW(:nn)   = SKEW(:nn)   * (1+temp)
   endif
-
   
   !--- Time variation for fields in matrix, multipole or RF-cavity
   ! 2015-Jun-24  18:55:43  ghislain: DOC FIXME not documented!!!
-  time_var = node_value('time_var ') .ne. 0d0
+  time_var = node_value('time_var ') .ne. zero
 
   if (time_var .and. time_var_m) then
      time_var_m_cnt = time_var_m_cnt + 1
@@ -930,8 +910,8 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
 
      !--- find maximum order for myfield
      do i = maxmul, 0, -1
-        if (abs(myfield(time_var_m_cnt,1,i)) .gt. 0d0 .or.   &
-           abs(myfield(time_var_m_cnt,2,i)) .gt. 0d0) then
+        if (abs(myfield(time_var_m_cnt,1,i)) .gt. zero .or.   &
+           abs(myfield(time_var_m_cnt,2,i)) .gt. zero) then
            n_ferr = i ! replacing the previous count of field-errors
            goto 101
         endif
@@ -955,14 +935,14 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   !nd = 2 * max(nn, ns, n_ferr/2-1)
 
   !---- Dipole error.
-  !      dbr = bvk * field(1,0) / (1d0 + deltas)
-  !      dbi = bvk * field(2,0) / (1d0 + deltas)
+  !      dbr = bvk * field(1,0) / (one + deltas)
+  !      dbi = bvk * field(2,0) / (one + deltas)
   dbr = bvk * f_errors(0) !field(1,0)
   dbi = bvk * f_errors(1) !field(2,0)
 
   !---- Nominal dipole strength.
-  !      dipr = bvk * vals(1,0) / (1d0 + deltas)
-  !      dipi = bvk * vals(2,0) / (1d0 + deltas)
+  !      dipr = bvk * vals(1,0) / (one + deltas)
+  !      dipi = bvk * vals(2,0) / (one + deltas)
   dipr = bvk * normal(0) !vals(1,0)
   dipi = bvk * skew(0)   !vals(2,0)
 
@@ -971,9 +951,9 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   do iord = 1, nd/2
      ! do j = 1, 2
      !    !          field(j,iord) = bvk * (vals(j,iord) + field(j,iord))          &
-     !    !     / (1d0 + deltas)
+     !    !     / (one + deltas)
      !    field(j,iord) = bvk * (vals(j,iord) + field(j,iord))
-     !    if (field(j,iord) .ne. 0d0)  nord = iord
+     !    if (field(j,iord) .ne. zero)  nord = iord
      ! enddo
      f_errors(2*iord)   = bvk * (f_errors(2*iord) + normal(iord))
      f_errors(2*iord+1) = bvk * (f_errors(2*iord+1) + skew(iord))
@@ -987,11 +967,11 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
      dxt(:ktrack) = zero
      dyt(:ktrack) = zero
      !do jtrk = 1,ktrack
-     !   dxt(jtrk) = 0d0
-     !   dyt(jtrk) = 0d0
+     !   dxt(jtrk) = zero
+     !   dyt(jtrk) = zero
      !enddo
      !----------- introduction of dipole focusing
-     if (elrad.gt.0d0 .and. get_option('thin_foc ').eq.1) then
+     if (elrad.gt.zero .and. get_option('thin_foc ').eq.1) then
 
         DXT(:ktrack) = dipr*dipr*TRACK(1,:ktrack)/elrad
         DYT(:ktrack) = dipi*dipi*TRACK(3,:ktrack)/elrad
@@ -1020,10 +1000,10 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
         enddo
      enddo
      !        do jtrk = 1,ktrack
-     !          dxt(jtrk) = dxt(jtrk) / (1d0 + deltas)
-     !          dyt(jtrk) = dyt(jtrk) / (1d0 + deltas)
+     !          dxt(jtrk) = dxt(jtrk) / (one + deltas)
+     !          dyt(jtrk) = dyt(jtrk) / (one + deltas)
      !        enddo
-     if (elrad.gt.0d0 .and. get_option('thin_foc ').eq.1) then
+     if (elrad.gt.zero .and. get_option('thin_foc ').eq.1) then
         dxt(:ktrack) = dxt(:ktrack) + dipr*dipr*track(1,:ktrack)/elrad
         dyt(:ktrack) = dyt(:ktrack) + dipi*dipi*track(3,:ktrack)/elrad
         !do jtrk = 1,ktrack
@@ -1049,9 +1029,9 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
            px = track(2,jtrk)
            py = track(4,jtrk)
            pt = track(6,jtrk)
-           track(2,jtrk) = px - rfac * (1d0 + pt) * px
-           track(4,jtrk) = py - rfac * (1d0 + pt) * py
-           track(6,jtrk) = pt - rfac * (1d0 + pt) ** 2
+           track(2,jtrk) = px - rfac * (one + pt) * px
+           track(4,jtrk) = py - rfac * (one + pt) * py
+           track(6,jtrk) = pt - rfac * (one + pt) ** 2
         enddo
 
         !---- Energy loss like for closed orbit.
@@ -1059,9 +1039,9 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
 
         !---- Store energy loss on closed orbit.
         rfac = const * ((dipr + dxt(1))**2 + (dipi + dyt(1))**2)
-        rpx1 = rfac * (1d0 + track(6,1)) * track(2,1)
-        rpy1 = rfac * (1d0 + track(6,1)) * track(4,1)
-        rpt1 = rfac * (1d0 + track(6,1)) ** 2
+        rpx1 = rfac * (one + track(6,1)) * track(2,1)
+        rpy1 = rfac * (one + track(6,1)) * track(4,1)
+        rpt1 = rfac * (one + track(6,1)) ** 2
 
         track(2,:ktrack) = track(2,:ktrack) - rpx1
         track(4,:ktrack) = track(4,:ktrack) - rpy1
@@ -1073,15 +1053,15 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   !---- Apply multipole effect including dipole.
   do jtrk = 1,ktrack
      !       Added for correct Ripken implementation of formulae
-     ttt = sqrt( 1d0 + 2d0*track(6,jtrk)*bet0i + track(6,jtrk)**2 )
+     ttt = sqrt( one + two*track(6,jtrk)*bet0i + track(6,jtrk)**2 )
      ! track(2,jtrk) = track(2,jtrk) - (dbr + dxt(jtrk) - dipr * (deltas + beti*track(6,jtrk)))
      ! track(4,jtrk) = track(4,jtrk) + (dbi + dyt(jtrk) - dipi * (deltas + beti*track(6,jtrk)))
      ! track(5,jtrk) = track(5,jtrk) - (dipr*track(1,jtrk) - dipi*track(3,jtrk)) * beti
-     track(2,jtrk) = track(2,jtrk) - (dbr + dxt(jtrk) - dipr * (ttt - 1d0))
-     track(4,jtrk) = track(4,jtrk) + (dbi + dyt(jtrk) - dipi * (ttt - 1d0))
-     track(5,jtrk) = track(5,jtrk) -                    &
+     track(2,jtrk) = track(2,jtrk) - (dbr + dxt(jtrk) - dipr * (ttt - one))
+     track(4,jtrk) = track(4,jtrk) + (dbi + dyt(jtrk) - dipi * (ttt - one))
+     track(5,jtrk) = track(5,jtrk) - &
           (dipr*track(1,jtrk) - dipi*track(3,jtrk)) *   &
-          ((1d0 + bet0*track(6,jtrk))/ttt) * bet0i
+          ((one + bet0*track(6,jtrk))/ttt) * bet0i
   enddo
 
   !---- Radiation loss at exit.
@@ -1100,9 +1080,9 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
            px = track(2,jtrk)
            py = track(4,jtrk)
            pt = track(6,jtrk)
-           track(2,jtrk) = px - rfac * (1d0 + pt) * px
-           track(4,jtrk) = py - rfac * (1d0 + pt) * py
-           track(6,jtrk) = pt - rfac * (1d0 + pt) ** 2
+           track(2,jtrk) = px - rfac * (one + pt) * px
+           track(4,jtrk) = py - rfac * (one + pt) * py
+           track(6,jtrk) = pt - rfac * (one + pt) ** 2
         enddo
 
         !---- Energy loss like for closed orbit.
@@ -1110,9 +1090,9 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
 
         !---- Store energy loss on closed orbit.
         rfac = const * ((dipr + dxt(1))**2 + (dipi + dyt(1))**2)
-        rpx2 = rfac * (1d0 + track(6,1)) * track(2,1)
-        rpy2 = rfac * (1d0 + track(6,1)) * track(4,1)
-        rpt2 = rfac * (1d0 + track(6,1)) ** 2
+        rpx2 = rfac * (one + track(6,1)) * track(2,1)
+        rpy2 = rfac * (one + track(6,1)) * track(4,1)
+        rpt2 = rfac * (one + track(6,1)) ** 2
 
         track(2,:ktrack) = track(2,:ktrack) - rpx2
         track(4,:ktrack) = track(4,:ktrack) - rpy2
@@ -1185,6 +1165,7 @@ end subroutine ttyrot
 
 subroutine ttdrf(el,track,ktrack)
   use trackfi
+  use math_constfi, only : one, two
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1209,13 +1190,13 @@ subroutine ttdrf(el,track,ktrack)
      py = track(4,i)
      pt = track(6,i)
      ! L/pz
-     l_pz = el / sqrt( 1d0 + 2d0*pt*bet0i + pt**2 - px**2 - py**2)
+     l_pz = el / sqrt( one + two*pt*bet0i + pt**2 - px**2 - py**2)
      track(1,i) = track(1,i) + l_pz*px
      track(3,i) = track(3,i) + l_pz*py
      ! track(5,i) = track(5,i) + el*(beti + pt*dtbyds) - (beti+pt)*l_pz
      !---- AK 20060413
      !---- Ripken DESY-95-189 p.36
-     track(5,i) = track(5,i) + bet0i*(el - (1d0 + bet0*pt) * l_pz)
+     track(5,i) = track(5,i) + bet0i*(el - (one + bet0*pt) * l_pz)
   enddo
 !$OMP END DO
 !$OMP END PARALLEL
@@ -1226,6 +1207,7 @@ subroutine ttrf(track,ktrack)
   use name_lenfi
   use time_varfi
   use trackfi
+  use math_constfi, only : zero, one, two, ten3m, ten6p
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1253,7 +1235,6 @@ subroutine ttrf(track,ktrack)
   character(len=name_len) :: name
 
   double precision :: get_variable, node_value, get_value
-  double precision, parameter :: ten3m=1d-3, ten6p=1d6
 
   !---- Initialize
   clight=get_variable('clight ')
@@ -1268,7 +1249,7 @@ subroutine ttrf(track,ktrack)
   rfv = bvk * node_value('volt ')
 
   !---- Time Variation
-  time_var = node_value('time_var ') .ne. 0d0
+  time_var = node_value('time_var ') .ne. zero
   if (time_var.and.time_var_c) then
      time_var_c_cnt = time_var_c_cnt + 1
      time_var_c_lnt = time_var_c_lnt + 1
@@ -1314,8 +1295,8 @@ subroutine ttrf(track,ktrack)
 
   !*---- If there are wakefields split the cavity.
   !      if (lfile .ne. ' ' .or. tfile .ne. ' ') then
-  !        el1 = el / 2d0
-  !        rfv = rfv / 2d0
+  !        el1 = el / two
+  !        rfv = rfv / two
   !        lwake = .true.
   !      else
   !        el1 = el
@@ -1323,18 +1304,18 @@ subroutine ttrf(track,ktrack)
   !      endif
   !---- Set up.
   omega = rff * (ten6p * twopi / clight)
-  ! vrf   = rfv * ten3m / (pc * (1d0 + deltas))
+  ! vrf   = rfv * ten3m / (pc * (one + deltas))
   vrf   = rfv * ten3m / pc0
   phirf = rfl * twopi
-  ! dl    = el * 5d-1
-  ! bi2gi2 = 1d0 / (betas * gammas) ** 2
+  ! dl    = el / two
+  ! bi2gi2 = one / (betas * gammas) ** 2
 
   TRACK(6,1:ktrack) = TRACK(6,1:ktrack) +  vrf * sin(phirf - omega*TRACK(5,1:ktrack))
 
   !*---- If there were wakefields, track the wakes and then the 2nd half
   !*     of the cavity.
   !      if (lwake) then
-  !        call ttwake(2d0*el1, nbin, binmax, lfile, tfile, ener1, track,
+  !        call ttwake(two*el1, nbin, binmax, lfile, tfile, ener1, track,
   !     +              ktrack)
   !
   !*---- Track 2nd half of cavity -- loop for all particles.
@@ -1344,7 +1325,7 @@ subroutine ttrf(track,ktrack)
   !         px = track(2,i)
   !         py = track(4,i)
   !         pt = track(6,i)
-  !         ttt = 1d0/sqrt(1d0+2d0*pt*beti+pt**2 - px**2 - py**2)
+  !         ttt = one/sqrt(one+two*pt*beti+pt**2 - px**2 - py**2)
   !         track(1,i) = track(1,i) + dl*ttt*px
   !         track(3,i) = track(3,i) + dl*ttt*py
   !         track(5,i) = track(5,i)
@@ -1355,7 +1336,7 @@ subroutine ttrf(track,ktrack)
   !         track(6,i) = pt
   !
   !*---- Drift to end.
-  !         ttt = 1d0/sqrt(1d0+2d0*pt*beti+pt**2 - px**2 - py**2)
+  !         ttt = one/sqrt(one+two*pt*beti+pt**2 - px**2 - py**2)
   !         track(1,i) = track(1,i) + dl*ttt*px
   !         track(3,i) = track(3,i) + dl*ttt*py
   !         track(5,i) = track(5,i)
@@ -1365,6 +1346,7 @@ subroutine ttrf(track,ktrack)
 end subroutine ttrf
 
 subroutine ttcrabrf(track,ktrack,turn)
+  use math_constfi, only : zero, ten3m, ten6p
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1387,7 +1369,6 @@ subroutine ttcrabrf(track,ktrack,turn)
   double precision :: clight, twopi 
 
   double precision :: get_variable, node_value, get_value
-  double precision, parameter :: ten3m=1d-3, ten6p=1d6
 
   !---- Initialize
   clight = get_variable('clight ')
@@ -1415,7 +1396,7 @@ subroutine ttcrabrf(track,ktrack,turn)
   omega = rff * (ten6p * twopi / clight)
 
   if (turn .lt. t1)  then
-     vrf = 0d0
+     vrf = zero
   else if (turn .lt. t2) then
      vrf = (turn-t1) * rfv * ten3m/pc0/(t2-t1)
   else if (turn .lt. t3) then
@@ -1423,7 +1404,7 @@ subroutine ttcrabrf(track,ktrack,turn)
   else if (turn .lt. t4) then
      vrf = (t4-turn) * rfv * ten3m/pc0/(t4-t3)
   else
-     vrf = 0d0
+     vrf = zero
   endif
 
   !---- Set up phase ramp.
@@ -1443,6 +1424,7 @@ subroutine ttcrabrf(track,ktrack,turn)
 end subroutine ttcrabrf
 
 subroutine tthacdip(track,ktrack,turn)
+  use math_constfi, only : zero, ten3m, ten6p
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1453,18 +1435,16 @@ subroutine tthacdip(track,ktrack,turn)
   !----------------------------------------------------------------------*
   ! Added by Yipeng SUN on 11 Nov 2009                                   *
   !----------------------------------------------------------------------*
-  double precision :: track(6,*)
-  integer :: ktrack, turn
+  double precision, intent(INOUT) :: track(6,*)
+  integer, intent(IN) :: ktrack, turn
 
-  integer :: i, turn1, turn2, turn3, turn4
+  integer :: turn1, turn2, turn3, turn4
   double precision :: omega, phirf, rff, rfl, rfv, vrf, pc0
-  double precision :: clight, twopi
+  double precision :: twopi
 
   double precision :: get_variable, node_value, get_value
-  double precision, parameter :: ten3m=1d-3, ten6p=1d6
 
   !---- Initialize
-  clight = get_variable('clight ')
   twopi = get_variable('twopi ')
 
   !---- Fetch data.
@@ -1484,7 +1464,7 @@ subroutine tthacdip(track,ktrack,turn)
   phirf = rfl * twopi
 
   if (turn .lt. turn1)  then ! votage stable at zero
-     vrf = 0.d0
+     vrf = zero
   else if (turn .lt. turn2) then ! ramping up the voltage
      vrf = (turn-turn1) * vrf / (turn2-turn1)
   else if (turn .lt. turn3) then ! voltage stable at maximum
@@ -1492,16 +1472,15 @@ subroutine tthacdip(track,ktrack,turn)
   else if (turn .lt. turn4) then ! ramping down the voltage
      vrf = (turn4-turn) * vrf / (turn4-turn3)
   else ! stable again at zero
-     vrf = 0.d0
+     vrf = zero
   endif
   
-  do i = 1, ktrack
-     track(2,i) =  track(2,i) + vrf * sin(phirf + omega * turn)
-  enddo
+  TRACK(2,:ktrack) = TRACK(2,:ktrack) + vrf * sin(phirf + omega * turn)
 
 end subroutine tthacdip
 
 subroutine ttvacdip(track,ktrack,turn)
+  use math_constfi, only : zero, ten3m, ten6p
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1512,18 +1491,16 @@ subroutine ttvacdip(track,ktrack,turn)
   !----------------------------------------------------------------------*
   ! Added by Yipeng SUN on 11 Nov 2009                                   *
   !----------------------------------------------------------------------*
-  double precision :: track(6,*)
-  integer :: ktrack, turn
+  double precision, intent(INOUT) :: track(6,*)
+  integer, intent(IN) :: ktrack, turn
 
-  integer :: i, turn1, turn2, turn3, turn4
+  integer :: turn1, turn2, turn3, turn4
   double precision :: omega, phirf, rff, rfl, rfv, vrf, pc0
-  double precision :: clight, twopi
+  double precision :: twopi
 
   double precision :: get_variable, node_value, get_value
-  double precision, parameter :: ten3m=1d-3, ten6p=1d6
 
   !---- Initialize
-  clight = get_variable('clight ')
   twopi = get_variable('twopi ')
 
   !---- Fetch data.
@@ -1543,7 +1520,7 @@ subroutine ttvacdip(track,ktrack,turn)
   phirf = rfl * twopi
 
   if (turn .lt. turn1)  then ! voltage stable at zero
-     vrf = 0d0
+     vrf = zero
   else if (turn .lt. turn2) then ! ramping up the voltage
      vrf = (turn-turn1) * vrf / (turn2-turn1)
   else if (turn .lt. turn3) then ! voltage stable at maximum
@@ -1551,12 +1528,10 @@ subroutine ttvacdip(track,ktrack,turn)
   else if (turn .lt. turn4) then ! ramping down the voltage
      vrf = (turn4-turn) * vrf / (turn4-turn3)
   else ! stable again at zero
-     vrf = 0d0
+     vrf = zero
   endif
 
-  do i = 1, ktrack
-     track(4,i) =  track(4,i) + vrf * sin(phirf + omega * turn)
-  enddo
+  TRACK(4,:ktrack) = TRACK(4,:ktrack) + vrf * sin(phirf + omega * turn)
 
 end subroutine ttvacdip
 
@@ -1564,6 +1539,7 @@ end subroutine ttvacdip
 subroutine ttsep(el,track,ktrack)
   use twtrrfi
   use trackfi
+  use math_constfi, only : one, ten3m
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1584,7 +1560,6 @@ subroutine ttsep(el,track,ktrack)
   double precision :: cos_tilt, sin_tilt, efieldx, efieldy, pt
   
   double precision :: node_value, get_value
-  double precision, parameter :: one=1d0, ten3m=1d-3
   
   ex = node_value('ex_l ')
   ey = node_value('ey_l ')
@@ -1602,8 +1577,8 @@ subroutine ttsep(el,track,ktrack)
   efieldy = -ex*sin_tilt + ey*cos_tilt
 
   do i = 1, ktrack
-     deltap = sqrt(1d0 - 1d0/beta/beta + (track(6,i)+1d0/beta)**2) - 1d0
-     kick0 = charge * ten3m / pc / (1d0+deltap) / beta
+     deltap = sqrt(one - one/beta/beta + (track(6,i)+one/beta)**2) - one
+     kick0 = charge * ten3m / pc / (one+deltap) / beta
      track(2,i) = track(2,i) + kick0*efieldx
      track(4,i) = track(4,i) + kick0*efieldy
   end do
@@ -1613,6 +1588,7 @@ end subroutine ttsep
 subroutine ttcorr(el,track,ktrack,turn)
   use twtrrfi
   use trackfi
+  use math_constfi, only : zero, one, two, three
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1636,7 +1612,6 @@ subroutine ttcorr(el,track,ktrack,turn)
   
   integer :: node_fd_errors, get_option
   double precision :: get_variable, get_value, node_value
-  double precision, parameter :: zero=0.d0
 
   !---- Initialize.
   twopi = get_variable('twopi ')
@@ -1646,7 +1621,7 @@ subroutine ttcorr(el,track,ktrack,turn)
   betas = get_value('probe ','beta ')
   gammas = get_value('probe ','gamma ')
   dtbyds = get_value('probe ','dtbyds ')
-  dorad = get_value('probe ','radiate ') .ne. 0d0
+  dorad = get_value('probe ','radiate ') .ne. zero
   dodamp = get_option('damp ') .ne. 0
   dorand = get_option('quantum ') .ne. 0
 
@@ -1656,8 +1631,8 @@ subroutine ttcorr(el,track,ktrack,turn)
 
   F_ERRORS(0:maxferr) = zero ; n_ferr = node_fd_errors(f_errors)
 
-  if (el .eq. 0d0)  then
-     div = 1d0
+  if (el .eq. zero)  then
+     div = one
   else
      div = el
   endif
@@ -1667,16 +1642,16 @@ subroutine ttcorr(el,track,ktrack,turn)
   select case (code)
     case (14)
        xkick = bvk*(node_value('kick ')+node_value('chkick ')+field(1)/div)
-       ykick = 0d0
+       ykick = zero
     case (15)
        xkick = bvk*(node_value('hkick ')+node_value('chkick ')+field(1)/div)
        ykick = bvk*(node_value('vkick ')+node_value('cvkick ')+field(2)/div)
     case (16)
-       xkick = 0d0
+       xkick = zero
        ykick = bvk*(node_value('kick ')+node_value('cvkick ')+field(2)/div)
     case default
-       xkick = 0d0
-       ykick = 0d0
+       xkick = zero
+       ykick = zero
   end select
 
   !---- Sinusoidal kick
@@ -1697,21 +1672,21 @@ subroutine ttcorr(el,track,ktrack,turn)
   endif
 
   !---- Sum up total kicks.
-  dpx = xkick / (1d0 + deltas)
-  dpy = ykick / (1d0 + deltas)
+  dpx = xkick / (one + deltas)
+  dpy = ykick / (one + deltas)
   !---- Thin lens 6D version
   dpxx = xkick
   dpyy = ykick
 
-  bil2 = el / (2d0 * betas)
-  bi2gi2 = 1d0 / (betas * gammas) ** 2
+  bil2 = el / (two * betas)
+  bi2gi2 = one / (betas * gammas) ** 2
 
   !---- Half radiation effects at entrance.
   if (dorad  .and.  el .ne. 0) then
      if (dodamp .and. dorand) then
         curv = sqrt(dpx**2 + dpy**2) / el
      else
-        rfac = arad * gammas**3 * (dpx**2 + dpy**2) / (3d0 * el)
+        rfac = arad * gammas**3 * (dpx**2 + dpy**2) / (three * el)
      endif
 
      if (dodamp) then !---- Full damping.
@@ -1720,14 +1695,14 @@ subroutine ttcorr(el,track,ktrack,turn)
            px = track(2,i)
            py = track(4,i)
            pt = track(6,i)
-           track(2,i) = px - rfac * (1d0 + pt) * px
-           track(4,i) = py - rfac * (1d0 + pt) * py
-           track(6,i) = pt - rfac * (1d0 + pt) ** 2
+           track(2,i) = px - rfac * (one + pt) * px
+           track(4,i) = py - rfac * (one + pt) * py
+           track(6,i) = pt - rfac * (one + pt) ** 2
         enddo        
      else !---- Energy loss as for closed orbit.
-        rpx = rfac * (1d0 + track(6,1)) * track(2,1)
-        rpy = rfac * (1d0 + track(6,1)) * track(4,1)
-        rpt = rfac * (1d0 + track(6,1)) ** 2
+        rpx = rfac * (one + track(6,1)) * track(2,1)
+        rpy = rfac * (one + track(6,1)) * track(4,1)
+        rpt = rfac * (one + track(6,1)) ** 2
         do i = 1, ktrack
            track(2,i) = track(2,i) - rpx
            track(4,i) = track(4,i) - rpy
@@ -1739,20 +1714,20 @@ subroutine ttcorr(el,track,ktrack,turn)
   !---- Thick lens code taken out! AK 21.04.2006
   !!---- Half kick at entrance.
   !      do i = 1, ktrack
-  !        px = track(2,i) + 5d-1 * dpx
-  !        py = track(4,i) + 5d-1 * dpy
+  !        px = track(2,i) + dpx/two
+  !        py = track(4,i) + dpy/two
   !        pt = track(6,i)
   !
   !!---- Drift through corrector.
-  !        d = (1d0 - pt / betas) * el
+  !        d = (one - pt / betas) * el
   !        track(1,i) = track(1,i) + px * d
   !        track(3,i) = track(3,i) + py * d
   !        track(5,i) = track(5,i) + d * bi2gi2 * pt -           &
   !     bil2 * (px**2 + py**2 + bi2gi2*pt**2) + el*pt*dtbyds
   !
   !!---- Half kick at exit.
-  !        track(2,i) = px + 5d-1 * dpx
-  !        track(4,i) = py + 5d-1 * dpy
+  !        track(2,i) = px + dpx/two
+  !        track(4,i) = py + dpy/two
   !        track(6,i) = pt
   !      enddo
 
@@ -1762,22 +1737,22 @@ subroutine ttcorr(el,track,ktrack,turn)
      px = track(2,i)
      py = track(4,i)
      pt = track(6,i)
-     !        ttt = sqrt(1d0+2d0*pt*bet0i+pt**2 - px**2 - py**2)
-     !        ddd = sqrt(1d0+2d0*pt*bet0i+pt**2)
+     !        ttt = sqrt(one+two*pt*bet0i+pt**2 - px**2 - py**2)
+     !        ddd = sqrt(one+two*pt*bet0i+pt**2)
      !        track(2,i) = px + dpxx*ttt/ddd
      !        track(4,i) = py + dpyy*ttt/ddd
-     !        ttt = sqrt(1d0+2d0*pt*bet0i+pt**2 - dpxx**2 - dpyy**2)
-     !        ddd = sqrt(1d0+2d0*pt*bet0i+pt**2)
+     !        ttt = sqrt(one+two*pt*bet0i+pt**2 - dpxx**2 - dpyy**2)
+     !        ddd = sqrt(one+two*pt*bet0i+pt**2)
      !        track(2,i) = px + dpxx*ttt/ddd
      !        track(4,i) = py + dpyy*ttt/ddd
 
-     !        ttt = sqrt(1d0+2d0*pt*bet0i+pt**2 - px**2 - py**2)
-     !        ddd = sqrt(1d0+2d0*pt*bet0i+pt**2)
+     !        ttt = sqrt(one+two*pt*bet0i+pt**2 - px**2 - py**2)
+     !        ddd = sqrt(one+two*pt*bet0i+pt**2)
      !
      !        xp = px/ttt + dpxx/ddd  ! Apply kick in standard coordinates!
      !        yp = py/ttt + dpyy/ddd
      !
-     !        ttt = sqrt(1d0 + xp**2 + yp**2)
+     !        ttt = sqrt(one + xp**2 + yp**2)
      !
      !        px = xp*ddd/ttt ! Transform back to canonical coordinates
      !        py = yp*ddd/ttt
@@ -1791,7 +1766,7 @@ subroutine ttcorr(el,track,ktrack,turn)
      !       Add time of flight effects (stolen from Ripken-Dipole)
      !        track(5,i) = track(5,i) -                             &
      !        (dpxx*track(1,i) - dpyy*track(3,i)) *                &
-     !        ((1d0 + bet0*track(6,i))/ddd)*bet0i
+     !        ((one + bet0*track(6,i))/ddd)*bet0i
 
   enddo
 
@@ -1804,14 +1779,14 @@ subroutine ttcorr(el,track,ktrack,turn)
            px = track(2,i)
            py = track(4,i)
            pt = track(6,i)
-           track(2,i) = px - rfac * (1d0 + pt) * px
-           track(4,i) = py - rfac * (1d0 + pt) * py
-           track(6,i) = pt - rfac * (1d0 + pt) ** 2
+           track(2,i) = px - rfac * (one + pt) * px
+           track(4,i) = py - rfac * (one + pt) * py
+           track(6,i) = pt - rfac * (one + pt) ** 2
         enddo        
      else !---- Energy loss as for closed orbit.
-        rpx = rfac * (1d0 + track(6,1)) * track(2,1)
-        rpy = rfac * (1d0 + track(6,1)) * track(4,1)
-        rpt = rfac * (1d0 + track(6,1)) ** 2
+        rpx = rfac * (one + track(6,1)) * track(2,1)
+        rpy = rfac * (one + track(6,1)) * track(4,1)
+        rpt = rfac * (one + track(6,1)) ** 2
 
         do i = 1, ktrack
            track(2,i) = track(2,i) - rpx
@@ -1824,6 +1799,8 @@ subroutine ttcorr(el,track,ktrack,turn)
 end subroutine ttcorr
 
 subroutine ttbb(track,ktrack,parvec)
+  use bbfi, only : explim
+  use math_constfi, only : zero, one, two, half
   implicit none
   !----------------------------------------------------------------------*
   ! purpose:                                                             *
@@ -1847,17 +1824,15 @@ subroutine ttbb(track,ktrack,parvec)
   double precision :: get_value, node_value, get_variable
   double precision, parameter :: cme32=1d-32
 
-  !     if x > explim, exp(-x) is outside machine limits.
-
   !---- Calculate momentum deviation and according changes
   !     of the relativistic factor beta0
   dp  = get_variable('track_deltap ')
   q = get_value('probe ','charge ')
   q_prime = node_value('charge ')
   gamma0 = parvec(7)
-  beta0 = sqrt(1d0-1d0/gamma0**2)
-  ptot = beta0*gamma0*(1d0+dp)
-  beta_dp = ptot / sqrt(1d0 + ptot**2)
+  beta0 = sqrt(one - one/gamma0**2)
+  ptot = beta0*gamma0*(one+dp)
+  beta_dp = ptot / sqrt(one + ptot**2)
   b_dir_int = node_value('bbdir ')
   b_dir = dble(b_dir_int)
   b_dir = b_dir/sqrt(b_dir*b_dir + cme32)
@@ -1865,12 +1840,12 @@ subroutine ttbb(track,ktrack,parvec)
   !---- pre-factor, if zero, anything else does not need to be calculated
   bb_ultra_relati = get_option('bb_ultra_relati ') .ne. 0
   if (bb_ultra_relati) then
-     fk = 2d0 * parvec(5) * parvec(6) / parvec(7)
+     fk = two * parvec(5) * parvec(6) / parvec(7)
   else
-     fk = 2d0*parvec(5)*parvec(6)/parvec(7)/beta0/(1d0+dp)/q*          &
-       (1d0-beta0*beta_dp*b_dir)/(beta_dp+5d-1*(b_dir-1d0)*b_dir*beta0)
+     fk = two*parvec(5)*parvec(6)/parvec(7)/beta0/(one+dp)/q*          &
+       (one-beta0*beta_dp*b_dir)/(beta_dp+half*(b_dir-one)*b_dir*beta0)
   endif
-  if (fk .eq. 0d0)  return
+  if (fk .eq. zero)  return
 
   !---- choose beamshape: 1-Gaussian, 2-flattop=trapezoidal, 3-hollow-parabolic
   beamshape = node_value('bbshape ')
@@ -1894,6 +1869,7 @@ subroutine ttbb_gauss(track,ktrack,fk)
   use bbfi
   use spch_bbfi
   use fasterror
+  use math_constfi, only : zero, one, two, half, ten3m
   implicit none
   ! ---------------------------------------------------------------------*
   ! purpose: kicks the particles of the beam considered with a beam      *
@@ -1901,7 +1877,7 @@ subroutine ttbb_gauss(track,ktrack,fk)
   ! input and output as those of subroutine ttbb                         *
   ! ---------------------------------------------------------------------*
   double precision :: track(6,*), fk
-  integer :: ktrack
+  integer, intent(IN) :: ktrack
 
   integer :: i, ipos, mylen
   double precision :: pi, sx, sy, xm, ym, sx2, sy2, xs, ys, rho2, tk
@@ -1918,9 +1894,7 @@ subroutine ttbb_gauss(track,ktrack,fk)
   !-------------------------------------------------------------------
   integer :: get_option
   double precision :: get_variable, node_value
-  double precision, parameter :: ten3m=1d-3, explim=150d0
-  ! if x > explim, exp(-x) is outside machine limits.
-
+  
   !---- initialize.
   bborbit = get_option('bborbit ') .ne. 0
   pi = get_variable('pi ')
@@ -1949,7 +1923,7 @@ subroutine ttbb_gauss(track,ktrack,fk)
   ym = node_value('yma ')
   if (bb_sxy_update) fk = fk * rat_bb_n_ions !Ratio_for_bb_N_ions
 
-  if (fk .eq. 0d0)  return
+  if (fk .eq. zero)  return
 
   ipos = 0
   if (.not. bborbit)  then
@@ -1971,31 +1945,33 @@ subroutine ttbb_gauss(track,ktrack,fk)
         xs = track(1,i) - xm
         ys = track(3,i) - ym
         rho2 = xs * xs + ys * ys
-        tk = rho2 / (2d0 * sx2)
+        tk = rho2 / (two * sx2)
 
         if (bb_sxy_update) then
-           gauss_factor_t = exp(-5d-1*(track(5,i)-mean_t)**2/sigma_t**2)!VVK 20100321
+           gauss_factor_t = exp(-half*(track(5,i)-mean_t)**2/sigma_t**2)!VVK 20100321
 
            if (tk .gt. explim) then
+              ! if x > explim, exp(-x) is outside machine limits.
               phix = xs * fk / rho2 * gauss_factor_t !VVK 20100321
               phiy = ys * fk / rho2 * gauss_factor_t !VVK 20100321
-           else if (rho2 .ne. 0d0) then
-              phix = xs * fk / rho2 * (1d0 - exp(-tk) ) * gauss_factor_t !VVK 20100321
-              phiy = ys * fk / rho2 * (1d0 - exp(-tk) ) * gauss_factor_t !VVK 20100321
+           else if (rho2 .ne. zero) then
+              phix = xs * fk / rho2 * (one - exp(-tk) ) * gauss_factor_t !VVK 20100321
+              phiy = ys * fk / rho2 * (one - exp(-tk) ) * gauss_factor_t !VVK 20100321
            else
-              phix = 0d0
-              phiy = 0d0
+              phix = zero
+              phiy = zero
            endif
         else
            if (tk .gt. explim) then
+              ! if x > explim, exp(-x) is outside machine limits.
               phix = xs * fk / rho2
               phiy = ys * fk / rho2
-           else if (rho2 .ne. 0d0) then
-              phix = xs * fk / rho2 * (1d0 - exp(-tk) )
-              phiy = ys * fk / rho2 * (1d0 - exp(-tk) )
+           else if (rho2 .ne. zero) then
+              phix = xs * fk / rho2 * (one - exp(-tk) )
+              phiy = ys * fk / rho2 * (one - exp(-tk) )
            else
-              phix = 0d0
-              phiy = 0d0
+              phix = zero
+              phiy = zero
            endif
         endif
 
@@ -2012,7 +1988,7 @@ subroutine ttbb_gauss(track,ktrack,fk)
 
      !---- case sigma(x) > sigma(y).
   else if (sx2 .gt. sy2) then
-     r2 = 2d0 * (sx2 - sy2)
+     r2 = two * (sx2 - sy2)
      r  = sqrt(r2)
      ! rk = fk * sqrt(pi) / r                 !VVK 20100321
      rk = fk * sqrt(pi) / r
@@ -2022,7 +1998,7 @@ subroutine ttbb_gauss(track,ktrack,fk)
         do i = 1, ktrack
 
            if (bb_sxy_update) then
-              gauss_factor_t = exp(-5d-1*(track(5,i)-mean_t)**2/sigma_t**2)!VVK 20100321
+              gauss_factor_t = exp(-half*(track(5,i)-mean_t)**2/sigma_t**2)!VVK 20100321
               rkv(i) = fk * sqrt(pi) / r*gauss_factor_t !VVK 20100321
            endif
 
@@ -2030,7 +2006,7 @@ subroutine ttbb_gauss(track,ktrack,fk)
            ysv(i) = track(3,i) - ym
            xrv(i) = abs(xsv(i)) / r
            yrv(i) = abs(ysv(i)) / r
-           tkv(i) = (xsv(i) * xsv(i) / sx2 + ysv(i) * ysv(i) / sy2) / 2d0
+           tkv(i) = (xsv(i) * xsv(i) / sx2 + ysv(i) * ysv(i) / sy2) / two
            xbv(i) = (sy / sx) * xrv(i)
            ybv(i) = (sx / sy) * yrv(i)
         enddo
@@ -2040,6 +2016,7 @@ subroutine ttbb_gauss(track,ktrack,fk)
         call wzsubv(ktrack,xbv, ybv, cbxv, cbyv)
 !        do i = 1, ktrack
 !           if (tkv(i) .gt. explim) then
+               ! if x > explim, exp(-x) is outside machine limits.
 !              phixv(i) = rk * cryv(i)
 !              phiyv(i) = rk * crxv(i)
 !           endif
@@ -2049,8 +2026,8 @@ subroutine ttbb_gauss(track,ktrack,fk)
         do i = 1, ktrack
            phixv(i) = rkv(i) * (cryv(i) - exp(-tkv(i)) * cbyv(i))
            phiyv(i) = rkv(i) * (crxv(i) - exp(-tkv(i)) * cbxv(i))
-           track(2,i) = track(2,i) + phixv(i) * sign(1d0,xsv(i))
-           track(4,i) = track(4,i) + phiyv(i) * sign(1d0,ysv(i))
+           track(2,i) = track(2,i) + phixv(i) * sign(one,xsv(i))
+           track(4,i) = track(4,i) + phiyv(i) * sign(one,ysv(i))
            if (ipos .ne. 0)  then
               !--- subtract closed orbit kick
               track(2,i) = track(2,i) - bb_kick(1,ipos)
@@ -2065,7 +2042,7 @@ subroutine ttbb_gauss(track,ktrack,fk)
         do i = 1, ktrack
 
            if (bb_sxy_update) then
-              gauss_factor_t = exp(-5d-1*(track(5,i)-mean_t)**2/sigma_t**2)!VVK 20100321
+              gauss_factor_t = exp(-half*(track(5,i)-mean_t)**2/sigma_t**2)!VVK 20100321
               rk = fk * sqrt(pi) / r*gauss_factor_t !VVK 20100321
            endif
 
@@ -2074,8 +2051,9 @@ subroutine ttbb_gauss(track,ktrack,fk)
            xr = abs(xs) / r
            yr = abs(ys) / r
            call ccperrf(xr, yr, crx, cry)
-           tk = (xs * xs / sx2 + ys * ys / sy2) / 2d0
+           tk = (xs * xs / sx2 + ys * ys / sy2) / two
            if (tk .gt. explim) then
+              ! if x > explim, exp(-x) is outside machine limits.
               phix = rk * cry
               phiy = rk * crx
            else
@@ -2085,8 +2063,8 @@ subroutine ttbb_gauss(track,ktrack,fk)
               phix = rk * (cry - exp(-tk) * cby)
               phiy = rk * (crx - exp(-tk) * cbx)
            endif
-           track(2,i) = track(2,i) + phix * sign(1d0,xs)
-           track(4,i) = track(4,i) + phiy * sign(1d0,ys)
+           track(2,i) = track(2,i) + phix * sign(one,xs)
+           track(4,i) = track(4,i) + phiy * sign(one,ys)
            if (ipos .ne. 0)  then
               !--- subtract closed orbit kick
               track(2,i) = track(2,i) - bb_kick(1,ipos)
@@ -2100,7 +2078,7 @@ subroutine ttbb_gauss(track,ktrack,fk)
 
      !---- case sigma(x) < sigma(y).
   else
-     r2 = 2d0 * (sy2 - sx2)
+     r2 = two * (sy2 - sx2)
      r  = sqrt(r2)
      ! rk = fk * sqrt(pi) / r                 !VVK 20100321
      rk = fk * sqrt(pi) / r
@@ -2109,7 +2087,7 @@ subroutine ttbb_gauss(track,ktrack,fk)
      do i = 1, ktrack
 
         if (bb_sxy_update) then
-           gauss_factor_t = exp(-5d-1*(track(5,i)-mean_t)**2/sigma_t**2)!VVK 20100321
+           gauss_factor_t = exp(-half*(track(5,i)-mean_t)**2/sigma_t**2)!VVK 20100321
            rk = fk * sqrt(pi) / r*gauss_factor_t !VVK 20100321
         endif
 
@@ -2124,8 +2102,9 @@ subroutine ttbb_gauss(track,ktrack,fk)
            call ccperrf(yr, xr, cry, crx)
         endif
 
-        tk = (xs * xs / sx2 + ys * ys / sy2) / 2d0
+        tk = (xs * xs / sx2 + ys * ys / sy2) / two
         if (tk .gt. explim) then
+           ! if x > explim, exp(-x) is outside machine limits.
            phix = rk * cry
            phiy = rk * crx
         else
@@ -2141,8 +2120,8 @@ subroutine ttbb_gauss(track,ktrack,fk)
            phix = rk * (cry - exp(-tk) * cby)
            phiy = rk * (crx - exp(-tk) * cbx)
         endif
-        track(2,i) = track(2,i) + phix * sign(1d0,xs)
-        track(4,i) = track(4,i) + phiy * sign(1d0,ys)
+        track(2,i) = track(2,i) + phix * sign(one,xs)
+        track(4,i) = track(4,i) + phiy * sign(one,ys)
         if (ipos .ne. 0)  then
            !--- subtract closed orbit kick
            track(2,i) = track(2,i) - bb_kick(1,ipos)
@@ -2156,6 +2135,7 @@ end subroutine ttbb_gauss
 
 subroutine ttbb_flattop(track,ktrack,fk)
   use bbfi
+  use math_constfi, only : one, two, three, four, six, eight, twelve, half, ten3m
   implicit none
   ! ---------------------------------------------------------------------*
   ! purpose: kicks the particles of the beam considered with a beam      *
@@ -2173,12 +2153,7 @@ subroutine ttbb_flattop(track,ktrack,fk)
 
   integer :: get_option
   double precision :: get_variable, node_value       
-  double precision, parameter :: four=4d0, six=6d0, eight=8d0, twelve=12d0
-  double precision, parameter :: twentyfour=24d0, fortyeight=48d0, quarter=25d-2
-  double precision, parameter :: ten3m=1d-3, explim=150d0
-
-  !     if x > explim, exp(-x) is outside machine limits.
-
+ 
   !---- initialize.
   bborbit = get_option('bborbit ') .ne. 0
   pi = get_variable('pi ')
@@ -2204,18 +2179,18 @@ subroutine ttbb_flattop(track,ktrack,fk)
   !---- limit formulae for mean radius(x) = mean radius(y),
   !-----      preliminary the only case considered.
   !
-  if (abs(r0x2 - r0y2) .gt. ten3m * (r0x2 + r0y2)) then
-     zz = 5d-1*(r0x + r0y)
-     r0x=zz
-     r0y=zz
-     r0x2=r0x*r0x
-     r0y2=r0y*r0y
+  if (abs(r0x2 - r0y2) .gt. ten3m*(r0x2+r0y2)) then
+     zz = half*(r0x + r0y)
+     r0x = zz
+     r0y = zz
+     r0x2 = r0x*r0x
+     r0y2 = r0y*r0y
      if (first) call aawarn('TTBB_FLATTOP: ','beam is assumed to be circular')
      first=.false.
   endif
 
-  norm = (twelve*r0x**2 + wx**2)/twentyfour
-  r1 = r0x - wx/2d0
+  norm = half*r0x**2 + wx**2/(six*four)
+  r1 = r0x - wx/two
 !$OMP PARALLEL PRIVATE(i, xs, ys, rho, rho2, phir, phix, phiy)
 !$OMP DO
   do i = 1, ktrack
@@ -2223,18 +2198,17 @@ subroutine ttbb_flattop(track,ktrack,fk)
      ys = track(3,i) - ym
      rho2 = xs * xs + ys * ys
      rho  = sqrt(rho2)
-     if (rho.le.r1) then
-        phir = 5d-1/norm
+     if (rho .le. r1) then
+        phir = half/norm
         phix = phir*xs
         phiy = phir*ys
      else if (rho.gt.r1 .and. rho.lt.r1+wx) then
-        phir = ((r0x**2/four - r0x**3/six/wx - r0x*wx/eight +            &
-             wx**2/fortyeight)/rho2 + quarter + 5d-1*r0x/wx -            &
-             rho/3d0/wx)/norm
+        phir = ( (r0x**2/four - r0x**3/six/wx - r0x*wx/eight + wx**2/(six*eight))/rho2 &
+                + one/four + half*r0x/wx - rho/three/wx) / norm
         phix = phir*xs
         phiy = phir*ys
-     else if (rho.ge.r1+wx) then
-        phir = 1d0/rho2
+     else if (rho .ge. r1+wx) then
+        phir = one/rho2
         phix = xs*phir
         phiy = ys*phir
      endif
@@ -2248,6 +2222,7 @@ end subroutine ttbb_flattop
 
 subroutine ttbb_hollowparabolic(track,ktrack,fk)
   use bbfi
+  use math_constfi, only : zero, one, two, three, four, twelve, half, ten3m
   implicit none
   ! ---------------------------------------------------------------------*
   ! purpose: kicks the particles of the beam considered with a beam      *
@@ -2265,11 +2240,7 @@ subroutine ttbb_hollowparabolic(track,ktrack,fk)
 
   integer :: get_option
   double precision :: get_variable, node_value       
-  double precision, parameter :: four=4d0, twelve=12d0
-  double precision, parameter :: ten3m=1d-3, explim=150d0
-
-  !     if x > explim, exp(-x) is outside machine limits.
-
+    
   !---- initialize.
   bborbit = get_option('bborbit ') .ne. 0
   pi = get_variable('pi ')
@@ -2279,7 +2250,7 @@ subroutine ttbb_hollowparabolic(track,ktrack,fk)
   wi = node_value('width ')
   ! width is given as FWHM of parabolic density profile, but formulas were
   ! derived with half width at the bottom of the parabolic density profile
-  wi = wi/sqrt(2d0)
+  wi = wi/sqrt(two)
   xm = node_value('xma ')
   ym = node_value('yma ')
   ipos = 0
@@ -2299,13 +2270,13 @@ subroutine ttbb_hollowparabolic(track,ktrack,fk)
   !-----      preliminary the only case considered.
   !
   if (abs(r0x2 - r0y2) .gt. ten3m * (r0x2 + r0y2)) then
-     zz = 5d-1*(r0x + r0y)
-     r0x=zz
-     r0y=zz
-     r0x2=r0x*r0x
-     r0y2=r0y*r0y
+     zz = half*(r0x + r0y)
+     r0x = zz
+     r0y = zz
+     r0x2 = r0x*r0x
+     r0y2 = r0y*r0y
      if (first) call aawarn('TTBB_HOLLOWPARABOLIC: ', 'beam is assumed to be circular')
-     first=.false.
+     first = .false.
   endif
 
 !$OMP PARALLEL PRIVATE(i, xs, ys, rho, rho2, phir, phix, phiy)
@@ -2316,17 +2287,16 @@ subroutine ttbb_hollowparabolic(track,ktrack,fk)
      rho2 = xs * xs + ys * ys
      rho  = sqrt(rho2)
      if (rho.le.r0x-wx) then
-        phix = 0d0
-        phiy = 0d0
+        phix = zero
+        phiy = zero
      else if (rho.gt.r0x-wx .and. rho.lt.r0x+wx) then
-        phir=75d-2/wx/r0x/rho2*(r0x**4/twelve/wx**2 - r0x**2/2d0 +   &
-             2d0*r0x*wx/3d0 - wx**2/four + rho2/2d0*(1d0 -           &
-             r0x**2/wx**2) + rho**3/3d0*2d0*r0x/wx**2 -              &
-             rho**4/four/wx**2)
+        phir = three/four/wx/r0x/rho2 * (r0x**4/twelve/wx**2 - r0x**2/two + &
+             two*r0x*wx/three - wx**2/four + rho2/two*(one - r0x**2/wx**2) + & 
+             rho**3/three*two*r0x/wx**2 - rho**4/four/wx**2)
         phix = phir*xs
         phiy = phir*ys
      else
-        phir = 1d0/rho2
+        phir = one/rho2
         phix = xs*phir
         phiy = ys*phir
      endif
@@ -2361,7 +2331,7 @@ subroutine trkill(n, turn, sum, jmax, part_id, &
   !!--- As elements might have a tilt we have to transform back
   !!--- into the original coordinate system!
   !      theta = node_value('tilt ')
-  !      if (theta .ne. 0d0)  then
+  !      if (theta .ne. zero)  then
   !          st = sin(theta)
   !          ct = cos(theta)
   !!--- rotate trajectory (at exit)
@@ -2538,6 +2508,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
   use twiss0fi
   use name_lenfi
   use Inf_NaN_Detection
+  use math_constfi, only : zero, one
   implicit none
   ! 2015-Feb-20  18:46:05  ghislain: rewrite of trcoll
   ! 2015-Mar-09  14:50:37  ghislain: adapted to new racetrack parameter definition
@@ -2576,7 +2547,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
 
   integer, external :: get_option
   double precision, external :: get_variable
-  double precision, parameter :: zero=0.d0, min_double=1.d-36
+  double precision, parameter :: min_double=1.d-36
 
   pi=get_variable('pi ')
 
@@ -2674,12 +2645,12 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            if (debug) print *, " zero or negative vertical extent ", ap2, " replaced by default ", maxaper(3)
            ap2 = maxaper(3)
         endif
-        if (ap3.lt.0.d0) then ! zero extent of rounded corned is allowed
+        if (ap3.lt.zero) then ! zero extent of rounded corned is allowed
            if (debug) print *, " negative horizontal semi-axis ", ap3, & 
                 "; horizontal semi-axis reset to horizontal extent", ap1
            ap3 = ap1
         endif
-        if (ap4.lt.0.d0) then ! zero extent of rounded corner is allowed
+        if (ap4.lt.zero) then ! zero extent of rounded corner is allowed
            if (debug) print *, " negative vertical semi-axis ", ap4, & 
                 "; horizontal semi-axis reset to horizontal extent", ap2
            ap4 = ap2
@@ -2749,19 +2720,19 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
      select case (apertype)
 
      case ("circle")
-        lost = (x/ap1)**2 + (y/ap1)**2 .gt. 1d0  
+        lost = (x/ap1)**2 + (y/ap1)**2 .gt. one  
      
      case ("ellipse")
-        lost = (x/ap1)**2 + (y/ap2)**2 .gt. 1d0
+        lost = (x/ap1)**2 + (y/ap2)**2 .gt. one
 
      case ("rectangle")
         lost =  x .gt. ap1 .or. y .gt. ap2
         
      case ("lhcscreen", "rectcircle")
-        lost = x .gt. ap1 .or. y .gt. ap2 .or. (x/ap3)**2 + (y/ap3)**2 .gt. 1d0 
+        lost = x .gt. ap1 .or. y .gt. ap2 .or. (x/ap3)**2 + (y/ap3)**2 .gt. one 
   
      case ("rectellipse")
-       lost =  x .gt. ap1 .or. y .gt. ap2 .or. (x/ap3)**2 + (y/ap4)**2 .gt. 1d0 
+       lost =  x .gt. ap1 .or. y .gt. ap2 .or. (x/ap3)**2 + (y/ap4)**2 .gt. one 
  
      case ("racetrack")
         ! 2015-Mar-09  15:05:39  ghislain: adapted to new racetrack parameter definition
@@ -2769,13 +2740,13 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
         !    then test ellipse for corner part.
         lost =  x .gt. ap1 .or. y .gt. ap2 .or. &
              ( x .gt. ap1-ap3 .and. y .gt. ap2-ap3 .and. & 
-               ((x-(ap1-ap3)) / ap3)**2 + ((y-(ap2-ap3)) / ap4)**2 .gt. 1.d0 )
+               ((x-(ap1-ap3)) / ap3)**2 + ((y-(ap2-ap3)) / ap4)**2 .gt. one )
         
      case ("octagon")
         ! 2015-Feb-20  18:42:26  ghislain: added octagon shape           
         !*** case of octagon: test outer rectangle (ap1,ap2) then test cut corner.
         lost =  x .gt. ap1 .or. y .gt. ap2 .or. & 
-             (ap2*tan(pi/2 - ap4) - ap1)*(y - ap1*tan(ap3)) - (ap2 - ap1*tan(ap3))*(x - ap1) .lt. 0 
+             (ap2*tan(pi/2 - ap4) - ap1)*(y - ap1*tan(ap3)) - (ap2 - ap1*tan(ap3))*(x - ap1) .lt. zero 
 
      case default
         
@@ -2851,6 +2822,7 @@ end subroutine ttrfloss
 subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
   use bbfi
   use trackfi
+  use math_constfi, only : zero, one
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -2893,7 +2865,7 @@ subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
   ey = get_value('probe ','ey ')
   et = get_value('probe ','et ')
   bet0  = get_value('beam ','beta ')
-  bet0i = 1d0 / bet0
+  bet0i = one / bet0
   !-----get x add-on for lyaponuv calculation from dynap table
   deltax = get_value('dynap ', 'lyapunov ')
 
@@ -2915,7 +2887,7 @@ subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
      track(5) = t
      ! track(6) = deltae
      !---- Here we absorb deltap into the PT variable
-     track(6) = deltae + sqrt((1d0+deltap)**2+bet0i**2-1d0)-bet0i
+     track(6) = deltae + sqrt((one+deltap)**2+bet0i**2-one)-bet0i
      track(7) = fx
      track(8) = phix
      track(9) = fy
@@ -2924,7 +2896,7 @@ subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
      track(12) = phit
      
      do k = 1, 12
-        if (abs(track(k)) .ne. 0d0) then
+        if (abs(track(k)) .ne. zero) then
            itype(k) = 1
         else
            itype(k) = 0
@@ -3001,6 +2973,7 @@ end subroutine trbegn
 
 subroutine ttdpdg_map(track, ktrack, e1, h, hgap, fint, tilt)
   use matrices, only : EYE
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose: computes the effect of the dipole edge                      *
@@ -3013,7 +2986,6 @@ subroutine ttdpdg_map(track, ktrack, e1, h, hgap, fint, tilt)
   double precision :: corr, ek(6), rw(6,6), tw(6,6,6)
 
   double precision, external :: node_value
-  double precision, parameter :: zero=0.d0
 
   EK = zero 
   RW = EYE 
@@ -3024,11 +2996,10 @@ subroutine ttdpdg_map(track, ktrack, e1, h, hgap, fint, tilt)
   !---- Fringe fields effects computed from the TWISS routine tmfrng
   !     tmfrng returns the matrix elements rw(used) and tw(unused)
   !     No radiation effects as it is a pure thin lens with no lrad
-  call tmfrng(.false.,h,0d0,e1,0d0,0d0,corr,rw,tw)
-  call tmtilt(.false.,tilt,ek,rw,tw)
+  call tmfrng(.false., h, zero, e1, zero, zero, corr, rw, tw)
+  call tmtilt(.false., tilt, ek, rw, tw)
 
   TRACK(2,1:ktrack) = TRACK(2,1:ktrack) + RW(2,1) * TRACK(1,1:ktrack)
-
   TRACK(4,1:ktrack) = TRACK(4,1:ktrack) + RW(4,3) * TRACK(3,1:ktrack)
 
   return
@@ -3036,6 +3007,7 @@ end subroutine ttdpdg_map
 
 subroutine ttdpdg(track, ktrack)
   use matrices, only : EYE
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose: computes the effect of the dipole edge                      *
@@ -3049,7 +3021,6 @@ subroutine ttdpdg(track, ktrack)
   double precision :: ek(6), rw(6,6), tw(6,6,6)
 
   double precision :: node_value
-  double precision, parameter :: zero=0.d0
 
   EK = zero 
   RW = EYE 
@@ -3066,6 +3037,7 @@ subroutine ttdpdg(track, ktrack)
 end subroutine ttdpdg
 
 subroutine trsol(track,ktrack)
+  use math_constfi, only : one, two, half
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -3104,9 +3076,9 @@ subroutine trsol(track,ktrack)
   sksl = sksl * bvk
 
   !---- Set up strengths
-  ! sk    = sks / 2d0 / (1d0 + deltap)
-  sk    = sks / 2d0
-  skl   = sksl / 2d0
+  ! sk    = sks / two / (one + deltap)
+  sk    = sks / two
+  skl   = sksl / two
 
   !---- Loop over particles
   do  i = 1, ktrack
@@ -3116,9 +3088,9 @@ subroutine trsol(track,ktrack)
      psigf = track(6,i) / beta
 
      !     We do not use a constant deltap!!!!! WE use full 6D formulae!
-     onedp   = sqrt( 1d0 + 2*psigf + (beta**2)*(psigf**2) )
-     fpsig   = onedp - 1d0
-     fppsig  = ( 1d0 + (beta**2)*psigf ) / onedp
+     onedp   = sqrt( one + 2*psigf + (beta**2)*(psigf**2) )
+     fpsig   = onedp - one
+     fppsig  = ( one + (beta**2)*psigf ) / onedp
 
      !     Set up C,S, Q,R,Z
      cosTh = cos(skl/onedp)
@@ -3129,7 +3101,7 @@ subroutine trsol(track,ktrack)
 
      pxf  = track(2,i) + xf*Q
      pyf  = track(4,i) + yf*Q
-     sigf = track(5,i)*beta - 5d-1*(xf**2 + yf**2)*R
+     sigf = track(5,i)*beta - half*(xf**2 + yf**2)*R
 
      !       Ripken formulae p.29 (3.37)
      track(1,i) =  xf  * cosTh  +  yf  * sinTh
@@ -3236,6 +3208,7 @@ subroutine trclor(switch,orbit0)
   use name_lenfi
   use trackfi
   use matrices, only : EYE
+  use math_constfi, only : zero, one
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -3260,7 +3233,7 @@ subroutine trclor(switch,orbit0)
   double precision :: z(6,7), zz(6), z0(6,7), z00(6,7), a(6,7), ddd(6)
   double precision :: cotol, err, deltap, el, dxt(200), dyt(200)
   double precision :: al_errors(align_max)
-  double precision :: sum=0.d0, orbit(6)
+  double precision :: sum=zero, orbit(6)
   double precision :: last_pos(6), last_orbit(6,1), maxaper(6)
   character(len=12) :: char_a
 
@@ -3268,7 +3241,6 @@ subroutine trclor(switch,orbit0)
   integer, external :: restart_sequ, advance_node, get_option, node_al_errors
   double precision, external :: node_value, get_value, get_variable
 
-  double precision, parameter :: zero=0.d0
   integer, parameter :: itmax=10
 
   print *, " "
@@ -3303,13 +3275,13 @@ subroutine trclor(switch,orbit0)
   bet0   = get_value('beam ','beta ')
   betas  = get_value('probe ','beta ')
   gammas = get_value('probe ','gamma ')
-  bet0i  = 1d0 / bet0
-  beti   = 1d0 / betas
+  bet0i  = one / bet0
+  beti   = one / betas
   dtbyds = get_value('probe ','dtbyds ')
   deltas = get_variable('track_deltap ')
   deltap = get_value('probe ','deltap ')
   arad   = get_value('probe ','arad ')
-  dorad  = get_value('probe ','radiate ') .ne. 0d0
+  dorad  = get_value('probe ','radiate ') .ne. zero
   dodamp = get_option('damp ') .ne. 0
   dorand = get_option('quantum ') .ne. 0
 
@@ -3384,9 +3356,9 @@ subroutine trclor(switch,orbit0)
      A(:6,:6) = A(:6,:6) - EYE
      A(:6,7)  = Z(:6,1) - Z0(:6,1)
      err = maxval(abs(A(:,7)))
-     !err = 0d0
+     !err = zero
      !do i= 1,6
-     !   a(i,i) = a(i,i) - 1d0
+     !   a(i,i) = a(i,i) - one
      !   a(i,7) = z(i,1) - z0(i,1)
      !   err = max(abs(a(i,7)), err)
      !enddo
@@ -3428,6 +3400,7 @@ subroutine ixy_fitting()
   use name_lenfi
   use bbfi
   use spch_bbfi
+  use math_constfi, only : zero, one
   implicit none
 
   logical :: emittance_update
@@ -3443,11 +3416,11 @@ subroutine ixy_fitting()
   ! limit for particles taken for Ix, Iy evaluations
   double precision :: Ix_i, Iy_i, dpi_i, z_part_i, Ixy_rel_summ, N_for_I_dble
   double precision :: c_sumx, y_sumx, t_sumx, c_sumy, y_sumy, t_sumy, a_sum
-  double precision :: J0x=0d0, J0y=0d0, Sum_Jx=0d0, Sum_Jy=0d0 
+  double precision :: J0x=zero, J0y=zero, Sum_Jx=zero, Sum_Jy=zero 
   double precision, parameter :: ce10=1d10
 
-  integer :: get_option
-  double precision :: get_value
+  integer, external :: get_option
+  double precision, external :: get_value
 
   !----------------------------------------------------------------------
   emittance_update = get_option('emittance_update ') .ne. 0
@@ -3479,32 +3452,32 @@ subroutine ixy_fitting()
   N_for_I_dble=dble(N_for_I)
 
   !     rms of the relative momentum
-  Summ_dpi_square=0d0
+  Summ_dpi_square = zero
   sigma_p_loop: DO iii=1, N_for_I
-     Summ_dpi_square=Summ_dpi_square+dpi(iii)**2
+     Summ_dpi_square = Summ_dpi_square + dpi(iii)**2
   ENDDO sigma_p_loop
 
-  Summ_dpi_square=Summ_dpi_square/N_for_I_dble
-  if (Summ_dpi_square .GE. 0d0) then
+  Summ_dpi_square = Summ_dpi_square / N_for_I_dble
+  if (Summ_dpi_square .ge. zero) then
      if (emittance_update) sigma_p=sqrt(Summ_dpi_square)
   else
      call aafail('IXY_FITTING: Fatal: ','Summ_dpi_square<0')
   endif
 
   !     rms of the bunch length
-  Summ_z_part_square=0d0
+  Summ_z_part_square = zero
   sigma_z_loop: DO iii=1, N_for_I
-     Summ_z_part_square=Summ_z_part_square+z_part(iii)**2
+     Summ_z_part_square = Summ_z_part_square + z_part(iii)**2
   ENDDO sigma_z_loop
-  Summ_z_part_square=Summ_z_part_square/N_for_I_dble
-  if (Summ_z_part_square .GE. 0d0) then
-     sigma_z=sqrt(Summ_z_part_square)
+  Summ_z_part_square = Summ_z_part_square / N_for_I_dble
+  if (Summ_z_part_square .ge. zero) then
+     sigma_z = sqrt(Summ_z_part_square)
   else
      call aafail('IXY_FITTING: Fatal: ','Summ_z_part_square<0')
   endif
 
   !     SORTING Ix
-  Ix_min_last=0d0
+  Ix_min_last = zero
   iii_loop: DO iii=1, N_for_I
 
      Ix_min=ce10
@@ -3517,11 +3490,11 @@ subroutine ixy_fitting()
      ENDDO jjj_loop
 !$OMP END DO
 !$OMP END PARALLEL
-     Ix_sorted(iii)=Ix_min
-     Ix_min_last=Ix_min
+     Ix_sorted(iii) = Ix_min
+     Ix_min_last = Ix_min
   ENDDO iii_loop
 
-  Iy_min_last=0d0
+  Iy_min_last = zero
   iii_loop_y: DO iii=1, N_for_I
 
      Iy_min=ce10
@@ -3534,54 +3507,54 @@ subroutine ixy_fitting()
      ENDDO jjj_loop_y
 !$OMP END DO
 !$OMP END PARALLEL
-     Iy_sorted(iii)=Iy_min
-     Iy_min_last=Iy_min
+     Iy_sorted(iii) = Iy_min
+     Iy_min_last = Iy_min
   ENDDO iii_loop_y
 
 !New normalisation of the emittance calculation to exclude artificial collapses
 !R.Wasef
-  J0x=0d0
-  J0y=0d0
+  J0x = zero
+  J0y = zero
   jjj_loop_ray: DO jjj=1,N_for_I
-           J0x=J0x+Ix_sorted(jjj)
-           J0y=J0y+Iy_sorted(jjj)
+           J0x = J0x + Ix_sorted(jjj)
+           J0y = J0y + Iy_sorted(jjj)
   ENDDO jjj_loop_ray
-  J0x=J0x/(N_for_I_dble*N_for_I_dble)
-  J0y=J0y/(N_for_I_dble*N_for_I_dble)
-  J0x=J0x*J0x
-  J0y=J0y*J0y
+  J0x = J0x / (N_for_I_dble*N_for_I_dble)
+  J0y = J0y / (N_for_I_dble*N_for_I_dble)
+  J0x = J0x*J0x
+  J0y = J0y*J0y
   
-  Sum_Jx=0d0
-  Sum_Jy=0d0
+  Sum_Jx = zero
+  Sum_Jy = zero
   jjj_loop_ray2: DO jjj=1,N_for_I
-          Sum_Jx=Sum_Jx+( (Ix_sorted(jjj)*Ix_sorted(jjj)) /( J0x+(Ix_sorted(jjj)*Ix_sorted(jjj)) ) )
-          Sum_Jy=Sum_Jy+( (Iy_sorted(jjj)*Iy_sorted(jjj)) /( J0y+(Iy_sorted(jjj)*Iy_sorted(jjj)) ) )
+          Sum_Jx = Sum_Jx + ( (Ix_sorted(jjj)*Ix_sorted(jjj)) /( J0x+(Ix_sorted(jjj)*Ix_sorted(jjj)) ) )
+          Sum_Jy = Sum_Jy + ( (Iy_sorted(jjj)*Iy_sorted(jjj)) /( J0y+(Iy_sorted(jjj)*Iy_sorted(jjj)) ) )
   ENDDO jjj_loop_ray2
 
   !     Summ of step-function for Ex/Ey evaluation
   !     Kahan summation algorithm
-  Summ_x=0d0
-  Summ_y=0d0
-  c_sumx=0d0
-  c_sumy=0d0
+  Summ_x = zero
+  Summ_y = zero
+  c_sumx = zero
+  c_sumy = zero
   alpha = get_value('run ', 'alpha ')
 !!!!!$OMP PARALLEL PRIVATE(iii,a_sum,c_sumx,c_sumy,y_sumx,y_sumy,t_sumx,t_sumy)
 !!!!!$OMP DO REDUCTION(+:Summ_x,Summ_y)
   Summ_loop: DO iii=1,N_for_I    !!! the first particle is shifted
-     a_sum=Log(1d0-(alpha+dble(iii-1))/N_for_I_dble)
-     y_sumx=(Ix_sorted(iii)/(Ix_sorted(iii)*Ix_sorted(iii)+J0x))*a_sum/Sum_Jx-c_sumx
-     y_sumy=(Iy_sorted(iii)/(Iy_sorted(iii)*Iy_sorted(iii)+J0y))*a_sum/Sum_Jy-c_sumy
-     t_sumx=Summ_x+y_sumx
-     t_sumy=Summ_y+y_sumy
-     c_sumx=(t_sumx-Summ_x)-y_sumx
-     c_sumy=(t_sumy-Summ_y)-y_sumy
-     Summ_x=t_sumx
-     Summ_y=t_sumy
+     a_sum = Log(one-(alpha+dble(iii-1))/N_for_I_dble)
+     y_sumx = (Ix_sorted(iii)/(Ix_sorted(iii)*Ix_sorted(iii)+J0x))*a_sum/Sum_Jx-c_sumx
+     y_sumy = (Iy_sorted(iii)/(Iy_sorted(iii)*Iy_sorted(iii)+J0y))*a_sum/Sum_Jy-c_sumy
+     t_sumx = Summ_x + y_sumx
+     t_sumy = Summ_y + y_sumy
+     c_sumx = (t_sumx-Summ_x) - y_sumx
+     c_sumy = (t_sumy-Summ_y) - y_sumy
+     Summ_x = t_sumx
+     Summ_y = t_sumy
   ENDDO Summ_loop
 !!!!!$OMP END DO
 !!!!!$OMP END PARALLEL
-  Ey_rms=-1d0/Summ_y
-  Ex_rms=-1d0/Summ_x
+  Ey_rms = -one/Summ_y
+  Ex_rms = -one/Summ_x
 
   return
 END subroutine ixy_fitting
@@ -3595,6 +3568,7 @@ subroutine ixy_calcs(betas, orbit, z,          &
   use name_lenfi
   use bbfi
   use spch_bbfi
+  use math_constfi, only : two 
   implicit none
   double precision :: betas, orbit(6), z(6,N_macro_surv)
   double precision :: betax_start, betay_start
@@ -3615,17 +3589,17 @@ subroutine ixy_calcs(betas, orbit, z,          &
 
   do i=1,N_macro_surv
      ! Exact formulation might be too computational time costly
-     !        DPI=(sqrt((1d0+z(6,i)*betas)**2-gammas**(-2)))/betas-1d0
+     !        DPI=(sqrt((one+z(6,i)*betas)**2-gammas**(-2)))/betas-one
      DPI = (z(6,i) - orbit(6)) / betas
      XI  =  z(1,i) - orbit(1) - dx_start  * DPI
      PXI =  z(2,i) - orbit(2) - dpx_start * DPI
      YI  =  z(3,i) - orbit(3) - dy_start  * DPI
      PYI =  z(4,i) - orbit(4) - dpy_start * DPI
 
-     Ix_array(i)=(gamax_start*XI*XI+2d0*alfax_start*XI*PXI+betax_start*PXI*PXI)/2d0
-     Iy_array(i)=(gamay_start*YI*YI+2d0*alfay_start*YI*PYI+betay_start*PYI*PYI)/2d0
-     dpi_array(i)=DPI
-     z_part_array(i)=(z(5,i)-orbit(5))*betas
+     Ix_array(i) = (gamax_start*XI*XI + two*alfax_start*XI*PXI + betax_start*PXI*PXI) / two
+     Iy_array(i) = (gamay_start*YI*YI + two*alfay_start*YI*PYI + betay_start*PYI*PYI) / two
+     dpi_array(i) = DPI
+     z_part_array(i) = (z(5,i)-orbit(5))*betas
   enddo
 
 end subroutine ixy_calcs
@@ -3640,6 +3614,7 @@ subroutine table_input( betx_start, bety_start, &
   use twtrrfi
   use time_varfi
   use spch_bbfi
+  use math_constfi, only : zero, one
   implicit none
   double precision :: betx_start, bety_start
   double precision :: alfx_start, alfy_start 
@@ -3653,7 +3628,7 @@ subroutine table_input( betx_start, bety_start, &
   character(len=20) :: text
 
   integer :: double_from_table_row, string_from_table_row, advance_to_pos
-  double precision, parameter :: zero=0.d0, cme10=1d-10
+  double precision, parameter :: cme10=1d-10
 
   MYFIELD = zero 
   PHASE_TROMB = zero 
@@ -3684,7 +3659,7 @@ subroutine table_input( betx_start, bety_start, &
      if (i .eq. range(1)) then
         flag = string_from_table_row('spch_bb ', 'name ', i, name); if (flag.ne.0) goto 98
         flag = double_from_table_row('spch_bb ', 's ',i, position); if (flag.ne.0) goto 98
-        if (name(:10).ne."RING$START" .and. position.ne.0d0) then
+        if (name(:10).ne."RING$START" .and. position.ne.zero) then
            write(text, '(1p,i8)') i
            call aafail('TRRUN: Fatal: ', &
                 'Global TWISS not readable from table spch_bb'// text)
@@ -3699,8 +3674,8 @@ subroutine table_input( betx_start, bety_start, &
         endif
         flag = double_from_table_row('spch_bb ', 'alfx ', i, alfx_start); if (flag.ne.0) goto 98
         flag = double_from_table_row('spch_bb ', 'alfy ', i, alfy_start); if (flag.ne.0) goto 98
-        gamx_start = (1d0+alfx_start*alfx_start)/betx_start
-        gamy_start = (1d0+alfy_start*alfy_start)/bety_start
+        gamx_start = (one+alfx_start*alfx_start)/betx_start
+        gamy_start = (one+alfy_start*alfy_start)/bety_start
         flag = double_from_table_row('spch_bb ', 'dx ', i,  dx_start); if (flag.ne.0) goto 98
         flag = double_from_table_row('spch_bb ', 'dpx ', i, dpx_start); if (flag.ne.0) goto 98
         flag = double_from_table_row('spch_bb ', 'dy ', i,  dy_start); if (flag.ne.0) goto 98
@@ -3718,8 +3693,8 @@ subroutine table_input( betx_start, bety_start, &
         endif
         flag = double_from_table_row('spch_bb ', 'alfx ', i, alfx_bb(ii)); if (flag.ne.0) goto 98
         flag = double_from_table_row('spch_bb ', 'alfy ', i, alfy_bb(ii)); if (flag.ne.0) goto 98
-        gamx_bb(ii) = (1d0+alfx_bb(ii)*alfx_bb(ii))/betx_bb(ii)
-        gamy_bb(ii) = (1d0+alfy_bb(ii)*alfy_bb(ii))/bety_bb(ii)
+        gamx_bb(ii) = (one+alfx_bb(ii)*alfx_bb(ii))/betx_bb(ii)
+        gamy_bb(ii) = (one+alfy_bb(ii)*alfy_bb(ii))/bety_bb(ii)
         flag = double_from_table_row('spch_bb ', 'dx ', i,  dx_bb(ii)); if (flag.ne.0) goto 98
         flag = double_from_table_row('spch_bb ', 'dy ', i,  dy_bb(ii)); if (flag.ne.0) goto 98
      endif
@@ -3861,6 +3836,7 @@ subroutine table_input( betx_start, bety_start, &
 end subroutine table_input
 
 subroutine ttnllens(track,ktrack)
+  use math_constfi, only : zero, one, two, half
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -3887,24 +3863,24 @@ subroutine ttnllens(track,ktrack)
     x = track(1,i) / cnll
     y = track(3,i) / cnll
 
-    u=0.5*sqrt((x-1)**2+y**2)+0.5*sqrt((x+1)**2+y**2)
-    v=0.5*sqrt((x+1)**2+y**2)-0.5*sqrt((x-1)**2+y**2)
-    if (u .eq. 1d0) then
-       dd=0
+    u = half*sqrt((x-one)**2+y**2) + half*sqrt((x+one)**2+y**2)
+    v = half*sqrt((x+one)**2+y**2) - half*sqrt((x-one)**2+y**2)
+    if (u .eq. one) then
+       dd = zero
     else
-       dd=u**2*log(u+sqrt(u*u-1))/sqrt(u**2-1)
+       dd = u**2 * log(u + sqrt(u*u-one))/sqrt(u**2-one)
     endif
-    dUu=(u+log(u+sqrt(u*u-1))*sqrt(u**2-1)+dd)/(u**2-v**2) &
-         -2*u*(u*log(u+sqrt(u*u-1))*sqrt(u**2-1) &
-         +v*(acos(v)-0.5*pi)*sqrt(1-v**2)) /(u**2-v**2)**2
-    dUv=2*v*(u*log(u+sqrt(u*u-1))*sqrt(u**2-1) &
-         +v*(acos(v)-0.5*pi)*sqrt(1-v**2)) /(u**2-v**2)**2 &
-         -(v-(acos(v)-0.5*pi)*sqrt(1-v**2)+v**2*(acos(v)-0.5*pi)/sqrt(1-v**2)) &
-         /(u**2-v**2)
-    dux=0.5*(x-1)/sqrt((x-1)**2+y**2) +0.5*(x+1)/sqrt((x+1)**2+y**2)
-    duy=0.5*y/sqrt((x-1)**2+y**2) +0.5*y/sqrt((x+1)**2+y**2)
-    dvx=0.5*(x+1)/sqrt((x+1)**2+y**2) -0.5*(x-1)/sqrt((x-1)**2+y**2)
-    dvy=0.5*y/sqrt((x+1)**2+y**2) -0.5*y/sqrt((x-1)**2+y**2)
+    dUu = (u + log(u+sqrt(u*u-one))*sqrt(u**2-one) + dd)/(u**2-v**2) &
+         - two*u*(u*log(u+sqrt(u*u-one))*sqrt(u**2-one) &
+                + v*(acos(v)-pi/two)*sqrt(one-v**2)) /(u**2-v**2)**2
+    dUv = two*v*(u*log(u+sqrt(u*u-one))*sqrt(u**2-one) &
+               + v*(acos(v)-pi/two)*sqrt(one-v**2)) /(u**2-v**2)**2 &
+         - (v - (acos(v)-pi/two)*sqrt(one-v**2) + v**2*(acos(v)-pi/two)/sqrt(one-v**2)) &
+            / (u**2-v**2)
+    dux = half*(x-one)/sqrt((x-one)**2+y**2) + half*(x+one)/sqrt((x+one)**2+y**2)
+    duy = half*y/sqrt((x-one)**2+y**2) + half*y/sqrt((x+one)**2+y**2)
+    dvx = half*(x+one)/sqrt((x+one)**2+y**2) - half*(x-one)/sqrt((x-one)**2+y**2)
+    dvy = half*y/sqrt((x+one)**2+y**2) - half*y/sqrt((x-one)**2+y**2)
 
     track(2,i) = track(2,i) + knll*(dUu*dux+dUv*dvx)
     track(4,i) = track(4,i) + knll*(dUu*duy+dUv*dvy)
@@ -3916,6 +3892,7 @@ end subroutine ttnllens
 subroutine ttrfmult(track, ktrack, turn)
   use twtrrfi
   use trackfi
+  use math_constfi, only : zero, one, three, ten3m, ten6p
   implicit none
   !--------------------*
   ! Andrea Latina 2012 *
@@ -3950,8 +3927,7 @@ subroutine ttrfmult(track, ktrack, turn)
 
   double precision, external :: node_value, get_value, get_variable
   integer, external :: node_fd_errors
-  double complex, parameter :: ii=(0d0,1d0)
-  double precision, parameter :: zero=0.d0, ten3m=1d-3
+  double complex, parameter :: ii=(zero,one)
 
   twopi = get_variable('twopi ')  
   clight = get_variable('clight ')
@@ -3971,53 +3947,49 @@ subroutine ttrfmult(track, ktrack, turn)
   bvk = node_value('other_bv ')
   elrad = node_value('lrad ')
   deltap = get_value('probe ', 'deltap ')
-  dorad = get_value('probe ','radiate ') .ne. 0d0
+  dorad = get_value('probe ','radiate ') .ne. zero
   arad = get_value('probe ','arad ')
   gammas = get_value('probe ','gamma ')
   beta = get_value('probe ','beta ')
   pc = get_value('probe ','pc ')
   
-  n_ferr = node_fd_errors(f_errors);
+  n_ferr = node_fd_errors(f_errors)
   call get_node_vector('knl ', nn, normal)
   call get_node_vector('ksl ', ns, skew)
-  call get_node_vector('pnl ', dummyi, pnl);
-  call get_node_vector('psl ', dummyi, psl);
+  call get_node_vector('pnl ', dummyi, pnl)
+  call get_node_vector('psl ', dummyi, psl)
 
   rfac = zero
 
   !---- Set-up some parameters
-  volt = bvk * node_value('volt ');
-  krf = twopi*freq*1d6/clight;
+  volt = bvk * node_value('volt ')
+  krf = twopi*freq*ten6p/clight
 
   if (n_ferr .gt. 0) call dcopy(f_errors,field,n_ferr)
 
-  nord = max(nn, ns, n_ferr/2-1);
+  nord = max(nn, ns, n_ferr/2-1)
 
   !---- Prepare to calculate the kick and the matrix elements
   do jtrk = 1,ktrack
     ! apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
-    x  = bvk * track(1,jtrk);
-    px =       track(2,jtrk);
-    y  =       track(3,jtrk);
-    py = bvk * track(4,jtrk);
-    z  = bvk * track(5,jtrk);
-    pt =       track(6,jtrk);
+    x  = bvk * track(1,jtrk)
+    px =       track(2,jtrk)
+    y  =       track(3,jtrk)
+    py = bvk * track(4,jtrk)
+    z  = bvk * track(5,jtrk)
+    pt =       track(6,jtrk)
 
     !---- Vector with strengths + field errors
-    do iord = 0, nord;
-      field_cos(1,iord) = bvk * (normal(iord) * cos(pnl(iord) * twopi - krf * z) + field(1,iord));
-      field_sin(1,iord) = bvk * (normal(iord) * sin(pnl(iord) * twopi - krf * z));
-      field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * twopi - krf * z) + field(2,iord));
-      field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * twopi - krf * z));
+    do iord = 0, nord
+      field_cos(1,iord) = bvk * (normal(iord) * cos(pnl(iord) * twopi - krf * z) + field(1,iord))
+      field_sin(1,iord) = bvk * (normal(iord) * sin(pnl(iord) * twopi - krf * z))
+      field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * twopi - krf * z) + field(2,iord))
+      field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * twopi - krf * z))
     enddo
-    Cm2 = 0d0;
-    Sm2 = 0d0;
-    Cm1 = 0d0;
-    Sm1 = 0d0;
-    Cp0 = 0d0;
-    Sp0 = 0d0;
-    Cp1 = 0d0;
-    Sp1 = 0d0;
+
+    Cm2 = zero; Sm2 = zero; Cm1 = zero; Sm1 = zero; 
+    Cp0 = zero; Sp0 = zero; Cp1 = zero; Sp1 = zero;
+
     do iord = nord, 0, -1
       if (iord.ge.2) then
         Cm2 = Cm2 * (x+ii*y) / (iord-1) + field_cos(1,iord)+ii*field_cos(2,iord);
@@ -4042,11 +4014,11 @@ subroutine ttrfmult(track, ktrack, turn)
     dpt = (volt * ten3m * sin(lag * twopi - krf * z) / pc - krf * REAL(Sp1));
 
     !---- Radiation effects at entrance.
-    if (dorad  .and.  elrad .ne. 0d0) then
-      rfac = arad * gammas**3 * (dpx**2+dpy**2) / (3d0*elrad)
-      px = px - rfac * (1d0 + pt) * px
-      py = py - rfac * (1d0 + pt) * py
-      pt = pt - rfac * (1d0 + pt) ** 2
+    if (dorad  .and.  elrad .ne. zero) then
+      rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
+      px = px - rfac * (one + pt) * px
+      py = py - rfac * (one + pt) * py
+      pt = pt - rfac * (one + pt) ** 2
     endif
 
     !---- Apply the kick
@@ -4055,10 +4027,10 @@ subroutine ttrfmult(track, ktrack, turn)
     pt = pt + dpt
 
     !---- Radiation effects at exit.
-    if (dorad  .and.  elrad .ne. 0d0) then
-      px = px - rfac * (1d0 + pt) * px
-      py = py - rfac * (1d0 + pt) * py
-      pt = pt - rfac * (1d0 + pt) ** 2
+    if (dorad  .and.  elrad .ne. zero) then
+      px = px - rfac * (one + pt) * px
+      py = py - rfac * (one + pt) * py
+      pt = pt - rfac * (one + pt) ** 2
     endif
 
     ! apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
@@ -4076,6 +4048,7 @@ end subroutine ttrfmult
 subroutine tttquad(track, ktrack)
   use twtrrfi
   use trackfi
+  use math_constfi, only : zero, one, two, half
   implicit none
   !-------------------------*
   ! Andrea Latina 2012-2013 *
@@ -4112,18 +4085,18 @@ subroutine tttquad(track, ktrack)
   k1s = node_value('k1s ');
   length = node_value('l ');
 
-  if (k1 .eq. 0d0 .and. k1s .eq. 0d0) then
+  if (k1.eq.zero .and. k1s.eq.zero) then
      call ttdrf(length,track,ktrack);
      return
-  else if (k1.ne.0d0 .and. k1s.ne.0d0) then
+  else if (k1.ne.zero .and. k1s.ne.zero) then
      call aawarn('trrun: ','a quadrupole cannot have *both* K1 and K1S different from zero!');
      return
   endif
 
-  if (k1s.ne.0d0) then
+  if (k1s .ne. zero) then
      kk0 = k1s; skew = .true.
   else
-     kk0 = k1; skew = .false.
+     kk0 = k1;  skew = .false.
   endif
 
   !---- Prepare to calculate the kick and the matrix elements
@@ -4137,17 +4110,17 @@ subroutine tttquad(track, ktrack)
      pt = track(6,jtrk);
 
 !!$    !---- Radiation effects at entrance.
-!!$    if (dorad  .and.  elrad .ne. 0d0) then
-!!$      rfac = arad * gammas**3 * (dpx**2+dpy**2) / (3d0*elrad)
-!!$      track(2,jtrk) = track(2,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(2,jtrk)
-!!$      track(4,jtrk) = track(4,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(4,jtrk)
-!!$      track(6,jtrk) = track(6,jtrk) - rfac * (1d0 + track(6,jtrk)) ** 2
+!!$    if (dorad  .and.  elrad .ne. zero) then
+!!$      rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
+!!$      track(2,jtrk) = track(2,jtrk) - rfac * (one + track(6,jtrk)) * track(2,jtrk)
+!!$      track(4,jtrk) = track(4,jtrk) - rfac * (one + track(6,jtrk)) * track(4,jtrk)
+!!$      track(6,jtrk) = track(6,jtrk) - rfac * (one + track(6,jtrk)) ** 2
 !!$    endif
 
      !---- If SKEW rotates by -45 degrees
      if (skew) then
-        ct =  sqrt2 / 2d0
-        st = -sqrt2 / 2d0
+        ct =  sqrt2 / two
+        st = -sqrt2 / two
         tmp = x
         x = ct * tmp + st * y
         y = ct * y   - st * tmp
@@ -4157,11 +4130,11 @@ subroutine tttquad(track, ktrack)
      endif
 
      !---- Computes 1+delta and kk
-     delta_p1 = sqrt(pt*pt+2d0*pt/bet0+1d0);
+     delta_p1 = sqrt(pt*pt + two*pt/bet0 + one);
      kk = kk0 / delta_p1;
 
      !---- Computes the kick
-     if (kk .gt. 0d0) then
+     if (kk .gt. zero) then
         ksqrt = sqrt(kk);
         C = cos(ksqrt*length);
         S = sin(ksqrt*length);
@@ -4191,11 +4164,11 @@ subroutine tttquad(track, ktrack)
      y_  = Ch * y + Sh_over_ksqrt * py / delta_p1;
      py_ = -ksqrt_Sh * delta_p1 * y + Ch * py;
      !---- Z
-     z_ = z + pt*length*(1d0-bet0sqr)/bet0sqr - &
-          (0.5) * (bet0*pt+1d0)/bet0/(delta_p1*delta_p1) * &
-          (0.5 * kk0 * ((x*x)*(length-C*S_over_ksqrt) - (y*y)*(length-Ch*Sh_over_ksqrt)) + &
-          0.5 * ((px*px)*(length+C*S_over_ksqrt) + (py*py)*(length+Ch*Sh_over_ksqrt)) / delta_p1 - &
-          (x*px*(1d0-C*C)+y*py*(1d0-Ch*Ch)));
+     z_ = z + pt*length*(one-bet0sqr)/bet0sqr - &
+          half * (bet0*pt+one)/bet0/(delta_p1*delta_p1) * &
+          (half * kk0 * ((x*x)*(length-C*S_over_ksqrt) - (y*y)*(length-Ch*Sh_over_ksqrt)) + &
+          half * ((px*px)*(length+C*S_over_ksqrt) + (py*py)*(length+Ch*Sh_over_ksqrt)) / delta_p1 - &
+          (x*px*(one-C*C)+y*py*(one-Ch*Ch)));
      !pt_ = pt; ! unchanged
 
      x = x_;
@@ -4207,8 +4180,8 @@ subroutine tttquad(track, ktrack)
 
      !---- If SKEW rotates by +45 degrees
      if (skew) then
-        ct = sqrt2 / 2d0
-        st = sqrt2 / 2d0
+        ct = sqrt2 / two
+        st = sqrt2 / two
         tmp = x
         x = ct * tmp + st * y
         y = ct * y   - st * tmp
@@ -4226,10 +4199,10 @@ subroutine tttquad(track, ktrack)
      !track(6,jtrk) = pt ! unchanged
 
 !!$    !---- Radiation effects at exit.
-!!$    if (dorad  .and.  elrad .ne. 0d0) then
-!!$      track(2,jtrk) = track(2,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(2,jtrk)
-!!$      track(4,jtrk) = track(4,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(4,jtrk)
-!!$      track(6,jtrk) = track(6,jtrk) - rfac * (1d0 + track(6,jtrk)) ** 2
+!!$    if (dorad  .and.  elrad .ne. zero) then
+!!$      track(2,jtrk) = track(2,jtrk) - rfac * (one + track(6,jtrk)) * track(2,jtrk)
+!!$      track(4,jtrk) = track(4,jtrk) - rfac * (one + track(6,jtrk)) * track(4,jtrk)
+!!$      track(6,jtrk) = track(6,jtrk) - rfac * (one + track(6,jtrk)) ** 2
 !!$    endif
 
   enddo
@@ -4239,6 +4212,7 @@ end subroutine tttquad
 subroutine tttdipole(track, ktrack)
   use twtrrfi
   use trackfi
+  use math_constfi, only : zero, one, two, three, five, seven, half
   implicit none
   !-------------------------*
   ! Andrea Latina 2013-2014 *
@@ -4276,15 +4250,15 @@ subroutine tttdipole(track, ktrack)
   hgap = node_value('hgap ')
   fint = node_value('fint ')
   fintx = node_value('fintx ')
-  kill_ent_fringe = node_value('kill_ent_fringe ') .ne. 0d0
-  kill_exi_fringe = node_value('kill_exi_fringe ') .ne. 0d0
+  kill_ent_fringe = node_value('kill_ent_fringe ') .ne. zero
+  kill_exi_fringe = node_value('kill_exi_fringe ') .ne. zero
   arad = get_value('probe ','arad ')
   gamma = get_value('probe ','gamma ')
-  dorad = get_value('probe ','radiate ') .ne. 0d0
+  dorad = get_value('probe ','radiate ') .ne. zero
 
   !---- Apply entrance dipole edge effect
   if (.not.kill_ent_fringe) &
-       call ttdpdg_map(track, ktrack, e1, h1, hgap, fint, 0d0)
+       call ttdpdg_map(track, ktrack, e1, h1, hgap, fint, zero)
   
   !---- Read-in the parameters
   bet0sqr = bet0*bet0;
@@ -4306,17 +4280,17 @@ subroutine tttdipole(track, ktrack)
   
      !---- Radiation effects at entrance.
      if (dorad) then
-        delta_plus_1_sqr = pt*pt+2d0*pt/bet0+1d0;
+        delta_plus_1_sqr = pt*pt + two*pt/bet0 + one;
         delta_plus_1 = sqrt(delta_plus_1_sqr);
-        hx = 1d0/(rho*delta_plus_1);
-        hy = 0d0;
-        rfac = (arad * gamma**3 * L / 3d0) * (hx**2 + hy**2) * (1d0 + h*x) * (1d0 - tan(e1)*x)
-        px = px - rfac * (1d0 + pt) * px
-        py = py - rfac * (1d0 + pt) * py
-        pt = pt - rfac * (1d0 + pt) ** 2
+        hx = one/(rho*delta_plus_1);
+        hy = zero;
+        rfac = (arad * gamma**3 * L / three) * (hx**2 + hy**2) * (one + h*x) * (one - tan(e1)*x)
+        px = px - rfac * (one + pt) * px
+        py = py - rfac * (one + pt) * py
+        pt = pt - rfac * (one + pt) ** 2
      endif
 
-     delta_plus_1_sqr = pt*pt+2.0*pt/bet0+1;
+     delta_plus_1_sqr = pt*pt + two*pt/bet0 + one;
      delta_plus_1 = sqrt(delta_plus_1_sqr);
      sqrt_delta_plus_1 = sqrt(delta_plus_1);
      sqrt_h_sqrt_k0 = sign(sqrt(h*k0),k0);
@@ -4325,25 +4299,25 @@ subroutine tttdipole(track, ktrack)
      C=cos(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1);
      S=sin(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1);
      C_sqr = C*C;
-     x_ = px*S/(sqrt_delta_plus_1*sqrt_h_sqrt_k0)+x*C-delta_plus_1*C/k0+C/h+delta_plus_1/k0-1.0/h;
+     x_ = px*S/(sqrt_delta_plus_1*sqrt_h_sqrt_k0)+x*C-delta_plus_1*C/k0+C/h+delta_plus_1/k0-one/h;
      px_ = -sqrt_delta_plus_1*sqrt_h_sqrt_k0*x*S- &
           sqrt_delta_plus_1*sqrt_k0_div_sqrt_h*S+delta_plus_1*sqrt_delta_plus_1*sqrt_h_div_sqrt_k0*S+px*C;
      y_  = y + py * L / delta_plus_1; 
      py_ = py; 
-     z_  = z + pt*L*(1.0-bet0sqr)/bet0sqr + &
-          (-(0.5)*(bet0*pt+1.0)/bet0/(delta_plus_1**3) * &
-          (x*x*delta_plus_1*(h*k0*L-sqrt_delta_plus_1*sqrt_h_sqrt_k0*C*S)*0.5 + &
-          px*px*(sqrt_delta_plus_1*C*S/sqrt_h_sqrt_k0+L)*0.5 + &
+     z_  = z + pt*L*(one-bet0sqr)/bet0sqr + &
+          (-half*(bet0*pt+one)/bet0/(delta_plus_1**3) * &
+          (x*x*delta_plus_1*(h*k0*L-sqrt_delta_plus_1*sqrt_h_sqrt_k0*C*S)*half + &
+          px*px*(sqrt_delta_plus_1*C*S/sqrt_h_sqrt_k0+L)*half + &
           px*(-delta_plus_1_sqr*C_sqr/k0+delta_plus_1*C_sqr/h+delta_plus_1_sqr/k0-delta_plus_1/h) + &
-          x*(-delta_plus_1**(3.0*0.5)*sqrt_k0_div_sqrt_h*C*S+ &
-          delta_plus_1**(5.0*0.5)*sqrt_h_div_sqrt_k0*C*S+ &
+          x*(-delta_plus_1**(three*half)*sqrt_k0_div_sqrt_h*C*S+ &
+          delta_plus_1**(five*half)*sqrt_h_div_sqrt_k0*C*S+ &
           delta_plus_1*k0*L-delta_plus_1_sqr*h*L)+ &
-          x*px*delta_plus_1*(C_sqr-1.0) + &
+          x*px*delta_plus_1*(C_sqr-one) + &
           py*py*L + &
-          (-delta_plus_1**(3.0*0.5)*sqrt_k0_div_sqrt_h*C*S*0.5/h + &
-          delta_plus_1**(5.0*0.5)*C*S/(sqrt_h_sqrt_k0)+ &
-          (-delta_plus_1**(7.0*0.5)*sqrt_h_div_sqrt_k0*C*S*0.5/k0 + &
-          delta_plus_1*L*(delta_plus_1*(delta_plus_1*h/k0*0.5-1.0)+k0/h*0.5)))));
+          (-delta_plus_1**(three*half)*sqrt_k0_div_sqrt_h*C*S*half/h + &
+          delta_plus_1**(five*half)*C*S/(sqrt_h_sqrt_k0)+ &
+          (-delta_plus_1**(seven*half)*sqrt_h_div_sqrt_k0*C*S*half/k0 + &
+          delta_plus_1*L*(delta_plus_1*(delta_plus_1*h/k0*half-one)+k0/h*half)))));
      !pt_ = pt; ! unchanged
      
      x = x_;
@@ -4363,23 +4337,24 @@ subroutine tttdipole(track, ktrack)
      
      !---- Radiation effects at exit.
      if (dorad) then
-        hx = 1d0/(rho*delta_plus_1);
-        rfac = (arad * gamma**3 * L / 3d0) * (hx**2 + hy**2) * (1d0 + h*x) * (1d0 - tan(e2)*x)
-        px = px - rfac * (1d0 + pt) * px
-        py = py - rfac * (1d0 + pt) * py
-        pt = pt - rfac * (1d0 + pt) ** 2
+        hx = one/(rho*delta_plus_1);
+        rfac = (arad * gamma**3 * L / three) * (hx**2 + hy**2) * (one + h*x) * (one - tan(e2)*x)
+        px = px - rfac * (one + pt) * px
+        py = py - rfac * (one + pt) * py
+        pt = pt - rfac * (one + pt) ** 2
      endif
   enddo
   
   !---- Apply exit dipole edge effect
   if (.not.kill_exi_fringe) then
-     if (fintx.lt.0d0) fintx = fint
-     call ttdpdg_map(track, ktrack, e2, h2, hgap, fintx, 0d0)
+     if (fintx .lt. zero) fintx = fint
+     call ttdpdg_map(track, ktrack, e2, h2, hgap, fintx, zero)
   endif
   
 end subroutine tttdipole
 
 subroutine trphot(el,curv,rfac,deltap)
+  use math_constfi, only : zero, one, two, three, five, twelve
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -4409,7 +4384,7 @@ subroutine trphot(el,curv,rfac,deltap)
   character(len=20) text
 
   double precision :: get_value, get_variable, frndm
-  double precision, parameter :: five=5d0, twelve=12d0, fac1=3.256223d0
+  double precision, parameter :: fac1=3.256223d0
   integer, parameter :: nr=55, maxran=1000000000
 
   data (taby(i), i = 1, 52)                                         &
@@ -4478,14 +4453,14 @@ subroutine trphot(el,curv,rfac,deltap)
   gamma  = get_value('probe ','gamma ')
   deltap = get_value('probe ','deltap ')
   scalen = five / (twelve * hbar * clight)
-  scaleu = hbar * 3d0 * clight / 2d0
+  scaleu = hbar * three * clight / two
 
   !---- AMEAN is the average number of photons emitted.,
   !     NPHOT is the integer number generated from Poisson's law.
-  amean = scalen * abs(arad*pc*(1d0+deltap)*el*curv) * sqrt(3d0)
-  rfac = 0d0
+  amean = scalen * abs(arad*pc*(one+deltap)*el*curv) * sqrt(three)
+  rfac = zero
   real_am = amean
-  if (real_am .gt. 0d0) then
+  if (real_am .gt. zero) then
      call dpoissn(real_am, nphot, ierror)
 
      if (ierror .ne. 0) then
@@ -4498,7 +4473,7 @@ subroutine trphot(el,curv,rfac,deltap)
 
      if (nphot .ne. 0) then
         ucrit = scaleu * gamma**2 * abs(curv) / amass
-        xi = 0d0
+        xi = zero
         do i = 1, nphot
 
            !---- Find a uniform random number in the range [ 0,3.256223 ].
@@ -4521,6 +4496,7 @@ subroutine trphot(el,curv,rfac,deltap)
 end subroutine trphot
 
 subroutine dpoissn (amu,n,ierror)
+  use math_constfi, only : zero, one, half
   implicit none
   !----------------------------------------------------------------------*
   !    POISSON GENERATOR                                                 *
@@ -4540,7 +4516,7 @@ subroutine dpoissn (amu,n,ierror)
 
   ierror= 0
 
-  if (amu .le. 0d0) then
+  if (amu .le. zero) then
      ! MEAN SHOULD BE POSITIVE
      ierror = 1
      n = 0
@@ -4550,16 +4526,17 @@ subroutine dpoissn (amu,n,ierror)
   if (amu .gt. amax) then
      ! NORMAL APPROXIMATION FOR AMU.GT.AMAX
      ran = grndm()
-     n = ran * sqrt(amu) + amu + 5d-1
+     n = ran * sqrt(amu) + amu + half
      return
   endif
 
    expma = exp(-amu)
-   pir = 1d0
+   pir = one
    n = -1
+
 10 n = n + 1
    pir = pir * frndm()
-   if (pir.gt.expma) go to 10
+   if (pir .gt. expma) go to 10
 
 end subroutine dpoissn
 
@@ -4626,7 +4603,7 @@ subroutine mywwerf(x,y,wr,wi)
   integer :: n
   double precision :: rr(37), ri(37), sr0, sr, si, tr, ti, vi, vr, xa, xl, ya, zhi, zhr
 
-  double precision, parameter :: z1=1, hf=z1/2d0, z10=10d0
+  double precision, parameter :: z1=1d0, hf=z1/2d0, z10=10d0
   double precision, parameter :: c1=74d0/z10, c2=83d0/z10, c3=z10/32d0, c4=16d0/z10
   !double precision, parameter :: c=1.12837916709551257d0, p=(2d0*c4)**33
   double precision, parameter :: c=1.12837916709551257d0
@@ -4711,6 +4688,7 @@ subroutine mywwerf(x,y,wr,wi)
 end subroutine mywwerf
 
 subroutine wzsubv(n,vx,vy,vu,vv)
+  use math_constfi, only : one, two, half
   !  *********************************************************************
   !
   !  This subroutine sets u=real(w(z)) and v=imag(w(z)), where z=x+i*y and
@@ -4770,7 +4748,6 @@ subroutine wzsubv(n,vx,vy,vu,vv)
 
   double precision, parameter :: xcut=7.77d0, ycut=7.46d0 
   double precision, parameter :: h=1.d0/63.d0
-  double precision, parameter :: half=0.5d0, one=1.d0
   double precision, parameter :: a1=0.5124242248d0, a2=0.0517653588d0
   double precision, parameter :: b1=0.2752551286d0, b2=2.7247448714d0
   double precision, parameter :: xm=1d120
@@ -4811,7 +4788,7 @@ subroutine wzsubv(n,vx,vy,vu,vv)
               if (xx.ge.xm) xx=xm
               if (yy.ge.xm) yy=xm
               vp=xx**2-yy**2
-              vq=(2.d0*xx)*yy
+              vq=(two*xx)*yy
               vqsq=vq**2
               !  First term.
               vt=vp-b1
@@ -4858,7 +4835,7 @@ subroutine wzsubv(n,vx,vy,vu,vv)
               vti = vd23i - vd34i
               vtdd24r = vti - vtr
               !hr05 vtdd24i(j) = - ( vtr(j) + vti(j) )
-              vtdd24i = -1d0* ( vtr + vti )                             !hr05
+              vtdd24i = -one * ( vtr + vti )                             !hr05
               k = k + 1
               vw1r = wtreal(k)
               vw1i = wtimag(k)
@@ -4873,10 +4850,8 @@ subroutine wzsubv(n,vx,vy,vu,vv)
               !  Evaluate polynomial.
               vxhrel = vxh - dble(vmu)
               vyhrel = vyh - dble(vnu)
-              vusum3=half*(vtdd13r+                                       &
-                   &(vxhrel*vtdddr-vyhrel*vtdddi))
-              vvsum3=half*(vtdd13i+                                       &
-                   &(vxhrel*vtdddi+vyhrel*vtdddr))
+              vusum3 = half * (vtdd13r + (vxhrel*vtdddr - vyhrel*vtdddi))
+              vvsum3 = half * (vtdd13i + (vxhrel*vtdddi + vyhrel*vtdddr))
               vyhrel = vyhrel - one
               vusum=vd12r+(vxhrel*vusum3-vyhrel*vvsum3)
               vvsum=vd12i+(vxhrel*vvsum3+vyhrel*vusum3)
@@ -4891,31 +4866,31 @@ subroutine wzsubv(n,vx,vy,vu,vv)
   !     everything outside the rectangle so approximate
   !     write (*,*) 'ALL outside'
   !     write (*,*) 'i=',i
-  do j=1,out
-     xx=vx(outs(j))
-     yy=vy(outs(j))
+  do j= 1,out
+     xx = vx(outs(j))
+     yy = vy(outs(j))
      if (xx.ge.xm) xx=xm
      if (yy.ge.xm) yy=xm
-     vp=xx**2-yy**2
-     vq=(2.d0*xx)*yy
-     vqsq=vq**2
+     vp = xx**2 - yy**2
+     vq = (two*xx)*yy
+     vqsq = vq**2
      !  First term.
-     vt=vp-b1
-     vr=a1/(vt**2+vqsq)
-     vsreal=vr*vt
-     vsimag=-vr*vq
+     vt = vp-b1
+     vr = a1/(vt**2+vqsq)
+     vsreal =  vr*vt
+     vsimag = -vr*vq
      !  Second term
-     vt=vp-b2
-     vr=a2/(vt**2+vqsq)
-     vsreal=vsreal+vr*vt
-     vsimag=vsimag-vr*vq
+     vt = vp-b2
+     vr = a2/(vt**2+vqsq)
+     vsreal = vsreal +vr*vt
+     vsimag = vsimag -vr*vq
      !  Multiply by i*z.
-     vu(outs(j))=-(yy*vsreal+xx*vsimag)
-     vv(outs(j))=xx*vsreal-yy*vsimag
+     vu(outs(j)) = -(yy*vsreal+xx*vsimag)
+     vv(outs(j)) =   xx*vsreal-yy*vsimag
   enddo
   !     everything inside the square, so interpolate
   !     write (*,*) 'ALL inside'
-  do j=1,in
+  do j= 1,in
      vxh = hrecip*vx(ins(j))
      vyh = hrecip*vy(ins(j))
      vmu = int(vxh)
@@ -4938,7 +4913,7 @@ subroutine wzsubv(n,vx,vy,vu,vv)
      vti = vd23i - vd34i
      vtdd24r = vti - vtr
      !hr05 vtdd24i(j) = - ( vtr(j) + vti(j) )
-     vtdd24i = -1d0* ( vtr + vti )                             !hr05
+     vtdd24i = -one * ( vtr + vti )                             !hr05
      k = k + 1
      vw1r = wtreal(k)
      vw1i = wtimag(k)
@@ -4953,22 +4928,21 @@ subroutine wzsubv(n,vx,vy,vu,vv)
      !  Evaluate polynomial.
      vxhrel = vxh - dble(vmu)
      vyhrel = vyh - dble(vnu)
-     vusum3=half*(vtdd13r+                                       &
-          &(vxhrel*vtdddr-vyhrel*vtdddi))
-     vvsum3=half*(vtdd13i+                                       &
-          &(vxhrel*vtdddi+vyhrel*vtdddr))
+     vusum3 = half * (vtdd13r + (vxhrel*vtdddr-vyhrel*vtdddi))
+     vvsum3 = half * (vtdd13i + (vxhrel*vtdddi+vyhrel*vtdddr))
      vyhrel = vyhrel - one
-     vusum=vd12r+(vxhrel*vusum3-vyhrel*vvsum3)
-     vvsum=vd12i+(vxhrel*vvsum3+vyhrel*vusum3)
+     vusum = vd12r + (vxhrel*vusum3-vyhrel*vvsum3)
+     vvsum = vd12i + (vxhrel*vvsum3+vyhrel*vusum3)
      vxhrel = vxhrel - one
-     vu(ins(j))=vw1r+(vxhrel*vusum-vyhrel*vvsum)
-     vv(ins(j))=vw1i+(vxhrel*vvsum+vyhrel*vusum)
+     vu(ins(j)) = vw1r + (vxhrel*vusum-vyhrel*vvsum)
+     vv(ins(j)) = vw1i + (vxhrel*vvsum+vyhrel*vusum)
   enddo
   !$OMP END PARALLEL
   return
 end subroutine wzsubv
 
 subroutine wzsub(x,y,u,v)
+  use math_constfi, only : one, two, half
   !  *********************************************************************
   !
   !  This subroutine sets u=real(w(z)) and v=imag(w(z)), where z=x+i*y and
@@ -5008,7 +4982,6 @@ subroutine wzsub(x,y,u,v)
   double precision :: xh, xhrel, yh, yhrel
 
   double precision, parameter :: xcut=7.77d0, ycut=7.46d0
-  double precision, parameter :: half=0.5d0, one=1.d0
   double precision, parameter :: a1=0.5124242248d0, a2=0.0517653588d0
   double precision, parameter :: b1=0.2752551286d0, b2=2.7247448714d0
 
@@ -5074,7 +5047,7 @@ subroutine wzsub(x,y,u,v)
   !
 1000 p=x**2-y**2
   !hr05 q=2.d0*x*y
-  q=(2.d0*x)*y                                                       !hr05
+  q=(two*x)*y                                                       !hr05
   qsq=q**2
   !  First term.
   t=p-b1
@@ -5098,30 +5071,30 @@ end subroutine wzsub
 LOGICAL FUNCTION  is_thin()
   double precision node_value, el
   el = node_value('l ')
-  is_thin = el.eq.0d0;
+  is_thin = el .eq. 0d0;
 END FUNCTION is_thin
 
 LOGICAL FUNCTION  is_drift()
   double precision node_value, code
   code = node_value('mad8_type ')
-  is_drift = code.eq.1;
+  is_drift = code .eq. 1;
 END FUNCTION is_drift
 
 LOGICAL FUNCTION  is_dipole()
   double precision node_value, code
   code = node_value('mad8_type ')
-  is_dipole = code.eq.3;
+  is_dipole = code .eq. 3;
 END FUNCTION is_dipole
 
 LOGICAL FUNCTION  is_matrix()
   double precision node_value, code
   code = node_value('mad8_type ')
-  is_matrix = code.eq.4;
+  is_matrix = code .eq. 4;
 END FUNCTION is_matrix
 
 LOGICAL FUNCTION  is_quad()
   double precision node_value, code
   code = node_value('mad8_type ')
-  is_quad = code.eq.5;
+  is_quad = code .eq. 5;
 END FUNCTION is_quad
 

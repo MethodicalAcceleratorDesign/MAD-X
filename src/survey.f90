@@ -1,6 +1,6 @@
 !  Routines for the survey command in MADX / A. Verdier (started October 2001)
 subroutine survey
-
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -19,19 +19,20 @@ subroutine survey
   !   ENERGY from BEAM common, and call TMLCAV for each one to update    *
   !   ENERGY                                                             *
   !----------------------------------------------------------------------*
+  integer :: i, j, code, add_pass, passes, n_add_angle
+  integer :: angle_count, node_count, node_ref(100)
+  double precision :: dphi, dpsi, dtheta, phi, phi0, psi, psi0, theta, theta0
+  double precision :: sums, el, suml, tilt, globaltilt
+  double precision :: v(3), v0(3), ve(3), w(3,3), w0(3,3), we(3,3), tx(3)
+  double precision :: add_angle(10), org_ang(100)
 
-  integer i,j,code,restart_sequ,advance_node,add_pass,passes,n_add_angle
-  integer angle_count, node_count, node_ref(100),set_cont_sequence
-  double precision dphi,dpsi,dtheta,phi,phi0,proxim,psi,psi0,sums,  &
-       theta,theta0,v(3),v0(3),ve(3),w(3,3),w0(3,3),we(3,3),tx(3),       &
-       node_value,el,suml,get_value,tilt,globaltilt,zero,add_angle(10), &
-       org_ang(100)
-  parameter(zero=0d0)
+  integer, external :: restart_sequ, advance_node, set_cont_sequence
+  double precision, external :: proxim, node_value, get_value
 
   !---- Retrieve command attributes.
-  v0(1)=  get_value('survey ','x0 ')
-  v0(2)=  get_value('survey ','y0 ')
-  v0(3)=  get_value('survey ','z0 ')
+  v0(1) =  get_value('survey ','x0 ')
+  v0(2) =  get_value('survey ','y0 ')
+  v0(3) =  get_value('survey ','z0 ')
   theta0 = get_value('survey ','theta0 ')
   phi0 =   get_value('survey ','phi0 ')
   psi0 =   get_value('survey ','psi0 ')
@@ -42,32 +43,23 @@ subroutine survey
   psi = psi0
 
   !---- Set up initial V and W.
+  call sumtrx(theta0, phi0, psi0, w0)
+  V = V0
+  W = W0
+
   suml = zero
   sums = zero
-  call sumtrx(theta0, phi0, psi0, w0)
-  !      theta = theta0
-  !      phi =  phi0
-  !      psi =  psi0
 
-
-  !---- (replaces SUCOPY)
-  do j = 1, 3
-     v(j) = v0(j)
-     do i = 1, 3
-        w(i,j) = w0(i,j)
-     enddo
-  enddo
 5 continue
-
-  !---- loop over elements  NO SYMMETRIC SUPERPERIOD ANYMORE!   *******
-  !      print *,"suml  length   theta(x)   phi(y)    psi(z)   coord."
-  add_pass = get_value('sequence ','add_pass ')
-  ! multiple passes allowed
+  !---- loop over passes
+  add_pass = get_value('sequence ','add_pass ')   ! multiple passes allowed
   do passes = 0, add_pass
      j = restart_sequ()
      angle_count = 0
      node_count = 0
+
 10   continue
+     !---- loop over elements  
      node_count = node_count + 1
      if (passes .gt. 0)  then
         call get_node_vector('add_angle ',n_add_angle,add_angle)
@@ -80,19 +72,20 @@ subroutine survey
            call store_node_value('angle ', add_angle(passes))
         endif
      endif
+
      code = node_value('mad8_type ')
-     if(code.eq.39) code=15
-     if(code.eq.38) code=24
-     !      print *,"code   ", code
-     !**** el is the arc length for all bends  ********
+     !if(code.eq.39) code=15 ! 2015-Aug-06  21:50:12  ghislain: not required here
+     !if(code.eq.38) code=24
+      !**** el is the arc length for all bends  ********
      el = node_value('l ')
-     call suelem(el, ve, we,tilt)
-     !      print *,"el, tilt", el, tilt
+     call suelem(el, ve, we, tilt)
      suml = suml + el
      !**  Compute the coordinates at each point
-     call sutrak(v, w, ve, we)
+     !call sutrak(v, w, ve, we)
+     V = V + matmul(W,VE)
+     W = matmul(W,WE)
      !**  Compute globaltilt HERE : it's the value at the entrance
-     globaltilt=psi+tilt
+     globaltilt = psi + tilt
      !**  Compute the survey angles at each point
      call suangl(w, theta, phi, psi)
      !**  Fill the survey table
@@ -100,35 +93,32 @@ subroutine survey
      if (advance_node().ne.0)  goto 10
      !---- end of loop over elements  ***********************************
   enddo
-  ! restore original angle to node if necessary
+
+
   if (add_pass .gt. 0) then
      j = restart_sequ()
      angle_count = 1
      node_count = 0
+
 20   continue
+     !---- loop over elements to
+     ! restore original angle to node if necessary
      node_count = node_count+1
      if (node_ref(angle_count) .eq. node_count)  then
         call store_node_value('angle ', org_ang(angle_count))
         angle_count = angle_count+1
      endif
      if (advance_node().ne.0)  goto 20
+
   endif
   if (set_cont_sequence() .ne. 0)  goto 5
 
   !---- Centre of machine.
-  do i = 1, 3
-     tx(i) = v(i) - v0(i)
-  enddo
+  TX = V - V0
   dtheta = theta - proxim(theta0, theta)
   dphi = phi - proxim(phi0, phi)
   dpsi = psi - proxim(psi0, psi)
-  !      print *,v, theta, phi, psi
 end subroutine survey
-!-----------------  end of survey  subroutine -------------------------
-
-!***********************************************************************
-!  Subroutines necessary : suangl sumtrx sutrak suelem sutran
-!**********************************************************************
 
 subroutine suangl(w, theta, phi, psi)
   implicit none
@@ -142,46 +132,40 @@ subroutine suangl(w, theta, phi, psi)
   !   PHI       (real)    Elevation angle.                               *
   !   PSI       (real)    Roll angle.                                    *
   !----------------------------------------------------------------------*
-  double precision arg,theta,phi,psi,w(3,3),proxim
+  double precision, intent(IN) :: w(3,3)
+  double precision, intent(OUT) :: theta, phi, psi
+
+  double precision :: arg
+  double precision, external :: proxim
 
   arg = sqrt(w(2,1)**2 + w(2,2)**2)
-  phi = atan2(w(2,3), arg)
-  !      print *,"SUANGL: phi =",phi," arg=",arg,"  w23 =",w(2,3),
-  !      "  w22 =",w(2,2),"  w21 =",w(2,1)
 
-  !*****  old procedure commented as incompatiblr with YROT
-  !      if (arg .gt. 1.0e-20) then
+  phi = atan2(w(2,3), arg)
   theta = proxim(atan2(w(1,3), w(3,3)), theta)
   psi = proxim(atan2(w(2,1), w(2,2)), psi)
-  !      else
-  !        theta = atan2(w(1,3), w(3,3))
-  !        psi = proxim(atan2(-w(1,2), w(1,1))-theta, psi)
-  !      endif
-end subroutine suangl
-!-----------------  end of suangl  subroutine -------------------------
-!
 
-!**********************************************************************
-subroutine sumtrx(the, phi, psi, w)
+end subroutine suangl
+
+subroutine sumtrx(theta, phi, psi, w)
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Given three survey angles, compute rotation matrix.                *
   ! Input:                                                               *
-  !   THE       (real)    Azimuthal angle.                               *
+  !   THETA     (real)    Azimuthal angle.                               *
   !   PHI       (real)    Elevation angle.                               *
   !   PSI       (real)    Roll angle.                                    *
   ! Output:                                                              *
   !   W(3,3)    (real)    Rotation matrix.                               *
   !----------------------------------------------------------------------*
-  double precision cosphi,cospsi,costhe,phi,psi,sinphi,sinpsi,sinthe,the,w(3,3)
+  double precision, intent(IN) :: theta, phi, psi
+  double precision, intent(OUT) :: w(3,3) 
 
-  costhe = cos(the)
-  sinthe = sin(the)
-  cosphi = cos(phi)
-  sinphi = sin(phi)
-  cospsi = cos(psi)
-  sinpsi = sin(psi)
+  double precision :: cosphi, cospsi, costhe, sinphi, sinpsi, sinthe
+
+  costhe = cos(theta);   cosphi = cos(phi);   cospsi = cos(psi)
+  sinthe = sin(theta);   sinphi = sin(phi);   sinpsi = sin(psi)
+
   w(1,1) = + costhe * cospsi - sinthe * sinphi * sinpsi
   w(1,2) = - costhe * sinpsi - sinthe * sinphi * cospsi
   w(1,3) =                     sinthe * cosphi
@@ -193,81 +177,12 @@ subroutine sumtrx(the, phi, psi, w)
   w(3,3) =                     costhe * cosphi
 
 end subroutine sumtrx
-!-----------------  end of sumtrx subroutine --------------------------
 
-!**********************************************************************
-subroutine sutran(w, v, we)
-  implicit none
-  !----------------------------------------------------------------------*
-  ! Purpose:                                                             *
-  !   Transform rotation W and displacement V from entrance to exit.     *
-  ! Input:                                                               *
-  !   W(3,3)    (real)    Rotation matrix w.r.t. input system.           *
-  !   V(3)      (real)    Displacement w.r.t. input system.              *
-  !   WE(3,3)   (real)    Rotation matrix due to element.                *
-  ! Output:                                                              *
-  !   W(3,3)    (real)    Rotation matrix w.r.t. output system.          *
-  !   V(3)      (real)    Displacement w.r.t. output system.             *
-  !----------------------------------------------------------------------*
-  integer i,k
-  double precision v(3),vt(3),w(3,3),we(3,3),wt(3,3)
-
-  !---- VT := transpose(WE) * V;
-  !     WT := transpose(WE) * W;
-  do i = 1, 3
-     vt(i) = we(1,i)*v(1) + we(2,i)*v(2) + we(3,i)*v(3)
-     do k = 1, 3
-        wt(i,k) = we(1,i)*w(1,k) + we(2,i)*w(2,k) + we(3,i)*w(3,k)
-     enddo
-  enddo
-
-  !---- V := VT       [= transpose(WE) * V];
-  !     W := WT * WE  [= transpose(WE) * W * WE];
-  do i = 1, 3
-     v(i) = vt(i)
-     do k = 1, 3
-        w(i,k) = wt(i,1)*we(1,k) + wt(i,2)*we(2,k) + wt(i,3)*we(3,k)
-     enddo
-  enddo
-end subroutine sutran
-!-----------------  end of sutran subroutine --------------------------
-
-!**********************************************************************
-
-subroutine sutrak(v, w, ve, we)
-  implicit none
-  !----------------------------------------------------------------------*
-  ! Purpose:                                                             *
-  !   Update global position.                                            *
-  ! Input:                                                               *
-  !   V(3)      (real)    Global displacement before element.            *
-  !   W(3,3)    (real)    Global rotation matrix before element.         *
-  !   VE(3)     (real)    Displacement due to element.                   *
-  !   WE(3,3)   (real)    Rotation due to element.                       *
-  ! Output:                                                              *
-  !   V(3)      (real)    Global displacement after element.             *
-  !   W(3,3)    (real)    Global rotation matrix after element.          *
-  !----------------------------------------------------------------------*
-  integer i
-  double precision v(3),ve(3),w(3,3),we(3,3),wt1,wt2,wt3
-
-  do i = 1, 3
-     v(i) = v(i) + w(i,1)*ve(1) + w(i,2)*ve(2) + w(i,3)*ve(3)
-     wt1 = w(i,1)*we(1,1) + w(i,2)*we(2,1) + w(i,3)*we(3,1)
-     wt2 = w(i,1)*we(1,2) + w(i,2)*we(2,2) + w(i,3)*we(3,2)
-     wt3 = w(i,1)*we(1,3) + w(i,2)*we(2,3) + w(i,3)*we(3,3)
-     w(i,1) = wt1
-     w(i,2) = wt2
-     w(i,3) = wt3
-  enddo
-end subroutine sutrak
-!-----------------  end of sutrak subroutine --------------------------
-!
-
-subroutine suelem(el, ve, we,tilt)
+subroutine suelem(el, ve, we, tilt)
   use twtrrfi
+  use matrices, only : EYE
+  use math_constfi, only : zero, one
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Compute Displacement and rotation for one element.                 *
@@ -285,224 +200,123 @@ subroutine suelem(el, ve, we,tilt)
   ! Modified: 28-DEC-1998, T. Raubenheimer (SLAC)                        *
   !   Added LCAVITY element at ISP 27                                    *
   !----------------------------------------------------------------------*
-  integer code,nn,ns
-  double precision angle,cospsi,costhe,ds,dx,sinpsi,sinthe,tilt,    &
-       ve(3),we(3,3),node_value,el,normal(0:maxmul),skew(0:maxmul)       &
-       ,zero,one
-  parameter(zero=0d0,one=1d0)
+  double precision, intent(IN) :: el
+  double precision, intent(OUT) :: ve(3), we(3,3), tilt
+
+  integer :: code, nn, ns
+  double precision :: angle, cospsi, costhe, sinpsi, sinthe,  ds, dx
+  double precision :: normal(0:maxmul), skew(0:maxmul)
+
+  double precision, external :: node_value
+
   !---- Branch on subprocess code.
   tilt = zero
   angle = zero
-  code = node_value('mad8_type ')
-  if(code.eq.39) code=15
-  if(code.eq.38) code=24
-  go to ( 10,  20,  20,  40,  50,  60,  70,  80,  90, 100,          &
-       110, 120, 130, 140, 150, 160, 170, 180, 190, 200,                 &
-       210, 220, 230, 240, 250,  20, 270, 280, 290, 300,                 &
-       310, 310, 310, 310, 310, 310, 310, 310, 310, 310), code
-
-  !---- elements without tilt attribute
-  !---- Drift space.
-10 continue
-
-  !---- Arbitrary matrix.
-40 continue
-
-  !---- Solenoid.
-90 continue
-
-  !---- RF cavity.
-100 continue
-
-  !---- Monitors.
-170 continue
-180 continue
-190 continue
-
-  !---- Marker.
-250 continue
-
-  !---- Beam-beam.
-220 continue
-
-  !---- lcavity
-270 continue
-
-  !---- Reserved.
-280 continue
-290 continue
-300 continue
-
-  !---- Lump.
-230 continue
-
-  !---- User-defined elements.
-310 continue
-
-  !     not necessary to distinguish between elements with or w/o tilt attribute
-  !     see below (FT 17.2.05)
-  !     goto 400
-
-
-  !---- elements with tilt attribute
-  !---- Quadrupole.
-50 continue
-
-  !---- Sextupole.
-60 continue
-
-  !---- Octupole.
-70 continue
-
-  !---- Electrostatic separator.
-110 continue
-
-  !---- Kickers.
-140 continue
-150 continue
-160 continue
-
-  !---- Apertures.
-200 continue
-210 continue
-
-  !---- Beam instrument.
-240 continue
-
-  !---- get tilt attribute
-  !---- checked to work for elements without this attribute (FT 17.2.05)
-  !---- OK with F.Sschmidt
-  tilt =  node_value('tilt ')
-
-  !---- calculate matrix for straight elements
-  continue
-  ve(1) = zero
-  ve(2) = zero
-  ve(3) = el
-  we(1,1) = one
-  we(2,1) = zero
-  we(3,1) = zero
-  we(1,2) = zero
-  we(2,2) = one
-  we(3,2) = zero
-  we(1,3) = zero
-  we(2,3) = zero
-  we(3,3) = one
-  go to 500
-  !****** end of straight elements ***************
-
-  !---- multipoles , introduced  17.09.02 / AV, extended LD 2014.10.15
-  !---- waste of CPU cycles removed
-80  continue
-  normal(0)=0d0
-  skew(0)=0d0
-  angle=0d0
-  tilt=0d0
-
-  !-----  dipole_bv introduced to suppress SU in MADX input (AV  7.10.02)
-  !      angle = normal(0)*node_value('dipole_bv ')
-
-  call get_node_vector('knl ', nn, normal)
-  call get_node_vector('ksl ', ns, skew)
-
-  ! ks0l processing added (LD 15.10.2014)
-  if (nn.ne.0 .or. ns.ne.0) then
-    angle = sqrt(normal(0)**2+skew(0)**2)*node_value('other_bv ')
-  endif
-
-  if (abs(angle) .gt. 1d-13) then
-    tilt = node_value('tilt ')-atan2(skew(0),normal(0))
-  endif
-
-  ! As el=0, there is no dx and no ds
   dx = zero
   ds = zero
-  go to 490
+  
+  VE(1:2) = zero ; ve(3) = el
+  WE = EYE(:3,:3)
 
-  !---- Any kind of  bend.
-20 continue
-  !--------------  dipole_bv introduced to suppress SU (AV  7.10.02)
-  !      angle = node_value('angle ')*node_value('dipole_bv ')
-  angle = node_value('angle ')*node_value('other_bv ')
-  !      print *,"SUELEM dipole : angle =",angle
-  if (abs(angle) .lt. 1d-13) then
-     dx = zero
-     ds = el
-     tilt = zero
-  else
-     tilt =  node_value('tilt ')
-     !      print *,"SUELEM dipole : tilt =",tilt," length= ",el
-     dx = el * (cos(angle)-one)/angle
-     ds = el * sin(angle)/angle
-  endif
-  !      print *,"SUELEM dipole : tilt =",tilt," length= ",&
-  !     el," angv = ",angv," bv =",node_value('dipole_bv ')
-  !     el," angv = ",angv," bv =",node_value('other_bv ')
-  go to 490
+  code = node_value('mad8_type ')
 
-  !---- Rotation around S-axis. SPECIAL CASE
-120 continue
-!  print *,"SROT"
-  tilt = node_value('angle ')
-  ve(1) = zero
-  ve(2) = zero
-  ve(3) = zero
-  we(1,1) =  cos(tilt)
-  we(2,1) =  sin(tilt)
-  we(3,1) = zero
-  we(1,2) = -sin(tilt)
-  we(2,2) = cos(tilt)
-  we(3,2) = zero
-  we(1,3) = zero
-  we(2,3) = zero
-  we(3,3) = one
-  go to 500
+  select case (code)
+ 
+     case (2, 3, 26) !---- RBEND, SBEND, GBEND
+        angle = node_value('angle ')*node_value('other_bv ')
+       if (abs(angle) .ge. 1d-13) then
+           tilt =  node_value('tilt ')
+           dx = el * (cos(angle)-one)/angle
+           ds = el * sin(angle)/angle
+        else
+           ds = el
+        endif
 
-  !---- Rotation around Y-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!
-130 continue
-!  print *,"YROT"
-  dx = node_value('angle ')
-!  print *,"angle",dx
-  tilt = zero
-  ve(1) = zero
-  ve(2) = zero
-  ve(3) = zero
-  we(1,1) =  cos(dx)
-  we(2,1) = zero
-  we(3,1) = sin(dx)
-  we(1,2) = zero
-  we(2,2) = zero
-  we(3,2) = one
-  we(1,3) = -sin(dx)
-  we(2,3) = zero
-  we(3,3) = cos(dx)
-  go to 500
+        cospsi = cos(tilt);  sinpsi = sin(tilt)
+        costhe = cos(angle); sinthe = sin(angle)
 
-  !---- Common for bends and multipoles: Displacement and rotation matrix.
-490 continue
-  cospsi = cos(tilt)
-  sinpsi = sin(tilt)
-  costhe = cos(angle)
-  sinthe = sin(angle)
-  ve(1) = dx * cospsi
-  ve(2) = dx * sinpsi
-  ve(3) = ds
-  we(1,1) = costhe * cospsi*cospsi + sinpsi*sinpsi
-  we(2,1) = (costhe - one) * cospsi * sinpsi
-  we(3,1) = sinthe * cospsi
-  we(1,2) = we(2,1)
-  we(2,2) = costhe * sinpsi*sinpsi + cospsi*cospsi
-  we(3,2) =  sinthe * sinpsi
-  we(1,3) = - we(3,1)
-  we(2,3) = - we(3,2)
-  we(3,3) = costhe
-500 continue
+        ve(1) = dx * cospsi
+        ve(2) = dx * sinpsi
+        ve(3) = ds
+
+        we(1,1) = costhe * cospsi*cospsi + sinpsi*sinpsi
+        we(2,1) = (costhe - one) * cospsi * sinpsi
+        we(3,1) = sinthe * cospsi
+        we(1,2) = we(2,1)
+        we(2,2) = costhe * sinpsi*sinpsi + cospsi*cospsi
+        we(3,2) =  sinthe * sinpsi
+        we(1,3) = - we(3,1)
+        we(2,3) = - we(3,2)
+        we(3,3) = costhe
+        
+
+     case (8) !---- MULTIPOLE (thin, no length) 
+        ! introduced  17.09.02 / AV, extended LD 2014.10.15
+        !---- waste of CPU cycles removed
+        normal(0) = zero ; call get_node_vector('knl ', nn, normal)
+        skew(0) = zero   ; call get_node_vector('ksl ', ns, skew)
+        ! ks0l processing added (LD 15.10.2014)
+        if (nn.ne.0 .or. ns.ne.0) then
+           angle = sqrt(normal(0)**2 + skew(0)**2) * node_value('other_bv ')
+        endif
+
+        if (abs(angle) .gt. 1d-13) then
+           tilt = node_value('tilt ') - atan2(skew(0),normal(0))
+        endif        
+
+        cospsi = cos(tilt);  sinpsi = sin(tilt)
+        costhe = cos(angle); sinthe = sin(angle)
+
+        ! VE is equal to default because length is zero
+
+        we(1,1) = costhe * cospsi*cospsi + sinpsi*sinpsi
+        we(2,1) = (costhe - one) * cospsi * sinpsi
+        we(3,1) = sinthe * cospsi
+        we(1,2) = we(2,1)
+        we(2,2) = costhe * sinpsi*sinpsi + cospsi*cospsi
+        we(3,2) = sinthe * sinpsi
+        we(1,3) = - we(3,1)
+        we(2,3) = - we(3,2)
+        we(3,3) = costhe
+
+
+     case (12) !---- Rotation around S-axis. SPECIAL CASE
+        tilt = node_value('angle ')
+        we(1,1) =  cos(tilt)
+        we(2,1) =  sin(tilt)
+        we(3,1) = zero
+        we(1,2) = -sin(tilt)
+        we(2,2) = cos(tilt)
+        we(3,2) = zero
+        we(1,3) = zero
+        we(2,3) = zero
+        we(3,3) = one
+
+     case (13) !---- Rotation around Y-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!
+        dx = node_value('angle ')
+        we(1,1) = cos(dx)
+        we(2,1) = zero
+        we(3,1) = sin(dx)
+        we(1,2) = zero
+        we(2,2) = zero
+        we(3,2) = one
+        we(1,3) = -sin(dx)
+        we(2,3) = zero
+        we(3,3) = cos(dx)
+
+     
+     case default ! all straight elements and catch all; use default VE and WE
+        !---- get tilt attribute
+        !---- checked to work also for elements without this attribute (FT 17.2.05)
+        tilt =  node_value('tilt ')
+
+     end select
+     
 end subroutine suelem
-!-----------------  end of suelem subroutine --------------------------
 
-!**********************************************************************
 subroutine sufill(suml, v, theta, phi, psi, globaltilt)
   use twtrrfi
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -510,11 +324,15 @@ subroutine sufill(suml, v, theta, phi, psi, globaltilt)
   ! Output:                                                              *
   !   EL       (real)    Element length along design orbit.              *
   !   V(3)     (real)    Coordinate at the end of the element            *
-  ! theta, phi, psi(real) : the survey angles                            *
+  !   theta, phi, psi(real) : the survey angles                            *
   !----------------------------------------------------------------------*
-  integer code,nn,ns,i
-  double precision ang,el,v(3),theta,phi,psi,node_value,suml,       &
-       normal(0:maxmul),skew(0:maxmul),globaltilt,tmp, surv_vect(7)
+  double precision, intent(IN) :: suml, v(3), theta, phi, psi, globaltilt
+
+  integer :: code, nn, ns, i
+  double precision :: ang, el, tmp, surv_vect(7)
+  double precision :: normal(0:maxmul), skew(0:maxmul)
+
+  double precision, external :: node_value
 
   el = node_value('l ')
   call string_to_table_curr('survey ', 'name ', 'name ')
@@ -528,6 +346,7 @@ subroutine sufill(suml, v, theta, phi, psi, globaltilt)
   call double_to_table_curr('survey ', 'phi ',phi)
   call double_to_table_curr('survey ', 'psi ',psi)
   call double_to_table_curr('survey ', 'globaltilt ',globaltilt)
+
   i = node_value('pass_flag ')
   if (i .eq. 0) then
      surv_vect(1) = v(1)
@@ -542,28 +361,22 @@ subroutine sufill(suml, v, theta, phi, psi, globaltilt)
      i = 7
      call store_node_vector('surv_data ', i, surv_vect)
   endif
+
   code = node_value('mad8_type ')
-  if(code.eq.39) code=15
-  if(code.eq.38) code=24
-  if(code.eq.2.or.code.eq.3) then
-     ang = node_value('angle ')*node_value('other_bv ')
-  else if(code.eq.8) then ! multipoles (LD 2014.10.15)
-     normal(0)=0d0
-     skew(0)=0d0
-     ang=0d0
+
+  ang = zero  
+  if (code.eq.2 .or. code.eq.3) then ! RBEND or SBEND
+     ang = node_value('angle ') * node_value('other_bv ')
+  else if (code .eq. 8) then ! multipoles (LD 2014.10.15)
+     normal(0) = zero; skew(0) = zero
      call get_node_vector('knl ',nn,normal)
      call get_node_vector('ksl ',ns,skew) ! process ks0l (LD 2014.10.15)
      if (nn.ne.0 .or. ns.ne.0) then
-       ang = sqrt(normal(0)**2+skew(0)**2)*node_value('other_bv ')
+       ang = sqrt(normal(0)**2+skew(0)**2) * node_value('other_bv ')
      endif
-  else
-     ang = 0d0
   endif
-  call double_to_table_curr('survey ', 'angle ',ang)
 
-  !---------------- --------------------------
-  !     copy over the attributes 'mech_sep' and 'assembly_id'
-  !     FT 06.06.2008
+  call double_to_table_curr('survey ', 'angle ',ang)
 
   tmp = node_value('slot_id ')
   call double_to_table_curr('survey ', 'slot_id ',tmp)
@@ -574,14 +387,12 @@ subroutine sufill(suml, v, theta, phi, psi, globaltilt)
   tmp = node_value('mech_sep ')
   call double_to_table_curr('survey ', 'mech_sep ',tmp)
 
-  !== jln dealt with the new property v_pos as for mech_sep
   tmp = node_value('v_pos ')
   call double_to_table_curr('survey ', 'v_pos ',tmp)
-  !==
 
   call augment_count('survey ')
 end subroutine sufill
-!-----------------  end of sufill subroutine --------------------------
+
 
 subroutine survtest
   integer j, length, advance_node
