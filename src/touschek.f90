@@ -115,12 +115,12 @@ subroutine touschek
   pi2 = pi/two
 
   if (um1.eq.0) then
-     call aawarn('TOUSCHEK ', '  rf voltage = 0, rest skipped ')
+     call fort_warn('TOUSCHEK ', '  rf voltage = 0, rest skipped ')
      return
   endif
         
   if (iflag .eq.1) then
-     call aawarn('TOUSCHEK ', ' uloss = 0 missing chrom in twiss ')
+     call fort_warn('TOUSCHEK ', ' uloss = 0 missing chrom in twiss ')
      return
   endif  
 
@@ -232,7 +232,7 @@ subroutine touschek
   RETURN
 
 102 continue
-  call aawarn('TOUSCHEK ', 'table value not found, rest skipped ')
+  call fort_warn('TOUSCHEK ', 'table value not found, rest skipped ')
   return
   
 end subroutine touschek

@@ -75,7 +75,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
 
   !---- Get circumference
   circ = get_value('probe ','circ ')
-  if (circ .eq. zero) call aafail('TWISS: ', 'Zero length sequence.')
+  if (circ .eq. zero) call fort_fail('TWISS: ', 'Zero length sequence.')
 
   !---- Set fast_error_func flag to use faster error function
   !---- including tables. Thanks to late G. Erskine
@@ -218,7 +218,7 @@ SUBROUTINE twinifun(opt_fun0,rt)
   if (bety.gt.zero) opt_fun0(6) = bety
 
   if (opt_fun0(3).le.zero .or. opt_fun0(6).le.zero) &
-       call aafail('TWINIFUN: ', 'BETX and BETY must be both larger than zero.')
+       call fort_fail('TWINIFUN: ', 'BETX and BETY must be both larger than zero.')
 
   alfx=  get_value('twiss ','alfx ')
   mux=   get_value('twiss ','mux ')
@@ -580,6 +580,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
 
   logical :: fmap
   character(len=28) :: tmptxt1, tmptxt2, tmptxt3
+  character(len=120) :: warnstr
   character(len=name_len) :: c_name(2), p_name
   character(len=2) :: ptxt(2)=(/'x-','y-'/)
   integer :: j, code, n_align, nobs, node, old, poc_cnt, debug
@@ -754,8 +755,10 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
                  rep_cnt(kpro) = rep_cnt(kpro) + 1                 
 
                  if (rep_cnt(kpro) .gt. max_rep)  then
-                    write(tmptxt1, '(i6)') max_rep
-                    call fort_warn('threader: pickup skipped after', tmptxt1(:6)//' correction attempts')
+                    write(warnstr,'(a,i6,a)') 'pickup skipped after ',max_rep,' correction attempts'
+                    call fort_warn('THREADER: ',warnstr)
+                    !write(tmptxt1, '(i6)') max_rep
+                    !call fort_warn('threader: pickup skipped after', tmptxt1(:6)//' correction attempts')
                     goto 20
                  endif
                  
@@ -768,11 +771,11 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
                  call tmthrd(kpro,dorb,cmatr(1,1,kpro),pmatr,vector,node,cick,err)
                  
                  if (err .eq. 1)  then
-                    write(tmptxt1, '(i6)') old
-                    call fort_warn( 'threader: no corrector before pickup at node ', tmptxt1)
+                    write (warnstr, '(a,i6)') 'no corrector before pickup at node ', old
+                    call fort_warn('THREADER: ',warnstr)
 
                  elseif (err .eq. 2)  then
-                    call fort_warn('threader: kicker is at start', 'of sequence')
+                    call fort_warn('THREADER: ','kicker is at start of sequence')
 
                  elseif (err .eq. 0)  then
                     corr_pick(kpro) = old
@@ -781,10 +784,9 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
                     write(tmptxt2(lastnb(c_name(kpro))+1:), '(''['',i2,'']'')') coc_cnt(kpro)
                     tmptxt3 = p_name
                     write(tmptxt3(lastnb(p_name)+1:), '(''['',i2,'']'')') poc_cnt
-                    call fort_info( &
-                         '-threader- pickup: ' //tmptxt3(:lastnb(tmptxt3))     &
+                    call fort_info('-threader-','pickup: ' //tmptxt3(:lastnb(tmptxt3)) &
                          // '  kicker: '//tmptxt2(:lastnb(tmptxt2))//' total ' &
-                         //ptxt(kpro)//'kick:', tmptxt1)
+                         //ptxt(kpro)//'kick:'//tmptxt1)
 
                     !---  restore restart values
                     suml = restsum(kpro)
@@ -1024,17 +1026,17 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
 
   !---- Give message, if unstable.
   if (.not.stabx .or. .not.staby) then
-     if (.not.stabx) then 
-        write (msg, '("Mode 1 is unstable for delta(p)/p = ",f12.6,", cosmux = ",f12.6,", cosmuy = ",f12.6)') &
-             deltap, cosmux, cosmuy
-     else if (.not.staby) then
-        write (msg, '("Mode 2 is unstable for delta(p)/p = ",f12.6,", cosmux = ",f12.6,", cosmuy = ",f12.6)') &
-             deltap, cosmux, cosmuy
-     else
-        write (msg, '("Both modes are unstable for delta(p)/p = ",f12.6,", cosmux = ",f12.6,", cosmuy = ",f12.6)') &
-             deltap, cosmux, cosmuy
+     if (.not.stabx .and. .not.staby) then
+        write (msg,'(3(a,f12.6))') "Both modes are unstable for delta(p)/p = ",deltap, &
+             ": cosmux = ",cosmux,", cosmuy = ",cosmuy
+     elseif (.not.stabx) then 
+        write (msg,'(3(a,f12.6))') "Mode 1 is unstable for delta(p)/p = ",deltap, &
+             ": cosmux = ",cosmux,", cosmuy = ",cosmuy
+     elseif (.not.staby) then
+        write (msg,'(3(a,f12.6))') "Mode 2 is unstable for delta(p)/p = ",deltap, &
+             ": cosmux = ",cosmux,", cosmuy = ",cosmuy
      endif
-     call aawarn('TWCPIN: ',msg)
+     call fort_warn('TWCPIN: ',msg)
      eflag = 1
  endif
 
@@ -1083,7 +1085,7 @@ SUBROUTINE twdisp(rt,vect,disp)
   if (irank.ge.4) then
      DISP(1:4) = A(1:4,5)
   else
-     call aawarn('TWDISP: ', 'Unable to compute dispersion --- dispersion set to zero.')
+     call fort_warn('TWDISP: ', 'Unable to compute dispersion --- dispersion set to zero.')
      DISP(1:4) = zero 
   endif
 
@@ -1316,8 +1318,8 @@ SUBROUTINE twcpgo(rt,orbit0)
 
   !---- Warning messages.
   if (cplxt .or. dorad) & 
-       call aawarn('TWCPGO: ','TWISS uses the RF system or synchrotron radiation only & 
-                  &to find the closed orbit, for optical calculations it ignores both.')
+       call fort_warn('TWCPGO: ','TWISS uses the RF system or synchrotron radiation only '// & 
+                       'to find the closed orbit, for optical calculations it ignores both.')
 
   ! write (6,*) bxmax, bxmax_name
   ! write (6,*) bymax, bymax_name
@@ -1709,12 +1711,12 @@ SUBROUTINE twchgo
 
   !---- Warning, if system is coupled.
   if (cplxy) then
-     write (msg, '("TWISS found transverse coupling for delta(p)/p =",f12.6,'// &
-                 '"chromatic functions may be wrong.")') deltap
-     call aawarn('TWCHGO: ',msg)
+     write (msg,'(a,f12.6,a)') "TWISS found transverse coupling for delta(p)/p =",deltap, &
+          "chromatic functions may be wrong."
+     call fort_warn('TWCHGO: ',msg)
   endif
   if (cplxt .or. dorad) then
-     call aawarn('TWCHGO: ','TWISS uses the RF system or synchrotron radiation '// &
+     call fort_warn('TWCHGO: ','TWISS uses the RF system or synchrotron radiation '// &
                  'only to find the closed orbit, for optical calculations it '// &
                  'ignores both.')
   endif
@@ -3438,11 +3440,11 @@ SUBROUTINE tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
      time_var_p_lnt = time_var_p_lnt+1
 
      if (idnint(time_var_p_ind(time_var_p_cnt)) .ne. time_var_p_lnt)    &
-          call aafail('TMARB: ', 'wrong index in Table: time_var_pha')
+          call fort_fail('TMARB: ', 'wrong index in Table: time_var_pha')
      call element_name(name,len(name))
      mylen=len_trim(name)
      if (time_var_p_ch(time_var_p_cnt)(:mylen) .ne. name(:mylen))       & 
-          call aafail('TMARB: ', 'wrong element name in Table: time_var_pha')
+          call fort_fail('TMARB: ', 'wrong element name in Table: time_var_pha')
 
 !---- Matrix
      re(1,1)=phase_tromb(time_var_p_cnt,1)
@@ -5371,7 +5373,7 @@ SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
   case default
      if (first) then
         first = .false.
-        call aawarn('TMBB: ', 'beamshape out of range, set to default=1')
+        call fort_warn('TMBB: ', 'beamshape out of range, set to default=1')
      endif
      beamshape=1
      call tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
@@ -5408,7 +5410,7 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
   bborbit = get_option('bborbit ') .ne. 0
   if (bbd_flag.ne.0 .and. .not.bborbit)  then
      if (bbd_cnt .eq. bbd_max)  then
-        call aawarn('TMBB_GAUSS: ','maximum bb number reached')
+        call fort_warn('TMBB_GAUSS: ','maximum bb number reached')
      else
         bbd_cnt = bbd_cnt + 1
         bbd_loc(bbd_cnt) = bbd_pos
@@ -5430,11 +5432,11 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
      
      if (i_spch .gt. N_spch) then
         write(text, '(1p,i8)') i_spch
-        call aafail('TMBB: ', 'Table with too few BB elements: '//text)
+        call fort_fail('TMBB: ', 'Table with too few BB elements: '//text)
      endif
 
      if (spch_bb_name(i_spch)(:mylen) .ne. name(:mylen)) & 
-        call aafail('TMBB: ', 'wrong element name in Table: spch_bb')
+        call fort_fail('TMBB: ', 'wrong element name in Table: spch_bb')
 
      sx = sqrt(betx_bb(i_spch)*Ex_rms + (dx_bb(i_spch)*sigma_p)**2)
      sy = sqrt(bety_bb(i_spch)*Ey_rms + (dy_bb(i_spch)*sigma_p)**2)
@@ -5684,7 +5686,7 @@ SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
   bborbit = get_option('bborbit ') .ne. 0
   if (bbd_flag.ne.0 .and. .not.bborbit)  then
      if (bbd_cnt .eq. bbd_max)  then
-        call aawarn('TMBB_FLATTOP: ','maximum bb number reached')
+        call fort_warn('TMBB_FLATTOP: ','maximum bb number reached')
      else
         bbd_cnt = bbd_cnt + 1
         bbd_loc(bbd_cnt) = bbd_pos
@@ -5718,7 +5720,7 @@ SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
         r0y2 = r0y*r0y
         if (firstflag) then
            firstflag=.false.
-           call aawarn('TMBB_FLATTOP: ', 'beam is assumed to be circular')
+           call fort_warn('TMBB_FLATTOP: ', 'beam is assumed to be circular')
         endif
      endif
 
@@ -5880,7 +5882,7 @@ SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
   bborbit = get_option('bborbit ') .ne. 0
   if (bbd_flag.ne.0 .and. .not.bborbit)  then
      if (bbd_cnt .eq. bbd_max)  then
-        call aawarn('TMBB_HOLLOWPARABOLIC: ', 'maximum bb number reached')
+        call fort_warn('TMBB_HOLLOWPARABOLIC: ', 'maximum bb number reached')
      else
         bbd_cnt = bbd_cnt + 1
         bbd_loc(bbd_cnt) = bbd_pos
@@ -5920,7 +5922,7 @@ SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
            r0y2=r0y*r0y
            if (firstflag) then
               firstflag=.false.
-              call aawarn('TMBB_HOLLOWPARABOLIC: ', 'beam is assumed to be circular')
+              call fort_warn('TMBB_HOLLOWPARABOLIC: ', 'beam is assumed to be circular')
            endif
         endif
 

@@ -90,7 +90,7 @@ subroutine haveit(a,xin,cin,res,nx,im,ic,cb,xmeas,xres,y,z,xd)
 
     call dinv(ic,Z,ic,w,ifail)
     if ( ifail .ne. 0 ) & !write(*,*) 'IFAIL from dinv: ',ifail 
-         call aawarn('LSQ; in HAVEIT: ',' DINV returned failure code '//char(ifail+ichar('0')))
+         call fort_warn('LSQ in HAVEIT: ','DINV returned failure code '//char(ifail+ichar('0')))
 
     ! pseudoinverse of A is (At * A)^-1 * At
     ! and solution for correctors is

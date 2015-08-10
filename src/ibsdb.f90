@@ -183,10 +183,8 @@ subroutine twclog(bxbar, bybar, dxbar, dybar, const)
   !---- Print warning here if Coulomb logarithm gave bad results.
   !     Usually this error is due to a starting guess far from
   !     the equilibrium value.
-  if (coulog .lt. zero) then
-     call aawarn('TWCLOG', 'Coulomb logarithm gives invalid' &
-          // ' result --- check input parameters.')
-  endif
+  if (coulog .lt. zero) &
+     call fort_warn('TWCLOG: ', 'Coulomb logarithm gives invalid result --- check input parameters.')
 
   write (*,'(/5x,a,1p,e14.6,a)')     "X-emittance         = ",ex," m*rad"
   write (*, '(5x,a,1p,e14.6,a/)')    "Y-emittance         = ",ey," m*rad"
@@ -550,7 +548,7 @@ subroutine ibs
   return
 
 102 continue
-  call aafail('IBS ', 'table value not found, rest skipped, program stops ')
+  call fort_fail('IBS: ', 'table value not found, rest skipped, program stops ')
        
 end subroutine ibs
 
@@ -738,7 +736,7 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy, txi, tyi, tli)
   write (*,*) tmpl, zintl, tmpx, zintx, tmpy, zinty, test
 
   write (*, '(a,i3,a)') "Bjorken/Mtingwa integrals did not converge in ",maxdec," decades."
-  call aafail('TWSINT: ', 'Problem with TWSINT, program stopped ')
+  call fort_fail('TWSINT: ', 'Problem with TWSINT, program stopped ')
 
 100 continue
 

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.02  (64 bit, Darwin)      +
+  +     MAD-X 5.02.06  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2014.07.04               +
-  + Execution date: 2014.10.08 14:21:13      +
+  + Release   date: 2015.06.26               +
+  + Execution date: 2015.08.10 17:19:27      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option, -echo;
 
@@ -194,7 +194,7 @@ plot, haxis=s, colour=100 ,title="large # of variables on vaxis", noversion,
 Plot - default table plotted: twiss
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
- ++++++ warning: PLOT: Array index larger than array limit; label is truncated
+++++++ warning: PLOT:  Array index larger than array limit; label is truncated
  plot number =           12
 
 
@@ -223,7 +223,7 @@ plot, haxis=s, colour=100, title="overflow in number of variables to be plotted"
       vaxis4= re41,re42,re43,re44,re45,re46; 
 
 Plot - default table plotted: twiss
- Warning:  6 variables on vaxis4 would overflow max number(10). variables ignored.
+++++++ warning: PLOT:   6 variables on VAXIS4 would overflow max number(10). all variables ignored.                                            
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
  plot number =           14
@@ -264,7 +264,7 @@ orbit:   1.012398E-01  2.681371E-02  0.000000E+00  0.000000E+00  2.637681E-02 -6
 iteration:   4 error:   4.924530E-06 deltap:  -1.000000E-02
 orbit:   1.012389E-01  2.681383E-02  0.000000E+00  0.000000E+00  2.641738E-02 -6.321235E-03
   
-iteration:   5 error:   1.009066E-10 deltap:  -1.000000E-02
+iteration:   5 error:   1.009069E-10 deltap:  -1.000000E-02
 orbit:   1.012389E-01  2.681383E-02  0.000000E+00  0.000000E+00  2.641741E-02 -6.321235E-03
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
@@ -278,7 +278,7 @@ orbit:   5.077168E-02  1.279168E-02  0.000000E+00  0.000000E+00  1.138494E-02 -3
 iteration:   3 error:   4.841394E-05 deltap:  -5.000000E-03
 orbit:   5.083506E-02  1.277498E-02  0.000000E+00  0.000000E+00  1.197882E-02 -3.246188E-03
   
-iteration:   4 error:   1.004669E-08 deltap:  -5.000000E-03
+iteration:   4 error:   1.004670E-08 deltap:  -5.000000E-03
 orbit:   5.083506E-02  1.277498E-02  0.000000E+00  0.000000E+00  1.198089E-02 -3.246188E-03
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
@@ -328,19 +328,19 @@ orbit:  -1.497959E-01 -3.051391E-02  0.000000E+00  0.000000E+00 -2.503935E-02  9
 iteration:   4 error:   6.483818E-06 deltap:   1.500000E-02
 orbit:  -1.497965E-01 -3.051392E-02  0.000000E+00  0.000000E+00 -2.496765E-02  9.713727E-03
   
-iteration:   5 error:   3.823075E-10 deltap:   1.500000E-02
+iteration:   5 error:   3.823076E-10 deltap:   1.500000E-02
 orbit:  -1.497965E-01 -3.051392E-02  0.000000E+00  0.000000E+00 -2.496761E-02  9.713727E-03
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-       78.54370266     -0.03713175641     -0.02512051185       -6.309366534 
-       78.54370266     -0.02641740856      0.01215699275        9.069574679 
+       78.54370266     -0.03713175654     -0.02512051185       -6.309366534 
+       78.54370266     -0.02641740865      0.01215699275        9.069574679 
        78.54370266     -0.01198088659      0.07128671473        3.745378384 
-       78.54370266     5.42720872e-18       0.1241075638        2.838578276 
-       78.54370266     0.009818779913        0.170569425        2.421304489 
-       78.54370266      0.01802319859       0.2125083206        2.169262109 
-       78.54370266      0.02496760545       0.2511691688        1.995339665 
+       78.54370266    5.427208927e-18       0.1241075638        2.838578276 
+       78.54370266     0.009818779942        0.170569425        2.421304489 
+       78.54370266      0.01802319856       0.2125083206        2.169262109 
+       78.54370266      0.02496760539       0.2511691688        1.995339665 
 
                 q1                dq1            betxmax              dxmax 
        1.900385773       -6.461135002        22.48422319        24.96730367 
@@ -460,16 +460,16 @@ plot, haxis=s, vaxis= s,betx,bety,alfx,alfy,mux,muy,dx,dpx,dy,dpy,
       colour=100, title="overflow number of variables to be plotted", noversion;	
 
 Plot - default table plotted: twiss
- Warning: 11 variables on vaxis, would overflow max number(10). all variables ignored.
- Warning: no vertical plot variables, plot skipped
+++++++ warning: PLOT:  11 variables on VAXIS would overflow max number(10). all variables ignored.                                             
+++++++ warning: PLOT:  no vertical plot variables, plot skipped
 
 
 stop;
 
 
-  Number of warnings: 1
-0 in C and 1 in Fortran
+  Number of warnings: 4
+0 in C and 4 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.02 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

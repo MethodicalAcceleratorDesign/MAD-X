@@ -125,7 +125,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   endif
 
   if (fsecarb) then
-     call aawarn('trrun: ','Second order terms of arbitrary Matrix not allowed for tracking.')
+     call fort_warn('TRRUN: ','Second order terms of arbitrary Matrix not allowed for tracking.')
      return
   endif
  
@@ -175,12 +175,12 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 !$OMP END PARALLEL
   else
      if (jmax .eq. 0) then
-        call aawarn('trrun: ','Particle Number equals zero: exit from trrun')
+        call fort_warn('TRRUN: ','Particle Number equals zero: exit from trrun')
         return
      endif
      if (jmax .gt. max_part) then
-        write(text, '(1p,d20.12)') max_part
-        call aafail('TRRUN: ','Fatal: Maximum Particle Number exceeded =' // text)
+        write(text,'(a,d20.12,a)') "Maximum number of particles (",max_part,") exceeded"
+        call fort_fail('TRRUN: ',text)
      endif
 !$OMP PARALLEL PRIVATE(i,j)
 !$OMP DO
@@ -229,11 +229,11 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
      do  i = 1, j_tot
         if (abs(z(5,i)) .gt. t_max) then
            write(text, '(1p,d13.5,a1,i6)') t_max,"p",i
-           call aafail('TRACK_INITIAL: ','Fatal: T-Coordinate larger than' // text)
+           call fort_fail('TRACK_INITIAL: ','Fatal: T-Coordinate larger than' // text)
         endif
         if (abs(z(6,i)).gt.pt_max) then
            write(text, '(1p,d13.5,a1,i6)') pt_max,"p",i
-           call aafail('TRACK_INITIAL: ','Fatal: PT-Coordinate larger than' // text)
+           call fort_fail('TRACK_INITIAL: ','Fatal: PT-Coordinate larger than' // text)
         endif
         call double_to_table_curr('tracksumm ', 'number ', dble(i))
         call double_to_table_curr('tracksumm ', 'turn ', dble(tot_turn))
@@ -274,7 +274,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         time_var_m_cnt = 0 ; time_var_p_cnt = 0 ; time_var_c_cnt = 0
         ! <<N_macro_part_ini = N_macro_surv + N_macro_lost>>
         N_ions_in_beam = get_value('probe ', 'npart ') !BEAM->NPART
-        if (N_ions_in_beam .lt. zero) call aafail('TRRUN: ','N_ions_in_beam .lt. zero')
+        if (N_ions_in_beam .lt. zero) call fort_fail('TRRUN: ','N_ions_in_beam .lt. zero')
         Npart_gain = get_value('run ', 'n_part_gain ')
         N_ions_ini = Npart_gain * N_ions_in_beam
         N_macro_surv = jmax    ! = number of START lines submitted
@@ -282,11 +282,11 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 
         N_for_I = N_macro_surv ! at start (to be redefined in Ixy)
         if (N_macro_surv .gt. N_macro_max) & 
-             call aafail('TRRUN: ', 'Number N_macro_surv exceeds N_macro_max (array size)')
+             call fort_fail('TRRUN: ', 'Number N_macro_surv exceeds N_macro_max (array size)')
 
         ! 2015-Jul-03  18:07:00  ghislain: BUG or voluntary ? 
         if (N_macro_surv .gt. N_macro_surv) &  
-             call aafail('TRRUN: ', 'Number START-lines exceeds the initial number of macroparticles N_macro_surv')
+             call fort_fail('TRRUN: ', 'Number START-lines exceeds the initial number of macroparticles N_macro_surv')
 
         t_rms = get_value('run ', 'sigma_z ') * beti
         pt_rms = get_value('run ', 'deltap_rms ')
@@ -408,7 +408,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 
         if (abs(sigma_t) .eq. zero) then
            sigma_t=t_max/two
-           call aawarn('TTRUN Frozen SC: sigma_t = zero: ','sigma_t set to L/track_harmon/betas/2')
+           call fort_warn('TTRUN Frozen SC: sigma_t = zero: ','sigma_t set to L/track_harmon/betas/2')
         endif
         !-----------------------------------------------------------------
      endif 
@@ -438,7 +438,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
               print *," "
 
               sum = node_value('name ')
-              call aafail('TRRUN: Fatal ','----element with length found : CONVERT STRUCTURE WITH MAKETHIN')
+              call fort_fail('TRRUN: Fatal ','----element with length found : CONVERT STRUCTURE WITH MAKETHIN')
            endif
 
         else
@@ -491,7 +491,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            OBS_ORB = zero 
            call get_node_vector('obs_orbit ', lobs, obs_orb)
            if (lobs .lt. 6) &
-                call aafail('TRACK: Fatal ', 'obs. point orbit not found')
+                call fort_fail('TRACK: Fatal ', 'obs. point orbit not found')
            if (onetable)  then
               spos = sum
               call element_name(el_name,len(el_name))
@@ -543,7 +543,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
      if (exit_loss_turn .and. lost_in_turn) then
         lost_in_turn = .false.
         write(text, '(i6)') turn
-        call aawarn('TRRUN Frozen SC: ', 'Stop in Loss Turn: '//text)
+        call fort_warn('TRRUN Frozen SC: ', 'Stop in Loss Turn: '//text)
         goto 20 ! break loop over turns
      endif
      
@@ -619,7 +619,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 
   return
 
-100 call aafail('TRACK: Fatal ', 'checkpoint_restart file corrupted')
+100 call fort_fail('TRACK: Fatal ', 'checkpoint_restart file corrupted')
 end subroutine trrun
 
 subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
@@ -758,10 +758,10 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
        call ttcorr(el, track, ktrack, turn)
        
     case (20) ! ECOLLIMATOR
-       call aawarn('trrun: found deprecated ECOLLIMATOR element;',' should be replaced by COLLIMATOR')
+       call fort_warn('TRRUN: ','found deprecated ECOLLIMATOR element; should be replaced by COLLIMATOR')
        
     case (21) ! RCOLLIMATOR
-       call aawarn('trrun: found deprecated RCOLLIMATOR element;',' should be replaced by COLLIMATOR')     
+       call fort_warn('TRRUN: ','found deprecated RCOLLIMATOR element; should be replaced by COLLIMATOR')     
        
     case (22) !---- Beam-beam,  standard 4D, no aperture
        parvec(5) = get_value('probe ', 'arad ')
@@ -901,12 +901,12 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
      time_var_m_cnt = time_var_m_cnt + 1
      time_var_m_lnt = time_var_m_lnt + 1
      if (idnint(time_var_m_ind(time_var_m_cnt)) .ne. time_var_m_lnt)    &
-          call aafail('TTMULT: ', 'wrong index in Table: time_var_mul')
+          call fort_fail('TTMULT: ', 'wrong index in Table: time_var_mul')
 
      call element_name(name,len(name))
      mylen = len_trim(name)
      if (time_var_m_ch(time_var_m_cnt)(:mylen) .ne. name(:mylen)) &
-          call aafail('TTMULT: ', 'wrong element name in Table: time_var_mul')
+          call fort_fail('TTMULT: ', 'wrong element name in Table: time_var_mul')
 
      !--- find maximum order for myfield
      do i = maxmul, 0, -1
@@ -1254,11 +1254,11 @@ subroutine ttrf(track,ktrack)
      time_var_c_cnt = time_var_c_cnt + 1
      time_var_c_lnt = time_var_c_lnt + 1
      if (idnint(time_var_c_ind(time_var_c_cnt)) .ne. time_var_c_lnt)    &
-          call aafail('TTRF: ', 'wrong index in Table: time_var_cav')
+          call fort_fail('TTRF: ', 'wrong index in Table: time_var_cav')
      call element_name(name,len(name))
      mylen = len_trim(name)
      if (time_var_c_ch(time_var_c_cnt)(:mylen) .ne. name(:mylen))       &
-          call aafail('TTRF: ', 'wrong element name in Table: time_var_cav')
+          call fort_fail('TTRF: ', 'wrong element name in Table: time_var_cav')
      !---- Overwrite Volt
      rfv = cav_volt(time_var_c_cnt)
      !---- Store Volt
@@ -1857,7 +1857,7 @@ subroutine ttbb(track,ktrack,parvec)
     case (3)
        call ttbb_hollowparabolic(track,ktrack,fk)
     case default
-       if (first)  call aawarn('TTBB: ','beamshape out of range, set to default=1')
+       if (first)  call fort_warn('TTBB: ','beamshape out of range, set to default=1')
        first = .false.
        call ttbb_gauss(track,ktrack,fk)
   end select
@@ -1906,10 +1906,10 @@ subroutine ttbb_gauss(track,ktrack,fk)
      i_spch = i_spch+1
      if (i_spch .gt. N_spch) then
         write(text, '(1p,i8)') i_spch
-        call aafail('TTBB: ', 'Table with too few BB elements: '// text)
+        call fort_fail('TTBB: ', 'Table with too few BB elements: '// text)
      endif
      if (spch_bb_name(i_spch)(:mylen) .ne. name(:mylen)) then
-        call aafail('TTBB: ', 'wrong element name in Table: spch_bb')
+        call fort_fail('TTBB: ', 'wrong element name in Table: spch_bb')
      endif
 
      sx = sqrt(betx_bb(i_spch)*Ex_rms+(dx_bb(i_spch)*sigma_p)**2)
@@ -2185,7 +2185,7 @@ subroutine ttbb_flattop(track,ktrack,fk)
      r0y = zz
      r0x2 = r0x*r0x
      r0y2 = r0y*r0y
-     if (first) call aawarn('TTBB_FLATTOP: ','beam is assumed to be circular')
+     if (first) call fort_warn('TTBB_FLATTOP: ','beam is assumed to be circular')
      first=.false.
   endif
 
@@ -2275,7 +2275,7 @@ subroutine ttbb_hollowparabolic(track,ktrack,fk)
      r0y = zz
      r0x2 = r0x*r0x
      r0y2 = r0y*r0y
-     if (first) call aawarn('TTBB_HOLLOWPARABOLIC: ', 'beam is assumed to be circular')
+     if (first) call fort_warn('TTBB_HOLLOWPARABOLIC: ', 'beam is assumed to be circular')
      first = .false.
   endif
 
@@ -2689,14 +2689,14 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
            ap2 = pi/2
         endif
         if (ap3.gt.ap4) then
-           call aawarn('trcoll:','octagon aperture: first and second angles inverted. exit from trcoll')
+           call fort_warn('trcoll:','octagon aperture: first and second angles inverted. exit from trcoll')
            return
         endif
         
      case default
         ! add error case for un-identified aperture type; 
         ! this INCLUDES the case of aperture data given in file with input APERTYPE=filename!
-        call aawarn('trcoll:','called with unknown aperture type. Ignored')
+        call fort_warn('trcoll:','called with unknown aperture type. Ignored')
         
   end select
 
@@ -2757,7 +2757,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
         n = i
         call trkill(n, turn, sum, ntrk, part_id, last_turn, last_pos, last_orbit, z, apertype)
         if (ntrk .eq. 0) then
-           call aawarn('trcoll: ','Particle Number equals zero: exit from trcoll')
+           call fort_warn('trcoll: ','Particle Number equals zero: exit from trcoll')
            return
         endif
         ! particle numbering has been reset by trkill, restart the loop with new paramaters.
@@ -2810,7 +2810,7 @@ subroutine ttrfloss(turn, sum, part_id, last_turn, last_pos, last_orbit, z, ntrk
      nn = name_len
      call trkill(n, turn, sum, ntrk, part_id, last_turn, last_pos, last_orbit, z, non_app)
      if (ntrk .eq. 0) then
-        call aawarn('ttrfloss: ', 'Particle Number equals zero: exit from ttrfloss')
+        call fort_warn('ttrfloss: ', 'Particle Number equals zero: exit from ttrfloss')
         return 
      endif
 
@@ -2927,7 +2927,7 @@ subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
      if (dynap) COORDS(1:6,0,j) = ZSTART(1:6)
      
      if (zgiv .and. zngiv) & !---- Warn user about possible data conflict.
-          call aawarn('START: ','Absolute and normalized coordinates given, superposition used.')
+          call fort_warn('START: ','Absolute and normalized coordinates given, superposition used.')
      
      Z(1:6,j) = ORBIT0(1:6) + ZSTART(1:6)
      
@@ -3308,7 +3308,7 @@ subroutine trclor(switch,orbit0)
               print*,"MAKETHIN will save you"
               print*," "
               print*," "
-              call aafail('TRRUN: Fatal ','----element with length found : CONVERT STRUCTURE WITH MAKETHIN')
+              call fort_fail('TRRUN: Fatal ','----element with length found : CONVERT STRUCTURE WITH MAKETHIN')
            endif
         endif
         
@@ -3444,7 +3444,7 @@ subroutine ixy_fitting()
      endif
   ENDDO
   if (i_for_I.eq.0) then
-     call aawarn('trrun: ','the RMS emittances cannot be calculated: exit from IXY_FITTING');
+     call fort_warn('trrun: ','the RMS emittances cannot be calculated: exit from IXY_FITTING');
      return
   endif
   N_for_I=i_for_I
@@ -3461,7 +3461,7 @@ subroutine ixy_fitting()
   if (Summ_dpi_square .ge. zero) then
      if (emittance_update) sigma_p=sqrt(Summ_dpi_square)
   else
-     call aafail('IXY_FITTING: Fatal: ','Summ_dpi_square<0')
+     call fort_fail('IXY_FITTING: Fatal: ','Summ_dpi_square<0')
   endif
 
   !     rms of the bunch length
@@ -3473,7 +3473,7 @@ subroutine ixy_fitting()
   if (Summ_z_part_square .ge. zero) then
      sigma_z = sqrt(Summ_z_part_square)
   else
-     call aafail('IXY_FITTING: Fatal: ','Summ_z_part_square<0')
+     call fort_fail('IXY_FITTING: Fatal: ','Summ_z_part_square<0')
   endif
 
   !     SORTING Ix
@@ -3647,12 +3647,12 @@ subroutine table_input( betx_start, bety_start, &
   name=" "
   if (range(2).gt.bbd_max) then
      write(text, '(1p,i8)') bbd_max
-     call aafail('TRRUN: Fatal: ', &
+     call fort_fail('TRRUN: Fatal: ', &
           'overrun of the number of BB elements in table spch_bb =' // text)
   endif
   N_spch = range(2)-range(1)
   if (N_spch.lt.1) &
-       call aafail('TRRUN: Fatal: ', 'Table: spch_bb holds no BB elements')
+       call fort_fail('TRRUN: Fatal: ', 'Table: spch_bb holds no BB elements')
 
   do i = range(1), range(2)
      j = advance_to_pos('spch_bb ', i)
@@ -3661,14 +3661,14 @@ subroutine table_input( betx_start, bety_start, &
         flag = double_from_table_row('spch_bb ', 's ',i, position); if (flag.ne.0) goto 98
         if (name(:10).ne."RING$START" .and. position.ne.zero) then
            write(text, '(1p,i8)') i
-           call aafail('TRRUN: Fatal: ', &
+           call fort_fail('TRRUN: Fatal: ', &
                 'Global TWISS not readable from table spch_bb'// text)
         endif
         flag = double_from_table_row('spch_bb ', 'betx ', i, betx_start); if (flag.ne.0) goto 98
         flag = double_from_table_row('spch_bb ', 'bety ', i, bety_start); if (flag.ne.0) goto 98
         if (abs(betx_start).lt.cme10 .or. abs(bety_start).lt.cme10) then
            write(text, '(1p,i8)') i
-           call aafail('TRRUN: Fatal: ', &
+           call fort_fail('TRRUN: Fatal: ', &
                 'start beta values from TWISS table smaller than '// &
                 '1e-10, location: ' // text)
         endif
@@ -3687,7 +3687,7 @@ subroutine table_input( betx_start, bety_start, &
         flag = double_from_table_row('spch_bb ', 'bety ', i, bety_bb(ii)); if (flag.ne.0) goto 98
         if (abs(betx_bb(ii)).lt.cme10 .or. abs(bety_bb(ii)).lt.cme10) then
            write(text, '(1p,i8)') i
-           call aafail('TRRUN: Fatal: ', &
+           call fort_fail('TRRUN: Fatal: ', &
                 'BB beta values from TWISS table smaller '// &
                 'than 1e-10 at location:  '//text)
         endif
@@ -3702,7 +3702,7 @@ subroutine table_input( betx_start, bety_start, &
   goto 99
 
 98 write(text, '(1p,i8)') i
-   call aafail('TRRUN: Fatal: ', 'Table: spch_bb corrupted at row =' // text)
+   call fort_fail('TRRUN: Fatal: ', 'Table: spch_bb corrupted at row =' // text)
 
 99 continue
    call table_range('time_var_mul ', '#s/#e ', range)
@@ -3714,7 +3714,7 @@ subroutine table_input( betx_start, bety_start, &
    name=" "
    if (range(2).gt.n_time_var) then
       write(text, '(1p,i8)') n_time_var
-      call aafail('TRRUN: Fatal: ', 'overrun of time varying mult arrays =' // text)
+      call fort_fail('TRRUN: Fatal: ', 'overrun of time varying mult arrays =' // text)
    endif
    do i=range(1),range(2)
       j = advance_to_pos('time_var_mul ', i)
@@ -3747,7 +3747,7 @@ subroutine table_input( betx_start, bety_start, &
    goto 102
 
 101 write(text, '(1p,i8)') i
-   call aafail('TRRUN: Fatal: ', 'Table: time_var_mul corrupted at row =' // text)
+   call fort_fail('TRRUN: Fatal: ', 'Table: time_var_mul corrupted at row =' // text)
 
 102 continue
     call table_range('time_var_pha ', '#s/#e ', range)
@@ -3759,7 +3759,7 @@ subroutine table_input( betx_start, bety_start, &
     name=" "
     if (range(2).gt.n_time_var) then
        write(text, '(1p,i8)') n_time_var
-       call aafail('TRRUN: Fatal: ', 'overrun of time varying pha arrays =' // text)
+       call fort_fail('TRRUN: Fatal: ', 'overrun of time varying pha arrays =' // text)
     endif
     do i=range(1),range(2)
        j = advance_to_pos('time_var_pha ', i)
@@ -3806,7 +3806,7 @@ subroutine table_input( betx_start, bety_start, &
     goto 104
 
 103 write(text, '(1p,i8)') i
-    call aafail('TRRUN: Fatal: ', 'Table: time_var_pha corrupted at row =' // text)
+    call fort_fail('TRRUN: Fatal: ', 'Table: time_var_pha corrupted at row =' // text)
 
 104 continue
     call table_range('time_var_cav ', '#s/#e ', range)
@@ -3818,7 +3818,7 @@ subroutine table_input( betx_start, bety_start, &
     name=" "
     if (range(2).gt.n_time_var) then
        write(text, '(1p,i8)') n_time_var
-       call aafail('TRRUN: Fatal: ', 'overrun of time varying cav arrays =' // text)
+       call fort_fail('TRRUN: Fatal: ', 'overrun of time varying cav arrays =' // text)
     endif
     do i=range(1),range(2)
        j = advance_to_pos('time_var_cav ', i)
@@ -3830,7 +3830,7 @@ subroutine table_input( betx_start, bety_start, &
     goto 106
 
 105 write(text, '(1p,i8)') i
-    call aafail('TRRUN: Fatal: ', 'Table: time_var_cav corrupted at row =' // text)
+    call fort_fail('TRRUN: Fatal: ', 'Table: time_var_cav corrupted at row =' // text)
 
 106 continue
 end subroutine table_input
@@ -4089,7 +4089,7 @@ subroutine tttquad(track, ktrack)
      call ttdrf(length,track,ktrack);
      return
   else if (k1.ne.zero .and. k1s.ne.zero) then
-     call aawarn('trrun: ','a quadrupole cannot have *both* K1 and K1S different from zero!');
+     call fort_warn('trrun: ','a quadrupole cannot have *both* K1 and K1S different from zero!');
      return
   endif
 
@@ -4465,7 +4465,7 @@ subroutine trphot(el,curv,rfac,deltap)
 
      if (ierror .ne. 0) then
         write(text, '(1p,d20.12)') amean
-        call aafail('TRPHOT: ','Fatal: Poisson input mean =' // text)
+        call fort_fail('TRPHOT: ','Fatal: Poisson input mean =' // text)
      endif
 
      !---- For all photons, sum the radiated photon energy,

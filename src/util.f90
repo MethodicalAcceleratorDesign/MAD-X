@@ -647,13 +647,42 @@ end subroutine fort_info
 
 subroutine fort_warn(t1, t2)
   implicit none
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   Print warning message.                                             *
+  ! Input:                                                               *
+  !   T1      (char)    usually calling routine name or feature          *
+  !   T2      (char)    Message.                                         *
+  !----------------------------------------------------------------------*
   character(*) :: t1, t2
   integer :: get_option
+
   if (get_option('warn ') .ne. 0) then
      print '(a,1x,a,1x,a)', '++++++ warning:', t1, t2
      call augmentfwarn()
   endif
+
 end subroutine fort_warn
+
+subroutine fort_fail(t1,t2)
+  implicit none
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   Print fatal error message.                                         *
+  ! Input:                                                               *
+  !   T1      (char)    usually calling routine name or feature          *
+  !   T2      (char)    Message                                          *
+  !----------------------------------------------------------------------*
+  character(*) :: t1, t2
+  integer :: get_option
+
+  print *,' '
+  print *,  '+-+-+- fatal: ',t1,t2
+  print *,' '
+  
+  if (get_option('no_fatal_stop ') .eq. 0) stop  1  
+  
+end subroutine fort_fail
 
 subroutine getclor(orbit0, rt, tt, error)
   !----------------------------------------------------------------------*
@@ -1059,44 +1088,10 @@ subroutine dcopy(in,out,n)
 
 end subroutine dcopy
 
-subroutine aawarn(rout,text)
-  implicit none
-  !----------------------------------------------------------------------*
-  ! Purpose:                                                             *
-  !   Print warning message.                                             *
-  ! Input:                                                               *
-  !   ROUT      (char)    Calling routine name.                          *
-  !   TEXT      (char)    Message.                                       *
-  !----------------------------------------------------------------------*
-  character(*) :: rout,text
-
-  print *,  '++++++ warning: ',rout,text
-  call augmentfwarn()
-
-end subroutine aawarn
-
 subroutine aafail(rout,text)
   implicit none
-  !----------------------------------------------------------------------*
-  ! Purpose:                                                             *
-  !   Print fatal error message.                                         *
-  ! Input:                                                               *
-  !   ROUT      (char)    Calling routine name.                          *
-  !   TEXT      (char)    Message.                                       *
-  !----------------------------------------------------------------------*
   character(*) :: rout, text
-  integer :: get_option
-
-  print *,' '
-  print *,  '+-+-+- fatal: ',rout,text
-  print *,' '
-  
-  ! 2015-Jun-12  17:53:49  ghislain: inserted to mimic behavior of 
-  ! C routine 'fatal_error'
-  if (get_option('no_fatal_stop ') .eq. 0) stop  1
-  
-  return
-     
+  call fort_fail(rout,text)
 end subroutine aafail
 
 double precision function proxim(x,y)
@@ -1173,7 +1168,7 @@ subroutine laseig(fm,reeig,aieig,am)
   if (info .ne. 0) then
      write (6, 910) ((fm(i,k), k = 1, 6), i = 1, 6)
 910  format('Unable to find eigenvalues for matrix:'/(6f12.6))
-     call aafail('LASEIG',' Unable to find eigenvalues for matrix')
+     call fort_fail('LASEIG',' Unable to find eigenvalues for matrix')
      go to 999
   endif
 
@@ -1275,7 +1270,7 @@ subroutine ladeig(fm,reeig,aieig,am)
   if (info .ne. 0) then
      write (6, 910) ((fm(i,k), k = 1, 6), i = 1, 6)
 910  format('Unable to find eigenvalues for matrix:'/(6f12.6))
-     call aafail('LADEIG',' Unable to find eigenvalues for matrix')
+     call fort_fail('LADEIG',' Unable to find eigenvalues for matrix')
      go to 9999
   endif
 
