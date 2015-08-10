@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Darwin)      +
+  +     MAD-X 5.02.06  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.06.19 10:35:05      +
+  + Release   date: 2015.06.26               +
+  + Execution date: 2015.08.10 09:55:42      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2012
 
@@ -471,44 +471,50 @@ END MATCH SUMMARY
 VARIABLE "TAR" SET TO   0.00000000e+00
 enter Twiss module
   
-iteration:   1 error:   2.256452E-21 deltap:   0.000000E+00
-orbit:  -4.509846E-32 -5.764653E-34  0.000000E+00  0.000000E+00 -1.457925E-17  8.834406E-32
+iteration:   1 error:   3.047816E-05 deltap:   0.000000E+00
+orbit:  -1.454821E-05  3.682668E-07  1.598328E-05  2.778764E-07 -2.806200E-07  1.744753E-09
+  
+iteration:   2 error:   5.032907E-09 deltap:   0.000000E+00
+orbit:  -1.454829E-05  3.682714E-07  1.598063E-05  2.778508E-07 -2.809258E-07  1.746825E-09
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832    1.457925204e-17    0.0003463029846        53.73681013 
+        26658.8832    2.809258479e-07    0.0003463032869        53.73678668 
 
                 q1                dq1            betxmax              dxmax 
-       62.30999994         2.00009678        19393.42999        2.716682579 
+       62.30997468        2.002083623        19396.92557        2.721089669 
 
              dxrms             xcomax             xcorms                 q2 
-       1.451766607    7.604429581e-22    3.771108217e-22         60.3200002 
+        1.45181627    8.899809808e-05    1.535894983e-05         60.3200196 
 
                dq2            betymax              dymax              dyrms 
-       2.000000582        19393.42412                 -0                  0 
+       2.020727652        19393.75292       0.0242856899     0.004163935575 
 
             ycomax             ycorms             deltap            synch_1 
-                 0                  0                  0                  0 
+   0.0002183025239     2.63206514e-05                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
-table( summ q1 ) =        62.30999994 ;
-table( summ q2 ) =         60.3200002 ;
-table( summ dq1 ) =         2.00009678 ;
-table( summ dq2 ) =        2.000000582 ;
+table( summ q1 ) =        62.30997468 ;
+table( summ q2 ) =         60.3200196 ;
+table( summ dq1 ) =        2.002083623 ;
+table( summ dq2 ) =        2.020727652 ;
 enter TRACK module
   
-iteration:   1 error:   2.256452E-21 deltap:   0.000000E+00
-orbit:  -4.509846E-32 -5.764653E-34  0.000000E+00  0.000000E+00 -1.457925E-17  8.834406E-32
+iteration:   1 error:   3.047816E-05 deltap:   0.000000E+00
+orbit:  -1.454821E-05  3.682668E-07  1.598328E-05  2.778764E-07 -2.806200E-07  1.744753E-09
+  
+iteration:   2 error:   5.032907E-09 deltap:   0.000000E+00
+orbit:  -1.454829E-05  3.682714E-07  1.598063E-05  2.778508E-07 -2.809258E-07  1.746825E-09
   
   Full 6D closed orbit search.
   Initial value of 6-D closed orbit from Twiss: 
-  orbit0   -4.5098462785369661E-032  -5.7646530396899545E-034   0.0000000000000000        0.0000000000000000       -1.4579252035630431E-017   8.8344055806589227E-032
+  orbit0   -1.4548287932602022E-005   3.6827136697740030E-007   1.5980632752526962E-005   2.7785079530089028E-007  -2.8092584791299943E-007   1.7468254621344476E-009
   
  6D closed orbit found by subroutine trclor 
-iteration:  11 error:   2.799193E-22 deltap:   0.000000E+00
-orbit:   9.647291E-72  1.233060E-73  8.385157E-85 -6.453641E-87 -4.074840E-17  2.799193E-22
+iteration:  11 error:   2.229952E-10 deltap:   0.000000E+00
+orbit:  -1.235361E-11 -1.579116E-13 -1.607647E-24 -1.587557E-26  2.826187E-11  2.419519E-11
 
 *****  end of trrun  *****
 exit TRACK module
@@ -517,5 +523,5 @@ exit TRACK module
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  + MAD-X 5.02.06 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
