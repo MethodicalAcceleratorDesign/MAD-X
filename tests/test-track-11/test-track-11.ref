@@ -493,10 +493,6 @@ orbit:  -4.509846E-32 -5.764653E-34  0.000000E+00  0.000000E+00 -1.457925E-17  8
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
-table( summ q1 ) =        62.30999994 ;
-table( summ q2 ) =         60.3200002 ;
-table( summ dq1 ) =         2.00009678 ;
-table( summ dq2 ) =        2.000000582 ;
 enter TRACK module
   
 iteration:   1 error:   2.256452E-21 deltap:   0.000000E+00

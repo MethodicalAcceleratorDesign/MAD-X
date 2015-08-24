@@ -307,7 +307,7 @@ SUBROUTINE twprep(save,case,opt_fun,position)
   !     betx,alfx,amux,bety,alfy,amuy, etc.                              *
   !----------------------------------------------------------------------*
   integer :: save, case
-  double precision opt_fun(*), position
+  double precision :: opt_fun(*), position
 
   integer :: i 
   double precision :: opt5, opt8, opt20, opt21, opt23, opt24
@@ -593,7 +593,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   double precision :: cmatr(6,6,2), pmatr(6,6), dorb(6)
 
   integer, external :: restart_sequ, advance_node, node_al_errors, get_vector, get_option
-  double precision,external :: node_value, get_value
+  double precision, external :: node_value, get_value
   double precision, parameter :: orb_limit=1d1 
   integer, parameter :: ccode=15, pcode=18, max_rep=100
 
@@ -2104,7 +2104,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
   !---- Select element type.
   select case (code)
      
-     case (1, 17:21, 24, 27, 37, 44) !---- Drift space, monitor, collimator, instrument or crabcavity
+     case (1, 17:21, 24, 27, 44) !---- Drift space, monitor, collimator, instrument
         call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
         
      case (2, 3) !---- Bending magnet.
@@ -2146,10 +2146,13 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
      case (22) !---- Beam-beam. (Particles/bunch taken for the opposite beam).
         call tmbb(fsec,ftrk,orbit,fmap,re,te)
 
-     case (33) !--- Dipedge
+     case (33) !--- Dipedge.
         call tmdpdg(ftrk,orbit,fmap,ek,re,te)
 
-     case (42) !---- non-linear thin lens
+     case (37) !---- Crab-Cavity.
+        call tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
+        
+     case (42) !---- Non-Linear thin Lens
         call tmnll(fsec,ftrk,orbit,fmap,ek,re,te)
 
      case (43) !---- RF-Multipole.
@@ -2633,7 +2636,7 @@ SUBROUTINE tmfrng(fsec,h,sk1,edge,he,sig,corr,re,te)
   !     te(6,6,6) (double)  second order terms.                          *
   !----------------------------------------------------------------------*
   logical :: fsec
-  double precision h, sk1, edge, he, sig, corr 
+  double precision :: h, sk1, edge, he, sig, corr 
   double precision :: re(6,6), te(6,6,6)
 
   double precision :: hh, psip, secedg, tanedg
@@ -2895,7 +2898,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
   logical :: fsec, ftrk, fmap
-  double precision orbit(6), re(6,6), te(6,6,6)
+  double precision :: orbit(6), re(6,6), te(6,6,6)
 
   logical :: dorad
   integer :: n_ferr, nord, iord, j, nd, nn, ns
@@ -6456,7 +6459,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   double complex :: Cm2, Sm2, Cm1, Sm1, Cp0, Sp0, Cp1, Sp1
 
   integer, external :: node_fd_errors
-  double precision, external :: node_value,get_value,get_variable
+  double precision, external :: node_value, get_value, get_variable
   double complex, parameter :: icomp=(0d0,1d0) ! imaginary 
 
   !---- Zero the arrays
@@ -6831,3 +6834,238 @@ subroutine tmfoc(el,sk1,c,s,d,f)
   endif
 
 end subroutine tmfoc
+
+SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
+  use twtrrfi
+  use twisslfi
+  use math_constfi, only : zero, one, two, three, half, ten3m
+  use matrices, only : EYE
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     TRANSPORT map for thin crab cavity.                             *
+  !     Input:                                                           *
+  !     fsec      (logical) if true, return second order terms.          *
+  !     ftrk      (logical) if true, track orbit.                        *
+  !     Input/output:                                                    *
+  !     orbit(6)  (double)  closed orbit.                                *
+  !     Output:                                                          *
+  !     fmap      (logical) if true, element has a map.                  *
+  !     ek(6)     (double)  kick due to element.                         *
+  !     re(6,6)   (double)  transfer matrix.                             *
+  !     te(6,6,6) (double)  second-order terms.                          *
+  !----------------------------------------------------------------------*
+  ! Strategy to implement BV-flag
+  ! 0) apply bv-flag to voltage and multipole strengths (the inverse map has V = -V; K?N|S = -K?N|S)
+  ! 1) track orbit(6) : just as in track: P o inverse(M) * P
+  ! 2) ek, re, te : create the vector / matrix / tensor elements for 
+  !    the inverse map (see 0), then apply transformation P to each element
+
+  logical :: fsec, ftrk, fmap
+  double precision :: el
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+  logical :: dorad
+  integer :: j, ii, jj, kk, dummyi, n_ferr
+  double precision :: elrad, beta, deltap, arad, gammas, rfac, bvk, tilt, cangle, sangle, dtmp
+  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
+  double precision :: f_errors(0:maxferr), field(2,0:0)
+  double precision :: ed(6), rd(6,6), td(6,6,6)
+  
+  double precision :: pc, krf
+  double precision :: pi, twopi, clight
+  double precision :: x, y, z, px, py, pt, dpx, dpy, dpt
+  double precision :: freq, rfv, rfl, harmon
+  double precision :: field_cos(2,0:0)
+  double precision :: field_sin(2,0:0)
+  double precision :: kn0l, pn0
+  double precision :: P(6)
+  double complex :: Cp0, Sp0, Cp1, Sp1
+  
+  integer, external :: node_fd_errors
+  double precision, external :: node_value, get_value, get_variable
+  double complex, parameter :: icomp=(0d0,1d0) ! imaginary
+
+  !---- Zero the arrays
+  F_ERRORS = zero
+  FIELD = zero
+  TE = zero
+  
+  !---- drift matrix
+  ED = zero
+  RD = EYE
+  TD = zero
+  
+  call tmdrf(fsec,ftrk,orbit,fmap,el/two,ed,rd,td);
+    
+  !---- Read-in the parameters
+  clight = get_variable('clight ')
+  pi = get_variable('pi ')
+  twopi = two * pi
+
+  harmon = node_value('harmon ');
+  bvk = node_value('other_bv ')
+  elrad = node_value('lrad ')
+  deltap = get_value('probe ', 'deltap ')
+  dorad = get_value('probe ','radiate ') .ne. zero
+  arad = get_value('probe ','arad ')
+  gammas = get_value('probe ','gamma ')
+  beta = get_value('probe ','beta ')
+  pc = get_value('probe ','pc ')
+  tilt = node_value('tilt ')
+
+  rfv = bvk * node_value('volt ')
+  freq = node_value('freq ')
+  rfl = node_value('lag ')
+
+  kn0l = rfv / pc / 1d3; ! MeV / 1d3 / GeV = rad
+  pn0  = half + rfl; ! pi/2 + rfl
+
+  n_ferr = node_fd_errors(f_errors);
+ 
+  rfac = zero
+  fmap = .true.
+  
+  !---- Set-up some parameters
+  krf = twopi * freq * 1d6/clight;
+  
+  if (n_ferr .gt. 0) then
+     call dcopy(f_errors,field,n_ferr)
+  endif
+  
+  !---- Particle's coordinates
+  if (ftrk) then
+    ! apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
+    x  = orbit(1) * bvk;
+    px = orbit(2);
+    y  = orbit(3);
+    py = orbit(4) * bvk;
+    z  = orbit(5) * bvk;
+    pt = orbit(6);
+  else
+    x  = zero;
+    px = zero;
+    y  = zero;
+    py = zero;
+    z  = zero;
+    pt = zero;
+  endif
+  
+  !---- Vector with strengths + field errors
+  field_cos(1,0) = bvk * (kn0l * cos(pn0 * twopi - krf * z) + field(1,0)) / (one + deltap);
+  field_sin(1,0) = bvk * (kn0l * sin(pn0 * twopi - krf * z))              / (one + deltap);
+  field_cos(2,0) = zero; 
+  field_sin(2,0) = zero;
+  if (tilt .ne. zero)  then
+     cangle = cos(-tilt);
+     sangle = sin(-tilt);
+     
+     dtmp           = field_cos(1,0) * cangle;
+     field_cos(2,0) = field_cos(1,0) * sangle;
+     field_cos(1,0) = dtmp;
+
+     dtmp           = field_sin(1,0) * cangle - field_sin(2,0) * sangle;
+     field_sin(2,0) = field_sin(1,0) * sangle + field_sin(2,0) * cangle;
+     field_sin(1,0) = dtmp;
+  endif
+  
+  !---- Prepare to calculate the kick and the matrix elements
+  Cp0 = field_cos(1,0)+icomp*field_cos(2,0);
+  Sp0 = field_sin(1,0)+icomp*field_sin(2,0);
+  Cp1 = Cp0 * (x+icomp*y);
+  Sp1 = Sp0 * (x+icomp*y);
+  
+  !---- Track orbit.
+  if (ftrk) then
+
+     !---- The kick
+     dpx = -REAL(Cp0);
+     dpy = AIMAG(Cp0);
+     dpt = - krf * REAL(Sp1);
+     
+     !---- Radiation effects at entrance.
+     if (dorad  .and.  elrad .ne. zero) then
+        rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
+        px = px - rfac * (one + pt) * px
+        py = py - rfac * (one + pt) * py
+        pt = pt - rfac * (one + pt) ** 2
+     endif
+     
+     !---- Apply the kick
+     px = px + dpx
+     py = py + dpy
+     pt = pt + dpt
+  
+     !---- Radiation effects at exit.
+     if (dorad  .and.  elrad .ne. zero) then
+        px = px - rfac * (one + pt) * px
+        py = py - rfac * (one + pt) * py
+        pt = pt - rfac * (one + pt) ** 2
+     endif
+
+    ! apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
+    orbit(1) = x  * bvk;
+    orbit(2) = px;
+    orbit(3) = y;
+    orbit(4) = py * bvk;
+    orbit(5) = z  * bvk;
+    orbit(6) = pt;
+
+  endif
+  
+  !---- Element Kick
+  ek(2) = -REAL(Cp0);
+  ek(4) = AIMAG(Cp0);
+  ek(6) = - krf * REAL(Sp1);
+
+  !---- First-order terms
+  re(2,5) = -krf * REAL(Sp0);
+  re(4,5) =  krf * AIMAG(Sp0);
+  re(6,1) =  re(2,5);
+  re(6,3) =  re(4,5);
+  re(6,5) =  krf * krf * REAL(Cp1);
+  
+  !---- Second-order terms (use X,Y from orbit tracking).
+  if (fsec) then
+     te(2,5,5) =  ( krf * krf * REAL(Cp0)) / two;
+     te(4,5,5) =  (-krf * krf * AIMAG(Cp0)) / two;
+     te(6,5,5) =  (-krf + krf * krf * krf * REAL(Sp1)) / two;
+  endif
+
+  ! Apply P tranformation to each index
+  if (bvk .eq. -one) then
+    P(1) = -one;
+    P(2) =  one;
+    P(3) =  one;
+    P(4) = -one;
+    P(5) = -one;
+    P(6) =  one;
+    do ii=1,6
+      do jj=1,6
+        do kk=1,6
+          te(ii,jj,kk) = te(ii,jj,kk) * P(ii) * P(jj) * P(kk);
+        enddo
+        re(ii,jj) = re(ii,jj) * P(ii) * P(jj);
+      enddo
+      ek(ii) = ek(ii) * P(ii);
+    enddo
+  endif
+
+  ! adds half a drift space before and after the Crab kick
+  call tmcat1(fsec,ed,rd,td,ek,re,te,ek,re,te);
+  call tmdrf(fsec,ftrk,orbit,fmap,el/two,ed,rd,td);
+  call tmcat1(fsec,ek,re,te,ed,rd,td,ek,re,te);
+  
+  !---- centre option
+  if (centre_cptk .or. centre_bttk) then
+     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
+     if (centre_cptk) then
+        ORBIT0 = ORBIT
+        call twcptk(re,orbit0)
+     endif
+     if (centre_bttk) call twbttk(re,te)
+     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
+  endif
+
+end SUBROUTINE tmcrab
+

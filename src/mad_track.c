@@ -106,7 +106,6 @@ track_run(struct in_cmd* cmd)
   myfree(rout_name, buf_dxt); myfree(rout_name, buf_dyt);
   myfree(rout_name, buf1);    myfree(rout_name, buf2);  myfree(rout_name, buf3);
   myfree(rout_name, buf4);    myfree(rout_name, buf6);
-  fprintf(prt_file, "\n*****  end of trrun  *****\n");
 }
 
 static void

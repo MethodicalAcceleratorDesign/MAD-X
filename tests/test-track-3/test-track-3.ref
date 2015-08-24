@@ -30,8 +30,6 @@ particle #    19 lost turn      1  at pos. s =      1.00 element=qd             
     X=   9.3026840800000004E-004   Y=   8.0875658000000017E-004   T=   0.0000000000000000     
 particle #    20 lost turn      1  at pos. s =      1.00 element=qd                                               aperture =lhcscreen                                       
     X=  -3.3982317999999999E-004   Y=  -9.8802159999999994E-004   T=   0.0000000000000000     
-
-*****  end of trrun  *****
 exit TRACK module
 
 enter TRACK module
@@ -51,8 +49,6 @@ particle #    17 lost turn      1  at pos. s =      1.00 element=qf             
     X=  -8.3061408199999992E-004   Y=   6.3485309200000018E-004   T=   0.0000000000000000     
 particle #    19 lost turn      1  at pos. s =      1.00 element=qf                                               aperture =lhcscreen                                       
     X=  -1.0464713460000001E-003   Y=   9.1241710800000000E-004   T=   0.0000000000000000     
-
-*****  end of trrun  *****
 exit TRACK module
 
 

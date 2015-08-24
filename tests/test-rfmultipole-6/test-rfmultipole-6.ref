@@ -198,8 +198,6 @@ run, turns=10;
                 48                  0 
                 48                  0 
                 48                  0 
-
-*****  end of trrun  *****
 endtrack;
 
 exit TRACK module

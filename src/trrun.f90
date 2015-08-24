@@ -3243,11 +3243,10 @@ subroutine trclor(switch,orbit0)
 
   integer, parameter :: itmax=10
 
-  print *, " "
-  print *, "Full 6D closed orbit search."
-  print *, "Initial value of 6-D closed orbit from Twiss: "
-  print *, "orbit0 ", ORBIT0
-
+  write (*,'(/a)')          'Full 6D closed orbit search.'
+  write (*,'(a)')           'Initial value of 6-D closed orbit from Twiss: '
+  write (*,'(a,1p,6e14.6)') 'orbit0 ', ORBIT0
+  
   do k = 1, 7
      Z(:,k) = ORBIT0 
   enddo
@@ -3343,25 +3342,15 @@ subroutine trclor(switch,orbit0)
         j=j+1
      end do !---- end of loop over nodes
 
-
      !---- construct one-turn map
      do k=1,6
         A(:,k) = ( Z(:,k+1) - Z(:,1) ) / DDD(:)
-        !do i=1,6
-        !   a(i,k) = (z(i,k+1) - z(i,1))/ddd(i)
-        !enddo
      enddo
 
      !---- Solve for dynamic case.
      A(:6,:6) = A(:6,:6) - EYE
      A(:6,7)  = Z(:6,1) - Z0(:6,1)
      err = maxval(abs(A(:,7)))
-     !err = zero
-     !do i= 1,6
-     !   a(i,i) = a(i,i) - one
-     !   a(i,7) = z(i,1) - z0(i,1)
-     !   err = max(abs(a(i,7)), err)
-     !enddo
 
      call solver(a,6,1,irank)
      if (irank .lt. 6) go to 100
@@ -3386,14 +3375,13 @@ subroutine trclor(switch,orbit0)
   goto 110
 
 100 continue
-  print *," Singular matrix occurred during closed orbit search."
+  write (*,'(a)') '  Singular matrix occurred during closed orbit search.'
 
 110 continue
-  print *, ' '
-  print *, '6D closed orbit found by subroutine trclor '
-  print '(''iteration: '',i3,'' error: '',1p,e14.6,'' deltap: '',1p,e14.6)',itra,err,deltap
-  print '(''orbit: '', 1p,6e14.6)', orbit0
-
+  write (*,'(/a)')                          '6D closed orbit found by subroutine trclor '
+  write (*,'(a,i3,a,1p,e14.6,a,1p,e14.6)')  'iteration: ',itra,' error: ',err,' deltap: ',deltap
+  write (*,'(a,1p,6e14.6)')                 'orbit: ', ORBIT0
+  
 end subroutine trclor
 
 subroutine ixy_fitting()
