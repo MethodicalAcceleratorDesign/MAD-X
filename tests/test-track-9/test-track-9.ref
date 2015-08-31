@@ -33,6 +33,7 @@ orbit:   3.729602E-24  1.315902E-39  0.000000E+00  0.000000E+00 -3.167331E-17  1
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+makethin: style chosen : hybrid
 ++++++ warning: makethin: no selection list, slicing all to one thin lens.
 makethin: slicing sequence : c314
 enter Twiss module
