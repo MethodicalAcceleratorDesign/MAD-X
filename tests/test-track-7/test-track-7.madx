@@ -39,7 +39,7 @@ option, -echo,-warn,-info;
 select, flag= makethin, pattern= "MQXA.*", slice= 12;
 select, flag= makethin, pattern= "MQXB.*", slice= 12;
 select, flag= makethin, class= quadrupole, slice= 2;
-makethin, sequence= lhcb1;
+makethin, sequence= lhcb1,style=hybrid;
 
 
 ! ********** Track three particles

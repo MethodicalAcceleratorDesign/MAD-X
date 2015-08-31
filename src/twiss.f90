@@ -4587,20 +4587,20 @@ SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
   logical :: cplxy
-  double precision :: theta, ct, st 
+  double precision :: psi, ct, st 
   double precision :: orbit0(6), orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
 
   double precision, external :: node_value
 
   !---- Initialize.
-  theta = node_value('angle ')
-  fmap = theta .ne. zero
+  psi = node_value('angle ')
+  fmap = psi .ne. zero
   if (.not. fmap) return
 
   !---- First-order terms.
   cplxy = .true.
-  ct = cos(theta)
-  st = sin(theta)
+  ct = cos(psi)
+  st = sin(psi)
 
   re(1,1) = ct
   re(1,3) = st

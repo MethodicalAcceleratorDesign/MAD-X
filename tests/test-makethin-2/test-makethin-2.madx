@@ -23,7 +23,7 @@ twiss,  sequence=lhcb1, file=lhc_twiss_b1.before.dat, betx=beta.ip1, bety=beta.i
 option, info,  warn, -echo;
 call, file="../share/LHC/LHCRing/V6.503/toolkit/slice.madx";
 option, echo, warn, info;
-makethin, sequence=lhcb1;
+makethin, sequence=lhcb1,style=hybrid;
 
 ! set new strength file
 option,-echo,-warn,-info;

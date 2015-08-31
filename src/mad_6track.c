@@ -91,13 +91,14 @@
 
 // types
 
-/* MADX name     : circle, ellipse, rectangle, lhcscreen */
-/* internal code :    1       2         3          4     */
+/* MADX name and internal codes    : 
+   circle=1=CR, rectangle=2=RE, ellipse=3=EL, rectcircle=lhcscreen=4=RL, 
+   rectellipse=5=RL, racetrack=6=RT, octagon=7=OC */ 
 struct aper_struct {
     int apply;
     char name[255];
     char style[255];
-    double value[3];
+    double value[8]; // 2015-Jul-31 ghislain: adding more parameters to aperture
 };
 
 struct c6t_element
@@ -301,7 +302,8 @@ static void att_vkicker(struct c6t_element*);
 static void att_rfmultipole(struct c6t_element*);
 static void att_undefined(struct c6t_element*);
 static void clean_c6t_element(struct c6t_element*);
-static struct c6t_element* create_aperture(const char* ,const char* ,double , double , struct double_array*);
+static struct c6t_element* create_aperture(const char* ,const char* ,double, double, double, double, double, double, double,
+					   struct double_array*);
 static void concat_drifts(void);
 static void conv_elem(void);
 static void c6t_finish(void);
@@ -609,7 +611,7 @@ assign_att(void)
       el = types.member[i]->elem[j];
       if (el->flag > 0 && el->equiv == el)  /* all others ignored */
       {	
-        if (strcmp(el->base_name, "aperture") == 0) att_aperture(el);
+        if      (strcmp(el->base_name, "aperture") == 0) att_aperture(el);
         else if (strcmp(el->base_name, "beambeam") == 0) att_beambeam(el);
         else if (strcmp(el->base_name, "collimator") == 0) att_colli(el);
         else if (strcmp(el->base_name, "decapole") == 0) att_decapole(el);
@@ -1102,25 +1104,41 @@ clean_c6t_element(struct c6t_element* cleanme)
 }
 
 static struct c6t_element*
-create_aperture(const char* name, const char* type, double a, double b, struct double_array* p_al_err)
+create_aperture(const char* name, const char* type, double ap1, double ap2, double ap3, double ap4, 
+		double offx, double offy, double tilt, struct double_array* p_al_err)
 {
   struct c6t_element* aper_element;
-  aper_element = new_c6t_element(4,name,"aperture");
+  aper_element = new_c6t_element(9,name,"aperture");
   clean_c6t_element(aper_element);
   strcpy(aper_element->org_name,name);
-  aper_element->value[0] = 0.0;
-  aper_element->value[1] = a;
-  aper_element->value[2] = b;
-  if (strcmp(type,"RE")==0)
-  {
-    aper_element->value[3] = 1;
+
+  // type of element is coded by integer...  
+  if      (strcmp(type,"CR")==0) aper_element->value[1] = 1; 
+  else if (strcmp(type,"RE")==0) aper_element->value[1] = 2;
+  else if (strcmp(type,"EL")==0) aper_element->value[1] = 3;
+  else if (strcmp(type,"RC")==0) aper_element->value[1] = 4;
+  else if (strcmp(type,"RL")==0) aper_element->value[1] = 5;
+  else if (strcmp(type,"RT")==0) aper_element->value[1] = 6;
+  else if (strcmp(type,"OC")==0) aper_element->value[1] = 7;
+  else aper_element->value[1] = 0; 
+
+  aper_element->value[0] = 0.0; // zero length ? 
+  aper_element->value[2] = ap1 * 1e3; // sixtrack units are mm
+  aper_element->value[3] = ap2 * 1e3; 
+  aper_element->value[4] = ap3 * 1e3;
+  aper_element->value[5] = ap4 * 1e3;
+  aper_element->value[6] = offx * 1e3;
+  aper_element->value[7] = offy * 1e3;
+  aper_element->value[8] = tilt / M_PI * 180; // sixtrack units are degrees
+ 
+  if (aper_element->value[1] == 7) // Octagon
+  {   
+    aper_element->value[4] = ap3 / M_PI * 180; // sixtrack units are degrees
+    aper_element->value[5] = ap4 / M_PI * 180;
   }
-  else
-  {
-    aper_element->value[3] = 2;
-  }
+    
   aper_element->keep_in=1;
-  /* alignment errors of aperture are to be copied toalignment errors of element */
+  /* alignment errors of aperture are to be copied to alignment errors of element */
   if (p_al_err && p_al_err->curr>11)
   {
     align_cnt++;
@@ -1483,6 +1501,7 @@ convert_madx_to_c6t(struct node* p)
     for (j = 0; j < c6t_elem->n_values; j++)
       if (fabs(c6t_elem->value[j]) < eps_12)
         c6t_elem->value[j] = 0.0;
+    
     /* check to see if this has an aperture assigned, check for aperture flag */
     if ((aperture_flag)
         && (aper_param = return_param_recurse("apertype", p->p_elem)))
@@ -1491,16 +1510,33 @@ convert_madx_to_c6t(struct node* p)
       strcpy(tag_aperture.style,aper_param->string);
       strcpy(tag_aperture.name,t_name);
       strcat(tag_aperture.name,"_AP");
+      for (i=0; i<8; i++) tag_aperture.value[i] = 0. ;
+
       if ((aper_param = return_param_recurse("aperture", p->p_elem)))
       {
         if (aper_param->expr_list != NULL)
           update_vector(aper_param->expr_list, aper_param->double_array);
-        j=3;
-        if (aper_param->double_array->curr<3) j=aper_param->double_array->curr;
-        for(i=0;i<j;i++)
-        {
-          tag_aperture.value[i] = aper_param->double_array->a[i];
-        }
+	j = 4;
+	if (aper_param->double_array->curr < 4) j = aper_param->double_array->curr;	
+        for(i=1; i<=j; i++) tag_aperture.value[i] = aper_param->double_array->a[i-1];
+      }
+
+      if ((aper_param = return_param_recurse("aper_offset", p->p_elem)))
+      {
+        if (aper_param->expr_list != NULL)
+          update_vector(aper_param->expr_list, aper_param->double_array);
+	j = 2;
+	if (aper_param->double_array->curr < 2) j = aper_param->double_array->curr;	
+        for(i=1; i<=j; i++) tag_aperture.value[i+4] = aper_param->double_array->a[i-1];
+      }
+
+      if ((aper_param = return_param_recurse("aper_tilt", p->p_elem)))
+      {
+        if (aper_param->expr_list != NULL)
+          update_vector(aper_param->expr_list, aper_param->double_array);
+      	j = 1;
+      	if (aper_param->double_array->curr == 1)
+      	  tag_aperture.value[7] = aper_param->double_array->a[0];
       }
     }
 
@@ -2262,7 +2298,6 @@ pro_elem(struct node* cnode)
 {
   int i;
   char t_key[KEY_LENGTH];
-  char ap_name[255];
   struct c6t_element *tag_element;
   double tmp_vk,tmp_hk;
 
@@ -2270,7 +2305,7 @@ pro_elem(struct node* cnode)
   /* do the fiddly conversion but skip element if not needed */
   if (make_c6t_element(cnode) == NULL) return;
 
-  if (strcmp(cnode->base_name, "rbend") == 0) mod_rbend(current_element);
+  if      (strcmp(cnode->base_name, "rbend") == 0) mod_rbend(current_element);
   else if (strcmp(cnode->base_name, "lcavity") == 0) mod_lcavity(current_element);
   else if (strcmp(cnode->base_name, "multipole") == 0) mod_multipole(current_element);
   else if (strcmp(cnode->base_name, "octupole") == 0) mod_octupole(current_element);
@@ -2336,13 +2371,28 @@ pro_elem(struct node* cnode)
   {
     current_element->tilt_err = 0;
   }
+
   /* add aperture element if necessary */
-  if (tag_aperture.apply==1)
+  if (tag_aperture.apply == 1)
   {
-    if (strstr(tag_aperture.style,"circle")!=NULL)
+    char keyword[3]="00"; 
+    if      (0 == strcmp(tag_aperture.style,"circle"))      strcpy(keyword, "CR"); 
+    else if (0 == strcmp(tag_aperture.style,"ellipse"))     strcpy(keyword, "EL");  
+    else if (0 == strcmp(tag_aperture.style,"rectangle"))   strcpy(keyword, "RE");   
+    else if (0 == strcmp(tag_aperture.style,"rectcircle") ||  
+    	     0 == strcmp(tag_aperture.style,"lhcscreen"))   strcpy(keyword, "RC");    
+    else if (0 == strcmp(tag_aperture.style,"rectellipse")) strcpy(keyword, "RL");    
+    else if (0 == strcmp(tag_aperture.style,"racetrack"))   strcpy(keyword, "RT");    
+    else if (0 == strcmp(tag_aperture.style,"octagon"))     strcpy(keyword, "OC");    
+  
+    if (strcmp(keyword,"00") != 0) 
     {
-      tag_element = create_aperture(tag_aperture.name,"EL",
-                                    tag_aperture.value[0],tag_aperture.value[0],cnode->p_al_err);
+      tag_element = create_aperture(tag_aperture.name,keyword, 
+				    tag_aperture.value[1], tag_aperture.value[2],
+				    tag_aperture.value[3], tag_aperture.value[4],
+				    tag_aperture.value[5], tag_aperture.value[6],
+				    tag_aperture.value[7],
+				    cnode->p_al_err);
       tag_element->previous = current_element;
       tag_element->next = current_element->next;
       current_element->next = tag_element;
@@ -2351,54 +2401,7 @@ pro_elem(struct node* cnode)
       current_element->position = cnode->position;
       add_to_ellist(current_element);
     }
-    else if (strstr(tag_aperture.style,"ellipse")!=NULL)
-    {
-      tag_element = create_aperture(tag_aperture.name,"EL",
-                                    tag_aperture.value[0],tag_aperture.value[1],cnode->p_al_err);
-      tag_element->previous = current_element;
-      tag_element->next = current_element->next;
-      current_element->next = tag_element;
-      prev_element = current_element;
-      current_element = tag_element;
-      current_element->position = cnode->position;
-      add_to_ellist(current_element);
-    }
-    else if (strstr(tag_aperture.style,"rectangle")!=NULL)
-    {
-      tag_element = create_aperture(tag_aperture.name,"RE",
-                                    tag_aperture.value[0],tag_aperture.value[1],cnode->p_al_err);
-      tag_element->previous = current_element;
-      tag_element->next = current_element->next;
-      current_element->next = tag_element;
-      prev_element = current_element;
-      current_element = tag_element;
-      current_element->position = cnode->position;
-      add_to_ellist(current_element);
-    }
-    else if (strstr(tag_aperture.style,"lhcscreen")!=NULL)
-    {
-      strcpy(ap_name,tag_aperture.name); strcat(ap_name,"1");
-      tag_element = create_aperture(ap_name,"EL",
-                                    tag_aperture.value[0],tag_aperture.value[0],cnode->p_al_err);
-      tag_element->previous = current_element;
-      tag_element->next = current_element->next;
-      current_element->next = tag_element;
-      prev_element = current_element;
-      current_element = tag_element;
-      current_element->position = cnode->position;
-      add_to_ellist(current_element);
-      strcpy(ap_name,tag_aperture.name); strcat(ap_name,"2");
-      tag_element = create_aperture(ap_name,"RE",
-                                    tag_aperture.value[1],tag_aperture.value[2],cnode->p_al_err);
-      tag_element->previous = current_element;
-      tag_element->next = current_element->next;
-      current_element->next = tag_element;
-      prev_element = current_element;
-      current_element = tag_element;
-      current_element->position = cnode->position;
-      add_to_ellist(current_element);
-    }
-    else
+    else 
     {
       warning("general aperture element not supported in sixtrack",tag_aperture.name);
     }
@@ -2410,11 +2413,11 @@ read_sequ(void)
 {
   struct node* cnode;
   if ((current_sequ->n_nodes) > 0)  sequ_start = current_sequ->ex_start->position;
-  cnode=current_sequ->ex_start;
-  while(cnode && cnode!=current_sequ->ex_end)
+  cnode = current_sequ->ex_start;
+  while (cnode && cnode != current_sequ->ex_end)
   {
     if (strstr(cnode->name,"$")==NULL) pro_elem(cnode);
-    cnode=cnode->next;
+    cnode = cnode->next;
   }
   sequ_end = current_sequ->ex_end->position;
   sequ_length = sequ_end - sequ_start;
@@ -2765,7 +2768,7 @@ write_c6t_element(struct c6t_element* el)
       write_rfmultipole(el);
     } else {
       fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	      el->name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+	      el->name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);      
     }
   }
   el->w_flag = 1;
@@ -2959,6 +2962,7 @@ write_f34_special(void)
 static void
 write_f3_aper(void)
 {
+  char keyword[3];
   int f3aper_cnt = 0;
   current_element = first_in_sequ;
 
@@ -2971,17 +2975,22 @@ write_f3_aper(void)
       {
         f3aper  = fopen("fc.3.aper", "w");
         fprintf(f3aper,"LIMI\n");
-      }
-      if (current_element->value[3] == 1)
-      {
-        fprintf(f3aper,"%s %s %f %f\n",current_element->name,"RE",
-                current_element->value[1], current_element->value[2]);
-      }
-      else
-      {
-        fprintf(f3aper,"%s %s %f %f\n",current_element->name,"EL",
-                current_element->value[1], current_element->value[2]);
-      }
+      }	
+      if      (current_element->value[1] == 1) strcpy(keyword, "CR") ;
+      else if (current_element->value[1] == 2) strcpy(keyword, "RE") ;
+      else if (current_element->value[1] == 3) strcpy(keyword, "EL") ;
+      else if (current_element->value[1] == 4) strcpy(keyword, "RC") ;
+      else if (current_element->value[1] == 5) strcpy(keyword, "RL") ;
+      else if (current_element->value[1] == 6) strcpy(keyword, "RT") ;
+      else if (current_element->value[1] == 7) strcpy(keyword, "OC") ;
+      else strcpy(keyword, "UK") ; // unknown aperture type
+      
+      fprintf(f3aper,"%s   %s %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f\n",
+	      current_element->name, keyword,
+	      current_element->value[2], current_element->value[3], 
+	      current_element->value[4], current_element->value[5],
+      	      current_element->value[6], current_element->value[7],
+	      current_element->value[8]);
     }
     current_element = current_element->next;
   }

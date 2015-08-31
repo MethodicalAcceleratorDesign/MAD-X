@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Darwin)      +
+  +     MAD-X 5.02.06  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.06.19 11:54:39      +
+  + Release   date: 2015.06.26               +
+  + Execution date: 2015.08.31 16:24:52      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8
 
@@ -71,8 +71,9 @@ Beam, particle = proton, sequence=lhcb1, energy = 450.0,
 
 use,sequence=lhcb1;
 
-makethin,sequence=lhcb1;
+makethin,sequence=lhcb1,style=hybrid;
 
+makethin: style chosen : hybrid
 makethin: slicing sequence : lhcb1
 makethin: slicing sequence : ir11
 makethin: slicing sequence : ir2
@@ -832,5 +833,5 @@ stop;
 1 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  + MAD-X 5.02.06 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

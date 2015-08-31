@@ -5,12 +5,15 @@
 \chapter{Conversion to \textit{SixTrack}}
 \label{chap:sixtrack}
 
-This module produces input files for tracking in \textit{SixTrack}\cite{SixTrack_www}.
+\textit{SixTrack}\cite{SixTrack}\cite{SixTrack_www} is a separate beam 
+optics code that is often used for long term tracking of particles, 
+{\sl e.g.} for  dynamic aperture studies,
+because of its  speed and controllability. 
 
-In dynamic aperture studies \textit{SixTrack}\cite{SixTrack} is often
-used because of its  speed and controllability. However the input files
+However the input files
 are notoriously difficult to produce by hand. This command may be used
-to produce \textit{SixTrack} input files from a sequence loaded in \madx.
+to generate \textit{SixTrack} input files from a sequence loaded in \madx.
+
 
 \madbox{
 SIXTRACK, \=CAVALL=logical, MULT\_AUTO\_OFF=logical, MAX\_MULT\_ORD=integer, \\
@@ -43,8 +46,8 @@ The parameters are defined as:
    instead.   
 
    \ttitem{APERTURE} (optional flag) flag to convert the apertures
-   from \madx to \textit{SixTrack}, so \textit{SixTrack} will track
-   with aperture.   
+   from \madx to \textit{SixTrack} so that \textit{SixTrack} can track
+   with apertures defined. The aperture data is found in file {\tt fc.3.aper}.
 
    \ttitem{RADIUS} (optional, default value is 1~m). This sets the
    reference  radius for the magnets. This argument is optional but
@@ -70,10 +73,11 @@ The {\tt SIXTRACK} command always produces at least one output file:
    \item  fc.2 -  the basic structure of the lattice. 
 \end{itemize} 
 It may also produce any or all of the following files, depending on the
-sequence:
+sequence and command attributes:
 \begin{itemize}
    \item  fc.3 -   multipole mask(s). 
    \item  fc.3.aux -  various beam parameters. 
+   \item  fc.3.aper - aperture element data (units are {\tt mm} and {\tt degrees}).
    \item  fc.8 -   misalignments and tilts. 
    \item  fc.16 -  field errors and/or combined multipole kicks. 
    \item  fc.34 -  various optics parameters at various
@@ -81,7 +85,9 @@ sequence:
      be used as input to the program \textit{SODD}\cite{SODD}.)   
 \end{itemize}  
 
-For a full description of these files see the \textit{SixTrack} website\cite{SixTrack_www}, the \textit{SixTrack} user manual\cite{SixTrack}; and for information on running {\textit SixTrack} 
+For a full description of these files see the \textit{SixTrack} 
+website\cite{SixTrack_www}, the \textit{SixTrack} user 
+manual\cite{SixTrack}; and for information on running {\textit SixTrack} 
 see the \textit{SixTrack} run environment description\cite{SixTrack_RE}.
 
 %% EOF

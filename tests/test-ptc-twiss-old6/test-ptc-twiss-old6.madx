@@ -41,7 +41,7 @@ Beam, particle = proton, sequence=lhcb1, energy = 450.0,
           NPART=1.05E11, sige=      4.5e-4 ;
 
 use,sequence=lhcb1;
-makethin,sequence=lhcb1;
+makethin,sequence=lhcb1,style=hybrid;
 !save,beam,sequence=lhcb1,file="version3_00_00";
 
 Use, period=lhcb1;

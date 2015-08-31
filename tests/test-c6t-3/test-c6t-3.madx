@@ -2,7 +2,7 @@ TITLE;
 option,-echo,-warn;
 beam;
 	
-call,file="../share/fivecell/fivecell.seq";
+call,file="input/fivecell.seq";
 
 use,period=fivecell;   ! use needed for twiss (not necessarily needed before makethin)
 twiss;
