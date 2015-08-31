@@ -3,7 +3,7 @@
   +     MAD-X 5.02.06  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2015.06.26               +
-  + Execution date: 2015.08.10 09:55:42      +
+  + Execution date: 2015.08.31 16:19:18      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2012
 
@@ -80,6 +80,7 @@ poscrabb1 =              157.4 ;
 poscrabb2 =              156.1 ;
 poscrabc1 =              154.8 ;
 poscrabc2 =              153.5 ;
+makethin: style chosen : hybrid
 makethin: slicing sequence : lhcb1
 enter Twiss module
   

@@ -13,7 +13,9 @@ npara_5 =        15.47737402 ;
 npara_8 =        16.01107657 ;
 long_a =           0.020405 ;
 long_b =             0.0539 ;
+makethin: style chosen : hybrid
 makethin: slicing sequence : lhcb1
+makethin: style chosen : hybrid
 makethin: slicing sequence : lhcb2
 enter Twiss module
   

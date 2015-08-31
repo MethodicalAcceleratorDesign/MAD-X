@@ -55,9 +55,9 @@ ho_charge = 0.2;
 !++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 use,sequence=lhcb1;
-makethin,sequence=lhcb1;
+makethin,sequence=lhcb1,style=hybrid;
 use,sequence=lhcb2;
-makethin,sequence=lhcb2;
+makethin,sequence=lhcb2,style=hybrid;
 
 option,-warn,-echo,-info;
 call, file = "../share/LHC/LHCRing/V6.503/V6.5.thin.coll.str";

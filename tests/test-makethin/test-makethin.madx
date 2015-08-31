@@ -15,7 +15,7 @@ qxref = table(summ,q1); qyref = table(summ,q2);
 value, qxref, qyref;
 
 select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
-makethin,sequence=fivecell;
+makethin,sequence=fivecell,style=hybrid;
 use,sequence=fivecell;      ! use the thin sequence
 twiss,sequence=fivecell;    ! to allow to compare in output if betx,dx max etc agree to some percent with the thick twiss results
 save,sequence=fivecell,file="fivecell_thin.seq";
@@ -96,7 +96,7 @@ use,sequence=fivecell;      ! for twiss and makethin
 twiss,sequence=fivecell;
 
 select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
-makethin,sequence=fivecell, minimizeparents=true, makedipedge=true, makeconsistent=true;
+makethin,sequence=fivecell, style=hybrid, minimizeparents=true, makedipedge=true, makeconsistent=true;
 use,sequence=fivecell;      ! use the thin sequence
 twiss,sequence=fivecell;    ! to allow to compare in output if betx,dx max etc agree to some percent with the thick twiss results
 save,sequence=fivecell,file="fivecell_thin_options.seq";
