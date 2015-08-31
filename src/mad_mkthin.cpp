@@ -99,10 +99,10 @@ public:
   void slice_node();
   node* thick_node; // current node
 private:
-  double  simple_at_shift(const int slices, const int slice_no);
-  double  teapot_at_shift(const int slices, const int slice_no);
-  double  collim_at_shift(const int slices, const int slice_no);
-  double default_at_shift(const int slices, const int slice_no);
+  double simple_at_shift(const int slices, const int slice_no);
+  double teapot_at_shift(const int slices, const int slice_no);
+  double collim_at_shift(const int slices, const int slice_no);
+  double hybrid_at_shift(const int slices, const int slice_no);
   double at_shift(const int slices, const int slice_no,const std::string& local_slice_style); // return at relative shifts from centre of unsliced magnet
   int translate_k(command_parameter* *kparam, command_parameter* *ksparam,const command_parameter* angle_param, command_parameter* kn_param, command_parameter* ks_param);
   element* sbend_from_rbend(const element* rbend_el);
@@ -1336,11 +1336,12 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
 
   const int ipos_style = name_list_pos("style", nl);
   string slice_style;
+
   if (nl->inform[ipos_style] &&  pl->parameters[ipos_style]->string )
   {
     slice_style = pl->parameters[ipos_style]->string ;
     cout << "makethin: style chosen : " << slice_style << EOL;
-  }
+  } else slice_style = "teapot";
 
   if(debug_fl() && kill_fringe_fl)   cout << "kill_fringe_fl="   << kill_fringe_fl   << " is on. Flags kill_ent_fringe kill_exi_fringe will be set to true for thick bend body slices" << EOL;
   if(debug_fl() && dipedge_h1_h2_fl) cout << "dipedge_h1_h2_fl=" << dipedge_h1_h2_fl << " is on. Higher order h1, h2 parameters will be kept. Tracking may become non-simplectic" << EOL;
@@ -1664,7 +1665,7 @@ double SeqElList::collim_at_shift(const int slices,const int slice_no)
   return n>1 ? (i-1.0)/(n-1.0)-0.5 : 0.0;
 }
 
-double SeqElList::default_at_shift(const int slices, const int slice_no)
+double SeqElList::hybrid_at_shift(const int slices, const int slice_no)
 {
   return slices>4 ? simple_at_shift(slices, slice_no) : teapot_at_shift(slices, slice_no); // old for backwards compatibility, should be removed in future
 }
@@ -1673,7 +1674,7 @@ double SeqElList::at_shift(const int slices,const int slice_no,const string& loc
 {
   double shift=0;
   if (!slices || !slice_no) fatal_error("makethin: invalid slicing for zero slices",local_slice_style.c_str());
-  if      (local_slice_style==string(""))        shift= default_at_shift(slices,slice_no);
+  if      (local_slice_style==string("hybrid"))  shift= hybrid_at_shift(slices,slice_no);
   else if (local_slice_style==string("simple"))  shift= simple_at_shift(slices,slice_no);
   else if (local_slice_style==string("teapot"))  shift= teapot_at_shift(slices,slice_no);
   else if (local_slice_style==string("collim"))  shift= collim_at_shift(slices,slice_no);
