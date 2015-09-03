@@ -218,7 +218,7 @@ CONTAINS
     !k    data char_a / ' ' /
     !-------------------------------------------------------------------------
     
-    if (getdebug() > 3) then
+    if (getdebug() > 2) then
       ptc_track_debug = .true.
     endif
     
@@ -1187,6 +1187,9 @@ CONTAINS
             ! over one-turn in the DEFAULT state (citation, p. 25).                          +   !
             ! there is no any other an explicit description in KEK 2002-3 report             +   !
             !                                                                                !   ^
+            
+            
+            
             do k_th_coord=1,6 ! save coordinates for the current particle ---!               +   !
                if (ISNAN(current_x_coord_incl_co(k_th_coord))) then !VK20070328 XXXXXXXXX    +   !
                   ! BUG !? Aperture does not work, if lattice with spread multipoles XXXX    +   !
