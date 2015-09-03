@@ -2975,7 +2975,7 @@ if (MBX.4L2->l>0) {
   select, flag=makethin, pattern=mqtli\.,  slice=2;
   select, flag=makethin, pattern=mqt\.  ,  slice=2;
   !thin lens
-  beam;use,sequence=lhcb1; makethin, sequence=lhcb1;
+  beam;use,sequence=lhcb1; makethin, sequence=lhcb1, style=hybrid;
 } else {
   print, text="Sequence is already thin";
 };

@@ -15,7 +15,8 @@ subroutine touschek
   use name_lenfi
   use physconsfi
   use touschekfi
-  use math_constfi, only : zero, one, two, four, eight, half
+  use math_constfi, only : zero, one, two, four, eight, half, pi
+  use phys_constfi, only : clight
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -26,7 +27,7 @@ subroutine touschek
   !   TABLE     (name)    Name of Twiss table.                           *
   !----------------------------------------------------------------------*
   integer :: i, j, flag, iflag, range(2), table_output, lp, centre 
-  double precision :: ccost, fact, rr, beta2, gamma2, tolerance, pi, pi2
+  double precision :: ccost, fact, rr, beta2, gamma2, tolerance, pi2
   double precision :: uloss, km, um, bx, by, ax, ay, dx, dpx, dy, dpy, l, s
   double precision :: sigx2, sigy2, ddx2, ddy2, sigh2
   double precision :: litousch, litouschp, tlitouschek, litouschw, tltouschek
@@ -34,16 +35,12 @@ subroutine touschek
 
   integer, external :: get_option, double_from_table_row, restart_sequ
   integer, external :: string_from_table_row, advance_to_pos, get_string
-  double precision, external ::  get_value, get_variable, DGAUSS, ftousch
-
-  pi=get_variable('pi ')
-
+  double precision, external ::  get_value, DGAUSS, ftousch
+  
   ! ************* Get the parameters for the common blocks *************
   ! *************         /machin/ and /beamdb/            *************
 
   lp = get_string('beam ', 'particle ', sequ_name)
-
-  clight   = get_variable('clight ')
 
   charge   = get_value('probe ', 'charge ')
   gammas   = get_value('probe ', 'gamma ')
@@ -240,16 +237,17 @@ end subroutine touschek
 subroutine cavtouschek (um,uloss,iflag)
   use name_lenfi
   use touschekfi
-  use math_constfi, only : zero, one, two, three, half, ten6p, ten3m
+  use math_constfi, only : zero, one, two, three, half, ten6p, ten3m, pi, twopi
+  use phys_constfi, only : clight
   implicit none
 
   integer :: i, lg, code, flag, iflag
   double precision :: el, rfv, rff, rfl, um, harmonl, phirf, c0, vrf, pc, omega, orbit5
-  double precision :: pi, twopi, eta, qover, fq, uloss, vrfsum, harmonlm, umt, synch_2
+  double precision :: eta, qover, fq, uloss, vrfsum, harmonlm, umt, synch_2
   character(len=name_len) :: sequ_name, el_name
 
   integer, external :: get_string, restart_sequ, advance_node, double_from_table_row
-  double precision, external :: get_value, node_value, get_variable
+  double precision, external :: get_value, node_value
 
   !---- Initialize.
   qover = zero
@@ -265,8 +263,6 @@ subroutine cavtouschek (um,uloss,iflag)
   else
      uloss = two/three*arad*en0**4*beta**3*synch_2*1d3/(amass)**3
   endif
-  twopi = get_variable('twopi ')
-  pi = get_variable('pi ')
   um = zero
 
   lg = get_string('sequence ', 'name ', sequ_name)

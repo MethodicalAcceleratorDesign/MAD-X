@@ -4,7 +4,7 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   use twiss0fi
   use emitfi
   use matrices, only : EYE
-  use math_constfi, only : zero, one, three
+  use math_constfi, only : zero, one, three, twopi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -47,13 +47,10 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   double precision :: re(6,6), te(6,6,6), tt(6,6,6)
   double precision :: betas, bx, gx
 
-  double precision :: get_value, get_variable, node_value
+  double precision :: get_value, node_value
   integer :: i, j, j1, j2, k, k1, k2, eflag, n_align
   integer :: restart_sequ, node_al_errors, code, advance_node
   logical :: m66sta, fmap, stabx, staby, stabt, frad
-
-  double precision :: twopi
-  twopi = get_variable('twopi ')
 
   ORBIT(:6) = ORBIT0(:6)
   DISP(:6) = DISP0(:6)
@@ -203,7 +200,8 @@ end subroutine emit
 subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v, &
                   tunes,sig_v,pdamp)
   use emitfi
-  use math_constfi, only : zero, one, two, three, four
+  use math_constfi, only : zero, one, two, three, four, twopi
+  use phys_constfi, only : clight, hbar
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -230,27 +228,23 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v, &
 
   integer :: j, j1, j2, k, k1, k2
   double precision :: arad, gammas, clg, en0
-  double precision :: amass, clight, hbar, freq0, betas
+  double precision :: amass, freq0, betas
   double precision :: ex, ey, et, exn, eyn, sigx, sigy, sige, sigt  
   double precision :: reval(6), aival(6), alj(3), tau(3), tune(3)
   double precision :: sigma(6,6), bstar(3,3), gstar(3,3), dummy(6,6)
-  double precision :: twopi
 
-  double precision, external :: get_variable, get_value
+  double precision, external :: get_value
   integer, parameter :: iqpr2 = 6
   double precision, parameter :: ten3p=1.0d3, tenp6=1.0d6, tenp9=1.0d9
 
   SIGMA(:6,:6) = zero 
   ex=zero;  ey=zero;  et=zero
 
-  twopi=get_variable('twopi ')
-  clight = get_variable('clight ')
-  hbar = get_variable('hbar ')
-  arad = get_value('probe ','arad ')
-  betas = get_value('probe ','beta ')
+  arad   = get_value('probe ','arad ')
+  betas  = get_value('probe ','beta ')
   gammas = get_value('probe ','gamma ')
-  amass = get_value('probe ','mass ')
-  freq0 = get_value('probe ','freq0 ')
+  amass  = get_value('probe ','mass ')
+  freq0  = get_value('probe ','freq0 ')
 
   !---- Synchrotron energy loss [GeV].
   if (stabt .and. frad) then
@@ -398,7 +392,8 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   use emitfi
   use twtrrfi
   use matrices
-  use math_constfi, only : zero, one, two, three, four, six
+  use math_constfi, only : zero, one, two, three, four, six, pi
+  use phys_constfi, only : clight
   implicit none
   !---------------------------------------------------------------------*
   ! Purpose:                                                            *
@@ -442,13 +437,13 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   double precision  :: h2, hcb2, tedg2, fact2, fact2x, rfac2
   double precision  :: rfac2x, rfac2y, bi2gi2, betas, gammas
   double precision  :: e5sq1, e5sq2, e5sqs1, e5sqs2, x, y
-  double precision  :: f1, f2, f1s, f2s, twon, str, st, pi, clight
+  double precision  :: f1, f2, f1s, f2s, twon, str, st
   double precision  :: r1sq, r2sq, fh1, fh2, dr, di, drt
   double precision  :: rfv, rff, rfl, rfvlt, rffrq, rflag, time
   double precision  :: xkick, ykick, dpx, dpy, an, hyx, hcbs2,hbi
   double precision  :: sk3, rfac, rfacx, rfacy, fh
 
-  double precision  :: get_variable, node_value, get_value
+  double precision  :: node_value, get_value
   double precision, parameter :: ten3m = 1.0d-3, ten6p = 1.0d+6
   double precision, parameter :: half  = 0.5d0, twelve = 12.d0
 
@@ -777,8 +772,6 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rfv = node_value('volt ')
         rff = node_value('freq ')
         rfl = node_value('lag ')
-        pi = get_variable('pi ')
-        clight = get_variable('clight ')
         rfvlt = ten3m * rfv
         rffrq = rff * (ten6p * two * pi / clight)
         rflag = two * pi * rfl

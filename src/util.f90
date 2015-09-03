@@ -289,7 +289,7 @@ module ibsdbfi
   implicit none
   public
   integer :: bunch=0
-  double precision :: circ=0.d0, clight=0.d0, arad=0.d0, freq0=0.d0, alpha=0.d0
+  double precision :: circ=0.d0, arad=0.d0, freq0=0.d0, alpha=0.d0
   double precision :: amass=0.d0, charge=0.d0, en0=0.d0, gammas=0.d0, gamma=0.d0
   double precision :: ex=0.d0, ey=0.d0, et=0.d0, sigt=0.d0, sige=0.d0, sigx=0.d0, sigy=0.d0
   double precision :: betas=0.d0, beta=0.d0
@@ -309,18 +309,11 @@ module name_lenfi
   integer, parameter :: name_len=48
 end module name_lenfi
 
-module physconsfi
-  implicit none
-  public
-  double precision :: amu0=0.d0, elamda=0.d0, emass=0.d0, eps0=0.d0, erad=0.d0
-  double precision :: hbar=0.d0, plamda=0.d0, pmass=0.d0, prad=0.d0, qelect=0.d0, mumass=0.d0
-end module physconsfi
-
 module touschekfi
   implicit none
   public
   integer :: bunch=0
-  double precision :: circ=0.d0, clight=0.d0, arad=0.d0, freq0=0.d0, amass=0.d0
+  double precision :: circ=0.d0, arad=0.d0, freq0=0.d0, amass=0.d0
   double precision :: charge=0.d0, en0=0.d0, gammas=0.d0, gamma=0.d0, deltap=0.d0
   double precision :: ex=0.d0, ey=0.d0, et=0.d0, sigt=0.d0, sige=0.d0
   double precision :: betas=0.d0, beta=0.d0, parnum=0.d0, currnt=0.d0, alfa=0.d0
@@ -343,7 +336,7 @@ module time_varfi
   public
   logical time_var_m, time_var_p, time_var_c
   integer, parameter :: n_time_var = 10000
-  integer,save :: time_var_m_cnt, time_var_p_cnt, time_var_c_cnt
+  integer, save :: time_var_m_cnt, time_var_p_cnt, time_var_c_cnt
   integer, save :: time_var_m_lnt, time_var_p_lnt, time_var_c_lnt, trrun_nt
   double precision, save :: myfield(n_time_var,2,0:maxmul), phase_tromb(n_time_var,36), cav_volt(n_time_var)
   double precision, save :: time_var_m_ind(n_time_var), time_var_p_ind(n_time_var), time_var_c_ind(n_time_var)
@@ -518,7 +511,35 @@ module math_constfi ! 2015-Aug-06 Ghislain
   double precision, parameter :: half=0.5d0
   double precision, parameter :: ten3m=1d-3, ten6m=1d-6, ten9m=1d-9
   double precision, parameter :: ten3p=1d3,  ten6p=1d6,  ten9p=1d9
+  !double precision, parameter :: pi = four*atan(one),
+  double precision, parameter :: pi = 3.141592653589793238462643383279502884197169399375105820974944d0
+  double precision, parameter :: twopi = two*pi
+  double precision, parameter :: degrad = 180d0/pi, raddeg = pi/180d0
+  !double precision, parameter :: e = exp(1.)
+  double precision, parameter :: e = 2.718281828459045235360287471352662497757247093699959574966967d0
 end module math_constfi
+
+module phys_constfi
+  use math_constfi, only : pi
+  implicit none
+  public
+  !--- Definition of physical constants
+  ! sources  :
+  ! J. Beringer et al. (Particle Data Group), Phys. Rev. D86, 010001 (2012). = PDG 2012
+  ! K.A. Olive et al. (Particle Data Group), Chin. Phys. C, 38, 090001 (2014). = PDG 2014
+  double precision, parameter :: clight = 299792458d0       !     Speed of light in vacuum [m.s]
+  double precision, parameter :: qelect = 1.602176565d-19   !     Elementary charge [A*s]
+  double precision, parameter :: hbar   = 6.58211928d-25    !     Reduced Plack's constant [GeV*s]
+  double precision, parameter :: amu0   = 4d-7 * pi         !     Permeability of vacuum [V*s/A*m]
+  ! Rest Mass [GeV]
+  double precision, parameter :: emass  = 0.510998928d-3    
+  double precision, parameter :: mumass = 0.1056583715d0    
+  double precision, parameter :: nmass  = 0.931494061d0     
+  double precision, parameter :: pmass  = 0.938272046d0
+  ! Classical radius [m]
+  double precision, parameter :: erad   = 2.8179403267d-15  
+  double precision, parameter :: prad   = erad*emass/pmass  
+end module phys_constfi
 
 module resindexfi
   implicit none
@@ -1095,6 +1116,7 @@ subroutine aafail(rout,text)
 end subroutine aafail
 
 double precision function proxim(x,y)
+  use math_constfi, only : twopi
   !----------------------------------------------------------------------*
   !   Proximity function of x and y.                                     *
   !   If angle is larger than pi between vector x and y, 2pi is added to *
@@ -1103,9 +1125,6 @@ double precision function proxim(x,y)
   implicit none
   double precision :: x, y
 
-  double precision :: twopi, get_variable
-
-  twopi = get_variable('twopi ')
   proxim = x + twopi*anint((y-x)/twopi)
 
 end function proxim

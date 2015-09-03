@@ -64,6 +64,7 @@ mad_init_c(void)
   get_defined_constants();
   get_defined_commands();
   get_sxf_names();
+
   pi = get_variable("pi");
   twopi = two * pi;
   degrad = 180 / pi;
@@ -71,6 +72,7 @@ mad_init_c(void)
   e = get_variable("e");
   clight = get_variable("clight");
   hbar = get_variable("hbar");
+
   var = new_variable("twiss_tol", 1.e-6, 1, 1, NULL, NULL);
   add_to_var_list(var, variable_list, 1);
   title = permbuff("no-title");

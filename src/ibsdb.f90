@@ -98,8 +98,8 @@ end subroutine cavprt
 ! *********************************************************************
 subroutine twclog(bxbar, bybar, dxbar, dybar, const)
   use ibsdbfi
-  use physconsfi
-  use math_constfi, only : zero, two, four, eight
+  use math_constfi, only : zero, two, four, eight, pi
+  use phys_constfi, only : hbar, clight, qelect
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -118,15 +118,12 @@ subroutine twclog(bxbar, bybar, dxbar, dybar, const)
   double precision :: bgam, cbunch, coulog 
   double precision :: debyel, densty, etrans, pnbtot, qion, tempev, vol
   double precision :: rmax, rmin, rmincl, rminqm, sigtcm, sigxcm, sigycm
-  double precision :: pi
 
-  double precision, external :: get_variable, get_value
+  double precision, external :: get_value
 
   double precision, parameter :: ot2=1d2, ft8=5d8, ot5=1d5, ttm3=2d-3
   double precision, parameter :: fac1=743.4d0, fac2=1.44d-7
 
-  pi=get_variable('pi ')
-  
   ! **************************** DB *********************
   n = get_value('probe ', 'bunched ')
   fbch = n.ne.0
@@ -203,9 +200,9 @@ end subroutine twclog
 
 subroutine ibs
   use ibsdbfi
-  use physconsfi
   use name_lenfi
-  use math_constfi, only : zero, one, two
+  use math_constfi, only : zero, one, two, half
+  use phys_constfi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -230,30 +227,8 @@ subroutine ibs
   double precision :: s1, s2, ss2, l1, l2, ll2, const, dels, wnorm, sdum, tol
 
   integer, external :: get_option, double_from_table_row, restart_sequ, advance_to_pos
-  double precision, external :: get_value, get_variable  
-  double precision, parameter :: half=0.5d0
+  double precision, external :: get_value
   
-  !---- Universal physical constants.
-  amu0 = get_variable('amu0 ')      !     Permeability of vacuum [V*s/A*m]
-  eps0 = get_variable('eps0 ')      !     Permittivity of vaccum [A*S/V*m]
-  hbar = get_variable('hbar ')      !     Reduced Plack's constant [GeV*s]
-
-  !---- Electromagnetic constants.
-  qelect = get_variable('qelect ')  !     Elementary charge [A*s]
-
-  !---- Electron.
-  emass = get_variable('emass ')    !     Rest mass [GeV]
-  erad = get_variable('erad ')      !     Classical radius [m]
-  elamda = get_variable('elamda ')  !     Reduced Compton wavelength [m]
-
-  !---- Proton.
-  pmass = get_variable('pmass ')    !     Rest mass [GeV]
-  prad = get_variable('prad ')      !     Classical radius [m]
-  plamda = get_variable('plamda ')  !     Reduced Compton wavelength [m]
-
-  !---- Muon.
-  mumass = get_variable('mumass ')  !     Rest mass [GeV]
-
   ! ************* Get the parameters for the common blocks *************
   ! *************         /machin/ and /beamdb/            *************
   charge   = get_value('probe ', 'charge ')
@@ -271,11 +246,10 @@ subroutine ibs
   currnt   = get_value('probe ', 'bcurrent ')
   betas    = get_value('probe ', 'beta ')
   beta     = get_value('probe ', 'beta ')
-  clight   = get_variable('clight ')
   arad     = get_value('probe ', 'arad ')
   alfa     = get_value('probe ', 'alfa ')
   freq0    = get_value('probe ', 'freq0 ')
-  bunch   = get_value('probe ', 'kbunch ')
+  bunch    = get_value('probe ', 'kbunch ')
   
   ! NOTE:
   !****************************************************************
@@ -554,7 +528,7 @@ end subroutine ibs
 
 subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy, txi, tyi, tli)
   use ibsdbfi
-  use physconsfi
+  !use physconsfi
   use math_constfi, only : zero, one, two, three, four, six, ten
   implicit none
   !----------------------------------------------------------------------*

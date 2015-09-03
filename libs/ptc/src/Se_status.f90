@@ -514,6 +514,8 @@ CONTAINS
 
     !  real(dp) :: xlost(6)=zero
     !  character(120) :: messagelost
+    
+    !write(*,*) "Se_status.f90 CHECK_APERTURE_R :", E%KIND
 
     IF(CHECK_MADX_APERTURE.AND.APERTURE_FLAG) THEN
        SELECT CASE(E%KIND)
@@ -524,19 +526,24 @@ CONTAINS
              
              xlost=0.0_dp
              xlost=x
-             write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=1 elliptic aperture.", &
+             write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=1 elliptic aperture. ", &
                                    "Orbit: X=",X(1)," Y=",X(3)," Ap.: DX=",E%DX," DY=",E%DY," R1=",E%R(1)," R2=",E%R(2)
           ENDIF
        CASE(2)  ! rectangle
+          
+           !write(*,*) "Se_status.f90 CHECK_APERTURE_R : in real kind=2 rectangular aperture. ", &
+           !                       "Orbit: X=",X(1)," Y=",X(3)," Ap.: DX=",E%DX," DY=",E%DY," X=",E%X," Y=",E%Y
+          
           IF(ABS(X(1)-E%DX)>E%X.OR.ABS(X(3)-E%DY)>E%Y) THEN
              CHECK_STABLE=.FALSE.
              STABLE_DA=.false.
              
              xlost=0.0_dp
              xlost=x
-             write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=2 rectangular aperture.", &
-                                   "Orbit: X=",X(1)," Y=",X(3)," Ap.: DX=",E%DX," DY=",E%DY
+             write(messagelost,*) "Se_status.f90 CHECK_APERTURE_R : Lost in real kind=2 rectangular aperture. ", &
+                                  "Orbit: X=",X(1)," Y=",X(3)," Ap.: DX=",E%DX," DY=",E%DY," X=",E%X," Y=",E%Y
           ENDIF
+
        CASE(3)  ! RECTANGLE + ELLIPSE (CIRCLE)
           IF((ABS(X(1)-E%DX)>E%X).OR.(ABS(X(3)-E%DY)>E%Y).OR.  &
                ((X(1)-E%DX)**2/E%R(1)**2+(X(3)-E%DY)**2**2/E%R(2)**2>1.0_dp)) THEN

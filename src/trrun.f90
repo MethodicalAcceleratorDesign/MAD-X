@@ -1207,7 +1207,8 @@ subroutine ttrf(track,ktrack)
   use name_lenfi
   use time_varfi
   use trackfi
-  use math_constfi, only : zero, one, two, ten3m, ten6p
+  use math_constfi, only : zero, one, two, ten3m, ten6p, twopi
+  use phys_constfi, only : clight
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1230,15 +1231,10 @@ subroutine ttrf(track,ktrack)
   logical :: time_var
   integer :: i, mylen
   double precision :: omega, phirf, pt, rff, rfl, rfv, vrf, pc0, bvk   
-  double precision :: clight, twopi
   !      double precision px,py,ttt,beti,el1
   character(len=name_len) :: name
 
   double precision :: get_variable, node_value, get_value
-
-  !---- Initialize
-  clight=get_variable('clight ')
-  twopi=get_variable('twopi ')
 
   !---- BV flag
   bvk = node_value('other_bv ')
@@ -1346,7 +1342,8 @@ subroutine ttrf(track,ktrack)
 end subroutine ttrf
 
 subroutine ttcrabrf(track,ktrack,turn)
-  use math_constfi, only : zero, ten3m, ten6p
+  use math_constfi, only : zero, ten3m, ten6p, twopi
+  use phys_constfi, only : clight
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1366,13 +1363,10 @@ subroutine ttcrabrf(track,ktrack,turn)
   integer :: i, t1, t2, t3, t4, p1, p2, bvk
   double precision :: omega, phirf, pt, rff, rfl, rfv, eph, vrf, pc0,  px
   !      double precision px,py,ttt,beti,el1
-  double precision :: clight, twopi 
 
-  double precision :: get_variable, node_value, get_value
+  double precision :: node_value, get_value
 
   !---- Initialize
-  clight = get_variable('clight ')
-  twopi = get_variable('twopi ')
   bvk = node_value('other_bv ')
 
   !---- Fetch data.
@@ -1424,7 +1418,7 @@ subroutine ttcrabrf(track,ktrack,turn)
 end subroutine ttcrabrf
 
 subroutine tthacdip(track,ktrack,turn)
-  use math_constfi, only : zero, ten3m, ten6p
+  use math_constfi, only : zero, ten3m, ten6p, twopi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1440,12 +1434,8 @@ subroutine tthacdip(track,ktrack,turn)
 
   integer :: turn1, turn2, turn3, turn4
   double precision :: omega, phirf, rff, rfl, rfv, vrf, pc0
-  double precision :: twopi
 
-  double precision :: get_variable, node_value, get_value
-
-  !---- Initialize
-  twopi = get_variable('twopi ')
+  double precision :: node_value, get_value
 
   !---- Fetch data.
   rfv = node_value('volt ')
@@ -1480,7 +1470,7 @@ subroutine tthacdip(track,ktrack,turn)
 end subroutine tthacdip
 
 subroutine ttvacdip(track,ktrack,turn)
-  use math_constfi, only : zero, ten3m, ten6p
+  use math_constfi, only : zero, ten3m, ten6p, twopi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1496,12 +1486,8 @@ subroutine ttvacdip(track,ktrack,turn)
 
   integer :: turn1, turn2, turn3, turn4
   double precision :: omega, phirf, rff, rfl, rfv, vrf, pc0
-  double precision :: twopi
 
-  double precision :: get_variable, node_value, get_value
-
-  !---- Initialize
-  twopi = get_variable('twopi ')
+  double precision :: node_value, get_value
 
   !---- Fetch data.
   rfv = node_value('volt ')
@@ -1588,7 +1574,7 @@ end subroutine ttsep
 subroutine ttcorr(el,track,ktrack,turn)
   use twtrrfi
   use trackfi
-  use math_constfi, only : zero, one, two, three
+  use math_constfi, only : zero, one, two, three, twopi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1605,7 +1591,7 @@ subroutine ttcorr(el,track,ktrack,turn)
 
   integer :: i, n_ferr, code, bvk, sinkick
   double precision :: bi2gi2, bil2, curv, dpx, dpy, pt, px, py, rfac, rpt
-  double precision :: rpx, rpy, xkick, ykick, div, twopi, temp
+  double precision :: rpx, rpy, xkick, ykick, div, temp
   double precision :: f_errors(0:maxferr), field(2)
   double precision :: dpxx, dpyy
   double precision :: sinpeak, sintune, sinphase
@@ -1614,7 +1600,6 @@ subroutine ttcorr(el,track,ktrack,turn)
   double precision :: get_variable, get_value, node_value
 
   !---- Initialize.
-  twopi = get_variable('twopi ')
   bvk = node_value('other_bv ')
   deltas = get_variable('track_deltap ')
   arad = get_value('probe ','arad ')
@@ -1869,7 +1854,7 @@ subroutine ttbb_gauss(track,ktrack,fk)
   use bbfi
   use spch_bbfi
   use fasterror
-  use math_constfi, only : zero, one, two, half, ten3m
+  use math_constfi, only : zero, one, two, half, ten3m, pi
   implicit none
   ! ---------------------------------------------------------------------*
   ! purpose: kicks the particles of the beam considered with a beam      *
@@ -1880,7 +1865,7 @@ subroutine ttbb_gauss(track,ktrack,fk)
   integer, intent(IN) :: ktrack
 
   integer :: i, ipos, mylen
-  double precision :: pi, sx, sy, xm, ym, sx2, sy2, xs, ys, rho2, tk
+  double precision :: sx, sy, xm, ym, sx2, sy2, xs, ys, rho2, tk
   double precision :: phix, phiy, rk, xb, yb, crx, cry, xr, yr, r, r2, cbx, cby
   double precision :: xrv(ktrack), yrv(ktrack), crxv(ktrack), cryv(ktrack)
   double precision :: xbv(ktrack), ybv(ktrack), cbxv(ktrack), cbyv(ktrack)
@@ -1893,11 +1878,10 @@ subroutine ttbb_gauss(track,ktrack,fk)
   character(len=name_len) :: name
   !-------------------------------------------------------------------
   integer :: get_option
-  double precision :: get_variable, node_value
+  double precision :: node_value
   
   !---- initialize.
-  bborbit = get_option('bborbit ') .ne. 0
-  pi = get_variable('pi ')
+  bborbit       = get_option('bborbit ') .ne. 0
   bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
   if (bb_sxy_update) then
      name=' '
@@ -2135,7 +2119,7 @@ end subroutine ttbb_gauss
 
 subroutine ttbb_flattop(track,ktrack,fk)
   use bbfi
-  use math_constfi, only : one, two, three, four, six, eight, twelve, half, ten3m
+  use math_constfi, only : one, two, three, four, six, eight, twelve, half, ten3m, pi
   implicit none
   ! ---------------------------------------------------------------------*
   ! purpose: kicks the particles of the beam considered with a beam      *
@@ -2146,17 +2130,16 @@ subroutine ttbb_flattop(track,ktrack,fk)
   integer :: ktrack
 
   integer :: i, ipos
-  double precision :: pi, r0x, r0y, wi, wx, wy, xm, ym, r0x2, r0y2, xs, ys
+  double precision :: r0x, r0y, wi, wx, wy, xm, ym, r0x2, r0y2, xs, ys
   double precision :: rho, rho2, phir, phix, phiy, norm, r1, zz
   logical :: bborbit
   logical, save :: first= .true. 
 
   integer :: get_option
-  double precision :: get_variable, node_value       
+  double precision :: node_value
  
   !---- initialize.
   bborbit = get_option('bborbit ') .ne. 0
-  pi = get_variable('pi ')
   ! mean radii of the is given via variables sigx and sigy
   r0x = node_value('sigx ')
   r0y = node_value('sigy ')
@@ -2222,7 +2205,7 @@ end subroutine ttbb_flattop
 
 subroutine ttbb_hollowparabolic(track,ktrack,fk)
   use bbfi
-  use math_constfi, only : zero, one, two, three, four, twelve, half, ten3m
+  use math_constfi, only : zero, one, two, three, four, twelve, half, ten3m, pi
   implicit none
   ! ---------------------------------------------------------------------*
   ! purpose: kicks the particles of the beam considered with a beam      *
@@ -2233,17 +2216,16 @@ subroutine ttbb_hollowparabolic(track,ktrack,fk)
   integer :: ktrack
 
   integer :: i, ipos
-  double precision :: pi, r0x, r0y, wi, wx, wy, xm, ym, r0x2, r0y2, xs, ys
+  double precision :: r0x, r0y, wi, wx, wy, xm, ym, r0x2, r0y2, xs, ys
   double precision :: rho, rho2, phir, phix, phiy, norm, r1, zz
   logical :: bborbit
   logical, save :: first= .true. 
 
   integer :: get_option
-  double precision :: get_variable, node_value       
+  double precision :: node_value
     
   !---- initialize.
   bborbit = get_option('bborbit ') .ne. 0
-  pi = get_variable('pi ')
   ! mean radii of the is given via variables sigx and sigy
   r0x = node_value('sigx ')
   r0y = node_value('sigy ')
@@ -2508,7 +2490,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
   use twiss0fi
   use name_lenfi
   use Inf_NaN_Detection
-  use math_constfi, only : zero, one
+  use math_constfi, only : zero, one, pi
   implicit none
   ! 2015-Feb-20  18:46:05  ghislain: rewrite of trcoll
   ! 2015-Mar-09  14:50:37  ghislain: adapted to new racetrack parameter definition
@@ -2542,14 +2524,11 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
   integer :: turn, part_id(*), last_turn(*), ntrk
 
   integer :: i, n, nn
-  double precision :: ap1, ap2, ap3, ap4, x, y, pi
+  double precision :: ap1, ap2, ap3, ap4, x, y!, pi
   logical :: lost, debug
 
   integer, external :: get_option
-  double precision, external :: get_variable
   double precision, parameter :: min_double=1.d-36
-
-  pi=get_variable('pi ')
 
   debug = get_option('debug ') .ne. 0
 
@@ -2822,7 +2801,7 @@ end subroutine ttrfloss
 subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
   use bbfi
   use trackfi
-  use math_constfi, only : zero, one
+  use math_constfi, only : zero, one, twopi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -2849,15 +2828,12 @@ subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
   double precision :: fx, phix, fy, phiy, ft, phit
   double precision :: deltax, deltap, phi
 
-  double precision :: twopi
   double precision, external :: get_value, get_variable
   integer, external :: next_start
 
   ! 2015-Jul-08  19:16:53  ghislain: make code more readable
   run   = switch .eq. 1
   dynap = switch .eq. 2
-
-  twopi = get_variable('twopi ')
 
   deltap = get_variable('track_deltap ')
   !---- Initialise orbit, emittances and eigenvectors etc.
@@ -3223,17 +3199,17 @@ subroutine trclor(switch,orbit0)
   integer :: switch
   double precision :: orbit0(6)
 
-  logical :: aperflag = .false. , onepass = .true. ! ???
+  logical :: aperflag, onepass
   integer :: itra 
 
   integer :: i, j, k, bbd_pos, j_tot, code, irank, n_align
-  integer :: pmax=7, turn=1, turnmax=1, part_id(1), last_turn(1)
+  integer :: pmax, turn, turnmax, part_id(1), last_turn(1)
   integer :: nint, ndble, nchar, int_arr(1), char_l
   double precision :: re(6,6)
   double precision :: z(6,7), zz(6), z0(6,7), z00(6,7), a(6,7), ddd(6)
   double precision :: cotol, err, deltap, el, dxt(200), dyt(200)
   double precision :: al_errors(align_max)
-  double precision :: sum=zero, orbit(6)
+  double precision :: sum, orbit(6)
   double precision :: last_pos(6), last_orbit(6,1), maxaper(6)
   character(len=12) :: char_a
 
@@ -3246,25 +3222,33 @@ subroutine trclor(switch,orbit0)
   write (*,'(/a)')          'Full 6D closed orbit search.'
   write (*,'(a)')           'Initial value of 6-D closed orbit from Twiss: '
   write (*,'(a,1p,6e14.6)') 'orbit0 ', ORBIT0
-  
+
+  !---- Initialize variables
+  turn    = 1
+  turnmax = 1
+  !itmax   = 10
+  pmax    = 7
+  sum     = zero
+  aperflag  = .false.
+  onepass   = .true.
+
   do k = 1, 7
      Z(:,k) = ORBIT0 
   enddo
   
-  ! DDD = ORBIT0 / 100000 ! ??? 
-  ! for on momentum pt =0
-  DDD = 1d-15
-  ! do k=1,6
-  !    z(k,k+1) = z(k,k+1) + ddd(k)
-  ! enddo
+  DDD(1:6) = 1d-15
 
-  do k = 1, 7
-     Z0(:,k)  = Z(:,k)
-     Z00(:,k) = Z(:,k)
-  enddo
+  Z0  = Z
+  Z00 = Z
+  
+  !do k = 1, 7
+  !   Z0(:,k)  = Z(:,k)
+  !   Z00(:,k) = Z(:,k)
+  !enddo
 
   !--- jmax may be reduced by particle loss - keep number in j_tot
   j_tot = pmax
+
   !--- get vector of six coordinate maxapers (both RUN and DYNAP)
   call comm_para('maxaper ', nint, ndble, nchar, int_arr, maxaper, char_a, char_l)
 
@@ -3297,18 +3281,13 @@ subroutine trclor(switch,orbit0)
         if (code .eq. 39) code=15 ! TKICKER is a KICKER
         if (code .eq. 38) code=24 ! PLACEHOLDER is an INSTRUMENT
         el      = node_value('l ')
-        if (itra .eq. 1)  then
-           if (.not.(is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix())) then
-              print*," "
-              print*,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
-              print*," "
-              print*,"Track dies nicely"
-              print*,"Thick lenses will get nowhere"
-              print*,"MAKETHIN will save you"
-              print*," "
-              print*," "
-              call fort_fail('TRRUN: Fatal ','----element with length found : CONVERT STRUCTURE WITH MAKETHIN')
-           endif
+        if (itra .eq. 1 .and. & 
+             .not.(is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
+           print *,"\ncode: ",code," el: ",el,"   THICK ELEMENT FOUND\n"
+           print *,"Track dies nicely"
+           print *,"Thick lenses will get nowhere"
+           print *,"MAKETHIN will save you\n\n"
+           call fort_fail('TRRUN: Fatal ','----element with length found : CONVERT STRUCTURE WITH MAKETHIN')
         endif
         
         !--------  Misalignment at beginning of element (from twissfs.f)
@@ -3318,7 +3297,7 @@ subroutine trclor(switch,orbit0)
            if (n_align .ne. 0)  then
               do i = 1, pmax
                  ZZ = Z(:,i) 
-                 call tmali1(zz,al_errors, betas, gammas,z(1,i), re)
+                 call tmali1(zz, al_errors, betas, gammas, z(1,i), re)
               enddo
            endif
         endif
@@ -3328,13 +3307,11 @@ subroutine trclor(switch,orbit0)
              last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass)
         
         !--------  Misalignment at end of element (from twissfs.f)
-        if (code .ne. 1)  then
-           if (n_align .ne. 0)  then
-              do i = 1, pmax
-                 ZZ = Z(:,i) 
-                 call tmali2(el,zz, al_errors, betas, gammas,z(1,i), re)
-              enddo
-           endif
+        if (code .ne. 1 .and. n_align .ne. 0)  then
+           do i = 1, pmax
+              ZZ = Z(:,i) 
+              call tmali2(el,zz, al_errors, betas, gammas,z(1,i), re)
+           enddo
         endif
 
         if (advance_node() .eq. 0) exit
@@ -3824,7 +3801,7 @@ subroutine table_input( betx_start, bety_start, &
 end subroutine table_input
 
 subroutine ttnllens(track,ktrack)
-  use math_constfi, only : zero, one, two, half
+  use math_constfi, only : zero, one, two, half, pi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -3839,12 +3816,11 @@ subroutine ttnllens(track,ktrack)
   integer :: ktrack
 
   integer :: i
-  double precision :: pi, knll, cnll, dd, u, v, dUu, dUv, dux, duy, dvx, dvy, x, y
-  double precision, external :: node_value, get_variable
+  double precision :: knll, cnll, dd, u, v, dUu, dUv, dux, duy, dvx, dvy, x, y
+  double precision, external :: node_value
 
   cnll = node_value('cnll ')
   knll = node_value('knll ') / cnll
-  pi = get_variable('pi ')
 
   do i = 1, ktrack
 
@@ -3880,7 +3856,8 @@ end subroutine ttnllens
 subroutine ttrfmult(track, ktrack, turn)
   use twtrrfi
   use trackfi
-  use math_constfi, only : zero, one, three, ten3m, ten6p
+  use math_constfi, only : zero, one, three, ten3m, ten6p, twopi
+  use phys_constfi, only : clight
   implicit none
   !--------------------*
   ! Andrea Latina 2012 *
@@ -3910,15 +3887,11 @@ subroutine ttrfmult(track, ktrack, turn)
   double precision :: x, y, z, px, py, pt, dpx, dpy, dpt
   double precision :: freq, volt, lag, harmon
   double precision :: beta, bvk, deltap, elrad
-  double precision :: twopi, clight 
   double complex :: Cm2, Sm2, Cm1, Sm1, Cp0, Sp0, Cp1, Sp1
 
-  double precision, external :: node_value, get_value, get_variable
+  double precision, external :: node_value, get_value
   integer, external :: node_fd_errors
   double complex, parameter :: ii=(zero,one)
-
-  twopi = get_variable('twopi ')  
-  clight = get_variable('clight ')
 
   !---- Zero the arrays
   NORMAL = zero 
@@ -4343,6 +4316,7 @@ end subroutine tttdipole
 
 subroutine trphot(el,curv,rfac,deltap)
   use math_constfi, only : zero, one, two, three, five, twelve
+  use phys_constfi, only : clight, hbar
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -4367,11 +4341,11 @@ subroutine trphot(el,curv,rfac,deltap)
   integer :: i, ierror, j, nphot
   double precision :: amean, real_am, dlogr, scalen, scaleu, slope, ucrit, xi
   integer, parameter :: maxtab=101
-  double precision :: tabxi(maxtab),taby(maxtab)
-  double precision :: hbar, clight, arad, pc, gamma, amass
+  double precision :: tabxi(maxtab),taby(maxtab)  
+  double precision :: arad, pc, gamma, amass
   character(len=20) text
 
-  double precision :: get_value, get_variable, frndm
+  double precision :: get_value, frndm
   double precision, parameter :: fac1=3.256223d0
   integer, parameter :: nr=55, maxran=1000000000
 
@@ -4433,8 +4407,6 @@ subroutine trphot(el,curv,rfac,deltap)
        2.64617491d0 /
 
   !Get constants
-  clight = get_variable('clight ')
-  hbar   = get_variable('hbar ')
   arad   = get_value('probe ','arad ')
   pc     = get_value('probe ','pc ')
   amass  = get_value('probe ','mass ')

@@ -190,7 +190,7 @@ end SUBROUTINE tmrefo
 SUBROUTINE twinifun(opt_fun0,rt)
   use twiss0fi
   use twisslfi
-  use math_constfi, only : zero
+  use math_constfi, only : zero, twopi
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -205,12 +205,11 @@ SUBROUTINE twinifun(opt_fun0,rt)
   double precision :: betx, alfx, mux, bety, alfy, muy, dx, dpx, dy, dpy
   double precision :: x, px, y, py, t, pt 
   double precision :: wx, phix, dmux, wy, phiy, dmuy, ddx, ddpx, ddy, ddpy
-  double precision :: r(2,2), energy, twopi
+  double precision :: r(2,2), energy
 
-  double precision, external :: get_value, get_variable
+  double precision, external :: get_value
 
   !---- Initialize
-  twopi = get_variable('twopi ')
   betx = get_value('twiss ','betx ')
   bety = get_value('twiss ','bety ')
 
@@ -293,7 +292,7 @@ SUBROUTINE twprep(save,case,opt_fun,position)
   use twissafi
   use twisslfi
   use twissotmfi
-  use math_constfi, only : zero
+  use math_constfi, only : zero, twopi
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -311,12 +310,6 @@ SUBROUTINE twprep(save,case,opt_fun,position)
 
   integer :: i 
   double precision :: opt5, opt8, opt20, opt21, opt23, opt24
-  double precision :: twopi
-
-  double precision, external :: get_variable
-
-  !---- Initialize
-  twopi = get_variable('twopi ')
 
   if (case .eq. 1) then
      !--- fill with data from twcpgo (Twiss Couple)
@@ -1478,14 +1471,12 @@ SUBROUTINE twbtin(rt,tt)
   logical :: stabx, staby
   integer :: i, j, k
   double precision :: disp0(6), ddisp0(6), rtp(6,6), aux(6)
-  double precision :: twopi, sinmu2, bx, ax, by, ay, temp
+  double precision :: sinmu2, bx, ax, by, ay, temp
 
   integer, external :: get_option
-  double precision, external :: get_variable
   double precision, parameter :: eps=1d-8
 
   !---- Initialization
-  twopi = get_variable('twopi ')
   betx   = opt_fun0(3 )
   alfx   = opt_fun0(4 )
   amux   = opt_fun0(5 )
@@ -1909,7 +1900,7 @@ end SUBROUTINE twbttk
 SUBROUTINE tw_summ(rt,tt)
   use twiss0fi
   use twisscfi
-  use math_constfi, only : zero, one, two
+  use math_constfi, only : zero, one, two, twopi
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -1923,19 +1914,18 @@ SUBROUTINE tw_summ(rt,tt)
   integer :: i
   double precision :: deltap, sd, betas, gammas, detl, f, tb, t2
   double precision :: disp0(6), frt(6,6), frtp(6,6), rtp(6,6)
-  double precision :: bx0, ax0, by0, ay0, sx, sy, orbit5, twopi
+  double precision :: bx0, ax0, by0, ay0, sx, sy, orbit5
 
   integer, external :: get_option
-  double precision, external :: get_variable, get_value
+  double precision, external :: get_value
   
   !---- Initialization chromatic part
-  twopi = get_variable('twopi ')
   RTP = zero 
   FRT = zero 
   FRTP = zero 
   deltap = get_value('probe ','deltap ')
-  betas = get_value('probe ','beta ')
-  gammas= get_value('probe ','gamma ')
+  betas  = get_value('probe ','beta ')
+  gammas = get_value('probe ','gamma ')
 
   DISP0(1:4) = OPT_FUN0(15:18)
 
@@ -4789,7 +4779,8 @@ SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twisslfi
   use twiss_elpfi
   use matrices, only : EYE
-  use math_constfi, only : zero, one, two, half, ten6p, ten3m
+  use math_constfi, only : zero, one, two, half, ten6p, ten3m, pi, twopi
+  use phys_constfi, only : clight
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -4810,14 +4801,13 @@ SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision :: el
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
-  integer elpar_vl
+  integer :: elpar_vl
   double precision :: rfv, rff, rfl, dl, omega, vrf, phirf, pc, deltap, bvk
-  double precision :: clight, pi, twopi
-  double precision :: ek0(6), rw(6,6), tw(6,6,6)
+    double precision :: ek0(6), rw(6,6), tw(6,6,6)
   double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   double precision :: c0, c1, c2
 
-  double precision, external :: get_variable, get_value, node_value
+  double precision, external :: get_value, node_value
   integer, external :: el_par_vector
 
   !-- get element parameters
@@ -4840,10 +4830,6 @@ SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   TW = zero 
 
   !---- BV flag
-  clight = get_variable('clight ')
-  pi = get_variable('pi ')
-  twopi = two*pi
-
   rff = g_elpar(r_freq)
   rfl = g_elpar(r_lag)
   bvk = node_value('other_bv ')
@@ -5389,7 +5375,7 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
   use twisslfi
   use spch_bbfi
   use fasterror
-  use math_constfi, only : zero, one, two, three, ten3m
+  use math_constfi, only : zero, one, two, three, ten3m, pi
   implicit none
 
   logical :: fsec, ftrk, fmap
@@ -5397,7 +5383,7 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
 
   logical :: bborbit, bb_sxy_update
   integer :: mylen
-  double precision :: pi,sx,sy, xm, ym, sx2, sy2, xs, ys, rho2, fk, tk, exk 
+  double precision :: sx,sy, xm, ym, sx2, sy2, xs, ys, rho2, fk, tk, exk 
   double precision :: phix, phiy, rho4, phixx, phixy, phiyy, rho6, rk, exkc 
   double precision :: xb, yb, phixxx, phixxy, phixyy, phiyyy, crx, cry, xr
   double precision :: yr, r, r2, cbx, cby
@@ -5406,7 +5392,7 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
   character(len=name_len) :: name
 
   integer, external ::  get_option
-  double precision, external :: get_variable, node_value
+  double precision, external :: node_value
 
 
   !---- initialize.
@@ -5422,7 +5408,6 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
      endif
   endif
 
-  pi=get_variable('pi ')
   fmap = .true.
 
   bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
@@ -5664,7 +5649,7 @@ end SUBROUTINE tmbb_gauss
 SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
   use bbfi
   use twisslfi
-  use math_constfi, only : zero, one, two, three, ten3m
+  use math_constfi, only : zero, one, two, three, ten3m, pi
   implicit none
 
   logical :: fsec, ftrk, fmap
@@ -5673,14 +5658,13 @@ SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
   
   logical :: bborbit
   logical, save :: firstflag=.true.
-  double precision :: pi
   double precision :: orbit0(6), orbit00(6), re00(6,6), te00(6,6,6)
   double precision :: r0x, r0y, xm, ym, r0x2, r0y2, xs, ys, rho2
   double precision :: phix, phiy, phixx, phixy, phiyy, phixxx, phixxy, phixyy, phiyyy
   double precision :: wi, rho, wx, wy, norm, phir, phirr, phirrr, zz
 
   integer, external ::  get_option
-  double precision, external :: get_variable, node_value
+  double precision, external :: node_value
 
   !---- initialize.
   phix = zero
@@ -5697,8 +5681,7 @@ SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
         bb_kick(2,bbd_cnt) = zero
      endif
   endif
-
-  pi=get_variable('pi ')
+  
   fmap = .true.
   r0x = node_value('sigx ')
   r0y = node_value('sigy ')
@@ -5861,7 +5844,7 @@ end SUBROUTINE tmbb_flattop
 SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
   use bbfi
   use twisslfi
-  use math_constfi, only : zero, one, two, three, ten3m
+  use math_constfi, only : zero, one, two, three, ten3m, pi
   implicit none
 
   logical :: fsec, ftrk, fmap
@@ -5870,14 +5853,13 @@ SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
 
   logical :: bborbit
   logical, save :: firstflag=.true.
-  double precision :: pi
   double precision :: orbit0(6), orbit00(6), re00(6,6), te00(6,6,6)
   double precision :: r0x, r0y, xm, ym, r0x2, r0y2, xs, ys, rho2
   double precision :: phix, phiy, phixx, phixy, phiyy, phixxx, phixxy, phixyy, phiyyy
   double precision :: wi, rho, wx, wy, phir, phirr, phirrr, zz
 
   integer, external :: get_option
-  double precision, external :: get_variable, node_value
+  double precision, external :: node_value
 
   !---- initialize.
   phix = zero
@@ -5894,7 +5876,6 @@ SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
      endif
   endif
 
-  pi=get_variable('pi ')
   fmap = .true.
   r0x = node_value('sigx ')
   r0y = node_value('sigy ')
@@ -6334,7 +6315,7 @@ SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
 end SUBROUTINE tmsol_th
 
 SUBROUTINE tmnll(fsec,ftrk,orbit,fmap,ek,re,te)
-  use math_constfi, only : zero, one, two
+  use math_constfi, only : zero, one, two, pi
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -6353,9 +6334,9 @@ SUBROUTINE tmnll(fsec,ftrk,orbit,fmap,ek,re,te)
   logical :: fsec, ftrk, fmap
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6) 
 
-  double precision :: pi, knll, cnll, k1, dd, u, v, dUu, dUv, dux, duy, dvx, dvy, x, y
+  double precision :: knll, cnll, k1, dd, u, v, dUu, dUv, dux, duy, dvx, dvy, x, y
 
-  double precision, external :: node_value, get_variable
+  double precision, external :: node_value
 
   !---- Matrix
   fmap = .true.
@@ -6378,8 +6359,6 @@ SUBROUTINE tmnll(fsec,ftrk,orbit,fmap,ek,re,te)
 
   if (.not.ftrk) return
 
-  pi = get_variable('pi ')
-  
   !---- Track orbit.    
   x = orbit(1)/cnll
   y = orbit(3)/cnll
@@ -6415,7 +6394,8 @@ end SUBROUTINE tmnll
 SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   use twtrrfi
   use twisslfi
-  use math_constfi, only : zero, one, two, three, ten3m
+  use math_constfi, only : zero, one, two, three, ten3m, pi, twopi
+  use phys_constfi, only : clight
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -6449,7 +6429,6 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   double precision :: cangle, sangle, dtmp
 
   double precision :: pc, krf, vrf
-  double precision :: pi, twopi, clight
   double precision :: x, y, z, px, py, pt, dpx, dpy, dpt
   double precision :: freq, volt, lag, harmon
   double precision :: field_cos(2,0:maxmul)
@@ -6459,7 +6438,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   double complex :: Cm2, Sm2, Cm1, Sm1, Cp0, Sp0, Cp1, Sp1
 
   integer, external :: node_fd_errors
-  double precision, external :: node_value, get_value, get_variable
+  double precision, external :: node_value, get_value
   double complex, parameter :: icomp=(0d0,1d0) ! imaginary 
 
   !---- Zero the arrays
@@ -6470,23 +6449,20 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   F_ERRORS = zero 
   
   !---- Read-in the parameters
-  clight = get_variable('clight ')
-  pi = get_variable('pi ')
-  twopi = two * pi
-
-  freq = node_value('freq ');
-  volt = node_value('volt ');
-  lag = node_value('lag ');
+  freq   = node_value('freq ');
+  volt   = node_value('volt ');
+  lag    = node_value('lag ');
   harmon = node_value('harmon ');
-  bvk = node_value('other_bv ')
-  elrad = node_value('lrad ')
+  bvk    = node_value('other_bv ')
+  elrad  = node_value('lrad ')
+  tilt   = node_value('tilt ')
+  
   deltap = get_value('probe ', 'deltap ')
-  dorad = get_value('probe ','radiate ') .ne. zero
-  arad = get_value('probe ','arad ')
+  dorad  = get_value('probe ','radiate ') .ne. zero
+  arad   = get_value('probe ','arad ')
   gammas = get_value('probe ','gamma ')
-  beta = get_value('probe ','beta ')
-  pc = get_value('probe ','pc ')
-  tilt = node_value('tilt ')
+  beta   = get_value('probe ','beta ')
+  pc     = get_value('probe ','pc ')
   
   n_ferr = node_fd_errors(f_errors);
   call get_node_vector('knl ', nn, normal)
@@ -6838,7 +6814,8 @@ end subroutine tmfoc
 SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use twisslfi
-  use math_constfi, only : zero, one, two, three, half, ten3m
+  use math_constfi, only : zero, one, two, three, half, ten3m, pi, twopi
+  use phys_constfi, only : clight
   use matrices, only : EYE
   implicit none
   !----------------------------------------------------------------------*
@@ -6873,7 +6850,6 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision :: ed(6), rd(6,6), td(6,6,6)
   
   double precision :: pc, krf
-  double precision :: pi, twopi, clight
   double precision :: x, y, z, px, py, pt, dpx, dpy, dpt
   double precision :: freq, rfv, rfl, harmon
   double precision :: field_cos(2,0:0)
@@ -6883,7 +6859,7 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double complex :: Cp0, Sp0, Cp1, Sp1
   
   integer, external :: node_fd_errors
-  double precision, external :: node_value, get_value, get_variable
+  double precision, external :: node_value, get_value
   double complex, parameter :: icomp=(0d0,1d0) ! imaginary
 
   !---- Zero the arrays
@@ -6899,10 +6875,6 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   call tmdrf(fsec,ftrk,orbit,fmap,el/two,ed,rd,td);
     
   !---- Read-in the parameters
-  clight = get_variable('clight ')
-  pi = get_variable('pi ')
-  twopi = two * pi
-
   harmon = node_value('harmon ');
   bvk = node_value('other_bv ')
   elrad = node_value('lrad ')

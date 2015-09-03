@@ -3,6 +3,7 @@ subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog,turnnumber,dq)
   use wmaxmin0fi
   use dyntabfi
   use tunesfi
+  use math_constfi, only : zero, one, two, pi, twopi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -17,18 +18,14 @@ subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog,turnnumber,dq)
   double precision :: fitlyap, templyap
   double precision :: tunx1, tunx2, tuny1, tuny2, tuneabt, tuneabt2
   double precision :: dphi(3),dphi1,dphi2
-  double precision :: pi, twopi
 
-  double precision, external :: get_variable, get_value
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0
+  double precision, external :: get_value
 
   write(*,*) ' entered dynap '
 
   fastune = get_value('dynap ','fastune ') .ne. 0
   deltax  = get_value('dynap ','lyapunov ')
 
-  pi = get_variable('pi ')
-  twopi = get_variable('twopi ')
   dktrturns = turns
 
   !---- Initialize max and min betatron invariants.
@@ -194,6 +191,7 @@ subroutine dynaptunefill
 end subroutine dynaptunefill
 
 subroutine fft(data, nn, isign)
+  use math_constfi, only : zero, one, two, half, twopi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -214,13 +212,6 @@ subroutine fft(data, nn, isign)
 
   integer :: i, j, m, n, istep, mmax
   double precision :: tempi, tempr, theta, wi, wpi, wpr, wr, wtemp
-  double precision :: twopi
-
-  double precision, external :: get_variable
-  double precision, parameter :: zero=0d0, half=0.5d0, one=1d0, two=2d0
-
-  !---- Initialize
-  twopi = get_variable('twopi ')
 
   !---- Rearrange the data points.
   n = 2 * nn
@@ -271,6 +262,7 @@ subroutine fft(data, nn, isign)
 end subroutine fft
 
 double precision function tuneabt(zn, ixy, initt, maxn, turns, dq)
+  use math_constfi, only : zero, one, two, pi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -288,13 +280,6 @@ double precision function tuneabt(zn, ixy, initt, maxn, turns, dq)
 
   integer :: mft, nft, nftmax, npoint, mf
   double precision :: ftmax, temp, cf1, cf2, cf3, arg, assk
-  double precision :: pi
-
-  double precision, external :: get_variable
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0
-
-  !---- Initialize
-  pi = get_variable('pi ')
 
   !---- Use first NPOINT points.
   mft = int(log(float(maxn)) / log(two))
@@ -334,6 +319,7 @@ double precision function tuneabt(zn, ixy, initt, maxn, turns, dq)
 end function tuneabt
 
 double precision function tuneabt2(zn, ixy, initt, maxn, turns,dq)
+  use math_constfi, only : zero, one, two, pi, twopi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -352,14 +338,6 @@ double precision function tuneabt2(zn, ixy, initt, maxn, turns,dq)
   integer :: mft, nft, mf, nftmax, npoint, nn
   double precision :: cf1, cf2, cf3, scra1, scra2, scra3, scra4
   double precision :: ftmax, temp, step, assk, co, si, p1, p2
-  double precision :: pi, twopi
-
-  double precision, external :: get_variable
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0
-
-  !---- Initialize
-  pi = get_variable('pi ')
-  twopi = get_variable('twopi ')
 
   !---- Use first NPOINT points.
   mft = int(log(float(maxn)) / log(two))

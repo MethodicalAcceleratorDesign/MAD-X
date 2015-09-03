@@ -25,22 +25,28 @@ The parameters are defined as:
    have been previously loaded with a \hyperref[sec:use]{\tt USE} command.  
    The sequence must use the default positioning of elements ({\tt REFER=centre}).
 
-   \ttitem{STYLE} the slicing style to be used for all elements. 
-   Note that this argument is optional and adequate defaults are provided.\\
+   \ttitem{STYLE} the slicing style to be used for all elements. \\
    Available slicing styles are: 
 
    \begin{madlist}
-   	\ttitem{SIMPLE} produces slices of equal strength and length at equidistant
-   	positions.
-   	
    	\ttitem{TEAPOT} is the default slicing algorithm for all elements 
    	except collimators and is described in \cite{burkhardt2013}. 
    	{\tt TEAPOT} is a clear improvement over the {\tt SIMPLE} algorithm.
+   	
+   	\ttitem{SIMPLE} produces slices of equal strength and length at equidistant
+   	positions.
    	
    	\ttitem{COLLIM} is the default slicing algorithm for collimators. 
    	If only one slice is chosen it is placed in the middle of the old
    	element. If two slices are chosen they are placed at either
    	end. Three slices or more are treated as one slice. 
+   	
+   	\ttitem{HYBRID} is the previous default algorithm 
+   	that was active up to version 5.02.05 when the {\tt STYLE} 
+   	attribute was not given; the standard slicing for all
+   	elements, except collimators, is {\tt TEAPOT} if the number
+   	of slices is less or equal to four, and {\tt SIMPLE} otherwise.
+   
    \end{madlist}
    
    \ttitem{MAKEDIPEDGE} is a logical flag to control the generation of
@@ -114,9 +120,10 @@ slicing, with possible exception of dipole and quadrupole magnetic elements.
 
 The generated thin lens sequence has the following properties: 
 \begin{itemize}
-\item The new sequence has the same name as the original. The original sequence
-  is replaced by the new one in memory. If the original sequence is
-  needed for further processing in \madx, it should be reloaded.
+\item The new sequence has the same name as the original. 
+  The original sequence is replaced by the new one in memory. 
+  If the original sequence is needed for further processing in \madx, 
+  it should be reloaded.
 \item The algorithm also processes any sub-sequence inserted in the main
   sequence. These sub-sequences are also given the same names as the
   original ones. 
