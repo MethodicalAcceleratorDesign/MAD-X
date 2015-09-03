@@ -20,7 +20,9 @@ module ptc_multiparticle
   !  LOGICAL :: OLD_MOD=.TRUE.
 
   logical(lp),private, parameter :: dobb=.true.
-  logical(lp),private, parameter :: aperture_all_case0=.false.
+  
+  !flag for tracking in slices to check aperture at every regular integration step
+  logical(lp),public, parameter :: aperture_all_case0=.true.
   type(probe) :: xsm,xsm0
   !real(dp) :: unit_time =1.0e-3_dp
   REAL(dp) :: x_orbit_sync(6)= 0.0_dp,dt_orbit_sync=0.0_dp
@@ -979,7 +981,7 @@ CONTAINS
        SELECT CASE(EL%KIND)
        CASE(KIND0)
        case(KIND1)
-          CALL TRACK_SLICE(EL%D0,X,K)
+          CALL TRACK_SLICE(EL%D0,X,K) ! DRIFTL INTER_DRIFT1
        case(KIND2)
           CALL TRACK_SLICE(EL%K2,X,K,t%POS_IN_FIBRE-2)
        case(KIND3)
@@ -1026,6 +1028,7 @@ CONTAINS
           WRITE(6,*) "NOT IMPLEMENTED ",EL%KIND
           stop 999
        END SELECT
+       
        if(associated(T%PARENT_FIBRE%MAG%p%aperture).and.aperture_all_case0) &
             call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
 
