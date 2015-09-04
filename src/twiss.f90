@@ -6862,7 +6862,7 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision, external :: node_value, get_value
   double complex, parameter :: icomp=(0d0,1d0) ! imaginary
 
-  !---- Zero the arrays
+    !---- Zero the arrays
   F_ERRORS = zero
   FIELD = zero
   TE = zero
@@ -6900,9 +6900,9 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   
   !---- Set-up some parameters
   krf = twopi * freq * 1d6/clight;
-  
+
   if (n_ferr .gt. 0) then
-     call dcopy(f_errors,field,n_ferr)
+     call dcopy(f_errors, field, min(2, n_ferr))
   endif
   
   !---- Particle's coordinates
@@ -6942,8 +6942,8 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   endif
   
   !---- Prepare to calculate the kick and the matrix elements
-  Cp0 = field_cos(1,0)+icomp*field_cos(2,0);
-  Sp0 = field_sin(1,0)+icomp*field_sin(2,0);
+  Cp0 = field_cos(1)+icomp*field_cos(2);
+  Sp0 = field_sin(1)+icomp*field_sin(2);
   Cp1 = Cp0 * (x+icomp*y);
   Sp1 = Sp0 * (x+icomp*y);
   
