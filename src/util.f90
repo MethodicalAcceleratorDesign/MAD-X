@@ -480,25 +480,8 @@ module plot_bfi
   !--- fpmach set in routines pesopt and pefill, used in routine peplot
   !--- ddp_flag set in routine pefill, used in routine peplot
   !--- ptc_flag set in routines pesopt, used in routine pefill
-  logical,save :: fpmach=.false., dpp_flag=.false., ptc_flag=.false.
+  logical, save :: fpmach=.false., dpp_flag=.false., ptc_flag=.false.
 end module plot_bfi
-
-module plot_cfi
-  implicit none
-  public
-  !--- Definition of common / e2save /
-  !--- e2s initialised in routine pefill, used in routine peelma
-  double precision :: e2s=0.d0
-end module plot_cfi
-
-module plot_mathfi
-  implicit none
-  public
-  !--- Definitions of mathematical constants
-  double precision, parameter :: pi = 3.1415926535898d0
-  double precision, parameter :: zero = 0.d0, half = 0.5d0, eps = 1.d-5
-  double precision, parameter :: one = 1.d0, two = 2.d0, twopi = two * pi
-end module plot_mathfi
 
 module math_constfi ! 2015-Aug-06 Ghislain 
   implicit none
@@ -677,12 +660,10 @@ subroutine fort_warn(t1, t2)
   !----------------------------------------------------------------------*
   character(*) :: t1, t2
   integer :: get_option
-
   if (get_option('warn ') .ne. 0) then
      print '(a,1x,a,1x,a)', '++++++ warning:', t1, t2
      call augmentfwarn()
   endif
-
 end subroutine fort_warn
 
 subroutine fort_fail(t1,t2)
@@ -701,35 +682,14 @@ subroutine fort_fail(t1,t2)
   print *,  '+-+-+- fatal: ',t1,t2
   print *,' '
   
-  if (get_option('no_fatal_stop ') .eq. 0) stop  1  
-  
+  if (get_option('no_fatal_stop ') .eq. 0) stop  1
 end subroutine fort_fail
 
-subroutine getclor(orbit0, rt, tt, error)
-  !----------------------------------------------------------------------*
-  ! Purpose:
-  !   Get periodic closed orbit (e.g. at start of Twiss),
-  !   first + second order one-turn map
-  ! Input:
-  !   orbit0(6)   (real)  initial guess
-  ! Output:
-  !   rt(6,6)     (real)  one-turn matrix
-  !   tt(6,6,6)   (real)  one-turn second-order map
-  !   error       (int)   error flag (0: OK, else != 0)
-  !----------------------------------------------------------------------*
-  use twiss0fi
-  use matrices, only : EYE
+subroutine aafail(rout,text)
   implicit none
-
-  double precision :: orbit0(6), rt(6,6), tt(6,6,6)
-  integer :: error
-
-  double precision :: opt(fundim)
-
-  RT  = EYE 
-  OPT(:fundim) = 0.d0 
-  call tmclor(orbit0, .true., .true., opt, rt, tt, error)
-end subroutine getclor
+  character(*) :: rout, text
+  call fort_fail(rout,text)
+end subroutine aafail
 
 subroutine m66div(anum,aden,target,eflag)
   implicit none
@@ -820,6 +780,25 @@ logical function m66sta(amat)
   enddo
 
 end function m66sta
+
+subroutine dcopy(in,out,n)
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   Copy arrays.                                                       *
+  ! Input:                                                               *
+  !   in  (double)    array to be copied.                                *
+  !   n   (integer)   array length.                                      *
+  ! Output:                                                              *
+  !   out (double)    target array.                                      *
+  !----------------------------------------------------------------------*
+  implicit none
+
+  double precision :: in(*), out(*)
+  integer :: n
+
+  OUT(1:n) = IN(1:n)
+
+end subroutine dcopy
 
 subroutine solver(augmat,ndim,mdim,irank)
   implicit none
@@ -1089,31 +1068,6 @@ subroutine symeig(a,nd,n,eigen,nval,work)
 300 continue
 
 end subroutine symeig
-
-subroutine dcopy(in,out,n)
-  !----------------------------------------------------------------------*
-  ! Purpose:                                                             *
-  !   Copy arrays.                                                       *
-  ! Input:                                                               *
-  !   in  (double)    array to be copied.                                *
-  !   n   (integer)   array length.                                      *
-  ! Output:                                                              *
-  !   out (double)    target array.                                      *
-  !----------------------------------------------------------------------*
-  implicit none
-
-  double precision :: in(*), out(*)
-  integer :: n
-
-  OUT(1:n) = IN(1:n)
-
-end subroutine dcopy
-
-subroutine aafail(rout,text)
-  implicit none
-  character(*) :: rout, text
-  call fort_fail(rout,text)
-end subroutine aafail
 
 double precision function proxim(x,y)
   use math_constfi, only : twopi

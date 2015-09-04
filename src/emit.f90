@@ -847,3 +847,29 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
      end select
 
 end subroutine emdamp
+
+subroutine getclor(orbit0, rt, tt, error)
+  !----------------------------------------------------------------------*
+  ! Purpose:
+  !   Get periodic closed orbit (e.g. at start of Twiss),
+  !   first + second order one-turn map
+  ! Input:
+  !   orbit0(6)   (real)  initial guess
+  ! Output:
+  !   rt(6,6)     (real)  one-turn matrix
+  !   tt(6,6,6)   (real)  one-turn second-order map
+  !   error       (int)   error flag (0: OK, else != 0)
+  !----------------------------------------------------------------------*
+  use twiss0fi
+  use matrices, only : EYE
+  implicit none
+
+  double precision :: orbit0(6), rt(6,6), tt(6,6,6)
+  integer :: error
+
+  double precision :: opt(fundim)
+
+  RT  = EYE 
+  OPT(:fundim) = 0.d0 
+  call tmclor(orbit0, .true., .true., opt, rt, tt, error)
+end subroutine getclor

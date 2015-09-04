@@ -454,8 +454,8 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            n_align = node_al_errors(al_errors)
            if (n_align .ne. 0)  then
               do i = 1, jmax
-                 call dcopy(z(1,i),zz(1),6)
-                 call tmali1(zz(1),al_errors, betas, gammas,z(1,i), re(1,1))
+                 ZZ(:) = Z(:,i)
+                 call tmali1(zz, al_errors, betas, gammas, z(1,i), re)
               enddo
            endif
         endif
@@ -477,13 +477,11 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         endif
         
         !--------  Misalignment at end of element (from twissfs.f)
-        if (code .ne. 1)  then
-           if (n_align .ne. 0)  then
-              do i = 1, jmax
-                 call dcopy(z(1,i),zz(1),6)
-                 call tmali2(el,zz(1),al_errors, betas, gammas,z(1,i),re(1,1))
-              enddo
-           endif
+        if (code.ne.1 .and. n_align.ne.0)  then
+           do i = 1, jmax
+              ZZ(:) = Z(:,i)
+              call tmali2(el, zz, al_errors, betas, gammas, z(1,i), re)
+           enddo
         endif
         
         nlm = nlm + 1
@@ -3310,7 +3308,7 @@ subroutine trclor(switch,orbit0)
         if (code .ne. 1 .and. n_align .ne. 0)  then
            do i = 1, pmax
               ZZ = Z(:,i) 
-              call tmali2(el,zz, al_errors, betas, gammas,z(1,i), re)
+              call tmali2(el, zz, al_errors, betas, gammas, z(1,i), re)
            enddo
         endif
 

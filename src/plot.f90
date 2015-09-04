@@ -293,9 +293,7 @@ end subroutine pecurv
 subroutine pefill(ierr)
   use plotfi
   use plot_bfi
-  use plot_cfi
-  use plot_mathfi
-  use math_constfi, only : ten
+  use math_constfi, only : zero, half, ten
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:
@@ -1276,7 +1274,7 @@ end subroutine peiact
 subroutine peintp(crow, nint, proc, length, ierr)
   use plotfi
   use plot_bfi
-  use plot_mathfi
+  use math_constfi, only : zero, one
   implicit none
   !----------------------------------------------------------------------*
   !     purpose:
@@ -1340,7 +1338,7 @@ subroutine peintp(crow, nint, proc, length, ierr)
      k = double_from_table_row(tabname, 'py ',   1, tw1(14))
 
      k = double_from_table_row(tabname, 's ', 1, s_incr)
-     s = 0.0
+     s = zero
      ex = get_value('beam ','ex ')
      ey = get_value('beam ','ey ')
 
@@ -1578,8 +1576,7 @@ end subroutine pemima
 subroutine peplot
   use plotfi
   use plot_bfi
-  use plot_mathfi
-  use math_constfi, only : ten3m 
+  use math_constfi, only : zero, one, ten3m
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:
