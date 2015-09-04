@@ -7066,42 +7066,42 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical fsec,ftrk,fmap,dorad
-  integer j,node_fd_errors
-  double precision orbit(6),ek(6),re(6,6),te(6,6,6),elrad,beta,deltap,  &
-       field(2,0:0),orbit0(6),el,                  &
-       arad,gammas,rfac,bvk,                             &
-       zero,one,two,three, tilt, cangle, sangle, dtmp
-  double precision orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
+  logical fsec, ftrk, fmap, dorad
+  integer node_fd_errors
+
+  double precision orbit(6), orbit0(6), orbit00(6)
+  double precision P(6), ek(6), re(6,6), te(6,6,6)
+  double precision ed(6), rd(6,6), td(6,6,6)
+  double precision ek00(6), re00(6,6), te00(6,6,6)
   double precision f_errors(0:maxferr)
-  !double precisio vals(2,0:maxmul)
-  double precision, external :: node_value,get_value,get_variable
-  integer n_ferr
-  
-  ! Strategy to implement BV-flag
-  ! 0) apply bv-flag to voltage and multipole strengths (the inverse map has V = -V; K?N|S = -K?N|S)
-  ! 1) track orbit(6) : just as in track: P o inverse(M) * P
-  ! 2) ek, re, te : create the vector / matrix / tensor elements for 
-  !    the inverse map (see 0), then apply transformation P to each element
+  double precision bvk, arad, el, elrad, rfac
+  double precision freq, harmon, krf, rfl, rfv, tilt, kn0l, pn0
+  double precision pc, beta, clight, deltap, gammas
+  double precision x, y, z, px, py, pt
+  double precision dpx, dpy, dpt
 
-  !--- AL: RF-multipole
-  integer dummyi
-  double precision pc, krf
-  double precision pi, twopi, clight, ten3m
-  double precision x, y, z, px, py, pt, dpx, dpy, dpt
-  double precision freq, rfv, rfl, harmon
-  double precision field_cos(2,0:0)
-  double precision field_sin(2,0:0)
-  double precision kn0l, pn0
-  complex*16 icomp, Cp0, Sp0, Cp1, Sp1
-  integer ii,jj,kk
-  double precision P(6)
-  double precision ed(6),rd(6,6),td(6,6,6)
-  
-  parameter ( zero=0d0, one=1d0, two=2d0, three=3d0, ten3m=1d-3)
+  double precision field(2), field_cos(2), field_sin(2)
+  double precision cangle, sangle, dtmp, pi, twopi
+  complex*16 Cp0, Sp0, Cp1, Sp1
+  integer ii, jj, kk, n_ferr
+
+  double precision, external :: node_value, get_value, get_variable
+
+  double precision zero, one, two, three
+  parameter ( zero=0d0, one=1d0, two=2d0, three=3d0 )
+
+  complex*16 icomp
   parameter ( icomp=(0d0,1d0) )
+  
+!!$  ! Strategy to implement BV-flag
+!!$  ! 0) apply bv-flag to voltage and multipole strengths (the inverse map has V = -V; K?N|S = -K?N|S)
+!!$  ! 1) track orbit(6) : just as in track: P o inverse(M) * P
+!!$  ! 2) ek, re, te : create the vector / matrix / tensor elements for 
+!!$  !    the inverse map (see 0), then apply transformation P to each element
+!!$
+!!$  !--- AL: RF-multipole
 
-  !---- Zero the arrays
+    !---- Zero the arrays
   call dzero(f_errors,maxferr+1)
   call dzero(field,2)
   call dzero(te, 216)
@@ -7143,9 +7143,9 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   
   !---- Set-up some parameters
   krf = 2*pi*freq*1d6/clight;
-  
+
   if (n_ferr.gt.0) then
-     call dcopy(f_errors,field,n_ferr)
+     call dcopy(f_errors, field, min(2, n_ferr))
   endif
   
   !---- Particle's coordinates
@@ -7167,24 +7167,24 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   endif
   
   !---- Vector with strengths + field errors
-  field_cos(1,0) = bvk * (kn0l * cos(PN0 * twopi - krf * z) + field(1,0)) / (one + deltap);
-  field_sin(1,0) = bvk * (kn0l * sin(PN0 * twopi - krf * z))              / (one + deltap);
-  field_cos(2,0) = 0.0; 
-  field_sin(2,0) = 0.0;
+  field_cos(1) = bvk * (kn0l * cos(PN0 * twopi - krf * z) + field(1)) / (one + deltap);
+  field_sin(1) = bvk * (kn0l * sin(PN0 * twopi - krf * z))            / (one + deltap);
+  field_cos(2) = 0.0; 
+  field_sin(2) = 0.0;
   if (tilt.ne.zero)  then
      cangle = cos(-tilt);
      sangle = sin(-tilt);
-     dtmp           = field_cos(1,0) * cangle;
-     field_cos(2,0) = field_cos(1,0) * sangle;
-     field_cos(1,0) = dtmp;
-     dtmp           = field_sin(1,0) * cangle - field_sin(2,0) * sangle;
-     field_sin(2,0) = field_sin(1,0) * sangle + field_sin(2,0) * cangle;
-     field_sin(1,0) = dtmp;
+     dtmp         = field_cos(1) * cangle;
+     field_cos(2) = field_cos(1) * sangle;
+     field_cos(1) = dtmp;
+     dtmp         = field_sin(1) * cangle - field_sin(2) * sangle;
+     field_sin(2) = field_sin(1) * sangle + field_sin(2) * cangle;
+     field_sin(1) = dtmp;
   endif
   
   !---- Prepare to calculate the kick and the matrix elements
-  Cp0 = field_cos(1,0)+icomp*field_cos(2,0);
-  Sp0 = field_sin(1,0)+icomp*field_sin(2,0);
+  Cp0 = field_cos(1)+icomp*field_cos(2);
+  Sp0 = field_sin(1)+icomp*field_sin(2);
   Cp1 = Cp0 * (x+icomp*y);
   Sp1 = Sp0 * (x+icomp*y);
   
