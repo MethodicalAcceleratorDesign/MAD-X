@@ -6852,8 +6852,8 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision :: pc, krf
   double precision :: x, y, z, px, py, pt, dpx, dpy, dpt
   double precision :: freq, rfv, rfl, harmon
-  double precision :: field_cos(2,0:0)
-  double precision :: field_sin(2,0:0)
+  double precision :: field_cos(2)
+  double precision :: field_sin(2)
   double precision :: kn0l, pn0
   double precision :: P(6)
   double complex :: Cp0, Sp0, Cp1, Sp1
@@ -6891,7 +6891,7 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   rfl = node_value('lag ')
 
   kn0l = rfv / pc / 1d3; ! MeV / 1d3 / GeV = rad
-  pn0  = half + rfl; ! pi/2 + rfl
+  pn0  = half*half + rfl; ! pi/2 + rfl
 
   n_ferr = node_fd_errors(f_errors);
  
@@ -6924,26 +6924,26 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   endif
   
   !---- Vector with strengths + field errors
-  field_cos(1,0) = bvk * (kn0l * cos(pn0 * twopi - krf * z) + field(1,0)) / (one + deltap);
-  field_sin(1,0) = bvk * (kn0l * sin(pn0 * twopi - krf * z))              / (one + deltap);
-  field_cos(2,0) = zero; 
-  field_sin(2,0) = zero;
+  field_cos(1) = bvk * (kn0l * cos(pn0 * twopi - krf * z) + field(1,0)) / (one + deltap);
+  field_sin(1) = bvk * (kn0l * sin(pn0 * twopi - krf * z))              / (one + deltap);
+  field_cos(2) = zero; 
+  field_sin(2) = zero;
   if (tilt .ne. zero)  then
      cangle = cos(-tilt);
      sangle = sin(-tilt);
      
-     dtmp           = field_cos(1,0) * cangle;
-     field_cos(2,0) = field_cos(1,0) * sangle;
-     field_cos(1,0) = dtmp;
+     dtmp         = field_cos(1) * cangle;
+     field_cos(2) = field_cos(1) * sangle;
+     field_cos(1) = dtmp;
 
-     dtmp           = field_sin(1,0) * cangle - field_sin(2,0) * sangle;
-     field_sin(2,0) = field_sin(1,0) * sangle + field_sin(2,0) * cangle;
-     field_sin(1,0) = dtmp;
+     dtmp         = field_sin(1) * cangle - field_sin(2) * sangle;
+     field_sin(2) = field_sin(1) * sangle + field_sin(2) * cangle;
+     field_sin(1) = dtmp;
   endif
   
   !---- Prepare to calculate the kick and the matrix elements
-  Cp0 = field_cos(1)+icomp*field_cos(2);
-  Sp0 = field_sin(1)+icomp*field_sin(2);
+  Cp0 = field_cos(1) + icomp*field_cos(2);
+  Sp0 = field_sin(1) + icomp*field_sin(2);
   Cp1 = Cp0 * (x+icomp*y);
   Sp1 = Sp0 * (x+icomp*y);
   

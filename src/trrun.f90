@@ -3211,11 +3211,11 @@ subroutine trclor(switch,orbit0)
   double precision :: last_pos(6), last_orbit(6,1), maxaper(6)
   character(len=12) :: char_a
 
+  integer, parameter :: itmax=10
+  
   logical, external :: is_drift, is_thin, is_quad, is_matrix, is_dipole
   integer, external :: restart_sequ, advance_node, get_option, node_al_errors
   double precision, external :: node_value, get_value, get_variable
-
-  integer, parameter :: itmax=10
 
   write (*,'(/a)')          'Full 6D closed orbit search.'
   write (*,'(a)')           'Initial value of 6-D closed orbit from Twiss: '
@@ -3224,7 +3224,6 @@ subroutine trclor(switch,orbit0)
   !---- Initialize variables
   turn    = 1
   turnmax = 1
-  !itmax   = 10
   pmax    = 7
   sum     = zero
   aperflag  = .false.
@@ -3239,11 +3238,6 @@ subroutine trclor(switch,orbit0)
   Z0  = Z
   Z00 = Z
   
-  !do k = 1, 7
-  !   Z0(:,k)  = Z(:,k)
-  !   Z00(:,k) = Z(:,k)
-  !enddo
-
   !--- jmax may be reduced by particle loss - keep number in j_tot
   j_tot = pmax
 
@@ -3342,7 +3336,7 @@ subroutine trclor(switch,orbit0)
      enddo
 
      Z = Z0
-
+     
      !---- end of Iteration
   enddo
 

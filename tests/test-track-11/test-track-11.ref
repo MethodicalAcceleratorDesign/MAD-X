@@ -3,7 +3,7 @@
   +     MAD-X 5.02.06  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2015.06.26               +
-  + Execution date: 2015.08.31 16:19:18      +
+  + Execution date: 2015.09.07 18:25:12      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2012
 
@@ -472,51 +472,45 @@ END MATCH SUMMARY
 VARIABLE "TAR" SET TO   0.00000000e+00
 enter Twiss module
   
-iteration:   1 error:   3.047816E-05 deltap:   0.000000E+00
-orbit:  -1.454821E-05  3.682668E-07  1.598328E-05  2.778764E-07 -2.806200E-07  1.744753E-09
-  
-iteration:   2 error:   5.032907E-09 deltap:   0.000000E+00
-orbit:  -1.454829E-05  3.682714E-07  1.598063E-05  2.778508E-07 -2.809258E-07  1.746825E-09
+iteration:   1 error:   2.225376E-21 deltap:   0.000000E+00
+orbit:   8.908674E-22 -2.255121E-23 -9.785071E-22 -1.701329E-23 -1.456529E-17 -1.927238E-25
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832    2.809258479e-07    0.0003463032869        53.73678668 
+        26658.8832    1.456528548e-17    0.0003463029846        53.73681013 
 
                 q1                dq1            betxmax              dxmax 
-       62.30997468        2.002083623        19396.92557        2.721089669 
+       62.30999994         2.00009678        19393.42999        2.716682579 
 
              dxrms             xcomax             xcorms                 q2 
-        1.45181627    8.899809808e-05    1.535894983e-05         60.3200196 
+       1.451766607    5.617475226e-20    6.733253261e-21         60.3200002 
 
                dq2            betymax              dymax              dyrms 
-       2.020727652        19393.75292       0.0242856899     0.004163935575 
+       2.000000582        19393.42412    3.637658887e-18    6.130931513e-19 
 
             ycomax             ycorms             deltap            synch_1 
-   0.0002183025239     2.63206514e-05                  0                  0 
+   3.700000598e-20    4.371669696e-21                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 enter TRACK module
   
-iteration:   1 error:   3.047816E-05 deltap:   0.000000E+00
-orbit:  -1.454821E-05  3.682668E-07  1.598328E-05  2.778764E-07 -2.806200E-07  1.744753E-09
+iteration:   1 error:   2.225376E-21 deltap:   0.000000E+00
+orbit:   8.908674E-22 -2.255121E-23 -9.785071E-22 -1.701329E-23 -1.456529E-17 -1.927238E-25
   
-iteration:   2 error:   5.032907E-09 deltap:   0.000000E+00
-orbit:  -1.454829E-05  3.682714E-07  1.598063E-05  2.778508E-07 -2.809258E-07  1.746825E-09
+Full 6D closed orbit search.
+Initial value of 6-D closed orbit from Twiss: 
+orbit0   8.908674E-22 -2.255121E-23 -9.785071E-22 -1.701329E-23 -1.456529E-17 -1.927238E-25
   
-  Full 6D closed orbit search.
-  Initial value of 6-D closed orbit from Twiss: 
-  orbit0   -1.4548287932602022E-005   3.6827136697740030E-007   1.5980632752526962E-005   2.7785079530089028E-007  -2.8092584791299943E-007   1.7468254621344476E-009
-  
- 6D closed orbit found by subroutine trclor 
-iteration:  11 error:   2.229952E-10 deltap:   0.000000E+00
-orbit:  -1.235361E-11 -1.579116E-13 -1.607647E-24 -1.587557E-26  2.826187E-11  2.419519E-11
+6D closed orbit found by subroutine trclor 
+iteration:  11 error:   2.799193E-22 deltap:   0.000000E+00
+orbit:  -1.178419E-69 -1.506185E-71  1.588057E-81  1.725567E-83 -4.073446E-17  2.797265E-22
 exit TRACK module
 
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.06 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++
