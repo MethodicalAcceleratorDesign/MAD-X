@@ -7087,8 +7087,8 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   double precision, external :: node_value, get_value, get_variable
 
-  double precision zero, one, two, three
-  parameter ( zero=0d0, one=1d0, two=2d0, three=3d0 )
+  double precision zero, one, two, three, quarter
+  parameter ( zero=0d0, one=1d0, two=2d0, three=3d0, quarter=0.25d0 )
 
   complex*16 icomp
   parameter ( icomp=(0d0,1d0) )
@@ -7134,7 +7134,7 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   rfl = node_value('lag ')
 
   KN0L = rfv / pc / 1d3; ! MeV / 1d3 / GeV = rad
-  PN0 = 0.5 + rfl; ! pi/2 + rfl
+  PN0 = quarter + rfl; ! pi/2 + rfl
 
   n_ferr = node_fd_errors(f_errors);
  

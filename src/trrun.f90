@@ -3852,12 +3852,12 @@ subroutine trclor(switch,orbit0)
   !      ddd(5) = 1e-15
   !      ddd(6) = 1e-15
   !--------------------------------------
-  ddd(1) = 1e-15
-  ddd(2) = 1e-15
-  ddd(3) = 1e-15
-  ddd(4) = 1e-15
-  ddd(5) = 1e-15
-  ddd(6) = 1e-15
+  ddd(1) = 1d-15
+  ddd(2) = 1d-15
+  ddd(3) = 1d-15
+  ddd(4) = 1d-15
+  ddd(5) = 1d-15
+  ddd(6) = 1d-15
 
   !      do k=1,6
   !        z(k,k+1) = z(k,k+1) + ddd(k)
