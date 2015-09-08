@@ -40,8 +40,8 @@ diff_summary(const struct ndiff *dif)
   if (c) {
 //    if (option.test)
 //    warning("(*) files '%s'|'%s' from test '%s' differ", option.lhs_file, option.rhs_file, option.test);
-    warning("(=) % 6d lines have been diffed", n);
-    warning("(=) % 6d diffs have been detected", c);
+    warning(      "(=) % 6d lines have been diffed", n);
+    inform("       (=) % 6d diffs have been detected", c);
   } else {
     if (option.test)
     inform ("files '%s'|'%s' from test '%s' do not differ", option.lhs_file, option.rhs_file, option.test);

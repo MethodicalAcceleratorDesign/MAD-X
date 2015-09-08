@@ -264,10 +264,9 @@ ndiff_error(const struct context *cxt,
             int row, int col)
 {
   warning("dual constraints differ at %d:%d", row, col);
-  warning("getIncr select [#%d]", context_findIdx(cxt, c ));
-  warning("getAt   select [#%d]", context_findIdx(cxt, c2));
-  warning("rules list:");
-  context_print(cxt, stderr);
+  inform("       getIncr select [#%d]", context_findIdx(cxt, c ));
+  inform("       getAt   select [#%d]", context_findIdx(cxt, c2));
+  inform("       rules list:"); context_print(cxt, stderr);
   error("please report bug to mad@cern.ch");
 }
 
@@ -275,10 +274,10 @@ static void
 ndiff_header(void)
 {
   if (option.test)
-    warning("(*) files '%s'|'%s' from '%s' differ",
+    warning("files '%s'|'%s' from '%s' differ",
             option.lhs_file, option.rhs_file, option.test);
   else
-    warning("(*) files '%s'|'%s' differ",
+    warning("files '%s'|'%s' differ",
             option.lhs_file, option.rhs_file);
 }
 
@@ -665,9 +664,11 @@ quit_diff:
   dif->lhs_i = lhs_p-dif->lhs_b+1;
   dif->rhs_i = rhs_p-dif->rhs_b+1;
   if (!(c->eps.cmd & eps_nofail) && ++dif->cnt_i <= dif->max_i) {
+
     if (dif->cnt_i == 1) ndiff_header();
-    warning("(%d) files differ at line %d and char-columns %d|%d", dif->cnt_i, dif->row_i, dif->lhs_i, dif->rhs_i);
-    warning("(%d) strings: '%.25s'|'%.25s'", dif->cnt_i, lhs_p, rhs_p);
+
+    inform("   %2d: line %d char-cols %d|%d : strings '%.25s'|'%.25s'",
+            dif->cnt_i, dif->row_i, dif->lhs_i, dif->rhs_i, lhs_p, rhs_p);
   }
   if (c->eps.cmd & eps_onfail) context_onfail(dif->cxt, c);
 
@@ -806,30 +807,34 @@ ndiff_testNum (T *dif, const C *c)
 
 quit_diff:
   if (!(c->eps.cmd & eps_nofail) && ++dif->cnt_i <= dif->max_i) {
+
     if (dif->cnt_i == 1) ndiff_header();
-    warning("(%d) files differ at line %d column %d between char-columns %d|%d and %d|%d",
-            dif->cnt_i, dif->row_i, dif->col_i, dif->lhs_i+1, dif->rhs_i+1, dif->lhs_i+1+l1, dif->rhs_i+1+l2);
 
     char str[128];
-    sprintf(str, "(%%d) numbers: '%%.%ds'|'%%.%ds'", l1, l2);
-    warning(str, dif->cnt_i, lhs_p, rhs_p);
+    sprintf(str, "   %%2d: line %%d col %%d char-cols %%d|%%d to %%d|%%d : numbers '%%.%ds'|'%%.%ds'", l1, l2);
+
+    inform(str, dif->cnt_i, dif->row_i, dif->col_i, dif->lhs_i+1, dif->rhs_i+1,
+                 dif->lhs_i+1+l1, dif->rhs_i+1+l2, lhs_p, rhs_p);
+
+    inform("   %2d: line %d char-cols %d|%d : strings '%.25s'|'%.25s'",
+            dif->cnt_i, dif->row_i, dif->lhs_i, dif->rhs_i, dif->cnt_i, lhs_p, rhs_p);
 
     if (ret & eps_ign)
-      warning("(%d) one number is missing (column count can be wrong)", dif->cnt_i);
+      inform("   %2d: one number is missing (column count can be wrong)", dif->cnt_i);
 
     if (ret & eps_equ)
-      warning("(%d) numbers strict representation differ (rule #%d, line %d)", dif->cnt_i, ri, rl);
+      inform("   %2d: numbers strict representation differ (rule #%d, line %d)", dif->cnt_i, ri, rl);
 
     if (ret & eps_abs)
-      warning("(%d) absolute error (rule #%d, line %d: %.2g<=abs<=%.2g) abs=%.2g, rel=%.2g, ndig=%d",
+      inform("   %2d: absolute error (rule #%d, line %d: %.2g<=abs<=%.2g) abs=%.2g, rel=%.2g, ndig=%d",
               dif->cnt_i, ri, rl, _abs, abs, abs_d, rel_d, imax(n1, n2));
 
     if (ret & eps_rel)
-      warning("(%d) relative error (rule #%d, line %d: %.2g<=rel<=%.2g) abs=%.2g, rel=%.2g, ndig=%d",
+      inform("   %2d: relative error (rule #%d, line %d: %.2g<=rel<=%.2g) abs=%.2g, rel=%.2g, ndig=%d",
               dif->cnt_i, ri, rl, _rel, rel, abs_d, rel_d, imax(n1, n2));
 
     if (ret & eps_dig)
-      warning("(%d) numdigit error (rule #%d, line %d: %.2g<=rel<=%.2g) abs=%.2g, rel=%.2g, ndig=%d",
+      inform("   %2d: numdigit error (rule #%d, line %d: %.2g<=rel<=%.2g) abs=%.2g, rel=%.2g, ndig=%d",
               dif->cnt_i, ri, rl, _dig*pow_d, dig*pow_d, abs_d, rel_d, imax(n1, n2));
   }
   if (c->eps.cmd & eps_onfail) context_onfail(dif->cxt, c);

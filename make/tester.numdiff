@@ -41,9 +41,8 @@ NDSUM = tests-summary.txt
 
 #
 # numdiff flags
-# quiet, ingore blanks, check constraints, list mode, serie mode, debug mode, test title
-NDFLAGS = --quiet \
-          $(if $(call eq,$(NDDEBUG),yes),--debug,) \
+# ingore blanks, check constraints, list mode, serie mode, debug mode, test title
+NDFLAGS = $(if $(call eq,$(NDDEBUG),yes),--debug,) \
           $(if $(call eq,$(NDTRACE),yes),--trace,) \
           $(if $(call eq,$(NOCOLOR),yes),--nocolor,) \
           --blank --xcheck --list --accum ..$/$(NDSUM) --test $@
@@ -52,8 +51,7 @@ NDFLAGS = --quiet \
 # init-test macro
 #
 define init-test
-$_ $(call ND_tr,$(NDIFF_I) --quiet \
-                           $(if $(call eq,$(NDDEBUG),yes),--debug,) \
+$_ $(call ND_tr,$(NDIFF_I) $(if $(call eq,$(NDDEBUG),yes),--debug,) \
                            $(if $(call eq,$(NDTRACE),yes),--trace,) \
                            --accum tests$/$(NDSUM)) --reset
 endef
