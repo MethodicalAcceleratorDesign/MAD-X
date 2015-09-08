@@ -7150,7 +7150,7 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   
   !---- Particle's coordinates
   if (ftrk) then
-    ! apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
+    ! apply the transformation P: diag(-1, 1, 1, -1, -1, 1) * X
     x  = orbit(1) * bvk;
     px = orbit(2);
     y  = orbit(3);
@@ -7215,7 +7215,7 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
         pt = pt - rfac * (one + pt) ** 2
      endif
 
-    ! apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
+    ! apply the transformation P: diag(-1, 1, 1, -1, -1, 1) * X
     orbit(1) = x  * bvk;
     orbit(2) = px;
     orbit(3) = y;
@@ -7228,7 +7228,7 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !---- Element Kick
   ek(2) = -REAL(Cp0);
   ek(4) = AIMAG(Cp0);
-  ek(6) = - krf * REAL(Sp1);
+  ek(6) = -krf * REAL(Sp1);
 
   !---- First-order terms
   re(2,5) = -krf * REAL(Sp0);
@@ -7237,11 +7237,11 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   re(6,3) =  re(4,5);
   re(6,5) = krf * krf * REAL(Cp1);
   
-  !---- Second-order terms (use X,Y from orbit tracking).
+  !---- Second-order terms
   if (fsec) then
      te(2,5,5) = 0.5 * krf * krf * REAL(Cp0);
-     te(4,5,5) =  0.5 * (-krf * krf * AIMAG(Cp0));
-     te(6,5,5) =  0.5 * (-krf + krf * krf * krf * REAL(Sp1));
+     te(4,5,5) = 0.5 * (-krf * krf * AIMAG(Cp0));
+     te(6,5,5) = 0.5 * (-krf + krf * krf * krf * REAL(Sp1));
   endif
 
   ! Apply P tranformation to each index
@@ -7263,7 +7263,7 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
     enddo
   endif
 
-  ! adds half a drift space before and after the Crab kick
+  ! Add half a drift space before and after the Crab kick
   call tmcat1(fsec,ed,rd,td,ek,re,te,ek,re,te);
   call tmdrf(fsec,ftrk,orbit,fmap,el/2d0,ed,rd,td);
   call tmcat1(fsec,ek,re,te,ed,rd,td,ek,re,te);
