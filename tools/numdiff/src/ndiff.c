@@ -814,10 +814,7 @@ quit_diff:
     sprintf(str, "   %%2d: line %%d col %%d char-cols %%d|%%d to %%d|%%d : numbers '%%.%ds'|'%%.%ds'", l1, l2);
 
     inform(str, dif->cnt_i, dif->row_i, dif->col_i, dif->lhs_i+1, dif->rhs_i+1,
-                 dif->lhs_i+1+l1, dif->rhs_i+1+l2, lhs_p, rhs_p);
-
-    inform("   %2d: line %d char-cols %d|%d : strings '%.25s'|'%.25s'",
-            dif->cnt_i, dif->row_i, dif->lhs_i, dif->rhs_i, dif->cnt_i, lhs_p, rhs_p);
+                dif->lhs_i+1+l1, dif->rhs_i+1+l2, lhs_p, rhs_p);
 
     if (ret & eps_ign)
       inform("   %2d: one number is missing (column count can be wrong)", dif->cnt_i);
