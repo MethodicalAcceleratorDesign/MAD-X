@@ -43,7 +43,7 @@ logmsg(unsigned level, const char *file, int line, const char *fmt, ...)
   if (level < inform_level || logmsg_config.locate) {
     const char *p = strrchr(file, '/');
     if (p) file = p+1;
-    fprintf(stderr, "%s(%s:%d|%d,%d): ", str[level], file, line, level, logmsg_config.locate);
+    fprintf(stderr, "%s(%s:%d): ", str[level], file, line);
   } else
     fprintf(stderr, "%s", str[level]);
 
