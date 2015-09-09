@@ -24,13 +24,8 @@
 #include "error.h"
 
 struct logmsg_config logmsg_config = {
-#ifndef NDEBUG
-  .level  = debug_level,
-  .locate = 1,
-#else
   .level  = inform_level,
   .locate = 0,
-#endif
   .flush  = 1             // always flush stdout
 };
 
@@ -45,7 +40,7 @@ logmsg(unsigned level, const char *file, int line, const char *fmt, ...)
 
   if (logmsg_config.flush) fflush(stdout);
 
-  if (logmsg_config.locate && level != inform_level) {
+  if (level < inform_level || logmsg_config.locate) {
     const char *p = strrchr(file, '/');
     if (p) file = p+1;
     fprintf(stderr, "%s(%s:%d): ", str[level], file, line);

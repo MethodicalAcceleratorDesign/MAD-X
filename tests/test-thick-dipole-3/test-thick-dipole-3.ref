@@ -72,58 +72,8 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
                      0                      0                      0                      0 
 enter TRACK module
 one pass is on
-update is on
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
 
 ++++++ table: tracksumm
 
@@ -150,6 +100,8 @@ update is on
                     30                      0 
                     30                      0 
                     30                      0 
+
+*****  end of trrun  *****
 exit TRACK module
 
 

@@ -40,10 +40,9 @@ diff_summary(const struct ndiff *dif)
   if (c) {
 //    if (option.test)
 //    warning("(*) files '%s'|'%s' from test '%s' differ", option.lhs_file, option.rhs_file, option.test);
-    warning("(=) % 6d lines have been diffed", n);
-    warning("(=) % 6d diffs have been detected", c);
-  } else {
-    if (option.test)
+    warning(      "(=) % 6d lines have been diffed", n);
+    inform("       (=) % 6d diffs have been detected", c);
+  } else if (!option.quiet) {
     inform ("files '%s'|'%s' from test '%s' do not differ", option.lhs_file, option.rhs_file, option.test);
     inform ("% 6d lines have been diffed", n);
   }
@@ -110,9 +109,6 @@ main(int argc_, char** argv_)
   // start timers
   option.dat_t0 = time(0);
   option.clk_t0 = clock();
-
-  // set logging level
-  logmsg_config.level = inform_level;
 
   // argument list loop (too long, should refactored)
   while (option.argi < argc) {
@@ -189,7 +185,8 @@ main(int argc_, char** argv_)
           invalid_file(rhs_s);
       }
 
-      inform("processing '%s'|'%s'", option.lhs_file, option.rhs_file);
+      if (!option.quiet)
+        inform("processing '%s'|'%s'", option.lhs_file, option.rhs_file);
 
       // create context of constraints (using default size)
       struct context *cxt = context_alloc(0);
