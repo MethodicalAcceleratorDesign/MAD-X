@@ -448,8 +448,7 @@ parse_args(int argc, const char *argv[])
     // set quiet mode [setup]
     if (!strcmp(argv[option.argi], "--quiet") || (!option.lgopt && !strcmp(argv[option.argi], "-q"))) {
       debug("quiet mode on");
-      logmsg_config.level = warning_level;
-      logmsg_config.locate = 0;
+      option.quiet = 1;
       continue;
     }
 

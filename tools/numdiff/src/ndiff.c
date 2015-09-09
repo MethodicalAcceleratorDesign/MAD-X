@@ -264,10 +264,10 @@ ndiff_error(const struct context *cxt,
             int row, int col)
 {
   warning("dual constraints differ at %d:%d", row, col);
-  inform("       getIncr select [#%d]", context_findIdx(cxt, c ));
-  inform("       getAt   select [#%d]", context_findIdx(cxt, c2));
-  inform("       rules list:"); context_print(cxt, stderr);
-  error("please report bug to mad@cern.ch");
+  debug  ("  getIncr select [#%d]", context_findIdx(cxt, c ));
+  debug  ("  getAt   select [#%d]", context_findIdx(cxt, c2));
+  debug  ("  rules list:"); context_print(cxt, stderr);
+  error  ("please report bug to mad@cern.ch");
 }
 
 static void
