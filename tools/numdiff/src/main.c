@@ -110,9 +110,6 @@ main(int argc_, char** argv_)
   option.dat_t0 = time(0);
   option.clk_t0 = clock();
 
-  // set logging level
-  logmsg_config.level = inform_level;
-
   // argument list loop (too long, should refactored)
   while (option.argi < argc) {
     const char *lhs_s = 0, *rhs_s = 0, *cfg_s = 0;
