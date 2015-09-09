@@ -665,7 +665,7 @@ quit_diff:
   dif->rhs_i = rhs_p-dif->rhs_b+1;
   if (!(c->eps.cmd & eps_nofail) && ++dif->cnt_i <= dif->max_i) {
 
-    if (dif->cnt_i == 1) ndiff_header();
+    if (dif->cnt_i == 1) ndiff_header(); else inform("");
 
     inform("   %2d: line %d char-cols %d|%d : strings '%.25s'|'%.25s'",
             dif->cnt_i, dif->row_i, dif->lhs_i, dif->rhs_i, lhs_p, rhs_p);
@@ -808,7 +808,7 @@ ndiff_testNum (T *dif, const C *c)
 quit_diff:
   if (!(c->eps.cmd & eps_nofail) && ++dif->cnt_i <= dif->max_i) {
 
-    if (dif->cnt_i == 1) ndiff_header();
+    if (dif->cnt_i == 1) ndiff_header(); else inform("");
 
     char str[128];
     sprintf(str, "   %%2d: line %%d col %%d char-cols %%d|%%d to %%d|%%d : numbers '%%.%ds'|'%%.%ds'", l1, l2);
