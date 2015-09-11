@@ -57,7 +57,7 @@ exec_beam(struct in_cmd* cmd, int flag)
 }
 
 void
-save_beam(struct sequence* sequ, FILE* file)
+save_beam(struct sequence* sequ, FILE* file, int noexpr)
 {
   struct command* comm;
   char beam_buff[AUX_LG];
@@ -80,7 +80,7 @@ save_beam(struct sequence* sequ, FILE* file)
       {
         if (strcmp(comm->par_names->names[i], "sequence") != 0
             || def == 0)
-          export_comm_par(comm->par->parameters[i], beam_buff);
+          export_comm_par(comm->par->parameters[i], beam_buff, noexpr);
       }
     }
     write_nice(beam_buff, file);

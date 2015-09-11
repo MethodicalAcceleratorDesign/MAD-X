@@ -664,7 +664,7 @@ make_sequ_from_line(char* name)
 }
 
 static void
-export_sequence(struct sequence* sequ, FILE* file)
+export_sequence(struct sequence* sequ, FILE* file, int noexpr)
   /* exports sequence in mad-X format */
 {
   char num[2*NAME_L];
@@ -730,7 +730,7 @@ export_sequence(struct sequence* sequ, FILE* file)
         strcat(c_dum->c, ", from = ");
         strcat(c_dum->c, c_node->from_name);
       }
-      if (exp_par_flag) export_el_def(c_node->p_elem, c_dum->c);
+      if (exp_par_flag) export_el_def(c_node->p_elem, c_dum->c, noexpr);
       write_nice(c_dum->c, file);
     }
     if (c_node == sequ->end)  break;
@@ -809,7 +809,7 @@ export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
 }
 
 static void
-write_sequs(struct sequence_list* sql,struct command_list* cl, FILE* file)
+write_sequs(struct sequence_list* sql,struct command_list* cl, FILE* file, int noexpr)
 {
   /* exports sequences in order of their nest level, flat first etc. */
   int i, j, max_nest = 0;
@@ -821,7 +821,7 @@ write_sequs(struct sequence_list* sql,struct command_list* cl, FILE* file)
       if(sql->sequs[i]->nested == j)
       {
         if (pass_select_list(sql->sequs[i]->name, cl))
-          export_sequence(sql->sequs[i], file);
+          export_sequence(sql->sequs[i], file, noexpr);
       }
   }
 }
@@ -1725,9 +1725,12 @@ void
 exec_save(struct in_cmd* cmd)
   /* save a sequence with all necessary parameters and sub-sequences */
 {
-  int i, n = 0, pos, prev = 0, beam_save = log_val("beam", cmd->clone),
-    mad8 = log_val("mad8", cmd->clone),
-    bare = log_val("bare", cmd->clone), all_sequ = 0;
+  int i, n = 0, pos, prev = 0,
+    beam_save = log_val("beam", cmd->clone),
+    mad8      = log_val("mad8", cmd->clone),
+    bare      = log_val("bare", cmd->clone),
+    noexpr    = log_val("noexpr", cmd->clone),
+    all_sequ  = 0;
   char *name, *filename, *new_name = NULL;
   struct element* el;
   struct el_list* ell;
@@ -1800,7 +1803,7 @@ exec_save(struct in_cmd* cmd)
     /* end mod - HG 23.3.04 */
 
     if (beam_save && bare == 0) {
-      if (mad8 == 0) save_beam(sequ, out_file); /* only mad-X */
+      if (mad8 == 0) save_beam(sequ, out_file, noexpr); /* only mad-X */
       else warning("when mad-8 format requested,","beam not saved");
     }
   }
@@ -1852,10 +1855,10 @@ exec_save(struct in_cmd* cmd)
   }
   else {
     if (bare == 0) {
-      write_vars(varl, save_select, out_file);
-      write_elems(ell, save_select, out_file);
+      write_vars(varl, save_select, out_file, noexpr);
+      write_elems(ell, save_select, out_file, noexpr);
     }
-    write_sequs(sql, save_select, out_file);
+    write_sequs(sql, save_select, out_file, noexpr);
   }
 
   fclose(out_file);

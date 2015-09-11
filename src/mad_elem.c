@@ -32,7 +32,7 @@ dump_el_list(struct el_list* ell)
 #endif
 
 static void
-export_element(struct element* el, struct el_list* ell, FILE* file)
+export_element(struct element* el, struct el_list* ell, FILE* file, int noexpr)
   /* recursive to have parents always in front for MAD-8 */
 {
   int pos = name_list_pos(el->name, ell->list);
@@ -41,11 +41,11 @@ export_element(struct element* el, struct el_list* ell, FILE* file)
   {
     if (ell->list->inform[pos] == 0)  /* not yet written */
     {
-      export_element(el->parent, ell, file);
+      export_element(el->parent, ell, file, noexpr);
       strcpy(out, el->name);
       strcat(out, ": ");
       strcat(out, el->parent->name);
-      export_el_def(el, out);
+      export_el_def(el, out, noexpr);
       write_nice(out, file);
       ell->list->inform[pos] = 1;
     }
@@ -317,13 +317,13 @@ dump_element(struct element* el)
 }
 
 void
-write_elems(struct el_list* ell, struct command_list* cl, FILE* file)
+write_elems(struct el_list* ell, struct command_list* cl, FILE* file, int noexpr)
 {
   int i;
   for (i = 0; i < ell->curr; i++)
   {
     if (pass_select_list(ell->elem[i]->name, cl))
-      export_element(ell->elem[i], ell, file);
+      export_element(ell->elem[i], ell, file, noexpr);
   }
 }
 
@@ -339,18 +339,16 @@ write_elems_8(struct el_list* ell, struct command_list* cl, FILE* file)
 }
 
 void
-export_el_def(struct element* el, char* string)
+export_el_def(struct element* el, char* string, int noexpr)
   /* exports an element definition in mad-X format */
 {
   int i;
   struct command* def = el->def;
   struct command_parameter* par;
-  for (i = 0; i < def->par->curr; i++)
-  {
+  for (i = 0; i < def->par->curr; i++) {
     par = def->par->parameters[i];
-    if (def->par_names->inform[i]
-        && par_out_flag(el->base_type->name, par->name))
-      export_comm_par(par, string);
+    if (def->par_names->inform[i] && par_out_flag(el->base_type->name, par->name))
+      export_comm_par(par, string, noexpr);
   }
 }
 

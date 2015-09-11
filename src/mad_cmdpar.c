@@ -229,10 +229,10 @@ grow_command_parameter_list(struct command_parameter_list* p)
 }
 
 void
-export_comm_par(struct command_parameter* par, char* string)
+export_comm_par(struct command_parameter* par, char* string, int noexpr)
   /* exports a command parameter */
 {
-  int i, k, last;
+  int last;
   char num[2*NAME_L];
   strcat(string, ",");
   strcat(string, par->name);
@@ -245,15 +245,25 @@ export_comm_par(struct command_parameter* par, char* string)
       break;
     case 1:
     case 2:
-      strcat(string, ":=");
-      if (par->expr != NULL) strcat(string, par->expr->string);
+      if (par->expr != NULL && !noexpr) {
+        strcat(string, ":=");
+        strcat(string, par->expr->string);
+      }
       else
       {
+        if (par->expr != NULL)
+          par->double_value = expression_value(par->expr, 2);
+
+        // LD: use := for backward compatibility despite that it is a number...
+        strcat(string, noexpr ? "=" : ":=");
+
         if (par->type == 1)
         {
-          k = par->double_value; sprintf(num, v_format("%I"), k);
+          int k = par->double_value;
+          sprintf(num, v_format("%I"), k);
         }
-        else sprintf(num, v_format("%F"), par->double_value);
+        else
+          sprintf(num, v_format("%F"), par->double_value);
         strcat(string, supp_tb(num));
       }
       break;
@@ -265,8 +275,8 @@ export_comm_par(struct command_parameter* par, char* string)
       }
       break;
     case 11:
-    case 12:
-      strcat(string, ":=");
+    case 12: {
+      strcat(string, noexpr ? "=" : ":=");
       for (last = par->double_array->curr-1; last > 0; last--)
       {
         if (par->expr_list->list[last] != NULL)
@@ -275,23 +285,33 @@ export_comm_par(struct command_parameter* par, char* string)
         }
         else if (par->double_array->a[last] != zero) break;
       }
+
       strcat(string, "{");
-      for (i = 0; i <= last; i++)
-      {
+      for (int i = 0; i <= last; i++) {
+
         if (i > 0) strcat(string, ",");
-        if (par->expr_list->list[i] != NULL)
+
+        if (par->expr_list->list[i] != NULL && noexpr)
+          par->double_array->a[i] = expression_value(par->expr_list->list[i], 2);
+
+        if (par->expr_list->list[i] != NULL && !noexpr) {
           strcat(string, par->expr_list->list[i]->string);
-        else
-        {
-          if (par->type == 11)
-          {
-            k = par->double_array->a[i]; sprintf(num, v_format("%I"), k);
+        }
+        else {
+          if (par->type == 11) {
+            int k = par->double_array->a[i];
+            sprintf(num, v_format("%I"), k);
           }
-          else sprintf(num, v_format("%F"), par->double_array->a[i]);
+          else {
+            sprintf(num, v_format("%F"), par->double_array->a[i]);
+          }
           strcat(string, supp_tb(num));
         }
       }
       strcat(string, "}");
+      break;
+    }
+    default: error("export command param", "invalid type %d", par->type);
   }
 }
 
