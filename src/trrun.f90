@@ -156,7 +156,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
 
   if(switch.eq.1) then
      ! 2015-Feb-23  16:20:19  ghislain: open file only when necessary
-     if (checkpnt_restart) &
+     if (bb_sxy_update) &
           open(90,file='checkpoint_restart.dat',form='unformatted',status='unknown')
   else
      bb_sxy_update = .false.
@@ -684,7 +684,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   endif
 
 !--- Write checkpoint_restart data
-  if (checkpnt_restart) then
+  if (bb_sxy_update) then
      rewind 90
      write(90) jmax
      write(90) Ex_rms
