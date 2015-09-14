@@ -492,17 +492,18 @@ static bool copy_cmd_par(const char* from_name,const char* to_name,const element
 {
   const struct command_parameter* p = return_param(from_name, from_el);
   command_parameter* to_param = p ? clone_command_parameter(p) : 0; // clone to allow for changes in copy, uses my const clone_command_parameter which checks for NULL
-  bool done=true,found=false;
-  double value      =my_get_int_or_double_value(from_el           ,from_name,found);
-  double default_val=my_get_int_or_double_value(from_el->base_type,from_name,found);
-  const double eps=1.e-15; // used to check if strength is compatible with zero
-  // if(to_param || found ) // use this to take anyway, even if on default value,  just for test, may result in  memory access outside program range
-  if(to_param || (found && fabs(value-default_val)>eps) ) // expression defined or non-trivial value
+  bool done=true; //, found=false;
+  // LD: this optimization leads to either bug or dangerous ambiguity, as noted in the comment by HB, and can trig a segfault.
+  // double value      =my_get_int_or_double_value(from_el           ,from_name,found);
+  // double default_val=my_get_int_or_double_value(from_el->base_type,from_name,found);
+  // const double eps=1.e-15; // used to check if strength is compatible with zero
+  // // if(to_param || found ) // use this to take anyway, even if on default value,  just for test, may result in  memory access outside program range
+  if(to_param) // || (found && fabs(value-default_val) > eps)) // expression defined and is a non-trivial value
   {
     if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " from_name=" << from_name << " to_name=" << to_name << " cloned to_param=" << to_param << " before strcpy " << my_dump_command_parameter(to_param);
-    strcpy(to_param->name,to_name); // put to_name  to the cloned   command_parameter*
+    strcpy(to_param->name, to_name); // put to_name  to the cloned   command_parameter*
     if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " from_name=" << from_name << " to_name=" << to_name << " cloned to_param=" << to_param << " after  strcpy " << my_dump_command_parameter(to_param);
-    add_cmd_parameter_clone(cmd,to_param,(to_name),1);
+    add_cmd_parameter_clone(cmd, to_param, to_name, 1);
   }
   else
   {
