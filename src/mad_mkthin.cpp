@@ -1080,7 +1080,7 @@ static element* create_bend_dipedge_element(element* thick_elem,const bool Entry
     for(unsigned int i=0; i<ARRSIZE(CheckBendParams); ++i) // copy other nontrivial parameters given in CheckParams from thick bend  -- only gets here with nontrivial e1 or e2     -- otherwise already returned NULL before
     {
       const char* parnam = CheckBendParams[i];
-      command_parameter* this_param = return_param(parnam, thick_elem);
+      command_parameter* this_param = return_param_recurse(parnam, thick_elem);
       double value      =my_get_int_or_double_value(thick_elem           ,parnam,found);
       double default_val=my_get_int_or_double_value(thick_elem->base_type,parnam,found);
       if(this_param || (found && fabs(value-default_val)>eps) ) // expression defined or non-trivial value
