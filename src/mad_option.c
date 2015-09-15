@@ -6,8 +6,7 @@ get_option(const char* str)
 /* This function is called by fortran to get option of a command */
   int i; // , k; not used
   mycpy(c_dum->c, str);
-  if (options != NULL
-      && (i = name_list_pos(c_dum->c, options->par_names)) > -1)
+  if (options != NULL && (i = name_list_pos(c_dum->c, options->par_names)) > -1) 
     return options->par->parameters[i]->double_value; // (k = not used
   else if (strcmp(c_dum->c, "warn") == 0) return init_warn;
   else return 0;

@@ -39,8 +39,11 @@ static void
 export_variable(struct variable* var, FILE* file, int noexpr)
   /* exports variable in mad-X format */
 {
-  c_dum->c[0] = '\0';
   if (var->status == 0) var->value = expression_value(var->expr, var->type);
+
+  // LD: warning, the clear must be after the expression eval which uses c_dum->c
+  //     ugly side effect...
+  c_dum->c[0] = '\0';
   if (var->val_type == 0) strcat(c_dum->c, "int ");
   if (var->type == 0) strcat(c_dum->c, "const ");
   strcat(c_dum->c, var->name);
@@ -68,8 +71,11 @@ export_var_8(struct variable* var, FILE* file)
   /* exports variable in mad-8 format */
 {
   int k;
-  *c_dum->c = '\0';
   if (var->status == 0) var->value = expression_value(var->expr, var->type);
+
+  // LD: warning, the clear must be after the expression eval which uses c_dum->c
+  //     ugly side effect...
+  c_dum->c[0] = '\0';
   if (var->type == 0)
   {
     strcat(c_dum->c, var->name);
