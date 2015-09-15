@@ -136,6 +136,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
  end SUBROUTINE twiss
 
 SUBROUTINE tmrefe(rt)
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -150,7 +151,7 @@ SUBROUTINE tmrefe(rt)
   double precision :: orbit0(6), orbit(6), tt(6,6,6)
 
   ithr_on = 0
-  ORBIT0 = 0.d0 ; ORBIT = 0.d0 ; TT = 0.d0 
+  ORBIT0 = zero ; ORBIT = zero ; TT = zero 
   !---- Get transfer matrix.
   call tmfrst(orbit0,orbit,.false.,.false.,rt,tt,eflag,0,0,ithr_on)
 
@@ -158,6 +159,7 @@ end SUBROUTINE tmrefe
 
 SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
   use twiss0fi
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -178,7 +180,7 @@ SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
   integer, parameter :: izero=0, ione=1
 
   ithr_on = izero
-  ORBIT0 = 0.d0 
+  ORBIT0 = zero
   !---- Get closed orbit and coupled transfer matrix.
   call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
   call set_option('bbd_flag ', ione)
@@ -6394,7 +6396,7 @@ end SUBROUTINE tmnll
 SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   use twtrrfi
   use twisslfi
-  use math_constfi, only : zero, one, two, three, ten3m, pi, twopi
+  use math_constfi, only : zero, one, two, three, ten3m, ten6p, pi, twopi
   use phys_constfi, only : clight
   implicit none
   !----------------------------------------------------------------------*
@@ -6476,7 +6478,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   fmap = .true.
   
   !---- Set-up some parameters
-  krf = 2 * pi * freq * 1d6/clight;
+  krf = 2 * pi * freq * ten6p/clight;
   vrf = bvk * volt * ten3m / ( pc * (one+deltap) );
   
   !---- Particle's coordinates
@@ -6814,7 +6816,7 @@ end subroutine tmfoc
 SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use twisslfi
-  use math_constfi, only : zero, one, two, three, half, ten3m, pi, twopi
+  use math_constfi, only : zero, one, two, three, half, quarter, ten3m, ten3p, ten6p, pi, twopi
   use phys_constfi, only : clight
   use matrices, only : EYE
   implicit none
@@ -6890,8 +6892,8 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   freq = node_value('freq ')
   rfl = node_value('lag ')
 
-  kn0l = rfv / pc / 1d3; ! MeV / 1d3 / GeV = rad
-  pn0  = half*half + rfl; ! pi/2 + rfl
+  kn0l = rfv / pc / ten3p; ! MeV / 1d3 / GeV = rad
+  pn0  = quarter + rfl; ! 2pi/4 + rfl
 
   n_ferr = node_fd_errors(f_errors);
  
@@ -6899,7 +6901,7 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   fmap = .true.
   
   !---- Set-up some parameters
-  krf = twopi * freq * 1d6/clight;
+  krf = twopi * freq * ten6p/clight;
 
   if (n_ferr .gt. 0) then
      call dcopy(f_errors, field, min(2, n_ferr))

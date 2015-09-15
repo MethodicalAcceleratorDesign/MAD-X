@@ -12,6 +12,7 @@ act_value(int pos, const struct name_list* chunks)
   double val = zero;
   struct element* el;
   struct command* cmd = NULL;
+
   if ((p = strstr(name, "->")) == NULL) /* variable */
   {
     if ((current_variable = find_variable(name, variable_list)) == NULL)
@@ -50,6 +51,7 @@ act_value(int pos, const struct name_list* chunks)
     else if ((cmd = find_command(comm, defined_commands)) != NULL)
       val = command_par_value(par, cmd);
   }
+
   return val;
 }
 

@@ -52,7 +52,7 @@ struct variable* find_variable(const char* name, struct var_list*);
 
 char*   make_string_variable(char* string);
 void    print_global(double delta);
-void    write_vars(struct var_list*, struct command_list*, FILE*);
+void    write_vars(struct var_list*, struct command_list*, FILE*, int noexpr);
 void    write_vars_8(struct var_list*, struct command_list*, FILE*);
 void    set_variable(const char* name, double* value);
 void    set_stringvar(const char* name, char* string);

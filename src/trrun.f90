@@ -107,7 +107,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   emittance_update = get_option('emittance_update ') .ne. 0
   virgin_state = get_value('run ', 'virgin_state ') .ne. zero
 
-  if (run .and. checkpnt_restart) then
+  if (run .and. bb_sxy_update) then
      open(90,file='checkpoint_restart.dat',form='unformatted',status='unknown')
   else if (dynap) then
      bb_sxy_update = .false.
@@ -591,7 +591,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   endif
 
   !--- Write checkpoint_restart data
-  if (checkpnt_restart) then
+  if (bb_sxy_update) then
      rewind 90
      write(90) jmax
      write(90) Ex_rms

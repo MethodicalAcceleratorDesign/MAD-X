@@ -83,9 +83,10 @@ module madx_ptc_twiss_module
        0,0,0,0,0,1 /), &
        (/6,6/) )
 
-  logical :: slice_magnets, center_magnets, deltap_dependency, isRing
+  logical     :: slice_magnets, center_magnets, deltap_dependency, isRing
 
   logical     :: resetBetaExtrema;
+  
 
   real(dp)    :: minBeta(3,3) ! jluc: to store extremas of Twiss functions (show-up in summary table
   real(dp)    :: maxBeta(3,3) ! jluc: to store extremas of Twiss functions (show-up in summary table)
@@ -136,12 +137,16 @@ contains
     n=3  ! 1 2 3 are tunes
 
     ndel=0
-    if(c_%ndpt/=0)  then
-       !       print*, "We are at the mode 6D + nocav"
-       ndel=1  !this is 6D without cavity (MADX icase=56)
+    if(c_%ndpt/=0 .and. isRing )  then
+      ! in case of icase=56 the closed solution in long is not searched
+       !print*, "We are at the mode 6D + nocav"
+       ndel=1  !this is 6D without cavity (MADX icase=56) for a ring
     endif
-
+    ! calculation of alpha, beta, gamma 
     J=0;
+    
+    !print*, "EqualTwiss nd2=",c_%nd2
+    
     do i=1,c_%nd2-2*ndel
        do jj=i,c_%nd2-2*ndel
           do k=1,c_%nd-ndel
@@ -591,13 +596,14 @@ contains
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !  INIT Y that is tracked          !
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !
     call initmap(dt,slice)
-   
+
     if (geterrorflag() /= 0) then
        !if arror occured then return
        return
     endif
-    
+
     
     !############################################################################
     !############################################################################
@@ -1314,8 +1320,8 @@ contains
 
       ioptfun=36
       call vector_to_table_curr(table_name, 're11 ', opt_fun(1), ioptfun)
-
-
+      
+      deltae = deltae * (1.0_dp + y(5).sub.'0')
 
       opt_fun(beta11)= tw%beta(1,1) * deltae ! beta11=1
       opt_fun(beta12)= tw%beta(1,2) * deltae
@@ -1509,6 +1515,8 @@ contains
          ! hence we reflect this in the formula from Lebedev
          ay=ky*tw%alfa(2,2) * deltaeValue -tw%alfa(2,1) * deltaeValue /ky;
          kxy2=kx*kx*ky*ky;
+         
+         
          if((abs(kx*kx-ky*ky).gt.TINY(ONE)).and.(abs(one-kxy2).gt.TINY(ONE))) then
             usqrt=kxy2*(one+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))
             if(usqrt.gt.TINY(ONE)) then
@@ -1555,9 +1563,15 @@ contains
                  (u*kappa+tw%alfa(1,2)*tw%alfa(2,2)))/(kappa*sqrt(tw%beta(1,2)*tw%beta(2,2)))
             r22 = -sqrt(tw%beta(1,1)/tw%beta(2,1))*(u*cosv1+tw%alfa(2,1)*sinv1)/kappa
          else
+            call fort_warn("ptc_twiss","Edwards-Teng beta function is set to regular beta because")
             call fort_warn("ptc_twiss","Argument of sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))) smaller than TINY")
             print*,"Argument of sqrt(kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))) is: ",&
                  kxy2*(1+(ax*ax-ay*ay)/(kx*kx-ky*ky)*(one-kxy2))
+                 
+            print*, "kx=",kx
+            print*, "ky=",ky
+            print*, "kxy2=",kxy2
+                 
             betx = tw%beta(1,1) * deltaeValue
             bety = tw%beta(2,2) * deltaeValue
             alfx = tw%alfa(1,1) * deltaeValue
@@ -2034,7 +2048,7 @@ contains
       x(6)=get_value('ptc_twiss ','t ')
       x(5)=get_value('ptc_twiss ','pt ')
       !frs plug deltap
-      if(icase.eq.5) x(5) = x(5) + dt
+      if(icase.eq.5 .or. icase.eq.56 ) x(5) = x(5) + dt
 
 
       if (getdebug() > 0 ) then
@@ -2052,8 +2066,11 @@ contains
 
 
       do i=1,c_%nd
-         be(i)=beta(i)
-         al(i)=alpha(i)
+         !be(i)=beta(i)
+         !al(i)=alpha(i)
+         be(i)= beta(i)/(1_dp+x(5))
+         al(i)=alpha(i)/(1_dp+x(5))
+         !print*, 'be ', be(i), ' beta', beta(i)
       enddo
 
       do i=1,4
@@ -2099,16 +2116,16 @@ contains
       y=x
 
       do i=1,c_%nd
-         !         print*, " ", i, beta(i)
-         !         call print(y(2*i-1),6)
-         !         call print(y(2*i  ),6)
+                  !print*, " Beta(", i,")=", beta(i)
+                  !call print(y(2*i-1),6)
+                  !call print(y(2*i  ),6)
 
          y(2*i-1)= x(2*i-1) + sqrt(be(i)) * morph((one.mono.(2*i-1))    )
          y(2*i)= x(2*i) + one/sqrt(be(i)) * &
               (morph(  (one.mono.(2*i)) )-(al(i)) * morph((one.mono.(2*i-1))))
 
-         !         call print(y(2*i-1),6)
-         !         call print(y(2*i  ),6)
+                  !call print(y(2*i-1),6)
+                  !call print(y(2*i  ),6)
       enddo
 
 
