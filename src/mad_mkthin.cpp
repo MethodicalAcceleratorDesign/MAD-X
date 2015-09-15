@@ -1963,29 +1963,25 @@ element* SeqElList::create_thick_slice(element* thick_elem,const int slice_type)
     if(entry_fl) { // bend entry,  remove/turn off exit parameters
       ParameterRemove("e2"   ,sliced_elem);
       ParameterRemove("h2"   ,sliced_elem);
-      SetParameterValue("kill_exi_fringe",sliced_elem,true,k_logical);
+      ParameterTurnOn("fint" ,sliced_elem);  // use fint
+      ParameterTurnOn("fintx",sliced_elem);
+      SetParameterValue("fintx",sliced_elem,0); // leave fintx, with value 0, otherwise taking fint
       ParameterTurnOn("kill_exi_fringe"  ,sliced_elem); // turn writing on
+      SetParameterValue("kill_exi_fringe",sliced_elem,true,k_logical);
     }
     else if(exit_fl) { // bend exit, remove entry parameters
       ParameterRemove("e1",sliced_elem);
       ParameterRemove("h1",sliced_elem);
       SetParameterValue("kill_ent_fringe",sliced_elem,true,k_logical);
       ParameterTurnOn("kill_ent_fringe"  ,sliced_elem); // turn writing on
-    }
-#if 0
-    // old code kept for Xchecking the logic
-    else if (exit_fl) {
-      ParameterRemove("e1",sliced_elem);
       int i_fint = name_list_pos("fint", sliced_elem->def->par_names);
       const bool fint_on =  (i_fint > -1) && sliced_elem->def->par_names->inform[i_fint];
       int i_fintx = name_list_pos("fintx", sliced_elem->def->par_names);
       const bool fintx_on =  (i_fintx > -1) && sliced_elem->def->par_names->inform[i_fintx];
       if(fintx_on) ParameterRemove("fint", sliced_elem); // fintx is on and will be used, just remove any fint on the exit
-      else if(fint_on) // not fintx, use fint as fintx for exit
-      {
+      else if(fint_on) { // no fintx, use fint as fintx for exit
         ParameterTurnOn("fintx",sliced_elem);
-        if(i_fintx) // should be there, just inform off
-        {
+        if(i_fintx) { // should be there, just inform off
           bool found=false;
           double fint_value=my_get_int_or_double_value(sliced_elem,"fint",found);
           SetParameterValue("fintx",sliced_elem,fint_value);
@@ -1994,7 +1990,6 @@ element* SeqElList::create_thick_slice(element* thick_elem,const int slice_type)
         ParameterRemove("fint",sliced_elem); // remove fint on exit
       }
     }
-#endif
     else Remove_All_Fringe_Field_Parameters(sliced_elem); // thick magnet body, remove fringe fields
   }
   if (verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ <<  my_dump_element(sliced_elem) << EOL;
@@ -2392,7 +2387,9 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
     }
   } // new ExitDipedge
 
-  if(EntryDipedge || ExitDipedge) Remove_All_Fringe_Field_Parameters(thick_elem); // remove from body what is now taken care of by dipedges
+  if(IsBend && MakeDipedge) Remove_All_Fringe_Field_Parameters(thick_elem); // remove what is now taken care of by dipedges
+  // LD: Old logic, changed by HB in 2015.06 to the test above.
+  // if(EntryDipedge || ExitDipedge) Remove_All_Fringe_Field_Parameters(thick_elem); // remove from body what is now taken care of by dipedges
 
   // prepare for slicing
   element *sliced_elem=NULL;                  // pointer to new sliced element
