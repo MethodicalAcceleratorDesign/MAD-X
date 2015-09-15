@@ -2319,7 +2319,7 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
     nslices=1;
   }
 
-  if(nslices<1 || (nslices==1 && ThickSLice) )
+  if(nslices<1 || (nslices==1 && ThickSLice && !IsBend) )
   {
     if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " " << thick_elem->name << " ThickSLice=" << ThickSLice << " nslices=" << nslices << " place thick_node " << thick_node->name << " without slicing" << '\n';
     add_node_at_end_of_sequence(thick_node,sliced_seq); // straight copy
