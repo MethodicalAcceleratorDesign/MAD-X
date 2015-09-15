@@ -1023,10 +1023,8 @@ label: CRABCAVITY, \=L=real, VOLT=real, LAG=real, FREQ=real, \\
                    \>LAGF=real, HARMON=integer;
 }
 
-%  BETRF=real, PG=real,
-%  FREQ=real, SHUNT=real, TFILL=real; 
-
-A {\tt CRABCAVITY} has five real attributes and seven integer attributes: 
+A {\tt CRABCAVITY} has five attributes describing its steady state 
+and seven attributes to describe dynamic behaviour: 
 
 \begin{madlist}
   \ttitem{L} The length of the cavity (default: 0 m) 
@@ -1051,7 +1049,7 @@ A {\tt CRABCAVITY} has five real attributes and seven integer attributes:
 %\item EPHASE: Value of the final crab RF phase [2pi] with respect to  nominal value (default: 0). 
 \end{madlist}
 
-The other attributes describe the time evolution of a {\tt CRABCAVITY} behavior:
+The other attributes describe the time evolution of a {\tt CRABCAVITY} behaviour:
 
 {\begin{madlist}  
   \ttitem{RV1} Number of initial turns with zero voltage (default: 0). 
