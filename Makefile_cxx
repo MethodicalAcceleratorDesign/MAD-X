@@ -34,6 +34,7 @@ ifeq ($(CXXDEP),)
 
 tpsa.o:         tpsa.h
 mad_mkthin.o:   madx.h
+mad_6track_name_mangler.o:	mad_6track_name_mangler.h
 
 endif
 

@@ -449,6 +449,7 @@ char command_def[] =
 "cavall        = [l, false, true], "
 "aperture      = [l, false, true], "
 "split         = [l, false, true], "
+"mangle        = [l, false, true], "
 "max_mult_ord  = [i, 11], "
 "radius        = [r, 1]; "
 " "

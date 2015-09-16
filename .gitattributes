@@ -800,6 +800,8 @@ src/gxx11ps.f90 -text
 src/ibsdb.f90 -text
 src/mad_6track.c -text
 src/mad_6track.h -text
+src/mad_6track_name_mangler.cpp -text
+src/mad_6track_name_mangler.h -text
 src/mad_aper.c -text
 src/mad_aper.h -text
 src/mad_api.c -text
