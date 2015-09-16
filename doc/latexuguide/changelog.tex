@@ -14,13 +14,39 @@ version number where the change applies as well as the SVN
 release number for the change. 
 
 \begin{madlist}
+  \ttitem{2015-Sep-15} version 5.03.00, r5405\\
+  Removed the precedence information in the \hyperref[sec:beam]{\tt BEAM} 
+  command between the longitudinal emittance ({\tt ET}) and beams sizes 
+  ({\tt SIGT} and {\tt SIGE}) since this is actually not implemented in the 
+  code.
+  
+  \ttitemn{2015-Sep-15} version 5.03.00, r5399\\
+  A new option {\tt NOEXPR} has been added to the \hyperref[sec:save]{\tt SAVE} 
+  command to allow saving sequences with only values and no expressions in 
+  variables and commands.
+  
+  \ttitemn{2015-Sep-04} version 5.03.00, r5380\\
+  Change of the trailing message printed on output that no longer 
+  mentions the version number and version architecture. 
+  The same information can already be found in the header message.
+
+  \ttitem{2015-Aug-31} version 5.03.00, r5367\\
+  {\tt TEAPOT} is now the default style for 
+  \hyperref[chap:makethin]{\tt MAKETHIN}. 
+  The previous default style that was used when the {\tt STYLE} 
+  attribute was not specified in the {\tt MAKETHIN} command 
+  has been given the name {\tt HYBRID} 
+  and can still be used with the explicit {\tt STYLE=hybrid} attribute. \\
+  {\bf All {\tt MAKETHIN} commands where {\tt STYLE} is not specified now
+  use the {\tt TEAPOT} style instead of the previously unnamed {\tt HYBRID} 
+  style}
+
   \ttitem{2015-Jul-15} version 5.02.06, r5336 \\
   corrected a typo in equation \ref{eq:field_components} 
   reported by Michael Severance (Stony Brook). 
   The $B_2$ factor of the expansion of the $B_x$ 
   field was reading $(xy - \frac{h^3}{6}y^3+\cdots)$ 
   and has been corrected to $(xy - \frac{h}{6}y^3+\cdots)$.
-
 
   \ttitem{2015-Jun-09} version 5.02.06, r5250\\
   added a guard against negative sequence length and negative 

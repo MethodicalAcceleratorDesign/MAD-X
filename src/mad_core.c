@@ -233,7 +233,7 @@ madx_finish(void)
 
     printf("\n"
            "  ++++++++++++++++++++++++++++++++++++++++++++\n");
-    printf("  + MAD-X %s (%s bit) finished normally +\n", version_name, version_arch);
+    printf("  +          MAD-X finished normally         +\n");
     printf("  ++++++++++++++++++++++++++++++++++++++++++++\n");
   }
 }

@@ -68,7 +68,7 @@ void    fill_par_var_list(struct el_list*, struct command_parameter*, struct var
 int     decode_par(struct in_cmd* cmd, int start, int number, int pos, int log);
 void    store_set(struct command*, int flag);
 void    dump_command_parameter(struct command_parameter*);
-void    export_comm_par(struct command_parameter*, char* string);
+void    export_comm_par(struct command_parameter*, char* string, int noexpr);
 void    grow_command_parameter_list(struct command_parameter_list*);
 void    print_command_parameter(struct command_parameter*);
 int     par_present(const char* par, struct command*, struct command_list*);

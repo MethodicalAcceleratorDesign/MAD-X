@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Darwin)      +
+  +     MAD-X 5.02.06  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.06.05 15:27:39      +
+  + Release   date: 2015.06.26               +
+  + Execution date: 2015.08.31 16:17:41      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! H. Burkhardt.  Updated for improved makethin select in summer 2005
 
@@ -63,8 +63,9 @@ qyref =        1.260064776 ;
 
 select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
 
-makethin,sequence=fivecell;
+makethin,sequence=fivecell,style=hybrid;
 
+makethin: style chosen : hybrid
 makethin: slicing sequence : fivecell
 makethin: slicing sequence : ins
 use,sequence=fivecell;      ! use the thin sequence
@@ -528,8 +529,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
 select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
 
-makethin,sequence=fivecell, minimizeparents=true, makedipedge=true, makeconsistent=true;
+makethin,sequence=fivecell, style=hybrid, minimizeparents=true, makedipedge=true, makeconsistent=true;
 
+makethin: style chosen : hybrid
 makethin: slicing sequence : fivecell
 makethin: slicing sequence : ins
 use,sequence=fivecell;      ! use the thin sequence
@@ -583,5 +585,5 @@ stop;
 10 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  + MAD-X 5.02.06 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

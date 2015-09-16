@@ -50,7 +50,7 @@ mb1: multipole;
  
     select,flag=makethin,clear;
     select,flag=makethin,pattern="q*",slice=100; 
-    makethin,sequence=cella;
+    makethin,sequence=cella,style=hybrid;
 
     use, period=cella;
   

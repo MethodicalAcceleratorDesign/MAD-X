@@ -36,21 +36,27 @@ dump_variable(struct variable* v)
 #endif
 
 static void
-export_variable(struct variable* var, FILE* file)
+export_variable(struct variable* var, FILE* file, int noexpr)
   /* exports variable in mad-X format */
 {
-  int k;
-  *c_dum->c = '\0';
   if (var->status == 0) var->value = expression_value(var->expr, var->type);
+
+  // LD: warning, the clear must be after the expression eval which uses c_dum->c
+  //     ugly side effect...
+  c_dum->c[0] = '\0';
   if (var->val_type == 0) strcat(c_dum->c, "int ");
   if (var->type == 0) strcat(c_dum->c, "const ");
   strcat(c_dum->c, var->name);
-  if (var->type < 2) strcat(c_dum->c, " = ");
-  else               strcat(c_dum->c, " := ");
-  if (var->expr != NULL) strcat(c_dum->c, var->expr->string);
+
+  if (var->type < 2 || noexpr) strcat(c_dum->c, " = ");
+  else                         strcat(c_dum->c, " := ");
+
+  if (var->expr != NULL && !noexpr) strcat(c_dum->c, var->expr->string);
   else if (var->val_type == 0)
   {
-    k = var->value; sprintf(c_join->c, "%d", k); strcat(c_dum->c, c_join->c);
+    int k = var->value;
+    sprintf(c_join->c, "%d", k);
+    strcat(c_dum->c, c_join->c);
   }
   else
   {
@@ -65,8 +71,11 @@ export_var_8(struct variable* var, FILE* file)
   /* exports variable in mad-8 format */
 {
   int k;
-  *c_dum->c = '\0';
   if (var->status == 0) var->value = expression_value(var->expr, var->type);
+
+  // LD: warning, the clear must be after the expression eval which uses c_dum->c
+  //     ugly side effect...
+  c_dum->c[0] = '\0';
   if (var->type == 0)
   {
     strcat(c_dum->c, var->name);
@@ -248,14 +257,11 @@ get_varstring(const char* name)
 }
 
 void
-write_vars(struct var_list* varl, struct command_list* cl, FILE* file)
+write_vars(struct var_list* varl, struct command_list* cl, FILE* file, int noexpr)
 {
-  int i;
-  for (i = 0; i < varl->curr; i++)
-  {
-    if (predef_var(varl->vars[i]) == 0
-        && pass_select_list(varl->vars[i]->name, cl))
-      export_variable(varl->vars[i], file);
+  for (int i = 0; i < varl->curr; i++) {
+    if (predef_var(varl->vars[i]) == 0 && pass_select_list(varl->vars[i]->name, cl))
+      export_variable(varl->vars[i], file, noexpr);
   }
 }
 

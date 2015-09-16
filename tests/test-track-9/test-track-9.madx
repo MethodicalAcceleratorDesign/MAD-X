@@ -28,7 +28,7 @@ twiss save;
 title "Carol Johnstone's FFAG ring lattice 6 to 20 GeV - apr07k";
 c314: line=(314*carol);
 use, period=c314;
-makethin, sequence=c314;
+makethin, sequence=c314,style=hybrid;
 use, period=c314;
 
 twiss;

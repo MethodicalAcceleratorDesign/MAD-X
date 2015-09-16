@@ -240,14 +240,25 @@ relevant information.
 
 %saves the sequence or sequences specified, with all variables and elements 
 %%%needed for their expansion, onto the file given with the FILE argument.
-
+\begin{5.02.06}
 \madbox{
 SAVE, \=SEQUENCE=string{,string}, FILE=filename, \\
       \>BEAM=logical, BARE=logical, MAD8=logical, \\
       \>NEWNAME=string;
 }
+\end{5.02.06}
+
+\begin{5.03.00}
+\madbox{
+    SAVE, \=SEQUENCE=string{,string}, FILE=filename, \\
+    \>BEAM=logical, BARE=logical, MAD8=logical, \\
+    \>NOEXPR=logical, NEWNAME=string;
+}
+\end{5.03.00}
+
 
 The parameters are defined as: 
+\begin{5.02.06}
 \begin{madlist}
 	\ttitem{SEQUENCE} lists the sequences to be saved, separated by commas. 
 	This attribute is optional and when omitted, all known 
@@ -273,6 +284,43 @@ The parameters are defined as:
 	\ttitem {NEWNAME} provides a name for the saved sequence, overriding the 
 	original name. (see \hyperref[sec:extract]{\tt EXTRACT} above)
 \end{madlist}
+\end{5.02.06}
+
+\begin{5.03.00}
+\begin{madlist}
+	\ttitem{SEQUENCE} lists the sequences to be saved, separated by commas. 
+	This attribute is optional and when omitted, all known 
+	sequences are saved. \\
+	However, because of internal inconsistencies that can result in spurious 
+	entries in the output file, the user is strongly advised to always provide 
+	explicitly the names of sequences to be saved.
+
+	\ttitem{FILE} the filename of the output file. (Default: "save")
+
+	\ttitem{BEAM} an optional flag to specify that all beams linked to the
+	specified sequences are saved at the top of the output file.
+
+	\ttitem{BARE} an optional flag to save only the sequence without the
+	element definitions nor beam information. This allows to re-read in a
+	sequence with might otherwise create a stop of the program. This is
+	particularly useful to turn a line into a sequence in order to further edit 
+	it with \hyperref[sec:seqedit]{\tt SEQEDIT}.
+
+	\ttitem{MAD8} an optional flag to request that the sequences should be  
+	saved using \madeight input format.
+
+	\ttitem{NOEXPR} an optional flag to save values of expressions 
+	instead of the expressions themselves: the expressions in commands 
+	and variables are expanded and evaluated before saving.
+	This option must be used with care because the exported values were not deeply
+	checked and the code that writes variables and commands is widely spread
+	in the internal structure. \\
+	This option does not apply only for the saving of sequences in \madeight format. 
+
+	\ttitem {NEWNAME} provides a name for the saved sequence, overriding the 
+	original name. (see \hyperref[sec:extract]{\tt EXTRACT} above)
+\end{madlist}
+\end{5.03.00}
 
 
 Any number of {\tt SELECT, FLAG=save, ...} commands may precede

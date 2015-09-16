@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Darwin)      +
+  +     MAD-X 5.02.06  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.06.19 11:54:39      +
+  + Release   date: 2015.06.26               +
+  + Execution date: 2015.09.16 13:48:12      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8
 
@@ -71,8 +71,9 @@ Beam, particle = proton, sequence=lhcb1, energy = 450.0,
 
 use,sequence=lhcb1;
 
-makethin,sequence=lhcb1;
+makethin,sequence=lhcb1,style=hybrid;
 
+makethin: style chosen : hybrid
 makethin: slicing sequence : lhcb1
 makethin: slicing sequence : ir11
 makethin: slicing sequence : ir2
@@ -707,7 +708,7 @@ PTC_CREATE_LAYOUT,model=2,method=6,nst=1;
 
 SELECT, flag=ptc_twiss, clear;
 
-SELECT, flag=ptc_twiss, column=name,s,beta11,mu1,mu2,mu3;
+SELECT, flag=ptc_twiss, column=name,s,beta11,beta22,mu1,mu2,mu3,x,px,y,py,t,pt;
 
 ptc_twiss,closed_orbit,icase=6,file="twiss_lhc",summary_file="summaryMomentumCompaction"; ! jluc
 
@@ -746,22 +747,22 @@ ptc_twiss,closed_orbit,icase=6,file="twiss_lhc",summary_file="summaryMomentumCom
       0.3100017602                  0                  0     0.007940998712 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-       9.999895864         623.413894        9.819037801        639.6105802 
+       9.999904668        623.4144429        9.819046446        639.6111434 
 
          beta11min          beta11max          beta12min          beta12max 
-       9.999895859        623.4138936    3.584978793e-09    3.803557392e-07 
+       9.999904664        623.4144426     3.58498195e-09    3.803560741e-07 
 
          beta13min          beta13max          beta21min          beta21max 
-   3.924820251e-09      0.04761845315    2.791547341e-09    3.686518886e-07 
+   3.924823707e-09      0.04761849507    2.791549799e-09    3.686522132e-07 
 
          beta22min          beta22max          beta23min          beta23max 
-       9.819037801        639.6105799    6.372980571e-10    0.0001425092705 
+       9.819046446         639.611143    6.372986182e-10     0.000142509396 
 
          beta31min          beta31max          beta32min          beta32max 
-   9.522701275e-09      0.04963269592    3.544334345e-07    6.257019655e-05 
+   9.522709659e-09      0.04963273962    3.544337466e-07    6.257025164e-05 
 
          beta33min          beta33max           disp1min           disp1max 
-       166.9904128        167.0945244       -2.819916294         2.81483998 
+       166.9905598        167.0946715       -2.819916294         2.81483998 
 
           disp2min           disp2max           disp3min           disp3max 
     -0.04768141665      0.04963725713      -0.1540980697       0.1071611045 
@@ -832,5 +833,5 @@ stop;
 1 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

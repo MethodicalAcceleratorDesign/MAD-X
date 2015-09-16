@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Darwin)      +
+  +     MAD-X 5.02.06  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.06.17 15:26:37      +
+  + Release   date: 2015.06.26               +
+  + Execution date: 2015.08.31 16:22:08      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! YIL13: Taken from tests_old/test_runs/track_example/
 
@@ -33,6 +33,7 @@ orbit:   3.729602E-24  4.775166E-40  0.000000E+00  0.000000E+00 -3.167331E-17  1
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+makethin: style chosen : hybrid
 makethin: slicing sequence : c314
 enter Twiss module
   
@@ -69,5 +70,5 @@ exit TRACK module
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  + MAD-X 5.02.06 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

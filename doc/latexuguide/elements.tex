@@ -59,17 +59,17 @@ distinguished only by the reference system used:
 
 Bendig magnets are defined by the statements: 
 \madbox{
-label: SBEND, \= L = real, ANGLE = real, TILT = real, \\
-              \> K0 = real, K1 = real, K2 = real, \\
-              \> E1 = real, E2 = real, FINT = real, FINTX = real,\\ 
-              \> HGAP = real, H1 = real, H2 = real,\\
-              \> THICK = logical;\\[5mm]
+label: SBEND, \= L=real, ANGLE=real, TILT=real, \\
+              \> K0=real, K1=real, K2=real, \\
+              \> E1=real, E2=real, FINT=real, FINTX=real,\\ 
+              \> HGAP=real, H1=real, H2=real,\\
+              \> THICK=logical;\\[5mm]
 
-label: RBEND, \> L = real, ANGLE = real, TILT = real, \\
-              \> K0 = real, K1 = real, K2 = real, \\
-              \> E1 = real, E2 = real, FINT = real, FINTX = real, \\
-              \> HGAP = real, H1 = real, H2 = real, \\
-              \> THICK = logical, \\
+label: RBEND, \> L=real, ANGLE=real, TILT=real, \\
+              \> K0=real, K1=real, K2=real, \\
+              \> E1=real, E2=real, FINT=real, FINTX=real, \\
+              \> HGAP=real, H1=real, H2=real, \\
+              \> THICK=logical, \\
               \> ADD\_ANGLE='array';
 }
 
@@ -274,8 +274,8 @@ A {\tt DIPEDGE} has zero length and five attributes.
 \label{sec:quadrupole}
 
 \madbox{
-label: QUADRUPOLE, \= L = real, K1 = real, K1S = real, TILT = real,\\
-                   \> THICK = logical;
+label: QUADRUPOLE, \= L=real, K1=real, K1S=real, TILT=real,\\
+                   \> THICK=logical;
 }
 
 
@@ -335,7 +335,7 @@ a quadrupole is a Cartesian coordinate system.
 \label{sec:sextupole}
 
 \madbox{
-label: SEXTUPOLE, L = real, K2 = real, K2S = real, TILT = real;
+label: SEXTUPOLE, L=real, K2=real, K2S=real, TILT=real;
 }
 
 A {\tt SEXTUPOLE} has four real attributes: 
@@ -376,7 +376,7 @@ A {\tt SEXTUPOLE} has four real attributes:
   positive $K_{2s}$ with positive ${\tt TILT} = \pi/6$.} 
 
 Example: 
-\madxmp{S: SEXTUPOLE, L = 0.4, K2 = 0.00134;}
+\madxmp{S: SEXTUPOLE, L=0.4, K2=0.00134;}
 
 {\bf Note:} Additional attributes can be given to sextupoles that
 are useful for \ptc and defined in \ref{sec:add_option_PTC}.
@@ -390,7 +390,7 @@ sextupole is a Cartesian coordinate system.
 \label{sec:octupole}
 
 \madbox{
-label: OCTUPOLE, L = real, K3 = real, K3S = real, TILT = real;
+label: OCTUPOLE, L=real, K3=real, K3S=real, TILT=real;
 }
 
 An {\tt OCTUPOLE} has four real attributes: 
@@ -433,7 +433,7 @@ An {\tt OCTUPOLE} has four real attributes:
   positive $K_{3S}$ with positive {\tt TILT=+pi/8}. } 
 
 Example: 
-\madxmp{O3: OCTUPOLE, L = 0.3, K3 = 0.543;}
+\madxmp{O3: OCTUPOLE, L=0.3, K3=0.543;}
 
 {\bf Note:} Additional attributes can be given to octupoles that
 are useful for \ptc and defined in \ref{sec:add_option_PTC}.
@@ -452,8 +452,8 @@ A {\tt MULTIPOLE} is a thin-lens magnet of arbitrary order, including a
 dipole component.
 
 \madbox{
-label: MULTIPOLE, \= LRAD = real, TILT = real, \\
-                  \> KNL = \{real, \ldots \}, KSL = \{real, \ldots \};
+label: MULTIPOLE, \= LRAD=real, TILT=real, \\
+                  \> KNL=\{real, \ldots \}, KSL=\{real, \ldots \};
 }
 
 \begin{madlist}
@@ -557,9 +557,9 @@ hvbend: MULTIPOLE, KSL=\{2.e-3\}, TILT=-pi/4;
 Solenoids can be defined in two forms, a thick and a thin version: 
 
 \madbox{
-xxxxxxxxxxxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxxx\= \kill
-label: SOLENOID, L = real,  \>KS = real;           \> ! thick version \\ 
-label: SOLENOID, L = 0,     \>KS = real, KSI=real; \> ! thin version 
+xxxxxxxxxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxx\= \kill
+label: SOLENOID, L=real,  \>KS=real;           \> ! thick version \\ 
+label: SOLENOID, L=0,     \>KS=real, KSI=real; \> ! thin version 
 }
 
 A {\tt SOLENOID} has three real attributes: 
@@ -597,7 +597,7 @@ solenoid is a Cartesian coordinate system.
 \label{sec:nllens}
 
 \madbox{
-label: NLLENS, KNLL = real, CNLL = real;
+label: NLLENS, KNLL=real, CNLL=real;
 }
 
 The {\tt NLLENS} element represents a thin nonlinear lens with the potential
@@ -710,10 +710,10 @@ Three types of magnetic closed orbit correctors are available:
 \end{madlist}
 
 \madbox{
-xxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxxxxxx\= \kill
-label: HKICKER, \>L = real, KICK = real, \>TILT = real; \\
-label: VKICKER, \>L = real, KICK = real, \>TILT = real; \\
-label: KICKER,  \>L = real, HKICK = real, \>VKICK = real, TILT = real;
+xxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxx\= \kill
+label: HKICKER, \>L=real, KICK=real,  \>TILT=real; \\
+label: VKICKER, \>L=real, KICK=real,  \>TILT=real; \\
+label: KICKER,  \>L=real, HKICK=real, \>VKICK=real, TILT=real;
 }
 
 {\bf The type {\tt KICKER} should not be used when an orbit corrector
@@ -838,9 +838,9 @@ at the documentation of the orbit corrector type
 \label{sec:rf_cavity}\label{sec:rfcavity}
 
 \madbox{
-label: RFCAVITY, \= L = real, VOLT = real, LAG = real, \\
-                 \> HARMON = integer, FREQ = real, \\    
-                 \> N\_BESSEL = integer, NO\_CAVITY\_TOTALPATH = logical;
+label: RFCAVITY, \= L=real, VOLT=real, LAG=real, \\
+                 \> HARMON=integer, FREQ=real, \\    
+                 \> N\_BESSEL=integer, NO\_CAVITY\_TOTALPATH=logical;
 }
 
 %  HARMON=integer, BETRF=real,PG=real,
@@ -913,16 +913,16 @@ cavity is a Cartesian coordinate system.
 
 \madbox{
 xxxxxxxxxxxxxxxxxxxxx\= \kill
-label: RFMULTIPOLE, \> VOLT = real, LAG = real, \\
-       \> HARMON = integer, FREQ = real, \\
-       \> LRAD = real, TILT = real, \\
-       \> KNL = \{real, \ldots \}, KSL = \{real, \ldots \}, \\
-       \> PNL = \{real, \ldots \}, PSL = \{real, \ldots \};
+label: RFMULTIPOLE, \> VOLT=real, LAG=real, \\
+       \> HARMON=integer, FREQ=real, \\
+       \> LRAD=real, TILT=real, \\
+       \> KNL=\{real, \ldots \}, KSL=\{real, \ldots \}, \\
+       \> PNL=\{real, \ldots \}, PSL=\{real, \ldots \};
 }
 
 A {\tt RFMULTIPOLE} is a thin-lens element which exhibits the properties
-of an RF-cavity and of a magnet of arbitrary order oscillating the
-a certain frequency:        
+of an RF-cavity and of a magnet of arbitrary order oscillating at
+a certain frequency.
 
 The effect of the cavity is {\tt delta(E) = VOLT * sin(2 pi * (LAG - HARMON *
 f0 t))}. 
@@ -1023,10 +1023,8 @@ label: CRABCAVITY, \=L=real, VOLT=real, LAG=real, FREQ=real, \\
                    \>LAGF=real, HARMON=integer;
 }
 
-%  BETRF=real, PG=real,
-%  FREQ=real, SHUNT=real, TFILL=real; 
-
-A {\tt CRABCAVITY} has five real attributes and seven integer attributes: 
+A {\tt CRABCAVITY} has five attributes describing its steady state 
+and seven attributes to describe dynamic behaviour: 
 
 \begin{madlist}
   \ttitem{L} The length of the cavity (default: 0 m) 
@@ -1051,7 +1049,7 @@ A {\tt CRABCAVITY} has five real attributes and seven integer attributes:
 %\item EPHASE: Value of the final crab RF phase [2pi] with respect to  nominal value (default: 0). 
 \end{madlist}
 
-The other attributes describe the time evolution of a {\tt CRABCAVITY} behavior:
+The other attributes describe the time evolution of a {\tt CRABCAVITY} behaviour:
 
 {\begin{madlist}  
   \ttitem{RV1} Number of initial turns with zero voltage (default: 0). 
@@ -1123,7 +1121,7 @@ cavity is a Cartesian coordinate system.
 \label{sec:separator}\label{sec:elseparator}
 
 \madbox{
-label: ELSEPARATOR, L = real, EX = real, EY = real, TILT = real;
+label: ELSEPARATOR, L=real, EX=real, EY=real, TILT=real;
 }
 
 An {\tt ELSEPARATOR} element has four real attributes: 
@@ -1170,9 +1168,9 @@ Three different types of beam position monitors are recognised:
 \end{madlist}
 
 \madbox{
-label: HMONITOR, \=   L = real; \\
-label: VMONITOR, \>   L = real; \\
-label: MONITOR,  \>   L = real;
+label: HMONITOR, \=   L=real; \\
+label: VMONITOR, \>   L=real; \\
+label: MONITOR,  \>   L=real;
 }
 
 A beam position monitor has one real attribute: 
@@ -1310,15 +1308,15 @@ The BEAMBEAM element may be inserted in a beam line to simulate a
 beam-beam interaction point:  
  
 \madbox{
-label: BEAMBEAM, \= SIGX = real, SIGY = real, \\
-                 \> XMA = real, YMA = real, CHARGE = real, \\
-                 \> BBSHAPE = int, WIDTH = real, BBDIR = int;
+label: BEAMBEAM, \= SIGX=real, SIGY=real, \\
+                 \> XMA=real, YMA=real, CHARGE=real, \\
+                 \> BBSHAPE=integer, WIDTH=real, BBDIR=integer;
 }
 
 The beam-beam interaction is represented by a four-dimensional
 interaction with a thin element, i.e. horizontal and vertical non-linear kicks.
-The code for this element has been contributed by J.M. Veuillen (1987)
-and extended by S. Sorge (2007).  
+The code for this element has been contributed by J.M.~Veuillen (1987)
+and extended by S.~Sorge (2007).  
  
 \begin{madlist}
    \ttitem{SIGX}
@@ -1476,9 +1474,10 @@ For the definition of the LHC head-on and parasitic beam-beam elements see
 \section{Arbitrary Matrix Element}
 
 \madbox{
-label: MATRIX, \= TYPE  \= = name, L = real, \= KICK1 = real,..., KICK6 = real, \\
-               \> RM11  \> = real,..., RM66  \> = real, \\
-               \> TM111 \> = real,..., TM666 \> = real;
+label: MATRIX, \= TYPE=string, L=real,  \\
+               \> KICK1=real,..., KICK6=real, \\
+               \> RM11=real, ..., RM66=real, \\
+               \> TM111=real, ..., TM666=real;
 }
 
 The MATRIX permits the definition of an arbitrary transfer matrix. 
@@ -1507,7 +1506,7 @@ The element {\tt YROTATION} rotates the
 vertical ({\tt y}) axis.
 
 \madbox{
-label: YROTATION, ANGLE = real;
+label: YROTATION, ANGLE=real;
 }
 
 {\tt YROTATION} has no effect on the beam, but it
@@ -1545,7 +1544,7 @@ The element {\tt SROTATION} rotates the
 longitudinal ({\tt s}) axis. 
 
 \madbox{
-label: SROTATION, ANGLE = real;
+label: SROTATION, ANGLE=real;
 }
 
 {\tt SROTATION} has no effect on the beam, but it causes the beam to be 
@@ -1607,8 +1606,8 @@ The element {\tt CHANGEREF} changes the
 by applying both translations and rotations.
 
 \madbox{
-label: CHANGEREF, \= PATCH\_ANG = {real, real, real}, \\
-                  \> PATCH\_TRANS = {real, real, real};
+label: CHANGEREF, \= PATCH\_ANG={real, real, real}, \\
+                  \> PATCH\_TRANS={real, real, real};
 }
 
 {\tt CHANGEREF} has no effect on the beam, but it causes the beam to be 

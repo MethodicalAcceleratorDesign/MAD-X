@@ -41,13 +41,13 @@ struct element* clone_element(struct element*);
 struct element* delete_element(struct element*);
 void            update_element(struct element*, struct command* update);
 void            dump_element(struct element*);
-void            export_el_def(struct element*, char* string);
+void            export_el_def(struct element*, char* string, int noexpr);
 void            export_el_def_8(struct element*, char* string);
 
 struct el_list* new_el_list(int length);
 struct el_list* delete_el_list(struct el_list*);
 struct element* find_element(const char* name, struct el_list*);
-void            write_elems(struct el_list*, struct command_list*, FILE*);
+void            write_elems(struct el_list*, struct command_list*, FILE*, int noexpr);
 void            write_elems_8(struct el_list*, struct command_list*, FILE*);
 
 struct node*    new_elem_node(struct element*, int occ_cnt);

@@ -2295,7 +2295,6 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
 200 continue
 210 continue
 240 continue
-370 continue
 440 continue
   call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   go to 500
@@ -2401,6 +2400,11 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
   call tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   go to 500
 
+  !---- Crab-Cavity.
+370 continue
+  call tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
+  go to 500
+  
   !---- User-defined elements.
 310 continue
 
@@ -7041,6 +7045,247 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   endif
 
 end SUBROUTINE tmrfmult
+
+SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
+
+  use twtrrfi
+  use twisslfi
+  implicit none
+
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     TRANSPORT map for thin crab cavity.                             *
+  !     Input:                                                           *
+  !     fsec      (logical) if true, return second order terms.          *
+  !     ftrk      (logical) if true, track orbit.                        *
+  !     Input/output:                                                    *
+  !     orbit(6)  (double)  closed orbit.                                *
+  !     Output:                                                          *
+  !     fmap      (logical) if true, element has a map.                  *
+  !     ek(6)     (double)  kick due to element.                         *
+  !     re(6,6)   (double)  transfer matrix.                             *
+  !     te(6,6,6) (double)  second-order terms.                          *
+  !----------------------------------------------------------------------*
+  logical fsec, ftrk, fmap, dorad
+  integer node_fd_errors
+
+  double precision orbit(6), orbit0(6), orbit00(6)
+  double precision P(6), ek(6), re(6,6), te(6,6,6)
+  double precision ed(6), rd(6,6), td(6,6,6)
+  double precision ek00(6), re00(6,6), te00(6,6,6)
+  double precision f_errors(0:maxferr)
+  double precision bvk, arad, el, elrad, rfac
+  double precision freq, harmon, krf, rfl, rfv, tilt, kn0l, pn0
+  double precision pc, beta, clight, deltap, gammas
+  double precision x, y, z, px, py, pt
+  double precision dpx, dpy, dpt
+
+  double precision field(2), field_cos(2), field_sin(2)
+  double precision cangle, sangle, dtmp, pi, twopi
+  complex*16 Cp0, Sp0, Cp1, Sp1
+  integer ii, jj, kk, n_ferr
+
+  double precision, external :: node_value, get_value, get_variable
+
+  double precision zero, one, two, three, quarter
+  parameter ( zero=0d0, one=1d0, two=2d0, three=3d0, quarter=0.25d0 )
+
+  complex*16 icomp
+  parameter ( icomp=(0d0,1d0) )
+  
+!!$  ! Strategy to implement BV-flag
+!!$  ! 0) apply bv-flag to voltage and multipole strengths (the inverse map has V = -V; K?N|S = -K?N|S)
+!!$  ! 1) track orbit(6) : just as in track: P o inverse(M) * P
+!!$  ! 2) ek, re, te : create the vector / matrix / tensor elements for 
+!!$  !    the inverse map (see 0), then apply transformation P to each element
+!!$
+!!$  !--- AL: RF-multipole
+
+    !---- Zero the arrays
+  call dzero(f_errors,maxferr+1)
+  call dzero(field,2)
+  call dzero(te, 216)
+
+  !---- drift matrix
+  call dzero(ed,6)
+  call m66one(rd)
+  call dzero(td,216)
+
+  call tmdrf(fsec,ftrk,orbit,fmap,el/2d0,ed,rd,td);
+    
+  !---- Read-in the parameters
+  clight=get_variable('clight ')
+  pi=get_variable('pi ')
+  twopi=pi*two
+
+  harmon = node_value('harmon ');
+  bvk = node_value('other_bv ')
+  elrad = node_value('lrad ')
+  deltap = get_value('probe ', 'deltap ')
+  dorad = get_value('probe ','radiate ') .ne. zero
+  arad = get_value('probe ','arad ')
+  gammas = get_value('probe ','gamma ')
+  beta = get_value('probe ','beta ')
+  pc = get_value('probe ','pc ')
+  tilt = node_value('tilt ')
+
+  rfv = bvk * node_value('volt ')
+  freq = node_value('freq ')
+  rfl = node_value('lag ')
+
+  KN0L = rfv / pc / 1d3; ! MeV / 1d3 / GeV = rad
+  PN0 = quarter + rfl; ! pi/2 + rfl
+
+  n_ferr = node_fd_errors(f_errors);
+ 
+  rfac = zero
+  fmap = .true.
+  
+  !---- Set-up some parameters
+  krf = 2*pi*freq*1d6/clight;
+
+  if (n_ferr.gt.0) then
+     call dcopy(f_errors, field, min(2, n_ferr))
+  endif
+  
+  !---- Particle's coordinates
+  if (ftrk) then
+    ! apply the transformation P: diag(-1, 1, 1, -1, -1, 1) * X
+    x  = orbit(1) * bvk;
+    px = orbit(2);
+    y  = orbit(3);
+    py = orbit(4) * bvk;
+    z  = orbit(5) * bvk;
+    pt = orbit(6);
+  else
+    x  = zero;
+    px = zero;
+    y  = zero;
+    py = zero;
+    z  = zero;
+    pt = zero;
+  endif
+  
+  !---- Vector with strengths + field errors
+  field_cos(1) = bvk * (kn0l * cos(PN0 * twopi - krf * z) + field(1)) / (one + deltap);
+  field_sin(1) = bvk * (kn0l * sin(PN0 * twopi - krf * z))            / (one + deltap);
+  field_cos(2) = 0.0; 
+  field_sin(2) = 0.0;
+  if (tilt.ne.zero)  then
+     cangle = cos(-tilt);
+     sangle = sin(-tilt);
+     dtmp         = field_cos(1) * cangle;
+     field_cos(2) = field_cos(1) * sangle;
+     field_cos(1) = dtmp;
+     dtmp         = field_sin(1) * cangle - field_sin(2) * sangle;
+     field_sin(2) = field_sin(1) * sangle + field_sin(2) * cangle;
+     field_sin(1) = dtmp;
+  endif
+  
+  !---- Prepare to calculate the kick and the matrix elements
+  Cp0 = field_cos(1)+icomp*field_cos(2);
+  Sp0 = field_sin(1)+icomp*field_sin(2);
+  Cp1 = Cp0 * (x+icomp*y);
+  Sp1 = Sp0 * (x+icomp*y);
+  
+  !---- Track orbit.
+  if (ftrk) then
+     !---- The kick
+     dpx = -REAL(Cp0);
+     dpy = AIMAG(Cp0);
+     dpt = - krf * REAL(Sp1);
+     
+     !---- Radiation effects at entrance.
+     if (dorad  .and.  elrad .ne. zero) then
+        rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
+        px = px - rfac * (one + pt) * px
+        py = py - rfac * (one + pt) * py
+        pt = pt - rfac * (one + pt) ** 2
+     endif
+     
+     !---- Apply the kick
+     px = px + dpx
+     py = py + dpy
+     pt = pt + dpt
+  
+     !---- Radiation effects at exit.
+     if (dorad  .and.  elrad .ne. zero) then
+        px = px - rfac * (one + pt) * px
+        py = py - rfac * (one + pt) * py
+        pt = pt - rfac * (one + pt) ** 2
+     endif
+
+    ! apply the transformation P: diag(-1, 1, 1, -1, -1, 1) * X
+    orbit(1) = x  * bvk;
+    orbit(2) = px;
+    orbit(3) = y;
+    orbit(4) = py * bvk;
+    orbit(5) = z  * bvk;
+    orbit(6) = pt;
+
+  endif
+  
+  !---- Element Kick
+  ek(2) = -REAL(Cp0);
+  ek(4) = AIMAG(Cp0);
+  ek(6) = -krf * REAL(Sp1);
+
+  !---- First-order terms
+  re(2,5) = -krf * REAL(Sp0);
+  re(4,5) =  krf * AIMAG(Sp0);
+  re(6,1) =  re(2,5);
+  re(6,3) =  re(4,5);
+  re(6,5) = krf * krf * REAL(Cp1);
+  
+  !---- Second-order terms
+  if (fsec) then
+     te(2,5,5) = 0.5 * krf * krf * REAL(Cp0);
+     te(4,5,5) = 0.5 * (-krf * krf * AIMAG(Cp0));
+     te(6,5,5) = 0.5 * (-krf + krf * krf * krf * REAL(Sp1));
+  endif
+
+  ! Apply P tranformation to each index
+  if (bvk .eq. -one) then
+    P(1) = -one;
+    P(2) =  one;
+    P(3) =  one;
+    P(4) = -one;
+    P(5) = -one;
+    P(6) =  one;
+    do ii=1,6
+      do jj=1,6
+        do kk=1,6
+          te(ii,jj,kk) = te(ii,jj,kk) * P(ii) * P(jj) * P(kk);
+        enddo
+        re(ii,jj) = re(ii,jj) * P(ii) * P(jj);
+      enddo
+      ek(ii) = ek(ii) * P(ii);
+    enddo
+  endif
+
+  ! Add half a drift space before and after the Crab kick
+  call tmcat1(fsec,ed,rd,td,ek,re,te,ek,re,te);
+  call tmdrf(fsec,ftrk,orbit,fmap,el/2d0,ed,rd,td);
+  call tmcat1(fsec,ek,re,te,ed,rd,td,ek,re,te);
+  
+  !---- centre option
+  if(centre_cptk.or.centre_bttk) then
+     call dcopy(orbit,orbit00,6)
+     call dcopy(ek,ek00,6)
+     call dcopy(re,re00,36)
+     call dcopy(te,te00,216)
+     if(centre_cptk) then
+        call dcopy(orbit,orbit0,6)
+        call twcptk(re,orbit0)
+     endif
+     if(centre_bttk) call twbttk(re,te)
+     call dcopy(orbit00,orbit,6)
+     call dcopy(ek00,ek,6)
+     call dcopy(re00,re,36)
+     call dcopy(te00,te,216)
+  endif
+
+end SUBROUTINE tmcrab
 
 SUBROUTINE calcsyncint(rhoinv,blen,k1,e1,e2,betxi,alfxi,dxi,dpxi,I)
   implicit none

@@ -364,6 +364,7 @@ char command_def[] =
 "bare     = [l, false, true],"
 "beam     = [l, false, true],"
 "mad8     = [l, false, true], "
+"noexpr   = [l, false, true], "
 "file     = [s, save, save], "
 "newname  = [s, dummy, dummy]; "
 " "

@@ -16,7 +16,7 @@ twiss,file=twiss_lep;
 ! NOTE: would be better to match a thin sequence
 ! with less slices
 select, flag=makethin, class=quadrupole, slice=20;
-makethin, sequence=lep;
+makethin, sequence=lep,style=hybrid;
 use,sequence=lep;
 
 ! check table again

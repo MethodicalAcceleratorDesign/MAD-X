@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.01  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.04.25      +
-  + Execution Time Stamp: 11.06.14 13.59.53 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.06  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2015.06.26               +
+  + Execution date: 2015.08.31 16:19:59      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 ! Based on : ../../examples/twiss/job.sample.thin.new.madx
 
 
@@ -23,8 +23,10 @@ option, info, -warn, -echo;
 
  option, info, warn, -echo;
 
+makethin: style chosen : hybrid
 ++++++ warning: makethin selection without active sequence, ignored
 makethin: slicing sequence : lhcb1
+makethin: style chosen : hybrid
 ++++++ warning: makethin selection without active sequence, ignored
 makethin: slicing sequence : lhcb2
 
@@ -84,7 +86,7 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 26658.883200    -0.000000     0.000000     0.000000 
 
           q1          dq1      betxmax        dxmax 
-   66.732395     0.000000 43787.418274     4.835540 
+   66.732395     0.000000 43787.418273     4.835540 
 
        dxrms       xcomax       xcorms           q2 
     1.645209     0.000000     0.000000    61.702916 
@@ -128,13 +130,13 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 26658.883200    -0.000000     0.000000     0.000000 
 
           q1          dq1      betxmax        dxmax 
-   66.323118     0.000000 42969.954045     9.494739 
+   66.323118     0.000000 42969.954046     9.494739 
 
        dxrms       xcomax       xcorms           q2 
     2.008653     0.000000     0.000000    61.511088 
 
          dq2      betymax        dymax        dyrms 
-    0.000000 74690.599398     0.000000     0.000000 
+    0.000000 74690.599397     0.000000     0.000000 
 
       ycomax       ycorms       deltap      synch_1 
     0.000000     0.000000     0.000000     0.000000 
@@ -150,5 +152,5 @@ stop;
 2 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.01 (64 bit) finished normally +
+  + MAD-X 5.02.06 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

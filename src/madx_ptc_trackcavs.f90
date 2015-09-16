@@ -13,7 +13,7 @@ module madx_ptc_trackline_module
   real(dp),allocatable :: Dismom(:,:)    ! <xnormal_(2*i-1)**(2j)>= dismon(i,j)*I_i**j
   logical(lp)          :: onetable
 
-  character(1000),private   :: whymsg
+  character(1200),private   :: whymsg
   
 
   !********************************************************************************************
@@ -125,11 +125,11 @@ contains
     endif
 
     if (getdebug() > 0) then
-       print *, '###################################################'
-       print *, '###################################################'
-       print *, '######         TRACKING WITH PTC         ##########'
-       print *, '###################################################'
-       print *, '###################################################'
+       print *, '#######################################################'
+       print *, '#######################################################'
+       print *, '######         TRACKING WITH PTC every step  ##########'
+       print *, '#######################################################'
+       print *, '#######################################################'
     endif
 
     if (rplot) then
@@ -278,16 +278,19 @@ contains
        !       print*,"Name of the last element ", my_ring%end%mag%name
        !       print*,"Position of the last element ", my_ring%end%T2%pos
 
-       do ni=1, my_ring%end%T2%pos
+       do ni=1, my_ring%end%T2%pos-1
 
           if ( .not. associated(CURR_SLICE%PARENT_FIBRE, PREV_SLICE%PARENT_FIBRE) ) then
              e = e + 1
              p=>p%next
           endif
 
-
-          !          call track_beam(my_ring,TheBeam,getintstate(), pos1=ni, pos2=ni+1)
           call track_beam(my_ring,TheBeam,getintstate(), node1=ni, node2=ni+1)
+
+          !if(associated(CURR_SLICE%PARENT_FIBRE%MAG%p%aperture)) then
+          !  print*, 'Checking AP', p%mag%name
+          !  CALL CHECK_APERTURE(p%mag%p%APERTURE,TheBeam%X(1,1:6))
+          !endif
           
           if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
                 write(whymsg,*) 'DA got unstable. ', &
@@ -296,12 +299,15 @@ contains
 	            ', element no.:', e,    & 
 	            ', int. step: ',ni, &
 	            ', el. name:', p%MAG%name, &
-	            ', PTC msg: ',messagelost
+	            ', PTC msg: ',messagelost(1:LEN_TRIM(messagelost))
+                
                 call fort_warn('ptc_trackline: ',whymsg)
                 call seterrorflag(10,"ptc_trackline ",whymsg);
+                
+                
                 goto 101 !one of the tracks has problem, we can not contine
                 
-             endif
+           endif
           
           
           pathlegth = curr_slice%s(3)
@@ -309,8 +315,11 @@ contains
           if (getdebug() > 2 ) then
              !write(6,*) e, 'l=',pathlegth
              n=1! print only first one for debug
-             write(6,'(a7,1x,i4,1x,a5,1x,i3,1x,a4,1x,f9.2,1x ,6(f12.8,1x))') &
-                     'Track ',n,'Elem ',e,'S =',pathlegth,TheBeam%X(n,1:6)
+             write(6,'(a7,1x,i4,1x,a7,1x,i4,1x,a5,1x,i3,1x,a16,1x,a4,1x,f9.2,1x ,6(f12.8,1x))') &
+                     'Step  ',ni, &
+	 'Track ',n, &
+	 'Elem ',e, p%MAG%name,&
+	 'S =',pathlegth, TheBeam%X(n,1:6)
           endif
           
           isstart= (t.eq.1).and.(e.eq.1)
@@ -322,7 +331,7 @@ contains
                
                if (TheBeam%U(n)) then
                  if (getdebug() > 2 ) then
-                   print*, "Particle ", n , " alread lost at point ", ni
+                   print*, "Particle ", n , " already lost at point ", ni
                  endif
                  cycle
                endif
@@ -692,15 +701,24 @@ contains
              !write(6,'(a10,1x,i8,1x,6(f12.9,1x))') 'Track ',n,x
 
              call track(my_ring,x,e,e+1,getintstate())
+             
+             
              if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+                
+                
                 write(whymsg,*) 'DA got unstable. ', &
                                 'track no.: ',n,      &
                                 ', turn no.:',t,         &
 	            ', element no.:', e,    & 
 	            ', el. name:', p%MAG%name, &
-	            ', PTC msg: ',messagelost
-                call fort_warn('ptc_trackline: ',whymsg)
+	            ', PTC msg: ',messagelost(1:LEN_TRIM(messagelost))
+                
+                
+                call fort_warn('ptc_trackline: ',whymsg(1:LEN_TRIM(whymsg)))
+                whymsg(LEN_TRIM(whymsg)+1:LEN_TRIM(whymsg)+1) = char(0)
                 call seterrorflag(10,"ptc_trackline ",whymsg);
+                
+                
                 goto 100 !for the time being lets try next particle, 
                          !but most probably we will need to stop tracking and reinit 
 	     !goto 101
@@ -739,16 +757,27 @@ contains
                 call putintracktable(n,t,observedelements(e),x(1), x(2) , x(3), x(4) , x(6), x(5), pathlegth, p0,intstate%TOTALPATH)
              endif
              !fields in the table         "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e"
-
+             
+             
+             ! currently (Sept 2015) it is dead code because this flag relies on  check_stable
+             ! that we check independently above
              call produce_aperture_flag(apertflag)
              if (apertflag/=0) then
                 print *, 'Particle out of aperture!'
 
                 call ANALYSE_APERTURE_FLAG(apertflag,why)
-                Write(6,*) "ptc_trackline: APERTURE error for element: ",e," name: ",p%MAG%name
-                Write(6,*) "Message: ",messagelost
-                write(whymsg,*) 'APERTURE error: ',why
-                call fort_warn('ptc_twiss: ',whymsg)
+                
+                write(whymsg,*) 'ptc_trackline: APERTURE error ', &
+                'track no.: ',n,      &
+                ', turn no.:',t,         &
+                ', element no.:', e,    & 
+                ', el. name:', p%MAG%name, &
+                ', APERTURE error: ',why, &
+                ', PTC msg: ',messagelost(1:LEN_TRIM(messagelost))
+                
+                
+                call fort_warn('ptc_twiss: ',whymsg(1:LEN_TRIM(whymsg)))
+                whymsg(LEN_TRIM(whymsg)+1:LEN_TRIM(whymsg)+1) = char(0)
                 call seterrorflag(10,"ptc_twiss: ",whymsg);
                 
                 goto 100 !take next track

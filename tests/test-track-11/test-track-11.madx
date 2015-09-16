@@ -8,7 +8,7 @@ Option,  -warn,-info, -echo;
 !---------------------------------------------------------------;
 !           CALL IN SELECTION, MACRO's, SEQUENCE, BEAM, NRJ and OPTICS FILES;
 !---------------------------------------------------------------;
-call,file="macro.madx";        !Call some macro facilities
+call,file="input/macro.madx";        !Call some macro facilities
 
 !Call sequence V6.503 with finite length for the TAN
 REAL CONST l.TAN   = 3.7  ;REAL CONST l.TANAL = l.TAN;
@@ -17,7 +17,7 @@ REAL CONST l.TCT   = 1.0;REAL CONST l.TCTH  = l.TCT;REAL CONST l.TCTVA = l.TCT;
 call,file="../share/LHC/LHCRing/V6.503/V6.5.seq";
 
 !Install new triplet, D1 & corrector package
-call,file="slhc_sequence.madx";
+call,file="input/slhc_sequence.madx";
 
 
 
@@ -30,7 +30,7 @@ exec,crab_remove(B);
 exec,crab_remove(C);
 
 
-call, file="crab_install_all.madx";
+call, file="input/crab_install_all.madx";
 option, warn;
 
 on_crab1 := 1;
@@ -247,11 +247,6 @@ b4:=1760.*6./abrho/3.;
 if (NRJ<4999.9999) {VRF400:=8. ;LAGRF400.B1=0.5;LAGRF400.B2=0.;};
 if (NRJ>5000.0000) {VRF400:=16.;LAGRF400.B1=0.5;LAGRF400.B2=0.;};
 twiss;
-!emit;
- value, table(summ,q1);
- value, table(summ,q2);
- value, table(summ,dq1);
- value, table(summ,dq2);
 
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 !                 YIL inserted tracking

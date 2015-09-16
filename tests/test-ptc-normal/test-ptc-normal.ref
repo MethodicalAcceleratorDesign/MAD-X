@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Darwin)      +
+  +     MAD-X 5.02.06  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.06.01 14:24:12      +
+  + Release   date: 2015.06.26               +
+  + Execution date: 2015.08.31 16:25:50      +
   ++++++++++++++++++++++++++++++++++++++++++++
    !                     FODO for MAD-X
 
@@ -142,8 +142,9 @@ parameter: n1min   double value:                 -1
 
     select,flag=makethin,pattern="q*",slice=100; 
 
-    makethin,sequence=cella;
+    makethin,sequence=cella,style=hybrid;
 
+makethin: style chosen : hybrid
 makethin: slicing sequence : cella
 
 
@@ -312,5 +313,5 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  + MAD-X 5.02.06 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++
