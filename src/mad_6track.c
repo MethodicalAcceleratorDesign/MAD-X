@@ -491,9 +491,6 @@ static double ref_def = 0.017;
 
 static FILE *f2, *f3, *f3aux, *f3aper, *f8, *f16, *f34;
 
-static NameMangler_t *name_mangler;
-static char name_mangler_buffer[255];
-
 // private functions
 
 static void
@@ -1143,12 +1140,12 @@ convert_madx_to_c6t(struct node* p)
   struct command_parameter *kn_param = NULL,*ks_param = NULL,*aper_param = NULL;
   struct command_parameter *pn_param = NULL,*ps_param = NULL;
   struct c6t_element* c6t_elem = NULL;
-  char t_name[255];
+  char t_name[255]; /* minimum NAME_MANGLER_BASE + NAME_MANGLER_SUFFIX = 16 characters + 1*/
   int i,j;
   char* cp;
   int index=-1;
 
-  strcpy(t_name, NameMangler_mangle(name_mangler, p->name, name_mangler_buffer));
+  NameMangler_mangle(p->name, t_name);
   if ((cp = strchr(t_name, ':')) != NULL) *cp = '\0';
   if ((strcmp(p->base_name,"rbend") == 0)      ||
       (strcmp(p->base_name,"sbend") == 0)      ||
@@ -3364,36 +3361,30 @@ c6t_init(void)
 static void
 process_c6t(void)  /* steering routine */
 {
-  if ((name_mangler = NameMangler_init())) {
-    read_sequ();   /* from db read sequence, store all elements */
-    add_c6t_drifts();
-    conv_elem();   /* tag elements */
-    split();       /* convert to thin */
-    multi_loop();
-    supp_elem();   /* suppress/replace zero force, most markers,
-		      and possibly some cavities */
-    concat_drifts();
-    get_multi_refs();  /* get multipole flag */
-    equiv_elem();  /* find first equivalent for all elements */
-    post_multipoles();  /* give errors to all equiv. multipoles */
-    block_it();    /* group linear elements into blocks */
-    assign_att();  /* assign attributes + errors to all single elements */
-    mod_errors();  /* flip normal components */
-    
-    write_all_el();
-    write_blocks();
-    write_struct();
-    write_f16_errors();
-    write_f34_special();
-    write_f3_aux();
-    write_f3_matrix();
-    write_f3_aper();
-    write_f8_errors();
-    NameMangler_free(name_mangler);
-  } else {
-    puts("+++ fatal - cannot initialize name mangler\n");
-    exit(1);
-  }
+  read_sequ();   /* from db read sequence, store all elements */
+  add_c6t_drifts();
+  conv_elem();   /* tag elements */
+  split();       /* convert to thin */
+  multi_loop();
+  supp_elem();   /* suppress/replace zero force, most markers,
+		    and possibly some cavities */
+  concat_drifts();
+  get_multi_refs();  /* get multipole flag */
+  equiv_elem();  /* find first equivalent for all elements */
+  post_multipoles();  /* give errors to all equiv. multipoles */
+  block_it();    /* group linear elements into blocks */
+  assign_att();  /* assign attributes + errors to all single elements */
+  mod_errors();  /* flip normal components */
+  
+  write_all_el();
+  write_blocks();
+  write_struct();
+  write_f16_errors();
+  write_f34_special();
+  write_f3_aux();
+  write_f3_matrix();
+  write_f3_aper();
+  write_f8_errors();
 }
 
 // public interface

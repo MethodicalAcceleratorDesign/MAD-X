@@ -7,115 +7,95 @@
 
 #include "mad_6track_name_mangler.h"
 
-class NameMangler {
+static std::map<std::string, std::vector<std::string> > IDs; // the IDs, and their suffixes
 
-  std::map<std::string, std::vector<std::string> > IDs; // the IDs, and their suffixes
-
-  static std::string index2suffix(int index )
-  {
-    const int base = 'z' - 'a' + 1 + 'Z' - 'A' + 1;
-    std::string suffix;
-    for (int i=0; i < NAME_MANGLER_SUFFIX; i++) {
-      int digit;
-      if (index>0) {
-	digit = index % base;
-	index /= base;
-      } else {
-	digit = 0;
-      }
-      char digit_char = digit < (base>>1) ? ('a' + digit) : ('A' + digit - (base>>1));
-      suffix = digit_char + suffix;
-    }
+static std::string index2suffix(int index )
+{
+  const int base = 'z' - 'a' + 1 + 'Z' - 'A' + 1;
+  std::string suffix;
+  for (int i=0; i < NAME_MANGLER_SUFFIX; i++) {
+    int digit;
     if (index>0) {
-      std::cerr << "error: maximum number of IDs reached!\n";
+      digit = index % base;
+      index /= base;
+    } else {
+      digit = 0;
     }
-    return suffix;
+    char digit_char = digit < (base>>1) ? ('a' + digit) : ('A' + digit - (base>>1));
+    suffix = digit_char + suffix;
   }
+  if (index>0) {
+    std::cerr << "error: maximum number of IDs reached!\n";
+  }
+  return suffix;
+}
 
-  static int suffix2index(const std::string &suffix )
-  {
-    if (suffix.length()>NAME_MANGLER_SUFFIX) {
+static int suffix2index(const std::string &suffix )
+{
+  if (suffix.length()>NAME_MANGLER_SUFFIX) {
+    return -1;
+  }
+  const int base = 'z' - 'a' + 1 + 'Z' - 'A' + 1;
+  int index = 0;
+  for (int i=0; i < NAME_MANGLER_SUFFIX; i++) {
+    int digit;
+    if (suffix[i]>='a' && suffix[i]<='z') {
+      digit = suffix[i] - 'a';
+    } else if (suffix[i]>='A' && suffix[i]<='Z') {
+      digit = suffix[i] - 'A' + (base>>1);
+    } else {
       return -1;
     }
-    const int base = 'z' - 'a' + 1 + 'Z' - 'A' + 1;
-    int index = 0;
-    for (int i=0; i < NAME_MANGLER_SUFFIX; i++) {
-      int digit;
-      if (suffix[i]>='a' && suffix[i]<='z') {
-	digit = suffix[i] - 'a';
-      } else if (suffix[i]>='A' && suffix[i]<='Z') {
-	digit = suffix[i] - 'A' + (base>>1);
-      } else {
-	return -1;
-      }
-      index *= base;
-      index += digit;
-    }
-    return index;
+    index *= base;
+    index += digit;
   }
+  return index;
+}
   
-public:
-  
-  std::string mangle(const std::string &str )
-  {
-    if (str.length()<NAME_MANGLER_BASE+NAME_MANGLER_SUFFIX)
-      return str;
-
-    std::string base = str.substr(0, NAME_MANGLER_BASE);
-    std::string ending = str.substr(NAME_MANGLER_BASE);
-    std::string suffix;
-    
-    std::vector<std::string> &endings = IDs[base];
-    std::vector<std::string>::iterator ending_itr = std::find(endings.begin(), endings.end(), ending);
-    if (ending_itr == endings.end()) {
-      suffix = index2suffix(endings.size());
-      endings.push_back(ending);
-    } else {
-      suffix = index2suffix(ending_itr - endings.begin());
-    }
-    return base + suffix;
-  }
-
-  std::string demangle(const std::string &str )
-  {
-    if (str.length()<NAME_MANGLER_BASE+NAME_MANGLER_SUFFIX)
-      return str;
-
-    std::string base = str.substr(0, NAME_MANGLER_BASE);
-    std::string suffix = str.substr(NAME_MANGLER_BASE, NAME_MANGLER_SUFFIX);
-    std::vector<std::string> &endings = IDs[base];
-    int index = suffix2index(suffix);
-    if (index == -1 || index >= int(endings.size())) {
-      std::cerr << "error: incorrect element name '" << str << "'" << std::endl;
-      return std::string();
-    }
-    return base + endings[index];
-  }
-  
-};
-
-NameMangler_t *NameMangler_init()
+static std::string mangle(const std::string &str )
 {
-  return (void *)new class NameMangler;
+  if (str.length()<NAME_MANGLER_BASE+NAME_MANGLER_SUFFIX)
+    return str;
+  
+  std::string base = str.substr(0, NAME_MANGLER_BASE);
+  std::string ending = str.substr(NAME_MANGLER_BASE);
+  std::string suffix;
+  
+  std::vector<std::string> &endings = IDs[base];
+  std::vector<std::string>::iterator ending_itr = std::find(endings.begin(), endings.end(), ending);
+  if (ending_itr == endings.end()) {
+    suffix = index2suffix(endings.size());
+    endings.push_back(ending);
+  } else {
+    suffix = index2suffix(ending_itr - endings.begin());
+  }
+  return base + suffix;
 }
 
-void NameMangler_free(NameMangler_t *mangler )
+static std::string demangle(const std::string &str )
 {
-  delete reinterpret_cast<class NameMangler*>(mangler);
+  if (str.length()<NAME_MANGLER_BASE+NAME_MANGLER_SUFFIX)
+    return str;
+
+  std::string base = str.substr(0, NAME_MANGLER_BASE);
+  std::string suffix = str.substr(NAME_MANGLER_BASE, NAME_MANGLER_SUFFIX);
+  std::vector<std::string> &endings = IDs[base];
+  int index = suffix2index(suffix);
+  if (index == -1 || index >= int(endings.size())) {
+    std::cerr << "error: incorrect element name '" << str << "'" << std::endl;
+    return std::string();
+  }
+  return base + endings[index];
 }
 
-const char *NameMangler_mangle(NameMangler_t *mangler, const char *str, char *dest )
+const char *NameMangler_mangle(const char *str, char *dest )
 {
-  std::string mangled_str = reinterpret_cast<class NameMangler*>(mangler)->mangle(str);
-  strcpy(dest, mangled_str.c_str());
-  return dest;
+  return strcpy(dest, mangle(str).c_str());
 }
 
-const char *NameMangler_demangle(NameMangler_t *mangler, const char *str, char *dest )
+const char *NameMangler_demangle(const char *str, char *dest )
 {
-  std::string demangled_str = reinterpret_cast<class NameMangler*>(mangler)->demangle(str);
-  strcpy(dest, demangled_str.c_str());
-  return dest;
+  return strcpy(dest, demangle(str).c_str());
 }
 
 /* 
