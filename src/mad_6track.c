@@ -465,6 +465,7 @@ static int
   aperture_flag = 0,   /* if 1 insert apertures into structure */
 //  radius_flag = 0, // not used    /* change the default reference radius */
   split_flag = 0,      /* if 1 keep zero multipoles after split */
+  mangle_flag = 0,     /* if 1 truncate to 14 chars and mangle names */
   mult_auto_off = 1,   /* if 1 code does not process zero value
                           multipoles;
                           if 0 process up to order max_mult_ord */
@@ -1145,7 +1146,11 @@ convert_madx_to_c6t(struct node* p)
   char* cp;
   int index=-1;
 
-  NameMangler_mangle(p->name, t_name);
+  if (mangle_flag)
+    NameMangler_mangle(p->name, t_name);
+  else
+    strcpy(t_name, p->name);
+  
   if ((cp = strchr(t_name, ':')) != NULL) *cp = '\0';
   if ((strcmp(p->base_name,"rbend") == 0)      ||
       (strcmp(p->base_name,"sbend") == 0)      ||
@@ -1692,6 +1697,8 @@ get_args(struct in_cmd* my_cmd)
     put_info("c6t - mult_auto_off flag selected","");
   if ((split_flag = command_par_value("split", my_cmd->clone)))
     put_info("c6t - split flag selected","");
+  if ((mangle_flag = command_par_value("mangle", my_cmd->clone)))
+    put_info("c6t - mangle flag selected","");
   if ((tmp_max_mult_ord = command_par_value("max_mult_ord", my_cmd->clone))>0)
   {
     max_mult_ord = tmp_max_mult_ord;
@@ -3342,6 +3349,7 @@ c6t_init(void)
   cavall_flag = 0;     /* if 0 lump all cavities into first */
 //  radius_flag = 0; // not used    /* change the default reference radius */
   split_flag = 0;      /* if 1 keep zero multipoles after split */
+  mangle_flag = 0;     /* if 1 truncate to 14 chars and mangle names */
   multi_type = -1;     /* is set to multipole type if any found */
   cavity_count = 0;    /* count cavities in output */
 
