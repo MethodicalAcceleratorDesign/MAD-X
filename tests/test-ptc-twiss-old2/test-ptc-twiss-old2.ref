@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.06  (64 bit, Linux)       +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.01.17      +
-  + Execution Time Stamp: 21.01.14 13.35.58 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.05  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2015.04.06               +
+  + Execution date: 2015.05.19 17:03:28      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
 
@@ -249,7 +249,6 @@ parameter: energy   double value:                100
 
 ptc_create_universe;
 
- Now PTC
 ptc_create_layout,model=2,method=6,nst=10,exact;
 
  MAD-X Beam Parameters
@@ -258,17 +257,17 @@ ptc_create_layout,model=2,method=6,nst=10,exact;
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.999956E+02
  Setting MADx with 
-     energy           100.000000000000     
+     energy           100.00000000000000     
      method                   6
      Num. of steps           10
-     charge           1.00000000000000     
-  Length of machine:    534.600000000000     
+     charge           1.0000000000000000     
+  Length of machine:    534.59999999999991     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After    end:   -40.5807584670258       0.000000000000000E+000   532.533460530797     
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -40.580758467025781        0.0000000000000000        532.53346053079656     
 ptc_align;
 
 
@@ -302,9 +301,6 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=1;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   3.260715892537305E-004  2.596346259293698E-006  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
-Deviation from symplecticity  0.1804112415015879E-11 %
-Deviation from symplecticity  0.1804112415015879E-11 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -383,13 +379,11 @@ PTC_NORMAL,closed_orbit,maptable,icase=5,no=1;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   3.260715892537305E-004  2.596346259293698E-006  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Closed orbit:    3.2607158925373049E-004   2.5963462592936979E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
 
 
 ptc_end;
 
- Killing LayoutNo name assigned                                                                                                        
- Layout killed 
 
 
 !write,table="map_table",file="map_table";
@@ -423,7 +417,6 @@ select,flag=ptc_twiss,column=name,s,beta11,beta21,beta12,beta22,disp1,disp3;
 
 ptc_create_universe;
 
- Now PTC
 ptc_create_layout,model=2,method=6,nst=5,exact;
 
  MAD-X Beam Parameters
@@ -432,17 +425,17 @@ ptc_create_layout,model=2,method=6,nst=5,exact;
       Particle Rest Mass : 0.510999E-03
                 Momentum : 0.250000E+03
  Setting MADx with 
-     energy           250.000000000000     
+     energy           250.00000000000000     
      method                   6
      Num. of steps            5
-     charge          -1.00000000000000     
-  Length of machine:    534.600000000000     
+     charge          -1.0000000000000000     
+  Length of machine:    534.59999999999991     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After    end:   -40.5807584670258       0.000000000000000E+000   532.533460530797     
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -40.580758467025781        0.0000000000000000        532.53346053079656     
                                     
 
 ! Example 2: Input twiss parameters manually  ==============================
@@ -480,8 +473,7 @@ ptc_twiss,icase=5,no=1,
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit specified by the user!
- Closed orbit:   8.897806712109201E-005  7.283918352660537E-007  5.216050332314255E-005 -6.748041062611771E-007  0.000000000000000E+000
+ Closed orbit:    8.8978067121092011E-005   7.2839183526605370E-007   5.2160503323142552E-005  -6.7480410626117705E-007   0.0000000000000000     
  Reduced SUMM Table (Inital parameters specified)
 
 ++++++ table: ptc_twiss_summary
@@ -538,8 +530,6 @@ ptc_twiss,icase=5,no=1,
   -1.674289292e-06                  0                  0 
 ptc_end;
 
- Killing LayoutNo name assigned                                                                                                        
- Layout killed 
 
 
 removefile, file='Maxwellian_bend_for_ptc.txt';
@@ -550,5 +540,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.06 (64 bit) finished normally +
+  + MAD-X 5.02.05 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

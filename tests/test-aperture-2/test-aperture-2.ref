@@ -1,0 +1,237 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.05  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2015.04.06               +
+  + Execution date: 2015.05.20 18:13:46      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+TITLE, "LHC Version 6.503 -  July 2009 - version with RCOLLIMATORs" ;
+
+
+
+option, -echo, warn, -info;
+
+
+
+beam, sequence=lhcb1, particle=proton, pc=450, exn=3.75e-6, eyn=3.75e-6;
+
+
+
+on_x1:=1;
+
+++++++ info: on_x1 redefined
+on_sep1:=1;
+
+++++++ info: on_sep1 redefined
+on_atlas:=0;
+
+++++++ info: on_atlas redefined
+
+
+on_x2:=1;
+
+++++++ info: on_x2 redefined
+on_sep2:=1;
+
+++++++ info: on_sep2 redefined
+on_alice:=0;
+
+++++++ info: on_alice redefined
+
+
+on_x5:=1;
+
+++++++ info: on_x5 redefined
+on_sep5:=1;
+
+++++++ info: on_sep5 redefined
+on_cms  :=0;
+
+++++++ info: on_cms redefined
+
+
+on_x8:=1;
+
+++++++ info: on_x8 redefined
+on_sep8:=1;
+
+++++++ info: on_sep8 redefined
+on_lhcb :=0;
+
+++++++ info: on_lhcb redefined
+
+
+option, warn, info;
+
+
+
+use, sequence=lhcb1;
+
+select, flag=twiss, clear;
+
+select, flag=twiss, column=name,s,betx,bety,x,px,y,py,apertype,on_elem, class=rcollimator;
+
+twiss, sequence=lhcb1, file="twiss-table.out";
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   2.348867E-03 deltap:   0.000000E+00
+orbit:  -2.024091E-03  6.263101E-07  1.934669E-06  1.728349E-04  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.537435E-05 deltap:   0.000000E+00
+orbit:  -2.000002E-03 -1.655644E-10 -2.253537E-09  1.700004E-04  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   7.118363E-09 deltap:   0.000000E+00
+orbit:  -2.000000E-03  1.739113E-11  3.774323E-11  1.700000E-04  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003216328248        55.75962155 
+
+                q1                dq1            betxmax              dxmax 
+       64.28000058        2.011344842        595.1194952        2.815212581 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.397100393     0.008477892722    0.0007074565743        59.31000016 
+
+               dq2            betymax              dymax              dyrms 
+       2.011703321        609.5259354       0.1894286681      0.05700765142 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.008499924148    0.0007137266055                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+! Initialize PTC
+
+ptc_create_universe;
+
+ptc_create_layout, model=2, method=2, nst=2, exact;
+
+ MAD-X Beam Parameters
+                  Energy : 0.450001E+03
+          Kinetic Energy : 0.449063E+03
+      Particle Rest Mass : 0.938272E+00
+                Momentum : 0.450000E+03
+ Setting MADx with 
+     energy           450.00097817052830     
+     method                   2
+     Num. of steps            2
+     charge           1.0000000000000000     
+ Thin solenoid: MBLS2.1L2:1                                      has no strength - set to marker
+ Thin solenoid: MBLS2.1R2:1                                      has no strength - set to marker
+  Length of machine:    26658.883199998909     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    1.2170341194819135E-004   2.9337307977728491E-014  -7.9690698434831120E-005
+ HARMONIC NUMBER defined in the ring:        35640
+
+
+select, flag=ptc_twiss, column=name,s,betx,bety,x,px,y,py,apertype,on_elem, class=rcollimator;
+
+ptc_twiss,  closed_orbit, icase=6, no=3, file="ptc-twiss-table.out";
+
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+++++++ warning: return mystate:   no cavity - dimensionality reduced 6 -> 5 and 1/2
+ ************ State Summary ****************
+ MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     2
+  Default integration steps      2
+ This is a proton 
+       EXACT_MODEL =  TRUE 
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  TRUE 
+       TIME        =  TRUE 
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_4D     =  FALSE
+       DELTA       =  FALSE
+       SPIN        =  FALSE
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+        26658.8832    0.0003216320508           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000    0.0003172846404        55.75968864       0.2800010241 
+
+                q2                dq1                dq2                 qs 
+      0.3100006055                  0                  0                  0 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+       9.999992764        595.1202014        9.999993276        609.5257297 
+
+         beta11min          beta11max          beta12min          beta12max 
+       9.999992763        595.1202014     1.66144852e-11    1.037287626e-09 
+
+         beta13min          beta13max          beta21min          beta21max 
+                 0                  0    1.550393811e-11    1.201026586e-09 
+
+         beta22min          beta22max          beta23min          beta23max 
+       9.999993276        609.5257297                  0                  0 
+
+         beta31min          beta31max          beta32min          beta32max 
+                 0                  0                  0                  0 
+
+         beta33min          beta33max           disp1min           disp1max 
+                 0                  0       -2.745605259        2.816166302 
+
+          disp2min           disp2max           disp3min           disp3max 
+    -0.04812306244      0.05033586143      -0.1856652009       0.1450797205 
+
+          disp4min           disp4max             deltap            orbit_x 
+   -0.005458863922     0.004780221885                  0    -0.001999999076 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+  -5.887463714e-12   -6.470088576e-10    0.0001700000459                  0 
+
+         orbit_-cT             xcorms             ycorms            pxcorms 
+                 0    0.0007074564956     0.000713726789    2.376320089e-05 
+
+           pycorms             tcorms            ptcorms             xcomax 
+   2.414012503e-05    6.321234876e-06                  0     0.007390738796 
+
+            ycomax            pxcomax            pycomax             tcomax 
+    0.008056958782    0.0004263339813    0.0004558719032    1.013617463e-05 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+                 0     -0.00847788991    -0.008499924562   -0.0004558717414 
+
+           pycomin             tcomin            ptcomin 
+  -0.0003912272041   -1.067997988e-05                  0 
+
+
+ptc_end;
+
+
+
+removefile, file="Maxwellian_bend_for_ptc.txt";
+
+
+
+stop;
+
+
+  Number of warnings: 1
+0 in C and 1 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.02.05 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

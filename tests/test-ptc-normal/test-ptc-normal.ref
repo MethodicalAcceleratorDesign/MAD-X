@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.01  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.04.25      +
-  + Execution Time Stamp: 18.06.14 16.22.12 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.05  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2015.04.06               +
+  + Execution date: 2015.06.01 14:24:12      +
+  ++++++++++++++++++++++++++++++++++++++++++++
    !                     FODO for MAD-X
 
    ! FODO --: with SIS cell length and SIS bending magnets
@@ -93,11 +93,12 @@ parameter: charge   double value:                  1
 parameter: energy   double value:               5000
 parameter: pc   double value:        4999.999912
 parameter: gamma   double value:        5328.944863
+parameter: beta   double value:       0.9999999824
 parameter: brho   double value:        16678.20447
 parameter: ex   double value:                  1
-parameter: exn   double value:        21315.77908
+parameter: exn   double value:         5328.94477
 parameter: ey   double value:                  1
-parameter: eyn   double value:        21315.77908
+parameter: eyn   double value:         5328.94477
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
 parameter: sige   double value:                  0
@@ -108,7 +109,6 @@ parameter: freq0   double value:                  0
 parameter: circ   double value:                  0
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: beta   double value:       0.9999999824
 parameter: alfa   double value:    3.521417729e-08
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
@@ -216,7 +216,6 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
    ptc_create_universe;
 
- Now PTC
    ptc_create_layout,model=1,method=2,nst=1;!,exact;
 
  MAD-X Beam Parameters
@@ -229,13 +228,13 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
      method                   2
      Num. of steps            1
      charge           1.0000000000000000     
-  Length of machine:    19.099987755982863     
+  Length of machine:    19.099987755979949     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    0.0000000000000000        0.0000000000000000        19.099987755983108     
+ After    end:    0.0000000000000000        0.0000000000000000        19.099987755980202     
 !	select_ptc_normal, dx=1, dpx=1;
 
 !	select_ptc_normal, dy=1, dpy=1;	
@@ -301,11 +300,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
        ACCELERATE  =  FALSE
  Closed orbit:    0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Normal Form Type 1
-Deviation from symplecticity  0.6217248937900877E-12 %
    ptc_end;
 
- Killing LayoutNo name assigned                                                                                                        
- Layout killed 
    write, table=normal_results,file=ptc_normal_results.tfs; 
 
    write, table=map_table, file=ptc_map_table.tfs;
@@ -316,5 +312,5 @@ Deviation from symplecticity  0.6217248937900877E-12 %
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.01 (64 bit) finished normally +
+  + MAD-X 5.02.05 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

@@ -2283,9 +2283,10 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
        110, 120, 130, 140, 150, 160, 170, 180, 190, 200,        &
        210, 220, 230, 240, 250, 260,  10, 280, 290, 310,        &
        310, 310, 300, 310, 310, 310, 310, 310, 310, 310,	&
-       310, 420, 430), code  ! Enable non-linear thin lens and RF-Multipole  
+       310, 420, 430, 440), code  ! Enable non-linear thin lens and RF-Multipole  
   !     310, 310, 310), ! Disable non-linear thin lens and RF-Multipole
-   
+  ! 2015-Mar-18  14:04:54  ghislain: code 44 is temporary for collimators different from ecoll (code 20) and rcoll (code 21)
+
   !---- Drift space, monitor, collimator, or beam instrument.
 10 continue
 170 continue
@@ -2294,6 +2295,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
 200 continue
 210 continue
 240 continue
+440 continue
   call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   go to 500
 
@@ -6788,19 +6790,27 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   double precision, external :: node_value,get_value,get_variable
   integer n_ferr
   
+  ! Strategy to implement BV-flag
+  ! 0) apply bv-flag to voltage and multipole strengths (the inverse map has V = -V; K?N|S = -K?N|S)
+  ! 1) track orbit(6) : just as in track: P o inverse(M) * P
+  ! 2) ek, re, te : create the vector / matrix / tensor elements for 
+  !    the inverse map (see 0), then apply transformation P to each element
+
   !--- AL: RF-multipole
   integer dummyi
   double precision pc, krf, vrf
   double precision pi, twopi, clight, ten3m
-  double precision x, y, z, dpx, dpy, dpt
+  double precision x, y, z, px, py, pt, dpx, dpy, dpt
   double precision freq, volt, lag, harmon
   double precision field_cos(2,0:maxmul)
   double precision field_sin(2,0:maxmul)
   double precision pnl(0:maxmul), psl(0:maxmul)
-  complex*16 ii, Cm2, Sm2, Cm1, Sm1, Cp0, Sp0, Cp1, Sp1
-    
+  complex*16 icomp, Cm2, Sm2, Cm1, Sm1, Cp0, Sp0, Cp1, Sp1
+  integer ii,jj,kk
+  double precision P(6)
+  
   parameter ( zero=0d0, one=1d0, two=2d0, three=3d0, ten3m=1d-3)
-  parameter ( ii=(0d0,1d0) )
+  parameter ( icomp=(0d0,1d0) )
 
   !---- Zero the arrays
   call dzero(normal,maxmul+1)
@@ -6838,14 +6848,8 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   fmap = .true.
   
   !---- Set-up some parameters
-  !-- LD: 20.6.2014 (bvk=-1: not -V -> V but lag -> pi-lag)
-  !-- AL: 30.6.2014 (bvk=-1: z -> -z)
-  if (bvk .eq. -one) then
-    orbit(5) = -orbit(5);
-  endif
-
   krf = 2*pi*freq*1d6/clight;
-  vrf = volt*ten3m/(pc*(one+deltap));
+  vrf = bvk*volt*ten3m/(pc*(one+deltap));
   
   if (n_ferr.gt.0) then
      call dcopy(f_errors,field,n_ferr)
@@ -6854,13 +6858,20 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   
   !---- Particle's coordinates
   if (ftrk) then
-    x = orbit(1);
-    y = orbit(3);
-    z = orbit(5);
+    ! apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
+    x  = orbit(1) * bvk;
+    px = orbit(2);
+    y  = orbit(3);
+    py = orbit(4) * bvk;
+    z  = orbit(5) * bvk;
+    pt = orbit(6);
   else
-    x = zero;
-    y = zero;
-    z = zero;
+    x  = zero;
+    px = zero;
+    y  = zero;
+    py = zero;
+    z  = zero;
+    pt = zero;
   endif
   
   !---- Vector with strengths + field errors
@@ -6893,20 +6904,20 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   Sp1 = 0d0;
   do iord = nord, 0, -1
     if (iord.ge.2) then
-      Cm2 = Cm2 * (x+ii*y) / (iord-1) + field_cos(1,iord)+ii*field_cos(2,iord);
-      Sm2 = Sm2 * (x+ii*y) / (iord-1) + field_sin(1,iord)+ii*field_sin(2,iord);
+      Cm2 = Cm2 * (x+icomp*y) / (iord-1) + field_cos(1,iord)+icomp*field_cos(2,iord);
+      Sm2 = Sm2 * (x+icomp*y) / (iord-1) + field_sin(1,iord)+icomp*field_sin(2,iord);
     endif
     if (iord.ge.1) then
-      Cm1 = Cm1 * (x+ii*y) / (iord)   + field_cos(1,iord)+ii*field_cos(2,iord);
-      Sm1 = Sm1 * (x+ii*y) / (iord)   + field_sin(1,iord)+ii*field_sin(2,iord);
+      Cm1 = Cm1 * (x+icomp*y) / (iord)   + field_cos(1,iord)+icomp*field_cos(2,iord);
+      Sm1 = Sm1 * (x+icomp*y) / (iord)   + field_sin(1,iord)+icomp*field_sin(2,iord);
     endif
-    Cp0 = Cp0 * (x+ii*y) / (iord+1)   + field_cos(1,iord)+ii*field_cos(2,iord);
-    Sp0 = Sp0 * (x+ii*y) / (iord+1)   + field_sin(1,iord)+ii*field_sin(2,iord);
-    Cp1 = Cp1 * (x+ii*y) / (iord+2)   + field_cos(1,iord)+ii*field_cos(2,iord);
-    Sp1 = Sp1 * (x+ii*y) / (iord+2)   + field_sin(1,iord)+ii*field_sin(2,iord);
+    Cp0 = Cp0 * (x+icomp*y) / (iord+1)   + field_cos(1,iord)+icomp*field_cos(2,iord);
+    Sp0 = Sp0 * (x+icomp*y) / (iord+1)   + field_sin(1,iord)+icomp*field_sin(2,iord);
+    Cp1 = Cp1 * (x+icomp*y) / (iord+2)   + field_cos(1,iord)+icomp*field_cos(2,iord);
+    Sp1 = Sp1 * (x+icomp*y) / (iord+2)   + field_sin(1,iord)+icomp*field_sin(2,iord);
   enddo
-  Sp1 = Sp1 * (x+ii*y);
-  Cp1 = Cp1 * (x+ii*y);
+  Sp1 = Sp1 * (x+icomp*y);
+  Cp1 = Cp1 * (x+icomp*y);
   
   !---- Track orbit.
   if (ftrk) then
@@ -6918,22 +6929,31 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
      !---- Radiation effects at entrance.
      if (dorad  .and.  elrad .ne. zero) then
         rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
-        orbit(2) = orbit(2) - rfac * (one + orbit(6)) * orbit(2)
-        orbit(4) = orbit(4) - rfac * (one + orbit(6)) * orbit(4)
-        orbit(6) = orbit(6) - rfac * (one + orbit(6)) ** 2
+        px = px - rfac * (one + pt) * px
+        py = py - rfac * (one + pt) * py
+        pt = pt - rfac * (one + pt) ** 2
      endif
      
      !---- Apply the kick
-     orbit(2) = orbit(2) + dpx
-     orbit(4) = orbit(4) + dpy
-     orbit(6) = orbit(6) + dpt
+     px = px + dpx
+     py = py + dpy
+     pt = pt + dpt
   
      !---- Radiation effects at exit.
      if (dorad  .and.  elrad .ne. zero) then
-        orbit(2) = orbit(2) - rfac * (one + orbit(6)) * orbit(2)
-        orbit(4) = orbit(4) - rfac * (one + orbit(6)) * orbit(4)
-        orbit(6) = orbit(6) - rfac * (one + orbit(6)) ** 2
+        px = px - rfac * (one + pt) * px
+        py = py - rfac * (one + pt) * py
+        pt = pt - rfac * (one + pt) ** 2
      endif
+
+    ! apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
+    orbit(1) = x  * bvk;
+    orbit(2) = px;
+    orbit(3) = y;
+    orbit(4) = py * bvk;
+    orbit(5) = z  * bvk;
+    orbit(6) = pt;
+
   endif
   
   !---- Element Kick
@@ -6983,11 +7003,25 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
      te(6,5,5) =  0.5 * (-krf * krf * vrf * sin(lag * twopi - krf * z) + krf * krf * krf * REAL(Sp1));
   endif
 
-  !-- AL: 30.6.2014 (bvk=-1: z -> -z)
+  ! Apply P tranformation to each index
   if (bvk .eq. -one) then
-    orbit(5) = -orbit(5);
+    P(1) = -one;
+    P(2) =  one;
+    P(3) =  one;
+    P(4) = -one;
+    P(5) = -one;
+    P(6) =  one;
+    do ii=1,6
+      do jj=1,6
+        do kk=1,6
+          te(ii,jj,kk) = te(ii,jj,kk) * P(ii) * P(jj) * P(kk);
+        enddo
+        re(ii,jj) = re(ii,jj) * P(ii) * P(jj);
+      enddo
+      ek(ii) = ek(ii) * P(ii);
+    enddo
   endif
-  
+
   !---- centre option
   if(centre_cptk.or.centre_bttk) then
      call dcopy(orbit,orbit00,6)

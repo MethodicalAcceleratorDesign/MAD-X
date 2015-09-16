@@ -1,5 +1,6 @@
-\chapter{Change Log}
+\chapter*{Change Log}
 \label{chap:changelog}
+\addcontentsline{toc}{chapter}{Change Log}
 
 \begin{center} 
 \textbf{since version 5.02.00}
@@ -8,11 +9,157 @@
 The following changes have been made to the code and documentation since
 August 15th, 2014 in version 5.02.02
 
-The changes are indexed by the SVN release number. 
+The changes are indexed by date (most recent first) and provide the \madx 
+version number where the change applies as well as the SVN 
+release number for the change. 
 
 \begin{madlist}
 
-  \ttitemn{r4932} 2014-Aug-18, version 5.02.03 \\
+  \ttitemn{2015-Mar-31} version 5.02.05, r5181\\
+  added a \hyperref[sec:shrink]{\tt SHRINK} command to remove 
+  rows at the end of an existing table.
+
+  \ttitemn{2015-Mar-11} version 5.02.05, r5162\\
+  {\bf Major change} to the definition of emittances in the 
+  \hyperref[chap:beam]{\tt BEAM} command. For historical reasons, 
+  there was a factor 4 in the relation between normalised emittance 
+  $\epsilon_n$ and geometric emittance $\epsilon$: 
+  $\epsilon_n = 4 \beta \gamma \ \epsilon$, where $\beta$ and 
+  $\gamma$ are the usual relativistic factors. \\
+  The common definition $\epsilon_n = \beta \gamma \ \epsilon$ 
+  is now used across all \madx modules.
+  
+  The \hyperref[sec:aperture]{\tt APERTURE} command now gets the 
+  geometric emittances from values input or calculated in the 
+  \hyperref[chap:beam]{\tt BEAM} command; the attributes {\tt EXN} 
+  and {\tt EYN} of the {\tt APERTURE} command have been removed 
+  together with their default value of {\tt EXN = 2.75E-6} and 
+  {\tt EYN = 2.75E-6} corresponding to the standard normalized 
+  emittances for LHC beams in collisions. 
+  
+
+  \ttitemn{2015-Mar-10} version 5.02.05, r5161\\
+  {\bf Major change} to definition of {\tt RACETRACK} 
+  \hyperref[sec:def_aper]{aperture type}. 
+  The {\tt RACETRACK} aperture now refers to a generalized shape 
+  with rounding of corner with ellipse instead of circle. 
+  The {\tt APERTURE} array now takes four arguments for the 
+  {\tt RACETRACK} shape: maximum horizontal extent, maximum 
+  vertical extent, horizontal semi-axis and vertical semi-axis 
+  of ellipse for rounding the corner. \\
+  {\bf Note also that the definition of the first two arguments 
+  has changed from horizontal and vertical offsets to horizontal 
+  and vertical maximum extensions.}
+
+  Removed also all references in the code and the manual to the 
+  {\tt MARGUERITE} aperture type (two {\tt RECTCIRCLE}s 
+  crossing at right angle) that has been deprecated for some 
+  time already.
+
+%%  \ttitemn{2015-Mar-06} version 5.02.05, r5158\\
+%  {\bf Major change} to collimator elements: the {\tt RCOLLIMATOR} 
+%  and {\tt ECOLLIMATOR} elements are no longer defined in \madx and 
+%  replaced by a generic \hyperref[sec:collimator]{\tt COLLIMATOR} element.\\
+%  {\bf (give reference to web page giving details for translation...)}
+
+  \ttitemn{2015-Feb-19} version 5.02.05, r5143\\
+  added the {\tt OCTAGON} in the list of predefined 
+  \hyperref[chap:aperture]{\tt APERTURE} types.
+  
+  \ttitemn{2015-Feb-11} version 5.02.05, r5128\\
+  clarified that the {\tt NMASS} constant is the unified atomic mass 
+  unit and not the neutron mass. None of the constants have changed in 2014 PDG 
+  publication w.r.t. 2012 version \cite{PDG2012}. Updated the reference to PDG 
+  publications to include 2014 version \cite{PDG2014}.
+
+  \ttitemn{2015-Jan-28} version 5.02.05, r5118\\
+  clarified in the \hyperref[chap:elements]{definition of magnetic elements} 
+  that the effect of defined magnetic strengths is always the same, 
+  irrespective of the \hyperref[sec:beam]{\tt CHARGE} of the particles declared 
+  in the \hyperref[sec:beam]{\tt BEAM} command. It is agreed in the literature 
+  that a positive quadrupole (positive $K_1$) focuses positive particles in the 
+  horizontal plane and defocuses negative particles in the same horizontal 
+  plane, for the same direction of propagation. \\ 
+  Currently \mad ignores the \hyperref[sec:beam]{\tt CHARGE} attribute and 
+  focuses both positive and negative particles in the horizontal plane when 
+  going through a quadrupole with positive $K_1$. \\
+  {\bf THIS MAY CHANGE IN THE FUTURE TO CONFORM TO EXISTING CONVENTIONS}\\
+  Electrostatic elements (\hyperref[sec:elseparator]{\tt ELSEPARATOR}, 
+  \hyperref[sec:rfcavity]{\tt RFCAVITY}, \hyperref[sec:crabcavity]{\tt 
+  CRABCAVITY}, and the RF part of the \hyperref[sec:rfmultipole]{\tt 
+  RFMULTIPOLE}) handle the \hyperref[sec:beam]{\tt CHARGE} attribute 
+  appropriately and provide 
+  opposite effects for opposite charges travelling in the same direction. 
+
+
+  \ttitemn{2014-Dec-19} version 5.02.05, r5111\\
+  added the Gauss error function {\tt ERF} and the complementary error function 
+  {\tt ERFC} to the list of \hyperref[subsec:operator]{available operators in 
+  arithmetic expressions}. Added documentation in the same section for the 
+  {\tt FLOOR}, {\tt CEIL} and {\tt ROUND} functions that were already 
+  implemented. 
+  
+  
+  \ttitemn{2014-Dec-10} version 5.02.04, r5093 and r5101\\
+  clarified the global coordinate system figure~\ref{F-GLOB} with colors and 
+  representations of projections of planes onto the horizontal Cartesian 
+  plane as well as intersections of local coordinate planes with horizontal 
+  Cartesian plane. 
+  
+  
+  \ttitemn{2014-Nov-25} version 5.02.04, r5092\\
+  removed the \hyperref[sec:global]{\tt GLOBAL} matching constraints {\tt DDQ1, 
+  	DDQ2} from the documentation since they are not implemented in the code. 
+  
+  
+  \ttitemn{2014-Nov-14} version 5.02.04, r5081\\
+  added a \hyperref[sec:copyfile]{\tt COPYFILE} command. Changed the attribute 
+  name for the destination for the \hyperref[sec:renamefile]{\tt RENAMEFILE} 
+  command from {\tt NAME} to {\tt TO}.
+  
+  
+  \ttitemn{2014-Nov-13} version 5.02.04, r5078\\
+  fixed figure \ref{F-YSDISP} where the {\it x}-axis was pointing in
+  the wrong direction and the orientation of the element for positive
+  {\tt DPHI} was also not conforming to the text for the
+  \hyperref[sec:ealign]{\tt EALIGN} command.
+  
+  
+  \ttitemn{2014-Nov-13}  version 5.02.04, r5080\\
+  documented a bug occurring when \hyperref[sec:line]{\tt 
+  LINE} or \hyperref[sec:macro]{\tt MACRO} 
+  constructs appear within a \hyperref[sec:if]{\tt IF ... ELSEIF ... ELSE} or a 
+  \hyperref[sec:while]{\tt WHILE} construct. This bug will not be fixed now. \\ 
+  Clarified also that {\tt IF ... ELSEIF ... ELSE} and {\tt WHILE} constructs 
+  can be nested to at least six levels deep.
+  
+  
+  \ttitemn{2014-Oct-14} version 5.02.03, r5013\\
+  fixed a documented feature of \hyperref[chap:survey]{\tt SURVEY} where
+  the first {\tt KSL} component of thin \hyperref[sec:multipole]{\tt
+  	MULTIPOLE} elements, representing a vertical angle for a thin
+  dipole, was not taken into account. Both {\tt KNL} and {\tt KSL} are
+  now properly taken into account. Another change was to make {\tt
+  	SURVEY} take into account the \hyperref[sec:rfmultipole]{\tt
+  	RFMULTIPOLE} elements in the same way that it treats {\tt MULTIPOLE}
+  elements.
+  
+  
+  \ttitemn{2014-Aug-27} version 5.02.03, r4947 \\
+  changed the behaviour of \hyperref[sec:fill]{\tt FILL} to accept as
+  parameter a row number equal to the current number of rows in the
+  table plus one, with the effect of creating a new row and filling it. 
+  
+  
+  \ttitemn{2014-Aug-25} version 5.02.03, r4942 and r4943\\
+  harmonized the behaviour of \hyperref[sec:fill]{\tt FILL},
+  \hyperref[sec:setvars]{\tt SETVARS} and \hyperref[sec:setvars_lin]{\tt
+  	SETVARS\_LIN} with respect to negative row numbers, and updated the
+  default values. Added documentation sections for {\tt SETVARS} and {\tt
+  	SETVARS\_LIN} that were hitherto undocumented.  
+  
+  
+  \ttitemn{2014-Aug-18} version 5.02.03, r4932 \\
   a single element can now be repeated in a beamline expansion:
   \texttt{2*S} and \texttt{-2*S} are of course identical (single
   elements are not reversed head to tail), and also equivalent to
@@ -20,31 +167,6 @@ The changes are indexed by the SVN release number.
   element.\\
   Documentation updated; see \ref{sec:reflect_repeat_lines}
 
-
-  \ttitem{r4942, r4943} 2014-Aug-25, version 5.02.03 \\
-  harmonized the behaviour of \hyperref[sec:fill]{\tt FILL},
-  \hyperref[sec:setvars]{\tt SETVARS} and \hyperref[sec:setvars_lin]{\tt
-    SETVARS\_LIN} with respect to negative row numbers, and updated the
-  default values. Added documentation sections for {\tt SETVARS} and {\tt
-    SETVARS\_LIN} that were hitherto undocumented.  
-
-
-  \ttitem{r4947} 2014-Aug-27, version 5.02.03 \\
-  changed the behaviour of \hyperref[sec:fill]{\tt FILL} to accept as
-  parameter a row number equal to the current number of rows in the
-  table plus one, with the effect of creating a new row and filling it. 
-
-
-  \ttitem{r5013} 2014-Oct-14, version 5.02.03\\
-  fixed a documented feature of \hyperref[chap:survey]{\tt SURVEY} where
-  the first {\tt KSL} component of thin \hyperref[sec:multipole]{\tt
-    MULTIPOLE} elements, representing a vertical angle for a thin
-  dipole, was not taken into account. Both {\tt KNL} and {\tt KSL} are
-  now properly taken into account. Another change was to make {\tt
-    SURVEY} take into account the \hyperref[sec:rfmultipole]{\tt
-    RFMULTIPOLE} elements in the same way that it treats {\tt MULTIPOLE}
-  elements.
-  
 
 \end{madlist}
   

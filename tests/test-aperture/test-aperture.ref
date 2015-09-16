@@ -1,11 +1,11 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.02  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.07.01      +
-  + Execution Time Stamp: 30.06.14 19.21.42 +
-  +++++++++++++++++++++++++++++++++++++++++++
-title,'LHC Cell APERTURE example, BJ Aug2009';
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.11.14               +
+  + Execution date: 2015.03.10 10:39:48      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+title,'LHC Cell APERTURE example';
 
 
 
@@ -29,14 +29,14 @@ REAL CONST drift3 = 1.74;
 
 len_half_cell = l.MQ+drift1+3*l.MB+2*drift2+drift3;
 
-value, len_half_cell;
+Value, len_half_cell;
 
 len_half_cell =              53.45 ;
 
 
 !!!! apertures
 
-a=0.022; b=0.018; h=0.022; v=0.022;
+a=0.022; b=0.018; h=0.022; v=0.022; an1=pi/6; an2=pi/3;
 
 !!!! tolerances
 
@@ -44,9 +44,21 @@ th=0.001; tv=0.0005; tr=0.001;
 
 
 
-MB: SBEND, L := l.MB, angle = ANGLE.MB;
+offset=1.e-3;
 
-MQ: QUADRUPOLE, L := l.MQ, apertype=rectellipse,aperture = {a,b,h,v}, aper_tol = {th,tv,tr};
+off3 := 1.e-3*l.MQ*l.MQ;
+
+off2 := 2.e-3 * l.MQ;
+
+off1 = 3.e-3;
+
+
+
+MB: SBEND, L=l.MB, angle=ANGLE.MB;
+
+MQ: QUADRUPOLE, L=l.MQ, apertype=rectellipse,aperture = {a,b,h,v}, aper_tol = {th,tv,tr}
+
+                aper_offset={off1, off2, off3, offset*l.MQ, 0.005-l.MQ, 0.006+l.MQ};
 
 
 
@@ -56,13 +68,9 @@ kqd = -0.008705002933;
 
 
 
-LHCCELL: SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
+LHCCELL: SEQUENCE, refer = ENTRY, L = 2*len_half_cell; 
 
- 
-
-  MQ1: MQ, k1:= kqf, at= 0.;
-
-
+  MQ1: MQ,  at= 0., k1=kqf;
 
   MB1: MB,  at= l.MQ+drift1 ,
 
@@ -76,11 +84,9 @@ LHCCELL: SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
 
 	    apertype=rectangle, aperture = {a,b}, aper_tol = {th,tv,tr};
 
+  MQ2: MQ,  at=  len_half_cell, k1 := kqd,
 
-
-  MQ2: MQ, k1 := kqd,  at=  len_half_cell;
-
-
+            apertype=octagon, aperture={a,b,an1,an2}, aper_tol = {th,tv,tr};
 
   MB4: MB,  at= len_half_cell + l.MQ+drift1 ,
 
@@ -92,9 +98,7 @@ LHCCELL: SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
 
   MB6: MB,  at= len_half_cell + l.MQ+drift1+2*(l.mb+drift2),
 
-	    apertype=racetrack, aperture = {a,b,h/5.}, aper_tol = {th,tv,tr};
-
-
+	    apertype=racetrack, aperture = {a+h/5.,b+h/10.,h/5.,h/10.}, aper_tol = {th,tv,tr};
 
 endsequence;
 
@@ -169,6 +173,13 @@ APERTURE LIMIT: mq1:1, n1: 4.85602, at: 3.1
 
 
 
+!! One can then access the minimum n1 as a variable of the BEAM command:
+
+Value, beam->n1min;
+
+beam->n1min =   4.85602 ;
+
+
 !-----
 
 ! and now same test with bad aperture definitions...
@@ -179,13 +190,11 @@ c=-0.022; d=0.; h2=0.0; v2=-0.022;
 
 
 
-LHCCEL2: SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
+LHCCEL2: SEQUENCE, refer = ENTRY, L = 2*len_half_cell; 
 
- 
+  MQ11: MQ, k1= kqf, at= 0., aperture = {c,d,h2,v2},
 
-  MQ11: MQ, k1:= kqf, at= 0., aperture = {c,d,h2,v2};
-
-
+           aper_offset={off1, off2, off3, offset*l.MQ, 0.005-l.MQ, 0.0};
 
   MB11: MB,  at= l.MQ+drift1 ,
 
@@ -199,11 +208,9 @@ LHCCEL2: SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
 
 	    apertype=rectangle, aperture = {c,d}, aper_tol = {th,tv,tr};
 
+  MQ21: MQ, k1= kqd,  at=  len_half_cell, 
 
-
-  MQ21: MQ, k1 := kqd,  at=  len_half_cell, aperture = {c,d,h2,v2};
-
-
+            apertype=octagon, aperture = {c,d,an2,an1}, aper_tol = {th,tv,tr};
 
   MB41: MB,  at= len_half_cell + l.MQ+drift1 ,
 
@@ -215,9 +222,7 @@ LHCCEL2: SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
 
   MB61: MB,  at= len_half_cell + l.MQ+drift1+2*(l.mb+drift2),
 
-	    apertype=racetrack, aperture = {c,d,h2/5.}, aper_tol = {th,tv,tr};
-
-
+	    apertype=racetrack, aperture = {c+h2/5.,d+h2/10.,h2/5.,h2/10.}, aper_tol = {th,tv,tr};
 
 endsequence;
 
@@ -271,7 +276,7 @@ select, flag=aperture, clear;
 
 select, flag=aperture, column=name,s,betx,bety,dx,x,y,n1,apertype,xtol,ytol,rtol;
 
-option, debug;
+option, debug=true;
 
 aperture, dqf=2.086, betaqfx=170.25, dp=0.0015, 
 
@@ -284,7 +289,8 @@ Processing apertures from lhccel2$start:1 to lhccel2$end:1...
 +++++++ deltap from TWISS            0
 +++ aper_rectellipse:    7.30000     7.30000     8.40000     8.40000 1
 quarterlength : 9
-+++ aper_fill_quadrants: quarterlength = 9  0     7.30000     4.15572 
++++ aper_fill_quadrants: quarterlength = 9
+  0     7.30000     4.15572 
   1     7.03983     4.58266 
   2     6.75473     4.99336 
   3     6.44570     5.38637 
@@ -360,8 +366,8 @@ name: drift_2:0, ref: , do_survey: 0, true_flag: 0
 +++ aper_build_screen; apertype = '' quarterlength = 0
 
 name: mq21:1, ref: , do_survey: 0, true_flag: 0
-+++ aper_build_screen; apertype = 'rectellipse' quarterlength = 0
-+++ aper_build screen, rectellipse parameters:   -0.02200    0.00000    0.00000   -0.02200  -- exiting 0
++++ aper_build_screen; apertype = 'octagon' quarterlength = 0
++++ aper_build screen, octagon parameters:   -0.02200    0.00000    1.04720    0.52360  -- exiting 0
 
 name: drift_0:0, ref: , do_survey: 0, true_flag: 0
 +++ aper_build_screen; apertype = '' quarterlength = 0
@@ -394,6 +400,16 @@ name: lhccel2$end:1, ref: , do_survey: 0, true_flag: 0
 
 APERTURE LIMIT: none, n1: 999999, at: -1
 
+option, debug=false;
+
+
+
+value, aperture->nco;
+
+aperture->nco =   5.00000 ;
+value, beam->n1min;
+
+beam->n1min = 999999.00000 ;
 
 
 stop;
@@ -402,5 +418,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.02 (64 bit) finished normally +
+  + MAD-X 5.02.04 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

@@ -1,0 +1,52 @@
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %09s "TEST_LINE"
+@ PARTICLE         %08s "POSITRON"
+@ MASS             %le      0.000510998928
+@ CHARGE           %le                   1
+@ ENERGY           %le                   5
+@ PC               %le         4.999999974
+@ GAMMA            %le         9784.756339
+@ KBUNCH           %le                   1
+@ BCURRENT         %le        0.9606408961
+@ SIGE             %le              0.0015
+@ SIGT             %le               0.006
+@ NPART            %le               2e+10
+@ EX               %le     8.175982848e-10
+@ EY               %le     2.043995712e-12
+@ ET               %le                   1
+@ LENGTH           %le                   1
+@ ALFA             %le                   0
+@ ORBIT5           %le                  -0
+@ GAMMATR          %le                   0
+@ Q1               %le        0.0416958303
+@ Q2               %le        0.3634683751
+@ DQ1              %le                   0
+@ DQ2              %le                   0
+@ DXMAX            %le                   0
+@ DYMAX            %le                   0
+@ XCOMAX           %le                   0
+@ YCOMAX           %le                   0
+@ BETXMAX          %le         14.90780697
+@ BETYMAX          %le         3.495269034
+@ XCORMS           %le                   0
+@ YCORMS           %le                   0
+@ DXRMS            %le                   0
+@ DYRMS            %le                   0
+@ DELTAP           %le                   0
+@ SYNCH_1          %le                   0
+@ SYNCH_2          %le                   0
+@ SYNCH_3          %le                   0
+@ SYNCH_4          %le                   0
+@ SYNCH_5          %le                   0
+@ TITLE            %20s "test of rf-multipole"
+@ ORIGIN           %17s "5.02.04 Darwin 64"
+@ DATE             %08s "02/02/15"
+@ TIME             %08s "15.30.18"
+* NAME                                S               BETX               ALFX                MUX               BETY               ALFY                MUY                 DX                 DY 
+$ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
+ "TEST_LINE$START"                    0                  1                  0                  0                0.5                  0                  0                  0                  0
+ "RFM1"                               0                  1       -2.729317226                  0                0.5        1.364658613                  0                  0                  0
+ "DRIFT_0"                          0.5        5.841610355       -6.953903485      0.03316433859        0.566487952       -1.497634517        0.305652277                  0                  0
+ "M1"                                 1      -0.6270720223        3.903544883       0.0416958303       -0.147022659      -0.6114625314       0.3634683751                  0                  0
+ "TEST_LINE$END"                      1      -0.6270720223        3.903544883       0.0416958303       -0.147022659      -0.6114625314       0.3634683751                  0                  0

@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.01  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.04.25      +
-  + Execution Time Stamp: 18.06.14 15.49.48 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.11.14               +
+  + Execution date: 2015.03.11 15:01:38      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 title,'testing BEAM definitions in MADX';
 
 
@@ -28,10 +28,11 @@ parameter: charge   double value:                  1
 parameter: energy   double value:                450
 parameter: pc   double value:        449.9990218
 parameter: gamma   double value:        479.6050377
+parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.035166
-parameter: ex   double value:    1.954737678e-09
+parameter: ex   double value:    7.818950713e-09
 parameter: exn   double value:           3.75e-06
-parameter: ey   double value:    1.954737678e-09
+parameter: ey   double value:    7.818950713e-09
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
@@ -43,7 +44,6 @@ parameter: freq0   double value:                  0
 parameter: circ   double value:                  0
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: beta   double value:       0.9999978263
 parameter: alfa   double value:    4.347429295e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
@@ -89,7 +89,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0                  0                  0                  0 
 
 
-beam,particle=proton,energy=450.0, ex=1.954737678e-09, ey=1.954737678e-09;
+beam,particle=proton,energy=450.0, ex=7.818950713e-09, ey=7.818950713e-09;
 
 show, beam;
 
@@ -103,10 +103,11 @@ parameter: charge   double value:                  1
 parameter: energy   double value:                450
 parameter: pc   double value:        449.9990218
 parameter: gamma   double value:        479.6050377
+parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.035166
-parameter: ex   double value:    1.954737678e-09
+parameter: ex   double value:    7.818950713e-09
 parameter: exn   double value:           3.75e-06
-parameter: ey   double value:    1.954737678e-09
+parameter: ey   double value:    7.818950713e-09
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
@@ -118,7 +119,6 @@ parameter: freq0   double value:         2.80441353
 parameter: circ   double value:              106.9
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: beta   double value:       0.9999978263
 parameter: alfa   double value:    4.347429295e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
@@ -178,10 +178,11 @@ parameter: charge   double value:                  1
 parameter: energy   double value:        450.0017607
 parameter: pc   double value:        450.0007826
 parameter: gamma   double value:        479.6069143
+parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.041039
-parameter: ex   double value:     1.95473003e-09
+parameter: ex   double value:    7.818920119e-09
 parameter: exn   double value:           3.75e-06
-parameter: ey   double value:     1.95473003e-09
+parameter: ey   double value:    7.818920119e-09
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
@@ -193,7 +194,6 @@ parameter: freq0   double value:         2.80441353
 parameter: circ   double value:              106.9
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: beta   double value:       0.9999978263
 parameter: alfa   double value:    4.347395275e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
@@ -253,10 +253,11 @@ parameter: charge   double value:                  1
 parameter: energy   double value:                450
 parameter: pc   double value:        449.9990218
 parameter: gamma   double value:        479.6050377
+parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.035165
-parameter: ex   double value:    1.954737678e-09
+parameter: ex   double value:    7.818950713e-09
 parameter: exn   double value:           3.75e-06
-parameter: ey   double value:    1.954737678e-09
+parameter: ey   double value:    7.818950713e-09
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
@@ -268,7 +269,6 @@ parameter: freq0   double value:         2.80441353
 parameter: circ   double value:              106.9
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: beta   double value:       0.9999978263
 parameter: alfa   double value:    4.347429296e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
@@ -328,10 +328,11 @@ parameter: charge   double value:                  1
 parameter: energy   double value:                450
 parameter: pc   double value:        449.9990218
 parameter: gamma   double value:        479.6050377
+parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.035166
-parameter: ex   double value:    1.954737678e-09
+parameter: ex   double value:    7.818950713e-09
 parameter: exn   double value:           3.75e-06
-parameter: ey   double value:    1.954737678e-09
+parameter: ey   double value:    7.818950713e-09
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
@@ -343,7 +344,6 @@ parameter: freq0   double value:         2.80441353
 parameter: circ   double value:              106.9
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: beta   double value:       0.9999978263
 parameter: alfa   double value:    4.347429295e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
@@ -403,10 +403,11 @@ parameter: charge   double value:                  1
 parameter: energy   double value:                450
 parameter: pc   double value:        449.9990218
 parameter: gamma   double value:        479.6050377
+parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.035166
-parameter: ex   double value:    1.954737678e-09
+parameter: ex   double value:    7.818950713e-09
 parameter: exn   double value:           3.75e-06
-parameter: ey   double value:    1.954737678e-09
+parameter: ey   double value:    7.818950713e-09
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
@@ -418,7 +419,6 @@ parameter: freq0   double value:         2.80441353
 parameter: circ   double value:              106.9
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: beta   double value:       0.9999978263
 parameter: alfa   double value:    4.347429295e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
@@ -478,10 +478,11 @@ parameter: charge   double value:                  1
 parameter: energy   double value:                450
 parameter: pc   double value:        449.9990218
 parameter: gamma   double value:        479.6050377
+parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.035166
-parameter: ex   double value:    1.954737678e-09
+parameter: ex   double value:    7.818950713e-09
 parameter: exn   double value:           3.75e-06
-parameter: ey   double value:    1.954737678e-09
+parameter: ey   double value:    7.818950713e-09
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
@@ -493,7 +494,6 @@ parameter: freq0   double value:                400
 parameter: circ   double value:       0.7494795158
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: beta   double value:       0.9999978263
 parameter: alfa   double value:    4.347429295e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
@@ -553,10 +553,11 @@ parameter: charge   double value:                  1
 parameter: energy   double value:        450.0000001
 parameter: pc   double value:         449.999022
 parameter: gamma   double value:        479.6050378
+parameter: beta   double value:       0.9999978263
 parameter: brho   double value:        1501.035166
-parameter: ex   double value:    1.954737678e-09
+parameter: ex   double value:    7.818950711e-09
 parameter: exn   double value:           3.75e-06
-parameter: ey   double value:    1.954737678e-09
+parameter: ey   double value:    7.818950711e-09
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:                  1
 parameter: sigt   double value:                  0
@@ -568,7 +569,6 @@ parameter: freq0   double value:                400
 parameter: circ   double value:       0.7494795158
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: beta   double value:       0.9999978263
 parameter: alfa   double value:    4.347429293e-06
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0

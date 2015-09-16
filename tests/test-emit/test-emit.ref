@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.01  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.04.25      +
-  + Execution Time Stamp: 23.05.14 10.09.53 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.11.14               +
+  + Execution date: 2015.03.17 15:42:18      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 Beam, SEQUENCE=Machine, PARTICLE=electron, energy=3, RADIATE=True;
 
 Option, RBARC=FALSE;
@@ -202,6 +202,41 @@ orbit:   7.784384E-10 -1.536909E-07  0.000000E+00  0.000000E+00 -2.156959E-03  3
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+Show, beam%Machine;
+
+command: beam  module: control
+parameter: particle   string: electron
+parameter: sequence   string: machine
+parameter: bunched   logical: true
+parameter: radiate   logical: true
+parameter: mass   double value:     0.000510998928
+parameter: charge   double value:                 -1
+parameter: energy   double value:                  3
+parameter: pc   double value:        2.999999956
+parameter: gamma   double value:        5870.853803
+parameter: beta   double value:       0.9999999855
+parameter: brho   double value:        10.00692271
+parameter: ex   double value:                  1
+parameter: exn   double value:        5870.853718
+parameter: ey   double value:                  1
+parameter: eyn   double value:        5870.853718
+parameter: et   double value:                  1
+parameter: sigt   double value:                  0
+parameter: sige   double value:                  0
+parameter: kbunch   double value:                  1
+parameter: npart   double value:                  0
+parameter: bcurrent   double value:                  0
+parameter: freq0   double value:        4.461192314
+parameter: circ   double value:          67.200074
+parameter: dtbyds   double value:                  0
+parameter: deltap   double value:                  0
+parameter: alfa   double value:    2.901332271e-08
+parameter: u0   double value:                  0
+parameter: qs   double value:                  0
+parameter: arad   double value:    2.817940325e-15
+parameter: bv   double value:                  1
+parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
+parameter: n1min   double value:                 -1
 Emit, DELTAP=0.0 ;
 
 enter EMIT module
@@ -214,7 +249,6 @@ enter EMIT module
  Bcurrent                   0 A/bunch    Kbunch             1 
  Npart                      0 /bunch     Energy                     3 GeV 
  gamma            5870.853803            beta            0.9999999855
-guess:          0                  0                  0
      U0              0.254203 [MeV/turn]
  
                                                   M o d e   1         M o d e   2         M o d e   3
@@ -242,9 +276,46 @@ guess:          0                  0                  0
  Damping times [s]                                 0.35382027E-02      0.52907887E-02      0.35162382E-02
  Emittances [pi micro m]                       0.11259323E-02      0.11729932E-30      0.95690426E+00
 
+ EMIT: beam parameters have been updated.
+
  RF system: 
  Cavity                      length[m]        voltage[MV]                lag          freq[MHz]             harmon
  rfc                               0.5                3.6               0.48        1998.614157                448
+Show, beam%Machine;
+
+command: beam  module: control
+parameter: particle   string: electron
+parameter: sequence   string: machine
+parameter: bunched   logical: true
+parameter: radiate   logical: true
+parameter: mass   double value:     0.000510998928
+parameter: charge   double value:                 -1
+parameter: energy   double value:                  3
+parameter: pc   double value:        2.999999956
+parameter: gamma   double value:        5870.853803
+parameter: beta   double value:       0.9999999855
+parameter: brho   double value:        10.00692271
+parameter: ex   double value:     1.12593231e-09
+parameter: exn   double value:    6.610183888e-06
+parameter: ey   double value:    1.172993245e-37
+parameter: eyn   double value:    6.886471751e-34
+parameter: et   double value:    9.569042559e-07
+parameter: sigt   double value:    0.0008578397394
+parameter: sige   double value:     0.001115467836
+parameter: kbunch   double value:                  1
+parameter: npart   double value:                  0
+parameter: bcurrent   double value:                  0
+parameter: freq0   double value:        4.461192314
+parameter: circ   double value:          67.200074
+parameter: dtbyds   double value:                  0
+parameter: deltap   double value:                  0
+parameter: alfa   double value:    2.901332271e-08
+parameter: u0   double value:    0.0002542030271
+parameter: qs   double value:      0.01229083022
+parameter: arad   double value:    2.817940325e-15
+parameter: bv   double value:                  1
+parameter: pdamp   double array: 1.495329e+00 9.999981e-01 1.504670e+00 
+parameter: n1min   double value:                 -1
 
 
 Stop;
@@ -254,5 +325,5 @@ Stop;
 0 in C and 1 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.01 (64 bit) finished normally +
+  + MAD-X 5.02.04 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

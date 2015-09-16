@@ -1,15 +1,19 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (32 bit, Linux)       +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 07.02.13 18.42.44 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.11.14               +
+  + Execution date: 2015.02.25 15:43:02      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 ! H. Burkhardt.  Updated for improved makethin select in summer 2005
 
 
 
 title,"Five cell test";
+
+
+
+!---- Default
 
 
 
@@ -49,6 +53,12 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+qxref = table(summ,q1); qyref = table(summ,q2); 
+
+value, qxref, qyref;
+
+qxref =        1.248722214 ;
+qyref =        1.260064776 ;
 
 
 select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
@@ -93,12 +103,485 @@ save,sequence=fivecell,file="fivecell_thin.seq";
 ++++++ warning: structured sequence flattened: fivecell
 
 
+use,sequence=fivecell;      ! for twiss and makethin
+
+twiss,sequence=fivecell;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0     0.000438984401        47.72824396 
+
+                q1                dq1            betxmax              dxmax 
+       1.261337896        1.045148981        187.9959217        2.199912715 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.681319003                  0                  0        1.250009714 
+
+               dq2            betymax              dymax              dyrms 
+       1.038571822        181.8341684       0.0901650166      0.06741349785 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+qx = table(summ,q1); qy = table(summ,q2);
+
+value, qx-qxref, qy-qyref;
+
+qx-qxref =      0.01261568219 ;
+qy-qyref =     -0.01005506211 ;
+
+
+!---- TEAPOT
+
+
+
+option,-echo,-warn;
+
+
+
+beam;
+
+use,sequence=fivecell;      ! for twiss and makethin
+
+twiss,sequence=fivecell;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0     0.000443530778        47.48299658 
+
+                q1                dq1            betxmax              dxmax 
+       1.248722214        1.053620443        183.8515851        2.181076135 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.657376129                  0                  0        1.260064776 
+
+               dq2            betymax              dymax              dyrms 
+       1.050592974        177.9027092      0.09011673644      0.06727079848 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
+
+makethin,sequence=fivecell, style=TEAPOT;
+
+makethin: style chosen : teapot
+makethin: slicing sequence : fivecell
+makethin: slicing sequence : ins
+use,sequence=fivecell;      ! use the thin sequence
+
+twiss,sequence=fivecell;    ! to allow to compare in output if betx,dx max etc agree to some percent with the thick twiss results
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0    0.0004398232462        47.68270781 
+
+                q1                dq1            betxmax              dxmax 
+       1.260049428        1.051966902        187.8811082        2.202896652 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.684102789                  0                  0        1.248711996 
+
+               dq2            betymax              dymax              dyrms 
+       1.046542308        181.6898074      0.09046882219      0.06782568892 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+save,sequence=fivecell,file="fivecell_thin_teapot.seq";
+
+++++++ warning: SAVE makes all previous USE invalid !  
+++++++ warning: structured sequence flattened: fivecell
+
+
+use,sequence=fivecell;      ! for twiss and makethin
+
+twiss,sequence=fivecell;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0    0.0004398232462        47.68270781 
+
+                q1                dq1            betxmax              dxmax 
+       1.260049428        1.051966902        187.8811082        2.202896652 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.684102789                  0                  0        1.248711996 
+
+               dq2            betymax              dymax              dyrms 
+       1.046542308        181.6898074      0.09046882219      0.06782568892 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+qx = table(summ,q1); qy = table(summ,q2);
+
+++++++ info: qx redefined
+++++++ info: qy redefined
+value, qx-qxref, qy-qyref;
+
+qx-qxref =      0.01132721373 ;
+qy-qyref =     -0.01135277986 ;
+
+
+!---- SIMPLE
+
+
+
+option,-echo,-warn;
+
+
+
+beam;
+
+use,sequence=fivecell;      ! for twiss and makethin
+
+twiss,sequence=fivecell;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0     0.000443530778        47.48299658 
+
+                q1                dq1            betxmax              dxmax 
+       1.248722214        1.053620443        183.8515851        2.181076135 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.657376129                  0                  0        1.260064776 
+
+               dq2            betymax              dymax              dyrms 
+       1.050592974        177.9027092      0.09011673644      0.06727079848 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
+
+makethin,sequence=fivecell, style=SIMPLE;
+
+makethin: style chosen : simple
+makethin: slicing sequence : fivecell
+makethin: slicing sequence : ins
+use,sequence=fivecell;      ! use the thin sequence
+
+twiss,sequence=fivecell;    ! to allow to compare in output if betx,dx max etc agree to some percent with the thick twiss results
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0     0.000438984401        47.72824396 
+
+                q1                dq1            betxmax              dxmax 
+       1.261337896        1.045148981        187.9959217        2.199912715 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.681319003                  0                  0        1.250009714 
+
+               dq2            betymax              dymax              dyrms 
+       1.038571822        181.8341684       0.0901650166      0.06741349785 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+save,sequence=fivecell,file="fivecell_thin_simple.seq";
+
+++++++ warning: SAVE makes all previous USE invalid !  
+++++++ warning: structured sequence flattened: fivecell
+
+
+use,sequence=fivecell;      ! for twiss and makethin
+
+twiss,sequence=fivecell;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0     0.000438984401        47.72824396 
+
+                q1                dq1            betxmax              dxmax 
+       1.261337896        1.045148981        187.9959217        2.199912715 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.681319003                  0                  0        1.250009714 
+
+               dq2            betymax              dymax              dyrms 
+       1.038571822        181.8341684       0.0901650166      0.06741349785 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+qx = table(summ,q1); qy = table(summ,q2);
+
+++++++ info: qx redefined
+++++++ info: qy redefined
+value, qx-qxref, qy-qyref;
+
+qx-qxref =      0.01261568219 ;
+qy-qyref =     -0.01005506211 ;
+
+
+!---- COLLIM
+
+
+
+option,-echo,-warn;
+
+
+
+beam;
+
+use,sequence=fivecell;      ! for twiss and makethin
+
+twiss,sequence=fivecell;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0     0.000443530778        47.48299658 
+
+                q1                dq1            betxmax              dxmax 
+       1.248722214        1.053620443        183.8515851        2.181076135 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.657376129                  0                  0        1.260064776 
+
+               dq2            betymax              dymax              dyrms 
+       1.050592974        177.9027092      0.09011673644      0.06727079848 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
+
+makethin,sequence=fivecell, style=COLLIM;
+
+makethin: style chosen : collim
+makethin: slicing sequence : fivecell
+makethin: slicing sequence : ins
+use,sequence=fivecell;      ! use the thin sequence
+
+twiss,sequence=fivecell;    ! to allow to compare in output if betx,dx max etc agree to some percent with the thick twiss results
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0    0.0004440537625        47.45502679 
+
+                q1                dq1            betxmax              dxmax 
+       1.253604547        1.086218193        187.3204392        2.217970571 
+
+             dxrms             xcomax             xcorms                 q2 
+         1.6932521                  0                  0        1.242220474 
+
+               dq2            betymax              dymax              dyrms 
+       1.086700988         181.327329      0.09324096496      0.07010806001 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+save,sequence=fivecell,file="fivecell_thin_collim.seq";
+
+++++++ warning: SAVE makes all previous USE invalid !  
+++++++ warning: structured sequence flattened: fivecell
+qx = table(summ,q1); qy = table(summ,q2);
+
+++++++ info: qx redefined
+++++++ info: qy redefined
+value, qx-qxref, qy-qyref;
+
+qx-qxref =     0.004882333255 ;
+qy-qyref =     -0.01784430224 ;
+
+
+!---- Default with other options activated 
+
+
+
+option,-echo,-warn;
+
+
+
+beam;
+
+use,sequence=fivecell;      ! for twiss and makethin
+
+twiss,sequence=fivecell;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0     0.000443530778        47.48299658 
+
+                q1                dq1            betxmax              dxmax 
+       1.248722214        1.053620443        183.8515851        2.181076135 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.657376129                  0                  0        1.260064776 
+
+               dq2            betymax              dymax              dyrms 
+       1.050592974        177.9027092      0.09011673644      0.06727079848 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
+
+makethin,sequence=fivecell, minimizeparents=true, makedipedge=true, makeconsistent=true;
+
+makethin: slicing sequence : fivecell
+makethin: slicing sequence : ins
+use,sequence=fivecell;      ! use the thin sequence
+
+twiss,sequence=fivecell;    ! to allow to compare in output if betx,dx max etc agree to some percent with the thick twiss results
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             534.6                 -0    0.0004392341131        47.71467487 
+
+                q1                dq1            betxmax              dxmax 
+        1.25000744         1.04454652        187.8636431        2.201147472 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.659379784                  0                  0        1.261340163 
+
+               dq2            betymax              dymax              dyrms 
+       1.042182524        181.7010126      0.09016128042      0.06664388673 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+save,sequence=fivecell,file="fivecell_thin_options.seq";
+
+++++++ warning: SAVE makes all previous USE invalid !  
+++++++ warning: structured sequence flattened: fivecell
+qx = table(summ,q1); qy = table(summ,q2);
+
+++++++ info: qx redefined
+++++++ info: qy redefined
+value, qx-qxref, qy-qyref;
+
+qx-qxref =     0.001285225953 ;
+qy-qyref =     0.001275386661 ;
+
+
 stop;
 
 
-  Number of warnings: 2
-2 in C and 0 in Fortran
+  Number of warnings: 10
+10 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (32 bit) finished normally +
+  + MAD-X 5.02.04 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

@@ -18,11 +18,12 @@ may then be further processed.
 
 \madx writes the following descriptors in all tables: 
 \begin{itemize}
-   \item COMMENT: The current title string from the most recent TITLE command. 
+   \item COMMENT: The current title string from the most recent 
+   \hyperref[sec:title]{\tt TITLE} command. 
    \item ORIGIN: The version of \madx used. 
    \item DATE: The date of the \madx run. 
    \item TIME: The wall clock time of the \madx run. 
-   \item TYPE: The type of the table: e.g. TWISS 
+   \item TYPE: The type of the table: e.g. {\tt TWISS} 
 \end{itemize} 
 
 Additional descriptors exist in the \href{twiss_desc.html}{Twiss table},
@@ -65,7 +66,7 @@ the largest of the column name and the width of data values of the column.
 The format of the twiss table is best illustrated with an
 \href{select.html#tfs}{TFS file example}.  
 
-\madx gives access to parameters from \texttt{TWISS} and other tables using the
+\madx gives access to parameters from {\tt TWISS} and other tables using the
 \href{../Introduction/expression.html#table}{table access} function.  
 
 %% EOF

@@ -176,17 +176,17 @@ CONTAINS
     TYPE (fibre), POINTER :: Current
     TYPE (layout), TARGET, intent(inout):: L
     logical(lp) doneit
-    write(6,*) "Killing Layout",L%name
+    if(lielib_print(12)==1) write(6,*) "Killing Layout",L%name
     CALL LINE_L(L,doneit)
     nullify(current)
     IF(ASSOCIATED(L%T)) THEN
        CALL kill_NODE_LAYOUT(L%T)  !  KILLING THIN LAYOUT
        nullify(L%T)
-       WRITE(6,*) " NODE LAYOUT HAS BEEN KILLED "
+       if(lielib_print(12)==1) WRITE(6,*) " NODE LAYOUT HAS BEEN KILLED "
     ENDIF
     IF(ASSOCIATED(L%DNA)) THEN
        DEALLOCATE(L%DNA)
-       WRITE(6,*) " DNA CONTENT HAS BEEN DEALLOCATED "
+       if(lielib_print(12)==1) WRITE(6,*) " DNA CONTENT HAS BEEN DEALLOCATED "
     ENDIF
     !    IF(ASSOCIATED(L%con)) THEN
     !       DEALLOCATE(L%con)
@@ -214,7 +214,7 @@ CONTAINS
        L%N=L%N-1
     END DO
     call de_set_up(L)
-    WRITE(6,*) 'Layout killed '
+    if(lielib_print(12)==1) WRITE(6,*) 'Layout killed '
   END SUBROUTINE kill_layout
 
 

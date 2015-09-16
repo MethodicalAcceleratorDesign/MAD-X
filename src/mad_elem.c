@@ -1,7 +1,7 @@
 #include "madx.h"
 
 static struct element*
-new_element(char* name)
+new_element(const char* name)
 {
   const char *rout_name = "new_element";
   struct element* el = mycalloc(rout_name, 1, sizeof *el);
@@ -191,9 +191,9 @@ par_out_flag(char* base_name, char* par_name)
   if (strcmp(par_name,"at") == 0 || strcmp(par_name,"from") == 0) return 0;
   if (strcmp(base_name, "multipole") == 0
       && strcmp(par_name,"l") == 0) return 0;
-  if (strcmp(base_name, "rcollimator") == 0
-      && strcmp(par_name,"lrad") == 0) return 0;
-  if (strcmp(base_name, "ecollimator") == 0
+  if ( (strcmp(base_name, "collimator") == 0 || 
+	strcmp(base_name, "ecollimator") == 0 || 
+	strcmp(base_name, "rcollimator") == 0) 
       && strcmp(par_name,"lrad") == 0) return 0;
   return 1;
 }
@@ -247,7 +247,7 @@ clone_element(struct element* el)
 }
 
 struct element*
-make_element(char* name, char* parent, struct command* def, int flag)
+make_element(const char* name, const char* parent, struct command* def, int flag)
   /* makes a new element from declaration, stores in list */
 {
 /*  double length; */
@@ -481,7 +481,7 @@ element_name(char* name, int* l)
 }
 
 double
-element_value(struct node* node, char* par)
+element_value(const struct node* node, const char* par)
   /* all element parameter values except vectors are modified here
      resp. in el_par_value if any */
 {
@@ -492,7 +492,7 @@ element_value(struct node* node, char* par)
      return 0.0;
    }
 
-  struct element* el = node->p_elem;
+  const struct element* el = node->p_elem;
 
    if (el == 0) { 
      error("element_value","node has NULL element pointer.");
@@ -504,7 +504,7 @@ element_value(struct node* node, char* par)
      return 0.0;
    }
 
-   struct command* def = el->def;
+   const struct command* def = el->def;
 
    if (def == 0) { 
      error("element_value","element has NULL defintion pointer.");
@@ -519,7 +519,7 @@ element_value(struct node* node, char* par)
 }
 
 int
-element_vector(struct element* el, char* par, double* vector)
+element_vector(const struct element* el, const char* par, double* vector)
   /* returns length + vector of parameter par for element el */
 {
   int i, l = 0;
@@ -534,22 +534,12 @@ element_vector(struct element* el, char* par, double* vector)
       l = da->curr;
       copy_double(da->a, vector, l);
     }
-/*    else
-    {  
-      printf("element_vector:  parameter named %s for element %s is not double array\n",par,el->name);
-    } */
-    
   }
-/*  else
-   {
-     printf("element_vector: can not find parameter named %s for element %s\n",par,el->name);
-   }
-*/   
   return l;
 }
 
 void
-get_node_vector(char* par, int* length, double* vector)
+get_node_vector(const char* par, int* length, double* vector)
   /* returns vector for parameter par of current element */
 {
   char lpar[NAME_L];
@@ -593,7 +583,7 @@ get_node_vector(char* par, int* length, double* vector)
 }
 
 double
-el_par_value(char* par, struct element* el)
+el_par_value(const char* par, const struct element* el)
   /* returns an element parameter value */
 {
   int k = 0; // , n; not used
@@ -693,7 +683,7 @@ el_par_vector(int* total, double* vect)
 
 /* returns parameter if it has been modified, otherwise NULL */
 struct command_parameter*
-return_param(char* par, struct element* elem)
+return_param(const char* par, const struct element* elem)
 {
   int index;
   /* don't return base type definitions */
@@ -707,7 +697,7 @@ return_param(char* par, struct element* elem)
 
 /* returns parameter if it has been modified, otherwise NULL  - recursively */
 struct command_parameter*
-return_param_recurse(char* par, struct element* elem)
+return_param_recurse(const char* par, const struct element* elem)
 {
   struct command_parameter* param;
   param = return_param(par,elem);
@@ -720,7 +710,7 @@ return_param_recurse(char* par, struct element* elem)
 
 /* returns first parameter value found and recusively checks sub_elements */
 double
-el_par_value_recurse(char* par, struct element* elem)
+el_par_value_recurse(const char* par, const struct element* elem)
 {
   if (return_param(par, elem)) return el_par_value(par,elem);
   if (elem != elem->parent)
@@ -781,7 +771,7 @@ fill_elem_var_list(struct element* el, struct el_list* ell, struct var_list* var
 }
 
 struct element*
-find_element(char* name, struct el_list* ell)
+find_element(const char* name, struct el_list* ell)
 {
   int pos;
   if ((pos = name_list_pos(name, ell->list)) < 0)

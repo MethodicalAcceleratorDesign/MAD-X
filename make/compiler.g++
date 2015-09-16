@@ -69,7 +69,8 @@ CXXFLAGS += -pipe
 #
 
 CXXFLAGS += -Wpointer-arith -Wcast-align -Wcast-qual -Winline \
-            -Wfloat-equal -Wconversion -Wno-conversion \
-            -Wchar-subscripts -Wwrite-strings
+            -Wchar-subscripts -Wwrite-strings -Wconversion -Wno-conversion
+
+#           -Wfloat-equal -Wformat-nonliteral # not compatible with ugly MAD-X code...
 
 # end of makefile

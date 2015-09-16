@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.06  (64 bit, Linux)       +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.01.17      +
-  + Execution Time Stamp: 21.01.14 21.57.16 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.05  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2015.04.06               +
+  + Execution date: 2015.05.19 17:03:36      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 Title " Diamond Light Source Lattice 8.1.1";
 
 !assign echo="diamond.lis";
@@ -83,7 +83,6 @@ enter EMIT module
  Bcurrent                   0 A/bunch    Kbunch             1 
  Npart                      0 /bunch     Energy                     3 GeV 
  gamma            5870.853803            beta            0.9999999855
-guess:          0                  0                  0
  
                                                   M o d e   1         M o d e   2         M o d e   3
  Fractional tunes            undamped              0.22562273          0.36315219          0.00529040
@@ -103,6 +102,7 @@ guess:          0                  0                  0
  gamma(max) [1/m]            px                0.57593183E+01      0.21173435E-38      0.40838536E-07
                              py                0.36635826E-31      0.29767840E+01      0.39476178E-30
                              pt                0.83341187E-02      0.39462843E-29      0.34660196E+00
+++++++ warning: EMIT: beam not updated, RADIATE is false or longitudinal stability not ensured. 
 
  RF system: 
  Cavity                      length[m]        voltage[MV]                lag          freq[MHz]             harmon
@@ -112,7 +112,6 @@ guess:          0                  0                  0
 
 PTC_CREATE_UNIVERSE;
 
- Now PTC
 PTC_CREATE_LAYOUT,model=2,method=6,nst=5,exact;
 
  MAD-X Beam Parameters
@@ -165,9 +164,6 @@ ptc_twiss,closed_orbit,icase=6,file="twiss_diamond.out";
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    2.7376659710497951E-014  -7.2008025819289086E-016   0.0000000000000000        0.0000000000000000       -2.9975645770483342E-002   7.9176324123372622E-014
-Deviation from symplecticity  0.5245424687641105E-11 %
-Deviation from symplecticity  0.5245424687641105E-11 %
 
 ++++++ table: ptc_twiss_summary
 
@@ -251,7 +247,6 @@ Deviation from symplecticity  0.5245424687641105E-11 %
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
  Normal Form Type 1
-Deviation from symplecticity  0.1130762150580722E-10 %
    write, table=normal_results,file=normal_results; 
 
 
@@ -261,8 +256,9 @@ removefile, file='Maxwellian_bend_for_ptc.txt';
 stop;
 
 
-  Number of warnings: 0
+  Number of warnings: 1
+1 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.06 (64 bit) finished normally +
+  + MAD-X 5.02.05 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

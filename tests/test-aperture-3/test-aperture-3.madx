@@ -1,0 +1,63 @@
+
+ title, 'AD HE 2010 optics. Anti-Protons - 3.57 GeV/c';
+
+ option, RBARC=FALSE;
+
+ option, -echo;
+ call, file = '../share/AD/ad_quads_3837_ffe.str';
+ call, file = '../share/AD/ad_ERCOLL.ele';
+ call, file = '../share/AD/ad.dbx';
+ call, file = '../share/AD/ad_new.seq';
+ option, echo;
+
+ !set,  format="-21s";
+ !set,  format="13.11f";
+
+
+/*****************************************************************************
+ * store initial parameters in memory block
+ *****************************************************************************/
+INITBETA0: BETA0,
+  BETX=   3.85095118133,
+  ALFX=  -0.200025813081E-05,
+  MUX=MUX0,
+  BETY=1.,
+  ALFY=ALFY0,
+  MUY=MUY0,
+  X=X0,
+  PX=PX0,
+  Y=Y0,
+  PY=PY0,
+  T=T0,
+  PT=PT0,
+  DX=0.115194401814,
+  DPX=DPX0,
+  DY=DY0,
+  DPY=DPY0;
+
+
+ Beam, particle=POSITRON, ENERGY=1.0, EX=1.e-8, EY=1.e-8;
+ Use, sequence=AD;
+
+ Select flag=twiss,column=name, s, l, alfx, betx,dx, alfy, bety;
+ Twiss, centre, beta0=initbeta0;
+
+
+!!! uses default beam and halo data (lhc at injection)
+select, flag=aperture, clear;
+select, flag=aperture, column=name,s,betx,bety,dx,x,y,n1,apertype,xtol,ytol,rtol;
+aperture, offsetelem="offset.tfs", file="ap.tfs", 
+          dqf=2.086, betaqfx=16.25, dp=0.0015, 
+          dparx=0.273, dpary=0.273, cor=0.004, bbeat=1.1, 
+          nco=5, interval=1, halo={6., 8.4, 7.3, 7.3};
+
+!! One can then access the minimum n1 as a variable of the BEAM command:
+Value, beam->n1min;
+
+
+stop;
+
+
+
+
+

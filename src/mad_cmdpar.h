@@ -47,18 +47,18 @@ struct command_parameter_list /* contains list of command parameter pointers */
 
 // interface
 
-struct command_parameter*       new_command_parameter(char* name, int type);
+struct command_parameter*       new_command_parameter(const char* name, int type);
 struct command_parameter_list*  new_command_parameter_list(int length);
-struct command_parameter*       clone_command_parameter(struct command_parameter*);
+struct command_parameter*       clone_command_parameter(const struct command_parameter*);
 struct command_parameter*       delete_command_parameter(struct command_parameter*);
 struct command_parameter_list*  delete_command_parameter_list(struct command_parameter_list*);
 struct command_parameter*       store_comm_par_def(char* toks[], int start, int end);
 
 struct expression* command_par_expr(const char* parameter, struct command*);
-double  command_par_special(const char* parameter, struct element*);
-char*   command_par_string(const char* parameter, struct command*);
-double  command_par_value(const char* parameter, struct command*);
-int     command_par_value2(const char* parameter, struct command*, double* val);
+double  command_par_special(const char* parameter, const struct element*);
+char*   command_par_string(const char* parameter, const struct command*);
+double  command_par_value(const char* parameter, const struct command*);
+int     command_par_value2(const char* parameter, const struct command*, double* val);
 struct double_array* command_par_array(const char* parameter, struct command*);
 int     command_par_vector(const char* parameter, struct command*, double* vector);
 void    set_command_par_value(const char* parameter, struct command*, double val);
@@ -73,18 +73,18 @@ void    grow_command_parameter_list(struct command_parameter_list*);
 void    print_command_parameter(struct command_parameter*);
 int     par_present(char* par, struct command*, struct command_list*);
 void    store_comm_par_vector(const char* parameter, double* val, struct command*);
-void    add_cmd_parameter_clone(struct command*, struct command_parameter*,char* par_name,int inf);
-void    add_cmd_parameter_new(struct command*,double par_value,char* par_name,int inf);
+void    add_cmd_parameter_clone(struct command*, const struct command_parameter*, const char* par_name, int inf);
+void    add_cmd_parameter_new(struct command*,double par_value, const char* par_name, int inf);
 void    comm_para(char* name, int* n_int, int* n_double, int* n_string, int* int_array, double* double_array, char* strings, int* string_lengths);
 int     log_val(char* name, struct command*);
 
 // void    set_command_par_string(char* parameter, struct command*, char* val); // not used...
 
 // used by Fortran
-double  get_value (char* name, char* par);
-int     get_string(char* name, char* par, char* string);
-int     get_vector(char* name, char* par, double* vector);
-void    set_value (char* name, char* par, double* value);
+double  get_value (const char* name, const char* par);
+int     get_string(const char* name, const char* par, char* string);
+int     get_vector(const char* name, const char* par, double* vector);
+void    set_value (const char* name, const char* par, double* value);
 
 #endif // MAD_CMDPAR_H
 

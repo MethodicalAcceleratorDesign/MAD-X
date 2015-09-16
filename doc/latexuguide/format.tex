@@ -317,7 +317,12 @@ An expression can be formed using the following operators:
   \ttitem{SINH(x)} hyperbolic sine, 
   \ttitem{COSH(x)} hyperbolic cosine, 
   \ttitem{TANH(x)} hyperbolic tangent, 
-  \ttitem{ABS(x)} absolute value; 
+  \ttitem{ABS(x)} absolute value, 
+  \ttitem{ERF(x)} Gauss error,
+  \ttitem{ERFC(x)} complementary error,
+  \ttitem{FLOOR(x)} floor, largest previous integer,
+  \ttitem{CEIL(x)} ceiling, smallest next integer,
+  \ttitem{ROUND(x)} round, closest integer;
 \end{madlist}
 
 \subsubsection{Random Number Generators}
@@ -338,10 +343,11 @@ random generator use the \hyperref[sec:eoption]{\tt EOPTION} command.
 \label{subsubsec:table}
 
 \begin{madlist}
-  \ttitem{table(x,z)} accesses value of the named table column "z"
+  \ttitem{TABLE(x,z)} accesses value of the named table column "z"
   of table "x"; example: table(summ,q1) returns the hor. tune of
   the Twiss summary table "summ".  
-  \ttitem{table(x,y,z)} accesses value of the named table column "z"
+
+  \ttitem{TABLE(x,y,z)} accesses value of the named table column "z"
   for element "y" (first table row with that name) of table "x";
   example: table(twiss,mb.12,betx) returns the beta\_x at
   element mb.12 from the Twiss table "twiss".   When the element
@@ -395,7 +401,7 @@ Or another arbitrary test case of adding k1l taken from the Twiss table:
 
 Define macro: 
 \begin{verbatim}
-mycrap(xx,yy,zz): macro = {myval = table(xx,yy,zz);};
+mymacro(xx,yy,zz): macro = {myval = table(xx,yy,zz);};
 \end{verbatim}
 
 Use macro in loop: 
@@ -404,7 +410,7 @@ i = 0;
 incval = 0;
 while (i < 100) {
   value, i;
-  exec, mycrap(twiss,k1l,$i);
+  exec, mymacro(twiss,k1l,$i);
   incval = incval + myval;
   value, i, myval, incval;                
   i = i + 1;
@@ -443,7 +449,9 @@ Example:
 
 A number of predefined symbolic constants exist in \madx and can be used
 in expressions. The values of physical constants are regularly updated
-to reflect the values published by the Particle Data Group \cite{PDGlatest} 
+to reflect the values published by the Particle Data Group \cite{PDG2014} 
+The values published in 2014 (\cite{PDG2014}) have not changed with respect to 
+the values published in 2012 (\cite{PDG2012}).
 
 \begin{table}[ht]
 \caption{Predefined Symbolic Constants in \madx}
@@ -460,7 +468,7 @@ RADDEG & $\pi/180$ & PI / 180 & rad/deg \\
 E & e & exp(1) & 1 \\ 
 EMASS & $m_e$ & $0.510998928\times 10^{-3}$& GeV \\ 
 PMASS & $m_p$ & 0.938272046 & GeV \\ 
-NMASS & $m_n$ & 0.931494061 & GeV \\
+NMASS & $u$ & 0.931494061 & GeV \\
 MUMASS & $m_\mu$ & 0.1056583715 & GeV \\ 
 CLIGHT & $c$ & $2.99792458\times 10^{8}$ & m/s \\ 
 QELECT & $e$ & $1.602176565\times 10^{-19}$ & A.s \\ 
@@ -471,6 +479,9 @@ PRAD & $r_e (m_e / m_p)$ & ERAD*EMASS/PMASS & m \\
 \end{tabular}
 \end{center}
 \end{table}
+
+Note that the {\tt NMASS} constant in \madx is the unified atomic mass unit and 
+not the neutron mass.
 
 \subsubsection{Parameter labels} 
 Often a set of numerical values depends on a common variable
@@ -686,8 +697,9 @@ occurrence "$\backslash$." stands for a literal period.
 \label{sec:relations}\label{sec:defer}
 A relation is established between variables by one of two statements 
 \madbox{
-parameter-name = \= expression; \\
-parameter-name := \> expression;
+xxxxxxxxxxxxxxxx\= \kill
+parameter-name \>=  expression; \\
+parameter-name :\>=  expression;
 }
 The first form evaluates the expression on the right immediately and
 assigns its value to the parameter. It is an immediate assignment.
@@ -722,8 +734,8 @@ The parameter on the left may appear on the right as well in the
 computer science form of assignments: 
 \madxmp{x = x+1;}
 increases the value of x by 1. \\
-As a result, the SET statement of \madeight is no longer necessary and
-is not implemented in \madx.   
+%As a result, the SET statement of \madeight is no longer necessary and
+%is not implemented in \madx.   
 
 
 Successive definitions are allowed in the first form of relations or 
@@ -738,40 +750,7 @@ deferred assignments, are forbidden:
 a := b + 2; \\
 b := a * b;
 }
-will result in an error.
-
-%% Already in control.tex
-%% \section{\href{par_output}{VALUE: Output of Parameters}}
-%% The VALUE statement evaluates the current value of all listed expressions, and
-%% prints the result on the standard output file.
-%% \madbox{
-%% VALUE = expression {, expression2};
-%% }
-
-%% Example:
-%% \madxmp{
-%% p1 = 5; \\
-%% p2 = 7; \\
-%% VALUE, p1*p2-3;
-%% }
-%% After echoing the command, this prints:
-%% \madxmp{
-%% p1*p2-3 = 32       ;
-%% }
-
-%% Another example:
-%% \begin{verbatim}
-%% option,-warn;
-%% while (x 
-%% \end{verbatim}
-%% ?????
-
-%% After echoing the command, this prints:
-%% \begin{verbatim}
-%% x = 100        ;       
-%% x^2 = 10000      ;       
-%% log10(x) = 2      ;            
-%% \end{verbatim}
+results in an error.
 
 %\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg} 11.9.2000
 

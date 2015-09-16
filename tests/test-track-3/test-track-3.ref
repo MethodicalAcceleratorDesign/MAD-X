@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.02  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.05.24      +
-  + Execution Time Stamp: 02.09.13 11.18.25 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.11.14               +
+  + Execution date: 2015.02.20 23:23:17      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 ! Simple tracking test for LHC beam screen.
 
 ! tstTrack_ap_lhcscreen.madx
@@ -16,20 +16,20 @@ option,-echo,-info,warn;
 enter TRACK module
 one pass is on
 aperture tracking is on
-particle #    16 lost turn      1  at pos. s =      1.00 element=qd                                               aperture =lhcscreen                                       
-    X=  8.159254920000001E-004   Y= -8.893227380000000E-004   T=  0.000000000000000E+000
-particle #    18 lost turn      1  at pos. s =      1.00 element=qd                                               aperture =lhcscreen                                       
-    X= -8.598638520000001E-004   Y=  8.389165900000001E-004   T=  0.000000000000000E+000
-particle #    19 lost turn      1  at pos. s =      1.00 element=qd                                               aperture =lhcscreen                                       
-    X=  9.302684080000000E-004   Y=  8.087565800000002E-004   T=  0.000000000000000E+000
-particle #    20 lost turn      1  at pos. s =      1.00 element=qd                                               aperture =lhcscreen                                       
-    X= -3.398231800000000E-004   Y= -9.880215999999999E-004   T=  0.000000000000000E+000
 particle #     2 lost turn      1  at pos. s =      1.00 element=qd                                               aperture =lhcscreen                                       
-    X= -1.146443599999999E-004   Y=  9.902022480000002E-004   T=  0.000000000000000E+000
+    X=  -1.1464435999999987E-004   Y=   9.9020224800000023E-004   T=   0.0000000000000000     
 particle #     5 lost turn      1  at pos. s =      1.00 element=qd                                               aperture =lhcscreen                                       
-    X= -4.975781300000000E-004   Y=  8.020942740000001E-004   T=  0.000000000000000E+000
+    X=  -4.9757812999999995E-004   Y=   8.0209427400000015E-004   T=   0.0000000000000000     
 particle #     9 lost turn      1  at pos. s =      1.00 element=qd                                               aperture =lhcscreen                                       
-    X= -5.147772759999999E-004   Y= -7.682893560000000E-004   T=  0.000000000000000E+000
+    X=  -5.1477727599999988E-004   Y=  -7.6828935600000000E-004   T=   0.0000000000000000     
+particle #    16 lost turn      1  at pos. s =      1.00 element=qd                                               aperture =lhcscreen                                       
+    X=   8.1592549200000010E-004   Y=  -8.8932273799999999E-004   T=   0.0000000000000000     
+particle #    18 lost turn      1  at pos. s =      1.00 element=qd                                               aperture =lhcscreen                                       
+    X=  -8.5986385200000006E-004   Y=   8.3891659000000013E-004   T=   0.0000000000000000     
+particle #    19 lost turn      1  at pos. s =      1.00 element=qd                                               aperture =lhcscreen                                       
+    X=   9.3026840800000004E-004   Y=   8.0875658000000017E-004   T=   0.0000000000000000     
+particle #    20 lost turn      1  at pos. s =      1.00 element=qd                                               aperture =lhcscreen                                       
+    X=  -3.3982317999999999E-004   Y=  -9.8802159999999994E-004   T=   0.0000000000000000     
 
 *****  end of trrun  *****
 exit TRACK module
@@ -38,19 +38,19 @@ enter TRACK module
 one pass is on
 aperture tracking is on
 particle #     4 lost turn      1  at pos. s =      1.00 element=qf                                               aperture =lhcscreen                                       
-    X= -1.102201686000000E-003   Y=  5.286160260000001E-004   T=  0.000000000000000E+000
-particle #    15 lost turn      1  at pos. s =      1.00 element=qf                                               aperture =lhcscreen                                       
-    X= -1.174812422000000E-003   Y= -6.124647640000000E-004   T=  0.000000000000000E+000
-particle #    17 lost turn      1  at pos. s =      1.00 element=qf                                               aperture =lhcscreen                                       
-    X= -8.306140819999999E-004   Y=  6.348530920000002E-004   T=  0.000000000000000E+000
-particle #    19 lost turn      1  at pos. s =      1.00 element=qf                                               aperture =lhcscreen                                       
-    X= -1.046471346000000E-003   Y=  9.124171080000000E-004   T=  0.000000000000000E+000
+    X=  -1.1022016860000000E-003   Y=   5.2861602600000009E-004   T=   0.0000000000000000     
 particle #     6 lost turn      1  at pos. s =      1.00 element=qf                                               aperture =lhcscreen                                       
-    X=  7.663895900000001E-004   Y=  4.525653040000001E-004   T=  0.000000000000000E+000
+    X=   7.6638959000000005E-004   Y=   4.5256530400000013E-004   T=   0.0000000000000000     
 particle #    13 lost turn      1  at pos. s =      1.00 element=qf                                               aperture =lhcscreen                                       
-    X= -8.360400459999999E-004   Y= -2.977296640000000E-004   T=  0.000000000000000E+000
+    X=  -8.3604004599999995E-004   Y=  -2.9772966400000000E-004   T=   0.0000000000000000     
+particle #    15 lost turn      1  at pos. s =      1.00 element=qf                                               aperture =lhcscreen                                       
+    X=  -1.1748124220000000E-003   Y=  -6.1246476400000005E-004   T=   0.0000000000000000     
 particle #    16 lost turn      1  at pos. s =      1.00 element=qf                                               aperture =lhcscreen                                       
-    X= -9.908859020000000E-004   Y= -4.339330199999995E-005   T=  0.000000000000000E+000
+    X=  -9.9088590200000002E-004   Y=  -4.3393301999999955E-005   T=   0.0000000000000000     
+particle #    17 lost turn      1  at pos. s =      1.00 element=qf                                               aperture =lhcscreen                                       
+    X=  -8.3061408199999992E-004   Y=   6.3485309200000018E-004   T=   0.0000000000000000     
+particle #    19 lost turn      1  at pos. s =      1.00 element=qf                                               aperture =lhcscreen                                       
+    X=  -1.0464713460000001E-003   Y=   9.1241710800000000E-004   T=   0.0000000000000000     
 
 *****  end of trrun  *****
 exit TRACK module
@@ -59,5 +59,5 @@ exit TRACK module
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.02 (64 bit) finished normally +
+  + MAD-X 5.02.04 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

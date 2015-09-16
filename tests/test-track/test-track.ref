@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.02  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.05.24      +
-  + Execution Time Stamp: 02.09.13 11.18.18 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.11.14               +
+  + Execution date: 2015.02.20 23:23:03      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 ! Simple tracking test for collimator with aper definition.
 
 ! tstTrack_ap_collimator.madx
@@ -16,16 +16,16 @@ option,-echo,-info,warn;
 enter TRACK module
 one pass is on
 aperture tracking is on
-particle #    16 lost turn      1  at pos. s =      1.00 element=col                                              aperture =rectellipse                                     
-    X=  1.631850984000000E-003   Y= -1.511848654600000E-003   T=  0.000000000000000E+000
-particle #    18 lost turn      1  at pos. s =      1.00 element=col                                              aperture =rectellipse                                     
-    X= -1.719727704000000E-003   Y=  1.426158203000000E-003   T=  0.000000000000000E+000
-particle #    19 lost turn      1  at pos. s =      1.00 element=col                                              aperture =rectellipse                                     
-    X=  1.860536816000000E-003   Y=  1.374886186000000E-003   T=  0.000000000000000E+000
-particle #    20 lost turn      1  at pos. s =      1.00 element=col                                              aperture =rectellipse                                     
-    X= -6.796463600000000E-004   Y= -1.679636720000000E-003   T=  0.000000000000000E+000
 particle #     2 lost turn      1  at pos. s =      1.00 element=col                                              aperture =rectellipse                                     
-    X= -2.292887199999997E-004   Y=  1.683343821600000E-003   T=  0.000000000000000E+000
+    X=  -2.2928871999999974E-004   Y=   1.6833438216000000E-003   T=   0.0000000000000000     
+particle #    16 lost turn      1  at pos. s =      1.00 element=col                                              aperture =rectellipse                                     
+    X=   1.6318509840000002E-003   Y=  -1.5118486546000000E-003   T=   0.0000000000000000     
+particle #    18 lost turn      1  at pos. s =      1.00 element=col                                              aperture =rectellipse                                     
+    X=  -1.7197277040000001E-003   Y=   1.4261582030000001E-003   T=   0.0000000000000000     
+particle #    19 lost turn      1  at pos. s =      1.00 element=col                                              aperture =rectellipse                                     
+    X=   1.8605368160000001E-003   Y=   1.3748861860000000E-003   T=   0.0000000000000000     
+particle #    20 lost turn      1  at pos. s =      1.00 element=col                                              aperture =rectellipse                                     
+    X=  -6.7964635999999998E-004   Y=  -1.6796367199999999E-003   T=   0.0000000000000000     
 
 *****  end of trrun  *****
 exit TRACK module
@@ -34,5 +34,5 @@ exit TRACK module
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.02 (64 bit) finished normally +
+  + MAD-X 5.02.04 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

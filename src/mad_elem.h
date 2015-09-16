@@ -36,7 +36,7 @@ struct el_list /* contains list of element pointers sorted by name */
 
 // interface
 
-struct element* make_element(char* name, char* parent, struct command*, int flag);
+struct element* make_element(const char* name, const char* parent, struct command*, int flag);
 struct element* clone_element(struct element*);
 struct element* delete_element(struct element*);
 void            update_element(struct element*, struct command* update);
@@ -46,7 +46,7 @@ void            export_el_def_8(struct element*, char* string);
 
 struct el_list* new_el_list(int length);
 struct el_list* delete_el_list(struct el_list*);
-struct element* find_element(char* name, struct el_list*);
+struct element* find_element(const char* name, struct el_list*);
 void            write_elems(struct el_list*, struct command_list*, FILE*);
 void            write_elems_8(struct el_list*, struct command_list*, FILE*);
 
@@ -56,20 +56,20 @@ char*           compound(char* e_name, int occ_cnt);
 
 void    enter_element(struct in_cmd*);
 void    element_name(char* name, int* l);
-double  element_value(struct node*, char* par);
-int     element_vector(struct element*, char* par, double* vector);
+double  element_value(const struct node*, const char* par);
+int     element_vector(const struct element*, const char* par, double* vector);
 
 int     belongs_to_class(struct element*, char*);
-void    get_node_vector(char* par, int* length, double* vector);
+void    get_node_vector(const char* par, int* length, double* vector);
 int     el_par_vector(int* total, double* vect);
-double  el_par_value(char* par, struct element*);
-double  el_par_value_recurse(char* par, struct element*);
+double  el_par_value(const char* par, const struct element*);
+double  el_par_value_recurse(const char* par, const struct element*);
 void    fill_elem_var_list(struct element*, struct el_list*, struct var_list*);
 void    add_to_el_list(struct element**, int inf, struct el_list*, int flag);
 
 // used by mad_mkthin.c
-struct command_parameter* return_param(char* par, struct element*);
-struct command_parameter* return_param_recurse(char* par, struct element*);
+struct command_parameter* return_param(const char* par, const struct element*);
+struct command_parameter* return_param_recurse(const char* par, const struct element*);
 
 #endif // MAD_ELEM_H
 

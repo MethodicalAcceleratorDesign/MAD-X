@@ -36,7 +36,6 @@ struct macro* new_macro(int n_formal, int length, int p_length);
 
 struct macro_list* new_macro_list(int length);
 void               add_to_macro_list(struct macro*, struct macro_list*);
-int                remove_from_name_list(char* name, struct name_list*);
 
 void  disable_line(char* name, struct macro_list*);
 void  replace_lines(struct macro*, int replace, char** reps);

@@ -19,7 +19,7 @@ sequence of beam elements placed sequentially along a reference
 orbit. 
 The reference orbit is the path of a charged particle having the
 central design momentum of the accelerator through idealised magnets
-with no fringe fields (see Figure~\ref{F-REF}). 
+with no fringe fields (see Figure~\ref{F-REF}).
 
 \begin{figure}[htb]
 \centering
@@ -27,10 +27,12 @@ with no fringe fields (see Figure~\ref{F-REF}).
 \begin{picture}(400,250)
 % axes
 \thicklines
-\put(180,40){\vector(0,1){150}}
-\put(190,180){\makebox(0,0){\(y\)}}
+\put(180,60){\vector(0,1){130}}
+\put(188,182){\makebox(0,0){\(y\)}}
 \put(280,0){\vector(-1,1){160}}
 \put(120,150){\makebox(0,0){\(x\)}}
+\put(140,80){\vector(2,1){100}}
+\put(225,130){\makebox(0,0){\(z\)}}
 \thinlines
 \put(180,100){\circle*{4}}
 % coordinates
@@ -49,22 +51,26 @@ with no fringe fields (see Figure~\ref{F-REF}).
 \put(295,15){\makebox(0,0)[bl]{\shortstack{centre of \\curvature}}}
 % actual orbit
 \thicklines
+\color{red}
 \bezier{150}(0,100)(75,165)(150,190)
-\put(150,190){\vector(3,1){18}}
-\put(159,200){\makebox(0,0)[br]{\(d\vec r\)}}
 \bezier{150}(150,190)(240,220)(320,220)
 \put(320,220){\vector(1,0){4}}
+\color{black}
 \put(80,180){\vector(1,-1){12}}
 \put(80,180){\makebox(0,0)[br]{\shortstack{actual \\orbit}}}
+\put(150,190){\vector(3,1){18}}
+\put(159,200){\makebox(0,0)[br]{\(d\vec r\)}}
 % actual orbit
+\color{blue}
 \bezier{150}(40,0)(100,60)(180,100)
 \bezier{150}(180,100)(260,140)(340,160)
 \put(340,160){\vector(4,1){4}}
-\put(320,165){\makebox{\(s\)}}
+\color{black}
+\put(328,162){\makebox{\(s\)}}
 \put(320,135){\vector(-1,1){12}}
 \put(320,135){\makebox(0,0)[tl]{\shortstack{reference \\orbit}}}
 \end{picture}
-\caption{Local Reference System}
+\caption[Local Reference System]{Local Reference System}
 \label{F-REF}
 \end{figure}
 
@@ -72,10 +78,10 @@ with no fringe fields (see Figure~\ref{F-REF}).
 The reference orbit consists of a series of straight line segments and
 circular arcs. It is defined under the assumption that all elements are
 perfectly aligned. The accompanying tripod of the reference orbit spans
-a local curvilinear right handed coordinate system \textit{(x,y,s)} The
-local \textit{s}-axis is the tangent to the reference orbit. The two
+a local curvilinear right handed coordinate system {\it (x,y,s)} The
+local {\it s}-axis is the tangent to the reference orbit. The two
 other axes are perpendicular to the reference orbit and are labelled
-\textit{x} (in the bend plane) and \textit{y} (perpendicular to the bend
+{\it x} (in the bend plane) and {\it y} (perpendicular to the bend
 plane).  
 
 
@@ -86,11 +92,11 @@ Due to various errors like misalignment errors, field errors, fringe
 fields etc., the closed orbit does not coincide with the reference
 orbit. The closed orbit also changes with the momentum error. 
 The closed orbit is described with respect to the reference orbit, using
-the local reference system (\textit{x, y, s}). It is evaluated including
+the local reference system ({\it x, y, s}). It is evaluated including
 any nonlinear effects.  
 
 \madx also computes the betatron and synchrotron oscillations with respect
-to the closed orbit. Results are given in the local (\textit{x, y,
+to the closed orbit. Results are given in the local ({\it x, y,
   s})-system defined by the reference orbit. 
 
 
@@ -100,87 +106,213 @@ to the closed orbit. Results are given in the local (\textit{x, y,
 
 The global reference orbit of the accelerator is
 uniquely defined by the sequence of physical elements. The local
-reference system (\textit{x}, \textit{y}, \textit{s}) may thus be
-referred to a global Cartesian coordinate system (\textit{X},
-\textit{Y}, \textit{Z}) (see Figure~\ref{F-GLOB}). 
-The positions between beam elements are numbered 0,\ldots,i,\ldots,n. 
-The local reference system  (\textit{x$_i$, y$_i$, s$_i$}) at position
-\textit{i}, i.e. the displacement and direction of the reference orbit
-with respect to the system (\textit{X}, \textit{Y}, \textit{Z}) are
-defined by three displacements  ($X_i$, $Y_i$, $Z_i$) and three angles
-($\Theta_i$, $\Phi_i$, $Psi_i$) 
+reference system ({\it x, y, s}) may thus be
+referred to a global Cartesian coordinate system ({\it X, Y, Z}) 
+(see Figure~\ref{F-GLOB}). 
 
+The positions between beam elements are indexed with $i=0,\ldots n$. 
+The local reference system  ({$x_i$, $y_i$, $s_i$}) at position
+{\it i}, i.e. the displacement and direction of the reference orbit
+with respect to the system ({\it X, Y, Z}) are
+defined by three displacements  ($X_i$, $Y_i$, $Z_i$) and three angles
+($\theta_i$, $\phi_i$, $\psi_i$) 
+
+%% \begin{figure}[htb]% 1.2
+%% \centering
+%% \setlength{\unitlength}{1pt}
+%% \begin{picture}(400,270)
+%% % global axes
+%% \thicklines
+%% \put(20,150){\vector(2,-1){280}}
+%% \put(290,35){\makebox(0,0){\(Z\)}}
+%% \put(20,100){\vector(3,1){360}}
+%% \put(370,200){\makebox(0,0){\(X\)}}
+%% \put(80,0){\vector(0,1){270}}
+%% \put(70,240){\makebox(0,0){\(Y\)}}
+%% %local axes
+%% \put(133.3,0){\vector(1,3){90}}
+%% \put(213.3,260){\makebox(0,0){\(x\)}}
+%% \put(300,150){\vector(-2,1){180}}
+%% \put(150,215){\makebox(0,0){\(y\)}}
+%% \put(0,100){\vector(2,1){270}}
+%% \put(260,240){\makebox(0,0){\(s\)}}
+%% % projection of s onto ZX
+%% \thinlines
+%% \put(80,120){\circle*{4}}
+%% \put(200,200){\circle*{4}}
+%% \put(0,110){\line(1,0){290}}
+%% \put(300,110){\makebox(0,0)[l]{\shortstack{projection of \(s\) \\
+%% onto \(ZX\)-plane}}}
+%% \put(20,110){\circle*{4}}
+%% \put(50,110){\circle*{4}}
+%% \put(100,110){\circle*{4}}
+%% % displacement of local system
+%% \put(140,140){\line(2,-1){60}}
+%% \put(160,128){\makebox(0,0)[tr]{\(Z\)}}
+%% \put(140,90){\line(3,1){60}}
+%% \put(190,100){\makebox(0,0)[tl]{\(X\)}}
+%% \put(200,110){\line(0,1){90}}
+%% \put(205,140){\makebox(0,0)[l]{\(Y\)}}
+%% \put(140,90){\circle*{4}}
+%% \put(140,140){\circle*{4}}
+%% \put(200,110){\circle*{4}}
+%% % intersection of xy and ZX
+%% \put(130,0){\line(1,1){230}}
+%% \put(135,5){\circle*{4}}
+%% \put(193.3,63.3){\circle*{4}}
+%% \put(240,110){\circle*{4}}
+%% \put(286.7,156.7){\circle*{4}}
+%% \put(335,205){\circle*{4}}
+%% \thicklines
+%% \put(180,20){\vector(-1,1){12}}
+%% \put(180,20){\makebox(0,0)[tl]{\shortstack{intersection of \\
+%% \(xy\) and \(ZX\) planes}}}
+%% % reference orbit
+%% \bezier{80}(140,150)(170,185)(200,200)
+%% \bezier{80}(200,200)(230,215)(260,220)
+%% \put(260,220){\makebox(0,0)[l]{\shortstack{reference \\orbit}}}
+%% % roll angle
+%% \bezier{30}(160,30)(160,40)(150,50)
+%% \put(152,48){\vector(-1,1){2}}
+%% \put(150,30){\makebox(0,0){\(\psi\)}}
+%% \put(140,30){\makebox(0,0)[br]{roll angle}}
+%% % pitch angle
+%% \bezier{20}(60,110)(60,120)(55,125)
+%% \put(57,123){\vector(-1,2){2}}
+%% \put(50,118){\makebox(0,0){\(\phi\)}}
+%% \put(40,125){\makebox(0,0)[br]{pitch angle}}
+%% % azimuth
+%% \bezier{20}(130,95)(140,100)(140,110)
+%% \put(140,105){\vector(0,1){5}}
+%% \put(130,105){\makebox(0,0){\(\theta\)}}
+%% \put(115,95){\makebox(0,0)[t]{azimuth}}
+%% \end{picture}
+%% \caption{Global Reference System}
+%% \label{F-GLOB}
+%% \end{figure}
+
+%% alternate take for more clarity
 \begin{figure}[htb]% 1.2
 \centering
 \setlength{\unitlength}{1pt}
 \begin{picture}(400,270)
+
 % global axes
+\color{black}
 \thicklines
 \put(20,150){\vector(2,-1){280}}
-\put(290,35){\makebox(0,0){\(Z\)}}
+\put(300,20){\makebox(0,0){\(Z\)}}
 \put(20,100){\vector(3,1){360}}
-\put(370,200){\makebox(0,0){\(X\)}}
+\put(380,210){\makebox(0,0){\(X\)}}
 \put(80,0){\vector(0,1){270}}
-\put(70,240){\makebox(0,0){\(Y\)}}
+\put(70,265){\makebox(0,0){\(Y\)}}
+
 %local axes
+\color{red}
+\thinlines
 \put(133.3,0){\vector(1,3){90}}
-\put(213.3,260){\makebox(0,0){\(x\)}}
+\put(213.3,265){\makebox(0,0){\(x\)}}
 \put(300,150){\vector(-2,1){180}}
-\put(150,215){\makebox(0,0){\(y\)}}
+\put(125,230){\makebox(0,0){\(y\)}}
 \put(0,100){\vector(2,1){270}}
 \put(260,240){\makebox(0,0){\(s\)}}
-% projection of s onto ZX
+
+% displacement of local system
+\color{black}
+\put(140,140){\line(2,-1){60}}
+\put(160,128){\makebox(0,0)[tr]{\(Z_i\)}}
+\put(140,90){\line(3,1){60}}
+\put(180,100){\makebox(0,0)[tl]{\(X_i\)}}
+\put(200,110){\line(0,1){90}}
+\put(205,140){\makebox(0,0)[l]{\(Y_i\)}}
+
+% roll angle
+\bezier{30}(160,30)(160,40)(150,50)
+\put(151,49){\vector(-1,1){1}}
+\put(150,30){\makebox(0,0){\(\psi_i\)}}
+
+% pitch angle
+\bezier{20}(60,110)(60,120)(55,125)
+\put(57,123){\vector(-1,2){2}}
+\put(50,118){\makebox(0,0){\(\phi_i\)}}
+
+% azimuth angle
+\bezier{20}(130,95)(140,100)(140,110)
+\put(140,105){\vector(0,1){5}}
+\put(130,103){\makebox(0,0){\(\theta_i\)}}
+
+% reference orbit
+\color{black}
+\thicklines
+\bezier{80}(140,155)(170,185)(200,200)
+\bezier{80}(200,200)(230,215)(260,210)
+\put(260,213){\makebox(0,0)[l]{\shortstack{reference \\orbit}}}
+
+% intersections of planes
+\color{green}
 \thinlines
-\put(80,120){\circle*{4}}
-\put(200,200){\circle*{4}}
-\put(0,110){\line(1,0){290}}
-\put(300,110){\makebox(0,0)[l]{\shortstack{projection of \(s\) \\
+\multiput(130,0)(2,2){115}{\line(0,1){1}}
+\thicklines
+\put(180,20){\vector(-1,1){12}}
+\put(172,20){\makebox(0,0)[tl]{\shortstack{intersection of \\
+			\(xy\) and \(ZX\) planes}}}
+
+\thinlines
+\multiput(0,128)(2,-1.8){73}{\line(0,-1){1}}
+\thicklines
+\put(60,50){\vector(1,1){12}}
+\put(0,50){\makebox(0,0)[tl]{\shortstack{intersection of \\
+			\(xs\) and \(ZX\) \\ planes}}}
+
+\thinlines
+\multiput(0,107)(3,0.522){120}{\line(0,1){1}}
+\thicklines
+\put(318,149){\vector(-1,1){12}}
+\put(320,150){\makebox(0,0)[tl]{\shortstack{intersection of \\
+			\(ys\) and \(ZX\) \\ planes}}}
+
+% projection of axes onto ZX (horizontal plane)
+\color{blue}
+\thinlines
+\multiput(0,110)(2,0){180}{\line(1,0){1}}
+\put(300,95){\makebox(0,0)[l]{\shortstack{projection of \(s\) \\
 onto \(ZX\)-plane}}}
-\put(20,110){\circle*{4}}
+
 \put(50,110){\circle*{4}}
 \put(100,110){\circle*{4}}
-% displacement of local system
-\put(140,140){\line(2,-1){60}}
-\put(160,128){\makebox(0,0)[tr]{\(Z\)}}
-\put(140,90){\line(3,1){60}}
-\put(190,100){\makebox(0,0)[tl]{\(X\)}}
-\put(200,110){\line(0,1){90}}
-\put(205,140){\makebox(0,0)[l]{\(Y\)}}
-\put(140,90){\circle*{4}}
-\put(140,140){\circle*{4}}
-\put(200,110){\circle*{4}}
-% intersection of xy and ZX
-\put(130,0){\line(1,1){230}}
+
+\multiput(131,0)(1,1.6){123}{\line(1,0){1}}
+\put(177,71){\circle*{4}}
+\put(240,173){\circle*{4}}
+
+\multiput(147,80)(1.79,1){100}{\line(1,0){1}}
+\put(154,83){\circle*{4}}
+
+% dots for intersections of planes
+\color{green}
+\put(20,110){\circle*{4}}
+\put(28,102){\circle*{4}}
 \put(135,5){\circle*{4}}
 \put(193.3,63.3){\circle*{4}}
 \put(240,110){\circle*{4}}
 \put(286.7,156.7){\circle*{4}}
 \put(335,205){\circle*{4}}
-\thicklines
-\put(180,20){\vector(-1,1){12}}
-\put(180,20){\makebox(0,0)[tl]{\shortstack{intersection of \\
-\(xy\) and \(ZX\) planes}}}
-% reference orbit
-\bezier{80}(140,150)(170,185)(200,200)
-\bezier{80}(200,200)(230,215)(260,220)
-\put(260,220){\makebox(0,0)[l]{\shortstack{reference \\orbit}}}
-% roll angle
-\bezier{30}(160,30)(160,40)(150,50)
-\put(152,48){\vector(-1,1){2}}
-\put(150,30){\makebox(0,0){\(\psi\)}}
-\put(140,30){\makebox(0,0)[br]{roll angle}}
-% pitch angle
-\bezier{20}(60,110)(60,120)(55,125)
-\put(57,123){\vector(-1,2){2}}
-\put(50,118){\makebox(0,0){\(\phi\)}}
-\put(40,125){\makebox(0,0)[br]{pitch angle}}
-% azimuth
-\bezier{20}(130,95)(140,100)(140,110)
-\put(140,105){\vector(0,1){5}}
-\put(130,105){\makebox(0,0){\(\theta\)}}
-\put(115,95){\makebox(0,0)[t]{azimuth}}
+
+% dots for displacements
+\color{black}
+\put(140,90){\circle*{4}}
+\put(140,140){\circle*{4}}
+\put(200,110){\circle*{4}}
+
 \end{picture}
-\caption{Global Reference System}
+\caption[Global Reference System]{Global Reference System showing the global 
+Cartesian system ($X, Y, Z$) in black and the local reference system ($x, y, 
+s$) in red after translation ($X_i , Y_i, Z_i$) and rotation ($\theta_i, 
+\phi_i, \psi_i$). The projections of the local reference system axes onto the 
+horizontal $ZX$ plane of the Cartesian system are figured with blue dashed 
+lines. The intersections of planes $ys$, $xy$ and $xs$ of the local reference 
+system with the horizontal $ZX$ plane of the Cartesian system are figured in 
+green dashed lines. }
 \label{F-GLOB}
 \end{figure}
 
@@ -188,39 +320,39 @@ onto \(ZX\)-plane}}}
 
 The above quantities are defined more precisely as follows:  
 \begin{madlist}
-   \ttitem{X} Displacement of the local origin in \textit{X}-direction. 
-   \ttitem{Y} Displacement of the local origin in \textit{Y}-direction. 
-   \ttitem{Z} Displacement of the local origin in \textit{Z}-direction. 
+   \ttitem{X} Displacement of the local origin in {\it X}-direction. 
+   \ttitem{Y} Displacement of the local origin in {\it Y}-direction. 
+   \ttitem{Z} Displacement of the local origin in {\it Z}-direction. 
    \ttitem{THETA} $\theta$ is the angle of rotation (azimuth) about the
-     global \textit{Y}-axis, between the global \textit{Z}-axis and the
-     projection of the reference orbit onto the (\textit{Z},
-     \textit{X})-plane. A positive angle THETA forms a right-hand screw
-     with the \textit{Y}-axis. 
+     global {\it Y}-axis, between the global {\it Z}-axis and the
+     projection of the reference orbit onto the ({\it Z},
+     {\it X})-plane. A positive angle THETA forms a right-hand screw
+     with the {\it Y}-axis. 
    \ttitem{PHI} $\phi$ is the elevation angle, i.e. the angle between the
-     reference orbit and its projection onto the (\textit{Z},
-     \textit{X})-plane. A positive angle PHI correspond to increasing
-     \textit{Y}. If only horizontal bends are present, the reference
-     orbit remains in the (\textit{Z}, \textit{X})-plane. In this case
-     PHI is always zero. 
-   \ttitem{PSI} $\psi$ is the roll angle about the local \textit{s}-axis,
-     i.e. the angle between the intersection (\textit{x}, \textit{y})-
-     and (\textit{Z}, \textit{X})-planes and the local
-     \textit{x}-axis. A positive angle PSI forms a right-hand screw with
-     the \textit{s}-axis. 
+     reference orbit and its projection onto the ({\it Z},
+     {\it X})-plane. A positive angle PHI correspond to increasing
+     {\it Y}. \\ 
+     If only horizontal bends are present, the reference
+     orbit remains in the ({\it Z}, {\it X})-plane and PHI is always zero. 
+   \ttitem{PSI} $\psi$ is the roll angle about the local {\it s}-axis,
+     i.e. the angle between the line defined by the intersection of the 
+     ({\it x, y})-plane and ({\it Z, X})-plane on one hand, and the local
+     {\it x}-axis on the other hand. 
+     A positive angle PSI forms a right-hand screw with the {\it s}-axis. 
 \end{madlist} 
 
-The angles ($\theta$, $\phi$, $\psi$) are \textbf{not} the Euler
+The angles ($\theta$, $\phi$, $\psi$) are {\bf not} the Euler
 angles. The reference orbit starts at the origin and points by default
-in the direction of the positive \textit{Z}-axis. The initial local axes
-(\textit{x}, \textit{y}, \textit{s})  coincide with the global axes
-(\textit{X}, \textit{Y}, \textit{Z}) in this order. The initial values
+in the direction of the positive {\it Z}-axis. The initial local axes
+({\it x}, {\it y}, {\it s})  coincide with the global axes
+({\it X}, {\it Y}, {\it Z}) in this order. The initial values
 ($X_0$, $Y_0$, $Z_0$, $\theta_0$, $\phi_0$, $\psi_0$) are therefore all zero
 unless the user specifies different initial conditions.  
 
-Internally the displacement is described by a vector \textit{V} and the
-orientation by a unitary matrix \textit{W}. The column vectors of
-\textit{W} are the unit vectors spanning  the local coordinate axes in
-the order (\textit{x, y, s}). \textit{V} and \textit{W} have the values:  
+Internally the displacement is described by a vector {\it V} and the
+orientation by a unitary matrix {\it W}. The column vectors of
+{\it W} are the unit vectors spanning  the local coordinate axes in
+the order ({\it x, y, s}). {\it V} and {\it W} have the values:  
 
 \begin{equation}
 V =
@@ -271,7 +403,7 @@ $V_i$ and $W_i$ by the recurrence relations
 \end{equation}
 The vector $R_i$ is the displacement and the matrix
 $S_i$ is the rotation of the local reference system  at the
-exit of the element \textit{i} with respect to the entrance  of the same
+exit of the element {\it i} with respect to the entrance  of the same
 element. The values of $R_i$ and $S_i$ are listed below
 for different physical element types.  
 
@@ -282,7 +414,7 @@ for different physical element types.
 \subsection{Reference System for Straight Beam Elements} 
 \label{subsec:local_straight}
 In straight elements the local reference system is simply translated by
-the length of the element along the local \textit{s}-axis. 
+the length of the element along the local {\it s}-axis. 
 This is true for  
 \hyperref[sec:drift]{Drift spaces},\ttindex{drift} 
 \hyperref[sec:quadrupole]{Quadrupoles},\ttindex{quadrupole} 
@@ -296,7 +428,7 @@ This is true for
 \hyperref[sec:monitor]{Beam position monitors}\ttindex{monitor}.
 
 
-The corresponding \textit{R}, \textit{S} are 
+The corresponding {\it R}, {\it S} are 
 \begin{equation}
 R =
  \begin{pmatrix}
@@ -313,8 +445,8 @@ S =
  \end{pmatrix}
 .
 \end{equation}
-A rotation of the element about the \textit{S}-axis has no effect on
-\textit{R} and \textit{S}, since the rotations of the reference system
+A rotation of the element about the {\it S}-axis has no effect on
+{\it R} and {\it S}, since the rotations of the reference system
 before and after the element cancel.  
 
 %% % picture prepared by ghislain to reproduce the png graphics in html.
@@ -382,12 +514,14 @@ before and after the element cancel.
 \put(260,90){\makebox(0,0){\(x_2\)}}
 % magnet outline
 \thicklines
+\color{blue}
 \put(150,54){\line(0,1){26}}
 \put(150,46){\line(0,-1){26}}
 \put(250,54){\line(0,1){26}}
 \put(250,46){\line(0,-1){26}}
 \put(150,20){\line(1,0){100}}
 \put(150,80){\line(1,0){100}}
+\color{black}
 \put(200,2){\vector(1,0){50}}
 \put(200,2){\vector(-1,0){50}}
 \put(200,10){\makebox(0,0){L}}
@@ -400,8 +534,8 @@ before and after the element cancel.
 \subsection{Reference System for Bending Magnets}
 \label{subsec:local_rbend}
 \hyperref[sec:bend]{Bending magnets} have a curved reference orbit. 
-For both rectangular and sector bending magnets, the \textit{R} and
-\textit{S} are expressed as function the bend angle $\alpha$: 
+For both rectangular and sector bending magnets, the {\it R} and
+{\it S} are expressed as function the bend angle $\alpha$: 
 \begin{equation}
 R =
  \begin{pmatrix}
@@ -419,17 +553,17 @@ S =
 \end{equation}
  
 A positive bend angle represents a bend to the right, i.e. towards
-negative \textit{x} values. 
+negative {\it x} values. 
 For sector bending magnets, the bend radius is given by $\rho$, and for
 rectangular bending magnets it has the value $\rho = L / (2 \sin(\alpha/2))$. 
-If the magnet is rotated about the \textit{s}-axis by an angle $\psi$,
-\textit{R} and \textit{S} are transformed by  
+If the magnet is rotated about the {\it s}-axis by an angle $\psi$,
+{\it R} and {\it S} are transformed by  
 \begin{equation}
    \overline{R}=TR,
    \qquad
    \overline{S}=TST^{-1}
 \end{equation}
-where \textit{T} is the orthogonal rotation matrix 
+where {\it T} is the orthogonal rotation matrix 
 \begin{equation}
 T =
  \begin{pmatrix}
@@ -480,12 +614,14 @@ The special value $\psi = \pi/2$ represents a bend down.
 \put(200,102){\vector(-1,0){50}}
 \put(200,102){\vector(1,0){50}}
 \put(200,110){\makebox(0,0){L}}
+\color{blue}
 \put(151,154){\line(1,4){6}}
 \put(149,146){\line(-1,-4){6}}
 \put(249,154){\line(-1,4){6}}
 \put(251,146){\line(1,-4){6}}
 \put(157,178){\line(1,0){86}}
 \put(143,122){\line(1,0){114}}
+\color{black}
 \bezier{10}(150,195)(155.5,195)(160.9,193.7)
 \put(155.5,195){\vector(3,-1){5.4}}
 \put(150,205){\makebox(0,0)[l]{\(e_1\)}}
@@ -534,12 +670,14 @@ the signs of pole-face rotations are positive as shown.}
 \put(162,154){\vector(-3,-1){8}}
 \put(238,154){\vector(3,-1){8}}
 \put(210,168){\makebox(0,0){L}}
+\color{blue}
 \put(151,154){\line(1,4){6}}
 \put(149,146){\line(-1,-4){6}}
 \put(249,154){\line(-1,4){6}}
 \put(251,146){\line(1,-4){6}}
 \bezier{90}(157,178)(200,188.4)(243,178)
 \bezier{110}(143,122)(200,148.6)(257,122)
+\color{black}
 \bezier{20}(137.4,187.9)(149.1,191.5)(159.7,188.8)
 \put(153.7,190.8){\vector(3,-1){6}}
 \put(150,180){\makebox(0,0){\(e_1\)}}
@@ -585,7 +723,7 @@ The field coefficients have the following meaning:
    \item[\ldots] etc.
 \end{madlist} 
 
-Using this expansion and the curvature \textit{h} of the reference
+Using this expansion and the curvature {\it h} of the reference
 orbit, the longitudinal component of the vector potential to order 4 is:  
 \begin{equation}
 \begin{aligned}
@@ -617,7 +755,39 @@ coefficients are computed as
 K_n = q B_n / p_s  =  B_n / B \rho 
 \end{equation}
 
+\begin{5.02.06}
+\section{Generalisation to normal and skew components}
+\label{sec:normalskew}
+The previous section assumed an expansion at the mid-plane ($y=0$), 
+symmetry around the mid-plane and considered only the vertical 
+component of the field. 
 
+An extension using complex notation for the position ($x + i y$) 
+and the field is given as
+
+\begin{equation}
+B_y +  i B_x =\sum_{n=0}^{\infty} (b_n\,+ia_n) \frac{(x+iy)^n}{n^{n-1}}
+\end{equation}
+
+By introducing the normal and skew multipole coefficients 
+$KN$ and $KS$ at order $n$ as
+\begin{equation}\label{eq:knn}
+KN_n = q\,b_n / p_s  =  b_n / B \rho 
+\end{equation}
+and
+\begin{equation}\label{eq:kns}
+KS_n = q\,a_n / p_s  =  a_n / B \rho 
+\end{equation}
+the kicks received in each plane can be expressed as the summation 
+over all components
+\begin{equation}
+\Delta P_x - i \Delta P_y = \sum_{n=0}^{\infty} -(KN_n + i KS_n) \frac{(x+iy)^n}{n!}
+\end{equation}
+
+{\bf Remark:} need to add references to the $(a_n,b_n)$ field conventions 
+in the magnet world. 
+
+\end{5.02.06}
 
 \section{Variables}
 \label{sec:variables}
@@ -656,7 +826,8 @@ between square brackets, where [1] denotes a dimensionless variable.
 
 The independent variable is: 
 \begin{madlist}
-  \ttitem{S} \index{arc length} Arc length \textit{s} along the reference orbit, [m].   
+  \ttitem{S} \index{arc length} Arc length {\it s} along the reference orbit, 
+  [m].   
 \end{madlist} 
 
 In the limit of fully relativistic particles ($\gamma \gg 1$, $v = c$,
@@ -684,7 +855,7 @@ constant in order to keep the system canonical.
   \ttitem{WY} The vertical Courant-Snyder invariant \quad
   WY = $y_n^2 + p_{yn}^2$, [m]
   \ttitem{PHIY} The vertical phase \quad
-  $\phi_y = - \arctan ( p_{yn} / y_n ) / 2 \pi$, [1]
+  $\phi_y = -\arctan ( p_{yn} / y_n ) / 2 \pi$, [1]
   \ttitem{TN} The normalised longitudinal displacement \quad
   $t_n = Re ( E_3^T \,S\, Z )$, [sqrt(m)]
   \ttitem{PTN} The normalised longitudinal transverse momentum \quad
@@ -696,7 +867,7 @@ constant in order to keep the system canonical.
 \end{madlist} 
 
 In the above formulas the vectors \(E_i\) are the three complex
-eigenvectors, \(Z\) is the phase space vector, and the matrix \textit{S}
+eigenvectors, \(Z\) is the phase space vector, and the matrix {\it S}
 is the ``symplectic unit matrix'':   
 
 \begin{equation}

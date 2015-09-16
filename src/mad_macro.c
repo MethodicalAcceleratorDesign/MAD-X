@@ -235,40 +235,6 @@ add_to_macro_list( /* adds macro to alphabetic macro list */
   /* RDM new matching*/
 }
 
-int
-remove_from_name_list(char* name, struct name_list* nl)
-{
-  
-  char buf[5*NAME_L];
-  assert(name);
-  assert(nl);
-
-  int j, i, k = -1;
-  for (i = 0; i < nl->curr; i++)
-    if (strcmp(nl->names[nl->index[i]], name) == 0) break;
-  
-  
-  if (i < nl->curr)
-  {
-   
-    k = nl->index[i];
-    for (j = i+1; j < nl->curr; j++) nl->index[j-1] = nl->index[j];
-    
-    for (j = 0; j < nl->curr-1; j++)
-      if(nl->index[j] == nl->curr-1) break;
-      
-    nl->index[j] = k;
-    nl->inform[k] = nl->inform[nl->curr-1];
-    nl->names[k] = nl->names[--nl->curr];
-  }
-  else
-  {
-    warning("remove_from_name_list",(sprintf(buf,"Table %s not found",name),buf));
-  }
-  
-  return k;
-}
-
 void
 replace_lines(struct macro* org, int replace, char** reps)
   /* replaces lines in line by elements - recursive */

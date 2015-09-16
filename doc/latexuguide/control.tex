@@ -26,7 +26,7 @@ and so on.
 %% \label{subsec:coguess}
 
 %% In order to help the initial finding of the closed orbit by the
-%% \texttt{TWISS} module, it is possible to specify an initial guess. 
+%% {\tt TWISS} module, it is possible to specify an initial guess. 
 
 %% \madbox{
 %% COGUESS, \=TOLERANCE=real, \\
@@ -100,14 +100,14 @@ exp(sqrt(2)) = 4.113250379        ; \\
 \section{OPTION}
 \label{sec:option}
 
-The \texttt{OPTION} commands sets the logical value of a number of flags
+The {\tt OPTION} commands sets the logical value of a number of flags
 that control the behavior of \madx.
 
 \madbox{
 OPTION, flag=logical;
 }
 
-Because all attributes of \texttt{OPTION} are logical flags, the
+Because all attributes of {\tt OPTION} are logical flags, the
 following two statements are identical:
 \madxmp{
 OPTION, flag = true;\\
@@ -119,90 +119,62 @@ OPTION, flag = false;\\
 OPTION, -flag;
 }
 
-Several flags can be set in a single \texttt{OPTION} command, e.g.
+Several flags can be set in a single {\tt OPTION} command, e.g.
 \madxmp{
 OPTION, ECHO, WARN=true, -INFO, VERBOSE=false;
 }
 
-The available flags, their default values and their effect on \madx if
-they are set to \texttt{TRUE} are listed in table 
+The available flags, their default values and their effect on \madx when
+they are set to {\tt TRUE} are listed in table \ref{table:options}.
 
 \begin{table}[ht]
-  \caption{Flags available to \texttt{OPTION} command}
+  \caption{Flags available to {\tt OPTION} command}
   \vspace{1ex}
   \begin{center}
-   \begin{tabular}{|l|c|l|}
+    \label{table:options}
+    \begin{tabular}{|l|c|l|}
      \hline
-     {\bf FLAG }  & {\bf default} & {\bf effect if \texttt{TRUE}} \\
+     {\bf FLAG }  & {\bf default} & {\bf effect if {\tt TRUE}} \\
      \hline
-     \texttt{ECHO}  & true  & echoes the input on the standard output file \\
-     \texttt{WARN}  & true  & issues warning statements\\
-     \texttt{INFO}  & true  & issues information statements\\
-     \texttt{DEBUG} & false & issues debugging information \\
-     \texttt{ECHOMACRO} & false & issues macro expansion printout for debugging \\
-     \texttt{VERBOSE} & false & issues additional printout in makethin \\
-     \texttt{TRACE}   & false & prints the system time after each command \\
-     \texttt{VERIFY}  & false & issues a warning if an undefined variable is used \\
+     {\tt ECHO}  & true  & echoes the input on the standard output file \\
+     {\tt WARN}  & true  & issues warning statements\\
+     {\tt INFO}  & true  & issues information statements\\
+     {\tt DEBUG} & false & issues debugging information \\
+     {\tt ECHOMACRO} & false & issues macro expansion printout for debugging \\
+     {\tt VERBOSE} & false & issues additional printout in makethin \\
+     {\tt TRACE}   & false & prints the system time after each command \\
+     {\tt VERIFY}  & false & issues a warning if an undefined variable is used 
+     \\
      \hline
-     \texttt{TELL}  & false & prints the current value of all options \\
-     \texttt{RESET} & false & resets all options to their defaults \\
+     {\tt TELL}  & false & prints the current value of all options \\
+     {\tt RESET} & false & resets all options to their defaults \\
      \hline
-     \texttt{NO\_FATAL\_STOP} & false & Prevents madx from stopping in case of a fatal error \\
+     {\tt NO\_FATAL\_STOP} & false & Prevents madx from stopping in case of a 
+     fatal error \\
                               &       & {\bf Use at your own risk !} \\
      \hline
-     \texttt{RBARC}     & true & converts the RBEND straight length into the arc length \\
-     \texttt{THIN\_FOC} & true & enables the 1/(rho**2) focusing of thin dipoles \\
-     \texttt{BBORBIT}   & false & the closed orbit is modified by beam-beam kicks \\
-     \texttt{SYMPL}     & false & all element matrices are symplectified in Twiss \\
-     \texttt{TWISS\_PRINT} & true & controls whether the twiss command produces output \\
-     \texttt{THREADER}  & false & enables the threader for closed orbit finding in Twiss \\ 
+     {\tt RBARC}     & true & converts the RBEND straight length into the arc 
+     length \\
+     {\tt THIN\_FOC} & true & enables the 1/(rho**2) focusing of thin dipoles \\
+     {\tt BBORBIT}   & false & the closed orbit is modified by beam-beam kicks 
+     \\
+     {\tt SYMPL}     & false & all element matrices are symplectified in Twiss 
+     \\
+     {\tt TWISS\_PRINT} & true & controls whether the twiss command produces 
+     output \\
+     {\tt THREADER}  & false & enables the threader for closed orbit finding in 
+     Twiss \\ 
                         &       & (see Twiss module) \\ 
-     \hline
-     \texttt{BB\_ULTRA\_RELATI} & false  & To be documented \\
-     \texttt{BB\_SXY\_UPDATE}   & false  & To be documented \\
-     \texttt{EMITTANCE\_UPDATE} & true   & To be documented \\
-     \texttt{FAST\_ERROR\_FUNC} & false  & To be documented \\
      \hline
      \end{tabular}
    \end{center}
 \end{table}
 
-%% \begin{verbatim}
-%%   name           default meaning if true
-%%   ====           ======= ===============
-%%   echo            true   echoes the input on the standard output file
-%%   warn            true   issues warnings
-%%   info            true   issues information
-%%   debug           false  issues debugging information
-%%   echomacro       false  issues macro expansion printout for debugging
-%%   verbose         false  issues additional printout in makethin
-%%   trace           false  prints the system time after each command
-%%   verify          false  issues a warning if an undefined variable is used
-%%   tell            false  prints the current value of all options
-%%   reset           false  resets all options to their defaults
-%%   no_fatal_stop   false  Prevents madx from stopping in case of a fatal error. 
-%%                          Use at your own risk.
-
-%%   rbarc           true   converts the RBEND straight length into the arc 
-%%                          length
-%%   thin_foc        true   if false suppresses the 1(rho**2) focusing of thin 
-%%                          dipoles
-%%   bborbit         false  the closed orbit is modified by beam-beam kicks
-%%   sympl           false  all element matrices are symplectified in Twiss
-%%   twiss_print     true   controls whether the twiss command produces output.
-%%   threader        false  enables the threader for closed orbit finding in Twiss.
-%%                          (see Twiss module)
-
-%%   bb_ultra_relati false  To be documented
-%%   bb_sxy_update   false  To be documented 
-%%   emittance_update true  To be documented
-%%   fast_error_func false  To be documented
-%% \end{verbatim} 
-
-The option \texttt{RBARC} is implemented for backwards compatibility
+The option {\tt RBARC} is implemented for backwards compatibility
 with \madeight up to version 8.23.06 included; in this version, the
 RBEND length was just taken as the arc length of an SBEND with inclined
 pole faces, contrary to the \madeight manual.  
+
 
 
 
@@ -214,7 +186,7 @@ statement is then also stored and can be executed again with
 EXEC, label;
 }
 This mechanism can be invoked any number of times, and the executed
-statement may be calling another \texttt{EXEC}, etc. 
+statement may be calling another {\tt EXEC}, etc. 
 
 Note however, that the main usage of this \madx construct is the
 execution of a \href{special.html#macro}{macro}.   
@@ -228,25 +200,25 @@ EXEC, tw; ! second execution of the same TWISS command \\
 
 \section{SET}
 \label{sec:set}
-The SET command is used in two forms:
+The {\tt SET} command is used in two forms:
 \madbox{
 SET, FORMAT=string \{, string\} ;\\
 SET, SEQUENCE=string;
 }
 
 
-The first form of the \texttt{SET} command defines the formats for the
-output precision that \madx uses with the \texttt{SAVE}, \texttt{SHOW},
-\texttt{VALUE} and \texttt{TABLE} commands. The formats can be
+The first form of the {\tt SET} command defines the formats for the
+output precision that \madx uses with the {\tt SAVE}, {\tt SHOW},
+{\tt VALUE} and {\tt TABLE} commands. The formats can be
 given in any order and stay valid until replaced. 
 
 The formats follow the C convention and must be included in double
 quotes. The allowed formats are \\
-\texttt{{\it n}d} for integers with a field-width = {\it n}, \\
-\texttt{{\it m}.{\it n}f} or \texttt{{\it m}.{\it n}g} or \texttt{{\it
-    m}.{\it n}e} for floats with field-width = {\it m} and precision =
-       {\it n}, \\
-\texttt{{\it n}s} for strings with a field-width = {\it n}.\\
+{\tt {\it n}d} for integers with a field-width = {\it n}, \\
+{\tt {\it n}.{\it m}f} or {\tt {\it n}.{\it m}g} or {\tt {\it
+    n}.{\it m}e} for floats with field-width = {\it n} and precision =
+       {\it m}, \\
+{\tt {\it n}s} for strings with a field-width = {\it n}.\\
 The default is "right adjusted", a "-" changes it to "left adjusted".
 
 {\bf Example:}\\
@@ -265,7 +237,7 @@ SET, FORMAT="12d", "-18.5e", "25s";
 %% \end{verbatim} 
 
 
-The default formats are \texttt{"10d"},\texttt{"18.10g"} and \texttt{"-18s"}.
+The default formats are {\tt "10d", "18.10g"} and {\tt "-18s"}.
 
 Example: 
 \begin{verbatim}
@@ -279,10 +251,10 @@ sets all formats to automatic adjustment according to C conventions.
 
 
 
-The second form of the \texttt{SET} command allows to select the
+The second form of the {\tt SET} command allows to select the
 current sequence without the "USE" command, which would
 bring back to a bare lattice without errors. The command only works
-if the chosen sequence has been previously activated with a \texttt{USE} command,
+if the chosen sequence has been previously activated with a {\tt USE} command,
 otherwise a warning is issued and \madx continues with the
 unmodified current sequence. This command is particularly useful for
 commands that do not have the sequence as an argument like "EMIT" or
@@ -296,7 +268,7 @@ commands that do not have the sequence as an argument like "EMIT" or
 SYSTEM, "string";
 }
 transfers the quoted string to the system for execution. The quotes are
-stripped and no check of the return status is performed bt \madx.
+stripped and no check of the return status is performed by \madx.
 
 {\bf Example:}\\ 
 \madxmp{
@@ -306,8 +278,8 @@ makes a local link to an AFS directory with the name "shortname" on a
 UNIX system. 
 
 Attention: Although this command is very convenient, it is clearly not portable
-across systems and should probably avoid it if you intend to share \madx scripts with
-collaborators working on other platforms. 
+across systems and it should probably be avoided if one intends to share \madx 
+scripts with collaborators working on other platforms. 
 
 \section{TITLE}
 \label{sec:title}
@@ -321,7 +293,7 @@ plot results.
 \section{USE}
 \label{sec:use}
 \madx operates on beamlines that must be loaded and expanded in memory
-before other commands can be invoked. The \texttt{USE} allows this
+before other commands can be invoked. The {\tt USE} allows this
 loading and expansion.
 
 \madbox{
@@ -330,13 +302,13 @@ USE, \=PERIOD=sequence\_name, SEQUENCE=sequence\_name, \\
      \>SURVEY=logical;
 }
 
-The attributes to the \texttt{USE} command are:
+The attributes to the {\tt USE} command are:
 \begin{madlist}
   \ttitem{SEQUENCE} name of the sequence to be loaded and expanded. 
   \ttitem{PERIOD} name of the sequence to be loaded and expanded. \\ 
-  \texttt{PERIOD} is an alias to \texttt{SEQUENCE} that was kept for
+  {\tt PERIOD} is an alias to {\tt SEQUENCE} that was kept for
   backwards compatibility with \madeight and only one of them should be
-  specified in a \texttt{USE} statement. 
+  specified in a {\tt USE} statement. 
   \ttitem{RANGE} specifies a \hyperref[sec:range]{range}.   
   restriction so that only the specified part of the named sequence is
   loaded and  expanded.
@@ -344,880 +316,158 @@ The attributes to the \texttt{USE} command are:
   nodes on the first pass (see \hyperref[chap:survey]{\tt SURVEY}).
 \end{madlist}
 
-Note that reloading a sequence with the \texttt{USE} command reloads a
-bare sequence and that any \texttt{ERROR} or orbit correction previously
+Note that reloading a sequence with the {\tt USE} command reloads a
+bare sequence and that any {\tt ERROR} or orbit correction previously
 assigned or associated to the sequence are forgotten. 
 A mechanism to select a sequence without this side effect of the
-\texttt{USE} command is provided with the \texttt{SET, SEQUENCE=...} command.
+{\tt USE} command is provided with the {\tt SET, SEQUENCE=...} command.
 
 
 \section{SELECT} 
 \label{sec:select}
 
-\begin{verbatim}
-select, flag=string, range=string, class=string, pattern=string,
-        sequence=string, full, clear,
-        column = string{, string},  slice=integer, thick=logical;
-\end{verbatim} 
-selects one or several elements for special treatment in a subsequent
-command based on selection criteria.
+Some \madx commands can perform specific operations on selected elements
+or ranges of elements and can produce specific output for selected
+elements or ranges of elements. 
 
-The selection criteria on a single SELECT statement are logically
-ANDed, in other words, selected elements have to fulfill the {\tt RANGE},
-{\tt CLASS}, and {\tt PATTERN} criteria.  
-The selection criteria on different SELECT statements are logically
-ORed, in other words selected elements have to fulfill any of the
-selection criteria accumulated by the different statements.   
-All selections for a given command remain valid until the "clear" argument
-is specified; 
+The selection is made through the {\tt SELECT} command and applies to
+subsequent commands.
 
-The "flag" argument allows a determination of the applicability of the
-SELECT statement and can be one of the following: 
+\madbox{
+SELECT, \=FLAG=string, RANGE=string, CLASS=string, PATTERN=string, \\
+        \>SEQUENCE=string, FULL=logical, CLEAR=logical,\\
+        \>COLUMN=string\{,string\},  SLICE=integer, THICK=logical;
+} 
+
+The attributes to the {\tt SELECT} command are:
 \begin{madlist}
-   \ttitem{seqedit} selection of elements for the
-     \hyperref[sec:seqedit]{seqedit} module.  
-   \ttitem{error} selection of elements for the
-     \hyperref[chap:error]{error} assignment module.  
-   \ttitem{makethin} selection of elements for the
-     \hyperref[chap:makethin]{makethin} module that
-     converts the sequence into one with thin elements only.  
-   \ttitem{sectormap} selection of elements for the
-     \hyperref[subsec:sectormap]{sectormap} output file
-     from the Twiss module.  
-   \ttitem{save} selection of elements for the \hyperref[sec:save]{\tt
-     SAVE} command.   
-   \ttitem{table} is a table name such as {\tt twiss}, {\tt track}
-     etc., and the rows and columns to be written are selected.  
-\end{madlist} 
+  \ttitem{FLAG} determines the applicability of the
+         {\tt SELECT} statement and the attribute value can be one of
+         the following:
+     \begin{madlist}
+       \ttitem{SEQEDIT} selection of elements for the
+       \hyperref[sec:seqedit]{\tt SEQEDIT} module.
+       
+       \ttitem{ERROR} selection of elements for the
+       \hyperref[chap:error]{error assignment} module.
+       
+       \ttitem{MAKETHIN} selection of elements for the
+       \hyperref[chap:makethin]{\tt MAKETHIN} command that
+       converts the sequence into one with thin elements.
+       
+       \ttitem{SECTORMAP} selection of elements for the
+       \hyperref[subsec:sectormap]{\tt SECTORMAP} output file
+       from the \hyperref[chap:twiss]{\tt TWISS} module.
+       
+       \ttitem{SAVE} selection of elements for the
+       \hyperref[sec:save]{\tt SAVE} command.
+       
+       \ttitem{tablename} is a table name such as {\tt twiss}, 
+       {\tt track} etc., and the rows and columns to be written are
+       selected.
+     \end{madlist} 
+     
+  \ttitem{RANGE} the range of elements to be selected as defined in
+  section \ref{sec:range} on \hyperref[sec:range]{range} selection.
 
-The statement
-\madxmp{
-SELECT, FLAG=name, FULL;
+  \ttitem{CLASS} the class of elements to be selected as defined in
+  section \ref{sec:class} on \hyperref[sec:class]{class} selection.
+
+  \ttitem{PATTERN} the regular expression pattern for the element names
+  to be selected as defined in section \ref{sec:regex} on selection via
+  \hyperref[sec:regex]{regular expressions}. 
+
+  \ttitem{SEQUENCE} the name of a sequence to which the selection is applied.
+
+  \ttitem{FULL} a logical falg to select ALL positions in the sequence
+  for the named flag. \\
+  For the flag {\tt TWISS}, this attribute includes all standard
+  columns for a {\tt TWISS} table, and therefore the following two
+  statements are equivalent:
+  \madxmp{
+SELECT, FLAG=twiss, COLUMN= name, s, betx, ..., var1; \\
+SELECT, FLAG=twiss, FULL, COLUMN= var1; 
+  } 
+  {\tt FULL=true} is the default for the {\tt MAKETHIN} flag and for tables: 
+  {\sl eg} {\tt SELECT, FLAG=makethin;} is equivalent to {\tt SELECT,
+    FLAG=makethin, FULL;}  
+  
+  \ttitem{CLEAR} deselects ALL positions in the sequence for the flag
+  "name". This is the default for {\tt ERROR} and {\tt SEQEDIT}
+  flags. \\
+  {\sl eg} {\tt SELECT, FLAG=error;} is equivalent to {\tt SELECT, FLAG=error, CLEAR;}
+
+  \ttitem{COLUMN} is only valid for tables and takes as attribute value
+  a list of columns to be written into the TFS file. The special "\_name"
+  argument refers to the actual name of the element. 
+  %For an example, see \hyperref[sec:select]{\tt SELECT}.  
+
+  \ttitem{SLICE} is the number of slices into which the selected
+  elements have to be cut and is only used by
+  \hyperref[chap:makethin]{\tt MAKETHIN}. (Default = 1). 
+
+  \ttitem{THICK} is a logical flag to indicate  whether the selected
+  elements are treated as thick elements by the \hyperref[chap:makethin]{\tt
+    MAKETHIN} command. \\ 
+  This only applies up to now to \hyperref[sec:quadrupole]{\tt
+    QUADRUPOLE}s and \hyperref[sec:bend]{\tt BEND}s for which thick maps
+  have been explicitely derived. 
+\end{madlist}
+
+\vskip 5mm
+{\bf Composition of {\tt SELECT} statements:} \\
+The selection criteria provided on a single {\tt SELECT} statement are logically
+{\tt AND}ed, {\sl ie} selected elements have to fulfill {\bf all}
+provided criteria in the single {\tt SELECT} statement.  
+
+The selection criteria on different {\tt SELECT} statements are logically
+{\tt OR}ed, {\sl ie} selected elements have to fulfill {\bf any} of the
+selection criteria provided by the different {\tt SELECT} statements.   
+
+All selections for a given flag remain valid until a {\tt SELECT} statement
+with the {\tt CLEAR} argument is specified for the same flag.
+
+Note that because of these composition rules, it is considered good
+practice to start by clearing the selection for a given flag before
+making a new selection, eg: 
+\madxmp{ 
+SELECT, FLAG=twiss, CLEAR; \\
+SELECT, FLAG=twiss, CLASS=MQ; \\
+SELECT, FLAG=twiss, RANGE=MQ[5]/MQ[7]; \\
+...
 }
-selects ALL positions in the sequence for the flag "name". This is the default
-for flags for all tables and {\tt MAKETHIN}.
 
-The statement 
-\madxmp{
-SELECT, FLAG=name, CLEAR;
+
+\vskip 5mm
+{\bf Examples:} 
+\madxmp{ 
+SELECT, FLAG = ERROR, CLASS = quadrupole, RANGE = mb[1]/mb[5];\\
+SELECT, FLAG = ERROR, PATTERN = "\textasciicircum mqw.*";
 }
-deselects ALL positions in the sequence for the flag "name". This is the default
-for flags {\tt ERROR} and {\tt SEQEDIT}.
-
-"slice" is only used by \hyperref[chap:makethin]{makethin} and
-prescribes the number of slices into which the selected elements have to
-be cut (default = 1).  
-
-"column" is only valid for tables and determines the selection of columns
-to be written into the TFS file. The "name" argument is special in that
-it refers to the actual name of the selected element. For an example,
-see \hyperref[sec:select]{SELECT}.  
-
-"thick" is used to determine whether the selected elements will be
-treated as thick elements by the MAKETHIN command. This only applies to
-QUADRUPOLES and BENDS for which thick maps have been explicitely
-derived. (see ...) 
-%%2014-Apr-08  17:43:44  ghislain:  A completer.
-
-Example: 
-% keep verbatim for now and until ^ is solved
-\begin{verbatim} 
-select, flag = error, class = quadrupole, range = mb[1]/mb[5];
-select, flag = error, pattern = "^mqw.*";
-\end{verbatim}
 selects all quadrupoles in the range mb[1] to mb[5], as well as all
 elements (in the whole sequence) with name starting with "mqw", for 
-treatment by the error module.  
+treatment by the \hyperref[chap:error]{\tt ERROR} module.  
 
-Example:  
+\vskip 5mm
 \madxmp{
-select, flag=save, class=variable, pattern="abc.*";
-save, file=mysave;
+SELECT, FLAG=SAVE, CLASS=variable, PATTERN="abc.*"; \\
+SAVE, FILE=mysave;
 }
-will save all variables (and sequences) containing "abc" in their name.
-However note that since the element class "variable" does not exist, any
-element with name containing "abc" will not be saved. 
+saves all variables (and sequences) containing "abc" in their name, 
+but does not save elements with names containing "abc" since the class
+"variable" does not exist.  
 
-\vskip 1cm
-\hrule
-\vskip 1cm
-
-%% Imported from chapter 2
-%\subsection{Selection Statements}
-
-The elements, or a range of elements, in a sequence can be selected for
-various purposes. Such selections remain valid until cleared (in
-difference to \madeight); it is therefore recommended to always start with a  
-
-\begin{verbatim}
-select, flag =..., clear;
-\end{verbatim} 
-before setting a new selection. 
-\begin{verbatim}
-SELECT, FLAG=name, RANGE=range, CLASS=class, PATTERN=pattern [,FULL] [,CLEAR];
-\end{verbatim} 
-where the name for FLAG can be one of ERROR, MAKETHIN, SEQEDIT or the
-name of a twiss table which is established for all sequence positions in
-general.  
-
-Selected elements have to fulfill the \href{ranges.html#range}{RANGE},
-\href{ranges.html#class}{CLASS}, and \href{wildcard.html}{PATTERN}
-criteria.  
-
-Any number of SELECT commands can be issued for the same flag and are
-accumulated (logically ORed). In this context note the following:  
-
-\begin{verbatim}
-SELECT, FLAG=name, FULL;
-\end{verbatim} 
-selects all positions in the sequence for this flag. This is the default
-for all tables and makethin, whereas for ERROR and SEQEDIT the default
-is "nothing selected".  
-
-%\href{save_select}{}
-\label{save_select}
-SAVE: A SELECT,FLAG=SAVE statement causes the
-selected sequences, elements, and variables to be written into the save
-file. A class (only used for element selection), and a pattern can be
-specified. Example:  
-\begin{verbatim}
-select, flag=save, class=variable, pattern="abc.*";
-save, file=mysave;
-\end{verbatim} 
-will save all variables (and sequences) containing "abc" in their name,
-but not elements with names containing "abc" since the class "variable"
-does not exist (astucieux, non ?).  
-
-SECTORMAP: A SELECT,FLAG=SECTORMAP statement causes sectormaps to be
-written into the file "sectormap" like in \madeight. For the file to be
-written, a flag SECTORMAP must be issued on the TWISS command in
-addition.  
-
-TWISS: A SELECT,FLAG=TWISS statement causes the selected rows and
-columns to be written into the Twiss TFS file (former OPTICS command in
-\madeight). The column selection is done on the same select. See as well
-example 2.  
-
-%% Example 1:  
-%% \begin{verbatim}
-%% TITLE,'Test input for MAD-X';
-
-%% option,rbarc=false; // use arc length of rbends
-%% beam; ! sets the default beam for the following sequence
-%% option,-echo;
-%% call file=fv9.opt;  ! contains optics parameters
-%% call file="fv9.seq"; ! contains a small sequence "fivecell"
-%% OPTION,ECHO;
-%% SELECT,FLAG=SECTORMAP,clear;
-%% SELECT,FLAG=SECTORMAP,PATTERN="^m.*";
-%% SELECT,FLAG=TWISS,clear;
-%% SELECT,FLAG=TWISS,PATTERN="^m.*",column=name,s,betx,bety;
-%% USE,PERIOD=FIVECELL;
-%% twiss,file=optics,sectormap;
-%% stop;
-%% \end{verbatim} 
-
-%% This produces a file \href{sectormap.html}{sectormap}, and a
-%% twiss output file \label{tfs} (name = optics):  
-%% \begin{verbatim}
-%% @ TYPE             %05s "TWISS"
-%% @ PARTICLE         %08s "POSITRON"
-%% @ MASS             %le          0.000510998902
-%% @ CHARGE           %le                       1
-%% @ E0               %le                       1
-%% @ PC               %le           0.99999986944
-%% @ GAMMA            %le           1956.95136738
-%% @ KBUNCH           %le                       1
-%% @ NPART            %le                       0
-%% @ EX               %le                       1
-%% @ EY               %le                       1
-%% @ ET               %le                       0
-%% @ LENGTH           %le                   534.6
-%% @ ALFA             %le        0.00044339992938
-%% @ ORBIT5           %le                      -0
-%% @ GAMMATR          %le           47.4900022541
-%% @ Q1               %le           1.25413071556
-%% @ Q2               %le           1.25485338377
-%% @ DQ1              %le           1.05329608302
-%% @ DQ2              %le           1.04837000224
-%% @ DXMAX            %le           2.17763211131
-%% @ DYMAX            %le                       0
-%% @ XCOMAX           %le                       0
-%% @ YCOMAX           %le                       0
-%% @ BETXMAX          %le            177.70993499
-%% @ BETYMAX          %le           177.671582415
-%% @ XCORMS           %le                       0
-%% @ YCORMS           %le                       0
-%% @ DXRMS            %le           1.66004270906
-%% @ DYRMS            %le                       0
-%% @ DELTAP           %le                       0
-%% @ TITLE            %20s "Test input for MAD-X"
-%% @ ORIGIN           %16s "MAD-X 0.20 Linux"
-%% @ DATE             %08s "07/06/02"
-%% @ TIME             %08s "14.25.51"
-%% * NAME               S                  BETX               BETY               
-%% $ %s                 %le                %le                %le                
-%%  "MSCBH"             4.365              171.6688159        33.31817319       
-%%  "MB"                19.72              108.1309095        58.58680717       
-%%  "MB"                35.38              61.96499987        102.9962313       
-%%  "MB"                51.04              34.61640793        166.2227523       
-%%  "MSCBV.1"           57.825             33.34442808        171.6309057       
-%%  "MB"                73.18              58.61984637        108.0956006       
-%%  "MB"                88.84              103.0313887        61.93159422       
-%%  "MB"                104.5              166.2602486        34.58939635       
-%%  "MSCBH"             111.285            171.6688159        33.31817319       
-%%  "MB"                126.64             108.1309095        58.58680717       
-%%  "MB"                142.3              61.96499987        102.9962313       
-%%  "MB"                157.96             34.61640793        166.2227523       
-%%  "MSCBV"             164.745            33.34442808        171.6309057       
-%%  "MB"                180.1              58.61984637        108.0956006       
-%%  "MB"                195.76             103.0313887        61.93159422       
-%%  "MB"                211.42             166.2602486        34.58939635       
-%%  "MSCBH"             218.205            171.6688159        33.31817319       
-%%  "MB"                233.56             108.1309095        58.58680717       
-%%  "MB"                249.22             61.96499987        102.9962313       
-%%  "MB"                264.88             34.61640793        166.2227523       
-%%  "MSCBV"             271.665            33.34442808        171.6309057       
-%%  "MB"                287.02             58.61984637        108.0956006       
-%%  "MB"                302.68             103.0313887        61.93159422       
-%%  "MB"                318.34             166.2602486        34.58939635       
-%%  "MSCBH"             325.125            171.6688159        33.31817319       
-%%  "MB"                340.48             108.1309095        58.58680717       
-%%  "MB"                356.14             61.96499987        102.9962313       
-%%  "MB"                371.8              34.61640793        166.2227523       
-%%  "MSCBV"             378.585            33.34442808        171.6309057       
-%%  "MB"                393.94             58.61984637        108.0956006       
-%%  "MB"                409.6              103.0313887        61.93159422       
-%%  "MB"                425.26             166.2602486        34.58939635       
-%%  "MSCBH"             432.045            171.6688159        33.31817319       
-%%  "MB"                447.4              108.1309095        58.58680717       
-%%  "MB"                463.06             61.96499987        102.9962313       
-%%  "MB"                478.72             34.61640793        166.2227523       
-%%  "MSCBV"             485.505            33.34442808        171.6309057       
-%%  "MB"                500.86             58.61984637        108.0956006       
-%%  "MB"                516.52             103.0313887        61.93159422       
-%%  "MB"                532.18             166.2602486        34.58939635       
-%% \end{verbatim}
-
- %% Example 2: 
-
-%%  Addition of variables to (any internal) table: 
-%% \begin{verbatim}
-%% select, flag=table, column=name, s, betx, ..., var1, var2, ...; ! or
-%% select, flag=table, full, column=var1, var2, ...; ! default col.s + new
-%% \end{verbatim} 
-%% will write the current value of var1 etc. into the table each time a new
-%% line is added; values from the same (current) line can be accessed by
-%% these variables, e.g.  
-%% \begin{verbatim}
-%% var1 := sqrt(beam->ex*table(twiss,betx));
-%% \end{verbatim} 
-%% in the case of table above being "twiss". The plot command accepts the
-%% new variables.  
-
-%% Remark: this replaces the "string" variables of MAD-8. 
-
-%%  This example demonstrates as well the usage of a user defined table \label{ucreate}. 
-%% \begin{verbatim}
-%% beam,ex=1.e-6,ey=1.e-3;
-%% // element definitions
-%% mb:rbend, l=14.2, angle:=0,k0:=bang/14.2;
-%% mq:quadrupole, l:=3.1,apertype=ellipse,aperture={1,2};
-%% qft:mq, l:=0.31, k1:=kqf,tilt=-pi/4;
-%% qf.1:mq, l:=3.1, k1:=kqf;
-%% qf.2:mq, l:=3.1, k1:=kqf;
-%% qf.3:mq, l:=3.1, k1:=kqf;
-%% qf.4:mq, l:=3.1, k1:=kqf;
-%% qf.5:mq, l:=3.1, k1:=kqf;
-%% qd.1:mq, l:=3.1, k1:=kqd;
-%% qd.2:mq, l:=3.1, k1:=kqd;
-%% qd.3:mq, l:=3.1, k1:=kqd;
-%% qd.4:mq, l:=3.1, k1:=kqd;
-%% qd.5:mq, l:=3.1, k1:=kqd;
-%% bph:hmonitor, l:=l.bpm;
-%% bpv:vmonitor, l:=l.bpm;
-%% cbh:hkicker;
-%% cbv:vkicker;
-%% cbh.1:cbh, kick:=acbh1;
-%% cbh.2:cbh, kick:=acbh2;
-%% cbh.3:cbh, kick:=acbh3;
-%% cbh.4:cbh, kick:=acbh4;
-%% cbh.5:cbh, kick:=acbh5;
-%% cbv.1:cbv, kick:=acbv1;
-%% cbv.2:cbv, kick:=acbv2;
-%% cbv.3:cbv, kick:=acbv3;
-%% cbv.4:cbv, kick:=acbv4;
-%% cbv.5:cbv, kick:=acbv5;
-%% !mscbh:sextupole, l:=1.1, k2:=ksf;
-%% mscbh:multipole, knl:={0,0,0,ksf},tilt=-pi/8;
-%% mscbv:sextupole, l:=1.1, k2:=ksd;
-%% !mscbv:octupole, l:=1.1, k3:=ksd,tilt=-pi/8;
-
-%% // sequence declaration
-
-%% fivecell:sequence, refer=centre, l=534.6;
-%%    qf.1:qf.1, at=1.550000e+00;
-%%    qft:qft, at=3.815000e+00;
-%% !   mscbh:mscbh, at=3.815000e+00;
-%%    cbh.1:cbh.1, at=4.365000e+00;
-%%    mb:mb, at=1.262000e+01;
-%%    mb:mb, at=2.828000e+01;
-%%    mb:mb, at=4.394000e+01;
-%%    bpv:bpv, at=5.246000e+01;
-%%    qd.1:qd.1, at=5.501000e+01;
-%%    mscbv:mscbv, at=5.727500e+01;
-%%    cbv.1:cbv.1, at=5.782500e+01;
-%%    mb:mb, at=6.608000e+01;
-%%    mb:mb, at=8.174000e+01;
-%%    mb:mb, at=9.740000e+01;
-%%    bph:bph, at=1.059200e+02;
-%%    qf.2:qf.2, at=1.084700e+02;
-%%    mscbh:mscbh, at=1.107350e+02;
-%%    cbh.2:cbh.2, at=1.112850e+02;
-%%    mb:mb, at=1.195400e+02;
-%%    mb:mb, at=1.352000e+02;
-%%    mb:mb, at=1.508600e+02;
-%%    bpv:bpv, at=1.593800e+02;
-%%    qd.2:qd.2, at=1.619300e+02;
-%%    mscbv:mscbv, at=1.641950e+02;
-%%    cbv.2:cbv.2, at=1.647450e+02;
-%%    mb:mb, at=1.730000e+02;
-%%    mb:mb, at=1.886600e+02;
-%%    mb:mb, at=2.043200e+02;
-%%    bph:bph, at=2.128400e+02;
-%%    qf.3:qf.3, at=2.153900e+02;
-%%    mscbh:mscbh, at=2.176550e+02;
-%%    cbh.3:cbh.3, at=2.182050e+02;
-%%    mb:mb, at=2.264600e+02;
-%%    mb:mb, at=2.421200e+02;
-%%    mb:mb, at=2.577800e+02;
-%%    bpv:bpv, at=2.663000e+02;
-%%    qd.3:qd.3, at=2.688500e+02;
-%%    mscbv:mscbv, at=2.711150e+02;
-%%    cbv.3:cbv.3, at=2.716650e+02;
-%%    mb:mb, at=2.799200e+02;
-%%    mb:mb, at=2.955800e+02;
-%%    mb:mb, at=3.112400e+02;
-%%    bph:bph, at=3.197600e+02;
-%%    qf.4:qf.4, at=3.223100e+02;
-%%    mscbh:mscbh, at=3.245750e+02;
-%%    cbh.4:cbh.4, at=3.251250e+02;
-%%    mb:mb, at=3.333800e+02;
-%%    mb:mb, at=3.490400e+02;
-%%    mb:mb, at=3.647000e+02;
-%%    bpv:bpv, at=3.732200e+02;
-%%    qd.4:qd.4, at=3.757700e+02;
-%%    mscbv:mscbv, at=3.780350e+02;
-%%    cbv.4:cbv.4, at=3.785850e+02;
-%%    mb:mb, at=3.868400e+02;
-%%    mb:mb, at=4.025000e+02;
-%%    mb:mb, at=4.181600e+02;
-%%    bph:bph, at=4.266800e+02;
-%%    qf.5:qf.5, at=4.292300e+02;
-%%    mscbh:mscbh, at=4.314950e+02;
-%%    cbh.5:cbh.5, at=4.320450e+02;
-%%    mb:mb, at=4.403000e+02;
-%%    mb:mb, at=4.559600e+02;
-%%    mb:mb, at=4.716200e+02;
-%%    bpv:bpv, at=4.801400e+02;
-%%    qd.5:qd.5, at=4.826900e+02;
-%%    mscbv:mscbv, at=4.849550e+02;
-%%    cbv.5:cbv.5, at=4.855050e+02;
-%%    mb:mb, at=4.937600e+02;
-%%    mb:mb, at=5.094200e+02;
-%%    mb:mb, at=5.250800e+02;
-%%    bph:bph, at=5.336000e+02;
-%% end:marker, at=5.346000e+02;
-%% endsequence;
-
-%% // forces and other constants
-
-%% l.bpm:=.3;
-%% bang:=.509998807401e-2;
-%% kqf:=.872651312e-2;
-%% kqd:=-.872777242e-2;
-%% ksf:=.0198492943;
-%% ksd:=-.039621283;
-%% acbv1:=1.e-4;
-%% acbh1:=1.e-4;
-%% !save,sequence=fivecell,file,mad8;
-
-%% s := table(twiss,bpv[5],betx);
-%% myvar := sqrt(beam->ex*table(twiss,betx));
-%% use, period=fivecell;
-%% select,flag=twiss,column=name,s,myvar,apertype;
-%% twiss,file;
-%% n = 0;
-%% create,table=mytab,column=dp,mq1,mq2;
-%% mq1:=table(summ,q1);
-%% mq2:=table(summ,q2);
-%% while ( n < 11)
-%% {
-%%   n = n + 1;
-%%   dp = 1.e-4*(n-6);
-%%   twiss,deltap=dp;
-%%   fill,table=mytab;
-%% }
-%% write,table=mytab;
-%% plot,haxis=s,vaxis=aper_1,aper_2,colour=100,range=#s/cbv.1,notitle;
-%% stop;
-%% \end{verbatim}
-%% prints the following user table on output:
-
-%% \begin{verbatim}
-%% @ NAME             %05s "MYTAB"
-%% @ TYPE             %04s "USER"
-%% @ TITLE            %08s "no-title"
-%% @ ORIGIN           %16s "MAD-X 1.09 Linux"
-%% @ DATE             %08s "10/12/02"
-%% @ TIME             %08s "10.45.25"
-%% * DP                 MQ1                MQ2                
-%% $ %le                %le                %le                
-%%  -0.0005            1.242535951        1.270211135       
-%%  -0.0004            1.242495534        1.270197018       
-%%  -0.0003            1.242452432        1.270185673       
-%%  -0.0002            1.242406653        1.270177093       
-%%  -0.0001            1.242358206        1.270171269       
-%%  0                  1.242307102        1.27016819        
-%%  0.0001             1.242253353        1.270167843       
-%%  0.0002             1.242196974        1.270170214       
-%%  0.0003             1.24213798         1.270175288       
-%%  0.0004             1.242076387        1.270183048       
-%%  0.0005             1.242012214        1.270193477       
-%% \end{verbatim}
-%% and produces a twiss file with the additional column myvar, as well as a plot
-%% file with the aperture values plotted.
-
-
-%% \href{screate}{}
-
-%% Example of joining two tables with different length into a third table
-%% making use of the length of either table as given by
-%% table("your\_table\_name", tablelength) and adding names by the "\_name"
-%% attribute.
-
-%% \begin{verbatim}
-%% title,   "summing of offset and alignment tables";
-%% set,    format="13.6f";
-
-%% readtable, table=align,  file="align.ip2.b1.tfs";   // mesured alignment
-%% readtable, table=offset, file="offset.ip2.b1.tfs";  // nominal offsets
-
-%% n_elem  =  table(offset, tablelength);
-
-%% create,  table=align_offset, column=_name,s_ip,x_off,dx_off,ddx_off,y_off,dy_off,ddy_off;
-
-%% calcul(elem_name) : macro = {
-%%     x_off = table(align,  elem_name, x_ali) + x_off;
-%%     y_off = table(align,  elem_name, y_ali) + y_off;
-%% }
-
-
-%% one_elem(j_elem) : macro = {
-%%     setvars, table=offset, row=j_elem;
-%%     exec,  calcul(tabstring(offset, name, j_elem));
-%%     fill,  table=align_offset;
-%% }
-
-
-%% i_elem = 0;
-%% while (i_elem < n_elem) { i_elem = i_elem + 1; exec,  one_elem($i_elem); }
-
-%% write, table=align_offset, file="align_offset.tfs";
-
-%% stop;
-%% \end{verbatim}
-
-%%
-
-
-
-%\input{Introduction/select}
-\section{SELECT}
-\label{sec:selection}
-The elements, or a range of elements, in a sequence can be selected for
-various purposes. Such selections remain valid until cleared (in
-difference to \madeight); it is therefore recommended to always start with a  
-
-\begin{verbatim}
-select, flag =..., clear;
-\end{verbatim} 
-before setting a new selection. 
-\begin{verbatim}
-SELECT, FLAG=name, RANGE=range, CLASS=class, PATTERN=pattern [,FULL] [,CLEAR];
-\end{verbatim} 
-where the name for FLAG can be one of ERROR, MAKETHIN, SEQEDIT or the
-name of a twiss table which is established for all sequence positions in
-general.  
-
-Selected elements have to fulfill the \href{ranges.html#range}{RANGE},
-\href{ranges.html#class}{CLASS}, and \href{wildcard.html}{PATTERN}
-criteria.  
-
-Any number of SELECT commands can be issued for the same flag and are
-accumulated (logically ORed). In this context note the following:  
-
-\begin{verbatim}
-SELECT, FLAG=name, FULL;
-\end{verbatim} 
-selects all positions in the sequence for this flag. This is the default
-for all tables and makethin, whereas for ERROR and SEQEDIT the default
-is "nothing selected".  
-
-%\href{save_select}{}
-%\label{save_select}
-SAVE: A SELECT,FLAG=SAVE statement causes the
-selected sequences, elements, and variables to be written into the save
-file. A class (only used for element selection), and a pattern can be
-specified. Example:  
-\begin{verbatim}
-select, flag=save, class=variable, pattern="abc.*";
-save, file=mysave;
-\end{verbatim} 
-will save all variables (and sequences) containing "abc" in their name,
-but not elements with names containing "abc" since the class "variable"
-does not exist (astucieux, non ?).  
-
-SECTORMAP: A SELECT,FLAG=SECTORMAP statement causes sectormaps to be
-written into the file "sectormap" like in \madeight. For the file to be
-written, a flag SECTORMAP must be issued on the TWISS command in
-addition.  
-
-TWISS: A SELECT,FLAG=TWISS statement causes the selected rows and
-columns to be written into the Twiss TFS file (former OPTICS command in
-\madeight). The column selection is done on the same select. See as well
-example 2.  
-
-Example 1:  
-\begin{verbatim}
-TITLE,'Test input for MAD-X';
-
-option,rbarc=false; // use arc length of rbends
-beam; ! sets the default beam for the following sequence
-option,-echo;
-call file=fv9.opt;  ! contains optics parameters
-call file="fv9.seq"; ! contains a small sequence "fivecell"
-OPTION,ECHO;
-SELECT,FLAG=SECTORMAP,clear;
-SELECT,FLAG=SECTORMAP,PATTERN="^m.*";
-SELECT,FLAG=TWISS,clear;
-SELECT,FLAG=TWISS,PATTERN="^m.*",column=name,s,betx,bety;
-USE,PERIOD=FIVECELL;
-twiss,file=optics,sectormap;
-stop;
-\end{verbatim} 
-
-This produces a file \href{sectormap.html}{sectormap}, and a
-twiss output file \label{tfs} (name = optics):  
-\begin{verbatim}
-@ TYPE             %05s "TWISS"
-@ PARTICLE         %08s "POSITRON"
-@ MASS             %le          0.000510998902
-@ CHARGE           %le                       1
-@ E0               %le                       1
-@ PC               %le           0.99999986944
-@ GAMMA            %le           1956.95136738
-@ KBUNCH           %le                       1
-@ NPART            %le                       0
-@ EX               %le                       1
-@ EY               %le                       1
-@ ET               %le                       0
-@ LENGTH           %le                   534.6
-@ ALFA             %le        0.00044339992938
-@ ORBIT5           %le                      -0
-@ GAMMATR          %le           47.4900022541
-@ Q1               %le           1.25413071556
-@ Q2               %le           1.25485338377
-@ DQ1              %le           1.05329608302
-@ DQ2              %le           1.04837000224
-@ DXMAX            %le           2.17763211131
-@ DYMAX            %le                       0
-@ XCOMAX           %le                       0
-@ YCOMAX           %le                       0
-@ BETXMAX          %le            177.70993499
-@ BETYMAX          %le           177.671582415
-@ XCORMS           %le                       0
-@ YCORMS           %le                       0
-@ DXRMS            %le           1.66004270906
-@ DYRMS            %le                       0
-@ DELTAP           %le                       0
-@ TITLE            %20s "Test input for MAD-X"
-@ ORIGIN           %16s "MAD-X 0.20 Linux"
-@ DATE             %08s "07/06/02"
-@ TIME             %08s "14.25.51"
-* NAME               S                  BETX               BETY               
-$ %s                 %le                %le                %le                
- "MSCBH"             4.365              171.6688159        33.31817319       
- "MB"                19.72              108.1309095        58.58680717       
- "MB"                35.38              61.96499987        102.9962313       
- "MB"                51.04              34.61640793        166.2227523       
- "MSCBV.1"           57.825             33.34442808        171.6309057       
- "MB"                73.18              58.61984637        108.0956006       
- "MB"                88.84              103.0313887        61.93159422       
- "MB"                104.5              166.2602486        34.58939635       
- "MSCBH"             111.285            171.6688159        33.31817319       
- "MB"                126.64             108.1309095        58.58680717       
- "MB"                142.3              61.96499987        102.9962313       
- "MB"                157.96             34.61640793        166.2227523       
- "MSCBV"             164.745            33.34442808        171.6309057       
- "MB"                180.1              58.61984637        108.0956006       
- "MB"                195.76             103.0313887        61.93159422       
- "MB"                211.42             166.2602486        34.58939635       
- "MSCBH"             218.205            171.6688159        33.31817319       
- "MB"                233.56             108.1309095        58.58680717       
- "MB"                249.22             61.96499987        102.9962313       
- "MB"                264.88             34.61640793        166.2227523       
- "MSCBV"             271.665            33.34442808        171.6309057       
- "MB"                287.02             58.61984637        108.0956006       
- "MB"                302.68             103.0313887        61.93159422       
- "MB"                318.34             166.2602486        34.58939635       
- "MSCBH"             325.125            171.6688159        33.31817319       
- "MB"                340.48             108.1309095        58.58680717       
- "MB"                356.14             61.96499987        102.9962313       
- "MB"                371.8              34.61640793        166.2227523       
- "MSCBV"             378.585            33.34442808        171.6309057       
- "MB"                393.94             58.61984637        108.0956006       
- "MB"                409.6              103.0313887        61.93159422       
- "MB"                425.26             166.2602486        34.58939635       
- "MSCBH"             432.045            171.6688159        33.31817319       
- "MB"                447.4              108.1309095        58.58680717       
- "MB"                463.06             61.96499987        102.9962313       
- "MB"                478.72             34.61640793        166.2227523       
- "MSCBV"             485.505            33.34442808        171.6309057       
- "MB"                500.86             58.61984637        108.0956006       
- "MB"                516.52             103.0313887        61.93159422       
- "MB"                532.18             166.2602486        34.58939635       
-\end{verbatim}
-
- Example 2: 
-
- Addition of variables to (any internal) table: 
-\begin{verbatim}
-select, flag=table, column=name, s, betx, ..., var1, var2, ...; ! or
-select, flag=table, full, column=var1, var2, ...; ! default col.s + new
-\end{verbatim} 
-will write the current value of var1 etc. into the table each time a new
-line is added; values from the same (current) line can be accessed by
-these variables, e.g.  
-\begin{verbatim}
-var1 := sqrt(beam->ex*table(twiss,betx));
-\end{verbatim} 
-in the case of table above being "twiss". The plot command accepts the
-new variables.  
-
-Remark: this replaces the "string" variables of \madeight. 
-
- This example demonstrates as well the usage of a user defined table \label{ucreate}. 
-\begin{verbatim}
-beam,ex=1.e-6,ey=1.e-3;
-// element definitions
-mb:rbend, l=14.2, angle:=0,k0:=bang/14.2;
-mq:quadrupole, l:=3.1,apertype=ellipse,aperture={1,2};
-qft:mq, l:=0.31, k1:=kqf,tilt=-pi/4;
-qf.1:mq, l:=3.1, k1:=kqf;
-qf.2:mq, l:=3.1, k1:=kqf;
-qf.3:mq, l:=3.1, k1:=kqf;
-qf.4:mq, l:=3.1, k1:=kqf;
-qf.5:mq, l:=3.1, k1:=kqf;
-qd.1:mq, l:=3.1, k1:=kqd;
-qd.2:mq, l:=3.1, k1:=kqd;
-qd.3:mq, l:=3.1, k1:=kqd;
-qd.4:mq, l:=3.1, k1:=kqd;
-qd.5:mq, l:=3.1, k1:=kqd;
-bph:hmonitor, l:=l.bpm;
-bpv:vmonitor, l:=l.bpm;
-cbh:hkicker;
-cbv:vkicker;
-cbh.1:cbh, kick:=acbh1;
-cbh.2:cbh, kick:=acbh2;
-cbh.3:cbh, kick:=acbh3;
-cbh.4:cbh, kick:=acbh4;
-cbh.5:cbh, kick:=acbh5;
-cbv.1:cbv, kick:=acbv1;
-cbv.2:cbv, kick:=acbv2;
-cbv.3:cbv, kick:=acbv3;
-cbv.4:cbv, kick:=acbv4;
-cbv.5:cbv, kick:=acbv5;
-!mscbh:sextupole, l:=1.1, k2:=ksf;
-mscbh:multipole, knl:={0,0,0,ksf},tilt=-pi/8;
-mscbv:sextupole, l:=1.1, k2:=ksd;
-!mscbv:octupole, l:=1.1, k3:=ksd,tilt=-pi/8;
-
-// sequence declaration
-
-fivecell:sequence, refer=centre, l=534.6;
-   qf.1:qf.1, at=1.550000e+00;
-   qft:qft, at=3.815000e+00;
-!   mscbh:mscbh, at=3.815000e+00;
-   cbh.1:cbh.1, at=4.365000e+00;
-   mb:mb, at=1.262000e+01;
-   mb:mb, at=2.828000e+01;
-   mb:mb, at=4.394000e+01;
-   bpv:bpv, at=5.246000e+01;
-   qd.1:qd.1, at=5.501000e+01;
-   mscbv:mscbv, at=5.727500e+01;
-   cbv.1:cbv.1, at=5.782500e+01;
-   mb:mb, at=6.608000e+01;
-   mb:mb, at=8.174000e+01;
-   mb:mb, at=9.740000e+01;
-   bph:bph, at=1.059200e+02;
-   qf.2:qf.2, at=1.084700e+02;
-   mscbh:mscbh, at=1.107350e+02;
-   cbh.2:cbh.2, at=1.112850e+02;
-   mb:mb, at=1.195400e+02;
-   mb:mb, at=1.352000e+02;
-   mb:mb, at=1.508600e+02;
-   bpv:bpv, at=1.593800e+02;
-   qd.2:qd.2, at=1.619300e+02;
-   mscbv:mscbv, at=1.641950e+02;
-   cbv.2:cbv.2, at=1.647450e+02;
-   mb:mb, at=1.730000e+02;
-   mb:mb, at=1.886600e+02;
-   mb:mb, at=2.043200e+02;
-   bph:bph, at=2.128400e+02;
-   qf.3:qf.3, at=2.153900e+02;
-   mscbh:mscbh, at=2.176550e+02;
-   cbh.3:cbh.3, at=2.182050e+02;
-   mb:mb, at=2.264600e+02;
-   mb:mb, at=2.421200e+02;
-   mb:mb, at=2.577800e+02;
-   bpv:bpv, at=2.663000e+02;
-   qd.3:qd.3, at=2.688500e+02;
-   mscbv:mscbv, at=2.711150e+02;
-   cbv.3:cbv.3, at=2.716650e+02;
-   mb:mb, at=2.799200e+02;
-   mb:mb, at=2.955800e+02;
-   mb:mb, at=3.112400e+02;
-   bph:bph, at=3.197600e+02;
-   qf.4:qf.4, at=3.223100e+02;
-   mscbh:mscbh, at=3.245750e+02;
-   cbh.4:cbh.4, at=3.251250e+02;
-   mb:mb, at=3.333800e+02;
-   mb:mb, at=3.490400e+02;
-   mb:mb, at=3.647000e+02;
-   bpv:bpv, at=3.732200e+02;
-   qd.4:qd.4, at=3.757700e+02;
-   mscbv:mscbv, at=3.780350e+02;
-   cbv.4:cbv.4, at=3.785850e+02;
-   mb:mb, at=3.868400e+02;
-   mb:mb, at=4.025000e+02;
-   mb:mb, at=4.181600e+02;
-   bph:bph, at=4.266800e+02;
-   qf.5:qf.5, at=4.292300e+02;
-   mscbh:mscbh, at=4.314950e+02;
-   cbh.5:cbh.5, at=4.320450e+02;
-   mb:mb, at=4.403000e+02;
-   mb:mb, at=4.559600e+02;
-   mb:mb, at=4.716200e+02;
-   bpv:bpv, at=4.801400e+02;
-   qd.5:qd.5, at=4.826900e+02;
-   mscbv:mscbv, at=4.849550e+02;
-   cbv.5:cbv.5, at=4.855050e+02;
-   mb:mb, at=4.937600e+02;
-   mb:mb, at=5.094200e+02;
-   mb:mb, at=5.250800e+02;
-   bph:bph, at=5.336000e+02;
-end:marker, at=5.346000e+02;
-endsequence;
-
-// forces and other constants
-
-l.bpm:=.3;
-bang:=.509998807401e-2;
-kqf:=.872651312e-2;
-kqd:=-.872777242e-2;
-ksf:=.0198492943;
-ksd:=-.039621283;
-acbv1:=1.e-4;
-acbh1:=1.e-4;
-!save,sequence=fivecell,file,mad8;
-
-s := table(twiss,bpv[5],betx);
-myvar := sqrt(beam->ex*table(twiss,betx));
-use, period=fivecell;
-select,flag=twiss,column=name,s,myvar,apertype;
-twiss,file;
-n = 0;
-create,table=mytab,column=dp,mq1,mq2;
-mq1:=table(summ,q1);
-mq2:=table(summ,q2);
-while ( n < 11)
-{
-  n = n + 1;
-  dp = 1.e-4*(n-6);
-  twiss,deltap=dp;
-  fill,table=mytab;
+\vskip 5mm
+\madxmp{
+sig1 := sqrt(beam->ex*table(twiss,betx)); \\
+SELECT, FLAG=twiss, COLUMN= \_name, s, betx, ..., sig1; ! or equivalently \\
+SELECT, FLAG=twiss, FULL, COLUMN= sig1; ! default columns + new
 }
-write,table=mytab;
-plot,haxis=s,vaxis=aper_1,aper_2,colour=100,range=#s/cbv.1,notitle;
-stop;
-\end{verbatim}
-prints the following user table on output:
-
-\begin{verbatim}
-@ NAME             %05s "MYTAB"
-@ TYPE             %04s "USER"
-@ TITLE            %08s "no-title"
-@ ORIGIN           %16s "MAD-X 1.09 Linux"
-@ DATE             %08s "10/12/02"
-@ TIME             %08s "10.45.25"
-* DP                 MQ1                MQ2                
-$ %le                %le                %le                
- -0.0005            1.242535951        1.270211135       
- -0.0004            1.242495534        1.270197018       
- -0.0003            1.242452432        1.270185673       
- -0.0002            1.242406653        1.270177093       
- -0.0001            1.242358206        1.270171269       
- 0                  1.242307102        1.27016819        
- 0.0001             1.242253353        1.270167843       
- 0.0002             1.242196974        1.270170214       
- 0.0003             1.24213798         1.270175288       
- 0.0004             1.242076387        1.270183048       
- 0.0005             1.242012214        1.270193477       
-\end{verbatim}
-and produces a twiss file with the additional column myvar, as well as a plot
-file with the aperture values plotted.
-
-
-%\href{screate}{}
-
-Example of joining two tables with different length into a third table
-making use of the length of either table as given by
-table("your\_table\_name", tablelength) and adding names by the "\_name"
-attribute.
-
-\begin{verbatim}
-title,   "summing of offset and alignment tables";
-set,    format="13.6f";
-
-readtable, table=align,  file="align.ip2.b1.tfs";   // mesured alignment
-readtable, table=offset, file="offset.ip2.b1.tfs";  // nominal offsets
-
-n_elem  =  table(offset, tablelength);
-
-create,  table=align_offset, column=_name,s_ip,x_off,dx_off,ddx_off,y_off,dy_off,ddy_off;
-
-calcul(elem_name) : macro = {
-    x_off = table(align,  elem_name, x_ali) + x_off;
-    y_off = table(align,  elem_name, y_ali) + y_off;
-}
-
-
-one_elem(j_elem) : macro = {
-    setvars, table=offset, row=j_elem;
-    exec,  calcul(tabstring(offset, name, j_elem));
-    fill,  table=align_offset;
-}
-
-
-i_elem = 0;
-while (i_elem < n_elem) { i_elem = i_elem + 1; exec,  one_elem($i_elem); }
-
-write, table=align_offset, file="align_offset.tfs";
-
-stop;
-\end{verbatim}
-
+writes the current value of ``sig1'' into the {\tt TWISS} table each
+time a new line is added; Note that the values from the same (current)
+line can be are accessed by the variable ``sig1''.
+The \hyperref[chap:plot]{\tt PLOT} command also accepts the new variable 
+in the table.  
 
 %% EOF
 

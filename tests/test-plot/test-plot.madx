@@ -6,7 +6,7 @@ Title, "Test for PLOT command on the LHC 6.5 lattice with MADX";
 !---------------------------------------------------------------;
 
 option, -echo, -warn;
-call, file="../test-makethin-2/V6.5.thin.b1.seq";
+call, file="../share/LHC/LHCRing/V6.503/V6.5.thin.b1.seq";
 call, file="../share/LHC/LHCRing/V6.503/V6.5.thin.inj.str";
 option, echo, warn;
 
@@ -59,7 +59,5 @@ plot, file=plot2, table=tracktwo, trackfile=plot2, noversion, multiple,
       haxis=x, vaxis=px, particle=1,2,3,4; 
 plot, file=plot2, table=tracktwo, trackfile=plot2, noversion, multiple, 
       haxis=y, vaxis=py, particle=1,2,3,4;
-
-removefile,file=plot2one;
 
 exit;

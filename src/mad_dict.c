@@ -19,8 +19,8 @@
 "const erad = 2.8179402894e-15; "  
 "const prad = erad*emass/pmass; "; */
 
-
 /*  J. Beringer et al. (Particle Data Group), Phys. Rev. D86, 010001 (2012). = PDG 2012 */
+/*  K.A. Olive et al. (Particle Data Group), Chin. Phys. C, 38, 090001 (2014). = PDG2014 */
 char constant_def[] =
 "const pi = 4 * atan(1.); "
 "const twopi = 2 * pi; "
@@ -37,8 +37,6 @@ char constant_def[] =
 "const hbar = 6.58211928e-25; "
 "const erad = 2.8179403267e-15; " 
 "const prad = erad*emass/pmass; ";
-
-
 
 /* mods HG090508 - speed-up twiss
    all new elements must start with at, l, kmax, kmin, calib, polarity
@@ -119,8 +117,6 @@ char command_def[] =
 "halofile = [s, none, none], "       /* input file w/halo polygon coordinates */
 /* "pipefile = [s, none, none], " */     /* input file w/pipe polygon coordinates */
 "range    = [s, #s/#e, none], "      /* range */
-"exn      = [r, 3.75e-6], "          /* norm. emit */
-"eyn      = [r, 3.75e-6], "          /* norm. emit */
 "dqf      = [r, 2.086], "                /* peak linear dispersion */
 "betaqfx  = [r, 170.25], "               /* beta x in standard qf */
 "dp       = [r, 0.0015], "       /* bucket edge at injection */
@@ -139,8 +135,6 @@ char command_def[] =
 " "
 /* "aperture: aperture none 0 0 " */
 /* "range    = [s, #s/#e, none], " /\* range *\/ */
-/* "exn      = [r, 0.], "          /\* norm. emit *\/ */
-/* "eyn      = [r, 0.], "          /\* norm. emit *\/ */
 /* "dqf      = [r, 0.], "          /\* peak linear dispersion *\/ */
 /* "dparx    = [r, 0.], "          /\* fractional parasitic dispersion - horizontal *\/ */
 /* "dpary    = [r, 0.], "          /\* fractional parasitic dispersion - vertical *\/ */
@@ -174,6 +168,7 @@ char command_def[] =
 "energy   = [r, 1], "
 "pc       = [r, 0], "
 "gamma    = [r, 0], "
+"beta     = [r, 0], "
 "brho     = [r, 0], "
 "ex       = [r, 1], "
 "exn      = [r, 0], "
@@ -189,7 +184,6 @@ char command_def[] =
 "circ     = [r, 0], "
 "dtbyds   = [r, 0], "
 "deltap   = [r, 0], "
-"beta     = [r, 0], "
 "alfa     = [r, 0], "
 "u0       = [r, 0], "
 "qs       = [r, 0], "
@@ -261,6 +255,10 @@ char command_def[] =
 "fill: control none 0 0 "
 "table = [s, none], "
 "row = [i, 0]; "
+" "
+"shrink: control none 0 0 "
+"table = [s, none], "
+"row = [i, -1]; "
 " "
 "setvars: control none 0 0 "
 "table = [s, none], "
@@ -337,7 +335,7 @@ char command_def[] =
 "table = [s, none], "
 "file = [s, none]; "
 " "
-"readmytable: correct correct 0 0 "
+"readmytable: correct correct 0 0 " /* ghislain ???? */
 "table = [s, none], "
 "file  = [s, none]; "
 " "
@@ -346,7 +344,12 @@ char command_def[] =
 " "
 "renamefile: control none 0 0 "
 "file = [s, none], "
-"name = [s, none]; "
+"to = [s, none]; "
+" "
+"copyfile: control none 0 0 "
+"file = [s, none], "
+"to = [s, none], "
+"append = [l, false, true]; "
 " "
 "resbeam: control none 0 0, "
 "sequence = [s, none, none]; "
@@ -841,8 +844,7 @@ char command_def[] =
 " "
 "coption: correct none 0 0 "
 "seed     = [i, 123456789], "
-"print    = [i, 1],  "
-"debug    = [i, 0];  "
+"print    = [i, 1];"
 " "
 "seqedit: edit edit 1 0 "
 "sequence = [s, none, none]; "
@@ -1628,8 +1630,8 @@ char command_def[] =
 "aperture = [r, {0}],  "
 "aper_offset = [r, {0}], "
 "aper_tol = [r, {0, 0, 0}], "
-"xsize    = [r, 0],  "
-"ysize    = [r, 0], "
+"xsize    = [r, 0],  " 
+"ysize    = [r, 0], " 
 "slot_id  = [i, none], "
 "assembly_id = [i, none], "
 "mech_sep = [r, 0], "
@@ -1659,8 +1661,8 @@ char command_def[] =
 "aperture = [r, {0}],  "
 "aper_offset = [r, {0}], "
 "aper_tol = [r, {0, 0, 0}], "
-"xsize    = [r, 0],  "
-"ysize    = [r, 0], "
+"xsize    = [r, 0],  " 
+"ysize    = [r, 0], " 
 "slot_id  = [i, none], "
 "assembly_id = [i, none], "
 "mech_sep = [r, 0], "
@@ -2356,6 +2358,35 @@ char command_def[] =
 "pnl        = [r, {0}], " // RF-Multipole
 "psl        = [r, {0}]; " // RF-Multipole
 " "  
+"collimator: element none 0 44 "
+"at       = [r, 1.e20], "
+"l        = [r, 0],  "
+"kmax     = [r, 0], "
+"kmin     = [r, 0], "
+"calib    = [r, 0], "
+"polarity = [r, 0], "
+"tilt     = [r, 0],  "
+"lrad     = [r, 0],  "
+"magnet   = [i, 0],  "
+"apertype = [s, circle, circle], "
+"aperture = [r, {0}],  "
+"aper_offset = [r, {0}], "
+"aper_tol = [r, {0, 0, 0}], "
+"slot_id  = [i, none], "
+"assembly_id = [i, none], "
+"mech_sep = [r, 0], "
+"v_pos = [r, 0], "
+"model           = [i, -1], "
+"method          = [i, -1], "
+"exact           = [i, -1, 1], "
+"nst             = [i, -1], "
+"from     = [s, none], "
+"type     = [s, none, none], "
+"permfringe      = [l, false, true], "
+"bend_fringe     = [l, false, true], "
+"kill_ent_fringe = [l, false, true], "
+"kill_exi_fringe = [l, false, true]; "
+" "
 "emit: emit none 0 0 "
 "deltap   = [r, 0], "
 "tol      = [r, 1.000001, 0]; "
@@ -2428,7 +2459,7 @@ char command_def[] =
 "sequence = [s, none, none], "
 "makeconsistent = [l, false, true],  " /*hbu */
 "minimizeparents = [l, true, false], " /*hbu */
-"makedipedge = [l, false, true];"      /*hbu, 07/2012, in future by default on */
+"makedipedge = [l, false, true]; "     /*hbu, 07/2012, in future by default on */
 " "
 "survey: survey none 0 0 "
 "x0       = [r, 0],   y0     = [r, 0], z0       = [r, 0], "

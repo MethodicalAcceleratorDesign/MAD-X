@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.18  (32 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.09.26      +
-  + Execution Time Stamp: 30.11.12 18.05.51 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.05  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2015.04.06               +
+  + Execution date: 2015.05.19 17:28:34      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 !Example script showing usage of tracking with PTC
 
 !author: Piotr Skowronski (CERN)
@@ -15,31 +15,28 @@
 
 option,-echo;
 
- Now PTC
  MAD-X Beam Parameters
                   Energy : 0.200000E-01
           Kinetic Energy : 0.194890E-01
       Particle Rest Mass : 0.510999E-03
                 Momentum : 0.199935E-01
  Setting MADx with 
-     energy          2.000000000000000E-002
+     energy           2.0000000000000000E-002
      method                   6
      Num. of steps           20
-     charge          -1.00000000000000     
-  Length of machine:    9.00000000000000     
+     charge          -1.0000000000000000     
+  Length of machine:    9.0000000000000000     
  The machine is a LINE
  ------------------------------------ PTC Survey ------------------------------------
- Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After    end:   0.000000000000000E+000  0.000000000000000E+000   9.00000000000000     
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        8.9999999999999982     
 obs_points: 2 
 obs_points: 3 
- Killing LayoutNo name assigned                                                                                                        
- Layout killed 
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.18 (32 bit) finished normally +
+  + MAD-X 5.02.05 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

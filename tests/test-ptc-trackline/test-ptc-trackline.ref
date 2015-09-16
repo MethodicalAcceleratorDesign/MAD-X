@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.18  (32 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.09.26      +
-  + Execution Time Stamp: 30.11.12 18.05.51 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.05  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2015.04.06               +
+  + Execution date: 2015.05.19 17:03:50      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 !Example file showing the usage of PTC_SETSWITCH command 
 
 !that sets the internal state (i.e switches) of PTC
@@ -21,24 +21,23 @@
 
 option,-echo;
 
- Now PTC
  MAD-X Beam Parameters
                   Energy : 0.200000E-01
           Kinetic Energy : 0.194890E-01
       Particle Rest Mass : 0.510999E-03
                 Momentum : 0.199935E-01
  Setting MADx with 
-     energy          2.000000000000000E-002
+     energy           2.0000000000000000E-002
      method                   6
      Num. of steps          100
-     charge          -1.00000000000000     
-  Length of machine:    4.50000000000000     
+     charge          -1.0000000000000000     
+  Length of machine:    4.5000000000000000     
  The machine is a LINE
  ------------------------------------ PTC Survey ------------------------------------
- Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After    end:   0.000000000000000E+000  0.000000000000000E+000   4.50000000000000     
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        4.5000000000000000     
 ############################################
 ############################################
 ##     Tracking with default settings     ##
@@ -46,17 +45,9 @@ option,-echo;
 ############################################
 Enforcing onetable=true, current is 0.000000
 Now is 1.000000
-  PARENT LAYOUT NAME :No name assigned
-  NUMBER OF ORIGINAL LAYOUT ELEMENTS :          16
-  NUMBER OF THIN OBJECTS :         575
-  TOTAL IDEAL LENGTH OF STRUCTURE :   4.50000000000003     
-  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   4.50000000000003     
- Killing LayoutNo name assigned                                                                                                        
-  NODE LAYOUT HAS BEEN KILLED 
- Layout killed 
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.18 (32 bit) finished normally +
+  + MAD-X 5.02.05 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

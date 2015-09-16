@@ -1,43 +1,31 @@
 %%\title{Error Definitions}
 
-\chapter{Error Definitions}  
+\chapter{Error Definitions}
 \label{chap:error}
 This chapter describes the commands which provide error assignment and
 output of errors assigned to elements. It is possible to assign
 alignment errors and field errors to single beam elements or to ranges
-or classes of beam elements.  
+or classes of beam elements.
 
 Elements, classes or ranges of elements are selected by the
-\href{../Introduction/select.html}{SELECT} command.  
+\hyperref[sec:seclect]{\tt SELECT} command.
 
 ATTENTION: since errors can only be assigned to machine elements, it is
-necessary to  \href{../control/seqedit.html#flatten}{FLATTEN} a sequence
-if it includes other sequences.  
+necessary to \hyperref[sec:flatten]{\tt FLATTEN} a sequence
+if it includes other sequences.
 
-Errors can be specified with both constant or random values. 
+Errors can be specified with both constant or random values.
 
 Error definitions consist of four types of statements listed below. They
 may be entered after having selected a beam line by means of a
-\href{../control/general.html#use}{USE} command.  
+\hyperref[sec:use]{\tt USE} command.  
 
-WARNING: any further \href{../control/general.html#use}{USE} command
+WARNING: any further \hyperref[sec:use]{\tt USE} command
 will destroy the assigned errors. Use the
-\href{../error/error_save.html}{ESAVE} option to save and reload errors.  
-
-%\begin{itemize}
-%	\item \href{error_align.html}{EALIGN: Define Misalignments}
-%	\item \href{error_field.html}{Field Errors}
-%\begin{itemize}
-%	\item \href{error_field.html#efcomp}{EFCOMP: Components}
-%\end{itemize}
-%	\item \href{error_option.html}{EOPTION: Set Error Options}
-%	\item \href{error_print.html}{EPRINT: List Machine Imperfections}
-%	\item \href{error_save.html}{ESAVE: Save Machine Imperfections and read back from file}
-%\end{itemize}
+\hyperref[sec:esave]{\tt ESAVE} option to save and reload errors.
 
 %\href{http://consult.cern.ch/xwho/people/1808}{Werner Herr} 18.6.2002 
 
-% add other files to the end of this file
 
 %\input{error/error_align}
 %%\title{EALIGN}
@@ -51,22 +39,25 @@ will destroy the assigned errors. Use the
 \section{EALIGN: Alignment Errors} %EALIGN: Define Misalignments} 
 \label{sec:ealign}
 
-Alignment errors are defined by the EALIGN command. 
+Alignment errors are defined by the {\tt EALIGN} command. 
 The misalignments refer to the
-\href{../Introduction/local_system.html}{local reference system} for a
+\hyperref[sec:reference]{local reference system} for a
 perfectly aligned machine.  
-Possible misalignments are displacements along the three coordinate
+Misalignments are defined as displacements along the three coordinate
 axes, and rotations about the coordinate axes. 
 Alignment errors can be assigned to all beam elements except drift
 spaces. 
 The effect of misalignments is treated in a linear
-approximation. 
-A \href{read HREF=../Introduction/monitors.html}{Beam
-  position monitor} can be given read errors in both horizontal and
-vertical planes. Monitor errors (MREX, MREY, MSCALX and MSCALY) are
-ignored for all other elements. Each new EALIGN statement replaces the
-misalignment errors for all elements in its range, unless ``EOPTION,
-ADD=TRUE'' has been specified.   
+approximation.
+
+\hyperref[sec:monitor]{Beam Position Monitors} can be given readout errors as 
+well as readout scaling errors in both horizontal and vertical planes. 
+Monitor readout and scaling errors are ignored for all elements other than 
+\hyperref[sec:monitor]{monitors}.
+
+Each new {\tt EALIGN} statement replaces the misalignment errors for all 
+elements in its range, unless the logical {\tt ADD} attribute of 
+\hyperref[sec:eoption]{\tt EOPTION} has been specified.
 
 Alignment errors are defined by the statement 
 
@@ -79,66 +70,306 @@ EALIGN, \>DX=real, DY=real, DS=real, \\
         \>MSCALX=real, MSCALY=real,\\
         \>AREX=real, AREY=real;
 }
-and elements are now selected by the
-\href{../Introduction/select.html}{SELECT} command. 
+for elements selected by the
+\hyperref[sec:select]{\tt SELECT} command. 
+
+\begin{figure}[ht]
+	\centering
+	\setlength{\unitlength}{1pt}
+	\begin{picture}(400,140)(0,30)
+	\thinlines
+	\put(50,75){\line(1,0){96}}
+	\put(154,75){\vector(1,0){246}}
+	\put(50,75){\makebox(0,0)[r]{\shortstack{
+		\footnotesize original \\
+		\footnotesize beam line}}}
+	\put(395,67){\makebox(0,0)[r]{$s$}}
+	\put(150,75){\circle{8}}
+	\put(150,75){\circle*{2}}
+	\put(142,83){\makebox(0,0){$y$}}
+	\put(150,30){\line(0,1){41}}
+	\put(150,79){\vector(0,1){91}}
+	\put(142,163){\makebox(0,0){$x$}}
+	\put(130,55){\vector(1,1){15}}
+	\put(130,55){\makebox(0,0)[tr]{\shortstack{
+		\footnotesize original entrance \\
+		\footnotesize of the magnet}}}
+	\thicklines
+	\put(150,55){\vector(1,0){50}}
+	\put(175,45){\makebox(0,0){\tt DS}}
+	\put(130,75){\vector(0,1){50}}
+	\put(125,100){\makebox(0,0)[r]{\tt DX}}
+	\thinlines
+	\put(125,125){\line(1,0){185}}
+	\put(200,50){\line(0,1){120}}
+	\put(200,125){\circle*{4}}
+	\thicklines
+	\color{blue}
+	\put(168,117){\vector(4,1){144}}
+	\put(210,85){\vector(-1,4){20}}
+
+	\put(282,137){\line(-1,4){4}}
+	\put(202,117){\line(-1,4){4}}
+	\put(198,133){\line(4,1){80}}
+	\put(202,117){\line(4,1){80}}
+	\color{black}
+	\bezier{30}(300,125)(300,137)(297,149)
+	\put(299,140){\vector(-1,4){2}}
+	\put(305,137){\makebox(0,0)[l]{\tt DTHETA}}
+
+	\put(150,67){\line(1,0){80}}
+	\put(150,83){\line(1,0){80}}
+	\put(150,67){\line(0,1){4}}
+	\put(150,79){\line(0,1){4}}
+	\put(230,67){\line(0,1){16}}
+	\end{picture}
+	\caption{Alignment errors in the $(x,s)$-plane}
+	\label{F-XSDISP}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering
+	\setlength{\unitlength}{1pt}
+	\begin{picture}(400,150)
+	\thinlines
+	\put(204,75){\line(1,0){96}}
+	\put(196,75){\vector(-1,0){96}}
+	\put(305,75){\makebox(0,0)[l]{\shortstack{
+		\footnotesize horizontal \\
+		\footnotesize plane}}}
+	\put(106,68){\makebox(0,0)[l]{$x$}}
+	\put(200,75){\circle{8}}
+	\put(200,75){\makebox(0,0){\(\times\)}}
+	\put(208,66){\makebox(0,0){$s$}}
+	\put(200,0){\line(0,1){71}}
+	\put(200,79){\vector(0,1){71}}
+	\put(193,142){\makebox(0,0){$y$}}
+	\thicklines
+	\color{blue}
+	\put(196,76.3){\vector(-3,1){70}}
+	\put(204,73.7){\line(3,-1){70}}
+	\put(198.7,72){\line(-1,-3){23.3}}
+	\put(201.3,78){\vector(1,3){23.3}}
+	
+	\put(160,55){\line(3,-1){60}}
+	\put(180,115){\line(3,-1){60}}
+	\put(160,55){\line(1,3){20}}
+	\put(220,35){\line(1,3){20}}
+	\color{black}
+	\bezier{20}(260,75)(260,65)(257,56)
+	\put(259,62){\vector(-1,-3){2}}
+	\put(265,67){\makebox(0,0)[l]{\tt DPSI}}
+	
+	\bezier{20}(213,114)(222,111)(229,104)
+	\put(233,125){\makebox(0,0){\tt ROT}}
+	\put(227,106){\vector(1,-1){2}}
+	\color{magenta}
+	\put(197.2,72.2){\line(-1,-1){50}}
+	\put(202.8,77.8){\line(1,1){50}}
+	\end{picture}
+	\caption{Alignment errors in the $(x,y)$-plane}
+	\label{F-XYDISP}
+\end{figure}
+
+
+%% \begin{figure}[ht]
+%% \centering
+%% \setlength{\unitlength}{1pt}
+%% \begin{picture}(400,140)(0,30)
+%% \thinlines
+%% \put(50,75){\line(1,0){96}}
+%% \put(154,75){\vector(1,0){246}}
+%% \put(50,75){\makebox(0,0)[r]{\shortstack{original \\beam line}}}
+%% \put(390,65){\makebox(0,0)[r]{s}}
+%% \put(150,75){\circle{8}}
+%% \put(150,75){\circle*{2}}
+%% \put(140,85){\makebox(0,0){x}}
+%% \put(150,30){\line(0,1){41}}
+%% \put(150,79){\vector(0,1){91}}
+%% \put(140,160){\makebox(0,0){y}}
+%% \put(130,55){\vector(1,1){15}}
+%% \put(130,55){\makebox(0,0)[tr]{\shortstack{original entrance \\
+%% of the magnet}}}
+%% \thicklines
+%% \put(150,55){\vector(1,0){50}}
+%% \put(175,45){\makebox(0,0){DS}}
+%% \put(130,75){\vector(0,1){50}}
+%% \put(125,100){\makebox(0,0)[r]{DY}}
+%% \thinlines
+%% \put(125,125){\line(1,0){185}}
+%% \put(200,50){\line(0,1){120}}
+%% \put(200,125){\circle*{4}}
+%% \thicklines
+%% \put(168,133){\vector(4,-1){144}}
+%% \put(189,81){\vector(1,4){22}}
+%% \bezier{30}(300,125)(300,113)(297,101)
+%% \put(299,109){\vector(-1,-4){2}}
+%% \put(305,113){\makebox(0,0)[l]{DPHI}}
+%% \put(278,97){\line(1,4){4}}
+%% \put(198,117){\line(1,4){4}}
+%% \put(202,133){\line(4,-1){80}}
+%% \put(198,117){\line(4,-1){80}}
+%% \put(150,67){\line(1,0){80}}
+%% \put(150,83){\line(1,0){80}}
+%% \put(150,67){\line(0,1){4}}
+%% \put(150,79){\line(0,1){4}}
+%% \put(230,67){\line(0,1){16}}
+%% \end{picture}
+%% \caption{Example of Misplacement in the $(y,s)$-plane (WRONG)}
+%% \label{F-YSDISP}
+%% \end{figure}
+
+\begin{figure}[h!]
+	\centering
+	\setlength{\unitlength}{1pt}
+	\begin{picture}(400,140)(0,30)
+	\thinlines
+	\put(50,75){\line(1,0){96}}
+	\put(154,75){\vector(1,0){246}}
+	\put(50,75){\makebox(0,0)[r]{\shortstack{
+		\footnotesize original \\
+		\footnotesize beam line}}}
+	\put(395,67){\makebox(0,0)[r]{$s$}}
+	\put(150,75){\circle{8}}
+	\put(150,75){\makebox(0,0){\(\times\)}}
+	\put(142,83){\makebox(0,0){$x$}}
+	\put(150,30){\line(0,1){41}}
+	\put(150,79){\vector(0,1){91}}
+	\put(142,163){\makebox(0,0){$y$}}
+	\put(130,55){\vector(1,1){15}}
+	\put(130,55){\makebox(0,0)[tr]{\shortstack{
+		\footnotesize original entrance \\
+		\footnotesize of the magnet}}}
+	\thicklines
+	\put(150,55){\vector(1,0){50}}
+	\put(175,45){\makebox(0,0){\tt DS}}
+	\put(130,75){\vector(0,1){50}}
+	\put(125,100){\makebox(0,0)[r]{\tt DY}}
+	\thinlines
+	\put(125,125){\line(1,0){185}}
+	\put(200,50){\line(0,1){120}}
+	\put(200,125){\circle*{4}}
+	\thicklines
+	\color{blue}
+	\put(168,117){\vector(4,1){144}}
+	\put(211,81){\vector(-1,4){22}}
+	\put(278,153){\line(1,-4){4}}
+	\put(202,117){\line(-1,4){4}}
+	\put(198,133){\line(4,1){80}}
+	\put(202,117){\line(4,1){80}}
+	\color{black}
+	\bezier{30}(300,125)(300,137)(297,149)
+	\put(299,141){\vector(-1,4){2}}
+	\put(305,137){\makebox(0,0)[l]{\tt DPHI}}
+		
+	\put(150,67){\line(1,0){80}}
+	\put(150,83){\line(1,0){80}}
+	\put(150,67){\line(0,1){4}}
+	\put(150,79){\line(0,1){4}}
+	\put(230,67){\line(0,1){16}}
+	\end{picture}
+	\caption{Alignment errors in the $(y,s)$-plane}
+	\label{F-YSDISP}
+\end{figure}
+
+\begin{figure}[htb]
+	\centering
+	\setlength{\unitlength}{1pt}
+	\begin{picture}(400,150)(0,20)
+	\thinlines
+	\put(204,75){\line(1,0){96}}
+	\put(196,75){\vector(-1,0){196}}
+	\put(305,75){\makebox(0,0)[l]{\shortstack{
+		\footnotesize horizontal \\
+		\footnotesize plane}}}
+	\put(8,68){\makebox(0,0)[l]{$x$}}
+	\put(200,75){\circle{8}}\put(200,75){\makebox(0,0){\(\times\)}}
+	\put(220,55){\vector(-1,1){15}}
+	\put(220,55){\makebox(0,0)[tl]{\shortstack{
+		\footnotesize true beam \\
+		\footnotesize position}}}
+	\put(208,83){\makebox(0,0){$s$}}
+	\put(200,30){\line(0,1){41}}
+	\put(200,79){\vector(0,1){101}}
+	\put(193,172){\makebox(0,0){$y$}}
+	\color{blue}
+	\put(100,50){\vector(0,1){125}}
+	\put(150,125){\vector(-1,0){100}}
+	\put(100,125){\circle*{4}}
+	\color{black}
+	\put(80,145){\vector(1,-1){15}}
+	\put(80,145){\makebox(0,0)[br]{\shortstack{
+		\footnotesize beam position given \\
+		\footnotesize by the monitor}}}
+	\thicklines
+	\put(200,55){\vector(-1,0){100}}
+	\put(150,45){\makebox(0,0){\tt MREX}}
+	\put(80,75){\vector(0,1){50}}
+	\put(70,100){\makebox(0,0)[r]{\tt MREY}}
+	\end{picture}
+	\caption{Readout errors in a monitor}
+	\label{F-ERMONI}
+\end{figure}
+
 
 The attributes are: 
 \begin{madlist}
-  \ttitem{DX} The misalignment in the \textit{x}-direction for the entry of
+  \ttitem{DX} The misalignment in the {\it x}-direction for the entry of
   the beam element. (Default:~0~m).  \\ 
-  DX$>$0 displaces the element in the positive \textit{x}-direction 
+  {\tt DX}$>$0 displaces the element in the positive {\it x}-direction 
   
-  \ttitem{DY} The misalignment in the \textit{y}-direction for the entry of
-  the beam element. (Default:~0~m). \\ 
-  DY$>$0 displaces the element in the positive \textit{y}-direction 
-
-  \ttitem{DS} The misalignment in the \textit{s}-direction for the entry of
+  \ttitem{DY} The misalignment in the {\it y}-direction for the entry of
   the beam element. (Default:~0~m). \\
-  DS$>$0 displaces the element in the positive \textit{s}-direction 
+  {\tt DY}$>$0 displaces the element in the positive {\it y}-direction 
+
+  \ttitem{DS} The misalignment in the {\it s}-direction for the entry of
+  the beam element. (Default:~0~m). \\
+  {\tt DS}$>$0 displaces the element in the positive {\it s}-direction 
   
-  \ttitem{DPHI} The rotation around the \textit{x}-axis. (Default:~0~rad). \\ 
-  A positive angle gives a greater \textit{x}-coordinate for the exit
+  \ttitem{DPHI} The rotation around the {\it x}-axis. (Default:~0~rad). \\ 
+  A positive angle gives a greater {\it y}-coordinate for the exit
   than for the entry. 
 
-  \ttitem{DTHETA} The rotation around the \textit{y}-axis according to the
+  \ttitem{DTHETA} The rotation around the {\it y}-axis according to the
   right hand rule. (Default:~0~rad).  
 
-  \ttitem{DPSI} The rotation around the \textit{s}-axis according to the
+  \ttitem{DPSI} The rotation around the {\it s}-axis according to the
   right hand rule. (Default:~0~rad).  
 
   \ttitem{MREX} The horizontal read error for a monitor. This is ignored if
   the element is not a monitor. \\
-  If MREX$>$0 the reading for \textit{x} is too high (default: 0 m). 
+  If {\tt MREX}$>$0 the reading for {\it x} is too high (default: 0 m). 
 
   \ttitem{MREY} The vertical read error for a monitor. This is ignored if
   the element is not a monitor. \\  
-  If MREY$>$0, the reading for \textit{y} is too high (default: 0 m). 
-
-  \ttitem{AREX} The misalignment in the \textit{x}-direction for the entry
-  of an aperture limit (default: 0 m). \\ 
-  AREX$>$0 displaces the element in the positive \textit{x}-direction 
-
-  \ttitem{AREY} The misalignment in the \textit{y}-direction for the entry
-  of an aperture limit (default: 0 m). \\ 
-  AREY$>$0 displaces the element in the positive \textit{y}-direction 
+  If {\tt MREY}$>$0, the reading for {\it y} is too high (default: 0 m). 
 
   \ttitem{MSCALX} The relative horizontal scaling error for a monitor. This
   is ignored if the element is not a monitor. \\ 
-  If MSCALX$>$0 the reading for \textit{x} is too high (default: 0). A
+  If {\tt MSCALX}$>$0 the reading for {\it x} is too high (default: 0). A
   value of 0.5 implies that the actual reading is multiplied by 1.5.  
 
   \ttitem{MSCALY} The relative vertical scaling error for a monitor. This is
   ignored if the element is not a monitor. \\  
-  If MSCALY$>$0 the reading for \textit{y} is too high (default: 0). A
+  If {\tt MSCALY}$>$0 the reading for {\it y} is too high (default: 0). A
   value of -0.3 implies that the actual reading is multiplied by 0.7.  
+
+  \ttitem{AREX} The misalignment in the {\it x}-direction for the entry
+  of an aperture limit (default: 0 m). \\ 
+  {\tt AREX}$>$0 displaces the element in the positive {\it x}-direction 
+
+  \ttitem{AREY} The misalignment in the {\it y}-direction for the entry
+  of an aperture limit (default: 0 m). \\ 
+  {\tt AREY}$>$0 displaces the element in the positive {\it y}-direction 
+
 \end{madlist}
 
-Examples: 
+{\bf Examples:}
 \madxmp{
 SELECT, FLAG = ERROR, CLASS = MQ; \\
 EALIGN, DX = 0.002, DY = 0.0004*RANF(), DPHI = 0.0002*GAUSS();
 }
-Assigns alignment errors to all elements of class MQ.           
+Assigns alignment errors to all elements of class {\tt MQ}.
 
 
 
@@ -146,175 +377,9 @@ Assigns alignment errors to all elements of class MQ.
 SELECT, FLAG = ERROR, PATTERN = "QF.*"; \\
 EALIGN, DX = 0.001*TGAUSS(2.5), DY = 0.0001*RANF();
 }
-Assigns alignment errors to all elements starting with "QF". TGAUSS(2.5)
-means a Gaussian distribution cut at 2.5 sigma.  
+Assigns alignment errors to all elements starting with {\tt "QF"}. {\tt 
+TGAUSS(2.5)} specifies a Gaussian distribution cut at 2.5 sigma.
 
-\begin{figure}[ht]
-\centering
-\setlength{\unitlength}{1pt}
-\begin{picture}(400,140)(0,30)
-\thinlines
-\put(50,75){\line(1,0){96}}
-\put(154,75){\vector(1,0){246}}
-\put(50,75){\makebox(0,0)[r]{\shortstack{original \\beam line}}}
-\put(390,65){\makebox(0,0)[r]{s}}
-\put(150,75){\circle{8}}
-\put(150,75){\circle*{2}}
-\put(140,85){\makebox(0,0){y}}
-\put(150,30){\line(0,1){41}}
-\put(150,79){\vector(0,1){91}}
-\put(140,160){\makebox(0,0){x}}
-\put(130,55){\vector(1,1){15}}
-\put(130,55){\makebox(0,0)[tr]{\shortstack{original entrance \\
-of the magnet}}}
-\thicklines
-\put(150,55){\vector(1,0){50}}
-\put(175,45){\makebox(0,0){DS}}
-\put(130,75){\vector(0,1){50}}
-\put(125,100){\makebox(0,0)[r]{DX}}
-\thinlines
-\put(125,125){\line(1,0){185}}
-\put(200,50){\line(0,1){120}}
-\put(200,125){\circle*{4}}
-\thicklines
-\put(168,117){\vector(4,1){144}}
-\put(210,85){\vector(-1,4){20}}
-\bezier{30}(300,125)(300,137)(297,149)
-\put(299,140){\vector(-1,4){2}}
-\put(305,137){\makebox(0,0)[l]{DTHETA}}
-\put(282,137){\line(-1,4){4}}
-\put(202,117){\line(-1,4){4}}
-\put(198,133){\line(4,1){80}}
-\put(202,117){\line(4,1){80}}
-\put(150,67){\line(1,0){80}}
-\put(150,83){\line(1,0){80}}
-\put(150,67){\line(0,1){4}}
-\put(150,79){\line(0,1){4}}
-\put(230,67){\line(0,1){16}}
-\end{picture}
-\caption{Example of Misplacement in the $(x,s)$-plane}
-\label{F-XSDISP}
-\end{figure}
-
-
-\begin{figure}[ht]
-\centering
-\setlength{\unitlength}{1pt}
-\begin{picture}(400,150)
-\thinlines
-\put(204,75){\line(1,0){96}}
-\put(196,75){\vector(-1,0){96}}
-\put(305,75){\makebox(0,0)[l]{\shortstack{horizontal \\plane}}}
-\put(110,65){\makebox(0,0)[l]{x}}
-\put(200,75){\circle{8}}
-\put(200,75){\makebox(0,0){\(\times\)}}
-\put(210,65){\makebox(0,0){s}}
-\put(200,0){\line(0,1){71}}
-\put(200,79){\vector(0,1){71}}
-\put(190,140){\makebox(0,0){y}}
-\thicklines
-\put(196,76.3){\vector(-3,1){70}}
-\put(204,73.7){\line(3,-1){70}}
-\put(198.7,72){\line(-1,-3){23.3}}
-\put(201.3,78){\vector(1,3){23.3}}
-\bezier{20}(260,75)(260,65)(257,56)
-\put(259,62){\vector(-1,-3){2}}
-\put(265,67){\makebox(0,0)[l]{DPSI}}
-\put(160,55){\line(3,-1){60}}
-\put(180,115){\line(3,-1){60}}
-\put(160,55){\line(1,3){20}}
-\put(220,35){\line(1,3){20}}
-\put(202.8,77.8){\line(1,1){50}}
-\put(197.2,72.2){\line(-1,-1){50}}
-\bezier{20}(213,114)(222,111)(229,104)
-\put(227,106){\vector(1,-1){2}}
-\put(233,125){\makebox(0,0){ROT}}
-\end{picture}
-\caption{Example of Misplacement in the $(x,y)$-plane}
-\label{F-XYDISP}
-\end{figure}
-
-
-
-
-\begin{figure}[ht]
-\centering
-\setlength{\unitlength}{1pt}
-\begin{picture}(400,140)(0,30)
-\thinlines
-\put(50,75){\line(1,0){96}}
-\put(154,75){\vector(1,0){246}}
-\put(50,75){\makebox(0,0)[r]{\shortstack{original \\beam line}}}
-\put(390,65){\makebox(0,0)[r]{s}}
-\put(150,75){\circle{8}}\put(150,75){\circle*{2}}
-\put(140,85){\makebox(0,0){x}}
-\put(150,30){\line(0,1){41}}
-\put(150,79){\vector(0,1){91}}
-\put(140,160){\makebox(0,0){y}}
-\put(130,55){\vector(1,1){15}}
-\put(130,55){\makebox(0,0)[tr]{\shortstack{original entrance \\
-of the magnet}}}
-\thicklines
-\put(150,55){\vector(1,0){50}}
-\put(175,45){\makebox(0,0){DS}}
-\put(130,75){\vector(0,1){50}}
-\put(125,100){\makebox(0,0)[r]{DY}}
-\thinlines
-\put(125,125){\line(1,0){185}}
-\put(200,50){\line(0,1){120}}
-\put(200,125){\circle*{4}}
-\thicklines
-\put(168,133){\vector(4,-1){144}}
-\put(189,81){\vector(1,4){22}}
-\bezier{30}(300,125)(300,113)(297,101)
-\put(299,109){\vector(-1,-4){2}}
-\put(305,113){\makebox(0,0)[l]{DPHI}}
-\put(278,97){\line(1,4){4}}
-\put(198,117){\line(1,4){4}}
-\put(202,133){\line(4,-1){80}}
-\put(198,117){\line(4,-1){80}}
-\put(150,67){\line(1,0){80}}
-\put(150,83){\line(1,0){80}}
-\put(150,67){\line(0,1){4}}
-\put(150,79){\line(0,1){4}}
-\put(230,67){\line(0,1){16}}
-\end{picture}
-\caption{Example of Misplacement in the $(y,s)$-plane}
-\label{F-YSDISP}
-\end{figure}
-
-
-\begin{figure}[ht]
-\centering
-\setlength{\unitlength}{1pt}
-\begin{picture}(400,150)(0,20)
-\thinlines
-\put(204,75){\line(1,0){96}}
-\put(196,75){\vector(-1,0){196}}
-\put(305,75){\makebox(0,0)[l]{\shortstack{horizontal \\plane}}}
-\put(10,65){\makebox(0,0)[l]{x}}
-\put(200,75){\circle{8}}\put(200,75){\makebox(0,0){\(\times\)}}
-\put(220,55){\vector(-1,1){15}}
-\put(220,55){\makebox(0,0)[tl]{\shortstack{true beam \\position}}}
-\put(210,85){\makebox(0,0){s}}
-\put(200,30){\line(0,1){41}}
-\put(200,79){\vector(0,1){101}}
-\put(190,170){\makebox(0,0){y}}
-\put(100,50){\vector(0,1){125}}
-\put(150,125){\vector(-1,0){100}}
-\put(100,125){\circle*{4}}
-\put(80,145){\vector(1,-1){15}}
-\put(80,145){\makebox(0,0)[br]{\shortstack{beam position given \\
-by the monitor}}}
-\thicklines
-\put(200,55){\vector(-1,0){100}}
-\put(150,45){\makebox(0,0){MREX}}
-\put(80,75){\vector(0,1){50}}
-\put(70,100){\makebox(0,0)[r]{MREY}}
-\end{picture}
-\caption{Example of Read Errors in a monitor}
-\label{F-ERMONI}
-\end{figure}
 
 
 %\href{http://consult.cern.ch/xwho/people/1808} {Last updated:} 02.9.2002 \\ 
@@ -332,14 +397,15 @@ multipole components can be specified with different kinds of errors
 (relative or absolute). Relations between absolute and relative field
 errors are listed below.  
 
-In \madeight two commands were used for that purpose: EFIELD 
-and EFCOMP.
-Only EFCOMP was implemented in \madx since it provides the full functionality
-of EFIELD and there was no need for duplication.  
+In \madeight two commands were used for that purpose: {\tt EFIELD} 
+and {\tt EFCOMP}.
+Only {\tt EFCOMP} was implemented in \madx since it provides the full 
+functionality
+of {\tt EFIELD} and there was no need for duplication.  
 
-All field errors are specified as the integrated value
-int(\textit{K*ds}) of the \href{../Introduction/sign_convent.html}{field
-  components} along the magnet axis in m$^{-i}$. There is no provision
+All field errors are specified as the integrated value $\int K ds$ 
+of the \hyperref[sec:sign_convention]{field components} along the magnet axis 
+in $m^{-i}$. There is no provision
 to specify a global relative excitation error affecting all field
 components in a combined function magnet. Such an error may only be
 entered by defining the same relative error for all field components.  
@@ -365,15 +431,15 @@ xxxxxxxx\=xxxxxx\=xxxxxxxxxx\=xxxxxxxxx\= \kill
         \>DKNR=\>\{dknr(0), \>dknr(1), \>dknr(2),\ldots\}, \\
         \>DKSR=\>\{dksr(0), \>dksr(1), \>dksr(2),\ldots\};
 }
-and elements are now selected by the
-\href{../Introduction/select.html}{SELECT} command. 
+for elements selected by the
+\hyperref[sec:select]{\tt SELECT} command.
 
-Each new
-\href{efcomp}{EFCOMP} statement replaces the field errors for all
-elements in its range (s). Any old field errors present in the range are
+Each new {\tt EFCOMP} statement replaces the field errors for all
+elements in its range(s). Previous field errors present in the range are
 discarded or incremented depending on the setting of
-\href{error_option.html}{EOPTION,ADD}. EFCOMP defines them in terms of
-relative or absolute components.  
+{\tt ADD} logical attribute of the \hyperref[sec:eoption]{\tt EOPTION} command. 
+{\tt EFCOMP} defines the field errors in terms of
+relative or absolute components.
 
 The attributes are: 
 \begin{madlist}
@@ -386,9 +452,9 @@ The attributes are:
   relative field errors to a bending magnet since $k_0$ is used
   for the normalization and NOT the ANGLE. 
 
-  \ttitem{RADIUS} radius \textit{R} where dknr(i) or dksr(i) are specified
+  \ttitem{RADIUS} radius {\it R} where dknr(i) or dksr(i) are specified
   for 0...i...20 (default 1 m). This attribute is required if dknr(i) or
-  dksr(i) are specified. If \textit{R} is negative, the skew component is
+  dksr(i) are specified. If {\it R} is negative, the skew component is
   used for the reference strength.  
 
   \ttitem{DKN(i)} Absolute error for the normal multipole strength with
@@ -412,8 +478,8 @@ correction term is computed and added to the relative error.
 
 The correction term is parametrized as a 3rd order polynomial in the
 reference strength $k_{ref}$ according to:  
-\[ \Delta = \sum (c_i * \textit{k}^{i}_{ref})            i = 0...3\]
-The coefficients $c_i$ for the polynominal must be supplied in the
+\[ \Delta = \sum (c_i * {\it k}^{i}_{ref})            i = 0...3\]
+The coefficients $c_i$ for the polynomial must be supplied in the
 command.  
 
 Two additional parameters and options are required: 
@@ -472,7 +538,7 @@ xxxxxxxx\=xxxxxxxxx\=xxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
         \>          \>0.000, 0.000, 0.002, 0.000\};\>! coeff. mult. order 2
 }
 
-See also: \href{../Introduction/expression.html#random}{Random values}
+See also: \hyperref[sec:random]{random values}
 and \hyperref[sec:defer]{deferred expressions}.  
 
 %\href{http://consult.cern.ch/xwho/people/1808}{Werner Herr}  6.12.2004 
@@ -493,28 +559,28 @@ EOPTION, SEED=real, ADD=logical;
 }\vspace{5mm}
 
 \begin{madlist}
-  \ttitem{SEED} Selects a particular sequence of random values. A SEED
-  value is an integer in the range [0...999999999] (default:
-  123456789). SEED alone continues with the current sequence See
-  also: \href{../Introduction/expression.html#random}{Random
-    values}. SEED may be an expression.  
-  \ttitem{ADD} If this logical flag is set, an EALIGN or EFCOMP, causes
-  the errors to be added on top of existing ones. If it is not set,
+  \ttitem{SEED} Selects a particular sequence of random values. 
+  A {\tt SEED} value is an integer in the range [0...999999999] (default:
+  123456789). {\tt SEED} alone continues with the current sequence See
+  also: \hyperref[sec:random]{Random Values}. {\tt SEED} may be an expression.  
+
+  \ttitem{ADD} If this logical flag is set, an {\tt EALIGN} or {\tt EFCOMP} 
+  causes the errors to be added on top of existing ones. If it is not set,
   new errors overwrite any previous definitions. The default value is
-  TRUE if it is omitted in the EOPTION command. The default value is
-  false if no EOPTION command is used.  
+  TRUE if it is omitted in the {\tt EOPTION} command. The default value is
+  false if no {\tt EOPTION} command is used.  
   \\Please note a recent modification: the default value for the ADD
   option is only applied as long as the ADD option has not been set
   explicitly. 
-  \\Once it was set with EOPTION, it is NOT reset to the default when
-  the ADD option is omitted in subsequent calls to EOPTION.  
+  \\Once it was set with {\tt EOPTION}, it is NOT reset to the default when
+  the {\tt ADD} option is omitted in subsequent calls to {\tt EOPTION}.  
 \end{madlist}
 
 Example: 
 \madxmp{EOPTION, SEED = 987456321;}
 
 The random number generator for \madx is taken from
-\href{../Introduction/bibliography.html#knuth}{[Knuth]}. 
+\cite{knuth1981}. 
 
 
 %\input{error/error_print}
@@ -535,14 +601,14 @@ SELECT, FLAG=ERROR, RANGE=range, CLASS=name, PATTERN=string;
 EPRINT;
 }
 and elements are now selected by the
-\href{../Introduction/select.html}{SELECT} command.  
+\hyperref[sec:select]{\tt SELECT} command.  
 
 A listing for ALL elements, i.e. not only the selected, can be obtained
 with the command  
 \madbox{
 EPRINT, FULL=TRUE;
 }
-In that case, the SELECT command has no effect.
+In that case, the {\tt SELECT} command has no effect.
 
 % \href{http://consult.cern.ch/xwho/people/1808}{Werner Herr} 18.6.2002 
 
@@ -571,7 +637,7 @@ Example:
 SELECT, FLAG=ERROR, RANGE=range, CLASS=name, PATTERN=string;
 ESAVE, FILE=err.file;
 }
-and elements selected by the  \href{../Introduction/select.html}{SELECT}
+and elements selected by the  \hyperref[sec:seclect]{\tt SELECT}
 command are saved to the file.  
 
 
@@ -588,10 +654,11 @@ ESAVE, FILE = err.file;
 \label{Sec:seterr}
 
 To assign errors from a file is not a priori straightforward. It may be
-required to re-assign existing errors after a \textbf{USE} command was
-executed (which deletes all errors attached to a sequence).  
+required to re-assign existing errors after a \hyperref[sec:use]{\tt USE}
+command was executed since the {\tt USE} command deletes all errors attached to 
+a sequence).
 
-Errors stored in the form of an internal table (\textit{errtab}) can  be
+Errors stored in the form of an internal table ({\it errtab}) can  be
 directly attached to the appropriate positions in the sequence with the
 command:  
 
@@ -599,8 +666,8 @@ command:
 SETERR, TABLE=errtab;
 }
 
-The table \textit{errtab} can be generated internally or from an
-external file (\textit{errfile}) with the generic command READMYTABLE.  
+The table {\it errtab} can be generated internally or from an
+external file ({\it errfile}) with the generic command {\tt READMYTABLE}.  
  
 
 The command sequence: 
@@ -609,13 +676,13 @@ READMYTABLE, file=errfile, table=errtab; \\
 SETERR, TABLE=errtab;
 }
 
-reads the file \textit{errfile} into the table \textit{errtab} and the
-command SETERR attaches the errors to the elements in the active
+reads the file {\it errfile} into the table {\it errtab} and the
+command {\tt SETERR} attaches the errors to the elements in the active
 sequence.  
 
-The file \textit{errfile} can be produced by a preceding ESAVE command
+The file {\it errfile} can be produced by a preceding {\tt ESAVE} command
 or any other utility. It should follow the format of a file generated
-with ESAVE (see example program). 
+with {\tt ESAVE} (see example program). 
 
 {\bf Please note:}
 \begin{enumerate}
@@ -624,10 +691,10 @@ with ESAVE (see example program).
      identification is not possible. Elements in the file not identified
      in the active sequence are ignored.  
    \item Errors are assigned to ALL elements found in the file and the
-     FLAG=ERROR is set. Therefore the number of elements selected
-     corresponding to a command like:  
-     \\ SELECT, FLAG=ERROR,...;
-     \\ can be different after the execution of SETERR. 
+     {\tt FLAG=ERROR} is set. Therefore the number of elements selected
+     corresponding to a command like
+     \\ {\tt SELECT, FLAG=ERROR,...;}
+     \\ can be different after the execution of {\tt SETERR}. 
 \end{enumerate}
 
 %\href{http://consult.cern.ch/xwho/people/1808}{Werner Herr} 18.6.2002 

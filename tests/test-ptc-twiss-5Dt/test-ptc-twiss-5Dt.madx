@@ -21,16 +21,13 @@ select, flag=twiss, column=name,s,betx,bety,alfx,alfy,mux,muy,dx,dpx,
                           re51,re52,re53,re54,re55,re56,
                           re61,re62,re63,re64,re65,re66;
 
-
 twiss, rmatrix, chrom, save;
 
 write, table=summ, file="leir.summ.twiss";
 write, table=twiss, file="leir.twiss";
 
-plot, haxis=s, vaxis=betx,bety, colour=100;
-plot, haxis=s, vaxis=dx,        colour=100;
-
-
+!plot, haxis=s, vaxis=betx,bety, colour=100;
+!plot, haxis=s, vaxis=dx,        colour=100;
 
 select,flag=twiss,clear;
 select, flag=twiss, column=name,s,beta11,beta22,alfa11,alfa22,mu1,mu2,disp1,disp2,
@@ -40,8 +37,6 @@ select, flag=twiss, column=name,s,beta11,beta22,alfa11,alfa22,mu1,mu2,disp1,disp
                           re41,re42,re43,re44,re45,re46,
                           re51,re52,re53,re54,re55,re56,
                           re61,re62,re63,re64,re65,re66;
-
-
 
 ptc_create_universe;
   ptc_create_layout, model=1, method=6, nst=5, exact=true, closed_layout=true;

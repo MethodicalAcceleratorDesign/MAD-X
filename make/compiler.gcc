@@ -69,10 +69,10 @@ CFLAGS += -pipe
 #
 
 CFLAGS += -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations \
-          -Wchar-subscripts -Wconversion -Wno-conversion -Winline \
+          -Wchar-subscripts -Wwrite-strings -Wconversion -Wno-conversion -Winline \
           -Wpointer-arith -Wbad-function-cast -Wcast-align -Wcast-qual \
           -Wimplicit-function-declaration
 
-#         -Wfloat-equal -Wformat-nonliteral -Wwrite-strings
+#         -Wfloat-equal -Wformat-nonliteral # not compatible with ugly MAD-X code...
 
 # end of makefile

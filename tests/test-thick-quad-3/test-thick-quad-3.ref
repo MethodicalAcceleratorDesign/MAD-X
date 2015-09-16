@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.05  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.12.19      +
-  + Execution Time Stamp: 18.12.13 11.15.44 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.11.14               +
+  + Execution date: 2015.03.12 17:40:56      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 
 
 title,"Five cell test";
@@ -185,6 +185,8 @@ exit TRACK module
 
 removefile, file="fc.2";
 
+removefile, file="fc.3";
+
 removefile, file="fc.3.aper";
 
 removefile, file="fc.3.aux";
@@ -202,5 +204,5 @@ stop;
 2 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.05 (64 bit) finished normally +
+  + MAD-X 5.02.04 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

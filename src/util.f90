@@ -434,7 +434,7 @@ module plotfi
 
   integer maxseql, mtwcol, mpparm, mxcurv, mopt, mfile, marg, maxarg, mxdp, mxplot
 
-  parameter (maxseql = 20000, mtwcol = 46, mpparm = 10,             &
+  parameter (maxseql = 50000, mtwcol = 46, mpparm = 10,             &
        mxcurv = 10, mopt = 60, mfile = 120, marg = 60, maxarg = 1000,    &
        mxdp = 25, mxplot = 100)
 

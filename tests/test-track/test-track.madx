@@ -4,7 +4,7 @@
 option,-echo,-info,warn;
 
 ! **********  Apertures introduced **********
-col:rcollimator, l= 0.0, apertype= rectellipse,
+col:collimator, l= 0.0, apertype= rectellipse,
          aperture= { 0.00175,  0.00155, 0.0020,  0.0017};
 ! ----- syntax: {Hhalfwidthrect, Vhalfheightrect, Hhalfaxis, Vhalfaxis}
 endmk:marker;

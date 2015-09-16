@@ -43,6 +43,7 @@ endtrack;
 
 !--- cleanup after sixtrack
 removefile, file="fc.2";
+removefile, file="fc.3";
 removefile, file="fc.3.aper";
 removefile, file="fc.3.aux";
 removefile, file="fc.8";

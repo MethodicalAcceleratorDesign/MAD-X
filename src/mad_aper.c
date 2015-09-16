@@ -355,7 +355,7 @@ aper_fill_quadrants(double polyx[], double polyy[], int quarterlength, int* halo
   int i,j;
   int debug = get_option("debug");
 
-  if (debug) printf("+++ aper_fill_quadrants: quarterlength = %d", quarterlength);
+  if (debug) printf("+++ aper_fill_quadrants: quarterlength = %d\n", quarterlength);
   
   // The counter i starts at quarterlength+1, ie the first point to be mirrored.
   i=quarterlength+1;
@@ -537,11 +537,6 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
     return 1;
   }
 
-  else if (!strcmp(apertype,"marguerite")) {
-    printf("\nApertype %s not supported.", apertype);
-    return 0;
-  }
-
   else if (!strcmp(apertype,"rectellipse")) {
     *ap1=get_aperture(current_node, "var1"); /*half width rect*/
     *ap2=get_aperture(current_node, "var2"); /*half height rect*/
@@ -559,33 +554,55 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
   }
 
   else if (!strcmp(apertype,"racetrack")) {
-    *ap1=get_aperture(current_node, "var1"); /*half width rect*/
-    *ap2=get_aperture(current_node, "var2"); /*half height rect*/
-    *ap3=get_aperture(current_node, "var3"); /*radius circle*/
+    *ap1=get_aperture(current_node, "var1"); /*half width extension*/
+    *ap2=get_aperture(current_node, "var2"); /*half height extension*/
+    *ap3=get_aperture(current_node, "var3"); /*horizontal semi-axis*/
+    *ap4=get_aperture(current_node, "var4"); /*vertical semi-axis*/
     
-    *ap4 = *ap3; // curved part is a circle
-
     // 2014-Jun-27  11:14:27  ghislain: 
     // change check from ap1 or ap2<=0  to ap1 or ap2 or ap3 < 0
     // zero horizontal or vertical explosion factors, and zero radius should be allowed.
-    if ( (*ap1) < 0 || (*ap2) < 0 || (*ap3) < 0 ) { 
+    // 2015-Mar-09  14:43:33  ghislain: change meaning of parameters: ap1 and ap2 are now full rectangle extension, 
+    // 2015-Mar-10  10:18:46  ghislain: change rounded corners from circular to generalized elliptical shape
+    if ( (*ap1) < 0 || (*ap2) < 0 || (*ap3) < 0 || (*ap4) < 0 || (*ap1) < (*ap3) || (*ap2) < (*ap4)) { 
       if (debug) 
 	printf("+++ aper_build screen, racetrack parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
       return 0;
     }
-    // special call to build a circle first: note that we cannot invoque ap1 or ap2
-    aper_rectellipse(ap3, ap3, ap3, ap4, &quarterlength, pipex, pipey);
+    // special call to build an ellipse first: note that we cannot invoque ap1 or ap2
+    aper_rectellipse(ap3, ap4, ap3, ap4, &quarterlength, pipex, pipey);
       
     /* displace the quartercircle */
     for (i=0;i<=quarterlength;i++) {
-      pipex[i] += (*ap1); 
-      pipey[i] += (*ap2); 
+      pipex[i] += (*ap1) - (*ap3); 
+      pipey[i] += (*ap2) - (*ap4); 
     }
       
     aper_fill_quadrants(pipex, pipey, quarterlength, pipelength);      
     return 1;    
   }
   
+  // 2015-Feb-05  18:35:01  ghislain: adding octagon aperture type
+  else if (!strcmp(apertype,"octagon")) {
+    *ap1=get_aperture(current_node, "var1"); /*half width rect ; >= 0 */
+    *ap2=get_aperture(current_node, "var2"); /*half height rect ; >=0 */
+    *ap3=get_aperture(current_node, "var3"); /*first angle ; >=0, <=pi/2 */
+    *ap4=get_aperture(current_node, "var4"); /*second angle ; >=0, <=pi/2, >= *ap3*/
+    
+    if ( (*ap1) < 0 || (*ap2) < 0 || (*ap3) < 0 || (*ap4) < 0 || (*ap3) > pi/2 || (*ap4) > pi/2 || (*ap4) < (*ap3))  { 
+      if (debug) 
+	printf("+++ aper_build screen, octagon parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4); 
+      return 0;
+    }
+
+    quarterlength = 1;
+    pipex[0] = (*ap1); pipey[0] = (*ap1)*tan((*ap3));
+    pipex[1] = (*ap2)*tan(pi/2 - (*ap4)); pipey[1] = (*ap2);
+
+    aper_fill_quadrants(pipex, pipey, quarterlength, pipelength); 
+    return 1;    
+  }
+
   else if (strlen(apertype)) { 
     // general case, assume the given type is a filename
     *pipelength = aper_external_file(apertype, pipex, pipey);
@@ -879,7 +896,7 @@ static void
 aper_header(struct table* aper_t, struct aper_node *lim)
   /* puts beam and aperture parameters at start of the aperture table */
 {
-  int i, h_length = 25; // not used, nint=1;
+  int i, h_length = 26; // not used, nint=1;
   double dtmp, vtmp[4]; // not used, deltap_twiss;
   char tmp[NAME_L], name[NAME_L], *stmp;
 
@@ -920,19 +937,17 @@ aper_header(struct table* aper_t, struct aper_node *lim)
   dtmp = get_value("beam", "gamma");
   sprintf(c_dum->c, v_format("@ GAMMA            %%le  %F"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-
-
-  /* aperture command properties */
-
-  /* 2013-Nov-14  15:45:23  ghislain: The global parameters that have a default in the 
-     dictionary or can be input from other commands like BEAM, should be obtained adequately, not 
-     from the cmd input.
- */
-  dtmp = command_par_value("exn", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ EXN              %%le  %F"), dtmp);
+  // 2015-Mar-03  12:05:58  ghislain: added
+  dtmp = get_value("beam", "beta");
+  sprintf(c_dum->c, v_format("@ BETA             %%le  %F"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = command_par_value("eyn", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ EYN              %%le  %F"), dtmp);
+  // end addition
+  // 2015-Mar-11  15:30:15  ghislain: changed to get emittances from BEAM command, not from input parameters.
+  dtmp = get_value("beam", "exn");
+  sprintf(c_dum->c, v_format("@ EXN              %%le  %G"), dtmp);
+  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+  dtmp = get_value("beam", "eyn");
+  sprintf(c_dum->c, v_format("@ EYN              %%le  %G"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("dqf", this_cmd->clone);
   sprintf(c_dum->c, v_format("@ DQF              %%le  %F"), dtmp);
@@ -941,10 +956,10 @@ aper_header(struct table* aper_t, struct aper_node *lim)
   sprintf(c_dum->c, v_format("@ BETAQFX          %%le  %F"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("dparx", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ PARAS_DX         %%le       %g"), dtmp);
+  sprintf(c_dum->c, v_format("@ PARAS_DX         %%le    %g"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("dpary", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ PARAS_DY         %%le       %g"), dtmp);
+  sprintf(c_dum->c, v_format("@ PARAS_DY         %%le    %g"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("dp", this_cmd->clone);
   sprintf(c_dum->c, v_format("@ DP_BUCKET_SIZE   %%le  %F"), dtmp);
@@ -962,7 +977,7 @@ aper_header(struct table* aper_t, struct aper_node *lim)
   sprintf(c_dum->c, v_format("@ BETA_BEATING     %%le  %F"), dtmp);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
   dtmp = command_par_value("nco", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ NB_OF_ANGLES     %%d   %g"), dtmp*4);
+  sprintf(c_dum->c, v_format("@ NB_OF_ANGLES     %%d       %g"), dtmp*4);
   aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
 
   /* if a filename with halo coordinates is given, need not show halo */
@@ -1196,7 +1211,7 @@ aper_calc(double p, double q, double* minhl, double halox[], double haloy[],
 // public interface
 
 double
-get_apertol(struct node* node, char* par)
+get_apertol(struct node* node, const char* par)
   /* returns aper_tol parameter 'i' where i is integer at the end of par;
      e.g. aptol_1 gives i = 1 etc. (count starts at 1) */
 {
@@ -1210,7 +1225,7 @@ get_apertol(struct node* node, char* par)
 }
 
 double 
-get_aperture(struct node* node, char* par)
+get_aperture(struct node* node, const char* par)
   /* returns aperture parameter 'i' where i is integer at the end of par;
      e.g. aper_1 gives i = 1 etc. (count starts at 1) */
 {
@@ -1304,16 +1319,17 @@ pro_aperture(struct in_cmd* cmd)
 static struct aper_node*
 aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt, struct aper_node *lim_pt)
 {
-  int stop=0, nint=1, jslice=1, first, ap=1; // , err not used
+  int stop=0, nint=1, jslice=1, first, ap=1; 
   int true_flag, true_node=0, offs_node=0, do_survey=0;
   int truepos=0, true_cnt=0, offs_cnt=0;
-  int halo_q_length=1, halolength, pipelength, namelen=NAME_L, ntol; // nhalopar, not used
+  int halo_q_length=1, halolength, pipelength, namelen=NAME_L, ntol; 
   double surv_init[6]={0, 0, 0, 0, 0, 0};
   double surv_x=zero, surv_y=zero;
   double xa=0, xb=0, xc=0, ya=0, yb=0, yc=0;
   double on_ap=1, on_elem=0;
-  double mass, energy, exn, eyn, dqf, betaqfx, dp, dparx, dpary;
-  double cor, bbeat, nco, halo[4], interval, spec, ex, ey, notsimple;
+  double ex, ey;
+  double dqf, betaqfx, dp, dparx, dpary;
+  double cor, bbeat, nco, halo[4], interval, spec, notsimple;
   double s=0, x=0, y=0, betx=0, bety=0, dx=0, dy=0, ratio, n1, nr, length;
   double xeff=0,yeff=0;
   double n1x_m, n1y_m;
@@ -1334,7 +1350,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   char apertype[NAME_L];
   char name[NAME_L];
   char tol_err_mess[80] = "";
-
+  int code;
   
   // 2014-Sep-18  17:19:52  ghislain: attempt to read offset values from element attributes...
   //double aper_offset[2], xoffset, yoffset;
@@ -1361,8 +1377,10 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   /* removed IW 240205 */
   /*  pipefile = command_par_string("pipefile", this_cmd->clone); */
  
-  exn = command_par_value("exn", this_cmd->clone);
-  eyn = command_par_value("eyn", this_cmd->clone);
+  // 2015-Mar-03  17:25:49  ghislain: get geometric emittances from BEAM command
+  ex = get_value("beam","ex");
+  ey = get_value("beam","ey");
+
   dqf = command_par_value("dqf", this_cmd->clone);
   betaqfx = command_par_value("betaqfx", this_cmd->clone);
   dp = command_par_value("dp", this_cmd->clone);
@@ -1380,23 +1398,14 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 
   cmd_refnode = command_par_string("refnode", this_cmd->clone);
 
-  mass = get_value("beam", "mass");
-  energy = get_value("beam", "energy");
+  /* calculate delta angle */
+  dangle = twopi/(nco*4);
 
-  /* 2013-Nov-13  16:20:29  ghislain: attempt to extract relevant parameters 
-     from BEAM command instead of internal parameters. 
-     This works but needs a bit more thoughts, in conjuction with fetching other parameters 
-     from Twiss table
-
-  // exn = get_value("beam", "exn");
-  // eyn = get_value("beam", "eyn");
-
-  // and attempt to extract maximum parameters from twiss summary table
+  // 2013-Nov-13  16:20:29  ghislain: 
+  // attempt to extract maximum parameters from twiss summary table
   // double_from_table_row("summ","dxmax",&nint,&dqf);
   // printf ("+++++++ dqf from TWISS %12.6g\n",dqf);
   // TODO:  add some error checking.
-
-   end of ghislain: attempt... */
 
   /* fetch deltap as set by user in the former TWISS command */
   /* will be used below for displacement associated to parasitic dipersion */
@@ -1406,13 +1415,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   }
   else printf ("+++++++ deltap from TWISS %12.6g\n",lim_pt->deltap_twiss);
 
-  /* calculate emittance and delta angle */
-  /* mad_beam.c says :     ex = exn / (4 * beta * gamma); */
-  /* Warning: 1- MAD uses a different definition for emittance
-              2- This assumes beta = 1, explicitly ultra-relativistic particles */
-  ex = mass*exn/energy; ey = mass*eyn/energy;
-  dangle = twopi/(nco*4);
-
+  
   /* check if trueprofile and offsetelem files exist */
   true_flag = aper_e_d_read(truefile, &true_tab, &true_cnt, refnode);
   /* offs_flag = aper_e_d_read(offsfile, &offs_tab, &offs_cnt, refnode);*/
@@ -1484,6 +1487,14 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
     if ( (offs_tab != NULL) && (strcmp(refnode, name) == 0)) do_survey=1; // current name is refnode; switch survey on.
 
     if (debug) printf("\nname: %s, ref: %s, do_survey: %d, true_flag: %d\n",name,refnode,do_survey,true_flag);
+
+    // 2015-Mar-19  09:07:37  ghislain: 
+    code = node_value("mad8_type");
+    if (code==20) 
+      warning("Found deprecated ECOLLIMATOR element;"," Should be replaced by COLLIMATOR");
+    if (code==21)
+      warning("Found deprecated RCOLLIMATOR element;"," Should be replaced by COLLIMATOR");
+
 
     /* read data for tol displacement of halo */
     get_node_vector("aper_tol",&ntol,aper_tol);

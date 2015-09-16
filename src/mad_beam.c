@@ -215,30 +215,32 @@ update_beam(struct command* comm)
   }
 
   // emittance related
+  // 2015-Mar-11  15:27:31  ghislain: changed emittance definition: 
+  //                        was exn = ex * 4 * beta * gamma 
   if (nlc->inform[name_list_pos("ex", nlc)]) {
     ex = command_par_value("ex", comm);
-    exn = ex * 4 * beta * gamma;
+    exn = ex * beta * gamma;
   }
   else if (nlc->inform[name_list_pos("exn", nlc)]) {
     exn = command_par_value("exn", comm);
-    ex = exn / (4 * beta * gamma);
+    ex = exn / (beta * gamma);
   }
   else {
     ex = command_par_value("ex", current_beam);
-    exn = ex * 4 * beta * gamma;
+    exn = ex * beta * gamma;
   }
 
   if (nlc->inform[name_list_pos("ey", nlc)]) {
     ey = command_par_value("ey", comm);
-    eyn = ey * 4 * beta * gamma;
+     eyn = ey * beta * gamma;
   }
   else if (nlc->inform[name_list_pos("eyn", nlc)]) {
     eyn = command_par_value("eyn", comm);
-    ey = eyn / (4 * beta * gamma);
+    ey = eyn / (beta * gamma);
   }
   else {
     ey = command_par_value("ey", current_beam);
-    eyn = ey * 4 * beta * gamma;
+    eyn = ey * beta * gamma;
   }
 
   alfa = one / (gamma * gamma);
@@ -317,6 +319,7 @@ update_beam(struct command* comm)
   store_comm_par_value("energy", energy, current_beam);
   store_comm_par_value("pc", pc, current_beam);
   store_comm_par_value("gamma", gamma, current_beam);
+  store_comm_par_value("beta", beta, current_beam);
   store_comm_par_value("brho", brho, current_beam);
   store_comm_par_value("ex", ex, current_beam);
   store_comm_par_value("exn", exn, current_beam);
@@ -327,7 +330,6 @@ update_beam(struct command* comm)
   // 2014-Apr-09  15:44:57  ghislain: update of freq0 and circ is done above
   //store_comm_par_value("freq0", freq0, current_beam);
   //store_comm_par_value("circ", circ, current_beam);
-  store_comm_par_value("beta", beta, current_beam);
   store_comm_par_value("alfa", alfa, current_beam);
   store_comm_par_value("arad", arad, current_beam);
 }

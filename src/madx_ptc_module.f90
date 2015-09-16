@@ -64,9 +64,30 @@ CONTAINS
     nullify(maps)
 
     if (getdebug()==0) global_verbose = .false.
+
+    lielib_print =  (/0,0,0,0,0,0,0,0,0,0,0,0/)
+	 !  lielib_print(1)=1   lieinit prints info
+	 !  lielib_print(2)=1   expflo warning if no convergence
+	 !  lielib_print(3)=1   Shows details in flofacg
+	 !  lielib_print(4)=1   tunes and damping
+	 !  lielib_print(5)=1  order in orbital normal form
+	 !  lielib_print(6)=1  symplectic condition
+	 !  lielib_print(7)=-1  go manual in normal form  (use auto command in fpp)
+	 !  lielib_print(8)=-1  To use nplane from FPP normalform%plane
+	 !  lielib_print(9)=1  print in checksymp(s1,norm) in j_tpsalie.f90
+	 !  lielib_print(10)=1  print lingyun's checks
+	 !  lielib_print(11)=1  print warning about Teng-Edwards
+	 !  lielib_print(12)=1  print info in make_node_layout
+
     if (getdebug()>0) then
-        print*,"Now PTC"
+        lielib_print(9)=1 !prints symplecticity deviation
     endif
+
+    if (getdebug()>1) then
+        print*,"Now PTC"
+        lielib_print =  (/1,1,1,1,1,1,1,1,1,1,1,1/)
+    endif
+
     sector_nmul_max = get_value('ptc_create_universe ','sector_nmul_max ')
 
     !    print*,">>ss1<< old sector_nmul",sector_nmul
@@ -518,27 +539,43 @@ CONTAINS
           key%list%aperture_kind=2
           key%list%aperture_x=aperture(1)
           key%list%aperture_y=aperture(2)
-          !       case("lhcscreen")
-       case("rectellipse")
+       case("lhcscreen") ! 2015-Mar-10  14:28:41  ghislain: added 
+          key%list%aperture_on=.true.
+          key%list%aperture_kind=3
+          key%list%aperture_x=aperture(1)
+          key%list%aperture_y=aperture(2)
+          key%list%aperture_r(1)=aperture(3)
+          key%list%aperture_r(2)=aperture(3)
+       case("rectcircle") ! 2015-Mar-10  14:28:41  ghislain: added
+          key%list%aperture_on=.true.
+          key%list%aperture_kind=3
+          key%list%aperture_x=aperture(1)
+          key%list%aperture_y=aperture(2)
+          key%list%aperture_r(1)=aperture(3)
+          key%list%aperture_r(2)=aperture(3)
+        case("rectellipse")
           key%list%aperture_on=.true.
           key%list%aperture_kind=3
           key%list%aperture_x=aperture(1)
           key%list%aperture_y=aperture(2)
           key%list%aperture_r(1)=aperture(3)
           key%list%aperture_r(2)=aperture(4)
-       case("marguerite")
-          key%list%aperture_on=.true.
-          key%list%aperture_kind=4
-          key%list%aperture_r(1)=aperture(1)
-          key%list%aperture_r(2)=aperture(2)
-       case("racetrack")
+       case("racetrack") ! 2015-Mar-10  14:25:24  ghislain: generalized racetrack
           key%list%aperture_on=.true.
           key%list%aperture_kind=5
           key%list%aperture_x=aperture(1)
           key%list%aperture_y=aperture(2)
           key%list%aperture_r(1)=aperture(3)
-       case("general")
+          key%list%aperture_r(2)=aperture(4)
+       case("octagon") ! 2015-Mar-10  14:25:37  ghislain: added octagon
+          key%list%aperture_on=.true.
           key%list%aperture_kind=6
+          key%list%aperture_x=aperture(1)
+          key%list%aperture_y=aperture(2)
+          key%list%aperture_r(1)=aperture(3)          
+          key%list%aperture_r(2)=aperture(4)
+       case("general") ! 2015-Mar-10  14:25:48  ghislain: kind was 6
+          key%list%aperture_kind=7
           print*,"General aperture not implemented"
           stop
        end select
@@ -553,7 +590,7 @@ CONTAINS
     endif
     call append_empty(my_ring)
     
-    !print *,'Element code is ',code
+   ! print *,'Element code is ',code
     
     select case(code)
     case(0,4,25)
@@ -561,7 +598,7 @@ CONTAINS
     case(22)
        call fort_warn('ptc_input: ','Element Beam-Beam, must use slice tracking to get effect')
        key%magnet="marker"
-    case(1,11,20,21)
+    case(1,11,20,21,44)
        key%magnet="drift"
        CALL CONTEXT(key%list%name)
 
@@ -968,6 +1005,7 @@ CONTAINS
           key%list%t(i)=patch_trans(i)
        enddo
     case(14,15,16) ! PTC accepts mults
+       ! kickers (corrector magnets)
        call dzero(f_errors,maxferr+1)
        n_ferr = node_fd_errors(f_errors)
        do i=1,NMAX
@@ -1015,6 +1053,8 @@ CONTAINS
        key%magnet="monitor"
     case(19)
        key%magnet="vmonitor"
+       !  2015-Mar-05  13:13:35  ghislain: Warning !
+       !                         ecollimator and rcollimator replaced by collimator in MAD-X, with code 44
        !  case(20)
        !     key%magnet="ecollimator"
        !     key%list%x_col=node_value('xsize ')
@@ -1186,7 +1226,7 @@ CONTAINS
                              " instead of real orbit length. Obtained freq. = ",p%mag%freq," Hz"
 	         
                 call fort_warn("ptc_input",msg(:len_trim(msg)))
-                icav=1
+                if (p%mag%volt .ne. zero) icav=1
              endif
           endif
           p=>p%next

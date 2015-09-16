@@ -61,10 +61,10 @@ PTC\_CREATE\_LAYOUT, \=TIME= logical, MODEL= integer, \\
                      \>THIN= double, XBEND= double,  \\
                      \>EVEN = logical; \\
 ... \\
-PTC\_READ\_ERRORS, OVERWRITE= logical; \\
-... \\
 PTC\_MOVE\_TO\_LAYOUT, INDEX= integer; \\
 ...\\
+PTC\_READ\_ERRORS, OVERWRITE= logical; \\
+... \\
 PTC\_ALIGN; \\
 ...\\
 PTC\_END;
@@ -190,14 +190,13 @@ The attributes are:
   attribute (see below). 
   The tables can be \hyperref[sec:write]{written} to file, and can be
   read back via the {\tt ERRORS\_IN} flag.\\ 
-  The {\tt ERRORS\_IN} flag has precedence over this {\tt
-    ERRORS\_OUT} flag.    
+  The {\tt ERRORS\_IN} flag has precedence over this {\tt ERRORS\_OUT} flag.
 
   \ttitem{MAGNET\_NAME} a string giving a simple selection for the
   names of magnet to be used for an error write-out using the {\tt
     ERRORS\_OUT} flag (see above). The errors are recorded for all
   magnets with names starting with the exact string given here, which
-  would be equivalent to the ??? regular expression.\\ 
+  would be equivalent to the ??? regular expression.\\
   (Default:~nil)
   
   \ttitem{RESPLIT} a logical flag to apply the \ptc resplit
@@ -206,7 +205,7 @@ The attributes are:
   quadrupoles (using the {\tt THIN}  attribute) and dipoles (using the
   {\tt XBEND} attribute). The {\tt EVEN} attribute further controls the
   number of splits.  \\
-  (Default:~false) 
+  (Default:~false)
 
   \ttitem{THIN} is the main {\tt RESPLIT} attribute and is meant for
   splitting quadrupoles according to their strength. The default value
@@ -215,7 +214,7 @@ The attributes are:
   
   \ttitem{XBEND} is an optional {\tt RESPLIT} attribute and is meant for
   splitting dipoles. A value {\tt XBEND=0.001} is also advisable for
-  dipoles. \\  
+  dipoles. \\
   (Default: -1.0 for no splitting)
 
   \ttitem{EVEN} a logical switch to ensure even number of splits when
@@ -224,9 +223,28 @@ The attributes are:
     CENTER\_MAGNETS} option, i.e. to calculate the {\tt TWISS}
   parameters in the center of the element. 
   Uneven number of splits is ensured with {\tt EVEN=false}.  
-  (Default:~true) \\
+  (Default:~true)
 \end{madlist}
-  
+
+\section{PTC\_MOVE\_TO\_LAYOUT}
+\label{sec:ptc_move_to_layout}
+
+Several \ptc layouts can be created within a single \ptc-"universe". 
+The layouts are automatically numbered with sequential integers by the 
+\madx code. The {\tt PTC\_MOVE\_TO\_LAYOUT} command is used to
+activate a specific layout, and the next \ptc commands will be
+applied to this active \ptc layout until a new \ptc layout is created
+or activated. 
+
+\madbox{
+PTC\_MOVE\_TO\_LAYOUT, INDEX=integer;
+}
+
+The only attribute is:
+\begin{madlist}
+	\ttitem{INDEX} is the numeric index of the \ptc layout to be
+	activated.\\ (Default:~1)
+\end{madlist}
 
 \section{PTC\_READ\_ERRORS}
 \label{sec:ptc_read_errors}
@@ -266,25 +284,6 @@ will only happen if the {\tt WARN} option is true and this can be turned
 off with \madxmp{OPTION, -WARN;}
 
        
-\section{PTC\_MOVE\_TO\_LAYOUT}
-\label{sec:ptc_move_to_layout}
-
-Several \ptc layouts can be created within a single \ptc-"universe". 
-The layouts are automatically numbered with sequential integers by the 
-\madx code. The {\tt PTC\_MOVE\_TO\_LAYOUT} command is used to
-activate a specific layout, and the next \ptc commands will be
-applied to this active \ptc layout until a new \ptc layout is created
-or activated. 
-
-\madbox{
-PTC\_MOVE\_TO\_LAYOUT, INDEX=integer;
-}
-
-The only attribute is:
-\begin{madlist}
-   \ttitem{INDEX} is the numeric index of the \ptc layout to be
-   activated.\\ (Default:~1) \\
-\end{madlist}
 
 \section{PTC\_ALIGN}
 \label{sec:ptc_align}

@@ -238,7 +238,6 @@ extern int backup_type;
 extern int embedded_flag;          /* flag (= 1 when entering routine pro_embedded_twiss, 0 at exit) */
 extern int min_order;              /* minimum required order */
 extern int print_correct_opt;      /* PRINT options for orbit correction */
-extern int debug_correct_opt;      /* DEBUG options for orbit correction */
 extern int assign_start;           /* flag for multiple assign statements */
 extern int aux_count;              /* for debug purposes */
 extern int beam_info;              /* flag to print beam information once */

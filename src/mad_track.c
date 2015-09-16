@@ -75,6 +75,8 @@ track_run(struct in_cmd* cmd)
     /* closed orbit and one-turn linear transfer map */
   }
 
+  track_tables_delete(); /* deleting all track related tables, 
+                            emtying does not work because different number of particles*/
   track_tables_create(cmd);
 
   /* allocate buffers */
@@ -407,6 +409,7 @@ track_tables_create(struct in_cmd* cmd)
 
   if ((pos = name_list_pos("tracksumm", table_register->names)) > -1) {
     printf("Table tracksumm does exist already\n");
+    
   }
   else {
     t = make_table("tracksumm", "tracksumm", tracksumm_table_cols,
@@ -449,6 +452,27 @@ track_tables_create(struct in_cmd* cmd)
     }
   }
 }
+
+void
+track_tables_delete(void)
+{
+  int j;
+  /*
+  tracksumm
+  */
+  exec_delete_table("tracksumm");
+  for (j = table_register->names->curr - 1; j >= 0; j--)
+  {
+  
+    if (   strstr(table_register->names->names[j], "track.obs")
+        || (strcmp(table_register->names->names[j], "trackone") == 0) 
+        || (strcmp(table_register->names->names[j], "trackloss") == 0))
+    {
+      exec_delete_table(table_register->names->names[j]);
+    }
+  }
+}
+
 
 void
 track_tables_dump(void)

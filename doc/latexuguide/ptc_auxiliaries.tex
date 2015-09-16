@@ -28,7 +28,6 @@ auxiliary commands available in the \ptc library.
 \label{sec:ptc_setswitch}
 
 Routine that sets the internal \ptc switches.
-
 \madbox{
 PTC\_SETSWITCH, \=DEBUGLEVEL=integer, \\
                 \>MAXACCELERATION=logical,\\
@@ -107,7 +106,7 @@ PTC\_KNOB, \=ELEMENTNAME=string, \\
 }
 
 Sets knobs in \ptc calculations. This is currently valid only in
-{\tt  PTC\_TWISS}, {\tt PTC\_NORMAL} will follow. 
+{\tt  PTC\_TWISS}; {\tt PTC\_NORMAL} will follow. 
 
 Knobs appear as additional parameters of the phase space. Twiss
 functions are then obtained as functions of these additional parameters
@@ -153,7 +152,7 @@ Command parameters and switches:
 
 {\bf Example}\\
 \href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/knobs/knobs.madx}{dog
-  leg chicane}: Dipolar components of both rbends and dipolar and
+leg chicane}: Dipolar components of both rbends and dipolar and
 quadrupolar components of the focusing quads set as knobs. Some first
 and second order map coefficients set to be stored as parametric
 results. ptc\_twiss command is performed and the parametric results are
@@ -206,7 +205,7 @@ Command parameters and switches:
    (Default: -1)   
 
    \ttitem{VALUE} specifies the value to which the knob is to be set.\\
-   (Default: 0)\\
+   (Default: 0)
 \end{madlist}
 
 {\bf Example:}\\
@@ -247,7 +246,7 @@ where the attributes are
 \end{madlist}
 
 This matching procedure takes advantage of the parametric results that
-are accessible with \ptc. Namely, parameters occuring in the matching
+are accessible with \ptc. Namely, parameters occurring in the matching
 constrains are obtained as functions (polynomials) of the matching
 variables. In other words, each variable is a knob in \ptc
 calculation. Evaluation of the polynomials is relatively fast comparing
@@ -284,7 +283,7 @@ END_MATCH;
 
 For user convenience the limits are specified in the \madx units (k1,k2,
 etc). This also applies to dipolar field where the user must specify
-limits of {\tt K0 = angle/path\_lengh}. This guarantees concistency in
+limits of {\tt K0 = angle/path\_length}. This guarantees consistency in
 treatment of normal and skew dipole components.   
 
 {\bf Important:} Note that inside the code skew magnets are represented
@@ -293,14 +292,11 @@ always zero.  Inside \ptc tilt can not become a knob, while skew
 component can.  Remember about this fact when setting the limits of skew
 components in the matching.  When the final results are exported back to
 \madx, they are converted back to the "normal" state, so the nominal
-skew compoment is zero and tilt and normal component are modified
+skew component is zero and tilt and normal component are modified
 accordingly.
-
-
 
 {\bf Example}\\
 \href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/matchknobs/.madx}{dog leg chicane}.
-
 
 {\bf Algorithm}\\
 \begin{enumerate}
@@ -416,8 +412,8 @@ Command parameters and switches:
 
 \textbf{Example }\\
 \href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/eplacement/chicane.madx}{Dog
-  leg chicane}: postion of quadrupoless is matched to obtain required
-R566 value.   
+  leg chicane}: position of quadrupoles is matched to obtain required
+{\tt R566} value.   
 
 
 %% {\bf PROGRAMMER'S MANUAL}
@@ -474,8 +470,7 @@ Command parameters and switches:
 
 {\bf Example }\\
 \href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/eplacement/eplacement.madx}{Dog
-  leg chicane} with some elements displaced with help of
-ptc\_eplacement.
+  leg chicane} with some elements displaced with help of {\tt PTC\_EPLACEMENT}.
 
  
 % <h3> PROGRAMMERS MANUAL </h3>
@@ -608,8 +603,6 @@ PTC\_SELECT\_MOMENT, \=TABLE=tabname, COLUMN=string, \\
                      \>PARAMETRIC= logical;
 }
 
-
-
 Command parameters and switches:
 \begin{madlist}
   \ttitem{MOMENT\_S} a list of coma separated strings, each composed of
@@ -727,7 +720,7 @@ The command parameters and switches are
    \ttitem{XDISTR, YDISTR, ZDISTR} define the distribution in x, y and z
    dimension respectively and can take one of the following values:
    \begin{madlist}
-     \ttitem{gauss} Gaussian distirbution (Default)
+     \ttitem{gauss} Gaussian distribution (Default)
      \ttitem{flat5} flat distribution in the first of
      variables (dp over p) of a given dimension and Delta Dirac in
      the second one (T)  
@@ -790,14 +783,14 @@ The only command parameter is:
 \label{sec:ptc_setcavities}
 
 The {\tt PTC\_SETCAVITIES} command adjusts cavities and sets appropriate
-reference momenta for a layout containing traveling wave cavities. 
+reference momenta for a layout containing travelling wave cavities. 
 
 \madbox{
 PTC\_SETCAVITIES;
 }
 
 The main goal is to update the reference beam energy for the elements that
-follow a traveling wave cavity. \ptc traces the synchronous particle,
+follow a travelling wave cavity. \ptc traces the synchronous particle,
 that is the particle that has all its parameters set to zero at the
 beginning of the layout under study. 
 

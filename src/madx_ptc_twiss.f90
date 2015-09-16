@@ -531,9 +531,11 @@ contains
       !   enddo
       ! endif    
        
-       CALL write_closed_orbit(icase,x)
+      if (getdebug() > 1) then
+         CALL write_closed_orbit(icase,x)
+      endif
 
-    elseif(my_ring%closed .eqv. .true.) then
+    elseif((my_ring%closed .eqv. .true.) .and. (getdebug() > 1)) then
        print*, "Closed orbit specified by the user!"
        !CALL write_closed_orbit(icase,x) at this position it isn't read
     endif
@@ -655,6 +657,7 @@ contains
     do i=1,MY_RING%n
 
       if (getdebug() > 1) then
+         write(6,*) ""
          write(6,*) "##########################################"
          write(6,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
          write(6,'(a1,a,a1)') ">",current%mag%vorname,"<"
@@ -948,14 +951,7 @@ contains
 
 
     call set_option('ptc_twiss_summary ',1)
-    ! 26 november 2009: comment the following and replace by the above
-    !    if ( (momentumCompactionToggle .eqv. .true.)  .and. (getenforce6D() .eqv. .false.)) then
-    !       ! only makes sense if the lattice is a ring (skipped for a line lattice)
-    !       call oneTurnSummary()
-    !       call set_option('ptc_twiss_summary ', 1)
-    !    else
-    !       call set_option('ptc_twiss_summary ',0) ! for time-being, do not support lines
-    !    endif
+    
 
     if (getdebug() > 1) then
        write(6,*) "##########################################"
@@ -1962,9 +1958,17 @@ contains
       normal = y
 
       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-         write(whymsg,*) 'DA got unstable during Normal Form: PTC msg: ',messagelost(:len_trim(messagelost))
+         write(whymsg,*) 'DA got unstable during Normal Form: The closed solution does not exist. PTC msg: ', &
+              messagelost(:len_trim(messagelost))
          call fort_warn('ptc_twiss::maptoascript: ',whymsg(:len_trim(whymsg)))
+         if (icase == 6) then
+           print*,""
+           print*,"6D closed solution does not exist, you may try 4D or 5D (case = 4 or 5)"
+           print*,"and if it works check setting of the cavities (LAG and VOLT)"
+         endif
+
          call seterrorflag(10,"ptc_twiss::maptoascript ",whymsg);
+         
          return
       endif
 
@@ -2295,9 +2299,18 @@ contains
       theNormalForm = oneTurnMap
 
       if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-         write(whymsg,*) 'DA got unstable during Normal Form: PTC msg: ',messagelost(:len_trim(messagelost))
+         write(whymsg,*) 'DA got unstable during Normal Form: The closed solution does not exist. PTC msg: ', &
+              messagelost(:len_trim(messagelost))
          call fort_warn('ptc_twiss oneTurnSummary: ',whymsg(:len_trim(whymsg)))
+
+         if (icase == 6) then
+           print*,""
+           print*,"6D closed solution does not exist, you may try 4D or 5D (case = 4 or 5)"
+           print*,"and if it works check setting of the cavities (LAG and VOLT)"
+         endif
+
          call seterrorflag(10,"ptc_twiss oneTurnSummary",whymsg)
+
          call kill(theNormalForm)
          return
       endif

@@ -1,0 +1,2031 @@
+LSMALL = 1.E-10;
+FACTOR = 1./LSMALL;
+
+
+/*********************************************************************************************************
+ * AD MARKERS
+ *********************************************************************************************************/
+KHM03:MARKER;
+KVM04:MARKER;
+KHM14:MARKER;
+KVM15:MARKER;
+UHM31:MARKER;
+UVM32:MARKER;
+UHM42:MARKER;
+UVM43:MARKER;
+MECOOL:MARKER;
+SCRAPER:MARKER;
+BIPMH:MARKER;
+BIPMV:MARKER;
+S.SEPTUM:MARKER;
+
+
+/*********************************************************************************************************
+ * LE correctors
+ *********************************************************************************************************/
+!!! These correctors are from LEP, aperture 200mm, l=0.5, 190G*m max, 2.5A
+DHZ2908: HKICKER, KICK=0.; !0008387*0.805
+DHZ2913: HKICKER, KICK=0.; !0008387*0.805
+DVT1304: VKICKER, KICK=0.;
+DVT1608: VKICKER, KICK=0.;
+DVT4408: VKICKER, KICK=0.;
+
+!!! These correctors are from LEAR, ap. 220*530mm, l=0.5, 170(250)G*m, 10(15)A
+DVT2608: VKICKER, KICK=0.;
+DHV2904: KICKER, HKICK=0.; !, VKICK=0.
+DHV2917: KICKER, HKICK=0.; !, VKICK=0.
+DVT3105: VKICKER, KICK=0.;
+
+!!! These correctors are special, aperture 294mm, l=0.5m, 100G*m, 7.5A
+DHZ0204: HKICKER, KICK=0.;
+DHZ5404: HKICKER, KICK=0.;
+DVT0208: VKICKER, KICK=0.;
+DVT5408: VKICKER, KICK=0.;
+
+!!! These are trim on dipoles, 12 must be chosen from totally 24, 100G*m, 10A
+
+DTRIM05: HKICKER, KICK=0.;
+DTRIM06: HKICKER, KICK=0.;
+DTRIM08: HKICKER, KICK=0.;
+DTRIM09: HKICKER, KICK=0.;
+DTRIM11: HKICKER, KICK=0.;
+DTRIM12: HKICKER, KICK=0.;
+DTRIM17: HKICKER, KICK=0.;
+DTRIM18: HKICKER, KICK=0.;
+DTRIM20: HKICKER, KICK=0.;
+DTRIM21: HKICKER, KICK=0.;
+DTRIM23: HKICKER, KICK=0.;
+DTRIM24: HKICKER, KICK=0.;
+DTRIM33: HKICKER, KICK=0.;
+DTRIM34: HKICKER, KICK=0.;
+DTRIM36: HKICKER, KICK=0.;
+DTRIM37: HKICKER, KICK=0.;
+DTRIM39: HKICKER, KICK=0.;
+DTRIM40: HKICKER, KICK=0.;
+DTRIM45: HKICKER, KICK=0.;
+DTRIM46: HKICKER, KICK=0.;
+DTRIM48: HKICKER, KICK=0.;
+DTRIM49: HKICKER, KICK=0.;
+DTRIM51: HKICKER, KICK=0.;
+DTRIM52: HKICKER, KICK=0.;
+
+
+
+/*********************************************************************************************************
+ * HE correctors
+ *********************************************************************************************************/
+
+CORBMAIN:HKICKER, KICK=PHIBMAIN;
+CORBTRIM:HKICKER, KICK=PHIBTRIM;
+
+
+HCOR01:HKICKER, KICK=0.;
+HCOR02:HKICKER, KICK=0.;
+HCOR03:HKICKER, KICK=0.;
+HCOR04:HKICKER, KICK=KICK_QF4; ! -0.000231
+HCOR05:HKICKER, KICK=KICK_QD5; ! 0.000409
+HCOR06:HKICKER, KICK=0.;
+HCOR07:HKICKER, KICK=0.;
+HCOR08:HKICKER, KICK=0.;
+HCOR09:HKICKER, KICK=0.;
+HCOR10:HKICKER, KICK=0.;
+HCOR11:HKICKER, KICK=0.;
+HCOR12:HKICKER, KICK=0.;
+HCOR13:HKICKER, KICK=KICK_QD5; ! 0.000409
+HCOR14:HKICKER, KICK=KICK_QF4; ! -0.000231
+HCOR15:HKICKER, KICK=0.;
+HCOR16:HKICKER, KICK=KICK_QF4; ! -0.000231
+HCOR17:HKICKER, KICK=KICK_QD5; ! 0.000409
+HCOR18:HKICKER, KICK=0.;
+HCOR19:HKICKER, KICK=0.;
+HCOR20:HKICKER, KICK=0.;
+HCOR21:HKICKER, KICK=0.;
+HCOR22:HKICKER, KICK=0.;
+HCOR23:HKICKER, KICK=0.;
+HCOR24:HKICKER, KICK=0.;
+HCOR25:HKICKER, KICK=KICK_QD5; ! 0.000409
+HCOR26:HKICKER, KICK=KICK_QF4; ! -0.000231
+HCOR27:HKICKER, KICK=0.;
+HCOR28:HKICKER, KICK=0.;
+HCOR29A:HKICKER, KICK=0.;
+HCOR29B:HKICKER, KICK=0.;
+HCOR30:HKICKER, KICK=0.;
+HCOR31:HKICKER, KICK=0.;
+HCOR32:HKICKER, KICK=KICK_QF4; ! -0.000231
+HCOR33:HKICKER, KICK=KICK_QD5; ! 0.000409
+HCOR34:HKICKER, KICK=0.;
+HCOR35:HKICKER, KICK=0.;
+HCOR36:HKICKER, KICK=0.;
+HCOR37:HKICKER, KICK=0.;
+HCOR38:HKICKER, KICK=0.;
+HCOR39:HKICKER, KICK=0.;
+HCOR40:HKICKER, KICK=0.;
+HCOR41:HKICKER, KICK=KICK_QD5; ! 0.000409
+HCOR42:HKICKER, KICK=KICK_QF4; ! -0.000231
+HCOR43:HKICKER, KICK=0.;
+HCOR44:HKICKER, KICK=KICK_QF4; ! -0.000231
+HCOR45:HKICKER, KICK=KICK_QD5; ! 0.000409
+HCOR46:HKICKER, KICK=0.;
+HCOR47:HKICKER, KICK=0.;
+HCOR48:HKICKER, KICK=0.;
+HCOR49:HKICKER, KICK=0.;
+HCOR50:HKICKER, KICK=0.;
+HCOR51:HKICKER, KICK=0.;
+HCOR52:HKICKER, KICK=0.;
+HCOR53:HKICKER, KICK=KICK_QD53; ! 0.000409
+HCOR54:HKICKER, KICK=KICK_QF54; ! KICK_QF54 ! -0.000231
+HCOR55:HKICKER, KICK=0.;
+HCOR56:HKICKER, KICK=0.;
+VCOR01:VKICKER, KICK=0.;
+VCOR02:VKICKER, KICK=0.;
+VCOR03:VKICKER, KICK=0.;
+VCOR04:VKICKER, KICK=0.;
+VCOR05:VKICKER, KICK=0.;
+VCOR06:VKICKER, KICK=0.;
+VCOR07:VKICKER, KICK=0.;
+VCOR08:VKICKER, KICK=0.;
+VCOR09:VKICKER, KICK=0.;
+VCOR10:VKICKER, KICK=0.;
+VCOR11:VKICKER, KICK=0.;
+VCOR12:VKICKER, KICK=0.;
+VCOR13:VKICKER, KICK=0.;
+VCOR14:VKICKER, KICK=0.;
+VCOR15:VKICKER, KICK=0.;
+VCOR16:VKICKER, KICK=0.;
+VCOR17:VKICKER, KICK=0.;
+VCOR18:VKICKER, KICK=0.;
+VCOR19:VKICKER, KICK=0.;
+VCOR20:VKICKER, KICK=0.;
+VCOR21:VKICKER, KICK=0.;
+VCOR22:VKICKER, KICK=0.;
+VCOR23:VKICKER, KICK=0.;
+VCOR24:VKICKER, KICK=0.;
+VCOR25:VKICKER, KICK=0.;
+VCOR26:VKICKER, KICK=0.;
+VCOR27:VKICKER, KICK=0.;
+VCOR28:VKICKER, KICK=0.;
+VCOR29A:VKICKER, KICK=0.;
+VCOR29B:VKICKER, KICK=0.;
+VCOR30:VKICKER, KICK=0.;
+VCOR31:VKICKER, KICK=0.;
+VCOR32:VKICKER, KICK=0.;
+VCOR33:VKICKER, KICK=0.;
+VCOR34:VKICKER, KICK=0.;
+VCOR35:VKICKER, KICK=0.;
+VCOR36:VKICKER, KICK=0.;
+VCOR37:VKICKER, KICK=0.;
+VCOR38:VKICKER, KICK=0.;
+VCOR39:VKICKER, KICK=0.;
+VCOR40:VKICKER, KICK=0.;
+VCOR41:VKICKER, KICK=0.;
+VCOR42:VKICKER, KICK=0.;
+VCOR43:VKICKER, KICK=0.;
+VCOR44:VKICKER, KICK=0.;
+VCOR45:VKICKER, KICK=0.;
+VCOR46:VKICKER, KICK=0.;
+VCOR47:VKICKER, KICK=0.;
+VCOR48:VKICKER, KICK=0.;
+VCOR49:VKICKER, KICK=0.;
+VCOR50:VKICKER, KICK=0.;
+VCOR51:VKICKER, KICK=0.;
+VCOR52:VKICKER, KICK=0.;
+VCOR53:VKICKER, KICK=0.;
+VCOR54:VKICKER, KICK=0.;
+VCOR55:VKICKER, KICK=0.;
+VCOR56:VKICKER, KICK=0.;
+
+
+
+
+
+
+/*********************************************************************************************************
+ * AD PUs
+ *********************************************************************************************************/
+UVT01: VMONITOR;
+UHZ02: HMONITOR;
+UVT03: VMONITOR;
+UHZ04: HMONITOR;
+UVT05: VMONITOR;
+UHZ06: HMONITOR;
+UVT07: VMONITOR;
+UHZ07: HMONITOR;
+UVT09: VMONITOR;
+UHZ09: HMONITOR;
+UHZ11: HMONITOR;
+UVT11: VMONITOR;
+UHZ12: HMONITOR;
+UVT13: VMONITOR;
+UHZ14: HMONITOR;
+UVT15: VMONITOR;
+UHZ16: HMONITOR;
+UVT17: VMONITOR;
+UHZ18: HMONITOR;
+UVT19: VMONITOR;
+UHZ19: HMONITOR;
+UHZ21: HMONITOR;
+UVT21: VMONITOR;
+UHZ23: HMONITOR;
+UVT23: VMONITOR;
+UHZ24: HMONITOR;
+UVT25: VMONITOR;
+UHZ26: HMONITOR;
+UVT28: VMONITOR;
+UHZ2902: HMONITOR;
+UHZEC1: HMONITOR;
+UVTEC1: VMONITOR;
+UVTEC2: VMONITOR;
+UHZEC2: HMONITOR;
+UHZ2920: HMONITOR;
+UVT30: VMONITOR;
+UHZ32: HMONITOR;
+UVT33: VMONITOR;
+UHZ34: HMONITOR;
+UVT35: VMONITOR;
+UHZ35: HMONITOR;
+UVT37: VMONITOR;
+UHZ37: HMONITOR;
+UHZ39: HMONITOR;
+UVT39: VMONITOR;
+UHZ40: HMONITOR;
+UVT41: VMONITOR;
+UHZ42: HMONITOR;
+UVT43: VMONITOR;
+UHZ44: HMONITOR;
+UVT45: VMONITOR;
+UHZ46: HMONITOR;
+UVT47: VMONITOR;
+UHZ47: HMONITOR;
+UHZ49: HMONITOR;
+UVT49: VMONITOR;
+UHZ51: HMONITOR;
+UVT51: VMONITOR;
+UHZ52: HMONITOR;
+UVT53: VMONITOR;
+UHZ54: HMONITOR;
+UVT55: VMONITOR;
+UHZ56: HMONITOR;
+
+
+
+
+
+
+/*********************************************************************************************************
+ * COLLIMATORS (in fact they are vacuum chamber sizes)
+ *********************************************************************************************************/
+COL.QD1:ECOLLIMATOR,XSIZE=0.0615,YSIZE=0.0615;
+COL.QF2:ECOLLIMATOR,XSIZE=0.0615,YSIZE=0.0615;
+COL.QD3:ECOLLIMATOR,XSIZE=0.0615,YSIZE=0.0615;
+!!COL.PU_QF4:RCOLLIMATOR,XSIZE=0.0535,YSIZE=0.0313;
+COL.PU_QF4:RCOLLIMATOR,XSIZE=0.0518,YSIZE=0.0293;
+COL.QF4:ECOLLIMATOR,XSIZE=0.0761,YSIZE=0.0561;
+COL.QD5:ECOLLIMATOR,XSIZE=0.0615,YSIZE=0.0615;
+COL.QF6:ECOLLIMATOR,XSIZE=0.1115,YSIZE=0.1115;
+COL.QD7:ECOLLIMATOR,XSIZE=0.1115,YSIZE=0.1115;
+COL.QF8:RCOLLIMATOR,XSIZE=0.17,YSIZE=0.04;
+COL.QD9:ECOLLIMATOR,XSIZE=0.1115,YSIZE=0.1115;
+COL.QUAD_EC:ECOLLIMATOR,XSIZE=0.088,YSIZE=0.088;
+COL.PU_EC:ECOLLIMATOR,XSIZE=0.077,YSIZE=0.077;
+COL.EC_ENDS:RCOLLIMATOR,XSIZE=0.056,YSIZE=0.036;
+     COL.QFEC:ECOLLIMATOR,XSIZE=0.07,YSIZE=0.07; !  will be removed
+     COL.QDEC:ECOLLIMATOR,XSIZE=0.07,YSIZE=0.07; !  will be removed
+
+COL.BHW:RCOLLIMATOR,YSIZE=0.0515;
+COL.BHN:RCOLLIMATOR,YSIZE=0.0535;
+     COL.EC:ECOLLIMATOR,XSIZE=0.07,YSIZE=0.05; !  will be removed
+
+COL.SSVI:ECOLLIMATOR,XSIZE=0.155,YSIZE=0.055;
+COL.SSVE:ECOLLIMATOR,XSIZE=0.155,YSIZE=0.035;
+COL.SSHI:ECOLLIMATOR,XSIZE=0.055,YSIZE=0.155;
+COL.SSHE:ECOLLIMATOR,XSIZE=0.035,YSIZE=0.155;
+COL.SOLG:ECOLLIMATOR,XSIZE=0.09,YSIZE=0.09;
+COL.KI.A:RCOLLIMATOR,XSIZE=0.07,YSIZE=0.0475;
+COL.KI.B:RCOLLIMATOR,XSIZE=0.07,YSIZE=0.041;
+COL.KI.C:RCOLLIMATOR,XSIZE=0.07,YSIZE=0.036;
+
+COL.KHM0307.W:RCOLLIMATOR,XSIZE=0.04970,YSIZE=0.03970;
+COL.KHM0307.N:RCOLLIMATOR,XSIZE=0.03175,YSIZE=0.05365;
+COL.KVM0407.W:RCOLLIMATOR,XSIZE=0.03975,YSIZE=0.04625;
+COL.KVM0407.N:RCOLLIMATOR,XSIZE=0.05385,YSIZE=0.0300;
+COL.UHM3107.W:RCOLLIMATOR,XSIZE=0.04920,YSIZE=0.03950;
+COL.UHM3107.N:RCOLLIMATOR,XSIZE=0.03130+0.005,YSIZE=0.0534;
+COL.UVM3207.W:RCOLLIMATOR,XSIZE=0.0395,YSIZE=0.0464;
+COL.UVM3207.N:RCOLLIMATOR,XSIZE=0.0534,YSIZE=0.0302;
+
+COL.PU_QD1: ECOLLIMATOR,XSIZE=10.,YSIZE=10;
+COL.PU_QF2: ECOLLIMATOR,XSIZE=10.,YSIZE=10.;
+COL.PU_QD3: ECOLLIMATOR,XSIZE=10.,YSIZE=10.;
+COL.PU_QD5: ECOLLIMATOR,XSIZE=10.,YSIZE=10.;
+
+COL.USV0205.N: ECOLLIMATOR,XSIZE=0.0525,YSIZE=0.0295;
+COL.USV0205.W: ECOLLIMATOR,XSIZE=0.041,YSIZE=0.0365;
+COL.USH0207.W: ECOLLIMATOR,XSIZE=0.04,YSIZE=10.0;
+COL.USH0207.N: ECOLLIMATOR,XSIZE=0.0295,YSIZE=0.045;
+COL.USL4104.N: ECOLLIMATOR,XSIZE=0.036,YSIZE=0.036;
+
+COL.DAV1605.N: ECOLLIMATOR,XSIZE=10.,YSIZE=10.;
+COL.DAV1605.W: ECOLLIMATOR,XSIZE=10.,YSIZE=0.0409;
+COL.DAH1607.W: ECOLLIMATOR,XSIZE=10.,YSIZE=10.;
+COL.DAH1607.N: ECOLLIMATOR,XSIZE=0.03675,YSIZE=10.0;
+
+COL.KFI.A: RCOLLIMATOR,XSIZE=0.07,YSIZE=0.0475;
+COL.KFI.B: RCOLLIMATOR,XSIZE=0.07,YSIZE=0.0410;
+COL.KFI.C: RCOLLIMATOR,XSIZE=0.07,YSIZE=0.0360;
+COL.KFE.D: ECOLLIMATOR,XSIZE=10.,YSIZE=10.;
+COL.KFE.E: ECOLLIMATOR,XSIZE=10.,YSIZE=10.;
+
+COL.SMI5307: RCOLLIMATOR,XSIZE=10,YSIZE=10;
+COL.HIPM: RCOLLIMATOR,XSIZE=10,YSIZE=10;
+COL.VIPM: RCOLLIMATOR,XSIZE=10,YSIZE=10;
+
+
+
+
+/*********************************************************************************************************
+ * RF cavities
+ *********************************************************************************************************/
+CBR2506:RFCAVITY,L=2.028,LAG=0.,VOLT=VOLT0,HARMON=6;
+CBR2606:RFCAVITY,L=2.028,LAG=0.,VOLT=VOLT0,HARMON=6;
+
+
+
+/*********************************************************************************************************
+ * SOLENOIDs for electron cooling
+ *********************************************************************************************************/
+ECSOL29A.1: SOLENOID,L=0.275/2, KS=KSOL;
+ECSOL29A.2: SOLENOID,L=0.489/3, KS=KSOL;
+ECSOL29B: SOLENOID,L=0.651/5,KS=KSOL;
+
+
+
+/*********************************************************************************************************
+ * Kickers
+ *********************************************************************************************************/
+THOR.R: HKICKER, L=0., KICK=TKICK;
+THOR.L: HKICKER, L=0., KICK=-TKICK;
+
+
+
+/*********************************************************************************************************
+ * SEPTA
+ *********************************************************************************************************/
+LSEP=1.680;
+SM5306: DRIFT,L=LSEP;
+
+
+
+/*********************************************************************************************************
+ * Bending magnets
+ *********************************************************************************************************/
+PHI:=.2457993878;
+PHI2:=PHI/2.;
+PHI2x:=.2457993878/2;
+FE=0.5;
+K2eddy=0.0;
+PHIsmall:=PHI*LSMALL/1.9513;
+
+!BHF:  SBEND,L=LSMALL,ANGLE=PHIsmall,E1=0,E2=0 ,HGAP=0.057,FINT=FE/2;
+!BHNHL    :  SBEND,L=1.9513/2.,ANGLE=PHI2x,K2=K2eddy,E1=PHI2,E2=0.;
+!BHNHR    :  SBEND,L=1.9513/2.,ANGLE=PHI2x,K2=K2eddy,E1=0.,E2=PHI2;
+
+BHN1:       SBEND, L=1.9513/2, ANGLE=PHI2x, K2=K2eddy, HGAP=0.057, 
+                   E1=PHI2, E2=0, FINT=FE, FINTX=0;
+BHN2:       SBEND, L=1.9513/2, ANGLE=PHI2x, K2=K2eddy, HGAP=0.057, 
+                   E1=0, E2=PHI2, FINT=0, FINTX=FE;
+BHW1:       SBEND, L=1.9513/2, ANGLE=PHI2x, K2=K2eddy, HGAP=0.057,
+                   E1=PHI2, E2=0, FINT=FE, FINTX=0;
+BHW2:       SBEND, L=1.9513/2, ANGLE=PHI2x, K2=K2eddy, HGAP=0.057,
+                   E1=0, E2=PHI2, FINT=0, FINTX=FE;
+
+
+KHM0307.HALF : DRIFT, L=1.1;
+KHM03M   : MARKER;
+L_KHM03 = 2.2;
+KHM03    : sequence, refer=centre,  l = 2.200000;
+           KHM03.1: KHM0307.HALF , at = 0.550000;
+           KHM03M                , at = 1.100000;
+           KHM03.2: KHM0307.HALF , at = 1.650000;
+           endsequence;
+
+
+KVM04M        : MARKER;
+KVM0407.HALF  : DRIFT,L=1.1;
+L_KVM04 = 2.2;
+KVM04    : sequence, refer=centre,  l = 2.200000;
+           KVM04.1: KVM0407.HALF , at = 0.550000;
+           KVM04M                , at = 1.100000;
+           KVM04.2: KVM0407.HALF , at = 1.650000;
+           endsequence;
+
+
+
+L_BHN05 = 1.951300;
+BHN05    : sequence, refer=centre,  l = 1.951300;
+           BHN1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+           DTRIM05               , at = 0.975650;
+           BHN2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHN06 = 1.951300;
+BHN06    : sequence, refer=centre,  l = 1.951300;
+           BHN1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+           DTRIM06               , at = 0.975650;
+           BHN2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHW08 = 1.951300;
+BHW08    : sequence, refer=centre,  l = 1.951300;
+           BHW1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+!!           CORBTRIM              , at = 0.975650;
+           DTRIM08               , at = 0.975650;
+           BHW2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHW09 = 1.951300;
+BHW09    : sequence, refer=centre,  l = 1.951300;
+           BHW1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+!!           CORBTRIM              , at = 0.975650;
+           DTRIM09               , at = 0.975650;
+           BHW2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHN11 = 1.951300;
+BHN11    : sequence, refer=centre,  l = 1.951300;
+           BHN1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+           DTRIM11               , at = 0.975650;
+           BHN2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHN12 = 1.951300;
+BHN12    : sequence, refer=centre,  l = 1.951300;
+           BHN1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+           DTRIM12               , at = 0.975650;
+           BHN2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHN17 = 1.951300;
+BHN17    : sequence, refer=centre,  l = 1.951300;
+           BHN1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+           DTRIM17               , at = 0.975650;
+           BHN2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHN18 = 1.951300;
+BHN18    : sequence, refer=centre,  l = 1.951300;
+           BHN1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+           DTRIM18               , at = 0.975650;
+           BHN2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHW20 = 1.951300;
+BHW20    : sequence, refer=centre,  l = 1.951300;
+           BHW1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+!!           CORBTRIM              , at = 0.975650;
+           DTRIM20               , at = 0.975650;
+           BHW2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHW21 = 1.951300;
+BHW21    : sequence, refer=centre,  l = 1.951300;
+           BHW1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+!!           CORBTRIM              , at = 0.975650;
+           DTRIM21               , at = 0.975650;
+           BHW2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHN23 = 1.951300;
+BHN23    : sequence, refer=centre,  l = 1.951300;
+           BHN1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+           DTRIM23               , at = 0.975650;
+           BHN2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHN24 = 1.951300;
+BHN24    : sequence, refer=centre,  l = 1.951300;
+           BHN1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+           DTRIM24               , at = 0.975650;
+           BHN2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHN33 = 1.951300;
+BHN33    : sequence, refer=centre,  l = 1.951300;
+           BHN1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+           DTRIM33               , at = 0.975650;
+           BHN2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHN34 = 1.951300;
+BHN34    : sequence, refer=centre,  l = 1.951300;
+           BHN1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+           DTRIM34               , at = 0.975650;
+           BHN2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHW36 = 1.951300;
+BHW36    : sequence, refer=centre,  l = 1.951300;
+           BHW1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+!!           CORBTRIM              , at = 0.975650;
+           DTRIM36               , at = 0.975650;
+           BHW2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHW37 = 1.951300;
+BHW37    : sequence, refer=centre,  l = 1.951300;
+           BHW1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+!!           CORBTRIM              , at = 0.975650;
+           DTRIM37               , at = 0.975650;
+           BHW2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHN39 = 1.951300;
+BHN39    : sequence, refer=centre,  l = 1.951300;
+           BHN1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+           DTRIM39               , at = 0.975650;
+           BHN2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHN40 = 1.951300;
+BHN40    : sequence, refer=centre,  l = 1.951300;
+           BHN1                  , at = 0.487825;
+           CORBMAIN              , at = 0.975650;
+           DTRIM40               , at = 0.975650;
+           BHN2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHN45 = 1.951300;
+BHN45    : sequence, refer=centre,  l = 1.951300;
+           BHN1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+           DTRIM45               , at = 0.975650;
+           BHN2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHN46 = 1.951300;
+BHN46    : sequence, refer=centre,  l = 1.951300;
+           BHN1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+           DTRIM46               , at = 0.975650;
+           BHN2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHW48 = 1.951300;
+BHW48    : sequence, refer=centre,  l = 1.951300;
+           BHW1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+!!           CORBTRIM              , at = 0.975650;
+           DTRIM48               , at = 0.975650;
+           BHW2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHW49 = 1.951300;
+BHW49    : sequence, refer=centre,  l = 1.951300;
+           BHW1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+!!           CORBTRIM              , at = 0.975650;
+           DTRIM49               , at = 0.975650;
+           BHW2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHN51 = 1.951300;
+BHN51    : sequence, refer=centre,  l = 1.951300;
+           BHN1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+           DTRIM51               , at = 0.975650;
+           BHN2                  , at = 1.463475;
+           endsequence;
+
+
+
+L_BHS52 = 1.951300;
+BHS52    : sequence, refer=centre,  l = 1.951300;
+           BHN1                  , at = 0.487825;
+!           CORBMAIN              , at = 0.975650;
+           DTRIM52               , at = 0.975650;
+           BHN2                  , at = 1.463475;
+           endsequence;
+
+
+
+
+
+/*********************************************************************************************************
+ * QUADRUPOLEs
+ *********************************************************************************************************/
+LQ123  = 0.7106;
+HLQ123 = LQ123/2.;
+
+
+
+Q123:  QUADRUPOLE, L= HLQ123; ! magnetic length is true for 1800A
+QFEC:  QUADRUPOLE, L=0.3545;
+QDEC:  QUADRUPOLE, L=0.3598;
+
+
+
+QDS01.H:   Q123, K1=KF123;
+KSD.QD1:=-FACTOR*KF123*1.36*LQ123/4;
+SD.QD1: SEXTUPOLE,L=LSMALL,K2=KSD.QD1;
+
+
+
+QFN02.H    : Q123,  K1:=-KF123;
+L_QFN02 = 0.710600;
+QFN02    : sequence, refer=centre,  l = 0.710600;
+           QFN02.1: QFN02.H,     , at = 0.177650;
+           HCOR02                , at = 0.355300;
+           VCOR02                , at = 0.355300;
+           COL_QFN02: COL.QF2    , at = 0.355300;
+           QFN02.2: QFN02.H,     , at = 0.532950;
+           endsequence;
+
+
+
+QDS03.H  : Q123,  K1:=KF123;  ! magnetic length is true for 1800A
+KSD.QD3:=FACTOR*KF123*1.36*LQ123/4;
+SD.QD3   : SEXTUPOLE,L=LSMALL,K2=KSD.QD3;
+L_QDS03 = 0.710600;
+QDS03    : sequence, refer=centre,  l = 0.710600;
+           SD3.1: SD.QD3         , at = 0.000000;
+           QDS03.1: QDS03.H,     , at = 0.177650;
+           SD3.2: SD.QD3         , at = 0.355300;
+           HCOR03                , at = 0.355300;
+           VCOR03                , at = 0.355300;
+           COL_QDS03: COL.QD3    , at = 0.355300;
+           SD3.3: SD.QD3         , at = 0.355300;
+           QDS03.2: QDS03.H,     , at = 0.532950;
+           SD3.4: SD.QD3         , at = 0.710600;
+           endsequence;
+
+
+
+QF4A     :  RBEND ,L=0.00605,K1=KF4,ANGLE=0.030*0.00605/0.7321;
+QF4B     :  RBEND ,L=0.36000,K1=KF4,ANGLE=0.030*0.360/0.7321;
+QF4H     :  RBEND ,L=0.36605,K1=KF4,ANGLE=0.015; ! magn. length is true for 1800A
+L_QFN04 = 0.732100;
+QFN04    : sequence, refer=centre,  l = 0.732100;
+           QFN04.1: QF4A         , at = 0.003025;
+           UHZ04                 , at = 0.006050;
+           QFN04.2: QF4B         , at = 0.186050;
+           HCOR04                , at = 0.366050;
+           VCOR04                , at = 0.366050;
+           QFN04.3: QF4H         , at = 0.549075;
+           endsequence;
+
+
+
+QD5A  :  RBEND ,L=0.3605,K1=KD5,ANGLE=0.018*0.3605/0.7396;
+QD5B  :  RBEND ,L=0.0093,K1=KD5,ANGLE=0.018*0.0093/0.7396;
+QD5H  :  RBEND ,L=0.3698,K1=KD5,ANGLE=0.009; ! magn. length is true for 1800A
+L_QDN05 = 0.739600;
+QDN05    : sequence, refer=centre,  l = 0.739600;
+           QDN05.1: QD5H         , at = 0.184900;
+           HCOR05                , at = 0.369800;
+           VCOR05                , at = 0.369800;
+           QDN05.2: QD5A         , at = 0.550050;
+           UVT05                 , at = 0.730300;
+           QDN05.3: QD5B         , at = 0.734950;
+           endsequence;
+
+
+
+QF6:   QUADRUPOLE ,L=0.07568,K1=KF6;  ! magnetic length is true for 1800A
+KSF.QF6:= FACTOR*KF6*1.4623*0.7568/9;
+SF.QF6:  SEXTUPOLE, L=LSMALL, K2=KSF.QF6;
+L_QFW06 = 0.756800;
+QFW06    : sequence, refer=centre,  l = 0.756800;
+           QFW06.1: QF6          , at = 0.037840;
+           SF6.1: SF.QF6         , at = 0.075680;
+           QFW06.2: QF6          , at = 0.113520;
+           SF6.2: SF.QF6         , at = 0.151360;
+           QFW06.3: QF6          , at = 0.189200;
+           SF6.3: SF.QF6         , at = 0.227040;
+           QFW06.4: QF6          , at = 0.264880;
+           SF6.4: SF.QF6         , at = 0.302720;
+           QFW06.5: QF6          , at = 0.340560;
+           SF6.5: SF.QF6         , at = 0.378400;
+           HCOR06                , at = 0.378400;
+           VCOR06                , at = 0.378400;
+           COL_QFW06: COL.QF6    , at = 0.378400;
+           QFW06.6: QF6          , at = 0.416240;
+           SF6.6: SF.QF6         , at = 0.454080;
+           QFW06.7: QF6          , at = 0.491920;
+           SF6.7: SF.QF6         , at = 0.529760;
+           QFW06.8: QF6          , at = 0.567600;
+           SF6.8: SF.QF6         , at = 0.605440;
+           QFW06.9: QF6          , at = 0.643280;
+           SF6.9: SF.QF6         , at = 0.681120;
+           QFW06.10: QF6         , at = 0.718960;
+           endsequence;
+
+
+
+QD7:  QUADRUPOLE ,L=0.07499,K1=KF79; ! magnetic length is true for 2000A
+KSD.QD7:= FACTOR*KF79*1.4623*0.7499/9;
+SD.QD7:  SEXTUPOLE, L=LSMALL, K2=KSD.QD7;
+L_QDW07 = 0.749900;
+QDW07    : sequence, refer=centre,  l = 0.749900;
+           QDW07.1: QD7          , at = 0.037495;
+           SD7.1: SD.QD7         , at = 0.074990;
+           QDS07.2: QD7          , at = 0.112485;
+           SD7.2: SD.QD7         , at = 0.149980;
+           QDS07.3: QD7          , at = 0.187475;
+           SD7.3: SD.QD7         , at = 0.224970;
+           QDS07.4: QD7          , at = 0.262465;
+           SD7.4: SD.QD7         , at = 0.299960;
+           QDS07.5: QD7          , at = 0.337455;
+           SD7.5: SD.QD7         , at = 0.374950;
+           HCOR07                , at = 0.374950;
+           VCOR07                , at = 0.374950;
+           COL_QDW07: COL.QD7    , at = 0.374950;
+           QDS07.6: QD7          , at = 0.412445;
+           SD7.6: SD.QD7         , at = 0.449940;
+           QDS07.7: QD7          , at = 0.487435;
+           SD7.7: SD.QD7         , at = 0.524930;
+           QDS07.8: QD7          , at = 0.562425;
+           SD7.8: SD.QD7         , at = 0.599920;
+           QDS07.9: QD7          , at = 0.637415;
+           SD7.9: SD.QD7         , at = 0.674910;
+           QDS07.10: QD7         , at = 0.712405;
+           endsequence;
+
+
+
+QF8:  QUADRUPOLE, L=0.07494, K1=KF8;  ! magnetic length is true for 1800A
+KSF.QF8:= FACTOR*KF8*0.6117*0.7494/9;
+SF.QF8:  SEXTUPOLE, L=LSMALL, K2=KSF.QF8;
+L_QFW08 = 0.749400;
+QFW08    : sequence, refer=centre,  l = 0.749400;
+           QFW08.1: QF8          , at = 0.037470;
+           SF8.1: SF.QF8         , at = 0.074940;
+           QFW08.2: QF8          , at = 0.112410;
+           SF8.2: SF.QF8         , at = 0.149880;
+           QFW08.3: QF8          , at = 0.187350;
+           SF8.3: SF.QF8         , at = 0.224820;
+           QFW08.4: QF8          , at = 0.262290;
+           SF8.4: SF.QF8         , at = 0.299760;
+           QFW08.5: QF8          , at = 0.337230;
+           SF8.5: SF.QF8         , at = 0.374700;
+           HCOR08                , at = 0.374700;
+           VCOR08                , at = 0.374700;
+           COL_QFW08: COL.QF8    , at = 0.374700;
+           QFW08.6: QF8          , at = 0.412170;
+           SF8.6: SF.QF8         , at = 0.449640;
+           QFW08.7: QF8          , at = 0.487110;
+           SF8.7: SF.QF8         , at = 0.524580;
+           QFW08.8: QF8          , at = 0.562050;
+           SF8.8: SF.QF8         , at = 0.599520;
+           QFW08.9: QF8          , at = 0.636990;
+           SF8.9: SF.QF8         , at = 0.674460;
+           QFW08.10: QF8         , at = 0.711930;           
+	   endsequence;
+
+
+
+QD9:  QUADRUPOLE ,L=0.07641,K1=KF9;  ! magnetic length is true for 2000A
+KSD.QD9:= FACTOR*KF9*1.4623*0.7641/9;
+SD.QD9:  SEXTUPOLE, L=LSMALL, K2=KSD.QD9;
+L_QDW09 = 0.764100;
+QDW09    : sequence, refer=centre,  l = 0.764100;
+           QDW09.1: QD9          , at = 0.038205;
+           SD9.1: SD.QD9         , at = 0.076410;
+           QDW09.2: QD9          , at = 0.114615;
+           SD9.2: SD.QD9         , at = 0.152820;
+           QDW09.3: QD9          , at = 0.191025;
+           SD9.3: SD.QD9         , at = 0.229230;
+           QDW09.4: QD9          , at = 0.267435;
+           SD9.4: SD.QD9         , at = 0.305640;
+           QDW09.5: QD9          , at = 0.343845;
+           SD9.5: SD.QD9         , at = 0.382050;
+           HCOR09                , at = 0.382050;
+           VCOR09                , at = 0.382050;
+           COL_QDW09: COL.QD9    , at = 0.382050;
+           QDW09.6: QD9          , at = 0.420255;
+           SD9.6: SD.QD9         , at = 0.458460;
+           QDW09.7: QD9          , at = 0.496665;
+           SD9.7: SD.QD9         , at = 0.534870;
+           QDW09.8: QD9          , at = 0.573075;
+           SD9.8: SD.QD9         , at = 0.611280;
+           QDW09.9: QD9          , at = 0.649485;
+           SD9.9: SD.QD9         , at = 0.687690;
+           QDW09.10: QD9    , at = 0.725895;
+           endsequence;
+
+
+
+L_QFW10 = 0.749400;
+QFW10    : sequence, refer=centre,  l = 0.749400;
+           QFW10.1: QF8          , at = 0.037470;
+           SF10.1: SF.QF8        , at = 0.074940;
+           QFW10.2: QF8          , at = 0.112410;
+           SF10.2: SF.QF8        , at = 0.149880;
+           QFW10.3: QF8          , at = 0.187350;
+           SF10.3: SF.QF8        , at = 0.224820;
+           QFW10.4: QF8      ,     at = 0.262290;
+           SF10.4: SF.QF8        , at = 0.299760;
+           QFW10.5: QF8          , at = 0.337230;
+           SF10.5: SF.QF8        , at = 0.374700;
+           HCOR10                , at = 0.374700;
+           VCOR10                , at = 0.374700;
+           COL_QFW10: COL.QF8    , at = 0.374700;
+           QFW10.6: QF8          , at = 0.412170;
+           SF10.6: SF.QF8        , at = 0.449640;
+           QFW10.7: QF8          , at = 0.487110;
+           SF10.7: SF.QF8        , at = 0.524580;
+           QFW10.8: QF8          , at = 0.562050;
+           SF10.8: SF.QF8        , at = 0.599520;
+           QFW10.9: QF8          , at = 0.636990;
+           SF10.9: SF.QF8        , at = 0.674460;
+           QFW10.10: QF8         , at = 0.711930;
+           endsequence;
+
+
+L_QDW11 = 0.749900;
+QDW11    : sequence, refer=centre,  l = 0.749900;
+           QDW11.1: QD7          , at = 0.037495;
+           SD11.1: SD.QD7        , at = 0.074990;
+           QDW11.2: QD7          , at = 0.112485;
+           SD11.2: SD.QD7        , at = 0.149980;
+           QDW11.3: QD7          , at = 0.187475;
+           SD11.3: SD.QD7        , at = 0.224970;
+           QDW11.4: QD7          , at = 0.262465;
+           SD11.4: SD.QD7        , at = 0.299960;
+           QDW11.5: QD7          , at = 0.337455;
+           SD11.5: SD.QD7        , at = 0.374950;
+           HCOR11                , at = 0.374950;
+           VCOR11                , at = 0.374950;
+           COL_QDW11: COL.QD7, at = 0.374950;
+           QDW11.6: QD7          , at = 0.412445;
+           SD11.6: SD.QD7        , at = 0.449940;
+           QDW11.7: QD7          , at = 0.487435;
+           SD11.7: SD.QD7        , at = 0.524930;
+           QDW11.8: QD7          , at = 0.562425;
+           SD11.8: SD.QD7        , at = 0.599920;
+           QDW11.9: QD7          , at = 0.637415;
+           SD11.9: SD.QD7        , at = 0.674910;
+           QDW11.10: QD7         , at = 0.712405;
+           endsequence;
+
+
+
+L_QFW12 = 0.756800;
+QFW12    : sequence, refer=centre,  l = 0.756800;
+           QFW12.1: QF6,         , at = 0.037840;
+           SF12.1: SF.QF6        , at = 0.075680;
+           QFW12.2: QF6          , at = 0.113520;
+           SF12.2: SF.QF6        , at = 0.151360;
+           QFW12.3: QF6          , at = 0.189200;
+           SF12.3: SF.QF6        , at = 0.227040;
+           QFW12.4: QF6          , at = 0.264880;
+           SF12.4: SF.QF6        , at = 0.302720;
+           QFW12.5: QF6          , at = 0.340560;
+           SF12.5: SF.QF6        , at = 0.378400;
+           HCOR12                , at = 0.378400;
+           VCOR12                , at = 0.378400;
+           COL_QFW12: COL.QF6    , at = 0.378400;
+           QFW12.6: QF6          , at = 0.416240;
+           SF12.6: SF.QF6        , at = 0.454080;
+           QFW12.7: QF6          , at = 0.491920;
+           SF12.7: SF.QF6        , at = 0.529760;
+           QFW12.8: QF6          , at = 0.567600;
+           SF12.8: SF.QF6        , at = 0.605440;
+           QFW12.9: QF6          , at = 0.643280;
+           SF12.9: SF.QF6        , at = 0.681120;
+           QFW12.10: QF6         , at = 0.718960;
+           endsequence;
+
+
+
+L_QDN13 = 0.739600;
+QDN13    : sequence, refer=centre,  l = 0.739600;
+           QDN13.1: QD5B,        , at = 0.004650;
+           UVT13                 , at = 0.009300;
+           QDN13.2: QD5A,        , at = 0.189550;
+           HCOR13                , at = 0.369800;
+           VCOR13                , at = 0.369800;
+           QDN13.3: QD5H,        , at = 0.554700;
+           endsequence;
+
+
+L_QFN14 = 0.732100;
+QFN14    : sequence, refer=centre,  l = 0.732100;
+           QFN14.1: QF4H,       , at = 0.183025;
+           HCOR14                , at = 0.366050;
+           VCOR14                , at = 0.366050;
+           QFN14.2: QF4B,        , at = 0.546050;
+           UHZ14                 , at = 0.726050;
+           QFN14.3: QF4A,        , at = 0.729075;
+           endsequence;
+
+
+QSK_P14: QUADRUPOLE, L=0.510/10., K1=KSKEW1,TILT=-0.785398163397; ! Skew quadrupole in 10 parts
+L_QSK1404 = 0.510000;
+QSK1404  : sequence, refer=centre,  l = 0.510000;
+           QSK14.1: QSK_P14      , at = 0.025500;
+           QSK14.2: QSK_P14      , at = 0.076500;
+           QSK14.3: QSK_P14      , at = 0.127500;
+           QSK14.4: QSK_P14      , at = 0.178500;
+           QSK14.5: QSK_P14      , at = 0.229500;
+           QSK14.6: QSK_P14      , at = 0.280500;
+           QSK14.7: QSK_P14      , at = 0.331500;
+           QSK14.8: QSK_P14      , at = 0.382500;
+           QSK14.9: QSK_P14      , at = 0.433500;
+           QSK14.10: QSK_P14     , at = 0.484500;
+           endsequence;
+
+
+QDS15.H:   Q123, K1=KF123;
+L_QDS15 = 0.710600;
+QDS15    : sequence, refer=centre,  l = 0.710600;
+           SD15.1: SD.QD3        , at = 0.000000;
+           QDS15.1: QDS15.H,     , at = 0.177650;
+           SD15.2: SD.QD3,       , at = 0.355300;
+           HCOR15                , at = 0.355300;
+           VCOR15                , at = 0.355300;
+           COL_QDS15: COL.QD3    , at = 0.355300;
+           SD15.3: SD.QD3,       , at = 0.355300;
+           QDS15.2: QDS15.H      , at = 0.532950;
+           SD15.4: SD.QD3,       , at = 0.710600;
+           endsequence;
+
+
+L_QFN16 = 0.732100;
+QFN16    : sequence, refer=centre,  l = 0.732100;
+           QFN16.1: QF4A,        , at = 0.003025;
+           UHZ16                 , at = 0.006050;
+           QFN16.2: QF4B,        , at = 0.186050;
+           HCOR16                , at = 0.366050;
+           VCOR16                , at = 0.366050;
+           QFN16.3: QF4H,        , at = 0.549075;
+           endsequence;
+
+
+KXRC:= -2.2; ! -1.8 ! -1.044
+XRC:SEXTUPOLE,L=0.270,K2=KXRC;
+XRC16: XRC;
+
+
+L_QDN17 = 0.739600;
+QDN17    : sequence, refer=centre,  l = 0.739600;
+           QDN17.1: QD5H,        , at = 0.184900;
+           HCOR17                , at = 0.369800;
+           VCOR17                , at = 0.369800;
+           QDN17.2: QD5A,        , at = 0.550050;
+           UVT17                 , at = 0.730300;
+           QDN17.3: QD5B,        , at = 0.734950;
+           endsequence;
+
+
+
+L_QFW18 = 0.756800;
+QFW18    : sequence, refer=centre,  l = 0.756800;
+           QFW18.1: QF6          , at = 0.037840;
+           SF18.1: SF.QF6        , at = 0.075680;
+           QFW18.2: QF6          , at = 0.113520;
+           SF18.2: SF.QF6        , at = 0.151360;
+           QFW18.3: QF6          , at = 0.189200;
+           SF18.3: SF.QF6        , at = 0.227040;
+           QFW18.4: QF6          , at = 0.264880;
+           SF18.4: SF.QF6        , at = 0.302720;
+           QFW18.5: QF6          , at = 0.340560;
+           SF18.5: SF.QF6        , at = 0.378400;
+           HCOR18                , at = 0.378400;
+           VCOR18                , at = 0.378400;
+           COL_QFW18: COL.QF6    , at = 0.378400;
+           QFW18.6: QF6          , at = 0.416240;
+           SF18.6: SF.QF6        , at = 0.454080;
+           QFW18.7: QF6          , at = 0.491920;
+           SF18.7: SF.QF6        , at = 0.529760;
+           QFW18.8: QF6          , at = 0.567600;
+           SF18.8: SF.QF6        , at = 0.605440;
+           QFW18.9: QF6          , at = 0.643280;
+           SF18.9: SF.QF6        , at = 0.681120;
+           QFW18.10: QF6         , at = 0.718960;
+           endsequence;
+
+
+
+L_QDW19 = 0.749900;
+QDW19    : sequence, refer=centre,  l = 0.749900;
+           QDW19.1: QD7          , at = 0.037495;
+           SD19.1: SD.QD7        , at = 0.074990;
+           QDW19.2: QD7          , at = 0.112485;
+           SD19.2: SD.QD7        , at = 0.149980;
+           QDW19.3: QD7          , at = 0.187475;
+           SD19.3: SD.QD7        , at = 0.224970;
+           QDW19.4: QD7          , at = 0.262465;
+           SD19.4: SD.QD7        , at = 0.299960;
+           QDW19.5: QD7          , at = 0.337455;
+           SD19.5: SD.QD7        , at = 0.374950;
+           HCOR19                , at = 0.374950;
+           VCOR19                , at = 0.374950;
+           COL_QDW19: COL.QD7    , at = 0.374950;
+           QDW19.6: QD7          , at = 0.412445;
+           SD19.6: SD.QD7        , at = 0.449940;
+           QDW19.7: QD7          , at = 0.487435;
+           SD19.7: SD.QD7        , at = 0.524930;
+           QDW19.8: QD7          , at = 0.562425;
+           SD19.8: SD.QD7        , at = 0.599920;
+           QDW19.9: QD7          , at = 0.637415;
+           SD19.9: SD.QD7        , at = 0.674910;
+           QDW19.10: QD7         , at = 0.712405;
+           endsequence;
+
+
+L_QFW20 = 0.749400;
+QFW20    : sequence, refer=centre,  l = 0.749400;
+           QFW20.1: QF8          , at = 0.037470;
+           SF20.1: SF.QF8        , at = 0.074940;
+           QFW20.2: QF8          , at = 0.112410;
+           SF20.2: SF.QF8        , at = 0.149880;
+           QFW20.3: QF8          , at = 0.187350;
+           SF20.3: SF.QF8        , at = 0.224820;
+           QFW20.4: QF8          , at = 0.262290;
+           SF20.4: SF.QF8        , at = 0.299760;
+           QFW20.5: QF8          , at = 0.337230;
+           SF20.5: SF.QF8        , at = 0.374700;
+           HCOR20                , at = 0.374700;
+           VCOR20                , at = 0.374700;
+           COL_QFW20: COL.QF8    , at = 0.374700;
+           QFW20.6: QF8          , at = 0.412170;
+           SF20.6: SF.QF8        , at = 0.449640;
+           QFW20.7: QF8          , at = 0.487110;
+           SF20.7: SF.QF8        , at = 0.524580;
+           QFW20.8: QF8          , at = 0.562050;
+           SF20.8: SF.QF8        , at = 0.599520;
+           QFW20.9: QF8          , at = 0.636990;
+           SF20.9: SF.QF8        , at = 0.674460;
+           QFW20.10: QF8         , at = 0.711930;
+           endsequence;
+
+
+
+L_QDW21 = 0.764100;
+QDW21    : sequence, refer=centre,  l = 0.764100;
+           QDW21.1: QD9          , at = 0.038205;
+           SD21.1: SD.QD9        , at = 0.076410;
+           QDW21.2: QD9          , at = 0.114615;
+           SD21.2: SD.QD9        , at = 0.152820;
+           QDW21.3: QD9          , at = 0.191025;
+           SD21.3: SD.QD9        , at = 0.229230;
+           QDW21.4: QD9          , at = 0.267435;
+           SD21.4: SD.QD9        , at = 0.305640;
+           QDW21.5: QD9          , at = 0.343845;
+           SD.QD5: SD.QD9        , at = 0.382050;
+           HCOR21                , at = 0.382050;
+           VCOR21                , at = 0.382050;
+           COL_QDW21: COL.QD9    , at = 0.382050;
+           QDW21.6: QD9          , at = 0.420255;
+           SD21.6: SD.QD9        , at = 0.458460;
+           QDW21.7: QD9          , at = 0.496665;
+           SD21.7: SD.QD9        , at = 0.534870;
+           QDW21.8: QD9          , at = 0.573075;
+           SD21.8: SD.QD9        , at = 0.611280;
+           QDW21.9: QD9          , at = 0.649485;
+           SD21.9: SD.QD9        , at = 0.687690;
+           QDW21.10: QD9         , at = 0.725895;
+           endsequence;
+
+
+
+L_QFW22 = 0.749400;
+QFW22    : sequence, refer=centre,  l = 0.749400;
+           QFW22.1: QF8          , at = 0.037470;
+           SF22.1: SF.QF8        , at = 0.074940;
+           QFW22.2: QF8          , at = 0.112410;
+           SF22.2: SF.QF8        , at = 0.149880;
+           QFW22.3: QF8          , at = 0.187350;
+           SF22.3: SF.QF8        , at = 0.224820;
+           QFW22.4: QF8          , at = 0.262290;
+           SF22.4: SF.QF8        , at = 0.299760;
+           QFW22.5: QF8          , at = 0.337230;
+           SF22.5: SF.QF8        , at = 0.374700;
+           HCOR22                , at = 0.374700;
+           VCOR22                , at = 0.374700;
+           COL_QFW22: COL.QF8    , at = 0.374700;
+           QFW22.6: QF8          , at = 0.412170;
+           SF22.6: SF.QF8        , at = 0.449640;
+           QFW22.7: QF8          , at = 0.487110;
+           SF22.7: SF.QF8        , at = 0.524580;
+           QFW22.8: QF8          , at = 0.562050;
+           SF22.8: SF.QF8        , at = 0.599520;
+           QFW22.9: QF8          , at = 0.636990;
+           SF22.9: SF.QF8        , at = 0.674460;
+           QFW22.10: QF8         , at = 0.711930;
+           endsequence;
+
+
+L_QDW23 = 0.749900;
+QDW23    : sequence, refer=centre,  l = 0.749900;
+           QDW23.1: QD7          , at = 0.037495;
+           SD23.1: SD.QD7        , at = 0.074990;
+           QDW23.2: QD7          , at = 0.112485;
+           SD23.2: SD.QD7        , at = 0.149980;
+           QDW23.3: QD7          , at = 0.187475;
+           SD23.3: SD.QD7        , at = 0.224970;
+           QDW23.4: QD7          , at = 0.262465;
+           SD23.4: SD.QD7        , at = 0.299960;
+           QDW23.5: QD7 	 , at = 0.337455;
+           SD23.5: SD.QD7        , at = 0.374950;
+           HCOR23                , at = 0.374950;
+           VCOR23                , at = 0.374950;
+           COL_QDW23: COL.QD7    , at = 0.374950;
+           QDW23.6: QD7          , at = 0.412445;
+           SD23.6: SD.QD7        , at = 0.449940;
+           QDW23.7: QD7          , at = 0.487435;
+           SD23.7: SD.QD7        , at = 0.524930;
+           QDW23.8: QD7          , at = 0.562425;
+           SD23.8: SD.QD7        , at = 0.599920;
+           QDW23.9: QD7          , at = 0.637415;
+           SD23.9: SD.QD7        , at = 0.674910;
+           QDW23.10: QD7         , at = 0.712405;
+           endsequence;
+
+
+
+QFW24.S: QF6;
+L_QFW24 = 0.756800;
+QFW24    : sequence, refer=centre,  l = 0.756800;
+           QFW24.1: QF6          , at = 0.037840;
+           SF24.1: SF.QF6        , at = 0.075680;
+           QFW24.2: QF6          , at = 0.113520;
+           SF24.2: SF.QF6        , at = 0.151360;
+           QFW24.3: QF6          , at = 0.189200;
+           SF24.3: SF.QF6        , at = 0.227040;
+           QFW24.4: QF6          , at = 0.264880;
+           SF24.4: SF.QF6        , at = 0.302720;
+           QFW24.5: QF6          , at = 0.340560;
+           SF24.5: SF.QF6        , at = 0.378400;
+           HCOR24                , at = 0.378400;
+           VCOR24                , at = 0.378400;
+           COL_QFW24: COL.QF6    , at = 0.378400;
+           QFW24.6: QF6          , at = 0.416240;
+           SF24.6: SF.QF6        , at = 0.454080;
+           QFW24.7: QF6          , at = 0.491920;
+           SF24.7: SF.QF6        , at = 0.529760;
+           QFW24.8: QF6          , at = 0.567600;
+           SF24.8: SF.QF6        , at = 0.605440;
+           QFW24.9: QF6          , at = 0.643280;
+           SF24.9: SF.QF6        , at = 0.681120;
+           QFW24.10: QF6         , at = 0.718960;
+           endsequence;
+
+
+
+L_QDN25 = 0.739600;
+QDN25    : sequence, refer=centre,  l = 0.739600;
+           QDN25.1: QD5B         , at = 0.004650;
+           UVT25                 , at = 0.009300;
+           QDN25.2: QD5A         , at = 0.189550;
+           HCOR25                , at = 0.369800;
+           VCOR25                , at = 0.369800;
+           QDN25.3: QD5H         , at = 0.554700;
+           endsequence;
+
+
+L_QFN26 = 0.732100;
+QFN26    : sequence, refer=centre,  l = 0.732100;
+           QFN26.1: QF4A         , at = 0.003025;
+           UHZ26                 , at = 0.006050;
+           QFN26.2: QF4B         , at = 0.186050;
+           HCOR26                , at = 0.366050;
+           VCOR26                , at = 0.366050;
+           QFN26.3: QF4H         , at = 0.549075;
+           endsequence;
+
+
+SCOMP26_P: SOLENOID,L=0.343/10,KS=KSCOMP26;
+L_ECSCOMP2607 = 0.343000;
+ECSCOMP2607: sequence, refer=centre,  l = 0.343000;
+           SCOMP26.1: SCOMP26_P  , at = 0.017150;
+           SCOMP26.2: SCOMP26_P  , at = 0.051450;
+           SCOMP26.3: SCOMP26_P  , at = 0.085750;
+           SCOMP26.4: SCOMP26_P  , at = 0.120050;
+           SCOMP26.5: SCOMP26_P  , at = 0.154350;
+           SCOMP26.6: SCOMP26_P  , at = 0.188650;
+           SCOMP26.7: SCOMP26_P  , at = 0.222950;
+           SCOMP26.8: SCOMP26_P  , at = 0.257250;
+           SCOMP26.9: SCOMP26_P  , at = 0.291550;
+           SCOMP26.10: SCOMP26_P , at = 0.325850;
+           endsequence;
+
+
+QDN27.H:   QDEC, K1=KDEC;
+L_QDN27 = 0.719600;
+QDN27    : sequence, refer=centre,  l = 0.719600;
+           QDN27.1: QDN27.H      , at = 0.179900;
+           HCOR27                , at = 0.359800;
+           VCOR27                , at = 0.359800;
+           COL_QDN27: COL.QUAD_EC, at = 0.359800;
+           QDN27.2: QDN27.H      , at = 0.539700;
+           endsequence;
+
+
+QDN28.H:   QDEC, K1=KDEC;
+L_QDN28 = 0.719600;
+QDN28    : sequence, refer=centre,  l = 0.719600;
+           QDN28.1:QDN28.H       , at = 0.179900;
+           HCOR28                , at = 0.359800;
+           VCOR28                , at = 0.359800;
+           QDN28.2:QDN28.H       , at = 0.539700;
+           endsequence;
+
+
+QFN29A.H:  QFEC, K1=KFEC;
+L_QFN29A = 0.709000;
+QFN29A   : sequence, refer=centre,  l = 0.709000;
+           QFN29.1: QFN29A.H     , at = 0.177250;
+           HCOR29A               , at = 0.354500;
+           VCOR29A               , at = 0.354500;
+           COL_QFN29A:COL.QUAD_EC, at = 0.354500;
+           QFN29.2: QFN29A.H     , at = 0.531750;
+           endsequence;
+
+
+SS29A.4:DRIFT,L=0.220;
+L_COL.EC_ENDS = 0.220000;
+COL.EC_ENDS: sequence, refer=centre,  l = 0.220000;
+           SS29A.4                 , at = 0.110000;
+           endsequence;
+
+
+QFN29B.H:  QFEC, K1=KFEC;
+L_QFN29B = 0.709000;
+QFN29B   : sequence, refer=centre,  l = 0.709000;
+           QFN29.1: QFN29B.H     , at = 0.177250;
+           HCOR29B               , at = 0.354500;
+           VCOR29B               , at = 0.354500;
+           COL_QFN29B:COL.QUAD_EC, at = 0.354500;
+           QFN29.2: QFN29B.H     , at = 0.531750;
+           endsequence;
+
+
+QDN30.H:   QDEC, K1=KDEC;
+L_QDN30 = 0.719600;
+QDN30    : sequence, refer=centre,  l = 0.719600;
+           QDN30.1: QDN30.H      , at = 0.179900;
+           HCOR30                , at = 0.359800;
+           VCOR30                , at = 0.359800;
+           QDN30.2: QDN30.H      , at = 0.539700;
+           endsequence;
+
+
+QDN31.H:   QDEC, K1=KDEC;
+L_QDN31 = 0.719600;
+QDN31    : sequence, refer=centre,  l = 0.719600;
+           QDN31.1: QDN31.H      , at = 0.179900;
+           HCOR31                , at = 0.359800;
+           VCOR31                , at = 0.359800;
+           COL_QDN31: COL.QUAD_EC, at = 0.359800;
+           QDN31.2: QDN31.H      , at = 0.539700;
+           endsequence;
+
+
+SCOMP31_P: SOLENOID,L=0.343/10,KS=KSCOMP31;
+L_ECSCOMP3106 = 0.343000;
+ECSCOMP3106: sequence, refer=centre,  l = 0.343000;
+           SCOMP31.1: SCOMP31_P  , at = 0.017150;
+           SCOMP31.2: SCOMP31_P  , at = 0.051450;
+           SCOMP31.3: SCOMP31_P  , at = 0.085750;
+           SCOMP31.4: SCOMP31_P  , at = 0.120050;
+           SCOMP31.5: SCOMP31_P  , at = 0.154350;
+           SCOMP31.6: SCOMP31_P  , at = 0.188650;
+           SCOMP31.7: SCOMP31_P  , at = 0.222950;
+           SCOMP31.8: SCOMP31_P  , at = 0.257250;
+           SCOMP31.9: SCOMP31_P  , at = 0.291550;
+           SCOMP31.10: SCOMP31_P , at = 0.325850;
+           endsequence;
+
+
+UHM31_CENTRE: MARKER;
+UHM3107.H:DRIFT,L=1.10;
+L_UHM31 = 2.200000;
+UHM31    : sequence, refer=centre,  l = 2.200000;
+           UHM3107.1: UHM3107.H  , at = 0.550000;
+           UHM31_CENTRE          , at = 1.100000;
+           UHM3107.2: UHM3107.H  , at = 1.650000;
+           endsequence;
+
+
+L_QFN32 = 0.732100;
+QFN32    : sequence, refer=centre,  l = 0.732100;
+           QFN32.1: QF4H         , at = 0.183025;
+           HCOR32                , at = 0.366050;
+           VCOR32                , at = 0.366050;
+           QFN32.2: QF4B         , at = 0.546050;
+           UHZ32                 , at = 0.726050;
+           QFN32.3: QF4A         , at = 0.729075;
+           endsequence;
+
+
+UVM32_CENTRE: MARKER;
+UVM3207.H: DRIFT,L=1.10;
+L_UVM32 = 2.200000;
+UVM32    : sequence, refer=centre,  l = 2.200000;
+           UVM3207.1: UVM3207.H  , at = 0.550000;
+           UVM32_CENTRE          , at = 1.100000;
+           UVM3207.2: UVM3207.H  , at = 1.650000;
+           endsequence;
+
+
+L_QDN33 = 0.739600;
+QDN33    : sequence, refer=centre,  l = 0.739600;
+           QDN33.1: QD5H         , at = 0.184900;
+           HCOR33                , at = 0.369800;
+           VCOR33                , at = 0.369800;
+           QDN33.2: QD5A         , at = 0.550050;
+           UVT33                 , at = 0.730300;
+           QDN33.3: QD5B         , at = 0.734950;
+           endsequence;
+
+
+
+L_QFW34 = 0.756800;
+QFW34    : sequence, refer=centre,  l = 0.756800;
+           QFW34.1: QF6          , at = 0.037840;
+           SF34.1: SF.QF6        , at = 0.075680;
+           QFW34.2: QF6          , at = 0.113520;
+           SF34.2: SF.QF6        , at = 0.151360;
+           QFW34.3: QF6          , at = 0.189200;
+           SF34.3: SF.QF6        , at = 0.227040;
+           QFW34.4: QF6          , at = 0.264880;
+           SF34.4: SF.QF6        , at = 0.302720;
+           QFW34.5: QF6          , at = 0.340560;
+           SF34.5: SF.QF6        , at = 0.378400;
+           HCOR34                , at = 0.378400;
+           VCOR34                , at = 0.378400;
+           COL_QFW34: COL.QF6    , at = 0.378400;
+           QFW34.6: QF6          , at = 0.416240;
+           SF34.6: SF.QF6        , at = 0.454080;
+           QFW34.7: QF6          , at = 0.491920;
+           SF34.7: SF.QF6        , at = 0.529760;
+           QFW34.8: QF6          , at = 0.567600;
+           SF34.8: SF.QF6        , at = 0.605440;
+           QFW34.9: QF6          , at = 0.643280;
+           SF34.9: SF.QF6        , at = 0.681120;
+           QFW34.10: QF6         , at = 0.718960;
+           endsequence;
+
+
+
+L_QDW35 = 0.749900;
+QDW35    : sequence, refer=centre,  l = 0.749900;
+           QDW35.1: QD7          , at = 0.037495;
+           SD35.1: SD.QD7        , at = 0.074990;
+           QDW35.2: QD7          , at = 0.112485;
+           SD35.2: SD.QD7        , at = 0.149980;
+           QDW35.3: QD7          , at = 0.187475;
+           SD.5.3: SD.QD7        , at = 0.224970;
+           QDW35.4: QD7          , at = 0.262465;
+           SD35.4: SD.QD7        , at = 0.299960;
+           QDW35.5: QD7          , at = 0.337455;
+           SD35.5: SD.QD7        , at = 0.374950;
+           HCOR35                , at = 0.374950;
+           VCOR35                , at = 0.374950;
+           COL_QDW35: COL.QD7    , at = 0.374950;
+           QDW35.6: QD7          , at = 0.412445;
+           SD35.6: SD.QD7        , at = 0.449940;
+           QDW35.7: QD7          , at = 0.487435;
+           SD35.7: SD.QD7        , at = 0.524930;
+           QDW35.8: QD7          , at = 0.562425;
+           SD35.8: SD.QD7        , at = 0.599920;
+           QDW35.9: QD7          , at = 0.637415;
+           SD35.9: SD.QD7        , at = 0.674910;
+           QDW35.10: QD7         , at = 0.712405;
+           endsequence;
+
+
+KFE.E:   DRIFT,L=0.600;        ! Here L is magnetic length
+KFE.D:   DRIFT,L=0.600;        ! Here L is magnetic length
+L_KFE3505 = 1.328500;
+KFE3505  : sequence, refer=centre,  l = 1.328500;
+           COL_KFE35.1: COL.KFE.D, at = 0.020000;
+           KFE35.1: KFE.D        , at = 0.320000;
+           COL_KFE35.2: COL.KFE.D, at = 0.620000;
+           COL_KFE35.3: COL.KFE.E, at = 0.651000;
+           KFE35.2: KFE.E        , at = 0.951000;
+           COL_KFE35.4: COL.KFE.E, at = 1.251000;
+           endsequence;
+
+
+L_QFW36 = 0.749400;
+QFW36    : sequence, refer=centre,  l = 0.749400;
+           QFW36.1: QF8          , at = 0.037470;
+           SF36.1: SF.QF8        , at = 0.074940;
+           QFW36.2: QF8          , at = 0.112410;
+           SF36.2: SF.QF8        , at = 0.149880;
+           QFW36.3: QF8          , at = 0.187350;
+           SF36.3: SF.QF8        , at = 0.224820;
+           QFW36.4: QF8          , at = 0.262290;
+           SF36.4: SF.QF8        , at = 0.299760;
+           QFW36.5: QF8          , at = 0.337230;
+           SF36.5: SF.QF8        , at = 0.374700;
+           HCOR36                , at = 0.374700;
+           VCOR36                , at = 0.374700;
+           COL_QFW36: COL.QF8    , at = 0.374700;
+           QFW36.6: QF8          , at = 0.412170;
+           SF36.6: SF.QF8        , at = 0.449640;
+           QFW36.7: QF8          , at = 0.487110;
+           SF36.7: SF.QF8        , at = 0.524580;
+           QFW36.8: QF8          , at = 0.562050;
+           SF36.8: SF.QF8        , at = 0.599520;
+           QFW36.9: QF8          , at = 0.636990;
+           SF36.9: SF.QF8        , at = 0.674460;
+           QFW36.10: QF8         , at = 0.711930;
+           endsequence;
+
+
+
+L_QDW37 = 0.764100;
+QDW37    : sequence, refer=centre,  l = 0.764100;
+           QDW37.1: QD9          , at = 0.038205;
+           SD37.1: SD.QD9        , at = 0.076410;
+           QDW37.2: QD9          , at = 0.114615;
+           SD37.2: SD.QD9        , at = 0.152820;
+           QDW37.3: QD9          , at = 0.191025;
+           SD37.3: SD.QD9        , at = 0.229230;
+           QDW37.4: QD9          , at = 0.267435;
+           SD37.4: SD.QD9        , at = 0.305640;
+           QDW37.5: QD9          , at = 0.343845;
+           SD37.5: SD.QD9        , at = 0.382050;
+           HCOR37                , at = 0.382050;
+           VCOR37                , at = 0.382050;
+           COL_QDW37: COL.QD9    , at = 0.382050;
+           QDW37.6: QD9          , at = 0.420255;
+           SD37.6: SD.QD9        , at = 0.458460;
+           QDW37.7: QD9          , at = 0.496665;
+           SD37.7: SD.QD9        , at = 0.534870;
+           QDW37.8: QD9          , at = 0.573075;
+           SD37.8: SD.QD9        , at = 0.611280;
+           QDW37.9: QD9          , at = 0.649485;
+           SD37.9: SD.QD9        , at = 0.687690;
+           QDW37.10: QD9         , at = 0.725895;
+           endsequence;
+
+
+
+L_QFW38 = 0.749400;
+QFW38    : sequence, refer=centre,  l = 0.749400;
+           QFW38.1: QF8          , at = 0.037470;
+           SF38.1: SF.QF8        , at = 0.074940;
+           QFW38.2: QF8          , at = 0.112410;
+           SF38.2: SF.QF8        , at = 0.149880;
+           QFW38.3: QF8          , at = 0.187350;
+           SF38.3: SF.QF8        , at = 0.224820;
+           QFW38.4: QF8          , at = 0.262290;
+           SF38.4: SF.QF8        , at = 0.299760;
+           QFW38.5: QF8          , at = 0.337230;
+           SF38.5: SF.QF8        , at = 0.374700;
+           HCOR38                , at = 0.374700;
+           VCOR38                , at = 0.374700;
+           COL_QFW_38: COL.QF8   , at = 0.374700;
+           QFW38.6: QF8          , at = 0.412170;
+           SF38.6: SF.QF8        , at = 0.449640;
+           QFW38.7: QF8          , at = 0.487110;
+           SF38.7: SF.QF8        , at = 0.524580;
+           QFW38.8: QF8          , at = 0.562050;
+           SF38.8: SF.QF8        , at = 0.599520;
+           QFW38.9: QF8          , at = 0.636990;
+           SF38.9: SF.QF8        , at = 0.674460;
+           QFW38.10: QF8         , at = 0.711930;
+           endsequence;
+
+L_QDW39 = 0.749900;
+QDW39    : sequence, refer=centre,  l = 0.749900;
+           QDW39.1: QD7          , at = 0.037495;
+           SD39.1 : SD.QD7       , at = 0.074990;
+           QDW39.2: QD7          , at = 0.112485;
+           SD39.2 : SD.QD7       , at = 0.149980;
+           QDW39.3: QD7          , at = 0.187475;
+           SD39.3 : SD.QD7       , at = 0.224970;
+           QDW39.4: QD7          , at = 0.262465;
+           SD39.4 : SD.QD7       , at = 0.299960;
+           QDW39.5: QD7          , at = 0.337455;
+           SD39.5 : SD.QD7       , at = 0.374950;
+           HCOR39                , at = 0.374950;
+           VCOR39                , at = 0.374950;
+           COL_QDW39: COL.QD7    , at = 0.374950;
+           QDW39.6: QD7          , at = 0.412445;
+           SD39.6 : SD.QD7       , at = 0.449940;
+           QDW39.7: QD7          , at = 0.487435;
+           SD39.7 : SD.QD7       , at = 0.524930;
+           QDW39.8: QD7          , at = 0.562425;
+           SD39.8 : SD.QD7       , at = 0.599920;
+           QDW39.9: QD7          , at = 0.637415;
+           SD39.9 : SD.QD7       , at = 0.674910;
+           QDW39.10: QD7         , at = 0.712405;
+           endsequence;
+
+
+
+L_QFW40 = 0.756800;
+QFW40    : sequence, refer=centre,  l = 0.756800;
+           QFW40.1: QF6          , at = 0.037840;
+           SF40.1: SF.QF6        , at = 0.075680;
+           QFW40.2: QF6          , at = 0.113520;
+           SF40.2: SF.QF6        , at = 0.151360;
+           QFW40.3: QF6          , at = 0.189200;
+           SF40.3: SF.QF6        , at = 0.227040;
+           QFW40.4: QF6          , at = 0.264880;
+           SF40.4: SF.QF6        , at = 0.302720;
+           QFW40.5: QF6          , at = 0.340560;
+           SF40.5: SF.QF6        , at = 0.378400;
+           HCOR40                , at = 0.378400;
+           VCOR40                , at = 0.378400;
+           COL_QFW40: COL.QF6    , at = 0.378400;
+           QFW40.6: QF6          , at = 0.416240;
+           SF40.6: SF.QF6        , at = 0.454080;
+           QFW40.7: QF6          , at = 0.491920;
+           SF40.7: SF.QF6        , at = 0.529760;
+           QFW40.8: QF6          , at = 0.567600;
+           SF40.8: SF.QF6        , at = 0.605440;
+           QFW40.9: QF6          , at = 0.643280;
+           SF40.9: SF.QF6        , at = 0.681120;
+           QFW40.10: QF6         , at = 0.718960;
+           endsequence;
+
+
+
+L_QDN41 = 0.739600;
+QDN41    : sequence, refer=centre,  l = 0.739600;
+           QDN41.1: QD5B         , at = 0.004650;
+           UVT41                 , at = 0.009300;
+           QDN41.2: QD5A         , at = 0.189550;
+           HCOR41                , at = 0.369800;
+           VCOR41                , at = 0.369800;
+           QDN41.3: QD5H         , at = 0.554700;
+           endsequence;
+
+
+L_QFN42 = 0.732100;
+QFN42    : sequence, refer=centre,  l = 0.732100;
+           QFN42.1: QF4H         , at = 0.183025;
+           HCOR42                , at = 0.366050;
+           VCOR42                , at = 0.366050;
+           QFN42.2: QF4B         , at = 0.546050;
+           UHZ42                 , at = 0.726050;
+           QFN42.3: QF4A         , at = 0.729075;
+           endsequence;
+
+
+QDS43.H:   Q123, K1=KF123;
+L_QDS43 = 0.710600;
+QDS43    : sequence, refer=centre,  l = 0.710600;
+           QDS43.1: QDS43.H      , at = 0.177650;
+           SD43.1: SD.QD3        , at = 0.355300;
+           HCOR43                , at = 0.355300;
+           VCOR43                , at = 0.355300;
+           COL_QDS43: COL.QD3    , at = 0.355300;
+           SD43.2: SD.QD3        , at = 0.355300;
+           QDS43.3: QDS43.H      , at = 0.532950;
+           endsequence;
+
+
+QSK_P43: QUADRUPOLE, L=0.510/10., K1=KSKEW2, TILT=-0.785398163397; ! Skew quadrupole presented in 10 parts
+L_QSK4308 = 0.510000;
+QSK4308  : sequence, refer=centre,  l = 0.510000;
+           QSK43.1: QSK_P43      , at = 0.025500;
+           QSK43.2: QSK_P43      , at = 0.076500;
+           QSK43.3: QSK_P43      , at = 0.127500;
+           QSK43.4: QSK_P43      , at = 0.178500;
+           QSK43.5: QSK_P43      , at = 0.229500;
+           QSK43.6: QSK_P43      , at = 0.280500;
+           QSK43.7: QSK_P43      , at = 0.331500;
+           QSK43.8: QSK_P43      , at = 0.382500;
+           QSK43.9: QSK_P43      , at = 0.433500;
+           QSK43.10: QSK_P43     , at = 0.484500;
+           endsequence;
+
+
+L_QFN44 = 0.732100;
+QFN44    : sequence, refer=centre,  l = 0.732100;
+           QFN44.1: QF4A         , at = 0.003025;
+           UHZ44                 , at = 0.006050;
+           QFN44.2: QF4B         , at = 0.186050;
+           HCOR44                , at = 0.366050;
+           VCOR44                , at = 0.366050;
+           QFN44.3: QF4H         , at = 0.549075;
+           endsequence;
+
+
+L_QDN45 = 0.739600;
+QDN45    : sequence, refer=centre,  l = 0.739600;
+           QDN45.1: QD5H         , at = 0.184900;
+           HCOR45                , at = 0.369800;
+           VCOR45                , at = 0.369800;
+           QDN45.2: QD5A         , at = 0.550050;
+           UVT45                 , at = 0.730300;
+           QDN45.3: QD5B         , at = 0.734950;
+           endsequence;
+
+
+
+L_QFW46 = 0.756800;
+QFW46    : sequence, refer=centre,  l = 0.756800;
+           QFW46.1: QF6          , at = 0.037840;
+           SF46.1: SF.QF6        , at = 0.075680;
+           QFW46.2: QF6          , at = 0.113520;
+           SF46.2: SF.QF6        , at = 0.151360;
+           QFW46.3: QF6          , at = 0.189200;
+           SF46.3: SF.QF6        , at = 0.227040;
+           QFW46.4: QF6          , at = 0.264880;
+           SF46.4: SF.QF6        , at = 0.302720;
+           QFW46.5: QF6          , at = 0.340560;
+           SF46.5: SF.QF6        , at = 0.378400;
+           HCOR46                , at = 0.378400;
+           VCOR46                , at = 0.378400;
+           COL_QFW46: COL.QF6    , at = 0.378400;
+           QFW46.6: QF6          , at = 0.416240;
+           SF46.6: SF.QF6        , at = 0.454080;
+           QFW46.7: QF6          , at = 0.491920;
+           SF46.7: SF.QF6        , at = 0.529760;
+           QFW46.8: QF6          , at = 0.567600;
+           SF46.8: SF.QF6        , at = 0.605440;
+           QFW46.9: QF6          , at = 0.643280;
+           SF46.9: SF.QF6        , at = 0.681120;
+           QFW46.10: QF6         , at = 0.718960;
+           endsequence;
+
+
+
+L_QDW47 = 0.749900;
+QDW47    : sequence, refer=centre,  l = 0.749900;
+           QDW47.1: QD7          , at = 0.037495;
+           SD47.1: SD.QD7        , at = 0.074990;
+           QDW47.2: QD7          , at = 0.112485;
+           SD47.2: SD.QD7        , at = 0.149980;
+           QDW47.3: QD7          , at = 0.187475;
+           SD47.3: SD.QD7        , at = 0.224970;
+           QDW47.4: QD7          , at = 0.262465;
+           SD47.4: SD.QD7        , at = 0.299960;
+           QDW47.5: QD7          , at = 0.337455;
+           SD47.5: SD.QD7        , at = 0.374950;
+           HCOR47                , at = 0.374950;
+           VCOR47                , at = 0.374950;
+           COL_QDW47: COL.QD7    , at = 0.374950;
+           QDW47.6: QD7          , at = 0.412445;
+           SD47.6: SD.QD7        , at = 0.449940;
+           QDW47.7: QD7          , at = 0.487435;
+           SD47.7: SD.QD7        , at = 0.524930;
+           QDW47.8: QD7          , at = 0.562425;
+           SD47.8: SD.QD7        , at = 0.599920;
+           QDW47.9: QD7          , at = 0.637415;
+           SD47.9: SD.QD7        , at = 0.674910;
+           QDW47.10: QD7         , at = 0.712405;
+           endsequence;
+
+
+L_QFW48 = 0.749400;
+QFW48    : sequence, refer=centre,  l = 0.749400;
+           QFW48.1: QF8          , at = 0.037470;
+           SF48.1: SF.QF8        , at = 0.074940;
+           QFW48.2: QF8          , at = 0.112410;
+           SF48.2: SF.QF8        , at = 0.149880;
+           QFW48.3: QF8          , at = 0.187350;
+           SF48.3: SF.QF8        , at = 0.224820;
+           QFW48.4: QF8          , at = 0.262290;
+           SF48.4: SF.QF8        , at = 0.299760;
+           QFW48.5: QF8          , at = 0.337230;
+           SF48.5: SF.QF8        , at = 0.374700;
+           HCOR48                , at = 0.374700;
+           VCOR48                , at = 0.374700;
+           COL_QFW49: COL.QF8    , at = 0.374700;
+           QFW48.6: QF8          , at = 0.412170;
+           SF48.6: SF.QF8        , at = 0.449640;
+           QFW48.7: QF8          , at = 0.487110;
+           SF48.7: SF.QF8        , at = 0.524580;
+           QFW48.8: QF8          , at = 0.562050;
+           SF48.8: SF.QF8        , at = 0.599520;
+           QFW48.9: QF8          , at = 0.636990;
+           SF48.9: SF.QF8        , at = 0.674460;
+           QFW48.10: QF8         , at = 0.711930;
+           endsequence;
+
+
+
+L_QDW49 = 0.764100;
+QDW49    : sequence, refer=centre,  l = 0.764100;
+           QDW49.1: QD9          , at = 0.038205;
+           SD49.1: SD.QD9        , at = 0.076410;
+           QDW49.2: QD9          , at = 0.114615;
+           SD49.2: SD.QD9        , at = 0.152820;
+           QDW49.3: QD9          , at = 0.191025;
+           SD49.3: SD.QD9        , at = 0.229230;
+           QDW49.4: QD9          , at = 0.267435;
+           SD49.4: SD.QD9        , at = 0.305640;
+           QDW49.5: QD9          , at = 0.343845;
+           SD.QD5                , at = 0.382050;
+           HCOR49                , at = 0.382050;
+           VCOR49                , at = 0.382050;
+           COL_QDW49: COL.QD9    , at = 0.382050;
+           QDW49.6: QD9          , at = 0.420255;
+           SD49.6: SD.QD9        , at = 0.458460;
+           QDW49.7: QD9          , at = 0.496665;
+           SD49.7: SD.QD9        , at = 0.534870;
+           QDW49.8: QD9          , at = 0.573075;
+           SD49.8: SD.QD9        , at = 0.611280;
+           QDW49.9: QD9          , at = 0.649485;
+           SD49.9: SD.QD9        , at = 0.687690;
+           QDW49.10: QD9         , at = 0.725895;
+           endsequence;
+
+
+
+L_QFW50 = 0.749400;
+QFW50    : sequence, refer=centre,  l = 0.749400;
+           QFW50.1: QF8          , at = 0.037470;
+           SF50.1: SF.QF8        , at = 0.074940;
+           QFW50.2: QF8          , at = 0.112410;
+           SF50.2: SF.QF8        , at = 0.149880;
+           QFW50.3: QF8          , at = 0.187350;
+           SF50.3: SF.QF8        , at = 0.224820;
+           QFW50.4: QF8          , at = 0.262290;
+           SF50.4: SF.QF8        , at = 0.299760;
+           QFW50.5: QF8          , at = 0.337230;
+           SF50.5: SF.QF8        , at = 0.374700;
+           HCOR50                , at = 0.374700;
+           VCOR50                , at = 0.374700;
+           COL_QDW50: COL.QF8    , at = 0.374700;
+           QFW50.6: QF8          , at = 0.412170;
+           SF50.6: SF.QF8        , at = 0.449640;
+           QFW50.7: QF8          , at = 0.487110;
+           SF50.7: SF.QF8        , at = 0.524580;
+           QFW50.8: QF8          , at = 0.562050;
+           SF50.8: SF.QF8        , at = 0.599520;
+           QFW50.9: QF8          , at = 0.636990;
+           SF50.9: SF.QF8        , at = 0.674460;
+           QFW50.10: QF8         , at = 0.711930;
+           endsequence;
+
+
+KFE.E:   DRIFT,L=0.600;        ! Here L is magnetic length
+KFE.D:   DRIFT,L=0.600;        ! Here L is magnetic length
+L_KFE5005 = 1.328500;
+KFE5005  : sequence, refer=centre,  l = 1.328500;
+           COL_KFE50.1: COL.KFE.E, at = 0.077500;
+           KFE50.1: KFE.E        , at = 0.377500;
+           COL_KFE50.2: COL.KFE.E, at = 0.677500;
+           COL_KFE50.3: COL.KFE.D, at = 0.708500;
+           KFE50.2: KFE.D        , at = 1.008500;
+           COL_KFE50.4: COL.KFE.D, at = 1.308500;
+           endsequence;
+
+
+L_QDW51 = 0.749900;
+QDW51    : sequence, refer=centre,  l = 0.749900;
+           QDW51.1: QD7          , at = 0.037495;
+           SD51.1: SD.QD7        , at = 0.074990;
+           QDW51.2: QD7          , at = 0.112485;
+           SD51.2: SD.QD7        , at = 0.149980;
+           QDW51.3: QD7          , at = 0.187475;
+           SD51.3: SD.QD7        , at = 0.224970;
+           QDW51.4: QD7          , at = 0.262465;
+           SD51.4: SD.QD7        , at = 0.299960;
+           QDW51.5: QD7          , at = 0.337455;
+           SD51.5: SD.QD7        , at = 0.374950;
+           HCOR51                , at = 0.374950;
+           VCOR51                , at = 0.374950;
+           COL_QDW51: COL.QD7    , at = 0.374950;
+           QDW51.6: QD7          , at = 0.412445;
+           SD51.6: SD.QD7        , at = 0.449940;
+           QDW51.7: QD7 	 , at = 0.487435;
+           SD51.7: SD.QD7        , at = 0.524930;
+           QDW51.8: QD7          , at = 0.562425;
+           SD51.8: SD.QD7        , at = 0.599920;
+           QDW51.9: QD7          , at = 0.637415;
+           SD51.9: SD.QD7        , at = 0.674910;
+           QDW51.10: QD7         , at = 0.712405;
+           endsequence;
+
+
+
+QFW52.S: QF6;
+L_QFW52 = 0.756800;
+QFW52    : sequence, refer=centre,  l = 0.756800;
+           QFW52.1: QF6          , at = 0.037840;
+           SF52.1: SF.QF6        , at = 0.075680;
+           QFW52.2: QF6          , at = 0.113520;
+           SF52.2: SF.QF6        , at = 0.151360;
+           QFW52.3: QF6          , at = 0.189200;
+           SF52.3: SF.QF6        , at = 0.227040;
+           QFW52.4: QF6          , at = 0.264880;
+           SF52.4: SF.QF6        , at = 0.302720;
+           QFW52.5: QF6          , at = 0.340560;
+           SF52.5: SF.QF6        , at = 0.378400;
+           HCOR52                , at = 0.378400;
+           VCOR52                , at = 0.378400;
+           COL_QFW52: COL.QF6    , at = 0.378400;
+           QFW52.6: QF6          , at = 0.416240;
+           SF52.6: SF.QF6        , at = 0.454080;
+           QFW52.7: QF6          , at = 0.491920;
+           SF52.7: SF.QF6        , at = 0.529760;
+           QFW52.8: QF6          , at = 0.567600;
+           SF52.8: SF.QF6        , at = 0.605440;
+           QFW52.9: QF6          , at = 0.643280;
+           SF52.9: SF.QF6        , at = 0.681120;
+           QFW52.10: QF6         , at = 0.718960;
+           endsequence;
+
+
+
+QDN53.C: RBEND, L=0.01395, K1=KD53,ANGLE=0.018*0.01395/0.7396;
+QDN53.D: RBEND, L=0.35585, K1=KD53,ANGLE=0.018*0.35585/0.7396;
+QDN53.H: RBEND, L=0.3698,  K1=KD53,ANGLE=0.009;
+L_QDN53 = 0.739600;
+QDN53    : sequence, refer=centre,  l = 0.739600;
+           QDN53.1: QDN53.C      , at = 0.006975;
+           UVT53                 , at = 0.013950;
+           QDN53.2: QDN53.D      , at = 0.191875;
+           HCOR53                , at = 0.369800;
+           VCOR53                , at = 0.369800;
+           QDN53.3: QDN53.H      , at = 0.554700;
+           endsequence;
+
+
+QFN54.H: RBEND ,L=0.36605,K1=KF54,ANGLE=0.015;
+L_QFN54 = 0.732100;
+QFN54    : sequence, refer=centre,  l = 0.732100;
+           QFN54.1: QFN54.H      , at = 0.183025;
+           HCOR54                , at = 0.366050;
+           VCOR54                , at = 0.366050;
+           QFN54.2: QFN54.H      , at = 0.549075;
+           endsequence;
+
+
+QDS55.H:   Q123, K1=KF123;
+L_QDS55 = 0.710600;
+QDS55    : sequence, refer=centre,  l = 0.710600;
+           QDS55.1: QDS55.H      , at = 0.177650;
+           SD53.1: SD.QD3        , at = 0.355300;
+           HCOR55                , at = 0.355300;
+           VCOR55                , at = 0.355300;
+           COL_QDS55: COL.QD3    , at = 0.355300;
+           SD53.2: SD.QD3        , at = 0.355300;
+           QDS55.2: QDS55.H      , at = 0.532950;
+           endsequence;
+
+
+KFI.A:   DRIFT,L=0.672; 
+KFI.B:   DRIFT,L=0.504;
+KFI.C:   DRIFT,L=0.504;
+L_KFI5506 = 2.042500;
+KFI5506  : sequence, refer=centre,  l = 2.042500;
+           COL_KFI55.1: COL.KFI.A, at = 0.237500;
+           KFI55.1: KFI.A        , at = 0.573500;
+           COL_KFI55.2: COL.KFI.A, at = 0.909500;
+           COL_KFI55.3: COL.KFI.B, at = 0.934500;
+           KFI55.2: KFI.B        , at = 1.186500;
+           COL_KFI55.4: COL.KFI.B, at = 1.438500;
+           COL_KFI55.5: COL.KFI.C, at = 1.463500;
+           KFI55.3: KFI.C        , at = 1.715500;
+           COL_KFI55.6: COL.KFI.C, at = 1.967500;
+           endsequence;
+
+
+QFN56.H:   Q123, K1=-KF123;
+L_QFN56 = 0.710600;
+QFN56    : sequence, refer=centre,  l = 0.710600;
+           QFN56.1: QFN56.H      , at = 0.177650;
+           HCOR56                , at = 0.355300;
+           VCOR56                , at = 0.355300;
+           COL_QFN56: COL.QF2    , at = 0.355300;
+           QFN56.2: QFN56.H      , at = 0.532950;
+           endsequence;
+
+
+L_KFI5606 = 2.042500;
+KFI5606  : sequence, refer=centre,  l = 2.042500;
+           COL_KFI56.1: COL.KFI.C, at = 0.075000;
+           KFI56.1: KFI.C        , at = 0.327000;
+           COL_KFI56.2: COL.KFI.C, at = 0.579000;
+           COL_KFI56.3: COL.KFI.B, at = 0.604000;
+           KFI56.2: KFI.B        , at = 0.856000;
+           COL_KFI56.4: COL.KFI.B, at = 1.108000;
+           COL_KFI56.5: COL.KFI.A, at = 1.133000;
+           KFI56.3: KFI.A        , at = 1.469000;
+           COL_KFI56.6: COL.KFI.A, at = 1.805000;
+           endsequence;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

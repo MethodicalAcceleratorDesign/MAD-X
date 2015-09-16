@@ -69,6 +69,7 @@ control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "beta0")       == 0) store_beta0(cmd);
   else if (strcmp(toks[k], "call")        == 0) exec_call(cmd);
   else if (strcmp(toks[k], "coguess")     == 0) exec_store_coguess(cmd);
+  else if (strcmp(toks[k], "copyfile")    == 0) exec_copyfile(cmd);
   else if (strcmp(toks[k], "create")      == 0) exec_create_table(cmd);
   else if (strcmp(toks[k], "delete")      == 0) exec_cmd_delete(cmd);
   else if (strcmp(toks[k], "deselect")    == 0) store_deselect(cmd);
@@ -77,6 +78,7 @@ control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "exit")        == 0) ;
   else if (strcmp(toks[k], "extract")     == 0) exec_extract(cmd);
   else if (strcmp(toks[k], "fill")        == 0) exec_fill_table(cmd);
+  else if (strcmp(toks[k], "shrink")      == 0) exec_shrink_table(cmd);
   else if (strcmp(toks[k], "setvars")     == 0) exec_setvars_table(cmd);
   else if (strcmp(toks[k], "setvars_lin") == 0) exec_setvars_lin_table(cmd);
   else if (strcmp(toks[k], "help")        == 0) ;
@@ -266,7 +268,7 @@ exec_command(void)
 }
 
 struct command*
-find_command(char* name, struct command_list* cl)
+find_command(const char* name, struct command_list* cl)
 {
   int pos;
   if ((pos = name_list_pos(name, cl->list)) < 0)
@@ -275,7 +277,7 @@ find_command(char* name, struct command_list* cl)
 }
 
 struct command_list*
-find_command_list(char* name, struct command_list_list* sl)
+find_command_list(const char* name, struct command_list_list* sl)
 {
   int pos;
   if ((pos = name_list_pos(name, sl->list)) < 0)
@@ -529,7 +531,7 @@ clone_command(struct command* p)
 }
 
 struct command*
-new_command(char* name, int nl_length, int pl_length, char* module, char* group, int link, int mad_8)
+new_command(const char* name, int nl_length, int pl_length, const char* module, const char* group, int link, int mad_8)
 {
   const char *rout_name = "new_command";
   char loc_name[2*NAME_L];
@@ -549,7 +551,7 @@ new_command(char* name, int nl_length, int pl_length, char* module, char* group,
 }
 
 struct command_list*
-new_command_list(char* l_name, int length)
+new_command_list(const char* l_name, int length)
 {
   const char *rout_name = "new_command_list";
   struct command_list* il = mycalloc(rout_name, 1, sizeof *il);

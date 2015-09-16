@@ -2,6 +2,7 @@
   *
   * SPS Ring version STUDY in MAD X SEQUENCE format
   * Generated the 14-SEP-2010 08:58:31 from LHCLAYOUT@EDMSDB Database
+  * Modified 2015-Mar-06  19:22:30  ghislain: changed RCOLLIMATOR to COLLIMATOR
   *
   ***********************************************************************************/
 
@@ -122,22 +123,22 @@ QSE       : QUADRUPOLE  , L := .42;       ! Quadrupole with strip and electron c
 MBA       : RBEND       , L := 6.26;      ! Bending magnet, type B1
 MBB       : RBEND       , L := 6.26;      ! Bending Magnet, type B2
 //---------------------- RCOLLIMATOR    ---------------------------------------------
-BRCH      : RCOLLIMATOR , L := .6;        ! Collimator horizontal (from LEP)
-BRCV      : RCOLLIMATOR , L := .6;        ! Collimator vertical (from LEP)
-BRCZ      : RCOLLIMATOR , L := .36;       ! Collimator (from LEP)
-BSHV      : RCOLLIMATOR , L := .45;       ! Beam scraper, horizontal + vertical (test)
-TACW      : RCOLLIMATOR , L := .848;      ! Aperture Collimator with Tungsten jaw
-TAL       : RCOLLIMATOR , L := 1.25;      ! Tungsten absorber - Secondary collimator. Drawing SPSTCSTV0026.
-TBSJ      : RCOLLIMATOR , L := 2.1;       ! Beam stopper, before inflector, type B (?)
-TBSM      : RCOLLIMATOR , L := 2;         ! Beam stopper, first turn
-TCE       : RCOLLIMATOR , L := 2.7;       ! Collimator, extraction
-TCSM      : RCOLLIMATOR , L := 1.83;      ! Simplified Phase I collimator prototype (Glidcop jaw with graphite inserts) with integrated BPMs
-TIDH      : RCOLLIMATOR , L := 4.3;       ! Internal beam dump, horizontal
-TIDP      : RCOLLIMATOR , L := 4.3;       ! Internal beam dump, momentum
-TIDV      : RCOLLIMATOR , L := 4.3;       ! Internal beam dump, vertical
-TPSG      : RCOLLIMATOR , L := 3;         ! Protection shield for septum magnet MSE, graphite
-TPSGS     : RCOLLIMATOR , L := 1.853;
-TPST      : RCOLLIMATOR , L := 2.52;      ! Protection shield for septum magnet MST
+BRCH      : COLLIMATOR , L := .6 , APERTYPE=RECTANGLE;        ! Collimator horizontal (from LEP)
+BRCV      : COLLIMATOR , L := .6 , APERTYPE=RECTANGLE;        ! Collimator vertical (from LEP)
+BRCZ      : COLLIMATOR , L := .36 , APERTYPE=RECTANGLE;       ! Collimator (from LEP)
+BSHV      : COLLIMATOR , L := .45 , APERTYPE=RECTANGLE;       ! Beam scraper, horizontal + vertical (test)
+TACW      : COLLIMATOR , L := .848 , APERTYPE=RECTANGLE;      ! Aperture Collimator with Tungsten jaw
+TAL       : COLLIMATOR , L := 1.25 , APERTYPE=RECTANGLE;      ! Tungsten absorber - Secondary collimator. Drawing SPSTCSTV0026.
+TBSJ      : COLLIMATOR , L := 2.1 , APERTYPE=RECTANGLE;       ! Beam stopper, before inflector, type B (?)
+TBSM      : COLLIMATOR , L := 2 , APERTYPE=RECTANGLE;         ! Beam stopper, first turn
+TCE       : COLLIMATOR , L := 2.7 , APERTYPE=RECTANGLE;       ! Collimator, extraction
+TCSM      : COLLIMATOR , L := 1.83 , APERTYPE=RECTANGLE;      ! Simplified Phase I collimator prototype (Glidcop jaw with graphite inserts) with integrated BPMs
+TIDH      : COLLIMATOR , L := 4.3 , APERTYPE=RECTANGLE;       ! Internal beam dump, horizontal
+TIDP      : COLLIMATOR , L := 4.3 , APERTYPE=RECTANGLE;       ! Internal beam dump, momentum
+TIDV      : COLLIMATOR , L := 4.3 , APERTYPE=RECTANGLE;       ! Internal beam dump, vertical
+TPSG      : COLLIMATOR , L := 3 , APERTYPE=RECTANGLE;         ! Protection shield for septum magnet MSE, graphite
+TPSGS     : COLLIMATOR , L := 1.853 , APERTYPE=RECTANGLE;
+TPST      : COLLIMATOR , L := 2.52 , APERTYPE=RECTANGLE;      ! Protection shield for septum magnet MST
 //---------------------- RFCAVITY       ---------------------------------------------
 ACL       : RFCAVITY    , L := 3.52913;   ! Accelerating cavity, Landau damping, travelling wave 800 MHz, Valvo
 ACTA      : RFCAVITY    , L := 17.782;    ! Accelerating cavity, travelling wave 200 MHz, type A (4 modules, 43 cells)

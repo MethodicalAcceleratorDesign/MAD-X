@@ -1,13 +1,14 @@
 #include "madx.h"
 
 static double
-act_value(int pos, struct name_list* chunks)
+act_value(int pos, const struct name_list* chunks)
   /* returns the actual value of a variable, element, or command parameter */
 {
-  char* name = chunks->names[pos];
+  const char* name = chunks->names[pos];
+  const char *n = name, *p; 
   char comm[NAME_L];
   char par[NAME_L];
-  char *p, *n = name, *q = comm;
+  char *q = comm;
   double val = zero;
   struct element* el;
   struct command* cmd = NULL;
@@ -683,6 +684,12 @@ polish_value(struct int_array* deco, char* expr_string)
               double int_part;
               stack[c_stack] = modf(stack[c_stack], &int_part);
               } break;
+            case 23:
+              stack[c_stack] = erf(stack[c_stack]);
+              break;
+            case 24:
+              stack[c_stack] = erfc(stack[c_stack]);
+              break;
             default:
               fatal_error("polish_value: illegal function in expr:",
                           expr_string);

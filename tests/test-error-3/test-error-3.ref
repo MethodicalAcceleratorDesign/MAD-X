@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.02  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.07.01      +
-  + Execution Time Stamp: 01.07.14 14.21.40 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.11.14               +
+  + Execution date: 2015.03.11 12:28:04      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 Title, "Compiling Optics for the LHC 6.5 lattice with MADX";
 
 
@@ -79,11 +79,12 @@ parameter: charge   double value:                  1
 parameter: energy   double value:               7000
 parameter: pc   double value:        6999.999937
 parameter: gamma   double value:        7460.522809
+parameter: beta   double value:        0.999999991
 parameter: brho   double value:        23349.48645
 parameter: ex   double value:    5.026457389e-10
-parameter: exn   double value:    1.499999987e-05
+parameter: exn   double value:    3.749999966e-06
 parameter: ey   double value:    5.026457389e-10
-parameter: eyn   double value:    1.499999987e-05
+parameter: eyn   double value:    3.749999966e-06
 parameter: et   double value:                  1
 parameter: sigt   double value:              0.075
 parameter: sige   double value:            0.00011
@@ -94,7 +95,6 @@ parameter: freq0   double value:                  0
 parameter: circ   double value:                  0
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: beta   double value:        0.999999991
 parameter: alfa   double value:    1.796641699e-08
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
@@ -123,5 +123,5 @@ Esave, file=err.file.out;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.02 (64 bit) finished normally +
+  + MAD-X 5.02.04 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

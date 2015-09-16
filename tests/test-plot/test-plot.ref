@@ -294,10 +294,6 @@ looking for file plot2.obs0001.p0003
 looking for file plot2.obs0001.p0004 
 
 
-removefile,file=plot2one;
-
-
-
 exit;
 
 

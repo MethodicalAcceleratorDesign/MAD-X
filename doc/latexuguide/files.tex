@@ -1,6 +1,11 @@
 \chapter{File Handling Statements}
 \label{chap:files}
 
+Note that the filenames given as attribute values in File Handling statements 
+must be explicit names and should not contain wildcard characters since the 
+filename strings are not passed to the underlying Operating System for evaluation.
+
+
 \section{ASSIGN}
 \label{sec:assign}
 
@@ -8,13 +13,14 @@
 ASSIGN, ECHO="filename", TRUNCATE;
 }
 where "filename" is the name of an output file, or "terminal" and
-TRUNCATE specifies if the file must be truncated when opened (ignored
+{\tt TRUNCATE} specifies if the file must be truncated when opened (ignored
 for terminal). 
 
 This allows switching the echo stream to a file or back,
-but only for the commands value, show, and print. Allows easy
-composition of future \madx input files. A real life example (always the
-same) is to be found under \href{foot.html}{footprint example}.  
+but only for the commands \hyperref[sec:value]{\tt VALUE}, 
+\hyperref[sec:show]{\tt SHOW}, and \hyperref[sec:print]{\tt PRINT}. 
+Allows easy composition of future \madx input files. A real life example 
+(always the same) is to be found under \href{foot.html}{footprint example}.  
 
 \section{CALL}
 \label{sec:call}
@@ -23,7 +29,7 @@ CALL, FILE="filename";
 }
 where "filename"  is the name of an input file. This file will be read
 until a "RETURN" statement, or until End\_Of\_File; The file being
-"called" may in turn contain any number of \texttt{CALL} statements
+"called" may in turn contain any number of {\tt CALL} statements
 itself, and so on to any depth.  
 
 \section{RETURN}
@@ -91,9 +97,9 @@ More specifiers than values: 1.200000, 11.3,   6.953222976e-310
 More values than specifiers: 1.200000, 11.3
 \end{verbatim}
 
-Note that \texttt{PRINTF}, like \texttt{PRINT}, produces output that
+Note that {\tt PRINTF}, like {\tt PRINT}, produces output that
 cannot be read back by \madx. For output that can be read back by \madx,
-use the command \texttt{VALUE} or TFS tables.
+use the command {\tt VALUE} or TFS tables.
 
 Note also that a percent sign (\%) can be printed using the format
 \verb|text="%%"|. 
@@ -101,13 +107,31 @@ Note also that a percent sign (\%) can be printed using the format
 
 \section{RENAMEFILE}
 \label{sec:renamefile}
+%\madbox{RENAMEFILE, FILE="filename", NAME = "new\_filename";}
 \madbox{
-RENAMEFILE, FILE="filename", NAME = "new\_filename";
+RENAMEFILE, FILE="filename", TO="new\_filename";
 }
-renames the file "filename" to "new\_filename" on the disk. \\
-It is more portable than a {\tt SYSTEM} call:
+renames the file "filename" to "new\_filename" on disk. \\
+It is more portable than an equivalent \hyperref[sec:system]{\tt SYSTEM} call:
 \madxmp{
 SYSTEM("mv filename new\_filename"); ! Unix specific
+}
+
+\section{COPYFILE}
+\label{sec:copyfile}
+\madbox{
+COPYFILE, FILE="filename", TO="new\_filename", APPEND=logical;
+}
+copies the file "filename" to the file "new\_filename" on disk.
+
+The attribute {\tt APPEND=true} causes {\tt COPYFILE} to append the content of 
+"filename" at the end of the file "new\_filename".\\
+The default value {\tt APPEND=false} causes the 
+replacement of the content of "new\_filename" with the content of "filename".
+
+{\tt COPYFILE, APPEND=true...} is more portable than an equivalent \hyperref[sec:system]{\tt SYSTEM} call:
+\madxmp{
+SYSTEM("copy /y filename new\_filename"); ! Windows specific
 }
 
 \section{REMOVEFILE}
@@ -115,8 +139,8 @@ SYSTEM("mv filename new\_filename"); ! Unix specific
 \madbox{
 REMOVEFILE, FILE="filename";
 }
-removes the file "filename" from disk.
-It is more portable than a {\tt SYSTEM} call: 
+removes the file "filename" from disk. \\
+It is more portable than an equivalent \hyperref[sec:system]{\tt SYSTEM} call: 
 \madxmp{
 SYSTEM("rm filename"); ! Unix specific
 }

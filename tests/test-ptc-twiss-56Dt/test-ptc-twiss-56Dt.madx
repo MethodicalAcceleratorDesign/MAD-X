@@ -38,6 +38,9 @@ ptc_create_universe;
   
 ptc_end;
 
+removefile, file="Maxwellian_bend_for_ptc.txt";
+
+stop;
 
 plot, haxis=s, vaxis=beta11,beta22, colour=100;
 plot, haxis=s, vaxis=disp1, colour=100;

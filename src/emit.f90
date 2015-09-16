@@ -1,5 +1,5 @@
-subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v,       &
-     nemit_v, bmax, gmax, dismax, tunes, sig_v, pdamp)
+subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
+                bmax, gmax, dismax, tunes, sig_v, pdamp, updatebeam)
   use bbfi
   use twiss0fi
   use emitfi
@@ -20,13 +20,14 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v,       &
   ! Output:
   !   u0         (real)   Radiation loss per turn in GeV
   !   emit_v     (real)   ex, ey, et (emittances)
-  !   nemit_v    (real)   exn, eyn, etn (normalised emitt., MAD style)
+  !   nemit_v    (real)   exn, eyn, etn (normalised emittances)
   !   bmax       (real)   Maximum extents of modes.
   !   gmax       (real)   Maximum divergences of modes.
   !   dismax     (real)   Maximum dispersion.
   !   tunes      (real)   qx, qy, qs
   !   pdamp      (real)   damping partition numbers
   !   sig_v      (real)   sigx, sigy, sigt, sige
+  !   updatebeam (logical) flag to trigger BEAM update upon return
   !----------------------------------------------------------------------*
   !---- Communication area for radiation damping.
   double precision orbit0(6), orbit(6), orbit2(6), em(6,6), rd(6,6), reval(6)
@@ -40,41 +41,43 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v,       &
   double precision get_variable, node_value
   integer i, j, j1, j2, k, k1, k2, eflag, restart_sequ, n_align
   integer node_al_errors, code, advance_node
-  logical m66sta, fmap, stabx, staby, stabt, frad
+  logical m66sta, fmap, stabx, staby, stabt, frad, updatebeam
   double precision zero, one, three, twopi
   parameter (zero = 0.0d0, one = 1.d0, three = 3.0d0)
 
   twopi = get_variable('twopi ')
-  do i = 1, 6
-     orbit(i) = orbit0(i)
-     disp(i) = disp0(i)
-  enddo
-  call dzero(emit_v, 3)
-  call dzero(nemit_v, 3)
-  call dzero(bmax, 9)
-  call dzero(gmax, 9)
-  call dzero(dismax, 4)
-  call dzero(tunes, 3)
-  call dzero(sig_v, 4)
-  call dzero(pdamp, 3)
+
+  ORBIT = ORBIT0
+  DISP = DISP0
+  EMIT_V = zero
+  NEMIT_V = zero
+  BMAX  = zero
+  GMAX  = zero
+  DISMAX = zero
+  TUNES = zero
+  SIG_V = zero
+  PDAMP = zero
   u0 = zero
+
   !---- Find eigenvectors at initial position.
   if (m66sta(rt)) then
+     !print *, 'Case static...'
      call laseig(rt, reval, aival, em)
-     stabt = .false.
-     !        print '('' Static map, eigenvalues:'',(/1X,2E15.8))',
-     !     +    (reval(i), aival(i), i = 1, 4)
+     stabt = .false.     
+     !print '('' Static map, eigenvalues:'',(/1X,2E15.8))', &
+     !     (reval(i), aival(i), i = 1, 4)
   else
+     !print *, 'Case dynamic...' 
      call ladeig(rt, reval, aival, em)
      stabt = reval(5)**2 + aival(5)**2 .le. tol  .and.               &
-          reval(6)**2 + aival(6)**2 .le. tol
-     !        print '('' Static map, eigenvalues:'',(/1X,2E15.8))',
-     !     +    (reval(i), aival(i), i = 1, 6)
+             reval(6)**2 + aival(6)**2 .le. tol
+     !print '('' Dynamic map, eigenvalues:'',(/1X,2E15.8))', & 
+     !     (reval(i), aival(i), i = 1, 6)
   endif
   stabx = reval(1)**2 + aival(1)**2 .le. tol  .and.                 &
-       reval(2)**2 + aival(2)**2 .le. tol
+          reval(2)**2 + aival(2)**2 .le. tol
   staby = reval(3)**2 + aival(3)**2 .le. tol  .and.                 &
-       reval(4)**2 + aival(4)**2 .le. tol
+          reval(4)**2 + aival(4)**2 .le. tol
 
   !---- Maximum extents.
   do j = 1, 3
@@ -87,11 +90,13 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v,       &
         gmax(j,k) = em(j2,k1) * em(j2,k1) + em(j2,k2) * em(j2,k2)
      enddo
   enddo
+
   arad = get_value('probe ','arad ')
   betas = get_value('probe ','beta ')
   gammas = get_value('probe ','gamma ')
   cg = arad * gammas**3 / three
   frad = get_value('probe ','radiate ') .ne. zero
+
   !---- Initialize damping calculation.
   if (frad .and. stabt) then
      sum(1) = zero
@@ -108,6 +113,7 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v,       &
   bbd_flag=1
 
   i = restart_sequ()
+
 10 continue
   bbd_pos=i
   code = node_value('mad8_type ')
@@ -179,6 +185,9 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v,       &
   !---- Summary output.
   call emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,tunes,   &
        sig_v,pdamp)
+
+  updatebeam = frad .and. stabt
+
 end subroutine emit
 subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,   &
      tunes,sig_v,pdamp)
@@ -199,13 +208,13 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,   &
   ! Output:
   !   u0         (real)   Radiation loss per turn in GeV
   !   emit_v     (real)   ex, ey, et (emittances)
-  !   nemit_v    (real)   exn, eyn, etn (normalised emitt., MAD style)
+  !   nemit_v    (real)   exn, eyn, etn (normalised emittances)
   !   tunes      (real)   qx, qy, qs
   !   pdamp      (real)   damping partition numbers
   !   sig_v      (real)   sigx, sigy, sigt, sige
   !----------------------------------------------------------------------*
   integer j,j1,j2,k,k1,k2,iqpr2
-  double precision arad,gammas,clg,etpr,expr,eypr,f0,sal,en0
+  double precision arad,gammas,clg,f0,sal,en0
   double precision amass, clight, hbar, freq0, u0, betas
   double precision ten3p,tenp6,tenp9,three,twopi,one,two,zero,four
   double precision ex,ey,et,exn,eyn,sigx,sigy,sige,sigt
@@ -231,6 +240,7 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,   &
   gammas = get_value('probe ','gamma ')
   amass = get_value('probe ','mass ')
   freq0 = get_value('probe ','freq0 ')
+
   !---- Synchrotron energy loss [GeV].
   if (stabt .and. frad) then
      u0 = sumu0
@@ -287,8 +297,9 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,   &
      enddo
   enddo
 
-  exn = ex * four * betas * gammas
-  eyn = ey * four * betas * gammas
+  exn = ex * betas * gammas
+  eyn = ey * betas * gammas
+
   sigx = sqrt(abs(sigma(1,1)))
   sigy = sqrt(abs(sigma(3,3)))
   if (sigma(5,5) .gt. zero .or. sigma(6,6) .gt. zero)  then
@@ -312,9 +323,6 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,   &
   sig_v(4) = sige
   !---- Summary output; header and global parameters.
   !---- Dynamic case.
-  expr = ex * tenp6
-  eypr = ey * tenp6
-  etpr = et * tenp6
   if (stabt) then
      if (frad) write (iqpr2, 910) ten3p * u0
      write (iqpr2, 920) 1, 2, 3
@@ -326,7 +334,7 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,   &
           ((gmax(j,k), j = 1, 3), k = 1, 3)
      if (frad) then
         write (iqpr2, 960) pdamp, alj, (tau(j), j = 1, 3),            &
-             expr, eypr, etpr
+             ex*tenp6, ey*tenp6, et*tenp6
      endif
   else
      write (iqpr2, 920) 1, 2

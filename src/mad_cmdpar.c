@@ -31,8 +31,9 @@ set_command_par_string(char* parameter, struct command* cmd, char* val)
 #endif
 
 struct command_parameter*
-clone_command_parameter(struct command_parameter* p)
+clone_command_parameter(const struct command_parameter* p)
 {
+  assert(p);
   struct command_parameter* clone = new_command_parameter(p->name, p->type);
   clone->call_def = p->call_def;
   switch (p->type)
@@ -64,7 +65,7 @@ clone_command_parameter(struct command_parameter* p)
 }
 
 struct command_parameter*
-new_command_parameter(char* name, int type)
+new_command_parameter(const char* name, int type)
 {
   const char *rout_name = "new_command_parameter";
   struct command_parameter* new = mycalloc(rout_name, 1, sizeof *new);
@@ -306,7 +307,7 @@ command_par_expr(const char* parameter, struct command* cmd)
 }
 
 double
-command_par_special(const char* parameter, struct element* el)
+command_par_special(const char* parameter, const struct element* el)
 /* construct missing tilt from normal and skew  */
 {
   double val = zero;
@@ -323,7 +324,7 @@ command_par_special(const char* parameter, struct element* el)
 }
 
 char*
-command_par_string(const char* parameter, struct command* cmd)
+command_par_string(const char* parameter, const struct command* cmd)
   /* returns a command parameter string if found, else NULL */
 {
   struct command_parameter* cp;
@@ -338,7 +339,8 @@ command_par_string(const char* parameter, struct command* cmd)
 }
 
 void
-add_cmd_parameter_clone(struct command* cmd,struct command_parameter *param,char* par_name,int inf) /*hbu add an identical copy (clone) of param to cmd */
+add_cmd_parameter_clone(struct command* cmd, const struct command_parameter *param, const char* par_name, int inf)
+/* hbu add an identical copy (clone) of param to cmd */
 {
   if(param)
   {
@@ -349,7 +351,8 @@ add_cmd_parameter_clone(struct command* cmd,struct command_parameter *param,char
 }
 
 void
-add_cmd_parameter_new(struct command* cmd,double par_value,char* par_name,int inf) /*hbu add a new param with one value to cmd */
+add_cmd_parameter_new(struct command* cmd, double par_value, const char* par_name, int inf)
+/*hbu add a new param with one value to cmd */
 {
   cmd->par->parameters[cmd->par->curr] = new_command_parameter(par_name, 2);
   cmd->par->parameters[cmd->par->curr]->double_value = par_value;
@@ -358,12 +361,12 @@ add_cmd_parameter_new(struct command* cmd,double par_value,char* par_name,int in
 }
 
 double
-command_par_value(const char* parameter, struct command* cmd)
+command_par_value(const char* parameter, const struct command* cmd)
   /* returns a command parameter value if found, else zero */
 {
   /*printf("command_par_value par = >>%s<<, c=%p\n",parameter,cmd);*/
   
-  struct command_parameter* cp;
+  const struct command_parameter* cp;
   double val = zero;
   int i;
   if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
@@ -379,11 +382,11 @@ command_par_value(const char* parameter, struct command* cmd)
 }
 
 int
-command_par_value2(const char* parameter, struct command* cmd, double* val)
+command_par_value2(const char* parameter, const struct command* cmd, double* val)
   /* returns a command parameter value val
      if found returns 1, else 0 */
 {
-  struct command_parameter* cp;
+  const struct command_parameter* cp;
   int i;
   int ret = 0;
 
@@ -1049,7 +1052,7 @@ log_val(char* name, struct command* cmd)
 // public interface (used by Fortran)
 
 double
-get_value(char* name, char* par)
+get_value(const char* name, const char* par)
   /* this function is used by fortran to get the parameters values
      returns parameter value "par" for command or store "name" if present,
      else INVALID */
@@ -1113,7 +1116,7 @@ get_value(char* name, char* par)
 }
 
 int
-get_vector(char* name, char* par, double* vector)
+get_vector(const char* name, const char* par, double* vector)
   /* returns double "vector" for "par" of command or store "name";
      length is returned as function value (0 if not found) */
 {
@@ -1125,7 +1128,7 @@ get_vector(char* name, char* par, double* vector)
 }
 
 int
-get_string(char* name, char* par, char* string)
+get_string(const char* name, const char* par, char* string)
   /* returns string for  value "par" of command or store "name" if present,
      length = string length, else length = 0 if not present */
 {
@@ -1244,7 +1247,7 @@ get_string(char* name, char* par, char* string)
 }
 
 void
-set_value(char* name, char* par, double* value)
+set_value(const char* name, const char* par, double* value)
   /* sets parameter value "par" for command or store "name" if present */
 {
   mycpy(c_dum->c, name);

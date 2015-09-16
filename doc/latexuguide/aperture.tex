@@ -16,7 +16,7 @@ available aperture, and the particle lost if it falls outside
 the defined aperture.
 
 
-\section{Defining aperture}
+\section{Aperture definition}
 \label{sec:def_aper}
 The aperture for a particular element or class of elements can be 
 set in \madx at the time of definition or instantiation of the 
@@ -24,7 +24,6 @@ element or class.
 
 Note that instantiation can also happen at the time of declaration of 
 an element in a \hyperref[chap:sequence]{sequence}.  
-
 
 The aperture can be specified for any element or class of elements, 
 with the exception of drift spaces. 
@@ -46,73 +45,94 @@ The minimum aperture definition uses the following two attributes:
 %% tracking.  The aperture of any elements can be specified (excepts
 %% drifts) by the use of the following parameters:  
 
+
+
 \begin{madlist}
-  \ttitem{APERTYPE} defines the aperture type from a set of seven
-  preselected types:
-    \begin{madlist}
-      \ttitem{CIRCLE}
-      \ttitem{RECTANGLE} 
-      \ttitem{ELLIPSE} 
-      \ttitem{RECTCIRCLE} a superposition of a CIRCLE and
-        a RECTANGLE 
-      \ttitem{LHCSCREEN} an alias for RECTCIRCLE
-      \ttitem{RECTELLIPSE} a superposition of an ELLIPSE and a
-        RECTANGLE
-      \ttitem{RACETRACK} a circle exploded in four with
-      quartercircles connected by straight lines.  
-    \end{madlist}
-    or from a provided file.
-  \ttitem{APERTURE} is an array of values, the number and meaning 
-of which depends on the APERTYPE.  
+	\ttitem{APERTYPE} defines the aperture type from a set of
+	preselected types, or from a file if a filename is provided as argument.
+	The preselected types are:
+	\begin{madlist}
+		\ttitem{CIRCLE}
+		\ttitem{RECTANGLE} 
+		\ttitem{ELLIPSE} 
+		\ttitem{RECTCIRCLE} a superposition of a {\tt CIRCLE} and
+		a {\tt RECTANGLE} 
+		\ttitem{LHCSCREEN} an alias for {\tt RECTCIRCLE}
+		\ttitem{RECTELLIPSE} a superposition or intersection of 
+		an {\tt ELLIPSE} and a {\tt RECTANGLE}
+		\ttitem{RACETRACK} the union of an {\tt ELLIPSE} and a 
+		{\tt RECTANGLE} forming a {\tt RACETRACK} shape 
+		with four quarters of ellipse, one per quadrant, connected 
+		by straight lines 
+		\ttitem{OCTAGON} a simply connex octagon
+	\end{madlist}
+	If a filename is provided as argument, the file must contain a 
+	list of x and y coordinates, one pair per line, outlining the complete aperture shape, 
+	i.e. no symmetry is assumed. This option is only supported by the 
+	\hyperref[chap:aperture]{\tt APERTURE} module and an aperture thus defined is 
+	ignored in the \hyperref[chap:thintrack]{\tt TRACK} module.
+	When a filename is provided as argument, the {\tt APERTURE} attribute is ignored.\\
+	\\
+	\ttitem{APERTURE} is an array of values, the number and meaning 
+	of which depends on the {\tt APERTYPE}.  
 \end{madlist}
 
-Note that the {\tt MARGUERITE} aperture type (two {\tt RECTCIRCLE}s 
-crossing
-at right angle) is no longer supported. 
+\begin{table}[ht]
+	\caption{Predefined aperture types}
+	\vspace{1ex}
+	\begin{tabular}{|l | c | p{8cm}|}
+		\hline 
+		{\bf APERTYPE} & {\bf \# of values} & {\bf meaning of values}\\
+		\hline
+		{\tt CIRCLE} & 1 &  radius of circle \\
+		\hline
+		{\tt RECTANGLE} & 2 & half width and half height of rectangle\\ 
+		\hline
+		{\tt ELLIPSE} & 2 & horizontal and vertical semi-axes of ellipse \\  
+		\hline
+		{\tt RECTCIRCLE} or {\tt LHCSCREEN} & 3 & half width and half height 
+		of rectangle, radius of circle\\
+		\hline
+		{\tt RECTELLIPSE} & 4 & half width and half height of rectangle, 
+		horizontal and vertical semi-axes of ellipse \\
+		\hline
+		{\tt RACETRACK} & 4 & half width and half height along main axes, 
+		and horizontal and vertical semi-axes of ellipse for the rounding 
+		of the corners \\
+		\hline
+		{\tt OCTAGON} & 4 & half width and half height along main axes, 
+		two angles sustaining the cut corner in the first quadrant, 
+		given in radians and in order of increasing values. \\   
+		\hline
+	\end{tabular}
+\end{table}
 
-\begin{tabular}{|l | c | p{9cm}|}
-\hline 
-\textbf{APERTYPE} & \textbf{\# of values} & \textbf{meaning of
-  values} \\  
-\hline
-CIRCLE & 1 &  radius of circle \\ 
-\hline
-ELLIPSE & 2 & horizontal an vertical semi-axes of ellipse \\  
-\hline
-RECTANGLE & 2 & half width and half height of rectangle\\ 
-\hline
-LHCSCREEN & 3 & half width and half height of rectangle, radius of circle\\  
-\hline
-MARGUERITE & 3 & half width and half height of rectangle, radius of circle\\  
-\hline
-RECTELLIPSE & 4 & half width and half height of rectangle, horizontal
-and vertical semi-axes of ellipse \\  
-\hline
-RACETRACK & 3 & horizontal and vertical offsets (g and s) of the circle center,
-radius (r) of the circular part (see figure below)\\  
-\hline
-filename & 0 & where the file contains a list of x and y coordinates
-outlining the shape. This option is only supported by the aperture
-module, see below. \\  
-\hline
-\end{tabular}
-
+\vskip 5mm
 
 {\bf Examples}\\
-The following sets an ELLIPTICAL aperture for the main
-dipoles for the LHC.
+The following statements are equivalent in setting an elliptic aperture 
+using the variables {\tt APH} and {\tt APV}:
 \madxmp{
-MB: SBEND, L=l.MB, APERTYPE=ellipse, 
-APERTURE=\{0.02202,0.02202\};
+..., APERTYPE=ellipse, APERTURE=\{APH, APV\}; \\
+..., APERTYPE=rectellipse, APERTURE=\{APH, APV, APH, APV\}; \\
+..., APERTYPE=racetrack, APERTURE=\{APH, APV, APH, APV\}; 
 }
 
-When the aperture is specified in a specific file the only aperture
-parameter is the filename: 
+Similarly the following statements are equivalent in setting a rectangular 
+aperture using the variables {\tt APX} and {\tt APY}, 
+and {\tt APR:=SQRT(APX**2+APY**2)}:
 \madxmp{
-MB: SBEND, L=l.MB, APERTYPE=filename;
+..., APERTYPE=rectangle, APERTURE=\{APX,APY\}; \\
+..., APERTYPE=rectellipse, APERTURE=\{APX, APY, APR, APR\}; \\
+..., APERTYPE=racetrack, APERTURE=\{APX, APY, 0.0, 0.0\}; 
 }
 
-where "filename" contains the list of x-y coordinates defining the
+When the aperture is described in a file, the only parameter to be provided is 
+a filename given as value to the {\tt APERTYPE} attribute:
+\madxmp{
+MB: SBEND, L=l.MB, APERTYPE="MB-aper.txt";
+}
+where {\tt "MB-aper.txt"} contains the list of x-y coordinates defining the
 aperture shape:
 \madxmp{
 *****\= \kill
@@ -128,35 +148,62 @@ xn   \>yn
      different aperture types. This is historical and is kept for
      backwards compatibility. Pay some attention to the parameters you
      introduce! 
+
+
+	\item The {\tt RECTELLIPSE}  and {\tt RACETRACK} shapes are fundamental 
+	in the sense that both can properly model the other {\tt CIRCLE}, 
+	{\tt ELLIPSE} and {\tt RECTANGLE} shapes, and that {\tt RECTCIRCLE} 
+	and {\tt LHCSCREEN} shapes are a particular of {\tt RECTELLIPSE}
+
+	\item It is considered good practice to always set the first two 
+	{\tt APERTURE} parameters for predefined shapes to be the maximum
+	horizontal and vertical extents. This proves useful when trying to 
+	plot horizontal and vertical beam stay-clear. 
+	For example, it is better to use
+	\madxmp{
+..., APERTYPE=rectellipse, APERTURE={APX, APY, APX, APY};
+	}
+	rather than
+	\madxmp{
+..., APERTYPE=rectellipse, APERTURE={100, 100, APX, APY};
+	}
+
    \item When \hyperref[chap:makethin]{\tt MAKETHIN} is called all
      thin slices inherit the aperture of their respective original thick
      lens version.  
-   \item When the \hyperref[chap:c6t]{\tt SIXTRACK} command is 
-   called (see the
+
+   \item When the \hyperref[chap:c6t]{\tt SIXTRACK} command is called (see the
      \hyperref[chap:sixtrack]{SixTrack converter module}) the apertures are
      ignored by default. To convert the apertures as well the {\tt APERTURE}
      flag has to be set in {\tt C6T}.  
+
    \item  Aperture parameters are like all parameters and are inherited
      by derived elements. Like other parameters they can also be overridden by
      the derived elements if necessary.  
-\end{itemize}
 
-The \texttt{APERTYPE} and the \texttt{APERTURE}s themselves can be
-conveniently added to the \hyperref[chap:twiss]{\texttt{TWISS}}
-(\autoref{chap:twiss}) table by 
-using the 
-\hyperref[sec:select]{\tt SELECT} command (\autoref{sec:select}). 
-For example the command:    
+   \item The {\tt APERTYPE} and the {\tt APERTURE}s themselves can be
+     conveniently added to the \hyperref[chap:twiss]{\texttt{TWISS}} 
+     (\autoref{chap:twiss}) table by using the \hyperref[sec:select]{\tt 
+     SELECT} command (\autoref{sec:select}). For example the command:    
 \madxmp{
 xxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
-select, flag=twiss, clear; \\
-select, flag=twiss, column= \>name,s,betx,alfx,mux,bety,alfy,muy, \\
+Select, flag=twiss, clear; \\
+Select, flag=twiss, column= \>name,s,betx,alfx,mux,bety,alfy,muy, \\
                             \>apertype,aper\_1,aper\_2; \\
 }
-and a subsequent TWISS command put the aperture information
-together with the specified TWISS parameters into the TWISS table.
+     and a subsequent {\tt TWISS} command put the aperture information together 
+     with the specified {\tt TWISS} parameters into the {\tt TWISS} table.
 
-\section{Defining aperture tolerances}
+   \item The minimum beam stay-clear value (n1 value) computed along the 
+     beamline is printed to standard out and is also available as an output 
+     variable {\tt N1MIN} of the \hyperref[sec:beam]{\tt BEAM} command: 
+\madxmp{
+Value, beam->n1min;\\
+nmin = beam->n1min;}
+
+\end{itemize}
+
+\section{Aperture tolerance definition}
 \label{sec:apertol}
 A parameter closely connected to the aperture is the sum of the
 mechanical and alignment tolerances. The mechanical tolerance is 
@@ -183,7 +230,7 @@ APER\_TOL = \{r, g, s\};
 MB: SBEND, L=l.MB, APER\_TOL=\{1.5, 1.1, 0\};
 }
 
-\section{Defining aperture offsets}
+\section{Aperture offset definition}
 \label{sec:aperoffset}
 
 An aperture offset can be assigned to each element in a \madx sequence as a vector: 
@@ -192,31 +239,38 @@ APER\_OFFSET = \{real, real\};
 }
 
 where the two real values are respectively the horizontal and vertical
-offsets of the aperture inside the element.
+offsets of the aperture inside the element. 
 
-{\bf ATTENTION: to be rewritten following reverse engineering of the
-  code in trrun.f90\\ 17-09-2014 Ghislain Roy}
+The offsets are only used in the \hyperref[chap:thintrack]{\tt tracking} 
+module of \madx and are ignored by the {\tt APERTURE} command and by 
+\hyperref[sec:ptc_track]{\tt PTC\_TRACK}.
+
 
 \section{APERTURE}
 \label{sec:aperture}
-{\bf The APERTURE module was developped specifically for the LHC.\\ 
-Default parameter values are LHC values and the physics 
-in APERTURE module assumes ultra-relativistic particles (v\(\approx\)c).} 
+{\bf The APERTURE module was developed specifically for the LHC.\\ 
+Default parameter values are LHC values.} 
 
-The APERTURE module computes the n1 values for a piece of machine. 
-Each element is sliced into thick subelements at given intervals, and
+The {\tt APERTURE} module computes the {\tt n1} values for a piece of machine. 
+Each element is sliced into thick sub-elements at given intervals, and
 the available aperture is computed at the end of each slice. 
-The computation is based on the last Twiss table, so it is important to
-run the \hyperref[chap:twiss]{\tt TWISS} and \texttt{APERTURE} commands
-on the same period or sequence, see the aperture example below. Also showed in the
-example is how {\tt n1} values can be \hyperref[chap:plot]{plotted}.
+The {\tt APERTURE} module gets the geometric emittances from the values given 
+or calculated in the \hyperref[chap:beam]{\tt BEAM} command. 
+The computation is based on the last Twiss table computed by the 
+\hyperref[chap:twiss]{\tt TWISS} command. 
+It is important to properly define a {\tt BEAM}, and run 
+\hyperref[chap:twiss]{\tt TWISS} and \texttt{APERTURE} commands 
+on the same period or sequence.
 
-The minimum {\tt n1} for each element is written to the last Twiss table, to
-allow for \hyperref[chap:match]{matching by aperture}.   
-	
+The {\tt APERTURE} example below also shows how to \hyperref[chap:plot]{plot} 
+the resulting {\tt n1} values.
+
+The minimum {\tt n1} value is written to the last Twiss table, to
+allow for \hyperref[chap:match]{matching by aperture}.
+
 \madbox{
 APERTURE, \=RANGE=range, \\
-          \>EXN=real, EYN=real, DQF=real, DPARX=real, DPARY=real, \\
+          \>DQF=real, DPARX=real, DPARY=real, \\
           \>BETAQFX=real, BBEAT=real, DP=real, \\
           \>COR=real,  NCO=integer, \\
           \>HALO=\{real,real,real,real\}, HALOFILE=filename,\\
@@ -224,56 +278,47 @@ APERTURE, \=RANGE=range, \\
           \>TRUEPROFILE=filename, OFFSETELEM=filename, \\
           \>FILE=filename;  
 }
+
 where the parameters have the following meaning: 
 \begin{madlist}
-   \ttitem{RANGE} \hyperref[sec:range]{Range} given by
-     elements. Default = {\tt \#s/\#e}  
-   \ttitem{EXN} Normalised horizontal emittance. Default = 3.75*e-6  
-   \ttitem{EYN} Normalised vertical emittance. Default = 3.75*e-6 
-   \ttitem{DQF} Peak linear dispersion [m]. Default = 2.086 
-   \ttitem{DPARX} Fractional horizontal parasitic dispersion. Default = 0.273 
-   \ttitem{DPARY} Fractional vertical parasitic dispersion. Default = 0.273 
-   \ttitem{BETAQFX} Beta x in standard qf [m]. Default = 170.25 
-   \ttitem{BBEAT} Beta beating coefficient applying to beam size. Default = 1.1 
-   \ttitem{DP} Bucket edge at the current beam energy. Default = 0.0015 
-   \ttitem{COR} Maximum radial closed orbit uncertainty [m]. Default = 0.004 
-   \ttitem{NCO} Number of azimuth for radial scan. Default = 5 
-   \ttitem{HALO} Halo parameters: \{n, r, h, v\}. n is the radius of the
-     primary halo,  r is the radial part of the secondary halo, h and v
-     is the horizontal and  vertical cuts in the secondary halo. Default
-     = \{6, 8.4, 7.3, 7.3\}  
-   \ttitem{HALOFILE} Input file with halo polygon coordinates. Will
-     suppress  an eventual halo parameter. Default = none  
-   \ttitem{INTERVAL} Approximate length in meters between
-     measurements. Actual value:  nslice = nodelength/interval, nslice
-     is rounded down to closest integer,  interval =
-     nodelength/nslice. Default = 1.0  
-   \ttitem{SPEC} Aperture spec, for plotting only. Gives the spec line in
-     the plot. Default = 0.0  
-   \ttitem{NOTSIMPLE} Use only if one or more beamscreens in the range are
-     considered not to  be a "simply connex". Since all \madx apertypes
-     are simply connex, this is only possible  if an input file with
-     beam screen coordinates are given. See below for a graphical
-     example. Default = false.  
-   \ttitem{TRUEPROFILE} A file containing a list of magnets, and for each
-     magnet a list of horizontal and vertical deviations from the ideal
-     magnet axis. These values may come from measurements done on the
-     magnet. See below for example. Default = none.  
-   \ttitem{OFFSETELEM} A file containing a reference point in the machine,
-     and a list of magnets with their offsets from this point described
-     as a parabola. See below for example. Default = none. \\
-     {\bf Note that the reference point should be within the range of
-       elements given for the offsets to be taken into account.}
-   \ttitem{FILE} Output file with aperture table. Default = none 
+	\ttitem{RANGE} \hyperref[sec:range]{Range} given by
+	elements. Default = {\tt \#s/\#e}  
+	\ttitem{DQF} Peak linear dispersion [m]. Default = 2.086 
+	\ttitem{DPARX} Fractional horizontal parasitic dispersion. Default = 0.273 
+	\ttitem{DPARY} Fractional vertical parasitic dispersion. Default = 0.273 
+	\ttitem{BETAQFX} Beta x in standard qf [m]. Default = 170.25 
+	\ttitem{BBEAT} Beta beating coefficient applying to beam size. Default = 1.1 
+	\ttitem{DP} Bucket edge at the current beam energy. Default = 0.0015 
+	\ttitem{COR} Maximum radial closed orbit uncertainty [m]. Default = 0.004 
+	\ttitem{NCO} Number of azimuth for radial scan. Default = 5 
+	\ttitem{HALO} Halo parameters: \{n, r, h, v\}. n is the radius of the
+	primary halo,  r is the radial part of the secondary halo, h and v
+	is the horizontal and  vertical cuts in the secondary halo. Default
+	= \{6, 8.4, 7.3, 7.3\}  
+	\ttitem{HALOFILE} Input file with halo polygon coordinates. Will
+	suppress  an eventual halo parameter. Default = none  
+	\ttitem{INTERVAL} Approximate length in meters between
+	measurements. Actual value:  nslice = nodelength/interval, nslice
+	is rounded down to closest integer,  interval =
+	nodelength/nslice. Default = 1.0  
+	\ttitem{SPEC} Aperture spec, for plotting only. Gives the spec line in
+	the plot. Default = 0.0  
+	\ttitem{NOTSIMPLE} Use only if one or more beamscreens in the range are
+	considered not to  be a "simply connex". Since all \madx apertypes
+	are simply connex, this is only possible  if an input file with
+	beam screen coordinates are given. See below for a graphical
+	example. Default = false.  
+	\ttitem{TRUEPROFILE} A file containing a list of magnets, and for each
+	magnet a list of horizontal and vertical deviations from the ideal
+	magnet axis. These values may come from measurements done on the
+	magnet. See below for example. Default = none.  
+	\ttitem{OFFSETELEM} A file containing a reference point in the machine,
+	and a list of magnets with their offsets from this point described
+	as a parabola. See below for example. Default = none. \\
+	{\bf Note that the reference point should be within the range of
+	elements given for the offsets to be taken into account.}
+	\ttitem{FILE} Output file with aperture table. Default = none 
 \end{madlist}
-
-
-{\bf Important note regarding emittances:}\\
-The APERTURE module sets the actual emittances from the normalized values
-given as input using the definition \madxmp{ EX = EXN / GAMMA }
-while the \hyperref[chap:beam]{\tt BEAM} command in \madx uses the definition 
-\madxmp{ EX = EXN / (4 * BETA * GAMMA) } 
-
 
 \section{Not simply connex beam pipe profiles} 
 \label{sec:notconnex}
@@ -365,26 +410,19 @@ etc.
 
 {\bf Example of file:}
 \begin{verbatim}
-!This is the start of the file.
-!Comments are made with exclamation marks.
-
 mb.a14r1.b1
 0        0.0002        0.000004
 7.15     1.4e-5        0.3e-3
 14.3     0.0000000032  4e-6
-
-!further comments can of course be added
 
 mq.22r1.b1
 0      0.3e-5     1.332e-4
 1.033  0.00034    0.3e-9
 2.066  0          0.00e-2
 3.1    4.232e-4   0.00000003
-
-!This is the end of the file.
 \end{verbatim}
 
-\section{OFFSETELEM file syntax}
+\section{Offsetelem file syntax}
 \label{sec:offsetelem}
 This file contains parameters describing how certain elements are
 actually located in space with respect to a given reference element in
@@ -420,29 +458,29 @@ have been given through the {\tt OFFSETELEM} file mechanism.
 The file must be given in {\tt TFS} format according to the following
 template, with mandatory header and any number of data lines, one per element. 
 
-\begin{verbatim}
+{\small \begin{verbatim}
 @ NAME             %06s "OFFSET" 
 @ TYPE             %06s "OFFSET" 
 @ REFERENCE        %10s "reference-element-name" 
 * NAME          S_IP       X_OFF     DX_OFF    DDX_OFF    Y_OFF    DY_OFF     DDY_OFF
 $ %s            %le        %le       %le       %le        %le      %le        %le
-"elementname"	real       real      real      real       real     real       real
-\end{verbatim}
+"elementname"   real       real      real      real       real     real       real
+\end{verbatim}}
 
 Note that the column S\_IP is actually not used, and the values are ignored, 
 but the column and values are parsed nevertheless and must be present. 
 The absence of this column will trigger an error. 
 
 {\bf Example:}
-\begin{verbatim}
+{\small \begin{verbatim}
 @ NAME             %06s "OFFSET" 
 @ TYPE             %06s "OFFSET" 
 @ REFERENCE        %10s "mq.12r1.b1" 
 * NAME          S_IP       X_OFF     DX_OFF    DDX_OFF    Y_OFF    DY_OFF     DDY_OFF
 $ %s            %le        %le       %le       %le        %le      %le        %le
-"mq.12r1.b1"	0.0        -3.0      -2.56545   0.0       0.0      -2.3443666 0.0
+"mq.12r1.b1"    0.0        -3.0      -2.56545   0.0       0.0      -2.344366  0.0
 "mcbxa.3r2"     0.0        -0.84     32.443355  0.3323    0.0      32.554363  0.2522
-\end{verbatim}
+\end{verbatim}}
 
 %A python script to convert a file from the old V.3.XX format to the new V4.xx can be found at :
 %/afs/cern.ch/eng/lhc/optics/V6.503/aperture/convert_offsets.py
@@ -461,35 +499,32 @@ does not coincide with the reference trajectory.
 Note that prior to \madx version 4, the layout of the file was different
 and not formatted as TFS file: 
 
-\begin{verbatim}
-reference-element-name
+\madxmp{
+reference-element-name \\
+\\
+elementname \\
+DDX\_OFF   \=DX\_OFF   \=X\_OFF \\
+DDY\_OFF   \>DY\_OFF   \>Y\_OFF 
+} 
 
-elementname
-DDX_OFF   DX_OFF   X_OFF
-DDY_OFF   DY_OFF   Y_OFF
-\end{verbatim} 
 
 {\bf Example:} 
-\begin{verbatim}
-!comment can be given anywhere with an exclamation mark
-
-mq.12r1.b1
-
-!Then we give a list of elements and their displacement 
-!w.r.t. the reference point.
-mcbxa.3l2
-0   -2.56545   -3
-0   -2.3443666  0
-
-!The next element use the same reference point.
-!Elements offset w.r.t. another point must be given in another file,
-!together with the new reference point.
-mcbxa.3r2
-0.3323  32.443355 -0.84
-0.2522  32.554363 0.0
-
-!This is the end of the file.
-\end{verbatim}
+\madxmp{
+! Reference point \\
+mq.12r1.b1 \\
+\\
+! List of elements and their displacement w.r.t. reference point. \\
+mcbxa.3l2 \\
+0   -2.5654500 -3 \\
+0   -2.3443666  0 \\
+\\
+! The next element uses the same reference point. \\
+! Elements offset w.r.t. another point must be given in another file, \\
+! together with the new reference point. \\
+mcbxa.3r2 \\
+0.3323  32.443355 -0.84 \\
+0.2522  32.554363  0.0
+}
 
 
 %% This file contains coordinates describing how certain elements are
@@ -649,7 +684,7 @@ tolerances:
 
 {\tt ON\_ELEM} indicates whether the node is an element or a drift, and
 {\tt ON\_AP} whether it has a valid aperture. The Twiss parameters are the
-interpolated  values used for aperture computation.  
+interpolated values used for aperture computation.  
 
 When one wants to plot the aperture, the {\tt TABLE=aperture} parameter
 is necessary. The normal line of hardware symbols along the top is not

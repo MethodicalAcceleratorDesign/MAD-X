@@ -65,7 +65,7 @@ struct sequence_list /* contains list of sequence pointers sorted by name */
 // interface
 
 struct node*     new_sequ_node(struct sequence*, int occ_cnt);
-struct sequence* new_sequence(char* name, int ref);
+struct sequence* new_sequence(const char* name, int ref);
 struct sequence* delete_sequence(struct sequence*);
 struct sequence_list* new_sequence_list(int length);
 

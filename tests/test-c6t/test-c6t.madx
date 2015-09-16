@@ -5,7 +5,7 @@ option, -echo,-warn,-info;
 vrf400= 8.0;
 
 ! ---------- sequence
-call, file="../test-makethin-2/V6.5.thin.b1.seq";
+call, file="../share/LHC/LHCRing/V6.503/V6.5.thin.b1.seq";
 !---------nominal strength--------
 call, file="../share/LHC/LHCRing/V6.503/V6.5.thin.inj.str";
 
@@ -69,3 +69,7 @@ TWISS;
 ! ----------- Twiss
 use, sequence= lhcb1;
 sixtrack, radius=0.017;
+
+removefile, file="fc.3";
+
+stop;

@@ -325,8 +325,7 @@ Finally found 1 singular values
   
  start LEAST SQUARES correction with all correctors
   
- IFAIL from lstsql:            0
-  
+   
  end LEAST SQUARES correction with all correctors
   
 CORRECTION SUMMARY:   
@@ -1167,7 +1166,6 @@ Finally found 0 singular values
   
  start LEAST SQUARES correction with all correctors
   
- IFAIL from lstsql:            0
   
  end LEAST SQUARES correction with all correctors
   

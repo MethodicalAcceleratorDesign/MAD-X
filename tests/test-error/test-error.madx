@@ -25,7 +25,7 @@ s3t:multipole, ksl:={0,0,0,6.e-5};
 //rfc:marker
 
 Beam, particle=electron, energy:=10.0, 
- exn:=6.88E-6*4, eyn:=3.75E-6*4, NPART:=1.05E11, sige:=4.5e-4; //<<<<
+ exn:=6.88E-6, eyn:=3.75E-6, NPART:=1.05E11, sige:=4.5e-4; //<<<<
 show, beam;
 option,-debug,-echo;
 elseq:sequence, refer=centre,l=2.592e2;

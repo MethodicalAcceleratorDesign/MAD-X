@@ -21,7 +21,7 @@ exec_delete_sequ(char* name)
 }
 
 void
-exec_delete_table(char* name)
+exec_delete_table(const char* name)
 {
   struct table_list* tl;
   int j, k, pos;
@@ -101,6 +101,7 @@ exec_assign(struct in_cmd* cmd)
     if (strcmp(stolower(tmp), "terminal") == 0)
       prt_file = stdout;
     else {
+      p = str2path(p);
       if (assign_start == 0) {
         assign_start = 1;
         prt_file = fopen(p, "w");
@@ -109,6 +110,11 @@ exec_assign(struct in_cmd* cmd)
         prt_file = fopen(p, "a");
       else
         prt_file = fopen(p, "w");
+  
+      if (!prt_file) {
+        warning("unable to open assigned file: ", p);
+        prt_file = stdout;
+      }
     }
   }
   else prt_file = stdout;
@@ -122,7 +128,8 @@ exec_removefile(struct in_cmd* cmd)
   int pos = name_list_pos("file", nl);
 
   if (nl->inform[pos]) {
-    if (remove(pl->parameters[pos]->string))
+    char *src = str2path(pl->parameters[pos]->string); 
+    if (remove(src))
       warning("unable to remove file: ", pl->parameters[pos]->string);
   }
 }
@@ -133,11 +140,53 @@ exec_renamefile(struct in_cmd* cmd)
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
   int pos = name_list_pos("file", nl);
-  int new = name_list_pos("name", nl);
+  int new = name_list_pos("to", nl);
 
   if (nl->inform[pos] && nl->inform[new]) {
-    if (rename(pl->parameters[pos]->string, pl->parameters[new]->string))
-      warning("unable to rename file: ", pl->parameters[pos]->string);
+    char *src = str2path(pl->parameters[pos]->string);
+    char *dst = str2path(pl->parameters[new]->string);
+    if (rename(src,dst)) warning("unable to rename file: ", src);
+  }
+}
+
+void
+exec_copyfile(struct in_cmd* cmd)
+{
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  int pos = name_list_pos("file", nl);
+  int new = name_list_pos("to", nl);
+  int flg = name_list_pos("append", nl);
+
+  if (nl->inform[pos] && nl->inform[new]) {
+    char *src_s = str2path(pl->parameters[pos]->string);
+    char *dst_s = str2path(pl->parameters[new]->string);
+
+    FILE *src = fopen(src_s, "r");
+    if (!src) {
+      warning("unable to open in read mode file: ", src_s);
+      return;
+    }
+
+    const char *mode = "w";
+    if (nl->inform[flg] && pl->parameters[flg]->double_value)
+      mode = "a";
+
+    FILE *dst = fopen(dst_s, mode);
+    if (!dst) {
+      warning("unable to open in write mode file: ", dst_s);
+      fclose(src);
+      return;
+    }
+
+    int c;
+    while ((c = fgetc(src)) != EOF) fputc(c, dst);
+
+    if (!feof(src))
+      warning("unable to copy entirely file: ", src_s);
+
+    fclose(src);
+    fclose(dst);
   }
 }
 
@@ -338,6 +387,44 @@ exec_dump(struct in_cmd* cmd)
 }
 
 void
+exec_shrink_table(struct in_cmd* cmd)
+  /* removes rows from a table */
+{
+  struct table* t;
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  int pos = name_list_pos("table", nl);
+  char* name = NULL;
+  int row;
+
+  if (nl->inform[pos] == 0) {
+    warning("no table name:", "ignored");
+    return;
+  }
+
+  if ((name = pl->parameters[pos]->string) == NULL) {
+    warning("no table name: ", "ignored");
+    return;
+  }
+
+  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+    warning("table name not found:", "ignored");
+    return;
+  }
+
+  t = table_register->tables[pos];
+  pos = name_list_pos("row", nl);
+  row = pos >= 0 ? pl->parameters[pos]->double_value : t->curr - 1;
+
+  if (row < 0) row = t->curr + row;
+  if (row < 0 || row > t->curr) {
+    warning("row index out of bounds:", " ignored");
+    return;
+  }
+  t->curr = row;
+}
+
+void
 exec_fill_table(struct in_cmd* cmd)
   /* adds variables to a table */
 {
@@ -346,7 +433,7 @@ exec_fill_table(struct in_cmd* cmd)
   struct command_parameter_list* pl = cmd->clone->par;
   int pos = name_list_pos("table", nl);
   char* name = NULL;
-  int row,curr;
+  int row;
   if (nl->inform[pos] == 0) {
     warning("no table name:", "ignored");
     return;
@@ -363,11 +450,13 @@ exec_fill_table(struct in_cmd* cmd)
   }
   t = table_register->tables[pos];
 
-  pos=name_list_pos("row", nl);
-  row=(int) pl->parameters[pos]->double_value;
+  pos = name_list_pos("row", nl);
+  row = pos >=0 ? pl->parameters[pos]->double_value : t->curr + 1;
 
   if (row==0 || row == t->curr + 1) { // add row to table and fill
+    int cols = t->org_cols ; t->org_cols = 0;
     add_vars_to_table(t);
+    t->org_cols = cols;
     if (++t->curr == t->max) grow_table(t);
     return;
   }
@@ -381,14 +470,14 @@ exec_fill_table(struct in_cmd* cmd)
   // 2014-Aug-18  17:05:33  ghislain: allow for negative row numbers; 
   // -1 indexes last row and negative numbers count row numbers backwards from end
   // -2 denoting the one before last and so on
-  if (row<0) row=t->curr + 1 + row; 
+  if (row < 0) row = t->curr + 1 + row; 
   
-  curr=t->curr;
-  t->curr=row-1;
-  add_vars_to_table(t);
-  t->curr=curr;
-  
-  return;
+  { int cols = t->org_cols ; t->org_cols = 0;
+    int curr = t->curr; t->curr = row - 1;
+    add_vars_to_table(t);
+    t->curr = curr;
+    t->org_cols = cols;
+  }
 }
 
 void
@@ -400,7 +489,7 @@ exec_setvars_table(struct in_cmd* cmd)
   struct command_parameter_list* pl = cmd->clone->par;
   int pos = name_list_pos("table", nl);
   char* name = NULL;
-  int row,curr;
+  int row;
 
   if (nl->inform[pos] == 0) {
     warning("no table name:", "ignored");
@@ -431,14 +520,11 @@ exec_setvars_table(struct in_cmd* cmd)
   // 2014-Aug-18  17:05:33  ghislain: allow for negative row numbers; 
   // -1 indexes last row and negative numbers count row numbers backwards from end
   // -2 denoting the one before last and so on
-  if (row<0) row=t->curr + 1 + row; 
+  if (row < 0) row = t->curr + 1 + row; 
   
-  curr=t->curr;
-  t->curr=row-1;
+  int curr = t->curr; t->curr = row - 1;
   set_vars_from_table(t);
-  t->curr=curr;
-  
-  return;
+  t->curr = curr;
 }
 
 
@@ -449,15 +535,12 @@ exec_setvars_lin_table(struct in_cmd* cmd)
   struct table* t;
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
-  int pos,row1,row2,i;
+  int pos = name_list_pos("table", nl);
   char* name = NULL;
   char* param = NULL;
-  char* colname = NULL;
-  double val1,val2;
   char expr[10*NAME_L];
-  i=0;
+  int row1, row2;
 
-  pos = name_list_pos("table", nl);
   if (nl->inform[pos] == 0) {
     warning("no table name:", "ignored");
     return;
@@ -468,14 +551,7 @@ exec_setvars_lin_table(struct in_cmd* cmd)
     return;
   }
 
-  /*current_node = NULL;  to distinguish from other table fills ????*/
-  pos=name_list_pos("row1", nl);
-  row1=(int) pl->parameters[pos]->double_value; 
-  pos=name_list_pos("row2", nl);
-  row2=(int) pl->parameters[pos]->double_value; 
-
-  pos = name_list_pos("param", nl);
-  param = pl->parameters[pos]->string;
+  current_node = NULL; /* to distinguish from other table fills */
 
   if ((pos = name_list_pos(name, table_register->names)) < 0) {
     warning("table name not found:", "ignored");
@@ -483,10 +559,18 @@ exec_setvars_lin_table(struct in_cmd* cmd)
   }
   t = table_register->tables[pos];
 
+  pos=name_list_pos("row1", nl);
+  row1=(int) pl->parameters[pos]->double_value;
+  pos=name_list_pos("row2", nl);
+  row2=(int) pl->parameters[pos]->double_value;
+  pos = name_list_pos("param", nl);
+  param = pl->parameters[pos]->string;
+
   if (abs(row1) > t->curr || row1 == 0){
     warning("row1 index out of bounds:", " ignored");
     return;
-  } else if (abs(row2) > t->curr || row2 == 0){
+  }
+  if (abs(row2) > t->curr || row2 == 0){
     warning("row2 index out of bounds:", " ignored");
     return;
   }
@@ -496,22 +580,22 @@ exec_setvars_lin_table(struct in_cmd* cmd)
   if (row1<0) row1=t->curr + 1 + row1; 
   if (row2<0) row2=t->curr + 1 + row2;
 
-  for (i = 0; i < t->num_cols; i++) {
-    if (t->columns->inform[i] <3){
-      colname=t->columns->names[i];
-      val1=t->d_cols[i][row1-1];
-      val2=t->d_cols[i][row2-1];
+  for (int i = 0; i < t->num_cols; i++) {
+    if (t->columns->inform[i] < 3) {
+      const char *colname = t->columns->names[i];
+      double val1 = t->d_cols[i][row1-1];
+      double val2 = t->d_cols[i][row2-1];
       // 2014-Aug-18  17:15:08  ghislain: 
       // value := val1*param + val2*(1-param) ; 
       // sprintf(expr,"%s:=%10.16g*(%s)%+10.16g*(1-(%s));", colname,val1,param,val2,param);
       // is counterintuitve for interpolation between val1 and val2 and should instead be 
       // value := val1 + param*(val2-val1) = val1*(1-param) + val2*param;
-      sprintf(expr,"%s:=%10.16g*(1-(%s))%+10.16g*(%s);", colname,val1,param,val2,param);
+      sprintf(expr, "%s:=%10.16g*(1-(%s))%+10.16g*(%s);", colname, val1, param, val2, param);
       pro_input(expr);
+    } else if (t->columns->inform[i] == 3) {
+      set_stringvar(t->columns->names[i],t->s_cols[i][row1-1]) ;
     }
   }
- 
- return;
 }
 
 void

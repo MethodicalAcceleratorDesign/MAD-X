@@ -163,7 +163,7 @@ delete_var_list(struct var_list* varl)
 }
 
 struct variable*
-find_variable(char* name, struct var_list* varl)
+find_variable(const char* name, struct var_list* varl)
 {
   int pos;
   if ((pos = name_list_pos(name, varl->list)) < 0)
@@ -204,7 +204,7 @@ clone_var_list(struct var_list* vl)
 }
 
 struct variable*
-new_variable(char* name, double val, int val_type, int type, struct expression* expr, char* string)
+new_variable(const char* name, double val, int val_type, int type, struct expression* expr, char* string)
 {
   const char *rout_name = "new_variable";
   struct variable* var = mycalloc(rout_name, 1, sizeof *var);
@@ -234,7 +234,7 @@ new_var_list(int length)
 }
 
 char*
-get_varstring(char* name)
+get_varstring(const char* name)
 {
   struct variable* var;
   char *ret; // *p, not used
@@ -445,7 +445,7 @@ add_to_var_list( /* adds variable to alphabetic variable list */
 }
 
 void
-set_stringvar(char* name, char* string)
+set_stringvar(const char* name, char* string)
 {
   /* sets variable name->string to string */
 //  char* p;
@@ -490,17 +490,15 @@ print_global(double delta)
   if (freq0 > zero) t0 = one / freq0;
   eta = alfa - one / (gamma*gamma);
   puts(" ");
-  printf(" Global parameters for %ss, radiate = %s:\n\n",
-         tmp, trad);
+  printf(" Global parameters for %ss, radiate = %s:\n\n", tmp, trad);
+  // 2015-Apr-15  15:27:15  ghislain: proposal for more elegant statement avoiding the strcopy to extra variable
+  // printf(" Global parameters for %ss, radiate = %s:\n\n", tmp, rad ? "true" : "false"); 
   printf(v_format(" C         %F m          f0        %F MHz\n"),circ, freq0);
   printf(v_format(" T0        %F musecs     alfa      %F \n"), t0, alfa);
   printf(v_format(" eta       %F            gamma(tr) %F \n"), eta, gamtr);
-  printf(v_format(" Bcurrent  %F A/bunch    Kbunch    %I \n"),
-         bcurrent, kbunch);
-  printf(v_format(" Npart     %F /bunch     Energy    %F GeV \n"),
-         npart,energy);
-  printf(v_format(" gamma     %F            beta      %F\n"),
-         gamma, beta);
+  printf(v_format(" Bcurrent  %F A/bunch    Kbunch    %I \n"), bcurrent, kbunch);
+  printf(v_format(" Npart     %F /bunch     Energy    %F GeV \n"), npart,energy);
+  printf(v_format(" gamma     %F            beta      %F\n"), gamma, beta);
 }
 
 #if 0 // not used
@@ -566,7 +564,7 @@ sss_variable(char* name)
 // public interface (used by Fortran)
 
 double
-get_variable(char* name)
+get_variable(const char* name)
 {
   char comm[NAME_L];
   char par[NAME_L];
@@ -601,7 +599,7 @@ get_variable(char* name)
 }
 
 void
-set_variable(char* name, double* value)
+set_variable(const char* name, double* value)
 {
   /* sets variable name to value */
   char comm[NAME_L];

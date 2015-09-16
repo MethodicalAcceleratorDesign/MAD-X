@@ -23,6 +23,8 @@
 #                added test-line testsuite with first test for repetition count 
 #                for element vs line
 # 
+# 2015-Apr-01  17:47:56  ghislain:
+#                added shrink tests in test-setvars_lin and renamed to test-table 
 
 #################################################
 # testsuite
@@ -37,14 +39,15 @@
 
 # tests order
 tests-all := \
-test-setvars_lin \
+test-table \
 test-memory \
 \
 test-makethin test-makethin-2 \
 test-survey test-survey-2 \
 test-track test-track-2 test-track-3 test-track-4 test-track-5 test-track-6 \
 test-track-7 test-track-8 test-track-9 test-track-10 test-track-11 \
-test-twiss test-twiss-2 test-twiss-3 test-twiss-4 test-twiss-5 test-twiss-6 test-twiss-8 test-twiss-9 \
+test-twiss test-twiss-2 test-twiss-3 test-twiss-4 test-twiss-5 \
+test-twiss-6 test-twiss-8 test-twiss-9 test-twiss-10 test-twiss-11 \
 test-cororbit test-cororbit-2 test-cororbit-3 test-cororbit-4 \
 test-emit test-emit-2 \
 test-ibs test-ibs-2 test-ibs-3 test-ibs-4 \
@@ -56,14 +59,14 @@ test-thick-dipole test-thick-dipole-3 \
 test-jacobian test-jacobian-2 test-jacobian-knobs \
 test-match test-match-2 test-match-3 test-match-4 \
 test-match-5 test-match-6 test-match-7 test-match-8 \
-test-aperture \
+test-aperture test-aperture-2 test-aperture-3 \
 test-beam \
 \
-test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 \
+test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 test-rfmultipole-5 test-rfmultipole-6 \
 \
-test-ptc-twiss test-ptc-twiss-1 test-ptc-twiss-2 \
+test-ptc-twiss-1 test-ptc-twiss-2 test-ptc-twiss-3 \
 test-ptc-twiss-old1 test-ptc-twiss-old2 test-ptc-twiss-old3 test-ptc-twiss-old4 test-ptc-twiss-old5 $(if $(call eq,$(OSTYPE),Windows),,test-ptc-twiss-old6) test-ptc-twiss-old7 \
-test-ptc-twiss-5D test-ptc-twiss-56D test-ptc-twiss-56Dt test-ptc-twiss-56Dl test-ptc-twiss-56Dtl test-ptc-twiss-6D \
+test-ptc-twiss-5D test-ptc-twiss-5Dt test-ptc-twiss-56D test-ptc-twiss-56Dt test-ptc-twiss-56Dl test-ptc-twiss-56Dtl test-ptc-twiss-6D \
 test-ptc-normal test-ptc-twiss-maptable \
 test-ptc-trackline test-ptc-trackline-2 \
 test-touschek test-touschek-2 \
@@ -83,10 +86,10 @@ $(if $(call eq,$(OSTYPE),Windows),,test-ptc-twiss-old6) test-ptc-twiss-old7 \
 test-touschek test-touschek-2
 
 # tests dependencies
-test-c6t:     test-makethin-2
-test-track-2: test-makethin-2
-test-track-7: test-makethin-2
-test-track-8: test-makethin-2
+#test-c6t:     test-makethin-2
+#test-track-2: test-makethin-2
+#test-track-7: test-makethin-2
+#test-track-8: test-makethin-2
 
 # lexicographical order
 tests-to-setup := \
@@ -112,8 +115,8 @@ test-ptc-trackline:  TESTSUITE := PTC Trackline testsuite
 test-ptc-twiss:      TESTSUITE := PTC Twiss testsuite
 test-rfmultipole:    TESTSUITE := RF Multipole testsuite
 test-sequence:	     TESTSUITE := Sequence testsuite
-test-setvars_lin:    TESTSUITE := Special features
 test-survey:         TESTSUITE := Survey testsuite
+test-table:	     TESTSUITE := Table testsuite
 test-thick-quad:     TESTSUITE := Thick Quadrupole testsuite
 test-touschek:       TESTSUITE := Touschek testsuite
 test-track:          TESTSUITE := Track testsuite

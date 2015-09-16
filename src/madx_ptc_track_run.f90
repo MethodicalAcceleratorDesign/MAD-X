@@ -7,6 +7,8 @@ MODULE madx_ptc_track_run_module
   USE madx_ptc_module , ONLY: dp, lp, lnv, &
                                 ! shorts for <double precision>, <logical>, 0D0 etc.
        doublenum ! am temprorary double number for I/O with C-procedures
+  USE madx_ptc_intstate_module, ONLY: getdebug  ! new debug control by PS (from 2006.03.20)
+
   use name_lenfi
   use definition
   implicit none
@@ -215,7 +217,11 @@ CONTAINS
 
     !k    data char_a / ' ' /
     !-------------------------------------------------------------------------
-
+    
+    if (getdebug() > 3) then
+      ptc_track_debug = .true.
+    endif
+    
     ! default value
     return_from_subr_ptc_track=.FALSE. ! used to RETURN from this subr.
 
@@ -243,11 +249,12 @@ CONTAINS
 
     Call Call_my_state_and_update_states ! parameter "deltap" is defined now
     !                                    ! icase_ptc is changed to correct value
-
-    Print *;  Print *,'  ================================================================'
-    Print *, '  ptc_track: The current dimensionality of the problem is icase=', icase_ptc
-    Print *,'  ================================================================'; Print *;
-
+    if (getdebug() > 1) then
+      Print *;  Print *,'  ================================================================'
+      Print *, '  ptc_track: The current dimensionality of the problem is icase=', icase_ptc
+      Print *,'  ================================================================'; Print *;
+    endif
+    
     warn_coordinate_system_changed: IF((.NOT. mytime) .AND.(icase_ptc.gt.4) ) THEN
        CALL FORT_WARN('time=false => coord. system: {-pathlength, delta_p} ', &
             'the table headers mean:  PT -> delta_p, T -> pathlength')
@@ -751,8 +758,11 @@ CONTAINS
          call aafail('Call_my_state_and_update_states: ',' ICASE not 4, 5 or 6 found: ' // text)
       endif
       IF (Radiation_PTC) DEFAULT=DEFAULT+RADIATION0
-      Print *, ' Radiation_PTC    =     ', Radiation_PTC
-
+      
+      if(getdebug() > 1) then
+        Print *, ' Radiation_PTC    =     ', Radiation_PTC
+      endif
+      
       debug_print_2: if (ptc_track_debug) then
          print *, &
               "after call my_state(icase,deltap,deltap0)"
@@ -761,15 +771,17 @@ CONTAINS
          print *; print*, '----------------------------------'
          print *, "before CALL UPDATE_STATES"
       end if debug_print_2
-
+       
       CALL UPDATE_STATES
       MYSTATE=DEFAULT
-      print *, "after CALL UPDATE_STATES"
-      print *; print*, '----------------------------------'
-      print *, "Printing by <call print(default,6)>:"
-      call print(MYSTATE,6)
-      print *, "after call print(MYSTATE,6)"
-
+      
+      if (getdebug()>1) then
+        print *, "after CALL UPDATE_STATES"
+        print *; print*, '----------------------------------'
+        print *, "Printing by <call print(default,6)>:"
+        call print(MYSTATE,6)
+        print *, "after call print(MYSTATE,6)"
+      endif
     END SUBROUTINE Call_my_state_and_update_states
     !=============================================================================
 
@@ -2635,12 +2647,14 @@ CONTAINS
       call alloc(m)
       call alloc(xs)
       call alloc(nf)
-
-      PRINT*," "
-      WRITE(6,'(A)') " Print the state: MYSTATE_ENV "
-      PRINT*," "
-      call print(MYSTATE_ENV,6)
-
+      
+      if (getdebug() > 1) then
+        PRINT*," "
+        WRITE(6,'(A)') " Print the state: MYSTATE_ENV "
+        PRINT*," "
+        call print(MYSTATE_ENV,6)
+      endif
+      
       xs0=x
       m=1        ! damapspin set to identity
       xs=xs0+m   ! Probe_8 = closed orbit probe + Identity

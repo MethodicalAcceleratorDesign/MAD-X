@@ -2,6 +2,7 @@
   *
   * TI2 version STUDY in MAD X SEQUENCE format
   * Generated the 11-MAR-2013 15:14:38 from LHCLAYOUT@EDMSDB Database
+  * Modified 2015-Mar-06  19:25:21  ghislain: changed RCOLLIMATOR to COLLIMATOR
   *
   ***********************************************************************************/
 
@@ -123,10 +124,10 @@ MDLV      : RBEND       , L := l.MDLV;       ! Correcting dipole, BT line, long,
 MKIMA192  : RBEND       , L := l.MKIMA192;   ! Injection kicker RA23
 MSIA      : RBEND       , L := l.MSIA;       ! Injection septum, Module A
 MSIB      : RBEND       , L := l.MSIB;       ! Injection septum, Module B
-//---------------------- RCOLLIMATOR    ---------------------------------------------
-TCDIH     : RCOLLIMATOR , L := l.TCDIH;      ! Collimator
-TCDIM     : RCOLLIMATOR , L := l.TCDIM;      ! Collimator
-TCDIV     : RCOLLIMATOR , L := l.TCDIV;      ! Collimator
+//---------------------- COLLIMATOR    ---------------------------------------------
+TCDIH     : COLLIMATOR , L := l.TCDIH , APERTYPE = rectangle;      ! Collimator
+TCDIM     : COLLIMATOR , L := l.TCDIM , APERTYPE = rectangle;      ! Collimator
+TCDIV     : COLLIMATOR , L := l.TCDIV , APERTYPE = rectangle;      ! Collimator
 //---------------------- VKICKER        ---------------------------------------------
 MCIAV     : VKICKER     , L := l.MCIAV;      ! Corrector magnet, vertical
 
