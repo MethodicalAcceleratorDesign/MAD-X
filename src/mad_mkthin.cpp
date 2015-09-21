@@ -1136,6 +1136,7 @@ static void place_thin_slice(const node* node, sequence* to_sequ, element* slice
 
 static void place_thick_slice(element* thick_elem,const node* node, sequence* to_sequ, element* sliced_elem, const int i, const string& slice_style) // make nodes for the _s, _b  pieces  and place them in the sequence
 {
+  if(sliced_elem==nullptr) return; // nothing to place
   const int n_thick_slices = get_slices_from_elem(thick_elem);
   const int n=n_thick_slices-1; // in case of thick slices,
   SliceDistPos SP(n, slice_style==string("teapot") ); //
@@ -1150,7 +1151,8 @@ static void place_thick_slice(element* thick_elem,const node* node, sequence* to
   double at = node->at_value;
 
   double rel_shift;
-  if(i==1)                    rel_shift=-0.5 + SP.delta/2.; // entry
+  if(n_thick_slices==1)       rel_shift=0; // single thick piece remains in centre
+  else if(i==1)               rel_shift=-0.5 + SP.delta/2.; // entry
   else if(i==n_thick_slices)  rel_shift= 0.5 - SP.delta/2.; // exit
   else                        rel_shift=-0.5 + SP.delta + (i-1.5)*SP.Delta; // body
 
@@ -2405,11 +2407,19 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
     sliced_elem = create_sliced_magnet(thick_elem,1,ThickSLice); // get info from first slice
     if(ThickSLice) // create entry, body, exit pieces,  for bends or quadrupoles   --- if not yet existing
     {
-      if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " ThickSLice, nslices=" << nslices << " create thick slices _en, _bo, _ex sliced_elem->name=" << sliced_elem->name << '\n';
-      en =               create_thick_slice(thick_elem,0); // entry slice
-      if(nslices>2) bo = create_thick_slice(thick_elem,1); // body slices,   last parameter = 1     since there will be only one type of body
-      if(ThickSLice && IsQuad) ex=en; // for quad entry/exit are the same
-      else ex =          create_thick_slice(thick_elem,2); // exit slice
+      if(nslices==1) // special case singel thik
+      {
+        en = thick_elem; // full slice as entry, no body/exit
+        if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " ThickSLice, nslices=" << nslices << " create thick slices _en, _bo, _ex sliced_elem->name=" << sliced_elem->name << " here single slice just entry, not body, exit" << '\n';
+      }
+      else // nslices>1
+      {
+        if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " ThickSLice, nslices=" << nslices << " create thick slices _en, _bo, _ex sliced_elem->name=" << sliced_elem->name << '\n';
+        en =               create_thick_slice(thick_elem,0); // entry slice
+        if(nslices>2) bo = create_thick_slice(thick_elem,1); // body slices,   last parameter = 1     since there will be only one type of body
+        if(ThickSLice && IsQuad) ex=en; // for quad entry/exit are the same
+        else ex =          create_thick_slice(thick_elem,2); // exit slice
+      }
     }
   } // done with create_thin or create_thick.  Next is positioning slices as node
 
