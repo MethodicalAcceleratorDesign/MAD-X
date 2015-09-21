@@ -1136,7 +1136,7 @@ static void place_thin_slice(const node* node, sequence* to_sequ, element* slice
 
 static void place_thick_slice(element* thick_elem,const node* node, sequence* to_sequ, element* sliced_elem, const int i, const string& slice_style) // make nodes for the _s, _b  pieces  and place them in the sequence
 {
-  if(sliced_elem==nullptr) return; // nothing to place
+  if(sliced_elem==NULL) return; // nothing to place
   const int n_thick_slices = get_slices_from_elem(thick_elem);
   const int n=n_thick_slices-1; // in case of thick slices,
   SliceDistPos SP(n, slice_style==string("teapot") ); //
@@ -2407,7 +2407,7 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
     sliced_elem = create_sliced_magnet(thick_elem,1,ThickSLice); // get info from first slice
     if(ThickSLice) // create entry, body, exit pieces,  for bends or quadrupoles   --- if not yet existing
     {
-      if(nslices==1) // special case singel thik
+      if(nslices==1) // special case single thick
       {
         en = thick_elem; // full slice as entry, no body/exit
         if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " ThickSLice, nslices=" << nslices << " create thick slices _en, _bo, _ex sliced_elem->name=" << sliced_elem->name << " here single slice just entry, not body, exit" << '\n';
