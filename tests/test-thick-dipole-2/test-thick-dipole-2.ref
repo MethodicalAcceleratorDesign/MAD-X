@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Darwin)      +
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.06.05 17:59:04      +
+  + Release   date: 2015.09.16               +
+  + Execution date: 2015.09.22 12:49:56      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option, -debug, -echo;
 
@@ -59,7 +59,7 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
     0.2446983297804837                      0      900.7992169104017     0.3999800003555519 
 
                  dxrms                 xcomax                 xcorms                     q2 
-    0.2692453502349975                      0                      0     0.2446967987972323 
+    0.2127759758777228                      0                      0     0.2446967987972323 
 
                    dq2                betymax                  dymax                  dyrms 
                      0                    901                      0                      0 
@@ -158,5 +158,5 @@ exit TRACK module
 2 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++
