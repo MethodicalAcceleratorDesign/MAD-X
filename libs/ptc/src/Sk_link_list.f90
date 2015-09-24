@@ -20,7 +20,7 @@ MODULE S_FIBRE_BUNDLE
   private FIND_POS_in_universe,FIND_POS_in_layout,super_dealloc_fibre
   TYPE(LAYOUT), PRIVATE, POINTER:: LC
   logical :: superkill=.false.
-  logical(lp),TARGET :: use_info=.false.
+  logical(lp),TARGET :: use_info=.true.
   integer, target :: nsize_info = 70
   private zero_fibre
   INTEGER :: INDEX_0=0, INDEX_1=0
@@ -186,7 +186,7 @@ CONTAINS
     ENDIF
     IF(ASSOCIATED(L%DNA)) THEN
        DEALLOCATE(L%DNA)
-       if(lielib_print(12)==1) WRITE(6,*) " DNA CONTENT HAS BEEN DEALLOCATED "
+       WRITE(6,*) " DNA CONTENT HAS BEEN DEALLOCATED "
     ENDIF
     !    IF(ASSOCIATED(L%con)) THEN
     !       DEALLOCATE(L%con)
@@ -1236,11 +1236,18 @@ CONTAINS
 
     CALL FIND_PATCH(B,EXI,A,ENT,D,ANG)
 
+  ! if(a_xz==-1.or.a_yz==-1) then
+  !   write(6,*) "  discrete ",  a_xz,A_YZ
+  !  endif
+
+
     NORM=0.0_dp
     DO I=1,3
        NORM=NORM+ABS(D(I))
     ENDDO
+ 
     IF(NORM>=PREC) THEN
+       if(global_verbose)  Write(6,'(a20,1x,3(1x,g12.5))') " Patch Translations ",d
        D=0.0_dp
        PATCH_NEEDED=PATCH_NEEDED+1
     ENDIF
@@ -1250,26 +1257,34 @@ CONTAINS
     ENDDO
     ene=(NORM<=PREC.and.(A_XZ==1.and.A_YZ==1)).or.(NORM<=PREC.and.(A_XZ==-1.and.A_YZ==-1))
     IF(.not.ene) THEN
-       ANG=0.0_dp
+        if(global_verbose) Write(6,'(a20,1x,3(1x,g12.5))') "  Patch rotations  ",ang
+        ANG=0.0_dp
        PATCH_NEEDED=PATCH_NEEDED+10
     ENDIF
 
 
-    if(ABS((EL2%MAG%P%P0C-EL1%MAG%P%P0C)/EL1%MAG%P%P0C)>PREC) PATCH_NEEDED=PATCH_NEEDED+100
-
+    if(ABS((EL2%MAG%P%P0C-EL1%MAG%P%P0C)/EL1%MAG%P%P0C)>PREC) then
+     if(global_verbose) Write(6,'(a20,1x,1(1x,g12.5))') "  Patch Energy      ", &
+      ABS((EL2%MAG%P%P0C-EL1%MAG%P%P0C)/EL1%MAG%P%P0C)
+     PATCH_NEEDED=PATCH_NEEDED+100
+    endif
 
     DISCRETE=.false.
     IF(ANG(1)/TWOPI<-0.25_dp) THEN
+       write(6,*) " #1 Discrete IMPOSSIBLE ANG(1)/TWOPI<-0.25_dp"
        DISCRETE=.TRUE.
     ENDIF
     IF(ANG(1)/TWOPI>0.25_dp) THEN
-       DISCRETE=.TRUE.
+       write(6,*) " #2 Discrete IMPOSSIBLE  ANG(1)/TWOPI>0.25_dp"
+        DISCRETE=.TRUE.
     ENDIF
     IF(ANG(2)/TWOPI<-0.25_dp) THEN
-       DISCRETE=.TRUE.
+       write(6,*) " #3 Discrete IMPOSSIBLE ANG(2)/TWOPI<-0.25_dp"
+        DISCRETE=.TRUE.
     ENDIF
     IF(ANG(1)/TWOPI>0.25_dp) THEN
-       DISCRETE=.TRUE.
+       write(6,*) " #4 Discrete IMPOSSIBLE  ANG(1)/TWOPI>0.25_dp"
+        DISCRETE=.TRUE.
     ENDIF
 
     !    IF(DISCRETE) THEN
@@ -1281,12 +1296,12 @@ CONTAINS
        PATCH_NEEDED=PATCH_NEEDED-1000
     endif
 
-    norm=abs(el1%mag%p%p0c-el2%mag%p%p0c)
-    ene=(norm>prec)
+   ! norm=abs(el1%mag%p%p0c-el2%mag%p%p0c)
+   ! ene=(norm>prec)
 
-    if(ene) then
-       PATCH_NEEDED=PATCH_NEEDED+100
-    endif
+!    if(ene) then
+!       PATCH_NEEDED=PATCH_NEEDED+100
+!    endif
 
   END SUBROUTINE CHECK_NEED_PATCH
 
@@ -1315,7 +1330,7 @@ CONTAINS
 
   end SUBROUTINE remove_patch
 
-  SUBROUTINE FIND_PATCH_P_new(EL1,EL2_NEXT,D,ANG,DIR,ENERGY_PATCH,PREC) ! COMPUTES PATCHES
+  SUBROUTINE FIND_PATCH_P_new(EL1,EL2_NEXT,D,ANG,DIR,ENERGY_PATCH,PREC,patching) ! COMPUTES PATCHES
     IMPLICIT NONE
     TYPE (FIBRE), INTENT(INOUT) :: EL1
     TYPE (FIBRE),TARGET,OPTIONAL, INTENT(INOUT) :: EL2_NEXT
@@ -1325,6 +1340,8 @@ CONTAINS
     REAL(DP), POINTER,DIMENSION(:)::A,B
     INTEGER, INTENT(IN) ::  DIR
     LOGICAL(LP), OPTIONAL, INTENT(IN) ::  ENERGY_PATCH
+
+    LOGICAL(LP), OPTIONAL, INTENT(out) ::  patching
     REAL(DP), OPTIONAL, INTENT(IN) ::  PREC
     INTEGER A_YZ,A_XZ
     LOGICAL(LP) ENE,DOIT,DISCRETE
@@ -1419,7 +1436,7 @@ CONTAINS
           ENDIF
        ENDIF
        if(PRESENT(PREC)) then
-          norm=abs(el1%mag%p%p0c-el2%mag%p%p0c)
+          norm=abs(2*(el1%mag%p%p0c-el2%mag%p%p0c)/(el1%mag%p%p0c+el2%mag%p%p0c))
           ene=ene.and.(norm>prec)
        endif
 
@@ -1488,11 +1505,7 @@ CONTAINS
                 END SELECT
              ENDIF
           ELSE
-             W_P=0
-             W_P%NC=1
-             W_P%FC='((1X,A72))'
-             W_P%C(1)= " NOT EVEN ENERGY PATCH POSSIBLE ON ELEMENT 2 "
-             ! call ! WRITE_I
+           write(6,*) " NOT EVEN ENERGY PATCH POSSIBLE ON ELEMENT 1 "
           ENDIF
 
        ELSEIF(DIR==-1) THEN
@@ -1507,11 +1520,7 @@ CONTAINS
                 END SELECT
              ENDIF
           ELSE
-             W_P=0
-             W_P%NC=1
-             W_P%FC='((1X,A72))'
-             W_P%C(1)= " NOT EVEN ENERGY PATCH POSSIBLE ON ELEMENT 1 "
-             ! call ! WRITE_I
+           write(6,*) " NOT EVEN ENERGY PATCH POSSIBLE ON ELEMENT 1 "
           ENDIF
        ENDIF
 
@@ -1532,17 +1541,14 @@ CONTAINS
     ENDIF
 
     IF(DISCRETE) THEN
-       W_P=0
-       W_P%NC=1
-       W_P%FC='(2(1X,A72,/),(1X,A72))'
-       W_P%C(1)= " NO GEOMETRIC PATCHING POSSIBLE : MORE THAN 90 DEGREES BETWEEN FACES "
-       ! call ! WRITE_I
+        write(6,*) " NO GEOMETRIC PATCHING POSSIBLE : MORE THAN 90 DEGREES BETWEEN FACES "
     ENDIF
 
+    if(present(patching)) patching=.not.discrete
 
   END SUBROUTINE FIND_PATCH_P_new
 
-  SUBROUTINE FIND_PATCH_0(EL1,EL2_NEXT,NEXT,ENERGY_PATCH,PREC) ! COMPUTES PATCHES
+  SUBROUTINE FIND_PATCH_0(EL1,EL2_NEXT,NEXT,ENERGY_PATCH,PREC,patching) ! COMPUTES PATCHES
     IMPLICIT NONE
     TYPE (FIBRE),pointer :: EL1
     TYPE (FIBRE),TARGET,OPTIONAL, INTENT(INOUT) :: EL2_NEXT
@@ -1552,7 +1558,7 @@ CONTAINS
     LOGICAL(LP), OPTIONAL, INTENT(IN) ::  NEXT,ENERGY_PATCH
     INTEGER DIR
     LOGICAL(LP) ENE,NEX
-
+    LOGICAL(LP), OPTIONAL, INTENT(out) ::  patching
     IF(PRESENT(EL2_NEXT)) THEN
        EL2=>EL2_NEXT
     ELSE
@@ -1634,7 +1640,7 @@ CONTAINS
     DIR=-1  ; IF(NEX) DIR=1;
     D=0.0_dp;ANG=0.0_dp;
 
-    CALL FIND_PATCH_P_new(EL1,EL2,D,ANG,DIR,ENERGY_PATCH=ENE,prec=PREC)
+    CALL FIND_PATCH_P_new(EL1,EL2,D,ANG,DIR,ENERGY_PATCH=ENE,prec=PREC,patching=patching)
 
 
   END SUBROUTINE FIND_PATCH_0
@@ -2324,6 +2330,11 @@ CONTAINS
     !      CALL KILL(t%bb)
     !      DEALLOCATE(T%bb)
     !    endif
+
+    IF(ASSOCIATED(T%TEAPOT_LIKE)) DEALLOCATE(T%TEAPOT_LIKE)
+    IF(ASSOCIATED(T%delta_rad_in)) DEALLOCATE(T%delta_rad_in)
+    IF(ASSOCIATED(T%delta_rad_out)) DEALLOCATE(T%delta_rad_out)
+    IF(ASSOCIATED(T%ref)) DEALLOCATE(T%ref)
     IF(ASSOCIATED(T%a)) DEALLOCATE(T%a)
     IF(ASSOCIATED(T%ent)) DEALLOCATE(T%ent)
     IF(ASSOCIATED(T%b)) DEALLOCATE(T%b)

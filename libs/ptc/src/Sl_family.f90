@@ -263,7 +263,7 @@ CONTAINS
        IF(ASSOCIATED(P%MAG%FREQ)) THEN
           IF(P%MAG%FREQ/=0.0_dp) THEN
              FREQ=TWOPI*P%MAG%FREQ/CLIGHT
-             VOLT=-P%MAG%VOLT*1e-3_dp/P%MAG%P%P0C
+             VOLT=-P%MAG%VOLT*volt_c/P%MAG%P%P0C
              PHAS=P%MAG%PHAS
           ENDIF
        ENDIF
@@ -382,14 +382,15 @@ CONTAINS
   END SUBROUTINE ADD_FREQ
 
   !END NEW
-  SUBROUTINE ADDP_ANBN(EL,NM,F,V) ! EXTENDS THE ADD ROUTINES FROM THE ELEMENT(P) TO THE FIBRE
+  SUBROUTINE ADDP_ANBN(EL,NM,F,V,ELECTRIC) ! EXTENDS THE ADD ROUTINES FROM THE ELEMENT(P) TO THE FIBRE
     IMPLICIT NONE
     TYPE(FIBRE),target, INTENT(INOUT) ::EL
     REAL(DP), INTENT(IN) ::V
     INTEGER, INTENT(IN) ::NM,F
+    LOGICAL(LP), OPTIONAL :: ELECTRIC
 
-    CALL ADD(EL%MAG,NM,F,V)
-    CALL ADD(EL%MAGP,NM,F,V)
+    CALL ADD(EL%MAG,NM,F,V,ELECTRIC)
+    CALL ADD(EL%MAGP,NM,F,V,ELECTRIC)
 
   END SUBROUTINE ADDP_ANBN
 
@@ -1287,7 +1288,7 @@ CONTAINS
     if(pat) then
        k=0
        if(associated(R%doko)) then
-          dk=>r%doko
+          dk=>r% doko
           do while(associated(dk))  !!! PATCH TO DOKO'S  IF CREATED USING DNA I.E. APPEND_POINT
              p=> dk%parent_fibre
              call FIND_PATCH(p,p%next,NEXT=my_false,ENERGY_PATCH=my_true,prec=PREC0)

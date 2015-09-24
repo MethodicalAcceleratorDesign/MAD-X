@@ -14,6 +14,15 @@ module madx_ptc_trackline_module
   logical(lp)          :: onetable
 
   character(1200),private   :: whymsg
+
+  TYPE BEAM
+     REAL(DP), POINTER :: X(:,:)
+     LOGICAL(LP), POINTER :: U(:)
+     TYPE(BEAM_LOCATION), POINTER::POS(:)
+     INTEGER, POINTER :: N,LOST
+     REAL(DP), POINTER :: A(:),D(:)
+  END TYPE BEAM
+
   
 
   !********************************************************************************************
@@ -22,6 +31,53 @@ module madx_ptc_trackline_module
 
 contains
 
+  SUBROUTINE KILL_BEAM(B)
+    IMPLICIT NONE
+    TYPE(BEAM) , INTENT (INOUT) :: B
+    IF(ASSOCIATED(B%N)) THEN
+       DEALLOCATE(B%N,B%LOST,B%X,B%U,B%POS)
+    ENDIF
+  END SUBROUTINE KILL_BEAM
+
+  SUBROUTINE ALLOCATE_BEAM(B,N)
+    IMPLICIT NONE
+    TYPE(BEAM) , INTENT (INOUT) :: B
+    INTEGER , INTENT (IN) :: N
+    INTEGER I
+
+    ALLOCATE(B%N,B%LOST)
+
+    B%N=N
+    B%LOST=0
+    ALLOCATE(B%X(N,7))
+    ALLOCATE(B%U(0:N))
+    ALLOCATE(B%POS(0:N))
+    DO I=0,N
+       NULLIFY(B%POS(i)%NODE)
+    ENDDO
+
+    B%X  = 0.0_dp
+    B%U  = .FALSE.
+  END SUBROUTINE ALLOCATE_BEAM
+
+  SUBROUTINE TRACK_beam(r,b,k, fibre1,fibre2,node1,node2) ! fibre i1 to i2
+    IMPLICIT NONE
+    TYPE(layout),target,INTENT(INOUT):: r
+    real(dp) x(6)
+    type(beam),intent(INOUT) ::  b
+    TYPE(INTERNAL_STATE) K
+    integer,optional:: fibre1,fibre2,node1,node2
+    integer i
+
+    do i=1,b%n
+       if(b%u(i)) cycle
+       !x=b%x(i,:)
+       call track_probe_x(r,b%x(i,:),k, fibre1,fibre2,node1,node2)
+       B%U(I)=.NOT.CHECK_STABLE
+       !call X_IN_BEAM(B,X,I)
+    enddo
+    !          call track_beam(my_ring,TheBeam,getintstate(), pos1=ni, pos2=ni+1)
+  end SUBROUTINE TRACK_beam
 
 
   subroutine ptc_track_everystep(nobs)
@@ -221,12 +277,7 @@ contains
         print *, 'There is ', npart,' tracks'
     endif
 
-    !     IF(.NOT.ASSOCIATED(TheBeam%N)) THEN
     CALL ALLOCATE_BEAM(TheBeam,npart)
-    !     ELSEIF(TheBeam%N/=npart) THEN
-    !        CALL KILL_BEAM(TheBeam)
-    !        CALL ALLOCATE_BEAM(TheBeam,npart)
-    !     ENDIF
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!    READS DATA FROM MADX         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

@@ -44,6 +44,8 @@ TYPE girder_list
 
 END TYPE girder_list
 
+
+
 TYPE MUL_BLOCK
    ! stuff for setting multipole
    real(dp) AN(NMAX),BN(NMAX)
@@ -57,13 +59,24 @@ type work
    integer power
 end type work
 
+
 TYPE INTERNAL_STATE
-   INTEGER TOTALPATH
-   !    LOGICAL(LP) TIME,RADIATION,NOCAVITY,FRINGE,EXACTMIS,STOCHASTIC,ENVELOPE
-   LOGICAL(LP) TIME,RADIATION,NOCAVITY,FRINGE,STOCHASTIC,ENVELOPE
-   LOGICAL(LP) PARA_IN,ONLY_4D,DELTA
-   LOGICAL(LP) SPIN,MODULATION
+   INTEGER TOTALPATH   ! total time or path length is used
+   LOGICAL(LP) TIME  ! Time is used instead of path length
+   LOGICAL(LP) RADIATION ! Radiation is turned on
+   LOGICAL(LP) NOCAVITY ! Cavity is turned into a drift
+   LOGICAL(LP) FRINGE ! Fringe fields are turned on (mainly for quadrupoles)
+   LOGICAL(LP) STOCHASTIC ! Random Stochastic kicks to x(5) 
+   LOGICAL(LP) ENVELOPE ! Stochastic envelope terms tracked in probe_8 
+   LOGICAL(LP) PARA_IN  ! If true, parameters in the map are included
+   LOGICAL(LP) ONLY_4D  ! REAL_8 Taylor in (x,p_x,y,p_y)
+   LOGICAL(LP) DELTA  ! REAL_8 Taylor in (x,p_x,y,p_y,delta)
+   LOGICAL(LP) SPIN  ! Spin is tracked
+   LOGICAL(LP) MODULATION !  One modulated family tracked by probe
+   LOGICAL(LP) ONLY_2D  !  REAL_8 Taylor in (x,p_x)
 END TYPE INTERNAL_STATE
+
+
 
 TYPE POL_BLOCK
    CHARACTER(nlp) NAME
@@ -118,7 +131,8 @@ TYPE MAGNET_CHART
 
    !
    LOGICAL(lp), POINTER :: EXACT
-   LOGICAL(lp), POINTER :: KILL_ENT_FRINGE,KILL_EXI_FRINGE, bend_fringe,permFRINGE                  !
+   LOGICAL(lp), POINTER :: KILL_ENT_FRINGE,KILL_EXI_FRINGE, bend_fringe
+   integer, pointer :: permFRINGE,highest_fringe                 !
    !
    INTEGER, POINTER :: METHOD,NST                   ! METHOD OF INTEGRATION 2,4,OR 6 YOSHIDA
    INTEGER, POINTER :: NMUL                         ! NUMBER OF MULTIPOLE
@@ -198,7 +212,8 @@ TYPE ELEMENT
    TYPE(CAV_TRAV), POINTER :: CAV21            ! CAVITY TRAVELLING WAVE
    TYPE(SAGAN), POINTER :: WI                ! USER DEFINED
    TYPE(PANCAKE), POINTER :: PA          ! GENERAL B
-   TYPE(HELICAL_DIPOLE), POINTER :: HE22          ! GENERAL B
+   TYPE(HELICAL_DIPOLE), POINTER :: HE22          !  
+   TYPE(SUPERDRIFT1), POINTER :: SDR          ! GENERAL DRIFT
    TYPE(FIBRE), POINTER :: PARENT_FIBRE
    TYPE(fibre_appearance), POINTER :: doko
    type(element), pointer :: siamese
@@ -260,6 +275,7 @@ TYPE ELEMENTP
    TYPE(ECOLP), POINTER :: ECOL19             ! ECOLLIMATOR
    TYPE(CAV_TRAVP), POINTER :: CAV21            ! CAVITY TRAVELLING WAVE
    TYPE(HELICAL_DIPOLEP), POINTER :: HE22          ! GENERAL B
+   TYPE(SUPERDRIFT1P), POINTER :: SDR          ! GENERAL DRIFT
    TYPE(SAGANP), POINTER :: WI                ! USER DEFINED
    TYPE(PANCAKEP), POINTER :: PA          ! GENERAL B
    TYPE(FIBRE), POINTER :: PARENT_FIBRE
@@ -282,29 +298,29 @@ END type info
 
 TYPE FIBRE
    !  BELOW ARE THE DATA CARRIED BY THE NODE
-   INTEGER,POINTER ::DIR
-   TYPE(PATCH),POINTER ::PATCH
-   TYPE(CHART),POINTER ::CHART
-   TYPE (ELEMENT), POINTER ::  MAG
-   TYPE (ELEMENTP),POINTER ::  MAGP
+   INTEGER,POINTER ::DIR => null()
+   TYPE(PATCH),POINTER ::PATCH => null()
+   TYPE(CHART),POINTER ::CHART => null()
+   TYPE (ELEMENT), POINTER ::  MAG => null()
+   TYPE (ELEMENTP),POINTER ::  MAGP => null()
    !  END OF DATA
    !  POINTER TO THE MAGNETS ON EACH SIDE OF THIS NODE
-   TYPE (FIBRE),POINTER :: PREVIOUS
-   TYPE (FIBRE),POINTER :: NEXT
+   TYPE (FIBRE),POINTER :: PREVIOUS => null()
+   TYPE (FIBRE),POINTER :: NEXT => null()
    !  POINTING TO PARENT LAYOUT AND PARENT FIBRE DATA
-   TYPE (LAYOUT),POINTER :: PARENT_LAYOUT
-   type(info),pointer ::i
-   TYPE(INTEGRATION_NODE),POINTER :: T1,T2   ! FIRST AND LAST INTEGRATION_NODE CHILDREN CORRESPOUNDING TO PATCHES
-   TYPE(INTEGRATION_NODE),POINTER :: TM      ! MIDDLE INTEGRATION_NODE
-   INTEGER,POINTER ::pos              ! POSITION IN LAYOUT
+   TYPE (LAYOUT),POINTER :: PARENT_LAYOUT => null()
+   type(info),pointer ::i => null()
+   TYPE(INTEGRATION_NODE),POINTER :: T1 => null(),T2 => null()  ! FIRST AND LAST INTEGRATION_NODE CHILDREN CORRESPOUNDING TO PATCHES
+   TYPE(INTEGRATION_NODE),POINTER :: TM  => null()     ! MIDDLE INTEGRATION_NODE
+   INTEGER,POINTER ::pos  => null()             ! POSITION IN LAYOUT
    ! NEW STUFF....
-   real(dp), POINTER :: BETA0,GAMMA0I,GAMBET,MASS   !,P0C
-   real(dp), POINTER :: CHARGE
-   real(dp), POINTER :: AG  ! spin g-2
+   real(dp), POINTER :: BETA0 => null(),GAMMA0I => null(),GAMBET => null(),MASS  => null()  !,P0C
+   real(dp), POINTER :: CHARGE => null()
+   real(dp), POINTER :: AG  => null()! spin g-2
    ! TO TIE LAYOUTS
-   TYPE (FIBRE),POINTER :: P
-   TYPE (FIBRE),POINTER :: N
-   INTEGER,POINTER :: loc
+   TYPE (FIBRE),POINTER :: P => null()
+   TYPE (FIBRE),POINTER :: N => null()
+   INTEGER,POINTER :: loc => null()
 
 END TYPE FIBRE
 
@@ -350,13 +366,6 @@ TYPE MAD_UNIVERSE             ! THE MOTHER OF ALL STRUCTURES
    TYPE (FIBRE), POINTER :: LAST ! LAST VISITED
 END TYPE MAD_UNIVERSE
 
-TYPE BEAM
-   REAL(DP), POINTER :: X(:,:)
-   LOGICAL(LP), POINTER :: U(:)
-   TYPE(BEAM_LOCATION), POINTER::POS(:)
-   INTEGER, POINTER :: N,LOST
-   REAL(DP), POINTER :: A(:),D(:)
-END TYPE BEAM
 
 TYPE INTEGRATION_NODE
    INTEGER, POINTER :: pos_in_fibre, CAS
@@ -473,3 +482,12 @@ END TYPE fibre_array
   real(dp) :: r_hiromi=10.0,h_hiromi=10.0,kicker_hiromi=0.4d0,angle_hiromi(3)=0.d0
   real(dp) :: ent_hiromi(3,3),x0_hiromi(6),t0_hiromi,dt_hiromi
   type(internal_state) state_hiromi
+
+!!! used by y_lin_beam only
+
+TYPE E_BEAM
+   integer N 
+   type(probe), POINTER :: Z(:)
+END TYPE E_BEAM
+
+type(e_beam), pointer :: my_e_beam =>null()

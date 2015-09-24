@@ -58,39 +58,35 @@ contains
     endif
   end subroutine alloc_all
 
-  subroutine alloc_
-    implicit none
-    integer i
-    allocate(cc(lst))
-    allocate(i_1(lst));allocate(i_2(lst));
-    allocate(ie1(lea));allocate(ie2(lea));allocate(ieo(lea));
-    allocate(ia1(0:lia));allocate(ia2(0:lia));
-    allocate(idano(lda));allocate(idanv(lda));allocate(idapo(lda));
-    allocate(idalm(lda));allocate(idall(lda));
-    allocate(daname(lda));
-    allocate(allvec(lda));
-    do i=1,lst
-       cc(I)=0.0_dp  ! ADDED BY ETIENNE
-       i_1(i)=0
-       i_2(i)=0
-    enddo
-    do i=1,lea
-       ie1(i)=0
-       ie2(i)=0
-       ieo(i)=0
-    enddo
-    do i=0,lia
-       ia1(i)=0
-       ia2(i)=0
-    enddo
-    do i=1,lda
-       idano(i)=0
-       idanv(i)=0
-       idapo(i)=0
-       idalm(i)=0
-       idall(i)=0
-    enddo
-  end subroutine alloc_
+subroutine alloc_
+implicit none
+allocate(cc(lst))
+allocate(i_1(lst));allocate(i_2(lst));
+allocate(ie1(lea));allocate(ie2(lea));allocate(ieo(lea));
+allocate(ia1(0:lia));allocate(ia2(0:lia));
+allocate(idano(lda));allocate(idanv(lda));allocate(idapo(lda));
+allocate(idalm(lda));allocate(idall(lda));
+allocate(daname(lda));
+allocate(allvec(lda));
+
+cc=0.0_dp ! ADDED BY ETIENNE
+i_1=0
+i_2=0
+ie1=0
+ie2=0
+ieo=0
+ia1=0
+ia2=0
+idano=0
+idanv=0
+idapo=0
+idalm=0
+idall=0
+
+end subroutine alloc_
+
+
+
 
 
   subroutine dealloc_all

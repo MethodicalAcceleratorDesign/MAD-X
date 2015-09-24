@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Linux)       +
+  +     MAD-X 5.02.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.05.19 17:03:30      +
+  + Release   date: 2015.09.24               +
+  + Execution date: 2015.09.23 20:45:32      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
@@ -274,6 +274,7 @@ ptc_create_layout,model=2,method=6,nst=10,exact;
           Kinetic Energy : 0.990617E+02
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.999956E+02
+  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy           100.00000000000000     
      method                   6
@@ -313,6 +314,7 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2;
        TIME        =  TRUE 
        FRINGE      =  FALSE
        PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
        ONLY_4D     =  TRUE 
        DELTA       =  TRUE 
        SPIN        =  FALSE
@@ -359,16 +361,16 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2;
    2.596346259e-06                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    0.0002136648478                  0    3.396649284e-06 
+                 0    0.0002136648529                  0    3.396649391e-06 
 
            pycorms             tcorms            ptcorms             xcomax 
                  0                  0                  0    0.0003315824884 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    5.310271543e-06                  0                  0 
+                 0     5.31027193e-06                  0                  0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -0.0001525455854                  0   -6.256318806e-06 
+                 0   -0.0001525456102                  0   -6.256318806e-06 
 
            pycomin             tcomin            ptcomin 
                  0                  0                  0 
@@ -391,13 +393,14 @@ PTC_NORMAL,closed_orbit,maptable,icase=5,no=2;
        TIME        =  TRUE 
        FRINGE      =  FALSE
        PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
        ONLY_4D     =  TRUE 
        DELTA       =  TRUE 
        SPIN        =  FALSE
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    3.2607158925373049E-004   2.5963462592936979E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Closed orbit:    3.2607158926246916E-004   2.5963462593228193E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
 
 
 x_end  = table(map_table,c1_000000,coef);
@@ -419,8 +422,8 @@ print, text="orbit at the end from ptc_normal:";
 orbit at the end from ptc_normal:
 value,x_end,px_end;
 
-x_end =    0.0003260715489 ;
-px_end =    2.596345986e-06 ;
+x_end =    0.0003260715263 ;
+px_end =    2.596345499e-06 ;
 
 
 ptc_end;
@@ -500,6 +503,7 @@ ptc_twiss,icase=5,no=2,initial_matrix_table, file=twiss_ptc_line;
        TIME        =  TRUE 
        FRINGE      =  FALSE
        PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
        ONLY_4D     =  TRUE 
        DELTA       =  TRUE 
        SPIN        =  FALSE
@@ -541,22 +545,22 @@ ptc_twiss,icase=5,no=2,initial_matrix_table, file=twiss_ptc_line;
      -0.0296661037      0.02965905227                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    0.0003260715489 
+                 0                  0                  0    0.0003260715263 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.596345986e-06                  0                  0                  0 
+   2.596345499e-06                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    0.0002136648624                  0    3.396649557e-06 
+                 0    0.0002136648272                  0    3.396648862e-06 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    0.0003315825475 
+                 0                  0                  0    0.0003315824999 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    5.310271716e-06                  0                  0 
+                 0    5.310270527e-06                  0                  0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -0.0001525455658                  0   -6.256319471e-06 
+                 0   -0.0001525455168                  0   -6.256318522e-06 
 
            pycomin             tcomin            ptcomin 
                  0                  0                  0 
@@ -579,6 +583,7 @@ ptc_twiss,icase=5,no=2,initial_matrix_table, file=twiss_ptc_line.orbit0, ignore_
        TIME        =  TRUE 
        FRINGE      =  FALSE
        PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
        ONLY_4D     =  TRUE 
        DELTA       =  TRUE 
        SPIN        =  FALSE
@@ -653,5 +658,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

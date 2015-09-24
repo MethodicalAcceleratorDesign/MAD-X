@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Linux)       +
+  +     MAD-X 5.02.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.05.19 17:03:19      +
+  + Release   date: 2015.09.24               +
+  + Execution date: 2015.09.23 20:59:17      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS ';
 
@@ -78,6 +78,7 @@ parameter: energy   double value:                100
           Kinetic Energy : 0.990617E+02
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.999956E+02
+  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy           100.00000000000000     
      method                   6
@@ -105,6 +106,7 @@ parameter: energy   double value:                100
        TIME        =  TRUE 
        FRINGE      =  FALSE
        PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
        ONLY_4D     =  TRUE 
        DELTA       =  TRUE 
        SPIN        =  FALSE
@@ -145,10 +147,10 @@ parameter: energy   double value:                100
     -0.02964638027      0.02964631228                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    8.892828933e-05 
+                 0                  0                  0    8.892828935e-05 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   7.277292573e-07                  0                  0                  0 
+   7.277292575e-07                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
                  0    7.160124621e-05                  0    8.586224592e-07 
@@ -157,10 +159,10 @@ parameter: energy   double value:                100
                  0                  0                  0     8.89284238e-05 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    7.281201483e-07                  0                  0 
+                 0     7.28120148e-07                  0                  0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0      5.2188044e-05                  0   -1.674875719e-06 
+                 0    5.218804399e-05                  0   -1.674875719e-06 
 
            pycomin             tcomin            ptcomin 
                  0                  0                  0 
@@ -179,17 +181,18 @@ parameter: energy   double value:                100
        TIME        =  TRUE 
        FRINGE      =  FALSE
        PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
        ONLY_4D     =  TRUE 
        DELTA       =  TRUE 
        SPIN        =  FALSE
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    8.8928289333262345E-005   7.2772925727354185E-007   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Closed orbit:    8.8928289351356365E-005   7.2772925748185414E-007   0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Normal Form Type 1
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

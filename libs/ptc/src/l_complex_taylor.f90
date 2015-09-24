@@ -2630,9 +2630,10 @@ contains
     temp%r=s1
     a0=abs(temp%r)
     if(a0>1.0_dp) then
+       dasintt%i=0
        check_stable=.false.
        stable_da=.false.
-       messagelost= "l_complex_taylor.f90 dasintt : x>1 Not defined in dasintt of complex_taylor "
+       messagelost= " Not defined in dasintt of complex_taylor "
     endif
 
     temp=asin(temp)
@@ -2682,9 +2683,10 @@ contains
 
     a0=abs(s1)
     if(a0>1.0_dp) then
+       dacostt%i=0
        check_stable=.false.
        stable_da=.false.
-       messagelost= "l_complex_taylor.f90 dacostt : Not defined in dacostt of complex_taylor "
+       messagelost= " Not defined in dacostt of complex_taylor "
     endif
 
     !   if(debug_flag) then

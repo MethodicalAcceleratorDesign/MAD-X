@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.06  (64 bit, Linux)       +
+  +     MAD-X 5.02.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.06.26               +
-  + Execution date: 2015.09.16 13:48:12      +
+  + Release   date: 2015.09.24               +
+  + Execution date: 2015.09.23 20:53:23      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8
 
@@ -692,6 +692,7 @@ PTC_CREATE_LAYOUT,model=2,method=6,nst=1;
           Kinetic Energy : 0.449062E+03
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.449999E+03
+  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy           450.00000000000000     
      method                   6
@@ -728,6 +729,7 @@ ptc_twiss,closed_orbit,icase=6,file="twiss_lhc",summary_file="summaryMomentumCom
        TIME        =  TRUE 
        FRINGE      =  FALSE
        PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
        ONLY_4D     =  FALSE
        DELTA       =  FALSE
        SPIN        =  FALSE
@@ -810,6 +812,7 @@ ptc_normal,closed_orbit,normal,icase=5,no=2;
        TIME        =  TRUE 
        FRINGE      =  FALSE
        PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
        ONLY_4D     =  TRUE 
        DELTA       =  TRUE 
        SPIN        =  FALSE

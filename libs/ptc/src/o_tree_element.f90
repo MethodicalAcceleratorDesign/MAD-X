@@ -19,7 +19,7 @@ module tree_element_MODULE
   private EQUAL_IDENTITY_SPINOR_8_r3 ,EQUAL_SPINOR_SPINOR8,exp_spinor_8
   private INTO_RES_SPIN8_eq,INTO_SPIN8_from_RES_eq,ALLOC_rf_phasor_8,KILL_rf_phasor_8
 
-  private find_ar
+  private find_ar,find_ap_mix
   private find_ap,PRINT_spinor_8,dot_spinor_8,dot_spinor,print_res_spinor_8
   private  find_n_thetar,find_n_thetap,read_spinor_8
   !  private smatp,smatmulp
@@ -34,8 +34,8 @@ module tree_element_MODULE
   private check_fix,test_jc,A_OPT_damap,K_OPT_damap,factor_am,factor_as,concatxp
   private find_axisp,spin8_scal8_map,add_spin8_spin8,sub_spin8_spin8,mul_spin8_spin8
   private find_perp_basisp,find_exponentp
-  private alloc_res_SPINOR_8,KILL_res_SPINOR_8,full_abst,EQUAL_RF8_RF8,extract_envelope_probe8
-  PRIVATE EQUAL_RF8_RF,EQUAL_RF_RF8,print_rf_phasor_8,concat_envelope,extract_envelope_damap
+  private alloc_res_SPINOR_8,KILL_res_SPINOR_8,full_abst,EQUAL_RF8_RF8 !,extract_envelope_probe8
+  PRIVATE EQUAL_RF8_RF,EQUAL_RF_RF8,print_rf_phasor_8,concat_envelope !,extract_envelope_damap
   private EQUAL_DAMAP_RAY8,spimat_spinmat,EQUAL_damapspin_smat,EQUAL_smat_damapspin
   private flip,dlie,dphase,phase_shift  ! flip in lielib
   integer, target :: spin_extra_tpsa = 0 ,n0_normal= 2
@@ -43,11 +43,11 @@ module tree_element_MODULE
   logical(lp) :: force_positive=.false.
   logical(lp) :: use_ptc_ac_position=.false.
   integer, private :: nd_used,i_phase,i_plane, decal
-  logical :: onelie = my_false
+  logical :: onelie = my_false, phase_nonlinear=my_true
   logical :: firstfac=.true.
   integer, private, parameter :: nfac=20
   real(dp), private :: fac(0:nfac)
-
+  private copy_damap_matrix,copy_matrix_matrix,invert_22 ,matmul_33
   INTERFACE assignment (=)
      !
      MODULE PROCEDURE REAL_8REAL6
@@ -124,10 +124,10 @@ module tree_element_MODULE
      MODULE PROCEDURE sub_spin8_spin8
   END  INTERFACE
 
-  INTERFACE extract_beam_sizes   !
-     MODULE PROCEDURE extract_envelope_damap  !
-     MODULE PROCEDURE extract_envelope_probe8  !
-  END INTERFACE
+ ! INTERFACE extract_beam_sizes   !
+ !    MODULE PROCEDURE extract_envelope_damap  !
+ !    MODULE PROCEDURE extract_envelope_probe8  !
+ ! END INTERFACE
 
   INTERFACE exp   !  damapspin = exp(spinor_8)
      MODULE PROCEDURE exp_spinor_8  !
@@ -156,6 +156,7 @@ module tree_element_MODULE
 
   INTERFACE find_a    ! (n(3),a(3,3))  if you have n you get a(3,3)
      MODULE PROCEDURE find_ar  ! such that ai.s.a = exp(theta L_y)
+     MODULE PROCEDURE find_ap_mix
      MODULE PROCEDURE find_ap
   END INTERFACE
 
@@ -342,8 +343,11 @@ CONTAINS
     do i=nd2+1,ndd
        localmaster=master
        call ass(daddsco(i))
-       if(nd2==4.and.(c_%npara==5.or.c_%npara==8).and.i==5) then
-          daddsco(i)=s2(i)+(1.0_dp.mono.'00001')
+       if(nd2<=4.and.(c_%npara==3.or.c_%npara==5.or.c_%npara==8).and.i==5+ndpt_bmad) then
+          If(ndpt_bmad==0) then
+           if(nd2==4) daddsco(i)=s2(i)+(1.0_dp.mono.'00001')
+           if(nd2==2) daddsco(i)=s2(i)+(1.0_dp.mono.'001')
+          endif
        else
           daddsco(i)=s2(i)
        endif
@@ -370,14 +374,14 @@ CONTAINS
     do i=nd2+1,ndd
        localmaster=master
        call ass(scdaddo(i))
-       if(nd2==4.and.(c_%npara==5.or.c_%npara==8).and.i==5) then
-          scdaddo(i)=s2(i)+(1.0_dp.mono.'00001')
+       if(nd2<=4.and.(c_%npara==3.or.c_%npara==5.or.c_%npara==8).and.i==5+ndpt_bmad) then
+         if(nd2==4)  scdaddo(i)=s2(i)+(1.0_dp.mono.'00001')
+         if(nd2==2)  scdaddo(i)=s2(i)+(1.0_dp.mono.'001')
        else
           scdaddo(i)=s2(i)
        endif
        master=localmaster
     enddo
-
 
   END FUNCTION scdaddo
 
@@ -712,7 +716,6 @@ CONTAINS
        if(abs(xi(1))>c_%absolute_aperture.or.abs(xi(3))>c_%absolute_aperture) then
           c_%CHECK_STABLE=.FALSE.
           xlost=xi
-          messagelost="o_tree_element.f90 track_tree : aperture exeeded"
        endif
     enddo
 
@@ -968,7 +971,9 @@ CONTAINS
 
     do i=1,3
        do j=1,3
+
           CUTORDER%s%s(i,j)=s1%s%s(i,j).cut.(s2-1)
+
        enddo
     enddo
 
@@ -1308,6 +1313,9 @@ CONTAINS
        R%S(2)=2
        R%S(3)=3
     ELSEif(s==0) then
+       R%S(1)=0
+       R%S(2)=0
+       R%S(3)=0
     else
        STOP 100
     ENDIF
@@ -1411,8 +1419,9 @@ CONTAINS
     implicit none
     TYPE(probe_8), INTENT(IN) :: R
     TYPE(damapspin), INTENT(INOUT) :: DS
-    real(dp) s(3,3)
+    real(dp) m(6,6)
     INTEGER I,J,nd2t
+    logical(lp) rad_in
 
     nd2t=C_%ND2
     if(doing_ac_modulation_in_ptc) then
@@ -1436,7 +1445,13 @@ CONTAINS
     !          DS%S(I,1)=R%SX%X(I)
     !          DS%S(I,2)=R%SY%X(I)
     !          DS%S(I,3)=R%SZ%X(I)
-    ds%e_ij=r%e_ij
+    call check_rad(r%e_ij,rad_in)
+    ds%e_ij=0.0_dp
+    if(rad_in) then
+       m=ds%m
+       ds%e_ij=matmul(matmul(m,r%e_ij),transpose(m))
+    endif
+!    ds%e_ij=r%e_ij
 
     !  DO I=1,3
     !    !     n(i)=R%S(0)%X(I)
@@ -1460,6 +1475,8 @@ CONTAINS
     implicit none
     TYPE(probe_8), INTENT(INOUT) :: R
     TYPE(damapspin), INTENT(IN) :: DS
+    real(dp) m(6,6)
+    logical(lp) rad_in
     INTEGER I,J
 
     !  if(C_%ND2/=6) then
@@ -1479,8 +1496,13 @@ CONTAINS
           R%S(J)%X(I)=DS%S%s(I,J)                  ! taylor MORPH(DS%S(I,J))
        ENDDO
     ENDDO
-
-    r%e_ij=ds%e_ij
+    call check_rad(ds%e_ij,rad_in)
+        r%e_ij=0.0_dp
+    if(rad_in) then
+       m=ds%m**(-1)
+       r%e_ij=matmul(matmul(m,ds%e_ij),transpose(m))
+    endif
+  !  r%e_ij=ds%e_ij
 
 
 
@@ -1538,6 +1560,7 @@ CONTAINS
        nd2t=6
     else
        write(6,*) " internal PTC error in scdadd o_tree_element.f90 "
+       read(5,*) 
        stop 666
     endif
 
@@ -1553,7 +1576,8 @@ CONTAINS
     do i=nd2t+1,6
        localmaster=master
        call ass(scdadd%x(i))
-       if((c_%npara==5+dc).AND.I==5) then   ! npr
+       if(((c_%npara==5+dc).AND.I==5+ndpt_bmad).or.((c_%npara==3+dc).AND.I==5+ndpt_bmad)) then   ! npr
+!       if((c_%npara==5+dc).AND.I==5) then   ! npr
           scdadd%x(i)=s2%x(i)+(1.0_dp.mono.c_%npara)
        else
           scdadd%x(i)=s2%x(i)
@@ -1565,12 +1589,12 @@ CONTAINS
     localmaster=master
     call ass(scdadd%AC%x(1))
     !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
-    scdadd%ac%x(1)=s1%M%V(C_%ND2-1) +s2%AC%x(1)
+    scdadd%ac%x(1)=s1%M%V(C_%ND2-1) +addclock*s2%AC%x(1)
     master=localmaster
     localmaster=master
     call ass(scdadd%AC%x(2))
     !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
-    scdadd%ac%x(2)=s1%M%V(C_%ND2) +s2%AC%x(2)
+    scdadd%ac%x(2)=s1%M%V(C_%ND2) +addclock*s2%AC%x(2)
     master=localmaster
     localmaster=master
     call ass(scdadd%AC%om)
@@ -1624,6 +1648,7 @@ CONTAINS
        nd2t=6
     else
        write(6,*) " internal PTC error in daddsc o_tree_element.f90 "
+       read(5,*) 
        stop 666
     endif
 
@@ -1639,7 +1664,8 @@ CONTAINS
     do i=nd2t+1,6
        localmaster=master
        call ass(daddsc%x(i))
-       if((c_%npara==5+dc).AND.I==5) then   ! npr
+       if(((c_%npara==5+dc).AND.I==5+ndpt_bmad).or.((c_%npara==3+dc).AND.I==5+ndpt_bmad)) then   ! npr
+!       if((c_%npara==5+dc).AND.I==5) then   ! npr
           daddsc%x(i)=s2%x(i)+(1.0_dp.mono.c_%npara)
        else
           daddsc%x(i)=s2%x(i)
@@ -1651,12 +1677,12 @@ CONTAINS
     localmaster=master
     call ass(daddsc%AC%x(1))
     !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
-    daddsc%ac%x(1)=s1%M%V(C_%ND2-1) +s2%AC%x(1)
+    daddsc%ac%x(1)=s1%M%V(C_%ND2-1) +addclock*s2%AC%x(1)
     master=localmaster
     localmaster=master
     call ass(daddsc%AC%x(2))
     !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
-    daddsc%ac%x(2)=s1%M%V(C_%ND2) +s2%AC%x(2)
+    daddsc%ac%x(2)=s1%M%V(C_%ND2) +addclock*s2%AC%x(2)
     master=localmaster
     localmaster=master
     call ass(daddsc%AC%om)
@@ -1770,7 +1796,7 @@ CONTAINS
 
        do i=1,6
           do j=1,6
-             write(6,*) i,j,ds%e_ij(i,j)
+             write(mf,*) i,j,ds%e_ij(i,j)
           enddo
        enddo
     else
@@ -1792,7 +1818,7 @@ CONTAINS
     TYPE(rf_phasor_8), INTENT(INOUT) :: s
     INTEGER MF,I
 
-    write(mf,*) ' AC INFORMATION '
+    write(mf,*) ' AC INFORMATION : omega, pseudo-time, hands of the clock'
     call print(s%om,mf)
     call print(s%t,mf)
     do i=1,2
@@ -1817,7 +1843,7 @@ CONTAINS
   subroutine print_res_spinor_8(S,MF)
     implicit none
     TYPE(res_spinor_8), INTENT(INOUT) :: s
-    INTEGER MF,I
+    INTEGER MF 
 
   !  do i=1,3
        write(mf,*) ' ' 
@@ -2175,10 +2201,12 @@ CONTAINS
   subroutine find_perp_basisp(y_axis,x_axis,z_axis)  !
     implicit none
     type(spinor_8),intent(inout) :: y_axis,x_axis,z_axis
-    integer i,is
+    type(spinor_8) junk_axis
+    integer is
     type(real_8) norm
 
     call alloc(norm)
+    call alloc(junk_axis)
 
     is=1
     if(abs(y_axis%x(is))>abs(y_axis%x(2))) then
@@ -2191,8 +2219,14 @@ CONTAINS
     !  now is = smallest
 
     x_axis=is
+    
+    norm=x_axis.dot.y_axis
 
-    x_axis=x_axis-(x_axis.dot.y_axis)*y_axis
+    junk_axis=norm*y_axis 
+       
+    x_axis=x_axis-junk_axis
+
+   ! x_axis=x_axis-(x_axis.dot.y_axis)*y_axis
 
     norm=sqrt(x_axis.dot.x_axis)
     x_axis=(1.d0/norm)*x_axis
@@ -2204,7 +2238,8 @@ CONTAINS
     z_axis=(1.d0/norm)*z_axis
 
 
-
+ 
+    call kill(junk_axis)
     call kill(norm)
 
   end subroutine find_perp_basisp
@@ -2255,6 +2290,7 @@ CONTAINS
 
     if(i>nmax-2) then
        write(6,*) "Did not converge in find_exponent_jet_p"
+       read(5,*) 
        stop 666
     endif
 
@@ -2358,7 +2394,7 @@ CONTAINS
     type(taylor) t
     integer i,j
     integer  nmax
-    real(dp) c,eps,norm1,norm2
+    real(dp)  eps,norm1,norm2
     logical check
 !!!  original as_xyz = as_xyz*r_y = a_y*a_nl*r_y  on exit
     check=.true.
@@ -2433,7 +2469,7 @@ CONTAINS
     type(taylor) t
     integer i,j
     integer  nmax
-    real(dp) c,eps,norm1,norm2
+    real(dp) eps,norm1,norm2
     logical check
 !!!  original as_xyz = as_xyz*r_y = a_y*a_nl*r_y  on exit
     check=.true.
@@ -2615,10 +2651,11 @@ CONTAINS
   ! end of  find exponent of rotation routines
 
 
-  subroutine find_ar(n2,a)
+  subroutine find_ar(n2,a,ang)
     implicit none
-    real(dp)  n2(3),n1(3),n3(3)
-    real(dp) a(3,3),s,n
+    real(dp)  n2(3),n1(3),n3(3),n1p(3),n3p(3)
+    real(dp) a(3,3),s,n,al
+    real(dp) , optional :: ang
     integer i,is
 
     ! here we find smallest value of n2
@@ -2654,8 +2691,21 @@ CONTAINS
     enddo
     n3=n3/sqrt(n)
     ! spin_normal_position
+    n1p=0
+    n3p=0
+    if(present(ang)) al=ang
+    do i=1,3
+     n1p(i)=cos(al)*n1(i)+sin(al)*n3(i)
+     n3p(i)=cos(al)*n3(i)-sin(al)*n1(i)
+    enddo
+    do i=1,3     
+     n1(i)=n1p(i)
+     n3(i)=n3p(i)
+    enddo
 
     !    a=zero
+
+
     if(spin_normal_position==2) then
        a(:,1)=n1
        a(:,2)=n2
@@ -2673,16 +2723,20 @@ CONTAINS
 
   end subroutine find_ar
 
-  subroutine find_ap(n2,a)
+  subroutine find_ap_mix(n2i,ma,al,n0,m,l)
     implicit none
-    type(real_8)  n2(3),n1(3),n3(3)
-    type(real_8)  a(3,3),s,n
-    real(dp) aa(3,3)
-    integer j
+    type(spinor) n2i
+     real(dp)  n2(3),n1(3),n3(3),n1p(3),n3p(3),n,s
+    type(damapspin) ma
+    real(dp), optional :: n0(3),m(3),l(3)
+    real(dp) al
+
     integer i,is
-    call alloc(n1,3)
-    call alloc(n3,3)
-    call alloc(s,n)
+
+
+    do i=1,3
+     n2(i)=n2i%x(i)
+    enddo
     ! here we find smallest value of n2
     is=2
     if(abs(n2(1))< abs(n2(2))) is=1
@@ -2722,6 +2776,118 @@ CONTAINS
        n3(i)=n3(i)/sqrt(n)
     enddo
 
+    n1p=0
+    n3p=0
+
+    do i=1,3
+     n1p(i)=cos(al)*n1(i)+sin(al)*n3(i)
+     n3p(i)=cos(al)*n3(i)-sin(al)*n1(i)
+    enddo
+    do i=1,3     
+     n1(i)=n1p(i)
+     n3(i)=n3p(i)
+    enddo
+
+    if(spin_normal_position==2) then
+       do i=1,3
+          ma%s%s(i,1)=n1(i)
+          ma%s%s(i,2)=n2(i)
+          ma%s%s(i,3)=n3(i)
+       enddo
+    elseif(spin_normal_position==3) then
+       do i=1,3
+          ma%s%s(i,2)=n1(i)
+          ma%s%s(i,3)=n2(i)
+          ma%s%s(i,1)=n3(i)
+       enddo
+    else
+       do i=1,3
+          ma%s%s(i,3)=n1(i)
+          ma%s%s(i,1)=n2(i)
+          ma%s%s(i,2)=n3(i)
+       enddo
+    endif
+
+     if(present(n0)) then
+
+       do i=1,3
+        n0(i)=n2(i)
+        m(i)=n3(i)
+        l(i)=n1(i)
+       enddo
+    endif
+
+
+  end subroutine find_ap_mix
+
+  subroutine find_ap(n2,a,ang)
+    implicit none
+    type(real_8)  n2(3),n1(3),n3(3),n1p(3),n3p(3)
+    type(real_8)  a(3,3),s,n
+    real(dp),optional :: ang
+    real(dp) al
+
+    integer i,is
+
+    call alloc(n1,3)
+    call alloc(n3,3)
+    call alloc(n1p,3)
+    call alloc(n3p,3)
+    call alloc(s,n)
+    ! here we find smallest value of n2
+    is=2
+    if(abs(n2(1))< abs(n2(2))) is=1
+
+    if(is==1) then
+       if(abs(n2(3))<abs(n2(1))) is=3
+    else
+       if(abs(n2(3))<abs(n2(2))) is=3
+    endif
+
+    !  put n1 in along that value
+    do i=1,3
+       n1(i)=0.0_dp
+    enddo
+    n1(is)=1.0_dp
+
+    s=n2(is)*n1(is)
+
+    n=0.0_dp
+    do i=1,3
+       n1(i)=n1(i)-s*n2(i)
+       n=n1(i)**2+n
+    enddo
+    do i=1,3
+       n1(i)=n1(i)/sqrt(n)
+    enddo
+
+    n3(1)=n1(2)*n2(3)-n1(3)*n2(2)
+    n3(2)=n1(3)*n2(1)-n1(1)*n2(3)
+    n3(3)=n1(1)*n2(2)-n1(2)*n2(1)
+
+    n=0.0_dp
+    do i=1,3
+       n=n3(i)**2+n
+    enddo
+    do i=1,3
+       n3(i)=n3(i)/sqrt(n)
+    enddo
+    do i=1,3
+     n1p(i)=0
+     n3p(i)=0
+    enddo
+   
+    if(present(ang)) al=ang
+    do i=1,3
+     n1p(i)=cos(al)*n1(i)+sin(al)*n3(i)
+     n3p(i)=cos(al)*n3(i)-sin(al)*n1(i)
+    enddo
+    do i=1,3     
+     n1(i)=n1p(i)
+     n3(i)=n3p(i)
+    enddo
+
+
     if(spin_normal_position==2) then
        do i=1,3
           a(i,1)=n1(i)
@@ -2744,10 +2910,11 @@ CONTAINS
 
 
     call kill(n1,3)
+    call kill(n1p,3)
     call kill(n3,3)
+    call kill(n3p,3)
     call kill(s,n)
   end subroutine find_ap
-
 
 
   subroutine copy_damap_matrix(mi,a)
@@ -3520,7 +3687,10 @@ CONTAINS
     TYPE (damapspin) S11
     INTEGER I,R22
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+      POWMAP%m%v%i=0
+     RETURN
+    endif
     localmaster=master
 
 
@@ -3673,53 +3843,59 @@ CONTAINS
     s1mi=0.0_dp
     e=0.0_dp
 
-    s1mi=(s1%m.sub.1)**(-1)
+  !  s1mi=(s1%m.sub.1)**(-1) ! old way as in PTC
 
-    e(1:c_%nd2,1:c_%nd2)=s2%e_ij
-    e=matmul(matmul(s1mi,e),transpose(s1mi))
+  !  e(1:c_%nd2,1:c_%nd2)=s2%e_ij
+  !  e=matmul(matmul(s1mi,e),transpose(s1mi))
+  ! s3%e_ij=e(1:c_%nd2,1:c_%nd2)+s1%e_ij
 
-    s3%e_ij=e(1:c_%nd2,1:c_%nd2)+s1%e_ij
+      s1mi= s2%m.sub.1 
+
+     e(1:c_%nd2,1:c_%nd2)=s1%e_ij
+     e=matmul(matmul(s1mi,e),transpose(s1mi))
+
+     s3%e_ij=e(1:c_%nd2,1:c_%nd2)+s2%e_ij
 
   end subroutine concat_envelope
 
-  subroutine extract_envelope_damap(S1,E0_ij,E_ij)
-    implicit none
-    TYPE (damapspin), INTENT (IN) :: S1
-    real(dp), INTENT (in) :: E0_ij(6,6)
-    real(dp), INTENT (out) :: E_ij(6,6)
-    real(dp) s1m(ndim2,ndim2)
-    real(dp) e(ndim2,ndim2)
+ ! subroutine extract_envelope_damap(S1,E0_ij,E_ij)
+ !   implicit none
+ !   TYPE (damapspin), INTENT (IN) :: S1
+ !   real(dp), INTENT (in) :: E0_ij(6,6)
+ !   real(dp), INTENT (out) :: E_ij(6,6)
+ !   real(dp) s1m(ndim2,ndim2)
+ !   real(dp) e(ndim2,ndim2)
 
-    s1m=0.0_dp
-    e=0.0_dp
-
-
-    s1m=s1%m.sub.1
+!    s1m=0.0_dp
+!    e=0.0_dp
 
 
-    e(1:c_%nd2,1:c_%nd2)=s1%e_ij+E0_ij
-    e=matmul(matmul(s1m,e),transpose(s1m))
+ !   s1m=s1%m.sub.1
 
-    E_ij=e(1:c_%nd2,1:c_%nd2)
 
-  end subroutine extract_envelope_damap
+  !  e(1:c_%nd2,1:c_%nd2)=s1%e_ij+E0_ij
+  !  e=matmul(matmul(s1m,e),transpose(s1m))
 
-  subroutine extract_envelope_probe8(p,E0_ij,E_ij)
-    implicit none
-    TYPE (probe_8), INTENT (IN) :: p
-    TYPE (damapspin)  S1
-    real(dp), INTENT (in) :: E0_ij(6,6)
-    real(dp), INTENT (out) :: E_ij(6,6)
-    real(dp) s1m(ndim2,ndim2)
-    real(dp) e(ndim2,ndim2)
+  !  E_ij=e(1:c_%nd2,1:c_%nd2)
 
-    call alloc(s1)
-    s1=p
+  !end subroutine extract_envelope_damap
 
-    call extract_envelope_damap(s1,E0_ij,E_ij)
+ ! subroutine extract_envelope_probe8(p,E0_ij,E_ij)
+ !   implicit none
+ !   TYPE (probe_8), INTENT (IN) :: p
+ !   TYPE (damapspin)  S1
+ !   real(dp), INTENT (in) :: E0_ij(6,6)
+ !   real(dp), INTENT (out) :: E_ij(6,6)
+ !   real(dp) s1m(ndim2,ndim2)
+ !   real(dp) e(ndim2,ndim2)
 
-    call kill(s1)
-  end subroutine extract_envelope_probe8
+ !   call alloc(s1)
+ !   s1=p
+
+!    call extract_envelope_damap(s1,E0_ij,E_ij)
+
+!    call kill(s1)
+!  end subroutine extract_envelope_probe8
 
 
   FUNCTION cmul(S2,S1)   ! multiply spin part with real(dp) s1
@@ -3952,7 +4128,7 @@ CONTAINS
     implicit none
     type(spinor_8) mul_spin8_spin8
     type(spinor_8), INTENT (IN) :: S1,S2
-    integer i
+ 
     integer localmaster
 
     IF(.NOT.C_%STABLE_DA) RETURN
@@ -4188,11 +4364,10 @@ CONTAINS
     type(damapspin)s ,a ,ai
     type(taylor) nn
     type(real_8) a11,a13
-    integer i,j,jj(lnv)
-    real(dp) ss(3,3)
+
+ 
 !!!!!!!!!!   wrapping for radiation  !!!!!!!!!!!!!!!!!!!
-    type(radtaylor) ys(ndim2)
-    type(beamenvelope) env
+ 
 
 
     call alloc(a1i)
@@ -4220,37 +4395,8 @@ CONTAINS
 !!!!!!!!!!   later to be change changed  !!!!!!!!!!!!!!!
     call check_rad(ds%e_ij,rad_in)
     if(rad_in) then
-       if(c_%no==1) then
           call normalize_envelope(ns,DS)
           Write(6,*) "New envelope calculation attempted with NO=1 "
-       else
-          call alloc(ys,6)
-          call alloc(env)
-          jj=0
-          do i=1,6
-             ys(i)%v=ds%m%v(i)
-             do j=1,6
-                ys(i)%e(j)=ds%e_ij(i,j)
-             enddo
-          enddo
-          env%stochastic=ns%stochastic
-          env%auto=ns%auto
-          env=ys
-
-          ns%s_ij0      =  env%s_ij0
-          ns%emittance  =  env%emittance
-          ns%KICK       =  env%KICK
-          do i=1,6
-             do j=1,6
-                jj(j)=1
-                ns%STOCH(i,j)  =  env%STOCH%v(i).sub.jj
-                jj(j)=0
-             enddo
-          enddo
-
-          call kill(env)
-          call kill(ys,6)
-       endif
     endif
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     s=1
@@ -4315,14 +4461,14 @@ CONTAINS
     implicit none
     type(normal_spin) norm_spin
     type(damapspin) m_spin
-    type(normalform) norm
-    type(damap) m
-    integer i,j,i1,i2
+ 
+ 
+    integer i,j
     real(dp) a(6,6),ai(6,6),ait(6,6),mat(6,6), sigma_inf(6,6),at(6,6),br(6,6)
     complex(dp) c(6,6),ci(6,6),cit(6,6), b(6,6),ct(6,6)
-    complex(dp) coef,ba(6,6),b_phasor(6,6)
+    complex(dp) ba(6,6),b_phasor(6,6)
     complex(dp) R(6,6),r_phasor(6,6), sigma_inf_phasor(6,6)
-    real(dp) xj(6,6),mj(6,6),xn,jb(6,6),bs(6,6)
+    real(dp) xj(6,6),bs(6,6)
 
     b=m_spin%e_ij
     bs=m_spin%e_ij
@@ -4363,7 +4509,8 @@ CONTAINS
 
     do i=1,6
        do j=1,6
-          sigma_inf_phasor(i,j)= r_phasor(i,i)*r_phasor(j,j)/(1.0_dp-r_phasor(i,i)*r_phasor(j,j))*b_phasor(i,j)
+!          sigma_inf_phasor(i,j)= r_phasor(i,i)*r_phasor(j,j)/(1.0_dp-r_phasor(i,i)*r_phasor(j,j))*b_phasor(i,j) ! old ptc order
+          sigma_inf_phasor(i,j)= 1.0_dp/(1.0_dp-r_phasor(i,i)*r_phasor(j,j))*b_phasor(i,j)
        enddo
     enddo
     do i=1,3
@@ -4565,7 +4712,7 @@ CONTAINS
     TYPE(complextaylor) omr(3),omc(3)
     integer N,i,nd,j
     integer, allocatable :: jc(:)
-    real(dp) value,ang,tune(4)
+    real(dp) value,ang 
     complex(dp) denom
     logical doit,doflip
 
@@ -4886,19 +5033,27 @@ CONTAINS
     logical(lp), INTENT(INout) :: spin_in
     TYPE(damapspin), INTENT(IN) :: DS
     integer i,j
-    real(dp) norm
+    real(dp) norm,normd
 
     spin_in=.true.
     norm=0.0_dp
     do i=1,3
-       do j=1,3
-          norm=norm+full_abs(DS%s%s(i,j))
-       enddo
+    !   do j=1,3
+          norm=norm+full_abs(DS%s%s(i,i))
+    !   enddo
     enddo
     norm=abs(norm-3.0_dp)
 
-    if(norm<=eps_tpsalie) then
-       write(6,*) " Spin Map is identity : not normalized "
+
+    normd=0.0_dp
+    do i=1,3
+       do j=1,3
+      if(i/=j)      normd=normd+full_abs(DS%s%s(i,j))
+       enddo
+    enddo
+
+    if(norm<=eps_tpsalie.and.normd<=eps_tpsalie) then
+       if(lielib_print(12)/=0) write(6,*) " Spin Map is identity : not normalized "
        spin_in=.false.
     endif
 
@@ -5353,7 +5508,7 @@ CONTAINS
        dr=s1i
        !       a_t_cs= a_f*a_l_cs* a_nl     ! a_nl is not yet " standard "
 !!!!!   nonlinear part if s1i !!!!!!
-       if(c_%no>1.and.courant_snyder) then
+       if(c_%no>1.and.courant_snyder.and.phase_nonlinear) then
           if(onelie) then
              nd_used=c_%nd2/2
              if(c_%ndpt/=0) nd_used=nd_used-1
@@ -5646,13 +5801,13 @@ CONTAINS
   subroutine factor_am_special(a_t,a_f,a_l,a_nl,DR)
     implicit none
     TYPE(damap), INTENT(INout) :: a_t,a_nl,a_l,a_f
-    integer i,n,k,nt,j
+    integer  i,n,k,nt 
     integer, allocatable :: jc(:)
-    real(dp) value,alpha0
+    real(dp) value
     logical doit
     TYPE(damap) atemp,s1,s1i,m1
     TYPE(taylor)a12,a11,p(ndim)
-    logical(lp) doflip,dote,lagrange0
+    logical(lp) doflip,lagrange0
     TYPE(damap), optional, intent(inout) ::DR
  !   type(taylor) m(ndim2,ndim2)
  !   type(taylor) at(2,2),bt(2,2),ct(2,2),dt(2,2),ati(2,2),bti(2,2),alpha,det
@@ -6207,7 +6362,6 @@ CONTAINS
     real(dp) value,valuexp
     integer, allocatable :: jc(:)
     logical(lp), optional :: use_J
-    logical usej
     integer i,n,j,it,nd,iu
     logical doflip,uj
 
@@ -6354,7 +6508,7 @@ CONTAINS
  integer function mul_fac(ju)
     implicit none
     integer ju(:),nv
-    integer i,k,no
+    integer i,k 
     
     mul_fac=1.0_dp
     if(firstfac) then

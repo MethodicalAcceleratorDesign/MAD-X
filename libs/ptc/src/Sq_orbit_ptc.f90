@@ -495,9 +495,7 @@ contains
        if(.not.CHECK_STABLE) then
           CALL RESET_APERTURE_FLAG
           u=my_true
-! EB - comment by Elena Benedetto - Only the 4 transverse coordinates are multiplied by xbig, 
-! to avoid loosing the information on the phase (when the mod 2pi is taken)
-         ! x(1)=XBIG
+ !         x(1)=XBIG
           x(1:4) =x(1:4)*XBIG
           if(wherelost==1) then
              t%lost=t%lost+1
@@ -567,7 +565,7 @@ contains
     freqs=1.e38_dp
     werk=0
     travail=0
-    t0=x_orbit_sync(6) ! read from the initial_settings file and multiplied by clight
+    t0=x_orbit_sync(6)
     if(present(t)) t0=t
     if(fill_patch) then
        write(6,*) " filling patches with t= x0 from main program "
@@ -599,23 +597,12 @@ contains
     enddo
     if(freqs/=0.and.found) then
        my_ORBIT_LATTICE%ORBIT_OMEGA=twopi*freqs/CLIGHT
-
-! EB  beginning - added by Elena Benedetto - to have correct energy already at the beginning
-       my_ORBIT_LATTICE%ORBIT_P0C=werk%P0C
-       my_ORBIT_LATTICE%ORBIT_kinetic=werk%kinetic
-       my_ORBIT_LATTICE%orbit_beta0=werk%beta0
-       my_ORBIT_LATTICE%orbit_brho=werk%brho
-       my_ORBIT_LATTICE%orbit_energy=werk%energy
-       my_ORBIT_LATTICE%orbit_gamma=1.0_dp/werk%gamma0i
-! EB end - added by Elena Benedetto
-
     else
        write(6,*) " cavity with frequency problems ", freqs,found
        stop
     endif
     write(6,*) "Final Frequency of First Cavity", paccfirst%mag%c4%freq
     write(6,*) "Initial and Final beta0 ",travail%beta0,werk%beta0
-    write(6,*) "Starting time of simulations =",t0/clight ," and kinetic energy =",my_ORBIT_LATTICE%ORBIT_kinetic
 
   end subroutine energize_ORBIT_lattice
 
@@ -650,17 +637,7 @@ contains
     enddo
 
     if(freqs/=0.and.found) then
-      my_ORBIT_LATTICE%ORBIT_OMEGA=twopi*freqs/CLIGHT
-
-! EB beginning - added by Elena Benedetto - to pass the correct energy from PTC RF table to Orbit
-       my_ORBIT_LATTICE%ORBIT_P0C=a%w2%P0C
-       my_ORBIT_LATTICE%ORBIT_kinetic=a%w2%kinetic
-       my_ORBIT_LATTICE%orbit_beta0=a%w2%beta0
-       my_ORBIT_LATTICE%orbit_brho=a%w2%brho
-       my_ORBIT_LATTICE%orbit_energy=a%w2%energy
-       my_ORBIT_LATTICE%orbit_gamma=1.0_dp/a%w2%gamma0i       
-! EB end - added by Elena Benedetto
-
+       my_ORBIT_LATTICE%ORBIT_OMEGA=twopi*freqs/CLIGHT
     else
        write(6,*) " ORBIT_up_grade_mag ", freqs,found
        write(6,*) " cavity with frequency problems ", freqs,found
@@ -1110,7 +1087,7 @@ contains
   SUBROUTINE ORBIT_TRACK_NODEP(K,X,STATE)
     IMPLICIT NONE
     type(real_8),  INTENT(INOUT) :: X(6)
-    INTEGER K,I,j
+    INTEGER K,I
     LOGICAL(LP) U
     type(real_8) X5
     TYPE(INTEGRATION_NODE), POINTER  :: T
@@ -1151,12 +1128,7 @@ contains
        if(.not.CHECK_STABLE) then
           !          CALL RESET_APERTURE_FLAG
           u=my_true
-! EB - comment by Elena Benedetto - Only the 4 transverse coordinates are multiplied by xbig, 
-! to avoid loosing the information on the phase (when the mod 2pi is taken)
-        !  x(1)=XBIG
-          do j=1,4
-            x(j)=x(j)*XBIG
-          enddo
+          x(1)=XBIG
           exit
        endif
        T=>T%NEXT
@@ -1237,6 +1209,7 @@ contains
        my_ORBIT_LATTICE%ORBIT_OMEGA=twopi*FREQ/CLIGHT
     ELSE
        WRITE(6,*) " COULD NOT LOCALIZE NON 0.0_dp CAVITY FREQUENCY "
+       WRITE(6,*) "  ORBIT_OMEGA set to 1 "
        my_ORBIT_LATTICE%ORBIT_OMEGA=1.0_dp
        my_ORBIT_LATTICE%ORBIT_WARNING=1
     ENDIF

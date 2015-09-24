@@ -80,12 +80,12 @@ module precision_constants
   real(dp),parameter::A_MUON=1.16592069e-3_dp         !frs NIST CODATA 2006
   real(dp),parameter::A_PROTON=1.79284735e-0_dp       !frs (approx) NIST CODATA 2006
   real(dp),parameter:: pmaMUON = 105.6583668E-3_DP    !frs NIST CODATA 2006
-  real(dp) :: e_muon = 0.d0
+  real(dp) :: e_muon = 0.d0, volt_c=1.0e-3_dp, volt_i=1.0_dp
  !  real(dp),parameter:: pmadt = 1.875612793e0_dp    ! sateesh
   !  real(dp),parameter:: pmah3 = 2.808391e0_dp    ! sateesh
   !  real(dp),parameter:: A_dt = -0.142987272e0_dp    ! sateesh
   !  real(dp),parameter:: a_h3 =-4.183963e0_dp    ! sateesh
-
+  logical(lp),  public :: longprint = my_true
 
   real(dp) :: A_particle = A_ELECTRON
   real(dp),parameter::pmae=5.10998910e-4_dp           !frs NIST CODATA 2006
@@ -195,14 +195,16 @@ module precision_constants
   logical(lp) :: printdainfo=my_false
   integer   lielib_print(12)
   DATA lielib_print /0,0,0,0,0,0,0,0,0,0,0,1/
-  INTEGER,TARGET :: SECTOR_NMUL_MAX=10
-  INTEGER, target :: SECTOR_NMUL = 10
-  integer, parameter :: no_e=5  !  electric 
-
+  integer :: SECTOR_NMUL_MAX=22
+  INTEGER, target :: SECTOR_NMUL = 11
+!  integer, parameter :: no_e=5  !  electric 
+  logical(lp) :: use_complex_in_ptc=.false.
   logical(lp) :: change_sector=my_true
   real(dp) :: xlost(6)=0.0_dp
-  character(1024) :: messagelost
-  
+  integer :: limit_int0(2) =(/4,18/)
+  character(255) :: messagelost
+  integer, target :: ndpt_bmad = 0, only2d =0, addclock=0
+  integer,TARGET :: HIGHEST_FRINGE=2
   !  logical(lp) :: fixed_found
   !  lielib_print(1)=1   lieinit prints info
   !  lielib_print(2)=1   expflo warning if no convergence
@@ -310,6 +312,7 @@ module precision_constants
      real(dp),pointer :: phase0 ! default phase in cavity
      logical(lp), pointer :: global_verbose
      logical(lp), pointer :: no_hyperbolic_in_normal_form ! unstable produces exception
+     integer, pointer :: ndpt_bmad 
   end type CONTROL
 
   type(control) c_
@@ -387,7 +390,6 @@ contains
        IF(ABS(S1(I))>C_%ABSOLUTE_APERTURE) THEN
           S1=PUNY
           C_%CHECK_STABLE=.FALSE.
-          messagelost="a_scratch_size.f90 check_stability: aperture"
           EXIT
        ENDIF
     ENDDO
@@ -431,13 +433,13 @@ contains
 
     if(ttt) then
        if(change_sector) then
-          write(6,*) " SECTOR_NMUL_MAX is changed from ",SECTOR_NMUL_MAX," to ",se1
+  !        write(6,*) " SECTOR_NMUL_MAX is changed from ",SECTOR_NMUL_MAX," to ",se1
           write(6,*) " SECTOR_NMUL is changed from ",SECTOR_NMUL," to ",se2
           write(6,*) " GLOBAL VARIABLES that can no longer be changed"
           SECTOR_NMUL_MAX=se1
           SECTOR_NMUL=se2
        else
-          if(t1) write(6,*) " sector_nmul_max CANNOT be changed from ",SECTOR_NMUL_MAX," to ",se1
+ !         if(t1) write(6,*) " sector_nmul_max CANNOT be changed from ",SECTOR_NMUL_MAX," to ",se1
           if(t2) write(6,*) " sector_nmul CANNOT be changed from ",SECTOR_NMUL," to ",se2
           write(6,*) " Watch out : The are GLOBAL VARIABLES "
        endif
@@ -510,58 +512,6 @@ contains
        s2%c(i)=s1(i)
     enddo
   END SUBROUTINE EQUAL_c
-
-  !  SUBROUTINE WRITE_G(IEX)
-  !    IMPLICIT NONE
-  !    integer, OPTIONAL :: IEX
-  !    integer I,MYPAUSE,IPAUSE
-  !    if(.not.global_verbose) return
-  !    IF(W_P%NC/=0) THEN
-  !       if(W_P%FC/=' ') then
-  !          WRITE(6,W_P%FC,advance=W_P%ADV) (W_P%C(I), I=1,W_P%NC)
-  !       else
-  !          do i=1,W_P%NC
-  !             WRITE(6,*) W_P%C(I)
-  !          enddo
-  !       endif
-  !    ENDIF
-  !    IF(W_P%NI/=0) THEN
-  !       if(W_P%FI/=' ') then
-  !          WRITE(6,W_P%FI,advance=W_P%ADV) (W_P%I(I), I=1,W_P%NI )
-  !       else
-  !          do i=1,W_P%NI
-  !             WRITE(6,*) W_P%I(I)
-  !          enddo
-  !       endif
-  !    ENDIF
-  !    IF(W_P%NR/=0) THEN
-  !       if(W_P%FR/=' ') then
-  !          WRITE(6,W_P%FR,advance=W_P%ADV) (W_P%R(I), I=1,W_P%NR)
-  !       else
-  !          do i=1,W_P%NR
-  !             WRITE(6,*) W_P%R(I)
-  !          enddo
-  !       endif
-  !    ENDIF
-  !    if(W_P%ADV=='NO') then
-  !       WRITE(6,*) " "
-  !    endif
-  !    IF(PRESENT(IEX)) THEN
-  !       if(iex==-1) stop
-  !       IPAUSE=MYPAUSE(IEX)
-  !    ENDIF
-  !  END SUBROUTINE WRITE_G
-  !
-  !  SUBROUTINE WRITE_a(IEX)
-  !    IMPLICIT NONE
-  !    integer, OPTIONAL :: IEX
-  !    logical(lp) temp
-  !    temp=global_verbose
-  !    global_verbose=.true.
-  !    ! call ! WRITE_I(IEX)
-  !    global_verbose=temp
-  !
-  !  END SUBROUTINE WRITE_a
   !
   SUBROUTINE read_int(IEX)
     IMPLICIT NONE
@@ -602,13 +552,11 @@ contains
     IF((ABS(X)>1.0_dp).AND.c_%ROOT_CHECK) THEN
        ARCCOS_lielib=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="a_scratch_size.f90 ARCCOS_lielib: abs(x)>1"
     ELSEIF(ABS(X)<=1.0_dp) THEN
        ARCCOS_lielib=ACOS(X)
     ELSE      !  IF X IS NOT A NUMBER
        ARCCOS_lielib=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="a_scratch_size.f90 ARCCOS_lielib: abs(x)>1"
     ENDIF
 
   END FUNCTION ARCCOS_lielib
@@ -624,13 +572,94 @@ contains
     IF(X<=0.0_dp.AND.c_%ROOT_CHECK) THEN
        LOGE_lielib=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="a_scratch_size.f90 LOGE_lielib: x<0"
     ELSE
        LOGE_lielib=LOG(X)
     ENDIF
 
   END FUNCTION LOGE_lielib
 
+ subroutine dofma(nt,dt,xlist,pxlist,q0,qmean,qvar)
+! demin's Laskar routine
+! nt number of turns (periods) nt=2048
+! time winows in units of turns   dt=512   max dt=nt/2
+! xlist(1:nt), pxlist(1:nt) one-plane data usually x-px
+! q0 closed orbit tune in x-px plane in revolutions
+! output qmean average tune in nt window
+! qvar = variance of measured tune
+!
+      implicit none
+      
+      ! Input parameters
+      integer nt, dt
+      real(dp) :: xlist(1:nt), pxlist(1:nt)
+      real(dp) q0 
+      
+      ! Output
+      real(dp) qmean, qvar
+      
+      ! Local
+      real(dp) qmin, qmax, afind, bfind, stepfind, find, findnu, xnu
+      real(dp) sumr, sumi, tw, rr, sumnorm
+      real(dp), allocatable :: nulist(:)
+      integer np, nwindow, iw, ik, ik1, i
+      
+      ! Preparations
+      qmin = floor(q0*2.0)/2.0+0.001
+      qmax = qmin + 0.498
+      np = nt/2
+      nwindow = (nt-np)/dt + 1
+      allocate(nulist(1:nwindow))
+      qmean = 0.0
+      qvar = 0.0
+      
+      ! FMA calculation, Ref. D. Shatilov, Phys. Rev. ST Accel. Beams 14, 014001 (2011)
+      do iw = 0, nwindow-1
+        afind = qmax
+        bfind = qmin
+        stepfind = 0.002
+        do while(stepfind>1.0e-12)
+          find = 0.0
+          findnu = 0.0
+          xnu = afind
+          do while(xnu .ge. bfind)
+            sumr = 0.0
+            sumi = 0.0
+            ik = 0
+            do while(ik .le. np)
+              tw = 2.0 * dble(ik) / np - 1.0
+              rr = twopi * ik * xnu
+              ik1 = ik + iw * dt + 1
+              sumr = sumr + (xlist(ik1) * cos(rr) + pxlist(ik1) * sin(rr)) * (1.0 + cos(pi*tw))
+              sumi = sumi + (-xlist(ik1) * sin(rr) + pxlist(ik1) * cos(rr)) * (1.0 + cos(pi*tw))
+              ik = ik + 1
+            enddo
+            sumnorm = sqrt((sumr*sumr+sumi*sumi)/np)
+            if(find < sumnorm) then
+              find = sumnorm
+              findnu = xnu  
+            end if
+            xnu = xnu - stepfind
+          enddo
+          afind = findnu + stepfind
+          bfind = findnu - stepfind
+          stepfind = stepfind / 10.0
+        enddo
+        nulist(iw+1) = findnu
+      enddo
+      
+      do i = 1, nwindow
+        qmean = qmean + nulist(i)
+      enddo
+      qmean = qmean/nwindow
+      
+      do i = 1, nwindow
+        qvar = qvar + (nulist(i)-qmean) * (nulist(i)-qmean)
+      enddo
+      qvar = sqrt(qvar/nwindow)
+
+      return
+      
+   end subroutine dofma
 end module precision_constants
 
 
@@ -802,18 +831,25 @@ CONTAINS
   END SUBROUTINE ReportOpenFiles
 
 
-  SUBROUTINE CONTEXT( STRING, nb )
+  SUBROUTINE CONTEXT( STRING, nb,dollar )
     IMPLICIT NONE
     CHARACTER(*) STRING
     CHARACTER(1) C1
     integer, optional :: nb
+    logical(lp), optional :: dollar
     integer I,J,K,nb0,count
+     logical(lp) dol
     nb0=0
+    dol=.false.
     if(present(nb)) nb0=1
+    if(present(dollar)) dol=dollar
     J = 0
     count=0
     DO I = 1, LEN (STRING)
        C1 = STRING(I:I)
+       if(dol) then
+        if(c1=='$') c1="_"
+       endif
        STRING(I:I) = ' '
        IF( C1 .NE. ' ' ) THEN
           if(count/=0.and.nb0==1) then
@@ -1226,7 +1262,7 @@ contains
 
   FUNCTION DSQRTT( S1 )
     implicit none
-    type (my_1D_taylor) DSQRTT,t
+    type (my_1D_taylor) DSQRTT 
     type (my_1D_taylor), INTENT (IN) :: S1
     ! WRITE(6,*) " MARDE "
     ! STOP 666
@@ -1342,7 +1378,7 @@ integer function mypause(i)
   w_p%c(1)=' ipause=mypause(0)  ';w_p%fc='((A8,1x))'
 
   ! call ! WRITE_I
-  ! read(*,*) I
+   read(5,*) I
   mypause=i
   ! mypause=sqrt(dble(-i))
 end function mypause

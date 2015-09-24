@@ -20,13 +20,35 @@
 
 TYPE DRIFT1
    TYPE(MAGNET_CHART), POINTER :: P
-   real(dp) , POINTER ::L                    !  Storage space for computed
+   real(dp) , POINTER ::L                    !  Storage space for computed  
 END  TYPE DRIFT1
 
 TYPE DRIFT1P
    TYPE(MAGNET_CHART), POINTER :: P
    TYPE(REAL_8) , POINTER ::L
 END  TYPE DRIFT1P
+
+TYPE SUPERDRIFT1
+   TYPE(MAGNET_CHART), POINTER :: P
+   real(dp) , POINTER ::L                    !  Storage space for computed
+   INTEGER, POINTER :: A_X1,A_X2   ! FOR ROTATION OF PI AT ENTRANCE = -1, DEFAULT = 1 ,
+   REAL(DP),DIMENSION(:), POINTER:: A_D,a_ang     ! TRANSLATIONS  A_D(3) and Angles
+   INTEGER(2), POINTER:: ENERGY   ! IF TRUE, ENERGY PATCHES NEEDED
+   INTEGER(2), POINTER:: TIME     ! IF TRUE, TIME PATCHES NEEDED
+   REAL(DP), POINTER:: A_T        ! TIME SHIFT NEEDED SOMETIMES WHEN RELATIVE TIME IS USED
+   REAL(DP), POINTER:: p0b,b0b     ! for bmad patching
+END  TYPE SUPERDRIFT1
+
+TYPE SUPERDRIFT1P
+   TYPE(MAGNET_CHART), POINTER :: P
+   TYPE(REAL_8) , POINTER ::L
+   INTEGER, POINTER :: A_X1,A_X2   ! FOR ROTATION OF PI AT ENTRANCE = -1, DEFAULT = 1 ,
+   REAL(DP),DIMENSION(:), POINTER:: A_D,a_ang     ! TRANSLATIONS  A_D(3) and Angles
+   INTEGER(2), POINTER:: ENERGY   ! IF TRUE, ENERGY PATCHES NEEDED
+   INTEGER(2), POINTER:: TIME     ! IF TRUE, TIME PATCHES NEEDED
+   REAL(DP), POINTER:: A_T        ! TIME SHIFT NEEDED SOMETIMES WHEN RELATIVE TIME IS USED
+   REAL(DP), POINTER:: p0b,b0b     ! for bmad patching
+END  TYPE SUPERDRIFT1P
 
 TYPE DKD2
    TYPE(MAGNET_CHART), POINTER:: P
@@ -56,6 +78,7 @@ TYPE KICKT3
    logical(lp),   POINTER:: patch ! highly illegal additions by frs
    real(dp), POINTER ::B_SOL
    real(dp),   POINTER::  ls
+   real(dp),   POINTER:: dx,dy,pitch_x,pitch_y   ! SADISTIC
 END  TYPE KICKT3
 
 TYPE KICKT3P
@@ -66,6 +89,7 @@ TYPE KICKT3P
    logical(lp),   POINTER:: patch ! highly illegal additions by frs
    TYPE(REAL_8), POINTER ::B_SOL
    real(dp),   POINTER::  ls
+   real(dp),   POINTER:: dx,dy,pitch_x,pitch_y   ! SADISTIC
 END  TYPE KICKT3P
 
 TYPE CAV4
@@ -106,6 +130,7 @@ TYPE CAV_TRAV
    real(dp) , POINTER ::L                    !  Storage space for computed
    real(dp), POINTER :: VOLT, FREQ,PHAS,DELTA_E,phase0
    real(dp), POINTER :: PSI,DPHAS,DVDS
+   logical, pointer :: always_on
    integer, POINTER :: CAVITY_TOTALPATH     ! Cavity information
 END  TYPE CAV_TRAV
 
@@ -116,7 +141,8 @@ TYPE CAV_TRAVP
    TYPE(REAL_8) , POINTER ::L                    !  Storage space for computed
    TYPE(REAL_8), POINTER :: VOLT, FREQ,PHAS
    TYPE(REAL_8), POINTER :: PSI,DPHAS,DVDS
-   real(dp), POINTER :: DELTA_E ,phase0                       ! Cavity information
+   real(dp), POINTER :: DELTA_E ,phase0
+   logical, pointer :: always_on
    integer, POINTER :: CAVITY_TOTALPATH     ! Cavity information
 END  TYPE CAV_TRAVP
 
@@ -129,7 +155,8 @@ TYPE SOL5
    real(dp),  DIMENSION(:), POINTER :: AN,BN         !Multipole component
    real(dp),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
-   real(dp),   POINTER:: VA,VS         !valishev-like multipole
+   real(dp),   POINTER:: VA,VS         ! sad f1,f2
+   real(dp),   POINTER:: dx,dy,pitch_x,pitch_y   ! SADISTIC
 END  TYPE SOL5
 
 TYPE SOL5P
@@ -140,6 +167,7 @@ TYPE SOL5P
    TYPE(REAL_8),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: VA,VS         !valishev-like multipole
+   real(dp),   POINTER:: dx,dy,pitch_x,pitch_y   ! SADISTIC
 END  TYPE SOL5P
 
 
@@ -236,10 +264,11 @@ TYPE TEAPOT
    real(dp),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
    integer, pointer :: f
+   real(dp),   POINTER:: VA,VS         !valishev-like multipole
    !!  electric info
    real(dp),  DIMENSION(:), POINTER :: AE,BE  ! an,bn for electric stuff
-   real(dp),  DIMENSION(:,:,:), POINTER :: As,Bs
-   real(dp),  POINTER :: e_x,e_y,PHI
+   real(dp),  DIMENSION(:),  POINTER :: e_x,e_y,PHI,vm
+   LOGICAL(LP), POINTER :: ELECTRIC
 END TYPE TEAPOT
 
 TYPE TEAPOTP
@@ -252,10 +281,11 @@ TYPE TEAPOTP
    TYPE(REAL_8),   POINTER:: FINT,HGAP         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1,H2             !FRINGE FUDGE FOR MAD
    integer, pointer :: f
+   TYPE(REAL_8),   POINTER:: VA,VS         !valishev-like multipole
    !!  electric info
-   TYPE(REAL_8),  DIMENSION(:), POINTER :: AE,BE ! an,bn for electric stuff
-   real(dp),  DIMENSION(:,:,:), POINTER :: As,Bs
-   TYPE(REAL_8),  POINTER :: e_x,e_y,PHI
+   TYPE(REAL_8),  DIMENSION(:), POINTER :: AE,BE  ! an,bn for electric stuff
+   TYPE(REAL_8),  DIMENSION(:),  POINTER :: e_x,e_y,PHI,vm
+   LOGICAL(LP), POINTER :: ELECTRIC
 END TYPE TEAPOTP
 
 TYPE MON

@@ -278,7 +278,10 @@ contains
     TYPE (PBfield), INTENT (IN) :: S1
     TYPE (taylor)  , INTENT (IN) :: S2
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       mul_PBf_t%i=0
+      RETURN
+    endif
     localmaster=master
     call ass(mul_PBf_t)
 
@@ -295,7 +298,10 @@ contains
     TYPE (vecfield), INTENT (IN) :: S1
     TYPE (taylor)  , INTENT (IN) :: S2
     integer localmaster,i
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       mul_VECf_t%i=0
+      RETURN
+    endif
     localmaster=master
 
     call ass(mul_VECf_t)
@@ -315,7 +321,10 @@ contains
     TYPE (vecfield), INTENT (IN) :: S1
     TYPE (DAMAP)  , INTENT (IN) :: S2
     integer localmaster,i
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       mul_VECf_MAP%v%i=0
+      RETURN
+    endif
     localmaster=master
 
 
@@ -336,7 +345,10 @@ contains
     TYPE (PBfield), INTENT (IN) :: S1
     TYPE (DAMAP)  , INTENT (IN) :: S2
     integer localmaster,i
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       mul_PBf_MAP%v%i=0
+      RETURN
+    endif
     localmaster=master
 
 
@@ -814,7 +826,10 @@ contains
     type (damap),INTENT(IN)::S1
     real(dp) R1
     INTEGER I
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       R1=0
+      RETURN
+    endif
 
     DABSMAP=0.0_dp
     R1=0.0_dp
@@ -2515,9 +2530,9 @@ contains
           norm1=norm1+abs(xj(i,j))
        enddo
     enddo
-    norm1=norm1-nd2
+    norm1=abs(norm1-nd2)
     if(lielib_print(9)==1.or.nn) write(6,'(a29,(1x,E15.8))')"deviation from symplecticity ", norm1
-    if(present(norm)) norm=norm1
+    if(present(norm)) norm=abs(norm1)
 
   end subroutine checksymp
 

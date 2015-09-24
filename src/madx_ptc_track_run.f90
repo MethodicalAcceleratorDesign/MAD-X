@@ -109,15 +109,13 @@ CONTAINS
          NORMALFORM, & ! type for normalform                                               !
          REAL_8, &     ! type for map                                                      !
          damap, &      ! type for diff algebra                                             !
-         RADIATION, & ! STOCH_IN_REC, & ! type for radiation with quadrupoles in PTC       !
-         BEAMENVELOPE, ENV_8        ! For beam envelope                                    !
+         RADIATION ! STOCH_IN_REC, & ! type for radiation with quadrupoles in PTC       !
     ! ======== functions ==================================================================!
     USE  madx_ptc_module, ONLY: &                                                          !
          print, find_orbit,FIND_ORBIT_x, track,track_probe_x,UPDATE_STATES, my_state, &    !
          PRODUCE_APERTURE_FLAG, ANALYSE_APERTURE_FLAG, &                                   !
          kill, daprint, alloc, Get_one, &                                                  !
          assignment(=), operator(+), operator(*), operator(.sub.), &                       !
-         Find_Envelope, &                                                                  !
          ! Coord_MAD_to_PTC, Coord_PTC_to_MAD,  & => at the end of this module             !
          write_closed_orbit,Convert_dp_to_dt,mytime                                        !
     !======================================================================================!

@@ -2006,10 +2006,13 @@ CONTAINS
     call kill_universe(m_u)
     nullify(my_ring)
     call kill_tpsa
-    do i=1,size(s_b)
-       call nul_coef(s_b(i))
-    enddo
-    deallocate(s_b)
+    
+    !do i=1,size(s_b_from_v)
+    !   call nul_coef(s_b_from_v(i))
+    !enddo
+    !deallocate(s_b_from_v)
+    
+    
     firsttime_coef=.true.
 
     universe=universe-1

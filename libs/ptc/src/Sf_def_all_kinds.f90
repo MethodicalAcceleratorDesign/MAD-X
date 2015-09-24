@@ -634,4 +634,231 @@ contains
   end SUBROUTINE SURVEY_INNER_MAG
 
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!   New Survey Routines !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+subroutine survey_integration_node_case0(a0,ent0,t,b0,exi0)
+implicit none
+type(integration_node), target :: t
+real(dp), target :: a0(3),ent0(3,3),b0(3),exi0(3,3),ang(3)
+type(fibre), pointer :: f
+type(element), pointer :: m
+type(magnet_chart), pointer :: p
+real(dp) h,d(3)
+
+f=>t%parent_fibre
+m=>f%mag
+p=>m%p
+b0=a0
+exi0=ent0
+write(6,*) " kind ",kind2,m%kind
+select case(m%kind) 
+
+CASE(KIND0,KIND1,KIND3:KIND5,KIND8:KIND9,KIND11:KIND15,KIND17:KIND22,kindwiggler,kindsuper1)
+   h=p%lc/p%nst
+   d=(/0.0_dp,0.0_dp,h/)
+
+   call geo_tra(b0,exi0,d,1)
+CASE(KIND2,KIND6:KIND7,KIND10,KINDPA)
+   h=p%ld/p%nst
+  if(p%b0==0.0_dp) then
+   d=(/0.0_dp,0.0_dp,h/)
+
+   call geo_tra(b0,exi0,d,1)
+  else
+  ang=0.0_dp
+  ang(2)=h*p%b0/2
+  h=2*sin(ang(2))/p%b0
+  d=(/0.0_dp,0.0_dp,h/)
+  call geo_rot(exi0,exi0,ang,exi0)
+  call geo_tra(b0,exi0,d,1)
+  call geo_rot(exi0,exi0,ang,exi0)
+
+  endif
+
+CASE(KIND16)
+   h=m%l/p%nst
+   d=(/0.0_dp,0.0_dp,h/)
+   call geo_tra(b0,exi0,d,1)
+
+CASE default
+ write(6,*) " not supported in survey_integration_node_case0 "
+ stop
+
+end select
+
+end subroutine survey_integration_node_case0
+
+subroutine survey_integration_node_p1(a0,ent0,t,b0,exi0)
+implicit none
+type(integration_node), target :: t
+real(dp), target :: a0(3),ent0(3,3),b0(3),exi0(3,3)
+type(fibre), pointer :: f
+real(dp) pix1(3),pix2(3) 
+logical(lp) :: ENTERING=my_true
+
+f=>t%parent_fibre
+pix1=0.0_dp;pix2=0.0_dp;
+b0=a0
+exi0=ent0
+
+
+
+if(f%patch%A_X1==-1) pix1(1)=pi
+if(f%patch%A_X2==-1) pix2(1)=pi
+
+!
+call GEO_ROT(exi0,pix1,1, ent0)
+call GEO_ROT(exi0,f%patch%a_ang,1, exi0)
+call TRANSLATE_point(b0,f%patch%A_D,1,exi0)  
+call GEO_ROT(exi0,pix2,1, exi0)
+
+pix1=0.0_dp
+pix1(3)=f%MAG%P%TILTD
+ call GEO_ROT(exi0,pix1,1, exi0)
+
+    IF(f%MAG%MIS) THEN
+      call MIS_survey(b0,exi0,f,b0,exi0,ENTERING)
+    ENDIF
+
+!    IF(PATCHG==1.or.PATCHG==3) THEN
+!       patch=ALWAYS_EXACT_PATCHING.or.C%MAG%P%EXACT
+!       CALL PATCH_FIB(C,X,k,PATCH,MY_TRUE)
+!    ENDIF
+!       X(3)=C%PATCH%A_X1*X(3);X(4)=C%PATCH%A_X1*X(4);
+!       CALL ROT_YZ(C%PATCH%A_ANG(1),X,C%MAG%P%BETA0,PATCH,k%TIME)
+!       CALL ROT_XZ(C%PATCH%A_ANG(2),X,C%MAG%P%BETA0,PATCH,k%TIME)
+!       CALL ROT_XY(C%PATCH%A_ANG(3),X)  !,PATCH)
+!       CALL TRANS(C%PATCH%A_D,X,C%MAG%P%BETA0,PATCH,k%TIME)
+!       X(3)=C%PATCH%A_X2*X(3);X(4)=C%PATCH%A_X2*X(4);
+
+end subroutine survey_integration_node_p1
+
+
+subroutine survey_integration_node_p2(a0,ent0,t,b0,exi0)
+implicit none
+type(integration_node), target :: t
+real(dp), target :: a0(3),ent0(3,3),b0(3),exi0(3,3)
+type(fibre), pointer :: f
+real(dp) pix1(3),pix2(3)
+logical(lp) :: ENTERING=my_FALSE
+
+f=>t%parent_fibre
+
+b0=a0
+exi0=ent0
+
+
+
+
+    IF(f%MAG%MIS) THEN
+      call MIS_survey(b0,exi0,f,b0,exi0,ENTERING)
+    ENDIF
+
+
+pix1=0.0_dp
+pix1(3)=-f%MAG%P%TILTD
+ call GEO_ROT(exi0,pix1,1, exi0)
+
+pix1=0.0_dp;pix2=0.0_dp;
+if(f%patch%B_X1==-1) pix1(1)=pi
+if(f%patch%B_X2==-1) pix2(1)=pi
+
+!
+call GEO_ROT(exi0,pix1,1, ent0)
+call GEO_ROT(exi0,f%patch%B_ang,1, exi0)
+call TRANSLATE_point(b0,f%patch%b_D,1,exi0)  
+call GEO_ROT(exi0,pix2,1, exi0)
+
+
+!       X(3)=C%PATCH%B_X1*X(3);X(4)=C%PATCH%B_X1*X(4);
+!       CALL ROT_YZ(C%PATCH%B_ANG(1),X,C%MAG%P%BETA0,PATCH,k%TIME)
+!       CALL ROT_XZ(C%PATCH%B_ANG(2),X,C%MAG%P%BETA0,PATCH,k%TIME)
+!       CALL ROT_XY(C%PATCH%B_ANG(3),X)  !,PATCH)
+!       CALL TRANS(C%PATCH%B_D,X,C%MAG%P%BETA0,PATCH,k%TIME)
+!       X(3)=C%PATCH%B_X2*X(3);X(4)=C%PATCH%B_X2*X(4);
+
+end subroutine survey_integration_node_p2
+
+ SUBROUTINE MIS_survey(a0,ent0,C,b0,exi0,ENTERING)
+    implicit none
+    ! MISALIGNS REAL FIBRES IN PTC ORDER FOR FORWARD AND BACKWARD FIBRES
+    TYPE(FIBRE),target,INTENT(INOUT):: C
+    real(dp), target :: a0(3),ent0(3,3),b0(3),exi0(3,3)
+    real(dp) ang(3),d(3)
+    logical(lp),INTENT(IN)::  ENTERING
+    exi0=ent0
+    b0=a0
+    IF(ASSOCIATED(C%CHART)) THEN
+       IF(C%DIR==1) THEN   ! FORWARD PROPAGATION
+          IF(ENTERING) THEN
+             call GEO_ROT(exi0,c%chart%ANG_IN,1, exi0)
+  !           CALL ROT_YZ(C%CHART%ANG_IN(1),X,C%MAG%P%BETA0,OU,k%TIME)   ! ROTATIONS
+  !           CALL ROT_XZ(C%CHART%ANG_IN(2),X,C%MAG%P%BETA0,OU,k%TIME)
+  !           CALL ROT_XY(C%CHART%ANG_IN(3),X)  !,OU)
+            call TRANSLATE_point(b0,c%chart%D_IN,1,exi0)  
+  !           CALL TRANS(C%CHART%D_IN,X,C%MAG%P%BETA0,OU,k%TIME)         ! TRANSLATION
+          ELSE
+             call GEO_ROT(exi0,c%chart%ANG_OUT,1, exi0)
+  !           CALL ROT_YZ(C%CHART%ANG_OUT(1),X,C%MAG%P%BETA0,OU,k%TIME)  ! ROTATIONS
+  !           CALL ROT_XZ(C%CHART%ANG_OUT(2),X,C%MAG%P%BETA0,OU,k%TIME)
+  !           CALL ROT_XY(C%CHART%ANG_OUT(3),X)  !,OU)
+  !           CALL TRANS(C%CHART%D_OUT,X,C%MAG%P%BETA0,OU,k%TIME)        ! TRANSLATION
+            call TRANSLATE_point(b0,c%chart%D_OUT,1,exi0) 
+          ENDIF
+       ELSE
+          IF(ENTERING) THEN  ! BACKWARD PROPAGATION
+              d=c%chart%D_OUT
+              ang=C%CHART%ANG_OUT
+             C%CHART%D_OUT(1)=-C%CHART%D_OUT(1)
+             C%CHART%D_OUT(2)=-C%CHART%D_OUT(2)
+             C%CHART%ANG_OUT(3)=-C%CHART%ANG_OUT(3)
+
+             call TRANSLATE_point(b0,d,-1,exi0)  
+!             CALL TRANS(C%CHART%D_OUT,X,C%MAG%P%BETA0,OU,k%TIME)        ! TRANSLATION
+!             CALL ROT_XY(C%CHART%ANG_OUT(3),X)  !,OU)
+!             CALL ROT_XZ(C%CHART%ANG_OUT(2),X,C%MAG%P%BETA0,OU,k%TIME)
+!             CALL ROT_YZ(C%CHART%ANG_OUT(1),X,C%MAG%P%BETA0,OU,k%TIME)  ! ROTATIONS
+             d=ang
+             ang=0.d0
+             ang(3)=-d(3)
+             call GEO_ROT(exi0,ang,1, exi0)  
+             ang=0.d0
+             ang(2)=-d(2)
+             call GEO_ROT(exi0,ang,1, exi0)  
+             ang=0.d0
+             ang(1)=-d(1)
+             call GEO_ROT(exi0,ang,1, exi0)
+             C%CHART%D_OUT(1)=-C%CHART%D_OUT(1)
+             C%CHART%D_OUT(2)=-C%CHART%D_OUT(2)
+             C%CHART%ANG_OUT(3)=-C%CHART%ANG_OUT(3)
+          ELSE
+              d=C%CHART%D_IN
+              ang=C%CHART%ANG_IN
+             C%CHART%D_IN(1)=-C%CHART%D_IN(1)
+             C%CHART%D_IN(2)=-C%CHART%D_IN(2)
+             C%CHART%ANG_IN(3)=-C%CHART%ANG_IN(3)
+             call TRANSLATE_point(b0,d,-1,exi0)
+!             CALL TRANS(C%CHART%D_IN,X,C%MAG%P%BETA0,OU,k%TIME)         ! TRANSLATION
+!             CALL ROT_XY(C%CHART%ANG_IN(3),X)  !,OU)
+!             CALL ROT_XZ(C%CHART%ANG_IN(2),X,C%MAG%P%BETA0,OU,k%TIME)
+!             CALL ROT_YZ(C%CHART%ANG_IN(1),X,C%MAG%P%BETA0,OU,k%TIME)   ! ROTATIONS
+             d=ang
+             ang=0.d0
+             ang(3)=-d(3)
+             call GEO_ROT(exi0,ang,1, exi0)  
+             ang=0.d0
+             ang(2)=-d(2)
+             call GEO_ROT(exi0,ang,1, exi0)  
+             ang=0.d0
+             ang(1)=-d(1)
+             call GEO_ROT(exi0,ang,1, exi0)
+             C%CHART%D_IN(1)=-C%CHART%D_IN(1)
+             C%CHART%D_IN(2)=-C%CHART%D_IN(2)
+             C%CHART%ANG_IN(3)=-C%CHART%ANG_IN(3)
+          ENDIF
+       ENDIF
+    ENDIF
+  END SUBROUTINE MIS_survey
+
+
 end module S_def_all_kinds

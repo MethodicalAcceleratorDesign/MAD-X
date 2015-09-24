@@ -68,8 +68,10 @@ module Mad_like
      LOGICAL(LP) APERTURE_ON
      INTEGER APERTURE_KIND
      REAL(DP) APERTURE_R(2),APERTURE_X,APERTURE_Y
-     LOGICAL(LP) KILL_ENT_FRINGE,KILL_EXI_FRINGE,BEND_FRINGE,PERMFRINGE
+     LOGICAL(LP) KILL_ENT_FRINGE,KILL_EXI_FRINGE,BEND_FRINGE
+     integer PERMFRINGE,highest_fringe
      REAL(DP) DPHAS,PSI,dvds
+     logical(lp) usethin
      INTEGER N_BESSEL
      !     logical(lp) in,out
   END TYPE EL_LIST
@@ -253,6 +255,9 @@ module Mad_like
      MODULE PROCEDURE BLTILT
   end  INTERFACE
 
+  INTERFACE multipole 
+     MODULE PROCEDURE BLTILT
+  end  INTERFACE
 
   INTERFACE HKICKER
      MODULE PROCEDURE HKICKTILT
@@ -703,11 +708,13 @@ CONTAINS
        s2%KILL_ENT_FRINGE=my_false
        s2%KILL_EXI_FRINGE=my_false
        s2%BEND_FRINGE=my_false
-       s2%PERMFRINGE=my_false
+       s2%PERMFRINGE=0
+       s2%highest_fringe=highest_fringe
        s2%DPHAS=0.0_dp
        s2%PSI=0.0_dp
        s2%dvds=0.0_dp
        s2%N_BESSEL=0
+       s2%usethin=my_true
 
     ENDIF
   END SUBROUTINE EL_0
@@ -896,13 +903,14 @@ CONTAINS
     ENDIF   !1
   END FUNCTION SMITILT
 
-  FUNCTION  BLTILT(NAME,K,T,LIST)
+  FUNCTION  BLTILT(NAME,k0l,k1l,K,T,LIST)
     implicit none
     type (EL_LIST) BLTILT
     type (EL_LIST),optional, INTENT(IN):: LIST
     CHARACTER(*), INTENT(IN):: NAME
     type (TILTING),optional, INTENT(IN):: T
     TYPE(MUL_BLOCK),OPTIONAL, INTENT(IN):: K
+    real(dp),OPTIONAL, INTENT(IN):: K0l,k1l
     INTEGER I
     LOGICAL(LP) COUNT
     if(present(list)) then   !1
@@ -943,7 +951,7 @@ CONTAINS
           BLTILT%NAME=NAME
        ENDIF
 
-    else   !1
+    elseif(present(k)) then
        BLTILT=0
        BLTILT%L=0.0_dp
        BLTILT%LD=0.0_dp
@@ -977,6 +985,44 @@ CONTAINS
        ELSE
           BLTILT%NAME=NAME
        ENDIF
+    elseif(present(k0l).or.present(k1l)) then
+       BLTILT=0
+       BLTILT%L=0.0_dp
+       BLTILT%LD=0.0_dp
+       BLTILT%LC=0.0_dp
+
+       BLTILT%KIND=kind3
+       BLTILT%nmul=1
+       if(present(k1l)) then
+          BLTILT%nmul=2      
+          BLTILT%K(2)=k1l
+       endif
+       if(present(k0l)) BLTILT%K(1)=k0l
+
+       if(present(t)) then
+          IF(T%NATURAL) THEN
+             BLTILT%tilt=t%tilt(K%NATURAL)
+          ELSE
+             BLTILT%tilt=t%tilt(0)
+          ENDIF
+       endif
+
+
+
+       IF(LEN(NAME)>nlp) THEN
+          w_p=0
+          w_p%nc=2
+          w_p%fc='((1X,a72,/),(1x,a72))'
+          w_p%c(1)=name
+          WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+          ! call ! WRITE_I
+          BLTILT%NAME=NAME(1:16)
+       ELSE
+          BLTILT%NAME=NAME
+       ENDIF
+    else
+       write(6,*) "incorrect input in BLTILT"
+       stop 444
     endif    !1
   END FUNCTION BLTILT
 
@@ -997,7 +1043,7 @@ CONTAINS
     HKICKTILT%L=L1
     HKICKTILT%LD=L1
     HKICKTILT%LC=L1
-    IF(L1==0.0_dp) THEN
+    IF(L1==0.0_dp.and.HKICKTILT%usethin) THEN
        HKICKTILT%K(1)=-K11        ! MAD convention K1>0 means px > 0
        HKICKTILT%KIND=MADKIND3N
        HKICKTILT%nmul=1
@@ -1045,7 +1091,7 @@ CONTAINS
     VKICKTILT%L=L1
     VKICKTILT%LD=L1
     VKICKTILT%LC=L1
-    IF(L1==0.0_dp) THEN
+    IF(L1==0.0_dp.and.VKICKTILT%usethin) THEN
        VKICKTILT%KS(1)=K11        ! MAD convention K1>0 means px > 0
        VKICKTILT%KIND=MADKIND3S
        VKICKTILT%nmul=1
@@ -1105,7 +1151,7 @@ CONTAINS
     GKICKTILT%L=L1
     GKICKTILT%LD=L1
     GKICKTILT%LC=L1
-    IF(L1==0.0_dp) THEN
+    IF(L1==0.0_dp.and.GKICKTILT%usethin) THEN
        GKICKTILT%K(1)=-K11        ! MAD convention K1>0 means px > 0
        GKICKTILT%KS(1)=K21        ! MAD convention K1>0 means px > 0
        GKICKTILT%KIND=KIND3
@@ -1162,7 +1208,7 @@ CONTAINS
     QUADTILT%LD=L1
     QUADTILT%LC=L1
     QUADTILT%K(2)=K11
-    IF(L1==0.0_dp) THEN
+    IF(L1==0.0_dp.and.QUADTILT%usethin) THEN
        QUADTILT%K(2)=K11
        QUADTILT%KIND=MADKIND3N
     ELSE
@@ -1206,7 +1252,7 @@ CONTAINS
     multipoleTILT%L=L1
     multipoleTILT%LD=L1
     multipoleTILT%LC=L1
-    IF(L1==0.0_dp) THEN
+    IF(L1==0.0_dp.and.multipoleTILT%usethin) THEN
        multipoleTILT%KIND=MADKIND3N
     ELSE
        multipoleTILT%KIND=MADKIND2
@@ -1240,6 +1286,7 @@ CONTAINS
     real(dp) L1,K11,Ks11,LAG1,FREQ01
     L1=0.0_dp
     K11=0.0_dp
+    Ks11=0.0_dp
     IF(PRESENT(L)) L1=L
     IF(PRESENT(K1)) K11=K1
     IF(PRESENT(Ks1)) Ks11=Ks1
@@ -1317,7 +1364,7 @@ CONTAINS
     SOLTILT%LC=L1
     SOLTILT%BSOL=K11
     SOLTILT%nmul=2
-    IF(L1==0.0_dp) THEN
+    IF(L1==0.0_dp.and.SOLTILT%usethin) THEN
        SOLTILT%KIND=KIND3    ! used to be kind0
     ELSE
        SOLTILT%K(2)=KQ !/FAC(2)    ! MAD FACTOR
@@ -1371,7 +1418,7 @@ CONTAINS
     SEXTTILT%L=L1
     SEXTTILT%LD=L1
     SEXTTILT%LC=L1
-    IF(L1==0.0_dp) THEN
+    IF(L1==0.0_dp.and.SEXTTILT%usethin) THEN
        SEXTTILT%K(3)=K11  !/FAC(3)    ! MAD FACTOR
        SEXTTILT%KIND=MADKIND3N
     ELSE
@@ -1423,7 +1470,7 @@ CONTAINS
     OCTUTILT%L=L1
     OCTUTILT%LD=L1
     OCTUTILT%LC=L1
-    IF(L1==0.0_dp) THEN
+    IF(L1==0.0_dp.and.OCTUTILT%usethin) THEN
        OCTUTILT%K(4)=K11 !/FAC(4)         ! MAD FACTOR
        OCTUTILT%KIND=MADKIND3N
     ELSE
@@ -1486,13 +1533,13 @@ CONTAINS
     endif
 
     if(present(t))then
-       IF(EXACT_MODEL) THEN                 ! .and.madkind2==kind2
+       IF(EXACT_MODEL.or.solve_electric) THEN                 ! .and.madkind2==kind2
           SBTILT=POTTILT(NAME,L1,ANG1,E11,E22,T,LIST)
        ELSE
           SBTILT=GBEND(NAME,L1,ANG1,E11,E22,T,LIST)
        ENDIF
     else
-       IF(EXACT_MODEL) THEN                 ! .and.madkind2==kind2
+       IF(EXACT_MODEL.or.solve_electric) THEN                 ! .and.madkind2==kind2
           SBTILT=POTTILT(NAME,L1,ANG1,E11,E22)
        ELSE
           SBTILT=GBEND(NAME,L1,ANG1,E11,E22)
@@ -1565,7 +1612,7 @@ CONTAINS
 
     POTTILT%KIND=KIND10
     POTTILT%K(1)=POTTILT%B0+POTTILT%K(1)
-    POTTILT%nmul=SECTOR_NMUL
+    POTTILT%nmul=SECTOR_NMUL_max
 
   END FUNCTION POTTILT
 
@@ -1897,6 +1944,7 @@ CONTAINS
        rectaETILT%KILL_EXI_FRINGE=list%KILL_EXI_FRINGE
        rectaETILT%BEND_FRINGE=list%BEND_FRINGE
        rectaETILT%PERMFRINGE=list%PERMFRINGE
+       rectaETILT%highest_fringe=list%highest_fringe
     endif
 
 
@@ -1940,6 +1988,43 @@ CONTAINS
     drft%KIND=KIND1
 
   END FUNCTION drft
+
+  FUNCTION  superdrft(NAME,L,LIST)
+    implicit none
+    type (EL_LIST) superdrft
+    CHARACTER(*), INTENT(IN):: NAME
+    TYPE(EL_LIST) ,optional, INTENT(IN):: LIST
+    real(dp) ,optional, INTENT(IN):: L
+    real(dp)  L1
+    L1=0.0_dp
+    IF(PRESENT(L)) L1=L
+
+    if(present(list)) then
+       superdrft=list
+       l1=list%L
+    else
+       superdrft=0
+    endif
+    superdrft%NST=1
+    superdrft%METHOD=2
+
+    superdrft%L=L1
+    superdrft%LD=L1
+    superdrft%LC=L1
+    IF(LEN(NAME)>nlp) THEN
+       w_p=0
+       w_p%nc=2
+       w_p%fc='((1X,a72,/),(1x,a72))'
+       w_p%c(1)=name
+       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       ! call ! WRITE_I
+       superdrft%NAME=NAME(1:16)
+    ELSE
+       superdrft%NAME=NAME
+    ENDIF
+    superdrft%KIND=KIND1
+
+  END FUNCTION superdrft
 
   FUNCTION  RCOLIT(NAME,L,T,LIST)
     implicit none
@@ -2311,7 +2396,9 @@ CONTAINS
     ELSE
        RFCAVITYL%NAME=NAME
     ENDIF
-    RFCAVITYL%VOLT=VOLT1
+
+     RFCAVITYL%VOLT=VOLT1*volt_i
+
     RFCAVITYL%LAG=LAG1
     RFCAVITYL%HARMON=HARMON1
     RFCAVITYL%FREQ0=FREQ01
@@ -2392,7 +2479,9 @@ CONTAINS
     ELSE
        TWCAVITYL%NAME=NAME
     ENDIF
-    TWCAVITYL%VOLT=VOLT1
+ 
+     TWCAVITYL%VOLT=VOLT1*volt_i
+ 
     TWCAVITYL%LAG=LAG1
     TWCAVITYL%HARMON=HARMON1
     TWCAVITYL%FREQ0=FREQ01
@@ -2427,7 +2516,9 @@ CONTAINS
     ELSESTILT%L=L1
     ELSESTILT%LD=L1
     ELSESTILT%LC=L1
-    ELSESTILT%VOLT=K11
+
+         ELSESTILT%VOLT=K11*volt_i
+ 
     ELSESTILT%KIND=KIND15
     ELSESTILT%NST=1
     ELSESTILT%METHOD=2
@@ -2523,6 +2614,15 @@ CONTAINS
        nullify(S22%ag);allocate(s22%ag);
        nullify(S22%CHARGE);allocate(s22%CHARGE);
        !     111 CONTINUE  ! SAGAN CHECK MEMORY
+!!!!   testing for Bmad 2014.08.08
+
+  !     nullify(S22%tm);
+  !     nullify(S22%t1);
+  !     nullify(S22%t2);
+  !     nullify(S22%pos);
+  !     nullify(S22%loc);
+ 
+
   end subroutine nullify_for_madx
 
   SUBROUTINE  EL_Q(s22,S1)
@@ -2619,6 +2719,7 @@ CONTAINS
 
 !    S2%PERMFRINGE=S1%PERMFRINGE
     S2%p%PERMFRINGE=S1%PERMFRINGE
+    S2%p%highest_fringe=S1%highest_fringe
     S2%P%KILL_EXI_FRINGE=S1%KILL_EXI_FRINGE
     S2%P%KILL_ENT_FRINGE=S1%KILL_ENT_FRINGE
     !    S2%P%BEND_FRINGE=S1%BEND_FRINGE    ! SET ON THE BASIS OF B0
@@ -2944,7 +3045,7 @@ CONTAINS
     c_%FIBRE_flip => FIBRE_flip
     c_%eps_pos => eps_pos
     c_%SECTOR_NMUL => SECTOR_NMUL
-    c_%SECTOR_NMUL_MAX => SECTOR_NMUL_MAX
+!    c_%SECTOR_NMUL_MAX => SECTOR_NMUL_MAX
     c_%electron => electron
     c_%massfactor => muon
     c_%compute_stoch_kick => compute_stoch_kick
@@ -2956,7 +3057,7 @@ CONTAINS
     c_%phase0 => phase0
     c_%ALWAYS_knobs => ALWAYS_knobs
     c_%recirculator_cheat => recirculator_cheat
-
+    c_%ndpt_bmad => ndpt_bmad
   end subroutine set_pointers
 
   SUBROUTINE  Set_mad(Energy,kinetic,p0c,BRHO,BETa,noisy,method,step)

@@ -47,7 +47,7 @@ module tpsalie_analysis
      MODULE PROCEDURE EQUALMAPgen !  not ready
      MODULE PROCEDURE EQUALgenMAP  !  not ready
      !radiation
-     MODULE PROCEDURE beamrad
+!     MODULE PROCEDURE beamrad
   end  INTERFACE
 
   INTERFACE OPERATOR (*)
@@ -70,7 +70,7 @@ module tpsalie_analysis
      MODULE PROCEDURE allocgen
      MODULE PROCEDURE alloctares
      !radiation stochastic
-     MODULE PROCEDURE allocbeamenvelope
+!    MODULE PROCEDURE allocbeamenvelope
   END INTERFACE
 
   INTERFACE kill
@@ -83,7 +83,7 @@ module tpsalie_analysis
      MODULE PROCEDURE KILLgen
      MODULE PROCEDURE killtares
      !radiation stochastic
-     MODULE PROCEDURE killbeamenvelope
+!     MODULE PROCEDURE killbeamenvelope
   END INTERFACE
 
 
@@ -134,7 +134,10 @@ contains
     TYPE (damap), INTENT (IN) :: S2
     TYPE (onelieexponent), INTENT (IN) :: S1
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       one_map%v%i=0
+      RETURN
+    endif
     localmaster=master
 
     call checkdamap(s2)
@@ -159,7 +162,10 @@ contains
     TYPE (damap), INTENT (IN) :: S2
     TYPE (onelieexponent), INTENT (IN) :: S1
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       map_one%v%i=0
+      RETURN
+    endif
     localmaster=master
 
     call checkdamap(s2)
@@ -185,7 +191,10 @@ contains
     TYPE (damap), INTENT (IN) :: S2
     TYPE (dragtfinn), INTENT (IN) :: S1
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       df_map%v%i=0
+      RETURN
+    endif
     localmaster=master
 
     call checkdamap(s2)
@@ -210,7 +219,10 @@ contains
     TYPE (damap), INTENT (IN) :: S2
     TYPE (dragtfinn), INTENT (IN) :: S1
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       map_df%v%i=0
+      RETURN
+    endif
     localmaster=master
 
     call checkdamap(s2)
@@ -235,7 +247,10 @@ contains
     TYPE (damap), INTENT (IN) :: S2
     TYPE (reversedragtfinn), INTENT (IN) :: S1
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       fd_map%v%i=0
+      RETURN
+    endif
     localmaster=master
 
     call checkdamap(s2)
@@ -260,7 +275,10 @@ contains
     TYPE (damap), INTENT (IN) :: S2
     TYPE (reversedragtfinn), INTENT (IN) :: S1
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       map_fd%v%i=0
+      RETURN
+    endif
     localmaster=master
 
     call checkdamap(s2)
@@ -859,7 +877,11 @@ contains
     logical(lp) more
     integer i,j,k,imax,ier,ifac
 
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       pushgen=0
+      RETURN
+    endif
+
     if(.not.imaxflag) then
        junk(:)=0
        do i=1,nd2
@@ -1296,10 +1318,10 @@ contains
     newprint=.false.
     ! if(old) then
     call LIEINIT(NO1,NV,ND1,NDPT1)   !,0
-    w_p=0
-    w_p%nc=1
-    w_p=(/" Berz's Package  "/)
-    w_p%fc='(1((1X,A72),/))'
+ !   w_p=0
+ !   w_p%nc=1
+ !   w_p=(/" Berz's Package  "/)
+ !   w_p%fc='(1((1X,A72),/))'
     !       ! call ! WRITE_I
     !    else
     !       if(no1>3) then
@@ -1322,12 +1344,12 @@ contains
 
 
 
-    w_p=0
-    w_p%nc=1
-    w_p=(/"          NO          ND         ND2          NP        NDPT          NV"/)
-    w_p%fc='(1((1X,A72)))'
-    w_p%fi='(1x,6(6x,i6))'
-    w_p=(/NO,ND,ND2,NP,NDPT,NV/)
+!    w_p=0
+!    w_p%nc=1
+!    w_p=(/"          NO          ND         ND2          NP        NDPT          NV"/)
+!    w_p%fc='(1((1X,A72)))'
+!    w_p%fi='(1x,6(6x,i6))'
+!    w_p=(/NO,ND,ND2,NP,NDPT,NV/)
     ! call ! WRITE_I
     CALL ASSIGN
     !    CALL ASSIGNMAP
@@ -1467,285 +1489,333 @@ contains
   end subroutine DATERMINATE
 
   !radiation special
-  SUBROUTINE  allocbeamenvelope(S2)
-    implicit none
-    type (beamenvelope),INTENT(INOUT)::S2
-    call allocTPSA(s2%transpose)
-    call allocTPSA(s2%bij)
-    call allocTPSA(s2%sij0)
-    call allocpbres(s2%bijnr)
-    s2%auto=.true.
-    s2%STOCHASTIC=.FALSE.
-    call allocTPSA(s2%STOCH)
-  END SUBROUTINE allocbeamenvelope
+!  SUBROUTINE  allocbeamenvelope(S2)
+!    implicit none
+!    type (beamenvelope),INTENT(INOUT)::S2
+!    call allocTPSA(s2%transpose)
+!    call allocTPSA(s2%bij)
+!    call allocTPSA(s2%sij0)
+!    call allocpbres(s2%bijnr)
+!    s2%auto=.true.
+!    s2%STOCHASTIC=.FALSE.
+!    call allocTPSA(s2%STOCH)
+!  END SUBROUTINE allocbeamenvelope
 
-  SUBROUTINE  killbeamenvelope(S2)
-    implicit none
-    type (beamenvelope),INTENT(INOUT)::S2
-    call killTPSA(s2%transpose)
-    call killTPSA(s2%bij)
-    call killTPSA(s2%sij0)
-    call killpbres(s2%bijnr)
-    call killTPSA(s2%STOCH)
-  END SUBROUTINE killbeamenvelope
+!  SUBROUTINE  killbeamenvelope(S2)
+!    implicit none
+!    type (beamenvelope),INTENT(INOUT)::S2
+!    call killTPSA(s2%transpose)
+!    call killTPSA(s2%bij)
+!    call killTPSA(s2%sij0)
+!    call killpbres(s2%bijnr)
+!    call killTPSA(s2%STOCH)
+!  END SUBROUTINE killbeamenvelope
 
-  SUBROUTINE  beamrad(S2,S1)
-    implicit none
-    type (beamenvelope),INTENT(inOUT)::S2
-    type (radtaylor),INTENT(IN)::S1(ndim2)
-    !     type (matrix) tr
-    real(dp) tr(ndim2,ndim2),norm
-    type (damap) id
-    type (normalform) n
-    type (pbfield) bijn,bijnout,t
-    type (taylor) tc(2),trt(ndim2,ndim2)
-    real(dp) st(ndim),rad(ndim),ang(ndim)
-    real(dp) stn(ndim),radn(ndim),angn(ndim)
-    integer i,j,jj(lnv)
-    character(6) ind_stoc(ndim2)
-
-    IF(.NOT.C_%STABLE_DA) RETURN
-    call check_snake
-    st(:)=0.0_dp;rad(:)=0.0_dp;ang(:)=0.0_dp;
-    stn(:)=0.0_dp;radn(:)=0.0_dp;angn(:)=0.0_dp;
-    do i=1,ndim2
-       do j=1,ndim2
-          call alloc(trt(i,j))
-       enddo
-    enddo
-
-    do i=1,ndim2
-       ind_stoc(i)=' '
-    enddo
-    if(nd2==2) then
-       ind_stoc(1)='10'
-       ind_stoc(2)='01'
-    elseif(nd2==4) then
-       ind_stoc(1)='1000'
-       ind_stoc(2)='0100'
-       ind_stoc(3)='0010'
-       ind_stoc(4)='0001'
-    else
-       ind_stoc(1)='100000'
-       ind_stoc(2)='010000'
-       ind_stoc(3)='001000'
-       ind_stoc(4)='000100'
-       ind_stoc(5)='000010'
-       ind_stoc(6)='000001'
-    endif
-
-
-    call alloc(id)
-    call alloc(n)
-    call allocdas(tc,2)
-    call alloc(bijn)
-    call alloc(bijnout)
-    call alloc(t)
-
-
-
-    s2%bij=0.0_dp
-
-    do i=1,nd2
-       s2%transpose%v(i)=s1(i)%v
-    enddo
-
-    tr=s2%transpose
-    do i=1,nd2
-       do j=1,nd2
-          trt(i,j)=(s2%transpose%v(i)).par.ind_stoc(j)
-       enddo
-    enddo
-
-    s2%transpose=0
-
-    id=1
-
-    do i=1,lnv
-       jj(i)=0
-    enddo
-
-    do i=1,nd2
-       do j=1,nd2
-          !    jj(j)=1
-          !     call pok(s2%transpose%v(i),jj,tr%m(j,i))
-          !     call pok(s2%transpose%v(i),jj,tr(j,i))
-          s2%transpose%v(i)=s2%transpose%v(i)+trt(j,i)*(1.0_dp.mono.ind_stoc(j))
-          !     jj(j)=0
-          s2%bij=s2%bij+s1(i)%e(j)*id%v(i)*id%v(j)
-       enddo
-    enddo
-    !  call daprint(s2%transpose,17)
-    !  pause 666
-    s2%bij=s2%bij*s2%transpose
-    !transposed map is normalized
-    n%auto=s2%auto
-    n=s2%transpose
-
-    !bij in Floquet variables
-    !    bijn=s2%bij*n%a%linear
-    bijn=s2%bij*n%a_t
-    s2%bijnr=bijn
-    tc(1)=s2%bijnr%cos
-    tc(2)=s2%bijnr%sin
-
-    do i=1,nd
-       s2%damping(i)=n%damping(i)
-       s2%tune(i)=1.0_dp-n%tune(i)
-       if(s2%tune(i)<0.0_dp) s2%tune(i)=s2%tune(i)+1.0_dp
-    enddo
-    if(s2%tune(3)>=0.5_dp) s2%tune(3)=s2%tune(3)-1.0_dp
-    s2%emittance(1)=-(tc(1).sub.'11' )/2.0_dp/n%damping(1)
-    if(nd>1) then
-       s2%emittance(2)=-(tc(1).sub.'0011'  )/2.0_dp/n%damping(2)
-       if(nd==3) s2%emittance(3)=-(tc(1).sub.'000011')/2.0_dp/n%damping(3)
-    endif
-    call pertpeek(st,ang,rad)
-    call flowpara(0,0)
-    do  i=1,nd
-       angn(i)=-ang(i)
-       radn(i)=-rad(i)
-       stn(i)=st(i)
-    enddo
-    call initpert(stn,angn,radn)
-    call  kernelrad(bijn,bijnout)
-
-
-    bijn=bijnout
-
-
-
-    !  Nonlinear loop in case of parameter dependence
-
-    id=n%normal%linear
-    n%normal%linear=1
-    id=n%normal         ! gets nonlinear stuff only from normal form
-
-    call initpert(st,ang,rad)
-    t=bijn
-    do i=1,no-1
-       t%h=(t%h-t%h*id)
-       call  kernelrad(t,bijnout)
-       t%h=bijnout%h
-       bijn%h=bijn%h+t%h
-    enddo
-    !  End of Nonlinear loop in case of parameter dependence
-
-    s2%sij0=bijn
-    s2%sij0=s2%sij0*(n%a_t**(-1))
-    !    s2%sij0=s2%sij0*(n%a%linear**(-1))
-
-    IF(S2%STOCHASTIC) THEN
-       !       norm=s2%bij ! 2002.10.17
-       norm=full_abs(s2%bij) ! 2002.10.17
-
-       bijn=s2%bij/norm
-       id=1
-
-       if(s2%emittance(2)==0.0_dp.and.nd2>=2) then
-          bijn%h=bijn%h+(1e-7_dp.mono.'002')+(1e-7_dp.mono.'0002')
-       endif
-       id=texp(bijn,id)
-
-       n%auto=.true.
-       n=id
-       bijn=s2%bij*n%a%linear
-
-       DO I=1,ND
-          JJ(2*I-1)=2
-          call pEk(bijn%H,jj,S2%KICK(I))
-          JJ(2*I-1)=0
-       ENDDO
-
-       if(s2%emittance(2)==0.0_dp) then
-          S2%KICK(2)=0.0_dp    !  to make the map away from identity in case on e_2=0
-       endif
-
-       DO I=1,ND
-          S2%KICK(i)=SQRT(abs(s2%KICK(i)))
-       ENDDO
-
-
-
-       ID=n%a%linear
-       do i=1,nd2
-          do j=1,nd2
-             jj(j)=1
-             call pEk(ID%v(i),jj,tr(i,j))
-             jj(j)=0
-          enddo
-       enddo
-       do i=1,nd2
-          do j=1,nd2
-             jj(j)=1
-             call pOk(s2%STOCH%v(i),jj,tr(j,i))
-             jj(j)=0
-          enddo
-       enddo
-
-    ENDIF
-
-    do i=1,nd2
-       do j=i,nd2
-          jj=0
-          jj(i)=1
-          jj(j)=1+jj(j)
-          call pek(s2%sij0,jj,s2%s_ij0(i,j))
-          if(i/=j) then
-             s2%s_ij0(i,j)=s2%s_ij0(i,j)/2.d0
-             s2%s_ij0(j,i)=s2%s_ij0(i,j)
-          endif
-       enddo
-    enddo
-
-
-    call killdas(tc,2)
-    call kill(bijn)
-    call kill(bijnout)
-    call kill(t)
-    call kill(id)
-    call kill(n)
-
-    do i=1,ndim2
-       do j=1,ndim2
-          call kill(trt(i,j))
-       enddo
-    enddo
-
-
-
-  END SUBROUTINE beamrad
-
-  SUBROUTINE  kernelrad(bin,bout)
-    implicit none
-    type (pbfield),INTENT(in)::bin
-    type (pbfield),INTENT(inout)::bout
-
-    type (pbfield) bijn
-    type (taylor) tc(2)
-    TYPE (pbresonance) bijnr
-
-    IF(.NOT.C_%STABLE_DA) RETURN
-    call allocdas(tc,2)
-    call alloc(bijn)
-    call alloc(bijnr)
-
-    bijnr=bin
-    tc(1)=bijnr%cos
-    tc(2)=bijnr%sin
-
-    ! if(old) then
-    call comcfu(tc%i,xgam,xgbm,tc%i)
-    !    else
-    !       call newcomcfu(tc%j,xgam,xgbm,tc%j)
-    !    endif
-    bijnr%cos=tc(1)
-    bijnr%sin=tc(2)
-    bout=bijnr
-
-    call killdas(tc,2)
-  end SUBROUTINE  kernelrad
+!  SUBROUTINE  beamrad(S2,S1)
+!    implicit none
+!    type (beamenvelope),INTENT(inOUT)::S2
+!    type (radtaylor),INTENT(IN)::S1(ndim2)
+!    !     type (matrix) tr
+!    real(dp) tr(ndim2,ndim2),norm
+!    type (damap) id
+!    type (normalform) n
+!    type (pbfield) bijn,bijnout,t
+!    type (taylor) tc(2),trt(ndim2,ndim2)
+!    real(dp) st(ndim),rad(ndim),ang(ndim)
+!    real(dp) stn(ndim),radn(ndim),angn(ndim)
+!    integer i,j,jj(lnv)
+!    character(6) ind_stoc(ndim2)
+!
+!    IF(.NOT.C_%STABLE_DA) RETURN
+!    call check_snake
+!    st(:)=0.0_dp;rad(:)=0.0_dp;ang(:)=0.0_dp;
+!    stn(:)=0.0_dp;radn(:)=0.0_dp;angn(:)=0.0_dp;
+!    do i=1,ndim2
+!       do j=1,ndim2
+!          call alloc(trt(i,j))
+!       enddo
+!    enddo
+!
+!    do i=1,ndim2
+!       ind_stoc(i)=' '
+!    enddo
+!    if(nd2==2) then
+!       ind_stoc(1)='10'
+!       ind_stoc(2)='01'
+!    elseif(nd2==4) then
+!       ind_stoc(1)='1000'
+!       ind_stoc(2)='0100'
+!       ind_stoc(3)='0010'
+!       ind_stoc(4)='0001'
+!    else
+!       ind_stoc(1)='100000'
+!       ind_stoc(2)='010000'
+!       ind_stoc(3)='001000'
+!       ind_stoc(4)='000100'
+!       ind_stoc(5)='000010'
+!       ind_stoc(6)='000001'
+!    endif
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!    call alloc(id)
+!    call alloc(n)
+!    call allocdas(tc,2)
+!    call alloc(bijn)
+!    call alloc(bijnout)
+!    call alloc(t)
+!
+!
+!
+!    s2%bij=0.0_dp
+!
+!    do i=1,nd2
+!       s2%transpose%v(i)=s1(i)%v
+!    enddo
+!
+!    tr=s2%transpose
+!    do i=1,nd2
+!       do j=1,nd2
+!          trt(i,j)=(s2%transpose%v(i)).par.ind_stoc(j)
+!       enddo
+!    enddo
+!
+!    s2%transpose=0
+!
+!    id=1
+!
+!    do i=1,lnv
+!       jj(i)=0
+!    enddo
+!
+!    do i=1,nd2
+!       do j=1,nd2
+!          !    jj(j)=1
+!          !     call pok(s2%transpose%v(i),jj,tr%m(j,i))
+!          !     call pok(s2%transpose%v(i),jj,tr(j,i))
+!          s2%transpose%v(i)=s2%transpose%v(i)+trt(j,i)*(1.0_dp.mono.ind_stoc(j))
+!          !     jj(j)=0
+!          s2%bij=s2%bij+s1(i)%e(j)*id%v(i)*id%v(j)
+!       enddo
+!    enddo
+!    !  call daprint(s2%transpose,17)
+!    !  pause 666
+!    s2%bij=s2%bij*s2%transpose
+!    !transposed map is normalized
+!    n%auto=s2%auto
+!    n=s2%transpose
+!
+!    !bij in Floquet variables
+!    !    bijn=s2%bij*n%a%linear
+!    bijn=s2%bij*n%a_t
+!    s2%bijnr=bijn
+!    tc(1)=s2%bijnr%cos
+!    tc(2)=s2%bijnr%sin
+!
+!    do i=1,nd
+!       s2%damping(i)=n%damping(i)
+!       s2%tune(i)=1.0_dp-n%tune(i)
+!       if(s2%tune(i)<0.0_dp) s2%tune(i)=s2%tune(i)+1.0_dp
+!    enddo
+!    if(s2%tune(3)>=0.5_dp) s2%tune(3)=s2%tune(3)-1.0_dp
+!    s2%emittance(1)=-(tc(1).sub.'11' )/2.0_dp/n%damping(1)
+!    if(nd>1) then
+!       s2%emittance(2)=-(tc(1).sub.'0011'  )/2.0_dp/n%damping(2)
+!       if(nd==3) s2%emittance(3)=-(tc(1).sub.'000011')/2.0_dp/n%damping(3)
+!    endif
+!    call pertpeek(st,ang,rad)
+!    call flowpara(0,0)
+!    do  i=1,nd
+!       angn(i)=-ang(i)
+!       radn(i)=-rad(i)
+!       stn(i)=st(i)
+!    enddo
+!    call initpert(stn,angn,radn)
+!    call  kernelrad(bijn,bijnout)
+!
+!
+!    bijn=bijnout
+!
+!
+!
+!    !  Nonlinear loop in case of parameter dependence
+!
+!    id=n%normal%linear
+!    n%normal%linear=1
+!    id=n%normal         ! gets nonlinear stuff only from normal form
+!
+!    call initpert(st,ang,rad)
+!    t=bijn
+!    do i=1,no-1
+!       t%h=(t%h-t%h*id)
+!       call  kernelrad(t,bijnout)
+!       t%h=bijnout%h
+!       bijn%h=bijn%h+t%h
+!    enddo
+!    !  End of Nonlinear loop in case of parameter dependence
+!
+!    s2%sij0=bijn
+!    s2%sij0=s2%sij0*(n%a_t**(-1))
+!    !    s2%sij0=s2%sij0*(n%a%linear**(-1))
+!
+!    IF(S2%STOCHASTIC) THEN
+!       !       norm=s2%bij ! 2002.10.17
+!       norm=full_abs(s2%bij) ! 2002.10.17
+!
+!       bijn=s2%bij/norm
+!       id=1
+!
+!       if(s2%emittance(2)==0.0_dp.and.nd2>=2) then
+!          bijn%h=bijn%h+(1e-7_dp.mono.'002')+(1e-7_dp.mono.'0002')
+!       endif
+!       id=texp(bijn,id)
+!
+!       n%auto=.true.
+!       n=id
+!       bijn=s2%bij*n%a%linear
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!       DO I=1,ND
+!          JJ(2*I-1)=2
+!          call pEk(bijn%H,jj,S2%KICK(I))
+!          JJ(2*I-1)=0
+!       ENDDO
+!
+!       if(s2%emittance(2)==0.0_dp) then
+!          S2%KICK(2)=0.0_dp    !  to make the map away from identity in case on e_2=0
+!       endif
+!
+!       DO I=1,ND
+!          S2%KICK(i)=SQRT(abs(s2%KICK(i)))
+!       ENDDO
+!
+!
+!
+!       ID=n%a%linear
+!       do i=1,nd2
+!          do j=1,nd2
+!             jj(j)=1
+!             call pEk(ID%v(i),jj,tr(i,j))
+!             jj(j)=0
+!          enddo
+!       enddo
+!       do i=1,nd2
+!          do j=1,nd2
+!             jj(j)=1
+!             call pOk(s2%STOCH%v(i),jj,tr(j,i))
+!             jj(j)=0
+!          enddo
+!       enddo
+!
+!    ENDIF
+!
+!    do i=1,nd2
+!       do j=i,nd2
+!          jj=0
+!          jj(i)=1
+!          jj(j)=1+jj(j)
+!          call pek(s2%sij0,jj,s2%s_ij0(i,j))
+!          if(i/=j) then
+!             s2%s_ij0(i,j)=s2%s_ij0(i,j)/2.d0
+!             s2%s_ij0(j,i)=s2%s_ij0(i,j)
+!          endif
+!       enddo
+!    enddo
+!
+!
+!    call killdas(tc,2)
+!    call kill(bijn)
+!    call kill(bijnout)
+!    call kill(t)
+!    call kill(id)
+!    call kill(n)
+!
+!    do i=1,ndim2
+!       do j=1,ndim2
+!          call kill(trt(i,j))
+!       enddo
+!    enddo
+!
+!
+!
+!  END SUBROUTINE beamrad
+!
+!  SUBROUTINE  kernelrad(bin,bout)
+!    implicit none
+!    type (pbfield),INTENT(in)::bin
+!    type (pbfield),INTENT(inout)::bout
+!
+!    type (pbfield) bijn
+!    type (taylor) tc(2)
+!    TYPE (pbresonance) bijnr
+!
+!    IF(.NOT.C_%STABLE_DA) RETURN
+!    call allocdas(tc,2)
+!    call alloc(bijn)
+!    call alloc(bijnr)
+!
+!    bijnr=bin
+!    tc(1)=bijnr%cos
+!    tc(2)=bijnr%sin
+!
+!    ! if(old) then
+!    call comcfu(tc%i,xgam,xgbm,tc%i)
+!    !    else
+!    !       call newcomcfu(tc%j,xgam,xgbm,tc%j)
+!    !    endif
+!    bijnr%cos=tc(1)
+!    bijnr%sin=tc(2)
+!    bout=bijnr
+!
+!    call killdas(tc,2)
+!  end SUBROUTINE  kernelrad
 
 
 
 end module tpsalie_analysis
+
+
+
+
+
+

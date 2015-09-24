@@ -485,7 +485,7 @@ MODULE TPSA
   END INTERFACE
 
   INTERFACE OPERATOR (.i.)
-     MODULE PROCEDURE GETINTegrate    !@1 takes derivatives
+     MODULE PROCEDURE GETINTegrate    !@1 takes anti-derivatives
   END INTERFACE
 
 
@@ -765,7 +765,10 @@ CONTAINS
     TYPE (TAYLOR), INTENT (IN) :: S1
     integer localmaster
 
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+     unaryADD%i=0
+     RETURN
+    endif
 
     localmaster=master
 
@@ -784,7 +787,10 @@ CONTAINS
     TYPE (TAYLOR), INTENT (IN) :: S1
     integer localmaster
 
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+     unarysub%i=0
+     RETURN
+    endif
     localmaster=master
 
     call ass(unarySUB)
@@ -962,6 +968,7 @@ CONTAINS
     implicit none
     type (TAYLOR),INTENT(IN)::S2
     real(dp) DAABSEQUAL
+    DAABSEQUAL=0
     IF(.NOT.C_%STABLE_DA) RETURN
 
 
@@ -1027,7 +1034,10 @@ CONTAINS
     TYPE (taylor) dexpt
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+     dexpt%i=0 
+     RETURN
+    endif
     localmaster=master
 
     !    call check(s1)
@@ -1048,7 +1058,7 @@ CONTAINS
     implicit none
     real(dp) FULL_ABST
     TYPE (taylor), INTENT (IN) :: S1
-
+    FULL_ABST=0
     IF(.NOT.C_%STABLE_DA) RETURN
     !    call check(s1)
 
@@ -1068,7 +1078,11 @@ CONTAINS
     TYPE (taylor) dtant
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+
+    IF(.NOT.C_%STABLE_DA) then
+      dtant%i=0
+     RETURN
+    endif
     localmaster=master
 
     !    call check(s1)
@@ -1095,7 +1109,10 @@ CONTAINS
     TYPE (taylor) datanht
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+      datanht%i=0
+     RETURN
+    endif
     localmaster=master
 
     !    call check(s1)
@@ -1112,7 +1129,10 @@ CONTAINS
     TYPE (taylor) dcost
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+      dcost%i=0
+     RETURN
+    endif
     localmaster=master
 
 
@@ -1136,7 +1156,10 @@ CONTAINS
     TYPE (taylor) dsint
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+      dsint%i=0
+     RETURN
+    endif
     localmaster=master
 
 
@@ -1158,7 +1181,10 @@ CONTAINS
     TYPE (taylor) dsinHt
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+      dsinHt%i=0
+     RETURN
+    endif
     localmaster=master
 
 
@@ -1179,7 +1205,10 @@ CONTAINS
     TYPE (taylor) DCOSHT
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+      DCOSHT%i=0
+     RETURN
+    endif
     localmaster=master
 
 
@@ -1201,7 +1230,10 @@ CONTAINS
     TYPE (taylor) dtanht
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+      dtanht%i=0
+     RETURN
+    endif
     localmaster=master
 
 
@@ -1223,7 +1255,10 @@ CONTAINS
     TYPE (taylor) dlogt
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+      dlogt%i=0
+     RETURN
+    endif
     localmaster=master
 
 
@@ -1245,7 +1280,10 @@ CONTAINS
     TYPE (taylor) dsqrtt
     TYPE (taylor), INTENT (IN) :: S1
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+      dsqrtt%i=0
+     RETURN
+    endif
     localmaster=master
 
 
@@ -1268,7 +1306,10 @@ CONTAINS
     TYPE (taylor) mul
     TYPE (taylor), INTENT (IN) :: S1, S2
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+      mul%i=0
+     RETURN
+    endif
     localmaster=master
 
 
@@ -1293,7 +1334,10 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1, S2
     integer localmaster
     integer i
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+      pbbra%i=0
+     RETURN
+    endif
     localmaster=master
 
 
@@ -1323,7 +1367,10 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     INTEGER, INTENT (IN) ::  S2
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+      GETORDER%i=0
+     RETURN
+    endif
     localmaster=master
 
 
@@ -1350,7 +1397,10 @@ CONTAINS
     TYPE (taylor), INTENT (IN) :: S1
     INTEGER, INTENT (IN) ::  S2
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       CUTORDER%i=0
+      RETURN
+    endif
     localmaster=master
 
     !    call check(s1)
@@ -1383,7 +1433,11 @@ CONTAINS
     CHARACTER (LEN = LNV)  resul
     integer j(lnv),i
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       dputchar%i=0
+      RETURN
+    endif
+
     localmaster=master
 
 
@@ -1426,7 +1480,10 @@ CONTAINS
     integer  , INTENT (IN) ::  S2(:)
     integer j(lnv),i
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       dputint%i=0
+      RETURN
+    endif
     localmaster=master
 
 
@@ -1469,7 +1526,10 @@ CONTAINS
     integer  , INTENT (IN) ::  S2
     integer j(lnv)
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       dputint0%i=0
+      RETURN
+    endif
     localmaster=master
 
 
@@ -1500,7 +1560,11 @@ CONTAINS
     CHARACTER(*)  , INTENT (IN) ::  S2
 
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       GETCHARnd2s%i=0
+      RETURN
+    endif
+
     localmaster=master
 
 
@@ -1522,7 +1586,10 @@ CONTAINS
     integer  , INTENT (IN) ::  S2(:)
 
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       GETintnd2s%i=0
+      RETURN
+    endif
     localmaster=master
 
 
@@ -1545,7 +1612,10 @@ CONTAINS
     integer  , INTENT (IN) ::  S2
 
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       GETintk%i=0
+      RETURN
+    endif
     localmaster=master
 
 
@@ -1570,6 +1640,8 @@ CONTAINS
     CHARACTER(*)  , INTENT (IN) ::  S2
     CHARACTER (LEN = LNV)  resul
     integer j(lnv),i,c
+
+    getchar=0
     IF(.NOT.C_%STABLE_DA) RETURN
 
  
@@ -1617,6 +1689,8 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     integer , INTENT (IN) ::  S2(:)
     integer j(lnv),i,c
+
+     getint=0
     IF(.NOT.C_%STABLE_DA) RETURN
 
  
@@ -1656,7 +1730,11 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     INTEGER, INTENT (IN) ::  S2
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+
+    IF(.NOT.C_%STABLE_DA) then
+       GETdiff%i=0
+      RETURN
+    endif
     localmaster=master
 
 
@@ -1683,7 +1761,10 @@ endif
     type(taylor) t,x
     real(dp) value
     integer, allocatable :: jc(:)
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       GETINTegrate%i=0
+      RETURN
+    endif
     localmaster=master
 
     allocate(jc(c_%nv))
@@ -1717,7 +1798,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     INTEGER, INTENT (IN) ::  S2
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       GETdatra%i=0
+      RETURN
+    endif
     localmaster=master
 
 
@@ -1742,7 +1826,10 @@ endif
     INTEGER, INTENT (IN) :: R2
     INTEGER I,R22
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       POW%i=0
+      RETURN
+    endif
     localmaster=master
 
 
@@ -1770,7 +1857,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: R2
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       POWR8%i=0
+      RETURN
+    endif
     localmaster=master
 
 
@@ -1796,7 +1886,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     REAL(SP), INTENT (IN) :: R2
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       POWR%i=0
+      RETURN
+    endif
     localmaster=master
 
 
@@ -1825,7 +1918,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       dmulsc%i=0
+      RETURN
+    endif
     localmaster=master
 
 
@@ -1848,7 +1944,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       mulsc%i=0
+      RETURN
+    endif
     localmaster=master
 
 
@@ -1871,7 +1970,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       imulsc%i=0
+      RETURN
+    endif
     localmaster=master
 
 
@@ -1895,7 +1997,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       dscmul%i=0
+      RETURN
+    endif     
     localmaster=master
 
 
@@ -1919,7 +2024,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       scmul%i=0
+      RETURN
+    endif     
     localmaster=master
 
 
@@ -1945,7 +2053,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       iscmul%i=0
+      RETURN
+    endif  
     localmaster=master
 
 
@@ -1968,7 +2079,10 @@ endif
     TYPE (taylor) div
     TYPE (taylor), INTENT (IN) :: S1, S2
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       div%i=0
+      RETURN
+    endif  
     localmaster=master
 
 
@@ -1993,7 +2107,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       dscdiv%i=0
+      RETURN
+    endif  
     localmaster=master
 
 
@@ -2017,7 +2134,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       scdiv%i=0
+      RETURN
+    endif  
     localmaster=master
 
 
@@ -2042,7 +2162,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       iscdiv%i=0
+      RETURN
+    endif  
     localmaster=master
 
 
@@ -2066,7 +2189,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       ddivsc%i=0
+      RETURN
+    endif  
     localmaster=master
 
 
@@ -2090,7 +2216,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       divsc%i=0
+      RETURN
+    endif 
     localmaster=master
 
 
@@ -2115,7 +2244,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       idivsc%i=0
+      RETURN
+    endif 
     localmaster=master
 
 
@@ -2139,7 +2271,10 @@ endif
     TYPE (taylor) add
     TYPE (taylor), INTENT (IN) :: S1, S2
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       add%i=0
+      RETURN
+    endif 
     localmaster=master
 
 
@@ -2167,7 +2302,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       daddsc%i=0
+      RETURN
+    endif 
     localmaster=master
 
 
@@ -2190,7 +2328,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       addsc%i=0
+      RETURN
+    endif 
     localmaster=master
 
 
@@ -2215,7 +2356,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       iaddsc%i=0
+      RETURN
+    endif 
     localmaster=master
 
 
@@ -2238,7 +2382,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       dscadd%i=0
+      RETURN
+    endif 
     localmaster=master
 
 
@@ -2261,7 +2408,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       scadd%i=0
+      RETURN
+    endif 
     localmaster=master
 
 
@@ -2286,7 +2436,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       iscadd%i=0
+      RETURN
+    endif 
     localmaster=master
 
 
@@ -2309,7 +2462,10 @@ endif
     TYPE (taylor) subs
     TYPE (taylor), INTENT (IN) :: S1, S2
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       subs%i=0
+      RETURN
+    endif 
     localmaster=master
 
 
@@ -2335,7 +2491,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       dsubsc%i=0
+      RETURN
+    endif 
     localmaster=master
 
 
@@ -2360,7 +2519,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       subsc%i=0
+      RETURN
+    endif 
     localmaster=master
 
 
@@ -2384,7 +2546,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       isubsc%i=0
+      RETURN
+    endif 
     localmaster=master
 
 
@@ -2407,7 +2572,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     real(dp), INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       dscsub%i=0
+      RETURN
+    endif 
     localmaster=master
 
 
@@ -2430,7 +2598,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     real(sp), INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       scsub%i=0
+      RETURN
+    endif 
     localmaster=master
 
 
@@ -2454,7 +2625,10 @@ endif
     TYPE (taylor), INTENT (IN) :: S1
     integer, INTENT (IN) :: sc
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       iscsub%i=0
+      RETURN
+    endif 
     localmaster=master
 
 
@@ -2482,7 +2656,10 @@ endif
     real(dp), INTENT (IN) :: S1
     integer  , INTENT (IN) ::  S2
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       varf%i=0
+      RETURN
+    endif 
     localmaster=master
 
 
@@ -2500,7 +2677,10 @@ endif
     real(dp), INTENT (IN) :: S1(2)
     integer  , INTENT (IN) ::  S2
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       varf001%i=0
+      RETURN
+    endif 
     localmaster=master
 
 
@@ -2698,8 +2878,10 @@ endif
     CHARACTER (LEN = LNV)  resul
     integer i,k
     integer localmaster
-
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       GETCHARnd2%i=0
+      RETURN
+    endif 
     localmaster=master
 
     ndel=0
@@ -2763,7 +2945,10 @@ endif
     integer , INTENT (IN) ::  S2(:)
     integer i,k
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       GETintnd2%i=0
+      RETURN
+    endif 
     localmaster=master
 
     !    call check(s1)
@@ -2826,7 +3011,10 @@ endif
     integer s2(lnv)
     integer i
     integer localmaster
-    IF(.NOT.C_%STABLE_DA) RETURN
+    IF(.NOT.C_%STABLE_DA) then
+       GETintnd2t%i=0
+      RETURN
+    endif 
     localmaster=master
 
     !    call check(s1)
@@ -2990,7 +3178,11 @@ endif
     integer check_j
     INTEGER,INTENT(in),dimension(:)::j
     integer i,no
-    IF(.NOT.C_%STABLE_DA) RETURN
+
+    IF(.NOT.C_%STABLE_DA) then
+      check_j=0
+     RETURN
+    endif
 
     check_j=0
 
@@ -3627,7 +3819,7 @@ endif
     type (TAYLOR),INTENT(INOUT)::S2
     type (TAYLOR), intent(INOUT):: s1
     real(dp) prec
-    INTEGER ipresent,k,n,I,illa
+    INTEGER ipresent,n,I,illa
     real(dp) value
     INTEGER, allocatable :: j(:)
     type (TAYLOR) t
@@ -3706,7 +3898,7 @@ endif
     type (vecresonance),INTENT(INOUT)::S2
     type (vecresonance), intent(INOUT):: s1
     real(dp) prec
-    integer i
+
 
 
        call clean_vecfield(s1%cos,s2%cos,prec)
@@ -3721,7 +3913,7 @@ endif
     type (onelieexponent),INTENT(INOUT)::S2
     type (onelieexponent), intent(INOUT):: s1
     real(dp) prec
-    integer i
+
 
 
        call clean_vecfield(s1%vector,s2%vector,prec)
@@ -3740,8 +3932,8 @@ endif
     type (complextaylor), intent(INOUT):: s1
     real(dp) prec
 
-    call clean_taylor(S1%r,S1%r,prec)
-    call clean_taylor(S1%i,S1%i,prec)
+    call clean_taylor(S1%r,S2%r,prec)
+    call clean_taylor(S1%i,S2%i,prec)
 
 
   END SUBROUTINE clean_complextaylor
