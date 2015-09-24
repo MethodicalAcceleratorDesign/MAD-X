@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.06  (64 bit, Darwin)      +
+  +     MAD-X 5.02.06  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2015.06.26               +
-  + Execution date: 2015.09.14 07:35:26      +
+  + Execution date: 2015.09.16 13:48:12      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8
 
@@ -708,7 +708,7 @@ PTC_CREATE_LAYOUT,model=2,method=6,nst=1;
 
 SELECT, flag=ptc_twiss, clear;
 
-SELECT, flag=ptc_twiss, column=name,s,beta11,mu1,mu2,mu3;
+SELECT, flag=ptc_twiss, column=name,s,beta11,beta22,mu1,mu2,mu3,x,px,y,py,t,pt;
 
 ptc_twiss,closed_orbit,icase=6,file="twiss_lhc",summary_file="summaryMomentumCompaction"; ! jluc
 

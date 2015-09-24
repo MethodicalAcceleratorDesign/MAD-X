@@ -65,18 +65,13 @@ twiss,rmatrix, betx=1,bety=1,file="twiss_thin.tfs";
 
 ! show,beam;
 
-tr$macro(turn): macro = {
-}
-
-track, onepass, update, dump;
+track, onepass, dump;
 start, x=1e-6, px=0, y=1e-6, py=0, t=-0.25;
 start, x=1e-6, px=0, y=1e-6, py=0, t=-1.0;
 start, x=1e-6, px=0, y=1e-6, py=0, t=-1.75;
 run, turns=50, ffile=1;
 endtrack;
 stop;
-
-
 
 
 !---  read back the thin sequence;

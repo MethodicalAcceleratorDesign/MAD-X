@@ -198,7 +198,7 @@ PTC_CREATE_UNIVERSE;
 PTC_CREATE_LAYOUT,model=2,method=6,nst=1;
 
 SELECT, flag=ptc_twiss, clear;
-SELECT, flag=ptc_twiss, column=name,s,beta11,mu1,mu2,mu3;
+SELECT, flag=ptc_twiss, column=name,s,beta11,beta22,mu1,mu2,mu3,x,px,y,py,t,pt;
 ptc_twiss,closed_orbit,icase=6,file="twiss_lhc",summary_file="summaryMomentumCompaction"; ! jluc
 
 select_ptc_normal, dq1,dq2;

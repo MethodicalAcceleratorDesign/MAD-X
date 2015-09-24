@@ -1,5 +1,32 @@
 #include "madx.h"
 
+static void
+print_rfc(void)
+  /* prints the rf cavities present */
+{
+  double freq0, harmon, freq;
+  int i, n = current_sequ->cavities->curr;
+  struct element* el;
+  if (n == 0)  return;
+  freq0 = command_par_value("freq0", probe_beam);
+  printf("\n RF system: \n");
+  printf(v_format(" %S %NFs %NFs %NFs %NFs %NFs\n"),
+         "Cavity","length[m]","voltage[MV]","lag","freq[MHz]","harmon");
+  for (i = 0; i < n; i++)
+  {
+    el = current_sequ->cavities->elem[i];
+    if ((harmon = el_par_value("harmon", el)) > zero)
+    {
+      freq = freq0 * harmon;
+      printf(v_format(" %S %F %F %F %F %F\n"),
+             el->name, el->length, el_par_value("volt", el),
+             el_par_value("lag", el), freq, harmon);
+    }
+  }
+}
+
+// public interface
+
 void
 pro_emit(struct in_cmd* cmd)
   /* calls the emit module */

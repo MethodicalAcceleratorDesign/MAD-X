@@ -24,6 +24,33 @@ get_beam_value(char* name, char* par)
 }
 #endif
 
+
+static double
+rfc_slope(void)
+  /* calculates the accumulated "slope" of all cavities */
+{
+  double slope = zero, harmon, charge, pc;
+  struct node* c_node = current_sequ->range_start;
+  struct element* el;
+  charge = command_par_value("charge", current_beam);
+  pc = command_par_value("pc", current_beam);
+  do
+  {
+    el = c_node->p_elem;
+    if (strcmp(el->base_type->name, "rfcavity") == 0 &&
+        (harmon = command_par_value("harmon", el->def)) > zero)
+    {
+      double volt = command_par_value("volt", el->def);
+      double lag = command_par_value("lag", el->def);
+      slope += ten_m_3 * charge * volt * harmon * cos(twopi * lag) / pc;
+    }
+    if (c_node == current_sequ->range_end) break;
+    c_node = c_node->next;
+  }
+  while (c_node != NULL);
+  return slope;
+}
+
 // public interface
 
 void
@@ -373,3 +400,91 @@ attach_beam(struct sequence* sequ)
   return current_beam->beam_def;
 }
 
+void
+adjust_probe(double delta_p)
+  /* adjusts beam parameters to the current deltap */
+{
+  int j;
+  double etas, slope, qs, fact, tmp, ds;
+  double alfa, beta, gamma, dtbyds, circ, freq0; 
+  double betas, gammas, et, sigt, sige;
+
+  ds = oneturnmat[34];
+  et = command_par_value("et", current_beam);
+  sigt = command_par_value("sigt", current_beam);
+  sige = command_par_value("sige", current_beam);
+  beta = command_par_value("beta", current_beam);
+  gamma = command_par_value("gamma", current_beam);
+  circ = command_par_value("circ", current_beam);
+
+  /* assume oneturnmap and disp0 already computed (see pro_emit) */ 
+  for (j = 0; j < 4; j++) ds += oneturnmat[4 + 6*j] * disp0[j];
+  tmp = - beta * beta * ds / circ;
+  freq0 = (clight * ten_m_6 * beta) / (circ * (one + tmp * delta_p));
+  etas = beta * gamma * (one + delta_p);
+  gammas = sqrt(one + etas * etas);
+  betas = etas / gammas;
+  tmp = - betas * betas * ds / circ;
+  alfa = one / (gammas * gammas) + tmp;
+  dtbyds = delta_p * tmp / betas;
+
+  store_comm_par_value("freq0", freq0, probe_beam);
+  store_comm_par_value("alfa", alfa, probe_beam);
+  store_comm_par_value("beta", betas, probe_beam);
+  store_comm_par_value("gamma", gammas, probe_beam);
+  store_comm_par_value("dtbyds", dtbyds, probe_beam);
+  store_comm_par_value("deltap", delta_p, probe_beam);
+
+  slope = -rfc_slope();
+  qs = sqrt(fabs((tmp * slope) / (twopi * betas)));
+
+  if (qs != zero) {
+    fact = (tmp * circ) / (twopi * qs);
+    if (et > zero) {
+      sigt = sqrt(fabs(et * fact));
+      sige = sqrt(fabs(et / fact));
+    }
+    else if (sigt > zero) {
+      sige = sigt / fact;
+      et = sige * sigt;
+    }
+    else if (sige > zero) {
+      sigt = sige * fact;
+      et = sige * sigt;
+    }
+  }
+
+  if (sigt < ten_m_15) {
+    put_info("Zero value of SIGT", "replaced by 1.");
+    sigt = one;
+  }
+  
+  if (sige < ten_m_15) {
+    put_info("Zero value of SIGE", "replaced by 1/1000.");
+    sigt = ten_m_3;
+  }
+  
+  store_comm_par_value("qs", qs, probe_beam);
+  store_comm_par_value("et", et, probe_beam);
+  store_comm_par_value("sigt", sigt, probe_beam);
+  store_comm_par_value("sige", sige, probe_beam);
+}
+
+void
+adjust_rfc(void)
+{
+  /* adjusts rfc frequency to given harmon number */
+  double freq0, harmon, freq;
+  int i;
+  struct element* el;
+  freq0 = command_par_value("freq0", probe_beam);
+  for (i = 0; i < current_sequ->cavities->curr; i++)
+  {
+    el = current_sequ->cavities->elem[i];
+    if ((harmon = command_par_value("harmon", el->def)) > zero)
+    {
+      freq = freq0 * harmon;
+      store_comm_par_value("freq", freq, el->def);
+    }
+  }
+}

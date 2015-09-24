@@ -76,7 +76,8 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 ibs,file="ibs-table.tfs";
 
  sige    4.6800203460575546E-004
- Twiss was calculated at the exit of the elements. Twiss functions at the center  of the elements are calculated through linear interpolation
+ Twiss was calculated at the exit of the elements.
+ Twiss functions at the center  of the elements are calculated through linear interpolation
  
  Global parameters for the machine: 
 

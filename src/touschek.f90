@@ -13,7 +13,6 @@ subroutine touschek
   !      considering a constant inverse lifetime along the element (see above) 
   !      and the length of the element
   use name_lenfi
-  use physconsfi
   use touschekfi
   use math_constfi, only : zero, one, two, four, eight, half, pi
   use phys_constfi, only : clight
@@ -319,7 +318,6 @@ subroutine cavtouschek (um,uloss,iflag)
 END subroutine cavtouschek
 
 double precision function ftousch(k)
-  use physconsfi
   use touschekfi
   use math_constfi, only : zero, one, two
   implicit none

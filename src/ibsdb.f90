@@ -7,12 +7,12 @@
 
 subroutine enprem
   use ibsdbfi
+  use math_constfi, only : ten6p, ten3p
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Print emittances and sigmas.                                       *
   !----------------------------------------------------------------------*
-  double precision, parameter :: ten6p=1d6, ten3p=1d3
 
   write (*,'(/a/)') " Emittances:"
   write (*,'(t6,a,t16,e16.6,a,t48,a,t58,f14.6,a)') & 
@@ -309,8 +309,8 @@ subroutine ibs
   
   if ((ss2-s1) .eq. ll2) then
 	testtype = 1
-	print *, 'Twiss was calculated at the exit of the elements. Twiss functions at the center &
-		      & of the elements are calculated through linear interpolation'
+	print *, 'Twiss was calculated at the exit of the elements.' 
+        print *, 'Twiss functions at the center of the elements are calculated through linear interpolation'
   else if ((ss2-s1) .eq. (l1+ll2)/2) then
 	testtype = 2
 	print *, 'Twiss was calculated at the center of the elements. No interpolation is used'
