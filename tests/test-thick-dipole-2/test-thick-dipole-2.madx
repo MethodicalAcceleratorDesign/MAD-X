@@ -79,8 +79,8 @@ option, -echo, -info;
 call, file = "thin.seq";
 option, echo, info;
 use, sequence=myseq;
-show,mb1.edge_l;
+show,mb1_den;
+show,mb1_dex;
 twiss,rmatrix, betx=1,bety=1,file="twiss_thin2.tfs";
-
 
 stop; !---------------------------------------------------------------

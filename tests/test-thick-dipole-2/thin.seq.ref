@@ -1,8 +1,14 @@
-lmb := 10;
 amb := 0.01;
+lmb := 10;
 none = 0;
-mb1: sbend,l:=lmb ,angle:=amb ;
+mb1_den: dipedge,h:=( amb ) / ( lmb ) ;
+mb1: sbend,l:=lmb ,angle:=amb ,kill_ent_fringe=true,kill_exi_fringe=true;
+mb1_dex: dipedge,h:=( amb ) / ( lmb ) ;
 myseq: sequence, l = 30;
-mb1, at = lmb / 2 ;
-mb1, at = 1.5 * lmb ;
+mb1_den, at = ( lmb / 2 ) + ( ( lmb ) * ( 0 - 0.5 ) ) ;
+mb1, at = ( lmb / 2 ) + ( ( lmb ) * ( 0 ) ) ;
+mb1_dex, at = ( lmb / 2 ) + ( ( lmb ) * ( 0.5 ) ) ;
+mb1_den, at = ( 1.5 * lmb ) + ( ( lmb ) * ( 0 - 0.5 ) ) ;
+mb1, at = ( 1.5 * lmb ) + ( ( lmb ) * ( 0 ) ) ;
+mb1_dex, at = ( 1.5 * lmb ) + ( ( lmb ) * ( 0.5 ) ) ;
 endsequence;

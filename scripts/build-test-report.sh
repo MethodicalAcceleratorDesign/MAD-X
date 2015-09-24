@@ -151,8 +151,10 @@ build_test_send ()
     if [ -s build-test-failed.tmp ] ; then
         count=`wc -l < build-test-failed.tmp`
         status="${incomplete}failed ($count)"
+    elif [ "$incomplete" != "" ] ; then
+        status="${incomplete}failed"
     else
-        status="${incomplete}passed"
+        status="passed"
     fi
 
     echo "===== Tests $status ====="                                           > build-test-report.out

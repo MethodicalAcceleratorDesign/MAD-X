@@ -760,3 +760,18 @@ int   atc_flag = 0;
 const char* atm_type = 0;
 int   atm_flag = 0;
 
+
+const char* const nonlin_table_cols[] =
+{
+  "name", "nickname", "basevariable" "value", 
+  "order", "order_x", "order_px","order_y",
+           "order_py","order_pt","order_t"         
+};
+
+const int nonlin_table_types[] =
+{
+  3, 3, 3, 2, 
+  1, 1, 1, 1,
+     1, 1, 1
+};
+     

@@ -116,4 +116,7 @@ extern       int    atc_flag;
 extern const char*  atm_type;
 extern       int    atm_flag;
 
+extern const char* const nonlin_table_cols[];  
+extern const int    nonlin_table_types[];
+
 #endif // MAD_GCST_H
