@@ -9,7 +9,7 @@
 
 
 \chapter{Ripken Optics Parameters}
-\label{chap:ptc_twiss}
+\label{chap:ptc-twiss}
 
 
 \section{Introduction}
@@ -128,7 +128,7 @@ PTC\_END;
 }
 
 \section{PTC\_TWISS}
-\label{sec:ptc_twiss}
+\label{sec:ptc-twiss}
  
 The {\tt PTC\_TWISS} command causes computation of the Twiss
 parameters in Ripken's style. It operates on the working beam line
@@ -137,8 +137,8 @@ defined in the latest \hyperref[sec:use]{\tt USE} command.
 Applications for the {\tt PTC\_TWISS} command are similar to the
 \hyperref[chap:twiss]{\tt TWISS} command of \madx. 
 The {\tt PTC\_TWIS}S can be applied to two basic tasks. It can calculate either a
-\hyperlink{Periodic_Solution}{periodic solution} or a
-\hyperlink{Initial_Conditions}{solution with initial conditions}. 
+\hyperref[sec:ptc-twiss-periodic]{periodic solution} or a
+\hyperref[sec:ptc-twiss-sol-initial-cond]{solution with initial conditions}. 
 
 \madbox{
 PTC\_TWISS, \=ICASE=integer, DELTAP=real, \\
@@ -178,7 +178,7 @@ The attributes are:
 
   \ttitem{CLOSED\_ORBIT}  
   a logical switch to trigger the closed orbit calculation
-  (applies to \hyperlink{Periodic_Solution}{periodic solution} ONLY). \\  
+  (applies to \hyperref[sec:ptc-twiss-periodic]{periodic solution} ONLY). \\  
   (Default: false)
 
   \ttitem{DELTAP\_DEPENDENCY}  
@@ -276,7 +276,7 @@ The attributes are:
   \ttitem{INITIAL\_MAP\_MANUAL}
   a logical flag to trigger the use of an input map stored beforehand in
   file "fort.18",  e.g. by a previous initial run of
-  \hyperref[chap:ptc_normal]{\tt PTC\_NORMAL}). \\
+  \hyperref[chap:ptc-normal]{\tt PTC\_NORMAL}). \\
   (Default: false)
 
   \ttitem{IGNORE\_MAP\_ORBIT} 
@@ -309,18 +309,18 @@ The attributes are:
   (Default: false)
 
   \ttitem{X, PX, Y, PY, T, PT} the
-  \hyperref[subsec:tables_canon]{canonical} coordinates of the initial
+  \hyperref[subsec:tables-canon]{canonical} coordinates of the initial
   orbit. \\ (Default: 0.0) \\
   
 \end{madlist}
 
 
 \section{Periodic Solution}
-\label{sec:ptc_twiss_periodic}	
+\label{sec:ptc-twiss-periodic}	
 
 This is the simplest form of the {\tt PTC\_TWISS} command, which
 computes the periodic solution for a specified beam line. It may
-accept all basic attributes described in \hyperref[sec:ptc_twiss]{\tt
+accept all basic attributes described in \hyperref[sec:ptc-twiss]{\tt
   PTC\_TWISS} above.
 
 \madbox{
@@ -330,14 +330,14 @@ PTC\_TWISS, \=ICASE=integer, DELTAP=real, CLOSED\_ORBIT=logical,\\
 
 
 \section{Evaluation of Twiss parameters inside magnets}
-\label{sec:ptc_twiss_slicing}
+\label{sec:ptc-twiss-slicing}
 
 This computes the periodic solution for a specified beam
 line and evaluates the Twiss parameters at each thin-slice
 (a.k.a "integration-node") inside magnets. The number of such
 integration-nodes is given by the number of steps ({\tt NST})
 selected when creating the \ptc layout. All other basic
-attributes described in \hyperref[sec:ptc_twiss]{\tt PTC\_TWISS} above
+attributes described in \hyperref[sec:ptc-twiss]{\tt PTC\_TWISS} above
 may be selected.
 
 \madbox{
@@ -355,7 +355,7 @@ An example is found in the
 
 
 \section{Solution with Initial Conditions}
-\label{sec:ptc_twiss_sol_initial_cond}
+\label{sec:ptc-twiss-sol-initial-cond}
 
 
 Initial conditions can be supplied in different ways.  Naturally only
@@ -372,26 +372,26 @@ initial conditions:
 \madbox{
 xxxxxxxx\=xx\= \kill
 IF     \>( \=INITIAL\_MATRIX\_TABLE=true  \&\&  (a map-table exists))  THEN \\
-        \>  \>use \hyperref[subsec:from_map_table]{initial values from a Map-Table}\\
+        \>  \>use \hyperref[subsec:from-map-table]{initial values from a Map-Table}\\
 \\
 ELSEIF \>( \>INITIAL\_MAP\_MANUAL=true ) THEN \\
-        \>  \>use \hyperref[subsec:from_map_file]{initial values from a Given Map File}\\ 
+        \>  \>use \hyperref[subsec:from-map-file]{initial values from a Given Map File}\\ 
 \\
 ELSEIF \>( \>INITIAL\_MATRIX\_MANUAL=true ) THEN \\
-        \>  \>use \hyperref[subsec:from_given_matrix]{initial values from a Given Matrix}\\ 
+        \>  \>use \hyperref[subsec:from-given-matrix]{initial values from a Given Matrix}\\ 
 \\
 ELSEIF \>( \>BETA0 block is given ) THEN \\
-       \>  \>use \hyperref[subsec:from_beta0_block]{initial values from a BETA0 block}\\ 
+       \>  \>use \hyperref[subsec:from-beta0-block]{initial values from a BETA0 block}\\ 
 \\
 ELSE \\
-       \>  \> use \hyperref[subsec:from_twiss_command]{initial values from Given Twiss parameters}\\ 
+       \>  \> use \hyperref[subsec:from-twiss-command]{initial values from Given Twiss parameters}\\ 
 \\
 ENDIF
 }
 
 
 \subsection{Initial Values from the Given Twiss Parameters}
-\label{subsec:from_twiss_command}
+\label{subsec:from-twiss-command}
 
 {\tt PTC\_TWISS} calculates a solution with initial conditions
 given by the Twiss parameters, which are explicitly typed as attributes
@@ -419,13 +419,13 @@ in the folder
 
 
 \subsection{Initial Values from a Map-Table}
-\label{subsec:from_map_table}
+\label{subsec:from-map-table}
 
 {\tt PTC\_TWISS} calculates a solution with initial conditions given
 as a map-table of preceding ring or beam-line. It requires the input
 option {\tt INITIAL\_MATRIX\_TABLE} and an existing map-table
 in memory, as generated by a preceding
-\hyperref[sec:ptc_normal]{\tt PTC\_NORMAL} command.  
+\hyperref[sec:ptc-normal]{\tt PTC\_NORMAL} command.  
 
 \madbox{
 PTC\_TWISS, \=ICASE=integer, DELTAP=real, \\ %CLOSED\_ORBIT, \\
@@ -442,14 +442,14 @@ An example is found in the
 
 
 \subsection{Initial Values from a Map-File}
-\label{subsec:from_map_file}
+\label{subsec:from-map-file}
 
 {\tt PTC\_TWISS} calculates a solution with initial
 conditions given as a map-file (fort.18) obtained from a
 preceding ring or beam-line. It requires the input option
 {\tt INITIAL\_MAP\_MANUAL} and an existing map-file
 in file "fort.18", as generated by a preceding
-\hyperref[sec:ptc_normal]{\tt PTC\_NORMAL} command. 
+\hyperref[sec:ptc-normal]{\tt PTC\_NORMAL} command. 
 
 \madbox{
 PTC\_TWISS, \=ICASE=integer, DELTAP=real, \\ % \\ CLOSED\_ORBIT, \\
@@ -466,7 +466,7 @@ An example is found in the
 
 
 \subsection{Initial Values from a Given Matrix}
-\label{subsec:from_given_matrix}
+\label{subsec:from-given-matrix}
 
 {\tt PTC\_TWISS} calculates a solution with initial conditions given
 by a matrix explicitly given as attribute to the command. 
@@ -491,7 +491,7 @@ An example is found in the
 
 
 \subsection{Initial Values from Twiss Parameters via BETA0-block}
-\label{subsec:from_beta0_block}
+\label{subsec:from-beta0-block}
 
 {\tt PTC\_TWISS} calculates a solution with initial conditions given by
 Twiss parameters, which are transferred from the {\tt BETA0} block.  The

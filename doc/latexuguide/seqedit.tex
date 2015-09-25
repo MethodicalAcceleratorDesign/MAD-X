@@ -210,7 +210,7 @@ element of the extracted sequence.
 \end{madlist}
 
 
-The extracted sequence is declared as \hyperref[sec:sequence]{\tt SHARE}d and
+The extracted sequence is declared as \hyperref[chap:sequence]{\tt SHARE}d and
 can therefore be combined e.g. into the cycled original sequence.
 
 {\bf Note:} the element given by the {\tt FROM} attribute must be located, in 
@@ -248,13 +248,13 @@ SAVE, \=SEQUENCE=string{,string}, FILE=filename, \\
 }
 \end{5.02.06}
 
-\begin{5.03.00}
+\begin{5.02.07}
 \madbox{
     SAVE, \=SEQUENCE=string{,string}, FILE=filename, \\
     \>BEAM=logical, BARE=logical, MAD8=logical, \\
     \>NOEXPR=logical, NEWNAME=string;
 }
-\end{5.03.00}
+\end{5.02.07}
 
 
 The parameters are defined as: 
@@ -286,7 +286,7 @@ The parameters are defined as:
 \end{madlist}
 \end{5.02.06}
 
-\begin{5.03.00}
+\begin{5.02.07}
 \begin{madlist}
 	\ttitem{SEQUENCE} lists the sequences to be saved, separated by commas. 
 	This attribute is optional and when omitted, all known 
@@ -320,7 +320,7 @@ The parameters are defined as:
 	\ttitem {NEWNAME} provides a name for the saved sequence, overriding the 
 	original name. (see \hyperref[sec:extract]{\tt EXTRACT} above)
 \end{madlist}
-\end{5.03.00}
+\end{5.02.07}
 
 
 Any number of {\tt SELECT, FLAG=save, ...} commands may precede

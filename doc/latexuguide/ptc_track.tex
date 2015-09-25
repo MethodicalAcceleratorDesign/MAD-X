@@ -4,7 +4,7 @@
 
 
 \chapter{Thick-Lens Tracking Module}
-\label{chap:ptc_track}
+\label{chap:ptc-track}
 
 The {\tt PTC-TRACK} module \cite{kapin2006,schmidt2005} is the
 symplectic thick-lens tracking facility in \madx.  It is based on \ptc
@@ -14,7 +14,7 @@ brackets ([]).
 
 Prior to using this module the active beam line must be selected by
 means of a \hyperref[sec:use]{USE} command.  
-The general \hyperref[chap:ptc_setup]{PTC environment} must
+The general \hyperref[chap:ptc-setup]{PTC environment} must
 also be initialized.  
 
 {\bf Examples}\\
@@ -23,7 +23,7 @@ Several examples can be found on the web at
 
 
 \section{Synopsis}
-\label{sec:ptc_track_synopsis}
+\label{sec:ptc-track-synopsis}
 
 A typical tracking job in \ptc requires a number of commands to be issued:
 
@@ -48,14 +48,14 @@ PTC\_END;
 
 
 \section{PTC\_START}
-\label{sec:ptc_start}
+\label{sec:ptc-start}
 
 To start particle tracking, a series of initial trajectory coordinates
 must be given with the {\tt PTC\_START} command;  and as many
 commands as initial trajectories can be given. 
 
 {\tt PTC\_START} commands must appear before the
-\hyperref[sec:ptc_track]{\tt PTC\_TRACK} command. 
+\hyperref[sec:ptc-track]{\tt PTC\_TRACK} command. 
 
 \madbox{  
 PTC\_START, \=X=real, PX=real, Y=real, PY=real, T=real, PT=real,\\
@@ -92,25 +92,25 @@ given in the {\tt PTC\_START} command, they are summed after conversion
 of the action-angle coordinates to canonical coordinates.
 
 The use of the action-angle coordinates requires the option 
-\hyperref[opt:closed_orbit]{\tt CLOSED\_ORBIT} in the 
-\hyperref[sec:ptc_track]{\tt PTC\_TRACK} command. 
+\hyperref[opt:closed-orbit]{\tt CLOSED\_ORBIT} in the 
+\hyperref[sec:ptc-track]{\tt PTC\_TRACK} command. 
 
 If the option
-\hyperref[opt:closed_orbit]{\tt CLOSED\_ORBIT} in the
-\hyperref[sec:ptc_track]{\tt PTC\_TRACK} command is active
+\hyperref[opt:closed-orbit]{\tt CLOSED\_ORBIT} in the
+\hyperref[sec:ptc-track]{\tt PTC\_TRACK} command is active
 (see above) all coordinates are specified with respect to the actual
 closed orbit (possibly off-momentum with magnet errors) and NOT with
 respect to the reference orbit. 
-If the option \hyperref[opt:closed_orbit]{\tt CLOSED\_ORBIT} is absent,
+If the option \hyperref[opt:closed-orbit]{\tt CLOSED\_ORBIT} is absent,
 then coordinates are specified with respect to the reference orbit.  
 
 {\bf Important:} \\
 The initial trajectory coordinates specified with the {\tt PTC\_START} command 
-(and the \hyperref[sec:ptc_start]{\tt PTC\_START} command remain in the 
+(and the \hyperref[sec:ptc-start]{\tt PTC\_START} command remain in the 
 {\tt TRACKSUMM} table for the duration of the \madx run. 
 Therefore any subsequent {\tt RUN} command 
-(and \hyperref[sec:ptc_trcak]{\tt PTC\_TRACK} or 
-\hyperref[sec:ptc_trackline]{\tt PTC\_TRACKLINE}) to actually start tracking 
+(and \hyperref[sec:ptc-track]{\tt PTC\_TRACK} or 
+\hyperref[sec:ptc-trackline]{\tt PTC\_TRACKLINE}) to actually start tracking 
 will effectively use {\bf all} initial trajectory coordinates found in the {\tt 
 TRACKSUMM} table.
 A workaround this odd behaviour is to delete the {\tt TRACKSUMM} table before 
@@ -121,7 +121,7 @@ current run:
 
 
 \section{PTC\_OBSERVE} 
-\label{sec:ptc_observe}
+\label{sec:ptc-observe}
 
 Besides the beginning of the beam-line, one can define an additional
 observation points along the machine. Subsequent \texttt{PTC\_TRACK}
@@ -149,22 +149,22 @@ in two different ways:
 \begin{enumerate}
   \item traditional element-by-element tracking. (See
     \hyperref[chap:thintrack]{\madx thin tracking}) which 
-    requires the option \hyperref[opt:element_by_element]{\tt
-      ELEMENT\_BY\_ELEMENT} of \hyperref[sec:ptc_track]{\tt PTC\_TRACK} to
+    requires the option \hyperref[opt:element-by-element]{\tt
+      ELEMENT\_BY\_ELEMENT} of \hyperref[sec:ptc-track]{\tt PTC\_TRACK} to
     be active.
 
   \item coordinate transformation from {\bf "start"} to the
   respective observation points using high-order \ptc transfer
-  maps, which requires the option \hyperref[opt:closed_orbit]{\tt
-    CLOSED\_ORBIT} of \hyperref[sec:ptc_track]{\tt PTC\_TRACK} to be
+  maps, which requires the option \hyperref[opt:closed-orbit]{\tt
+    CLOSED\_ORBIT} of \hyperref[sec:ptc-track]{\tt PTC\_TRACK} to be
   active, and the options \hyperref[opt:radiation]{\tt RADIATION}
-  and \hyperref[opt:element_by_element]{\tt ELEMENT\_BY\_ELEMENT} of
-  \hyperref[sec:ptc_track]{\tt PTC\_TRACK} to be inactive.
+  and \hyperref[opt:element-by-element]{\tt ELEMENT\_BY\_ELEMENT} of
+  \hyperref[sec:ptc-track]{\tt PTC\_TRACK} to be inactive.
 \end{enumerate} 
 
 
 \section{PTC\_TRACK}
-\label{sec:ptc_track}
+\label{sec:ptc-track}
 
 The {\tt PTC\_TRACK} command initiates trajectory tracking by
 entering the thick-lens tracking module.  
@@ -213,19 +213,19 @@ The attributes are:
    \ttitem{DELTAP} the relative momentum offset for reference closed
    orbit (used for 5D case ONLY). \\
    {\tt DELTAP} is ignored for {\tt ICASE=6}, but the option 
-   {\tt OFFSET\_DELTAP} of command \hyperref[sec:ptc_create_layout]
+   {\tt OFFSET\_DELTAP} of command \hyperref[sec:ptc-create-layout]
    {\tt PTC\_CREATE\_LAYOUT} may be used, if the reference particle should
    have a momentum offset. \\ 
    (Default: 0.0) 
 
-   \ttitem{CLOSED\_ORBIT}\label{opt:closed_orbit}
+   \ttitem{CLOSED\_ORBIT}\label{opt:closed-orbit}
    a logical switch to activate the closed orbit calculation.
    This option must be used for closed rings only. This
    option allows to activate the Normal Form analysis, if
    required. With {\tt CLOSED\_ORBIT=false}, the sequence is treated as
    a transfer line. \\ (Default: false)
      
-   \ttitem{ELEMENT\_BY\_ELEMENT}\label{opt:element_by_element}
+   \ttitem{ELEMENT\_BY\_ELEMENT}\label{opt:element-by-element}
    a logical switch to activate the element-by-element tracking, from
    the default turn-by-turn tracking. \\ (Default: false)
 
@@ -277,7 +277,7 @@ The attributes are:
    radiation according to the method given in \cite{roy1990}. This model
    simulates quantum excitation via a random number generator and tables
    for photon emission. It can be used only with the option
-   \hyperref[opt:element_by_element]{\tt ELEMENT\_BY\_ELEMENT}.\\ 
+   \hyperref[opt:element-by-element]{\tt ELEMENT\_BY\_ELEMENT}.\\ 
    (Default: false) 
 
    \ttitem{RADIATION\_ENERGY\_LOSS} a logical flag to add back the
@@ -301,20 +301,20 @@ The attributes are:
 
 
 \section{PTC\_TRACKLINE}
-\label{sec:ptc_trackline}
+\label{sec:ptc-trackline}
 
 The {\tt PTC\_TRACKLINE} command performs particle tracking that takes
 into account acceleration in travelling wave cavities. 
 It must be invoked in the scope of correctly initialized
-\hyperref[chap:ptc_setup]{PTC environment}, 
-i.e. after \hyperref[sec:ptc_create_universe]{\tt PTC\_CREATE\_UNIVERSE}
-and \hyperref[sec:ptc_create_layout]{\tt PTC\_CREATE\_LAYOUT} commands, and before
-corresponding \hyperref[sec:ptc_end]{\tt PTC\_END}. 
+\hyperref[chap:ptc-setup]{PTC environment}, 
+i.e. after \hyperref[sec:ptc-create-universe]{\tt PTC\_CREATE\_UNIVERSE}
+and \hyperref[sec:ptc-create-layout]{\tt PTC\_CREATE\_LAYOUT} commands, and before
+corresponding \hyperref[sec:ptc-end]{\tt PTC\_END}. 
 
-All tracks created with \hyperref[sec:ptc_start]{\tt PTC\_START}
+All tracks created with \hyperref[sec:ptc-start]{\tt PTC\_START}
 commands before {\tt PTC\_TRACKLINE} command is issued are 
 tracked. Track parameters are dumped at every defined observation point
-(see \hyperref[sec:ptc_observe]{\tt PTC\_OBSERVE} command). 
+(see \hyperref[sec:ptc-observe]{\tt PTC\_OBSERVE} command). 
 
 Please note that \madx always creates an observation point at the end of a
 sequence.
@@ -402,9 +402,9 @@ Tracks that do not fit in the defined aperture for elements are
 immediately stopped.  
 
 Behavior of PTC calculations can be adapted with
-\hyperref[sec:ptc_setswitch]{\tt PTC\_SETSWITCH} command 
+\hyperref[sec:ptc-setswitch]{\tt PTC\_SETSWITCH} command 
 and with appropriate switches of
-\hyperref[sec:ptc_create_layout]{\tt PTC\_CREATE\_LAYOUT} command.  
+\hyperref[sec:ptc-create-layout]{\tt PTC\_CREATE\_LAYOUT} command.  
 
 
 %% {\bf PROGRAMMER'S MANUAL}\\
@@ -473,7 +473,7 @@ and with appropriate switches of
 
 
 \section{PTC\_TRACK\_END}
-\label{sec:ptc_track_end}
+\label{sec:ptc-track-end}
 
 The {\tt PTC\_TRACK\_END} command terminates the command lines related
 to the {\tt PTC\_TRACK} module. 
@@ -488,7 +488,7 @@ to file.
 
 
 \section{Choice of options}
-\label{sec:choice_options}
+\label{sec:choice-options}
 
 The following table facilitates the choice of the correct options for a
 number of typical tasks: 

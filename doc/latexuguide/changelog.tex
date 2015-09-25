@@ -14,23 +14,23 @@ version number where the change applies as well as the SVN
 release number for the change. 
 
 \begin{madlist}
-  \ttitem{2015-Sep-15} version 5.03.00, r5405\\
+  \ttitem{2015-Sep-15} version 5.02.07, r5407\\
   Removed the precedence information in the \hyperref[sec:beam]{\tt BEAM} 
   command between the longitudinal emittance ({\tt ET}) and beams sizes 
   ({\tt SIGT} and {\tt SIGE}) since this is actually not implemented in the 
   code.
   
-  \ttitemn{2015-Sep-15} version 5.03.00, r5399\\
+  \ttitemn{2015-Sep-15} version 5.02.07, r5399\\
   A new option {\tt NOEXPR} has been added to the \hyperref[sec:save]{\tt SAVE} 
   command to allow saving sequences with only values and no expressions in 
   variables and commands.
   
-  \ttitemn{2015-Sep-04} version 5.03.00, r5380\\
+  \ttitemn{2015-Sep-04} version 5.02.07, r5380\\
   Change of the trailing message printed on output that no longer 
   mentions the version number and version architecture. 
   The same information can already be found in the header message.
 
-  \ttitem{2015-Aug-31} version 5.03.00, r5367\\
+  \ttitem{2015-Aug-31} version 5.02.07, r5367\\
   {\tt TEAPOT} is now the default style for 
   \hyperref[chap:makethin]{\tt MAKETHIN}. 
   The previous default style that was used when the {\tt STYLE} 
@@ -42,7 +42,7 @@ release number for the change.
   style}
 
   \ttitem{2015-Jul-15} version 5.02.06, r5336 \\
-  corrected a typo in equation \ref{eq:field_components} 
+  corrected a typo in equation \ref{eq:field-components} 
   reported by Michael Severance (Stony Brook). 
   The $B_2$ factor of the expansion of the $B_x$ 
   field was reading $(xy - \frac{h^3}{6}y^3+\cdots)$ 
@@ -85,7 +85,7 @@ release number for the change.
 
   \ttitemn{2015-Mar-10} version 5.02.05, r5161\\
   {\bf Major change} to definition of {\tt RACETRACK} 
-  \hyperref[sec:def_aper]{aperture type}. 
+  \hyperref[sec:def-aper]{aperture type}. 
   The {\tt RACETRACK} aperture now refers to a generalized shape 
   with rounding of corner with ellipse instead of circle. 
   The {\tt APERTURE} array now takes four arguments for the 
@@ -153,8 +153,8 @@ release number for the change.
   
   
   \ttitemn{2014-Nov-25} version 5.02.04, r5092\\
-  removed the \hyperref[sec:global]{\tt GLOBAL} matching constraints {\tt DDQ1, 
-  	DDQ2} from the documentation since they are not implemented in the code. 
+  removed the \hyperref[sec:global]{\tt GLOBAL} matching constraints
+  {\tt DDQ1, DDQ2} from the documentation since they are not implemented in the code. 
   
   
   \ttitemn{2014-Nov-14} version 5.02.04, r5081\\
@@ -171,9 +171,9 @@ release number for the change.
   
   
   \ttitemn{2014-Nov-13}  version 5.02.04, r5080\\
-  documented a bug occurring when \hyperref[sec:line]{\tt 
-  LINE} or \hyperref[sec:macro]{\tt MACRO} 
-  constructs appear within a \hyperref[sec:if]{\tt IF ... ELSEIF ... ELSE} or a 
+  documented a bug occurring when \hyperref[sec:beamline]{\tt LINE}
+  or \hyperref[sec:macro]{\tt MACRO} constructs appear within a
+  \hyperref[sec:if]{\tt IF ... ELSEIF ... ELSE} or a 
   \hyperref[sec:while]{\tt WHILE} construct. This bug will not be fixed now. \\ 
   Clarified also that {\tt IF ... ELSEIF ... ELSE} and {\tt WHILE} constructs 
   can be nested to at least six levels deep.
@@ -198,7 +198,7 @@ release number for the change.
   
   \ttitemn{2014-Aug-25} version 5.02.03, r4942 and r4943\\
   harmonized the behaviour of \hyperref[sec:fill]{\tt FILL},
-  \hyperref[sec:setvars]{\tt SETVARS} and \hyperref[sec:setvars_lin]{\tt
+  \hyperref[sec:setvars]{\tt SETVARS} and \hyperref[sec:setvars-lin]{\tt
   	SETVARS\_LIN} with respect to negative row numbers, and updated the
   default values. Added documentation sections for {\tt SETVARS} and {\tt
   	SETVARS\_LIN} that were hitherto undocumented.  
@@ -210,7 +210,7 @@ release number for the change.
   elements are not reversed head to tail), and also equivalent to
   \texttt{2*(S)} and \texttt{-2*(S)} if \texttt{S} is a single
   element.\\
-  Documentation updated; see \ref{sec:reflect_repeat_lines}
+  Documentation updated; see \ref{sec:reflect-repeat-lines}
 
 
 \end{madlist}

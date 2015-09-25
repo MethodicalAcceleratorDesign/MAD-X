@@ -10,9 +10,9 @@
 \label{chap:twiss}
 
 The {\tt TWISS} command calculates the
-\hyperref[subsec:tables_linear]{linear lattice
-  functions} \cite{Courant_Snyder1958}, and optionally the
-\hyperref[subsec:tables_chrom]{chromatic functions}. 
+\hyperref[subsec:tables-linear]{linear lattice
+  functions} \cite{Courant-Snyder1958}, and optionally the
+\hyperref[subsec:tables-chrom]{chromatic functions}. 
 The coupled functions are calculated in the sense of
 Edwards and Teng\cite{edwards1973}.
 For the uncoupled cases they reduce to the C and S functions. 
@@ -61,7 +61,7 @@ The  attributes of the {\tt TWISS} command are:
 
 
   \ttitem{CHROM} a logical flag to trigger computation of the
-  \hyperref[subsec:tables_chrom]{chromatic functions} as well as the radiation 
+  \hyperref[subsec:tables-chrom]{chromatic functions} as well as the radiation 
   synchrotron integrals. \\
   \textit{Please note that this option is needed for a proper
     calculation of the chromaticities in the presence of coupling!}\\
@@ -74,12 +74,11 @@ The  attributes of the {\tt TWISS} command are:
     to {\tt DELTAP}+1.e-6. The tune differences divided by 1.e-6 yield the
     chromaticities.}
 
-  \ttitem{CENTRE} a logical 
-  flag to enforce the calculation of the
-  \hyperref[subsec:tables_linear]{linear lattice
-    functions} at the center of the element instead of the end
-  of the element. The values in the tables and in the output files are
-  affected by this flag. \\ (Default: false) \\
+  \ttitem{CENTRE} a logical flag to enforce the calculation of the
+  \hyperref[subsec:tables-linear]{linear lattice functions} at the
+  center of the element instead of the end of the element. The values in
+  the tables and in the output files are affected by this
+  flag. \\ (Default: false) \\ 
   \textit{ Since the lattice functions are calculated inside the element
     the closed orbit coordinates in the output also include the misalignment
     of the element.}  
@@ -98,11 +97,11 @@ The  attributes of the {\tt TWISS} command are:
   command with the {\tt FLAG=twiss} attribute. 
 
   \ttitem{TABLE} the name of the table where 
-  \hyperref[subsec:tables_linear]{linear lattice functions} as well 
-  as \hyperref[subsec:tables_chrom]{chromatic functions} are stored. 
+  \hyperref[subsec:tables-linear]{linear lattice functions} as well 
+  as \hyperref[subsec:tables-chrom]{chromatic functions} are stored. 
   (Default: ``twiss'') \\
 %  \madx creates a full
-%  \hyperref[subsec:tables_linear]{Twiss table} in
+%  \hyperref[subsec:tables-linear]{Twiss table} in
 %  memory and gives it the name {\tt TWISS}, unless {\tt TABLE=tabname}
 %  is given, then it is called "tabname". This table
 %  includes linear lattice functions as well as the chromatic
@@ -131,18 +130,18 @@ The  attributes of the {\tt TWISS} command are:
   {\tt "COLUMN, REij"} one gets all or the component "ij" respectively.    
 
   \ttitem{SECTORMAP} a logical flag to initiate the calculation of a 
-  \hyperref[subsec:sectormap]{sector map}.
+  \hyperref[sec:sectormap]{sector map}.
   
   \ttitem{SECTORTABLE} the name of the table containing the {\tt SECTORMAP}
   values. The elements (lines) and parameters (columns) 
   of the table can be tailored using the \hyperref[sec:select]{\tt SELECT} 
-  command as specified in \hyperref[subsec:sectormap]{\tt SECTORMAP} \\
+  command as specified in \hyperref[sec:sectormap]{\tt SECTORMAP} \\
   (Default: sectortable)
 
   \ttitem{SECTORFILE} the name of the file to which the {\tt SECTORMAP} is
   written. 
   The format of the output can be adjusted as specified in 
-  \hyperref[subsec:sectormap]{\tt SECTORMAP} \\
+  \hyperref[sec:sectormap]{\tt SECTORMAP} \\
   (Default: "sectormap")
   %% Used to write SECTORMAPs to the file
   %% SECTORFILE="filename", if missing the output of SECTORMAP
@@ -172,7 +171,7 @@ The  attributes of the {\tt TWISS} command are:
   result in apparently non-closure of the beta values in the
   plane with non-zero dispersion. The full 6D Twiss parameters
   can be calculated with the
-  \hyperref[chap:ptc_twiss]{PTC\_TWISS} command.    
+  \hyperref[chap:ptc-twiss]{PTC\_TWISS} command.    
 
   \ttitem{RIPKEN} This flag calculates the Ripken-Mais Twiss
   parameters ({\tt beta11, beta12, beta21, beta22, alfa11, alfa12,
@@ -194,7 +193,7 @@ coupling!
 Notice also that in \madx, {\tt DELTAP} is converted to {\tt PT}, which is used 
 as longitudinal variable. 
 Dispersive and chromatic functions are hence derivatives with
-respects to {\tt PT}. (see \hyperref[subsec:tables_summ]{summ table}). 
+respects to {\tt PT}. (see \hyperref[subsec:tables-summ]{summ table}). 
 
 These summary parameters can later be accessed via the 
 \hyperref[chap:tables]{table access functions} using the "SUMM" table.  
@@ -355,7 +354,7 @@ TWISS,...;
 
 When reaching the \href{../control/general.html#place}{place} in the
 sequence "s\_name" during execution of TWISS, \madx will save a
-\hyperlink{beta0}{beta0} block with the
+\hyperref[sec:beta0]{beta0} block with the
 \href{../Introduction/label.html}{label} name: This block is filled with
 the values of all lattice parameters in place.  
 
@@ -367,7 +366,7 @@ TWISS;
 USE, period=INSERT;
 TWISS, BETA0=END;
 \end{verbatim}
-This first example calculates the \hyperlink{periodic}{periodic
+This first example calculates the \hyperref[sec:twissperiod]{periodic
   solution} of the line CELL, and then track lattice parameters through
 INSERT, using all end conditions (including orbit) in CELL to start.  
 
@@ -594,7 +593,7 @@ The following \madx commands enables the threader :
 and the threader can be disabled with
 \madxmp{OPTION, -THREADER;}
 
-During the trajectory search in \hyperref[sec:twiss]{\tt TWISS}, or the first 
+During the trajectory search in \hyperref[chap:twiss]{\tt TWISS}, or the first 
 turn of the orbit search for a closed machine, the threader calculates at each
 monitor the difference between the present trajectory reading and a
 reference value.
@@ -631,7 +630,7 @@ is actually applied by the threader.
 An attenuation factor of 0.5 will apply 50\% of the calculated kicks.
 
 \section{Closed Orbit Guess}
-\label{subsec:coguess}
+\label{sec:coguess}
 
 In order to help the initial finding of the closed orbit by the
 {\tt TWISS} module, it is possible to specify an initial guess for
@@ -643,7 +642,7 @@ COGUESS, \=X=real, PX=real, Y=real, PY=real, T=real, PT=real, \\
          \>CLEAR=logical;
 }
 
-The COGUESS command has the following attributes:
+The {\tt COGUESS} command has the following attributes:
 \begin{madlist}
   \ttitem{X, PX, Y, PY, T, PT} each parameter specified defines a first guess for all future closed orbit
   searches in case they are different from zero.  

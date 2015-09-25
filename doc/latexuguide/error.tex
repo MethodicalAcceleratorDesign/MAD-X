@@ -8,7 +8,7 @@ alignment errors and field errors to single beam elements or to ranges
 or classes of beam elements.
 
 Elements, classes or ranges of elements are selected by the
-\hyperref[sec:seclect]{\tt SELECT} command.
+\hyperref[sec:select]{\tt SELECT} command.
 
 ATTENTION: since errors can only be assigned to machine elements, it is
 necessary to \hyperref[sec:flatten]{\tt FLATTEN} a sequence
@@ -219,7 +219,7 @@ for elements selected by the
 %% \label{F-YSDISP}
 %% \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht]
 	\centering
 	\setlength{\unitlength}{1pt}
 	\begin{picture}(400,140)(0,30)
@@ -271,46 +271,6 @@ for elements selected by the
 	\caption{Alignment errors in the $(y,s)$-plane}
 	\label{F-YSDISP}
 \end{figure}
-
-\begin{figure}[htb]
-	\centering
-	\setlength{\unitlength}{1pt}
-	\begin{picture}(400,150)(0,20)
-	\thinlines
-	\put(204,75){\line(1,0){96}}
-	\put(196,75){\vector(-1,0){196}}
-	\put(305,75){\makebox(0,0)[l]{\shortstack{
-		\footnotesize horizontal \\
-		\footnotesize plane}}}
-	\put(8,68){\makebox(0,0)[l]{$x$}}
-	\put(200,75){\circle{8}}\put(200,75){\makebox(0,0){\(\times\)}}
-	\put(220,55){\vector(-1,1){15}}
-	\put(220,55){\makebox(0,0)[tl]{\shortstack{
-		\footnotesize true beam \\
-		\footnotesize position}}}
-	\put(208,83){\makebox(0,0){$s$}}
-	\put(200,30){\line(0,1){41}}
-	\put(200,79){\vector(0,1){101}}
-	\put(193,172){\makebox(0,0){$y$}}
-	\color{blue}
-	\put(100,50){\vector(0,1){125}}
-	\put(150,125){\vector(-1,0){100}}
-	\put(100,125){\circle*{4}}
-	\color{black}
-	\put(80,145){\vector(1,-1){15}}
-	\put(80,145){\makebox(0,0)[br]{\shortstack{
-		\footnotesize beam position given \\
-		\footnotesize by the monitor}}}
-	\thicklines
-	\put(200,55){\vector(-1,0){100}}
-	\put(150,45){\makebox(0,0){\tt MREX}}
-	\put(80,75){\vector(0,1){50}}
-	\put(70,100){\makebox(0,0)[r]{\tt MREY}}
-	\end{picture}
-	\caption{Readout errors in a monitor}
-	\label{F-ERMONI}
-\end{figure}
-
 
 The attributes are: 
 \begin{madlist}
@@ -364,14 +324,51 @@ The attributes are:
 
 \end{madlist}
 
+\begin{figure}[htb]
+	\centering
+	\setlength{\unitlength}{1pt}
+	\begin{picture}(400,150)(0,20)
+	\thinlines
+	\put(204,75){\line(1,0){96}}
+	\put(196,75){\vector(-1,0){196}}
+	\put(305,75){\makebox(0,0)[l]{\shortstack{
+		\footnotesize horizontal \\
+		\footnotesize plane}}}
+	\put(8,68){\makebox(0,0)[l]{$x$}}
+	\put(200,75){\circle{8}}\put(200,75){\makebox(0,0){\(\times\)}}
+	\put(220,55){\vector(-1,1){15}}
+	\put(220,55){\makebox(0,0)[tl]{\shortstack{
+		\footnotesize true beam \\
+		\footnotesize position}}}
+	\put(208,83){\makebox(0,0){$s$}}
+	\put(200,30){\line(0,1){41}}
+	\put(200,79){\vector(0,1){101}}
+	\put(193,172){\makebox(0,0){$y$}}
+	\color{blue}
+	\put(100,50){\vector(0,1){125}}
+	\put(150,125){\vector(-1,0){100}}
+	\put(100,125){\circle*{4}}
+	\color{black}
+	\put(80,145){\vector(1,-1){15}}
+	\put(80,145){\makebox(0,0)[br]{\shortstack{
+		\footnotesize beam position given \\
+		\footnotesize by the monitor}}}
+	\thicklines
+	\put(200,55){\vector(-1,0){100}}
+	\put(150,45){\makebox(0,0){\tt MREX}}
+	\put(80,75){\vector(0,1){50}}
+	\put(70,100){\makebox(0,0)[r]{\tt MREY}}
+	\end{picture}
+	\caption{Readout errors in a monitor}
+	\label{F-ERMONI}
+\end{figure}
+
 {\bf Examples:}
 \madxmp{
 SELECT, FLAG = ERROR, CLASS = MQ; \\
 EALIGN, DX = 0.002, DY = 0.0004*RANF(), DPHI = 0.0002*GAUSS();
 }
 Assigns alignment errors to all elements of class {\tt MQ}.
-
-
 
 \madxmp{
 SELECT, FLAG = ERROR, PATTERN = "QF.*"; \\
@@ -380,11 +377,8 @@ EALIGN, DX = 0.001*TGAUSS(2.5), DY = 0.0001*RANF();
 Assigns alignment errors to all elements starting with {\tt "QF"}. {\tt 
 TGAUSS(2.5)} specifies a Gaussian distribution cut at 2.5 sigma.
 
-
-
 %\href{http://consult.cern.ch/xwho/people/1808} {Last updated:} 02.9.2002 \\ 
 %\href{http://consult.cern.ch/xwho/people/1808}{Werner Herr} 18.6.2002 
-
 
 %\input{error/error_field}
 %%\title{Field Errors}
@@ -404,7 +398,7 @@ functionality
 of {\tt EFIELD} and there was no need for duplication.  
 
 All field errors are specified as the integrated value $\int K ds$ 
-of the \hyperref[sec:sign_convention]{field components} along the magnet axis 
+of the \hyperref[sec:sign-convention]{field components} along the magnet axis 
 in $m^{-i}$. There is no provision
 to specify a global relative excitation error affecting all field
 components in a combined function magnet. Such an error may only be
@@ -538,7 +532,7 @@ xxxxxxxx\=xxxxxxxxx\=xxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
         \>          \>0.000, 0.000, 0.002, 0.000\};\>! coeff. mult. order 2
 }
 
-See also: \hyperref[sec:random]{random values}
+See also: \hyperref[subsubsec:random]{random values}
 and \hyperref[sec:defer]{deferred expressions}.  
 
 %\href{http://consult.cern.ch/xwho/people/1808}{Werner Herr}  6.12.2004 
@@ -562,7 +556,7 @@ EOPTION, SEED=real, ADD=logical;
   \ttitem{SEED} Selects a particular sequence of random values. 
   A {\tt SEED} value is an integer in the range [0...999999999] (default:
   123456789). {\tt SEED} alone continues with the current sequence See
-  also: \hyperref[sec:random]{Random Values}. {\tt SEED} may be an expression.  
+  also: \hyperref[subsubsec:random]{Random Values}. {\tt SEED} may be an expression.  
 
   \ttitem{ADD} If this logical flag is set, an {\tt EALIGN} or {\tt EFCOMP} 
   causes the errors to be added on top of existing ones. If it is not set,
@@ -637,7 +631,7 @@ Example:
 SELECT, FLAG=ERROR, RANGE=range, CLASS=name, PATTERN=string;
 ESAVE, FILE=err.file;
 }
-and elements selected by the  \hyperref[sec:seclect]{\tt SELECT}
+and elements selected by the  \hyperref[sec:select]{\tt SELECT}
 command are saved to the file.  
 
 
@@ -651,7 +645,7 @@ ESAVE, FILE = err.file;
   saved and not relative errors. } 
 
 \section{SETERR: Reading errors from a table or file}
-\label{Sec:seterr}
+\label{sec:seterr}
 
 To assign errors from a file is not a priori straightforward. It may be
 required to re-assign existing errors after a \hyperref[sec:use]{\tt USE}
