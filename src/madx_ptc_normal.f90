@@ -79,6 +79,15 @@ contains
        dt=deltap
     endif
     if(icase.eq.5) x(5)=dt
+    
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!
+    !! Closed orbit search
+    !!    if requested
+    !!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    
+    
     closed_orbit = get_value('ptc_normal ','closed_orbit ') .ne. 0
     if(closed_orbit) then
       ! pass starting point for closed orbit search
@@ -94,12 +103,25 @@ contains
     endif
 
 
-    call init(default,no,nda,BERZ,mynd2,npara)
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!
+    !! INIT PTC
+    !!    and allocate map
+    !!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+    call init(default,no,nda,BERZ,mynd2,npara)
 
     call alloc(y)
     y=npara
     Y=X
+
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!
+    !! Track the map
+    !!    and allocate map
+    !!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
     c_%watch_user=.true.
     call track(my_ring,y,1,default)
@@ -120,6 +142,14 @@ contains
        c_%watch_user=.false.
        return
     endif
+   
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!
+    !! Write the map 
+    !!    to fort.18
+    !!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
     c_%watch_user=.false.
     !if (getdebug()>1)
     print77=.false.
@@ -127,8 +157,8 @@ contains
 
     call daprint(y,18)
 
+
     maptable = get_value('ptc_normal ','maptable ') .ne. 0
-    
     if(maptable) then
        call makemaptable(y,no)
     endif
@@ -141,12 +171,16 @@ contains
 
        n_rows = select_ptc_idx()
        
-       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-       !! Q (+chroma+anharmon) and DX
-       !here we do normal type 1
+       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+       !! 
+       !! HERE WE DO NORMAL FORM TYPE 1
+       !!     Q (+chroma+anharmon) and DX
+       !! 
+       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+       
        call alloc(n) 
        if (getdebug() > 0) print*,"Normal Form Type 1"
-       n=y
+       n=y !! HERE WE DO NORMAL FORM TYPE 1
 
        if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
           write(whymsg,*) 'DA got unstable in Normal Form: PTC msg: ',messagelost
@@ -156,23 +190,24 @@ contains
        endif
 
        if (getdebug() > 1) then
-          write(19,'(/a/)') 'Dispersion, First and Higher Orders'
+          write(19,'(/a/)') 'NORMAL: Dispersion, First and Higher Orders'
           call daprint(n%A1,19)
        endif
        
        
        if (getdebug() > 1) then
-          write(19,'(/a/)') 'Tunes, Chromaticities and Anharmonicities'
+          write(19,'(/a/)') 'NORMAL:  Tunes, Chromaticities and Anharmonicities'
           !  call daprint(n%A_t,19)
-          !  call daprint(n%A,19)
+          call daprint(n%A%pb,19)
           call daprint(n%dhdj,19) ! orig one
           !  call daprint(pbrh,19)
        endif
 
 
        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-       !! HAML 
-       !!here we do normal type 2
+       !! 
+       !! HERE WE DO NORMAL FORM TYPE 2
+       !!       HAML and GNFU
        !! It has resonanses left in the normal form
        !! which are defined with normal%M
 
@@ -181,7 +216,8 @@ contains
        nres = 0       
        n_haml = 0
        n_gnfu = 0
-
+       
+       ! read HAML's and GNUF's that user asks for
        if (n_rows > 0) then
           do row = 1,n_rows
              name_var=" "
@@ -206,15 +242,17 @@ contains
                 mynres = int(doublenum)
                 row = row_haml(j1) - 3*mynres + 2
                 starti = 1
+                
                 if (j1 .eq. 1) then
-                   k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
+                   k = double_from_table_row("normal_results ", "order1 ", row, doublenum) !ordrer in X
                    indexa(1) = int(doublenum)
-                   k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
+                   k = double_from_table_row("normal_results ", "order2 ", row, doublenum) !ordrer in PX
                    indexa(2) = int(doublenum)
-                   k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
+                   k = double_from_table_row("normal_results ", "order3 ", row, doublenum) !ordrer in Y
                    indexa(3) = int(doublenum)
-                   k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
+                   k = double_from_table_row("normal_results ", "order4 ", row, doublenum) !ordrer in PY
                    indexa(4) = int(doublenum)
+
                    index1(1,1) = indexa(1) - indexa(2)
                    index1(1,2) = indexa(3) - indexa(4)
                    n_t2%m(1,1)= index1(1,1)
@@ -468,7 +506,7 @@ contains
            ind(3) = int(doublenum)
            k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
            ind(4) = int(doublenum)
-           ind(5) = 0
+           ind(5) = 1
            ind(6) = 0
            d_val = pbrg%cos%h.sub.ind
            double_from_normal_t1 = d_val
@@ -482,7 +520,7 @@ contains
            ind(3) = int(doublenum)
            k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
            ind(4) = int(doublenum)
-           ind(5) = 0
+           ind(5) = 1
            ind(6) = 0
            d_val = pbrg%sin%h.sub.ind
            double_from_normal_t1 = d_val
@@ -496,7 +534,7 @@ contains
            ind(3) = int(doublenum)
            k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
            ind(4) = int(doublenum)
-           ind(5) = 0
+           ind(5) = 1
            ind(6) = 0
            d_val1 = pbrg%cos%h.sub.ind
            d_val2 = pbrg%sin%h.sub.ind
