@@ -1153,25 +1153,28 @@ contains
     real(dp),INTENT(INOUT):: X(6)
     TYPE(SAGAN),INTENT(IN):: EL
     real(dp),INTENT(IN):: L
-    real(dp) PZ,PZ0
+    real(dp) PZ,PZ0,DPZ
     TYPE(INTERNAL_STATE),OPTIONAL :: K
     ! ETIENNE
     IF(EL%P%EXACT) THEN
        if(k%TIME) then
           PZ=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
           PZ0=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)
-          PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
-          X(1)=X(1)+L*X(2)*PZ
-          X(3)=X(3)+L*X(4)*PZ
-
-          X(6)=X(6)+L*(1.0_dp/EL%P%beta0+x(5))*PZ+k%TOTALPATH*L/EL%P%BETA0
+          DPZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
+          X(1)=X(1)+L*X(2)*DPZ
+          X(3)=X(3)+L*X(4)*DPZ
+          X(6)=X(6)+L*(1.0_dp/EL%P%BETA0+X(5))/PZ +k%TOTALPATH*L/EL%P%BETA0
+          PZ=ROOT(1.0_dp+2.0_dp*X(5)/EL%P%BETA0+x(5)**2)   ! WRONG NOT SYMPLECTIC 2015.8.11
+          X(6)=X(6)-((X(2)*X(2)+X(4)*X(4))/2.0_dp/pz**2+1.0_dp)*(1.0_dp/EL%P%BETA0+x(5))*L/pz
        else
           PZ=ROOT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
           PZ0=1.0_dp+X(5)
-          PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
-          X(1)=X(1)+L*X(2)*PZ
-          X(3)=X(3)+L*X(4)*PZ
-          X(6)=X(6)+L*(1.0_dp+x(5))*PZ+k%TOTALPATH*L
+          DPZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
+          X(1)=X(1)+L*X(2)*DPZ
+          X(3)=X(3)+L*X(4)*DPZ
+          X(6)=X(6)+L*(1.0_dp+X(5))/PZ +k%TOTALPATH*L 
+          PZ=ROOT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
+          X(6)=X(6)-(L/(1.0_dp+X(5)))*(X(2)*X(2)+X(4)*X(4))/2.0_dp/(1.0_dp+X(5))
        endif
     ELSE
        if(k%TIME) then
@@ -1188,28 +1191,31 @@ contains
     TYPE(REAL_8),INTENT(INOUT):: X(6)
     TYPE(SAGANP),INTENT(IN):: EL
     TYPE(REAL_8),INTENT(IN):: L
-    TYPE(REAL_8) PZ,PZ0
+    TYPE(REAL_8) PZ,PZ0,DPZ
     TYPE(INTERNAL_STATE),OPTIONAL :: K
     ! ETIENNE
     IF(EL%P%EXACT) THEN
-       CALL ALLOC(PZ,PZ0)
+       CALL ALLOC(PZ,PZ0,DPZ)
        if(k%TIME) then
-          PZ=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
-          PZ0=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)
-          PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
-          X(1)=X(1)+L*X(2)*PZ
-          X(3)=X(3)+L*X(4)*PZ
-
-          X(6)=X(6)+L*(1.0_dp/EL%P%beta0+x(5))*PZ+k%TOTALPATH*L/EL%P%BETA0
+          PZ=sqrt(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2-X(2)**2-X(4)**2)
+          PZ0=sqrt(1.0_dp+2.0_dp*X(5)/EL%P%beta0+x(5)**2)
+          DPZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
+          X(1)=X(1)+L*X(2)*DPZ
+          X(3)=X(3)+L*X(4)*DPZ
+          X(6)=X(6)+L*(1.0_dp/EL%P%BETA0+X(5))/PZ +k%TOTALPATH*L/EL%P%BETA0
+          PZ=SQRT(1.0_dp+2.0_dp*X(5)/EL%P%BETA0+x(5)**2)   ! WRONG NOT SYMPLECTIC 2015.8.11
+          X(6)=X(6)-((X(2)*X(2)+X(4)*X(4))/2.0_dp/pz**2+1.0_dp)*(1.0_dp/EL%P%BETA0+x(5))*L/pz
        else
-          PZ=SQRT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
+          PZ=sqrt((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
           PZ0=1.0_dp+X(5)
-          PZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
-          X(1)=X(1)+L*X(2)*PZ
-          X(3)=X(3)+L*X(4)*PZ
-          X(6)=X(6)+L*(1.0_dp+x(5))*PZ+k%TOTALPATH*L
+          DPZ=(X(2)**2+X(4)**2)/PZ/PZ0/(PZ+PZ0)   ! = (one/PZ-one/PZ0)
+          X(1)=X(1)+L*X(2)*DPZ
+          X(3)=X(3)+L*X(4)*DPZ
+          X(6)=X(6)+L*(1.0_dp+X(5))/PZ +k%TOTALPATH*L 
+          PZ=SQRT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
+          X(6)=X(6)-(L/(1.0_dp+X(5)))*(X(2)*X(2)+X(4)*X(4))/2.0_dp/(1.0_dp+X(5))
        endif
-       CALL KILL(PZ,PZ0)
+       CALL KILL(PZ,PZ0,DPZ)
     ELSE
        if(k%TIME) then
           X(6)=X(6)+k%TOTALPATH*L/EL%P%BETA0

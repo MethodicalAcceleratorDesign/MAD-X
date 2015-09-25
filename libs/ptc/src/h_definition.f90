@@ -122,10 +122,6 @@ module definition
      type(real_8) x(3)  ! x(3) = (s_x, s_y, s_z)   with  |s|=1
   end type spinor_8
 
-  type res_spinor_8
-     type(double_complex) x(3)
-  end type res_spinor_8
-
   !    scratch levels of DA using linked list
 
   type dascratch
@@ -267,37 +263,11 @@ module definition
      INTEGER,POINTER :: N,ND2,no
   end  type tree_element
   !@3 ---------------------------------------------</br>
-  type spinmatrix
-     type(real_8) s(3,3)
-  end type spinmatrix
+ 
   !@3 ---------------------------------------------</br>
-  type damapspin
-     type(damap) M
-     type(spinmatrix) s
-     real(dp) e_ij(6,6) ! stochastic envelope
-  end type damapspin
+ 
   !@3 ---------------------------------------------</br>
-  type normal_spin
-     type(normalform) N   ! regular orbital normal form
-     type(damapspin) a1   ! brings to fixed point
-     type(damapspin) ar   ! normalises around the fixed point
-     type(damapspin) as   ! pure spin map
-     type(damapspin) a_t  ! !! (a_t%m,a_t%s) 
-!!!  extra spin info
-     integer M(NDIM,NRESO),MS(NRESO),NRES  ! orbital and spin resonances to be left in the map
-     type(real_8) n0(3)     ! n0 vector
-     type(real_8) theta0    !  angle for the matrix around the orbit (analogous to linear tunes)
-     real(dp) nu    !  spin tune
-!!!Envelope radiation stuff to normalise radiation (Sands's like theory)
-     real(dp) s_ij0(6,6)  !  equilibrium beam sizes
-     complex(dp) s_ijr(6,6)  !  equilibrium beam sizes in resonance basis
-! equilibrium emittances (partially well defined only for infinitesimal damping)
-     real(dp) emittance(3),tune(3),damping(3)   
-     logical(lp) AUTO,STOCHASTIC
-     real(dp)  KICK(3)   ! fake kicks for tracking stochastically
-     real(dp)  STOCH(6,6)  ! Diagonalized stochastic part of map for tracking stochastically
-     real(dp)  STOCH_inv(6,6)  ! Diagonalized stochastic part of map for tracking stochastically
-  end type normal_spin
+
   !@3 ---------------------------------------------</br>
   include "a_def_frame_patch_chart.inc"
   include "a_def_all_kind.inc"

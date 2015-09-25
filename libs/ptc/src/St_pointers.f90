@@ -1336,18 +1336,18 @@ endif
           read(mf,*) filename, NAME, integrated
           read(mf,*) del
 
-          call compute_twiss(my_ering,my_estate,filename,1,del,1,integrated,name,my_true,my_false)
+    !      call compute_twiss(my_ering,my_estate,filename,1,del,1,integrated,name,my_true,my_false)
        case('PTCTWISS','TWISS','PTCTWISSRIPKEN','TWISSRIPKEN')  !
           read(mf,*) filename, NAME, integrated
           read(mf,*) del
 
-          call compute_twiss(my_ering,my_estate,filename,1,del,1,integrated,name,my_false,my_false)
+       !   call compute_twiss(my_ering,my_estate,filename,1,del,1,integrated,name,my_false,my_false)
 
        case('PTCTWISSSASHA','TWISSSASHA','PTCTWISSRIPKENSASHA','TWISSRIPKENSASHA')  !
           read(mf,*) filename, NAME, integrated
           read(mf,*) del
 
-          call compute_twiss(my_ering,my_estate,filename,1,del,1,integrated,name,my_false,my_true)
+    !      call compute_twiss(my_ering,my_estate,filename,1,del,1,integrated,name,my_false,my_true)
 
        case('FITTUNESCAN','SEARCHAPERTUREX=Y')
           read(mf,*) epsf
@@ -2100,7 +2100,7 @@ endif
                 stop
              endif
           endif
-          call radia_new(my_ering,POS,i1,FILENAME,my_estate)
+        !  call radia_new(my_ering,POS,i1,FILENAME,my_estate)
        case('SPECIALALEX')
           READ(MF,*) I1
           READ(MF,*) targ_tune(1:2),sc
@@ -2522,115 +2522,6 @@ endif
 
 
 
-  SUBROUTINE radia_new(R,loc,i1,FILE1,estate)
-    implicit none
-    TYPE(LAYOUT) R
-
-    REAL(DP) X(6),m,energy,deltap
-    CHARACTER(*) FILE1
-    type(normal_spin) normal
-    integer  i,j ,i1
-    TYPE(damapspin) ID
-    TYPE(INTERNAL_STATE) state
-    TYPE(INTERNAL_STATE), target :: estate
-    integer loc,mf1
-    type(fibre), pointer :: p
-    type(probe) xs0
-    type(probe_8) xs
-
-    call kanalnummer(mf1)
-    open(mf1,file=FILE1)
-
-
-
-
-    state=(estate-nocavity0)+radiation0
-    x=0.d0
-
-    CALL FIND_ORBIT_x(R,X,STATE,1.0e-5_dp,fibre1=loc)
-    WRITE(6,*) " CLOSED ORBIT AT LOCATION ",loc
-    write(6,*) x
-
-
-
-
-    call GET_loss(r,energy,deltap)
-
-    write(6,*) "energy loss: GEV and DeltaP/p0c ",energy,deltap
-
-    write(mf1,*) " stable closed orbit tracked "
-    write(mf1,"(6(1X,D18.11))") x
-    write(mf1,*) "energy loss: GEV and DeltaP/p0c ",energy,deltap
-
-    CALL INIT(state,1,0)
-    CALL ALLOC(NORMAL)
-    CALL ALLOC(ID)
-    call alloc(xs)
-
-    if(i1==1) normal%stochastic=my_true
-    xs0=x
-    ID=1
-    xs=XS0+ID
-
-    state=state+envelope0
-
-    CALL TRACK_PROBE(r,xs,state, fibre1=loc)
-    write(mf1,*) " Full Map "
-     id=xs    
-     call print(id,mf1)
-    write(mf1,*) " End of Full Map "
-
-    normal=id
-    write(mf1,*)" $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
-    write(mf1,*)" Tunes "
-    write(mf1,*) normal%tune
-    write(mf1,*)" Damping "
-    write(mf1,*) normal%damping
-    write(mf1,*)" Emittances "
-    write(mf1,*) normal%emittance
-    write(mf1,*)" $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
-    write(mf1,*)"   "
-
-    write(mf1,*)" Equilibrium Beam Sizes "
-    do i=1,6
-       do j=1,6
-          write(mf1,*) i,j,normal%s_ij0(i,j)
-       enddo
-    enddo
-    write(mf1,*)" Equilibrium Phasor Sizes "
-    do i=1,6
-       do j=1,6
-          write(mf1,*) i,j,normal%s_ijr(i,j)
-       enddo
-    enddo
-
-    if(normal%stochastic) then
-       write(mf1,*) "Stochastic kicks"
-       write(mf1,*) normal%kick
-
-       write(mf1,*)" Stochastic Transformation "
-       do i=1,6
-          do j=1,6
-             write(mf1,*) i,j,normal%STOCH(i,j)
-          enddo
-       enddo
-
-       write(mf1,*)" Inverse Stochastic Transformation "
-       do i=1,6
-          do j=1,6
-             write(mf1,*) i,j,normal%STOCH_inv(i,j)
-          enddo
-       enddo
-
-    endif
-
-    close(mf1)
-
-    CALL KILL(NORMAL)
-    CALL KILL(ID)
-    CALL KILL(xs)
-
-  end subroutine radia_new
 
   subroutine Universe_max_n(n)
     !use build_lattice

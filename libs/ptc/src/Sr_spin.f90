@@ -2825,10 +2825,7 @@ call kill(e)
        CALL TRACK_MODULATION(C,XS,K) !modulate
     ENDIF !modulate
     
-   !     if(ramp) then !modulate
-   !       if(c%parent_fibre%mag%slow_ac) CALL do_ramping_r(c,XS%ac%t,k) !modulate
-   !       if(.not.k%modulation) CALL TRACK_MODULATION(C,XS,K) 
-   !    endif !modulate
+
 
  
     if(c%cas==0) then
