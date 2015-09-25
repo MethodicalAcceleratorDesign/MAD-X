@@ -1226,7 +1226,8 @@ contains
       integer i1,i2,ii,i1a,i2a
       real(kind(1d0))   :: opt_fun(150),myx  ! opt_fun(72) -> opt_fun(81)
       ! increase to 150 to have extra space beyond what's needed to accomodate additional derivatives w.r.t. delta_p
-      real(kind(1d0))   :: deltae
+      real(kind(1d0))   :: deltae ! for reference energy increase via acceleration
+      real(kind(1d0))   :: deltap ! for deltap treatment
       type(real_8), target :: transfermap(6)
       ! added on 3 November 2010 to hold Edwards & Teng parametrization
       real(dp) :: betx,bety,alfx,alfy,R11,R12,R21,R22
@@ -1321,7 +1322,8 @@ contains
       ioptfun=36
       call vector_to_table_curr(table_name, 're11 ', opt_fun(1), ioptfun)
       
-      deltae = deltae * (1.0_dp + y(5).sub.'0')
+      deltap = y(5).sub.'0'
+      deltae = deltae * (1.0 + deltap)
 
       opt_fun(beta11)= tw%beta(1,1) * deltae ! beta11=1
       opt_fun(beta12)= tw%beta(1,2) * deltae

@@ -1380,6 +1380,7 @@ SUBROUTINE twcptk(re,orbit)
   use twissotmfi
   use matrices, only : JMAT, JMATT
   use math_constfi, only : zero, one
+  use name_lenfi !LD: 09.2015
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -1396,6 +1397,7 @@ SUBROUTINE twcptk(re,orbit)
   double precision :: adet, tempa, tempb
   double precision :: alfx0=zero, alfy0=zero, betx0=zero, bety0=zero
   double precision :: amux0=zero, amuy0=zero
+  character(name_len) :: name !LD: 09.2015
 
   integer, external :: get_option
   double precision, parameter :: eps=1d-36
@@ -1421,6 +1423,7 @@ SUBROUTINE twcptk(re,orbit)
   endif
 
   !---- Auxiliary matrices.
+  !LD:  a = re_x - re_xy*rmat
   a(1,1) = re(1,1) - (re(1,3) * rmat(1,1) + re(1,4) * rmat(2,1))
   a(1,2) = re(1,2) - (re(1,3) * rmat(1,2) + re(1,4) * rmat(2,2))
   a(2,1) = re(2,1) - (re(2,3) * rmat(1,1) + re(2,4) * rmat(2,1))
@@ -1464,6 +1467,11 @@ SUBROUTINE twcptk(re,orbit)
      alfy = - (tempa * tempb + c(1,2) * c(2,2)) / (adet * bety)
      bety =   (tempb * tempb + c(1,2) * c(1,2)) / (adet * bety)
      if (abs(c(1,2)) .gt. eps) amuy = amuy + atan2(c(1,2),tempb)
+  else
+    !LD: 09.2015
+    call element_name(name,len(name))
+    print *, 'coupling too strong for element ', name, ' (adet= ', adet, ')'
+    call fort_warn('TWCPTK: ','twiss parameter might be unphysical (split element)')
   endif
   
   !---- Cummulative R matrix and one-turn map at element location.
