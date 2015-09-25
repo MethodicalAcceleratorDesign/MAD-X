@@ -698,6 +698,7 @@ libs/ptc/Makefile -text
 libs/ptc/Makefile_f90 -text
 libs/ptc/Makefile_lib -text
 libs/ptc/src/CMakeLists.txt -text
+libs/ptc/src/Ci_tpsa.f90 -text
 libs/ptc/src/Sa_extend_poly.f90 -text
 libs/ptc/src/Sb_sagan_pol_arbitrary.f90 -text
 libs/ptc/src/Sc_euclidean.f90 -text
@@ -730,6 +731,8 @@ libs/ptc/src/a_namelists.inc -text
 libs/ptc/src/a_scratch_size.f90 -text
 libs/ptc/src/b_da_arrays_all.f90 -text
 libs/ptc/src/c_dabnew.f90 -text
+libs/ptc/src/cb_da_arrays_all.f90 -text
+libs/ptc/src/cc_dabnew.f90 -text
 libs/ptc/src/d_lielib.f90 -text
 libs/ptc/src/h_definition.f90 -text
 libs/ptc/src/i_tpsa.f90 -text
