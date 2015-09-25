@@ -46,14 +46,14 @@ can also be issued during matching.
   \item \hyperref[sec:global]{\tt GLOBAL}: Global Constraints
   \item \hyperref[sec:gweight]{\tt GWEIGHT}: Weights for Global Constraints
   \end{itemize}
-\item \hyperref[sec:match_methods]{Matching Methods}
+\item \hyperref[sec:match-methods]{Matching Methods}
   \begin{itemize}
-  \item \hyperref[subsec:match_lmdif]{\tt LMDIF}: Fast Gradient Minimisation
-  \item \hyperref[subsec:match_migrad]{\tt MIGRAD}: Gradient Minimisation
-  \item \hyperref[subsec:match_simplex]{\tt SIMPLEX}: Simplex Minimisation
-  \item \hyperref[subsec:match_jacobian]{\tt JACOBIAN}: Newton Minimisation
+  \item \hyperref[subsec:match-lmdif]{\tt LMDIF}: Fast Gradient Minimisation
+  \item \hyperref[subsec:match-migrad]{\tt MIGRAD}: Gradient Minimisation
+  \item \hyperref[subsec:match-simplex]{\tt SIMPLEX}: Simplex Minimisation
+  \item \hyperref[subsec:match-jacobian]{\tt JACOBIAN}: Newton Minimisation
   \end{itemize}
-\item Expression Matching with \hyperref[sec:use_macro]{\tt USE\_MACRO}
+\item Expression Matching with \hyperref[sec:use-macro]{\tt USE\_MACRO}
 \end{itemize}
 
 %\line(1,0){300}
@@ -82,32 +82,11 @@ can also be issued during matching.
 \section{MATCH \ldots ENDMATCH}
 \label{sec:match}\label{sec:endmatch}
 
-The {\tt MATCH} command is used for matching either a periodic cell
-or an insertion to another part of the machine. 
+The {\tt MATCH} command is used for matching either a \hyperref[sec:cell]{periodic cell}
+or an \hyperref[sec:insertion]{insertion} to another part of the machine. 
 
 Both matching modes are initiated by the {\tt MATCH} command using
-one of several forms:
-
-\madbox{
-MATCH, \=SEQUENCE='name1', 'name2', \ldots , 'name-n', \\
-       \>SLOW=logical;
-}
-
-\madbox{
-MATCH, \=SEQUENCE= 'name1', 'name2', \ldots , 'name-n',\\
-       \>BETA0= 'beta01', 'beta02', \ldots , 'beta0n', \\
-       \>SLOW=logical; \\
-\\
-or\\
-\\
-MATCH, \=SEQUENCE='seqname', \\ 
-       \>BETX=real, ALFX=real, MUX=real, \\
-       \>BETY=real, ALFY=real, MUY=real, \\
-       \>X=real, PX=real, Y=real, PY=real, \\
-       \>DX=real, DY=real, DPX=real, DPY=real, \\
-       \>DELTAP=real, SLOW=logical;
-}
-
+one of several forms outlined below. 
 
 The {\tt ENDMATCH} command terminates the matching section and deletes
 all tables related to the matching run. 
@@ -116,44 +95,74 @@ ENDMATCH;
 }
 
 
-\begin{itemize}
-  \item Cell matching:
-    In the first mode the matching routine is initiated only with one
-    attribute specifying the sequence(s) the matching module will work
-    on. In this matching mode the periodicity of the optics functions is
-    enforced at the beginning and end of the selected range. 
-    \madxmp{MATCH, SEQUENCE='name1', 'name2', \ldots ,'name-n';}
-    
-  \item Insertion matching:
-    In the second mode, called insertion matching, the matching routine is
-    initiated with two attributes: one specifying the sequence(s) the
-    matching module will work on and one specifying the initial conditions
-    of the optic functions for each sequence. In this case the initial
-    values are assumed as exact. 
- 
-    \begin{itemize}
-      \item Specification of Initial Values: The initial values of the optical
-        functions  for the insertion matching can either be specified in form of
-        a \hyperref[sec:savebeta]{\tt SAVEBETA} command or by
-        explicitly stating the individual optic function values after the
-        {\tt MATCH} command. The two options can be entered as         
-        \madxmp{
-          MATCH, \=SEQUENCE= 'name1', 'name2',.., 'name-n',\\
-                 \>BETA0= 'beta01', 'beta02',..., 'beta0n';
-        }
-        or
-        \madxmp{
-          MATCH, \=SEQUENCE='seqname', \\ 
-                 \>BETX=real, ALFX=real, MUX=real, \\
-                 \>BETY=real, ALFY=real, MUY=real, \\
-                 \>X=real, PX=real, Y=real, PY=real, \\
-                 \>DX=real, DY=real, DPX=real, DPY=real, \\
-                 \>DELTAP=real;
-        }
+\section{Cell Matching}
+\label{sec:cell}
 
-{\bf Examples:}
- 
-Example 1:
+The matching of a periodic cell is initiated by a {\tt MATCH} command of
+the form:
+
+\madbox{
+MATCH, \=SEQUENCE='name1', 'name2', \ldots , 'name-n', \\
+       \>SLOW=logical;
+}
+
+In this first mode the matching routine is initiated only with one
+attribute specifying the sequence(s) the matching module will work
+on. In this matching mode the periodicity of the optics functions is
+enforced at the beginning and end of the selected range. 
+\madxmp{MATCH, SEQUENCE='name1', 'name2', \ldots ,'name-n';}
+    
+
+
+\section{Insertion Matching}
+\label{sec:insertion}
+The matching of an insertion to another part of the machine is initiated
+by a {\tt MATCH} command taking one of the following forms:
+
+\madbox{
+MATCH, \=SEQUENCE= 'name1', 'name2', \ldots , 'name-n',\\
+       \>BETA0= 'beta01', 'beta02', \ldots , 'beta0n', \\
+       \>SLOW=logical;
+}
+
+or
+
+\madbox{
+MATCH, \=SEQUENCE='seqname', \\ 
+       \>BETX=real, ALFX=real, MUX=real, \\
+       \>BETY=real, ALFY=real, MUY=real, \\
+       \>X=real, PX=real, Y=real, PY=real, \\
+       \>DX=real, DY=real, DPX=real, DPY=real, \\
+       \>DELTAP=real, SLOW=logical;
+}
+
+In the second mode, called insertion matching, the matching routine is
+initiated with two attributes: one specifying the sequence(s) the
+matching module will work on and one specifying the initial conditions
+of the optic functions for each sequence. In this case the initial
+values are assumed as exact. 
+    
+{\bf Specification of Initial Values:}
+The initial values of the optical
+functions  for the insertion matching can either be specified in form of
+a \hyperref[sec:savebeta]{\tt SAVEBETA} command or by
+explicitly stating the individual optic function values after the
+{\tt MATCH} command. The two options can be entered as         
+\madxmp{
+  MATCH, \=SEQUENCE= 'name1', 'name2',.., 'name-n',\\
+         \>BETA0= 'beta01', 'beta02',..., 'beta0n';
+}
+or
+\madxmp{
+  MATCH, \=SEQUENCE='seqname', \\ 
+         \>BETX=real, ALFX=real, MUX=real, \\
+         \>BETY=real, ALFY=real, MUY=real, \\
+         \>X=real, PX=real, Y=real, PY=real, \\
+         \>DX=real, DY=real, DPX=real, DPY=real, \\
+         \>DELTAP=real;
+}
+
+{\bf Example 1:}   
 \begin{verbatim}
 CELL: SEQUENCE=(...) ;
 INSERT: SEQUENCE=(...) ;
@@ -164,11 +173,12 @@ USE, PERIOD=insert;
 MATCH, SEQUENCE=insert, BETA0=bini;
 CONSTRAINT, SEQUENCE=insert, RANGE=#e, MUX=9.345, MUY=9.876;
 \end{verbatim}
+
 This matches the sequence 'INSERT' with initial conditions to a new
 phase advance. The initial conditions are given by the periodic solution
 for the sequence CELL1. 
-
-Example 2:	
+    
+{\bf Example 2:}	
 \begin{verbatim}
 USE, PERIOD=insert;
 MATCH, SEQUENCE=insert;
@@ -177,8 +187,6 @@ CONSTRAINT, SEQUENCE=insert, RANGE=#e, MUX=9.345, MUY=9.876;
 This matches the beam line 'INSERT' with periodic boundary conditions to
 a new phase advance. 
 
-
- 
 The initial conditions can also be transmitted by a combination of a
 \hyperref[sec:savebeta]{\tt SAVEBETA} command and explicit
 optic function specifications: 
@@ -194,13 +202,11 @@ This example transmits all values of the {\tt SAVEBETA} array 'bini' as
 initial values to the {\tt MATCH} command and overrides the initial phase
 values by the given values.
 
-\end{itemize}
-
 An additional \hyperref[sec:constraint]{\tt CONSTRAINT} may be
 imposed in other places, i.e. intermediate or end values of the optics
 functions at the transition point.  
  
-\item More than one active sequence:
+\section{More than one active sequence}
 
 The matching module can act on more than one sequence simultaneously by
 specifying more than one sequence after the {\tt MATCH} command: 
@@ -217,19 +223,19 @@ functions of sequence 'CELL1'. Without the initial conditions the
 matching module will work in the \hyperref[sec:cell]{\tt CELL}
 mode. 
  
-	\item  Special flags:
+\section{SLOW attribute}
 
 The {\tt SLOW} logical flag enforces the old and slow matching procedure
 which allows to use the special columns {\tt mvar1, ..., mvar4}, if they
-are added to the twiss table. Recently a number of parameter, like 
-{\tt RE56}, have been added to the list of parameters that can be matched.
+are added to the twiss table.
+
+Recently a number of parameter, like {\tt RE56}, have been added to the
+list of parameters that can be matched. 
+
 Nevertheless, some parameters might only be available when using the
 {\tt SLOW} attribute.
  
-
-\end{itemize}
- 
-\subsection{Useful TWISS attributes}
+\section{Useful TWISS attributes}
 
 Some of the attributes of the \hyperref[chap:twiss]{\tt TWISS} command
 can be used in the {\tt MATCH} command and are transmitted to the {\tt
@@ -263,7 +269,7 @@ command are:
   Target values for the chromatic functions at certain positions in the
   sequence can be specified with the help of the
   \hyperref[sec:constraint]{\tt CONSTRAINT} command and the repective keywords
-  \hyperref[subsec:tables_chrom]{\tt WX, PHIX, WY, PHIY,...} for the
+  \hyperref[subsec:tables-chrom]{\tt WX, PHIX, WY, PHIY,...} for the
   chromatic functions. 
 \end{madlist}
 
@@ -312,11 +318,11 @@ It has six attributes:
   \ttitem{UPPER} Upper limit for the parameter (optional). 
 
   \ttitem{SLOPE} allowed change rate (optional, available only using
-  \hyperref[sec:jacobian]{JACOBIAN} routine). Limit the
+  \hyperref[subsec:match-jacobian]{JACOBIAN} routine). Limit the
   parameter to increase ({\tt SLOPE=1}) or decrease ({\tt SLOPE=-1}) only.
 
   \ttitem{OPT} optimal value for the parameter (optional, available
-  only using \hyperref[sec:jacobian]{JACOBIAN} routine).  
+  only using \hyperref[subsec:match-jacobian]{JACOBIAN} routine).  
 \end{madlist}
 
 {\bf Examples:}
@@ -342,7 +348,7 @@ process.
 
 After a matching operation all varied attributes retain their
 value after the last successful matching iteration. Using
-\hyperref[sec:jacobian]{JACOBIAN} routine, {\tt STRATEGY=3}, in case
+\hyperref[subsec:match-jacobian]{JACOBIAN} routine, {\tt STRATEGY=3}, in case
 the number of parameters is greater than the number of constraint, if a
 parameter comes outside the limits, it is excluded automatically from
 the set of variables and a new solution is searched.  
@@ -600,13 +606,13 @@ Default values for matching weights are given in the table below.
 %  Changed by: Oliver Bruning, 20-Jun-2002 
 
 \section{Matching Methods}
-\label{sec:match_methods}
+\label{sec:match-methods}
 
 \madx currently supports four different matching algorithms each associated to 
 a command with its own attributes. 
 
 \subsection{LMDIF: Fast Gradient Minimisation}
-\label{subsec:match_lmdif}
+\label{subsec:match-lmdif}
 The {\tt LMDIF} command minimises the sum of squares of the constraint
 functions using their numerical derivatives. It is the fastest
 minimisation method available in \madx.
@@ -624,7 +630,7 @@ The command has two attributes:
 \end{madlist}
 
 \subsection{MIGRAD: Gradient Minimisation}
-\label{subsec:match_migrad}
+\label{subsec:match-migrad}
 The {\tt MIGRAD} command minimises the penalty function using the numerical
 derivatives of the sum of squares.  
 
@@ -643,7 +649,7 @@ The command has three attributes:
 \end{madlist} 
 
 \subsection{SIMPLEX: Simplex Minimisation}
-\label{subsec:match_simplex}
+\label{subsec:match-simplex}
 The {\tt SIMPLEX} command minimises the penalty function by the simplex
 method. Details are given in \cite{MINUIT}.
 
@@ -660,7 +666,7 @@ The command has two attributes:
 \end{madlist} 
 
 \subsection{JACOBIAN: Newton Minimisation}
-\label{subsec:match_jacobian}
+\label{subsec:match-jacobian}
 The {\tt JACOBIAN} command minimises the penalty function calculating the
 Jacobian and solving the linear problem. A $Q R$ or $L Q$  decomposition is
 performed when the system is over or under-determined. Before starting
@@ -730,7 +736,7 @@ The command has the folowing attributes:
 %  Changed by: Hans Grote, 30-Sep-2002 
 
 \section{USE\_MACRO}
-\label{sec:use_macro}
+\label{sec:use-macro}
  
 It is possible to match user defined expressions with the
 {\tt USE\_MACRO} keyword. 
@@ -852,7 +858,7 @@ ENDMATCH;
 %  Changed by: Hans Grote, 25-Sep-2002 
  
 \section{Matching Examples}
-\label{sec:match_examples}
+\label{sec:match-examples}
 
 All matching examples and the related files for executing the MADX
 sample jobs can be found in the examples directory. 

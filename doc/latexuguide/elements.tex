@@ -1,5 +1,6 @@
 
 \chapter{Element Types}
+\label{chap:elements}
 
 \section{Marker}
 \ttindex{marker}
@@ -36,7 +37,7 @@ DR2: \> DRIFT, \> L = DR1->L;
 }
 
 The length of DR2 will always be equal to the length of DR1. The
-\hyperref[subsec:local_straight]{straight reference system} for a drift
+\hyperref[subsec:local-straight]{straight reference system} for a drift
 space is a Cartesian coordinate system.   
 
 
@@ -46,15 +47,15 @@ space is a Cartesian coordinate system.
 Two different type keywords are recognised for bending magnets, they are
 distinguished only by the reference system used:  
 \begin{madlist}
-  \ttitem{SBEND}\label{bend_sbend} is a sector bending magnet. \\
+  \ttitem{SBEND}\label{bend-sbend} is a sector bending magnet. \\
   The planes of the pole faces intersect at the centre of curvature of
   the curved 
   % Its pole faces meet at the centre of curvature of the curved
-  \hyperref[subsec:local_rbend]{sbend reference system}.  
-  \ttitem{RBEND}\label{bend_rbend} is a rectangular bending magnet. \\ 
+  \hyperref[subsec:local-rbend]{sbend reference system}.  
+  \ttitem{RBEND}\label{bend-rbend} is a rectangular bending magnet. \\ 
   The pole faces are parallel. The reference system is the curved  
   % It has parallel pole faces and is based on a curved
-  \hyperref[subsec:local_rbend]{rbend reference system}.
+  \hyperref[subsec:local-rbend]{rbend reference system}.
 \end{madlist}
 
 Bendig magnets are defined by the statements: 
@@ -181,7 +182,7 @@ Bending magnets have the following attributes:
 \end{madlist}
 
 {\bf Note:} Additional attributes can be given to bending magnets that
-are useful for \ptc and defined in \ref{sec:add_option_PTC}.
+are useful for \ptc and defined in \ref{sec:add-option-PTC}.
 
 \vskip 5mm
 {\bf \underline{Fringe Fields:}}
@@ -222,8 +223,8 @@ on one side only, e.g. when slicing a dipole.
 \madxmp{
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
 BR: RBEND, L=5., ANGLE=+0.001;             \>! Deflection to the right \\
-BD: RBEND, L=5., ANGLE=+0.001, TILT=pi/2;  \>! Deflection down \\
-BL: RBEND, L=5., ANGLE=+0.001, TILT=pi;    \>! Deflection to the left \\
+BD: RBEND, L=5., ANGLE=+0.001, TILT= pi/2; \>! Deflection down \\
+BL: RBEND, L=5., ANGLE=+0.001, TILT= pi;   \>! Deflection to the left \\
 BU: RBEND, L=5., ANGLE=+0.001, TILT=-pi/2; \>! Deflection up
 }
 
@@ -260,7 +261,7 @@ A {\tt DIPEDGE} has zero length and five attributes.
      \href{local_system.html#sbend}{sector bend}. Note that each {\tt DIPEDGE}
      has its own {\tt FINT}, so {\tt FINTX} is no longer necessary.  
    \ttitem{HGAP} half gap height of the associated {\tt SBEND}
-     \hyperref[sec:sbend]{Bending Magnet}.   
+     \hyperref[bend-sbend]{Bending Magnet}.   
    \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
      rad, i.e. a horizontal bend). A positive angle represents a
      clockwise rotation.  
@@ -324,9 +325,9 @@ Example:
 \madxmp{QF: QUADRUPOLE, L = 1.5, K1 = 0.001, THICK = 1;}
 
 {\bf Note:} Additional attributes can be given to quadrupoles that
-are useful for \ptc and defined in \ref{sec:add_option_PTC}.
+are useful for \ptc and defined in \ref{sec:add-option-PTC}.
 
-The \hyperref[subsec:local_straight]{straight reference system} for
+The \hyperref[subsec:local-straight]{straight reference system} for
 a quadrupole is a Cartesian coordinate system.
 
 
@@ -360,11 +361,11 @@ A {\tt SEXTUPOLE} has four real attributes:
 
     \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
       rad, i.e. a normal sextupole). A positive angle represents a
-      clockwise rotation. A $\tt{TILT} = \pi/6$ turns a positive normal 
+      clockwise rotation. A {\tt TILT = pi/6} turns a positive normal 
       sextupole into a negative skew sextupole.
       
       \textbf{  Please note that contrary to \madeight one has to specify the
-        desired TILT angle, otherwise it is taken as 0 rad. This was needed to
+        desired TILT angle, otherwise it is taken as 0~rad. This was needed to
         avoid the confusion in \madeight about the actual meaning of the TILT
         attribute for various elements. } 
 \end{madlist}
@@ -379,9 +380,9 @@ Example:
 \madxmp{S: SEXTUPOLE, L=0.4, K2=0.00134;}
 
 {\bf Note:} Additional attributes can be given to sextupoles that
-are useful for \ptc and defined in \ref{sec:add_option_PTC}.
+are useful for \ptc and defined in \ref{sec:add-option-PTC}.
 
-The \hyperref[subsec:local_straight]{straight reference system} for a
+The \hyperref[subsec:local-straight]{straight reference system} for a
 sextupole is a Cartesian coordinate system.   
 
 
@@ -416,7 +417,7 @@ An {\tt OCTUPOLE} has four real attributes:
 
    \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
      rad, i.e. a normal octupole). A positive angle represents a
-     clockwise rotation. A TILT=pi/8 turns a positive normal octupole
+     clockwise rotation. A {\tt TILT=pi/8} turns a positive normal octupole
      into a negative skew octupole.  
 
      \textbf{Please note that contrary to \madeight one has to specify the
@@ -436,9 +437,9 @@ Example:
 \madxmp{O3: OCTUPOLE, L=0.3, K3=0.543;}
 
 {\bf Note:} Additional attributes can be given to octupoles that
-are useful for \ptc and defined in \ref{sec:add_option_PTC}.
+are useful for \ptc and defined in \ref{sec:add-option-PTC}.
 
-The \hyperref[subsec:local_straight]{straight reference system} for a
+The \hyperref[subsec:local-straight]{straight reference system} for a
 octupole is a Cartesian coordinate system. Octupoles are normally
 treated as thin lenses, except when tracking by Lie-algebraic methods.   
 
@@ -581,13 +582,13 @@ THINSOLO: \> SOLENOID, L = 0,  \> KS = 0.001, KSI = 0.002;
 }
 
 {\bf Note:} Additional attributes can be given to solenoids that
-are useful for \ptc and defined in \ref{sec:add_option_PTC}.
+are useful for \ptc and defined in \ref{sec:add-option-PTC}.
 In particular multipole coefficients {\tt KNL} and {\tt KSL} can also be 
 specified for 
 solenoids. They have no effect in \madx proper but are used in \ptc for 
 solenoid with multipoles.
 
-The \hyperref[subsec:local_straight]{straight reference system} for a
+The \hyperref[subsec:local-straight]{straight reference system} for a
 solenoid is a Cartesian coordinate system. 
  
 
@@ -630,10 +631,10 @@ U(x,y)=\frac{k}{c}\frac{\xi\sqrt{\xi^2-1} \, \text{acosh}\xi +
 Figure below shows the contour plot of the scalar potential: \\
 \begin{figure}
   \begin{center}    
-    %\includegraphics[width=220px]{png/nllens_potential-2D.png}
-    \includegraphics[width=220px]{jpg/nllens_potential-2D.jpg}
+    %\includegraphics[width=220bp]{png/nllens_potential-2D.png}
+    \includegraphics[width=220bp]{jpg/nllens_potential-2D.jpg}
     \caption{Contour plot of the scalar potential}
-    \label{fig:nllens_potential}
+    \label{fig:nllens-potential}
   \end{center}
 \end{figure}
 
@@ -700,7 +701,7 @@ thin lenses:
 %  Changed by: Werner Herr, 22-May-2007 
 \section{Closed Orbit Corrector}
 \ttindex{kicker}\index{orbit corrector}
-\label{sec:closed_orbit_cor}\label{sec:kicker}
+\label{sec:closed-orbit-cor}\label{sec:kicker}
 
 Three types of magnetic closed orbit correctors are available: 
 \begin{madlist}
@@ -763,7 +764,7 @@ The assignment in the form of a deferred expression has the advantage
 that the values can be assigned and/or modified at any time (and
 matched!).   
 
-The \hyperref[subsec:local_straight]{straight reference system} for an
+The \hyperref[subsec:local-straight]{straight reference system} for an
 orbit corrector is a Cartesian coordinate system.  
 
 
@@ -835,11 +836,11 @@ at the documentation of the orbit corrector type
 
 \section{RF Cavity}
 \ttindex{RFcavity}
-\label{sec:rf_cavity}\label{sec:rfcavity}
+\label{sec:rf-cavity}\label{sec:rfcavity}
 
 \madbox{
 label: RFCAVITY, \= L=real, VOLT=real, LAG=real, \\
-                 \> HARMON=integer, FREQ=real, \\    
+                 \> FREQ=real, HARMON=integer, \\    
                  \> N\_BESSEL=integer, NO\_CAVITY\_TOTALPATH=logical;
 }
 
@@ -852,8 +853,8 @@ An {\tt RFCAVITY} has eight real attributes and one integer attribute:
    \ttitem{L} The length of the cavity (DEFAULT: 0 m) 
    \ttitem{VOLT} The peak electrical RF voltage (DEFAULT: 0 MV). The effect of 
    the cavity is \\
-     delta(\textit{E}) = VOLT * sin(2 pi * (LAG - HARMON * \textit{f$_0$ t})). 
-   \ttitem{LAG} The phase lag [2pi] (DEFAULT: 0). 
+     delta(\textit{E}) = VOLT * sin(2$\pi$ * (LAG - HARMON * \textit{f$_0$ t})). 
+   \ttitem{LAG} The phase lag [$2\pi$] (DEFAULT: 0). 
    \ttitem{FREQ} The frequency [MHz] (no DEFAULT). Note that if the RF
      frequency is not given, it is computed from the harmonic number and
      the revolution frequency \textit{f$_0$} as before. However, for
@@ -875,7 +876,7 @@ An {\tt RFCAVITY} has eight real attributes and one integer attribute:
   the {\tt TWISS} parameters in the plane of non-zero dispersion may not
   close as expected. Therefore, it is best to perform {\tt TWISS} in 4D
   only, i.e. with cavities switched off. If 6D is needed one has to
-  use the \hyperref[sec:ptc_twiss]{\tt PTC\_TWISS} command. } 
+  use the \hyperref[sec:ptc-twiss]{\tt PTC\_TWISS} command. } 
 
 The {\tt RFCAVITY} can also have attributes that will only become active in 
 \ptc: 
@@ -903,7 +904,7 @@ BEAM, PARTICLE = ELECTRON, ENERGY = 50.0; \\
 CAVITY: RFCAVITY, L = 10.0, VOLT = 150.0, LAG = 0.0, HARMON = 31320;
 }
 
-The \hyperref[subsec:local_straight]{straight reference system} for a
+The \hyperref[subsec:local-straight]{straight reference system} for a
 cavity is a Cartesian coordinate system.  
 
 
@@ -914,7 +915,7 @@ cavity is a Cartesian coordinate system.
 \madbox{
 xxxxxxxxxxxxxxxxxxxxx\= \kill
 label: RFMULTIPOLE, \> VOLT=real, LAG=real, \\
-       \> HARMON=integer, FREQ=real, \\
+       \> FREQ=real, HARMON=integer, \\
        \> LRAD=real, TILT=real, \\
        \> KNL=\{real, \ldots \}, KSL=\{real, \ldots \}, \\
        \> PNL=\{real, \ldots \}, PSL=\{real, \ldots \};
@@ -924,12 +925,12 @@ A {\tt RFMULTIPOLE} is a thin-lens element which exhibits the properties
 of an RF-cavity and of a magnet of arbitrary order oscillating at
 a certain frequency.
 
-The effect of the cavity is {\tt delta(E) = VOLT * sin(2 pi * (LAG - HARMON *
+The effect of the cavity is {\tt delta(E) = VOLT * sin(2$\pi$ * (LAG - HARMON *
 f0 t))}. 
  
 \begin{madlist}
    \ttitem{VOLT} The peak RF voltage (DEFAULT: 0 MV).  
-   \ttitem{LAG} The phase lag [2pi] (DEFAULT: 0) 
+   \ttitem{LAG} The phase lag [$2\pi$] (DEFAULT: 0) 
    \ttitem{FREQ} The frequency [MHz] (no DEFAULT). \\ 
      Note that if the RF
      frequency is not given, it is computed from the harmonic
@@ -1014,13 +1015,13 @@ parameters.
 %  Edited by: A. Latina, Jun 2013
 \section{Crab Cavity}
 \ttindex{crabcavity}
-\label{sec:crab_cavity}\label{sec:crabcavity}
+\label{sec:crab-cavity}\label{sec:crabcavity}
 
 \madbox{
-label: CRABCAVITY, \=L=real, VOLT=real, LAG=real, FREQ=real, \\
+label: CRABCAVITY, \=L=real, VOLT=real, LAG=real, \\
+                   \>FREQ=real, HARMON=integer, \\
                    \>RV1=integer, RV2=integer, RV3=integer, RV4=integer, \\
-                   \>RPH1=integer, RPH2=integer, \\
-                   \>LAGF=real, HARMON=integer;
+                   \>RPH1=integer, RPH2=integer, LAGF=real ;
 }
 
 A {\tt CRABCAVITY} has five attributes describing its steady state 
@@ -1031,7 +1032,7 @@ and seven attributes to describe dynamic behaviour:
 
   \ttitem{VOLT} The peak RF voltage (default: 0 MV). 
 
-  \ttitem{LAG} The initial phase lag [2pi] (default: 0). 
+  \ttitem{LAG} The initial phase lag [$2\pi$] (default: 0). 
 
   \ttitem{FREQ} The RF frequency [MHz] (no default). \\[3mm]
     {\bf Note that if the RF frequency is not given, it is computed from the
@@ -1057,10 +1058,10 @@ The other attributes describe the time evolution of a {\tt CRABCAVITY} behaviour
   \ttitem{RV3} Number of turns with nominal voltage (default: 0). 
   \ttitem{RV4} Number of turns to ramp voltage from nominal value to zero (default: 0).  
 
-  \ttitem{LAGF} Value of the final crab RF phase lag [2pi] (default: 0).
+  \ttitem{LAGF} Value of the final crab RF phase lag [$2\pi$] (default: 0).
 
   \ttitem{RPH1} Number of initial turns with nominal phase (default: 0). 
-  \ttitem{RPH2} Number of turns to ramp phase [2pi] from nominal to
+  \ttitem{RPH2} Number of turns to ramp phase [$2\pi$] from nominal to
     specified value \\ (default:~0). 
 
 \end{madlist}
@@ -1109,7 +1110,7 @@ CAVITY:  \>CRABCAVITY, L = 10.0, VOLT = 5.0, LAG = 0.0, FREQ = 400, \\
          \>RPH1 = 100, RPH2 = 500, LAGF = 0.125;
 }
 
-The \hyperref[subsec:local_straight]{straight reference system} for a
+The \hyperref[subsec:local-straight]{straight reference system} for a
 cavity is a Cartesian coordinate system.  
  
 %\href{http://www.cern.ch/rcalaga}{R. Calaga}, September 2010
@@ -1138,7 +1139,7 @@ An {\tt ELSEPARATOR} element has four real attributes:
 
 An electrostatic separator requires the particle energy
 ({\tt ENERGY}) and the particle charge
-({\tt CHARGE}) to be set by a \hyperref[sec"beam]{\tt BEAM}
+({\tt CHARGE}) to be set by a \hyperref[sec:beam]{\tt BEAM}
 command before any calculation is performed.  
 
 Example: 
@@ -1147,7 +1148,7 @@ BEAM, PARTICLE=positron, ENERGY=50.0;\\
 SEP: ELSEPARATOR, L=5.0, EY=0.5;
 }
 
-The \hyperref[subsec:local_straight]{straight reference system} for a
+The \hyperref[subsec:local-straight]{straight reference system} for a
 separator is a Cartesian coordinate system.   
 
 
@@ -1186,7 +1187,7 @@ MH: HMONITOR, L = 1; \\
 MV: VMONITOR;
 }
 
-The \hyperref[subsec:local_straight]{straight reference system} for a
+The \hyperref[subsec:local-straight]{straight reference system} for a
 monitor is a Cartesian coordinate system.  
 
 %  Added by: Ghislain Roy, 23-May-2013. Split from section on BPM's
@@ -1222,7 +1223,7 @@ An instrument or placeholder has one real attribute:
    \ttitem{L} The length of the instrument (default: 0 m). 
 \end{madlist}
 
-The \hyperref[subsec:local_straight]{straight reference system} for an 
+The \hyperref[subsec:local-straight]{straight reference system} for an 
 instrument is a Cartesian coordinate system.  
 
 
@@ -1245,10 +1246,10 @@ A {\tt COLLIMATOR} has one specific real attribute:
 
 Additionally, like any other element, except {\tt DRIFT} space, 
 a {\tt COLLIMATOR} can have specific aperture related attributes 
-as defined in the related section \hyperref[sec:def_aper]{Defining 
+as defined in the related section \hyperref[sec:def-aper]{Defining 
 aperture in \madx}
 
-During \hyperref[chap:thin_track]{tracking} in \madx, particle loss 
+During \hyperref[chap:thintrack]{tracking} in \madx, particle loss 
 is checked at the entrance of the element by comparing particle coordinates 
 and defined aperture, provided that the {\tt APERTURE} flag is {\tt true} 
 in the \hyperref[sec:track]{\tt TRACK} command, 
@@ -1262,7 +1263,7 @@ Example:
 COLLIM: COLLIMATOR, L=0.5, APERTYPE=ellipse, APERTURE={0.01,0.005};
 }
 
-The \hyperref[subsec:local_straight]{straight reference system} for a
+The \hyperref[subsec:local-straight]{straight reference system} for a
 collimator is a Cartesian coordinate system.  
 
 \textbf{NOTE:} A collimator can be displaced transversally in order to
@@ -1274,7 +1275,7 @@ beam line.
 Other collimator elements have been inherited from \madeight and still exist 
 in \madx for backward compatibility.
 {\tt ECOLLIMATOR} (elliptic aperture collimator) and {\tt RCOLLIMATOR} 
-(rectangular aperture collimator)behave both as drift spaces in \madx 
+(rectangular aperture collimator) behave both as drift spaces in \madx 
 They are declared with
 
 \madbox{
@@ -1291,7 +1292,7 @@ Either type has several real attributes:
 	unlimited). \\ \textbf{OBSOLETE : parsed and stored but not used.} 
 \end{madlist}
 
-It is STRONGLY advised to replaced all instances of {\tt RCOLLIMATOR} 
+Users are STRONGLY advised to replaced all instances of {\tt RCOLLIMATOR} 
 and {\tt ECOLLIMATOR} in input files with appropriate {\tt COLLIMATOR} 
 elements. The {\tt RCOLLIMATOR} and {\tt ECOLLIMATOR} elements are only
 kept for the time being for backward compatibility and will be removed in 
@@ -1344,7 +1345,7 @@ and extended by S.~Sorge (2007).
        \item  {\tt BBSHAPE=1}: Gaussian shape (default), {\tt SIGX, SIGY}: 
        standard deviation in horizontal, vertical direction.
        \item  {\tt BBSHAPE=2}: trapezoidal shape (see 
-       fig.\ref{fig:beambeam_n_trapez}), {\tt SIGX, SIGY}: half width of 
+       fig.\ref{fig:beambeam-n-trapez}), {\tt SIGX, SIGY}: half width of 
        density profile, i.e. distance from the centre to half edge region with 
        linear decrease of density in horizontal, vertical direction. Still only 
        circular opposite beam possible, i.e. in the calculations {\tt 
@@ -1353,14 +1354,14 @@ and extended by S.~Sorge (2007).
 
 \begin{figure}[h]
   \begin{center}
-    \includegraphics[width=400px]{jpg/beambeam_n_trapez.jpg}
+    \includegraphics[width=400bp]{jpg/beambeam_n_trapez.jpg}
     \caption{Trapezoidal shape of radial density for beam-beam lens.} 
-    \label{fig:beambeam_n_trapez}
+    \label{fig:beambeam-n-trapez}
   \end{center}
 \end{figure}
 
        \item  {\tt BBSHAPE=3}: hollow-parabolic shape (see
-       fig.\ref{fig:beambeam_n_hollowparabol}, {\tt SIGX, SIGY}: distance 
+       fig.\ref{fig:beambeam-n-hollowparabol}, {\tt SIGX, SIGY}: distance 
        from the centre to the maximum of the parabolic density profile in 
        horizontal, vertical directions. Still only circular opposite beam 
        possible, i.e. in the calculations {\tt SIGX'=SIGY'=(SIGX+SIGY)/2} is 
@@ -1369,9 +1370,9 @@ and extended by S.~Sorge (2007).
 \begin{figure}[h]
   \begin{center}
     \flushright
-    \includegraphics[width=420px]{jpg/beambeam_n_hollowparabol.jpg}
+    \includegraphics[width=420bp]{jpg/beambeam_n_hollowparabol.jpg}
     \caption{Hollow parabolic shape of radial density for beam-beam lens.} 
-    \label{fig:beambeam_n_hollowparabol}
+    \label{fig:beambeam-n-hollowparabol}
   \end{center}
 \end{figure}
 
@@ -1502,7 +1503,7 @@ case the tracking run will be aborted.
 \label{sec:yrotation}
 
 The element {\tt YROTATION} rotates the
-\hyperref[subsec:local_straight]{straight reference system} about the
+\hyperref[subsec:local-straight]{straight reference system} about the
 vertical ({\tt y}) axis.
 
 \madbox{
@@ -1540,7 +1541,7 @@ KINK: YROTATION, ANGLE = 0.0001;
 \label{sec:srotation}
 
 The element {\tt SROTATION} rotates the
-\hyperref[subsec:local_straight]{straight reference system} about the
+\hyperref[subsec:local-straight]{straight reference system} about the
 longitudinal ({\tt s}) axis. 
 
 \madbox{
@@ -1582,7 +1583,7 @@ VBEND: SBEND, L = 6.0, K0S = 0.01/6;
 \label{sec:translation}
 
 The element {\tt TRANSLATION} changes the
-\hyperref[subsec:local_straight]{reference system} 
+\hyperref[subsec:local-straight]{reference system} 
 by applying a translation of the reference system.
 
 \madbox{
@@ -1602,7 +1603,7 @@ referred to the new coordinate system \\
 \label{sec:changeref}
 
 The element {\tt CHANGEREF} changes the
-\hyperref[subsec:local_straight]{reference system} 
+\hyperref[subsec:local-straight]{reference system} 
 by applying both translations and rotations.
 
 \madbox{

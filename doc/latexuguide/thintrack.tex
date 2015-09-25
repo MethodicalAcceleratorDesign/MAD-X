@@ -44,14 +44,14 @@ type) and exactness (full or extended Hamiltonian) of the results.
 
 
 The first \ptc thick-lens tracking module is named
-\hyperref[sec:ptc_track]{PTC\_TRACK}. 
+\hyperref[sec:ptc-track]{PTC\_TRACK}. 
 It has the same features as the thin-lens tracking code
 ({\tt \href{../thintrack/thintrack.html}{thintrack}}) except that it
 treats thick-lenses in a symplectic manner. 
 
 
 There is a second \ptc tracking module called the line tracking module
-(\hyperref[sec:ptc_track_line]{\tt PTC\_TRACK\_LINE}). It is
+(\hyperref[sec:ptc-trackline]{\tt PTC\_TRACKLINE}). It is
 meant for tracking particles in 
 \href{http://clic-study.web.cern.ch/CLIC-Study/}{CLIC}, in fact it
 treats beam-lines containing traveling-wave cavities and includes a beam
@@ -84,7 +84,7 @@ element tracking of one or several particle trajectories in the last
 Only thin elements are allowed (apart from the element {\tt DRIFT}),
 which guarantees the symplecticity of the coordinate transformation. Any
 lattice can be converted into a "thin element" lattice by invoking the
-\hyperref[chap:maketin]{\tt MAKETHIN} command. 
+\hyperref[chap:makethin]{\tt MAKETHIN} command. 
 
 Several commands are actually required to complete a tracking run:
 
@@ -220,7 +220,7 @@ The attributes of the TRACK command are:
   \hyperref[chap:aperture]{\tt APERTURE} information of each element 
   in the sequence is used to assess the particle loss. 
   However {\tt TRACK} only takes into account the predefined aperture 
-  types listed in table \ref{T-apertype}
+  types listed in table \ref{table:apertype}
   \\
   
   Note that if no aperture information was specified for an element, 
@@ -375,10 +375,10 @@ coordinates are specified with respect to the reference orbit.
 
 {\bf Important:} \\
 The initial trajectory coordinates specified with the {\tt START} command (and 
-the \hyperref[sec:ptc_start]{\tt PTC\_START} command) remain in the {\tt 
+the \hyperref[sec:ptc-start]{\tt PTC\_START} command) remain in the {\tt 
 TRACKSUMM} table for the duration of the \madx run. Therefore any subsequent 
-{\tt RUN} command (and \hyperref[sec:ptc_trcak]{\tt PTC\_TRACK} or 
-\hyperref[sec:ptc_trackline]{\tt PTC\_TRACKLINE}) to actually start tracking 
+{\tt RUN} command (and \hyperref[sec:ptc-track]{\tt PTC\_TRACK} or 
+\hyperref[sec:ptc-trackline]{\tt PTC\_TRACKLINE}) to actually start tracking 
 will effectively use {\bf all} 
 initial trajectory coordinates found in the {\tt TRACKSUMM} table.
 A workaround this odd behaviour is to \hyperref[sec:delete]{delete} the {\tt 

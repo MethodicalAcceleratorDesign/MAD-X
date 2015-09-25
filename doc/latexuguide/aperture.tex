@@ -17,7 +17,7 @@ the defined aperture.
 
 
 \section{Aperture definition}
-\label{sec:def_aper}
+\label{sec:def-aper}
 The aperture for a particular element or class of elements can be 
 set in \madx at the time of definition or instantiation of the 
 element or class. 
@@ -78,33 +78,34 @@ The minimum aperture definition uses the following two attributes:
 \end{madlist}
 
 \begin{table}[ht]
-	\caption{Predefined aperture types}
-	\vspace{1ex}
-	\begin{tabular}{|l | c | p{8cm}|}
-		\hline 
-		{\bf APERTYPE} & {\bf \# of values} & {\bf meaning of values}\\
-		\hline
-		{\tt CIRCLE} & 1 &  radius of circle \\
-		\hline
-		{\tt RECTANGLE} & 2 & half width and half height of rectangle\\ 
-		\hline
-		{\tt ELLIPSE} & 2 & horizontal and vertical semi-axes of ellipse \\  
-		\hline
-		{\tt RECTCIRCLE} or {\tt LHCSCREEN} & 3 & half width and half height 
-		of rectangle, radius of circle\\
-		\hline
-		{\tt RECTELLIPSE} & 4 & half width and half height of rectangle, 
-		horizontal and vertical semi-axes of ellipse \\
-		\hline
-		{\tt RACETRACK} & 4 & half width and half height along main axes, 
-		and horizontal and vertical semi-axes of ellipse for the rounding 
-		of the corners \\
-		\hline
-		{\tt OCTAGON} & 4 & half width and half height along main axes, 
-		two angles sustaining the cut corner in the first quadrant, 
-		given in radians and in order of increasing values. \\   
-		\hline
-	\end{tabular}
+  \label{table:apertype}
+  \caption{Predefined aperture types}
+  \vspace{1ex}
+  \begin{tabular}{|l | c | p{8cm}|}
+    \hline 
+    {\bf APERTYPE} & {\bf \# of values} & {\bf meaning of values}\\
+    \hline
+    {\tt CIRCLE} & 1 &  radius of circle \\
+    \hline
+    {\tt RECTANGLE} & 2 & half width and half height of rectangle\\ 
+    \hline
+    {\tt ELLIPSE} & 2 & horizontal and vertical semi-axes of ellipse \\  
+    \hline
+    {\tt RECTCIRCLE} or {\tt LHCSCREEN} & 3 & half width and half height 
+    of rectangle, radius of circle\\
+    \hline
+    {\tt RECTELLIPSE} & 4 & half width and half height of rectangle, 
+    horizontal and vertical semi-axes of ellipse \\
+    \hline
+    {\tt RACETRACK} & 4 & half width and half height along main axes, 
+    and horizontal and vertical semi-axes of ellipse for the rounding 
+    of the corners \\
+    \hline
+    {\tt OCTAGON} & 4 & half width and half height along main axes, 
+    two angles sustaining the cut corner in the first quadrant, 
+    given in radians and in order of increasing values. \\   
+    \hline
+  \end{tabular}
 \end{table}
 
 \vskip 5mm
@@ -172,7 +173,7 @@ xn   \>yn
      thin slices inherit the aperture of their respective original thick
      lens version.  
 
-   \item When the \hyperref[chap:c6t]{\tt SIXTRACK} command is called (see the
+   \item When the \hyperref[chap:sixtrack]{\tt SIXTRACK} command is called (see the
      \hyperref[chap:sixtrack]{SixTrack converter module}) the apertures are
      ignored by default. To convert the apertures as well the {\tt APERTURE}
      flag has to be set in {\tt C6T}.  
@@ -211,13 +212,13 @@ the maximal error margin of errors in the element body which
 causes a decrease of aperture, and the alignment tolerance is a 
 misalignment of the element in the accelerator, which also causes a 
 decrease of aperture. The tolerance is given in the transverse plane 
-as a racetrack, like in picture \ref{fig:aperture_tol} below. 
+as a racetrack, like in picture \ref{fig:aperture-tol} below. 
 
 \begin{figure}[htb]
   \begin{center}
-    \includegraphics[width=250px]{jpg/tolerance.jpg}
+    \includegraphics[width=250bp]{jpg/tolerance.jpg}
     \caption{Definition of aperture tolerances}
-    \label{fig:aperture_tol}
+    \label{fig:aperture-tol}
   \end{center}
 \end{figure}
 
@@ -243,7 +244,7 @@ offsets of the aperture inside the element.
 
 The offsets are only used in the \hyperref[chap:thintrack]{\tt tracking} 
 module of \madx and are ignored by the {\tt APERTURE} command and by 
-\hyperref[sec:ptc_track]{\tt PTC\_TRACK}.
+\hyperref[sec:ptc-track]{\tt PTC\_TRACK}.
 
 
 \section{APERTURE}
@@ -337,7 +338,7 @@ particular longitudinal position.
 
 \begin{figure}[h]
   \begin{center}
-    \includegraphics[width=250px]{jpg/notsimple0.jpg}
+    \includegraphics[width=250bp]{jpg/notsimple0.jpg}
     \caption{Determination of maximum halo size}
     \label{fig:notsimple0}
   \end{center}
@@ -353,7 +354,7 @@ polygon in the area where the latter is dented inwards.
 
 \begin{figure}[htb]
   \begin{center}
-    \includegraphics[width=250px]{jpg/notsimple1.jpg}
+    \includegraphics[width=250bp]{jpg/notsimple1.jpg}
     \caption{Not connex beam pipe profile: problem}
     \label{fig:notsimple1}
   \end{center}
@@ -361,7 +362,7 @@ polygon in the area where the latter is dented inwards.
 
 \begin{figure}[htb]
   \begin{center}
-    \includegraphics[width=250px]{jpg/notsimple2.jpg}    
+    \includegraphics[width=250bp]{jpg/notsimple2.jpg}    
     \caption{Not connex beam pipe profile: solution}
     \label{fig:notsimple2}
   \end{center}
@@ -490,7 +491,7 @@ As an example we see in the picture below how the horizontal axes of elements m1
 does not coincide with the reference trajectory.
 \begin{figure}[htb]
   \begin{center}
-    \includegraphics[width=400px]{jpg/offsetelem.jpg}
+    \includegraphics[width=400bp]{jpg/offsetelem.jpg}
     \caption{Illustration of effect of {\tt OFFSETELEM}}
     \label{fig:offsetelem}
   \end{center}
@@ -612,7 +613,7 @@ mcbxa.3r2 \\
 %% As an example we see in the picture below how the horizontal axes of
 %% elements m1 and m2 does not coincide with the reference trajectory.  
 %% \\
-%% \includegraphics[width=450px]{Introduction/offsetelem.jpg}
+%% \includegraphics[width=450bp]{Introduction/offsetelem.jpg}
 %% %%\includegraphics{offsetelem.jpg align=center width=780}
 %% \\ 
 %% The X\_ref(s) and Y\_ref(s) of the reference trajectory are
@@ -697,7 +698,7 @@ and the hardware symbolized by {\tt ON\_ELEM}.
 
 \begin{figure}[ht]  
   \begin{center}
-    \includegraphics[width=450px]{jpg/aperexample.jpg}
+    \includegraphics[width=450bp]{jpg/aperexample.jpg}
     \caption{Example of plot showing aperture limits and n1}
     \label{fig:aperexample}  
   \end{center}

@@ -1,31 +1,31 @@
 %%\title{PTC Set-up Parameters}
 
 \chapter{{\madx}-{\ptc} Auxiliaries}
-\label{chap:ptc_auxiliaries}
+\label{chap:ptc-auxiliaries}
 
 This chapter documents the interface between \madx and \ptc and the
 auxiliary commands available in the \ptc library.
 
 {\bf Available Commands }
 \begin{itemize}
-   \item \hyperref[sec:ptc_setswitch]{\tt PTC\_SETSWITCH}
-   \item \hyperref[sec:ptc_knob]{\tt PTC\_KNOB}
-   \item \hyperref[sec:ptc_setknobvalue]{\tt PTC\_SETKNOBVALUE}
+   \item \hyperref[sec:ptc-setswitch]{\tt PTC\_SETSWITCH}
+   \item \hyperref[sec:ptc-knob]{\tt PTC\_KNOB}
+   \item \hyperref[sec:ptc-setknobvalue]{\tt PTC\_SETKNOBVALUE}
    \item {\tt MATCH\_WITHPTCKNOBS} \qquad {\bf (Under Construction)} 
-   \item \hyperref[sec:ptc_printparametric]{\tt PTC\_PRINTPARAMETRIC}
-   \item \hyperref[sec:ptc_eplacement]{\tt PTC\_EPLACEMENT}
-   \item \hyperref[sec:ptc_printframes]{\tt PTC\_PRINTFRAMES}
-   \item \hyperref[sec:ptc_select]{\tt PTC\_SELECT}
-   \item \hyperref[sec:ptc_select_moment]{\tt PTC\_SELECT\_MOMENT}
-   \item \hyperref[sec:ptc_moments]{\tt PTC\_MOMENTS} \qquad {\bf (Under Construction)} 
-   \item \hyperref[sec:ptc_dumpmaps]{\tt PTC\_DUMPMAPS}
-   \item \hyperref[sec:ptc_setcavities]{\tt PTC\_SETCAVITIES}
+   \item \hyperref[sec:ptc-printparametric]{\tt PTC\_PRINTPARAMETRIC}
+   \item \hyperref[sec:ptc-eplacement]{\tt PTC\_EPLACEMENT}
+   \item \hyperref[sec:ptc-printframes]{\tt PTC\_PRINTFRAMES}
+   \item \hyperref[sec:ptc-select]{\tt PTC\_SELECT}
+   \item \hyperref[sec:ptc-select-moment]{\tt PTC\_SELECT\_MOMENT}
+   \item \hyperref[sec:ptc-moments]{\tt PTC\_MOMENTS} \qquad {\bf (Under Construction)} 
+   \item \hyperref[sec:ptc-dumpmaps]{\tt PTC\_DUMPMAPS}
+   \item \hyperref[sec:ptc-setcavities]{\tt PTC\_SETCAVITIES}
 \end{itemize}
 
 \newpage
 
 \section{PTC\_SETSWITCH}
-\label{sec:ptc_setswitch}
+\label{sec:ptc-setswitch}
 
 Routine that sets the internal \ptc switches.
 \madbox{
@@ -97,7 +97,7 @@ Command parameters and switches:
 
 
 \section{PTC\_KNOB}
-\label{sec:ptc_knob}
+\label{sec:ptc-knob}
 
 \madbox{
 PTC\_KNOB, \=ELEMENTNAME=string, \\
@@ -112,19 +112,19 @@ Knobs appear as additional parameters of the phase space. Twiss
 functions are then obtained as functions of these additional parameters
 (Taylor series).  
 Map elements may also be stored as functions of knobs. 
-The \hyperref[sec:ptc_select]{\tt PTC\_SELECT} command 
+The \hyperref[sec:ptc-select]{\tt PTC\_SELECT} command 
 description shows how to request a given element to be stored as a 
 Taylor series.  
 
 The parametric results can also be: 
 \begin{enumerate}
    \item  written to a file with
-     \hyperref[sec:ptc_printparametric]{\tt PTC\_PRINTPARAMETRIC}. 
+     \hyperref[sec:ptc-printparametric]{\tt PTC\_PRINTPARAMETRIC}. 
    \item  plotted and studied using rviewer command
      (\hyperref[sec:rplot]{\tt RPLOT} plugin). 
    \item  used to rapidly obtain approximate values of lattice
      functions for given values of knobs
-     (\hyperref[sec:ptc_setknobvalue]{\tt PTC\_SETKNOBVALUE}). This
+     (\hyperref[sec:ptc-setknobvalue]{\tt PTC\_SETKNOBVALUE}). This
      feature is the foundation of a fast matching algorithm with \ptc.      
 \end{enumerate}
 
@@ -177,7 +177,7 @@ functions.
 
 
 \section{PTC\_SETKNOBVALUE}
-\label{sec:ptc_setknobvalue}
+\label{sec:ptc-setknobvalue}
 
 The {\tt PTC\_SETKNOBVALUE} command sets a given knob value.
 
@@ -188,7 +188,7 @@ PTC\_SETKNOBVALUE, \=ELEMENTNAME=string, \\
 }
 
 All values in the twiss table used by the last {\tt PTC\_TWISS} command 
-and the columns specified with \hyperref[sec:ptc_select]{\tt
+and the columns specified with \hyperref[sec:ptc-select]{\tt
   PTC\_SELECT}{\tt, PARAMETRIC=true;}  are reevaluated using the
 buffered parametric results.   
 
@@ -221,7 +221,7 @@ matched to obtain the required R56 value.
 
 
 \section{PTC\_VARYKNOBS (Under Construction)}
-\label{sec:ptc_varyknobs}
+\label{sec:ptc-varyknobs}
 
 The {\tt PTC\_VARYKNOBS} command allows matching with \ptc knobs.
 
@@ -345,7 +345,7 @@ accordingly.
 
 
 \section{PTC\_PRINTPARAMETRIC}
-\label{sec:ptc_printparametric}
+\label{sec:ptc-printparametric}
 
 {\bf Editor's Note:} This command exists but is not documented. The file 
 PTC\_PrintParametric.html contains the same content as PTC\_Knob.html. I
@@ -353,7 +353,7 @@ presume the original file has been lost and overwritten...
 
 
 \section{PTC\_EPLACEMENT}
-\label{sec:ptc_eplacement}
+\label{sec:ptc-eplacement}
 
 Places a given element at required position and orientation.  All
 rotations are made around the front face of the element.
@@ -446,7 +446,7 @@ Command parameters and switches:
 
 
 \section{PTC\_PRINTFRAMES}
-\label{sec:ptc_printframes}
+\label{sec:ptc-printframes}
 
 Print the \ptc geometry of a layout to a specified file.
 
@@ -485,10 +485,10 @@ Command parameters and switches:
 % <p>
 
 \section{PTC\_SELECT}
-\label{sec:ptc_select}
+\label{sec:ptc-select}
 
 Selects a map element to be stored in a user-defined table, or stored as
-a function (Taylor series) of a defined \hyperref[sec:ptc_knob]{knob}.
+a function (Taylor series) of a defined \hyperref[sec:ptc-knob]{knob}.
 Both cases can be joined in a single {\tt PTC\_SELECT} command.  
 
 \madbox{
@@ -519,7 +519,7 @@ Command parameters and switches:
    words it is R21.   
 
    \ttitem{PARAMETRIC} a logical switch. If true, and if any
-   \hyperref[sec:ptc_knob]{knobs} is defined, the map element is stored
+   \hyperref[sec:ptc-knob]{knobs} is defined, the map element is stored
    as the parametric result. \\ (Default: false) 
    
    \ttitem{QUANTITY} ??? is that the element referred above ??
@@ -591,7 +591,7 @@ functions.
 
 
 \section{PTC\_SELECT\_MOMENT}
-\label{sec:ptc_select_moment}
+\label{sec:ptc-select-moment}
 
 Selects a moment to be stored in a user-defined table, or stored as
 a function (Taylor series) of a defined knob.  Both cases can be joined
@@ -654,7 +654,7 @@ Command parameters and switches:
   (Default: moments)
 
   \ttitem{PARAMETRIC} a logical flag to to store the element as a
-  parametric result if a \hyperref[sec:ptc_knob]{knob} has been
+  parametric result if a \hyperref[sec:ptc-knob]{knob} has been
   defined. \\
   (Default: false)
 \end{madlist} 
@@ -698,11 +698,11 @@ ptc\_select\_moment, table = momord6,   \>moment\_s=\>6;
 
 
 \section{PTC\_MOMENTS}
-\label{sec:ptc_moments}
+\label{sec:ptc-moments}
 
 The command {\tt PTC\_MOMENTS} calculates moments previously selected with the
-\hyperref[sec:ptc_select_moment]{\tt PTC\_SELECT\_MOMENT} command.  It uses maps
-saved by the \hyperref[sec:ptc_twiss]{\tt PTC\_TWISS} command, hence,
+\hyperref[sec:ptc-select-moment]{\tt PTC\_SELECT\_MOMENT} command.  It uses maps
+saved by the \hyperref[sec:ptc-twiss]{\tt PTC\_TWISS} command, hence,
 the {\tt SAVEMAPS} switch of {\tt PTC\_TWISS} must be set to {\tt true}
 (Default) to be able to calculate moments.
 
@@ -746,7 +746,7 @@ The command parameters and switches are
 
 
 \section{PTC\_DUMPMAPS}
-\label{sec:ptc_dumpmaps}
+\label{sec:ptc-dumpmaps}
 
 {\tt PTC\_DUMPMAPS} dumps the linear part of the map for each element of the
 layout into the specified file.  
@@ -780,7 +780,7 @@ The only command parameter is:
 
 
 \section{PTC\_SETCAVITIES}
-\label{sec:ptc_setcavities}
+\label{sec:ptc-setcavities}
 
 The {\tt PTC\_SETCAVITIES} command adjusts cavities and sets appropriate
 reference momenta for a layout containing travelling wave cavities. 
@@ -796,7 +796,7 @@ beginning of the layout under study.
 
 When \ptc reaches a cavity in the layout, the parameters of the cavity
 may be adjusted according to the user-defined {\tt MAXACCEL} switch
-previously set in \hyperref[sec:ptc_setswitch]{\tt PTC\_SETSWITCH}.
+previously set in \hyperref[sec:ptc-setswitch]{\tt PTC\_SETSWITCH}.
 
 If {\tt MAXACCEL=true} the phase of the cavity is adjusted so it gives
 the maximum acceleration. The phase lag is then added to this adjusted

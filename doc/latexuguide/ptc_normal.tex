@@ -2,11 +2,11 @@
 %  Created by: Valery KAPIN, 21-Mar-2006 
 
 \chapter{Non-Linear Machine Parameters}
-\label{chap:ptc_normal}
+\label{chap:ptc-normal}
 
 
 The {\tt PTC\_NORMAL} module (\cite{schmidt2005} and
-\cite{damico2004_2}) of \madx is based on \ptc code. This module takes
+\cite{damico2004-2}) of \madx is based on \ptc code. This module takes
 full advantage of the \ptc Normal Form analysis which is a considerable
 upgrade of what was available with the Lie Algebra technique used in
 \madeight. It allows to calculate dispersions, chromaticities,
@@ -42,7 +42,7 @@ PTC\_END;
 }
 
 \section{SELECT\_PTC\_NORMAL} 
-\label{sec:select_ptc_normal}
+\label{sec:select-ptc-normal}
 
 The {\tt SELECT\_PTC\_NORMAL} command selects parameters to be 
 calculated by a subsequent {\tt PTC\_NORMAL} command.
@@ -118,7 +118,7 @@ because higher orders contain "cross terms" from the lower ones.
 
 
 \section{PTC\_NORMAL}
-\label{sec:ptc_normal}
+\label{sec:ptc-normal}
 
 The calculation of the parameters specified by the preceding
 {\tt SELECT\_PTC\_NORMAL} commands is initiated by the
@@ -146,7 +146,7 @@ The attributes are:
   \ttitem{MAPTABLE} a logical flag to activate the storage of the
   map-table in memory. \\ 
   {\tt MAPTABLE=true} and {\tt NO=1} creates the one-turn matrix which
-  can be used by the next \hyperref[chap:ptc_twiss]{\tt PTC\_TWISS}
+  can be used by the next \hyperref[chap:ptc-twiss]{\tt PTC\_TWISS}
   command.\\ (Default: false) 
 
   \ttitem{NORMAL} a logical flag to activate the calculation of the

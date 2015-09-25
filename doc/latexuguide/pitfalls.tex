@@ -11,11 +11,11 @@ this list.
 
 \item[Twiss calculation is 4D only!]  The Twiss command will calculate
   an approximate 6D closed orbit when the accelerator structure includes
-  an active \hyperref[sec:rf_cavity]{cavity}. However, the calculation of
+  an active \hyperref[sec:rf-cavity]{cavity}. However, the calculation of
   the Twiss parameters are 4D only. This may result in apparently
   non-closure of the beta values in the plane with non-zero
   dispersion. The full 6D Twiss parameters can be calculated with the
-  \hyperref[chap:ptc_twiss]{\tt PTC\_TWISS} command.  The
+  \hyperref[chap:ptc-twiss]{\tt PTC\_TWISS} command.  The
   \hyperref[chap:thintrack]{Thinlens Tracking} module presently suffers
   from this deficiency since it requires the true 6d closed orbit and
   not the approximate one as calculated by Twiss. In this context one
@@ -36,17 +36,17 @@ this list.
   dispersion being divided by the relativistic beta which is annoying
   for low energy machines. PTC allows to change the coordinate system
   to  delta-p over p with the "time=false" option of the
-  \hyperref[sec:ptc_create_layout]{\tt PTC\_CREATE\_LAYOUT}
+  \hyperref[sec:ptc-create-layout]{\tt PTC\_CREATE\_LAYOUT}
   command which delivers the proper dispersion with the
-  \hyperref{sec:ptc_twiss}{\tt PTC\_TWISS} command.  
+  \hyperref{sec:ptc-twiss}{\tt PTC\_TWISS} command.  
 
 
 
 \item[Non-standard definition of DDX, DDPX, DDY, DDPY] 
   The \madx proper defintion of DDX, DDPX, DDY, DDPY is not the second
   order derivative with respect to deltap/p but multiplied by a factor
-  of 2. The corresponding values from \hyperref[chap:ptc_normal]{\tt
-    PTC\_NORMAL} and in \hyperref[chap:ptc_twiss]{\tt PTC\_TWISS} are
+  of 2. The corresponding values from \hyperref[chap:ptc-normal]{\tt
+    PTC\_NORMAL} and in \hyperref[chap:ptc-twiss]{\tt PTC\_TWISS} are
   the proper derivaties to all orders.
   
 
@@ -98,18 +98,18 @@ this list.
   file is used as input for \ptc. Internally, both \ptc and \madx have
   their own independent databases which are linked via the
   interface. With the
-  \hyperref[sec:ptc_create_layout]{\tt PTC\_CREATE\_LAYOUT}
+  \hyperref[sec:ptc-create-layout]{\tt PTC\_CREATE\_LAYOUT}
   command, only numerical numbers are transferred from the \madx
   database to the \ptc database. Any modification to the \madx
   database is ignored in \ptc until the next call to
-  \hyperref[sec:ptc_create_layout]{\tt PTC\_CREATE\_LAYOUT}
+  \hyperref[sec:ptc-create-layout]{\tt PTC\_CREATE\_LAYOUT}
   For example, a deferred expression of \madx after a
-  \hyperref[sec:ptc_create_layout]{\tt PTC\_CREATE\_LAYOUT}
+  \hyperref[sec:ptc-create-layout]{\tt PTC\_CREATE\_LAYOUT}
   command is ignored within \ptc.  
   
   When introducing a cavity with the {\tt HARMON} instead of the {\tt
     FREQ} attribute (highly discouraged!) a problem arises for
-  \hyperref[sec:ptc_twiss]{\tt PTC\_TWISS} due to the fact that
+  \hyperref[sec:ptc-twiss]{\tt PTC\_TWISS} due to the fact that
   internally {\tt HARMON} is transferred to {\tt FREQ} too late. A
   simple \hyperref[chap:twiss]{\tt TWISS} command executed before \ptc
   start-up will help. However, avoiding {\tt HARMON} is advantageous.
@@ -140,7 +140,7 @@ this list.
   parameters via a transformation from the Teng-Edwards Twiss
   parameters. Obviously this fails when the Teng-Edwards Twiss
   parameters are ill defined. In this case one has to rely on
-  \hyperref[chap:ptc_twiss]{\tt PTC\_TWISS}.    
+  \hyperref[chap:ptc-twiss]{\tt PTC\_TWISS}.    
   
 \end{description}
 

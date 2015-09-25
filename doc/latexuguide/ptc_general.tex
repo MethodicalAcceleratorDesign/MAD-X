@@ -3,7 +3,7 @@
 %  Changed by: ____________, ___________ 
 
 \chapter{\ptc Set-up Parameters}
-\label{chap:ptc_setup}
+\label{chap:ptc-setup}
 
 The Polymorphic Tracking Code \cite{forest2002} of Etienne
 Forest is a kick code, allowing a symplectic integration through all
@@ -23,30 +23,30 @@ interest.
 \ptc exists inside of \madx as a library. \madx offers the interface to
 \ptc, i.e. the \madx input file is used as input for \ptc. Internally,
 both \ptc and \madx have their own independent databases which are
-linked via the interface. With the \hyperref[sec:ptc_create_layout]{\tt
+linked via the interface. With the \hyperref[sec:ptc-create-layout]{\tt
   PTC\_CREATE\_LAYOUT} command, only numerical values are transferred
 from the \madx data structures to the \ptc data structures. Any
 modification to the \madx data structure is unknown to \ptc until the
-next call to \hyperref[sec:ptc_create_layout]{\tt PTC\_CREATE\_LAYOUT}. 
+next call to \hyperref[sec:ptc-create-layout]{\tt PTC\_CREATE\_LAYOUT}. 
 For example, a \hyperref[sec:defer]{deferred expression} of \madx is
-only evaluated at the time of the \hyperref[sec:ptc_create_layout]{\tt
+only evaluated at the time of the \hyperref[sec:ptc-create-layout]{\tt
   PTC\_CREATE\_LAYOUT} command and is ignored within \ptc afterwards.
 
 
 Several modules using the PTC code have been presently implemented in
 \madx. These {\madx}-{\ptc} modules\cite{schmidt2005} are executed by
 the following commands: 
-\hyperref[chap:ptc_twiss]{\tt PTC\_TWISS},
-\hyperref[chap:ptc_normal]{\tt PTC\_NORMAL},
-\hyperref[chap:ptc_track]{\tt PTC\_TRACK},
-\hyperref[sec:ptc_trackline]{\tt PTC\_TRACK\_LINE}. 
+\hyperref[chap:ptc-twiss]{\tt PTC\_TWISS},
+\hyperref[chap:ptc-normal]{\tt PTC\_NORMAL},
+\hyperref[chap:ptc-track]{\tt PTC\_TRACK},
+\hyperref[sec:ptc-trackline]{\tt PTC\_TRACK\_LINE}. 
 
 To perform calculations with these {\madx}-{\ptc} commands, the \ptc
 environment must be initialized, handled and turned off by special
 commands within the \madx input script. 
 
 \section{Command Synopsis}
-\label{sec:ptc_synopsis}
+\label{sec:ptc-synopsis}
 
 A typical set of commands to invoke \ptc is given below: 
 
@@ -71,7 +71,7 @@ PTC\_END;
 }
 
 \section{PTC\_CREATE\_UNIVERSE}
-\label{sec:ptc_create_universe}
+\label{sec:ptc-create-universe}
 
 The {\tt PTC\_CREATE\_UNIVERSE} command is required to set-up the
 \ptc environment.  
@@ -112,7 +112,7 @@ The attributes are:
 
 
 \section{PTC\_CREATE\_LAYOUT}
-\label{sec:ptc_create_layout}
+\label{sec:ptc-create-layout}
 
 The {\tt PTC\_CREATE\_LAYOUT} command creates the \ptc-layout
 according to  the specified integration method and fills it with the
@@ -136,11 +136,11 @@ The attributes are:
   whether the calculation is done in 5D or 6D: 
   \begin{madlist}
     \ttitem{5D} if {\tt TIME} is true, the fifth coordinate is
-    \hyperref[subsec:tables_canon]{\tt PT}, $p_t = \Delta E / p_0 c$ \\ 
+    \hyperref[subsec:tables-canon]{\tt PT}, $p_t = \Delta E / p_0 c$ \\ 
     if {\tt TIME} is false, the fifth coordinate is
-    \hyperref[subsec:tables_canon]{\tt DELTAP}, $\delta_p = \Delta p / p_0$
+    \hyperref[subsec:tables-canon]{\tt DELTAP}, $\delta_p = \Delta p / p_0$
     
-    \ttitem{6D} if {\tt TIME} is true, the \hyperref[subsec:tables_canon]{\madx
+    \ttitem{6D} if {\tt TIME} is true, the \hyperref[subsec:tables-canon]{\madx
       coordinate system} \{$-ct$, $p_t$\} is used. \\   
     if {\tt TIME} is false, the second \ptc coordinate system
     \{-pathlength, $\delta_p$\} is used. 
@@ -176,7 +176,7 @@ The attributes are:
   This attribute sets the same {\tt NST} value  for all "thick" elements
   ($l > 0$) of a beam-line; however each individual element may also have
   its own {\tt NST} value defined independently 
-  (\hyperref[sec:add_option_PTC]{see below}).
+  (\hyperref[sec:add-option-PTC]{see below}).
 
   \ttitem{EXACT} a logical flag to turn on calculations with an exact
   Hamiltonian, otherwise the expanded Hamiltonian is used. \\
@@ -234,7 +234,7 @@ The attributes are:
 \end{madlist}
 
 \section{PTC\_MOVE\_TO\_LAYOUT}
-\label{sec:ptc_move_to_layout}
+\label{sec:ptc-move-to-layout}
 
 Several \ptc layouts can be created within a single \ptc-"universe". 
 The layouts are automatically numbered with sequential integers by the 
@@ -254,7 +254,7 @@ The only attribute is:
 \end{madlist}
 
 \section{PTC\_READ\_ERRORS}
-\label{sec:ptc_read_errors}
+\label{sec:ptc-read-errors}
 
 The {\tt PTC\_READ\_ERRORS} command reads any number of
 \textbf{"errors\_read"} table through the 
@@ -293,7 +293,7 @@ off with \madxmp{OPTION, -WARN;}
        
 
 \section{PTC\_ALIGN}
-\label{sec:ptc_align}
+\label{sec:ptc-align}
 
 The {\tt PTC\_ALIGN} command is used to apply the \madx alignment
 errors to the current PTC layout, and takes no attributes.
@@ -304,7 +304,7 @@ PTC\_ALIGN;
 
 
 \section{PTC\_END}
-\label{sec:ptc_end}
+\label{sec:ptc-end}
 
 The {\tt PTC\_END} command turns off the \ptc environment,
 which releases all memory and returns control to the \madx world proper.
@@ -315,7 +315,7 @@ PTC\_END;
 
 
 \section{Additional Options for Physical Elements}
-\label{sec:add_option_PTC}
+\label{sec:add-option-PTC}
 
 For some of the \madx elements, additional attributes can be defined
 that are available to \ptc only. \ptc also uses standard \madx
@@ -333,7 +333,7 @@ These attributes are:
   (\hyperref[sec:bend]{\tt SBEND} or \hyperref[sec:bend]{\tt RBEND})
   as \hyperref[sec:marker]{\tt MARKER} if their length is equal to zero. 
      
-  \ttitem{NST} gives a specific \hyperref[sec:ptc_twiss]{\tt NST}
+  \ttitem{NST} gives a specific \hyperref[sec:ptc-twiss]{\tt NST}
   values for a particular "thick" element ($L > 0$). \\
   \\
   For example RF cavities are represented in \madx 

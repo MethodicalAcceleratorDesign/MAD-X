@@ -86,7 +86,7 @@ plane).
 
 
 \section{Closed Orbit}
-\label{sec:closed_orbit}
+\label{sec:closed-orbit}
 
 Due to various errors like misalignment errors, field errors, fringe
 fields etc., the closed orbit does not coincide with the reference
@@ -102,7 +102,7 @@ to the closed orbit. Results are given in the local ({\it x, y,
 
 
 \section{Global Reference System}
-\label{sec:global_ref}
+\label{sec:global-ref}
 
 The global reference orbit of the accelerator is
 uniquely defined by the sequence of physical elements. The local
@@ -409,10 +409,10 @@ for different physical element types.
 
 
 \section{Local Reference Systems}
-\label{sec:local_ref}
+\label{sec:local-ref}
 
 \subsection{Reference System for Straight Beam Elements} 
-\label{subsec:local_straight}
+\label{subsec:local-straight}
 In straight elements the local reference system is simply translated by
 the length of the element along the local {\it s}-axis. 
 This is true for  
@@ -421,8 +421,8 @@ This is true for
 \hyperref[sec:sextupole]{Sextupoles},\ttindex{sextupole} 
 \hyperref[sec:octupole]{Octupoles},\ttindex{octupole} 
 \hyperref[sec:solenoid]{Solenoids},\ttindex{solenoid} 
-\hyperref[sec:crab_cavity]{Crab cavities},\ttindex{crab cavity}
-\hyperref[sec:rf_cavity]{RF cavities},\ttindex{cavity}\ttindex{RF cavity}
+\hyperref[sec:crab-cavity]{Crab cavities},\ttindex{crab cavity}
+\hyperref[sec:rf-cavity]{RF cavities},\ttindex{cavity}\ttindex{RF cavity}
 \hyperref[sec:separator]{Electrostatic separators},\ttindex{separator}\ttindex{electrostatic separator}
 \hyperref[sec:kicker]{Closed orbit correctors}\ttindex{corrector} and
 \hyperref[sec:monitor]{Beam position monitors}\ttindex{monitor}.
@@ -532,7 +532,7 @@ before and after the element cancel.
  
 
 \subsection{Reference System for Bending Magnets}
-\label{subsec:local_rbend}
+\label{subsec:local-rbend}
 \hyperref[sec:bend]{Bending magnets} have a curved reference orbit. 
 For both rectangular and sector bending magnets, the {\it R} and
 {\it S} are expressed as function the bend angle $\alpha$: 
@@ -695,7 +695,7 @@ the signs of pole-face rotations are positive as shown.}
 
 
 \section{Sign Conventions for Magnetic Fields}
-\label{sec:sign_convention}
+\label{sec:sign-convention}
 The \madx program uses the following Taylor expansion for the field on the
 mid-plane $y=0$, described in \cite{slac75} (Note the factorial in the
 denominator): 
@@ -736,7 +736,7 @@ A_s =
 \end{equation}
 Taking \(\vec{B} = \nabla \times \vec{A}\) in curvilinear coordinates,
 the field components can be computed as  
-\begin{equation}\label{eq:field_components}
+\begin{equation}\label{eq:field-components}
 \begin{aligned}
 B_x(x,y) = &+ B_1\,\Big(y+\frac{h^2}{6}y^3+\cdots\Big)  &  \\
            &+ B_2\,\Big(xy - \frac{h}{6}y^3+\cdots \Big) &+ B_3\,\Big(\frac{1}{6}(3x^2y-y^3)+ \cdots \Big)+\cdots\\
@@ -794,7 +794,7 @@ For each variable listed in this section, the physical units are given
 between square brackets, where [1] denotes a dimensionless variable.
 
 \subsection{Canonical Variables Describing Orbits}
-\label{subsec:tables_canon}
+\label{subsec:tables-canon}
 \madx uses the following canonical variables to describe the motion of particles: 
 
 \begin{madlist}
@@ -837,7 +837,7 @@ fractional momentum error. The reference momentum $p_s$ must be
 constant in order to keep the system canonical.  
 
 \subsection{Normalised Variables and other Derived Quantities}
-\label{subsec:tables_normal}
+\label{subsec:tables-normal}
 \begin{madlist}
   \ttitem{XN} The normalised horizontal displacement \quad
   $x_n = Re ( E_1^T \, S\, Z )$, [sqrt(m)]
@@ -886,13 +886,13 @@ S =
 
 
 \subsection{Linear Lattice Functions (Optical Functions)}
-\label{subsec:tables_linear}
+\label{subsec:tables-linear}
 Several \madx commands refer to linear lattice functions or optical
 functions.  
 
 Because \madx uses the canonical momenta ($p_x$, $p_y$) instead of the
 slopes ($x'$, $y'$), the definitions of the linear lattice functions
-differ slightly from those in Courant and Snyder\cite{Courant_Snyder1958}.
+differ slightly from those in Courant and Snyder\cite{Courant-Snyder1958}.
 
 Notice that in \madx, PT substitutes DELTAP as longitudinal
 variable. 
@@ -931,7 +931,7 @@ The linear lattice functions are known to \madx under the following names:
 
 
 \subsection{Chromatic Functions} 
-\label{subsec:tables_chrom}
+\label{subsec:tables-chrom}
 Several \madx commands refer to the chromatic functions. 
 
 Because \madx uses the canonical momenta ($p_x$, $p_y$) instead of the
@@ -988,7 +988,7 @@ The chromatic functions are known to \madx under the following names:
 \end{madlist}
 
 \subsection{Variables in the SUMM Table}
-\label{subsec:tables_summ}
+\label{subsec:tables-summ}
 After a successful TWISS command a summary table, with name SUMM, is created which
 contains the following variables:  
 
@@ -1029,7 +1029,7 @@ number of time equal to the order of the derivative to find the
 functions given in the literature. 
 
 \subsection{Variables in the TRACK Table}
-\label{subsec:tables_track}
+\label{subsec:tables-track}
 The command RUN writes tables with the following variables: 
 \begin{madlist}
   \ttitem{X} Horizontal position $x$ of the orbit, referred to the
@@ -1097,18 +1097,18 @@ International'' (SI). These units are summarised in the
       Angle                   & rad (radians) \\ 
       Quadrupole coefficient  & $m^{-2}$ \\ 
       Multipole coefficient, 2n poles   & $m^{-n}$ \\ 
-      Electric voltage        & MV (Megavolts) \\ 
+      Electric voltage        & MV (megavolts) \\ 
       Electric field strength & MV/m \\ 
-      Frequency               & MHz (Megahertz) \\ 
+      Frequency               & MHz (megahertz) \\ 
       Phase angles            & $2\pi$ \\ 
       Particle energy         & GeV \\ 
       Particle mass           & GeV/$c^2$ \\ 
       Particle momentum       & GeV/$c$ \\ 
-      Beam current            & A (Amp\`eres) \\ 
+      Beam current            & A (amp\`eres) \\ 
       Particle charge         & e (elementary charges) \\ 
       Impedance               & M$\Omega$ (Megohms) \\ 
       Emittance               & $\pi * 10^{-3}$ m.rad \\ % To be checked (Ghislain)
-      RF power                & MW (Megawatts) \\ 
+      RF power                & MW (megawatts) \\ 
       Higher order mode loss factor & V/pc \\
       \hline
     \end{tabular}
