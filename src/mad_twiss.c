@@ -477,7 +477,9 @@ pro_embedded_twiss(struct command* current_global_twiss)
 
     adjust_beam();
     probe_beam = clone_command(current_beam);
-    tmrefe_(oneturnmat); /* one-turn linear transfer map */
+
+    // 2015-Sep-25  17:59:16  ghislain: following suppressed as redundant and misplaced
+    //tmrefe_(oneturnmat); /* one-turn linear transfer map */
 
     summ_table = make_table("summ", "summ", summ_table_cols, summ_table_types, twiss_deltas->curr+1);
     add_to_table_list(summ_table, table_register);
@@ -962,6 +964,7 @@ pro_twiss(void)
 
   adjust_beam();
   probe_beam = clone_command(current_beam);
+
   tmrefe_(oneturnmat); /* one-turn linear transfer map */
 
   summ_table = make_table("summ", "summ", summ_table_cols, summ_table_types, twiss_deltas->curr+1);

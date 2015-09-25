@@ -35,12 +35,12 @@ subroutine enprgl
   ! Purpose:                                                             *
   !   Print global data for machine.                                     *
   !----------------------------------------------------------------------*
-  logical :: frad
+  logical :: dorad
   double precision :: eta, gamtr, t0
 
   double precision, external :: get_value
   
-  frad = get_value('probe ','radiate ') .ne. 0
+  dorad = get_value('probe ','radiate ') .ne. 0
 
   !---- Global parameters.
   gamtr = zero
@@ -51,7 +51,7 @@ subroutine enprgl
 
   write (*,'(/,a,/)') " Global parameters for the machine: "
 
-  write (*,'(a,l1,a/)') "radiate = ",frad,":"
+  write (*,'(a,l1,a/)') "radiate = ",dorad,":"
 
   write (*,'(t6,a,t16,f14.6,a,t46,a,t56,f14.6,a,t86,a,t96,f14.6,a)') &
        "C",circ," m",  "f0",freq0," MHz",   "T0",t0," microseconds"

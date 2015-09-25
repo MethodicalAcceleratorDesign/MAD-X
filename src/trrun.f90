@@ -84,9 +84,25 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   run   = switch .eq. 1
   dynap = switch .eq. 2
 
-  !-------added by Yipeng SUN 01-12-2008--------------
+  !--- Initialize
   deltap = get_value('probe ','deltap ')
+  betas  = get_value('probe ','beta ')
+  gammas = get_value('probe ','gamma ')
+  dtbyds = get_value('probe ','dtbyds ')
+  arad   = get_value('probe ','arad ')
+  dorad  = get_value('probe ','radiate ') .ne. zero
 
+  bet0  =  get_value('beam ','beta ')
+
+  bet0i  = one / bet0
+  beti   = one / betas
+
+  deltas = get_variable('track_deltap ')
+
+  dodamp = get_option('damp ') .ne. 0
+  dorand = get_option('quantum ') .ne. 0
+
+  !-------added by Yipeng SUN 01-12-2008--------------
   if (deltap .eq. zero) then
      onepass = get_option('onepass ') .ne. 0
      if (.not.onepass) call trclor(switch, orbit0)
@@ -201,19 +217,6 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   call comm_para(tol_a, nint, ndble, nchar, int_arr, maxaper, char_a, char_l)
   !hbu--- init info for tables initial s position is 0
   spos=0 ; nlm=0 ; el_name='start           '
-
-  !---- Initialize kinematics and orbit
-  bet0  =  get_value('beam ','beta ')
-  betas  = get_value('probe ','beta ')
-  gammas = get_value('probe ','gamma ')
-  bet0i  = one / bet0
-  beti   = one / betas
-  dtbyds = get_value('probe ','dtbyds ')
-  deltas = get_variable('track_deltap ')
-  arad   = get_value('probe ','arad ')
-  dorad  = get_value('probe ','radiate ') .ne. zero
-  dodamp = get_option('damp ') .ne. 0
-  dorand = get_option('quantum ') .ne. 0
 
   if (first) then
      !--- enter start coordinates in summary table

@@ -232,6 +232,15 @@ module twissotmfi
   double precision :: srmat(6,6)=0.d0, stmat(6,6,6)=0.d0
 end module twissotmfi
 
+module twissbeamfi
+  use math_constfi, only : zero
+  implicit none
+  public
+  logical, save :: dorad=.false.
+  double precision, save :: energy=zero, deltap=zero, beta=zero, gamma=zero, pc=zero
+  double precision, save :: arad=zero, dtbyds=zero, charge=zero, npart=zero
+end module twissbeamfi
+
 module max_iterate
   implicit none
   public

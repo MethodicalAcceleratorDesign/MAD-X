@@ -232,25 +232,9 @@ void micit_(F_DOUBLE a, F_CHARACTER conm, F_DOUBLE xin, F_DOUBLE cin, F_DOUBLE r
 void haveit_(F_DOUBLE a, F_DOUBLE xin, F_DOUBLE cin, F_DOUBLE res, F_INTEGER nx, F_INTEGER im,
 	     F_INTEGER ic, F_DOUBLE cb, F_DOUBLE xmeas, F_DOUBLE xres, F_DOUBLE y, F_DOUBLE z,
 	     F_DOUBLE xd);
-/* void svddec_m_(F_DOUBLE a, F_DOUBLE svdmat, F_DOUBLE umat, F_DOUBLE vmat, F_DOUBLE wmat, F_DOUBLE utmat, */
-/* 	       F_DOUBLE vtmat, F_DOUBLE wtmat, F_DOUBLE ws, F_DOUBLE wvec, F_INTEGER sortw,  */
-/* 	       F_DOUBLE sngcut, F_DOUBLE sngval, F_INTEGER im, F_INTEGER ic, F_INTEGER iflag, */
-/* 	       F_INTEGER sing, F_INTEGER dbg); */
-/* void svddec_c_(F_DOUBLE a, F_DOUBLE svdmat, F_DOUBLE umat, F_DOUBLE vmat, F_DOUBLE wmat, F_DOUBLE utmat, */
-/* 	       F_DOUBLE vtmat, F_DOUBLE wtmat, F_DOUBLE ws, F_DOUBLE wvec, F_INTEGER sortw, */
-/* 	       F_DOUBLE sngcut, F_DOUBLE sngval, F_INTEGER im, F_INTEGER ic, F_INTEGER iflag, */
-/* 	       F_INTEGER sing, F_INTEGER dbg); */
 void svddec_(F_DOUBLE a, F_DOUBLE svdmat, F_DOUBLE umat, F_DOUBLE vmat, F_DOUBLE ws, F_DOUBLE wvec, 
 	     F_INTEGER sortw, F_DOUBLE sngcut, F_DOUBLE sngval, F_INTEGER im, F_INTEGER ic, 
 	     F_INTEGER iflag, F_INTEGER sing, F_INTEGER dbg);
-/* void svdcorr_m_(F_DOUBLE a, F_DOUBLE svdmat, F_DOUBLE umat, F_DOUBLE vmat, F_DOUBLE wmat, F_DOUBLE utmat, */
-/* 		F_DOUBLE vtmat, F_DOUBLE wtmat, F_DOUBLE xin, F_DOUBLE xc, F_DOUBLE xout, F_DOUBLE xa, */
-/* 		F_DOUBLE xb, F_DOUBLE xpred, F_DOUBLE ws, F_DOUBLE wvec, F_INTEGER sortw, F_INTEGER nx, */
-/* 		F_INTEGER im, F_INTEGER ic, F_INTEGER iflag, F_INTEGER dbg); */
-/* void svdcorr_c_(F_DOUBLE a, F_DOUBLE svdmat, F_DOUBLE umat, F_DOUBLE vmat, F_DOUBLE wmat, F_DOUBLE utmat, */
-/* 		 F_DOUBLE vtmat, F_DOUBLE wtmat, F_DOUBLE xin, F_DOUBLE xc, F_DOUBLE xout, F_DOUBLE xa, */
-/* 		 F_DOUBLE xb, F_DOUBLE xpred, F_DOUBLE ws, F_DOUBLE wvec, F_INTEGER sortw, F_INTEGER nx, */
-/* 		 F_INTEGER im, F_INTEGER ic, F_INTEGER iflag, F_INTEGER dbg); */
 void svdcorr_(F_DOUBLE a, F_DOUBLE svdmat, F_DOUBLE umat, F_DOUBLE vmat, F_DOUBLE wmat, F_DOUBLE utmat,
 	      F_DOUBLE vtmat, F_DOUBLE wtmat, F_DOUBLE xin, F_DOUBLE xc, F_DOUBLE xout, 
 	      F_DOUBLE xpred, F_DOUBLE ws, F_DOUBLE wvec, F_INTEGER sortw, F_INTEGER nx,

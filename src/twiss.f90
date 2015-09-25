@@ -4,7 +4,8 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   use twisslfi
   use twisscfi
   use twissotmfi
-  use trackfi
+  use twissbeamfi
+  use trackfi, only : fsecarb
   use fasterror
   use matrices, only : EYE
   use math_constfi, only : zero, one, two
@@ -74,9 +75,21 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   sectormap = get_option('twiss_sector ').ne.zero
 
   !---- Get circumference
-  circ = get_value('probe ','circ ')
+  circ   = get_value('probe ','circ ')
   if (circ .eq. zero) call fort_fail('TWISS: ', 'Zero length sequence.')
 
+  !---- Get beam parameters
+  dorad  = get_value('probe ','radiate ') .ne. zero  
+  energy = get_value('probe ','energy ')
+  deltap = get_value('probe ','deltap ')
+  beta   = get_value('probe ','beta ')
+  gamma  = get_value('probe ','gamma ')
+  pc     = get_value('probe ','pc ')
+  arad   = get_value('probe ','arad ')
+  dtbyds = get_value('probe ','dtbyds ')
+  charge = get_value('probe ','charge ')
+  npart  = get_value('probe ','npart ')
+  
   !---- Set fast_error_func flag to use faster error function
   !---- including tables. Thanks to late G. Erskine
   fast_error_func = get_option('fast_error_func ') .ne. 0
@@ -90,7 +103,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
      call twinifun(opt_fun0, rt)
      if (get_option('twiss_print ') .ne. 0)  then
         print *, ' '
-        print '(''open line - error with deltap: '',1p,e14.6)', get_value('probe ','deltap ')
+        print '(''open line - error with deltap: '',1p,e14.6)', deltap
         print '(''initial orbit vector: '', 1p,6e14.6)', orbit0
      endif
      call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on)
@@ -132,16 +145,18 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   return
 
 900 call set_option('twiss_success ', izero)
-
- end SUBROUTINE twiss
+  
+end SUBROUTINE twiss
 
 SUBROUTINE tmrefe(rt)
+  use twissbeamfi
   use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Transfer matrix w.r.t. ideal orbit for one period.               *
   !     Ignores cavities, radiation, and imperfections.                  *
+  !     entry point for mad_twiss and mad_emit                           *
   !     Output:                                                          *
   !     rt(6,6) (double) transfer matrix.                                *
   !----------------------------------------------------------------------*
@@ -149,6 +164,20 @@ SUBROUTINE tmrefe(rt)
 
   integer :: eflag, ithr_on
   double precision :: orbit0(6), orbit(6), tt(6,6,6)
+
+  double precision, external :: get_value
+  
+  !---- Get beam parameters
+  dorad  = get_value('probe ','radiate ') .ne. zero  
+  energy = get_value('probe ','energy ')
+  deltap = get_value('probe ','deltap ')
+  beta   = get_value('probe ','beta ')
+  gamma  = get_value('probe ','gamma ')
+  pc     = get_value('probe ','pc ')
+  arad   = get_value('probe ','arad ')
+  dtbyds = get_value('probe ','dtbyds ')
+  charge = get_value('probe ','charge ')
+  npart  = get_value('probe ','npart ')
 
   ithr_on = 0
   ORBIT0 = zero ; ORBIT = zero ; TT = zero 
@@ -159,11 +188,13 @@ end SUBROUTINE tmrefe
 
 SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
   use twiss0fi
+  use twissbeamfi
   use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Transfer matrix w.r.t. ideal orbit for one period.               *
+  !     entry point for mad_dynap and mad_track                          *
   !     Input:                                                           *
   !     kobs    if > 0, track until node with this obs. point number     *
   !     Output:                                                          *
@@ -176,8 +207,22 @@ SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
   
   integer :: eflag, ithr_on
   double precision :: opt_fun0(fundim), tt(6,6,6)
+
+  double precision, external :: get_value
   
   integer, parameter :: izero=0, ione=1
+
+  !---- Get beam parameters
+  dorad  = get_value('probe ','radiate ') .ne. zero  
+  energy = get_value('probe ','energy ')
+  deltap = get_value('probe ','deltap ')
+  beta   = get_value('probe ','beta ')
+  gamma  = get_value('probe ','gamma ')
+  pc     = get_value('probe ','pc ')
+  arad   = get_value('probe ','arad ')
+  dtbyds = get_value('probe ','dtbyds ')
+  charge = get_value('probe ','charge ')
+  npart  = get_value('probe ','npart ')
 
   ithr_on = izero
   ORBIT0 = zero
@@ -192,6 +237,7 @@ end SUBROUTINE tmrefo
 SUBROUTINE twinifun(opt_fun0,rt)
   use twiss0fi
   use twisslfi
+  use twissbeamfi, only : energy
   use math_constfi, only : zero, twopi
   implicit none
   !----------------------------------------------------------------------*
@@ -207,7 +253,7 @@ SUBROUTINE twinifun(opt_fun0,rt)
   double precision :: betx, alfx, mux, bety, alfy, muy, dx, dpx, dy, dpy
   double precision :: x, px, y, py, t, pt 
   double precision :: wx, phix, dmux, wy, phiy, dmuy, ddx, ddpx, ddy, ddpy
-  double precision :: r(2,2), energy
+  double precision :: r(2,2)
 
   double precision, external :: get_value
 
@@ -249,7 +295,6 @@ SUBROUTINE twinifun(opt_fun0,rt)
   r(1,2) = get_value('twiss ','r12 ')
   r(2,1) = get_value('twiss ','r21 ')
   r(2,2) = get_value('twiss ','r22 ')
-  energy = get_value('probe ','energy ')
 
   if (alfx  .ne.zero) opt_fun0(4 ) = alfx
   if (mux   .ne.zero) opt_fun0(5 ) = mux * twopi
@@ -431,12 +476,14 @@ SUBROUTINE twfill_ripken(opt_fun)
 end SUBROUTINE twfill_ripken
 
 SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
+  use twissbeamfi, only : deltap
   use matrices, only : EYE
   use math_constfi, only : zero, one
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Find closed orbit for a beam line sequence.                      *
+  !     Called from emit as well
   !     Input:                                                           *
   !     guess(6)     (double)  first guess for orbit start               *
   !     fsec         (logical) if true, return second order terms.       *
@@ -455,21 +502,22 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
 
   logical :: pflag
   integer :: i, k, irank, itra, thr_on, ithr_on, save_opt
-  double precision :: cotol, err, deltap
+  double precision :: cotol, err
   double precision :: orbit0(6), orbit(6), a(6,7), b(4,5), as(3,4), bs(2,3)
 
   integer, external :: get_option
-  double precision, external :: get_value, get_variable 
+  double precision, external :: get_variable, get_value
   logical, external :: m66sta  
   integer, parameter :: itmax=20
 
   equivalence(a(1,1),b(1,1),as(1,1),bs(1,1)) ! 2015-Jul-02  13:20:19  ghislain: to be clarified
 
+  deltap = get_value('probe ','deltap ')
+
   !---- Initialize.
   ithr_on = 0
   thr_on = get_option('threader ')
   pflag = get_option('twiss_print ') .ne. 0
-  deltap = get_value('probe ','deltap ')
   cotol = get_variable('twiss_tol ')
   eflag = 0
 
@@ -492,7 +540,7 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
         A(:,:6) = RT(:,:6) - EYE
         A(1:6,7) = ORBIT(1:6) - ORBIT0(1:6)
         err = maxval(abs(A(1:6,7)))
-        
+
         call solver(a,6,1,irank)
         if (irank.lt.6) then
            print *, 'Singular matrix occurred during closed orbit search.'
@@ -506,8 +554,8 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
         err = zero
         B(:4,:4) = RT(:4,:4) - EYE(:4,:4)
         B(1:4,5) = ORBIT(1:4) - ORBIT0(1:4)
-        err = maxval(abs(B(1:4,5)))
-        
+        err = maxval(abs(B(1:4,5)))        
+
         call solver(b,4,1,irank)
         if (irank.lt.4) then
            print *, 'Singular matrix occurred during closed orbit search.'
@@ -545,6 +593,7 @@ end SUBROUTINE tmclor
 SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   use bbfi
   use twiss0fi
+  use twissbeamfi, only : beta, gamma, arad, charge, npart
   use name_lenfi
   use twisscfi
   use spch_bbfi
@@ -582,16 +631,16 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   integer :: kpro, corr_pick(2), enable, coc_cnt(2), lastnb, rep_cnt(2)
   double precision :: orbit2(6), ek(6), re(6,6), te(6,6,6)
   double precision :: al_errors(align_max) 
-  double precision :: el, betas, gammas, cick, err
+  double precision :: el, cick, err
   double precision :: parvec(26),  vector(10), reforb(6)
   double precision :: restsum(2), restorb(6,2), restm(6,6,2), restt(6,6,6,2)
   double precision :: cmatr(6,6,2), pmatr(6,6), dorb(6)
 
   integer, external :: restart_sequ, advance_node, node_al_errors, get_vector, get_option
-  double precision, external :: node_value, get_value
+  double precision, external :: node_value
   double precision, parameter :: orb_limit=1d1 
   integer, parameter :: ccode=15, pcode=18, max_rep=100
-
+  
   debug = get_option('debug ')
 
   !---- Initialize
@@ -609,9 +658,6 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      if (j .lt. 3) thr_on = 0
   endif
  
-  betas = get_value('probe ','beta ')
-  gammas= get_value('probe ','gamma ')
-
   TT = zero 
   RT  = EYE  
 
@@ -620,9 +666,9 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
 
   ORBIT = ORBIT0 
   
-  parvec(5) = get_value('probe ', 'arad ')
-  parvec(6) = get_value('probe ', 'charge ') * get_value('probe ', 'npart ')
-  parvec(7) = get_value('probe ', 'gamma ')
+  parvec(5) = arad
+  parvec(6) = charge * npart
+  parvec(7) = gamma
   bbd_cnt = 0
   bbd_flag = 1
   i_spch = 0
@@ -677,7 +723,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   n_align = node_al_errors(al_errors)
   if (n_align .ne. 0)  then
      ORBIT2 = ORBIT 
-     call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
+     call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
      RT = matmul(RE,RT) 
   endif
   
@@ -692,7 +738,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   
   if (n_align .ne. 0)  then
      ORBIT2 = ORBIT 
-     call tmali2(el,orbit2,al_errors,betas,gammas,orbit,re)
+     call tmali2(el,orbit2,al_errors,beta,gamma,orbit,re)
      RT = matmul(RE,RT)
   endif
     
@@ -811,7 +857,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   endif
   
   bbd_flag=0
-  
+
 end SUBROUTINE tmfrst
 
 SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
@@ -914,12 +960,14 @@ end SUBROUTINE tmthrd
 SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   use twiss0fi
   use twisscfi
+  use twissbeamfi, only : deltap
   use matrices, only : EYE
   use math_constfi, only : zero, one, two, four
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Initial values for linear coupling parameters.                   *
+  !     Entry point for mad_emit                                         *
   !     Input:                                                           *
   !     rt(6,6)      (double)  one turn transfer matrix.                 *
   !     Output:                                                          *
@@ -933,7 +981,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   
   logical :: stabx=.false., staby=.false.
   double precision :: a(2,2), aux(2,2), d(2,2)
-  double precision :: arg, den, det, dtr, sinmu2, deltap
+  double precision :: arg, den, det, dtr, sinmu2
   double precision :: betx0=zero, alfx0=zero, amux0=zero
   double precision :: bety0=zero, alfy0=zero, amuy0=zero
   character(len=120) :: msg
@@ -942,8 +990,10 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   double precision, external :: get_value
   double precision, parameter :: eps=1d-8
 
-  !---- Initialization
+  !--- initialize deltap because twcpin can be called directly from mad_emit
   deltap = get_value('probe ','deltap ')
+
+  !---- Initialization
   eflag=0
 
   !---- Initial dispersion.
@@ -1033,7 +1083,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
      endif
      call fort_warn('TWCPIN: ',msg)
      eflag = 1
- endif
+  endif
 
   opt_fun0(3)=betx0
   opt_fun0(4)=alfx0
@@ -1092,6 +1142,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   use twisscfi
   use twiss_elpfi
   use twissotmfi
+  use twissbeamfi, only : dorad, beta, gamma
   use spch_bbfi
   use name_lenfi
   use matrices, only: EYE
@@ -1108,11 +1159,11 @@ SUBROUTINE twcpgo(rt,orbit0)
   !----------------------------------------------------------------------*
   double precision :: rt(6,6), orbit0(6)
 
-  logical :: fmap, cplxy=.false., cplxt=.false., dorad, sector_sel, mycentre_cptk
+  logical :: fmap, cplxy=.false., cplxt=.false., sector_sel, mycentre_cptk
   integer :: i, iecnt, code, save, n_align, elpar_vl
   double precision :: ek(6), re(6,6), rwi(6,6), rc(6,6), te(6,6,6)
   double precision :: orbit(6), orbit2(6)
-  double precision :: betas, gammas, bvk, sumloc=0.d0, pos0=0.d0, sd, el
+  double precision :: bvk, sumloc=0.d0, pos0=0.d0, sd, el
   double precision :: al_errors(align_max)
   character(len=name_len) :: bxmax_name='nil ', bymax_name='nil '
   character(len=name_len) :: dxmax_name='nil ', dymax_name='nil '
@@ -1121,12 +1172,11 @@ SUBROUTINE twcpgo(rt,orbit0)
 
   integer, external :: el_par_vector, advance_node, restart_sequ, get_option, node_al_errors
   double precision, external :: node_value, get_value
-  
+
   !---- Initialization
   amux=zero
   amuy=zero
   currpos=zero
-  dorad = get_value('probe ','radiate ').ne.zero
   centre = get_value('twiss ','centre ').ne.zero
   RWI = EYE 
   RC = EYE 
@@ -1175,8 +1225,6 @@ SUBROUTINE twcpgo(rt,orbit0)
 
   !---- Loop over positions.
   iecnt = 0
-  betas  = get_value('probe ','beta ')
-  gammas = get_value('probe ','gamma ')
   centre_cptk = .false.
   i = restart_sequ()
   i_spch = 0
@@ -1202,7 +1250,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   n_align = node_al_errors(al_errors)
   if (n_align .ne. 0)  then
      ORBIT2 = ORBIT 
-     call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
+     call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
      mycentre_cptk = centre_cptk
      centre_cptk = .false.
      call twcptk(re,orbit)
@@ -1218,8 +1266,8 @@ SUBROUTINE twcpgo(rt,orbit0)
      pos0 = currpos
      currpos = currpos + el/two
      sd = rt(5,6) + dot_product(RT(5,1:4), DISP(1:4))
-     eta = - sd * betas**2 / circ
-     alfa = one / gammas**2 + eta
+     eta = - sd * beta**2 / circ
+     alfa = one / gamma**2 + eta
      opt_fun(74) = alfa
      call twprep(save,1,opt_fun,currpos)
   endif
@@ -1233,7 +1281,7 @@ SUBROUTINE twcpgo(rt,orbit0)
 
   if (n_align .ne. 0)  then
      ORBIT2 = ORBIT 
-     call tmali2(el,orbit2,al_errors,betas,gammas,orbit,re)
+     call tmali2(el,orbit2,al_errors,beta,gamma,orbit,re)
      mycentre_cptk = centre_cptk
      centre_cptk = .false.
      call twcptk(re,orbit)
@@ -1244,8 +1292,8 @@ SUBROUTINE twcpgo(rt,orbit0)
   sumloc = sumloc + el
   if (sector_sel) call twwmap(sumloc, orbit)
   sd = rt(5,6) + dot_product(RT(5,1:4),DISP(1:4))
-  eta = - sd * betas**2 / circ
-  alfa = one / gammas**2 + eta
+  eta = - sd * beta**2 / circ
+  alfa = one / gamma**2 + eta
   opt_fun(74) = alfa
   if (centre) then
      bxmax  = max(opt_fun(3)      ,bxmax)
@@ -1377,15 +1425,24 @@ SUBROUTINE twcptk(re,orbit)
   a(1,2) = re(1,2) - (re(1,3) * rmat(1,2) + re(1,4) * rmat(2,2))
   a(2,1) = re(2,1) - (re(2,3) * rmat(1,1) + re(2,4) * rmat(2,1))
   a(2,2) = re(2,2) - (re(2,3) * rmat(1,2) + re(2,4) * rmat(2,2))
+
+  ! Ghislain : replace above with 
+  !A(1:2,1:2) = RE(1:2,1:2) - matmul(RE(1:2,3:4),RMAT(1:2,1:2))
+  
   b(1,1) = re(3,1) - (re(3,3) * rmat(1,1) + re(3,4) * rmat(2,1))
   b(1,2) = re(3,2) - (re(3,3) * rmat(1,2) + re(3,4) * rmat(2,2))
   b(2,1) = re(4,1) - (re(4,3) * rmat(1,1) + re(4,4) * rmat(2,1))
   b(2,2) = re(4,2) - (re(4,3) * rmat(1,2) + re(4,4) * rmat(2,2))
+
+  ! Ghislain : replace above with  
+  !B(1:2,1:2) = RE(3:4,1:2) - matmul(RE(3:4,3:4),RMAT(1:2,1:2))
+  
   c(1,1) = re(3,3) + (re(3,1) * rmat(2,2) - re(3,2) * rmat(2,1))
   c(1,2) = re(3,4) - (re(3,1) * rmat(1,2) - re(3,2) * rmat(1,1))
   c(2,1) = re(4,3) + (re(4,1) * rmat(2,2) - re(4,2) * rmat(2,1))
   c(2,2) = re(4,4) - (re(4,1) * rmat(1,2) - re(4,2) * rmat(1,1))
 
+  
   !---- Track R matrix.
   adet = a(1,1) * a(2,2) - a(1,2) * a(2,1)
   if (abs(adet) .gt. eps) then
@@ -1572,6 +1629,7 @@ SUBROUTINE twchgo
   use twisslfi
   use twissafi
   use twisscfi
+  use twissbeamfi, only : dorad, deltap, beta, gamma
   use spch_bbfi
   use math_constfi, only : zero, one, two
   implicit none
@@ -1579,21 +1637,19 @@ SUBROUTINE twchgo
   !     Purpose:                                                         *
   !     Track Chromatic functions.                                       *
   !----------------------------------------------------------------------*
-  logical :: fmap, cplxy=.false., cplxt=.false., dorad, mycentre_bttk
+  logical :: fmap, cplxy=.false., cplxt=.false., mycentre_bttk
   integer :: i, code, save, n_align
   double precision :: orbit(6), orbit2(6), ek(6), re(6,6), te(6,6,6)
-  double precision :: al_errors(align_max), deltap, el, betas, gammas, pos0
+  double precision :: al_errors(align_max), el, pos0
   character(len=130) :: msg
 
   integer :: restart_sequ, advance_node, get_option, node_al_errors
   double precision :: node_value, get_value
- 
+
   !---- If save requested reset table
   save = get_option('twiss_save ')
   if (save .ne. 0) call reset_count(table_name)
 
-  deltap = get_value('probe ','deltap ')
-  dorad = get_value('probe ','radiate ').ne.zero
   centre = get_value('twiss ','centre ').ne.zero
 
   !---- Initial values for lattice functions.
@@ -1620,8 +1676,6 @@ SUBROUTINE twchgo
   synch_1 = zero; synch_2 = zero; synch_3 = zero; synch_4 = zero; synch_5 = zero
 
   !---- Loop over positions.
-  betas  = get_value('probe ','beta ')
-  gammas = get_value('probe ','gamma ')
   centre_bttk = .false.
   i = restart_sequ()
   if (centre) currpos = zero
@@ -1639,7 +1693,7 @@ SUBROUTINE twchgo
   n_align = node_al_errors(al_errors)
   if (n_align .ne. 0)  then
      ORBIT2 = ORBIT 
-     call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
+     call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
      mycentre_bttk = centre_bttk
      centre_bttk = .false.
      call twbttk(re,te)
@@ -1662,7 +1716,7 @@ SUBROUTINE twchgo
 
   if (n_align.ne.0)  then
      ORBIT2 = ORBIT 
-     call tmali2(el,orbit2,al_errors,betas,gammas,orbit,re)
+     call tmali2(el,orbit2,al_errors,beta,gamma,orbit,re)
      mycentre_bttk = centre_bttk
      centre_bttk = .false.
      call twbttk(re,te)
@@ -1720,6 +1774,7 @@ SUBROUTINE twbttk(re,te)
   use twiss0fi
   use twisslfi
   use twisscfi
+  use twissbeamfi, only : beta
   use math_constfi, only : zero, one, two
   implicit none
   !----------------------------------------------------------------------*
@@ -1738,13 +1793,13 @@ SUBROUTINE twbttk(re,te)
   double precision :: t2, ta, tb, temp, tg
   double precision :: alfx0=0.d0, alfy0=0.d0, betx0=0.d0, bety0=0.d0, amux0=0.d0, amuy0=0.d0
   double precision :: wx0=0.d0, wy0=0.d0, dmux0=0.d0, dmuy0=0.d0, phix0=0.d0, phiy0=0.d0
-  double precision :: an, e1, e2, sk1, curlyh, detl, f, rhoinv, blen, beta
+  double precision :: an, e1, e2, sk1, curlyh, detl, f, rhoinv, blen
   double precision :: syncint(5)
 
   integer, external :: get_option
-  double precision, external :: proxim, node_value, get_value
+  double precision, external :: proxim, node_value
   double precision, parameter :: eps=1d-8
-  
+
   !---- Create internal table for lattice functions if requested
   save = get_option('twiss_save ')
 
@@ -1765,7 +1820,6 @@ SUBROUTINE twbttk(re,te)
      ! Note that calcsyncint expects dx and dpx as derivatives wrt deltap.
      ! since MAD take disp(1) and disp(2) as derivatives wrt pt, they must be 
      ! multiplied by beta before the call to calcsyncint.
-     beta = get_value('probe ','beta ')
      call calcsyncint(rhoinv,blen,sk1,e1,e2,betx,alfx,disp(1)*beta,disp(2)*beta,syncint)
      synch_1 = synch_1 + syncint(1)
      synch_2 = synch_2 + syncint(2)
@@ -1902,6 +1956,7 @@ end SUBROUTINE twbttk
 SUBROUTINE tw_summ(rt,tt)
   use twiss0fi
   use twisscfi
+  use twissbeamfi, only : deltap, beta, gamma
   use math_constfi, only : zero, one, two, twopi
   implicit none
   !----------------------------------------------------------------------*
@@ -1914,20 +1969,16 @@ SUBROUTINE tw_summ(rt,tt)
   double precision :: rt(6,6), tt(6,6,6)
 
   integer :: i
-  double precision :: deltap, sd, betas, gammas, detl, f, tb, t2
+  double precision :: sd, detl, f, tb, t2
   double precision :: disp0(6), frt(6,6), frtp(6,6), rtp(6,6)
   double precision :: bx0, ax0, by0, ay0, sx, sy, orbit5
 
   integer, external :: get_option
-  double precision, external :: get_value
-  
+
   !---- Initialization chromatic part
   RTP = zero 
   FRT = zero 
   FRTP = zero 
-  deltap = get_value('probe ','deltap ')
-  betas  = get_value('probe ','beta ')
-  gammas = get_value('probe ','gamma ')
 
   DISP0(1:4) = OPT_FUN0(15:18)
 
@@ -1979,9 +2030,9 @@ SUBROUTINE tw_summ(rt,tt)
 
      xix = - sx / (twopi * sinmux)
      xiy = - sy / (twopi * sinmuy)
-     eta = - sd * betas**2 / suml
+     eta = - sd * beta**2 / suml
 
-     alfa = one / gammas**2 + eta
+     alfa = one / gamma**2 + eta
      if (alfa .eq. zero) then
         gamtr = zero
      else
@@ -2160,6 +2211,7 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
+  use twissbeamfi, only : dorad, deltap, gamma, arad
   use matrices
   use math_constfi, only : zero, one, two, three
   implicit none
@@ -2180,20 +2232,20 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   logical :: ftrk, fmap
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6), el
 
-  logical :: cplxy, dorad
+  logical :: cplxy
   logical :: kill_ent_fringe, kill_exi_fringe
   integer :: elpar_vl
   integer :: nd, n_ferr, code
   double precision :: f_errors(0:maxferr)
   !double precision :: field(2,0:maxmul)
   double precision :: rw(6,6), tw(6,6,6), ek0(6), orbit0(6)
-  double precision :: x, y, deltap=0.d0
+  double precision :: x, y
   double precision :: an, sk1, sk2, sks, tilt, e1, e2, h, h1, h2, hgap, fint, fintx, rhoinv, blen, bvk
-  double precision :: dh, corr, ct=0.d0, st=0.d0, hx, hy, rfac, arad, gamma, pt, el0
+  double precision :: dh, corr, ct=0.d0, st=0.d0, hx, hy, rfac, pt, el0
   double precision :: orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
 
   integer, external :: el_par_vector, node_fd_errors
-  double precision, external :: node_value, get_value
+  double precision, external :: node_value
   
   !---- Initialize.
   EK0 = zero 
@@ -2211,10 +2263,6 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
      !-- get element parameters
      elpar_vl = el_par_vector(b_k3s, g_elpar)
      bvk = node_value('other_bv ')
-     arad = get_value('probe ','arad ')
-     deltap = get_value('probe ','deltap ')
-     gamma = get_value('probe ','gamma ')
-     dorad = get_value('probe ','radiate ') .ne. zero
      an = bvk * g_elpar(b_angle)
      tilt = g_elpar(b_tilt)
      e1 = g_elpar(b_e1)
@@ -2339,6 +2387,7 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
 end SUBROUTINE tmbend
 
 SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
+  use twissbeamfi, only : beta, gamma, dtbyds
   use matrices, only: EYE
   use math_constfi, only : zero, one, two, three, four, six, nine, twelve, fifteen
   implicit none
@@ -2361,7 +2410,6 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
   double precision :: el, h, dh, sk1, sk2
   double precision :: ek(6), re(6,6), te(6,6,6)
 
-  double precision :: beta, gamma, dtbyds
   double precision :: bi, bi2, bi2gi2
   double precision :: cm, cp, cx, cy, cyy, dd, difsq, dm, dp, dx, dyy
   double precision :: fm, fp, fx, fyy, gx, h2, hx, sm, sp, sumsq, sx, sy, syy
@@ -2370,8 +2418,6 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
   double precision :: xk, xkl, xklsq, xksq, xs6 
   double precision :: y0, y1, y2, y2klsq, y2ksq, yk, ykl, yklsq, yksq, ys2
   double precision :: zc, zd, zf, zs      
-
-  double precision, external :: get_value
 
   double precision, parameter :: twty=20d0, twty2=22d0, twty4=24d0, thty=30d0
   double precision, parameter :: foty2=42d0, fvty6=56d0, svty2=72d0, httwty=120d0
@@ -2384,9 +2430,7 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
   EK = zero 
   RE = EYE 
   if (fsec) TE = zero 
-  beta = get_value('probe ','beta ')
-  gamma = get_value('probe ','gamma ')
-  dtbyds = get_value('probe ','dtbyds ')
+
   bi = one / beta
   bi2 = bi * bi
   bi2gi2 = one / (beta * gamma) ** 2
@@ -2758,6 +2802,7 @@ end SUBROUTINE tmtilt
 SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use math_constfi, only : zero, one, three, half
+  use twissbeamfi, only : dorad, deltap, gamma, arad
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -2779,14 +2824,14 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision, intent(IN OUT) :: orbit(6), el
   double precision, intent(OUT) :: ek(6), re(6,6), te(6,6,6)
   
-  logical :: cplxy, dorad
+  logical :: cplxy
   integer :: i, code, n_ferr
   double precision :: f_errors(0:maxferr)
-  double precision :: deltap, gamma, arad, rfac=0.d0, pt, bvk, tilt
+  double precision :: rfac=0.d0, pt, tilt, bvk
   double precision :: xkick, ykick, dpx, dpy, xau, div !, field(2)
 
   integer, external :: node_fd_errors
-  double precision, external :: node_value, get_value
+  double precision, external :: node_value
 
   if ( .not. ftrk) then
      !---- No orbit track desired, use drift map.
@@ -2797,11 +2842,6 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
      !---- Initialize.
      div = el ; if (el .eq. zero) div = one
      bvk = node_value('other_bv ')
-     deltap = get_value('probe ','deltap ')
-     arad = get_value('probe ','arad ')
-     arad = get_value('probe ','arad ')
-     gamma = get_value('probe ','gamma ')
-     dorad = get_value('probe ','radiate ') .ne. zero
      tilt = -node_value('tilt ')
 
      F_ERRORS = zero 
@@ -2874,6 +2914,7 @@ end SUBROUTINE tmcorr
 SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   use twtrrfi
   use twisslfi
+  use twissbeamfi, only : dorad, deltap, beta, gamma, arad
   use math_constfi, only : zero, one, two, three
   implicit none
   !----------------------------------------------------------------------*
@@ -2892,18 +2933,17 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   logical :: fsec, ftrk, fmap
   double precision :: orbit(6), re(6,6), te(6,6,6)
 
-  logical :: dorad
   integer :: n_ferr, nord, iord, j, nd, nn, ns
   double precision :: f_errors(0:maxferr)
 !  double precision :: field(2,0:maxmul)
 !  double precision :: vals(2,0:maxmul), 
   double precision :: normal(0:maxmul), skew(0:maxmul)
-  double precision :: beta, bi, deltap, pt, arad, gammas, rfac, bvk, elrad, tilt, angle
+  double precision :: bi, pt, rfac, bvk, elrad, tilt, angle
   double precision :: x, y, dbr, dbi, dipr, dipi, dr, di, drt, dpx, dpy, dpxr, dpyr, dtmp
   double precision :: orbit0(6), orbit00(6), re00(6,6), te00(6,6,6)
 
   integer :: get_option, node_fd_errors 
-  double precision :: node_value, get_value
+  double precision, external :: node_value
 
   !---- Initialize
   rfac = zero
@@ -2913,11 +2953,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
 
   !---- Multipole length for radiation.
   elrad = node_value('lrad ')
-  dorad = get_value('probe ','radiate ') .ne. zero
-  arad = get_value('probe ','arad ')
-  gammas = get_value('probe ','gamma ')
-  deltap = get_value('probe ', 'deltap ')
-  beta = get_value('probe ','beta ')
+
   bi = one / beta
 
   fmap = .true.
@@ -3055,7 +3091,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
      if (dorad  .and.  elrad.ne.zero) then
         dpxr = dpx + dipr
         dpyr = dpy + dipi
-        rfac = arad * gammas**3 * (dpxr**2+dpyr**2) / (three*elrad)
+        rfac = arad * gamma**3 * (dpxr**2+dpyr**2) / (three*elrad)
         pt = orbit(6)
         orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
         orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
@@ -3162,6 +3198,7 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
+  use twissbeamfi, only : dorad, deltap, gamma, arad
   use matrices, only : EYE
   use math_constfi, only : zero, one, two, three, four, six
   implicit none
@@ -3186,16 +3223,16 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision, intent(IN OUT) :: orbit(6), el
   double precision, intent(OUT) :: ek(6), re(6,6), te(6,6,6)
   
-  logical :: cplxy, dorad
+  logical :: cplxy
   integer :: i, code, n_ferr, elpar_vl
   double precision :: f_errors(0:maxferr)
   double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   double precision :: rw(6,6), tw(6,6,6) 
   double precision :: sk3, sk3l, sk3s, octr, octi, posr, posi, cr, ci, el0 
-  double precision :: deltap=0.d0, gamma, arad, rfac=0.d0, pt, bvk, tilt4  
+  double precision :: rfac=0.d0, pt, bvk, tilt4  
   
   integer, external :: node_fd_errors, el_par_vector
-  double precision, external :: node_value, get_value
+  double precision, external :: node_value
   
   if ( .not. ftrk) then
      !---- No orbit track requested, use drift map and return
@@ -3237,11 +3274,6 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
   ci = octr * posi + octi * posr
   orbit(2) = orbit(2) - cr / two
   orbit(4) = orbit(4) + ci / two
-  
-  arad = get_value('probe ','arad ')
-  gamma = get_value('probe ','gamma ')
-  deltap = get_value('probe ','deltap ')
-  dorad = get_value('probe ','radiate ') .ne. zero
   
   !---- Half radiation effects at entrance.
   if (dorad) then
@@ -3350,7 +3382,7 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
 end SUBROUTINE tmoct
 
 SUBROUTINE tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
-  use trackfi
+  use trackfi, only : fsecarb
   use twtrrfi
   use name_lenfi
   use time_varfi  
@@ -3751,6 +3783,7 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
+  use twissbeamfi, only : dorad, deltap, gamma, arad
   use math_constfi, only : zero, one, two, three
   implicit none
   !----------------------------------------------------------------------*
@@ -3775,17 +3808,16 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
   double precision :: plot_tilt, el
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
   
-  logical :: cplxy, dorad
+  logical :: cplxy
   integer :: i, j, n_ferr, elpar_vl
   double precision :: ct, st, tmp
   double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   double precision :: f_errors(0:maxferr)
-  double precision :: deltap, el0, tilt, sk1, pt, sk1s, bvk 
-  double precision :: rfac, arad, gamma
+  double precision :: el0, tilt, sk1, pt, sk1s, bvk, rfac 
 
   integer, external :: node_fd_errors
   integer, external :: el_par_vector
-  double precision, external :: node_value, get_value
+  double precision, external :: node_value
   
   !---- Initialize.
   st = zero
@@ -3822,11 +3854,6 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
 
   cplxy = cplxy .or. tilt .ne. zero
   tilt = tilt + plot_tilt
-
-  arad = get_value('probe ','arad ')
-  gamma = get_value('probe ','gamma ')
-  deltap = get_value('probe ','deltap ')
-  dorad = get_value('probe ','radiate ') .ne. zero
 
   sk1 = sk1 / (one + deltap)
 
@@ -3873,6 +3900,7 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
 end SUBROUTINE tmquad
 
 SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
+  use twissbeamfi, only : beta, gamma, dtbyds
   use math_constfi, only : zero, one, two, four, six, ten3m
   implicit none
   !----------------------------------------------------------------------*
@@ -3895,15 +3923,8 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
   double precision :: tilt, sk1, el
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
-  double precision :: gamma, beta, dtbyds, qk, qkl, qkl2
+  double precision :: qk, qkl, qkl2
   double precision :: cx, sx, cy, sy, biby4
-
-  double precision, external :: get_value
-
-  !---- Initialize.
-  beta = get_value('probe ','beta ')
-  gamma = get_value('probe ','gamma ')
-  dtbyds = get_value('probe ','dtbyds ')
 
   !---- Set up c's and s's.
   qk = sqrt(abs(sk1))
@@ -3982,6 +4003,7 @@ end SUBROUTINE qdbody
 SUBROUTINE tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twisslfi
   use twiss_elpfi
+  use twissbeamfi, only : deltap, pc, charge
   use math_constfi, only : zero, one, two, ten3m
   implicit none
   !----------------------------------------------------------------------*
@@ -4007,20 +4029,17 @@ SUBROUTINE tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   logical :: cplxy
   integer :: elpar_vl
-  double precision :: deltap, el0, tilt, ekick, charge, pc, efield, exfld, eyfld
+  double precision :: el0, tilt, ekick, efield, exfld, eyfld
   double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   double precision :: ct, st, tmp
 
   integer, external :: el_par_vector
-  double precision, external :: get_value, node_value
+  double precision, external :: node_value
 
   !---- Initialize.
   st = zero
   ct = zero
   cplxy = .false.
-  charge = get_value('probe ','charge ')
-  pc = get_value('probe ','pc ')
-  deltap = get_value('probe ','deltap ')
 
   fmap = el .ne. zero
   if (.not. fmap) return
@@ -4087,6 +4106,7 @@ SUBROUTINE tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
 end SUBROUTINE tmsep
 
 SUBROUTINE spbody(fsec,ftrk,tilt,ekick,orbit,el,ek,re,te)
+  use twissbeamfi, only : beta, gamma, dtbyds
   use math_constfi, only : zero, one, two, three
   implicit none
   !----------------------------------------------------------------------*
@@ -4109,15 +4129,9 @@ SUBROUTINE spbody(fsec,ftrk,tilt,ekick,orbit,el,ek,re,te)
   double precision :: el, tilt, ekick 
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
-  double precision :: beta, gamma, dtbyds, ekl, ch, sh, sy, dy, fact
+  double precision :: ekl, ch, sh, sy, dy, fact
 
-  double precision, external :: get_value
   double precision, parameter :: by2=1d0/2d0, by6=1d0/6d0, by24=1d0/24d0, eps=1d-4
-
-  !---- Initialize.
-  dtbyds = get_value('probe ','dtbyds ')
-  gamma = get_value('probe ','gamma ')
-  beta = get_value('probe ','beta ')
 
   !---- Prepare linear transformation parameters.
   !     DY = (COSH(K*L) - 1) / K.
@@ -4195,6 +4209,7 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
+  use twissbeamfi, only : dorad, deltap, gamma, arad
   use math_constfi, only : zero, one, two, three, twelve
   implicit none
   !----------------------------------------------------------------------*
@@ -4218,16 +4233,15 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision :: el
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
-  logical :: cplxy, dorad
+  logical :: cplxy
   integer :: i, j, n_ferr, elpar_vl
   double precision :: ct, st, tmp
   double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   double precision :: f_errors(0:maxferr)
-  double precision :: deltap, el0, tilt, sk2, pt,sk2s, bvk
-  double precision :: rfac, arad, gamma 
+  double precision :: el0, tilt, sk2, pt, sk2s, bvk, rfac
 
   integer, external :: el_par_vector, node_fd_errors
-  double precision, external :: node_value, get_value
+  double precision, external :: node_value
   
   !---- Initialize.
   st = zero
@@ -4264,10 +4278,6 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
   endif
   cplxy = cplxy .or. (tilt .ne. zero)
 
-  arad = get_value('probe ','arad ')
-  gamma = get_value('probe ','gamma ')
-  deltap = get_value('probe ','deltap ')
-  dorad = get_value('probe ','radiate ') .ne. zero
   sk2 = sk2 / (one + deltap)
 
   !---- Half radiation effects at entrance.
@@ -4316,6 +4326,7 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
 end SUBROUTINE tmsext
 
 SUBROUTINE sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
+  use twissbeamfi, only : beta, gamma, dtbyds
   use math_constfi, only : zero, two, three, four
   implicit none
   !----------------------------------------------------------------------*
@@ -4338,14 +4349,7 @@ SUBROUTINE sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
   double precision :: tilt, sk2, el
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
-  double precision :: skl, gamma, dtbyds, beta, s1, s2, s3, s4
-
-  double precision, external :: get_value
-  
-  !---- Initialize.
-  beta = get_value('probe ','beta ')
-  gamma = get_value('probe ','gamma ')
-  dtbyds = get_value('probe ','dtbyds ')
+  double precision :: skl, s1, s2, s3, s4
 
   !---- First-order terms.
   re(1,2) = el
@@ -4443,6 +4447,7 @@ SUBROUTINE tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
 end SUBROUTINE tmsol
 
 SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
+  use twissbeamfi, only : deltap, beta, gamma, dtbyds
   use math_constfi, only : zero, one, two, three, six
   implicit none
   !----------------------------------------------------------------------*
@@ -4465,19 +4470,15 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
   logical :: cplxy
-  double precision :: deltap, sks, sk, gamma, skl, beta, dtbyds, bvk
+  double precision :: sks, sk, skl, bvk
   double precision :: co, si, sibk, temp
   
-  double precision, external :: node_value, get_value
+  double precision, external :: node_value
   double precision, parameter :: ten5m=1d-5
 
   !---- Initialize.
   fmap = el .ne. zero
   if (.not. fmap) return
-  dtbyds = get_value('probe ','dtbyds ')
-  gamma = get_value('probe ','gamma ')
-  beta = get_value('probe ','beta ')
-  deltap = get_value('probe ','deltap ')
 
   !---- Strength.
   sks = node_value('ks ')
@@ -4620,6 +4621,7 @@ end SUBROUTINE tmsrot
 
 SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   use twisslfi
+  use twissbeamfi, only : beta
   use math_constfi, only : zero, one
   implicit none
   !----------------------------------------------------------------------*
@@ -4639,16 +4641,15 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   logical :: ftrk, fmap
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
-  double precision :: phi, cosphi, sinphi, tanphi, beta
+  double precision :: phi, cosphi, sinphi, tanphi
   double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   
-  double precision, external :: node_value, get_value
+  double precision, external :: node_value
 
   !---- Initialize.
   phi = node_value('angle ')
   fmap = phi .ne. zero
   if (.not. fmap) return
-  beta = get_value('probe ','beta ')
 
   !---- Kick.
   cosphi = cos(phi)
@@ -4679,6 +4680,7 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
 end SUBROUTINE tmyrot
 
 SUBROUTINE tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
+  use twissbeamfi, only : beta, gamma, dtbyds
   use matrices, only : EYE
   use math_constfi, only : zero, two, three
   implicit none
@@ -4700,19 +4702,12 @@ SUBROUTINE tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   logical :: fsec, ftrk, fmap
   double precision :: dl
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
-
-  double precision :: beta, gamma, dtbyds
-  
-  double precision, external :: get_value
   
   !---- Initialize.
   EK = zero 
   RE = EYE 
   if (fsec) TE = zero 
   fmap = dl .ne. zero
-  dtbyds = get_value('probe ', 'dtbyds ')
-  gamma = get_value('probe ', 'gamma ')
-  beta = get_value('probe ', 'beta ')
 
   !---- First-order terms.
   re(1,2) = dl
@@ -4780,6 +4775,7 @@ end SUBROUTINE tmdrf
 SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twisslfi
   use twiss_elpfi
+  use twissbeamfi, only : deltap, pc
   use matrices, only : EYE
   use math_constfi, only : zero, one, two, half, ten6p, ten3m, pi, twopi
   use phys_constfi, only : clight
@@ -4804,12 +4800,12 @@ SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
   integer :: elpar_vl
-  double precision :: rfv, rff, rfl, dl, omega, vrf, phirf, pc, deltap, bvk
-    double precision :: ek0(6), rw(6,6), tw(6,6,6)
+  double precision :: rfv, rff, rfl, dl, omega, vrf, phirf, bvk
+  double precision :: ek0(6), rw(6,6), tw(6,6,6)
   double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   double precision :: c0, c1, c2
 
-  double precision, external :: get_value, node_value
+  double precision, external :: node_value
   integer, external :: el_par_vector
 
   !-- get element parameters
@@ -4835,9 +4831,7 @@ SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   rff = g_elpar(r_freq)
   rfl = g_elpar(r_lag)
   bvk = node_value('other_bv ')
-  deltap = get_value('probe ','deltap ')
-  pc = get_value('probe ','pc ')
-
+  
   !-- LD: 20.6.2014 (bvk=-1: not -V -> V but lag -> pi-lag)
   if (bvk .eq. -one) then
     rfl = 0.5-rfl
@@ -5145,25 +5139,27 @@ SUBROUTINE tmsymp(r)
 
 end SUBROUTINE tmsymp
 
-SUBROUTINE tmali1(orb1, errors, betas, gammas, orb2, rm)
-  use twiss0fi
+SUBROUTINE tmali1(orb1, errors, beta, gamma, orb2, rm)
+  use twiss0fi, only : align_max
   use matrices, only : EYE
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for orbit displacement at entry of an element.     *
+  !       called from EMIT, TRRUN and TWISS modules.                     *
   !     Input:                                                           *
   !     orb1(6)   (real)    Orbit before misalignment.                   *
   !     errors(align_max) (real)    alignment errors                     *
-  !     betas     (real)    current beam beta                            *
-  !     gammas    (real)    current beam gamma                           *
+  !     beta (real)         beam beta relativistic factor                *
+  !     gamma (real)        beam gamma relativistic factor               *
   !     Output:                                                          *
   !     orb2(6)   (real)    Orbit after misalignment.                    *
   !     rm(6,6)   (real)    First order transfer matrix w.r.t. orbit.    *
   !----------------------------------------------------------------------*
-  double precision, intent(IN)  :: orb1(6), errors(align_max), betas, gammas
+  double precision, intent(IN)  :: orb1(6), errors(align_max)
+  double precision, intent(IN)  :: beta, gamma
   double precision, intent(OUT) :: orb2(6),  rm(6,6)
-
+  
   double precision :: orbt(6), w(3,3)
   double precision :: ds, dx, dy, the, phi, psi, s2
 
@@ -5181,10 +5177,10 @@ SUBROUTINE tmali1(orb1, errors, betas, gammas, orb2, rm)
   RM = EYE 
   rm(2,2) = w(1,1)
   rm(2,4) = w(2,1)
-  rm(2,6) = w(3,1) / betas
+  rm(2,6) = w(3,1) / beta
   rm(4,2) = w(1,2)
   rm(4,4) = w(2,2)
-  rm(4,6) = w(3,2) / betas
+  rm(4,6) = w(3,2) / beta
 
   rm(1,1) =   w(2,2) / w(3,3)
   rm(1,2) = rm(1,1) * s2
@@ -5194,11 +5190,11 @@ SUBROUTINE tmali1(orb1, errors, betas, gammas, orb2, rm)
   rm(3,2) = rm(3,1) * s2
   rm(3,3) =   w(1,1) / w(3,3)
   rm(3,4) = rm(3,3) * s2
-  rm(5,1) = w(1,3) / (w(3,3) * betas)
+  rm(5,1) = w(1,3) / (w(3,3) * beta)
   rm(5,2) = rm(5,1) * s2
-  rm(5,3) = w(2,3) / (w(3,3) * betas)
+  rm(5,3) = w(2,3) / (w(3,3) * beta)
   rm(5,4) = rm(5,3) * s2
-  rm(5,6) = - s2 / (betas * gammas)**2
+  rm(5,6) = - s2 / (beta * gamma)**2
 
   !---- Track orbit.
   ORBT = matmul(RM,ORB1) 
@@ -5206,33 +5202,36 @@ SUBROUTINE tmali1(orb1, errors, betas, gammas, orb2, rm)
   orb2(2) = orbt(2) + w(3,1)
   orb2(3) = orbt(3) - (w(1,1) * dy - w(2,1) * dx) / w(3,3)
   orb2(4) = orbt(4) + w(3,2)
-  orb2(5) = orbt(5) - s2 / betas
+  orb2(5) = orbt(5) - s2 / beta
   orb2(6) = orbt(6)
 
 end SUBROUTINE tmali1
 
-SUBROUTINE tmali2(el, orb1, errors, betas, gammas, orb2, rm)
-  use twiss0fi
+SUBROUTINE tmali2(el, orb1, errors, beta, gamma, orb2, rm)
+  use twiss0fi, only : align_max
   use matrices, only : EYE
   use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     TRANSPORT map for orbit displacement at exit of an element.      *
+  !       called from EMIT, TRRUN and TWISS modules.                     *
   !     Input:                                                           *
+  !     el (real)           Element length                               *
   !     orb1(6)   (real)    Orbit before misalignment.                   *
   !     errors(align_max) (real)    alignment errors                     *
-  !     betas     (real)    current beam beta                            *
-  !     gammas    (real)    current beam gamma                           *
+  !     beta (real)         beam beta relativistic factor                *
+  !     gamma (real)        beam gamma relativistic factor               *
   !     Output:                                                          *
   !     orb2(6)   (real)    Orbit after misalignment.                    *
   !     rm(6,6)   (real)    First order transfer matrix w.r.t. orbit.    *
   !----------------------------------------------------------------------*
-  double precision, intent(IN)  :: orb1(6), errors(align_max), betas, gammas
-  double precision, intent(OUT) :: orb2(6),  rm(6,6)
-
+  double precision, intent(IN)  :: el, orb1(6), errors(align_max)
+  double precision, intent(IN)  :: beta, gamma
+  double precision, intent(OUT) :: orb2(6), rm(6,6)
+  
   double precision :: orbt(6), v(3), ve(3), w(3,3), we(3,3)
-  double precision :: ds, dx, dy, the, phi, psi, s2, el, tilt
+  double precision :: ds, dx, dy, the, phi, psi, s2, tilt
 
   !---- Misalignment rotation matrix w.r.t. entrance system.
   dx  = errors(1)
@@ -5262,10 +5261,10 @@ SUBROUTINE tmali2(el, orb1, errors, betas, gammas, orb2, rm)
   RM = EYE 
   rm(1,1) = w(1,1)
   rm(3,1) = w(2,1)
-  rm(5,1) = w(3,1) / betas
+  rm(5,1) = w(3,1) / beta
   rm(1,3) = w(1,2)
   rm(3,3) = w(2,2)
-  rm(5,3) = w(3,2) / betas
+  rm(5,3) = w(3,2) / beta
 
   rm(2,2) =   w(2,2) / w(3,3)
   rm(1,2) = rm(2,2) * s2
@@ -5275,25 +5274,26 @@ SUBROUTINE tmali2(el, orb1, errors, betas, gammas, orb2, rm)
   rm(1,4) = rm(2,4) * s2
   rm(4,4) =   w(1,1) / w(3,3)
   rm(3,4) = rm(4,4) * s2
-  rm(2,6) = w(1,3) / (w(3,3) * betas)
+  rm(2,6) = w(1,3) / (w(3,3) * beta)
   rm(1,6) = rm(2,6) * s2
-  rm(4,6) = w(2,3) / (w(3,3) * betas)
+  rm(4,6) = w(2,3) / (w(3,3) * beta)
   rm(3,6) = rm(4,6) * s2
-  rm(5,6) = - s2 / (betas * gammas)**2
+  rm(5,6) = - s2 / (beta * gamma)**2
 
   !---- Track orbit.
   orbt(1) = orb1(1) + (w(2,2) * v(1) - w(1,2) * v(2)) / w(3,3)
   orbt(2) = orb1(2) - w(3,1)
   orbt(3) = orb1(3) + (w(1,1) * v(2) - w(2,1) * v(1)) / w(3,3)
   orbt(4) = orb1(4) - w(3,2)
-  orbt(5) = orb1(5) - s2 / betas
+  orbt(5) = orb1(5) - s2 / beta
   orbt(6) = orb1(6)
   ORB2 = matmul(RM,ORBT) 
 
 end SUBROUTINE tmali2
 
 SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
-  use trackfi
+  use trackfi, only : fsecarb
+  use twissbeamfi, only : gamma, arad, charge, npart
   use math_constfi, only : zero, one, two
   implicit none
   !----------------------------------------------------------------------*
@@ -5322,14 +5322,14 @@ SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
   double precision :: gamma0, beta0, beta_dp, ptot, b_dir
 
   integer, external :: get_option
-  double precision, external :: node_value, get_value, get_variable
+  double precision, external :: node_value, get_variable
   
   !---  standard 4D
-  q = get_value('probe ','charge ')
+  q = charge
   q_prime = node_value('charge ')
-  parvec(5) = get_value('probe ', 'arad ')
-  parvec(6) = node_value('charge ') * get_value('probe ', 'npart ')
-  parvec(7) = get_value('probe ','gamma ')
+  parvec(5) = arad
+  parvec(6) = node_value('charge ') * npart
+  parvec(7) = gamma
 
   !---- Calculate momentum deviation and according changes
   !     of the relativistic factor beta0
@@ -6248,6 +6248,7 @@ SUBROUTINE tmdpdg(ftrk,orbit,fmap,ek,re,te)
 end SUBROUTINE tmdpdg
 
 SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
+  use twissbeamfi, only : deltap
   use math_constfi, only : zero, one, two
   implicit none
   !     Stolen from trrun.F courtesy Alex Koschick
@@ -6267,14 +6268,11 @@ SUBROUTINE tmsol_th(ftrk,orbit,fmap,ek,re,te)
   logical :: ftrk, fmap
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
-  double precision :: deltap, bvk, sk, skl, sks, sksl, cosTh, sinTh, Q0, Q
+  double precision :: bvk, sk, skl, sks, sksl, cosTh, sinTh, Q0, Q
    
-  double precision, external :: get_value, node_value
+  double precision, external :: node_value
 
   fmap = .true.
-
-  !---- Initialize.
-  deltap  = get_value('probe ','deltap ')
 
   !---- Get solenoid parameters
   sksl    = node_value('ksi ')
@@ -6396,6 +6394,7 @@ end SUBROUTINE tmnll
 SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   use twtrrfi
   use twisslfi
+  use twissbeamfi, only : dorad, deltap, beta, gamma, pc, arad
   use math_constfi, only : zero, one, two, three, ten3m, ten6p, pi, twopi
   use phys_constfi, only : clight
   implicit none
@@ -6422,15 +6421,14 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   logical :: fsec, ftrk, fmap
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
-  logical :: dorad
   integer :: nord, i, j, nn, ns, n_ferr, dummyi, ii, jj, kk
-  double precision :: elrad, beta, deltap, arad, gammas, rfac, bvk, tilt, angle 
+  double precision :: elrad, rfac, bvk, tilt, angle 
   double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   double precision :: f_errors(0:maxferr)
   double precision :: normal(0:maxmul), skew(0:maxmul)
   double precision :: cangle, sangle, dtmp
 
-  double precision :: pc, krf, vrf
+  double precision :: krf, vrf
   double precision :: x, y, z, px, py, pt, dpx, dpy, dpt
   double precision :: freq, volt, lag, harmon
   double precision :: field_cos(2,0:maxmul)
@@ -6440,7 +6438,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   double complex :: Cm2, Sm2, Cm1, Sm1, Cp0, Sp0, Cp1, Sp1
 
   integer, external :: node_fd_errors
-  double precision, external :: node_value, get_value
+  double precision, external :: node_value
   double complex, parameter :: icomp=(0d0,1d0) ! imaginary 
 
   !---- Zero the arrays
@@ -6458,14 +6456,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   bvk    = node_value('other_bv ')
   elrad  = node_value('lrad ')
   tilt   = node_value('tilt ')
-  
-  deltap = get_value('probe ', 'deltap ')
-  dorad  = get_value('probe ','radiate ') .ne. zero
-  arad   = get_value('probe ','arad ')
-  gammas = get_value('probe ','gamma ')
-  beta   = get_value('probe ','beta ')
-  pc     = get_value('probe ','pc ')
-  
+    
   n_ferr = node_fd_errors(f_errors);
   call get_node_vector('knl ', nn, normal)
   call get_node_vector('ksl ', ns, skew)
@@ -6559,7 +6550,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
      
      !---- Radiation effects at entrance.
      if (dorad  .and.  elrad .ne. zero) then
-        rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
+        rfac = arad * gamma**3 * (dpx**2+dpy**2) / (three*elrad)
         px = px - rfac * (one + pt) * px
         py = py - rfac * (one + pt) * py
         pt = pt - rfac * (one + pt) ** 2
@@ -6816,6 +6807,7 @@ end subroutine tmfoc
 SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use twisslfi
+  use twissbeamfi, only : dorad, deltap, pc, beta, gamma, arad
   use math_constfi, only : zero, one, two, three, half, quarter, ten3m, ten3p, ten6p, pi, twopi
   use phys_constfi, only : clight
   use matrices, only : EYE
@@ -6844,14 +6836,13 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision :: el
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
-  logical :: dorad
   integer :: j, ii, jj, kk, dummyi, n_ferr
-  double precision :: elrad, beta, deltap, arad, gammas, rfac, bvk, tilt, cangle, sangle, dtmp
+  double precision :: elrad, rfac, bvk, tilt, cangle, sangle, dtmp
   double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   double precision :: f_errors(0:maxferr), field(2,0:0)
   double precision :: ed(6), rd(6,6), td(6,6,6)
   
-  double precision :: pc, krf
+  double precision :: krf
   double precision :: x, y, z, px, py, pt, dpx, dpy, dpt
   double precision :: freq, rfv, rfl, harmon
   double precision :: field_cos(2)
@@ -6861,7 +6852,7 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double complex :: Cp0, Sp0, Cp1, Sp1
   
   integer, external :: node_fd_errors
-  double precision, external :: node_value, get_value
+  double precision, external :: node_value
   double complex, parameter :: icomp=(0d0,1d0) ! imaginary
 
     !---- Zero the arrays
@@ -6880,12 +6871,6 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   harmon = node_value('harmon ');
   bvk = node_value('other_bv ')
   elrad = node_value('lrad ')
-  deltap = get_value('probe ', 'deltap ')
-  dorad = get_value('probe ','radiate ') .ne. zero
-  arad = get_value('probe ','arad ')
-  gammas = get_value('probe ','gamma ')
-  beta = get_value('probe ','beta ')
-  pc = get_value('probe ','pc ')
   tilt = node_value('tilt ')
 
   rfv = bvk * node_value('volt ')
@@ -6959,7 +6944,7 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
      
      !---- Radiation effects at entrance.
      if (dorad  .and.  elrad .ne. zero) then
-        rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
+        rfac = arad * gamma**3 * (dpx**2+dpy**2) / (three*elrad)
         px = px - rfac * (one + pt) * px
         py = py - rfac * (one + pt) * py
         pt = pt - rfac * (one + pt) ** 2
