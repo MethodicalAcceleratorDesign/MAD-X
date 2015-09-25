@@ -255,6 +255,7 @@ CONTAINS
     call setintstate(default)
     !valid October 2002: oldscheme=.false.
     !!valid October 2002: oldscheme=.true.
+    
 
     if (getdebug()==0) global_verbose = .false.
 
@@ -517,14 +518,15 @@ CONTAINS
     call node_string('apertype ',aptype,nn)
     call dzero(aperture,maxnaper)
     call get_node_vector('aperture ',nn,aperture)
-    !print*, name,' Got for aperture nn=',nn, aperture(1), aperture(2) 
+    
+    !print*, name,'madx_ptc_module: Got for aperture nn=',nn, aperture(1), aperture(2) 
     
     if(.not.((aptype.eq."circle".and.aperture(1).eq.zero).or.aptype.eq." ")) then
        
        
        c_%APERTURE_FLAG=.true.
        select case(aptype)
-       case("circle")
+       case("circle") 
           key%list%aperture_on=.true.
           key%list%aperture_kind=1
           key%list%aperture_r(1)=aperture(1)
@@ -598,6 +600,7 @@ CONTAINS
     case(22)
        call fort_warn('ptc_input: ','Element Beam-Beam, must use slice tracking to get effect')
        key%magnet="marker"
+    !case(1,11)
     case(1,11,20,21,44)
        key%magnet="drift"
        CALL CONTEXT(key%list%name)
@@ -1065,6 +1068,11 @@ CONTAINS
        !     key%list%x_col=node_value('xsize ')
        !     key%list%y_col=node_value('ysize ')
        !     key%tiltd=node_value('tilt ')
+    !case(20,21,44)
+    !        key%magnet="madcollimator"
+    !        key%list%x_col=1e3
+    !        key%list%y_col=1e3
+    !        key%tiltd=node_value('tilt ')
     case(33)
        !---- This is the dipedge element
        edge= node_value('e1 ')
@@ -2006,13 +2014,12 @@ CONTAINS
     call kill_universe(m_u)
     nullify(my_ring)
     call kill_tpsa
-    
-    !do i=1,size(s_b_from_v)
-    !   call nul_coef(s_b_from_v(i))
-    !enddo
-    !deallocate(s_b_from_v)
-    
-    
+!    do i=1,size(s_b)
+!       call nul_coef(s_b(i))
+!    enddo
+!    deallocate(s_b)
+
+
     firsttime_coef=.true.
 
     universe=universe-1
