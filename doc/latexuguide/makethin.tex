@@ -115,6 +115,64 @@ resulting changes in optics parameters.
 Keep in mind however that subsequent tracking generally requires full
 slicing, with possible exception of dipole and quadrupole magnetic elements. 
 
+\section{Choice of options}
+
+There are several options that affect the slicing of a sequence. 
+Depending whether some elements are kept as thick elements 
+(See \hyperref[sec:select]{\tt SELECT, FLAG=makethin}) and 
+whether the \hyperref[sec:makethin]{\tt MAKEDIPEDGE} option 
+of {\tt MAKETHIN} is used to generate 
+\hyperref[sec:dipedge]{\tt DIPEDGE} elements around the bending magnets, 
+the resulting sequence is more adapted to optics calculation or tracking. 
+The following table gives an indication of the best choice of options: 
+
+\begin{table}[ht]
+\caption{Best choice of options in {\tt MAKETHIN}}
+\vspace{1ex}
+\begin{center}
+	\begin{tabular}{|l|l|l|}
+	\hline
+	   & {\tt THICK=false} & {\tt THICK=true}\\
+	\hline
+	{\tt MAKEDIPEDGE=false} & backward compatibility & optics calculations \\
+	\hline
+	{\tt MAKEDIPEDGE=true} & thin tracking & thick tracking \\
+	\hline
+	\end{tabular}
+	\end{center}
+\end{table}
+
+The combination of {\tt THICK=false} (all elements as thin lenses) 
+and {\tt MAKEDIPEDGE=false} (no dipedge thin elements inserted 
+around the dipoles) results in a lattice with {\tt TWISS} parameters 
+that can differ significantly from those of the original sequence. 
+This is most obvious with the tune or phase advance parameters 
+that are generally differing by a significant amount (see first 
+hint below). This combination is however useful for backward compatibility 
+with previous versions of {\tt MAKETHIN} before 
+\hyperref[sec:dipedge]{\tt DIPEDGE} elements were
+implemented. 
+
+The combination of {\tt THICK=true} (all elements as thin lenses) 
+and {\tt MAKEDIPEDGE=false} (dipedge thin elements inserted 
+around the thin dipoles) results in a lattice with 
+\hyperref[chap:twiss]{\tt TWISS} parameters 
+very comparable to those of the original sequence. The dipoles are still a 
+single elements with proper edge effects up to second order.
+This is the best combination for optics studies without particle tracking, 
+e.g. with \hyperref[chap:twiss]{\tt TWISS}. 
+
+The combination of {\tt THICK=false} for dipoles and {\tt MAKEDIPEDGE=true} 
+transforms the original dipoles into one or several thin slices without 
+any edge effect, surrounded by a pair of \hyperref[sec:dipedge]{\tt DIPEDGE} 
+elements at the original location of dipole entrance and exit. 
+Note however that these \hyperref[sec:dipedge]{\tt DIPEDGE} elements only 
+contain first order effects for the purpose of tracking. 
+
+The combination of {\tt THICK=true} for dipoles and {\tt MAKEDIPEDGE=true} 
+conserves the dipoles as single elements with their associated edge effects 
+taken into account at first and second order for tracking. 
+
 
 \section{Additional information}
 
