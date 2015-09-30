@@ -1570,8 +1570,9 @@ SUBROUTINE twcptk(re,orbit)
   else
     !LD: 09.2015
     call element_name(name,len(name))
-    print *, 'coupling too strong for element ', name, ' (adet= ', adet, ')'
-    call aawarn('twcptk: ', 'twiss parameter might be unphysical (split element)')
+    print *, '+++ coupling too strong in element ', name
+    print *, '+++ adet=', adet, ', betx=', betx, ', bety=', bety
+    call aawarn('twcptk: ', 'twiss parameter might be unphysical, coupling skipped')
   endif
   
   !---- Cummulative R matrix and one-turn map at element location.
