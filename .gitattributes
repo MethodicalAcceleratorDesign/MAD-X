@@ -1539,6 +1539,26 @@ tests/test-ptc-twiss-maptable/map_table.tfs.ref -text
 tests/test-ptc-twiss-maptable/test-ptc-twiss-maptable.cfg -text
 tests/test-ptc-twiss-maptable/test-ptc-twiss-maptable.madx -text
 tests/test-ptc-twiss-maptable/test-ptc-twiss-maptable.ref -text
+tests/test-ptc-twiss-normal-6D/leir.6D.ptc.nonlin -text
+tests/test-ptc-twiss-normal-6D/leir.6D.ptc.summ.twiss.cfg -text
+tests/test-ptc-twiss-normal-6D/leir.6D.ptc.summ.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-6D/leir.6D.ptc.twiss.cfg -text
+tests/test-ptc-twiss-normal-6D/leir.6D.ptc.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-6D/ptc_map_table.tfs -text
+tests/test-ptc-twiss-normal-6D/ptc_normal_results.tfs -text
+tests/test-ptc-twiss-normal-6D/test-ptc-twiss-normal-6D.cfg -text
+tests/test-ptc-twiss-normal-6D/test-ptc-twiss-normal-6D.madx -text
+tests/test-ptc-twiss-normal-6D/test-ptc-twiss-normal-6D.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-genfu/normal.tfs -text
+tests/test-ptc-twiss-normal-genfu/ptc.nonlin.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-genfu/ptc.summ.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-genfu/ptc.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-genfu/ptc_map_table.tfs.cfg -text
+tests/test-ptc-twiss-normal-genfu/ptc_map_table.tfs.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-genfu/ptc_normal_results.tfs.cfg -text
+tests/test-ptc-twiss-normal-genfu/ptc_normal_results.tfs.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-genfu/test-ptc-twiss-normal-genfu.cfg -text
+tests/test-ptc-twiss-normal-genfu/test-ptc-twiss-normal-genfu.madx -text
 tests/test-ptc-twiss-old1/README -text
 tests/test-ptc-twiss-old1/fort.18.cfg -text
 tests/test-ptc-twiss-old1/fort.18.ref -text

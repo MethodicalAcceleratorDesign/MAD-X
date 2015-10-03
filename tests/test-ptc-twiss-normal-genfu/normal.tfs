@@ -1,0 +1,13 @@
+@ NAME             %09s PTC_NORMAL
+@ NO                %9d          3
+@ NV                %9d          6
+@ ND                %9d          3
+@ ND2               %9d          6
+@ NDPT              %9d          5
+@ NPARA             %9d          6
+@ NPARA_FPP         %9d          6
+@ NP_POL            %9d          0
+@ NSPIN             %9d          0
+@ SPIN_POS          %9d          0
+* NAME             NICKNAME                    VALUE            ORDER          ORDER_X         ORDER_PX          ORDER_Y         ORDER_PY         ORDER_PT          ORDER_T
+$ %s               %s                            %le              %le              %le              %le              %le              %le              %le              %le
