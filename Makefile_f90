@@ -51,6 +51,7 @@ FC_SRC := $(filter-out $(FC_SRC_RM),$(FC_SRC_MAD) $(FC_SRC_PTC))
 
 # files specific compiler flag (i.e. "internal compiler error" message)
 matchlib2.o:        override NOPT := 0
+Sg_sagan_wiggler.o: FFLAGS += -fdollar-ok
 l_complex_taylor.o: NOPT := 2
 
 ifeq ($(ARCH),32)
