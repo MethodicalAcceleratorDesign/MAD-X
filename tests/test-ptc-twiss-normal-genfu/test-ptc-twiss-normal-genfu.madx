@@ -1,6 +1,6 @@
 mydrift: drift, l=1;
-qfk1 := 5.08623;
-qdk1 := 5.08623;
+qfk1 := 5.08623+5e-2;
+qdk1 := 5.08623-5e-2;
 qf: quadrupole, l=0.1, k1:= qfk1;
 qd: quadrupole, l=0.1, k1:=-qdk1;
 
@@ -10,10 +10,10 @@ l1: line:=(qf, mydrift, qd, m1, mydrift);
 m: marker;
 m1: marker;
 
-qs: quadrupole, l=0.01, k1s:=1e-9;
-sx1: sextupole, l=0.01, k2:=0.1;
+qs: quadrupole, l=0.01, k1s:=1e-4;
+sx1: sextupole, l=0.01, k2:=0.2;
 
-myline: line:=(l1,l1,l1,l1,m);
+myline: line:=(l1, l1, l1, l1, m,sx1);
 
 
 
@@ -23,8 +23,8 @@ use, period=myline;
 
 
 
-select,flag=ptc_twiss,clear;
-select, flag=ptc_twiss, column=name,s,Energy,beta11,beta22,beta33,alfa11,alfa22,mu1,mu2,mu3,disp1,disp2,
+select,flag=twiss,clear;
+select, flag=twiss, column=name,s,Energy,beta11,beta22,beta33,alfa11,alfa22,mu1,mu2,mu3,disp1,disp2,
                           re11,re12,re13,re14,re15,re16,
                           re21,re22,re23,re24,re25,re26,
                           re31,re32,re33,re34,re35,re36,
@@ -41,11 +41,11 @@ ptc_create_universe;
 !  ptc_printframes, file="leir.C", format=rootmacro;!this prints my visualisation with ROOT
 
   !!!!!       T I M E   T R U E ,   T O T P A T H  F A L S E
-  ptc_setswitch, debuglevel=0, exact_mis=true, time=true, totalpath=false;
+  ptc_setswitch, debuglevel=1, exact_mis=true, time=true, totalpath=false;
 
 
   
-  ptc_twiss, table=twiss, icase=56, no=3, closed_orbit, normal;
+  ptc_twiss, table=twiss, icase=5, no=4, closed_orbit=false, normal;
 !  ptc_twiss, icase=6, no=2, betx=10, bety=10,betz=10;
   
 !  plot, table=ptc_twiss, vaxis=beta11,beta22, haxis=s;
@@ -56,7 +56,6 @@ ptc_create_universe;
   write, table=ptc_twiss_summary, file="ptc.summ.twiss";
   write, table=nonlin, file="ptc.nonlin";
 
-ptc_end;
 
 
 plot, haxis=s, vaxis=beta11,beta22, colour=100;
@@ -71,20 +70,45 @@ by = table(twiss, m, beta22);
 qx = table(twiss, myline$end, mu1);
 qy = table(twiss, myline$end, mu2);
 
-k1s_l = 1*0.01;
+k1s_l = 0.1*0.01;
 
 na = k1s_l*sqrt(bx*by);
 
-dc = 4*(1-cos(qx-qy));
-dd = 4*sin(qx-qy);
+dc = 4*(1-cos(2*pi*(qx-qy)));
+dd = 4*sin(2*pi*(qx-qy));
+
 
 f1001_de = dc*dc+dd*dd;
 
+value, dc, dd, f1001_de, qx, qy;
+
+
 f1001_re = na*dc/f1001_de;
 f1001_im = -na*dd/f1001_de;
+!!!!!!!!!!!!!!!!!!!!!!!!!!1
+
+na = 0.2*0.01*sqrt(bx*bx*bx);
+
+dc = 48*(1-cos(2*pi*3*qx));
+dd = -48*sin(2*pi*3*qx);
+
+f3000_de = dc*dc+dd*dd;
+f3000_re = -1*(na*dc/f3000_de);
+f3000_im = -1*(-na*dd/f3000_de);
+
+!1200
+dc = 16*(1-cos(-2*pi*qx));
+dd = -16*sin(-2*pi*qx);
+f1200_de = dc*dc+dd*dd;
+f1200_re = -1*(na*dc/f1200_de);
+f1200_im = -1*(-na*dd/f1200_de);
+
 
 value, f1001_re, f1001_im;
 
+value, f3000_re, f3000_im;
+value, f1200_re, f1200_im;
 
+value, table("nonlin", "GNFC_3_0_0_0_1_0" ,value),table(nonlin, "GNFS_3_0_0_0_0_0","value");
 
-value, table(nonlin, GNFC_1_0_0_1_1_0,value),table(twiss, GNFC_1_0_0_1_1_0,value);
+ptc_end;
