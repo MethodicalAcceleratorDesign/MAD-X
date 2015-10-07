@@ -22,7 +22,7 @@
 %%\usepackage[pdftex]{graphicx} 
 %% Show image: \includegraphics[width=x]{file}.
 \usepackage{graphicx} % Show image: \includegraphics[width=x]{file}.
-
+\usepackage{pict2e}
 \usepackage{multirow}
 \usepackage{longtable}
 \usepackage{parskip}
@@ -91,7 +91,6 @@
 \include{beams}         % Beam Statements
 \include{seqedit}       % Edit beamline sequences
 
-
 \part{Elements, Beamlines and Sequences}
 \include{definitions}   % Element definitions
 \include{elements}      % Physical Elements and Markers
@@ -107,7 +106,6 @@
 \include{index}         % probably material for an appendix
 \include{rplot_index}   % ditto
 
-
 \part{\mad Modules}
 \include{survey}        % SURVEY: geometric layout and survey
 \include{twiss}         % TWISS
@@ -122,14 +120,12 @@
 \include{ibs}           % IBS: Intra Beam Scattering
 \include{thintrack}     % THINTRACK: Thin-Lens Tracking Module 
 
-
 \part{\ptc Commands}
 \include{ptc_general}     % Set-up Parameters
 \include{ptc_track}       % PTC_TRACK: Thick-Lens Tracking Module
 \include{ptc_twiss}       % PTC_TWISS: Ripken Optics Parameters
 \include{ptc_normal}      % PTC_NORMAL: Non-Linear Machine Parameters
 \include{ptc_auxiliaries} % PTC Auxiliary Commands
-
 
 \part{Trailing Material}
 \include{defects}       % Known Differences to Other Programs 

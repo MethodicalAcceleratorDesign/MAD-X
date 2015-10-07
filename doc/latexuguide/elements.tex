@@ -3,8 +3,8 @@
 \label{chap:elements}
 
 \section{Marker}
-\ttindex{marker}
 \label{sec:marker}
+\ttindex{marker}
 
 \madbox{
 label: MARKER;
@@ -18,8 +18,8 @@ the beam line, for example to apply a matching constraint.
 
 
 \section{Drift Space}
-\ttindex{drift}
 \label{sec:drift}
+\ttindex{drift}
 
 \madbox{
 label: DRIFT, L=real;
@@ -1052,7 +1052,7 @@ and seven attributes to describe dynamic behaviour:
 
 The other attributes describe the time evolution of a {\tt CRABCAVITY} behaviour:
 
-{\begin{madlist}  
+\begin{madlist}  
   \ttitem{RV1} Number of initial turns with zero voltage (default: 0). 
   \ttitem{RV2} Number of turns to ramp voltage from zero to nominal value (default: 0). 
   \ttitem{RV3} Number of turns with nominal voltage (default: 0). 
@@ -1361,7 +1361,7 @@ and extended by S.~Sorge (2007).
 \end{figure}
 
        \item  {\tt BBSHAPE=3}: hollow-parabolic shape (see
-       fig.\ref{fig:beambeam-n-hollowparabol}, {\tt SIGX, SIGY}: distance 
+       fig.\ref{fig:beambeam-n-hollowparabol}), {\tt SIGX, SIGY}: distance 
        from the centre to the maximum of the parabolic density profile in 
        horizontal, vertical directions. Still only circular opposite beam 
        possible, i.e. in the calculations {\tt SIGX'=SIGY'=(SIGX+SIGY)/2} is 
@@ -1395,7 +1395,7 @@ and extended by S.~Sorge (2007).
        if {\tt WIDTH=0.01} and {\tt SIGX=5}mm, the edge  region has a full 
        width of 0.05\ mm. It must be {\tt WIDTH \textless 2.0}.
        \item  {\tt BBSHAPE=3}, {\tt WIDTH} denotes the full width at half 
-       maximum of the parabolic density profile in units of {\tt SIGX} (or {\tt 
+       maximum of the parabolic density profile in units of {\tt SIGX}, or {\tt 
        SIGX'} and {\tt SIGY'}, respectively, if {\tt SIGX} and {\tt SIGY} are 
        not equal. It must be {\tt WIDTH \textless SQRT(2.0)}.
      \end{itemize} 
