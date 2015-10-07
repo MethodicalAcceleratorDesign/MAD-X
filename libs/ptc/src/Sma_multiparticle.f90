@@ -571,10 +571,10 @@ CONTAINS
           IF(CN%PATCH%ENERGY==0.or.CN%PATCH%ENERGY==1.or.CN%PATCH%ENERGY==4) THEN     ! No need to patch IF PATCHED BEFORE
              P0=>CN%MAG%P%P0C
              B0=>CN%MAG%P%BETA0
-             if(use_bmad_units) then
-               b1=b0
-               call  convert_bmad_to_ptc(x,b1,k%TIME)
-             endif
+!             if(use_bmad_units) then
+!               b1=b0
+!               call  convert_bmad_to_ptc(x,b1,k%TIME)
+!             endif
              X(2)=X(2)*P0/C%MAG%P%P0C
              X(4)=X(4)*P0/C%MAG%P%P0C
              IF(k%TIME.or.recirculator_cheat)THEN
@@ -588,10 +588,10 @@ CONTAINS
        else  ! associated   
              P0=>C%PATCH%P0b
              B0=>C%PATCH%B0b
-             if(use_bmad_units) then
-               b1=b0
-               call  convert_bmad_to_ptc(x,b1,k%TIME)
-             endif
+!             if(use_bmad_units) then
+!               b1=b0
+!               call  convert_bmad_to_ptc(x,b1,k%TIME)
+!             endif
              X(2)=X(2)*P0/C%MAG%P%P0C
              X(4)=X(4)*P0/C%MAG%P%P0C
              IF(k%TIME.or.recirculator_cheat)THEN
@@ -602,8 +602,8 @@ CONTAINS
                 X(5)=(1.0_dp+X(5))*P0/C%MAG%P%P0C-1.0_dp
              ENDIF           
        ENDIF ! ASSOCIATED
-    else
-     if(use_bmad_units) call convert_bmad_to_ptc(x,b1,k%TIME)
+!    else
+!     if(use_bmad_units) call convert_bmad_to_ptc(x,b1,k%TIME)
     ENDIF
 
     ! The chart frame of reference is located here implicitely
@@ -628,9 +628,9 @@ CONTAINS
        ou = ALWAYS_EXACTMIS  !K%EXACTMIS.or.
        CALL MIS_FIB(C,X,k,OU,DONEITT)
     ENDIF
-             if(use_bmad_units) then
-               call  convert_ptc_to_bmad(x,c%beta0,k%TIME)
-             endif
+!             if(use_bmad_units) then
+!               call  convert_ptc_to_bmad(x,c%beta0,k%TIME)
+!             endif
   END SUBROUTINE TRACK_FIBRE_FRONTR
 
   SUBROUTINE TRACK_FIBRE_FRONTP(C,X,K)
@@ -666,10 +666,10 @@ CONTAINS
           IF(CN%PATCH%ENERGY==0.or.CN%PATCH%ENERGY==1.or.CN%PATCH%ENERGY==4) THEN     ! No need to patch IF PATCHED BEFORE
              P0=>CN%MAGP%P%P0C
              B0=>CN%MAGP%P%BETA0
-             if(use_bmad_units) then
-               b1=b0
-               call  convert_bmad_to_ptc(x,b1,k%TIME)
-             endif
+!             if(use_bmad_units) then
+!               b1=b0
+!               call  convert_bmad_to_ptc(x,b1,k%TIME)
+!             endif
              X(2)=X(2)*P0/C%MAGP%P%P0C
              X(4)=X(4)*P0/C%MAGP%P%P0C
              IF(k%TIME.or.recirculator_cheat)THEN
@@ -683,10 +683,10 @@ CONTAINS
        else  ! associated 
              P0=>C%PATCH%P0b
              B0=>C%PATCH%B0b
-             if(use_bmad_units) then
-               b1=b0
-               call  convert_bmad_to_ptc(x,b1,k%TIME)
-             endif
+!             if(use_bmad_units) then
+!               b1=b0
+!               call  convert_bmad_to_ptc(x,b1,k%TIME)
+!             endif
              X(2)=X(2)*P0/C%MAGP%P%P0C
              X(4)=X(4)*P0/C%MAGP%P%P0C
              IF(k%TIME.or.recirculator_cheat)THEN
@@ -698,8 +698,8 @@ CONTAINS
              ENDIF           
        ENDIF ! ASSOCIATED
 
-    else
-     if(use_bmad_units) call convert_bmad_to_ptc(x,b1,k%TIME)
+!    else
+!     if(use_bmad_units) call convert_bmad_to_ptc(x,b1,k%TIME)
     ENDIF
 
     ! The chart frame of reference is located here implicitely
@@ -725,9 +725,9 @@ CONTAINS
        CALL MIS_FIB(C,X,k,OU,DONEITT)
     ENDIF
 
-             if(use_bmad_units) then
-               call  convert_ptc_to_bmad(x,c%beta0,k%TIME)
-             endif
+!             if(use_bmad_units) then
+!               call  convert_ptc_to_bmad(x,c%beta0,k%TIME)
+!             endif
   END SUBROUTINE TRACK_FIBRE_FRONTP
 
 
@@ -752,9 +752,9 @@ CONTAINS
        PATCHT=0 ; PATCHE=0 ;PATCHG=0;
     ENDIF
 
-             if(use_bmad_units) then
-               call  convert_bmad_to_ptc(x,c%beta0,k%TIME)
-             endif
+ !            if(use_bmad_units) then
+ !              call  convert_bmad_to_ptc(x,c%beta0,k%TIME)
+ !            endif
 
     IF(C%MAG%MIS) THEN
        ou = ALWAYS_EXACTMIS  !K%EXACTMIS.or.
@@ -815,9 +815,9 @@ CONTAINS
     endif
 ENDIF
 
-             if(use_bmad_units) then
-               call  convert_ptc_to_bmad(x,b1,k%TIME)
-             endif
+!             if(use_bmad_units) then
+!               call  convert_ptc_to_bmad(x,b1,k%TIME)
+!             endif
   
   END SUBROUTINE TRACK_FIBRE_BACKR
 
@@ -840,9 +840,9 @@ ENDIF
        PATCHT=0 ; PATCHE=0 ;PATCHG=0;
     ENDIF
 
-             if(use_bmad_units) then
-               call  convert_bmad_to_ptc(x,c%beta0,k%TIME)
-             endif
+ !            if(use_bmad_units) then
+ !              call  convert_bmad_to_ptc(x,c%beta0,k%TIME)
+ !            endif
 
     IF(C%MAGP%MIS) THEN
        ou = ALWAYS_EXACTMIS   !K%EXACTMIS.or.
@@ -901,9 +901,9 @@ ENDIF
              ENDIF           
     ENDIF
 endif
-             if(use_bmad_units) then
-               call  convert_ptc_to_bmad(x,b1,k%TIME)
-             endif
+!             if(use_bmad_units) then
+!               call  convert_ptc_to_bmad(x,b1,k%TIME)
+!             endif
 
   END SUBROUTINE TRACK_FIBRE_BACKP
 

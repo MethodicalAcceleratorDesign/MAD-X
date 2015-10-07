@@ -20,7 +20,7 @@ MODULE S_FIBRE_BUNDLE
   private FIND_POS_in_universe,FIND_POS_in_layout,super_dealloc_fibre
   TYPE(LAYOUT), PRIVATE, POINTER:: LC
   logical :: superkill=.false.
-  logical(lp),TARGET :: use_info=.true.
+  logical(lp),TARGET :: use_info=.true., use_info_m=.false.
   integer, target :: nsize_info = 70
   private zero_fibre
   INTEGER :: INDEX_0=0, INDEX_1=0
@@ -102,7 +102,10 @@ CONTAINS
     allocate(c%fix(6));c%fix=0.0_dp;
     allocate(c%fix0(6));c%fix0=0.0_dp;
     allocate(c%pos(2));c%pos=0.0_dp;
-
+    if(use_info_m) then 
+      allocate(c%m(6,6))
+      c%m=0
+    endif
 
   end SUBROUTINE alloc_info
 
@@ -117,7 +120,7 @@ CONTAINS
     d%fix=c%fix
     d%fix0=c%fix0
     d%pos=c%pos
-
+    if(associated(c%m))d%m=c%m
   end SUBROUTINE copy_info
 
   SUBROUTINE kill_info( c ) ! Does the full allocation of fibre and initialization of internal variables
@@ -130,6 +133,7 @@ CONTAINS
     deallocate(c%fix0)
     deallocate(c%beta)
     deallocate(c%pos)
+    if(associated(c%m)) deallocate(c%m)
 
   end SUBROUTINE kill_info
 

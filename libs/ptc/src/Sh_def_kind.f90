@@ -129,7 +129,7 @@ MODULE S_DEF_KIND
   INTEGER :: N_CAV4_F=1
   INTEGER :: metcav=0, nstcav=0
   real(dp) :: xcav(1:6)=0.001d0, symplectic_check=1.d-10
-  logical(lp) :: switch_to_fake=.true.
+  
   
   
   ! stochastic radiation in straigth

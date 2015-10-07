@@ -3190,7 +3190,7 @@ endif
     do i=1,size(j)
        no=j(i)+no
     enddo
-
+ 
     if(no>c_%no) then
        check_j=no
        return

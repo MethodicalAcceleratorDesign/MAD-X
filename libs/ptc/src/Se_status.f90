@@ -135,7 +135,7 @@ module S_status
   type(my_1D_taylor) val_del
   logical(lp) :: ramp=my_false
   logical(lp) :: accelerate=my_false, first_particle=my_false
-
+  logical(lp) :: automatic_complex = my_true
   TYPE B_CYL
      integer firsttime
      integer, POINTER ::  nmul,n_mono   !,nmul_e,n_mono_e
@@ -1331,6 +1331,9 @@ CONTAINS
        n_acc=1
     endif
 
+    IF(STATE%spin.or.STATE%modulation.or.STATE%radiation.or.STATE%envelope)  then
+       if(automatic_complex) use_complex_in_ptc=.true.
+    endif
     !    write(6,*) NO1,ND1,NP1,NDEL,NDPT1
     !pause 678
     CALL INIT(NO1,ND1,NP1+NDEL,NDPT1,PACKAGE)

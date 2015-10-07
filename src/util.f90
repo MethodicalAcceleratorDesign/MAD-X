@@ -305,12 +305,21 @@ module matchfi
   integer :: icovar=0,ilevel=0
   double precision :: edm=0.d0,fmin=0.d0
 end module matchfi
+
 module name_lenfi
   implicit none
   public
   integer name_len
   parameter(name_len=48)
 end module name_lenfi
+
+module warncolim
+  implicit none
+  public
+  integer :: warnede = 0
+  integer :: warnedr = 0
+end module warncolim
+
 module physconsfi
   implicit none
   public

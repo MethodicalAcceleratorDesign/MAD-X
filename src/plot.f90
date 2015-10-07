@@ -2164,7 +2164,7 @@ subroutine peschm (nel, ityp, hr, es, ee, actwin)
   im1 = 0
 
   !--- set line style to solid
-
+  
   do i = 1, nel
      call jsln(1)
      it = mod(ityp(i), 20)
@@ -2205,6 +2205,12 @@ subroutine peschm (nel, ityp, hr, es, ee, actwin)
   enddo
 50 continue
   call jsln(1)
+
+  if (j_nodrift .lt. 1) then
+   print*, "plot.f90 peschm j_nodrift must be > 0 and it is ", j_nodrift 
+   stop;
+  endif
+  
   j = i_nodrift(j_nodrift)
   if (ee(j) .lt. hr(2))  then
      txp(1) = ee(j)

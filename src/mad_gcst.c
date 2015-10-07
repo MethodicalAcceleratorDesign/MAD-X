@@ -762,9 +762,9 @@ int   atm_flag = 0;
 
 const char* const nonlin_table_cols[] =
 {
-  "name", "nickname", "basevariable" "value", 
+  "name", "nickname", "basevariable", "value", 
   "order", "order_x", "order_px","order_y",
-           "order_py","order_pt","order_t"         
+           "order_py","order_pt","order_t", " "      
 };
 
 const int nonlin_table_types[] =

@@ -2090,7 +2090,7 @@ endif
 
  
        case('NEWEQUILIBRIUMSIZES','EQUILIBRIUMSIZES')
-          READ(MF,*) POS,FILENAME, i1,NAME
+          READ(MF,*) POS,FILENAME,NAME
           call context(name)
           if(name(1:11)/='NONAMEGIVEN') then
              posr=pos
@@ -2100,7 +2100,7 @@ endif
                 stop
              endif
           endif
-        !  call radia_new(my_ering,POS,i1,FILENAME,my_estate)
+          call radia_new(my_ering,POS,my_estate,FILENAME)
        case('SPECIALALEX')
           READ(MF,*) I1
           READ(MF,*) targ_tune(1:2),sc
@@ -2132,6 +2132,148 @@ endif
     if(mf/=5) close(mf)
 
   END subroutine read_ptc_command
+
+ SUBROUTINE radia_new(R,loc,estate,FILE1,fix,em,sij,sijr,tune,damping)
+    implicit none
+    TYPE(LAYOUT) R
+
+    REAL(DP) X(6),m,energy,deltap
+    CHARACTER(*), optional :: FILE1
+    type(c_damap)  Id,a0,a_cs
+    type(c_normal_form) normal
+    integer  i,j 
+    real(dp), optional :: fix(6), em(3),sij(6,6),tune(3),damping(3)
+    complex(dp), optional :: sijr(6,6)   
+    TYPE(INTERNAL_STATE) state
+    TYPE(INTERNAL_STATE), target :: estate
+    integer loc,mf1
+    type(fibre), pointer :: p
+    type(probe) xs0
+    type(probe_8) xs
+    character*48 fmd,fmd1
+
+    if(present(FILE1)) then
+    call kanalnummer(mf1)
+    open(mf1,file=FILE1)
+    endif
+fmd= '(a12,1X,a3,I1,a3,i1,a4,D18.11,1x,D18.11)'
+fmd1='(1X,a3,I1,a3,i1,a4,2(D18.11,1x),(f10.3,1x),a2)'
+
+
+
+    state=(estate-nocavity0)+radiation0
+    x=0.d0
+
+    CALL FIND_ORBIT_x(R,X,STATE,1.0e-8_dp,fibre1=loc)
+    if(present(FILE1)) then
+        WRITE(mf1,*) " CLOSED ORBIT AT LOCATION ",loc
+        write(mf1,*) x
+    endif
+     if(present(fix)) fix=x
+
+
+    call GET_loss(r,energy,deltap)
+       if(present(FILE1)) then
+    write(mf1,*) "energy loss: GEV and DeltaP/p0c ",energy,deltap
+    write(mf1,*) " stable closed orbit tracked "
+    write(mf1,"(6(1X,D18.11))") x
+    write(mf1,*) "energy loss: GEV and DeltaP/p0c ",energy,deltap
+    endif
+    CALL INIT(state,1,0)
+    CALL ALLOC(NORMAL)
+    CALL ALLOC(ID)
+    call alloc(xs)
+
+!    if(i1==1) normal%stochastic=my_true
+    xs0=x
+    ID=1
+    xs=XS0+ID
+
+    state=state+envelope0
+
+    CALL TRACK_PROBE(r,xs,state, fibre1=loc)
+     id=xs
+   if(present(FILE1)) then
+    write(mf1,*) " Full Map "    
+     call print(id,mf1)
+    write(mf1,*) " End of Full Map "
+   endif
+  call  c_normal(id,normal)             ! (8)
+
+   if(present(FILE1)) then
+    write(mf1,*)" $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
+    write(mf1,*)" Tunes "
+    write(mf1,*) normal%tune
+    write(mf1,*)" Damping "
+    write(mf1,*) normal%damping
+    write(mf1,*)" Emittances "
+    write(mf1,*) normal%emittance
+    write(mf1,*)" $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
+    write(mf1,*)"   "
+
+    write(mf1,*)" Equilibrium Beam Sizes "
+    do i=1,6
+       do j=1,6
+          write(mf1,*) i,j,normal%s_ij0(i,j)
+       enddo
+    enddo
+write(mf1,*)
+write(mf1,'(16X,a50)') "   Equilibrium moments in Phasors Basis           "
+ do i=1,6
+ do j=i,6 
+  if(abs(normal%s_ijr(i,j))>1.d-20) then
+   write(mf1,fmd) " Phasors -> ","<x_",i," x_",j,"> = ",  &   ! (14)
+                    c_clean(normal%s_ijr(i,j),1.d-20)  
+  endif
+ enddo
+ enddo 
+    close(mf1)
+endif
+if(present(em)) em=normal%emittance
+if(present(tune)) tune=normal%tune(1:3)
+if(present(damping)) damping=normal%damping(1:3)
+if(present(sij)) then
+do i=1,6
+do j=1,6
+ sij(i,j)=normal%s_ij0(i,j)
+enddo
+enddo
+endif
+if(present(sijr)) then
+do i=1,6
+do j=1,6
+ sijr(i,j)=normal%s_ijr(i,j)
+enddo
+enddo
+endif
+
+!    if(normal%stochastic) then
+!       write(mf1,*) "Stochastic kicks"
+!       write(mf1,*) normal%kick!
+
+!       write(mf1,*)" Stochastic Transformation "
+!       do i=1,6
+!          do j=1,6
+!             write(mf1,*) i,j,normal%STOCH(i,j)
+!          enddo
+!       enddo
+
+!       write(mf1,*)" Inverse Stochastic Transformation "
+!       do i=1,6
+!          do j=1,6
+!             write(mf1,*) i,j,normal%STOCH_inv(i,j)
+!          enddo
+!       enddo
+
+!    endif
+
+
+
+    CALL KILL(NORMAL)
+    CALL KILL(ID)
+    CALL KILL(xs)
+
+  end subroutine radia_new
 
   subroutine totalpath_cavity(r,j)
     implicit none

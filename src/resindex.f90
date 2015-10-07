@@ -5,6 +5,9 @@ subroutine res_index(skew,mynorder,myn1,myn2,indexa,mynres)
   integer mynorder,myn1,myn2,indexa(mnres,4),mynres
   integer i,j,n1,n2,n3,n4
   !---------------------------------------------------------------------
+  
+  !print*, skew,mynorder,myn1,myn2,mynres
+
   do i=1,mnres
      do j=1,4
         indexa(i,j)=0

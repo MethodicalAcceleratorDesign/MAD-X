@@ -2071,6 +2071,11 @@ eta2=0.0_dp
     APERTURE=c_%APERTURE_FLAG
     c_%APERTURE_FLAG=.false.
     messagelost=' Orbit most likely found'
+    if(state%radiation) then
+     write(6,*) "You have radiation : use find_orbit_x "
+     stop
+    endif
+
     if(.not.present(eps)) then
        if(.not.present(STATE)) then
           call FIND_ORBIT_LAYOUT(RING,FIX,LOC,TURNS=TURNS0)
@@ -3424,34 +3429,27 @@ endif
 
   SUBROUTINE  check_bend(xl,ggi,rhoi,xbend1,gf,met) ! A re-splitting routine
     IMPLICIT NONE
-    real(dp) xl,gg,ggi,rhoi,ar,ggb,co(7),xbend1,gf(7)
+    real(dp) xl,gg,ggi,rhoi,ggb,ar,co(7),xbend1,gf(7)
     integer i,met
 
     gg=int(ggi)
     if(gg==0.d0) gg=1.d0
-    co(3)=1.d0/6.0_dp
-    co(5)=  0.2992989446749238e0_dp
-    co(7)=0.2585213173527224e-1_dp
-    ar=abs(rhoi)
-    gf=0.0_dp
-    !     do i=3,7,2
-    !              ggb=((XL/gg) * ar)**(i)*(XL/gg)*co(i)  ! approximate residual orbit
-    !              if(xbend1<ggb) then
-    !                gf(i)=(ar**(i)*co(i)/xbend1)**(one/(i+one))*xl
-    !              write(6,*) i,gf(i)
-    !              pause
-    !              endif
-    !     enddo
+    co(2)=1.d0/12.0_dp
+    co(4)=  0.17e0_dp
+    co(6)=0.17e-1_dp
 
+    gf=0.0_dp
+ 
     do i=3,7,2
-       ggb=((XL/gg) * ar)**(i-1)*(XL/gg)*co(i)*twopi  ! approximate residual orbit
-       !              if(xbend1<ggb) then
-       gf(i)=(ar**(i-1)*co(i)/xbend1/twopi)**(1.0_dp/(i+0.0_dp))*xl
-       !              endif
+           ar=i-1
+       gf(i)= (co(i-1)/xbend1)**(1.d0/ar)*abs(rhoi)*xl 
+       if(gf(i)<gg) gf(i)=gg
     enddo
+    
     gf(2)=gf(3)
     gf(4)=gf(5)*3
     gf(6)=gf(7)*7
+    
 
     met=2
 
@@ -3459,8 +3457,94 @@ endif
     if(gf(6)<gf(4).and.gf(6)<gf(2)) met=6
     if(radiation_bend_split) met=2
     if(sixtrack_compatible) met=2
+    
 
   end SUBROUTINE  check_bend
+! routine which computed check_bends co(i)
+!call init(15,2,2,0,.true.)
+!call alloc(h1,h2,h)
+!call alloc(id,idh,idi)
+!call alloc(onel)
+!call alloc(dl,del,bb,t1,t2)
+!del=1.d0.mono.3
+!dl=1.d0.mono.6
+!bb=1.d0.mono.5
+!id=1
+!t1=(-(1.d0+bb*id%v(1))*sqrt((1.d0+del)**2-id%v(2)**2)+del)*dl
+!t2=+bb*(id%v(1)+id%v(1)**2/2.d0*bb)*dl
+!nn=1
+!h%h=t1+t2
+
+!h1%h=t1/2.d0
+!h2%h=t2
+!idi=exp(h1,id)
+!idi=exp(h2,idi)
+!idi=exp(h1,idi)
+!onel=idi
+!
+!idh=exp(h,id)
+!
+!idi%v(nn)=idi%v(nn)-idh%v(nn)
+!call print(idi%v(nn),6)
+!pause 1
+!
+!h%h=t1+t2
+!id=1
+!h1%h=fd1*t1
+!idi=exp(h1,id) 
+!h2%h=fk1*t2
+!idi=exp(h2,idi) 
+!h1%h=fd2*t1    
+!idi=exp(h1,idi) 
+!h2%h=fk2*t2 
+!idi=exp(h2,idi) 
+! 
+!h1%h=fd2*t1    
+!idi=exp(h1,idi) 
+!h2%h=fk1*t2
+!idi=exp(h2,idi) 
+!h1%h=fd1*t1
+!idi=exp(h1,idi) 
+!onel=idi 
+! 
+!idh=exp(h,id)
+
+!idi%v(nn)=idi%v(nn)-idh%v(nn)
+!call print(idi%v(nn),6)
+!pause 2
+!h%h=t1+t2
+!id=1
+!
+!call MAKE_YOSHIDA
+!
+!       DO i=4,2,-1
+!        h1%h=YOSD(I)*t1
+!       if(i==4) then
+!        idi=exp(h1,id) 
+!       else
+!        idi=exp(h1,idi) 
+!       endif
+!       h2%h=YOSK(I)*t2
+!       idi=exp(h2,idi) 
+!       ENDDO
+!        h1%h=YOSD(1)*t1
+!       idi=exp(h1,idi) 
+!       h2%h=YOSK(1)*t2
+!       idi=exp(h2,idi) 
+!        h1%h=YOSD(1)*t1
+!       idi=exp(h1,idi) 
+!       DO i=2,4
+!       h2%h=YOSK(I)*t2
+!       idi=exp(h2,idi) 
+!        h1%h=YOSD(I)*t1
+!        idi=exp(h1,idi) 
+!       ENDDO
+!onel=idi 
+! 
+!idh=exp(h,id)
+!
+!idi%v(nn)=idi%v(nn)-idh%v(nn)
+!call print(idi%v(nn),6)
 
   SUBROUTINE  THIN_LENS_restart(R,fib,useknob,universe) ! A re-splitting routine
     IMPLICIT NONE

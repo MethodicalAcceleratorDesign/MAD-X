@@ -24,6 +24,209 @@ module S_fitting_new
 
 contains
 
+subroutine find_time_patch(kekb,my_default,ee,kf,kb)
+implicit none
+type(layout), pointer :: kekb
+real(dp) ee,closed_orbit(6)
+integer, optional :: kf,kb
+integer kc,ke,i
+type(internal_state) my_default,state
+type(fibre), pointer :: f
+
+
+ke=0
+kc=0
+f=> kekb%start
+do i=1,kekb%n
+ f%patch%time=0
+ f%patch%a_t=0
+ f%patch%b_t=0
+f=>f%next
+enddo
+
+
+state=(my_default+nocavity0)-radiation0-spin0-time0
+closed_orbit=0.d0
+call propagate(kekb,closed_orbit,state,fibre1=1)
+closed_orbit(6)=0.d0
+
+
+
+f=> kekb%start
+do i=1,kekb%n
+
+call propagate(kekb,closed_orbit,state,fibre1=i,fibre2=i+1)
+
+if(abs(closed_orbit(6))>ee.or.f%next%mag%kind==kind4.or.f%mag%kind==kind4) then
+ if(f%next%mag%kind==kind4) then
+  f%next%patch%time=1
+  f%next%patch%A_T=closed_orbit(6)
+ kc=kc+1
+ elseif(f%mag%kind==kind4) then
+  f%patch%time=3
+  f%patch%B_T=closed_orbit(6)
+  ke=ke+1
+ closed_orbit(6)=0.d0
+ else
+  f%patch%time=2
+  f%patch%B_T=closed_orbit(6)
+  ke=ke+1
+  closed_orbit(6)=0.d0
+ endif
+
+endif
+ 
+
+f=>f%next
+enddo
+
+f=> kekb%end
+  f%patch%time=2
+  f%patch%B_T=closed_orbit(6)
+  ke=ke+1
+  closed_orbit(6)=0.d0
+
+
+if(present(kb)) kb=ke
+if(present(kf)) kf=kc
+
+end subroutine find_time_patch
+
+  subroutine compute_linear_one_magnet_maps(f,state,del)
+    implicit none
+    TYPE(fibre), pointer, intent(inout):: f
+    TYPE(layout), pointer :: als
+    type(internal_state) state
+    integer i,no
+    logical rad
+    real(dp), optional :: del
+    real(dp) closed(6),m(6,6) 
+    type(c_damap) c_map,d_map,id_s
+    type(probe) xs0
+    type(probe_8) xs
+    TYPE(fibre), pointer :: f1
+    rad=state%radiation
+    closed=0.d0
+    no=1
+    als=>f%parent_layout
+
+    if(present(del)) closed(5+ndpt_bmad)=del
+    call find_orbit_x(CLOSED,STATE,1.e-8_dp,fibre1=f)       
+    call init_all(STATE,no,0)
+call alloc(c_map,d_map)
+call alloc(id_s)
+ 
+   m=0.0_dp
+ 
+!!!! Polymorphic probe is created in the usual manner 
+
+
+
+
+
+! Copy probe_8 into a complex damap 
+
+
+f1=>f
+do i=1,als%n
+   XS0=CLOSED    
+   ID_S=1        
+   XS=XS0+ID_S 
+f1%i%fix0=xs%x
+ CALL propagate(XS,STATE,FIBRE1=f1,fibre2=f1%next)
+f1%i%fix=xs%x
+d_map=xs
+f1%i%m=d_map
+CLOSED=xs%x
+
+f1=>f1%next
+
+enddo
+
+
+
+call kill(c_map,d_map)
+call kill(id_s)
+
+end subroutine compute_linear_one_magnet_maps
+
+  subroutine compute_linear_one_turn_maps(f,state,del)
+    implicit none
+    TYPE(fibre), pointer, intent(inout):: f
+    TYPE(layout), pointer :: als
+    type(internal_state) state
+    integer i,no
+    logical rad
+    real(dp), optional :: del
+    real(dp) closed(6),m(6,6),s(6,6)
+    type(c_normal_form) c_n
+    type(c_damap) c_map,d_map,id_s
+    type(probe) xs0
+    type(probe_8) xs
+    TYPE(fibre), pointer :: f1
+    rad=state%radiation
+    closed=0.d0
+    no=1
+    als=>f%parent_layout
+
+    if(present(del)) closed(5+ndpt_bmad)=del
+    call find_orbit_x(CLOSED,STATE,1.e-8_dp,fibre1=f)    
+    call init_all(STATE,no,0)
+call alloc(c_map,d_map)
+call alloc(c_n)
+call alloc(id_s)
+   s=0.0_dp
+   m=0.0_dp
+do i=1,3
+ S(2*i-1,2*i) = 1.d0; S(2*i,2*i-1) = -1.d0;
+enddo
+!!!! Polymorphic probe is created in the usual manner 
+   XS0=CLOSED    
+   ID_S=1        
+   XS=XS0+ID_S 
+
+!!!! get spin polymorphic probe after one turn   
+CALL propagate(XS,STATE,FIBRE1=f)  ! (4)
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+
+! Copy probe_8 into a complex damap 
+c_map=XS ! (5)
+m=c_map
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+ 
+!call c_normal(c_map,c_n,dospin=state%spin)  ! (6)
+! write(6,'(4(1x,g21.14))') c_n%tune(1:3), c_n%spin_tune
+f%i%m=m
+f%i%fix0=xs%x
+
+   XS0=CLOSED    
+   ID_S=1        
+   XS=XS0+ID_S 
+
+f1=>f
+do i=1,als%n
+ 
+ CALL propagate(XS,STATE,FIBRE1=f1,fibre2=f1%next)
+f1=>f1%next
+d_map=xs
+f1%i%fix0=xs%x
+if(.not.state%radiation) then
+f1%i%m=d_map
+f1%i%m=matmul(f1%i%m, matmul(m,matmul(S,matmul(transpose(f1%i%m),transpose(S)))))
+else
+f1%i%m=d_map*c_map*d_map**(-1)
+endif
+
+enddo
+
+
+
+call kill(c_map,d_map)
+call kill(c_n)
+call kill(id_s)
+
+end subroutine compute_linear_one_turn_maps
+
   subroutine special_alex_main_ring(r,n_name,targ,sc)
     implicit none
     TYPE(layout), target, intent(inout):: R

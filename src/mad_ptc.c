@@ -286,7 +286,7 @@ pro_ptc_twiss(void)
   char *filename = NULL, *summary_filename = NULL; /* for summary table */
   int j,l ,pos, w_file,beta_def;
   int w_file_summary; /* toggle to write the summary table into a file */
-  /*struct table* nonlin_table = 0;*/
+  struct table* nonlin_table = 0;
   
   
   /*
@@ -385,16 +385,16 @@ pro_ptc_twiss(void)
   ptc_deltap = get_value(current_command->name,"deltap");
   adjust_probe(ptc_deltap); /* sets correct gamma, beta, etc. */
   adjust_rfc(); /* sets freq in rf-cavities from probe */
+  
+  nonlin_table = make_table("nonlin", "nonlin", nonlin_table_cols,
+                           nonlin_table_types, current_sequ->n_nodes);
+  /*nonlin_table->dynamic = 1;*/
+  add_to_table_list(nonlin_table, table_register);
+
   l = strlen(table_name);
   tarr = new_int_array(l+1);
   conv_char(table_name, tarr);
-/*   
-  nonlin_table = make_table("nonlin", "nonlin", nonlin_table_cols,
-                           nonlin_table_types, current_sequ->n_nodes);
-  nonlin_table->dynamic = 1;
-  add_to_table_list(nonlin_table, table_register);
-*/
-  
+
   twiss_table = make_table(table_name, "twiss", twiss_table_cols,
                            twiss_table_types, current_sequ->n_nodes);
 
@@ -608,7 +608,7 @@ select_ptc_normal(struct in_cmd* cmd)
         myn2 = (int)order[2];
         min_req_order = mynorder;
         res_index_(&skew, &mynorder, &myn1, &myn2, &indexa[0][0], &mynres);
-	if (mynres > 0)
+        if (mynres > 0)
         {
           if (j == 10)
           {
@@ -673,6 +673,7 @@ select_ptc_normal(struct in_cmd* cmd)
               double_to_table_curr("normal_results", "order4", &n4);
               augment_count("normal_results");
             }
+            
             string_to_table_curr("normal_results", "name", "gnfu");
             double_to_table_curr("normal_results", "order1", &order[0]);
             double_to_table_curr("normal_results", "order2", &order[1]);

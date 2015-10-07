@@ -724,6 +724,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   use twtrrfi
   use twiss0fi
   use name_lenfi
+  use warncolim
   implicit none
 
   !----------------------------------------------------------------------*
@@ -799,11 +800,14 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
 
 
   !---- 2015-Mar-19  09:07:37  ghislain: 
-  if(code.eq.20) then 
+  if(code.eq.20 .and. warnede.eq.0) then 
      call aawarn('trrun: found deprecated ECOLLIMATOR element;',' should be replaced by COLLIMATOR')
+     warnede = 1
   endif
-  if(code.eq.21) then 
+  
+  if(code.eq.21 .and. warnedr.eq.0) then 
      call aawarn('trrun: found deprecated RCOLLIMATOR element;',' should be replaced by COLLIMATOR')
+     warnedr = 1
   endif
      
 
@@ -3415,18 +3419,29 @@ subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
   ex = get_value('probe ','ex ')
   ey = get_value('probe ','ey ')
   et = get_value('probe ','et ')
+  
+!  print*, " "
+!  write(6,'(a16,1x,5ES8.1)') "EMITTANCES ",ex,ey,et, &
+!                           get_value('probe ','sigt '), get_value('probe ','sige ')
+  
   bet0  = get_value('beam ','beta ')
   bet0i = 1d0 / bet0
   !-----get x add-on for lyaponuv calculation from dynap table
   deltax = get_value('dynap ', 'lyapunov ')
 1 continue
   jt  =  next_start(x,px,y,py,t,deltae,fx,phix,fy,phiy,ft,phit)
+  
   if (switch.gt.1) then
      j = 2*jt-1
   else
      j = jt
   endif
   if (j .ne. -1 .and. j.ne.0)  then
+
+!     print*, "SWITCH ", switch
+!     write(6,'(a16,1x,6ES8.1)') "trinicmd can",x,px,y,py,t,deltae
+!     write(6,'(a16,1x,6ES8.1)') "trinicmd fxs",fx,phix,fy,phiy,ft,phit
+  
      if (switch .lt. 3 .or. j .eq. 1)  then
         jend = j
         if (switch.gt.1) jend=jend+1
@@ -3463,13 +3478,22 @@ subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
         zgiv = .false.
         zngiv = .false.
         do k = 1, 6
-           if (itype(k) .ne. 0) zgiv = .true.
-           if (itype(k+6) .ne. 0) zngiv = .true.
+           if (itype(k) .ne. 0) then
+             zgiv = .true.
+           endif
+           
+           if (itype(k+6) .ne. 0) then 
+             zngiv = .true.
+           endif  
+           
            zstart(k) = track(k)                                        &
                 + sqrt(ex) * (eigen(k,1) * zn(1) + eigen(k,2) * zn(2))            &
                 + sqrt(ey) * (eigen(k,3) * zn(3) + eigen(k,4) * zn(4))            &
                 + sqrt(et) * (eigen(k,5) * zn(5) + eigen(k,6) * zn(6))
         enddo
+
+        !write(6,'(a8,1x,i3,6(1x,ES8.1),a4,6(1x,ES8.1))') "zstart ",j, zstart(1:6), " zn ",zn(1:6) 
+
         if (switch .gt. 1)  then
            !--- keep initial coordinates for dynap
            do k = 1, 6

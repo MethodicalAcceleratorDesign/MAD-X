@@ -2800,7 +2800,7 @@ call kill(e)
     type(probe), INTENT(INOUT) :: xs
     TYPE(INTERNAL_STATE) K
     REAL(DP) FAC,DS
-    logical(lp) bmad
+!    logical(lp) bmad
     IF(.NOT.CHECK_STABLE) then
        CALL RESET_APERTURE_FLAG
     endif
@@ -2815,8 +2815,8 @@ call kill(e)
     C%PARENT_FIBRE%MAG%P%CHARGE=>C%PARENT_FIBRE%CHARGE
     !      ag=xs%s%g
     !      if(associated(c%bb)) call BBKICK(c%BB,XS%X)
-    bmad=use_bmad_units.and.(c%cas/=casep1.and.c%cas/=casep2)
-    if(bmad) then 
+!    bmad=use_bmad_units.and.(c%cas/=casep1.and.c%cas/=casep2)
+    if(use_bmad_units) then 
       call convert_bmad_to_ptc(xs,C%PARENT_FIBRE%beta0,k%time)
     endif
 
@@ -2844,15 +2844,15 @@ call kill(e)
        IF(c%cas==caseP1) THEN
           CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
           if(k%spin) then
-               If(use_bmad_units) call convert_bmad_to_ptc(xs,C%PARENT_FIBRE%beta0,k%time)
+!               If(use_bmad_units) call convert_bmad_to_ptc(xs,C%PARENT_FIBRE%beta0,k%time)
                  CALL TRACK_SPIN_FRONT(C%PARENT_FIBRE,XS)
-               If(use_bmad_units) call convert_ptc_to_bmad(xs,C%PARENT_FIBRE%beta0,k%time)
+!               If(use_bmad_units) call convert_ptc_to_bmad(xs,C%PARENT_FIBRE%beta0,k%time)
           endif
        ELSE
           if(k%spin) then
-               If(use_bmad_units) call convert_bmad_to_ptc(xs,C%PARENT_FIBRE%beta0,k%time)
+!               If(use_bmad_units) call convert_bmad_to_ptc(xs,C%PARENT_FIBRE%beta0,k%time)
                  CALL TRACK_SPIN_BACK(C%PARENT_FIBRE,XS)
-               If(use_bmad_units) call convert_ptc_to_bmad(xs,C%PARENT_FIBRE%beta0,k%time)
+!               If(use_bmad_units) call convert_ptc_to_bmad(xs,C%PARENT_FIBRE%beta0,k%time)
            endif
           CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
      ENDIF
@@ -2864,7 +2864,7 @@ call kill(e)
   !  IF((K%MODULATION.or.ramp).and.c%parent_fibre%mag%slow_ac) THEN  !modulate
   !     CALL restore_ANBN_SINGLE(C%PARENT_FIBRE%MAG,C%PARENT_FIBRE%MAGP)
   !  ENDIF  !modulate
-    if(bmad) then 
+    if(use_bmad_units) then 
       call convert_ptc_to_bmad(xs,C%PARENT_FIBRE%beta0,k%time)
     endif
     xs%u=.not.check_stable
@@ -2885,7 +2885,7 @@ call kill(e)
     logical(lp) CHECK_KNOB
     integer(2), pointer,dimension(:)::AN,BN
     integer ki
-    logical(lp) bmad
+!    logical(lp) bmad
     !   if(xs%u) return
 
     IF(.NOT.CHECK_STABLE) then
@@ -2900,8 +2900,8 @@ call kill(e)
     C%PARENT_FIBRE%MAGP%P%ag => C%PARENT_FIBRE%ag
     C%PARENT_FIBRE%MAGp%P%CHARGE=>C%PARENT_FIBRE%CHARGE
     !      ag=xs%s%g
-    bmad=use_bmad_units.and.(c%cas/=casep1.and.c%cas/=casep2)
-    if(bmad) then 
+ !   bmad=use_bmad_units.and.(c%cas/=casep1.and.c%cas/=casep2)
+    if(use_bmad_units) then 
       call convert_bmad_to_ptc(xs,C%PARENT_FIBRE%beta0,k%time)
     endif
 
@@ -2940,15 +2940,15 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        IF(c%cas==caseP1) THEN
           CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
           if(k%spin) then
-               If(use_bmad_units) call convert_bmad_to_ptc(xs,C%PARENT_FIBRE%beta0,k%time)
+ !              If(use_bmad_units) call convert_bmad_to_ptc(xs,C%PARENT_FIBRE%beta0,k%time)
                  CALL TRACK_SPIN_FRONT(C%PARENT_FIBRE,XS)
-               If(use_bmad_units) call convert_ptc_to_bmad(xs,C%PARENT_FIBRE%beta0,k%time)
+!               If(use_bmad_units) call convert_ptc_to_bmad(xs,C%PARENT_FIBRE%beta0,k%time)
           endif
        ELSE
           if(k%spin) then
-               If(use_bmad_units) call convert_bmad_to_ptc(xs,C%PARENT_FIBRE%beta0,k%time)
+   !            If(use_bmad_units) call convert_bmad_to_ptc(xs,C%PARENT_FIBRE%beta0,k%time)
                  CALL TRACK_SPIN_BACK(C%PARENT_FIBRE,XS)
-               If(use_bmad_units) call convert_ptc_to_bmad(xs,C%PARENT_FIBRE%beta0,k%time)
+  !             If(use_bmad_units) call convert_ptc_to_bmad(xs,C%PARENT_FIBRE%beta0,k%time)
            endif
           CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
      ENDIF
@@ -2970,7 +2970,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     call kill(ds)
 
 
-    if(bmad) then 
+    if(use_bmad_units) then 
       call convert_ptc_to_bmad(xs,C%PARENT_FIBRE%beta0,k%time)
     endif
 
@@ -4062,227 +4062,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
 
   END SUBROUTINE FIND_ORBIT_LAYOUT_noda
 
-  SUBROUTINE FIND_ORBIT_LAYOUT_noda_bmad(RING,FIX,STATE,eps,TURNS,fibre1,node1) ! Finds orbit without TPSA in State or compatible state
-    IMPLICIT NONE
-    TYPE(layout),target,INTENT(INOUT):: RING
-    real(dp) , intent(inOUT) :: FIX(6)
-    INTEGER , optional,intent(in) :: TURNS,node1,fibre1
-    real(dp)  eps
-    TYPE(INTERNAL_STATE),optional, intent(in) :: STATE
-    TYPE(INTERNAL_STATE) stat
-
-    real(dp)  DIX(6),xdix,xdix0,tiny,freq
-    real(dp) X(6),Y(6),MX(6,6),sxi(6,6),SX(6,6)
-    integer NO1,ND2,I,IU,ITE,ier,j,ITEM
-    TYPE (fibre), POINTER :: C
-    TYPE (integration_node), POINTER :: t
-    logical(lp) APERTURE
-    INTEGER TURNS0,trackflag
-
-    !    fixed_found=my_true
-    !!    type(probe) xs
-    if(.not.associated(RING%t)) call MAKE_NODE_LAYOUT(ring)
-    !!    xs%x=zero
-    !!    xs%s%x=zero
-
-    TURNS0=1
-    trackflag=0
-    IF(PRESENT(TURNS)) TURNS0=TURNS
- 
-    APERTURE=c_%APERTURE_FLAG
-    c_%APERTURE_FLAG=.false.
-
-    !!    call move_to(ring,c,loc)
-    !!    loct=c%t1%pos
-
-
-    Nullify(C);
-
-    if(.not.ring%closed) then
-       w_p=0
-       w_p%nc=1
-       w_p%fc='((1X,a72))'
-       w_p%c(1)=" This line is not ring : FIND_ORBIT_LAYOUT_noda "
-       ! call !write_e(100)
-    endif
-    dix(:)=0.0_dp
-    tiny=1e-40_dp
-    xdix0=1e4_dp*DEPS_tracking
-    NO1=1
-
-    if(.not.present(STATE)) then
-       IF(default%NOCAVITY) THEN
-          !    ND1=2
-          stat=default+    only_4d
-       ELSE
-          !   ND1=3
-          STAT=default
-          C=>RING%START
-          do i=1,RING%n
-             if(C%magp%kind==kind4.OR.C%magp%kind==kind21) goto 101
-             C=>C%NEXT
-          enddo
-          
-          messagelost= " No Cavity in the Line "
-          check_stable=.false.
-          return
- 
-       ENDIF
-    else   ! (.not.present(STATE)) t
-       IF(STATE%NOCAVITY) THEN
-          ND2=4
-          STAT=STATE+only_4d0
-          if(state%radiation) then
-             check_stable=.false.
-
-             messagelost= " Cavity needed when radiation present "
-             return
-          endif
-       ELSE
-          ND2=6
-          STAT=STATE
-          C=>RING%START
-          do i=1,RING%n
-             if(C%magp%kind==kind4.OR.C%magp%kind==kind21) goto 101
-             C=>C%NEXT
-          enddo
-          check_stable=.false.
-          messagelost= " State present; no cavity: FIND_ORBIT_LAYOUT will crash => exiting"
-         return
-
-       ENDIF
-    endif
-101 continue
-
-
-
-
-
-    ITEM=0
-3   continue
-    ITEM=ITEM+1
-    X=FIX
-
-    DO I=1,TURNS0
-       !       CALL TRACK(RING,X,LOC,STAT)
-       !       trackflag=TRACK_flag(RING,X,LOC,STAT)
-       !!       xs%x=x
-       call TRACK_probe_X(Ring,x,stat,fibre1=fibre1,node1=node1)
-       if(.not.check_stable) then
-          messagelost(len_trim(messagelost)+1:255)=" -> Unstable tracking guessed orbit "
-          c_%APERTURE_FLAG=APERTURE
-          return
-       endif
-       !     write(6,*) item,check_stable
-       !!       call TRACK_PROBE(Ring,xs,loct,loct+ring%t%n,stat)
-       !!       x=xs%x
-       !       if(trackflag/=0) then
-       !         ITEM=MAX_FIND_ITER+100
-       !       endif
-
-    ENDDO
- 
-
-    mx=0.0_dp
-    DO J=1,ND2
-       Y=FIX
-       Y(J)=FIX(J)+EPS
-       DO I=1,TURNS0
-          !          CALL TRACK(RING,Y,LOC,STAT)
-          !!       xs%x=y
-          call TRACK_probe_X(Ring,Y,stat,fibre1=fibre1,node1=node1)
-          if(.not.check_stable) then
-             messagelost(len_trim(messagelost)+1:255)=" -> Unstable while tracking small rays around the guessed orbit "
-             !   fixed_found=my_false
-             c_%APERTURE_FLAG=APERTURE
-             return
-          endif
-          !!       call TRACK_PROBE(Ring,xs,loct,loct+ring%t%n,stat)
-          !!       y=xs%x
-          !          if(.not.check_stable) then
-          !             w_p=0
-          !             w_p%nc=1
-          !             w_p%fc='((1X,a72))'
-          !             write(w_p%c(1),'(a30,i4)') " Lost in Fixed Point Searcher ",3
-          !             ! call ! WRITE_I
-
-          !             return
-          !          endif
-       ENDDO
- 
-
-       do i=1,ND2
-          MX(I,J)=(Y(i)-X(i))/eps
-       enddo
-
-    ENDDO
-
-    SX=MX;
-    DO I=1,nd2   !  6 before
-       SX(I,I)=MX(I,I)-1.0_dp
-    ENDDO
-
-    DO I=1,ND2
-       DIX(I)=FIX(I)-X(I)
-    enddo
-
-    CALL matinv(SX,SXI,ND2,6,ier)
-    IF(IER==132)  then
-       messagelost= " Inversion failed in FIND_ORBIT_LAYOUT_noda"
-        check_stable=.false.
-       return
-    endif
-
-    x=0.0_dp
-    do i=1,nd2
-       do j=1,nd2
-          x(i)=sxi(i,j)*dix(j)+x(i)
-       enddo
-    enddo
-    dix=x
-    DO  I=1,ND2
-       FIX(I)=FIX(I)+DIX(I)
-    ENDDO
-
-    xdix=0.0_dp
-    do iu=1,ND2
-       xdix=abs(dix(iu))+xdix
-    enddo
-    !    write(6,*) " Convergence Factor = ",nd2,xdix,deps_tracking
-    !    pause 123321
-  !  if(verbose) write(6,*) " Convergence Factor = ",xdix
-    if(xdix.gt.deps_tracking) then
-       ite=1
-    else
-       if(xdix.ge.xdix0.or.xdix<=tiny) then
-          ite=0
-       else
-          ite=1
-          xdix0=xdix
-       endif
-    endif
-
-    if(iteM>=MAX_FIND_ITER)  then
-       !   C_%stable_da=.FALSE.
-       !      IF(iteM==MAX_FIND_ITER+100) THEN
-       !        write(6,*) " Unstable in find_orbit without TPSA"
-       messagelost= "Maximum number of iterations in find_orbit without TPSA"
-       xlost=fix
-       check_stable=my_false
-       !     ENDIF
-       ITE=0
-    endif
-    !   write(6,*) item,xdix,xdix0,tiny
-
-    if(ite.eq.1)  then
-       GOTO 3
-
-    endif
-
- 
-    c_%APERTURE_FLAG=APERTURE
-
-  END SUBROUTINE FIND_ORBIT_LAYOUT_noda_bmad
+  
 
 
 
