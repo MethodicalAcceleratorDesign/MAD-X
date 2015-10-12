@@ -9,7 +9,7 @@
 \chapter{Twiss Module}
 \label{chap:twiss}
 
-The {\tt TWISS} command calculates the
+The \texttt{TWISS} command calculates the
 \hyperref[subsec:tables-linear]{linear lattice
   functions} \cite{Courant-Snyder1958}, and optionally the
 \hyperref[subsec:tables-chrom]{chromatic functions}. 
@@ -24,40 +24,42 @@ TWISS, \=SEQUENCE=seqname, LINE=linename, RANGE=range,  \\
        \>CENTRE=logical, TOLERANCE=real, \\
        \>FILE=filename, \\
        \>TABLE=tabname, NOTABLE=logical,\\
-       \>RMATRIX=logical, \\
-       \>SECTORMAP=logical, SECTORTABLE=tabname, SECTORFILE=filename,\\
+       \>RMATRIX=logical, SECTORMAP=logical, \\
+       \>SECTORTABLE=tabname, SECTORFILE=filename,\\
        \>KEEPORBIT=name, USEORBIT=name,\\
        \>COUPLE=logical,\\
        \>RIPKEN=logical;
 }
 
-The  attributes of the {\tt TWISS} command are: 
+The  attributes of the \texttt{TWISS} command are: 
 \begin{madlist}
   \ttitem{SEQUENCE} the name of a valid sequence for
   which the calculation of optical functions should be performed. \\ 
-  {\tt SEQUENCE} and {\tt LINE} are mutually exclusive.\\
-  (Default: sequence or beam line defined in the latest USE command)
+  \texttt{SEQUENCE} and \texttt{LINE} are mutually exclusive.\\
+  (Default: sequence or beam line defined in the latest \texttt{USE}
+  command) 
 
   \ttitem{LINE} the name of a valid beamline for which
   the calculation of optical functions should be performed. \\
-  {\tt SEQUENCE} and {\tt LINE} are mutually exclusive.\\
-  (Default: sequence or beam line defined in the latest USE command)
+  \texttt{SEQUENCE} and \texttt{LINE} are mutually exclusive.\\
+  (Default: sequence or beam line defined in the latest \texttt{USE}
+  command) 
   
-  \ttitem{RANGE} (Default: {\tt \#S/\#E})\\
-  The {\tt TWISS} calculation is restricted to the specified range.
-  See \href{../Introduction/ranges.html#range}{RANGE}.  
+  \ttitem{RANGE} (Default: \texttt{\#S/\#E})\\
+  The \texttt{TWISS} calculation is restricted to the specified range.
+  See \hyperref[sec:range]{\texttt{RANGE}}.  
 
-  \ttitem{DELTAP}={\tt real\{,real\}} or {\tt initial:final:step}
+  \ttitem{DELTAP}=\texttt{real\{,real\}} or \texttt{initial:final:step}
   (Default: 0.0)\\ 
-  The relative energy error {\tt DELTAP} may be entered in one of the
+  The relative energy error \texttt{DELTAP} may be entered in one of the
   two forms above. \\ 
   The first form lists several numbers, which may be general expressions,
   separated by commas. The second form specifies an initial value, a final
   value, and a step, which must be constant expressions, separated by
   colons. \\
-  For example, {\tt DELTAP=0.001} defines a single value, 
-  {\tt DELTAP=0.001,0.005} define two values and 
-  {\tt DELTAP=0.001:0.007:0.002} define four values. 
+  For example, \texttt{DELTAP=0.001} defines a single value, 
+  \texttt{DELTAP=0.001,0.005} defines two values and 
+  \texttt{DELTAP=0.001:0.007:0.002} defines four values. 
 
 
   \ttitem{CHROM} a logical flag to trigger computation of the
@@ -68,10 +70,10 @@ The  attributes of the {\tt TWISS} command are:
   \textit{Please note that this option also changes the way that the
     chromaticities are calculated: The chromaticities are normally
     calculated from the analysis of the first and second order
-    matrices. With {\tt CHROM}, the chromaticities are recalculated by
+    matrices. With \texttt{CHROM}, the chromaticities are recalculated by
     explicitely calculating the tunes for the case of the specified momentum
-    deviation {\tt DELTAP} and for the case of a momentum deviation equal
-    to {\tt DELTAP}+1.e-6. The tune differences divided by 1.e-6 yield the
+    deviation \texttt{DELTAP} and for the case of a momentum deviation equal
+    to \texttt{DELTAP}+1.e-6. The tune differences divided by 1.e-6 yield the
     chromaticities.}
 
   \ttitem{CENTRE} a logical flag to enforce the calculation of the
@@ -85,16 +87,16 @@ The  attributes of the {\tt TWISS} command are:
 
   \ttitem{TOLERANCE} the maximum closed orbit error, for all six orbit 
   components, that can be tolerated during the closed orbit search. 
-  The value given in the {\tt TWISS} command is only valid for the current 
+  The value given in the \texttt{TWISS} command is only valid for the current 
   calculation; 
-  the \hyperref[sec:coguess]{\tt COGUESS} command allows to 
+  the \hyperref[sec:coguess]{\texttt{COGUESS}} command allows to 
   change the default value for all subsequent closed orbit search calculations. 
   \\ (Default: 1.e-6)
 
   \ttitem{FILE} causes \madx to write a \hyperref[chap:tfs]{TFS Twiss table} 
   to the file specified. (Default: ``twiss'') \\
-  The columns of the table can be selected using the {\tt SELECT}
-  command with the {\tt FLAG=twiss} attribute. 
+  The columns of the table can be selected using the \texttt{SELECT}
+  command with the \texttt{FLAG=twiss} attribute. 
 
   \ttitem{TABLE} the name of the table where 
   \hyperref[subsec:tables-linear]{linear lattice functions} as well 
@@ -102,17 +104,13 @@ The  attributes of the {\tt TWISS} command are:
   (Default: ``twiss'') \\
 %  \madx creates a full
 %  \hyperref[subsec:tables-linear]{Twiss table} in
-%  memory and gives it the name {\tt TWISS}, unless {\tt TABLE=tabname}
+%  memory and gives it the name \texttt{TWISS}, unless \texttt{TABLE=tabname}
 %  is given, then it is called "tabname". This table
 %  includes linear lattice functions as well as the chromatic
 %  functions for all positions.\\
-  %An important new feature of \madx
-  %is the possibility to access entries of tables and in
-  %particular the twiss table (see
-  %href{../Introduction/expression.html#table}{table access}).\\
-  {\bf Note:} If the {\tt TABLE} option is given the selection of column 
-  names via the {\tt SELECT} command is ignored. Hence if both {\tt TABLE} and
-  {\tt FILE} options are given, the table written to file is the full
+  \textbf{Note:} If the \texttt{TABLE} option is given the selection of column 
+  names via the \texttt{SELECT} command is ignored. Hence if both \texttt{TABLE} and
+  \texttt{FILE} options are given, the table written to file is the full
   twiss table, containing all elements as rows and all known Twiss 
   parameters as columns. 
 
@@ -124,24 +122,24 @@ The  attributes of the {\tt TWISS} command are:
   \ttitem{RMATRIX} If this flag is used the the one-turn map at the
   location of every element is calculated and prepared for
   storage in the twiss table. Using the
-  \hyperref[sec:select]{\tt SELECT} command and using
-  the column {\tt RE, RE11 \ldots RE16 \ldots RE61 \ldots RE66} these
-  components will be added to the twiss table, i.e. with {\tt "COLUMN, RE"} and
-  {\tt "COLUMN, REij"} one gets all or the component "ij" respectively.    
+  \hyperref[sec:select]{\texttt{SELECT}} command and using
+  the column \texttt{RE, RE11 \ldots RE16 \ldots RE61 \ldots RE66} these
+  components will be added to the twiss table, i.e. with \texttt{"COLUMN, RE"} and
+  \texttt{"COLUMN, REij"} one gets all or the component "ij" respectively.    
 
   \ttitem{SECTORMAP} a logical flag to initiate the calculation of a 
   \hyperref[sec:sectormap]{sector map}.
   
-  \ttitem{SECTORTABLE} the name of the table containing the {\tt SECTORMAP}
+  \ttitem{SECTORTABLE} the name of the table containing the \texttt{SECTORMAP}
   values. The elements (lines) and parameters (columns) 
-  of the table can be tailored using the \hyperref[sec:select]{\tt SELECT} 
-  command as specified in \hyperref[sec:sectormap]{\tt SECTORMAP} \\
+  of the table can be tailored using the \hyperref[sec:select]{\texttt{SELECT}} 
+  command as specified in \hyperref[sec:sectormap]{\texttt{SECTORMAP}} \\
   (Default: sectortable)
 
-  \ttitem{SECTORFILE} the name of the file to which the {\tt SECTORMAP} is
+  \ttitem{SECTORFILE} the name of the file to which the \texttt{SECTORMAP} is
   written. 
   The format of the output can be adjusted as specified in 
-  \hyperref[sec:sectormap]{\tt SECTORMAP} \\
+  \hyperref[sec:sectormap]{\texttt{SECTORMAP}} \\
   (Default: "sectormap")
   %% Used to write SECTORMAPs to the file
   %% SECTORFILE="filename", if missing the output of SECTORMAP
@@ -163,7 +161,7 @@ The  attributes of the {\tt TWISS} command are:
   sense of Edwards and Teng \cite{edwards1973}. 
   For the uncoupled cases they reduce to the C and S functions.    
   
-  \textit{ Twiss calculation is 4D only!} : The {\tt TWISS}
+  \textit{ Twiss calculation is 4D only!} : The \texttt{TWISS}
   command calculates an approximate 6D closed orbit when the
   accelerator structure includes an active
   \hyperref[sec:rfcavity]{cavity}. However, the
@@ -174,26 +172,26 @@ The  attributes of the {\tt TWISS} command are:
   \hyperref[chap:ptc-twiss]{PTC\_TWISS} command.    
 
   \ttitem{RIPKEN} This flag calculates the Ripken-Mais Twiss
-  parameters ({\tt beta11, beta12, beta21, beta22, alfa11, alfa12,
-  alfa21, alfa22, gamma11, gamma12, gamma21} and {\tt gamma22}) using
-  {\tt betx, bety, alfx, alfy, gamax, gamay, R11, R12, R21} and {\tt R22} as
-  input.  
+  parameters (\texttt{beta11, beta12, beta21, beta22, alfa11, alfa12,
+  alfa21, alfa22, gamma11, gamma12, gamma21} and \texttt{gamma22}) using
+  the parameters \texttt{betx, bety, alfx, alfy, \\ gamax, gamay, R11, R12,
+    R21} and \texttt{R22} as input.  
 
 \end{madlist}
 
-The tables are suitable for \hyperref[chap:plot]{\tt PLOT}.
+The tables are suitable for \hyperref[chap:plot]{\texttt{PLOT}}.
 
-After a successful {\tt TWISS} run \madx creates a 
+After a successful \texttt{TWISS} run \madx creates a 
 table of summary parameters named "SUMM" which includes tunes,
-chromaticities, etc. versus the selected values of {\tt DELTAP}.
-Please note that the {\tt CHROM} attribute is needed
+chromaticities, etc. versus the selected values of \texttt{DELTAP}.
+Please note that the \texttt{CHROM} attribute is needed
 for a proper calculation of the chromaticities in the presence of
 coupling!
 
-Notice also that in \madx, {\tt DELTAP} is converted to {\tt PT}, which is used 
-as longitudinal variable. 
+Notice also that in \madx, \texttt{DELTAP} is converted to \texttt{PT},
+which is used as longitudinal variable. 
 Dispersive and chromatic functions are hence derivatives with
-respect to {\tt PT}. (see \hyperref[subsec:tables-summ]{summ table}). 
+respect to \texttt{PT}. (see \hyperref[subsec:tables-summ]{summ table}). 
 
 These summary parameters can later be accessed via the 
 \hyperref[chap:tables]{table access functions} using the "SUMM" table.  
@@ -201,12 +199,12 @@ These summary parameters can later be accessed via the
 \section{Twiss Parameters for a Period}
 \label{sec:twissperiod}
 
-The simplest form of the {\tt TWISS} command is
+The simplest form of the \texttt{TWISS} command is
 \madbox{
 TWISS;
 }
 which calculates the periodic solution for the last beamline or sequence
-declared in a {\tt USE} statement, and with zero {\tt DELTAP}.
+declared in a \texttt{USE} statement, and with zero \texttt{DELTAP}.
 Chromatic functions are not calculated. 
 Standard tables ("TWISS" and "SUMM") are created in memory but no file
 is written to disk. 
@@ -216,12 +214,12 @@ The slightly more elaborate version
 TWISS, DELTAP=real\{,real\}, CHROM, TABLE=tabname;
 }
 computes the periodic solution, including chromatic functions, for the last beam
-line or sequence declared in a {\tt USE} statement, for all values of
-DELTAP entered (or for {\tt DELTAP=0}, if none is entered). 
+line or sequence declared in a \texttt{USE} statement, for all values of
+DELTAP entered (or for \texttt{DELTAP=0}, if none is entered). 
 The tables "tabname" and "SUMM" are created in memory and no file is
 written to disk. 
 
-{\bf Example:} 
+\textbf{Example:} 
 \madxmp{
 USE, period=OCT; \\
 TWISS, DELTAP=0.001, CHROM;
@@ -253,7 +251,7 @@ DELTAP, \madx first searches for the periodic solution for the beam line
 mentioned in LINE=beamline: The result is used as an initial condition
 for the lattice function tracking. 
 
-{\bf Example:} 
+\textbf{Example:} 
 \madxmp{
 xxxxxxxx\= \kill
 CELL:   \>LINE=(...); \\
@@ -278,10 +276,10 @@ TWISS, LINE=CELL(SF1,SD1);
 
 \section{Given Initial Values}
 
-Initial values for \href{../Introduction/tables.html#linear}{linear
-  lattice functions} and
-\href{../Introduction/tables.html#chrom}{chromatic functions} may also
-be numerical. Initial values can be specified on the TWISS command:  
+Initial values for \hyperref[subsec:tables-linear]{linear
+lattice functions} and \hyperref[subsec:tables-chrom]{chromatic
+  functions} may also be numerical.
+Initial values can be specified on the \texttt{TWISS} command:  
 \madbox{
 TWISS,   \=BETX=real, ALFX=real, MUX=real,\\
          \>BETY=real, ALFY=real, MUY=real,\\
@@ -297,68 +295,63 @@ TWISS,   \=BETX=real, ALFX=real, MUX=real,\\
          \>DELTAP=real:real:real;
 }
 
-All initial values for \href{../Introduction/tables.html#linear}{linear
-  lattice functions} and
-\href{../Introduction/tables.html#chrom}{chromatic functions} are
-permitted, but BETX and BETY are required. Moreover, a
-\href{beta0}{beta0} block can be added as filled by the
-\href{../control/general.html#savebeta}{savebeta} command or see
-below. The lattice parameters are taken from this block, but will be
-overwritten by explicitly stated lattice parameters. As entered, the
-initial conditions cannot depend on DELTAP, and can thus be correct only
-for one such value.  
+All initial values for
+\hyperref[subsec:tables-linear]{linear lattice functions} and
+\hyperref[subsec:tables-chrom]{chromatic functions} are
+permitted, but \texttt{BETX} and \texttt{BETY} are required.
+Moreover, a \hyperref[sec:beta0]{BETA0} block can be added as filled by the
+\hyperref[sec:savebeta]{\texttt{SAVEBETA}} command (see below).
+The lattice parameters are taken from this block, but are also
+overwritten by lattice parameters explicitly decalred on the command 
+line. As entered, the initial conditions cannot depend on
+\texttt{DELTAP},
+and can thus be correct only for one such value.  
 
 \section{SAVEBETA}
 \label{sec:savebeta}
+Initial lattice parameters can be saved and transfered for later commands, in
+particular for \hyperref[chap:twiss]{\texttt{TWISS}} or the
+\hyperref[chap:match]{match module}, with the \texttt{SAVEBETA} command
+sequence.   
+
 \madbox{
 SAVEBETA, LABEL=string, PLACE=string, SEQUENCE=sequencename;
 }
-marks a location given by attribute {\tt PLACE} in an expanded sequence 
-"sequence\_name"; 
-at the next {\tt TWISS} command execution, a
-\href{../twiss/twiss.html#beta0}{beta0} 
-block will be saved at that location with the label given by the
-attribute {\tt LABEL}. 
-This is done only once; in order to get a new beta0 block at the same
-location in a subsequent {\tt TWISS} command, the {\tt SAVEBETA}
-command  must be repeated.
-The content of the beta0 block can then be used in other
-commands, e.g. {\tt TWISS} and {\tt MATCH}.  
+marks a location given by attribute \texttt{PLACE} in an expanded
+sequence \texttt{sequence\_name}; at the next \texttt{TWISS} command
+execution, a \hyperref[sec:beta0]{\texttt{BETA0}} block is saved at that
+location with the label given by the attribute \texttt{LABEL}. This is
+done only once; in order to get a new \texttt{BETA0} block at the same
+location in a subsequent \texttt{TWISS} command, the \texttt{SAVEBETA}
+command  must be repeated. The content of the \texttt{BETA0} block can
+then be used in other commands, \textsl{e.g.} \texttt{TWISS} and
+\texttt{MATCH}. 
 
-{\bf Example} (after sequence expansion): 
+\textbf{Example} (after sequence expansion): 
 \madxmp{
 SAVEBETA, LABEL=sb1, PLACE=mb[5], SEQUENCE=fivecell; \\
 TWISS; \\
 SHOW, sb1;
 }
-will save and show the beta0 block parameters at the end (!) of the
-fifth element of type "mb" in the sequence.  
+saves and then shows the \texttt{BETA0} block parameters at the end (!) of the
+fifth element of type \texttt{mb} in the sequence.  
 
-
-%\section{SAVEBETA: Save Lattice Parameters}
-%\label{sec:savebeta}
-
-Initial lattice parameters can be transfered for later commands, in
-particular for twiss or the \href{../match/match.html}{match module}, by
-using the \href{../control/general.html#savebeta}{savebeta} command
-sequence.  
 
 Parameters in tables can also be accessed 
-using the \href{../Introduction/expression.html#table}{table access}
-function. 
+using the \hyperref[chap:tables]{table access} functions. 
 \begin{verbatim}
 USE, period=...;
 SAVEBETA, LABEL=name, PLACE=place, SEQUENCE=s_name;
 TWISS,...;
 \end{verbatim}
 
-When reaching the \href{../control/general.html#place}{place} in the
-sequence "s\_name" during execution of TWISS, \madx will save a
-\hyperref[sec:beta0]{beta0} block with the
-\href{../Introduction/label.html}{label} name: This block is filled with
-the values of all lattice parameters in place.  
+When reaching the \texttt{PLACE} in the
+sequence \texttt{s\_name} during execution of
+\hyperref[chap:twiss]{\texttt{TWISS}}, \madx saves a
+\hyperref[sec:beta0]{BETA0} block with the \texttt{LABEL} name: This
+block is filled with the values of all lattice parameters in place.   
 
-Example 1: 
+\textbf{Example 1:} 
 \begin{verbatim}
 USE, period=CELL;
 SAVEBETA, LABEL=END, PLACE=#E, SEQUENCE=CELL;
@@ -367,10 +360,11 @@ USE, period=INSERT;
 TWISS, BETA0=END;
 \end{verbatim}
 This first example calculates the \hyperref[sec:twissperiod]{periodic
-  solution} of the line CELL, and then track lattice parameters through
-INSERT, using all end conditions (including orbit) in CELL to start.  
+  solution} of the line \texttt{CELL}, and then tracks lattice parameters through
+\texttt{INSERT}, using all end conditions (including orbit) in
+\texttt{CELL} at the start of \texttt{INSERT}.  
 
-Example 2: 
+\textbf{Example 2:} 
 \begin{verbatim}
 USE, period=CELL;
 SAVEBETA, LABEL=END, PLACE=#E, SEQUENCE=CELL;
@@ -383,37 +377,37 @@ This is similar to the first example,but the beta functions are interchanged (ov
 \section{BETA0: Set Initial Lattice Parameters}
 \label{sec:beta0}
 Initial lattice parameters can be set 'manually' for later commands, in
-particular for \hyperref[chap:twiss]{\tt TWISS} or the 
-\hyperref[chap:match]{\tt MATCH} module, by
-using the {\tt BETA0} command attached to a label.  
+particular for \hyperref[chap:twiss]{\texttt{TWISS}} or the 
+\hyperref[chap:match]{\texttt{MATCH}} module, by
+using the \texttt{BETA0} command attached to a label.  
 
 \madbox{
 label: BETA0, \=BETX=real, ALFX=real, MUX=real,\\
               \>BETY=real, ALFY=real, MUY=real,\\
-              \>\{etc for linear and chromatic lattice functions\} ;
+              \>\{etc for linear and chromatic lattice functions\};
 }
 
-A {\tt BETA0} block can be used as a whole with all values declared,
+A \texttt{BETA0} block can be used as a whole with all values declared,
 as a block with overriden values explicitly, or by extracting single
 values as shown in the three examples below:
 
-Example of {\tt BETA0} block used as a whole in {\tt TWISS}: 
+Example of \texttt{BETA0} block used as a whole in \texttt{TWISS}: 
 \madxmp{
 initial: BETA0, \=BETX=10., ALFX=0.0, MUX=0.0, \\
                 \>BETY=10., ALFY=0.0, MUY=0.0, \\
                 \>DX=1., DPX=0.0;\\
 TWISS, BETA0=initial;}
 
-Example of {\tt BETA0} block used as a whole but with overriden
-values in the {\tt TWISS} command:
+Example of \texttt{BETA0} block used as a whole but with overriden
+values in the \texttt{TWISS} command:
 \madxmp{
 initial: BETA0, \=BETX=10., ALFX=0.0, MUX=0.0, \\
                 \>BETY=10., ALFY=0.0, MUY=0.0, \\
                 \>DX=1., DPX=0.0;\\
 TWISS, BETA0=initial, ALFX=-0.1, ALFY=0.1;}
 
-Example of using {\tt BETA0} block by extracting single values in the
-{\tt TWISS} command:
+Example of using \texttt{BETA0} block by extracting single values in the
+\texttt{TWISS} command:
 \madxmp{
 initial: BETA0, \=BETX=10., ALFX=0.0, MUX=0.0, \\
                 \>BETY=10., ALFY=0.0, MUY=0.0, \\
@@ -426,13 +420,13 @@ TWISS, BETX=initial-$>$BETX, BETY=initial-$>$BETY;}
 \label{sec:sectormap}
 % Begin New version: Jean-Luc Nougaret, 18-Dec-2008 
 
-The flag {\tt SECTORMAP} of the {\tt TWISS} command (together with an element
-selection via {\tt SELECT, FLAG=sectormap,...}) causes a file "sectormap" to be
+The flag \texttt{SECTORMAP} of the \texttt{TWISS} command (together with an element
+selection via \texttt{SELECT, FLAG=sectormap,...}) causes a file "sectormap" to be
 written.
 
 For each user-selected element, it contains the user-selected coefficients of 
-the kick vector {\tt K} ($6$ values), of the first-order map {\tt R} 
-($6\times6$ values) and of the second-order map {\tt T} ($6\times6\times6$ 
+the kick vector \texttt{K} ($6$ values), of the first-order map \texttt{R} 
+($6\times6$ values) and of the second-order map \texttt{T} ($6\times6\times6$ 
 values)
 
 The sector file is the output of a standard TFS table, which means that
@@ -443,10 +437,11 @@ as in the following example:
 SELECT, FLAG=my\_sect\_table, COLUMN=name, pos, k1, r11, r66, t111;
 }
 
-The sectormap file contains for each selected element, one element per line, the
-set of chosen K, R, and T matrix coefficients: 
+The sectormap file contains for each selected element, one element per
+line, the set of chosen K, R, and T matrix coefficients: 
 \\
 \\
+{\footnotesize
 \begin{tabular}{l|l|l}
 @ NAME &              \%13s &  "MY\_SECT\_TABLE" \\ 
 @ TYPE &              \%09s &  "SECTORMAP" \\ 
@@ -477,50 +472,52 @@ set of chosen K, R, and T matrix coefficients:
 ... & ... & ... & ... & ... & ... \\ 
 ... & ... & ... & ... & ... & ...
 \end{tabular}
+}
 \\
 \\ 
-Of course, the {\tt SELECT} statement can be combined with additional
+Of course, the \texttt{SELECT} statement can be combined with additional
 options to filter-out the list of elements, such as in the following
 statement, which for instance only retains drift-type elements:  
 
 \madxmp{
-SELECT, FLAG=my\_sect\_table, CLASS=drift, COLUMN=name, pos, k1, r11, r66, t111;
+  SELECT, \=FLAG=my\_sect\_table, CLASS=drift, \\
+          \>COLUMN=name, pos, k1, r11, r66, t111;
 }
 
 
-{\tt K} coefficients range: 
-{\tt K1}... 
-{\tt K6}
+\texttt{K} coefficients range: 
+\texttt{K1}... 
+\texttt{K6}
 
 
-{\tt R} coefficients range: 
+\texttt{R} coefficients range: 
 \begin{tabular}{ccc}
-{\tt R11} & ... & {\tt R61} \\ 
-{\tt R12} & ... & {\tt R62} \\ 
+\texttt{R11} & ... & \texttt{R61} \\ 
+\texttt{R12} & ... & \texttt{R62} \\ 
 ... & ... & ... \\ 
-{\tt R16} & ... & {\tt R66}
+\texttt{R16} & ... & \texttt{R66}
 \end{tabular}
 
 
-{\tt T} coefficients range: 
+\texttt{T} coefficients range: 
 \begin{tabular}{ccc}
-{\tt T111} & ... &{\tt T611} \\ 
-{\tt T121} & ... & {\tt T621} \\ 
+\texttt{T111} & ... &\texttt{T611} \\ 
+\texttt{T121} & ... & \texttt{T621} \\ 
 ... & ... & ... \\ 
-{\tt T161} & ... & {\tt T661} \\ 
-{\tt T112} & ... & {\tt T612} \\ 
+\texttt{T161} & ... & \texttt{T661} \\ 
+\texttt{T112} & ... & \texttt{T612} \\ 
 ... & ... & ... \\ 
-{\tt T166} & ... & {\tt T666}
+\texttt{T166} & ... & \texttt{T666}
 \end{tabular}
 
  In the above notation, 
-{\tt Rij} stands for "effect on the 
-{\tt i}-th coordinate of the 
-{\tt j}-th coordinate in phase-space", whereas 
-{\tt Tijk} stands for "combined effect on the 
-{\tt i}-th coordinate of both the 
-{\tt j}-th and 
-{\tt k}-th coordinates in phase-space" along the lattice. 
+\texttt{Rij} stands for "effect on the 
+\texttt{i}-th coordinate of the 
+\texttt{j}-th coordinate in phase-space", whereas 
+\texttt{Tijk} stands for "combined effect on the 
+\texttt{i}-th coordinate of both the 
+\texttt{j}-th and 
+\texttt{k}-th coordinates in phase-space" along the lattice. 
 % End New Version 
 
 %  Commented by jluc, on 18 December 2008
@@ -579,7 +576,7 @@ beam does not circulate and the closed orbit cannot be established and
 measured. This can also happen in \madx and the closed orbit finder does
 not converge. 
 
-The {\tt THREADER} simulates beam steering through such a machine
+The \texttt{THREADER} simulates beam steering through such a machine
 with repeated measurement of trajectory over a certain number of
 monitors and correction of the trajectory with upstream correctors.   
 
@@ -588,12 +585,12 @@ orbit search is carried out by the \hyperref[chap:twiss]{TWISS}
 module.   
 
 The threader is controlled as an option. 
-The following \madx commands enables the threader :
+The following \madx command enables the threader:
 \madxmp{OPTION, THREADER;}
 and the threader can be disabled with
 \madxmp{OPTION, -THREADER;}
 
-During the trajectory search in \hyperref[chap:twiss]{\tt TWISS}, or the first 
+During the trajectory search in \hyperref[chap:twiss]{\texttt{TWISS}}, or the first 
 turn of the orbit search for a closed machine, the threader calculates at each
 monitor the difference between the present trajectory reading and a
 reference value.
@@ -608,8 +605,8 @@ turn.
 
 The reference value for the trajectory difference is zero by default but
 can also be obtained from a previous orbit calculation if the current
-{\tt TWISS} command has the {\tt USEORBIT} flag enabled and a previous
-{\tt TWISS} command had the {\tt KEEPORBIT} flag enabled. This allows
+\texttt{TWISS} command has the \texttt{USEORBIT} flag enabled and a previous
+\texttt{TWISS} command had the \texttt{KEEPORBIT} flag enabled. This allows
 for example to thread the beam into a machine with orbit bumps present.  
 
 The threshold values for triggering the threader correction can be set
@@ -633,7 +630,7 @@ An attenuation factor of 0.5 will apply 50\% of the calculated kicks.
 \label{sec:coguess}
 
 In order to help the initial finding of the closed orbit by the
-{\tt TWISS} module, it is possible to specify an initial guess for
+\texttt{TWISS} module, it is possible to specify an initial guess for
 the coordinates of the fixed point at the start of the lattice.
 
 \madbox{
@@ -642,7 +639,7 @@ COGUESS, \=X=real, PX=real, Y=real, PY=real, T=real, PT=real, \\
          \>CLEAR=logical;
 }
 
-The {\tt COGUESS} command has the following attributes:
+The \texttt{COGUESS} command has the following attributes:
 \begin{madlist}
   \ttitem{X, PX, Y, PY, T, PT} each parameter specified defines a first guess for all future closed orbit
   searches in case they are different from zero.  
@@ -651,7 +648,7 @@ The {\tt COGUESS} command has the following attributes:
   orbit search. \\ (Default: 1.e-6)  
   
   \ttitem{CLEAR} a flag to reset the tolerance to its default value and to
-  cancel the effect of a previous {\tt COGUESS} in defining a first
+  cancel the effect of a previous \texttt{COGUESS} in defining a first
   guess for subsequent closed orbit searches. \\ (Default:~false) 
 
 \end{madlist}

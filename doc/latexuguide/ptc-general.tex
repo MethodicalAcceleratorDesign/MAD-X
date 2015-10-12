@@ -19,27 +19,29 @@ The \ptc code is actually a library that can be used in many different
 ways to create an actual module that calculates some property of
 interest. 
 
-{\bf Attention:}
+\textbf{Attention:}
 \ptc exists inside of \madx as a library. \madx offers the interface to
-\ptc, i.e. the \madx input file is used as input for \ptc. Internally,
-both \ptc and \madx have their own independent databases which are
-linked via the interface. With the \hyperref[sec:ptc-create-layout]{\tt
-  PTC\_CREATE\_LAYOUT} command, only numerical values are transferred
+\ptc, \textsl{i.e.} the \madx input file is used as input for \ptc.
+Internally, both \ptc and \madx have their own independent databases
+which are linked via the interface. With the
+\hyperref[sec:ptc-create-layout]{\texttt{PTC\_CREATE\_LAYOUT}} command,
+only numerical values are transferred 
 from the \madx data structures to the \ptc data structures. Any
 modification to the \madx data structure is unknown to \ptc until the
-next call to \hyperref[sec:ptc-create-layout]{\tt PTC\_CREATE\_LAYOUT}. 
+next call to \hyperref[sec:ptc-create-layout]{\texttt{PTC\_CREATE\_LAYOUT}}. 
 For example, a \hyperref[sec:defer]{deferred expression} of \madx is
-only evaluated at the time of the \hyperref[sec:ptc-create-layout]{\tt
-  PTC\_CREATE\_LAYOUT} command and is ignored within \ptc afterwards.
+only evaluated at the time of the
+\hyperref[sec:ptc-create-layout]{\texttt{PTC\_CREATE\_LAYOUT}} command and
+is ignored within \ptc afterwards. 
 
 
 Several modules using the PTC code have been presently implemented in
 \madx. These {\madx}-{\ptc} modules\cite{schmidt2005} are executed by
 the following commands: 
-\hyperref[chap:ptc-twiss]{\tt PTC\_TWISS},
-\hyperref[chap:ptc-normal]{\tt PTC\_NORMAL},
-\hyperref[chap:ptc-track]{\tt PTC\_TRACK},
-\hyperref[sec:ptc-trackline]{\tt PTC\_TRACK\_LINE}. 
+\hyperref[chap:ptc-twiss]{\texttt{PTC\_TWISS}},
+\hyperref[chap:ptc-normal]{\texttt{PTC\_NORMAL}},
+\hyperref[chap:ptc-track]{\texttt{PTC\_TRACK}},
+\hyperref[sec:ptc-trackline]{\texttt{PTC\_TRACK\_LINE}}. 
 
 To perform calculations with these {\madx}-{\ptc} commands, the \ptc
 environment must be initialized, handled and turned off by special
@@ -73,7 +75,7 @@ PTC\_END;
 \section{PTC\_CREATE\_UNIVERSE}
 \label{sec:ptc-create-universe}
 
-The {\tt PTC\_CREATE\_UNIVERSE} command is required to set-up the
+The \texttt{PTC\_CREATE\_UNIVERSE} command is required to set-up the
 \ptc environment.  
 
 \madbox{
@@ -87,14 +89,14 @@ The attributes are:
    \ttitem{SECTOR\_NMUL\_MAX} a global variable in \ptc needed for exact
    sector bends defining up to which order Maxwell's equation are solved
    (see \cite{forest2002}~page~76-77). 
-   The value of {\tt SECTOR\_NMUL\_MAX} must not be smaller than
-   {\tt SECTOR\_NMUL} otherwise \madx stops with an error. \\ (Default:~10)
+   The value of \texttt{SECTOR\_NMUL\_MAX} must not be smaller than
+   \texttt{SECTOR\_NMUL} otherwise \madx stops with an error. \\ (Default:~10)
 
    \ttitem{SECTOR\_NMUL} a global variable in PTC needed for exact
    sector bends defining up to which order the multipole are included in
-   solving Maxwell's equation up to order {\tt SECTOR\_NMUL\_MAX}. 
-   Multipoles of order N with N $>$ {\tt SECTOR\_NMUL} and N $\leq$ 
-   {\tt SECTOR\_NMUL\_MAX} are treated similar to {\it SixTrack}. \\ 
+   solving Maxwell's equation up to order \texttt{SECTOR\_NMUL\_MAX}. 
+   Multipoles of order N with N $>$ \texttt{SECTOR\_NMUL} and N $\leq$ 
+   \texttt{SECTOR\_NMUL\_MAX} are treated similar to \textit{SixTrack}. \\ 
    (Default:~10)  
 
    \ttitem{NTPSA} invokes the Differential Algebra (DA) package
@@ -114,10 +116,10 @@ The attributes are:
 \section{PTC\_CREATE\_LAYOUT}
 \label{sec:ptc-create-layout}
 
-The {\tt PTC\_CREATE\_LAYOUT} command creates the \ptc-layout
+The \texttt{PTC\_CREATE\_LAYOUT} command creates the \ptc-layout
 according to  the specified integration method and fills it with the
 current \madx sequence defined in the latest
-\hyperref[sec:use]{\tt USE} command.
+\hyperref[sec:use]{\texttt{USE}} command.
 
 \madbox{
 PTC\_CREATE\_LAYOUT, \=TIME=logical, MODEL=integer, METHOD=integer,  \\
@@ -135,18 +137,21 @@ The attributes are:
   This option changes the canonical coordinate system depending
   whether the calculation is done in 5D or 6D: 
   \begin{madlist}
-    \ttitem{5D} if {\tt TIME} is true, the fifth coordinate is
-    \hyperref[subsec:tables-canon]{\tt PT}, $p_t = \Delta E / p_0 c$ \\ 
-    if {\tt TIME} is false, the fifth coordinate is
-    \hyperref[subsec:tables-canon]{\tt DELTAP}, $\delta_p = \Delta p / p_0$
+    \ttitem{5D} if \texttt{TIME} is true, the fifth coordinate is
+    \hyperref[subsec:tables-canon]{\texttt{PT}},
+    $p_t = \Delta E / p_0 c$ \\  
+    if \texttt{TIME} is false, the fifth coordinate is
+    \hyperref[subsec:tables-canon]{\texttt{DELTAP}},
+    $\delta_p = \Delta p / p_0$
     
-    \ttitem{6D} if {\tt TIME} is true, the \hyperref[subsec:tables-canon]{\madx
-      coordinate system} \{$-ct$, $p_t$\} is used. \\   
-    if {\tt TIME} is false, the second \ptc coordinate system
+    \ttitem{6D} if \texttt{TIME} is true, the
+    \hyperref[subsec:tables-canon]{\madx coordinate system}
+    \{$-ct$, $p_t$\} is used. \\    
+    if \texttt{TIME} is false, the second \ptc coordinate system
     \{-pathlength, $\delta_p$\} is used. 
   \end{madlist}
   
- {\bf Note:} at small energy ($\beta_0 << 1$),
+ \textbf{Note:} at small energy ($\beta_0 << 1$),
  momentum-dependent variables like dispersion will depend  strongly on
  the choice of  the logical input variable "time".  In fact, the
  derivative ($\frac{\partial}{\partial \delta_p}$)  and
@@ -165,71 +170,71 @@ The attributes are:
   \cite{forest2002}~Chapter~K) \\ (Default: 2)
 
   \ttitem{NST} the number of integration steps.  (Default:~1)\\
-  The body of each element is divided into {\tt NST} equal slices and
+  The body of each element is divided into \texttt{NST} equal slices and
   Forest-Yoshida integration is carried out on each slice.
-  For best results {\tt NST} should increase with strength
-  and length of elements. The optimum {\tt NST} value corresponds to 
+  For best results \texttt{NST} should increase with strength
+  and length of elements. The optimum \texttt{NST} value corresponds to 
   the value beyond which the studied properties no longer change. 
   However, for time consuming calculations the user may
-  reduce {\tt NST}. (See below the {\tt RESPLIT} option for automatic
+  reduce \texttt{NST}. (See below the \texttt{RESPLIT} option for automatic
   adjustment.)\\
-  This attribute sets the same {\tt NST} value  for all "thick" elements
+  This attribute sets the same \texttt{NST} value  for all "thick" elements
   ($l > 0$) of a beam-line; however each individual element may also have
-  its own {\tt NST} value defined independently 
+  its own \texttt{NST} value defined independently 
   (\hyperref[sec:add-option-PTC]{see below}).
 
   \ttitem{EXACT} a logical flag to turn on calculations with an exact
   Hamiltonian, otherwise the expanded Hamiltonian is used. \\
   (Default:~false)
 
-  \ttitem{OFFSET\_DELTAP} {\bf [ Beware: Expert attribute! ]}\\
+  \ttitem{OFFSET\_DELTAP} \textbf{[ Beware: Expert attribute! ]}
   provides relative momentum deviation of the reference particle (6D case
-  ONLY). This option implies {\tt TOTALPATH=true}. \\
+  ONLY). This option implies \texttt{TOTALPATH=true}. \\
   (Default: 0.0)
 
   \ttitem{ERRORS\_OUT} a logical flag to write-out multipolar errors
-  in \hyperref[sec:efcomp]{\tt EFCOMP} table format. 
+  in \hyperref[sec:efcomp]{\texttt{EFCOMP}} table format. 
   \\ (Default: false) \\
   Two tables are created and filled: "errors\_field" contains only
   field errors, "errors\_total" contains also desired field
   components, which can include the strength of correctors.  
-  The choice of magnets is defined by the {\tt MAGNET\_NAME}
+  The choice of magnets is defined by the \texttt{MAGNET\_NAME}
   attribute (see below). 
   The tables can be \hyperref[sec:write]{written} to file, and can be
-  read back via the {\tt ERRORS\_IN} flag.\\ 
-  The {\tt ERRORS\_IN} flag has precedence over this {\tt ERRORS\_OUT} flag.
+  read back via the \texttt{ERRORS\_IN} flag.\\ 
+  The \texttt{ERRORS\_IN} flag has precedence over this \texttt{ERRORS\_OUT} flag.
 
   \ttitem{MAGNET\_NAME} a string giving a simple selection for the
-  names of magnet to be used for an error write-out using the {\tt
-  ERRORS\_OUT} flag (see above). The errors are recorded for all
+  names of magnet to be used for an error write-out using the
+  \texttt{ERRORS\_OUT} flag (see above). The errors are recorded for all 
   magnets with names starting with the exact string given here, which
   would be equivalent to the ??? regular expression.\\
   (Default:~nil)
 
   \ttitem{RESPLIT} a logical flag to apply the \ptc resplit
-  procedure. This is meant to create an "adaptive" setting of the {\tt
-    METHOD} and {\tt NST} attributes according to the strengths of
-  quadrupoles (using the {\tt THIN}  attribute) and dipoles (using the
-  {\tt XBEND} attribute). The {\tt EVEN} attribute further controls the
-  number of splits.  \\
+  procedure. This is meant to create an "adaptive" setting of the
+  \texttt{METHOD} and \texttt{NST} attributes according to the strengths
+  of quadrupoles (using the \texttt{THIN}  attribute) and dipoles (using
+  the \texttt{XBEND} attribute). The \texttt{EVEN} attribute further
+  controls the number of splits.  \\
   (Default:~false)
 
-  \ttitem{THIN} is the main {\tt RESPLIT} attribute and is meant for
+  \ttitem{THIN} is the main \texttt{RESPLIT} attribute and is meant for
   splitting quadrupoles according to their strength. The default value
-  {\tt THIN=0.001} has shown in practice to work well without costing
+  \texttt{THIN=0.001} has shown in practice to work well without costing
   too much with respect of performance.
   
-  \ttitem{XBEND} is an optional {\tt RESPLIT} attribute and is meant for
-  splitting dipoles. A value {\tt XBEND=0.001} is also advisable for
+  \ttitem{XBEND} is an optional \texttt{RESPLIT} attribute and is meant for
+  splitting dipoles. A value \texttt{XBEND=0.001} is also advisable for
   dipoles. \\
   (Default: -1.0 for no splitting)
 
   \ttitem{EVEN} a logical switch to ensure even number of splits when
-  using the {\tt RESPLIT}  procedure of \ptc, which is particularly
-  useful when one attempts to calculate {\tt PTC\_TWISS} with the {\tt
-    CENTER\_MAGNETS} option, i.e. to calculate the {\tt TWISS}
+  using the \texttt{RESPLIT}  procedure of \ptc, which is particularly
+  useful when one attempts to calculate \texttt{PTC\_TWISS} with the
+  \texttt{CENTER\_MAGNETS} option, i.e. to calculate the \texttt{TWISS} 
   parameters in the center of the element. 
-  Uneven number of splits is ensured with {\tt EVEN=false}.  
+  Uneven number of splits is ensured with \texttt{EVEN=false}.
   (Default:~true)
 \end{madlist}
 
@@ -238,7 +243,7 @@ The attributes are:
 
 Several \ptc layouts can be created within a single \ptc-"universe". 
 The layouts are automatically numbered with sequential integers by the 
-\madx code. The {\tt PTC\_MOVE\_TO\_LAYOUT} command is used to
+\madx code. The \texttt{PTC\_MOVE\_TO\_LAYOUT} command is used to
 activate a specific layout, and the next \ptc commands will be
 applied to this active \ptc layout until a new \ptc layout is created
 or activated. 
@@ -256,9 +261,9 @@ The only attribute is:
 \section{PTC\_READ\_ERRORS}
 \label{sec:ptc-read-errors}
 
-The {\tt PTC\_READ\_ERRORS} command reads any number of
+The \texttt{PTC\_READ\_ERRORS} command reads any number of
 \textbf{"errors\_read"} table through the 
-\hyperref[sec:readmytable]{\tt READMYTABLE} mechanism.
+\hyperref[sec:readmytable]{\texttt{READMYTABLE}} mechanism.
 
 \madbox{
 PTC\_READ\_ERRORS, OVERWRITE=logical; 
@@ -272,22 +277,24 @@ The only attribute is
    (Default:~false)  
 \end{madlist}
 
-{\bf Note:}\\
+\textbf{Note:}\\
 Because of the way the table is read in memory, a warning will always be
 issued by default in the form:
+{\small
 \begin{verbatim}
 warning: string_from_table_row: row out of range: errors_read->name[1>=n+1<=n]
 \end{verbatim}
-where {\tt n} is  the number of records read from the table. 
+}
+where \texttt{n} is  the number of records read from the table. 
 This warning has no consequence on the errors read and the following
 calculation. \\
 The warning is purely the result of the way that the reading loop is
 programmed with a break based on the return value of the routine
-{\sl string\_from\_table\_row}.  
-But if {\sl string\_from\_table\_row} tries to read in a row ({\tt n+1})
-past the last row ({\tt n}) of the table, it prints a warning before
+\textsl{string\_from\_table\_row}.  
+But if \textsl{string\_from\_table\_row} tries to read in a row (\texttt{n+1})
+past the last row (\texttt{n}) of the table, it prints a warning before
 returning a value that will effectively break the loop. Of course this
-will only happen if the {\tt WARN} option is true and this can be turned
+will only happen if the \texttt{WARN} option is true and this can be turned
 off with \madxmp{OPTION, -WARN;}
 
        
@@ -295,7 +302,7 @@ off with \madxmp{OPTION, -WARN;}
 \section{PTC\_ALIGN}
 \label{sec:ptc-align}
 
-The {\tt PTC\_ALIGN} command is used to apply the \madx alignment
+The \texttt{PTC\_ALIGN} command is used to apply the \madx alignment
 errors to the current PTC layout, and takes no attributes.
 
 \madbox{
@@ -306,7 +313,7 @@ PTC\_ALIGN;
 \section{PTC\_END}
 \label{sec:ptc-end}
 
-The {\tt PTC\_END} command turns off the \ptc environment,
+The \texttt{PTC\_END} command turns off the \ptc environment,
 which releases all memory and returns control to the \madx world proper.
 
 \madbox{
@@ -330,16 +337,16 @@ SBEND | \=RBEND | QUADRUPOLE | SEXTUPOLE | OCTUPOLE | SOLENOID ,\\
 These attributes are:
 \begin{madlist}
   \ttitem{L} the length of the element. \\ \ptc treats bending magnets
-  (\hyperref[sec:bend]{\tt SBEND} or \hyperref[sec:bend]{\tt RBEND})
-  as \hyperref[sec:marker]{\tt MARKER} if their length is equal to zero. 
+  (\hyperref[sec:bend]{\texttt{SBEND}} or \hyperref[sec:bend]{\texttt{RBEND}})
+  as \hyperref[sec:marker]{\texttt{MARKER}} if their length is equal to zero. 
      
-  \ttitem{NST} gives a specific \hyperref[sec:ptc-twiss]{\tt NST}
+  \ttitem{NST} gives a specific \hyperref[sec:ptc-twiss]{\texttt{NST}}
   values for a particular "thick" element ($L > 0$). \\
   \\
   For example RF cavities are represented in \madx 
   by a single kick, while \ptc splits the RF cavity into
-  {\tt NST} segments thereby taking into account properly the
-  transit-time effects of the cavity. Specifying explicitly {\tt NST=1}
+  \texttt{NST} segments thereby taking into account properly the
+  transit-time effects of the cavity. Specifying explicitly \texttt{NST=1}
   for RF cavity reproduces in \ptc the approximate results of \madx,
   ignoring transit time effects.
   \\
@@ -347,13 +354,13 @@ These attributes are:
   \ttitem{KNL, KSL} The full range of  normal and skew multipole
   components on the bench can be  specified for the following physical
   elements: 
-  \hyperref[sec:bend]{\tt sbend}, 
-  \hyperref[sec:bend]{\tt rbend},
-  \hyperref[sec:quadrupole]{\tt quadrupole},
-  \hyperref[sec:sextupole]{\tt sextupole},  
-  \hyperref[sec:octupole]{\tt octupole} and 
-  \hyperref[sec:solenoid]{\tt solenoid}. 
-  {\tt KNL} and {\tt KSL} multipole coefficients are specified as the
+  \hyperref[sec:bend]{\texttt{sbend}}, 
+  \hyperref[sec:bend]{\texttt{rbend}},
+  \hyperref[sec:quadrupole]{\texttt{quadrupole}},
+  \hyperref[sec:sextupole]{\texttt{sextupole}},  
+  \hyperref[sec:octupole]{\texttt{octupole}} and 
+  \hyperref[sec:solenoid]{\texttt{solenoid}}. 
+  \texttt{KNL} and \texttt{KSL} multipole coefficients are specified as the
   integrated value ($\int K ds$) of the field components along the
   magnet axis. The multipole components in \ptc are spread over
   the length of thick elements. This is a considerable
@@ -365,14 +372,14 @@ These attributes are:
     \ttitem{KSL} is an array representing the skew multipole
     coefficients. \\ (Default:~0~m$^{-1}$)
   \end{madlist}
-  To preserve the reference orbit of straight elements, dipole
+  To preserve the reference orbit of straight elements, the dipole
   components for those elements are ignored and must be specified as
-  zero: KNL(0)=0, KSL(0)=0. 
+  zero: \texttt{KNL(0)=0, KSL(0)=0}. 
    
   A full range of additional multipole \hyperref[sec:efcomp]{field
     errors} can be additionally specified with the
-  \hyperref[sec:efcomp]{\tt EFCOMP} command. Errors are added to the
-  above multipole fields on the bench. 
+  \hyperref[sec:efcomp]{\texttt{EFCOMP}} command. Errors are added to
+  the above multipole fields on the bench. 
 
 \end{madlist}
 

@@ -6,7 +6,7 @@
 \chapter{Thick-Lens Tracking Module}
 \label{chap:ptc-track}
 
-The {\tt PTC-TRACK} module \cite{kapin2006,schmidt2005} is the
+The \texttt{PTC-TRACK} module \cite{kapin2006,schmidt2005} is the
 symplectic thick-lens tracking facility in \madx.  It is based on \ptc
 library \cite{forest2002} written by E.~Forest.  The commands of this
 module are described below, optional parameters are denoted by square
@@ -17,7 +17,7 @@ means of a \hyperref[sec:use]{USE} command.
 The general \hyperref[chap:ptc-setup]{PTC environment} must
 also be initialized.  
 
-{\bf Examples}\\
+\textbf{Examples}\\
 Several examples can be found on the web at
 \href{http://cern.ch/frs/mad-X_examples/ptc_track}{http:\/\/cern.ch\/frs\/mad-X\_examples\/ptc\_track}. 
 
@@ -33,7 +33,7 @@ PTC\_CREATE\_UNIVERSE; \\
 PTC\_CREATE\_LAYOUT, MODEL=integer, METHOD=integer, NST=integer, [EXACT];\\
 \>\ldots\\
 \>PTC\_START, X=real, PX=real, Y=real, PY=real, T=real, PT=real;\\
-\>PTC\_START, FX=real, PHIX=real, FY=real, PHIY=real, FT=real, PHIT=real;\\
+\>PTC\_START, FX=real,PHIX=real, FY=real,PHIY=real, FT=real,PHIT=real;\\
 \>\ldots\\
 \>PTC\_OBSERVE, PLACE=string; \\
 \>\ldots\\
@@ -51,11 +51,11 @@ PTC\_END;
 \label{sec:ptc-start}
 
 To start particle tracking, a series of initial trajectory coordinates
-must be given with the {\tt PTC\_START} command;  and as many
+must be given with the \texttt{PTC\_START} command;  and as many
 commands as initial trajectories can be given. 
 
-{\tt PTC\_START} commands must appear before the
-\hyperref[sec:ptc-track]{\tt PTC\_TRACK} command. 
+\texttt{PTC\_START} commands must appear before the
+\hyperref[sec:ptc-track]{\texttt{PTC\_TRACK}} command. 
 
 \madbox{  
 PTC\_START, \=X=real, PX=real, Y=real, PY=real, T=real, PT=real,\\
@@ -74,13 +74,13 @@ The coordinates can be
    (\textit{z = x, y, t}).
    The actions are computed with the values of the emittances,
    $F_z$, which must be specified in a preceding 
-   \hyperref[sec:beam]{\tt BEAM} command. $F_z$ are expressed in number
+   \hyperref[sec:beam]{\texttt{BEAM}} command. $F_z$ are expressed in number
    of r.m.s. beam sizes and $\Phi_z$ are expressed in
    radians.\\ (Default: 0.0) 
 \end{madlist}
 
 
-{\bf Remarks} \\
+\textbf{Remarks} \\
 In the uncoupled case, the canonical and the action-angle
 variables are related with equations 
 \begin{equation} 
@@ -88,36 +88,37 @@ z = F_z (E_z)^{1/2} cos(\Phi_z) \qquad  p_z = F_z (E_z)^{1/2} sin(\Phi_z)
 \end{equation}
 
 If both the canonical and the action-angle coordinates are 
-given in the {\tt PTC\_START} command, they are summed after conversion
+given in the \texttt{PTC\_START} command, they are summed after conversion
 of the action-angle coordinates to canonical coordinates.
 
 The use of the action-angle coordinates requires the option 
-\hyperref[opt:closed-orbit]{\tt CLOSED\_ORBIT} in the 
-\hyperref[sec:ptc-track]{\tt PTC\_TRACK} command. 
+\hyperref[opt:closed-orbit]{\texttt{CLOSED\_ORBIT}} in the 
+\hyperref[sec:ptc-track]{\texttt{PTC\_TRACK}} command. 
 
 If the option
-\hyperref[opt:closed-orbit]{\tt CLOSED\_ORBIT} in the
-\hyperref[sec:ptc-track]{\tt PTC\_TRACK} command is active
+\hyperref[opt:closed-orbit]{\texttt{CLOSED\_ORBIT}} in the
+\hyperref[sec:ptc-track]{\texttt{PTC\_TRACK}} command is active
 (see above) all coordinates are specified with respect to the actual
 closed orbit (possibly off-momentum with magnet errors) and NOT with
 respect to the reference orbit. 
-If the option \hyperref[opt:closed-orbit]{\tt CLOSED\_ORBIT} is absent,
+If the option \hyperref[opt:closed-orbit]{\texttt{CLOSED\_ORBIT}} is absent,
 then coordinates are specified with respect to the reference orbit.  
 
-{\bf Important:} \\
-The initial trajectory coordinates specified with the {\tt PTC\_START} command 
-(and the \hyperref[sec:ptc-start]{\tt PTC\_START} command remain in the 
-{\tt TRACKSUMM} table for the duration of the \madx run. 
-Therefore any subsequent {\tt RUN} command 
-(and \hyperref[sec:ptc-track]{\tt PTC\_TRACK} or 
-\hyperref[sec:ptc-trackline]{\tt PTC\_TRACKLINE}) to actually start tracking 
-will effectively use {\bf all} initial trajectory coordinates found in the {\tt 
-TRACKSUMM} table.
-A workaround this odd behaviour is to delete the {\tt TRACKSUMM} table before 
+\begin{5.02.06}
+\textbf{Important:} \\
+The initial trajectory coordinates specified with the \texttt{PTC\_START} command 
+(and the \hyperref[sec:ptc-start]{\texttt{PTC\_START}} command remain in the 
+\texttt{TRACKSUMM} table for the duration of the \madx run. 
+Therefore any subsequent \texttt{RUN} command 
+(and \hyperref[sec:ptc-track]{\texttt{PTC\_TRACK}} or 
+\hyperref[sec:ptc-trackline]{\texttt{PTC\_TRACKLINE}}) to actually start tracking 
+will effectively use \textbf{all} initial trajectory coordinates found
+in the \texttt{TRACKSUMM} table. 
+A workaround this odd behaviour is to delete the \texttt{TRACKSUMM} table before 
 specifying the initial trajectory coordinates that must be tracked in the 
 current run:
 \madxmp{DELETE, TABLE=tracksumm;}
-
+\end{5.02.06}
 
 
 \section{PTC\_OBSERVE} 
@@ -138,35 +139,36 @@ The only attribute is
 \end{madlist}
 
 
-{\bf Remarks}\\
+\textbf{Remarks}\\
 The first observation point at the beginning of the beam-line is marked
-as {\bf "start"}.  
+as \textbf{"start"}.  
        
 It is {\em strongly} recommended to specify markers as observation points.
 
-The data at observation points other than {\bf "start"} can be produced
+The data at observation points other than \textbf{"start"} can be produced
 in two different ways:
 \begin{enumerate}
   \item traditional element-by-element tracking. (See
     \hyperref[chap:thintrack]{\madx thin tracking}) which 
-    requires the option \hyperref[opt:element-by-element]{\tt
-      ELEMENT\_BY\_ELEMENT} of \hyperref[sec:ptc-track]{\tt PTC\_TRACK} to
-    be active.
+    requires the option
+    \hyperref[opt:element-by-element]{\texttt{ELEMENT\_BY\_ELEMENT}} of
+    \hyperref[sec:ptc-track]{\texttt{PTC\_TRACK}} to be active. 
 
-  \item coordinate transformation from {\bf "start"} to the
+  \item coordinate transformation from \textbf{"start"} to the
   respective observation points using high-order \ptc transfer
-  maps, which requires the option \hyperref[opt:closed-orbit]{\tt
-    CLOSED\_ORBIT} of \hyperref[sec:ptc-track]{\tt PTC\_TRACK} to be
-  active, and the options \hyperref[opt:radiation]{\tt RADIATION}
-  and \hyperref[opt:element-by-element]{\tt ELEMENT\_BY\_ELEMENT} of
-  \hyperref[sec:ptc-track]{\tt PTC\_TRACK} to be inactive.
+  maps, which requires the option
+  \hyperref[opt:closed-orbit]{\texttt{CLOSED\_ORBIT}} of
+  \hyperref[sec:ptc-track]{\texttt{PTC\_TRACK}} to be active, and the
+  options \hyperref[opt:radiation]{\texttt{RADIATION}} 
+  and \hyperref[opt:element-by-element]{\texttt{ELEMENT\_BY\_ELEMENT}} of
+  \hyperref[sec:ptc-track]{\texttt{PTC\_TRACK}} to be inactive.
 \end{enumerate} 
 
 
 \section{PTC\_TRACK}
 \label{sec:ptc-track}
 
-The {\tt PTC\_TRACK} command initiates trajectory tracking by
+The \texttt{PTC\_TRACK} command initiates trajectory tracking by
 entering the thick-lens tracking module.  
 
 The tracking can be done element-by-element or "turn-by-turn" with
@@ -180,7 +182,7 @@ In \ptc, there is a continuous check that the particle trajectories stay
 within the aperture limits.  
 
 The Normal Form calculation is controlled through options of the 
-{\tt PTC\_TRACK} command.
+\texttt{PTC\_TRACK} command.
 
 \madbox{
 PTC\_TRACK, \=ICASE=integer, DELTAP=real, CLOSED\_ORBIT=logical,\\ 
@@ -200,21 +202,21 @@ The attributes are:
   
   \ttitem{ICASE} the user-defined dimensionality of the phase-space 
   (4, 5 or 6). \\ 
-  {\tt ICASE} has higher priority over other options. In particular:
+  \texttt{ICASE} has higher priority over other options. In particular:
   \begin{enumerate}
     \item RF cavities with non-zero voltage are ignored for
-      {\tt ICASE=4} or {\tt ICASE=5}.
-    \item A non-zero {\tt DELTAP} is ignored for {\tt ICASE=4} or {\tt ICASE=6}.
+      \texttt{ICASE=4} or \texttt{ICASE=5}.
+    \item A non-zero \texttt{DELTAP} is ignored for \texttt{ICASE=4} or \texttt{ICASE=6}.
   \end{enumerate}
-  However, if an RF cavity has voltage set to zero and {\tt ICASE=6} is
-  specified, \ptc sets {\tt ICASE=4}.
+  However, if an RF cavity has voltage set to zero and \texttt{ICASE=6} is
+  specified, \ptc sets \texttt{ICASE=4}.
   \\(Default: 4)
 
    \ttitem{DELTAP} the relative momentum offset for reference closed
    orbit (used for 5D case ONLY). \\
-   {\tt DELTAP} is ignored for {\tt ICASE=6}, but the option 
-   {\tt OFFSET\_DELTAP} of command \hyperref[sec:ptc-create-layout]
-   {\tt PTC\_CREATE\_LAYOUT} may be used, if the reference particle should
+   \texttt{DELTAP} is ignored for \texttt{ICASE=6}, but the option 
+   \texttt{OFFSET\_DELTAP} of command \hyperref[sec:ptc-create-layout]
+   \texttt{PTC\_CREATE\_LAYOUT} may be used, if the reference particle should
    have a momentum offset. \\ 
    (Default: 0.0) 
 
@@ -222,7 +224,7 @@ The attributes are:
    a logical switch to activate the closed orbit calculation.
    This option must be used for closed rings only. This
    option allows to activate the Normal Form analysis, if
-   required. With {\tt CLOSED\_ORBIT=false}, the sequence is treated as
+   required. With \texttt{CLOSED\_ORBIT=false}, the sequence is treated as
    a transfer line. \\ (Default: false)
      
    \ttitem{ELEMENT\_BY\_ELEMENT}\label{opt:element-by-element}
@@ -244,7 +246,7 @@ The attributes are:
    loss. \\ (Default: \{0.1, 0.01, 0.1, 0.01, 1.0, 0.1\})
 
    \ttitem{NORM\_NO} order of the Normal Form.\\
-   {\tt NORM\_NO=1} makes the Normal Form linear (always true for
+   \texttt{NORM\_NO=1} makes the Normal Form linear (always true for
    \madx). \\ (Default: 1)
 
    \ttitem{NORM\_OUT} a logical switch to transform canonical variables
@@ -254,22 +256,22 @@ The attributes are:
    if FILE is present, track tables are printed, optionally to 
    files with name constructed from the base filename specified. \\
    The actual name of the output file is constructed from
-   tyhe baseline given with {\tt FILE} to which are appended the
+   tyhe baseline given with \texttt{FILE} to which are appended the
    strings ".obsnnnn" (where nnnn is the observation point index) and
    ".pnnnn" (where nnnn is now the particle number), unless the
-   \hyperref[opt:onetable]{\tt ONETABLE} option is activated.  \\
+   \hyperref[opt:onetable]{\texttt{ONETABLE}} option is activated.  \\
    (Default: "track") 
 
    \ttitem{EXTENSION} a string providing the filename extension for the
    track table files, e.g., txt, doc...  \\ (Default: nil)
 
-   \ttitem{FFILE} defines the periodicity {\tt n} of the printout:
+   \ttitem{FFILE} defines the periodicity \texttt{n} of the printout:
    coordinates are printed every n turns. \\ (Default: 1)
 
    \ttitem{RADIATION}\label{opt:radiation} a logical flag to turn on
      the synchrotron radiation calculated by an internal procedure of
      \ptc. \\
-     The option {\tt RADIATION} has precedence over {\tt RADIATION\_MODEL1}
+     The option \texttt{RADIATION} has precedence over \texttt{RADIATION\_MODEL1}
      when both are activated. 
      \\ (Default: false)
 
@@ -277,24 +279,26 @@ The attributes are:
    radiation according to the method given in \cite{roy1990}. This model
    simulates quantum excitation via a random number generator and tables
    for photon emission. It can be used only with the option
-   \hyperref[opt:element-by-element]{\tt ELEMENT\_BY\_ELEMENT}.\\ 
+   \hyperref[opt:element-by-element]{\texttt{ELEMENT\_BY\_ELEMENT}}.\\ 
    (Default: false) 
 
    \ttitem{RADIATION\_ENERGY\_LOSS} a logical flag to add back the
-   average energy loss for {\tt RADIATION\_MODEL1}, thereby taking only
-   the quantum excitation into effect.\\ (Default: false)
+   average energy loss thereby taking only the quantum excitation into
+   effect. It applies only when for \texttt{RADIATION\_MODEL1} is
+   active.\\
+   (Default: false)
 
    \ttitem{RADIATION\_QUADR} a logical flag to add the effect of
    synchrotron radiation in quadrupoles. It supplements either model
-   {\tt RADIATION} or {\tt RADIATION\_MODEL1}. \\
+   \texttt{RADIATION} or \texttt{RADIATION\_MODEL1}. \\
    (Default: false)
 
    \ttitem{BEAM\_ENVELOPE} a logical switch to activate the calculation
    of the beam envelopes with \ptc. It requires the options
-   {\tt RADIATION} and {\tt ICASE=6}.\\
+   \texttt{RADIATION} and \texttt{ICASE=6}.\\
    (Default: false)
 
-   \ttitem{SPACE\_CHARGE} {\bf [under construction]}\\
+   \ttitem{SPACE\_CHARGE} \textbf{[under construction]}\\
      a logical flag to activate the simulation of space charge forces
      between particles. \\ (Default: false)  
 \end{madlist}
@@ -303,18 +307,18 @@ The attributes are:
 \section{PTC\_TRACKLINE}
 \label{sec:ptc-trackline}
 
-The {\tt PTC\_TRACKLINE} command performs particle tracking that takes
+The \texttt{PTC\_TRACKLINE} command performs particle tracking that takes
 into account acceleration in travelling wave cavities. 
 It must be invoked in the scope of correctly initialized
-\hyperref[chap:ptc-setup]{PTC environment}, 
-i.e. after \hyperref[sec:ptc-create-universe]{\tt PTC\_CREATE\_UNIVERSE}
-and \hyperref[sec:ptc-create-layout]{\tt PTC\_CREATE\_LAYOUT} commands, and before
-corresponding \hyperref[sec:ptc-end]{\tt PTC\_END}. 
+\hyperref[chap:ptc-setup]{PTC environment}, \textsl{i.e.} after
+\hyperref[sec:ptc-create-universe]{\texttt{PTC\_CREATE\_UNIVERSE}} 
+and \hyperref[sec:ptc-create-layout]{\texttt{PTC\_CREATE\_LAYOUT}} commands, and before
+corresponding \hyperref[sec:ptc-end]{\texttt{PTC\_END}}. 
 
-All tracks created with \hyperref[sec:ptc-start]{\tt PTC\_START}
-commands before {\tt PTC\_TRACKLINE} command is issued are 
+All tracks created with \hyperref[sec:ptc-start]{\texttt{PTC\_START}}
+commands before \texttt{PTC\_TRACKLINE} command is issued are 
 tracked. Track parameters are dumped at every defined observation point
-(see \hyperref[sec:ptc-observe]{\tt PTC\_OBSERVE} command). 
+(see \hyperref[sec:ptc-observe]{\texttt{PTC\_OBSERVE}} command). 
 
 Please note that \madx always creates an observation point at the end of a
 sequence.
@@ -330,7 +334,7 @@ PTC\_TRACK\_LINE, \=TURNS=integer, \\
 The attributes are:
 \begin{madlist}
    \ttitem{TURNS} number of turns to be tracked. If the layout of the
-   machine is not closed, this value is forced to {\tt TURNS=1} by \ptc 
+   machine is not closed, this value is forced to \texttt{TURNS=1} by \ptc 
    \\ (Default: 1)
      
    \ttitem{ONETABLE}\label{opt:onetable2} a logical switch to write all
@@ -351,30 +355,30 @@ The attributes are:
    if FILE is present, track tables are printed, optionally to 
    files with name constructed from the base filename specified. \\
    The actual name of the output file is constructed from
-   tyhe baseline given with {\tt FILE} to which are appended the
+   tyhe baseline given with \texttt{FILE} to which are appended the
    strings ".obsnnnn" (where nnnn is the observation point index) and
    ".pnnnn" (where nnnn is now the particle number), unless the
-   \hyperref[opt:onetable2]{\tt ONETABLE} option is activated.  \\
+   \hyperref[opt:onetable2]{\texttt{ONETABLE}} option is activated.  \\
    (Default: "track") 
 
    \ttitem{EXTENSION} a string providing the filename extension for the
    track table files, e.g., txt, doc...  \\ (Default: nil)
 
    \ttitem{ROOTNTUPLE} a logical switch to store data to ROOT file as
-   ntuple. Accessible only if \hyperref[sec:rplot]{\tt RPLOT} plugin is
+   ntuple. Accessible only if \hyperref[sec:rplot]{\texttt{RPLOT}} plugin is
    available. i.e. only if \madx is dynamically linked and
-   \hyperref[sec:rplot]{\tt RPLOT} plugin is present. \\ 
+   \hyperref[sec:rplot]{\texttt{RPLOT}} plugin is present. \\ 
    (Default: false)
 
    \ttitem{EVERYSTEP} a logical switch to activate the recording of
    track parameters at every integration step. Normally tracking data
-   are stored internally only at the end of each element. {\tt EVERYSTEP}
+   are stored internally only at the end of each element. \texttt{EVERYSTEP}
    provides the user with finer data points. It implies usage of the so
    called node (thin) layout. \\ 
    Track parameters are stored for each step in file
    "thintracking\_ptc.txt". Storage of parameters in a table for each
    step might be very memory consuming. To switch it off use option
-   {\tt TABLEALLSTEPS}.\\  
+   \texttt{TABLEALLSTEPS}.\\  
    Collective effects can be taken into account only using this mode
    (this feature of PTC is not interfaced into MAD-X). \\
    (Default: false)
@@ -387,14 +391,14 @@ The attributes are:
 \end{madlist}
 
 
-%% Depending on value of {\tt ONETABLE} switch, all output information
+%% Depending on value of \texttt{ONETABLE} switch, all output information
 %% is stored in one table (and also file), or in one table per track per
 %% observation point is written if the switch is false. 
 
-Plotting of track parameters (see \hyperref[sec:plot]{\tt PLOT}
-command) is only possible if {\tt ONETABLE} switch is set to false (status 
+Plotting of track parameters (see \hyperref[sec:plot]{\texttt{PLOT}}
+command) is only possible if \texttt{ONETABLE} switch is set to false (status 
 as for Feb. 2006). This unfortunate solution is the legacy of the
-regular \madx \hyperref[chap:thintrack]{\tt TRACK} command, 
+regular \madx \hyperref[chap:thintrack]{\texttt{TRACK}} command, 
 designed for circular machines where the user usually tracks a few
 particles for many turns rather then many particles for one turn each.
 
@@ -402,12 +406,12 @@ Tracks that do not fit in the defined aperture for elements are
 immediately stopped.  
 
 Behavior of PTC calculations can be adapted with
-\hyperref[sec:ptc-setswitch]{\tt PTC\_SETSWITCH} command 
+\hyperref[sec:ptc-setswitch]{\texttt{PTC\_SETSWITCH}} command 
 and with appropriate switches of
-\hyperref[sec:ptc-create-layout]{\tt PTC\_CREATE\_LAYOUT} command.  
+\hyperref[sec:ptc-create-layout]{\texttt{PTC\_CREATE\_LAYOUT}} command.  
 
 
-%% {\bf PROGRAMMER'S MANUAL}\\
+%% \textbf{PROGRAMMER'S MANUAL}\\
 %% The routine PTC\_TRACKLINE is implemented in file
 %% madx\_ptc\_trackcavs.f90\\
 %% Its single parameter is the number of observation points.  
@@ -475,8 +479,8 @@ and with appropriate switches of
 \section{PTC\_TRACK\_END}
 \label{sec:ptc-track-end}
 
-The {\tt PTC\_TRACK\_END} command terminates the command lines related
-to the {\tt PTC\_TRACK} module. 
+The \texttt{PTC\_TRACK\_END} command terminates the command lines related
+to the \texttt{PTC\_TRACK} module. 
 
 \madbox{
 PTC\_TRACK\_END;
@@ -510,33 +514,33 @@ number of typical tasks:
 
 \begin{tabular}{|lccccc|}
 \hline 
-{\bf Option} & {\bf case 1} & {\bf case 2} & {\bf case 3} & {\bf case 4} & {\bf case 5 } \\ 
+\textbf{Option} & \textbf{case 1} & \textbf{case 2} & \textbf{case 3} & \textbf{case 4} & \textbf{case 5 } \\ 
 \hline
-{\tt CLOSED\_ORBIT} & - & - & + & + & + \\ 
+\texttt{CLOSED\_ORBIT} & - & - & + & + & + \\ 
 \hline
-{\tt ELEMENT\_BY\_ELEMENT} & - & + & - & + & - \\ 
+\texttt{ELEMENT\_BY\_ELEMENT} & - & + & - & + & - \\ 
 \hline
-{\tt PTC\_START, X, PX, ...} & + & + & + & + & + \\ 
+\texttt{PTC\_START, X, PX, ...} & + & + & + & + & + \\ 
 \hline
-{\tt PTC\_START, FX, PHIX, ...} & -  & - & + & + & + \\ 
+\texttt{PTC\_START, FX, PHIX, ...} & -  & - & + & + & + \\ 
 \hline
-{\tt NORM\_NO} & - & - & $>$1 & $>$1 & $>$1 \\ 
+\texttt{NORM\_NO} & - & - & $>$1 & $>$1 & $>$1 \\ 
 \hline
-{\tt NORM\_OUT} & - & - & + & - & + \\ 
+\texttt{NORM\_OUT} & - & - & + & - & + \\ 
 \hline
-{\tt PTC\_OBSERVE} & - & + & + & + & - \\ 
+\texttt{PTC\_OBSERVE} & - & + & + & + & - \\ 
 \hline
-{\tt RADIATION} & - & - & - & - & + \\ 
+\texttt{RADIATION} & - & - & - & - & + \\ 
 \hline
-{\tt RADIATION\_MODEL1} & - & - & - & - & - \\ 
+\texttt{RADIATION\_MODEL1} & - & - & - & - & - \\ 
 \hline
-{\tt RADIATION\_ENERGY\_LOSS} & - & - & - & - & - \\ 
+\texttt{RADIATION\_ENERGY\_LOSS} & - & - & - & - & - \\ 
 \hline
-{\tt RADIATION\_QUAD} & - & - & - & - & +/- \\ 
+\texttt{RADIATION\_QUAD} & - & - & - & - & +/- \\ 
 \hline
-{\tt BEAM\_ENVELOPE} & - & - & - & - & - \\ 
+\texttt{BEAM\_ENVELOPE} & - & - & - & - & - \\ 
 \hline
-{\tt SPACE\_CHARGE} & - & - & - & - & - \\ 
+\texttt{SPACE\_CHARGE} & - & - & - & - & - \\ 
 \hline
 \end{tabular}
 

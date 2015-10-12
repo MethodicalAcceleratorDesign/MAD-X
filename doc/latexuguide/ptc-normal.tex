@@ -5,7 +5,7 @@
 \label{chap:ptc-normal}
 
 
-The {\tt PTC\_NORMAL} module (\cite{schmidt2005} and
+The \texttt{PTC\_NORMAL} module (\cite{schmidt2005} and
 \cite{damico2004-2}) of \madx is based on \ptc code. This module takes
 full advantage of the \ptc Normal Form analysis which is a considerable
 upgrade of what was available with the Lie Algebra technique used in
@@ -18,17 +18,17 @@ The number of terms per order increases with some power law. The
 internal \madx tables are not adequate to keep such large amounts of
 data. On the other hand, only a reduced set of this data is actually
 needed by the user. Thus a much easier and flexible solution is to
-gather user requirements with a series of {\tt SELECT\_PTC\_NORMAL}
+gather user requirements with a series of \texttt{SELECT\_PTC\_NORMAL}
 command. A special \madx table is dynamically built using those
-commands and is filled by a subsequent call to {\tt PTC\_NORMAL}.
+commands and is filled by a subsequent call to \texttt{PTC\_NORMAL}.
 
 Another essential advantage of this table is that it is
 structured to facilitate exchange of Normal Form (including
 Hamiltonian terms of high order) between \madx modules. The immediate
 goal is to use this table to allow non-linear matching inside the
-present \madx \hyperref[chap:match]{\tt MATCHING} module. 
+present \madx \hyperref[chap:match]{\texttt{MATCHING}} module. 
 
-{\bf Synopsis:}
+\textbf{Synopsis:}
 \madbox{
 PTC\_CREATE\_UNIVERSE; \\
 PTC\_CREATE\_LAYOUT, MODEL=integer, METHOD=integer, NST=integer, [EXACT];\\ 
@@ -44,8 +44,8 @@ PTC\_END;
 \section{SELECT\_PTC\_NORMAL} 
 \label{sec:select-ptc-normal}
 
-The {\tt SELECT\_PTC\_NORMAL} command selects parameters to be 
-calculated by a subsequent {\tt PTC\_NORMAL} command.
+The \texttt{SELECT\_PTC\_NORMAL} command selects the parameters to be 
+calculated by a subsequent \texttt{PTC\_NORMAL} command.
 
 \madbox{
 xxxxxxxxxxxxxxxxxx\= \kill
@@ -64,7 +64,7 @@ The attributes are:
   $D_{px}^{(n)} = \partial^{(n)} px_{co} / \partial \delta_p^{(n)}$, 
   $D_y^{(n)} = \partial^{(n)} y_{co} / \partial \delta_p^{(n)}$, 
   $D_{py}^{(n)} = \partial^{(n)} py_{co} / \partial \delta_p^{(n)}$,
-  where {\tt co} is abbreviation of "closed orbit".
+  where \texttt{co} is abbreviation of "closed orbit".
 
   \ttitem{Q1, Q2} horizontal and vertical tune paramaters are fixed to
   order 0: $Q_1^{(0)}$,  $Q_2^{(0)}$
@@ -81,9 +81,9 @@ The attributes are:
   $\partial^{(n_1 + n_2 + n_3)} Q_z / (
   \partial\epsilon_1^{(n_1)} \partial\epsilon_2^{(n_2)}
   \partial\delta_p^{(n_3)})$.
-  For example, {\tt ANHX=2,0,0} represents second order
+  For example, \texttt{ANHX=2,0,0} represents second order
   in $\epsilon_1$:  $\partial^{(2)} Q_1 / \partial \epsilon_1^{(2)}$. 
-  And {\tt ANHY=3,1,2} represents $\partial^{(6)} Q_2 / (
+  And \texttt{ANHY=3,1,2} represents $\partial^{(6)} Q_2 / (
   \partial\epsilon_1^{(3)} \partial\epsilon_2^{(1)}
   \partial\delta_p^{(2)})$.
 
@@ -98,7 +98,7 @@ The attributes are:
   The positive and negative values of $n-1$ define the order of
   upright or skew resonances respectively. The integers $n_2$
   and $n_3$ are reserved for a future upgrade and must be set to 0. \\
-  For example {\tt GNFU=-5,0,0} calculates all Generating Function
+  For example \texttt{GNFU=-5,0,0} calculates all Generating Function
   terms for skew decapoles. In the output table the cosine, sine and amplitude
   coefficients are denoted as "GNFC", "GNFS" and "GNFA" respectively.
   
@@ -107,13 +107,13 @@ The attributes are:
   The positive and negative values of $n_1$ define the order of
   upright or skew resonances, respectively. The integers $n_2$
   and $n_3$ are reserved for a future upgrade and must be set to 0. \\
-  For example, {\tt HAML=3,0,0} calculates all Hamiltonian terms for
+  For example, \texttt{HAML=3,0,0} calculates all Hamiltonian terms for
   upright sextupoles. In the output table the cosine, sine and amplitude
   coefficients are denoted as "HAMC", "HAMS" and "HAMA" respectively. 
   
 \end{madlist}
 
-{\bf Caution:} if more than one order of terms is selected only the lower one is correct 
+\textbf{Caution:} if more than one order of terms is selected only the lower one is correct 
 because higher orders contain "cross terms" from the lower ones.
 
 
@@ -121,8 +121,8 @@ because higher orders contain "cross terms" from the lower ones.
 \label{sec:ptc-normal}
 
 The calculation of the parameters specified by the preceding
-{\tt SELECT\_PTC\_NORMAL} commands is initiated by the
-{\tt PTC\_NORMAL} command, which operates on the working beam
+\texttt{SELECT\_PTC\_NORMAL} commands is initiated by the
+\texttt{PTC\_NORMAL} command, which operates on the working beam
 line defined in the latest \hyperref[sec:use]{USE} command. 
 
 \madbox{
@@ -145,8 +145,8 @@ The attributes are:
 
   \ttitem{MAPTABLE} a logical flag to activate the storage of the
   map-table in memory. \\ 
-  {\tt MAPTABLE=true} and {\tt NO=1} creates the one-turn matrix which
-  can be used by the next \hyperref[chap:ptc-twiss]{\tt PTC\_TWISS}
+  \texttt{MAPTABLE=true} and \texttt{NO=1} creates the one-turn matrix which
+  can be used by the next \hyperref[chap:ptc-twiss]{\texttt{PTC\_TWISS}}
   command.\\ (Default: false) 
 
   \ttitem{NORMAL} a logical flag to activate the calculation of the
@@ -154,7 +154,7 @@ The attributes are:
 \end{madlist}
 
 
-{\bf Example}\\
+\textbf{Example}\\
 The simple example is located on the Web-page for the
 \href{http://cern.ch/frs/mad-X_examples/ptc_normal}{\texttt{PTC\_NORMAL}
   example}. 
