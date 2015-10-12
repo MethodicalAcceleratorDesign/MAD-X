@@ -51,7 +51,7 @@ FC_SRC := $(filter-out $(FC_SRC_RM),$(FC_SRC_MAD) $(FC_SRC_PTC))
 
 # files specific compiler flag (i.e. "internal compiler error" message)
 matchlib2.o:        override NOPT := 0
-Sg_sagan_wiggler.o: FFLAGS += -fdollar-ok
+Sg_sagan_wiggler.o: FFLAGS += -fdollar-ok NOPT := 2
 l_complex_taylor.o: NOPT := 2
 
 ifeq ($(ARCH),32)
@@ -67,6 +67,7 @@ ifeq ($(FDEP),)
 a_scratch_size.o:           $(FC_DIR_PTC)/a_scratch_size.f90
 b_da_arrays_all.o:          $(FC_DIR_PTC)/b_da_arrays_all.f90         a_scratch_size.o
 c_dabnew.o:                 $(FC_DIR_PTC)/c_dabnew.f90                b_da_arrays_all.o
+cc_dabnew.o:                $(FC_DIR_PTC)/cc_dabnew.f90                b_da_arrays_all.o
 c_dabnew_berz.o:            $(FC_DIR_MAD)/c_dabnew_berz.f90           b_da_arrays_all.o
 c_tpsa_interface.o:         $(FC_DIR_MAD)/c_tpsa_interface.F90        c_dabnew_berz.o
 d_lielib.o:                 $(FC_DIR_PTC)/d_lielib.f90                $(if $(call eq,$(NTPSA),yes),c_tpsa_interface.o,c_dabnew.o)
