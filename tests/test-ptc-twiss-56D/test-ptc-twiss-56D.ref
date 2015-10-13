@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.07  (64 bit, Darwin)      +
+  +     MAD-X 5.02.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2015.09.24               +
-  + Execution date: 2015.09.23 20:45:56      +
+  + Execution date: 2015.10.13 12:50:41      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -885,16 +885,16 @@ ptc_create_universe;
                  0    1.168573382e-08                  0    3.059593803e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0    9.711800037e-09                  0    2.508646062e-08 
+                 0    9.711800737e-09                  0    2.508646062e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.106287014e-08                  0    2.153666875e-08 
+                 0    1.106287014e-08                  0    3.285427201e-09 
 
            ptcomax             xcomin             ycomin            pxcomin 
                  0   -1.448330251e-12                  0   -1.106286944e-08 
 
            pycomin             tcomin            ptcomin 
-                 0   -3.285427357e-09                  0 
+                 0   -2.153666998e-08                  0 
   write, table=twiss, file="leir.56d.ptc.twiss";
 
   write, table=ptc_twiss_summary, file="leir.56d.ptc.summ.twiss";
