@@ -7527,8 +7527,8 @@ subroutine c_linear_a(xy,a1)
      if(ndpt==0) then
        fm0(1:nd2,1:nd2)=transpose(fm(1:nd2,1:nd2))
      else
-write(6,*) " nd2t,nd2,nd2harm "
-write(6,*) nd2t,nd2,nd2harm
+!write(6,*) " nd2t,nd2,nd2harm "
+!write(6,*) nd2t,nd2,nd2harm
 ! Consider the following example
 ! ndc2t,nd2t,nd2harm,nd2
 !           2           4           6           8

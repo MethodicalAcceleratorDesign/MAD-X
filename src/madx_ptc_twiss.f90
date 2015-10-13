@@ -2767,14 +2767,14 @@ contains
        call double_to_table_curr(summary_table_name,'ycomin ' ,minOrbit(3))
        call double_to_table_curr(summary_table_name,'pycomin ',minOrbit(4))
        call double_to_table_curr(summary_table_name,'ptcomin ',minOrbit(5))
-       call double_to_table_curr(summary_table_name,'tcomin ' ,-minOrbit(6))
+       call double_to_table_curr(summary_table_name,'tcomin ' ,-maxOrbit(6)) !change of sign to MADX
 
        call double_to_table_curr(summary_table_name,'xcomax ' ,maxOrbit(1))
        call double_to_table_curr(summary_table_name,'pxcomax ',maxOrbit(2))
        call double_to_table_curr(summary_table_name,'ycomax ' ,maxOrbit(3))
        call double_to_table_curr(summary_table_name,'pycomax ',maxOrbit(4))
        call double_to_table_curr(summary_table_name,'ptcomax ',maxOrbit(5))
-       call double_to_table_curr(summary_table_name,'tcomax ' ,-maxOrbit(6))
+       call double_to_table_curr(summary_table_name,'tcomax ' ,-minOrbit(6)) !change of sign to MADX
 
      
       

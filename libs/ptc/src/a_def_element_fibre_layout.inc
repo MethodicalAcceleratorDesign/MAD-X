@@ -289,12 +289,12 @@ type fibre_appearance
 end type fibre_appearance
 
 type info
-   real(dp),pointer :: s
-   real(dp),pointer ::  beta(:)
-   real(dp),pointer ::  fix0(:)
-   real(dp),pointer ::  fix(:)
-   real(dp), pointer:: pos(:)
-   real(dp), pointer:: m(:,:)
+   real(dp),pointer :: s => null()
+   real(dp),pointer ::  beta(:) => null()
+   real(dp),pointer ::  fix0(:) => null()
+   real(dp),pointer ::  fix(:) => null()
+   real(dp), pointer:: pos(:) => null()
+   real(dp), pointer:: m(:,:) => null()
 END type info
 
 TYPE FIBRE

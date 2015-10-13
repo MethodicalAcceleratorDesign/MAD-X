@@ -133,7 +133,17 @@ CONTAINS
     deallocate(c%fix0)
     deallocate(c%beta)
     deallocate(c%pos)
-    if(associated(c%m)) deallocate(c%m)
+    if(associated(c%m)) then 
+      deallocate(c%m)
+    endif
+
+    c%s => null()
+    c%fix => null()
+    c%fix0 => null()
+    c%beta => null()
+    c%pos => null()
+    c%m => null()
+
 
   end SUBROUTINE kill_info
 
