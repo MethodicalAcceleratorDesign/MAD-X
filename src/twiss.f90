@@ -1634,60 +1634,51 @@ SUBROUTINE twcptk1(re,orbit)
   use twisslfi
   use twisscfi
   use twissotmfi
+  use matrices, only : SMAT, SMATT, JMAT, JMATT
+  use math_constfi, only : zero, one
   use name_lenfi !LD: 09.2015
   implicit none
 
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
-  !     Track coupled lattice functions.                                 *
+  !     Track coupled lattice functions. Rewritten inmatrix formulaton.                                  *
   !     Input:                                                           *
   !     re(6,6)  (double)   transfer matrix of element.                  *
   !     orbit(6) (double)   closed orbit                                 *
   !----------------------------------------------------------------------*
-  integer i,i1,i2,j,get_option
-  double precision re(6,6),orbit(6),rw0(6,6),rwi(6,6),rc(6,6),      &
-       rmat0(2,2),dt(6),tempa,tempb,alfx0,     &
-       alfy0,betx0,bety0,amux0,amuy0,zero,one,eps
-  double precision E(2,2), F(2,2), RMAT_BAR(2,2), EDET,            &
-        EBAR(2,2), CD(2,2)     
-       
-  character(name_len) name !LD: 09.2015
-  parameter(zero=0d0,one=1d0,eps=1d-36)
+  double precision :: re(6,6), orbit(6)
 
-  !initialize
-  bety0=zero
-  betx0=zero
-  amux0=zero
-  amuy0=zero
-  alfy0=zero
-  alfx0=zero
+    integer :: i, i1, i2, j
+    double precision :: rw0(6,6), rwi(6,6), rc(6,6), dt(6)
+    double precision :: rmat0(2,2), E(2,2), F(2,2), CD(2,2)          
+    double precision :: RMAT_BAR(2,2), EBAR(2,2) 
+    double precision :: EDET, tempa, tempb
+    double precision :: alfx0=zero, alfy0=zero  
+    double precision :: betx0=zero, bety0=zero
+    double precision :: amux0=zero, amuy0=zero
+    character(name_len) :: name !LD: 09.2015
+
+    integer, external :: get_option
+    double precision, parameter :: eps=1d-36  
 
   !---- Dispersion.
-  call dzero(dt,6)
-  do i = 1, 6
-     do j = 1, 6
-        dt(i) = dt(i) + re(i,j) * disp(j)
-     enddo
-  enddo
-  if(.not.centre.or.centre_cptk) then
-     opt_fun(15)=dt(1)
-     opt_fun(16)=dt(2)
-     opt_fun(17)=dt(3)
-     opt_fun(18)=dt(4)
-  endif
+  DT = matmul(RE, DISP)
+
+  if(.not.centre.or.centre_cptk) opt_fun(15:18)=DT(1:4)
+ 
   if(centre_cptk) then
-     alfx0=alfx
-     alfy0=alfy
-     betx0=betx
-     bety0=bety
-     amux0=amux
-     amuy0=amuy
-     call dcopy(rmat,rmat0,4)
-     if(rmatrix) call dcopy(rw,rw0,36)
+     alfx0 = alfx
+     alfy0 = alfy
+     betx0 = betx
+     bety0 = bety
+     amux0 = amux
+     amuy0 = amuy
+     RMAT0 = RMAT
+     if(rmatrix) RW0=RW
   else
-     call dcopy(dt,disp,6)
-     disp(5) = zero
-     disp(6) = one
+     DISP(1:4) = DT(1:4)
+     DISP(5)   = zero
+     DISP(6)   = one
   endif
 
   !---- Auxiliary matrices.
@@ -1701,40 +1692,24 @@ SUBROUTINE twcptk1(re,orbit)
   ! --- U = | E 0 |
   ! ----    | 0 F |
   
-  ! --- R = !/sqrt(1+|rmat|)*|   I    rmat^{-1} |
-  ! ----                     | -rmat     I      |
+  ! --- R = 1/sqrt(1+|rmat|)*|   I    rmat^{-1} |
+  ! ----                     | -rmat     I      |    
 
-  ! RE: matrix([re13,re14],[re23,re24]);
-  ! RMAT: matrix([rmat11,rmat12],[rmat21,rmat22]);
-  ! U: RE.RMAT;
-  !  matrix([re14*rmat21+re13*rmat11,re14*rmat22+re13*rmat12], 
-  !         [re24*rmat21+re23*rmat11,re24*rmat22+re23*rmat12])
-  
-  ! E = A - BR, former auxiliary a
-  E(1:2,1:2) = RE(1:2,1:2) - matmul(RE(1:2,3:4),RMAT(1:2,1:2))
-  ! F = D + RBAR*C, former auxiliary c
-  ! RBAR = SR^{T}S^{T} - symplectic conjugate of R
-  call m22symp_conj(RMAT, RMAT_BAR) 
-  F(1:2,1:2) = RE(3:4,3:4) + matmul(RMAT_BAR(1:2,1:2),RE(3:4,3:4))
-
-  ! R = -(C-D*RMAT)*EBAR/|E|
-  ! C -  D*RMAT, former auxiliary b
-  ! C -D.RMAT 
-  ! ([−re34*rmat21−re33*rmat11+re31,−re34*rmat22−re33*rmat12+re32]
-  !   [−re44*rmat21−re43*rmat11+re41,−re44*rmat22−re43*rmat12+re42])
-  CD(1:2,1:2) = RE(3:4,1:2) - matmul(RE(3:4,3:4), RMAT(1:2,1:2)) 
+! RMAT_BAR = SRMAT^{T}S^{T} - symplectic conjugate of RMAT 
+  RMAT_BAR    = matmul(SMAT, matmul(transpose(RMAT),SMATT))        ! invert symplectic matrix
+  E(1:2,1:2)  = RE(1:2,1:2) - matmul(RE(1:2,3:4),RMAT(1:2,1:2))    ! E  = A - BR,     former a
+  F(1:2,1:2)  = RE(3:4,3:4) + matmul(RMAT_BAR(1:2,1:2),RE(3:4,3:4))! F  = D + RBAR*C, former c
+  CD(1:2,1:2) = RE(3:4,1:2) - matmul(RE(3:4,3:4), RMAT(1:2,1:2))   ! CD = C-D*RMAT,   former b
   
   !---- Track R matrix.
-  ! former adet
-  EDET = E(1,1) * E(2,2) - E(1,2) * E(2,1)
-  call m22symp_conj(E, EBAR) 
+  EDET = E(1,1) * E(2,2) - E(1,2) * E(2,1) ! former adet
+  EBAR = matmul(SMAT, matmul(transpose(E),SMATT))        ! symplectic conjugate of E = SE^TS^T
   
   !LD: 09.2015, adet must be positive for physical twiss parameters.
-  !if (abs(adet).gt.eps) then
-  if (EDET .gt. eps) then
-  ! former rmat
+  if (abs(EDET) .gt. eps) then
+     ! RMAT = -(C-D*RMAT)*EBAR/|E|
      RMAT(1:2, 1:2) = - matmul(CD(1:2, 1:2), EBAR(1:2,1:2)) / EDET
-    
+
      !---- Mode 1.
      tempb = E(1,1) * betx - E(1,2) * alfx
      tempa = E(2,1) * betx - E(2,2) * alfx
@@ -1758,13 +1733,12 @@ SUBROUTINE twcptk1(re,orbit)
   
   !---- Cummulative R matrix and one-turn map at element location.
   if(rmatrix) then
-     call m66mpy(re,rw,rw)
+     RW = matmul(RE,RW) 
      if (get_option('twiss_inval ') .ne. 0) then
-        call dcopy(rw,rc,36)
+        RC = RW 
      else
-        call m66inv(rw,rwi)
-        call m66mpy(rotm,rwi,rc)
-        call m66mpy(rw,rc,rc)
+        RWI = matmul(JMATT, matmul(transpose(RW),JMAT)) ! invert symplectic matrix
+        RC = matmul(RW,matmul(ROTM,RWI))
      endif
   endif
   
@@ -1775,10 +1749,11 @@ SUBROUTINE twcptk1(re,orbit)
      opt_fun(6 )=bety
      opt_fun(7 )=alfy
      opt_fun(8 )=amuy
-     opt_fun(29)=rmat(1,1)
-     opt_fun(30)=rmat(1,2)
-     opt_fun(31)=rmat(2,1)
-     opt_fun(32)=rmat(2,2)
+     
+     opt_fun(29) = rmat(1,1)
+     opt_fun(30) = rmat(1,2)
+     opt_fun(31) = rmat(2,1)
+     opt_fun(32) = rmat(2,2)
   endif
   if(rmatrix) then
      do i1=1,6
@@ -1788,20 +1763,15 @@ SUBROUTINE twcptk1(re,orbit)
      enddo
   endif
   if(centre_cptk) then
-     opt_fun(9 )=orbit(1)
-     opt_fun(10)=orbit(2)
-     opt_fun(11)=orbit(3)
-     opt_fun(12)=orbit(4)
-     opt_fun(13)=orbit(5)
-     opt_fun(14)=orbit(6)
-     alfx=alfx0
-     alfy=alfy0
-     betx=betx0
-     bety=bety0
-     amux=amux0
-     amuy=amuy0
-     call dcopy(rmat0,rmat,4)
-     if(rmatrix) call dcopy(rw0,rw,36)
+     OPT_FUN(9:14) = ORBIT
+     alfx = alfx0
+     alfy = alfy0
+     betx = betx0
+     bety = bety0
+     amux = amux0
+     amuy = amuy0
+     RMAT = RMAT0
+     if(rmatrix) RW=RW0
   endif
 
 end SUBROUTINE twcptk1

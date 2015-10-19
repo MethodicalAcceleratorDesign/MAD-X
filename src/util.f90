@@ -533,6 +533,24 @@ module plot_cfi
 
   double precision :: e2s=0.d0
 end module plot_cfi
+
+module math_constfi ! 2015-Aug-06 Ghislain 
+  implicit none
+  public
+  !--- Definition of useful mathematical constants
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0, four=4d0, five=5d0
+  double precision, parameter :: six=6d0, seven=7d0, eight=8d0, nine=9d0, ten=10d0
+  double precision, parameter :: eleven=11d0, twelve=12d0, thirteen=13d0, fourteen=14d0, fifteen=15d0
+  double precision, parameter :: sixteen=16d0, seventeen=17d0, eighteen=18d0, nineteen=19d0, twenty=20d0
+  double precision, parameter :: half=0.5d0, quarter=0.25d0
+  double precision, parameter :: ten3m=1d-3, ten6m=1d-6, ten9m=1d-9
+  double precision, parameter :: ten3p=1d3,  ten6p=1d6,  ten9p=1d9
+  double precision, parameter :: pi = 3.141592653589793238462643383279502884197169399375105820974944d0
+  double precision, parameter :: twopi = two*pi
+  double precision, parameter :: degrad = 180d0/pi, raddeg = pi/180d0
+  double precision, parameter :: e = 2.718281828459045235360287471352662497757247093699959574966967d0
+end module math_constfi
+
 module plot_mathfi
   implicit none
   public
@@ -647,6 +665,33 @@ module fasterror
   common /wzcom1/ hrecip, kstep
   common /wzcom2/ wtreal(idim), wtimag(idim)
 end module fasterror
+
+module matrices
+  ! useful matrices: Identity EYE(6,6) and Symplectic JMAT(6.6), SMAT(2,2)
+  implicit none
+  double precision, parameter :: EYE(6,6)=reshape((/1d0,0d0,0d0,0d0,0d0,0d0,&
+                                                    0d0,1d0,0d0,0d0,0d0,0d0,&
+                                                    0d0,0d0,1d0,0d0,0d0,0d0,&
+                                                    0d0,0d0,0d0,1d0,0d0,0d0,&
+                                                    0d0,0d0,0d0,0d0,1d0,0d0,&
+                                                    0d0,0d0,0d0,0d0,0d0,1d0 /), shape(EYE))
+  double precision, parameter :: JMAT(6,6)=reshape((/0d0,1d0,0d0,0d0,0d0,0d0, &
+                                                    -1d0,0d0,0d0,0d0,0d0,0d0, &
+                                                     0d0,0d0,0d0,1d0,0d0,0d0, &
+                                                     0d0,0d0,-1d0,0d0,0d0,0d0, &
+                                                     0d0,0d0,0d0,0d0,0d0,1d0, &
+                                                     0d0,0d0,0d0,0d0,-1d0,0d0 /), shape(JMAT))
+  double precision, parameter :: JMATINV(6,6) = -JMAT
+  double precision, parameter :: JMATT(6,6) = -JMAT
+  double precision, parameter :: SMAT(2,2)=reshape((/0d0,1d0, &
+                                                    -1d0,0d0 /),            shape(SMAT))
+  double precision, parameter :: SMATINV(2,2) = -SMAT
+  double precision, parameter :: SMATT(2,2) = -SMAT
+end module matrices
+
+
+! SUBROUTINES
+
 subroutine fort_info(t1, t2)
   implicit none
 
