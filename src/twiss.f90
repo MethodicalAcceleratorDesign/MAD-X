@@ -1624,6 +1624,282 @@ SUBROUTINE twcptk(re,orbit)
   endif
 
 end SUBROUTINE twcptk
+! to be added
+! twcptk1 Matrix formulation rewrite
+! twcptk2 Mad8 + Irina's correction
+! twcptk3 Sagan and Ruobin
+! twcptk4 Conte's implementation (below)
+SUBROUTINE twcptk4(re,orbit)
+  use twiss0fi
+  use twisslfi
+  use twisscfi
+  use twissotmfi
+  use name_lenfi !LD: 09.2015
+  implicit none
+
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Track coupled lattice functions.                                 *
+  !     Input:                                                           *
+  !     re(6,6)  (double)   transfer matrix of element.                  *
+  !     orbit(6) (double)   closed orbit                                 *
+  !----------------------------------------------------------------------*
+  integer i,i1,i2,j,get_option
+  double precision re(6,6),orbit(6),rw0(6,6),rwi(6,6),rc(6,6),      &
+       rmat0(2,2),a(2,2),adet,b(2,2),c(2,2),dt(6),tempa,tempb,alfx0,     &
+       alfy0,betx0,bety0,amux0,amuy0,zero,one,eps 
+   !---  I.T  
+   double precision mdet, nm(2,2),nmtr, NM_tr,        &  !---  I.T  
+                    x, K, sin_2phi, cos_2phi, tan_phi, sign_x_inv_sqrt_K! ----I.T.       
+
+  
+  character(name_len) name !LD: 09.2015
+  parameter(zero=0d0,one=1d0,eps=1d-36)
+
+  !initialize
+  bety0=zero
+  betx0=zero
+  amux0=zero
+  amuy0=zero
+  alfy0=zero
+  alfx0=zero
+
+  !---- Dispersion.
+  call dzero(dt,6)
+  do i = 1, 6
+     do j = 1, 6
+        dt(i) = dt(i) + re(i,j) * disp(j)
+     enddo
+  enddo
+  if(.not.centre.or.centre_cptk) then
+     opt_fun(15)=dt(1)
+     opt_fun(16)=dt(2)
+     opt_fun(17)=dt(3)
+     opt_fun(18)=dt(4)
+  endif
+  if(centre_cptk) then
+     alfx0=alfx
+     alfy0=alfy
+     betx0=betx
+     bety0=bety
+     amux0=amux
+     amuy0=amuy
+     call dcopy(rmat,rmat0,4)
+     if(rmatrix) call dcopy(rw,rw0,36)
+  else
+     call dcopy(dt,disp,6)
+     disp(5) = zero
+     disp(6) = one
+  endif
+
+
+  !---- Auxiliary matrices.
+  ! ----I.T.
+  !--- M =R*U*R^{-1}; 
+  ! --- M = | M n |
+  ! ----    | m N |
+  ! --- U = | A 0 |
+  ! ----    | 0 B |
+  ! --- R = | I*cos(phi) rmat^{-1}*sin(phi) |
+  ! ----    | -rmat*sin(phi) I*cos(phi) |
+
+! a 
+a(1,1) = re(1,1);
+a(1,2) = re(1,2);
+a(2,1) = re(2,1);
+a(2,2) = re(2,2);
+
+! b
+b(1,1) = re(3,3);
+b(1,2) = re(3,4);
+b(2,1) = re(4,3);
+b(2,2) = re(4,4);
+
+rmat(1,1) = -(re(3,1)+re(2,4)) 
+rmat(1,2) = -(re(3,2)-re(1,4))
+rmat(2,1) = -(re(4,1)-re(2,3))
+rmat(2,2) = -(re(4,2)+re(1,3))
+
+if (abs(rmat(1,1)).gt.eps.and.&
+    abs(rmat(1,2)).gt.eps.and.&
+    abs(rmat(2,1)).gt.eps.and.&
+    abs(rmat(2,2)).gt.eps) then
+
+    !---matrix([re13,re14],[re23,re24]).matrix([re31,re32],[re41,re42]);
+    nm(1,1)= re(1,3)*re(3,1)+re(1,4)*re(4,1) 
+    nm(2,2)= re(2,3)*re(3,2)+re(2,4)*re(4,2)
+
+    !---- tr(nm)
+
+    x = 0.5*(re(1,1)+re(2,2)-re(3,3)-re(4,4)) ! -- 0.5 * tr(M-N)
+    K = 2d0*(re(3,1)*re(4,2)-re(4,1)*re(3,2)) + (nm(1,1) + nm(2,2)) !-- 2det(m) +tr(nm)
+
+    cos_2phi = abs(x)/sqrt(K+x*x);
+    sin_2phi = sqrt(1d0 - cos_2phi**2);
+
+    if (sin_2phi.gt.eps) then
+        tan_phi = (1d0-cos_2phi)/sin_2phi;
+        
+        sign_x_inv_sqrt_K = sign(1d0, x) / sqrt(K);
+
+        rmat(1,1) = rmat(1,1) * sign_x_inv_sqrt_K
+        rmat(1,2) = rmat(1,2) * sign_x_inv_sqrt_K
+        rmat(2,1) = rmat(2,1) * sign_x_inv_sqrt_K
+        rmat(2,2) = rmat(2,2) * sign_x_inv_sqrt_K
+
+        !-- a =A in Conto corresponds to a = E in madx
+        ! --- A = M - rmat^{-1}*m*tan(phi)
+        ! det(rmat) = 1 !!!! 
+        !  --- rmat-1*m= matrix([rmat22,-rmat12],[-rmat21,rmat11]).matrix([re31,re32],[re41,re42]);
+        a(1,1) = re(1,1) - ( re(3,1)*rmat(2,2) - re(4,1)*rmat(1,2) ) * tan_phi
+        a(1,2) = re(1,2) - ( re(3,2)*rmat(2,2) - re(4,2)*rmat(1,2) ) * tan_phi
+        a(2,1) = re(2,1) - ( re(4,1)*rmat(1,1) - re(3,1)*rmat(2,1) ) * tan_phi
+        a(2,2) = re(2,2) - ( re(4,2)*rmat(1,1) - re(3,2)*rmat(2,1) ) * tan_phi
+
+        !-- b = B in Conto corresponds to b = F in madx
+        ! ---B = N + rmat*n*tan(phi)
+        ! ---rmat*n = matrix([rmat11,rmat12],[rmat21,rmat22]).matrix([re13,re14],[re23,re24]);
+        b(1,1) = re(3,3) + ( re(2,3)*rmat(1,2) + re(1,3)*rmat(1,1) ) * tan_phi
+        b(1,2) = re(3,4) + ( re(2,4)*rmat(1,2) + re(1,4)*rmat(1,1) ) * tan_phi
+        b(2,1) = re(4,3) + ( re(2,3)*rmat(2,2) + re(1,3)*rmat(2,1) ) * tan_phi
+        b(2,2) = re(4,4) + ( re(2,4)*rmat(2,2) + re(1,4)*rmat(2,1) ) * tan_phi
+
+        adet = a(1,1) * a(2,2) - a(1,2) * a(2,1)
+
+        call element_name(name,len(name))
+        if (isnan(adet)) then
+print *, ' adetnan for the element ', name, ' K1 = ', (re(3,1)*re(4,2)-re(4,1)*re(3,2)), ' K2 = ', (nm(1,1) + nm(2,2)), ' X=', x,&
+        'cos=', cos_2phi
+        else
+print *, ' adet for the element ', name, ' K1 = ', (re(3,1)*re(4,2)-re(4,1)*re(3,2)), ' K2 = ', (nm(1,1) + nm(2,2)), ' X=', x,&
+        'cos=', cos_2phi
+        endif
+    endif
+endif
+
+!  adet = a(1,1) * a(2,2) - a(1,2) * a(2,1)
+!  if (adet .gt. eps) then 
+     !---- Mode 1.
+     tempb = a(1,1) * betx - a(1,2) * alfx
+     tempa = a(2,1) * betx - a(2,2) * alfx
+     alfx = - (tempa * tempb + a(1,2) * a(2,2)) / betx
+     betx =   (tempb * tempb + a(1,2) * a(1,2)) / betx
+     if(abs(a(1,2)).gt.eps) amux=amux+atan2(a(1,2),tempb)
+     
+     !---- Mode 2.
+     tempb = b(1,1) * bety - b(1,2) * alfy
+     tempa = b(2,1) * bety - b(2,2) * alfy
+     alfy = - (tempa * tempb + b(1,2) * b(2,2)) / bety
+     bety =   (tempb * tempb + b(1,2) * b(1,2)) / bety
+     if(abs(b(1,2)).gt.eps) amuy=amuy+atan2(b(1,2),tempb)
+
+!  else
+!    !LD: 09.2015
+!    call element_name(name,len(name))
+!    print *, '+++ coupling too strong in element ', name
+!    print *, '+++ adet=', adet, ', betx=', betx, ', bety=', bety
+!    call aawarn('twcptk: ', 'twiss parameter might be unphysical, coupling skipped')
+!  endif
+  
+
+
+!!LD:  a = re_x - re_xy*rmat
+!  a(1,1) = re(1,1) - (re(1,3) * rmat(1,1) + re(1,4) * rmat(2,1))
+!  a(1,2) = re(1,2) - (re(1,3) * rmat(1,2) + re(1,4) * rmat(2,2))
+!  a(2,1) = re(2,1) - (re(2,3) * rmat(1,1) + re(2,4) * rmat(2,1))
+!  a(2,2) = re(2,2) - (re(2,3) * rmat(1,2) + re(2,4) * rmat(2,2))
+!  !LD:  b = re_yx - re_y*rmat
+!  b(1,1) = re(3,1) - (re(3,3) * rmat(1,1) + re(3,4) * rmat(2,1))
+!  b(1,2) = re(3,2) - (re(3,3) * rmat(1,2) + re(3,4) * rmat(2,2))
+!  b(2,1) = re(4,1) - (re(4,3) * rmat(1,1) + re(4,4) * rmat(2,1))
+!  b(2,2) = re(4,2) - (re(4,3) * rmat(1,2) + re(4,4) * rmat(2,2))
+!  !LD:  c = re_y - re_yx*rmat
+!  c(1,1) = re(3,3) + (re(3,1) * rmat(2,2) - re(3,2) * rmat(2,1))
+!  c(1,2) = re(3,4) - (re(3,1) * rmat(1,2) - re(3,2) * rmat(1,1))
+!  c(2,1) = re(4,3) + (re(4,1) * rmat(2,2) - re(4,2) * rmat(2,1))
+!  c(2,2) = re(4,4) - (re(4,1) * rmat(1,2) - re(4,2) * rmat(1,1))
+!
+!  !---- Track R matrix.
+!  adet = a(1,1) * a(2,2) - a(1,2) * a(2,1)
+!
+!  !LD: 09.2015, adet must be positive for physical twiss parameters.
+!  !if (abs(adet).gt.eps) then
+!  if (adet .gt. eps) then
+!     rmat(1,1) = - (b(1,1) * a(2,2) - b(1,2) * a(2,1)) / adet
+!     rmat(1,2) =   (b(1,1) * a(1,2) - b(1,2) * a(1,1)) / adet
+!     rmat(2,1) = - (b(2,1) * a(2,2) - b(2,2) * a(2,1)) / adet
+!     rmat(2,2) =   (b(2,1) * a(1,2) - b(2,2) * a(1,1)) / adet
+!    
+!     !---- Mode 1.
+!     tempb = a(1,1) * betx - a(1,2) * alfx
+!     tempa = a(2,1) * betx - a(2,2) * alfx
+!     alfx = - (tempa * tempb + a(1,2) * a(2,2)) / (adet * betx)
+!     betx =   (tempb * tempb + a(1,2) * a(1,2)) / (adet * betx)
+!     if(abs(a(1,2)).gt.eps) amux=amux+atan2(a(1,2),tempb)
+!     
+!     !---- Mode 2.
+!     tempb = c(1,1) * bety - c(1,2) * alfy
+!     tempa = c(2,1) * bety - c(2,2) * alfy
+!     alfy = - (tempa * tempb + c(1,2) * c(2,2)) / (adet * bety)
+!     bety =   (tempb * tempb + c(1,2) * c(1,2)) / (adet * bety)
+!     if(abs(c(1,2)).gt.eps) amuy=amuy+atan2(c(1,2),tempb)
+!  else
+!    !LD: 09.2015
+!    call element_name(name,len(name))
+!    print *, '+++ coupling too strong in element ', name
+!    print *, '+++ adet=', adet, ', betx=', betx, ', bety=', bety
+!    call aawarn('twcptk: ', 'twiss parameter might be unphysical, coupling skipped')
+!  endif
+  
+  !---- Cummulative R matrix and one-turn map at element location.
+  if(rmatrix) then
+     call m66mpy(re,rw,rw)
+     if (get_option('twiss_inval ') .ne. 0) then
+        call dcopy(rw,rc,36)
+     else
+        call m66inv(rw,rwi)
+        call m66mpy(rotm,rwi,rc)
+        call m66mpy(rw,rc,rc)
+     endif
+  endif
+  
+  if(.not.centre.or.centre_cptk) then
+     opt_fun(3 )=betx
+     opt_fun(4 )=alfx
+     opt_fun(5 )=amux
+     opt_fun(6 )=bety
+     opt_fun(7 )=alfy
+     opt_fun(8 )=amuy
+     opt_fun(29)=rmat(1,1)
+     opt_fun(30)=rmat(1,2)
+     opt_fun(31)=rmat(2,1)
+     opt_fun(32)=rmat(2,2)
+  endif
+  if(rmatrix) then
+     do i1=1,6
+        do i2=1,6
+           opt_fun(33+(i1-1)*6+i2)=rc(i1,i2)
+        enddo
+     enddo
+  endif
+  if(centre_cptk) then
+     opt_fun(9 )=orbit(1)
+     opt_fun(10)=orbit(2)
+     opt_fun(11)=orbit(3)
+     opt_fun(12)=orbit(4)
+     opt_fun(13)=orbit(5)
+     opt_fun(14)=orbit(6)
+     alfx=alfx0
+     alfy=alfy0
+     betx=betx0
+     bety=bety0
+     amux=amux0
+     amuy=amuy0
+     call dcopy(rmat0,rmat,4)
+     if(rmatrix) call dcopy(rw0,rw,36)
+  endif
+
+end SUBROUTINE twcptk4
 SUBROUTINE twbtin(rt,tt)
 
   use twiss0fi
