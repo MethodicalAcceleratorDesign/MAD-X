@@ -883,6 +883,32 @@ subroutine m66symp(r,nrm)
   call m66sub(T,J,T)
   call m66nrm(T,nrm)
 end subroutine m66symp
+!--- IT
+subroutine m22symp_conj(r,rsc)
+  implicit none
+  !----------------------------------------------------------------------*
+  ! Purpose:
+  !   Symplectic conjugate of a 2x2 matrix
+  !   
+  ! Input:
+  !   r(2,2)    (double)  Matrix R.
+  ! Output:
+  !   rsc(2,2)  (double)  Symplectic conjugate of R.
+  !----------------------------------------------------------------------*
+  integer i,j,k
+  double precision r(2,2), rsc(2,2)
+
+  call dzero(rsc,4)
+ ! RMAT: matrix([rmat11,rmat12],[rmat21,rmat22]);  
+ ! S:    matrix([0,1],[-1,0]);  
+ ! RSC: S.transpose(RMAT).transpose(S)
+ ! RSC: matrix([rmat22,−rmat12],[−rmat21,rmat11])
+  rsc(1,1) =   r(2,2) 
+  rsc(1,2) =  -r(1,2)
+  rsc(2,1) =  -r(2,1)
+  rsc(2,2) =  -r(1,1)
+end subroutine m22symp_conj
+!---end I.T
 subroutine m66mak(f2,target)
   implicit none
   !----------------------------------------------------------------------*

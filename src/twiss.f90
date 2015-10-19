@@ -1625,10 +1625,189 @@ SUBROUTINE twcptk(re,orbit)
 
 end SUBROUTINE twcptk
 ! to be added
-! twcptk1 Matrix formulation rewrite
+! twcptk1 Matrix formulation rewrite (below)
 ! twcptk2 Mad8 + Irina's correction
 ! twcptk3 Sagan and Ruobin
 ! twcptk4 Conte's implementation (below)
+SUBROUTINE twcptk1(re,orbit)
+  use twiss0fi
+  use twisslfi
+  use twisscfi
+  use twissotmfi
+  use name_lenfi !LD: 09.2015
+  implicit none
+
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Track coupled lattice functions.                                 *
+  !     Input:                                                           *
+  !     re(6,6)  (double)   transfer matrix of element.                  *
+  !     orbit(6) (double)   closed orbit                                 *
+  !----------------------------------------------------------------------*
+  integer i,i1,i2,j,get_option
+  double precision re(6,6),orbit(6),rw0(6,6),rwi(6,6),rc(6,6),      &
+       rmat0(2,2),dt(6),tempa,tempb,alfx0,     &
+       alfy0,betx0,bety0,amux0,amuy0,zero,one,eps
+  double precision E(2,2), F(2,2), RMAT_BAR(2,2), EDET,            &
+        EBAR(2,2), CD(2,2)     
+       
+  character(name_len) name !LD: 09.2015
+  parameter(zero=0d0,one=1d0,eps=1d-36)
+
+  !initialize
+  bety0=zero
+  betx0=zero
+  amux0=zero
+  amuy0=zero
+  alfy0=zero
+  alfx0=zero
+
+  !---- Dispersion.
+  call dzero(dt,6)
+  do i = 1, 6
+     do j = 1, 6
+        dt(i) = dt(i) + re(i,j) * disp(j)
+     enddo
+  enddo
+  if(.not.centre.or.centre_cptk) then
+     opt_fun(15)=dt(1)
+     opt_fun(16)=dt(2)
+     opt_fun(17)=dt(3)
+     opt_fun(18)=dt(4)
+  endif
+  if(centre_cptk) then
+     alfx0=alfx
+     alfy0=alfy
+     betx0=betx
+     bety0=bety
+     amux0=amux
+     amuy0=amuy
+     call dcopy(rmat,rmat0,4)
+     if(rmatrix) call dcopy(rw,rw0,36)
+  else
+     call dcopy(dt,disp,6)
+     disp(5) = zero
+     disp(6) = one
+  endif
+
+  !---- Auxiliary matrices.
+  
+  ! ----I.T.
+  !---  M =R*U*R^{-1}; 
+  
+  ! --- M = | A B |
+  ! ----    | C D |
+  
+  ! --- U = | E 0 |
+  ! ----    | 0 F |
+  
+  ! --- R = !/sqrt(1+|rmat|)*|   I    rmat^{-1} |
+  ! ----                     | -rmat     I      |
+
+  ! RE: matrix([re13,re14],[re23,re24]);
+  ! RMAT: matrix([rmat11,rmat12],[rmat21,rmat22]);
+  ! U: RE.RMAT;
+  !  matrix([re14*rmat21+re13*rmat11,re14*rmat22+re13*rmat12], 
+  !         [re24*rmat21+re23*rmat11,re24*rmat22+re23*rmat12])
+  
+  ! E = A - BR, former auxiliary a
+  E(1:2,1:2) = RE(1:2,1:2) - matmul(RE(1:2,3:4),RMAT(1:2,1:2))
+  ! F = D + RBAR*C, former auxiliary c
+  ! RBAR = SR^{T}S^{T} - symplectic conjugate of R
+  call m22symp_conj(RMAT, RMAT_BAR) 
+  F(1:2,1:2) = RE(3:4,3:4) + matmul(RMAT_BAR(1:2,1:2),RE(3:4,3:4))
+
+  ! R = -(C-D*RMAT)*EBAR/|E|
+  ! C -  D*RMAT, former auxiliary b
+  ! C -D.RMAT 
+  ! ([−re34*rmat21−re33*rmat11+re31,−re34*rmat22−re33*rmat12+re32]
+  !   [−re44*rmat21−re43*rmat11+re41,−re44*rmat22−re43*rmat12+re42])
+  CD(1:2,1:2) = RE(3:4,1:2) - matmul(RE(3:4,3:4), RMAT(1:2,1:2)) 
+  
+  !---- Track R matrix.
+  ! former adet
+  EDET = E(1,1) * E(2,2) - E(1,2) * E(2,1)
+  call m22symp_conj(E, EBAR) 
+  
+  !LD: 09.2015, adet must be positive for physical twiss parameters.
+  !if (abs(adet).gt.eps) then
+  if (EDET .gt. eps) then
+  ! former rmat
+     RMAT(1:2, 1:2) = - matmul(CD(1:2, 1:2), EBAR(1:2,1:2)) / EDET
+    
+     !---- Mode 1.
+     tempb = E(1,1) * betx - E(1,2) * alfx
+     tempa = E(2,1) * betx - E(2,2) * alfx
+     alfx = - (tempa * tempb + E(1,2) * E(2,2)) / (EDET * betx)
+     betx =   (tempb * tempb + E(1,2) * E(1,2)) / (EDET * betx)
+     if(abs(E(1,2)).gt.eps) amux=amux+atan2(E(1,2),tempb)
+     
+     !---- Mode 2.
+     tempb = F(1,1) * bety - F(1,2) * alfy
+     tempa = F(2,1) * bety - F(2,2) * alfy
+     alfy = - (tempa * tempb + F(1,2) * F(2,2)) / (EDET * bety)
+     bety =   (tempb * tempb + F(1,2) * F(1,2)) / (EDET * bety)
+     if(abs(F(1,2)).gt.eps) amuy=amuy+atan2(F(1,2),tempb)
+  else
+    !LD: 09.2015
+    call element_name(name,len(name))
+    print *, '+++ coupling too strong in element ', name
+    print *, '+++ adet=', EDET , ', betx=', betx, ', bety=', bety
+    call aawarn('twcptk: ', 'twiss parameter might be unphysical, coupling skipped')
+  endif
+  
+  !---- Cummulative R matrix and one-turn map at element location.
+  if(rmatrix) then
+     call m66mpy(re,rw,rw)
+     if (get_option('twiss_inval ') .ne. 0) then
+        call dcopy(rw,rc,36)
+     else
+        call m66inv(rw,rwi)
+        call m66mpy(rotm,rwi,rc)
+        call m66mpy(rw,rc,rc)
+     endif
+  endif
+  
+  if(.not.centre.or.centre_cptk) then
+     opt_fun(3 )=betx
+     opt_fun(4 )=alfx
+     opt_fun(5 )=amux
+     opt_fun(6 )=bety
+     opt_fun(7 )=alfy
+     opt_fun(8 )=amuy
+     opt_fun(29)=rmat(1,1)
+     opt_fun(30)=rmat(1,2)
+     opt_fun(31)=rmat(2,1)
+     opt_fun(32)=rmat(2,2)
+  endif
+  if(rmatrix) then
+     do i1=1,6
+        do i2=1,6
+           opt_fun(33+(i1-1)*6+i2)=rc(i1,i2)
+        enddo
+     enddo
+  endif
+  if(centre_cptk) then
+     opt_fun(9 )=orbit(1)
+     opt_fun(10)=orbit(2)
+     opt_fun(11)=orbit(3)
+     opt_fun(12)=orbit(4)
+     opt_fun(13)=orbit(5)
+     opt_fun(14)=orbit(6)
+     alfx=alfx0
+     alfy=alfy0
+     betx=betx0
+     bety=bety0
+     amux=amux0
+     amuy=amuy0
+     call dcopy(rmat0,rmat,4)
+     if(rmatrix) call dcopy(rw0,rw,36)
+  endif
+
+end SUBROUTINE twcptk1
+
+
+
 SUBROUTINE twcptk4(re,orbit)
   use twiss0fi
   use twisslfi
