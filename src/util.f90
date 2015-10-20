@@ -684,9 +684,9 @@ module matrices
   double precision, parameter :: JMATINV(6,6) = -JMAT
   double precision, parameter :: JMATT(6,6) = -JMAT
   double precision, parameter :: SMAT(2,2)=reshape((/0d0,1d0, &
-                                                    -1d0,0d0 /),            shape(SMAT))
+                                                    -1d0,0d0 /), shape(SMAT))
   double precision, parameter :: SMATINV(2,2) = -SMAT
-  double precision, parameter :: SMATT(2,2) = -SMAT
+  double precision, parameter :: SMATT(2,2)   = -SMAT
 end module matrices
 
 

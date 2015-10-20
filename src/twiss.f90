@@ -1297,7 +1297,7 @@ SUBROUTINE twcpgo(rt,orbit0)
      call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
      mycentre_cptk = centre_cptk
      centre_cptk = .false.
-     call twcptk(re,orbit)
+     call twcptk1(re,orbit)
      centre_cptk = mycentre_cptk
      if (sectormap) call m66mpy(re,srmat,srmat)
   endif
@@ -1322,7 +1322,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   centre_cptk=.false.
 
   if (fmap) then
-     call twcptk(re,orbit)
+     call twcptk1(re,orbit)
      if (sectormap) call tmcat(.true.,re,te,srmat,stmat,srmat,stmat)
   endif
 
@@ -1331,7 +1331,7 @@ SUBROUTINE twcpgo(rt,orbit0)
      call tmali2(el,orbit2,al_errors,betas,gammas,orbit,re)
      mycentre_cptk = centre_cptk
      centre_cptk = .false.
-     call twcptk(re,orbit)
+     call twcptk1(re,orbit)
      centre_cptk = mycentre_cptk
      if (sectormap) call m66mpy(re,srmat,srmat)
   endif
@@ -1560,12 +1560,17 @@ SUBROUTINE twcptk(re,orbit)
      alfx = - (tempa * tempb + a(1,2) * a(2,2)) / (adet * betx)
      betx =   (tempb * tempb + a(1,2) * a(1,2)) / (adet * betx)
      if(abs(a(1,2)).gt.eps) amux=amux+atan2(a(1,2),tempb)
+     print *, '+++ alpx twcptk = ', alfx
+     print *, '+++ betx twcptk = ', betx
      
      !---- Mode 2.
      tempb = c(1,1) * bety - c(1,2) * alfy
      tempa = c(2,1) * bety - c(2,2) * alfy
      alfy = - (tempa * tempb + c(1,2) * c(2,2)) / (adet * bety)
      bety =   (tempb * tempb + c(1,2) * c(1,2)) / (adet * bety)
+     print *, '+++ alpy twcptk = ', alfy
+     print *, '+++ bety twcptk = ', bety
+
      if(abs(c(1,2)).gt.eps) amuy=amuy+atan2(c(1,2),tempb)
   else
     !LD: 09.2015
@@ -1625,7 +1630,7 @@ SUBROUTINE twcptk(re,orbit)
 
 end SUBROUTINE twcptk
 ! to be added
-! twcptk1 Matrix formulation rewrite (below)
+! twcptk1 Rewritten twcptk in MAtrix formulation (equvivalent to twcptk) (below) - done
 ! twcptk2 Mad8 + Irina's correction
 ! twcptk3 Sagan and Ruobin
 ! twcptk4 Conte's implementation (below)
@@ -1641,13 +1646,13 @@ SUBROUTINE twcptk1(re,orbit)
 
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
-  !     Track coupled lattice functions. Rewritten inmatrix formulaton.                                  *
+  !     Track coupled lattice functions.                                 *
   !     Input:                                                           *
   !     re(6,6)  (double)   transfer matrix of element.                  *
   !     orbit(6) (double)   closed orbit                                 *
   !----------------------------------------------------------------------*
-  double precision :: re(6,6), orbit(6)
-
+    
+    double precision :: re(6,6), orbit(6)
     integer :: i, i1, i2, j
     double precision :: rw0(6,6), rwi(6,6), rc(6,6), dt(6)
     double precision :: rmat0(2,2), E(2,2), F(2,2), CD(2,2)          
@@ -1657,7 +1662,6 @@ SUBROUTINE twcptk1(re,orbit)
     double precision :: betx0=zero, bety0=zero
     double precision :: amux0=zero, amuy0=zero
     character(name_len) :: name !LD: 09.2015
-
     integer, external :: get_option
     double precision, parameter :: eps=1d-36  
 
@@ -1696,17 +1700,24 @@ SUBROUTINE twcptk1(re,orbit)
   ! ----                     | -rmat     I      |    
 
 ! RMAT_BAR = SRMAT^{T}S^{T} - symplectic conjugate of RMAT 
-  RMAT_BAR    = matmul(SMAT, matmul(transpose(RMAT),SMATT))        ! invert symplectic matrix
-  E(1:2,1:2)  = RE(1:2,1:2) - matmul(RE(1:2,3:4),RMAT(1:2,1:2))    ! E  = A - BR,     former a
-  F(1:2,1:2)  = RE(3:4,3:4) + matmul(RMAT_BAR(1:2,1:2),RE(3:4,3:4))! F  = D + RBAR*C, former c
-  CD(1:2,1:2) = RE(3:4,1:2) - matmul(RE(3:4,3:4), RMAT(1:2,1:2))   ! CD = C-D*RMAT,   former b
-  
+  RMAT_BAR    = matmul(SMAT, matmul(transpose(RMAT),SMATT))         ! invert symplectic matrix
+  E(1:2,1:2)  = RE(1:2,1:2) - matmul(RE(1:2,3:4), RMAT(1:2,1:2))    ! E  = A - BR,     former a
+  CD(1:2,1:2) = RE(3:4,1:2) - matmul(RE(3:4,3:4), RMAT(1:2,1:2))    ! CD = C-D*RMAT,   former b
+  F(1:2,1:2)  = RE(3:4,3:4) + matmul(RE(3:4,1:2), RMAT_BAR(1:2,1:2))! F  = D + C*RBAR, former c 
+  !!! bug??? should be F  = D + RBAR*C  ????? I.T
+
+  call element_name(name,len(name))
+  if(F(1,1).ne.FF(1,1)) print*,"FFFFFFFFF11 problem F11= ", F(1,1), " FF11 = ", FF(1,1), " element ", name
+  if(F(1,2).ne.FF(1,2)) print*,"FFFFFFFFF12 problem F12= ", F(1,2), " FF12 = ", FF(1,2), " element ", name
+  if(F(2,1).ne.FF(2,1)) print*,"FFFFFFFFF21 problem F21= ", F(2,1), " FF21 = ", FF(2,1), " element ", name
+  if(F(2,2).ne.FF(2,2)) print*,"FFFFFFFFF22 problem F22= ", F(2,2), " FF22 = ", FF(2,2), " element ", name
+
   !---- Track R matrix.
-  EDET = E(1,1) * E(2,2) - E(1,2) * E(2,1) ! former adet
-  EBAR = matmul(SMAT, matmul(transpose(E),SMATT))        ! symplectic conjugate of E = SE^TS^T
-  
+  EDET = E(1,1) * E(2,2) - E(1,2) * E(2,1)           ! former adet
+  EBAR = matmul(SMAT, matmul(transpose(E),SMATT))    ! symplectic conjugate of E = SE^TS^T
+
   !LD: 09.2015, adet must be positive for physical twiss parameters.
-  if (abs(EDET) .gt. eps) then
+  if (EDET.gt. eps) then
      ! RMAT = -(C-D*RMAT)*EBAR/|E|
      RMAT(1:2, 1:2) = - matmul(CD(1:2, 1:2), EBAR(1:2,1:2)) / EDET
 
@@ -1716,6 +1727,8 @@ SUBROUTINE twcptk1(re,orbit)
      alfx = - (tempa * tempb + E(1,2) * E(2,2)) / (EDET * betx)
      betx =   (tempb * tempb + E(1,2) * E(1,2)) / (EDET * betx)
      if(abs(E(1,2)).gt.eps) amux=amux+atan2(E(1,2),tempb)
+     print *, '+++ alpx twcptk = ', alfx
+     print *, '+++ betx twcptk = ', betx
      
      !---- Mode 2.
      tempb = F(1,1) * bety - F(1,2) * alfy
@@ -1723,6 +1736,9 @@ SUBROUTINE twcptk1(re,orbit)
      alfy = - (tempa * tempb + F(1,2) * F(2,2)) / (EDET * bety)
      bety =   (tempb * tempb + F(1,2) * F(1,2)) / (EDET * bety)
      if(abs(F(1,2)).gt.eps) amuy=amuy+atan2(F(1,2),tempb)
+     print *, '+++ alpy twcptk = ', alfy
+     print *, '+++ bety twcptk = ', bety
+
   else
     !LD: 09.2015
     call element_name(name,len(name))
@@ -1730,7 +1746,7 @@ SUBROUTINE twcptk1(re,orbit)
     print *, '+++ adet=', EDET , ', betx=', betx, ', bety=', bety
     call aawarn('twcptk: ', 'twiss parameter might be unphysical, coupling skipped')
   endif
-  
+
   !---- Cummulative R matrix and one-turn map at element location.
   if(rmatrix) then
      RW = matmul(RE,RW) 
@@ -1738,7 +1754,7 @@ SUBROUTINE twcptk1(re,orbit)
         RC = RW 
      else
         RWI = matmul(JMATT, matmul(transpose(RW),JMAT)) ! invert symplectic matrix
-        RC = matmul(RW,matmul(ROTM,RWI))
+        RC  = matmul(RW,matmul(ROTM,RWI))
      endif
   endif
   
@@ -1775,9 +1791,6 @@ SUBROUTINE twcptk1(re,orbit)
   endif
 
 end SUBROUTINE twcptk1
-
-
-
 SUBROUTINE twcptk4(re,orbit)
   use twiss0fi
   use twisslfi
@@ -2992,7 +3005,7 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
         !---- Track orbit.
         call dcopy(orbit,orbit0,6)
         if (ftrk) call tmtrak(ek,re,te,orbit0,orbit0)
-        if(centre_cptk) call twcptk(re,orbit0)
+        if(centre_cptk) call twcptk1(re,orbit0)
         if(centre_bttk) call twbttk(re,te)
         call dcopy(orbit00,orbit,6)
         call dcopy(ek00,ek,6)
@@ -3894,7 +3907,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
      call dcopy(te,te00,216)
      if(centre_cptk) then
         call dcopy(orbit,orbit0,6)
-        call twcptk(re,orbit0)
+        call twcptk1(re,orbit0)
      endif
      if(centre_bttk) call twbttk(re,te)
      call dcopy(orbit00,orbit,6)
@@ -4028,7 +4041,7 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
         call dcopy(orbit,orbit0,6)
         call tmdrf0(fsec,ftrk,orbit0,fmap,el0,ek,re,te)
         call tmcat(fsec,re,te,rw,tw,re,te)
-        if(centre_cptk) call twcptk(re,orbit0)
+        if(centre_cptk) call twcptk1(re,orbit0)
         if(centre_bttk) call twbttk(re,te)
         call dcopy(orbit00,orbit,6)
         call dcopy(ek00,ek,6)
@@ -4586,7 +4599,7 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
      el0=el/two
      call dcopy(orbit,orbit0,6)
      call qdbody(fsec,ftrk,tilt,sk1,orbit0,el0,ek,re,te)
-     if(centre_cptk) call twcptk(re,orbit0)
+     if(centre_cptk) call twcptk1(re,orbit0)
      if(centre_bttk) call twbttk(re,te)
      call dcopy(orbit00,orbit,6)
      call dcopy(ek00,ek,6)
@@ -4798,7 +4811,7 @@ SUBROUTINE tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
      el0=el/two
      call dcopy(orbit,orbit0,6)
      call spbody(fsec,ftrk,tilt,ekick,orbit0,el0,ek,re,te)
-     if(centre_cptk) call twcptk(re,orbit0)
+     if(centre_cptk) call twcptk1(re,orbit0)
      if(centre_bttk) call twbttk(re,te)
      call dcopy(orbit00,orbit,6)
      call dcopy(ek00,ek,6)
@@ -5019,7 +5032,7 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
      el0=el/two
      call dcopy(orbit,orbit0,6)
      call sxbody(fsec,ftrk,tilt,sk2,orbit0,el0,ek,re,te)
-     if(centre_cptk) call twcptk(re,orbit0)
+     if(centre_cptk) call twcptk1(re,orbit0)
      if(centre_bttk) call twbttk(re,te)
      call dcopy(orbit00,orbit,6)
      call dcopy(ek00,ek,6)
@@ -5167,7 +5180,7 @@ SUBROUTINE tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
         el0=el/two
         call dcopy(orbit,orbit0,6)
         call tmsol0(fsec,ftrk,orbit0,fmap,el0,ek,re,te)
-        if(centre_cptk) call twcptk(re,orbit0)
+        if(centre_cptk) call twcptk1(re,orbit0)
         if(centre_bttk) call twbttk(re,te)
         call dcopy(orbit00,orbit,6)
         call dcopy(ek00,ek,6)
@@ -5341,7 +5354,7 @@ SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
      call dcopy(te,te00,216)
      if(centre_cptk) then
         call dcopy(orbit,orbit0,6)
-        call twcptk(re,orbit0)
+        call twcptk1(re,orbit0)
      endif
      if(centre_bttk) call twbttk(re,te)
      call dcopy(orbit00,orbit,6)
@@ -5404,7 +5417,7 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
      call dcopy(te,te00,216)
      if(centre_cptk) then
         call dcopy(orbit,orbit0,6)
-        call twcptk(re,orbit0)
+        call twcptk1(re,orbit0)
      endif
      if(centre_bttk) call twbttk(re,te)
      call dcopy(orbit00,orbit,6)
@@ -5503,7 +5516,7 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
      dl0=dl/two
      call dcopy(orbit,orbit0,6)
      call tmdrf0(fsec,ftrk,orbit0,fmap,dl0,ek,re,te)
-     if(centre_cptk) call twcptk(re,orbit0)
+     if(centre_cptk) call twcptk1(re,orbit0)
      if(centre_bttk) call twbttk(re,te)
      call dcopy(orbit00,orbit,6)
      call dcopy(ek00,ek,6)
@@ -5612,7 +5625,7 @@ SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
       call dcopy(te,te00,216)
       if(centre_cptk) then
         call dcopy(orbit,orbit0,6)
-        call twcptk(re,orbit0)
+        call twcptk1(re,orbit0)
       endif
       if(centre_bttk) call twbttk(re,te)
       call dcopy(orbit00,orbit,6)
@@ -6246,7 +6259,7 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
         call dcopy(te,te00,216)
         if(centre_cptk) then
            call dcopy(orbit,orbit0,6)
-           call twcptk(re,orbit0)
+           call twcptk1(re,orbit0)
         endif
         if(centre_bttk) call twbttk(re,te)
         call dcopy(orbit00,orbit,6)
@@ -6427,7 +6440,7 @@ SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
         call dcopy(te,te00,216)
         if(centre_cptk) then
            call dcopy(orbit,orbit0,6)
-           call twcptk(re,orbit0)
+           call twcptk1(re,orbit0)
         endif
         if(centre_bttk) call twbttk(re,te)
         call dcopy(orbit00,orbit,6)
@@ -6607,7 +6620,7 @@ SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
         call dcopy(te,te00,216)
         if(centre_cptk) then
            call dcopy(orbit,orbit0,6)
-           call twcptk(re,orbit0)
+           call twcptk1(re,orbit0)
         endif
         if(centre_bttk) call twbttk(re,te)
         call dcopy(orbit00,orbit,6)
@@ -6847,7 +6860,7 @@ end SUBROUTINE tmbb_hollowparabolic
 !!$        call dcopy(te,te00,216)
 !!$        if(centre_cptk) then
 !!$           call dcopy(orbit,orbit0,6)
-!!$           call twcptk(re,orbit0)
+!!$           call twcptk1(re,orbit0)
 !!$        endif
 !!$        if(centre_bttk) call twbttk(re,te)
 !!$        call dcopy(orbit00,orbit,6)
@@ -7474,7 +7487,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
      call dcopy(te,te00,216)
      if(centre_cptk) then
         call dcopy(orbit,orbit0,6)
-        call twcptk(re,orbit0)
+        call twcptk1(re,orbit0)
      endif
      if(centre_bttk) call twbttk(re,te)
      call dcopy(orbit00,orbit,6)
@@ -7715,7 +7728,7 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
      call dcopy(te,te00,216)
      if(centre_cptk) then
         call dcopy(orbit,orbit0,6)
-        call twcptk(re,orbit0)
+        call twcptk1(re,orbit0)
      endif
      if(centre_bttk) call twbttk(re,te)
      call dcopy(orbit00,orbit,6)
