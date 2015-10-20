@@ -101,9 +101,9 @@ $(if $(call eq,$(NREF),yes),,$(if $(NDFILES_REF),,invalid test $@ -- no referenc
 -$_ $(if $(TESTSUITE),echo [ $(TESTSUITE) ],)
 -$_ $(if $(and $(TESTCMD),$(NDFILES_OUT)),$(RM) $(NDFILES_OUT),)
 -$_ $(if $(TESTCMD),cd tests$/$@ && ( $(TESTCMD) > $@.out 2>&1 || [ "1" ] ),)
--$_ $(if $(NDIFF),cd tests$/$@ && \
+-$_ $(if $(NDIFF),cd tests$/$@ && ( \
     $(call ND_tr,$(NDIFF_R) $(NDFLAGS)) $(NDFILES_REF) || \
-    echo "error: $@ failed, check output files in tests$/$@ for details",)
+    echo "error: $@ failed, check output files in tests$/$@ for details"),)
 endef
 
 # end of makefile
