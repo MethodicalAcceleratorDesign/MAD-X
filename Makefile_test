@@ -53,7 +53,7 @@ test-emit test-emit-2 \
 test-ibs test-ibs-2 test-ibs-3 test-ibs-4 \
 test-error test-error-2 test-error-3 \
 test-dynap \
-test-c6t test-c6t-2 test-c6t-3 \
+test-c6t test-c6t-2 test-c6t-3 test-c6t-4 \
 test-thick-quad test-thick-quad-2 test-thick-quad-3 \
 test-thick-dipole test-thick-dipole-2 test-thick-dipole-3 \
 test-jacobian test-jacobian-2 test-jacobian-knobs \
@@ -80,6 +80,7 @@ tests-long := \
 test-memory \
 test-track-7 test-track-8 test-track-10 test-track-11 \
 test-dynap \
+test-c6t-4 \
 test-match-6 test-match-7 \
 test-ptc-twiss-2 \
 $(if $(call eq,$(OSTYPE),Windows),,test-ptc-twiss-old6) test-ptc-twiss-old7 \
@@ -115,8 +116,8 @@ test-ptc-twiss:      TESTSUITE := PTC Twiss testsuite
 test-rfmultipole:    TESTSUITE := RF Multipole testsuite
 test-sequence:	     TESTSUITE := Sequence testsuite
 test-survey:         TESTSUITE := Survey testsuite
-test-table:	     	 TESTSUITE := Table testsuite
-test-thick-quad:     TESTSUITE := Thick Quadrupole testsuite
+test-table:	     TESTSUITE := Table testsuite
+test-thick-quad:     TESTSUITE := Thick Element testsuite
 test-touschek:       TESTSUITE := Touschek testsuite
 test-track:          TESTSUITE := Track testsuite
 test-twiss:          TESTSUITE := Twiss testsuite

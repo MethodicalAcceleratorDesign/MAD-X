@@ -1,0 +1,93 @@
+select(NIR,sec1,sec2,BIM): macro = {
+  use, sequence=lhcBIM, range=s.cell.sec1.BIM/e.cell.sec1.BIM;
+  savebeta, label=baux, place=s.cell.sec1.BIM;
+  twiss;
+
+  use, sequence=lhcBIM, range=e.cell.sec1.BIM/s.ds.lNIR.BIM;
+  savebeta, label=birNIRBIM, place=s.ds.lNIR.BIM;
+  twiss, beta0=baux;
+  birNIRBIM->mux=0;  birNIRBIM->muy=0;
+
+  use, sequence=lhcBIM, range=s.cell.sec2.BIM/e.cell.sec2.BIM;
+  savebeta, label=baux, place=s.cell.sec2.BIM;
+  twiss;
+  betxaux=baux->betx;  betyaux=baux->bety;
+  alfxaux=baux->alfx;  alfyaux=baux->alfy;
+  dxaux=baux->dx;      dpxaux=baux->dpx;
+
+  use, sequence=lhcBIM, range=e.ds.rNIR.BIM/s.cell.sec2.BIM;
+  savebeta, label=eirNIRBIM, place=e.ds.rNIR.BIM;
+  twiss,rmatrix,betx=1,bety=1;
+
+  r11=table(twiss,s.cell.sec2.BIM,Re11); r12=table(twiss,s.cell.sec2.BIM,Re12);
+  r21=table(twiss,s.cell.sec2.BIM,Re21); r22=table(twiss,s.cell.sec2.BIM,Re22);
+  r33=table(twiss,s.cell.sec2.BIM,Re33); r34=table(twiss,s.cell.sec2.BIM,Re34);
+  r43=table(twiss,s.cell.sec2.BIM,Re43); r44=table(twiss,s.cell.sec2.BIM,Re44);
+  r16=table(twiss,s.cell.sec2.BIM,Re16); r26=table(twiss,s.cell.sec2.BIM,Re26);
+
+  eirNIRBIM->betx=r22^2*betxaux+2.*r22*r12*alfxaux+r12^2*(1.+alfxaux^2)/betxaux;
+  eirNIRBIM->alfx=r22*r21*betxaux+(r11*r22+r12*r21)*alfxaux+r12*r11*(1.+alfxaux^2)/betxaux;
+  eirNIRBIM->bety=r44^2*betyaux+2.*r44*r34*alfyaux+r34^2*(1.+alfyaux^2)/betyaux;
+  eirNIRBIM->alfy=r44*r43*betyaux+(r33*r44+r34*r43)*alfyaux+r34*r33*(1.+alfyaux^2)/betyaux;
+  eirNIRBIM->dx=r22*(dxaux-r16)-r12*(dpxaux-r26);
+  eirNIRBIM->dpx=-r21*(dxaux-r16)+r11*(dpxaux-r26);
+};
+
+adjsector(NIR): macro = {
+  if (NIR ==1) {sec1=81; sec2=12;};
+  if (NIR ==2) {sec1=12; sec2=23;};
+  if (NIR ==3) {sec1=23; sec2=34;};
+  if (NIR ==4) {sec1=34; sec2=45;};
+  if (NIR ==5) {sec1=45; sec2=56;};
+  if (NIR ==6) {sec1=56; sec2=67;};
+  if (NIR ==7) {sec1=67; sec2=78;};
+  if (NIR ==8) {sec1=78; sec2=81;};
+};
+
+mk_apir(nir,bim,FULL) : macro ={
+  exec, adjsector(nir);
+  exec, select(nir,$sec1,$sec2,bim);
+
+  use, sequence=lhcbim, range=s.ds.lnir.bim/e.ds.rnir.bim;
+  survey, file=temp/survey_irnirbim.tfs;
+
+  if(FULL==0) {
+    use, sequence=lhcbim, range=s.ds.lnir.bim/e.ds.rnir.bim;
+    select, flag=twiss, clear;
+    select, flag=twiss, column=name,s,l,angle,k1l,k2l,hkick,vkick,kick,
+                               betx,bety,dx,dy,x,y,px,py,
+        	               apertype,aper_1,aper_2,aper_3,aper_4,aptol_1,aptol_2,aptol_3,
+			       mux,muy,
+            range=s.ds.lnir.bim/e.ds.rnir.bim;
+    twiss, file=temp/twiss_irnirbim.tfs, beta0=birnirbim;
+  };
+
+  if(FULL==1) {
+    use,sequence=lhcbim;
+    select, flag=twiss, clear;
+    select, flag=twiss, column=name,s,l,angle,k1l,k2l,hkick,vkick,kick,
+                               betx,bety,dx,dy,x,y,px,py,
+  	                       apertype,aper_1,aper_2,aper_3,aper_4,aptol_1,aptol_2,aptol_3,
+			       mux,muy,
+            range=s.ds.lnir.bim/e.ds.rnir.bim;
+  twiss, file=temp/twiss_irnirbim.tfs;
+  };
+
+  system, "cp db5/aperture/offset.ip*b*.tfs  .";
+  select, flag=aperture, clear;
+  select, flag=aperture, column=name,s,betx,bety,dx,dy,x,y,px,py,
+                                n1,apertype,Rtol,xtol,ytol,
+                                k1l,k1sl,k2l,k2sl,k3l,k3sl;
+  aperture, range=s.ds.lnir.bim/e.ds.rnir.bim,
+            offsetelem=./offset.IPnir.bim.tfs,
+            cor=COmax, dp=dPmax, spec=SPECIF,interval=0.5,
+            !exn=emittance_norm,eyn=emittance_norm,
+            halo={6,halor,halox,haloy},bbeat=apbbeat,
+            dparx=DParcx,dpary=DParcy,
+            file=temp/ap_irnirbim.tfs;
+  system, "rm offset.ip*b*.tfs";
+  
+  !system, "db5/aperture/check_aperture.py temp/ap_irnirbim.tfs";
+};
+
+

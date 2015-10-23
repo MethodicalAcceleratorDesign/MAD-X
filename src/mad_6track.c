@@ -2392,9 +2392,9 @@ pro_elem(struct node* cnode)
   // 2015-Oct-13  16:10:42  ghislain: before we add the current element to element list
   // check whether the element is long and has an aperture, and therefore
   // whether we should insert an aperture marker before the current element
-  if (strcmp(keyword,"00") != 0 && current_element->value[0] > 0.) {
+  if (strcmp(keyword,"00") != 0 && current_element->value[0] > 0.) {    
     tmp_element = current_element;
-    tag_element = create_aperture(tag_aperture.name,keyword,
+    tag_element = create_aperture(tag_aperture.name, keyword,
   				  tag_aperture.value[1], tag_aperture.value[2],
   				  tag_aperture.value[3], tag_aperture.value[4],
   				  tag_aperture.value[5], tag_aperture.value[6],
@@ -2423,7 +2423,7 @@ pro_elem(struct node* cnode)
   
   /* add aperture element if necessary */
   if (strcmp(keyword,"00") != 0) {
-    tag_element = create_aperture(tag_aperture.name,keyword, 
+    tag_element = create_aperture(tag_aperture.name, keyword, 
 				  tag_aperture.value[1], tag_aperture.value[2],
 				  tag_aperture.value[3], tag_aperture.value[4],
 				  tag_aperture.value[5], tag_aperture.value[6],

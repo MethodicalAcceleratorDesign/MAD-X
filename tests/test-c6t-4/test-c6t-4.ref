@@ -1,0 +1,1536 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.07  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2015.09.24               +
+  + Execution date: 2015.10.23 17:38:57      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+Title, "test-c6t-4 conversion of thick elements with apertures";
+
+
+
+Option, echo=false, warn=false, info=false;
+
+seqedit, sequence=lhcb1;
+
+  remove, element=brana.4l1;  remove, element=brana.4l5;
+
+  remove, element=brana.4r1;  remove, element=brana.4r5;
+
+  remove, element=x1fcl.4l1;  remove, element=x1fcr.4r1;
+
+  remove, element=x1zdc.a4l1; remove, element=x1zdc.a4r1;
+
+  remove, element=x5zdc.a4l5; remove, element=x5zdc.a4r5;
+
+  remove, element=x5zdc.b4l5; remove, element=x5zdc.b4r5;
+
+endedit;
+
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    12
+++++++ info: seqedit - number of elements replaced:   0
+
+
+emittance_norm = 3.75e-6;
+
+Beam, particle=proton, sequence=lhcb1, energy=450.,
+
+      NPART=1.15E11, sige=4.5e-4, sigt=0.075,
+
+      exn=emittance_norm, eyn=emittance_norm;
+
+
+
+! 2014 updated parameters injection
+
+emittance_norm = 3.5e-6;
+
+++++++ info: emittance_norm redefined
+apbbeat = 1.05;
+
+halor = 6.001; halox = 6; haloy = 6;
+
+DParcx = 0.14; DParcy = 0.14;
+
+COmax = 0.004; dPmax = 0.0006; VMAXI = 30; SPECIF = 7;
+
+
+
+exec, mk_apir(1,b1,1); 
+
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       106.8970318                 -0    0.0004057041854        49.64725667 
+
+                q1                dq1            betxmax              dxmax 
+      0.2634717773        0.253148068        176.9293486        2.008343141 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.464876472                  0                  0       0.2430568194 
+
+               dq2            betymax              dymax              dyrms 
+      0.1100109695        180.2234757                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter Twiss module
+ Found 6 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        1169.39735                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       2.864007152                  0        176.9293486        2.008343141 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.490471423                  0                  0        2.666847833 
+
+               dq2            betymax              dymax              dyrms 
+                 0        180.3271756                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       106.9029682                 -0    0.0004056569002        49.65015014 
+
+                q1                dq1            betxmax              dxmax 
+      0.2634908042      -0.4293827554        176.9450877        2.008263683 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.535892856                  0                  0       0.2430746761 
+
+               dq2            betymax              dymax              dyrms 
+      0.2409634861        180.2369084                 -0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       962.1267137                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+        2.24860688                  0        29744.37923        4.003561241 
+
+             dxrms             xcomax             xcorms                 q2 
+        1.80973824                  0                  0        2.250700216 
+
+               dq2            betymax              dymax              dyrms 
+                 0         5587.76731                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter Twiss module
+  
+iteration:   1 error:   2.349233E-03 deltap:   0.000000E+00
+orbit:  -2.021580E-03  1.001287E-06  2.721016E-06 -1.724208E-04  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.645506E-05 deltap:   0.000000E+00
+orbit:  -2.000002E-03 -1.163800E-10  2.327260E-09 -1.700002E-04  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   5.547930E-09 deltap:   0.000000E+00
+orbit:  -2.000000E-03 -2.381814E-12  3.077072E-11 -1.700000E-04  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003218201382        55.74339193 
+
+                q1                dq1            betxmax              dxmax 
+        64.2799999        3.000000008        595.8733361        2.816136811 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.352953502      0.01191650935     0.001284493214        59.31000004 
+
+               dq2            betymax              dymax              dyrms 
+       2.999999992        609.4788076       0.1932632569      0.05916187436 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01353295385     0.001377607928                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+Processing apertures from s.ds.l1.b1:1 to e.ds.r1.b1:1...
++++++++ deltap from TWISS            0
+
+ Reading offsets from tfs "./offset.ip1.b1.tfs"
+
+reference node: e.ds.l1.b1:1
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+
+
+APERTURE LIMIT: mq.11l1.b1:1, n1: 9.28446, at: 26221.6
+
+exec, mk_apir(2,b1,1); 
+
+++++++ info: sec1 redefined
+++++++ info: sec2 redefined
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       106.9029682                 -0    0.0004056569002        49.65015014 
+
+                q1                dq1            betxmax              dxmax 
+      0.2634908042      -0.4293827554        176.9450877        2.008263683 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.535892856                  0                  0       0.2430746761 
+
+               dq2            betymax              dymax              dyrms 
+      0.2409634861        180.2369084                 -0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter Twiss module
+ Found 6 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        1169.46265                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       2.890453821                  0        177.1785694        2.021237592 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.504766891                  0                  0        2.642418427 
+
+               dq2            betymax              dymax              dyrms 
+                 0         180.337175                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       106.8970318                 -0    0.0004057041854        49.64725667 
+
+                q1                dq1            betxmax              dxmax 
+      0.2634717773        0.253148068        176.9293486        2.008343141 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.464876472                  0                  0       0.2430568194 
+
+               dq2            betymax              dymax              dyrms 
+      0.1100109695        180.2234757                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+++++++ info: betxaux redefined
+++++++ info: betyaux redefined
+++++++ info: alfxaux redefined
+++++++ info: alfyaux redefined
+++++++ info: dxaux redefined
+++++++ info: dpxaux redefined
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       962.0732863                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       2.257316061                  0        5387.189214        4.261475085 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.827704894                  0                  0         2.24744386 
+
+               dq2            betymax              dymax              dyrms 
+                 0        30919.28053                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+++++++ info: r11 redefined
+++++++ info: r12 redefined
+++++++ info: r21 redefined
+++++++ info: r22 redefined
+++++++ info: r33 redefined
+++++++ info: r34 redefined
+++++++ info: r43 redefined
+++++++ info: r44 redefined
+++++++ info: r16 redefined
+++++++ info: r26 redefined
+enter Twiss module
+  
+iteration:   1 error:   2.349233E-03 deltap:   0.000000E+00
+orbit:  -2.021580E-03  1.001287E-06  2.721016E-06 -1.724208E-04  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.645506E-05 deltap:   0.000000E+00
+orbit:  -2.000002E-03 -1.163800E-10  2.327260E-09 -1.700002E-04  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   5.547930E-09 deltap:   0.000000E+00
+orbit:  -2.000000E-03 -2.381814E-12  3.077072E-11 -1.700000E-04  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003218201382        55.74339193 
+
+                q1                dq1            betxmax              dxmax 
+        64.2799999        3.000000008        595.8733361        2.816136811 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.352953502      0.01191650935     0.001284493214        59.31000004 
+
+               dq2            betymax              dymax              dyrms 
+       2.999999992        609.4788076       0.1932632569      0.05916187436 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01353295385     0.001377607928                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+Processing apertures from s.ds.l2.b1:1 to e.ds.r2.b1:1...
++++++++ deltap from TWISS            0
+
+ Reading offsets from tfs "./offset.ip2.b1.tfs"
+
+reference node: e.ds.l2.b1:1
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+
+
+APERTURE LIMIT: mq.11r2.b1:1, n1: 9.20876, at: 3767.56
+
+exec, mk_apir(3,b1,1); 
+
+++++++ info: sec1 redefined
+++++++ info: sec2 redefined
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       106.8970318                 -0    0.0004057041854        49.64725667 
+
+                q1                dq1            betxmax              dxmax 
+      0.2634717773        0.253148068        176.9293486        2.008343141 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.464876472                  0                  0       0.2430568194 
+
+               dq2            betymax              dymax              dyrms 
+      0.1100109695        180.2234757                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter Twiss module
+ Found 6 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        1169.39735                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       2.861995941                  0        177.0810299        2.020600563 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.492242443                  0                  0        2.667289857 
+
+               dq2            betymax              dymax              dyrms 
+                 0        180.2460519                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       106.8970318                 -0    0.0004057041854        49.64725667 
+
+                q1                dq1            betxmax              dxmax 
+      0.2634717773      -0.4293581522        176.9293486        2.008343141 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.535972185                  0                  0       0.2430568194 
+
+               dq2            betymax              dymax              dyrms 
+      0.2410049083        180.2234757                 -0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+++++++ info: betxaux redefined
+++++++ info: betyaux redefined
+++++++ info: alfxaux redefined
+++++++ info: alfyaux redefined
+++++++ info: dxaux redefined
+++++++ info: dpxaux redefined
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       962.0732863                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       2.248605076                  0        29739.50944        4.003794008 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.809744282                  0                  0        2.250694925 
+
+               dq2            betymax              dymax              dyrms 
+                 0        5591.190086                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+++++++ info: r11 redefined
+++++++ info: r12 redefined
+++++++ info: r21 redefined
+++++++ info: r22 redefined
+++++++ info: r33 redefined
+++++++ info: r34 redefined
+++++++ info: r43 redefined
+++++++ info: r44 redefined
+++++++ info: r16 redefined
+++++++ info: r26 redefined
+enter Twiss module
+  
+iteration:   1 error:   2.349233E-03 deltap:   0.000000E+00
+orbit:  -2.021580E-03  1.001287E-06  2.721016E-06 -1.724208E-04  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.645506E-05 deltap:   0.000000E+00
+orbit:  -2.000002E-03 -1.163800E-10  2.327260E-09 -1.700002E-04  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   5.547930E-09 deltap:   0.000000E+00
+orbit:  -2.000000E-03 -2.381814E-12  3.077072E-11 -1.700000E-04  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003218201382        55.74339193 
+
+                q1                dq1            betxmax              dxmax 
+        64.2799999        3.000000008        595.8733361        2.816136811 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.352953502      0.01191650935     0.001284493214        59.31000004 
+
+               dq2            betymax              dymax              dyrms 
+       2.999999992        609.4788076       0.1932632569      0.05916187436 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01353295385     0.001377607928                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+Processing apertures from s.ds.l3.b1:1 to e.ds.r3.b1:1...
++++++++ deltap from TWISS            0
+
+ Reading offsets from tfs "./offset.ip3.b1.tfs"
+
+reference node: e.ds.l3.b1:1
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+
+
+APERTURE LIMIT: mq.11l3.b1:1, n1: 9.10896, at: 6227.46
+
+exec, mk_apir(4,b1,1); 
+
+++++++ info: sec1 redefined
+++++++ info: sec2 redefined
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       106.8970318                 -0    0.0004057041854        49.64725667 
+
+                q1                dq1            betxmax              dxmax 
+      0.2634717773      -0.4293581522        176.9293486        2.008343141 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.535972185                  0                  0       0.2430568194 
+
+               dq2            betymax              dymax              dyrms 
+      0.2410049083        180.2234757                 -0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter Twiss module
+ Found 6 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        1169.39735                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       2.890244426                  0        177.1625458        2.021316518 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.504847674                  0                  0        2.642224508 
+
+               dq2            betymax              dymax              dyrms 
+                 0         180.323955                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       106.8970318                 -0    0.0004057041854        49.64725667 
+
+                q1                dq1            betxmax              dxmax 
+      0.2634717773        0.253148068        176.9293486        2.008343141 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.464876472                  0                  0       0.2430568194 
+
+               dq2            betymax              dymax              dyrms 
+      0.1100109695        180.2234757                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+++++++ info: betxaux redefined
+++++++ info: betyaux redefined
+++++++ info: alfxaux redefined
+++++++ info: alfyaux redefined
+++++++ info: dxaux redefined
+++++++ info: dpxaux redefined
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       962.0732863                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       2.257316061                  0        5387.189214        4.261475085 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.827704894                  0                  0         2.24744386 
+
+               dq2            betymax              dymax              dyrms 
+                 0        30919.28053                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+++++++ info: r11 redefined
+++++++ info: r12 redefined
+++++++ info: r21 redefined
+++++++ info: r22 redefined
+++++++ info: r33 redefined
+++++++ info: r34 redefined
+++++++ info: r43 redefined
+++++++ info: r44 redefined
+++++++ info: r16 redefined
+++++++ info: r26 redefined
+enter Twiss module
+  
+iteration:   1 error:   2.349233E-03 deltap:   0.000000E+00
+orbit:  -2.021580E-03  1.001287E-06  2.721016E-06 -1.724208E-04  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.645506E-05 deltap:   0.000000E+00
+orbit:  -2.000002E-03 -1.163800E-10  2.327260E-09 -1.700002E-04  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   5.547930E-09 deltap:   0.000000E+00
+orbit:  -2.000000E-03 -2.381814E-12  3.077072E-11 -1.700000E-04  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003218201382        55.74339193 
+
+                q1                dq1            betxmax              dxmax 
+        64.2799999        3.000000008        595.8733361        2.816136811 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.352953502      0.01191650935     0.001284493214        59.31000004 
+
+               dq2            betymax              dymax              dyrms 
+       2.999999992        609.4788076       0.1932632569      0.05916187436 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01353295385     0.001377607928                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+Processing apertures from s.ds.l4.b1:1 to e.ds.r4.b1:1...
++++++++ deltap from TWISS            0
+
+ Reading offsets from tfs "./offset.ip4.b1.tfs"
+
+reference node: e.ds.l4.b1:1
+
+
+APERTURE LIMIT: mq.11r4.b1:1, n1: 9.13949, at: 10432.1
+
+exec, mk_apir(5,b1,1); 
+
+++++++ info: sec1 redefined
+++++++ info: sec2 redefined
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       106.8970318                 -0    0.0004057041854        49.64725667 
+
+                q1                dq1            betxmax              dxmax 
+      0.2634717773        0.253148068        176.9293486        2.008343141 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.464876472                  0                  0       0.2430568194 
+
+               dq2            betymax              dymax              dyrms 
+      0.1100109695        180.2234757                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter Twiss module
+ Found 6 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        1169.39735                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       2.861995941                  0        177.0810299        2.020600563 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.492242443                  0                  0        2.667289857 
+
+               dq2            betymax              dymax              dyrms 
+                 0        180.2460519                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       106.9029682                 -0    0.0004056569002        49.65015014 
+
+                q1                dq1            betxmax              dxmax 
+      0.2634908042      -0.4293827554        176.9450877        2.008263683 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.535892856                  0                  0       0.2430746761 
+
+               dq2            betymax              dymax              dyrms 
+      0.2409634861        180.2369084                 -0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+++++++ info: betxaux redefined
+++++++ info: betyaux redefined
+++++++ info: alfxaux redefined
+++++++ info: alfyaux redefined
+++++++ info: dxaux redefined
+++++++ info: dpxaux redefined
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       962.1267137                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+        2.24860688                  0        29744.37923        4.003561241 
+
+             dxrms             xcomax             xcorms                 q2 
+        1.80973824                  0                  0        2.250700216 
+
+               dq2            betymax              dymax              dyrms 
+                 0         5587.76731                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+++++++ info: r11 redefined
+++++++ info: r12 redefined
+++++++ info: r21 redefined
+++++++ info: r22 redefined
+++++++ info: r33 redefined
+++++++ info: r34 redefined
+++++++ info: r43 redefined
+++++++ info: r44 redefined
+++++++ info: r16 redefined
+++++++ info: r26 redefined
+enter Twiss module
+  
+iteration:   1 error:   2.349233E-03 deltap:   0.000000E+00
+orbit:  -2.021580E-03  1.001287E-06  2.721016E-06 -1.724208E-04  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.645506E-05 deltap:   0.000000E+00
+orbit:  -2.000002E-03 -1.163800E-10  2.327260E-09 -1.700002E-04  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   5.547930E-09 deltap:   0.000000E+00
+orbit:  -2.000000E-03 -2.381814E-12  3.077072E-11 -1.700000E-04  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003218201382        55.74339193 
+
+                q1                dq1            betxmax              dxmax 
+        64.2799999        3.000000008        595.8733361        2.816136811 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.352953502      0.01191650935     0.001284493214        59.31000004 
+
+               dq2            betymax              dymax              dyrms 
+       2.999999992        609.4788076       0.1932632569      0.05916187436 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01353295385     0.001377607928                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+Processing apertures from s.ds.l5.b1:1 to e.ds.r5.b1:1...
++++++++ deltap from TWISS            0
+
+ Reading offsets from tfs "./offset.ip5.b1.tfs"
+
+reference node: e.ds.l5.b1:1
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+
+
+APERTURE LIMIT: mq.11l5.b1:1, n1: 8.96491, at: 12892
+
+exec, mk_apir(6,b1,1); 
+
+++++++ info: sec1 redefined
+++++++ info: sec2 redefined
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       106.9029682                 -0    0.0004056569002        49.65015014 
+
+                q1                dq1            betxmax              dxmax 
+      0.2634908042      -0.4293827554        176.9450877        2.008263683 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.535892856                  0                  0       0.2430746761 
+
+               dq2            betymax              dymax              dyrms 
+      0.2409634861        180.2369084                 -0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter Twiss module
+ Found 6 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        1169.46265                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       2.890453821                  0        177.1785694        2.021237592 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.504766891                  0                  0        2.642418427 
+
+               dq2            betymax              dymax              dyrms 
+                 0         180.337175                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       106.9029682                 -0    0.0004056569002        49.65015014 
+
+                q1                dq1            betxmax              dxmax 
+      0.2634908042       0.2531571687        176.9450877        2.008263683 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.464795464                  0                  0       0.2430746761 
+
+               dq2            betymax              dymax              dyrms 
+      0.1099852262        180.2369084                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+++++++ info: betxaux redefined
+++++++ info: betyaux redefined
+++++++ info: alfxaux redefined
+++++++ info: alfyaux redefined
+++++++ info: dxaux redefined
+++++++ info: dpxaux redefined
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       962.1267137                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       2.257326716                  0         5389.14786        4.261893881 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.827709779                  0                  0        2.247444983 
+
+               dq2            betymax              dymax              dyrms 
+                 0        30924.25813                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+++++++ info: r11 redefined
+++++++ info: r12 redefined
+++++++ info: r21 redefined
+++++++ info: r22 redefined
+++++++ info: r33 redefined
+++++++ info: r34 redefined
+++++++ info: r43 redefined
+++++++ info: r44 redefined
+++++++ info: r16 redefined
+++++++ info: r26 redefined
+enter Twiss module
+  
+iteration:   1 error:   2.349233E-03 deltap:   0.000000E+00
+orbit:  -2.021580E-03  1.001287E-06  2.721016E-06 -1.724208E-04  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.645506E-05 deltap:   0.000000E+00
+orbit:  -2.000002E-03 -1.163800E-10  2.327260E-09 -1.700002E-04  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   5.547930E-09 deltap:   0.000000E+00
+orbit:  -2.000000E-03 -2.381814E-12  3.077072E-11 -1.700000E-04  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003218201382        55.74339193 
+
+                q1                dq1            betxmax              dxmax 
+        64.2799999        3.000000008        595.8733361        2.816136811 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.352953502      0.01191650935     0.001284493214        59.31000004 
+
+               dq2            betymax              dymax              dyrms 
+       2.999999992        609.4788076       0.1932632569      0.05916187436 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01353295385     0.001377607928                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+Processing apertures from s.ds.l6.b1:1 to e.ds.r6.b1:1...
++++++++ deltap from TWISS            0
+
+ Reading offsets from tfs "./offset.ip6.b1.tfs"
+
+reference node: e.ds.l6.b1:1
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+
+
+APERTURE LIMIT: mq.11r6.b1:1, n1: 9.16169, at: 17096.9
+
+exec, mk_apir(7,b1,1); 
+
+++++++ info: sec1 redefined
+++++++ info: sec2 redefined
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       106.9029682                 -0    0.0004056569002        49.65015014 
+
+                q1                dq1            betxmax              dxmax 
+      0.2634908042       0.2531571687        176.9450877        2.008263683 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.464795464                  0                  0       0.2430746761 
+
+               dq2            betymax              dymax              dyrms 
+      0.1099852262        180.2369084                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter Twiss module
+ Found 6 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        1169.46265                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       2.862202302                  0        177.0970844        2.020521897 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.492161082                  0                  0        2.667486601 
+
+               dq2            betymax              dymax              dyrms 
+                 0        180.2594863                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       106.9029682                 -0    0.0004056569002        49.65015014 
+
+                q1                dq1            betxmax              dxmax 
+      0.2634908042      -0.4293827554        176.9450877        2.008263683 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.535892856                  0                  0       0.2430746761 
+
+               dq2            betymax              dymax              dyrms 
+      0.2409634861        180.2369084                 -0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+++++++ info: betxaux redefined
+++++++ info: betyaux redefined
+++++++ info: alfxaux redefined
+++++++ info: alfyaux redefined
+++++++ info: dxaux redefined
+++++++ info: dpxaux redefined
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       962.1267137                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+        2.24860688                  0        29744.37923        4.003561241 
+
+             dxrms             xcomax             xcorms                 q2 
+        1.80973824                  0                  0        2.250700216 
+
+               dq2            betymax              dymax              dyrms 
+                 0         5587.76731                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+++++++ info: r11 redefined
+++++++ info: r12 redefined
+++++++ info: r21 redefined
+++++++ info: r22 redefined
+++++++ info: r33 redefined
+++++++ info: r34 redefined
+++++++ info: r43 redefined
+++++++ info: r44 redefined
+++++++ info: r16 redefined
+++++++ info: r26 redefined
+enter Twiss module
+  
+iteration:   1 error:   2.349233E-03 deltap:   0.000000E+00
+orbit:  -2.021580E-03  1.001287E-06  2.721016E-06 -1.724208E-04  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.645506E-05 deltap:   0.000000E+00
+orbit:  -2.000002E-03 -1.163800E-10  2.327260E-09 -1.700002E-04  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   5.547930E-09 deltap:   0.000000E+00
+orbit:  -2.000000E-03 -2.381814E-12  3.077072E-11 -1.700000E-04  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003218201382        55.74339193 
+
+                q1                dq1            betxmax              dxmax 
+        64.2799999        3.000000008        595.8733361        2.816136811 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.352953502      0.01191650935     0.001284493214        59.31000004 
+
+               dq2            betymax              dymax              dyrms 
+       2.999999992        609.4788076       0.1932632569      0.05916187436 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01353295385     0.001377607928                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+Processing apertures from s.ds.l7.b1:1 to e.ds.r7.b1:1...
++++++++ deltap from TWISS            0
+
+ Reading offsets from tfs "./offset.ip7.b1.tfs"
+
+reference node: e.ds.l7.b1:1
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+
+
+APERTURE LIMIT: mcbcv.10r7.b1:1, n1: 9.05951, at: 20380.1
+
+exec, mk_apir(8,b1,1); 
+
+++++++ info: sec1 redefined
+++++++ info: sec2 redefined
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       106.9029682                 -0    0.0004056569002        49.65015014 
+
+                q1                dq1            betxmax              dxmax 
+      0.2634908042      -0.4293827554        176.9450877        2.008263683 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.535892856                  0                  0       0.2430746761 
+
+               dq2            betymax              dymax              dyrms 
+      0.2409634861        180.2369084                 -0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter Twiss module
+ Found 6 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        1169.46265                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       2.890453821                  0        177.1785694        2.021237592 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.504766891                  0                  0        2.642418427 
+
+               dq2            betymax              dymax              dyrms 
+                 0         180.337175                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       106.8970318                 -0    0.0004057041854        49.64725667 
+
+                q1                dq1            betxmax              dxmax 
+      0.2634717773        0.253148068        176.9293486        2.008343141 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.464876472                  0                  0       0.2430568194 
+
+               dq2            betymax              dymax              dyrms 
+      0.1100109695        180.2234757                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+++++++ info: betxaux redefined
+++++++ info: betyaux redefined
+++++++ info: alfxaux redefined
+++++++ info: alfyaux redefined
+++++++ info: dxaux redefined
+++++++ info: dpxaux redefined
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       962.0732863                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       2.257316061                  0        5387.189214        4.261475085 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.827704894                  0                  0         2.24744386 
+
+               dq2            betymax              dymax              dyrms 
+                 0        30919.28053                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+++++++ info: r11 redefined
+++++++ info: r12 redefined
+++++++ info: r21 redefined
+++++++ info: r22 redefined
+++++++ info: r33 redefined
+++++++ info: r34 redefined
+++++++ info: r43 redefined
+++++++ info: r44 redefined
+++++++ info: r16 redefined
+++++++ info: r26 redefined
+enter Twiss module
+  
+iteration:   1 error:   2.349233E-03 deltap:   0.000000E+00
+orbit:  -2.021580E-03  1.001287E-06  2.721016E-06 -1.724208E-04  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.645506E-05 deltap:   0.000000E+00
+orbit:  -2.000002E-03 -1.163800E-10  2.327260E-09 -1.700002E-04  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   5.547930E-09 deltap:   0.000000E+00
+orbit:  -2.000000E-03 -2.381814E-12  3.077072E-11 -1.700000E-04  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003218201382        55.74339193 
+
+                q1                dq1            betxmax              dxmax 
+        64.2799999        3.000000008        595.8733361        2.816136811 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.352953502      0.01191650935     0.001284493214        59.31000004 
+
+               dq2            betymax              dymax              dyrms 
+       2.999999992        609.4788076       0.1932632569      0.05916187436 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01353295385     0.001377607928                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+Processing apertures from s.ds.l8.b1:1 to e.ds.r8.b1:1...
++++++++ deltap from TWISS            0
+
+ Reading offsets from tfs "./offset.ip8.b1.tfs"
+
+reference node: e.ds.l8.b1:1
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+++++++ warning: Found deprecated RCOLLIMATOR element;  Should be replaced by COLLIMATOR
+
+
+APERTURE LIMIT: mqxa.1l8:1, n1: 8.80756, at: 23286
+
+
+
+select, flag=makethin, clear;
+
+select, flag=makethin, class=mb, slice=2, thick=true;
+
+select, flag=makethin, class=mq, slice=2, thick=true;
+
+select, flag=makethin, class=mqxa,  slice=16;
+
+select, flag=makethin, class=mqxb,  slice=16;
+
+select, flag=makethin, pattern=mbx\.,    slice=4;
+
+select, flag=makethin, pattern=mbrb\.,   slice=4;
+
+select, flag=makethin, pattern=mbrc\.,   slice=4;
+
+select, flag=makethin, pattern=mbrs\.,   slice=4;
+
+select, flag=makethin, pattern=mbh\.,    slice=4;
+
+select, flag=makethin, pattern=mqwa\.,   slice=4;
+
+select, flag=makethin, pattern=mqwb\.,   slice=4;
+
+select, flag=makethin, pattern=mqy\.,    slice=4, thick=true;
+
+select, flag=makethin, pattern=mqm\.,    slice=4, thick=true;
+
+select, flag=makethin, pattern=mqmc\.,   slice=1, thick=true;
+
+select, flag=makethin, pattern=mqml\.,   slice=4;
+
+select, flag=makethin, pattern=mqtlh\.,  slice=2;
+
+select, flag=makethin, pattern=mqtli\.,  slice=2;
+
+select, flag=makethin, pattern=mqt\.  ,  slice=2;
+
+
+
+!thin lens
+
+beam;
+
+use,sequence=lhcb1;
+
+makethin, sequence=lhcb1, style=teapot;
+
+makethin: style chosen : teapot
+makethin: slicing sequence : lhcb1
+
+
+Option, echo=false, warn=false, info=false;
+
+
+
+Beam;
+
+
+
+Use, sequence=lhcb1;
+
+
+
+Select, flag=twiss, clear;
+
+Select, flag=twiss, columns=name, s, betx, bety, mux, muy;
+
+Twiss;
+
+enter Twiss module
+  
+iteration:   1 error:   2.395909E-03 deltap:   0.000000E+00
+orbit:  -2.021771E-03  9.514578E-07  2.419469E-06 -1.724136E-04  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.654397E-05 deltap:   0.000000E+00
+orbit:  -2.000015E-03  3.869184E-09  2.256583E-09 -1.699970E-04  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   5.605958E-09 deltap:   0.000000E+00
+orbit:  -2.000013E-03  3.988369E-09 -2.859594E-11 -1.699968E-04  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        26658.8832                 -0    0.0003217837658        55.74654227 
+
+                q1                dq1            betxmax              dxmax 
+       64.28379505        3.054094637          605.28097        2.816687449 
+
+             dxrms             xcomax             xcorms                 q2 
+       1.312100034      0.01191655995     0.001550187127        59.31356729 
+
+               dq2            betymax              dymax              dyrms 
+       3.033991186         614.683543       0.1929651648      0.06066005701 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01353297952     0.001636953369                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+
+Sixtrack, aperture;
+
+  ++++++++++++++++++++++++++++
+  +   c6t version 2.0        +
+  ++++++++++++++++++++++++++++
+
+++++++ info: c6t - aperture flag selected 
+max_mult_ord set to : 11
+Reference radius set to : 1.000000
+++++++ info: MADX sequence converted to c6t internal. 
+
+total block length: 26658.883200
+
+c6t terminated - total number of elements: 18604
+                    field errors    MAD-X: 0
+                    field errors SixTrack: 0
+                 alignment errors   MAD-X: 8
+                alignment errors SixTrack: 8
+                          sequence length: 26658.883200 [m]
+
+
+Stop;
+
+
+  Number of warnings: 80
+80 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
