@@ -1116,6 +1116,7 @@ tests/test-c6t-3/input/fivecell.seq -text
 tests/test-c6t-3/test-c6t-3.cfg -text
 tests/test-c6t-3/test-c6t-3.madx -text
 tests/test-c6t-3/test-c6t-3.ref -text
+tests/test-c6t-4/fc.2.cfg -text
 tests/test-c6t-4/fc.2.ref -text
 tests/test-c6t-4/fc.3.aper.ref -text
 tests/test-c6t-4/input/mymacros.madx -text
