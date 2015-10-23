@@ -2,7 +2,7 @@
 
 // private globals
 
-static char tmp_key[NAME_L];
+static char tmp_key[100*NAME_L];
 
 // public interface
 
@@ -202,6 +202,7 @@ strip(char* name)
   /* strip ':' and following off */
 {
   char* p;
+  assert(strlen(name) < sizeof tmp_key);
   strcpy(tmp_key, name);
   if ((p = strchr(tmp_key, ':')) != NULL) *p = '\0';
   return tmp_key;
