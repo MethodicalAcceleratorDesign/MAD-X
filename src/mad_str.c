@@ -1,9 +1,5 @@
 #include "madx.h"
 
-// private globals
-
-static char tmp_key[100*NAME_L];
-
 // public interface
 
 void
@@ -201,6 +197,7 @@ char*
 strip(char* name)
   /* strip ':' and following off */
 {
+  static char tmp_key[10*NAME_L];
   char* p;
   assert(strlen(name) < sizeof tmp_key);
   strcpy(tmp_key, name);
