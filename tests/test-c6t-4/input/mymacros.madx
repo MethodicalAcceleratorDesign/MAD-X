@@ -73,7 +73,7 @@ mk_apir(nir,bim,FULL) : macro ={
   twiss, file=temp/twiss_irnirbim.tfs;
   };
 
-  system, "cp db5/aperture/offset.ip*b*.tfs  .";
+  system, "cp input/aperture/offset.ip*b*.tfs  .";
   select, flag=aperture, clear;
   select, flag=aperture, column=name,s,betx,bety,dx,dy,x,y,px,py,
                                 n1,apertype,Rtol,xtol,ytol,

@@ -1,12 +1,8 @@
 Title, "test-c6t-4 conversion of thick elements with apertures";
 
-Option, echo=false, warn=false, info=false;
-
-! Links definitions
-system, "ln -fns /afs/cern.ch/eng/lhc/optics/runII/2015 db5";
+Option, echo=false, warn=false, info=true;
 
 ! Sequence definition
-Option, info=true;
 
 REAL CONST l.TAN   = 3.7  ;
 REAL CONST l.TANAL = l.TAN;
@@ -23,16 +19,16 @@ REAL CONST l.MBLW              =0 ; REAL CONST l.MBWMD             =0 ;
 REAL CONST l.MBXWH             =0 ; REAL CONST l.MBXWS             =0 ;
 REAL CONST l.MBXWT             =0 ;
 
-call, file="db5/lhc_as-built.seq";
-call, file="db5/aperture/aperture_as-built.b1.madx";
-call, file="db5/aperture/aper_tol_as-built.b1.madx";
-call, file="db5/aperture/exp_pipe_model_after_LS1.madx";
-call, file="db5/aperture/exp_pipe_install_after_LS1.madx";
+call, file="input/lhc_as-built.seq";
+call, file="input/aperture/aperture_as-built.b1.madx";
+call, file="input/aperture/aper_tol_as-built.b1.madx";
+call, file="input/aperture/exp_pipe_model_after_LS1.madx";
+call, file="input/aperture/exp_pipe_install_after_LS1.madx";
 
 call,file="input/mymacros.madx";   !!! Ghislain : minimum version with aperture command modified
 
 !!! Injection optics
-call, file="db5/opt_inj.madx";
+call, file="input/opt_inj.madx";
 
 ! aperture not defined for those elements. They collide with thick TAN
 Option, echo=true, warn=true, info=true;
@@ -87,12 +83,12 @@ select, flag=makethin, pattern=mqtli\.,  slice=2;
 select, flag=makethin, pattern=mqt\.  ,  slice=2;
 
 !thin lens
-beam;
-use,sequence=lhcb1;
-makethin, sequence=lhcb1, style=teapot;
+Beam;
+Use, sequence=lhcb1;
+Makethin, sequence=lhcb1, style=teapot, makedipedge=true;
 
 Option, echo=false, warn=false, info=false;
-Call, file="db5/opt_inj_thin.madx";
+Call, file="input/opt_inj_thin.madx";
 Option, echo=true,  warn=true,  info=true;
 
 Beam;
@@ -104,5 +100,9 @@ Select, flag=twiss, columns=name, s, betx, bety, mux, muy;
 Twiss;
 
 Sixtrack, aperture;
+
+Removefile, file="fc.3";
+Removefile, file="fc.8";
+Removefile, file="fc.34";
 
 Stop;

@@ -3,13 +3,13 @@
   +     MAD-X 5.02.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2015.09.24               +
-  + Execution date: 2015.10.23 17:38:57      +
+  + Execution date: 2015.11.03 17:06:26      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Title, "test-c6t-4 conversion of thick elements with apertures";
 
 
 
-Option, echo=false, warn=false, info=false;
+Option, echo=false, warn=false, info=true;
 
 seqedit, sequence=lhcb1;
 
@@ -1444,11 +1444,11 @@ select, flag=makethin, pattern=mqt\.  ,  slice=2;
 
 !thin lens
 
-beam;
+Beam;
 
-use,sequence=lhcb1;
+Use, sequence=lhcb1;
 
-makethin, sequence=lhcb1, style=teapot;
+Makethin, sequence=lhcb1, style=teapot, makedipedge=true;
 
 makethin: style chosen : teapot
 makethin: slicing sequence : lhcb1
@@ -1474,31 +1474,31 @@ Twiss;
 
 enter Twiss module
   
-iteration:   1 error:   2.395909E-03 deltap:   0.000000E+00
-orbit:  -2.021771E-03  9.514578E-07  2.419469E-06 -1.724136E-04  0.000000E+00  0.000000E+00
+iteration:   1 error:   2.395435E-03 deltap:   0.000000E+00
+orbit:  -2.021822E-03  9.513935E-07  2.389747E-06 -1.724039E-04  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   3.654397E-05 deltap:   0.000000E+00
-orbit:  -2.000015E-03  3.869184E-09  2.256583E-09 -1.699970E-04  0.000000E+00  0.000000E+00
+iteration:   2 error:   3.654250E-05 deltap:   0.000000E+00
+orbit:  -2.000064E-03  3.660475E-09 -3.728185E-08 -1.699885E-04  0.000000E+00  0.000000E+00
   
-iteration:   3 error:   5.605958E-09 deltap:   0.000000E+00
-orbit:  -2.000013E-03  3.988369E-09 -2.859594E-11 -1.699968E-04  0.000000E+00  0.000000E+00
+iteration:   3 error:   5.602553E-09 deltap:   0.000000E+00
+orbit:  -2.000062E-03  3.779511E-09 -3.956450E-08 -1.699883E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832                 -0    0.0003217837658        55.74654227 
+        26658.8832                 -0    0.0003217837798        55.74654106 
 
                 q1                dq1            betxmax              dxmax 
-       64.28379505        3.054094637          605.28097        2.816687449 
+       64.28374798        3.053604771        605.3257525        2.816697748 
 
              dxrms             xcomax             xcorms                 q2 
-       1.312100034      0.01191655995     0.001550187127        59.31356729 
+       1.321690855      0.01191657792     0.001479564991        59.31361685 
 
                dq2            betymax              dymax              dyrms 
-       3.033991186         614.683543       0.1929651648      0.06066005701 
+       3.023003416        614.6862484       0.1929540341       0.0604133351 
 
             ycomax             ycorms             deltap            synch_1 
-     0.01353297952     0.001636953369                  0                  0 
+     0.01353294796     0.001559600687                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -1517,12 +1517,20 @@ Reference radius set to : 1.000000
 
 total block length: 26658.883200
 
-c6t terminated - total number of elements: 18604
+c6t terminated - total number of elements: 21308
                     field errors    MAD-X: 0
                     field errors SixTrack: 0
                  alignment errors   MAD-X: 8
                 alignment errors SixTrack: 8
                           sequence length: 26658.883200 [m]
+
+
+Removefile, file="fc.3";
+
+Removefile, file="fc.8";
+
+Removefile, file="fc.34";
+
 
 
 Stop;
