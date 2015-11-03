@@ -16,7 +16,7 @@ use, sequence=myseq;
 
 select, flag=makethin, class=sbend, thick=true; ! thick slice, with dipedge conversion    with dipedge  perfect  (to e-16)
 
-makethin, sequence=myseq,style=teapot;
+makethin, sequence=myseq,style=teapot, makedipedge=false;
 
 use, sequence=myseq;
 
