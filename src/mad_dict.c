@@ -22,6 +22,15 @@
 /*  J. Beringer et al. (Particle Data Group), Phys. Rev. D86, 010001 (2012). = PDG 2012 */
 /*  K.A. Olive et al. (Particle Data Group), Chin. Phys. C, 38, 090001 (2014). = PDG2014 */
 char constant_def[] =
+
+#define mkstr(a)  mkstr_(a)
+#define mkstr_(a) #a
+
+"const version = " mkstr(_VERSION_NUM) "; "
+
+#undef mkstr
+#undef mkstr_
+
 "const pi = 4 * atan(1.); "
 "const twopi = 2 * pi; "
 "const degrad = 180 / pi; "

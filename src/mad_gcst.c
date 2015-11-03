@@ -15,6 +15,7 @@ const char * const version_name   = mkstr(_VERSION);
 const char * const version_arch   = sizeof(void*) == 4 ? "32" : sizeof(void*) == 8 ? "64" : "??";
 const char * const version_ostype = mkstr(_VERSION_OSTYPE);
 const char * const version_date   = mkstr(_VERSION_DATE);
+const int          version_num    = _VERSION_NUM;
 
 #undef mkstr
 #undef mkstr_
