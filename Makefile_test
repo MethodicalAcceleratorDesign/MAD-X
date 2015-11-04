@@ -72,7 +72,8 @@ test-ptc-trackline test-ptc-trackline-2 \
 test-touschek test-touschek-2 \
 test-sequence test-sequence-2 test-sequence-3 test-sequence-4 test-sequence-5 test-sequence-6 \
 test-line \
-test-plot test-plot-2
+test-plot test-plot-2 \
+$(if $(call eq,$(OSTYPE),Linux),test-lhc,)
 
 # same order as tests-all, tests that take +10 seconds
 # to know the timing: make tests-all TIMER=time (on Unixes)
@@ -84,7 +85,8 @@ test-c6t-4 \
 test-match-6 test-match-7 \
 test-ptc-twiss-2 \
 $(if $(call eq,$(OSTYPE),Windows),,test-ptc-twiss-old6) test-ptc-twiss-old7 \
-test-touschek test-touschek-2
+test-touschek test-touschek-2 \
+$(if $(call eq,$(OSTYPE),Linux),test-lhc,)
 
 # tests dependencies
 #test-c6t:     test-makethin-2
@@ -106,6 +108,7 @@ test-error:          TESTSUITE := Error testsuite
 test-ibs:            TESTSUITE := IBS testsuite
 test-jacobian:       TESTSUITE := Jacobian testsuite
 test-line:           TESTSUITE := Line testsuite
+test-lhc:            TESTSUITE := LHC/HLLHC testsuite
 test-makethin:       TESTSUITE := Makethin testsuite
 test-match:          TESTSUITE := Matching testsuite
 test-memory:         TESTSUITE := Memory Management testsuite
