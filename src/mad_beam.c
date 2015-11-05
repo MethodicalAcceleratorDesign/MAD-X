@@ -175,32 +175,32 @@ update_beam(struct command* comm)
     pc = sqrt(energy*energy - mass*mass);
     gamma = energy / mass;
     beta = pc / energy;
-    brho = pc / ( abs(charge) * clight * 1.e-9);
+    brho = pc / ( fabs(charge) * clight * 1.e-9);
   }
   else if((pos = name_list_pos("pc", nlc)) > -1 && nlc->inform[pos]) {
     pc = command_par_value("pc", comm);
     energy = sqrt(pc*pc + mass*mass);
     gamma = energy / mass;
     beta = pc / energy;
-    brho = pc / ( abs(charge) * clight * 1.e-9);
+    brho = pc / ( fabs(charge) * clight * 1.e-9);
   }
   else if((pos = name_list_pos("gamma", nlc)) > -1 && nlc->inform[pos]) {
     if ((gamma = command_par_value("gamma", comm)) <= one) fatal_error("gamma must be","> 1");
     energy = gamma * mass;
     pc = sqrt(energy*energy - mass*mass);
     beta = pc / energy;
-    brho = pc / ( abs(charge) * clight * 1.e-9); 
+    brho = pc / ( fabs(charge) * clight * 1.e-9); 
   }
   else if((pos = name_list_pos("beta", nlc)) > -1 && nlc->inform[pos]) {
     if ((beta = command_par_value("beta", comm)) >= one) fatal_error("beta must be","< 1");
     gamma = one / sqrt(one - beta*beta);
     energy = gamma * mass;
     pc = sqrt(energy*energy - mass*mass);
-    brho = pc / ( abs(charge) * clight * 1.e-9);
+    brho = pc / ( fabs(charge) * clight * 1.e-9);
   }
   else if((pos = name_list_pos("brho", nlc)) > -1 && nlc->inform[pos]) {
     if ((brho = command_par_value("brho", comm)) < zero) fatal_error("brho must be","> 0");    
-    pc = brho * abs(charge) * clight * 1.e-9;
+    pc = brho * fabs(charge) * clight * 1.e-9;
     energy = sqrt(pc*pc + mass*mass);
     gamma = energy / mass;
     beta = pc / energy;
@@ -211,7 +211,7 @@ update_beam(struct command* comm)
     pc = sqrt(energy*energy - mass*mass);
     gamma = energy / mass;
     beta = pc / energy;
-    brho = pc / ( abs(charge) * clight * 1.e-9);
+    brho = pc / ( fabs(charge) * clight * 1.e-9);
   }
 
   // emittance related
