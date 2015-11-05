@@ -465,7 +465,7 @@ error_efcomp(struct in_cmd* cmd)
             break;
 
           case 5:
-            lag = lag;
+            lag = val; // LD: bug corrected? was lag=lag...
             nextnode->rfm_lag = lag;
             if (opt_debug) fprintf(prt_file, "lag flag is %g\n",lag);
             break;

@@ -875,7 +875,7 @@ static expression* curved_from_straight_length(const element* rbend_el)
     // in going from rbend to sbend, this correction must be applied   if the "l" expression is used,    not for the value
     string anglestr = my_get_cmd_expr_str( return_param_recurse("angle", rbend_el) );
     // const string rat = "("+anglestr+")*0.5/sin(("+anglestr+")/2)"; // L_sbend / L_rbend
-    // LD (16.06.2015): quick and dirty fix to broken inheritance of atributes,
+    // LD (16.06.2015): quick and dirty fix to broken inheritance of attributes,
     //                  set angle to 0 (default) when the returned string is empty
     if (anglestr == "") anglestr = "0";
     const string rat = "1.0/sinc("+anglestr+"*0.5)"; // L_sbend / L_rbend
@@ -1341,7 +1341,7 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
   {
     slice_style = pl->parameters[ipos_style]->string ;
     cout << "makethin: style chosen : " << slice_style << '\n';
-  } else slice_style = "teapot";
+  } else slice_style = "teapot"; // Should be "hybrid" for backward compatibility
 
   if(debug_fl() && kill_fringe_fl)   cout << "kill_fringe_fl="   << kill_fringe_fl   << " is on. Flags kill_ent_fringe kill_exi_fringe will be set to true for thick bend body slices" << '\n';
   if(debug_fl() && dipedge_h1_h2_fl) cout << "dipedge_h1_h2_fl=" << dipedge_h1_h2_fl << " is on. Higher order h1, h2 parameters will be kept. Tracking may become non-simplectic" << '\n';
@@ -1359,13 +1359,13 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
     set_option("makeconsistent", &MakeCons);
   }
 
+  int iMakeDipedge;
   const int ipos_md = name_list_pos("makedipedge", nl);
   if( ipos_md > -1 && nl->inform[ipos_md])
-  {
-    int iMakeDipedge=pl->parameters[ipos_md]->double_value;
-    if (verbose_fl()) cout << "makethin makedipedge flag ipos_md=" << ipos_md << " iMakeDipedge=" << iMakeDipedge << '\n';
-    set_option("makedipedge", &iMakeDipedge); // Why does this set the global flag?
-  }
+    iMakeDipedge=pl->parameters[ipos_md]->double_value;
+  else iMakeDipedge = 1; // default is true
+  set_option("makedipedge", &iMakeDipedge); // LD: Why does this set the global option flag?
+  if (verbose_fl()) cout << "makethin makedipedge flag ipos_md=" << ipos_md << " iMakeDipedge=" << iMakeDipedge << '\n';
 
   if (slice_select->curr > 0)
   {
@@ -1743,7 +1743,7 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
   // give sbend new name by appending _s to rbend name
 
   const string rbend_name=rbend_el->name;
-  const string sbend_name=rbend_name+"_s"; // add _s to rbend name
+  const string sbend_name=rbend_name+(rbarc_fl() ? "_s" : ""); // LD: add _s to rbend name if the length was changed
   element* sbend_el = RbendList->find_slice(rbend_el,sbend_name);
   if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " rbend_name=" << rbend_name << " sbend_el=" << sbend_el << '\n';
   if(sbend_el) return sbend_el; // was already done

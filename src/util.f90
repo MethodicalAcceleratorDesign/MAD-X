@@ -1,3 +1,42 @@
+module math_constfi ! 2015-Aug-06 Ghislain 
+  implicit none
+  public
+  !--- Definition of useful mathematical constants
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0, four=4d0, five=5d0
+  double precision, parameter :: six=6d0, seven=7d0, eight=8d0, nine=9d0, ten=10d0
+  double precision, parameter :: eleven=11d0, twelve=12d0, thirteen=13d0, fourteen=14d0, fifteen=15d0
+  double precision, parameter :: sixteen=16d0, seventeen=17d0, eighteen=18d0, nineteen=19d0, twenty=20d0
+  double precision, parameter :: half=0.5d0, quarter=0.25d0
+  double precision, parameter :: ten3m=1d-3, ten6m=1d-6, ten9m=1d-9
+  double precision, parameter :: ten3p=1d3,  ten6p=1d6,  ten9p=1d9
+  double precision, parameter :: pi = 3.141592653589793238462643383279502884197169399375105820974944d0
+  double precision, parameter :: twopi = two*pi
+  double precision, parameter :: degrad = 180d0/pi, raddeg = pi/180d0
+  double precision, parameter :: e = 2.718281828459045235360287471352662497757247093699959574966967d0
+end module math_constfi
+
+module phys_constfi
+  use math_constfi, only : pi
+  implicit none
+  public
+  !--- Definition of physical constants
+  ! sources  :
+  ! J. Beringer et al. (Particle Data Group), Phys. Rev. D86, 010001 (2012). = PDG 2012
+  ! K.A. Olive et al. (Particle Data Group), Chin. Phys. C, 38, 090001 (2014). = PDG 2014
+  double precision, parameter :: clight = 299792458d0       !     Speed of light in vacuum [m.s]
+  double precision, parameter :: qelect = 1.602176565d-19   !     Elementary charge [A*s]
+  double precision, parameter :: hbar   = 6.58211928d-25    !     Reduced Plack's constant [GeV*s]
+  double precision, parameter :: amu0   = 4d-7 * pi         !     Permeability of vacuum [V*s/A*m]
+  ! Rest Mass [GeV]
+  double precision, parameter :: emass  = 0.510998928d-3    
+  double precision, parameter :: mumass = 0.1056583715d0    
+  double precision, parameter :: nmass  = 0.931494061d0     
+  double precision, parameter :: pmass  = 0.938272046d0
+  ! Classical radius [m]
+  double precision, parameter :: erad   = 2.8179403267d-15  
+  double precision, parameter :: prad   = erad*emass/pmass  
+end module phys_constfi
+
 module Inf_NaN_Detection
 
   !!     Inf_NaN_Detection module
@@ -491,45 +530,6 @@ module plot_bfi
   !--- ptc_flag set in routines pesopt, used in routine pefill
   logical, save :: fpmach=.false., dpp_flag=.false., ptc_flag=.false.
 end module plot_bfi
-
-module math_constfi ! 2015-Aug-06 Ghislain 
-  implicit none
-  public
-  !--- Definition of useful mathematical constants
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0, three=3d0, four=4d0, five=5d0
-  double precision, parameter :: six=6d0, seven=7d0, eight=8d0, nine=9d0, ten=10d0
-  double precision, parameter :: eleven=11d0, twelve=12d0, thirteen=13d0, fourteen=14d0, fifteen=15d0
-  double precision, parameter :: sixteen=16d0, seventeen=17d0, eighteen=18d0, nineteen=19d0, twenty=20d0
-  double precision, parameter :: half=0.5d0, quarter=0.25d0
-  double precision, parameter :: ten3m=1d-3, ten6m=1d-6, ten9m=1d-9
-  double precision, parameter :: ten3p=1d3,  ten6p=1d6,  ten9p=1d9
-  double precision, parameter :: pi = 3.141592653589793238462643383279502884197169399375105820974944d0
-  double precision, parameter :: twopi = two*pi
-  double precision, parameter :: degrad = 180d0/pi, raddeg = pi/180d0
-  double precision, parameter :: e = 2.718281828459045235360287471352662497757247093699959574966967d0
-end module math_constfi
-
-module phys_constfi
-  use math_constfi, only : pi
-  implicit none
-  public
-  !--- Definition of physical constants
-  ! sources  :
-  ! J. Beringer et al. (Particle Data Group), Phys. Rev. D86, 010001 (2012). = PDG 2012
-  ! K.A. Olive et al. (Particle Data Group), Chin. Phys. C, 38, 090001 (2014). = PDG 2014
-  double precision, parameter :: clight = 299792458d0       !     Speed of light in vacuum [m.s]
-  double precision, parameter :: qelect = 1.602176565d-19   !     Elementary charge [A*s]
-  double precision, parameter :: hbar   = 6.58211928d-25    !     Reduced Plack's constant [GeV*s]
-  double precision, parameter :: amu0   = 4d-7 * pi         !     Permeability of vacuum [V*s/A*m]
-  ! Rest Mass [GeV]
-  double precision, parameter :: emass  = 0.510998928d-3    
-  double precision, parameter :: mumass = 0.1056583715d0    
-  double precision, parameter :: nmass  = 0.931494061d0     
-  double precision, parameter :: pmass  = 0.938272046d0
-  ! Classical radius [m]
-  double precision, parameter :: erad   = 2.8179403267d-15  
-  double precision, parameter :: prad   = erad*emass/pmass  
-end module phys_constfi
 
 module resindexfi
   implicit none
