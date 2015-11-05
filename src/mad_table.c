@@ -2073,8 +2073,10 @@ string_to_table_row(const char* table, const char* name, const int *row, const c
   mycpy(buf, string);
   if (strcmp(buf, "name") == 0)
     tbl->s_cols[col][*row-1] = tmpbuff(current_node->name);
+  else if (strcmp(buf, "base_name") == 0)
+    tbl->s_cols[col][*row-1] = tmpbuff(current_node->base_name);
   else
-    tbl->s_cols[col][*row-1] = tmpbuff(string);
+    tbl->s_cols[col][*row-1] = tmpbuff(buf);
   return 0;
 }
 
