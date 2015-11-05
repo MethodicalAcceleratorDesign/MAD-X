@@ -1398,6 +1398,7 @@ tests/test-lhc/ap_ir5b2_0.0006.tfs.ref -text
 tests/test-lhc/ap_ir5b2_0.tfs.cfg -text
 tests/test-lhc/ap_ir5b2_0.tfs.ref -text
 tests/test-lhc/d2_aperture.ref -text
+tests/test-lhc/lhc_hllhc11_round.seq.cfg -text
 tests/test-lhc/lhc_hllhc11_round.seq.ref -text
 tests/test-lhc/offset.ip1.b1.tfs.ref -text
 tests/test-lhc/offset.ip1.b2.tfs.ref -text
