@@ -2217,7 +2217,7 @@ string_to_table_curr(const char* table, const char* name, const char* string)
   else if (strcmp(buf, "base_name") == 0)
     tbl->s_cols[col][tbl->curr] = tmpbuff(current_node->base_name);
   else
-    tbl->s_cols[col][tbl->curr] = tmpbuff(string);
+    tbl->s_cols[col][tbl->curr] = tmpbuff(buf);
   return 0;
 }
 
