@@ -10,7 +10,7 @@ export PATH="/Users/mad/Projects/madX:/opt/local/bin:$PATH"
 check_error ()
 {
 	if [ "$?" != "0" ] ; then
-		echo "ERROR: $1"
+		echo -e "\nERROR: $1"
 		exit 1
 	fi
 }

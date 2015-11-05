@@ -13,7 +13,7 @@ uname -n > build-test-lxplus.run
 check_error ()
 {
 	if [ "$?" != "0" ] ; then
-		echo "ERROR: $1"
+		echo -e "\nERROR: $1"
 		[ "$2" != "no-exit" ] && exit 1
 	fi
 }
