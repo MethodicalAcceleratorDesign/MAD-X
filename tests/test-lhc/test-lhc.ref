@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.07  (64 bit, Darwin)      +
+  +     MAD-X 5.02.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2015.09.24               +
-  + Execution date: 2015.11.04 19:50:01      +
+  + Execution date: 2015.11.05 12:03:00      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -509,8 +509,8 @@ postcl.6q =            221.414 ;
 posapwl1 =            184.565 ;
 posapwl2 =            185.165 ;
 ap_mqx =                150 ;
-rm: Q1_APERTURE: No such file or directory
-rm: Q2Q3_APERTURE: No such file or directory
+rm: cannot remove `Q1_APERTURE': No such file or directory
+rm: cannot remove `Q2Q3_APERTURE': No such file or directory
 x_q1*2 =                118 ;
 r_q1*2 =        127.7222796 ;
 xx1 =              59000 ;
@@ -533,6 +533,7 @@ xx1 =             0.0435 ;
 yy1 =      0.01165432893 ;
 xx2 =      0.01165432893 ;
 yy2 =             0.0435 ;
+rm: cannot remove `d2_aperture': No such file or directory
 r_q4 =        37.80304415 ;
 g_q4 =               31.9 ;
 angle1_q4 =        12.54865235 ;
@@ -541,6 +542,7 @@ xx1 =             0.0369 ;
 yy1 =      0.00821341264 ;
 xx2 =      0.00821341264 ;
 yy2 =             0.0369 ;
+rm: cannot remove `q4_aperture': No such file or directory
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
