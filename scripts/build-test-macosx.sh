@@ -39,6 +39,8 @@ if [ "$?" != "0" ] ; then
 	svn update
 	check_error "svn update failed"
 fi
+# ensure that scripts are executable after an update
+chmod u+x scripts/build-test-report.sh $0
 
 echo -e "\n===== Release number ====="
 cat VERSION
