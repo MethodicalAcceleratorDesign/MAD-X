@@ -73,7 +73,7 @@ test-touschek test-touschek-2 \
 test-sequence test-sequence-2 test-sequence-3 test-sequence-4 test-sequence-5 test-sequence-6 \
 test-line \
 test-plot test-plot-2 \
-$(if $(call eq,$(OSTYPE),Linux),test-lhc,)
+$(call onlxplus,test-lhc test-hllhc)
 
 # same order as tests-all, tests that take +10 seconds
 # to know the timing: make tests-all TIMER=time (on Unixes)
@@ -86,7 +86,7 @@ test-match-6 test-match-7 \
 test-ptc-twiss-2 \
 $(if $(call eq,$(OSTYPE),Windows),,test-ptc-twiss-old6) test-ptc-twiss-old7 \
 test-touschek test-touschek-2 \
-$(if $(call eq,$(OSTYPE),Linux),test-lhc,)
+$(call onlxplus,test-lhc test-hllhc)
 
 # tests dependencies
 #test-c6t:     test-makethin-2
@@ -127,6 +127,9 @@ test-twiss:          TESTSUITE := Twiss testsuite
 
 # end of testsuite
 #################################################
+
+# useful macro
+onlxplus = $(if $(and $(call eq,$(OSTYPE),Linux) $(wildcard /afs/cern.ch/eng/lhc/optics)),$1,)
 
 # madx supported command for tests
 ifndef MADX
