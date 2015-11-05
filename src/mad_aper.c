@@ -142,10 +142,10 @@ aper_race(double xshift, double yshift, double r, double angle, double* x, doubl
   
   switch (quadrant) /*adjusting angle to first quadrant*/
     {
-    case 1: angle = angle; break;
-    case 2: angle = pi - angle; break;
-    case 3: angle = angle - pi; break;
-    case 4: angle = twopi - angle; break;
+    case 1: /* angle = angle; */    break;
+    case 2: angle = pi - angle;     break;
+    case 3: angle = angle - pi;     break;
+    case 4: angle = twopi - angle;  break;
     }
 
   if (angle == pi/2) {
