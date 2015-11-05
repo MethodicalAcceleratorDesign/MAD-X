@@ -213,6 +213,8 @@ module twisscfi
        phiy=0.d0,dmuy=0.d0,synch_1=0.d0,synch_2=0.d0,synch_3=0.d0,synch_4=0.d0,&
        synch_5=0.d0,suml=0.d0,circ=0.d0,eta=0.d0,alfa=0.d0,gamtr=0.d0,qx=0.d0,&
        qy=0.d0,sinmux=0.d0,sinmuy=0.d0,xix=0.d0,xiy=0.d0,currpos=0.d0
+ !--I.T
+ double precision :: gammacp=0.d0
 end module twisscfi
 module twissotmfi
   implicit none
