@@ -100,11 +100,11 @@ doc/latexuguide/pitfalls.tex -text
 doc/latexuguide/plot.tex -text
 doc/latexuguide/png/nllens_potential-2D.png -text
 doc/latexuguide/programflow.tex -text
-doc/latexuguide/ptc_auxiliaries.tex -text
-doc/latexuguide/ptc_general.tex -text
-doc/latexuguide/ptc_normal.tex -text
-doc/latexuguide/ptc_track.tex -text
-doc/latexuguide/ptc_twiss.tex -text
+doc/latexuguide/ptc-auxiliaries.tex -text
+doc/latexuguide/ptc-general.tex -text
+doc/latexuguide/ptc-normal.tex -text
+doc/latexuguide/ptc-track.tex -text
+doc/latexuguide/ptc-twiss.tex -text
 doc/latexuguide/r.tex -text
 doc/latexuguide/ranges.tex -text
 doc/latexuguide/rplot_index.tex -text

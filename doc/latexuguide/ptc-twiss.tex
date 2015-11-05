@@ -16,8 +16,8 @@
 
 The \textbf{PTC\_TWISS module}\cite{schmidt2005} of \madx is
 based on the \ptc code and is supplementary to the
-\hyperref[chap:twiss]{\tt TWISS} module of \madx.
-In {\tt PTC\_TWISS} the Twiss parameters are calculated according to
+\hyperref[chap:twiss]{\texttt{TWISS}} module of \madx.
+In \texttt{PTC\_TWISS} the Twiss parameters are calculated according to
 the formalism of G.~Ripken, developped in \cite{Ripken1970} and
 most accessible in \cite{Ripken1988}.
 
@@ -31,84 +31,86 @@ most accessible in \cite{Ripken1988}.
 %% depends on reprogramming and modifying the code at various places which
 %% is inherently error-prone.  
 
-{\tt PTC\_TWISS} tracks a special representation of the beam in three
+\texttt{PTC\_TWISS} tracks a special representation of the beam in three
 degrees of freedom. It works on the coupled lattice functions which are
 essentially the projections of the lattice functions for the eigen-modes
 on the three planes.  
 
-{\tt PTC\_TWISS} lists the projections of the ellipses of motion onto
+\texttt{PTC\_TWISS} lists the projections of the ellipses of motion onto
 the three planes ($x$, $p_x$), ($y$, $p_y$), ($t$, $p_t$) expressed via
 Ripken's parameters $b_{k,j}$, $a_{k,j}$, $g_{k,j}$ along with the phase
 advances $m_j$ in selected positions, where index $k=1 ... 3$ refers to
 the plane ($x$, $y$, ...), and the index $j= 1 ... 3$ denotes the
 eigen-mode.
 
-The {\tt PTC\_TWISS} command also calculates the dispersion values
+The \texttt{PTC\_TWISS} command also calculates the dispersion values
 $D_1$, ... ,$D_4$.
 
 In \madx commands and tables, these parameters are denoted as
-{\tt beta11, ..., beta33, alfa11, ..., alfa33, gama11, ..., gama33,
-  mu1, ..., mu3, disp1, ..., disp4}, respectively.
+\texttt{beta11, ..., beta33}, \texttt{alfa11, ..., alfa33},
+\texttt{gama11, ..., gama33}, \texttt{mu1, ..., mu3},
+\texttt{disp1, ..., disp4}, respectively. 
 
 The Ripken parametrization can be transformed into the Edwards-Teng
-parametrization (used in the module \hyperref[chap:twiss]{\tt TWISS} of
-\madx) using the formulae of Lebedev \cite{lebedev2010}.
+parametrization (used in the module
+\hyperref[chap:twiss]{\texttt{TWISS}} of \madx) using the formulae of
+Lebedev \cite{lebedev2010}. 
 
-The parameters are noted as {\tt betx, bety, alfx, alfy} and the
-coupling matrix: {\tt R11, R12, R21} and {\tt R22}. In absence of
-coupling, the following holds: {\tt betx = beta11}, {\tt bety = beta22},
-{\tt alfx = alfa11} and {\tt alfy = alfa22}.
+The parameters are noted as \texttt{betx, bety, alfx, alfy} and the
+coupling matrix: \texttt{R11, R12, R21} and \texttt{R22}. In absence of
+coupling, the following holds: \texttt{betx = beta11}, \texttt{bety = beta22},
+\texttt{alfx = alfa11} and \texttt{alfy = alfa22}.
 
-{\tt PTC\_TWISS} can also compute the deltap/p-dependency of the Twiss
-parameters. The column names {\tt beta11p, ..., beta33p,
+\texttt{PTC\_TWISS} can also compute the deltap/p-dependency of the Twiss
+parameters. The column names \texttt{beta11p, ..., beta33p,
   alfa11p, ..., alfa33p, gama11p, ..., gama33p} denote the derivatives of
 the optics parameters with respect to deltap/p. 
 
 In order to evaluate the deltap/p-dependency of the Twiss parameters,
-the order ({\tt NO}) of the map must set to at least 2.  
+the order (\texttt{NO}) of the map must set to at least 2.  
 
 The derivatives of the dispersion with respect to deltap/p have column
-names: {\tt disp1p, ..., disp4p}. 
+names: \texttt{disp1p, ..., disp4p}. 
 Second and third order derivatives have respective column names:  
-{\tt disp1p2, ..., disp4p2} for the second order, and 
-{\tt disp1p3, ..., disp4p3} for the third order.
+\texttt{disp1p2, ..., disp4p2} for the second order, and 
+\texttt{disp1p3, ..., disp4p3} for the third order.
 
 In addition, \ptc computes the momentum compaction factor $\alpha_c$ up to
-1st order for {\tt ICASE=5}, or 3rd order (for {\tt ICASE=56}). The
-values appear in the header of the {\tt PTC\_TWISS} output file, and a
+1st order for \texttt{ICASE=5}, or 3rd order (for \texttt{ICASE=56}). The
+values appear in the header of the \texttt{PTC\_TWISS} output file, and a
 value of zero means the value has not been computed.
 
 This feature is currently only available in the development
 version. \\
-{\bf [To be checked]}
+\textbf{[To be checked]}
 
 For clarification: in the 4-D case, there is the following
 correspondence between MAD-X and the Ripken's notations:  
-{\tt beta11} $\equiv \beta_{xI}$, 
-{\tt beta12} $\equiv \beta_{xII}$, 
-{\tt beta21} $\equiv \beta_{yI}$, 
-{\tt beta22} $\equiv \beta_{yII}$.
-In the uncoupled 4-D case, {\tt beta11} is the same as the
-classical $\beta_x$ ({\tt betx}) and {\tt beta22} is $\beta_y$ 
-({\tt bety}), while {\tt beta12} and {\tt beta21} are zero.  
-in the coupled case all {\tt betaNN} are non-zero and {\tt beta11},
-{\tt beta22} are distinctively different from $\beta_x$, $\beta_y$,
+\texttt{beta11} $\equiv \beta_{xI}$, 
+\texttt{beta12} $\equiv \beta_{xII}$, 
+\texttt{beta21} $\equiv \beta_{yI}$, 
+\texttt{beta22} $\equiv \beta_{yII}$.
+In the uncoupled 4-D case, \texttt{beta11} is the same as the
+classical $\beta_x$ (\texttt{betx}) and \texttt{beta22} is $\beta_y$ 
+(\texttt{bety}), while \texttt{beta12} and \texttt{beta21} are zero.  
+in the coupled case all \texttt{betaNN} are non-zero and \texttt{beta11},
+\texttt{beta22} are distinctively different from $\beta_x$, $\beta_y$,
 respectively.
 
-{\tt PTC\_TWISS} also tracks the eigenvectors and prints them to Twiss table
-according to the \hyperref[sec:select]{\tt SELECT} command  with {\tt
-  FLAG=ptc\_twiss}. 
+\texttt{PTC\_TWISS} also tracks the eigenvectors and prints them to Twiss table
+according to the \hyperref[sec:select]{\texttt{SELECT}} command  with
+\texttt{FLAG=ptc\_twiss}.  
 Either all 36 components or particular components of the eigenvectors
-can be selected with {\tt EIGN} or {\tt EIGNij}, respectively ({\tt j} = number of
-eigenvector, {\tt i} = number of coordinate \{$x$, $p_x$, $y$, $p_y$,
-$t$, $p_t$\}). 
+can be selected with \texttt{EIGN} or \texttt{EIGNij}, respectively
+(\texttt{j} = number of eigenvector, \texttt{i} = number of coordinate
+\{$x$, $p_x$, $y$, $p_y$, $t$, $p_t$\}). 
 
-For ring lattices, {\tt PTC\_TWISS} computes momentum compaction, transition
+For ring lattices, \texttt{PTC\_TWISS} computes momentum compaction, transition
 energy, as well as other one-turn characteristics such as the tunes
-(Q1, Q2 and if {\tt ICASE=6} with cavity, Qs) and chromaticities (for
-{\tt NO}$\geq 2$).  
+(Q1, Q2 and if \texttt{ICASE=6} with cavity, Qs) and chromaticities (for
+\texttt{NO}$\geq 2$).  
 
-{\bf Synopsis:}
+\textbf{Synopsis:}
 \madxmp{
 PTC\_CREATE\_UNIVERSE; \\
 PTC\_CREATE\_LAYOUT, MODEL=integer, METHOD=integer, NST=integer, [EXACT]; \\
@@ -130,13 +132,13 @@ PTC\_END;
 \section{PTC\_TWISS}
 \label{sec:ptc-twiss}
  
-The {\tt PTC\_TWISS} command causes computation of the Twiss
+The \texttt{PTC\_TWISS} command causes computation of the Twiss
 parameters in Ripken's style. It operates on the working beam line
-defined in the latest \hyperref[sec:use]{\tt USE} command. 
+defined in the latest \hyperref[sec:use]{\texttt{USE}} command. 
 
-Applications for the {\tt PTC\_TWISS} command are similar to the
-\hyperref[chap:twiss]{\tt TWISS} command of \madx. 
-The {\tt PTC\_TWIS}S can be applied to two basic tasks. It can calculate either a
+Applications for the \texttt{PTC\_TWISS} command are similar to the
+\hyperref[chap:twiss]{\texttt{TWISS}} command of \madx. 
+The \texttt{PTC\_TWIS}S can be applied to two basic tasks. It can calculate either a
 \hyperref[sec:ptc-twiss-periodic]{periodic solution} or a
 \hyperref[sec:ptc-twiss-sol-initial-cond]{solution with initial conditions}. 
 
@@ -163,9 +165,9 @@ The attributes are:
 
   \ttitem{ICASE} 
   the dimensionality of the phase-space (4, 5 or
-  6). (Default:~4)\\ Note that {\tt ICASE} is internally set to 56 when
-  attempting to set {\tt ICASE=6} with no cavity, and {\tt ICASE} is
-  internally set to 4 when attempting to set {\tt ICASE=6} with an RF
+  6). (Default:~4)\\ Note that \texttt{ICASE} is internally set to 56 when
+  attempting to set \texttt{ICASE=6} with no cavity, and \texttt{ICASE} is
+  internally set to 4 when attempting to set \texttt{ICASE=6} with an RF
   cavity with zero voltage.
 
   \ttitem{NO} 
@@ -184,7 +186,7 @@ The attributes are:
   \ttitem{DELTAP\_DEPENDENCY}  
   a logical switch to trigger the computation of the Twiss and
   dispersion derivatives w.r.t. deltap/p. Derivation formula assume that
-  {\tt ICASE $\ge$ 5}, so that deltap/p is supplied as a parameter. \\
+  \texttt{ICASE $\ge$ 5}, so that deltap/p is supplied as a parameter. \\
   (Default: false)
 
   \ttitem{SLICE\_MAGNETS}
@@ -196,76 +198,76 @@ The attributes are:
   %% skipped, whereas only the inner slices are kept. 
   a logical switch to activate the evaluation of Twiss parameters at each
   integration step inside magnets, in addition to the end face.  The
-  number of slices is determined by the number of steps ({\tt NST}) that
-  can be separately defined for each element, or otherwise set by {\tt
-    NST} parameter when creating the PTC layout.  Note that the orbit
-  rms calculated in this mode counts as valid data points both the end
-  of the previous element and the entrance of the current element. Since
-  the first integration node is always at the entrance of the magnet
-  (after position offset and fringe effects are calculated) which
-  corresponds to the same s position (and usually optical functions) as
-  the end of the previous element, the points at the interface between
-  magnets are included twice in the rms calculation. \\ 
+  number of slices is determined by the number of steps (\texttt{NST}) that
+  can be separately defined for each element, or otherwise set by
+  \texttt{NST} parameter when creating the PTC layout.  Note that the
+  orbit  rms calculated in this mode counts as valid data points both
+  the end of the previous element and the entrance of the current
+  element. Since the first integration node is always at the entrance of
+  the magnet (after position offset and fringe effects are calculated)
+  which corresponds to the same s position (and usually optical
+  functions) as the end of the previous element, the points at the
+  interface between magnets are included twice in the rms calculation. \\ 
   (Default: false)
 
   \ttitem{CENTER\_MAGNETS}
   a logical switch to activate the evaluation of Twiss
   parameters at the middle of each magnet. This relies on internal slicing
-  and 'integration nodes' as determined by the number of steps ({\tt NST})
+  and 'integration nodes' as determined by the number of steps (\texttt{NST})
   selected when creating the PTC layout. This number is assumed to be even
   otherwise the program issues a warning. \\
   (Default: false)
 
   \ttitem{FILE} 
-  if the {\tt FILE} attribute is omitted, no output is
-  written to file. \\ If the {\tt FILE} attribute name is present, the
+  if the \texttt{FILE} attribute is omitted, no output is
+  written to file. \\ If the \texttt{FILE} attribute name is present, the
   optional attribute value argument is the name of the file for printing
-  the {\tt PTC\_TWISS} output. The default file name is
+  the \texttt{PTC\_TWISS} output. The default file name is
   "ptc\_twiss". \\ 
   (Default: false)
 
   \ttitem{TABLE} 
-  if the {\tt TABLE} attribute is omitted, no output is
-  written to an internal table. \\ If the {\tt TABLE} attribute name is
+  if the \texttt{TABLE} attribute is omitted, no output is
+  written to an internal table. \\ If the \texttt{TABLE} attribute name is
   present, the optional attribute value argument is the name of the
-  internal table for {\tt PTC\_TWISS} variables. The default table name
+  internal table for \texttt{PTC\_TWISS} variables. The default table name
   is "ptc\_twiss". \\ 
   (Default: false)
 
   \ttitem{SUMMARY\_FILE} 
-  if the {\tt SUMMARY\_FILE} attribute is omitted, no summary output is
+  if the \texttt{SUMMARY\_FILE} attribute is omitted, no summary output is
   written to file. \\  
-  If the {\tt SUMMARY\_FILE} attribute name is present, the optional
+  If the \texttt{SUMMARY\_FILE} attribute name is present, the optional
   attribute value argument is the name of the file for printing the 
-  {\tt PTC\_TWISS\_SUMMARY} table output. The default file name is
+  \texttt{PTC\_TWISS\_SUMMARY} table output. The default file name is
   "ptc\_twiss\_summary". \\
   (Default: false)
 
   \ttitem{SUMMARY\_TABLE} 
-  if the {\tt SUMMARY\_TABLE} attribute is omitted, no summary output is
+  if the \texttt{SUMMARY\_TABLE} attribute is omitted, no summary output is
   written to an internal table. \\ 
-  If the {\tt SUMMARY\_TABLE} attribute name is present, the optional
+  If the \texttt{SUMMARY\_TABLE} attribute name is present, the optional
   attribute value argument is the name of the internal summary table for
-  {\tt PTC\_TWISS\_SUMMARY} variables. The default table name is 
+  \texttt{PTC\_TWISS\_SUMMARY} variables. The default table name is 
   "ptc\_twiss\_summary".  \\ 
   (Default: false)
 
   \ttitem{RANGE} 
-  a string in \hyperref[sec:range]{\tt RANGE} format that
-  specifies a segment of beam-line for the {\tt PTC\_TWISS}
+  a string in \hyperref[sec:range]{\texttt{RANGE}} format that
+  specifies a segment of beam-line for the \texttt{PTC\_TWISS}
   calculation. \\ 
   (Default: $\#S/\#E$)
 
   \ttitem{INITIAL\_MATRIX\_TABLE} 
   a logical flag to trigger the reading of the transfer map from table
-  named "map\_table" created by a preceding {\tt PTC\_TWISS} or {\tt
-    PTC\_NORMAL} command. The table can be also read 
-  before hand from files using a \hyperref[sec:readtable]{\tt READTABLE}
+  named "map\_table" created by a preceding \texttt{PTC\_TWISS} or
+  \texttt{PTC\_NORMAL} command. The table can be also read 
+  before hand from files using a \hyperref[sec:readtable]{\texttt{READTABLE}}
   command.\\ 
   (Default: false)
   
   \ttitem{INITIAL\_MATRIX\_MANUAL} 
-  a logical flag to trigger the used of the input variables {\tt RE11,
+  a logical flag to trigger the use of the input variables \texttt{RE11,
     \ldots ,RE66} as the transfer matrix. \\
   (Default: false)
 
@@ -276,26 +278,26 @@ The attributes are:
   \ttitem{INITIAL\_MAP\_MANUAL}
   a logical flag to trigger the use of an input map stored beforehand in
   file "fort.18",  e.g. by a previous initial run of
-  \hyperref[chap:ptc-normal]{\tt PTC\_NORMAL}). \\
+  \hyperref[chap:ptc-normal]{\texttt{PTC\_NORMAL}}). \\
   (Default: false)
 
   \ttitem{IGNORE\_MAP\_ORBIT} 
   a logical flag to ignore the orbit in the map and use the closed orbit
   instead if requested, or the orbit defined by the starting point
-  specified with {\tt X, PX, Y, P, T, DT} parameters otherwise. \\
+  specified with \texttt{X, PX, Y, P, T, DT} parameters otherwise. \\
   (Default: false)
 
   \ttitem{BETA0} 
-  the name of a {\tt BETA0} block containing the Twiss
-  parameters to be used as input. When {\tt ICASE=6}, this information
-  must be complemented by supplying a value for {\tt BETZ} on the {\tt
-    PTC\_TWISS} command line. \\
+  the name of a \texttt{BETA0} block containing the Twiss
+  parameters to be used as input. When \texttt{ICASE=6}, this information
+  must be complemented by supplying a value for \texttt{BETZ} on the
+  \texttt{PTC\_TWISS} command line. \\
   (Default: beta0)
 
   \ttitem{MAPTABLE} 
   a logical flag to save the one-turn-map to table
   "map\_table". The one-turn-map can then be used as starting condition
-  for a subsequent {\tt PTC\_TWISS}, see {\tt INITIAL\_MATRIX\_TABLE}
+  for a subsequent \texttt{PTC\_TWISS}, see \texttt{INITIAL\_MATRIX\_TABLE}
   parameter above. \\ (Default: false)
 
   \ttitem{BETX, ALFX, MUX, BETY, ALFY, MUY, DX, DPX, DY, DPY} : \\
@@ -318,10 +320,10 @@ The attributes are:
 \section{Periodic Solution}
 \label{sec:ptc-twiss-periodic}	
 
-This is the simplest form of the {\tt PTC\_TWISS} command, which
+This is the simplest form of the \texttt{PTC\_TWISS} command, which
 computes the periodic solution for a specified beam line. It may
-accept all basic attributes described in \hyperref[sec:ptc-twiss]{\tt
-  PTC\_TWISS} above.
+accept all basic attributes described in
+\hyperref[sec:ptc-twiss]{\texttt{PTC\_TWISS}} above. 
 
 \madbox{
 PTC\_TWISS, \=ICASE=integer, DELTAP=real, CLOSED\_ORBIT=logical,\\
@@ -335,10 +337,10 @@ PTC\_TWISS, \=ICASE=integer, DELTAP=real, CLOSED\_ORBIT=logical,\\
 This computes the periodic solution for a specified beam
 line and evaluates the Twiss parameters at each thin-slice
 (a.k.a "integration-node") inside magnets. The number of such
-integration-nodes is given by the number of steps ({\tt NST})
+integration-nodes is given by the number of steps (\texttt{NST})
 selected when creating the \ptc layout. All other basic
-attributes described in \hyperref[sec:ptc-twiss]{\tt PTC\_TWISS} above
-may be selected.
+attributes described in \hyperref[sec:ptc-twiss]{\texttt{PTC\_TWISS}}
+above may be selected.
 
 \madbox{
 PTC\_TWISS, \=ICASE=integer, DELTAP=real, CLOSED\_ORBIT=logical,\\
@@ -347,10 +349,10 @@ PTC\_TWISS, \=ICASE=integer, DELTAP=real, CLOSED\_ORBIT=logical,\\
 }
 
 
-{\bf Example} \\
+\textbf{Example:} \\
 An example is found in the
 \href{http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/SliceMagnets/}
-{{\tt PTC\_TWISS} Examples} repository. 
+{\texttt{PTC\_TWISS} Examples} repository. 
 
 
 
@@ -362,7 +364,7 @@ Initial conditions can be supplied in different ways.  Naturally only
 one of the methods below can be used at a time, and they can not be
 mixed.  In this mode it is assumed that the lattice is a line and no
 ring parameters are evaluated (their values are set to -1000000), unless
-{\tt RING\_PARAMETERS=true}, which forces computation of closed solution
+\texttt{RING\_PARAMETERS=true}, which forces computation of closed solution
 for the resulting map. If a closed solution does not exist, \ptc
 reports an error and exits.
 
@@ -393,7 +395,7 @@ ENDIF
 \subsection{Initial Values from the Given Twiss Parameters}
 \label{subsec:from-twiss-command}
 
-{\tt PTC\_TWISS} calculates a solution with initial conditions
+\texttt{PTC\_TWISS} calculates a solution with initial conditions
 given by the Twiss parameters, which are explicitly typed as attributes
 to the command. 
 This case is also limited to uncoupled motion of the preceding ring or
@@ -409,10 +411,10 @@ PTC\_TWISS, \=ICASE=integer, DELTAP=real, \\ %CLOSED\_ORBIT, \\
 }
 
 
-{\bf Example:} \\
+\textbf{Example:} \\
 An example is found in the
 \href{http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/}
-{{\tt PTC\_TWISS} Examples} 
+{\texttt{PTC\_TWISS} Examples} 
 in the folder
 \href{http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/Example2}
 {"Example2"}.  
@@ -421,11 +423,11 @@ in the folder
 \subsection{Initial Values from a Map-Table}
 \label{subsec:from-map-table}
 
-{\tt PTC\_TWISS} calculates a solution with initial conditions given
+\texttt{PTC\_TWISS} calculates a solution with initial conditions given
 as a map-table of preceding ring or beam-line. It requires the input
-option {\tt INITIAL\_MATRIX\_TABLE} and an existing map-table
+option \texttt{INITIAL\_MATRIX\_TABLE} and an existing map-table
 in memory, as generated by a preceding
-\hyperref[sec:ptc-normal]{\tt PTC\_NORMAL} command.  
+\hyperref[sec:ptc-normal]{\texttt{PTC\_NORMAL}} command.  
 
 \madbox{
 PTC\_TWISS, \=ICASE=integer, DELTAP=real, \\ %CLOSED\_ORBIT, \\
@@ -433,10 +435,10 @@ PTC\_TWISS, \=ICASE=integer, DELTAP=real, \\ %CLOSED\_ORBIT, \\
             \>INITIAL\_MATRIX\_TABLE;
 }
 
-{\bf Example:} \\
+\textbf{Example:} \\
 An example is found in the
 \href{http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/}
-{{\tt PTC\_TWISS} Examples} in the folder
+{\texttt{PTC\_TWISS} Examples} in the folder
 \href{http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/Example3}
 {"Example3"}. 
 
@@ -444,12 +446,12 @@ An example is found in the
 \subsection{Initial Values from a Map-File}
 \label{subsec:from-map-file}
 
-{\tt PTC\_TWISS} calculates a solution with initial
+\texttt{PTC\_TWISS} calculates a solution with initial
 conditions given as a map-file (fort.18) obtained from a
 preceding ring or beam-line. It requires the input option
-{\tt INITIAL\_MAP\_MANUAL} and an existing map-file
+\texttt{INITIAL\_MAP\_MANUAL} and an existing map-file
 in file "fort.18", as generated by a preceding
-\hyperref[sec:ptc-normal]{\tt PTC\_NORMAL} command. 
+\hyperref[sec:ptc-normal]{\texttt{PTC\_NORMAL}} command. 
 
 \madbox{
 PTC\_TWISS, \=ICASE=integer, DELTAP=real, \\ % \\ CLOSED\_ORBIT, \\
@@ -457,10 +459,10 @@ PTC\_TWISS, \=ICASE=integer, DELTAP=real, \\ % \\ CLOSED\_ORBIT, \\
             \>INITIAL\_MAP\_MANUAL;
 }
 
-{\bf Example:} \\
+\textbf{Example:} \\
 An example is found in the
 \href{http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/}
-{{\tt PTC\_TWISS} Examples} in the folder
+{\texttt{PTC\_TWISS} Examples} in the folder
 \href{http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/Example3}
 {"Example3"}. 
 
@@ -468,9 +470,9 @@ An example is found in the
 \subsection{Initial Values from a Given Matrix}
 \label{subsec:from-given-matrix}
 
-{\tt PTC\_TWISS} calculates a solution with initial conditions given
+\texttt{PTC\_TWISS} calculates a solution with initial conditions given
 by a matrix explicitly given as attribute to the command. 
-It requires the option {\tt INITIAL\_MATRIX\_MANUAL}. 
+It requires the option \texttt{INITIAL\_MATRIX\_MANUAL}. 
 \madx expects a symplectic 6x6 transfer matrix as input. 
 
 \madbox{
@@ -482,10 +484,10 @@ PTC\_TWISS, \=ICASE=integer, DELTAP=real, \\ % CLOSED\_ORBIT, \\
             \>RE61=real, RE62=real, ... , RE66=real;
 }
 
-{\bf Example:}  \\
+\textbf{Example:} \\
 An example is found in the
 \href{http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/}
-{{\tt PTC\_TWISS} Examples} in the folder
+{\texttt{PTC\_TWISS} Examples} in the folder
 \href{http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/Example4}
 {"Example4"}. 
 
@@ -493,12 +495,13 @@ An example is found in the
 \subsection{Initial Values from Twiss Parameters via BETA0-block}
 \label{subsec:from-beta0-block}
 
-{\tt PTC\_TWISS} calculates a solution with initial conditions given by
-Twiss parameters, which are transferred from the {\tt BETA0} block.  The
-data in the the {\tt BETA0} block have to be filled by a combination of
-the \hyperref[sec:savebeta]{\tt SAVEBETA} and \hyperref[chap:twiss]{\tt
-  TWISS} commands of \madx for a preceding ring or beam-line. This case
-is limited to uncoupled motion of the preceding machine.
+\texttt{PTC\_TWISS} calculates a solution with initial conditions given by
+Twiss parameters, which are transferred from the \texttt{BETA0} block.  The
+data in the the \texttt{BETA0} block have to be filled by a combination of
+the \hyperref[sec:savebeta]{\texttt{SAVEBETA}} and
+\hyperref[chap:twiss]{\texttt{TWISS}} commands of \madx for a preceding
+ring or beam-line. This case is limited to uncoupled motion of the
+preceding machine. 
 
 \madbox{
 PTC\_TWISS, \=ICASE=integer, DELTAP=real, \\ % CLOSED\_ORBIT, \\
@@ -506,10 +509,10 @@ PTC\_TWISS, \=ICASE=integer, DELTAP=real, \\ % CLOSED\_ORBIT, \\
             \>BETA0=string ;
 }
       
-{\bf Example:} \\
+\textbf{Example:} \\
 An example is found in the
 \href{http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/}
-{{\tt PTC\_TWISS} Examples} in the folder
+{\texttt{PTC\_TWISS} Examples} in the folder
 \href{http://madx.web.cern.ch/madx/madX/examples/ptc_twiss/Example1}
 {"Example1"}. 
 

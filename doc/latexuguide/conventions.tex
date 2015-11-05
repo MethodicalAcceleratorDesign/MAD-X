@@ -78,10 +78,10 @@ with no fringe fields (see Figure~\ref{F-REF}).
 The reference orbit consists of a series of straight line segments and
 circular arcs. It is defined under the assumption that all elements are
 perfectly aligned. The accompanying tripod of the reference orbit spans
-a local curvilinear right handed coordinate system {\it (x,y,s)} The
-local {\it s}-axis is the tangent to the reference orbit. The two
+a local curvilinear right handed coordinate system \textit{(x,y,s)} The
+local \textit{s}-axis is the tangent to the reference orbit. The two
 other axes are perpendicular to the reference orbit and are labelled
-{\it x} (in the bend plane) and {\it y} (perpendicular to the bend
+\textit{x} (in the bend plane) and \textit{y} (perpendicular to the bend
 plane).  
 
 
@@ -92,13 +92,12 @@ Due to various errors like misalignment errors, field errors, fringe
 fields etc., the closed orbit does not coincide with the reference
 orbit. The closed orbit also changes with the momentum error. 
 The closed orbit is described with respect to the reference orbit, using
-the local reference system ({\it x, y, s}). It is evaluated including
+the local reference system (\textit{x, y, s}). It is evaluated including
 any nonlinear effects.  
 
 \madx also computes the betatron and synchrotron oscillations with respect
-to the closed orbit. Results are given in the local ({\it x, y,
+to the closed orbit. Results are given in the local (\textit{x, y,
   s})-system defined by the reference orbit. 
-
 
 
 \section{Global Reference System}
@@ -106,14 +105,14 @@ to the closed orbit. Results are given in the local ({\it x, y,
 
 The global reference orbit of the accelerator is
 uniquely defined by the sequence of physical elements. The local
-reference system ({\it x, y, s}) may thus be
-referred to a global Cartesian coordinate system ({\it X, Y, Z}) 
+reference system (\textit{x, y, s}) may thus be
+referred to a global Cartesian coordinate system (\textit{X, Y, Z}) 
 (see Figure~\ref{F-GLOB}). 
 
 The positions between beam elements are indexed with $i=0,\ldots n$. 
 The local reference system  ({$x_i$, $y_i$, $s_i$}) at position
-{\it i}, i.e. the displacement and direction of the reference orbit
-with respect to the system ({\it X, Y, Z}) are
+\textit{i}, i.e. the displacement and direction of the reference orbit
+with respect to the system (\textit{X, Y, Z}) are
 defined by three displacements  ($X_i$, $Y_i$, $Z_i$) and three angles
 ($\theta_i$, $\phi_i$, $\psi_i$) 
 
@@ -320,39 +319,41 @@ green dashed lines. }
 
 The above quantities are defined more precisely as follows:  
 \begin{madlist}
-   \ttitem{X} Displacement of the local origin in {\it X}-direction. 
-   \ttitem{Y} Displacement of the local origin in {\it Y}-direction. 
-   \ttitem{Z} Displacement of the local origin in {\it Z}-direction. 
+   \ttitem{X} Displacement of the local origin in \textit{X}-direction. 
+   \ttitem{Y} Displacement of the local origin in \textit{Y}-direction. 
+   \ttitem{Z} Displacement of the local origin in \textit{Z}-direction. 
    \ttitem{THETA} $\theta$ is the angle of rotation (azimuth) about the
-     global {\it Y}-axis, between the global {\it Z}-axis and the
-     projection of the reference orbit onto the ({\it Z},
-     {\it X})-plane. A positive angle THETA forms a right-hand screw
-     with the {\it Y}-axis. 
+     global \textit{Y}-axis, between the global \textit{Z}-axis and the
+     projection of the reference orbit onto the (\textit{Z},
+     \textit{X})-plane. A positive angle \texttt{THETA} forms a
+     right-hand screw with the \textit{Y}-axis. 
    \ttitem{PHI} $\phi$ is the elevation angle, i.e. the angle between the
-     reference orbit and its projection onto the ({\it Z},
-     {\it X})-plane. A positive angle PHI correspond to increasing
-     {\it Y}. \\ 
+     reference orbit and its projection onto the (\textit{Z},
+     \textit{X})-plane. A positive angle \texttt{PHI} corresponds to
+     increasing \textit{Y}. \\ 
      If only horizontal bends are present, the reference
-     orbit remains in the ({\it Z}, {\it X})-plane and PHI is always zero. 
-   \ttitem{PSI} $\psi$ is the roll angle about the local {\it s}-axis,
+     orbit remains in the (\textit{Z}, \textit{X})-plane and
+     \texttt{PHI} is always zero. 
+   \ttitem{PSI} $\psi$ is the roll angle about the local \textit{s}-axis,
      i.e. the angle between the line defined by the intersection of the 
-     ({\it x, y})-plane and ({\it Z, X})-plane on one hand, and the local
-     {\it x}-axis on the other hand. 
-     A positive angle PSI forms a right-hand screw with the {\it s}-axis. 
+     (\textit{x, y})-plane and (\textit{Z, X})-plane on one hand, and
+     the local \textit{x}-axis on the other hand. 
+     A positive angle \texttt{PSI} forms a right-hand screw with the
+     \textit{s}-axis. 
 \end{madlist} 
 
-The angles ($\theta$, $\phi$, $\psi$) are {\bf not} the Euler
+The angles ($\theta$, $\phi$, $\psi$) are \textbf{not} the Euler
 angles. The reference orbit starts at the origin and points by default
-in the direction of the positive {\it Z}-axis. The initial local axes
-({\it x}, {\it y}, {\it s})  coincide with the global axes
-({\it X}, {\it Y}, {\it Z}) in this order. The initial values
+in the direction of the positive \textit{Z}-axis. The initial local axes
+(\textit{x}, \textit{y}, \textit{s})  coincide with the global axes
+(\textit{X}, \textit{Y}, \textit{Z}) in this order. The initial values
 ($X_0$, $Y_0$, $Z_0$, $\theta_0$, $\phi_0$, $\psi_0$) are therefore all zero
 unless the user specifies different initial conditions.  
 
-Internally the displacement is described by a vector {\it V} and the
-orientation by a unitary matrix {\it W}. The column vectors of
-{\it W} are the unit vectors spanning  the local coordinate axes in
-the order ({\it x, y, s}). {\it V} and {\it W} have the values:  
+Internally the displacement is described by a vector \textit{V} and the
+orientation by a unitary matrix \textit{W}. The column vectors of
+\textit{W} are the unit vectors spanning  the local coordinate axes in
+the order (\textit{x, y, s}). \textit{V} and \textit{W} have the values:  
 
 \begin{equation}
 V =
@@ -401,11 +402,10 @@ $V_i$ and $W_i$ by the recurrence relations
    \qquad
    W_i=W_{i-1}S_i
 \end{equation}
-The vector $R_i$ is the displacement and the matrix
-$S_i$ is the rotation of the local reference system  at the
-exit of the element {\it i} with respect to the entrance  of the same
-element. The values of $R_i$ and $S_i$ are listed below
-for different physical element types.  
+The vector $R_i$ is the displacement and the matrix $S_i$ is the
+rotation of the local reference system  at the exit of the element
+\textit{i} with respect to the entrance of the same element. The values
+of $R_i$ and $S_i$ are listed below for different physical element types.  
 
 
 \section{Local Reference Systems}
@@ -414,7 +414,7 @@ for different physical element types.
 \subsection{Reference System for Straight Beam Elements} 
 \label{subsec:local-straight}
 In straight elements the local reference system is simply translated by
-the length of the element along the local {\it s}-axis. 
+the length of the element along the local \textit{s}-axis. 
 This is true for  
 \hyperref[sec:drift]{Drift spaces},\ttindex{drift} 
 \hyperref[sec:quadrupole]{Quadrupoles},\ttindex{quadrupole} 
@@ -428,7 +428,7 @@ This is true for
 \hyperref[sec:monitor]{Beam position monitors}\ttindex{monitor}.
 
 
-The corresponding {\it R}, {\it S} are 
+The corresponding \textit{R}, \textit{S} are 
 \begin{equation}
 R =
  \begin{pmatrix}
@@ -445,8 +445,8 @@ S =
  \end{pmatrix}
 .
 \end{equation}
-A rotation of the element about the {\it S}-axis has no effect on
-{\it R} and {\it S}, since the rotations of the reference system
+A rotation of the element about the \textit{S}-axis has no effect on
+\textit{R} and \textit{S}, since the rotations of the reference system
 before and after the element cancel.  
 
 %% % picture prepared by ghislain to reproduce the png graphics in html.
@@ -534,8 +534,8 @@ before and after the element cancel.
 \subsection{Reference System for Bending Magnets}
 \label{subsec:local-rbend}
 \hyperref[sec:bend]{Bending magnets} have a curved reference orbit. 
-For both rectangular and sector bending magnets, the {\it R} and
-{\it S} are expressed as function the bend angle $\alpha$: 
+For both rectangular and sector bending magnets, the \textit{R} and
+\textit{S} are expressed as function the bend angle $\alpha$: 
 \begin{equation}
 R =
  \begin{pmatrix}
@@ -553,17 +553,17 @@ S =
 \end{equation}
  
 A positive bend angle represents a bend to the right, i.e. towards
-negative {\it x} values. 
+negative \textit{x} values. 
 For sector bending magnets, the bend radius is given by $\rho$, and for
 rectangular bending magnets it has the value $\rho = L / (2 \sin(\alpha/2))$. 
-If the magnet is rotated about the {\it s}-axis by an angle $\psi$,
-{\it R} and {\it S} are transformed by  
+If the magnet is rotated about the \textit{s}-axis by an angle $\psi$,
+\textit{R} and \textit{S} are transformed by  
 \begin{equation}
    \overline{R}=TR,
    \qquad
    \overline{S}=TST^{-1}
 \end{equation}
-where {\it T} is the orthogonal rotation matrix 
+where \textit{T} is the orthogonal rotation matrix 
 \begin{equation}
 T =
  \begin{pmatrix}
@@ -573,7 +573,6 @@ T =
  \end{pmatrix}
 \end{equation}
 The special value $\psi = \pi/2$ represents a bend down.  
-
 
 \begin{figure}[htb]
 \centering
@@ -635,7 +634,7 @@ the signs of pole-face rotations are positive as shown.}
 \label{F-RBND}
 \end{figure}
  
-\begin{figure}[htb]%                                         3.3
+\begin{figure}[htb]
 \centering
 \setlength{\unitlength}{1pt}
 \begin{picture}(400,215)
@@ -691,9 +690,6 @@ the signs of pole-face rotations are positive as shown.}
 \label{F-SBND}
 \end{figure}
 
-
-
-
 \section{Sign Conventions for Magnetic Fields}
 \label{sec:sign-convention}
 The \madx program uses the following Taylor expansion for the field on the
@@ -723,27 +719,34 @@ The field coefficients have the following meaning:
    \item[\ldots] etc.
 \end{madlist} 
 
-Using this expansion and the curvature {\it h} of the reference
+Using this expansion and the curvature \textit{h} of the reference
 orbit, the longitudinal component of the vector potential to order 4 is:  
 \begin{equation}
-\begin{aligned}
-A_s =  
-&+ B_0\,\Big(x-\frac{hx^2}{2(1+hx)}\Big)&
-&+ B_1\,\Big(\frac{1}{2}(x^2-y^2) - \frac{h}{6}x^3 + \frac{h^2}{24}(4x^4-y^4)+\cdots\Big) \\
-&+ B_2\,\Big(\frac{1}{6}(x^3-3xy^2) - \frac{h}{24}(x^4-y^4)+\cdots \Big)&
-&+ B_3\,\Big(\frac{1}{24}(x^4-6x^2y^2+y^4) \cdots \Big)+\cdots
-\end{aligned}
+  \begin{aligned}
+    A_s = &+ B_0\,\Big(x-\frac{hx^2}{2(1+hx)}\Big) \\
+    &+ B_1\,\Big(\frac{1}{2}(x^2-y^2) - \frac{h}{6}x^3 + \frac{h^2}{24}(4x^4-y^4)+\cdots\Big) \\
+    &+ B_2\,\Big(\frac{1}{6}(x^3-3xy^2) - \frac{h}{24}(x^4-y^4)+\cdots\Big) \\
+    &+ B_3\,\Big(\frac{1}{24}(x^4-6x^2y^2+y^4) \cdots \Big) \\
+    &+\cdots
+  \end{aligned}
 \end{equation}
 Taking \(\vec{B} = \nabla \times \vec{A}\) in curvilinear coordinates,
 the field components can be computed as  
 \begin{equation}\label{eq:field-components}
-\begin{aligned}
-B_x(x,y) = &+ B_1\,\Big(y+\frac{h^2}{6}y^3+\cdots\Big)  &  \\
-           &+ B_2\,\Big(xy - \frac{h}{6}y^3+\cdots \Big) &+ B_3\,\Big(\frac{1}{6}(3x^2y-y^3)+ \cdots \Big)+\cdots\\
-B_y(x,y)=  &+ B_0   &+ B_1\,\Big(x-\frac{h}{2}y^2+\frac{h^2}{2}xy^2+\cdots \Big)\\
-           &+ B_2\,\Big(\frac{1}{2}(x^2-y^2)-\frac{h}{2}xy^2+\cdots \Big) &+ B_3\,\Big(\frac{1}{6}(x^3-3xy^2)+ \cdots \Big)+\cdots
-\end{aligned}
+  \begin{aligned}
+B_x(x,y) = &+ B_1\,\Big(y+\frac{h^2}{6}y^3+\cdots\Big) \\
+           &+ B_2\,\Big(xy - \frac{h}{6}y^3+\cdots \Big) \\
+           &+ B_3\,\Big(\frac{1}{6}(3x^2y-y^3)+ \cdots \Big)\\
+           &+\cdots\\
+& \\
+B_y(x,y)=  &+ B_0   \\
+           &+ B_1\,\Big(x-\frac{h}{2}y^2+\frac{h^2}{2}xy^2+\cdots \Big)\\
+           &+ B_2\,\Big(\frac{1}{2}(x^2-y^2)-\frac{h}{2}xy^2+\cdots \Big)\\
+           &+ B_3\,\Big(\frac{1}{6}(x^3-3xy^2)+ \cdots \Big)\\
+           &+\cdots
+  \end{aligned}
 \end{equation}
+
 It can be easily verified that both \(\nabla \times \vec{B}\)
 and \(\nabla . \vec{B}\) are zero to the order of the
 \(B_3\) term.  
@@ -783,7 +786,7 @@ over all components
 \Delta P_x - i \Delta P_y = \sum_{n=0}^{\infty} -(KN_n + i KS_n) \frac{(x+iy)^n}{n!}
 \end{equation}
 
-{\bf Remark:} need to add references to the $(a_n,b_n)$ field conventions 
+\textbf{Remark:} need to add references to the $(a_n,b_n)$ field conventions 
 in the magnet world. 
 
 
@@ -817,7 +820,7 @@ between square brackets, where [1] denotes a dimensionless variable.
 	This value is only non-zero when synchrotron motion is
 	present. It describes the deviation of the particle from the orbit
 	of a particle with the momentum error DELTAP.   
-	\ttitem{DELTAP} {\bf Difference between the reference momentum and the design
+	\ttitem{DELTAP} \textbf{Difference between the reference momentum and the design
 	momentum, divided by the design momentum: DELTAP =
 	$\Delta p / p_0$, [1].} This quantity is used to
 	\hyperref[chap:differences]{normalize} all element strengths.   
@@ -825,8 +828,8 @@ between square brackets, where [1] denotes a dimensionless variable.
 
 The independent variable is: 
 \begin{madlist}
-  \ttitem{S} \index{arc length} Arc length {\it s} along the reference orbit, 
-  [m].   
+  \ttitem{S} \index{arc length} Arc length \textit{s} along the
+  reference orbit, [m].    
 \end{madlist} 
 
 In the limit of fully relativistic particles ($\gamma \gg 1$, $v = c$,
@@ -839,34 +842,34 @@ constant in order to keep the system canonical.
 \subsection{Normalised Variables and other Derived Quantities}
 \label{subsec:tables-normal}
 \begin{madlist}
-  \ttitem{XN} The normalised horizontal displacement \quad
-  $x_n = Re ( E_1^T \, S\, Z )$, [sqrt(m)]
-  \ttitem{PXN} The normalised horizontal transverse momentum \quad
-  $p_{xn} = Im ( E_1^T\, S\, Z )$, [sqrt(m)]
-  \ttitem{WX} The horizontal Courant-Snyder invariant \quad
-  WX = $x_n^2 + p_{xn}^2$, [m].    
-  \ttitem{PHIX} The horizontal phase \quad
-  $\phi_x = -\arctan ( p_{xn} / x_n ) / 2 \pi$, [1]
-  \ttitem{YN} The normalised vertical displacement \quad 
-  $y_n = Re ( E_2^T \,S\, Z )$, [sqrt(m)]
-  \ttitem{PYN} The normalised vertical transverse momentum \quad
-  $p_{yn} = Im ( E_2^T\, S\, Z )$, [sqrt(m)]
-  \ttitem{WY} The vertical Courant-Snyder invariant \quad
-  WY = $y_n^2 + p_{yn}^2$, [m]
-  \ttitem{PHIY} The vertical phase \quad
-  $\phi_y = -\arctan ( p_{yn} / y_n ) / 2 \pi$, [1]
-  \ttitem{TN} The normalised longitudinal displacement \quad
-  $t_n = Re ( E_3^T \,S\, Z )$, [sqrt(m)]
-  \ttitem{PTN} The normalised longitudinal transverse momentum \quad
-  $p_{tn} = Im ( E_3^T\, S\, Z )$, [sqrt(m)]
-  \ttitem{WT} The longitudinal invariant \quad
-  WT = $t_n^2 + p_{tn}^2$, [m]
-  \ttitem{PHIT} The longitudinal phase \quad
-  $\phi_t = - atan ( p_{tn} / t_n ) / 2 \pi$, [1]
+  \ttitem{XN} The normalised horizontal displacement, [sqrt(m)]\\
+  $x_n = Re ( E_1^T \, S\, Z )$
+  \ttitem{PXN} The normalised horizontal transverse momentum, [sqrt(m)]\\
+  $p_{xn} = Im ( E_1^T\, S\, Z )$
+  \ttitem{WX} The horizontal Courant-Snyder invariant, [m]\\
+  WX = $x_n^2 + p_{xn}^2$
+  \ttitem{PHIX} The horizontal phase, [1]\\
+  $\phi_x = -\arctan ( p_{xn} / x_n ) / 2 \pi$
+  \ttitem{YN} The normalised vertical displacement, [sqrt(m)]\\
+  $y_n = Re ( E_2^T \,S\, Z )$
+  \ttitem{PYN} The normalised vertical transverse momentum, [sqrt(m)]\\
+  $p_{yn} = Im ( E_2^T\, S\, Z )$
+  \ttitem{WY} The vertical Courant-Snyder invariant, [m]\\
+  WY = $y_n^2 + p_{yn}^2$
+  \ttitem{PHIY} The vertical phase, [1]\\
+  $\phi_y = -\arctan ( p_{yn} / y_n ) / 2 \pi$
+  \ttitem{TN} The normalised longitudinal displacement, [sqrt(m)]\\
+  $t_n = Re ( E_3^T \,S\, Z )$
+  \ttitem{PTN} The normalised longitudinal transverse momentum, [sqrt(m)]\\
+  $p_{tn} = Im ( E_3^T\, S\, Z )$
+  \ttitem{WT} The longitudinal invariant, [m]\\
+  WT = $t_n^2 + p_{tn}^2$
+  \ttitem{PHIT} The longitudinal phase, [1]\\
+  $\phi_t = - atan ( p_{tn} / t_n ) / 2 \pi$
 \end{madlist} 
 
 In the above formulas the vectors \(E_i\) are the three complex
-eigenvectors, \(Z\) is the phase space vector, and the matrix {\it S}
+eigenvectors, \(Z\) is the phase space vector, and the matrix \textit{S}
 is the ``symplectic unit matrix'':   
 
 \begin{equation}
@@ -940,10 +943,10 @@ slightly from those in \cite{Montague1979}.
 
 Notice also that in \madx, PT substitutes DELTAP as longitudinal
 variable. Dispersive and chromatic functions are hence derivatives with
-respects to PT. 
-And since PT=BETA*DELTAP, where BETA is the relativistic Lorentz 
+respect to PT. 
+Since PT=BETA*DELTAP, where BETA is the relativistic Lorentz 
 factor, those functions given by \madx must be multiplied by BETA a
-number of time equal to the order of the derivative to find the
+number of times equal to the order of the derivative to find the
 functions given in the literature. 
 
 The chromatic functions are known to \madx under the following names:
@@ -1011,8 +1014,8 @@ contains the following variables:
 	\ttitem{DYRMS} The r.m.s. of the vertical dispersion $D_y$, [m].     
 	\ttitem{YCOMAX} The maximum of the absolute vertical closed orbit deviation [m].     
 	\ttitem{YCORMS} The r.m.s. of the vertical closed orbit deviation [m].     
-	\ttitem{DELTAP} {\bf Momentum difference, divided by the reference
-	momentum: DELTAP = $\Delta p / p_0$ [1].}
+	\ttitem{DELTAP} \textbf{Momentum difference, divided by the reference
+	momentum [1]. \\ DELTAP = $\Delta p / p_0$}
 	\ttitem{SYNCH\_1} First synchrotron radiation integral  
 	\ttitem{SYNCH\_2} Second synchrotron radiation integral  
 	\ttitem{SYNCH\_3} Third synchrotron radiation integral  
@@ -1022,7 +1025,7 @@ contains the following variables:
 
 Notice that in \madx, PT substitutes DELTAP as longitudinal
 variable. Dispersive and chromatic functions are hence derivatives with
-respects to PT.
+respect to PT.
 And since PT=BETA*DELTAP, where BETA is the relativistic Lorentz 
 factor, those functions given by \madx must be multiplied by BETA a
 number of time equal to the order of the derivative to find the
@@ -1041,7 +1044,7 @@ The command RUN writes tables with the following variables:
   \ttitem{PY} Vertical canonical momentum $p_y$ of the orbit
   referred to the ideal orbit, divided by the reference momentum.    
   \ttitem{T} Velocity of light times the negative time difference with
-  respect to the reference particle, $\hbox{\tt T}=-c\Delta t$, [m]. 
+  respect to the reference particle, $\mathtt{T}=-c\Delta t$, [m]. 
   A positive T means that the particle arrives ahead of the reference
   particle.    
   \ttitem{PT} Energy difference, divided by the reference momentum times
@@ -1070,49 +1073,48 @@ International'' (SI). These units are summarised in the
 \begin{table}[ht]
   \caption{Physical Units used by \madx}
   \vspace{1ex}
-  \begin{center}
-    \index{length}
-    \index{angle}
-    \index{quadrupole}
-    \index{multipole}
-    \index{voltage}
-    \index{field}
-    \index{electric field}
-    \index{frequency}
-    \index{RF}
-    \index{energy}
-    \index{mass}
-    \index{momentum}
-    \index{current}
-    \index{charge}
-    \index{impedance}
-    \index{emittance}
-    \index{power}
-    \index{high order modes} 
-   \begin{tabular}{|l|l|}
-      \hline
-      {\bf Quantity}          & {\bf Unit} \\
-      \hline
-      Length                  & m (metres) \\ 
-      Angle                   & rad (radians) \\ 
-      Quadrupole coefficient  & $m^{-2}$ \\ 
-      Multipole coefficient, 2n poles   & $m^{-n}$ \\ 
-      Electric voltage        & MV (megavolts) \\ 
-      Electric field strength & MV/m \\ 
-      Frequency               & MHz (megahertz) \\ 
-      Phase angles            & $2\pi$ \\ 
-      Particle energy         & GeV \\ 
-      Particle mass           & GeV/$c^2$ \\ 
-      Particle momentum       & GeV/$c$ \\ 
-      Beam current            & A (amp\`eres) \\ 
-      Particle charge         & e (elementary charges) \\ 
-      Impedance               & M$\Omega$ (Megohms) \\ 
-      Emittance               & $\pi * 10^{-3}$ m.rad \\ % To be checked (Ghislain)
-      RF power                & MW (megawatts) \\ 
-      Higher order mode loss factor & V/pc \\
-      \hline
-    \end{tabular}
-  \end{center}
+  \centering  
+  \index{length}
+  \index{angle}
+  \index{quadrupole}
+  \index{multipole}
+  \index{voltage}
+  \index{field}
+  \index{electric field}
+  \index{frequency}
+  \index{RF}
+  \index{energy}
+  \index{mass}
+  \index{momentum}
+  \index{current}
+  \index{charge}
+  \index{impedance}
+  \index{emittance}
+  \index{power}
+  \index{high order modes} 
+  \begin{tabular}{|l|l|}
+    \hline
+    \textbf{Quantity}       & \textbf{Unit} \\
+    \hline
+    Length                  & m (metres) \\ 
+    Angle                   & rad (radians) \\ 
+    Quadrupole coefficient  & $m^{-2}$ \\ 
+    Multipole coefficient, 2n poles   & $m^{-n}$ \\ 
+    Electric voltage        & MV (megavolts) \\ 
+    Electric field strength & MV/m \\ 
+    Frequency               & MHz (megahertz) \\ 
+    Phase angles            & $2\pi$ \\ 
+    Particle energy         & GeV \\ 
+    Particle mass           & GeV/$c^2$ \\ 
+    Particle momentum       & GeV/$c$ \\ 
+    Beam current            & A (amp\`eres) \\ 
+    Particle charge         & e (elementary charges) \\ 
+    Impedance               & M$\Omega$ (Megohms) \\ 
+    Emittance               & $\pi * 10^{-3}$ m.rad \\ % To be checked (Ghislain)
+    RF power                & MW (megawatts) \\ 
+    Higher order mode loss factor & V/pc \\
+    \hline
+  \end{tabular}
 \end{table}
 
 %% End of Chapter 'Conventions'

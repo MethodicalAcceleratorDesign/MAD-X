@@ -6,20 +6,20 @@
 This chapter documents the interface between \madx and \ptc and the
 auxiliary commands available in the \ptc library.
 
-{\bf Available Commands }
+\textbf{Available Commands }
 \begin{itemize}
-   \item \hyperref[sec:ptc-setswitch]{\tt PTC\_SETSWITCH}
-   \item \hyperref[sec:ptc-knob]{\tt PTC\_KNOB}
-   \item \hyperref[sec:ptc-setknobvalue]{\tt PTC\_SETKNOBVALUE}
-   \item {\tt MATCH\_WITHPTCKNOBS} \qquad {\bf (Under Construction)} 
-   \item \hyperref[sec:ptc-printparametric]{\tt PTC\_PRINTPARAMETRIC}
-   \item \hyperref[sec:ptc-eplacement]{\tt PTC\_EPLACEMENT}
-   \item \hyperref[sec:ptc-printframes]{\tt PTC\_PRINTFRAMES}
-   \item \hyperref[sec:ptc-select]{\tt PTC\_SELECT}
-   \item \hyperref[sec:ptc-select-moment]{\tt PTC\_SELECT\_MOMENT}
-   \item \hyperref[sec:ptc-moments]{\tt PTC\_MOMENTS} \qquad {\bf (Under Construction)} 
-   \item \hyperref[sec:ptc-dumpmaps]{\tt PTC\_DUMPMAPS}
-   \item \hyperref[sec:ptc-setcavities]{\tt PTC\_SETCAVITIES}
+   \item \hyperref[sec:ptc-setswitch]{\texttt{PTC\_SETSWITCH}}
+   \item \hyperref[sec:ptc-knob]{\texttt{PTC\_KNOB}}
+   \item \hyperref[sec:ptc-setknobvalue]{\texttt{PTC\_SETKNOBVALUE}}
+   \item \texttt{MATCH\_WITHPTCKNOBS} \qquad \textbf{(Under Construction)} 
+   \item \hyperref[sec:ptc-printparametric]{\texttt{PTC\_PRINTPARAMETRIC}}
+   \item \hyperref[sec:ptc-eplacement]{\texttt{PTC\_EPLACEMENT}}
+   \item \hyperref[sec:ptc-printframes]{\texttt{PTC\_PRINTFRAMES}}
+   \item \hyperref[sec:ptc-select]{\texttt{PTC\_SELECT}}
+   \item \hyperref[sec:ptc-select-moment]{\texttt{PTC\_SELECT\_MOMENT}}
+   \item \hyperref[sec:ptc-moments]{\texttt{PTC\_MOMENTS}} \qquad \textbf{(Under Construction)} 
+   \item \hyperref[sec:ptc-dumpmaps]{\texttt{PTC\_DUMPMAPS}}
+   \item \hyperref[sec:ptc-setcavities]{\texttt{PTC\_SETCAVITIES}}
 \end{itemize}
 
 \newpage
@@ -79,7 +79,7 @@ Command parameters and switches:
 \end{madlist}
 
 
-%% {\bf PROGRAMMERS MANUAL}   
+%% \textbf{PROGRAMMERS MANUAL}   
 %% Values of the switches are stored in Fortran 90 module
 %% mad\_ptc\_intstate (mad\_ptc\_intstate.f90). The command is processed by
 %% pro\_ptc\_setswitch C function, in file madxn.c, that calls appropriate
@@ -106,25 +106,25 @@ PTC\_KNOB, \=ELEMENTNAME=string, \\
 }
 
 Sets knobs in \ptc calculations. This is currently valid only in
-{\tt  PTC\_TWISS}; {\tt PTC\_NORMAL} will follow. 
+\texttt{PTC\_TWISS}; \texttt{PTC\_NORMAL} will follow. 
 
 Knobs appear as additional parameters of the phase space. Twiss
 functions are then obtained as functions of these additional parameters
 (Taylor series).  
 Map elements may also be stored as functions of knobs. 
-The \hyperref[sec:ptc-select]{\tt PTC\_SELECT} command 
+The \hyperref[sec:ptc-select]{\texttt{PTC\_SELECT}} command 
 description shows how to request a given element to be stored as a 
 Taylor series.  
 
 The parametric results can also be: 
 \begin{enumerate}
    \item  written to a file with
-     \hyperref[sec:ptc-printparametric]{\tt PTC\_PRINTPARAMETRIC}. 
+     \hyperref[sec:ptc-printparametric]{\texttt{PTC\_PRINTPARAMETRIC}}. 
    \item  plotted and studied using rviewer command
-     (\hyperref[sec:rplot]{\tt RPLOT} plugin). 
+     (\hyperref[sec:rplot]{\texttt{RPLOT}} plugin). 
    \item  used to rapidly obtain approximate values of lattice
      functions for given values of knobs
-     (\hyperref[sec:ptc-setknobvalue]{\tt PTC\_SETKNOBVALUE}). This
+     (\hyperref[sec:ptc-setknobvalue]{\texttt{PTC\_SETKNOBVALUE}}). This
      feature is the foundation of a fast matching algorithm with \ptc.      
 \end{enumerate}
 
@@ -150,7 +150,7 @@ Command parameters and switches:
 \end{madlist}
 
 
-{\bf Example}\\
+\textbf{Example}\\
 \href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/knobs/knobs.madx}{dog
 leg chicane}: Dipolar components of both rbends and dipolar and
 quadrupolar components of the focusing quads set as knobs. Some first
@@ -179,7 +179,7 @@ functions.
 \section{PTC\_SETKNOBVALUE}
 \label{sec:ptc-setknobvalue}
 
-The {\tt PTC\_SETKNOBVALUE} command sets a given knob value.
+The \texttt{PTC\_SETKNOBVALUE} command sets a given knob value.
 
 \madbox{
 PTC\_SETKNOBVALUE, \=ELEMENTNAME=string, \\
@@ -187,10 +187,10 @@ PTC\_SETKNOBVALUE, \=ELEMENTNAME=string, \\
                    \>VALUE=real;
 }
 
-All values in the twiss table used by the last {\tt PTC\_TWISS} command 
-and the columns specified with \hyperref[sec:ptc-select]{\tt
-  PTC\_SELECT}{\tt, PARAMETRIC=true;}  are reevaluated using the
-buffered parametric results.   
+All values in the twiss table used by the last \texttt{PTC\_TWISS}
+command and the columns specified with
+\hyperref[sec:ptc-select]{\texttt{PTC\_SELECT, PARAMETRIC=true;}}  are
+reevaluated using the buffered parametric results.
 
 The parameters of the command basically contain the fields that allow
 to identify uniquely the knob and the value to be set.
@@ -208,7 +208,7 @@ Command parameters and switches:
    (Default: 0)
 \end{madlist}
 
-{\bf Example:}\\
+\textbf{Example:}\\
 \href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/matchknobs/matchknobs.madx}{dog
   leg chicane}: strength of dipole field component in quadrupoles is
 matched to obtain the required R56 value.    
@@ -223,7 +223,7 @@ matched to obtain the required R56 value.
 \section{PTC\_VARYKNOBS (Under Construction)}
 \label{sec:ptc-varyknobs}
 
-The {\tt PTC\_VARYKNOBS} command allows matching with \ptc knobs.
+The \texttt{PTC\_VARYKNOBS} command allows matching with \ptc knobs.
 
 \madbox{
 PTC\_VARYKNOB, \=INITIAL=string, ELEMENT=string, \\
@@ -283,10 +283,10 @@ END_MATCH;
 
 For user convenience the limits are specified in the \madx units (k1,k2,
 etc). This also applies to dipolar field where the user must specify
-limits of {\tt K0 = angle/path\_length}. This guarantees consistency in
+limits of \texttt{K0 = angle/path\_length}. This guarantees consistency in
 treatment of normal and skew dipole components.   
 
-{\bf Important:} Note that inside the code skew magnets are represented
+\textbf{Important:} Note that inside the code skew magnets are represented
 only by normal component and tilt, so the nominal skew component is
 always zero.  Inside \ptc tilt can not become a knob, while skew
 component can.  Remember about this fact when setting the limits of skew
@@ -295,15 +295,16 @@ components in the matching.  When the final results are exported back to
 skew component is zero and tilt and normal component are modified
 accordingly.
 
-{\bf Example}\\
+\textbf{Example}\\
 \href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/matchknobs/.madx}{dog leg chicane}.
 
-{\bf Algorithm}\\
+\textbf{Algorithm}\\
 \begin{enumerate}
-   \item Buffer the key commands (ptc\_varyknob, constraint,
-     ptc\_setswitch, ptc\_twiss or ptc\_normal, etc) appearing between 
-     match, useptcknobs=true; and any of matching actions calls
-     (migrad,lmdif,jacobian, etc) 
+   \item Buffer the key commands (\texttt{ptc\_varyknob},
+     \texttt{constraint}, \texttt{ptc\_setswitch}, \texttt{ptc\_twiss},
+     \texttt{ptc\_normal}, etc) appearing between \texttt{match,
+       useptcknobs=true;} and any of matching actions calls
+     (migrad, lmdif, jacobian, etc)  
    \item  When matching action appears,  
      \begin{enumerate}
        \item set "The Current Variables Values" (TCVV) to zero      
@@ -347,9 +348,10 @@ accordingly.
 \section{PTC\_PRINTPARAMETRIC}
 \label{sec:ptc-printparametric}
 
-{\bf Editor's Note:} This command exists but is not documented. The file 
-PTC\_PrintParametric.html contains the same content as PTC\_Knob.html. I
-presume the original file has been lost and overwritten...
+\textbf{Editor's Note:} This command exists but is not documented.\\
+The file PTC\_PrintParametric.html contains the same content as
+PTC\_Knob.html.
+I presume the original file has been lost and overwritten...
 
 
 \section{PTC\_EPLACEMENT}
@@ -413,10 +415,10 @@ Command parameters and switches:
 \textbf{Example }\\
 \href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/eplacement/chicane.madx}{Dog
   leg chicane}: position of quadrupoles is matched to obtain required
-{\tt R566} value.   
+\texttt{R566} value.   
 
 
-%% {\bf PROGRAMMER'S MANUAL}
+%% \textbf{PROGRAMMER'S MANUAL}
 
 %% The command is implemented pro\_ptc\_eplacement function in madxn.c and
 %% by subroutine ptc\_eplacement() in madx\_ptc\_eplacement.f90.  
@@ -462,15 +464,15 @@ Command parameters and switches:
      Currently two formats are accepted:       
      \begin{madlist}
 	\ttitem{text} prints a simple text file. (Default)          
-	\ttitem{rootmacro} creates \href{http://root.cern.ch}{\tt ROOT}
+	\ttitem{rootmacro} creates \href{http://root.cern.ch}\texttt{ROOT}
           macro that can be used to produce a 3D display of the geometry.             
      \end{madlist}
 \end{madlist}
 
 
-{\bf Example }\\
+\textbf{Example }\\
 \href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/eplacement/eplacement.madx}{Dog
-  leg chicane} with some elements displaced with help of {\tt PTC\_EPLACEMENT}.
+  leg chicane} with some elements displaced with help of \texttt{PTC\_EPLACEMENT}.
 
  
 % <h3> PROGRAMMERS MANUAL </h3>
@@ -489,7 +491,7 @@ Command parameters and switches:
 
 Selects a map element to be stored in a user-defined table, or stored as
 a function (Taylor series) of a defined \hyperref[sec:ptc-knob]{knob}.
-Both cases can be joined in a single {\tt PTC\_SELECT} command.  
+Both cases can be joined in a single \texttt{PTC\_SELECT} command.  
 
 \madbox{
 PTC\_SELECT, \=TABLE=tabname, COLUMN=string{,string}, \\
@@ -511,7 +513,7 @@ Command parameters and switches:
    monomials of the polynomial in \ptc nomenclature. The length of the
    string should be equal to the number of variables and each digit
    corresponds to the exponent of the corresponding variable. 
-   Monomial {\tt 'ijklmn'} defines $x^i {p_x}^j y^k {p_y}^l \Delta T^m
+   Monomial \texttt{'ijklmn'} defines $x^i {p_x}^j y^k {p_y}^l \Delta T^m
    (\Delta p/p)^n$. 
 
    For example, element=2 and monomial=1000000 defines coefficient of
@@ -528,13 +530,13 @@ Command parameters and switches:
 
 
 To store map elements in a user-defined table and column, the table with the
-named columns should pre-exist the {\tt PTC\_SELECT} command.
+named columns should pre-exist the \texttt{PTC\_SELECT} command.
 
-To store map elements as a function of a defined knob, the {\tt
-  PARAMETRIC} attribute must be set to {\tt true}.
+To store map elements as a function of a defined knob, the
+\texttt{PARAMETRIC} attribute must be set to \texttt{true}.
 
 
-{\bf Examples}\\
+\textbf{Examples}\\
 
 \href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/ptc_secordmatch/chicane.madx}{dog
   leg chicane}: strength of quads is matched to obtain required T112
@@ -550,7 +552,7 @@ help of knobs to obtain required momentum compaction and Twiss
 functions.   
 
 
-%% {\bf PROGRAMMER'S MANUAL} 
+%% \textbf{PROGRAMMER'S MANUAL} 
 
 %% The command is implemented pro\_ptc\_select function in madxn.c and  by
 %% subroutine addpush in madx\_ptc\_knobs.f90, that is part of
@@ -607,46 +609,46 @@ Command parameters and switches:
 \begin{madlist}
   \ttitem{MOMENT\_S} a list of coma separated strings, each composed of
   up to 6 digits defining the moment of a polynomial in \ptc
-  nomenclature: \\ the string {\tt 'ijklmn'}, where i,j,k,l,m,n are digits
+  nomenclature: \\ the string \texttt{'ijklmn'}, where i,j,k,l,m,n are digits
   from 0 to 9, defines the moment $<x^i {p_x}^j y^k {p_y}^l \Delta T^m
   (\Delta p/p)^n>$.
   
-  For example, {\tt MOMENT\_S=100000} defines $<x^1>$ 
+  For example, \texttt{MOMENT\_S=100000} defines $<x^1>$ 
   
   Note that for input we always use \madx notation where dp/p is always
   the 6th coordinate. Internally to \ptc, dp/p is the 5th coordinate. We
   perform automatic conversion that is transparent for the user. As the
-  consequence RMS in dp/p is always denoted as the string {\tt
-    '000002'}, even in 5D case.     
+  consequence RMS in dp/p is always denoted as the string
+  \texttt{'000002'}, even in 5D case.     
   
   This notation allows to define more then one moment with a single
   command. In this case, the corresponding column names are built from
-  the string arguments to {\tt MOMENT\_S} with a {\tt mu} prefix. 
+  the string arguments to \texttt{MOMENT\_S} with a \texttt{mu} prefix. 
   However, they are always extended to 6 digits, i.e. trailing 0's are
   automatically added.
 
-  For example, with {\tt MOMENT\_S=2}, defines  $<x^2>$ and the
-  corresponding column name is {\tt mu200000}.
+  For example, with \texttt{MOMENT\_S=2}, defines  $<x^2>$ and the
+  corresponding column name is \texttt{mu200000}.
   
   This method does not allow to pass bigger numbers larger than 9. In
-  order to define such a moment, see the attribute {\tt MOMENT} below.    
+  order to define such a moment, see the attribute \texttt{MOMENT} below.    
   
   \ttitem{MOMENT} a list of up to 6 coma separated integers that define
   the moment: \\ 
   $<x^i {p_x}^j y^k {p_y}^l \Delta T^m (\Delta p/p)^n>$ being
-  defined as {\tt MOMENT=i,j,k,l,m,n}\\
+  defined as \texttt{MOMENT=i,j,k,l,m,n}\\
   (Default:~0)
   
-  For example: {\tt MOMENT=2} defines $< x^2 >$, {\tt MOMENT=0,0,2}
-  defines  $< y^2 >$, {\tt MOMENT=0,14,0,2} defines $<{p_x}^{14} {p_y}^2>$, 
+  For example: \texttt{MOMENT=2} defines $< x^2 >$, \texttt{MOMENT=0,0,2}
+  defines  $< y^2 >$, \texttt{MOMENT=0,14,0,2} defines $<{p_x}^{14} {p_y}^2>$, 
   etc. 
   
   \ttitem{COLUMN} defines the name of the column where values should be
   stored. If not specified then it is automatically generated from
-  the {\tt MOMENT} definition:\\ 
-  $< x^i {p_x}^j y^k {p_y}^l \Delta T^m (\Delta p/p)^n>$ =$>$ {\tt mu\_i\_j\_k\_l\_m\_n} \\
+  the \texttt{MOMENT} definition:\\ 
+  $< x^i {p_x}^j y^k {p_y}^l \Delta T^m (\Delta p/p)^n>$ =$>$ \texttt{mu\_i\_j\_k\_l\_m\_n} \\
   (where numbers are separated with underscores). \\
-  This attribute is ignored if {\tt MOMENT\_S} is specified. \\
+  This attribute is ignored if \texttt{MOMENT\_S} is specified. \\
   (Default: none)
 
   \ttitem{TABLE} specifies the name of the table where the calculated
@@ -660,12 +662,12 @@ Command parameters and switches:
 \end{madlist} 
 
 To store a moment in a user-defined table and column, the table with the
-named columns should pre-exist the {\tt PTC\_SELECT\_MOMENT} command.
+named columns should pre-exist the \texttt{PTC\_SELECT\_MOMENT} command.
 
-To store a moment as a function of a defined knob, the {\tt
-  PARAMETRIC} attribute must be set to {\tt true}.
+To store a moment as a function of a defined knob, the
+\texttt{PARAMETRIC} attribute must be set to \texttt{true}.
 
-{\bf Examples}\\
+\textbf{Examples}\\
 from
 \href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/moments/moments.madx}{ATF2}:
 
@@ -700,11 +702,13 @@ ptc\_select\_moment, table = momord6,   \>moment\_s=\>6;
 \section{PTC\_MOMENTS}
 \label{sec:ptc-moments}
 
-The command {\tt PTC\_MOMENTS} calculates moments previously selected with the
-\hyperref[sec:ptc-select-moment]{\tt PTC\_SELECT\_MOMENT} command.  It uses maps
-saved by the \hyperref[sec:ptc-twiss]{\tt PTC\_TWISS} command, hence,
-the {\tt SAVEMAPS} switch of {\tt PTC\_TWISS} must be set to {\tt true}
-(Default) to be able to calculate moments.
+The command \texttt{PTC\_MOMENTS} calculates the moments previously
+selected with the
+\hyperref[sec:ptc-select-moment]{\texttt{PTC\_SELECT\_MOMENT}} 
+command.  It uses maps saved by the
+\hyperref[sec:ptc-twiss]{\texttt{PTC\_TWISS}} command, hence, 
+the \texttt{SAVEMAPS} switch of \texttt{PTC\_TWISS} must be set to
+\texttt{true} (Default) to be able to calculate moments.
 
 \madbox{
 PTC\_MOMENTS, \=NO=integer, \\
@@ -728,7 +732,7 @@ The command parameters and switches are
    \end{madlist}
 \end{madlist}
 
-{\bf Examples}\\
+\textbf{Examples}\\
 \href{http://cern.ch/frs/mad-X_examples/ptc_madx_interface/moments/moments.madx}{ATF2}
 
 
@@ -748,7 +752,7 @@ The command parameters and switches are
 \section{PTC\_DUMPMAPS}
 \label{sec:ptc-dumpmaps}
 
-{\tt PTC\_DUMPMAPS} dumps the linear part of the map for each element of the
+\texttt{PTC\_DUMPMAPS} dumps the linear part of the map for each element of the
 layout into the specified file.  
 
 \madbox{
@@ -761,13 +765,13 @@ The only command parameter is:
   (Default: ptcmaps)
 \end{madlist}
 
-%% {\bf Attention:}\\
+%% \textbf{Attention:}\\
 %% For programming reasons, any element that changes the reference
 %% momentum, i.e. travelling wave cavities, must be followed by a marker. If a
 %% marker does not follow immediately each of these elements, \ptc
 %% detects an error and stops the program. 
 
-%% {\bf PROGRAMMERS MANUAL} \\  
+%% \textbf{PROGRAMMERS MANUAL} \\  
 %% The command is implemented by subroutine ptc\_dumpmaps() in
 %% madx\_ptc\_module.f90. The matrix for a single element is obtained by
 %% tracking identity map through an element, that is initialized for each
@@ -782,7 +786,7 @@ The only command parameter is:
 \section{PTC\_SETCAVITIES}
 \label{sec:ptc-setcavities}
 
-The {\tt PTC\_SETCAVITIES} command adjusts cavities and sets appropriate
+The \texttt{PTC\_SETCAVITIES} command adjusts cavities and sets appropriate
 reference momenta for a layout containing travelling wave cavities. 
 
 \madbox{
@@ -795,14 +799,14 @@ that is the particle that has all its parameters set to zero at the
 beginning of the layout under study. 
 
 When \ptc reaches a cavity in the layout, the parameters of the cavity
-may be adjusted according to the user-defined {\tt MAXACCEL} switch
-previously set in \hyperref[sec:ptc-setswitch]{\tt PTC\_SETSWITCH}.
+may be adjusted according to the user-defined \texttt{MAXACCEL} switch
+previously set in \hyperref[sec:ptc-setswitch]{\texttt{PTC\_SETSWITCH}}.
 
-If {\tt MAXACCEL=true} the phase of the cavity is adjusted so it gives
+If \texttt{MAXACCEL=true} the phase of the cavity is adjusted so it gives
 the maximum acceleration. The phase lag is then added to this adjusted
 phase.
 
-If {\tt MAXACCEL=false} the cavity parameters are left unchanged. 
+If \texttt{MAXACCEL=false} the cavity parameters are left unchanged. 
 
 %% There are 2 cases   
 %% \begin{enumerate}
@@ -830,16 +834,16 @@ Parameters of the cavities are printed to a file named
 %% The exact program behavior depends on the  \href{PTC_SetSwitch.html}{
 %%   PTC switches settings}.   
 
-{\bf Attention:}\\ 
+\textbf{Attention:}\\ 
 in \ptc the phase velocity of a cavity wave is always equal to the speed
-of light.  Hence, if \ptc internal state {\tt TIME} is {\tt true}, which
+of light.  Hence, if \ptc internal state \texttt{TIME} is \texttt{true}, which
 is the most correct setting, the voltage seen by a particle is varying
-along the structure. If {\tt TIME=false}, the tracked particle is
+along the structure. If \texttt{TIME=false}, the tracked particle is
 assumed to propagate at the speed of light ($v=c$) and the particle
 moves synchronously with the wave front.
 
 
-{\bf Attention:}\\
+\textbf{Attention:}\\
 For programming reasons, any element that changes the reference
 momentum, i.e. travelling wave cavities, must be followed by a marker. If a
 marker does not follow immediately each of these elements, \ptc

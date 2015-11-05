@@ -16,10 +16,10 @@ programs most of which use the set ($x$, $x'$), ($y$, $y'$),
 
 Like Dragt \cite{dragt1982}, \madeight uses the relative
 energy error $p / p_0$, which is equal the relative momentum error
-${\tt delta} = \delta p / p_0$ multiplied by $\beta = v/c$.
+$\mathtt{delta} = \delta p / p_0$ multiplied by $\beta = v/c$.
 
 As from Version 8.13, \madeight used an additional \textbf{constant}
-momentum error $\texttt{delta}_s$ in all optical calculations. 
+momentum error $\mathtt{delta}_s$ in all optical calculations. 
 The transfer maps contained the \textbf{exact} dependence upon this
 value; therefore the tunes for large deviations could be computed with
 high accuracy as opposed to previous versions.
@@ -40,7 +40,8 @@ shows that the orbit functions cannot be the same.
 A more detailed analysis, using 
 $x' = p_x / (1 + \delta)$
 shows that all formulas can be made consistent by defining the MAD orbit
-functions (index M) wrt. the Courant and Snyder functions (index C) as follows:
+functions (index M) with respect to the Courant and Snyder functions
+(index C) as follows: 
 
 $\beta_{xM} = \beta_{xC} \times (1 + \delta)$, \\
 $\alpha_{xM} = \alpha_{xC}$, \\
@@ -48,7 +49,7 @@ $\gamma_{xM} = \gamma_{xC} / (1 + \delta)$
 
 For constant $\delta_s$ along the beam line and $\delta = 0$, the
 lattice functions are the same. In a machine where $\delta$ varies along
-the circumference, e.g. in a linear accelerator or in an
+the circumference, \textsl{e.g.} in a linear accelerator or in an
 electron-positron storage ring, the definition of the Courant-Snyder
 invariants must be generalised. The \madeight invariants have the advantage
 that they remain invariants along the beam line even for variable $\delta$.

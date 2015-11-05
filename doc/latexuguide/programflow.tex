@@ -29,7 +29,7 @@ expr1  \>oper expr2 \\
 expr11 \>oper1 expr12   \>\&\&   \>expr21 oper2 expr22 \\
 expr11 \>oper1 expr12   \>||    \>expr21 oper2 expr22 
 }
-and {\tt oper} is one of 
+and \texttt{oper} is one of 
 \begin{madlist}
 \ttitem{==}  equal
 \ttitem{<>}  not equal
@@ -42,31 +42,29 @@ and {\tt oper} is one of
 The expressions are arithmetic expressions of type real. The statements
 in the curly brackets are executed if the logical expression is true.  
 
-{\tt ELSEIF} constructs are only possible (in any number) behind an
-{\tt IF}, or another {\tt ELSEIF}; the branch is executed if
-"logical\_expression" is true, and if none of the preceding {\tt IF}
-or {\tt ELSEIF} logical conditions was true.   
+\texttt{ELSEIF} constructs are only possible (in any number) behind an
+\texttt{IF}, or another \texttt{ELSEIF}; the branch is executed if
+"logical\_expression" is true, and if none of the preceding \texttt{IF}
+or \texttt{ELSEIF} logical conditions was true.   
 
 
-{\tt ELSE} construct is only possible once behind an {\tt IF}, or
-an {\tt ELSEIF}; the branch is executed if "logical\_expression" is
-true, and if none of the preceding {\tt IF} or {\tt ELSEIF}
+\texttt{ELSE} construct is only possible once behind an \texttt{IF}, or
+an \texttt{ELSEIF}; the branch is executed if "logical\_expression" is
+true, and if none of the preceding \texttt{IF} or \texttt{ELSEIF}
 logical conditions was true.   
 
-{\bf Warning:}\\
-Because {\tt IF ... ELSEIF ... ELSE} constructs are a \madx special
-feature and not part of a full language, \madx does not deal gracefully with 
-other special constructs such as {\tt MACRO} or {\tt LINE} when they are placed 
-inside {\tt IF ... 
-ELSEIF ... ELSE} statements: this can lead to silent and/or catastrophic errors 
-and is due to the fact that {\tt MACRO} and {\tt LINE} constructs contain, 
-either explicitly or implicitly, a closing curly bracket that unbalances the 
-{\tt IF ... ELSEIF ... ELSE} statements.
+\textbf{Warning:}\\
+Because \texttt{IF ... ELSEIF ... ELSE} constructs are a \madx special
+feature and not part of a full language, \madx does not deal gracefully
+with other special constructs such as \texttt{MACRO} or \texttt{LINE}
+when they are placed  inside \texttt{IF ... ELSEIF ... ELSE} statements:
+this can lead to silent and/or catastrophic errors and is due to the
+fact that \texttt{MACRO} and \texttt{LINE} constructs contain, 
+either explicitly or implicitly, a closing curly bracket that unbalances
+the \texttt{IF ... ELSEIF ... ELSE} statements.
 
-However it is possible to nest {\tt IF ... ELSEIF ... ELSE} constructs to at 
-least six levels deep.
-
-%For a real life example, see \href{foot.html}{ELSE example}. 
+However it is possible to nest \texttt{IF ... ELSEIF ... ELSE}
+constructs to at least six levels deep.
 
 \section{WHILE}
 \label{sec:while}
@@ -78,20 +76,19 @@ is true.
 
 
 
-{\bf Warning:}\\
-Because {\tt WHILE} constructs are a \madx special
-feature and not part of a full language, \madx does not deal gracefully with 
-other special constructs such as {\tt MACRO} or {\tt LINE} when they are placed 
-inside {\tt WHILE} statement blocks: this can lead to silent and/or 
-catastrophic errors and is due to the 
-fact that {\tt MACRO} and {\tt LINE} constructs contain, either explicitly or 
-implicitly, a closing curly bracket that unbalances the {\tt WHILE} statements.
+\textbf{Warning:}\\
+Because \texttt{WHILE} constructs are a \madx special
+feature and not part of a full language, \madx does not deal gracefully
+with other special constructs such as \texttt{MACRO} or \texttt{LINE}
+when they are placed inside \texttt{WHILE} statement blocks: this can
+lead to silent and/or catastrophic errors and is due to the fact that
+\texttt{MACRO} and \texttt{LINE} constructs contain, either explicitly or  
+implicitly, a closing curly bracket that unbalances the \texttt{WHILE}
+statements. 
 
-However it is possible to nest {\tt WHILE} statements to at least six levels 
-deep.
+However it is possible to nest \texttt{WHILE} statements to at least six
+levels deep. 
 
-
-%For a real life example, see \href{foot.html}{WHILE example}.
 Example giving the value of the first ten factorials:
 \madxmp{
 	n = 1; m = 1; \\
@@ -117,7 +114,7 @@ The first form allows the execution of the defined group of statements via a
 single command,  
 \madxmp{EXEC, label;}
 that executes the statements defined between curly brackets exactly
-once. The {\tt EXEC} command can then be issued any number of times.  
+once. The \texttt{EXEC} command can then be issued any number of times.  
 
 The second form allows to replace strings anywhere inside the statements
 in curly brackets by other strings, or integer numbers prior to
@@ -133,7 +130,7 @@ EXEC, simple(a,b);
 }
 
 
-{\bf Passing arguments}\\
+\textbf{Passing arguments}\\
 In the following example we use the fact that a "\$" in front of an
 argument means that the truncated integer value of this argument is used
 for replacement, rather than the argument string itself.  
@@ -147,23 +144,21 @@ WHILE \=(n < 3) \{ \\
 \};
 }
 
+%% Whereas the actual use of the preceding example is NOT recommended,
+%% a real life example, showing the full power (!) of macros is to be
+%% found under \href{foot.html}{macro usage} for the usage, and
+%% under \href{foot.html#macro}{macro definition} for the
+%% definition.
 
-Whereas the actual use of the preceding example is NOT recommended,
-a real life example, showing the full power (!) of macros is to be
-found under \href{foot.html}{macro usage} for the usage, and
-under \href{foot.html#macro}{macro definition} for the
-definition.
-
-
-Because {\tt MACRO} statements are a \madx
-construct and not part of a full language, \madx  allows only one level
-of inclusion of another {\tt IF ... ELSEIF ... ELSE}, {\tt WHILE}
-or {\tt MACRO} statements.  
+Because \texttt{MACRO} statements are a \madx construct and not part of
+a full language, \madx  allows only one level of inclusion of another
+\texttt{IF ... ELSEIF ... ELSE}, \texttt{WHILE} or \texttt{MACRO}
+statements.   
 
 
 Macros cannot be called with number arguments but always with string
-arguments. In case numerical values should be passed to a {\tt MACRO} in an
-{\tt EXEC} statement, one can conveniently use variables names: 
+arguments. In case numerical values should be passed to a \texttt{MACRO}
+in an \texttt{EXEC} statement, one can conveniently use variables names: 
 \madxmp{
 n1=99; n2=219;\\
 EXEC, thismacro(\$n1, \$n2);
@@ -173,7 +168,4 @@ instead of
 EXEC, thismacro(\$99, \$129); ! fails...
 }
 
-
 %% EOF
-
-

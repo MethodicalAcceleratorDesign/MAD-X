@@ -99,11 +99,11 @@ define run-test
 $(if $(call eq,$(SHOW),yes),$(trace-test),)
 $(if $(call eq,$(NREF),yes),,$(if $(NDFILES_REF),,invalid test $@ -- no reference file found))
 -$_ $(if $(TESTSUITE),echo [ $(TESTSUITE) ],)
--$_ $(if $(NDFILES_OUT),$(RM) $(NDFILES_OUT),)
--$_ cd tests$/$@ && ( $(TESTCMD) > $@.out 2>&1 || [ "1" ] )
--$_ cd tests$/$@ && \
+-$_ $(if $(and $(TESTCMD),$(NDFILES_OUT)),$(RM) $(NDFILES_OUT),)
+-$_ $(if $(TESTCMD),cd tests$/$@ && ( $(TESTCMD) > $@.out 2>&1 || [ "1" ] ),)
+-$_ $(if $(NDIFF_R),cd tests$/$@ && ( \
     $(call ND_tr,$(NDIFF_R) $(NDFLAGS)) $(NDFILES_REF) || \
-    echo "error: $@ failed, check output files in tests$/$@ for details"
+    echo "error: $@ failed, check output files in tests$/$@ for details"),)
 endef
 
 # end of makefile

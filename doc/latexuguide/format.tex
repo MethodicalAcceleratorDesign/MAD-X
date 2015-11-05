@@ -32,32 +32,33 @@ or
 are both valid.
 
 \section{Comments}
-When an exclamation mark ({\tt !}) or double forward slash ({\tt //}) is
+When an exclamation mark (\texttt{!}) or double forward slash (\texttt{//}) is
 found in the input line, the remaining characters until the end of the
 line are treated as a comment and are skipped. 
 
-A comment spreading over multiple lines starts with a "/*" and ends with a "*/".
+A comment spreading over multiple lines starts with a string \texttt{/*}
+and ends with a string \texttt{*/}.
 
 \section{Commands}
 The general format for a command is 
 \madbox{
 label: keyword \{,attribute\} ;
 }
-where the  {\tt \{ \}} are not part of the command and the items
-enclosed in {\tt \{ \}} can be omitted or repeated any number of times. 
+where the  \texttt{\{ \}} are not part of the command and the items
+enclosed in \texttt{\{ \}} can be omitted or repeated any number of times. 
 
 
 A command contains three parts:
 \begin{madlist}
    \ttitem{label}\index{label} 
-   A \href{label.html}{label} is required for a definition statement. 
-   It gives a name to the stored command.
+   A label is required for a definition statement. 
+   A label gives a name to the stored command.
      
    \ttitem{keyword}\index{keyword} 
-   A \href{keyword.html}{keyword} identifies the action desired.
+   A keyword identifies the action desired.
      
    \ttitem{attributes}\index{attribute} 
-   The \href{attribute.html}{attributes} are normally entered in the
+   The attributes are normally entered in the
    form \madxmp{attribute-name = attribute-value}
    and serve to define data for the command, where:
    \begin{madlist}
@@ -66,15 +67,15 @@ A command contains three parts:
    \end{madlist}
 \end{madlist}
 
-If a value is to be assigned to an attribute, the {\tt attribute-name} is
+If a value is to be assigned to an attribute, the \texttt{attribute-name} is
 mandatory.
 
 Whenever an attribute is not explicitly given a value, the default 
-{\tt attribute-value} specified in the command dictionary is assumed. 
+\texttt{attribute-value} specified in the command dictionary is assumed. 
 
 %% In the case of attributes taking logical values, it is sufficient to
-%% enter the {\tt attribute-name} only; the attribute is then given the
-%% default {\tt attribute-value} specified in the command dictionary.
+%% enter the \texttt{attribute-name} only; the attribute is then given the
+%% default \texttt{attribute-value} specified in the command dictionary.
 
 \section{Keywords}
 \label{subsec:keyword}
@@ -88,36 +89,35 @@ in a fatal error.
 \section{Attribute Types}
 The command attributes can have one of the following types:
 \begin{itemize}
-  \item \href{string.html}{String attribute},
-  \item \href{logical.html}{Logical attribute},
-  \item \href{integer.html}{Integer attribute},
-  \item \href{real.html}{Real attribute},
-  \item \href{expression.html}{Expression},
-  \item \href{select.html}{Range selection},
+  \item String attribute,
+  \item Logical attribute,
+  \item Integer attribute,
+  \item Real attribute,
+  \item Expression,
+  \item Range selection,
 \end{itemize}
 
-Any integer or real attribute can be replaced by
-a \href{expression.html}{real expression}; expressions are
-normally deferred\index{deferred} 
-(see \hyperref[sec:defer]{deferred expression}), except in the  
+Any integer or real attribute can be replaced by a real expression;
+expressions are normally deferred\index{deferred} (see
+\hyperref[sec:defer]{deferred expression}), except in the   
 definition of constants where they are evaluated immediately.
 
-When a command has a \href{label.html}{label}, \madx keeps this command
-in memory. This allows repeated execution of the same command
-by just entering EXEC label. This construct may be nested.
+When a command has a \hyperref[sec:label]{label}, \madx keeps this
+command in memory. This allows repeated execution of the same command by
+simply entering \texttt{EXEC label;}. This construct may be nested. 
 
-For an exhaustive list of valid declarations of constants or variables
-see \href{declarations.html}{declarations}.
+%For an exhaustive list of valid declarations of constants or variables
+%see \href{declarations.html}{declarations}.
 
 
 \section{Variable Declarations}
 \label{subsec:var_declarations}
 
-In the following, "=" means that the variable at the left receives the
-current value of the expression at right, but does not depend on it any
-further, whereas ":=" makes it depend on this expression, i.e. every
-time the expression changes, the variable is re-evaluated, except for
-"const" variables.  
+In the following, "=" means that the variable on the left receives the
+current value of the expression on the right, but does not depend on it
+any further, whereas ":=" makes the variable on the left depend on the
+expression on the right, \textsl{i.e.} every time the expression
+changes, the variable is re-evaluated, except for "const" variables.
 
 \madxmp{
 var = expression; \\
@@ -156,18 +156,15 @@ results in a fatal error.
 \label{sec:attribute}
 
 \begin{itemize}
-	\item A \href{name.html}{name or string attribute} refers to an object, or a string. 
-	\item A \href{logical.html}{logical attribute} selects or deselects an option. 
-	\item An \href{integer.html}{integer attribute} is a counter, as for repetition in a beam line. 
-        \item A \href{real.html}{real attribute} defines a value stored
-          as double precisiom data.  
-	\item A \href{expression.html}{real expression} defines a datum
-          for a command, it may be varied in matching. An expression is
-          built of a combination of
-          \href{expression.html#operator}{operator} and
-          \href{expression.html#operand}{operand}. 
-	\item A \href{constraint.html}{constraint}, specifies a matching constraint. 
-	\item A \href{variable.html}{variable name} selects a variable to be matched. 
+  \item A name or string attribute refers to an object, or a string. 
+  \item A logical attribute selects or deselects an option. 
+  \item An integer attribute defines a value stored as integer data.
+  \item A real attribute defines a value stored as double precision data.  
+  \item A real expression defines a datum for a command, it may be
+    varied in matching. An expression is built of a combination of
+    operator and operand. 
+  \item A constraint specifies a matching constraint. 
+  \item A variable name selects a variable to be matched. 
 \end{itemize}
 
 
@@ -339,7 +336,7 @@ An expression can be formed using the following operators:
 
 in the above cases, "x" can be any expression, i.e. contain other
 functions, variable or constant expressions. To initialize the \madx
-random generator use the \hyperref[sec:eoption]{\tt EOPTION} command.
+random generator use the \hyperref[sec:eoption]{\texttt{EOPTION}} command.
 
 \subsubsection{Table Access Functions}
 \label{subsubsec:table}
@@ -435,8 +432,8 @@ Examples:
 
 \subsubsection{Symbolic constants}
 \label{subsubsec:symbolic_const}
-\madx recognizes some \hyperlink{constant}{mathematical and physical
-  constants}. Their names must not be used for user-defined labels.  
+\madx recognizes some \hyperref[tab-constants]{mathematical and physical
+constants}. Their names must not be used for user-defined labels.  
 
 Additional symbolic constants may be defined to simplify their repeated
 use in statements and expressions.  
@@ -456,9 +453,10 @@ The values published in 2014 (\cite{PDG2014}) have not changed with respect to
 the values published in 2012 (\cite{PDG2012}).
 
 \begin{table}[ht]
-\caption{Predefined Symbolic Constants in \madx}
+  \caption{Predefined Symbolic Constants in \madx}
+  \label{tab-constants}
 \vspace{1ex}
-\begin{center}
+\centering
 \begin{tabular}{|l|c|c|c|}
 \hline
 \textbf{\madx name} & \textbf{symbol} & \textbf{value} & \textbf{unit} \\ 
@@ -479,38 +477,38 @@ ERAD & $r_e$ & $2.8179403267\times 10^{-15}$ & m\\
 PRAD & $r_e (m_e / m_p)$ & ERAD*EMASS/PMASS & m \\
 \hline
 \end{tabular}
-\end{center}
 \end{table}
 
-Note that the {\tt NMASS} constant in \madx is the unified atomic mass unit and 
+Note that the \texttt{NMASS} constant in \madx is the unified atomic mass unit and 
 not the neutron mass.
 
 \subsubsection{Parameter labels} 
 Often a set of numerical values depends on a common variable
-parameter. Such a parameter must be defined as a
-\href{parameter.html}{global parameter}. A global parameter always has a
-current value; however, this value may be re-evaluated or not, depending
-on the parameter definition:  
+parameter. Such a parameter must be defined as a global parameter. A
+global parameter always has a current value; however, this value may be
+re-evaluated or not, depending on the parameter definition:  
 \begin{verbatim}
 x = a;
 \end{verbatim} 
-x is set to the current value of a and not changed, even if a
-changes. This makes assignments such as  
+\texttt{x} is set to the current value of \texttt{a} and not changed,
+even if \texttt{a} changes. This makes assignments such as  
 \begin{verbatim}
 x = x + 1;
 \end{verbatim} 
-perfectly valid (this replaces the old SET instruction). 
+perfectly valid (this replaces the deprecated \texttt{SET} instruction).
 
 The definition of the deferred expression  
 \begin{verbatim}
 x := a;
 \end{verbatim} 
-assign the current value of a to x every time x is used, i.e. it is
-re-evaluated using the latest value of a; therefore,  
+assign the current value of \texttt{a} to \texttt{x} every time
+\texttt{x} is used, \textsl{i.e.} it is re-evaluated using the latest
+value of \texttt{a}; therefore,   
 \begin{verbatim}
 x := x + 1;
 \end{verbatim} 
-results in an infinite loop (!) when x is used (error abort). 
+results in an infinite loop (!) when \texttt{x} is used, which results
+in abnormnal termination of \madx. 
 
 Of course, the following definitions are equivalent:  
 \begin{verbatim}
@@ -527,8 +525,9 @@ x := 1.0; \\
 d1: drift, l =  x; \\
 d2: drift, l := 2.0 - x; \\
 }
-When the value of x is changed, the length of the drift d1 remains
-unchanged, that of d2 is recalculated.   
+When the value of \texttt{x} is changed, the length of the drift
+\texttt{d1} remains unchanged, while the length of the drift \texttt{d2}
+is recalculated.
 
 \subsubsection{Element or Command Attributes} 
 In arithmetic expressions the attributes of physical elements or
@@ -546,7 +545,8 @@ xxxxxxxx\= \kill
 D1:     \>DRIFT, L= 1.0; \\
 D2:     \>DRIFT, L= 2.0 - D1->L;
 }
-\texttt{D1-\textgreater L} refers to the length L of the drift space D1.  
+\texttt{D1-\textgreater L} refers to the length \texttt{L} of the drift
+space \texttt{D1}.   
 
 \subsection{Expressions and Random Values}
 \label{subsec:expr_rnd}
@@ -560,7 +560,7 @@ Example:
 \madxmp{
 a := 3*ranf();
 }
-Every time a is used, it gets a random value assigned from a uniform
+Every time \texttt{a} is used, it gets a random value assigned from a uniform
 distribution between 0 and 3.  
 
 \madxmp{
@@ -616,20 +616,19 @@ A variable name can have one of the formats:
  table(table-name,..,..)
 }
 
-The first format refers to the value of the \href{parameter.html}{global
-  parameter} "parameter-name". 
+The first format refers to the value of the global parameter
+\texttt{parameter-name}.
 
-The second and third formats refer to the
-\href{real.html}{real attribute} "attribute-name" of the element
-"element-name", or the command "command-name". 
+The second and third formats refer to the real attribute
+\texttt{attribute-name} of the element  \texttt{element-name}, or the
+command \texttt{command-name}.  
 
 The fourth format is specific
 to beams belonging to a particular sequence (for details see
-\href{sequence.html#beam}{sequences and beams}). 
+\hyperref[chap:sequence]{sequences} and \hyperref[chap:beam]{beams}). 
 
-The fifth format allows
-extraction of variables from existing tables, as specified in
-\href{expression.html#table}{table access}.  
+The fifth format allows extraction of variables from existing tables, as specified in
+\hyperref[chap:tables]{table access}.  
 
 
 

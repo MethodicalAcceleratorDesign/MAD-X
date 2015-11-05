@@ -8,7 +8,7 @@
 This module takes a sequence with thick elements and creates another one 
 with similar functionality but composed of
 thin (zero length) element slices or simplified thick slices as required
-by \madx tracking or conversion to {\tt SIXTRACK} input format.
+by \madx tracking or conversion to \texttt{SIXTRACK} input format.
 
 \section{MAKETHIN}
 \label{sec:makethin}
@@ -22,8 +22,9 @@ The parameters are defined as:
 \begin{madlist}
    \ttitem{SEQUENCE} seqname is the name of the sequence to be
    processed to thin slices. The sequence must be active, i.e. it should
-   have been previously loaded with a \hyperref[sec:use]{\tt USE} command.  
-   The sequence must use the default positioning of elements ({\tt REFER=centre}).
+   have been previously loaded with a \hyperref[sec:use]{\texttt{USE}} command.  
+   The sequence must use the default positioning of elements
+   ({\texttt{REFER=centre}}). 
 
    \ttitem{STYLE} the slicing style to be used for all elements. \\
    Available slicing styles are: 
@@ -31,7 +32,7 @@ The parameters are defined as:
    \begin{madlist}
    	\ttitem{TEAPOT} is the default slicing algorithm for all elements 
    	except collimators and is described in \cite{burkhardt2013}. 
-   	{\tt TEAPOT} is a clear improvement over the {\tt SIMPLE} algorithm.
+   	\texttt{TEAPOT} is a clear improvement over the \texttt{SIMPLE} algorithm.
    	
    	\ttitem{SIMPLE} produces slices of equal strength and length at equidistant
    	positions.
@@ -42,22 +43,22 @@ The parameters are defined as:
    	end. Three slices or more are treated as one slice. 
    	
    	\ttitem{HYBRID} is the previous default algorithm 
-   	that was active up to version 5.02.05 when the {\tt STYLE} 
+   	that was active up to version 5.02.05 when the \texttt{STYLE} 
    	attribute was not given; the standard slicing for all
-   	elements, except collimators, is {\tt TEAPOT} if the number
-   	of slices is less or equal to four, and {\tt SIMPLE} otherwise.
+   	elements, except collimators, is \texttt{TEAPOT} if the number
+   	of slices is less or equal to four, and \texttt{SIMPLE} otherwise.
    
    \end{madlist}
    
    \ttitem{MAKEDIPEDGE} is a logical flag to control the generation of
-   {\tt DIPEDGE} elements at the start and/or end of bending magnets,
-   to conserve edge focusing from pole face angles {\tt E1, E2}
-   or extra fields described by {\tt FINT, FINTX}, in the
+   \texttt{DIPEDGE} elements at the start and/or end of bending magnets,
+   to conserve edge focusing from pole face angles \texttt{E1, E2}
+   or extra fields described by \texttt{FINT, FINTX}, in the
    process of slicing bending magnets to thin multipole slices.   
-   Selection with {\tt THICK=true} will translate a complex thick 
-   {\tt RBEND} or {\tt SBEND}, including edge effects, to a simple
-   thick {\tt SBEND} with edge focusing transferred to extra 
-   {\tt DIPEDGE} elements. \\ 
+   Selection with \texttt{THICK=true} will translate a complex thick 
+   \texttt{RBEND} or \texttt{SBEND}, including edge effects, to a simple
+   thick \texttt{SBEND} with edge focusing transferred to extra 
+   \texttt{DIPEDGE} elements. \\ 
    (Default:~true)
 \end{madlist}
 
@@ -68,30 +69,31 @@ SELECT, FLAG=makethin, CLASS=rbend, THICK=true;
 }
 
 \section{Controlling the number of slices}
+\label{sec:numberofslices}
 
 The number of slices can be set individually for elements or groups of
-elements using the {\tt SELECT} command
+elements using the \texttt{SELECT} command
 \madxmp{
 SELECT, \=FLAG=makethin, \\
         \>RANGE=range, CLASS=class, PATTERN=pattern[,FULL][,CLEAR], \\
         \>THICK=logical, SLICE=integer;
 }
-where the argument to the attribute {\tt SLICE} stands for the number of
+where the argument to the attribute \texttt{SLICE} stands for the number of
 slices for the selected elements. The default is one slice and
-{\tt THICK=false} for all elements, i.e. conversion of all thick
+\texttt{THICK=false} for all elements, i.e. conversion of all thick
 elements to a single thin slice positioned at the centre of the original
 thick element.
 
-Note that {\tt THICK=true} only applies to dipole or quadrupole magnetic
+Note that \texttt{THICK=true} only applies to dipole or quadrupole magnetic
 elements and is ignored otherwise.
 
-{\tt MAKETHIN} allows for thick quadrupole slicing with insertion of
-thin {\tt MULTIPOLE} elements between thick slices. 
+\texttt{MAKETHIN} allows for thick quadrupole slicing with insertion of
+thin \texttt{MULTIPOLE} elements between thick slices. 
 Positioning is done with markers between
 slices, here however with thick slice quadrupole piece filling the whole
 length.
 
-{\bf Examples:}
+\textbf{Examples:}
 \madxmp{
 ! slice quadrupoles in three thick slices, insert 2 markers per quadrupole \\
 SELECT, FLAG=makethin, CLASS=quadrupole, THICK=true, SLICE=3; \\ 
@@ -115,6 +117,76 @@ resulting changes in optics parameters.
 Keep in mind however that subsequent tracking generally requires full
 slicing, with possible exception of dipole and quadrupole magnetic elements. 
 
+\section{Choice of options for dipoles}
+
+There are several options that affect the slicing of a sequence. 
+Depending whether dipole magnets (\hyperref[sec:bend]{\texttt{RBEND} 
+or \texttt{SBEND}}) are kept as thick elements 
+(See \hyperref[sec:select]{\texttt{SELECT, FLAG=makethin}}) and 
+whether the \hyperref[sec:makethin]{\texttt{MAKEDIPEDGE}} option 
+of \texttt{MAKETHIN} is used to generate 
+\hyperref[sec:dipedge]{\texttt{DIPEDGE}} elements around these bending magnets, 
+the resulting sequence is more adapted to optics calculation or tracking. 
+The following table gives an indication of the best choice of options for 
+dipole elements 
+
+\begin{table}[ht]
+  \caption{Best choice of options in \texttt{MAKETHIN}}
+  \vspace{1ex}
+  \centering
+  \begin{tabular}{|l|l|l|}
+    \hline
+    & \texttt{THICK=false} & \texttt{THICK=true}\\
+    \hline
+    \texttt{MAKEDIPEDGE=false} & backward compatibility & thick optics calculations \\
+    \hline
+    \texttt{MAKEDIPEDGE=true} & thin tracking & thick tracking \\
+    \hline
+  \end{tabular}
+\end{table}
+
+The combination of \hyperref[sec:numberofslices]{\texttt{THICK=false}} 
+(dipoles converted to thin lenses) 
+and \hyperref[sec:makethin]{\texttt{MAKEDIPEDGE=false}} 
+(no \hyperref[sec:dipedge]{\texttt{DIPEDGE}} 
+thin elements inserted around the dipoles) results in a lattice with 
+Twiss parameters that can differ significantly from those of 
+the original sequence. 
+This is most obvious with the tune or phase advance parameters 
+that are generally differing by a significant amount (see first 
+hint below). This combination is however useful for backward compatibility 
+with previous versions of \texttt{MAKETHIN} before 
+\hyperref[sec:dipedge]{\texttt{DIPEDGE}} elements were
+implemented. 
+
+The combination of \hyperref[sec:numberofslices]{\texttt{THICK=true}} 
+(dipoles are kept as thick elements and not converted to thin lenses) 
+and \hyperref[sec:makethin]{\texttt{MAKEDIPEDGE=false}} 
+(\hyperref[sec:dipedge]{\texttt{DIPEDGE}} thin elements 
+are not inserted around the thick dipoles to replace the edge effects 
+that stay with the bends themselves) 
+results in a lattice with \hyperref[chap:twiss]{\texttt{TWISS}} parameters 
+very comparable to those of the original sequence. The dipoles are still 
+thick elements, eventually sliced, with proper edge effects up to second 
+order, although non-symplectic.
+This is the best combination for optics studies without particle tracking, 
+e.g. with \hyperref[chap:twiss]{\texttt{TWISS}}. 
+
+The combination of \hyperref[sec:numberofslices]{\texttt{THICK=false}}
+for dipoles and \hyperref[sec:makethin]{\texttt{MAKEDIPEDGE=true}} 
+transforms the original dipoles into one or several thin slices without 
+any edge effect, surrounded by a pair of
+\hyperref[sec:dipedge]{\texttt{DIPEDGE}}  
+elements at the original location of dipole entrance and exit. 
+Note however that these \hyperref[sec:dipedge]{\texttt{DIPEDGE}}
+elements only contain first order effects for the purpose of tracking. 
+
+The combination of \hyperref[sec:numberofslices]{\texttt{THICK=true}}
+for dipoles and \hyperref[sec:makethin]{\texttt{MAKEDIPEDGE=true}} 
+conserves the dipoles as thick element dipole bodies only while their
+associated edge effects are transferred to
+\hyperref[sec:dipedge]{\texttt{DIPEDGE}} elements that are taken into
+account at first order only for symplectic tracking. 
 
 \section{Additional information}
 
@@ -131,16 +203,17 @@ The generated thin lens sequence has the following properties:
   same name as the original. 
 \item If an element is sliced into more than one slice, the individual
   slices have the same basename as the original element plus a suffix 
-  {\tt ..1}, {\tt ..2}, etc. and a marker, with the name of the original
-  element, is placed at the location of the center of the original element.
+  \texttt{..1}, \texttt{..2}, etc. and a marker, with the name of the
+  original element, is placed at the location of the center of the
+  original element. 
 \end{itemize}
 
 
-{\bf Hints}
+\textbf{Hints}
 \begin{enumerate}
 \item Compare the main optics parameters like tunes before and after slicing
-  with {\tt MAKETHIN}. Rematch tunes and chromaticity as necessary after
-  {\tt MAKETHIN}. 
+  with \texttt{MAKETHIN}. Rematch tunes and chromaticity as necessary after
+  \texttt{MAKETHIN}. 
 
 \item In tests, turn off slicing for some of the main element classes to
   identify the main sources of changes. 
@@ -152,7 +225,7 @@ The generated thin lens sequence has the following properties:
   required. 
 
 \item In case of problems or doubts, consider to
-  {\tt FLATTEN} the sequence before slicing.  
+  \texttt{FLATTEN} the sequence before slicing.  
 
 \item See the
   \href{http://madx.web.cern.ch/madx/madX/examples/makethin/}{examples}
@@ -164,16 +237,4 @@ The generated thin lens sequence has the following properties:
 
 \end{enumerate}
 
-
-
 %%%%%%%%
-
-
-
-
-
-
-
-
-
-
