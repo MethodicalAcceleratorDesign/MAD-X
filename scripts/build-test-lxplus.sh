@@ -13,7 +13,7 @@ uname -n > build-test-lxplus.run
 check_error ()
 {
 	if [ "$?" != "0" ] ; then
-		echo "ERROR: $1"
+		echo -e "\nERROR: $1"
 		[ "$2" != "no-exit" ] && exit 1
 	fi
 }
@@ -42,6 +42,8 @@ if [ "$?" != "0" ] ; then
 	svn update
 	check_error "svn update failed"
 fi
+# ensure that scripts are executable after an update
+chmod u+x scripts/build-test-report.sh $0
 
 echo -e "\n===== Release number ====="
 cat VERSION

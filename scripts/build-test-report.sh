@@ -129,10 +129,10 @@ build_test_report ()
             cp -f build-test-$arch.out tests/reports/${thedate}_build-test-$arch.out
             check_error "backup of build-test-$arch.out failed (cp)"
 
-            perl -ne '/: FAIL|ERROR: [^0]/i && print' build-test-$arch.out >> build-test-failed.tmp
+            perl -ne '/: FAIL$|^ERROR: / && print' build-test-$arch.out >> build-test-failed.tmp
             check_error "unable to search for failures or errors (perl)"
 
-            perl -ne '/: FAIL|ERROR: [^0]/i && print ;
+            perl -ne '/: FAIL$|^ERROR: / && print ;
                       /===== Testing (madx-\S+) =====/ && print "\n$1:\n"' build-test-$arch.out >> build-test-result.tmp
             check_error "unable to build report summary (perl)"
         else
