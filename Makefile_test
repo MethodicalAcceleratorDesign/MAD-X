@@ -65,7 +65,7 @@ test-beam \
 test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 test-rfmultipole-5 test-rfmultipole-6 \
 \
 test-ptc-twiss-1 test-ptc-twiss-2 test-ptc-twiss-3 \
-test-ptc-twiss-old1 test-ptc-twiss-old2 test-ptc-twiss-old3 test-ptc-twiss-old4 test-ptc-twiss-old5 $(if $(call eq,$(OSTYPE),Windows),,test-ptc-twiss-old6) test-ptc-twiss-old7 \
+test-ptc-twiss-old1 test-ptc-twiss-old2 test-ptc-twiss-old3 test-ptc-twiss-old4 test-ptc-twiss-old5 $(call onwin,test-ptc-twiss-old6) test-ptc-twiss-old7 \
 test-ptc-twiss-5D test-ptc-twiss-5Dt test-ptc-twiss-56D test-ptc-twiss-56Dt test-ptc-twiss-56Dl test-ptc-twiss-56Dtl test-ptc-twiss-6D \
 test-ptc-normal test-ptc-twiss-maptable \
 test-ptc-trackline test-ptc-trackline-2 \
@@ -84,7 +84,7 @@ test-dynap \
 test-c6t-4 \
 test-match-6 test-match-7 \
 test-ptc-twiss-2 \
-$(if $(call eq,$(OSTYPE),Windows),,test-ptc-twiss-old6) test-ptc-twiss-old7 \
+$(call onwin,test-ptc-twiss-old6) test-ptc-twiss-old7 \
 test-touschek test-touschek-2 \
 $(call onlxplus,test-lhc test-hllhc)
 
@@ -119,7 +119,7 @@ test-ptc-twiss:      TESTSUITE := PTC Twiss testsuite
 test-rfmultipole:    TESTSUITE := RF Multipole testsuite
 test-sequence:	     TESTSUITE := Sequence testsuite
 test-survey:         TESTSUITE := Survey testsuite
-test-table:	     TESTSUITE := Table testsuite
+test-table:	     	 TESTSUITE := Table testsuite
 test-thick-quad:     TESTSUITE := Thick Element testsuite
 test-touschek:       TESTSUITE := Touschek testsuite
 test-track:          TESTSUITE := Track testsuite
@@ -128,8 +128,9 @@ test-twiss:          TESTSUITE := Twiss testsuite
 # end of testsuite
 #################################################
 
-# useful macro
-onlxplus = $(if $(and $(call eq,$(OSTYPE),Linux) $(wildcard /afs/cern.ch/eng/lhc/optics)),$1,)
+# useful macros
+onwin    = $(if       $(call eq,$(OSTYPE),Windows),$1,)
+onlxplus = $(if $(and $(call eq,$(OSTYPE),Linux),$(wildcard /afs/cern.ch/eng/lhc/optics)),$1,)
 
 # madx supported command for tests
 ifndef MADX
