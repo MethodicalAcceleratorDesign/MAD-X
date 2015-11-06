@@ -970,9 +970,6 @@ SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
   node = node -1
 
 end SUBROUTINE tmthrd
-
-
-
 SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
 
   use twiss0fi
@@ -1075,7 +1072,6 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
         bety0 = zero
         alfy0 = zero
      endif
-
      !---- Unstable due to coupling.
   else
      stabx = 0
@@ -1164,7 +1160,7 @@ SUBROUTINE twcpin1(rt,disp0,r0mat, eflag)
   endif
   disp0(5) = zero
   disp0(6) = one  
-      
+  print*, "CHECK COUNT"             
   !---- Matrix H = C + B(bar) = m + n(bar) (Sagan) (I.T) and its determinant.
   aux(1,1) = rt(3,1) + rt(2,4)
   aux(1,2) = rt(3,2) - rt(1,4)
@@ -1172,11 +1168,11 @@ SUBROUTINE twcpin1(rt,disp0,r0mat, eflag)
   aux(2,2) = rt(4,2) + rt(1,3)
   ! -- det(H) = det (C + B(bar))
   det = aux(1,1) * aux(2,2) - aux(1,2) * aux(2,1)
-  !---- trace(M-N)(Sagan) =trace(A-D) and gamma  I.T
-  dtr = (rt(1,1) + rt(2,2) - rt(3,3) - rt(4,4)) 
-
+  !---- trace(M-N)(Sagan) =trace(A-D) --  I.T
+  dtr = rt(1,1) + rt(2,2) - rt(3,3) - rt(4,4) 
   arg = dtr**2 + 4*det 
 
+  if (arg.lt.zero) print*, "UNSTABLE!"
   !---- Coupling matrix. If arg < 0, the motion is unstable! -- I.T.
   if (arg.ge.zero) then
      if (arg .eq. zero) then    
@@ -1186,15 +1182,15 @@ SUBROUTINE twcpin1(rt,disp0,r0mat, eflag)
         r0mat(2,1) = zero
         gammacp     = one
      else 
-        if(det.gt.0) then ! --- I.T "small" coupling solution
+ !       if(det.gt.zero) then ! --- I.T 
         gammacp  = sqrt(0.5 + 0.5*sqrt(dtr**2/arg))
         den     = - gammacp*sqrt(arg)
         r0mat(1:2,1:2) = sign(aux(1:2,1:2), dtr) / den !-- r0mat =R_1 = C (Sagan) 
-        else   !-- I.T highly coupled lattice
-        gammacp  = sqrt(0.5 - 0.5*sqrt(dtr**2/arg))
-        den     = gammacp*sqrt(arg)
-        r0mat(1:2,1:2) = sign(aux(1:2,1:2), dtr) / den !-- r0mat =R_1 = C (Sagan)  
-        endif
+!        if(det.gt.zero) then ! --- I.T second solution with det > 0 
+!        gammacp  = sqrt(0.5 - 0.5*sqrt(dtr**2/arg))
+!        den     = gammacp*sqrt(arg)
+!        r0mat(1:2,1:2) = sign(aux(1:2,1:2), dtr) / den !-- r0mat =R_1 = C (Sagan)  
+!        endif
     endif
     
     !--R0MAT_BAR = SRMAT^{T}S^{T} - symplectic conjugate of R0MAT 
