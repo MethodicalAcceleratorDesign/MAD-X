@@ -38,7 +38,7 @@
 # tests-all  : runs tests-all
 
 # tests order
-tests-all := \
+tests-all = \
 test-table \
 test-memory \
 \
@@ -73,11 +73,12 @@ test-touschek test-touschek-2 \
 test-sequence test-sequence-2 test-sequence-3 test-sequence-4 test-sequence-5 test-sequence-6 \
 test-line \
 test-plot test-plot-2 \
-$(call onlxplus,test-lhc test-hllhc)
+\
+$(call onlxi64,$(user-cases))
 
 # same order as tests-all, tests that take +10 seconds
 # to know the timing: make tests-all TIMER=time (on Unixes)
-tests-long := \
+tests-long = \
 test-memory \
 test-track-7 test-track-8 test-track-10 test-track-11 \
 test-dynap \
@@ -86,7 +87,12 @@ test-match-6 test-match-7 \
 test-ptc-twiss-2 \
 $(call onwin,test-ptc-twiss-old6) test-ptc-twiss-old7 \
 test-touschek test-touschek-2 \
-$(call onlxplus,test-lhc test-hllhc)
+\
+$(call onlxi64,$(user-cases))
+
+# user-cases are run only with tests-all on Lxplus + AFS + Intel 64 bit
+user-cases := \
+test-lhc test-hllhc
 
 # tests dependencies
 #test-c6t:     test-makethin-2
@@ -131,6 +137,10 @@ test-twiss:          TESTSUITE := Twiss testsuite
 # useful macros
 onwin    = $(if       $(call eq,$(OSTYPE),Windows),$1,)
 onlxplus = $(if $(and $(call eq,$(OSTYPE),Linux),$(wildcard /afs/cern.ch/eng/lhc/optics)),$1,)
+onlxi64  = $(if $(and $(call eq,$(OSTYPE),Linux),\
+                      $(call eq,$(COMP),intel),\
+                      $(call eq,$(ARCH),64),\
+                      $(wildcard /afs/cern.ch/eng/lhc/optics)),$1,)
 
 # madx supported command for tests
 ifndef MADX
