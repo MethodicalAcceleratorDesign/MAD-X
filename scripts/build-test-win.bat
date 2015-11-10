@@ -94,16 +94,16 @@ if "%1"=="notest" (
 	%echo% ""
 
 	%echo% -e "\n===== Testing madx-win64-intel ====="
-	%make% madx-win64-intel && %ls% -l madx-win64-intel.exe madx64.exe && %make% cleantest && %make% tests-all ARCH=64 NOCOLOR=yes
+	%make% madx-win64-intel && %ls% -l madx-win64-intel.exe madx64.exe && %make% cleantest && %make% tests-all COMP=intel ARCH=64 NOCOLOR=yes
 	if ERRORLEVEL 1 %echo% -e "\nERROR: make tests-all for madx-win64-intel failed" && exit /B 1
 
 	%echo% -e "\n===== Testing madx-win32-intel ====="
-	%make% madx-win32-intel && %ls% -l madx-win32-intel.exe madx32.exe && %make% cleantest && %make% tests-all ARCH=32 NOCOLOR=yes
+	%make% madx-win32-intel && %ls% -l madx-win32-intel.exe madx32.exe && %make% cleantest && %make% tests-all COMP=intel ARCH=32 NOCOLOR=yes
 	if ERRORLEVEL 1 %echo% -e "\nERROR: make tests-all for madx-win32-intel failed" && exit /B 1
 
 	%echo% -e "\n===== Testing madx-win64-gnu ====="
 	set GFORTRAN_UNBUFFERED_PRECONNECTED=y
-	%make% madx-win64-gnu && %ls% -l madx-win64-gnu.exe madx64.exe && %make% cleantest && %make% tests-all ARCH=64 NOCOLOR=yes
+	%make% madx-win64-gnu && %ls% -l madx-win64-gnu.exe madx64.exe && %make% cleantest && %make% tests-all COMP=gnu ARCH=64 NOCOLOR=yes
 	if ERRORLEVEL 1 %echo% -e "\nERROR: make tests-all for madx-win64-intel failed" && exit /B 1
 
 	REM restore the default version
