@@ -101,7 +101,7 @@ test-lhc test-hllhc
 #test-track-8: test-makethin-2
 
 # lexicographical order
-tests-to-setup := 
+tests-to-setup = 
 
 # testsuite titles (attached to first test of the suite, lex. order)
 test-aperture:       TESTSUITE := Aperture testsuite
@@ -125,7 +125,7 @@ test-ptc-twiss:      TESTSUITE := PTC Twiss testsuite
 test-rfmultipole:    TESTSUITE := RF Multipole testsuite
 test-sequence:	     TESTSUITE := Sequence testsuite
 test-survey:         TESTSUITE := Survey testsuite
-test-table:	     	 TESTSUITE := Table testsuite
+test-table:	     TESTSUITE := Table testsuite
 test-thick-quad:     TESTSUITE := Thick Element testsuite
 test-touschek:       TESTSUITE := Touschek testsuite
 test-track:          TESTSUITE := Track testsuite
