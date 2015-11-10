@@ -162,11 +162,11 @@ libmadx-linux32-gnu:
 
 libmadx-linux64-gnu:
 	$E "*** Building $@"                                # STATIC=no due to missing -fPIC in the runtime library of gfortran 64 bit
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=llvm STATIC=no && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.so
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=gnu STATIC=no && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.so
 
 libmadx-linux32-llvm:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=gnu && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.so
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=llvm && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.so
 
 libmadx-linux64-llvm:
 	$E "*** Building $@"                                # STATIC=no due to missing -fPIC in the runtime library of gfortran 64 bit
