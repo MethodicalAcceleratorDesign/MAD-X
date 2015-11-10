@@ -1,0 +1,59 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - clang++ 3.8+ linker settings
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+#
+# linker flags
+#
+
+LDFLAGS = -m$(ARCH) -O$(NOPT)
+LDLIBS  =
+
+#
+# options flags
+#
+
+ifeq ($(DEBUG),yes)
+LDFLAGS += -g -ggdb
+endif
+
+ifeq ($(PROFILE),yes)
+LDFLAGS += -pg
+endif
+
+ifeq ($(STATIC),yes)
+LDFLAGS += -static -pthread
+endif
+
+ifeq ($(SHARED),yes)
+LDFLAGS += -shared -fPIC
+endif
+
+ifeq ($(PLUGIN),yes)
+LDFLAGS += -rdynamic
+LDLIBS  += -ldl
+endif
+
+ifeq ($(OPENMP),yes)
+LDFLAGS += -fopenmp
+endif
+
+ifeq ($(SANITIZE),yes)
+LDFLAGS += -fsanitize=address -fno-omit-frame-pointer
+endif
+
+# end of makefile
