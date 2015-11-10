@@ -142,8 +142,6 @@ onlxi64  = $(if $(and $(call eq,$(OSTYPE),Linux),\
                       $(call eq,$(ARCH),64),\
                       $(wildcard /afs/cern.ch/eng/lhc/optics)),$1,)
 
-$(error $(call onlxi64,$(user-cases)))
-
 # madx supported command for tests
 ifndef MADX
 MADXCMD := $(firstword $(wildcard $(PROJECT)$(ARCH)$(BINARY_EXT) $(PROJECT)$(BINARY_EXT)))
