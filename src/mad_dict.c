@@ -1779,6 +1779,7 @@ char command_def[] =
 "type     = [s, none, none], "
 "apertype = [s, circle, circle], "
 "aperture = [r, {0}], "
+"aper_offset = [r, {0}], " /*hbu */
 "aper_tol = [r, {0, 0, 0}], "
 "slot_id  = [i, none], "
 "assembly_id = [i, none], "
@@ -2471,7 +2472,8 @@ char command_def[] =
 "makedipedge = [l, true, true], "
   /* "verbose = [l, false, true], " will replace the "option, verbose" used only by makethin */
 "makeconsistent = [l, false, true],  " /*hbu */
-"minimizeparents = [l, true, false]; " /*hbu */
+"minimizeparents = [l, true, false], " /*hbu */
+"makeendmarkers = [l, false, true];  " /*hbu */
 
 " "
 "survey: survey none 0 0 "

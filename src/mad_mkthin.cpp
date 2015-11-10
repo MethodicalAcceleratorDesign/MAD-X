@@ -1170,6 +1170,32 @@ static void place_thick_slice(element* thick_elem,const node* node, sequence* to
   }
 }
 
+static void place_new_marker(sequence* to_sequ,const node* thick_node,const bool at_start)
+{
+  const element* thick_elem=thick_node->p_elem;
+  command_parameter* aperture_param = return_param_recurse("aperture",thick_elem);
+  if(aperture_param) // only write marker when aperture information available
+  {
+    if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " thick_node " << thick_node->name << " at_start=" << at_start
+      << " aperture_param=" << aperture_param << " " << my_dump_command_parameter(aperture_param) << '\n';
+    
+    string AddToName;
+    double rel_shift;
+    if(at_start)
+    {
+      AddToName="_mken"; // for marker at entry
+      rel_shift=-0.5;    // -0.5 length from centre
+    }
+    else
+    {
+      AddToName="_mkex"; // for marker at exit
+      rel_shift= 0.5;    // +0.5 length from centre
+    }
+    element* start_end_marker=new_marker_element("marker",string(thick_elem->name+AddToName).c_str(),thick_elem);
+    place_thin_slice(thick_node,to_sequ,start_end_marker,rel_shift);
+  }
+}
+
 static sequence* slice_sequence(const string& slice_style,sequence* thick_sequ) // make recursively a sliced sequence out of the thick_seque
 {
   if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " slice_style=\"" << slice_style << "\"" << '\n';
@@ -1341,7 +1367,7 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
   {
     slice_style = pl->parameters[ipos_style]->string ;
     cout << "makethin: style chosen : " << slice_style << '\n';
-  } else slice_style = "teapot"; // Should be "hybrid" for backward compatibility
+  } else slice_style = "teapot";
 
   if(debug_fl() && kill_fringe_fl)   cout << "kill_fringe_fl="   << kill_fringe_fl   << " is on. Flags kill_ent_fringe kill_exi_fringe will be set to true for thick bend body slices" << '\n';
   if(debug_fl() && dipedge_h1_h2_fl) cout << "dipedge_h1_h2_fl=" << dipedge_h1_h2_fl << " is on. Higher order h1, h2 parameters will be kept. Tracking may become non-simplectic" << '\n';
@@ -1357,6 +1383,14 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
   {
     int MakeCons=pl->parameters[ipos_mk]->double_value;
     set_option("makeconsistent", &MakeCons);
+  }
+  
+  const int ipos_me = name_list_pos("makeendmarkers", nl);
+  if( ipos_me > -1 && nl->inform[ipos_me])
+  {
+    int MakeEndM=pl->parameters[ipos_me]->double_value;
+    set_option("makeendmarkers", &MakeEndM);
+    if (verbose_fl()) cout << "makethin makeendmarkers flag ipos_me=" << ipos_me << " MakeEndM=" << MakeEndM << '\n';
   }
 
   int iMakeDipedge;
@@ -2292,6 +2326,7 @@ element* SeqElList::create_thin_elseparator(const element* thick_elem, int slice
 void SeqElList::slice_this_node() // main stearing what to do.   called in loop over nodes which can be sliced, makes slices, adds them to  sliced_seq
 {
   bool UseDipedges=true; // Normally true.   For tests set false, to see the result without dipedges, dipedges will then be created but not written
+  const int makeendmarkers=get_option("makeendmarkers");
 
   element* thick_elem=thick_node->p_elem; // work directly on this element  --  to do translaton only once, element maybe used several times in sequence
 
@@ -2466,6 +2501,9 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
 
   if(EntryDipedge && UseDipedges) place_thin_slice(thick_node,sliced_seq,EntryDipedge,-0.5); // subtract half of the length to be at start
 
+  bool at_start;
+  if(makeendmarkers) place_new_marker(sliced_seq, thick_node, at_start=true);
+  
   for (int i=1; i<=nslices; ++i) // loop to place the nslices in the sequence
   {
     element *thin_slice_i=NULL;
@@ -2499,11 +2537,13 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
     {
       element* middle_marker=new_marker_element("marker",thick_elem->name,thick_elem);
       place_node_at(thick_node, sliced_seq, middle_marker,at_expr);
-      if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " thick_node " << thick_node->name << " nslices=" << nslices << " i=" << i << " middle=" << middle << " place middle marker at=" << at << " at_expr=" << at_expr
+      if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " thick_node " << thick_node->name << " nslices=" << nslices << " i=" << i << " middle=" << middle << " place middle marker at=" << thick_node->at_value << " at_expr=" << at_expr
         << " thin_at_value=" << my_get_expression_value(thin_at_expr) << '\n';
     }
     if(thin_slice_i && !ThickSLice) place_node_at(thick_node, sliced_seq, thin_slice_i,thin_at_expr);
   }
+
+  if(makeendmarkers) place_new_marker(sliced_seq, thick_node, at_start=false);
 
   if(ExitDipedge && UseDipedges) place_thin_slice(thick_node,sliced_seq,ExitDipedge,0.5);  // write end dipedge for dipoles
 } // SeqElList::slice_this_node()
