@@ -21,6 +21,7 @@
 #
 all-macosx:         all-macosx32        all-macosx64
 all-macosx-gnu:     all-macosx32-gnu    all-macosx64-gnu
+all-macosx-llvm:    all-macosx32-llvm   all-macosx64-llvm
 all-macosx-intel:   all-macosx32-intel  all-macosx64-intel
 
 all-macosx32:       madx-macosx32 libmadx-macosx32 libptc-macosx32 numdiff-macosx32
@@ -28,6 +29,9 @@ all-macosx64:       madx-macosx64 libmadx-macosx64 libptc-macosx64 numdiff-macos
 
 all-macosx32-gnu:   madx-macosx32-gnu libmadx-macosx32-gnu libptc-macosx32-gnu numdiff-macosx32-gnu
 all-macosx64-gnu:   madx-macosx64-gnu libmadx-macosx64-gnu libptc-macosx64-gnu numdiff-macosx64-gnu
+
+all-macosx32-llvm:  madx-macosx32-llvm libmadx-macosx32-llvm libptc-macosx32-llvm numdiff-macosx32-llvm
+all-macosx64-llvm:  madx-macosx64-llvm libmadx-macosx64-llvm libptc-macosx64-llvm numdiff-macosx64-llvm
 
 all-macosx32-intel: madx-macosx32-intel libmadx-macosx32-intel libptc-macosx32-intel numdiff-macosx32-intel
 all-macosx64-intel: madx-macosx64-intel libmadx-macosx64-intel libptc-macosx64-intel numdiff-macosx64-intel
@@ -45,10 +49,12 @@ cleanarch:
 #
 madx-macosx:        madx-macosx32         madx-macosx64
 madx-macosx-gnu:    madx-macosx32-gnu     madx-macosx64-gnu
+madx-macosx-llvm:   madx-macosx32-llvm    madx-macosx64-llvm
 madx-macosx-intel:  madx-macosx32-intel   madx-macosx64-intel
 
 .PHONY: madx-macosx32       madx-macosx64
 .PHONY: madx-macosx32-gnu   madx-macosx64-gnu
+.PHONY: madx-macosx32-llvm  madx-macosx64-llvm
 .PHONY: madx-macosx32-intel madx-macosx64-intel
 
 madx-macosx%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=yes USEGC=yes APPENDLD=yes
@@ -70,6 +76,14 @@ madx-macosx32-gnu: libs/gc/libgc-macosx32-gnu.a
 madx-macosx64-gnu: libs/gc/libgc-macosx64-gnu.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=gnu && $(MAKE_LINK) madx64
+
+madx-macosx32-llvm: libs/gc/libgc-macosx32-llvm.a
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=llvm && $(MAKE_LINK) madx32
+
+madx-macosx64-llvm: libs/gc/libgc-macosx64-llvm.a
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=llvm && $(MAKE_LINK) madx64
 
 #
 # libgc
@@ -106,11 +120,20 @@ libs/gc/libgc-macosx64-gnu.a:
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) libgc-gnu64
 
+libs/gc/libgc-macosx32-llvm.a:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_OPTS) libgc-llvm32
+
+libs/gc/libgc-macosx64-llvm.a:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_OPTS) libgc-llvm64
+
 #
 # libmadx
 #
 libmadx-macosx:       libmadx-macosx32        libmadx-macosx64
 libmadx-macosx-gnu:   libmadx-macosx32-gnu    libmadx-macosx64-gnu
+libmadx-macosx-llvm:  libmadx-macosx32-llvm   libmadx-macosx64-llvm
 libmadx-macosx-intel: libmadx-macosx32-intel  libmadx-macosx64-intel
 
 libmadx-macosx%: DESTDIR   := $(DESTDIR)libs/madx
@@ -135,11 +158,20 @@ libmadx-macosx64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=gnu && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.dylib
 
+libmadx-macosx32-llvm:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=llvm && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.dylib
+
+libmadx-macosx64-llvm:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=llvm && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.dylib
+
 #
 # libptc
 #
 libptc-macosx:        libptc-macosx32        libptc-macosx64
 libptc-macosx-gnu:    libptc-macosx32-gnu    libptc-macosx64-gnu
+libptc-macosx-llvm:   libptc-macosx32-llvm   libptc-macosx64-llvm
 libptc-macosx-intel:  libptc-macosx32-intel  libptc-macosx64-intel
 
 libptc-macosx%: DESTDIR   := $(DESTDIR)libs/ptc
@@ -164,11 +196,20 @@ libptc-macosx64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=gnu && $(MAKE_LINK1) libptc64.a && $(MAKE_LINK2) libptc64.dylib
 
+libptc-macosx32-llvm:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=llvm && $(MAKE_LINK1) libptc32.a && $(MAKE_LINK2) libptc32.dylib
+
+libptc-macosx64-llvm:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=llvm && $(MAKE_LINK1) libptc64.a && $(MAKE_LINK2) libptc64.dylib
+
 #
 # numdiff
 #
 numdiff-macosx:       numdiff-macosx32        numdiff-macosx64
 numdiff-macosx-gnu:   numdiff-macosx32-gnu    numdiff-macosx64-gnu
+numdiff-macosx-llvm:  numdiff-macosx32-llvm   numdiff-macosx64-llvm
 numdiff-macosx-intel: numdiff-macosx32-intel  numdiff-macosx64-intel
 
 numdiff-macosx%: DESTDIR  := $(DESTDIR)tools/numdiff
@@ -191,5 +232,13 @@ numdiff-macosx32-gnu:
 numdiff-macosx64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=gnu && $(MAKE_LINK) numdiff64
+
+numdiff-macosx32-llvm:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=llvm && $(MAKE_LINK) numdiff32
+
+numdiff-macosx64-llvm:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=llvm && $(MAKE_LINK) numdiff64
 
 # end of makefile

@@ -746,6 +746,8 @@ make/README.windows -text
 make/README_DEV.doc -text
 make/clean.rules -text
 make/compiler.cl -text
+make/compiler.clang -text
+make/compiler.clang++ -text
 make/compiler.g++ -text
 make/compiler.g95 -text
 make/compiler.gcc -text
