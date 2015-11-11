@@ -1777,7 +1777,7 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
   // give sbend new name by appending _s to rbend name
 
   const string rbend_name=rbend_el->name;
-  const string sbend_name=rbend_name+(rbarc_fl() ? "_s" : ""); // LD: add _s to rbend name if the length was changed
+  const string sbend_name=rbend_name;
   element* sbend_el = RbendList->find_slice(rbend_el,sbend_name);
   if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " rbend_name=" << rbend_name << " sbend_el=" << sbend_el << '\n';
   if(sbend_el) return sbend_el; // was already done
