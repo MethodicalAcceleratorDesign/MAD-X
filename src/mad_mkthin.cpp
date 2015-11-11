@@ -44,6 +44,9 @@ extern "C" {
 #define NDEBUG 1
 #include <assert.h>
 
+// LD: variables local to module that control makethin behavior (was pushed in option before)
+static int iMakeDipedge, iMakeEndMarkers, iMinimizeParents;
+
 //------------------------------- forward declarations --------------
 
 class SliceDistPos // defines the distances and positions, depending on number of slices and slicing style
@@ -1374,31 +1377,28 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
 
   // first check makethin parameters which influence the selection
   const int ipos_mp = name_list_pos("minimizeparents", nl);
-  int MinPar=0;  // or =1  to set minimizeparents to true by default
-  if( ipos_mp > -1 && nl->inform[ipos_mp]) MinPar=pl->parameters[ipos_mp]->double_value;
-  set_option("minimizeparents", &MinPar);
+  if( ipos_mp > -1 && nl->inform[ipos_mp] )
+    iMinimizeParents = pl->parameters[ipos_mp]->double_value;
+  else iMinimizeParents = 1; // default is true in mad_dict.c
 
+  int iMakeConsistent;
   const int ipos_mk = name_list_pos("makeconsistent", nl);
   if( ipos_mk > -1 && nl->inform[ipos_mk])
-  {
-    int MakeCons=pl->parameters[ipos_mk]->double_value;
-    set_option("makeconsistent", &MakeCons);
-  }
+    iMakeConsistent = pl->parameters[ipos_mk]->double_value;
+  else iMakeConsistent = 0; // default is false in mad_dict.c
   
   const int ipos_me = name_list_pos("makeendmarkers", nl);
   if( ipos_me > -1 && nl->inform[ipos_me])
-  {
-    int MakeEndM=pl->parameters[ipos_me]->double_value;
-    set_option("makeendmarkers", &MakeEndM);
-    if (verbose_fl()) cout << "makethin makeendmarkers flag ipos_me=" << ipos_me << " MakeEndM=" << MakeEndM << '\n';
-  }
+    iMakeEndMarkers = pl->parameters[ipos_me]->double_value;
+  else iMakeEndMarkers = 0; // default is false in mad_dict.c
 
-  int iMakeDipedge;
+  if (verbose_fl()) cout << "makethin makeendmarkers flag ipos_me=" << ipos_me << " iMakeEndMarkers=" << iMakeEndMarkers << '\n';
+
   const int ipos_md = name_list_pos("makedipedge", nl);
   if( ipos_md > -1 && nl->inform[ipos_md])
     iMakeDipedge=pl->parameters[ipos_md]->double_value;
-  else iMakeDipedge = 1; // default is true
-  set_option("makedipedge", &iMakeDipedge); // LD: Why does this set the global option flag?
+  else iMakeDipedge = 1; // default is true in mad_dict.c
+
   if (verbose_fl()) cout << "makethin makedipedge flag ipos_md=" << ipos_md << " iMakeDipedge=" << iMakeDipedge << '\n';
 
   if (slice_select->curr > 0)
@@ -1408,7 +1408,7 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
   }
   else  warning("makethin: no selection list,","slicing all to one thin lens.");
 
-  if(get_option("makeconsistent")) force_consistent_slices();
+  if(iMakeConsistent) force_consistent_slices();
 
   const int ipos_seq = name_list_pos("sequence", nl);
   char* name = NULL;
@@ -1648,7 +1648,8 @@ void ElementListWithSlices::Print() const
 }
 
 //--------  SeqElList
-SeqElList::SeqElList(const string& seqname,const string& slice_style,sequence* thick_sequ,sequence* sliced_seq,node* thick_node) : verbose(0),eps(1.e-15),MakeDipedge(true) // SeqElList constructor, eps used to check if values are is compatible with zero
+SeqElList::SeqElList(const string& seqname,const string& slice_style,sequence* thick_sequ,sequence* sliced_seq,node* thick_node)
+  : verbose(0), eps(1.e-15), MakeDipedge(iMakeDipedge) // SeqElList constructor, eps used to check if values are is compatible with zero
 {
   this->seqname=seqname;
   this->slice_style=slice_style;
@@ -1661,12 +1662,8 @@ SeqElList::SeqElList(const string& seqname,const string& slice_style,sequence* t
   RbendList       =new ElementListWithSlices(verbose);
   theBendEdgeList =new ElementListWithSlices(verbose);
   // verbose=3; // -- special for code development ---   turn on extra debugging within SeqElList
-  MakeDipedge=get_option("makedipedge");
-  if(verbose && !MakeDipedge) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " ***  makedipedge is off, should always be on except for backwards compatibility checks  *** " << '\n';
-  if(verbose>1)
-  {
-    cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " constructor seqname=" << seqname << " makedipedge check  MakeDipedge=" << MakeDipedge << '\n';
-  }
+  if(verbose && !iMakeDipedge) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " ***  makedipedge is off, should always be on except for backwards compatibility checks  *** " << '\n';
+  if(verbose > 1)              cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " constructor seqname=" << seqname << " makedipedge check  MakeDipedge=" << iMakeDipedge << '\n';
 }
 
 SeqElList::~SeqElList() // destructor
@@ -2043,7 +2040,7 @@ element* SeqElList::create_sliced_magnet(const element* thick_elem, int slice_no
     thin_elem_parent = create_sliced_magnet(thick_elem->parent,slice_no,ThickSLice); // recursively slice parent
   }
   const command_parameter* at_param = return_param(("at"),thick_elem);  // handle parent with possibly different slice number than child
-  const int minimizefl=get_option("minimizeparents") && !at_param && thick_elem == thick_elem->parent;
+  const int minimizefl=iMinimizeParents && !at_param && thick_elem == thick_elem->parent;
   if(minimizefl)
   {
     slice_no=slices=1; // do not slice this one
@@ -2167,7 +2164,7 @@ element* SeqElList::create_thin_solenoid(const element* thick_elem, int slice_no
   const command_parameter* at_param      = return_param("at",thick_elem);
 
   int slices = get_slices_from_elem(thick_elem);
-  const int minimizefl=get_option("minimizeparents") && !at_param && thick_elem == thick_elem->parent;
+  const int minimizefl=iMinimizeParents && !at_param && thick_elem == thick_elem->parent;
   if(minimizefl) slice_no=slices=1; // do not slice this one
 
   // set up new solenoid command
@@ -2246,7 +2243,7 @@ element* SeqElList::create_thin_elseparator(const element* thick_elem, int slice
   const command_parameter* at_param      = return_param("at",thick_elem);
 
   int slices = get_slices_from_elem(thick_elem);
-  const int minimizefl=get_option("minimizeparents") && !at_param && thick_elem == thick_elem->parent;
+  const int minimizefl=iMinimizeParents && !at_param && thick_elem == thick_elem->parent;
   if(minimizefl)
   {
     slice_no=slices=1; /* do not slice this one */
@@ -2326,7 +2323,6 @@ element* SeqElList::create_thin_elseparator(const element* thick_elem, int slice
 void SeqElList::slice_this_node() // main stearing what to do.   called in loop over nodes which can be sliced, makes slices, adds them to  sliced_seq
 {
   bool UseDipedges=true; // Normally true.   For tests set false, to see the result without dipedges, dipedges will then be created but not written
-  const int makeendmarkers=get_option("makeendmarkers");
 
   element* thick_elem=thick_node->p_elem; // work directly on this element  --  to do translaton only once, element maybe used several times in sequence
 
@@ -2502,7 +2498,7 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
   if(EntryDipedge && UseDipedges) place_thin_slice(thick_node,sliced_seq,EntryDipedge,-0.5); // subtract half of the length to be at start
 
   bool at_start;
-  if(makeendmarkers) place_new_marker(sliced_seq, thick_node, at_start=true);
+  if(iMakeEndMarkers) place_new_marker(sliced_seq, thick_node, at_start=true);
   
   for (int i=1; i<=nslices; ++i) // loop to place the nslices in the sequence
   {
@@ -2543,7 +2539,7 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
     if(thin_slice_i && !ThickSLice) place_node_at(thick_node, sliced_seq, thin_slice_i,thin_at_expr);
   }
 
-  if(makeendmarkers) place_new_marker(sliced_seq, thick_node, at_start=false);
+  if(iMakeEndMarkers) place_new_marker(sliced_seq, thick_node, at_start=false);
 
   if(ExitDipedge && UseDipedges) place_thin_slice(thick_node,sliced_seq,ExitDipedge,0.5);  // write end dipedge for dipoles
 } // SeqElList::slice_this_node()
