@@ -68,7 +68,7 @@ endif
 infotestdep:
 	$E "** Computing tests pointless files"
 	$_ $(foreach f, \
-	   	$(patsubst %.out,%,$(filter-out %$/README %$/input %.madx %.cfg %.ref %.ref.gz,$(wildcard tests$/test-*$/*))), \
+	   	$(patsubst %.out,%,$(filter-out %$/README %$/input %$/temp %.madx %.cfg %.ref %.ref.gz,$(wildcard tests$/test-*$/*))), \
 		$(if $(wildcard $f.ref $f.ref.gz),,echo $f &&)) \
 		echo "** End of pointless files"
 
