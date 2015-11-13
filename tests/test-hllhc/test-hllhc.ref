@@ -3,7 +3,7 @@
   +     MAD-X 5.02.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2015.09.24               +
-  + Execution date: 2015.11.10 18:38:51      +
+  + Execution date: 2015.11.13 17:55:52      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2012
 
@@ -5457,6 +5457,16 @@ orbit:   3.332778E-06 -1.478821E-07 -3.318265E-06 -4.044892E-08  4.915447E-06  4
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 !System,"gzip last_twiss.20";
+
+
+
+! cleaning files
+
+removefile file="db5" ;
+
+removefile file="slhc" ;
+
+removefile file="wise" ;
 
 
 
