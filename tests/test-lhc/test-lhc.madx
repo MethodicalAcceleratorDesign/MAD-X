@@ -5052,3 +5052,8 @@ aperture,range=e.ds.r8.b2/s.ds.l1.b2,
 
 ! saving sequence
 save,beam,sequence=lhcb1,lhcb2,file=result/lhc_hllhc11_round.seq;
+
+! cleaning files
+removefile file="db5" ;
+removefile file="result" ;
+removefile file="slhc" ;

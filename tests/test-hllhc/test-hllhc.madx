@@ -679,4 +679,9 @@ select, flag=twiss, clear;
 twiss,file="last_twiss.20";
 !System,"gzip last_twiss.20";
 
+! cleaning files
+removefile file="db5" ;
+removefile file="slhc" ;
+removefile file="wise" ;
+
 stop;
