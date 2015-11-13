@@ -1173,12 +1173,13 @@ static void place_thick_slice(element* thick_elem,const node* node, sequence* to
   }
 }
 
-static void place_new_marker(sequence* to_sequ,const node* thick_node,const bool at_start)
+static void place_end_marker(sequence* to_sequ,const node* thick_node,const bool at_start)
 {
   const element* thick_elem=thick_node->p_elem;
   command_parameter* aperture_param = return_param_recurse("aperture",thick_elem);
-  if(aperture_param) // only write marker when aperture information available
-  {
+  // LD: from the request, the markers should be always added
+  // if(aperture_param) // only write marker when aperture information available
+  // {
     if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " thick_node " << thick_node->name << " at_start=" << at_start
       << " aperture_param=" << aperture_param << " " << my_dump_command_parameter(aperture_param) << '\n';
     
@@ -1196,7 +1197,7 @@ static void place_new_marker(sequence* to_sequ,const node* thick_node,const bool
     }
     element* start_end_marker=new_marker_element("marker",string(thick_elem->name+AddToName).c_str(),thick_elem);
     place_thin_slice(thick_node,to_sequ,start_end_marker,rel_shift);
-  }
+  // }
 }
 
 static sequence* slice_sequence(const string& slice_style,sequence* thick_sequ) // make recursively a sliced sequence out of the thick_seque
@@ -2498,7 +2499,7 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
   if(EntryDipedge && UseDipedges) place_thin_slice(thick_node,sliced_seq,EntryDipedge,-0.5); // subtract half of the length to be at start
 
   bool at_start;
-  if(iMakeEndMarkers) place_new_marker(sliced_seq, thick_node, at_start=true);
+  if(iMakeEndMarkers) place_end_marker(sliced_seq, thick_node, at_start=true);
   
   for (int i=1; i<=nslices; ++i) // loop to place the nslices in the sequence
   {
@@ -2539,7 +2540,7 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
     if(thin_slice_i && !ThickSLice) place_node_at(thick_node, sliced_seq, thin_slice_i,thin_at_expr);
   }
 
-  if(iMakeEndMarkers) place_new_marker(sliced_seq, thick_node, at_start=false);
+  if(iMakeEndMarkers) place_end_marker(sliced_seq, thick_node, at_start=false);
 
   if(ExitDipedge && UseDipedges) place_thin_slice(thick_node,sliced_seq,ExitDipedge,0.5);  // write end dipedge for dipoles
 } // SeqElList::slice_this_node()
