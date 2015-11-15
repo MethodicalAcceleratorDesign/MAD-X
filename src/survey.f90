@@ -74,8 +74,8 @@ subroutine survey
      endif
 
      code = node_value('mad8_type ')
-     !if(code.eq.39) code=15 ! 2015-Aug-06  21:50:12  ghislain: not required here
-     !if(code.eq.38) code=24
+     !if (code.eq.39) code=15 ! 2015-Aug-06  21:50:12  ghislain: not required here
+     !if (code.eq.38) code=24
       !**** el is the arc length for all bends  ********
      el = node_value('l ')
      call suelem(el, ve, we, tilt)
@@ -182,6 +182,7 @@ subroutine suelem(el, ve, we, tilt)
   use twtrrfi
   use matrices, only : EYE
   use math_constfi, only : zero, one
+  use code_constfi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -222,7 +223,7 @@ subroutine suelem(el, ve, we, tilt)
 
   select case (code)
  
-     case (2, 3, 26) !---- RBEND, SBEND, GBEND
+     case (code_rbend, code_sbend, code_gbend) !---- RBEND, SBEND, GBEND
         angle = node_value('angle ')*node_value('other_bv ')
        if (abs(angle) .ge. 1d-13) then
            tilt =  node_value('tilt ')
@@ -250,7 +251,7 @@ subroutine suelem(el, ve, we, tilt)
         we(3,3) = costhe
         
 
-     case (8) !---- MULTIPOLE (thin, no length) 
+     case (code_multipole) !---- MULTIPOLE (thin, no length) 
         ! introduced  17.09.02 / AV, extended LD 2014.10.15
         !---- waste of CPU cycles removed
         normal(0) = zero ; call get_node_vector('knl ', nn, normal)
@@ -280,7 +281,7 @@ subroutine suelem(el, ve, we, tilt)
         we(3,3) = costhe
 
 
-     case (12) !---- Rotation around S-axis. SPECIAL CASE
+     case (code_srotation) !---- Rotation around S-axis. SPECIAL CASE
         tilt = node_value('angle ')
         we(1,1) =  cos(tilt)
         we(2,1) =  sin(tilt)
@@ -292,7 +293,7 @@ subroutine suelem(el, ve, we, tilt)
         we(2,3) = zero
         we(3,3) = one
 
-     case (13) !---- Rotation around Y-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!
+     case (code_yrotation) !---- Rotation around Y-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!
         dx = node_value('angle ')
         we(1,1) = cos(dx)
         we(2,1) = zero
@@ -317,6 +318,7 @@ end subroutine suelem
 subroutine sufill(suml, v, theta, phi, psi, globaltilt)
   use twtrrfi
   use math_constfi, only : zero
+  use code_constfi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -365,9 +367,9 @@ subroutine sufill(suml, v, theta, phi, psi, globaltilt)
   code = node_value('mad8_type ')
 
   ang = zero  
-  if (code.eq.2 .or. code.eq.3) then ! RBEND or SBEND
+  if (code .eq. code_rbend .or. code .eq. code_sbend) then ! RBEND or SBEND
      ang = node_value('angle ') * node_value('other_bv ')
-  else if (code .eq. 8) then ! multipoles (LD 2014.10.15)
+  else if (code .eq. code_multipole) then ! multipoles (LD 2014.10.15)
      normal(0) = zero; skew(0) = zero
      call get_node_vector('knl ',nn,normal)
      call get_node_vector('ksl ',ns,skew) ! process ks0l (LD 2014.10.15)

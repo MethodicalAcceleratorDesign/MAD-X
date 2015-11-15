@@ -10,6 +10,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   use fasterror
   use matrices, only : EYE
   use math_constfi, only : zero, one, two
+  use code_constfi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -78,7 +79,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 
   integer, external :: restart_sequ, advance_node, get_option, node_al_errors
   double precision, external :: node_value, get_variable, get_value
-  logical, external :: is_drift, is_thin, is_quad, is_matrix, is_dipole
+  !logical, external :: is_drift, is_thin, is_quad, is_matrix, is_dipole
 
   ! 2015-Jul-08  19:16:53  ghislain: make code more readable
   run   = switch .eq. 1
@@ -422,15 +423,17 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         if (turn .eq. 1)  then
 
            code = node_value('mad8_type ')
-           if (code .eq. 39) code=15 ! TKICKER is a KICKER
-           if (code .eq. 38) code=24 ! PLACEHOLDER is an INSTRUMENT
+           if (code .eq. code_tkicker)     code = code_kicker
+           if (code .eq. code_placeholder) code = code_instrument
 
            el = node_value('l ')
            code_buf(nlm+1) = code
            l_buf(nlm+1) = el
            call element_name(el_name,len(el_name))
 
-           if (.not. (is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
+           if ( code.ne.code_drift .and. code.ne.code_quadrupole .and. code.ne.code_sbend & 
+                .and. code.ne.code_matrix .and. el.ne.zero ) then ! rbend missing ? 
+              !if (.not. (is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
               print *," "
               print *,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
               print *," "
@@ -452,7 +455,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         if (run) nobs = node_value('obs_point ')
 
         !--------  Misalignment at beginning of element (from twissfs.f)
-        if (code .ne. 1)  then
+        if (code .ne. code_drift)  then
            AL_ERRORS = zero 
            n_align = node_al_errors(al_errors)
            if (n_align .ne. 0)  then
@@ -480,7 +483,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         endif
         
         !--------  Misalignment at end of element (from twissfs.f)
-        if (code.ne.1 .and. n_align.ne.0)  then
+        if (code .ne. code_drift .and. n_align.ne.0)  then
            do i = 1, jmax
               ZZ(:) = Z(:,i)
               call tmali2(el, zz, al_errors, betas, gammas, z(1,i), re)
@@ -629,6 +632,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   use twiss0fi
   use name_lenfi
   use math_constfi, only : zero, one
+  use code_constfi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -677,7 +681,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   TE(:6,:6,:6) = zero 
 
   !---- Drift space; no rotation or aperture check, go straight to tracking and return
-  if (code .eq. 1) then
+  if (code .eq. code_drift) then
      call ttdrf(el,track,ktrack)
      sum = sum + el 
      return
@@ -725,73 +729,73 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   ! Switch based on element code for element specific tracking
   select case (code)
 
-    case (2, 3) ! RBEND, SBEND
+    case (code_rbend, code_sbend)
        call tttdipole(track,ktrack)
      
-    case (4) ! ARBITRARY MATRIX
+    case (code_matrix)
        call tmarb(.false.,.false.,craporb,fmap,ek,re,te)
        call tttrak(ek,re,track,ktrack)
        
-    case (5) ! Thick quadrupole
+    case (code_quadrupole)
        call tttquad(track,ktrack)
        
-    case (8) ! Thin multipole
+    case (code_multipole)
        call ttmult(track,ktrack,dxt,dyt,turn)
        
-    case (9) ! Solenoid
+    case (code_solenoid)
        call trsol(track, ktrack)
        
-    case (10) ! RF cavity
+    case (code_rfcavity)
        call ttrf(track,ktrack)
        if (run) &
             call ttrfloss(turn, sum, part_id, last_turn, last_pos,last_orbit,track,ktrack)
        
-    case (11) ! ELSEPARATOR
+    case (code_elseparator)
        call ttsep(el, track, ktrack)
        
-    case (12) ! SROTATION
+    case (code_srotation)
        call ttsrot(track, ktrack)
        
-    case (13) ! YROTATION
+    case (code_yrotation)
        ! call ttyrot(track, ktrack)
        
-    case (14:16) ! CORRECTORS
+    case (code_hkicker, code_vkicker, code_kicker)
        call ttcorr(el, track, ktrack, turn)
        
-    case (20) ! ECOLLIMATOR
+    case (code_ecollimator)
        call fort_warn('TRRUN: ','found deprecated ECOLLIMATOR element; should be replaced by COLLIMATOR')
        
-    case (21) ! RCOLLIMATOR
+    case (code_rcollimator)
        call fort_warn('TRRUN: ','found deprecated RCOLLIMATOR element; should be replaced by COLLIMATOR')     
        
-    case (22) !---- Beam-beam,  standard 4D, no aperture
+    case (code_beambeam)
        parvec(5) = get_value('probe ', 'arad ')
        parvec(6) = node_value('charge ') * get_value('probe ', 'npart ')
        parvec(7) = get_value('probe ','gamma ')
        call ttbb(track, ktrack, parvec)
        
-    case (27) ! LCAV
+    case (code_twcavity)
        ! call ttlcav(el, track, ktrack)
        
-    case (33) ! DIPEDGE
+    case (code_dipedge)
        call ttdpdg(track,ktrack)
        
-    case (36) ! TRANSLATION
+    case (code_translation)
        if (onepass) call tttrans(track,ktrack)
        
-    case (37) ! CRABCAVITY
+    case (code_crabcavity)
        call ttcrabrf(track,ktrack,turn)
        
-    case (40) ! H AC-DIPOLE
+    case (code_hacdipole)
        call tthacdip(track,ktrack,turn)
        
-    case (41) ! V AC-DIPOLE
+    case (code_vacdipole)
        call ttvacdip(track,ktrack,turn)
        
-    case (42) ! NLLENS
+    case (code_nllens)
        call ttnllens(track,ktrack)
        
-    case (43) ! RF-MULTIPOLE
+    case (code_rfmultipole)
        call ttrfmult(track,ktrack,turn)
        
     case default ! The rest: do nothing
@@ -1576,6 +1580,7 @@ subroutine ttcorr(el,track,ktrack,turn)
   use twtrrfi
   use trackfi
   use math_constfi, only : zero, one, two, three, twopi
+  use code_constfi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1612,8 +1617,8 @@ subroutine ttcorr(el,track,ktrack,turn)
   dorand = get_option('quantum ') .ne. 0
 
   code = node_value('mad8_type ')
-  if (code .eq. 39) code=15 ! TKICKER is a KICKER
-  !if (code .eq. 38) code=24 ! PLACEHOLDER is an INSTRUMENT
+  if (code .eq. code_tkicker)      code = code_kicker
+  !if (code .eq. code_placeholder) code = code_instrument
 
   F_ERRORS(0:maxferr) = zero ; n_ferr = node_fd_errors(f_errors)
 
@@ -1626,13 +1631,13 @@ subroutine ttcorr(el,track,ktrack,turn)
   FIELD(1:2) = zero
   
   select case (code)
-    case (14)
+    case (code_hkicker)
        xkick = bvk*(node_value('kick ')+node_value('chkick ')+field(1)/div)
        ykick = zero
-    case (15)
+    case (code_kicker)
        xkick = bvk*(node_value('hkick ')+node_value('chkick ')+field(1)/div)
        ykick = bvk*(node_value('vkick ')+node_value('cvkick ')+field(2)/div)
-    case (16)
+    case (code_vkicker)
        xkick = zero
        ykick = bvk*(node_value('kick ')+node_value('cvkick ')+field(2)/div)
     case default
@@ -1647,12 +1652,12 @@ subroutine ttcorr(el,track,ktrack,turn)
      sintune = node_value('sintune ')
      sinphase = node_value('sinphase ')
      select case (code)
-       case (14)
+       case (code_hkicker)
           xkick = xkick + sinpeak * sin(sinphase + twopi * sintune * turn)
-       case (15)
+       case (code_kicker)
           xkick = xkick + sinpeak * sin(sinphase + twopi * sintune * turn)
           ykick = ykick + sinpeak * sin(sinphase + twopi * sintune * turn)
-       case (16)
+       case (code_vkicker)
           ykick = ykick + sinpeak * sin(sinphase + twopi * sintune * turn)
      end select
   endif
@@ -3186,6 +3191,7 @@ subroutine trclor(switch,orbit0)
   use trackfi
   use matrices, only : EYE
   use math_constfi, only : zero, one
+  use code_constfi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -3216,7 +3222,7 @@ subroutine trclor(switch,orbit0)
 
   integer, parameter :: itmax=10
   
-  logical, external :: is_drift, is_thin, is_quad, is_matrix, is_dipole
+  !logical, external :: is_drift, is_thin, is_quad, is_matrix, is_dipole
   integer, external :: restart_sequ, advance_node, get_option, node_al_errors
   double precision, external :: node_value, get_value, get_variable
 
@@ -3273,11 +3279,13 @@ subroutine trclor(switch,orbit0)
 
         bbd_pos = j
         code    = node_value('mad8_type ')
-        if (code .eq. 39) code=15 ! TKICKER is a KICKER
-        if (code .eq. 38) code=24 ! PLACEHOLDER is an INSTRUMENT
+        if (code .eq. code_tkicker)     code = code_kicker
+        if (code .eq. code_placeholder) code = code_instrument
         el      = node_value('l ')
         if (itra .eq. 1 .and. & 
-             .not.(is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
+             code.ne.code_drift .and. code.ne.code_quadrupole .and. code.ne.code_sbend & 
+             .and. code.ne.code_matrix .and. el.ne.zero ) then ! rbend missing ? 
+           !  .not.(is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
            print *,"\ncode: ",code," el: ",el,"   THICK ELEMENT FOUND\n"
            print *,"Track dies nicely"
            print *,"Thick lenses will get nowhere"
@@ -3286,7 +3294,7 @@ subroutine trclor(switch,orbit0)
         endif
         
         !--------  Misalignment at beginning of element (from twissfs.f)
-        if (code .ne. 1)  then
+        if (code .ne. code_drift)  then
            AL_ERRORS(:align_max) = zero 
            n_align = node_al_errors(al_errors)
            if (n_align .ne. 0)  then
@@ -3302,7 +3310,7 @@ subroutine trclor(switch,orbit0)
              last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass)
         
         !--------  Misalignment at end of element (from twissfs.f)
-        if (code .ne. 1 .and. n_align .ne. 0)  then
+        if (code .ne. code_drift .and. n_align .ne. 0)  then
            do i = 1, pmax
               ZZ = Z(:,i) 
               call tmali2(el, zz, al_errors, betas, gammas, z(1,i), re)
@@ -5023,33 +5031,33 @@ subroutine wzsub(x,y,u,v)
   !
 end subroutine wzsub
 
-LOGICAL FUNCTION  is_thin()
-  double precision node_value, el
-  el = node_value('l ')
-  is_thin = el .eq. 0d0;
-END FUNCTION is_thin
+! LOGICAL FUNCTION  is_thin()
+!   double precision node_value, el
+!   el = node_value('l ')
+!   is_thin = el .eq. 0d0;
+! END FUNCTION is_thin
 
-LOGICAL FUNCTION  is_drift()
-  double precision node_value, code
-  code = node_value('mad8_type ')
-  is_drift = code .eq. 1;
-END FUNCTION is_drift
+! LOGICAL FUNCTION  is_drift()
+!   double precision node_value, code
+!   code = node_value('mad8_type ')
+!   is_drift = code .eq. 1;
+! END FUNCTION is_drift
 
-LOGICAL FUNCTION  is_dipole()
-  double precision node_value, code
-  code = node_value('mad8_type ')
-  is_dipole = code .eq. 3;
-END FUNCTION is_dipole
+! LOGICAL FUNCTION  is_dipole()
+!   double precision node_value, code
+!   code = node_value('mad8_type ')
+!   is_dipole = code .eq. 3;
+! END FUNCTION is_dipole
 
-LOGICAL FUNCTION  is_matrix()
-  double precision node_value, code
-  code = node_value('mad8_type ')
-  is_matrix = code .eq. 4;
-END FUNCTION is_matrix
+! LOGICAL FUNCTION  is_matrix()
+!   double precision node_value, code
+!   code = node_value('mad8_type ')
+!   is_matrix = code .eq. 4;
+! END FUNCTION is_matrix
 
-LOGICAL FUNCTION  is_quad()
-  double precision node_value, code
-  code = node_value('mad8_type ')
-  is_quad = code .eq. 5;
-END FUNCTION is_quad
+! LOGICAL FUNCTION  is_quad()
+!   double precision node_value, code
+!   code = node_value('mad8_type ')
+!   is_quad = code .eq. 5;
+! END FUNCTION is_quad
 

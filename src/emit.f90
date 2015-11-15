@@ -5,6 +5,7 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   use emitfi
   use matrices, only : EYE
   use math_constfi, only : zero, one, three, twopi
+  use code_constfi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -119,8 +120,8 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
    el = node_value('l ')
 
    code = node_value('mad8_type ')
-   if(code .eq. 39) code=15 ! TKICKER treated as KICKER
-   if(code .eq. 38) code=24 ! PLACEHOLDER treated as INSTRUMENT
+   if(code .eq. code_tkicker)     code = code_kicker ! TKICKER treated as KICKER
+   if(code .eq. code_placeholder) code = code_instrument ! PLACEHOLDER treated as INSTRUMENT
 
    n_align = node_al_errors(al_errors)
    if (n_align .ne. 0)  then
@@ -394,6 +395,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   use matrices
   use math_constfi, only : zero, one, two, three, four, six, pi
   use phys_constfi, only : clight
+  use code_constfi
   implicit none
   !---------------------------------------------------------------------*
   ! Purpose:                                                            *
@@ -448,7 +450,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   double precision, parameter :: half  = 0.5d0, twelve = 12.d0
 
   !if (code .eq. 8)  then !--- thin multipole ; what about RF multipole ? 
-  if (code .eq. 8 .or. code .eq. 43)  then !--- thin multipole and thin RF multipole
+  if (code .eq. code_multipole .or. code .eq. code_rfmultipole)  then !--- thin multipole and thin RF multipole
      el = node_value('lrad ')
   else
      el = node_value('l ')
@@ -467,7 +469,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   ! Switch based on element code for element specific damping
   select case (code)
 
-     case (2, 3) !---- DIPOLE
+     case (code_rbend, code_sbend) !---- DIPOLE
         ! FRS 16.11.2004 This is still in the intermediate spirit of k0&k0s
         !      an = node_value('angle ')
         !      sk0 = an / el
@@ -632,19 +634,19 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(6,6) = one - two * rfac2 * (one + pt2)
         RE = matmul(RW,RE) ! ghislain ?? 
 
-     case (5,6,7) !---- Common to all pure multipoles.
+     case (code_quadrupole , code_sextupole, code_octupole) !---- Common to all pure multipoles.
         select case (code)
-        case (5)  !---- Quadrupole
+        case (code_quadrupole)  !---- Quadrupole
            sk1 = bvk * node_value('k1 ')
            str  = sk1
            n    = 1
            twon = two
-        case (6)   !---- Sextupole
+        case (code_sextupole)   !---- Sextupole
            sk2 = bvk * node_value('k2 ')
            str  = sk2 / two
            n    = 2
            twon = four
-        case (7)   !---- Octupole
+        case (code_octupole)   !---- Octupole
            sk3 = bvk * node_value('k2 ')
            str  = sk3 / six
            n    = 3
@@ -788,13 +790,13 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         if (n_ferr .gt. 0) FERROR(:2) = F_ERRORS(:min(2,n_ferr)) 
         
         select case (code)
-        case (14)
+        case (code_hkicker)
            xkick=bvk*(node_value('kick ')+node_value('chkick ')+ferror(1))
            ykick=zero
-        case (15, 39)
+        case (code_kicker, code_tkicker)
            xkick=bvk*(node_value('hkick ')+node_value('chkick ')+ferror(1))
            ykick=bvk*(node_value('vkick ')+node_value('cvkick ')+ferror(2))
-        case (16)
+        case (code_vkicker)
            xkick=zero
            ykick=bvk*(node_value('kick ')+node_value('cvkick ')+ferror(2))
         case default

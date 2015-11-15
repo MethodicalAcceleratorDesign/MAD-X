@@ -37,6 +37,57 @@ module phys_constfi
   double precision, parameter :: prad   = erad*emass/pmass  
 end module phys_constfi
 
+module code_constfi
+  implicit none
+  public
+  !--- Definition of mad8 codes in a more readable format
+  integer, parameter :: code_drift = 1
+  integer, parameter :: code_rbend = 2
+  integer, parameter :: code_sbend = 3
+  integer, parameter :: code_matrix = 4  
+  integer, parameter :: code_quadrupole = 5
+  integer, parameter :: code_sextupole = 6
+  integer, parameter :: code_octupole = 7
+  integer, parameter :: code_multipole = 8
+  integer, parameter :: code_solenoid = 9
+  integer, parameter :: code_rfcavity = 10
+  integer, parameter :: code_elseparator = 11
+  integer, parameter :: code_srotation = 12
+  integer, parameter :: code_yrotation = 13
+  integer, parameter :: code_hkicker = 14
+  integer, parameter :: code_kicker = 15
+  integer, parameter :: code_vkicker = 16
+  integer, parameter :: code_hmonitor = 17
+  integer, parameter :: code_monitor = 18
+  integer, parameter :: code_vmonitor = 19
+  integer, parameter :: code_ecollimator = 20
+  integer, parameter :: code_rcollimator = 21
+  integer, parameter :: code_beambeam = 22
+  ! code 23 is missing
+  integer, parameter :: code_instrument = 24
+  integer, parameter :: code_marker = 25
+  integer, parameter :: code_gbend = 26
+  integer, parameter :: code_twcavity = 27
+  ! code 28 is missing
+  integer, parameter :: code_wire = 29
+  integer, parameter :: code_slmonitor = 30
+  integer, parameter :: code_blmonitor = 31
+  integer, parameter :: code_imonitor = 32
+  integer, parameter :: code_dipedge = 33
+  ! code 34 is missing
+  integer, parameter :: code_changeref = 35
+  integer, parameter :: code_translation = 36
+  integer, parameter :: code_crabcavity = 37
+  integer, parameter :: code_placeholder = 38
+  integer, parameter :: code_tkicker = 39
+  integer, parameter :: code_hacdipole = 40
+  integer, parameter :: code_vacdipole = 41
+  integer, parameter :: code_nllens = 42
+  integer, parameter :: code_rfmultipole = 43
+  integer, parameter :: code_collimator = 44
+end module code_constfi
+
+  
 module Inf_NaN_Detection
 
   !!     Inf_NaN_Detection module

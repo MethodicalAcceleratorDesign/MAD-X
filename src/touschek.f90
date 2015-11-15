@@ -238,6 +238,7 @@ subroutine cavtouschek (um,uloss,iflag)
   use touschekfi
   use math_constfi, only : zero, one, two, three, half, ten6p, ten3m, pi, twopi
   use phys_constfi, only : clight
+  use code_constfi
   implicit none
 
   integer :: i, lg, code, flag, iflag
@@ -269,10 +270,10 @@ subroutine cavtouschek (um,uloss,iflag)
   i = restart_sequ()
 10 continue
   code = node_value('mad8_type ')
-  if(code.eq.39) code=15
-  if(code.eq.38) code=24
+  if (code .eq. code_tkicker) code = code_kicker
+  if (code .eq. code_placeholder) code = code_instrument
   ! cavity
-  if (code .eq. 10) then
+  if (code .eq. code_rfcavity) then
      lg = get_string('element ', 'name ', el_name)
      el = node_value('l ')
      rfv = node_value('volt ')

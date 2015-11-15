@@ -30,6 +30,7 @@ end subroutine enprem
 subroutine enprgl
   use ibsdbfi
   use math_constfi, only : zero, one
+  use code_constfi
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -66,9 +67,10 @@ end subroutine enprgl
 
 subroutine cavprt()
   use name_lenfi
+  use code_constfi
   implicit none
 
-  integer :: i, lg, code 
+  integer :: i, lg
   double precision :: el, rfv, rff, rfl, deltap  
   character(len=name_len) :: sequ_name, el_name
 
@@ -80,8 +82,7 @@ subroutine cavprt()
   i = restart_sequ()
 
   do
-     code = node_value('mad8_type ')
-     if (code .eq. 10) then      ! cavity
+     if (node_value('mad8_type ') .eq. code_rfcavity) then
         lg = get_string('element ', 'name ', el_name)
         el = node_value('l ')
         rfv = node_value('volt ')

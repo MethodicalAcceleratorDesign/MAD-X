@@ -599,6 +599,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   use spch_bbfi
   use matrices, only : EYE
   use math_constfi, only : zero
+  use code_constfi
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -639,7 +640,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   integer, external :: restart_sequ, advance_node, node_al_errors, get_vector, get_option
   double precision, external :: node_value
   double precision, parameter :: orb_limit=1d1 
-  integer, parameter :: ccode=15, pcode=18, max_rep=100
+  integer, parameter :: max_rep=100
   
   debug = get_option('debug ')
 
@@ -683,19 +684,19 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
 
   code = node_value('mad8_type ')
   
-  if (code.eq.39) code=15 ! TKICKER treated as KICKER
-  if (code.eq.38) code=24 ! PLACEHOLDER treated as INSTRUMENT
+  if (code .eq. code_tkicker)     code = code_kicker ! TKICKER treated as KICKER
+  if (code .eq. code_placeholder) code = code_instrument ! PLACEHOLDER treated as INSTRUMENT
   
   if (thr_on .gt. 0)  then
      !---  threader is on - keep position,orbit,matrix,and tensor for restart
      select case (code)
-     case (14) ! HKICKER
+     case (code_hkicker) ! HKICKER
             restsum(1) = suml
             RESTORB(:,1) = ORBIT(:) 
             RESTM(:,:,1) = RT(:,:)    
             RESTT(:,:,:,1) = TT(:,:,:)  
         
-     case (15) ! KICKER or TKICKER
+     case (code_kicker) ! KICKER or TKICKER
             restsum(1) = suml
             RESTORB(:,1) = ORBIT(:) 
             RESTM(:,:,1) = RT(:,:)    
@@ -706,7 +707,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
             RESTM(:,:,2) = RT(:,:)   
             RESTT(:,:,:,2) = TT(:,:,:)  
 
-     case (16) ! VKICKER
+     case (code_vkicker) ! VKICKER
             restsum(2) = suml
             RESTORB(:,2) = ORBIT(:) 
             RESTM(:,:,2) = RT(:,:)   
@@ -746,12 +747,12 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   
   if (thr_on .gt. 0)  then !---  threader is on;  keep matrix  
      select case (code)
-     case (14) ! HKICKER
+     case (code_hkicker) ! HKICKER
             CMATR(1:6,1:6,1) = RT(1:6,1:6) 
             j = name_len
             call element_name(c_name(1),j)
             coc_cnt(1) = node_value('occ_cnt ')
-     case (15) ! KICKER or TKICKER
+     case (code_kicker) ! KICKER or TKICKER
             CMATR(1:6,1:6,1) = RT(1:6,1:6) 
             CMATR(1:6,1:6,2) = RT(1:6,1:6) 
             j = name_len
@@ -759,7 +760,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
             coc_cnt(1) = node_value('occ_cnt ')
             call element_name(c_name(2),j)
             coc_cnt(2) = node_value('occ_cnt ')
-     case (16) ! VKICKER
+     case (code_vkicker) ! VKICKER
             CMATR(1:6,1:6,2) = RT(1:6,1:6) 
             j = name_len
             call element_name(c_name(2),j)
@@ -767,7 +768,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
      end select
   endif
   
-  if (code .ge. pcode-1 .and. code .le. pcode+1)  then !---  monitors (code 17 to 19)  
+  if (code .ge. code_monitor - 1 .and. code .le. code_monitor + 1)  then !---  monitors (code 17 to 19)  
      enable = node_value('enable ')
      if (save .gt. 0 .and. enable .gt. 0) &
           call store_node_vector('orbit_ref ', 6, orbit)
@@ -778,8 +779,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
         call get_node_vector('orbit_ref ', 6, reforb)
         
         do kpro = 1, 2 ! projection plane: x or y
-           if (      kpro .eq. 1 .and. code .le. pcode &        !--- plane is x and monitor or hmonitor 
-                .or. kpro .eq. 2 .and. code .ge. pcode)  then   !--- plane is y and monitor or vmonitor
+           if (      kpro .eq. 1 .and. code .le. code_monitor &        !--- plane is x and monitor or hmonitor 
+                .or. kpro .eq. 2 .and. code .ge. code_monitor)  then   !--- plane is y and monitor or vmonitor
               
               j = 2*kpro-1
               dorb(j) = orbit(j) - reforb(j) !--- orbit distortion
@@ -862,6 +863,7 @@ end SUBROUTINE tmfrst
 
 SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
   use matrices
+  use code_constfi
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -888,14 +890,13 @@ SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
   integer, external :: advance_node, retreat_node
   double precision, external :: node_value
   double precision, parameter :: tol1min=1.d-2 
-  integer, parameter :: ccode=15
-
+  
   error = 0
   
   !---  keep position of current pickup
   npick = node
 
-  itp = ccode + (-1)**kpro ! 14 or 16
+  itp = code_kicker + (-1)**kpro ! 14 or 16
  
   lc  = 2 * (kpro - 1)
   lc1 = lc + 1
@@ -916,11 +917,11 @@ SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
   node = node - 1
   code = node_value('mad8_type ')
 
-  if (code.eq.39) code=15 ! TKICKER is a KICKER
-  if (code.eq.38) code=24 ! PLACEHOLDE is an INSTRUMENT
+  if (code .eq. code_tkicker)     code = code_kicker ! TKICKER is a KICKER
+  if (code .eq. code_placeholder) code = code_instrument ! PLACEHOLDE is an INSTRUMENT
 
   !-- if wrong corrector or not a corrector, loop
-  if (code .ne. itp .and. code .ne. ccode) goto 10 
+  if (code .ne. itp .and. code .ne. code_kicker) goto 10 
 
   !--- corrector found for the projection plane
   ncorr = node
@@ -1147,6 +1148,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   use name_lenfi
   use matrices, only: EYE
   use math_constfi, only : zero, one, two
+  use code_constfi
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -1233,8 +1235,8 @@ SUBROUTINE twcpgo(rt,orbit0)
 
   sector_sel = node_value('sel_sector ') .ne. zero .and. sectormap
   code = node_value('mad8_type ')
-  if (code.eq.39) code=15 ! TKICKER is a KICKER
-  if (code.eq.38) code=24 ! PLACEHOLDER is an INSTRUMENT
+  if (code .eq. code_tkicker)     code = code_kicker ! TKICKER is a KICKER
+  if (code .eq. code_placeholder) code = code_instrument ! PLACEHOLDER is an INSTRUMENT
   bvk = node_value('other_bv ')
   elpar_vl = el_par_vector(g_polarity, g_elpar)
   el = node_value('l ')
@@ -1640,6 +1642,7 @@ SUBROUTINE twchgo
   use twissbeamfi, only : dorad, deltap, beta, gamma
   use spch_bbfi
   use math_constfi, only : zero, one, two
+  use code_constfi
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -1694,8 +1697,8 @@ SUBROUTINE twchgo
   el = node_value('l ')
 
   code = node_value('mad8_type ')
-  if (code.eq.39) code=15 ! TKICKER is a KICKER
-  if (code.eq.38) code=24 ! PLACEHOLDER is an INSTRUMENT
+  if (code .eq. code_tkicker)     code = code_kicker ! TKICKER is a KICKER
+  if (code .eq. code_placeholder) code = code_instrument ! PLACEHOLDER is an INSTRUMENT
 
   !---- Physical element.
   n_align = node_al_errors(al_errors)
@@ -2116,6 +2119,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
   use time_varfi
   use matrices, only: EYE
   use math_constfi, only : zero
+  use code_constfi
   implicit none
   !----------------------------------------------------------------------*
   !     purpose:                                                         *
@@ -2155,61 +2159,79 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
   !---- Select element type.
   select case (code)
      
-     case (1, 17:21, 24, 27, 44) !---- Drift space, monitor, collimator, instrument
+     case (code_drift, code_hmonitor:code_rcollimator, code_instrument, code_twcavity, &
+        code_slmonitor:code_imonitor, code_placeholder, code_collimator)
+        !---- Drift space, monitors and derivatives, collimators, instrument
         call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
         
-     case (2, 3) !---- Bending magnet.
+     case (code_rbend, code_sbend) !---- Bending magnet.
         call tmbend(ftrk,orbit,fmap,el,ek,re,te)
 
-     case (4) !---- Arbitrary matrix.
+     case (code_matrix) !---- Arbitrary matrix.
         call tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
 
-     case (5) !---- Quadrupole.
+     case (code_quadrupole) !---- Quadrupole.
         call tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)   
 
-     case (6) !---- Sextupole.
+     case (code_sextupole) !---- Sextupole.
         call tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
-     case (7) !---- Octupole.
+     case (code_octupole) !---- Octupole.
         call tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
-     case (8) !---- Multipole.
+     case (code_multipole) !---- Multipole.
         call tmmult(fsec,ftrk,orbit,fmap,re,te)
 
-     case (9) !---- Solenoid.
+     case (code_solenoid) !---- Solenoid.
         call tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
-     case (10) !---- RF cavity.
+     case (code_rfcavity) !---- RF cavity.
         call tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
-     case (11) !---- Electrostatic separator.
+     case (code_elseparator) !---- Electrostatic separator.
         call tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
-     case (12) !---- Rotation around s-axis.
+     case (code_srotation) !---- Rotation around s-axis.
         call tmsrot(ftrk,orbit,fmap,ek,re,te)
 
-     case (13) !---- Rotation around y-axis.
+     case (code_yrotation) !---- Rotation around y-axis.
         call tmyrot(ftrk,orbit,fmap,ek,re,te)
 
-     case (14:16) !---- Correctors.
+     case (code_hkicker, code_kicker, code_vkicker) !---- Correctors.
         call tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
-     case (22) !---- Beam-beam. (Particles/bunch taken for the opposite beam).
+     case (code_beambeam) !---- Beam-beam. (Particles/bunch taken for the opposite beam).
         call tmbb(fsec,ftrk,orbit,fmap,re,te)
 
-     case (33) !--- Dipedge.
+     case (code_marker) !---- Marker
+        ! nothing on purpose!
+        
+     case (code_gbend) !---- Gbend
+        ! nothing for now...
+        
+     case (code_wire) !---- Wire
+        ! nothing for now...
+        
+     case (code_dipedge) !---- Dipedge.
         call tmdpdg(ftrk,orbit,fmap,ek,re,te)
 
-     case (37) !---- Crab-Cavity.
-        call tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
+     case (code_changeref, code_translation) !--- Changeref, Translation
+        ! nothing for now...
         
-     case (42) !---- Non-Linear thin Lens
+     case (code_crabcavity) !---- Crab-Cavity.
+        call tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
+
+     case (code_tkicker, code_hacdipole, code_vacdipole) !---- Tkicker, Hacdipole, Vacdipole
+        ! nothing in MAD-X only used for conversion to sixtrack
+        
+     case (code_nllens) !---- Non-Linear thin Lens
         call tmnll(fsec,ftrk,orbit,fmap,ek,re,te)
 
-     case (43) !---- RF-Multipole.
+     case (code_rfmultipole) !---- RF-Multipole.
         call tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
 
-     case default !--- anything else
+     case default !--- anything else:
+        ! nil (23, 28, 34)
         
      end select
 
@@ -2811,6 +2833,7 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use math_constfi, only : zero, one, three, half
   use twissbeamfi, only : dorad, deltap, gamma, arad
+  use code_constfi
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -2859,15 +2882,15 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
      code = node_value('mad8_type ')
      select case (code)
 
-       case (14)
+       case (code_hkicker)
           xkick=bvk*(node_value('kick ')+node_value('chkick ')+f_errors(0)/div)
           ykick=zero
         
-       case (15)
+       case (code_kicker)
           xkick=bvk*(node_value('hkick ')+node_value('chkick ')+f_errors(0)/div)
           ykick=bvk*(node_value('vkick ')+node_value('cvkick ')+f_errors(1)/div)
 
-       case(16)
+       case (code_vkicker)
           xkick=zero
           ykick=bvk*(node_value('kick ')+node_value('cvkick ')+f_errors(1)/div)
           
@@ -3232,7 +3255,7 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision, intent(OUT) :: ek(6), re(6,6), te(6,6,6)
   
   logical :: cplxy
-  integer :: i, code, n_ferr, elpar_vl
+  integer :: i, n_ferr, elpar_vl
   double precision :: f_errors(0:maxferr)
   double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   double precision :: rw(6,6), tw(6,6,6) 
