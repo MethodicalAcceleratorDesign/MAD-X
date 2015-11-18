@@ -228,48 +228,6 @@ static void c_haveit(double *dmat, double *monvec, double *corvec,
   myfree(rout_name, xd);
 }
 
-/* static int c_svddec(double *dmat, int imon, int icor, int *sing, double *sngcut, */
-/*         double *sngval) { */
-/*   const char *rout_name = "c_svddev"; */
-/*   int flag; */
-/*   int debug = get_option("debug"); */
-
-/*   double *s, *u, *v, *w, *ut, *vt, *wt; */
-/*   double *ws, *wv; */
-/*   int *sw; */
-
-/*   s  = mycalloc_atomic("c_svddec_s" , icor*imon, sizeof *s); */
-/*   u  = mycalloc_atomic("c_svddec_u" , icor*imon, sizeof *u); */
-/*   v  = mycalloc_atomic("c_svddec_v" , icor*imon, sizeof *v); */
-/*   w  = mycalloc_atomic("c_svddec_w" , icor*imon, sizeof *w); */
-/*   ut = mycalloc_atomic("c_svddec_ut", icor*imon, sizeof *ut); */
-/*   vt = mycalloc_atomic("c_svddec_vt", icor*imon, sizeof *vt); */
-/*   wt = mycalloc_atomic("c_svddec_wt", icor*imon, sizeof *wt); */
-/*   ws = mycalloc_atomic("c_svddec_ws", icor , sizeof *ws); */
-/*   wv = mycalloc_atomic("c_svddec_wv", icor , sizeof *wv); */
-/*   sw = mycalloc_atomic("c_svddec_sw", icor , sizeof *sw); */
-
-/*   if (imon >= icor) */
-/*     svddec_m_(dmat, s, u, v, w, ut, vt, wt, ws, wv, sw, sngcut, sngval, */
-/*         &imon, &icor, &flag, sing, &debug); */
-/*   else */
-/*     svddec_c_(dmat, s, u, v, w, ut, vt, wt, ws, wv, sw, sngcut, sngval, */
-/*         &imon, &icor, &flag, sing, &debug); */
-
-/*   myfree(rout_name, s); */
-/*   myfree(rout_name, u); */
-/*   myfree(rout_name, v); */
-/*   myfree(rout_name, w); */
-/*   myfree(rout_name, ut); */
-/*   myfree(rout_name, vt); */
-/*   myfree(rout_name, wt); */
-/*   myfree(rout_name, ws); */
-/*   myfree(rout_name, wv); */
-/*   myfree(rout_name, sw); */
-
-/*   return flag; */
-/* } */
-
 static int c_svddec(double *dmat, int imon, int icor, int *sing, 
 		     double *sngcut, double *sngval) {
   const char *rout_name = "c_svddec";
@@ -299,59 +257,6 @@ static int c_svddec(double *dmat, int imon, int icor, int *sing,
 
   return flag;
 }
-
-/* static int c_svdcorr(double *dmat, double *xin, double *cor, double *res, */
-/* 		     int *nx, int imon, int icor) { */
-/*   const char *rout_name = "c_svdcorr"; */
-/*   int flag; */
-/*   int debug; */
-
-/*   double *s, *u, *v, *w, *ut, *vt, *wt; */
-/*   double *xa, *xb, *xp, *wv, *ws; */
-/*   int *sw; */
-
-/*   s  = mycalloc_atomic("c_svdcorr_s" , icor*imon, sizeof *s); */
-/*   u  = mycalloc_atomic("c_svdcorr_u" , icor*imon, sizeof *u); */
-/*   v  = mycalloc_atomic("c_svdcorr_v" , icor*imon, sizeof *v); */
-/*   w  = mycalloc_atomic("c_svdcorr_w" , icor*imon, sizeof *w); */
-/*   ut = mycalloc_atomic("c_svdcorr_ut", icor*imon, sizeof *ut); */
-/*   vt = mycalloc_atomic("c_svdcorr_vt", icor*imon, sizeof *vt); */
-/*   wt = mycalloc_atomic("c_svdcorr_wt", icor*imon, sizeof *wt); */
-
-/*   xa = mycalloc_atomic("c_svdcorr_xa", imon, sizeof *xa); */
-/*   xb = mycalloc_atomic("c_svdcorr_xb", imon, sizeof *xb); */
-/*   xp = mycalloc_atomic("c_svdcorr_xp", imon, sizeof *xp); */
-/*   ws = mycalloc_atomic("c_svdcorr_xp", icor, sizeof *ws); */
-/*   wv = mycalloc_atomic("c_svdcorr_xp", icor, sizeof *wv); */
-
-/*   sw = mycalloc_atomic("c_svdcorr_sw", icor, sizeof *sw); */
-
-/*   debug = get_option("debug"); */
-
-/*   if (imon >= icor) */
-/*     svdcorr_m_(dmat, s, u, v, w, ut, vt, wt, xin, cor, res, xa, xb, xp, ws, */
-/* 	       wv, sw, nx, &imon, &icor, &flag, &debug); */
-/*   else */
-/*     svdcorr_c_(dmat, s, u, v, w, ut, vt, wt, xin, cor, res, xa, xb, xp, ws, */
-/* 	       wv, sw, nx, &imon, &icor, &flag, &debug); */
-  
-/*   myfree(rout_name, s); */
-/*   myfree(rout_name, u); */
-/*   myfree(rout_name, v); */
-/*   myfree(rout_name, w); */
-/*   myfree(rout_name, ut); */
-/*   myfree(rout_name, vt); */
-/*   myfree(rout_name, wt); */
-/*   myfree(rout_name, sw); */
-/*   myfree(rout_name, xa); */
-/*   myfree(rout_name, xb); */
-/*   myfree(rout_name, xp); */
-/*   myfree(rout_name, ws); */
-/*   myfree(rout_name, wv); */
-  
-/*   return flag; */
-/* } */
-
 
 static int c_svdcorr(double *dmat, double *xin, double *cor, double *res,
 		      int *nx, int imon, int icor) {
@@ -419,8 +324,6 @@ static void fill_orbit_table(struct table* t_out, struct table* t_in)
     }
   }
 }
-
-/* revert to old version after Thys Risselada's fix of Micado */
 
 static void correct_setcorr(struct in_cmd* cmd) {
   // 2013-Dec-04  08:56:16  ghislain: The command SETCORR is not documented.
@@ -492,37 +395,26 @@ static void correct_setcorr(struct in_cmd* cmd) {
       stolower(name);
       strcpy(slname, strip(name));
       supp_tb(slname);
-
+      
       /* printf("corrs: %s %d %e %e %e %e\n",name,ix,xold,yold,xnew,ynew); */
       nextnode = mysequ->ex_start;
       while (nextnode != ndexe) {
-  stolower(name);
-  strcpy(slname, strip(name));
-  supp_tb(slname);
-
-  strcpy(nname, nextnode->name);
-  stolower(nname);
-  strcpy(slnname, strip(nname));
-  supp_tb(slnname);
-
-  /* printf("seq and input (0): %s %d %s %d\n", nname,strlen(nname),  name,strlen(name));
-     printf("seq d in (2): %s %d %s %d\n",slnname,strlen(slnname),slname,strlen(slname)); */
-
-  if (strcmp(slname, slnname) == 0) {
-    /*
-      printf("Corrector selection found: %s, %s %d\n",lname,nextnode->name,nextnode->sel_err);
-      printf("corrs: %s %d %e %e %e %e\n",name,ix,xold,yold,xnew,ynew);
-      printf("corrs in sequence: %s %e %e\n",nextnode->name,nextnode->chkick,nextnode->cvkick);
-    */
-    nextnode->chkick += xnew;
-    nextnode->cvkick += ynew;
-    /*
-      printf("corrs in sequence: %s %e %e\n",nextnode->name,nextnode->chkick,nextnode->cvkick);
-    */
-    nextnode = ndexe;
-  } else {
-    nextnode = nextnode->next;
-  }
+	stolower(name);
+	strcpy(slname, strip(name));
+	supp_tb(slname);
+	
+	strcpy(nname, nextnode->name);
+	stolower(nname);
+	strcpy(slnname, strip(nname));
+	supp_tb(slnname);
+		
+	if (strcmp(slname, slnname) == 0) {
+	  nextnode->chkick += xnew;
+	  nextnode->cvkick += ynew;
+	  nextnode = ndexe;
+	} else {
+	  nextnode = nextnode->next;
+	}
       }      
     }
     i++;
@@ -584,49 +476,34 @@ static void correct_readcorr(struct in_cmd* cmd) {
 
     if (ix == 0) { // 2013-Dec-02  18:19:55  ghislain: what was that supposed to test ? 
                    // Before: just the last return value above, Now: any of the above return values ? 
-      /* printf("corrs: %s %d %e %e %e %e\n",name,ix,xold,yold,xnew,ynew); */
       nextnode = mysequ->ex_start;
       while (nextnode != ndexe) {
-  // loop over all elements in the sequence; look for the corrector "name"
-  strcpy(lname, name);
-  stolower(lname);
-  strcpy(slname, strip(lname));
-  uslname = supp_tb(slname);
-
-  strcpy(nname, nextnode->name);
-  strcpy(lnname, nname);
-  stolower(lnname);
-  strcpy(slnname, strip(lnname));
-  uslnname = supp_tb(slnname);
-
-  /* printf("seq and input (0): %s %d %s %d\n", nname,strlen(nname),  name,strlen(name));
-     printf("seq d in (1): %s %d %s %d\n",lnname,strlen(lnname),lname,strlen(lname));
-     printf("seq d in (2): %s %d %s %d\n",slnname,strlen(slnname),slname,strlen(slname));
-     printf("seq d in (3): %s %d %s %d\n",uslnname,strlen(uslnname),uslname,strlen(uslname));
-     printf("compare: %s %d %s %d \n",uslname,strlen(uslname),uslnname,strlen(uslnname)); */
-
-  if (strcmp(uslname, uslnname) == 0) {
-    // found element "nname" matches the corrector "name"
-    /*
-      printf("Corrector selection found: %s, %s %d\n",lname,nextnode->name,nextnode->sel_err);
-      printf("corrs: %s %d %e %e %e %e\n",name,ix,xold,yold,xnew,ynew);
-      printf("corrs in sequence: %s %e %e\n",nextnode->name,nextnode->chkick,nextnode->cvkick);
-    */
-    // add the kicks read from corr table for corrector "name" to the 
-    // already existing kick values for element "nname"
-    nextnode->chkick += xnew;
-    nextnode->cvkick += ynew;
-    /*
-      printf("corrs in sequence: %s %e %e\n",nextnode->name,nextnode->chkick,nextnode->cvkick);
-    */
-    // and call it quit for this corrector by placing ourselves at end of sequence 
-    // which will break the loop over sequence nodes. 
-    nextnode = ndexe;
-  } else 
-    {
-      // the "nname" element does not match the "name" corector; continue along the sequence.
-      nextnode = nextnode->next;
-    }
+	// loop over all elements in the sequence; look for the corrector "name"
+	strcpy(lname, name);
+	stolower(lname);
+	strcpy(slname, strip(lname));
+	uslname = supp_tb(slname);
+	
+	strcpy(nname, nextnode->name);
+	strcpy(lnname, nname);
+	stolower(lnname);
+	strcpy(slnname, strip(lnname));
+	uslnname = supp_tb(slnname);
+	
+	if (strcmp(uslname, uslnname) == 0) {
+	  // found element "nname" matches the corrector "name"
+	  // add the kicks read from corr table for corrector "name" to the 
+	  // already existing kick values for element "nname"
+	  nextnode->chkick += xnew;
+	  nextnode->cvkick += ynew;
+	  // and call it quit for this corrector by placing ourselves at end of sequence 
+	  // which will break the loop over sequence nodes. 
+	  nextnode = ndexe;
+	} else 
+	  {
+	    // the "nname" element does not match the "name" corector; continue along the sequence.
+	    nextnode = nextnode->next;
+	  }
       }
     }
     i++;
@@ -1005,68 +882,68 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
 
   for (j = 0; j < b1->curr; j++) {
     if ((strncmp(atm[iplane - 1], b1->p_nodes[j]->base_name, 4) == 0)
-  || (strncmp(atm[2], b1->p_nodes[j]->base_name, 4) == 0)) {
+	|| (strncmp(atm[2], b1->p_nodes[j]->base_name, 4) == 0)) {
       /*    printf("1m: %s %ld\n", b1->p_nodes[j]->name, strstr(".b2", b1->p_nodes[j]->name)); */
       if (strstr(b1->p_nodes[j]->name, ".b1") != NULL ) {
-  mon_l1->id_ttb[0] = j;
-  mon_l1->id_ttb[1] = -1;
-  mon_l1->enable = b1->p_nodes[j]->enable;
-  mon_l1->p_node = b1->p_nodes[j];
-  mon_l1->next = mon_l1;
-  mon_l1->next++;
-  mon_l1++;
-  cntm1++;
+	mon_l1->id_ttb[0] = j;
+	mon_l1->id_ttb[1] = -1;
+	mon_l1->enable = b1->p_nodes[j]->enable;
+	mon_l1->p_node = b1->p_nodes[j];
+	mon_l1->next = mon_l1;
+	mon_l1->next++;
+	mon_l1++;
+	cntm1++;
       } else {
-  /*      printf("Removed: %s\n",b1->p_nodes[j]->name); */
+	/*      printf("Removed: %s\n",b1->p_nodes[j]->name); */
       }
     }
 
     if ((strncmp(atc[iplane - 1], b1->p_nodes[j]->base_name, 4) == 0)
-  || (strncmp(atc[2], b1->p_nodes[j]->base_name, 4) == 0)) {
+	|| (strncmp(atc[2], b1->p_nodes[j]->base_name, 4) == 0)) {
       /*    printf("1c: %s %ld\n", b1->p_nodes[j]->name, b1->p_nodes[j]->name); */
       if (strstr(b1->p_nodes[j]->name, ".b1") != NULL ) {
-  cor_l1->id_ttb[0] = j;
-  cor_l1->id_ttb[1] = -1;
-  cor_l1->enable = b1->p_nodes[j]->enable;
-  cor_l1->p_node = b1->p_nodes[j];
-  cor_l1->p_node_s1 = b1->p_nodes[j];
-  cor_l1->p_node_s2 = NULL;
+	cor_l1->id_ttb[0] = j;
+	cor_l1->id_ttb[1] = -1;
+	cor_l1->enable = b1->p_nodes[j]->enable;
+	cor_l1->p_node = b1->p_nodes[j];
+	cor_l1->p_node_s1 = b1->p_nodes[j];
+	cor_l1->p_node_s2 = NULL;
 
-  if (command_par_value("corzero", cmd->clone) > 0) {
-    if (iplane == 1)
-      cor_l1->p_node_s1->chkick = 0.0;
-    if (iplane == 2)
-      cor_l1->p_node_s1->cvkick = 0.0;
-  }
-
-  cor_l1->next = cor_l1;
-  cor_l1->next++;
-  cor_l1++;
-  cntc1++;
+	if (command_par_value("corzero", cmd->clone) > 0) {
+	  if (iplane == 1)
+	    cor_l1->p_node_s1->chkick = 0.0;
+	  if (iplane == 2)
+	    cor_l1->p_node_s1->cvkick = 0.0;
+	}
+	
+	cor_l1->next = cor_l1;
+	cor_l1->next++;
+	cor_l1++;
+	cntc1++;
       } else {
-  /*      printf("Removed: %s\n",b1->p_nodes[j]->name); */
+	/* printf("Removed: %s\n",b1->p_nodes[j]->name); */
       }
     }
   }
-
+  
   mon_l2 = mon_l1;
   cor_l2 = cor_l1;
-
+  
   for (j = 0; j < b2->curr; j++) {
     if ((strncmp(atm[iplane - 1], b2->p_nodes[j]->base_name, 4) == 0)
-  || (strncmp(atm[2], b2->p_nodes[j]->base_name, 4) == 0)) {
-      /*    printf("2m: %s %ld\n", b2->p_nodes[j]->name, b2->p_nodes[j]->name); */
+	|| (strncmp(atm[2], b2->p_nodes[j]->base_name, 4) == 0)) {
+      /* printf("2m: %s %ld\n", b2->p_nodes[j]->name, b2->p_nodes[j]->name); */
       if (strstr(b2->p_nodes[j]->name, ".b2") != NULL ) {
-  mon_l2->id_ttb[0] = -1;
-  mon_l2->id_ttb[1] = j;
-  mon_l2->enable = b2->p_nodes[j]->enable;
-  mon_l2->p_node = b2->p_nodes[j];
-  mon_l2->next = mon_l2;
-  mon_l2->next++;
-  mon_l2++;
-  cntm2++;
+	mon_l2->id_ttb[0] = -1;
+	mon_l2->id_ttb[1] = j;
+	mon_l2->enable = b2->p_nodes[j]->enable;
+	mon_l2->p_node = b2->p_nodes[j];
+	mon_l2->next = mon_l2;
+	mon_l2->next++;
+	mon_l2++;
+	cntm2++;
       } else {
-  /*      printf("Removed: %s\n",b2->p_nodes[j]->name); */
+	/* printf("Removed: %s\n",b2->p_nodes[j]->name); */
       }
     }
 
@@ -1074,88 +951,88 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
   || (strncmp(atc[2], b2->p_nodes[j]->base_name, 4) == 0)) {
       /*    printf("2c: %s %ld\n", b2->p_nodes[j]->name, b2->p_nodes[j]->name); */
       if (strstr(b2->p_nodes[j]->name, ".b2") != NULL ) {
-  cor_l2->id_ttb[0] = -1;
-  cor_l2->id_ttb[1] = j;
-  cor_l2->enable = b2->p_nodes[j]->enable;
-  cor_l2->p_node = b2->p_nodes[j];
-  cor_l2->p_node_s2 = b2->p_nodes[j];
-  cor_l2->p_node_s1 = NULL;
-
-  if (command_par_value("corzero", cmd->clone) > 0) {
-    if (iplane == 1)
-      cor_l2->p_node_s2->chkick = 0.0;
-    if (iplane == 2)
-      cor_l2->p_node_s2->cvkick = 0.0;
-  }
-
-  cor_l2->next = cor_l2;
-  cor_l2->next++;
-  cor_l2++;
-  cntc2++;
+	cor_l2->id_ttb[0] = -1;
+	cor_l2->id_ttb[1] = j;
+	cor_l2->enable = b2->p_nodes[j]->enable;
+	cor_l2->p_node = b2->p_nodes[j];
+	cor_l2->p_node_s2 = b2->p_nodes[j];
+	cor_l2->p_node_s1 = NULL;
+	
+	if (command_par_value("corzero", cmd->clone) > 0) {
+	  if (iplane == 1)
+	    cor_l2->p_node_s2->chkick = 0.0;
+	  if (iplane == 2)
+	    cor_l2->p_node_s2->cvkick = 0.0;
+	}
+	
+	cor_l2->next = cor_l2;
+	cor_l2->next++;
+	cor_l2++;
+	cntc2++;
       } else {
-  /*      printf("Removed: %s\n",b2->p_nodes[j]->name); */
+	/* printf("Removed: %s\n",b2->p_nodes[j]->name); */
       }
     }
   }
-
+  
   mon_l12 = mon_l2;
   cor_l12 = cor_l2;
   for (j = 0; j < b1->curr; j++) {
     if ((strncmp(atm[iplane - 1], b1->p_nodes[j]->base_name, 4) == 0)
-  || (strncmp(atm[2], b1->p_nodes[j]->base_name, 4) == 0)) {
+	|| (strncmp(atm[2], b1->p_nodes[j]->base_name, 4) == 0)) {
       /*    printf("12m: %s \n", b1->p_nodes[j]->name); */
       if ((strstr(b1->p_nodes[j]->name, ".b1") == NULL )&&
-    (strstr(b1->p_nodes[j]->name,".b2") == NULL)){
-  mon_l12->id_ttb[0] = j;
-  for (k=0; k < b2->curr; k++) {
-    if(strcmp(b2->p_nodes[k]->name,b1->p_nodes[j]->name) == 0) {
-      mon_l12->id_ttb[1] = k;
-    }
-  }
-  mon_l12->enable = b1->p_nodes[j]->enable;
-  mon_l12->p_node = b1->p_nodes[j];
-  mon_l12->next = mon_l12;
-  mon_l12->next++; mon_l12++;
-  cntm12++;
+	  (strstr(b1->p_nodes[j]->name,".b2") == NULL)){
+	mon_l12->id_ttb[0] = j;
+	for (k=0; k < b2->curr; k++) {
+	  if(strcmp(b2->p_nodes[k]->name,b1->p_nodes[j]->name) == 0) {
+	    mon_l12->id_ttb[1] = k;
+	  }
+	}
+	mon_l12->enable = b1->p_nodes[j]->enable;
+	mon_l12->p_node = b1->p_nodes[j];
+	mon_l12->next = mon_l12;
+	mon_l12->next++; mon_l12++;
+	cntm12++;
       } else {
-  /*      printf("Removed: %s\n",b1->p_nodes[j]->name); */
+	/* printf("Removed: %s\n",b1->p_nodes[j]->name); */
       }
     }
 
     if((strncmp(atc[iplane-1],b1->p_nodes[j]->base_name,4) == 0) ||
        (strncmp(atc[2], b1->p_nodes[j]->base_name,4) == 0)) {
-      /*    printf("12c: %s \n", b1->p_nodes[j]->name);     */
+      /* printf("12c: %s \n", b1->p_nodes[j]->name);     */
       if((strstr(b1->p_nodes[j]->name,".b1") == NULL) &&
-   (strstr(b1->p_nodes[j]->name,".b2") == NULL)) {
-  cor_l12->id_ttb[0] = j;
-  for (k=0; k < b2->curr; k++) {
-    if(strcmp(b2->p_nodes[k]->name,b1->p_nodes[j]->name) == 0) {
-      cor_l12->id_ttb[1] = k;
-    }
-  }
-  cor_l12->p_node = b1->p_nodes[j];
-  cor_l12->p_node_s1 = b1->p_nodes[cor_l12->id_ttb[0]];
-  cor_l12->p_node_s2 = b2->p_nodes[cor_l12->id_ttb[1]];
-  ebl1 = b1->p_nodes[cor_l12->id_ttb[0]]->enable;
-  ebl2 = b2->p_nodes[cor_l12->id_ttb[1]]->enable;
-  cor_l12->enable = ebl1*ebl2;
-
-  if (command_par_value("corzero", cmd->clone) > 0) {
-    if(iplane == 1) cor_l12->p_node_s1->chkick = 0.0;
-    if(iplane == 2) cor_l12->p_node_s1->cvkick = 0.0;
-    if(iplane == 1) cor_l12->p_node_s2->chkick = 0.0;
-    if(iplane == 2) cor_l12->p_node_s2->cvkick = 0.0;
-  }
-
-  cor_l12->next = cor_l12;
-  cor_l12->next++; cor_l12++;
-  cntc12++;
+	 (strstr(b1->p_nodes[j]->name,".b2") == NULL)) {
+	cor_l12->id_ttb[0] = j;
+	for (k=0; k < b2->curr; k++) {
+	  if(strcmp(b2->p_nodes[k]->name,b1->p_nodes[j]->name) == 0) {
+	    cor_l12->id_ttb[1] = k;
+	  }
+	}
+	cor_l12->p_node = b1->p_nodes[j];
+	cor_l12->p_node_s1 = b1->p_nodes[cor_l12->id_ttb[0]];
+	cor_l12->p_node_s2 = b2->p_nodes[cor_l12->id_ttb[1]];
+	ebl1 = b1->p_nodes[cor_l12->id_ttb[0]]->enable;
+	ebl2 = b2->p_nodes[cor_l12->id_ttb[1]]->enable;
+	cor_l12->enable = ebl1*ebl2;
+	
+	if (command_par_value("corzero", cmd->clone) > 0) {
+	  if(iplane == 1) cor_l12->p_node_s1->chkick = 0.0;
+	  if(iplane == 2) cor_l12->p_node_s1->cvkick = 0.0;
+	  if(iplane == 1) cor_l12->p_node_s2->chkick = 0.0;
+	  if(iplane == 2) cor_l12->p_node_s2->cvkick = 0.0;
+	}
+	
+	cor_l12->next = cor_l12;
+	cor_l12->next++; cor_l12++;
+	cntc12++;
       } else {
-  /*      printf("Removed: %s\n",b1->p_nodes[j]->name); */
+	/* printf("Removed: %s\n",b1->p_nodes[j]->name); */
       }
     }
   }
-
+  
   /* terminate linked list   */
   mon_l12--;
   mon_l12->next = NULL;
@@ -1165,19 +1042,19 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
   printf("mons and corrs (beam 1)   : %ld %ld\n", (long int) cntm1,  (long int) cntc1);
   printf("mons and corrs (beam 2)   : %ld %ld\n", (long int) cntm2,  (long int) cntc2);
   printf("mons and corrs (beam 1+2) : %ld %ld\n", (long int) cntm12, (long int) cntc12);
-
+  
   if (get_option("debug")) {
     prt = correct_orbit12->mon_table;
     while (prt != NULL ) {
       printf("Monitors beam12: %s %ld %ld\n", prt->p_node->name,
-       (long int) prt->id_ttb[0], (long int) prt->id_ttb[1]);
+	     (long int) prt->id_ttb[0], (long int) prt->id_ttb[1]);
       prt = prt->next;
     }
-
+    
     prt = correct_orbit12->cor_table;
     while (prt != NULL ) {
       printf("Correctors beam12: %s %ld %ld\n", prt->p_node->name,
-       (long int) prt->id_ttb[0], (long int) prt->id_ttb[1]);
+	     (long int) prt->id_ttb[0], (long int) prt->id_ttb[1]);
       prt = prt->next;
     }
   }
@@ -1191,27 +1068,27 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
     corr_table2 = make_table("corr2", "corr2", corr_table_cols, corr_table_types, 15000);
     add_to_table_list(corr_table2, table_register);
   }
-
+  
   pro_correct2_make_corr_table();
-
+  
   if (mon_table == NULL ) {
     mon_table = make_table("mon", "mon", mon_table_cols, mon_table_types, 15000);
     add_to_table_list(mon_table, table_register);
     pro_correct2_make_mon_table();
   }
-
+  
   // 2013-Jun-24  12:21:49  ghislain: 
   //following is a kludge to return a single value but has to be decoded on other side.    
   if( cntc1+cntc2+cntc12 >= 10000) 
     fatal_error("Found more than 10000 correctors; decoding in mad_orbit.c will fail",
-    "Please report this issue to MAD developpers (mad@cern.ch)");
+		"Please report this issue to MAD developpers (mad@cern.ch)");
   return 10000 * (cntm1 + cntm2 + cntm12) + cntc1 + cntc2 + cntc12;
 }
 
 static int pro_correct2_getorbit(struct in_cmd* cmd) {
   struct name_list* nl;
   int pos;
-
+  
   struct id_mic2 *m; /* access to tables for monitors and correctors */
   double **da1;
   double **da2;
@@ -1236,7 +1113,7 @@ static int pro_correct2_getorbit(struct in_cmd* cmd) {
   
   if ((posx = name_list_pos(strx, twiss_table_beam1->columns)) < 0) 
     fatal_error("orbit x not found in input table", ", MAD-X terminates ");
-
+  
   if ((posy = name_list_pos(stry, twiss_table_beam1->columns)) < 0) 
     fatal_error("orbit y not found in input table", ", MAD-X terminates ");
   
@@ -1246,12 +1123,12 @@ static int pro_correct2_getorbit(struct in_cmd* cmd) {
     
     if ((pospy = name_list_pos("py", twiss_table_beam1->columns)) < 0) 
       warning("orbit py not found in input table", ", MAD-X continues ");
-
+    
     printf("====c1===>  %d %d %d %d \n", posx, posy, pospx, pospy);
   }
-
+  
   while (m) {
-
+    
     /* If correction to target orbit, subtract the wanted orbit ... */
     if (m->id_ttb[0] > 0) {
       m->val.before[0] = m->p_node->other_bv * da1[9] [m->id_ttb[0]];
@@ -1266,7 +1143,7 @@ static int pro_correct2_getorbit(struct in_cmd* cmd) {
     } else {
       fatal_error("Unforeseen case in pro_correct2_getorbit", ", MAD-X terminates ");
     }
-
+    
     pos = name_list_pos("monon", nl);
     if (nl->inform[pos] > 0) {
       xlimit = command_par_value("monon", cmd->clone);
@@ -1275,7 +1152,7 @@ static int pro_correct2_getorbit(struct in_cmd* cmd) {
 	printf("Monitor %s disabled\n", m->p_node->name);
       }
     }
-
+    
     if (debug) {
       printf("m-list: %d %d %s %s\n", m->id_ttb[0], m->id_ttb[1], m->p_node->name, m->p_node->base_name);
       printf("initial reading: %e %e\n\n", m->val.before[0], m->val.before[1]);
@@ -2935,35 +2812,35 @@ static void pro_correct_make_corr_table(void) {
    {
      fatal_error("pro_correct_make_corr_table "," Model table does not exist");
    }
-/*   else
-   {
-     printf("pro_correct_make_corr_table model table OK \n");
-     printf("pro_correct_make_corr_table model table name %s\n",model_table->name);
-     printf("pro_correct_make_corr_table model table type %s\n",model_table->type);
-     printf("pro_correct_make_corr_table model table curr %d\n",model_table->curr);
-     
-   }
- */
+  /*   else
+       {
+       printf("pro_correct_make_corr_table model table OK \n");
+       printf("pro_correct_make_corr_table model table name %s\n",model_table->name);
+       printf("pro_correct_make_corr_table model table type %s\n",model_table->type);
+       printf("pro_correct_make_corr_table model table curr %d\n",model_table->curr);
+       
+       }
+  */
   for (j = 0; j < ttb->curr; j++) 
-   {
-/* 
-    printf("pro_correct_make_corr_table node %d \n",j);
-    printf("                         node_addr %#x\n",ttb->p_nodes[j]);
-    printf("                         base_name %#x\n",ttb->p_nodes[j]->base_name);
-    
- */    
-    if (!ttb->p_nodes[j]->base_name) 
-     {
-       continue;
-     }
-     
-    if ( (strncmp(atc[0], ttb->p_nodes[j]->base_name, 4) == 0)
-      || (strncmp(atc[1], ttb->p_nodes[j]->base_name, 4) == 0)
-      || (strncmp(atc[2], ttb->p_nodes[j]->base_name, 4) == 0)) {
-      string_to_table_curr("corr", "name", ttb->p_nodes[j]->name);
-      augment_count("corr");
+    {
+      /* 
+	 printf("pro_correct_make_corr_table node %d \n",j);
+	 printf("                         node_addr %#x\n",ttb->p_nodes[j]);
+	 printf("                         base_name %#x\n",ttb->p_nodes[j]->base_name);
+	 
+      */    
+      if (!ttb->p_nodes[j]->base_name) 
+	{
+	  continue;
+	}
+      
+      if ( (strncmp(atc[0], ttb->p_nodes[j]->base_name, 4) == 0)
+	   || (strncmp(atc[1], ttb->p_nodes[j]->base_name, 4) == 0)
+	   || (strncmp(atc[2], ttb->p_nodes[j]->base_name, 4) == 0)) {
+	string_to_table_curr("corr", "name", ttb->p_nodes[j]->name);
+	augment_count("corr");
+      }
     }
-  }
 }
 
 static void pro_correct2_make_corr_table(void) {
@@ -2976,13 +2853,13 @@ static void pro_correct2_make_corr_table(void) {
 
   while (ttb != NULL ) {
     if ((strncmp(atc[0], ttb->p_node->base_name, 4) == 0)
-     || (strncmp(atc[1], ttb->p_node->base_name, 4) == 0)
-     || (strncmp(atc[2], ttb->p_node->base_name, 4) == 0)) {
+	|| (strncmp(atc[1], ttb->p_node->base_name, 4) == 0)
+	|| (strncmp(atc[2], ttb->p_node->base_name, 4) == 0)) {
       if (ttb->id_ttb[0] > 0) {
         string_to_table_curr("corr1", "name", ttb->p_node->name);
         augment_count("corr1");
       }
-
+      
       if (ttb->id_ttb[1] > 0) {
         string_to_table_curr("corr2", "name", ttb->p_node->name);
         augment_count("corr2");

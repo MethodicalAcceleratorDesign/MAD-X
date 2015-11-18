@@ -9,67 +9,7 @@ TITLE, 'RF-Dipole example';
 
 
 
-!!!! data
-
-
-
-Lq = 0.4;
-
-Lb = 1.0;
-
-Ld = (1.6 - Lb)/2.0;
-
-Kf =  1.0; !  1.02780070155859;
-
-Kd = -1.0; ! -1.02780070155859;
-
-
-
-lcell = 2.0*Lq + 4.0*Ld + 2.0*Lb;
-
-ncell = 12;
-
-circum = ncell*lcell;
-
-
-
-qf1:  quadrupole, l=Lq,     k1:=Kf;
-
-qf1h: quadrupole, l=Lq/2.0, k1:=Kf;
-
-qd1:  quadrupole, l=Lq,	    k1:=Kd;
-
-mb:   sbend, 	  l=Lb, ANGLE=2.0*pi/ncell/2.0;
-
-rfm1: rfmultipole, l=0, freq=12, knl:={1e-3},  pnl:={0.25};
-
-
-
-!!!!! sequence
-
-my_seq: sequence, refer=entry, l=ncell*lcell;
-
-rfm1: rfm1, at=0.0;
-
-
-
-n=1;
-
-qf1h:	qf1h, at=(n-1)*lcell;
-
-while (n<ncell) {
-
-      mb:	mb,   at=(n-1)*lcell + Lq/2.0 + Ld;
-
-      qd1:	qd1,  at=(n-1)*lcell + lcell/2.0 - Lq/2.0;
-
-      mb:	mb,   at=(n-1)*lcell + lcell/2.0 + Lq/2.0 + Ld;
-
-      qf1:	qf1, at=(n-1)*lcell + lcell - Lq/2.0;
-
-      n=n+1;
-
-}
+Option, echo=false;
 
 ++++++ info: n redefined
 ++++++ info: n redefined
@@ -82,16 +22,6 @@ while (n<ncell) {
 ++++++ info: n redefined
 ++++++ info: n redefined
 ++++++ info: n redefined
-mb:	mb,   at=(n-1)*lcell + Lq/2.0 + Ld;
-
-qd1:	qd1,  at=(n-1)*lcell + lcell/2.0 - Lq/2.0;
-
-mb:	mb,   at=(n-1)*lcell + lcell/2.0 + Lq/2.0 + Ld;
-
-qf1h:	qf1h, at=(n-1)*lcell + lcell - Lq/2.0;
-
-endsequence;
-
 
 
 !!!!! beam
@@ -108,7 +38,7 @@ use, sequence = my_seq;
 
 select, flag = twiss, column=name,s,betx,alfx,mux, bety, alfy,muy,dx,dy;
 
-twiss, save, centre; ! file=twiss2c.out;
+twiss, save, centre;
 
 enter Twiss module
 ++++++ info: Zero value of SIGT replaced by 1.
@@ -135,25 +65,18 @@ orbit:   2.023900E-36 -8.175075E-35  0.000000E+00  0.000000E+00 -2.434672E-16 -4
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
-!	plot, haxis=s, vaxis=betx,bety,dx,colour=100;
-
 
 
 !!!!! track
 
 use, sequence=my_seq;
 
-tr$macro(turn): macro = {
-
-}
 
 
-
-track, onepass, update, dump;
+track, onepass, dump;
 
 enter TRACK module
 one pass is on
-update is on
 start, x=0, px=0, y=0, py=0, t=-0.01, pt=0;
 
 start, x=0, px=0, y=0, py=0, t= 0.00, pt=0;
@@ -163,15 +86,6 @@ start, x=0, px=0, y=0, py=0, t= 0.01, pt=0;
 run, turns=10;
 
 ++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
-++++++ info: tr$turni redefined
 
 ++++++ table: tracksumm
 
@@ -201,16 +115,6 @@ run, turns=10;
 endtrack;
 
 exit TRACK module
-
-
-
-!!!!! Convert to SixTrack
-
-
-
-!use, period=my_seq;
-
-!sixtrack, radius=0.017;
 
 
 

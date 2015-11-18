@@ -165,8 +165,6 @@ one pass is on
                  s                  e 
                  0                  0 
              534.6                  0 
-
-*****  end of trrun  *****
 endtrack;
 
 exit TRACK module

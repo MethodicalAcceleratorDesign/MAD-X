@@ -79,7 +79,7 @@ module code_constfi
   integer, parameter :: code_translation = 36
   integer, parameter :: code_crabcavity = 37
   integer, parameter :: code_placeholder = 38
-  integer, parameter :: code_tkicker = 39
+  integer, parameter :: code_tkicker = 39 
   integer, parameter :: code_hacdipole = 40
   integer, parameter :: code_vacdipole = 41
   integer, parameter :: code_nllens = 42
