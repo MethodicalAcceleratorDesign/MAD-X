@@ -362,11 +362,14 @@ aper_fill_quadrants(double polyx[], double polyy[], int quarterlength, int* halo
 
 static void
 aper_read_twiss(const char* table, int* jslice, double* s, double* x, double* y,
+		double* px, double* py,
                 double* betx, double* bety, double* dx, double* dy)
 {
   double_from_table_row(table, "s", jslice, s);
   double_from_table_row(table, "x", jslice, x);
   double_from_table_row(table, "y", jslice, y);
+  double_from_table_row(table, "px", jslice, px);
+  double_from_table_row(table, "py", jslice, py);
   double_from_table_row(table, "betx", jslice, betx);
   double_from_table_row(table, "bety", jslice, bety);
   double_from_table_row(table, "dx", jslice, dx);
@@ -1060,11 +1063,11 @@ aper_trim_ws(char* string, int len)
 
 static void
 aper_write_table(char* name, double* n1, double* n1x_m, double* n1y_m,
-                  double* rtol, double* xtol, double* ytol,
-                  char* apertype,double* ap1,double* ap2,double* ap3,double* ap4,
-                  double* on_ap, double* on_elem, double* spec,double* s,
-                  double* x, double* y, double* betx, double* bety,double* dx, double* dy,
-                  char *table)
+		 double* rtol, double* xtol, double* ytol, double* xoffset, double* yoffset,
+		 char* apertype,double* ap1,double* ap2,double* ap3,double* ap4,
+		 double* on_ap, double* on_elem, double* spec,double* s,
+		 double* x, double* y, double* px, double* py,
+		 double* betx, double* bety,double* dx, double* dy, char *table)
 {
   string_to_table_curr(table, "name", name);
   double_to_table_curr(table, "n1", n1);
@@ -1073,6 +1076,8 @@ aper_write_table(char* name, double* n1, double* n1x_m, double* n1y_m,
   double_to_table_curr(table, "rtol", rtol);
   double_to_table_curr(table, "xtol", xtol);
   double_to_table_curr(table, "ytol", ytol);
+  double_to_table_curr(table, "xoffset", xoffset);
+  double_to_table_curr(table, "yoffset", yoffset);
   string_to_table_curr(table, "apertype", apertype);
   double_to_table_curr(table, "aper_1", ap1);
   double_to_table_curr(table, "aper_2", ap2);
@@ -1084,6 +1089,8 @@ aper_write_table(char* name, double* n1, double* n1x_m, double* n1y_m,
   double_to_table_curr(table, "s", s);
   double_to_table_curr(table, "x", x);
   double_to_table_curr(table, "y", y);
+  double_to_table_curr(table, "px", px);
+  double_to_table_curr(table, "py", py);
   double_to_table_curr(table, "betx", betx);
   double_to_table_curr(table, "bety", bety);
   double_to_table_curr(table, "dx", dx);
@@ -1320,7 +1327,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   double ex, ey;
   double dqf, betaqfx, dp, dparx, dpary;
   double cor, bbeat, nco, halo[4], interval, spec, notsimple;
-  double s=0, x=0, y=0, betx=0, bety=0, dx=0, dy=0, ratio, n1, length; // nr not used
+  double s=0, x=0, y=0, px=0, py=0, betx=0, bety=0, dx=0, dy=0, ratio, n1, length; // nr not used
   double xeff=0,yeff=0;
   double n1x_m, n1y_m;
   double s_start, s_curr, s_end;
@@ -1343,8 +1350,8 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
   int code;
   
   // 2014-Sep-18  17:19:52  ghislain: attempt to read offset values from element attributes...
-  // double aper_offset[2], xoffset, yoffset;
-  // int noffset;
+  double aper_offset[2], xoffset, yoffset;
+  int noffset;
   
   struct node* rng_glob[2];
   // struct aper_node limit_node = {"none", -1, -1, "none", {-1,-1,-1,-1}, {-1,-1,-1}};
@@ -1438,7 +1445,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       if ( pipelength > -1) ext_pipe=1; */
 
   /* get initial twiss parameters, from start of first element in range */
-  aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &betx, &bety, &dx, &dy);
+  aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy);
   // LD: shift further results by one step (?) and finish outside the table
   //  (*tw_cnt)++;
   aper_adj_halo_si(ex, ey, betx, bety, bbeat, halox, haloy, halolength, haloxsi, haloysi);
@@ -1496,15 +1503,17 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
     else r = xshift = yshift = 0.;
     //if (debug) printf("\nname: %s, x-shift: %f, y-shift: %f\n",name,xshift, yshift);
 
+    xoffset=yoffset=0;
     // 2014-Sep-18  17:19:52  ghislain: attempt to read offset values from element attributes...
     /* read data for aper_offset */
-    //get_node_vector("aper_offset",&noffset,aper_offset);
-    //if (noffset == 2) {
-    //  xoffset = aper_offset[0];
-    //  yoffset = aper_offset[1];
-    //}
-    //else xoffset=yoffset=0;
-    //if (debug) printf("\nname: %s, x-offset: %f, y-offset: %f\n",name,xoffset, yoffset);
+    get_node_vector("aper_offset", &noffset, aper_offset);
+    if (noffset == 2) {
+      xoffset = aper_offset[0];
+      yoffset = aper_offset[1];
+    }
+    else xoffset=yoffset=0;
+    if (debug) printf("name: %s, x-offset: %f, y-offset: %f\n", name, xoffset, yoffset);
+    xoffset=yoffset=0; // 2015-Nov-20  15:43:45  ghislain: until clarified in MAD-X meeting
 
     /*read aperture data and make polygon tables for beam pipe*/
     /* IW 250205 */
@@ -1515,11 +1524,11 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
       /* if no pipe can be built, the n1 is set to inf and Twiss parms read for reference*/
       n1=999999; n1x_m=999999; n1y_m=999999; on_ap=-999999; nint=1;
 
-      aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &betx, &bety, &dx, &dy);
+      aper_read_twiss(tw_cp->name, tw_cnt, &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy);
 
-      aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, apertype,
-                       &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec,
-                       &s_end, &x, &y, &betx, &bety, &dx, &dy, table);
+      aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, &xoffset, &yoffset, 
+		       apertype, &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec,
+                       &s_end, &x, &y, &px, &py, &betx, &bety, &dx, &dy, table);
       on_ap=1;
 
       double_to_table_row(tw_cp->name, "n1", tw_cnt, &n1);
@@ -1602,7 +1611,8 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
           s = 0;                /*used to calculate survey adjustments */
         } 
 	else {
-          aper_read_twiss("embedded_twiss_table", &jslice, &s, &x, &y, &betx, &bety, &dx, &dy);
+          aper_read_twiss("embedded_twiss_table", &jslice, &s, &x, &y, &px, &py, 
+			  &betx, &bety, &dx, &dy);
 	  
 	  if(debug) printf("embedded twiss for slice %d: s= %f betx= %f bety= %f dx= %f dy= %f\n", 
 			   jslice, s, betx, bety, dx, dy);
@@ -1626,7 +1636,13 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 	         (re-use from end of former node) */
         xeff = x;
         yeff = y;
-	  
+
+	/* offset adjustment */
+	if (noffset == 2) {
+	  xeff -= xoffset;
+	  yeff -= yoffset;
+	}
+
         /* survey adjustments */
         if (offs_node) {
           xeff += surv_x - (xa*s*s + xb*s + xc);
@@ -1686,9 +1702,9 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 	/* test block 'if (n1 < node_n1)' included in test block   */
 
         if (is_zero_len == 0 || jslice == 1) {
-          aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, apertype,
-                           &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec, &s_curr,
-                           &xeff, &yeff, &betx, &bety, &dx, &dy, table);
+          aper_write_table(name, &n1, &n1x_m, &n1y_m, &r, &xshift, &yshift, &xoffset, &yoffset,
+			   apertype, &ap1, &ap2, &ap3, &ap4, &on_ap, &on_elem, &spec, &s_curr,
+                           &xeff, &yeff, &px, &py, &betx, &bety, &dx, &dy, table);
 
 	  /* save node minimum n1 */
           if (n1 < node_n1) {
