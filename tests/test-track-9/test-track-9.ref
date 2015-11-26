@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.02  (64 bit, Linux)       +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.05.24      +
-  + Execution Time Stamp: 07.06.13 18.09.47 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.06  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2015.06.26               +
+  + Execution date: 2015.08.31 16:18:30      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 ! YIL13: Taken from tests_old/test_runs/track_example/
 
 option,-echo,-info;
@@ -12,7 +12,7 @@ option,-echo,-info;
 enter Twiss module
   
 iteration:   1 error:   1.502666E-21 deltap:   0.000000E+00
-orbit:   3.729602E-24  1.315902E-39  0.000000E+00  0.000000E+00 -3.167331E-17  1.243713E-23
+orbit:   3.729602E-24  4.775166E-40  0.000000E+00  0.000000E+00 -3.167331E-17  1.243714E-23
 
 ++++++ table: summ
 
@@ -23,7 +23,7 @@ orbit:   3.729602E-24  1.315902E-39  0.000000E+00  0.000000E+00 -3.167331E-17  1
       0.1072467205      -0.1135571662         13.8302683       0.2998762806 
 
              dxrms             xcomax             xcorms                 q2 
-      0.2679078562    5.297618523e-23    3.061450232e-23       0.1058727477 
+      0.2679078562    5.297618537e-23    3.061450241e-23       0.1058727477 
 
                dq2            betymax              dymax              dyrms 
      -0.1107431782        13.59510076                  0                  0 
@@ -39,7 +39,7 @@ makethin: slicing sequence : c314
 enter Twiss module
   
 iteration:   1 error:   4.718370E-19 deltap:   0.000000E+00
-orbit:   3.113913E-25  2.096717E-28  0.000000E+00  0.000000E+00 -9.945508E-15  1.045339E-24
+orbit:   3.113962E-25  2.096718E-28  0.000000E+00  0.000000E+00 -9.945508E-15  1.045356E-24
 
 ++++++ table: summ
 
@@ -80,5 +80,5 @@ exit TRACK module
 1 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.02 (64 bit) finished normally +
+  + MAD-X 5.02.06 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

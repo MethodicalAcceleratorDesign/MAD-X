@@ -40,25 +40,19 @@ a=0.022; b=0.018; h=0.022; v=0.022; an1=pi/6; an2=pi/3;
 
 !!!! tolerances
 
-th=0.001; tv=0.0005; tr=0.001;
+tr=0.001; th=0.0005; tv=0.001; 
 
+!!!! offsets
 
-
-offset=1.e-3;
-
-off3 := 1.e-3*l.MQ*l.MQ;
-
-off2 := 2.e-3 * l.MQ;
-
-off1 = 3.e-3;
+offx = 3.e-3; offy = 1.e-3;
 
 
 
 MB: SBEND, L=l.MB, angle=ANGLE.MB;
 
-MQ: QUADRUPOLE, L=l.MQ, apertype=rectellipse,aperture = {a,b,h,v}, aper_tol = {th,tv,tr}
+MQ: QUADRUPOLE, L=l.MQ, apertype=rectellipse,aperture = {a,b,h,v}, aper_tol = {tr,th,tv}
 
-                aper_offset={off1, off2, off3, offset*l.MQ, 0.005-l.MQ, 0.006+l.MQ};
+                aper_offset={offx, offy};
 
 
 
@@ -74,31 +68,31 @@ LHCCELL: SEQUENCE, refer = ENTRY, L = 2*len_half_cell;
 
   MB1: MB,  at= l.MQ+drift1 ,
 
-	    apertype=circle, aperture = {a}, aper_tol = {th,tv,tr};
+	    apertype=circle, aperture = {a}, aper_tol = {tr,th,tv};
 
   MB2: MB,  at= l.MQ+drift1+l.mb+drift2,
 
-	    apertype=ellipse, aperture = {a,b}, aper_tol = {th,tv,tr};
+	    apertype=ellipse, aperture = {a,b}, aper_tol = {tr,th,tv};
 
   MB3: MB,  at= l.MQ+drift1+2*(l.mb+drift2),
 
-	    apertype=rectangle, aperture = {a,b}, aper_tol = {th,tv,tr};
+	    apertype=rectangle, aperture = {a,b}, aper_tol = {tr,th,tv};
 
   MQ2: MQ,  at=  len_half_cell, k1 := kqd,
 
-            apertype=octagon, aperture={a,b,an1,an2}, aper_tol = {th,tv,tr};
+            apertype=octagon, aperture={a,b,an1,an2}, aper_tol = {tr,th,tv};
 
   MB4: MB,  at= len_half_cell + l.MQ+drift1 ,
 
-	    apertype=rectcircle, aperture = {a,b,h}, aper_tol = {th,tv,tr};
+	    apertype=rectcircle, aperture = {a,b,h}, aper_tol = {tr,th,tv};
 
   MB5: MB,  at= len_half_cell + l.MQ+drift1+l.mb+drift2,
 
-	    apertype=lhcscreen, aperture = {a,b,h}, aper_tol = {th,tv,tr};
+	    apertype=lhcscreen, aperture = {a,b,h}, aper_tol = {tr,th,tv};
 
   MB6: MB,  at= len_half_cell + l.MQ+drift1+2*(l.mb+drift2),
 
-	    apertype=racetrack, aperture = {a+h/5.,b+h/10.,h/5.,h/10.}, aper_tol = {th,tv,tr};
+	    apertype=racetrack, aperture = {a+h/5.,b+h/10.,h/5.,h/10.}, aper_tol = {tr,th,tv};
 
 endsequence;
 
@@ -192,37 +186,35 @@ c=-0.022; d=0.; h2=0.0; v2=-0.022;
 
 LHCCEL2: SEQUENCE, refer = ENTRY, L = 2*len_half_cell; 
 
-  MQ11: MQ, k1= kqf, at= 0., aperture = {c,d,h2,v2},
-
-           aper_offset={off1, off2, off3, offset*l.MQ, 0.005-l.MQ, 0.0};
+  MQ11: MQ, k1= kqf, at= 0., aperture = {c,d,h2,v2}, aper_offset={offx, offy};
 
   MB11: MB,  at= l.MQ+drift1 ,
 
-	    apertype=circle, aperture = {c}, aper_tol = {th,tv,tr};
+	    apertype=circle, aperture = {c}, aper_tol = {tr,th,tv};
 
   MB21: MB,  at= l.MQ+drift1+l.mb+drift2,
 
-	    apertype=ellipse, aperture = {c,d}, aper_tol = {th,tv,tr};
+	    apertype=ellipse, aperture = {c,d}, aper_tol = {tr,th,tv};
 
   MB31: MB,  at= l.MQ+drift1+2*(l.mb+drift2),
 
-	    apertype=rectangle, aperture = {c,d}, aper_tol = {th,tv,tr};
+	    apertype=rectangle, aperture = {c,d}, aper_tol = {tr,th,tv};
 
   MQ21: MQ, k1= kqd,  at=  len_half_cell, 
 
-            apertype=octagon, aperture = {c,d,an2,an1}, aper_tol = {th,tv,tr};
+            apertype=octagon, aperture = {c,d,an2,an1}, aper_tol = {tr,th,tv};
 
   MB41: MB,  at= len_half_cell + l.MQ+drift1 ,
 
-	    apertype=rectcircle, aperture = {c,d,h2}, aper_tol = {th,tv,tr};
+	    apertype=rectcircle, aperture = {c,d,h2}, aper_tol = {tr,th,tv};
 
   MB51: MB,  at= len_half_cell + l.MQ+drift1+l.mb+drift2,
 
-	    apertype=lhcscreen, aperture = {c,d,h2}, aper_tol = {th,tv,tr};
+	    apertype=lhcscreen, aperture = {c,d,h2}, aper_tol = {tr,th,tv};
 
   MB61: MB,  at= len_half_cell + l.MQ+drift1+2*(l.mb+drift2),
 
-	    apertype=racetrack, aperture = {c+h2/5.,d+h2/10.,h2/5.,h2/10.}, aper_tol = {th,tv,tr};
+	    apertype=racetrack, aperture = {c+h2/5.,d+h2/10.,h2/5.,h2/10.}, aper_tol = {tr,th,tv};
 
 endsequence;
 
@@ -334,66 +326,84 @@ quarterlength : 9
 
 
 name: lhccel2$start:1, ref: , do_survey: 0, true_flag: 0
+name: lhccel2$start:1, x-offset: 0.000000, y-offset: 0.000000
 +++ aper_build_screen; apertype = 'circle' quarterlength = 0
 +++ aper_build screen, circle parameters:    0.00000    0.00000    0.00000    0.00000  -- exiting 0
 
 name: mq11:1, ref: , do_survey: 0, true_flag: 0
+name: mq11:1, x-offset: 0.003000, y-offset: 0.001000
 +++ aper_build_screen; apertype = 'rectellipse' quarterlength = 0
 +++ aper_build screen, rectellipse parameters:   -0.02200    0.00000    0.00000   -0.02200  -- exiting 0
 
 name: drift_0:0, ref: , do_survey: 0, true_flag: 0
+name: drift_0:0, x-offset: 0.000000, y-offset: 0.000000
 +++ aper_build_screen; apertype = '' quarterlength = 0
 
 name: mb11:1, ref: , do_survey: 0, true_flag: 0
+name: mb11:1, x-offset: 0.000000, y-offset: 0.000000
 +++ aper_build_screen; apertype = 'circle' quarterlength = 0
 +++ aper_build screen, circle parameters:    0.00000    0.00000   -0.02200    0.00000  -- exiting 0
 
 name: drift_1:0, ref: , do_survey: 0, true_flag: 0
+name: drift_1:0, x-offset: 0.000000, y-offset: 0.000000
 +++ aper_build_screen; apertype = '' quarterlength = 0
 
 name: mb21:1, ref: , do_survey: 0, true_flag: 0
+name: mb21:1, x-offset: 0.000000, y-offset: 0.000000
 +++ aper_build_screen; apertype = 'ellipse' quarterlength = 0
 +++ aper_build screen, ellipse parameters:    0.00000    0.00000   -0.02200    0.00000  -- exiting 0
 
 name: drift_1:0, ref: , do_survey: 0, true_flag: 0
+name: drift_1:0, x-offset: 0.000000, y-offset: 0.000000
 +++ aper_build_screen; apertype = '' quarterlength = 0
 
 name: mb31:1, ref: , do_survey: 0, true_flag: 0
+name: mb31:1, x-offset: 0.000000, y-offset: 0.000000
 +++ aper_build_screen; apertype = 'rectangle' quarterlength = 0
 +++ aper_build screen, rectangle parameters:   -0.02200    0.00000    0.00000    0.00000  -- exiting 0
 
 name: drift_2:0, ref: , do_survey: 0, true_flag: 0
+name: drift_2:0, x-offset: 0.000000, y-offset: 0.000000
 +++ aper_build_screen; apertype = '' quarterlength = 0
 
 name: mq21:1, ref: , do_survey: 0, true_flag: 0
+name: mq21:1, x-offset: 0.003000, y-offset: 0.001000
 +++ aper_build_screen; apertype = 'octagon' quarterlength = 0
 +++ aper_build screen, octagon parameters:   -0.02200    0.00000    1.04720    0.52360  -- exiting 0
 
 name: drift_0:0, ref: , do_survey: 0, true_flag: 0
+name: drift_0:0, x-offset: 0.000000, y-offset: 0.000000
 +++ aper_build_screen; apertype = '' quarterlength = 0
 
 name: mb41:1, ref: , do_survey: 0, true_flag: 0
+name: mb41:1, x-offset: 0.000000, y-offset: 0.000000
 +++ aper_build_screen; apertype = 'rectcircle' quarterlength = 0
 +++ aper_build screen, rectcircle parameters:   -0.02200    0.00000    0.00000    0.00000  -- exiting 0
 
 name: drift_1:0, ref: , do_survey: 0, true_flag: 0
+name: drift_1:0, x-offset: 0.000000, y-offset: 0.000000
 +++ aper_build_screen; apertype = '' quarterlength = 0
 
 name: mb51:1, ref: , do_survey: 0, true_flag: 0
+name: mb51:1, x-offset: 0.000000, y-offset: 0.000000
 +++ aper_build_screen; apertype = 'lhcscreen' quarterlength = 0
 +++ aper_build screen, rectcircle parameters:   -0.02200    0.00000    0.00000    0.00000  -- exiting 0
 
 name: drift_1:0, ref: , do_survey: 0, true_flag: 0
+name: drift_1:0, x-offset: 0.000000, y-offset: 0.000000
 +++ aper_build_screen; apertype = '' quarterlength = 0
 
 name: mb61:1, ref: , do_survey: 0, true_flag: 0
+name: mb61:1, x-offset: 0.000000, y-offset: 0.000000
 +++ aper_build_screen; apertype = 'racetrack' quarterlength = 0
 +++ aper_build screen, racetrack parameters:   -0.02200    0.00000    0.00000    0.00000  -- exiting 0
 
 name: drift_2:0, ref: , do_survey: 0, true_flag: 0
+name: drift_2:0, x-offset: 0.000000, y-offset: 0.000000
 +++ aper_build_screen; apertype = '' quarterlength = 0
 
 name: lhccel2$end:1, ref: , do_survey: 0, true_flag: 0
+name: lhccel2$end:1, x-offset: 0.000000, y-offset: 0.000000
 +++ aper_build_screen; apertype = 'circle' quarterlength = 0
 +++ aper_build screen, circle parameters:    0.00000    0.00000    0.00000    0.00000  -- exiting 0
 

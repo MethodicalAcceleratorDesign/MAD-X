@@ -1,0 +1,37 @@
+title, "V6.5 Thin Lens" ;    // USE ONLY WITH MAD-X version > June 2005
+
+option,echo,warn,info;
+
+set, format="12.6f";
+select, flag=twiss, clear;
+select, flag=twiss, pattern="IP\.*",     column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy,x,px,y,py;
+select, flag=twiss, pattern="s.ds.l\.*", column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy,x,px,y,py;
+select, flag=twiss, pattern="e.ds.r\.*", column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy,x,px,y,py;
+
+option,-echo,-warn;
+call, file="../share/LHC/LHCRing/V6.503/V6.5.seq";
+call, file="../share/LHC/LHCRing/V6.503/V6.5.inj.str";
+option,echo,warn,info;
+
+beam, particle = proton, sequence=lhcb1, energy = 450.0;
+
+! without this we get poor tune (and more?) in twiss table after makethin
+use,    sequence=lhcb1;
+twiss,  sequence=lhcb1, file=lhc_twiss_b1.before.dat, betx=beta.ip1, bety=beta.ip1, x=+x.ip1, y=+y.ip1, py=+py.ip1;
+
+! convert to THIN
+option, info,  warn, -echo;
+call, file="../share/LHC/LHCRing/V6.503/toolkit/slice.madx";
+option, echo, warn, info;
+makethin, sequence=lhcb1,style=hybrid, makedipedge=false, makeendmarkers=true;
+
+! set new strength file
+option,-echo,-warn,-info;
+call, file="../share/LHC/LHCRing/V6.503/V6.5.thin.inj.str";
+option,echo,warn,info;
+
+use,    sequence=lhcb1;
+twiss,  sequence=lhcb1, file=lhc_twiss_b1.dat, betx=beta.ip1, bety=beta.ip1, x=+x.ip1, y=+y.ip1, py=+py.ip1;
+save,sequence=lhcb1,file="V6.5.thin.b1.seq";
+
+stop;

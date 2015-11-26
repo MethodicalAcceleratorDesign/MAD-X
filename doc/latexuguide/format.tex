@@ -9,10 +9,10 @@
 \section{Input Statements}
 
 Input for \madx follows in broad lines the
-\href{http://cern.ch/mad9}{\madnine}\index{MAD-9} format, i.e. free
-format with commas (,) as separators, although blanks may be used as
+\href{http://cern.ch/mad9}{\madnine}\index{MAD-9} format, \textsl{i.e.} 
+free format with commas (,) as separators, although blanks may be used as
 separators outside \{...\} enclosures. 
- 
+
 Blank input lines do not affect program execution. 
 
 The input is not case sensitive except for strings enclosed in double
@@ -82,8 +82,23 @@ Whenever an attribute is not explicitly given a value, the default
 
 A keyword begins with a letter and consists of letters and digits. 
 
-The \madx keywords are protected; using one of them as a label results
-in a fatal error.   
+The \madx keywords are protected; attempting to use a protected 
+keyword as a label results in a fatal error.
+
+\begin{5.02.07}
+
+The keyword \texttt{VERSION} has been introduced since version 5.02.07. 
+It contains the version number of the \madx release quoted as a decimal.
+For example:
+\madxmp{
+X:> value VERSION;\\
+version =              50207 ;
+}
+This allows testing of the version number of the running \madx process. 
+Note that any version prior to version 5.02.07 reports the value 
+\texttt{version = 0;}
+
+\end{5.02.07}
 
 
 \section{Attribute Types}

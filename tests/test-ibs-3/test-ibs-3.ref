@@ -1,10 +1,10 @@
 
-  ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.06  (64 bit, Darwin)      +
-  + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.06.26               +
-  + Execution date: 2015.08.05 19:12:35      +
-  ++++++++++++++++++++++++++++++++++++++++++++
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.01.03  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2013.10.14      +
+  + Execution Time Stamp: 15.10.13 17.45.59 +
+  +++++++++++++++++++++++++++++++++++++++++++
 !! **************************************************************************************
 
 !! 										
@@ -69,7 +69,7 @@ orbit:   2.225485E-06  3.094462E-07  0.000000E+00  0.000000E+00  1.311738E-02  1
   
 iteration:   3 error:   1.998538E-08 deltap:   0.000000E+00
 orbit:   2.224308E-06  3.094511E-07  0.000000E+00  0.000000E+00  1.311766E-02  1.758089E-04
- ++++++ warning: TWCPGO: TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+ ++++++ warning: TWCPGO: TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.        
 
 ++++++ table: summ
 
@@ -118,7 +118,7 @@ orbit:   2.225485E-06  3.094462E-07  0.000000E+00  0.000000E+00  1.311738E-02  1
   
 iteration:   3 error:   1.998538E-08 deltap:   0.000000E+00
 orbit:   2.224308E-06  3.094511E-07  0.000000E+00  0.000000E+00  1.311766E-02  1.758089E-04
- ++++++ warning: TWCPGO: TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
+++++++ warning: TWCPGO: TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.        
 
 ++++++ table: summ
 
@@ -132,7 +132,7 @@ orbit:   2.224308E-06  3.094511E-07  0.000000E+00  0.000000E+00  1.311766E-02  1
       0.1473892005    0.0001361357237    3.582791087e-05        12.26536813 
 
                dq2            betymax              dymax              dyrms 
-   -0.002894683952        25.78242615                  0                  0 
+   -0.002894683952        25.78242615                 -0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -141,7 +141,7 @@ orbit:   2.224308E-06  3.094511E-07  0.000000E+00  0.000000E+00  1.311766E-02  1
                  0                  0                  0                  0 
 ibs,file=ibs-table.tfs;
 
- sige    4.1388071834743481E-003
+ sige   4.138807183474348E-003
  Twiss was calculated at the center of the elements. No interpolation is used
  
  Global parameters for the machine: 
@@ -152,14 +152,14 @@ radiate = T:
      alfa            0.360977E-02            eta             0.360974E-02            gamma(tr)      16.644094
      Bcurrent        0.055543 A/bunch        Kbunch       312                        Npart           0.450000E+12 per bunch
      E               2.860000 GeV            gamma        5596.880626                beta            1.000000
-
+ 
  Emittances:
-
+ 
      Ex            0.125070E+01 pi*mm*mrad     sigx            2.579938 mm
      Ey            0.125070E+04 pi*mm*mrad     sigy           88.883452 mm
      Et            0.750000E+02 pi*mm*mrad     sigt           18.121164 mm             sigE          4.138807 1/1000
 
-sequence name: pdr
+ sequence name: pdr
 
 rf  0.100000E-04   10.0000       999.950      0.500000       0.00000    
  
@@ -204,5 +204,5 @@ stop;
 0 in C and 2 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.06 (64 bit) finished normally +
+  + MAD-X 5.01.03 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

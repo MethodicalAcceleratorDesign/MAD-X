@@ -1,0 +1,76 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - g++ 4.8+ compiler settings
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+#
+# makedep
+#
+
+CXXDEP = $(CXX) -MM
+
+#
+# preprocessor flags
+#
+
+CPPFLAGS += -D_CLANGXX
+
+#
+# compiler
+#
+
+CXXFLAGS = -m$(ARCH) -O$(NOPT) -std=c++98 -Wall -W -Wextra -pedantic -c
+
+#
+# options flags
+#
+
+ifeq ($(DEBUG),yes)
+CXXFLAGS += -g -ggdb
+endif
+
+ifeq ($(PROFILE),yes)
+CXXFLAGS += -pg
+endif
+
+ifeq ($(SHARED),yes)
+CXXFLAGS += -fPIC
+endif
+
+ifeq ($(OPENMP),yes)
+CXXFLAGS += -fopenmp
+endif
+
+ifeq ($(SANITIZE),yes)
+CXXFLAGS += -fsanitize=address -fno-omit-frame-pointer
+endif
+
+#
+# extra flags
+#
+
+CXXFLAGS += -pipe
+
+#
+# diagnostics (g++ is the reference)
+#
+
+CXXFLAGS += -Wpointer-arith -Wcast-align -Wcast-qual -Winline \
+            -Wchar-subscripts -Wwrite-strings -Wconversion -Wno-conversion
+
+#           -Wfloat-equal -Wformat-nonliteral # not compatible with ugly MAD-X code...
+
+# end of makefile

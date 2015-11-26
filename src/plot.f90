@@ -2237,7 +2237,7 @@ subroutine pesopt(ierr)
      ! with basename equal to the first ignored variable (eg dy.ps), it is better to discard the whole plot
      ! and let the user fix the problem (for now at least...)
      if (k .gt. mxcurv) then
-        write (warnstr,'(i2,a,i2,a)') k," variables on VAXIS would overflow max number(",&
+        write (warnstr,'(i2,a,i2,a)') k," variables on VAXIS would overflow max number (",&
              mxcurv,"). all variables ignored."
         call fort_warn('PLOT: ',warnstr)
         goto 110

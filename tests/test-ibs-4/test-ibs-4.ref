@@ -1,10 +1,10 @@
 
-  ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.06  (64 bit, Darwin)      +
-  + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.06.26               +
-  + Execution date: 2015.08.05 19:15:54      +
-  ++++++++++++++++++++++++++++++++++++++++++++
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.01.03  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2013.10.14      +
+  + Execution Time Stamp: 15.10.13 17.45.59 +
+  +++++++++++++++++++++++++++++++++++++++++++
 Option, -echo,-warn,-info;
 
 
@@ -75,9 +75,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0                  0                  0                  0 
 ibs,file="ibs-table.tfs";
 
- sige    4.6800203460575546E-004
+ sige   4.680020346057555E-004
  Twiss was calculated at the exit of the elements.
- Twiss functions at the center  of the elements are calculated through linear interpolation
+ Twiss functions at the center of the elements are calculated through linear interpolation
  
  Global parameters for the machine: 
 
@@ -87,14 +87,14 @@ radiate = F:
      alfa            0.321634E-03            eta             0.317287E-03            gamma(tr)      55.759505
      Bcurrent        0.000198 A/bunch        Kbunch         1                        Npart           0.110000E+12 per bunch
      E             450.000000 GeV            gamma         479.605038                beta            0.999998
-
+ 
  Emittances:
-
+ 
      Ex            0.782000E-02 pi*mm*mrad     sigx            0.876942 mm
      Ey            0.782000E-02 pi*mm*mrad     sigy            0.895105 mm
      Et            0.100000E+07 pi*mm*mrad     sigt          115.000000 mm             sigE          0.468002 1/1000
 
-sequence name: lhcb1
+ sequence name: lhcb1
 
 acnca.d5l4.b1   1.10000       0.00000       200.394      0.500000       0.00000    
 acnca.c5l4.b1   1.10000       0.00000       200.394      0.500000       0.00000    
@@ -149,5 +149,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.06 (64 bit) finished normally +
+  + MAD-X 5.01.03 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

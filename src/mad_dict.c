@@ -277,19 +277,20 @@ char command_def[] =
 "dummy    = [s, 0]; "
 " "
 "option: control none 0 0 "
-"echo      = [l, true, true], "
-"echomacro = [l, false, true], " /* ld */
-"info      = [l, true, true], "
-"reset     = [l, false, true], "
-"debug     = [l, false, true], "
-"verbose   = [l, false, true], " /*hbu */
-"rbarc     = [l, true, true], "
-"thin_foc  = [l, true, true], "
-"sympl     = [l, true, true], "
-"tell      = [l, false, true], "
-"threader  = [l, false, true], "
-"trace     = [l, false, true], "
-"verify    = [l, false, true], "
+"echo       = [l, true, true], "
+"echomacro  = [l, false, true], " /* ld */
+"echosystem = [l, false, true], " /* ld */
+"info       = [l, true, true], "
+"reset      = [l, false, true], "
+"debug      = [l, false, true], "
+"verbose    = [l, false, true], " /*hbu */
+"rbarc      = [l, true, true], "
+"thin_foc   = [l, true, true], "
+"sympl      = [l, true, true], "
+"tell       = [l, false, true], "
+"threader   = [l, false, true], "
+"trace      = [l, false, true], "
+"verify     = [l, false, true], "
 "no_fatal_stop= [l, false, true], "
 "twiss_print  = [l, true, true], "
 "warn     = [l, true, true], "
@@ -1779,6 +1780,7 @@ char command_def[] =
 "type     = [s, none, none], "
 "apertype = [s, circle, circle], "
 "aperture = [r, {0}], "
+"aper_offset = [r, {0}], " /*hbu */
 "aper_tol = [r, {0, 0, 0}], "
 "slot_id  = [i, none], "
 "assembly_id = [i, none], "
@@ -2498,7 +2500,8 @@ char command_def[] =
 "makedipedge = [l, true, true], "
   /* "verbose = [l, false, true], " will replace the "option, verbose" used only by makethin */
 "makeconsistent = [l, false, true],  " /*hbu */
-"minimizeparents = [l, true, false]; " /*hbu */
+"minimizeparents = [l, true, false], " /*hbu */
+"makeendmarkers = [l, false, true];  " /*hbu */
 
 " "
 "survey: survey none 0 0 "

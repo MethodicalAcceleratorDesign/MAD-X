@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Darwin)      +
+  +     MAD-X 5.02.06  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.06.19 14:14:08      +
+  + Release   date: 2015.06.26               +
+  + Execution date: 2015.08.31 16:18:30      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! based on examples/emit/LEP/
 
@@ -108,8 +108,8 @@ Initial value of 6-D closed orbit from Twiss:
 orbit0   4.954688E-05 -3.462812E-07  0.000000E+00  0.000000E+00  1.525359E-01  7.169429E-04
   
 6D closed orbit found by subroutine trclor 
-iteration:  11 error:   1.679851E-06 deltap:   0.000000E+00
-orbit:   4.962732E-05 -3.420737E-07  0.000000E+00  0.000000E+00  1.525355E-01  7.165204E-04
+iteration:  11 error:   1.436106E-06 deltap:   0.000000E+00
+orbit:   4.962471E-05 -3.415771E-07  0.000000E+00  0.000000E+00  1.525357E-01  7.165082E-04
 exit TRACK module
 
 
@@ -117,5 +117,5 @@ exit TRACK module
 0 in C and 2 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  + MAD-X 5.02.06 (64 bit) finished normally +
   ++++++++++++++++++++++++++++++++++++++++++++

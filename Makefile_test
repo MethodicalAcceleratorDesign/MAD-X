@@ -38,11 +38,11 @@
 # tests-all  : runs tests-all
 
 # tests order
-tests-all := \
+tests-all = \
 test-table \
 test-memory \
 \
-test-makethin test-makethin-2 \
+test-makethin test-makethin-2 test-makethin-3 \
 test-survey test-survey-2 \
 test-track test-track-2 test-track-3 test-track-4 test-track-5 test-track-6 \
 test-track-7 test-track-8 test-track-9 test-track-10 test-track-11 \
@@ -65,7 +65,7 @@ test-beam \
 test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 test-rfmultipole-5 test-rfmultipole-6 \
 \
 test-ptc-twiss-1 test-ptc-twiss-2 test-ptc-twiss-3 \
-test-ptc-twiss-old1 test-ptc-twiss-old2 test-ptc-twiss-old3 test-ptc-twiss-old4 test-ptc-twiss-old5 $(if $(call eq,$(OSTYPE),Windows),,test-ptc-twiss-old6) test-ptc-twiss-old7 \
+test-ptc-twiss-old1 test-ptc-twiss-old2 test-ptc-twiss-old3 test-ptc-twiss-old4 test-ptc-twiss-old5 $(call onwin,,test-ptc-twiss-old6) test-ptc-twiss-old7 \
 test-ptc-twiss-5D test-ptc-twiss-5Dt test-ptc-twiss-56D test-ptc-twiss-56Dt test-ptc-twiss-56Dl test-ptc-twiss-56Dtl test-ptc-twiss-6D \
 test-ptc-normal test-ptc-twiss-maptable \
 test-ptc-trackline test-ptc-trackline-2 \
@@ -73,20 +73,26 @@ test-touschek test-touschek-2 \
 test-sequence test-sequence-2 test-sequence-3 test-sequence-4 test-sequence-5 test-sequence-6 \
 test-line \
 test-plot test-plot-2 \
-$(if $(call eq,$(OSTYPE),Linux),test-lhc,)
+\
+$(call onlxi64,$(user-cases))
 
 # same order as tests-all, tests that take +10 seconds
 # to know the timing: make tests-all TIMER=time (on Unixes)
-tests-long := \
+tests-long = \
 test-memory \
 test-track-7 test-track-8 test-track-10 test-track-11 \
 test-dynap \
 test-c6t-4 \
 test-match-6 test-match-7 \
 test-ptc-twiss-2 \
-$(if $(call eq,$(OSTYPE),Windows),,test-ptc-twiss-old6) test-ptc-twiss-old7 \
+$(call onwin,,test-ptc-twiss-old6) test-ptc-twiss-old7 \
 test-touschek test-touschek-2 \
-$(if $(call eq,$(OSTYPE),Linux),test-lhc,)
+\
+$(call onlxi64,$(user-cases))
+
+# user-cases are run only with tests-all on Lxplus + AFS + Intel 64 bit
+user-cases = \
+test-lhc test-hllhc
 
 # tests dependencies
 #test-c6t:     test-makethin-2
@@ -95,7 +101,7 @@ $(if $(call eq,$(OSTYPE),Linux),test-lhc,)
 #test-track-8: test-makethin-2
 
 # lexicographical order
-tests-to-setup := 
+tests-to-setup = 
 
 # testsuite titles (attached to first test of the suite, lex. order)
 test-aperture:       TESTSUITE := Aperture testsuite
@@ -127,6 +133,14 @@ test-twiss:          TESTSUITE := Twiss testsuite
 
 # end of testsuite
 #################################################
+
+# useful macros
+onwin    = $(if       $(call eq,$(OSTYPE),Windows),$1,$2)
+onlxplus = $(if $(and $(call eq,$(OSTYPE),Linux),$(wildcard /afs/cern.ch/eng/lhc/optics)),$1,$2)
+onlxi64  = $(if $(and $(call eq,$(OSTYPE),Linux),\
+                      $(call eq,$(COMP),intel),\
+                      $(call eq,$(ARCH),64),\
+                      $(wildcard /afs/cern.ch/eng/lhc/optics)),$1,$2)
 
 # madx supported command for tests
 ifndef MADX

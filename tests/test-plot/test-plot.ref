@@ -93,12 +93,12 @@ enter TRACK module
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
   
-  Full 6D closed orbit search.
-  Initial value of 6-D closed orbit from Twiss: 
-  orbit0    0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
+Full 6D closed orbit search.
+Initial value of 6-D closed orbit from Twiss: 
+orbit0   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
   Singular matrix occurred during closed orbit search.
   
- 6D closed orbit found by subroutine trclor 
+6D closed orbit found by subroutine trclor 
 iteration:   2 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 

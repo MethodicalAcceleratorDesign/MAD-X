@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.04  (32 bit, Darwin)      +
+  +     MAD-X 5.02.07  (32 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2014.11.14               +
-  + Execution date: 2015.03.12 17:29:48      +
+  + Release   date: 2015.09.24               +
+  + Execution date: 2015.10.12 19:04:23      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, 'RF-Dipole example';
 
@@ -38,7 +38,7 @@ use, sequence = my_seq;
 
 select, flag = twiss, column=name,s,betx,alfx,mux, bety, alfy,muy,dx,dy;
 
-twiss, save, centre;
+twiss, save, centre; 
 
 enter Twiss module
 ++++++ info: Zero value of SIGT replaced by 1.
@@ -124,5 +124,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.04 (32 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++
