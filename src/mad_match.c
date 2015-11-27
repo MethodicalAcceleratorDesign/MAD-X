@@ -231,6 +231,11 @@ match_action(struct in_cmd* cmd)
     match_work[3] = new_double_array(total_vars);
     match_work[4] = new_double_array(total_vars);
     fprintf(prt_file, "START JACOBIAN:\n\n");
+    size_t mem_size = (2*total_const*total_vars + 1020 * (total_const+total_vars)) * sizeof(double);
+    if (mem_size > 8000000) {
+      fprintf(prt_file, "Problem size is too large (may cause stability problems): %d*%d (%lu bytes)\n\n", total_const, total_vars, mem_size);
+//      fatal_error("stack overflow will occur in fortran routines,","good bye");
+    }
     mtjac_(&total_const, &total_vars,
            &jac_strategy, &jac_cool,&jac_balance, &jac_random,
            &jac_repeat,&jac_bisec,&jac_cond,&match_is_on,
