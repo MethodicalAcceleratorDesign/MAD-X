@@ -20,7 +20,7 @@
 # linker flags
 #
 
-LDFLAGS = -m$(ARCH) -O$(NOPT)
+LDFLAGS = -m$(ARCH) -O$(NOPT) -fmax-stack-var-size=65536
 LDLIBS  =
 
 #
