@@ -33,6 +33,11 @@ adjust_rfc(void)
   int i;
   struct element* el;
   freq0 = command_par_value("freq0", probe_beam);
+  if (current_sequ == 0x0)
+   {
+     printf("adjust_rfc: mad sequence not initialized, can not calculate frequencies from harmonic\n");
+     return;
+   }
   for (i = 0; i < current_sequ->cavities->curr; i++)
   {
     el = current_sequ->cavities->elem[i];
