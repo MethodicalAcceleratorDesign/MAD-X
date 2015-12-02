@@ -535,6 +535,212 @@ contains
 
   !_________________________________________________________________________________
 
+  subroutine trackline_standalone()
+    implicit none
+    integer              :: npart = 1
+    integer              :: n = 1
+    integer              :: nturns = 1
+    integer              :: t = 1
+    type(fibre), pointer :: p
+    real (dp)            :: x(1:6)
+    real (dp)            :: xini(1:6)
+    real (dp)            :: xp, yp, p0, pathlegth = zero
+    integer              :: apertflag, e, mf
+    integer              :: why(9)
+    logical(lp)          :: gcs, everystep
+    logical(lp)          :: rplot
+    real (dp)            :: gposx, gposy, gposz
+    integer              :: getnumberoftracks !function
+    real(kind(1d0))      :: get_value  
+    integer              :: get_option  
+    
+    if (m_u%n < 1) return;
+    
+    print*, "I'm going under and I can't turn round"
+    
+    my_ring => m_u%end
+    
+    n=1
+    npart = getnumberoftracks()
+    if (getdebug() > 0) then
+        print *, 'There is ', npart,' tracks'
+    endif
+
+    nturns = get_value('ptc_trackline ','turns ')
+    if (getdebug() > 2) then
+        print *, 'ptc_trackline, nturns = ', nturns
+    endif
+
+    everystep = get_option('everystep ') .ne. 0
+    
+    call kanalnummer(mf)
+    open(unit=mf,file='trackone.raw')
+    
+    write(mf,'(a2,a16,1x,a4,1x,a10,1x)') '@ ',ch16lft('NAME'),'%09s', 'PTC_NORMAL'
+    write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NO'),  '%9d', c_%no
+    write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NV'),  '%9d', c_%nv
+    write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('ND'),  '%9d', c_%nd
+    write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('ND2'), '%9d', c_%nd2
+    write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NDPT'),'%9d', c_%ndpt
+    write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NPARA'),    '%9d', c_%npara
+    write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NPARA_FPP'),'%9d', c_%npara_fpp
+    write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NP_POL'),   '%9d', c_%np_pol
+    write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NSPIN'),    '%9d', c_%nspin
+    write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('SPIN_POS'), '%9d', c_%SPIN_pos
+
+    write(mf,'(a2,a16,9(1x,a16))') '* ',ch16lft('NUMBER'),ch16lft('TURN'), &
+                                   'X','PX', &
+                                   'Y','PY', &
+                                   'PT','T', &
+	               'S','E'
+	               
+    write(mf,'(a2,a16,9(1x,a16))') '$ ',ch16lft('%d'),ch16lft('%d'), &
+                                   '%le','%le', &
+                                   '%le','%le', &
+                                   '%le','%le', &
+                                   '%le','%le'
+
+
+    do n=1, npart
+
+       pathlegth = zero
+
+       if (getdebug() > 3 ) then
+           print *, 'Getting track ',n
+       endif
+
+       call gettrack(n,x(1),x(2),x(3),x(4),x(6),x(5))
+       x(6) = -x(6)
+       if (getdebug() > 0 ) write(6,'(a10,1x,i8,1x,6(f9.6,1x))') 'Track ',n,x
+       xini = x
+       
+       write(mf,'(a2,2(i16,1x),8(ES16.8,1x))') '  ', n, 0, x(1:6), p0, pathlegth 
+       
+       do t=1, nturns
+
+          p=>my_ring%start
+
+          do e=1, my_ring%n
+
+             !print*, p%mag%name, p%mag%P%KILL_ENT_FRINGE, p%mag%P%KILL_EXI_FRINGE,  &
+             !        p%mag%P%BEND_FRINGE,  p%mag%p%PERMFRINGE, p%mag%PERMFRINGE
+             
+             !print*, p%mag%name
+             !write(6,'(a10,1x,i8,1x,6(f12.9,1x))') 'Track ',n,x
+
+             call track(my_ring,x,e,e+1,getintstate())
+             
+             
+             if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+                
+                
+                write(whymsg,*) 'DA got unstable. ', &
+                                'track no.: ',n,      &
+                                ', turn no.:',t,         &
+	            ', element no.:', e,    & 
+	            ', el. name:', p%MAG%name, &
+	            ', PTC msg: ',messagelost(1:LEN_TRIM(messagelost))
+                
+                
+                call fort_warn('ptc_trackline: ',whymsg(1:LEN_TRIM(whymsg)))
+                whymsg(LEN_TRIM(whymsg)+1:LEN_TRIM(whymsg)+1) = char(0)
+                call seterrorflag(10,"ptc_trackline ",whymsg);
+                
+                
+                goto 100 !for the time being lets try next particle, 
+                         !but most probably we will need to stop tracking and reinit 
+	     !goto 101
+                
+             endif
+             
+             pathlegth = pathlegth + p%mag%p%ld
+
+             if (getdebug() > 2 ) then
+                write(6,*) e, 'l=',pathlegth
+                write(6,'(5f8.4, f16.8)') x(1),x(2),x(3),x(4),x(5),x(6)
+             endif
+
+             p0 = p%mag%p%p0c
+
+             if (rplot) then
+                if (gcs) then
+                   !                write(6,'(a12,3f8.4)') "Magnet B ", p%mag%p%f%b(1), p%mag%p%f%b(2), p%mag%p%f%b(3)
+                   gposx = x(1)*p%chart%f%exi(1,1) + x(3)*p%chart%f%exi(1,2) + x(6)*p%chart%f%exi(1,3)
+                   gposy = x(1)*p%chart%f%exi(2,1) + x(3)*p%chart%f%exi(2,2) + x(6)*p%chart%f%exi(2,3)
+                   gposz = x(1)*p%chart%f%exi(3,1) + x(3)*p%chart%f%exi(3,2) + x(6)*p%chart%f%exi(3,3)
+                   !                write(6,'(a12,3f8.4)') " Rotated ", gposx,gposy,gposz
+                   gposx = gposx + p%chart%f%b(1)
+                   gposy = gposy + p%chart%f%b(2)
+                   gposz = gposz + p%chart%f%b(3)
+
+                   if (getdebug() > 3 ) write(6,'(a12, 2i6,3f8.4)') p%mag%name, n,e, gposx,gposy,gposz
+
+                   call plottrack(n, e, t, gposx, x(2) , gposy, x(4) , x(5), p0 , gposz)
+                else
+                   call plottrack(n, e, t, x(1), x(2) , x(3), x(4) , x(5), p0 , x(6))
+                endif
+             endif
+             
+             if (everystep) then
+                write(mf,'(a2,2(i16,1x),8(ES16.8,1x))') '  ', n, t, x(1:6), p0, pathlegth 
+             endif
+             
+             call produce_aperture_flag(apertflag)
+             if (apertflag/=0) then
+                print *, 'Particle out of aperture!'
+
+                call ANALYSE_APERTURE_FLAG(apertflag,why)
+                
+                write(whymsg,*) 'ptc_trackline: APERTURE error ', &
+                'track no.: ',n,      &
+                ', turn no.:',t,         &
+                ', element no.:', e,    & 
+                ', el. name:', p%MAG%name, &
+                ', APERTURE error: ',why, &
+                ', PTC msg: ',messagelost(1:LEN_TRIM(messagelost))
+                
+                
+                call fort_warn('ptc_twiss: ',whymsg(1:LEN_TRIM(whymsg)))
+                whymsg(LEN_TRIM(whymsg)+1:LEN_TRIM(whymsg)+1) = char(0)
+                call seterrorflag(10,"ptc_twiss: ",whymsg);
+                
+                goto 100 !take next track
+                
+             endif
+
+             if (e .lt. my_ring%n) p=>p%next
+
+          enddo !over elements
+          
+          write(mf,'(a2,2(i16,1x),8(ES16.8,1x))') '  ', n, t, x(1:6), p0, pathlegth 
+
+          if (apertflag/=0) then
+             exit; !goes to the next particle
+          endif
+
+       enddo !loop over turns
+       !           npart,turn,elno,elna,spos,stat,x,xini,e,mf
+       
+       !fen = p;
+       t = t - 1
+       !call putinstatustable(n,t,e,p%previous%MAG%name,pathlegth,0,x,xini,fen%energy,mf)
+      
+100    continue!take next track
+       
+    enddo !loop over tracks
+    
+
+101 continue!finish the program
+    
+    call deletetrackstrarpositions()
+
+    close(mf)
+    
+  end subroutine trackline_standalone
+
+
+
+!___________________________________________________________________
 
   subroutine ptc_trackline(nobs)
     ! subroutine that performs tracking with acceleration
@@ -585,7 +791,9 @@ contains
        return
     endif
     if(index_mad.le.0.or.EXCEPTION.ne.0) then
+        
        call fort_warn('return from ptc_trackline: ',' no layout created')
+       call trackline_standalone()
        return
     endif
 
@@ -821,6 +1029,15 @@ contains
 
 
   !_________________________________________________________________________________
+
+    function ch16lft(in)
+     implicit none
+     character(*) :: in
+     character(len=17) :: ch16lft
+
+     write(ch16lft,'(a16)') in
+     ch16lft = adjustl(ch16lft)
+    end function ch16lft
 
 
 end module madx_ptc_trackline_module
