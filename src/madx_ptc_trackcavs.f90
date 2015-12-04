@@ -35,7 +35,7 @@ contains
     type(fibre), pointer :: p
     real (dp)            :: x(1:6)
     !    real (dp)            :: polarx(1:6)   ! track vector -
-    real (dp)            :: xp, yp,  p0
+    real (dp)            :: xp, yp,  p0, en
     real (dp)            :: pathlegth = zero
     integer              :: npart = 1
     integer              :: n = 1
@@ -76,6 +76,23 @@ contains
        call fort_warn('return from ptc_trackline: ',' no layout created')
        return
     endif
+    
+    intstate = getintstate()
+    if (icav > 0 ) then
+       if (getdebug() > 0) then
+         print*,"Cavities present: enforcing NOCAVITY=false and TOTALPATH=true"
+       endif
+       
+       ! nocavity0==false then cavities are ignored
+       ! totalpath0==false cavity is rephased for each turn (phase set to 0)
+       intstate = intstate  - delta0 - only_4d0 - nocavity0 + totalpath0
+    endif
+
+    if (gcs .and.  intstate%TOTALPATH==1) then
+       call fort_warn("ptc_trackline","Having global coordinates and totalpath for z is sensless")
+       gcs = .false.
+    endif
+
 
     nturns = get_value('ptc_trackline ','turns ')
     if (getdebug() > 2) then
@@ -94,12 +111,7 @@ contains
 
     rplot = get_value('ptc_trackline ','rootntuple ') .ne. 0
 
-    intstate = getintstate()
-    if (gcs .and.  intstate%TOTALPATH==1) then
-       call fort_warn("ptc_trackline","Having global coordinates and totalpath for z is sensless")
-       gcs = .false.
-    endif
-
+    
 
     allocate(observedelements(1:my_ring%n)); observedelements(:)=0 ! zero means that this element is not an obs. point
 
@@ -285,7 +297,7 @@ contains
              p=>p%next
           endif
 
-          call track_beam(my_ring,TheBeam,getintstate(), node1=ni, node2=ni+1)
+          call track_beam(my_ring,TheBeam,intstate, node1=ni, node2=ni+1)
 
           !if(associated(CURR_SLICE%PARENT_FIBRE%MAG%p%aperture)) then
           !  print*, 'Checking AP', p%mag%name
@@ -339,12 +351,13 @@ contains
                x = TheBeam%X(n,1:6)
 
                p0 = p%mag%p%p0c
+               en = hypot(p0,p%mass)
 
                 ! a simple hook to get a text file 
                if (getdebug() > 1 ) then
                   write(mf,'(i8,1x, a16, 1x, 3i4, 1x,2f8.4, 1x, 7f12.8)' ) ni, p%mag%name, e, n, t, &
                        pathlegth, TheBeam%X(n,7), &
-                       x(1), x(2) , x(3), x(4) , x(5), x(6) , p0
+                       x(1), x(2) , x(3), x(4) , x(5), x(6) , en
                endif
 
                if (rplot) then
@@ -361,10 +374,10 @@ contains
                   !      gposz = gposz + p%chart%f%b(3)
                   !
                   !      write(6,'(a12, 2i6,3f8.4)') p%mag%name, n,e, gposx,gposy,gposz
-                  !      call plottrack(n, e, t, gposx, xp , gposy, yp , x(5), p0 , gposz)
+                  !      call plottrack(n, e, t, gposx, xp , gposy, yp , x(5), en , gposz)
                   !   else
-                  !call plottrack(n, e, t, x(1), xp , x(3), yp , x(5), p0 , x(6))
-                   call plottrack(n, e, t, x(1), x(2) , x(3), x(4) , x(5), p0 , x(6))
+                  !call plottrack(n, e, t, x(1), xp , x(3), yp , x(5), en , x(6))
+                   call plottrack(n, e, t, x(1), x(2) , x(3), x(4) , x(5), en , x(6))
                   !   endif
                endif
 
@@ -372,7 +385,7 @@ contains
                   !if ( associated(CURR_SLICE, p%t2 ) ) then
                   if (CURR_SLICE%cas==case0) then
 	 !print*, "Sending to table", n, e, pathlegth
-	 call putintracktable(n,t,observedelements(e),x(1), x(2) , x(3), x(4) ,x(6), x(5), pathlegth, p0, intstate%TOTALPATH)
+	 call putintracktable(n,t,observedelements(e),x(1), x(2) , x(3), x(4) ,x(6), x(5), pathlegth, en, intstate%TOTALPATH)
                   endif
                endif
                !fields in the table         "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e"
@@ -544,7 +557,7 @@ contains
     type(fibre), pointer :: p
     real (dp)            :: x(1:6)
     real (dp)            :: xini(1:6)
-    real (dp)            :: xp, yp, p0, pathlegth = zero
+    real (dp)            :: xp, yp, p0,en, pathlegth = zero
     integer              :: apertflag, e, mf
     integer              :: why(9)
     logical(lp)          :: gcs, everystep
@@ -553,6 +566,7 @@ contains
     integer              :: getnumberoftracks !function
     real(kind(1d0))      :: get_value  
     integer              :: get_option  
+    type(internal_state) :: intstate
     
     if (m_u%n < 1) return;
     
@@ -600,6 +614,7 @@ contains
                                    '%le','%le', &
                                    '%le','%le'
 
+    intstate = getintstate();
 
     do n=1, npart
 
@@ -614,6 +629,9 @@ contains
        if (getdebug() > 0 ) write(6,'(a10,1x,i8,1x,6(f9.6,1x))') 'Track ',n,x
        xini = x
        
+       p0 = my_ring%start%mag%p%p0c
+       en = hypot(p0,p%mass)
+
        write(mf,'(a2,2(i16,1x),8(ES16.8,1x))') '  ', n, 0, x(1:6), p0, pathlegth 
        
        do t=1, nturns
@@ -628,7 +646,7 @@ contains
              !print*, p%mag%name
              !write(6,'(a10,1x,i8,1x,6(f12.9,1x))') 'Track ',n,x
 
-             call track(my_ring,x,e,e+1,getintstate())
+             call track(my_ring,x,e,e+1,intstate)
              
              
              if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
@@ -661,6 +679,7 @@ contains
              endif
 
              p0 = p%mag%p%p0c
+             en = hypot(p0,p%mass)
 
              if (rplot) then
                 if (gcs) then
@@ -754,7 +773,7 @@ contains
     real (dp)            :: x(1:6)
     real (dp)            :: xini(1:6)
     !    real (dp)            :: polarx(1:6)   ! track vector -
-    real (dp)            :: xp, yp, p0
+    real (dp)            :: xp, yp, p0,en
     real (dp)            :: pathlegth = zero
     integer              :: npart = 1
     integer              :: n = 1
@@ -797,6 +816,23 @@ contains
        return
     endif
 
+    intstate = getintstate()
+    if (icav > 0 ) then
+       if (getdebug() > 0) then
+         print*,"Cavities present: enforcing NOCAVITY=false and TOTALPATH=true"
+       endif
+       
+       ! nocavity0==false then cavities are ignored
+       ! totalpath0==false cavity is rephased for each turn (phase set to 0)
+       intstate = intstate  - delta0 - only_4d0 - nocavity0 + totalpath0
+    endif
+
+    if (gcs .and.  intstate%TOTALPATH==1) then
+       call fort_warn("ptc_trackline","Having global coordinates and totalpath for z is sensless")
+       call fort_warn("ptc_trackline","Disabling gcs")
+       gcs = .false.
+    endif
+
     nturns = get_value('ptc_trackline ','turns ')
     if (getdebug() > 2) then
         print *, 'ptc_trackline, nturns = ', nturns
@@ -814,12 +850,6 @@ contains
 
     rplot = get_value('ptc_trackline ','rootntuple ') .ne. 0
 
-    intstate = getintstate()
-    if (gcs .and.  intstate%TOTALPATH==1) then
-       call fort_warn("ptc_trackline","Having global coordinates and totalpath for z is sensless")
-       call fort_warn("ptc_trackline","Disabling gcs")
-       gcs = .false.
-    endif
 
 
     allocate(observedelements(1:my_ring%n)); observedelements(:)=0 ! zero means that this element is not an obs. point
@@ -882,7 +912,11 @@ contains
     n=1
     npart = getnumberoftracks()
     if (getdebug() > 0) then
+        
+        call print(intstate,6)
+        
         print *, 'There is ', npart,' tracks'
+        
     endif
     do n=1, npart
 
@@ -908,7 +942,7 @@ contains
              !print*, p%mag%name
              !write(6,'(a10,1x,i8,1x,6(f12.9,1x))') 'Track ',n,x
 
-             call track(my_ring,x,e,e+1,getintstate())
+             call track(my_ring,x,e,e+1,intstate)
              
              
              if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
@@ -941,6 +975,7 @@ contains
              endif
 
              p0 = p%mag%p%p0c
+             en = hypot(p0,p%mass)
 
              if (rplot) then
                 if (gcs) then
@@ -955,14 +990,14 @@ contains
 
                    if (getdebug() > 3 ) write(6,'(a12, 2i6,3f8.4)') p%mag%name, n,e, gposx,gposy,gposz
 
-                   call plottrack(n, e, t, gposx, x(2) , gposy, x(4) , x(5), p0 , gposz)
+                   call plottrack(n, e, t, gposx, x(2) , gposy, x(4) , x(5), en , gposz)
                 else
-                   call plottrack(n, e, t, x(1), x(2) , x(3), x(4) , x(5), p0 , x(6))
+                   call plottrack(n, e, t, x(1), x(2) , x(3), x(4) , x(5), en , x(6))
                 endif
              endif
 
              if ( observedelements(e) .gt. 0) then
-                call putintracktable(n,t,observedelements(e),x(1), x(2) , x(3), x(4) , x(6), x(5), pathlegth, p0,intstate%TOTALPATH)
+                call putintracktable(n,t,observedelements(e),x(1), x(2) , x(3), x(4) , x(6), x(5), pathlegth, en,intstate%TOTALPATH)
              endif
              !fields in the table         "number", "turn", "x", "px", "y", "py", "t", "pt", "s", "e"
              
