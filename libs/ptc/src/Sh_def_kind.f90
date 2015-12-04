@@ -1356,8 +1356,13 @@ contains
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     DO I=1,EL%P%NST
-       IF(.NOT.PRESENT(MID)) call track_slice(EL,X,k,i)
-       IF(PRESENT(MID)) CALL XMID(MID,X,I)
+       IF(.NOT.PRESENT(MID)) then
+         call track_slice(EL,X,k,i)
+       endif
+ 
+       IF(PRESENT(MID)) then
+         CALL XMID(MID,X,I)
+       endif
     ENDDO
 
     !    k%TOTALPATH=TOTALPATH_FLAG
@@ -2403,9 +2408,13 @@ CALL FRINGECAV(EL,X,k,2)
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
-    O=twopi*EL%freq/CLIGHT
+    if(k%TIME) then
+       O=twopi*EL%freq/CLIGHT
+    else
+       O=twopi*EL%freq/(EL%p%beta0*CLIGHT)
+    endif
     VL=dir*YL*EL%volt*1e-3_dp/EL%P%P0C
-
+    
     do ko=1,el%nf    ! over modes
 
        DF=0.0_dp
@@ -2498,7 +2507,11 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
     DIR=EL%P%DIR*EL%P%CHARGE
 
-    O=twopi*EL%freq/CLIGHT
+    if(k%TIME) then
+       O=twopi*EL%freq/CLIGHT
+    else
+       O=twopi*EL%freq/(EL%p%beta0*CLIGHT)
+    endif
     VL=dir*YL*EL%volt*1e-3_dp/EL%P%P0C
 
     do ko=1,el%nf    ! over modes
@@ -10363,21 +10376,28 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     aper=APERTURE_FLAG
     APERTURE_FLAG=.true.
 
+    !print*,'Sgh_def_kind.f90 RCOLLIMATORiR Start check '
+    !CALL CHECK_APERTURE(EL%p%APERTURE,X)
+
     CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
-    if(mod(el%p%nst,2)==1) then
+    !if(mod(el%p%nst,2)==1) then
        !       IF(PRESENT(MID)) THEN
        !          if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
        !       ENDIF
-    endif
+    !endif
+
+    !print*,'Sgh_def_kind.f90 RCOLLIMATORiR Mid aperture check '
     CALL CHECK_APERTURE(EL%p%APERTURE,X)
-!    CALL CHECK_APERTURE(EL%A,X)
 
     CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
-    if(mod(el%p%nst,2)==0) then
+    !if(mod(el%p%nst,2)==0) then
        !       IF(PRESENT(MID)) THEN
        !          if(i==el%p%nst/2)  CALL XMID(MID,X,1)
        !       ENDIF
-    endif
+    !endif
+
+    !print*,'Sgh_def_kind.f90 RCOLLIMATORiR End aperture check '
+    !CALL CHECK_APERTURE(EL%p%APERTURE,X)
 
     IF(PRESENT(MID)) CALL XMID(MID,X,I)
 
@@ -10403,23 +10423,30 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     aper=APERTURE_FLAG
     APERTURE_FLAG=.true.
 
+    !print*,'Sgh_def_kind.f90 RCOLLIMATORiP Start aperture check '
+    !CALL CHECK_APERTURE(EL%p%APERTURE,X)
+
     CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
-    if(mod(el%p%nst,2)==1) then
+!    if(mod(el%p%nst,2)==1) then
        !       IF(PRESENT(MID)) THEN
        !          if(i==(el%p%nst+1)/2)  CALL XMID(MID,X,1)
        !       ENDIF
-    endif
-     CALL CHECK_APERTURE(EL%p%APERTURE,X)
-!    CALL CHECK_APERTURE(EL%A,X)
+!    endif
+
+    !print*,'Sgh_def_kind.f90 RCOLLIMATORiP Mid aperture check '
+    CALL CHECK_APERTURE(EL%p%APERTURE,X)
 
     CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
-    if(mod(el%p%nst,2)==0) then
+!    if(mod(el%p%nst,2)==0) then
        !       IF(PRESENT(MID)) THEN
        !          if(i==el%p%nst/2)  CALL XMID(MID,X,1)
        !       ENDIF
-    endif
+!    endif
 
     !IF(PRESENT(MID)) CALL XMID(MID,X,I)
+
+    !print*,'Sgh_def_kind.f90 RCOLLIMATORiP End aperture check '
+    !CALL CHECK_APERTURE(EL%p%APERTURE,X)
 
     APERTURE_FLAG=aper
 
@@ -10521,7 +10548,6 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        ENDIF
     endif
     CALL CHECK_APERTURE(EL%p%APERTURE,X)
-!    CALL CHECK_APERTURE(EL%A,X)
 
     CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
     if(mod(el%p%nst,2)==0) then
@@ -10559,7 +10585,6 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     !       ENDIF
     !    endif
     CALL CHECK_APERTURE(EL%p%APERTURE,X)
-!    CALL CHECK_APERTURE(EL%A,X)
     CALL DRIFT(DH,DD,EL%P%beta0,k%TOTALPATH,EL%P%EXACT,k%TIME,X)
     !    if(mod(el%p%nst,2)==0) then
     !       IF(PRESENT(MID)) THEN
