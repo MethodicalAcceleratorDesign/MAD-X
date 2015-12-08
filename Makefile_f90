@@ -121,7 +121,7 @@ madx_ptc_intstate.o:        $(FC_DIR_MAD)/madx_ptc_intstate.f90       Sp_keyword
 madx_ptc_knobs.o:           $(FC_DIR_MAD)/madx_ptc_knobs.f90          util.o madx_ptc_intstate.o Sp_keywords.o
 madx_ptc_module.o:          $(FC_DIR_MAD)/madx_ptc_module.f90         util.o madx_ptc_setcavs.o madx_ptc_knobs.o Sra_fitting.o
 madx_ptc_normal.o:          $(FC_DIR_MAD)/madx_ptc_normal.f90         madx_ptc_module.o
-madx_ptc_script.o:          $(FC_DIR_MAD)/madx_ptc_script.f90         util.o Sp_keywords.o
+madx_ptc_script.o:          $(FC_DIR_MAD)/madx_ptc_script.f90         madx_ptc_module.o util.o Sp_keywords.o
 madx_ptc_setcavs.o:         $(FC_DIR_MAD)/madx_ptc_setcavs.f90        madx_ptc_intstate.o Sp_keywords.o
 madx_ptc_trackcavs.o:       $(FC_DIR_MAD)/madx_ptc_trackcavs.f90      util.o madx_ptc_intstate.o madx_ptc_module.o madx_ptc_setcavs.o Sp_keywords.o
 madx_ptc_track_run.o:       $(FC_DIR_MAD)/madx_ptc_track_run.f90      util.o madx_ptc_module.o Sp_keywords.o
