@@ -2,6 +2,7 @@ module madx_ptc_script_module
   !This module enables the user to execute a PTC script
   !that enables additional functionality that is not possible with MAD-X scripting language
   use madx_keywords
+  use madx_ptc_module
   !  use pointer_lattice
   implicit none
   save
@@ -29,7 +30,11 @@ contains
     integer   scriptname(*)
     character(48) scriptfilename
     character(48) charconv
-
+    
+    if (m_u%n < 1) then
+      call append_empty_layout(m_u)
+    endif
+    
     scriptfilename = charconv(scriptname)
     print*, "I am in execsript: Script name is ", scriptfilename
     CALL read_ptc_command77(scriptfilename)
