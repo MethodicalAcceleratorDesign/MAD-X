@@ -27,8 +27,8 @@ MODULE madx_ptc_module
   integer ipause
   integer,external :: mypause
   real(kind(1d0)) get_value,node_value
-  type(layout),pointer :: my_ring, bmadl
-  type(mad_universe),target ::  m_u,m_t
+  type(layout),pointer :: my_ring=>null(), bmadl=>null()
+  type(mad_universe),pointer ::  m_u=>null(),m_t=>null()
   integer, private, parameter :: mynreso=20
   integer, private, dimension(4) :: iia,icoast
   real(dp) :: mux_default=c_0_28, muy_default=c_0_31, muz_default=c_1d_3
@@ -100,8 +100,20 @@ CONTAINS
        call aafail('sector_nmul_max must be larger than sector_nmul: ',&
             'check your ptc_create_universe input')
     endif
+    
+    ! copy from Ss_fake_mad.f90:ptc_ini_no_append
+    allocate(m_u)
     call set_up_universe(m_u)
+    allocate(m_t)
+    call set_up_universe(m_t)
+    
     universe=universe+1
+    
+    allocate(bmadl)
+    call set_up(bmadl)
+    bmadl%NAME='BMAD REUSED FIBRE LAYOUT'
+    call point_m_u(m_u,m_t)
+
 
 
   end subroutine ptc_create_universe
@@ -111,7 +123,7 @@ CONTAINS
     implicit none
     real(kind(1d0)) get_value
 
-    if(universe.le.0.or.EXCEPTION.ne.0) then
+    if(universe.le.0 .or. EXCEPTION.ne.0) then
        call fort_warn('return from ptc_create_layout: ',' no universe created')
        return
     endif
@@ -200,7 +212,7 @@ CONTAINS
     !  Etienne helical
     character(nlp) heli(100)
     integer mheli,helit,ihelit
-    type(fibre), pointer :: p
+    type(fibre), pointer :: p => null()
     !---------------------------------------------------------------
     !---------------------------------------------------------------
     if (getdebug() > 1) then
