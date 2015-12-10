@@ -68,12 +68,12 @@ contains
     !------------------------------------------------------
 
     if(universe.le.0.or.EXCEPTION.ne.0) then
-       call fort_warn('return from ptc_trackline: ',' no universe created')
+       call fort_warn('return from ptc_track_everystep: ',' no universe created')
        print*,"Max number of nobs ", nobs
        return
     endif
     if(index_mad.le.0.or.EXCEPTION.ne.0) then
-       call fort_warn('return from ptc_trackline: ',' no layout created')
+       call fort_warn('return from ptc_track_everystep: ',' no layout created')
        return
     endif
     
@@ -96,7 +96,7 @@ contains
 
     nturns = get_value('ptc_trackline ','turns ')
     if (getdebug() > 2) then
-        print *, 'ptc_trackline, nturns = ', nturns
+        print *, 'ptc_track_everystep, nturns = ', nturns
     endif
 
     if ( (nturns > 1) .and. (my_ring%closed .eqv. .false.)) then
@@ -231,6 +231,8 @@ contains
     npart = getnumberoftracks()
     if (getdebug() > 0) then
         print *, 'There is ', npart,' tracks'
+        
+        call print(getintstate(),6)
     endif
 
     !     IF(.NOT.ASSOCIATED(TheBeam%N)) THEN
