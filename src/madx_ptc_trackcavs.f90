@@ -353,7 +353,8 @@ contains
                x = TheBeam%X(n,1:6)
 
                p0 = p%mag%p%p0c
-               en = hypot(p0,p%mass)
+               !en = hypot(p0,p%mass)
+               en = sqrt(p0**2 + (p%mass)**2)
 
                 ! a simple hook to get a text file 
                if (getdebug() > 1 ) then
