@@ -106,7 +106,6 @@ update_beam(struct command* comm)
      ex->exn
      ey->eyn
      current->npart
-     et->sigt->sige
      where any item to the left takes precendence over the others;
      for ions, the input energy is multiplied by the charge, and the
   */
@@ -249,23 +248,15 @@ update_beam(struct command* comm)
   if (nlc->inform[name_list_pos("circ", nlc)]) {
     circ = command_par_value("circ", comm);
     if (circ > zero) freq0 = (beta * clight) / (ten_p_6 * circ);
-    // 2014-Apr-09  15:45:51  ghislain: update freq0 and circ only as necessary
     store_comm_par_value("freq0", freq0, current_beam);
     store_comm_par_value("circ", circ, current_beam);
   }
   else if (nlc->inform[name_list_pos("freq0", nlc)]) {
     freq0 = command_par_value("freq0", comm);
     if (freq0 > zero) circ = (beta * clight) / (ten_p_6 * freq0);
-    // 2014-Apr-09  15:45:51  ghislain: update freq0 and circ only as necessary
     store_comm_par_value("freq0", freq0, current_beam);
     store_comm_par_value("circ", circ, current_beam);
   }
-  // 2014-Apr-09  15:44:05  ghislain: name contains the particle name if any so this
-  // attempt to get circumference from sequence length fails always...
-  /*else if ((pos = name_list_pos(name, sequences->list)) >= 0) { 
-    circ = sequence_length(sequences->sequs[pos]);
-    freq0 = (beta * clight) / (ten_p_6 * circ);
-  } */
   
   // intensity related
   if (nlc->inform[name_list_pos("bcurrent", nlc)]) {
@@ -327,9 +318,6 @@ update_beam(struct command* comm)
   store_comm_par_value("eyn", eyn, current_beam);
   store_comm_par_value("npart", npart, current_beam);
   store_comm_par_value("bcurrent", bcurrent, current_beam);
-  // 2014-Apr-09  15:44:57  ghislain: update of freq0 and circ is done above
-  //store_comm_par_value("freq0", freq0, current_beam);
-  //store_comm_par_value("circ", circ, current_beam);
   store_comm_par_value("alfa", alfa, current_beam);
   store_comm_par_value("arad", arad, current_beam);
 }

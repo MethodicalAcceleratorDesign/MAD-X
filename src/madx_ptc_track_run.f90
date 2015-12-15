@@ -1429,7 +1429,7 @@ CONTAINS
             !Print *,'name=',current%MAG%name, &        !                   !                         e
             !        'l=',current%MAG%P%ld              !                   !                         l
          endif !+++end debug print++++++++++++++++++++++!                   !                         e
-         Call Paricle_Interactions &                                        !                         m
+         Call Particle_Interactions &                                       !                         m
               (i_current_elem, name_curr_elem, Entry_not_Exit,&             !                         e
               sum_length,length_curr_elem)                                  !                         n
          !                                                                  !                         t
@@ -1553,7 +1553,7 @@ CONTAINS
             !Print *,'name=',current%MAG%name, &         !                  !                         *
             !        'l=',current%MAG%P%ld               !                  !                         *
          endif !+++end debug print+++++++++++++++++++++++!                  !                         *
-         Call Paricle_Interactions &                                        !                         *
+         Call Particle_Interactions &                                       !                         *
               (i_current_elem, name_curr_elem, Entry_not_Exit,&             !                         *
               sum_length,length_curr_elem)                                  !                         *
          !                                                                  !                         *
@@ -1899,7 +1899,7 @@ CONTAINS
     !==============================================================================
 
     !==============================================================================
-    SUBROUTINE Paricle_Interactions &
+    SUBROUTINE Particle_Interactions &
          (i_current_elem, name_curr_elem, Entry_not_Exit,&
          sum_length,length_curr_elem)
       ! This intenal subroutine of the host subr. <ptc_track_run>
@@ -2035,9 +2035,9 @@ CONTAINS
 
       ENDIF Space_Charge_Calculation
 
-      ! print * , ' SUBROUTINE Paricle_Interactions is under construction => RETURN'
+      ! print * , ' SUBROUTINE Particle_Interactions is under construction => RETURN'
       RETURN
-    END SUBROUTINE Paricle_Interactions
+    END SUBROUTINE Particle_Interactions
     !==============================================================================
 
     !==============================================================================
