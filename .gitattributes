@@ -1863,6 +1863,11 @@ tests/test-rfmultipole-6/track.obs0001.p0002.cfg -text
 tests/test-rfmultipole-6/track.obs0001.p0002.ref -text
 tests/test-rfmultipole-6/track.obs0001.p0003.cfg -text
 tests/test-rfmultipole-6/track.obs0001.p0003.ref -text
+tests/test-rfmultipole-ptc-1/test-rfmultipole-ptc-1.cfg -text
+tests/test-rfmultipole-ptc-1/test-rfmultipole-ptc-1.madx -text
+tests/test-rfmultipole-ptc-1/test-rfmultipole-ptc-1.ref -text svneol=unset#application/x-gzip
+tests/test-rfmultipole-ptc-1/trackone.cfg -text
+tests/test-rfmultipole-ptc-1/trackone.ref -text svneol=unset#application/x-gzip
 tests/test-rfmultipole/fc.16.ref -text
 tests/test-rfmultipole/fc.2.ref -text
 tests/test-rfmultipole/fc.3.aux.ref -text

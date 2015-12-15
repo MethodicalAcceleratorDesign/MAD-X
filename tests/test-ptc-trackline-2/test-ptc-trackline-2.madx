@@ -49,9 +49,9 @@ USE, period=ctf;
 ptc_create_universe;
 ptc_create_layout, model=1, method=6, nst=20, exact=false, closed_layout=false;
 
-ptc_setswitch, debuglevel=0, nocavity=false, 
-               maxacceleration=true, exact_mis=true, time=false,
-               totalpath=false, fringe=true;
+ptc_setswitch, debuglevel=3, nocavity=false, 
+               maxacceleration=true, exact_mis=true, time=true,
+               totalpath=false, fringe=false;
 
 
 

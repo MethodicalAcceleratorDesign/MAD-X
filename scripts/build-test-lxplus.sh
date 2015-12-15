@@ -87,13 +87,12 @@ ifort    --version
 make all-linux64-intel all-linux64
 check_error "make all-linux64-intel failed"
 
-# license not yet back...
-#echo -e "\n===== NagFor build ====="
-#export PATH="${PATH}:/afs/cern.ch/sw/fortran/nag2012/bin"
-#export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/afs/cern.ch/sw/fortran/nag2012/lib"
-#export NAG_KUSARI_FILE="/afs/cern.ch/sw/fortran/nag2012/lib/nag.licence.5.2,lxlic04.cern.ch:"
-#make madx-linux-nagfor
-#check_error "make madx-linux-nagfor failed" "no-exit"
+echo -e "\n===== NagFor build ====="
+export PATH="${PATH}:/afs/cern.ch/sw/fortran/nag2012/bin"
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/afs/cern.ch/sw/fortran/nag2012/lib"
+export NAG_KUSARI_FILE="/afs/cern.ch/sw/fortran/nag2012/lib/nag.licence.5.2,lxlicen04.cern.ch:"
+make madx-linux-nagfor
+check_error "make madx-linux-nagfor failed" "no-exit"
 
 echo -e "\n===== Lahey 32 build ====="
 source /afs/cern.ch/sw/lcg/contrib/gcc/max/i686-slc6/setup.sh
