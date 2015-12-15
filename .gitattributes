@@ -954,7 +954,6 @@ src/matchsa.f90 -text
 src/orbf.f90 -text
 src/photoni.inc -text
 src/plot.f90 -text
-src/poisson.f90 -text
 src/ptc_export_xml.f90 -text
 src/resindex.f90 -text
 src/sodd.f90 -text

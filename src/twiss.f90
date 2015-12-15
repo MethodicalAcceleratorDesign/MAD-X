@@ -2267,7 +2267,6 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   integer :: elpar_vl
   integer :: nd, n_ferr, code
   double precision :: f_errors(0:maxferr)
-  !double precision :: field(2,0:maxmul)
   double precision :: rw(6,6), tw(6,6,6), ek0(6), orbit0(6)
   double precision :: x, y
   double precision :: an, sk1, sk2, sks, tilt, e1, e2, h, h1, h2, hgap, fint, fintx, rhoinv, blen, bvk
@@ -2859,7 +2858,7 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
   integer :: i, code, n_ferr
   double precision :: f_errors(0:maxferr)
   double precision :: rfac=0.d0, pt, tilt, bvk
-  double precision :: xkick, ykick, dpx, dpy, xau, div !, field(2)
+  double precision :: xkick, ykick, dpx, dpy, xau, div 
 
   integer, external :: node_fd_errors
   double precision, external :: node_value
@@ -2966,8 +2965,6 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
 
   integer :: n_ferr, nord, iord, j, nd, nn, ns
   double precision :: f_errors(0:maxferr)
-!  double precision :: field(2,0:maxmul)
-!  double precision :: vals(2,0:maxmul), 
   double precision :: normal(0:maxmul), skew(0:maxmul)
   double precision :: bi, pt, rfac, bvk, elrad, tilt, angle
   double precision :: x, y, dbr, dbi, dipr, dipi, dr, di, drt, dpx, dpy, dpxr, dpyr, dtmp
@@ -2991,37 +2988,18 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
 
   !---- Multipole components.
   NORMAL = zero ; call get_node_vector('knl ',nn,normal)
-  SKEW = zero   ; call get_node_vector('ksl ',ns,skew)
+  SKEW   = zero ; call get_node_vector('ksl ',ns,skew)
   tilt = node_value('tilt ')
 
-  !VALS = zero 
-  !VALS(1,0:nn) = NORMAL(0:nn)
-  !do iord = 0, nn
-  !   vals(1,iord) = normal(iord)
-  !enddo
-  !VALS(2,0:ns) = SKEW(0:ns)
-  !do iord = 0, ns
-  !   vals(2,iord) = skew(iord)
-  !enddo
-
-  !---- Field error vals.
-  !FIELD = zero 
-  !if (n_ferr .gt. 0) then
-  !   call dcopy(f_errors,field,n_ferr)
-  !endif
   nd = 2 * max(nn, ns, n_ferr/2-1)
 
   !---- Dipole error.
   dbr = f_errors(0) / (one + deltap)
   dbi = f_errors(1) / (one + deltap)
-  !dbr = field(1,0) / (one + deltap)
-  !dbi = field(2,0) / (one + deltap)
 
   !---- Nominal dipole strength.
   dipr = normal(0) / (one + deltap)
   dipi = skew(0)   / (one + deltap)
-  !dipr = vals(1,0) / (one + deltap)
-  !dipi = vals(2,0) / (one + deltap)
 
   if (tilt .ne. zero)  then
      if (dipi.ne.zero .or. dipr.ne.zero) then
@@ -3051,13 +3029,6 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
           normal(iord).ne.zero .or. skew(iord).ne.zero) nord = iord     
   enddo
 
-  !do iord = 1, nd/2
-  !   do j = 1, 2
-  !      if (field(j,iord) .ne. zero)  nord = iord
-  !      if (vals(j,iord) .ne. zero)  nord = iord
-  !   enddo
-  !enddo
-
   do iord = 1, nord
      f_errors(2*iord)   = (normal(iord) + f_errors(2*iord))   / (one + deltap)
      f_errors(2*iord+1) = (skew(iord)   + f_errors(2*iord+1)) / (one + deltap)
@@ -3075,27 +3046,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
      f_errors(2*iord)   = bvk * f_errors(2*iord)
      f_errors(2*iord+1) = bvk * f_errors(2*iord+1)
   enddo
-     
-!  do iord = 1, nord
-!     do j = 1, 2
-!        field(j,iord) = (vals(j,iord) + field(j,iord)) / (one + deltap)
-!     enddo
-!     if (tilt .ne. zero)  then
-!        if (field(2,iord).ne.zero.or.field(1,iord).ne.zero) then
-!           angle = atan2(field(2,iord), field(1,iord))/(iord+1) - tilt
-!        else
-!           angle = -tilt
-!        endif
-!        dtmp = sqrt(field(1,iord)**2+field(2,iord)**2)
-!        angle = (iord+1) * angle
-!        field(1,iord) = dtmp * cos(angle)
-!        field(2,iord) = dtmp * sin(angle)
-!     endif
-!     do j = 1, 2
-!        field(j,iord) = bvk * field(j,iord)
-!     enddo
-!  enddo
-
+  
   if (ftrk) then !---- Track orbit.
      x = orbit(1)
      y = orbit(3)
@@ -3109,11 +3060,6 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
         di  = (dr * y + di * x) / (iord+1) + f_errors(2*iord+1)
         dr  = drt
      enddo
- !    do iord = nord, 1, -1
- !       drt = (dr * x - di * y) / (iord+1) + field(1,iord)
- !       di  = (dr * y + di * x) / (iord+1) + field(2,iord)
- !       dr  = drt
- !    enddo
      dpx = dbr + (dr * x - di * y)
      dpy = dbi + (di * x + dr * y)
 
@@ -3158,11 +3104,6 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   if (nord .ge. 1) then
      dr = zero
      di = zero
-!     do iord = nord, 1, -1
-!        drt = (dr * x - di * y) / (iord) + field(1,iord)
-!        di  = (dr * y + di * x) / (iord) + field(2,iord)
-!        dr  = drt
-!     enddo
      do iord = nord, 1, -1
         drt = (dr * x - di * y) / (iord) + f_errors(2*iord)
         di  = (dr * y + di * x) / (iord) + f_errors(2*iord+1)
@@ -3194,11 +3135,6 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
            di  = (dr * y + di * x) / (iord-1) + f_errors(2*iord+1)
            dr  = drt
         enddo
-!        do iord = nord, 2, -1
-!           drt = (dr * x - di * y) / (iord-1) + field(1,iord)
-!           di  = (dr * y + di * x) / (iord-1) + field(2,iord)
-!           dr  = drt
-!        enddo
         dr = dr / two
         di = di / two
         te(2,1,1) = - dr
@@ -6462,8 +6398,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   double precision :: krf, vrf
   double precision :: x, y, z, px, py, pt, dpx, dpy, dpt
   double precision :: freq, volt, lag, harmon
-  double precision :: field_cos(2,0:maxmul)
-  double precision :: field_sin(2,0:maxmul)
+  double precision :: field_cos(2,0:maxmul), field_sin(2,0:maxmul)
   double precision :: pnl(0:maxmul), psl(0:maxmul)
   double precision :: P(6)
   double complex :: Cm2, Sm2, Cm1, Sm1, Cp0, Sp0, Cp1, Sp1
@@ -6870,14 +6805,13 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   integer :: j, ii, jj, kk, dummyi, n_ferr
   double precision :: elrad, rfac, bvk, tilt, cangle, sangle, dtmp
   double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
-  double precision :: f_errors(0:maxferr), field(2,0:0)
+  double precision :: f_errors(0:maxferr)!, field(2,0:0)
   double precision :: ed(6), rd(6,6), td(6,6,6)
   
   double precision :: krf
   double precision :: x, y, z, px, py, pt, dpx, dpy, dpt
   double precision :: freq, rfv, rfl, harmon
-  double precision :: field_cos(2)
-  double precision :: field_sin(2)
+  double precision :: field_cos(2), field_sin(2)
   double precision :: kn0l, pn0
   double precision :: P(6)
   double complex :: Cp0, Sp0, Cp1, Sp1
@@ -6888,7 +6822,7 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
     !---- Zero the arrays
   F_ERRORS = zero
-  FIELD = zero
+  !FIELD = zero
   TE = zero
   
   !---- drift matrix
@@ -6919,9 +6853,9 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !---- Set-up some parameters
   krf = twopi * freq * ten6p/clight;
 
-  if (n_ferr .gt. 0) then
-     call dcopy(f_errors, field, min(2, n_ferr))
-  endif
+  !if (n_ferr .gt. 0) then
+  !   call dcopy(f_errors, field, min(2, n_ferr))
+  !endif
   
   !---- Particle's coordinates
   if (ftrk) then
@@ -6942,8 +6876,9 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   endif
   
   !---- Vector with strengths + field errors
-  field_cos(1) = bvk * (kn0l * cos(pn0 * twopi - krf * z) + field(1,0)) / (one + deltap);
-  field_sin(1) = bvk * (kn0l * sin(pn0 * twopi - krf * z))              / (one + deltap);
+  !field_cos(1) = bvk * (kn0l * cos(pn0 * twopi - krf * z) + field(1,0)) / (one + deltap);
+  field_cos(1) = bvk * (kn0l * cos(pn0 * twopi - krf * z) + f_errors(0)) / (one + deltap);
+  field_sin(1) = bvk * (kn0l * sin(pn0 * twopi - krf * z))               / (one + deltap);
   field_cos(2) = zero; 
   field_sin(2) = zero;
   if (tilt .ne. zero)  then

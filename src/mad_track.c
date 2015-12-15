@@ -76,7 +76,7 @@ track_run(struct in_cmd* cmd)
   }
 
   track_tables_delete(); /* deleting all track related tables, 
-                            emtying does not work because different number of particles*/
+                            emptying does not work because different number of particles*/
   track_tables_create(cmd);
 
   /* allocate buffers */

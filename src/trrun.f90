@@ -79,7 +79,6 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 
   integer, external :: restart_sequ, advance_node, get_option, node_al_errors
   double precision, external :: node_value, get_variable, get_value
-  !logical, external :: is_drift, is_thin, is_quad, is_matrix, is_dipole
 
   ! 2015-Jul-08  19:16:53  ghislain: make code more readable
   run   = switch .eq. 1
@@ -3222,7 +3221,6 @@ subroutine trclor(switch,orbit0)
 
   integer, parameter :: itmax=10
   
-  !logical, external :: is_drift, is_thin, is_quad, is_matrix, is_dipole
   integer, external :: restart_sequ, advance_node, get_option, node_al_errors
   double precision, external :: node_value, get_value, get_variable
 
@@ -5030,34 +5028,3 @@ subroutine wzsub(x,y,u,v)
   return
   !
 end subroutine wzsub
-
-! LOGICAL FUNCTION  is_thin()
-!   double precision node_value, el
-!   el = node_value('l ')
-!   is_thin = el .eq. 0d0;
-! END FUNCTION is_thin
-
-! LOGICAL FUNCTION  is_drift()
-!   double precision node_value, code
-!   code = node_value('mad8_type ')
-!   is_drift = code .eq. 1;
-! END FUNCTION is_drift
-
-! LOGICAL FUNCTION  is_dipole()
-!   double precision node_value, code
-!   code = node_value('mad8_type ')
-!   is_dipole = code .eq. 3;
-! END FUNCTION is_dipole
-
-! LOGICAL FUNCTION  is_matrix()
-!   double precision node_value, code
-!   code = node_value('mad8_type ')
-!   is_matrix = code .eq. 4;
-! END FUNCTION is_matrix
-
-! LOGICAL FUNCTION  is_quad()
-!   double precision node_value, code
-!   code = node_value('mad8_type ')
-!   is_quad = code .eq. 5;
-! END FUNCTION is_quad
-

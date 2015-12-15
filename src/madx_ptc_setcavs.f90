@@ -52,7 +52,7 @@ contains
     localis = getintstate()
     
 !    localis = localis - nocavity0 + totalpath0
-    localis = localis - nocavity0 
+    localis = localis - delta0 - only_4d0 - nocavity0 + totalpath0
     if (getdebug() > 1) then
        print *, "I am in setcavities "
        call print(localis,6)

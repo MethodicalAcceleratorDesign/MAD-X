@@ -210,8 +210,15 @@ ptc_track_end(void)
       delete_command(stored_track_start->commands[i]);
   stored_track_start->curr = 0;
   
-  
-  c_node = current_sequ->ex_start;
+  if (current_sequ)  
+   {
+     c_node = current_sequ->ex_start;
+   }
+  else
+   { 
+     c_node = 0x0;
+   }   
+   
   while(c_node != NULL) /* clean observation points */
   {
     c_node->obs_point = 0;
@@ -787,6 +794,7 @@ pro_ptc_trackline(struct in_cmd* cmd)
 
   adjust_beam();
   probe_beam = clone_command(current_beam);
+  
   adjust_rfc(); /* sets freq in rf-cavities from probe */
 
   track_tables_delete(); /* deleting all track related tables*/
