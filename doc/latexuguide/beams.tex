@@ -86,14 +86,7 @@ in separate \texttt{BEAM} commands, the energy is left unchanged and the momentu
   $\sigma_E / E$ in [1].  
 \end{madlist} 
 
-\begin{5.02.06}
-The order of precedence for arguments is: \texttt{ex->exn}, \texttt{ey->eyn} and 
-\texttt{et->sigt->sige}.
-\end{5.02.06}
-\begin{5.02.07}
 The order of precedence for arguments is: \texttt{ex->exn}, \texttt{ey->eyn}.
-\end{5.02.07}
-
 
 Note that up to version 5.02.04 the definition of normalised emittance used in 
 \madx was referring to the so-called 2-sigma geometric emittance:
@@ -137,17 +130,6 @@ where $C$ is the machine circumference, and
 \textbf{\underline{Order and Precedence:}}\\
 Internally the BEAM command processes the parameters in the following
 order and with the following precedence (left to right): 
-\begin{5.02.06}
-\madxmp{
-    particle -> (mass+charge) \\
-    energy -> pc -> gamma -> beta -> brho \\
-    ex -> exn \\
-    ey -> eyn \\
-    current -> npart \\
-    et -> sigt -> sige
-}
-\end{5.02.06}
-\begin{5.02.07}
 \madxmp{
     particle -> (mass+charge) \\
     energy -> pc -> gamma -> beta -> brho \\
@@ -155,8 +137,6 @@ order and with the following precedence (left to right):
     ey -> eyn \\
     current -> npart
 }
-\end{5.02.07}
-
 
 \textbf{Warning:} BEAM updates, i.e. it replaces attributes explicitly
 mentioned, may calculate other attributes according to the precedence rules
