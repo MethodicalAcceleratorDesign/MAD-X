@@ -3,10 +3,13 @@ module madx_ptc_module
   use S_fitting_new
   implicit none
   public
+  
   TYPE(INTERNAL_STATE),POINTER :: my_state
   TYPE(layout),POINTER :: my_ring,bmadl
   type(mad_universe), pointer :: m_u=>null(),m_t=>null();
-
+  
+  public ptc_ini_no_append
+  
 contains
 
   subroutine ptc_INI()

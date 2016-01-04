@@ -171,7 +171,7 @@ module precision_constants
   LOGICAL(lp),TARGET  :: CHECK_MADX_APERTURE=.TRUE.
   LOGICAL(lp),TARGET  :: APERTURE_FLAG=.true.
 
-  REAL(dp),TARGET   :: absolute_aperture=1.0_dp
+  REAL(dp),TARGET   :: absolute_aperture=1.0_dp, t_aperture =1.d6
   integer,TARGET :: wherelost=0
   logical(lp),TARGET :: stable_da =.true.
   logical(lp),TARGET :: check_da =.true.
@@ -381,20 +381,7 @@ contains
 
   end function mat_norm
 
-  SUBROUTINE  check_stability(S1)
-    implicit none
-    REAL(DP),INTENT(INOUT)::S1(6)
-    INTEGER I
 
-    DO I=1,5
-       IF(ABS(S1(I))>C_%ABSOLUTE_APERTURE) THEN
-          S1=PUNY
-          C_%CHECK_STABLE=.FALSE.
-          EXIT
-       ENDIF
-    ENDDO
-
-  end   SUBROUTINE check_stability
 
   ! Symplectic integrator routines setting coefficients
 

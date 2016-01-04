@@ -144,7 +144,9 @@ CONTAINS
     TYPE(WORM),OPTIONAL, INTENT(INOUT):: MID
     TYPE(INTERNAL_STATE) K
 
-    if(associated(el%p%aperture)) call CHECK_APERTURE(EL%p%aperture,X)
+    if(associated(el%p%aperture)) then
+     if(el%p%dir*el%p%aperture%pos==0.OR.el%p%dir*el%p%aperture%pos==-1) call CHECK_APERTURE(EL%p%aperture,X)
+    endif
     !    if(other_program) then
     !       call track_R(x)
     !       return
@@ -201,6 +203,9 @@ CONTAINS
        write(w_p%c(1),'(1x,i4,a21)') el%kind," not supported TRACKR"
        ! call !write_e(0)
     END SELECT
+    if(associated(el%p%aperture)) then
+     if(el%p%dir*el%p%aperture%pos==0.OR.el%p%dir*el%p%aperture%pos==1)  call CHECK_APERTURE(EL%p%aperture,X)
+    endif
   END SUBROUTINE TRACKR
 
   SUBROUTINE TRACKP(EL,X,K)
@@ -210,11 +215,9 @@ CONTAINS
     !    TYPE(WORM_8),OPTIONAL, INTENT(INOUT):: MID
     TYPE(INTERNAL_STATE) K
 
-    if(associated(el%p%aperture)) call CHECK_APERTURE(EL%p%aperture,X)
-    !    if(other_program) then
-    !       call track_p(x)
-    !       return
-    !    endif
+    if(associated(el%p%aperture)) then
+     if(el%p%dir*el%p%aperture%pos==0.OR.el%p%dir*el%p%aperture%pos==-1)  call CHECK_APERTURE(EL%p%aperture,X)
+    endif
     SELECT CASE(EL%KIND)
     CASE(KIND0)
        !       IF(PRESENT(MID)) CALL XMID(MID,X,0)
@@ -265,6 +268,9 @@ CONTAINS
        write(w_p%c(1),'(1x,i4,a21)') el%kind," not supported TRACKP"
        ! call !write_e(0)
     END SELECT
+    if(associated(el%p%aperture)) then
+     if(el%p%dir*el%p%aperture%pos==0.OR.el%p%dir*el%p%aperture%pos==1)  call CHECK_APERTURE(EL%p%aperture,X)
+    endif
   END SUBROUTINE TRACKP
 
   !  SUBROUTINE TRACK_R(X)
@@ -2533,6 +2539,7 @@ ENDIF
     nullify(EL%SIAMESE_FRAME);
     nullify(EL%girder_FRAME);
     nullify(EL%doko);
+    nullify(EL%forward,EL%backWARD,el%usef,el%useb);
   end SUBROUTINE null_EL
 
   SUBROUTINE null_ELp(EL)
@@ -2584,6 +2591,7 @@ ENDIF
     nullify(EL%PA);
     nullify(EL%P);
     nullify(EL%PARENT_FIBRE);
+    nullify(EL%forward,EL%backWARD,el%usef,el%useb);
   end SUBROUTINE null_ELp
 
 
@@ -2716,6 +2724,18 @@ ENDIF
        IF(ASSOCIATED(EL%WI))        then
           el%WI=-1     !USER DEFINED MAGNET
           DEALLOCATE(EL%WI)
+       ENDIF
+
+       IF(ASSOCIATED(EL%forward))        then
+          call kill(EL%forward)     
+          DEALLOCATE(EL%forward)
+          DEALLOCATE(EL%usef)
+       ENDIF
+
+       IF(ASSOCIATED(EL%backWARD))        then
+          call kill(EL%backWARD)     
+          DEALLOCATE(EL%backWARD)
+          DEALLOCATE(EL%useb)
        ENDIF
 
        IF(ASSOCIATED(EL%ramp))        then
@@ -2920,6 +2940,17 @@ ENDIF
           DEALLOCATE(EL%WI)
        ENDIF
 
+       IF(ASSOCIATED(EL%forward))        then
+          call kill(EL%forward)     
+          DEALLOCATE(EL%forward)
+          DEALLOCATE(EL%usef)
+       ENDIF
+
+       IF(ASSOCIATED(EL%backWARD))        then
+          call kill(EL%backWARD)     
+          DEALLOCATE(EL%backWARD)
+          DEALLOCATE(EL%useb)
+       ENDIF
 
        IF(ASSOCIATED(EL%ramp))        then
           el%ramp=-1     !USER DEFINED MAGNET
@@ -3412,6 +3443,32 @@ ENDIF
     !       ELP%PARENT_FIBRE=>EL%PARENT_FIBRE
     !    ENDIF
 
+       IF(ASSOCIATED(EL%backWARD))        then
+         if(associated(elp%backWARD)) then
+          call kill(ELp%backWARD)     
+          DEALLOCATE(ELp%backWARD)
+         endif
+         allocate(ELp%backWARD(3))
+         do i=1,3
+         call alloc_tree(ELp%backWARD(i),ELp%backWARD(i)%n,ELp%backWARD(i)%np)
+         enddo
+         call COPY_TREE_N(EL%backWARD,ELp%backWARD)
+         ELp%useb= EL%useb
+       ENDIF
+ 
+
+       IF(ASSOCIATED(EL%forward))        then
+         if(associated(elp%forward)) then
+          call kill(ELp%forward)     
+          DEALLOCATE(ELp%forward)
+         endif
+         allocate(elp%forward(3))
+         do i=1,3
+         call alloc_tree(elp%forward(i),el%forward(i)%n,elp%forward(i)%np)
+         enddo
+         call COPY_TREE_N(EL%forward,ELp%forward)
+         ELp%usef= EL%usef
+       ENDIF
 
   END SUBROUTINE copy_el_elp
 
@@ -3754,11 +3811,33 @@ ENDIF
        CALL COPY(EL%PA,ELP%PA)
     ENDIF
 
-    !    IF(ASSOCIATED(EL%PARENT_FIBRE))        then
-    !       ELP%PARENT_FIBRE=>EL%PARENT_FIBRE
-    !    ENDIF
 
+       IF(ASSOCIATED(EL%backWARD))        then
+         if(associated(elp%backWARD)) then
+          call kill(ELp%backWARD)     
+          DEALLOCATE(ELp%backWARD)
+         endif
+         allocate(ELp%backWARD(3))
+         do i=1,3
+         call alloc_tree(ELp%backWARD(i),ELp%backWARD(i)%n,ELp%backWARD(i)%np)
+         enddo
+         call COPY_TREE_N(EL%backWARD,ELp%backWARD)
+         ELp%useb= EL%useb
+       ENDIF
+ 
 
+       IF(ASSOCIATED(EL%forward))        then
+         if(associated(elp%forward)) then
+          call kill(ELp%forward)     
+          DEALLOCATE(ELp%forward)
+         endif
+         allocate(ELp%forward(3))
+         do i=1,3
+         call alloc_tree(ELp%forward(i),ELp%forward(i)%n,ELp%forward(i)%np)
+         enddo
+         call COPY_TREE_N(EL%forward,ELp%forward)
+         ELp%usef= EL%usef
+       ENDIF
   END SUBROUTINE copy_elp_el
 
 
@@ -4104,6 +4183,33 @@ ENDIF
     !       ELP%PARENT_FIBRE=>EL%PARENT_FIBRE
     !    ENDIF
 
+
+       IF(ASSOCIATED(EL%backWARD))        then
+         if(associated(elp%backWARD)) then
+          call kill(ELp%backWARD)     
+          DEALLOCATE(ELp%backWARD)
+         endif
+         allocate(ELp%backWARD(3))
+         do i=1,3
+         call alloc_tree(ELp%backWARD(i),ELp%backWARD(i)%n,ELp%backWARD(i)%np)
+         enddo
+         call COPY_TREE_N(EL%backWARD,ELp%backWARD)
+         ELp%useb= EL%useb
+       ENDIF
+ 
+
+       IF(ASSOCIATED(EL%forward))        then
+         if(associated(elp%forward)) then
+          call kill(ELp%forward)     
+          DEALLOCATE(ELp%forward)
+         endif
+         allocate(ELp%forward(3))
+         do i=1,3
+         call alloc_tree(ELp%forward(i),ELp%forward(i)%n,ELp%forward(i)%np)
+         enddo
+         call COPY_TREE_N(EL%forward,ELp%forward)
+         ELp%usef= EL%usef
+       ENDIF
 
   END SUBROUTINE copy_el_el
 

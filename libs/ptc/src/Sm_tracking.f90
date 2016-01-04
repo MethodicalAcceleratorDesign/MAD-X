@@ -537,10 +537,7 @@ contains
     endif
 
     CALL TRACK(C%MAG,X,K,X_IN)
-    !    if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then ! new 2010
-    !       if(CHECK_MADX_APERTURE) c_%message="exceed absolute_aperture in TRACK_FIBRE_R"
-    !       CHECK_STABLE=.false.
-    !    else   ! new 2010
+ 
 
     IF(PRESENT(X_IN)) then
        CALL XMID(X_IN,X,X_IN%nst+1)
@@ -620,7 +617,7 @@ contains
 
     !    endif ! new 2010
 
-    if(abs(x(1))+abs(x(3))>absolute_aperture) then   !.or.(.not.CHECK_MADX_APERTURE)) then
+    if(abs(x(1))+abs(x(3))>absolute_aperture.or.abs(x(6))>t_aperture) then   !.or.(.not.CHECK_MADX_APERTURE)) then
        messageLOST="exceed absolute_aperture in TRACK_FIBRE_R"
        xlost=x
        CHECK_STABLE=.false.
@@ -800,7 +797,7 @@ ENDIF
     ! END NEW STUFF WITH KIND=3
 
     ! new 2010
-    if(abs(x(1))+abs(x(3))>absolute_aperture) then   !.or.(.not.CHECK_MADX_APERTURE)) then
+    if(abs(x(1))+abs(x(3))>absolute_aperture.or.abs(x(6))>t_aperture) then   !.or.(.not.CHECK_MADX_APERTURE)) then
        messageLOST="exceed absolute_aperture in TRACK_FIBRE_P"
        xlost=x
        CHECK_STABLE=.false.

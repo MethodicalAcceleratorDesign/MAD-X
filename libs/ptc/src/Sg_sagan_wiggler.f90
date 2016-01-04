@@ -1264,14 +1264,14 @@ contains
                *sinx_x(EL%W%K(2,i)*(X(3)+EL%W%Y0(I)))*(X(3)+EL%W%Y0(I))* &
                 SIN(EL%W%K(3,i)*Z+EL%W%F(I))/EL%W%K(1,i) + A
           B =  EL%W%A(I)*EL%W%K(3,i)*COSEH(EL%W%K(1,i)*(X(1)+EL%W%X0(i)))*COS(EL%W%K(2,i)*(X(3)+EL%W%Y0(I)))* &
-                SIN(EL%W%K(3,i)*Z+EL%W%F(I)) + B
+                SIN(EL%W%K(3,i)*Z+EL%W%F(I))/EL%W%K(1,i)**2 + B
 !          A =  EL%W%A(I)*EL%W%K(3,i)*SINEH(EL%W%K(1,i)*(X(1)+EL%W%X0(i)))*SIN(EL%W%K(2,i)*(X(3)+EL%W%Y0(I)))* &
 !                SIN(EL%W%K(3,i)*Z+EL%W%F(I))/EL%W%K(1,i)/EL%W%K(2,i) + A
        endif
      enddo
 
     A=A*EL%P%CHARGE 
-    B=A*EL%P%CHARGE 
+    B=B*EL%P%CHARGE 
     
   END SUBROUTINE COMPX_R
 
@@ -1283,8 +1283,7 @@ contains
     TYPE(REAL_8),INTENT(INOUT):: A,B
     INTEGER I
     A=0.0_dp
-    A=A*EL%P%CHARGE 
-
+    B=0.0_dp
 ! COSEH(X) ! REPLACES COSH(X)
 ! SINEH(X) ! REPLACES SINH(X)
 ! SINEHX_X(X) ! REPLACES SINH(X)/X
@@ -1314,14 +1313,14 @@ contains
                *sinx_x(EL%W%K(2,i)*(X(3)+EL%W%Y0(I)))*(X(3)+EL%W%Y0(I))* &
                 SIN(EL%W%K(3,i)*Z+EL%W%F(I))/EL%W%K(1,i) + A
           B =  EL%W%A(I)*EL%W%K(3,i)*cosh(EL%W%K(1,i)*(X(1)+EL%W%X0(i)))*COS(EL%W%K(2,i)*(X(3)+EL%W%Y0(I)))* &
-                SIN(EL%W%K(3,i)*Z+EL%W%F(I)) + B
+                SIN(EL%W%K(3,i)*Z+EL%W%F(I))/EL%W%K(1,i)**2 + B
 !          A =  EL%W%A(I)*EL%W%K(3,i)*SINH(EL%W%K(1,i)*(X(1)+EL%W%X0(i)))*SIN(EL%W%K(2,i)*(X(3)+EL%W%Y0(I)))* &
 !                SIN(EL%W%K(3,i)*Z+EL%W%F(I))/EL%W%K(1,i)/EL%W%K(2,i) + A
        endif
      enddo
 
-    B=0.0_dp
-    B=A*EL%P%CHARGE 
+    A=A*EL%P%CHARGE 
+    B=B*EL%P%CHARGE 
   END SUBROUTINE COMPX_P
 
   !   Y_PLANE

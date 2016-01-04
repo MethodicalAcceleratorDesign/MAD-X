@@ -29,14 +29,14 @@ module ptc_spin
   !  private PUSH_SPIN_RAY8
   private radiate_2p,radiate_2r,radiate_2
   private TRACK_NODE_FLAG_probe_R,TRACK_NODE_FLAG_probe_p,TRACK_NODE_LAYOUT_FLAG_spinr_x
-  private FIND_ORBIT_LAYOUT_noda,FIND_ORBIT_LAYOUT_noda_object,FIND_ORBIT_LAYOUT_noda_spin_object
+  private FIND_ORBIT_LAYOUT_noda,FIND_ORBIT_LAYOUT_noda_object
   PRIVATE get_Bfield_fringeR,get_Bfield_fringeP,get_Bfield_fringe,TRACK_NODE_LAYOUT_FLAG_spinp_x
   private TRACK_LAYOUT_FLAG_spin12r_x,TRACK_LAYOUT_FLAG_spin12p_x
   PRIVATE TRACK_LAYOUT_FLAG_probe_spin12R,TRACK_LAYOUT_FLAG_probe_spin12P
   private PUSH_SPIN_fake_fringer,PUSH_SPIN_fake_fringep,PUSH_SPIN_fake_fringe
   PRIVATE TRACK_NODE_LAYOUT_FLAG_pr_t12_R,TRACK_NODE_LAYOUT_FLAG_pr_t12_P
   private TRACK_LAYOUT_FLAG_spint12r_x,TRACK_LAYOUT_FLAG_spint12p_x,alloc_temporal_beam
-  private alloc_temporal_probe,FIND_ORBIT_LAYOUT_noda_spin,GET_BZ_fringe,GET_BZ_fringer,GET_BZ_fringep
+  private alloc_temporal_probe,GET_BZ_fringe,GET_BZ_fringer,GET_BZ_fringep
   private TRACK_rotate_spin_r,TRACK_rotate_spin_p,TRACK_rotate_spin
   private TRACK_FRINGE_multipole_r,TRACK_FRINGE_multipole_p,TRACK_FRINGE_multipole
   private TRACK_wedge_spin_R,TRACK_wedge_spin_p,TRACK_wedge_spin
@@ -112,10 +112,7 @@ module ptc_spin
   END INTERFACE
 
 
-  INTERFACE FIND_ORBIT_probe_spin
-     MODULE PROCEDURE FIND_ORBIT_LAYOUT_noda_spin
-     MODULE PROCEDURE FIND_ORBIT_LAYOUT_noda_spin_object
-  END INTERFACE
+
 
 
   INTERFACE radiate_2
@@ -1029,6 +1026,10 @@ contains
        OM(3)=0.0_dp
     END SELECT
 
+    IF(.not.k%TIME) THEN
+      x(5)=(2*x(5)+x(5)**2)/(sqrt(1.0_dp/p%beta0**2+2.0_dp*x(5)+x(5)**2)+1.0_dp/p%beta0)
+    endif
+
     !  MUST ALWAYS COMPUTER GAMMA EVEN IF TIME=FALSE.
     GAMMA=P%BETA0/P%GAMMA0I*( 1.0_dp/P%BETA0 + X(5) )
     beta=sqrt(1.0_dp+2.0_dp*x(5)/p%beta0+x(5)**2)/(1.0_dp/P%BETA0 + x(5))  ! replaced  
@@ -1052,6 +1053,10 @@ contains
     DO I=1,3
        OM(I)=OM(I)-DLDS*0.5_dp*e_muon*(GAMMA*E(I)+(1-GAMMA)*EFD(I))
     ENDDO
+
+    IF(.not.k%TIME) THEN
+       x(5)=(2.0_dp*x(5)/p%beta0+x(5)**2)/(sqrt(1.0_dp+2.0_dp*x(5)/p%beta0+x(5)**2)+1.0_dp)
+    endif
 
     if((k%radiation.or.k%envelope)) then
        !      if(P%RADIATION) then
@@ -1186,6 +1191,10 @@ contains
        OM(3)=0.0_dp
     END SELECT
 
+    IF(.not.k%TIME) THEN
+      x(5)=(2*x(5)+x(5)**2)/(sqrt(1.0_dp/p%beta0**2+2.0_dp*x(5)+x(5)**2)+1.0_dp/p%beta0)
+    endif
+
     !  MUST ALWAYS COMPUTER GAMMA EVEN IF TIME=FALSE.
     GAMMA=P%BETA0/P%GAMMA0I*( 1.0_dp/P%BETA0 + X(5) )
 
@@ -1211,6 +1220,10 @@ contains
     DO I=1,3
        OM(I)=OM(I)-DLDS*0.5_dp*e_muon_scale*(GAMMA*E(I)+(1-GAMMA)*EFD(I))
     ENDDO
+
+    IF(.not.k%TIME) THEN
+       x(5)=(2.0_dp*x(5)/p%beta0+x(5)**2)/(sqrt(1.0_dp+2.0_dp*x(5)/p%beta0+x(5)**2)+1.0_dp)
+    endif
 
     if((k%radiation.or.k%envelope)) then
        !      if(P%RADIATION) then
@@ -2800,6 +2813,8 @@ call kill(e)
     type(probe), INTENT(INOUT) :: xs
     TYPE(INTERNAL_STATE) K
     REAL(DP) FAC,DS
+    logical useptc,dofix0,dofix
+    type(tree_element), pointer :: arbre(:)
 !    logical(lp) bmad
     IF(.NOT.CHECK_STABLE) then
        CALL RESET_APERTURE_FLAG
@@ -2813,6 +2828,19 @@ call kill(e)
     C%PARENT_FIBRE%MAG%P%MASS => C%PARENT_FIBRE%MASS
     C%PARENT_FIBRE%MAG%P%ag => C%PARENT_FIBRE%ag
     C%PARENT_FIBRE%MAG%P%CHARGE=>C%PARENT_FIBRE%CHARGE
+
+     useptc=.true.
+     if(C%PARENT_FIBRE%dir==1) then
+       if(associated(C%PARENT_FIBRE%MAG%forward)) then
+         if(C%PARENT_FIBRE%MAG%usef) useptc=.false.
+          arbre=>C%PARENT_FIBRE%MAG%forward
+       endif
+     else
+       if(associated(C%PARENT_FIBRE%MAG%backward)) then
+         if(C%PARENT_FIBRE%MAG%useb) useptc=.false.
+          arbre=>C%PARENT_FIBRE%MAG%backward
+       endif
+     endif
     !      ag=xs%s%g
     !      if(associated(c%bb)) call BBKICK(c%BB,XS%X)
 !    bmad=use_bmad_units.and.(c%cas/=casep1.and.c%cas/=casep2)
@@ -2829,15 +2857,22 @@ call kill(e)
 
  
     if(c%cas==0) then
+       if(useptc) then
        ds=c%parent_fibre%MAG%L/c%parent_fibre%MAG%p%nst
        fac=0.5_dp
-       call PUSH_SPIN(c,ds,FAC,XS,my_true,k,C%POS_IN_FIBRE-3)
-       CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
-       call PUSH_SPIN(c,ds,FAC,XS,my_false,k,C%POS_IN_FIBRE-2)
-    elseIF(c%cas==case1) then
+        call PUSH_SPIN(c,ds,FAC,XS,my_true,k,C%POS_IN_FIBRE-3)
+        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
+        call PUSH_SPIN(c,ds,FAC,XS,my_false,k,C%POS_IN_FIBRE-2)
+       else
+          dofix0=.false.;dofix=.false.
+          if(C%POS_IN_FIBRE-2==1) dofix0=.true.
+          if(C%POS_IN_FIBRE-C%PARENT_FIBRE%MAG%p%nst==2) dofix=.true.
+        call track_TREE_probe_complex(arbre,xs,dofix0,dofix,k) 
+       endif
+    elseIF(c%cas==case1.and.useptc) then
        CALL TRACK_FRINGE_spin(C,XS,K)
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
-    elseIF(c%cas==case2) then
+    elseIF(c%cas==case2.and.useptc) then
        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
        CALL TRACK_FRINGE_spin(C,XS,K)
     else
@@ -2848,7 +2883,7 @@ call kill(e)
                  CALL TRACK_SPIN_FRONT(C%PARENT_FIBRE,XS)
 !               If(use_bmad_units) call convert_ptc_to_bmad(xs,C%PARENT_FIBRE%beta0,k%time)
           endif
-       ELSE
+       ELSEif(c%cas==caseP2) THEN
           if(k%spin) then
 !               If(use_bmad_units) call convert_bmad_to_ptc(xs,C%PARENT_FIBRE%beta0,k%time)
                  CALL TRACK_SPIN_BACK(C%PARENT_FIBRE,XS)
@@ -2872,6 +2907,7 @@ call kill(e)
        xs%lost_node=>c
        lost_fibre=>c%parent_fibre
        lost_node=>c
+       xlost=xs%x
     endif
   END SUBROUTINE TRACK_NODE_FLAG_probe_R
 
@@ -2885,6 +2921,8 @@ call kill(e)
     logical(lp) CHECK_KNOB
     integer(2), pointer,dimension(:)::AN,BN
     integer ki
+    logical useptc,dofix0,dofix
+    type(tree_element), pointer :: arbre(:)
 !    logical(lp) bmad
     !   if(xs%u) return
 
@@ -2899,6 +2937,20 @@ call kill(e)
     C%PARENT_FIBRE%MAGP%P%MASS => C%PARENT_FIBRE%MASS
     C%PARENT_FIBRE%MAGP%P%ag => C%PARENT_FIBRE%ag
     C%PARENT_FIBRE%MAGp%P%CHARGE=>C%PARENT_FIBRE%CHARGE
+
+    useptc=.true.
+     if(C%PARENT_FIBRE%dir==1) then
+       if(associated(C%PARENT_FIBRE%MAGP%forward)) then
+         if(C%PARENT_FIBRE%MAGP%usef) useptc=.false.
+          arbre=>C%PARENT_FIBRE%MAGP%forward
+       endif
+     else
+       if(associated(C%PARENT_FIBRE%MAGP%backward)) then
+         if(C%PARENT_FIBRE%MAGP%useb) useptc=.false.
+          arbre=>C%PARENT_FIBRE%MAGP%backward
+       endif
+     endif
+
     !      ag=xs%s%g
  !   bmad=use_bmad_units.and.(c%cas/=casep1.and.c%cas/=casep2)
     if(use_bmad_units) then 
@@ -2921,16 +2973,23 @@ call kill(e)
     !      if(associated(c%bb)) call BBKICK(c%BB,XS%X)
 
     if(c%cas==0) then
+       if(useptc) then
        ds=c%parent_fibre%MAGp%L/c%parent_fibre%MAG%p%nst
        fac=0.5_dp
-if(ki==kind10)CALL MAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,K)
-       call PUSH_SPIN(c,ds,FAC,XS,my_true,k,C%POS_IN_FIBRE-3)
-if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
-       CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
-if(ki==kind10)CALL MAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
-       call PUSH_SPIN(c,ds,FAC,XS,my_false,k,C%POS_IN_FIBRE-2)
-if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
-    elseIF(c%cas==case1.or.c%cas==case2) then
+        if(ki==kind10)CALL MAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,K)
+        call PUSH_SPIN(c,ds,FAC,XS,my_true,k,C%POS_IN_FIBRE-3)
+         if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
+        CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
+         if(ki==kind10)CALL MAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
+        call PUSH_SPIN(c,ds,FAC,XS,my_false,k,C%POS_IN_FIBRE-2)
+         if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
+       else
+          dofix0=.false.;dofix=.false.
+          if(C%POS_IN_FIBRE-2==1) dofix0=.true.
+          if(C%POS_IN_FIBRE-C%PARENT_FIBRE%MAGp%p%nst==2) dofix=.true.
+        call track_TREE_probe_complex(arbre,xs,dofix0,dofix,k)  
+       endif
+    elseIF((c%cas==case1.or.c%cas==case2).and.useptc) then
 if(ki==kind10)CALL MAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        CALL TRACK_FRINGE_spin(C,XS,K)
 if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
@@ -2944,7 +3003,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
                  CALL TRACK_SPIN_FRONT(C%PARENT_FIBRE,XS)
 !               If(use_bmad_units) call convert_ptc_to_bmad(xs,C%PARENT_FIBRE%beta0,k%time)
           endif
-       ELSE
+       ELSEif(c%cas==caseP2) THEN
           if(k%spin) then
    !            If(use_bmad_units) call convert_bmad_to_ptc(xs,C%PARENT_FIBRE%beta0,k%time)
                  CALL TRACK_SPIN_BACK(C%PARENT_FIBRE,XS)
@@ -2979,6 +3038,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        xs%lost_node=>c
        lost_fibre=>c%parent_fibre
        lost_node=>c
+       xlost=xs%x
     endif
 
   END SUBROUTINE TRACK_NODE_FLAG_probe_P
@@ -3009,8 +3069,17 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
           call TRACK_rotate_spin(C,p,K)
        endif
     else
-       write(6,*) " TRACK_FRINGE_spin_R "
-       stop 888
+      ! write(6,*) " TRACK_FRINGE_spin_R "
+       IF(C%CAS==CASE1) THEN
+          call TRACK_rotate_spin(C,p,K)
+          call TRACK_FRINGE_multipole(C,p,K)
+          call TRACK_wedge_spin(C,p,K)
+       else
+          call TRACK_wedge_spin(C,p,K)
+          call TRACK_FRINGE_multipole(C,p,K)
+          call TRACK_rotate_spin(C,p,K)
+       endif
+     !  stop 888
     endif
   end SUBROUTINE TRACK_FRINGE_spin_R
 
@@ -3040,8 +3109,17 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
           call TRACK_rotate_spin(C,p,K)
        endif
     else
-       write(6,*) " TRACK_FRINGE_spin_p "
-       stop 888
+       IF(C%CAS==CASE1) THEN
+          call TRACK_rotate_spin(C,p,K)
+          call TRACK_FRINGE_multipole(C,p,K)
+          call TRACK_wedge_spin(C,p,K)
+       else
+          call TRACK_wedge_spin(C,p,K)
+          call TRACK_FRINGE_multipole(C,p,K)
+          call TRACK_rotate_spin(C,p,K)
+       endif
+      ! write(6,*) " TRACK_FRINGE_spin_p "
+      ! stop 888
     endif
 
   end SUBROUTINE TRACK_FRINGE_spin_p
@@ -3645,144 +3723,6 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
 
   END SUBROUTINE DTILTP_SPIN
 
-  SUBROUTINE FIND_ORBIT_LAYOUT_noda_spin(RING,FIX,STATE,eps,TURNS,fibre1,node1,theta0)
-    ! Finds orbit without TPSA in State or compatible state
-    IMPLICIT NONE
-    TYPE(layout),target,INTENT(INOUT):: RING
-    type(probe) , intent(inOUT) :: FIX
-    type(probe)  FIXT
-    INTEGER , optional,intent(in) :: TURNS,node1,fibre1
-    real(dp)  eps,x0(6),theta0r,s(3,3)
-    real(dp), optional,intent(inout) :: theta0
-    TYPE(INTERNAL_STATE), intent(in) :: STATE
-    TYPE(INTERNAL_STATE) stat
-    !    type(probe_8) xs
-    !    type(damapspin) ds
-    integer i,turns0,J
-    turns0=1
-    theta0r=0.d0
-    if(present(turns)) turns0=turns
-    x0=FIX%x
-    stat=state
-    call find_orbit_x(RING,x0,STATE,eps,TURNS,fibre1,node1)
-
-    stat=state+spin0 !+spin_only0
-
-    FIX=x0
-
-    !        call init(stat,1,0)
-
-    !        call alloc(xs)
-    !        call alloc(ds)
-
-    !        ds=1
-    !        xs= FIX + ds
-
-    !        do i=1,TURNS0
-    !         call track_probe(RING,xs,stat,fibre1,node1)
-    !        enddo
-
-    !        ds=xs
-
-    !         DO J=1,3
-    FIXT=x0
-
-    do i=1,TURNS0
-       call track_probe(RING,fixt,stat,fibre1=fibre1,node1=node1)
-    enddo
-    DO J=1,3
-       s(1:3,j)=FIXT%S(J)%X(1:3)
-    ENDDO
-    !         ENDDO
-
-
-
-    call get_spin_n0(S,theta0r,FIX%s(1)%x)
-    FIX%s(2)%x=FIX%s(1)%x
-    FIX%s(3)%x=FIX%s(1)%x
-    if(present(theta0)) theta0=theta0r
-
-    !        call kill(xs)
-    !        call kill(ds)
-
-
-
-  END SUBROUTINE FIND_ORBIT_LAYOUT_noda_spin
-
-  SUBROUTINE FIND_ORBIT_LAYOUT_noda_spin_object(FIX,STATE,eps,TURNS,fibre1,node1,theta0)
-    ! Finds orbit without TPSA in State or compatible state
-    IMPLICIT NONE
-    TYPE(layout),pointer :: RING
-    type(probe) , intent(inOUT) :: FIX
-    type(probe)  FIXT
-    INTEGER , optional,intent(in) :: TURNS
-    type(fibre), optional, pointer :: fibre1
-    type(integration_node), optional, pointer :: node1
-    real(dp)  eps,x0(6),theta0r,s(3,3)
-    real(dp), optional,intent(inout) :: theta0
-    TYPE(INTERNAL_STATE), intent(in) :: STATE
-    TYPE(INTERNAL_STATE) stat
-    !    type(probe_8) xs
-    !    type(damapspin) ds
-    integer i,turns0,J
-
-    
-    if(present(fibre1)) then
-     ring=>fibre1%parent_layout
-    else
-     ring=>node1%parent_fibre%parent_layout
-    endif
-
-    turns0=1
-    theta0r=0.d0
-    if(present(turns)) turns0=turns
-    x0=FIX%x
-    stat=state
-    call find_orbit_x(x0,STATE,eps,TURNS,fibre1,node1)
-
-    stat=state+spin0 !+spin_only0
-
-    FIX=x0
-
-    !        call init(stat,1,0)
-
-    !        call alloc(xs)
-    !        call alloc(ds)
-
-    !        ds=1
-    !        xs= FIX + ds
-
-    !        do i=1,TURNS0
-    !         call track_probe(RING,xs,stat,fibre1,node1)
-    !        enddo
-
-    !        ds=xs
-
-    !         DO J=1,3
-    FIXT=x0
-
-    do i=1,TURNS0
-       call track_probe(fixt,stat,fibre1=fibre1,node1=node1)
-    enddo
-    DO J=1,3
-       s(1:3,j)=FIXT%S(J)%X(1:3)
-    ENDDO
-    !         ENDDO
-
-
-
-    call get_spin_n0(S,theta0r,FIX%s(1)%x)
-    FIX%s(2)%x=FIX%s(1)%x
-    FIX%s(3)%x=FIX%s(1)%x
-    if(present(theta0)) theta0=theta0r
-
-    !        call kill(xs)
-    !        call kill(ds)
-
-
-
-  END SUBROUTINE FIND_ORBIT_LAYOUT_noda_spin_object
-
   SUBROUTINE FIND_ORBIT_LAYOUT_noda(RING,FIX,STATE,eps,TURNS,fibre1,node1) ! Finds orbit without TPSA in State or compatible state
     IMPLICIT NONE
     TYPE(layout),target,INTENT(INOUT):: RING
@@ -3792,12 +3732,12 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     TYPE(INTERNAL_STATE),optional, intent(in) :: STATE
     TYPE(INTERNAL_STATE) stat
 
-    real(dp)  DIX(6),xdix,xdix0,tiny,freq
+    real(dp)  DIX(6),xdix,xdix0,tiny,freq,beta1
     real(dp) X(6),Y(6),MX(6,6),sxi(6,6),SX(6,6)
     integer NO1,ND2,I,IU,ITE,ier,j,ITEM
     TYPE (fibre), POINTER :: C
     TYPE (integration_node), POINTER :: t
-    logical(lp) APERTURE
+    logical(lp) APERTURE,use_bmad_units_temp
     INTEGER TURNS0,trackflag
 
     !    fixed_found=my_true
@@ -3805,6 +3745,20 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     if(.not.associated(RING%t)) call MAKE_NODE_LAYOUT(ring)
     !!    xs%x=zero
     !!    xs%s%x=zero
+    use_bmad_units_temp=use_bmad_units
+ 
+    if(use_bmad_units_temp) then 
+          if(present(fibre1)) then
+           call move_to_p_safe( Ring,c,fibre1)
+           beta1=c%mag%p%beta0
+          else
+           CALL move_to_INTEGRATION_NODE( Ring%T,t,node1 )
+           beta1=t%parent_fibre%mag%p%beta0
+          endif
+      call convert_bmad_to_ptc(fix,beta1,STATE%TIME)
+    endif
+
+    use_bmad_units=.false.
 
     TURNS0=1
     trackflag=0
@@ -3943,7 +3897,9 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        !       CALL TRACK(RING,X,LOC,STAT)
        !       trackflag=TRACK_flag(RING,X,LOC,STAT)
        !!       xs%x=x
+
        call TRACK_probe_X(Ring,x,stat,fibre1=fibre1,node1=node1)
+
        if(.not.check_stable) then
           messagelost(len_trim(messagelost)+1:255)=" -> Unstable tracking guessed orbit "
           c_%APERTURE_FLAG=APERTURE
@@ -3967,6 +3923,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        DO I=1,TURNS0
           !          CALL TRACK(RING,Y,LOC,STAT)
           !!       xs%x=y
+
           call TRACK_probe_X(Ring,Y,stat,fibre1=fibre1,node1=node1)
           if(.not.check_stable) then
              messagelost(len_trim(messagelost)+1:255)=" -> Unstable while tracking small rays around the guessed orbit "
@@ -4056,7 +4013,11 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
 
     endif
 
-
+    if(use_bmad_units_temp) then 
+ 
+      call convert_ptc_to_bmad(fix,beta1,STATE%TIME)
+    endif
+   use_bmad_units=use_bmad_units_temp
     !    FIX(6)=FIX(6)+freq*turns0
     c_%APERTURE_FLAG=APERTURE
 
@@ -4077,12 +4038,12 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     TYPE(INTERNAL_STATE),optional, intent(in) :: STATE
     TYPE(INTERNAL_STATE) stat
 
-    real(dp)  DIX(6),xdix,xdix0,tiny,freq
+    real(dp)  DIX(6),xdix,xdix0,tiny,freq,beta1
     real(dp) X(6),Y(6),MX(6,6),sxi(6,6),SX(6,6)
     integer NO1,ND2,I,IU,ITE,ier,j,ITEM
     TYPE (fibre), POINTER :: C
     TYPE (integration_node), POINTER :: t
-    logical(lp) APERTURE
+    logical(lp) APERTURE,use_bmad_units_temp
     INTEGER TURNS0,trackflag
     
     if(present(fibre1)) then
@@ -4096,6 +4057,16 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     if(.not.associated(RING%t)) call MAKE_NODE_LAYOUT(ring)
     !!    xs%x=zero
     !!    xs%s%x=zero
+    use_bmad_units_temp=use_bmad_units
+    if(use_bmad_units_temp) then 
+          if(present(fibre1)) then
+           beta1=fibre1%mag%p%beta0
+          else
+           beta1=node1%parent_fibre%mag%p%beta0
+          endif
+      call convert_bmad_to_ptc(fix,beta1,STATE%TIME)
+    endif
+    use_bmad_units=.false.
 
     TURNS0=1
     trackflag=0
@@ -4347,7 +4318,11 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
 
     endif
 
-
+    if(use_bmad_units_temp) then 
+ 
+      call convert_ptc_to_bmad(fix,beta1,STATE%TIME)
+    endif
+   use_bmad_units=use_bmad_units_temp
     !    FIX(6)=FIX(6)+freq*turns0
     c_%APERTURE_FLAG=APERTURE
 
@@ -4793,7 +4768,173 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
   end SUBROUTINE TRACK_temporal_beam
 
 
+!!!! Routines to create maps for tracking out of PTC !!!!
+!!! this fibre must be part of a layout and a thin layout as well
 
+
+
+subroutine fill_tree_element(f,no,fix0)
+implicit none
+type(fibre), target :: f
+type(layout), pointer :: r
+TYPE(INTEGRATION_NODE),POINTER:: t1c,t2c
+TYPE (NODE_LAYOUT), POINTER :: t
+TYPE (tree_element), POINTER :: arbre(:)
+type(internal_state) state
+real(dp) fixr(6),fixs(6),fix(6),fix0(6),mat(6,6),e_ij(6,6),xn
+type(probe) xs0
+type(probe_8) xs
+type(c_damap) m,mr
+ 
+ 
+integer no,i
+if(.not.associated(f%parent_layout)) then
+ write(6,*) " parent layout not associated "
+ stop
+else
+ r=>f%parent_layout
+endif
+
+if(.not.associated(f%parent_layout%t)) then
+ write(6,*) " parent node layout not associated "
+ stop
+else
+ t=>f%parent_layout%t
+ t1c=>f%t1 !%next
+ t2c=>f%t2%next
+endif
+
+state=radiation0+envelope0+time0
+call init_all(state,1,0)
+
+call alloc(xs);call alloc(m,mr)
+
+ 
+! radiation
+ 
+xs0=fix0
+mr=1
+xs=xs0+mr
+call propagate(xs,state,node1=t1c,node2=t2c)
+
+
+fixr=xs%x
+mr=xs
+do i=1,6
+ mr%v(i)=mr%v(i)-(mr%v(i).sub.0)
+enddo
+ 
+e_ij=xs%e_ij
+! no radiation
+state=time0
+xs0=fix0
+m=1
+xs=xs0+m
+call propagate(xs,state,node1=t1c,node2=t2c)
+fix=xs%x
+m=xs
+do i=1,6
+ m%v(i)=m%v(i)-(m%v(i).sub.0)
+enddo
+m=m**(-1)*mr
+
+call  nth_root(m,m,f%mag%p%nst)
+
+mat=m
+
+
+call kill(xs);call kill(m)
+
+state=spin0+time0
+call init_all(state,no,0)
+call alloc(xs);call alloc(m,mr)
+ 
+
+xs0=fix0
+m=1
+xs=xs0+m
+call propagate(xs,state,node1=t1c,node2=t2c)
+ 
+fix=xs%x
+m=xs
+
+m%e_ij=e_ij
+do i=1,6
+ m%v(i)=m%v(i)-(m%v(i).sub.0)
+enddo 
+
+ 
+call  nth_root(m,m,f%mag%p%nst)
+ 
+
+
+ 
+if(f%dir==1) then
+ if(.not.associated(f%mag%forward)) then 
+  allocate(f%mag%forward(3))
+  allocate(f%mag%usef)
+ else
+  call KILL(f%mag%forward)
+ endif
+
+call SET_TREE_G_complex(f%mag%forward,m)
+
+ f%mag%usef=.true.
+ arbre=>f%mag%forward
+else
+ if(.not.associated(f%mag%backward)) then 
+  allocate(f%mag%backward(3))
+  allocate(f%mag%useb)
+ else
+  call KILL(f%mag%backward)
+ endif
+ call SET_TREE_G_complex(f%mag%backward,m)
+ f%mag%useb=.true.
+ arbre=>f%mag%backward
+endif
+
+arbre(1)%rad=mat
+arbre(1)%fix0(1:6)=fix0
+arbre(1)%fixr(1:6)=fixr
+arbre(1)%fix(1:6)=fix
+arbre(1)%ds=f%mag%p%ld/f%mag%p%nst
+arbre(1)%beta0=f%beta0
+
+if(f%dir==1) then
+ if(.not.associated(f%magp%forward)) then 
+  allocate(f%magp%forward(3))
+  allocate(f%magp%usef)
+ else
+  call KILL(f%magp%forward)
+ endif
+ call SET_TREE_G_complex(f%magp%forward,m)
+ f%magp%usef=.true.
+ arbre=>f%magp%forward
+else
+
+ if(.not.associated(f%magp%backward)) then 
+  allocate(f%magp%backward(3))
+  allocate(f%magp%useb)
+ else
+  call KILL(f%magp%backward)
+ endif
+ call SET_TREE_G_complex(f%magp%backward,m)
+ !call alloc_tree(elp%forward,el%forward%n,elp%forward%np)
+ !call copy_tree(f%mag%backward,f%magp%backward)
+ f%magp%useb=.true.
+ arbre=>f%magp%backward
+endif
+
+arbre(1)%rad=mat
+arbre(1)%fix0(1:6)=fix0
+arbre(1)%fixr(1:6)=fixr
+arbre(1)%fix(1:6)=fix
+arbre(1)%ds=f%mag%p%ld/f%mag%p%nst
+arbre(1)%beta0=f%beta0
+ 
+call kill(xs);call kill(m)
+ 
+end subroutine fill_tree_element
 
 
 
@@ -4820,74 +4961,6 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
 
     call kill(m)
   end subroutine extract_moments
-
-!!! extract moments using initial moment and the probe_8 containing fluctuations and map
-  subroutine normalize_moments(s_ij_in,crash,a)
-    implicit none
-    integer ipause, mypause
-    real(dp), intent(in) :: s_ij_in(:,:)
-    real(dp), intent(out) :: a(:,:)
-    type(damap) id
-    integer i,j,i1,i2
-    type(pbfield) h
-    type(normalform) n
-    real(dp) norm,crash,sca,e1
-
-    call alloc(h)
-    call alloc(id)
-    call alloc(n)
-    do i=1,c_%nd
-       do j=1,c_%nd
-          i1=2*i-1
-          i2=2*j-1
-          h%h=h%h+ s_ij_in(i1,i2)*(1.0_dp.mono.(i1+1))*(1.0_dp.mono.(i2+1))
-          i1=2*i
-          i2=2*j
-          h%h=h%h+ s_ij_in(i1,i2)*(1.0_dp.mono.(i1-1))*(1.0_dp.mono.(i2-1))
-          i1=2*i-1
-          i2=2*j
-          h%h=h%h-s_ij_in(i1,i2)*(1.0_dp.mono.(i1+1))*(1.0_dp.mono.(i2-1))
-          i1=2*i
-          i2=2*j-1
-          h%h=h%h- s_ij_in(i1,i2)*(1.0_dp.mono.(i1-1))*(1.0_dp.mono.(i2+1))
-       enddo
-    enddo
-    call print(h%h,6)
-    ipause=mypause(0)
-    norm=full_abs(h%h)
-    write(6,*) " norm ",norm
-
-    sca=1.0_dp/10.0_dp
-
-    h%h=sca/norm*h%h
-
-    i=2
-    h%h=crash*( (1.0_dp.mono.(2*i-1))**2+(1.0_dp.mono.(2*i))**2 ) + h%h
-
-    id=1
-
-    id=texp(h,id).sub.1
-
-    !  n%auto=.false.
-    n=id
-    n%a_t=n%a_t.sub.1
-
-
-
-    a=n%a_t
-
-    id=n%a_t**(-1)*id*n%a_t
-
-    e1=asin((id%v(1).sub.'01')/(id%v(1).sub.'1'))
-    write(6,*) e1*norm/sca/2
-    e1=asin((id%v(5).sub.'000001')/(id%v(5).sub.'00001'))
-    write(6,*) e1*norm/sca/2
-
-    call kill(n)
-    call kill(id)
-    call kill(h)
-  end subroutine normalize_moments
-
 
 
 

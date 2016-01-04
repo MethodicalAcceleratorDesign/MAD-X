@@ -24,6 +24,9 @@ module S_fitting_new
 
 contains
 
+
+
+
 subroutine find_time_patch(kekb,my_default,ee,kf,kb)
 implicit none
 type(layout), pointer :: kekb
@@ -2843,6 +2846,67 @@ SET_TPSAFIT=.FALSE.
 
   end subroutine lattice_fit_bump_min_rcs
   
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+
+  subroutine compute_twiss(machine,icase,no)
+    implicit none
+    type(layout),pointer :: machine 
+    integer :: icase, no, i
+    type(probe_8)         :: A_script_probe
+    type(real_8)          :: A_script(6)
+    real(dp)  :: x(6)
+    type(c_normal_form) theNormalForm
+    type(c_damap)  :: c_Map
+    real(dp)  :: beta(3)
+    
+    
+    call print(default,6)
+    
+    x = 0_dp;
+    
+    call alloc(A_script_probe)
+    A_script_probe%u=my_false
+    A_script_probe%x=icase
+    A_script_probe%x=X
+
+    call TRACK_PROBE(machine,A_script_probe,default) 
+
+    
+    call print(A_script_probe,6)
+
+    call alloc(c_Map)
+    c_Map = A_script_probe
+ 
+    call alloc(theNormalForm)
+    call  c_normal(c_Map,theNormalForm)       ! (4)
+
+
+    c_Map = x + theNormalForm%a_t
+    A_script_probe = c_Map
+    call kill(theNormalForm)
+    call kill(c_Map)
+  
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    
+    do i=1,machine%n
+     
+      call TRACK_PROBE(machine,A_script_probe,default, fibre1=i,fibre2=i+1)
+      
+      A_script = A_script_probe%x
+      !print*, A_script(1)%t.sub.'10'
+      beta(1) = (A_script(1)%t.sub.'100000')**2 + (A_script(1)%t.sub.'010000')**2
+      beta(2) = (A_script(3)%t.sub.'001000')**2 + (A_script(3)%t.sub.'000100')**2
+      beta(3) = (A_script(6)%t.sub.'000010')**2 + (A_script(6)%t.sub.'000001')**2
+      
+      print*,"BETAS ", beta
+    enddo
+  
+    
+    print*, "TWISS"
+  end subroutine compute_twiss
 
   
 end module S_fitting_new

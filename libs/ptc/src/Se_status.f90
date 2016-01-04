@@ -75,7 +75,7 @@ module S_status
 
   PRIVATE EQUALt,ADD,PARA_REMA,EQUALtilt
   !PRIVATE DTILTR,DTILTP,DTILTS
-  PRIVATE DTILTR_EXTERNAL,DTILTP_EXTERNAL
+  PRIVATE DTILTR_EXTERNAL,DTILTP_EXTERNAL,orthonormaliser,orthonormalisep
   PRIVATE CHECK_APERTURE_R,CHECK_APERTURE_P !,CHECK_APERTURE_S
   LOGICAL(lp), target:: electron
   real(dp), target :: muon=1.0_dp
@@ -136,6 +136,11 @@ module S_status
   logical(lp) :: ramp=my_false
   logical(lp) :: accelerate=my_false, first_particle=my_false
   logical(lp) :: automatic_complex = my_true
+  integer :: aperture_pos_default=0
+  private track_TREE_G_complexr,track_TREE_G_complexp,track_TREE_probe_complexr,track_TREE_probe_complexp
+  integer :: size_tree=15
+  integer :: ind_spin(3,3),k1_spin(9),k2_spin(9)
+
   TYPE B_CYL
      integer firsttime
      integer, POINTER ::  nmul,n_mono   !,nmul_e,n_mono_e
@@ -215,12 +220,25 @@ module S_status
      MODULE PROCEDURE B2PERPP
   END INTERFACE
 
+  INTERFACE orthonormalise
+     MODULE PROCEDURE orthonormaliser
+     MODULE PROCEDURE orthonormalisep
+  END INTERFACE
+
   INTERFACE DTILTD
      MODULE PROCEDURE DTILTR_EXTERNAL
      MODULE PROCEDURE DTILTP_EXTERNAL       ! EXTERNAL
   END INTERFACE
 
+  INTERFACE track_TREE_G_complex
+     MODULE PROCEDURE track_TREE_G_complexr
+     MODULE PROCEDURE track_TREE_G_complexp       ! EXTERNAL
+  END INTERFACE
 
+  INTERFACE track_TREE_probe_complex
+     MODULE PROCEDURE track_TREE_probe_complexr
+     MODULE PROCEDURE track_TREE_probe_complexp       ! EXTERNAL
+  END INTERFACE 
 
 CONTAINS
 
@@ -241,7 +259,7 @@ CONTAINS
     implicit none
     type (MADX_APERTURE), pointer:: P
 
-    nullify(P%KIND);nullify(P%R);nullify(P%X);nullify(P%Y);nullify(P%dX);nullify(P%dY);
+    nullify(P%KIND);nullify(P%R);nullify(P%X);nullify(P%Y);nullify(P%dX);nullify(P%dY);nullify(P%pos);
   end subroutine NULL_A
 
   SUBROUTINE  alloc_A(p)
@@ -251,8 +269,8 @@ CONTAINS
     nullify(p)
     allocate(p)
     CALL NULL_A(p)
-    ALLOCATE(P%R(2));ALLOCATE(P%X);ALLOCATE(P%Y);ALLOCATE(P%KIND);
-    P%KIND=0; P%R=0.0_dp;P%X=0.0_dp;P%Y=0.0_dp;
+    ALLOCATE(P%R(2));ALLOCATE(P%X);ALLOCATE(P%Y);ALLOCATE(P%KIND);ALLOCATE(P%pos);
+    P%KIND=0; P%R=0.0_dp;P%X=0.0_dp;P%Y=0.0_dp;P%pos=aperture_pos_default;
     ALLOCATE(P%DX);ALLOCATE(P%DY);
     P%DX=0.0_dp;P%DY=0.0_dp;
   end subroutine alloc_A
@@ -263,7 +281,7 @@ CONTAINS
 
     if(associated(p%R)) then
        DEALLOCATE(P%R);DEALLOCATE(P%X);DEALLOCATE(P%Y);DEALLOCATE(P%KIND);
-       DEALLOCATE(P%DX);DEALLOCATE(P%DY);
+       DEALLOCATE(P%DX);DEALLOCATE(P%DY);DEALLOCATE(P%pos);
     endif
   end SUBROUTINE  dealloc_A
 
@@ -469,6 +487,7 @@ CONTAINS
     ELP%Y=EL%Y
     ELP%DX=EL%DX
     ELP%DY=EL%DY
+    ELP%pos=EL%pos
   END SUBROUTINE  equal_A
 
 
@@ -596,6 +615,11 @@ CONTAINS
     CALL CHECK_APERTURE(E,Y)
 
   END SUBROUTINE  CHECK_APERTURE_P
+
+
+
+ 
+
 
   FUNCTION minu( S1,S2  )
     implicit none
@@ -1281,7 +1305,7 @@ CONTAINS
     INTEGER, INTENT(IN):: NO1,NP1
     INTEGER ND1,NDEL,NDPT1
     INTEGER,optional :: ND2,NPARA
-    INTEGER  ND2l,NPARAl,n_acc
+    INTEGER  ND2l,NPARAl,n_acc,no1c
     LOGICAL(lp) package
 !    call dd_p !valishev
     doing_ac_modulation_in_ptc=.false.
@@ -1349,7 +1373,8 @@ CONTAINS
     if(present(nd2)) nd2=nd2l
     if(present(npara)) npara=nparal
 ! etienne
-    if(use_complex_in_ptc) call c_init(NO1,nd1,np1+ndel,ndpt1,n_acc,ptc=my_false)  ! PTC false because we will not use the real FPP for acc modulation
+no1c=no1+complex_extra_order
+    if(use_complex_in_ptc) call c_init(NO1c,nd1,np1+ndel,ndpt1,n_acc,ptc=my_false)  ! PTC false because we will not use the real FPP for acc modulation
 !call c_init(c_%NO,c_%nd,c_%np,c_%ndpt,number_of_ac_plane,ptc=my_true)  
 !  subroutine c_init(NO1,NV1,np1,ndpt1,AC_rf,ptc)  !,spin
 !    implicit none
@@ -6363,6 +6388,730 @@ enddo
 
 
   end subroutine nul_coef
+
+!!!!!!!!!!!!!!!!!!!!   tree tracking for PTC using stuff in 
+  SUBROUTINE SET_TREE_G_complex(T,Ma)
+    IMPLICIT NONE
+    TYPE(TREE_ELEMENT), INTENT(INOUT) :: T(:)
+    TYPE(c_damap), INTENT(INOUT) :: Ma
+    INTEGER N,NP,i,k,j
+    real(dp) norm,mat(6,6)
+    TYPE(taylor), ALLOCATABLE :: M(:), MG(:)
+    TYPE(damap) ms
+    integer js(6)
+ 
+
+    
+!    np=ma%n+18
+    if(ma%n/=6) then
+     write(6,*) " you need a 6-d map in SET_TREE_G_complex for PTC "
+     stop
+    endif
+    np=size_tree
+    ind_spin(1,1)=1+ma%n;ind_spin(1,2)=2+ma%n;ind_spin(1,3)=3+ma%n;
+    ind_spin(2,1)=4+ma%n;ind_spin(2,2)=5+ma%n;ind_spin(2,3)=6+ma%n;
+    ind_spin(3,1)=7+ma%n;ind_spin(3,2)=8+ma%n;ind_spin(3,3)=9+ma%n;    
+    k1_spin(1)=1;k2_spin(1)=1;
+    k1_spin(2)=1;k2_spin(2)=2;
+    k1_spin(3)=1;k2_spin(3)=3;
+    k1_spin(4)=2;k2_spin(4)=1;
+    k1_spin(5)=2;k2_spin(5)=2;
+    k1_spin(6)=2;k2_spin(6)=3;
+    k1_spin(7)=3;k2_spin(7)=1;
+    k1_spin(8)=3;k2_spin(8)=2;
+    k1_spin(9)=3;k2_spin(9)=3;
+
+    ALLOCATE(M(NP))
+    CALL ALLOC(M,NP)
+    ALLOCATE(Mg(NP))
+    CALL ALLOC(mg,NP)
+    do i=1,np
+     m(i)=0.e0_dp
+     mg(i)=0.e0_dp
+    enddo
+     do i=1,ma%n
+      m(i)=ma%v(i)
+     enddo
+
+    call c_full_norm_spin(Ma%s,k,norm)
+
+    if(k==-1) then
+      do i=1,3
+      do j=1,3
+        m(ind_spin(i,j))=ma%s%s(i,j)
+      enddo
+      enddo
+    else
+      do i=1,3
+        m(ind_spin(i,i))=1.0e0_dp
+      enddo
+    endif
+
+      js=0
+     js(1)=1;js(3)=1;js(5)=1; ! q_i(q_f,p_i) and p_f(q_f,p_i)
+     call alloc(ms)
+     ms=ma
+     ms=ms**js
+!     do i=1,3
+!      mg(i)=ms%v(2*i-1)   !  q_i(q_f,p_i)
+!      mg(3+i)=ms%v(2*i)   !  p_f(q_f,p_i)
+!     enddo
+     do i=1,6
+      mg(i)=ms%v(i) 
+     enddo
+     do i=1,3
+     do j=1,3
+       mg(ind_spin(i,j))=ms%v(2*i-1).d.(2*j-1)  !   Jacobian for Newton search
+     enddo
+     enddo
+      call kill(ms)    
+   
+
+     call SET_TREE_g(T(1),m(1:6))
+
+     call SET_TREE_g(T(2),m(7:15))
+
+     call SET_TREE_g(T(3),mg(1:size_tree))
+
+       mat=ma**(-1)
+       t(1)%e_ij=matmul(matmul(mat,ma%e_ij),transpose(mat))
+ 
+    deallocate(M)
+
+  END SUBROUTINE SET_TREE_G_complex
+
+  SUBROUTINE track_TREE_probe_complexr(T,xs,dofix0,dofix,sta,jump)
+    use da_arrays
+    IMPLICIT NONE
+    TYPE(TREE_ELEMENT), INTENT(IN) :: T(:)
+    logical, optional :: jump
+    type(probe) xs
+    real(dp) x(size_tree),x0(size_tree),s0(3,3),r(3,3),dx6,beta,q(3),p(3),qg(3),qf(3)
+    real(dp) normb,norm 
+    integer i,j,k,ier,nrmax,is
+    type(internal_state) sta
+    logical dofix0,dofix,doit,jumpnot
+    jumpnot=.true.
+    if(present(jump)) jumpnot=.not.jump
+
+ 
+
+    nrmax=1000
+    doit=.true.
+    x=0.e0_dp
+    x0=0.e0_dp
+    do i=1,6
+      x(i)=xs%x(i)
+      x0(i)=xs%x(i)
+    enddo
+!      x0(1:6)=x(1:6)
+      x(7:12)=x(1:6)
+ if(jumpnot) then
+     if(.not.sta%time) then
+     dx6=x(6)
+     x(5)=(2*x(5)+x(5)**2)/(root(1.0_dp/t(1)%beta0**2+2.0_dp*x(5)+x(5)**2)+1.0_dp/t(1)%beta0)
+     x(11)=x(5)
+     x0(5)=x(5)
+    endif
+
+    if(dofix0) then
+     do i=1,6
+      x(i)=x(i)-t(1)%fix0(i)
+      x0(i)=x0(i)-t(1)%fix0(i)
+     enddo
+      x(7:12)=x(1:6)
+    endif
+
+    if(sta%radiation) then
+      x(1:6)=matmul(t(1)%rad,x(1:6))
+      x0(1:6)=x(1:6)
+!      x(1:6)=x(1:6)
+      x(7:12)=x(1:6)
+    endif
+    
+
+!!!
+
+endif ! jumpnot
+
+!!! symplectic here
+if(t(3)%symptrack) then
+    do i=1,3
+     q(i)=x(2*i-1)
+     p(i)=x(2*i)
+    enddo
+endif
+
+ if(t(3)%usenonsymp.or..not.t(3)%symptrack) then
+    call track_TREE_G_complex(T(1),X(1:6))
+ else
+    do i=1,3
+     x(2*i-1)=0.d0   ! use non symplectic as approximation
+    enddo
+  endif
+!!! symplectic here!! symplectic here
+if(t(3)%symptrack) then
+   do i=1,3
+     qf(i)=x(2*i-1)   ! use non symplectic as approximation
+    enddo
+normb=1.d38
+do is=1,nrmax
+   do i=1,3
+     x0(2*i)=p(i)
+     x0(2*i-1)=qf(i)  
+     qg(i)=0
+    enddo
+    call track_TREE_G_complex(T(3),X0(1:15))
+ 
+    do i=1,3
+    do j=1,3
+     r(i,j)=x0(ind_spin(i,j))
+    enddo
+    enddo
+    call matinv(r,r,3,3,ier)
+    if(ier/=0) then
+     write(6,*) "matinv failed in track_TREE_probe_complexr "
+     stop
+    endif
+    do i=1,3
+    do j=1,3
+      qg(i)=r(i,j)*(q(j)-x0(2*j-1)) + qg(i)
+    enddo
+    enddo
+    do i=1,3
+
+     qf(i) = qf(i) + qg(i)
+    enddo
+   norm=abs(qg(1))+abs(qg(2))+abs(qg(3))
+
+   if(norm>t(3)%eps.and.doit) then
+     if(normb<=norm) doit=.false.
+     normb=norm
+   else
+     if(normb<=norm) then 
+       x(1)=qf(1)
+       x(3)=qf(2)
+       x(5)=qf(3)
+       x(2)=x0(2)
+       x(4)=x0(4)
+       x(6)=x0(6)       
+       exit
+     endif
+     normb=norm
+   endif
+
+enddo  ! is 
+ if(is>nrmax-10) then
+   xs%u=.true.
+  check_stable=.false.
+ endif
+!!!    
+ endif
+
+if(jumpnot) then
+    if(sta%spin) then  ! spin
+    call track_TREE_G_complex(T(2),X(7:15))
+    s0=0.0e0_dp
+ 
+    do i=1,3
+    do j=1,3
+     r(i,j)=x(ind_spin(i,j))
+    enddo
+    enddo
+
+    call orthonormalise(r)
+    
+    do k=1,3
+     s0(k,1:3)=0.0e0_dp
+     do i=1,3
+     do j=1,3
+!       s0(k,i)=x(ind_spin(i,j))*xs%s(k)%x(j)+s0(k,i)
+        s0(k,i)=r(i,j)*xs%s(k)%x(j)+s0(k,i)
+     enddo
+    enddo
+    enddo
+
+    do k=1,3
+     do j=1,3
+       xs%s(k)%x(j)=s0(k,j)
+     enddo
+    enddo   
+    endif ! spin
+
+
+    if(dofix) then
+       if(sta%radiation) then
+         do i=1,6
+           x(i)=x(i)+t(1)%fixr(i)
+         enddo
+       else
+         do i=1,6
+           x(i)=x(i)+t(1)%fix(i)
+         enddo
+       endif
+    endif
+
+
+    if(.not.sta%time) then
+     dx6=X(6)-dx6
+      beta=root(1.0_dp+2.0_dp*x(5)/t(1)%beta0+x(5)**2)/(1.0_dp/t(1)%BETA0 + x(5))
+      x(6)=x(6)-dx6+beta*dx6 +  (beta/t(1)%beta0-1.0_dp)*t(1)%ds
+      x(5)=(2.0_dp*x(5)/t(1)%beta0+x(5)**2)/(root(1.0_dp+2.0_dp*x(5)/t(1)%beta0+x(5)**2)+1.0_dp)
+       if(sta%totalpath==1) then
+        x(6)=x(6)+t(1)%ds
+       endif
+    else
+        if(sta%totalpath==1) then
+        x(6)=x(6)+t(1)%ds/t(1)%beta0 
+       endif     
+    endif
+endif ! jumpnot
+
+    do i=1,6
+      xs%x(i)=x(i)
+    enddo
+
+  end SUBROUTINE track_TREE_probe_complexr
+
+  SUBROUTINE orthonormaliser(r)
+   implicit none
+   real(dp)  r(3,3),id(3,3),rt(3,3),eps,a,ab
+   integer nmax,i,j,k
+! Furmanizing the rotation 
+    eps=1.d-8
+    nmax=1000
+    id=0
+    do i=1,3
+      id(i,i)=1.5e0_dp
+    enddo
+    ab=1.d8
+    do i=1,nmax
+     rt=matmul(r,transpose(r))
+     r= matmul((id-0.5e0_dp*rt),r)
+
+     a=-3.e0_dp
+     do j=1,3
+     do k=1,3
+      a=a+abs(rt(j,k))
+     enddo
+     enddo
+     a=abs(a)
+     if(a<eps) then
+      if(a>=ab) exit
+      ab=a
+     endif
+    enddo
+    if(i>nrmax-10) then
+     write(6,*) i, a, "did not converge in orthonormaliser"
+      stop
+    endif 
+  end SUBROUTINE orthonormaliser
+
+  SUBROUTINE track_TREE_probe_complexp(T,xs,dofix0,dofix,sta)
+    use da_arrays
+    IMPLICIT NONE
+    TYPE(TREE_ELEMENT), INTENT(IN) :: T(:)
+    type(probe_8) xs
+    type(probe) xs0
+    type(real_8) x(size_tree),x0(size_tree),s0(3,3),r(3,3),dx6,beta
+    real(dp) m(6,6),xi(6),norm
+    type(damap) dm,md,iq
+    integer i,j,k
+    type(internal_state) sta
+    logical dofix0,dofix
+    integer, allocatable :: js(:)
+ 
+    call alloc(x,size_tree)
+    call alloc(x0,size_tree)
+    call alloc(dx6)
+    do i=1,3
+    do j=1,3
+     call alloc(s0(i,j))
+     call alloc(r(i,j))
+    enddo
+    enddo
+ 
+
+
+    if(sta%envelope.and.c_%no>1) then
+    call alloc(dm)
+     dm=xs
+     m=(dm.sub.1)**(-1)
+        xs%e_ij=xs%e_ij+matmul(matmul(m,t(1)%e_ij),transpose(m))
+    call kill(dm)
+     endif
+
+    do i=1,6
+      x(i)=xs%x(i)
+      x0(i)=xs%x(i)
+      x(i+6)=x(i)
+    enddo
+
+
+     if(.not.sta%time) then
+     dx6=x(6)
+     x(5)=(2*x(5)+x(5)**2)/(sqrt(1.0_dp/t(1)%beta0**2+2.0_dp*x(5)+x(5)**2)+1.0_dp/t(1)%beta0)
+     x(11)=x(5)
+     x0(5)=x(5)
+    endif
+
+
+    if(dofix0) then
+
+     do i=1,6
+      x(i)=x(i)-t(1)%fix0(i)
+      x0(i)=x0(i)-t(1)%fix0(i)
+      x(i+6)=x(i)
+     enddo
+    endif
+
+    if(sta%radiation) then
+     do i=1,6
+      x(i)=0.0_dp
+     enddo
+
+     do i=1,6
+     do j=1,6
+      x(i)=t(1)%rad(i,j)*x(j+6)+x(i)
+     enddo
+     enddo
+
+
+      do i=1,6
+       x0(i)=x(i)
+       x(i+6)=x(i)
+     enddo
+
+    endif
+
+ 
+    if(t(3)%symptrack) then
+     xs0=0
+     do i=1,6
+      xs0%x(i)=x0(i)
+      xi(i)=x0(i)
+     enddo
+      call  track_TREE_probe_complexr(T,xs0,.false.,.false.,sta,jump=.true.)
+
+!!! compute map  for speed up
+     norm=0.d0
+     do i=1,6
+      norm=norm+abs(x(1).sub.'1')
+     enddo
+!     write(6,*) "norm = ",norm
+     if(norm>0) then
+     call alloc(dm,md,iq)
+     allocate(js(c_%nd2))
+      do i=1,3   !c_%nd
+       xi(2*i-1)=xs0%x(2*i-1)
+      enddo
+
+      do i=1,c_%nd2
+      x0(i)=xi(i)+(1.0_dp.mono.i)
+      enddo
+      if(c_%nd2==4.and.C_%NPARA==5) then
+     !  x0(5)=xi(5)+(1.0_dp.mono.5)
+       x0(6)=0.0_dp !xi(6)
+      elseif(C_%NPARA==4) then
+       write(6,*) C_%NPARA
+       x0(5)=xi(5)
+       x0(6)=0.0_dp !xi(6)       
+      endif
+          call track_TREE_G_complex(T(3),X0(1:15))
+       js=0
+      do i=1,c_%nd2
+       if(mod(i,2)==1) js(i)=1
+       dm%v(i)=x0(i)-(x0(i).sub.'0') 
+      enddo
+       dm=dm**(js)
+        do i=1,c_%nd2
+          md%v(i)=x(i)-(x(i).sub.'0') 
+        enddo 
+      if(c_%nd2==4) then
+        do i=1,c_%nd
+          iq%v(2*i-1)=dm%v(2*i-1) 
+          iq%v(2*i)=1.0_dp.mono.(2*i)
+        enddo 
+        x0(6)=x0(6)*iq  ! partial invertion undone
+        x0(6)=x0(6)*md  ! previous line concatenated
+       endif
+          md=dm*md
+        do i=1,c_%nd2
+         x(i)=md%v(i)+xs0%x(i)
+        enddo
+
+      if(c_%nd2==4) then
+       x(6)=x0(6)+x(6)
+      endif
+
+     call kill(dm,md,iq)
+     deallocate(js)
+     else
+       do i=1,6  !c_%nd2
+         x(i)=xs0%x(i)
+        enddo
+     endif
+
+
+     else
+       call track_TREE_G_complex(T(1),X(1:6))
+     endif
+ 
+
+
+
+
+
+ 
+    if(sta%spin) then  ! spin
+    call track_TREE_G_complex(T(2),X(7:15))
+ 
+
+    do i=1,3
+    do j=1,3
+     r(i,j)=x(ind_spin(i,j))
+    enddo
+    enddo
+
+    call orthonormalise(r)
+
+    do k=1,3
+     do i=1,3
+     do j=1,3
+       s0(k,i)=r(i,j)*xs%s(k)%x(j)+s0(k,i)
+     enddo
+    enddo
+    enddo
+
+    do k=1,3
+     do j=1,3
+       xs%s(k)%x(j)=s0(k,j)
+     enddo
+    enddo   
+endif ! spin
+
+
+
+    if(dofix) then
+       if(sta%radiation) then
+         do i=1,6
+           x(i)=x(i)+t(1)%fixr(i)
+         enddo
+       else
+         do i=1,6
+           x(i)=x(i)+t(1)%fix(i)
+         enddo
+       endif
+    endif
+
+
+    if(.not.sta%time) then
+     dx6=X(6)-dx6
+      beta=sqrt(1.0_dp+2.0_dp*x(5)/t(1)%beta0+x(5)**2)/(1.0_dp/t(1)%BETA0 + x(5))
+      x(6)=x(6)-dx6+beta*dx6 +  (beta/t(1)%beta0-1.0_dp)*t(1)%ds
+      x(5)=(2.0_dp*x(5)/t(1)%beta0+x(5)**2)/(sqrt(1.0_dp+2.0_dp*x(5)/t(1)%beta0+x(5)**2)+1.0_dp)
+       if(sta%totalpath==1) then
+        x(6)=x(6)+t(1)%ds
+       endif
+    call kill(dx6)
+    else
+        if(sta%totalpath==1) then
+        x(6)=x(6)+t(1)%ds/t(1)%beta0 
+       endif     
+    endif
+
+    do i=1,6
+      xs%x(i)=x(i)
+    enddo
+
+    call kill(dx6)
+    call kill(x0,size_tree)
+    call kill(x,size_tree)  
+    do i=1,3
+    do j=1,3
+     call kill(s0(i,j))
+     call kill(r(i,j))
+    enddo
+    enddo
+
+  end SUBROUTINE track_TREE_probe_complexp
+
+  SUBROUTINE orthonormalisep(r)
+   implicit none
+   type(real_8)  r(3,3),id(3,3),rt(3,3)
+    real(dp) eps,a,ab
+   integer nmax,i,j,k
+! Furmanizing the rotation  
+    do i=1,3
+    do j=1,3
+     call alloc(id(i,j))
+     call alloc(rt(i,j))
+    enddo
+    enddo
+    eps=1.d-8
+    nmax=1000
+    do i=1,3
+      id(i,i)=1.5e0_dp
+    enddo
+    ab=1.d8
+    do i=1,nmax
+    ! rt=matmul(r,transpose(r))
+    ! r= matmul((id-0.5e0_dp*rt),r)
+
+      call furman_rrt(r,r,rt)
+
+     a=-3.e0_dp
+     do j=1,3
+     do k=1,3
+      a=a+abs(rt(j,k))
+     enddo
+     enddo
+     a=abs(a)
+     if(a<eps) then
+      if(a>=ab) exit
+      ab=a
+     endif
+    enddo
+    if(i>nrmax-10) then
+     write(6,*) i, a, "did not converge in orthonormalisep"
+     ! stop
+    endif 
+    do i=1,3
+    do j=1,3
+     call kill(id(i,j))
+     call kill(rt(i,j))
+    enddo
+    enddo
+  end SUBROUTINE orthonormalisep
+
+  SUBROUTINE furman_rrt(r,s,rt)
+   implicit none
+   type(real_8)  r(3,3),s(3,3),rt(3,3),id(3,3),ik(3,3)
+   integer i,j,k
+
+    do i=1,3
+    do j=1,3
+     call alloc(id(i,j))
+     call alloc(ik(i,j))
+    enddo
+    enddo
+
+      do i=1,3
+       ik(i,i)=1.5e0_dp
+      do j=1,3
+      do k=1,3
+       id(i,k)=r(i,j)*r(k,j)+id(i,k)
+      enddo
+      enddo
+      enddo
+
+    do i=1,3
+    do j=1,3
+     rt(i,j)=id(i,j)
+     id(i,j)=0.e0_dp
+    enddo
+    enddo
+
+    do i=1,3
+    do j=1,3
+    do k=1,3
+      id(i,k)=(ik(i,j)-0.5e0_dp*rt(i,j))*r(j,k)+ id(i,k)
+    enddo
+    enddo
+    enddo
+
+
+
+    do i=1,3
+    do j=1,3
+     s(i,j)=id(i,j)
+     call kill(id(i,j))
+     call kill(ik(i,j))
+    enddo
+    enddo
+
+end   SUBROUTINE furman_rrt
+
+  SUBROUTINE track_TREE_G_complexr(T,XI)
+    use da_arrays
+    IMPLICIT NONE
+    TYPE(TREE_ELEMENT), INTENT(IN) :: T
+    REAL(DP), INTENT(INOUT) :: XI(:)
+    REAL(DP) XT(lno),XF(lnv),XM(lno+1),XX
+    INTEGER JC,I,IV
+
+    XT=0.0_dp
+    XF=0.0_dp
+    XM=0.0_dp
+
+    do i=1,T%np
+       xt(i)=xi(i)
+    enddo
+    do i=1,T%np
+       xf(i) = T%cc(i)
+    enddo
+
+    XM(1) = 1.0_dp
+    JC=T%np
+
+    do i=1,(T%N-T%np)/T%np
+       !
+       xx = xm(T%jl(JC+1))*xt(T%jV(JC+1))
+       xm(T%jl(JC+1)+1) = xx
+       !
+       do iv=1,T%np
+          jc=jc+1
+          xf(iv) = xf(iv) + t%cc(jc) * xx
+       enddo
+    enddo
+    do i=1,size(xi)
+       xI(i)=xF(i)
+    enddo
+
+  END SUBROUTINE track_TREE_G_complexr
+
+  SUBROUTINE track_TREE_G_complexp(T,XI)
+    use da_arrays
+    IMPLICIT NONE
+    TYPE(TREE_ELEMENT), INTENT(IN) :: T
+    type(real_8), INTENT(INOUT) :: XI(:)
+    type(real_8) XT(lno),XF(lnv),XM(lno+1),XX
+    INTEGER JC,I,IV
+
+    call alloc(xt)
+    call alloc(xf)
+    call alloc(xm)
+    call alloc(xx)
+
+    do i=1,T%np
+       xt(i)=xi(i)
+    enddo
+    do i=1,T%np
+       xf(i) = T%cc(i)
+    enddo
+
+    XM(1) = 1.0_dp
+    JC=T%np
+    do i=1,(T%N-T%np)/T%np
+       !
+       xx = xm(T%jl(JC+1))*xt(T%jV(JC+1))
+       xm(T%jl(JC+1)+1) = xx
+       !
+       do iv=1,T%np
+          jc=jc+1
+          xf(iv) = xf(iv) + t%cc(jc) * xx
+       enddo
+    enddo
+    do i=1,size(xi)
+       xI(i)=xF(i)
+    enddo
+
+    call kill(xt)
+    call kill(xf)
+    call kill(xm)
+    call kill(xx)
+
+  END SUBROUTINE track_TREE_G_complexp
 
 
 end module S_status

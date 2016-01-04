@@ -258,9 +258,13 @@ module definition
   !@3 ---------------------------------------------</br>
   type  tree_element   !@1  USED FOR FAST TRACKING IN O_TREE_ELEMENT.F90
      real(dp) ,  DIMENSION(:), POINTER :: CC
-     real(dp) ,  DIMENSION(:), POINTER :: fix
+     real(dp) ,  DIMENSION(:), POINTER :: fixr,fix,fix0
      integer,  DIMENSION(:), POINTER :: JL,JV
-     INTEGER,POINTER :: N,ND2,no
+     INTEGER,POINTER :: N,NP,no
+     real(dp), pointer :: e_ij(:,:)
+     real(dp), pointer :: rad(:,:)
+     real(dp), pointer :: ds,beta0,eps
+     logical, pointer :: symptrack,usenonsymp
   end  type tree_element
   !@3 ---------------------------------------------</br>
  
@@ -274,8 +278,8 @@ module definition
   include "a_def_sagan.inc"
   include "a_def_element_fibre_layout.inc"
   !@3 ---------------------------------------------</br>
-  type(fibre), pointer :: lost_fibre
-  type(integration_node), pointer :: lost_node
+  type(fibre), pointer :: lost_fibre=>null()
+  type(integration_node), pointer :: lost_node=>null()
 
   type rf_phasor
      real(dp) x(2)
@@ -294,7 +298,7 @@ module definition
      type(rf_phasor) AC
      type(spinor) s(3)
      logical u
-     type(integration_node),pointer :: lost_node
+     type(integration_node),pointer :: lost_node=>null()
   end type probe
   !@3 ---------------------------------------------</br>
   type probe_8
@@ -304,7 +308,7 @@ module definition
      type(spinor_8) s(3)   ! Polymorphic spin s(1:3)
      !   stuff for exception
      logical u
-     type(integration_node),pointer :: lost_node
+     type(integration_node),pointer :: lost_node=>null()
   end type probe_8
   !@3 ---------------------------------------------</br>
   type TEMPORAL_PROBE
@@ -363,7 +367,8 @@ module definition
   TYPE c_vector_field  !@1 
       integer :: n=0,nrmax !@1 n dimension used v(1:n) (nd2 by default) ; nrmax some big integer if eps<1 
       real(dp) eps !@1 if eps=-integer  then |eps| Lie brackets are taken ; otherwise eps=eps_tpsalie=10^-9
-      type (c_taylor) v(lnv)                        
+      type (c_taylor) v(lnv)  
+      type(c_spinor) om                      
   END TYPE c_vector_field
   !@3 ---------------------------------------------</br>
   TYPE c_vector_field_fourier  !@1 
@@ -385,7 +390,7 @@ module definition
       type(c_damap) a_t !@1 transformation a (m=a n a^-1) 
       type(c_damap) n   !@1 transformation n (m=a n a^-1)      
       type(c_damap) As  !@1  For Spin   (m = As a n a^-1 As^-1)  
-      integer NRES,M(NDIM2t/2,NRESO),ms(NDIM2t/2) !@1 stores resonances to be left in the map, including spin (ms)
+      integer NRES,M(NDIM2t/2,NRESO),ms(NRESO) !@1 stores resonances to be left in the map, including spin (ms)
       real(dp) tune(NDIM2t/2),damping(NDIM2t/2),spin_tune !@1 Stores simple information
       logical positive ! forces positive tunes (close to 1 if <0)
 !!!Envelope radiation stuff to normalise radiation (Sand's like theory)

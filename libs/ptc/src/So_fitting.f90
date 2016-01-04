@@ -3788,50 +3788,6 @@ endif
 
   ! THIN LENS EXAMPLE
 
-  SUBROUTINE assign_one_aperture(L,pos,kindaper,R,X,Y,dx,dy)
-    IMPLICIT NONE
-    TYPE(LAYOUT),TARGET :: L
-    integer pos,kindaper
-    REAL(DP) R(:),X,Y,dx,dy
-    type(fibre), pointer :: P
-
-    call move_to(L,p,pos)
-
-    if(.NOT.ASSOCIATED(P%MAG%p%aperture)) THEN
-       call alloc(P%MAG%p%aperture)
-       call alloc(P%MAGP%p%aperture)
-    ENDIF
-    if(kindaper/=0) then
-       P%MAG%p%aperture%kind = kindaper
-       P%MAGP%p%aperture%kind = kindaper
-       P%MAG%p%aperture%r    = R
-       P%MAG%p%aperture%x    = X
-       P%MAG%p%aperture%y    = y
-       P%MAG%p%aperture%dx    = dX
-       P%MAG%p%aperture%dy    = dy
-       P%MAGP%p%aperture%r    = R
-       P%MAGP%p%aperture%x    = X
-       P%MAGP%p%aperture%y    = y
-       P%MAGP%p%aperture%dx    = dX
-       P%MAGP%p%aperture%dy    = dy
-    endif
-
-  end SUBROUTINE assign_one_aperture
-
-  SUBROUTINE TURN_OFF_ONE_aperture(R,pos)
-    IMPLICIT NONE
-    TYPE(LAYOUT),TARGET :: R
-    integer pos
-    type(fibre), pointer :: P
-
-    call move_to(r,p,pos)
-
-    if(ASSOCIATED(P%MAG%p%aperture)) THEN
-       P%MAG%p%aperture%kind = -P%MAG%p%aperture%kind
-       P%MAGP%p%aperture%kind = P%MAG%p%aperture%kind
-    ENDIF
-
-  end SUBROUTINE TURN_OFF_ONE_aperture
 
   SUBROUTINE REVERSE_BEAM_LINE(R, changeanbn )
     IMPLICIT NONE

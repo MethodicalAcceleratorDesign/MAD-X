@@ -107,6 +107,7 @@ END TYPE POL_BLOCK_INICOND
 
 
 TYPE MADX_APERTURE
+   integer,pointer :: pos
    INTEGER,pointer ::  KIND   ! 1,2,3,4
    REAL(DP),pointer :: R(:)
    REAL(DP),pointer :: X,Y,DX,DY
@@ -223,7 +224,8 @@ TYPE ELEMENT
    !   integer, POINTER ::girder_index
    type(girder),pointer :: assembly
    type(ramping), pointer :: ramp
-
+   type(tree_element), pointer :: forward(:)=> null(),backward(:)=> null()
+   logical, pointer :: usef=> null(),useb=> null()
 END TYPE  ELEMENT
 
 
@@ -281,6 +283,8 @@ TYPE ELEMENTP
    TYPE(FIBRE), POINTER :: PARENT_FIBRE
    !   TYPE(fibre_appearance), POINTER :: doko
    type(ramping), pointer :: ramp
+   type(tree_element), pointer :: forward(:)=> null(),backward(:)=> null()
+   logical, pointer :: usef=> null(),useb=> null()
 END TYPE  ELEMENTP
 
 type fibre_appearance
@@ -289,12 +293,12 @@ type fibre_appearance
 end type fibre_appearance
 
 type info
-   real(dp),pointer :: s => null()
-   real(dp),pointer ::  beta(:) => null()
-   real(dp),pointer ::  fix0(:) => null()
-   real(dp),pointer ::  fix(:) => null()
-   real(dp), pointer:: pos(:) => null()
-   real(dp), pointer:: m(:,:) => null()
+   real(dp),pointer :: s  => null()
+   real(dp),pointer ::  beta(:)  => null()
+   real(dp),pointer ::  fix0(:)  => null()
+   real(dp),pointer ::  fix(:)  => null()
+   real(dp), pointer:: pos(:)  => null()
+   real(dp), pointer:: m(:,:)  => null()
 END type info
 
 TYPE FIBRE
@@ -385,7 +389,7 @@ TYPE INTEGRATION_NODE
    TYPE(FIBRE), POINTER :: PARENT_FIBRE
    !   TYPE(EXTRA_WORK), POINTER :: WORK
    TYPE(BEAM_BEAM_NODE), POINTER :: BB
-   TYPE(tree_element), POINTER :: T
+!   TYPE(tree_element), POINTER :: T
 END TYPE INTEGRATION_NODE
 
 TYPE BEAM_LOCATION

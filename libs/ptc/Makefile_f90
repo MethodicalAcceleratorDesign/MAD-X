@@ -22,6 +22,8 @@ FC_DIR := src
 FC_SRC := $(notdir $(wildcard $(FC_DIR)/*.f90 $(FC_DIR)/*.F90))
 
 # files specific compiler flag
+Sg_sagan_wiggler.o: FFLAGS += -fdollar-ok
+Sg_sagan_wiggler.o: NOPT := 2
 l_complex_taylor.o: NOPT := 2
 
 #######################
@@ -44,6 +46,8 @@ l_complex_taylor.o:         $(FC_DIR)/l_complex_taylor.f90        k_tpsalie_anal
 m_real_polymorph.o:         $(FC_DIR)/m_real_polymorph.f90        l_complex_taylor.o
 n_complex_polymorph.o:      $(FC_DIR)/n_complex_polymorph.f90     m_real_polymorph.o
 o_tree_element.o:           $(FC_DIR)/o_tree_element.f90          n_complex_polymorph.o
+
+Ci_tpsa.o:                  $(FC_DIR)/Ci_tpsa.f90                 h_definition.o o_tree_element.o 
 
 Sa_extend_poly.o:           $(FC_DIR)/Sa_extend_poly.f90          o_tree_element.o Ci_tpsa.o
 Sb_sagan_pol_arbitrary.o:   $(FC_DIR)/Sb_sagan_pol_arbitrary.f90  Sa_extend_poly.o

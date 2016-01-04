@@ -5,8 +5,8 @@ module pointer_lattice
   implicit none
   public
   ! stuff for main program
-  type(layout),pointer :: my_ering
-  type(internal_state),pointer :: my_estate
+  type(layout),pointer :: my_ering => null()
+  type(internal_state),pointer :: my_estate=> null()
 !  type(internal_state),pointer :: my_old_state
   integer ,pointer :: my_start, MY_ORDER, MY_NP,MY_END,my_start_t
   real(dp), pointer :: my_fix(:),MY_DELTA
@@ -56,11 +56,11 @@ contains
     read77 =.true.
 
     my_ering => m_u%start
-m_u_t=.true.
-if(m_t%n>0) then
-    my_ering => m_t%end
-    m_u_t=.false.
-endif
+    m_u_t=.true.
+    if(m_t%n>0) then
+      my_ering => m_t%end
+      m_u_t=.false.
+    endif
     if(associated(my_estate)) then
     !  my_estate=>my_old_state
       etat=my_estate
@@ -197,11 +197,18 @@ endif
     else
      mf=5
     endif
+    
     if(i_layout==0) then
+             print*,"Skowron: i_layout==0"
+
+             nullify(my_ering)
+
              i_layout=1
              call move_to_layout_i(m_u,my_ering,i_layout)
              write(6,*) "Selected Layout in m_u",i_layout,"  called  ---> ",my_ering%name
              m_u_t=.true.
+    else
+             print*,"Skowron: i_layout=", i_layout
     endif
     do i=1,10000
        read(mf,'(a120)') comT
@@ -251,6 +258,7 @@ endif
 
        select case(com)
        case('SELECTLAYOUT','SELECTLATTICE')
+          print*,"SCV: ", m_u%n
           read(mf,*) i_layout_temp
           if(i_layout_temp>m_u%n) then
              write(6,*) " Universe Size ", m_u%n
@@ -1338,10 +1346,10 @@ endif
 
     !      call compute_twiss(my_ering,my_estate,filename,1,del,1,integrated,name,my_true,my_false)
        case('PTCTWISS','TWISS','PTCTWISSRIPKEN','TWISSRIPKEN')  !
-          read(mf,*) filename, NAME, integrated
-          read(mf,*) del
-
-       !   call compute_twiss(my_ering,my_estate,filename,1,del,1,integrated,name,my_false,my_false)
+          !read(mf,*) filename, NAME, integrated
+          !read(mf,*) del
+          
+          call compute_twiss(my_ering,6,3)
 
        case('PTCTWISSSASHA','TWISSSASHA','PTCTWISSRIPKENSASHA','TWISSRIPKENSASHA')  !
           read(mf,*) filename, NAME, integrated

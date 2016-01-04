@@ -923,7 +923,7 @@ endif
     !    endif
 
     x=V%X
-    if(abs(x(1))+abs(x(3))>absolute_aperture) then
+    if(abs(x(1))+abs(x(3))>absolute_aperture.or.abs(x(6))>t_aperture) then
        messageLOST="exceed absolute_aperture in TRACKV_NODE_SINGLE"
        lost_node=>t
        lost_fibre=>t%parent_fibre
@@ -984,12 +984,12 @@ endif
     TYPE(INTERNAL_STATE)  K
     !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
     type(element),pointer :: el
-
+    LOGICAL TA
     IF(.NOT.CHECK_STABLE) return
     !       CALL RESET_APERTURE_FLAG
     !    endif
 
-    if(abs(x(1))+abs(x(3))>absolute_aperture) then   !.or.(.not.CHECK_MADX_APERTURE)) then
+    if(abs(x(1))+abs(x(3))>absolute_aperture.or.abs(x(6))>t_aperture) then   !.or.(.not.CHECK_MADX_APERTURE)) then
        messageLOST="exceed absolute_aperture in TRACKR_NODE_SINGLE"
        lost_node=>t
        lost_fibre=>t%parent_fibre
@@ -1015,8 +1015,15 @@ endif
     SELECT CASE(T%CAS)
     CASE(CASEP1)
        CALL TRACK_FIBRE_FRONT(T%PARENT_FIBRE,X,K)
-       if(associated(T%PARENT_FIBRE%MAG%p%aperture)) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
+     if(associated(T%PARENT_FIBRE%MAG%p%aperture)) then
+TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==-1.OR.T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==0
+          if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
+     endif
     CASE(CASEP2)
+     if(associated(T%PARENT_FIBRE%MAG%p%aperture)) then
+TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==0
+          if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
+     endif
        CALL TRACK_FIBRE_BACK(T%PARENT_FIBRE,X,K)
 
     CASE(CASE1,CASE2)
@@ -1133,10 +1140,10 @@ endif
           call BBKICK(t%bb,X)
           if(t%bb%patch)call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_false)
        endif
-       IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
+!       IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
     case(CASETF1,CASETF2)
 
-       IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
+!       IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
 
 
     END SELECT
@@ -1162,12 +1169,12 @@ endif
     logical(lp) BN2,L
     logical(lp) CHECK_KNOB
     integer(2), pointer,dimension(:)::AN,BN
-
+     logical TA
     IF(.NOT.CHECK_STABLE) return
     !       CALL RESET_APERTURE_FLAG
     !    endif
 
-    if(abs(x(1))+abs(x(3))>absolute_aperture) then
+    if(abs(x(1))+abs(x(3))>absolute_aperture.or.abs(x(6))>t_aperture) then
        messageLOST="exceed absolute_aperture in TRACKP_NODE_SINGLE"
        lost_node=>t
        lost_fibre=>t%parent_fibre
@@ -1190,11 +1197,15 @@ endif
     SELECT CASE(T%CAS)
     CASE(CASEP1)
        CALL TRACK_FIBRE_FRONT(T%PARENT_FIBRE,X,K)
-       if(associated(T%PARENT_FIBRE%MAGP%p%aperture)) call CHECK_APERTURE(T%PARENT_FIBRE%MAGP%p%aperture,X)
+     if(associated(T%PARENT_FIBRE%MAG%p%aperture)) then
+TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==-1.OR.T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==0
+          if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
+     endif
     CASE(CASEP2)
-       !    if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then ! new 2010
-       !       CHECK_STABLE=.false.
-       !    endif
+     if(associated(T%PARENT_FIBRE%MAG%p%aperture)) then
+TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==0
+          if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
+     endif
        CALL TRACK_FIBRE_BACK(T%PARENT_FIBRE,X,K)
 
     CASE(CASE1,CASE2)
@@ -1334,10 +1345,10 @@ endif
           call BBKICK(t%bb,X)
           if(t%bb%patch)call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_false)
        endif
-       IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
+ !      IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
     case(CASETF1,CASETF2)
 
-       IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
+ !      IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
 
 
 
@@ -2148,6 +2159,18 @@ endif
      call kill(t)
 
 
-     end subroutine convert_ptc_to_bmadp   
+     end subroutine convert_ptc_to_bmadp 
+
+     subroutine in_bmad_units
+     implicit none  
+      use_bmad_units=.true.
+      ndpt_bmad=1
+     end subroutine in_bmad_units
+
+     subroutine in_ptc_units
+     implicit none  
+      use_bmad_units=.false.
+      ndpt_bmad=0
+     end subroutine in_ptc_units
 
 end module ptc_multiparticle

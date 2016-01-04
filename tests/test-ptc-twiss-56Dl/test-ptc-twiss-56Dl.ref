@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Linux)       +
+  +     MAD-X 5.02.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.05.19 17:03:44      +
+  + Release   date: 2015.09.24               +
+  + Execution date: 2015.10.13 13:05:33      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -815,6 +815,7 @@ ptc_create_universe;
           Kinetic Energy : 0.145151E+00
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.541711E+00
+  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy           1.0834226784000001     
      method                   6
@@ -865,6 +866,7 @@ obs_points pro_ptc_setswitch Done
        TIME        =  FALSE
        FRINGE      =  FALSE
        PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
        ONLY_4D     =  FALSE
        DELTA       =  FALSE
        SPIN        =  FALSE
@@ -899,28 +901,28 @@ obs_points pro_ptc_setswitch Done
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0        -10.3020712    0.0005941579859 
+                 0                  0        -10.3020712    0.0005941579857 
 
           disp2min           disp2max           disp3min           disp3max 
        -4.54310719         4.54310719                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    1.068886127e-08 
+                 0                  0                  0    1.068886489e-08 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.546139786e-09                  0                  0                  0 
+      2.546139e-09                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    1.168573345e-08                  0    3.059593723e-09 
+                 0    1.168573382e-08                  0    3.059593803e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0        46.00166095                  0    2.508645927e-08 
+                 0        46.00166095                  0    2.508646062e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.106286922e-08                  0        78.54370268 
+                 0    1.106287014e-08                  0        78.54370268 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -1.447485988e-12                  0   -1.106286967e-08 
+                 0   -1.448330251e-12                  0   -1.106286944e-08 
 
            pycomin             tcomin            ptcomin 
                  0                  0                  0 
@@ -944,5 +946,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

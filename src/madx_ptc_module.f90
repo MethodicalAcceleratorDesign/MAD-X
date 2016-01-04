@@ -55,6 +55,8 @@ CONTAINS
   subroutine ptc_create_universe()
     implicit none
     real(kind(1d0)) get_value
+   
+    !piotr_freq=.true. ! flag introduced in PTC cavity tracking to have correct phasing with time=false
 
     print77=.false.
     read77 =.false.
@@ -129,6 +131,9 @@ CONTAINS
     endif
 
     call append_empty_layout(m_u)
+    call append_empty_layout(m_t)
+    
+    
     index_mad=index_mad+1
     my_ring=>m_u%end
 
@@ -990,7 +995,7 @@ CONTAINS
        else
           key%list%cavity_totalpath=1
        endif
-
+       
 !       print*,"madx_ptc_module::input volt: ", key%list%volt, &
 !                                    " lag : ", key%list%lag, &
 !                                    " harm: ", key%list%harmon, &

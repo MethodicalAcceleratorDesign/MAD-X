@@ -82,9 +82,7 @@ m_real_polymorph.o:         $(FC_DIR_PTC)/m_real_polymorph.f90        l_complex_
 n_complex_polymorph.o:      $(FC_DIR_PTC)/n_complex_polymorph.f90     m_real_polymorph.o
 o_tree_element.o:           $(FC_DIR_PTC)/o_tree_element.f90          n_complex_polymorph.o
 
-Ci_tpsa.o:           $(FC_DIR_PTC)/Ci_tpsa.f90          h_definition.o o_tree_element.o 
-
-
+Ci_tpsa.o:                  $(FC_DIR_PTC)/Ci_tpsa.f90                 h_definition.o o_tree_element.o 
 
 Sa_extend_poly.o:           $(FC_DIR_PTC)/Sa_extend_poly.f90          o_tree_element.o
 Sb_sagan_pol_arbitrary.o:   $(FC_DIR_PTC)/Sb_sagan_pol_arbitrary.f90  Sa_extend_poly.o

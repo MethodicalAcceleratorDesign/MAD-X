@@ -15,7 +15,7 @@ module c_dabnew
   public c_dapok,c_dapek,c_etall1,c_DAshift,c_dacop,c_dacon,c_daadd,c_dacad,c_dasub
   public c_dacsu,c_dasuc,c_dacmu,c_dadal1,c_dapri,c_dapri77,c_darea,c_darea77,c_daeps
   public c_dacdi,c_dadic,c_count_da,c_mtree,c_dafun,c_DAABS,c_dadiv,c_take,c_datrunc,c_dader,c_datra
-  public c_daran,c_dacfu,c_matinv,c_dapek0,c_dapok0,c_dacct,c_dainv,c_etcom
+  public c_daran,c_dacfu,c_matinv,c_dapek0,c_dapok0,c_dacct,c_dainv,c_etcom,c_danot
 
   integer,private,parameter:: lsw=1
   integer :: c_lda_max_used=0
@@ -1195,7 +1195,7 @@ contains
     return
   end subroutine c_dacon
   !
-  subroutine danot(not)
+  subroutine c_danot(not)
     implicit none
     !     *********************
     !
@@ -1220,7 +1220,7 @@ contains
     c_nocut = not
     !
     return
-  end subroutine danot
+  end subroutine c_danot
   !  subroutine getdanot(not)
   !    implicit none
   !     *********************
