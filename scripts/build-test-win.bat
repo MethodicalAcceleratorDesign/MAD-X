@@ -70,11 +70,11 @@ REM cleanall not supported on windows (relies on find)
 if ERRORLEVEL 1 %echo% -e "\nERROR: make all-win64-gnu failed" && exit /B 1
 
 %echo% -e "\n===== Intel build ====="
-call "C:\Program Files (x86)\Intel\Composer XE 2013 SP1\bin\ipsxe-comp-vars.bat" ia32 vs2012
+call "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\bin\compilervars.bat" ia32 vs2013
 %make% all-win32-intel all-win32
 if ERRORLEVEL 1 %echo% -e "\nERROR: make all-win32-intel failed" && exit /B 1
 
-call "C:\Program Files (x86)\Intel\Composer XE 2013 SP1\bin\ipsxe-comp-vars.bat" intel64 vs2012
+call "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\bin\compilervars.bat" intel64 vs2013
 %make% all-win64-intel all-win64
 if ERRORLEVEL 1 %echo% -e "\nERROR: make all-win64-intel failed" && exit /B 1
 

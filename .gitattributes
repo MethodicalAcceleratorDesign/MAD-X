@@ -958,8 +958,6 @@ src/ptc_export_xml.f90 -text
 src/resindex.f90 -text
 src/sodd.f90 -text
 src/survey.f90 -text
-src/timest.f90 -text
-src/timex.f90 -text
 src/touschek.f90 -text
 src/tpsa.cpp -text
 src/tpsa.h -text

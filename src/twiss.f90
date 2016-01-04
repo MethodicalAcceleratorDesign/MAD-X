@@ -5084,6 +5084,7 @@ SUBROUTINE tmsymp(r)
   call m66div(a,b,v,eflag) ! V = A * B-1
   if (eflag) goto 100
 
+  ! A = Jt*Vt*J ; ie A = V**(-1)
   A = matmul(JMATT, matmul(transpose(V),JMAT)) ! invert symplectic matrix
   
   A = ( A - V ) / two 
@@ -6805,7 +6806,7 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   integer :: j, ii, jj, kk, dummyi, n_ferr
   double precision :: elrad, rfac, bvk, tilt, cangle, sangle, dtmp
   double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
-  double precision :: f_errors(0:maxferr)!, field(2,0:0)
+  double precision :: f_errors(0:maxferr)
   double precision :: ed(6), rd(6,6), td(6,6,6)
   
   double precision :: krf
@@ -6876,7 +6877,6 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   endif
   
   !---- Vector with strengths + field errors
-  !field_cos(1) = bvk * (kn0l * cos(pn0 * twopi - krf * z) + field(1,0)) / (one + deltap);
   field_cos(1) = bvk * (kn0l * cos(pn0 * twopi - krf * z) + f_errors(0)) / (one + deltap);
   field_sin(1) = bvk * (kn0l * sin(pn0 * twopi - krf * z))               / (one + deltap);
   field_cos(2) = zero; 

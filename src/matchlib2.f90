@@ -1,3 +1,6 @@
+! Cannot be included back in matchlib.f90 because this subroutine needs
+! to be compiled with NOPT=0. See Makefile_f90
+!
 !***********************************************************************
 !
       SUBROUTINE DLAMC1( BETA, T, RND, IEEE1 )

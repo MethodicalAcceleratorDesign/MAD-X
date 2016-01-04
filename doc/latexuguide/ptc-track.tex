@@ -104,23 +104,6 @@ respect to the reference orbit.
 If the option \hyperref[opt:closed-orbit]{\texttt{CLOSED\_ORBIT}} is absent,
 then coordinates are specified with respect to the reference orbit.  
 
-\begin{5.02.06}
-\textbf{Important:} \\
-The initial trajectory coordinates specified with the \texttt{PTC\_START} command 
-(and the \hyperref[sec:ptc-start]{\texttt{PTC\_START}} command remain in the 
-\texttt{TRACKSUMM} table for the duration of the \madx run. 
-Therefore any subsequent \texttt{RUN} command 
-(and \hyperref[sec:ptc-track]{\texttt{PTC\_TRACK}} or 
-\hyperref[sec:ptc-trackline]{\texttt{PTC\_TRACKLINE}}) to actually start tracking 
-will effectively use \textbf{all} initial trajectory coordinates found
-in the \texttt{TRACKSUMM} table. 
-A workaround this odd behaviour is to delete the \texttt{TRACKSUMM} table before 
-specifying the initial trajectory coordinates that must be tracked in the 
-current run:
-\madxmp{DELETE, TABLE=tracksumm;}
-\end{5.02.06}
-
-
 \section{PTC\_OBSERVE} 
 \label{sec:ptc-observe}
 

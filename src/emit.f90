@@ -539,7 +539,6 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         TW = zero 
         call tmfrng(.false.,h,sk1,edg2,zero,-one,corr,rw,tw)
         RW0 = RW 
-        !call m66inv(rw0,rw)
         RW = matmul(JMATT, matmul(transpose(RW0),JMAT)) !invert symplectic matrix
         O2 = matmul(RW,O2) 
         

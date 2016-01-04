@@ -726,6 +726,7 @@ subroutine fort_warn(t1, t2)
      call augmentfwarn()
   endif
 end subroutine fort_warn
+
 subroutine fort_fail(t1,t2)
   implicit none
   !----------------------------------------------------------------------*
