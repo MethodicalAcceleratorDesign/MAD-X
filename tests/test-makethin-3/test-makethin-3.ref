@@ -1,0 +1,133 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.07  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2015.09.24               +
+  + Execution date: 2015.11.13 18:42:05      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+title, "V6.5 Thin Lens" ;    // USE ONLY WITH MAD-X version > June 2005
+
+
+
+option,echo,warn,info;
+
+
+
+set, format="12.6f";
+
+select, flag=twiss, clear;
+
+select, flag=twiss, pattern="IP\.*",     column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy,x,px,y,py;
+
+select, flag=twiss, pattern="s.ds.l\.*", column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy,x,px,y,py;
+
+select, flag=twiss, pattern="e.ds.r\.*", column=name,s,betx,bety,alfx,alfy,dx,dpx,mux,muy,x,px,y,py;
+
+
+
+option,-echo,-warn;
+
+
+
+beam, particle = proton, sequence=lhcb1, energy = 450.0;
+
+
+
+! without this we get poor tune (and more?) in twiss table after makethin
+
+use,    sequence=lhcb1;
+
+twiss,  sequence=lhcb1, file=lhc_twiss_b1.before.dat, betx=beta.ip1, bety=beta.ip1, x=+x.ip1, y=+y.ip1, py=+py.ip1;
+
+enter Twiss module
+ Found 3 initial orbit vector values from twiss command. 
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+      length       orbit5         alfa      gammatr 
+26658.883200    -0.000000     0.000000     0.000000 
+
+          q1          dq1      betxmax        dxmax 
+   64.280001     0.000000   595.119430     2.859817 
+
+       dxrms       xcomax       xcorms           q2 
+    1.396822     0.000000     0.000000    59.310000 
+
+         dq2      betymax        dymax        dyrms 
+    0.000000   609.526114     0.000000     0.000000 
+
+      ycomax       ycorms       deltap      synch_1 
+    0.000000     0.000000     0.000000     0.000000 
+
+     synch_2      synch_3      synch_4      synch_5 
+    0.000000     0.000000     0.000000     0.000000 
+
+
+! convert to THIN
+
+option, info,  warn, -echo;
+
+makethin, sequence=lhcb1,style=hybrid, makedipedge=false, makeendmarkers=true;
+
+makethin: style chosen : hybrid
+makethin: slicing sequence : lhcb1
+
+
+! set new strength file
+
+option,-echo,-warn,-info;
+
+
+
+use,    sequence=lhcb1;
+
+twiss,  sequence=lhcb1, file=lhc_twiss_b1.dat, betx=beta.ip1, bety=beta.ip1, x=+x.ip1, y=+y.ip1, py=+py.ip1;
+
+enter Twiss module
+ Found 3 initial orbit vector values from twiss command. 
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+      length       orbit5         alfa      gammatr 
+26658.883200    -0.000000     0.000000     0.000000 
+
+          q1          dq1      betxmax        dxmax 
+   64.280001     0.000000   595.290029     2.860704 
+
+       dxrms       xcomax       xcorms           q2 
+    1.384525     0.000000     0.000000    59.310000 
+
+         dq2      betymax        dymax        dyrms 
+    0.000000   611.782965     0.000000     0.000000 
+
+      ycomax       ycorms       deltap      synch_1 
+    0.000000     0.000000     0.000000     0.000000 
+
+     synch_2      synch_3      synch_4      synch_5 
+    0.000000     0.000000     0.000000     0.000000 
+save,sequence=lhcb1,file="V6.5.thin.b1.seq";
+
+++++++ warning: SAVE makes all previous USE invalid !  
+
+
+stop;
+
+
+  Number of warnings: 1
+1 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

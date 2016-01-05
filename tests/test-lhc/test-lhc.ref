@@ -1,0 +1,1713 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.07  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2015.09.24               +
+  + Execution date: 2015.11.10 18:36:50      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+
+
+! Links definitions
+
+option, warn,info;
+
+
+
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/HLLHCV1.1 slhc";
+
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503 db5";
+
+system,"ln -fns . result";
+
+
+
+! Sequence definition
+
+Option, -echo,warn,-info;
+
+++++++ warning: ignored: attempt to redefine constant: l.tanal
+++++++ warning: ignored: attempt to redefine constant: l.tanar
+++++++ warning: ignored: attempt to redefine constant: l.tanc
+++++++ warning: ignored: attempt to redefine constant: l.tcth
+++++++ warning: ignored: attempt to redefine constant: l.tctva
+++++++ warning: implicit element re-definition ignored: ip1
+++++++ warning: implicit element re-definition ignored: mbas2.1r1
+++++++ warning: implicit element re-definition ignored: tas.1r1
+++++++ warning: implicit element re-definition ignored: mqxa.1r1
+++++++ warning: implicit element re-definition ignored: mcbxh.1r1
+++++++ warning: implicit element re-definition ignored: mcbxv.1r1
+++++++ warning: implicit element re-definition ignored: mqxb.a2r1
+++++++ warning: implicit element re-definition ignored: mcbxh.2r1
+++++++ warning: implicit element re-definition ignored: mcbxv.2r1
+++++++ warning: implicit element re-definition ignored: mqxb.b2r1
+++++++ warning: implicit element re-definition ignored: tasb.3r1
+++++++ warning: implicit element re-definition ignored: mqsx.3r1
+++++++ warning: implicit element re-definition ignored: mqxa.3r1
+++++++ warning: implicit element re-definition ignored: mcbxh.3r1
+++++++ warning: implicit element re-definition ignored: mcbxv.3r1
+++++++ warning: implicit element re-definition ignored: mcsx.3r1
+++++++ warning: implicit element re-definition ignored: mctx.3r1
+++++++ warning: implicit element re-definition ignored: mcosx.3r1
+++++++ warning: implicit element re-definition ignored: mcox.3r1
+++++++ warning: implicit element re-definition ignored: mcssx.3r1
+++++++ warning: implicit element re-definition ignored: dfbxb.3r1
+++++++ warning: implicit element re-definition ignored: mbxw.a4r1
+++++++ warning: implicit element re-definition ignored: mbxw.b4r1
+++++++ warning: implicit element re-definition ignored: mbxw.c4r1
+++++++ warning: implicit element re-definition ignored: mbxw.d4r1
+++++++ warning: implicit element re-definition ignored: mbxw.e4r1
+++++++ warning: implicit element re-definition ignored: mbxw.f4r1
+++++++ warning: implicit element re-definition ignored: x1fcr.4r1
+++++++ warning: implicit element re-definition ignored: brana.4r1
+++++++ warning: implicit element re-definition ignored: x1zdc.a4r1
+++++++ warning: implicit element re-definition ignored: tanar.4r1
+++++++ warning: implicit element re-definition ignored: x2zdc.4l2
+++++++ warning: implicit element re-definition ignored: branb.4l2
+++++++ warning: implicit element re-definition ignored: btvst.a4l2
+++++++ warning: implicit element re-definition ignored: tctvb.4l2
+++++++ warning: implicit element re-definition ignored: tcdd.4l2
+++++++ warning: implicit element re-definition ignored: mbx.4l2
+++++++ warning: implicit element re-definition ignored: dfbxc.3l2
+++++++ warning: implicit element re-definition ignored: mcosx.3l2
+++++++ warning: implicit element re-definition ignored: mcox.3l2
+++++++ warning: implicit element re-definition ignored: mcssx.3l2
+++++++ warning: implicit element re-definition ignored: mcbxh.3l2
+++++++ warning: implicit element re-definition ignored: mcbxv.3l2
+++++++ warning: implicit element re-definition ignored: mcsx.3l2
+++++++ warning: implicit element re-definition ignored: mctx.3l2
+++++++ warning: implicit element re-definition ignored: mqxa.3l2
+++++++ warning: implicit element re-definition ignored: mqsx.3l2
+++++++ warning: implicit element re-definition ignored: mqxb.b2l2
+++++++ warning: implicit element re-definition ignored: mcbxh.2l2
+++++++ warning: implicit element re-definition ignored: mcbxv.2l2
+++++++ warning: implicit element re-definition ignored: mqxb.a2l2
+++++++ warning: implicit element re-definition ignored: mcbxh.1l2
+++++++ warning: implicit element re-definition ignored: mcbxv.1l2
+++++++ warning: implicit element re-definition ignored: mqxa.1l2
+++++++ warning: implicit element re-definition ignored: mbxwt.1l2
+++++++ warning: implicit element re-definition ignored: mbwmd.1l2
+++++++ warning: implicit element re-definition ignored: mbls2.1l2
+++++++ warning: implicit element re-definition ignored: ip2
+++++++ warning: implicit element re-definition ignored: mbls2.1r2
+++++++ warning: implicit element re-definition ignored: mbaw.1r2
+++++++ warning: implicit element re-definition ignored: mbxwt.1r2
+++++++ warning: implicit element re-definition ignored: mqxa.1r2
+++++++ warning: implicit element re-definition ignored: mcbxh.1r2
+++++++ warning: implicit element re-definition ignored: mcbxv.1r2
+++++++ warning: implicit element re-definition ignored: mqxb.a2r2
+++++++ warning: implicit element re-definition ignored: mcbxh.2r2
+++++++ warning: implicit element re-definition ignored: mcbxv.2r2
+++++++ warning: implicit element re-definition ignored: mqxb.b2r2
+++++++ warning: implicit element re-definition ignored: mqsx.3r2
+++++++ warning: implicit element re-definition ignored: mqxa.3r2
+++++++ warning: implicit element re-definition ignored: mcbxh.3r2
+++++++ warning: implicit element re-definition ignored: mcbxv.3r2
+++++++ warning: implicit element re-definition ignored: mcsx.3r2
+++++++ warning: implicit element re-definition ignored: mctx.3r2
+++++++ warning: implicit element re-definition ignored: mcosx.3r2
+++++++ warning: implicit element re-definition ignored: mcox.3r2
+++++++ warning: implicit element re-definition ignored: mcssx.3r2
+++++++ warning: implicit element re-definition ignored: dfbxd.3r2
+++++++ warning: implicit element re-definition ignored: mbx.4r2
+++++++ warning: implicit element re-definition ignored: tctvb.4r2
+++++++ warning: implicit element re-definition ignored: tclia.4r2
+++++++ warning: implicit element re-definition ignored: branb.4r2
+++++++ warning: implicit element re-definition ignored: x2zdc.4r2
+++++++ warning: implicit element re-definition ignored: ip3
+++++++ warning: implicit element re-definition ignored: ip4
+++++++ warning: implicit element re-definition ignored: tanc.4l5
+++++++ warning: implicit element re-definition ignored: x5zdc.b4l5
+++++++ warning: implicit element re-definition ignored: brana.4l5
+++++++ warning: implicit element re-definition ignored: x5zdc.a4l5
+++++++ warning: implicit element re-definition ignored: mbxw.f4l5
+++++++ warning: implicit element re-definition ignored: mbxw.e4l5
+++++++ warning: implicit element re-definition ignored: mbxw.d4l5
+++++++ warning: implicit element re-definition ignored: mbxw.c4l5
+++++++ warning: implicit element re-definition ignored: mbxw.b4l5
+++++++ warning: implicit element re-definition ignored: mbxw.a4l5
+++++++ warning: implicit element re-definition ignored: dfbxe.3l5
+++++++ warning: implicit element re-definition ignored: mcosx.3l5
+++++++ warning: implicit element re-definition ignored: mcox.3l5
+++++++ warning: implicit element re-definition ignored: mcssx.3l5
+++++++ warning: implicit element re-definition ignored: mcbxh.3l5
+++++++ warning: implicit element re-definition ignored: mcbxv.3l5
+++++++ warning: implicit element re-definition ignored: mcsx.3l5
+++++++ warning: implicit element re-definition ignored: mctx.3l5
+++++++ warning: implicit element re-definition ignored: mqxa.3l5
+++++++ warning: implicit element re-definition ignored: mqsx.3l5
+++++++ warning: implicit element re-definition ignored: tasb.3l5
+++++++ warning: implicit element re-definition ignored: mqxb.b2l5
+++++++ warning: implicit element re-definition ignored: mcbxh.2l5
+++++++ warning: implicit element re-definition ignored: mcbxv.2l5
+++++++ warning: implicit element re-definition ignored: mqxb.a2l5
+++++++ warning: implicit element re-definition ignored: mcbxh.1l5
+++++++ warning: implicit element re-definition ignored: mcbxv.1l5
+++++++ warning: implicit element re-definition ignored: mqxa.1l5
+++++++ warning: implicit element re-definition ignored: tas.1l5
+++++++ warning: implicit element re-definition ignored: mbcs2.1l5
+++++++ warning: implicit element re-definition ignored: ip5
+++++++ warning: implicit element re-definition ignored: mbcs2.1r5
+++++++ warning: implicit element re-definition ignored: tas.1r5
+++++++ warning: implicit element re-definition ignored: mqxa.1r5
+++++++ warning: implicit element re-definition ignored: mcbxh.1r5
+++++++ warning: implicit element re-definition ignored: mcbxv.1r5
+++++++ warning: implicit element re-definition ignored: mqxb.a2r5
+++++++ warning: implicit element re-definition ignored: mcbxh.2r5
+++++++ warning: implicit element re-definition ignored: mcbxv.2r5
+++++++ warning: implicit element re-definition ignored: mqxb.b2r5
+++++++ warning: implicit element re-definition ignored: tasb.3r5
+++++++ warning: implicit element re-definition ignored: mqsx.3r5
+++++++ warning: implicit element re-definition ignored: mqxa.3r5
+++++++ warning: implicit element re-definition ignored: mcbxh.3r5
+++++++ warning: implicit element re-definition ignored: mcbxv.3r5
+++++++ warning: implicit element re-definition ignored: mcsx.3r5
+++++++ warning: implicit element re-definition ignored: mctx.3r5
+++++++ warning: implicit element re-definition ignored: mcosx.3r5
+++++++ warning: implicit element re-definition ignored: mcox.3r5
+++++++ warning: implicit element re-definition ignored: mcssx.3r5
+++++++ warning: implicit element re-definition ignored: dfbxf.3r5
+++++++ warning: implicit element re-definition ignored: mbxw.a4r5
+++++++ warning: implicit element re-definition ignored: mbxw.b4r5
+++++++ warning: implicit element re-definition ignored: mbxw.c4r5
+++++++ warning: implicit element re-definition ignored: mbxw.d4r5
+++++++ warning: implicit element re-definition ignored: mbxw.e4r5
+++++++ warning: implicit element re-definition ignored: mbxw.f4r5
+++++++ warning: implicit element re-definition ignored: x5zdc.b4r5
+++++++ warning: implicit element re-definition ignored: brana.4r5
+++++++ warning: implicit element re-definition ignored: x5zdc.a4r5
+++++++ warning: implicit element re-definition ignored: tanc.4r5
+++++++ warning: implicit element re-definition ignored: ip6
+++++++ warning: implicit element re-definition ignored: ip7
+++++++ warning: implicit element re-definition ignored: branb.4l8
+++++++ warning: implicit element re-definition ignored: tclia.4l8
+++++++ warning: implicit element re-definition ignored: tctvb.4l8
+++++++ warning: implicit element re-definition ignored: mbx.4l8
+++++++ warning: implicit element re-definition ignored: dfbxg.3l8
+++++++ warning: implicit element re-definition ignored: mcosx.3l8
+++++++ warning: implicit element re-definition ignored: mcox.3l8
+++++++ warning: implicit element re-definition ignored: mcssx.3l8
+++++++ warning: implicit element re-definition ignored: mcbxh.3l8
+++++++ warning: implicit element re-definition ignored: mcbxv.3l8
+++++++ warning: implicit element re-definition ignored: mcsx.3l8
+++++++ warning: implicit element re-definition ignored: mctx.3l8
+++++++ warning: implicit element re-definition ignored: mqxa.3l8
+++++++ warning: implicit element re-definition ignored: mqsx.3l8
+++++++ warning: implicit element re-definition ignored: mqxb.b2l8
+++++++ warning: implicit element re-definition ignored: mcbxh.2l8
+++++++ warning: implicit element re-definition ignored: mcbxv.2l8
+++++++ warning: implicit element re-definition ignored: mqxb.a2l8
+++++++ warning: implicit element re-definition ignored: mcbxh.1l8
+++++++ warning: implicit element re-definition ignored: mcbxv.1l8
+++++++ warning: implicit element re-definition ignored: mqxa.1l8
+++++++ warning: implicit element re-definition ignored: mbxws.1l8
+++++++ warning: implicit element re-definition ignored: mbxwh.1l8
+++++++ warning: implicit element re-definition ignored: ip8
+++++++ warning: implicit element re-definition ignored: mblw.1r8
+++++++ warning: implicit element re-definition ignored: mbxws.1r8
+++++++ warning: implicit element re-definition ignored: mqxa.1r8
+++++++ warning: implicit element re-definition ignored: mcbxh.1r8
+++++++ warning: implicit element re-definition ignored: mcbxv.1r8
+++++++ warning: implicit element re-definition ignored: mqxb.a2r8
+++++++ warning: implicit element re-definition ignored: mcbxh.2r8
+++++++ warning: implicit element re-definition ignored: mcbxv.2r8
+++++++ warning: implicit element re-definition ignored: mqxb.b2r8
+++++++ warning: implicit element re-definition ignored: mqsx.3r8
+++++++ warning: implicit element re-definition ignored: mqxa.3r8
+++++++ warning: implicit element re-definition ignored: mcbxh.3r8
+++++++ warning: implicit element re-definition ignored: mcbxv.3r8
+++++++ warning: implicit element re-definition ignored: mcsx.3r8
+++++++ warning: implicit element re-definition ignored: mctx.3r8
+++++++ warning: implicit element re-definition ignored: mcosx.3r8
+++++++ warning: implicit element re-definition ignored: mcox.3r8
+++++++ warning: implicit element re-definition ignored: mcssx.3r8
+++++++ warning: implicit element re-definition ignored: dfbxh.3r8
+++++++ warning: implicit element re-definition ignored: mbx.4r8
+++++++ warning: implicit element re-definition ignored: tcddm.4r8
+++++++ warning: implicit element re-definition ignored: tctvb.4r8
+++++++ warning: implicit element re-definition ignored: btvst.a4r8
+++++++ warning: implicit element re-definition ignored: branb.4r8
+++++++ warning: implicit element re-definition ignored: tanal.4l1
+++++++ warning: implicit element re-definition ignored: x1zdc.a4l1
+++++++ warning: implicit element re-definition ignored: brana.4l1
+++++++ warning: implicit element re-definition ignored: x1fcl.4l1
+++++++ warning: implicit element re-definition ignored: mbxw.f4l1
+++++++ warning: implicit element re-definition ignored: mbxw.e4l1
+++++++ warning: implicit element re-definition ignored: mbxw.d4l1
+++++++ warning: implicit element re-definition ignored: mbxw.c4l1
+++++++ warning: implicit element re-definition ignored: mbxw.b4l1
+++++++ warning: implicit element re-definition ignored: mbxw.a4l1
+++++++ warning: implicit element re-definition ignored: dfbxa.3l1
+++++++ warning: implicit element re-definition ignored: mcosx.3l1
+++++++ warning: implicit element re-definition ignored: mcox.3l1
+++++++ warning: implicit element re-definition ignored: mcssx.3l1
+++++++ warning: implicit element re-definition ignored: mcbxh.3l1
+++++++ warning: implicit element re-definition ignored: mcbxv.3l1
+++++++ warning: implicit element re-definition ignored: mcsx.3l1
+++++++ warning: implicit element re-definition ignored: mctx.3l1
+++++++ warning: implicit element re-definition ignored: mqxa.3l1
+++++++ warning: implicit element re-definition ignored: mqsx.3l1
+++++++ warning: implicit element re-definition ignored: tasb.3l1
+++++++ warning: implicit element re-definition ignored: mqxb.b2l1
+++++++ warning: implicit element re-definition ignored: mcbxh.2l1
+++++++ warning: implicit element re-definition ignored: mcbxv.2l1
+++++++ warning: implicit element re-definition ignored: mqxb.a2l1
+++++++ warning: implicit element re-definition ignored: mcbxh.1l1
+++++++ warning: implicit element re-definition ignored: mcbxv.1l1
+++++++ warning: implicit element re-definition ignored: mqxa.1l1
+++++++ warning: implicit element re-definition ignored: tas.1l1
+++++++ warning: implicit element re-definition ignored: mbas2.1l1
+++++++ warning: implicit element re-definition ignored: ip1.l1
+++++++ warning: implicit element re-definition ignored: marks.l1
+++++++ warning: implicit element re-definition ignored: marke.l1
+++++++ warning: implicit element re-definition ignored: marke.r1
+++++++ warning: implicit element re-definition ignored: marks.r1
+++++++ warning: implicit element re-definition ignored: marks.l5
+++++++ warning: implicit element re-definition ignored: marke.l5
+++++++ warning: implicit element re-definition ignored: marke.r5
+++++++ warning: implicit element re-definition ignored: marks.r5
+++++++ warning: ignored because of unknown element: ms.10l1.b1
+++++++ warning: ignored because of unknown element: ms.10r1.b1
+++++++ warning: ignored because of unknown element: ms.10l5.b1
+++++++ warning: ignored because of unknown element: ms.10r5.b1
+++++++ warning: ignored because of unknown element: mcbh.10l1.b1
+++++++ warning: ignored because of unknown element: mcbv.10r1.b1
+++++++ warning: ignored because of unknown element: mcbh.10l5.b1
+++++++ warning: ignored because of unknown element: mcbv.10r5.b1
+++++++ warning: ignored because of unknown element: mqyl.5l6.b1
+++++++ warning: ignored because of unknown element: mqyl.5r6.b1
+++++++ warning: implicit element re-definition ignored: marks.l1
+++++++ warning: implicit element re-definition ignored: marke.l1
+++++++ warning: implicit element re-definition ignored: marke.r1
+++++++ warning: implicit element re-definition ignored: marks.r1
+++++++ warning: implicit element re-definition ignored: marks.l5
+++++++ warning: implicit element re-definition ignored: marke.l5
+++++++ warning: implicit element re-definition ignored: marke.r5
+++++++ warning: implicit element re-definition ignored: marks.r5
+++++++ warning: ignored because of unknown element: ms.10l1.b2
+++++++ warning: ignored because of unknown element: ms.10r1.b2
+++++++ warning: ignored because of unknown element: ms.10l5.b2
+++++++ warning: ignored because of unknown element: ms.10r5.b2
+++++++ warning: ignored because of unknown element: mcbv.10l1.b2
+++++++ warning: ignored because of unknown element: mcbh.10r1.b2
+++++++ warning: ignored because of unknown element: mcbv.10l5.b2
+++++++ warning: ignored because of unknown element: mcbh.10r5.b2
+++++++ warning: ignored because of unknown element: mqyl.5l6.b2
+++++++ warning: ignored because of unknown element: mqyl.5r6.b2
+postas =             20.015 ;
+posq1a =                 25 ;
+posq1b =               29.5 ;
+posq2a =               38.6 ;
+posq2b =               47.4 ;
+posq3a =               56.5 ;
+posq3b =                 61 ;
+kmax_mcbxfb =        2.083333333 ;
+posmcbxfba =               34.1 ;
+posmcbxfba =               34.1 ;
+posmcbxfbb =               51.9 ;
+posmcbxfbb =               51.9 ;
+posmcbxfa =           66.44444 ;
+posmqsxf =           68.24394 ;
+posmctxf =           69.00382 ;
+posmctsxf =           69.40119 ;
+posmcdxf =           69.62757 ;
+posmcdsxf =           69.85695 ;
+posmcoxf =           70.08033 ;
+posmcosxf =           70.29771 ;
+posmcsxf =           70.52709 ;
+posmcssxf =           70.76847 ;
+posmcbxfa =           66.44444 ;
+posmcbxfa =           66.44444 ;
+posmqsxf =           68.24394 ;
+posmctxf =           69.00382 ;
+posmctsxf =           69.40119 ;
+posmcdxf =           69.62757 ;
+posmcdsxf =           69.85695 ;
+posmcoxf =           70.08033 ;
+posmcosxf =           70.29771 ;
+posmcsxf =           70.52709 ;
+posmcssxf =           70.76847 ;
+posd1 =             75.455 ;
+posbpmw =            21.3475 ;
+posbpm1 =               32.7 ;
+posbpm2a =               43.2 ;
+posbpm2b =               53.7 ;
+posbpm3a =           64.68444 ;
+posbpm3b =           71.51044 ;
+posbpmw =            21.3475 ;
+posbpm1 =               32.7 ;
+posbpm2a =               43.2 ;
+posbpm2b =               53.7 ;
+posbpm3a =           64.68444 ;
+posbpm3b =           71.51044 ;
+posbpm4 =              80.52 ;
+posd1 =             75.455 ;
+posd2 =            142.396 ;
+posd2-posd1 =             66.941 ;
+ad1.lr1 =     0.001449036198 ;
+l.mbxf =               6.27 ;
+ad1.lr1/l.mbxf*scale =         5.39607659 ;
+ad2.l1 =     0.001449036198 ;
+l.mbrd =               7.78 ;
+ad2.l1/l.mbrd*scale =        4.348766095 ;
+posd2 =            142.396 ;
+posbpmwq1 =           135.8325 ;
+posbpmwq2 =           135.8325 ;
+posmcbrda =            147.516 ;
+posmcbrdb =            149.496 ;
+posbpmqa.4 =            180.517 ;
+posq4 =              177.6 ;
+posmcbyy.b4 =            174.585 ;
+posmcbyy.a4 =            172.605 ;
+posmcbyy.b4 =            174.585 ;
+posq5 =             207.49 ;
+posbpmy.5 =            210.164 ;
+posmcbyy.b5 =                  0 ;
+posmcbyy.5 =                  0 ;
+posmcbyy.a5 =                  0 ;
+posq6 =             228.39 ;
+posmsq10 =              2.745 ;
+posmcbq10 =              3.338 ;
+on_cutms.10 =                  0 ;
+on_cutms.14 =                  0 ;
+posq5ir6 =              208.2 ;
+posq5bir6 =            211.981 ;
+dposbpmq5ir6 =               2.66 ;
+dposmcbyq5ir6 =              2.363 ;
+++++++ warning: ignored because of unknown element: bpmya.5l6.b1
+++++++ warning: ignored because of unknown element: mcbyv.5r6.b1
+++++++ warning: ignored because of unknown element: mqy.5l6.b1
+++++++ warning: ignored because of unknown element: mqy.5r6.b1
+++++++ warning: ignored because of unknown element: mqy.b5r6.b1
+++++++ warning: ignored because of unknown element: mqy.b5l6.b1
+++++++ warning: ignored because of unknown element: bpmyb.5l6.b2
+++++++ warning: ignored because of unknown element: mcbyh.5r6.b2
+++++++ warning: ignored because of unknown element: bpmya.5r6.b2
+++++++ warning: ignored because of unknown element: mcbyv.5l6.b2
+++++++ warning: ignored because of unknown element: bpmyb.5l6.b2
+++++++ warning: ignored because of unknown element: mcbyh.5r6.b2
+++++++ warning: ignored because of unknown element: mqy.5l6.b2
+++++++ warning: ignored because of unknown element: mqy.5r6.b2
+++++++ warning: ignored because of unknown element: mqy.b5r6.b2
+++++++ warning: ignored because of unknown element: mqy.b5l6.b2
+++++++ warning: ignored because of unknown element: acfca.al5.b1
+++++++ warning: ignored because of unknown element: acfca.ar5.b1
+++++++ warning: ignored because of unknown element: acfca.al1.b1
+++++++ warning: ignored because of unknown element: acfca.ar1.b1
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   0
+++++++ warning: ignored because of unknown element: acfca.al5.b2
+++++++ warning: ignored because of unknown element: acfca.ar5.b2
+++++++ warning: ignored because of unknown element: acfca.al1.b2
+++++++ warning: ignored because of unknown element: acfca.ar1.b2
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   0
+++++++ warning: ignored because of unknown element: acfca.bl5.b1
+++++++ warning: ignored because of unknown element: acfca.br5.b1
+++++++ warning: ignored because of unknown element: acfca.bl1.b1
+++++++ warning: ignored because of unknown element: acfca.br1.b1
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   0
+++++++ warning: ignored because of unknown element: acfca.bl5.b2
+++++++ warning: ignored because of unknown element: acfca.br5.b2
+++++++ warning: ignored because of unknown element: acfca.bl1.b2
+++++++ warning: ignored because of unknown element: acfca.br1.b2
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   0
+++++++ warning: ignored because of unknown element: acfca.cl5.b1
+++++++ warning: ignored because of unknown element: acfca.cr5.b1
+++++++ warning: ignored because of unknown element: acfca.cl1.b1
+++++++ warning: ignored because of unknown element: acfca.cr1.b1
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   0
+++++++ warning: ignored because of unknown element: acfca.cl5.b2
+++++++ warning: ignored because of unknown element: acfca.cr5.b2
+++++++ warning: ignored because of unknown element: acfca.cl1.b2
+++++++ warning: ignored because of unknown element: acfca.cr1.b2
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   0
+++++++ warning: ignored because of unknown element: acfca.dl5.b1
+++++++ warning: ignored because of unknown element: acfca.dr5.b1
+++++++ warning: ignored because of unknown element: acfca.dl1.b1
+++++++ warning: ignored because of unknown element: acfca.dr1.b1
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   0
+++++++ warning: ignored because of unknown element: acfca.dl5.b2
+++++++ warning: ignored because of unknown element: acfca.dr5.b2
+++++++ warning: ignored because of unknown element: acfca.dl1.b2
+++++++ warning: ignored because of unknown element: acfca.dr1.b2
+++++++ info: seqedit - number of elements installed:  0
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   0
+poscraba1 =            153.574 ;
+poscraba2 =            156.974 ;
+++++++ info: seqedit - number of elements installed:  4
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   0
+++++++ info: seqedit - number of elements installed:  4
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   0
+poscrabb1 =            154.624 ;
+poscrabb2 =            158.024 ;
+++++++ info: seqedit - number of elements installed:  4
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   0
+++++++ info: seqedit - number of elements installed:  4
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   0
+poscrabc1 =            160.174 ;
+poscrabc2 =            163.574 ;
+++++++ info: seqedit - number of elements installed:  4
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   0
+++++++ info: seqedit - number of elements installed:  4
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   0
+poscrabd1 =            161.224 ;
+poscrabd2 =            164.624 ;
+++++++ info: seqedit - number of elements installed:  4
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   0
+++++++ info: seqedit - number of elements installed:  4
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    0
+++++++ info: seqedit - number of elements replaced:   0
+postclma =            136.425 ;
+postclmb.5 =            199.591 ;
+postclmc.6c =            222.567 ;
+postclmc.6q =            223.174 ;
+postclma =            136.425 ;
+postclmb.5 =            199.591 ;
+postan =            128.736 ;
+postcth =            133.103 ;
+postctv =            131.483 ;
+postcl.4 =            134.628 ;
+postcl.5 =            197.831 ;
+postcl.6c =            220.807 ;
+postcl.6q =            221.414 ;
+posapwl1 =            184.565 ;
+posapwl2 =            185.165 ;
+ap_mqx =                150 ;
+rm: cannot remove `Q1_APERTURE': No such file or directory
+rm: cannot remove `Q2Q3_APERTURE': No such file or directory
+x_q1*2 =                118 ;
+r_q1*2 =        127.7222796 ;
+xx1 =              59000 ;
+yy1 =        24438.60018 ;
+xx2 =        24438.60018 ;
+yy2 =              59000 ;
+x_q1*2 =                 98 ;
+r_q1*2 =        106.0744356 ;
+xx1 =              49000 ;
+yy1 =        20296.46456 ;
+xx2 =        20296.46456 ;
+yy2 =              49000 ;
+bs_type =                  4 ;
+ap_mqx =                150 ;
+r_d2 =        45.03413575 ;
+g_d2 =                 39 ;
+angle1_d2 =        14.99820462 ;
+angle2_d2 =        75.00179538 ;
+xx1 =             0.0435 ;
+yy1 =      0.01165432893 ;
+xx2 =      0.01165432893 ;
+yy2 =             0.0435 ;
+rm: cannot remove `d2_aperture': No such file or directory
+r_q4 =        37.80304415 ;
+g_q4 =               31.9 ;
+angle1_q4 =        12.54865235 ;
+angle2_q4 =        77.45134765 ;
+xx1 =             0.0369 ;
+yy1 =      0.00821341264 ;
+xx2 =      0.00821341264 ;
+yy2 =             0.0369 ;
+rm: cannot remove `q4_aperture': No such file or directory
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999903e+04 -0.000000000000000e+00  3.467266609930204e-04  5.370396873462850e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.230999999952406e+01  2.000000002856248e+00  2.071812779203324e+04  2.773574485051201e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.493015410629952e+00  0.000000000000000e+00  0.000000000000000e+00  6.031999999971563e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 2.000000000483719e+00  2.071812779865169e+04 -0.000000000000000e+00  0.000000000000000e+00 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999904e+04 -0.000000000000000e+00  3.459703598576015e-04  5.376263589853946e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.230999999957101e+01  1.999999999256508e+00  2.071812779313979e+04  2.792496347245689e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.491507573303534e+00  0.000000000000000e+00  0.000000000000000e+00  6.031999999970036e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 1.999999999167605e+00  2.071812779662683e+04  0.000000000000000e+00  0.000000000000000e+00 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+enter Twiss module
+  
+iteration:   1 error:   9.275154E-04 deltap:   0.000000E+00
+orbit:   4.229374E-05 -1.520664E-06  8.147966E-05 -1.338078E-05  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.563397E-05 deltap:   0.000000E+00
+orbit:   4.881362E-05 -1.979004E-06  7.978196E-05 -1.340821E-05  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   5.784477E-10 deltap:   0.000000E+00
+orbit:   4.880493E-05 -1.978899E-06  7.978159E-05 -1.340821E-05  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999903e+04 -0.000000000000000e+00  3.467348530964806e-04  5.370333431460581e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.231013140573211e+01  1.764897261657371e+00  2.080743659629399e+04  3.080005454275097e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.513663525467619e+00  1.671665264663329e-02  1.540608539673802e-03  6.032002507313818e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 1.663820328305084e+00  2.077613222617067e+04  9.225475318354871e-01  1.342542393063993e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.670246890480821e-02  1.404430692029580e-03  0.000000000000000e+00  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+enter Twiss module
+  
+iteration:   1 error:   2.153352E-03 deltap:   0.000000E+00
+orbit:   2.631374E-05  4.952151E-07  1.163507E-03 -4.540205E-05  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.432976E-05 deltap:   0.000000E+00
+orbit:   7.646518E-07 -1.259042E-07  1.160743E-03 -4.542488E-05  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   4.704384E-08 deltap:   0.000000E+00
+orbit:   7.385086E-07 -1.261436E-07  1.160739E-03 -4.542482E-05  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999904e+04 -0.000000000000000e+00  3.459815022007471e-04  5.376177017803577e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.231000773179684e+01  2.062936335719936e+00  2.083381007320971e+04  3.012264128159287e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.515458945057077e+00  1.670251456492392e-02  1.549423237860737e-03  6.031995116493027e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 2.169549973239505e+00  2.075161881517014e+04  7.928641877036670e-01  1.262652163646421e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.671661249030082e-02  1.411535334712514e-03  0.000000000000000e+00  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+enter Twiss module
+  
+iteration:   1 error:   9.275154E-04 deltap:   0.000000E+00
+orbit:   4.229374E-05 -1.520664E-06  8.147966E-05 -1.338078E-05  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.563397E-05 deltap:   0.000000E+00
+orbit:   4.881362E-05 -1.979004E-06  7.978196E-05 -1.340821E-05  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   5.784478E-10 deltap:   0.000000E+00
+orbit:   4.880493E-05 -1.978899E-06  7.978159E-05 -1.340821E-05  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999903e+04 -0.000000000000000e+00  3.467348530964802e-04  5.370333431460585e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.231013140573243e+01  1.764897261650366e+00  2.080743659628319e+04  3.080005454275103e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.513663522839704e+00  1.671665264663599e-02  1.540813829224048e-03  6.032002507313785e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 1.663820328306284e+00  2.077613222617178e+04  9.225475318359899e-01  1.342542361587414e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.670246890481841e-02  1.404767522810426e-03  0.000000000000000e+00  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+enter Twiss module
+  
+iteration:   1 error:   2.153352E-03 deltap:   0.000000E+00
+orbit:   2.631374E-05  4.952151E-07  1.163507E-03 -4.540205E-05  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.432976E-05 deltap:   0.000000E+00
+orbit:   7.646518E-07 -1.259042E-07  1.160743E-03 -4.542488E-05  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   4.704384E-08 deltap:   0.000000E+00
+orbit:   7.385086E-07 -1.261436E-07  1.160739E-03 -4.542482E-05  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999904e+04 -0.000000000000000e+00  3.459815022007476e-04  5.376177017803573e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.231000773179679e+01  2.062936335736894e+00  2.083381007321981e+04  3.012264128159686e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.515458941875106e+00  1.670251456492283e-02  1.549627359668940e-03  6.031995116493020e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 2.169549973239913e+00  2.075161881517338e+04  7.928641877033401e-01  1.262652143804332e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.671661249029254e-02  1.411870470532044e-03  0.000000000000000e+00  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+comax =  2.000000000000000e-03 ;
+dpmax =  2.000000000000000e-04 ;
+emittance_norm =  3.500000000000000e-06 ;
+apbbeat =  1.100000000000000e+00 ;
+halor =  6.000100000000000e+00 ;
+halox =  6.000000000000000e+00 ;
+haloy =  6.000000000000000e+00 ;
+dparcx =  1.000000000000000e-01 ;
+dparcy =  1.000000000000000e-01 ;
+enter Twiss module
+  
+iteration:   1 error:   9.275154E-04 deltap:   0.000000E+00
+orbit:   4.229374E-05 -1.520664E-06  8.147966E-05 -1.338078E-05  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.563397E-05 deltap:   0.000000E+00
+orbit:   4.881362E-05 -1.979004E-06  7.978196E-05 -1.340821E-05  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   5.784478E-10 deltap:   0.000000E+00
+orbit:   4.880493E-05 -1.978899E-06  7.978159E-05 -1.340821E-05  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999903e+04 -0.000000000000000e+00  3.467348530964802e-04  5.370333431460585e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.231013140573243e+01  1.764897261650366e+00  2.080743659628319e+04  3.080005454275103e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.513663522839704e+00  1.671665264663599e-02  1.540813829224048e-03  6.032002507313785e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 1.663820328306284e+00  2.077613222617178e+04  9.225475318359899e-01  1.342542361587414e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.670246890481841e-02  1.404767522810426e-03  0.000000000000000e+00  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l1.b1:1 to e.ds.r1.b1:1...
++++++++ deltap from TWISS            0
+
+ Reading offsets from tfs "./offset.ip1.b1.tfs"
+
+reference node: e.ds.l1.b1:1
+
+
+APERTURE LIMIT: mqxfa.b3l1:1, n1: 11.0545, at: 485.174
+
+enter Twiss module
+  
+iteration:   1 error:   5.593363E-04 deltap:   6.000000E-04
+orbit:   7.524170E-04 -1.090226E-05 -2.412267E-04 -1.715407E-05  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.566649E-05 deltap:   6.000000E-04
+orbit:   7.395713E-04 -1.119435E-05 -2.442313E-04 -1.739568E-05  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   2.709262E-08 deltap:   6.000000E-04
+orbit:   7.395096E-04 -1.119307E-05 -2.442298E-04 -1.739563E-05  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999903e+04 -0.000000000000000e+00  3.465812932278382e-04  5.371523017260809e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.231170534486542e+01  3.469745385609793e+00  2.059813401267650e+04  2.959951128715887e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.504310217996479e+00  1.556241197851073e-02  1.719534868012149e-03  6.031988851849139e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+-2.302850660299018e+00  2.087375675986652e+04  9.492751997484333e-01  1.316819690714619e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.634932739409932e-02  1.382184018846122e-03  5.999999999999999e-04  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l1.b1:1 to e.ds.r1.b1:1...
++++++++ deltap from TWISS       0.0006
+
+ Reading offsets from tfs "./offset.ip1.b1.tfs"
+
+reference node: e.ds.l1.b1:1
+
+
+APERTURE LIMIT: mqxfa.b3l1:1, n1: 10.9106, at: 485.174
+
+enter Twiss module
+  
+iteration:   1 error:   7.976605E-04 deltap:   2.000000E-04
+orbit:   2.780601E-04 -4.686969E-06 -2.500215E-05 -1.461573E-05  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.251557E-05 deltap:   2.000000E-04
+orbit:   2.817726E-04 -5.087240E-06 -2.973035E-05 -1.475217E-05  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   5.286829E-09 deltap:   2.000000E-04
+orbit:   2.817624E-04 -5.087070E-06 -2.973317E-05 -1.475221E-05  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999903e+04 -0.000000000000000e+00  3.466836105564697e-04  5.370730305367101e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.231054441238179e+01  2.372159350832692e+00  2.073803115255283e+04  3.036811776875014e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.510172914949199e+00  1.630203878587286e-02  1.543104981700957e-03  6.032023767873220e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 4.336452207460488e-01  2.082913911655253e+04  9.283765894033190e-01  1.331405414020211e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.657868156353405e-02  1.396376046870485e-03  2.000000000000000e-04  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l1.b1:1 to e.ds.r1.b1:1...
++++++++ deltap from TWISS       0.0002
+
+ Reading offsets from tfs "./offset.ip1.b1.tfs"
+
+reference node: e.ds.l1.b1:1
+
+
+APERTURE LIMIT: mqxfa.b3l1:1, n1: 11.1285, at: 485.174
+
+enter Twiss module
+  
+iteration:   1 error:   9.275154E-04 deltap:   0.000000E+00
+orbit:   4.229374E-05 -1.520664E-06  8.147966E-05 -1.338078E-05  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.563397E-05 deltap:   0.000000E+00
+orbit:   4.881362E-05 -1.979004E-06  7.978196E-05 -1.340821E-05  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   5.784478E-10 deltap:   0.000000E+00
+orbit:   4.880493E-05 -1.978899E-06  7.978159E-05 -1.340821E-05  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999903e+04 -0.000000000000000e+00  3.467348530964802e-04  5.370333431460585e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.231013140573243e+01  1.764897261650366e+00  2.080743659628319e+04  3.080005454275103e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.513663522839704e+00  1.671665264663599e-02  1.540813829224048e-03  6.032002507313785e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 1.663820328306284e+00  2.077613222617178e+04  9.225475318359899e-01  1.342542361587414e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.670246890481841e-02  1.404767522810426e-03  0.000000000000000e+00  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l1.b1:1 to e.ds.r1.b1:1...
++++++++ deltap from TWISS            0
+
+ Reading offsets from tfs "./offset.ip1.b1.tfs"
+
+reference node: e.ds.l1.b1:1
+
+
+APERTURE LIMIT: mqxfa.b3l1:1, n1: 11.2428, at: 485.174
+
+enter Twiss module
+  
+iteration:   1 error:   1.062373E-03 deltap:  -2.000000E-04
+orbit:  -1.932092E-04  1.675725E-06  1.875493E-04 -1.215688E-05  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.164796E-05 deltap:  -2.000000E-04
+orbit:  -1.871061E-04  1.162466E-06  1.910040E-04 -1.204617E-05  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   7.883518E-09 deltap:  -2.000000E-04
+orbit:  -1.871237E-04  1.162725E-06  1.910086E-04 -1.204612E-05  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999903e+04 -0.000000000000000e+00  3.467861748454442e-04  5.369936032252941e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.230984047444748e+01  1.121581445507976e+00  2.087576432519975e+04  3.126602364622482e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.517547883113325e+00  1.716261462523696e-02  1.598833495096030e-03  6.031957897737878e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 2.797878430239531e+00  2.070522754345896e+04  9.194922726253426e-01  1.355696814060097e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.683166170295984e-02  1.413968974353162e-03 -2.000000000000000e-04  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l1.b1:1 to e.ds.r1.b1:1...
++++++++ deltap from TWISS      -0.0002
+
+ Reading offsets from tfs "./offset.ip1.b1.tfs"
+
+reference node: e.ds.l1.b1:1
+
+
+APERTURE LIMIT: mqxfa.b3l1:1, n1: 11.0648, at: 485.174
+
+enter Twiss module
+  
+iteration:   1 error:   1.340579E-03 deltap:  -6.000000E-04
+orbit:  -6.668537E-04  8.164049E-06  4.001733E-04 -9.714119E-06  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   5.213246E-05 deltap:  -6.000000E-04
+orbit:  -6.685316E-04  7.531996E-06  4.190650E-04 -9.259585E-06  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   6.327921E-08 deltap:  -6.000000E-04
+orbit:  -6.686299E-04  7.533604E-06  4.191028E-04 -9.259358E-06  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999903e+04 -0.000000000000000e+00  3.468891049419125e-04  5.369139280446866e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.230964915272706e+01 -2.618712135389028e-01  2.100780227081092e+04  3.230525850014012e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.526527516688849e+00  1.815213205200026e-02  1.869558125717674e-03  6.031806676422964e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 4.773622309183364e+00  2.056479471398979e+04  9.212161844870156e-01  1.386730810813456e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.710428029079989e-02  1.434657655353416e-03 -5.999999999999999e-04  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l1.b1:1 to e.ds.r1.b1:1...
++++++++ deltap from TWISS      -0.0006
+
+ Reading offsets from tfs "./offset.ip1.b1.tfs"
+
+reference node: e.ds.l1.b1:1
+
+
+APERTURE LIMIT: mqxfa.b3l1:1, n1: 10.7159, at: 485.174
+
+enter Twiss module
+  
+iteration:   1 error:   2.105626E-03 deltap:   0.000000E+00
+orbit:  -1.149830E-03  4.753993E-05  2.208516E-07 -4.518213E-08  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   8.471466E-05 deltap:   0.000000E+00
+orbit:  -1.138611E-03  4.615609E-05  2.676955E-07 -4.736860E-08  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   2.396520E-08 deltap:   0.000000E+00
+orbit:  -1.138728E-03  4.615771E-05  2.810085E-07 -4.722694E-08  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999907e+04 -0.000000000000000e+00  3.467348530964192e-04  5.370333431461057e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.231013140573457e+01  1.764782306569901e+00  2.080743659629645e+04  3.080005454020849e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.513655773027030e+00  1.671665264354420e-02  1.540787539471147e-03  6.032002507313905e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 1.663938424419299e+00  2.077613222630271e+04  9.225475321646487e-01  1.342493778847110e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.670246890298621e-02  1.404714706899193e-03  0.000000000000000e+00  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l5.b1:1 to e.ds.r5.b1:1...
++++++++ deltap from TWISS            0
+
+ Reading offsets from tfs "./offset.ip5.b1.tfs"
+
+reference node: e.ds.l5.b1:1
+
+
+APERTURE LIMIT: mqxfa.b3r5:1, n1: 10.9213, at: 609.174
+
+enter Twiss module
+  
+iteration:   1 error:   1.907729E-03 deltap:   6.000000E-04
+orbit:  -2.628797E-04  3.760937E-05 -3.399065E-05 -9.848892E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.804611E-05 deltap:   6.000000E-04
+orbit:  -3.106971E-04  3.811109E-05 -2.582409E-05 -9.043091E-07  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   1.084947E-07 deltap:   6.000000E-04
+orbit:  -3.108180E-04  3.811325E-05 -2.577970E-05 -9.040032E-07  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999907e+04 -0.000000000000000e+00  3.465812932277956e-04  5.371523017261139e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.231170534486628e+01  3.470922568507033e+00  2.059813401297445e+04  2.959951128566705e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.504299569690190e+00  1.556241197724611e-02  1.719472330105061e-03  6.031988851849276e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+-2.304054703799034e+00  2.087375675990928e+04  9.492752004305597e-01  1.316780793889878e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.634932739038077e-02  1.382132069937964e-03  5.999999999999999e-04  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l5.b1:1 to e.ds.r5.b1:1...
++++++++ deltap from TWISS       0.0006
+
+ Reading offsets from tfs "./offset.ip5.b1.tfs"
+
+reference node: e.ds.l5.b1:1
+
+
+APERTURE LIMIT: mqxfa.b3r5:1, n1: 11.1584, at: 609.174
+
+enter Twiss module
+  
+iteration:   1 error:   2.031564E-03 deltap:   2.000000E-04
+orbit:  -8.515851E-04  4.420528E-05 -7.342110E-06 -3.156355E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   5.337823E-05 deltap:   2.000000E-04
+orbit:  -8.591315E-04  4.346426E-05 -6.097995E-06 -3.011318E-07  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   4.454079E-08 deltap:   2.000000E-04
+orbit:  -8.592343E-04  4.346625E-05 -6.082072E-06 -3.009789E-07  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999907e+04 -0.000000000000000e+00  3.466836105564246e-04  5.370730305367451e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.231054441238435e+01  2.372513687280162e+00  2.073803115259870e+04  3.036811776751813e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.510164139587888e+00  1.630203878605066e-02  1.543064953201866e-03  6.032023767873296e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 4.332813536360122e-01  2.082913911673535e+04  9.283765896068841e-01  1.331359353590701e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.657868156229085e-02  1.396323547496305e-03  2.000000000000000e-04  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l5.b1:1 to e.ds.r5.b1:1...
++++++++ deltap from TWISS       0.0002
+
+ Reading offsets from tfs "./offset.ip5.b1.tfs"
+
+reference node: e.ds.l5.b1:1
+
+
+APERTURE LIMIT: mqxfa.b3r5:1, n1: 11.1987, at: 609.174
+
+enter Twiss module
+  
+iteration:   1 error:   2.105626E-03 deltap:   0.000000E+00
+orbit:  -1.149830E-03  4.753993E-05  2.208516E-07 -4.518213E-08  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   8.471466E-05 deltap:   0.000000E+00
+orbit:  -1.138611E-03  4.615609E-05  2.676955E-07 -4.736860E-08  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   2.396520E-08 deltap:   0.000000E+00
+orbit:  -1.138728E-03  4.615771E-05  2.810085E-07 -4.722694E-08  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999907e+04 -0.000000000000000e+00  3.467348530964192e-04  5.370333431461057e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.231013140573457e+01  1.764782306569901e+00  2.080743659629645e+04  3.080005454020849e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.513655773027030e+00  1.671665264354420e-02  1.540787539471147e-03  6.032002507313905e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 1.663938424419299e+00  2.077613222630271e+04  9.225475321646487e-01  1.342493778847110e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.670246890298621e-02  1.404714706899193e-03  0.000000000000000e+00  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l5.b1:1 to e.ds.r5.b1:1...
++++++++ deltap from TWISS            0
+
+ Reading offsets from tfs "./offset.ip5.b1.tfs"
+
+reference node: e.ds.l5.b1:1
+
+
+APERTURE LIMIT: mqxfa.b3r5:1, n1: 11.2067, at: 609.174
+
+enter Twiss module
+  
+iteration:   1 error:   2.194335E-03 deltap:  -2.000000E-04
+orbit:  -1.448599E-03  5.080943E-05  4.241440E-06  1.849199E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.182768E-04 deltap:  -2.000000E-04
+orbit:  -1.421887E-03  4.885530E-05  4.299713E-06  1.751575E-07  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   3.940823E-08 deltap:  -2.000000E-04
+orbit:  -1.422039E-03  4.885656E-05  4.314468E-06  1.753093E-07  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999907e+04 -0.000000000000000e+00  3.467861748453236e-04  5.369936032253875e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.230984047444917e+01  1.120979630673047e+00  2.087576432519432e+04  3.126602363984050e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.517541219602702e+00  1.716261461299687e-02  1.598820935503717e-03  6.031957897738020e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 2.798496320377565e+00  2.070522754342760e+04  9.194922733865626e-01  1.355646410571994e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.683166169914360e-02  1.413915812832927e-03 -2.000000000000000e-04  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l5.b1:1 to e.ds.r5.b1:1...
++++++++ deltap from TWISS      -0.0002
+
+ Reading offsets from tfs "./offset.ip5.b1.tfs"
+
+reference node: e.ds.l5.b1:1
+
+
+APERTURE LIMIT: mqxfa.b3r5:1, n1: 10.911, at: 609.174
+
+enter Twiss module
+  
+iteration:   1 error:   2.434512E-03 deltap:  -6.000000E-04
+orbit:  -2.046223E-03  5.706736E-05  2.457921E-06  5.313171E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.868785E-04 deltap:  -6.000000E-04
+orbit:  -2.000663E-03  5.426357E-05  5.243178E-06  5.268936E-07  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   1.208442E-07 deltap:  -6.000000E-04
+orbit:  -2.000991E-03  5.426568E-05  5.274260E-06  5.271562E-07  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999907e+04 -0.000000000000000e+00  3.468891049414097e-04  5.369139280450757e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.230964915272872e+01 -2.634053807710163e-01  2.100780227184970e+04  3.230525847138845e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.526523209921261e+00  1.815213199282052e-02  1.869568352421861e-03  6.031806676422840e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 4.775191310474097e+00  2.056479471370135e+04  9.212161880665266e-01  1.386678928025428e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.710428027430035e-02  1.434603715276038e-03 -5.999999999999999e-04  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l5.b1:1 to e.ds.r5.b1:1...
++++++++ deltap from TWISS      -0.0006
+
+ Reading offsets from tfs "./offset.ip5.b1.tfs"
+
+reference node: e.ds.l5.b1:1
+
+
+APERTURE LIMIT: mqxfa.b3r5:1, n1: 10.2943, at: 609.174
+
+enter Twiss module
+  
+iteration:   1 error:   2.153352E-03 deltap:   0.000000E+00
+orbit:   2.631374E-05  4.952151E-07  1.163507E-03 -4.540205E-05  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.432976E-05 deltap:   0.000000E+00
+orbit:   7.646518E-07 -1.259042E-07  1.160743E-03 -4.542488E-05  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   4.704384E-08 deltap:   0.000000E+00
+orbit:   7.385086E-07 -1.261436E-07  1.160739E-03 -4.542482E-05  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999904e+04 -0.000000000000000e+00  3.459815022007476e-04  5.376177017803573e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.231000773179679e+01  2.062936335736894e+00  2.083381007321981e+04  3.012264128159686e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.515458941875106e+00  1.670251456492283e-02  1.549627359668940e-03  6.031995116493020e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 2.169549973239913e+00  2.075161881517338e+04  7.928641877033401e-01  1.262652143804332e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.671661249029254e-02  1.411870470532044e-03  0.000000000000000e+00  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l1.b2:1 to e.ds.r1.b2:1...
++++++++ deltap from TWISS            0
+
+ Reading offsets from tfs "./offset.ip1.b2.tfs"
+
+reference node: e.ds.l1.b2:1
+
+
+APERTURE LIMIT: mqxfa.b3r1:1, n1: 11.0647, at: 609.188
+
+enter Twiss module
+  
+iteration:   1 error:   2.264367E-03 deltap:   6.000000E-04
+orbit:   1.247633E-03  1.582187E-05  1.054444E-03 -4.811500E-05  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.080111E-04 deltap:   6.000000E-04
+orbit:   1.204814E-03  1.558821E-05  1.081144E-03 -4.903630E-05  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   1.429489E-07 deltap:   6.000000E-04
+orbit:   1.204744E-03  1.558739E-05  1.081132E-03 -4.903534E-05  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999904e+04 -0.000000000000000e+00  3.457742374968032e-04  5.377788075951340e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.231181245337236e+01  3.856363479455505e+00  2.091190447246899e+04  2.993440151513584e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.507862070185653e+00  1.601185145330856e-02  1.756446530876544e-03  6.032076123211235e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 4.302664130624476e-01  2.067419785133728e+04  7.777313451566019e-01  1.313674931928625e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.706492035079979e-02  1.439964753850788e-03  5.999999999999999e-04  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l1.b2:1 to e.ds.r1.b2:1...
++++++++ deltap from TWISS       0.0006
+
+ Reading offsets from tfs "./offset.ip1.b2.tfs"
+
+reference node: e.ds.l1.b2:1
+
+
+APERTURE LIMIT: mqxfa.b3r1:1, n1: 10.8166, at: 609.188
+
+enter Twiss module
+  
+iteration:   1 error:   2.105983E-03 deltap:   2.000000E-04
+orbit:   4.357760E-04  5.681964E-06  1.127503E-03 -4.627031E-05  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.789064E-05 deltap:   2.000000E-04
+orbit:   4.081928E-04  5.166568E-06  1.134388E-03 -4.660633E-05  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   4.095424E-08 deltap:   2.000000E-04
+orbit:   4.081742E-04  5.166479E-06  1.134385E-03 -4.660628E-05  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999904e+04 -0.000000000000000e+00  3.459124277318127e-04  5.376713769312983e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.231048759372832e+01  2.728273739417188e+00  2.084915830384259e+04  3.002237535960827e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.512750367934777e+00  1.645587758732469e-02  1.563251222661964e-03  6.032033505283562e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 1.655473375552592e+00  2.072926571247577e+04  7.875968160643474e-01  1.277620414591368e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.682722333635138e-02  1.420441830592982e-03  2.000000000000000e-04  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l1.b2:1 to e.ds.r1.b2:1...
++++++++ deltap from TWISS       0.0002
+
+ Reading offsets from tfs "./offset.ip1.b2.tfs"
+
+reference node: e.ds.l1.b2:1
+
+
+APERTURE LIMIT: mqxfa.b3r1:1, n1: 11.1043, at: 609.188
+
+enter Twiss module
+  
+iteration:   1 error:   2.153352E-03 deltap:   0.000000E+00
+orbit:   2.631374E-05  4.952151E-07  1.163507E-03 -4.540205E-05  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.432976E-05 deltap:   0.000000E+00
+orbit:   7.646518E-07 -1.259042E-07  1.160743E-03 -4.542488E-05  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   4.704384E-08 deltap:   0.000000E+00
+orbit:   7.385086E-07 -1.261436E-07  1.160739E-03 -4.542482E-05  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999904e+04 -0.000000000000000e+00  3.459815022007476e-04  5.376177017803573e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.231000773179679e+01  2.062936335736894e+00  2.083381007321981e+04  3.012264128159686e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.515458941875106e+00  1.670251456492283e-02  1.549627359668940e-03  6.031995116493020e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 2.169549973239913e+00  2.075161881517338e+04  7.928641877033401e-01  1.262652143804332e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.671661249029254e-02  1.411870470532044e-03  0.000000000000000e+00  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l1.b2:1 to e.ds.r1.b2:1...
++++++++ deltap from TWISS            0
+
+ Reading offsets from tfs "./offset.ip1.b2.tfs"
+
+reference node: e.ds.l1.b2:1
+
+
+APERTURE LIMIT: mqxfa.b3r1:1, n1: 11.247, at: 609.188
+
+enter Twiss module
+  
+iteration:   1 error:   2.198065E-03 deltap:  -2.000000E-04
+orbit:  -3.841973E-04 -4.772723E-06  1.199177E-03 -4.456243E-05  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.499637E-05 deltap:  -2.000000E-04
+orbit:  -4.135249E-04 -5.483332E-06  1.186933E-03 -4.426355E-05  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   6.530672E-08 deltap:  -2.000000E-04
+orbit:  -4.135639E-04 -5.483685E-06  1.186931E-03 -4.426347E-05  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999904e+04 -0.000000000000000e+00  3.460505562273287e-04  5.375640585790489e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.230966752148311e+01  1.331833271671035e+00  2.082822681261938e+04  3.043394737764543e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.518337989089971e+00  1.696604659643684e-02  1.595614861885832e-03  6.031947107226286e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 2.615636584961163e+00  2.079360144497619e+04  7.982032927779454e-01  1.249526864519058e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.661108384265687e-02  1.404057333701057e-03 -2.000000000000000e-04  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l1.b2:1 to e.ds.r1.b2:1...
++++++++ deltap from TWISS      -0.0002
+
+ Reading offsets from tfs "./offset.ip1.b2.tfs"
+
+reference node: e.ds.l1.b2:1
+
+
+APERTURE LIMIT: mqxfa.b3r1:1, n1: 11.0934, at: 609.188
+
+enter Twiss module
+  
+iteration:   1 error:   2.278910E-03 deltap:  -6.000000E-04
+orbit:  -1.202391E-03 -1.551694E-05  1.269727E-03 -4.295411E-05  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   7.081332E-05 deltap:  -6.000000E-04
+orbit:  -1.264987E-03 -1.642474E-05  1.238827E-03 -4.199442E-05  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   1.967395E-07 deltap:  -6.000000E-04
+orbit:  -1.265108E-03 -1.642543E-05  1.238871E-03 -4.199555E-05  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999904e+04 -0.000000000000000e+00  3.461885537607670e-04  5.374569061220029e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.230945813185914e+01 -3.222606706151123e-01  2.084412062224116e+04  3.110352212021804e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.524559979683562e+00  1.754405248673311e-02  1.844240366133468e-03  6.031827739752196e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 3.298034117165541e+00  2.106686166683601e+04  8.088974451557188e-01  1.228208830947833e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.641402235649549e-02  1.390603377650718e-03 -5.999999999999999e-04  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l1.b2:1 to e.ds.r1.b2:1...
++++++++ deltap from TWISS      -0.0006
+
+ Reading offsets from tfs "./offset.ip1.b2.tfs"
+
+reference node: e.ds.l1.b2:1
+
+
+APERTURE LIMIT: mqxfa.b3r1:1, n1: 10.7818, at: 609.188
+
+enter Twiss module
+  
+iteration:   1 error:   1.141908E-03 deltap:   0.000000E+00
+orbit:  -6.175496E-05  1.684142E-05 -5.868184E-05  2.297383E-06  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.245079E-05 deltap:   0.000000E+00
+orbit:  -9.488129E-05  1.604654E-05 -5.686807E-05  2.225474E-06  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   8.298564E-08 deltap:   0.000000E+00
+orbit:  -9.492605E-05  1.604617E-05 -5.686767E-05  2.225472E-06  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999907e+04 -0.000000000000000e+00  3.459815022007485e-04  5.376177017803565e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.231000773179727e+01  2.063251441110069e+00  2.083381007316809e+04  3.012264128166577e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.515563503204112e+00  1.670251456501305e-02  1.549569316158531e-03  6.031995116492971e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 2.169226232124515e+00  2.075161881525294e+04  7.928641876810201e-01  1.262609379276788e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.671661249015903e-02  1.411817473815751e-03  0.000000000000000e+00  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l5.b2:1 to e.ds.r5.b2:1...
++++++++ deltap from TWISS            0
+
+ Reading offsets from tfs "./offset.ip5.b2.tfs"
+
+reference node: e.ds.l5.b2:1
+
+
+APERTURE LIMIT: mqxfa.b3l5:1, n1: 10.9743, at: 485.188
+
+enter Twiss module
+  
+iteration:   1 error:   1.374326E-03 deltap:   6.000000E-04
+orbit:   1.480132E-03  3.715396E-05 -7.710250E-05  3.410668E-06  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.240522E-04 deltap:   6.000000E-04
+orbit:   1.416874E-03  3.632376E-05 -7.745759E-05  3.386492E-06  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   1.967556E-07 deltap:   6.000000E-04
+orbit:   1.416807E-03  3.632383E-05 -7.744934E-05  3.386409E-06  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999907e+04 -0.000000000000000e+00  3.457742374967983e-04  5.377788075951378e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.231181245337414e+01  3.857890275223301e+00  2.091190447261425e+04  2.993440151370007e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.507960185847178e+00  1.601185145621533e-02  1.756423461336688e-03  6.032076123211229e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 4.287011527296865e-01  2.067419785149016e+04  7.777313449362441e-01  1.313627918219551e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.706492035061656e-02  1.439910771358813e-03  5.999999999999999e-04  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l5.b2:1 to e.ds.r5.b2:1...
++++++++ deltap from TWISS       0.0006
+
+ Reading offsets from tfs "./offset.ip5.b2.tfs"
+
+reference node: e.ds.l5.b2:1
+
+
+APERTURE LIMIT: mqxfa.b3l5:1, n1: 10.9405, at: 485.188
+
+enter Twiss module
+  
+iteration:   1 error:   3.764638E-04 deltap:   2.000000E-04
+orbit:   4.527616E-04  2.366810E-05 -6.496330E-05  2.649240E-06  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   4.944276E-05 deltap:   2.000000E-04
+orbit:   4.131917E-04  2.284250E-05 -6.445767E-05  2.596334E-06  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   9.510702E-08 deltap:   2.000000E-04
+orbit:   4.131472E-04  2.284224E-05 -6.445811E-05  2.596369E-06  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999907e+04 -0.000000000000000e+00  3.459124277318134e-04  5.376713769312977e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.231048759372863e+01  2.728932041342299e+00  2.084915830381457e+04  3.002237535947628e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.512852549474616e+00  1.645587758734337e-02  1.563196553617185e-03  6.032033505283452e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 1.654797073995385e+00  2.072926571254878e+04  7.875968160466127e-01  1.277576223075387e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.682722333621297e-02  1.420388535471261e-03  2.000000000000000e-04  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l5.b2:1 to e.ds.r5.b2:1...
++++++++ deltap from TWISS       0.0002
+
+ Reading offsets from tfs "./offset.ip5.b2.tfs"
+
+reference node: e.ds.l5.b2:1
+
+
+APERTURE LIMIT: mqxfa.b3l5:1, n1: 11.1236, at: 485.188
+
+enter Twiss module
+  
+iteration:   1 error:   1.141908E-03 deltap:   0.000000E+00
+orbit:  -6.175496E-05  1.684142E-05 -5.868184E-05  2.297383E-06  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.245079E-05 deltap:   0.000000E+00
+orbit:  -9.488129E-05  1.604654E-05 -5.686807E-05  2.225474E-06  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   8.298564E-08 deltap:   0.000000E+00
+orbit:  -9.492605E-05  1.604617E-05 -5.686767E-05  2.225472E-06  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999907e+04 -0.000000000000000e+00  3.459815022007485e-04  5.376177017803565e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.231000773179727e+01  2.063251441110069e+00  2.083381007316809e+04  3.012264128166577e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.515563503204112e+00  1.670251456501305e-02  1.549569316158531e-03  6.031995116492971e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 2.169226232124515e+00  2.075161881525294e+04  7.928641876810201e-01  1.262609379276788e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.671661249015903e-02  1.411817473815751e-03  0.000000000000000e+00  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l5.b2:1 to e.ds.r5.b2:1...
++++++++ deltap from TWISS            0
+
+ Reading offsets from tfs "./offset.ip5.b2.tfs"
+
+reference node: e.ds.l5.b2:1
+
+
+APERTURE LIMIT: mqxfa.b3l5:1, n1: 11.2036, at: 485.188
+
+enter Twiss module
+  
+iteration:   1 error:   1.836000E-03 deltap:  -2.000000E-04
+orbit:  -5.745281E-04  9.959068E-06 -5.229777E-05  1.963330E-06  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.132381E-05 deltap:  -2.000000E-04
+orbit:  -6.076424E-04  9.206921E-06 -4.855728E-05  1.870523E-06  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   8.376403E-08 deltap:  -2.000000E-04
+orbit:  -6.076891E-04  9.206604E-06 -4.855361E-05  1.870454E-06  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999907e+04 -0.000000000000000e+00  3.460505562273340e-04  5.375640585790448e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.230966752148301e+01  1.331883139569786e+00  2.082822681258979e+04  3.043394737788608e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.518445175269092e+00  1.696604659693149e-02  1.595563572389390e-03  6.031947107226240e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 2.615585379534012e+00  2.079360144486073e+04  7.982032927300488e-01  1.249485542681190e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.661108384249325e-02  1.404004607745917e-03 -2.000000000000000e-04  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l5.b2:1 to e.ds.r5.b2:1...
++++++++ deltap from TWISS      -0.0002
+
+ Reading offsets from tfs "./offset.ip5.b2.tfs"
+
+reference node: e.ds.l5.b2:1
+
+
+APERTURE LIMIT: mqxfa.b3l5:1, n1: 10.9807, at: 485.188
+
+enter Twiss module
+  
+iteration:   1 error:   3.019325E-03 deltap:  -6.000000E-04
+orbit:  -1.584700E-03 -3.916112E-06 -3.930358E-05  1.343525E-06  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   8.554940E-05 deltap:  -6.000000E-04
+orbit:  -1.648790E-03 -4.623980E-06 -2.979162E-05  1.207723E-06  0.000000E+00  0.000000E+00
+  
+iteration:   3 error:   1.744567E-07 deltap:  -6.000000E-04
+orbit:  -1.648892E-03 -4.624388E-06 -2.977367E-05  1.207642E-06  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+ 2.665888319999907e+04 -0.000000000000000e+00  3.461885537607834e-04  5.374569061219902e+01 
+
+                    q1                    dq1                betxmax                  dxmax 
+ 6.230945813185869e+01 -3.224565128619605e-01  2.084412062254452e+04  3.110352212190744e+00 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+ 1.524673172737534e+00  1.754405248997269e-02  1.844226455189136e-03  6.031827739752136e+01 
+
+                   dq2                betymax                  dymax                  dyrms 
+ 3.298234620118295e+00  2.106686166663473e+04  8.088974453033053e-01  1.228170452921374e-01 
+
+                ycomax                 ycorms                 deltap                synch_1 
+ 1.641402235340821e-02  1.390551118198609e-03 -5.999999999999999e-04  0.000000000000000e+00 
+
+               synch_2                synch_3                synch_4                synch_5 
+ 0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00  0.000000000000000e+00 
+
+Processing apertures from s.ds.l5.b2:1 to e.ds.r5.b2:1...
++++++++ deltap from TWISS      -0.0006
+
+ Reading offsets from tfs "./offset.ip5.b2.tfs"
+
+reference node: e.ds.l5.b2:1
+
+
+APERTURE LIMIT: mqxfa.b3l5:1, n1: 10.513, at: 485.188
+
+
+  Number of warnings: 316
+316 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

@@ -11,8 +11,8 @@ option, info, warn, echo;
 ! convert to THIN
  option, info, warn, -echo;
  call, file="../share/LHC/LHCRing/V6.503/toolkit/slice.madx";
- makethin, sequence=lhcb1,style=hybrid;
- makethin, sequence=lhcb2,style=hybrid;
+ makethin, sequence=lhcb1,style=hybrid, makedipedge=false;
+ makethin, sequence=lhcb2,style=hybrid, makedipedge=false;
  option, echo, warn, info;
 
  beam, particle = proton, sequence=lhcb1, energy = 450.0;

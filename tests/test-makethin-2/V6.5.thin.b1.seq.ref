@@ -1400,12 +1400,12 @@ dfbxb: placeholder,l:= 0.000000,lrad:=l.dfbxb ;
 dfbxb.3r1: dfbxb,lrad:=l.dfbxb ,slot_id:= 104672,mech_sep:= 0.000000;
 bpmsy: monitor,l:=l.bpmsy ;
 bpmsy.4r1.b1: bpmsy,slot_id:= 104595,mech_sep:= 0.000000;
-mbxw.a4r1_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={- ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
-mbxw.b4r1_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={- ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
-mbxw.c4r1_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={- ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
-mbxw.d4r1_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={- ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
-mbxw.e4r1_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={- ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
-mbxw.f4r1_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={- ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
+mbxw.a4r1: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={- ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
+mbxw.b4r1: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={- ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
+mbxw.c4r1: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={- ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
+mbxw.d4r1: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={- ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
+mbxw.e4r1: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={- ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
+mbxw.f4r1: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr1 * 0.5 ) ) ,knl:={- ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
 x1fcr: instrument,l:=l.x1fcr ;
 x1fcr.4r1: x1fcr,slot_id:= 378054,assembly_id:= 102108,mech_sep:= 0.000000;
 brana: instrument,l:=l.brana ;
@@ -1418,14 +1418,14 @@ tclp: collimator,l:= 0.000000;
 tclp.4r1.b1: tclp,slot_id:= 102109;
 bpmwb: monitor,l:=l.bpmwb ;
 bpmwb.4r1.b1: bpmwb,slot_id:= 181634,mech_sep:= 0.174000;
-mbrc.4r1.b1_s..1: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.r1 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
+mbrc.4r1.b1..1: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.r1 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
  0.188000;
-mbrc.4r1.b1_s..2: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.r1 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
+mbrc.4r1.b1..2: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.r1 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
  0.188000;
-mbrc.4r1.b1_s: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,polarity:= 1.000000,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,mech_sep:= 0.188000;
-mbrc.4r1.b1_s..3: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.r1 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
+mbrc.4r1.b1: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,polarity:= 1.000000,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,mech_sep:= 0.188000;
+mbrc.4r1.b1..3: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.r1 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
  0.188000;
-mbrc.4r1.b1_s..4: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.r1 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
+mbrc.4r1.b1..4: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.r1 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
  0.188000;
 mcbyv: vcorrector,l:= 0.000000,kmax:=kmax_mcbyv ,kmin:=kmin_mcbyv ,calib:=kmax_mcbyv / imax_mcbyv ,lrad:=l.mcbyv ;
 mcbyv.a4r1.b1: mcbyv,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,polarity:= 1.000000,lrad:=l.mcbyv ,kick:=acbyvs4.r1b1 ,slot_id:= 249460,assembly_id:= 102111,mech_sep:= 0.194000;
@@ -2290,14 +2290,14 @@ mqy.a4l2.b1..2: mqy,lrad:=( l.mqy ) / ( 2 ) ,knl:={ 0.000000,( ( kq4.l2b1 ) * ( 
 mcbyv.b4l2.b1: mcbyv,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,polarity:= 1.000000,lrad:=l.mcbyv ,kick:=acbyv4.l2b1 ,slot_id:= 249991,assembly_id:= 102330,mech_sep:= 0.194000;
 mcbyh.4l2.b1: mcbyh,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,polarity:= 1.000000,lrad:=l.mcbyh ,kick:=acbyhs4.l2b1 ,slot_id:= 249993,assembly_id:= 102330,mech_sep:= 0.194000;
 mcbyv.a4l2.b1: mcbyv,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,polarity:= 1.000000,lrad:=l.mcbyv ,kick:=acbyvs4.l2b1 ,slot_id:= 249995,assembly_id:= 102330,mech_sep:= 0.194000;
-mbrc.4l2.b1_s..1: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.l2 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
+mbrc.4l2.b1..1: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.l2 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
  0.188000;
-mbrc.4l2.b1_s..2: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.l2 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
+mbrc.4l2.b1..2: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.l2 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
  0.188000;
-mbrc.4l2.b1_s: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,polarity:= 1.000000,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,mech_sep:= 0.188000;
-mbrc.4l2.b1_s..3: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.l2 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
+mbrc.4l2.b1: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,polarity:= 1.000000,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,mech_sep:= 0.188000;
+mbrc.4l2.b1..3: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.l2 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
  0.188000;
-mbrc.4l2.b1_s..4: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.l2 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
+mbrc.4l2.b1..4: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.l2 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
  0.188000;
 bpmwi: monitor,l:=l.bpmwi ;
 bpmwi.4l2.b1: bpmwi,slot_id:= 104597,mech_sep:= 0.174000;
@@ -2317,11 +2317,11 @@ tcdd: collimator,l:= 0.000000;
 tcdd.4l2: tcdd,slot_id:= 102334,mech_sep:= 0.000000;
 bpmsx: monitor,l:=l.bpmsx ;
 bpmsx.4l2.b1: bpmsx,slot_id:= 104598,mech_sep:= 0.000000;
-mbx.4l2_s..1: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad1.l2 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000;
-mbx.4l2_s..2: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad1.l2 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000;
-mbx.4l2_s: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,polarity:= -1.000000,calib:=kmax_mbx / imax_mbx ;
-mbx.4l2_s..3: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad1.l2 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000;
-mbx.4l2_s..4: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad1.l2 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000;
+mbx.4l2..1: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad1.l2 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000;
+mbx.4l2..2: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad1.l2 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000;
+mbx.4l2: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,polarity:= -1.000000,calib:=kmax_mbx / imax_mbx ;
+mbx.4l2..3: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad1.l2 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000;
+mbx.4l2..4: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad1.l2 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000;
 dfbxc: placeholder,l:= 0.000000,lrad:=l.dfbxc ;
 dfbxc.3l2: dfbxc,lrad:=l.dfbxc ,slot_id:= 104675,mech_sep:= 0.000000;
 mcosx.3l2: mcosx,polarity:= 1.000000,ksl:={ 0.000000, 0.000000, 0.000000,kcosx3.l2 * l.mcosx },slot_id:= 282240,assembly_id:= 102336,mech_sep:= 0.000000;
@@ -2405,11 +2405,11 @@ mcox.3r2: mcox,polarity:= 1.000000,knl:={ 0.000000, 0.000000, 0.000000,kcox3.r2 
 mcssx.3r2: mcssx,polarity:= 1.000000,ksl:={ 0.000000, 0.000000,kcssx3.r2 * l.mcssx },slot_id:= 282241,assembly_id:= 102341,mech_sep:= 0.000000;
 dfbxd: placeholder,l:= 0.000000,lrad:=l.dfbxd ;
 dfbxd.3r2: dfbxd,lrad:=l.dfbxd ,slot_id:= 104676,mech_sep:= 0.000000;
-mbx.4r2_s..1: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad1.r2 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000;
-mbx.4r2_s..2: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad1.r2 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000;
-mbx.4r2_s: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,polarity:= 1.000000,calib:=kmax_mbx / imax_mbx ;
-mbx.4r2_s..3: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad1.r2 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000;
-mbx.4r2_s..4: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad1.r2 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000;
+mbx.4r2..1: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad1.r2 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000;
+mbx.4r2..2: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad1.r2 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000;
+mbx.4r2: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,polarity:= 1.000000,calib:=kmax_mbx / imax_mbx ;
+mbx.4r2..3: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad1.r2 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000;
+mbx.4r2..4: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad1.r2 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000;
 bpmsx.4r2.b1: bpmsx,slot_id:= 104601,mech_sep:= 0.000000;
 tctvb.4r2: tctvb,slot_id:= 357145;
 tclia: collimator,l:= 0.000000;
@@ -2418,14 +2418,14 @@ branb.4r2: branb,slot_id:= 377596,mech_sep:= 0.000000;
 x2zdc002: instrument,l:= 0.000000;
 x2zdc.4r2: x2zdc002,slot_id:= 102343,mech_sep:= 0.000000;
 bpmwb.4r2.b1: bpmwb,slot_id:= 104602,mech_sep:= -0.174000;
-mbrc.4r2.b1_s..1: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.r2 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
+mbrc.4r2.b1..1: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.r2 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.188000;
-mbrc.4r2.b1_s..2: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.r2 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
+mbrc.4r2.b1..2: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.r2 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.188000;
-mbrc.4r2.b1_s: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,polarity:= -1.000000,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,mech_sep:= -0.188000;
-mbrc.4r2.b1_s..3: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.r2 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
+mbrc.4r2.b1: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,polarity:= -1.000000,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,mech_sep:= -0.188000;
+mbrc.4r2.b1..3: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.r2 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.188000;
-mbrc.4r2.b1_s..4: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.r2 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
+mbrc.4r2.b1..4: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.r2 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.188000;
 mcbyh.a4r2.b1: mcbyh,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,polarity:= 1.000000,lrad:=l.mcbyh ,kick:=acbyhs4.r2b1 ,slot_id:= 250021,assembly_id:= 102345,mech_sep:= -0.194000;
 mcbyv.4r2.b1: mcbyv,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,polarity:= 1.000000,lrad:=l.mcbyv ,kick:=acbyvs4.r2b1 ,slot_id:= 250023,assembly_id:= 102345,mech_sep:= -0.194000;
@@ -3252,18 +3252,18 @@ mqtlh.a6l3.b1..1: mqtlh,lrad:=( l.mqtlh ) / ( 2 ) ,knl:={ 0.000000,( ( kq6.l3b1 
 mqtlh.a6l3.b1: marker,kmax:=kmax_mqtlh_4.5k ,kmin:=kmin_mqtlh_4.5k ,polarity:= 1.000000,calib:=kmax_mqtlh_4.5k / imax_mqtlh_4.5k ,mech_sep:= -0.194000;
 mqtlh.a6l3.b1..2: mqtlh,lrad:=( l.mqtlh ) / ( 2 ) ,knl:={ 0.000000,( ( kq6.l3b1 ) * ( l.mqtlh ) ) * ( 0.5 ) },kmax:=kmax_mqtlh_4.5k ,kmin:=kmin_mqtlh_4.5k ,calib:=kmax_mqtlh_4.5k / imax_mqtlh_4.5k ,polarity:= 1.000000,mech_sep:= -0.194000;
 bpm.6l3.b1: bpm,slot_id:= 377943,assembly_id:= 102561,mech_sep:= -0.194000;
-mbw.f6l3.b1_s: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
-mbw.e6l3.b1_s: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
-mbw.d6l3.b1_s: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbw.f6l3.b1: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbw.e6l3.b1: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbw.d6l3.b1: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
 tcp: collimator,l:= 0.000000;
 tcp.6l3.b1: tcp,slot_id:= 102563,mech_sep:= -0.205500;
 tchsh: collimator,l:= 0.000000;
 tchsh.6l3.b1: tchsh,slot_id:= 281845;
 tcapa020: collimator,l:= 0.000000;
 tcapa.6l3.b1: tcapa020,slot_id:= 691018,mech_sep:= -0.221000;
-mbw.c6l3.b1_s: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={- ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
-mbw.b6l3.b1_s: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={- ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
-mbw.a6l3.b1_s: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={- ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
+mbw.c6l3.b1: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={- ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
+mbw.b6l3.b1: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={- ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
+mbw.a6l3.b1: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={- ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
 bpmwe008: monitor,l:=l.bpmwe008 ;
 bpmwe.5l3.b1: bpmwe008,slot_id:= 297858,mech_sep:= -0.224000;
 mqwa: multipole,lrad:=l.mqwa ,kmax:=kmax_mqwa ,kmin:=kmin_mqwa ,calib:=kmax_mqwa / imax_mqwa ;
@@ -3374,13 +3374,13 @@ mqwa.e5r3.b1: marker,kmax:=kmax_mqwa ,kmin:=kmin_mqwa ,polarity:= 1.000000,calib
 mqwa.e5r3.b1..2: mqwa,lrad:=( l.mqwa ) / ( 2 ) ,knl:={ 0.000000,( ( 0 - kq5.lr3 ) * ( l.mqwa ) ) * ( 0.5 ) },kmax:=kmax_mqwa ,kmin:=kmin_mqwa ,calib:=kmax_mqwa / imax_mqwa ,polarity:= 1.000000,mech_sep:= -0.224000;
 bpmwe009: monitor,l:=l.bpmwe009 ;
 bpmwe.5r3.b1: bpmwe009,slot_id:= 134742,mech_sep:= -0.224000;
-mbw.a6r3.b1_s: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={- ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
-mbw.b6r3.b1_s: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={- ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
-mbw.c6r3.b1_s: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={- ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
+mbw.a6r3.b1: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={- ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
+mbw.b6r3.b1: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={- ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
+mbw.c6r3.b1: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr3 * 0.5 ) ) ,knl:={- ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= -0.224000;
 tcla.6r3.b1: tcla,slot_id:= 479340,mech_sep:= -0.203000;
-mbw.d6r3.b1_s: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
-mbw.e6r3.b1_s: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
-mbw.f6r3.b1_s: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbw.d6r3.b1: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbw.e6r3.b1: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
+mbw.f6r3.b1: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr3 * 0.5 ) ) ,knl:={ad34.lr3 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= -0.194000;
 bpmwc: monitor,l:=l.bpmwc ;
 bpmwc.6r3.b1: bpmwc,slot_id:= 104603,mech_sep:= -0.194000;
 mcbcv.6r3.b1: mcbcv,kmax:=kmax_mcbcv_4.5k ,kmin:=kmin_mcbcv_4.5k ,polarity:= 1.000000,lrad:=l.mcbcv ,kick:=acbcv6.r3b1 ,slot_id:= 250549,assembly_id:= 102578,mech_sep:= -0.194000;
@@ -4191,23 +4191,23 @@ mqy.5l4.b1..1: mqy,lrad:=( l.mqy ) / ( 2 ) ,knl:={ 0.000000,( ( kq5.l4b1 ) * ( l
 mqy.5l4.b1: marker,kmax:=kmax_mqy_4.5k ,kmin:=kmin_mqy_4.5k ,polarity:= 1.000000,calib:=kmax_mqy_4.5k / imax_mqy_4.5k ,mech_sep:= -0.194000;
 mqy.5l4.b1..2: mqy,lrad:=( l.mqy ) / ( 2 ) ,knl:={ 0.000000,( ( kq5.l4b1 ) * ( l.mqy ) ) * ( 0.5 ) },kmax:=kmax_mqy_4.5k ,kmin:=kmin_mqy_4.5k ,calib:=kmax_mqy_4.5k / imax_mqy_4.5k ,polarity:= 1.000000,mech_sep:= -0.194000;
 mcbyh.5l4.b1: mcbyh,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,polarity:= 1.000000,lrad:=l.mcbyh ,kick:=acbyh5.l4b1 ,slot_id:= 251064,assembly_id:= 102791,mech_sep:= -0.194000;
-mbrb.5l4.b1_s..1: multipole,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad4.l4 ) * ( 0.25 ) },kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= 
+mbrb.5l4.b1..1: multipole,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad4.l4 ) * ( 0.25 ) },kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= 
 -0.194000;
-mbrb.5l4.b1_s..2: multipole,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad4.l4 ) * ( 0.25 ) },kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= 
+mbrb.5l4.b1..2: multipole,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad4.l4 ) * ( 0.25 ) },kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= 
 -0.194000;
-mbrb.5l4.b1_s: marker,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,polarity:= 1.000000,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,mech_sep:= -0.194000;
-mbrb.5l4.b1_s..3: multipole,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad4.l4 ) * ( 0.25 ) },kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= 
+mbrb.5l4.b1: marker,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,polarity:= 1.000000,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,mech_sep:= -0.194000;
+mbrb.5l4.b1..3: multipole,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad4.l4 ) * ( 0.25 ) },kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= 
 -0.194000;
-mbrb.5l4.b1_s..4: multipole,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad4.l4 ) * ( 0.25 ) },kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= 
+mbrb.5l4.b1..4: multipole,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad4.l4 ) * ( 0.25 ) },kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= 
 -0.194000;
-mbrs.5l4.b1_s..1: multipole,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad3.l4 ) * ( 0.25 ) },kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000
+mbrs.5l4.b1..1: multipole,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad3.l4 ) * ( 0.25 ) },kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.418100;
-mbrs.5l4.b1_s..2: multipole,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad3.l4 ) * ( 0.25 ) },kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000
+mbrs.5l4.b1..2: multipole,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad3.l4 ) * ( 0.25 ) },kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.418100;
-mbrs.5l4.b1_s: marker,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,polarity:= -1.000000,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,mech_sep:= -0.418100;
-mbrs.5l4.b1_s..3: multipole,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad3.l4 ) * ( 0.25 ) },kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000
+mbrs.5l4.b1: marker,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,polarity:= -1.000000,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,mech_sep:= -0.418100;
+mbrs.5l4.b1..3: multipole,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad3.l4 ) * ( 0.25 ) },kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.418100;
-mbrs.5l4.b1_s..4: multipole,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad3.l4 ) * ( 0.25 ) },kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000
+mbrs.5l4.b1..4: multipole,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad3.l4 ) * ( 0.25 ) },kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.418100;
 acnca: rfcavity,l:= 0.000000,volt:=vrf200 / 4 ,lag:= 0.500000,harmon:=hrf200 ;
 acnca.d5l4.b1: acnca,mech_sep:= -0.420000,slot_id:= 377949,assembly_id:= 102795;
@@ -4246,14 +4246,14 @@ mu.a5r4.b1: mu,polarity:= 1.000000,lrad:=l.mu ,hkick:= 0.000000,slot_id:= 266549
 mu.b5r4.b1: mu,polarity:= 1.000000,lrad:=l.mu ,hkick:= 0.000000,slot_id:= 266548,assembly_id:= 102817,mech_sep:= -0.420000;
 mu.c5r4.b1: mu,polarity:= 1.000000,lrad:=l.mu ,hkick:= 0.000000,slot_id:= 266547,assembly_id:= 102817,mech_sep:= -0.420000;
 mu.d5r4.b1: mu,polarity:= 1.000000,lrad:=l.mu ,hkick:= 0.000000,slot_id:= 266546,assembly_id:= 102817,mech_sep:= -0.420000;
-mbrs.5r4.b1_s..1: multipole,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad3.r4 ) * ( 0.25 ) },kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000
+mbrs.5r4.b1..1: multipole,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad3.r4 ) * ( 0.25 ) },kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.418200;
-mbrs.5r4.b1_s..2: multipole,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad3.r4 ) * ( 0.25 ) },kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000
+mbrs.5r4.b1..2: multipole,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad3.r4 ) * ( 0.25 ) },kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.418200;
-mbrs.5r4.b1_s: marker,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,polarity:= -1.000000,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,mech_sep:= -0.418200;
-mbrs.5r4.b1_s..3: multipole,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad3.r4 ) * ( 0.25 ) },kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000
+mbrs.5r4.b1: marker,kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,polarity:= -1.000000,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,mech_sep:= -0.418200;
+mbrs.5r4.b1..3: multipole,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad3.r4 ) * ( 0.25 ) },kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.418200;
-mbrs.5r4.b1_s..4: multipole,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad3.r4 ) * ( 0.25 ) },kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000
+mbrs.5r4.b1..4: multipole,lrad:=( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad3.r4 ) * ( 0.25 ) },kmax:=kmax_mbrs_4.5k ,kmin:=kmin_mbrs_4.5k ,calib:=kmax_mbrs_4.5k / imax_mbrs_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.418200;
 bsrta: instrument,l:=l.bsrta ;
 bsrta.5r4.b1: bsrta,slot_id:= 635738,mech_sep:= -0.404000;
@@ -4263,14 +4263,14 @@ bws: instrument,l:=l.bws ;
 bws.5r4.b1: bws,slot_id:= 642430,mech_sep:= -0.318000;
 bqsv: instrument,l:=l.bqsv ;
 bqsv.5r4.b1: bqsv,slot_id:= 635695,mech_sep:= -0.216000;
-mbrb.5r4.b1_s..1: multipole,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad4.r4 ) * ( 0.25 ) },kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= 
+mbrb.5r4.b1..1: multipole,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad4.r4 ) * ( 0.25 ) },kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= 
 -0.194000;
-mbrb.5r4.b1_s..2: multipole,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad4.r4 ) * ( 0.25 ) },kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= 
+mbrb.5r4.b1..2: multipole,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad4.r4 ) * ( 0.25 ) },kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= 
 -0.194000;
-mbrb.5r4.b1_s: marker,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,polarity:= 1.000000,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,mech_sep:= -0.194000;
-mbrb.5r4.b1_s..3: multipole,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad4.r4 ) * ( 0.25 ) },kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= 
+mbrb.5r4.b1: marker,kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,polarity:= 1.000000,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,mech_sep:= -0.194000;
+mbrb.5r4.b1..3: multipole,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad4.r4 ) * ( 0.25 ) },kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= 
 -0.194000;
-mbrb.5r4.b1_s..4: multipole,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad4.r4 ) * ( 0.25 ) },kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= 
+mbrb.5r4.b1..4: multipole,lrad:=( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad4.r4 ) * ( 0.25 ) },kmax:=kmax_mbrb_4.5k ,kmin:=kmin_mbrb_4.5k ,calib:=kmax_mbrb_4.5k / imax_mbrb_4.5k ,polarity:= 1.000000,mech_sep:= 
 -0.194000;
 mcbyv.5r4.b1: mcbyv,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,polarity:= 1.000000,lrad:=l.mcbyv ,kick:=acbyv5.r4b1 ,slot_id:= 251067,assembly_id:= 102820,mech_sep:= -0.194000;
 mqy.5r4.b1..1: mqy,lrad:=( l.mqy ) / ( 2 ) ,knl:={ 0.000000,( ( kq5.r4b1 ) * ( l.mqy ) ) * ( 0.5 ) },kmax:=kmax_mqy_4.5k ,kmin:=kmin_mqy_4.5k ,calib:=kmax_mqy_4.5k / imax_mqy_4.5k ,polarity:= -1.000000,mech_sep:= -0.194000;
@@ -5084,14 +5084,14 @@ mqy.4l5.b1..2: mqy,lrad:=( l.mqy ) / ( 2 ) ,knl:={ 0.000000,( ( kq4.l5b1 ) * ( l
 mcbyh.b4l5.b1: mcbyh,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,polarity:= 1.000000,lrad:=l.mcbyh ,kick:=acbyh4.l5b1 ,slot_id:= 251586,assembly_id:= 103038,mech_sep:= -0.194000;
 mcbyv.4l5.b1: mcbyv,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,polarity:= 1.000000,lrad:=l.mcbyv ,kick:=acbyvs4.l5b1 ,slot_id:= 251588,assembly_id:= 103038,mech_sep:= -0.194000;
 mcbyh.a4l5.b1: mcbyh,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,polarity:= 1.000000,lrad:=l.mcbyh ,kick:=acbyhs4.l5b1 ,slot_id:= 251590,assembly_id:= 103038,mech_sep:= -0.194000;
-mbrc.4l5.b1_s..1: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.l5 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
+mbrc.4l5.b1..1: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.l5 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.188000;
-mbrc.4l5.b1_s..2: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.l5 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
+mbrc.4l5.b1..2: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.l5 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.188000;
-mbrc.4l5.b1_s: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,polarity:= -1.000000,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,mech_sep:= -0.188000;
-mbrc.4l5.b1_s..3: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.l5 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
+mbrc.4l5.b1: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,polarity:= -1.000000,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,mech_sep:= -0.188000;
+mbrc.4l5.b1..3: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.l5 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.188000;
-mbrc.4l5.b1_s..4: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.l5 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
+mbrc.4l5.b1..4: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.l5 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.188000;
 bpmwb.4l5.b1: bpmwb,slot_id:= 104608,mech_sep:= -0.174000;
 tcth.4l5.b1: tcth,slot_id:= 377606,mech_sep:= -0.170500;
@@ -5104,12 +5104,12 @@ x5zdc.b4l5: x5zdc001,slot_id:= 2019606,assembly_id:= 103042,mech_sep:= 0.000000;
 brana.4l5: brana,slot_id:= 883709,assembly_id:= 103042,mech_sep:= 0.000000;
 x5zdc002: instrument,l:= 0.000000;
 x5zdc.a4l5: x5zdc002,slot_id:= 2019602,assembly_id:= 103042,mech_sep:= 0.000000;
-mbxw.f4l5_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
-mbxw.e4l5_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
-mbxw.d4l5_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
-mbxw.c4l5_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
-mbxw.b4l5_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
-mbxw.a4l5_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
+mbxw.f4l5: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
+mbxw.e4l5: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
+mbxw.d4l5: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
+mbxw.c4l5: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
+mbxw.b4l5: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
+mbxw.a4l5: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr5 * 0.5 ) ) ,knl:={ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
 bpmsy.4l5.b1: bpmsy,slot_id:= 104609,mech_sep:= 0.000000;
 dfbxe: placeholder,l:= 0.000000,lrad:=l.dfbxe ;
 dfbxe.3l5: dfbxe,lrad:=l.dfbxe ,slot_id:= 104683,mech_sep:= 0.000000;
@@ -5192,12 +5192,12 @@ mcssx.3r5: mcssx,polarity:= 1.000000,ksl:={ 0.000000, 0.000000,kcssx3.r5 * l.mcs
 dfbxf: placeholder,l:= 0.000000,lrad:=l.dfbxf ;
 dfbxf.3r5: dfbxf,lrad:=l.dfbxf ,slot_id:= 104684,mech_sep:= 0.000000;
 bpmsy.4r5.b1: bpmsy,slot_id:= 104612,mech_sep:= 0.000000;
-mbxw.a4r5_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={- ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
-mbxw.b4r5_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={- ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
-mbxw.c4r5_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={- ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
-mbxw.d4r5_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={- ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
-mbxw.e4r5_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={- ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
-mbxw.f4r5_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={- ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
+mbxw.a4r5: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={- ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
+mbxw.b4r5: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={- ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
+mbxw.c4r5: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={- ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
+mbxw.d4r5: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={- ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
+mbxw.e4r5: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={- ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
+mbxw.f4r5: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( 0 - ad1.lr5 * 0.5 ) ) ,knl:={- ad1.lr5 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= -1.000000;
 x5zdc.b4r5: x5zdc002,slot_id:= 2019608,assembly_id:= 103053,mech_sep:= 0.000000;
 brana.4r5: brana,slot_id:= 883604,assembly_id:= 103053,mech_sep:= 0.000000;
 x5zdc.a4r5: x5zdc001,slot_id:= 2019604,assembly_id:= 103053,mech_sep:= 0.000000;
@@ -5212,14 +5212,14 @@ xrph.b4r5.b1: xrph,slot_id:= 826637,assembly_id:= 825715,mech_sep:= 0.194000;
 xrpv.b4r5.b1: xrpv,slot_id:= 826649,assembly_id:= 825715,mech_sep:= 0.194000;
 bpmwt.b4r5.b1: bpmwt,slot_id:= 826625,assembly_id:= 825715,mech_sep:= 0.175800;
 bpmwb.4r5.b1: bpmwb,slot_id:= 181643,mech_sep:= 0.174000;
-mbrc.4r5.b1_s..1: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.r5 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
+mbrc.4r5.b1..1: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.r5 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
  0.188000;
-mbrc.4r5.b1_s..2: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.r5 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
+mbrc.4r5.b1..2: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.r5 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
  0.188000;
-mbrc.4r5.b1_s: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,polarity:= 1.000000,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,mech_sep:= 0.188000;
-mbrc.4r5.b1_s..3: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.r5 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
+mbrc.4r5.b1: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,polarity:= 1.000000,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,mech_sep:= 0.188000;
+mbrc.4r5.b1..3: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.r5 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
  0.188000;
-mbrc.4r5.b1_s..4: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.r5 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
+mbrc.4r5.b1..4: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.r5 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
  0.188000;
 mcbyv.a4r5.b1: mcbyv,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,polarity:= 1.000000,lrad:=l.mcbyv ,kick:=acbyvs4.r5b1 ,slot_id:= 251616,assembly_id:= 103057,mech_sep:= 0.194000;
 mcbyh.4r5.b1: mcbyh,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,polarity:= 1.000000,lrad:=l.mcbyh ,kick:=acbyhs4.r5b1 ,slot_id:= 251618,assembly_id:= 103057,mech_sep:= 0.194000;
@@ -6871,8 +6871,8 @@ mqtlh.a6l7.b1: marker,kmax:=kmax_mqtlh_4.5k ,kmin:=kmin_mqtlh_4.5k ,polarity:= 1
 mqtlh.a6l7.b1..2: mqtlh,lrad:=( l.mqtlh ) / ( 2 ) ,knl:={ 0.000000,( ( kq6.l7b1 ) * ( l.mqtlh ) ) * ( 0.5 ) },kmax:=kmax_mqtlh_4.5k ,kmin:=kmin_mqtlh_4.5k ,calib:=kmax_mqtlh_4.5k / imax_mqtlh_4.5k ,polarity:= 1.000000,mech_sep:= 0.194000;
 mcbch.6l7.b1: mcbch,kmax:=kmax_mcbch_4.5k ,kmin:=kmin_mcbch_4.5k ,polarity:= 1.000000,lrad:=l.mcbch ,kick:=acbch6.l7b1 ,slot_id:= 252655,assembly_id:= 103498,mech_sep:= 0.194000;
 bpmwc.6l7.b1: bpmwc,slot_id:= 181644,mech_sep:= 0.194000;
-mbw.d6l7.b1_s: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ,knl:={- ad34.lr7 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
-mbw.c6l7.b1_s: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ,knl:={- ad34.lr7 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
+mbw.d6l7.b1: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ,knl:={- ad34.lr7 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
+mbw.c6l7.b1: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ,knl:={- ad34.lr7 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
 tcp.d6l7.b1: tcp,slot_id:= 103500,mech_sep:= 0.199500;
 tcp.c6l7.b1: tcp,slot_id:= 103501,mech_sep:= 0.201000;
 tcp.b6l7.b1: tcp,slot_id:= 103502,mech_sep:= 0.202500;
@@ -6884,10 +6884,10 @@ tchss: collimator,l:= 0.000000;
 tchss.6l7.b1: tchss,slot_id:= 281851;
 tcapa019: collimator,l:= 0.000000;
 tcapa.6l7.b1: tcapa019,slot_id:= 820100,mech_sep:= 0.222000;
-mbw.b6l7.b1_s: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ,knl:={ad34.lr7 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
+mbw.b6l7.b1: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ,knl:={ad34.lr7 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
 tcapb: collimator,l:= 0.000000;
 tcapb.6l7.b1: tcapb,slot_id:= 820112,mech_sep:= 0.224000;
-mbw.a6l7.b1_s: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ,knl:={ad34.lr7 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
+mbw.a6l7.b1: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ,knl:={ad34.lr7 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
 tcsg.b6l7.b1: tcsg,slot_id:= 103505,mech_sep:= 0.224000;
 tcsm.b6l7.b1: tcsm,slot_id:= 103506,mech_sep:= 0.224000;
 tcsg.a6l7.b1: tcsg,slot_id:= 103507,mech_sep:= 0.224000;
@@ -7008,11 +7008,11 @@ bpmwe.5r7.b1: bpmwe003,slot_id:= 182524,mech_sep:= 0.224000;
 tcsg.6r7.b1: tcsg,slot_id:= 281887,mech_sep:= 0.224000;
 tcsm.6r7.b1: tcsm,slot_id:= 281888,mech_sep:= 0.224000;
 tcla.a6r7.b1: tcla,slot_id:= 691005,mech_sep:= 0.224000;
-mbw.a6r7.b1_s: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ,knl:={ad34.lr7 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
-mbw.b6r7.b1_s: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ,knl:={ad34.lr7 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
+mbw.a6r7.b1: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ,knl:={ad34.lr7 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
+mbw.b6r7.b1: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( ad34.lr7 * 0.5 ) ) ,knl:={ad34.lr7 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= 1.000000,mech_sep:= 0.224000;
 tcla.b6r7.b1: tcla,slot_id:= 691006,mech_sep:= 0.214800;
-mbw.c6r7.b1_s: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ,knl:={- ad34.lr7 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
-mbw.d6r7.b1_s: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ,knl:={- ad34.lr7 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
+mbw.c6r7.b1: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ,knl:={- ad34.lr7 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
+mbw.d6r7.b1: multipole,lrad:=( l.mbw ) * ( 1.0 / sinc ( 0 - ad34.lr7 * 0.5 ) ) ,knl:={- ad34.lr7 },kmax:=kmax_mbw ,kmin:=kmin_mbw ,calib:=kmax_mbw / imax_mbw ,polarity:= -1.000000,mech_sep:= 0.194000;
 tcla.c6r7.b1: tcla,slot_id:= 691007,mech_sep:= 0.194000;
 tcla.d6r7.b1: tcla,slot_id:= 691008,mech_sep:= 0.194000;
 bpmr.6r7.b1: bpmr,slot_id:= 378033,assembly_id:= 103537,mech_sep:= 0.194000;
@@ -7837,14 +7837,14 @@ mqy.a4l8.b1..2: mqy,lrad:=( l.mqy ) / ( 2 ) ,knl:={ 0.000000,( ( kq4.l8b1 ) * ( 
 mcbyv.b4l8.b1: mcbyv,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,polarity:= 1.000000,lrad:=l.mcbyv ,kick:=acbyv4.l8b1 ,slot_id:= 253179,assembly_id:= 103753,mech_sep:= 0.194000;
 mcbyh.4l8.b1: mcbyh,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,polarity:= 1.000000,lrad:=l.mcbyh ,kick:=acbyhs4.l8b1 ,slot_id:= 253181,assembly_id:= 103753,mech_sep:= 0.194000;
 mcbyv.a4l8.b1: mcbyv,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,polarity:= 1.000000,lrad:=l.mcbyv ,kick:=acbyvs4.l8b1 ,slot_id:= 253183,assembly_id:= 103753,mech_sep:= 0.194000;
-mbrc.4l8.b1_s..1: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.l8 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
+mbrc.4l8.b1..1: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.l8 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
  0.188000;
-mbrc.4l8.b1_s..2: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.l8 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
+mbrc.4l8.b1..2: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.l8 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
  0.188000;
-mbrc.4l8.b1_s: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,polarity:= 1.000000,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,mech_sep:= 0.188000;
-mbrc.4l8.b1_s..3: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.l8 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
+mbrc.4l8.b1: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,polarity:= 1.000000,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,mech_sep:= 0.188000;
+mbrc.4l8.b1..3: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.l8 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
  0.188000;
-mbrc.4l8.b1_s..4: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.l8 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
+mbrc.4l8.b1..4: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad2.l8 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= 1.000000,mech_sep:=
  0.188000;
 bpmwb.4l8.b1: bpmwb,slot_id:= 181645,mech_sep:= 0.174000;
 tcth.4l8.b1: tcth,slot_id:= 377640,mech_sep:= 0.168900;
@@ -7852,11 +7852,11 @@ branb.4l8: branb,slot_id:= 377641,mech_sep:= 0.000000;
 tclia.4l8: tclia,slot_id:= 357150;
 tctvb.4l8: tctvb,slot_id:= 357151;
 bpmsx.4l8.b1: bpmsx,slot_id:= 104616,mech_sep:= 0.000000;
-mbx.4l8_s..1: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad1.l8 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000;
-mbx.4l8_s..2: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad1.l8 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000;
-mbx.4l8_s: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,polarity:= -1.000000,calib:=kmax_mbx / imax_mbx ;
-mbx.4l8_s..3: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad1.l8 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000;
-mbx.4l8_s..4: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad1.l8 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000;
+mbx.4l8..1: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad1.l8 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000;
+mbx.4l8..2: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad1.l8 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000;
+mbx.4l8: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,polarity:= -1.000000,calib:=kmax_mbx / imax_mbx ;
+mbx.4l8..3: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad1.l8 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000;
+mbx.4l8..4: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad1.l8 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= -1.000000;
 dfbxg: placeholder,l:= 0.000000,lrad:=l.dfbxg ;
 dfbxg.3l8: dfbxg,lrad:=l.dfbxg ,slot_id:= 104691,mech_sep:= 0.000000;
 mcosx.3l8: mcosx,polarity:= 1.000000,ksl:={ 0.000000, 0.000000, 0.000000,kcosx3.l8 * l.mcosx },slot_id:= 282252,assembly_id:= 103756,mech_sep:= 0.000000;
@@ -7937,11 +7937,11 @@ mcox.3r8: mcox,polarity:= 1.000000,knl:={ 0.000000, 0.000000, 0.000000,kcox3.r8 
 mcssx.3r8: mcssx,polarity:= 1.000000,ksl:={ 0.000000, 0.000000,kcssx3.r8 * l.mcssx },slot_id:= 282253,assembly_id:= 103761,mech_sep:= 0.000000;
 dfbxh: placeholder,l:= 0.000000,lrad:=l.dfbxh ;
 dfbxh.3r8: dfbxh,lrad:=l.dfbxh ,slot_id:= 104692,mech_sep:= 0.000000;
-mbx.4r8_s..1: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad1.r8 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000;
-mbx.4r8_s..2: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad1.r8 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000;
-mbx.4r8_s: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,polarity:= 1.000000,calib:=kmax_mbx / imax_mbx ;
-mbx.4r8_s..3: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad1.r8 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000;
-mbx.4r8_s..4: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad1.r8 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000;
+mbx.4r8..1: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad1.r8 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000;
+mbx.4r8..2: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad1.r8 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000;
+mbx.4r8: marker,kmax:=kmax_mbx ,kmin:=kmin_mbx ,polarity:= 1.000000,calib:=kmax_mbx / imax_mbx ;
+mbx.4r8..3: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad1.r8 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000;
+mbx.4r8..4: multipole,lrad:=( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( ad1.r8 ) * ( 0.25 ) },kmax:=kmax_mbx ,kmin:=kmin_mbx ,calib:=kmax_mbx / imax_mbx ,polarity:= 1.000000;
 bpmsx.4r8.b1: bpmsx,slot_id:= 104619,mech_sep:= 0.000000;
 tcddm: collimator,l:= 0.000000;
 tcddm.4r8: tcddm,slot_id:= 103763,mech_sep:= 0.000000;
@@ -7950,14 +7950,14 @@ btvst064: monitor,l:=l.btvst064 ;
 btvst.a4r8: btvst064,slot_id:= 181630,mech_sep:= -0.080000;
 branb.4r8: branb,slot_id:= 377644,mech_sep:= 0.000000;
 bpmwb.4r8.b1: bpmwb,slot_id:= 181646,mech_sep:= -0.174000;
-mbrc.4r8.b1_s..1: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.r8 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
+mbrc.4r8.b1..1: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.r8 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.188000;
-mbrc.4r8.b1_s..2: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.r8 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
+mbrc.4r8.b1..2: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.r8 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.188000;
-mbrc.4r8.b1_s: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,polarity:= -1.000000,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,mech_sep:= -0.188000;
-mbrc.4r8.b1_s..3: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.r8 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
+mbrc.4r8.b1: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,polarity:= -1.000000,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,mech_sep:= -0.188000;
+mbrc.4r8.b1..3: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.r8 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.188000;
-mbrc.4r8.b1_s..4: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.r8 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
+mbrc.4r8.b1..4: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.r8 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.188000;
 mcbyh.a4r8.b1: mcbyh,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,polarity:= 1.000000,lrad:=l.mcbyh ,kick:=acbyhs4.r8b1 ,slot_id:= 253209,assembly_id:= 103766,mech_sep:= -0.194000;
 mcbyv.4r8.b1: mcbyv,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,polarity:= 1.000000,lrad:=l.mcbyv ,kick:=acbyvs4.r8b1 ,slot_id:= 253211,assembly_id:= 103766,mech_sep:= -0.194000;
@@ -8777,14 +8777,14 @@ mqy.4l1.b1..2: mqy,lrad:=( l.mqy ) / ( 2 ) ,knl:={ 0.000000,( ( kq4.l1b1 ) * ( l
 mcbyh.b4l1.b1: mcbyh,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,polarity:= 1.000000,lrad:=l.mcbyh ,kick:=acbyh4.l1b1 ,slot_id:= 253738,assembly_id:= 103985,mech_sep:= -0.194000;
 mcbyv.4l1.b1: mcbyv,kmax:=kmax_mcbyv_4.5k ,kmin:=kmin_mcbyv_4.5k ,polarity:= 1.000000,lrad:=l.mcbyv ,kick:=acbyvs4.l1b1 ,slot_id:= 253740,assembly_id:= 103985,mech_sep:= -0.194000;
 mcbyh.a4l1.b1: mcbyh,kmax:=kmax_mcbyh_4.5k ,kmin:=kmin_mcbyh_4.5k ,polarity:= 1.000000,lrad:=l.mcbyh ,kick:=acbyhs4.l1b1 ,slot_id:= 253742,assembly_id:= 103985,mech_sep:= -0.194000;
-mbrc.4l1.b1_s..1: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.l1 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
+mbrc.4l1.b1..1: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.l1 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.188000;
-mbrc.4l1.b1_s..2: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.l1 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
+mbrc.4l1.b1..2: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.l1 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.188000;
-mbrc.4l1.b1_s: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,polarity:= -1.000000,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,mech_sep:= -0.188000;
-mbrc.4l1.b1_s..3: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.l1 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
+mbrc.4l1.b1: marker,kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,polarity:= -1.000000,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,mech_sep:= -0.188000;
+mbrc.4l1.b1..3: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.l1 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.188000;
-mbrc.4l1.b1_s..4: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.l1 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
+mbrc.4l1.b1..4: multipole,lrad:=( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) / ( 4 ) ,knl:={( 0 - ad2.l1 ) * ( 0.25 ) },kmax:=kmax_mbrc_4.5k ,kmin:=kmin_mbrc_4.5k ,calib:=kmax_mbrc_4.5k / imax_mbrc_4.5k ,polarity:= -1.000000
 ,mech_sep:= -0.188000;
 bpmwb.4l1.b1: bpmwb,slot_id:= 104621,mech_sep:= -0.174000;
 tcth.4l1.b1: tcth,slot_id:= 377649,mech_sep:= -0.170500;
@@ -8795,12 +8795,12 @@ x1zdc.a4l1: x1zdc001,slot_id:= 2019579,assembly_id:= 103988,mech_sep:= 0.000000;
 brana.4l1: brana,slot_id:= 883499,assembly_id:= 103988,mech_sep:= 0.000000;
 x1fcl: instrument,l:=l.x1fcl ;
 x1fcl.4l1: x1fcl,slot_id:= 378051,assembly_id:= 103988,mech_sep:= 0.000000;
-mbxw.f4l1_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
-mbxw.e4l1_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
-mbxw.d4l1_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
-mbxw.c4l1_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
-mbxw.b4l1_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
-mbxw.a4l1_s: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
+mbxw.f4l1: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
+mbxw.e4l1: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
+mbxw.d4l1: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
+mbxw.c4l1: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
+mbxw.b4l1: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
+mbxw.a4l1: multipole,lrad:=( l.mbxw ) * ( 1.0 / sinc ( ad1.lr1 * 0.5 ) ) ,knl:={ad1.lr1 },kmax:=kmax_mbxw ,kmin:=kmin_mbxw ,calib:=kmax_mbxw / imax_mbxw ,polarity:= 1.000000;
 bpmsy.4l1.b1: bpmsy,slot_id:= 104622,mech_sep:= 0.000000;
 dfbxa: placeholder,l:= 0.000000,lrad:=l.dfbxa ;
 dfbxa.3l1: dfbxa,lrad:=l.dfbxa ,slot_id:= 104695,mech_sep:= 0.000000;
@@ -8883,23 +8883,23 @@ mcox.3r1: mcox, at = 54.297000, from = ip1,polarity:= 1.000000,knl:={ 0.000000, 
 mcssx.3r1: mcssx, at = 54.297000, from = ip1,polarity:= 1.000000,ksl:={ 0.000000, 0.000000,kcssx3.r1 * l.mcssx },slot_id:= 282235,assembly_id:= 102106,mech_sep:= 0.000000;
 dfbxb.3r1, at = 56.427000, from = ip1;
 bpmsy.4r1.b1: bpmsy, at = 58.314500, from = ip1,slot_id:= 104595,mech_sep:= 0.000000;
-mbxw.a4r1_s, at = ( 61.322 ) + ( 0 ) , from = ip1;
-mbxw.b4r1_s, at = ( 65.588 ) + ( 0 ) , from = ip1;
-mbxw.c4r1_s, at = ( 69.854 ) + ( 0 ) , from = ip1;
-mbxw.d4r1_s, at = ( 74.12 ) + ( 0 ) , from = ip1;
-mbxw.e4r1_s, at = ( 78.386 ) + ( 0 ) , from = ip1;
-mbxw.f4r1_s, at = ( 82.652 ) + ( 0 ) , from = ip1;
+mbxw.a4r1, at = ( 61.322 ) + ( 0 ) , from = ip1;
+mbxw.b4r1, at = ( 65.588 ) + ( 0 ) , from = ip1;
+mbxw.c4r1, at = ( 69.854 ) + ( 0 ) , from = ip1;
+mbxw.d4r1, at = ( 74.12 ) + ( 0 ) , from = ip1;
+mbxw.e4r1, at = ( 78.386 ) + ( 0 ) , from = ip1;
+mbxw.f4r1, at = ( 82.652 ) + ( 0 ) , from = ip1;
 x1fcr.4r1: x1fcr, at = 141.150000, from = ip1,slot_id:= 378054,assembly_id:= 102108,mech_sep:= 0.000000;
 brana.4r1: brana, at = 141.350000, from = ip1,slot_id:= 883446,assembly_id:= 102108,mech_sep:= 0.000000;
 x1zdc.a4r1, at = 141.700000, from = ip1;
 tanar.4r1: tanar, at = 142.750000, from = ip1,slot_id:= 102108,mech_sep:= 0.000000;
 tclp.4r1.b1, at = ( 149.73 ) + ( 0 ) , from = ip1;
 bpmwb.4r1.b1: bpmwb, at = 151.094500, from = ip1,slot_id:= 181634,mech_sep:= 0.174000;
-mbrc.4r1.b1_s..1, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip1;
-mbrc.4r1.b1_s..2, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip1;
-mbrc.4r1.b1_s, at = ( 157.9 ) + ( 0 ) , from = ip1;
-mbrc.4r1.b1_s..3, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip1;
-mbrc.4r1.b1_s..4, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip1;
+mbrc.4r1.b1..1, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip1;
+mbrc.4r1.b1..2, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip1;
+mbrc.4r1.b1, at = ( 157.9 ) + ( 0 ) , from = ip1;
+mbrc.4r1.b1..3, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip1;
+mbrc.4r1.b1..4, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r1 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip1;
 mcbyv.a4r1.b1, at = 164.439000, from = ip1;
 mcbyh.4r1.b1, at = 165.735000, from = ip1;
 mcbyv.b4r1.b1, at = 167.031000, from = ip1;
@@ -9726,11 +9726,11 @@ mqy.a4l2.b1..2, at = ( ( 0 - 137.59 ) + ( 0 ) ) + ( ( l.mqy ) * ( 0.333333333333
 mcbyv.b4l2.b1, at = -135.243000, from = ip2;
 mcbyh.4l2.b1, at = -134.096000, from = ip2;
 mcbyv.a4l2.b1, at = -132.950000, from = ip2;
-mbrc.4l2.b1_s..1, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip2;
-mbrc.4l2.b1_s..2, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip2;
-mbrc.4l2.b1_s, at = ( 0 - 126.403 ) + ( 0 ) , from = ip2;
-mbrc.4l2.b1_s..3, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip2;
-mbrc.4l2.b1_s..4, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip2;
+mbrc.4l2.b1..1, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip2;
+mbrc.4l2.b1..2, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip2;
+mbrc.4l2.b1, at = ( 0 - 126.403 ) + ( 0 ) , from = ip2;
+mbrc.4l2.b1..3, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip2;
+mbrc.4l2.b1..4, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l2 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip2;
 bpmwi.4l2.b1: bpmwi, at = -119.597500, from = ip2,slot_id:= 104597,mech_sep:= 0.174000;
 tcth.4l2.b1, at = ( 0 - 118.233 ) + ( 0 ) , from = ip2;
 x2zdc.4l2, at = -115.284500, from = ip2;
@@ -9740,11 +9740,11 @@ tdi.4l2.b1, at = ( 0 - 80.833 ) + ( 0 ) , from = ip2;
 tctvb.4l2, at = ( 0 - 73.748 ) + ( 0 ) , from = ip2;
 tcdd.4l2, at = ( 0 - 71.228 ) + ( 0 ) , from = ip2;
 bpmsx.4l2.b1: bpmsx, at = -69.440500, from = ip2,slot_id:= 104598,mech_sep:= 0.000000;
-mbx.4l2_s..1, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip2;
-mbx.4l2_s..2, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip2;
-mbx.4l2_s, at = ( 0 - 63.108 ) + ( 0 ) , from = ip2;
-mbx.4l2_s..3, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip2;
-mbx.4l2_s..4, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip2;
+mbx.4l2..1, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip2;
+mbx.4l2..2, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip2;
+mbx.4l2, at = ( 0 - 63.108 ) + ( 0 ) , from = ip2;
+mbx.4l2..3, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip2;
+mbx.4l2..4, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l2 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip2;
 dfbxc.3l2, at = -56.308500, from = ip2;
 mcosx.3l2: mcosx, at = -54.297000, from = ip2,polarity:= 1.000000,ksl:={ 0.000000, 0.000000, 0.000000,kcosx3.l2 * l.mcosx },slot_id:= 282240,assembly_id:= 102336,mech_sep:= 0.000000;
 mcox.3l2: mcox, at = -54.297000, from = ip2,polarity:= 1.000000,knl:={ 0.000000, 0.000000, 0.000000,kcox3.l2 * l.mcox },slot_id:= 282239,assembly_id:= 102336,mech_sep:= 0.000000;
@@ -9822,22 +9822,22 @@ mcosx.3r2: mcosx, at = 54.297000, from = ip2,polarity:= 1.000000,ksl:={ 0.000000
 mcox.3r2: mcox, at = 54.297000, from = ip2,polarity:= 1.000000,knl:={ 0.000000, 0.000000, 0.000000,kcox3.r2 * l.mcox },slot_id:= 282242,assembly_id:= 102341,mech_sep:= 0.000000;
 mcssx.3r2: mcssx, at = 54.297000, from = ip2,polarity:= 1.000000,ksl:={ 0.000000, 0.000000,kcssx3.r2 * l.mcssx },slot_id:= 282241,assembly_id:= 102341,mech_sep:= 0.000000;
 dfbxd.3r2, at = 56.308500, from = ip2;
-mbx.4r2_s..1, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip2;
-mbx.4r2_s..2, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip2;
-mbx.4r2_s, at = ( 63.108 ) + ( 0 ) , from = ip2;
-mbx.4r2_s..3, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip2;
-mbx.4r2_s..4, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip2;
+mbx.4r2..1, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip2;
+mbx.4r2..2, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip2;
+mbx.4r2, at = ( 63.108 ) + ( 0 ) , from = ip2;
+mbx.4r2..3, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip2;
+mbx.4r2..4, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r2 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip2;
 bpmsx.4r2.b1: bpmsx, at = 69.440500, from = ip2,slot_id:= 104601,mech_sep:= 0.000000;
 tctvb.4r2, at = ( 73.748 ) + ( 0 ) , from = ip2;
 tclia.4r2, at = ( 76.008 ) + ( 0 ) , from = ip2;
 branb.4r2: branb, at = 112.969000, from = ip2,slot_id:= 377596,mech_sep:= 0.000000;
 x2zdc.4r2, at = 114.684500, from = ip2;
 bpmwb.4r2.b1: bpmwb, at = 119.673500, from = ip2,slot_id:= 104602,mech_sep:= -0.174000;
-mbrc.4r2.b1_s..1, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip2;
-mbrc.4r2.b1_s..2, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip2;
-mbrc.4r2.b1_s, at = ( 126.403 ) + ( 0 ) , from = ip2;
-mbrc.4r2.b1_s..3, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip2;
-mbrc.4r2.b1_s..4, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip2;
+mbrc.4r2.b1..1, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip2;
+mbrc.4r2.b1..2, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip2;
+mbrc.4r2.b1, at = ( 126.403 ) + ( 0 ) , from = ip2;
+mbrc.4r2.b1..3, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip2;
+mbrc.4r2.b1..4, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r2 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip2;
 mcbyh.a4r2.b1, at = 132.950000, from = ip2;
 mcbyv.4r2.b1, at = 134.096000, from = ip2;
 mcbyh.b4r2.b1, at = 135.243000, from = ip2;
@@ -10655,15 +10655,15 @@ mqtlh.a6l3.b1..1, at = ( ( 0 - 197.162 ) + ( 0 ) ) + ( ( l.mqtlh ) * ( 0 - 0.333
 mqtlh.a6l3.b1, at = ( 0 - 197.162 ) + ( 0 ) , from = ip3;
 mqtlh.a6l3.b1..2, at = ( ( 0 - 197.162 ) + ( 0 ) ) + ( ( l.mqtlh ) * ( 0.33333333333333 ) ) , from = ip3;
 bpm.6l3.b1: bpm, at = -195.792000, from = ip3,slot_id:= 377943,assembly_id:= 102561,mech_sep:= -0.194000;
-mbw.f6l3.b1_s, at = ( 0 - 191.466 ) + ( 0 ) , from = ip3;
-mbw.e6l3.b1_s, at = ( 0 - 187.231 ) + ( 0 ) , from = ip3;
-mbw.d6l3.b1_s, at = ( 0 - 182.996 ) + ( 0 ) , from = ip3;
+mbw.f6l3.b1, at = ( 0 - 191.466 ) + ( 0 ) , from = ip3;
+mbw.e6l3.b1, at = ( 0 - 187.231 ) + ( 0 ) , from = ip3;
+mbw.d6l3.b1, at = ( 0 - 182.996 ) + ( 0 ) , from = ip3;
 tcp.6l3.b1, at = ( 0 - 177.0495 ) + ( 0 ) , from = ip3;
 tchsh.6l3.b1, at = ( 0 - 175.4495 ) + ( 0 ) , from = ip3;
 tcapa.6l3.b1, at = ( 0 - 168.173 ) + ( 0 ) , from = ip3;
-mbw.c6l3.b1_s, at = ( 0 - 164.973 ) + ( 0 ) , from = ip3;
-mbw.b6l3.b1_s, at = ( 0 - 160.738 ) + ( 0 ) , from = ip3;
-mbw.a6l3.b1_s, at = ( 0 - 156.503 ) + ( 0 ) , from = ip3;
+mbw.c6l3.b1, at = ( 0 - 164.973 ) + ( 0 ) , from = ip3;
+mbw.b6l3.b1, at = ( 0 - 160.738 ) + ( 0 ) , from = ip3;
+mbw.a6l3.b1, at = ( 0 - 156.503 ) + ( 0 ) , from = ip3;
 bpmwe.5l3.b1: bpmwe008, at = -152.662500, from = ip3,slot_id:= 297858,mech_sep:= -0.224000;
 mqwa.e5l3.b1..1, at = ( ( 0 - 150.548 ) + ( 0 ) ) + ( ( l.mqwa ) * ( 0 - 0.33333333333333 ) ) , from = ip3;
 mqwa.e5l3.b1, at = ( 0 - 150.548 ) + ( 0 ) , from = ip3;
@@ -10759,13 +10759,13 @@ mqwa.e5r3.b1..1, at = ( ( 150.548 ) + ( 0 ) ) + ( ( l.mqwa ) * ( 0 - 0.333333333
 mqwa.e5r3.b1, at = ( 150.548 ) + ( 0 ) , from = ip3;
 mqwa.e5r3.b1..2, at = ( ( 150.548 ) + ( 0 ) ) + ( ( l.mqwa ) * ( 0.33333333333333 ) ) , from = ip3;
 bpmwe.5r3.b1: bpmwe009, at = 152.738500, from = ip3,slot_id:= 134742,mech_sep:= -0.224000;
-mbw.a6r3.b1_s, at = ( 156.351 ) + ( 0 ) , from = ip3;
-mbw.b6r3.b1_s, at = ( 160.586 ) + ( 0 ) , from = ip3;
-mbw.c6r3.b1_s, at = ( 164.821 ) + ( 0 ) , from = ip3;
+mbw.a6r3.b1, at = ( 156.351 ) + ( 0 ) , from = ip3;
+mbw.b6r3.b1, at = ( 160.586 ) + ( 0 ) , from = ip3;
+mbw.c6r3.b1, at = ( 164.821 ) + ( 0 ) , from = ip3;
 tcla.6r3.b1, at = ( 179.0495 ) + ( 0 ) , from = ip3;
-mbw.d6r3.b1_s, at = ( 182.844 ) + ( 0 ) , from = ip3;
-mbw.e6r3.b1_s, at = ( 187.079 ) + ( 0 ) , from = ip3;
-mbw.f6r3.b1_s, at = ( 191.314 ) + ( 0 ) , from = ip3;
+mbw.d6r3.b1, at = ( 182.844 ) + ( 0 ) , from = ip3;
+mbw.e6r3.b1, at = ( 187.079 ) + ( 0 ) , from = ip3;
+mbw.f6r3.b1, at = ( 191.314 ) + ( 0 ) , from = ip3;
 bpmwc.6r3.b1: bpmwc, at = 193.729500, from = ip3,slot_id:= 104603,mech_sep:= -0.194000;
 mcbcv.6r3.b1, at = 195.870000, from = ip3;
 mqtlh.a6r3.b1..1, at = ( ( 197.161 ) + ( 0 ) ) + ( ( l.mqtlh ) * ( 0 - 0.33333333333333 ) ) , from = ip3;
@@ -11566,16 +11566,16 @@ mqy.5l4.b1..1, at = ( ( 0 - 132.62 ) + ( 0 ) ) + ( ( l.mqy ) * ( 0 - 0.333333333
 mqy.5l4.b1, at = ( 0 - 132.62 ) + ( 0 ) , from = ip4;
 mqy.5l4.b1..2, at = ( ( 0 - 132.62 ) + ( 0 ) ) + ( ( l.mqy ) * ( 0.33333333333333 ) ) , from = ip4;
 mcbyh.5l4.b1, at = -130.273000, from = ip4;
-mbrb.5l4.b1_s..1, at = ( ( 0 - 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip4;
-mbrb.5l4.b1_s..2, at = ( ( 0 - 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip4;
-mbrb.5l4.b1_s, at = ( 0 - 123.684 ) + ( 0 ) , from = ip4;
-mbrb.5l4.b1_s..3, at = ( ( 0 - 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip4;
-mbrb.5l4.b1_s..4, at = ( ( 0 - 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip4;
-mbrs.5l4.b1_s..1, at = ( ( 0 - 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip4;
-mbrs.5l4.b1_s..2, at = ( ( 0 - 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip4;
-mbrs.5l4.b1_s, at = ( 0 - 51.783 ) + ( 0 ) , from = ip4;
-mbrs.5l4.b1_s..3, at = ( ( 0 - 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip4;
-mbrs.5l4.b1_s..4, at = ( ( 0 - 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip4;
+mbrb.5l4.b1..1, at = ( ( 0 - 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip4;
+mbrb.5l4.b1..2, at = ( ( 0 - 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip4;
+mbrb.5l4.b1, at = ( 0 - 123.684 ) + ( 0 ) , from = ip4;
+mbrb.5l4.b1..3, at = ( ( 0 - 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip4;
+mbrb.5l4.b1..4, at = ( ( 0 - 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.l4 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip4;
+mbrs.5l4.b1..1, at = ( ( 0 - 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip4;
+mbrs.5l4.b1..2, at = ( ( 0 - 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip4;
+mbrs.5l4.b1, at = ( 0 - 51.783 ) + ( 0 ) , from = ip4;
+mbrs.5l4.b1..3, at = ( ( 0 - 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip4;
+mbrs.5l4.b1..4, at = ( ( 0 - 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.l4 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip4;
 acnca.d5l4.b1, at = -41.834000, from = ip4;
 acnca.c5l4.b1, at = -39.834000, from = ip4;
 acnca.b5l4.b1, at = -36.372000, from = ip4;
@@ -11607,20 +11607,20 @@ mu.a5r4.b1, at = 45.631000, from = ip4;
 mu.b5r4.b1, at = 45.771000, from = ip4;
 mu.c5r4.b1, at = 45.911000, from = ip4;
 mu.d5r4.b1, at = 46.051000, from = ip4;
-mbrs.5r4.b1_s..1, at = ( ( 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip4;
-mbrs.5r4.b1_s..2, at = ( ( 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip4;
-mbrs.5r4.b1_s, at = ( 51.783 ) + ( 0 ) , from = ip4;
-mbrs.5r4.b1_s..3, at = ( ( 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip4;
-mbrs.5r4.b1_s..4, at = ( ( 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip4;
+mbrs.5r4.b1..1, at = ( ( 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip4;
+mbrs.5r4.b1..2, at = ( ( 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip4;
+mbrs.5r4.b1, at = ( 51.783 ) + ( 0 ) , from = ip4;
+mbrs.5r4.b1..3, at = ( ( 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip4;
+mbrs.5r4.b1..4, at = ( ( 51.783 ) + ( 0 ) ) + ( ( ( l.mbrs ) * ( 1.0 / sinc ( 0 - ad3.r4 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip4;
 bsrta.5r4.b1: bsrta, at = 58.781000, from = ip4,slot_id:= 635738,mech_sep:= -0.404000;
 bsrtm.5r4.b1: bsrtm, at = 73.081000, from = ip4,slot_id:= 635739,mech_sep:= -0.376000;
 bws.5r4.b1: bws, at = 84.876000, from = ip4,slot_id:= 642430,mech_sep:= -0.318000;
 bqsv.5r4.b1: bqsv, at = 116.109000, from = ip4,slot_id:= 635695,mech_sep:= -0.216000;
-mbrb.5r4.b1_s..1, at = ( ( 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip4;
-mbrb.5r4.b1_s..2, at = ( ( 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip4;
-mbrb.5r4.b1_s, at = ( 123.684 ) + ( 0 ) , from = ip4;
-mbrb.5r4.b1_s..3, at = ( ( 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip4;
-mbrb.5r4.b1_s..4, at = ( ( 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip4;
+mbrb.5r4.b1..1, at = ( ( 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip4;
+mbrb.5r4.b1..2, at = ( ( 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip4;
+mbrb.5r4.b1, at = ( 123.684 ) + ( 0 ) , from = ip4;
+mbrb.5r4.b1..3, at = ( ( 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip4;
+mbrb.5r4.b1..4, at = ( ( 123.684 ) + ( 0 ) ) + ( ( ( l.mbrb ) * ( 1.0 / sinc ( ad4.r4 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip4;
 mcbyv.5r4.b1, at = 130.273000, from = ip4;
 mqy.5r4.b1..1, at = ( ( 132.62 ) + ( 0 ) ) + ( ( l.mqy ) * ( 0 - 0.33333333333333 ) ) , from = ip4;
 mqy.5r4.b1, at = ( 132.62 ) + ( 0 ) , from = ip4;
@@ -12423,11 +12423,11 @@ mqy.4l5.b1..2, at = ( ( 0 - 169.553 ) + ( 0 ) ) + ( ( l.mqy ) * ( 0.333333333333
 mcbyh.b4l5.b1, at = -167.031000, from = ip5;
 mcbyv.4l5.b1, at = -165.735000, from = ip5;
 mcbyh.a4l5.b1, at = -164.439000, from = ip5;
-mbrc.4l5.b1_s..1, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip5;
-mbrc.4l5.b1_s..2, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip5;
-mbrc.4l5.b1_s, at = ( 0 - 157.9 ) + ( 0 ) , from = ip5;
-mbrc.4l5.b1_s..3, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip5;
-mbrc.4l5.b1_s..4, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip5;
+mbrc.4l5.b1..1, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip5;
+mbrc.4l5.b1..2, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip5;
+mbrc.4l5.b1, at = ( 0 - 157.9 ) + ( 0 ) , from = ip5;
+mbrc.4l5.b1..3, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip5;
+mbrc.4l5.b1..4, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l5 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip5;
 bpmwb.4l5.b1: bpmwb, at = -151.094500, from = ip5,slot_id:= 104608,mech_sep:= -0.174000;
 tcth.4l5.b1, at = ( 0 - 147.52 ) + ( 0 ) , from = ip5;
 tctva.4l5.b1: tctva, at = -145.840000, from = ip5,slot_id:= 377607,mech_sep:= -0.166700;
@@ -12435,12 +12435,12 @@ tanc.4l5: tanc, at = -142.750000, from = ip5,slot_id:= 103042,mech_sep:= 0.00000
 x5zdc.b4l5, at = -141.612500, from = ip5;
 brana.4l5: brana, at = -141.175000, from = ip5,slot_id:= 883709,assembly_id:= 103042,mech_sep:= 0.000000;
 x5zdc.a4l5, at = -141.062500, from = ip5;
-mbxw.f4l5_s, at = ( 0 - 82.652 ) + ( 0 ) , from = ip5;
-mbxw.e4l5_s, at = ( 0 - 78.386 ) + ( 0 ) , from = ip5;
-mbxw.d4l5_s, at = ( 0 - 74.12 ) + ( 0 ) , from = ip5;
-mbxw.c4l5_s, at = ( 0 - 69.854 ) + ( 0 ) , from = ip5;
-mbxw.b4l5_s, at = ( 0 - 65.588 ) + ( 0 ) , from = ip5;
-mbxw.a4l5_s, at = ( 0 - 61.322 ) + ( 0 ) , from = ip5;
+mbxw.f4l5, at = ( 0 - 82.652 ) + ( 0 ) , from = ip5;
+mbxw.e4l5, at = ( 0 - 78.386 ) + ( 0 ) , from = ip5;
+mbxw.d4l5, at = ( 0 - 74.12 ) + ( 0 ) , from = ip5;
+mbxw.c4l5, at = ( 0 - 69.854 ) + ( 0 ) , from = ip5;
+mbxw.b4l5, at = ( 0 - 65.588 ) + ( 0 ) , from = ip5;
+mbxw.a4l5, at = ( 0 - 61.322 ) + ( 0 ) , from = ip5;
 bpmsy.4l5.b1: bpmsy, at = -58.314500, from = ip5,slot_id:= 104609,mech_sep:= 0.000000;
 dfbxe.3l5, at = -56.427000, from = ip5;
 mcosx.3l5: mcosx, at = -54.297000, from = ip5,polarity:= 1.000000,ksl:={ 0.000000, 0.000000, 0.000000,kcosx3.l5 * l.mcosx },slot_id:= 282246,assembly_id:= 103044,mech_sep:= 0.000000;
@@ -12520,12 +12520,12 @@ mcox.3r5: mcox, at = 54.297000, from = ip5,polarity:= 1.000000,knl:={ 0.000000, 
 mcssx.3r5: mcssx, at = 54.297000, from = ip5,polarity:= 1.000000,ksl:={ 0.000000, 0.000000,kcssx3.r5 * l.mcssx },slot_id:= 282247,assembly_id:= 103051,mech_sep:= 0.000000;
 dfbxf.3r5, at = 56.427000, from = ip5;
 bpmsy.4r5.b1: bpmsy, at = 58.314500, from = ip5,slot_id:= 104612,mech_sep:= 0.000000;
-mbxw.a4r5_s, at = ( 61.322 ) + ( 0 ) , from = ip5;
-mbxw.b4r5_s, at = ( 65.588 ) + ( 0 ) , from = ip5;
-mbxw.c4r5_s, at = ( 69.854 ) + ( 0 ) , from = ip5;
-mbxw.d4r5_s, at = ( 74.12 ) + ( 0 ) , from = ip5;
-mbxw.e4r5_s, at = ( 78.386 ) + ( 0 ) , from = ip5;
-mbxw.f4r5_s, at = ( 82.652 ) + ( 0 ) , from = ip5;
+mbxw.a4r5, at = ( 61.322 ) + ( 0 ) , from = ip5;
+mbxw.b4r5, at = ( 65.588 ) + ( 0 ) , from = ip5;
+mbxw.c4r5, at = ( 69.854 ) + ( 0 ) , from = ip5;
+mbxw.d4r5, at = ( 74.12 ) + ( 0 ) , from = ip5;
+mbxw.e4r5, at = ( 78.386 ) + ( 0 ) , from = ip5;
+mbxw.f4r5, at = ( 82.652 ) + ( 0 ) , from = ip5;
 x5zdc.b4r5, at = 141.062500, from = ip5;
 brana.4r5: brana, at = 141.175000, from = ip5,slot_id:= 883604,assembly_id:= 103053,mech_sep:= 0.000000;
 x5zdc.a4r5, at = 141.612500, from = ip5;
@@ -12537,11 +12537,11 @@ xrph.b4r5.b1: xrph, at = 150.027000, from = ip5,slot_id:= 826637,assembly_id:= 8
 xrpv.b4r5.b1: xrpv, at = 150.476000, from = ip5,slot_id:= 826649,assembly_id:= 825715,mech_sep:= 0.194000;
 bpmwt.b4r5.b1: bpmwt, at = 150.701000, from = ip5,slot_id:= 826625,assembly_id:= 825715,mech_sep:= 0.175800;
 bpmwb.4r5.b1: bpmwb, at = 151.094500, from = ip5,slot_id:= 181643,mech_sep:= 0.174000;
-mbrc.4r5.b1_s..1, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip5;
-mbrc.4r5.b1_s..2, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip5;
-mbrc.4r5.b1_s, at = ( 157.9 ) + ( 0 ) , from = ip5;
-mbrc.4r5.b1_s..3, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip5;
-mbrc.4r5.b1_s..4, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip5;
+mbrc.4r5.b1..1, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip5;
+mbrc.4r5.b1..2, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip5;
+mbrc.4r5.b1, at = ( 157.9 ) + ( 0 ) , from = ip5;
+mbrc.4r5.b1..3, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip5;
+mbrc.4r5.b1..4, at = ( ( 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.r5 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip5;
 mcbyv.a4r5.b1, at = 164.439000, from = ip5;
 mcbyh.4r5.b1, at = 165.735000, from = ip5;
 mcbyv.b4r5.b1, at = 167.031000, from = ip5;
@@ -14171,8 +14171,8 @@ mqtlh.a6l7.b1, at = ( 0 - 224.966 ) + ( 0 ) , from = ip7;
 mqtlh.a6l7.b1..2, at = ( ( 0 - 224.966 ) + ( 0 ) ) + ( ( l.mqtlh ) * ( 0.33333333333333 ) ) , from = ip7;
 mcbch.6l7.b1, at = -223.675000, from = ip7;
 bpmwc.6l7.b1: bpmwc, at = -221.510500, from = ip7,slot_id:= 181644,mech_sep:= 0.194000;
-mbw.d6l7.b1_s, at = ( 0 - 214.413 ) + ( 0 ) , from = ip7;
-mbw.c6l7.b1_s, at = ( 0 - 210.178 ) + ( 0 ) , from = ip7;
+mbw.d6l7.b1, at = ( 0 - 214.413 ) + ( 0 ) , from = ip7;
+mbw.c6l7.b1, at = ( 0 - 210.178 ) + ( 0 ) , from = ip7;
 tcp.d6l7.b1, at = ( 0 - 204.978 ) + ( 0 ) , from = ip7;
 tcp.c6l7.b1, at = ( 0 - 202.978 ) + ( 0 ) , from = ip7;
 tcp.b6l7.b1, at = ( 0 - 200.978 ) + ( 0 ) , from = ip7;
@@ -14181,9 +14181,9 @@ tchsv.6l7.b1, at = ( 0 - 197.378 ) + ( 0 ) , from = ip7;
 tchsh.6l7.b1, at = ( 0 - 196.178 ) + ( 0 ) , from = ip7;
 tchss.6l7.b1, at = ( 0 - 194.978 ) + ( 0 ) , from = ip7;
 tcapa.6l7.b1, at = ( 0 - 177.9735 ) + ( 0 ) , from = ip7;
-mbw.b6l7.b1_s, at = ( 0 - 175.0235 ) + ( 0 ) , from = ip7;
+mbw.b6l7.b1, at = ( 0 - 175.0235 ) + ( 0 ) , from = ip7;
 tcapb.6l7.b1, at = ( 0 - 172.4885 ) + ( 0 ) , from = ip7;
-mbw.a6l7.b1_s, at = ( 0 - 170.0885 ) + ( 0 ) , from = ip7;
+mbw.a6l7.b1, at = ( 0 - 170.0885 ) + ( 0 ) , from = ip7;
 tcsg.b6l7.b1, at = ( 0 - 165.4835 ) + ( 0 ) , from = ip7;
 tcsm.b6l7.b1, at = ( 0 - 163.4835 ) + ( 0 ) , from = ip7;
 tcsg.a6l7.b1, at = ( 0 - 161.4835 ) + ( 0 ) , from = ip7;
@@ -14303,11 +14303,11 @@ bpmwe.5r7.b1: bpmwe003, at = 144.380500, from = ip7,slot_id:= 182524,mech_sep:= 
 tcsg.6r7.b1, at = ( 146.861 ) + ( 0 ) , from = ip7;
 tcsm.6r7.b1, at = ( 148.861 ) + ( 0 ) , from = ip7;
 tcla.a6r7.b1, at = ( 153.927 ) + ( 0 ) , from = ip7;
-mbw.a6r7.b1_s, at = ( 170.0885 ) + ( 0 ) , from = ip7;
-mbw.b6r7.b1_s, at = ( 175.0235 ) + ( 0 ) , from = ip7;
+mbw.a6r7.b1, at = ( 170.0885 ) + ( 0 ) , from = ip7;
+mbw.b6r7.b1, at = ( 175.0235 ) + ( 0 ) , from = ip7;
 tcla.b6r7.b1, at = ( 184.801 ) + ( 0 ) , from = ip7;
-mbw.c6r7.b1_s, at = ( 210.178 ) + ( 0 ) , from = ip7;
-mbw.d6r7.b1_s, at = ( 214.413 ) + ( 0 ) , from = ip7;
+mbw.c6r7.b1, at = ( 210.178 ) + ( 0 ) , from = ip7;
+mbw.d6r7.b1, at = ( 214.413 ) + ( 0 ) , from = ip7;
 tcla.c6r7.b1, at = ( 218.07 ) + ( 0 ) , from = ip7;
 tcla.d6r7.b1, at = ( 220.07 ) + ( 0 ) , from = ip7;
 bpmr.6r7.b1: bpmr, at = 223.596000, from = ip7,slot_id:= 378033,assembly_id:= 103537,mech_sep:= 0.194000;
@@ -15129,22 +15129,22 @@ mqy.a4l8.b1..2, at = ( ( 0 - 137.59 ) + ( 0 ) ) + ( ( l.mqy ) * ( 0.333333333333
 mcbyv.b4l8.b1, at = -135.243000, from = ip8;
 mcbyh.4l8.b1, at = -134.096000, from = ip8;
 mcbyv.a4l8.b1, at = -132.950000, from = ip8;
-mbrc.4l8.b1_s..1, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip8;
-mbrc.4l8.b1_s..2, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip8;
-mbrc.4l8.b1_s, at = ( 0 - 126.403 ) + ( 0 ) , from = ip8;
-mbrc.4l8.b1_s..3, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip8;
-mbrc.4l8.b1_s..4, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip8;
+mbrc.4l8.b1..1, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip8;
+mbrc.4l8.b1..2, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip8;
+mbrc.4l8.b1, at = ( 0 - 126.403 ) + ( 0 ) , from = ip8;
+mbrc.4l8.b1..3, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip8;
+mbrc.4l8.b1..4, at = ( ( 0 - 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( ad2.l8 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip8;
 bpmwb.4l8.b1: bpmwb, at = -119.673500, from = ip8,slot_id:= 181645,mech_sep:= 0.174000;
 tcth.4l8.b1, at = ( 0 - 118.233 ) + ( 0 ) , from = ip8;
 branb.4l8: branb, at = -114.108000, from = ip8,slot_id:= 377641,mech_sep:= 0.000000;
 tclia.4l8, at = ( 0 - 76.008 ) + ( 0 ) , from = ip8;
 tctvb.4l8, at = ( 0 - 73.748 ) + ( 0 ) , from = ip8;
 bpmsx.4l8.b1: bpmsx, at = -69.440500, from = ip8,slot_id:= 104616,mech_sep:= 0.000000;
-mbx.4l8_s..1, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip8;
-mbx.4l8_s..2, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip8;
-mbx.4l8_s, at = ( 0 - 63.108 ) + ( 0 ) , from = ip8;
-mbx.4l8_s..3, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip8;
-mbx.4l8_s..4, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip8;
+mbx.4l8..1, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip8;
+mbx.4l8..2, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip8;
+mbx.4l8, at = ( 0 - 63.108 ) + ( 0 ) , from = ip8;
+mbx.4l8..3, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip8;
+mbx.4l8..4, at = ( ( 0 - 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( 0 - ad1.l8 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip8;
 dfbxg.3l8, at = -56.308500, from = ip8;
 mcosx.3l8: mcosx, at = -54.297000, from = ip8,polarity:= 1.000000,ksl:={ 0.000000, 0.000000, 0.000000,kcosx3.l8 * l.mcosx },slot_id:= 282252,assembly_id:= 103756,mech_sep:= 0.000000;
 mcox.3l8: mcox, at = -54.297000, from = ip8,polarity:= 1.000000,knl:={ 0.000000, 0.000000, 0.000000,kcox3.l8 * l.mcox },slot_id:= 282251,assembly_id:= 103756,mech_sep:= 0.000000;
@@ -15220,22 +15220,22 @@ mcosx.3r8: mcosx, at = 54.297000, from = ip8,polarity:= 1.000000,ksl:={ 0.000000
 mcox.3r8: mcox, at = 54.297000, from = ip8,polarity:= 1.000000,knl:={ 0.000000, 0.000000, 0.000000,kcox3.r8 * l.mcox },slot_id:= 282254,assembly_id:= 103761,mech_sep:= 0.000000;
 mcssx.3r8: mcssx, at = 54.297000, from = ip8,polarity:= 1.000000,ksl:={ 0.000000, 0.000000,kcssx3.r8 * l.mcssx },slot_id:= 282253,assembly_id:= 103761,mech_sep:= 0.000000;
 dfbxh.3r8, at = 56.308500, from = ip8;
-mbx.4r8_s..1, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip8;
-mbx.4r8_s..2, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip8;
-mbx.4r8_s, at = ( 63.108 ) + ( 0 ) , from = ip8;
-mbx.4r8_s..3, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip8;
-mbx.4r8_s..4, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip8;
+mbx.4r8..1, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip8;
+mbx.4r8..2, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip8;
+mbx.4r8, at = ( 63.108 ) + ( 0 ) , from = ip8;
+mbx.4r8..3, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip8;
+mbx.4r8..4, at = ( ( 63.108 ) + ( 0 ) ) + ( ( ( l.mbx ) * ( 1.0 / sinc ( ad1.r8 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip8;
 bpmsx.4r8.b1: bpmsx, at = 69.440500, from = ip8,slot_id:= 104619,mech_sep:= 0.000000;
 tcddm.4r8, at = ( 71.358 ) + ( 0 ) , from = ip8;
 tctvb.4r8, at = ( 73.748 ) + ( 0 ) , from = ip8;
 btvst.a4r8: btvst064, at = 85.441000, from = ip8,slot_id:= 181630,mech_sep:= -0.080000;
 branb.4r8: branb, at = 114.108000, from = ip8,slot_id:= 377644,mech_sep:= 0.000000;
 bpmwb.4r8.b1: bpmwb, at = 119.597500, from = ip8,slot_id:= 181646,mech_sep:= -0.174000;
-mbrc.4r8.b1_s..1, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip8;
-mbrc.4r8.b1_s..2, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip8;
-mbrc.4r8.b1_s, at = ( 126.403 ) + ( 0 ) , from = ip8;
-mbrc.4r8.b1_s..3, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip8;
-mbrc.4r8.b1_s..4, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip8;
+mbrc.4r8.b1..1, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip8;
+mbrc.4r8.b1..2, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip8;
+mbrc.4r8.b1, at = ( 126.403 ) + ( 0 ) , from = ip8;
+mbrc.4r8.b1..3, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip8;
+mbrc.4r8.b1..4, at = ( ( 126.403 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.r8 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip8;
 mcbyh.a4r8.b1, at = 132.950000, from = ip8;
 mcbyv.4r8.b1, at = 134.096000, from = ip8;
 mcbyh.b4r8.b1, at = 135.243000, from = ip8;
@@ -16052,11 +16052,11 @@ mqy.4l1.b1..2, at = ( ( 0 - 169.553 ) + ( 0 ) ) + ( ( l.mqy ) * ( 0.333333333333
 mcbyh.b4l1.b1, at = -167.031000, from = ip1.l1;
 mcbyv.4l1.b1, at = -165.735000, from = ip1.l1;
 mcbyh.a4l1.b1, at = -164.439000, from = ip1.l1;
-mbrc.4l1.b1_s..1, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip1.l1;
-mbrc.4l1.b1_s..2, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip1.l1;
-mbrc.4l1.b1_s, at = ( 0 - 157.9 ) + ( 0 ) , from = ip1.l1;
-mbrc.4l1.b1_s..3, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip1.l1;
-mbrc.4l1.b1_s..4, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip1.l1;
+mbrc.4l1.b1..1, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) * ( 0 - 0.4 ) ) , from = ip1.l1;
+mbrc.4l1.b1..2, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) * ( 0 - 0.13333333333333 ) ) , from = ip1.l1;
+mbrc.4l1.b1, at = ( 0 - 157.9 ) + ( 0 ) , from = ip1.l1;
+mbrc.4l1.b1..3, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) * ( 0.13333333333333 ) ) , from = ip1.l1;
+mbrc.4l1.b1..4, at = ( ( 0 - 157.9 ) + ( 0 ) ) + ( ( ( l.mbrc ) * ( 1.0 / sinc ( 0 - ad2.l1 * 0.5 ) ) ) * ( 0.4 ) ) , from = ip1.l1;
 bpmwb.4l1.b1: bpmwb, at = -151.094500, from = ip1.l1,slot_id:= 104621,mech_sep:= -0.174000;
 tcth.4l1.b1, at = ( 0 - 147.52 ) + ( 0 ) , from = ip1.l1;
 tctva.4l1.b1: tctva, at = -145.840000, from = ip1.l1,slot_id:= 377650,mech_sep:= -0.166700;
@@ -16064,12 +16064,12 @@ tanal.4l1: tanal, at = -142.750000, from = ip1.l1,slot_id:= 103988,mech_sep:= 0.
 x1zdc.a4l1, at = -141.700000, from = ip1.l1;
 brana.4l1: brana, at = -141.350000, from = ip1.l1,slot_id:= 883499,assembly_id:= 103988,mech_sep:= 0.000000;
 x1fcl.4l1: x1fcl, at = -141.150000, from = ip1.l1,slot_id:= 378051,assembly_id:= 103988,mech_sep:= 0.000000;
-mbxw.f4l1_s, at = ( 0 - 82.652 ) + ( 0 ) , from = ip1.l1;
-mbxw.e4l1_s, at = ( 0 - 78.386 ) + ( 0 ) , from = ip1.l1;
-mbxw.d4l1_s, at = ( 0 - 74.12 ) + ( 0 ) , from = ip1.l1;
-mbxw.c4l1_s, at = ( 0 - 69.854 ) + ( 0 ) , from = ip1.l1;
-mbxw.b4l1_s, at = ( 0 - 65.588 ) + ( 0 ) , from = ip1.l1;
-mbxw.a4l1_s, at = ( 0 - 61.322 ) + ( 0 ) , from = ip1.l1;
+mbxw.f4l1, at = ( 0 - 82.652 ) + ( 0 ) , from = ip1.l1;
+mbxw.e4l1, at = ( 0 - 78.386 ) + ( 0 ) , from = ip1.l1;
+mbxw.d4l1, at = ( 0 - 74.12 ) + ( 0 ) , from = ip1.l1;
+mbxw.c4l1, at = ( 0 - 69.854 ) + ( 0 ) , from = ip1.l1;
+mbxw.b4l1, at = ( 0 - 65.588 ) + ( 0 ) , from = ip1.l1;
+mbxw.a4l1, at = ( 0 - 61.322 ) + ( 0 ) , from = ip1.l1;
 bpmsy.4l1.b1: bpmsy, at = -58.314500, from = ip1.l1,slot_id:= 104622,mech_sep:= 0.000000;
 dfbxa.3l1, at = -56.427000, from = ip1.l1;
 mcosx.3l1: mcosx, at = -54.297000, from = ip1.l1,polarity:= 1.000000,ksl:={ 0.000000, 0.000000, 0.000000,kcosx3.l1 * l.mcosx },slot_id:= 282258,assembly_id:= 103990,mech_sep:= 0.000000;

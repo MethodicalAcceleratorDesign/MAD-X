@@ -14,13 +14,9 @@ select,flag=twiss,column=name,s,betx,alfx,dx,dpx,bety,alfy,dy,dpy,mux,muy,aperty
 twiss,sequence=fivecell,file="fivecell_thick.tfs";
 
 !--- quads
-! select, flag=makethin, class=quadrupole, slice= 100; ! slice all quadrupoles
-! select, flag=makethin, class=quadrupole, slice= 0; ! turn quad slicing off
   select, flag=makethin, class=quadrupole, thick=true;
 
 !--- bends
-! select, flag=makethin, class="rbend", slice=0;    ! bend slicing off --- use this to test only quadrupole slicing   or at least use makedipedge
-! select, flag=makethin, class="rbend", slice=2;    ! negative drift with dipedge      refer=centre    problem,   ok with flatten
   select, flag=makethin, class="rbend", slice=1;
 
 makethin,sequence=fivecell,style=teapot,makedipedge=true;
@@ -31,9 +27,9 @@ twiss,sequence=fivecell,file="fivecell_thin.tfs";
 save,sequence=fivecell,file="fivecell_thin.seq";
 use,sequence=fivecell;
 
-!--- check that the sliced sequence is quitable for SIXTRACK translation  http://mad.web.cern.ch/mad/madx.old/c6t/c6t.html
+!--- check that the sliced sequence is suitable for SIXTRACK translation  http://mad.web.cern.ch/mad/madx.old/c6t/c6t.html
 
-sixtrack;
+sixtrack, aperture;
 
 !--- test MAD-X tracking   http://mad.web.cern.ch/mad/madx.old/thintrack/thintrack.html
 track, onepass, dump; ! onepass=true no closed orbit computed before tracking

@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.01  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.04.25      +
-  + Execution Time Stamp: 11.06.14 14.03.02 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.07  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2015.09.24               +
+  + Execution date: 2015.11.03 19:47:07      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 ang:=-PI/2;             !     0.000974144    -0.00864182        before bug fix was   0.000974144       -1.41323
 
 
@@ -66,7 +66,7 @@ final orbit vector:     1.799465E-19  1.693624E-19  7.061250E-03 -2.776802E-03 -
 
 
 
-makethin, sequence=SingleBend, style=collim;
+makethin, sequence=SingleBend, style=collim, makedipedge=false;
 
 makethin: style chosen : collim
 makethin: slicing sequence : singlebend
@@ -117,5 +117,5 @@ stop;
 2 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.01 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

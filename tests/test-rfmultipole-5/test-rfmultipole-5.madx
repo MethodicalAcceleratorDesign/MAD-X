@@ -16,8 +16,8 @@ beam, energy=5, npart=bunchcharge,
 !!!
 
 k:=(pi);
-rfm1 : rfmultipole, l=0.0, knl:={0,  (2), (3)}, ksl:={0, -(5), -(7) }, tilt=0.456,  freq=12, pnl:={ 0, 0, 0,0,0,0,0,0,0 }, psl:={0,0,0,0,0,0,0,0};
-m1   : multipole, l=0.0, knl:={0,  (2), (3)}, ksl:={0, -(5), -(7) }, tilt=0.123;
+rfm1 : rfmultipole, l=0.0, knl:={0,  (2), (3)}, ksl:={0, -0.1, -7 }, tilt=0.456,  freq=12, pnl:={ 0, 0, 0,0,0,0,0,0,0 }, psl:={0,0,0,0,0,0,0,0};
+m1   : multipole, l=0.0, knl:={0,  (2), (3)}, ksl:={0, -0.1, -7 }, tilt=0.123;
 
 test_line: sequence, refer=entry, l=1.0;
 rfm1: rfm1, at=0.0;

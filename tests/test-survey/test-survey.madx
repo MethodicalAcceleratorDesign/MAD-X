@@ -34,7 +34,7 @@ survey,psi0=0.0,file="test-survey_1.tfs";
 !  x(dip3) = -19.098593   , z(dip3) =  19.098593        *
 !  x(dip6) = -38.19718634 , z(dip6) = -3.948578443e-12  *
 !********************************************************
-makethin,sequence=musr,style=hybrid;
+makethin,sequence=musr,style=hybrid, makedipedge=false;
 use,period=musr;
 select,flag=survey,clear;
 select,flag=survey,column=name,keyword,l,angle,x,z,theta;

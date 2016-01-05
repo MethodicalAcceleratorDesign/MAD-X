@@ -25,9 +25,9 @@
 @ N1MIN            %le   4.85602
 @ AT_ELEMENT       %05s  "MQ1:1"
 @ TITLE            %25s "LHC Cell APERTURE example"
-@ ORIGIN           %17s "5.02.04 Darwin 64"
-@ DATE             %08s "10/03/15"
-@ TIME             %08s "10.39.48"
+@ ORIGIN           %17s "5.02.07 Darwin 64"
+@ DATE             %08s "20/11/15"
+@ TIME             %08s "15.53.55"
 * NAME                       S      BETX      BETY        DX         X         Y        N1 APERTYPE              APER_1    APER_2    APER_3    APER_4      XTOL      YTOL      RTOL 
 $ %s                       %le       %le       %le       %le       %le       %le       %le %s                       %le       %le       %le       %le       %le       %le       %le 
  "LHCCELL$START"       0.00000 177.45326  32.26597   2.18636   0.00000   0.00000 999999.00000 "CIRCLE"              0.00000   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000
