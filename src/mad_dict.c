@@ -22,6 +22,15 @@
 /*  J. Beringer et al. (Particle Data Group), Phys. Rev. D86, 010001 (2012). = PDG 2012 */
 /*  K.A. Olive et al. (Particle Data Group), Chin. Phys. C, 38, 090001 (2014). = PDG2014 */
 char constant_def[] =
+
+#define mkstr(a)  mkstr_(a)
+#define mkstr_(a) #a
+
+"const version = " mkstr(_VERSION_NUM) "; "
+
+#undef mkstr
+#undef mkstr_
+
 "const pi = 4 * atan(1.); "
 "const twopi = 2 * pi; "
 "const degrad = 180 / pi; "
@@ -268,19 +277,20 @@ char command_def[] =
 "dummy    = [s, 0]; "
 " "
 "option: control none 0 0 "
-"echo      = [l, true, true], "
-"echomacro = [l, false, true], " /* ld */
-"info      = [l, true, true], "
-"reset     = [l, false, true], "
-"debug     = [l, false, true], "
-"verbose   = [l, false, true], " /*hbu */
-"rbarc     = [l, true, true], "
-"thin_foc  = [l, true, true], "
-"sympl     = [l, true, true], "
-"tell      = [l, false, true], "
-"threader  = [l, false, true], "
-"trace     = [l, false, true], "
-"verify    = [l, false, true], "
+"echo       = [l, true, true], "
+"echomacro  = [l, false, true], " /* ld */
+"echosystem = [l, false, true], " /* ld */
+"info       = [l, true, true], "
+"reset      = [l, false, true], "
+"debug      = [l, false, true], "
+"verbose    = [l, false, true], " /*hbu */
+"rbarc      = [l, true, true], "
+"thin_foc   = [l, true, true], "
+"sympl      = [l, true, true], "
+"tell       = [l, false, true], "
+"threader   = [l, false, true], "
+"trace      = [l, false, true], "
+"verify     = [l, false, true], "
 "no_fatal_stop= [l, false, true], "
 "twiss_print  = [l, true, true], "
 "warn     = [l, true, true], "
@@ -1771,6 +1781,7 @@ char command_def[] =
 "type     = [s, none, none], "
 "apertype = [s, circle, circle], "
 "aperture = [r, {0}], "
+"aper_offset = [r, {0}], " /*hbu */
 "aper_tol = [r, {0, 0, 0}], "
 "slot_id  = [i, none], "
 "assembly_id = [i, none], "
@@ -2463,7 +2474,8 @@ char command_def[] =
 "makedipedge = [l, true, true], "
   /* "verbose = [l, false, true], " will replace the "option, verbose" used only by makethin */
 "makeconsistent = [l, false, true],  " /*hbu */
-"minimizeparents = [l, true, false]; " /*hbu */
+"minimizeparents = [l, true, false], " /*hbu */
+"makeendmarkers = [l, false, true];  " /*hbu */
 
 " "
 "survey: survey none 0 0 "

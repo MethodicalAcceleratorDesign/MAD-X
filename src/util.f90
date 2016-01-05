@@ -160,47 +160,55 @@ module bbfi
   integer :: bbd_loc(bbd_max)=0,bbd_cnt=0,bbd_flag=0,bbd_pos=0
   double precision :: bb_kick(2,bbd_max)=0.d0
 end module bbfi
+
 module deltrafi
   implicit none
   public
   logical :: dorad=.false.,dodamp=.false.,dorand=.false.,fastune=.false.
   double precision :: deltax=0.d0
 end module deltrafi
+
 module dyntabfi
   implicit none
   public
   double precision :: dynapfrac=0.d0,dktrturns=0.d0,xend=0.d0,pxend=0.d0,&
        yend=0.d0,pyend=0.d0,tend=0.d0,ptend=0.d0,smear=0.d0,yapunov=0.d0
 end module dyntabfi
+
 module wmaxmin0fi
   implicit none
   public
   double precision :: wxmax=0.d0,wxmin=0.d0,wymax=0.d0,wymin=0.d0,&
        wxymax=0.d0,wxymin=0.d0
 end module wmaxmin0fi
+
 module tunesfi
   implicit none
   public
   double precision :: x0=0.d0,y0=0.d0,tunx=0.d0,tuny=0.d0,dtune=0.d0
 end module tunesfi
+
 module twiss0fi
   implicit none
   public
   integer align_max,fundim
   parameter(align_max=14,fundim = 74)
 end module twiss0fi
+
 module twissafi
   implicit none
   public
   character(48) :: table_name=' ',sectorTableName=' '
   logical :: match_is_on=.false.
 end module twissafi
+
 module twisslfi
   implicit none
   public
   logical ::  centre=.false.,centre_cptk=.false.,centre_bttk=.false.,first,&
        rmatrix=.false.,sectormap=.false.,ripken=.false.
 end module twisslfi
+
 module twisscfi
   use twiss0fi
   implicit none
@@ -214,18 +222,21 @@ module twisscfi
        synch_5=0.d0,suml=0.d0,circ=0.d0,eta=0.d0,alfa=0.d0,gamtr=0.d0,qx=0.d0,&
        qy=0.d0,sinmux=0.d0,sinmuy=0.d0,xix=0.d0,xiy=0.d0,currpos=0.d0
 end module twisscfi
+
 module twissotmfi
   implicit none
   public
   double precision :: rotm(6,6)=0.d0,rw(6,6)=0.d0,skick(6)=0.d0,sorb(6)=0.d0,&
        srmat(6,6)=0.d0,stmat(6,6,6)=0.d0
 end module twissotmfi
+
 module max_iterate
   implicit none
   public
   integer MAXITER
   parameter(MAXITER=150)
 end module max_iterate
+
 module twiss_elpfi
   implicit none
   public
@@ -277,12 +288,14 @@ module twiss_elpfi
   parameter (k_tilt = 7, k_lrad = 8, k_hkick = 9, k_vkick = 10,      &
        k_chkick = 11, k_cvkick = 12)
 end module twiss_elpfi
+
 module emitfi
   implicit none
   public
   double precision :: qx=0.d0,qy=0.d0,qs=0.d0,cg=0.d0,sum(3)=0.d0,sumu0=0.d0
   save qx, qy, qs, cg,sum,sumu0
 end module emitfi
+
 module twtrrfi
   implicit none
   public
@@ -290,6 +303,7 @@ module twtrrfi
   integer maxmul,maxferr,maxnaper
   parameter(maxmul=20,maxferr=50,maxnaper=100)
 end module twtrrfi
+
 module ibsdbfi
   implicit none
   public
@@ -299,6 +313,7 @@ module ibsdbfi
        et=0.d0,sigt=0.d0,sige=0.d0,betas=0.d0,beta=0.d0,parnum=0.d0,&
        currnt=0.d0,sigx=0.d0,sigy=0.d0,alfa=0.d0
 end module ibsdbfi
+
 module matchfi
   implicit none
   public
@@ -335,6 +350,7 @@ module touschekfi
        sigt=0.d0,sige=0.d0,betas=0.d0,beta=0.d0,parnum=0.d0,currnt=0.d0,&
        alfa=0.d0,um1=0.d0,deltap=0.d0,fb1=0.d0,fb2=0.d0
 end module touschekfi
+
 module trackfi
   implicit none
   public
@@ -343,6 +359,7 @@ module trackfi
   logical :: dodamp=.false.,dorad=.false.,dorand=.false.,fsecarb=.false.
   save arad,betas,beti,gammas,dtbyds,bet0,bet0i
 end module trackfi
+
 module time_varfi
   use twtrrfi
   use name_lenfi
@@ -368,6 +385,7 @@ module time_varfi
        time_var_p_ind,time_var_c_ind,time_var_m_nt,time_var_p_nt,        &
        time_var_c_nt,time_var_m_ch,time_var_p_ch,time_var_c_ch
 end module time_varfi
+
 module spch_bbfi
   use name_lenfi
   use bbfi
@@ -396,6 +414,7 @@ module spch_bbfi
         rat_bb_n_ions,sigma_t, mean_t,spch_bb_name
   data rat_bb_n_ions / 1d0 /
 end module spch_bbfi
+
 module plotfi
   implicit none
   public
@@ -523,6 +542,7 @@ module plotfi
        vmima,qhval,qvval,estart,eend,horname,tabname,toptitle,plfnam,axlabel,&
        sname,slabl
 end module plotfi
+
 module plot_bfi
   implicit none
   public
@@ -534,6 +554,7 @@ module plot_bfi
   logical :: fpmach=.false.,dpp_flag=.false.,ptc_flag=.false.
   save fpmach,dpp_flag,ptc_flag
 end module plot_bfi
+
 module plot_cfi
   implicit none
   public
@@ -542,6 +563,7 @@ module plot_cfi
 
   double precision :: e2s=0.d0
 end module plot_cfi
+
 module plot_mathfi
   implicit none
   public
@@ -552,12 +574,14 @@ module plot_mathfi
   parameter         (zero = 0.d0, half = 0.5d0, eps = 1.d-5)
   parameter         (one = 1.d0, two = 2.d0, twopi = two * pi)
 end module plot_mathfi
+
 module resindexfi
   implicit none
   public
   integer mnres,mymorder
   parameter (mnres=1000,mymorder=20)
 end module resindexfi
+
 module gxx11_common
   implicit none
   public
@@ -614,6 +638,7 @@ module gxx11_common
   !
   real :: p(madim1,2)=0.,s(madim1)=0.,yy1d(madim1,2)=0.,yy2d(madim1,2)=0.
 end module gxx11_common
+
 module gxx11_aux
   implicit none
   public
@@ -645,6 +670,7 @@ module gxx11_aux
   !     14        marker scale factor
   save    ivals, rvals
 end module gxx11_aux
+
 module fasterror
   implicit none
   logical :: fasterror_on = .false.
@@ -656,20 +682,17 @@ module fasterror
   common /wzcom1/ hrecip, kstep
   common /wzcom2/ wtreal(idim), wtimag(idim)
 end module fasterror
+
 subroutine fort_info(t1, t2)
   implicit none
-
-
   character(*) t1, t2
   integer get_option
   if (get_option('info ') .ne. 0 .and. get_option('warn ') .ne. 0)  &
        print '(a,1x,a,1x,a)', '++++++ info:', t1, t2
 end subroutine fort_info
+
 subroutine fort_warn(t1, t2)
   implicit none
-
-
-
   character(*) t1, t2
   integer get_option
   if (get_option('warn ') .ne. 0) then
@@ -677,8 +700,8 @@ subroutine fort_warn(t1, t2)
      call augmentfwarn()
   endif
 end subroutine fort_warn
-subroutine getclor(orbit0, rt, tt, error)
 
+subroutine getclor(orbit0, rt, tt, error)
   !----------------------------------------------------------------------*
   ! Purpose:
   !   Get periodic closed orbit (e.g. at start of Twiss),
@@ -692,7 +715,6 @@ subroutine getclor(orbit0, rt, tt, error)
   !----------------------------------------------------------------------*
   use twiss0fi
   implicit none
-
   double precision orbit0(6), rt(6,6), tt(6,6,6)
   double precision opt(fundim)
   integer error

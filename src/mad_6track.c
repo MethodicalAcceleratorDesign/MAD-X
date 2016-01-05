@@ -93,7 +93,7 @@
 // types
 
 /* MADX name and internal codes    : 
-   circle=1=CR, rectangle=2=RE, ellipse=3=EL, rectcircle=lhcscreen=4=RL, 
+   circle=1=CR, rectangle=2=RE, ellipse=3=EL, rectcircle=lhcscreen=4=RC, 
    rectellipse=5=RL, racetrack=6=RT, octagon=7=OC */ 
 struct aper_struct {
     int apply;
@@ -515,7 +515,7 @@ add_c6t_drifts(void)
         current_element->name, dl);
       exit(1);
     }
-    else if (dl > eps_9)
+    else if (dl > eps_9) // create an appropriate drift
     {
       af = get_next_name(c, 'd');
       d1 = new_c6t_element(1, c, "drift");
@@ -2306,21 +2306,21 @@ pro_elem(struct node* cnode)
 {
   int i;
   char t_key[KEY_LENGTH];
-  struct c6t_element *tag_element;
+  struct c6t_element *tag_element, *tmp_element;
   double tmp_vk,tmp_hk;
 
   tag_aperture.apply=0;
   /* do the fiddly conversion but skip element if not needed */
   if (make_c6t_element(cnode) == NULL) return;
 
-  if      (strcmp(cnode->base_name, "rbend") == 0) mod_rbend(current_element);
-  else if (strcmp(cnode->base_name, "lcavity") == 0) mod_lcavity(current_element);
-  else if (strcmp(cnode->base_name, "multipole") == 0) mod_multipole(current_element);
-  else if (strcmp(cnode->base_name, "octupole") == 0) mod_octupole(current_element);
-  else if (strcmp(cnode->base_name, "quadrupole") == 0) mod_quadrupole(current_element);
-  else if (strcmp(cnode->base_name, "sextupole") == 0) mod_sextupole(current_element);
-  else if (strcmp(cnode->base_name, "rfcavity") == 0) mod_rfcavity(current_element);
-  else if (strcmp(cnode->base_name, "crabcavity") == 0) mod_crabcavity(current_element);
+  if      (strcmp(cnode->base_name, "rbend") == 0)       mod_rbend(current_element);
+  else if (strcmp(cnode->base_name, "lcavity") == 0)     mod_lcavity(current_element);
+  else if (strcmp(cnode->base_name, "multipole") == 0)   mod_multipole(current_element);
+  else if (strcmp(cnode->base_name, "octupole") == 0)    mod_octupole(current_element);
+  else if (strcmp(cnode->base_name, "quadrupole") == 0)  mod_quadrupole(current_element);
+  else if (strcmp(cnode->base_name, "sextupole") == 0)   mod_sextupole(current_element);
+  else if (strcmp(cnode->base_name, "rfcavity") == 0)    mod_rfcavity(current_element);
+  else if (strcmp(cnode->base_name, "crabcavity") == 0)  mod_crabcavity(current_element);
   else if (strcmp(cnode->base_name, "rfmultipole") == 0) mod_rfmultipole(current_element);
   
   if (strstr(cnode->base_name, "kicker") || strstr(cnode->base_name, "tkicker"))
@@ -2342,11 +2342,9 @@ pro_elem(struct node* cnode)
     strcpy(current_element->name, t_key);
   }
   current_element->position = cnode->position;
-  add_to_ellist(current_element);
 
   /* errors in MADX are stored in the same way as c6t */
-  if (cnode->p_fd_err)
-  {
+  if (cnode->p_fd_err) {
     field_cnt++;
     current_element->nf_err = cnode->p_fd_err->curr;
     current_element->p_fd_err = make_obj("FDDUM",0,FIELD_MAX,0,0);
@@ -2359,8 +2357,8 @@ pro_elem(struct node* cnode)
     current_element->ref_radius = ref_def;
     get_error_refs(current_element);
   }
-  if (cnode->p_al_err)
-  {
+
+  if (cnode->p_al_err) {
     align_cnt++;
     current_element->na_err = cnode->p_al_err->curr;
     current_element->p_al_err = make_obj("ALDUM",0,ALIGN_MAX,0,0);
@@ -2368,53 +2366,81 @@ pro_elem(struct node* cnode)
     for (i=0;i<cnode->p_al_err->curr;i++)
       current_element->p_al_err->a_dble[i] = cnode->p_al_err->a[i];
   }
+
   /* if we have a tilt set the flag */
   ///// AL: WARNING: NOT ALL ELEMENTS STORE "TILT" in value[6]
-  if (current_element->n_values >= 7 && fabs(current_element->value[6]) > zero)
-  {
+  current_element->tilt_err = 0;
+  if (current_element->n_values >= 7 && fabs(current_element->value[6]) > zero) {
     align_cnt++;
     current_element->tilt_err = 1;
   }
-  else
-  {
-    current_element->tilt_err = 0;
-  }
-
-  /* add aperture element if necessary */
-  if (tag_aperture.apply == 1)
-  {
-    char keyword[3]="00"; 
+  
+  // store the aperture type as keyword
+  char keyword[3]="00";
+  if (tag_aperture.apply == 1 ) {    
     if      (0 == strcmp(tag_aperture.style,"circle"))      strcpy(keyword, "CR"); 
     else if (0 == strcmp(tag_aperture.style,"ellipse"))     strcpy(keyword, "EL");  
     else if (0 == strcmp(tag_aperture.style,"rectangle"))   strcpy(keyword, "RE");   
     else if (0 == strcmp(tag_aperture.style,"rectcircle") ||  
-    	     0 == strcmp(tag_aperture.style,"lhcscreen"))   strcpy(keyword, "RC");    
+	     0 == strcmp(tag_aperture.style,"lhcscreen"))   strcpy(keyword, "RC");    
     else if (0 == strcmp(tag_aperture.style,"rectellipse")) strcpy(keyword, "RL");    
     else if (0 == strcmp(tag_aperture.style,"racetrack"))   strcpy(keyword, "RT");    
     else if (0 == strcmp(tag_aperture.style,"octagon"))     strcpy(keyword, "OC");    
+    else warning("general aperture element not supported in sixtrack",tag_aperture.name);
+ }
   
-    if (strcmp(keyword,"00") != 0) 
-    {
-      tag_element = create_aperture(tag_aperture.name,keyword, 
-				    tag_aperture.value[1], tag_aperture.value[2],
-				    tag_aperture.value[3], tag_aperture.value[4],
-				    tag_aperture.value[5], tag_aperture.value[6],
-				    tag_aperture.value[7],
-				    cnode->p_al_err);
-      tag_element->previous = current_element;
-      tag_element->next = current_element->next;
-      current_element->next = tag_element;
-      prev_element = current_element;
-      current_element = tag_element;
-      current_element->position = cnode->position;
-      add_to_ellist(current_element);
-    }
-    else 
-    {
-      warning("general aperture element not supported in sixtrack",tag_aperture.name);
-    }
+  // 2015-Oct-13  16:10:42  ghislain: before we add the current element to element list
+  // check whether the element is long and has an aperture, and therefore
+  // whether we should insert an aperture marker before the current element
+  if (strcmp(keyword,"00") != 0 && current_element->value[0] > 0.) {    
+    tmp_element = current_element;
+    tag_element = create_aperture(tag_aperture.name, keyword,
+  				  tag_aperture.value[1], tag_aperture.value[2],
+  				  tag_aperture.value[3], tag_aperture.value[4],
+  				  tag_aperture.value[5], tag_aperture.value[6],
+  				  tag_aperture.value[7],
+  				  cnode->p_al_err);
+
+    tag_element->previous = prev_element;
+    prev_element->next = tag_element;
+    tag_element->position = cnode->position - current_element->value[0] / 2.; 
+
+    current_element = tag_element;
+    add_to_ellist(current_element);
+    
+    tmp_element->previous = current_element;
+    current_element->next = tmp_element;
+    tmp_element->position = cnode->position;    
+    
+    prev_element = current_element;
+    current_element = tmp_element;
+    
+  }
+
+
+  add_to_ellist(current_element); 
+
+  
+  /* add aperture element if necessary */
+  if (strcmp(keyword,"00") != 0) {
+    tag_element = create_aperture(tag_aperture.name, keyword, 
+				  tag_aperture.value[1], tag_aperture.value[2],
+				  tag_aperture.value[3], tag_aperture.value[4],
+				  tag_aperture.value[5], tag_aperture.value[6],
+				  tag_aperture.value[7],
+				  cnode->p_al_err);
+    tag_element->previous = current_element;
+    tag_element->next = current_element->next;
+    current_element->next = tag_element;
+
+    prev_element = current_element;
+    current_element = tag_element;      
+    // 2015-Oct-13  15:45:58  ghislain: add half the prev_element length to account for thick elements
+    current_element->position = cnode->position + prev_element->value[0] / 2.; 
+    add_to_ellist(current_element);
   }
 }
+
 
 static void
 read_sequ(void)
@@ -3411,8 +3437,8 @@ conv_sixtrack(struct in_cmd* mycmd) /* writes sixtrack input files from MAD-X */
 {
   last_row = 0;
 
-  puts("  ++++++++++++++++++++++++++++");
-  puts("  +   c6t version 2.0        +");
+  puts("  ++++++++++++++++++++++++++++"  );
+  puts("  +   c6t version 2.0        +"  );
   puts("  ++++++++++++++++++++++++++++\n");
 
   c6t_init();

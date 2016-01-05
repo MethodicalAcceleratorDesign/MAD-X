@@ -1473,6 +1473,7 @@ SUBROUTINE twcptk(re,orbit)
   use twisslfi
   use twisscfi
   use twissotmfi
+  use name_lenfi !LD: 09.2015
   implicit none
 
   !----------------------------------------------------------------------*
@@ -1486,6 +1487,7 @@ SUBROUTINE twcptk(re,orbit)
   double precision re(6,6),orbit(6),rw0(6,6),rwi(6,6),rc(6,6),      &
        rmat0(2,2),a(2,2),adet,b(2,2),c(2,2),dt(6),tempa,tempb,alfx0,     &
        alfy0,betx0,bety0,amux0,amuy0,zero,one,eps
+  character(name_len) name !LD: 09.2015
   parameter(zero=0d0,one=1d0,eps=1d-36)
 
   !initialize
@@ -1525,14 +1527,17 @@ SUBROUTINE twcptk(re,orbit)
   endif
 
   !---- Auxiliary matrices.
+  !LD:  a = re_x - re_xy*rmat
   a(1,1) = re(1,1) - (re(1,3) * rmat(1,1) + re(1,4) * rmat(2,1))
   a(1,2) = re(1,2) - (re(1,3) * rmat(1,2) + re(1,4) * rmat(2,2))
   a(2,1) = re(2,1) - (re(2,3) * rmat(1,1) + re(2,4) * rmat(2,1))
   a(2,2) = re(2,2) - (re(2,3) * rmat(1,2) + re(2,4) * rmat(2,2))
+  !LD:  b = re_yx - re_y*rmat
   b(1,1) = re(3,1) - (re(3,3) * rmat(1,1) + re(3,4) * rmat(2,1))
   b(1,2) = re(3,2) - (re(3,3) * rmat(1,2) + re(3,4) * rmat(2,2))
   b(2,1) = re(4,1) - (re(4,3) * rmat(1,1) + re(4,4) * rmat(2,1))
   b(2,2) = re(4,2) - (re(4,3) * rmat(1,2) + re(4,4) * rmat(2,2))
+  !LD:  c = re_y - re_yx*rmat
   c(1,1) = re(3,3) + (re(3,1) * rmat(2,2) - re(3,2) * rmat(2,1))
   c(1,2) = re(3,4) - (re(3,1) * rmat(1,2) - re(3,2) * rmat(1,1))
   c(2,1) = re(4,3) + (re(4,1) * rmat(2,2) - re(4,2) * rmat(2,1))
@@ -1540,7 +1545,10 @@ SUBROUTINE twcptk(re,orbit)
 
   !---- Track R matrix.
   adet = a(1,1) * a(2,2) - a(1,2) * a(2,1)
-  if (abs(adet).gt.eps) then
+
+  !LD: 09.2015, adet must be positive for physical twiss parameters.
+  !if (abs(adet).gt.eps) then
+  if (adet .gt. eps) then
      rmat(1,1) = - (b(1,1) * a(2,2) - b(1,2) * a(2,1)) / adet
      rmat(1,2) =   (b(1,1) * a(1,2) - b(1,2) * a(1,1)) / adet
      rmat(2,1) = - (b(2,1) * a(2,2) - b(2,2) * a(2,1)) / adet
@@ -1559,6 +1567,12 @@ SUBROUTINE twcptk(re,orbit)
      alfy = - (tempa * tempb + c(1,2) * c(2,2)) / (adet * bety)
      bety =   (tempb * tempb + c(1,2) * c(1,2)) / (adet * bety)
      if(abs(c(1,2)).gt.eps) amuy=amuy+atan2(c(1,2),tempb)
+  else
+    !LD: 09.2015
+    call element_name(name,len(name))
+    print *, '+++ coupling too strong in element ', name
+    print *, '+++ adet=', adet, ', betx=', betx, ', bety=', bety
+    call aawarn('twcptk: ', 'twiss parameter might be unphysical, coupling skipped')
   endif
   
   !---- Cummulative R matrix and one-turn map at element location.

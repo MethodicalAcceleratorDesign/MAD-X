@@ -146,7 +146,11 @@ exec_command(void)
     else if (strcmp(cmd_name, "show") == 0)    exec_show(p);
     else if (strcmp(cmd_name, "return") == 0)  return_flag = 1;
     else if (strcmp(cmd_name, "value") == 0)   print_value(p);   
-    else if (strcmp(cmd_name, "system") == 0)  system(noquote(toks[p->decl_start])); // ret =, not used
+    else if (strcmp(cmd_name, "system") == 0)  {
+      char *pp = noquote(toks[p->decl_start]);
+      if (get_option("echosystem")) printf("=== echoing system(\"%s\")\n", pp);
+      system(pp); // ret =, not used
+    } 
     else if (strcmp(cmd_name, "title") == 0)   title = permbuff(noquote(toks[p->decl_start]));
     else if (strcmp(cmd_name, "resplot") == 0) {
       plot_options = delete_command(plot_options);
