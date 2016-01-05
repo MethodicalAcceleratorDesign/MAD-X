@@ -1,7 +1,7 @@
 # |
 # o---------------------------------------------------------------------o
 # |
-# | MAD makefile - gfortran linker settings
+# | MAD makefile - clang linker settings
 # |
 # o---------------------------------------------------------------------o
 # |
@@ -20,7 +20,7 @@
 # linker flags
 #
 
-LDFLAGS = -m$(ARCH) -O$(NOPT) -fmax-stack-var-size=65536
+LDFLAGS = -m$(ARCH) -O$(NOPT)
 LDLIBS  =
 
 #
@@ -28,7 +28,7 @@ LDLIBS  =
 #
 
 ifeq ($(DEBUG),yes)
-LDFLAGS += -g -ggdb 
+LDFLAGS += -g -ggdb
 endif
 
 ifeq ($(PROFILE),yes)
@@ -36,9 +36,7 @@ LDFLAGS += -pg
 endif
 
 ifeq ($(STATIC),yes)
-LDFLAGS += $(if $(call eq,$(OSTYPE),Darwin),-static-libgfortran -static-libstdc++ -static-libgcc,-static) -pthread
-LDLIBS  += $(if $(call eq,$(OSTYPE),Darwin),-lgfortran -lstdc++ -lgcc -lgcc_eh -lSystem -nodefaultlibs,)
-LIBS    += $(if $(call eq,$(OSTYPE),Darwin),$(wildcard $(call GNULIB,libquadmath.a)),)
+LDFLAGS += -static -pthread
 endif
 
 ifeq ($(SHARED),yes)
@@ -55,7 +53,7 @@ LDFLAGS += -fopenmp
 endif
 
 ifeq ($(SANITIZE),yes)
-LDFLAGS += -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined 
+LDFLAGS += -fsanitize=address -fno-omit-frame-pointer
 endif
 
 # end of makefile

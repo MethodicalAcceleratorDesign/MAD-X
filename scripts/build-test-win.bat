@@ -47,7 +47,7 @@ if ERRORLEVEL 1 (
 	%echo% -e "\n===== SVN cleanup & update ====="
 	%svn% cleanup
 	%svn% update
-	%echo% "ERROR: svn update failed" && exit /B 1
+	%echo% -e "\nERROR: svn update failed" && exit /B 1
 )
 
 %echo% -e "\n===== Release number ====="
@@ -67,24 +67,24 @@ REM cleanall not supported on windows (relies on find)
 %gcxx% --version 
 %gfc%  --version
 %make% all-win64-gnu
-if ERRORLEVEL 1 %echo% "ERROR: make all-win64-gnu failed" && exit /B 1
+if ERRORLEVEL 1 %echo% -e "\nERROR: make all-win64-gnu failed" && exit /B 1
 
 %echo% -e "\n===== Intel build ====="
-call "C:\Program Files (x86)\Intel\Composer XE 2013 SP1\bin\ipsxe-comp-vars.bat" ia32 vs2012
+call "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\bin\compilervars.bat" ia32 vs2013
 %make% all-win32-intel all-win32
-if ERRORLEVEL 1 %echo% "ERROR: make all-win32-intel failed" && exit /B 1
+if ERRORLEVEL 1 %echo% -e "\nERROR: make all-win32-intel failed" && exit /B 1
 
-call "C:\Program Files (x86)\Intel\Composer XE 2013 SP1\bin\ipsxe-comp-vars.bat" intel64 vs2012
+call "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\bin\compilervars.bat" intel64 vs2013
 %make% all-win64-intel all-win64
-if ERRORLEVEL 1 %echo% "ERROR: make all-win64-intel failed" && exit /B 1
+if ERRORLEVEL 1 %echo% -e "\nERROR: make all-win64-intel failed" && exit /B 1
 
 %echo% -e "\n===== Binaries dependencies ====="
 %make% infobindep
-if ERRORLEVEL 1 %echo% "ERROR: make infobindep failed" && exit /B 1
+if ERRORLEVEL 1 %echo% -e "\nERROR: make infobindep failed" && exit /B 1
 
 %echo% -e "\n===== Tests pointless files ====="
 %make% cleantest && %make% infotestdep
-if ERRORLEVEL 1 %echo% "ERROR: make infotestdep failed" && exit /B 1
+if ERRORLEVEL 1 %echo% -e "\nERROR: make infotestdep failed" && exit /B 1
 
 %echo% -e "\n===== Running tests (long) ====="
 if "%1"=="notest" (
@@ -94,21 +94,21 @@ if "%1"=="notest" (
 	%echo% ""
 
 	%echo% -e "\n===== Testing madx-win64-intel ====="
-	%make% madx-win64-intel && %ls% -l madx-win64-intel.exe madx64.exe && %make% cleantest && %make% tests-all ARCH=64 NOCOLOR=yes
-	if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win64-intel failed" && exit /B 1
+	%make% madx-win64-intel && %ls% -l madx-win64-intel.exe madx64.exe && %make% cleantest && %make% tests-all COMP=intel ARCH=64 NOCOLOR=yes
+	if ERRORLEVEL 1 %echo% -e "\nERROR: make tests-all for madx-win64-intel failed" && exit /B 1
 
 	%echo% -e "\n===== Testing madx-win32-intel ====="
-	%make% madx-win32-intel && %ls% -l madx-win32-intel.exe madx32.exe && %make% cleantest && %make% tests-all ARCH=32 NOCOLOR=yes
-	if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win32-intel failed" && exit /B 1
+	%make% madx-win32-intel && %ls% -l madx-win32-intel.exe madx32.exe && %make% cleantest && %make% tests-all COMP=intel ARCH=32 NOCOLOR=yes
+	if ERRORLEVEL 1 %echo% -e "\nERROR: make tests-all for madx-win32-intel failed" && exit /B 1
 
 	%echo% -e "\n===== Testing madx-win64-gnu ====="
 	set GFORTRAN_UNBUFFERED_PRECONNECTED=y
-	%make% madx-win64-gnu && %ls% -l madx-win64-gnu.exe madx64.exe && %make% cleantest && %make% tests-all ARCH=64 NOCOLOR=yes
-	if ERRORLEVEL 1 %echo% "ERROR: make tests-all for madx-win64-intel failed" && exit /B 1
+	%make% madx-win64-gnu && %ls% -l madx-win64-gnu.exe madx64.exe && %make% cleantest && %make% tests-all COMP=gnu ARCH=64 NOCOLOR=yes
+	if ERRORLEVEL 1 %echo% -e "\nERROR: make tests-all for madx-win64-intel failed" && exit /B 1
 
 	REM restore the default version
 	%make% madx-win32 > tmp.out && %make% madx-win64 > tmp.out && %rm% -f tmp.out
-	if ERRORLEVEL 1 %echo% "ERROR: unable to restore the default version" && exit /B 1
+	if ERRORLEVEL 1 %echo% -e "\nERROR: unable to restore the default version" && exit /B 1
 )
 
 REM date & end marker

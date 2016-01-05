@@ -6,7 +6,7 @@
 \label{chap:differences}
 
 \section{Definitions in \madeight}
-\label{sec:mad8_definitions}
+\label{sec:mad8-definitions}
 
 \madeight uses full 6-by-6 matrices to allow coupling effects to be treated,
 and the canonical variable set ($x$ , $p_x / p_0$),
@@ -16,17 +16,17 @@ programs most of which use the set ($x$, $x'$), ($y$, $y'$),
 
 Like Dragt \cite{dragt1982}, \madeight uses the relative
 energy error $p / p_0$, which is equal the relative momentum error
-${\tt delta} = \delta p / p_0$ multiplied by $\beta = v/c$.
+$\mathtt{delta} = \delta p / p_0$ multiplied by $\beta = v/c$.
 
 As from Version 8.13, \madeight used an additional \textbf{constant}
-momentum error $\texttt{delta}_s$ in all optical calculations. 
+momentum error $\mathtt{delta}_s$ in all optical calculations. 
 The transfer maps contained the \textbf{exact} dependence upon this
 value; therefore the tunes for large deviations could be computed with
 high accuracy as opposed to previous versions.
 
 The choice of canonical variables in \madx still leads to slightly
 different definitions of the lattice functions. In \madx the
-Courant-Snyder invariants mentioned in \cite{Courant_Snyder1958} take
+Courant-Snyder invariants mentioned in \cite{Courant-Snyder1958} take
 the form
 
 $W_x = \gamma_x x^2 - 2 \alpha_x x p_x + \beta_x  p_x^2$
@@ -40,7 +40,8 @@ shows that the orbit functions cannot be the same.
 A more detailed analysis, using 
 $x' = p_x / (1 + \delta)$
 shows that all formulas can be made consistent by defining the MAD orbit
-functions (index M) wrt. the Courant and Snyder functions (index C) as follows:
+functions (index M) with respect to the Courant and Snyder functions
+(index C) as follows: 
 
 $\beta_{xM} = \beta_{xC} \times (1 + \delta)$, \\
 $\alpha_{xM} = \alpha_{xC}$, \\
@@ -48,7 +49,7 @@ $\gamma_{xM} = \gamma_{xC} / (1 + \delta)$
 
 For constant $\delta_s$ along the beam line and $\delta = 0$, the
 lattice functions are the same. In a machine where $\delta$ varies along
-the circumference, e.g. in a linear accelerator or in an
+the circumference, \textsl{e.g.} in a linear accelerator or in an
 electron-positron storage ring, the definition of the Courant-Snyder
 invariants must be generalised. The \madeight invariants have the advantage
 that they remain invariants along the beam line even for variable $\delta$.
@@ -57,7 +58,7 @@ With the new method this problem occurs in Twiss module (see
 \ref{chap:twiss}) only for non-constant $\delta$.    
 
 \section{Treatment of Energy Error in TWISS} 
-\label{sec:twiss_energy_error}
+\label{sec:twiss-energy-error}
 It has been noted by Milutinovic and Ruggiero \cite{milutinovic1988}
 that \madeight returned tunes which are too low for non-zero
 $\delta$. The difference was found to be quadratic in delta with a negative

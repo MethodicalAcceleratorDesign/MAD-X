@@ -8,9 +8,9 @@
 \chapter{SURVEY}
 \label{chap:survey}
 
-The \texttt{SURVEY} command computes the geometrical layout, i.e. the
-coordinates of all machine elements in a 
-\hyperref[sec:global_ref]{global reference system}. These
+The \texttt{SURVEY} command computes the geometrical layout,
+\textsl{i.e.} the coordinates of all machine elements in a 
+\hyperref[sec:global-ref]{global reference system}. These
 coordinates can be used for installation. In order to produce
 coordinates in a particular system, the initial coordinates and angles
 can be specified. 
@@ -20,10 +20,10 @@ SURVEY, \=SEQUENCE=string, FILE= string, \\
         \>X0=real, Y0=real, Z0=real, \\
         \>THETA0=real, PHI0=real, PSI0=real;}
 
-The {\tt SURVEY} command has the following attributes:
+The \texttt{SURVEY} command has the following attributes:
 \begin{madlist}
   \ttitem{SEQUENCE} the name of sequence to be surveyed. By default the
-  last sequence expanded with the {\tt USE} command will be surveyed.  
+  last sequence expanded with the \texttt{USE} command will be surveyed.  
   \ttitem{FILE}  the name of external file to which the results are
   written.\\ (Default:~survey)
   \ttitem{X0, Y0, Z0} the initial horizontal, vertical and longitudinal
@@ -38,14 +38,15 @@ contains the global coordinates of an element taken at the end of the
 element.
 
 The computation takes into account the length of each element, as well
-as the rotation angles defined for \hyperref[bend_sbend]{\tt SBEND},
-\hyperref[bend_rbend]{\tt RBEND}, thin \hyperref[sec:multipole]{\tt
-  MULTIPOLE} and thin \hyperref[sec:rfmultipole]{\tt RFMULTIPOLE}
-elements exclusively.  Rotation angles introduced via the {\tt KNL},
-{\tt KSL} mechanism for other elements are ignored by {\tt
-  SURVEY}, other \madx commands, as well as \ptc commands.
+as the rotation angles defined for \hyperref[bend-sbend]{\texttt{SBEND}},
+\hyperref[bend-rbend]{\texttt{RBEND}}, thin
+\hyperref[sec:multipole]{\texttt{MULTIPOLE}} and thin
+\hyperref[sec:rfmultipole]{\texttt{RFMULTIPOLE}} 
+elements exclusively.  Rotation angles introduced via the \texttt{KNL},
+\texttt{KSL} mechanism for other elements are ignored by
+\texttt{SURVEY}, other \madx commands, as well as \ptc commands. 
 
-{\bf Example:} average LHC ring with CERN coordinates.
+\textbf{Example:} average LHC ring with CERN coordinates.
 \madxmp{
 REAL CONST R0 = 1.0; ! to obtain the average ring \\
 USE, SEQUENCE=lhcb1;\\
@@ -55,13 +56,12 @@ SURVEY, \=X0=-2202.21027, Y0=2359.00656, Z0=2710.63882,  \\
 }
 
 
-{\bf WARNING :}\\
+\textbf{WARNING :}\\
 In the case a machine geometry is constructed with thick lenses, the
 circumference changes when the structure is converted into thin lenses
-via the \hyperref[chap:makethin]{\tt MAKETHIN} command. This is an
-unavoidable feature of {\tt MAKETHIN}. ONLY the structure with thick
+via the \hyperref[chap:makethin]{\texttt{MAKETHIN}} command. This is an
+unavoidable feature of \texttt{MAKETHIN}. ONLY the structure with thick
 lenses must be used for practical purposes.
-
 
 
 %% {\bf INFORMATION:}\\

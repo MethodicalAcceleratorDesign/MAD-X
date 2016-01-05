@@ -12,33 +12,36 @@ filename strings are not passed to the underlying Operating System for evaluatio
 \madbox{
 ASSIGN, ECHO="filename", TRUNCATE;
 }
-where "filename" is the name of an output file, or "terminal" and
-{\tt TRUNCATE} specifies if the file must be truncated when opened (ignored
-for terminal). 
+where \texttt{filename} is either the name of an output file, or the
+string \texttt{terminal}, and \texttt{TRUNCATE} specifies whether the
+file is truncated when opened 
+(ignored for terminal). 
 
-This allows switching the echo stream to a file or back,
-but only for the commands \hyperref[sec:value]{\tt VALUE}, 
-\hyperref[sec:show]{\tt SHOW}, and \hyperref[sec:print]{\tt PRINT}. 
-Allows easy composition of future \madx input files. A real life example 
-(always the same) is to be found under \href{foot.html}{footprint example}.  
+This allows switching the echo stream to a file or back to the terminal,
+but only for the commands \hyperref[sec:value]{\texttt{VALUE}}, 
+\hyperref[sec:show]{\texttt{SHOW}}, and \hyperref[sec:print]{\texttt{PRINT}}. 
+Allows easy composition of future \madx input files.
+
+%% A real life example (always the same) is to be found under
+%% \href{foot.html}{footprint example}.   
 
 \section{CALL}
 \label{sec:call}
 \madbox{
 CALL, FILE="filename"; 
 }
-where "filename"  is the name of an input file. This file will be read
-until a "RETURN" statement, or until End\_Of\_File; The file being
-"called" may in turn contain any number of {\tt CALL} statements
-itself, and so on to any depth.  
+where \texttt{filename} is the name of an input file. This is then read
+until a \texttt{RETURN} statement is encountered, or until the
+End\_Of\_File; The file being "called" may in turn contain any number of
+\texttt{CALL} statements itself, and so on to any depth.
 
 \section{RETURN}
 \label{Sec:return}
 \madbox{
 RETURN;
 }
-ends reading from a "called" file; if encountered in the standard input
-file, it ends the program execution.  
+ends the reading from a "called" file. If encountered in the standard
+input file, it ends the program execution.  
 
 
 \section{PRINT}
@@ -46,10 +49,10 @@ file, it ends the program execution.
 \madbox{
 PRINT, TEXT="string";
 }
-prints the quoted text string to the current output file (see ASSIGN
-above). The text can be edited with the help of a
-\href{special.html#macro}{macro statement}. For more details, see
-there. [TBC]  
+prints the quoted text \texttt{string} to the current output file (see
+\hyperref[sec:assign]{\texttt{ASSIGN}} above). The text can be edited
+with the help of a \hyperref[sec:macro]{macro} statement.
+%For more details, see there. [TBC]  
 
 
 \section{PRINTF}
@@ -57,30 +60,31 @@ there. [TBC]
 \madbox{
 PRINTF, TEXT="string", VALUE= expr{,expr};
 }
-prints the numerical values specified in the value field, formatted
-according to the string format provided in the text field, to the
-current output file.  
+prints the numerical values specified in the \texttt{VALUE} field to the
+current output file, with formatting according to the string format
+provided in the \texttt{TEXT} field. 
 
 The string format can take numeric C or \madx format specifiers for
 double real values; integer and string formats are not supported but 
-can be approximated with the \%g in the case of integers, and via
-\hyperref[sec:macro]{\tt MACRO} statements, which perform string
-substitution, themselves containing a \hyperref[sec:print]{\tt PRINT}
-statement.  
+can be approximated with the \texttt{\%g} format in the case of
+integers, and via \hyperref[sec:macro]{\texttt{MACRO}} statements, which
+perform string substitution, themselves containing a
+\hyperref[sec:print]{\texttt{PRINT}} statement.   
 
 The maximum number of values that can be printed in one
 statement is limited to 100. 
 
 If the number of format specifiers given in the string is higher 
-than the number of values in the value field, undefined values are printed 
-where they are not explicitly provided. 
+than the number of values in the value field, undefined values are
+printed where they are not explicitly provided. 
 
 If the number of format specifiers given in the string is lower 
 than the number of values in the value field, the values that 
 do not correspond to a format specifier are ignored. 
 
 
-{\bf Example:}
+\textbf{Example:}
+{\small
 \madxmp{
 xxxxxxx\=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
 a = 1.2; b = 3.4/0.3; c := 0.8*a/b; \\
@@ -88,18 +92,18 @@ PRINTF, \>TEXT="String with floats a=\%f, b=\%.3g, text and MAD float c=\%F;", \
         \>VALUE = a,b,c; \\
 PRINTF, \>TEXT="More specifiers than values: \%f, \%.3g, \%F", \>VALUE = a,b; \\
 PRINTF, \>TEXT="More values than specifiers: \%f, \%.3g",      \>VALUE = a,b,c;
-}
+}}
 
 produces the following output:
 \begin{verbatim}
-String with floats a=1.200000, b=11.3, text and MAD float c=     0.08470588235;
+String with floats a=1.200000, b=11.3, text and MAD float c=  0.08470588235;
 More specifiers than values: 1.200000, 11.3,   6.953222976e-310
 More values than specifiers: 1.200000, 11.3
 \end{verbatim}
 
-Note that {\tt PRINTF}, like {\tt PRINT}, produces output that
+Note that \texttt{PRINTF}, like \texttt{PRINT}, produces output that
 cannot be read back by \madx. For output that can be read back by \madx,
-use the command {\tt VALUE} or TFS tables.
+use the command \texttt{VALUE} or TFS tables.
 
 Note also that a percent sign (\%) can be printed using the format
 \verb|text="%%"|. 
@@ -111,8 +115,9 @@ Note also that a percent sign (\%) can be printed using the format
 \madbox{
 RENAMEFILE, FILE="filename", TO="new\_filename";
 }
-renames the file "filename" to "new\_filename" on disk. \\
-It is more portable than an equivalent \hyperref[sec:system]{\tt SYSTEM} call:
+renames the file \texttt{filename} to \texttt{new\_filename} on disk. \\
+This command is more portable than an equivalent
+\hyperref[sec:system]{\texttt{SYSTEM}} call: 
 \madxmp{
 SYSTEM("mv filename new\_filename"); ! Unix specific
 }
@@ -122,14 +127,16 @@ SYSTEM("mv filename new\_filename"); ! Unix specific
 \madbox{
 COPYFILE, FILE="filename", TO="new\_filename", APPEND=logical;
 }
-copies the file "filename" to the file "new\_filename" on disk.
+copies the file \texttt{filename} to the file \texttt{new\_filename} on disk.
 
-The attribute {\tt APPEND=true} causes {\tt COPYFILE} to append the content of 
-"filename" at the end of the file "new\_filename".\\
-The default value {\tt APPEND=false} causes the 
-replacement of the content of "new\_filename" with the content of "filename".
+The attribute \texttt{APPEND=true} causes \texttt{COPYFILE} to append
+the content of \texttt{filename} at the end of the file
+\texttt{new\_filename}.\\ 
+The default value \texttt{APPEND=false} causes the replacement of the
+content of \texttt{new\_filename} with the content of \texttt{filename}.
 
-{\tt COPYFILE, APPEND=true...} is more portable than an equivalent \hyperref[sec:system]{\tt SYSTEM} call:
+\texttt{COPYFILE, APPEND=true...} is more portable than an equivalent
+\hyperref[sec:system]{\texttt{SYSTEM}} call: 
 \madxmp{
 SYSTEM("copy /y filename new\_filename"); ! Windows specific
 }
@@ -139,12 +146,10 @@ SYSTEM("copy /y filename new\_filename"); ! Windows specific
 \madbox{
 REMOVEFILE, FILE="filename";
 }
-removes the file "filename" from disk. \\
-It is more portable than an equivalent \hyperref[sec:system]{\tt SYSTEM} call: 
+removes the file \texttt{filename} from disk. \\
+It is more portable than an equivalent \hyperref[sec:system]{\texttt{SYSTEM}} call: 
 \madxmp{
 SYSTEM("rm filename"); ! Unix specific
 }
-
-
 
 %% EOF

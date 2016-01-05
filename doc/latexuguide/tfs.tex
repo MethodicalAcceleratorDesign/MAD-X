@@ -19,16 +19,15 @@ may then be further processed.
 \madx writes the following descriptors in all tables: 
 \begin{itemize}
    \item COMMENT: The current title string from the most recent 
-   \hyperref[sec:title]{\tt TITLE} command. 
+   \hyperref[sec:title]{\texttt{TITLE}} command. 
    \item ORIGIN: The version of \madx used. 
    \item DATE: The date of the \madx run. 
    \item TIME: The wall clock time of the \madx run. 
-   \item TYPE: The type of the table: e.g. {\tt TWISS} 
+   \item TYPE: The type of the table: \textsl{e.g.} \texttt{TWISS} 
 \end{itemize} 
 
-Additional descriptors exist in the \href{twiss_desc.html}{Twiss table},
-as well as the \href{tables.html#track}{Track tables}.  
-
+Additional descriptors exist in the \hyperref[chap:twiss]{Twiss table},
+as well as the \hyperref[chap:thintrack]{Track tables}.  
 
 
 \section{Column Formats}
@@ -38,19 +37,18 @@ The column formats used are listed below:
 %in the  \hyperlink{table}{TFS columns table}.   
 
 \begin{table}[ht]
-  \begin{center}
-    \caption{ Column Formats used in TFS Tables}    
-    \vspace{1ex}
-    \begin{tabular}{|l l l|}
-      \hline
-      \textbf{C format} & \textbf{Meaning} & \textbf{C format} \\ 
-      \hline
-      \%hd & Short integer & (\%8d) \\ 
-      \%le & Long float & (\%-18.10g) \\ 
-      \%ks & String of length k & ("$\backslash$"-18s$\backslash$"")\\
-      \hline
-   \end{tabular}
-  \end{center}
+  \centering
+  \caption{ Column Formats used in TFS Tables}    
+  \vspace{1ex}
+  \begin{tabular}{|l l l|}
+    \hline
+    \textbf{C format} & \textbf{Meaning} & \textbf{C format} \\ 
+    \hline
+    \%hd & Short integer & (\%8d) \\ 
+    \%le & Long float & (\%-18.10g) \\ 
+    \%ks & String of length k & ("$\backslash$"-18s$\backslash$"")\\
+    \hline
+  \end{tabular}
 \end{table}
 
 Control lines begin with the TFS control character, followed by a
@@ -63,11 +61,11 @@ the largest of the column name and the width of data values of the column.
 \section{Twiss TFS file header}
 \label{sec:tfs_twiss}
  
-The format of the twiss table is best illustrated with an
-\href{select.html#tfs}{TFS file example}.  
+%The format of the twiss table is best illustrated with an
+%\href{select.html#tfs}{TFS file example}.   
 
-\madx gives access to parameters from {\tt TWISS} and other tables using the
-\href{../Introduction/expression.html#table}{table access} function.  
+\madx gives access to parameters from \texttt{TWISS} and other tables using the
+\hyperref[chap:tables]{table access} commands.  
 
 %% EOF
 

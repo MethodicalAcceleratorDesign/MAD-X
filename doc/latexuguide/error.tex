@@ -8,21 +8,21 @@ alignment errors and field errors to single beam elements or to ranges
 or classes of beam elements.
 
 Elements, classes or ranges of elements are selected by the
-\hyperref[sec:seclect]{\tt SELECT} command.
+\hyperref[sec:select]{\texttt{SELECT}} command.
 
 ATTENTION: since errors can only be assigned to machine elements, it is
-necessary to \hyperref[sec:flatten]{\tt FLATTEN} a sequence
+necessary to \hyperref[sec:flatten]{\texttt{FLATTEN}} a sequence
 if it includes other sequences.
 
 Errors can be specified with both constant or random values.
 
 Error definitions consist of four types of statements listed below. They
 may be entered after having selected a beam line by means of a
-\hyperref[sec:use]{\tt USE} command.  
+\hyperref[sec:use]{\texttt{USE}} command.  
 
-WARNING: any further \hyperref[sec:use]{\tt USE} command
+WARNING: any further \hyperref[sec:use]{\texttt{USE}} command
 will destroy the assigned errors. Use the
-\hyperref[sec:esave]{\tt ESAVE} option to save and reload errors.
+\hyperref[sec:esave]{\texttt{ESAVE}} option to save and reload errors.
 
 %\href{http://consult.cern.ch/xwho/people/1808}{Werner Herr} 18.6.2002 
 
@@ -39,7 +39,7 @@ will destroy the assigned errors. Use the
 \section{EALIGN: Alignment Errors} %EALIGN: Define Misalignments} 
 \label{sec:ealign}
 
-Alignment errors are defined by the {\tt EALIGN} command. 
+Alignment errors are defined by the \texttt{EALIGN} command. 
 The misalignments refer to the
 \hyperref[sec:reference]{local reference system} for a
 perfectly aligned machine.  
@@ -55,9 +55,9 @@ well as readout scaling errors in both horizontal and vertical planes.
 Monitor readout and scaling errors are ignored for all elements other than 
 \hyperref[sec:monitor]{monitors}.
 
-Each new {\tt EALIGN} statement replaces the misalignment errors for all 
-elements in its range, unless the logical {\tt ADD} attribute of 
-\hyperref[sec:eoption]{\tt EOPTION} has been specified.
+Each new \texttt{EALIGN} statement replaces the misalignment errors for all 
+elements in its range, unless the logical \texttt{ADD} attribute of 
+\hyperref[sec:eoption]{\texttt{EOPTION}} has been specified.
 
 Alignment errors are defined by the statement 
 
@@ -71,7 +71,7 @@ EALIGN, \>DX=real, DY=real, DS=real, \\
         \>AREX=real, AREY=real;
 }
 for elements selected by the
-\hyperref[sec:select]{\tt SELECT} command. 
+\hyperref[sec:select]{\texttt{SELECT}} command. 
 
 \begin{figure}[ht]
 	\centering
@@ -96,9 +96,9 @@ for elements selected by the
 		\footnotesize of the magnet}}}
 	\thicklines
 	\put(150,55){\vector(1,0){50}}
-	\put(175,45){\makebox(0,0){\tt DS}}
+	\put(175,45){\makebox(0,0)\texttt{DS}}
 	\put(130,75){\vector(0,1){50}}
-	\put(125,100){\makebox(0,0)[r]{\tt DX}}
+	\put(125,100){\makebox(0,0)[r]\texttt{DX}}
 	\thinlines
 	\put(125,125){\line(1,0){185}}
 	\put(200,50){\line(0,1){120}}
@@ -115,7 +115,7 @@ for elements selected by the
 	\color{black}
 	\bezier{30}(300,125)(300,137)(297,149)
 	\put(299,140){\vector(-1,4){2}}
-	\put(305,137){\makebox(0,0)[l]{\tt DTHETA}}
+	\put(305,137){\makebox(0,0)[l]\texttt{DTHETA}}
 
 	\put(150,67){\line(1,0){80}}
 	\put(150,83){\line(1,0){80}}
@@ -158,10 +158,10 @@ for elements selected by the
 	\color{black}
 	\bezier{20}(260,75)(260,65)(257,56)
 	\put(259,62){\vector(-1,-3){2}}
-	\put(265,67){\makebox(0,0)[l]{\tt DPSI}}
+	\put(265,67){\makebox(0,0)[l]\texttt{DPSI}}
 	
 	\bezier{20}(213,114)(222,111)(229,104)
-	\put(233,125){\makebox(0,0){\tt ROT}}
+	\put(233,125){\makebox(0,0)\texttt{ROT}}
 	\put(227,106){\vector(1,-1){2}}
 	\color{magenta}
 	\put(197.2,72.2){\line(-1,-1){50}}
@@ -219,7 +219,7 @@ for elements selected by the
 %% \label{F-YSDISP}
 %% \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[ht]
 	\centering
 	\setlength{\unitlength}{1pt}
 	\begin{picture}(400,140)(0,30)
@@ -242,9 +242,9 @@ for elements selected by the
 		\footnotesize of the magnet}}}
 	\thicklines
 	\put(150,55){\vector(1,0){50}}
-	\put(175,45){\makebox(0,0){\tt DS}}
+	\put(175,45){\makebox(0,0)\texttt{DS}}
 	\put(130,75){\vector(0,1){50}}
-	\put(125,100){\makebox(0,0)[r]{\tt DY}}
+	\put(125,100){\makebox(0,0)[r]\texttt{DY}}
 	\thinlines
 	\put(125,125){\line(1,0){185}}
 	\put(200,50){\line(0,1){120}}
@@ -260,7 +260,7 @@ for elements selected by the
 	\color{black}
 	\bezier{30}(300,125)(300,137)(297,149)
 	\put(299,141){\vector(-1,4){2}}
-	\put(305,137){\makebox(0,0)[l]{\tt DPHI}}
+	\put(305,137){\makebox(0,0)[l]\texttt{DPHI}}
 		
 	\put(150,67){\line(1,0){80}}
 	\put(150,83){\line(1,0){80}}
@@ -271,6 +271,58 @@ for elements selected by the
 	\caption{Alignment errors in the $(y,s)$-plane}
 	\label{F-YSDISP}
 \end{figure}
+
+The attributes are: 
+\begin{madlist}
+  \ttitem{DX} The misalignment in the \textit{x}-direction for the entry of
+  the beam element. (Default:~0~m).  \\ 
+  \texttt{DX}$>$0 displaces the element in the positive \textit{x}-direction 
+  
+  \ttitem{DY} The misalignment in the \textit{y}-direction for the entry of
+  the beam element. (Default:~0~m). \\
+  \texttt{DY}$>$0 displaces the element in the positive \textit{y}-direction 
+
+  \ttitem{DS} The misalignment in the \textit{s}-direction for the entry of
+  the beam element. (Default:~0~m). \\
+  \texttt{DS}$>$0 displaces the element in the positive \textit{s}-direction 
+  
+  \ttitem{DPHI} The rotation around the \textit{x}-axis. (Default:~0~rad). \\ 
+  A positive angle gives a greater \textit{y}-coordinate for the exit
+  than for the entry. 
+
+  \ttitem{DTHETA} The rotation around the \textit{y}-axis according to the
+  right hand rule. (Default:~0~rad).  
+
+  \ttitem{DPSI} The rotation around the \textit{s}-axis according to the
+  right hand rule. (Default:~0~rad).  
+
+  \ttitem{MREX} The horizontal read error for a monitor. This is ignored if
+  the element is not a monitor. \\
+  If \texttt{MREX}$>$0 the reading for \textit{x} is too high (default: 0 m). 
+
+  \ttitem{MREY} The vertical read error for a monitor. This is ignored if
+  the element is not a monitor. \\  
+  If \texttt{MREY}$>$0, the reading for \textit{y} is too high (default: 0 m). 
+
+  \ttitem{MSCALX} The relative horizontal scaling error for a monitor. This
+  is ignored if the element is not a monitor. \\ 
+  If \texttt{MSCALX}$>$0 the reading for \textit{x} is too high (default: 0). A
+  value of 0.5 implies that the actual reading is multiplied by 1.5.  
+
+  \ttitem{MSCALY} The relative vertical scaling error for a monitor. This is
+  ignored if the element is not a monitor. \\  
+  If \texttt{MSCALY}$>$0 the reading for \textit{y} is too high (default: 0). A
+  value of -0.3 implies that the actual reading is multiplied by 0.7.  
+
+  \ttitem{AREX} The misalignment in the \textit{x}-direction for the entry
+  of an aperture limit (default: 0 m). \\ 
+  \texttt{AREX}$>$0 displaces the element in the positive \textit{x}-direction 
+
+  \ttitem{AREY} The misalignment in the \textit{y}-direction for the entry
+  of an aperture limit (default: 0 m). \\ 
+  \texttt{AREY}$>$0 displaces the element in the positive \textit{y}-direction 
+
+\end{madlist}
 
 \begin{figure}[htb]
 	\centering
@@ -303,88 +355,30 @@ for elements selected by the
 		\footnotesize by the monitor}}}
 	\thicklines
 	\put(200,55){\vector(-1,0){100}}
-	\put(150,45){\makebox(0,0){\tt MREX}}
+	\put(150,45){\makebox(0,0)\texttt{MREX}}
 	\put(80,75){\vector(0,1){50}}
-	\put(70,100){\makebox(0,0)[r]{\tt MREY}}
+	\put(70,100){\makebox(0,0)[r]\texttt{MREY}}
 	\end{picture}
 	\caption{Readout errors in a monitor}
 	\label{F-ERMONI}
 \end{figure}
 
-
-The attributes are: 
-\begin{madlist}
-  \ttitem{DX} The misalignment in the {\it x}-direction for the entry of
-  the beam element. (Default:~0~m).  \\ 
-  {\tt DX}$>$0 displaces the element in the positive {\it x}-direction 
-  
-  \ttitem{DY} The misalignment in the {\it y}-direction for the entry of
-  the beam element. (Default:~0~m). \\
-  {\tt DY}$>$0 displaces the element in the positive {\it y}-direction 
-
-  \ttitem{DS} The misalignment in the {\it s}-direction for the entry of
-  the beam element. (Default:~0~m). \\
-  {\tt DS}$>$0 displaces the element in the positive {\it s}-direction 
-  
-  \ttitem{DPHI} The rotation around the {\it x}-axis. (Default:~0~rad). \\ 
-  A positive angle gives a greater {\it y}-coordinate for the exit
-  than for the entry. 
-
-  \ttitem{DTHETA} The rotation around the {\it y}-axis according to the
-  right hand rule. (Default:~0~rad).  
-
-  \ttitem{DPSI} The rotation around the {\it s}-axis according to the
-  right hand rule. (Default:~0~rad).  
-
-  \ttitem{MREX} The horizontal read error for a monitor. This is ignored if
-  the element is not a monitor. \\
-  If {\tt MREX}$>$0 the reading for {\it x} is too high (default: 0 m). 
-
-  \ttitem{MREY} The vertical read error for a monitor. This is ignored if
-  the element is not a monitor. \\  
-  If {\tt MREY}$>$0, the reading for {\it y} is too high (default: 0 m). 
-
-  \ttitem{MSCALX} The relative horizontal scaling error for a monitor. This
-  is ignored if the element is not a monitor. \\ 
-  If {\tt MSCALX}$>$0 the reading for {\it x} is too high (default: 0). A
-  value of 0.5 implies that the actual reading is multiplied by 1.5.  
-
-  \ttitem{MSCALY} The relative vertical scaling error for a monitor. This is
-  ignored if the element is not a monitor. \\  
-  If {\tt MSCALY}$>$0 the reading for {\it y} is too high (default: 0). A
-  value of -0.3 implies that the actual reading is multiplied by 0.7.  
-
-  \ttitem{AREX} The misalignment in the {\it x}-direction for the entry
-  of an aperture limit (default: 0 m). \\ 
-  {\tt AREX}$>$0 displaces the element in the positive {\it x}-direction 
-
-  \ttitem{AREY} The misalignment in the {\it y}-direction for the entry
-  of an aperture limit (default: 0 m). \\ 
-  {\tt AREY}$>$0 displaces the element in the positive {\it y}-direction 
-
-\end{madlist}
-
-{\bf Examples:}
+\textbf{Examples:}
 \madxmp{
 SELECT, FLAG = ERROR, CLASS = MQ; \\
 EALIGN, DX = 0.002, DY = 0.0004*RANF(), DPHI = 0.0002*GAUSS();
 }
-Assigns alignment errors to all elements of class {\tt MQ}.
-
-
+Assigns alignment errors to all elements of class \texttt{MQ}.
 
 \madxmp{
 SELECT, FLAG = ERROR, PATTERN = "QF.*"; \\
 EALIGN, DX = 0.001*TGAUSS(2.5), DY = 0.0001*RANF();
 }
-Assigns alignment errors to all elements starting with {\tt "QF"}. {\tt 
+Assigns alignment errors to all elements starting with \texttt{"QF"}. \texttt{
 TGAUSS(2.5)} specifies a Gaussian distribution cut at 2.5 sigma.
-
-
 
 %\href{http://consult.cern.ch/xwho/people/1808} {Last updated:} 02.9.2002 \\ 
 %\href{http://consult.cern.ch/xwho/people/1808}{Werner Herr} 18.6.2002 
-
 
 %\input{error/error_field}
 %%\title{Field Errors}
@@ -397,14 +391,14 @@ multipole components can be specified with different kinds of errors
 (relative or absolute). Relations between absolute and relative field
 errors are listed below.  
 
-In \madeight two commands were used for that purpose: {\tt EFIELD} 
-and {\tt EFCOMP}.
-Only {\tt EFCOMP} was implemented in \madx since it provides the full 
+In \madeight two commands were used for that purpose: \texttt{EFIELD} 
+and \texttt{EFCOMP}.
+Only \texttt{EFCOMP} was implemented in \madx since it provides the full 
 functionality
-of {\tt EFIELD} and there was no need for duplication.  
+of \texttt{EFIELD} and there was no need for duplication.  
 
 All field errors are specified as the integrated value $\int K ds$ 
-of the \hyperref[sec:sign_convention]{field components} along the magnet axis 
+of the \hyperref[sec:sign-convention]{field components} along the magnet axis 
 in $m^{-i}$. There is no provision
 to specify a global relative excitation error affecting all field
 components in a combined function magnet. Such an error may only be
@@ -432,13 +426,14 @@ xxxxxxxx\=xxxxxx\=xxxxxxxxxx\=xxxxxxxxx\= \kill
         \>DKSR=\>\{dksr(0), \>dksr(1), \>dksr(2),\ldots\};
 }
 for elements selected by the
-\hyperref[sec:select]{\tt SELECT} command.
+\hyperref[sec:select]{\texttt{SELECT}} command.
 
-Each new {\tt EFCOMP} statement replaces the field errors for all
+Each new \texttt{EFCOMP} statement replaces the field errors for all
 elements in its range(s). Previous field errors present in the range are
 discarded or incremented depending on the setting of
-{\tt ADD} logical attribute of the \hyperref[sec:eoption]{\tt EOPTION} command. 
-{\tt EFCOMP} defines the field errors in terms of
+\texttt{ADD} logical attribute of the
+\hyperref[sec:eoption]{\texttt{EOPTION}} command. 
+\texttt{EFCOMP} defines the field errors in terms of
 relative or absolute components.
 
 The attributes are: 
@@ -452,9 +447,9 @@ The attributes are:
   relative field errors to a bending magnet since $k_0$ is used
   for the normalization and NOT the ANGLE. 
 
-  \ttitem{RADIUS} radius {\it R} where dknr(i) or dksr(i) are specified
+  \ttitem{RADIUS} radius \textit{R} where dknr(i) or dksr(i) are specified
   for 0...i...20 (default 1 m). This attribute is required if dknr(i) or
-  dksr(i) are specified. If {\it R} is negative, the skew component is
+  dksr(i) are specified. If \textit{R} is negative, the skew component is
   used for the reference strength.  
 
   \ttitem{DKN(i)} Absolute error for the normal multipole strength with
@@ -471,14 +466,14 @@ The attributes are:
 \end{madlist}
 
 
-{\bf Time memory effects:}
+\textbf{Time memory effects:}
 
 The relative errors can be corrected for possible time memory effects. A
 correction term is computed and added to the relative error. 
 
 The correction term is parametrized as a 3rd order polynomial in the
 reference strength $k_{ref}$ according to:  
-\[ \Delta = \sum (c_i * {\it k}^{i}_{ref})            i = 0...3\]
+\[ \Delta = \sum (c_i * {\mathit k}^{i}_{ref})            i = 0...3\]
 The coefficients $c_i$ for the polynomial must be supplied in the
 command.  
 
@@ -494,7 +489,7 @@ Two additional parameters and options are required:
   preceding zeros must be given.  
 \end{madlist}
 
-{\bf Examples:}
+\textbf{Examples:}
 
 Example to assign relative errors to quadrupoles: 
 %% \begin{verbatim}
@@ -538,7 +533,7 @@ xxxxxxxx\=xxxxxxxxx\=xxxxxxxxxxxxxxxxxxxxxxxxxxxxx\= \kill
         \>          \>0.000, 0.000, 0.002, 0.000\};\>! coeff. mult. order 2
 }
 
-See also: \hyperref[sec:random]{random values}
+See also: \hyperref[subsubsec:random]{random values}
 and \hyperref[sec:defer]{deferred expressions}.  
 
 %\href{http://consult.cern.ch/xwho/people/1808}{Werner Herr}  6.12.2004 
@@ -560,20 +555,20 @@ EOPTION, SEED=real, ADD=logical;
 
 \begin{madlist}
   \ttitem{SEED} Selects a particular sequence of random values. 
-  A {\tt SEED} value is an integer in the range [0...999999999] (default:
-  123456789). {\tt SEED} alone continues with the current sequence See
-  also: \hyperref[sec:random]{Random Values}. {\tt SEED} may be an expression.  
+  A \texttt{SEED} value is an integer in the range [0...999999999] (default:
+  123456789). \texttt{SEED} alone continues with the current sequence See
+  also: \hyperref[subsubsec:random]{Random Values}. \texttt{SEED} may be an expression.  
 
-  \ttitem{ADD} If this logical flag is set, an {\tt EALIGN} or {\tt EFCOMP} 
+  \ttitem{ADD} If this logical flag is set, an \texttt{EALIGN} or \texttt{EFCOMP} 
   causes the errors to be added on top of existing ones. If it is not set,
   new errors overwrite any previous definitions. The default value is
-  TRUE if it is omitted in the {\tt EOPTION} command. The default value is
-  false if no {\tt EOPTION} command is used.  
+  TRUE if it is omitted in the \texttt{EOPTION} command. The default value is
+  false if no \texttt{EOPTION} command is used.  
   \\Please note a recent modification: the default value for the ADD
   option is only applied as long as the ADD option has not been set
   explicitly. 
-  \\Once it was set with {\tt EOPTION}, it is NOT reset to the default when
-  the {\tt ADD} option is omitted in subsequent calls to {\tt EOPTION}.  
+  \\Once it was set with \texttt{EOPTION}, it is NOT reset to the default when
+  the \texttt{ADD} option is omitted in subsequent calls to \texttt{EOPTION}.  
 \end{madlist}
 
 Example: 
@@ -597,18 +592,18 @@ corresponding absolute error at definition time. An error print is
 requested by the statement  
 
 \madbox{
-SELECT, FLAG=ERROR, RANGE=range, CLASS=name, PATTERN=string;
+SELECT, FLAG=ERROR, RANGE=range, CLASS=name, PATTERN=string;\\
 EPRINT;
 }
 and elements are now selected by the
-\hyperref[sec:select]{\tt SELECT} command.  
+\hyperref[sec:select]{\texttt{SELECT}} command.  
 
 A listing for ALL elements, i.e. not only the selected, can be obtained
 with the command  
 \madbox{
 EPRINT, FULL=TRUE;
 }
-In that case, the {\tt SELECT} command has no effect.
+In that case, the \texttt{SELECT} command has no effect.
 
 % \href{http://consult.cern.ch/xwho/people/1808}{Werner Herr} 18.6.2002 
 
@@ -637,7 +632,7 @@ Example:
 SELECT, FLAG=ERROR, RANGE=range, CLASS=name, PATTERN=string;
 ESAVE, FILE=err.file;
 }
-and elements selected by the  \hyperref[sec:seclect]{\tt SELECT}
+and elements selected by the  \hyperref[sec:select]{\texttt{SELECT}}
 command are saved to the file.  
 
 
@@ -647,18 +642,18 @@ SELECT, FLAG = ERROR, FULL; \\
 ESAVE, FILE = err.file;
 }
 
-{\bf Please note: in case of field errors, the absolute errors are
+\textbf{Please note: in case of field errors, the absolute errors are
   saved and not relative errors. } 
 
 \section{SETERR: Reading errors from a table or file}
-\label{Sec:seterr}
+\label{sec:seterr}
 
 To assign errors from a file is not a priori straightforward. It may be
-required to re-assign existing errors after a \hyperref[sec:use]{\tt USE}
-command was executed since the {\tt USE} command deletes all errors attached to 
+required to re-assign existing errors after a \hyperref[sec:use]{\texttt{USE}}
+command was executed since the \texttt{USE} command deletes all errors attached to 
 a sequence).
 
-Errors stored in the form of an internal table ({\it errtab}) can  be
+Errors stored in the form of an internal table (\textit{errtab}) can  be
 directly attached to the appropriate positions in the sequence with the
 command:  
 
@@ -666,8 +661,8 @@ command:
 SETERR, TABLE=errtab;
 }
 
-The table {\it errtab} can be generated internally or from an
-external file ({\it errfile}) with the generic command {\tt READMYTABLE}.  
+The table \textit{errtab} can be generated internally or from an
+external file (\textit{errfile}) with the generic command \texttt{READMYTABLE}.  
  
 
 The command sequence: 
@@ -676,25 +671,25 @@ READMYTABLE, file=errfile, table=errtab; \\
 SETERR, TABLE=errtab;
 }
 
-reads the file {\it errfile} into the table {\it errtab} and the
-command {\tt SETERR} attaches the errors to the elements in the active
+reads the file \textit{errfile} into the table \textit{errtab} and the
+command \texttt{SETERR} attaches the errors to the elements in the active
 sequence.  
 
-The file {\it errfile} can be produced by a preceding {\tt ESAVE} command
+The file \textit{errfile} can be produced by a preceding \texttt{ESAVE} command
 or any other utility. It should follow the format of a file generated
-with {\tt ESAVE} (see example program). 
+with \texttt{ESAVE} (see example program). 
 
-{\bf Please note:}
+\textbf{Please note:}
 \begin{enumerate}
    \item To assign correctly the errors from the file to the elements in
      the sequence, all elements must have individual names, otherwise an
      identification is not possible. Elements in the file not identified
      in the active sequence are ignored.  
    \item Errors are assigned to ALL elements found in the file and the
-     {\tt FLAG=ERROR} is set. Therefore the number of elements selected
+     \texttt{FLAG=ERROR} is set. Therefore the number of elements selected
      corresponding to a command like
-     \\ {\tt SELECT, FLAG=ERROR,...;}
-     \\ can be different after the execution of {\tt SETERR}. 
+     \\ \texttt{SELECT, FLAG=ERROR,...;}
+     \\ can be different after the execution of \texttt{SETERR}. 
 \end{enumerate}
 
 %\href{http://consult.cern.ch/xwho/people/1808}{Werner Herr} 18.6.2002 

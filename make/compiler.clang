@@ -1,0 +1,78 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - gcc compiler settings
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+#
+# makedep
+#
+
+CDEP = $(CC) -MM
+
+#
+# preprocessor flags
+#
+
+CPPFLAGS += -D_CLANG
+
+#
+# compiler flags
+#
+
+CFLAGS = -m$(ARCH) -O$(NOPT) -std=c99 -Wall -W -Wextra -pedantic -c
+
+#
+# options flags
+#
+
+ifeq ($(DEBUG),yes)
+CFLAGS += -g -ggdb 
+endif
+
+ifeq ($(PROFILE),yes)
+CFLAGS += -pg
+endif
+
+ifeq ($(SHARED),yes)
+CFLAGS += -fPIC
+endif
+
+ifeq ($(OPENMP),yes)
+CFLAGS += -fopenmp
+endif
+
+ifeq ($(SANITIZE),yes)
+CFLAGS += -fsanitize=address -fno-omit-frame-pointer
+endif
+
+#
+# extra flags
+#
+
+CFLAGS += -pipe
+ 
+#
+# diagnostics (gcc is the reference)
+#
+
+CFLAGS += -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations \
+          -Wchar-subscripts -Wwrite-strings -Wconversion -Wno-conversion -Winline \
+          -Wpointer-arith -Wbad-function-cast -Wcast-align -Wcast-qual \
+          -Wimplicit-function-declaration
+
+#         -Wfloat-equal -Wformat-nonliteral # not compatible with ugly MAD-X code...
+
+# end of makefile

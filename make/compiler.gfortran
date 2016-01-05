@@ -67,6 +67,6 @@ endif
 # extra flags
 #
 
-FFLAGS += -pipe -fno-second-underscore -fall-intrinsics -fno-range-check -J$(OBJDIR)
+FFLAGS += -pipe -fno-second-underscore -fall-intrinsics -fno-range-check -fmax-stack-var-size=65536 -J$(OBJDIR)
 
 # end of makefile

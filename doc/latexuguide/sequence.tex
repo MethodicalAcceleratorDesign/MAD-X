@@ -14,10 +14,12 @@ A sequence is declared with the following statements:
 name: \=SEQUENCE, \=L=real, REFER=string, REFPOS=string, \\
       \>          \>ADD\_PASS=integer, NEXT\_SEQU=string; \\
       \>\dots \\ 
-xxxxxx\=xxxxxxx\=xxxxxxxx\= \kill
-%      \>label: \>       \>AT=real, FROM=string \{, additional attributes\}; \\
-      \>label: \>class, \>AT=real, FROM=string \{, additional attributes\}; \\
-      \>       \>class, \>AT=real, FROM=string \{, additional attributes\}; \\
+xxxxxxx\=xxxxxxx\=xxxxxxxx\= \kill
+%     \>label: \>       \>AT=real, FROM=string \{, additional attributes\}; \\
+      \>label: \>class, \>AT=real, FROM=string \{, add. attributes\}; \\
+      \>\dots \\ 
+      \>       \>class, \>AT=real, FROM=string \{, add. attributes\}; \\
+      \>\dots \\
       \>seqname, \>     \>AT=real, FROM=string; \\
       \>\ldots \\
 ENDSEQUENCE;
@@ -27,25 +29,25 @@ The first statement declares a sequence, giving it a name in the form of
 a label, and providing some key parameters: 
 
 \begin{madlist}
-   \ttitem{L} (Default: {\tt 0.})\\
-     the total length of the sequence in meters. 
-   \ttitem{REFER}{\tt = keyword} in {\tt \{entry, centre, exit\}} (Default:
-          {\tt centre}) \\
-     specifies which part of the element is taken as the reference point 
-     at which the position along the beamline is given.
-   \ttitem{REFPOS} (Default: {\tt none})\\
-   specifies the name of an element in this sequence to be used as the
-   reference point for the insertion of this sequence in another
-   sequence.
-   \ttitem{ADD\_PASS} (Default: 0)\\ 
-     specifies a number of additional passes (max. 5) through the
-     structure; in case of an RBEND the angle will be overwritten in  survey
-     using the i-th component ($1 \le i \le {\tt add\_pass} \le 5$) of
-     its {\tt array\_of\_angles} attribute (see \hyperref[sec:rbend]{\tt 
-     RBEND}). 
-   \ttitem{NEXT\_SEQU} (Default: {\tt none})\\
-     specifies the name of a sequence to be concatenated 
-     to the end of this sequence.
+  \ttitem{L} (Default: 0)\\
+  the total length of the sequence in meters. 
+  \ttitem{REFER}\texttt{= keyword} in \texttt{\{entry, centre, exit\}}
+  (Default: \texttt{centre}) \\
+  specifies which part of the element is taken as the reference point 
+  at which the position along the beamline is given.
+  \ttitem{REFPOS} (Default: none)\\
+  specifies the name of an element in this sequence to be used as the
+  reference point for the insertion of this sequence in another
+  sequence.
+  \ttitem{ADD\_PASS} (Default: 0)\\ 
+  specifies a number of additional passes (max. 5) through the
+  structure; in case of an RBEND the angle will be overwritten in  survey
+  using the i-th component ($1 \le i \le \mathtt{add\_pass} \le 5$) of
+  its \texttt{array\_of\_angles} attribute (see
+  \hyperref[bend-rbend]{\texttt{RBEND}}).  
+  \ttitem{NEXT\_SEQU} (Default: none)\\
+  specifies the name of a sequence to be concatenated 
+  to the end of this sequence.
 \end{madlist}
  
 The \texttt{ENDSEQUENCE} statement terminates the declaration of a
@@ -66,7 +68,7 @@ several types of statements may appear:
   an element declaration as usual, with additional \texttt{AT}
   attribute giving the relative element position, and an optional
   \texttt{FROM} attribute; \\ 
-  {\bf CAUTION:} an existing definition for an element with the
+  \textbf{CAUTION:} an existing definition for an element with the
   same name (label) will be replaced, however, defining the same
   element twice inside the same sequence results in a fatal error,
   since a unique object (this element) would be placed at two
@@ -87,13 +89,13 @@ several types of statements may appear:
   %this causes the sequence with that name (inserted sequence) to be
   %placed at the position relative to the start of the current
   %containing sequence. \\ 
-  Depending upon the {\tt REFER} attribute of the current (containing)
-  sequence, the \texttt{entry}, \texttt{centre}, or \texttt{exit} of
+  Depending upon the \texttt{REFER} attribute of the current (containing)
+  sequence, the \texttt{entry, centre}, or \texttt{exit} of
   the inserted sequence is placed at the position specified. \\
-  HOWEVER, if the inserted sequence has a {\tt REFPOS} attribute containing
+  HOWEVER, if the inserted sequence has a \texttt{REFPOS} attribute containing
   the name of an element in the inserted sequence, the inserted sequence
-  is placed such that the element pointed to by {\tt REFPOS} is at the location
-  specified in the current sequence.
+  is placed such that the element pointed to by \texttt{REFPOS} is at
+  the location specified in the current sequence.
 \end{itemize} 
 
 
@@ -101,22 +103,23 @@ The additional arguments that can be given in the declaration of sequence
 elements or sub-sequences are: 
 \begin{madlist}
   \ttitem{AT} mandatory argument giving the location at
-  which the reference point ({\tt entry, centre} or {\tt exit}) of
+  which the reference point (\texttt{entry, centre} or \texttt{exit}) of
   the element is to be placed in the sequence. \\
   The value is absolute with the zero reference at the start of the
-  sequence, unless a {\tt FROM} argument is specified.
+  sequence, unless a \texttt{FROM} argument is specified.
 
   \ttitem{FROM} optional argument giving the name of an
   element of the same sequence. \\
-  The location given for the current element or sequence in the {\tt AT}
-  argument is then taken as {\bf relative}  to the position of the
-  center of the element given by the {\tt FROM} argument. \\
-  Only simple elements should be used in FROM; specifying a sequence 
-  as the FROM reference can lead to erroneous sequence expansion at best.  
+  The location given for the current element or sequence in the \texttt{AT}
+  argument is then taken as \textbf{relative}  to the position of the
+  center of the element given by the \texttt{FROM} argument. \\
+  Only simple elements should be used in \texttt{FROM}; specifying a
+  sequence as the \texttt{FROM} reference can lead to erroneous sequence
+  expansion at best. 
 \end{madlist}
 
 
-When the sequence is expanded in a \hyperref[sec:use]{\tt USE} 
+When the sequence is expanded in a \hyperref[sec:use]{\texttt{USE}} 
 command, \madx generates the drift spaces between elements according to
 the following rules: 
 \begin{enumerate}
@@ -129,29 +132,30 @@ the following rules:
   previous element and the entrance of the next element is less than a
   given tolerance of $1\mu m$, no drift space is created and the
   elements are considered as contiguous. \\
-  {\bf Note that in very specific cases this can cause very small errors
+  \textbf{Note that in very specific cases this can cause very small errors
     to accumulate and the actual length of the sequence can vary
     slightly from the declared length. (see second example below)} 
 \item When the distance between the exit of the previous element and the 
   entrance of the next element is negative and less than $-1\mu m$,
   the elements are considered to be overlapping and \madx terminates
-  with a ``{\tt negative drift length}'' fatal error. 
+  with a ``\texttt{negative drift length}'' fatal error. 
 \end{enumerate} 
 
-When the sequence is expanded in a \hyperref[sec:use]{\tt USE} 
+When the sequence is expanded in a \hyperref[sec:use]{\texttt{USE}} 
 command, \madx also checks that the calculated sequence length 
 is positive and that the lengths of all elements in the sequence 
 are positive or zero. A negative sequence length or negative element 
 length stops the \madx run with a fatal error.
 
-For efficiency reasons \madx imposes an {\bf important restriction}
+For efficiency reasons \madx imposes an \textbf{important restriction}
 on element lengths and positions: once a sequence is expanded, the
 element positions and lengths are considered as fixed; in order to vary
 a position or element length, a re-expansion of the sequence becomes
-necessary. The \hyperref[chap:match]{\tt MATCH} command contains a special flag 
-{\tt VLENGTH} to vary element lengths during matching.
+necessary. The \hyperref[chap:match]{\texttt{MATCH}} command contains a
+special flag \texttt{VLENGTH} to vary element lengths during matching.
 
-{\bf Example:}
+\madhline \\
+\textbf{Example:}
 \begin{verbatim}
 ! Define element classes for a simple cell:
 b:   sbend, l = 35.09, angle = 0.011306116;
@@ -171,11 +175,11 @@ sequ:  sequence, l = 79;
    endm:  marker, at = 79.0;
 endsequence;
 \end{verbatim}
+\madhline
 
-
-
-
-Example of very small drift space being ignored during sequence
+\vskip 5mm
+\madhline \\
+\textbf{Example} of very small drift space being ignored during sequence
 expansion: 
 \begin{verbatim}
 QTEST: QUADRUPOLE, L=1.000001;
@@ -188,4 +192,7 @@ USE, SEQUENCE=TEST;
 SURVEY, FILE='test';
 \end{verbatim}
 The above sequence will expand to a total length of $2.0000005 m$, half
-a micron longer than the claimed length of $2 m$, but will not fail.
+a micron longer than the claimed length of $2 m$, but will not fail.\\
+\madhline
+
+%EOF

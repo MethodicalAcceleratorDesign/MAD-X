@@ -7,55 +7,59 @@
 CREATE, TABLE=tabname, COLUMN= var\{, var\} \{, \_name\} ;
 }
 creates a table with the specified variables as columns. 
-This table is initially empty and can be subsequently filled, and
-eventually written to file in TFS format.  
+The table created is initially empty and can be subsequently
+\hyperref[sec:fill]{filled}, and eventually
+\hyperref[sec:write]{written} to file in
+\hyperref[chap:tfs]{\texttt{TFS}} format.
 
-The special variable name attribute "\_name" adds
+The special variable name attribute \texttt{\_name} adds
 the element name to the table at the specified column.
 
 %this replaces the
 %undocumented "withname" attribute that was not always working properly.  
 
-See the \href{../Introduction/select.html#ucreate}{user table I}
-example; 
-or an example of joining 2 tables of different length in one table
-including the element name:
-\href{../Introduction/select.html#screate}{user table II} 
+%% See the \href{../Introduction/select.html#ucreate}{user table I}
+%% example; 
+%% or an example of joining 2 tables of different length in one table
+%% including the element name:
+%% \href{../Introduction/select.html#screate}{user table II} 
 
 \section{DELETE}
 \label{sec:delete}
 \madbox{
 DELETE, SEQUENCE=seqname, TABLE=tabname;
 }
-deletes a sequence with name "seqname" or a table with name "tabname"
-from memory. The sequence deletion is done without influence on other
-sequences that may have elements that were in the deleted sequence.   
+deletes a sequence with name \texttt{seqname} or a table with name
+\texttt{tabname} from memory. The sequence deletion is done without
+influence on other sequences that may have elements that were in the
+deleted sequence.
 
 \section{READTABLE}
 \label{sec:readtable}
 \madbox{
 READTABLE, FILE="filename";
 }
-reads the TFS file "filename" containing a \mad table and loads the
-table back into memory. This table can then be manipulated as any other
-table, i.e. its values can be accessed, it can be plotted, written out
-again etc.
+reads the \texttt{TFS} file \texttt{filename} containing a \mad table
+and loads the table into memory. The table can then be manipulated as
+any other table, \textsl{i.e.} its values can be accessed, its data can
+be plotted or changed, and it can be written out again.
 
 \section{READMYTABLE}
 \label{sec:readmytable}
 \madbox{
 READMYTABLE, FILE="filename", TABLE=tabname;
 }
-reads a TFS file "filename" containing a \mad table and loads the table
-into memory with the name "tabname". This table
-can then be manipulated as any other table, i.e. its values can be
-accessed, it can be plotted, written out again etc. 
+reads a \texttt{TFS} file \texttt{filename} containing a \mad table and
+loads the table into memory with the name \texttt{tabname}. The table
+can then be manipulated as any other table, \textsl{i.e.} its values can
+be accessed, its data can be plotted or changed, and it can be written
+out again. 
 
-An internal name for the table can be freely assigned while for the
-command READTABLE the tabname is taken from the information section of
-the table itself.  
-This feature allows to store multiple tables of the same type in memory without
-overwriting existing ones.   
+An internal name for the table can be freely assigned, while for the
+command \hyperref[sec:readtable]{\texttt{READTABLE}} the table name is
+taken from the information section of the table itself.  
+This feature allows to store multiple tables of the same type in memory
+without overwriting existing ones.   
 
 \section{TABSTRING}
 \label{sec:tabstring}
@@ -107,9 +111,9 @@ the last row, allowing access to the table in reverse order of rows:
 etc\ldots  
 
 Trying to access the table forward beyond the last row, i.e. \texttt{ROW}
-strictly greater than {\tt nrow} the number of rows in the table, or
+strictly greater than \texttt{nrow} the number of rows in the table, or
 trying to access the table backwards before the first row, i.e. \texttt{ROW}
-strictly lower than {\tt -nrow}, or trying to access the illegal
+strictly lower than \texttt{-nrow}, or trying to access the illegal
 \texttt{ROW=0}, all result in a ``row out of bound'' message and no
 variable values are returned and set.  
 
@@ -122,13 +126,14 @@ variable values are returned and set.
 
 
 \section{SETVARS\_LIN}
-\label{sec:setvars_lin}
+\label{sec:setvars-lin}
 
-The {\tt SETVARS\_LIN} command sets the variables with values calculated
+The \texttt{SETVARS\_LIN} command sets the variables with values calculated
 by linear interpolation, or extrapolation, between two rows of a table. 
 
 \madbox{
-SETVARS\_LIN, TABLE=tabname, ROW1=integer, ROW2=integer, PARAM=string;
+  SETVARS\_LIN, \=TABLE=tabname, \\
+                \>ROW1=integer, ROW2=integer, PARAM=string;
 }
 
 The attributes of \texttt{SETVARS\_LIN} are:
@@ -138,36 +143,38 @@ The attributes of \texttt{SETVARS\_LIN} are:
   \ttitem{ROW2} a second row number with values for interpolation. (Default: 0)
   \ttitem{PARAM} a string containing the linear interpolation factor or
   the name of a variable or expression containing the interpolation
-  factor. If the resulting value of {\tt PARAM} is outside the
+  factor. If the resulting value of \texttt{PARAM} is outside the
   $[0,1]$ interval, the result is a linear extrapolation. \\
   (Default: "interp", itself defaulting to a value of 0.0 when evaluated)
 \end{madlist}
 
-{\tt SETVARS\_LIN} sets the variables with values calculated through
+\texttt{SETVARS\_LIN} sets the variables with values calculated through
 the following formula that \madx constructs internally as a deferred
 expression which is immediately evaluated:
 \madxmp{value := value(row1)*(1-param) + value(row2)*param;}
 Both the expression and the value of the expression are available to the
-user through respectively the commands \hyperref[sec:show]{\tt SHOW} 
-and \hyperref[sec:value]{\tt VALUE}.
+user through respectively the commands \hyperref[sec:show]{\texttt{SHOW}} 
+and \hyperref[sec:value]{\texttt{VALUE}}.
 
-When the values are represented as strings, e.g. the name or 
-keyword of elements, the resulting value is the string in {\tt ROW1}.
+When the values are represented as strings, \textsl{e.g.} the name or 
+keyword of elements, the resulting value is the string in \texttt{ROW1}.
 
-Negative {\tt ROWi} values are allowed and count the row numbers from
-the last row, allowing access to the table in reverse order of rows:
-{\tt ROWi~=~-1} accesses the last row of the table,
-{\tt ROWi~=~-2} accesses the penultimate (one before last) row,
-etc\ldots  
+Negative \texttt{ROW\textit{i}} values are allowed and count the row
+numbers from the last row, allowing access to the table in reverse order
+of rows: 
+\texttt{ROW\textit{i}~=~-1} accesses the last row of the table,
+\texttt{ROW\textit{i}~=~-2} accesses the penultimate (one before last)
+row, etc\ldots  
 
-Trying to access the table forward beyond the last row, i.e. {\tt ROWi}
-strictly greater than {\tt nrow} the number of rows in the table, or
-trying to access the table backwards before the first row, i.e. {\tt ROWi}
-strictly lower than {\tt -nrow}, or trying to access the illegal
-{\tt ROWi=0}, all result in a ``row out of bound'' message and the
-expression is not constructed or evaluated. 
+Trying to access the table forward beyond the last row,
+i.e. \texttt{ROW\textit{i}} strictly greater than \texttt{nrow} the
+number of rows in the table, or trying to access the table backwards
+before the first row, i.e. \texttt{ROW\textit{i}} strictly lower than
+\texttt{-nrow}, or trying to access the illegal
+\texttt{ROW\textit{i}=0}, all result in a ``row out of bound'' message
+and the expression is not constructed or evaluated. 
 
-{\bf Example:}
+\textbf{Example:}
 \madxmp{
 !  extracts the position of the centre of each element from a standard \\
 !  TWISS table giving positions at end of elements: \\
@@ -185,37 +192,37 @@ WHILE \=(i < len) \{ \\
 
 \section{FILL} 
 \label{sec:fill}
-The {\tt FILL} command fills a row of a table with the current values 
+The \texttt{FILL} command fills a row of a table with the current values 
 of all declared column variables of the table.
 \madbox{
 FILL, TABLE=tabname, ROW=integer;
 }
 
-The FILL command takes two arguments:
+The \texttt{FILL} command takes two arguments:
 \begin{madlist}
   \ttitem{TABLE} is the name of the table to be filled. The table must
   have been \hyperref[sec:create]{created} beforehand. 
-  The table can then be \hyperref[sec:write]{written} to file in {\tt TFS}
-  format. 
+  The table can then be \hyperref[sec:write]{written} to file in
+  \texttt{TFS} format. 
 
-  \ttitem{ROW} is the row number to be filled with the current values of
+  \ttitem{ROW} is the row number to be filled with the current values of 
   all column variables. \\ 
-  {\tt ROW=0}, or {\tt ROW=nrow + 1}, where {\tt nrow} is the current
-  number of rows in the table, causes {\tt FILL} to add a row at
+  \texttt{ROW=0}, or \texttt{ROW=nrow + 1}, where \texttt{nrow} is the
+  current number of rows in the table, causes \texttt{FILL} to add a row at
   the end of the table and fill it with the current values of all
   column variables. \\ (Default: 0) 
 \end{madlist}
 
-Negative {\tt ROW} values are allowed and count the row numbers from
+Negative \texttt{ROW} values are allowed and count the row numbers from
 the last row, allowing access to the table in reverse order of rows:
-{\tt ROW = -1} accesses the last row of the table,
-{\tt ROW = -2} accesses the penultimate (one before last) row,
+\texttt{ROW = -1} accesses the last row of the table,
+\texttt{ROW = -2} accesses the penultimate (one before last) row,
 etc\ldots  
 
 Trying to access the table forward beyond the last row, i.e. \texttt{ROW}
-strictly greater than {\tt nrow + 1}, where {\tt nrow} is the number of
+strictly greater than \texttt{nrow + 1}, where \texttt{nrow} is the number of
 rows in the table, or trying to access the table backwards before the
-first row, i.e. \texttt{ROW} strictly lower than {\tt -nrow}, both
+first row, i.e. \texttt{ROW} strictly lower than \texttt{-nrow}, both
 result in a ``row out of bound'' message and no values are filled in the
 table. 
 
@@ -225,42 +232,43 @@ table.
 %% backwards before the first row, result in a ``row out of bound'' message
 %% and no values are filled in the table.
 
-{\bf Reminder:} One can get access to the current number of rows in a
+\textbf{Reminder:} One can get access to the current number of rows in a
 table using the variable \madxmp{TABLE(tablenanme, TABLELENGTH)}
 
-See as well the \href{../Introduction/select.html#ucreate}{user table}
-example.   
+%% See as well the \href{../Introduction/select.html#ucreate}{user
+%% table} example.   
 
 \section{SHRINK} 
 \label{sec:shrink}
-The {\tt SHRINK} command removes a number of rows at the end of a table.
+The \texttt{SHRINK} command removes a number of rows at the end of a table.
 \madbox{
 SHRINK, TABLE=tabname, ROW=integer;
 }
 
-The {\tt SHRINK} command takes two arguments:
+The \texttt{SHRINK} command takes two arguments:
 \begin{madlist}
-	\ttitem{TABLE} is the name of the table from which rows should be removed. 
-	The table must have been previously \hyperref[sec:create]{created} and 
-	\hyperref[sec:fill]{filled} or read from file with \hyperref[sec:readtable]
-	{\tt READTABLE} or \hyperref[sec:readmytable]{\tt READMYTABLE}.
-	
-	\ttitem{ROW} is the number of the last row to be kept in the table. 
-	All rows beyond the given row number are removed. \\
-	Negative values are allowed and count the row numbers from
-	the last row, allowing access to the table in reverse order of rows:
-	\texttt{ROW~=~-1} removes the last row of the table,
-	\texttt{ROW~=~-2} removes the last two rows of the table,
-	etc\ldots  \\ 
-	(Default: -1) 
+  \ttitem{TABLE} is the name of the table from which rows should be removed. 
+  The table must have been previously \hyperref[sec:create]{created} and 
+  \hyperref[sec:fill]{filled} or read from file with
+  \hyperref[sec:readtable]{\texttt{READTABLE}}
+  or \hyperref[sec:readmytable]{\texttt{READMYTABLE}}.
+	   
+  \ttitem{ROW} is the number of the last row to be kept in the table. 
+  All rows beyond the given row number are removed. \\
+  Negative values are allowed and count the row numbers from
+  the last row, allowing access to the table in reverse order of rows:
+  \texttt{ROW~=~-1} removes the last row of the table,
+  \texttt{ROW~=~-2} removes the last two rows of the table,
+  etc\ldots  \\ 
+  (Default: -1) 
 \end{madlist}
 
 Trying to access the table forward beyond the last row, i.e. \texttt{ROW}
-strictly greater than {\tt nrow}, where {\tt nrow} is the number of
+strictly greater than \texttt{nrow}, where \texttt{nrow} is the number of
 rows in the table, or trying to access the table backwards before the
-first row, i.e. {\tt ROW} strictly lower than {\tt -nrow}, both
-result in a ``row out of bound'' message and no values are filled in the
-table. 
+first row, \textsl{i.e.} \texttt{ROW} strictly lower than \texttt{-nrow},
+both result in a ``row out of bound'' message and no values are filled
+in the table. 
 
 
 %% \section{SELECT} 
@@ -275,8 +283,8 @@ table.
 %% command based on selection criteria.
 
 %% The selection criteria on a single SELECT statement are logically
-%% ANDed, in other words, selected elements have to fulfill the {\tt RANGE},
-%% {\tt CLASS}, and {\tt PATTERN} criteria.  
+%% ANDed, in other words, selected elements have to fulfill the \texttt{RANGE},
+%% \texttt{CLASS}, and \texttt{PATTERN} criteria.  
 %% The selection criteria on different SELECT statements are logically
 %% ORed, in other words selected elements have to fulfill any of the
 %% selection criteria accumulated by the different statements.   
@@ -296,8 +304,8 @@ table.
 %%    \ttitem{sectormap} selection of elements for the
 %%      \href{../Introduction/sectormap.html}{sectormap} output file
 %%      from the Twiss module.  
-%%    \ttitem{save} selection of elements for the {\tt SAVE} command.  
-%%    \ttitem{table} is a table name such as {\tt twiss}, {\tt track}
+%%    \ttitem{save} selection of elements for the \texttt{SAVE} command.  
+%%    \ttitem{table} is a table name such as \texttt{twiss}, \texttt{track}
 %%      etc., and the rows and columns to be written are selected.  
 %% \end{madlist} 
 
@@ -306,14 +314,14 @@ table.
 %% SELECT, FLAG=name, FULL;
 %% \end{verbatim} 
 %% selects ALL positions in the sequence for the flag "name". This is the default
-%% for flags for all tables and {\tt MAKETHIN}.
+%% for flags for all tables and \texttt{MAKETHIN}.
 
 %% The statement 
 %% \begin{verbatim}
 %% SELECT, FLAG=name, CLEAR;
 %% \end{verbatim} 
 %% deselects ALL positions in the sequence for the flag "name". This is the default
-%% for flags {\tt ERROR} and {\tt SEQEDIT}.
+%% for flags \texttt{ERROR} and \texttt{SEQEDIT}.
 
 %% "slice" is only used by \href{../makethin/makethin.html}{makethin} and
 %% prescribes the number of slices into which the selected elements have to

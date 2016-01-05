@@ -3,10 +3,10 @@
 %  Changed by: Hans Grote, 25-Sep-2002
 
 \chapter{Definition of Elements}
-\label{chap:element_definition}
+\label{chap:element-definition}
 
 \section{Element Input Format}
-\label{sec:element_input}
+\label{sec:element-input}
 
 All physical elements are defined by statements of the form 
 \madbox{
@@ -16,14 +16,16 @@ where
 \begin{madlist}
   \ttitem{label} is a name to be given to the element.
   \ttitem{keyword} is an element type keyword.  
-  \ttitem{attribute} normally -- with exception for multipoles -- takes one of the two forms:
+  \ttitem{attribute} normally -- with exception for multipoles -- takes
+  one of the two forms: 
     \madxmp{attribute-name \== attribute-value \\ 
     attribute-name \>:= attribute-value}
     \begin{madlist}
       \ttitem{attribute-name} selects the attribute,
       as defined for the element type keyword.   
-      \ttitem{attribute-value} provides a value to the {\tt
-        attribute\_name}. The value may be specified by an expression.
+      \ttitem{attribute-value} provides a value to the
+      \texttt{attribute\_name}. The value may be specified by an
+      expression. 
     \end{madlist}
     The "=" assigns the value on the right to
     the attribute at the time of definition, regardless of any
@@ -35,24 +37,26 @@ where
 
 Omitted attributes are assigned a default value.
 
-{\bf Example:} 
+\textbf{Example:} 
 \madxmp{QF: QUADRUPOLE, L=1.8, K1=0.015832;}
 
-A special format is used for a \hyperref[sec:multipole]{multipole}\index{multipole}: 
+A special format is used for a
+\hyperref[sec:multipole]{multipole}\index{multipole}:  
 \madxmp{
 M: MULTIPOLE, \= KN= {kn0, kn1, kn2, ..., knmax},\\
               \> KS= {ks0, ks1, ks2, ..., ksmax};
 }
-where {\tt KN} and {\tt KS} give the integrated normal and skew strengths,
+where \texttt{KN} and \texttt{KS} give the integrated normal and skew strengths,
 respectively. The commas are mandatory, each strength can be an
-expression; their position defines the order. example:  
+expression; their position defines the order.\\
+\textbf{Example:}  
 \madxmp{M: MULTIPOLE, KN={0,0,0,myoct*lrad}, KS={0,0,0,0,-1.e-5};}
 defines a multipole with a normal octupole component and a skew decapole
 component.  
 
 %\input{Introduction/elm_edit}
 \section{Editing Element Definitions}  
-\label{sec:element_editing}
+\label{sec:element-editing}
 
 An element definition can be changed in two ways: 
 \begin{itemize}
@@ -77,13 +81,12 @@ attribute is the more efficient way.
 
 Element definitions can be edited freely. The changes do not affect
 already defined objects which belong to its
-\href{elm_class.html}{element class}.  
-
+\hyperref[sec:element-classes]{element class} (see below).  
 
 
 %\input{Introduction/elm_class}
 \section{Element Classes}  
-\label{sec:element_classes}
+\label{sec:element-classes}
 The concept of element classes solves the problem of addressing
 instances of elements in the accelerator in a convenient manner. 
 
@@ -135,7 +138,4 @@ definition may override some of those values by new ones. All class and
 object names can be used in range selections, providing a powerful
 mechanism to specify positions for matching constraints and printing.  
 
-
 %% EOF
-
-

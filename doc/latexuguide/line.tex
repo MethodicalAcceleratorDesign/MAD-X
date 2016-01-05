@@ -35,20 +35,20 @@ The formal argument list (arg\{,arg\}) is optional (see below). Each
 Beam lines may be nested to any level (see \ref{sec:sublines})  
 
 
-{\bf Warning:}\\
+\textbf{Warning:}\\
 \madx has been developed using sequences. Machine description using
 beamlines was kept in \madx to a minimal extent to keep backward 
 compatibility but also because it is often easier to start from beamlines 
-when designing an accelerator {\sl ab initio}.
+when designing an accelerator \textsl{ab initio}.
 But since \madx works only with sequences internally, there may exist
 some inconveniences when only beamlines are defined by the user. It is
 therefore recommended to convert beamlines into sequences (e.g. by means
-of the \hyperref[sec:save]{\tt SAVE} command) as soon as possible lines in 
-the design phase and to use only sequences for a finalised machine.     
+of the \hyperref[sec:save]{\texttt{SAVE}} command) as soon as possible
+lines in the design phase and to use only sequences for a finalised
+machine.      
 
-Attempting to do sequence edition on a sequence that has
-been expanded in memory from a beam line specified by the user is
-strongly discouraged.
+Attempting to do sequence edition on a sequence that has been expanded
+in memory from a beam line specified by the user is strongly discouraged. 
 
 \section{Simple Beam Lines} 
 \label{sec:beamline}
@@ -62,8 +62,8 @@ exmp1: \=LINE=(a,b,c,d,a,d); \\
 USE,   \>PERIOD=exmp1;
 }
 
-The {\tt USE} command causes \madx to load and expand the specified
-beamline. This in particular loads the beamline as a SEQUENCE
+The \texttt{USE} command causes \madx to load and expand the specified
+beamline. This in particular loads the beamline as a \texttt{SEQUENCE}
 representation in memory. All subsequent calculations are done on this
 sequence in memory.  
 
@@ -92,7 +92,7 @@ produces the following expansion steps:
 \end{enumerate}
 
 \section{Reflection and Repetition} 
-\label{sec:reflect_repeat_lines}
+\label{sec:reflect-repeat-lines}
 An unsigned repetition count and an asterisk (multiplication sign)
 indicate repetition of a beam line member. 
 A repetition count can be applied to sub-lines as well as elements. 
@@ -136,7 +136,7 @@ single element gives the same single element.
 %% Fixed in r4932, a single element can now be repeated. 2*S and -2*S
 %% are of course identical, and also equivalent to 2*(S) and -2*(S) if S
 %% is a single element.
-%%{\bf Attention:} the repetition \texttt{2*S} only works if \texttt{S} is
+%%\textbf{Attention:} the repetition \texttt{2*S} only works if \texttt{S} is
 %%itself a line. If \texttt{S} is a single element, the repetition syntax
 %%should be \texttt{2*(S)}. 
  
@@ -186,9 +186,9 @@ Proceeding step by step, this example generates the expansion
 
 \section{Limits of Construction of Beam Lines}  
 
-Since Lines are in fact depreciated there are some limits of how they
-can be constructed. Please find below a running \madx run which shows an
-example of OK (valid) and WRONG (invalid) cases.   
+Since \texttt{LINE}s are in fact deprecated there are some limits to how
+they can be constructed. Below is a running \madx example which shows a
+collection of valid (marked OK) and invalid cases (marked WRONG).
 
 \begin{verbatim}
 !----------------------------------------------------------------------
@@ -214,31 +214,16 @@ test6: LINE=(rpl((3*sl),(-3*sl))); ! WRONG
 
 test7: LINE=(3*sl,-3*sl);          !OK
 
-use, period=test0;
-twiss,BETX=1,bety=1;
-
-use, period=test1;
-twiss,BETX=1,bety=1;
-
-use, period=test2;
-twiss,BETX=1,bety=1;
-
-use, period=test3;
-twiss,BETX=1,bety=1;
-
-use, period=test4;
-twiss,BETX=1,bety=1;
-
-use, period=test5;
-twiss,BETX=1,bety=1;
-
-use, period=test6;
-twiss,BETX=1,bety=1;
-
-use, period=test7;
-twiss,BETX=1,bety=1;
+use, period=test0; twiss,BETX=1,bety=1;
+use, period=test1; twiss,BETX=1,bety=1;
+use, period=test2; twiss,BETX=1,bety=1;
+use, period=test3; twiss,BETX=1,bety=1;
+use, period=test4; twiss,BETX=1,bety=1;
+use, period=test5; twiss,BETX=1,bety=1;
+use, period=test6; twiss,BETX=1,bety=1;
+use, period=test7; twiss,BETX=1,bety=1;
 !----------------------------------------------------------------------
 \end{verbatim}
 
 %\href{http://www.cern.ch/Hans.Grote/hansg_sign.html}{hansg}, June 17, 2002 
-
+%EOF

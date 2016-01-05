@@ -13,7 +13,7 @@ uname -n > build-test-lxplus.run
 check_error ()
 {
 	if [ "$?" != "0" ] ; then
-		echo "ERROR: $1"
+		echo -e "\nERROR: $1"
 		[ "$2" != "no-exit" ] && exit 1
 	fi
 }
@@ -42,6 +42,8 @@ if [ "$?" != "0" ] ; then
 	svn update
 	check_error "svn update failed"
 fi
+# ensure that scripts are executable after an update
+chmod u+x scripts/build-test-report.sh $0
 
 echo -e "\n===== Release number ====="
 cat VERSION
@@ -85,13 +87,12 @@ ifort    --version
 make all-linux64-intel all-linux64
 check_error "make all-linux64-intel failed"
 
-# license not yet back...
-#echo -e "\n===== NagFor build ====="
-#export PATH="${PATH}:/afs/cern.ch/sw/fortran/nag2012/bin"
-#export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/afs/cern.ch/sw/fortran/nag2012/lib"
-#export NAG_KUSARI_FILE="/afs/cern.ch/sw/fortran/nag2012/lib/nag.licence.5.2,lxlic04.cern.ch:"
-#make madx-linux-nagfor
-#check_error "make madx-linux-nagfor failed" "no-exit"
+echo -e "\n===== NagFor build ====="
+export PATH="${PATH}:/afs/cern.ch/sw/fortran/nag2012/bin"
+export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/afs/cern.ch/sw/fortran/nag2012/lib"
+export NAG_KUSARI_FILE="/afs/cern.ch/sw/fortran/nag2012/lib/nag.licence.5.2,lxlicen04.cern.ch:"
+make madx-linux-nagfor
+check_error "make madx-linux-nagfor failed" "no-exit"
 
 echo -e "\n===== Lahey 32 build ====="
 source /afs/cern.ch/sw/lcg/contrib/gcc/max/i686-slc6/setup.sh
@@ -116,19 +117,19 @@ else
 	echo ""
 
 	echo -e "\n===== Testing madx-linux64-intel ====="
-	make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
+	make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=yes
 	check_error "make tests-all for madx-linux64-intel failed"
 
 	echo -e "\n===== Testing madx-linux32-intel ====="
-	make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
+	make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=yes
 	check_error "make tests-all for madx-linux32-intel failed"
 
 	echo -e "\n===== Testing madx-linux64-gnu ====="
-	make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
+	make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=yes
 	check_error "make tests-all for madx-linux64-gnu failed"
 
 	echo -e "\n===== Testing madx-linux32-gnu ====="
-	make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
+	make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=yes
 	check_error "make tests-all for madx-linux32-gnu failed"
 fi
 
