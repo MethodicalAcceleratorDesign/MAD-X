@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Linux)       +
+  +     MAD-X 5.02.08  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.06.26 11:38:16      +
+  + Release   date: 2015.11.20               +
+  + Execution date: 2016.01.05 11:31:05      +
   ++++++++++++++++++++++++++++++++++++++++++++
 PTCNSTEPS=3;
 
@@ -70,6 +70,7 @@ ptc_create_universe;
           Kinetic Energy : 0.199489E+00
       Particle Rest Mass : 0.510999E-03
                 Momentum : 0.199999E+00
+  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy          0.20000000000000001     
      method                   6
@@ -77,6 +78,21 @@ ptc_create_universe;
      charge           1.0000000000000000     
   Length of machine:    1.2000000000000002     
  The machine is a LINE
+ Previous of cutable Elements            2
+ METHOD 2            2           2
+ METHOD 4            0           0
+ METHOD 6            0           0
+ number of Slices            2
+ Total NST            9
+ Present of cutable Elements            2
+ METHOD 2            2           4
+ METHOD 4            0           0
+ METHOD 6            0           0
+ number of Slices            4
+ Total NST           11
+ Total NST due to Bend Closed Orbit            0
+ Total NST due to Sextupoles            0
+ Biggest ds    5.0000000000000003E-002
  ------------------------------------ PTC Survey ------------------------------------
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
@@ -88,7 +104,7 @@ ptc_create_universe;
 
 
 
- PTC_TWISS, table=twiss, icase=56, no=2, betz=1.0, betx=10, bety=10;
+ PTC_TWISS, table=twiss, icase=6, no=2, betz=1.0, betx=10, bety=10;
 
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
@@ -160,5 +176,5 @@ ptc_end;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

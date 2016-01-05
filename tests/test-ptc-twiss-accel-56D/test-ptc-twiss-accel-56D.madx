@@ -31,7 +31,7 @@ ptc_create_universe;
    ptc_setswitch, debuglevel=0, nocavity=false, 
                   maxacceleration=true, fringe=true, exact_mis=true, time=true, totalpath=true;
 
- PTC_TWISS, table=twiss, icase=56, no=2, betz=1.0, betx=10, bety=10;
+ PTC_TWISS, table=twiss, icase=6, no=2, betz=1.0, betx=10, bety=10;
 
  write, table=twiss, file="ptc.twiss";
 
