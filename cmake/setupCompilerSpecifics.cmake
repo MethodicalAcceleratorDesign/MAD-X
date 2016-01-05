@@ -54,7 +54,11 @@ if(MADX_DEBUG)
    add_definitions(-D_DEBUG -DDEBUG_ALL)
 endif()
 
-add_definitions(-D_FULL -D_VERSION=${MADX_VERSION} -D_VERSION_DATE=${VERSION_DATE} -D_VERSION_OSTYPE=${CMAKE_SYSTEM_NAME})
+add_definitions(-D_FULL)
+add_definitions(-D_VERSION=${MADX_VERSION})
+add_definitions(-D_VERSION_NUM=${VERSION_NUM})
+add_definitions(-D_VERSION_DATE=${VERSION_DATE})
+add_definitions(-D_VERSION_OSTYPE=${CMAKE_SYSTEM_NAME})
 
 # C stuff:
 # -- not needed for gnu/intel --

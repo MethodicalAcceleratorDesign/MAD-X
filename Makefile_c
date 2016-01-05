@@ -31,8 +31,10 @@ $(OBJDIR)/mad_gxx11c.d: CPPFLAGS += $(call incdir,/usr/X11/include /opt/X11/incl
 
 # files specific compiler flag
 mad_gcst.o: CPPFLAGS   += -D_VERSION=$(VERSION) \
+                          -D_VERSION_NUM=$(VERSION_NUM) \
                           -D_VERSION_DATE=$(VERSION_DATE) \
                           -D_VERSION_OSTYPE=$(OSTYPE)
+mad_dict.o: CPPFLAGS   += -D_VERSION_NUM=$(VERSION_NUM)
 mad_gxx11c.o: CPPFLAGS += $(call incdir,/usr/X11/include /opt/X11/include)
 mad_gxx11c.o: CFLAGS   += $(if $(call neq,$(CCNAME),icc),,-diag-disable 161) \
                           $(if $(call neq,$(CCNAME),gcc),,-Wno-variadic-macros)

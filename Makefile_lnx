@@ -21,6 +21,7 @@
 #
 all-linux:         all-linux32        all-linux64
 all-linux-gnu:     all-linux32-gnu    all-linux64-gnu
+all-linux-llvm:    all-linux32-llvm   all-linux64-llvm
 all-linux-intel:   all-linux32-intel  all-linux64-intel
 
 all-linux32:       madx-linux32 libmadx-linux32 libptc-linux32 numdiff-linux32
@@ -28,6 +29,9 @@ all-linux64:       madx-linux64 libmadx-linux64 libptc-linux64 numdiff-linux64
 
 all-linux32-gnu:   madx-linux32-gnu libmadx-linux32-gnu libptc-linux32-gnu numdiff-linux32-gnu
 all-linux64-gnu:   madx-linux64-gnu libmadx-linux64-gnu libptc-linux64-gnu numdiff-linux64-gnu
+
+all-linux32-llvm:  madx-linux32-llvm libmadx-linux32-llvm libptc-linux32-llvm numdiff-linux32-llvm
+all-linux64-llvm:  madx-linux64-llvm libmadx-linux64-llvm libptc-linux64-llvm numdiff-linux64-llvm
 
 all-linux32-intel: madx-linux32-intel libmadx-linux32-intel libptc-linux32-intel numdiff-linux32-intel
 all-linux64-intel: madx-linux64-intel libmadx-linux64-intel libptc-linux64-intel numdiff-linux64-intel
@@ -45,12 +49,14 @@ cleanarch:
 #
 madx-linux:         madx-linux32         madx-linux64
 madx-linux-gnu:     madx-linux32-gnu     madx-linux64-gnu
+madx-linux-llvm:    madx-linux32-llvm    madx-linux64-llvm
 madx-linux-intel:   madx-linux32-intel   madx-linux64-intel
 madx-linux-lahey:   madx-linux32-lahey   madx-linux64-lahey
 madx-linux-nagfor:  madx-linux32-nagfor  madx-linux64-nagfor
 
 .PHONY:  madx-linux32         madx-linux64
 .PHONY:  madx-linux32-gnu     madx-linux64-gnu
+.PHONY:  madx-linux32-llvm    madx-linux64-llvm
 .PHONY:  madx-linux32-intel   madx-linux64-intel
 .PHONY:  madx-linux32-lahey   madx-linux64-lahey
 .PHONY:  madx-linux32-nagfor  madx-linux64-nagfor
@@ -74,6 +80,14 @@ madx-linux32-gnu: libs/gc/libgc-linux32-gnu.a
 madx-linux64-gnu: libs/gc/libgc-linux64-gnu.a
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=gnu && $(MAKE_LINK) madx64
+
+madx-linux32-llvm: libs/gc/libgc-linux32-llvm.a
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=llvm && $(MAKE_LINK) madx32
+
+madx-linux64-llvm: libs/gc/libgc-linux64-llvm.a
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=llvm && $(MAKE_LINK) madx64
 
 madx-linux32-nagfor: libs/gc/libgc-linux32-gnu.a
 	$E "*** Building $@"
@@ -112,11 +126,20 @@ libs/gc/libgc-linux64-gnu.a:
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_OPTS) libgc-gnu64
 
+libs/gc/libgc-linux32-llvm.a:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_OPTS) libgc-llvm32
+
+libs/gc/libgc-linux64-llvm.a:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_OPTS) libgc-llvm64
+
 #
 # libmadx
 #
 libmadx-linux:        libmadx-linux32        libmadx-linux64
 libmadx-linux-gnu:    libmadx-linux32-gnu    libmadx-linux64-gnu
+libmadx-linux-llvm:   libmadx-linux32-llvm   libmadx-linux64-llvm
 libmadx-linux-intel:  libmadx-linux32-intel  libmadx-linux64-intel
 
 libmadx-linux%: DESTDIR   := $(DESTDIR)libs/madx
@@ -141,11 +164,20 @@ libmadx-linux64-gnu:
 	$E "*** Building $@"                                # STATIC=no due to missing -fPIC in the runtime library of gfortran 64 bit
 	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=gnu STATIC=no && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.so
 
+libmadx-linux32-llvm:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=llvm && $(MAKE_LINK1) libmadx32.a && $(MAKE_LINK2) libmadx32.so
+
+libmadx-linux64-llvm:
+	$E "*** Building $@"                                # STATIC=no due to missing -fPIC in the runtime library of gfortran 64 bit
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=llvm STATIC=no && $(MAKE_LINK1) libmadx64.a && $(MAKE_LINK2) libmadx64.so
+
 #
 # libptc
 #
 libptc-linux:         libptc-linux32        libptc-linux64
 libptc-linux-gnu:     libptc-linux32-gnu    libptc-linux64-gnu
+libptc-linux-llvm:    libptc-linux32-llvm   libptc-linux64-llvm
 libptc-linux-intel:   libptc-linux32-intel  libptc-linux64-intel
 
 libptc-linux%: DESTDIR   := $(DESTDIR)libs/ptc
@@ -170,11 +202,20 @@ libptc-linux64-gnu:
 	$E "*** Building $@"                                # STATIC=no due to missing -fPIC in the runtime library of gfortran 64 bit
 	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=gnu STATIC=no && $(MAKE_LINK1) libptc64.a && $(MAKE_LINK2) libptc64.so
 
+libptc-linux32-llvm:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=llvm && $(MAKE_LINK1) libptc32.a && $(MAKE_LINK2) libptc32.so
+
+libptc-linux64-llvm:
+	$E "*** Building $@"                                 # STATIC=no due to missing -fPIC in the runtime library of gfortran 64 bit
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=llvm STATIC=no && $(MAKE_LINK1) libptc64.a && $(MAKE_LINK2) libptc64.so
+
 #
 # numdiff
 #
 numdiff-linux:        numdiff-linux32        numdiff-linux64
 numdiff-linux-gnu:    numdiff-linux32-gnu    numdiff-linux64-gnu
+numdiff-linux-llvm:   numdiff-linux32-llvm   numdiff-linux64-llvm
 numdiff-linux-intel:  numdiff-linux32-intel  numdiff-linux64-intel
 
 numdiff-linux%: DESTDIR  := $(DESTDIR)tools/numdiff
@@ -197,5 +238,13 @@ numdiff-linux32-gnu:
 numdiff-linux64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=gnu && $(MAKE_LINK) numdiff64
+
+numdiff-linux32-llvm:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=llvm && $(MAKE_LINK) numdiff32
+
+numdiff-linux64-llvm:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=llvm && $(MAKE_LINK) numdiff64
 
 # end of makefile

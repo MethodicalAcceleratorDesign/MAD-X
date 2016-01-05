@@ -115,7 +115,7 @@ ND  	:= numdiff
 
 # makefiles to include (in this order, all optional, here are default names)
 FILE_PRE  := Makefile_pre          # user's preprocessing extra stuff
-FILE_VER  := VERSION               # setup project VERSION and VERSION_DATE
+FILE_VER  := VERSION               # setup project VERSION, VERSION_NUM and VERSION_DATE
 FILE_CPP  := Makefile_cpp          # setup project specific CPPFLAGS defines
 FILE_C    := Makefile_c            # setup project CC_SRC and CC_HDR
 FILE_CXX  := Makefile_cxx          # setup project CXX_SRC and CXX_HDR
