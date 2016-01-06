@@ -182,6 +182,8 @@ contains
        enddo
     enddo
     
+    !print*,"BETZ=",(A_script(6).sub.'000010')**2 + (A_script(6).sub.'000001')**2
+    
     if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
       write(whymsg,*) ' check_stable ',check_stable,' c_%stable_da ',c_%stable_da,' PTC msg: ', &
                        messagelost(:len_trim(messagelost))
@@ -285,7 +287,7 @@ contains
        s1%disp(i)=lat(0,i,1)
     enddo
 
-
+    !swap for longitudinal beta with gamma
     if (c_%nd == 3) then
        do i=1,c_%nd
           test = s1%beta(3,i)
@@ -639,7 +641,7 @@ contains
     c_idef(:) = 0
     c_idef(1)=1; c_idef(2)=3; c_idef(3)=5;
     
-    c_normal_auto=-1;
+    c_normal_auto=1;
 
 !    call init_all(default,no,nda)
     ! mynd2 and npara are outputs
