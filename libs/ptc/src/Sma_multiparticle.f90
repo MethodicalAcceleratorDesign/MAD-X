@@ -2001,7 +2001,7 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     IMPLICIT NONE
     real(dp),target,intent(INOUT) ::  z(6)
     real(dp) b0,t,b1
-     logical time
+    logical(LP) time
 
     if(time) then
      b0=b1
@@ -2020,7 +2020,7 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     type(real_8),target,intent(INOUT) ::  z(6)
     type(real_8) t
     real(dp) b0,b1
-     logical time
+    logical(LP) time
 
     if(time) then
      b0=b1
@@ -2042,7 +2042,7 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     IMPLICIT NONE
     real(dp),target,intent(INOUT) :: z(6)
     real(dp) b0,t,b1
-     logical time
+    logical(LP) time
 
     if(time) then
      b0=b1
@@ -2061,9 +2061,8 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     IMPLICIT NONE
     type(real_8),target,intent(INOUT) ::  z(6)
     type(real_8) t 
- 
-     real(dp) b0,b1
-     logical time
+    real(dp) b0,b1
+    logical(LP) time
 
     if(time) then
      b0=b1
@@ -2086,7 +2085,7 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     IMPLICIT NONE
     type(probe),target,intent(INOUT) ::  z
     real(dp) b0,t,b1
-     logical time
+    logical(LP) time
 
     if(time) then
      b0=b1
@@ -2106,7 +2105,7 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     type(probe_8),target,intent(INOUT) ::  z
     type(real_8) t
     real(dp) b0,b1
-    logical time
+    logical(LP) time
     if(time) then
      b0=b1
     else
@@ -2126,7 +2125,8 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     IMPLICIT NONE
     type(probe),target,intent(INOUT) :: z
     real(dp) b0,t,b1
-    logical time
+    logical(LP) time
+    
     if(time) then
      b0=b1
     else
@@ -2144,7 +2144,8 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     type(probe_8),target,intent(INOUT) ::  z
     type(real_8) t
     real(dp) b0,b1
-    logical time
+    logical(LP) time
+    
     if(time) then
      b0=b1
     else

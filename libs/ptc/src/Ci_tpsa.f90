@@ -1565,7 +1565,7 @@ end subroutine c_get_indices
 
     do i=1,n
        call c_taylor_cycle(s1,ii=i,value=value,j=j)
-       x=imag(value)
+       x=aimag(value)
        c_aimag=c_aimag+(x.cmono.j)
    enddo
    
@@ -6170,7 +6170,7 @@ cgetvectorfield=0
   x=s1
   v=0
        if(abs(x)>prec) v=x
-       x=imag(s1)
+       x=aimag(s1)
        if(abs(x)>prec) v=v+i_*x
   c_clean=v
 
@@ -6199,7 +6199,7 @@ cgetvectorfield=0
        v=0.0_dp
        x=value
        if(abs(x)>prec) v=x
-       x=imag(value)
+       x=aimag(value)
        if(abs(x)>prec) v=v+i_*x
 !       if(abs(value)>prec) then
           t=t+(v.cmono.j)
