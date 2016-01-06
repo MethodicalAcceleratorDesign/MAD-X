@@ -1439,7 +1439,7 @@ eta2=0.0_dp
     CALL TRACK(R,Y,1,+STATE)
     norm=y
     cmap=y
-    call c_normal(cmap,cn,dospin=.false.)
+    call c_normal(cmap,cn,dospin=my_false)
     call flatten_c_factored_lie(cn%ker,cvec)
     cvec=transform_vector_field_by_map(cvec,to_phasor())
     cmap=(cn%a_t)**(-1)
