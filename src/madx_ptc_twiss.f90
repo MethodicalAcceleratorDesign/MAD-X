@@ -636,7 +636,7 @@ contains
     
     !new complex PTC
     call init_all(default,no,nda,BERZ,mynd2,npara)
-    c_verbose=.true.
+    c_verbose=.false.
     
     c_idef(:) = 0
     c_idef(1)=1; c_idef(2)=3; c_idef(3)=5;
@@ -2155,13 +2155,17 @@ contains
          call print(theNormalForm%a_t,19)
       endif
 
-
   
       call kill(A_script_probe)
       call alloc(A_script_probe)
       A_script_probe%u=my_false
        
       A_script_probe =  orbit_probe + theNormalForm%a_t
+
+      if (getdebug() > 2) then
+        call print(A_script_probe,21)
+        call flush(21)
+      endif
       
       call kill(theNormalForm)
       call kill(c_Map)
@@ -3324,9 +3328,6 @@ contains
      call alloc(c_Map)
      
      c_Map = oneTurnMap;
-
-     !flush(19)
-     !return
      
      call alloc(theNormalForm) 
 
@@ -3346,20 +3347,20 @@ contains
         return
      endif
      
-!     call daprint(oneTurnMap,18)
+!     call daprint(oneTurnMap,99)
 
-     write(19,'(/a/)') '%A1 Dispersion, First and Higher Orders'
-     call daprint(theNormalForm%A1,19)
-     write(19,'(/a/)') '%Tunes, Chromaticities and Anharmonicities'
+     write(99,'(/a/)') '%A1 Dispersion, First and Higher Orders'
+     call daprint(theNormalForm%A1,99)
+     write(99,'(/a/)') '%Tunes, Chromaticities and Anharmonicities'
 
-     write(19,'(/ES16.8/)') theNormalForm%tune
+     write(99,'(/ES16.8/)') theNormalForm%tune
 
 
-     write(19,'(/a/)') '%A_t Eigen vectors'
-     call daprint(theNormalForm%a_t,19) ! orig one
+     write(99,'(/a/)') '%A_t Eigen vectors'
+     call daprint(theNormalForm%a_t,99) ! orig one
      
-     write(19,'(/a/)') '%N ???'
-     call daprint(theNormalForm%n,19) ! orig one
+     write(99,'(/a/)') '%N ???'
+     call daprint(theNormalForm%n,99) ! orig one
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
     !!
@@ -3396,18 +3397,18 @@ contains
                                    '%le','%le', &
                                    '%le','%le'
 
-    write(19,*); write(19,*) " KERNEL  ";write(19,*); 
-        call print(theNormalForm%ker,19)
-    write(19,*) "--------------------------------------" 
+    write(99,*); write(99,*) " KERNEL  ";write(99,*); 
+        call print(theNormalForm%ker,99)
+    write(99,*) "--------------------------------------" 
     
     call alloc(vf_kernel)
     vf_kernel=0
     call flatten_c_factored_lie(theNormalForm%ker,vf_kernel)
 
-    write(19,*) " KERNEL Flattened  ";
-    write(19,*); 
-    call print(vf_kernel,19)
-    write(19,*) "--------------------------------------" 
+    write(99,*) " KERNEL Flattened  ";
+    write(99,*); 
+    call print(vf_kernel,99)
+    write(99,*) "--------------------------------------" 
 
     
     call putQnormaltable(vf_kernel%v(1),1) 
@@ -3437,9 +3438,9 @@ contains
     g_io =-cgetpb(vf)
     call putGnormaltable(g_io)
     
-    write(19,*); write(19,*) " Normalised Generating Function  ";write(19,*); 
-        call print(g_io,19)
-    write(19,*) "--------------------------------------" 
+    write(99,*); write(99,*) " Normalised Generating Function  ";write(99,*); 
+        call print(g_io,99)
+    write(99,*) "--------------------------------------" 
 
 
     !!!!!!!!!!!!!!!!!!!!!!
@@ -3451,10 +3452,10 @@ contains
     nrmlzdPseudoHam=-cgetpb(vf_kernel)
      !nrmlzdPseudoHam=-cgetpb(vf)/dt                ! (6c)
 
-    write(19,*) " Normalised Pseudo-Hamiltonian  ";
-    write(19,*); 
-    call print(nrmlzdPseudoHam,19)
-    write(19,*) "--------------------------------------" 
+    write(99,*) " Normalised Pseudo-Hamiltonian  ";
+    write(99,*); 
+    call print(nrmlzdPseudoHam,99)
+    write(99,*) "--------------------------------------" 
 
 
     
