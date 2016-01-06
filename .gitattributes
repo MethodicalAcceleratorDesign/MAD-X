@@ -1027,6 +1027,7 @@ tests/share/AD/ad_new.seq -text
 tests/share/AD/ad_quads_3837_ffe.str -text
 tests/share/ALBA/ALBA-25.4th.seq -text
 tests/share/ALBA/ALBA-25.4th_v2.seq -text
+tests/share/ALS/als.seqx -text
 tests/share/CLIC-DR/clicdr.madx -text
 tests/share/DIAMOND/dls811.seq -text
 tests/share/FCCe/fcc-ee_v14.seq -text
