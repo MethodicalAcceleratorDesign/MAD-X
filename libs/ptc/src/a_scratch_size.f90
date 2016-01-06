@@ -179,7 +179,7 @@ module precision_constants
   logical(lp),TARGET :: sixtrack_compatible =.false.
   integer ,target ::  spin_normal_position=2
   real(dp),target ::  da_absolute_aperture=1e6_dp
-  real(dp),pointer :: crash
+  real(dp),pointer :: crash => null()
   INTEGER,  TARGET :: NPARA_original
   logical  :: default_tpsa=.false.
   logical, target :: lingyun_yang=.false.
@@ -233,86 +233,86 @@ module precision_constants
 
   type CONTROL
      ! Da stuff
-     real(dp),pointer :: total_da_size !  in megabytes
-     integer,pointer :: lda_used       !  maximum number of da variables in Berz's
-     logical(lp),pointer  :: OLD    ! = true  = bERZ
-     logical(lp),pointer  :: real_warning  ! = true
-     integer,pointer :: no       ! order of da
-     integer,pointer :: nv       ! number of variables
-     integer,pointer :: nd       ! degrees of freedom
-     integer,pointer :: nd2      ! phase space dimension
-     integer,pointer :: np       ! number of parameters in fpp
-     integer,pointer :: nspin       ! number of spin variables (0 or 3)
-     integer,pointer :: SPIN_pos       ! position of spin variables (0 or 3)
-     integer,pointer :: ndpt     ! constant energy variable position is different from zero
-     integer,pointer :: NPARA     ! PARAMETER LOCATION IN PTC in fpp
-     integer,pointer :: npara_fpp     ! PARAMETER LOCATION IN FPP or PTC
-     integer,pointer :: np_pol     ! parameters produced through pol_block
-     logical(lp),pointer :: knob
-     logical(lp),pointer :: valishev
+     real(dp),pointer :: total_da_size => null() !  in megabytes
+     integer,pointer :: lda_used => null()       !  maximum number of da variables in Berz's
+     logical(lp),pointer  :: OLD => null()    ! = true  = bERZ
+     logical(lp),pointer  :: real_warning => null()  ! = true
+     integer,pointer :: no  => null()      ! order of da
+     integer,pointer :: nv  => null()      ! number of variables
+     integer,pointer :: nd  => null()      ! degrees of freedom
+     integer,pointer :: nd2 => null()      ! phase space dimension
+     integer,pointer :: np  => null()      ! number of parameters in fpp
+     integer,pointer :: nspin => null()       ! number of spin variables (0 or 3)
+     integer,pointer :: SPIN_pos => null()       ! position of spin variables (0 or 3)
+     integer,pointer :: ndpt     => null() ! constant energy variable position is different from zero
+     integer,pointer :: NPARA    => null() ! PARAMETER LOCATION IN PTC in fpp
+     integer,pointer :: npara_fpp=> null()     ! PARAMETER LOCATION IN FPP or PTC
+     integer,pointer :: np_pol   => null()  ! parameters produced through pol_block
+     logical(lp),pointer :: knob => null()
+     logical(lp),pointer :: valishev => null()
      !     integer, pointer :: NDPT_OTHER
-     logical(lp), pointer :: setknob
-     REAL(dp),pointer     :: da_absolute_aperture  ! in case one tracks with da.
+     logical(lp), pointer :: setknob => null()
+     REAL(dp),pointer     :: da_absolute_aperture => null()  ! in case one tracks with da.
      !
 
-     integer,pointer :: wherelost     ! counting lost particles in integration nodes
-     logical(lp),pointer  :: ROOT_CHECK   !=.TRUE. performs check in roots and hyperbolic if true
-     logical(lp),pointer  :: CHECK_STABLE !=.TRUE. particle status
-     logical(lp),pointer  :: CHECK_MADX_APERTURE  !=.TRUE. false means particle lost in aperture
-     logical(lp),pointer  :: APERTURE_FLAG       !=.TRUE. aperture checks globally done (default)
-     logical(lp),pointer  :: s_aperture_CHECK       !=.TRUE. aperture checks globally done (default)
+     integer,pointer :: wherelost => null()     ! counting lost particles in integration nodes
+     logical(lp),pointer  :: ROOT_CHECK => null()   !=.TRUE. performs check in roots and hyperbolic if true
+     logical(lp),pointer  :: CHECK_STABLE => null() !=.TRUE. particle status
+     logical(lp),pointer  :: CHECK_MADX_APERTURE => null()  !=.TRUE. false means particle lost in aperture
+     logical(lp),pointer  :: APERTURE_FLAG => null()       !=.TRUE. aperture checks globally done (default)
+     logical(lp),pointer  :: s_aperture_CHECK => null()       !=.TRUE. aperture checks globally done (default)
 
 
-     logical(lp),pointer  :: WATCH_USER     ! FALSE NORMALLY : WATCHES USER FOR FAILING TO CHECK APERTURES
+     logical(lp),pointer  :: WATCH_USER => null()     ! FALSE NORMALLY : WATCHES USER FOR FAILING TO CHECK APERTURES
 
-     REAL(dp),pointer     :: absolute_aperture     !=1e3_dp generic aperture check
-     real(dp),pointer :: hyperbolic_aperture  ! controls crashes in exponentials
+     REAL(dp),pointer     :: absolute_aperture => null()     !=1e3_dp generic aperture check
+     real(dp),pointer :: hyperbolic_aperture => null()  ! controls crashes in exponentials
 
 
      ! influence fibre creation
 
-     integer, pointer :: MADTHICK        !
-     integer, pointer :: MADTHIN_NORMAL
-     integer, pointer :: MADTHIN_SKEW
-     integer, pointer::  NSTD,METD       ! number of steps and integration method
-     logical(lp), pointer :: MADLENGTH   ! =.false. rbend crazy length in mad8 as input
-     logical(lp), pointer :: MAD         !=.false. mad definition of multipole for input only
-     logical(lp), pointer :: EXACT_MODEL != .false. exact model used
-     logical(lp), pointer :: ALWAYS_EXACTMIS  !=.TRUE. exact formula in tracking used for that element
-     logical(lp),pointer :: ALWAYS_knobs  !=.false. ptc knob default status
-     logical(lp),pointer :: recirculator_cheat  ! =.false.  if true energy patches use the time formula always
-     logical(lp),pointer :: sixtrack_compatible !  to insure some sixtrack compatibility default=false
-     integer, pointer:: CAVITY_TOTALPATH ! REAL PILL B0X =1 , FAKE =0  default
-     integer,pointer :: HIGHEST_FRINGE !=2  quadrupole fringe ON IF FRINGE PRESENT
-     logical(lp),pointer :: do_beam_beam   ! obvious meaning: false normally
+     integer, pointer :: MADTHICK => null()        !
+     integer, pointer :: MADTHIN_NORMAL => null()
+     integer, pointer :: MADTHIN_SKEW => null()
+     integer, pointer::  NSTD => null(),METD => null()       ! number of steps and integration method
+     logical(lp), pointer :: MADLENGTH => null()   ! =.false. rbend crazy length in mad8 as input
+     logical(lp), pointer :: MAD       => null()   !=.false. mad definition of multipole for input only
+     logical(lp), pointer :: EXACT_MODEL => null() != .false. exact model used
+     logical(lp), pointer :: ALWAYS_EXACTMIS => null()  !=.TRUE. exact formula in tracking used for that element
+     logical(lp),pointer :: ALWAYS_knobs => null()  !=.false. ptc knob default status
+     logical(lp),pointer :: recirculator_cheat => null()  ! =.false.  if true energy patches use the time formula always
+     logical(lp),pointer :: sixtrack_compatible => null() !  to insure some sixtrack compatibility default=false
+     integer, pointer:: CAVITY_TOTALPATH => null() ! REAL PILL B0X =1 , FAKE =0  default
+     integer,pointer :: HIGHEST_FRINGE => null() !=2  quadrupole fringe ON IF FRINGE PRESENT
+     logical(lp),pointer :: do_beam_beam => null()   ! obvious meaning: false normally
      ! creates a reverse propagator
-     integer,pointer ::FIBRE_DIR         !=1 or -1 for reversed
-     real(dp),pointer ::INITIAL_CHARGE         ! =1 or -1 AND  ADJUST THE MASS IS THE PREFERED MODE
+     integer,pointer ::FIBRE_DIR => null()         !=1 or -1 for reversed
+     real(dp),pointer ::INITIAL_CHARGE => null()         ! =1 or -1 AND  ADJUST THE MASS IS THE PREFERED MODE
      ! creates a reverse propagator and a reversed ring in combination with above
-     logical(lp),pointer ::FIBRE_flip    !=.true.
+     logical(lp),pointer ::FIBRE_flip => null()    !=.true.
      !  x_prime true means noncanonical outside magnets. x(5) variables stays the same.
-     real(dp), pointer :: eps_pos
+     real(dp), pointer :: eps_pos => null()
      ! fill once and never touch again
 
-     integer, pointer :: SECTOR_NMUL_MAX     != 10 maxwell equations is solved to order 10 in exact sectors
-     integer, pointer :: SECTOR_NMUL     != 4  MULTIPOLES IN TEAPOT BEND ALLOWED BY DEFAULT
-     real(dp), pointer :: wedge_coeff(:)     ! QUAD_KICK IN WEDGE
-     logical(lp), pointer :: MAD8_WEDGE      ! QUAD_KICK + FRINGE IF FRINGE IS OUT.
+     integer, pointer :: SECTOR_NMUL_MAX => null()     != 10 maxwell equations is solved to order 10 in exact sectors
+     integer, pointer :: SECTOR_NMUL     => null() != 4  MULTIPOLES IN TEAPOT BEND ALLOWED BY DEFAULT
+     real(dp), pointer :: wedge_coeff(:) => null()     ! QUAD_KICK IN WEDGE
+     logical(lp), pointer :: MAD8_WEDGE  => null()     ! QUAD_KICK + FRINGE IF FRINGE IS OUT.
 
-     logical(lp), pointer:: electron     !  electron if true otherwise proton
-     real(dp), pointer :: massfactor     !=one  sets variable muon and electron must be true
+     logical(lp), pointer:: electron     => null()!  electron if true otherwise proton
+     real(dp), pointer :: massfactor     => null()!=one  sets variable muon and electron must be true
      ! global on the fly
-     logical(lp), pointer :: compute_stoch_kick != .false. store stochastic kick for stochastic tracking
-     logical(lp),pointer :: FEED_P0C   !=.FALSE.  work takes p0c instead of energy
-     logical(lp),pointer :: ALWAYS_EXACT_PATCHING  !=.TRUE. patching done correctly
+     logical(lp), pointer :: compute_stoch_kick => null() != .false. store stochastic kick for stochastic tracking
+     logical(lp),pointer :: FEED_P0C => null()   !=.FALSE.  work takes p0c instead of energy
+     logical(lp),pointer :: ALWAYS_EXACT_PATCHING => null()  !=.TRUE. patching done correctly
      ! used to output horror messages
-     logical(lp),pointer :: stable_da !=.true.  interrupts DA if check_da is true
-     logical(lp),pointer :: check_da  !=.true.
-     logical(lp),pointer :: OLD_IMPLEMENTATION_OF_SIXTRACK  !=.true.
-     real(dp),pointer :: phase0 ! default phase in cavity
-     logical(lp), pointer :: global_verbose
-     logical(lp), pointer :: no_hyperbolic_in_normal_form ! unstable produces exception
-     integer, pointer :: ndpt_bmad 
+     logical(lp),pointer :: stable_da => null() !=.true.  interrupts DA if check_da is true
+     logical(lp),pointer :: check_da  => null() !=.true.
+     logical(lp),pointer :: OLD_IMPLEMENTATION_OF_SIXTRACK => null()  !=.true.
+     real(dp),pointer :: phase0  => null()! default phase in cavity
+     logical(lp), pointer :: global_verbose => null()
+     logical(lp), pointer :: no_hyperbolic_in_normal_form => null()! unstable produces exception
+     integer, pointer :: ndpt_bmad => null() 
   end type CONTROL
 
   type(control) c_
@@ -320,8 +320,8 @@ module precision_constants
   type(info_window),TARGET:: w_i
   type(info_window),TARGET:: w_ii
   type(info_window),TARGET::  r_i
-  type(info_window),pointer:: W_P
-  type(info_window),pointer:: R_P
+  type(info_window),pointer:: W_P => null()
+  type(info_window),pointer:: R_P => null()
 
   INTERFACE assignment (=)
      MODULE PROCEDURE EQUAL_Si
