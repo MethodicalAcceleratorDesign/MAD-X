@@ -3413,9 +3413,10 @@ contains
     
     call putQnormaltable(vf_kernel%v(1),1) 
     call putQnormaltable(vf_kernel%v(3),2)
-
+    
+    !this does not work with 6D dispersion 
     do i=1,4
-      call putDnormaltable(theNormalForm%A1%V(i),i)
+      call putDnormaltable(theNormalForm%A_t%V(i),i)
     enddo
 
     !EIGN
@@ -3504,9 +3505,11 @@ contains
       real(dp)    :: d_val
       integer     :: ind(10), order
       
+      !print*,"Nick in:  ", nick
       call ch16cterm(name)
       call ch16cterm(nick)
       call ch16cterm(basevar)
+      !print*,"Nick out: ", nick
       
       call string_to_table_curr(nl_table_name, 'name ', name)
       call string_to_table_curr(nl_table_name, 'nickname ', nick)
@@ -3601,7 +3604,7 @@ contains
       real(dp)    :: d_val
       complex(dp) :: c_val
 
-      !print*, 'putDnormaltable, plane=',planei
+     ! print*, 'putDnormaltable, plane=',planei
       
       cnv = c_%nv
       if (cnv .lt.6)  cnv=6
@@ -3630,18 +3633,20 @@ contains
       i=1
       
       call c_taylor_cycle(v,size=N)
-
+      
+      !print*, "There is ", N ," coefficioents"
       do i=1,N
 
          call c_taylor_cycle(v,ii=i,value=c_val,j=ind(1:c_%nv))
          d_val = real(c_val)
-         !print*, 'putDnormaltable, plane=',planei,' i=',i,' Value=',d_val,  ind(1:c_%nv)
 
          order = sum(ind(1:cnv))
          if (order /= ind(5)) then
            !it is the first order term that stays in the calculation with 1.0 coeff
            cycle
          endif
+
+         !print*, 'putDnormaltable, plane=',planei,' i=',i,' Value=',d_val,  ind(1:c_%nv)
          
          nn = parname
          ni = 'D'//trim(planel)
@@ -3650,10 +3655,14 @@ contains
            nn = trim(nn) // '_p'
            ni = trim(ni) // '_p'
          endif  
-         if (order > 2) write(nn,'(a,i1)') trim(nn),order-1
-
-         write(mf,fmt) '  ',ch16lft(nn),  ch16lft(ni), &
-                       d_val, sum(ind(1:cnv)), ind(1:cnv)
+         if (order > 2) then  
+           write(nn,'(a,i1)') trim(nn),order-1
+           write(ni,'(a,i1)') trim(ni),order-1
+         endif
+         
+         !print*,nn,ni
+         !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(ni), &
+         !              d_val, sum(ind(1:cnv)), ind(1:cnv)
 
          call puttonormaltable(nn,ni,planel,d_val,order,ind)
 
@@ -3661,7 +3670,7 @@ contains
       enddo 
       
       if (nw == 0) then
-         !there was nothing written, it means there is no dispersin. Put zero to the table
+         !print*,"there was nothing written, it means there is no dispersin. Put zero to the table"
          ni = 'D'//trim(planel)
          ind(:)=0
          ind(5)=1
@@ -3758,14 +3767,14 @@ contains
       i=1
       call c_taylor_cycle(gen,size=mynres)
 
-      print*,"GNFU mynres ",mynres
+      !print*,"GNFU mynres ",mynres
       
 
       do r=1,mynres
         
         call c_taylor_cycle(gen,ii=r,value=c_val,j=ind(1:c_%nv))
 
-        print*,"GNFU ",ind(1:6)
+        !print*,"GNFU ",ind(1:6)
         
         im_val = real(c_val)
         re_val = imag(c_val)
@@ -3780,10 +3789,10 @@ contains
         
         write(nn,'(a4,6(a1,i1))') 'GNFA','_',ind(1),'_',ind(2),'_',ind(3), &
                                         '_',ind(4),'_',ind(5),'_',ind(6)
-
+        
         write(nick,'(a2,6(i1))') 'f_',ind(1),ind(2),ind(3), &
                                       ind(4),ind(5),ind(6)
-
+        !
         !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
         !               d_val, order, ind(1:6)
         call puttonormaltable(nn,nick,genfunamp,d_val,order,ind)
