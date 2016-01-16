@@ -689,8 +689,8 @@ static void correct_correct2(struct in_cmd* cmd)
 
   ip = pro_correct_getcommands(cmd);
   im = pro_correct2_gettables(ip, cmd);
-  ncorr = im % 10000;
-  nmon = im / 10000;
+  ncorr = im % 100000;
+  nmon = im / 100000;
   printf("%d monitors and %d correctors found in input\n", nmon, ncorr);
 
   if (nmon == 0) {
@@ -732,8 +732,8 @@ static void correct_correct2(struct in_cmd* cmd)
 
   /* find and prepare enabled correctors and monitors, may be repeated */
   ix = pro_correct2_getactive(ip, nm, nx, nc, corvec, monvec, conm);
-  icor = ix % 10000;
-  imon = ix / 10000;
+  icor = ix % 100000;
+  imon = ix / 100000;
   printf("%d monitors and %d correctors enabled\n", imon, icor);
 
   if (debug) {
@@ -1129,10 +1129,10 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
 
   // 2013-Jun-24  12:21:49  ghislain: 
   //following is a kludge to return a single value but has to be decoded on other side.    
-  if( cntc1+cntc2+cntc12 >= 10000) 
-    fatal_error("Found more than 10000 correctors; decoding in mad_orbit.c will fail",
+  if( cntc1+cntc2+cntc12 >= 100000) 
+    fatal_error("Found more than 100000 correctors; decoding in mad_orbit.c will fail",
     "Please report this issue to MAD developpers (mad@cern.ch)");
-  return 10000 * (cntm1 + cntm2 + cntm12) + cntc1 + cntc2 + cntc12;
+  return 100000 * (cntm1 + cntm2 + cntm12) + cntc1 + cntc2 + cntc12;
 }
 
 static int pro_correct2_getorbit(struct in_cmd* cmd) {
@@ -1291,11 +1291,11 @@ static int pro_correct2_getactive(int ip, int *nm, int *nx, int *nc,
   
   // 2013-Jun-24  12:21:49  ghislain: 
   //following is a kludge to return a single value but has to be decoded on other side.    
-  if(icor >= 10000) 
-    fatal_error("Found more than 10000 correctors; decoding in mad_orbit.c will fail",
+  if(icor >= 100000) 
+    fatal_error("Found more than 100000 correctors; decoding in mad_orbit.c will fail",
     "Please report this issue to MAD developpers (mad@cern.ch)");
   
-  return (10000 * imon + icor);
+  return (100000 * imon + icor);
 }
 
 static double* pro_correct2_response_ring(int ip, int nc, int nm) {
@@ -1645,8 +1645,8 @@ static void correct_correct1(struct in_cmd* cmd)
 
   ip = pro_correct_getcommands(cmd);
   im = pro_correct_gettables(ip, cmd);
-  ncorr = im % 10000;
-  nmon = im / 10000;
+  ncorr = im % 100000;
+  nmon = im / 100000;
   printf("%d monitors and %d correctors found in input\n", nmon, ncorr);
   
   if (nmon == 0) {
@@ -1690,8 +1690,8 @@ static void correct_correct1(struct in_cmd* cmd)
 
   /* find and prepare enabled correctors and monitors, may be repeated */
   ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
-  icor = ix % 10000;
-  imon = ix / 10000;
+  icor = ix % 100000;
+  imon = ix / 100000;
   printf("%d monitors and %d correctors enabled\n", imon, icor);
   
   /* normalized cut on beam position, if requested */
@@ -1699,8 +1699,8 @@ static void correct_correct1(struct in_cmd* cmd)
     idrop = pro_correct_filter(ip, sigcut);
     printf("Disabled %d monitors with %-2.2f sigma cut\n", idrop, sigcut);
     ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
-    icor = ix % 10000;
-    imon = ix / 10000;
+    icor = ix % 100000;
+    imon = ix / 100000;
     printf("After filter of %-2.2f sigma:\n", sigcut);
     printf("%d monitors and %d correctors enabled\n", imon, icor);
   }
@@ -1732,8 +1732,8 @@ static void correct_correct1(struct in_cmd* cmd)
       
       /* find and prepare enabled correctors and monitors, may be repeated */
       ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
-      icor = ix % 10000;
-      imon = ix / 10000;      
+      icor = ix % 100000;
+      imon = ix / 100000;      
       printf("After SVD conditioning:             \n");
       printf("%d monitors and %d correctors enabled\n\n", imon, icor);
       
@@ -1771,8 +1771,8 @@ static void correct_correct1(struct in_cmd* cmd)
       }
 
       ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
-      icor = ix % 10000;
-      imon = ix / 10000;
+      icor = ix % 100000;
+      imon = ix / 100000;
       printf("After SVD conditioning:             \n");
       printf("%d monitors and %d correctors enabled\n\n", imon, icor);
 
@@ -2133,10 +2133,10 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
 
   // 2013-Jun-24  12:21:49  ghislain: 
   //following is a kludge to return a single value but has to be decoded on other side.    
-  if(cntc >= 10000) 
-    fatal_error("Found more than 10000 correctors; decoding in mad_orbit.c will fail",
+  if(cntc >= 100000) 
+    fatal_error("Found more than 100000 correctors; decoding in mad_orbit.c will fail",
 		"Please report this issue to MAD developpers (mad@cern.ch)");
-  return (10000 * cntm + cntc);
+  return (100000 * cntm + cntc);
 }
 
 static int pro_correct_getorbit(struct in_cmd* cmd) {
@@ -2250,22 +2250,22 @@ static int pro_correct_getorbit(struct in_cmd* cmd) {
     pos = name_list_pos("monerror", nl);
     if (nl->inform[pos] > 0) {
       if ((command_par_value("monerror", cmd->clone)) == 1) {
-  if (m->p_node->p_al_err != NULL ) {
-    if (debug) {
-      printf("m-list: %d %s %s\n", m->id_ttb, m->p_node->name, m->p_node->base_name);
-      printf("errors: %e %e \n", m->p_node->p_al_err->a[6], m->p_node->p_al_err->a[7]);
-    }
-    dpsi = m->p_node->p_al_err->a[5];
-    rx = m->val.before[0];
-    ry = m->val.before[1];
-    printf("\nA: %e %e %e\n", m->val.before[0], m->val.before[1], dpsi);
-    m->val.before[0] = rx * cos(dpsi) + ry * sin(dpsi);
-    m->val.before[1] = -rx * sin(dpsi) + ry * cos(dpsi);
-    printf("B: %e %e %e\n", m->val.before[0], m->val.before[1], dpsi);
-    m->val.before[0] += m->p_node->p_al_err->a[6] * 1000.;
-    m->val.before[1] += m->p_node->p_al_err->a[7] * 1000.;
-    printf("C: %e %e %e\n", m->val.before[0], m->val.before[1], dpsi);
-  }
+	if (m->p_node->p_al_err != NULL ) {
+	  if (debug) {
+	    printf("m-list: %d %s %s\n", m->id_ttb, m->p_node->name, m->p_node->base_name);
+	    printf("errors: %e %e \n", m->p_node->p_al_err->a[6], m->p_node->p_al_err->a[7]);
+	  }
+	  dpsi = m->p_node->p_al_err->a[5];
+	  rx = m->val.before[0];
+	  ry = m->val.before[1];
+	  if (debug) printf("\nA: %e %e %e\n", m->val.before[0], m->val.before[1], dpsi);
+	  m->val.before[0] = rx * cos(dpsi) + ry * sin(dpsi);
+	  m->val.before[1] = -rx * sin(dpsi) + ry * cos(dpsi);
+	  if (debug) printf("B: %e %e %e\n", m->val.before[0], m->val.before[1], dpsi);
+	  m->val.before[0] += m->p_node->p_al_err->a[6] * 1000.;
+	  m->val.before[1] += m->p_node->p_al_err->a[7] * 1000.;
+	  if (debug) printf("C: %e %e %e\n", m->val.before[0], m->val.before[1], dpsi);
+	}
       }
     }
 
@@ -3176,10 +3176,10 @@ static int pro_correct_getactive(int ip, int *nm, int *nx, int *nc,
 
   // 2013-Jun-24  12:21:49  ghislain: 
   //following is a kludge to return a single value but has to be decoded on other side.    
-  if(icor >= 10000) 
-    fatal_error("Found more than 10000 correctors; decoding in mad_orbit.c will fail",
+  if(icor >= 100000) 
+    fatal_error("Found more than 100000 correctors; decoding in mad_orbit.c will fail",
     "Please report this issue to MAD developpers (mad@cern.ch)");
-  return (10000 * imon + icor);
+  return (100000 * imon + icor);
 }
 
 static void correct_option(struct in_cmd* cmd) {
