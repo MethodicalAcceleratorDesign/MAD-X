@@ -7,7 +7,7 @@ subroutine trdynrun (eigen,coords,turns,npart,distvect,zn,onelog,turnnumber,dq)
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
-  !
+  !           PLEASE DOCUMENT THE CODE!!!
   !----------------------------------------------------------------------*
   integer :: turns, npart
   double precision :: eigen(6,6), coords(6,0:turns,*), distvect(turns)

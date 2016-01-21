@@ -65,7 +65,7 @@ CFLAGS += /D_CRT_SECURE_NO_WARNINGS /Qdiag-disable:3280,2259,1572,981 # /Qdiag-e
 #
 
 ifeq ($(DEBUG),yes)
-CFLAGS += /debug:full
+CFLAGS += /Z7 /debug:full /traceback /RTC1 /RTCc /Qcheck-pointers:rw /Qcheck-pointers-dangling:all /check:conversions,stack,uninit
 endif
 
 ifeq ($(PROFILE),yes)
@@ -122,7 +122,7 @@ CXXFLAGS += /D_CRT_SECURE_NO_WARNINGS /Qdiag-disable:3280,2259,1572,981 # /Qdiag
 #
 
 ifeq ($(DEBUG),yes)
-CXXFLAGS += /debug:full
+CXXFLAGS += /Z7 /debug:full /traceback /RTC1 /RTCc /Qcheck-pointers:rw /Qcheck-pointers-dangling:all /check:conversions,stack,uninit
 endif
 
 ifeq ($(PROFILE),yes)

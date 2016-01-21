@@ -3925,7 +3925,7 @@ subroutine ttrfmult(track, ktrack, turn)
 
   !---- Set-up some parameters
   volt = bvk * node_value('volt ')
-  krf = twopi*freq*ten6p/clight
+  krf = twopi * freq * ten6p/clight
 
   if (n_ferr .gt. 0) call dcopy(f_errors,field,n_ferr)
 

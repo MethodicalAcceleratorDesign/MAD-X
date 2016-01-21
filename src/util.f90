@@ -37,6 +37,25 @@ module phys_constfi
   double precision, parameter :: prad   = erad*emass/pmass  
 end module phys_constfi
 
+module matrices
+  ! useful matrices: Identity EYE(6,6) and Symplectic JMAT(6.6)
+  implicit none
+  double precision, parameter :: EYE(6,6)=reshape((/1d0,0d0,0d0,0d0,0d0,0d0,&
+                                                    0d0,1d0,0d0,0d0,0d0,0d0,&
+                                                    0d0,0d0,1d0,0d0,0d0,0d0,&
+                                                    0d0,0d0,0d0,1d0,0d0,0d0,&
+                                                    0d0,0d0,0d0,0d0,1d0,0d0,&
+                                                    0d0,0d0,0d0,0d0,0d0,1d0 /), shape(EYE))
+  double precision, parameter :: JMAT(6,6)=reshape((/0d0,1d0,0d0,0d0,0d0,0d0, &
+                                                    -1d0,0d0,0d0,0d0,0d0,0d0, &
+                                                     0d0,0d0,0d0,1d0,0d0,0d0, &
+                                                     0d0,0d0,-1d0,0d0,0d0,0d0, &
+                                                     0d0,0d0,0d0,0d0,0d0,1d0, &
+                                                     0d0,0d0,0d0,0d0,-1d0,0d0 /), shape(JMAT))
+  double precision, parameter :: JMATINV(6,6) = -JMAT
+  double precision, parameter :: JMATT(6,6) = -JMAT
+end module matrices
+
 module code_constfi
   implicit none
   public
@@ -679,25 +698,6 @@ module fasterror
   double precision :: hrecip, wtimag(idim), wtreal(idim)
 end module fasterror
 
-module matrices
-  ! useful matrices: Identity EYE(6,6) and Symplectic JMAT(6.6)
-  implicit none
-  double precision, parameter :: EYE(6,6)=reshape((/1d0,0d0,0d0,0d0,0d0,0d0,&
-                                                    0d0,1d0,0d0,0d0,0d0,0d0,&
-                                                    0d0,0d0,1d0,0d0,0d0,0d0,&
-                                                    0d0,0d0,0d0,1d0,0d0,0d0,&
-                                                    0d0,0d0,0d0,0d0,1d0,0d0,&
-                                                    0d0,0d0,0d0,0d0,0d0,1d0 /), shape(EYE))
-  double precision, parameter :: JMAT(6,6)=reshape((/0d0,1d0,0d0,0d0,0d0,0d0, &
-                                                    -1d0,0d0,0d0,0d0,0d0,0d0, &
-                                                     0d0,0d0,0d0,1d0,0d0,0d0, &
-                                                     0d0,0d0,-1d0,0d0,0d0,0d0, &
-                                                     0d0,0d0,0d0,0d0,0d0,1d0, &
-                                                     0d0,0d0,0d0,0d0,-1d0,0d0 /), shape(JMAT))
-  double precision, parameter :: JMATINV(6,6) = -JMAT
-  double precision, parameter :: JMATT(6,6) = -JMAT
-end module matrices
-
 
 ! SUBROUTINES
 
@@ -751,73 +751,6 @@ subroutine aafail(rout,text)
   character(*) :: rout, text
   call fort_fail(rout,text)
 end subroutine aafail
-
-subroutine m66div(anum,aden,target,eflag)
-  implicit none
-  !----------------------------------------------------------------------*
-  ! Purpose:
-  !   "Divide" matrices, i. e. postmultiply with inverse of denominator.
-  ! Input:
-  !   ANUM(6,6)   (real)  "Numerator" matrix.
-  !   ADEN(6,6)   (real)  "Denominator" matrix.
-  ! Output:
-  !   TARGET(6,6) (real)  "Quotient" matrix: TARGET = ANUM * ADEN**(-1).
-  !   EFLAG       (logical) Error flag.
-  !----------------------------------------------------------------------*
-  double precision :: anum(6,6), aden(6,6), target(6,6)
-  logical :: eflag
-
-  integer :: i, j, irank
-  double precision :: augmat(6,12)
-
-  !---- Copy input to local array.
-  AUGMAT(:,1:6) = ADEN
-  AUGMAT(:,7:12) = ANUM
-  
-  !---- Solve resulting system.
-  call solver(augmat,6,6,irank)
-  if (irank .lt. 6) then
-     eflag = .true.
-  else
-     !---- Copy result.
-     eflag = .false.
-     TARGET = AUGMAT(:,7:12)     
-  endif
-
-end subroutine m66div
-
-subroutine m66symp(r,nrm) ! can be moved to twiss.f90
-  use matrices, only : JMAT
-  implicit none
-  !----------------------------------------------------------------------*
-  ! Purpose:
-  !   Check if a 6 by 6 matrix R is symplectic.
-  ! Input:
-  !   r(6,6)    (double)  Matrix R to check
-  ! Output:
-  !   nrm       (double)  The column norm of (R'*J*R)-J
-  !----------------------------------------------------------------------*
-  double precision :: R(6,6), nrm
-
-  double precision :: T(6,6)
-  double precision :: sum
-  double precision, parameter :: zero=0d0
-  integer :: i, j
-
-  ! calculate norm( (Rt J R) - J)
-
-  T = matmul( matmul(transpose(R), JMAT), R) - JMAT 
- 
-  nrm = zero
-  do j = 1, 6
-     sum = zero
-     do i = 1, 6
-        sum = sum + abs(T(i,j))
-     enddo
-     nrm = max(nrm,sum)
-  enddo
-
-end subroutine m66symp
 
 logical function m66sta(amat)
   implicit none

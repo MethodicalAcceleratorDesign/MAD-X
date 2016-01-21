@@ -639,8 +639,8 @@ static void correct_correct2(struct in_cmd* cmd)
 
   ip = pro_correct_getcommands(cmd);
   im = pro_correct2_gettables(ip, cmd);
-  ncorr = im % 100000;
-  nmon = im / 100000;
+  ncorr = im % 30000;
+  nmon = im / 30000;
   printf("%d monitors and %d correctors found in input\n", nmon, ncorr);
 
   if (nmon == 0) {
@@ -682,8 +682,8 @@ static void correct_correct2(struct in_cmd* cmd)
 
   /* find and prepare enabled correctors and monitors, may be repeated */
   ix = pro_correct2_getactive(ip, nm, nx, nc, corvec, monvec, conm);
-  icor = ix % 100000;
-  imon = ix / 100000;
+  icor = ix % 30000;
+  imon = ix / 30000;
   printf("%d monitors and %d correctors enabled\n", imon, icor);
 
   if (debug) {
@@ -860,8 +860,8 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
   if (correct_orbit12->mon_table != NULL )
     myfree(rout_name, correct_orbit12->mon_table);
 
-  correct_orbit12->cor_table = mycalloc("pro_correct2_gettables_cor",5200, sizeof *correct_orbit12->cor_table);
-  correct_orbit12->mon_table = mycalloc("pro_correct2_gettables_mon",5200, sizeof *correct_orbit12->mon_table);
+  correct_orbit12->cor_table = mycalloc("pro_correct2_gettables_cor",30200, sizeof *correct_orbit12->cor_table);
+  correct_orbit12->mon_table = mycalloc("pro_correct2_gettables_mon",30200, sizeof *correct_orbit12->mon_table);
 
   /* orbit table available, get units, if defined */
   if ((ounits = command_par_value("units", cmd->clone)) > 0)
@@ -1078,11 +1078,11 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
   }
   
   // 2013-Jun-24  12:21:49  ghislain: 
-  //following is a kludge to return a single value but has to be decoded on other side.    
-  if( cntc1+cntc2+cntc12 >= 100000) 
-    fatal_error("Found more than 100000 correctors; decoding in mad_orbit.c will fail",
+  // following is a kludge to return a single value but has to be decoded on other side.    
+  if( cntc1+cntc2+cntc12 >= 30000) 
+    fatal_error("Found more than 30000 correctors; decoding in mad_orbit.c will fail",
     "Please report this issue to MAD developpers (mad@cern.ch)");
-  return 100000 * (cntm1 + cntm2 + cntm12) + cntc1 + cntc2 + cntc12;
+  return 30000 * (cntm1 + cntm2 + cntm12) + cntc1 + cntc2 + cntc12;
 }
 
 static int pro_correct2_getorbit(struct in_cmd* cmd) {
@@ -1240,12 +1240,12 @@ static int pro_correct2_getactive(int ip, int *nm, int *nx, int *nc,
   };
   
   // 2013-Jun-24  12:21:49  ghislain: 
-  //following is a kludge to return a single value but has to be decoded on other side.    
-  if(icor >= 100000) 
-    fatal_error("Found more than 100000 correctors; decoding in mad_orbit.c will fail",
+  // following is a kludge to return a single value but has to be decoded on other side.    
+  if(icor >= 30000) 
+    fatal_error("Found more than 30000 correctors; decoding in mad_orbit.c will fail",
     "Please report this issue to MAD developpers (mad@cern.ch)");
   
-  return (100000 * imon + icor);
+  return (30000 * imon + icor);
 }
 
 static double* pro_correct2_response_ring(int ip, int nc, int nm) {
@@ -1597,8 +1597,8 @@ static void correct_correct1(struct in_cmd* cmd)
 
   ip = pro_correct_getcommands(cmd);
   im = pro_correct_gettables(ip, cmd);
-  ncorr = im % 100000;
-  nmon = im / 100000;
+  ncorr = im % 30000;
+  nmon = im / 30000;
   printf("%d monitors and %d correctors found in input\n", nmon, ncorr);
   
   if (nmon == 0) {
@@ -1642,8 +1642,8 @@ static void correct_correct1(struct in_cmd* cmd)
 
   /* find and prepare enabled correctors and monitors, may be repeated */
   ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
-  icor = ix % 100000;
-  imon = ix / 100000;
+  icor = ix % 30000;
+  imon = ix / 30000;
   printf("%d monitors and %d correctors enabled\n", imon, icor);
   
   /* normalized cut on beam position, if requested */
@@ -1651,8 +1651,8 @@ static void correct_correct1(struct in_cmd* cmd)
     idrop = pro_correct_filter(ip, sigcut);
     printf("Disabled %d monitors with %-2.2f sigma cut\n", idrop, sigcut);
     ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
-    icor = ix % 100000;
-    imon = ix / 100000;
+    icor = ix % 30000;
+    imon = ix / 30000;
     printf("After filter of %-2.2f sigma:\n", sigcut);
     printf("%d monitors and %d correctors enabled\n", imon, icor);
   }
@@ -1684,8 +1684,8 @@ static void correct_correct1(struct in_cmd* cmd)
       
       /* find and prepare enabled correctors and monitors, may be repeated */
       ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
-      icor = ix % 100000;
-      imon = ix / 100000;      
+      icor = ix % 30000;
+      imon = ix / 30000;      
       printf("After SVD conditioning:             \n");
       printf("%d monitors and %d correctors enabled\n\n", imon, icor);
       
@@ -1723,8 +1723,8 @@ static void correct_correct1(struct in_cmd* cmd)
       }
 
       ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
-      icor = ix % 100000;
-      imon = ix / 100000;
+      icor = ix % 30000;
+      imon = ix / 30000;
       printf("After SVD conditioning:             \n");
       printf("%d monitors and %d correctors enabled\n\n", imon, icor);
 
@@ -2005,14 +2005,14 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
   
   if (debug) printf("-0-\n");
   // if(corr_table == NULL) {   
-  corr_table = make_table("corr", "corr", corr_table_cols, corr_table_types, 5000);
+  corr_table = make_table("corr", "corr", corr_table_cols, corr_table_types, 15000);
   add_to_table_list(corr_table, table_register);
   pro_correct_make_corr_table();
   // } 
 
   if (debug) printf("-1-\n");
   // if(mon_table == NULL) {
-  mon_table = make_table("mon", "mon", mon_table_cols, mon_table_types, 5000);
+  mon_table = make_table("mon", "mon", mon_table_cols, mon_table_types, 15000);
   add_to_table_list(mon_table, table_register);
   pro_correct_make_mon_table();
   // } 
@@ -2021,8 +2021,8 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
   
   if (correct_orbit->cor_table != NULL ) myfree(rout_name, correct_orbit->cor_table);
   if (correct_orbit->mon_table != NULL ) myfree(rout_name, correct_orbit->mon_table);
-  correct_orbit->cor_table = mycalloc("pro_correct_gettables_cor", 5200, sizeof *correct_orbit->cor_table);
-  correct_orbit->mon_table = mycalloc("pro_correct_gettables_mon", 5200, sizeof *correct_orbit->mon_table);
+  correct_orbit->cor_table = mycalloc("pro_correct_gettables_cor", 30200, sizeof *correct_orbit->cor_table);
+  correct_orbit->mon_table = mycalloc("pro_correct_gettables_mon", 30200, sizeof *correct_orbit->mon_table);
   
   /* orbit table available, get units, if defined */
   //  2013-Jun-24  12:06:03  ghislain: FIXME - units option of CORRECT command is only partially documented!!!
@@ -2084,11 +2084,11 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
   if (debug) printf("done: %d %d\n", cntm, cntc);
 
   // 2013-Jun-24  12:21:49  ghislain: 
-  //following is a kludge to return a single value but has to be decoded on other side.    
-  if(cntc >= 100000) 
-    fatal_error("Found more than 100000 correctors; decoding in mad_orbit.c will fail",
+  // following is a kludge to return a single value but has to be decoded on other side.    
+  if(cntc >= 30000) 
+    fatal_error("Found more than 30000 correctors; decoding in mad_orbit.c will fail",
 		"Please report this issue to MAD developpers (mad@cern.ch)");
-  return (100000 * cntm + cntc);
+  return (30000 * cntm + cntc);
 }
 
 static int pro_correct_getorbit(struct in_cmd* cmd) {
@@ -3088,14 +3088,14 @@ static int pro_correct_getactive(int ip, int *nm, int *nx, int *nc,
   struct id_mic *m, *c;
 
   int debug = get_option("debug");
-
+    
   m = correct_orbit->mon_table;
   imon = 0;
   imona = 0;
   while (m) {
     if (debug) {
-      printf("from list: %d %s %s\n", m->id_ttb, m->p_node->name, m->p_node->base_name);
-      printf("orbit readings: %d %f %f\n", ip, m->val.before[0], m->val.before[1]);
+      printf("from list: %d %d %s %s ", m->enable, m->id_ttb, m->p_node->name, m->p_node->base_name);
+      printf("\t\t orbit readings: %d %f %f\n", ip, m->val.before[0], m->val.before[1]);
     }
     if (m->enable == 1) {
       monvec[imon] = m->val.before[ip - 1];
@@ -3111,8 +3111,8 @@ static int pro_correct_getactive(int ip, int *nm, int *nx, int *nc,
   icora = 0;
   while (c) {
     if (debug) {
-      printf("from list: %d %d %s %s\n", c->enable, c->id_ttb, c->p_node->name, c->p_node->base_name);
-      printf("kicker readings: %f %f\n", c->val.before[0], c->val.before[1]);
+      printf("from list: %d %d %s %s ", c->enable, c->id_ttb, c->p_node->name, c->p_node->base_name);
+      printf("\t\t kicker readings: %f %f\n", c->val.before[0], c->val.before[1]);
     }
     if (c->enable == 1) {
       corvec[icor] = c->val.before[ip - 1];
@@ -3127,11 +3127,11 @@ static int pro_correct_getactive(int ip, int *nm, int *nx, int *nc,
   }
 
   // 2013-Jun-24  12:21:49  ghislain: 
-  //following is a kludge to return a single value but has to be decoded on other side.    
-  if(icor >= 100000) 
-    fatal_error("Found more than 100000 correctors; decoding in mad_orbit.c will fail",
+  // following is a kludge to return a single value but has to be decoded on other side.    
+  if(icor >= 30000) 
+    fatal_error("Found more than 30000 correctors; decoding in mad_orbit.c will fail",
     "Please report this issue to MAD developpers (mad@cern.ch)");
-  return (100000 * imon + icor);
+  return (30000 * imon + icor);
 }
 
 static void correct_option(struct in_cmd* cmd) {
