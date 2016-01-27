@@ -34,7 +34,7 @@ twiss;
 select, flag= makethin, pattern= "MQXA.*", slice= 12;
 select, flag= makethin, pattern= "MQXB.*", slice= 12;
 select, flag= makethin, class= quadrupole, slice= 2;
-makethin, sequence= lhcb1,style=hybrid;
+makethin, sequence= lhcb1,style=hybrid, makedipedge=false;
 
 !---- AC dipole
     seqedit, sequence=lhcb1; flatten;

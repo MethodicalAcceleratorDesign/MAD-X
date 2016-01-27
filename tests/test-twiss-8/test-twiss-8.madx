@@ -14,7 +14,7 @@ twiss, betx=50, bety=100, alfx=-4, alfy=10, x=0, y=0.01, sequence=SingleBend, fi
   select, flag=makethin, class=sbend, slice=100;
 ! select, flag=makethin, class=sbend, thick=true; !hbu works perfectly with upgraded makethin
 
-makethin, sequence=SingleBend, style=collim;
+makethin, sequence=SingleBend, style=collim, makedipedge=false;
 use, sequence=SingleBend;
 
 twiss, betx=50, bety=100, alfx=-4, alfy=10, x=0, y=0.01, sequence=SingleBend, file="twiss_thin.tfs";

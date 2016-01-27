@@ -25,7 +25,7 @@ ifneq ($(OSTYPE),Windows)
 # linker flags
 #
 
-LDFLAGS = -m$(ARCH) -O$(NOPT) $(if $(call eq,$(FCMAIN),no),-nofor-main,)
+LDFLAGS = -m$(ARCH) -O$(NOPT) $(if $(call eq,$(FCMAIN),no),-nofor-main,) -heap-arrays 65536
 LDLIBS  =
 
 #
@@ -73,7 +73,7 @@ ifeq ($(OSTYPE),Windows)
 # linker flags
 #
 
-LDFLAGS = /nologo /O$(NOPT) /extlnk:.o
+LDFLAGS = /nologo /O$(NOPT) /extlnk:.o /heap-arrays:65536
 LDLIBS  =
 
 #

@@ -46,7 +46,7 @@ MODULE madx_ptc_module
   type(mapbuffer), pointer  :: maps(:) !buffered maps from the last twiss
   integer                   :: mapsorder = 0  !order of the buffered maps, if 0 maps no maps buffered
   integer                   :: mapsicase = 0
-   
+
   
   character(1000), private  :: whymsg
      
@@ -422,9 +422,8 @@ CONTAINS
     endif
 
     icav=0
-    nt=0
     j=restart_sequ()
-    j=0
+    nt=0
     l_machine=zero
 
     errors_out = get_value('ptc_create_layout ','errors_out ').ne.0
@@ -448,7 +447,7 @@ CONTAINS
 
     call zero_key(key)
 
-    j=j+1
+    !j=j+1
     nt=nt+1
     if(nt==nt0) then
        call fort_warn("Potential problem for very large structure: ","More than 20'000 elements found")
@@ -598,6 +597,30 @@ CONTAINS
     case(22)
        call fort_warn('ptc_input: ','Element Beam-Beam, must use slice tracking to get effect')
        key%magnet="marker"
+
+!     case(40) !AC dipoles
+!        key%magnet="marker"
+!        idx = nt
+!        plane = 0
+!        ampl = node_value('volt ')
+!        freq = node_value('freq ')
+!        ramp1 = node_value('ramp1 ')
+!        ramp2 = node_value('ramp2 ')
+!        ramp3 = node_value('ramp3 ')
+!        ramp4 = node_value('ramp4 ')
+!        
+!     case(41) !AC dipoles
+!        key%magnet="marker"
+!        idx = nt
+!        plane = 1
+!        ampl = node_value('volt ')
+!        freq = node_value('freq ')
+!        ramp1 = node_value('ramp1 ')
+!        ramp2 = node_value('ramp2 ')
+!        ramp3 = node_value('ramp3 ')
+!        ramp4 = node_value('ramp4 ')
+!        
+       !key%magnet="acdipole_h"
     case(1,11,20,21,44)
        key%magnet="drift"
        CALL CONTEXT(key%list%name)
@@ -892,6 +915,8 @@ CONTAINS
           call dcopy(f_errors,field,n_ferr)
        endif
        nd = max(nn, ns, n_ferr/2)
+
+
        if(nd.ge.maxmul) nd=maxmul-1
        if(n_ferr.gt.0) then
           do i=0,nd
@@ -1111,7 +1136,7 @@ CONTAINS
           key%list%ang(i)=patch_ang(i)
           key%list%t(i)=patch_trans(i)
        enddo
-    case(37)
+    case(37)!CRAB ??
        key%magnet="rfcavity"
        key%list%volt=zero
        do i=1,NMAX
@@ -1137,16 +1162,129 @@ CONTAINS
        key%list%harmon=one
 
        if(key%list%k(1).ne.zero.and.key%list%freq0.ne.zero) icav=1
+
+    !RFMULTIPOLE, crab also falls here, but is made with special case where volt defines BN(1)
+    case(43)
+       key%magnet="rfcavity"
+       key%list%volt=bvk*node_value('volt ')
+       freq=c_1d6*node_value('freq ')
+       key%list%lag=node_value('lag ')*twopi
+
+       print*,"RF frequency " , freq," Hz, lag ", key%list%lag, " [radian]"
+
+       offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
+       if(offset_deltap.ne.zero) then
+          
+          default = getintstate()
+          default=default+totalpath0
+          call setintstate(default)
+          freq=freq*((gammatr2-gamma2)*offset_deltap/gammatr2/gamma2+one) !regular twiss values
+          
+       endif
+       key%list%freq0=freq
+       key%list%n_bessel=node_value('n_bessel ')
+       key%list%harmon=one ! it is ignored by PTC because it does not know the circumference
+       
+       key%list%k(:)=zero
+       key%list%ks(:)=zero
+
+       call dzero(f_errors,maxferr+1)
+       n_ferr = node_fd_errors(f_errors)
+       call dzero(normal,maxmul+1)
+       call dzero(skew,maxmul+1)
+       call get_node_vector('knl ',nn,normal)
+       call get_node_vector('ksl ',ns,skew)
+       if(nn.ge.NMAX) nn=NMAX-1
+       if(ns.ge.NMAX) ns=NMAX-1
+
+       skew(0)=-skew(0) ! frs error found 30.08.2008
+       key%list%thin_h_angle=bvk*normal(0)
+       key%list%thin_v_angle=bvk*skew(0)
+       lrad=node_value('lrad ')
+       if(lrad.gt.zero) then
+          key%list%thin_h_foc=normal(0)*normal(0)/lrad
+          key%list%thin_v_foc=skew(0)*skew(0)/lrad
+       endif
+
+       do i=0,nn
+          key%list%k(i+1)=normal(i)
+          if (normal(i) /= zero) icav=1
+       enddo
+
+       do i=0,ns
+          key%list%ks(i+1)=skew(i)
+          if (normal(i) /= zero) icav=1
+       enddo
+
+       call dzero(field,2*(maxmul+1))
+       if (n_ferr .gt. 0) then
+          call dcopy(f_errors,field,n_ferr)
+       endif
+       nd = max(nn, ns, n_ferr/2)
+
+
+       if(nd.ge.maxmul) nd=maxmul-1
+       if(n_ferr.gt.0) then
+          do i=0,nd
+             key%list%k(i+1)=key%list%k(i+1)+field(1,i)
+             key%list%ks(i+1)=key%list%ks(i+1)+field(2,i)
+          enddo
+       endif
+
+       key%tiltd=node_value('tilt ')
+       if(errors_out) then
+          if(key%list%name(:len_trim(magnet_name)-1).eq. &
+               magnet_name(:len_trim(magnet_name)-1)) then
+             call string_to_table_curr('errors_field ', 'name ', key%list%name)
+             call string_to_table_curr('errors_total ', 'name ', key%list%name)
+             i=2*maxmul+2
+             myfield(:) = zero
+             do kk=1,nd+1
+                myfield(2*kk-1) = field(1,kk-1)
+                myfield(2*kk)   = field(2,kk-1)
+             enddo
+             call vector_to_table_curr('errors_field ', 'k0l ', myfield(1), i)
+             myfield(:) = zero
+             do kk=1,nd+1
+                myfield(2*kk-1) = key%list%k(kk)
+                myfield(2*kk)   = key%list%ks(kk)
+             enddo
+             call vector_to_table_curr('errors_total ', 'k0l ', myfield(1), i)
+             call augment_count('errors_field ')
+             call augment_count('errors_total ')
+          endif
+       endif
+       
+       
+       if(key%list%volt.ne.zero.and.key%list%freq0.ne.zero) icav=1
+       
+       m_u%end%HARMONIC_NUMBER=node_value('harmon ')   ! etienne_harmon
+       no_cavity_totalpath=node_value('no_cavity_totalpath ').ne.0
+       if(no_cavity_totalpath) then
+          key%list%cavity_totalpath=0
+       else
+          key%list%cavity_totalpath=1
+       endif
+
+!       print*,"madx_ptc_module::input volt: ", key%list%volt, &
+!                                    " lag : ", key%list%lag, &
+!                                    " harm: ", key%list%harmon, &
+!                                    " freq: ", key%list%freq0 
+       
+       
+
     case default
-       print*,"Element: ",name," not implemented in PTC"
+       print*,"Element: ",name, "of type ",code," not implemented in PTC"
        stop
     end select
 100 continue
 !    if(code.ne.14.and.code.ne.15.and.code.ne.16) then
+
        do i=1,NMAX
           key%list%k(i)=bvk*key%list%k(i)
           key%list%ks(i)=bvk*key%list%ks(i)
        enddo
+
 !    endif
     call create_fibre(my_ring%end,key,EXCEPTION) !in ../libs/ptc/src/Sp_keywords.f90 
 

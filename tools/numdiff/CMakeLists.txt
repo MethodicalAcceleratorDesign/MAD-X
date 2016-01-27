@@ -23,3 +23,13 @@ install(TARGETS numdiff
    DESTINATION bin
    COMPONENT Runtime
    )
+
+# Define tests (without using config from parent folder)
+enable_testing()
+include(CTest)
+foreach(testname test-register test-register-2 test-register-3)
+    message("adding test ${testname}")
+    set(testpath  "${CMAKE_SOURCE_DIR}/tests/${testname}/${testname}")
+    add_test(${testname} numdiff ${testpath}.nd.lhs ${testpath}.nd.rhs ${testpath}.nd.cfg)
+    set_tests_properties(${testname} PROPERTIES PASS_REGULAR_EXPRESSION "diffs detected over")
+endforeach()

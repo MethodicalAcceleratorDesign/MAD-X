@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.06  (64 bit, Darwin)      +
+  +     MAD-X 5.02.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.06.26               +
-  + Execution date: 2015.08.31 16:17:41      +
+  + Release   date: 2015.09.24               +
+  + Execution date: 2015.11.03 19:45:31      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! H. Burkhardt.  Updated for improved makethin select in summer 2005
 
@@ -63,7 +63,7 @@ qyref =        1.260064776 ;
 
 select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
 
-makethin,sequence=fivecell,style=hybrid;
+makethin,sequence=fivecell,style=HYBRID, makedipedge=false;
 
 makethin: style chosen : hybrid
 makethin: slicing sequence : fivecell
@@ -186,7 +186,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
 select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
 
-makethin,sequence=fivecell, style=TEAPOT;
+makethin,sequence=fivecell, style=TEAPOT, makedipedge=false;
 
 makethin: style chosen : teapot
 makethin: slicing sequence : fivecell
@@ -311,7 +311,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
 select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
 
-makethin,sequence=fivecell, style=SIMPLE;
+makethin,sequence=fivecell, style=SIMPLE, makedipedge=false;
 
 makethin: style chosen : simple
 makethin: slicing sequence : fivecell
@@ -436,7 +436,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
 select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
 
-makethin,sequence=fivecell, style=COLLIM;
+makethin,sequence=fivecell, style=COLLIM, makedipedge=false;
 
 makethin: style chosen : collim
 makethin: slicing sequence : fivecell
@@ -585,5 +585,5 @@ stop;
 10 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.06 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

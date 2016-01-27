@@ -1,15 +1,13 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.02.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.09.16               +
-  + Execution date: 2015.09.22 12:53:31      +
+  + Release   date: 2015.09.24               +
+  + Execution date: 2015.10.13 11:36:15      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option, -debug, -echo;
 
-factor_val =       1.00000416667882 ;
-++++++ info: lstraight redefined
-lstraight =      9.999958333385417 ;
+lstraight := lmb/factor ;
 lmb2 := lstraight ;
 enter Twiss module
 ++++++ info: Zero value of SIGT replaced by 1.
@@ -42,7 +40,6 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 makethin: style chosen : teapot
 makethin: slicing sequence : myseq
 ++++++ warning: SAVE makes all previous USE invalid !  
-mb1.edge_l not found
 enter Twiss module
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.

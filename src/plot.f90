@@ -496,8 +496,7 @@ subroutine pefill(ierr)
 
   do j = nrrang(1), nrrang(2)
      crow = j
-     if (itbv .eq. 1 .and. advance_to_pos(tabname, j) .eq. 0)        &
-          goto 100
+     if (itbv .eq. 1 .and. advance_to_pos(tabname, j) .eq. 0) goto 100
      k = double_from_table_row(tabname, horname, j, currpos)
 
      if (itbv .eq. 1)  then
@@ -574,7 +573,7 @@ subroutine pefill(ierr)
         endif
      endif
 
-     mystep=0.1d0 * step
+     mystep= step/10.d0
      do l = 1, nivvar
         if (nqval(l) .eq. maxseql)  then
            print *, 'Warning: plot buffer full, plot truncated'

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.06  (64 bit, Darwin)      +
+  +     MAD-X 5.02.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.06.26               +
-  + Execution date: 2015.08.31 16:17:46      +
+  + Release   date: 2015.09.24               +
+  + Execution date: 2015.11.03 19:45:37      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -29,7 +29,7 @@ survey,psi0=0.0,file="test-survey_1.tfs";
 
 !********************************************************
 
-makethin,sequence=musr,style=hybrid;
+makethin,sequence=musr,style=hybrid, makedipedge=false;
 
 makethin: style chosen : hybrid
 ++++++ warning: makethin: no selection list, slicing all to one thin lens.
@@ -49,5 +49,5 @@ stop;
 1 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.06 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

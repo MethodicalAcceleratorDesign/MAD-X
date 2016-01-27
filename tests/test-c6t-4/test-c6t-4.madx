@@ -1,0 +1,108 @@
+Title, "test-c6t-4 conversion of thick elements with apertures";
+
+Option, echo=false, warn=false, info=true;
+
+! Sequence definition
+
+REAL CONST l.TAN   = 3.7  ;
+REAL CONST l.TANAL = l.TAN;
+REAL CONST l.TANAR = L.TAN;
+REAL CONST l.TANC  = l.TAN;
+
+REAL CONST l.TCT   = 1.0;
+REAL CONST l.TCTH  = l.TCT;
+REAL CONST l.TCTVA = l.TCT;
+
+REAL CONST l.MBAS2             =0 ; REAL CONST l.MBAW              =0 ;
+REAL CONST l.MBCS2             =0 ; REAL CONST l.MBLS2             =0 ;
+REAL CONST l.MBLW              =0 ; REAL CONST l.MBWMD             =0 ;
+REAL CONST l.MBXWH             =0 ; REAL CONST l.MBXWS             =0 ;
+REAL CONST l.MBXWT             =0 ;
+
+call, file="input/lhc_as-built.seq";
+call, file="input/aperture/aperture_as-built.b1.madx";
+call, file="input/aperture/aper_tol_as-built.b1.madx";
+call, file="input/aperture/exp_pipe_model_after_LS1.madx";
+call, file="input/aperture/exp_pipe_install_after_LS1.madx";
+
+call,file="input/mymacros.madx";   !!! Ghislain : minimum version with aperture command modified
+
+!!! Injection optics
+call, file="input/opt_inj.madx";
+
+! aperture not defined for those elements. They collide with thick TAN
+Option, echo=true, warn=true, info=true;
+seqedit, sequence=lhcb1;
+  remove, element=brana.4l1;  remove, element=brana.4l5;
+  remove, element=brana.4r1;  remove, element=brana.4r5;
+  remove, element=x1fcl.4l1;  remove, element=x1fcr.4r1;
+  remove, element=x1zdc.a4l1; remove, element=x1zdc.a4r1;
+  remove, element=x5zdc.a4l5; remove, element=x5zdc.a4r5;
+  remove, element=x5zdc.b4l5; remove, element=x5zdc.b4r5;
+endedit;
+
+emittance_norm = 3.75e-6;
+Beam, particle=proton, sequence=lhcb1, energy=450.,
+      NPART=1.15E11, sige=4.5e-4, sigt=0.075,
+      exn=emittance_norm, eyn=emittance_norm;
+
+! 2014 updated parameters injection
+emittance_norm = 3.5e-6;
+apbbeat = 1.05;
+halor = 6.001; halox = 6; haloy = 6;
+DParcx = 0.14; DParcy = 0.14;
+COmax = 0.004; dPmax = 0.0006; VMAXI = 30; SPECIF = 7;
+
+exec, mk_apir(1,b1,1); 
+exec, mk_apir(2,b1,1); 
+exec, mk_apir(3,b1,1); 
+exec, mk_apir(4,b1,1); 
+exec, mk_apir(5,b1,1); 
+exec, mk_apir(6,b1,1); 
+exec, mk_apir(7,b1,1); 
+exec, mk_apir(8,b1,1); 
+
+select, flag=makethin, clear;
+select, flag=makethin, class=mb, slice=2, thick=true;
+select, flag=makethin, class=mq, slice=2, thick=true;
+select, flag=makethin, class=mqxa,  slice=16;
+select, flag=makethin, class=mqxb,  slice=16;
+select, flag=makethin, pattern=mbx\.,    slice=4;
+select, flag=makethin, pattern=mbrb\.,   slice=4;
+select, flag=makethin, pattern=mbrc\.,   slice=4;
+select, flag=makethin, pattern=mbrs\.,   slice=4;
+select, flag=makethin, pattern=mbh\.,    slice=4;
+select, flag=makethin, pattern=mqwa\.,   slice=4;
+select, flag=makethin, pattern=mqwb\.,   slice=4;
+select, flag=makethin, pattern=mqy\.,    slice=4, thick=true;
+select, flag=makethin, pattern=mqm\.,    slice=4, thick=true;
+select, flag=makethin, pattern=mqmc\.,   slice=1, thick=true;
+select, flag=makethin, pattern=mqml\.,   slice=4;
+select, flag=makethin, pattern=mqtlh\.,  slice=2;
+select, flag=makethin, pattern=mqtli\.,  slice=2;
+select, flag=makethin, pattern=mqt\.  ,  slice=2;
+
+!thin lens
+Beam;
+Use, sequence=lhcb1;
+Makethin, sequence=lhcb1, style=teapot, makedipedge=true;
+
+Option, echo=false, warn=false, info=false;
+Call, file="input/opt_inj_thin.madx";
+Option, echo=true,  warn=true,  info=true;
+
+Beam;
+
+Use, sequence=lhcb1;
+
+Select, flag=twiss, clear;
+Select, flag=twiss, columns=name, s, betx, bety, mux, muy;
+Twiss;
+
+Sixtrack, aperture;
+
+Removefile, file="fc.3";
+Removefile, file="fc.8";
+Removefile, file="fc.34";
+
+Stop;

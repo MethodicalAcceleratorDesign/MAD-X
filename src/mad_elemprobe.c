@@ -8,6 +8,7 @@ adjust_probe(double delta_p)
   double etas, slope, qs, fact, tmp, ds = oneturnmat[34];
   double alfa, beta, gamma, dtbyds, circ, freq0; // , deltat // not used
   double betas, gammas, et, sigt, sige;
+
   et = command_par_value("et", current_beam);
   sigt = command_par_value("sigt", current_beam);
   sige = command_par_value("sige", current_beam);
@@ -34,6 +35,7 @@ adjust_probe(double delta_p)
   store_comm_par_value("deltap", delta_p, probe_beam);
   slope = -rfc_slope();
   qs = sqrt(fabs((tmp * slope) / (twopi * betas)));
+
   if (qs != zero)
   {
     fact = (tmp * circ) / (twopi * qs);

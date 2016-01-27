@@ -44,6 +44,9 @@ extern "C" {
 #define NDEBUG 1
 #include <assert.h>
 
+// LD: variables local to module that control makethin behavior (was pushed in option before)
+static int iMakeDipedge, iMakeEndMarkers, iMinimizeParents;
+
 //------------------------------- forward declarations --------------
 
 class SliceDistPos // defines the distances and positions, depending on number of slices and slicing style
@@ -875,7 +878,7 @@ static expression* curved_from_straight_length(const element* rbend_el)
     // in going from rbend to sbend, this correction must be applied   if the "l" expression is used,    not for the value
     string anglestr = my_get_cmd_expr_str( return_param_recurse("angle", rbend_el) );
     // const string rat = "("+anglestr+")*0.5/sin(("+anglestr+")/2)"; // L_sbend / L_rbend
-    // LD (16.06.2015): quick and dirty fix to broken inheritance of atributes,
+    // LD (16.06.2015): quick and dirty fix to broken inheritance of attributes,
     //                  set angle to 0 (default) when the returned string is empty
     if (anglestr == "") anglestr = "0";
     const string rat = "1.0/sinc("+anglestr+"*0.5)"; // L_sbend / L_rbend
@@ -1170,6 +1173,33 @@ static void place_thick_slice(element* thick_elem,const node* node, sequence* to
   }
 }
 
+static void place_end_marker(sequence* to_sequ,const node* thick_node,const bool at_start)
+{
+  const element* thick_elem=thick_node->p_elem;
+  command_parameter* aperture_param = return_param_recurse("aperture",thick_elem);
+  // LD: from the request, the markers should be always added
+  // if(aperture_param) // only write marker when aperture information available
+  // {
+    if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " thick_node " << thick_node->name << " at_start=" << at_start
+      << " aperture_param=" << aperture_param << " " << my_dump_command_parameter(aperture_param) << '\n';
+    
+    string AddToName;
+    double rel_shift;
+    if(at_start)
+    {
+      AddToName="_mken"; // for marker at entry
+      rel_shift=-0.5;    // -0.5 length from centre
+    }
+    else
+    {
+      AddToName="_mkex"; // for marker at exit
+      rel_shift= 0.5;    // +0.5 length from centre
+    }
+    element* start_end_marker=new_marker_element("marker",string(thick_elem->name+AddToName).c_str(),thick_elem);
+    place_thin_slice(thick_node,to_sequ,start_end_marker,rel_shift);
+  // }
+}
+
 static sequence* slice_sequence(const string& slice_style,sequence* thick_sequ) // make recursively a sliced sequence out of the thick_seque
 {
   if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " slice_style=\"" << slice_style << "\"" << '\n';
@@ -1348,24 +1378,29 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
 
   // first check makethin parameters which influence the selection
   const int ipos_mp = name_list_pos("minimizeparents", nl);
-  int MinPar=0;  // or =1  to set minimizeparents to true by default
-  if( ipos_mp > -1 && nl->inform[ipos_mp]) MinPar=pl->parameters[ipos_mp]->double_value;
-  set_option("minimizeparents", &MinPar);
+  if( ipos_mp > -1 && nl->inform[ipos_mp] )
+    iMinimizeParents = pl->parameters[ipos_mp]->double_value;
+  else iMinimizeParents = 1; // default is true in mad_dict.c
 
+  int iMakeConsistent;
   const int ipos_mk = name_list_pos("makeconsistent", nl);
   if( ipos_mk > -1 && nl->inform[ipos_mk])
-  {
-    int MakeCons=pl->parameters[ipos_mk]->double_value;
-    set_option("makeconsistent", &MakeCons);
-  }
+    iMakeConsistent = pl->parameters[ipos_mk]->double_value;
+  else iMakeConsistent = 0; // default is false in mad_dict.c
+  
+  const int ipos_me = name_list_pos("makeendmarkers", nl);
+  if( ipos_me > -1 && nl->inform[ipos_me])
+    iMakeEndMarkers = pl->parameters[ipos_me]->double_value;
+  else iMakeEndMarkers = 0; // default is false in mad_dict.c
+
+  if (verbose_fl()) cout << "makethin makeendmarkers flag ipos_me=" << ipos_me << " iMakeEndMarkers=" << iMakeEndMarkers << '\n';
 
   const int ipos_md = name_list_pos("makedipedge", nl);
   if( ipos_md > -1 && nl->inform[ipos_md])
-  {
-    int iMakeDipedge=pl->parameters[ipos_md]->double_value;
-    if (verbose_fl()) cout << "makethin makedipedge flag ipos_md=" << ipos_md << " iMakeDipedge=" << iMakeDipedge << '\n';
-    set_option("makedipedge", &iMakeDipedge); // Why does this set the global flag?
-  }
+    iMakeDipedge=pl->parameters[ipos_md]->double_value;
+  else iMakeDipedge = 1; // default is true in mad_dict.c
+
+  if (verbose_fl()) cout << "makethin makedipedge flag ipos_md=" << ipos_md << " iMakeDipedge=" << iMakeDipedge << '\n';
 
   if (slice_select->curr > 0)
   {
@@ -1374,7 +1409,7 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
   }
   else  warning("makethin: no selection list,","slicing all to one thin lens.");
 
-  if(get_option("makeconsistent")) force_consistent_slices();
+  if(iMakeConsistent) force_consistent_slices();
 
   const int ipos_seq = name_list_pos("sequence", nl);
   char* name = NULL;
@@ -1614,7 +1649,8 @@ void ElementListWithSlices::Print() const
 }
 
 //--------  SeqElList
-SeqElList::SeqElList(const string& seqname,const string& slice_style,sequence* thick_sequ,sequence* sliced_seq,node* thick_node) : verbose(0),eps(1.e-15),MakeDipedge(true) // SeqElList constructor, eps used to check if values are is compatible with zero
+SeqElList::SeqElList(const string& seqname,const string& slice_style,sequence* thick_sequ,sequence* sliced_seq,node* thick_node)
+  : verbose(0), eps(1.e-15), MakeDipedge(iMakeDipedge) // SeqElList constructor, eps used to check if values are is compatible with zero
 {
   this->seqname=seqname;
   this->slice_style=slice_style;
@@ -1627,12 +1663,8 @@ SeqElList::SeqElList(const string& seqname,const string& slice_style,sequence* t
   RbendList       =new ElementListWithSlices(verbose);
   theBendEdgeList =new ElementListWithSlices(verbose);
   // verbose=3; // -- special for code development ---   turn on extra debugging within SeqElList
-  MakeDipedge=get_option("makedipedge");
-  if(verbose && !MakeDipedge) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " ***  makedipedge is off, should always be on except for backwards compatibility checks  *** " << '\n';
-  if(verbose>1)
-  {
-    cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " constructor seqname=" << seqname << " makedipedge check  MakeDipedge=" << MakeDipedge << '\n';
-  }
+  if(verbose && !iMakeDipedge) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " ***  makedipedge is off, should always be on except for backwards compatibility checks  *** " << '\n';
+  if(verbose > 1)              cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " constructor seqname=" << seqname << " makedipedge check  MakeDipedge=" << iMakeDipedge << '\n';
 }
 
 SeqElList::~SeqElList() // destructor
@@ -1743,7 +1775,7 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
   // give sbend new name by appending _s to rbend name
 
   const string rbend_name=rbend_el->name;
-  const string sbend_name=rbend_name+(rbarc_fl() ? "_s" : ""); // LD: add _s to rbend name if the length was changed
+  const string sbend_name=rbend_name;
   element* sbend_el = RbendList->find_slice(rbend_el,sbend_name);
   if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__  << " rbend_name=" << rbend_name << " sbend_el=" << sbend_el << '\n';
   if(sbend_el) return sbend_el; // was already done
@@ -2009,7 +2041,7 @@ element* SeqElList::create_sliced_magnet(const element* thick_elem, int slice_no
     thin_elem_parent = create_sliced_magnet(thick_elem->parent,slice_no,ThickSLice); // recursively slice parent
   }
   const command_parameter* at_param = return_param(("at"),thick_elem);  // handle parent with possibly different slice number than child
-  const int minimizefl=get_option("minimizeparents") && !at_param && thick_elem == thick_elem->parent;
+  const int minimizefl=iMinimizeParents && !at_param && thick_elem == thick_elem->parent;
   if(minimizefl)
   {
     slice_no=slices=1; // do not slice this one
@@ -2133,7 +2165,7 @@ element* SeqElList::create_thin_solenoid(const element* thick_elem, int slice_no
   const command_parameter* at_param      = return_param("at",thick_elem);
 
   int slices = get_slices_from_elem(thick_elem);
-  const int minimizefl=get_option("minimizeparents") && !at_param && thick_elem == thick_elem->parent;
+  const int minimizefl=iMinimizeParents && !at_param && thick_elem == thick_elem->parent;
   if(minimizefl) slice_no=slices=1; // do not slice this one
 
   // set up new solenoid command
@@ -2212,7 +2244,7 @@ element* SeqElList::create_thin_elseparator(const element* thick_elem, int slice
   const command_parameter* at_param      = return_param("at",thick_elem);
 
   int slices = get_slices_from_elem(thick_elem);
-  const int minimizefl=get_option("minimizeparents") && !at_param && thick_elem == thick_elem->parent;
+  const int minimizefl=iMinimizeParents && !at_param && thick_elem == thick_elem->parent;
   if(minimizefl)
   {
     slice_no=slices=1; /* do not slice this one */
@@ -2466,6 +2498,9 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
 
   if(EntryDipedge && UseDipedges) place_thin_slice(thick_node,sliced_seq,EntryDipedge,-0.5); // subtract half of the length to be at start
 
+  bool at_start;
+  if(iMakeEndMarkers) place_end_marker(sliced_seq, thick_node, at_start=true);
+  
   for (int i=1; i<=nslices; ++i) // loop to place the nslices in the sequence
   {
     element *thin_slice_i=NULL;
@@ -2499,11 +2534,13 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
     {
       element* middle_marker=new_marker_element("marker",thick_elem->name,thick_elem);
       place_node_at(thick_node, sliced_seq, middle_marker,at_expr);
-      if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " thick_node " << thick_node->name << " nslices=" << nslices << " i=" << i << " middle=" << middle << " place middle marker at=" << at << " at_expr=" << at_expr
+      if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " thick_node " << thick_node->name << " nslices=" << nslices << " i=" << i << " middle=" << middle << " place middle marker at=" << thick_node->at_value << " at_expr=" << at_expr
         << " thin_at_value=" << my_get_expression_value(thin_at_expr) << '\n';
     }
     if(thin_slice_i && !ThickSLice) place_node_at(thick_node, sliced_seq, thin_slice_i,thin_at_expr);
   }
+
+  if(iMakeEndMarkers) place_end_marker(sliced_seq, thick_node, at_start=false);
 
   if(ExitDipedge && UseDipedges) place_thin_slice(thick_node,sliced_seq,ExitDipedge,0.5);  // write end dipedge for dipoles
 } // SeqElList::slice_this_node()

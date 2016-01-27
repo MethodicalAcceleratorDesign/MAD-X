@@ -3,66 +3,66 @@
 \section{RPLOT}
 \label{sec:rplot}
 
-RPLOT is a MAD-X plug-in that privides additional functionality using
-\href{http://root.cern.ch}{ ROOT }.  It contains several tools   
+\texttt{RPLOT} is a \madx plug-in that privides additional functionality
+using \href{http://root.cern.ch}{ROOT}.  It contains several tools.
 
 \begin{description}
 
 \item[\textbf{ RVIEWER }] 
 \textit{ plotting tool that handles the results in paramremtric form }
 
-What makes it different      from the standard PLOT module of MAD-X is
-that it is also able to      deal with the parmateric results. RPLOT
-proviedes graphical user interface      that allows to choose which
-functions shall be drawn, set its ranges     and adjust all the details
-of the plot formatting. Of course, the result     is immendiately
-visible on the screen, in contrary to the standard plot tool     that is
+What makes it different from the standard PLOT module of \madx is
+that it is also able to deal with the parmateric results. \texttt{RPLOT} 
+provides graphical user interface that allows to choose which
+functions shall be drawn, set its ranges and adjust all the details
+of the plot formatting. Of course, the result is immendiately
+visible on the screen, in contrary to the standard plot tool that is
 able to work solely in the batch mode. The user can choose several
 formats to save his plot, including postscript, gif, pdf, root macro and
-many      others.       
+many others.       
 
-RVIEWER is able to draw the lattice functions     
+\texttt{RVIEWER} is able to draw the lattice functions     
 \begin{enumerate}
    \item  along the layout 
    \item  at given position in function of one or two knobs  
 \end{enumerate}     
 
 It provides a convienient way to set the knob values. As the value is
-set,      the plotted functions are immediately drawn for the new value.            
+set, the plotted functions are immediately drawn for the new value.            
 
-In order to run RVIEWER simpy issue "rviewer;" command        
+In order to run \texttt{RVIEWER} simpy issue "rviewer;" command        
 
-\item[\textbf{ RTRACKSTORE }] 
-\textit{ enables storage of the tracking data in ROOT NTuple/Tree format }
+\item[\textbf{RTRACKSTORE}] 
+\textit{enables storage of the tracking data in ROOT NTuple/Tree format}
 
 Ntuple and its modern extension called Tree are formats designed
-for storing particle tracking data. It is proven to provide       the
-fastest data writing and reading thanks to column wise       I/O
+for storing particle tracking data. It is proven to provide the
+fastest data writing and reading thanks to column wise I/O
 operations. It is commonly used for data storage by HEP
-experiments. Additionally, ROOT provides automatical        ZIP data
+experiments. Additionally, ROOT provides automatical ZIP data
 compression that is transparent for the user algorithms.
-Morover, ROOT provides wide set of very comfortable tools       for
+Morover, ROOT provides wide set of very comfortable tools for
 advanced analysis and plotting of the data stored in Trees.    
 
-Addtionally, we plan to extend RVIEWER functionality that would provide
-intuitive graphical user interface to most commonly used       features
-in particle tracking in accelerators. Thanks to that,       the user is
+Addtionally, we plan to extend \texttt{RVIEWER} functionality that would
+provide intuitive graphical user interface to most commonly used
+features in particle tracking in accelerators. Thanks to that, the user is
 not forced to learn how to use the ROOT package.    
 
-Currently the feature is enabled only for tracking using        the
-ptc\_trackline command, however, it will be extended to       other
+Currently the feature is enabled only for tracking using the
+\texttt{PTC\_TRACKLINE} command, however, it will be extended to other
 tracking modes.           
 \end{description}
 
-\textbf{ Download } \\
-The newest version is available \href{download/}{ here }\\
+%\textbf{Download} \\
+%The newest version is available \href{download/}{here}\\
 
-\textbf{ Installation }\\
-Prerequisite: ROOT must be installed beforehand compilation and whenever
+\textbf{Installation}\\
+Prerequisite: ROOT must be installed before compilation and whenever
 the user wants to use the plug-in. See explanations on
 \href{http://root.cern.ch}{ROOT webpage}.  \\ 
 
-To install RPLOT 
+To install \texttt{RPLOT} 
 \begin{enumerate}
    \item  Unpack the archive, it will create directory rplot    
 \begin{verbatim}
@@ -80,7 +80,7 @@ To install RPLOT
 \end{verbatim}
 \end{enumerate}
 
-\textbf{ Examples}
+\textbf{Examples}
 
 
 \textbf{SYNOPSIS}
@@ -89,7 +89,7 @@ RVIEWER;
 \end{verbatim}
 
 
-\textbf{ PROGRAMMERS MANUAL  } \\
+\textbf{PROGRAMMERS MANUAL  } \\
 
  To be continued... 
 

@@ -10,7 +10,7 @@ export PATH="/Users/mad/Projects/madX:/opt/local/bin:$PATH"
 check_error ()
 {
 	if [ "$?" != "0" ] ; then
-		echo "ERROR: $1"
+		echo -e "\nERROR: $1"
 		exit 1
 	fi
 }
@@ -39,6 +39,8 @@ if [ "$?" != "0" ] ; then
 	svn update
 	check_error "svn update failed"
 fi
+# ensure that scripts are executable after an update
+chmod u+x scripts/build-test-report.sh $0
 
 echo -e "\n===== Release number ====="
 cat VERSION
@@ -81,19 +83,19 @@ else
 	echo ""
 
 	echo -e "\n===== Testing madx-macosx64-intel ====="
-	make madx-macosx64-intel && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
+	make madx-macosx64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=yes
 	check_error "make tests-all for madx-macosx64-intel failed"
 
 	echo -e "\n===== Testing madx-macosx32-intel ====="
-	make madx-macosx32-intel && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
+	make madx-macosx32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=yes
 	check_error "make tests-all for madx-macosx32-intel failed"
 
 	echo -e "\n===== Testing madx-macosx64-gnu ====="
-	make madx-macosx64-gnu && ls -l madx64 && make cleantest && make tests-all ARCH=64 NOCOLOR=yes
+	make madx-macosx64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=yes
 	check_error "make tests-all for madx-macosx64-gnu failed"
 
 	echo -e "\n===== Testing madx-macosx32-gnu ====="
-	make madx-macosx32-gnu && ls -l madx32 && make cleantest && make tests-all ARCH=32 NOCOLOR=yes
+	make madx-macosx32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=yes
 	check_error "make tests-all for madx-macosx32-gnu failed"
 fi
 

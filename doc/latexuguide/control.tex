@@ -12,13 +12,15 @@
 \chapter{General Control Statements} 
 
 \madx consists of a core program, and modules for specific tasks such as
-twiss parameter calculation, matching, thin lens tracking, and so on.  
+\hyperref[chap:twiss]{twiss parameter calculation},
+\hyperref[chap:match]{matching}, \hyperref[chap:thintrack]{thin lens
+  tracking}, \textsl{etc.}   
  
-The statements listed here are those executed by the program core. They
-deal with the I/O, element and sequence declaration, sequence
-manipulation, statement flow control (e.g. IF, WHILE), MACRO
-declaration, saving sequences onto files in \madx or \madeight format,
-and so on.  
+The statements listed here are those executed by the program core.
+They deal with the I/O, element and sequence declaration, sequence
+manipulation, statement flow control (e.g. \texttt{IF, WHILE}),
+\texttt{MACRO} declaration, saving sequences onto files in \madx or
+\madeight format, \textsl{etc.}  
 
 
 %% Moved to TWISS chapter
@@ -26,7 +28,7 @@ and so on.
 %% \label{subsec:coguess}
 
 %% In order to help the initial finding of the closed orbit by the
-%% {\tt TWISS} module, it is possible to specify an initial guess. 
+%% \texttt{TWISS} module, it is possible to specify an initial guess. 
 
 %% \madbox{
 %% COGUESS, \=TOLERANCE=real, \\
@@ -43,7 +45,7 @@ and so on.
 %% The clear parameter in the argument list resets the tolerance to its default value 
 %% and cancels the effect of coguess in defining a first guess for subsequent 
 %% closed orbit searches. \\
-%% Default = false, {\tt clear} alone is equivalent to {\tt clear=true}
+%% Default = false, \texttt{clear} alone is equivalent to \texttt{clear=true}
 
 
 \section{EXIT, QUIT, STOP}
@@ -62,25 +64,26 @@ STOP;
 
 \section{HELP}
 \label{sec:help}
-The HELP command prints all parameters, and their defaults values, for
-the statement given; this includes basic element types.
+The \texttt{HELP} command prints all parameters, and their defaults
+values, for the statement given; this includes basic element types.
 \madbox{
 HELP, statement\_name;
 }
 
 \section{SHOW}
 \label{sec:show}
-The SHOW command prints the "command" (typically "beam", "beam\%sequ",
-or an element name), with the actual value of all its parameters.  
+The \texttt{SHOW} command prints the \texttt{command} (typically
+\texttt{beam}, \texttt{beam\%sequ}, or an element name), with the actual
+value of all its parameters.   
 \madbox{
 SHOW, command;
 }
 
 \section{VALUE}
 \label{sec:value}
-The VALUE command evaluates the current value of all listed expressions,
-constants or variables, and prints the result in the form of \madx
-statements on the assigned output file. 
+The \texttt{VALUE} command evaluates the current value of all listed
+expressions, constants or variables, and prints the result in the form
+of \madx statements on the assigned output file. 
 \madbox{
 VALUE, expression\{, expression\} ;
 }
@@ -100,14 +103,14 @@ exp(sqrt(2)) = 4.113250379        ; \\
 \section{OPTION}
 \label{sec:option}
 
-The {\tt OPTION} commands sets the logical value of a number of flags
+The \texttt{OPTION} commands sets the logical value of a number of flags
 that control the behavior of \madx.
 
 \madbox{
 OPTION, flag=logical;
 }
 
-Because all attributes of {\tt OPTION} are logical flags, the
+Because all attributes of \texttt{OPTION} are logical flags, the
 following two statements are identical:
 \madxmp{
 OPTION, flag = true;\\
@@ -119,62 +122,54 @@ OPTION, flag = false;\\
 OPTION, -flag;
 }
 
-Several flags can be set in a single {\tt OPTION} command, e.g.
+Several flags can be set in a single \texttt{OPTION} command, e.g.
 \madxmp{
 OPTION, ECHO, WARN=true, -INFO, VERBOSE=false;
 }
 
 The available flags, their default values and their effect on \madx when
-they are set to {\tt TRUE} are listed in table \ref{table:options}.
+they are set to \texttt{TRUE} are listed in table \ref{table:options}.
 
 \begin{table}[ht]
-  \caption{Flags available to {\tt OPTION} command}
+  \caption{Flags available to \texttt{OPTION} command}
   \vspace{1ex}
-  \begin{center}
-    \label{table:options}
-    \begin{tabular}{|l|c|l|}
-     \hline
-     {\bf FLAG }  & {\bf default} & {\bf effect if {\tt TRUE}} \\
-     \hline
-     {\tt ECHO}  & true  & echoes the input on the standard output file \\
-     {\tt WARN}  & true  & issues warning statements\\
-     {\tt INFO}  & true  & issues information statements\\
-     {\tt DEBUG} & false & issues debugging information \\
-     {\tt ECHOMACRO} & false & issues macro expansion printout for debugging \\
-     {\tt VERBOSE} & false & issues additional printout in makethin \\
-     {\tt TRACE}   & false & prints the system time after each command \\
-     {\tt VERIFY}  & false & issues a warning if an undefined variable is used 
-     \\
-     \hline
-     {\tt TELL}  & false & prints the current value of all options \\
-     {\tt RESET} & false & resets all options to their defaults \\
-     \hline
-     {\tt NO\_FATAL\_STOP} & false & Prevents madx from stopping in case of a 
-     fatal error \\
-                              &       & {\bf Use at your own risk !} \\
-     \hline
-     {\tt RBARC}     & true & converts the RBEND straight length into the arc 
-     length \\
-     {\tt THIN\_FOC} & true & enables the 1/(rho**2) focusing of thin dipoles \\
-     {\tt BBORBIT}   & false & the closed orbit is modified by beam-beam kicks 
-     \\
-     {\tt SYMPL}     & false & all element matrices are symplectified in Twiss 
-     \\
-     {\tt TWISS\_PRINT} & true & controls whether the twiss command produces 
-     output \\
-     {\tt THREADER}  & false & enables the threader for closed orbit finding in 
-     Twiss \\ 
-                        &       & (see Twiss module) \\ 
-     \hline
-     \end{tabular}
-   \end{center}
+  \centering
+  \label{table:options}
+  \begin{tabular}{|l|c|l|}
+    \hline
+    \textbf{FLAG }  & \textbf{default} & \textbf{effect if \texttt{TRUE}} \\
+    \hline
+    \texttt{ECHO}      & true  & echoes the input on the standard output file \\
+    \texttt{WARN}      & true  & issues warning statements\\
+    \texttt{INFO}      & true  & issues information statements\\
+    \texttt{DEBUG}     & false & issues debugging information \\
+    \texttt{ECHOMACRO} & false & issues macro expansion printout for debugging \\
+    \texttt{VERBOSE}   & false & issues additional printout in makethin \\
+    \texttt{TRACE}     & false & prints the system time after each command \\
+    \texttt{VERIFY}    & false & issues a warning if an undefined variable is used 
+    \\
+    \hline
+    \texttt{TELL}      & false & prints the current value of all options \\
+    \texttt{RESET}     & false & resets all options to their defaults \\
+    \hline
+    \texttt{NO\_FATAL\_STOP} & false & Prevents madx from stopping in case of a fatal error \\
+    &       & \textbf{Use at your own risk !} \\
+    \hline
+    \texttt{RBARC}     & true & converts the RBEND straight length into the arc length \\
+    \texttt{THIN\_FOC} & true & enables the 1/(rho**2) focusing of thin dipoles \\
+    \texttt{BBORBIT}   & false & the closed orbit is modified by beam-beam kicks \\
+    \texttt{SYMPL}     & false & all element matrices are symplectified in Twiss \\
+    \texttt{TWISS\_PRINT} & true & controls whether the twiss command produces output \\
+    \texttt{THREADER}  & false & enables the threader for closed orbit finding in Twiss \\ 
+    &       & (see Twiss module) \\ 
+    \hline
+  \end{tabular}
 \end{table}
 
-The option {\tt RBARC} is implemented for backwards compatibility
+The option \texttt{RBARC} is implemented for backwards compatibility
 with \madeight up to version 8.23.06 included; in this version, the
-RBEND length was just taken as the arc length of an SBEND with inclined
-pole faces, contrary to the \madeight manual.  
-
+\texttt{RBEND} length was just taken as the arc length of an
+\texttt{SBEND} with inclined pole faces, contrary to the \madeight manual.  
 
 
 
@@ -186,10 +181,10 @@ statement is then also stored and can be executed again with
 EXEC, label;
 }
 This mechanism can be invoked any number of times, and the executed
-statement may be calling another {\tt EXEC}, etc. 
+statement may be calling another \texttt{EXEC}, etc. 
 
 Note however, that the main usage of this \madx construct is the
-execution of a \href{special.html#macro}{macro}.   
+execution of a \hyperref[sec:macro]{\texttt{MACRO}}.   
 
 \madxmp{
 tw: TWISS, FILE, SAVE; ! first execution of TWISS \\
@@ -200,28 +195,28 @@ EXEC, tw; ! second execution of the same TWISS command \\
 
 \section{SET}
 \label{sec:set}
-The {\tt SET} command is used in two forms:
+The \texttt{SET} command is used in two forms:
 \madbox{
 SET, FORMAT=string \{, string\} ;\\
 SET, SEQUENCE=string;
 }
 
 
-The first form of the {\tt SET} command defines the formats for the
-output precision that \madx uses with the {\tt SAVE}, {\tt SHOW},
-{\tt VALUE} and {\tt TABLE} commands. The formats can be
+The first form of the \texttt{SET} command defines the formats for the
+output precision that \madx uses with the \texttt{SAVE}, \texttt{SHOW},
+\texttt{VALUE} and \texttt{TABLE} commands. The formats can be
 given in any order and stay valid until replaced. 
 
 The formats follow the C convention and must be included in double
 quotes. The allowed formats are \\
-{\tt {\it n}d} for integers with a field-width = {\it n}, \\
-{\tt {\it n}.{\it m}f} or {\tt {\it n}.{\it m}g} or {\tt {\it
-    n}.{\it m}e} for floats with field-width = {\it n} and precision =
-       {\it m}, \\
-{\tt {\it n}s} for strings with a field-width = {\it n}.\\
+\texttt{\textit{n}d} for integers with a field-width = \textit{n}, \\
+\texttt{\textit{n}.\textit{m}f} or \texttt{\textit{n}.\textit{m}g} or
+\texttt{\textit{n}.\textit{m}e} for floats with field-width = \textit{n}
+and precision = \textit{m}, \\
+\texttt{\textit{n}s} for strings with a field-width = \textit{n}.\\
 The default is "right adjusted", a "-" changes it to "left adjusted".
 
-{\bf Example:}\\
+\textbf{Example:}\\
 \madxmp{
 SET, FORMAT="12d", "-18.5e", "25s";
 }
@@ -237,28 +232,28 @@ SET, FORMAT="12d", "-18.5e", "25s";
 %% \end{verbatim} 
 
 
-The default formats are {\tt "10d", "18.10g"} and {\tt "-18s"}.
+The default formats are \texttt{"10d", "18.10g"} and \texttt{"-18s"}.
 
 Example: 
 \begin{verbatim}
-set,format="22.14e";
+set, format="22.14e";
 \end{verbatim} 
-changes the current floating point format to 22.14e; the other formats remain untouched. 
+changes the current floating point format to \texttt{22.14e}; the other
+formats remain unchanged.  
 \begin{verbatim}
-set,format="s","d","g";
+set, format="s","d","g";
 \end{verbatim} 
 sets all formats to automatic adjustment according to C conventions. 
 
-
-
-The second form of the {\tt SET} command allows to select the
-current sequence without the "USE" command, which would
-bring back to a bare lattice without errors. The command only works
-if the chosen sequence has been previously activated with a {\tt USE} command,
-otherwise a warning is issued and \madx continues with the
+The second form of the \texttt{SET} command allows to select the
+current sequence without the \hyperref[sec:use]{\texttt{USE}} command,
+which would bring back to a bare lattice without errors. The command
+only works 
+if the chosen sequence has been previously activated with a \texttt{USE}
+command, otherwise a warning is issued and \madx continues with the
 unmodified current sequence. This command is particularly useful for
-commands that do not have the sequence as an argument like "EMIT" or
-"IBS". 
+commands that do not have the sequence as an argument like
+\hyperref[chap:emit]{\texttt{EMIT}} or \hyperref[chap:ibs]{\texttt{IBS}}. 
 
 
 
@@ -267,34 +262,36 @@ commands that do not have the sequence as an argument like "EMIT" or
 \madbox{
 SYSTEM, "string";
 }
-transfers the quoted string to the system for execution. The quotes are
-stripped and no check of the return status is performed by \madx.
+transfers the quoted \texttt{string} to the operating system for
+execution. The quotes are stripped and no check of the return status is
+performed by \madx. 
 
-{\bf Example:}\\ 
+\textbf{Example:} 
 \madxmp{
-SYSTEM,"ln -s /afs/cern.ch/user/j/joe/public/some/directory shortname";
+SYSTEM, "ln -s /afs/cern.ch/user/j/joe/input shortname";
 }
-makes a local link to an AFS directory with the name "shortname" on a
-UNIX system. 
+makes a local link to an AFS directory with the name \texttt{shortname}
+on a \texttt{UNIX} system.  
 
-Attention: Although this command is very convenient, it is clearly not portable
-across systems and it should probably be avoided if one intends to share \madx 
-scripts with collaborators working on other platforms. 
+\textbf{Attention:} Although this command is very convenient, it is
+clearly not portable across systems and it should probably be avoided if
+one intends to share \madx scripts with collaborators working on other
+platforms.  
 
 \section{TITLE}
 \label{sec:title}
 \madbox{
 TITLE, "string";
 }
-the string in quotes is inserted as title in various table outputs and
-plot results.  
+defines a \texttt{string} that is inserted as title in various table
+outputs and plot results.  
 
 
 \section{USE}
 \label{sec:use}
 \madx operates on beamlines that must be loaded and expanded in memory
-before other commands can be invoked. The {\tt USE} allows this
-loading and expansion.
+before other commands can be invoked. The \texttt{USE} command allows
+this loading and expansion.
 
 \madbox{
 USE, \=PERIOD=sequence\_name, SEQUENCE=sequence\_name, \\
@@ -302,25 +299,26 @@ USE, \=PERIOD=sequence\_name, SEQUENCE=sequence\_name, \\
      \>SURVEY=logical;
 }
 
-The attributes to the {\tt USE} command are:
+The attributes to the \texttt{USE} command are:
 \begin{madlist}
   \ttitem{SEQUENCE} name of the sequence to be loaded and expanded. 
   \ttitem{PERIOD} name of the sequence to be loaded and expanded. \\ 
-  {\tt PERIOD} is an alias to {\tt SEQUENCE} that was kept for
+  \texttt{PERIOD} is an alias to \texttt{SEQUENCE} that was kept for
   backwards compatibility with \madeight and only one of them should be
-  specified in a {\tt USE} statement. 
+  specified in a \texttt{USE} statement. 
   \ttitem{RANGE} specifies a \hyperref[sec:range]{range}.   
   restriction so that only the specified part of the named sequence is
   loaded and  expanded.
   \ttitem{SURVEY} option to plug the survey data into the sequence elements
-  nodes on the first pass (see \hyperref[chap:survey]{\tt SURVEY}).
+  nodes on the first pass (see \hyperref[chap:survey]{\texttt{SURVEY}}).
 \end{madlist}
 
-Note that reloading a sequence with the {\tt USE} command reloads a
-bare sequence and that any {\tt ERROR} or orbit correction previously
-assigned or associated to the sequence are forgotten. 
+Note that reloading a sequence with the \texttt{USE} command reloads a
+bare sequence and that any \texttt{ERROR} or orbit correction previously
+assigned or associated to the sequence are discarded. 
 A mechanism to select a sequence without this side effect of the
-{\tt USE} command is provided with the {\tt SET, SEQUENCE=...} command.
+\texttt{USE} command is provided with the
+\hyperref[sec:set]{\texttt{SET, SEQUENCE=...}} command. 
 
 
 \section{SELECT} 
@@ -330,7 +328,7 @@ Some \madx commands can perform specific operations on selected elements
 or ranges of elements and can produce specific output for selected
 elements or ranges of elements. 
 
-The selection is made through the {\tt SELECT} command and applies to
+The selection is made through the \texttt{SELECT} command and applies to
 subsequent commands.
 
 \madbox{
@@ -339,34 +337,33 @@ SELECT, \=FLAG=string, RANGE=string, CLASS=string, PATTERN=string, \\
         \>COLUMN=string\{,string\},  SLICE=integer, THICK=logical;
 } 
 
-The attributes to the {\tt SELECT} command are:
+The attributes to the \texttt{SELECT} command are:
 \begin{madlist}
-  \ttitem{FLAG} determines the applicability of the
-         {\tt SELECT} statement and the attribute value can be one of
-         the following:
-     \begin{madlist}
-       \ttitem{SEQEDIT} selection of elements for the
-       \hyperref[sec:seqedit]{\tt SEQEDIT} module.
-       
-       \ttitem{ERROR} selection of elements for the
-       \hyperref[chap:error]{error assignment} module.
-       
-       \ttitem{MAKETHIN} selection of elements for the
-       \hyperref[chap:makethin]{\tt MAKETHIN} command that
-       converts the sequence into one with thin elements.
-       
-       \ttitem{SECTORMAP} selection of elements for the
-       \hyperref[sec:sectormap]{\tt SECTORMAP} output file
-       from the \hyperref[chap:twiss]{\tt TWISS} module.
-       
-       \ttitem{SAVE} selection of elements for the
-       \hyperref[sec:save]{\tt SAVE} command.
-       
-       \ttitem{tablename} is a table name such as {\tt twiss}, 
-       {\tt track} etc., and the rows and columns to be written are
-       selected.
-     \end{madlist} 
-     
+  \ttitem{FLAG} determines the applicability of the \texttt{SELECT}
+  statement and the attribute value can be one of the following: 
+  \begin{madlist}
+    \ttitem{SEQEDIT} selection of elements for the
+    \hyperref[sec:seqedit]{\texttt{SEQEDIT}} module.
+    
+    \ttitem{ERROR} selection of elements for the
+    \hyperref[chap:error]{error assignment} module.
+    
+    \ttitem{MAKETHIN} selection of elements for the
+    \hyperref[chap:makethin]{\texttt{MAKETHIN}} command that
+    converts the sequence into one with thin elements.
+    
+    \ttitem{SECTORMAP} selection of elements for the
+    \hyperref[sec:sectormap]{\texttt{SECTORMAP}} output file
+    from the \hyperref[chap:twiss]{\texttt{TWISS}} module.
+    
+    \ttitem{SAVE} selection of elements for the
+    \hyperref[sec:save]{\texttt{SAVE}} command.
+    
+    \ttitem{tablename} is a table name such as \texttt{twiss}, 
+    \texttt{track} etc., and the rows and columns to be written are
+    selected.
+  \end{madlist} 
+  
   \ttitem{RANGE} the range of elements to be selected as defined in
   section \ref{sec:range} on \hyperref[sec:range]{range} selection.
 
@@ -381,51 +378,55 @@ The attributes to the {\tt SELECT} command are:
 
   \ttitem{FULL} a logical falg to select ALL positions in the sequence
   for the named flag. \\
-  For the flag {\tt TWISS}, this attribute includes all standard
-  columns for a {\tt TWISS} table, and therefore the following two
+  For the flag \texttt{TWISS}, this attribute includes all standard
+  columns for a \texttt{TWISS} table, and therefore the following two
   statements are equivalent:
   \madxmp{
 SELECT, FLAG=twiss, COLUMN= name, s, betx, ..., var1; \\
 SELECT, FLAG=twiss, FULL, COLUMN= var1; 
   } 
-  {\tt FULL=true} is the default for the {\tt MAKETHIN} flag and for tables: 
-  {\sl eg} {\tt SELECT, FLAG=makethin;} is equivalent to {\tt SELECT,
-    FLAG=makethin, FULL;}  
+  \texttt{FULL=true} is the default for the \texttt{MAKETHIN} flag and
+  for tables: \textsl{e.g.} \texttt{SELECT, FLAG=makethin;} is
+  equivalent to \texttt{SELECT, FLAG=makethin, FULL;}   
   
   \ttitem{CLEAR} deselects ALL positions in the sequence for the flag
-  "name". This is the default for {\tt ERROR} and {\tt SEQEDIT}
+  "name". This is the default for \texttt{ERROR} and \texttt{SEQEDIT}
   flags. \\
-  {\sl eg} {\tt SELECT, FLAG=error;} is equivalent to {\tt SELECT, FLAG=error, CLEAR;}
+  \textsl{e.g.} \texttt{SELECT, FLAG=error;} is equivalent to
+  \texttt{SELECT, FLAG=error, CLEAR;} 
 
   \ttitem{COLUMN} is only valid for tables and takes as attribute value
   a list of columns to be written into the TFS file. The special "\_name"
   argument refers to the actual name of the element. 
-  %For an example, see \hyperref[sec:select]{\tt SELECT}.  
+  %For an example, see \hyperref[sec:select]{\texttt{SELECT}}.  
 
   \ttitem{SLICE} is the number of slices into which the selected
   elements have to be cut and is only used by
-  \hyperref[chap:makethin]{\tt MAKETHIN}. (Default = 1). 
+  \hyperref[chap:makethin]{\texttt{MAKETHIN}}. (Default = 1). 
 
   \ttitem{THICK} is a logical flag to indicate  whether the selected
-  elements are treated as thick elements by the \hyperref[chap:makethin]{\tt
-    MAKETHIN} command. \\ 
-  This only applies up to now to \hyperref[sec:quadrupole]{\tt
-    QUADRUPOLE}s and \hyperref[sec:bend]{\tt BEND}s for which thick maps
+  elements are treated as thick elements by the
+  \hyperref[chap:makethin]{\texttt{MAKETHIN}} command. \\  
+  This only applies up to now to
+  \hyperref[sec:quadrupole]{\texttt{QUADRUPOLE}}s and
+  \hyperref[sec:bend]{\texttt{BEND}}s for which thick maps
   have been explicitely derived. 
 \end{madlist}
 
 \vskip 5mm
-{\bf Composition of {\tt SELECT} statements:} \\
-The selection criteria provided on a single {\tt SELECT} statement are logically
-{\tt AND}ed, {\sl ie} selected elements have to fulfill {\bf all}
-provided criteria in the single {\tt SELECT} statement.  
+\textbf{Composition of \texttt{SELECT} statements:} \\
+The selection criteria provided on a single \texttt{SELECT} statement
+are logically \texttt{AND}ed, \textsl{i.e.} selected elements have to
+fulfill \textbf{all} provided criteria in the single \texttt{SELECT}
+statement. 
 
-The selection criteria on different {\tt SELECT} statements are logically
-{\tt OR}ed, {\sl ie} selected elements have to fulfill {\bf any} of the
-selection criteria provided by the different {\tt SELECT} statements.   
+The selection criteria on different \texttt{SELECT} statements are
+logically \texttt{OR}ed, \textsl{i.e.} selected elements have to fulfill
+\textbf{any} of the selection criteria provided by the different
+\texttt{SELECT} statements. 
 
-All selections for a given flag remain valid until a {\tt SELECT} statement
-with the {\tt CLEAR} argument is specified for the same flag.
+All selections for a given flag remain valid until a \texttt{SELECT}
+statement with the \texttt{CLEAR} argument is specified for the same flag.
 
 Note that because of these composition rules, it is considered good
 practice to start by clearing the selection for a given flag before
@@ -439,14 +440,14 @@ SELECT, FLAG=twiss, RANGE=MQ[5]/MQ[7]; \\
 
 
 \vskip 5mm
-{\bf Examples:} 
+\textbf{Examples:} 
 \madxmp{ 
 SELECT, FLAG = ERROR, CLASS = quadrupole, RANGE = mb[1]/mb[5];\\
 SELECT, FLAG = ERROR, PATTERN = "\textasciicircum mqw.*";
 }
 selects all quadrupoles in the range mb[1] to mb[5], as well as all
 elements (in the whole sequence) with name starting with "mqw", for 
-treatment by the \hyperref[chap:error]{\tt ERROR} module.  
+treatment by the \hyperref[chap:error]{\texttt{ERROR}} module.  
 
 \vskip 5mm
 \madxmp{
@@ -463,10 +464,10 @@ sig1 := sqrt(beam->ex*table(twiss,betx)); \\
 SELECT, FLAG=twiss, COLUMN= \_name, s, betx, ..., sig1; ! or equivalently \\
 SELECT, FLAG=twiss, FULL, COLUMN= sig1; ! default columns + new
 }
-writes the current value of ``sig1'' into the {\tt TWISS} table each
+writes the current value of ``sig1'' into the \texttt{TWISS} table each
 time a new line is added; Note that the values from the same (current)
 line can be are accessed by the variable ``sig1''.
-The \hyperref[chap:plot]{\tt PLOT} command also accepts the new variable 
+The \hyperref[chap:plot]{\texttt{PLOT}} command also accepts the new variable 
 in the table.  
 
 %% EOF

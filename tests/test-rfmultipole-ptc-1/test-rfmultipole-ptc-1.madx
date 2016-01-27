@@ -1,0 +1,108 @@
+TITLE, 'RF-Dipole example';
+
+Option, echo=false;
+
+!!!! data
+Lq = 0.4;
+Lb = 1.0;
+Ld = (1.6 - Lb)/2.0;
+Kf =  1.0; 
+Kd = -1.0; 
+
+lcell = 2.0*Lq + 4.0*Ld + 2.0*Lb;
+ncell = 6;
+circum = ncell*lcell;
+
+protonmass = 0.938272;
+
+beamenergy = 10;
+
+gammaR = beamenergy/protonmass;
+
+betaR = sqrt(1 - 1/(gammaR*gammaR) );
+velocity=betaR*clight;
+
+fr=1e-6*velocity/(lcell*ncell+.2);
+
+qf1:  quadrupole, l=Lq,     k1:=Kf;
+qf1h: quadrupole, l=Lq/2.0, k1:=Kf;
+qd1:  quadrupole, l=Lq,	    k1:=Kd;
+mb:   sbend, 	  l=Lb, ANGLE=2.0*pi/ncell/2.0;
+rfm1: rfmultipole, l=0.1, freq:=fr, lag=0, knl:={1e-33,0,0};!,  pnl:={0.25};
+!rfm1: rfmultipole, l=0.1, freq=19.664, lag=0, knl:={1e-3,0,0};!,  pnl:={0.25};
+
+aftrfd: marker;
+
+!!!!! sequence
+my_seq: sequence, refer=entry, l=ncell*lcell+0.2;
+
+rfm1: rfm1, at=0.0;
+
+aftrfd: aftrfd, at=0.16;
+
+n=1;
+qf1h:	qf1h, at=0.2+(n-1)*lcell;
+while (n<ncell) {
+      mb:	mb,   at=0.2+(n-1)*lcell + Lq/2.0 + Ld;
+      qd1:	qd1,  at=0.2+(n-1)*lcell + lcell/2.0 - Lq/2.0;
+      mb:	mb,   at=0.2+(n-1)*lcell + lcell/2.0 + Lq/2.0 + Ld;
+      qf1:	qf1, at=0.2+(n-1)*lcell + lcell - Lq/2.0;
+      n=n+1;
+}
+mb:	mb,   at=0.2+(n-1)*lcell + Lq/2.0 + Ld;
+qd1:	qd1,  at=0.2+(n-1)*lcell + lcell/2.0 - Lq/2.0;
+mb:	mb,   at=0.2+(n-1)*lcell + lcell/2.0 + Lq/2.0 + Ld;
+qf1h:	qf1h, at=0.2+(n-1)*lcell + lcell - Lq/2.0;
+
+
+!rfm1: rfm1, at=ncell*lcell+0.4 -0.15;
+
+endsequence;
+
+Option, echo=true;
+
+!!!!! beam
+beam, particle = proton, sequence = my_seq, energy = beamenergy,
+      NPART=1.05E11, sige=4.5e-4 ;
+
+!!!!! twiss
+use, sequence = my_seq;
+select, flag = twiss, column=name,s,betx,alfx,mux, bety, alfy,muy,dx,dy;
+twiss, save, centre; 
+
+q1 = table(summ, q1);
+q1 = q1 - floor(q1);
+
+
+!!!!! track
+use, sequence=my_seq;
+
+ptc_create_universe;
+    ptc_create_layout, model=1, method=6, nst=5, exact=true, closed_layout=true;
+    
+    
+    ptc_twiss, table=twiss,icase=5;
+    q1ptc = table(twiss, my_seq$end, mu1);
+    q1ptc = q1ptc - floor(q1ptc);
+ptc_end;
+
+fr = fr * q1;
+
+ptc_create_universe;
+    ptc_create_layout, model=1, method=6, nst=5, exact=true, closed_layout=true;
+
+    ptc_setswitch, debuglevel=1,maxacceleration=false, totalpath,time=false;
+
+    ptc_observe, place=aftrfd;
+    ptc_start, x=0.0, px=0.0, y=0, py=0, t= 0.00, pt=0;
+!    ptc_start, x=0, px=0, y=0, py=0, t=-0.01, pt=0;
+!    ptc_start, x=0, px=0, y=0, py=0, t= 0.01, pt=0;
+
+    ptc_trackline, turns=500, onetable=true;!, rootntuple;
+
+!     ptc_track, icase=6, turns=5,onetable=true, FILE=track;
+
+ptc_end;
+
+value, q1, q1ptc;
+stop;

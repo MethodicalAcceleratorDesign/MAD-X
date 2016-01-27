@@ -1,4 +1,5 @@
-\documentclass[11pt,a4paper,twoside]{report}
+%\RequirePackage[l2tabu, orthodox]{nag} % for debugging purpose
+\documentclass[11pt, a4paper, twoside]{report}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \includeonly{
@@ -7,7 +8,7 @@
   definitions, elements, ranges, line, sequence,
   tfs, c6t, sxf, plot, index, rplot_index,
   survey, twiss, match, emit, aperture, makethin, error, cororbit, sodd, touschek, ibs, thintrack,	
-  ptc_general, ptc_track, ptc_twiss, ptc_normal, ptc_auxiliaries, 
+  ptc-general, ptc-track, ptc-twiss, ptc-normal, ptc-auxiliaries, 
   defects, pitfalls
  }
 
@@ -15,10 +16,12 @@
 \usepackage{xspace}
 \usepackage[dvipsnames,svgnames]{xcolor}
 \usepackage{a4wide} % for better presentation
+    %% \oddsidemargin 0.125 in    %   Note that \oddsidemargin = \evensidemargin
+    %% \evensidemargin 0.125 in
+    %% \marginparwidth 0.75 in
+    %% \textwidth 6.125 in % Width of text line.
 \usepackage{amsmath}
-
 \usepackage[english]{babel}
-
 %%\usepackage[pdftex]{graphicx} 
 %% Show image: \includegraphics[width=x]{file}.
 \usepackage{graphicx} % Show image: \includegraphics[width=x]{file}.
@@ -39,12 +42,14 @@
 \addeditor{GR}
 
 \usepackage{versions}
-\excludeversion{5.02.06}
-\includeversion{5.02.07}
+\excludeversion{5.02.07}
+\includeversion{5.02.08}
+%\includeversion{5.03.00}
 % following tags the version with their name in the printout
 % and effectively overrides excludeversion !
-%\markversion{5.02.06}
 %\markversion{5.02.07}
+%\markversion{5.02.08}
+%\markversion{5.03.00}
 
 %\usepackage{comment}
 
@@ -58,15 +63,20 @@
 
 \usepackage{madstyle}
 
+%\vbadness=100000
+%\hbadness=100000
+
 \makeindex        % use \index{keyword}
 %\makeglossary     % use \glossary{concept}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 
+\pagenumbering{roman}
 \include{coverpage}
 \include{copyright}
 
+\pagenumbering{arabic}
 \tableofcontents
 \newpage
 
@@ -121,11 +131,11 @@
 \include{thintrack}     % THINTRACK: Thin-Lens Tracking Module 
 
 \part{\ptc Commands}
-\include{ptc_general}     % Set-up Parameters
-\include{ptc_track}       % PTC_TRACK: Thick-Lens Tracking Module
-\include{ptc_twiss}       % PTC_TWISS: Ripken Optics Parameters
-\include{ptc_normal}      % PTC_NORMAL: Non-Linear Machine Parameters
-\include{ptc_auxiliaries} % PTC Auxiliary Commands
+\include{ptc-general}     % Set-up Parameters
+\include{ptc-track}       % PTC_TRACK: Thick-Lens Tracking Module
+\include{ptc-twiss}       % PTC_TWISS: Ripken Optics Parameters
+\include{ptc-normal}      % PTC_NORMAL: Non-Linear Machine Parameters
+\include{ptc-auxiliaries} % PTC Auxiliary Commands
 
 \part{Trailing Material}
 \include{defects}       % Known Differences to Other Programs 

@@ -51,7 +51,7 @@ FFLAGS = -m$(ARCH) -O$(NOPT) -warn all -warn nounused -warn nointerfaces -c
 #
 
 ifeq ($(DEBUG),yes)
-FFLAGS += -g -traceback -gdwarf-2 -check all
+FFLAGS += -g -gdwarf-2 -debug full -debug extended -traceback -check all
 endif
 
 ifeq ($(PROFILE),yes)
@@ -70,7 +70,7 @@ endif
 # extra flags
 #
 
-FFLAGS += -mp1 -fp-model strict -assume noold_unit_star -module $(OBJDIR) -fexceptions
+FFLAGS += -mp1 -fp-model strict -heap-arrays 65536 -assume noold_unit_star -module $(OBJDIR) -fexceptions
 
 endif # Unix Settings
 
@@ -101,7 +101,7 @@ FFLAGS = /O$(NOPT) /stand:f95 /warn:all /warn:nounused /c
 #
 
 ifeq ($(DEBUG),yes)
-FFLAGS += /debug:full /traceback /check:all
+FFLAGS += /Z7 /debug:full /traceback /check:all /debug-parameters:all /RTCu
 endif
 
 ifeq ($(PROFILE),yes)
@@ -116,7 +116,7 @@ endif
 # extra flags
 #
 
-FFLAGS += /nologo /Qprec /fp:source /fpp \
+FFLAGS += /nologo /Qprec /fp:source /fpp /heap-arrays:65536 \
           /names:lowercase /assume:underscore /assume:noold_unit_star \
           /module:$(OBJDIR)
 

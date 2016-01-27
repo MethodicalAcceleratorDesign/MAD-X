@@ -55,7 +55,7 @@ CFLAGS += -diag-disable 2259,1572,981 # -diag-enable port-win # -diag-enable sc2
 #
 
 ifeq ($(DEBUG),yes)
-CFLAGS += -g -gdwarf-2
+CFLAGS += -g -gdwarf-2 -debug all -debug extended -traceback -check=conversions,stack,uninit
 endif
 
 ifeq ($(PROFILE),yes)
@@ -107,7 +107,7 @@ CXXFLAGS += -diag-disable 2259,1572,981 # -diag-enable port-win # -diag-enable s
 #
 
 ifeq ($(DEBUG),yes)
-CXXFLAGS += -g -gdwarf-2
+CXXFLAGS += -g -gdwarf-2 -debug all -debug extended -traceback -check=conversions,stack,uninit
 endif
 
 ifeq ($(PROFILE),yes)
@@ -125,7 +125,7 @@ endif
 #
 # extra flags
 #
- 
+
 CXXFLAGS += -mp1 -fp-model strict
 
 endif

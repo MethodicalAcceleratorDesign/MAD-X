@@ -9,7 +9,7 @@
 
 
 \chapter{Intra-Beam Scattering}
-\label{chap:IBS}
+\label{chap:ibs}
 
 The Intra-Beam Scattering command computes the contribution to emittance
 growth rates due to Coulomb scattering of particles within relativistic
@@ -43,7 +43,7 @@ machine and consequently, the knowledge of the optical functions along
 the machine is required: \texttt{IBS} should only be called after fully
 qualified \texttt{BEAM} command and a \texttt{TWISS} command. 
 
-{\bf Warning:} Calling \texttt{EMIT} between the \texttt{TWISS} and
+\textbf{Warning:} Calling \texttt{EMIT} between the \texttt{TWISS} and
 \texttt{IBS} commands leads to \texttt{IBS} using wrong beam parameters,
 even if the \texttt{BEAM} command is reiterated.
 
@@ -71,7 +71,7 @@ each element by performing a linear interpolation between the end values
 for the previous element and the end values for the current element.
 
   
-{\bf Input of the beam parameters:}\\
+\textbf{Input of the beam parameters:}\\
 A number of parameters have to be present in the  \texttt{BEAM} command
 in order to run the IBS module: 
 
@@ -114,7 +114,7 @@ in order to run the IBS module:
 \end{madlist}
 
 
-{\bf Example of BEAM input:}\\
+\textbf{Example of BEAM input:}\\
 A beam of fully stripped Lead ions at the LHC injection energy may be
 defined as follows for \texttt{IBS} calculations: 
 \madxmp{
@@ -127,21 +127,23 @@ BEAM, \=PARTICLE= lead, CHARGE= charge, MASS= nucleon*nmass, \\
 }
 
 
-{\bf Resulting Table and File:} \\
-The IBS command produces a table "ibs" containing the following data for
+\textbf{Resulting Table and File:} \\
+The \texttt{IBS} command produces a table "ibs" containing the following
+data for 
 each element of the machine: element name, position, optical functions
 (beta, alfa, dispersion and derivative) in both transverse planes, as
-well as the particular variables DELS, the length difference in meters
-between consecutive elements, and TXI, TYI and TLI, the IBS growth times
-in the two transverse and longitudinal planes. 
+well as the particular variables \texttt{DELS}, the length difference in
+meters between consecutive elements, and \texttt{TXI, TYI} and
+\texttt{TLI}, the IBS growth times in the two transverse and
+longitudinal planes.  
 
-This table can be accessed through the usual mechanisms, and if the
-attribute \texttt{FILE="file\_name"} was given, \madx writes this table
-to the named file.  
+This table can be accessed through the usual mechanisms. If the
+attribute \texttt{FILE="file\_name"} is also given, \madx writes the
+table to the named file.  
 
 
 
-{\bf Features:} \\
+\textbf{Features:} \\
 The average growth rates in [sec] are defined as variables called
 \texttt{ibs.tx}, \texttt{ibs.ty}, \texttt{ibs.tl} for the horizontal,
 vertical and longitudinal growth times respectively. They are directly
@@ -153,13 +155,13 @@ defines a variable Tx which is the average horizontal growth rate in seconds.
 
 
 
-{\bf Examples:} \\
+\textbf{Examples:} \\
 The two examples provided for the module Intra-Beam Scattering
 illustrate the commands required to run the module. The two examples
 have been selected such as to highlight the differences between a
 computation for protons and that for ions. Both examples compute the IBS
 growth times at injection into the LHC.\\
- The examples are located at
+The examples are located at
 \href{http://madx.web.cern.ch/madx/madX/examples/ibs/}{http://madx.web.cern.ch/madx/madX/examples/ibs/}. 
 
 

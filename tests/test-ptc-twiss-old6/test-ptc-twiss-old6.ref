@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.06  (64 bit, Linux)       +
+  +     MAD-X 5.02.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.06.26               +
-  + Execution date: 2015.09.16 13:48:12      +
+  + Release   date: 2015.09.24               +
+  + Execution date: 2015.11.03 19:51:00      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8
 
@@ -71,7 +71,7 @@ Beam, particle = proton, sequence=lhcb1, energy = 450.0,
 
 use,sequence=lhcb1;
 
-makethin,sequence=lhcb1,style=hybrid;
+makethin,sequence=lhcb1,style=hybrid, makedipedge=false;
 
 makethin: style chosen : hybrid
 makethin: slicing sequence : lhcb1
@@ -693,17 +693,17 @@ PTC_CREATE_LAYOUT,model=2,method=6,nst=1;
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.449999E+03
  Setting MADx with 
-     energy           450.00000000000000     
+     energy           450.000000000000     
      method                   6
      Num. of steps            1
-     charge           1.0000000000000000     
-  Length of machine:    26658.883200000084     
+     charge           1.00000000000000     
+  Length of machine:    26658.8832000001     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    0.0000000000000000        0.0000000000000000        26658.883200001525     
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:   0.000000000000000E+000  0.000000000000000E+000   26658.8832000015     
 
 
 SELECT, flag=ptc_twiss, clear;
@@ -816,7 +816,7 @@ ptc_normal,closed_orbit,normal,icase=5,no=2;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   -2.4999927550805419E-003  -3.8031143112122184E-009  -8.1822966983911208E-008   1.6000806167850115E-004   0.0000000000000000     
+ Closed orbit:  -2.499992755080542E-003 -3.803114311212218E-009 -8.182296698391121E-008  1.600080616785012E-004  0.000000000000000E+000
  Normal Form Type 1
 write, table=normal_results,file="normal_results";
 

@@ -17,12 +17,12 @@ The attributes for the \texttt{EMIT} command are:
 
 \begin{madlist}
   \ttitem{DELTAP} the average energy error. \\
-  {\tt EMIT} adjusts the RF frequencies in order to obtain this
+  \texttt{EMIT} adjusts the RF frequencies in order to obtain this
   average energy error: the revolution frequency $f_0$
   is determined for a fictitious particle with constant momentum error  
   %DELTAP = delta$_\textit{s}$ = delta(\textit{E}) / \textit{p$_s$ c}
-  {\tt DELTAP} = $\delta_s = \delta(E) / p_s c$ travelling along the design
-  orbit. The RF frequencies are then set to   
+  $\mathtt{DELTAP} = \delta_s = \delta(E) / p_s c$ travelling along the
+  design orbit. The RF frequencies are then set to   
   %\textit{f$_{RF}$ = h f$_0$}. 
   $f_{RF} = h f_0$. 
 
@@ -36,28 +36,29 @@ The attributes for the \texttt{EMIT} command are:
 
 
 If the machine contains at least one RF cavity, and if synchrotron
-radiation is enabled with \hyperref[sec:beam]{\tt BEAM, RADIATE=true;}, the
-{\tt EMIT} command computes the equilibrium emittances and other
+radiation is enabled with \hyperref[sec:beam]{\texttt{BEAM,
+    RADIATE=true;}}, the 
+\texttt{EMIT} command computes the equilibrium emittances and other
 electron beam parameters using the method in \cite{chao1979}.
 
 In this calculation the effects of quadrupoles, sextupoles and
 octupoles along the closed orbit are also considered. Thin multipoles are
-used only if they have a fictitious length {\tt LRAD} different from zero.  
+used only if they have a fictitious length \texttt{LRAD} different from zero.  
 
 If the machine does not contain any RF cavity, if synchrotron radiation is
-turned off (\hyperref[sec:beam]{\tt BEAM, RADIATE=false;}, or if the longitudinal
-motion is not stable, {\tt EMIT} only computes the parameters that
-are not related to radiation and does not update the {\tt BEAM} values.
+turned off (\hyperref[sec:beam]{\texttt{BEAM, RADIATE=false;}}, or if the longitudinal
+motion is not stable, \texttt{EMIT} only computes the parameters that
+are not related to radiation and does not update the \texttt{BEAM} values.
 
-If synchrotron radiation is enabled (\hyperref[sec:beam]{\tt BEAM, RADIATE=true;}, 
-and the {\tt DELTAP} attribute is zero, and the longitudinal motion is stable, 
-{\tt EMIT} calculates and updates the following values for the {\tt BEAM} attached 
+If synchrotron radiation is enabled (\hyperref[sec:beam]{\texttt{BEAM, RADIATE=true;}}, 
+and the \texttt{DELTAP} attribute is zero, and the longitudinal motion is stable, 
+\texttt{EMIT} calculates and updates the following values for the \texttt{BEAM} attached 
 to the current sequence: both geometric and normalized transverse emittances, 
 longitudinal emittance and beam sizes ($\sigma_E$ and $\sigma_t$), 
 damping partition numbers, energy loss per turn and synchrotron tune.
 
 
-{\bf Example:}
+\textbf{Example:}
 \madxmp{
 RFC: RFCAVITY, HARMON..., VOLT=...; \\
 \ldots \\
@@ -65,14 +66,14 @@ BEAM, ENERGY = 100.0, RADIATE=true; \\
 EMIT, DELTAP = 0.01;
 }
 
-{\bf Remark:}\\
+\textbf{Remark:}\\
 This module assumes nearly constant lattice functions
 inside elements. This assumption works for many machines, like LEP
-(\href{http://cern.ch/frs/mad-X_examples/emit/LEP/}{see example}), but
-it fails when the lattice functions largely vary inside single
-elements. In the later case it is advised to slice the elements as shown
-in the example pertaining to
-\href{http://cern.ch/frs/mad-X_examples/emit/ALBA/}{ALBA}.     
+%(\href{http://cern.ch/frs/mad-X_examples/emit/LEP/}{see example}),
+but it fails when the lattice functions largely vary inside single
+elements. In the later case it is advised to slice the elements.
+%as shown in the example pertaining to
+%\href{http://cern.ch/frs/mad-X_examples/emit/ALBA/}{ALBA}.     
 
 % \href{Rogelio HREF=http://consult.cern.ch/xwho/people/69118}{R.Tom\'as} 
 % \textbf{Last updated:} 03/13/2013 13:47:20

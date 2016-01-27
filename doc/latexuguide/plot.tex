@@ -16,37 +16,38 @@ be displayed at the top of the plot.
 
 In certain conditions true interpolation of optical functions and
 parameters inside the element is available through internal slicing of
-the element and a call to the \hyperref[chap:twiss]{\tt TWISS} module
-for each slice. 
+the element and a call to the \hyperref[chap:twiss]{\texttt{TWISS}}
+module for each slice. 
 
 The basic plot attributes, such as line thickness, annotation size,
 and PostScript format and interpolation can be set with the
-\hyperref[sec:setplot]{\tt SETPLOT} command and reset with the
-\hyperref[sec:resplot]{\tt RESPLOT} command.
+\hyperref[sec:setplot]{\texttt{SETPLOT}} command and reset with the
+\hyperref[sec:resplot]{\texttt{RESPLOT}} command.
 
 Note also that for various reasons a sequence must be defined before the 
-{\tt PLOT} command can be invoked. 
+\texttt{PLOT} command can be invoked. 
 
 \section{PLOT}	
 \label{sec:plot}
 
 \madbox{
 xxxxxx\=xxxxxxxx\= \kill
-PLOT, \>HAXIS=  \>hname, HMIN=real, HMAX=real, \\ 
-      \>VAXIS=  \>vname1, vname2, \ldots, vnamen, \\
-      \>VAXIS1=  \>vname1, vname2, \ldots, vnamen, \\
-      \>VAXIS2=  \>vname1, vname2, \ldots, vnamen, \\
-      \>VAXIS3=  \>vname1, vname2, \ldots, vnamen, \\
-      \>VAXIS4=  \>vname1, vname2, \ldots, vnamen, \\
-      \>VMIN= reals, VMAX= reals,  \\
-      \>TITLE= string, \\
-      \>BARS= integer, STYLE= integer, COLOUR= integer, SYMBOL= integer, \\
-      \>INTERPOLATE= logical, ZERO\_SUPPR= logical, \\
-      \>NOVERSION= logical, NOLINE= logical, NOTITLE= logical, \\
-      \>MARKER\_PLOT= logical, RANGE\_PLOT= logical, RANGE= range, \\ 
-      \>TABLE= tabname, PARTICLE= particle1,particle2,\ldots,particlen, \\
-      \>MULTIPLE= logical, FILE= file\_name\_start, TRACKFILE= basename, \\
-      \>PTC= logical, PTC\_TABLE= tabname; 
+PLOT, \>HAXIS=  \>string, HMIN=real, HMAX=real, \\ 
+      \>VAXIS=  \>string\textit{1}, \ldots, string\textit{n}, \\
+      \>VAXIS1= \>string\textit{1}, \ldots, string\textit{n}, \\ 
+      \>VAXIS2= \>string\textit{1}, \ldots, string\textit{n}, \\ 
+      \>VAXIS3= \>string\textit{1}, \ldots, string\textit{n}, \\
+      \>VAXIS4= \>string\textit{1}, \ldots, string\textit{n}, \\
+      \>VMIN=reals, VMAX=reals,  \\
+      \>TITLE=string, \\
+      \>BARS=integer, STYLE=integer, \\
+      \>COLOUR=integer, SYMBOL=integer, \\
+      \>INTERPOLATE=logical, ZERO\_SUPPR=logical, \\
+      \>NOVERSION=logical, NOLINE=logical, NOTITLE=logical, \\
+      \>MARKER\_PLOT=logical, RANGE\_PLOT=logical, RANGE=range, \\ 
+      \>TABLE=tabname, PARTICLE=particle1,particle2,\ldots,particlen, \\
+      \>MULTIPLE=logical, FILE=file\_name\_start, TRACKFILE=basename, \\
+      \>PTC=logical, PTC\_TABLE=tabname; 
 }
 
 where the parameters have the following meaning: 
@@ -60,12 +61,12 @@ where the parameters have the following meaning:
      against a single vertical axis. If more than 10 variables are
      specified, the plot is not produced.   
 
-   \ttitem{VAXIS{\sl i}} one or several variables from the table to be plotted
-     against vertical axis number {\sl i}. There is a maximum of 4
+   \ttitem{VAXIS\textsl{i}} one or several variables from the table to be plotted
+     against vertical axis number \textsl{i}. There is a maximum of 4
      vertical axes. \\
-     If the number of variables given for a single vaxis{\sl i} would
+     If the number of variables given for a single vaxis\textsl{i} would
      push the total number of variables beyond the maximum of 10, the
-     variables given for this vaxis{\sl i}, as well as those for
+     variables given for this vaxis\textsl{i}, as well as those for
      subsequent vaxes, are ignored but the plot is produced for the
      variables accumulated so far.  \\
      \textit{Important: VAXIS and VAXIS{1..4} are exclusive in their
@@ -102,38 +103,39 @@ where the parameters have the following meaning:
      invisible. 
 
    \ttitem{INTERPOLATE} logical, default=false. The data points are
-     normally connected by straight lines; if {\tt INTERPOLATE} is
+     normally connected by straight lines; if \texttt{INTERPOLATE} is
      specified, the following on-momentum Twiss parameters are
      interpolated with calls to the Twiss module inside 
      each element: beta, sqrt(beta), alfa, phase advance, orbit, angle,
      dispersion and its first derivative, for both planes. \\ 
      For all other variables splines are used to smooth
      the curves. \\ 
-     {\bf Note} that setting this option is ineffective if the {\tt INTERPOLATE}
-     option of the \hyperref[sec:setplot]{\tt SETPLOT} command has been set to 
+     \textbf{Note} that setting this option is ineffective if the
+     \texttt{INTERPOLATE} option of the
+     \hyperref[sec:setplot]{\texttt{SETPLOT}} command has been set to  
      true; in this case all plots will be interpolated. \\
-     {\bf Note} also that because the {\tt INTERPOLATE} option causes {\tt 
-     TWISS} to be called internally with a range, any range that might have 
-     been defined in a previous \hyperref[sec:use]{\tt USE} command is lost. In 
-     this case the {\tt USE} statement must be reiterated with the range, which 
-     in turn could cause assigned errors to be lost.
-
+     \textbf{Note} also that because the \texttt{INTERPOLATE} option
+     causes \texttt{TWISS} to be called internally with a range, any
+     range that might have been defined in a previous
+     \hyperref[sec:use]{\texttt{USE}} command is lost. In this case the
+     \texttt{USE} statement must be reiterated with the range, which in
+     turn could cause assigned errors to be lost. 
 
    \ttitem{ZERO\_SUPPR} To be documented (default = false)
 
-   \ttitem{NOVERSION} logical, default=false. If {\tt NOVERSION=true}, the
+   \ttitem{NOVERSION} logical, default=false. If \texttt{NOVERSION=true}, the
      information concerning the version of \madx and the date of the run
      are suppressed from the title.  
      This option frees additional space available for the user specified
      title of the plot.  
 
-   \ttitem{NOLINE} logical, default=false. If {\tt s} is the horizontal
+   \ttitem{NOLINE} logical, default=false. If \texttt{s} is the horizontal
      variable, then a symbolic representation of the beamline is plotted
      above the plot, except for tables that have been read back into \madx. 
      In case the horizontal scale is too large and the density of
      beamline elements is too high, this may result in hardly legible
      representation and a thick black block in the worst case. 
-     The {\tt NOLINE=true} option suppresses this symbolic representation 
+     The \texttt{NOLINE=true} option suppresses this symbolic representation 
      of the beamline. 
 
    \ttitem{NOTITLE} logical, default=false. If true, suppresses the title
@@ -148,8 +150,8 @@ where the parameters have the following meaning:
    \ttitem{RANGE\_PLOT} logical, default=false. Allows the specification
      of a plotting range for the user defined horizontal axis.   
 
-   \ttitem{RANGE} horizontal plot
-     \href{../Introduction/ranges.html}{range} given by elements.  
+   \ttitem{RANGE} horizontal plot \hyperref[sec:range]{range} given by
+   elements.   
 
    \ttitem{TABLE} name of the table from which data is plotted (default:
      twiss). \\ 
@@ -197,9 +199,10 @@ where the parameters have the following meaning:
      below) the plots will either all be written into one file
      file\_name.ps, or one per plot into file\_name01.eps,
      file\_name02.eps, etc. \\
-     {\bf Note:} in the case of several {\tt PLOT} commands in a single \madx 
-     job, the first {\tt FILE} argument determines the basename and other {\tt 
-     FILE} arguments in subsequent {\tt PLOT} commands are ignored.
+     \textbf{Note:} in the case of several \texttt{PLOT} commands in a
+     single \madx job, the first \texttt{FILE} argument determines the
+     basename and other \texttt{FILE} arguments in subsequent
+     \texttt{PLOT} commands are ignored.  
 
    \ttitem{TRACKFILE} basename of the files containing
      tracking data for each particle (default: track)  
@@ -211,13 +214,13 @@ where the parameters have the following meaning:
      the names set in the definition of the ptc twiss
      table. Interpolation is not available and the attribute
      \textit{interpolate} has no effect. \\ 
-     This option is highly recommended when plotting data obtained from
-     \hyperref[chap:ptc-twiss]{\tt PTC\_TWISS} since there is no
-     mechanism for {\tt PLOT} to physically interpolate the optical
-     functions beyond using splines with no mechanism for constraints
-     with derivatives. In most cases the {\tt INTERPOLATE} option with
-     data obtained with {\tt PTC\_TWISS} produces unphysical data
-     representation.
+     This option is recommended when plotting data
+     obtained from \hyperref[chap:ptc-twiss]{\texttt{PTC\_TWISS}} since
+     there is no mechanism for \texttt{PLOT} to physically interpolate
+     the optical functions beyond using splines with no mechanism for
+     constraints with derivatives. In most cases the
+     \texttt{INTERPOLATE} option with data obtained with
+     \texttt{PTC\_TWISS} produces unphysical data representation. 
 
    \ttitem{PTC\_TABLE} name of the ptc twiss table from which data is
      plotted (default: ptc\_twiss)
@@ -269,17 +272,17 @@ where the parameters have the following meaning:
    \ttitem{RSCALE} axis text character height scale factor, default=1.  
 
    \ttitem{INTERPOLATE} (default=false) The data points are
-     normally connected by straight lines; if {\tt INTERPOLATE} is
+     normally connected by straight lines; if \texttt{INTERPOLATE} is
      specified, the following on-momentum Twiss parameters are
      interpolated with calls to the Twiss module inside 
      each element:  beta, sqrt(beta), alfa, phase advance, orbit, angle,
      dispersion and its first derivative, for both planes. \\ 
      For all other variables splines are used to smooth the curves. \\  
-     Note that if {\tt INTERPOLATE=true}, all subsequent {\tt PLOT} 
+     Note that if \texttt{INTERPOLATE=true}, all subsequent \texttt{PLOT} 
      commands use interpolation, irrespective of the setting of their 
-     {\tt INTERPOLATE} attribute; 
-     If {\tt INTERPOLATE=false} (default), all subsequent {\tt PLOT} 
-     commands respect the setting of their {\tt INTERPOLATE} attribute.
+     \texttt{INTERPOLATE} attribute; \\
+     If \texttt{INTERPOLATE=false} (default), all subsequent \texttt{PLOT} 
+     commands respect the setting of their \texttt{INTERPOLATE} attribute.
 \end{madlist}
 
 
@@ -288,7 +291,7 @@ where the parameters have the following meaning:
 \madbox{
 RESPLOT;
 }
-resets all defaults for the \hyperref[sec:setplot]{\tt SETPLOT} command.  
+resets all defaults for the \hyperref[sec:setplot]{\texttt{SETPLOT}} command.  
 
 
 \section{First example for plots of tracking data}
@@ -298,6 +301,7 @@ The following \madx code sample defines the tracking of four particles
 with the generation of a single file with name \textit{basisone} 
 holding the tracking data for all four particles.  
 
+\madhline
 \begin{verbatim}
 // track particles
 track, file=basis, dump, onetable;
@@ -308,6 +312,7 @@ track, file=basis, dump, onetable;
  run,turns=1024;
 endtrack;
 \end{verbatim}
+\madhline
 
 The following sample code defines the plotting of the x-px and y-py
 phase space coordinates for all four particles. 
@@ -315,6 +320,7 @@ It takes into account the fact that all coordinates are in a single file
 with \textit{table=trackone} and defines the filename where tracking data 
 is to be found (\textit{basisone}) with \textit{trackfile=basis}. 
 
+\madhline
 \begin{verbatim}
 // plot trajectories
 setplot, post=1; 
@@ -324,11 +330,13 @@ plot, file=plot, table=trackone, trackfile=basis, noversion, multiple,
 plot, file=plot, table=trackone, trackfile=basis, noversion, multiple, 
       haxis=y, vaxis=py, particle=1,2,3,4;
 \end{verbatim}
+\madhline
 
 With each plot command a temporary file \textit{gnu\_plot.gp} containing
 GNUPLOT instructions is generated.  
 The file generated by the first plot command reads: 
 
+\madhline
 {\footnotesize \begin{verbatim}  
 set terminal postscript color
 set pointsize 0.48
@@ -341,10 +349,11 @@ plot 'basisone' using 3:($1==1 ? $4 : NaN) title 'particle 1' with points pointt
      'basisone' using 3:($1==3 ? $4 : NaN) title 'particle 3' with points pointtype 3 , \
      'basisone' using 3:($1==4 ? $4 : NaN) title 'particle 4' with points pointtype 4 
 \end{verbatim}}
-
+\madhline
+  
 \madx then calls GNUPLOT as a subprocess to execute this file, which
 generates the file \textit{tmpplot.ps}.  
-The file \textit{tmpplot.ps} is then {\bf appended} to the file 
+The file \textit{tmpplot.ps} is then \textbf{appended} to the file 
 {\textit plot.ps} determined by the attribute \textit{file=plot}.  
 The files \textit{gnu\_plot.gp} and \textit{tmpplot.ps} are then
 discarded. 
@@ -361,6 +370,7 @@ with the generation of individual files with name
 \textit{basis.obs0001.p000i} with \textit{i=1..4}  
 holding the tracking data for each of the four particles.  
 
+\madhline
 \begin{verbatim}
 // track particles
 track, file=basis, dump;
@@ -371,6 +381,7 @@ track, file=basis, dump;
  run,turns=1024;
 endtrack;
 \end{verbatim}
+\madhline
 
 The following sample code defines the plotting of the x-px and y-py
 phase space coordinates for all four particles with the data of all four
@@ -381,6 +392,7 @@ are in separate files with
 data is to be found (\textit{basis.obs0001.p000i}) with
 \textit{trackfile=basis}.  
 
+\madhline
 \begin{verbatim}
 // plot trajectories
 setplot, post=1; 
@@ -390,11 +402,14 @@ plot, file=plot, table=trackfodo, trackfile=basis, noversion, multiple,
 plot, file=plot, table=trackfodo, trackfile=basis, noversion, multiple, 
       haxis=y, vaxis=py, particle=1,2,3,4;  
 \end{verbatim}
+\madhline
 
 With each plot command a temporary file gnu\_plot.gp containing GNUPLOT instruction is generated. 
 The file generated by the first plot command reads: 
 
-{\footnotesize \begin{verbatim}
+{\footnotesize
+\madhline
+\begin{verbatim}
 set terminal postscript color
 set pointsize 0.48
 set output 'tmpplot.ps'
@@ -405,11 +420,13 @@ plot 'basis.obs0001.p0001' using 3:4 title 'particle 1' with points pointtype 1 
      'basis.obs0001.p0002' using 3:4 title 'particle 2' with points pointtype 2 , \
      'basis.obs0001.p0003' using 3:4 title 'particle 3' with points pointtype 3 , \
      'basis.obs0001.p0004' using 5:4 title 'particle 4' with points pointtype 4 
-\end{verbatim}}
+\end{verbatim}
+\madhline
+}
 
 \madx then calls GNUPLOT as a subprocess to execute this file, which
 generates the file \textit{tmpplot.ps}.  
-The file \textit{tmpplot.ps} is then {\bf appended} to the file
+The file \textit{tmpplot.ps} is then \textbf{appended} to the file
 \textit{plot.ps} determined by the attribute \textit{file=plot}.  
 The files \textit{gnu\_plot.gp} and \textit{tmpplot.ps} are then
 discarded. 

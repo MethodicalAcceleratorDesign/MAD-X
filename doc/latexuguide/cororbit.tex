@@ -37,19 +37,19 @@ The CORRECT command has the following format (some options are valid
 only for special algorithms):   
 
 \madbox{
-CORRECT, \=ORBIT=orbittable, MODEL=modeltable, TARGET=targettable, \\
-         \>SEQUENCE=seqname, \\
-         \>FLAG=string, MODE=string, COND=integer,\\
-         \>TWISSUM=integer, \\
-         \>NCORR=integer, CORRLIM=real, \\
-         \>MONERROR=integer, MONON=real, MONSCALE=real, ERROR=real,\\ 
-         \>PLANE=string, RESOUT=integer, \\
-         \>CLIST=filename,MLIST=filename, \\
-         \>UNITS=real, CORZERO=integer, \\
-         \>SNGCUT=real, SNGVAL=real \\
-         \>TWORING=logical, BEAM1TAB=tabname, BEAM2TAB=tabname, \\
+CORRECT, \=SEQUENCE=seqname, \\        
+         \>FLAG=string, MODE=string, PLANE=string, \\
+         \>COND=integer, NCORR=integer, \\
+         \>SNGVAL=real, SNGCUT=real, \\
+         \>MONERROR=integer, MONON=real, MONSCALE=real, \\
+         \>CORRLIM=real, TWORING=logical, UNITS=real, \\           
+         \>CORZERO=integer, ERROR=real,\\         
+         \>ORBIT=table, MODEL=table, TARGET=table, \\
+         \>BEAM1TAB=table, BEAM2TAB=table, \\
+         \>EXTERN=logical, \\
          \>NAME\_COL=string, X\_COL=string, Y\_COL=string, \\
-         \>EXTERN=logical;  
+         \>CLIST=filename, MLIST=filename, \\
+         \>RESOUT=integer, TWISSUM=integer;         
 }
 
 %% "correct: correct correct 0 0 "
@@ -85,15 +85,15 @@ CORRECT, \=ORBIT=orbittable, MODEL=modeltable, TARGET=targettable, \\
 %% "extern   = [l, false, true]; " v
 
 
-The command {\tt CORRECT} is set up with defaults which should allow a
+The command \texttt{CORRECT} is set up with defaults which should allow a
 reasonable correction for most cases with a minimum of required options
 (see Example 1 below).  
 
-The orbit correction must always be preceded by {\tt TWISS} commands  which
+The orbit correction must always be preceded by \texttt{TWISS} commands  which
 generate Twiss tables. The most recent Twiss table is assumed to contain
 the optical parameters and the distorted orbits. 
 
-The options used in the {\tt CORRECT} command are: 
+The options used in the \texttt{CORRECT} command are: 
 
 \begin{madlist}
    \ttitem{FLAG} can be "ring" or "line", either a circular machine
@@ -101,61 +101,61 @@ The options used in the {\tt CORRECT} command are:
      \\ (Default: ring) 
 
    \ttitem{MODE} defines the method to be used for corrections. 
-     \\ Available modes are {\tt LSQ, MICADO} and {\tt SVD}.  
+     \\ Available modes are \texttt{LSQ, MICADO} and \texttt{SVD}.  
      The first performs a
      least squares minimization using all available correctors. The mode
-     {\tt SVD} uses a Singular Value Decomposition to compute a correction
+     \texttt{SVD} uses a Singular Value Decomposition to compute a correction
      using all available correctors. The latter can also be used to
-     condition the response matrix for the modes {\tt LSQ} or {\tt MICADO} (using
-     {\tt COND=1}). It is highly recommended to precede a {\tt LSQ} correction by a
-     {\tt SVD} conditioning (set {\tt COND=1}).  
-     \\ The mode {\tt MICADO} is a "best kick" algorithm. Naive use or using
-     it with a large number of correctors (see option {\tt NCORR}) can get
+     condition the response matrix for the modes \texttt{LSQ} or \texttt{MICADO} (using
+     \texttt{COND=1}). It is highly recommended to precede a \texttt{LSQ} correction by a
+     \texttt{SVD} conditioning (set \texttt{COND=1}).  
+     \\ The mode \texttt{MICADO} is a "best kick" algorithm. Naive use or using
+     it with a large number of correctors (see option \texttt{NCORR}) can get
      unexpected results. To avoid the creation of local bumps, it is
-     recommended to precede a {\tt MICADO} correction by a {\tt SVD} conditioning
-     (set {\tt COND=1}).  
-     \\ (Default: {\tt MICADO})
+     recommended to precede a \texttt{MICADO} correction by a \texttt{SVD} conditioning
+     (set \texttt{COND=1}).  
+     \\ (Default: \texttt{MICADO})
 
-   \ttitem{PLANE} With {\tt PLANE=x}, the orbit correction
-     is performed for the horizontal plane; With {\tt PLANE=y}, 
+   \ttitem{PLANE} With \texttt{PLANE=x}, the orbit correction
+     is performed for the horizontal plane; With \texttt{PLANE=y}, 
      the correction is performed for the vertical plane. made. (This
      differs from the \madeight implementation).  
      \\ (Default: X for horizontal plane) 
 
-   \ttitem{COND} When {\tt COND=1}, a Singular Value Decomposition is
+   \ttitem{COND} When \texttt{COND=1}, a Singular Value Decomposition is
      performed and  the response matrix is conditioned to avoid linearly
      dependent correctors. This can be used to avoid creation of
-     artificial bumps during a {\tt LSQ} or {\tt MICADO} correction.  
+     artificial bumps during a \texttt{LSQ} or \texttt{MICADO} correction.  
      Please note: this option is not robust since it
      depends on parameters which control the determination of singular
      values and redundant correctors. These can be set with the attributes
-     {\tt SNGVAL} and {\tt SNGCUT}. Both parameters depend on the machine and may
+     \texttt{SNGVAL} and \texttt{SNGCUT}. Both parameters depend on the machine and may
      need adjustment. Default values are adjusted to large machines and give
      "reasonable" performance for smaller machines.
 
    \ttitem{NCORR} Defines the number of correctors to be used by the 
-     {\tt MICADO} algorithm. If {\tt NCORR=0} all available
-     correctors are used. Only used by the {\tt MICADO} algorithm.
+     \texttt{MICADO} algorithm. If \texttt{NCORR=0} all available
+     correctors are used. Only used by the \texttt{MICADO} algorithm.
      \\ (Default: 0 i.e. all available correctors)
 
    \ttitem{SNGVAL}  Used to set the threshold for finding singular values
-     with the {\tt COND} attribute. (Hint: smaller number finds fewer singular
+     with the \texttt{COND} attribute. (Hint: smaller number finds fewer singular
      values).  
-     \\ {\bf Use with care ! }
+     \\ \textbf{Use with care !}
      \\ (Default: 2.0)
 
    \ttitem{SNGCUT}  Used to set the threshold for finding redundant
-     correctors with the {\tt COND} attribute. (Hint: larger number finds fewer
+     correctors with the \texttt{COND} attribute. (Hint: larger number finds fewer
      redundant correctors).  
-     \\ {\bf Use with extreme care ! }
+     \\ \textbf{Use with extreme care !}
      \\ (Default: 50.0) 
 
-   \ttitem{MONERROR} When {\tt MONERROR} is 1, the {\tt MREX} and {\tt MREY} 
+   \ttitem{MONERROR} When \texttt{MONERROR} is 1, the \texttt{MREX} and \texttt{MREY} 
      alignment errors on monitors assigned  by \hyperref[sec:ealign]{EALIGN} 
      are taken into account, otherwise they are ignored.
      \\ (Default: 0)
 
-   \ttitem{MONSCALE} When {\tt MONSCALE} is 1, the MSCALX and
+   \ttitem{MONSCALE} When \texttt{MONSCALE} is 1, the MSCALX and
      MSCALY scaling errors on monitors assigned  by \hyperref[sec:ealign]{EALIGN}  
      are taken into account, otherwise they are ignored.
      \\ (Default: 0)
@@ -163,7 +163,7 @@ The options used in the {\tt CORRECT} command are:
    \ttitem{MONON} takes a real number between 0.0 and 1.0. It
      determines the number of available monitors. If the command is
      given, each monitor is considered valid with a probability
-     {\tt MONON}. In the average a fraction $(1.0 - \texttt{MONON})$ 
+     \texttt{MONON}. In the average a fraction $(1.0 - \texttt{MONON})$ 
      of the monitors will be disabled for the correction, i.e. they are 
      considered not existing.  This allows to study the effect of missing monitors.
      \\ (Default: 1.0 i.e. 100 \%) 
@@ -176,8 +176,8 @@ The options used in the {\tt CORRECT} command are:
 
    \ttitem{TWORING} When true, the correction will be done on two rings at
      once. The only correction mode available in this case is
-     {\tt MICADO}. The attribute {\tt ORBIT=table} is ignored and {\tt BEAM1TAB=table} and
-     {\tt BEAM2TAB=table} are used instead.  
+     \texttt{MICADO}. The attribute \texttt{ORBIT=table} is ignored and \texttt{BEAM1TAB=table} and
+     \texttt{BEAM2TAB=table} are used instead.  
      \\ (Default: false)
 
    \ttitem{UNITS} when this parameter is set the value is a multiplier [TO BE COMPLETED] 
@@ -185,13 +185,13 @@ The options used in the {\tt CORRECT} command are:
 
    \ttitem{CORZERO} an integer value to specify whether corrector settings 
      should be all reset to zero before starting the orbit correction 
-     ({\tt CORZERO}$>0$) 
+     (\texttt{CORZERO}$>0$) 
      or corrector settings calculated by the orbit correction should be added to 
-     existing corrector settings ({\tt CORZERO}$=0$, Default).
+     existing corrector settings (\texttt{CORZERO}$=0$, Default).
 
    \ttitem{ERROR} specifies the maximum RMS value, in meters, of the 
      orbit to be reached by the correction algorithm, 
-     e.g. {\tt ERROR=1.e-3} for a 1~mm RMS target value. 
+     e.g. \texttt{ERROR=1.e-3} for a 1~mm RMS target value. 
      \\ (Default: 1.e-5 m)
 
 \end{madlist}
@@ -199,7 +199,7 @@ The options used in the {\tt CORRECT} command are:
 Normally the last active table provides the orbit to be
 corrected and the model for the correction. This can be overwritten
 by the appropriate options. Optionally, these tables can be given
-names like in \hyperref[chap:twiss]{\tt TWISS, TABLE=name;}. 
+names like in \hyperref[chap:twiss]{\texttt{TWISS, TABLE=name;}}. 
 To use these named tables, one of the following optional
 parameters must be  used:  
 
@@ -213,28 +213,28 @@ parameters must be  used:
      last (named or unnamed) Twiss table.  
 
    \ttitem{TARGET} When this parameter is given, the correction is made to
-     a named target orbit, pre-computed with a {\tt TWISS} command. Default is
+     a named target orbit, pre-computed with a \texttt{TWISS} command. Default is
      correction to the zero orbit.  
 
-   \ttitem{EXTERN} (default: false): When false, the {\tt ORBIT} and 
-     {\tt TARGET} table
-     are assumed to be computed by \mad with a previous {\tt TWISS}
+   \ttitem{EXTERN} (default: false): When false, the \texttt{ORBIT} and 
+     \texttt{TARGET} table
+     are assumed to be computed by \mad with a previous \texttt{TWISS}
      command. When set to true, that option allows to use twiss tables
-     imported from an external file (with the {\tt READMYTABLE} command), for
+     imported from an external file (with the \texttt{READMYTABLE} command), for
      example to use measured BPM data. In that case, the imported twiss
      table is allowed to contain coordinate data only at the location of
      the monitors.  
      
    \ttitem{NAME\_COL} The name of the column that contains the name of 
-     monitors in the tables. (Default: "{\tt name}")
-   \ttitem{X\_COL} The name of the column that contains the {\tt X} position 
-     readings of monitors in the tables. (Default: "{\tt X}")
-   \ttitem{Y\_COL} The name of the column that contains the {\tt Y} position 
-     readings of monitors in the tables. (Default: "{\tt Y}")
+     monitors in the tables. (Default: "\texttt{name}")
+   \ttitem{X\_COL} The name of the column that contains the \texttt{X} position 
+     readings of monitors in the tables. (Default: "\texttt{X}")
+   \ttitem{Y\_COL} The name of the column that contains the \texttt{Y} position 
+     readings of monitors in the tables. (Default: "\texttt{Y}")
      
 \end{madlist}
 
-Example of use of {\tt CORRECT} to reproduce a measured orbit: 
+Example of use of \texttt{CORRECT} to reproduce a measured orbit: 
 \begin{verbatim}
 ! To have a refererence optical model
 twiss, table=twiss_ref;
@@ -265,7 +265,7 @@ Two attributes affect the printing of tables and results:
      \textbf{ATTENTION: May produce gigantic outputs for large
        machines.} 
 
-   \ttitem{TWISSUM} If the attribute value is larger than 0, {\tt CORRECT}
+   \ttitem{TWISSUM} If the attribute value is larger than 0, \texttt{CORRECT}
      prints maximum orbit and r.m.s. values for both planes, taken from the
      Twiss summary table, in computer readable form. This allows to analyze
      orbits etc. at elements that are not monitors or correctors. The
@@ -283,7 +283,7 @@ GETORBIT, PUTORBIT           /* Replaced by generic TFS access */
 GETKICK, PUTKICK             /* Replaced by generic TFS access */
 \end{verbatim}
 
-{\bf EXAMPLES:}\\ 
+\textbf{EXAMPLES:}\\ 
 for complete MAD input files see section on examples:
 
 Example 1: correct orbit in horizontal plane, taken from most recent
@@ -360,6 +360,7 @@ Both commands have the same attributes:
 \end{madlist} 
 
 Example:
+{\small
 \begin{verbatim}
 USE,...                                ! set working beam line 
 ...                                    ! define imperfections 
@@ -369,7 +370,7 @@ CORRECT, NCORR = 32;                   ! uses different set of correctors
 USEKICK, STATUS = OFF, RANGE = ...;    ! deactivate different set of correctors 
 CORRECT, NCORR = 32;                   ! uses different set of correctors
 \end{verbatim}
-
+}
 
 %\input{cororbit/co_corrsave}
 \section{CSAVE}
@@ -396,24 +397,22 @@ option command specifies different seeds for random values:
 
 \begin{madlist}
    \ttitem{SEED} Selects a particular seed for the sequence of random values. 
-     The attribute value is an integer in the range [0...999999999], or an expression that evaluates to an integer in the same range
+     The attribute value is an integer in the range [0...999999999], or
+     an expression that evaluates to an integer in the same range 
      (Default: 123456789). 
-     {\tt SEED} alone with no attribute value continues with the current sequence.
+     \texttt{SEED} alone with no attribute value continues with the current sequence.
      \\ See also: \hyperref[subsubsec:random]{Random values}. 
    \ttitem{PRINT} A flag taking integer values to control the printout. 
      \\ In general: the higher the value the more printout is produced.  
-     \\ For {\tt PRINT=0} no output is produced. 
+     \\ For \texttt{PRINT=0} no output is produced. 
      \\ The default value is 1 (Correction summary is given). 
 \end{madlist}
 
-{\bf Example:}
+\textbf{Example:}
 \madxmp{
 COPTION, SEED=987456321, PRINT=2;
 }
 
 Note that the random generator for \mad is taken from \cite{knuth1981}.
 
-
-
-
-
+%% EOF

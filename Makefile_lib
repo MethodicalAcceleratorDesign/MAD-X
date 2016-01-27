@@ -40,17 +40,16 @@ endif
 # Libraries on MacOSX
 
 ifeq ($(OSTYPE),Darwin)
-ifeq ($(STATIC),yes)
-
-	# X11
-	X11PATH := /opt/local/lib/
-	X11LIBS := libX11.a libxcb.a libXau.a libXdmcp.a
-	ifneq ($(wildcard /opt/local/lib/),)
-	LIBS  += $(wildcard $(addprefix $(X11PATH),$(X11LIBS)))
-	else
-	LIBS  += $(call libdir,/usr/X11/lib) -lX11
-	endif
-
+  ifeq ($(STATIC),yes)
+  	# X11
+  	X11PATH := /opt/local/lib/
+  	X11LIBS := libX11.a libxcb.a libXau.a libXdmcp.a
+  	ifneq ($(wildcard /opt/local/lib/),)
+  	  LIBS  += $(wildcard $(addprefix $(X11PATH),$(X11LIBS)))
+  	else
+  	  LIBS  += $(call libdir,/usr/X11/lib) -lX11
+  	endif
+  
     # C/C++
     GNULIBS := $(wildcard $(call GNULIB,libstdc++.a) $(call GNULIB,libgcc_eh.a))
     ifneq ($(GNULIBS),)
@@ -58,11 +57,15 @@ ifeq ($(STATIC),yes)
     else
       LDLIBS += -lstdc++ -lm
     endif
-
-else
+  
+  else
     LIBS   += $(call libdir,/usr/X11/lib) -lX11
     LDLIBS += -lstdc++ -lm
-endif
+  endif
+
+  ifeq ($(LDNAME),ifort)
+    LDLIBS += -lc++
+  endif
 endif
 
 # Libraries on Windows
