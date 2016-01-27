@@ -136,7 +136,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
      call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on)
      if(eflag.ne.0) go to 900
      call twcpin(rt,disp0,r0mat,eflag)
-     !call twcpin3(rt,disp0,r0mat, eflag) !----IT For Sagan-Rubin version of coupling
+     !call twcpin_sagan(rt,disp0,r0mat, eflag) !----IT For Sagan-Rubin version of coupling
      if(eflag.ne.0) go to 900
      !---- Initialize opt_fun0
      call twinifun(opt_fun0,rt)
@@ -1683,7 +1683,7 @@ SUBROUTINE twcptk (re,orbit)
   E(1:2,1:2)  = RE(1:2,1:2) - matmul(RE(1:2,3:4), RMAT(1:2,1:2))    ! E  = A - BR,     former a
   EDET = E(1,1) * E(2,2) - E(1,2) * E(2,1)           ! former adet  
 
-  if (EDET.gt. eps) then  !IT --- the same calculation as in twcptk1
+  if (EDET.gt. eps) then  !IT --- the same calculation as in twcptk
 
     EBAR = matmul(SMAT, matmul(transpose(E),SMATT))                   ! symplectic conjugate of E = SE^TS^T
     CD(1:2,1:2) = RE(3:4,1:2) - matmul(RE(3:4,3:4), RMAT(1:2,1:2))    ! CD = C-D*RMAT,   former b
