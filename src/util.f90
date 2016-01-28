@@ -3,7 +3,7 @@ module Inf_NaN_Detection
   !!     Inf_NaN_Detection module
   !!     Copyright(c) 2003, Lahey Computer Systems, Inc.
   !!     Copies of this source code, or standalone compiled files
-  !!     derived from this source may not be sold without permission
+  !!     derived x1from this source may not be sold without permission
   !!     from Lahey Computers Systems. All or part of this module may be
   !!     freely incorporated into executable programs which are offered
   !!     for sale. Otherwise, distribution of all or part of this file is
@@ -221,6 +221,8 @@ module twisscfi
        phiy=0.d0,dmuy=0.d0,synch_1=0.d0,synch_2=0.d0,synch_3=0.d0,synch_4=0.d0,&
        synch_5=0.d0,suml=0.d0,circ=0.d0,eta=0.d0,alfa=0.d0,gamtr=0.d0,qx=0.d0,&
        qy=0.d0,sinmux=0.d0,sinmuy=0.d0,xix=0.d0,xiy=0.d0,currpos=0.d0
+  !--I.T
+  double precision :: gammacp=1.d0;  
 end module twisscfi
 
 module twissotmfi
@@ -558,6 +560,13 @@ module plot_cfi
   double precision :: e2s=0.d0
 end module plot_cfi
 
+module math_constfi
+  implicit none
+  public
+  !---Constants
+  double precision, parameter :: zero=0d0, one=1d0, two=2d0
+end module math_constfi
+
 module plot_mathfi
   implicit none
   public
@@ -676,6 +685,30 @@ module fasterror
   common /wzcom1/ hrecip, kstep
   common /wzcom2/ wtreal(idim), wtimag(idim)
 end module fasterror
+
+module matrices
+  ! useful matrices: Identity EYE(6,6) and Symplectic JMAT(6.6), SMAT(2,2)
+  implicit none
+  double precision, parameter :: EYE(6,6)=reshape((/1d0,0d0,0d0,0d0,0d0,0d0,&
+                                                    0d0,1d0,0d0,0d0,0d0,0d0,&
+                                                    0d0,0d0,1d0,0d0,0d0,0d0,&
+                                                    0d0,0d0,0d0,1d0,0d0,0d0,&
+                                                    0d0,0d0,0d0,0d0,1d0,0d0,&
+                                                    0d0,0d0,0d0,0d0,0d0,1d0 /), shape(EYE))
+  double precision, parameter :: JMAT(6,6)=reshape((/0d0,1d0,0d0,0d0,0d0,0d0, &
+                                                    -1d0,0d0,0d0,0d0,0d0,0d0, &
+                                                     0d0,0d0,0d0,1d0,0d0,0d0, &
+                                                     0d0,0d0,-1d0,0d0,0d0,0d0, &
+                                                     0d0,0d0,0d0,0d0,0d0,1d0, &
+                                                     0d0,0d0,0d0,0d0,-1d0,0d0 /), shape(JMAT))
+  double precision, parameter :: JMATINV(6,6) = -JMAT
+  double precision, parameter :: JMATT(6,6) = -JMAT
+  double precision, parameter :: SMAT(2,2)=reshape((/0d0,1d0, &
+                                                    -1d0,0d0 /), shape(SMAT))
+  double precision, parameter :: SMATINV(2,2) = -SMAT
+  double precision, parameter :: SMATT(2,2)   = -SMAT
+end module matrices
+
 
 subroutine fort_info(t1, t2)
   implicit none
