@@ -51,7 +51,7 @@ BEND : RBEND, L=LBEND, ANGLE=ALPHA, k1=-0.778741;
 BEND1 : RBEND,L= LBEND, ANGLE=ALPHA, k1=-0.778741;
  
 CAVM:MARKER;
-CAV:RFCAVITY,L=0.2000,VOLT=-1.0d0,FREQ=0.5;
+CAV:RFCAVITY,L=0.2000,VOLT=0.2d0,FREQ=500.;
 
  sfline: line = (1*sf);
  sdline: line = (1*sd);
@@ -71,6 +71,7 @@ SUPb: line=(L1+L2+L3+QF1+VC5+L4+L5+QD1+L6+L7+L8+VC5+BEND+VC5+L9+sfline+L10+
            L26+VC5+L27c+cav);
 
 
+SSTART: marker; !to get compatible with lattice build in F90 code (pure PTC example)
 
-ALS: line = (11*sup1+supb);
+ALS: line = (SSTART + 11*sup1 + supb);
 
