@@ -8,8 +8,8 @@ option, echo = true;
 beam, particle = electron, energy = 3.0;!, radiate;
 use, period=DIAMOND;
 
-     SELECT, flag=twiss, clear;
-select,flag=twiss,column=name,s,betx,bety;!,re11,re12,re13,re14,re15,re16,
+SELECT, flag=twiss, clear;
+select,flag=twiss,column=name,s,betx,bety,dx,dy,mux,muy,x,y;!,re11,re12,re13,re14,re15,re16,
 !re21,re22,re23,re24,re25,re26,
 !re31,re32,re33,re34,re35,re36,
 !re41,re42,re43,re44,re45,re46,
@@ -20,18 +20,23 @@ twiss, file=twiss_madx;
 EMIT,DELTAP=0.;
 !stop;
 
+
+
+
 PTC_CREATE_UNIVERSE;
 PTC_CREATE_LAYOUT,model=2,method=6,nst=5,exact;
-
+      
      SELECT, flag=ptc_twiss, clear;
 !    SELECT, flag=ptc_twiss, column=name, s, beta11,beta22,beta33,mu1,mu2,mu3;
-    SELECT, flag=ptc_twiss, column=name, s, beta11,mu1,mu2,mu3;
-ptc_twiss,closed_orbit,icase=6,file="twiss_diamond.out";
+     select,flag=ptc_twiss,column=name,s,betx,bety,beta11,beta22,disp1,disp3,mu1,mu2,x,y;!,re11,re12,re13,re14,re15,re16,
+     
+     ptc_setswitch, debuglevel=1, exact_mis=true, time=true, totalpath=false;
+     
+     ptc_twiss,closed_orbit,icase=6,file="twiss_diamond.out";
 
-	select_ptc_normal, dq1,dq2;
-			
-   ptc_normal,normal,icase=5,no=2;
-   write, table=normal_results,file=normal_results; 
+     select_ptc_normal, dq1,dq2;
+     ptc_normal,normal,icase=5,no=2;
+     write, table=normal_results,file=normal_results; 
 
 removefile, file='Maxwellian_bend_for_ptc.txt';
 stop;
