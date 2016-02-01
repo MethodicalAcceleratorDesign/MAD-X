@@ -226,6 +226,8 @@ TYPE ELEMENT
    type(ramping), pointer :: ramp => null()
    type(tree_element), pointer :: forward(:)=> null(),backward(:)=> null()
    logical, pointer :: usef=> null(),useb=> null()
+   logical, pointer :: skip_ptc_f=> null(),skip_ptc_b=> null()
+   logical, pointer :: do1mapf=> null(),do1mapb=> null()
 END TYPE  ELEMENT
 
 
@@ -285,6 +287,8 @@ TYPE ELEMENTP
    type(ramping), pointer :: ramp => null()
    type(tree_element), pointer :: forward(:)=> null(),backward(:)=> null()
    logical, pointer :: usef=> null(),useb=> null()
+   logical, pointer :: skip_ptc_f=> null(),skip_ptc_b=> null()
+   logical, pointer :: do1mapf=> null(),do1mapb=> null()
 END TYPE  ELEMENTP
 
 type fibre_appearance

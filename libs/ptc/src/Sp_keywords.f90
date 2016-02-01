@@ -1313,11 +1313,15 @@ ffl=(index(LINEt,"FFL")/=0).or.(index(LINEt,"TFL")/=0).or. &
        IF(.NOT.ASSOCIATED(M%AN)) THEN
           ALLOCATE(M%AN(M%P%NMUL))
           ALLOCATE(M%BN(M%P%NMUL))
+          M%AN = zero; !piotr&valgrind
+          M%BN = zero;
        ELSE
           DEALLOCATE(M%AN)
           DEALLOCATE(M%BN)
           ALLOCATE(M%AN(M%P%NMUL))
           ALLOCATE(M%BN(M%P%NMUL))
+          M%AN = zero; !piotr&valgrind
+          M%BN = zero;
        ENDIF
        !     write(6,*) M%KIND,M%NAME,M%VORNAME
 

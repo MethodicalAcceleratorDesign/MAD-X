@@ -463,7 +463,14 @@ contains
        ROOT=1.0_dp
        return
     endif
-
+    IF(X<0.0_dp)then
+      messagelost=" "
+    endif
+    
+    if (c_%ROOT_CHECK) THEN
+      messagelost=" "
+    endif
+    
     IF((X<0.0_dp).AND.c_%ROOT_CHECK) THEN
        ROOT=1.0_dp
        c_%CHECK_STABLE=.FALSE.

@@ -28,7 +28,7 @@ module madx_ptc_twiss_module
 
   !PSk 2011.01.05 goes global to the modules so the slice tracking produces it for the summ table
   type(probe_8)            :: theTransferMap
-  type(universal_taylor)  :: unimap(6)
+  type(universal_taylor)   :: unimap(6)
 
   type twiss
 
@@ -70,7 +70,7 @@ module madx_ptc_twiss_module
   real(dp), private, dimension(3)       :: phase
 
   character(len=5), private, dimension(5), parameter :: str5 = (/'10000','01000','00100','00010','00001'/)
-
+  integer, private, dimension(6,6,3 )    :: Iaa ! for i=1,3 Ia(2*i-1,2*i-1,i) =1.d0;  Ia(2*i,2*i,i)   = 1.d0;
   integer, private, allocatable          :: J(:)
   integer, private, dimension(6)         :: j5 = (/0,0,0,0,1,0/)
   integer, private, dimension(6)         :: j6 = (/0,0,0,0,0,1/)
@@ -121,11 +121,61 @@ module madx_ptc_twiss_module
 
 contains
   !____________________________________________________________________________________________
+  
+  subroutine initIaaMatrix()
+    implicit none
+    integer i
 
+    Iaa = 0;
+    do i=1,3
+      Iaa(2*i-1,2*i-1,i) =1;  Iaa(2*i,2*i,i)   = 1;
+    enddo
+    
+  end subroutine initIaaMatrix
+  
+  subroutine dispesion6D(A_script,disp)
+    implicit none
+!    type(probe_8), intent(in)::A_script_probe
+    type(real_8) ::A_script(6)
+    real(dp), intent(out)  :: disp(4)
+    type(damap)  :: amap 
+    real(dp)  :: amatrix(6,6)
+    real(dp) ::amatrix_inv(6,6),Ha(6,6,3)
+    integer Ia(6,6,3)
+    integer i
+    ! H based dispersion as in Chao-Sands paper
+    
+    call alloc(amap)
+    
+    amap = A_script ! move the transformation to type damap
+    
+    amatrix    =amap       ! now we can copy to simple 6:6 matrix
+    amatrix_inv=amap**(-1) ! and invert it and copy to 6:6 matrixs
+    
+    do i=1,c_%nd
+   
+     Ha(1:6,1:6,i)=matmul(matmul(amatrix,Iaa(1:6,1:6,i)),amatrix_inv)  ! (15b)
+     
+     !do ii=1,6
+     !  print*,"        ",Ha(1:6,ii,i)
+     !enddo
+     
+   enddo
+
+   do i=1,4
+     disp(i) = Ha(i,5,3)/Ha(5,5,3)
+   enddo    
+    
+   call kill(amap) 
+   
+  end subroutine dispesion6D
+    
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
   subroutine equaltwiss(s1,A_script)
     implicit none
     type(twiss), intent(inout)::s1
-    type(real_8), intent(in)::A_script(:)
+    type(real_8), intent(in) ::A_script(6)
+    real(dp)  :: amatrix(6,6) ! first order A_script
     integer jj,i,k, ndel
     real(dp) :: lat(0:6,6,3)=0
     real(dp) :: test, dph
@@ -140,6 +190,7 @@ contains
       call seterrorflag(10,"equaltwiss CHECK 0 ",whymsg)
       return
     endif
+    
     
     lat = zero
     
@@ -195,21 +246,25 @@ contains
     J=0
     !here ND2=4 and delta is present      nd2=6 and delta is a constant
     !      print*,"nv",c_%nv,"nd2",c_%nd2,"np",c_%np,"ndpt",c_%ndpt ,"=>",c_%nv-c_%nd2-c_%np
-    if( (c_%npara==5)       .or.  (c_%ndpt/=0) ) then
+    if( (c_%npara==5)       .or.  (c_%ndpt/=0)  ) then
        !when there is no cavity it gives us dispersions
        do i=1,4
           lat(0,i,1)=(A_script(i).sub.J5)
        enddo
     elseif (c_%nd2 == 6) then
-       do i=1,4
-          lat(0,i,1) =              (A_script(i).sub.J5)*(A_script(6).sub.J6)
-          lat(0,i,1) = lat(0,i,1) + (A_script(i).sub.J6)*(A_script(5).sub.J5)
-       enddo
+      
+      call dispesion6D(A_script,lat(0,1:4,1))
+    
     else
        do i=1,4
           lat(0,i,1)=zero
        enddo
     endif
+
+    !when there is no cavity it gives us dispersions
+    do i=1,c_%nd2-2*ndel
+       s1%disp(i)=lat(0,i,1)
+    enddo
 
     if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
       write(whymsg,*) ' check_stable ',check_stable,' c_%stable_da ',c_%stable_da,' PTC msg: ', &
@@ -280,12 +335,6 @@ contains
        endif
     endif
     ! ---
-
-
-    !when there is no cavity it gives us dispersions
-    do i=1,c_%nd2-2*ndel
-       s1%disp(i)=lat(0,i,1)
-    enddo
 
     !swap for longitudinal beta with gamma
     if (c_%nd == 3) then
@@ -436,9 +485,19 @@ contains
        call seterrorflag(2,"ptc_twiss ","no layout created till now");
        return
     endif
+    
+    if (getdebug() > 1) then
+      if(.not.associated(MY_RING%t)) then
+        print*,"ptc_twiss: NODE LAYOUT ALREADY CREATED"
+      else
+        print*,"ptc_twiss: NODE LAYOUT NOT YET CREATED"
+      endif
+    endif
+
 
     call resetBetaExtremas()
-
+    call initIaaMatrix()
+    
     !skipnormalform = my_false
     countSkipped = 0
     
@@ -579,22 +638,18 @@ contains
 
        if (getdebug() > 2) then
          print*, "Looking for orbit"
+         print*, "Init orbit ", orbit
          call print(default,6)
        endif
        
-       
-       if ( slice )  then
-         call FIND_ORBIT_x(my_ring,orbit,default,c_1d_7)
-       else
-         call find_orbit(my_ring,orbit,1,default,c_1d_7)
-       endif
+       current=>my_ring%start
+       call FIND_ORBIT_x(orbit,default,c_1d_8,fibre1=current)
        
        if ( .not. check_stable) then
           write(whymsg,*) 'DA got unstable during closed orbit search: PTC msg: ',messagelost(:len_trim(messagelost))
           call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
           call seterrorflag(10,"ptc_twiss ",whymsg);
           return
-          !          return
        endif
        
       ! print*, "From closed orbit", w_p%nc
@@ -638,10 +693,10 @@ contains
     call init_all(default,no,nda,BERZ,mynd2,npara)
     c_verbose=.false.
     
-    c_idef(:) = 0
-    c_idef(1)=1; c_idef(2)=3; c_idef(3)=5;
+    i_piotr(:) = 0
+    i_piotr(1)=1; i_piotr(2)=3; i_piotr(3)=5;
     
-    c_normal_auto=1;
+    c_normal_auto=.true.;
 
 !    call init_all(default,no,nda)
     ! mynd2 and npara are outputs
@@ -718,7 +773,7 @@ contains
     !Y
 
     !the initial twiss is needed to initialize propely calculation of some variables f.g. phase advance
-    tw=A_script_probe%x
+    tw = A_script_probe%x
     if (geterrorflag() /= 0) then
        call fort_warn('ptc_twiss: ','equaltwiss at the begining of the line returned with error')
        return
@@ -1020,7 +1075,7 @@ contains
         !print*,"Skowron 4 ", current%mag%name,  check_stable, c_%stable_da, A_script_probe%x(1).sub.'100000'
 
         ! compute the Twiss parameters
-        tw=A_script_probe%x
+        tw = A_script_probe%x
         if (geterrorflag() /= 0) then
            call fort_warn('ptc_twiss: ','equaltwiss at ' // current%mag%name // ' returned with error')
            return
@@ -1167,7 +1222,8 @@ contains
       integer     :: mmap
       real(dp)    :: dt
       logical(lp) :: slice
-      
+      integer     :: mf
+
       beta_flg = (get_value('ptc_twiss ','betx ').gt.0) .and. (get_value('ptc_twiss ','bety ').gt.0)
 
       mman  = get_value('ptc_twiss ','initial_matrix_manual ')
@@ -1336,6 +1392,10 @@ contains
           
          if (getdebug() > 1) then
             call print(A_script_probe,18)
+            call kanalnummer(mf,file="theOneTurnMap.txt")
+            call print(A_script_probe,mf)
+            close(mf)
+            
             print*,"Initializing map from one turn map. One Turn Map"
          endif
 
@@ -1842,7 +1902,7 @@ contains
 
       if(dodo==1) then
          x=zero
-         call find_orbit(my_ring,x,1,default,c_1d_7)
+         call FIND_ORBIT_x(x,default,c_1d_7,fibre1=my_ring%start)
          write(6,*) x
          call init_all(default,1,0)
          call alloc(yy)
@@ -2075,7 +2135,6 @@ contains
       real(dp),dimension(ndim2)::reval,aieval
       real(dp),dimension(ndim2,ndim2)::revec,aievec
       real(dp):: checkvalue
-      
       call liepeek(iia,icoast)
       if (getdebug() > 1) then
          write (6,'(8a8)')   "no","nv","nd","nd2","ndc","ndc2","ndt","ndpt"
@@ -2122,7 +2181,8 @@ contains
       !Performes normal form on a map, and plugs A_ in its place
       implicit none
       type(c_normal_form) theNormalForm
-      type(c_damap)  :: c_Map
+      type(c_damap)  :: c_Map, a_cs 
+      integer :: mf
       
       if (getdebug() > 2) then
          print*,"maptoascript: doing normal form"
@@ -2153,22 +2213,42 @@ contains
       if (getdebug() > 2) then
          print*,"maptoascript: normal form done"
          call print(theNormalForm%a_t,19)
+         
       endif
-
+      
+      !print*, "maptoascript: TUNES    NF ", theNormalForm%tune
   
       call kill(A_script_probe)
       call alloc(A_script_probe)
+      
+      
       A_script_probe%u=my_false
-       
-      A_script_probe =  orbit_probe + theNormalForm%a_t
+
+      !use Courant Snyder
+      call alloc(a_cs)
+      call c_full_canonise(theNormalForm%a_t,a_cs)   ! (0)
+      A_script_probe = orbit_probe +  a_cs
+      !A_script_probe =  orbit_probe + theNormalForm%a_t
 
       if (getdebug() > 2) then
-        call print(A_script_probe,21)
-        call flush(21)
+
+        call kanalnummer(mf,file="NormalFormA_t.txt")
+        call print(theNormalForm%a_t,mf)
+        close(mf)
+
+        call kanalnummer(mf,file="NormalFormA1.txt")
+        call print(theNormalForm%a1,mf)
+        close(mf)
+
+        call kanalnummer(mf,file="Ascript_start.txt")
+        call print(A_script_probe,mf)
+        close(mf)
+
       endif
       
       call kill(theNormalForm)
       call kill(c_Map)
+      call kill(a_cs)
 
     end subroutine maptoascript
     !_________________________________________________________________
@@ -2457,7 +2537,7 @@ contains
            0,0,0,0,0,1/), (/6,6/))
       real(dp) :: dispersion(4)
       real(dp) :: dispersion_p(4) ! derivative of the dispersion w.r.t delta-p/p
-      integer :: debugFiles
+      integer :: debugFiles, mf
       integer :: icase
       integer :: order
       real(dp) :: rdp_mmilion = -1e6
@@ -2470,7 +2550,7 @@ contains
 
       ! should end-up gracefully here in case the topology of the lattice is not those of a closed-ring
 
-      debugFiles = 1 ! set it to one and fort.21, fort.22 and fort.23 are created
+      debugFiles = 0 ! set it to one and fort.21, fort.22 and fort.23 are created
 
 
       ! 2. retreive the relativistic parameters beta and gamma
@@ -2552,8 +2632,15 @@ contains
       
       
       if (debugFiles .eq. 1) then
-         call daprint(theNormalForm%A1,23) ! supposed to print dispersion's first and higher orders
-         call daprint(theNormalForm%A_t,24) 
+
+        call kanalnummer(mf,file="NormalFormA_t.summ.txt")
+        call print(theNormalForm%a_t,mf)
+        close(mf)
+
+        call kanalnummer(mf,file="NormalFormA1.summ.txt")
+        call print(theNormalForm%a1,mf)
+        close(mf)
+
          ! according to h_definition.f90: type normalform contains A1 as dispersion
          ! (would need to go through DHDJ to get the tune...)
       endif
@@ -2562,10 +2649,10 @@ contains
       !skowron: old ptc
       !print*, "Cplx dispersion A1(1,5)", theNormalForm%A1%v(1).sub.'000010'
       
-      dispersion(1) = real(theNormalForm%A1%v(1).sub.'000010')
-      dispersion(2) = real(theNormalForm%A1%v(2).sub.'000010')
-      dispersion(3) = real(theNormalForm%A1%v(3).sub.'000010')
-      dispersion(4) = real(theNormalForm%A1%v(4).sub.'000010')
+      dispersion(1) = real(theNormalForm%A_t%v(1).sub.'000010')
+      dispersion(2) = real(theNormalForm%A_t%v(2).sub.'000010')
+      dispersion(3) = real(theNormalForm%A_t%v(3).sub.'000010')
+      dispersion(4) = real(theNormalForm%A_t%v(4).sub.'000010')
       
       !print*, "Dispersion: ", dispersion
       
@@ -2800,16 +2887,11 @@ contains
       ! also output the tunes ...
       fractionalTunes(1) = tuneFromComplexVF(vf_kernel%v(1).sub.'1000') ! as in So_fitting.f90
       fractionalTunes(2) = tuneFromComplexVF(vf_kernel%v(3).sub.'0010') ! as in So_fitting.f90
-      if (fractionalTunes(1) < 0) fractionalTunes(1) = fractionalTunes(1) + one
-      if (fractionalTunes(2) < 0) fractionalTunes(2) = fractionalTunes(2) + one
       
-      ! we can also take the tune directly from the normal form
-      !print*, "TUNES NF   ", theNormalForm%tune
-      !print*, "  vf_kernel", fractionalTunes
       
       ! 26 november 2009
       if (icase.eq.6) then
-         fractionalTunes(3) = tuneFromComplexVF(vf_kernel%v(5).sub.'0001') ! to enter here icase must be 6 but not only:
+         fractionalTunes(3) = tuneFromComplexVF(vf_kernel%v(6).sub.'000001') ! to enter here icase must be 6 but not only:
          ! there must be a cavity otherwise icase is set internally to 56 by my_state in ptc_module.f90
          !write(0,*) 'fractionTunes(3)=', fractionalTunes(3)
          ! in the above, inserted minus sign to match the 'phase' or 'tw%mu(3)'
@@ -2820,6 +2902,14 @@ contains
       endif
       ! Q: is it possible to get the actual total tune, as returned by twiss.F?
       ! => no, not with a map...
+
+      if (fractionalTunes(1) < 0) fractionalTunes(1) = fractionalTunes(1) + one
+      if (fractionalTunes(2) < 0) fractionalTunes(2) = fractionalTunes(2) + one
+      !if (fractionalTunes(3) < 0) fractionalTunes(3) = fractionalTunes(3) + one
+
+      ! we can also take the tune directly from the normal form
+      !print*, "TUNES    NF ", theNormalForm%tune
+      !print*, "  vf_kernel ", fractionalTunes
 
       ! ... as well as the chromaticities
       if (icase.eq.5 .or. icase.eq.56) then
@@ -2834,9 +2924,15 @@ contains
 
       ! for debug: check the values by printing the map
       if (debugFiles .eq. 1) then
-         call daprint(oneTurnMap%x,25) ! prints the one-turn map on file 25
-         call daprint(vf_kernel,26) ! print tunes, chromaticities and anharmonicities
-         ! as done in madx_ptc_normal.f90
+
+        call kanalnummer(mf,file="oneTurnMap.summ.txt")
+        call print(oneTurnMap,mf)
+        close(mf)
+
+        call kanalnummer(mf,file="vf_kernel.summ.txt")
+        call print(vf_kernel,mf)
+        close(mf)
+
       endif
        
       call kill(vf_kernel)
@@ -3347,68 +3443,69 @@ contains
         return
      endif
      
-!     call daprint(oneTurnMap,99)
+ !     call daprint(oneTurnMap,99)
 
-     write(99,'(/a/)') '%A1 Dispersion, First and Higher Orders'
-     call daprint(theNormalForm%A1,99)
-     write(99,'(/a/)') '%Tunes, Chromaticities and Anharmonicities'
-
-     write(99,'(/ES16.8/)') theNormalForm%tune
-
-
-     write(99,'(/a/)') '%A_t Eigen vectors'
-     call daprint(theNormalForm%a_t,99) ! orig one
-     
-     write(99,'(/a/)') '%N ???'
-     call daprint(theNormalForm%n,99) ! orig one
+ !    write(99,'(/a/)') '%A1 Dispersion, First and Higher Orders'
+ !    call daprint(theNormalForm%A1,99)
+ !    write(99,'(/a/)') '%Tunes, Chromaticities and Anharmonicities'
+ !
+ !    write(99,'(/ES16.8/)') theNormalForm%tune
+ !
+ !
+ !    write(99,'(/a/)') '%A_t Eigen vectors'
+ !    call daprint(theNormalForm%a_t,99) ! orig one
+ !    
+ !    write(99,'(/a/)') '%N ???'
+ !    call daprint(theNormalForm%n,99) ! orig one
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
     !!
+    if (getdebug()>2) then
+       call kanalnummer(mf)
+       open(unit=mf,file='normal.tfs')
 
-    call kanalnummer(mf)
-    open(unit=mf,file='normal.tfs')
-    
-    write(mf,'(a2,a16,1x,a4,1x,a10,1x)') '@ ',ch16lft('NAME'),'%09s', 'PTC_NORMAL'
-    write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NO'),  '%9d', c_%no
-    write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NV'),  '%9d', c_%nv
-    write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('ND'),  '%9d', c_%nd
-    write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('ND2'), '%9d', c_%nd2
-    write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NDPT'),'%9d', c_%ndpt
-    write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NPARA'),    '%9d', c_%npara
-    write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NPARA_FPP'),'%9d', c_%npara_fpp
-    write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NP_POL'),   '%9d', c_%np_pol
-    write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NSPIN'),    '%9d', c_%nspin
-    write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('SPIN_POS'), '%9d', c_%SPIN_pos
-    
-    !! make space for knobs, to be completed with proper handling of T and PT if absent           
-    i=1+c_%nv
-    if (i .lt. 7) i=7
-    write (fmt,'(a,i1,a)')  '(a2,2(a16,1x),ES16.8,',i,'(1x,i16))' 
-    !write (fmt,'(a)')  '(a2,2(a16,1x),ES16.8,'
-        
-    write(mf,'(a2,a16,9(1x,a16))') '* ',ch16lft('NAME'),ch16lft('NICKNAME'), &
-                                   'VALUE',  'ORDER', &
-                                   'ORDER_X','ORDER_PX', &
-                                   'ORDER_Y','ORDER_PY', &
-                                   'ORDER_PT','ORDER_T'
-    write(mf,'(a2,a16,9(1x,a16))') '$ ',ch16lft('%s'),ch16lft('%s'), &
-                                   '%le','%le', &
-                                   '%le','%le', &
-                                   '%le','%le', &
-                                   '%le','%le'
+       write(mf,'(a2,a16,1x,a4,1x,a10,1x)') '@ ',ch16lft('NAME'),'%09s', 'PTC_NORMAL'
+       write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NO'),  '%9d', c_%no
+       write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NV'),  '%9d', c_%nv
+       write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('ND'),  '%9d', c_%nd
+       write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('ND2'), '%9d', c_%nd2
+       write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NDPT'),'%9d', c_%ndpt
+       write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NPARA'),    '%9d', c_%npara
+       write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NPARA_FPP'),'%9d', c_%npara_fpp
+       write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NP_POL'),   '%9d', c_%np_pol
+       write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('NSPIN'),    '%9d', c_%nspin
+       write(mf,'(a2,a16,1x,a4,1x,i10,1x)') '@ ',ch16lft('SPIN_POS'), '%9d', c_%SPIN_pos
 
-    write(99,*); write(99,*) " KERNEL  ";write(99,*); 
-        call print(theNormalForm%ker,99)
-    write(99,*) "--------------------------------------" 
+       !! make space for knobs, to be completed with proper handling of T and PT if absent           
+       i=1+c_%nv
+       if (i .lt. 7) i=7
+       write (fmt,'(a,i1,a)')  '(a2,2(a16,1x),ES16.8,',i,'(1x,i16))' 
+       !write (fmt,'(a)')  '(a2,2(a16,1x),ES16.8,'
+
+       write(mf,'(a2,a16,9(1x,a16))') '* ',ch16lft('NAME'),ch16lft('NICKNAME'), &
+                                      'VALUE',  'ORDER', &
+                                      'ORDER_X','ORDER_PX', &
+                                      'ORDER_Y','ORDER_PY', &
+                                      'ORDER_PT','ORDER_T'
+       write(mf,'(a2,a16,9(1x,a16))') '$ ',ch16lft('%s'),ch16lft('%s'), &
+                                      '%le','%le', &
+                                      '%le','%le', &
+                                      '%le','%le', &
+                                      '%le','%le'
+    endif
+    
+   ! write(99,*); write(99,*) " KERNEL  ";write(99,*); 
+   !     call print(theNormalForm%ker,99)
+   ! write(99,*) "--------------------------------------" 
     
     call alloc(vf_kernel)
     vf_kernel=0
     call flatten_c_factored_lie(theNormalForm%ker,vf_kernel)
 
-    write(99,*) " KERNEL Flattened  ";
-    write(99,*); 
-    call print(vf_kernel,99)
-    write(99,*) "--------------------------------------" 
+   ! write(99,*) " KERNEL Flattened  ";
+   ! write(99,*); 
+   ! call print(vf_kernel,99)
+   ! write(99,*) "--------------------------------------" 
 
     
     call putQnormaltable(vf_kernel%v(1),1) 
@@ -3439,9 +3536,9 @@ contains
     g_io =-cgetpb(vf)
     call putGnormaltable(g_io)
     
-    write(99,*); write(99,*) " Normalised Generating Function  ";write(99,*); 
-        call print(g_io,99)
-    write(99,*) "--------------------------------------" 
+  !  write(99,*); write(99,*) " Normalised Generating Function  ";write(99,*); 
+  !      call print(g_io,99)
+  !  write(99,*) "--------------------------------------" 
 
 
     !!!!!!!!!!!!!!!!!!!!!!
@@ -3453,14 +3550,12 @@ contains
     nrmlzdPseudoHam=-cgetpb(vf_kernel)
      !nrmlzdPseudoHam=-cgetpb(vf)/dt                ! (6c)
 
-    write(99,*) " Normalised Pseudo-Hamiltonian  ";
-    write(99,*); 
-    call print(nrmlzdPseudoHam,99)
-    write(99,*) "--------------------------------------" 
+  !  write(99,*) " Normalised Pseudo-Hamiltonian  ";
+  !  write(99,*); 
+  !  call print(nrmlzdPseudoHam,99)
+  !  write(99,*) "--------------------------------------" 
 
 
-    
-    print*,"Putting one turn map"
     call putMnormaltable(oneTurnMap%x)
     
     
@@ -3573,9 +3668,11 @@ contains
              write(basevar,'(a1,i1)') 'M',j
              write(nn,'(a1,i1,6(a1,i1))') 'M',j,'_',ind(1),'_',ind(2),'_',ind(3), &
                                                 '_',ind(4),'_',ind(5),'_',ind(6)
-
-             write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
-                             d_val, order, ind(1:6)
+             
+             if (getdebug() > 2) then
+               write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
+                                  d_val, order, ind(1:6)
+             endif
              
              call puttonormaltable(nn,nn,basevar,d_val,order,ind)
              
@@ -3674,8 +3771,12 @@ contains
          ni = 'D'//trim(planel)
          ind(:)=0
          ind(5)=1
-         write(mf,fmt) '  ',ch16lft(parname),  ch16lft(ni), &
-                       0.0, 1, ind(1:cnv)
+         
+         if (getdebug() > 2) then
+           write(mf,fmt) '  ',ch16lft(parname),  ch16lft(ni), &
+                          0.0, 1, ind(1:cnv)
+         endif
+         
          d_val = 0.0
          call puttonormaltable(parname,ni,planel,d_val,1,ind)
       endif
@@ -3714,9 +3815,11 @@ contains
                                         '_',ind(4),'_',ind(5),'_',ind(6)
         write(nick,'(a4,3(a1,SP,i2))') 'HAMA','_',ind(1)-ind(2),'_',ind(3)-ind(4),'_',ind(5)-ind(6)
 		
-        write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
-                       d_val, order, ind(1:6)
-        
+        if (getdebug() > 2) then
+          write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
+                         d_val, order, ind(1:6)
+        endif
+            
         call puttonormaltable(nn,nick,bv,d_val,order,ind)
         
         !!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -3724,18 +3827,24 @@ contains
         write(nn,'(a4,6(a1,i1))') 'HAMS','_',ind(1),'_',ind(2),'_',ind(3), &
                                         '_',ind(4),'_',ind(5),'_',ind(6)
         write(nick,'(a4,3(a1,SP,i2))') 'HAMS','_',ind(1)-ind(2),'_',ind(3)-ind(4),'_',ind(5)-ind(6)
-        write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
-                       re_val, order, ind(1:6)
-
+        
+        if (getdebug() > 2) then
+          write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
+                         re_val, order, ind(1:6)
+        endif
+        
         call puttonormaltable(nn,nick,bv,re_val,order,ind)
 
 
         write(nn,'(a4,6(a1,i1))') 'HAMC','_',ind(1),'_',ind(2),'_',ind(3), &
                                         '_',ind(4),'_',ind(5),'_',ind(6)
         write(nick,'(a4,3(a1,SP,i2))') 'HAMC','_',ind(1)-ind(2),'_',ind(3)-ind(4),'_',ind(5)-ind(6)
-        write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
-                       im_val, order, ind(1:6)
-        
+
+        if (getdebug() > 2) then
+          write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
+                         im_val, order, ind(1:6)
+        endif
+            
         call puttonormaltable(nn,nick,bv,im_val,order,ind)
     
     end subroutine putHnormaltable
@@ -3759,7 +3868,6 @@ contains
 
       ind(:) = 0
 
-      !print*,"GNFU order ",order
       
       myn1 = 0
       myn2 = 0
@@ -3767,7 +3875,7 @@ contains
       i=1
       call c_taylor_cycle(gen,size=mynres)
 
-      !print*,"GNFU mynres ",mynres
+      print*,"GNFU mynres ",mynres
       
 
       do r=1,mynres
@@ -3776,12 +3884,13 @@ contains
 
         !print*,"GNFU ",ind(1:6)
         
-        im_val = real(c_val)
-        re_val = imag(c_val)
+        im_val = imag(c_val)
+        re_val = real(c_val)
         d_val  = hypot(re_val, im_val)
 
         ! if amplitude is close to zero then it is not worth to output
         if (d_val .lt. eps) then
+          if (getdebug()>2) print*,"putGnormaltable idx=",r," ",d_val," smaller then eps=",eps, " skipping "
           cycle
         endif
         
@@ -3795,6 +3904,11 @@ contains
         !
         !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
         !               d_val, order, ind(1:6)
+
+        !write (fmt,'(a,i1,a)')  '(a2,2(a16,1x),ES16.8,',7,'(1x,i16))'
+        !write(6,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
+        !               d_val, order, ind(1:6)
+        
         call puttonormaltable(nn,nick,genfunamp,d_val,order,ind)
 
 
@@ -3804,16 +3918,16 @@ contains
         write(nick,'(a2,6(i1),a3)') 'f_',ind(1),ind(2),ind(3), &
                                          ind(4),ind(5),ind(6),'_im'
         !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
-        !               re_val, order, ind(1:6)
-        call puttonormaltable(nn,nick,genfunsin,re_val,order,ind)
+        !               im_val, order, ind(1:6)
+        call puttonormaltable(nn,nick,genfunsin,im_val,order,ind)
 
         write(nn,'(a4,6(a1,i1))') 'GNFC','_',ind(1),'_',ind(2),'_',ind(3), &
                                         '_',ind(4),'_',ind(5),'_',ind(6)
         write(nick,'(a2,6(i1),a3)') 'f_',ind(1),ind(2),ind(3), &
                                          ind(4),ind(5),ind(6),'_re'
         !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
-        !               im_val, order, ind(1:6)
-        call puttonormaltable(nn,nick,genfuncos,im_val,order,ind)
+        !               re_val, order, ind(1:6)
+        call puttonormaltable(nn,nick,genfuncos,re_val,order,ind)
         
       enddo
       
@@ -3844,9 +3958,12 @@ contains
          d_val = real(v.sub.ind(1:6))
          write(nn,'(a4,2i1)') 'EIGN',planei,i
          
-         write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
-                       d_val, 1, ind(1:6)
-
+         if (getdebug() > 2) then
+            write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
+                          d_val, 1, ind(1:6)
+         endif
+         
+         
          call puttonormaltable(nn,nn,bv,d_val,1,ind)
 
          ind(i)=0
@@ -3960,12 +4077,12 @@ contains
 
 
         endif !else order==0  
-          
-         
-         
-         write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
-                       d_val, order, ind(1:cnv)
-         
+
+         if (getdebug() > 2) then
+            write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
+                          d_val, order, ind(1:cnv)
+         endif
+                  
          call puttonormaltable(nn,nick,bv,d_val,order,ind)
             
       ENDDO

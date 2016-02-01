@@ -1406,7 +1406,8 @@ contains
     !
     if((.not.C_STABLE_DA)) then
        if(C_watch_user) then
-          write(6,*) "big problem in dabnew ", sqrt(crash)
+          write(6,*) "big problem in dabnew, going to crash "
+          write(6,*) sqrt(crash)
        endif
        return
     endif
@@ -1418,7 +1419,8 @@ contains
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
     if((.not.C_STABLE_DA)) then
        if(C_watch_user) then
-          write(6,*) "big problem in dabnew ", sqrt(crash)
+          write(6,*) "big problem in dabnew, going to crash "
+          write(6,*) sqrt(crash)
        endif
        return
     endif
@@ -3289,6 +3291,7 @@ contains
     do i=1,c_lnv
        jj(i)=0
     enddo
+    
     if(ma(1).eq.mb(1)) then
        call dainf(mb(1),inob,invb,ipob,ilmb,illb)
        if((.not.C_STABLE_DA)) then
@@ -3310,11 +3313,18 @@ contains
        enddo
        call dadal(ml,ib)
     else
+      
        do i=1,ia
           call c_dapek(ma(i),jj,x(i))
           call c_dapok(ma(i),jj,(0.0_dp,0.0_dp))
        enddo
+
        call dainvt(ma,ia,mb,ib)
+       if((.not.C_STABLE_DA)) then 
+         print*,"cc_dabmew.f90: c_dainv unstable at 4"
+         return
+       endif
+       
        do i=1,ia
           call c_dapok(ma(i),jj,x(i))
        enddo

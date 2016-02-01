@@ -6,8 +6,8 @@ MODULE ptc_results
   integer :: order = 20
   character(len = 2), dimension(6) :: ptc_variables = (/'x ','xp','y ','yp','z ','dp'/)
   character(len = 2) :: ptc_var
-  type(normalform) n
-  type (pbresonance) pbrg,pbrh
+  !type(normalform) n            ! with the new complex da it goes local to the modules
+  !type (pbresonance) pbrg,pbrh  ! with the new complex da it goes local to the modules
 END MODULE ptc_results
 
 MODULE madx_ptc_module

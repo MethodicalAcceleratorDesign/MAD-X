@@ -1534,14 +1534,18 @@ CONTAINS
 
     if(present(t))then
        IF(EXACT_MODEL.or.solve_electric) THEN                 ! .and.madkind2==kind2
+          !print*,"Skowron: Making POTTILT (no tilit)"
           SBTILT=POTTILT(NAME,L1,ANG1,E11,E22,T,LIST)
        ELSE
+          !print*,"Skowron: Making GBand  (no tilit)"
           SBTILT=GBEND(NAME,L1,ANG1,E11,E22,T,LIST)
        ENDIF
     else
        IF(EXACT_MODEL.or.solve_electric) THEN                 ! .and.madkind2==kind2
+          !print*,"Skowron: Making POTTILT (with tilit)"
           SBTILT=POTTILT(NAME,L1,ANG1,E11,E22)
        ELSE
+          !print*,"Skowron: Making GBand  (with tilit)"
           SBTILT=GBEND(NAME,L1,ANG1,E11,E22)
        ENDIF
     endif

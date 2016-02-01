@@ -17,6 +17,7 @@ MODULE c_TPSA
   integer,private::ndel ,nd2par,nd2part,nd2partt
   integer,private,dimension(lnv)::jfil,jfilt
 
+  public equal_c_tayls
   private equal,DAABSEQUAL,Dequaldacon ,equaldacon ,Iequaldacon  !,AABSEQUAL 2002.10.17
   private pow, GETORDER,CUTORDER,getchar,GETint,GETORDERMAP,c_exp_vectorfield_on_spinmatrix  !, c_bra_v_spinmatrix
   private getdiff,getdATRA  ,mul,dmulsc,dscmul,c_spinor_spinmatrix
@@ -45,6 +46,7 @@ MODULE c_TPSA
   logical(lp),target  :: c_real_warning =.true.
   logical(lp) :: c_mess_up_vector=.false. 
   real(dp) :: a_mess=0.d0 , b_mess=1.d0
+  integer :: i_piotr(3)= (/0,0,0/)
 
   PRIVATE null_it,Set_Up,de_Set_Up,LINE_L,RING_L,kill_DALEVEL,dealloc_DASCRATCH,set_up_level
   private insert_da,append_da,GETINTegrate,c_pek000,c_pok000,cDEQUALDACON
@@ -64,9 +66,7 @@ integer, private :: nd2t=6,ndt=3,ndc2t=2,ndct=1,nd2harm,ndharm
 !integer, private, parameter :: ndim2t=10
 logical(lp), private ::   c_similarity=my_false
 logical(lp) :: symp =my_false
-integer :: c_normal_auto=1
-integer c_idef(100)
-logical(lp) :: c_verbose=my_true
+logical(lp) :: c_normal_auto=my_true,c_verbose=my_true
 integer :: spin_tune_def=-1,spin_def=-1   !, private 
 integer :: order_gofix=1
 logical(lp) :: time_lie_choice=my_false,courant_snyder_teng_edwards=my_true,dosymp=my_false
@@ -2040,8 +2040,8 @@ end subroutine c_get_indices
     !    endif
   END SUBROUTINE c_DPOKMAP
 
-  SUBROUTINE  EQUAL(S2,S1)
 !*
+  SUBROUTINE  EQUAL(S2,S1)
     implicit none
     type (c_taylor),INTENT(inOUT)::S2
     type (c_taylor),INTENT(IN)::S1
@@ -2057,6 +2057,15 @@ end subroutine c_get_indices
  
   END SUBROUTINE EQUAL
 
+  !skowron to bypass strange gfortran error when using s2=s1
+  SUBROUTINE  equal_c_tayls(S2,S1)
+    implicit none
+    type (c_taylor),INTENT(inOUT)::S2
+    type (c_taylor),INTENT(IN)::S1
+    
+    call equal(s2,s1)
+  
+  end SUBROUTINE  equal_c_tayls
 
   SUBROUTINE  EQUALspinmatrix(S2,S1) ! spin routine
 !*
@@ -7436,7 +7445,7 @@ endif
      endif
     localmaster=c_master
 
- 
+     c_bra_v_dm%n=s2%n
     call c_ASSmap(c_bra_v_dm)
      
     s22%n=s2%n
@@ -7941,38 +7950,49 @@ subroutine c_linear_a(xy,a1)
 !! It will fail if some orbital planes are exactly rotations, say beta=1.00000000 and no coupling
 call  c_locate_modulated_magnet_planes(fm0,idef,reval)
 
-if( c_normal_auto == -1) then
 
-  idef(1:ndharm) = c_idef(1:ndharm)
-  !write(6,'(a,100(i2,1x))') " Order defined by the user in c_idef -> ",idef(1:ndharm)
 
-else if( c_normal_auto == 0) then
+if(.not.c_normal_auto) then
 
  write(6,*) " "
 
     do i=1,nd2harm  !t
-     write(6,'(i2,2(1x,G21.14))') i, reval(i),imval(i)
+       write(6,'(i2,2(1x,G21.14))') i, reval(i),imval(i)
     enddo
+    
     call c_locate_planes(vr,vi,idef)
- write(6,'(a82)') " The order of the planes has been guessed using the algorithm in c_locate_planes "
- write(6,'(a41)') " Hopefully it is correct! Please check! "
- write(6,'(a18,100(i2,1x))') " Order guessed -> ",idef(1:ndharm)
+    
+    if(i_piotr(1)==0.and.nd<=ndharm) then
+       write(6,'(a82)') " The order of the planes has been guessed using the algorithm in c_locate_planes "
+       write(6,'(a41)') " Hopefully it is correct! Please check! "
+       write(6,'(a18,100(i2,1x))') " Order guessed -> ",idef(1:ndharm)
 
- write(6,*) " Manually identify the location of distinct tunes in the order you like "
- read(5,*) idef(1:ndharm)
+       write(6,*) " Manually identify the location of distinct tunes in the order you like "
+       read(5,*) idef(1:ndharm)
+
+    else
+      do j=1,ndharm
+        idef(j)=i_piotr(j)
+      enddo
+    endif
 else
 !!  c_locate_planes tries to locate the planes: important if there is little coupling
 !! I suppose that this routine can be refined
    call c_locate_planes(vr,vi,idef)
-if(c_verbose) then
-    do i=1,nd2harm  !t
-     write(6,'(i2,2(1x,G21.14))') i, reval(i),imval(i)
-    enddo
- write(6,'(a82)') " The order of the planes has been guessed using the algorithm in c_locate_planes "
- write(6,'(a41)') " Hopefully it is correct! Please check! "
- write(6,'(a18,100(i2,1x))') " Order guessed -> ",idef(1:ndharm)
- endif
+   if(c_verbose) then
+      do i=1,nd2harm  !t
+        write(6,'(i2,2(1x,G21.14))') i, reval(i),imval(i)
+      enddo
+      
+      write(6,'(a82)') " The order of the planes has been guessed using the algorithm in c_locate_planes "
+      write(6,'(a41)') " Hopefully it is correct! Please check! "
+      write(6,'(a18,100(i2,1x))') " Order guessed -> ",idef(1:ndharm)
+   endif
 endif 
+
+!do j=1,ndharm
+!  i_piotr(j) = idef(j)
+!enddo
 
 if(c_mess_up_vector) then
  vrt= a_mess*vr-b_mess*vi
@@ -8083,43 +8103,71 @@ subroutine c_locate_planes(vr,vi,idef)
 !$ asked to choose planes manually. 
     implicit none
     real(dp), intent(in) ::  vr(ndim2t,ndim2t),vi(ndim2t,ndim2t)
+    real(dp) t(ndim2t,ndim2t)
     integer idef(ndim2t/2)
     real(dp) r,rmax
     logical doit
-    integer j,k,kmax
+    integer j,k,jmax,i
 !    idef=0
 ! write(6,*) " nd2,ndc2t ",nd2,ndc2t 
 !pause 
 !      do j=2,nd2-ndc2t,2
-     do j=2,nd2-ndc2t-2*rf,2
-       rmax=0
-       kmax=0
-       do k=1,(nd2-ndc2t)/2
-         r=abs(vr(2*k-1,j))+abs(vr(2*k,j))+abs(vi(2*k-1,j))+abs(vi(2*k,j))
+     
+     
+     !print*,"Skowron: T mtx:"
 
-         if(r>rmax) then
-           rmax=r
-           kmax=k
-         endif
+     do j=1,nd-ndct-rf
+ !      rmax=0
+ !      kmax=0
+       do k=1,(nd2-ndc2t)/2
+         r=abs(vr(2*k-1,2*j))+abs(vr(2*k,2*j))+abs(vi(2*k-1,2*j))+abs(vi(2*k,2*j))
+         t(j,k)=r
+
 
        enddo
-      idef(j/2)=2*kmax-1
+       
+       !print*,"Skowron: t(",j,",:)=",t(j,1:(nd2-ndc2t)/2)
+       
+  !    idef(j/2)=2*kmax-1
     enddo
    
+
+    do k=1,(nd2-ndc2t)/2
+       rmax=0
+       jmax=0
+       do j=1,nd-ndct*rf
+          r=t(j,k) 
+
+          if(r>rmax) then
+            rmax=r
+            jmax=j
+          endif
+
+       enddo
+
+       idef(k)=2*jmax-1
+     enddo
+
+     !print*,"Skowron c_locate_planes: ",nd-ndct-rf, (nd2-ndc2t)/2, " planes order: ", idef
+     
  !!!! checking   maybe equal tunes....
       doit=.false.
       do j=1,(nd2-ndc2t-2*rf )/2
-      do k=1,(nd2-ndc2t-2*rf )/2
- 
-         if(j==k) cycle
-        if(idef(j)==idef(k)) doit=.true.
+        do k=1,(nd2-ndc2t-2*rf )/2
+          if(j==k) cycle
+          if(idef(j)==idef(k)) then 
+            
+            doit=.true.
+            
+           endif 
      
-        if(doit) exit
-      enddo
+          if(doit) exit
+        enddo
       enddo
 
      if(doit) then
-       if(c_verbose) write(6,*) "warning : trouble locating planes, so chosen arbitrarily "
+       !if(c_verbose) 
+       write(6,*) "warning : trouble locating planes, so chosen arbitrarily Skowron"
        do k=1,(nd2-ndc2t-2*rf )/2
         idef(k)=2*k-1
         enddo
@@ -9217,6 +9265,7 @@ end subroutine c_full_canonise
     type(c_damap), intent(in):: s1
     type(c_damap), intent(in) :: s2
     type(c_taylor) tt
+
       localmaster=c_master
 
  
@@ -9225,7 +9274,8 @@ end subroutine c_full_canonise
     call c_assmap(c_sub_map)
     
     do i=1,s1%n
-      tt=c_sub_map%v(i)- c_sub_map%v(i) 
+! etienne was completely wrong fixed 1/5/2016
+      tt=s1%v(i)- s2%v(i) 
       c_sub_map%v(i)=tt
     enddo
     c_sub_map%s=s1%s- s1%s 
@@ -13023,10 +13073,10 @@ end  subroutine normalise_vector_field_fourier
  
 end  subroutine normalise_vector_field_fourier_factored
 
-subroutine symplectify_for_sethna(m,ms,norma)
+subroutine symplectify_for_sethna(m,ms,eps_and_norm)
 implicit none
 TYPE(c_damap),intent(inout):: m,ms
-real(dp),optional:: norma
+real(dp),optional:: eps_and_norm
 TYPE(c_damap) mt,l
 type(damap) mm
 type(c_vector_field) f,fs
@@ -13035,7 +13085,7 @@ type(c_taylor) t,dt
 real(dp),allocatable::  mat(:,:), matt(:,:),S(:,:),id(:,:)
 integer i,j,k,n(11),nv,nd2,al,ii,a
 integer, allocatable :: je(:)
-real(dp) dm,norm,normb
+real(dp) dm,norm,normb,norma
 
 call c_get_indices(n,0)
 nv=n(4)
@@ -13123,24 +13173,45 @@ do i=1,f%n
 
 enddo
 
-l=exp(fs,l)
+mt=exp(fs,l)
 
 
-if(present(norma)) then
-ms=m**(-1)*l
+if(present(eps_and_norm)) then
+ m=m-(m.sub.0)
+ 
+ l=m-mt
+ norma=0.0_dp
+ k=0
 
-norma=0.0_dp
-do i=1,ms%n
- norma=norma+full_abs(ms%v(i))
+do i=1,l%n
+
+       j=1
+
+        do while(.true.) 
+
+          call  c_cycle(l%v(i),j,v ,je); if(j==0) exit;
+       
+          normb=abs(m%v(i).sub.je)
+          norm=abs(v)
+          if(norm>eps_and_norm) then
+          norma=norm/normb+norma
+      !    write(16,*) je
+      !    write(16,*) norma,norm,normb
+          k=k+1
+          endif
+
+
+        enddo
+
 enddo
-
- norma=abs(norma-ms%n)
+!write(6,*) k
+eps_and_norm=norma/k
 
 endif
 
-ms=l
 
 
+ms=mt
 
 
 
@@ -13179,7 +13250,6 @@ k1(k)=i
 k2(k)=j
 enddo
 enddo
-
 
 
 f=c_logf_spin(m)

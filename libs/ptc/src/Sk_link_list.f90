@@ -609,7 +609,9 @@ CONTAINS
     type(mad_universe), pointer :: madu
 !  new 2012.9.7
     nullify(madu)
-   if(associated(L%parent_universe) ) madu=>L%parent_universe
+    if( associated(L%parent_universe) ) then 
+      madu=>L%parent_universe
+    endif
 !    
 
     CALL NULLIFY_LAYOUT(L)
@@ -937,6 +939,7 @@ CONTAINS
     implicit none
     type(fibre),target,intent(inout):: c
     integer, intent(in) :: i
+    logical :: proceed=.false.
     if(i==0) then
        c%DIR=1
        !    C%P0C = ONE
@@ -953,7 +956,16 @@ CONTAINS
        if(associated(c%CHART)) c%CHART=0
        if(associated(c%PATCH)) c%PATCH=0
     elseif(i==-1) then
-       IF(ASSOCIATED(LC,c%mag%PARENT_FIBRE%PARENT_LAYOUT).or.superkill) THEN    ! ORDINARY
+       !if (.not.ASSOCIATED(LC) ) print*,"Skowron zero_fibre: LC==0x0"
+       !if (.not.ASSOCIATED(c%mag) ) print*,"Skowron zero_fibre: c%mag==0x0"
+       !if (.not.ASSOCIATED(c%mag%PARENT_FIBRE) ) print*,"Skowron zero_fibre: c%mag%PARENT_FIBRE==0x0"
+       
+       !if LC is c%mag%PARENT_FIBRE%PARENT_LAYOUT or superkill
+       IF(  (associated(c%mag) .and. &
+             associated(c%mag%PARENT_FIBRE) .and. & 
+             ASSOCIATED(LC,c%mag%PARENT_FIBRE%PARENT_LAYOUT)) &
+         .or.superkill) THEN    ! ORDINARY
+             
           IF(ASSOCIATED(c%magP)) then  !  2010_1
              c%magp=-1;
              deallocate(c%magP);
@@ -971,11 +983,30 @@ CONTAINS
              deallocate(c%PATCH);
           ENDIF
        ELSE   ! POINTED LAYOUT
-          IF(.NOT.ASSOCIATED(c%mag%PARENT_FIBRE%CHART,c%CHART)) then
+          proceed = .false.
+          IF(     .NOT.ASSOCIATED(c%mag)) then
+            proceed = .true.
+          else IF(.NOT.ASSOCIATED(c%mag%PARENT_FIBRE)) then
+            proceed = .true.
+          else IF(.NOT.ASSOCIATED(c%mag%PARENT_FIBRE%CHART,c%CHART)) then
+            proceed = .true.
+          endif
+            
+          IF(proceed) then
              C%CHART=-1
              deallocate(c%CHART);
           ENDIF
-          IF(.NOT.ASSOCIATED(c%mag%PARENT_FIBRE%PATCH,c%PATCH)) then
+          
+          proceed = .false.
+          IF(     .NOT.ASSOCIATED(c%mag)) then
+            proceed = .true.
+          else IF(.NOT.ASSOCIATED(c%mag%PARENT_FIBRE)) then
+            proceed = .true.
+          else IF(.NOT.ASSOCIATED(c%mag%PARENT_FIBRE%PATCH,c%PATCH)) then
+            proceed = .true.
+          endif
+          
+          IF(proceed) then
              C%PATCH=-1
              deallocate(c%PATCH);
           ENDIF

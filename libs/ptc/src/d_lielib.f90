@@ -2644,7 +2644,7 @@ contains
     ! ---------------------
     integer i,ier,iunst,j,l,n1
     integer,dimension(ndim)::n
-    real(dp) ap,ax,rd,rd1,xd,xsu
+    real(dp) ap,ax,rd,rd1,xd,xsu,xsus
     real(dp),dimension(ndim2,ndim2)::cr,xj,sa,sai,cm,w,vr,vi,s1
     real(dp),dimension(ndim)::x,xx,st
     real(dp),dimension(ndim2)::rr,ri,p
@@ -2682,17 +2682,10 @@ contains
     endif
     call mulnd2(xj,w)
     call mulnd2(cr,w)
-    if(lielib_print(6)==1) then
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1((1X,A72),/))'
-       w_p%c(1)= 'Check of the symplectic condition on the linear part'
-       !CALL !WRITE_a
+
+
        xsu=0.0_dp
        do i=1,nd2
-          w_p=0
-          w_p%nr=nd2
-          w_p%fr='(6(2x,g23.16))'
           do j=1,nd2
              w_p%r(j)=w(i,j)
           enddo
@@ -2702,9 +2695,8 @@ contains
              xsu=xsu+abs(w(i,j)-XJ(I,J))
           enddo
        enddo
-       w_p=0
-       w_p%nc=1
-       w_p%fc='((1X,A120))'
+xsus=(xsu)/ND2
+  if(lielib_print(6)==1) then
        !     write(w_p%c(1),'(a29,g23.16,a2)') 'Deviation from symplecticity ',c_100*(xsu)/ND2, ' %'
        write(6,'(a29,g23.16,a2)') 'Deviation from symplecticity ',100.0_dp*(xsu)/ND2, ' %'
        !CALL !WRITE_a
@@ -2752,7 +2744,7 @@ if(check_krein.and.(.not.hyp)) then
         xd=abs(log(rr(i)**2+ri(i)**2))+xd
        enddo
  
-       if(xsu>=0.and.xd>size_krein) then
+       if(xsu>=0.and.xd>size_krein.and.xsus<=size_krein) then
          write(6,*) " A Krein collision seemed to have happened "
          write(6,*) " All calculations interrupted "
        do i=1,nd2-ndc

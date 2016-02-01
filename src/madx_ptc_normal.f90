@@ -2,15 +2,19 @@ module madx_ptc_normal_module
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
   ! madx_ptc_normal module
   ! Frank Schmidt (CERN)
-  !
+  ! updates by Piotr Skowronski (CERN)
   use madx_ptc_module
+  use c_TPSA
+!  use madx_ptc_twiss
+  
   !_________________________________________________________________
   implicit none
+  save
 
-  public
+  public :: ptc_normal
 
   
-  private double_from_normal_t1,display_table_results
+  private display_table_results
   
   character(1000), private  :: whymsg
   
@@ -36,9 +40,12 @@ contains
     character(len = 5) name_var
     type(real_8) y(6)
     type(real_8) :: theAscript(6) ! used here to compute dispersion's derivatives
-    type(normalform) ::  n_t2  ! normal from type 2 for hamiltonian terms
-
-    !------------------------------------------------------------------------------
+    type(c_damap)  :: c_Map
+    type(c_vector_field) vf_kernel, vf
+    type(c_taylor)  :: g_io
+    type(c_normal_form), target :: theNormalForm, theNormalForm_t2 ! normal from type 2 for hamiltonian terms
+    
+    !--------------------------------------------------------;----------------------
 
     if(universe.le.0.or.EXCEPTION.ne.0) then
        call fort_warn('return from ptc_normal: ',' no universe created')
@@ -110,7 +117,14 @@ contains
     !!
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    call init(default,no,nda,BERZ,mynd2,npara)
+    !new complex PTC
+    call init_all(default,no,nda,BERZ,mynd2,npara)
+    c_verbose=.false.
+    
+    i_piotr(:) = 0
+    i_piotr(1)=1; i_piotr(2)=3; i_piotr(3)=5;
+    
+    c_normal_auto=.true.;
 
     call alloc(y)
     y=npara
@@ -178,10 +192,15 @@ contains
        !! 
        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
        
-       call alloc(n) 
-       if (getdebug() > 0) print*,"Normal Form Type 1"
-       n=y !! HERE WE DO NORMAL FORM TYPE 1
+       call alloc(theNormalForm) 
+       call alloc(c_Map)
+   
+       c_Map = y;
 
+       if (getdebug() > 0) print*,"Normal Form Type 1"
+       
+       call  c_normal(c_Map,theNormalForm)       ! (4) !! HERE WE DO NORMAL FORM TYPE 1
+       
        if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
           write(whymsg,*) 'DA got unstable in Normal Form: PTC msg: ',messagelost
           call fort_warn('ptc_normal: ',whymsg)
@@ -191,16 +210,21 @@ contains
 
        if (getdebug() > 1) then
           write(19,'(/a/)') 'NORMAL: Dispersion, First and Higher Orders'
-          call daprint(n%A1,19)
+          call daprint(theNormalForm%A1,19)
        endif
        
-       
+
+       call alloc(vf_kernel)
+       vf_kernel=0
+       call flatten_c_factored_lie(theNormalForm%ker,vf_kernel)
+
        if (getdebug() > 1) then
           write(19,'(/a/)') 'NORMAL:  Tunes, Chromaticities and Anharmonicities'
-          !  call daprint(n%A_t,19)
-          call daprint(n%A%pb,19)
-          call daprint(n%dhdj,19) ! orig one
-          !  call daprint(pbrh,19)
+
+          call daprint(theNormalForm%A_t,19)! WARNING, this does not work with 6D dispersion, need to use Chao-Sands prescription
+          call daprint(vf_kernel,19) ! tunes
+
+
        endif
 
 
@@ -211,7 +235,7 @@ contains
        !! It has resonanses left in the normal form
        !! which are defined with normal%M
 
-       call alloc(n_t2) 
+       call alloc(theNormalForm_t2) 
        
        nres = 0       
        n_haml = 0
@@ -235,7 +259,9 @@ contains
           enddo
 
           if (n_haml > 0) then
-             call alloc(pbrh)
+             
+             !call alloc(pbrh)
+             
              do j1 =1,n_haml
                 row = row_haml(j1)
                 k = double_from_table_row("normal_results ", "value ", row, doublenum)
@@ -255,9 +281,14 @@ contains
 
                    index1(1,1) = indexa(1) - indexa(2)
                    index1(1,2) = indexa(3) - indexa(4)
-                   n_t2%m(1,1)= index1(1,1)
-                   n_t2%m(2,1)= index1(1,2)
-                   if(c_%nd2.eq.6) n_t2%m(3,1)= indexa(3)
+                   
+                   
+                   !n_t2%m(1,1)= index1(1,1)
+                   !n_t2%m(2,1)= index1(1,2)
+                   !if(c_%nd2.eq.6) n_t2%m(3,1)= indexa(3)
+                   call fort_warn('ptc_normal: ',' Hamiltonian terms not yet implemented with the new complex PTC')
+                   
+                   
                    nres = 1
                    starti = 2
                 endif
@@ -282,14 +313,18 @@ contains
                       nres = nres + 1
                       index1(nres,1) = n1
                       index1(nres,2) = n2
-                      n_t2%m(1,nres)= n1
-                      n_t2%m(2,nres)= n2
-                      if(c_%nd2.eq.6) n_t2%m(3,nres)= indexa(3)
+                      !n_t2%m(1,nres)= n1
+                      !n_t2%m(2,nres)= n2
+                      !if(c_%nd2.eq.6) n_t2%m(3,nres)= indexa(3)
+	  call fort_warn('ptc_normal: ',' Hamiltonian terms not yet implemented with the new complex PTC')
+	  
 100                   continue
                    enddo
                 endif
              enddo
-             n_t2%nres = nres
+             
+             !n_t2%nres = nres
+             call fort_warn('ptc_normal: ',' Hamiltonian terms not yet implemented with the new complex PTC')
           endif
 
        endif
@@ -298,7 +333,12 @@ contains
        if (n_haml > 0) then
            
            if (getdebug() > 0) print*,"Normal Form Type 2 (for Hamiltonian Terms)"
-           n_t2=y
+           
+           call fort_warn('ptc_normal: ',' Hamiltonian terms not yet implemented with the new complex PTC')
+
+           !call alloc(theNormalForm_t2)
+           !call  c_normal(c_Map,theNormalForm)
+
 
            if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
               write(whymsg,*) 'DA got unstable in Normal Form: PTC msg: ',messagelost
@@ -307,15 +347,27 @@ contains
               return
            endif
 
-           
-
-           pbrh = n_t2%normal%pb
 
        endif
        
        if (n_gnfu > 0) then
-         call alloc(pbrg)
-         pbrg = n%a%pb
+
+          !!!!!!!!!!!!!!!!!!!!!!
+          !Generating functions
+
+          !n%g is the vecotor field for the transformation 
+          !from resonance basis (action angle coordinate system, (x+ipx),(x-ipx)) back to cartesion X,Y
+          !the ndim polynomials need to be flattened to get RDT's
+          call alloc(vf);
+          call flatten_c_factored_lie(theNormalForm%G,vf)
+          
+          call alloc(g_io);
+          
+          call equal_c_tayls(g_io,-cgetpb(vf))
+          
+          !g_io =-cgetpb(vf)
+          !call putGnormaltable(g_io)
+
        endif
        
        !------ get values and store them in the table 'normal_results' ---------
@@ -338,19 +390,25 @@ contains
        endif
        
        call alloc(theAscript)
-       theAscript = X+n%A_t;
+       theAscript = X+theNormalForm%A_t;
        
        call putusertable(1,'$end$ ',dt ,dt,y,theAscript)
        call kill(theAscript)
        
 
 
-       if (n_gnfu > 0) call kill(pbrg)
-       if (n_haml > 0) call kill(pbrh)
+       if (n_gnfu > 0) then
+          call kill(g_io)
+          call kill(vf)
+       endif   
+
+       !if (n_haml > 0) then 
+         !clean after hamiltonian when implemented
+       !endif  
  
 
-       call kill(n)
-       call kill(n_t2)
+       call kill(theNormalForm)
+       !call kill(n_t2)
 
     endif
     
@@ -367,263 +425,291 @@ contains
 ! f90flush is not portable, and useless...
 !    call f90flush(18,my_false)
 !    call f90flush(19,my_false)
-
-  END subroutine ptc_normal
+  
+  contains
   !________________________________________________________________________________
 
-  FUNCTION double_from_normal_t1(name_var,row,icase)
-    USE ptc_results
-    implicit none
-    logical(lp) name_l
-    integer,intent(IN) ::  row,icase
-    real(dp) double_from_normal_t1, d_val, d_val1, d_val2
-    integer ii,i1,i2,jj
-    integer j,k,ind(6)
-    integer double_from_table_row
-    character(len = 4)  name_var
-    character(len = 2)  name_var1
-    character(len = 3)  name_var2
+     FUNCTION double_from_normal_t1(name_var,row,icase)
+       USE ptc_results
+       implicit none
+       logical(lp) name_l
+       integer,intent(IN) ::  row,icase
+       real(dp) double_from_normal_t1, d_val, d_val1, d_val2
+       complex(dp) :: c_val
+       integer ii,i1,i2,jj
+       integer j,k,ind(6)
+       integer double_from_table_row
+       character(len = 4)  name_var
+       character(len = 2)  name_var1
+       character(len = 3)  name_var2
 
-    name_l = .false.
-    double_from_normal_t1 = zero
-
-    name_var1 = name_var
-    SELECT CASE (name_var1)
-    CASE ("dx")
-       ind(:)=0
-       k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
-       ind(5) = int(doublenum)
-       if (ind(5) == 0) ind(5) = 1
-       ind(6) = 0
-       d_val = n%A1%V(1).sub.ind
-    CASE ('dy')
-       ind(:)=0
-       k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
-       ind(5) = int(doublenum)
-       if (ind(5) == 0) ind(5) = 1
-       ind(6) = 0
-       d_val = n%A1%V(3).sub.ind
-    CASE ('q1')
-       ind(:)=0
-       d_val = n%dhdj%V(c_%nd+1).sub.ind 
-    CASE ('q2')
-       ind(:)=0
-       d_val = n%dhdj%V(c_%nd+2).sub.ind 
-    CASE DEFAULT
-       name_l = .true.
-    END SELECT
-    if (name_l) then
        name_l = .false.
-       name_var2 = name_var
-       SELECT CASE (name_var2)
-       CASE ('dpx')
+       double_from_normal_t1 = zero
+
+       name_var1 = name_var
+       SELECT CASE (name_var1)
+       CASE ("dx")
           ind(:)=0
           k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           ind(5) = int(doublenum)
           if (ind(5) == 0) ind(5) = 1
           ind(6) = 0
-          d_val = n%A1%V(2).sub.ind
-       CASE ('dpy')
+          d_val = theNormalForm%A1%V(1).sub.ind
+       CASE ('dy')
           ind(:)=0
           k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           ind(5) = int(doublenum)
           if (ind(5) == 0) ind(5) = 1
           ind(6) = 0
-          d_val = n%A1%V(4).sub.ind
-       CASE ('dq1')
-          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
+          d_val = theNormalForm%A1%V(3).sub.ind
+       CASE ('q1')
           ind(:)=0
-          ind(5) = int(doublenum)
-          if (ind(5) == 0) ind(5) = 1
-          ind(6) = 0
-          d_val = n%dhdj%V(c_%nd+1).sub.ind ! LD: was V(3)
-       CASE ('dq2')
-          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
+          ind(1)=1 !kernel has extra exponent at the plane variable, q1=v(1).sub.'100000'
+          c_val=vf_kernel%v(1).sub.ind 
+          d_val = -aimag(c_val)/(2.*pi)
+
+       CASE ('q2')
           ind(:)=0
-          ind(5) = int(doublenum)
-          if (ind(5) == 0) ind(5) = 1
-          ind(6) = 0
-          d_val = n%dhdj%V(c_%nd+2).sub.ind ! LD: was V(4)
+          ind(3)=1 !kernel has extra exponent at the plane variable, q1=v(1).sub.'100000'
+          c_val=vf_kernel%v(3).sub.ind 
+          d_val = -aimag(c_val)/(2.*pi)
        CASE DEFAULT
           name_l = .true.
        END SELECT
-    endif
-    if (name_l) then
+       if (name_l) then
+          name_l = .false.
+          name_var2 = name_var
+          SELECT CASE (name_var2)
+          CASE ('dpx')
+             ind(:)=0
+             k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
+             ind(5) = int(doublenum)
+             if (ind(5) == 0) ind(5) = 1
+             ind(6) = 0
+             d_val = theNormalForm%A1%V(2).sub.ind
+          CASE ('dpy')
+             ind(:)=0
+             k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
+             ind(5) = int(doublenum)
+             if (ind(5) == 0) ind(5) = 1
+             ind(6) = 0
+             d_val = theNormalForm%A1%V(4).sub.ind
+          CASE ('dq1')
+             k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
+             ind(:)=0
+             ind(1)=1
+             ind(5) = int(doublenum)
+             if (ind(5) == 0) ind(5) = 1
+             ind(6) = 0
+             c_val=vf_kernel%v(1).sub.ind 
+             d_val = -aimag(c_val)/(2.*pi)
+          CASE ('dq2')
+             k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
+             ind(:)=0
+             ind(3)=1
+             ind(5) = int(doublenum)
+             if (ind(5) == 0) ind(5) = 1
+             ind(6) = 0
+             c_val=vf_kernel%v(3).sub.ind 
+             d_val = -aimag(c_val)/(2.*pi)
+          CASE DEFAULT
+             name_l = .true.
+          END SELECT
+       endif
+       if (name_l) then
+          SELECT CASE (name_var)
+          CASE ('anhx')
+             k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
+             do j = 1,2
+                ind(j) =  int(doublenum)
+             enddo
+             k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
+             do j = 3,4
+                ind(j) = int(doublenum)
+             enddo
+             k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
+             ind(5) = int(doublenum)
+             ind(6) = 0
+             ind(1) = ind(1) + 1
+             c_val=vf_kernel%v(1).sub.ind 
+             d_val = -aimag(c_val)/(2.*pi)
+             
+             
+          CASE ('anhy')
+             k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
+             do j = 1,2
+                ind(j) = int(doublenum)
+             enddo
+             k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
+             do j = 3,4
+                ind(j) = int(doublenum)
+             enddo
+             k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
+             ind(5) = int(doublenum)
+             ind(6) = 0
+             ind(3) = ind(3) + 1
+             c_val=vf_kernel%v(3).sub.ind 
+             d_val = -aimag(c_val)/(2.*pi)
+          CASE ('eign')
+             ii=(icase/2)*2
+             k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
+             i1 = int(doublenum)
+             if(i1.gt.ii) call aafail('return from double_from_normal_t1: ',' wrong # of eigenvectors')
+             jj=0
+             if(i1.eq.5) jj=6
+             if(i1.eq.6) i1=5
+             if(jj.eq.6) i1=jj
+             k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
+             i2 = int(doublenum)
+             if(i2.gt.ii) call aafail('return from double_from_normal_t1: ',' eigenvectors too many components')
+             jj=0
+             if(i2.eq.5) jj=6
+             if(i2.eq.6) i2=5
+             if(jj.eq.6) i2=jj
+             ind(:)=0
+             ind(i2)=1
+             double_from_normal_t1 = theNormalForm%A_t%V(i1).sub.ind
+             if(mytime.and.i2.eq.6) double_from_normal_t1 = -double_from_normal_t1
+             RETURN
+           CASE ('gnfc')
+              k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
+              ind(1) = int(doublenum)
+              k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
+              ind(2) = int(doublenum)
+              k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
+              ind(3) = int(doublenum)
+              k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
+              ind(4) = int(doublenum)
+              ind(5) = 0
+              ind(6) = 0
+              c_val = g_io.sub.ind
+              d_val = -real(c_val)
+              double_from_normal_t1 = d_val
+              RETURN
+           CASE ('gnfs')
+              k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
+              ind(1) = int(doublenum)
+              k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
+              ind(2) = int(doublenum)
+              k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
+              ind(3) = int(doublenum)
+              k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
+              ind(4) = int(doublenum)
+              ind(5) = 0
+              ind(6) = 0
+              c_val = g_io.sub.ind
+              d_val = -imag(c_val)
+              double_from_normal_t1 = d_val
+              RETURN
+           CASE ('gnfa')
+              k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
+              ind(1) = int(doublenum)
+              k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
+              ind(2) = int(doublenum)
+              k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
+              ind(3) = int(doublenum)
+              k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
+              ind(4) = int(doublenum)
+              ind(5) = 0
+              ind(6) = 0
+              c_val = g_io.sub.ind
+              d_val1 = imag(c_val)
+              d_val2 = real(c_val)
+              double_from_normal_t1 = SQRT(d_val1**2 + d_val2**2)
+              RETURN
+           CASE ('gnfu')
+              double_from_normal_t1 = zero ! should never arrive here
+              RETURN
+          CASE DEFAULT
+             print *,"--Error in the table normal_results-- Unknown input: ",name_var
+          END SELECT
+       endif
+       double_from_normal_t1 = d_val*(factorial(ind(1))*factorial(ind(3))*factorial(ind(5)))
+     END FUNCTION double_from_normal_t1
+   !________________________________________________
+   !Extraction of normal type 2 variables: hamiltonian and generating functions
+
+     FUNCTION double_from_normal_t2(name_var,row,icase)
+       USE ptc_results
+       implicit none
+       logical(lp) name_l
+       integer,intent(IN) ::  row,icase
+       real(dp) double_from_normal_t2, d_val, d_val1, d_val2
+       integer ii,i1,i2,jj
+       integer j,k,ind(6)
+       integer double_from_table_row
+       character(len = 4)  name_var
+       character(len = 2)  name_var1
+       character(len = 3)  name_var2
+
+       double_from_normal_t2 = zero
+
+       name_var1 = name_var
+
+      ! if (LEN_TRIM(name_var))
+
        SELECT CASE (name_var)
-       CASE ('anhx')
+       CASE ('hamc')
           k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
-          do j = 1,2
-             ind(j) =  int(doublenum)
-          enddo
+          ind(1) = int(doublenum)
           k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
-          do j = 3,4
-             ind(j) = int(doublenum)
-          enddo
+          ind(2) = int(doublenum)
           k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
-          ind(5) = int(doublenum)
+          ind(3) = int(doublenum)
+          k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
+          ind(4) = int(doublenum)
+          ind(5) = 0
           ind(6) = 0
-          d_val = n%dhdj%V(c_%nd+1).sub.ind ! LD: was V(3)
-       CASE ('anhy')
-          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
-          do j = 1,2
-             ind(j) = int(doublenum)
-          enddo
-          k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
-          do j = 3,4
-             ind(j) = int(doublenum)
-          enddo
-          k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
-          ind(5) = int(doublenum)
-          ind(6) = 0
-          d_val = n%dhdj%V(c_%nd+2).sub.ind ! LD: was V(4)
-       CASE ('eign')
-          ii=(icase/2)*2
-          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
-          i1 = int(doublenum)
-          if(i1.gt.ii) call aafail('return from double_from_normal_t1: ',' wrong # of eigenvectors')
-          jj=0
-          if(i1.eq.5) jj=6
-          if(i1.eq.6) i1=5
-          if(jj.eq.6) i1=jj
-          k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
-          i2 = int(doublenum)
-          if(i2.gt.ii) call aafail('return from double_from_normal_t1: ',' eigenvectors too many components')
-          jj=0
-          if(i2.eq.5) jj=6
-          if(i2.eq.6) i2=5
-          if(jj.eq.6) i2=jj
-          ind(:)=0
-          ind(i2)=1
-          double_from_normal_t1 = n%A_t%V(i1).sub.ind
-          if(mytime.and.i2.eq.6) double_from_normal_t1 = -double_from_normal_t1
+          !d_val = pbrh%cos%h.sub.ind
+          d_val = zero
+          call fort_warn('double_from_normal_t2: ',' Hamiltonian terms not yet implemented with the new complex PTC')
+          double_from_normal_t2 = d_val
           RETURN
-        CASE ('gnfc')
-           k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
-           ind(1) = int(doublenum)
-           k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
-           ind(2) = int(doublenum)
-           k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
-           ind(3) = int(doublenum)
-           k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
-           ind(4) = int(doublenum)
-           ind(5) = 1
-           ind(6) = 0
-           d_val = pbrg%cos%h.sub.ind
-           double_from_normal_t1 = d_val
-           RETURN
-        CASE ('gnfs')
-           k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
-           ind(1) = int(doublenum)
-           k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
-           ind(2) = int(doublenum)
-           k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
-           ind(3) = int(doublenum)
-           k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
-           ind(4) = int(doublenum)
-           ind(5) = 1
-           ind(6) = 0
-           d_val = pbrg%sin%h.sub.ind
-           double_from_normal_t1 = d_val
-           RETURN
-        CASE ('gnfa')
-           k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
-           ind(1) = int(doublenum)
-           k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
-           ind(2) = int(doublenum)
-           k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
-           ind(3) = int(doublenum)
-           k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
-           ind(4) = int(doublenum)
-           ind(5) = 1
-           ind(6) = 0
-           d_val1 = pbrg%cos%h.sub.ind
-           d_val2 = pbrg%sin%h.sub.ind
-           double_from_normal_t1 = SQRT(d_val1**2 + d_val2**2)
-           RETURN
-        CASE ('gnfu')
-           double_from_normal_t1 = zero ! should never arrive here
-           RETURN
+       CASE ('hams')
+          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
+          ind(1) = int(doublenum)
+          k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
+          ind(2) = int(doublenum)
+          k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
+          ind(3) = int(doublenum)
+          k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
+          ind(4) = int(doublenum)
+          ind(5) = 0
+          ind(6) = 0
+          !d_val = pbrh%sin%h.sub.ind
+          d_val = zero
+          call fort_warn('double_from_normal_t2: ',' Hamiltonian terms not yet implemented with the new complex PTC')
+          double_from_normal_t2 = d_val
+          RETURN
+       CASE ('hama')
+          k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
+          ind(1) = int(doublenum)
+          k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
+          ind(2) = int(doublenum)
+          k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
+          ind(3) = int(doublenum)
+          k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
+          ind(4) = int(doublenum)
+          ind(5) = 0
+          ind(6) = 0
+          !d_val1 = pbrh%cos%h.sub.ind
+          !d_val2 = pbrh%sin%h.sub.ind
+          !double_from_normal_t2 = SQRT(d_val1**2 + d_val2**2)
+          double_from_normal_t2 = zero
+          call fort_warn('double_from_normal_t2: ',' Hamiltonian terms not yet implemented with the new complex PTC')
+          
+          RETURN
+       CASE ('haml')
+          double_from_normal_t2 = zero
+          RETURN
        CASE DEFAULT
           print *,"--Error in the table normal_results-- Unknown input: ",name_var
        END SELECT
-    endif
-    double_from_normal_t1 = d_val*(factorial(ind(1))*factorial(ind(3))*factorial(ind(5)))
-  END FUNCTION double_from_normal_t1
-!________________________________________________
-!Extraction of normal type 2 variables: hamiltonian and generating functions
 
-  FUNCTION double_from_normal_t2(name_var,row,icase)
-    USE ptc_results
-    implicit none
-    logical(lp) name_l
-    integer,intent(IN) ::  row,icase
-    real(dp) double_from_normal_t2, d_val, d_val1, d_val2
-    integer ii,i1,i2,jj
-    integer j,k,ind(6)
-    integer double_from_table_row
-    character(len = 4)  name_var
-    character(len = 2)  name_var1
-    character(len = 3)  name_var2
+       double_from_normal_t2 = d_val*(factorial(ind(1))*factorial(ind(3))*factorial(ind(5)))
+     END FUNCTION double_from_normal_t2
 
-    double_from_normal_t2 = zero
-
-    name_var1 = name_var
-    
-   ! if (LEN_TRIM(name_var))
-    
-    SELECT CASE (name_var)
-    CASE ('hamc')
-       k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
-       ind(1) = int(doublenum)
-       k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
-       ind(2) = int(doublenum)
-       k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
-       ind(3) = int(doublenum)
-       k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
-       ind(4) = int(doublenum)
-       ind(5) = 0
-       ind(6) = 0
-       d_val = pbrh%cos%h.sub.ind
-       double_from_normal_t2 = d_val
-       RETURN
-    CASE ('hams')
-       k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
-       ind(1) = int(doublenum)
-       k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
-       ind(2) = int(doublenum)
-       k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
-       ind(3) = int(doublenum)
-       k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
-       ind(4) = int(doublenum)
-       ind(5) = 0
-       ind(6) = 0
-       d_val = pbrh%sin%h.sub.ind
-       double_from_normal_t2 = d_val
-       RETURN
-    CASE ('hama')
-       k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
-       ind(1) = int(doublenum)
-       k = double_from_table_row("normal_results ", "order2 ", row, doublenum)
-       ind(2) = int(doublenum)
-       k = double_from_table_row("normal_results ", "order3 ", row, doublenum)
-       ind(3) = int(doublenum)
-       k = double_from_table_row("normal_results ", "order4 ", row, doublenum)
-       ind(4) = int(doublenum)
-       ind(5) = 0
-       ind(6) = 0
-       d_val1 = pbrh%cos%h.sub.ind
-       d_val2 = pbrh%sin%h.sub.ind
-       double_from_normal_t2 = SQRT(d_val1**2 + d_val2**2)
-       RETURN
-    CASE ('haml')
-       double_from_normal_t2 = zero
-       RETURN
-    CASE DEFAULT
-       print *,"--Error in the table normal_results-- Unknown input: ",name_var
-    END SELECT
-
-    double_from_normal_t2 = d_val*(factorial(ind(1))*factorial(ind(3))*factorial(ind(5)))
-  END FUNCTION double_from_normal_t2
+  END subroutine ptc_normal
 !_________________________________________________________________
 
   SUBROUTINE display_table_results()

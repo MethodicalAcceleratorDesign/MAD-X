@@ -58,8 +58,8 @@ contains
     my_ering => m_u%start
     m_u_t=.true.
     if(m_t%n>0) then
-      my_ering => m_t%end
-      m_u_t=.false.
+    my_ering => m_t%end
+    m_u_t=.false.
     endif
     if(associated(my_estate)) then
     !  my_estate=>my_old_state
@@ -116,7 +116,7 @@ contains
     ! fitting and scanning tunes
     real(dp) tune_ini(2),tune_fin(2),dtu(2),fint,hgap
     integer nstep(2),i1,i2,I3,n_bessel
-    LOGICAL(LP) STRAIGHT,skip,fixp
+    LOGICAL(LP) STRAIGHT,skip,fixp,skipcav
     ! end
     ! TRACK 4D NORMALIZED
     INTEGER POS,NTURN,resmax
@@ -164,7 +164,7 @@ contains
     REAL(DP) XA,YA,DXA,DYA, DC_ac,A_ac,theta_ac,D_ac
     real(dp), allocatable :: an(:),bn(:) !,n_co(:)
     integer icnmin,icnmax,n_ac,inode !,n_coeff
-    logical :: log_estate=.true.,longprintt
+    logical :: log_estate=.true.,longprintt,onemap
     integer :: mftune=6,nc
     real(dp), allocatable :: tc(:)
     type(integration_node), pointer  :: t
@@ -217,7 +217,7 @@ contains
 
        COM=COMT
        call context(com)
-
+       com=com(1:len_trim(com))
        if(index(com,'!')/=0) then
          if(index(com,'!')/=1) then
           comt=com(1:index(com,'!')-1)
@@ -258,7 +258,6 @@ contains
 
        select case(com)
        case('SELECTLAYOUT','SELECTLATTICE')
-          print*,"SCV: ", m_u%n
           read(mf,*) i_layout_temp
           if(i_layout_temp>m_u%n) then
              write(6,*) " Universe Size ", m_u%n
@@ -1282,6 +1281,107 @@ contains
       !       deallocate(n_co)
       !    endif
 
+
+       case('MAKEMAP','TRACKWITHMAP')
+          READ(MF,*) NAME
+          READ(MF,*) I1  ! ORDER OF THE MAP
+          READ(MF,*)  onemap  ! use one map : no cutting
+          READ(MF,*) fixp  !  SYMPLECTIC 
+          if(.not.associated(my_ering%t)) call make_node_layout(my_ering)
+          x_ref=0.0_DP
+          CALL CONTEXT(NAME)
+          N_NAME=0
+          IF(NAME(1:2)=='NO') THEN
+             READ(MF,*) NAME
+             call context(name)
+             N_NAME=len_trim(name)
+          ENDIF
+
+          p=>my_ering%start
+          do ii=1,my_ering%N
+             found_it=MY_FALSE
+             IF(N_NAME==0) THEN
+                found_it=P%MAG%NAME==NAME
+             ELSE
+                found_it=P%MAG%NAME(1:N_NAME)==NAME(1:N_NAME)
+             ENDIF
+
+             IF(FOUND_IT) THEN
+                write(6,*) "  magnet found FOR MAP REPLACEMENT ",P%MAG%name
+                call fill_tree_element(p,I1,x_REF,onemap)
+                   IF(P%DIR==1) THEN
+                    p%mag%forward(3)%symptrack=FIXP
+                    p%magP%forward(3)%symptrack=FIXP
+                   ELSE
+                    p%mag%BACKward(3)%symptrack=FIXP
+                    p%magP%BACKward(3)%symptrack=FIXP
+                   ENDIF
+             ENDIF
+
+             p=>p%next
+          enddo
+
+       case('MAKEALLMAP','TRACKALLWITHMAP')
+          READ(MF,*) I1  ! ORDER OF THE MAP
+          READ(MF,*)  onemap  ! use one map : no cutting
+          READ(MF,*) fixp  !  SYMPLECTIC 
+          READ(MF,*) skipcav  !  skip cavity 
+          x_ref=0.0_DP
+ 
+          if(.not.associated(my_ering%t)) call make_node_layout(my_ering)
+          p=>my_ering%start
+          do ii=1,my_ering%N
+   
+
+             IF(p%mag%kind/=kind0.or.(skipcav.and.(p%mag%kind/=kind4.and.p%mag%kind/=kind21))) THEN
+                write(6,*) "  magnet found FOR MAP REPLACEMENT ",P%MAG%name
+                call fill_tree_element(p,I1,x_REF,onemap)
+                   IF(P%DIR==1) THEN
+                    p%mag%forward(3)%symptrack=FIXP
+                    p%magP%forward(3)%symptrack=FIXP
+                   ELSE
+                    p%mag%BACKward(3)%symptrack=FIXP
+                    p%magP%BACKward(3)%symptrack=FIXP
+                   ENDIF
+             ENDIF
+
+
+             p=>p%next
+          enddo
+    
+       case('REMOVEALLMAP')
+
+          p=>my_ering%start
+          do ii=1,my_ering%N
+   
+          if(associated(p%MAG%forward)) then
+             p%MAG%usef=.false.
+             p%MAGp%usef=.false.
+          endif
+           if(associated(p%MAG%backward)) then
+             p%MAG%useb=.false.
+             p%MAGp%useb=.false.
+           endif
+             p=>p%next
+          enddo
+    
+       case('PUTBACKALLMAP')
+
+          p=>my_ering%start
+          do ii=1,my_ering%N
+   
+       if(associated(p%MAG%forward)) then
+             p%MAG%usef=.true.
+             p%MAGp%usef=.true.
+       endif
+       if(associated(p%MAG%backward)) then
+             p%MAG%useb=.true.
+             p%MAGp%useb=.true.
+       endif
+ 
+             p=>p%next
+          enddo
+    
        case('SETAPERTURE')
           READ(MF,*) KINDA,NAME
 
@@ -1348,7 +1448,7 @@ contains
        case('PTCTWISS','TWISS','PTCTWISSRIPKEN','TWISSRIPKEN')  !
           !read(mf,*) filename, NAME, integrated
           !read(mf,*) del
-          
+
           call compute_twiss(my_ering,6,3)
 
        case('PTCTWISSSASHA','TWISSSASHA','PTCTWISSRIPKENSASHA','TWISSRIPKENSASHA')  !

@@ -2254,9 +2254,16 @@ call kill(e)
 
     DO  WHILE(.not.ASSOCIATED(C,n2))
 
+       !if (c%PARENT_FIBRE%mag%kind == 40) then
+       !  print*,"skowron: ","suspecting an issue"
+       !endif
+
        CALL TRACK_NODE_PROBE(C,XS,K)
        if(.not.check_stable) exit
-
+       
+       !print*,"skowron ", c%pos, c%PARENT_FIBRE%mag%name, c%PARENT_FIBRE%mag%kind
+       !print*,"skowron: ",XS%X
+       
        C=>C%NEXT
     ENDDO
 
@@ -2397,7 +2404,7 @@ call kill(e)
     J=I1
 
     DO  WHILE(J<I22.AND.ASSOCIATED(C))
-
+  
        CALL TRACK_NODE_PROBE(C,XS,K)  !,R%charge)
 
        if(.not.check_stable) exit
@@ -2813,7 +2820,7 @@ call kill(e)
     type(probe), INTENT(INOUT) :: xs
     TYPE(INTERNAL_STATE) K
     REAL(DP) FAC,DS
-    logical useptc,dofix0,dofix
+    logical useptc,dofix0,dofix,doonemap
     type(tree_element), pointer :: arbre(:)
 !    logical(lp) bmad
     IF(.NOT.CHECK_STABLE) then
@@ -2830,17 +2837,25 @@ call kill(e)
     C%PARENT_FIBRE%MAG%P%CHARGE=>C%PARENT_FIBRE%CHARGE
 
      useptc=.true.
+
+     
+    if(.not.(k%nocavity.and.(C%PARENT_FIBRE%MAG%kind==kind4.or.C%PARENT_FIBRE%MAG%kind==kind21))) then
      if(C%PARENT_FIBRE%dir==1) then
+       if(C%PARENT_FIBRE%MAG%skip_ptc_f) return
        if(associated(C%PARENT_FIBRE%MAG%forward)) then
          if(C%PARENT_FIBRE%MAG%usef) useptc=.false.
           arbre=>C%PARENT_FIBRE%MAG%forward
+          doonemap=C%PARENT_FIBRE%MAG%do1mapf
        endif
      else
+       if(C%PARENT_FIBRE%MAG%skip_ptc_b) return
        if(associated(C%PARENT_FIBRE%MAG%backward)) then
          if(C%PARENT_FIBRE%MAG%useb) useptc=.false.
           arbre=>C%PARENT_FIBRE%MAG%backward
+          doonemap=C%PARENT_FIBRE%MAG%do1mapb
        endif
      endif
+    endif ! cavity
     !      ag=xs%s%g
     !      if(associated(c%bb)) call BBKICK(c%BB,XS%X)
 !    bmad=use_bmad_units.and.(c%cas/=casep1.and.c%cas/=casep2)
@@ -2863,6 +2878,11 @@ call kill(e)
         call PUSH_SPIN(c,ds,FAC,XS,my_true,k,C%POS_IN_FIBRE-3)
         CALL TRACK_NODE_SINGLE(C,XS%X,K)  !,CHARGE
         call PUSH_SPIN(c,ds,FAC,XS,my_false,k,C%POS_IN_FIBRE-2)
+       elseif(doonemap) then
+          if(C%POS_IN_FIBRE-2==1) then 
+                     dofix0=.true.;dofix=.true.
+           call track_TREE_probe_complex(arbre,xs,dofix0,dofix,k)  
+          endif
        else
           dofix0=.false.;dofix=.false.
           if(C%POS_IN_FIBRE-2==1) dofix0=.true.
@@ -2921,7 +2941,7 @@ call kill(e)
     logical(lp) CHECK_KNOB
     integer(2), pointer,dimension(:)::AN,BN
     integer ki
-    logical useptc,dofix0,dofix
+    logical useptc,dofix0,dofix,doonemap
     type(tree_element), pointer :: arbre(:)
 !    logical(lp) bmad
     !   if(xs%u) return
@@ -2939,18 +2959,23 @@ call kill(e)
     C%PARENT_FIBRE%MAGp%P%CHARGE=>C%PARENT_FIBRE%CHARGE
 
     useptc=.true.
+    if(.not.(k%nocavity.and.(ki==kind4.or.ki==kind21))) then
      if(C%PARENT_FIBRE%dir==1) then
+       if(C%PARENT_FIBRE%MAGp%skip_ptc_f) return
        if(associated(C%PARENT_FIBRE%MAGP%forward)) then
          if(C%PARENT_FIBRE%MAGP%usef) useptc=.false.
           arbre=>C%PARENT_FIBRE%MAGP%forward
+          doonemap=C%PARENT_FIBRE%MAGp%do1mapf
        endif
      else
+       if(C%PARENT_FIBRE%MAGp%skip_ptc_b) return
        if(associated(C%PARENT_FIBRE%MAGP%backward)) then
          if(C%PARENT_FIBRE%MAGP%useb) useptc=.false.
           arbre=>C%PARENT_FIBRE%MAGP%backward
+          doonemap=C%PARENT_FIBRE%MAGp%do1mapb
        endif
      endif
-
+    endif
     !      ag=xs%s%g
  !   bmad=use_bmad_units.and.(c%cas/=casep1.and.c%cas/=casep2)
     if(use_bmad_units) then 
@@ -2983,6 +3008,12 @@ call kill(e)
          if(ki==kind10)CALL MAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
         call PUSH_SPIN(c,ds,FAC,XS,my_false,k,C%POS_IN_FIBRE-2)
          if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
+       elseif(doonemap) then
+
+          if(C%POS_IN_FIBRE-2==1) then 
+                     dofix0=.true.;dofix=.true.
+           call track_TREE_probe_complex(arbre,xs,dofix0,dofix,k)  
+          endif
        else
           dofix0=.false.;dofix=.false.
           if(C%POS_IN_FIBRE-2==1) dofix0=.true.
@@ -4054,7 +4085,11 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
 
     !    fixed_found=my_true
     !!    type(probe) xs
-    if(.not.associated(RING%t)) call MAKE_NODE_LAYOUT(ring)
+    if(.not.associated(RING%t)) then
+       !print*,"Skowron: Creating node layout"
+       call MAKE_NODE_LAYOUT(ring)
+       !print*,"+++++++++++++++++++++++++++"
+    endif
     !!    xs%x=zero
     !!    xs%s%x=zero
     use_bmad_units_temp=use_bmad_units
@@ -4205,12 +4240,14 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        !       CALL TRACK(RING,X,LOC,STAT)
        !       trackflag=TRACK_flag(RING,X,LOC,STAT)
        !!       xs%x=x
+       !print*,"Skowron 1 OrbitSearch x_i", x
        call TRACK_probe_X(x,stat,fibre1=fibre1,node1=node1)
        if(.not.check_stable) then
           messagelost(len_trim(messagelost)+1:255)=" -> Unstable tracking guessed orbit "
           c_%APERTURE_FLAG=APERTURE
           return
        endif
+       !print*,"Skowron 1 OrbitSearch x_f", x
        !     write(6,*) item,check_stable
        !!       call TRACK_PROBE(Ring,xs,loct,loct+ring%t%n,stat)
        !!       x=xs%x
@@ -4287,7 +4324,11 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     do iu=1,ND2
        xdix=abs(dix(iu))+xdix
     enddo
-    !    write(6,*) " Convergence Factor = ",nd2,xdix,deps_tracking
+    
+   
+    !print*,"Skowron 1 OrbitSearch: Current orbit", fix
+    !write(6,*) "Skowron 1 OrbitSearch Convergence Factor = ",nd2,xdix,deps_tracking
+    
     !    pause 123321
   !  if(verbose) write(6,*) " Convergence Factor = ",xdix
     if(xdix.gt.deps_tracking) then
@@ -4773,7 +4814,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
 
 
 
-subroutine fill_tree_element(f,no,fix0)
+subroutine fill_tree_element(f,no,fix0,onemap)   ! fix0 is the initial condition for the maps
 implicit none
 type(fibre), target :: f
 type(layout), pointer :: r
@@ -4785,7 +4826,7 @@ real(dp) fixr(6),fixs(6),fix(6),fix0(6),mat(6,6),e_ij(6,6),xn
 type(probe) xs0
 type(probe_8) xs
 type(c_damap) m,mr
- 
+logical :: onemap
  
 integer no,i
 if(.not.associated(f%parent_layout)) then
@@ -4804,7 +4845,10 @@ else
  t2c=>f%t2%next
 endif
 
+! Classical radiation with stochastic envelope
+
 state=radiation0+envelope0+time0
+
 call init_all(state,1,0)
 
 call alloc(xs);call alloc(m,mr)
@@ -4818,27 +4862,43 @@ xs=xs0+mr
 call propagate(xs,state,node1=t1c,node2=t2c)
 
 
-fixr=xs%x
-mr=xs
+! For David
+!!  mr: linear map with radiation would be read here instead of being computed, 
+!! and must be stored in fixr
+
+fixr=xs%x    ! <---
+mr=xs   ! <---
+
 do i=1,6
- mr%v(i)=mr%v(i)-(mr%v(i).sub.0)
+ mr%v(i)=mr%v(i)-(mr%v(i).sub.0)   
 enddo
- 
-e_ij=xs%e_ij
+
+! For David
+!!  The stochastic kicks are stored at e_ij
+
+e_ij=xs%e_ij         ! <---
 ! no radiation
+
+
 state=time0
 xs0=fix0
 m=1
 xs=xs0+m
 call propagate(xs,state,node1=t1c,node2=t2c)
 fix=xs%x
-m=xs
+! For David
+!!  The same linear map is computed WITHOUT radiation : result put into m, the constant part is removed
+!!  
+m=xs   ! <---   
 do i=1,6
  m%v(i)=m%v(i)-(m%v(i).sub.0)
 enddo
+
 m=m**(-1)*mr
 
-call  nth_root(m,m,f%mag%p%nst)
+if(.not.onemap) then
+ call  nth_root(m,m,f%mag%p%nst)
+endif
 
 mat=m
 
@@ -4850,13 +4910,17 @@ call init_all(state,no,0)
 call alloc(xs);call alloc(m,mr)
  
 
+
 xs0=fix0
 m=1
 xs=xs0+m
 call propagate(xs,state,node1=t1c,node2=t2c)
  
 fix=xs%x
-m=xs
+! For David
+!!  The full nonlinear map m is computed
+!!  
+m=xs  ! <---   
 
 m%e_ij=e_ij
 do i=1,6
@@ -4864,9 +4928,9 @@ do i=1,6
 enddo 
 
  
-call  nth_root(m,m,f%mag%p%nst)
- 
-
+if(.not.onemap) then
+ call  nth_root(m,m,f%mag%p%nst)
+endif
 
  
 if(f%dir==1) then
@@ -4878,7 +4942,7 @@ if(f%dir==1) then
  endif
 
 call SET_TREE_G_complex(f%mag%forward,m)
-
+ f%mag%do1mapf=onemap
  f%mag%usef=.true.
  arbre=>f%mag%forward
 else
@@ -4889,6 +4953,7 @@ else
   call KILL(f%mag%backward)
  endif
  call SET_TREE_G_complex(f%mag%backward,m)
+ f%mag%do1mapb=onemap
  f%mag%useb=.true.
  arbre=>f%mag%backward
 endif
@@ -4908,6 +4973,7 @@ if(f%dir==1) then
   call KILL(f%magp%forward)
  endif
  call SET_TREE_G_complex(f%magp%forward,m)
+ f%magp%do1mapf=onemap
  f%magp%usef=.true.
  arbre=>f%magp%forward
 else
@@ -4921,6 +4987,7 @@ else
  call SET_TREE_G_complex(f%magp%backward,m)
  !call alloc_tree(elp%forward,el%forward%n,elp%forward%np)
  !call copy_tree(f%mag%backward,f%magp%backward)
+ f%magp%do1mapb=onemap
  f%magp%useb=.true.
  arbre=>f%magp%backward
 endif
