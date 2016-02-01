@@ -3,7 +3,7 @@
   +     MAD-X 5.02.08  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2015.11.20               +
-  + Execution date: 2016.02.01 18:18:56      +
+  + Execution date: 2016.02.01 18:56:12      +
   ++++++++++++++++++++++++++++++++++++++++++++
    !                     FODO for MAD-X
 
@@ -328,7 +328,6 @@ obs_points pro_ptc_setswitch Done
        ACCELERATE  =  FALSE
  Normal Form Type 1
  Normal Form Type 1 DONE
- GNFU mynres          210
 
 ++++++ table: ptc_twiss_summary
 

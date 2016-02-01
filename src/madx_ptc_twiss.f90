@@ -3875,8 +3875,7 @@ contains
       i=1
       call c_taylor_cycle(gen,size=mynres)
 
-      print*,"GNFU mynres ",mynres
-      
+      !print*,"GNFU mynres ",mynres
 
       do r=1,mynres
         
