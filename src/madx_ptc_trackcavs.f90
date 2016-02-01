@@ -404,8 +404,8 @@ contains
                x = TheBeam%X(n,1:6)
 
                p0 = p%mag%p%p0c
-               !en = hypot(p0,p%mass)
-               en = sqrt(p0**2 + (p%mass)**2)
+               
+               en = sqrt(p0**2 + (p%mass)**2)!en = hypot(p0,p%mass)
 
                 ! a simple hook to get a text file 
                if (getdebug() > 1 ) then
@@ -684,7 +684,7 @@ contains
        xini = x
        
        p0 = my_ring%start%mag%p%p0c
-       en = hypot(p0,p%mass)
+       en = sqrt(p0**2 + (p%mass)**2) !en = hypot(p0,p%mass)
 
        write(mf,'(a2,2(i16,1x),8(ES16.8,1x))') '  ', n, 0, x(1:6), p0, pathlegth 
        
@@ -733,7 +733,7 @@ contains
              endif
 
              p0 = p%mag%p%p0c
-             en = hypot(p0,p%mass)
+             en = sqrt(p0**2 + (p%mass)**2) !en = hypot(p0,p%mass)
 
              if (rplot) then
                 if (gcs) then
@@ -1029,7 +1029,7 @@ contains
              endif
 
              p0 = p%mag%p%p0c
-             en = hypot(p0,p%mass)
+             en = sqrt(p0**2 + (p%mass)**2) !en = hypot(p0,p%mass)
 
              if (rplot) then
                 if (gcs) then
