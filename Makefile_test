@@ -66,9 +66,9 @@ test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 test-r
 \
 test-ptc-twiss-1 test-ptc-twiss-2 test-ptc-twiss-3 \
 test-ptc-twiss-old1 test-ptc-twiss-old2 test-ptc-twiss-old3 test-ptc-twiss-old4 test-ptc-twiss-old5 $(call onwin,,test-ptc-twiss-old6) test-ptc-twiss-old7 \
-test-ptc-twiss-5D test-ptc-twiss-5Dt test-ptc-twiss-56D test-ptc-twiss-56Dt test-ptc-twiss-56Dl test-ptc-twiss-56Dtl test-ptc-twiss-6D \
+test-ptc-twiss-5D test-ptc-twiss-5Dt test-ptc-twiss-56D test-ptc-twiss-56Dt test-ptc-twiss-56Dl test-ptc-twiss-56Dtl test-ptc-twiss-6D test-ptc-twiss-6D-ALS \
 test-ptc-twiss-accel-56D \
-test-ptc-normal test-ptc-twiss-maptable \
+test-ptc-normal test-ptc-twiss-normal-genfu test-ptc-twiss-maptable \
 test-ptc-trackline test-ptc-trackline-2 \
 test-rfmultipole-ptc-1 \
 test-touschek test-touschek-2 \
