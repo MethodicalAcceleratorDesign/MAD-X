@@ -54,7 +54,7 @@ matchlib2.o:        override NOPT := 0
 l_complex_taylor.o: NOPT := 2
 Sg_sagan_wiggler.o: NOPT := 2
 
-ifneq ($(CCNAME),nagfor)
+ifneq ($(FCNAME),nagfor)
 Sg_sagan_wiggler.o: FFLAGS += -fdollar-ok
 endif
 
