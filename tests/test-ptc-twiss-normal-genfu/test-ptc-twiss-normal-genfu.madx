@@ -1,6 +1,6 @@
 mydrift: drift, l=1;
-qfk1 := 5.08623+5e-2;
-qdk1 := 5.08623-5e-2;
+qfk1 := 5.08623 + 0.05;
+qdk1 := 5.08623 - 0.05;
 qf: quadrupole, l=0.1, k1:= qfk1;
 qd: quadrupole, l=0.1, k1:=-qdk1;
 

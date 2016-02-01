@@ -1766,10 +1766,6 @@ tests/test-ptc-twiss-normal-genfu/normal.tfs -text
 tests/test-ptc-twiss-normal-genfu/ptc.nonlin.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-normal-genfu/ptc.summ.twiss.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-normal-genfu/ptc.twiss.ref -text svneol=unset#application/x-gzip
-tests/test-ptc-twiss-normal-genfu/ptc_map_table.tfs.cfg -text
-tests/test-ptc-twiss-normal-genfu/ptc_map_table.tfs.ref -text svneol=unset#application/x-gzip
-tests/test-ptc-twiss-normal-genfu/ptc_normal_results.tfs.cfg -text
-tests/test-ptc-twiss-normal-genfu/ptc_normal_results.tfs.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-normal-genfu/test-ptc-twiss-normal-genfu.cfg -text
 tests/test-ptc-twiss-normal-genfu/test-ptc-twiss-normal-genfu.madx -text
 tests/test-ptc-twiss-old1/README -text
