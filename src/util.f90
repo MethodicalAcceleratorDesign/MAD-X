@@ -38,7 +38,7 @@ module phys_constfi
 end module phys_constfi
 
 module matrices
-  ! useful matrices: Identity EYE(6,6) and Symplectic JMAT(6.6)
+  ! useful matrices: Identity EYE(6,6) and Symplectic JMAT(6.6) and SMAT(2,2)
   implicit none
   double precision, parameter :: EYE(6,6)=reshape((/1d0,0d0,0d0,0d0,0d0,0d0,&
                                                     0d0,1d0,0d0,0d0,0d0,0d0,&
@@ -53,7 +53,12 @@ module matrices
                                                      0d0,0d0,0d0,0d0,0d0,1d0, &
                                                      0d0,0d0,0d0,0d0,-1d0,0d0 /), shape(JMAT))
   double precision, parameter :: JMATINV(6,6) = -JMAT
-  double precision, parameter :: JMATT(6,6) = -JMAT
+  double precision, parameter :: JMATT(6,6)   = -JMAT
+  double precision, parameter :: SMAT(2,2)=reshape((/0d0,1d0, &
+                                                    -1d0,0d0 /), shape(SMAT))
+  double precision, parameter :: SMATINV(2,2) = -SMAT
+  double precision, parameter :: SMATT(2,2)   = -SMAT
+
 end module matrices
 
 module code_constfi
@@ -332,6 +337,7 @@ module twisscfi
   double precision :: wgt=0.d0, suml=0.d0, circ=0.d0, eta=0.d0, alfa=0.d0, gamtr=0.d0, currpos=0.d0
   double precision :: wx=0.d0, phix=0.d0, dmux=0.d0, xix=0.d0, wy=0.d0, phiy=0.d0, dmuy=0.d0, xiy=0.d0
   double precision :: synch_1=0.d0, synch_2=0.d0, synch_3=0.d0, synch_4=0.d0, synch_5=0.d0
+  double precision :: gammacp=1.d0
 end module twisscfi
 
 module twissotmfi
@@ -592,7 +598,6 @@ module plotfi
   character(len=mtitl), save  :: toptitle=' '
 end module plotfi
 
-
 module plot_bfi
   implicit none
   public
@@ -602,7 +607,6 @@ module plot_bfi
   !--- ptc_flag set in routines pesopt, used in routine pefill
   logical, save :: fpmach=.false., dpp_flag=.false., ptc_flag=.false.
 end module plot_bfi
-
 
 module resindexfi
   implicit none
