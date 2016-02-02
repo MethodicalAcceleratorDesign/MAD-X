@@ -56,8 +56,8 @@ CONTAINS
     implicit none
     real(kind(1d0)) get_value
    
-    !piotr_freq=.true. ! flag introduced in PTC cavity tracking to have correct phasing with time=false
-
+    piotr_freq=.true. ! flag introduced in PTC cavity tracking to have correct phasing with time=false
+  
     print77=.false.
     read77 =.false.
     lingyun_yang=get_value('ptc_create_universe ','ntpsa ').ne.0
