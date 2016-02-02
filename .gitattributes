@@ -1775,6 +1775,7 @@ tests/test-ptc-twiss-normal-genfu/ptc.summ.twiss.ref -text svneol=unset#applicat
 tests/test-ptc-twiss-normal-genfu/ptc.twiss.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-normal-genfu/test-ptc-twiss-normal-genfu.cfg -text
 tests/test-ptc-twiss-normal-genfu/test-ptc-twiss-normal-genfu.madx -text
+tests/test-ptc-twiss-normal-genfu/test-ptc-twiss-normal-genfu.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-old1/README -text
 tests/test-ptc-twiss-old1/fort.18.cfg -text
 tests/test-ptc-twiss-old1/fort.18.ref -text
