@@ -1,22 +1,22 @@
 @ NAME             %14s "NORMAL_RESULTS"
 @ TYPE             %10s "NORMAL_RES"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.02.07 Linux 64"
-@ DATE             %08s "07/12/15"
-@ TIME             %08s "15.51.02"
+@ ORIGIN           %16s "5.02.08 Linux 64"
+@ DATE             %08s "01/02/16"
+@ TIME             %08s "19.08.57"
 * NAME                   ORDER1     ORDER2     ORDER3     ORDER4              VALUE 
 $ %s                         %d         %d         %d         %d                %le 
- "GNFC"                       1          0          1          0                  0
- "GNFS"                       1          0          1          0                  0
+ "GNFC"                       1          0          1          0                 -0
+ "GNFS"                       1          0          1          0                 -0
  "GNFA"                       1          0          1          0                  0
- "GNFC"                       1          0          0          1                  0
- "GNFS"                       1          0          0          1                  0
+ "GNFC"                       1          0          0          1                 -0
+ "GNFS"                       1          0          0          1                 -0
  "GNFA"                       1          0          0          1                  0
  "GNFU"                      -2          0          0          0                  2
- "GNFC"                       2          0          0          0                  0
- "GNFS"                       2          0          0          0                  0
+ "GNFC"                       2          0          0          0                 -0
+ "GNFS"                       2          0          0          0                 -0
  "GNFA"                       2          0          0          0                  0
- "GNFC"                       0          0          2          0                  0
- "GNFS"                       0          0          2          0                  0
+ "GNFC"                       0          0          2          0                 -0
+ "GNFS"                       0          0          2          0                 -0
  "GNFA"                       0          0          2          0                  0
  "GNFU"                       2          0          0          0                  2
