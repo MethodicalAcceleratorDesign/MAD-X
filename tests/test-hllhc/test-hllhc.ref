@@ -3,7 +3,7 @@
   +     MAD-X 5.02.08  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2015.11.20               +
-  + Execution date: 2016.02.03 14:59:00      +
+  + Execution date: 2016.02.04 10:26:42      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2012
 
@@ -607,8 +607,8 @@ makethin: style chosen : teapot
 makethin: slicing sequence : lhcb1
 makethin: style chosen : teapot
 makethin: slicing sequence : lhcb2
-rm: impossible de supprimer « temp/sliceho.res »: Aucun fichier ou dossier de ce type
-rm: impossible de supprimer « temp/sliceho.input »: Aucun fichier ou dossier de ce type
+rm: cannot remove `temp/sliceho.res': No such file or directory
+rm: cannot remove `temp/sliceho.input': No such file or directory
 hocharge_ir1 =                0.2 ;
 long_ir1_1 =            0.01995 ;
 long_ir1_2 =             0.0525 ;
@@ -5755,19 +5755,20 @@ orbit:   3.367223E-06 -1.485215E-07 -3.333576E-06 -4.068129E-08  4.905946E-06  4
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
-!System,"gzip last_twiss.20";
+system,"gzip last_twiss.20";
 
+gzip: last_twiss.20.gz already exists; do you wish to overwrite (y or n)? 	not overwritten
 
 
 ! cleaning files
 
-!removefile file="db5" ;
+removefile file="db5" ;
 
-!removefile file="slhc" ;
+removefile file="slhc" ;
 
-!removefile file="wise" ;
+removefile file="wise" ;
 
-!system, "rm -rf temp" ;
+system, "rm -rf temp" ;
 
 
 
