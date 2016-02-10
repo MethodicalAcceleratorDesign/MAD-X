@@ -1155,8 +1155,7 @@ static int pro_correct2_getorbit(struct in_cmd* cmd) {
   da2 = twiss_table_beam2->d_cols;
 
   nl = cmd->clone->par_names;
- 
-  // mattias: m is (*correct_orbit12).mon_table  = table of monitors (?)
+  
   m = correct_orbit12->mon_table;
   
   strcpy(strx, "x");
@@ -1184,7 +1183,6 @@ static int pro_correct2_getorbit(struct in_cmd* cmd) {
     if (m->id_ttb[0] > 0) {
       m->val.before[0] = m->p_node->other_bv * da1[9] [m->id_ttb[0]];
       m->val.before[1] = m->p_node->other_bv * da1[11][m->id_ttb[0]];
-      // mattias: why is this done twice? (except the conversion to millimeters)
       m->val.before[0] = m->p_node->other_bv * da1[9] [m->id_ttb[0]] * 1000.;
       m->val.before[1] = m->p_node->other_bv * da1[11][m->id_ttb[0]] * 1000.;
     } else if (m->id_ttb[1] > 0) {
@@ -2289,13 +2287,10 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
   double **da2 = NULL;
   double xlimit;
   char name[NAME_L];
-  char my_name[NAME_L];
   char l1name[NAME_L];
   char l2name[NAME_L];
   char l3name[NAME_L];
   char l4name[NAME_L];
-  char l5name[NAME_L];
-  char l6name[NAME_L];
   double rx, ry, dpsi;
   
   char *nam_col;
@@ -2313,7 +2308,7 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
 
   int yok;
 
-  int jjx, jjy, jj, abc, abcx, found_target;
+  int jjx, jjy, jj;
 
   int debug = get_option("debug");
 
@@ -2330,7 +2325,6 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
   m = correct_orbit->mon_table;
 
   if ((x_col = command_par_string("x_col", cmd->clone)) != NULL ) {
-    // mattias: if the x-column is named x_col instead of x ?? 
     printf("X orbit in column: %s\n", x_col);
     strcpy(strx, x_col);
   } else {
@@ -2352,8 +2346,6 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
     strcpy(strn, "name");
   }
 
-  // mattias: check if x,y orbits exist in twiss table ?
-  // ttb refers to orbin_table, i.e. different than target table
   if ((posx = name_list_pos(strx, ttb->columns)) < 0) 
     fatal_error("orbit x not found in input table", ", MAD-X terminates ");
   
@@ -2368,12 +2360,8 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
       warning("orbit py not found in input table", ", MAD-X continues ");
     
     printf("====c1===>  %d %d %d %d \n", posx, posy, pospx, pospy);
-    // mattias: confirmed, here the column numbers from "my_model" (i.e. a twiss table)
-    // are printed
   }
 
-  // if target is specified as a parameter
-  // this code block finds the x,y columns in the target table
   if (command_par_string("target", cmd->clone) != NULL ) {
     if ((tosx = name_list_pos("x", tar->columns)) < 0) 
       fatal_error("target orbit x not found in table", ", MAD-X terminates ");
@@ -2402,13 +2390,11 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
   
   jj = 0;
 
-  abcx = 0;
-
   while (m) { // loop over the monitors
-    strcpy(l1name, m->p_node->name);    // copy name of element in mlist
-    stolower(l1name);                   // put name to lower case
-    strcpy(l2name, strip(l1name));      // remove whitespace, copy name to l2name
-    supp_tb(l2name);                    // suppress trailing blanks
+    strcpy(l1name, m->p_node->name);
+    stolower(l1name);
+    strcpy(l2name, strip(l1name));
+    supp_tb(l2name);
 
     if (debug)
       printf("monitor name: %s\n", l2name);
@@ -2424,44 +2410,16 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
       stolower(l3name);
       strcpy(l4name, strip(l3name));
       supp_tb(l4name);
-      if (strlen(l4name) == strlen(l2name)) { // if the two names are of equal length
-      	if (strncmp(l4name, l2name, strlen(l2name)) == 0) { // if strings are equal
-      	  jjx = j - 1;  // one less than j, so probably row number (which starts at 0 ...)
-      	  jjy = jj - 1; // counter for monitors
-      	  yok = 1;      // flag which says that it has been found (?)
-      	  if (debug)
-      	    printf("monitor names found: %s %s %d\n", l2name, l4name, yok);
-      	}
-      }
-    }
-    
-    /* mattias */
-    // adding entire code block-------------------------------------------------------------------------------------
-    found_target = 0;
-  
-    // if abcx is equal to target table length, start from 0 instead
-    if (abcx == (tar->curr) - 1) {
-      abcx = 0;
-    }
-
-    for (abc = abcx+1; abc < (tar->curr)+1; abc++) {                 // loop over target table
-      string_from_table_row(tar->name, "name", &abc, my_name);    // extract name of bpm from target table
-      strcpy(l5name, my_name);                                    // copy my_name to l5name
-      stolower(l5name);                                           // set l5name to lowercase
-      strcpy(l6name, strip(l5name));                              // copy a stripped versio nof l5name to l6name
-      supp_tb(l6name);                                            // suppress trailing blanks
-      
-      if (strlen(l6name) == strlen(l2name)) { // check that the two names are of equal length
-        if (strncmp(l6name, l2name, strlen(l2name)) == 0) { // the two names are equal
-          abcx = abc-1;
-          found_target = 1;
+      if (strlen(l4name) == strlen(l2name)) {
+        if (strncmp(l4name, l2name, strlen(l2name)) == 0) {
+          jjx = j - 1;
+          jjy = jj - 1;
+          yok = 1;
           if (debug)
-            printf("monitor found in target table: %s, at row: %d.\n", l6name, abc);
-          break;
+            printf("monitor names found: %s %s %d\n", l2name, l4name, yok);
         }
       }
     }
-    // end of mattias edit -----------------------------------------------------------------------------------------
 
     if (debug)
       printf("jjx, jjy, yok : %d %d %d\n", jjx, jjy, yok);
@@ -2476,19 +2434,12 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
           printf("y ==> %e %e\n",                       da1[posy][jjx], da2[tosy][jjy]);
         }
 
-        // mattias ----------------------------------------------------------
-        if (found_target == 0) {
-      	  m->val.before[0] = da1[posx][jjx]  * 1000. * correct_orbit->units;
-      	  m->val.before[1] = da1[posy][jjx]  * 1000. * correct_orbit->units;
-        } else {
-      	  m->val.before[0] = (da1[posx][jjx] - da2[tosx][abcx]) * 1000. * correct_orbit->units;
-      	  m->val.before[1] = (da1[posy][jjx] - da2[tosy][abcx]) * 1000. * correct_orbit->units;
-        }
-        //--------------------------------------------------------------------
-	
+        m->val.before[0] = (da1[posx][jjx] - da2[tosx][jjy]) * 1000. * correct_orbit->units;
+        m->val.before[1] = (da1[posy][jjx] - da2[tosy][jjy]) * 1000. * correct_orbit->units;
+  
         if (debug) 
           printf("bxy ==> %s %d %e %e\n", m->p_node->name, jjx, m->val.before[0], m->val.before[1]);
-	
+  
       } else { // no target was given
 
         if (debug) {
@@ -2769,11 +2720,6 @@ pro_correct_response_ring(int ip, int nc, int nm) {
   double respx, respy;
   double *dmat;
   
-  // mattias adding the following 2 char
-  char l1name[NAME_L];
-  char l2name[NAME_L];
-  // end of mattias edit
-  
   int debug = get_option("debug");
   
   ttb = model_table;
@@ -2802,31 +2748,9 @@ pro_correct_response_ring(int ip, int nc, int nm) {
       piy_c = da1[8][c->id_ttb];
       m = correct_orbit->mon_table;
       im = 0;
-      
-      // mattias adding the following debug statement
-      if (debug) {
-        strcpy(l1name, c->p_node->name);    // copy name of element in mlist
-        stolower(l1name);                   // put name to lower case
-        strcpy(l2name, strip(l1name));      // remove whitespace, copy name to l2nam
-        supp_tb(l2name);                    // suppress trailing blanks
-        printf("corrector name: %s\n", l2name);
-      }
-      // end of mattias edit
-      
       while (m) {
 	if (debug)
 	  printf("monitor flag: %d\n", m->enable);
-        
-        // mattias adding the following debug statement
-        if (debug) {
-          strcpy(l1name, m->p_node->name);    // copy name of element in mlist
-          stolower(l1name);                   // put name to lower case
-          strcpy(l2name, strip(l1name));      // remove whitespace, copy name to l2nam
-          supp_tb(l2name);                    // suppress trailing blanks
-          printf("monitor name: %s\n", l2name);
-        }
-        // end of mattias edit
-
 	if (m->enable == 1) {
 	  bx_m = da1[3][m->id_ttb];
 	  by_m = da1[6][m->id_ttb];
@@ -2836,10 +2760,6 @@ pro_correct_response_ring(int ip, int nc, int nm) {
 	  respy = 0.0;
 	  if (ip == 1) {
 	    respx = sqrt(bx_m * bx_c) / (2.0 * sin(pi * qx0)) * cos((fabs(pix_m - pix_c) * twopi) - qx0 * pi);
-            // mattias adding debug statement
-            if (debug)
-              printf("Response matrix element: %f\n", respx);
-            // end of mattias edit
 	    setup_(&respx, dmat, &im, &ic, &nm, &nc);
 	  } else if (ip == 2) {
 	    respy = sqrt(by_m * by_c) / (2.0 * sin(pi * qy0)) * cos((fabs(piy_m - piy_c) * twopi) - qy0 * pi);
@@ -3168,11 +3088,6 @@ static void pro_correct_write_results(double *monvec, double *resvec, double *co
     printf("Corrector:  Before:     After:    Difference:\n");
     printf("             (mrad)     (mrad)       (mrad)  \n");
   }
-  
-  //mattias
-  char *shortname;
-  size_t sz;
-  // mattias
 
   if (fcdata != NULL ) fprintf(fcdata, "\n! RESOUT = %d\n", resout);
 
@@ -3193,18 +3108,8 @@ static void pro_correct_write_results(double *monvec, double *resvec, double *co
 				  c[nc[i]].p_node->chkick);
       /*                          c[nc[i]].p_node->other_bv*0.001*corvec[nx[i]-1]); */
       if (fcdata != NULL ) {
-        // mattias editing two following rows
-	//fprintf(fcdata, "%s = %e;\n", c[nc[i]].p_node->name,
-	//	c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1]);
-
-        // this code is to extract the real name from a statement such as
-        // my.name:1  ... from which I want  my.name
-        sz = snprintf(NULL, 0, "%s",c[nc[i]].p_node->name);
-        shortname = (char *)malloc(sz + 1);
-        snprintf(shortname, sz-1, "%s", c[nc[i]].p_node->name);
-
-        fprintf(fcdata, "%s->hkick = %e; \t! %d\n", shortname,
-                c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1], resout);
+	fprintf(fcdata, "%s->hkick = %e; \t! %d\n", strip(c[nc[i]].p_node->name),
+		c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1], resout);
       }
     } else if (ip == 2) {
       c[nc[i]].p_node->cvkick += c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1];
@@ -3213,13 +3118,8 @@ static void pro_correct_write_results(double *monvec, double *resvec, double *co
 				  c[nc[i]].p_node->cvkick);
       /*                          c[nc[i]].p_node->other_bv*0.001*corvec[nx[i]-1]); */
       if (fcdata != NULL ) {
-        // mattias editing the two following rows
-        sz = snprintf(NULL, 0, "%s",c[nc[i]].p_node->name);
-        shortname = (char *)malloc(sz + 1);
-        snprintf(shortname, sz-1, "%s", c[nc[i]].p_node->name);
-	
-        fprintf(fcdata, "%s->vkick = %e; \t! %d\n", shortname,
-                c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1], resout);
+	fprintf(fcdata, "%s->vkick = %e; \t! %d\n", strip(c[nc[i]].p_node->name),	
+		c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1], resout);
       }
     }
   } /* end of loop over correctors */
@@ -3242,9 +3142,8 @@ static int pro_correct_getactive(int ip, int *nm, int *nx, int *nc,
   imona = 0;
   while (m) {
     if (debug) {
-      // mattias: this is in the output ...
-      printf("from list: %d %s %s\n", m->id_ttb, m->p_node->name, m->p_node->base_name);
-      printf("orbit readings: %d %f %f\n", ip, m->val.before[0], m->val.before[1]);
+      printf("from list: %d %d %s %s ", m->enable, m->id_ttb, m->p_node->name, m->p_node->base_name);
+      printf("\t\t orbit readings: %d %f %f\n", ip, m->val.before[0], m->val.before[1]);
     }
     if (m->enable == 1) {
       monvec[imon] = m->val.before[ip - 1];
