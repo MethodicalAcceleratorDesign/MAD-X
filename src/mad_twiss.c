@@ -2,6 +2,33 @@
 
 // private functions
 
+static double
+mult_par(const char* par, struct element* el)
+  /* returns multipole parameter for par = "k0l" or "k0sl" etc. */
+{
+  double val = zero;
+  char tmp[12] ,*p;
+  strcpy(tmp, par);
+  if (*tmp == 'k' && (p = strchr(tmp, 'l')) != NULL)
+  {
+    *p = '\0';  /* suppress trailing l */
+    int skew = 0;
+    if ((p = strchr(tmp, 's')) != NULL)
+    {
+      skew = 1; *p = '\0';
+    }
+    int k = 0;
+    sscanf(&tmp[1], "%d", &k);
+    double vect[FIELD_MAX];
+    int l;
+    if (skew) l = element_vector(el, "ksl", vect);
+    else      l = element_vector(el, "knl", vect);
+    if (k < l) val = vect[k];
+  }
+  return val;
+}
+
+
 static void
 fill_beta0(struct command* beta0, struct node* node)
 {
@@ -450,7 +477,9 @@ pro_embedded_twiss(struct command* current_global_twiss)
 
     adjust_beam();
     probe_beam = clone_command(current_beam);
-    tmrefe_(oneturnmat); /* one-turn linear transfer map */
+
+    // 2015-Sep-25  17:59:16  ghislain: following suppressed as redundant and misplaced
+    //tmrefe_(oneturnmat); /* one-turn linear transfer map */
 
     summ_table = make_table("summ", "summ", summ_table_cols, summ_table_types, twiss_deltas->curr+1);
     add_to_table_list(summ_table, table_register);
@@ -935,6 +964,7 @@ pro_twiss(void)
 
   adjust_beam();
   probe_beam = clone_command(current_beam);
+
   tmrefe_(oneturnmat); /* one-turn linear transfer map */
 
   summ_table = make_table("summ", "summ", summ_table_cols, summ_table_types, twiss_deltas->curr+1);

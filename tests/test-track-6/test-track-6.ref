@@ -107,8 +107,6 @@ one pass is on
 
   run,   turns= 10;
 
-
-*****  end of trrun  *****
 endtrack;
 
 exit TRACK module

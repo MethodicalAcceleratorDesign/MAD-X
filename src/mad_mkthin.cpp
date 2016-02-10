@@ -1371,7 +1371,7 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
   {
     slice_style = pl->parameters[ipos_style]->string ;
     cout << "makethin: style chosen : " << slice_style << '\n';
-  } else slice_style = "teapot";
+  } else slice_style = "teapot"; // Should be "hybrid" for backward compatibility
 
   if(debug_fl() && kill_fringe_fl)   cout << "kill_fringe_fl="   << kill_fringe_fl   << " is on. Flags kill_ent_fringe kill_exi_fringe will be set to true for thick bend body slices" << '\n';
   if(debug_fl() && dipedge_h1_h2_fl) cout << "dipedge_h1_h2_fl=" << dipedge_h1_h2_fl << " is on. Higher order h1, h2 parameters will be kept. Tracking may become non-simplectic" << '\n';

@@ -1,5 +1,32 @@
 #include "madx.h"
 
+static void
+print_rfc(void)
+  /* prints the rf cavities present */
+{
+  double freq0, harmon, freq;
+  int i, n = current_sequ->cavities->curr;
+  struct element* el;
+  if (n == 0)  return;
+  freq0 = command_par_value("freq0", probe_beam);
+  printf("\n RF system: \n");
+  printf(v_format(" %S %NFs %NFs %NFs %NFs %NFs\n"),
+         "Cavity","length[m]","voltage[MV]","lag","freq[MHz]","harmon");
+  for (i = 0; i < n; i++)
+  {
+    el = current_sequ->cavities->elem[i];
+    if ((harmon = el_par_value("harmon", el)) > zero)
+    {
+      freq = freq0 * harmon;
+      printf(v_format(" %S %F %F %F %F %F\n"),
+             el->name, el->length, el_par_value("volt", el),
+             el_par_value("lag", el), freq, harmon);
+    }
+  }
+}
+
+// public interface
+
 void
 pro_emit(struct in_cmd* cmd)
   /* calls the emit module */
@@ -14,34 +41,44 @@ pro_emit(struct in_cmd* cmd)
   char tmp[100];
   int updatebeam;
 
+  fprintf(prt_file, "enter EMIT module\n");
+
   if (current_sequ == NULL || current_sequ->ex_start == NULL) {
     warning("sequence not active,", "EMIT ignored");
     return;
   }
-  fprintf(prt_file, "enter EMIT module\n");
+
   if (attach_beam(current_sequ) == 0)
     fatal_error("EMIT - sequence without beam:", current_sequ->name);
+
   e_deltap = command_par_value("deltap", emit);
   e_tol = command_par_value("tol", emit);
+
   keep = get_option("twiss_print");
   j = 0;
   set_option("twiss_print", &j);
+
   zero_double(orbit0, 6);
   zero_double(disp0, 6);
   zero_double(oneturnmat, 36);
+
   tt = mycalloc_atomic("pro_emit", 216, sizeof *tt);
+  
   adjust_beam();
   probe_beam = clone_command(current_beam);
+
   tmrefe_(oneturnmat); /* one-turn linear transfer map */
   twcpin_(oneturnmat,disp0,r0mat,&error); /* added for disp0 computation */
+
   adjust_probe(e_deltap); /* sets correct gamma, beta, etc. */
   print_global(e_deltap);
   adjust_rfc(); /* sets freq in rf-cavities from probe */
 
   // guess_flag is set by COGUESS command
-  //printf(v_format("guess: %I %F %F\n"), guess_flag, guess_orbit[0], guess_orbit[1]);
   if (guess_flag) copy_double(guess_orbit, orbit0, 6);
+
   getclor_(orbit0, oneturnmat, tt, &error); /* closed orbit */
+
   myfree(rout_name, tt);
 
   if (error == 0) {
@@ -70,6 +107,7 @@ pro_emit(struct in_cmd* cmd)
 
     print_rfc();
   }
+
   set_option("twiss_print", &keep);
 }
 

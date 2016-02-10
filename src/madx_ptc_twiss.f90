@@ -485,7 +485,7 @@ contains
 
     if( closed_orbit .and. (icav .gt. 0) .and. (my_ring%closed .eqv. .false.)) then
        call fort_warn('return from ptc_twiss: ',' Closed orbit requested on not closed layout.')
-       call seterrorflag(3,"ptc_twiss ","Closed orbit requested on not closed layout.");
+       call seterrorflag(3,"ptc_twiss ","Closed orbit requested on not closed layout.")
        return
     endif
 
@@ -493,8 +493,8 @@ contains
 
        if ( .not. c_%stable_da) then
           call fort_warn('ptc_twiss: ','DA got unstable even before finding closed orbit')
-          call seterrorflag(10,"ptc_twiss ","DA got unstable even before finding closed orbit");
-          stop
+          call seterrorflag(10,"ptc_twiss ","DA got unstable even before finding closed orbit")
+          call aafail('ptc_twiss: ','DA got unstable even before finding closed orbit. program stops')
           !          return
        endif
 
@@ -2031,7 +2031,7 @@ contains
       if (c_%nd == 3) then
          if (beta(3) <= zero) then
             call fort_warn("ptc_twiss","Fatal Error: 6D requested and betz is smaller then or equal to 0!")
-            stop
+            call aafail("ptc_twiss","Fatal Error: 6D requested and betz is smaller then or equal to 0! program stops")
          endif
 
          beta(3) = (one+alpha(3)**2)/beta(3)

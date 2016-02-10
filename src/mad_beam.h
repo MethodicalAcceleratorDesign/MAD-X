@@ -15,6 +15,8 @@ void    show_beam(char* tok);                           // used by mad_exec.c
 void    update_beam(struct command* comm);              // used by mad_option.c
 void    adjust_beam(void);                              // many uses
 int     attach_beam(struct sequence* sequ);             // many uses
+void    adjust_probe(double delta_p);                   // many uses
+void    adjust_rfc(void);                               // many uses
 
 #endif // MAD_BEAM_H
 

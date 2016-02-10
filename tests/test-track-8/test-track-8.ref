@@ -61,8 +61,6 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
  6D closed orbit found by subroutine trclor 
 iteration:   2 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-
-*****  end of trrun  *****
 exit TRACK module
 
 

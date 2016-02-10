@@ -194,7 +194,7 @@ plot, haxis=s, colour=100 ,title="large # of variables on vaxis", noversion,
 Plot - default table plotted: twiss
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
- ++++++ warning: PLOT: Array index larger than array limit; label is truncated
+++++++ warning: PLOT: Array index larger than array limit; label is truncated
  plot number =           12
 
 
@@ -223,7 +223,7 @@ plot, haxis=s, colour=100, title="overflow in number of variables to be plotted"
       vaxis4= re41,re42,re43,re44,re45,re46; 
 
 Plot - default table plotted: twiss
- Warning:  6 variables on vaxis4 would overflow max number(10). variables ignored.
+++++++ warning: PLOT:   6 variables on VAXIS4 would overflow max number (10). all variables ignored.                                            
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
  plot number =           14
@@ -460,15 +460,15 @@ plot, haxis=s, vaxis= s,betx,bety,alfx,alfy,mux,muy,dx,dpx,dy,dpy,
       colour=100, title="overflow number of variables to be plotted", noversion;	
 
 Plot - default table plotted: twiss
- Warning: 11 variables on vaxis, would overflow max number(10). all variables ignored.
- Warning: no vertical plot variables, plot skipped
+++++++ warning: PLOT:  11 variables on VAXIS would overflow max number (10). all variables ignored.                                             
+++++++ warning: PLOT:  no vertical plot variables, plot skipped
 
 
 stop;
 
 
-  Number of warnings: 1
-0 in C and 1 in Fortran
+  Number of warnings: 4
+0 in C and 4 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   + MAD-X 5.02.02 (64 bit) finished normally +

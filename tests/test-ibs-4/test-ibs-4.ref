@@ -7,6 +7,20 @@
   +++++++++++++++++++++++++++++++++++++++++++
 Option, -echo,-warn,-info;
 
+
+
+select,flag=ibs,clear;
+
+select,flag=ibs,column=S,TLI,TXI,TYI;
+
+
+
+beam,particle=proton,energy=450,npart=1.1e11,ex=7.82e-09,ey=7.82e-09,sigt=0.115,sige=4.68e-4,bunched;
+
+Use, sequence=lhcb1;
+
+twiss, sequence=lhcb1;
+
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -31,6 +45,10 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+Use, period=lhcb1;
+
+twiss;
+
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -55,8 +73,11 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+ibs,file="ibs-table.tfs";
+
  sige   4.680020346057555E-004
- Twiss was calculated at the exit of the elements. Twiss functions at the center  of the elements are calculated through linear interpolation
+ Twiss was calculated at the exit of the elements.
+ Twiss functions at the center of the elements are calculated through linear interpolation
  
  Global parameters for the machine: 
 
@@ -72,7 +93,9 @@ radiate = F:
      Ex            0.782000E-02 pi*mm*mrad     sigx            0.876942 mm
      Ey            0.782000E-02 pi*mm*mrad     sigy            0.895105 mm
      Et            0.100000E+07 pi*mm*mrad     sigt          115.000000 mm             sigE          0.468002 1/1000
+
  sequence name: lhcb1
+
 acnca.d5l4.b1   1.10000       0.00000       200.394      0.500000       0.00000    
 acnca.c5l4.b1   1.10000       0.00000       200.394      0.500000       0.00000    
 acnca.b5l4.b1   1.10000       0.00000       200.394      0.500000       0.00000    
@@ -105,8 +128,7 @@ acsca.d5r4.b1   1.09500       0.00000       400.789       0.00000       0.00000
  Ring average values (m)
  
      betx   =   9.83411E+01    bety   =   1.02457E+02    Dx  =  1.15329E+00    Dy  =  0.00000E+00
-     alfx   =   2.44286E-06    alfy   =   1.36010E-05    Dpx = -4.75563E-08
-     Dpy =  0.00000E+00
+     alfx   =   2.44286E-06    alfy   =   1.36010E-05    Dpx = -4.75563E-08    Dpy =  0.00000E+00
      1/betx =   1.44932E-02    1/bety =   1.34416E-02
  
      (Weighted) average rates (1/sec):
@@ -119,6 +141,10 @@ acsca.d5r4.b1   1.09500       0.00000       400.789       0.00000       0.00000
      Horizontal  =    1.970808E+05
      Vertical    =   -2.707621E+07
  
+
+
+stop;
+
 
   Number of warnings: 0
 

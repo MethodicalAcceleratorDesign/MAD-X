@@ -7,26 +7,21 @@
 
 subroutine enprem
   use ibsdbfi
+  use math_constfi, only : ten6p, ten3p
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Print emittances and sigmas.                                       *
   !----------------------------------------------------------------------*
-  !---- Double precision version.
-  !----------------------------------------------------------------------*
-  double precision ten3p,ten6p
-  parameter(ten6p=1d6,ten3p=1d3)
 
-  !---- Emittances and sigmas.
-  write (*, 910) ten6p * ex, ten3p * sigx,                          &
-       ten6p * ey, ten3p * sigy,                                         &
-       ten6p * et, ten3p * sigt, ten3p * sige
-
-910 format(' '/' Emittances:'/' '/                                    &
-       t6,'Ex',t16,e16.6,' pi*mm*mrad',t48,'sigx',t58,f14.6,' mm'/       &
-       t6,'Ey',t16,e16.6,' pi*mm*mrad',t48,'sigy',t58,f14.6,' mm'/       &
-       t6,'Et',t16,e16.6,' pi*mm*mrad',t48,'sigt',t58,f14.6,' mm',       &
-       t88,'sigE',t96,f14.6,' 1/1000')
+  write (*,'(/a/)') " Emittances:"
+  write (*,'(t6,a,t16,e16.6,a,t48,a,t58,f14.6,a)') & 
+       "Ex",ten6p*ex," pi*mm*mrad","sigx",ten3p*sigx," mm"
+  write (*,'(t6,a,t16,e16.6,a,t48,a,t58,f14.6,a)') & 
+       "Ey",ten6p*ey," pi*mm*mrad","sigy",ten3p*sigy," mm"
+  write (*,'(t6,a,t16,e16.6,a,t48,a,t58,f14.6,a,t88,a,t96,f14.6,a/)') &
+       "Et",ten6p*et," pi*mm*mrad","sigt",ten3p*sigt, " mm", &
+       "sigE",ten3p*sige," 1/1000"
 
 end subroutine enprem
 
@@ -34,85 +29,79 @@ end subroutine enprem
 
 subroutine enprgl
   use ibsdbfi
+  use math_constfi, only : zero, one
+  use code_constfi
   implicit none
-
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Print global data for machine.                                     *
   !----------------------------------------------------------------------*
-  !---- Double precision version.
-  !----------------------------------------------------------------------*
-  logical frad
-  integer n1
-  double precision eta,gamtr,t0,get_value,zero,one
-  parameter(zero=0d0,one=1d0)
+  logical :: dorad
+  double precision :: eta, gamtr, t0
 
-  n1 = get_value('probe ','radiate ')
-  frad = n1.ne.0
+  double precision, external :: get_value
+  
+  dorad = get_value('probe ','radiate ') .ne. 0
 
   !---- Global parameters.
+  gamtr = zero
+  if (alfa .ne. zero) gamtr = sign(one,alfa) * sqrt( one / abs(alfa))
 
-  if (alfa .gt. zero) then
-     gamtr = sqrt(one / alfa)
-  else if (alfa .eq. zero) then
-     gamtr = zero
-  else
-     gamtr = - sqrt(-one / alfa)
-  endif
   t0 = one / freq0
   eta = alfa - one / gamma**2
 
-  write (*, 910) frad, circ, freq0, t0, alfa,                       &
-       eta, gamtr, currnt, bunch, parnum, en0, gamma, beta
-   
-910 format(' '/' Global parameters for the machine: ',//,             &
-       'radiate = ',l1,':'/' '/                                          &
-       t6,'C',t16,f14.6,' m',t46,'f0',t56,f14.6,' MHz',                  &
-       t86,'T0',t96,f14.6,' microseconds'/                               &
-       t6,'alfa',t16,e18.6,t46,'eta',t56,e18.6,                          &
-       t86,'gamma(tr)',t96,f14.6/                                        &
-       t6,'Bcurrent',t16,f14.6,' A/bunch',t46,'Kbunch',t56,I6,           &
-       t86,'Npart',t96,e18.6,' per bunch'/                               &
-       t6,'E',t16,f14.6,' GeV',t46,'gamma',t56,f14.6,                    &
-       t86,'beta',t96,f14.6)
+  write (*,'(/,a,/)') " Global parameters for the machine: "
+
+  write (*,'(a,l1,a/)') "radiate = ",dorad,":"
+
+  write (*,'(t6,a,t16,f14.6,a,t46,a,t56,f14.6,a,t86,a,t96,f14.6,a)') &
+       "C",circ," m",  "f0",freq0," MHz",   "T0",t0," microseconds"
+  write (*,'(t6,a,t16,e18.6,t46,a,t56,e18.6,t86,a,t96,f14.6)') &
+       "alfa",alfa, "eta",eta, "gamma(tr)",gamtr
+  write (*,'(t6,a,t16,f14.6,a,t46,a,t56,i6,t86,a,t96,e18.6,a)') &
+       "Bcurrent",currnt," A/bunch",   "Kbunch",bunch,    "Npart",parnum," per bunch"
+  write (*,'(t6,a,t16,f14.6,a,t46,a,t56,f14.6,t86,a,t96,f14.6)') & 
+       "E",en0," GeV",   "gamma",gamma,    "beta",beta
 
 end subroutine enprgl
-! *************************************************************
-subroutine cavprt()
 
+subroutine cavprt()
   use name_lenfi
+  use code_constfi
   implicit none
 
-  integer i,lg,code,get_string,restart_sequ,advance_node
-  double precision get_value,node_value,el,rfv,rff,rfl,deltap
-  character(name_len) sequ_name,el_name
+  integer :: i, lg
+  double precision :: el, rfv, rff, rfl, deltap  
+  character(len=name_len) :: sequ_name, el_name
+
+  integer, external :: get_string, restart_sequ, advance_node
+  double precision, external ::  get_value, node_value
 
   lg = get_string('sequence ', 'name ', sequ_name)
-  if (lg .gt. 0) print *, 'sequence name: ', sequ_name(:lg)
+  if (lg .gt. 0) write(*,'("sequence name: ",a/)') sequ_name(:lg)
   i = restart_sequ()
-10 continue
-  code = node_value('mad8_type ')
-  if(code.eq.39) code=15
-  if(code.eq.38) code=24
-  if (code .eq. 10) then      ! cavity
-     lg = get_string('element ', 'name ', el_name)
-     el = node_value('l ')
-     rfv = node_value('volt ')
-     rff = node_value('freq ')
-     rfl = node_value('lag ')
-     deltap = get_value('probe ','deltap ')
-     print '(a,5g14.6)', el_name(:lg), el, rfv, rff, rfl, deltap
-  endif
-  if (advance_node().ne.0)  goto 10
+
+  do
+     if (node_value('mad8_type ') .eq. code_rfcavity) then
+        lg = get_string('element ', 'name ', el_name)
+        el = node_value('l ')
+        rfv = node_value('volt ')
+        rff = node_value('freq ')
+        rfl = node_value('lag ')
+        deltap = get_value('probe ','deltap ')
+        print '(a,5g14.6)', el_name(:lg), el, rfv, rff, rfl, deltap
+     endif
+     if  (advance_node().eq.0) exit
+  end do
+
 end subroutine cavprt
 
 ! *********************************************************************
-subroutine twclog(bxbar, bybar,dxbar,dybar, const)
+subroutine twclog(bxbar, bybar, dxbar, dybar, const)
   use ibsdbfi
-  use physconsfi
+  use math_constfi, only : zero, two, four, eight, pi
+  use phys_constfi, only : hbar, clight, qelect
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Calculation of Coulomb logarithm (and print)                       *
@@ -123,19 +112,19 @@ subroutine twclog(bxbar, bybar,dxbar,dybar, const)
   ! Output:                                                              *
   !   CONST     (real)    Constant in eq. (IV.9.1), ZAP user's manual.   *
   !----------------------------------------------------------------------*
-  !---- Double precision version.
-  !----------------------------------------------------------------------*
-  logical fbch
-  integer n
-  double precision get_value,bgam,bxbar,bybar,dxbar,dybar,cbunch,const,coulog,  &
-       debyel,densty,etrans,pnbtot,qion,rmax,rmin,rmincl,rminqm,sigtcm,  &
-       sigxcm,sigycm,tempev,vol,pi,get_variable,zero,two,four,eight,ot2, &
-       ft8,ot5,ttm3,fac1,fac2
-  parameter(zero=0d0,two=2d0,four=4d0,eight=8d0,ot2=1d2,ft8=5d8,    &
-       ot5=1d5,ttm3=2d-3,fac1=743.4d0,fac2=1.44d-7)
+  double precision :: bxbar, bybar, dxbar, dybar, const
 
-  pi=get_variable('pi ')
-  
+  logical :: fbch
+  integer :: n
+  double precision :: bgam, cbunch, coulog 
+  double precision :: debyel, densty, etrans, pnbtot, qion, tempev, vol
+  double precision :: rmax, rmin, rmincl, rminqm, sigtcm, sigxcm, sigycm
+
+  double precision, external :: get_value
+
+  double precision, parameter :: ot2=1d2, ft8=5d8, ot5=1d5, ttm3=2d-3
+  double precision, parameter :: fac1=743.4d0, fac2=1.44d-7
+
   ! **************************** DB *********************
   n = get_value('probe ', 'bunched ')
   fbch = n.ne.0
@@ -174,57 +163,48 @@ subroutine twclog(bxbar, bybar,dxbar,dybar, const)
   bgam = betas * gammas
   qion   = abs(charge)
   if (fbch) then
-     const = parnum * coulog * arad**2 * clight / (eight * pi * betas&
-          **3 * gammas**4 * ex * ey * sige * sigt)
+     const = parnum * coulog * arad**2 * clight / & 
+          (eight * pi * betas **3 * gammas**4 * ex * ey * sige * sigt)
      cbunch = qion * parnum * qelect * betas * clight / circ
   else
-     const = currnt * coulog * arad**2 /                             &
+     const = currnt * coulog * arad**2 / &
           (four * sqrt(pi) * qion * qelect * bgam**4 * ex * ey * sige)
   endif
-  write (*, 910) const
 
-  write (*, 920) en0, betas, gammas, coulog
+  write (*,'(/t6,a,1p,e14.6)')       "CONST               = ",const
+
+  write (*,'(/5x,a,f14.6,a)')        "ENERGY              = ",en0," GeV"
+  write (*,'( 5x,a,f14.6)')          "BETA                = ",betas
+  write (*,'( 5x,a,f14.3)')          "GAMMA               = ",gammas
+  write (*,'( 5x,a,f14.3)')          "COULOMB LOG         = ",coulog
 
   !---- Print warning here if Coulomb logarithm gave bad results.
   !     Usually this error is due to a starting guess far from
   !     the equilibrium value.
-  if (coulog .lt. zero) then
-     call aawarn('TWCLOG', 'Coulomb logarithm gives invalid'         &
-          // ' result --- check input parameters.')
-  endif
+  if (coulog .lt. zero) &
+     call fort_warn('TWCLOG: ', 'Coulomb logarithm gives invalid result --- check input parameters.')
 
-  write (*, 940) ex, ey
+  write (*,'(/5x,a,1p,e14.6,a)')     "X-emittance         = ",ex," m*rad"
+  write (*, '(5x,a,1p,e14.6,a/)')    "Y-emittance         = ",ey," m*rad"
 
   if (fbch) then
-     write (*, 950) sige, sigt, parnum, cbunch
+     write (*,'(5x,a,1p,e14.6)')    "Momentum spread     = ",sige
+     write (*,'(5x,a,0p,f14.6,a/)') "Bunch length        = ",sigt," m"
+     write (*,'(5x,a,1p,e14.6)')    "Particles per bunch = ",parnum
+     write (*,'(5x,a,1p,e14.6,a)')  "Bunch current       = ",cbunch," A"          
   else
-     write (*, 960) sige, currnt
+     write (*,'(5x,a,1p,e14.6/)')   "Momentum spread     = ",sige
+     write (*,'(5x,a,0p,f14.6,a)')  "Current             = ",currnt," A"
   endif
 
-910 format(' '/5x,'CONST               = ',1p,e14.6)
-920 format(' '/5x,'ENERGY              = ',f14.6,' GeV'/              &
-       5x,'BETA                = ',f14.6/                                &
-       5x,'GAMMA               = ',f14.3/                                &
-       5x,'COULOMB LOG         = ',f14.3)
-940 format(' '/5x,'X-emittance         = ',1p,e14.6,' m*rad'/         &
-       5x,'Y-emittance         = ',   e14.6,' m*rad')
-950 format(' '/5x,'Momentum spread     = ',1p,e14.6/                  &
-       5x,'Bunch length        = ',0p,f14.6,' m'/' '/                    &
-       5x,'Particles per bunch = ',1p,e14.6/                             &
-       5x,'Bunch current       = ',1p,e14.6,' A')
-960 format(' '/5x,'Momentum spread     = ',1p,e14.6/' '/              &
-       5x,'Current             = ',0p,f14.6,' A'/' ')
-
 end subroutine twclog
-! *********************************************************************
+
 subroutine ibs
-
   use ibsdbfi
-  use physconsfi
   use name_lenfi
+  use math_constfi, only : zero, one, two, half
+  use phys_constfi
   implicit none
-
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   INTRABEAM SCATTERING, IBS Command                                  *
@@ -234,55 +214,24 @@ subroutine ibs
   ! Attribute:                                                           *
   !   TABLE     (name)    Name of Twiss table.                           *
   !----------------------------------------------------------------------*
-  integer step,i,j,flag,testtype,range(2),n,get_option,double_from_table_row,    &
-       restart_sequ,advance_to_pos
-  double precision tol,alx,alxbar,alxwtd,aly,alybar,ax1,ax2,ay1,ay2,&
-       betax,betay,beteff,bx1,bx2,bxbar,bxinv,by1,by2,bybar,byinv,bywtd, &
-       const,dels,dpx,dpx1,dpx2,dpxbr,dpxwtd,dx,dx1,dx2,dxbar,dxwtd,     &
-       hscrpt,hscwtd,s1,s2,ss2,l1,l2,ll2,salxb,salyb,sbxb,sbxinv,sbyb,sbyinv,sdpxb,    &
-       sdxb,taul,taux,tauy,tavl,tavlc,tavx,tavxc,tavy,tavyc,tlbar,tlidc, &
-       tlwtd,txbar,txidc,txwtd,tybar,tyidc,tywtd,wnorm,sdum,get_value,   &
-       get_variable,zero,one,two,half,dy,dy1,dy2,dybar,dywtd,hscrpty,    &
-       hscwtdy,sdpyb,sdyb,dpy,dpy1,dpy2,dpybr,dpywtd,beteffy,alywtd
-  parameter(zero=0d0,one=1d0,two=2d0,half=0.5d0)
+
+  integer :: step, i, j, flag, testtype, range(2), n
+  double precision :: alx, alxbar, alxwtd, aly, alybar, alywtd
+  double precision :: betax, betay, beteff, beteffy, bxbar, bxinv, bybar, byinv, bywtd
+  double precision :: ax1, ax2, ay1, ay2, bx1, bx2, by1, by2
+  double precision :: dx, dx1, dx2, dxbar, dxwtd, dpx, dpx1, dpx2, dpxbr, dpxwtd
+  double precision :: dy, dy1, dy2, dybar, dywtd, dpy, dpy1, dpy2, dpybr, dpywtd
+  double precision :: taul, taux, tauy, tavl, tavlc, tavx, tavxc, tavy, tavyc
+  double precision :: tlbar, tlidc, tlwtd, txbar, txidc, txwtd, tybar, tyidc, tywtd
+  double precision :: salxb, salyb, sbxb, sbxinv, sbyb, sbyinv, sdpxb, sdxb, sdpyb, sdyb
+  double precision :: hscrpt, hscwtd, hscrpty, hscwtdy
+  double precision :: s1, s2, ss2, l1, l2, ll2, const, dels, wnorm, sdum, tol
+
+  integer, external :: get_option, double_from_table_row, restart_sequ, advance_to_pos
+  double precision, external :: get_value
   
-  !---- Universal physical constants.
-
-  !     Permeability of vacuum [V*s/A*m]:
-  amu0 = get_variable('amu0 ')
-  !     Permittivity of vaccum [A*S/V*m]:
-  eps0 = get_variable('eps0 ')
-  !     Reduced Plack's constant [GeV*s]:
-  hbar = get_variable('hbar ')
-
-  !---- Electromagnetic constants.
-  !     Elementary charge [A*s]:
-  qelect = get_variable('qelect ')
-
-  !---- Electron.
-  !     Rest mass [GeV]:
-  emass = get_variable('emass ')
-  !     Classical radius [m]:
-  erad = get_variable('erad ')
-  !     Reduced Compton wavelength [m]:
-  elamda = get_variable('elamda ')
-
-  !---- Proton.
-  !     Rest mass [GeV]:
-  pmass = get_variable('pmass ')
-  !     Classical radius [m]:
-  prad = get_variable('prad ')
-  !     Reduced Compton wavelength [m]:
-  plamda = get_variable('plamda ')
-
-  !---- Muon.
-  !     Rest mass [GeV]:
-  mumass = get_variable('mumass ')
-
   ! ************* Get the parameters for the common blocks *************
   ! *************         /machin/ and /beamdb/            *************
-
-
   charge   = get_value('probe ', 'charge ')
   gammas   = get_value('probe ', 'gamma ')
   gamma    = get_value('probe ', 'gamma ')
@@ -298,11 +247,10 @@ subroutine ibs
   currnt   = get_value('probe ', 'bcurrent ')
   betas    = get_value('probe ', 'beta ')
   beta     = get_value('probe ', 'beta ')
-  clight   = get_variable('clight ')
   arad     = get_value('probe ', 'arad ')
   alfa     = get_value('probe ', 'alfa ')
   freq0    = get_value('probe ', 'freq0 ')
-  bunch   = get_value('probe ', 'kbunch ')
+  bunch    = get_value('probe ', 'kbunch ')
   
   ! NOTE:
   !****************************************************************
@@ -312,81 +260,33 @@ subroutine ibs
   sige    = sige/beta/beta
   print *, 'sige ', sige
   
-  !  ****************** Test print ********
-  !     print *, 'Charge ', charge
-  !     print *, 'gammas ', gammas
-  !     print *, 'gamma ', gamma
-  !     print *, 'Energy ', en0
-  !     print *, 'Mass ', amass
-  !     print *, 'Ex ', ex
-  !     print *, 'Ey ', ey
-  !     print *, 'Et ', et
-  !     print *, 'sigt ', sigt
-  !     print *, 'sige ', sige
-  !     print *, 'parnum ', parnum
-  !     print *, 'circ ', circ
-  !     print *, 'currnt ', currnt
-  !     print *, 'betas ', betas
-  !     print *, 'beat ', beta
-  !     print *, 'clight ', clight
-  !     print *, 'arad ', arad
-  !     print *, 'alfa ', alfa
-  !     print *, 'freq0 ', freq0
-  !     print *, 'kbunch ', bunch
-  ! ***************************************
-
   !---- Initialize variables to accumulate weighted average lifetimes.
-  tavlc  = zero
-  tavxc  = zero
-  tavyc  = zero
-  dxwtd  = zero
-  dpxwtd = zero
-  dywtd  = zero
-  dpywtd = zero
-  bywtd  = zero
-  alxwtd = zero
-  alywtd = zero
-  hscwtd = zero
-  hscwtdy= zero
+  tavlc  = zero;  tavxc  = zero;  tavyc  = zero
+  sbxb   = zero;  salxb  = zero;  sdxb   = zero;  sdpxb  = zero  
+  sbyb   = zero;  salyb  = zero;  sdyb   = zero;  sdpyb  = zero
+  sbxinv = zero;  sbyinv = zero
+                  alxwtd = zero;  dxwtd  = zero;  dpxwtd = zero
+  bywtd  = zero;  alywtd = zero;  dywtd  = zero;  dpywtd = zero
+  hscwtd = zero;  hscwtdy= zero
   wnorm  = zero
-  sbxb   = zero
-  sbyb   = zero
-  salxb  = zero
-  salyb  = zero
-  sdxb   = zero
-  sdpxb  = zero
-  sdyb   = zero
-  sdpyb  = zero
-  sbxinv = zero
-  sbyinv = zero
 
   ! ****** Start new Twiss Table reading *****************
   !
   step = get_value('ibs ', 'steps ')
   tol = get_value('ibs ', 'tolerance ')
-  !     print *, 'steps: ', step, '  tolerance: ', tol
+
   call table_range('twiss ', '#s/#e ', range)
-  !     print *, 'Range for Table ', range
-  flag = double_from_table_row('twiss ', 's ', range(1), s1)
-  if (flag .ne. 0)  goto 102
-  flag = double_from_table_row('twiss ', 'l ', range(1), l1)
-  if (flag .ne. 0)  goto 102
-  flag = double_from_table_row('twiss ', 'betx ', range(1), bx1)
-  if (flag .ne. 0)  goto 102
-  flag = double_from_table_row('twiss ', 'bety ', range(1), by1)
-  if (flag .ne. 0)  goto 102
-  flag = double_from_table_row('twiss ', 'alfx ', range(1), ax1)
-  if (flag .ne. 0)  goto 102
-  flag = double_from_table_row('twiss ', 'alfy ', range(1), ay1)
-  if (flag .ne. 0)  goto 102
-  flag = double_from_table_row('twiss ', 'dx ', range(1), dx1)
-  if (flag .ne. 0)  goto 102
-  flag = double_from_table_row('twiss ', 'dpx ', range(1), dpx1)
-  if (flag .ne. 0)  goto 102
-  flag = double_from_table_row('twiss ', 'dy ', range(1), dy1)
-  if (flag .ne. 0)  goto 102
-  flag = double_from_table_row('twiss ', 'dpy ', range(1), dpy1)
-  if (flag .ne. 0)  goto 102
+  
+  flag = double_from_table_row('twiss ', 's ',    range(1), s1);  if (flag .ne. 0)  goto 102
+  flag = double_from_table_row('twiss ', 'l ',    range(1), l1);  if (flag .ne. 0)  goto 102
+  flag = double_from_table_row('twiss ', 'betx ', range(1), bx1); if (flag .ne. 0)  goto 102
+  flag = double_from_table_row('twiss ', 'bety ', range(1), by1); if (flag .ne. 0)  goto 102
+  flag = double_from_table_row('twiss ', 'alfx ', range(1), ax1); if (flag .ne. 0)  goto 102
+  flag = double_from_table_row('twiss ', 'alfy ', range(1), ay1); if (flag .ne. 0)  goto 102
+  flag = double_from_table_row('twiss ', 'dx ',   range(1), dx1); if (flag .ne. 0)  goto 102
+  flag = double_from_table_row('twiss ', 'dpx ',  range(1), dpx1);if (flag .ne. 0)  goto 102
+  flag = double_from_table_row('twiss ', 'dy ',   range(1), dy1); if (flag .ne. 0)  goto 102
+  flag = double_from_table_row('twiss ', 'dpy ',  range(1), dpy1);if (flag .ne. 0)  goto 102
   
   j = restart_sequ()
   do i=range(1)+1, range(2)     
@@ -397,27 +297,27 @@ subroutine ibs
      if (flag .gt. 0)  goto 102
      if (ll2 .gt. 0.0001) goto 103 
   enddo
+
   103 continue
   
   ! NOTE by F.A & F.Z
   ! ************************************************************************************
   ! Added 16.01.2012 to check if the twiss is taken at the center (testtype=2) or the 
   ! exit (testtype=1) of the elements.
-  ! I testtype=1 linear interpolation will be used to 
-  ! calculate the twiss at the center of the elements.
+  ! If testtype=1 linear interpolation is used to calculate the twiss at the center of 
+  ! the elements.
   !*************************************************************************************
   
   if ((ss2-s1) .eq. ll2) then
 	testtype = 1
-	print *, 'Twiss was calculated at the exit of the elements. Twiss functions at the center &
-		      & of the elements are calculated through linear interpolation'
+	print *, 'Twiss was calculated at the exit of the elements.' 
+        print *, 'Twiss functions at the center of the elements are calculated through linear interpolation'
   else if ((ss2-s1) .eq. (l1+ll2)/2) then
 	testtype = 2
 	print *, 'Twiss was calculated at the center of the elements. No interpolation is used'
   endif
 
   ! ************** Check if "ibs_table" required  ****************
-
   n = get_option('ibs_table ')
 
   ! ********** Start Do loop ***************
@@ -425,26 +325,16 @@ subroutine ibs
   j = restart_sequ()
   do i = range(1)+1, range(2)
      j = advance_to_pos('twiss ', i)
-     flag = double_from_table_row('twiss ', 's ', i, s2)
-     if (flag .ne. 0)  goto 102
-     flag = double_from_table_row('twiss ', 'l ', i, l2)
-     if (flag .ne. 0)  goto 102
-     flag = double_from_table_row('twiss ', 'betx ', i, bx2)
-     if (flag .ne. 0)  goto 102
-     flag = double_from_table_row('twiss ', 'bety ', i, by2)
-     if (flag .ne. 0)  goto 102
-     flag = double_from_table_row('twiss ', 'alfx ', i, ax2)
-     if (flag .ne. 0)  goto 102
-     flag = double_from_table_row('twiss ', 'alfy ', i, ay2)
-     if (flag .ne. 0)  goto 102
-     flag = double_from_table_row('twiss ', 'dx ', i, dx2)
-     if (flag .ne. 0)  goto 102
-     flag = double_from_table_row('twiss ', 'dpx ', i, dpx2)
-     if (flag .ne. 0)  goto 102
-     flag = double_from_table_row('twiss ', 'dy ', i, dy2)
-     if (flag .ne. 0)  goto 102
-     flag = double_from_table_row('twiss ', 'dpy ', i, dpy2)
-     if (flag .ne. 0)  goto 102
+     flag = double_from_table_row('twiss ', 's ',    i, s2);   if (flag .ne. 0)  goto 102
+     flag = double_from_table_row('twiss ', 'l ',    i, l2);   if (flag .ne. 0)  goto 102
+     flag = double_from_table_row('twiss ', 'betx ', i, bx2);  if (flag .ne. 0)  goto 102
+     flag = double_from_table_row('twiss ', 'bety ', i, by2);  if (flag .ne. 0)  goto 102
+     flag = double_from_table_row('twiss ', 'alfx ', i, ax2);  if (flag .ne. 0)  goto 102
+     flag = double_from_table_row('twiss ', 'alfy ', i, ay2);  if (flag .ne. 0)  goto 102
+     flag = double_from_table_row('twiss ', 'dx ',   i, dx2);  if (flag .ne. 0)  goto 102
+     flag = double_from_table_row('twiss ', 'dpx ',  i, dpx2); if (flag .ne. 0)  goto 102
+     flag = double_from_table_row('twiss ', 'dy ',   i, dy2);  if (flag .ne. 0)  goto 102
+     flag = double_from_table_row('twiss ', 'dpy ',  i, dpy2); if (flag .ne. 0)  goto 102
 
     
     !  NOTE by F.A & F.Z
@@ -488,8 +378,6 @@ subroutine ibs
 	sdpxb  = sdpxb + dpx * dels
 	sdyb   = sdyb + dy * dels
 	sdpyb  = sdpyb + dpy * dels
-
-
  
      !*---- Calculate weighted average in region of non-zero DX's.
      !     These values are used to calculate "average" ring lifetimes
@@ -512,8 +400,7 @@ subroutine ibs
      endif
 
      !---- TWSINT calculates the Bjorken/Mtingwa integral.
-     call twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,           &
-          txidc, tyidc, tlidc)
+     call twsint(betax, betay, alx, aly, dx, dpx, dy, dpy, txidc, tyidc, tlidc)
 
      !---- Accumulate contributions.
      tavlc = tavlc + tlidc * dels
@@ -553,12 +440,6 @@ subroutine ibs
      dpy1 = dpy2
 
   enddo
-  goto 101
-102 continue
-  call aawarn('IBS ', 'table value not found, rest skipped ')
-  stop
-101 continue
-
 
   !---- We have finished reading the lattice from MAD
   bxbar  = sbxb / s2
@@ -598,22 +479,26 @@ subroutine ibs
   ! ************************************************************
 
   !---- Integral for averaged quantities.
-  call twsint(bxbar,bybar,alxbar,alybar, dxbar,dpxbr,               &
-       dybar,dpybr,txbar,tybar,tlbar)
+  call twsint(bxbar,bybar,alxbar,alybar, dxbar,dpxbr, dybar,dpybr,txbar,tybar,tlbar)
 
   !---- Integral for effective quantities.
-  call twsint(beteff,beteffy,alxwtd,alywtd,dxwtd,dpxwtd,            &
-       dywtd,dpywtd,txwtd,tywtd,tlwtd)
+  call twsint(beteff,beteffy,alxwtd,alywtd,dxwtd,dpxwtd, dywtd,dpywtd,txwtd,tywtd,tlwtd)
 
   !---- Calculate the Coulomb logarithm.
   call twclog(bxbar, bybar, dxbar, dybar, const)
 
   !---- Output (weighted) average values.
-  write (*, 940) bxbar, bybar, dxbar, dybar, alxbar, alybar,        &
-       dpxbr, dpybr,                                                     &
-       bxinv, byinv
+  write (*,'(/a/)') " Ring average values (m) "
 
-  !---- Output averaged values.
+  write (*,'(5x,a,1pe13.5,4x,a,1pe13.5,4x,a,1pe12.5,4x,a,1pe12.5)') & 
+       "betx   = ",bxbar,  "bety   = ",bybar, "Dx  = ",dxbar, "Dy  = ",dybar
+
+  write (*,'(5x,a,1pe13.5,4x,a,1pe13.5,4x,a,1pe12.5,4x,a,1pe12.5)') & 
+       "alfx   = ",alxbar, "alfy   = ",alybar, "Dpx = ",dpxbr, "Dpy = ",dpybr
+
+  write (*,'(5x,a,1pe13.5,4x,a,1pe13.5)')  "1/betx = ",bxinv, "1/bety = ",byinv
+
+ !---- Output averaged values.
   tavl   = tavlc * const / s2
   tavx   = tavxc * const / s2
   tavy   = tavyc * const / s2
@@ -626,37 +511,27 @@ subroutine ibs
   call set_variable('ibs.ty ',tauy)
   call set_variable('ibs.tl ',taul)
   
-  write (*, 950) tavl, tavx, tavy, taul, taux, tauy
+  write (*,'(/5x,a)')           "(Weighted) average rates (1/sec):" 
+  write (*,'( 5x,a,1p,es15.6)') "Longitudinal= ",tavl
+  write (*,'( 5x,a,   es15.6)') "Horizontal  = ",tavx
+  write (*,'( 5x,a,   es15.6)') "Vertical    = ",tavy
+  write (*,'(/5x,a)')           "(Weighted) average lifetimes (sec):"
+  write (*,'( 5x,a,1p,es15.6)') "Longitudinal= ",taul
+  write (*,'( 5x,a,   es15.6)') "Horizontal  = ",taux
+  write (*,'( 5x,a,   es15.6/)') "Vertical    = ",tauy
 
-910 format(' '/' Particle beam: ',a,10x,a,'bunched.')
-920 format(' '/' Individual lattice point lifetimes'/' '/             &
-       26x,'TLI/const',10x,'TXI/const',10x,'TYI/const'/                  &
-       27x,'(1/sec)',12x,'(1/sec)',12x,'(1/sec)'/' ')
-930 format(1x,i8,2x,a8,3x,3(1pe15.6,3x))
-940 format(' '/' Ring average values (m)'/' '/ 5x,'betx   = ',        &
-       1pe13.5,4x, 'bety   = ',1pe13.5,4x,'Dx  = ',1pe12.5,              &
-       4x,'Dy  = ',1pe12.5/                                              &
-       5x,'alfx   = ',1pe13.5,4x,'alfy   = ',1pe13.5,4x,'Dpx = ',        &
-       1pe12.5/5x,'Dpy = ',                                              &
-       1pe12.5/5x,'1/betx = ',1pe13.5,4x,'1/bety = ',1pe13.5)
-950 format(' '/5x,'(Weighted) average rates (1/sec):'/                &
-       5x,'Longitudinal= ',1p,e15.6/                                     &
-       5x,'Horizontal  = ',   e15.6/                                     &
-       5x,'Vertical    = ',   e15.6/                                     &
-       ' '/5x,'(Weighted) average lifetimes (sec):'/                     &
-       5x,'Longitudinal= ',1p,e15.6/                                     &
-       5x,'Horizontal  = ',   e15.6/                                     &
-       5x,'Vertical    = ',   e15.6/' ')
+  return
+
+102 continue
+  call fort_fail('IBS: ', 'table value not found, rest skipped, program stops ')
        
 end subroutine ibs
-! *********************************************************************
-subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
-     txi, tyi, tli)
 
+subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy, txi, tyi, tli)
   use ibsdbfi
-  use physconsfi
+  !use physconsfi
+  use math_constfi, only : zero, one, two, three, four, six, ten
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Subroutine uses Simpson's rule integration                         *
@@ -693,16 +568,24 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
   !   TYI       (real)    Vertical rate / const.                         *
   !   TLI       (real)    Longitudinal rate / const.                     *
   !----------------------------------------------------------------------*
-  integer iiz,iloop,maxdec,ns
-  parameter(maxdec=30,ns=50)
-  double precision a,al(31),alam,aloop,alx,am,b,betax,betay,bl(30), &
-       c1,c2,c3,ccy,chklog,cl,coeff(2),cof,cprime,cscale,cx,cy,dpx,dx,f, &
-       func,h,phi,polyl,polyx,polyy,r1,suml,sumx,sumy,td1,td2,term,tl1,  &
-       tl2,tli,tmpl,tmpx,tmpy,tx1,tx2,txi,ty1,ty2,tyi,zintl,zintx,zinty, &
-       zero,one,two,three,six,tstlog,power,ten,test,dy,dpy,aly,phiy,c1y, &
-       c2y,chy,four,onetominus20
-  parameter(zero=0d0,one=1d0,two=2d0,three=3d0,six=6d0,tstlog=74d0, &
-       power=-two/three,ten=1d1,test=1d-7,four=4d0,onetominus20=1d-20)
+  double precision, intent(IN) :: betax, betay,  alx, aly, dx, dpx, dy, dpy
+  double precision, intent(OUT) :: txi, tyi, tli
+
+  integer :: iiz, iloop
+  integer, parameter :: maxdec=30, ns=50
+
+  double precision :: a, b, am, c1, c2, c3, c1y, c2y, chy, cx, cy, cl, r1
+  double precision :: cscale, chklog, cprime, ccy
+  double precision :: zintl, zintx, zinty
+  double precision :: td1, td2, tl1, tl2, tx1, tx2, ty1, ty2
+  double precision :: al(31), bl(30), h, aloop
+  double precision :: term, func, polyl, polyx, polyy, suml, sumx, sumy
+  double precision :: cof, f, alam, phi, phiy, tmpl, tmpx, tmpy
+
+  double precision, parameter :: onetominus20=1d-20
+  double precision, parameter :: tstlog=74d0, power=-two/three, test=1d-7
+
+  double precision :: coeff(2)
   data coeff / 2d0, 4d0 /
 
   phi    = dpx + (alx * dx / betax)
@@ -747,27 +630,24 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
   tl1    = (two * a - three *cy - three * c3) / cprime
   tl2    = (b - three * c3 * cy ) / cprime
 !--- corrected ty1 23.02.2011 
-  ty1    = (- a + three * cy -chy - chy/cy*(c3 -                 &
-       two*gammas**2/sige**2) + two * chy * (cx +chy)/cy + six * c2y)    &
-       / cprime
+  ty1    = (-a + three*cy - chy - chy/cy*(c3 - two*gammas**2/sige**2) &
+       + two*chy*(cx+chy)/cy + six*c2y) / cprime
 !--- corrected ty2 23.02.2011 
-  ty2    = (b - c1y * (c3+cy) +chy*(cy+chy)+chy*ey*(one/ey+&
-            betax/(betay*ex))                                            &
-       *gammas**2/sige**2-chy*betax/ex*four+(one+(betax*ey)/             &
-       (betay*ex))*                                                      &
-       cx*chy+(chy**2)*(betax*ey)/(betay*ex)-chy*ey*c2*c3/betay          &
-       -c2y*(cy+c3+chy)+three*c3*(two*c2y+c1y)) / cprime - r1 / cscale
+  ty2    = (b - c1y*(c3+cy) + chy*(cy+chy) & 
+       + chy*ey*(one/ey + betax/(betay*ex)) * gammas**2/sige**2 &
+       - chy*betax/ex*four + (one+(betax*ey)/(betay*ex))*cx*chy & 
+       + (chy**2)*(betax*ey)/(betay*ex) - chy*ey*c2*c3/betay &
+       - c2y*(cy+c3+chy) + three*c3*(two*c2y+c1y)) & 
+       / cprime - r1 / cscale
 
 !--- corrected tx1 23.02.2011 
-  tx1    = (two * (a-c3-cy) * (cx - c3) - cy * cx +                         &
-       c3 * (c1y + six * c2 + c2y + two * c3 + cl - cy)) / cprime
+  tx1    = (two*(a-c3-cy)*(cx-c3) - cy*cx &
+       + c3*(c1y + six*c2 + c2y + two*c3 + cl - cy)) / cprime
 !--- corrected tx2 23.02.2011 
-  tx2    = (c3 + cx) * ((b - c1y * (c3 + cy)) / cprime)-        &
-       six / cscale + three * c3 * cy * (cl / cprime)                    &
-       + ( six*c3*cy*c1y                               &
-       + (betay/ey+betax/ex)*chy*cx +                                    &
-       chy*(c3**2-two*cy*c3)-c2y*cx*(cy+c3)+(two*cy*c3-c3*c3)*           &
-       c2y ) / cprime
+  tx2    = (c3 + cx) * ( (b - c1y * (c3 + cy)) / cprime ) &
+       - six / cscale + three*c3*cy*(cl/cprime) &
+       + ( six*c3*cy*c1y + (betay/ey + betax/ex)*chy*cx + &
+       chy*(c3**2-two*cy*c3)-c2y*cx*(cy+c3)+(two*cy*c3-c3*c3)* c2y ) / cprime
 
   al(1)  = zero
 
@@ -780,11 +660,10 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
      !---- Evaluate Simpson's rule summation for one interval.
      !     The integrand is calculated in the loop itself
      if (abs(cy+aloop).gt.onetominus20) then
-        term = sqrt((cy+aloop)*ccy)*sqrt(                             &
-             (aloop*ccy*aloop+td1*aloop+td2)+aloop*c2y*(c3-cy)*ccy/(cy+aloop))
+        term = sqrt((cy+aloop)*ccy) * & 
+             sqrt((aloop*ccy*aloop+td1*aloop+td2) + aloop*c2y*(c3-cy)*ccy/(cy+aloop))
      else
-        term = sqrt((cy+aloop)*ccy)*sqrt(                             &
-             (aloop*ccy*aloop+td1*aloop+td2))
+        term = sqrt((cy+aloop)*ccy) * sqrt((aloop*ccy*aloop+td1*aloop+td2))
      endif
      func = sqrt(aloop) / term**3
      polyl = tl1 * aloop + tl2
@@ -794,16 +673,14 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
      sumx = func * polyx
      sumy = func * polyy
 
-
      do iiz = 1, ns
         alam = aloop + iiz * h
         cof = coeff(mod(iiz,2)+1)
         if (abs(cy+alam).gt.onetominus20) then
-           term = sqrt((cy+alam)*ccy)*sqrt(                            &
-                (alam*ccy*alam+td1*alam+td2)+alam*c2y*(c3-cy)*ccy/(cy+alam))
+           term = sqrt((cy+alam)*ccy) * &
+                sqrt((alam*ccy*alam+td1*alam+td2)+alam*c2y*(c3-cy)*ccy/(cy+alam))
         else
-           term = sqrt((cy+alam)*ccy)*sqrt(                            &
-                (alam*ccy*alam+td1*alam+td2))
+           term = sqrt((cy+alam)*ccy)*sqrt((alam*ccy*alam+td1*alam+td2))
         endif
         f = sqrt(alam) / term**3
         polyl = tl1 * alam + tl2
@@ -826,16 +703,16 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
      zinty = zinty + tmpy
 
      !---- Test to see if integral has converged.
-     if (abs(tmpl/zintl) .lt. test .and.                             &
-          abs(tmpx/zintx) .lt. test .and.                                   &
+     if ( abs(tmpl/zintl) .lt. test .and. &
+          abs(tmpx/zintx) .lt. test .and. &
           abs(tmpy/zinty) .lt. test) goto 100
   enddo
-  write (*, *) tmpl,zintl, tmpx,zintx, tmpy,zinty, test
-  write (*, 910) maxdec
-910 format('Bjorken/Mtingwa integrals did not converge in ',          &
-       i3,' decades.')
-  call aawarn('TWSINT: ', 'Problem with TWSINT, program stopped ')
-  stop
+
+  write (*,*) tmpl, zintl, tmpx, zintx, tmpy, zinty, test
+
+  write (*, '(a,i3,a)') "Bjorken/Mtingwa integrals did not converge in ",maxdec," decades."
+  call fort_fail('TWSINT: ', 'Problem with TWSINT, program stopped ')
+
 100 continue
 
   !---- Divide answers by cprime to account for scaling.
@@ -844,4 +721,4 @@ subroutine twsint(betax, betay, alx, aly, dx, dpx, dy, dpy,       &
   tyi    = cy * (zinty / cprime)  
   
 end subroutine twsint
-! ***************************************************************
+

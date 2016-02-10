@@ -26,8 +26,6 @@ particle #    19 lost turn      1  at pos. s =      1.00 element=col            
     X=   1.8605368160000001E-003   Y=   1.3748861860000000E-003   T=   0.0000000000000000     
 particle #    20 lost turn      1  at pos. s =      1.00 element=col                                              aperture =rectellipse                                     
     X=  -6.7964635999999998E-004   Y=  -1.6796367199999999E-003   T=   0.0000000000000000     
-
-*****  end of trrun  *****
 exit TRACK module
 
 

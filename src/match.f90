@@ -444,7 +444,7 @@
 !      call fcn(m,n,x,fvec,iflag)
       calls = calls + 1
       if (iflag .ne. 0) then
-        call aawarn('LMDIF', ' stopped, possibly unstable')
+        call fort_warn('LMDIF', ' stopped, possibly unstable')
         info = - 1
         go to 300
       endif
@@ -1330,11 +1330,9 @@
       icovar = 0
       ilevel = 0
 !---- Too many variable parameters?
-      if (nvar .gt. ncon) then
-        call aawarn('MTMIGR','More variables than constraints seen.')
-        call aawarn('MTMIGR',                                           &
-     &'MIGRAD may not converge to optimal solution.')
-      endif
+      if (nvar .gt. ncon) &
+        call fort_warn('MTMIGR', &
+          'More variables than constraints seen. MIGRAD may not converge to optimal solution.')
 
 !---- Call minimization routine.
       call mtgeti(vect, dvect)
@@ -1383,8 +1381,7 @@
       call fcn(nf, nx, x, fvec, iflag)
       calls = calls + 1
       if (iflag .ne. 0) then
-        call aawarn('MTMIG1',                                           &
-     &'Matching stopped -- start point seems to be unstable')
+        call fort_warn('MTMIG1','Matching stopped -- start point seems to be unstable')
         go to 500
       endif
       fmin = vdot(nf, fvec, fvec)
@@ -1979,11 +1976,9 @@
       ilevel = 0
 
 !---- Too many variable parameters?
-      if (nvar .gt. ncon) then
-        call aawarn('MTSIMP','More variables than constraints seen.')
-        call aawarn('MTSIMP',                                           &
-     &'SIMPLEX may not converge to optimal solution.')
-      endif
+      if (nvar .gt. ncon) &
+           call fort_warn('MTSIMP', & 
+           'More variables than constraints seen. SIMPLEX may not converge to optimal solution.')
 
 !---- Call minimization routine.
       call mtgeti(vect, dvect)
@@ -2036,7 +2031,7 @@
 !      call fcn(nf, nx, x, fvec, iflag)
       calls = calls + 1
       if (iflag .ne. 0) then
-        call aawarn('MTSIMP', ' stopped, possibly unstable')
+        call fort_warn('MTSIMP', ' stopped, possibly unstable')
         go to 400
       endif
       fmin = vdot(nf, fvec, fvec)
