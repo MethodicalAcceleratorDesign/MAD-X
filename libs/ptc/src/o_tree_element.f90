@@ -560,6 +560,7 @@ CONTAINS
        if(abs(xi(1))>c_%absolute_aperture.or.abs(xi(3))>c_%absolute_aperture) then
           c_%CHECK_STABLE=.FALSE.
           xlost=xi
+          messagelost="o_tree_element.f90 track_tree : aperture exeeded"
        endif
     enddo
 

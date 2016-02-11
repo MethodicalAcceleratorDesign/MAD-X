@@ -20,7 +20,7 @@ module ptc_multiparticle
   !  LOGICAL :: OLD_MOD=.TRUE.
 
   logical(lp),private, parameter :: dobb=.true.
-  logical(lp),private, parameter :: aperture_all_case0=.false.
+  logical(lp),private, parameter :: aperture_all_case0=.true.
  ! type(probe) :: xsm,xsm0
   real(dp) :: xsm0t=0.0_dp,xsmt=0.0_dp
   !real(dp) :: unit_time =1.0e-3_dp

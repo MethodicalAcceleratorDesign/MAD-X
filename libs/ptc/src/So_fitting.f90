@@ -2818,13 +2818,15 @@ endif
         C=>C%NEXT
        endif
     enddo
-    write(6,*) "Previous of cutable Elements ",r%NTHIN
-    write(6,*) "METHOD 2 ",M1,MK1
-    write(6,*) "METHOD 4 ",M2,MK2
-    write(6,*) "METHOD 6 ",M3,MK3
-    write(6,*)   "number of Slices ", MK1+MK2+MK3
-    write(6,*)   "Total NST ", NST_tot
-
+    if (lielib_print(12) > 0) then
+      write(6,*) "Previous of cutable Elements ",r%NTHIN
+      write(6,*) "METHOD 2 ",M1,MK1
+      write(6,*) "METHOD 4 ",M2,MK2
+      write(6,*) "METHOD 6 ",M3,MK3
+      write(6,*)   "number of Slices ", MK1+MK2+MK3
+      write(6,*)   "Total NST ", NST_tot
+    endif
+    
     if(eject) then
        !      limit(1)=limit0(1)
        !      limit(2)=limit0(2)
@@ -3255,12 +3257,15 @@ endif
     enddo   !   end of do   WHILE
 
 
-    write(6,*) "Present of cutable Elements ",r%NTHIN
-    write(6,*) "METHOD 2 ",M1,MK1
-    write(6,*) "METHOD 4 ",M2,MK2
-    write(6,*) "METHOD 6 ",M3,MK3
-    write(6,*)   "number of Slices ", MK1+MK2+MK3
-    write(6,*)   "Total NST ", NST_tot
+    if (lielib_print(12) > 0) then
+      write(6,*) "Present of cutable Elements ",r%NTHIN
+      write(6,*) "METHOD 2 ",M1,MK1
+      write(6,*) "METHOD 4 ",M2,MK2
+      write(6,*) "METHOD 6 ",M3,MK3
+      write(6,*)   "number of Slices ", MK1+MK2+MK3
+      write(6,*)   "Total NST ", NST_tot
+    endif
+      
     if(radiation_bend_split) then
        write(6,*)   "Total NST due to Bend Closed Orbit ", int(ggbt)
        write(6,*)   "Restricted to method=2 for radiation or spin "
@@ -3692,13 +3697,14 @@ endif
     enddo
 
 
-    write(6,*) "Present of cutable Elements ",r%NTHIN
-    write(6,*) "METHOD 2 ",M1,MK1
-    write(6,*) "METHOD 4 ",M2,MK2
-    write(6,*) "METHOD 6 ",M3,MK3
-    write(6,*)   "number of Slices ", MK1+MK2+MK3
-    write(6,*)   "Total NST ", NST_tot
-
+    if (lielib_print(12) > 0) then
+      write(6,*) "Present of cutable Elements ",r%NTHIN
+      write(6,*) "METHOD 2 ",M1,MK1
+      write(6,*) "METHOD 4 ",M2,MK2
+      write(6,*) "METHOD 6 ",M3,MK3
+      write(6,*)   "number of Slices ", MK1+MK2+MK3
+      write(6,*)   "Total NST ", NST_tot
+    endif
 
 
     !    CALL RING_L(R,doneit)
