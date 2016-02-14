@@ -108,9 +108,8 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
         print '(''open line - error with deltap: '',1p,e14.6)', deltap
         print '(''initial orbit vector: '', 1p,6e14.6)', orbit0
      endif
-     call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on)
-     if (eflag.ne.0) go to 900
-     if (get_option('twiss_print ') .ne. 0)  &
+     call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on); if (eflag.ne.0) go to 900
+     if (get_option('twiss_print ') .ne. 0) &
         print '(''final orbit vector:   '', 1p,6e14.6)', orbit
   else 
      !---- Initial values from periodic solution.
@@ -663,7 +662,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   endif
  
   TT = zero 
-  RT  = EYE  
+  RT = EYE  
 
   eflag = 0
   suml = zero
@@ -693,13 +692,13 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   if (thr_on .gt. 0)  then
      !---  threader is on - keep position,orbit,matrix,and tensor for restart
      select case (code)
-     case (code_hkicker) ! HKICKER
+     case (code_hkicker) 
             restsum(1) = suml
             RESTORB(:,1) = ORBIT(:) 
             RESTM(:,:,1) = RT(:,:)    
             RESTT(:,:,:,1) = TT(:,:,:)  
         
-     case (code_kicker) ! KICKER or TKICKER
+     case (code_kicker) 
             restsum(1) = suml
             RESTORB(:,1) = ORBIT(:) 
             RESTM(:,:,1) = RT(:,:)    
@@ -710,7 +709,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
             RESTM(:,:,2) = RT(:,:)   
             RESTT(:,:,:,2) = TT(:,:,:)  
 
-     case (code_vkicker) ! VKICKER
+     case (code_vkicker) 
             restsum(2) = suml
             RESTORB(:,2) = ORBIT(:) 
             RESTM(:,:,2) = RT(:,:)   
@@ -750,12 +749,12 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   
   if (thr_on .gt. 0)  then !---  threader is on;  keep matrix  
      select case (code)
-     case (code_hkicker) ! HKICKER
+     case (code_hkicker) 
             CMATR(1:6,1:6,1) = RT(1:6,1:6) 
             j = name_len
             call element_name(c_name(1),j)
             coc_cnt(1) = node_value('occ_cnt ')
-     case (code_kicker) ! KICKER or TKICKER
+     case (code_kicker) 
             CMATR(1:6,1:6,1) = RT(1:6,1:6) 
             CMATR(1:6,1:6,2) = RT(1:6,1:6) 
             j = name_len
@@ -763,7 +762,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
             coc_cnt(1) = node_value('occ_cnt ')
             call element_name(c_name(2),j)
             coc_cnt(2) = node_value('occ_cnt ')
-     case (code_vkicker) ! VKICKER
+     case (code_vkicker) 
             CMATR(1:6,1:6,2) = RT(1:6,1:6) 
             j = name_len
             call element_name(c_name(2),j)
@@ -802,8 +801,6 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
                  if (rep_cnt(kpro) .gt. max_rep)  then
                     write(warnstr,'(a,i6,a)') 'pickup skipped after ',max_rep,' correction attempts'
                     call fort_warn('THREADER: ',warnstr)
-                    !write(tmptxt1, '(i6)') max_rep
-                    !call fort_warn('threader: pickup skipped after', tmptxt1(:6)//' correction attempts')
                     goto 20
                  endif
                  
@@ -899,7 +896,7 @@ SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
   !---  keep position of current pickup
   npick = node
 
-  itp = code_kicker + (-1)**kpro ! 14 or 16
+  itp = code_kicker + (-1)**kpro ! 14 for x plane or 16 for y plane
  
   lc  = 2 * (kpro - 1)
   lc1 = lc + 1
@@ -920,8 +917,8 @@ SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
   node = node - 1
   code = node_value('mad8_type ')
 
-  if (code .eq. code_tkicker)     code = code_kicker ! TKICKER is a KICKER
-  if (code .eq. code_placeholder) code = code_instrument ! PLACEHOLDE is an INSTRUMENT
+  if (code .eq. code_tkicker)     code = code_kicker 
+  if (code .eq. code_placeholder) code = code_instrument 
 
   !-- if wrong corrector or not a corrector, loop
   if (code .ne. itp .and. code .ne. code_kicker) goto 10 
@@ -1386,13 +1383,13 @@ SUBROUTINE twcpgo(rt,orbit0)
 
   sector_sel = node_value('sel_sector ') .ne. zero .and. sectormap
   code = node_value('mad8_type ')
-  if (code .eq. code_tkicker)     code = code_kicker ! TKICKER is a KICKER
-  if (code .eq. code_placeholder) code = code_instrument ! PLACEHOLDER is an INSTRUMENT
+  if (code .eq. code_tkicker)     code = code_kicker 
+  if (code .eq. code_placeholder) code = code_instrument 
   bvk = node_value('other_bv ')
   elpar_vl = el_par_vector(g_polarity, g_elpar)
   el = node_value('l ')
 
-  !--- 2013-Nov-14  10:34:00  ghislain: add acquistion of name of element here.  
+  !--- 2013-Nov-14  10:34:00  ghislain: add acquisition of name of element here.  
   call element_name(el_name,len(el_name))
 
   opt_fun(70) = g_elpar(g_kmax)
@@ -1552,7 +1549,6 @@ SUBROUTINE twcptk(re,orbit)
   double precision :: a(2,2), b(2,2), c(2,2), d(2,2)
   double precision :: rmat0(2,2), e(2,2), f(2,2), cd(2,2)
   double precision :: rmat_bar(2,2), ebar(2,2), fbar(2,2), hmat(2,2)
-  !double precision :: adet, tempa, tempb
   double precision :: edet, fdet, tempa, tempb
   double precision :: alfx0=zero, betx0=zero, amux0=zero, alfx_ini=zero, betx_ini=zero
   double precision :: alfy0=zero, bety0=zero, amuy0=zero, alfy_ini=zero, bety_ini=zero
@@ -2072,8 +2068,8 @@ SUBROUTINE twchgo
   double precision :: al_errors(align_max), el, pos0
   character(len=130) :: msg
 
-  integer :: restart_sequ, advance_node, get_option, node_al_errors
-  double precision :: node_value, get_value
+  integer, external :: restart_sequ, advance_node, get_option, node_al_errors
+  double precision, external :: node_value, get_value
 
   !---- If save requested reset table
   save = get_option('twiss_save ')
@@ -2262,10 +2258,6 @@ SUBROUTINE twbttk(re,te)
   do i = 1, 6
      do k = 1, 6
         temp = dot_product(TE(i,:,k),DISP(:))
-        !temp = zero        
-        !do j = 1, 6
-        !   temp = temp + te(i,j,k)*disp(j)
-        !enddo
         aux(i) = aux(i) + re(i,k)*disp(k)
         auxp(i) = auxp(i) + temp*disp(k) + re(i,k)*ddisp(k)
         rep(i,k) = two*temp
@@ -2582,70 +2574,71 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
         !---- Drift space, monitors and derivatives, collimators, instrument
         call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
         
-     case (code_rbend, code_sbend) !---- Bending magnet.
+     case (code_rbend, code_sbend) 
         call tmbend(ftrk,orbit,fmap,el,ek,re,te)
 
-     case (code_matrix) !---- Arbitrary matrix.
+     case (code_matrix) 
         call tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
 
-     case (code_quadrupole) !---- Quadrupole.
+     case (code_quadrupole) 
         call tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)   
 
-     case (code_sextupole) !---- Sextupole.
+     case (code_sextupole) 
         call tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
-     case (code_octupole) !---- Octupole.
+     case (code_octupole) 
         call tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
-     case (code_multipole) !---- Multipole.
+     case (code_multipole) 
         call tmmult(fsec,ftrk,orbit,fmap,re,te)
 
-     case (code_solenoid) !---- Solenoid.
+     case (code_solenoid) 
         call tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
-     case (code_rfcavity) !---- RF cavity.
+     case (code_rfcavity) 
         call tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
-     case (code_elseparator) !---- Electrostatic separator.
+     case (code_elseparator) 
         call tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
-     case (code_srotation) !---- Rotation around s-axis.
+     case (code_srotation) 
         call tmsrot(ftrk,orbit,fmap,ek,re,te)
 
-     case (code_yrotation) !---- Rotation around y-axis.
+     case (code_yrotation) 
         call tmyrot(ftrk,orbit,fmap,ek,re,te)
 
-     case (code_hkicker, code_kicker, code_vkicker) !---- Correctors.
+     case (code_hkicker, code_kicker, code_vkicker) 
         call tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
-     case (code_beambeam) !---- Beam-beam. (Particles/bunch taken for the opposite beam).
+     case (code_beambeam)
+        !---- (Particles/bunch taken for the opposite beam).
         call tmbb(fsec,ftrk,orbit,fmap,re,te)
 
-     case (code_marker) !---- Marker
+     case (code_marker) 
         ! nothing on purpose!
         
-     case (code_gbend) !---- Gbend
+     case (code_gbend) 
         ! nothing for now...
         
-     case (code_wire) !---- Wire
+     case (code_wire) 
         ! nothing for now...
         
-     case (code_dipedge) !---- Dipedge.
+     case (code_dipedge) 
         call tmdpdg(ftrk,orbit,fmap,ek,re,te)
 
-     case (code_changeref, code_translation) !--- Changeref, Translation
+     case (code_changeref, code_translation) 
         ! nothing for now...
         
-     case (code_crabcavity) !---- Crab-Cavity.
+     case (code_crabcavity) 
         call tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
-     case (code_tkicker, code_hacdipole, code_vacdipole) !---- Tkicker, Hacdipole, Vacdipole
+     case (code_tkicker, code_hacdipole, code_vacdipole) 
         ! nothing in MAD-X only used for conversion to sixtrack
         
-     case (code_nllens) !---- Non-Linear thin Lens
+     case (code_nllens) 
         call tmnll(fsec,ftrk,orbit,fmap,ek,re,te)
 
-     case (code_rfmultipole) !---- RF-Multipole.
+     case (code_rfmultipole) 
         call tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
 
      case default !--- anything else:
@@ -2662,6 +2655,7 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   use twissbeamfi, only : dorad, deltap, gamma, arad
   use matrices
   use math_constfi, only : zero, one, two, three
+  use code_constfi
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -2715,7 +2709,7 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
      e1 = g_elpar(b_e1)
      e2 = g_elpar(b_e2)
 
-     if (code.eq.2) then ! RBEND
+     if (code .eq. code_rbend) then 
         e1 = e1 + an / two
         e2 = e2 + an / two
      endif
@@ -3158,6 +3152,7 @@ SUBROUTINE tmfrng(fsec,h,sk1,edge,he,sig,corr,re,te)
 end SUBROUTINE tmfrng
 
 SUBROUTINE tmtilt(fsec,tilt,ek,r,t)
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -3183,7 +3178,7 @@ SUBROUTINE tmtilt(fsec,tilt,ek,r,t)
   double precision :: t1jk, t2jk, ti1k, ti2k, tij1, tij2
 
   !---- don't bother tilting by 0 degrees..
-  if (tilt.eq.0) return
+  if (tilt .eq. zero) return
 
   c = cos(tilt)
   s = sin(tilt)
@@ -3388,7 +3383,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   double precision :: x, y, dbr, dbi, dipr, dipi, dr, di, drt, dpx, dpy, dpxr, dpyr, dtmp
   double precision :: orbit0(6), orbit00(6), re00(6,6), te00(6,6,6)
 
-  integer :: get_option, node_fd_errors 
+  integer, external :: get_option, node_fd_errors 
   double precision, external :: node_value
 
   !---- Initialize
@@ -4812,13 +4807,13 @@ SUBROUTINE tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision :: el0       
   double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
 
-  if (el.eq.zero) then
+  if (el .eq. zero) then
      call tmsol_th(ftrk,orbit,fmap,ek,re,te)
      return
   endif
 
   !---- centre option
-  if (centre_cptk.or.centre_bttk) then
+  if (centre_cptk .or. centre_bttk) then
      ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE 
      el0 = el/two
      ORBIT0 = ORBIT 
@@ -5064,6 +5059,46 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
 
 end SUBROUTINE tmyrot
 
+SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
+  use twisslfi
+  use math_constfi, only : two
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     TRANSPORT map for drift space, with centre option.               *
+  !     Input:                                                           *
+  !     fsec      (logical) if true, return second order terms.          *
+  !     ftrk      (logical) if true, track orbit.                        *
+  !     Input/output:                                                    *
+  !     orbit(6)  (double)  closed orbit.                                *
+  !     Output:                                                          *
+  !     fmap      (logical) if true, element has a map.                  *
+  !     dl        (double)  element length.                              *
+  !     ek(6)     (double)  kick due to element.                         *
+  !     re(6,6)   (double)  transfer matrix.                             *
+  !     te(6,6,6) (double)  second-order terms.                          *
+  !----------------------------------------------------------------------*
+  logical :: fsec, ftrk, fmap
+  double precision :: dl
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
+
+  double precision :: dl0 
+  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
+
+  !---- centre option
+  if (centre_cptk .or. centre_bttk) then
+     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
+     dl0=dl/two
+     ORBIT0 = ORBIT
+     call tmdrf0(fsec,ftrk,orbit0,fmap,dl0,ek,re,te)
+     if (centre_cptk) call twcptk(re,orbit0)
+     if (centre_bttk) call twbttk(re,te)
+     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00 
+  endif
+  call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
+
+end SUBROUTINE tmdrf
+
 SUBROUTINE tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   use twissbeamfi, only : beta, gamma, dtbyds
   use matrices, only : EYE
@@ -5116,46 +5151,6 @@ SUBROUTINE tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
 end SUBROUTINE tmdrf0
-
-SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
-  use twisslfi
-  use math_constfi, only : two
-  implicit none
-  !----------------------------------------------------------------------*
-  !     Purpose:                                                         *
-  !     TRANSPORT map for drift space, with centre option.               *
-  !     Input:                                                           *
-  !     fsec      (logical) if true, return second order terms.          *
-  !     ftrk      (logical) if true, track orbit.                        *
-  !     Input/output:                                                    *
-  !     orbit(6)  (double)  closed orbit.                                *
-  !     Output:                                                          *
-  !     fmap      (logical) if true, element has a map.                  *
-  !     dl        (double)  element length.                              *
-  !     ek(6)     (double)  kick due to element.                         *
-  !     re(6,6)   (double)  transfer matrix.                             *
-  !     te(6,6,6) (double)  second-order terms.                          *
-  !----------------------------------------------------------------------*
-  logical :: fsec, ftrk, fmap
-  double precision :: dl
-  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
-
-  double precision :: dl0 
-  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
-
-  !---- centre option
-  if (centre_cptk .or. centre_bttk) then
-     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
-     dl0=dl/two
-     ORBIT0 = ORBIT
-     call tmdrf0(fsec,ftrk,orbit0,fmap,dl0,ek,re,te)
-     if (centre_cptk) call twcptk(re,orbit0)
-     if (centre_bttk) call twbttk(re,te)
-     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00 
-  endif
-  call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
-
-end SUBROUTINE tmdrf
 
 SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twisslfi
@@ -5479,7 +5474,7 @@ end SUBROUTINE tmtrak
 
 SUBROUTINE tmsymp(r)
   use matrices
-  use math_constfi, only : zero, one, two
+  use math_constfi, only : zero, two
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -5499,7 +5494,7 @@ SUBROUTINE tmsymp(r)
   A = -R + EYE
   B =  R + EYE
   
-  call m66div(a,b,v,eflag) ! V = A * B-1
+  call m66div(A,B,V,eflag) ! V = A * B-1
   if (eflag) goto 100
 
   ! A = Jt*Vt*J ; ie A = V**(-1)
@@ -5510,7 +5505,7 @@ SUBROUTINE tmsymp(r)
   A = A + EYE
   B = B + EYE
 
-  call m66div(a,b,v,eflag) ! V = A * B-1
+  call m66div(A,B,V,eflag) ! V = A * B-1
   if (eflag) goto 100
 
   R = V 
@@ -5548,7 +5543,7 @@ subroutine m66div(anum,aden,target,eflag)
   AUGMAT(:,7:12) = ANUM
   
   !---- Solve resulting system.
-  call solver(augmat,6,6,irank)
+  call solver(AUGMAT,6,6,irank)
   if (irank .lt. 6) then
      eflag = .true.
   else
@@ -6407,7 +6402,7 @@ SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
            ! 2nd order effects
            if (fsec) then
               phirrr = 0.75/wx/r0x*(8.0/rho2**3*(r0x**4/12.0/           &
-                   wx**2-r0x**2/2.0+2.0*r0x*wx/3.0-wx**2/4.0) -                      &
+                   wx**2-r0x**2/2.0+2.0*r0x*wx/3.0-wx**2/4.0) -         &
                    2.0*r0x/3.0/wx**2/rho**3)
               phixxx = 3.0*xs*phirr + xs**3*phirrr
               phixxy = ys*phirr + xs*xs*ys*phirrr
@@ -6933,7 +6928,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
     py = orbit(4) * bvk;
     z  = orbit(5) * bvk;
     pt = orbit(6);
-  else ! why not take orbit components ?? 
+  else 
     x  = zero;
     px = zero;
     y  = zero;
