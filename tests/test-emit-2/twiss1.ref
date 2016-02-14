@@ -9,12 +9,12 @@
 @ GAMMA            %le         5870.853803
 @ KBUNCH           %le                   1
 @ BCURRENT         %le                   0
-@ SIGE             %le      0.001115467837
-@ SIGT             %le       0.00085783974
+@ SIGE             %le      0.001115467834
+@ SIGT             %le      0.000857839738
 @ NPART            %le                   0
-@ EX               %le     1.125932308e-09
-@ EY               %le     4.503155999e-37
-@ ET               %le     9.569042574e-07
+@ EX               %le     1.125932316e-09
+@ EY               %le     1.169471369e-37
+@ ET               %le     9.569042528e-07
 @ LENGTH           %le           67.200074
 @ ALFA             %le     0.0008829339349
 @ ORBIT5           %le      0.002156959112
@@ -24,15 +24,15 @@
 @ DQ1              %le        0.3280484114
 @ DQ2              %le        0.1526852467
 @ DXMAX            %le        0.2344520764
-@ DYMAX            %le     1.007042774e-15
+@ DYMAX            %le     1.007243896e-15
 @ XCOMAX           %le     1.388447576e-05
-@ YCOMAX           %le      4.14176847e-20
+@ YCOMAX           %le     1.158311292e-20
 @ BETXMAX          %le         17.73701544
 @ BETYMAX          %le          19.3658027
 @ XCORMS           %le     5.588626089e-06
-@ YCORMS           %le     1.743238624e-20
+@ YCORMS           %le     5.935453057e-21
 @ DXRMS            %le        0.1455152745
-@ DYRMS            %le     5.203296922e-16
+@ DYRMS            %le     5.204061642e-16
 @ DELTAP           %le                   0
 @ SYNCH_1          %le                   0
 @ SYNCH_2          %le                   0
@@ -40,9 +40,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %33s "ALBA-24                          "
-@ ORIGIN           %23s "MAD-X 5.01.03 Darwin 64"
-@ DATE             %08s "15/10/13"
-@ TIME             %08s "10.34.11"
+@ ORIGIN           %17s "5.02.08 Darwin 64"
+@ DATE             %08s "14/02/16"
+@ TIME             %08s "20.01.19"
 * NAME                                S               BETX               BETY 
 $ %s                                %le                %le                %le 
  "QD1"                            4.215        14.01022269        8.121167256

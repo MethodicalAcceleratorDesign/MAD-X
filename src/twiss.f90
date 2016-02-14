@@ -508,14 +508,12 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
   logical :: pflag
   integer :: i, k, irank, itra, thr_on, ithr_on, save_opt
   double precision :: cotol, err
-  double precision :: orbit0(6), orbit(6), a(6,7), b(4,5), as(3,4), bs(2,3)
+  double precision :: orbit0(6), orbit(6), a(6,7), b(4,5)
 
   integer, external :: get_option
   double precision, external :: get_variable, get_value
   logical, external :: m66sta  
   integer, parameter :: itmax=20
-
-  equivalence(a(1,1),b(1,1),as(1,1),bs(1,1)) ! 2015-Jul-02  13:20:19  ghislain: to be clarified
 
   deltap = get_value('probe ','deltap ')
 

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  +     MAD-X 5.02.08  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2014.11.14               +
-  + Execution date: 2015.03.17 15:42:18      +
+  + Release   date: 2015.11.20               +
+  + Execution date: 2016.02.14 20:01:18      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Beam, SEQUENCE=Machine, PARTICLE=electron, energy=3, RADIATE=True;
 
@@ -181,7 +181,7 @@ orbit:  -4.503831E-09 -1.532567E-07  0.000000E+00  0.000000E+00 -2.166152E-03  3
   
 iteration:   2 error:   9.223175E-07 deltap:   0.000000E+00
 orbit:   7.784384E-10 -1.536909E-07  0.000000E+00  0.000000E+00 -2.156959E-03  3.297717E-10
- ++++++ warning: TWCPGO: TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.        
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
 
 ++++++ table: summ
 
@@ -253,7 +253,7 @@ enter EMIT module
  
                                                   M o d e   1         M o d e   2         M o d e   3
  Fractional tunes            undamped              0.54473120          0.09300237          0.01229083
-                             damped                0.54473120          0.09300237          0.01229083
+                             damped                0.54473120          0.09300238          0.01229083
  
  beta* [m]                   x                 0.11192592E+02      0.34258053E-37      0.19146962E-02
                              y                 0.39631624E-31      0.59288108E+01      0.75108727E-31
@@ -271,10 +271,10 @@ enter EMIT module
                              py                0.40677883E-31      0.41245502E+01      0.78691963E-30
                              pt                0.26021594E-01      0.54746372E-31      0.13022468E+01
  
- Damping partition numbers                         1.49532944          0.99999809          1.50467012
+ Damping partition numbers                         1.49532943          0.99999809          1.50467012
  Damping constants [1/s]                           0.28262937E+03      0.18900774E+03      0.28439484E+03
  Damping times [s]                                 0.35382027E-02      0.52907887E-02      0.35162382E-02
- Emittances [pi micro m]                       0.11259323E-02      0.11729932E-30      0.95690426E+00
+ Emittances [pi micro m]                       0.11259323E-02      0.11729932E-30      0.95690425E+00
 
  EMIT: beam parameters have been updated.
 
@@ -295,13 +295,13 @@ parameter: pc   double value:        2.999999956
 parameter: gamma   double value:        5870.853803
 parameter: beta   double value:       0.9999999855
 parameter: brho   double value:        10.00692271
-parameter: ex   double value:     1.12593231e-09
-parameter: exn   double value:    6.610183888e-06
-parameter: ey   double value:    1.172993245e-37
-parameter: eyn   double value:    6.886471751e-34
-parameter: et   double value:    9.569042559e-07
-parameter: sigt   double value:    0.0008578397394
-parameter: sige   double value:     0.001115467836
+parameter: ex   double value:    1.125932317e-09
+parameter: exn   double value:     6.61018393e-06
+parameter: ey   double value:    1.172993246e-37
+parameter: eyn   double value:    6.886471757e-34
+parameter: et   double value:    9.569042515e-07
+parameter: sigt   double value:    0.0008578397374
+parameter: sige   double value:     0.001115467834
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0
@@ -325,5 +325,5 @@ Stop;
 0 in C and 1 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.04 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

@@ -427,10 +427,10 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   double precision :: x2, y2, t2, px2, py2, pt2
   equivalence       (x1, o1(1)), (px1, o1(2))
   equivalence       (y1, o1(3)), (py1, o1(4))
-  equivalence       (t1, o1(3)), (pt1, o1(4))
+  equivalence       (t1, o1(5)), (pt1, o1(6))
   equivalence       (x2, o2(1)), (px2, o2(2))
   equivalence       (y2, o2(3)), (py2, o2(4))
-  equivalence       (t2, o2(3)), (pt2, o2(4))
+  equivalence       (t2, o2(5)), (pt2, o2(6))
 
   double precision  :: el, tilt, bvk
   double precision  :: edg1, edg2, sk1, sk2, hgap, fint, sks, h, ct
