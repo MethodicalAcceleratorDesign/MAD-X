@@ -68,4 +68,4 @@ include(setupExternalProjects)
 # Setting up testing:
 include(setupTesting)
 # Add test folders:
-include(numdifftests)
+include(ndifftests)

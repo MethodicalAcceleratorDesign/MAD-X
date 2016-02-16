@@ -20,12 +20,12 @@ if(HAD_ERROR)
     message("${madxoutput}")
     message(FATAL_ERROR "\n\t -- CTEST ERROR -- Test failed with error ${HAD_ERROR}")
 else()
-    # Run numdiff if all went well..
-    message("COMMAND ${NUMDIFF} -b -l -t ${TEST_NAME} ${STRING_TEST_OUTPUT}")
-    execute_process(COMMAND ${NUMDIFF} -b -l -t ${TEST_NAME} ${TEST_OUTPUT}
-        WORKING_DIRECTORY ${SOURCEDIR} RESULT_VARIABLE NUMDIFF_ERROR)
-    if(NUMDIFF_ERROR)
-       message(FATAL_ERROR "Test failed with numdiff error ${NUMDIFF_ERROR}")
+    # Run ndiff if all went well..
+    message("COMMAND ${NDIFF} -b -l -t ${TEST_NAME} ${STRING_TEST_OUTPUT}")
+    execute_process(COMMAND ${NDIFF} -b -l -t ${TEST_NAME} ${TEST_OUTPUT}
+        WORKING_DIRECTORY ${SOURCEDIR} RESULT_VARIABLE NDIFF_ERROR)
+    if(NDIFF_ERROR)
+       message(FATAL_ERROR "Test failed with ndiff error ${NDIFF_ERROR}")
     endif()
 endif()
 

@@ -21,9 +21,9 @@ for l in fin:
         nextline=''
 
 for l in lines:
-    if l.split(':=')[0].strip()=='tests-all':
+    if l.split('=')[0].strip()=='tests-all':
         tests_all=l.split()[2:]
-    if l.split(':=')[0].strip()=='tests-long':
+    if l.split('=')[0].strip()=='tests-long':
         tests_long=l.split()[2:]
 
 # Find tests defined in cmake:
@@ -78,9 +78,9 @@ if ctest_missing:
     print(" -- Missing tests: --")
     for test in ctest_missing:
         if test in ctest_missing_long:
-            print('numdiff_test('+test+' 1)')
+            print('ndiff_test('+test+' 1)')
         else:
-            print('numdiff_test('+test+' 0)')
+            print('ndiff_test('+test+' 0)')
 
 # Print tests that don't exist:
 for test in ctest_all:
