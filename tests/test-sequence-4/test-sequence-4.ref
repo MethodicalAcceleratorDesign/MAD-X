@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.03  (64 bit, Darwin)      +
+  +     MAD-X 5.02.08  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2014.10.16               +
-  + Execution date: 2014.10.27 13:15:19      +
+  + Release   date: 2015.11.20               +
+  + Execution date: 2016.02.16 18:51:57      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -2639,8 +2639,19 @@ TWISS, beta0=QF.60010.BETA,SAVE; !, FILE="twiss.all.tfs";
 enter Twiss module
  Found 6 initial orbit vector values from twiss command. 
  Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+updating probe_beam with for ds=-2.42253
+  freq0=0.0788971, alfa=0.000641889, beta=0.999998, gamma=479.606, dtbyds=0, deltap=0
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
+ 
+ Global parameters for protons, radiate = F:
+
+ C                3799.783251 m          f0             0.07889708084 MHz
+ T0               12.67474017 musecs     alfa         0.0006418890797 
+ eta          0.0006375416693            gamma(tr)        39.47026174 
+ Bcurrent                   0 A/bunch    Kbunch             1 
+ Npart                      0 /bunch     Energy           450.0009782 GeV 
+ gamma            479.6060802            beta            0.9999978263
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -2673,5 +2684,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.03 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++
