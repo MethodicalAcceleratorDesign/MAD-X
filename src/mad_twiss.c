@@ -616,9 +616,8 @@ set_twiss_deltas(struct command* comm)
   int i, k = 0, n = 0, pos;
   double s, sign = one, ar[3];
   struct name_list* nl = comm->par_names;
-  pos = name_list_pos("deltap", nl);
   twiss_deltas->curr = 1;
-  twiss_deltas->a[0] = zero;
+  twiss_deltas->a[0] = 0;
   if ((pos = name_list_pos("deltap", nl)) >= 0 && nl->inform[pos]
       && (string = comm->par->parameters[pos]->string) != NULL)
   {
@@ -944,10 +943,6 @@ pro_twiss(void)
     end of command decoding
   */
 
-  zero_double(orbit0, 6);
-  /*  zero_double(disp0, 6); */
-  zero_double(oneturnmat, 36);
-
   if ((beta_def = twiss_input(current_twiss)) < 0) {
     if (beta_def == -1) warning("unknown beta0,", "Twiss ignored");
     else if (beta_def == -2) warning("betx or bety missing,", "Twiss ignored");
@@ -962,10 +957,45 @@ pro_twiss(void)
 
   set_twiss_deltas(current_twiss);
 
+  zero_double(orbit0, 6);
+  zero_double(disp0, 6);
+  zero_double(oneturnmat, 6*6);
+
   adjust_beam();
   probe_beam = clone_command(current_beam);
 
+#if 1 // LD: 2016.02.16 ORIG, set to 0 to enable the fix point search
+  // TODO: understand why probe_beam has side effects on current_beam
+  // clear_beam(probe_beam); // needed??
   tmrefe_(oneturnmat); /* one-turn linear transfer map */
+#else // LD: 2016.02.16 START
+  double err0 = 0;
+  double dp0 = twiss_deltas->a[0];
+  double oneturnmat0[4] = {0}, r0mat[4] = {0};
+  int fp_step = 0, error = 0;
+
+  if (get_option("debug"))
+    printf("Twiss pre-init: adjusting probe and oneturnmat (fix point)\n");
+
+  do { // LD: search the fix point of the oneturnmat versus probe
+    if (get_option("debug"))
+      printf("Twiss pre-init: iteration %d (fix point)\n", ++fp_step);
+
+    tmrefe_(oneturnmat); /* one-turn linear transfer map */
+    twcpin_(oneturnmat,disp0,r0mat,&error); /* added for disp0 computation */
+
+    adjust_probe(dp0);   /* sets correct gamma, beta, etc. */
+    adjust_rfc();        /* sets rf freq and harmon */
+
+    err0 = 0;
+    for (int i=0; i<4; i++) {
+      err0 += fabs(oneturnmat[4+6*i] - oneturnmat0[i]); 
+      oneturnmat0[i] = oneturnmat[4+6*i];
+    }
+  } while (dp0 != 0 && err0 > 1e-15);
+
+  if (get_option("debug")) print_probe();
+#endif // LD: 2016.02.16 END
 
   summ_table = make_table("summ", "summ", summ_table_cols, summ_table_types, twiss_deltas->curr+1);
   add_to_table_list(summ_table, table_register);
@@ -1071,9 +1101,10 @@ pro_twiss(void)
 
     adjust_probe(twiss_deltas->a[i]); /* sets correct gamma, beta, etc. */
     adjust_rfc(); /* sets freq in rf-cavities from probe */
+    if (get_option("info")) print_probe();
     current_node = current_sequ->ex_start;
 
-    twiss_(oneturnmat, disp0, tarr->i,tarr_sector->i);
+    twiss_(oneturnmat, disp0, tarr->i, tarr_sector->i);
 
     augment_count("summ ");
 
@@ -1090,12 +1121,10 @@ pro_twiss(void)
         pos = name_list_pos("dq2", summ_table->columns);
         summ_table->d_cols[pos][i] = dq2;
       }
-      if (get_option("keeporbit"))  copy_double(orbit0, current_sequ->orbits->vectors[k_orb]->a, 6);
+      if (get_option("keeporbit")) copy_double(orbit0, current_sequ->orbits->vectors[k_orb]->a, 6);
       if (k_save) fill_twiss_header(twiss_table);
       if (i == 0) exec_savebeta(); /* fill beta0 at first delta_p only */
-        if (k_save && w_file) {
-        out_table(table_name, twiss_table, filename);
-      }
+      if (k_save && w_file) out_table(table_name, twiss_table, filename);
       if ((twiss_deltas->curr>1)&&(i<twiss_deltas->curr-1)) {
         struct table *t = detach_table_from_table_list(table_name, table_register);
         if (t) {
@@ -1111,7 +1140,7 @@ pro_twiss(void)
       warning("Twiss failed: ", "MAD-X continues");
     }
     tarr = delete_int_array(tarr);
-  }
+  } // i = 0 .. twiss_deltas->curr-1
 
   if (get_option("twiss_sector")){
     out_table( sector_table_name, twiss_sector_table, sector_name );
