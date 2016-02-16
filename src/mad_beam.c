@@ -392,12 +392,10 @@ void
 adjust_probe(double delta_p)
   /* adjusts beam parameters to the current deltap */
 {
-  int j;
   double etas, slope, qs, fact, tmp, ds;
   double alfa, beta, gamma, dtbyds, circ, freq0; 
   double betas, gammas, et, sigt, sige;
 
-  ds = oneturnmat[34];
   et = command_par_value("et", current_beam);
   sigt = command_par_value("sigt", current_beam);
   sige = command_par_value("sige", current_beam);
@@ -405,8 +403,15 @@ adjust_probe(double delta_p)
   gamma = command_par_value("gamma", current_beam);
   circ = command_par_value("circ", current_beam);
 
-  /* assume oneturnmap and disp0 already computed (see pro_emit) */ 
-  for (j = 0; j < 4; j++) ds += oneturnmat[4 + 6*j] * disp0[j];
+  /* assume oneturnmap and disp0 already computed (see pro_twiss and pro_emit) */ 
+  ds = oneturnmat[4 + 6*5]; // assumes disp0[5] = 1 (dp/p = 1)
+  for (int j=0; j < 4; j++) {
+    ds += oneturnmat[4 + 6*j] * disp0[j];
+// LD: debug
+    // printf("oneturnmat[%d]=%g, disp0[%d]=%g\n", 4 + 6*j, oneturnmat[4 + 6*j], j, disp0[j]);
+  }
+  // printf("oneturnmat[%d]=%g, disp0[%d]=1\n", 34, oneturnmat[34], 5);
+
   tmp = - beta * beta * ds / circ;
   freq0 = (clight * ten_m_6 * beta) / (circ * (one + tmp * delta_p));
   etas = beta * gamma * (one + delta_p);
@@ -415,6 +420,12 @@ adjust_probe(double delta_p)
   tmp = - betas * betas * ds / circ;
   alfa = one / (gammas * gammas) + tmp;
   dtbyds = delta_p * tmp / betas;
+
+// LD: 2016.02.16
+  if (get_option("debug"))
+    printf("updating probe_beam with for ds=%g\n"
+           "  freq0=%g, alfa=%g, beta=%g, gamma=%g, dtbyds=%g, deltap=%g\n",
+           ds, freq0, alfa, betas, gammas, dtbyds, delta_p);
 
   store_comm_par_value("freq0", freq0, probe_beam);
   store_comm_par_value("alfa", alfa, probe_beam);
@@ -476,3 +487,65 @@ adjust_rfc(void)
     }
   }
 }
+
+void
+print_rfc(void)
+  /* prints the rf cavities present in sequ */
+{
+  double freq0, harmon, freq;
+  int i, n = current_sequ->cavities->curr;
+  struct element* el;
+
+  if (n == 0) return;
+
+  freq0 = command_par_value("freq0", probe_beam);
+  printf("\n RF system: \n");
+  printf(v_format(" %S %NFs %NFs %NFs %NFs %NFs\n"),
+         "Cavity","length[m]","voltage[MV]","lag","freq[MHz]","harmon");
+
+  for (i = 0; i < n; i++) {
+    el = current_sequ->cavities->elem[i];
+    if ((harmon = el_par_value("harmon", el)) > zero) {
+      freq = freq0 * harmon;
+      printf(v_format(" %S %F %F %F %F %F\n"),
+             el->name, el->length, el_par_value("volt", el),
+             el_par_value("lag", el), freq, harmon);
+    }
+  }
+}
+
+void
+print_probe(void)
+{
+  char tmp[NAME_L], trad[4];
+  double alfa = get_value("probe", "alfa");
+  double freq0 = get_value("probe", "freq0");
+  double gamma = get_value("probe", "gamma");
+  double beta = get_value("probe", "beta");
+  double circ = get_value("probe", "circ");
+  double bcurrent = get_value("probe", "bcurrent");
+  double npart = get_value("probe", "npart");
+  double energy = get_value("probe", "energy");
+  int kbunch = get_value("probe", "kbunch");
+  int rad = get_value("probe", "radiate");
+  double gamtr = zero, t0 = zero, eta;
+
+  get_string("probe", "particle", tmp);
+  if (rad) strcpy(trad, "T");
+  else     strcpy(trad, "F");
+  if (alfa > zero) gamtr = sqrt(one / alfa);
+  else if (alfa < zero) gamtr = sqrt(-one / alfa);
+  if (freq0 > zero) t0 = one / freq0;
+  eta = alfa - one / (gamma*gamma);
+  puts(" ");
+  printf(" Global parameters for %ss, radiate = %s:\n\n", tmp, trad);
+  // 2015-Apr-15  15:27:15  ghislain: proposal for more elegant statement avoiding the strcpy to extra variable
+  // printf(" Global parameters for %ss, radiate = %s:\n\n", tmp, rad ? "true" : "false"); 
+  printf(v_format(" C         %F m          f0        %F MHz\n"),circ, freq0);
+  printf(v_format(" T0        %F musecs     alfa      %F \n"), t0, alfa);
+  printf(v_format(" eta       %F            gamma(tr) %F \n"), eta, gamtr);
+  printf(v_format(" Bcurrent  %F A/bunch    Kbunch    %I \n"), bcurrent, kbunch);
+  printf(v_format(" Npart     %F /bunch     Energy    %F GeV \n"), npart,energy);
+  printf(v_format(" gamma     %F            beta      %F\n"), gamma, beta);
+}
+

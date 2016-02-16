@@ -471,42 +471,6 @@ set_stringvar(const char* name, char* string)
   }
 }
 
-void
-print_global(double delta)
-{
-  char tmp[NAME_L], trad[4];
-  double alfa = get_value("probe", "alfa");
-  double freq0 = get_value("probe", "freq0");
-  double gamma = get_value("probe", "gamma");
-  double beta = get_value("probe", "beta");
-  double circ = get_value("probe", "circ");
-  double bcurrent = get_value("probe", "bcurrent");
-  double npart = get_value("probe", "npart");
-  double energy = get_value("probe", "energy");
-  int kbunch = get_value("probe", "kbunch");
-  int rad = get_value("probe", "radiate");
-  double gamtr = zero, t0 = zero, eta;
-
-  (void)delta;
-  get_string("probe", "particle", tmp);
-  if (rad) strcpy(trad, "T");
-  else     strcpy(trad, "F");
-  if (alfa > zero) gamtr = sqrt(one / alfa);
-  else if (alfa < zero) gamtr = sqrt(-one / alfa);
-  if (freq0 > zero) t0 = one / freq0;
-  eta = alfa - one / (gamma*gamma);
-  puts(" ");
-  printf(" Global parameters for %ss, radiate = %s:\n\n", tmp, trad);
-  // 2015-Apr-15  15:27:15  ghislain: proposal for more elegant statement avoiding the strcopy to extra variable
-  // printf(" Global parameters for %ss, radiate = %s:\n\n", tmp, rad ? "true" : "false"); 
-  printf(v_format(" C         %F m          f0        %F MHz\n"),circ, freq0);
-  printf(v_format(" T0        %F musecs     alfa      %F \n"), t0, alfa);
-  printf(v_format(" eta       %F            gamma(tr) %F \n"), eta, gamtr);
-  printf(v_format(" Bcurrent  %F A/bunch    Kbunch    %I \n"), bcurrent, kbunch);
-  printf(v_format(" Npart     %F /bunch     Energy    %F GeV \n"), npart,energy);
-  printf(v_format(" gamma     %F            beta      %F\n"), gamma, beta);
-}
-
 #if 0 // not used
 int
 vary_name(char* name, int* name_l, int* index)

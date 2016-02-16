@@ -17,6 +17,8 @@ void    adjust_beam(void);                              // many uses
 int     attach_beam(struct sequence* sequ);             // many uses
 void    adjust_probe(double delta_p);                   // many uses
 void    adjust_rfc(void);                               // many uses
+void    print_rfc(void);
+void    print_probe(void);
 
 #endif // MAD_BEAM_H
 
