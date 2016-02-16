@@ -1101,7 +1101,7 @@ pro_twiss(void)
 
     adjust_probe(twiss_deltas->a[i]); /* sets correct gamma, beta, etc. */
     adjust_rfc(); /* sets freq in rf-cavities from probe */
-//    if (get_option("debug")) print_probe(); // need to adjust the tests
+    if (get_option("debug")) print_probe();
     current_node = current_sequ->ex_start;
 
     twiss_(oneturnmat, disp0, tarr->i, tarr_sector->i);
