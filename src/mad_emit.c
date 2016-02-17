@@ -37,6 +37,7 @@ pro_emit(struct in_cmd* cmd)
 
   adjust_beam();
   probe_beam = clone_command(current_beam);
+  adjust_rfc();        /* sets rf freq and harmon */
 
   tmrefe_(oneturnmat); /* one-turn linear transfer map */
   twcpin_(oneturnmat,disp0,r0mat,&error); /* added for disp0 computation */
@@ -78,6 +79,7 @@ pro_emit(struct in_cmd* cmd)
     print_rfc();
   }
 
+  probe_beam = delete_command(probe_beam);
   set_option("twiss_print", &keep);
 }
 
