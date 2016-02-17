@@ -529,8 +529,7 @@ clone_command(struct command* p)
   copy_name_list(clone->par_names, p->par_names);
   clone->par->curr = p->par->curr;
   for (i = 0; i < p->par->curr; i++)
-    clone->par->parameters[i] =
-      clone_command_parameter(p->par->parameters[i]);
+    clone->par->parameters[i] = clone_command_parameter(p->par->parameters[i]);
   return clone;
 }
 
