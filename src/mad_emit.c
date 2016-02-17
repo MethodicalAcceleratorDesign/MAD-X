@@ -48,7 +48,7 @@ pro_emit(struct in_cmd* cmd)
   // guess_flag is set by COGUESS command
   if (guess_flag) copy_double(guess_orbit, orbit0, 6);
 
-  double tt[6*6*6];
+  double tt[6*6*6] = {0};
   getclor_(orbit0, oneturnmat, tt, &error); /* closed orbit */
 
   if (error == 0) {
