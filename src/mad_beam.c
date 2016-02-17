@@ -363,7 +363,7 @@ adjust_beam(void)
   gamma = command_par_value("gamma", current_beam);
   alfa = one / (gamma * gamma);
 
-  freq0 = (beta * clight) / (ten_p_6 * circ);
+  freq0 = (beta * clight * ten_m_6) / circ;
 
   if (nl->inform[name_list_pos("bcurrent", nl)] &&
       (bcurrent = command_par_value("bcurrent", current_beam)) > zero)
@@ -413,7 +413,7 @@ adjust_probe(double delta_p)
   // printf("oneturnmat[%d]=%g, disp0[%d]=1\n", 34, oneturnmat[34], 5);
 
   tmp = - beta * beta * ds / circ;
-  freq0 = (clight * ten_m_6 * beta) / (circ * (one + tmp * delta_p));
+  freq0 = (beta * clight * ten_m_6) / (circ * (one + tmp * delta_p));
   etas = beta * gamma * (one + delta_p);
   gammas = sqrt(one + etas * etas);
   betas = etas / gammas;
