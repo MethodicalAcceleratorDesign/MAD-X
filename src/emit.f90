@@ -32,27 +32,30 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   !----------------------------------------------------------------------*
   !---- Communication area for radiation damping.
 
-  double precision :: deltap, tol 
-  double precision :: orbit0(6), disp0(6), rt(6,6)
-  double precision :: u0, emit_v(3), nemit_v(3) 
-  double precision :: bmax(3,3), gmax(3,3), dismax(4)
-  double precision :: tunes(3), sig_v(4), pdamp(3)
-  logical :: updatebeam
+  double precision, intent(IN) :: deltap, tol 
+  double precision, intent(IN) :: orbit0(6), disp0(6)
+  double precision, intent(IN OUT) :: rt(6,6)
+  double precision, intent(OUT) :: u0, emit_v(3), nemit_v(3) 
+  double precision, intent(OUT) :: bmax(3,3), gmax(3,3), dismax(4)
+  double precision, intent(OUT) :: tunes(3), sig_v(4), pdamp(3)
+  logical, intent(OUT) :: updatebeam
 
   double precision :: orbit(6), orbit1(6), orbit2(6) 
-  double precision :: em(6,6), em2(6,6), rd(6,6) 
-  double precision :: reval(6), aival(6), ek(6)
+  double precision :: em(6,6), em2(6,6), rd(6,6) ! eigenvalues and damping matrices
+  double precision :: reval(6), aival(6), ek(6) ! re and im parts for damping and tunes
   double precision :: disp(6)
   double precision :: al_errors(align_max)
   double precision :: arad, suml, gammas, el
   double precision :: re(6,6), te(6,6,6), tt(6,6,6)
   double precision :: betas, bx, gx
 
-  double precision :: get_value, node_value
-  integer :: i, j, j1, j2, k, k1, k2, eflag, n_align
-  integer :: restart_sequ, node_al_errors, code, advance_node
-  logical :: m66sta, fmap, stabx, staby, stabt, dorad
+  integer :: i, j, j1, j2, k, k1, k2, eflag, n_align, code
+  logical :: fmap, stabx, staby, stabt, dorad
 
+  integer, external :: restart_sequ, advance_node, node_al_errors
+  logical, external :: m66sta
+  double precision, external :: get_value, node_value
+  
   ORBIT(:6) = ORBIT0(:6)
   DISP(:6) = DISP0(:6)
 
@@ -106,7 +109,7 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   endif
 
   TT = zero
-  RT = EYE 
+  RT = EYE  ! redefining RT
 
   eflag = 0
   suml = zero
@@ -197,196 +200,6 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   updatebeam = dorad .and. stabt
 
 end subroutine emit
-
-subroutine emsumm(rd,em,bmax,gmax,stabt,dorad,u0,emit_v,nemit_v, &
-                  tunes,sig_v,pdamp)
-  use emitfi
-  use math_constfi, only : zero, one, two, three, four, twopi
-  use phys_constfi, only : clight, hbar
-  implicit none
-  !----------------------------------------------------------------------*
-  ! Purpose:                                                             *
-  !   Finish radiation damping calculation and print summary.            *
-  ! Input:                                                               *
-  !   RD(6,6)   (real)    Damped one-turn transfer matrix.               *
-  !   EM(6,6)   (real)    Undamped eigenvectors.                         *
-  !   BMAX(3,3) (real)    Maximum extents of modes.                      *
-  !   GMAX(3,3) (real)    Maximum divergences of modes.                  *
-  !   STABT     (logical) anti-STATIC flag
-  !   FRAD      (logical) radiation flag
-  ! Output:
-  !   u0         (real)   Radiation loss per turn in GeV
-  !   emit_v     (real)   ex, ey, et (emittances)
-  !   nemit_v    (real)   exn, eyn, etn (normalised emittances)
-  !   tunes      (real)   qx, qy, qs
-  !   pdamp      (real)   damping partition numbers
-  !   sig_v      (real)   sigx, sigy, sigt, sige
-  !----------------------------------------------------------------------*
-  double precision :: rd(6,6), em(6,6), bmax(3,3), gmax(3,3)
-  logical :: stabt, dorad
-  double precision :: u0
-  double precision :: emit_v(3), nemit_v(3), tunes(3), sig_v(4), pdamp(3)
-
-  integer :: j, j1, j2, k, k1, k2
-  double precision :: arad, gammas, clg, en0
-  double precision :: amass, freq0, betas
-  double precision :: ex, ey, et, exn, eyn, sigx, sigy, sige, sigt  
-  double precision :: reval(6), aival(6), alj(3), tau(3), tune(3)
-  double precision :: sigma(6,6), bstar(3,3), gstar(3,3), dummy(6,6)
-
-  double precision, external :: get_value
-  integer, parameter :: iqpr2 = 6
-  double precision, parameter :: ten3p=1.0d3, tenp6=1.0d6, tenp9=1.0d9
-
-  SIGMA(:6,:6) = zero 
-  ex=zero;  ey=zero;  et=zero
-
-  arad   = get_value('probe ','arad ')
-  betas  = get_value('probe ','beta ')
-  gammas = get_value('probe ','gamma ')
-  amass  = get_value('probe ','mass ')
-  freq0  = get_value('probe ','freq0 ')
-
-  !---- Synchrotron energy loss [GeV].
-  if (stabt .and. dorad) then
-     u0 = sumu0
-
-     !---- Tunes.
-     call ladeig(rd, reval, aival, dummy)
-     tune(1) = atan2(aival(1), reval(1)) / twopi
-       if (tune(1) .lt. zero) tune(1) = tune(1) + one
-     tune(2) = atan2(aival(3), reval(3)) / twopi
-       if (tune(2) .lt. zero) tune(2) = tune(2) + one
-     tune(3) = atan2(aival(5), reval(5)) / twopi
-       if (tune(3) .lt. zero) tune(3) = - tune(3)
-
-     !---- Damping constants per turn.
-     alj(1) = - log(reval(1)**2 + aival(1)**2) / two
-     alj(2) = - log(reval(3)**2 + aival(3)**2) / two
-     alj(3) = - log(reval(5)**2 + aival(5)**2) / two
-
-     !---- Damping partition numbers.
-     en0 = get_value('probe ','energy ')
-     PDAMP(:) = ALJ(:) * two * en0 / u0
-
-     !---- Emittances.
-     clg = ((55.d0*hbar*clight) / (96.d0*sqrt(three))) * ((arad * gammas**5) / amass)
-     ex = clg * sum(1) / alj(1)
-     ey = clg * sum(2) / alj(2)
-     et = clg * sum(3) / alj(3)
-
-     !---- Damping constants per second and damping times.
-     ALJ(:) = abs(ALJ(:) * freq0 * tenp6)
-     TAU(:) = one / ALJ(:)
-  endif
-
-  !---- TRANSPORT sigma matrix.
-  call emce2i(stabt, em, ex, ey, et, sigma)
-
-  !---- Extents at interaction point.
-  do j = 1, 3
-     j1 = 2 * j -1
-     j2 = 2 * j
-     do k = 1, 3
-        k1 = 2 * k - 1
-        k2 = 2 * k
-        bstar(j,k) = em(j1,k1) * em(j1,k1) + em(j1,k2) * em(j1,k2)
-        gstar(j,k) = em(j2,k1) * em(j2,k1) + em(j2,k2) * em(j2,k2)
-     enddo
-  enddo
-
-  exn = ex * betas * gammas
-  eyn = ey * betas * gammas
-
-  sigx = sqrt(abs(sigma(1,1)))
-  sigy = sqrt(abs(sigma(3,3)))
-  if (sigma(5,5) .gt. zero .or. sigma(6,6) .gt. zero)  then
-     sigt = sqrt(abs(sigma(5,5)));     sige = sqrt(abs(sigma(6,6)))
-  else
-     sigt = zero;     sige = zero
-  endif
-  tunes(1) = qx;    tunes(2) = qy;    tunes(3) = qs
-  emit_v(1) = ex;   emit_v(2) = ey;   emit_v(3) = et
-  nemit_v(1) = exn; nemit_v(2) = eyn
-  sig_v(1) = sigx;  sig_v(2) = sigy;  sig_v(3) = sigt;  sig_v(4) = sige
-  
-  !---- Summary output; header and global parameters.
-  
-  if (stabt) then !---- Dynamic case.
-     if (dorad) write (iqpr2, 910) ten3p * u0
-     write (iqpr2, 920) 1, 2, 3
-     write (iqpr2, 930) qx, qy, qs
-     if (dorad) write (iqpr2, 940) tune
-     write (iqpr2, 950) ((bstar(j,k), j = 1, 3), k = 1, 3), &
-                        ((gstar(j,k), j = 1, 3), k = 1, 3), &
-                        ((bmax(j,k), j = 1, 3), k = 1, 3),  &
-                        ((gmax(j,k), j = 1, 3), k = 1, 3) 
-     if (dorad) then
-        write (iqpr2, 960) pdamp, alj, (tau(j), j = 1, 3), &
-                           ex*tenp6, ey*tenp6, et*tenp6
-     endif
-  else !---- Static case
-     write (iqpr2, 920) 1, 2
-     write (iqpr2, 930) qx, qy
-     write (iqpr2, 970) ((bstar(j,k), j = 1, 2), k = 1, 2), &
-                        ((gstar(j,k), j = 1, 2), k = 1, 2), &
-                        ((bmax(j,k), j = 1, 2), k = 1, 2),  &
-                        ((gmax(j,k), j = 1, 2), k = 1, 2)
-  endif
-
-  !---- RF system.
-  !      call enprrf
-
-910 format(t6,'U0',t16,f14.6,' [MeV/turn]')
-920 format(' '/' ',t42,3(9x,'M o d e',3x,i1:))
-930 format(' Fractional tunes',t30,'undamped',t42,3f20.8)
-940 format(' ',t30,'damped',t42,3f20.8)
-950 format(' '/' beta* [m]',t30,'x',t42,3e20.8/t30,'y',t42,3e20.8/    &
-       t30,'t',t42,3e20.8/                                               &
-       ' '/' gamma* [1/m]',t30,'px',t42,3e20.8/t30,'py',t42,3e20.8/      &
-       t30,'pt',t42,3e20.8/                                              &
-       ' '/' beta(max) [m]',t30,'x',t42,3e20.8/t30,'y',t42,3e20.8/       &
-       t30,'t',t42,3e20.8/                                               &
-       ' '/' gamma(max) [1/m]',t30,'px',t42,3e20.8/t30,'py',t42,3e20.8/  &
-       t30,'pt',t42,3e20.8)
-960 format(' '/' Damping partition numbers',t42,3f20.8/               &
-       ' Damping constants [1/s]',t46,3e20.8/                            &
-       ' Damping times [s]',t46,3e20.8/                                  &
-       ' Emittances [pi micro m]',t42,3e20.8)
-970 format(' '/' beta* [m]',t30,'x',t42,2e20.8/t30,'y',t42,2e20.8/    &
-       ' '/' gamma* [1/m]',t30,'px',t42,2e20.8/t30,'py',t42,2e20.8/      &
-       ' '/' beta(max) [m]',t30,'x',t42,2e20.8/t30,'y',t42,2e20.8/       &
-       ' '/' gamma(max) [1/m]',t30,'px',t42,2e20.8/t30,'py',t42,2e20.8)
-
-end subroutine emsumm
-
-subroutine emce2i(stabt, em, ex, ey, et, sigma)
-  implicit none
-  !----------------------------------------------------------------------*
-  ! Purpose:                                                             *
-  !   Convert eigenvectors to internal sigma matrix form.                *
-  ! Input:                                                               *
-  !   EM(6,6)   (real)    Eigenvector matrix.                            *
-  !   EX        (real)    Horizontal emittance.                          *
-  !   EY        (real)    Vertical emittance.                            *
-  !   ET        (real)    Longitudinal emittance.                        *
-  ! Output:                                                              *
-  !   SIGMA(6,6)(real)    Beam matrix in internal form.                  *
-  !----------------------------------------------------------------------*
-  logical :: stabt
-  double precision :: ex, ey, et, em(6,6), sigma(6,6)
-
-  integer :: j, k
-
-  do j = 1, 6
-     do k = 1, 6
-        sigma(j,k) = ex * (em(j,1)*em(k,1) + em(j,2)*em(k,2)) + &
-                     ey * (em(j,3)*em(k,3) + em(j,4)*em(k,4))
-        if (stabt) & 
-             sigma(j,k) = sigma(j,k) + et * (em(j,5)*em(k,5) + em(j,6)*em(k,6))
-     enddo
-  enddo
-end subroutine emce2i
 
 subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   use twiss0fi
@@ -737,13 +550,13 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
         rw(2,6) =     - rfac                    * orb1(2)
         rw(4,1) =     - rfacx * (one + orb1(6)) * orb1(4)
         rw(4,3) =     - rfacy * (one + orb1(6)) * orb1(4)
-        rw(4,4) = one - rfac * (one + orb1(6))
+        rw(4,4) = one - rfac  * (one + orb1(6))
         rw(4,6) =     - rfac                    * orb1(4)
         rw(6,1) =     - rfacx * (one + orb1(6))
         rw(6,3) =     - rfacy * (one + orb1(6))
         rw(6,6) = one - two * rfac * (one + orb1(6))
         
-        ! RE = RW * RE *  RW
+        ! RE = RW * RE * RW
         RE = matmul(RW, matmul(RE,RW)) 
 
 
@@ -823,6 +636,196 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
      end select
 
 end subroutine emdamp
+
+subroutine emsumm(rd,em,bmax,gmax,stabt,dorad,u0,emit_v,nemit_v, &
+                  tunes,sig_v,pdamp)
+  use emitfi
+  use math_constfi, only : zero, one, two, three, four, twopi
+  use phys_constfi, only : clight, hbar
+  implicit none
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   Finish radiation damping calculation and print summary.            *
+  ! Input:                                                               *
+  !   RD(6,6)   (real)    Damped one-turn transfer matrix.               *
+  !   EM(6,6)   (real)    Undamped eigenvectors.                         *
+  !   BMAX(3,3) (real)    Maximum extents of modes.                      *
+  !   GMAX(3,3) (real)    Maximum divergences of modes.                  *
+  !   STABT     (logical) anti-STATIC flag
+  !   FRAD      (logical) radiation flag
+  ! Output:
+  !   u0         (real)   Radiation loss per turn in GeV
+  !   emit_v     (real)   ex, ey, et (emittances)
+  !   nemit_v    (real)   exn, eyn, etn (normalised emittances)
+  !   tunes      (real)   qx, qy, qs
+  !   pdamp      (real)   damping partition numbers
+  !   sig_v      (real)   sigx, sigy, sigt, sige
+  !----------------------------------------------------------------------*
+  double precision :: rd(6,6), em(6,6), bmax(3,3), gmax(3,3)
+  logical :: stabt, dorad
+  double precision :: u0
+  double precision :: emit_v(3), nemit_v(3), tunes(3), sig_v(4), pdamp(3)
+
+  integer :: j, j1, j2, k, k1, k2
+  double precision :: arad, gammas, clg, en0
+  double precision :: amass, freq0, betas
+  double precision :: ex, ey, et, exn, eyn, sigx, sigy, sige, sigt  
+  double precision :: reval(6), aival(6), alj(3), tau(3), tune(3)
+  double precision :: sigma(6,6), bstar(3,3), gstar(3,3), dummy(6,6)
+
+  double precision, external :: get_value
+  integer, parameter :: iqpr2 = 6
+  double precision, parameter :: ten3p=1.0d3, tenp6=1.0d6, tenp9=1.0d9
+
+  SIGMA(:6,:6) = zero 
+  ex=zero;  ey=zero;  et=zero
+
+  arad   = get_value('probe ','arad ')
+  betas  = get_value('probe ','beta ')
+  gammas = get_value('probe ','gamma ')
+  amass  = get_value('probe ','mass ')
+  freq0  = get_value('probe ','freq0 ')
+
+  !---- Synchrotron energy loss [GeV].
+  if (stabt .and. dorad) then
+     u0 = sumu0
+
+     !---- Tunes.
+     call ladeig(rd, reval, aival, dummy)
+     tune(1) = atan2(aival(1), reval(1)) / twopi
+       if (tune(1) .lt. zero) tune(1) = tune(1) + one
+     tune(2) = atan2(aival(3), reval(3)) / twopi
+       if (tune(2) .lt. zero) tune(2) = tune(2) + one
+     tune(3) = atan2(aival(5), reval(5)) / twopi
+       if (tune(3) .lt. zero) tune(3) = - tune(3)
+
+     !---- Damping constants per turn.
+     alj(1) = - log(reval(1)**2 + aival(1)**2) / two
+     alj(2) = - log(reval(3)**2 + aival(3)**2) / two
+     alj(3) = - log(reval(5)**2 + aival(5)**2) / two
+
+     !---- Damping partition numbers.
+     en0 = get_value('probe ','energy ')
+     PDAMP(:) = ALJ(:) * two * en0 / u0
+
+     !---- Emittances.
+     clg = ((55.d0*hbar*clight) / (96.d0*sqrt(three))) * ((arad * gammas**5) / amass)
+     ex = clg * sum(1) / alj(1)
+     ey = clg * sum(2) / alj(2)
+     et = clg * sum(3) / alj(3)
+
+     !---- Damping constants per second and damping times.
+     ALJ(:) = abs(ALJ(:) * freq0 * tenp6)
+     TAU(:) = one / ALJ(:)
+  endif
+
+  !---- TRANSPORT sigma matrix.
+  call emce2i(stabt, em, ex, ey, et, sigma)
+
+  !---- Extents at interaction point.
+  do j = 1, 3
+     j1 = 2 * j -1
+     j2 = 2 * j
+     do k = 1, 3
+        k1 = 2 * k - 1
+        k2 = 2 * k
+        bstar(j,k) = em(j1,k1) * em(j1,k1) + em(j1,k2) * em(j1,k2)
+        gstar(j,k) = em(j2,k1) * em(j2,k1) + em(j2,k2) * em(j2,k2)
+     enddo
+  enddo
+
+  exn = ex * betas * gammas
+  eyn = ey * betas * gammas
+
+  sigx = sqrt(abs(sigma(1,1)))
+  sigy = sqrt(abs(sigma(3,3)))
+  if (sigma(5,5) .gt. zero .or. sigma(6,6) .gt. zero)  then
+     sigt = sqrt(abs(sigma(5,5)));     sige = sqrt(abs(sigma(6,6)))
+  else
+     sigt = zero;     sige = zero
+  endif
+  tunes(1) = qx;    tunes(2) = qy;    tunes(3) = qs
+  emit_v(1) = ex;   emit_v(2) = ey;   emit_v(3) = et
+  nemit_v(1) = exn; nemit_v(2) = eyn
+  sig_v(1) = sigx;  sig_v(2) = sigy;  sig_v(3) = sigt;  sig_v(4) = sige
+  
+  !---- Summary output; header and global parameters.
+  
+  if (stabt) then !---- Dynamic case.
+     if (dorad) write (iqpr2, 910) ten3p * u0
+     write (iqpr2, 920) 1, 2, 3
+     write (iqpr2, 930) qx, qy, qs
+     if (dorad) write (iqpr2, 940) tune
+     write (iqpr2, 950) ((bstar(j,k), j = 1, 3), k = 1, 3), &
+                        ((gstar(j,k), j = 1, 3), k = 1, 3), &
+                        ((bmax(j,k), j = 1, 3), k = 1, 3),  &
+                        ((gmax(j,k), j = 1, 3), k = 1, 3) 
+     if (dorad) then
+        write (iqpr2, 960) pdamp, alj, (tau(j), j = 1, 3), &
+                           ex*tenp6, ey*tenp6, et*tenp6
+     endif
+  else !---- Static case
+     write (iqpr2, 920) 1, 2
+     write (iqpr2, 930) qx, qy
+     write (iqpr2, 970) ((bstar(j,k), j = 1, 2), k = 1, 2), &
+                        ((gstar(j,k), j = 1, 2), k = 1, 2), &
+                        ((bmax(j,k), j = 1, 2), k = 1, 2),  &
+                        ((gmax(j,k), j = 1, 2), k = 1, 2)
+  endif
+
+  !---- RF system.
+  !      call enprrf
+
+910 format(t6,'U0',t16,f14.6,' [MeV/turn]')
+920 format(' '/' ',t42,3(9x,'M o d e',3x,i1:))
+930 format(' Fractional tunes',t30,'undamped',t42,3f20.8)
+940 format(' ',t30,'damped',t42,3f20.8)
+950 format(' '/' beta* [m]',t30,'x',t42,3e20.8/t30,'y',t42,3e20.8/    &
+       t30,'t',t42,3e20.8/                                               &
+       ' '/' gamma* [1/m]',t30,'px',t42,3e20.8/t30,'py',t42,3e20.8/      &
+       t30,'pt',t42,3e20.8/                                              &
+       ' '/' beta(max) [m]',t30,'x',t42,3e20.8/t30,'y',t42,3e20.8/       &
+       t30,'t',t42,3e20.8/                                               &
+       ' '/' gamma(max) [1/m]',t30,'px',t42,3e20.8/t30,'py',t42,3e20.8/  &
+       t30,'pt',t42,3e20.8)
+960 format(' '/' Damping partition numbers',t42,3f20.8/               &
+       ' Damping constants [1/s]',t46,3e20.8/                            &
+       ' Damping times [s]',t46,3e20.8/                                  &
+       ' Emittances [pi micro m]',t42,3e20.8)
+970 format(' '/' beta* [m]',t30,'x',t42,2e20.8/t30,'y',t42,2e20.8/    &
+       ' '/' gamma* [1/m]',t30,'px',t42,2e20.8/t30,'py',t42,2e20.8/      &
+       ' '/' beta(max) [m]',t30,'x',t42,2e20.8/t30,'y',t42,2e20.8/       &
+       ' '/' gamma(max) [1/m]',t30,'px',t42,2e20.8/t30,'py',t42,2e20.8)
+
+end subroutine emsumm
+
+subroutine emce2i(stabt, em, ex, ey, et, sigma)
+  implicit none
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   Convert eigenvectors to internal sigma matrix form.                *
+  ! Input:                                                               *
+  !   EM(6,6)   (real)    Eigenvector matrix.                            *
+  !   EX        (real)    Horizontal emittance.                          *
+  !   EY        (real)    Vertical emittance.                            *
+  !   ET        (real)    Longitudinal emittance.                        *
+  ! Output:                                                              *
+  !   SIGMA(6,6)(real)    Beam matrix in internal form.                  *
+  !----------------------------------------------------------------------*
+  logical :: stabt
+  double precision :: ex, ey, et, em(6,6), sigma(6,6)
+
+  integer :: j, k
+
+  do j = 1, 6
+     do k = 1, 6
+        sigma(j,k) = ex * (em(j,1)*em(k,1) + em(j,2)*em(k,2)) + &
+                     ey * (em(j,3)*em(k,3) + em(j,4)*em(k,4))
+        if (stabt) & 
+             sigma(j,k) = sigma(j,k) + et * (em(j,5)*em(k,5) + em(j,6)*em(k,6))
+     enddo
+  enddo
+end subroutine emce2i
 
 subroutine getclor(orbit0, rt, tt, error)
   !----------------------------------------------------------------------*

@@ -19,7 +19,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   integer :: sector_tab_name(*) ! holds sectormap data
 
   integer :: i, ithr_on
-  integer :: chrom, eflag 
+  integer :: eflag 
   double precision :: orbit0(6), orbit(6), tt(6,6,6), ddisp0(6), r0mat(2,2)
   character(len=48) :: charconv
   logical :: fast_error_func
@@ -32,7 +32,6 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   !---- Initialization
   table_name = charconv(tab_name)
   sectorTableName = charconv(sector_tab_name)
-  chrom=0
   eflag=0
   ithr_on=0
   fsecarb=.false.
@@ -65,9 +64,6 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
 
   suml=zero; circ=zero; eta=zero; alfa=zero; gamtr=zero; wgt=zero
 
-  !---- Track chromatic functions
-  chrom = get_option('twiss_chrom ')
-  
   !---- flag if called from match process
   !---- get match flag for storing variables in nodes
   match_is_on = get_option('match_is_on ') .ne. 0
@@ -133,7 +129,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   call twcpgo(rt,orbit0)
 
   !---- List chromatic functions.
-  if (chrom .ne. 0) then
+  if (get_option('twiss_chrom ') .ne. 0) then
      call twbtin(rt,tt)
      call twchgo
   endif
@@ -646,6 +642,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   
   debug = get_option('debug ')
 
+  ! if (debug .ne. zero) print *, 'tmfrst: gamma = ', gamma
+  
   !---- Initialize
   !---- corr_pick stores for both projection the last pickup used by the
   !     threader in order to avoid corrections in front of it when
@@ -921,7 +919,7 @@ SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
   if (code .eq. code_placeholder) code = code_instrument 
 
   !-- if wrong corrector or not a corrector, loop
-  if (code .ne. itp .and. code .ne. code_kicker) goto 10 
+  if (code .ne. itp .and. code .ne. code_kicker) goto 10 ! loop over nodes 
 
   !--- corrector found for the projection plane
   ncorr = node
@@ -931,7 +929,7 @@ SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
   ATEMP = matmul(PMATR,ATEMP) 
 
   !--- if kicker is not efficient enough - loop
-  if (abs(atemp(lc1,lc2)) .lt. tol1min) goto 10 
+  if (abs(atemp(lc1,lc2)) .lt. tol1min) goto 10 ! loop over nodes 
 
   !---  now we got one good corrector - get kick with attenuation factor
   cick = -thrvec(3) * dorb(2*kpro-1) / atemp(lc1,lc2)
@@ -1498,7 +1496,7 @@ SUBROUTINE twcpgo(rt,orbit0)
      opt_fun(32) = rmat(2,2)
   endif
 
-  if (advance_node() .ne. 0) goto 10
+  if (advance_node() .ne. 0) goto 10 ! loop over nodes
 
   !---- Compute summary.
   wgt    = max(iecnt, 1)
@@ -2179,7 +2177,7 @@ SUBROUTINE twchgo
      opt_fun(32) = rmat(2,2)
   endif
 
-  if (advance_node() .ne. 0)  goto 10
+  if (advance_node() .ne. 0)  goto 10 ! loop over nodes
 
   !---- Warning, if system is coupled.
   if (cplxy) then
@@ -5509,14 +5507,15 @@ SUBROUTINE tmsymp(r)
   if (eflag) goto 100
 
   R = V 
-  return
+  return ! normal exit 
 
-100 continue
-    call m66symp(r,nrm)
-    if (nrm .gt. zero) then
-       print *," Singular matrix occurred during symplectification of R (left unchanged)."
-       print *," The column norm of R'*J*R-J is ",nrm
-    endif
+100 continue ! failure
+
+  call m66symp(r,nrm)
+  if (nrm .gt. zero) then
+     print *," Singular matrix occurred during symplectification of R (left unchanged)."
+     print *," The column norm of R'*J*R-J is ",nrm
+  endif
 
 end SUBROUTINE tmsymp
 
@@ -5554,7 +5553,7 @@ subroutine m66div(anum,aden,target,eflag)
 
 end subroutine m66div
 
-subroutine m66symp(r,nrm) ! can be moved to twiss.f90
+subroutine m66symp(r,nrm) 
   use matrices, only : JMAT
   implicit none
   !----------------------------------------------------------------------*

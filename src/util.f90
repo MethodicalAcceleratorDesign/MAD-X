@@ -709,7 +709,8 @@ end module fasterror
 subroutine fort_info(t1, t2)
   implicit none
   character(*) :: t1, t2
-  integer :: get_option
+  integer, external :: get_option
+
   if (get_option('info ') .ne. 0 .and. get_option('warn ') .ne. 0)  &
        print '(a,1x,a,1x,a)', '++++++ info:', t1, t2
 end subroutine fort_info
@@ -724,7 +725,8 @@ subroutine fort_warn(t1, t2)
   !   T2      (char)    Message.                                         *
   !----------------------------------------------------------------------*
   character(*) :: t1, t2
-  integer :: get_option
+  integer, external :: get_option
+
   if (get_option('warn ') .ne. 0) then
      print '(a,1x,a,1x,a)', '++++++ warning:', t1, t2
      call augmentfwarn()
@@ -741,12 +743,12 @@ subroutine fort_fail(t1,t2)
   !   T2      (char)    Message                                          *
   !----------------------------------------------------------------------*
   character(*) :: t1, t2
-  integer :: get_option
+  integer, external :: get_option
 
   print *,' '
   print *,  '+-+-+- fatal: ',t1,t2
   print *,' '
-  
+
   if (get_option('no_fatal_stop ') .eq. 0) stop  1
 end subroutine fort_fail
 
@@ -757,6 +759,7 @@ subroutine aafail(rout,text)
 end subroutine aafail
 
 logical function m66sta(amat)
+  use math_constfi , only : one
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:
@@ -767,10 +770,10 @@ logical function m66sta(amat)
   !   .TRUE.              For static case     (constant p).
   !   .FALSE.             For dynamic case    (variable p).
   !----------------------------------------------------------------------*
-  double precision :: amat(6,6)
+  double precision, intent(IN) :: amat(6,6)
 
   integer :: j
-  double precision, parameter :: one=1d0, tol=1d-12
+  double precision, parameter :: tol=1d-12
 
   m66sta = abs(amat(6,6) - one) .le. tol
   do j = 1, 5
@@ -780,6 +783,7 @@ logical function m66sta(amat)
 end function m66sta
 
 subroutine dcopy(in,out,n)
+  implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Copy arrays.                                                       *
@@ -789,16 +793,16 @@ subroutine dcopy(in,out,n)
   ! Output:                                                              *
   !   out (double)    target array.                                      *
   !----------------------------------------------------------------------*
-  implicit none
-
-  double precision :: in(*), out(*)
-  integer :: n
-
+  integer, intent(IN) :: n
+  double precision, intent(IN)  :: in(*)
+  double precision, intent(OUT) :: out(*)
+  
   OUT(1:n) = IN(1:n)
 
 end subroutine dcopy
 
 subroutine solver(augmat,ndim,mdim,irank)
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:
@@ -810,12 +814,12 @@ subroutine solver(augmat,ndim,mdim,irank)
   !   AUGMAT(n,n+m)       Identity(n,n), augmented by X(n,m).
   !   IRANK               Rank of A.
   !----------------------------------------------------------------------*
-  double precision :: augmat(ndim,ndim+mdim)
-  integer :: ndim, mdim, irank 
+  integer, intent(IN)  :: ndim, mdim
+  integer, intent(OUT) :: irank
+  double precision, intent(IN OUT) :: augmat(ndim,ndim+mdim)
 
   double precision :: h, pivot
-  integer ::ic, ip, ir, it, nc, nr
-  double precision, parameter :: zero=0d0
+  integer :: ic, ip, ir, it, nc, nr
 
   nr = ndim
   nc = ndim + mdim
@@ -830,7 +834,7 @@ subroutine solver(augmat,ndim,mdim,irank)
         endif
      enddo
 
-     if (pivot .eq. zero) go to 9999
+     if (pivot .eq. zero) return
      irank = it
 
      do ic = 1, nc
@@ -857,9 +861,10 @@ subroutine solver(augmat,ndim,mdim,irank)
 
   irank = ndim
 
-9999 end subroutine solver
+end subroutine solver
 
 subroutine symsol(a,n,eflag,work_1,work_2,work_3)
+  use math_constfi, only : zero, one
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:
@@ -871,19 +876,18 @@ subroutine symsol(a,n,eflag,work_1,work_2,work_3)
   !   A(*,*)    (real)    Inverted matrix.
   !   EFLAG     (logical) Error flag.
   !----------------------------------------------------------------------*
-  double precision :: a(n,n), work_1(n), work_2(n), work_3(n)
-  integer :: n
-  logical :: eflag
+  integer, intent(IN)  :: n
+  double precision, intent(IN OUT) :: a(n,n)
+  logical, intent(OUT) :: eflag
 
-  integer :: i,j,k
-  double precision :: si
-  double precision, parameter :: zero=0d0, one=1d0
+  integer :: i, j, k
+  double precision :: si, work_1(n), work_2(n), work_3(n)
 
   !---- Scale upper triangle.
   eflag = .true.
   do i = 1, n
      si = a(i,i)
-     if (si .le. zero) go to 100
+     if (si .le. zero) return
      work_1(i) = one / sqrt(si)
   enddo
   do i = 1, n
@@ -894,7 +898,7 @@ subroutine symsol(a,n,eflag,work_1,work_2,work_3)
 
   !---- Invert upper triangle.
   do i = 1, n
-     if (a(i,i) .eq. zero) go to 100
+     if (a(i,i) .eq. zero) return
      work_2(i) = one
      work_3(i) = one / a(i,i)
      a(i,i) = zero
@@ -923,13 +927,13 @@ subroutine symsol(a,n,eflag,work_1,work_2,work_3)
         a(j,i) = a(i,j)
      enddo
   enddo
-  eflag = .false.
 
-100 continue
+  eflag = .false.
 
 end subroutine symsol
 
 subroutine symeig(a,nd,n,eigen,nval,work)
+  use math_constfi, only : zero, one, two, four
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -941,22 +945,24 @@ subroutine symeig(a,nd,n,eigen,nval,work)
   !   EIGEN(*)  (real)    Eigenvalues of A in descending order.          *
   !   NVAL      (integer) Number of eigenvalues found.                   *
   !----------------------------------------------------------------------*
-  double precision :: a(nd,nd), eigen(nd), work(nd)
-  integer :: nd, n, nval 
+  integer, intent(IN)  :: nd, n
+  integer, intent(OUT) :: nval
+  double precision, intent(IN OUT)  :: a(nd,nd)
+  double precision, intent(OUT) :: eigen(nd), work(nd)
 
-  integer :: i, it, j, k, l, m, itmax
+  integer :: i, it, j, k, l, m
   double precision :: b, c, f, g, h, p, r, s
 
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0, four=4d0, big=1d10, eps=1d-20
-  parameter(itmax=15)
+  double precision, parameter :: big=1d10, eps=1d-20
+  integer, parameter :: itmax=15
 
   nval = n
-  if (n .le. 0) go to 300 ! 
+  if (n .le. 0) return
 
   !---- Matrix is 1 * 1.
   if (n .eq. 1) then
      eigen(1) = a(1,1)
-     go to 300
+     return
   endif
 
   !---- Matrix is 2 * 2.
@@ -965,10 +971,10 @@ subroutine symeig(a,nd,n,eigen,nval,work)
      g = sqrt((a(1,1) - a(2,2))**2 + four * a(2,1)**2)
      eigen(1) = (f - g) / two
      eigen(2) = (f + g) / two
-     go to 300
+     return
   endif
 
-  !---- N is at least 3, reduce to tridiagonal form.
+  !---- n is at least 3, reduce to tridiagonal form.
   do i = n, 3, -1
      g = zero
      do k = 1, i-2
@@ -1003,6 +1009,7 @@ subroutine symeig(a,nd,n,eigen,nval,work)
         enddo
      endif
   enddo
+
   work(2) = a(2,1)
   work(1) = zero
   eigen(2) = a(2,2)
@@ -1016,12 +1023,14 @@ subroutine symeig(a,nd,n,eigen,nval,work)
   work(n) = zero
   f = zero
   b = zero
+
   do l = 1, n
      b = max(eps*(abs(eigen(l))+abs(work(l))),b)
      do m = l, n
         if (abs(work(m)) .le. b) go to 130
      enddo
      m = n
+
 130  if (m .ne. l) then
         do it = 1, itmax
            p = (eigen(l+1) - eigen(l)) / (two * work(l))
@@ -1053,17 +1062,19 @@ subroutine symeig(a,nd,n,eigen,nval,work)
            if (abs(work(l)) .le. b) go to 170
         enddo
         nval = l - 1
-        go to 300
+        return
      endif
+
 170  p = eigen(l) + f
+
      do i = l, 2, -1
         if (p .ge. eigen(i-1)) go to 190
         eigen(i) = eigen(i-1)
      enddo
      i = 1
 190  eigen(i) = p
+
   enddo
-300 continue
 
 end subroutine symeig
 
@@ -1082,17 +1093,16 @@ double precision function proxim(x,y)
 end function proxim
 
 character(len=48) function charconv(tint)
+  implicit none
   !----------------------------------------------------------------------*
   ! purpose:                                                             *
   !   converts integer array to string (based on ascii)                  *
   ! input:                                                               *
   !   tint  (int array)  1 = length, rest = string                       *
   !----------------------------------------------------------------------*
-  implicit none
-
   integer :: tint(*)
 
-  integer ::i, j, n
+  integer :: i, j, n
   integer, parameter :: m = 128
   character(len=m) :: letter
   data letter / &
@@ -1109,6 +1119,7 @@ end function charconv
 
 subroutine laseig(fm,reeig,aieig,am)
   use matrices, only : EYE
+  use math_constfi, only : zero, one
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1120,13 +1131,13 @@ subroutine laseig(fm,reeig,aieig,am)
   !   AIEIG(6)  (real)    Imaginary parts of eigenvalues.                *
   !   AM(6,6)   (real)    Transforming matrix, contains eigenvectors.    *
   !----------------------------------------------------------------------*
-  double precision :: fm(6,6), reeig(6), aieig(6), am(6,6)
+  double precision, intent(IN)  :: fm(6,6)
+  double precision, intent(OUT) :: reeig(6), aieig(6), am(6,6)
 
   integer :: i, info, ipind, iqind, j, k, kpnt(6)
   double precision :: aival(6), d(6), reval(6), tm(6,6)
   double precision :: big, c, dx, dy, pb, s
 
-  double precision, parameter :: zero=0d0, one=1d0
   integer, parameter :: ilo=1, ihi=4, mdim=6, nn=4
 
   !---- Compute eigenvalues and vectors.
@@ -1140,7 +1151,7 @@ subroutine laseig(fm,reeig,aieig,am)
      write (6, 910) ((fm(i,k), k = 1, 6), i = 1, 6)
 910  format('Unable to find eigenvalues for matrix:'/(6f12.6))
      call fort_fail('LASEIG',' Unable to find eigenvalues for matrix')
-     go to 999
+     return
   endif
 
   !---- Normalize the eigenvectors.
@@ -1209,10 +1220,11 @@ subroutine laseig(fm,reeig,aieig,am)
 
   AM = matmul(AM,TM) 
 
-999 end subroutine laseig
+end subroutine laseig
 
 subroutine ladeig(fm,reeig,aieig,am)
   use matrices, only : EYE
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1224,13 +1236,13 @@ subroutine ladeig(fm,reeig,aieig,am)
   !   AIEIG(6)  (real)    Imaginary parts of eigenvalues.                *
   !   AM(6,6)   (real)    Transforming matrix, contains eigenvectors.    *
   !----------------------------------------------------------------------*
-  double precision :: fm(6,6), reeig(6), aieig(6), am(6,6)
-
+  double precision, intent(IN)  :: fm(6,6)
+  double precision, intent(OUT) :: reeig(6), aieig(6), am(6,6)
+  
   integer i, info, j, k, kpnt(6)
   double precision :: aival(6), d(6), reval(6), tm(6,6)
   double precision :: big, c, dt, dx, dy, pb, s
 
-  double precision, parameter :: zero=0d0
   integer, parameter :: ilo=1, ihi=6, mdim=6, nn=6
 
   !---- Compute eigenvalues and eigenvectors.
@@ -1242,7 +1254,7 @@ subroutine ladeig(fm,reeig,aieig,am)
      write (6, 910) ((fm(i,k), k = 1, 6), i = 1, 6)
 910  format('Unable to find eigenvalues for matrix:'/(6f12.6))
      call fort_fail('LADEIG',' Unable to find eigenvalues for matrix')
-     go to 9999
+     return
   endif
 
   !---- Normalize the eigenvectors.
@@ -1321,9 +1333,10 @@ subroutine ladeig(fm,reeig,aieig,am)
   tm(6,6) = tm(5,5)
   AM = matmul(AM,TM) 
 
-9999 end subroutine ladeig
+end subroutine ladeig
 
 subroutine orthes(ndim,n,ilow,iupp,a,d)
+  use math_constfi, only : zero
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1344,12 +1357,12 @@ subroutine orthes(ndim,n,ilow,iupp,a,d)
   !                       about the orthogonal transformations.          *
   !   D(N)      (real)    Further information.                           *
   !----------------------------------------------------------------------*
-  integer :: ndim, n, ilow, iupp
-  double precision :: a(ndim,n), d(n)
+  integer, intent (IN) :: ndim, n, ilow, iupp
+  double precision, intent (IN OUT) :: a(ndim,n)
+  double precision, intent (OUT) :: d(n)
 
   integer :: i, j, m
-  double precision :: f,g,h,scale
-  double precision, parameter :: zero=0d0
+  double precision :: f, g, h, scale
 
   do m = ilow + 1, iupp - 1
      h = zero
@@ -1396,6 +1409,7 @@ subroutine orthes(ndim,n,ilow,iupp,a,d)
 end subroutine orthes
 
 subroutine ortran(ndim,n,ilow,iupp,h,d,v)
+  use math_constfi, only : zero, one
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1415,13 +1429,13 @@ subroutine ortran(ndim,n,ilow,iupp,h,d,v)
   !   V(NDIM,N) (real)    The accumulated transformation.                *
   !   D(N)      (real)    Destroyed.                                     *
   !----------------------------------------------------------------------*
-  integer :: ndim, n, ilow, iupp
-  double precision :: h(ndim,n), d(n), v(ndim,n) 
+  integer, intent(IN) :: ndim, n, ilow, iupp
+  double precision, intent(IN)  :: h(ndim,n)
+  double precision, intent(OUT) :: d(n), v(ndim,n) 
 
   integer :: i, j, k, m
   double precision :: x, y
-  double precision, parameter :: zero=0d0, one=1d0
-
+  
   !---- Initialize V to identity matrix.
   V(:n,:n) = zero
   do i = 1, n
@@ -1452,6 +1466,7 @@ end subroutine ortran
 
 subroutine hqr2(ndim,n,ilow,iupp,h,wr,wi,vecs,ierr)
   use max_iterate
+  use math_constfi, only : zero, one, two
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1476,14 +1491,14 @@ subroutine hqr2(ndim,n,ilow,iupp,h,wr,wi,vecs,ierr)
   !   VECS(NDIM,N) (real) The unnormalized eigenvectors of A.            *
   !                       Complex vectors are stored as pairs of reals.  *
   !----------------------------------------------------------------------*
-  integer :: ndim, n, ilow, iupp, ierr 
-  double precision :: h(ndim,n), wi(n), wr(n), vecs(ndim,n)
-
+  integer, intent(IN)  :: ndim, n, ilow, iupp 
+  integer, intent(OUT) :: ierr
+  double precision, intent(OUT) :: h(ndim,n), wi(n), wr(n), vecs(ndim,n)
+  
   integer :: i, j, k, l, m, na, ien, its
   double precision :: den, hnorm, p, q, r, ra, s, sa, t, temp, tempi
   double precision :: tempr, vi, vr, w, x, y, z
-
-  double precision, parameter :: zero=0d0, one=1d0, two=2d0
+  
   double precision, parameter :: epsmch=1d-16, triqua=.75d0, fac1=.4375d0
 
   !Initialize
@@ -1522,7 +1537,7 @@ subroutine hqr2(ndim,n,ilow,iupp,h,wr,wi,vecs,ierr)
      if (its .eq. MAXITER) then
         write(6,*) "Maximum Iteration exceeded in HQR2, increase MAXITER: ",MAXITER
         ierr = ien
-        go to 9999
+        return
      endif
      !---- Form exceptional shift.
      if (its .eq. 10  .or.  its .eq. 20) then
@@ -1815,7 +1830,8 @@ subroutine hqr2(ndim,n,ilow,iupp,h,wr,wi,vecs,ierr)
         enddo
      endif
   enddo
-9999 end subroutine hqr2
+
+end subroutine hqr2
 
 integer function lastnb(t)
   !----------------------------------------------------------------------*
@@ -1835,35 +1851,36 @@ integer function lastnb(t)
 20 lastnb = i
 end function lastnb
 
-subroutine f77flush(i,option)
+subroutine f77flush(i, option)
   implicit none
   integer :: i, ios
-  real :: a
-  logical ostat, fexist,option
-  character(len=20) ::faccess, fform
+  logical :: ostat, fexist, option
+  character(len=20) :: faccess, fform
   character(len=255) :: fname
   character(len=1) :: c
+  real :: a ! dp ? 
 
-  inquire(err=5,iostat=ios,unit=i,opened=ostat,exist=fexist)
-  if (.not.ostat.or..not.fexist) return
+  inquire( err=5, iostat=ios, unit=i, opened=ostat, exist=fexist)
+  if (.not.ostat .or. .not.fexist) return
 
-  inquire(err=6,iostat=ios,unit=i,access=faccess,form=fform,name=fname)
+  inquire(err=6, iostat=ios, unit=i, access=faccess, form=fform, name=fname)
 
-  close (unit=i,err=7,iostat=ios)
+  close (unit=i, err=7, iostat=ios)
 
-  open(err=8,iostat=ios,unit=i,access=faccess,form=fform,file=fname,status='old')
+  open(err=8, iostat=ios, unit=i, access=faccess, form=fform, file=fname, status='old')
 
   if (option) then
-     if (fform.eq.'FORMATTED') then
-3       read (i,100,err=9,iostat=ios,end=4) c
+     if (fform .eq. 'FORMATTED') then
+3       read (i, 100, err=9, iostat=ios, end=4) c
         go to 3
      else
-2       read (i,err=10,iostat=ios,end=1) a
+2       read (i, err=10, iostat=ios, end=1) a
         go to 2
      endif
 4    backspace i
 1    continue
   endif
+  
   return
 
 100 format (a1)

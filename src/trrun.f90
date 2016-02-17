@@ -34,10 +34,16 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   !   code_buf    int(nelem)  local mad-8 code storage                   *
   !   l_buf       dp(nelem)   local length storage                       *
   !----------------------------------------------------------------------*
-  integer :: switch, turns, e_flag
+  integer, intent(IN)  :: switch, turns
+  integer, intent(OUT) :: e_flag
+
+  double precision, intent(IN) :: orbit0(6)
+  double precision, intent(IN OUT) :: rt(6,6)
+  double precision, intent(OUT) :: eigen(6,6), coords(6,0:turns,*)
+
   integer :: part_id(*), last_turn(*), code_buf(*)
-  double precision :: orbit0(6), rt(6,6), last_pos(*), z(6,*), dxt(*), dyt(*)
-  double precision :: last_orbit(6,*), eigen(6,6), coords(6,0:turns,*), l_buf(*)
+  double precision :: last_pos(*), z(6,*), dxt(*), dyt(*)
+  double precision :: last_orbit(6,*),  l_buf(*)
 
   logical :: onepass, onetable, last_out, info, aperflag, doupdate
   logical :: run=.false.,dynap=.false. 
@@ -149,7 +155,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   e_flag = 0
   ! flag to avoid double entry of last line
   last_out = .false.
-  onepass = get_option('onepass ') .ne. 0
+  onepass  = get_option('onepass ') .ne. 0
   onetable = get_option('onetable ') .ne. 0
 
   info = get_option('info ') * get_option('warn ') .gt. 0 ! why not just respect info and warn ? 
@@ -4467,8 +4473,8 @@ subroutine dpoissn (amu,n,ierror)
   !    ON RETURN IERROR.EQ.0 NORMALLY                                    *
   !              IERROR.EQ.1 IF AMU.LE.0.                                *
   !----------------------------------------------------------------------*
-  double precision :: amu
-  integer :: n, ierror
+  double precision, intent(IN) :: amu
+  integer, intent(OUT) :: n, ierror
 
   double precision :: ran, pir, expma
   double precision :: frndm, grndm

@@ -778,8 +778,7 @@ pro_twiss(void)
   char dummy[NAME_L] = "dummy", *sector_table_name = dummy; /* second string required by) */
   /* will be set to a proper string in case twiss_sector option selected */
   double tol,tol_keep, q1_val_p = 0, q2_val_p = 0, q1_val, q2_val, dq1, dq2;
-  int i, j, lp, k_orb = 0, u_orb = 0, pos, k_save = 1, k = 1, k_sect, 
-      w_file, beta_def;
+  int i, j, lp, k_orb = 0, u_orb = 0, pos, k_save = 1, k = 1, k_sect, w_file, beta_def;
   int chrom_flg;
   int orbit_input = 0; // counter of number of elements of initial orbit given on command line
 
@@ -813,11 +812,9 @@ pro_twiss(void)
 				    this can be overridden with option "slow"
                                     on match command */
 
-  /*
-    start command decoding
-  */
+  /*    start command decoding  */
   pos = name_list_pos("sequence", nl);
-  if(nl->inform[pos]) { /* sequence specified */
+  if (nl->inform[pos]) { /* sequence specified */
     name = pl->parameters[pos]->string;
     if ((lp = name_list_pos(name, sequences->list)) > -1)
       current_sequ = sequences->sequs[lp];
@@ -922,8 +919,6 @@ pro_twiss(void)
     }
     if (filename == NULL) filename = permbuff("dummy");
     w_file = 1;
-    // 2015-Jul-31  11:41:59  ghislain: aperture twiss file for output of twiss table ! not needed
-    //strcpy(aptwfile,filename); /* IW 02.12.2004 */
   }
   else w_file = 0;
 
@@ -939,9 +934,7 @@ pro_twiss(void)
 
   if((pos = name_list_pos("notable", nl)) > -1 && nl->inform[pos]) k_save = 0;
 
-  /*
-    end of command decoding
-  */
+  /*    end of command decoding  */
 
   if ((beta_def = twiss_input(current_twiss)) < 0) {
     if (beta_def == -1) warning("unknown beta0,", "Twiss ignored");
@@ -1019,16 +1012,6 @@ pro_twiss(void)
     add_to_table_list(twiss_sector_table, table_register);
   }
 
-  // 2014-May-30  12:33:48  ghislain: suppressed
-  /* if (get_option("useorbit")) */
-  /*   copy_double(current_sequ->orbits->vectors[u_orb]->a, orbit0, 6); */
-  /* else if (guess_flag) { */
-  /*   for (i = 0; i < 6; i++) { */
-  /*     if (guess_orbit[i] != zero) orbit0[i] = guess_orbit[i]; */
-  /*   } */
-  /* } */
-
-  
   // 2014-May-30  12:33:48  ghislain: modified order of priority
   //              and added input for values given on command line
   if (guess_flag) {
@@ -1079,11 +1062,13 @@ pro_twiss(void)
       current_sequ->tw_table = twiss_table;
       current_sequ->tw_valid = 1;
       twiss_table->org_sequ = current_sequ;
+      
       adjust_probe(twiss_deltas->a[i]+DQ_DELTAP);
       adjust_rfc(); /* sets freq in rf-cavities from probe */
       current_node = current_sequ->ex_start;
-      // CALL TWISS
-      twiss_(oneturnmat, disp0, tarr->i, tarr_sector->i);
+      
+      twiss_(oneturnmat, disp0, tarr->i, tarr_sector->i); // CALL TWISS
+
       pos = name_list_pos("q1", summ_table->columns);
       q1_val_p = summ_table->d_cols[pos][i];
       pos = name_list_pos("q2", summ_table->columns);
@@ -1110,21 +1095,29 @@ pro_twiss(void)
 
     if ((twiss_success = get_option("twiss_success"))) {
       if (chrom_flg) { /* calculate chromaticity from tune difference - HG 6.2.09*/
-        pos = name_list_pos("q1", summ_table->columns);
+
+	pos = name_list_pos("q1", summ_table->columns);
         q1_val = summ_table->d_cols[pos][i];
         pos = name_list_pos("q2", summ_table->columns);
         q2_val = summ_table->d_cols[pos][i];
+
         dq1 = (q1_val_p - q1_val) / DQ_DELTAP;
         dq2 = (q2_val_p - q2_val) / DQ_DELTAP;
+
         pos = name_list_pos("dq1", summ_table->columns);
         summ_table->d_cols[pos][i] = dq1;
         pos = name_list_pos("dq2", summ_table->columns);
         summ_table->d_cols[pos][i] = dq2;
       }
+
       if (get_option("keeporbit")) copy_double(orbit0, current_sequ->orbits->vectors[k_orb]->a, 6);
+
       if (k_save) fill_twiss_header(twiss_table);
+
       if (i == 0) exec_savebeta(); /* fill beta0 at first delta_p only */
+
       if (k_save && w_file) out_table(table_name, twiss_table, filename);
+
       if ((twiss_deltas->curr>1)&&(i<twiss_deltas->curr-1)) {
         struct table *t = detach_table_from_table_list(table_name, table_register);
         if (t) {
@@ -1135,21 +1128,22 @@ pro_twiss(void)
         }
       }
     }
+
     else {
       seterrorflag(1,"pro_twiss","TWISS failed");
       warning("Twiss failed: ", "MAD-X continues");
     }
+
     tarr = delete_int_array(tarr);
+
   } // i = 0 .. twiss_deltas->curr-1
-
-  if (get_option("twiss_sector")){
-    out_table( sector_table_name, twiss_sector_table, sector_name );
-  }
-
+  
+  if (get_option("twiss_sector")) out_table( sector_table_name, twiss_sector_table, sector_name );
+  
   tarr_sector = delete_int_array(tarr_sector);
-
+  
   if (twiss_success && get_option("twiss_print")) print_table(summ_table);
-
+  
   /* cleanup */
   current_beam = keep_beam;
   probe_beam = delete_command(probe_beam);
