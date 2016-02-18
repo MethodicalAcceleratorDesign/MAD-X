@@ -8,9 +8,8 @@ pro_emit(struct in_cmd* cmd)
 {
   struct command* emit = cmd->clone;
   double e_deltap, e_tol, u0;
-  int j, error, keep;
-  double emit_v[3], nemit_v[3], bmax[9], gmax[9], dismax[4], tunes[3],
-    sig_v[4], pdamp[3], r0mat[4];
+  int j, keep;
+  double emit_v[3], nemit_v[3], bmax[9], gmax[9], dismax[4], tunes[3], sig_v[4], pdamp[3];
   char tmp[100];
   int updatebeam;
 
@@ -39,12 +38,14 @@ pro_emit(struct in_cmd* cmd)
   probe_beam = clone_command(current_beam);
   adjust_rfc();        /* sets rf freq and harmon */
 
+  int error = 0;
+  double r0mat[4] = {0};
   tmrefe_(oneturnmat); /* one-turn linear transfer map */
   twcpin_(oneturnmat,disp0,r0mat,&error); /* added for disp0 computation */
 
   adjust_probe(e_deltap); /* sets correct gamma, beta, etc. */
-  print_probe();
   adjust_rfc(); /* sets freq in rf-cavities from probe */
+  print_probe();
 
   // guess_flag is set by COGUESS command
   if (guess_flag) copy_double(guess_orbit, orbit0, 6);
