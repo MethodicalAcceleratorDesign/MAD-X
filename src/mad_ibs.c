@@ -16,12 +16,8 @@ pro_ibs(struct in_cmd* cmd)
     warning("no TWISS table present","IBS command ignored");
 
   else {
-    if ((current_beam
-         = find_command(twiss_table->org_sequ->name, beam_list)) == NULL)
+    if ((current_beam = find_command(twiss_table->org_sequ->name, beam_list)) == NULL)
       current_beam = find_command("default_beam", beam_list);
-
-    if (probe_beam != NULL) delete_command(probe_beam);
-    probe_beam = clone_command(current_beam);
 
     pos = name_list_pos("file", nl);
     if (nl->inform[pos]) {
@@ -43,11 +39,20 @@ pro_ibs(struct in_cmd* cmd)
       add_to_table_list(ibs_table, table_register);
     }
     
-    adjust_probe(zero); /* sets correct gamma, beta, etc. */
+    // LD 2016.02.18: START
+    // adjust_beam();
+    probe_beam = clone_command(current_beam);
+    // adjust_rfc(); /* sets freq in rf-cavities from probe */
+
+    // LD 2016.02.17: BUG, depends on the previous oneturnmap and disp0 -> alpha is wrong even with dp=0
+    adjust_probe(0); /* sets correct gamma, beta, etc. */
+    // adjust_rfc(); /* sets freq in rf-cavities from probe */
+    // LD 2016.02.18: END
+
     ibs_();
 
     if (w_file) out_table(table_name, ibs_table, filename);
-    if (probe_beam) probe_beam = delete_command(probe_beam);
+    probe_beam = delete_command(probe_beam); // LD: added...
     current_beam = keep_beam;
   }
 }
