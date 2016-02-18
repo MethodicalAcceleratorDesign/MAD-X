@@ -867,7 +867,6 @@ src/mad_math.c -text
 src/mad_math.h -text
 src/mad_mem.c -text
 src/mad_mem.h -text
-src/mad_mkthin.c- -text
 src/mad_mkthin.cpp -text
 src/mad_mkthin.h -text
 src/mad_name.c -text
