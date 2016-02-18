@@ -404,13 +404,8 @@ adjust_probe(double delta_p)
   circ = command_par_value("circ", current_beam);
 
   /* assume oneturnmap and disp0 already computed (see pro_twiss and pro_emit) */ 
-  ds = oneturnmat[4 + 6*5]; // assumes disp0[5] = 1 (dp/p = 1)
-  for (int j=0; j < 4; j++) {
-    ds += oneturnmat[4 + 6*j] * disp0[j];
-// LD: debug
-    // printf("oneturnmat[%d]=%g, disp0[%d]=%g\n", 4 + 6*j, oneturnmat[4 + 6*j], j, disp0[j]);
-  }
-  // printf("oneturnmat[%d]=%g, disp0[%d]=1\n", 34, oneturnmat[34], 5);
+  ds = oneturnmat[4 + 6*5]; // uses disp0[5] = 1 -> dp/p = 1
+  for (int j=0; j < 4; j++) ds += oneturnmat[4 + 6*j] * disp0[j];
 
   tmp = - beta * beta * ds / circ;
   freq0 = (beta * clight * ten_m_6) / (circ * (one + tmp * delta_p));
