@@ -249,7 +249,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
   double precision :: e5sq1, e5sq2, e5sqs1, e5sqs2, x, y
   double precision :: f1, f2, f1s, f2s, twon, str, st
   double precision :: r1sq, r2sq, fh1, fh2, dr, di, drt
-  double precision :: rfv, rff, rfl, rfvlt, rffrq, rflag, time
+  double precision :: rfv, rff, rfl, time
   double precision :: xkick, ykick, dpx, dpy, an, hyx, hcbs2,hbi
   double precision :: sk3, rfac, rfacx, rfacy, fh
   
@@ -561,14 +561,11 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
 
 
      case (code_rfcavity) !---- RF cavities.
-        rfv = node_value('volt ')
-        rff = node_value('freq ')
-        rfl = node_value('lag ')
-        rfvlt = ten3m * rfv
-        rffrq = rff * (ten6p * two * pi / clight)
-        rflag = two * pi * rfl
+        rfv = node_value('volt ') * ten3m ! MV but u0 is in GeV
+        rff = node_value('freq ') * ten6p * two * pi / clight
+        rfl = node_value('lag ')  * two * pi
         time = half * (orb1(5) + orb2(5))
-        sumu0 = sumu0 + rfvlt * sin(rflag - rffrq * time)
+        sumu0 = sumu0 + rfv * sin(rfl - rff * time)
 
 
      case (code_hkicker, code_kicker, code_vkicker, code_tkicker) !---- Orbit correctors.

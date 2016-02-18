@@ -236,14 +236,17 @@ end subroutine touschek
 subroutine cavtouschek (um,uloss,iflag)
   use name_lenfi
   use touschekfi
-  use math_constfi, only : zero, one, two, three, half, ten6p, ten3m, pi, twopi
+  use math_constfi, only : zero, one, two, three, half, ten3p, ten6p, ten3m, pi, twopi
   use phys_constfi, only : clight
   use code_constfi
   implicit none
 
-  integer :: i, lg, code, flag, iflag
-  double precision :: el, rfv, rff, rfl, um, harmonl, phirf, c0, vrf, pc, omega, orbit5
-  double precision :: eta, qover, fq, uloss, vrfsum, harmonlm, umt, synch_2
+  double precision, intent(OUT) :: um, uloss
+  integer, intent(OUT) :: iflag
+  
+  integer :: i, lg, code, flagerr
+  double precision :: el, rfv, rff, rfl, harmonl, phirf, c0, vrf, pc, omega, orbit5
+  double precision :: eta, qover, fq, vrfsum, harmonlm, umt, synch_2
   character(len=name_len) :: sequ_name, el_name
 
   integer, external :: get_string, restart_sequ, advance_node, double_from_table_row
@@ -255,32 +258,29 @@ subroutine cavtouschek (um,uloss,iflag)
   harmonlm = ten6p
   umt = zero
   iflag = 0
-
-  flag = double_from_table_row('summ ','synch_2 ',1,synch_2)
-  if (synch_2 .eq. 0) then
-     iflag = 1
-     uloss = zero
-  else
-     uloss = two/three*arad*en0**4*beta**3*synch_2*1d3/(amass)**3
-  endif
   um = zero
+  
+  flagerr = double_from_table_row('summ ','synch_2 ',1,synch_2)
+  if (synch_2 .eq. zero) then
+      uloss = zero ;     iflag = 1
+  else
+     uloss = two/three * arad * en0**4 * beta**3 * synch_2 * ten3p / amass**3
+  endif
 
   lg = get_string('sequence ', 'name ', sequ_name)
-
   i = restart_sequ()
-10 continue
-  code = node_value('mad8_type ')
-  if (code .eq. code_tkicker) code = code_kicker
-  if (code .eq. code_placeholder) code = code_instrument
-  ! cavity
-  if (code .eq. code_rfcavity) then
+
+
+  ! treat only cavities
+10 if (node_value('mad8_type ') .eq. code_rfcavity) then
      lg = get_string('element ', 'name ', el_name)
-     el = node_value('l ')
+     el  = node_value('l ')
      rfv = node_value('volt ')
      rff = node_value('freq ')
-     if (rff.eq.zero.or.rfv.eq.zero) goto 11
      rfl = node_value('lag ')
 
+     if (rff.eq.zero .or. rfv.eq.zero) goto 11 ! skip
+ 
      harmonl = ten6p * rff * circ/clight
 
      pc = get_value('probe ','pc ')
@@ -288,34 +288,32 @@ subroutine cavtouschek (um,uloss,iflag)
      omega = rff * ten6p * twopi / clight
      vrf   = rfv * ten3m / (pc * (one + deltap))
 
-     flag = double_from_table_row('twiss ','t ',1,orbit5)
+     flagerr = double_from_table_row('twiss ','t ',1,orbit5)
      phirf = rfl * twopi - omega * orbit5
-     c0 =   vrf*charge
-     if (cos(phirf).lt.0) vrf=-vrf
+     c0    = vrf * charge
+     if (cos(phirf) .lt. 0) vrf = -vrf
      eta = alfa - one / gammas**2
-     if (uloss.ne.zero) then
-        qover = qover+rfv/uloss*charge
-        vrfsum = vrfsum+rfv/harmonl*charge
-        harmonlm = min(harmonl,harmonlm)
+     if (uloss .ne. zero) then
+        qover = qover + charge * rfv/uloss 
+        vrfsum = vrfsum + charge * rfv/harmonl
+        harmonlm = min(harmonl, harmonlm)
      else
-        umt = umt + two/(harmonl*eta*pi)*c0
+        umt = umt + (two * c0) / (harmonl * eta * pi) 
      endif
      
   endif
-11 continue
 
-  if (advance_node().ne.0)  goto 10
+11 if (advance_node().ne.0)  goto 10
 
   if (uloss.ne.zero) then
-     fq = two*(sqrt(one-one/qover**2)*vrfsum*harmonlm - uloss*acos(one/qover))
-     um = ten3m/(harmonlm*eta*pi) * fq/(pc*(one+deltap))
+     fq = two * (sqrt(one - one/qover**2) * vrfsum * harmonlm - uloss * acos(one/qover))
+     um = ten3m / (harmonlm * eta * pi) * fq / (pc * (one + deltap))
   else
      um = umt
   endif
 
   um = abs(um) * beta**2
   
-  RETURN
 END subroutine cavtouschek
 
 double precision function ftousch(k)

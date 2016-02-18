@@ -1311,12 +1311,12 @@ subroutine ttrf(track,ktrack)
   !---- Set up.
   omega = rff * (ten6p * twopi / clight)
   ! vrf   = rfv * ten3m / (pc * (one + deltas))
-  vrf   = rfv * ten3m / pc0
+  vrf   = rfv * ten3m
   phirf = rfl * twopi
   ! dl    = el / two
   ! bi2gi2 = one / (betas * gammas) ** 2
 
-  TRACK(6,1:ktrack) = TRACK(6,1:ktrack) +  vrf * sin(phirf - omega*TRACK(5,1:ktrack))
+  TRACK(6,1:ktrack) = TRACK(6,1:ktrack) +  vrf * sin(phirf - omega*TRACK(5,1:ktrack)) / pc0
 
   !*---- If there were wakefields, track the wakes and then the 2nd half
   !*     of the cavity.
