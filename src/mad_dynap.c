@@ -56,13 +56,30 @@ track_dynap(struct in_cmd* cmd)
     turns = 64;
   }
 
+  // LD 2016.02.18: START
+  // zero_double(orbit0, 6);
+  // zero_double(disp0, 6);
+  // zero_double(oneturnmat, 6*6);
+
   adjust_beam();
-  if (probe_beam) probe_beam = delete_command(probe_beam);
   probe_beam = clone_command(current_beam);
+  //  adjust_rfc(); /* sets freq in rf-cavities from probe */
+
+  // int error = 0;
+  // double r0mat[4] = {0};
+  // tmrefe_(oneturnmat); /* one-turn linear transfer map */
+  // twcpin_(oneturnmat,disp0,r0mat,&error); /* added for disp0 computation */
+
+  // LD 2016.02.17: BUG, depends on the previous oneturnmap and disp0
   adjust_probe(track_deltap); /* sets correct gamma, beta, etc. */
   adjust_rfc(); /* sets freq in rf-cavities from probe */
+  // if (get_option("debug")) print_probe();
+
   zero_double(orbit0, 6);
-  zero_double(oneturnmat, 36);
+  // zero_double(disp0, 6);
+  zero_double(oneturnmat, 6*6);
+  // LD 2016.02.18: END
+
   if (get_option("onepass") == 0)
     /* closed orbit and one-turn linear transfer map */
     tmrefo_(&izero,orbit0,orbit,oneturnmat);
@@ -79,7 +96,7 @@ track_dynap(struct in_cmd* cmd)
   buf1    = mymalloc_atomic(rout_name, npart   * sizeof *buf1);
   buf2    = mymalloc_atomic(rout_name, 6*npart * sizeof *buf2);
   buf3    = mymalloc_atomic(rout_name, 6*npart * sizeof *buf3);
-  buf4    = mymalloc_atomic(rout_name, 36      * sizeof *buf4); /* eigenvectors */
+  buf4    = mymalloc_atomic(rout_name, 6*6     * sizeof *buf4); /* eigenvectors */
   buf5    = mymalloc_atomic(rout_name, 6*npart * (turns+1) * sizeof *buf5);
   buf6    = mymalloc_atomic(rout_name, nnode   * sizeof *buf6);
   buf7    = mymalloc_atomic(rout_name, turns   * sizeof *buf7);
@@ -104,10 +121,12 @@ track_dynap(struct in_cmd* cmd)
      print_table(t);
      if (get_option("dynap_dump")) dynap_tables_dump();  */
 
+  probe_beam = delete_command(probe_beam);
+
   /* free buffers */
   myfree(rout_name, ibuf1);   myfree(rout_name, ibuf2);   myfree(rout_name, ibuf3);
-  myfree(rout_name, buf1);    myfree(rout_name, buf2);
   myfree(rout_name, buf_dxt); myfree(rout_name, buf_dyt);
+  myfree(rout_name, buf1);    myfree(rout_name, buf2);
   myfree(rout_name, buf3);    myfree(rout_name, buf4);    myfree(rout_name, buf5);
   myfree(rout_name, buf6);    myfree(rout_name, buf7);    myfree(rout_name, buf8);
   myfree(rout_name, buf9);    myfree(rout_name, buf10);   myfree(rout_name, buf11);
