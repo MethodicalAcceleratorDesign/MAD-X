@@ -418,9 +418,10 @@ adjust_probe(double delta_p)
 
 // LD: 2016.02.16
   if (get_option("debug"))
-    printf("updating probe_beam for ds=%g\n"
-           "  parameters: freq0=%g, alfa=%g, beta=%g, gamma=%g, dtbyds=%g, deltap=%g\n",
-           ds, freq0, alfa, betas, gammas, dtbyds, delta_p);
+    printf("updating probe_beam for deltap=%g => ds=%23.18g\n"
+           "  parameters: freq0=%23.18g, alfa=%23.18g\n"
+           "              beta=%23.18g, gamma=%23.18g, dtbyds=%23.18g\n",
+           delta_p, ds, freq0, alfa, betas, gammas, dtbyds);
 
   store_comm_par_value("freq0", freq0, probe_beam);
   store_comm_par_value("alfa", alfa, probe_beam);
