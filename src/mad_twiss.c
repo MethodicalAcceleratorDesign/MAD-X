@@ -959,7 +959,7 @@ pro_twiss(void)
 
   // LD 2016.02.18: START
   zero_double(orbit0, 6);
-  /* zero_double(disp0, 6); // why is it disabled? */
+  // zero_double(disp0, 6); // why is it disabled? */
   zero_double(oneturnmat, 6*6);
 
   adjust_beam();
@@ -968,7 +968,7 @@ pro_twiss(void)
 
 #if 1 // LD: 2016.02.16 ORIG, set to 0 to enable the fix point search
   tmrefe_(oneturnmat); /* one-turn linear transfer map */
-  // incomplete init...
+  // twcpin_(oneturnmat,disp0,r0mat,&error); /* added for disp0 computation, unstable r0mat */
 #else // LD: 2016.02.16 START
   double err0 = 0;
   double dp0 = twiss_deltas->a[0];
