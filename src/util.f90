@@ -283,8 +283,8 @@ end module deltrafi
 module dyntabfi
   implicit none
   public
-  double precision :: dynapfrac=0.d0, dktrturns=0.d0, xend=0.d0, pxend=0.d0
-  double precision :: yend=0.d0, pyend=0.d0, tend=0.d0, ptend=0.d0
+  double precision :: dynapfrac=0.d0, dktrturns=0.d0
+  double precision :: xend=0.d0, pxend=0.d0, yend=0.d0, pyend=0.d0, tend=0.d0, ptend=0.d0
   !double precision :: smear=0.d0, yapunov=0.d0
   double precision :: smear=0.d0, lyapunov=0.d0
 end module dyntabfi
