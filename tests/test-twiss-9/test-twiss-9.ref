@@ -102,8 +102,9 @@ twiss, save, centre;
 
 enter Twiss module
  Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
-updating probe_beam for ds=-0.615549
-  parameters: freq0=0.00375226, alfa=7.70435e-06, beta=1, gamma=342466, dtbyds=0, deltap=0
+updating probe_beam for deltap=0 => ds=   -0.61554925635823643
+  parameters: freq0= 0.00375226490803993572, alfa=7.70435135473932066e-06
+              beta=   0.999999999995736744, gamma=    342466.471867040789, dtbyds=                      0
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
  
@@ -5523,7 +5524,7 @@ updating probe_beam for ds=-0.615549
 iteration:   1 error:   4.919639E-04 deltap:   0.000000E+00
 orbit:   2.502626E-06  2.178362E-05 -1.992044E-05 -5.056846E-06  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   6.136233E-11 deltap:   0.000000E+00
+iteration:   2 error:   6.136157E-11 deltap:   0.000000E+00
 orbit:   2.502581E-06  2.178362E-05 -1.992047E-05 -5.056848E-06  0.000000E+00  0.000000E+00
 
 ++++++ table: summ

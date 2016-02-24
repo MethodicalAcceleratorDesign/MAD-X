@@ -2639,8 +2639,9 @@ TWISS, beta0=QF.60010.BETA,SAVE; !, FILE="twiss.all.tfs";
 enter Twiss module
  Found 6 initial orbit vector values from twiss command. 
  Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
-updating probe_beam for ds=-2.42422
-  parameters: freq0=0.0788971, alfa=0.000642333, beta=0.999998, gamma=479.606, dtbyds=0, deltap=0
+updating probe_beam for deltap=0 => ds=   -2.42421663108122809
+  parameters: freq0=  0.0788970808426955744, alfa=0.000642332772159964565
+              beta=    0.99999782629243994, gamma=    479.606080229025906, dtbyds=                      0
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
  
