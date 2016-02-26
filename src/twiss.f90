@@ -1166,12 +1166,12 @@ SUBROUTINE twcpin_sagan(rt,disp0,r0mat, eflag)
   
   else
      if (arg .eq. zero) then    
-        R0MAT(:2,:2) = EYE(:2,:2)
         gammacp = one
+        R0MAT(:2,:2) = EYE(:2,:2)
      else 
+        gammacp = sqrt(half + half*sqrt(dtr**2/arg))
         den = - gammacp*sqrt(arg)
         R0MAT(1:2,1:2) = sign(AUX(1:2,1:2), dtr) / den !-- r0mat =R_1 = C (Sagan) 
-        gammacp = sqrt(half + half*sqrt(dtr**2/arg))
     endif
     
     !--R0MAT_BAR = SRMAT^{T}S^{T} - symplectic conjugate of R0MAT 
