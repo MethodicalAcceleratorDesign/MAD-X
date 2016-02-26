@@ -1704,6 +1704,17 @@ tests/test-ptc-twiss-56Dt-ini_mtx_man/test-ptc-twiss-56Dt-ini_mtx_man.cfg -text
 tests/test-ptc-twiss-56Dt-ini_mtx_man/test-ptc-twiss-56Dt-ini_mtx_man.madx -text
 tests/test-ptc-twiss-56Dt-ini_mtx_man/test-ptc-twiss-56Dt-ini_mtx_man.out -text
 tests/test-ptc-twiss-56Dt-ini_mtx_man/test-ptc-twiss-56Dt-ini_mtx_man.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/fort.18.cfg -text
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/fort.18.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/leir.56dt.ptc.mtx.twiss.cfg -text
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/leir.56dt.ptc.mtx.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/leir.56dt.ptc.summ.twiss.cfg -text
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/leir.56dt.ptc.summ.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/leir.56dt.ptc.twiss.cfg -text
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/leir.56dt.ptc.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/test-ptc-twiss-56Dt-ini_mtx_tbl.cfg -text
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/test-ptc-twiss-56Dt-ini_mtx_tbl.madx -text
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/test-ptc-twiss-56Dt-ini_mtx_tbl.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-56Dt/leir.56dt.ptc.summ.twiss.cfg -text
 tests/test-ptc-twiss-56Dt/leir.56dt.ptc.summ.twiss.ref -text
 tests/test-ptc-twiss-56Dt/leir.56dt.ptc.twiss.cfg -text
