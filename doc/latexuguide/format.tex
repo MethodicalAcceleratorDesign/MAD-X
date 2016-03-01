@@ -85,8 +85,6 @@ A keyword begins with a letter and consists of letters and digits.
 The \madx keywords are protected; attempting to use a protected 
 keyword as a label results in a fatal error.
 
-\begin{5.02.07}
-
 The keyword \texttt{VERSION} has been introduced since version 5.02.07. 
 It contains the version number of the \madx release quoted as a decimal.
 For example:
@@ -97,8 +95,6 @@ version =              50207 ;
 This allows testing of the version number of the running \madx process. 
 Note that any version prior to version 5.02.07 reports the value 
 \texttt{version = 0;}
-
-\end{5.02.07}
 
 
 \section{Attribute Types}
@@ -245,14 +241,14 @@ set in two ways:
 \madxmp{flag | flag = true}
 
 It can be reset by: 
-\madxmp{-flag | flag=false}
+\madxmp{-flag | flag = false}
 
 Example: 
 \madxmp{
 OPTION, -ECHO;  // switch off copying the input to the standard output
 }
 
-The default for a logical flag is normally false, but can be found e.g. for options by the command  
+The default for a logical flag is normally \texttt{false}, but can be found e.g. for options by the command  
 \madxmp{HELP, option;}
 
 
