@@ -3,7 +3,7 @@
   +     MAD-X 5.02.08  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2015.11.20               +
-  + Execution date: 2016.02.01 18:43:01      +
+  + Execution date: 2016.02.24 11:12:49      +
   ++++++++++++++++++++++++++++++++++++++++++++
 mydrift: drift, l=1;
 
@@ -126,7 +126,7 @@ obs_points pro_ptc_setswitch Done
 
   
 
-  ptc_twiss, table=twiss, icase=5, no=4, closed_orbit=false, normal;
+  ptc_twiss, table=twiss, icase=5, no=4, closed_orbit=false, rmatrix, normal;
 
  ************ State Summary ****************
  MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       

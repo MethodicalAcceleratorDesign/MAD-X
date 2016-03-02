@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.07  (64 bit, Darwin)      +
+  +     MAD-X 5.02.08  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.09.24               +
-  + Execution date: 2015.09.23 20:45:41      +
+  + Release   date: 2015.11.20               +
+  + Execution date: 2016.02.12 17:29:14      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
@@ -255,9 +255,9 @@ parameter: ddpx   double value:                  0
 parameter: ddy   double value:                  0
 parameter: ddpy   double value:                  0
 parameter: r11   double value:                 -0
-parameter: r12   double value:                  0
+parameter: r12   double value:                 -0
 parameter: r21   double value:                 -0
-parameter: r22   double value:                  0
+parameter: r22   double value:                 -0
 parameter: energy   double value:                100
 
 
@@ -297,7 +297,7 @@ select,flag=ptc_twiss,column=name,s,beta11,beta21,
 
 
 
-ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2;
+ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2,rmatrix;
 
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
@@ -331,7 +331,7 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2;
           -1000000    0.0003550636492        47.50612091       0.2546759882 
 
                 q2                dq1                dq2                 qs 
-      0.2546749559         1.05106564        1.046759439                  0 
+       0.254674956         1.05106564        1.046759439                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        32.03433146        177.7089538        32.03308004        177.7231017 
@@ -355,25 +355,27 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2;
      -0.0296661037      0.02965905227                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    0.0003260715893 
+                 0                  0                  0    0.0003260716069 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.596346259e-06                  0                  0                  0 
+   2.596346496e-06                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    0.0002136648529                  0    3.396649391e-06 
+                 0    0.0002136648539                  0    3.396649362e-06 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    0.0003315824884 
+                 0                  0                  0    0.0003315824915 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0     5.31027193e-06                  0                  0 
+                 0     5.31027159e-06                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -0.0001525456102                  0   -6.256318806e-06 
+                 0    -0.000152545601                  0   -6.256318909e-06 
 
            pycomin             tcomin            ptcomin 
-                 0                  0                  0 
+                 0                 -0                  0 
+
+
 
 
 PTC_NORMAL,closed_orbit,maptable,icase=5,no=2;
@@ -489,10 +491,6 @@ ptc_twiss,icase=5,no=2, initial_matrix_manual,
 
     re12 =  177.6244021,
 
-    re13 =  0,
-
-    re14 =  0,
-
     re16 =  2.219772938,
 
     re21 = -0.03836532036,
@@ -508,6 +506,14 @@ ptc_twiss,icase=5,no=2, initial_matrix_manual,
     re43 = -0.03838049208,
 
     re44 = -0.50877646,
+
+    re51 = -0.01852016683 ,
+
+    re52 = 2.257114914  ,             
+
+    re56 = 0.1632326785 ,                 
+
+    re55 = 0,
 
     re66 =  1,
 
@@ -547,13 +553,13 @@ ptc_twiss,icase=5,no=2, initial_matrix_manual,
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-             534.6    0.0004431607235    7.716949486e-05           -1000000 
+             534.6    0.0004430990925    0.0001283942339           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000    0.0003551252802        47.50281742       0.2545782522 
+          -1000000    0.0003550636493         47.5061209       0.2546759882 
 
                 q2                dq1                dq2                 qs 
-      0.2547040739        1.051445019        1.047115194                  0 
+       0.254674956                 -0                 -0                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        32.03433144        177.7089536        32.03308004        177.7231017 
@@ -589,13 +595,13 @@ ptc_twiss,icase=5,no=2, initial_matrix_manual,
                  0                  0                  0    0.0003315825782 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    5.310271254e-06                  0                  0 
+                 0    5.310271254e-06                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
                  0   -0.0001525455628                  0   -6.256320049e-06 
 
            pycomin             tcomin            ptcomin 
-                 0                  0                  0 
+                 0                 -0                  0 
 ptc_end;
 
 

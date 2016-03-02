@@ -3796,7 +3796,17 @@ endif
        stop 123
     ENDIF
 
-    if(.not.no_ndum_check) iass0user(master)=iass0user(master)+1
+    if(.not.no_ndum_check) then
+
+      if (master < 1) then
+        print*,"Error Error Error master is ", master
+        flush(6)
+      endif
+      
+      iass0user(master)=iass0user(master)+1
+    
+    endif
+      
     if(iass0user(master)>scratchda(master)%n) then
        call INSERT_DA( scratchda(master) )
     ELSE

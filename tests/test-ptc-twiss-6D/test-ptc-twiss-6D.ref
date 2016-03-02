@@ -3,7 +3,7 @@
   +     MAD-X 5.02.08  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2015.11.20               +
-  + Execution date: 2016.02.01 11:53:55      +
+  + Execution date: 2016.02.11 17:49:16      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -813,17 +813,17 @@ ptc_create_universe;
                 Momentum : 0.541711E+00
   recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
-     energy           1.0834226784000001     
+     energy           1.08342267840000     
      method                   6
      Num. of steps            5
-     charge           1.0000000000000000     
-  Length of machine:    78.543702661677713     
+     charge           1.00000000000000     
+  Length of machine:    78.5437026616777     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -6.2727600891321345E-015   0.0000000000000000        8.4376949871511897E-015
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:  -6.272760089132134E-015  0.000000000000000E+000  8.437694987151190E-015
 
 
 !  ptc_printframes, file="leir.C", format=rootmacro;!this prints my visualisation with ROOT
@@ -836,7 +836,7 @@ ptc_create_universe;
 
   
 
-  ptc_twiss, icase=6, no=2, closed_orbit;
+  ptc_twiss, icase=6, no=2, closed_orbit, rmatrix;
 
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
@@ -844,10 +844,10 @@ ptc_create_universe;
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-       78.54370266       0.4965421425           -1000000           -1000000 
+       78.54370266       0.4965421422           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000      -0.2534586305        1.419129223       0.8200596216 
+          -1000000      -0.2534586307        1.419129223       0.8200596216 
 
                 q2                dq1                dq2                 qs 
       0.7198292865                  0                  0   -0.0001731096304 
@@ -859,22 +859,22 @@ ptc_create_universe;
        3.282153623        15.12420814    2.195336124e-31    1.318063101e-29 
 
          beta13min          beta13max          beta21min          beta21max 
-   3.501540066e-12     0.002348220167     4.14067433e-30    2.480419474e-28 
+   3.501540066e-12     0.002348220167    4.140673724e-30    2.480419566e-28 
 
          beta22min          beta22max          beta23min          beta23max 
-       1.633285391        20.07025824    4.072695116e-30    2.932634176e-25 
+       1.633285391        20.07025824    4.072726781e-30    2.932634195e-25 
 
          beta31min          beta31max          beta32min          beta32max 
-    2.82443997e-07        129.3455317     6.36447494e-29    4.959758934e-28 
+   2.824439971e-07        129.3455317    6.364474807e-29    4.959758894e-28 
 
          beta33min          beta33max           disp1min           disp1max 
        180788.7996        180788.8514       -20.60417203     0.001188274077 
 
           disp2min           disp2max           disp3min           disp3max 
-      -9.086227448        9.086227448   -2.302924321e-13    3.157107144e-13 
+      -9.086227448        9.086227448   -2.302924313e-13    3.157107111e-13 
 
           disp4min           disp4max             deltap            orbit_x 
-  -1.195303071e-13    9.942255707e-14                  0    9.059200564e-09 
+  -1.195303056e-13    9.942255623e-14                  0    9.059200564e-09 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
    2.157945671e-09                  0                  0     1.85630994e-10 
@@ -883,7 +883,7 @@ ptc_create_universe;
    2.389265304e-09     9.89789088e-09                  0    2.606798135e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0    4.166272431e-09     1.85630994e-10    2.126168665e-08 
+                 0    4.166272442e-09     1.85630994e-10    2.126168665e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
                  0    9.376184415e-09                  0    1.135233429e-08 
@@ -917,11 +917,11 @@ ptc_end;
 
 
 
-!plot, haxis=s, vaxis=beta11,beta22, colour=100;
+!plot, table=ptc_twiss, haxis=s, vaxis=beta11,beta22, colour=100;
 
-!plot, haxis=s, vaxis=disp1, colour=100;
+!plot, table=ptc_twiss, haxis=s, vaxis=disp1, colour=100;
 
-!plot, haxis=s, vaxis=x, colour=100;
+!plot, table=ptc_twiss, haxis=s, vaxis=x, colour=100;
 
 
 

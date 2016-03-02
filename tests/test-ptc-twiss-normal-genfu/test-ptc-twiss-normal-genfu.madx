@@ -45,7 +45,7 @@ ptc_create_universe;
 
 
   
-  ptc_twiss, table=twiss, icase=5, no=4, closed_orbit=false, normal;
+  ptc_twiss, table=twiss, icase=5, no=4, closed_orbit=false, rmatrix, normal;
 !  ptc_twiss, icase=6, no=2, betx=10, bety=10,betz=10;
   
 !  plot, table=ptc_twiss, vaxis=beta11,beta22, haxis=s;

@@ -31,7 +31,7 @@ ptc_create_universe;
   !!!!!       T I M E   T R U E ,   T O T P A T H  F A L S E
   ptc_setswitch, debuglevel=0, exact_mis=true, time=true, totalpath=false;
   
-  ptc_twiss, icase=6, no=2, closed_orbit;
+  ptc_twiss, icase=6, no=2, closed_orbit, rmatrix;
 !  ptc_twiss, icase=6, no=2, betx=10, bety=10,betz=10;
   
 !  plot, table=ptc_twiss, vaxis=beta11,beta22, haxis=s;
@@ -44,9 +44,9 @@ ptc_create_universe;
 ptc_end;
 
 
-!plot, haxis=s, vaxis=beta11,beta22, colour=100;
-!plot, haxis=s, vaxis=disp1, colour=100;
-!plot, haxis=s, vaxis=x, colour=100;
+!plot, table=ptc_twiss, haxis=s, vaxis=beta11,beta22, colour=100;
+!plot, table=ptc_twiss, haxis=s, vaxis=disp1, colour=100;
+!plot, table=ptc_twiss, haxis=s, vaxis=x, colour=100;
 
 !removefile, file='leir.C';
 removefile, file='Maxwellian_bend_for_ptc.txt';

@@ -1,8 +1,9 @@
 #!/bin/sh
-
-pdflatex uguide.tex
-pdflatex uguide.tex
-makeindex uguide
-bibtex uguide
-pdflatex uguide.tex
-pdflatex uguide.tex
+echo 'building documentation for MAD-X. Be patient...'
+lualatex uguide.tex > makelatexdoc.log
+lualatex uguide.tex >> makelatexdoc.log
+makeindex uguide >> makelatexdoc.log  2&>1
+bibtex uguide >> makelatexdoc.log
+lualatex uguide.tex >> makelatexdoc.log
+lualatex uguide.tex >> makelatexdoc.log
+echo 'all done. See report in makelatexdoc.log'

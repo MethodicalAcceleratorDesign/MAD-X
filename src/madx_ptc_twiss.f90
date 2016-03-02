@@ -68,6 +68,7 @@ module madx_ptc_twiss_module
   !new lattice function
   real(dp), private, dimension(3)       :: testold
   real(dp), private, dimension(3)       :: phase
+  real(dp), private, allocatable, dimension(:,:,:)        :: savedTM
 
   character(len=5), private, dimension(5), parameter :: str5 = (/'10000','01000','00100','00010','00001'/)
   integer, private, dimension(6,6,3 )    :: Iaa ! for i=1,3 Ia(2*i-1,2*i-1,i) =1.d0;  Ia(2*i,2*i,i)   = 1.d0;
@@ -451,7 +452,7 @@ contains
     integer                 :: tab_name(*)
     integer                 :: summary_tab_name(*)
     real(dp)                :: deltap0,deltap ,d_val
-    real(kind(1d0))         :: get_value,suml,s
+    double precision         :: get_value,suml,s
     integer                 :: posstart, posnow
     integer                 :: geterrorflag !C function that returns errorflag value
     real(dp)                :: orbit(6)=0.d0
@@ -467,9 +468,14 @@ contains
     logical(lp)             :: maptable
     logical(lp)             :: ring_parameters  !! forces isRing variable to true, i.e. calclulation of closed solution
     logical(lp)             :: doNormal         !! do normal form analysis
-    integer                 :: rmatrix
     real(dp)                :: emi(3)
-    logical(lp)             :: isputdata
+    logical(lp)             :: isputdata  ! in everystep mode (node by node) switch deciding if data are to be put in twiss table for a give node
+    logical(lp)             :: rmatrix  ! flag to mark that transfer matrix should be saved (otherwise we might not track theTransferMap)
+    logical(lp)             :: isTMsave ! flag that TM was recorded during pre-run for closed solution search
+    logical(lp)             :: doTMtrack ! true if rmatrix==true .and. isRing==true . do not track theTransferMap and save time
+                                           !      .or. already tracked form closed solution search
+    logical(lp)             :: usertableActive = .false.  ! flag to mark that there was something requested with ptc_select 
+    
     integer                 :: countSkipped
     character(48)           :: summary_table_name
     character(12)           :: tmfile='transfer.map'
@@ -528,7 +534,17 @@ contains
 
     nda = getnknobsall() !defined in madx_ptc_knobs
     suml=zero
-
+    
+    rmatrix = get_value('ptc_twiss ','rmatrix ') .ne. 0
+    if ( (getnknobsall() + getnpushes()) < 1) then
+      usertableActive = .false.
+    else
+      usertableActive = .true.
+      rmatrix = .true. ! for the time being force if ptc_select or ptc_knob was defined
+    endif
+    
+    isTMsave = .false.
+        
     no = get_value('ptc_twiss ','no ')
     if ( no .lt. 1 ) then
        call fort_warn('madx_ptc_twiss.f90 <ptc_twiss>:','Order in twiss is smaller then 1')
@@ -539,8 +555,6 @@ contains
     icase = get_value('ptc_twiss ','icase ')
 
     deltap0 = get_value('ptc_twiss ','deltap ')
-
-    rmatrix = get_value('ptc_twiss ','rmatrix ')
 
     deltap = zero
 
@@ -590,11 +604,12 @@ contains
     center_magnets = get_value('ptc_twiss ','center_magnets ') .ne. 0
 
     slice = slice_magnets .or. center_magnets
-    
+        
     if ( slice) then
      call make_node_layout(my_ring) 
      call getBeamBeam()
     endif 
+    
 
     !############################################################################
     !############################################################################
@@ -711,16 +726,6 @@ contains
     endif
 
 
-    !This must be before init map
-    call alloc(A_script_probe)
-    A_script_probe%u=my_false
-    A_script_probe%x=npara
-    A_script_probe%x=orbit
-
-    !    if (maxaccel .eqv. .false.) then
-    !      cavsareset = .false.
-    !    endif
-
     if ( (cavsareset .eqv. .false.) .and. (my_ring%closed .eqv. .false.) ) then
 
        call setcavities(my_ring,maxaccel)
@@ -731,8 +736,14 @@ contains
 
     call setknobs(my_ring)
 
-    
-    
+
+
+    call alloc(A_script_probe)
+    A_script_probe%u=my_false
+    A_script_probe%x=npara
+    A_script_probe%x=orbit
+
+    !This must be before init map
     call alloc(theTransferMap)
     theTransferMap%u = .false.
     theTransferMap%x = npara
@@ -743,9 +754,9 @@ contains
     !############################################################################
     !############################################################################
     !############################################################################
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    !  INIT Y that is tracked          !
-    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    !  INIT A_script_probe that is tracked          !
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !
     call initmap(dt,slice)
 
@@ -761,6 +772,53 @@ contains
       call seterrorflag(10,"ptc_twiss INIT CHECK",whymsg)
       return
     endif
+    
+    ! assume that we track the transfer map
+    doTMtrack = .true.
+    
+    !and check now if we could skip it and save time
+    if ((usertableActive .eqv. .false.) ) then
+      !we do not need the full thing to fill usertable
+      ! currently we save only the first order map (i.e. matrix)
+      ! we can consider saving the map in universal taylor, if this still pays back
+      
+      if ( isTMsave .and. ( (slice .eqv. .false.) .and. (rmatrix .eqv. .true.) ) ) then
+        !the matrix was tracked in the initmap, and slice is off (it is saved only for each element)
+        ! in the future should do support for slicing 
+        doTMtrack = .false.
+      endif
+
+      !another independent condition
+      if ( (isRing .eqv. .false.) .and. (rmatrix .eqv. .false.) ) then
+        !we do not have to do the normal form at the end (isRing false)
+        ! and
+        !the user does not want transfer maps (rmatrix false) 
+        !
+        doTMtrack = .false.
+      endif  
+      
+     
+     endif 
+    
+    
+    if (doTMtrack) then
+      !we will be tracking theTransferMap
+      ! get clean initialization after initmap
+      call kill(theTransferMap)
+      call alloc(theTransferMap)
+      theTransferMap%u = .false.
+      theTransferMap%x = npara
+      theTransferMap%x = orbit
+      
+      if (getdebug() > 1) then
+        print*, "doTMtrack=true, theTransferMap is new"  
+      endif  
+      
+    elseif (getdebug() > 1) then  
+        print*, "doTMtrack=false, theTransferMap stays as it was"  
+      
+    endif
+
     
     !############################################################################
     !############################################################################
@@ -909,13 +967,18 @@ contains
          if (nda > 0) then
             call propagate(my_ring,A_script_probe,+default, & ! +default in case of extra parameters !?
                  & node1=nodePtr%pos,node2=nodePtr%pos+1)
-            call propagate(my_ring,theTransferMap,+default, & ! +default in case of extra parameters !?
-                 & node1=nodePtr%pos,node2=nodePtr%pos+1)
+            
+            if (doTMtrack) then
+               call propagate(my_ring,theTransferMap,+default, & ! +default in case of extra parameters !?
+	& node1=nodePtr%pos,node2=nodePtr%pos+1)
+            endif
           else
             call propagate(my_ring,A_script_probe,default, &
                  & node1=nodePtr%pos,node2=nodePtr%pos+1)
-            call propagate(my_ring,theTransferMap,default, &
-                 & node1=nodePtr%pos,node2=nodePtr%pos+1)
+            if (doTMtrack) then
+               call propagate(my_ring,theTransferMap,default, &
+	& node1=nodePtr%pos,node2=nodePtr%pos+1)
+            endif
           endif
 
           if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
@@ -984,7 +1047,7 @@ contains
             suml = s; 
 
             call puttwisstable(theTransferMap%x)
-            call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x, A_script_probe%x)
+            if(usertableActive) call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x, A_script_probe%x)
 
           !else
           !  write(6,*) "                                                NOT Saving data"
@@ -1006,7 +1069,7 @@ contains
           endif
 
           call puttwisstable(theTransferMap%x)
-          call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x, A_script_probe%x)
+          if(usertableActive) call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x, A_script_probe%x)
 
         endif
 
@@ -1016,7 +1079,9 @@ contains
            !         if (getnknobis() > 0) c_%knob = my_true
            !print*, "parametric",i,c_%knob
            call propagate(my_ring,A_script_probe,+default,fibre1=i,fibre2=i+1)
-           call propagate(my_ring,theTransferMap,+default,fibre1=i,fibre2=i+1)
+           if (doTMtrack) then
+             call propagate(my_ring,theTransferMap,+default,fibre1=i,fibre2=i+1)
+           endif
         else
 
            !print*,"Skowron 1 ", current%mag%name,  check_stable, c_%stable_da, A_script_probe%x(1).sub.'100000'
@@ -1024,7 +1089,9 @@ contains
            call propagate(my_ring,A_script_probe,default, fibre1=i,fibre2=i+1)
            
            !print*,"Skowron 2 ", current%mag%name,  check_stable, c_%stable_da, A_script_probe%x(1).sub.'100000'
-           call propagate(my_ring,theTransferMap,default,fibre1=i,fibre2=i+1)
+           if (doTMtrack) then
+             call propagate(my_ring,theTransferMap,default,fibre1=i,fibre2=i+1)
+           endif
            
            !print*,"Skowron 3 ", current%mag%name, check_stable, c_%stable_da
         endif
@@ -1083,11 +1150,15 @@ contains
 
         !print*,"Skowron 5 ", current%mag%name,  check_stable, c_%stable_da, A_script_probe%x(1).sub.'100000'
 
-        call puttwisstable(theTransferMap%x)
+        if(isTMsave) then
+          call puttwisstable(theTransferMap%x,transfermapSaved=savedTM(i,:,:))
+        else
+          call puttwisstable(theTransferMap%x)
+        endif 
 
         !print*,"Skowron 6 ", current%mag%name,  check_stable, c_%stable_da, A_script_probe%x(1).sub.'100000'
         
-        call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x,A_script_probe%x)
+        if(usertableActive) call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x,A_script_probe%x)
 
         !print*,"Skowron 7 ", current%mag%name,  check_stable, c_%stable_da, A_script_probe%x(1).sub.'100000'
 
@@ -1201,7 +1272,7 @@ contains
     endif
 
     deallocate(j)
-
+    if (allocated(savedTM)) deallocate(savedTM)
 ! f90flush is not portable, and useless...
 !    call f90flush(20,my_false)
 
@@ -1223,6 +1294,7 @@ contains
       real(dp)    :: dt
       logical(lp) :: slice
       integer     :: mf
+      integer     :: i,j,k
 
       beta_flg = (get_value('ptc_twiss ','betx ').gt.0) .and. (get_value('ptc_twiss ','bety ').gt.0)
 
@@ -1347,10 +1419,11 @@ contains
       else
 
          isRing = .true. ! compute momemtum compaction factor, tunes, chromaticies for ring
-
+         
+         
          if (getdebug() > 1) then
             print*,"Initializing map from one turn map: Start Map"
-            call print(A_script_probe,6)
+            call print(theTransferMap,6)
          
             print*,"Tracking identity map to get closed solution. STATE:"
             call print(default,6)
@@ -1359,46 +1432,57 @@ contains
          
          if (getdebug() > 2) then
            print*, "printing the initial map"
-           call print(A_script_probe,17)
-         endif
-         !if (slice) then always sliced 
-           call propagate(my_ring,A_script_probe,default) 
-        !else
-        !   call track(my_ring,A_script_probe,1,default)
-        ! endif
-                  
-         if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-            write(whymsg,*) 'DA got unstable (one turn map production) at ', &
-                             lost_fibre%mag%name, &
-                            ' PTC msg: ',messagelost(:len_trim(messagelost))
-            call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
-            call seterrorflag(10,"ptc_twiss ",whymsg);
-            return
+           call print(theTransferMap,17)
          endif
 
-         call PRODUCE_APERTURE_FLAG(flag_index)
-         if(flag_index/=0) then
-            call ANALYSE_APERTURE_FLAG(flag_index,why)
+         allocate(savedTM(my_ring%n,6,6))
+         
+         do i=1,MY_RING%n
 
-            write(whymsg,*) 'APERTURE unstable (one turn map production) - programs continues: ',why
-            call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
-            call seterrorflag(10,"ptc_twiss: ",whymsg);
-            !          Write(6,*) "ptc_twiss unstable (map production)-programs continues "
-            !          Write(6,*) why ! See produce aperture flag routine in sd_frame
-            c_%watch_user=.false.
-            CALL kill(A_script_probe)
-            return
-         endif
-          
-         if (getdebug() > 1) then
-            call print(A_script_probe,18)
+           call propagate(my_ring,theTransferMap,default, fibre1=i,fibre2=i+1)
+
+           if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+              write(whymsg,*) 'DA got unstable (one turn map production) at ', &
+                               lost_fibre%mag%name, &
+                              ' PTC msg: ',messagelost(:len_trim(messagelost))
+              call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
+              call seterrorflag(10,"ptc_twiss ",whymsg);
+              return
+           endif
+
+           call PRODUCE_APERTURE_FLAG(flag_index)
+           if(flag_index/=0) then
+              call ANALYSE_APERTURE_FLAG(flag_index,why)
+
+              write(whymsg,*) 'APERTURE unstable (one turn map production) - programs continues: ',why
+              call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
+              call seterrorflag(10,"ptc_twiss: ",whymsg);
+              !          Write(6,*) "ptc_twiss unstable (map production)-programs continues "
+              !          Write(6,*) why ! See produce aperture flag routine in sd_frame
+              c_%watch_user=.false.
+              return
+           endif
+           
+           do j=1,6
+             do k=1,6
+               savedTM(i,j,k) = theTransferMap%x(j).sub.fo(k,:)
+             enddo  
+           enddo  
+           
+         enddo
+         
+         
+         if (getdebug() > 2) then
+            call print(theTransferMap,18)
             call kanalnummer(mf,file="theOneTurnMap.txt")
-            call print(A_script_probe,mf)
+            call print(theTransferMap,mf)
             close(mf)
             
             print*,"Initializing map from one turn map. One Turn Map"
          endif
 
+         isTMsave = .true.
+         
          call maptoascript()
 
          call reademittance()
@@ -1442,15 +1526,16 @@ contains
     end function getdeltae
     !____________________________________________________________________________________________
 
-    subroutine puttwisstable(transfermap)
+    subroutine puttwisstable(transfermap,transfermapSaved)
       implicit none
       include "madx_ptc_knobs.inc"
+      type(real_8), target :: transfermap(6)  !
+      double precision , optional :: transfermapSaved(6,6)
       integer i1,i2,ii,i1a,i2a
-      real(kind(1d0))   :: opt_fun(150),myx  ! opt_fun(72) -> opt_fun(81)
+      double precision  :: opt_fun(150), tmpa6(6),tmpa66(6,6) ,myx  ! opt_fun(72) -> opt_fun(81)
       ! increase to 150 to have extra space beyond what's needed to accomodate additional derivatives w.r.t. delta_p
-      real(kind(1d0))   :: deltae ! for reference energy increase via acceleration
-      real(kind(1d0))   :: deltap ! for deltap treatment
-      type(real_8), target :: transfermap(6)
+      double precision    :: deltae ! for reference energy increase via acceleration
+      double precision    :: deltap ! for deltap treatment
       ! added on 3 November 2010 to hold Edwards & Teng parametrization
       real(dp) :: betx,bety,alfx,alfy,R11,R12,R21,R22
       ! to convert between Ripken and Edwards-Teng parametrization
@@ -1493,56 +1578,78 @@ contains
       
       ioptfun=6
       call vector_to_table_curr(table_name, 'x ', opt_fun(1), ioptfun)
+      
+      if (rmatrix) then
+        if (present(transfermapSaved)) then
+          ! we have to swap 5 and 6, and to avoid confusion, I do it on a copy (original would be swapped, and if used again...)
+          
+          tmpa66 = transfermapSaved
+           
+          tmpa6 = tmpa66(:,6)
+          tmpa66(:,6) = tmpa66(:,5)
+          tmpa66(:,5) = tmpa6
+          
+          
+          opt_fun( 1:6 ) = tmpa66(1,:)
+          opt_fun( 7:12) = tmpa66(2,:)
+          opt_fun(13:18) = tmpa66(3,:)
+          opt_fun(19:24) = tmpa66(4,:)
+          opt_fun(31:36) = tmpa66(5,:)
+          opt_fun(25:30) = tmpa66(6,:)
+
+        else
+
+          opt_fun(1) = transfermap(1).sub.fo(1,:)
+          opt_fun(2) = transfermap(1).sub.fo(2,:)
+          opt_fun(3) = transfermap(1).sub.fo(3,:)
+          opt_fun(4) = transfermap(1).sub.fo(4,:)
+          opt_fun(5) = transfermap(1).sub.fo(6,:)
+          opt_fun(6) = transfermap(1).sub.fo(5,:)
 
 
-      opt_fun(1) = transfermap(1).sub.fo(1,:)
-      opt_fun(2) = transfermap(1).sub.fo(2,:)
-      opt_fun(3) = transfermap(1).sub.fo(3,:)
-      opt_fun(4) = transfermap(1).sub.fo(4,:)
-      opt_fun(5) = transfermap(1).sub.fo(6,:)
-      opt_fun(6) = transfermap(1).sub.fo(5,:)
+          opt_fun(7) = transfermap(2).sub.fo(1,:)
+          opt_fun(8) = transfermap(2).sub.fo(2,:)
+          opt_fun(9) = transfermap(2).sub.fo(3,:)
+          opt_fun(10)= transfermap(2).sub.fo(4,:)
+          opt_fun(11)= transfermap(2).sub.fo(6,:)
+          opt_fun(12)= transfermap(2).sub.fo(5,:)
+
+          opt_fun(13)= transfermap(3).sub.fo(1,:)
+          opt_fun(14)= transfermap(3).sub.fo(2,:)
+          opt_fun(15)= transfermap(3).sub.fo(3,:)
+          opt_fun(16)= transfermap(3).sub.fo(4,:)
+          opt_fun(17)= transfermap(3).sub.fo(6,:)
+          opt_fun(18)= transfermap(3).sub.fo(5,:)
+
+          opt_fun(19)= transfermap(4).sub.fo(1,:)
+          opt_fun(20)= transfermap(4).sub.fo(2,:)
+          opt_fun(21)= transfermap(4).sub.fo(3,:)
+          opt_fun(22)= transfermap(4).sub.fo(4,:)
+          opt_fun(23)= transfermap(4).sub.fo(6,:)
+          opt_fun(24)= transfermap(4).sub.fo(5,:)
 
 
-      opt_fun(7) = transfermap(2).sub.fo(1,:)
-      opt_fun(8) = transfermap(2).sub.fo(2,:)
-      opt_fun(9) = transfermap(2).sub.fo(3,:)
-      opt_fun(10)= transfermap(2).sub.fo(4,:)
-      opt_fun(11)= transfermap(2).sub.fo(6,:)
-      opt_fun(12)= transfermap(2).sub.fo(5,:)
-
-      opt_fun(13)= transfermap(3).sub.fo(1,:)
-      opt_fun(14)= transfermap(3).sub.fo(2,:)
-      opt_fun(15)= transfermap(3).sub.fo(3,:)
-      opt_fun(16)= transfermap(3).sub.fo(4,:)
-      opt_fun(17)= transfermap(3).sub.fo(6,:)
-      opt_fun(18)= transfermap(3).sub.fo(5,:)
-
-      opt_fun(19)= transfermap(4).sub.fo(1,:)
-      opt_fun(20)= transfermap(4).sub.fo(2,:)
-      opt_fun(21)= transfermap(4).sub.fo(3,:)
-      opt_fun(22)= transfermap(4).sub.fo(4,:)
-      opt_fun(23)= transfermap(4).sub.fo(6,:)
-      opt_fun(24)= transfermap(4).sub.fo(5,:)
+          opt_fun(25)= transfermap(6).sub.fo(1,:)
+          opt_fun(26)= transfermap(6).sub.fo(2,:)
+          opt_fun(27)= transfermap(6).sub.fo(3,:)
+          opt_fun(28)= transfermap(6).sub.fo(4,:)
+          opt_fun(29)= transfermap(6).sub.fo(6,:)
+          opt_fun(30)= transfermap(6).sub.fo(5,:)
 
 
-      opt_fun(25)= transfermap(6).sub.fo(1,:)
-      opt_fun(26)= transfermap(6).sub.fo(2,:)
-      opt_fun(27)= transfermap(6).sub.fo(3,:)
-      opt_fun(28)= transfermap(6).sub.fo(4,:)
-      opt_fun(29)= transfermap(6).sub.fo(6,:)
-      opt_fun(30)= transfermap(6).sub.fo(5,:)
+          opt_fun(31)= transfermap(5).sub.fo(1,:)
+          opt_fun(32)= transfermap(5).sub.fo(2,:)
+          opt_fun(33)= transfermap(5).sub.fo(3,:)
+          opt_fun(34)= transfermap(5).sub.fo(4,:)
+          opt_fun(35)= transfermap(5).sub.fo(6,:)
+          opt_fun(36)= transfermap(5).sub.fo(5,:)
 
+        endif
 
-      opt_fun(31)= transfermap(5).sub.fo(1,:)
-      opt_fun(32)= transfermap(5).sub.fo(2,:)
-      opt_fun(33)= transfermap(5).sub.fo(3,:)
-      opt_fun(34)= transfermap(5).sub.fo(4,:)
-      opt_fun(35)= transfermap(5).sub.fo(6,:)
-      opt_fun(36)= transfermap(5).sub.fo(5,:)
-
-      ioptfun=36
-      call vector_to_table_curr(table_name, 're11 ', opt_fun(1), ioptfun)
-
+        ioptfun=36
+        call vector_to_table_curr(table_name, 're11 ', opt_fun(1), ioptfun)
+      endif
+      
       deltap = A_script_probe%x(5).sub.'0'
       deltae = deltae * (1.0 + deltap)
 
@@ -1888,31 +1995,30 @@ contains
       !reads covariance matrix of the initial distribution
       implicit none
       include 'madx_ptc_distrib.inc'
-      type(taylor) ht
+      type(taylor) ht, ht0
       type(pbfield) h
       type(damap) id
       type(normalform) norm
       real(dp) lam
       integer nd,nd_m
-      logical fake_3
+      logical flat_longi
       integer jc(6)
       type(probe_8) yy
-      integer :: dodo = 0
       real(dp) x(6)
-
-      if(dodo==1) then
-         x=zero
-         call FIND_ORBIT_x(x,default,c_1d_7,fibre1=my_ring%start)
-         write(6,*) x
-         call init_all(default,1,0)
-         call alloc(yy)
-         call alloc(id)
-         id=1
-         yy%x=x+id
-         call propagate(my_ring,yy,default)
-         call print(yy,6)
-         stop 999
-      endif
+!       integer :: dodo = 0
+!       if(dodo==1) then
+!          x=zero
+!          call FIND_ORBIT_x(x,default,c_1d_7,fibre1=my_ring%start)
+!          write(6,*) x
+!          call init_all(default,1,0)
+!          call alloc(yy)
+!          call alloc(id)
+!          id=1
+!          yy%x=x+id
+!          call propagate(my_ring,yy,default)
+!          call print(yy,6)
+!          stop 999
+!       endif
 
       jc(1)=2
       jc(2)=1
@@ -1933,34 +2039,44 @@ contains
       print*, re(6,:)
 
       nd=2
-      if(icase==6) nd=3
+      if(icase==6 .or. icase==56) nd=3
       nd_m=nd
-      fake_3=.false.
+
+      flat_longi=.false.
       if (getdistrtype(3) /= distr_gauss.and.nd==3) then
          !here we have flat in delta
          nd_m=2
-         fake_3=.true.
+         flat_longi=.true.
       endif
 
       call init_all(default,2,nd)
 
       call alloc(ht)
+      call alloc(ht0)
       call alloc(h)
       call alloc(id)
       call alloc(norm)
 
       do i = 1,nd_m*2
          do ii = 1,nd_m*2
-            ht=ht+re(i,ii)*(-1)**(ii+i)*(1.0_dp.mono.jc(i))*(1.0_dp.mono.jc(ii))
+            
+            if (abs(re(i,ii)) > 1e-24) then
+               ht0 =  re(i,ii)* (-1)**(ii+i) *(1.0_dp.mono.jc(i))*(1.0_dp.mono.jc(ii))
+               !print*,'(',i,ii,')'
+               !call daprint(ht0,6)
+               ht=ht + ht0
+            endif           
          enddo
       enddo
       ht=-ht*pi
 
       lam=ten*full_abs(ht)
       ht=ht/lam
-      if(fake_3) then !1959 is the yearh of birth of Etienne (just a number)
+      
+      if(flat_longi) then !1959 is the yearh of birth of Etienne (just a number)
          ht=ht+(0.1959e0_dp.mono.'000020')+(0.1959e0_dp.mono.'000002')
       endif
+      
       h=ht
       id=1
       id=texp(h,id)
@@ -1977,6 +2093,7 @@ contains
 
       !      re=id
       call setemittances(emi(1),emi(2),emi(3))
+      print*,"Emittances: ", emi(1),emi(2),emi(3)
 
       call kill(h)
       call kill(ht)
@@ -2045,11 +2162,11 @@ contains
             jj(4)=nyp
             jj(5)=ndeltap
             jj(6)=nt
-            call pok(A_script_probe%x(index)%T,jj,coeff)
+            call pok(theTransferMap%x(index)%T,jj,coeff)
             ! the following gives the same result as the above
-            !oldv = A_script_probe(index).sub.jj
+            !oldv = theTransferMap(index).sub.jj
             !newtoset = (coeff - oldv).mono.jj ! mono for monomial
-            !y(index)%t=y(index)%t+newtoset
+            !theTransferMap(index)%t=theTransferMap(index)%t+newtoset
 
          endif
 
@@ -2063,7 +2180,7 @@ contains
       
       if ( .not. ignore_map_orbit ) then
         do row=1,6
-          orbit(row) = A_script_probe%x(row).sub.'0'
+          orbit(row) = theTransferMap%x(row).sub.'0'
         enddo
         
         orbit_probe = orbit 
@@ -2077,11 +2194,33 @@ contains
     subroutine readinitialmap ! from fort.18 file
       implicit none
       type(damap) :: map
+      integer :: row
+      logical(lp) :: ignore_map_orbit
       ! call readMapFromFort18(y)
       call alloc(map)
+      
+      ! I don't know why, but between initialization, when these flags are set to false, and this point they are flipped to true
+      read77  = .false.
+      print77 = .false.
+      !print*,"read77=", read77
       call dainput(map,18)
-      A_script_probe%x = map
+      close(18)
+      
+      theTransferMap%x = map
       call kill(map)
+      
+
+      ignore_map_orbit = get_value('ptc_twiss ','ignore_map_orbit ') .ne. 0
+      
+      if ( .not. ignore_map_orbit ) then
+        do row=1,6
+          orbit(row) = theTransferMap%x(row).sub.'0'
+        enddo
+        
+        orbit_probe = orbit 
+      endif
+      
+      
       call maptoascript()
       call reademittance()
     end subroutine readinitialmap
@@ -2107,7 +2246,10 @@ contains
       implicit none
       type(damap) :: map
       call alloc(map)
+      read77  = .false.
+      print77 = .false.
       call dainput(map,19)
+      close(19)
       A_script_probe%x = orbit + map
       call kill(map)
       call reademittance()
@@ -2135,6 +2277,26 @@ contains
       real(dp),dimension(ndim2)::reval,aieval
       real(dp),dimension(ndim2,ndim2)::revec,aievec
       real(dp):: checkvalue
+      real(dp) :: orbit(6)
+      type(taylor) :: t
+      
+      call alloc(t)
+
+      allocate(j(6))
+      j(:)=0
+
+      do i=1,c_%npara
+        orbit(i) = theTransferMap%x(i).sub.j
+      enddo
+      
+  !    call kill(theTransferMap)
+  !    call alloc(theTransferMap)
+  !
+     ! theTransferMap%u = .false.
+     ! theTransferMap%x = c_%npara
+     ! theTransferMap%x = orbit
+      
+
       call liepeek(iia,icoast)
       if (getdebug() > 1) then
          write (6,'(8a8)')   "no","nv","nd","nd2","ndc","ndc2","ndt","ndpt"
@@ -2142,23 +2304,45 @@ contains
          print*, "c_%npara is ", c_%npara
       endif
 
-      allocate(j(c_%nv))
-      j(:)=0
-      do i = 1,c_%npara
-         do ii = 1,c_%npara
+      do i = 1,6
+        
+        t = orbit(i)
+        
+        do ii = 1,c_%npara
             j(ii)=1
-            r=re(i,ii)-(A_script_probe%x(i).sub.j)
-            A_script_probe%x(i)%T=A_script_probe%x(i)%T+(r.mono.j)
+            
+            r=re(i,ii)
+            t = t+(r.mono.j)
+            
+            if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+              write(*,*) 'DA got unstable during Setup of transfer map i=',i,' ii=',ii 
+            endif
+
             j(ii)=0
          enddo
+         
+         theTransferMap%x(i) = t
       enddo
+    
+      
+      if (getdebug() > 2) then
+        print*,"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
+        print*,"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
+        print*,"PRINT "
+        call print(theTransferMap,6)
+        print*,"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
+        print*,"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
+        print*,"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ "
+      endif
       deallocate(j)
-
+      
 !      call daprint(A_script_probe,29) ! to be compared with fort.18 created by ptc_normal and fort.28
-
+     
+     
       call eig6(re,reval,aieval,revec,aievec)
       do i=1,iia(4)-icoast(2)
          checkvalue = abs(reval(i)**2+aieval(i)**2 - one)
+         
          if(checkvalue .gt.c_1d_10) then
             write(whymsg,*) "Provided matrix has eigenvalue more than 1e-10 off the unit circle ! plane = ",i, &
                             " r^2 = ", reval(i)**2+aieval(i)**2, " delta = ",checkvalue 
@@ -2189,7 +2373,7 @@ contains
       endif
 
       call alloc(c_Map)
-      c_Map = A_script_probe
+      c_Map = theTransferMap
       
       call alloc(theNormalForm)
       call  c_normal(c_Map,theNormalForm)       ! (4)
@@ -2256,12 +2440,12 @@ contains
     subroutine readinitialtwiss(dt)
       !Reads initial twiss parameters from MAD-X command
       implicit none
-      real(kind(1d0)) alpha(3),beta(3),disp(4),mu(3)
+      double precision alpha(3),beta(3),disp(4),mu(3)
       type(real_8) al(3),be(3),di(4)
       type(pol_block_inicond) :: inicondknobs
       integer k_system
       real(dp)  sizept
-      real(kind(1d0)) emiz
+      double precision emiz
       real(dp) dt
 
       beta(1)  = get_value('ptc_twiss ','betx ')
@@ -2528,13 +2712,6 @@ contains
       real(dp) :: chromaticities(2)
       integer :: i,j
       real(dp) :: sd ! as in twiss.F
-      integer, dimension(6,6) :: coeffSelector = &
-           reshape( (/1,0,0,0,0,0, &
-           0,1,0,0,0,0, &
-           0,0,1,0,0,0, &
-           0,0,0,1,0,0, &
-           0,0,0,0,1,0, &
-           0,0,0,0,0,1/), (/6,6/))
       real(dp) :: dispersion(4)
       real(dp) :: dispersion_p(4) ! derivative of the dispersion w.r.t delta-p/p
       integer :: debugFiles, mf
@@ -2563,11 +2740,14 @@ contains
       if (debugFiles .eq. 1) then
          do i=1,6
             do j=1,6
-               write(21,*) "r(",i,j,")=",oneTurnMap%x(i).sub.coeffSelector(j,:)
+               write(21,*) "r(",i,j,")=",oneTurnMap%x(i).sub.fo(j,:)
             enddo
          enddo
+         flush(21)
       endif
-     
+      
+      
+      
       if (getdebug() > 1) then
         write(6,*) "Doing normal form ... "
       endif
@@ -2693,11 +2873,12 @@ contains
          !sd = r(5,6)+r(5,1)*disp(1)+...+r(5,4)*disp(4)
          !print*,"ALPHA_C, GAMMA TR : TIME ON"
 
-         sd = - oneTurnMap%x(6).sub.coeffSelector(5,:) ! 5/6 swap MADX/PTC
+         sd = -1.0*(oneTurnMap%x(6).sub.fo(5,:)) ! 5/6 swap MADX/PTC
          !print*,'sd(0)',sd
          do i=1,4
             !print*, 'Disp',i,'=', dispersion(i)
-            sd = sd - (oneTurnMap%x(6).sub.coeffSelector(i,:))*dispersion(i)
+            sd = sd - (oneTurnMap%x(6).sub.fo(i,:))*dispersion(i)
+            !print*,'sd(',i,')',sd
          enddo
          !print*,'sd(f)',sd
 
@@ -2710,11 +2891,12 @@ contains
          ! Here R56 is dL/ddelta 
          ! so we get alpha_c first from transfer matrix
 
-         sd = +1.0*(oneTurnMap%x(6).sub.coeffSelector(5,:)) ! 5/6 swap MADX/PTC
+         sd = +1.0*(oneTurnMap%x(6).sub.fo(5,:)) ! 5/6 swap MADX/PTC
          !print*,'sd(0)',sd
          do i=1,4
-            !print*, 'Disp',i,'=', dispersion(i)
-            sd = sd + (oneTurnMap%x(6).sub.coeffSelector(i,:))*dispersion(i)
+           ! print*, 'Disp',i,'=', dispersion(i)
+            sd = sd + (oneTurnMap%x(6).sub.fo(i,:))*dispersion(i)
+           ! print*,'sd(',i,')',sd
          enddo
          !print*,'sd(f)',sd
          alpha_c = sd/suml
@@ -2830,7 +3012,7 @@ contains
          ! terms involving derivatives of the dispersions
          do i=1,4
 !            print*, 'sd=',sd,' disp=',dispersion_p(i)
-            sd = sd - (oneTurnMap%x(6).sub.coeffSelector(i,:))*dispersion_p(i)
+            sd = sd - (oneTurnMap%x(6).sub.fo(i,:))*dispersion_p(i)
          enddo
 
 !         print*, 'sd=',sd
@@ -3083,7 +3265,7 @@ contains
     integer :: k,i
     integer :: J(lnv) ! the map's coefficient selector, as usual
     integer :: Jderiv(lnv) ! to store the map's coefficient selector of the derivative w.r.t deltap
-    real(kind(1d0)) :: get_value ! C-function
+    double precision :: get_value ! C-function
     integer :: no ! order must be at equal to 2 to be able to get terms of the form x*deltap
     ! required to evaluate the derivatives of Twiss parameters w.r.t deltap
     integer :: ndel ! as in subroutine 'equaltwiss'...
@@ -3340,7 +3522,7 @@ contains
    integer, external       :: restart_sequ, & !  restart beamline and return number of beamline node
                               advance_node    !  advance to the next node in expanded sequence
                                               !  =0 (end of range), =1 (else)
-   REAL(KIND(1d0)), external :: node_value  !/*returns value for parameter par of current element */
+   double precision, external :: node_value  !/*returns value for parameter par of current element */
    type(fibre), pointer    :: p
    real (dp)               :: fk
    

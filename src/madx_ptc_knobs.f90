@@ -156,8 +156,8 @@ contains
     character(*)         :: name !fibre name
     real(kind(1d0))      :: s  !position along the orbit
     real(dp)             :: denergy
-    type(real_8),target  :: y(6)!input 6 dimensional function (polynomial) : Full MAP: A*YC*A_1
-    type(real_8),target  :: A(6)!input 6 dimensional function (polynomial) : Full MAP: A*YC*A_1
+    type(real_8),target  :: y(6)!input 6 dimensional function (polynomial) : Full MAP: theTransferMap 
+    type(real_8),target  :: A(6)!input 6 dimensional function (polynomial) : A_script
     type(real_8),pointer :: e !element in array
     real(kind(1d0))      :: coeff
     integer              :: i !iterator
@@ -188,7 +188,11 @@ contains
         print*,"PTC_NORMAL mode"
       endif
     endif  
-
+    
+    !if (present(y) == .false.) then
+    !  return
+    !endif
+      
     if (c_%npara == 6) then
        call sixdmode()
     else
@@ -197,6 +201,7 @@ contains
           e => y(pushes(i)%element)
 
           if (pushes(i)%pushtab) then
+             !save value defined by ptc_select in the user TFS table
              coeff  = e.sub.(pushes(i)%monomial)
              if (getdebug()>3) then
                 write(6,'(a13, a10, a3, f9.6, a10, i1, 5(a13), i3)') &
@@ -209,7 +214,7 @@ contains
           endif
 
           if ( pblockson .and. (pushes(i)%index > 0) ) then
-
+             !save polynomial in function of knobs in the results array
              results(currentrow,pushes(i)%index) = e.par.(pushes(i)%monomial)
 
              if (getdebug()>3) then

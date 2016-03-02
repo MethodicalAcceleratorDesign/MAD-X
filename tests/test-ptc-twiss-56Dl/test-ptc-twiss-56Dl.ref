@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.07  (64 bit, Linux)       +
+  +     MAD-X 5.02.08  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.09.24               +
-  + Execution date: 2015.10.13 13:05:33      +
+  + Release   date: 2015.11.20               +
+  + Execution date: 2016.02.11 17:56:03      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -817,17 +817,17 @@ ptc_create_universe;
                 Momentum : 0.541711E+00
   recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
-     energy           1.0834226784000001     
+     energy           1.08342267840000     
      method                   6
      Num. of steps            5
-     charge           1.0000000000000000     
-  Length of machine:    78.543702661677713     
+     charge           1.00000000000000     
+  Length of machine:    78.5437026616777     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -6.2727600891321345E-015   0.0000000000000000        8.4376949871511897E-015
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:  -6.272760089132134E-015  0.000000000000000E+000  8.437694987151190E-015
 
 
   !!!!!       T I M E   F A L S E,   T O T P A T H  T R U E
@@ -847,7 +847,7 @@ obs_points pro_ptc_setswitch Done
 
   
 
-  ptc_twiss, table=twiss, icase=56, no=2, closed_orbit;
+  ptc_twiss, table=twiss, icase=56, no=2, closed_orbit, rmatrix;
 
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
@@ -901,28 +901,28 @@ obs_points pro_ptc_setswitch Done
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0        -10.3020712    0.0005941579857 
+                 0                  0        -10.3020712    0.0005941579858 
 
           disp2min           disp2max           disp3min           disp3max 
        -4.54310719         4.54310719                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    1.068886489e-08 
+                 0                  0                  0    1.068886442e-08 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-      2.546139e-09                  0                  0                  0 
+   2.546139122e-09                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    1.168573382e-08                  0    3.059593803e-09 
+                 0    1.168573391e-08                  0    3.059593852e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0        46.00166095                  0    2.508646062e-08 
+                 0        46.00166095                  0    2.508646064e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.106287014e-08                  0        78.54370268 
+                 0    1.106287025e-08                  0        78.54370268 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -1.448330251e-12                  0   -1.106286944e-08 
+                 0   -1.449191389e-12                  0   -1.106286975e-08 
 
            pycomin             tcomin            ptcomin 
                  0                  0                  0 

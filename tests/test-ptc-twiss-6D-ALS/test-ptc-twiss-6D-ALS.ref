@@ -3,7 +3,7 @@
   +     MAD-X 5.02.08  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2015.11.20               +
-  + Execution date: 2016.02.01 19:12:53      +
+  + Execution date: 2016.02.11 17:50:35      +
   ++++++++++++++++++++++++++++++++++++++++++++
 call, file="../share/ALS/als.seqx";
 
@@ -212,17 +212,17 @@ ptc_create_universe;
                 Momentum : 0.150000E+01
   recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
-     energy           1.5000000870399657     
+     energy           1.50000008703997     
      method                   2
      Num. of steps            5
-     charge          -1.0000000000000000     
-  Length of machine:    196.87813579154621     
+     charge          -1.00000000000000     
+  Length of machine:    196.878135791546     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:    5.6919674902566881E-014   0.0000000000000000       -7.7160500211448380E-015
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:   5.691967490256688E-014  0.000000000000000E+000 -7.716050021144838E-015
 
 
 !  ptc_printframes, file="ALS.C", format=rootmacro;!this prints my visualisation with ROOT
@@ -248,7 +248,7 @@ obs_points pro_ptc_setswitch Done
 
   
 
-  ptc_twiss, icase=6, no=3, closed_orbit=true;
+  ptc_twiss, icase=6, no=3, closed_orbit=true, rmatrix;
 
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
@@ -284,46 +284,46 @@ obs_points pro_ptc_setswitch Done
           -1000000     0.001520230817        25.64653265       0.3752128212 
 
                 q2                dq1                dq2                 qs 
-      0.4458490684                  0                  0    5.410418165e-16 
+      0.4458490684                  0                  0   -2.654417402e-15 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
       0.8365220166        12.17178358        1.328095408        22.61686982 
 
          beta11min          beta11max          beta12min          beta12max 
-      0.8365220166        12.17178358    1.667319502e-36    9.281191343e-34 
+      0.8365220166        12.17178358    1.667333129e-36    9.281611482e-34 
 
          beta13min          beta13max          beta21min          beta21max 
-   1.535511156e-06      0.01396581595    1.054625779e-37    1.384061755e-34 
+   1.535511156e-06      0.01396581595    1.656740233e-38    4.437651316e-35 
 
          beta22min          beta22max          beta23min          beta23max 
-       1.328095408        22.61686982    1.143088994e-33    2.807600789e-28 
+       1.328095408        22.61686982    1.391613138e-33    2.714073223e-28 
 
          beta31min          beta31max          beta32min          beta32max 
-   9.078588374e-06      0.01187969556    3.911370868e-33     7.18975417e-33 
+   9.078588374e-06      0.01187969556    4.097811507e-33    7.067508809e-33 
 
          beta33min          beta33max           disp1min           disp1max 
        65.53499429        67.95294438                  0       0.2319574658 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.1866966465       0.1866874363   -1.048862264e-15    9.601959736e-16 
+     -0.1866966465       0.1866874363   -5.622878742e-16    6.195384101e-16 
 
           disp4min           disp4max             deltap            orbit_x 
-  -5.771842061e-16    5.609932485e-16                  0   -1.548045409e-14 
+  -3.398492248e-16    3.288495094e-16                  0    -1.54804526e-14 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-  -4.062680229e-18                  0                  0   -1.539730901e-12 
+  -4.063231522e-18                  0                  0   -1.539730901e-12 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-     -0.1000000058    1.748879194e-13                  0    1.659180152e-13 
+     -0.1000000058    1.748879194e-13                  0    1.659180151e-13 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0       0.1000000058    1.539730648e-12   -3.780459323e-15 
+                 0       0.1000000058    1.539730648e-12   -3.780458408e-15 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    2.874849989e-13                  0       0.1000000058 
+                 0    2.874849979e-13                  0       0.1000000058 
 
            ptcomax             xcomin             ycomin            pxcomin 
-  -1.539662434e-12   -3.571798444e-13                  0   -2.874739914e-13 
+  -1.539662434e-12   -3.571798474e-13                  0   -2.874739898e-13 
 
            pycomin             tcomin            ptcomin 
                  0       0.1000000058   -1.539730901e-12 

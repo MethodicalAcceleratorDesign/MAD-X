@@ -29,7 +29,7 @@ ptc_create_universe;
   
 !  ptc_script, file="printflatfile.txt";
   
-  ptc_twiss, icase=6, no=3, closed_orbit=true;
+  ptc_twiss, icase=6, no=3, closed_orbit=true, rmatrix;
 !  ptc_twiss, icase=6, no=2, betx=10, bety=10,betz=10;
   
 !  plot, table=ptc_twiss, vaxis=beta11,beta22, haxis=s;

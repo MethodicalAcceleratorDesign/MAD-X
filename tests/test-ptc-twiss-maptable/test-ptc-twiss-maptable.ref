@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.07  (64 bit, Linux)       +
+  +     MAD-X 5.02.08  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.09.24               +
-  + Execution date: 2015.12.08 12:26:03      +
+  + Release   date: 2015.11.20               +
+  + Execution date: 2016.02.26 09:50:40      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -838,7 +838,7 @@ ptc_create_universe;
 
   
 
-  ptc_twiss, table=twiss, icase=5, no=3, closed_orbit, maptable;
+  ptc_twiss, table=twiss, icase=5, no=3, closed_orbit, rmatrix, maptable;
 
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
@@ -870,28 +870,28 @@ ptc_create_universe;
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0        -10.3020712    0.0005941579857 
+                 0                  0        -10.3020712    0.0005941579858 
 
           disp2min           disp2max           disp3min           disp3max 
        -4.54310719         4.54310719                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    1.068886489e-08 
+                 0                  0                  0    1.068886442e-08 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-      2.546139e-09                  0                  0                  0 
+   2.546139122e-09                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    1.168573382e-08                  0    3.059593803e-09 
+                 0    1.168573391e-08                  0    3.059593852e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    2.508646062e-08 
+                 0                  0                  0    2.508646064e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.106287014e-08                  0                 -0 
+                 0    1.106287025e-08                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -1.448330251e-12                  0   -1.106286944e-08 
+                 0   -1.449191389e-12                  0   -1.106286975e-08 
 
            pycomin             tcomin            ptcomin 
                  0                 -0                  0 
@@ -905,7 +905,7 @@ ptc_create_universe;
 
   !another turn but use as the starting conditions the map produced by the above twiss
 
-  ptc_twiss, table=twiss, icase=5, no=3, initial_matrix_table; 
+  ptc_twiss, table=twiss, icase=5, no=3, rmatrix, initial_matrix_table; 
 
 ++++++ info: Zero value of SIGT replaced by 1.
 ++++++ info: Zero value of SIGE replaced by 1/1000.
@@ -938,28 +938,28 @@ ptc_create_universe;
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0        -10.3020712    0.0005941579857 
+                 0                  0        -10.3020712    0.0005941579858 
 
           disp2min           disp2max           disp3min           disp3max 
        -4.54310719         4.54310719                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    1.068886484e-08 
+                 0                  0                  0    1.068886393e-08 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.546139162e-09                  0                  0                  0 
+   2.546139617e-09                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    1.168573408e-08                  0    3.059593903e-09 
+                 0    1.168573429e-08                  0    3.059593993e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    2.508646069e-08 
+                 0                  0                  0    2.508646099e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.106287027e-08                  0                 -0 
+                 0     1.10628705e-08                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -1.448637497e-12                  0   -1.106286994e-08 
+                 0   -1.449256918e-12                  0   -1.106287044e-08 
 
            pycomin             tcomin            ptcomin 
                  0                 -0                  0 

@@ -48,7 +48,7 @@ ptc_create_universe;
   ptc_setswitch, debuglevel=1, exact_mis=true, time=true, totalpath=false;
   
   
-  ptc_twiss, table=twiss, icase=5, no=2, closed_orbit;
+  ptc_twiss, table=twiss, icase=5, no=2, closed_orbit, rmatrix;
   write, table=twiss, file="leir.5dt.ptc.twiss";
   write, table=ptc_twiss_summary, file="leir.5dt.ptc.summ.twiss";
   
