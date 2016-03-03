@@ -156,7 +156,7 @@ they are set to \texttt{TRUE} are listed in table \ref{table:options}.
     &       & \textbf{Use at your own risk !} \\
     \hline
     \texttt{RBARC}     & true & converts the RBEND straight length into the arc length \\
-    \texttt{THIN\_FOC} & true & enables the 1/(rho**2) focusing of thin dipoles \\
+    \texttt{THIN\_FOC} & true & enables the $1/\rho^2$ focusing of thin dipoles \\
     \texttt{BBORBIT}   & false & the closed orbit is modified by beam-beam kicks \\
     \texttt{SYMPL}     & false & all element matrices are symplectified in Twiss \\
     \texttt{TWISS\_PRINT} & true & controls whether the twiss command produces output \\
@@ -182,16 +182,13 @@ EXEC, label;
 }
 This mechanism can be invoked any number of times, and the executed
 statement may be calling another \texttt{EXEC}, etc. 
-
-Note however, that the main usage of this \madx construct is the
-execution of a \hyperref[sec:macro]{\texttt{MACRO}}.   
-
 \madxmp{
 tw: TWISS, FILE, SAVE; ! first execution of TWISS \\
 ... \\
 EXEC, tw; ! second execution of the same TWISS command \\
 }
-
+Note however, that the main usage of this \madx construct is the
+execution of a \hyperref[sec:macro]{\texttt{MACRO}}.   
 
 \section{SET}
 \label{sec:set}
@@ -209,11 +206,11 @@ given in any order and stay valid until replaced.
 
 The formats follow the C convention and must be included in double
 quotes. The allowed formats are \\
-\texttt{\textit{n}d} for integers with a field-width = \textit{n}, \\
-\texttt{\textit{n}.\textit{m}f} or \texttt{\textit{n}.\textit{m}g} or
-\texttt{\textit{n}.\textit{m}e} for floats with field-width = \textit{n}
+\textit{n}\texttt{d} for integers with a field-width = \textit{n}, \\
+\textit{n.m}\texttt{f} or \textit{n.m}\texttt{g} or
+\textit{n.m}\texttt{e} for floats with field-width = \textit{n}
 and precision = \textit{m}, \\
-\texttt{\textit{n}s} for strings with a field-width = \textit{n}.\\
+\textit{n}\texttt{s} for strings with a field-width = \textit{n}.\\
 The default is "right adjusted", a "-" changes it to "left adjusted".
 
 \textbf{Example:}\\
@@ -249,7 +246,8 @@ The second form of the \texttt{SET} command allows to select the
 current sequence without the \hyperref[sec:use]{\texttt{USE}} command,
 which would bring back to a bare lattice without errors. The command
 only works 
-if the chosen sequence has been previously activated with a \texttt{USE}
+if the chosen sequence has been previously activated with a
+\hyperref[sec:use]{\texttt{USE}} 
 command, otherwise a warning is issued and \madx continues with the
 unmodified current sequence. This command is particularly useful for
 commands that do not have the sequence as an argument like
@@ -294,7 +292,7 @@ before other commands can be invoked. The \texttt{USE} command allows
 this loading and expansion.
 
 \madbox{
-USE, \=PERIOD=sequence\_name, SEQUENCE=sequence\_name, \\
+USE, \=SEQUENCE=sequence\_name, PERIOD=sequence\_name,\\
      \>RANGE=range, \\
      \>SURVEY=logical;
 }
@@ -314,9 +312,9 @@ The attributes to the \texttt{USE} command are:
 \end{madlist}
 
 Note that reloading a sequence with the \texttt{USE} command reloads a
-bare sequence and that any \texttt{ERROR} or orbit correction previously
-assigned or associated to the sequence are discarded. 
-A mechanism to select a sequence without this side effect of the
+bare sequence and that any \hyperref[chap:error]{\texttt{ERROR}} or
+orbit correction previously assigned or associated to the sequence are
+discarded. A mechanism to select a sequence without this side effect of the 
 \texttt{USE} command is provided with the
 \hyperref[sec:set]{\texttt{SET, SEQUENCE=...}} command. 
 
