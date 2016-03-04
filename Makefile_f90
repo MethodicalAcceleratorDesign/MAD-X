@@ -55,7 +55,7 @@ l_complex_taylor.o: NOPT := 2
 Sg_sagan_wiggler.o: NOPT := 2
 
 ifneq ($(FCNAME),nagfor)
-Sg_sagan_wiggler.o: FFLAGS += -fdollar-ok
+Sg_sagan_wiggler.o: FFLAGS += $(if $(call eq,$(FCNAME),lf95),-dollar-ok,-fdollar-ok)
 endif
 
 ifeq ($(ARCH),32)

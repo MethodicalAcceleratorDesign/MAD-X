@@ -3894,11 +3894,14 @@ subroutine ttrfmult(track, ktrack, turn)
   double precision :: x, y, z, px, py, pt, dpx, dpy, dpt
   double precision :: freq, volt, lag, harmon
   double precision :: beta, bvk, deltap, elrad
-  double complex :: Cm2, Sm2, Cm1, Sm1, Cp0, Sp0, Cp1, Sp1
+
+  ! LD: 2016.03.04 - use complex declaration compatible with Lahey
+  integer, parameter:: dp=kind(0.d0)
+  complex(kind=dp) :: Cm2, Sm2, Cm1, Sm1, Cp0, Sp0, Cp1, Sp1
 
   double precision, external :: node_value, get_value
   integer, external :: node_fd_errors
-  double complex, parameter :: ii=(zero,one)
+  complex(kind=dp), parameter :: ii=(0.0_dp,1.0_dp)
 
   !---- Zero the arrays
   NORMAL = zero 
