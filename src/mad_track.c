@@ -22,21 +22,22 @@ track_observe(struct in_cmd* cmd)
     nodes[0]->obs_orbit->curr = 6;
 
     // LD 2016.02.18: START
-    // zero_double(orbit0, 6);
-    /* zero_double(disp0, 6); */
-    // zero_double(oneturnmat, 6*6);
+    zero_double(orbit0, 6); // LD: added 2016.03.08
+    zero_double(disp0, 6);  // LD: added 2016.03.08
+    zero_double(oneturnmat, 6*6); // LD: added 2016.03.08
 
     adjust_beam();
     probe_beam = clone_command(current_beam);
-    // adjust_rfc(); /* sets freq in rf-cavities from probe */
+    adjust_rfc(); /* sets freq in rf-cavities from probe */ // LD: added 2016.03.08
+    tmrefe_(oneturnmat); // ONE TURN MAP // LD: added 2016.03.08
 
     // LD 2016.02.17: BUG, depends on the previous oneturnmap and disp0
     adjust_probe(track_deltap); /* sets correct gamma, beta, etc. */
     adjust_rfc(); /* sets freq in rf-cavities from probe */
 
-    zero_double(orbit0, 6); // should be moved up
-    zero_double(oneturnmat, 6*6); // should be moved up
-    // LD 2016.02.18: START
+    // zero_double(orbit0, 6); // LD: removed 2016.03.08
+    // zero_double(oneturnmat, 6*6); // LD: removed 2016.03.08
+    // LD 2016.02.18: END
 
     if (get_option("onepass") == 0)
     {
@@ -76,18 +77,23 @@ track_run(struct in_cmd* cmd)
   }
 
   // LD 2016.02.18: START
+  zero_double(orbit0, 6); // LD: added 2016.03.08
+  zero_double(disp0, 6);  // LD: added 2016.03.08
+  zero_double(oneturnmat, 6*6); // LD: added 2016.03.08
+
   adjust_beam();
   probe_beam = clone_command(current_beam);
-  // adjust_rfc(); /* sets freq in rf-cavities from probe */
+  adjust_rfc(); /* sets freq in rf-cavities from probe */ // LD: added 2016.03.08
+  tmrefe_(oneturnmat); // ONE TURN MAP // LD: added 2016.03.08
 
   // LD 2016.02.17: BUG, depends on the previous oneturnmap and disp0
   adjust_probe(track_deltap); /* sets correct gamma, beta, etc. */
   adjust_rfc(); /* sets freq in rf-cavities from probe */
 
   // LD: to move before the adjust_probe ?
-  zero_double(orbit0, 6);
-  // zero_double(disp0, 6);
-  zero_double(oneturnmat, 6*6);
+  /// zero_double(orbit0, 6); // LD: removed 2016.03.08
+  // zero_double(disp0, 6); // LD: removed 2016.03.08
+  // zero_double(oneturnmat, 6*6); // LD: removed 2016.03.08
   // LD 2016.02.18: END
 
   if (get_option("onepass") == 0) {
@@ -121,7 +127,7 @@ track_run(struct in_cmd* cmd)
   if (get_option("info")) print_table(t);
   if (get_option("track_dump")) track_tables_dump();
 
-  probe_beam = delete_command(probe_beam); // LD: added...
+  probe_beam = delete_command(probe_beam); // LD: added 2016.02.17
 
   /* free buffers */
   myfree(rout_name, ibuf1);   myfree(rout_name, ibuf2);  myfree(rout_name, ibuf3);

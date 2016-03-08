@@ -37,7 +37,7 @@ pro_emit(struct in_cmd* cmd)
   adjust_beam();
   probe_beam = clone_command(current_beam);
   // LD 2016.02.17: missing init of rf freq
-  // adjust_rfc();        /* sets rf freq and harmon */
+  adjust_rfc(); /* sets rf freq and harmon */ // LD: added 2016.03.08
 
   int error = 0;
   double r0mat[4] = {0};

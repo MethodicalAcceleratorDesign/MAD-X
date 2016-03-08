@@ -959,15 +959,19 @@ pro_twiss(void)
 
   // LD 2016.02.18: START
   zero_double(orbit0, 6);
-  // zero_double(disp0, 6); // why is it disabled? */
+  zero_double(disp0, 6); // LD: added 2016.03.08
   zero_double(oneturnmat, 6*6);
 
   adjust_beam();
   probe_beam = clone_command(current_beam);
-  // adjust_rfc(); /* sets rf freq and harmon */ 
+  adjust_rfc(); /* sets rf freq and harmon */ // LD: added 2016.03.08
 
 #if 1 // LD: 2016.02.16 ORIG, set to 0 to enable the fix point search
   tmrefe_(oneturnmat); /* one-turn linear transfer map */
+  // I do not run twcpin:
+  //  - either a proposer computation of disp0 must be provided
+  //  - either disp0 should not be used by adjust_probe(dp) making a tiny error
+  //    when disp0 shoud not be zero for transverse planes
   // twcpin_(oneturnmat,disp0,r0mat,&error); /* added for disp0 computation, unstable r0mat */
 #else // LD: 2016.02.16 START
   double err0 = 0;
