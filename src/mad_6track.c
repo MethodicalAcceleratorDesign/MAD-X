@@ -1471,7 +1471,7 @@ convert_madx_to_c6t(struct node* p)
     ** value[14] = phase for skew octupole
     */ 
     
-    c6t_elem = new_c6t_element(17,t_name,p->base_name);
+    c6t_elem = new_c6t_element(19,t_name,p->base_name);
     clean_c6t_element(c6t_elem);
     strcpy(c6t_elem->org_name,t_name);
     // rf & general params
@@ -1489,9 +1489,11 @@ convert_madx_to_c6t(struct node* p)
     c6t_elem->value[10] = maxpn>2?(pn_param->double_array->a[2]):0.0;
     c6t_elem->value[11] = maxpn>3?(pn_param->double_array->a[3]):0.0;
     // skew component
+    c6t_elem->value[18] = maxks>0?(ks_param->double_array->a[0]):0.0;
     c6t_elem->value[12] = maxks>1?(ks_param->double_array->a[1]):0.0;
     c6t_elem->value[13] = maxks>2?(ks_param->double_array->a[2]):0.0;
     c6t_elem->value[14] = maxks>3?(ks_param->double_array->a[3]):0.0;
+    c6t_elem->value[19] = maxps>0?(ps_param->double_array->a[0]):0.0;
     c6t_elem->value[15] = maxps>1?(ps_param->double_array->a[1]):0.0;
     c6t_elem->value[16] = maxps>2?(ps_param->double_array->a[2]):0.0;
     c6t_elem->value[17] = maxps>3?(ps_param->double_array->a[3]):0.0;
@@ -2706,7 +2708,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->value[7]
   };
   const double ksl[] = {
-    0.0,
+    el->value[18],
     el->value[12],
     el->value[13],
     el->value[14]
@@ -2756,6 +2758,17 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "o");
+    fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
+	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+  }
+  if (fabs(ksl[0])>eps_9) {
+    double lag = -el->value[19];
+    el->out_1 = -23; // ID
+    el->out_2 = ksl[0]; // 1/m
+    el->out_3 = freq; // freq
+    el->out_4 = 2.0 * M_PI * lag; // rad
+    strcpy(name, el->name);
+    strcat(name, "ds");
     fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
