@@ -2764,7 +2764,7 @@ static void write_rfmultipole(struct c6t_element* el)
   if (fabs(ksl[0])>eps_9) {
     double lag = -el->value[19];
     el->out_1 = -23; // ID
-    el->out_2 = ksl[0]; // 1/m
+    el->out_2 = ksl[0] * pc0 * 1e3; // rad * GeV/c * 1e3 == rad * MeV/c => MV
     el->out_3 = freq; // freq
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
