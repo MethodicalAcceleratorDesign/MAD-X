@@ -848,12 +848,14 @@ att_crabcavity(struct c6t_element* el)
     el->out_1 = -23;
   else
     el->out_1 = 23;
-  if (cavall_flag == 0)
-  {
-    el->out_2 = total_voltage;
-    strcpy(el->name, "CAV");
-  }
-  else el->out_2 = el->value[1];
+  /* AL: Discussions with RdM lead to the conclusions that a CrabCavity shouldn't be considered as a regular accelerating cavity */
+  /* if (cavall_flag == 0) */
+  /* { */
+  /*   el->out_2 = total_voltage; */
+  /*   strcpy(el->name, "CAV"); */
+  /* } */
+  /* else */
+  el->out_2 = el->value[1];
   el->out_3 = el->value[4]; // freq = // not used
   if (lag < -0.5) lag +=1.;
   else if (lag > 0.5) lag -=1.;
@@ -2762,7 +2764,8 @@ static void write_rfmultipole(struct c6t_element* el)
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(ksl[0])>eps_9) {
-    double lag = -el->value[19];
+    double lag = 0.25-el->value[8];
+    double pc0 = get_value("beam", "pc"); // GeV/c
     el->out_1 = -23; // ID
     el->out_2 = ksl[0] * pc0 * 1e3; // rad * GeV/c * 1e3 == rad * MeV/c => MV
     el->out_3 = freq; // freq
