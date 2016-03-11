@@ -2764,7 +2764,7 @@ static void write_rfmultipole(struct c6t_element* el)
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(ksl[0])>eps_9) {
-    double lag = 0.25-el->value[8];
+    double lag = 0.25-el->value[19];
     double pc0 = get_value("beam", "pc"); // GeV/c
     el->out_1 = -23; // ID
     el->out_2 = ksl[0] * pc0 * 1e3; // rad * GeV/c * 1e3 == rad * MeV/c => MV
