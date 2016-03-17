@@ -22,15 +22,11 @@
 clean:
 	$E "** Cleaning local files"
 	$_ $(RM) core
-	$_ $(RM) *~
+	$_ $(RM) $(wildcard *~)
 
 cleandir: clean
 	$E "** Cleaning files in depth"
-ifneq ($(OSTYPE),Windows)
 	$_ $(FIND) . -name '*~' -exec $(RM) {} \;
-else
-	$E "not supported on Windows platforms"
-endif
 
 cleandep:
 	$E "** Removing DEP generated files"
@@ -54,11 +50,7 @@ cleanf90:
 
 cleanbin:
 	$E "** Removing binaries"
-ifneq ($(OSTYPE),Windows)
 	$_ $(FIND) $(DESTDIR) -type f -perm -a+x -exec $(RM) {} \;
-else
-	$E "not supported on Windows platforms"
-endif
 
 cleanprj:
 	$E "** Removing $(PRJNAME)"
@@ -70,11 +62,6 @@ cleanbuild: cleanarch
 
 cleanall: cleandir cleanbuild cleantest
   
-ifeq ($(OSTYPE),Windows)
-# assume that GnuWin32 rm is installed
-override RM := rm -f
-endif
-
 cleantest:
 	$E "** Cleaning tests files"
 	$_ $(RM) $(wildcard tests$/test-*$/*.out tests$/$(NDSUM))
