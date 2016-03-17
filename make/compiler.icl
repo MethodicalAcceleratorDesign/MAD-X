@@ -45,7 +45,9 @@ ifeq ($(CCNAME),icl)
 
 ifneq ($(SED),)
 CDEP = $(CC) /nologo /Zs /QMM
-CDEP_tr = | $(SED) -e "s/$(call f2bs,$(CURDIR)/)//gi" -e "s/\.obj:/\.o:/g"
+CDEP_tr = | $(SED) -e "s/$(call f2bs,$(CURDIR)/)//gi" -e "s+\\+/+g" -e "s/\.obj:/\.o:/g"
+else
+$(warning cannot compute files dependencies)
 endif
 
 #
@@ -102,7 +104,9 @@ ifeq ($(CXXNAME),icl)
 
 ifneq ($(SED),)
 CXXDEP = $(CXX) /nologo /Zs /QMM
-CXXDEP_tr = | $(SED) -e "s/$(call f2bs,$(CURDIR)/)//gi" -e "s/\.obj:/\.o:/g"
+CXXDEP_tr = | $(SED) -e "s/$(call f2bs,$(CURDIR)/)//gi" -e "s+\\+/+g" -e "s/\.obj:/\.o:/g"
+else
+$(warning cannot compute files dependencies)
 endif
 
 #
