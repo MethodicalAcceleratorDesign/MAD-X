@@ -58,7 +58,7 @@ madx-macosx-intel:  madx-macosx32-intel   madx-macosx64-intel
 .PHONY: madx-macosx32-intel madx-macosx64-intel
 
 madx-macosx%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=yes USEGC=yes APPENDLD=yes
-madx-macosx%: MAKE_OPTS = -j9 $(MAKEFLAGS) $(MAKEOVERRIDES)
+madx-macosx%: MAKE_OPTS = -j9 $(MAKEARGS)
 madx-macosx%: MAKE_LINK = $(if $(DESTDIR),ln -sf $(DESTDIR)$@ &&,) ln -sf $@ 
 
 madx-macosx32-intel madx-macosx32: libs/gc/libgc-macosx32-intel.a
@@ -138,7 +138,7 @@ libmadx-macosx-intel: libmadx-macosx32-intel  libmadx-macosx64-intel
 
 libmadx-macosx%: DESTDIR   := $(DESTDIR)libs/madx
 libmadx-macosx%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) ONLINE=no STATIC=no USEGC=yes APPENDLD=yes
-libmadx-macosx%: MAKE_OPTS  = -j9 --no-print-directory -C libs/madx $(MAKEFLAGS) $(MAKEOVERRIDES)
+libmadx-macosx%: MAKE_OPTS  = -j9 --no-print-directory -C libs/madx $(MAKEARGS)
 libmadx-macosx%: MAKE_LINK1 = ln -sf $(DESTDIR)/$@.a     && ln -sf $@.a
 libmadx-macosx%: MAKE_LINK2 = ln -sf $(DESTDIR)/$@.dylib && ln -sf $@.dylib
 
@@ -176,7 +176,7 @@ libptc-macosx-intel:  libptc-macosx32-intel  libptc-macosx64-intel
 
 libptc-macosx%: DESTDIR   := $(DESTDIR)libs/ptc
 libptc-macosx%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) STATIC=no APPENDLD=yes
-libptc-macosx%: MAKE_OPTS  = -j9 --no-print-directory -C libs/ptc $(MAKEFLAGS) $(MAKEOVERRIDES)
+libptc-macosx%: MAKE_OPTS  = -j9 --no-print-directory -C libs/ptc $(MAKEARGS)
 libptc-macosx%: MAKE_LINK1 = ln -sf $(DESTDIR)/$@.a     && ln -sf $@.a
 libptc-macosx%: MAKE_LINK2 = ln -sf $(DESTDIR)/$@.dylib && ln -sf $@.dylib
 
@@ -214,7 +214,7 @@ numdiff-macosx-intel: numdiff-macosx32-intel  numdiff-macosx64-intel
 
 numdiff-macosx%: DESTDIR  := $(DESTDIR)tools/numdiff
 numdiff-macosx%: MAKE_ARGS = PRJNAME=$@ DESTDIR=../../$(DESTDIR) STATIC=yes APPENDLD=yes
-numdiff-macosx%: MAKE_OPTS = -j9 --no-print-directory -C tools/numdiff $(MAKEFLAGS) $(MAKEOVERRIDES)
+numdiff-macosx%: MAKE_OPTS = -j9 --no-print-directory -C tools/numdiff $(MAKEARGS)
 numdiff-macosx%: MAKE_LINK = ln -sf $(DESTDIR)/$@ && ln -sf $@
 
 numdiff-macosx32-intel numdiff-macosx32:

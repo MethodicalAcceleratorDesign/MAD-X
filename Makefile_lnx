@@ -62,7 +62,7 @@ madx-linux-nagfor:  madx-linux32-nagfor  madx-linux64-nagfor
 .PHONY:  madx-linux32-nagfor  madx-linux64-nagfor
 
 madx-linux%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=yes STATIC=yes USEGC=yes APPENDLD=yes
-madx-linux%: MAKE_OPTS = -j9 $(MAKEFLAGS) $(MAKEOVERRIDES)
+madx-linux%: MAKE_OPTS = -j9 $(MAKEARGS)
 madx-linux%: MAKE_LINK = $(if $(DESTDIR),ln -sf $(DESTDIR)$@ &&,) ln -sf $@ 
 
 madx-linux32-intel madx-linux32: libs/gc/libgc-linux32-intel.a
@@ -144,7 +144,7 @@ libmadx-linux-intel:  libmadx-linux32-intel  libmadx-linux64-intel
 
 libmadx-linux%: DESTDIR   := $(DESTDIR)libs/madx
 libmadx-linux%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) ONLINE=no STATIC=yes USEGC=yes APPENDLD=yes
-libmadx-linux%: MAKE_OPTS  = -j9 --no-print-directory -C libs/madx $(MAKEFLAGS) $(MAKEOVERRIDES)
+libmadx-linux%: MAKE_OPTS  = -j9 --no-print-directory -C libs/madx $(MAKEARGS)
 libmadx-linux%: MAKE_LINK1 = ln -sf $(DESTDIR)/$@.a  && ln -sf $@.a
 libmadx-linux%: MAKE_LINK2 = ln -sf $(DESTDIR)/$@.so && ln -sf $@.so
 
@@ -182,7 +182,7 @@ libptc-linux-intel:   libptc-linux32-intel  libptc-linux64-intel
 
 libptc-linux%: DESTDIR   := $(DESTDIR)libs/ptc
 libptc-linux%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) STATIC=yes APPENDLD=yes
-libptc-linux%: MAKE_OPTS  = -j9 --no-print-directory -C libs/ptc $(MAKEFLAGS) $(MAKEOVERRIDES)
+libptc-linux%: MAKE_OPTS  = -j9 --no-print-directory -C libs/ptc $(MAKEARGS)
 libptc-linux%: MAKE_LINK1 = ln -sf $(DESTDIR)/$@.a  && ln -sf $@.a
 libptc-linux%: MAKE_LINK2 = ln -sf $(DESTDIR)/$@.so && ln -sf $@.so
 
@@ -220,7 +220,7 @@ numdiff-linux-intel:  numdiff-linux32-intel  numdiff-linux64-intel
 
 numdiff-linux%: DESTDIR  := $(DESTDIR)tools/numdiff
 numdiff-linux%: MAKE_ARGS = PRJNAME=$@ DESTDIR=../../$(DESTDIR) STATIC=yes APPENDLD=yes
-numdiff-linux%: MAKE_OPTS = -j9 --no-print-directory -C tools/numdiff $(MAKEFLAGS) $(MAKEOVERRIDES)
+numdiff-linux%: MAKE_OPTS = -j9 --no-print-directory -C tools/numdiff $(MAKEARGS)
 numdiff-linux%: MAKE_LINK = ln -sf $(DESTDIR)/$@ && ln -sf $@
 
 numdiff-linux32-intel numdiff-linux32:

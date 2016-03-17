@@ -48,7 +48,7 @@ madx-win-gnu:    madx-win32-gnu    madx-win64-gnu
 madx-win-intel:  madx-win32-intel  madx-win64-intel
 
 madx-win%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=yes USEGC=yes APPENDLD=yes
-madx-win%: MAKE_OPTS = -j9 $(MAKEFLAGS) $(MAKEOVERRIDES)
+madx-win%: MAKE_OPTS = -j9 $(MAKEARGS)
 madx-win%: MAKE_LINK = $(if $(DESTDIR),$(CP) $(DESTDIR)$@.exe $@.exe &&,) $(CP) $@.exe
 
 madx-win32-intel madx-win32:
@@ -76,7 +76,7 @@ numdiff-win-intel:  numdiff-win32-intel  numdiff-win64-intel
 
 numdiff-win%: DESTDIR  := $(DESTDIR)tools$/numdiff
 numdiff-win%: MAKE_ARGS = PRJNAME=$@ DESTDIR=..$/..$/$(DESTDIR) STATIC=yes APPENDLD=yes
-numdiff-win%: MAKE_OPTS = -j9 --no-print-directory -C tools/numdiff $(MAKEFLAGS) $(MAKEOVERRIDES)
+numdiff-win%: MAKE_OPTS = -j9 --no-print-directory -C tools/numdiff $(MAKEARGS)
 numdiff-win%: MAKE_LINK = $(if $(DESTDIR),$(CP) $(DESTDIR)$/$@.exe $@.exe &&,) $(CP) $@.exe
 
 numdiff-win32-intel numdiff-win32:
