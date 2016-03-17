@@ -58,12 +58,8 @@ infoall: infoprj
 
 infobin:
 	$E "** Listing binaries and archives in $(DESTDIR)"
-ifneq ($(OSTYPE),Windows)
 	$_ $(FIND) $(DESTDIR) -type f -perm -a+x
 	$_ $(FIND) $(DESTDIR) -type f -name '*.a'
-else
-	$E "not supported on Windows platforms"
-endif
 
 infotestdep:
 	$E "** Computing tests pointless files"
@@ -83,7 +79,8 @@ ifeq ($(OSTYPE),Darwin)
 	$_ $(FIND) $(DESTDIR) -type f  \( -not -name 'lib*' \) -perm -a+x -exec otool -L {} \;
 endif
 ifeq ($(OSTYPE),Windows)
-	$E "not supported on Windows platforms"
+	$E "** not supported on Windows platforms"
+	$E "** run manually: $(FIND) $(DESTDIR) -type f ( -not -name 'lib*' ) -perm -a+x -print -exec ldd {} ;"
 endif
 
 infolibdep:
@@ -95,7 +92,8 @@ ifeq ($(OSTYPE),Darwin)
 	$_ $(FIND) $(DESTDIR) -type f -name 'lib*' -perm -a+x -exec otool -L {} \;
 endif
 ifeq ($(OSTYPE),Windows)
-	$E "not supported on Windows platforms"
+	$E "** not supported on Windows platforms"
+	$E "** run manually: $(FIND) $(DESTDIR) -type f -name 'lib*' -perm -a+x -print -exec ldd {} ;"
 endif
 
 # end of makefile
