@@ -786,6 +786,7 @@ make/system.Windows -text
 make/tester.numdiff -text
 make/tester.rules -text
 scripts/asan_symbolize.py -text
+scripts/build-test-linux.sh -text
 scripts/build-test-lxplus.sh -text
 scripts/build-test-macosx.sh -text
 scripts/build-test-report.sh -text
