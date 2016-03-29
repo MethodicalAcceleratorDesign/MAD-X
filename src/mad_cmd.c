@@ -137,8 +137,8 @@ exec_command(void)
     cmd_name = p->cmd_def->name;
 
     if (strcmp(cmd_name, "stop") == 0 || 
-	      strcmp(cmd_name, "quit") == 0 || 
-	      strcmp(cmd_name, "exit") == 0) {
+        strcmp(cmd_name, "quit") == 0 || 
+        strcmp(cmd_name, "exit") == 0) {
         madx_finish(); stop_flag = 1; return;
     }
 
@@ -149,7 +149,8 @@ exec_command(void)
     else if (strcmp(cmd_name, "system") == 0)  {
       char *pp = noquote(toks[p->decl_start]);
       if (get_option("echosystem")) printf("=== echoing system(\"%s\")\n", pp);
-      system(pp); // ret =, not used
+      if (system(pp) == -1)
+        warning("system failed to run the command: ", pp);
     } 
     else if (strcmp(cmd_name, "title") == 0)   title = permbuff(noquote(toks[p->decl_start]));
     else if (strcmp(cmd_name, "resplot") == 0) {
@@ -387,13 +388,13 @@ get_stmt(FILE* file, int supp_flag)
       c_cc = c_cc < c_ex ? c_cc : c_ex; *c_cc = '\0';
     }
     else if(c_cc != NULL 
-	    &&(c_st == NULL || c_cc < c_st))
+      &&(c_st == NULL || c_cc < c_st))
     {
       if (c_cc == &ca->c[ca->curr]) goto next;
       else *c_cc = '\0';
     }
     else if(c_ex != NULL
-	    &&(c_st == NULL || c_ex < c_st))
+      &&(c_st == NULL || c_ex < c_st))
     {
       if (c_ex == &ca->c[ca->curr]) goto next;
       else *c_ex = '\0';
