@@ -64,7 +64,7 @@ check_error "make all-macosx-gnu failed"
 echo -e "\n===== Intel build ====="
 icc      --version
 ifort    --version
-make all-macosx-intel all-macosx
+make all-macosx-intel
 check_error "make all-macosx-intel failed"
 
 echo -e "\n===== Binaries dependencies ====="
@@ -100,7 +100,7 @@ else
 fi
 
 # restore the default version
-make madx-macosx32 > /dev/null && make madx-macosx64 > /dev/null
+make madx-macosx32-gnu > /dev/null && make madx-macosx64-gnu > /dev/null
 check_error "unable to restore the default version"
 
 # date & end marker
