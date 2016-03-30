@@ -791,6 +791,7 @@ scripts/build-test-lxplus.sh -text
 scripts/build-test-macosx.sh -text
 scripts/build-test-report.sh -text
 scripts/build-test-win.bat -text
+scripts/build-test-win.sh -text
 scripts/test-valgrind.sh -text
 src/.htaccess -text
 src/CMakeLists.txt -text
