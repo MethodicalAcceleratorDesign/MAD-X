@@ -4,7 +4,7 @@
 
 # env settings
 export LC_CTYPE="C"
-export PATH="/Users/mad/Projects/madX:/opt/local/bin:$PATH"
+export PATH=`pwd`:"/opt/local/bin:$PATH"
 
 # error handler
 check_error ()
@@ -61,11 +61,11 @@ gfortran --version
 make all-macosx-gnu
 check_error "make all-macosx-gnu failed"
 
-echo -e "\n===== Intel build ====="
-icc      --version
-ifort    --version
-make all-macosx-intel
-check_error "make all-macosx-intel failed"
+#echo -e "\n===== Intel build ====="
+#icc      --version
+#ifort    --version
+#make all-macosx-intel
+#check_error "make all-macosx-intel failed"
 
 echo -e "\n===== Binaries dependencies ====="
 make infobindep
@@ -82,13 +82,13 @@ if [ "$1" = "notest" ] ; then
 else
 	echo ""
 
-	echo -e "\n===== Testing madx-macosx64-intel ====="
-	make madx-macosx64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=yes
-	check_error "make tests-all for madx-macosx64-intel failed"
-
-	echo -e "\n===== Testing madx-macosx32-intel ====="
-	make madx-macosx32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=yes
-	check_error "make tests-all for madx-macosx32-intel failed"
+#	echo -e "\n===== Testing madx-macosx64-intel ====="
+#	make madx-macosx64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=yes
+#	check_error "make tests-all for madx-macosx64-intel failed"
+#
+#	echo -e "\n===== Testing madx-macosx32-intel ====="
+#	make madx-macosx32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=yes
+#	check_error "make tests-all for madx-macosx32-intel failed"
 
 	echo -e "\n===== Testing madx-macosx64-gnu ====="
 	make madx-macosx64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=yes
