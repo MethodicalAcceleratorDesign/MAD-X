@@ -2,11 +2,6 @@
 # run:
 # bash scripts/build-test-win.sh [noecho] [cleanall] [notest]
 
-# env settings
-export LC_CTYPE="C"
-export PATH=`pwd`:"$PATH"
-export GFORTRAN_UNBUFFERED_PRECONNECTED=y
-
 # error handler
 check_error ()
 {
@@ -15,6 +10,17 @@ check_error ()
 		exit 1
 	fi
 }
+
+# change directory
+if [ "$PWD" != "$HOME/madX" ] ; then
+  cd "$HOME/madX"
+  check_error "unable to move to madX directory"
+fi
+
+# env settings
+export LC_CTYPE="C"
+export PATH=`pwd`:"$PATH"
+export GFORTRAN_UNBUFFERED_PRECONNECTED=y
 
 # set env 32 or 64 bit
 set_env ()
@@ -97,11 +103,11 @@ else
 	echo ""
 
 	echo -e "\n===== Testing madx-win64-gnu ====="
-	make madx-win64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=yes
+	make madx-win64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64
 	check_error "make tests-all for madx-win64-gnu failed"
 
 	echo -e "\n===== Testing madx-win32-gnu ====="
-	make madx-win32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=yes
+	make madx-win32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32
 	check_error "make tests-all for madx-win32-gnu failed"
 fi
 
