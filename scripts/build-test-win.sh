@@ -39,6 +39,7 @@ set_env ()
 rm -f build-test-win.out
 if [ "$1" = "noecho" ] ; then
 	shift
+    export NOCOLOR=yes
 	exec > build-test-win.out 2>&1
 	check_error "redirection with noecho failed"
 else
@@ -102,13 +103,13 @@ if [ "$1" = "notest" ] ; then
 else
 	echo ""
 
-	echo -e "\n===== Testing madx-win64-gnu ====="
-	make madx-win64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64
-	check_error "make tests-all for madx-win64-gnu failed"
-
 	echo -e "\n===== Testing madx-win32-gnu ====="
-	make madx-win32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32
+	make madx-win32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=$NOCOLOR
 	check_error "make tests-all for madx-win32-gnu failed"
+
+	echo -e "\n===== Testing madx-win64-gnu ====="
+	make madx-win64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=$NOCOLOR
+	check_error "make tests-all for madx-win64-gnu failed"
 fi
 
 # restore the default version

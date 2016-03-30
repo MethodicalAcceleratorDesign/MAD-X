@@ -2,10 +2,6 @@
 # run:
 # bash scripts/build-test-macosx.sh [noecho] [cleanall] [notest]
 
-# env settings
-export LC_CTYPE="C"
-export PATH=`pwd`:"/opt/local/bin:$PATH"
-
 # error handler
 check_error ()
 {
@@ -15,10 +11,15 @@ check_error ()
 	fi
 }
 
+# env settings
+export LC_CTYPE="C"
+export PATH=`pwd`:"/opt/local/bin:$PATH"
+
 # I/O redirection
 rm -f build-test-macosx.out
 if [ "$1" = "noecho" ] ; then
 	shift
+	export NOCOLOR=yes
 	exec > build-test-macosx.out 2>&1
 	check_error "redirection with noecho failed"
 else
@@ -58,12 +59,15 @@ echo -e "\n===== Gnu build ====="
 gcc      --version
 g++      --version
 gfortran --version
+
 make all-macosx-gnu
 check_error "make all-macosx-gnu failed"
 
 #echo -e "\n===== Intel build ====="
+
 #icc      --version
 #ifort    --version
+
 #make all-macosx-intel
 #check_error "make all-macosx-intel failed"
 
@@ -82,21 +86,21 @@ if [ "$1" = "notest" ] ; then
 else
 	echo ""
 
-#	echo -e "\n===== Testing madx-macosx64-intel ====="
-#	make madx-macosx64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=yes
-#	check_error "make tests-all for madx-macosx64-intel failed"
-#
-#	echo -e "\n===== Testing madx-macosx32-intel ====="
-#	make madx-macosx32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=yes
-#	check_error "make tests-all for madx-macosx32-intel failed"
+	echo -e "\n===== Testing madx-macosx32-gnu ====="
+	make madx-macosx32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=$NOCOLOR
+	check_error "make tests-all for madx-macosx32-gnu failed"
 
 	echo -e "\n===== Testing madx-macosx64-gnu ====="
-	make madx-macosx64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=yes
+	make madx-macosx64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=$NOCOLOR
 	check_error "make tests-all for madx-macosx64-gnu failed"
 
-	echo -e "\n===== Testing madx-macosx32-gnu ====="
-	make madx-macosx32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=yes
-	check_error "make tests-all for madx-macosx32-gnu failed"
+#	echo -e "\n===== Testing madx-macosx32-intel ====="
+#	make madx-macosx32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=$NOCOLOR
+#	check_error "make tests-all for madx-macosx32-intel failed"
+
+#	echo -e "\n===== Testing madx-macosx64-intel ====="
+#	make madx-macosx64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=$NOCOLOR
+#	check_error "make tests-all for madx-macosx64-intel failed"
 fi
 
 # restore the default version

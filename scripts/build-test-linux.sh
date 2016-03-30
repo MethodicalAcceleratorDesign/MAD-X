@@ -2,10 +2,6 @@
 # run:
 # bash scripts/build-test-linux.sh [noecho] [cleanall] [notest]
 
-# env settings
-export LC_CTYPE="C"
-export PATH=`pwd`:"$PATH"
-
 # error handler
 check_error ()
 {
@@ -15,10 +11,15 @@ check_error ()
 	fi
 }
 
+# env settings
+export LC_CTYPE="C"
+export PATH=`pwd`:"$PATH"
+
 # I/O redirection
 rm -f build-test-linux.out
 if [ "$1" = "noecho" ] ; then
 	shift
+	export NOCOLOR=yes
 	exec > build-test-linux.out 2>&1
 	check_error "redirection with noecho failed"
 else
@@ -58,6 +59,7 @@ echo -e "\n===== Gnu build ====="
 gcc      --version
 g++      --version
 gfortran --version
+
 make all-linux-gnu
 check_error "make all-linux-gnu failed"
 
@@ -76,13 +78,13 @@ if [ "$1" = "notest" ] ; then
 else
 	echo ""
 
-	echo -e "\n===== Testing madx-linux64-gnu ====="
-	make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=yes
-	check_error "make tests-all for madx-linux64-gnu failed"
-
 	echo -e "\n===== Testing madx-linux32-gnu ====="
-	make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=yes
+	make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=$NOCOLOR
 	check_error "make tests-all for madx-linux32-gnu failed"
+
+	echo -e "\n===== Testing madx-linux64-gnu ====="
+	make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=$NOCOLOR
+	check_error "make tests-all for madx-linux64-gnu failed"
 fi
 
 # restore the default version
