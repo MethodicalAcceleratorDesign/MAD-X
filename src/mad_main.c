@@ -99,18 +99,26 @@ mad_fini(void)
 }
 
 // Special environment setup for gfortran and I/O sync with C
-// Check order: nm madx64 | grep -E -w -e "_?init_env" -e _init | sort
-// Check address: export DYLD_PRINT_INITIALIZERS=1 ; ./madx64
+// Check addr: nm madx64 | grep -E -w -e "_?init_env" -e _init | sort
+// Check exec: export DYLD_PRINT_INITIALIZERS=1 ; ./madx64
 
 #ifdef _GFORTRAN
 
+#ifdef _DARWIN
+// on Darwin, linking order ensures init_env to be called before _init
 static void __attribute__((constructor))
+#else
+// on Linux|Win, linking order doesn't ensure any calling order, use priority
+static void __attribute__((constructor(101)))
+#endif
 init_env (void)
 {
   if (getenv("GFORTRAN_UNBUFFERED_PRECONNECTED") == 0) {
 #ifndef _WIN32
+    // known to leak memory (duplicate the string)!
     setenv("GFORTRAN_UNBUFFERED_PRECONNECTED", "y", 0);
 #else
+    // known to reference the string, use permanent buffer!
     int putenv(const char *string);
     putenv("GFORTRAN_UNBUFFERED_PRECONNECTED=y");
 #endif
