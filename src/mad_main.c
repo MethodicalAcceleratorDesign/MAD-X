@@ -99,9 +99,12 @@ mad_fini(void)
 }
 
 // Special environment setup for gfortran and I/O sync with C
+// Check order: nm madx64 | grep -w -e _init_env -e _init | sort
+// Check address: export DYLD_PRINT_INITIALIZERS=1 ; ./madx64
 
 #ifdef _GFORTRAN
-static void __attribute__((constructor(101)))
+
+static void __attribute__((constructor))
 init_env (void)
 {
   if (getenv("GFORTRAN_UNBUFFERED_PRECONNECTED") == 0) {
@@ -114,14 +117,4 @@ init_env (void)
   }
 }
 
-static void __attribute__((constructor(102)))
-check_env (void)
-{
-  char *p = getenv("GFORTRAN_UNBUFFERED_PRECONNECTED");
-
-  if (!p || (*p != 'y' && *p != 'Y' && *p != '1')) {
-    fprintf(stderr, "fatal error: set GFORTRAN_UNBUFFERED_PRECONNECTED=y to synchronize Fortran versus C I/O\n");
-    exit(EXIT_FAILURE);
-  }
-}
 #endif // _GFORTRAN
