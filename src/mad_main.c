@@ -99,7 +99,7 @@ mad_fini(void)
 }
 
 // Special environment setup for gfortran and I/O sync with C
-// Check order: nm madx64 | grep -w -e _init_env -e _init | sort
+// Check order: nm madx64 | grep -E -w -e "_?init_env" -e _init | sort
 // Check address: export DYLD_PRINT_INITIALIZERS=1 ; ./madx64
 
 #ifdef _GFORTRAN
