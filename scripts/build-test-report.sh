@@ -55,8 +55,11 @@ die ()
 
 # general settings
 readonly thedate=`date "+%Y-%m-%d"`
-readonly srvdir="mad@macserv15865.cern.ch:Projects/madX"
 readonly webdir="http://cern.ch/madx/madX"
+
+readonly windir="mad@macserv15865W10.cern.ch:madX"
+readonly linuxdir="mad@macserv15865LX.cern.ch:madX"
+readonly macosxdir="mad@macserv15865.dyndns.cern.ch:madX"
 
 # error handler
 check_error ()
@@ -77,7 +80,7 @@ clear_old_reports ()
     find tests/reports -ctime +501 -name '*_build-test-report.out' -exec rm {} \;
 }
 
-# check for completed jobs [lxplus | macosx | win]
+# check for completed jobs [lxplus | macosx | linux | win]
 build_test_completed ()
 {
     local marker="not found"
@@ -98,25 +101,26 @@ build_test_check ()
     return 0
 }
 
-# retrieve remote report [lxplus | macosx | win]
+# retrieve remote report [lxplus | macosx | linux | win]
 build_test_remote ()
 {
     for arch in "$@" ; do
-        scp -q -p "$srvdir/build-test-$arch.out" build-test-$arch.out
+        scp -q -p "${${arch}dir}/build-test-$arch.out" build-test-$arch.out
         check_error "unable to retrieve $arch remote report (scp)"
         if [ -s build-test-$arch.out ] ; then
             cat build-test-$arch.out | tr -d '\r' > build-test-$arch.tr
             mv -f build-test-$arch.tr build-test-$arch.out
             # retrieve binaries for download of last builds
-            scp -q -p "$srvdir/madx-macosx64-*" .
-            scp -q -p "$srvdir/madx-macosx32-*" .
-            scp -q -p "$srvdir/madx-win*.exe"   .
+            scp -q -p "${${arch}dir}/madx-${arch}64-gnu*" .
+            scp -q -p "${${arch}dir}/madx-${arch}32-gnu*" .
+            scp -q -p "${${arch}dir}/numdiff-${arch}64-gnu*" .
+            scp -q -p "${${arch}dir}/numdiff-${arch}32-gnu*" .
         fi
     done
     return 0
 }
 
-# look for failed tests [lxplus | macosx | win]
+# look for failed tests [lxplus | macosx | linux | win]
 build_test_report ()
 {
     local completed
@@ -142,7 +146,7 @@ build_test_report ()
     return 0
 }
 
-# send daily reports summary by email [lxplus | macosx | win]
+# send daily reports summary by email [lxplus | macosx | linux | win]
 build_test_send ()
 {
     local status
@@ -183,16 +187,16 @@ clean_tmp
 build_test_check  lxplus
 
 # retrieve remote reports
-build_test_remote        macosx win
+build_test_remote        macosx linux win
 
 # check if non-local reports are finished
-build_test_check         macosx win
+build_test_check         macosx linux win
 
 # build the final report
-build_test_report lxplus macosx win
+build_test_report lxplus macosx linux win
 
 # send the final report
-build_test_send   lxplus macosx win
+build_test_send   lxplus macosx linux win
 
 # report errors by email if any
 if [ "$nomail" != "nomail" -a -s build-test-report.log ] ; then
