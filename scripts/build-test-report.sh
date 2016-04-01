@@ -104,17 +104,19 @@ build_test_check ()
 # retrieve remote report [lxplus | macosx | linux | win]
 build_test_remote ()
 {
+    local dir
     for arch in "$@" ; do
-        scp -q -p "${${arch}dir}/build-test-$arch.out" build-test-$arch.out
+        eval dir=\$${arch}dir
+        scp -q -p "$dir/build-test-$arch.out" build-test-$arch.out
         check_error "unable to retrieve $arch remote report (scp)"
         if [ -s build-test-$arch.out ] ; then
             cat build-test-$arch.out | tr -d '\r' > build-test-$arch.tr
             mv -f build-test-$arch.tr build-test-$arch.out
             # retrieve binaries for download of last builds
-            scp -q -p "${${arch}dir}/madx-${arch}64-gnu*" .
-            scp -q -p "${${arch}dir}/madx-${arch}32-gnu*" .
-            scp -q -p "${${arch}dir}/numdiff-${arch}64-gnu*" .
-            scp -q -p "${${arch}dir}/numdiff-${arch}32-gnu*" .
+            scp -q -p "$dir/madx-${arch}64-gnu*" .
+            scp -q -p "$dir/madx-${arch}32-gnu*" .
+            scp -q -p "$dir/numdiff-${arch}64-gnu*" .
+            scp -q -p "$dir/numdiff-${arch}32-gnu*" .
         fi
     done
     return 0
