@@ -52,6 +52,8 @@ logmsg(unsigned level, const char *file, int line, const char *fmt, ...)
   vfprintf(stderr, fmt, ap);
   va_end(ap);
 
+  putc('\n', stderr);
+
   if (logmsg_config.flush) fflush(stderr);
 
   switch(level) {
