@@ -79,8 +79,7 @@ ifeq ($(OSTYPE),Darwin)
 	$_ $(FIND) $(DESTDIR) -type f  \( -not -name 'lib*' \) -perm -a+x -exec otool -L {} \;
 endif
 ifeq ($(OSTYPE),Windows)
-	$E "** not supported on Windows platforms"
-	$E "** run manually: $(FIND) $(DESTDIR) -type f ( -not -name 'lib*' ) -perm -a+x -print -exec ldd {} ;"
+	$_ $(FIND) $(DESTDIR) -type f  \( -not -name 'lib*' \) -perm -a+x -print -exec ldd {} \;
 endif
 
 infolibdep:
@@ -92,8 +91,7 @@ ifeq ($(OSTYPE),Darwin)
 	$_ $(FIND) $(DESTDIR) -type f -name 'lib*' -perm -a+x -exec otool -L {} \;
 endif
 ifeq ($(OSTYPE),Windows)
-	$E "** not supported on Windows platforms"
-	$E "** run manually: $(FIND) $(DESTDIR) -type f -name 'lib*' -perm -a+x -print -exec ldd {} ;"
+	$_ $(FIND) $(DESTDIR) -type f -name 'lib*' -perm -a+x -print -exec ldd {} \;
 endif
 
 # end of makefile

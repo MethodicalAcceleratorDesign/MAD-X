@@ -2,6 +2,10 @@
 # run:
 # bash scripts/build-test-win.sh [noecho] [cleanall] [notest]
 
+# env settings
+export LC_CTYPE="C"
+export PATH=`pwd`:"/c/Program Files/gnuplot/bin:$PATH"
+
 # error handler
 check_error ()
 {
@@ -17,19 +21,14 @@ if [ "$PWD" != "$HOME/madX" ] ; then
   check_error "unable to move to madX directory"
 fi
 
-# env settings
-export LC_CTYPE="C"
-export PATH=`pwd`:"$PATH"
-export GFORTRAN_UNBUFFERED_PRECONNECTED=y
-
 # set env 32 or 64 bit
 set_env ()
 {
-	local lo="s/mingw(32|64)/mingw$1/g"
-	local up="s/MINGW(32|64)/MINGW$1/g"
+    local lo="s/mingw(32|64)/mingw$1/g"
+    local up="s/MINGW(32|64)/MINGW$1/g"
 
     export PATH=`echo "$PATH"                       | sed -r -e "$lo"`
-	export MANPATH=`echo $MANPATH                   | sed -r -e "$lo"`
+    export MANPATH=`echo $MANPATH                   | sed -r -e "$lo"`
     export MSYSTEM=`echo "$MSYSTEM"                 | sed -r -e "$up"`
     export ACLOCAL_PATH=`echo "$ACLOCAL_PATH"       | sed -r -e "$lo"`
     export PKG_CONFIG_PATH=`echo "$PKG_CONFIG_PATH" | sed -r -e "$lo"`
@@ -39,7 +38,7 @@ set_env ()
 rm -f build-test-win.out
 if [ "$1" = "noecho" ] ; then
 	shift
-    export NOCOLOR=yes
+        export NOCOLOR=yes
 	exec > build-test-win.out 2>&1
 	check_error "redirection with noecho failed"
 else
@@ -76,6 +75,7 @@ else
 fi 
 
 echo -e "\n===== Gnu build ====="
+set_env 64
 gcc      --version
 g++      --version
 gfortran --version

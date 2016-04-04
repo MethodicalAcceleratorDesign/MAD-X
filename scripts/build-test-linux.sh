@@ -2,6 +2,10 @@
 # run:
 # bash scripts/build-test-linux.sh [noecho] [cleanall] [notest]
 
+# env settings
+export LC_CTYPE="C"
+export PATH=`pwd`:"$PATH"
+
 # error handler
 check_error ()
 {
@@ -10,10 +14,6 @@ check_error ()
 		exit 1
 	fi
 }
-
-# env settings
-export LC_CTYPE="C"
-export PATH=`pwd`:"$PATH"
 
 # I/O redirection
 rm -f build-test-linux.out
