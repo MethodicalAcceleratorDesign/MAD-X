@@ -143,10 +143,10 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   endif
 
   !---- Print summary
-  ! if (MOD(nmode_flip, 2).ne.0) then
-  !    write (warnstr, '(a,i3)') 'Total number of mode flips is not even! Nflips = ', nmode_flip
-  !    print*, 'Total number of mode flips is not even! Nflips = ', nmode_flip
-  ! endif
+  if (MOD(nmode_flip, 2).ne.0) then
+     write (warnstr, '(a,i5)') 'Total number of mode flips is not even! Nflips = ', nmode_flip
+     print*, 'Total number of mode flips is not even! Nflips = ', nmode_flip
+  endif
 
   if (get_option('twiss_summ ') .ne. 0) call tw_summ(rt,tt)
 
@@ -1038,8 +1038,8 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   eflag   = 0
   gammacp = one
   RA = RT
-  ! to put back for final coupling change
-  !call tmsymp(RA)
+
+  call tmsymp(RA)
   ! RA(1:4,1:4) = ( A , B
   !                 C , D)
   A = RA(1:2,1:2) ; B = RA(1:2,3:4)
@@ -1789,6 +1789,7 @@ SUBROUTINE twcptk(re,orbit)
   !     Purpose:                                                         *
   !     Track coupled lattice functions.                                 *
   !     Irina Tecker : new version rewritten in matrix formalism         *
+  !                   + added mode flip                                  *
   !                   + no "guard" for negative betx                     *
   !     Input:                                                           *
   !     re(6,6)  (double)   transfer matrix of element.                  *
@@ -1811,7 +1812,7 @@ SUBROUTINE twcptk(re,orbit)
   integer, external :: get_option
   double precision, parameter :: eps=1d-36
 
-  ! logical :: mode_flip_ele =.false.
+  logical :: mode_flip_ele =.false.
   logical :: cp_error=.false.
 
   call element_name(name,len(name))
@@ -1855,27 +1856,26 @@ SUBROUTINE twcptk(re,orbit)
      return
   endif
 
-  ! if   (all( B == zero  .and.  C == zero)  ) then
+  if   (all( B == zero  .and.  C == zero)  ) then
      
-  !    E(1:2,1:2) = A(1:2,1:2)
-  !    F(1:2,1:2) = D(1:2,1:2)
-    
-  !    ! symplectic conjugate of E = S*E^T*S^T 
-  !    EBAR = matmul(SMAT, matmul(transpose(E),SMATT))
-  !    edet = e(1,1) * e(2,2) - e(1,2) * e(2,1)  
-  !    CD   =  - matmul(F, RMAT)        
-  !   ! RMAT = - matmul(CD, EBAR) / edet 
-  !    RMAT = - matmul(CD, EBAR) 
-
-  ! else
-
+     E(1:2,1:2) = A(1:2,1:2)
+     F(1:2,1:2) = D(1:2,1:2)
+     
+     ! symplectic conjugate of E = S*E^T*S^T 
+     EBAR = matmul(SMAT, matmul(transpose(E),SMATT))
+     edet = e(1,1) * e(2,2) - e(1,2) * e(2,1)  
+     CD   =  - matmul(F, RMAT)        
+     RMAT = - matmul(CD, EBAR) / edet 
+     
+  else
+     
      ! invert symplectic matrix
      RMAT_BAR  = matmul(SMAT, matmul(transpose(RMAT),SMATT))
      TMP       = gammacp*(A -  matmul(B,RMAT))                         
      det       = tmp(1,1) * tmp(2,2) - tmp(1,2) * tmp(2,1)
 
      
-     !     if (det .gt. 0.9 .or. (det .gt. 0.1 .and. .not. mode_flip) ) then  !--- normal mode
+     if (det .gt. 0.9 .or. (det .gt. 0.1 .and. .not. mode_flip) ) then  !--- normal mode
         E       = A - matmul( B,RMAT )                           ! former a
         edet    = e(1,1) * e(2,2) - e(1,2) * e(2,1)              ! former adet
         EBAR    = matmul( SMAT, matmul(transpose( E ), SMATT ))  ! symplectic conjugate of E = S*E^T*S^T
@@ -1884,39 +1884,39 @@ SUBROUTINE twcptk(re,orbit)
         RMAT    = - matmul( CD, EBAR ) /  edet   
         gammacp = sqrt( det )
 
-  !    else  !---flip mode
+     else  !---flip mode
         
-  !       mode_flip_ele = .not. mode_flip
-  !       nmode_flip = nmode_flip + 1  
+        mode_flip_ele = .not. mode_flip
+        nmode_flip = nmode_flip + 1  
         
-  !       TMP = gammacp*(matmul(A,RMAT_BAR) + B)
-  !       det = tmp(1,1) * tmp(2,2) - tmp(1,2) * tmp(2,1)
+        TMP = gammacp*(matmul(A,RMAT_BAR) + B)
+        det = tmp(1,1) * tmp(2,2) - tmp(1,2) * tmp(2,1)
         
-  !       if (det .lt. zero) then
-  !          write (warnstr, '(a,a)') 'Negative determinant in ', name
-  !          call fort_warn('TWCPTK: ', warnstr)
-  !          !print*, "Negative determinant! Rounding error?!?!? det = ", det 
-  !       endif
+        if (det .lt. zero) then
+           write (warnstr, '(a,a)') 'Negative determinant in ', name
+           call fort_warn('TWCPTK: ', warnstr)
+           !print*, "Negative determinant! Rounding error?!?!? det = ", det 
+        endif
         
-  !       F       = matmul (A, RMAT_BAR) + B 
-  !       fdet    = f(1,1) * f(2,2) - f(1,2) * f(2,1) 
-  !       FBAR    = matmul(SMAT, matmul(transpose(F),SMATT)) ! symplectic conjugate of F = S*F^T*S^T
-  !       E       = C -  matmul(D, RMAT)
-  !       CD      = matmul(C, RMAT_BAR) + D
-  !       RMAT    = - matmul(CD, FBAR)/ abs( fdet )     
-  !       gammacp = sqrt (abs(det))
+        F       = matmul (A, RMAT_BAR) + B 
+        fdet    = f(1,1) * f(2,2) - f(1,2) * f(2,1) 
+        FBAR    = matmul(SMAT, matmul(transpose(F),SMATT)) ! symplectic conjugate of F = S*F^T*S^T
+        E       = C -  matmul(D, RMAT)
+        CD      = matmul(C, RMAT_BAR) + D
+        RMAT    = - matmul(CD, FBAR)/ abs( fdet )     
+        gammacp = sqrt (abs(det))
         
-  !       write (warnstr, '(a, a, a, i3)') 'Mode flip in the element ', name, ', nflips up to now = ', nmode_flip
-  !       call fort_warn('TWCPTK: ', warnstr)
-  !       ! print *, '+++ mode flip in the element ', name, ", nflips up to now = ", nmode_flip 
-  !    endif
-  ! endif
+        write (warnstr, '(a, a, a, i3)') 'Mode flip in the element ', name, ', nflips up to now = ', nmode_flip
+        call fort_warn('TWCPTK: ', warnstr)
+        ! print *, '+++ mode flip in the element ', name, ", nflips up to now = ", nmode_flip 
+     endif
+  endif
   
-  ! if(mode_flip) then
-  !    call twcptk_twiss(f, e, cp_error)
-  ! else
-      call twcptk_twiss(e, f, cp_error)
-  ! endif
+  if(mode_flip) then
+     call twcptk_twiss(f, e, cp_error)
+  else
+     call twcptk_twiss(e, f, cp_error)
+  endif
   
   if (cp_error) then
      ! print *, '+++ det of block diagonal matrix is zero in ', name
@@ -1925,15 +1925,15 @@ SUBROUTINE twcptk(re,orbit)
   endif
   
   ! When we are comming out of a flipped mode, the phase is often off by a factor of twopi. As twopi doesn't have any effect on physics we can substract twopi.
-  ! Unfortunately there is no definitive way to calcuate what the "right" way to handle this is but "-twopi" is better than nothing (c, Sagan)
-  ! if(mode_flip .and. .not. mode_flip_ele) then
+  ! Unfortunately there is no definitive way to calcuate what the "right" way to handle this is but "-twopi" is better than nothing ((c), Sagan)
+  if(mode_flip .and. .not. mode_flip_ele) then
      
-  !    amux = amux - twopi
-  !    amuy = amuy - twopi
+     amux = amux - twopi
+     amuy = amuy - twopi
      
-  ! endif
+  endif
  
-  ! mode_flip = mode_flip_ele
+  mode_flip = mode_flip_ele
   
   if (betx.lt.eps .or. bety.lt.eps) then
      write (warnstr, '(a, a, a)') 'Negative beta in ', name, ' Twiss parameter might be unphysical!'
