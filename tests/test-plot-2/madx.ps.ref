@@ -1,7 +1,7 @@
 %!PS-Adobe-2.0
 %%Title: madx.ps
 %%Creator: gx11 version  1.50
-%%CreationDate: 14/10/08 12:20
+%%CreationDate: 16/04/04 09:24
 %%Orientation: Landscape
 %%BoundingBox:  17  30 573 790
 %%Pages: (atend)
@@ -215,11 +215,11 @@ black  384  825 t    90 r
 (leir)
 show   -90 r  -384  -825 t
 /xs 0 def
-(MAD-X 5.02.02  08/10/14 12.20.57)
+(MAD-X 5.02.08  04/04/16 09.24.40)
 /Times-Italic    77 stwn
 black  384 2878 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     77 sf 0 0 m
-(MAD-X 5.02.02  08/10/14 12.20.57)
+(MAD-X 5.02.08  04/04/16 09.24.40)
 show xs 0 t 0 0 m   -90 r  -384 -2878 t
  3.750 setlinewidth [] 0 sd                 
 black n  1953   825 m  405  825 l
@@ -2312,11 +2312,11 @@ black  384  825 t    90 r
 (sample plot)
 show   -90 r  -384  -825 t
 /xs 0 def
-(MAD-X 5.02.02  08/10/14 12.20.57)
+(MAD-X 5.02.08  04/04/16 09.24.40)
 /Times-Italic    77 stwn
 black  384 2878 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     77 sf 0 0 m
-(MAD-X 5.02.02  08/10/14 12.20.57)
+(MAD-X 5.02.08  04/04/16 09.24.40)
 show xs 0 t 0 0 m   -90 r  -384 -2878 t
  3.750 setlinewidth [] 0 sd                 
 black n  1953   825 m  405  825 l
@@ -4409,11 +4409,11 @@ black  384  825 t    90 r
 (two variables)
 show   -90 r  -384  -825 t
 /xs 0 def
-(MAD-X 5.02.02  08/10/14 12.20.57)
+(MAD-X 5.02.08  04/04/16 09.24.40)
 /Times-Italic    77 stwn
 black  384 2878 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     77 sf 0 0 m
-(MAD-X 5.02.02  08/10/14 12.20.57)
+(MAD-X 5.02.08  04/04/16 09.24.40)
 show xs 0 t 0 0 m   -90 r  -384 -2878 t
  3.750 setlinewidth [] 0 sd                 
 black n  1953   825 m  405  825 l
@@ -6606,11 +6606,11 @@ black  384  825 t    90 r
 (two variables with range)
 show   -90 r  -384  -825 t
 /xs 0 def
-(MAD-X 5.02.02  08/10/14 12.20.57)
+(MAD-X 5.02.08  04/04/16 09.24.40)
 /Times-Italic    77 stwn
 black  384 2835 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     77 sf 0 0 m
-(MAD-X 5.02.02  08/10/14 12.20.57)
+(MAD-X 5.02.08  04/04/16 09.24.40)
 show xs 0 t 0 0 m   -90 r  -384 -2835 t
  3.750 setlinewidth [] 0 sd                 
 black n  1953   825 m  405  825 l
@@ -8454,11 +8454,11 @@ black  384  825 t    90 r
 (two variables on vaxis2)
 show   -90 r  -384  -825 t
 /xs 0 def
-(MAD-X 5.02.02  08/10/14 12.20.57)
+(MAD-X 5.02.08  04/04/16 09.24.40)
 /Times-Italic    77 stwn
 black  384 2878 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     77 sf 0 0 m
-(MAD-X 5.02.02  08/10/14 12.20.57)
+(MAD-X 5.02.08  04/04/16 09.24.40)
 show xs 0 t 0 0 m   -90 r  -384 -2878 t
  3.750 setlinewidth [] 0 sd                 
 black n  1953   825 m  405  825 l
@@ -17852,11 +17852,11 @@ black  192  886 t    90 r
 (non-s horizontal axis)
 show   -90 r  -192  -886 t
 /xs 0 def
-(MAD-X 5.02.02  08/10/14 12.20.58)
+(MAD-X 5.02.08  04/04/16 09.24.41)
 /Times-Italic    85 stwn
 black  192 2864 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     85 sf 0 0 m
-(MAD-X 5.02.02  08/10/14 12.20.58)
+(MAD-X 5.02.08  04/04/16 09.24.41)
 show xs 0 t 0 0 m   -90 r  -192 -2864 t
  3.750 setlinewidth [] 0 sd                 
 black n  1936   886 m  215  886 l
@@ -23370,11 +23370,11 @@ black  384  825 t    90 r
 (overflow in number of variables to be plotted)
 show   -90 r  -384  -825 t
 /xs 0 def
-(MAD-X 5.02.02  08/10/14 12.20.58)
+(MAD-X 5.02.08  04/04/16 09.24.41)
 /Times-Italic    77 stwn
 black  384 2368 t    90 r xs neg 0 t 0 0 m
 /Times-Italic fft     77 sf 0 0 m
-(MAD-X 5.02.02  08/10/14 12.20.58)
+(MAD-X 5.02.08  04/04/16 09.24.41)
 show xs 0 t 0 0 m   -90 r  -384 -2368 t
  3.750 setlinewidth [] 0 sd                 
 black n  1953   825 m  405  825 l
@@ -25692,20 +25692,20 @@ black  261 2843 t   180 r xs neg 0 t 0 0 m
 (q2)
 show xs 0 t 0 0 m  -180 r  -261 -2843 t
  3.750 setlinewidth [] 0 sd                 
-black n   558  1086 m   634  1287 l   739  1487 l   834  1687 l
+black n   632  1086 m   641  1287 l   739  1487 l   834  1687 l
    920  1888 l  1001  2088 l  1077  2288 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   558  1081 m   558  1092 l
+black n   632  1081 m   632  1092 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   552  1086 m   563  1086 l
+black n   626  1086 m   637  1086 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   634  1281 m   634  1292 l
+black n   641  1281 m   641  1292 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-black n   629  1287 m   640  1287 l
+black n   635  1287 m   646  1287 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 black n   739  1482 m   739  1492 l
@@ -25745,26 +25745,26 @@ black  344 1337 t    90 r xs 2 div neg 0 t 0 0 m
 (q1)
 show xs 2 div 0 t 0 0 m   -90 r  -344 -1337 t
  3.750 setlinewidth [2 10] 0 sd             
-black n   344  1337 m   661  1337 l
+black n   344  1337 m   665  1337 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-red n   596  1086 m   759  1287 l   981  1487 l  1179  1687 l
+red n   766  1086 m   774  1287 l   982  1487 l  1179  1687 l
   1357  1888 l  1521  2088 l  1673  2288 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-red n   596  1081 m   596  1092 l
+red n   766  1081 m   766  1092 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-red n   590  1086 m   601  1086 l
+red n   761  1086 m   772  1086 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-red n   759  1281 m   759  1292 l
+red n   774  1281 m   774  1292 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-red n   754  1287 m   765  1287 l
+red n   768  1287 m   779  1287 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
-red n   981  1482 m   981  1492 l
+red n   982  1482 m   982  1492 l
 col-1 s                                 
  3.750 setlinewidth [] 0 sd                 
 red n   976  1487 m   987  1487 l
