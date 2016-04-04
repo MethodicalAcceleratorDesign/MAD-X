@@ -2,6 +2,10 @@
 # run:
 # bash scripts/build-test-report.sh [noecho] [clean|cleanall] [forcereport] [force] [nomail]
 
+# env settings
+export LC_CTYPE="C"
+export PATH=/afs/cern.ch/user/m/mad/madx/madX:$PATH
+
 # I/O redirection
 rm -f build-test-report.log
 if [ "$1" = "noecho" ] ; then
@@ -10,10 +14,6 @@ if [ "$1" = "noecho" ] ; then
 else
     exec 2>&1 | tee build-test-report.log
 fi
-
-# env settings
-export LC_CTYPE="C"
-export PATH=/afs/cern.ch/user/m/mad/madx/madX:$PATH
 
 # parse arguments
 while [ "$1" != "" ] ; do
