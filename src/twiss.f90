@@ -19,9 +19,10 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   integer :: sector_tab_name(*) ! holds sectormap data
 
   integer :: i, ithr_on
-  integer :: eflag 
+  integer :: chrom, eflag 
   double precision :: orbit0(6), orbit(6), tt(6,6,6), ddisp0(6), r0mat(2,2)
   character(len=48) :: charconv
+  character(len=120) :: warnstr
   logical :: fast_error_func
 
   double precision, external :: get_value
@@ -32,6 +33,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   !---- Initialization
   table_name = charconv(tab_name)
   sectorTableName = charconv(sector_tab_name)
+  chrom=0
   eflag=0
   ithr_on=0
   fsecarb=.false.
@@ -58,12 +60,17 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   sigyco=zero; sigdy=zero; cosmuy=zero; wy=zero; phiy=zero; dmuy=zero
   qy=zero; sinmuy=zero; xiy=zero
 
-  gammacp=one
-  
+   gammacp=one
+   nmode_flip = 0
+   mode_flip  =.false.
+
   synch_1=zero;  synch_2=zero;  synch_3=zero;  synch_4=zero;  synch_5=zero
 
   suml=zero; circ=zero; eta=zero; alfa=zero; gamtr=zero; wgt=zero
 
+  !---- Track chromatic functions
+  chrom = get_option('twiss_chrom ')
+  
   !---- flag if called from match process
   !---- get match flag for storing variables in nodes
   match_is_on = get_option('match_is_on ') .ne. 0
@@ -112,8 +119,9 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
      call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag);          if (eflag.ne.0) go to 900
      call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on); if (eflag.ne.0) go to 900
      call twcpin(rt,disp0,r0mat,eflag);                               if (eflag.ne.0) go to 900
-     !----IrinaTecker: For Sagan-Rubin version of coupling
+     !----IrinaTecker: For Sagan-Rubin and Talman versions of coupling
      !call twcpin_sagan(rt,disp0,r0mat, eflag);                       if (eflag.ne.0) go to 900 
+     !call twcpin_talman(rt,disp0,r0mat, eflag);                       if (eflag.ne.0) go to 900 
 
      !---- Initialize opt_fun0
      call twinifun(opt_fun0,rt)
@@ -129,12 +137,17 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   call twcpgo(rt,orbit0)
 
   !---- List chromatic functions.
-  if (get_option('twiss_chrom ') .ne. 0) then
+  if (chrom .ne. 0) then
      call twbtin(rt,tt)
      call twchgo
   endif
 
   !---- Print summary
+  ! if (MOD(nmode_flip, 2).ne.0) then
+  !    write (warnstr, '(a,i3)') 'Total number of mode flips is not even! Nflips = ', nmode_flip
+  !    print*, 'Total number of mode flips is not even! Nflips = ', nmode_flip
+  ! endif
+
   if (get_option('twiss_summ ') .ne. 0) call tw_summ(rt,tt)
 
   if (get_option('keeporbit ') .ne. 0)  then
@@ -624,13 +637,13 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   logical :: fmap
   character(len=28) :: tmptxt1, tmptxt2, tmptxt3
   character(len=120) :: warnstr
-  character(len=name_len) :: c_name(2), p_name
+  character(len=name_len) :: c_name(2), p_name, el_name
   character(len=2) :: ptxt(2)=(/'x-','y-'/)
   integer :: j, code, n_align, nobs, node, old, poc_cnt, debug
   integer :: kpro, corr_pick(2), enable, coc_cnt(2), lastnb, rep_cnt(2)
   double precision :: orbit2(6), ek(6), re(6,6), te(6,6,6)
   double precision :: al_errors(align_max) 
-  double precision :: el, cick, err
+  double precision :: el, cick, err, nrm
   double precision :: parvec(26),  vector(10), reforb(6)
   double precision :: restsum(2), restorb(6,2), restm(6,6,2), restt(6,6,6,2)
   double precision :: cmatr(6,6,2), pmatr(6,6), dorb(6)
@@ -642,8 +655,6 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   
   debug = get_option('debug ')
 
-  ! if (debug .ne. zero) print *, 'tmfrst: gamma = ', gamma
-  
   !---- Initialize
   !---- corr_pick stores for both projection the last pickup used by the
   !     threader in order to avoid corrections in front of it when
@@ -735,12 +746,31 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   if (fmap) then 
      call tmcat(.true.,re,te,rt,tt,rt,tt)
      suml = suml + el
+     !--- IT check if RT is symplectic
+     call m66symp(rt,nrm)
+     if ((nrm .gt. 1d-12) .and. (get_option('debug ') .ne. zero)) then
+        call element_name(el_name,len(el_name))
+        write (warnstr,'(a,f12.6, a)') "The column norm is ", nrm, &
+             " in element ", el_name
+        call fort_warn('THREADER: ', warnstr)
+        !call tmsymp(rt)
+     endif
+
   endif
   
   if (n_align .ne. 0)  then
      ORBIT2 = ORBIT 
      call tmali2(el,orbit2,al_errors,beta,gamma,orbit,re)
      RT = matmul(RE,RT)
+     !--- IT check if RT is symplectic
+     call m66symp(rt,nrm)
+     if ((nrm .gt. 1d-12) .and. (get_option('debug ') .ne. zero)) then
+        call element_name(el_name,len(el_name))
+        write (warnstr,'(a,f12.6, a)') "The column norm is ", nrm, &
+             " in element ", el_name
+        call fort_warn('THREADER: ', warnstr)
+        !call tmsymp(rt)
+     endif
   endif
     
   if (kobs.gt.0 .and. kobs.eq.nobs) return
@@ -919,7 +949,7 @@ SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
   if (code .eq. code_placeholder) code = code_instrument 
 
   !-- if wrong corrector or not a corrector, loop
-  if (code .ne. itp .and. code .ne. code_kicker) goto 10 ! loop over nodes 
+  if (code .ne. itp .and. code .ne. code_kicker) goto 10 
 
   !--- corrector found for the projection plane
   ncorr = node
@@ -929,7 +959,7 @@ SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
   ATEMP = matmul(PMATR,ATEMP) 
 
   !--- if kicker is not efficient enough - loop
-  if (abs(atemp(lc1,lc2)) .lt. tol1min) goto 10 ! loop over nodes 
+  if (abs(atemp(lc1,lc2)) .lt. tol1min) goto 10 
 
   !---  now we got one good corrector - get kick with attenuation factor
   cick = -thrvec(3) * dorb(2*kpro-1) / atemp(lc1,lc2)
@@ -960,7 +990,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   use twiss0fi
   use twisscfi
   use twissbeamfi, only : deltap
-  use matrices, only : EYE
+  use matrices, only : EYE, SMAT
   use math_constfi, only : zero, one, two, quarter
   implicit none
   !----------------------------------------------------------------------*
@@ -979,8 +1009,9 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   integer, intent(OUT) :: eflag
   
   logical :: stabx=.false., staby=.false.
-  double precision :: a(2,2), aux(2,2), d(2,2)
-  double precision :: arg, den, det, dtr, sinmu2
+  double precision :: a(2,2), b(2,2), c(2,2), d(2,2), ra(6,6)
+  double precision :: e(2,2), aux(2,2), f(2,2), bbar(2,2)
+  double precision :: arg, den, det, r_det, dtr, sinmu2
   double precision :: betx0=zero, alfx0=zero, amux0=zero
   double precision :: bety0=zero, alfy0=zero, amuy0=zero
   character(len=120) :: msg
@@ -993,10 +1024,19 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   deltap = get_value('probe ','deltap ')
 
   !---- Initialization
-  eflag=0
-
+  eflag   = 0
+  gammacp = one
+  RA = RT
+  ! to put back for final coupling change
+  !call tmsymp(RA)
+  ! RA(1:4,1:4) = ( A , B
+  !                 C , D)
+  A = RA(1:2,1:2) ; B = RA(1:2,3:4)
+  C = RA(3:4,1:2) ; D = RA(3:4,3:4)
+  
   !---- Initial dispersion.
   if (get_option('twiss_inval ') .eq. 0) then
+  !--should we change to RA?????   
      call twdisp(rt,rt(1,6),disp0)
   else
      DISP0(1:4) = OPT_FUN(15:18) 
@@ -1004,16 +1044,17 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   disp0(5) = zero
   disp0(6) = one
 
-  !---- Matrix C + B(bar) and its determinant.
-  aux(1,1) = rt(3,1) + rt(2,4)
-  aux(1,2) = rt(3,2) - rt(1,4)
-  aux(2,1) = rt(4,1) - rt(2,3)
-  aux(2,2) = rt(4,2) + rt(1,3)
+  !---- Matrix C + B(bar) and its determinant (for R_A)
+  BBAR = matmul(matmul(-SMAT,transpose(B)),SMAT)
+  aux = C + BBAR
   det = aux(1,1) * aux(2,2) - aux(1,2) * aux(2,1)
 
   !---- Coupling matrix.
-  dtr = (rt(1,1) + rt(2,2) - rt(3,3) - rt(4,4)) / two
-  arg = det + dtr**2 ! det|C+BBAR| + (trA-trD)**2/4
+  !--- (trA - trD) / 2
+  dtr = (A(1,1) + A(2,2) - D(1,1) - D(2,2)) / two
+
+  !--- det|C+BBAR| + [(trA - trD) / 2]**2:
+  arg = det + dtr**2
 
   if (arg .lt. zero) then
      !---- Unstable due to coupling.
@@ -1023,44 +1064,222 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
      if (arg .eq. zero) then
         R0MAT(:2,:2) = EYE(:2,:2)
      else
-        den = - (dtr + sign(sqrt(arg),dtr))
-        R0MAT = AUX / den
+        den     = - (dtr + sign(sqrt(arg),dtr))
+        R0MAT   = AUX / den
      endif
 
-     !---- Decouple: Find diagonal blocks.
-     a(1,1) = rt(1,1) - rt(1,3)*r0mat(1,1) - rt(1,4)*r0mat(2,1)
-     a(1,2) = rt(1,2) - rt(1,3)*r0mat(1,2) - rt(1,4)*r0mat(2,2)
-     a(2,1) = rt(2,1) - rt(2,3)*r0mat(1,1) - rt(2,4)*r0mat(2,1)
-     a(2,2) = rt(2,2) - rt(2,3)*r0mat(1,2) - rt(2,4)*r0mat(2,2)
+     r_det     = r0mat(1,1) * r0mat(2,2) - r0mat(1,2) * r0mat(2,1)
+     gammacp   = 1 / sqrt( 1 + r_det ) 
 
-     d(1,1) = rt(3,3) + r0mat(1,1)*rt(1,3) + r0mat(1,2)*rt(2,3)
-     d(1,2) = rt(3,4) + r0mat(1,1)*rt(1,4) + r0mat(1,2)*rt(2,4)
-     d(2,1) = rt(4,3) + r0mat(2,1)*rt(1,3) + r0mat(2,2)*rt(2,3)
-     d(2,2) = rt(4,4) + r0mat(2,1)*rt(1,4) + r0mat(2,2)*rt(2,4)
 
+     ! !---- Decouple: Find diagonal blocks.
+     ! a(1,1) = rt(1,1) - rt(1,3)*r0mat(1,1) - rt(1,4)*r0mat(2,1)
+     ! a(1,2) = rt(1,2) - rt(1,3)*r0mat(1,2) - rt(1,4)*r0mat(2,2)
+     ! a(2,1) = rt(2,1) - rt(2,3)*r0mat(1,1) - rt(2,4)*r0mat(2,1)
+     ! a(2,2) = rt(2,2) - rt(2,3)*r0mat(1,2) - rt(2,4)*r0mat(2,2)
+
+     ! d(1,1) = rt(3,3) + r0mat(1,1)*rt(1,3) + r0mat(1,2)*rt(2,3)
+     ! d(1,2) = rt(3,4) + r0mat(1,1)*rt(1,4) + r0mat(1,2)*rt(2,4)
+     ! d(2,1) = rt(4,3) + r0mat(2,1)*rt(1,3) + r0mat(2,2)*rt(2,3)
+     ! d(2,2) = rt(4,4) + r0mat(2,1)*rt(1,4) + r0mat(2,2)*rt(2,4)
+
+     !--The same as above a and d, just rewriten in matrix formalism (e = a, f = d)
+     !-- In d callucaltion to have the same values as below in f one has to add parenthesis around R0MAT*B
+     ! i.e d(1,1) = rt(3,3) +  ( r0mat(1,1)*rt(1,3) + r0mat(1,2)*rt(2,3) )
+     e = A - matmul( B,     R0MAT )
+     f = D + matmul( R0MAT, B     )
+     
      !---- First mode.
-     cosmux = (a(1,1) + a(2,2)) / two
+     cosmux = (e(1,1) + e(2,2)) / two
      stabx = abs(cosmux).lt.one
      if (stabx) then
-        sinmu2 = - a(1,2)*a(2,1) - quarter*(a(1,1) - a(2,2))**2
+        sinmu2 = - e(1,2)*e(2,1) - quarter*(e(1,1) - e(2,2))**2
         if (sinmu2.lt.zero) sinmu2 = eps
-        sinmux = sign(sqrt(sinmu2), a(1,2))
-        betx0 = a(1,2) / sinmux
-        alfx0 = (a(1,1) - a(2,2)) / (two * sinmux)
+        sinmux = sign(sqrt(sinmu2), e(1,2))
+        betx0 = e(1,2) / sinmux
+        alfx0 = (e(1,1) - e(2,2)) / (two * sinmux)
      else
         betx0 = zero
         alfx0 = zero
      endif
 
      !---- Second mode.
-     cosmuy = (d(1,1) + d(2,2)) / two
+     cosmuy = (f(1,1) + f(2,2)) / two
      staby = abs(cosmuy).lt.one
      if (staby) then
-        sinmu2 = - d(1,2)*d(2,1) - quarter*(d(1,1) - d(2,2))**2
+        sinmu2 = - f(1,2)*f(2,1) - quarter*(f(1,1) - f(2,2))**2
         if (sinmu2.lt.zero) sinmu2 = eps
-        sinmuy = sign(sqrt(sinmu2), d(1,2))
-        bety0 = d(1,2) / sinmuy
-        alfy0 = (d(1,1) - d(2,2)) / (two * sinmuy)
+        sinmuy = sign(sqrt(sinmu2), f(1,2))
+        bety0 = f(1,2) / sinmuy
+        alfy0 = (f(1,1) - f(2,2)) / (two * sinmuy)
+     else
+        bety0 = zero
+        alfy0 = zero
+     endif
+
+  endif
+
+  ! call twcpin_print(rt,r0mat)
+
+  !---- Give message, if unstable.
+  if (.not.stabx .or. .not.staby) then
+     if (.not.stabx .and. .not.staby) then
+        write (msg,'(3(a,f12.6))') "Both modes are unstable for delta(p)/p = ",deltap, &
+             ": cosmux = ",cosmux,", cosmuy = ",cosmuy
+     elseif (.not.stabx) then 
+        write (msg,'(3(a,f12.6))') "Mode 1 is unstable for delta(p)/p = ",deltap, &
+             ": cosmux = ",cosmux,", cosmuy = ",cosmuy
+     elseif (.not.staby) then
+        write (msg,'(3(a,f12.6))') "Mode 2 is unstable for delta(p)/p = ",deltap, &
+             ": cosmux = ",cosmux,", cosmuy = ",cosmuy
+     endif
+     call fort_warn('TWCPIN: ',msg)
+     eflag = 1
+  endif
+
+  opt_fun0(3)=betx0
+  opt_fun0(4)=alfx0
+  opt_fun0(5)=amux0
+  opt_fun0(6)=bety0
+  opt_fun0(7)=alfy0
+  opt_fun0(8)=amuy0
+
+  OPT_FUN0(15:18) = DISP0(1:4)
+
+  opt_fun0(29)=r0mat(1,1)
+  opt_fun0(30)=r0mat(1,2)
+  opt_fun0(31)=r0mat(2,1)
+  opt_fun0(32)=r0mat(2,2)
+
+end SUBROUTINE twcpin
+
+SUBROUTINE twcpin_talman(rt,disp0,r0mat,eflag)
+  use twiss0fi
+  use twisscfi
+  use twissbeamfi, only : deltap
+  use matrices, only : EYE, SMAT
+  use math_constfi, only : zero, one, two, quarter
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Initial values for linear coupling parameters.                   *
+  !     Irina Tecker: Talman's approach                                  *
+  !     Entry point for mad_emit                                         *
+  !     Input:                                                           *
+  !     rt(6,6)      (double)  one turn transfer matrix.                 *
+  !     Output:                                                          *
+  !     disp0        (double)  initial dispersion vector                 *
+  !     r0mat(2,2)   (double)  coupling matrix                           *
+  !     eflag        (integer) error flag.                               *
+  !----------------------------------------------------------------------*
+  double precision, intent(IN)  :: rt(6,6)
+  double precision, intent(OUT) :: disp0(6), r0mat(2,2)
+  integer, intent(OUT) :: eflag
+  
+  logical :: stabx=.false., staby=.false.
+  double precision :: a(2,2),  b(2,2),  c(2,2),  d(2,2)
+  double precision :: bbar(2,2), r0mat_bar(2,2)
+  double precision :: e(2,2), aux(2,2), f(2,2)
+  double precision :: arg, den, det, dtr, sinmu2, r_det
+  double precision :: betx0=zero, alfx0=zero, amux0=zero
+  double precision :: bety0=zero, alfy0=zero, amuy0=zero
+  character(len=120) :: msg
+
+  double precision :: det_e=zero, det_f=zero
+  
+  integer, external :: get_option
+  double precision, external :: get_value
+  double precision, parameter :: eps=1d-8
+
+  !--- initialize deltap because twcpin can be called directly from mad_emit
+  deltap = get_value('probe ','deltap ')
+
+  !---- Initialization
+  eflag=0
+  gammacp=one
+  !---- Initial dispersion.
+  if (get_option('twiss_inval ') .eq. 0) then
+     call twdisp(rt,rt(1,6),disp0)
+  else
+     DISP0(1:4) = OPT_FUN(15:18) 
+  endif
+  disp0(5) = zero
+  disp0(6) = one
+
+  ! RT(1:4,1:4) = ( A , B
+  !                 C , D)
+  A = RT(1:2,1:2) ; B = RT(1:2,3:4)
+  C = RT(3:4,1:2) ; D = RT(3:4,3:4)
+  
+  !---- Matrix C + B(bar) and its determinant (for R_A)
+  bbar = matmul(matmul(-SMAT,transpose(b)),SMAT)
+  aux(:2,:2) = C(:2,:2) + BBAR(:2,:2)
+  det = aux(1,1) * aux(2,2) - aux(1,2) * aux(2,1)
+
+  
+  !---- Coupling matrix.
+  !--- (trA - trD) / 2
+  dtr = (A(1,1) + A(2,2) - D(1,1) - D(2,2)) / two
+  !--- det|C+BBAR| + [(trA - trD) / 2]**2:
+  arg = det + dtr**2
+
+  
+  if (arg .lt. zero) then
+     !---- Unstable due to coupling.
+     stabx = .false. ; staby = .false.
+  
+  else
+     if (arg .eq. zero) then
+        R0MAT(:2,:2) = EYE(:2,:2)
+        r_det     = r0mat(1,1) * r0mat(2,2) - r0mat(1,2) * r0mat(2,1)
+        gammacp   = 1 / sqrt( 1 + r_det ) 
+
+     else
+        ! --- - [(trA - trD) / 2 + sign(trA - trD)*sqrt(det|C+BBAR| + [(trA - trD) / 2]**2)]
+        den     = ( dtr + sign(sqrt(arg),dtr) ) ! --- (lamda_A - trd) p.13, Talman to have -R_A = (C+BBAR)/ - (lamda_A - trd)
+        gammacp = sqrt(abs(den)/abs(-2*sign(sqrt(arg),dtr)))! -- numerical coefitient in front of R0MAT (p.16 ,Talman)
+        
+        ! V = [ gammacp* I, RD ; -RD_BAR, gammacp*I]
+        !R0MAT = gammacp*AUX / den  ! ---  RD
+        !R0MAT_BAR = - matmul(matmul(-SMAT,transpose(R0MAT)),SMAT) ! ---- RA = - RD_BAR 
+        R0MAT = - AUX / den  ! --- - RA
+     endif
+     R0MAT_BAR =  matmul(matmul(-SMAT,transpose(R0MAT)),SMAT) ! --- RD = - RA_BAR 
+     
+     !---- Decouple: Find diagonal blocks.
+     !A : g2(A + BRA - RDC - RFRA)
+     !D = g2(-RERD - RAB + CRD + D ) .
+     !     e =   gammacp**2 * A    + gammacp * matmul(B,R0MAT_BAR) - gammacp * matmul(R0MAT,C) - matmul(matmul(R0MAT,D),R0MAT_BAR) 
+     !     f =  -matmul(matmul(R0MAT_BAR,A),R0MAT) - gammacp * matmul(R0MAT_BAR,B) + gammacp * matmul(C,R0MAT) + gammacp**2 * D
+     e =   gammacp**2 * ( A    -  matmul(B,R0MAT) - matmul(R0MAT_BAR,C) + matmul(matmul(R0MAT_BAR,D),R0MAT)) 
+     f =   gammacp**2 * (matmul(matmul(R0MAT,A),R0MAT_BAR) +  matmul(R0MAT,B) + matmul(C,R0MAT_BAR) + D)
+     
+     det_e = e(1,1) * e(2,2) - e(1,2) * e(2,1)
+     det_f = f(1,1) * f(2,2) - f(1,2) * f(2,1)
+
+     !---- First mode.
+     cosmux = (e(1,1) + e(2,2)) / two
+     stabx = abs(cosmux).lt.one
+     if (stabx) then
+        sinmu2 = - e(1,2)*e(2,1) - quarter*(e(1,1) - e(2,2))**2
+        if (sinmu2.lt.zero) sinmu2 = eps
+        sinmux = sign(sqrt(sinmu2), e(1,2))
+        betx0 = e(1,2) / sinmux
+        alfx0 = (e(1,1) - e(2,2)) / (two * sinmux)
+     else
+        betx0 = zero
+        alfx0 = zero
+     endif
+     
+     !---- Second mode.
+     cosmuy = (f(1,1) + f(2,2)) / two
+     staby = abs(cosmuy).lt.one
+     if (staby) then
+        sinmu2 = - f(1,2)*f(2,1) - quarter*(f(1,1) - f(2,2))**2
+        if (sinmu2.lt.zero) sinmu2 = eps
+        sinmuy = sign(sqrt(sinmu2), f(1,2))
+        bety0 = f(1,2) / sinmuy
+        alfy0 = (f(1,1) - f(2,2)) / (two * sinmuy)
      else
         bety0 = zero
         alfy0 = zero
@@ -1098,7 +1317,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   opt_fun0(31)=r0mat(2,1)
   opt_fun0(32)=r0mat(2,2)
 
-end SUBROUTINE twcpin
+end SUBROUTINE twcpin_talman
 
 SUBROUTINE twcpin_sagan(rt,disp0,r0mat, eflag)
   use twiss0fi
@@ -1122,10 +1341,12 @@ SUBROUTINE twcpin_sagan(rt,disp0,r0mat, eflag)
   double precision, intent(IN)  :: rt(6,6)
   double precision, intent(OUT) :: disp0(6), r0mat(2,2)
   integer, intent(OUT) :: eflag
-
+  integer :: i
   logical :: stabx=.false., staby=.false.
-  double precision :: a(2,2), aux(2,2), d(2,2), r0mat_bar(2,2)      
-  double precision :: arg, den, det, dtr, sinmu2
+  double precision :: e(2,2), aux(2,2), f(2,2), r0mat_bar(2,2)      
+  double precision :: a(2,2), b(2,2), c(2,2), d(2,2), cbar(2,2)
+  double precision :: v(4, 4), u (4,4), vbar(4,4)
+  double precision :: arg, den, det, dtr, sinmu2, det_e, det_f
   double precision :: betx0=zero, alfx0=zero, amux0=zero
   double precision :: bety0=zero, alfy0=zero, amuy0=zero
   character(len=120) :: msg
@@ -1148,67 +1369,87 @@ SUBROUTINE twcpin_sagan(rt,disp0,r0mat, eflag)
   disp0(5) = zero
   disp0(6) = one
   
+  ! RT(1:4,1:4) = ( A , B
+  !                 C , D)
+  A = RT(1:2,1:2) ; B = RT(1:2,3:4)
+  C = RT(3:4,1:2) ; D = RT(3:4,3:4)
+  
   !---- Matrix H = B + C(bar) = m + n(bar) (Sagan) and its determinant.
-  aux(1,1) = rt(1,3) + rt(4,2)
-  aux(1,2) = rt(1,4) - rt(3,2)
-  aux(2,1) = rt(2,3) - rt(4,1)
-  aux(2,2) = rt(2,4) + rt(3,1)
+  cbar = matmul(matmul(-SMAT,transpose(c)),SMAT)
+  aux(:2,:2) = B(:2,:2) + CBAR(:2,:2)
   !-- det(H) = det (B + C(bar))
   det = aux(1,1) * aux(2,2) - aux(1,2) * aux(2,1)
-  !---- trace(M-N)(Sagan) =trace(A-D)
-  dtr = rt(1,1) + rt(2,2) - rt(3,3) - rt(4,4) 
-  arg = dtr**2 + four*det 
-
-  !---- Coupling matrix. If arg < 0, the motion is unstable! 
-  if (arg .lt. zero) then
+  
+  !---- Coupling matrix.
+  !---- trace(M-N)(Sagan) = trace(A-D)
+  dtr = A(1,1) + A(2,2) - D(1,1) - D(2,2)
+  !--- det|C+BBAR| + [(trA - trD) / 2]**2:
+  arg = dtr**2 + four * det 
+  
+  !---- If arg <= 0, the motion is unstable, we are in a stop band
+  if (arg .le. zero) then
+     
      !---- Unstable due to coupling.
      stabx = .false. ; staby = .false.
-  
+     
   else
-     if (arg .eq. zero) then    
-        gammacp = one
-        R0MAT(:2,:2) = EYE(:2,:2)
-     else 
-        gammacp = sqrt(half + half*sqrt(dtr**2/arg))
-        den = - gammacp*sqrt(arg)
-        R0MAT(1:2,1:2) = sign(AUX(1:2,1:2), dtr) / den !-- r0mat =R_1 = C (Sagan) 
-    endif
-    
-    !--R0MAT_BAR = SRMAT^{T}S^{T} - symplectic conjugate of R0MAT 
-    R0MAT_BAR = matmul(SMAT, matmul(transpose(R0MAT),SMATT))         ! invert symplectic matrix R1
-    !---- Decouple: Find diagonal blocks.
-    !--- E = A(Sagan) = gammacp**2*A - gammacp(r0mat*C + B*r0mat_bar) + r0mat*D*r0mat**2
-    A = gammacp**2 * RT(1:2,1:2) &
-         - gammacp*(matmul(R0MAT,RT(3:4,1:2)) + matmul(RT(1:2,3:4),R0MAT_BAR)) &
-         + matmul(matmul(R0MAT,RT(3:4,3:4)),matmul(R0MAT,R0MAT))
-    !--- F = B(Sagan) = gammacp**2*D - gammacp(C*r0mat + r0mat_bar*B) + r0mat*A*r0mat**2
-    D = gammacp**2 * RT(3:4,3:4) &
-         - gammacp*(matmul(RT(3:4,1:2),R0MAT) + matmul(R0MAT_BAR,RT(1:2,3:4))) &
-         + matmul(matmul(R0MAT,RT(1:2,1:2)),matmul(R0MAT,R0MAT))
+     gammacp = sqrt(half + half*sqrt(dtr**2/arg))
+     den     =  gammacp * sqrt(arg)
+     R0MAT   = - sign(AUX, dtr) / den !-- r0mat = C (Sagan) 
+     
+     !--R0MAT_BAR = SRMAT^{T}S^{T} - symplectic conjugate of R0MAT 
+     R0MAT_BAR = matmul(-SMAT, matmul(transpose(R0MAT),SMAT))   
+     
+     
+     ! --Compute matrix V ("rotation", [ gammacp*I R0MAT ; -R0MAT_BAR gammacp*I]
+     V(1:4, 1:4)= zero
+     do i = 1, 4
+        V(i,i) = gammacp
+     enddo
+     
+     V(1:2,3:4) =  R0MAT
+     V(3:4,1:2) = -R0MAT_BAR
 
-    !---- First mode.
-     cosmux = (a(1,1) + a(2,2)) / two
+     ! --Compute matrix inv(V)
+     VBAR(1:4, 1:4)= zero
+     do i = 1, 4
+          VBAR(i,i) = gammacp
+     enddo
+     VBAR(1:2,3:4) = -R0MAT
+     VBAR(3:4,1:2) = R0MAT_BAR
+     
+     ! --Compute uncoupled block-diagonal U matrix [E 0, F 0]
+
+     U = matmul (matmul (VBAR, RT(1:4,1:4)), V)
+
+     !---- Find diagonal blocks.
+
+     E = U(1:2, 1:2)
+     F = U(3:4, 3:4)
+  
+     !---- First mode.
+     cosmux = (e(1,1) + e(2,2)) / two
      stabx = abs(cosmux).lt.one
      if (stabx) then
-        sinmu2 = - a(1,2)*a(2,1) - quarter*(a(1,1) - a(2,2))**2
+        sinmu2 = - e(1,2)*e(2,1) - quarter*(e(1,1) - e(2,2))**2
         if (sinmu2.lt.zero) sinmu2 = eps
-        sinmux = sign(sqrt(sinmu2), a(1,2))
-        betx0 = a(1,2) / sinmux
-        alfx0 = (a(1,1) - a(2,2)) / (two * sinmux)
+        sinmux = sign(sqrt(sinmu2), e(1,2))
+        betx0 = e(1,2) / sinmux
+        alfx0 = (e(1,1) - e(2,2)) / (two * sinmux)
      else
         betx0 = zero
         alfx0 = zero
      endif
-
+     
      !---- Second mode.
-     cosmuy = (d(1,1) + d(2,2)) / two
+     cosmuy = (f(1,1) + f(2,2)) / two
      staby = abs(cosmuy).lt.one
      if (staby) then
-        sinmu2 = - d(1,2)*d(2,1) - quarter*(d(1,1) - d(2,2))**2
+        sinmu2 = - f(1,2)*f(2,1) - quarter*(f(1,1) - f(2,2))**2
         if (sinmu2.lt.zero) sinmu2 = eps
-        sinmuy = sign(sqrt(sinmu2), d(1,2))
-        bety0 = d(1,2) / sinmuy
-        alfy0 = (d(1,1) - d(2,2)) / (two * sinmuy)
+        sinmuy = sign(sqrt(sinmu2), f(1,2))
+        bety0 = f(1,2) / sinmuy
+        alfy0 = (f(1,1) - f(2,2)) / (two * sinmuy)
      else
         bety0 = zero
         alfy0 = zero
@@ -1397,6 +1638,7 @@ SUBROUTINE twcpgo(rt,orbit0)
 
   n_align = node_al_errors(al_errors)
   if (n_align .ne. 0)  then
+     !print*, "coupl1: Element = ", el_name
      ORBIT2 = ORBIT 
      call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
      mycentre_cptk = centre_cptk
@@ -1424,17 +1666,19 @@ SUBROUTINE twcpgo(rt,orbit0)
 
   if (fmap) then
      call twcptk(re,orbit)
+     !print*, "couplfmap: Element = ", el_name
      if (sectormap) call tmcat(.true.,re,te,srmat,stmat,srmat,stmat)
   endif
 
   if (n_align .ne. 0)  then
+     !print*, "coupl2: Element = ", el_name
      ORBIT2 = ORBIT 
      call tmali2(el,orbit2,al_errors,beta,gamma,orbit,re)
      mycentre_cptk = centre_cptk
      centre_cptk = .false.
      call twcptk(re,orbit)
      centre_cptk = mycentre_cptk
-     if (sectormap) SRMAT = matmul(RE,SRMAT) 
+     if (sectormap) SRMAT = matmul(RE,SRMAT)
   endif
 
   sumloc = sumloc + el
@@ -1496,7 +1740,7 @@ SUBROUTINE twcpgo(rt,orbit0)
      opt_fun(32) = rmat(2,2)
   endif
 
-  if (advance_node() .ne. 0) goto 10 ! loop over nodes
+  if (advance_node() .ne. 0) goto 10
 
   !---- Compute summary.
   wgt    = max(iecnt, 1)
@@ -1527,14 +1771,13 @@ SUBROUTINE twcptk(re,orbit)
   use twisscfi
   use twissotmfi
   use matrices, only : JMAT, JMATT, SMAT, SMATT
-  use math_constfi, only : zero, one
+  use math_constfi, only : zero, one, two, twopi
   use name_lenfi
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Track coupled lattice functions.                                 *
   !     Irina Tecker : new version rewritten in matrix formalism         *
-  !                   + added mode flip                                  *
   !                   + no "guard" for negative betx                     *
   !     Input:                                                           *
   !     re(6,6)  (double)   transfer matrix of element.                  *
@@ -1542,19 +1785,25 @@ SUBROUTINE twcptk(re,orbit)
   !----------------------------------------------------------------------*
   double precision :: re(6,6), orbit(6)
 
-  integer :: i, i1, i2, j
+  integer :: i, i1, i2, j, irank
   double precision :: rw0(6,6), rwi(6,6), rc(6,6), dt(6)
-  double precision :: a(2,2), b(2,2), c(2,2), d(2,2)
-  double precision :: rmat0(2,2), e(2,2), f(2,2), cd(2,2)
+  double precision :: a(2,2), b(2,2), c(2,2), d(2,2), ra(4,8)
+  double precision :: rmat0(2,2), e(2,2), f(2,2), cd(2,2), tmp(2,2)
   double precision :: rmat_bar(2,2), ebar(2,2), fbar(2,2), hmat(2,2)
-  double precision :: edet, fdet, tempa, tempb
+  double precision :: edet, fdet, tempa, tempb, det
   double precision :: alfx0=zero, betx0=zero, amux0=zero, alfx_ini=zero, betx_ini=zero
   double precision :: alfy0=zero, bety0=zero, amuy0=zero, alfy_ini=zero, bety_ini=zero
-  character(len=name_len) :: name
 
+  character(len=name_len) :: name
+  character(len=120)      :: warnstr
+  
   integer, external :: get_option
   double precision, parameter :: eps=1d-36
 
+  ! logical :: mode_flip_ele =.false.
+  logical :: cp_error=.false.
+
+  call element_name(name,len(name))
   !---- Dispersion.
   DT = matmul(RE, DISP)
 
@@ -1580,73 +1829,516 @@ SUBROUTINE twcptk(re,orbit)
   A = RE(1:2,1:2) ; B = RE(1:2,3:4)
   C = RE(3:4,1:2) ; D = RE(3:4,3:4)
 
-  RMAT_BAR  = matmul(SMAT, matmul(transpose(RMAT),SMATT)) ! invert symplectic matrix
-  E  = A - matmul(B,RMAT)                            ! former a
-  edet = e(1,1) * e(2,2) - e(1,2) * e(2,1)           ! former adet  
+  !---- Check RE rank
+  RA(1:4,1:4) = RE(1:4,1:4)
+  RA(1:4,5:8) = zero
+  RA(1,5)     = one
+  RA(2,6)     = one
+  RA(3,7)     = one
+  RA(4,8)     = one
+  
+  call solver(ra,4,4,irank)
+  if (irank.lt.4) then
+     write (warnstr, '(a)') 'Coupling failed: Rank deficient matrix RE, irank < 4 '
+     call fort_warn('TWCPTK: ', warnstr)
+     return
+  endif
 
-  if (edet .gt. eps) then  !--- same calculation as in twcptk
-
-    EBAR = matmul(SMAT, matmul(transpose(E),SMATT)) ! symplectic conjugate of E = S*E^T*S^T
-    CD = C - matmul(D, RMAT)        ! former b
-    F  = D + matmul(C, RMAT_BAR)    ! former c 
-
-    RMAT = - matmul(CD, EBAR) / edet 
-    !--- a_f = E*f_ini; b_f=F*b_ini    
-    !---- Mode 1.
-    tempb = e(1,1) * betx - e(1,2) * alfx
-    tempa = e(2,1) * betx - e(2,2) * alfx
-    alfx = - (tempa * tempb + e(1,2) * e(2,2)) / (edet * betx)
-    betx =   (tempb * tempb + e(1,2) * e(1,2)) / (edet * betx)
-    if (abs(e(1,2)).gt.eps) amux = amux + atan2(e(1,2),tempb)
-
-    !---- Mode 2.
-    tempb = f(1,1) * bety - f(1,2) * alfy
-    tempa = f(2,1) * bety - f(2,2) * alfy
-    alfy = - (tempa * tempb + f(1,2) * f(2,2)) / (edet * bety)
-    bety =   (tempb * tempb + f(1,2) * f(1,2)) / (edet * bety)
-    if (abs(f(1,2)).gt.eps) amuy = amuy + atan2(f(1,2),tempb)
-
-  else  !-- mode flip, off-diagonal matrix
-
-    E  = C - matmul(D, RMAT)      ! former a
-    CD = D + matmul(C, RMAT_BAR)  ! former b
-    F  = B + matmul(A, RMAT_BAR)  ! former c  
-    fdet  = f(1,1) * f(2,2) - f(1,2) * f(2,1)        
-    edet  = e(1,1) * e(2,2) - e(1,2) * e(2,1)      
-    if (fdet.lt.eps) print *,  '+++ NEGFDET = ', fdet, ' NEGEDET = ', edet ! ??? debug ???
+  ! if   (all( B == zero  .and.  C == zero)  ) then
+     
+  !    E(1:2,1:2) = A(1:2,1:2)
+  !    F(1:2,1:2) = D(1:2,1:2)
     
-    FBAR = matmul(SMAT, matmul(transpose(F),SMATT))   ! symplectic conjugate of F = S*F^T*S^T    
-    RMAT = - matmul(CD, FBAR) / fdet   
+  !    ! symplectic conjugate of E = S*E^T*S^T 
+  !    EBAR = matmul(SMAT, matmul(transpose(E),SMATT))
+  !    edet = e(1,1) * e(2,2) - e(1,2) * e(2,1)  
+  !    CD   =  - matmul(F, RMAT)        
+  !   ! RMAT = - matmul(CD, EBAR) / edet 
+  !    RMAT = - matmul(CD, EBAR) 
 
-    betx_ini = betx ; alfx_ini = alfx
-    bety_ini = bety ; alfy_ini = alfy
+  ! else
 
-    !---- Mode 1.
-    !--- a_f = F*b_ini; b_f=E*a_ini    
-    tempb = e(1,1) * betx_ini - e(1,2) * alfx_ini
-    tempa = e(2,1) * betx_ini - e(2,2) * alfx_ini
-    alfy = - (tempa * tempb + e(1,2) * e(2,2)) / (fdet * betx_ini)
-    bety =   (tempb * tempb + e(1,2) * e(1,2)) / (fdet * betx_ini)
-    if (abs(e(1,2)).gt.eps) amux = amux + atan2(e(1,2),tempb)
+     ! invert symplectic matrix
+     RMAT_BAR  = matmul(SMAT, matmul(transpose(RMAT),SMATT))
+     TMP       = gammacp*(A -  matmul(B,RMAT))                         
+     det       = tmp(1,1) * tmp(2,2) - tmp(1,2) * tmp(2,1)
 
-    !---- Mode 2.
-    tempb = f(1,1) * bety_ini - f(1,2) * alfy_ini
-    tempa = f(2,1) * bety_ini - f(2,2) * alfy_ini
-    alfx = - (tempa * tempb + f(1,2) * f(2,2)) / (fdet * bety_ini)
-    betx =   (tempb * tempb + f(1,2) * f(1,2)) / (fdet * bety_ini)    
-    if (abs(f(1,2)).gt.eps) amuy = amuy + atan2(f(1,2),tempb)
+     
+     !     if (det .gt. 0.9 .or. (det .gt. 0.1 .and. .not. mode_flip) ) then  !--- normal mode
+        E       = A - matmul( B,RMAT )                           ! former a
+        edet    = e(1,1) * e(2,2) - e(1,2) * e(2,1)              ! former adet
+        EBAR    = matmul( SMAT, matmul(transpose( E ), SMATT ))  ! symplectic conjugate of E = S*E^T*S^T
+        CD      = C - matmul( D, RMAT )        ! former b
+        F       = D + matmul( C, RMAT_BAR )    ! former c 
+        RMAT    = - matmul( CD, EBAR ) /  edet   
+        gammacp = sqrt( det )
 
-    call element_name(name,len(name))
-    print *, '+++ betx twcptk = ', betx, ' mode flip in element', name ! ??? debug ???
+  !    else  !---flip mode
+        
+  !       mode_flip_ele = .not. mode_flip
+  !       nmode_flip = nmode_flip + 1  
+        
+  !       TMP = gammacp*(matmul(A,RMAT_BAR) + B)
+  !       det = tmp(1,1) * tmp(2,2) - tmp(1,2) * tmp(2,1)
+        
+  !       if (det .lt. zero) then
+  !          write (warnstr, '(a, a, a)') 'Negative determinant in ', name
+  !          call fort_warn('TWCPTK: ', warnstr)
+  !          !print*, "Negative determinant! Rounding error?!?!? det = ", det 
+  !       endif
+        
+  !       F       = matmul (A, RMAT_BAR) + B 
+  !       fdet    = f(1,1) * f(2,2) - f(1,2) * f(2,1) 
+  !       FBAR    = matmul(SMAT, matmul(transpose(F),SMATT)) ! symplectic conjugate of F = S*F^T*S^T
+  !       E       = C -  matmul(D, RMAT)
+  !       CD      = matmul(C, RMAT_BAR) + D
+  !       RMAT    = - matmul(CD, FBAR)/ abs( fdet )     
+  !       gammacp = sqrt (abs(det))
+        
+  !       write (warnstr, '(a, a, a, i3)') 'Mode flip in the element ', name, ', nflips up to now = ', nmode_flip
+  !       call fort_warn('TWCPTK: ', warnstr)
+  !       ! print *, '+++ mode flip in the element ', name, ", nflips up to now = ", nmode_flip 
+  !    endif
+  ! endif
+  
+  ! if(mode_flip) then
+  !    call twcptk_twiss(f, e, cp_error)
+  ! else
+      call twcptk_twiss(e, f, cp_error)
+  ! endif
+  
+  if (cp_error) then
+     ! print *, '+++ det of block diagonal matrix is zero in ', name
+     write (warnstr, '(a, a, a)') 'Det of block diagonal matrix is zero in ', name,  &
+          ', twiss parameter might be unphysical! '
+     call fort_warn('TWCPTK: ', warnstr)
+  endif
+  
+  ! When we are comming out of a flipped mode, the phase is often off by a factor of twopi. As twopi doesn't have any effect on physics we can substract twopi.
+  ! Unfortunately there is no definitive way to calcuate what the "right" way to handle this is but "-twopi" is better than nothing (c, Sagan)
+  ! if(mode_flip .and. .not. mode_flip_ele) then
+     
+  !    amux = amux - twopi
+  !    amuy = amuy - twopi
+     
+  ! endif
+ 
+  ! mode_flip = mode_flip_ele
+  
+  if (betx.lt.eps .or. bety.lt.eps) then
+     write (warnstr, '(a, a, a)') 'Negative beta in ', name, ' Twiss parameter might be unphysical!'
+     call fort_warn('TWCPTK: ', warnstr)
+    ! print *, '+++ negative beta: name', name, 'betx=', betx, ', bety=', bety 
+  endif
+     
+     
+     ! !---- Auxiliary matrices.
+     ! !LD:  a = re_x - re_xy*rmat
+     ! a(1,1) = re(1,1) - (re(1,3) * rmat(1,1) + re(1,4) * rmat(2,1))
+     ! a(1,2) = re(1,2) - (re(1,3) * rmat(1,2) + re(1,4) * rmat(2,2))
+     ! a(2,1) = re(2,1) - (re(2,3) * rmat(1,1) + re(2,4) * rmat(2,1))
+     ! a(2,2) = re(2,2) - (re(2,3) * rmat(1,2) + re(2,4) * rmat(2,2))
+     
+     ! b(1,1) = re(3,1) - (re(3,3) * rmat(1,1) + re(3,4) * rmat(2,1))
+     ! b(1,2) = re(3,2) - (re(3,3) * rmat(1,2) + re(3,4) * rmat(2,2))
+     ! b(2,1) = re(4,1) - (re(4,3) * rmat(1,1) + re(4,4) * rmat(2,1))
+     ! b(2,2) = re(4,2) - (re(4,3) * rmat(1,2) + re(4,4) * rmat(2,2))
+     
+     ! c(1,1) = re(3,3) + (re(3,1) * rmat(2,2) - re(3,2) * rmat(2,1))
+     ! c(1,2) = re(3,4) - (re(3,1) * rmat(1,2) - re(3,2) * rmat(1,1))
+     ! c(2,1) = re(4,3) + (re(4,1) * rmat(2,2) - re(4,2) * rmat(2,1))
+     ! c(2,2) = re(4,4) - (re(4,1) * rmat(1,2) - re(4,2) * rmat(1,1))
+     
+     
+     ! !---- Track R matrix.
+     ! adet = a(1,1) * a(2,2) - a(1,2) * a(2,1)
+     ! if (abs(adet) .gt. eps) then
+     !    rmat(1,1) = - (b(1,1) * a(2,2) - b(1,2) * a(2,1)) / adet
+     !    rmat(1,2) =   (b(1,1) * a(1,2) - b(1,2) * a(1,1)) / adet
+     !    rmat(2,1) = - (b(2,1) * a(2,2) - b(2,2) * a(2,1)) / adet
+     !    rmat(2,2) =   (b(2,1) * a(1,2) - b(2,2) * a(1,1)) / adet
+     
+     !    !---- Mode 1.
+     !    tempb = a(1,1) * betx - a(1,2) * alfx
+     !    tempa = a(2,1) * betx - a(2,2) * alfx
+     !    alfx = - (tempa * tempb + a(1,2) * a(2,2)) / (adet * betx)
+     !    betx =   (tempb * tempb + a(1,2) * a(1,2)) / (adet * betx)
+     !    if (abs(a(1,2)) .gt. eps) amux = amux + atan2(a(1,2),tempb)
+     
+     !    !---- Mode 2.
+     !    tempb = c(1,1) * bety - c(1,2) * alfy
+     !    tempa = c(2,1) * bety - c(2,2) * alfy
+     !    alfy = - (tempa * tempb + c(1,2) * c(2,2)) / (adet * bety)
+     !    bety =   (tempb * tempb + c(1,2) * c(1,2)) / (adet * bety)
+     !    if (abs(c(1,2)) .gt. eps) amuy = amuy + atan2(c(1,2),tempb)
+     ! else
+     !   !LD: 09.2015
+     !   call element_name(name,len(name))
+     !   print *, 'coupling too strong for element ', name, ' (adet= ', adet, ')'
+     !   call fort_warn('TWCPTK: ','twiss parameter might be unphysical (split element)')
+     ! endif
+
+  
+
+  !---- Cumulative R matrix and one-turn map at element location.
+  if (rmatrix) then
+     RW = matmul(RE,RW) 
+     if (get_option('twiss_inval ') .ne. 0) then
+        RC = RW 
+     else
+        RWI = matmul(JMATT, matmul(transpose(RW),JMAT)) ! invert symplectic matrix
+        RC = matmul(RW,matmul(ROTM,RWI))
+     endif
+  endif
+  
+  if (.not.centre.or.centre_cptk) then
+     opt_fun(3) = betx
+     opt_fun(4) = alfx
+     opt_fun(5) = amux
+     opt_fun(6) = bety
+     opt_fun(7) = alfy
+     opt_fun(8) = amuy
+
+     opt_fun(29) = rmat(1,1)
+     opt_fun(30) = rmat(1,2)
+     opt_fun(31) = rmat(2,1)
+     opt_fun(32) = rmat(2,2)
+  endif
+
+  if (rmatrix) then
+     do i1=1,6
+        do i2=1,6
+           opt_fun(33 + (i1-1)*6 + i2) = rc(i1,i2)
+        enddo
+     enddo
+  endif
+
+  if (centre_cptk) then
+     OPT_FUN(9:14) = ORBIT
+     alfx = alfx0
+     alfy = alfy0
+     betx = betx0
+     bety = bety0
+     amux = amux0
+     amuy = amuy0
+     RMAT = RMAT0 
+     if (rmatrix) RW = RW0
+  endif
+
+end SUBROUTINE twcptk
+SUBROUTINE twcptk_twiss(matx, maty, error)
+  use twiss0fi
+  use twisslfi
+  use twisscfi
+  use twissotmfi
+  use math_constfi, only : zero, twopi
+  use name_lenfi 
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Calculation of twiss parameters by Irina Tecker                  *
+  !     Irina Tecker : new version rewritten in matrix formalism         *
+  !                   + added mode flip                                  *
+  !                   + no "guard" for negative betx                     *
+  !     Input:                                                           *
+  !     matx(2,2)  (double)   X-plane matrix of block-diagonal           *
+  !     maty(2,2)  (double)   Y-plane matrix of block-diagonal           *
+  !----------------------------------------------------------------------*
+  
+  double precision :: matx(2,2), maty(2,2)
+  double precision :: matx11, matx12, matx21, matx22
+  double precision :: maty11, maty12, maty21, maty22
+  double precision :: alfx_ini=zero, betx_ini=zero, tempa
+  double precision :: alfy_ini=zero, bety_ini=zero, tempb
+  double precision :: detx, dety 
+  logical          :: error
+  double precision, parameter :: eps=1d-36
+  character(len=name_len) :: name
+  error = .true.
+  
+  detx = matx(1,1) * matx(2,2) - matx(1,2) * matx(2,1)
+  dety = maty(1,1) * maty(2,2) - maty(1,2) * maty(2,1)
+
+  call element_name(name,len(name)) 
+
+  if (detx == 0) return 
+  if (dety == 0) return 
+  betx_ini = betx ; alfx_ini = alfx ; 
+  bety_ini = bety ; alfy_ini = alfy ; 
+  
+
+  matx11 = matx(1,1)
+  matx12 = matx(1,2)
+  matx21 = matx(2,1)
+  matx22 = matx(2,2)
+
+  maty11 = maty(1,1)
+  maty12 = maty(1,2)
+  maty21 = maty(2,1)
+  maty22 = maty(2,2)
+  
+  !---- Mode 1.
+  tempb = matx11 * betx_ini - matx12 * alfx_ini
+  tempa = matx21 * betx_ini - matx22 * alfx_ini
+  alfx = - (tempa * tempb + matx12 * matx22) / (detx*betx_ini)
+  betx =   (tempb * tempb + matx12 * matx12) / (detx*betx_ini)
+!  alfx = - (tempa * tempb + matx12 * matx22) / (betx_ini)
+!  betx =   (tempb * tempb + matx12 * matx12) / (betx_ini)
+  if (abs(matx12).gt.eps) amux = amux + atan2(matx12,tempb)
+  
+  !---- Mode 2.
+  tempb = maty11 * bety_ini - maty12 * alfy_ini
+  tempa = maty21 * bety_ini - maty22 * alfy_ini
+  alfy = - (tempa * tempb + maty12 * maty22) / (detx*bety_ini)
+  bety =   (tempb * tempb + maty12 * maty12) / (detx*bety_ini)
+!  alfy = - (tempa * tempb + maty12 * maty22) / (bety_ini)
+!  bety =   (tempb * tempb + maty12 * maty12) / (bety_ini)
+  if (abs(maty12).gt.eps) amuy = amuy + atan2(maty12,tempb)
+  
+  error = .false.
+end SUBROUTINE twcptk_twiss
+SUBROUTINE twcptk_twiss_new(matx, maty, error)
+  use twiss0fi
+  use twisslfi
+  use twisscfi
+  use twissotmfi
+  use math_constfi, only : zero, twopi
+  use name_lenfi 
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Calculation of twiss parameters by Irina Tecker                  *
+  !     Irina Tecker : new version rewritten in matrix formalism         *
+  !                   + added mode flip                                  *
+  !                   + no "guard" for negative betx                     *
+  !     Input:                                                           *
+  !     matx(2,2)  (double)   X-plane matrix of block-diagonal           *
+  !     maty(2,2)  (double)   Y-plane matrix of block-diagonal           *
+  !----------------------------------------------------------------------*
+  
+  double precision :: matx(2,2), maty(2,2)
+  double precision :: matx11, matx12, matx21, matx22
+  double precision :: maty11, maty12, maty21, maty22
+  double precision :: alfx_ini=zero, betx_ini=zero, tempa
+  double precision :: alfy_ini=zero, bety_ini=zero, tempb
+  double precision :: detx, dety 
+  logical          :: error
+  double precision, parameter :: eps=1d-36
+  character(len=name_len) :: name
+  error = .true.
+  
+  detx = matx(1,1) * matx(2,2) - matx(1,2) * matx(2,1)
+  dety = maty(1,1) * maty(2,2) - maty(1,2) * maty(2,1)
+
+  call element_name(name,len(name)) 
+
+  if (detx == 0) return 
+  if (dety == 0) return 
+  betx_ini = betx ; alfx_ini = alfx ; 
+  bety_ini = bety ; alfy_ini = alfy ; 
+  
+
+  matx11 = matx(1,1)
+  matx12 = matx(1,2)
+  matx21 = matx(2,1)
+  matx22 = matx(2,2)
+
+  maty11 = maty(1,1)
+  maty12 = maty(1,2)
+  maty21 = maty(2,1)
+  maty22 = maty(2,2)
+  
+  !---- Mode 1.
+  tempb = matx11 * betx_ini - matx12 * alfx_ini
+  tempa = matx21 * betx_ini - matx22 * alfx_ini
+  alfx = - (tempa * tempb + matx12 * matx22) / (betx_ini)
+  betx =   (tempb * tempb + matx12 * matx12) / (betx_ini)
+  if (abs(matx12).gt.eps) amux = amux + atan2(matx12,tempb)
+  
+  !---- Mode 2.
+  tempb = maty11 * bety_ini - maty12 * alfy_ini
+  tempa = maty21 * bety_ini - maty22 * alfy_ini
+  alfy = - (tempa * tempb + maty12 * maty22) / (bety_ini)
+  bety =   (tempb * tempb + maty12 * maty12) / (bety_ini)
+  if (abs(maty12).gt.eps) amuy = amuy + atan2(maty12,tempb)
+  
+  error = .false.
+end SUBROUTINE twcptk_twiss_new
+
+SUBROUTINE twcptk_sagan(re,orbit) ! new, RD matrix, talman, sagan
+  use twiss0fi
+  use twisslfi
+  use twisscfi
+  use twissotmfi
+  use matrices, only : JMAT, JMATT, SMAT, SMATT
+  use math_constfi, only : zero, one, two, twopi
+  use name_lenfi
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Track coupled lattice functions.                                 *
+  !     Irina Tecker : new version rewritten in matrix formalism         *
+  !                   + Talman/Sagan                                     *
+  !                   + added mode flip                                  *
+  !                   + no "guard" for negative betx                     *
+  !     Input:                                                           *
+  !     re(6,6)  (double)   transfer matrix of element.                  *
+  !     orbit(6) (double)   closed orbit                                 *
+  !----------------------------------------------------------------------*
+  double precision :: re(6,6), orbit(6)
+
+  integer :: i, i1, i2, j, irank
+  double precision :: rw0(6,6), rwi(6,6), rc(6,6), dt(6)
+  double precision :: a(2,2), b(2,2), c(2,2), d(2,2),ra(4,8)
+  double precision :: rmat0(2,2), e(2,2), f(2,2), cd(2,2), tmp(2,2)
+  double precision :: rmat_bar(2,2), ebar(2,2), fbar(2,2), dbar(2,2)
+  double precision :: edet, fdet, tempa, tempb, det, det44, gamma_2
+  double precision :: alfx0=zero, betx0=zero, amux0=zero, alfx_ini=zero, betx_ini=zero
+  double precision :: alfy0=zero, bety0=zero, amuy0=zero, alfy_ini=zero, bety_ini=zero
+
+  character(len=name_len) :: name
+  character(len=120)      :: warnstr
+  
+  integer, external :: get_option
+  double precision, parameter :: eps=1d-36
+  logical :: mode_flip_ele =.false.
+  logical :: cp_error=.false.
+  
+  call element_name(name,len(name))
+  !---- Dispersion.
+  DT = matmul(RE, DISP)
+  if (.not.centre .or. centre_cptk) OPT_FUN(15:18) = DT(1:4)
+
+  if (centre_cptk) then
+     alfx0 = alfx
+     alfy0 = alfy
+     betx0 = betx
+     bety0 = bety
+     amux0 = amux
+     amuy0 = amuy
+     RMAT0 = RMAT 
+     if (rmatrix) RW0 = RW 
+  else
+     DISP(1:4) = DT(1:4) 
+     disp(5) = zero
+     disp(6) = one
+  endif
+
+  ! RE(1:4,1:4) = ( A , B
+  !                 C , D)
+  A = RE(1:2,1:2) ; B = RE(1:2,3:4)
+  C = RE(3:4,1:2) ; D = RE(3:4,3:4)
+
+  !---- Check RE rank
+  RA(1:4,1:4) = RE(1:4,1:4)
+  RA(1:4,5:8)  = zero
+  RA(1,5)     = one
+  RA(2,6)     = one
+  RA(3,7)     = one
+  RA(4,8)     = one
+  
+  call solver(ra,4,4,irank)
+  if (irank.lt.4) then
+     write (warnstr, '(a)') 'Coupling failed: Rank deficient matrix RE, irank < 4 '
+     call fort_warn('TWCPTK: ', warnstr)
+     return
+  endif
+
+  if   (all( B == zero  .and.  C == zero)  ) then
+     
+     E(:2,:2) = A(:2,:2)
+     F(:2,:2) = D(:2,:2)
+     DBAR = matmul(SMAT, matmul(transpose(D),SMATT)) ! symplectic conjugate of D = S*D^T*S^T 
+     RMAT = matmul(matmul(E, RMAT), DBAR)
+     
+  else
+
+     RMAT_BAR  = matmul(SMAT, matmul(transpose(RMAT),SMATT)) ! symplectic conjugate of RMAT
+     TMP       = gammacp*A -  matmul(B,RMAT_BAR)                         
+     det       = (tmp(1,1) * tmp(2,2) - tmp(1,2) * tmp(2,1))
+
+     if (det .gt. 0.9 .or. (det .gt. 0.1 .and. .not. mode_flip) ) then  !--- normal mode
+        
+        gamma_2 = sqrt (det)
+        E = TMP / gamma_2
+        F  = ( gammacp*D + matmul(C, RMAT)) / gamma_2   
+        
+        CD   = matmul(A, RMAT) + gammacp*B       
+        FBAR = matmul(SMAT, matmul(transpose(F),SMATT)) ! symplectic conjugate of F = S*F^T*S^T
+        RMAT = matmul(CD, FBAR)
+        
+        gammacp = gamma_2
+
+     else  !---flip mode
+        
+        mode_flip_ele = .not. mode_flip
+        nmode_flip = nmode_flip + 1  
+        
+        TMP = matmul(A,RMAT) + gammacp*B
+        det = (tmp(1,1) * tmp(2,2) - tmp(1,2) * tmp(2,1))
+        
+        if (det .lt. zero) then
+           write (warnstr, '(a, a, a, i5.5)') 'Negative determinant in ', name, ', det = ', det
+           call fort_warn('TWCPTK: ', warnstr)
+           !print*, "Negative deterinant! Rounding error?!?!?"
+        endif
+        
+        gamma_2 = sqrt (abs(det))
+        E  = ( gammacp*C - matmul(D, RMAT_BAR)) / gamma_2   
+        F = TMP / gamma_2
+        
+        CD = gammacp*A - matmul(B, RMAT_BAR)        
+        EBAR = matmul(SMAT, matmul(transpose(E),SMATT)) ! symplectic conjugate of E = S*E^T*S^T
+        RMAT = matmul(CD, EBAR)
+        
+        gammacp = gamma_2
+        
+        write (warnstr, '(a, a, a, i3)') 'Mode flip in the element ', name, ', nflips up to now = ', nmode_flip
+        call fort_warn('TWCPTK: ', warnstr)
+        !print *, '+++ mode flip in the element ', name, ", nflips up to now = ", nmode_flip 
+     endif
+  endif
+  
+  
+  if(mode_flip) then
+     call twcptk_twiss_new(f, e, cp_error)
+  else
+     call twcptk_twiss_new(e, f, cp_error)
+  endif
+  
+  if (cp_error) then
+     ! print *, '+++ det of block diagonal matrix is zero in ', name
+     write (warnstr, '(a, a, a)') 'Det of block diagonal matrix is zero in ', name,  &
+          ', twiss parameter might be unphysical! '
+     call fort_warn('TWCPTK: ', warnstr)
+  endif
+  
+  ! When we are comming out of a flipped mode, the phase is often off by a factor of twopi. As twopi doesn't have any effect on physics we can substract twopi.
+  ! Unfortunately there is no definitive way to calcuate what the "right" way to handle this is but "-twopi" is better than nothing (c, Sagan)
+  if(mode_flip .and. .not. mode_flip_ele) then
+
+     amux = amux - twopi
+     amuy = amuy - twopi
+     
+  endif
+ 
+  mode_flip = mode_flip_ele
+
+  EDET = E(1,1) * E(2,2) - E(1,2) * E(2,1)           ! former adet
+  FDET = F(1,1) * F(2,2) - F(1,2) * F(2,1)           
+
+  if ( EDET .gt. two .or. FDET .gt. two .or. EDET .lt. zero .or. FDET .lt. zero) then
+     ! print *, '+++ det of block diagonal matrix is > 2 in ', name
+     write (warnstr, '(a, a)') 'Det of block diagonal matrix is > 2 or  < 0 in ', name
+     call fort_warn('TWCPTK: ', warnstr)
   endif
 
   if (betx.lt.eps .or. bety.lt.eps) then
-        call element_name(name,len(name))
-        print *, '+++ negative beta: name', name, 'betx=', betx, ', bety=', bety 
-        call fort_warn('twcptk: ', 'twiss parameter might be unphysical!')
+     write (warnstr, '(a, a, a)') 'Negative beta in ', name, ' Twiss parameter might be unphysical!'
+     call fort_warn('TWCPTK: ', warnstr)
+     print *, '+++ negative beta: name', name, 'betx=', betx, ', bety=', bety 
   endif
-
-
+  
   ! !---- Auxiliary matrices.
   ! !LD:  a = re_x - re_xy*rmat
   ! a(1,1) = re(1,1) - (re(1,3) * rmat(1,1) + re(1,4) * rmat(2,1))
@@ -1740,200 +2432,8 @@ SUBROUTINE twcptk(re,orbit)
      if (rmatrix) RW = RW0
   endif
 
-end SUBROUTINE twcptk
-
-SUBROUTINE twcptk_sagan(re,orbit)
-  use twiss0fi
-  use twisslfi
-  use twisscfi
-  use twissotmfi
-  use matrices, only : JMAT, JMATT, SMAT, SMATT 
-  use math_constfi, only : zero, one
-  use name_lenfi 
-  implicit none
-  !----------------------------------------------------------------------*
-  !     Purpose:                                                         *
-  !     Track coupled lattice functions.                                 *
-  !     Sagan , requires update of twcpin (I.T) -> twcpin_sagan          *
-  !     Input:                                                           *
-  !     re(6,6)  (double)   transfer matrix of element.                  *
-  !     orbit(6) (double)   closed orbit                                 *
-  !----------------------------------------------------------------------*
-  double precision :: re(6,6), orbit(6)
-  
-  integer :: i, i1, i2, j
-  double precision :: rw0(6,6), rwi(6,6), rc(6,6), dt(6)
-  double precision :: rmat0(2,2), a(2,2), b(2,2), c(2,2), d(2,2), e(2,2), f(2,2) 
-  double precision :: edet, fdet, tempa, tempb, gamma_2
-  
-  double precision :: rmat_bar(2,2), ebar(2,2), fbar(2,2), rmattemp(2,2)
-  double precision :: tmp(2,2), tmpdet
-
-  double precision :: alfx0=zero, betx0=zero, amux0=zero 
-  double precision :: alfy0=zero, bety0=zero, amuy0=zero 
-  double precision :: alfx_ini=zero, alfy_ini=zero  
-  double precision :: betx_ini=zero, bety_ini=zero
-  
-  character(len=name_len) :: name
-
-  integer, external :: get_option
-  double precision, parameter :: eps=1d-36
-
-  !---- Dispersion.
-  DT = matmul(RE, DISP)
-
-  if(.not.centre.or.centre_cptk) OPT_FUN(15:18) = DT(1:4)
- 
-  if(centre_cptk) then
-     alfx0 = alfx
-     alfy0 = alfy
-     betx0 = betx
-     bety0 = bety
-     amux0 = amux
-     amuy0 = amuy
-     RMAT0 = RMAT
-     if (rmatrix) RW0 = RW
-  else
-     DISP(1:4) = DT(1:4)
-     disp(5) = zero
-     disp(6) = one
-  endif  
-  
-  !---- Auxiliary matrices.
-  !--- M = R * U * R^{-1};
-  
-  !--- M = | A B |
-  !----    | C D |
-
-  A = RE(1:2,1:2) ; B = RE(1:2,3:4)
-  C = RE(3:4,1:2) ; D = RE(3:4,3:4) 
-  
-  !--- U = | E 0 |
-  !----    | 0 F |
-
-  !--- R = | gammacp*I rmat      |
-  !----    | rmat_bar  gammacp*I |
-
-  ! RMAT2*W12 = M12*RMAT1 (Sagan) --> RMAT*W12=RE*R0MAT
-  ! gammacp**2 + det(R0MAT) = 1 (as R should be symplectic)
-
-  RMAT_BAR = matmul(SMAT, matmul(transpose(RMAT),SMATT)) ! symplectic conjugate of RMAT
-
-  TMP = matmul(C,RMAT) + gammacp * D
-  tmpdet = tmp(1,1)*tmp(2,2) - tmp(1,2)*tmp(2,1)               
-  
-  !if (tmpdet .gt. eps) then !--- normal mode
-  if (tmpdet .ge. zero) then !--- normal mode
-     gamma_2  = sqrt(tmpdet)
-     E = (gammacp * A - matmul(B,RMAT_BAR)) / gamma_2  ! former a
-     F = (matmul(C,RMAT) + gammacp * D) / gamma_2      ! former c
-     FBAR = matmul(SMAT, matmul(transpose(F),SMATT))   ! symplectic conjugate of F
-
-     !  temporary matrix for rmat calculation
-     RMATTEMP = matmul(A,RMAT) + gammacp * B
-     RMAT =  matmul(RMATTEMP, FBAR)
-     gammacp = gamma_2
-
-     !---- Mode 1.
-     tempb = e(1,1) * betx - e(1,2) * alfx
-     tempa = e(2,1) * betx - e(2,2) * alfx
-     alfx = - (tempa * tempb + e(1,2) * e(2,2)) / betx
-     betx =   (tempb * tempb + e(1,2) * e(1,2)) / betx
-     if (abs(e(1,2)).gt.eps) amux = amux + atan2(e(1,2),tempb)
-     
-     !---- Mode 2.
-     tempb = f(1,1) * bety - f(1,2) * alfy
-     tempa = f(2,1) * bety - f(2,2) * alfy
-     alfy = - (tempa * tempb + f(1,2) * f(2,2)) / bety
-     bety =   (tempb * tempb + f(1,2) * f(1,2)) / bety
-     if (abs(f(1,2)).gt.eps) amuy = amuy + atan2(f(1,2),tempb)
-     
-  else !---- mode flip 
-     TMP = matmul(A, RMAT) + gammacp * B
-     tmpdet = tmp(1,1)*tmp(2,2) - tmp(1,2)*tmp(2,1)            
-     gamma_2 = sqrt(tmpdet)
-     E = (gammacp * C - matmul(D,RMAT_BAR)) / gamma_2  ! former a     
-     EBAR = matmul(SMAT, matmul(transpose(E),SMATT))  ! symplectic conjugate of E
-     F = (matmul(A,RMAT) + gammacp * B) / gamma_2     ! former c
-     
-     !  temporary matrix for rmat calculation
-     RMATTEMP = gammacp * A - matmul(B,RMAT_BAR) 
-     RMAT =  matmul(RMATTEMP, EBAR) 
-     gammacp = gamma_2
-     
-     !--- a_f = F*b_ini; b_f=E*a_ini    
-     !--- need intermediate variables for mode flip
-     betx_ini = betx ; alfx_ini = alfx
-     bety_ini = bety ; alfy_ini = alfy
-     
-     !---- Mode 1.
-     tempb = e(1,1) * betx_ini - e(1,2) * alfx_ini
-     tempa = e(2,1) * betx_ini - e(2,2) * alfx_ini
-     alfy = - (tempa * tempb + e(1,2) * e(2,2)) / betx_ini
-     bety =   (tempb * tempb + e(1,2) * e(1,2)) / betx_ini
-     if (abs(e(1,2)).gt.eps) amux = amux + atan2(e(1,2),tempb)
-     
-     !---- Mode 2.
-     tempb = f(1,1) * bety_ini - f(1,2) * alfy_ini
-     tempa = f(2,1) * bety_ini - f(2,2) * alfy_ini
-     alfx = - (tempa * tempb + f(1,2) * f(2,2)) / bety_ini
-     betx =   (tempb * tempb + f(1,2) * f(1,2)) / bety_ini
-     if (abs(f(1,2)).gt.eps) amuy = amuy + atan2(f(1,2),tempb)
-     
-  endif
-  
-  !if (bety.lt.eps .or. bety.lt.eps) then
-  if (betx.le.zero .or. bety.le.zero) then
-     call element_name(name,len(name))
-     print *, '+++ negative beta: name', name, 'betx=', betx, ', bety=', bety 
-  endif
-
-  !---- Cumulative R matrix and one-turn map at element location.
-  if(rmatrix) then
-     RW = matmul(RE,RW) 
-     if (get_option('twiss_inval ') .ne. 0) then
-        RC = RW 
-     else
-        RWI = matmul(JMATT, matmul(transpose(RW),JMAT)) ! invert symplectic matrix
-        RC  = matmul(RW,matmul(ROTM,RWI))
-     endif
-  endif
-  
-  if(.not.centre.or.centre_cptk) then
-     opt_fun(3) = betx
-     opt_fun(4) = alfx
-     opt_fun(5) = amux
-     opt_fun(6) = bety
-     opt_fun(7) = alfy
-     opt_fun(8) = amuy
-     
-     opt_fun(29) = rmat(1,1)
-     opt_fun(30) = rmat(1,2)
-     opt_fun(31) = rmat(2,1)
-     opt_fun(32) = rmat(2,2)
-  endif
-  
-  if(rmatrix) then
-     do i1=1,6
-        do i2=1,6
-           opt_fun(33+(i1-1)*6+i2)=rc(i1,i2)
-        enddo
-     enddo
-  endif
-  
-  if(centre_cptk) then
-     OPT_FUN(9:14) = ORBIT
-     alfx = alfx0
-     alfy = alfy0
-     betx = betx0
-     bety = bety0
-     amux = amux0
-     amuy = amuy0
-     RMAT = RMAT0
-     if(rmatrix) RW=RW0
-  endif
-  
 end SUBROUTINE twcptk_sagan
+
 
 SUBROUTINE twbtin(rt,tt)
   use twiss0fi
@@ -2177,7 +2677,7 @@ SUBROUTINE twchgo
      opt_fun(32) = rmat(2,2)
   endif
 
-  if (advance_node() .ne. 0)  goto 10 ! loop over nodes
+  if (advance_node() .ne. 0)  goto 10
 
   !---- Warning, if system is coupled.
   if (cplxy) then
@@ -5507,15 +6007,14 @@ SUBROUTINE tmsymp(r)
   if (eflag) goto 100
 
   R = V 
-  return ! normal exit 
+  return
 
-100 continue ! failure
-
-  call m66symp(r,nrm)
-  if (nrm .gt. zero) then
-     print *," Singular matrix occurred during symplectification of R (left unchanged)."
-     print *," The column norm of R'*J*R-J is ",nrm
-  endif
+100 continue
+    call m66symp(r,nrm)
+    if (nrm .gt. zero) then
+       print *," Singular matrix occurred during symplectification of R (left unchanged)."
+       print *," The column norm of R'*J*R-J is ",nrm
+    endif
 
 end SUBROUTINE tmsymp
 
@@ -5553,7 +6052,7 @@ subroutine m66div(anum,aden,target,eflag)
 
 end subroutine m66div
 
-subroutine m66symp(r,nrm) 
+subroutine m66symp(r,nrm) ! can be moved to twiss.f90
   use matrices, only : JMAT
   implicit none
   !----------------------------------------------------------------------*
@@ -7472,4 +7971,180 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   endif
 
 end SUBROUTINE tmcrab
+SUBROUTINE twcpin_print(rt,r0mat )
+  use twiss0fi
+  use twisscfi
+  use twissbeamfi, only : deltap
+  use matrices, only : EYE, SMAT
+  use math_constfi, only : zero, one, two, quarter
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Print initial values for linear coupling parameters.                   *
+  !     Entry point for mad_emit                                         *
+  !     Input:                                                           *
+  !     rt(6,6)      (double)  one turn transfer matrix.                 *
+  !----------------------------------------------------------------------*
+  double precision, intent(IN)  :: rt(6,6), r0mat(2,2)
+  double precision :: e(2,2),  f(2,2), edet =zero, fdet = zero, r0mat_bar(2,2)
+  double precision :: e1(2,2),  f1(2,2), e1det =zero, f1det = zero
+  double precision :: e11(2,2),  f11(2,2), e11det =zero, f11det = zero
+  double precision :: et(2,2),  ft(2,2), etdet =zero, ftdet = zero
+  double precision :: em(2,2),  fm(2,2), emdet =zero, fmdet = zero
+  double precision :: e_12(2,2), e_21(2,2)
+  double precision :: f_12(2,2), f_21(2,2)
+  double precision :: e1_12(2,2), e1_21(2,2)
+  double precision :: f1_12(2,2), f1_21(2,2)
+  double precision :: e11_12(2,2), e11_21(2,2)
+  double precision :: f11_12(2,2), f11_21(2,2)
+  double precision :: et_12(2,2), et_21(2,2)
+  double precision :: ft_12(2,2), ft_21(2,2)
+  double precision :: em_12(2,2), em_21(2,2)
+  double precision :: fm_12(2,2), fm_21(2,2)
+  double precision :: a(2,2), b(2,2), c(2,2), d(2,2)
+  double precision :: ra(4,4), ss(4,4)
+  double precision :: u(4,4), v(4,4), vbar(4,4), vu (4,4), tmp(2,2), r_Det
+  double precision :: gamma=one
+
+  open (unit = 2, file = "afterclean_twcpin.out")
+  write(2,*) "After clean fort "
+  !-- simplecticity
+  RA  = RT(1:4, 1:4)
+  ss  = zero
+  ss(1:2, 1:2)  = SMAT
+  ss(3:4, 3:4)  = SMAT
+  
+
+  ! RT(1:4,1:4) = ( A , B
+  !                 C , D)
+  A  = RT(1:2,1:2) ; B  = RT(1:2,3:4)
+  C  = RT(3:4,1:2) ; D  = RT(3:4,3:4)
+
+  R0MAT_BAR =  matmul(matmul(-SMAT,transpose(R0MAT)),SMAT)
+  r_det = r0mat(1,1) * r0mat(2,2) - r0mat(1,2) * r0mat(2,1)
+  gamma = 1 /sqrt(1 + r_det)
+
+  write(2,*) "check symplecticity Rt(1:4,1:4) " , matmul(transpose(RA),matmul(SS,RA)) - SS 
+  write(2,*) "R0MAT   = ", R0MAT
+  write(2,*) "gammacp = ", gamma
+
+  e   = zero
+  f   = zero
+  e1  = zero
+  f1  = zero
+  e11 = zero
+  f11 = zero
+  et  = zero
+  et  = zero
+  em  = zero
+  em  = zero
+  
+  !--MAD-X Legacy
+  e = (A - matmul(B,R0MAT))
+  f = (D + matmul(R0MAT, B))
+  edet = e(1,1) * e(2,2) - e(1,2) * e(2,1)
+  fdet = f(1,1) * f(2,2) - f(1,2) * f(2,1)
+  
+  ! --Compute matrix V ("rotation", gamma*[ I R0MAT_BAR ; -R0MAT I]
+  V(1:4, 1:4) = zero
+  V(1:2, 1:2) = EYE(1:2, 1:2)
+  V(3:4, 3:4) = EYE(3:4, 3:4)
+  V(1:2, 3:4) =  R0MAT_BAR
+  V(3:4, 1:2) = -R0MAT
+  
+  ! --Compute matrix inv(V)= VBAR
+  VBAR(1:4, 1:4) = zero
+  VBAR(1:2, 1:2) = EYE(1:2, 1:2)
+  VBAR(3:4, 3:4) = EYE(3:4, 3:4)
+  VBAR(1:2, 3:4) = -R0MAT_BAR
+  VBAR(3:4, 1:2) = R0MAT
+  
+  ! --Compute VU = MV
+  VU = matmul(RT(1:4,1:4),V)
+  write(2,*) "MADX   E=VU(1:2,1:2)        " , VU(1:2, 1:2) 
+  write(2,*) "MADX   F=VU(3:4,3:4)        " , VU(3:4, 3:4)  
+  write(2,*) "MADX -RE=VU(3:4,1:2)        " , VU(3:4, 1:2)
+  write(2,*) "MADX   E=VU(1:2,1:2)/(-R)   " , -matmul(R0MAT_BAR,VU(3:4, 1:2))/r_det
+  write(2,*) "det V = ", v(1,1) * v(2,2) - v(1,2) * v(2,1)
+  
+     ! --Compute uncoupled block-diagonal U = g**2*[E 0, F 0]
+     U = zero
+     U = matmul(VBAR,VU)/(1 + r_det)
+
+     !---- Find diagonal blocks.
+     EM = U(1:2, 1:2)
+     FM = U(3:4, 3:4)
+    
+     write(2,*) "MADX E=U(1:2,1:2) " , U(1:2, 1:2) 
+     write(2,*) "MADX F=U(3:4,3:4) " , U(1:2, 1:2) 
+     write(2,*) "MADX 0=U(1:2,3:4) " , U(1:2, 3:4) 
+     write(2,*) "MADX 0=U(3:4,1:2) " , U(3:4, 1:2) 
+
+     tmp = matmul(D,R0MAT) - C
+     e1 = matmul(R0MAT_BAR, TMP)/r_det ! another way to express E = 
+     
+     e11 = VU(1:2, 1:2)
+     f11 = VU(3:4, 3:4)
+
+     ! U = VBAR*M*V (Talman) 
+     !A = gamma2*(A        + B*RA - RD*C - RD*D*RA)(talman) = gamma2*(A        -B*R - RBAR*C + RBAR*D*R) (madx)
+     !D = gamma2*(-RA*A*RD - RA*B + C*RD + D )     (talman) = gamma2*(R*A*RBAR +R*B + C*RBAR + D)        (madx)
+     et = gamma**2*(A - matmul(B,R0MAT) - matmul(R0MAT_BAR,C) + matmul(R0MAT_BAR,matmul(D,R0MAT))) 
+     ft = gamma**2*(D + matmul(R0MAT,B) + matmul(C, R0MAT_BAR) + matmul(R0MAT,matmul(A,R0MAT_BAR)))
+     
+     write(2,*) "Talman 0=U(1:2,3:4) ", U(1:2, 3:4)
+     write(2,*) "Talman 0=U(3:4,1:2) ", U(3:4,1:2)
+     
+     write(2,*) "E legacy (E=A-BR)         " , e
+     write(2,*) "E (E1=RBAR(DR - C)/||R||) " , e1
+     write(2,*) "E (E11 from VU=MV)        " , e11
+     write(2,*) "E (Et)(talman)            " , et
+     write(2,*) "E (Em)(E from E =VBARMV)  " , em
+
+end SUBROUTINE twcpin_print
+SUBROUTINE twcptk_print(re,r0mat, e, f)
+  use twiss0fi
+  use twisscfi
+  use twissbeamfi, only : deltap
+  use matrices, only : EYE, SMAT
+  use math_constfi, only : zero, one, two, quarter
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Print initial values for linear coupling parameters.                   *
+  !     Entry point for mad_emit                                         *
+  !     Input:                                                           *
+  !     rt(6,6)      (double)  one turn transfer matrix.                 *
+  !     Output:                                                          *
+  !     disp0        (double)  initial dispersion vector                 *
+  !     r0mat(2,2)   (double)  coupling matrix                           *
+  !     eflag        (integer) error flag.                               *
+  !----------------------------------------------------------------------*
+  double precision, intent(IN) :: re(6,6), r0mat(2,2), e(2,2), f(2,2)
+  double precision ::  edet =zero, fdet = zero, r0mat_bar(2,2)
+  double precision :: a(2,2), b(2,2), c(2,2), d(2,2)
+  double precision :: ra(4,4), ss(4,4)
+
+  
+  open (unit = 3, file = "afterclean_twcptk.out")
+  write(3,*) "After clean fort tk "
+  !-- simplecticity
+  RA  = RE(1:4, 1:4)
+  ss  = zero
+  ss(1:2, 1:2)  = SMAT
+  ss(3:4, 3:4)  = SMAT
+
+  R0MAT_BAR =  matmul(matmul(-SMAT,transpose(R0MAT)),SMAT)
+
+  write(3,*) "check symplecticity RE(1:4,1:4) " , matmul(transpose(RA),matmul(SS,RA)) - SS 
+  write(3,*) "R0MAT = ", R0MAT
+
+  edet = e(1,1) * e(2,2) - e(1,2) * e(2,1)
+  fdet = f(1,1) * f(2,2) - f(1,2) * f(2,1)
+
+  write(3,*) "EDET tk =       " , edet
+  write(3,*) "FDET tk =       " , fdet
+  
+
+end SUBROUTINE twcptk_print
 
