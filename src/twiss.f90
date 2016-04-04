@@ -650,7 +650,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
 
   integer, external :: restart_sequ, advance_node, node_al_errors, get_vector, get_option
   double precision, external :: node_value
-  double precision, parameter :: orb_limit=1d1 
+  double precision, parameter :: orb_limit=1d1, symp_thrd=1d-11 ! FCC2 needs a bit more than 1e-12
   integer, parameter :: max_rep=100
   
   debug = get_option('debug ')
@@ -734,9 +734,19 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
 
   n_align = node_al_errors(al_errors)
   if (n_align .ne. 0)  then
-     ORBIT2 = ORBIT 
-     call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
-     RT = matmul(RE,RT) 
+    ORBIT2 = ORBIT 
+    call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
+    RT = matmul(RE,RT)
+    !--- IT check if RT is symplectic
+    if (debug .ne. zero) then
+      call m66symp(rt,nrm)
+      if (nrm .gt. symp_thrd) then
+        call element_name(el_name,len(el_name))
+        write (warnstr,'(a,e12.6,a,a)') "The column norm is ", nrm, " in element ", el_name
+        call fort_warn('THREADER-1: ', warnstr)
+        !call tmsymp(rt)
+      endif
+    endif
   endif
   
   !---- Element matrix
@@ -744,33 +754,34 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   
   !--- if element has a map, concatenate
   if (fmap) then 
-     call tmcat(.true.,re,te,rt,tt,rt,tt)
-     suml = suml + el
-     !--- IT check if RT is symplectic
-     call m66symp(rt,nrm)
-     if ((nrm .gt. 1d-12) .and. (get_option('debug ') .ne. zero)) then
+    call tmcat(.true.,re,te,rt,tt,rt,tt)
+    suml = suml + el
+    !--- IT check if RT is symplectic
+    if (debug .ne. zero) then
+      call m66symp(rt,nrm)
+      if (nrm .gt. symp_thrd) then
         call element_name(el_name,len(el_name))
-        write (warnstr,'(a,f12.6, a)') "The column norm is ", nrm, &
-             " in element ", el_name
-        call fort_warn('THREADER: ', warnstr)
+        write (warnstr,'(a,e12.6,a,a)') "The column norm is ", nrm, " in element ", el_name
+        call fort_warn('THREADER-M: ', warnstr)
         !call tmsymp(rt)
-     endif
-
+      endif
+    endif
   endif
   
   if (n_align .ne. 0)  then
-     ORBIT2 = ORBIT 
-     call tmali2(el,orbit2,al_errors,beta,gamma,orbit,re)
-     RT = matmul(RE,RT)
-     !--- IT check if RT is symplectic
-     call m66symp(rt,nrm)
-     if ((nrm .gt. 1d-12) .and. (get_option('debug ') .ne. zero)) then
+    ORBIT2 = ORBIT 
+    call tmali2(el,orbit2,al_errors,beta,gamma,orbit,re)
+    RT = matmul(RE,RT)
+    !--- IT check if RT is symplectic
+    if (debug .ne. zero) then
+      call m66symp(rt,nrm)
+      if (nrm .gt. symp_thrd) then
         call element_name(el_name,len(el_name))
-        write (warnstr,'(a,f12.6, a)') "The column norm is ", nrm, &
-             " in element ", el_name
-        call fort_warn('THREADER: ', warnstr)
+        write (warnstr,'(a,e12.6,a,a)') "The column norm is ", nrm, " in element ", el_name
+        call fort_warn('THREADER-2: ', warnstr)
         !call tmsymp(rt)
-     endif
+      endif
+    endif
   endif
     
   if (kobs.gt.0 .and. kobs.eq.nobs) return
@@ -1882,7 +1893,7 @@ SUBROUTINE twcptk(re,orbit)
   !       det = tmp(1,1) * tmp(2,2) - tmp(1,2) * tmp(2,1)
         
   !       if (det .lt. zero) then
-  !          write (warnstr, '(a, a, a)') 'Negative determinant in ', name
+  !          write (warnstr, '(a,a)') 'Negative determinant in ', name
   !          call fort_warn('TWCPTK: ', warnstr)
   !          !print*, "Negative determinant! Rounding error?!?!? det = ", det 
   !       endif
@@ -1909,8 +1920,7 @@ SUBROUTINE twcptk(re,orbit)
   
   if (cp_error) then
      ! print *, '+++ det of block diagonal matrix is zero in ', name
-     write (warnstr, '(a, a, a)') 'Det of block diagonal matrix is zero in ', name,  &
-          ', twiss parameter might be unphysical! '
+     write (warnstr, '(a, a, a)') 'Det of block diagonal matrix is zero in ', name, ', twiss parameter might be unphysical! '
      call fort_warn('TWCPTK: ', warnstr)
   endif
   
@@ -2278,7 +2288,7 @@ SUBROUTINE twcptk_sagan(re,orbit) ! new, RD matrix, talman, sagan
         det = (tmp(1,1) * tmp(2,2) - tmp(1,2) * tmp(2,1))
         
         if (det .lt. zero) then
-           write (warnstr, '(a, a, a, i5.5)') 'Negative determinant in ', name, ', det = ', det
+           write (warnstr, '(a, a, a, f12.6)') 'Negative determinant in ', name, ', det = ', det
            call fort_warn('TWCPTK: ', warnstr)
            !print*, "Negative deterinant! Rounding error?!?!?"
         endif
@@ -2308,8 +2318,7 @@ SUBROUTINE twcptk_sagan(re,orbit) ! new, RD matrix, talman, sagan
   
   if (cp_error) then
      ! print *, '+++ det of block diagonal matrix is zero in ', name
-     write (warnstr, '(a, a, a)') 'Det of block diagonal matrix is zero in ', name,  &
-          ', twiss parameter might be unphysical! '
+     write (warnstr, '(a, a, a)') 'Det of block diagonal matrix is zero in ', name, ', twiss parameter might be unphysical! '
      call fort_warn('TWCPTK: ', warnstr)
   endif
   
