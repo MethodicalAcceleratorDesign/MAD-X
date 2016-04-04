@@ -1106,6 +1106,7 @@ tests/test-c6t-2/test-c6t-2.ref -text
 tests/test-c6t-3/fc.2.ref -text
 tests/test-c6t-3/fc.3.aper.ref -text
 tests/test-c6t-3/fc.3.aux.ref -text
+tests/test-c6t-3/fc.34.cfg -text
 tests/test-c6t-3/fc.34.ref -text
 tests/test-c6t-3/fc.8.ref -text
 tests/test-c6t-3/input/fivecell.seq -text
