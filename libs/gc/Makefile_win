@@ -1,0 +1,51 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD GC makefile for Mac OS X
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Garbage collector for MAD-X (Boehm GC)
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+#
+# win
+#
+
+$(PROJECT):   libgc-gnu
+
+libgc-gnu:    libgc-gnu32   libgc-gnu64
+libgc-intel:  libgc-intel32 libgc-intel64
+
+libgc-%32:    ARCH := 32
+libgc-%64:    ARCH := 64
+
+cleanarch:
+	$E "** Cleaning binaries and libraries"
+	$_ $(RM) $(wildcard libgc32* libgc64* libgc-win*)
+
+libgc-intel32 libgc-intel64:
+	$E "*** Building $@"
+	$_ cd $(GCDIR) ; \
+	env CC="icc -m$(ARCH) -DLARGE_CONFIG" ./configure --enable-static --disable-shared --with-pic \
+	    $(if $(call eq,$(OPENMP),yes),--enable-threads=posix,--disable-threads) ; \
+	make clean ; make ; make check ; cd - ; \
+	cp -f $(GCDIR)/.libs/libgc.a libgc-win$(ARCH)-intel.a ; \
+	ln -sf libgc-win$(ARCH)-intel.a libgc$(ARCH)-intel.a
+
+libgc-gnu32 libgc-gnu64:
+	$E "*** Building $@"
+	$_ cd $(GCDIR) ; \
+	env CC="gcc -m$(ARCH) -DLARGE_CONFIG" ./configure --enable-static --disable-shared --with-pic \
+	    $(if $(call eq,$(OPENMP),yes),--enable-threads=posix,--disable-threads) ; \
+	make clean ; make ; make check ; cd - ; \
+	cp -f $(GCDIR)/.libs/libgc.a libgc-win$(ARCH)-gnu.a ; \
+	ln -sf libgc-win$(ARCH)-gnu.a libgc$(ARCH)-gnu.a
+
+# end of makefile

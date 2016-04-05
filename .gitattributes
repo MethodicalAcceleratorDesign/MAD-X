@@ -382,6 +382,7 @@ libs/gc/Makefile_lnx -text
 libs/gc/Makefile_mac -text
 libs/gc/Makefile_post -text
 libs/gc/Makefile_pre -text
+libs/gc/Makefile_win -text
 libs/gc/gc-7.2f/BCC_MAKEFILE -text
 libs/gc/gc-7.2f/CMakeLists.txt -text
 libs/gc/gc-7.2f/ChangeLog -text
