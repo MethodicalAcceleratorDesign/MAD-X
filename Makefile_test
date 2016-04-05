@@ -65,7 +65,7 @@ test-beam \
 test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 test-rfmultipole-5 test-rfmultipole-6 \
 \
 test-ptc-twiss-1 test-ptc-twiss-2 test-ptc-twiss-3 \
-test-ptc-twiss-old1 test-ptc-twiss-old2 test-ptc-twiss-old3 test-ptc-twiss-old4 test-ptc-twiss-old5 $(call onwin,,test-ptc-twiss-old6) test-ptc-twiss-old7 \
+test-ptc-twiss-old1 test-ptc-twiss-old2 test-ptc-twiss-old3 test-ptc-twiss-old4 test-ptc-twiss-old5 test-ptc-twiss-old6 test-ptc-twiss-old7 \
 test-ptc-twiss-5D test-ptc-twiss-5Dt test-ptc-twiss-56D test-ptc-twiss-56Dt test-ptc-twiss-56Dl test-ptc-twiss-56Dtl test-ptc-twiss-6D \
 test-ptc-twiss-accel-56D \
 test-ptc-normal test-ptc-twiss-maptable \
@@ -87,7 +87,7 @@ test-dynap \
 test-c6t-4 \
 test-match-6 test-match-7 \
 test-ptc-twiss-2 \
-$(call onwin,,test-ptc-twiss-old6) test-ptc-twiss-old7 \
+test-ptc-twiss-old6 test-ptc-twiss-old7 \
 test-touschek test-touschek-2 \
 \
 $(call onlxi64,$(user-cases))
@@ -141,8 +141,7 @@ onwin    = $(if       $(call eq,$(OSTYPE),Windows),$1,$2)
 onlxplus = $(if $(and $(call eq,$(OSTYPE),Linux),$(wildcard /afs/cern.ch/eng/lhc/optics)),$1,$2)
 onlxi64  = $(if $(and $(call eq,$(OSTYPE),Linux),\
                       $(call eq,$(COMP),gnu),\
-                      $(call eq,$(ARCH),64),\
-                      $(wildcard /afs/cern.ch/eng/lhc/optics)),$1,$2)
+                      $(call eq,$(ARCH),64),     $(wildcard /afs/cern.ch/eng/lhc/optics)),$1,$2)
 
 # madx supported command for tests
 ifndef MADX
