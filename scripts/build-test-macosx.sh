@@ -3,6 +3,7 @@
 # bash scripts/build-test-macosx.sh [noecho] [cleanall] [notest]
 
 # env settings
+export LC_ALL="C"
 export LC_CTYPE="C"
 export PATH=`pwd`:"/opt/local/bin:$PATH"
 
