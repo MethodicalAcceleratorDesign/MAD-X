@@ -10,6 +10,7 @@
 /Makefile_f90 -text
 /Makefile_lib -text
 /Makefile_lnx -text
+/Makefile_local -text
 /Makefile_mac -text
 /Makefile_post -text
 /Makefile_pre -text
