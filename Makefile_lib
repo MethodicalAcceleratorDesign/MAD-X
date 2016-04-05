@@ -25,9 +25,9 @@ endif
 # Garbage Collector
 
 ifeq ($(USEGC),yes)
-ifneq ($(OSTYPE),Windows)
+#ifneq ($(OSTYPE),Windows)
 LIBS += -Llibs$/gc -lgc$(ARCH)$(if $(findstring -intel,$@),-intel,-gnu)
-endif
+#endif
 endif
 
 # Libraries on Linux
