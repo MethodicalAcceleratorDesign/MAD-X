@@ -3,8 +3,9 @@
 # bash scripts/build-test-linux.sh [noecho] [cleanall] [notest]
 
 # env settings
+export LC_ALL="C"
 export LC_CTYPE="C"
-export PATH=`pwd`:"$PATH"
+export PATH=`pwd`:"/opt/intel/bin:$PATH"
 
 # error handler
 check_error ()
@@ -66,6 +67,16 @@ check_error "make all-linux32-gnu failed" "no-exit"
 make all-linux64-gnu
 check_error "make all-linux64-gnu failed"
 
+echo -e "\n===== Intel build ====="
+icc      --version
+ifort    --version
+
+make all-linux32-intel
+check_error "make all-linux32-intel failed" "no-exit"
+
+make all-linux64-intel
+check_error "make all-linux64-intel failed" "no-exit"
+
 echo -e "\n===== Binaries dependencies ====="
 make infobindep
 check_error "make infobindep failed"
@@ -80,6 +91,14 @@ if [ "$1" = "notest" ] ; then
 	echo "Skipped (explicit request)."
 else
 	echo ""
+
+	echo -e "\n===== Testing madx-linux32-intel ====="
+	make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=$NOCOLOR
+	check_error "make tests-all for madx-linux32-intel failed" "no-exit"
+
+	echo -e "\n===== Testing madx-linux64-intel ====="
+	make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=$NOCOLOR
+	check_error "make tests-all for madx-linux64-intel failed" "no-exit"
 
 	echo -e "\n===== Testing madx-linux32-gnu ====="
 	make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=$NOCOLOR
