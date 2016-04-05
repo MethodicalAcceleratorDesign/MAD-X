@@ -11,7 +11,7 @@ check_error ()
 {
 	if [ "$?" != "0" ] ; then
 		echo -e "\nERROR: $1"
-		exit 1
+		[ "$2" != "no-exit" ] && exit 1
 	fi
 }
 
@@ -60,8 +60,11 @@ gcc      --version
 g++      --version
 gfortran --version
 
-make all-linux-gnu
-check_error "make all-linux-gnu failed"
+make all-linux32-gnu
+check_error "make all-linux32-gnu failed" "no-exit"
+
+make all-linux64-gnu
+check_error "make all-linux64-gnu failed"
 
 echo -e "\n===== Binaries dependencies ====="
 make infobindep
@@ -80,7 +83,7 @@ else
 
 	echo -e "\n===== Testing madx-linux32-gnu ====="
 	make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=$NOCOLOR
-	check_error "make tests-all for madx-linux32-gnu failed"
+	check_error "make tests-all for madx-linux32-gnu failed" "no-exit"
 
 	echo -e "\n===== Testing madx-linux64-gnu ====="
 	make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=$NOCOLOR
