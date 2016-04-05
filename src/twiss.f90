@@ -742,7 +742,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
       call m66symp(rt,nrm)
       if (nrm .gt. symp_thrd) then
         call element_name(el_name,len(el_name))
-        write (warnstr,'(a,e12.6,a,a)') "The column norm is ", nrm, " in element ", el_name
+        write (warnstr,'(a,e13.6,a,a)') "The column norm is ", nrm, " in element ", el_name
         call fort_warn('THREADER-1: ', warnstr)
         !call tmsymp(rt)
       endif
@@ -761,7 +761,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
       call m66symp(rt,nrm)
       if (nrm .gt. symp_thrd) then
         call element_name(el_name,len(el_name))
-        write (warnstr,'(a,e12.6,a,a)') "The column norm is ", nrm, " in element ", el_name
+        write (warnstr,'(a,e13.6,a,a)') "The column norm is ", nrm, " in element ", el_name
         call fort_warn('THREADER-M: ', warnstr)
         !call tmsymp(rt)
       endif
@@ -777,7 +777,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
       call m66symp(rt,nrm)
       if (nrm .gt. symp_thrd) then
         call element_name(el_name,len(el_name))
-        write (warnstr,'(a,e12.6,a,a)') "The column norm is ", nrm, " in element ", el_name
+        write (warnstr,'(a,e13.6,a,a)') "The column norm is ", nrm, " in element ", el_name
         call fort_warn('THREADER-2: ', warnstr)
         !call tmsymp(rt)
       endif
