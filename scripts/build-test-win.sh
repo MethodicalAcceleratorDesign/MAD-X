@@ -11,7 +11,7 @@ check_error ()
 {
 	if [ "$?" != "0" ] ; then
 		echo -e "\nERROR: $1"
-		exit 1
+    [ "$2" != "no-exit" ] && exit 1
 	fi
 }
 
@@ -82,7 +82,7 @@ gfortran --version
 
 set_env 32
 make all-win32-gnu
-check_error "make all-win32-gnu failed"
+check_error "make all-win32-gnu failed" "no-exit"
 
 set_env 64
 make all-win64-gnu
@@ -105,7 +105,7 @@ else
 
 	echo -e "\n===== Testing madx-win32-gnu ====="
 	make madx-win32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=$NOCOLOR
-	check_error "make tests-all for madx-win32-gnu failed"
+	check_error "make tests-all for madx-win32-gnu failed" "no-exit"
 
 	echo -e "\n===== Testing madx-win64-gnu ====="
 	make madx-win64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=$NOCOLOR
