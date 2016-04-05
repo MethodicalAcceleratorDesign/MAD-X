@@ -116,21 +116,21 @@ if [ "$1" = "notest" ] ; then
 else
 	echo ""
 
-	echo -e "\n===== Testing madx-linux64-intel ====="
-	make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=yes
-	check_error "make tests-all for madx-linux64-intel failed"
-
 	echo -e "\n===== Testing madx-linux32-intel ====="
 	make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=yes
 	check_error "make tests-all for madx-linux32-intel failed"
 
-	echo -e "\n===== Testing madx-linux64-gnu ====="
-	make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=yes
-	check_error "make tests-all for madx-linux64-gnu failed"
+	echo -e "\n===== Testing madx-linux64-intel ====="
+	make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=yes
+	check_error "make tests-all for madx-linux64-intel failed"
 
 	echo -e "\n===== Testing madx-linux32-gnu ====="
 	make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=yes
 	check_error "make tests-all for madx-linux32-gnu failed"
+
+	echo -e "\n===== Testing madx-linux64-gnu ====="
+	make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=yes
+	check_error "make tests-all for madx-linux64-gnu failed"
 fi
 
 # restore the default version
