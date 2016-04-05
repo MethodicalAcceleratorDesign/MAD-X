@@ -3,9 +3,7 @@
 # bash scripts/build-test-linux.sh [noecho] [cleanall] [notest]
 
 # env settings
-export LC_ALL="C"
-export LC_CTYPE="C"
-export PATH=`pwd`:"/opt/intel/bin:$PATH"
+export PATH="`pwd`:/opt/intel/bin:$PATH"
 
 # error handler
 check_error ()

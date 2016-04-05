@@ -3,8 +3,7 @@
 # bash scripts/build-test-report.sh [noecho] [clean|cleanall] [forcereport] [force] [nomail]
 
 # env settings
-export LC_CTYPE="C"
-export PATH=/afs/cern.ch/user/m/mad/madx/madX:$PATH
+export PATH="`pwd`:$PATH"
 
 # I/O redirection
 rm -f build-test-report.log

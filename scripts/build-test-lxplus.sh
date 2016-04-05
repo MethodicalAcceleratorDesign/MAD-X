@@ -3,11 +3,7 @@
 # bash scripts/build-test-lxplus.sh [noecho] [cleanall] [notest]
 
 # env settings
-export LC_CTYPE="C"
-export PATH="/afs/cern.ch/user/m/mad/madx/madX:$PATH"
-
-# store lxplus node name in a file
-uname -n > build-test-lxplus.run
+export PATH="`pwd`:$PATH"
 
 # error handler
 check_error ()
@@ -17,6 +13,9 @@ check_error ()
 		[ "$2" != "no-exit" ] && exit 1
 	fi
 }
+
+# store lxplus node name in a file
+uname -n > build-test-lxplus.run
 
 # I/O redirection
 rm -f build-test-lxplus.out
@@ -70,7 +69,7 @@ gcc      --version
 g++      --version
 gfortran --version
 make all-linux64-gnu
-check_error "make all-linux64-gnu failed"
+check_error "make all-linux64-gnu failed" "no-exit"
 
 echo -e "\n===== Intel build ====="
 source /afs/cern.ch/sw/lcg/contrib/gcc/max/i686-slc6/setup.sh

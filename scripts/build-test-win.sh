@@ -3,8 +3,7 @@
 # bash scripts/build-test-win.sh [noecho] [cleanall] [notest]
 
 # env settings
-export LC_CTYPE="C"
-export PATH=`pwd`:"/c/Program Files/gnuplot/bin:$PATH"
+export PATH="`pwd`:/c/Program Files/gnuplot/bin:$PATH"
 
 # error handler
 check_error ()
@@ -19,6 +18,7 @@ check_error ()
 if [ "$PWD" != "$HOME/madX" ] ; then
   cd "$HOME/madX"
   check_error "unable to move to madX directory"
+  export PATH="`pwd`:$PATH"
 fi
 
 # set env 32 or 64 bit
