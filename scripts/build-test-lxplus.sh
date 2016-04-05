@@ -63,7 +63,7 @@ gcc      --version
 g++      --version
 gfortran --version
 make all-linux32-gnu
-check_error "make all-linux32-gnu failed"
+check_error "make all-linux32-gnu failed" "no-exit"
 
 source /afs/cern.ch/sw/lcg/contrib/gcc/max/x86_64-slc6/setup.sh
 gcc      --version
@@ -78,14 +78,14 @@ source /afs/cern.ch/sw/IntelSoftware/linux/all-setup.sh ia32
 icc      --version
 ifort    --version
 make all-linux32-intel all-linux32
-check_error "make all-linux32-intel failed"
+check_error "make all-linux32-intel failed" "no-exit"
 
 source /afs/cern.ch/sw/lcg/contrib/gcc/max/x86_64-slc6/setup.sh
 source /afs/cern.ch/sw/IntelSoftware/linux/all-setup.sh intel64
 icc      --version
 ifort    --version
 make all-linux64-intel all-linux64
-check_error "make all-linux64-intel failed"
+check_error "make all-linux64-intel failed" "no-exit"
 
 echo -e "\n===== NagFor build ====="
 export PATH="${PATH}:/afs/cern.ch/sw/fortran/nag2012/bin"
@@ -118,7 +118,7 @@ else
 
 	echo -e "\n===== Testing madx-linux32-intel ====="
 	make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=yes
-	check_error "make tests-all for madx-linux32-intel failed"
+	check_error "make tests-all for madx-linux32-intel failed"  "no-exit"
 
 	echo -e "\n===== Testing madx-linux64-intel ====="
 	make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=yes
@@ -126,15 +126,15 @@ else
 
 	echo -e "\n===== Testing madx-linux32-gnu ====="
 	make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=yes
-	check_error "make tests-all for madx-linux32-gnu failed"
+	check_error "make tests-all for madx-linux32-gnu failed"  "no-exit"
 
 	echo -e "\n===== Testing madx-linux64-gnu ====="
 	make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=yes
-	check_error "make tests-all for madx-linux64-gnu failed"
+	check_error "make tests-all for madx-linux64-gnu failed"  "no-exit"
 fi
 
 # restore the default version
-make madx-linux32 > /dev/null && make madx-linux64 > /dev/null
+make madx-linux32-gnu > /dev/null && make madx-linux64-gnu > /dev/null
 check_error "unable to restore the default version"
 
 # date & end marker
