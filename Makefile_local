@@ -132,21 +132,6 @@ else
 endif
 
 #
-# Makefile_pre/post installation (Darwin only)
-#
-
-.PHONY: makefile-install
-
-makefile-install:
-	$E "*** Installing $@"
-ifneq ($(OSTYPE),Windows)
-	$_ scp Makefile_local mad@lxplus.cern.ch:madx/madX
-	$_ scp Makefile_local mad@macserv15865.cern.ch:Projects/madX
-else
-	@echo "*** $@ not supported on $(OSTYPE)"
-endif
-
-#
 # count number of builds
 #
 

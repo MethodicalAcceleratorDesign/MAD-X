@@ -19,12 +19,8 @@
 #
 # all
 #
-all-win:          all-win32        all-win64
 all-win-gnu:      all-win32-gnu    all-win64-gnu
 all-win-intel:    all-win32-intel  all-win64-intel
-
-all-win32:  madx-win32  numdiff-win32
-all-win64:  madx-win64  numdiff-win64
 
 all-win32-gnu:  madx-win32-gnu  numdiff-win32-gnu
 all-win64-gnu:  madx-win64-gnu  numdiff-win64-gnu
@@ -43,21 +39,12 @@ cleanarch:
 #
 # madx
 #
-madx-win:        madx-win32        madx-win64
 madx-win-gnu:    madx-win32-gnu    madx-win64-gnu
 madx-win-intel:  madx-win32-intel  madx-win64-intel
 
-madx-win%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=yes USEGC=yes APPENDLD=yes
-madx-win%: MAKE_OPTS = -j9 $(MAKEARGS)
-madx-win%: MAKE_LINK = $(if $(DESTDIR),$(CP) $(DESTDIR)$@.exe $@.exe &&,) $(CP) $@.exe
-
-madx-win32-intel madx-win32:
-	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=intel && $(MAKE_LINK) madx32.exe
-
-madx-win64-intel madx-win64:
-	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=intel && $(MAKE_LINK) madx64.exe
+madx-win-%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=yes USEGC=yes APPENDLD=yes
+madx-win-%: MAKE_OPTS = -j9 $(MAKEARGS)
+madx-win-%: MAKE_LINK = $(if $(DESTDIR),$(CP) $(DESTDIR)$@.exe $@.exe &&,) $(CP) $@.exe
 
 madx-win32-gnu:
 	$E "*** Building $@"
@@ -67,25 +54,24 @@ madx-win64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=gnu && $(MAKE_LINK) madx64.exe
 
+madx-win32-intel:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=intel && $(MAKE_LINK) madx32.exe
+
+madx-win64-intel:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=intel && $(MAKE_LINK) madx64.exe
+
 #
 # numdiff
 #
-numdiff-win:        numdiff-win32        numdiff-win64
 numdiff-win-gnu:    numdiff-win32-gnu    numdiff-win64-gnu
 numdiff-win-intel:  numdiff-win32-intel  numdiff-win64-intel
 
-numdiff-win%: DESTDIR  := $(DESTDIR)tools$/numdiff
-numdiff-win%: MAKE_ARGS = PRJNAME=$@ DESTDIR=..$/..$/$(DESTDIR) STATIC=yes APPENDLD=yes
-numdiff-win%: MAKE_OPTS = -j9 --no-print-directory -C tools/numdiff $(MAKEARGS)
-numdiff-win%: MAKE_LINK = $(if $(DESTDIR),$(CP) $(DESTDIR)$/$@.exe $@.exe &&,) $(CP) $@.exe
-
-numdiff-win32-intel numdiff-win32:
-	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=intel && $(MAKE_LINK) numdiff32.exe
-
-numdiff-win64-intel numdiff-win64:
-	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=intel && $(MAKE_LINK) numdiff64.exe
+numdiff-win-%: DESTDIR  := $(DESTDIR)tools$/numdiff
+numdiff-win-%: MAKE_ARGS = PRJNAME=$@ DESTDIR=..$/..$/$(DESTDIR) STATIC=yes APPENDLD=yes
+numdiff-win-%: MAKE_OPTS = -j9 --no-print-directory -C tools/numdiff $(MAKEARGS)
+numdiff-win-%: MAKE_LINK = $(if $(DESTDIR),$(CP) $(DESTDIR)$/$@.exe $@.exe &&,) $(CP) $@.exe
 
 numdiff-win32-gnu:
 	$E "*** Building $@"
@@ -94,5 +80,13 @@ numdiff-win32-gnu:
 numdiff-win64-gnu:
 	$E "*** Building $@"
 	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=gnu && $(MAKE_LINK) numdiff64.exe
+
+numdiff-win32-intel:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=32 COMP=intel && $(MAKE_LINK) numdiff32.exe
+
+numdiff-win64-intel:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_ARGS) $(MAKE_OPTS) ARCH=64 COMP=intel && $(MAKE_LINK) numdiff64.exe
 
 # end of makefile
