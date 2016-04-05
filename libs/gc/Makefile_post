@@ -31,7 +31,6 @@ endif
 
 ifeq ($(OSTYPE),Windows)
 include Makefile_win
-#$(error libgc separate built is not supported on $(OSTYPE))
 endif
 
 ifeq ($(OSTYPE),Cygwin)

@@ -104,29 +104,29 @@ madx-linux64-lahey: libs/gc/libgc-linux64-gnu.a
 #
 libs/gc/libgc-linux%: MAKE_OPTS = -j9 --no-print-directory -C libs/gc
 
-libs/gc/libgc-linux32-intel.a:
-	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) libgc-intel32
-
-libs/gc/libgc-linux64-intel.a:
-	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) libgc-intel64
-
 libs/gc/libgc-linux32-gnu.a:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) libgc-gnu32
+	$_ $(MAKE) $(MAKE_OPTS) libgc-linux32-gnu
 
 libs/gc/libgc-linux64-gnu.a:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) libgc-gnu64
+	$_ $(MAKE) $(MAKE_OPTS) libgc-linux64-gnu
+
+libs/gc/libgc-linux32-intel.a:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_OPTS) libgc-linux32-intel
+
+libs/gc/libgc-linux64-intel.a:
+	$E "*** Building $@"
+	$_ $(MAKE) $(MAKE_OPTS) libgc-linux64-intel
 
 libs/gc/libgc-linux32-llvm.a:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) libgc-llvm32
+	$_ $(MAKE) $(MAKE_OPTS) libgc-linux32-llvm
 
 libs/gc/libgc-linux64-llvm.a:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) libgc-llvm64
+	$_ $(MAKE) $(MAKE_OPTS) libgc-linux64-llvm
 
 #
 # libmadx

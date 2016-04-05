@@ -84,43 +84,29 @@ madx-macosx64-llvm: libs/gc/libgc-macosx64-llvm.a
 #
 libs/gc/libgc-macosx%: MAKE_OPTS = -j9 --no-print-directory -C libs/gc
 
-# BUG in GC 7.2f or Intel 14.0.4
-# remove the 2 rules and uncomment the 2 right after when it is solved...
-# to check if it solved, we (still) build libgc32/64-intel and run the tests...
-
-#libs/gc/libgc-macosx32-intel.a: libs/gc/libgc-macosx32-gnu.a
-#	$E "*** Building $@"
-#	$_ $(MAKE) $(MAKE_OPTS) libgc-intel32 ; \
-#	   cd libs/gc ; ln -sf libgc32-gnu.a libgc32-intel.a
-#
-#libs/gc/libgc-macosx64-intel.a: libs/gc/libgc-macosx64-gnu.a
-#	$E "*** Building $@"
-#	$_ $(MAKE) $(MAKE_OPTS) libgc-intel64 ; \
-#	   cd libs/gc ; ln -sf libgc64-gnu.a libgc64-intel.a
-
 libs/gc/libgc-macosx32-gnu.a:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) libgc-gnu32
+	$_ $(MAKE) $(MAKE_OPTS) libgc-macosx32-gnu
 
 libs/gc/libgc-macosx64-gnu.a:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) libgc-gnu64
+	$_ $(MAKE) $(MAKE_OPTS) libgc-macosx64-gnu
 
 libs/gc/libgc-macosx32-intel.a:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) libgc-intel32
+	$_ $(MAKE) $(MAKE_OPTS) libgc-macosx32-intel
 
 libs/gc/libgc-macosx64-intel.a:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) libgc-intel64
+	$_ $(MAKE) $(MAKE_OPTS) libgc-macosx64-intel
 
 libs/gc/libgc-macosx32-llvm.a:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) libgc-llvm32
+	$_ $(MAKE) $(MAKE_OPTS) libgc-macosx32-llvm
 
 libs/gc/libgc-macosx64-llvm.a:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) libgc-llvm64
+	$_ $(MAKE) $(MAKE_OPTS) libgc-macosx64-llvm
 
 #
 # libmadx

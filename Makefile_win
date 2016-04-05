@@ -69,19 +69,19 @@ libs/gc/libgc-win%: MAKE_OPTS = -j9 --no-print-directory -C libs/gc
 
 libs/gc/libgc-win32-gnu.a:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) libgc-gnu32
+	$_ $(MAKE) $(MAKE_OPTS) libgc-win32-gnu
 
 libs/gc/libgc-win64-gnu.a:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) libgc-gnu64
+	$_ $(MAKE) $(MAKE_OPTS) libgc-win64-gnu
 
 libs/gc/libgc-win32-intel.a:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) libgc-intel32
+	$_ $(MAKE) $(MAKE_OPTS) libgc-win32-intel
 
 libs/gc/libgc-win64-intel.a:
 	$E "*** Building $@"
-	$_ $(MAKE) $(MAKE_OPTS) libgc-intel64
+	$_ $(MAKE) $(MAKE_OPTS) libgc-win64-intel
 
 #
 # numdiff
