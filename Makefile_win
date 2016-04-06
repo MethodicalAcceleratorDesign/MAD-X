@@ -92,7 +92,7 @@ numdiff-win-intel:  numdiff-win32-intel  numdiff-win64-intel
 numdiff-win%: DESTDIR  := $(DESTDIR)tools$/numdiff
 numdiff-win%: MAKE_ARGS = PRJNAME=$@ DESTDIR=..$/..$/$(DESTDIR) STATIC=yes APPENDLD=yes
 numdiff-win%: MAKE_OPTS = -j9 --no-print-directory -C tools/numdiff $(MAKEARGS)
-numdiff-win%: MAKE_LINK = $(if $(DESTDIR),$(CP) $(DESTDIR)$/$@.exe $@.exe &&,) $(CP) $@.exe
+numdiff-win%: MAKE_LINK = $(if $(DESTDIR),$(CP) $(DESTDIR)$@.exe $@.exe &&,) $(CP) $@.exe
 
 numdiff-win32-gnu:
 	$E "*** Building $@"

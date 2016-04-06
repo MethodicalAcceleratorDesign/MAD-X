@@ -30,7 +30,7 @@ islxplus = $(and $(call eq,$(OSTYPE),Linux),\
 .PHONY: madx-release
 
 ifeq ($(ismacsrv),yes)
-madx-release: madx-info madx-src madx-usrguide # madx-mktag
+madx-release: madx-info madx-src madx-usrguide madx-install madx-mktag
 else ifeq ($(islxplus),yes)
 madx-release: madx-install madx-reports madx-activate
 endif

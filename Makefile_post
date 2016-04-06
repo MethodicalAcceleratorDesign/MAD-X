@@ -33,10 +33,6 @@ ifeq ($(OSTYPE),Windows)
 include Makefile_win
 endif
 
-ifeq ($(OSTYPE),Cygwin)
-include Makefile_cyg
-endif
-
 # not mandatory
 -include Makefile_local
 

@@ -6,7 +6,6 @@
 /Makefile_c -text
 /Makefile_cpp -text
 /Makefile_cxx -text
-/Makefile_cyg -text
 /Makefile_f90 -text
 /Makefile_lib -text
 /Makefile_lnx -text
@@ -781,7 +780,6 @@ make/make.act -text
 make/make.cfg -text
 make/make.inc -text
 make/make.lib -text
-make/system.Cygwin -text
 make/system.Darwin -text
 make/system.Linux -text
 make/system.Windows -text
