@@ -16,15 +16,23 @@
 # | $Id$
 # |
 
+# useful macros
+ismacsrv = $(and $(call eq,$(OSTYPE),Darwin),\
+                 $(or $(call eq,$(PWD),/Users/mad/madX),\
+                      $(call eq,$(PWD),/Users/ldeniau/Projects/madx/madx-src)),yes)
+islxplus = $(and $(call eq,$(OSTYPE),Linux),\
+                 $(findstring lxplus,$(HOSTNAME)),\
+                 $(wildcard /afs/cern.ch/eng/lhc/optics),yes)
+
 ###################################
 # Build & Install
 
 .PHONY: madx-release
 
-ifeq ($(OSTYPE),Darwin)
-madx-release: madx-info madx-src madx-usrguide madx-install
-else ifeq ($(OSTYPE),Linux)
-madx-release: madx-install
+ifeq ($(ismacsrv),yes)
+madx-release: madx-info madx-src madx-usrguide # madx-mktag
+else ifeq ($(islxplus),yes)
+madx-release: madx-install madx-reports madx-activate
 endif
 
 #
@@ -35,14 +43,10 @@ endif
 
 madx-info:
 	$E "*** Building $@"
-ifneq ($(OSTYPE),Windows)
 	$_ echo "release  $(VERSION)"                   > madx-info.txt ; \
 	   echo "`date '+date     %Y.%m.%d %H:%M:%S'`" >> madx-info.txt ; \
 	   echo "svn      `svn update`"                >> madx-info.txt ; \
 	   echo `grep svn madx-info.txt`
-else
-	@echo "*** $@ not supported on $(OSTYPE)"
-endif
 
 #
 # madx src tarball
@@ -52,27 +56,20 @@ endif
 
 madx-src:
 	$E "*** Building $@"
-ifneq ($(OSTYPE),Windows)
 	$_ svn export http://svn.cern.ch/guest/madx/trunk/madX madx-$(VERSION) && \
 	   tar cvz --exclude madx-$(VERSION)/examples -f madx-src.tgz madx-$(VERSION) && \
 	   rm -rf madx-$(VERSION)
-else
-	@echo "*** $@ not supported on $(OSTYPE)"
-endif
 
 #
 # madx latex user's guide
 #
+
 .PHONY: madx-usrguide
 
 madx-usrguide:
 	$E "*** Building $@"
-ifneq ($(OSTYPE),Windows)
 	$_ cd doc/latexuguide ; ./makelatexdoc && cd - && \
 	   cp doc/latexuguide/uguide.pdf madxuguide.pdf
-else
-	@echo "*** $@ not supported on $(OSTYPE)"
-endif
 
 #
 # madx installation (Darwin and Linux only)
@@ -80,26 +77,51 @@ endif
 
 .PHONY: madx-install
 
+FILES = $(wildcard madx-$(OSNAME)*-gnu numdiff-$(OSNAME)*-gnu \
+                   madx-src.tgz madxuguide.pdf madx-info.txt)
+#                   libmadx-$(OSNAME)*-gnu libptc-$(OSNAME)*-gnu \
+
 madx-install:
 	$E "*** Installing madx"
-ifeq ($(OSTYPE),Darwin)
 	$_ mkdir $(VERSION) $(VERSION)/reports && \
-     rm -f *-gnu *-gnu.* *-intel *-intel.* && \
-	   cp -L madx-* libmadx-* libptc-* numdiff-* madx-src.tgz madxuguide.pdf madx-info.txt $(VERSION) && \
+     cp -L $(FILES) $(VERSION) && \
 	   scp -r $(VERSION) mad@lxplus.cern.ch:madx/releases/ && \
-	   rm -rf $(VERSION) && \
-	   svn copy https://svn.cern.ch/reps/madx/trunk/ \
-	            https://svn.cern.ch/reps/madx/tags/$(VERSION) -m "madx release tag $(VERSION)"
-else ifeq ($(OSTYPE),Linux)
-	$_ rm -f *-gnu *-gnu.* *-intel *-intel.* *-lahey *-nagfor && \
-     scp madx-linux* libmadx-linux* libptc-linux* numdiff-linux* mad@lxplus.cern.ch:madx/releases/$(VERSION) && \
-     scp tests/reports/`date "+%Y-%m-%d"`_build-test-*.out mad@lxplus.cern.ch:madx/releases/$(VERSION)/reports && \
-     pushd /afs/cern.ch/project/mad/madx/releases && \
+	   rm -rf $(VERSION)
+
+#
+# madx backup reports
+#
+
+.PHONY: madx-reports
+
+madx-reports:
+	$E "*** Recording reports"
+	$_ scp tests/reports/`date "+%Y-%m-%d"`_build-test-*.out \
+	       mad@lxplus.cern.ch:madx/releases/$(VERSION)/reports
+
+
+#
+# madx backup trunk
+#
+
+.PHONY: madx-mktag
+
+madx-mktag:
+	$E "*** Tagging madx"
+	$_  svn copy https://svn.cern.ch/reps/madx/trunk/ \
+	             https://svn.cern.ch/reps/madx/tags/$(VERSION) -m "madx release tag $(VERSION)"
+
+#
+# madx activation
+#
+
+.PHONY: madx-activate
+
+madx-activate:
+	$E "*** Activating madx"
+	$_ pushd /afs/cern.ch/project/mad/madx/releases && \
      ls -l . $(VERSION) && rm -i last-dev ; ln -s $(VERSION) last-dev && \
      ls -l . last-dev   && popd
-else
-	@echo "*** $@ not supported on $(OSTYPE)"
-endif
 
 #
 # libptc installation (Linux only)
@@ -109,11 +131,7 @@ endif
 
 libptc-install:
 	$E "*** Installing libptc"
-ifeq ($(OSTYPE),Linux)
-	$_ scp libptc-linux* mad@lxplus.cern.ch:madx/releases/$(VERSION)
-else
-	@echo "*** $@ not supported on $(OSTYPE)"
-endif
+	$_ scp libptc-* mad@lxplus.cern.ch:madx/releases/$(VERSION)
 
 #
 # numdiff installation (Linux only)
@@ -123,13 +141,7 @@ endif
 
 numdiff-install:
 	$E "*** Installing numdiff"
-ifeq ($(OSTYPE),Darwin)
-	$_ scp numdiff-macosx* numdiff-win* mad@lxplus.cern.ch:madx/releases/$(VERSION)
-else ifeq ($(OSTYPE),Linux)
-	$_ scp numdiff-linux* mad@lxplus.cern.ch:madx/releases/$(VERSION)
-else
-	@echo "*** $@ not supported on $(OSTYPE)"
-endif
+	$_ scp numdiff-* mad@lxplus.cern.ch:madx/releases/$(VERSION)
 
 #
 # count number of builds

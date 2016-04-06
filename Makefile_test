@@ -138,10 +138,14 @@ test-twiss:          TESTSUITE := Twiss testsuite
 
 # useful macros
 onwin    = $(if       $(call eq,$(OSTYPE),Windows),$1,$2)
-onlxplus = $(if $(and $(call eq,$(OSTYPE),Linux),$(wildcard /afs/cern.ch/eng/lhc/optics)),$1,$2)
+onlxplus = $(if $(and $(call eq,$(OSTYPE),Linux),\
+                      $(findstring lxplus,$(HOSTNAME)),\
+                      $(wildcard /afs/cern.ch/eng/lhc/optics),yes),$1,$2)
 onlxi64  = $(if $(and $(call eq,$(OSTYPE),Linux),\
                       $(call eq,$(COMP),gnu),\
-                      $(call eq,$(ARCH),64),     $(wildcard /afs/cern.ch/eng/lhc/optics)),$1,$2)
+                      $(call eq,$(ARCH),64),\
+                      $(findstring lxplus,$(HOSTNAME)),\
+                      $(wildcard /afs/cern.ch/eng/lhc/optics),yes),$1,$2)
 
 # madx supported command for tests
 ifndef MADX
