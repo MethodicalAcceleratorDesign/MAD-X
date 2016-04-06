@@ -61,6 +61,7 @@ source /afs/cern.ch/sw/lcg/contrib/gcc/max/i686-slc6/setup.sh
 gcc      --version
 g++      --version
 gfortran --version
+
 make all-linux32-gnu
 check_error "make all-linux32-gnu failed" "no-exit"
 
@@ -68,6 +69,7 @@ source /afs/cern.ch/sw/lcg/contrib/gcc/max/x86_64-slc6/setup.sh
 gcc      --version
 g++      --version
 gfortran --version
+
 make all-linux64-gnu
 check_error "make all-linux64-gnu failed" "no-exit"
 
@@ -76,27 +78,34 @@ source /afs/cern.ch/sw/lcg/contrib/gcc/max/i686-slc6/setup.sh
 source /afs/cern.ch/sw/IntelSoftware/linux/all-setup.sh ia32
 icc      --version
 ifort    --version
-make all-linux32-intel all-linux32
+
+make all-linux32-intel
 check_error "make all-linux32-intel failed" "no-exit"
 
 source /afs/cern.ch/sw/lcg/contrib/gcc/max/x86_64-slc6/setup.sh
 source /afs/cern.ch/sw/IntelSoftware/linux/all-setup.sh intel64
 icc      --version
 ifort    --version
-make all-linux64-intel all-linux64
+
+make all-linux64-intel
 check_error "make all-linux64-intel failed" "no-exit"
 
 echo -e "\n===== NagFor build ====="
 export PATH="${PATH}:/afs/cern.ch/sw/fortran/nag2012/bin"
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/afs/cern.ch/sw/fortran/nag2012/lib"
 export NAG_KUSARI_FILE="/afs/cern.ch/sw/fortran/nag2012/lib/nag.licence.5.2,lxlicen04.cern.ch:"
-make madx-linux-nagfor
-check_error "make madx-linux-nagfor failed" "no-exit"
+
+make madx-linux32-nagfor
+check_error "make madx-linux32-nagfor failed" "no-exit"
+
+make madx-linux65-nagfor
+check_error "make madx-linux64-nagfor failed" "no-exit"
 
 echo -e "\n===== Lahey 32 build ====="
 source /afs/cern.ch/sw/lcg/contrib/gcc/max/i686-slc6/setup.sh
 export PATH="${PATH}:/afs/cern.ch/sw/fortran/lahey/lf9562e/bin"
 export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/afs/cern.ch/sw/fortran/lahey/lf9562e/lib"
+
 make madx-linux32-lahey
 check_error "make madx-linux32-lahey failed" "no-exit"
 
