@@ -900,19 +900,29 @@ cavity is a Cartesian coordinate system.
 
 \madbox{
 xxxxxxxxxxxxxxxxxxxxx\= \kill
-label: RFMULTIPOLE, \> VOLT=real, LAG=real, \\
+label: RFMULTIPOLE, \>L=real, VOLT=real, LAG=real, \\
        \> FREQ=real, HARMON=integer, \\
        \> LRAD=real, TILT=real, \\
        \> KNL=\{real, \ldots \}, KSL=\{real, \ldots \}, \\
        \> PNL=\{real, \ldots \}, PSL=\{real, \ldots \};
 }
 
-A \texttt{RFMULTIPOLE} is a thin-lens element which exhibits the properties
-of an RF-cavity and of a magnet of arbitrary order oscillating at
-a certain frequency.
+A \texttt{RFMULTIPOLE} is a element which exhibits the properties
+of an RF cavity as well as those of a multipole, of arbitrary order, oscillating at
+the same RF frequency.
 
-The effect of the cavity is \texttt{delta(E) = VOLT * sin(2$\pi$ * (LAG - HARMON *
-f0 t))}. 
+The accelerating kick is \texttt{delta(E) = VOLT * sin(2$\pi$ * (LAG - HARMON *
+f0 t))}, and the multipole moments oscillate with the same RF frequency.
+ 
+An \texttt{RFMULTIPOLE} requires the particle
+\hyperref[sec:beam]{\texttt{ENERGY}} and the particle 
+\hyperref[sec:beam]{\texttt{CHARGE}} to be set with a
+\hyperref[sec:beam]{\texttt{BEAM}} command before any calculation is
+performed.  
+
+Contrary to the regular multipole, where the dipole
+component has no effect on the reference orbit, an RF-Multipole that
+includes a dipole component bends also the reference orbit.      
  
 \begin{madlist}
    \ttitem{VOLT} The peak voltage of the RF accelerating mode (DEFAULT: 0 MV).
@@ -971,22 +981,6 @@ f0 t))}.
      therefore leading zeros must be filled in for components that do not
      exist.  
 \end{madlist}
-
-An \texttt{RFMULTIPOLE} requires the particle
-\hyperref[sec:beam]{\texttt{ENERGY}} and the particle 
-\hyperref[sec:beam]{\texttt{CHARGE}} to be set with a
-\hyperref[sec:beam]{\texttt{BEAM}} command before any calculation is
-performed.  
-
-%Notice that, contrary to the regular multipole where the dipole
-%component has no effect on the reference orbit, an RF-Multipole that
-%includes a dipole component bends also the reference orbit.      
-
-An \texttt{RFMULTIPOLE} with no dipole component has no effect on the reference
-orbit, \textit{i.e.} the reference system at the exit is the same as at the
-entrance. If the \texttt{RFMULTIPOLE} includes a dipole component, it
-has the same effect on the reference orbit as a thin \texttt{MULTIPOLE}
-with equivalent parameters. 
 
 \textbf{Examples}
 \begin{itemize}
