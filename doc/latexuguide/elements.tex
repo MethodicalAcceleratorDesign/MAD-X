@@ -915,7 +915,7 @@ The effect of the cavity is \texttt{delta(E) = VOLT * sin(2$\pi$ * (LAG - HARMON
 f0 t))}. 
  
 \begin{madlist}
-   \ttitem{VOLT} The peak RF voltage (DEFAULT: 0 MV).  
+   \ttitem{VOLT} The peak voltage of the RF accelerating mode (DEFAULT: 0 MV).
    \ttitem{LAG} The phase lag [$2\pi$] (DEFAULT: 0) 
    \ttitem{FREQ} The frequency [MHz] (no DEFAULT). \\ 
      Note that if the RF
@@ -972,13 +972,7 @@ f0 t))}.
      exist.  
 \end{madlist}
 
-
-\textbf{Example:}
-\madxmp{MS: RFMULTIPOLE, KSL=\{0, 0, 0, k3sl\};}
-
-Both \texttt{KNL} and \texttt{KSL} may be specified for the same multipole.  
-
-A \texttt{RFMULTIPOLE} requires the particle
+An \texttt{RFMULTIPOLE} requires the particle
 \hyperref[sec:beam]{\texttt{ENERGY}} and the particle 
 \hyperref[sec:beam]{\texttt{CHARGE}} to be set with a
 \hyperref[sec:beam]{\texttt{BEAM}} command before any calculation is
@@ -988,12 +982,28 @@ performed.
 %component has no effect on the reference orbit, an RF-Multipole that
 %includes a dipole component bends also the reference orbit.      
 
-A \texttt{RFMULTIPOLE} with no dipole component has no effect on the reference
+An \texttt{RFMULTIPOLE} with no dipole component has no effect on the reference
 orbit, \textit{i.e.} the reference system at the exit is the same as at the
 entrance. If the \texttt{RFMULTIPOLE} includes a dipole component, it
 has the same effect on the reference orbit as a thin \texttt{MULTIPOLE}
 with equivalent parameters. 
 
+\textbf{Examples}
+\begin{itemize}
+	\item A skew RF octupole
+	\madxmp{MS: RFMULTIPOLE, KSL=\{0, 0, 0, k3sl\};}
+
+Notice that both \texttt{KNL} and \texttt{KSL} for the same multipole mode can be specified simultaneously.  
+
+\item An \texttt{RFMULTIPOLE} used as a \texttt{CRABCAVITY}:
+	\madxmp{rfdipole: RFMULTIPOLE, \=L=Lcrab, KNL=\{ Vcrab / PC0 \}, \\
+								   \>PNL=\{ 0.5 + LAGcrab \};}
+	
+is equivalent to
+
+	\madxmp{crab: CRABCAVITY,  \=L=Lcrab, VOLT=Vcrab, LAG=LAGcrab;}
+
+\end{itemize}
 
 %  Added by: R. Calaga, Sep 2010 
 %  Edited by: A. Latina, Jun 2013
