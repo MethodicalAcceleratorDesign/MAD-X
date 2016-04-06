@@ -115,7 +115,7 @@ libmadx-macosx-gnu:   libmadx-macosx32-gnu    libmadx-macosx64-gnu
 libmadx-macosx-llvm:  libmadx-macosx32-llvm   libmadx-macosx64-llvm
 libmadx-macosx-intel: libmadx-macosx32-intel  libmadx-macosx64-intel
 
-libmadx-macosx%: DESTDIR   := $(DESTDIR)libs/madx
+libmadx-macosx%: DESTDIR   := $(DESTDIR)libs/madx/
 libmadx-macosx%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) ONLINE=no STATIC=no USEGC=yes APPENDLD=yes
 libmadx-macosx%: MAKE_OPTS  = -j9 --no-print-directory -C libs/madx $(MAKEARGS)
 libmadx-macosx%: MAKE_LINK  = ln -sf $(DESTDIR)$@.a && ln -sf $(DESTDIR)$@.dylib
@@ -151,7 +151,7 @@ libptc-macosx-gnu:    libptc-macosx32-gnu    libptc-macosx64-gnu
 libptc-macosx-llvm:   libptc-macosx32-llvm   libptc-macosx64-llvm
 libptc-macosx-intel:  libptc-macosx32-intel  libptc-macosx64-intel
 
-libptc-macosx%: DESTDIR   := $(DESTDIR)libs/ptc
+libptc-macosx%: DESTDIR   := $(DESTDIR)libs/ptc/
 libptc-macosx%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) STATIC=no APPENDLD=yes
 libptc-macosx%: MAKE_OPTS  = -j9 --no-print-directory -C libs/ptc $(MAKEARGS)
 libptc-macosx%: MAKE_LINK  = ln -sf $(DESTDIR)$@.a && ln -sf $(DESTDIR)$@.dylib
@@ -187,7 +187,7 @@ numdiff-macosx-gnu:   numdiff-macosx32-gnu    numdiff-macosx64-gnu
 numdiff-macosx-llvm:  numdiff-macosx32-llvm   numdiff-macosx64-llvm
 numdiff-macosx-intel: numdiff-macosx32-intel  numdiff-macosx64-intel
 
-numdiff-macosx%: DESTDIR  := $(DESTDIR)tools/numdiff
+numdiff-macosx%: DESTDIR  := $(DESTDIR)tools/numdiff/
 numdiff-macosx%: MAKE_ARGS = PRJNAME=$@ DESTDIR=../../$(DESTDIR) STATIC=yes APPENDLD=yes
 numdiff-macosx%: MAKE_OPTS = -j9 --no-print-directory -C tools/numdiff $(MAKEARGS)
 numdiff-macosx%: MAKE_LINK = ln -sf $(DESTDIR)$@ && ln -sf $@
