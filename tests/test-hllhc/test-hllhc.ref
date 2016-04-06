@@ -5753,7 +5753,7 @@ orbit:   3.367340E-06 -1.485247E-07 -3.333567E-06 -4.068063E-08  4.905949E-06  4
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
-system,"gzip last_twiss.20";
+system,"gzip -f last_twiss.20";
 
 
 
