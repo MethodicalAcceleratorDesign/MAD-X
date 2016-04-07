@@ -77,9 +77,9 @@ madx-usrguide:
 
 .PHONY: madx-install
 
-FILES = $(wildcard madx-$(OSNAME)*-gnu numdiff-$(OSNAME)*-gnu \
+FILES = $(wildcard madx-$(OSNAME)*-gnu* numdiff-$(OSNAME)*-gnu* \
                    madx-src.tgz madxuguide.pdf madx-info.txt)
-#                   libmadx-$(OSNAME)*-gnu libptc-$(OSNAME)*-gnu \
+#                  libmadx-$(OSNAME)*-gnu* libptc-$(OSNAME)*-gnu* \
 
 madx-install:
 	$E "*** Installing madx"
