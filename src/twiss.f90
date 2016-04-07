@@ -7106,6 +7106,8 @@ SUBROUTINE twwmap(pos, orbit)
 
   integer :: i, k, l
   double precision :: sum1, sum2, ek(6)
+  double precision, external :: get_value
+  logical :: accmap=.false.
 
   !---- Track ORBIT0 using zero kick.
   do i = 1, 6
@@ -7142,8 +7144,14 @@ SUBROUTINE twwmap(pos, orbit)
   !     write (99, '(6e16.8)') stmat
 
   !---- re-initialize map.
-  SRMAT = EYE 
-  STMAT = zero 
+  accmap = get_value('twiss ','sectoracc ') .ne. zero
+  if (accmap) then
+  !  print *,"accumulate sector maps"
+  else
+  !  print *,"clearing sector maps"
+    SRMAT = EYE 
+    STMAT = zero 
+  endif
 
 end SUBROUTINE twwmap
 
