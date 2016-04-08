@@ -43,7 +43,7 @@ char constant_def[] =
 "const pmass = 0.938272046; " 
 "const clight = 299792458.; "     
 "const qelect = 1.602176565e-19; "
-"const hbar = 6.58211928e-25; "
+"const hbar = 6.58211928e-25; " // GeV.s
 "const erad = 2.8179403267e-15; " 
 "const prad = erad*emass/pmass; ";
 

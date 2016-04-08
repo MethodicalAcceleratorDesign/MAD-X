@@ -276,7 +276,7 @@ end module bbfi
 module deltrafi
   implicit none
   public
-  logical :: dorad=.false., dodamp=.false., dorand=.false., fastune=.false.
+  logical :: radiate=.false., damp=.false., quantum=.false., fastune=.false.
   double precision :: deltax=0.d0
 end module deltrafi
 
@@ -354,7 +354,7 @@ module twissbeamfi
   use math_constfi, only : zero
   implicit none
   public
-  logical, save :: dorad=.false.
+  logical, save :: radiate=.false.
   double precision, save :: energy=zero, deltap=zero, beta=zero, gamma=zero, pc=zero
   double precision, save :: arad=zero, dtbyds=zero, charge=zero, npart=zero
 end module twissbeamfi
@@ -454,7 +454,7 @@ module trackfi
   double precision, save :: arad=0.d0, betas=0.d0, beti=0.d0, gammas=0.d0, dtbyds=0.d0
   double precision, save :: bet0=0.d0, bet0i=0.d0
   double precision :: deltas=0.d0, t_max=1.d20, pt_max=1.d20
-  logical :: dodamp=.false., dorad=.false., dorand=.false., fsecarb=.false.
+  logical :: radiate=.false., damp=.false., quantum=.false., fsecarb=.false.
 end module trackfi
 
 module time_varfi

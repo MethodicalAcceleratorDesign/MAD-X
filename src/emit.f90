@@ -50,7 +50,7 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   double precision :: betas, bx, gx
 
   integer :: i, j, j1, j2, k, k1, k2, eflag, n_align, code
-  logical :: fmap, stabx, staby, stabt, dorad
+  logical :: fmap, stabx, staby, stabt, radiate
 
   integer, external :: restart_sequ, advance_node, node_al_errors
   logical, external :: m66sta
@@ -99,10 +99,10 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   betas = get_value('probe ','beta ')
   gammas = get_value('probe ','gamma ')
   cg = arad * gammas**3 / three
-  dorad = get_value('probe ','radiate ') .ne. zero
+  radiate = get_value('probe ','radiate ') .ne. zero
 
   !---- Initialize damping calculation.
-  if (dorad .and. stabt) then
+  if (radiate .and. stabt) then
      SUM(:3) = zero
      sumu0 = zero
      RD = EYE 
@@ -132,7 +132,7 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
       call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
       if (.not. stabt) DISP = matmul(RE,DISP)
       EM = matmul(RE,EM) 
-      if (dorad .and. stabt) RD = matmul(RE,RD) 
+      if (radiate .and. stabt) RD = matmul(RE,RD) 
    endif
 
   !---- Keep orbit at entrance.
@@ -152,7 +152,7 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
 
      !---- Radiation damping.
      EM2 = matmul(RE,EM) 
-     if (dorad .and. stabt) then
+     if (radiate .and. stabt) then
         call emdamp(code, deltap, em, em2, orbit1, orbit, re)
         RD = matmul(RE,RD) 
      endif
@@ -179,7 +179,7 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
      call tmali2(el,orbit2,al_errors,betas,gammas,orbit,re)
      if (.not. stabt) DISP = matmul(RE,DISP) 
      EM = matmul(RE,EM) 
-     if (dorad .and. stabt) RD = matmul(RE,RD) 
+     if (radiate .and. stabt) RD = matmul(RE,RD) 
   endif
 
   if (advance_node().ne.0)  then
@@ -195,9 +195,9 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   qs = atan2(aival(5), reval(5)) / twopi ; if (qs .lt. zero) qs = - qs
 
   !---- Summary output.
-  call emsumm(rd,em,bmax,gmax,stabt,dorad,u0,emit_v,nemit_v,tunes,sig_v,pdamp)
+  call emsumm(rd,em,bmax,gmax,stabt,radiate,u0,emit_v,nemit_v,tunes,sig_v,pdamp)
 
-  updatebeam = dorad .and. stabt
+  updatebeam = radiate .and. stabt
 
 end subroutine emit
 
@@ -264,7 +264,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
      el = node_value('l ')
   endif
 
-  if (el .eq. zero .and. code .ne. 10) return !- no damping
+  if (el.eq.zero .and. code.ne.code_rfcavity) return !- no damping
   ! RF cavities with zero length still accepted beyond this point
 
   betas  = get_value('probe ','beta ')
@@ -634,7 +634,7 @@ subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
 
 end subroutine emdamp
 
-subroutine emsumm(rd,em,bmax,gmax,stabt,dorad,u0,emit_v,nemit_v, &
+subroutine emsumm(rd,em,bmax,gmax,stabt,radiate,u0,emit_v,nemit_v, &
                   tunes,sig_v,pdamp)
   use emitfi
   use math_constfi, only : zero, one, two, three, four, twopi
@@ -659,7 +659,7 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,dorad,u0,emit_v,nemit_v, &
   !   sig_v      (real)   sigx, sigy, sigt, sige
   !----------------------------------------------------------------------*
   double precision :: rd(6,6), em(6,6), bmax(3,3), gmax(3,3)
-  logical :: stabt, dorad
+  logical :: stabt, radiate
   double precision :: u0
   double precision :: emit_v(3), nemit_v(3), tunes(3), sig_v(4), pdamp(3)
 
@@ -684,7 +684,7 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,dorad,u0,emit_v,nemit_v, &
   freq0  = get_value('probe ','freq0 ')
 
   !---- Synchrotron energy loss [GeV].
-  if (stabt .and. dorad) then
+  if (stabt .and. radiate) then
      u0 = sumu0
 
      !---- Tunes.
@@ -749,15 +749,15 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,dorad,u0,emit_v,nemit_v, &
   !---- Summary output; header and global parameters.
   
   if (stabt) then !---- Dynamic case.
-     if (dorad) write (iqpr2, 910) ten3p * u0
+     if (radiate) write (iqpr2, 910) ten3p * u0
      write (iqpr2, 920) 1, 2, 3
      write (iqpr2, 930) qx, qy, qs
-     if (dorad) write (iqpr2, 940) tune
+     if (radiate) write (iqpr2, 940) tune
      write (iqpr2, 950) ((bstar(j,k), j = 1, 3), k = 1, 3), &
                         ((gstar(j,k), j = 1, 3), k = 1, 3), &
                         ((bmax(j,k), j = 1, 3), k = 1, 3),  &
                         ((gmax(j,k), j = 1, 3), k = 1, 3) 
-     if (dorad) then
+     if (radiate) then
         write (iqpr2, 960) pdamp, alj, (tau(j), j = 1, 3), &
                            ex*tenp6, ey*tenp6, et*tenp6
      endif

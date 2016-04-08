@@ -84,16 +84,16 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   if (circ .eq. zero) call fort_fail('TWISS: ', 'Zero length sequence.')
 
   !---- Get beam parameters
-  dorad  = get_value('probe ','radiate ') .ne. zero  
-  energy = get_value('probe ','energy ')
-  deltap = get_value('probe ','deltap ')
-  beta   = get_value('probe ','beta ')
-  gamma  = get_value('probe ','gamma ')
-  pc     = get_value('probe ','pc ')
-  arad   = get_value('probe ','arad ')
-  dtbyds = get_value('probe ','dtbyds ')
-  charge = get_value('probe ','charge ')
-  npart  = get_value('probe ','npart ')
+  radiate = get_value('probe ','radiate ') .ne. zero  
+  energy  = get_value('probe ','energy ')
+  deltap  = get_value('probe ','deltap ')
+  beta    = get_value('probe ','beta ')
+  gamma   = get_value('probe ','gamma ')
+  pc      = get_value('probe ','pc ')
+  arad    = get_value('probe ','arad ')
+  dtbyds  = get_value('probe ','dtbyds ')
+  charge  = get_value('probe ','charge ')
+  npart   = get_value('probe ','npart ')
   
   !---- Set fast_error_func flag to use faster error function
   !---- including tables. Thanks to late G. Erskine
@@ -181,7 +181,7 @@ SUBROUTINE tmrefe(rt)
   double precision, external :: get_value
   
   !---- Get beam parameters
-  dorad  = get_value('probe ','radiate ') .ne. zero  
+  radiate  = get_value('probe ','radiate ') .ne. zero  
   energy = get_value('probe ','energy ')
   deltap = get_value('probe ','deltap ')
   beta   = get_value('probe ','beta ')
@@ -226,7 +226,7 @@ SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
   integer, parameter :: izero=0, ione=1
 
   !---- Get beam parameters
-  dorad  = get_value('probe ','radiate ') .ne. zero  
+  radiate  = get_value('probe ','radiate ') .ne. zero  
   energy = get_value('probe ','energy ')
   deltap = get_value('probe ','deltap ')
   beta   = get_value('probe ','beta ')
@@ -1541,7 +1541,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   use twisscfi
   use twiss_elpfi
   use twissotmfi
-  use twissbeamfi, only : dorad, beta, gamma
+  use twissbeamfi, only : radiate, beta, gamma
   use spch_bbfi
   use name_lenfi
   use matrices, only: EYE
@@ -1763,7 +1763,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   cosmuy = (rt(3,3) + rt(4,4)) / two
 
   !---- Warning messages.
-  if (cplxt .or. dorad) & 
+  if (cplxt .or. radiate) & 
        call fort_warn('TWCPGO: ','TWISS uses the RF system or synchrotron radiation only '// & 
                        'to find the closed orbit, for optical calculations it ignores both.')
 
@@ -2560,7 +2560,7 @@ SUBROUTINE twchgo
   use twisslfi
   use twissafi
   use twisscfi
-  use twissbeamfi, only : dorad, deltap, beta, gamma
+  use twissbeamfi, only : radiate, deltap, beta, gamma
   use spch_bbfi
   use math_constfi, only : zero, one, two
   use code_constfi
@@ -2694,7 +2694,7 @@ SUBROUTINE twchgo
           "chromatic functions may be wrong."
      call fort_warn('TWCHGO: ',msg)
   endif
-  if (cplxt .or. dorad) then
+  if (cplxt .or. radiate) then
      call fort_warn('TWCHGO: ','TWISS uses the RF system or synchrotron radiation '// &
                  'only to find the closed orbit, for optical calculations it '// &
                  'ignores both.')
@@ -3159,7 +3159,7 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
-  use twissbeamfi, only : dorad, deltap, gamma, arad
+  use twissbeamfi, only : radiate, deltap, gamma, arad
   use matrices
   use math_constfi, only : zero, one, two, three
   use code_constfi
@@ -3241,7 +3241,7 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
      sks = bvk * (sks + f_errors(3) / el) / (one + deltap) ! skew quad term       
 
      !---- Half radiation effects at entrance.
-     if (ftrk .and. dorad) then
+     if (ftrk .and. radiate) then
         ct = cos(tilt)
         st = sin(tilt)
         x =   orbit(1) * ct + orbit(3) * st
@@ -3317,7 +3317,7 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
         call tmtrak(ek,re,te,orbit,orbit)
 
         !---- Half radiation effects at exit.
-        if (ftrk .and. dorad) then
+        if (ftrk .and. radiate) then
            x =   orbit(1) * ct + orbit(3) * st
            y = - orbit(1) * st + orbit(3) * ct
            hx = h + dh + sk1*(x - h*y**2/two) + sks*y + sk2*(x**2 - y**2)/two
@@ -3576,33 +3576,9 @@ SUBROUTINE tmsect(fsec,el,h,dh,sk1,sk2,ek,re,te)
 
 end SUBROUTINE tmsect
 
-SUBROUTINE tmsymm(t)
-  implicit none
-  !----------------------------------------------------------------------*
-  !     Purpose:                                                         *
-  !     Symmetrize second-order array T.                                 *
-  !     Input:                                                           *
-  !     t(6,6,6)  (double)  array to be symmetrized.                     *
-  !     Output:                                                          *
-  !     t(6,6,6)  (double)  symmetrized array.                           *
-  !----------------------------------------------------------------------*
-  double precision :: t(6,6,6)
-
-  integer :: i, j, k
-
-  do k = 1, 5
-     do j = k+1, 6
-        do i = 1, 6
-           t(i,j,k) = t(i,k,j)
-        enddo
-     enddo
-  enddo
-
-end SUBROUTINE tmsymm
-
 SUBROUTINE tmfrng(fsec,h,sk1,edge,he,sig,corr,re,te)
   use matrices, only : EYE
-  use math_constfi, only : zero, one
+  use math_constfi, only : zero, one, two
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -3636,10 +3612,10 @@ SUBROUTINE tmfrng(fsec,h,sk1,edge,he,sig,corr,re,te)
   !---- Second-order terms.
   if (fsec) then
      TE = zero
-     hh = sig * (h/2)
+     hh = sig * (h/two)
      te(1,1,1) = - hh * tanedg**2
      te(1,3,3) = + hh * secedg**2
-     te(2,1,1) = (h/2) * he * secedg**3 + sk1 * tanedg
+     te(2,1,1) = (h/two) * he * secedg**3 + sk1 * tanedg
      te(2,1,2) = - te(1,1,1)
      te(2,3,3) = hh * h * tanedg**3 - te(2,1,1)
      te(2,3,4) = + te(1,1,1)
@@ -3648,10 +3624,10 @@ SUBROUTINE tmfrng(fsec,h,sk1,edge,he,sig,corr,re,te)
      te(4,1,4) = + te(1,1,1)
      te(4,2,3) = - te(1,3,3)
      if (sig .gt. zero) then
-        te(2,3,3) = te(2,3,3) + (h*secedg)**2 * tanedg/2
+        te(2,3,3) = te(2,3,3) + (h*secedg)**2 * tanedg/two
      else
-        te(2,1,1) = te(2,1,1) - (h*tanedg)**2 * tanedg/2
-        te(4,1,3) = te(4,1,3) + (h*secedg)**2 * tanedg/2
+        te(2,1,1) = te(2,1,1) - (h*tanedg)**2 * tanedg/two
+        te(4,1,3) = te(4,1,3) + (h*secedg)**2 * tanedg/two
      endif
      call tmsymm(te)
   endif
@@ -3751,7 +3727,7 @@ end SUBROUTINE tmtilt
 SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use math_constfi, only : zero, one, three, half
-  use twissbeamfi, only : dorad, deltap, gamma, arad
+  use twissbeamfi, only : radiate, deltap, gamma, arad
   use code_constfi
   implicit none
   !----------------------------------------------------------------------*
@@ -3833,7 +3809,7 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
      orbit(4) = orbit(4) + half * dpy
 
      !---- Half radiation effects at entrance.
-     if (dorad  .and.  el.ne.zero) then
+     if (radiate  .and.  el.ne.zero) then
         rfac = arad * gamma**3 * (dpx**2 + dpy**2) / (three * el)
         pt = orbit(6)
         orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
@@ -3845,7 +3821,7 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
      if (el .ne. zero) call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
      !---- Half radiation effects at exit.
-     if (dorad  .and.  el.ne.zero) then
+     if (radiate  .and.  el.ne.zero) then
         pt = orbit(6)
         orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
         orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
@@ -3864,7 +3840,7 @@ end SUBROUTINE tmcorr
 SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   use twtrrfi
   use twisslfi
-  use twissbeamfi, only : dorad, deltap, beta, gamma, arad
+  use twissbeamfi, only : radiate, deltap, beta, gamma, arad
   use math_constfi, only : zero, one, two, three
   implicit none
   !----------------------------------------------------------------------*
@@ -3985,7 +3961,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
 
 
      !---- Radiation effects at entrance.
-     if (dorad  .and.  elrad.ne.zero) then
+     if (radiate  .and.  elrad.ne.zero) then
         dpxr = dpx + dipr
         dpyr = dpy + dipi
         rfac = arad * gamma**3 * (dpxr**2+dpyr**2) / (three*elrad)
@@ -4007,7 +3983,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
      endif
 
      !---- Radiation effects at exit.
-     if (dorad  .and.  elrad.ne.zero) then
+     if (radiate  .and.  elrad.ne.zero) then
         pt = orbit(6)
         orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
         orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
@@ -4085,7 +4061,7 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
-  use twissbeamfi, only : dorad, deltap, gamma, arad
+  use twissbeamfi, only : radiate, deltap, gamma, arad
   use matrices, only : EYE
   use math_constfi, only : zero, one, two, three, four, six
   implicit none
@@ -4163,7 +4139,7 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
   orbit(4) = orbit(4) + ci / two
   
   !---- Half radiation effects at entrance.
-  if (dorad) then
+  if (radiate) then
      rfac = arad * gamma**3 * (cr**2 + ci**2) / (three * el)
      pt = orbit(6)
      orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
@@ -4226,7 +4202,7 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
   orbit(4) = orbit(4) + ci / two
 
   !---- Half radiation effects.
-  if (dorad) then
+  if (radiate) then
      rfac = arad * gamma**3 * (cr**2 + ci**2) / (three * el)
      pt = orbit(6)
      orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
@@ -4670,7 +4646,7 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
-  use twissbeamfi, only : dorad, deltap, gamma, arad
+  use twissbeamfi, only : radiate, deltap, gamma, arad
   use math_constfi, only : zero, one, two, three
   implicit none
   !----------------------------------------------------------------------*
@@ -4745,7 +4721,7 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
   sk1 = sk1 / (one + deltap)
 
   !---- Half radiation effect at entry.
-  if (dorad .and. ftrk) then
+  if (radiate .and. ftrk) then
      rfac = (arad * gamma**3 * sk1**2 * el / three) * (orbit(1)**2 + orbit(3)**2)
      pt = orbit(6)
      orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
@@ -4766,7 +4742,7 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
   call qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
 
   !---- Half radiation effect at exit.
-  if (dorad .and. ftrk) then
+  if (radiate .and. ftrk) then
      rfac = (arad * gamma**3 * sk1**2 * el / three) * (orbit(1)**2 + orbit(3)**2)
      pt = orbit(6)
      orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
@@ -5096,7 +5072,7 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
-  use twissbeamfi, only : dorad, deltap, gamma, arad
+  use twissbeamfi, only : radiate, deltap, gamma, arad
   use math_constfi, only : zero, one, two, three, twelve
   implicit none
   !----------------------------------------------------------------------*
@@ -5168,7 +5144,7 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
   sk2 = sk2 / (one + deltap)
 
   !---- Half radiation effects at entrance.
-  if (ftrk .and. dorad) then
+  if (ftrk .and. radiate) then
      rfac = arad * gamma**3 * sk2**2 * el * (orbit(1)**2 + orbit(3)**2)**2 / twelve
      pt = orbit(6)
      orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
@@ -5191,7 +5167,7 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   !---- Half radiation effects at exit.
   if (ftrk) then
-     if (dorad) then
+     if (radiate) then
         rfac = arad * gamma**3 * sk2**2 * el * (orbit(1)**2 + orbit(3)**2)**2 / twelve
         pt = orbit(6)
         orbit(2) = orbit(2) - rfac * (one + pt) * orbit(2)
@@ -6026,6 +6002,30 @@ SUBROUTINE tmsymp(r)
     endif
 
 end SUBROUTINE tmsymp
+
+SUBROUTINE tmsymm(t)
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Symmetrize second-order array T.                                 *
+  !     Input:                                                           *
+  !     t(6,6,6)  (double)  array to be symmetrized.                     *
+  !     Output:                                                          *
+  !     t(6,6,6)  (double)  symmetrized array.                           *
+  !----------------------------------------------------------------------*
+  double precision :: t(6,6,6)
+
+  integer :: i, j, k
+
+  do k = 1, 5
+     do j = k+1, 6
+        do i = 1, 6
+           t(i,j,k) = t(i,k,j)
+        enddo
+     enddo
+  enddo
+
+end SUBROUTINE tmsymm
 
 subroutine m66div(anum,aden,target,eflag)
   implicit none
@@ -7357,7 +7357,7 @@ end SUBROUTINE tmnll
 SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
   use twtrrfi
   use twisslfi
-  use twissbeamfi, only : dorad, deltap, beta, gamma, pc, arad
+  use twissbeamfi, only : radiate, deltap, beta, gamma, pc, arad
   use math_constfi, only : zero, one, two, three, ten3m, ten6p, pi, twopi
   use phys_constfi, only : clight
   implicit none
@@ -7511,7 +7511,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
      dpt =  vrf * sin(lag * twopi - krf * z) - krf * REAL(Sp1);
      
      !---- Radiation effects at entrance.
-     if (dorad  .and.  elrad .ne. zero) then
+     if (radiate  .and.  elrad .ne. zero) then
         rfac = arad * gamma**3 * (dpx**2+dpy**2) / (three*elrad)
         px = px - rfac * (one + pt) * px
         py = py - rfac * (one + pt) * py
@@ -7524,7 +7524,7 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
      pt = pt + dpt
   
      !---- Radiation effects at exit.
-     if (dorad  .and.  elrad .ne. zero) then
+     if (radiate  .and.  elrad .ne. zero) then
         px = px - rfac * (one + pt) * px
         py = py - rfac * (one + pt) * py
         pt = pt - rfac * (one + pt) ** 2
@@ -7769,7 +7769,7 @@ end subroutine tmfoc
 SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   use twtrrfi
   use twisslfi
-  use twissbeamfi, only : dorad, deltap, pc, beta, gamma, arad
+  use twissbeamfi, only : radiate, deltap, pc, beta, gamma, arad
   use math_constfi, only : zero, one, two, three, half, quarter, ten3m, ten3p, ten6p, pi, twopi
   use phys_constfi, only : clight
   use matrices, only : EYE
@@ -7904,7 +7904,7 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
      dpt = - krf * REAL(Sp1);
      
      !---- Radiation effects at entrance.
-     if (dorad  .and.  elrad .ne. zero) then
+     if (radiate  .and.  elrad .ne. zero) then
         rfac = arad * gamma**3 * (dpx**2+dpy**2) / (three*elrad)
         px = px - rfac * (one + pt) * px
         py = py - rfac * (one + pt) * py
@@ -7917,7 +7917,7 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
      pt = pt + dpt
   
      !---- Radiation effects at exit.
-     if (dorad  .and.  elrad .ne. zero) then
+     if (radiate  .and.  elrad .ne. zero) then
         px = px - rfac * (one + pt) * px
         py = py - rfac * (one + pt) * py
         pt = pt - rfac * (one + pt) ** 2

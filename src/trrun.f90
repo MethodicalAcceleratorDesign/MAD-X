@@ -96,7 +96,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   gammas = get_value('probe ','gamma ')
   dtbyds = get_value('probe ','dtbyds ')
   arad   = get_value('probe ','arad ')
-  dorad  = get_value('probe ','radiate ') .ne. zero
+  radiate  = get_value('probe ','radiate ') .ne. zero
 
   bet0  =  get_value('beam ','beta ')
 
@@ -105,8 +105,8 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
 
   deltas = get_variable('track_deltap ')
 
-  dodamp = get_option('damp ') .ne. 0
-  dorand = get_option('quantum ') .ne. 0
+  damp = get_option('damp ') .ne. 0
+  quantum = get_option('quantum ') .ne. 0
 
   !-------added by Yipeng SUN 01-12-2008--------------
   if (deltap .eq. zero) then
@@ -707,8 +707,8 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
      enddo
   endif
 
-  !---- Test aperture. ALL ELEMENTS BUT DRIFTS and BEAMBEAM (code 22)
-  if (aperflag .and. code.ne.22) then
+  !---- Test aperture. ALL ELEMENTS BUT DRIFTS and BEAMBEAM
+  if (aperflag .and. code.ne.code_beambeam) then
      nn=name_len
      call node_string('apertype ',aptype,nn)
 
@@ -753,7 +753,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
     case (code_rfcavity)
        call ttrf(track,ktrack)
        if (run) &
-            call ttrfloss(turn, sum, part_id, last_turn, last_pos,last_orbit,track,ktrack)
+            call ttrfloss(turn,sum,part_id,last_turn,last_pos,last_orbit,track,ktrack)
        
     case (code_elseparator)
        call ttsep(el, track, ktrack)
@@ -936,9 +936,6 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
      call dcopy(f_errors,field,nd+2)
      n_ferr = store_no_fd_err(f_errors,n_ferr)
 
-!  else
-!     if (n_ferr .gt. 0) &
-!          call dcopy(f_errors,field,n_ferr)
   endif
 
   !-----added FrankS, 10-12-2008
@@ -959,78 +956,48 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   !---- Other components and errors.
   nord = 0
   do iord = 1, nd/2
-     ! do j = 1, 2
-     !    !          field(j,iord) = bvk * (vals(j,iord) + field(j,iord))          &
-     !    !     / (one + deltas)
-     !    field(j,iord) = bvk * (vals(j,iord) + field(j,iord))
-     !    if (field(j,iord) .ne. zero)  nord = iord
-     ! enddo
      f_errors(2*iord)   = bvk * (f_errors(2*iord) + normal(iord))
      f_errors(2*iord+1) = bvk * (f_errors(2*iord+1) + skew(iord))
      if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero) nord=iord
   enddo
 
-  !print *, 'ttmult; found nord=',nord
-
   !---- Pure dipole: only quadrupole kicks according to lrad.
   if (nord .eq. 0) then
      dxt(:ktrack) = zero
      dyt(:ktrack) = zero
-     !do jtrk = 1,ktrack
-     !   dxt(jtrk) = zero
-     !   dyt(jtrk) = zero
-     !enddo
      !----------- introduction of dipole focusing
      if (elrad.gt.zero .and. get_option('thin_foc ').eq.1) then
 
         DXT(:ktrack) = dipr*dipr*TRACK(1,:ktrack)/elrad
         DYT(:ktrack) = dipi*dipi*TRACK(3,:ktrack)/elrad
-        !do jtrk = 1,ktrack
-        !   dxt(jtrk) =  dipr*dipr*track(1,jtrk)/elrad
-        !   dyt(jtrk) =  dipi*dipi*track(3,jtrk)/elrad
-        !enddo
      endif
   !---- Accumulate multipole kick from highest multipole to quadrupole.
   else
      DXT(:ktrack) = f_errors(2*nord)*TRACK(1,:ktrack) - f_errors(2*nord+1)*TRACK(3,:ktrack)
      DYT(:ktrack) = f_errors(2*nord)*TRACK(3,:ktrack) + f_errors(2*nord+1)*TRACK(1,:ktrack)
-     !do jtrk = 1,ktrack
-     !   dxt(jtrk) = field(1,nord)*track(1,jtrk) - field(2,nord)*track(3,jtrk)
-     !   dyt(jtrk) = field(1,nord)*track(3,jtrk) + field(2,nord)*track(1,jtrk)
-     !enddo
 
      do iord = nord - 1, 1, -1
         do jtrk = 1,ktrack
            dx = dxt(jtrk)*ordinv(iord+1) + f_errors(2*iord)
            dy = dyt(jtrk)*ordinv(iord+1) + f_errors(2*iord+1)           
-           !dx = dxt(jtrk)*ordinv(iord+1) + field(1,iord)
-           !dy = dyt(jtrk)*ordinv(iord+1) + field(2,iord)
            dxt(jtrk) = dx*track(1,jtrk) - dy*track(3,jtrk)
            dyt(jtrk) = dx*track(3,jtrk) + dy*track(1,jtrk)
         enddo
      enddo
-     !        do jtrk = 1,ktrack
-     !          dxt(jtrk) = dxt(jtrk) / (one + deltas)
-     !          dyt(jtrk) = dyt(jtrk) / (one + deltas)
-     !        enddo
      if (elrad.gt.zero .and. get_option('thin_foc ').eq.1) then
-        dxt(:ktrack) = dxt(:ktrack) + dipr*dipr*track(1,:ktrack)/elrad
-        dyt(:ktrack) = dyt(:ktrack) + dipi*dipi*track(3,:ktrack)/elrad
-        !do jtrk = 1,ktrack
-        !   dxt(jtrk) = dxt(jtrk) + dipr*dipr*track(1,jtrk)/elrad
-        !   dyt(jtrk) = dyt(jtrk) + dipi*dipi*track(3,jtrk)/elrad
-        !enddo
+        DXT(:ktrack) = DXT(:ktrack) + dipr*dipr*TRACK(1,:ktrack)/elrad
+        DYT(:ktrack) = DYT(:ktrack) + dipi*dipi*TRACK(3,:ktrack)/elrad
      endif
   endif
 
   !---- Radiation loss at entrance.
-  if (dorad .and. elrad .ne. 0) then
+  if (radiate .and. elrad .ne. 0) then
      !---- Full damping.
-     if (dodamp) then
+     if (damp) then
         do jtrk = 1,ktrack
            curv = sqrt((dipr + dxt(jtrk))**2 + (dipi + dyt(jtrk))**2) / elrad
 
-           if (dorand) then
+           if (quantum) then
               call trphot(elrad,curv,rfac,deltas)
            else
               rfac = const * curv**2 * elrad
@@ -1048,14 +1015,15 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
      else
 
         !---- Store energy loss on closed orbit.
+        ! 2016-Mar-16  18:45:41  ghislain: track(i,1) is not the closed orbit but the first particle!!!
         rfac = const * ((dipr + dxt(1))**2 + (dipi + dyt(1))**2)
         rpx1 = rfac * (one + track(6,1)) * track(2,1)
         rpy1 = rfac * (one + track(6,1)) * track(4,1)
         rpt1 = rfac * (one + track(6,1)) ** 2
 
-        track(2,:ktrack) = track(2,:ktrack) - rpx1
-        track(4,:ktrack) = track(4,:ktrack) - rpy1
-        track(6,:ktrack) = track(6,:ktrack) - rpt1        
+        TRACK(2,:ktrack) = TRACK(2,:ktrack) - rpx1 
+        TRACK(4,:ktrack) = TRACK(4,:ktrack) - rpy1 
+        TRACK(6,:ktrack) = TRACK(6,:ktrack) - rpt1 
         
      endif
   endif
@@ -1075,13 +1043,13 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   enddo
 
   !---- Radiation loss at exit.
-  if (dorad .and. elrad .ne. 0) then
+  if (radiate .and. elrad .ne. 0) then
      !---- Full damping.
-     if (dodamp) then
+     if (damp) then
         do jtrk = 1,ktrack
            curv = sqrt((dipr + dxt(jtrk))**2 + (dipi + dyt(jtrk))**2) / elrad
 
-           if (dorand) then
+           if (quantum) then
               call trphot(elrad,curv,rfac,deltas)
            else
               rfac = const * curv**2 * elrad
@@ -1104,9 +1072,9 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
         rpy2 = rfac * (one + track(6,1)) * track(4,1)
         rpt2 = rfac * (one + track(6,1)) ** 2
 
-        track(2,:ktrack) = track(2,:ktrack) - rpx2
-        track(4,:ktrack) = track(4,:ktrack) - rpy2
-        track(6,:ktrack) = track(6,:ktrack) - rpt2
+        TRACK(2,:ktrack) = TRACK(2,:ktrack) - rpx2
+        TRACK(4,:ktrack) = TRACK(4,:ktrack) - rpy2
+        TRACK(6,:ktrack) = TRACK(6,:ktrack) - rpt2
 
      endif
   endif
@@ -1561,17 +1529,19 @@ subroutine ttsep(el,track,ktrack)
   ey = node_value('ey_l ')
 
   charge = get_value('probe ','charge ')
-  mass   = get_value('probe ','mass ')
+  !mass   = get_value('probe ','mass ')
   pc     = get_value('probe ','pc ')
   beta   = get_value('probe ','beta ')
 
+  ! 2016-Mar-17  09:16:12  ghislain: TILT was already taken into account before entrance of element!!!
   tilt = node_value('tilt ')
   cos_tilt = cos(tilt)
   sin_tilt = sin(tilt)
 
   efieldx =  ex*cos_tilt + ey*sin_tilt
   efieldy = -ex*sin_tilt + ey*cos_tilt
-
+  ! end comment
+  
   do i = 1, ktrack
      deltap = sqrt(one - one/beta/beta + (track(6,i)+one/beta)**2) - one
      kick0 = charge * ten3m / pc / (one+deltap) / beta
@@ -1617,9 +1587,9 @@ subroutine ttcorr(el,track,ktrack,turn)
   betas = get_value('probe ','beta ')
   gammas = get_value('probe ','gamma ')
   dtbyds = get_value('probe ','dtbyds ')
-  dorad = get_value('probe ','radiate ') .ne. zero
-  dodamp = get_option('damp ') .ne. 0
-  dorand = get_option('quantum ') .ne. 0
+  radiate = get_value('probe ','radiate ') .ne. zero
+  damp = get_option('damp ') .ne. 0
+  quantum = get_option('quantum ') .ne. 0
 
   code = node_value('mad8_type ')
   if (code .eq. code_tkicker)      code = code_kicker
@@ -1678,16 +1648,16 @@ subroutine ttcorr(el,track,ktrack,turn)
   bi2gi2 = one / (betas * gammas) ** 2
 
   !---- Half radiation effects at entrance.
-  if (dorad  .and.  el .ne. 0) then
-     if (dodamp .and. dorand) then
+  if (radiate  .and.  el .ne. 0) then
+     if (damp .and. quantum) then
         curv = sqrt(dpx**2 + dpy**2) / el
      else
         rfac = arad * gammas**3 * (dpx**2 + dpy**2) / (three * el)
      endif
 
-     if (dodamp) then !---- Full damping.
+     if (damp) then !---- Full damping.
         do i = 1, ktrack
-           if (dorand) call trphot(el,curv,rfac,deltas)
+           if (quantum) call trphot(el,curv,rfac,deltas)
            px = track(2,i)
            py = track(4,i)
            pt = track(6,i)
@@ -1768,10 +1738,10 @@ subroutine ttcorr(el,track,ktrack,turn)
 
   !---- Half radiation effects at exit.
   !     If not random, use same RFAC as at entrance.
-  if (dorad  .and.  el .ne. 0) then
-     if (dodamp) then !---- Full damping.
+  if (radiate  .and.  el .ne. 0) then
+     if (damp) then !---- Full damping.
         do i = 1, ktrack
-           if (dorand) call trphot(el,curv,rfac,deltas)
+           if (quantum) call trphot(el,curv,rfac,deltas)
            px = track(2,i)
            py = track(4,i)
            pt = track(6,i)
@@ -3269,9 +3239,9 @@ subroutine trclor(switch,orbit0)
   deltas = get_variable('track_deltap ')
   deltap = get_value('probe ','deltap ')
   arad   = get_value('probe ','arad ')
-  dorad  = get_value('probe ','radiate ') .ne. zero
-  dodamp = get_option('damp ') .ne. 0
-  dorand = get_option('quantum ') .ne. 0
+  radiate  = get_value('probe ','radiate ') .ne. zero
+  damp = get_option('damp ') .ne. 0
+  quantum = get_option('quantum ') .ne. 0
 
   ORBIT = ORBIT0 
 
@@ -3918,7 +3888,7 @@ subroutine ttrfmult(track, ktrack, turn)
   bvk = node_value('other_bv ')
   elrad = node_value('lrad ')
   deltap = get_value('probe ', 'deltap ')
-  dorad = get_value('probe ','radiate ') .ne. zero
+  radiate = get_value('probe ','radiate ') .ne. zero
   arad = get_value('probe ','arad ')
   gammas = get_value('probe ','gamma ')
   beta = get_value('probe ','beta ')
@@ -3985,7 +3955,7 @@ subroutine ttrfmult(track, ktrack, turn)
     dpt = (volt * ten3m * sin(lag * twopi - krf * z) / pc - krf * REAL(Sp1));
 
     !---- Radiation effects at entrance.
-    if (dorad  .and.  elrad .ne. zero) then
+    if (radiate  .and.  elrad .ne. zero) then
       rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
       px = px - rfac * (one + pt) * px
       py = py - rfac * (one + pt) * py
@@ -3998,7 +3968,7 @@ subroutine ttrfmult(track, ktrack, turn)
     pt = pt + dpt
 
     !---- Radiation effects at exit.
-    if (dorad  .and.  elrad .ne. zero) then
+    if (radiate  .and.  elrad .ne. zero) then
       px = px - rfac * (one + pt) * px
       py = py - rfac * (one + pt) * py
       pt = pt - rfac * (one + pt) ** 2
@@ -4081,7 +4051,7 @@ subroutine tttquad(track, ktrack)
      pt = track(6,jtrk);
 
 !!$    !---- Radiation effects at entrance.
-!!$    if (dorad  .and.  elrad .ne. zero) then
+!!$    if (radiate  .and.  elrad .ne. zero) then
 !!$      rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
 !!$      track(2,jtrk) = track(2,jtrk) - rfac * (one + track(6,jtrk)) * track(2,jtrk)
 !!$      track(4,jtrk) = track(4,jtrk) - rfac * (one + track(6,jtrk)) * track(4,jtrk)
@@ -4170,7 +4140,7 @@ subroutine tttquad(track, ktrack)
      !track(6,jtrk) = pt ! unchanged
 
 !!$    !---- Radiation effects at exit.
-!!$    if (dorad  .and.  elrad .ne. zero) then
+!!$    if (radiate  .and.  elrad .ne. zero) then
 !!$      track(2,jtrk) = track(2,jtrk) - rfac * (one + track(6,jtrk)) * track(2,jtrk)
 !!$      track(4,jtrk) = track(4,jtrk) - rfac * (one + track(6,jtrk)) * track(4,jtrk)
 !!$      track(6,jtrk) = track(6,jtrk) - rfac * (one + track(6,jtrk)) ** 2
@@ -4206,29 +4176,27 @@ subroutine tttdipole(track, ktrack)
   double precision :: delta_plus_1, delta_plus_1_sqr, sqrt_delta_plus_1
   double precision :: sqrt_h_sqrt_k0, sqrt_h_div_sqrt_k0, sqrt_k0_div_sqrt_h
   double precision :: C, S, C_sqr
-  double precision :: gamma, hx, hy, get_value, rfac
+  double precision :: gamma, hx2, hy2, rfac
   double precision :: bet0sqr
   double precision :: e1, e2, h1, h2, hgap, fint, fintx
-  logical :: kill_ent_fringe, kill_exi_fringe
+  
+  double precision, external :: node_value, get_value 
 
-  double precision, external :: node_value
+  arad    = get_value('probe ','arad ')
+  gamma   = get_value('probe ','gamma ')
+  radiate = get_value('probe ','radiate ') .ne. zero
 
   !---- Read-in dipole edges angles
-  e1 = node_value('e1 ');
-  e2 = node_value('e2 ');
-  h1 = node_value('h1 ')
-  h2 = node_value('h2 ')
-  hgap = node_value('hgap ')
-  fint = node_value('fint ')
+  e1    = node_value('e1 ');
+  e2    = node_value('e2 ');
+  h1    = node_value('h1 ')
+  h2    = node_value('h2 ')
+  hgap  = node_value('hgap ')
+  fint  = node_value('fint ')
   fintx = node_value('fintx ')
-  kill_ent_fringe = node_value('kill_ent_fringe ') .ne. zero
-  kill_exi_fringe = node_value('kill_exi_fringe ') .ne. zero
-  arad = get_value('probe ','arad ')
-  gamma = get_value('probe ','gamma ')
-  dorad = get_value('probe ','radiate ') .ne. zero
 
   !---- Apply entrance dipole edge effect
-  if (.not.kill_ent_fringe) &
+  if (node_value('kill_ent_fringe ') .eq. zero) &
        call ttdpdg_map(track, ktrack, e1, h1, hgap, fint, zero)
   
   !---- Read-in the parameters
@@ -4250,12 +4218,11 @@ subroutine tttdipole(track, ktrack)
      pt = track(6,jtrk);
   
      !---- Radiation effects at entrance.
-     if (dorad) then
-        delta_plus_1_sqr = pt*pt + two*pt/bet0 + one;
-        delta_plus_1 = sqrt(delta_plus_1_sqr);
-        hx = one/(rho*delta_plus_1);
-        hy = zero;
-        rfac = (arad * gamma**3 * L / three) * (hx**2 + hy**2) * (one + h*x) * (one - tan(e1)*x)
+     ! classical effect only with damping 
+     if (radiate) then
+        hx2 = one / (rho**2  *  (pt*pt + two*pt/bet0 + one));
+        hy2 = zero;
+        rfac = (arad * gamma**3 * L / three) * (hx2 + hy2) * (one + h*x) * (one - tan(e1)*x)
         px = px - rfac * (one + pt) * px
         py = py - rfac * (one + pt) * py
         pt = pt - rfac * (one + pt) ** 2
@@ -4267,14 +4234,19 @@ subroutine tttdipole(track, ktrack)
      sqrt_h_sqrt_k0 = sign(sqrt(h*k0),k0);
      sqrt_h_div_sqrt_k0 = sqrt(h/k0);
      sqrt_k0_div_sqrt_h = sqrt(k0/h);
-     C=cos(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1);
-     S=sin(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1);
+
+     C = cos(sqrt_h_sqrt_k0 * L / sqrt_delta_plus_1);
+     S = sin(sqrt_h_sqrt_k0 * L / sqrt_delta_plus_1);
      C_sqr = C*C;
-     x_ = px*S/(sqrt_delta_plus_1*sqrt_h_sqrt_k0)+x*C-delta_plus_1*C/k0+C/h+delta_plus_1/k0-one/h;
-     px_ = -sqrt_delta_plus_1*sqrt_h_sqrt_k0*x*S- &
-          sqrt_delta_plus_1*sqrt_k0_div_sqrt_h*S+delta_plus_1*sqrt_delta_plus_1*sqrt_h_div_sqrt_k0*S+px*C;
+     
+     x_  = px*S/(sqrt_delta_plus_1*sqrt_h_sqrt_k0)+x*C-delta_plus_1*C/k0+C/h+delta_plus_1/k0-one/h;
+     px_ = -sqrt_delta_plus_1*sqrt_h_sqrt_k0*x*S - &
+            sqrt_delta_plus_1*sqrt_k0_div_sqrt_h*S + &
+            delta_plus_1*sqrt_delta_plus_1*sqrt_h_div_sqrt_k0*S + px*C;
+     
      y_  = y + py * L / delta_plus_1; 
-     py_ = py; 
+     py_ = py; ! unchanged
+
      z_  = z + pt*L*(one-bet0sqr)/bet0sqr + &
           (-half*(bet0*pt+one)/bet0/(delta_plus_1**3) * &
           (x*x*delta_plus_1*(h*k0*L-sqrt_delta_plus_1*sqrt_h_sqrt_k0*C*S)*half + &
@@ -4289,35 +4261,32 @@ subroutine tttdipole(track, ktrack)
           delta_plus_1**(five*half)*C*S/(sqrt_h_sqrt_k0)+ &
           (-delta_plus_1**(seven*half)*sqrt_h_div_sqrt_k0*C*S*half/k0 + &
           delta_plus_1*L*(delta_plus_1*(delta_plus_1*h/k0*half-one)+k0/h*half)))));
-     !pt_ = pt; ! unchanged
+     pt_ = pt; ! unchanged
      
-     x = x_;
-     y = y_;
-     z = z_;
-     px = px_;
-     py = py_;
-     !pt = pt_; ! unchanged
+     x  = x_;     y = y_;     z = z_;
+     px = px_;   py = py_;   pt = pt_; 
      
+     !---- Radiation effects at exit.
+     if (radiate) then
+        hx2 = one / (rho**2  *  (pt*pt + two*pt/bet0 + one));
+        rfac = (arad * gamma**3 * L / three) * (hx2 + hy2) * (one + h*x) * (one - tan(e2)*x)
+        px = px - rfac * (one + pt) * px
+        py = py - rfac * (one + pt) * py
+        pt = pt - rfac * (one + pt) ** 2
+     endif
+
      !---- Applies the kick
      track(1,jtrk) = x
      track(2,jtrk) = px
      track(3,jtrk) = y
      track(4,jtrk) = py
      track(5,jtrk) = z
-     !track(6,jtrk) = pt ! unchanged
+     track(6,jtrk) = pt 
      
-     !---- Radiation effects at exit.
-     if (dorad) then
-        hx = one/(rho*delta_plus_1);
-        rfac = (arad * gamma**3 * L / three) * (hx**2 + hy**2) * (one + h*x) * (one - tan(e2)*x)
-        px = px - rfac * (one + pt) * px
-        py = py - rfac * (one + pt) * py
-        pt = pt - rfac * (one + pt) ** 2
-     endif
   enddo
   
   !---- Apply exit dipole edge effect
-  if (.not.kill_exi_fringe) then
+  if (node_value('kill_exi_fringe ') .eq. zero) then
      if (fintx .lt. zero) fintx = fint
      call ttdpdg_map(track, ktrack, e2, h2, hgap, fintx, zero)
   endif
@@ -4349,7 +4318,7 @@ subroutine trphot(el,curv,rfac,deltap)
   double precision :: el, curv, rfac, deltap
 
   integer :: i, ierror, j, nphot
-  double precision :: amean, real_am, dlogr, scalen, scaleu, slope, ucrit, xi
+  double precision :: amean, dlogr, slope, ucrit, xi, sumxi
   integer, parameter :: maxtab=101
   double precision :: tabxi(maxtab),taby(maxtab)  
   double precision :: arad, pc, gamma, amass
@@ -4357,9 +4326,9 @@ subroutine trphot(el,curv,rfac,deltap)
 
   double precision :: get_value, frndm
   double precision, parameter :: fac1=3.256223d0
-  integer, parameter :: nr=55, maxran=1000000000
+  ! integer, parameter :: maxran=1000000000
 
-  data (taby(i), i = 1, 52)                                         &
+  data (taby(i), i = 1, 101)                                         &
        / -1.14084005d0,  -0.903336763d0, -0.769135833d0, -0.601840854d0, &
        -0.448812515d0, -0.345502228d0, -0.267485678d0, -0.204837948d0,   &
        -0.107647471d0, -0.022640628d0,  0.044112321d0,  0.0842842236d0,  &
@@ -4372,9 +4341,8 @@ subroutine trphot(el,curv,rfac,deltap)
        0.830520391d0,  0.856329501d0,  0.879087269d0,  0.905612588d0,    &
        0.928626955d0,  0.948813677d0,  0.970829248d0,  0.989941061d0,    &
        1.0097903d0,    1.02691281d0,   1.04411256d0,   1.06082714d0,     &
-       1.0750246d0,    1.08283985d0,   1.0899564d0,    1.09645379d0 /
-  data (taby(i), i = 53, 101)                                       &
-       /  1.10352755d0,   1.11475027d0,   1.12564385d0,   1.1306442d0,   &
+       1.0750246d0,    1.08283985d0,   1.0899564d0,    1.09645379d0,     &
+       1.10352755d0,   1.11475027d0,   1.12564385d0,   1.1306442d0,      &
        1.13513422d0,   1.13971806d0,   1.14379156d0,   1.14741969d0,     &
        1.15103698d0,   1.15455759d0,   1.15733826d0,   1.16005647d0,     &
        1.16287541d0,   1.16509759d0,   1.16718769d0,   1.16911888d0,     &
@@ -4387,7 +4355,7 @@ subroutine trphot(el,curv,rfac,deltap)
        1.18055761d0,   1.18056166d0,   1.18056381d0,   1.1805656d0,      &
        1.18056655d0,   1.18056703d0,   1.18056726d0,   1.1805675d0,      &
        1.18056762d0 /
-  data (tabxi(i), i = 1, 52)                                        &
+  data (tabxi(i), i = 1, 101)                                        &
        / -7.60090017d0,  -6.90775537d0,  -6.50229025d0,  -5.99146461d0,  &
        -5.52146101d0,  -5.20300722d0,  -4.96184492d0,  -4.76768923d0,    &
        -4.46540833d0,  -4.19970512d0,  -3.98998451d0,  -3.86323285d0,    &
@@ -4400,9 +4368,8 @@ subroutine trphot(el,curv,rfac,deltap)
        -1.30933332d0,  -1.20397282d0,  -1.10866261d0,  -0.99425226d0,    &
        -0.89159810d0,  -0.79850775d0,  -0.69314718d0,  -0.59783697d0,    &
        -0.49429631d0,  -0.40047753d0,  -0.30110508d0,  -0.19845095d0,    &
-       -0.10536054d0,  -0.05129330d0,   0.0d0,          0.048790119d0 /
-  data (tabxi(i), i = 53, 101)                                      &
-       /  0.104360029d0,  0.198850885d0,  0.300104618d0,  0.350656837d0, &
+       -0.10536054d0,  -0.05129330d0,   0.0d0,          0.048790119d0,   &
+       0.104360029d0,  0.198850885d0,  0.300104618d0,  0.350656837d0,    &
        0.398776114d0,  0.451075643d0,  0.500775278d0,  0.548121393d0,    &
        0.598836541d0,  0.652325153d0,  0.69813472d0 ,  0.746687889d0,    &
        0.802001595d0,  0.850150883d0,  0.900161386d0,  0.951657832d0,    &
@@ -4422,28 +4389,24 @@ subroutine trphot(el,curv,rfac,deltap)
   amass  = get_value('probe ','mass ')
   gamma  = get_value('probe ','gamma ')
   deltap = get_value('probe ','deltap ')
-  scalen = five / (twelve * hbar * clight)
-  scaleu = hbar * three * clight / two
 
   !---- AMEAN is the average number of photons emitted.,
   !     NPHOT is the integer number generated from Poisson's law.
-  amean = scalen * abs(arad*pc*(one+deltap)*el*curv) * sqrt(three)
+  amean = five * sqrt(three) / (twelve * hbar * clight) * abs(arad * pc * (one+deltap) * el * curv) 
   rfac = zero
-  real_am = amean
-  if (real_am .gt. zero) then
-     call dpoissn(real_am, nphot, ierror)
+  if (amean .gt. zero) then
+     call dpoissn(amean, nphot, ierror)
 
      if (ierror .ne. 0) then
         write(text, '(1p,d20.12)') amean
         call fort_fail('TRPHOT: ','Fatal: Poisson input mean =' // text)
      endif
 
-     !---- For all photons, sum the radiated photon energy,
-     !     in units of UCRIT (relative to total energy).
+     !---- For all photons, sum the radiated photon energy in units of UCRIT
+     if (nphot .ne. 0) then        
+        ucrit = three/two * hbar * clight * gamma**3 * abs(curv)
 
-     if (nphot .ne. 0) then
-        ucrit = scaleu * gamma**2 * abs(curv) / amass
-        xi = zero
+        sumxi = zero
         do i = 1, nphot
 
            !---- Find a uniform random number in the range [ 0,3.256223 ].
@@ -4459,10 +4422,15 @@ subroutine trphot(el,curv,rfac,deltap)
            !---- Perform linear interpolation and sum up energy lost.
 20         slope = (dlogr - taby(j-1)) / (taby(j) - taby(j-1))
            xi = dexp(tabxi(j-1) + slope * (tabxi(j) - tabxi(j-1)))
-           rfac = rfac + ucrit * xi
+           sumxi = sumxi + xi
+           ! write(60,*) xi ! 2016-Mar-16  18:22:30  ghislain: dump individual photons to file
         enddo
      endif
   endif
+
+  ! normalize rfac to beam energy
+  rfac = sumxi * ucrit * curv**2 / (gamma*amass)
+  
 end subroutine trphot
 
 subroutine dpoissn (amu,n,ierror)
