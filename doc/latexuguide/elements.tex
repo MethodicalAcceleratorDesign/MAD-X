@@ -1313,9 +1313,9 @@ and extended by S.~Sorge (2007).
 \begin{madlist}
    \ttitem{CHARGE}
      The charge of particles in the opposite beam, in elementary charges.
-     (default: 1). \\
+     \\ (default: +1) \\
      In order to describe interactions between beams containing the same
-     particles and having a charge different from 1, one should set the
+     particles and having a charge different from +1, one should set the
      \texttt{CHARGE} explicitly in the
      \hyperref[sec:beam]{\texttt{BEAM}} command as well as in the
      \texttt{BEAMBEAM} element.   
@@ -1341,7 +1341,7 @@ and extended by S.~Sorge (2007).
 
 
    \ttitem{BBSHAPE} A parameter to select the radial density shape of the 
-     opposite beam (default: 1)
+     opposite beam \\ (default: 1)
      \begin{itemize}
        \item  \texttt{BBSHAPE=1}: Gaussian shape (default).
          \texttt{SIGX, SIGY} are the standard deviations in horizontal
@@ -1479,8 +1479,8 @@ It has four real array attributes:
    \ttitem{L} Length of the element, which may be zero. 
    \ttitem{KICKi} Defines the kick of the element acting on the six phase
      space coordinates.  
-   \ttitem{RMik} Defines the linear transfer matrix (6*6) of the element.  
-   \ttitem{TMikl} Defines the second-order terms (6*6*6) of the element. 
+   \ttitem{RMik} Defines the linear transfer matrix ($6\times6$ terms) of the element.  
+   \ttitem{TMikl} Defines the second-order terms ($6\times6\times6$ terms) of the element. 
 \end{madlist}
 
 Data values that are not explicitly entered are taken from the identity

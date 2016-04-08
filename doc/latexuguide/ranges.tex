@@ -11,26 +11,31 @@ A range can be defined starting at  a given element and ending at
 another element, both elements included. Two forms exist:  
 
 \madxmp{
-RANGE=position; \\
-RANGE=position1/position2;
+RANGE = position; \\
+RANGE = position1 / position2;
 } 
 
 In the first case, only one element is selected; in the second case, one
-or several elements are selected. NOTE: position1 must not be behind
-position2 in the sequence.  
+or several elements that are between \texttt{position1} and
+\texttt{position2} are selected. \\
+NOTE: \texttt{position1} must appear before \texttt{position2} in the
+sequence.   
 
-"position" is composed of the element name and an optional occurrence 
-count in the sequence: \label{range_position}
+The \texttt{position} is composed of a single element name if that name
+is unique in the sequence, or an element class name followed by the
+occurrence count \texttt{n} in the sequence within square brackets to
+specify the n$^{th}$ occurence of an element of that class in the sequence:
+\label{range_position}
 \madxmp{
 xxxxxxxxxxxxxx\= \kill
-mq.ir5.l6..1  \> ! no occurrence count given\\
-mb[17]        \> ! occurrence count given
+mq.ir5.l6..1  \> ! unique element in the sequence\\
+mb[17]        \> ! 17th occurence of an element of class mb
 }
 
-There are two predefined indices in \madx: 
+There are two special predefined psoitions in \madx: 
 \begin{madlist}
-   \ttitem{\#S} The start of the beam line expanded by USE, 
-   \ttitem{\#E} The end of the beam line expanded by USE. 
+   \ttitem{\#S} The start of the beam line or sequence expanded by \hyperref[sec:use]{\texttt{USE}}, 
+   \ttitem{\#E} The end of the beam line or sequence expanded by \hyperref[sec:use]{\texttt{USE}}. 
 \end{madlist} 
 
 If a range is selected in a \texttt{USE} statement: 
@@ -45,7 +50,7 @@ end of the  range expanded by the \texttt{USE} statement.
 xxxxxxxxxxxxxxxxxxxxxxxx\= \kill
 .., RANGE=\#S;          \>! first element \\
 .., RANGE=\#S/\#E;      \>! full expansion range \\
-.., RANGE=mb[5]/\#E;    \>! from mb 5 to end \\
+.., RANGE=mb[5]/\#E;    \>! from 5th mb to end \\
 .., RANGE=mq.ir5.l6..1; \>! first occurrence of element mq.ir5.l6..1
 }
 
