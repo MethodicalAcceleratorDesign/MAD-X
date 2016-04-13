@@ -1803,9 +1803,8 @@ SUBROUTINE twcptk(re,orbit)
   double precision :: rmat0(2,2), e(2,2), f(2,2), cd(2,2), tmp(2,2)
   double precision :: rmat_bar(2,2), ebar(2,2), fbar(2,2), hmat(2,2)
   double precision :: edet, fdet, tempa, tempb, det
-  double precision :: alfx0=zero, betx0=zero, amux0=zero, alfx_ini=zero, betx_ini=zero
-  double precision :: alfy0=zero, bety0=zero, amuy0=zero, alfy_ini=zero, bety_ini=zero
-
+  double precision :: alfx0=zero, betx0=zero, amux0=zero, alfx_ini=zero, betx_ini=zero, amux_ini=zero
+  double precision :: alfy0=zero, bety0=zero, amuy0=zero, alfy_ini=zero, bety_ini=zero, amuy_ini=zero
   character(len=name_len) :: name
   character(len=120)      :: warnstr
   
@@ -1840,7 +1839,7 @@ SUBROUTINE twcptk(re,orbit)
   !                 C , D)
   A = RE(1:2,1:2) ; B = RE(1:2,3:4)
   C = RE(3:4,1:2) ; D = RE(3:4,3:4)
-
+  
   !---- Check RE rank
   RA(1:4,1:4) = RE(1:4,1:4)
   RA(1:4,5:8) = zero
@@ -1911,6 +1910,9 @@ SUBROUTINE twcptk(re,orbit)
         ! print *, '+++ mode flip in the element ', name, ", nflips up to now = ", nmode_flip 
      endif
   endif
+
+  amux_ini = amux
+  amuy_ini = amuy
   
   if(mode_flip) then
      call twcptk_twiss(f, e, cp_error)
@@ -1926,13 +1928,25 @@ SUBROUTINE twcptk(re,orbit)
   
   ! When we are comming out of a flipped mode, the phase is often off by a factor of twopi. As twopi doesn't have any effect on physics we can substract twopi.
   ! Unfortunately there is no definitive way to calcuate what the "right" way to handle this is but "-twopi" is better than nothing ((c), Sagan)
-  if(mode_flip .and. .not. mode_flip_ele) then
-     
-     amux = amux - twopi
-     amuy = amuy - twopi
-     
+  if(mode_flip .and. .not. mode_flip_ele ) then
+
+     if (abs(amux-amux_ini) .gt. twopi ) then
+        if ((amux-amux_ini) .gt. zero) then
+           amux = amux - twopi
+        else
+           amux = amux + twopi
+        endif
+     endif
+
+     if (abs(amuy-amuy_ini) .gt. twopi ) then
+        if ((amuy-amuy_ini) .gt. zero) then
+           amuy = amuy - twopi
+        else
+           amuy = amuy + twopi
+        endif
+     endif
   endif
- 
+  
   mode_flip = mode_flip_ele
   
   if (betx.lt.eps .or. bety.lt.eps) then
