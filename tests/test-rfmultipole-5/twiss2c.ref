@@ -19,8 +19,8 @@
 @ ALFA             %le                   0
 @ ORBIT5           %le                  -0
 @ GAMMATR          %le                   0
-@ Q1               %le                -0.5
-@ Q2               %le                -0.5
+@ Q1               %le                 0.5
+@ Q2               %le                 0.5
 @ DQ1              %le                   0
 @ DQ2              %le                   0
 @ DXMAX            %le                   0
@@ -40,13 +40,13 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %20s "test of rf-multipole"
-@ ORIGIN           %17s "5.02.08 Darwin 64"
-@ DATE             %08s "04/04/16"
-@ TIME             %08s "16.26.15"
+@ ORIGIN           %17s "5.02.09 Darwin 64"
+@ DATE             %08s "14/04/16"
+@ TIME             %08s "08.34.07"
 * NAME                                S               BETX               ALFX                MUX               BETY               ALFY                MUY                 DX                 DY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "TEST_LINE$START"                    0                  1                  0                  0                0.5                  0                  0                  0                  0
  "RFM1"                               0                  1        1.145258066                  0                0.5       -0.572629033                  0                  0                  0
  "DRIFT_0"                          0.5       0.4326459434     -0.01054995287       0.1374391677        1.736581038       -1.900533042      0.09014271623                  0                  0
  "M1"                                 1        2.812598316        -8.05469213                0.5        1.406299158       0.2147477491                0.5                  0                  0
- "TEST_LINE$END"                      1        2.812598316         2.72001163               -0.5        1.406299158       -5.172604131               -0.5                  0                  0
+ "TEST_LINE$END"                      1        2.812598316         2.72001163                0.5        1.406299158       -5.172604131                0.5                  0                  0
