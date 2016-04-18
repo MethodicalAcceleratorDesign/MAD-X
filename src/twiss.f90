@@ -1926,25 +1926,26 @@ SUBROUTINE twcptk(re,orbit)
      call fort_warn('TWCPTK: ', warnstr)
   endif
   
-  ! When we are comming out of a flipped mode, the phase is often off by a factor of twopi. As twopi doesn't have any effect on physics we can substract twopi.
+  ! When we are comming out of a flipped mode, the phase is often off by a factor of twopi.
   ! Unfortunately there is no definitive way to calcuate what the "right" way to handle this is but "-twopi" is better than nothing ((c), Sagan)
   if(mode_flip .and. .not. mode_flip_ele ) then
 
-     if (abs(amux-amux_ini) .gt. twopi ) then
-        if ((amux-amux_ini) .gt. zero) then
-           amux = amux - twopi
-        else
-           amux = amux + twopi
-        endif
-     endif
+    if ((amux-amux_ini) .ge. twopi ) then
+      amux = amux - twopi
+    elseif ((amux-amux_ini) .lt. zero) then
+      write (warnstr,'(a,e13.6,a,a)') "Negative phase advance in x-plane (mode flip) of ", amux-amux_ini, " in element ", name
+      call fort_warn('TWCPTK: ', warnstr)
+      amux = amux + twopi
+    endif
 
-     if (abs(amuy-amuy_ini) .gt. twopi ) then
-        if ((amuy-amuy_ini) .gt. zero) then
-           amuy = amuy - twopi
-        else
-           amuy = amuy + twopi
-        endif
-     endif
+    if ((amuy-amuy_ini) .ge. twopi ) then
+      amuy = amuy - twopi
+    elseif ((amuy-amuy_ini) .lt. zero) then
+      write (warnstr,'(a,e13.6,a,a)') "Negative phase advance in y-plane (mode flip) of ", amuy-amuy_ini, " in element ", name
+      call fort_warn('TWCPTK: ', warnstr)
+      amuy = amuy + twopi
+    endif
+
   endif
   
   mode_flip = mode_flip_ele
