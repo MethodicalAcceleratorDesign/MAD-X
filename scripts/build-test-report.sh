@@ -205,5 +205,10 @@ if [ "$nomail" != "nomail" -a -s build-test-report.log ] ; then
     check_error "unable to email report errors (check mail)"
 fi
 
+# backup last-build
+if [ -x madx-linux64-gnu -a -x ../releases ] ; then
+  cp -f madx-linux64-gnu ../releases
+fi
+
 clear_old_reports
 clean_tmp

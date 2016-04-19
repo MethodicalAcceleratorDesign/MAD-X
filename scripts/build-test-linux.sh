@@ -3,7 +3,7 @@
 # bash scripts/build-test-linux.sh [noecho] [cleanall] [notest]
 
 # env settings
-export PATH="`pwd`:/opt/intel/bin:$PATH"
+export PATH="`pwd`:$PATH"
 
 # error handler
 check_error ()
@@ -69,9 +69,11 @@ echo -e "\n===== Intel build ====="
 icc      --version
 ifort    --version
 
+source compilervars.sh ia32
 make all-linux32-intel
 check_error "make all-linux32-intel failed" "no-exit"
 
+source compilervars.sh intel64
 make all-linux64-intel
 check_error "make all-linux64-intel failed" "no-exit"
 
