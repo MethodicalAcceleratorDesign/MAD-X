@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.08  (64 bit, Darwin)      +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.11.20               +
-  + Execution date: 2016.04.04 16:27:18      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:25:03      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8
 
@@ -93,7 +93,6 @@ select, flag=twiss, pattern="IP\.*",column=name,s,betx,bety,alfx,alfy;
 TWISS,sequence=lhcb1;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
   
 iteration:   1 error:   2.952045E-03 deltap:   0.000000E+00
 orbit:  -2.525268E-03  3.101651E-07  1.894646E-05  1.614353E-04  0.000000E+00  0.000000E+00
@@ -218,7 +217,6 @@ select, flag=twiss, pattern="IP\.*",column=name,s,betx,bety,alfx,alfy;
 TWISS,sequence=lhcb1;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
   
 iteration:   1 error:   3.033804E-03 deltap:   0.000000E+00
 orbit:  -2.456089E-03 -9.018156E-08  3.858750E-07  1.650082E-04  0.000000E+00  0.000000E+00
@@ -289,7 +287,6 @@ select, flag=twiss, pattern="IP\.*",column=name,s,betx,bety,alfx,alfy;
 TWISS,sequence=lhcb1;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
   
 iteration:   1 error:   3.025347E-03 deltap:   0.000000E+00
 orbit:  -2.486670E-03 -2.014743E-06 -1.003184E-04  1.597085E-04  0.000000E+00  0.000000E+00
@@ -356,7 +353,6 @@ select, flag=twiss, pattern="IP\.*",column=name,s,betx,bety,alfx,alfy;
 TWISS,sequence=lhcb1;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
   
 iteration:   1 error:   3.027435E-03 deltap:   0.000000E+00
 orbit:  -2.484951E-03 -2.131134E-06 -1.002163E-04  1.597352E-04  0.000000E+00  0.000000E+00
@@ -423,7 +419,6 @@ select, flag=twiss, pattern="IP\.*",column=name,s,betx,bety,alfx,alfy;
 TWISS,sequence=lhcb1;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
   
 iteration:   1 error:   3.028677E-03 deltap:   0.000000E+00
 orbit:  -2.486882E-03 -2.187515E-06 -9.757922E-05  1.586651E-04  0.000000E+00  0.000000E+00
@@ -712,7 +707,6 @@ SELECT, flag=ptc_twiss, column=name,s,beta11,beta22,mu1,mu2,mu3,x,px,y,py,t,pt;
 
 ptc_twiss,closed_orbit,icase=6,file="twiss_lhc",summary_file="summaryMomentumCompaction"; ! jluc
 
-++++++ info: Zero value of SIGT replaced by 1.
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
   Rectangular Bend: input arc length (rho alpha) 

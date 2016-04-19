@@ -395,8 +395,8 @@ pro_ptc_twiss(void)
   // adjust_rfc(); /* sets freq in rf-cavities from probe */
 
   // LD 2016.02.17: BUG, depends on the previous oneturnmap and disp0
-  adjust_probe(ptc_deltap); /* sets correct gamma, beta, etc. */
-  adjust_rfc(); /* sets freq in rf-cavities from probe */
+  adjust_probe_fp(ptc_deltap); /* sets correct gamma, beta, etc. */
+  // adjust_rfc(); /* sets freq in rf-cavities from probe */
   // LD 2016.02.18: END
 
   tarr = new_int_array(strlen(table_name)+1);

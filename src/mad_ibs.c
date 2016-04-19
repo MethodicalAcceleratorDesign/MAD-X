@@ -40,12 +40,12 @@ pro_ibs(struct in_cmd* cmd)
     }
     
     // LD 2016.02.18: START
-    // adjust_beam();
+    adjust_beam();
     probe_beam = clone_command(current_beam);
     // adjust_rfc(); /* sets freq in rf-cavities from probe */
 
     // LD 2016.02.17: BUG, depends on the previous oneturnmap and disp0 -> alpha is wrong even with dp=0
-    adjust_probe(0); /* sets correct gamma, beta, etc. */
+    adjust_probe_fp(0); /* sets correct gamma, beta, etc. */
     // adjust_rfc(); /* sets freq in rf-cavities from probe */
     // LD 2016.02.18: END
 

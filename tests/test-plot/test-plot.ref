@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.04  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.12.12      +
-  + Execution Time Stamp: 17.12.13 17.13.03 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:27:09      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 Option, warn, info, echo;
 
 Title, "Test for PLOT command on the LHC 6.5 lattice with MADX";
@@ -40,13 +40,9 @@ use, period=lhcb1;
 twiss, chrom, table;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   3.148198E-12 deltap:   1.000000E-06
 orbit:   1.575937E-11  1.440482E-12  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -57,13 +53,13 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
         26658.8832                 -0    0.0003171305985        56.15402958 
 
                 q1                dq1            betxmax              dxmax 
-       64.28000118        1.985440946        595.2900593        2.860758575 
+       64.28000118        1.985440917        595.2900593        2.860758575 
 
              dxrms             xcomax             xcorms                 q2 
        1.347846458                  0                  0        59.31000027 
 
                dq2            betymax              dymax              dyrms 
-       2.000224377         611.782944                 -0                  0 
+       2.000224349         611.782944                 -0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -87,17 +83,15 @@ enter TRACK module
 
  run,turns=10;
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-  
+
 Full 6D closed orbit search.
 Initial value of 6-D closed orbit from Twiss: 
 orbit0   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
   Singular matrix occurred during closed orbit search.
-  
+
 6D closed orbit found by subroutine trclor 
 iteration:   2 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -170,13 +164,9 @@ use, period=lhcb1;
 twiss, chrom, table;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   3.148198E-12 deltap:   1.000000E-06
 orbit:   1.575937E-11  1.440482E-12  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -187,13 +177,13 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
         26658.8832                 -0    0.0003171305985        56.15402958 
 
                 q1                dq1            betxmax              dxmax 
-       64.28000118        1.985440946        595.2900593        2.860758575 
+       64.28000118        1.985440917        595.2900593        2.860758575 
 
              dxrms             xcomax             xcorms                 q2 
        1.347846458                  0                  0        59.31000027 
 
                dq2            betymax              dymax              dyrms 
-       2.000224377         611.782944                 -0                  0 
+       2.000224349         611.782944                 -0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -217,18 +207,16 @@ enter TRACK module
 
  run,turns=10;
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-  
-  Full 6D closed orbit search.
-  Initial value of 6-D closed orbit from Twiss: 
-  orbit0    0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
+
+Full 6D closed orbit search.
+Initial value of 6-D closed orbit from Twiss: 
+orbit0   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
   Singular matrix occurred during closed orbit search.
-  
- 6D closed orbit found by subroutine trclor 
+
+6D closed orbit found by subroutine trclor 
 iteration:   2 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 
@@ -296,5 +284,5 @@ exit;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.04 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

@@ -16,6 +16,7 @@ void    update_beam(struct command* comm);              // used by mad_option.c
 void    adjust_beam(void);                              // many uses
 int     attach_beam(struct sequence* sequ);             // many uses
 void    adjust_probe(double delta_p);                   // many uses
+void    adjust_probe_fp(double dp);                     // fix point, should replace adjust_probe
 void    adjust_rfc(void);                               // many uses
 void    print_rfc(void);
 void    print_probe(void);

@@ -1116,6 +1116,7 @@ tests/test-c6t-3/test-c6t-3.ref -text
 tests/test-c6t-4/fc.2.cfg -text
 tests/test-c6t-4/fc.2.ref -text
 tests/test-c6t-4/fc.3.aper.ref -text
+tests/test-c6t-4/fc.3.aux.ref -text svneol=unset#application/x-gzip
 tests/test-c6t-4/input/aperture/aper_tol_as-built.b1.madx -text
 tests/test-c6t-4/input/aperture/aperture_as-built.b1.madx -text
 tests/test-c6t-4/input/aperture/exp_pipe_install_after_LS1.madx -text

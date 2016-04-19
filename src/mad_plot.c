@@ -403,8 +403,8 @@ exec_plot(struct in_cmd* cmd)
 	      probe_beam = clone_command(current_beam);
         // adjust_rfc(); /* sets freq in rf-cavities from probe */
         // LD 2016.02.17: BUG, depends on the previous oneturnmap and disp0
-	      adjust_probe(twiss_deltas->a[0]); /* sets correct gamma, beta, etc. */
-	      adjust_rfc(); /* sets freq in rf-cavities from probe */
+	      adjust_probe_fp(twiss_deltas->a[0]); /* sets correct gamma, beta, etc. */
+	      // adjust_rfc(); /* sets freq in rf-cavities from probe */
         // LD 2016.02.18: END
       }
       pefill_(&ierr);

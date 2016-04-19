@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Linux)       +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.05.19 17:03:45      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:26:05      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -848,8 +848,6 @@ obs_points pro_ptc_setswitch Done
 
   ptc_twiss, table=twiss, icase=56, no=2, closed_orbit;
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  ************ State Summary ****************
  MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
   Rectangular Bend: input arc length (rho alpha) 
@@ -944,5 +942,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

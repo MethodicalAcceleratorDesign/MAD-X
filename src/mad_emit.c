@@ -31,21 +31,21 @@ pro_emit(struct in_cmd* cmd)
   set_option("twiss_print", &j);
 
   zero_double(orbit0, 6);
-  zero_double(disp0, 6);
-  zero_double(oneturnmat, 6*6);
+  // zero_double(disp0, 6);
+  // zero_double(oneturnmat, 6*6);
 
   adjust_beam();
   probe_beam = clone_command(current_beam);
   // LD 2016.02.17: missing init of rf freq
-  adjust_rfc(); /* sets rf freq and harmon */ // LD: added 2016.03.08
+  // adjust_rfc(); /* sets rf freq and harmon */ // LD: added 2016.03.08
 
   int error = 0;
-  double r0mat[4] = {0};
-  tmrefe_(oneturnmat); /* one-turn linear transfer map */
-  twcpin_(oneturnmat,disp0,r0mat,&error); /* added for disp0 computation */
+  //double r0mat[4] = {0};
+  //tmrefe_(oneturnmat); /* one-turn linear transfer map */
+  //twcpin_(oneturnmat,disp0,r0mat,&error); /* added for disp0 computation */
 
-  adjust_probe(e_deltap); /* sets correct gamma, beta, etc. */
-  adjust_rfc(); /* sets freq in rf-cavities from probe */
+  adjust_probe_fp(e_deltap); /* sets correct gamma, beta, etc. */
+  // adjust_rfc(); /* sets freq in rf-cavities from probe */
   print_probe();
 
   // guess_flag is set by COGUESS command

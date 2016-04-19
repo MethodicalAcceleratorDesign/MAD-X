@@ -9,12 +9,12 @@
 @ GAMMA            %le  1956.95126781166
 @ KBUNCH           %le  1.00000000000
 @ BCURRENT         %le  0.00000000000
-@ SIGE             %le  0.00000000000
-@ SIGT             %le  0.00000000000
+@ SIGE             %le  0.00100000000
+@ SIGT             %le  1.00000000000
 @ NPART            %le  0.00000000000
 @ EX               %le  1.00000000000
 @ EY               %le  1.00000000000
-@ ET               %le  1.00000000000
+@ ET               %le  0.00100000000
 @ LENGTH           %le  182.43280003125
 @ ALFA             %le  0.00000000000
 @ ORBIT5           %le  -0.00000000000
@@ -40,9 +40,9 @@
 @ SYNCH_4          %le  0.00000000000
 @ SYNCH_5          %le  0.00000000000
 @ TITLE            %44s "AD HE 2010 optics. Anti-Protons - 3.57 GeV/c"
-@ ORIGIN           %23s "MAD-X 5.01.02 Darwin 32"
-@ DATE             %08s "09/10/13"
-@ TIME             %08s "16.09.08"
+@ ORIGIN           %17s "5.02.09 Darwin 64"
+@ DATE             %08s "18/04/16"
+@ TIME             %08s "18.27.07"
 * NAME                              S             L          ALFX          BETX            DX          ALFY          BETY 
 $ %s                              %le           %le           %le           %le           %le           %le           %le 
  "STARTAD"              0.00000000000 0.00000000000 -0.00000200026 3.85095118133 0.11519440181 0.00000000000 1.00000000000

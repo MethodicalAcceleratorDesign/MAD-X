@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.08  (64 bit, Darwin)      +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.11.20               +
-  + Execution date: 2016.02.14 20:01:18      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:20:08      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Beam, SEQUENCE=Machine, PARTICLE=electron, energy=3, RADIATE=True;
 
@@ -220,9 +220,9 @@ parameter: ex   double value:                  1
 parameter: exn   double value:        5870.853718
 parameter: ey   double value:                  1
 parameter: eyn   double value:        5870.853718
-parameter: et   double value:                  1
-parameter: sigt   double value:                  0
-parameter: sige   double value:                  0
+parameter: et   double value:              0.001
+parameter: sigt   double value:                  1
+parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0
@@ -298,7 +298,7 @@ parameter: brho   double value:        10.00692271
 parameter: ex   double value:    1.125932317e-09
 parameter: exn   double value:     6.61018393e-06
 parameter: ey   double value:    1.172993246e-37
-parameter: eyn   double value:    6.886471757e-34
+parameter: eyn   double value:    6.886471758e-34
 parameter: et   double value:    9.569042515e-07
 parameter: sigt   double value:    0.0008578397374
 parameter: sige   double value:     0.001115467834

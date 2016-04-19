@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.07  (64 bit, Darwin)      +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.09.24               +
-  + Execution date: 2015.10.13 11:36:08      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:22:08      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option, -debug, -echo;
 
@@ -11,8 +11,8 @@ makethin: style chosen : teapot
 makethin: slicing sequence : myseq
 enter TRACK module
 one pass is on
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
+ TWDISP: Unable to compute intial dispersion --- dispersion set to zero.
+ TWDISP: Unable to compute intial dispersion --- dispersion set to zero.
 
 ++++++ table: tracksumm
 

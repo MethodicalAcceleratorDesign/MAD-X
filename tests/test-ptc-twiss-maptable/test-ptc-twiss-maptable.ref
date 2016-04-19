@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Linux)       +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.05.19 17:03:48      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:26:11      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -839,8 +839,6 @@ ptc_create_universe;
 
   ptc_twiss, table=twiss, icase=5, no=3, closed_orbit, maptable;
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
 
 ++++++ table: ptc_twiss_summary
 
@@ -906,8 +904,6 @@ ptc_create_universe;
 
   ptc_twiss, table=twiss, icase=5, no=3, initial_matrix_table; 
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  Reduced SUMM Table (Inital parameters specified)
 
 ++++++ table: ptc_twiss_summary
@@ -990,5 +986,5 @@ removefile, file='Maxwellian_bend_for_ptc.txt';
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

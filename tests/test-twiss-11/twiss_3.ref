@@ -10,11 +10,11 @@
 @ KBUNCH           %le                   1
 @ BCURRENT         %le                   0
 @ SIGE             %le                0.03
-@ SIGT             %le                   0
+@ SIGT             %le                   1
 @ NPART            %le                   0
 @ EX               %le          3.6692e-06
 @ EY               %le          3.6692e-06
-@ ET               %le                   1
+@ ET               %le               0.001
 @ LENGTH           %le         23.30217314
 @ ALFA             %le                   0
 @ ORBIT5           %le                  -0
@@ -40,9 +40,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %35s "Triplet lattice for gantry - dec17i"
-@ ORIGIN           %17s "5.02.05 Darwin 64"
-@ DATE             %08s "20/05/15"
-@ TIME             %08s "17.52.43"
+@ ORIGIN           %17s "5.02.09 Darwin 64"
+@ DATE             %08s "18/04/16"
+@ TIME             %08s "18.19.27"
 * NAME                                S               BETX               ALFX                MUX                 DX                DPX               BETY               ALFY                MUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "GANTRY$START"                       0        0.743975239                  0                  0                  0                  0        0.743975239                  0                  0

@@ -485,6 +485,36 @@ adjust_rfc(void)
 }
 
 void
+adjust_probe_fp(double dp) // fix point version of adjust_probe, includes adjust_rfc
+{
+  int fp_step = 0, debug = get_option("debug");
+  double ds = 0, ds0 = 0;
+
+  if (debug)
+    printf("Twiss pre-init: adjusting probe and oneturnmat (fix point)\n");
+
+  adjust_rfc();          /* pre-sets rf freq and harmon */
+
+  do {
+    tmrefe_(oneturnmat); /* one-turn linear transfer map */
+    twdisp_ini_(oneturnmat,disp0);  /* added for disp0 computation */
+
+    adjust_probe(dp);    /* sets correct gamma, beta, etc. */
+    adjust_rfc();        /* sets rf freq and harmon */
+
+    ds0 = ds;
+    ds = oneturnmat[4 + 6*5]; // must be same as adjust_probe!
+    for (int j=0; j < 4; j++) ds += oneturnmat[4 + 6*j] * disp0[j];
+
+    if (debug)
+      printf("Twiss pre-init: iteration %d, delta ds = %.8e (fix point)\n", ++fp_step, ds-ds0);
+
+  } while (fabs(ds-ds0) > 1e-6);
+
+  if (debug) print_probe();
+}
+
+void
 print_rfc(void)
   /* prints the rf cavities present in sequ */
 {

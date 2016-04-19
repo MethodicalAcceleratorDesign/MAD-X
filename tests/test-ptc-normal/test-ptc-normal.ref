@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.07  (64 bit, Darwin)      +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.09.24               +
-  + Execution date: 2015.11.03 19:51:42      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:26:10      +
   ++++++++++++++++++++++++++++++++++++++++++++
    !                     FODO for MAD-X
 
@@ -99,9 +99,9 @@ parameter: ex   double value:                  1
 parameter: exn   double value:         5328.94477
 parameter: ey   double value:                  1
 parameter: eyn   double value:         5328.94477
-parameter: et   double value:                  1
-parameter: sigt   double value:                  0
-parameter: sige   double value:                  0
+parameter: et   double value:              0.001
+parameter: sigt   double value:                  1
+parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0
@@ -186,8 +186,6 @@ Assigned field errors to 1 elements
 TWISS;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -225,17 +223,17 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.500000E+04
  Setting MADx with 
-     energy           5000.00000000000     
+     energy           5000.0000000000000     
      method                   2
      Num. of steps            1
-     charge           1.00000000000000     
-  Length of machine:    19.0999877559799     
+     charge           1.0000000000000000     
+  Length of machine:    19.099987755979949     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After    end:   0.000000000000000E+000  0.000000000000000E+000   19.0999877559802     
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        19.099987755980202     
 !	select_ptc_normal, dx=1, dpx=1;
 
 !	select_ptc_normal, dy=1, dpy=1;	
@@ -299,7 +297,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Closed orbit:    0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Normal Form Type 1
    ptc_end;
 

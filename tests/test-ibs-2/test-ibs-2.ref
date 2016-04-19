@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.03  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.10.14      +
-  + Execution Time Stamp: 15.10.13 17.45.58 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:20:09      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 !! **************************************************************************************
 
 !! 										
@@ -109,7 +109,7 @@ enter Twiss module
   
 iteration:   1 error:   6.253859E-07 deltap:   0.000000E+00
 orbit:  -8.359839E-07 -1.313307E-07  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
- ++++++ warning: TWCPGO: TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.        
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
 
 ++++++ table: summ
 
@@ -152,7 +152,7 @@ enter Twiss module
   
 iteration:   1 error:   6.253859E-07 deltap:   0.000000E+00
 orbit:  -8.359839E-07 -1.313307E-07  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
- ++++++ warning: TWCPGO: TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.        
+++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
 
 ++++++ table: summ
 
@@ -175,59 +175,59 @@ orbit:  -8.359839E-07 -1.313307E-07  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0                  0                  0                  0 
 ibs,file=ibs-table.tfs;
 
- sige   1.500000047884966E-002
+ sige    1.5000000478849657E-002
  Twiss was calculated at the center of the elements. No interpolation is used
- 
+
  Global parameters for the machine: 
 
 radiate = T:
- 
+
      C               5.314466 m              f0             56.410642 MHz            T0              0.017727 microseconds
-     alfa            0.786651E-02            eta             0.786648E-02            gamma(tr)      11.274802
+     alfa            0.786658E-02            eta             0.786655E-02            gamma(tr)      11.274754
      Bcurrent        4.067091 A/bunch        Kbunch       312                        Npart           0.450000E+12 per bunch
      E               2.860000 GeV            gamma        5596.880626                beta            1.000000
- 
+
  Emittances:
- 
+
      Ex            0.125070E+01 pi*mm*mrad     sigx            4.162845 mm
      Ey            0.125070E+04 pi*mm*mrad     sigy           83.181554 mm
      Et            0.750000E+02 pi*mm*mrad     sigt            9.000000 mm             sigE         15.000000 1/1000
 
- sequence name: tme
+sequence name: tme
 
 
      CONST               =   5.177148E-12
- 
+
      ENERGY              =       2.860000 GeV
      BETA                =       1.000000
      GAMMA               =       5596.881
      COULOMB LOG         =         25.168
- 
+
      X-emittance         =   1.250699E-06 m*rad
      Y-emittance         =   1.250699E-03 m*rad
- 
+
      Momentum spread     =   1.500000E-02
      Bunch length        =       0.009000 m
- 
+
      Particles per bunch =   4.500000E+11
      Bunch current       =   4.067091E+00 A
- 
- Ring average values (m)
- 
+
+ Ring average values (m) 
+
      betx   =   3.13943E+00    bety   =   5.53224E+00    Dx  =  2.81016E-01    Dy  =  0.00000E+00
      alfx   =  -3.89429E-08    alfy   =  -3.85904E-08    Dpx =  1.74809E-08    Dpy =  0.00000E+00
      1/betx =   3.47774E-01    1/bety =   2.08759E-01
- 
+
      (Weighted) average rates (1/sec):
      Longitudinal=    4.676898E-09
      Horizontal  =    2.776352E-08
      Vertical    =   -1.937972E-16
- 
+
      (Weighted) average lifetimes (sec):
      Longitudinal=    2.138169E+08
      Horizontal  =    3.601849E+07
      Vertical    =   -5.160033E+15
- 
+
 
 
 
@@ -235,5 +235,5 @@ radiate = T:
 0 in C and 2 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.03 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

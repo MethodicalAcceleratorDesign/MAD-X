@@ -9,12 +9,12 @@
 @ GAMMA            %le         191781.2242
 @ KBUNCH           %le                   1
 @ BCURRENT         %le                   0
-@ SIGE             %le                   0
-@ SIGT             %le                   0
+@ SIGE             %le               0.001
+@ SIGT             %le                   1
 @ NPART            %le                   0
 @ EX               %le                   1
 @ EY               %le                   1
-@ ET               %le                   1
+@ ET               %le               0.001
 @ LENGTH           %le         26658.87208
 @ ALFA             %le     0.0001453616101
 @ ORBIT5           %le       -0.1525203075
@@ -40,9 +40,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %51s "F1020B98v1.lep, 102/90 BT optics for 1998 to 97 GeV"
-@ ORIGIN           %23s "MAD-X 5.01.03 Darwin 64"
-@ DATE             %08s "15/10/13"
-@ TIME             %08s "10.32.45"
+@ ORIGIN           %17s "5.02.09 Darwin 64"
+@ DATE             %08s "18/04/16"
+@ TIME             %08s "18.17.37"
 *                  S NAME                             BETX               BETY 
 $                %le %s                                %le                %le 
                   0 "IP1"                      71.22457703        35.81006654

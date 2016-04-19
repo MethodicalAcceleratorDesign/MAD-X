@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Darwin)      +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.05.20 18:10:17      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:19:26      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option,-echo,-warn;
 
@@ -12,31 +12,31 @@ enter Twiss module
   
 open line - error with deltap:  -3.000000E-01
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:    -1.992820E-02  6.772696E-02  0.000000E+00  0.000000E+00 -1.514319E-01  0.000000E+00
+final orbit vector:    -1.992820E-02  6.772696E-02  0.000000E+00  0.000000E+00 -1.285650E-01  0.000000E+00
   
 open line - error with deltap:  -2.000000E-01
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:    -1.496148E-02  1.044054E-03  0.000000E+00  0.000000E+00  1.136979E+00  0.000000E+00
+final orbit vector:    -1.496148E-02  1.044054E-03  0.000000E+00  0.000000E+00 -1.065931E-01  0.000000E+00
   
 open line - error with deltap:  -1.000000E-01
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:    -1.452494E-03  6.298396E-03  0.000000E+00  0.000000E+00  2.522286E-02  0.000000E+00
+final orbit vector:    -1.452494E-03  6.298396E-03  0.000000E+00  0.000000E+00 -1.006407E-02  0.000000E+00
   
 open line - error with deltap:   2.775558E-17
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:    -1.523314E-29 -4.656899E-29  0.000000E+00  0.000000E+00 -2.928407E-18  0.000000E+00
+final orbit vector:    -1.523314E-29 -4.656976E-29  0.000000E+00  0.000000E+00 -1.688833E-22  0.000000E+00
   
 open line - error with deltap:   1.000000E-01
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:     5.191341E-04  1.668336E-03  0.000000E+00  0.000000E+00 -5.992746E-03  0.000000E+00
+final orbit vector:     5.191341E-04  1.668336E-03  0.000000E+00  0.000000E+00 -2.521597E-03  0.000000E+00
   
 open line - error with deltap:   2.000000E-01
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:    -1.080816E-02  5.542068E-03  0.000000E+00  0.000000E+00 -7.831913E-04  0.000000E+00
+final orbit vector:    -1.080816E-02  5.542068E-03  0.000000E+00  0.000000E+00 -1.018988E-02  0.000000E+00
   
 open line - error with deltap:   3.000000E-01
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:    -2.077855E-03 -3.853374E-02  0.000000E+00  0.000000E+00  2.758938E-02  0.000000E+00
+final orbit vector:    -2.077855E-03 -3.853374E-02  0.000000E+00  0.000000E+00 -3.031706E-02  0.000000E+00
 
 ++++++ table: summ
 
@@ -97,5 +97,5 @@ final orbit vector:    -2.077855E-03 -3.853374E-02  0.000000E+00  0.000000E+00  
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

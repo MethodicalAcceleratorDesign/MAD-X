@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2014.11.14               +
-  + Execution date: 2015.03.11 12:28:04      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:20:15      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Title, "Compiling Optics for the LHC 6.5 lattice with MADX";
 
@@ -85,7 +85,7 @@ parameter: ex   double value:    5.026457389e-10
 parameter: exn   double value:    3.749999966e-06
 parameter: ey   double value:    5.026457389e-10
 parameter: eyn   double value:    3.749999966e-06
-parameter: et   double value:                  1
+parameter: et   double value:              0.001
 parameter: sigt   double value:              0.075
 parameter: sige   double value:            0.00011
 parameter: kbunch   double value:                  1
@@ -123,5 +123,5 @@ Esave, file=err.file.out;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.04 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.07  (64 bit, Darwin)      +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.09.24               +
-  + Execution date: 2015.11.03 19:45:32      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:16:40      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title, "V6.5 Thin Lens" ;    // USE ONLY WITH MAD-X version > June 2005
 
@@ -41,8 +41,6 @@ twiss,  sequence=lhcb1, file=lhc_twiss_b1.before.dat, betx=beta.ip1, bety=beta.i
 
 enter Twiss module
  Found 3 initial orbit vector values from twiss command. 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -91,8 +89,6 @@ twiss,  sequence=lhcb1, file=lhc_twiss_b1.dat, betx=beta.ip1, bety=beta.ip1, x=+
 
 enter Twiss module
  Found 3 initial orbit vector values from twiss command. 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00

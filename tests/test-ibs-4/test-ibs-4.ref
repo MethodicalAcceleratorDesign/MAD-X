@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.01.03  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2013.10.14      +
-  + Execution Time Stamp: 15.10.13 17.45.59 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:20:10      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 Option, -echo,-warn,-info;
 
 
@@ -75,26 +75,26 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0                  0                  0                  0 
 ibs,file="ibs-table.tfs";
 
- sige   4.680020346057555E-004
+ sige    4.6800203460575546E-004
  Twiss was calculated at the exit of the elements.
  Twiss functions at the center of the elements are calculated through linear interpolation
- 
+
  Global parameters for the machine: 
 
 radiate = F:
- 
+
      C           26658.883200 m              f0              0.011245 MHz            T0             88.924656 microseconds
      alfa            0.321634E-03            eta             0.317287E-03            gamma(tr)      55.759505
      Bcurrent        0.000198 A/bunch        Kbunch         1                        Npart           0.110000E+12 per bunch
      E             450.000000 GeV            gamma         479.605038                beta            0.999998
- 
+
  Emittances:
- 
+
      Ex            0.782000E-02 pi*mm*mrad     sigx            0.876942 mm
      Ey            0.782000E-02 pi*mm*mrad     sigy            0.895105 mm
-     Et            0.100000E+07 pi*mm*mrad     sigt          115.000000 mm             sigE          0.468002 1/1000
+     Et            0.100000E+04 pi*mm*mrad     sigt          115.000000 mm             sigE          0.468002 1/1000
 
- sequence name: lhcb1
+sequence name: lhcb1
 
 acnca.d5l4.b1   1.10000       0.00000       200.394      0.500000       0.00000    
 acnca.c5l4.b1   1.10000       0.00000       200.394      0.500000       0.00000    
@@ -108,39 +108,39 @@ acsca.a5r4.b1   1.09500       0.00000       400.789       0.00000       0.00000
 acsca.b5r4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
 acsca.c5r4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
 acsca.d5r4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
- 
+
      CONST               =   4.122769E-07
- 
+
      ENERGY              =     450.000000 GeV
      BETA                =       0.999998
      GAMMA               =        479.605
      COULOMB LOG         =         23.231
- 
+
      X-emittance         =   7.820000E-09 m*rad
      Y-emittance         =   7.820000E-09 m*rad
- 
+
      Momentum spread     =   4.680020E-04
      Bunch length        =       0.115000 m
- 
+
      Particles per bunch =   1.100000E+11
      Bunch current       =   1.981896E-04 A
- 
- Ring average values (m)
- 
+
+ Ring average values (m) 
+
      betx   =   9.83411E+01    bety   =   1.02457E+02    Dx  =  1.15329E+00    Dy  =  0.00000E+00
      alfx   =   2.44286E-06    alfy   =   1.36010E-05    Dpx = -4.75563E-08    Dpy =  0.00000E+00
      1/betx =   1.44932E-02    1/bety =   1.34416E-02
- 
+
      (Weighted) average rates (1/sec):
      Longitudinal=    8.208516E-06
      Horizontal  =    5.074061E-06
      Vertical    =   -3.693279E-08
- 
+
      (Weighted) average lifetimes (sec):
      Longitudinal=    1.218247E+05
      Horizontal  =    1.970808E+05
      Vertical    =   -2.707621E+07
- 
+
 
 
 stop;
@@ -149,5 +149,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.01.03 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

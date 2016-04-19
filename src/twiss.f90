@@ -1046,14 +1046,8 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   C = RA(3:4,1:2) ; D = RA(3:4,3:4)
   
   !---- Initial dispersion.
-  if (get_option('twiss_inval ') .eq. 0) then
   !--should we change to RA?????   
-     call twdisp(rt,rt(1,6),disp0)
-  else
-     DISP0(1:4) = OPT_FUN(15:18) 
-  endif
-  disp0(5) = zero
-  disp0(6) = one
+  call twdisp_ini(rt, disp0) !-- LD: 2016.04.18
 
   !---- Matrix C + B(bar) and its determinant (for R_A)
   BBAR = matmul(matmul(-SMAT,transpose(B)),SMAT)
@@ -1208,14 +1202,9 @@ SUBROUTINE twcpin_talman(rt,disp0,r0mat,eflag)
   !---- Initialization
   eflag=0
   gammacp=one
+
   !---- Initial dispersion.
-  if (get_option('twiss_inval ') .eq. 0) then
-     call twdisp(rt,rt(1,6),disp0)
-  else
-     DISP0(1:4) = OPT_FUN(15:18) 
-  endif
-  disp0(5) = zero
-  disp0(6) = one
+  call twdisp_ini(rt,disp0) !-- LD: 2016.04.18
 
   ! RT(1:4,1:4) = ( A , B
   !                 C , D)
@@ -1372,13 +1361,7 @@ SUBROUTINE twcpin_sagan(rt,disp0,r0mat, eflag)
   deltap   = get_value('probe ','deltap ')
 
   !---- Initial dispersion.
-  if (get_option('twiss_inval ') .eq. 0) then
-     call twdisp(rt,rt(1,6),disp0)
-  else
-     DISP0(1:4) = OPT_FUN(15:18)     
-  endif
-  disp0(5) = zero
-  disp0(6) = one
+  call twdisp_ini(rt,disp0)  !-- LD: 2016.04.18
   
   ! RT(1:4,1:4) = ( A , B
   !                 C , D)
@@ -1517,6 +1500,7 @@ SUBROUTINE twdisp(rt,vect,disp)
   !     disp(6)   (double)    dispersion vector.                         *
   !----------------------------------------------------------------------*
   double precision :: rt(6,6), vect(6), disp(6) 
+  integer, external :: get_option
   
   integer :: i, j, irank
   double precision :: a(4,5)
@@ -1529,11 +1513,40 @@ SUBROUTINE twdisp(rt,vect,disp)
   if (irank.ge.4) then
      DISP(1:4) = A(1:4,5)
   else
-     call fort_warn('TWDISP: ', 'Unable to compute dispersion --- dispersion set to zero.')
+     if (get_option('info ') .ne. 0) then
+       print *, 'TWDISP: Unable to compute intial dispersion --- dispersion set to zero.'
+     endif
      DISP(1:4) = zero 
   endif
 
 end SUBROUTINE twdisp
+
+SUBROUTINE twdisp_ini(rt,disp0)
+  use math_constfi, only : zero, one
+  use twiss0fi
+  use twisscfi
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Initial values for dispersion.                                   *
+  !     Input:                                                           *
+  !     rt(6,6)   (double)    one turn transfer matrix.                  *
+  !     Output:                                                          *
+  !     disp(6)   (double)    dispersion vector.                         *
+  !----------------------------------------------------------------------*
+  double precision :: rt(6,6), disp0(6)
+  integer, external :: get_option
+
+  !---- Initial dispersion.
+  if (get_option('twiss_inval ') .eq. 0) then
+     call twdisp(rt,rt(1,6),disp0)
+  else
+     DISP0(1:4) = OPT_FUN(15:18)     
+  endif
+  disp0(5) = zero
+  disp0(6) = one
+
+end SUBROUTINE twdisp_ini
 
 SUBROUTINE twcpgo(rt,orbit0)
   use twiss0fi

@@ -9,12 +9,12 @@
 @ GAMMA            %le    479.605038
 @ KBUNCH           %le      1.000000
 @ BCURRENT         %le      0.000000
-@ SIGE             %le      0.000000
-@ SIGT             %le      0.000000
+@ SIGE             %le      0.001000
+@ SIGT             %le      1.000000
 @ NPART            %le      0.000000
 @ EX               %le      1.000000
 @ EY               %le      1.000000
-@ ET               %le      1.000000
+@ ET               %le      0.001000
 @ LENGTH           %le  26658.883200
 @ ALFA             %le      0.000000
 @ ORBIT5           %le     -0.000000
@@ -27,8 +27,8 @@
 @ DYMAX            %le      0.000000
 @ XCOMAX           %le      0.000000
 @ YCOMAX           %le      0.000000
-@ BETXMAX          %le  42969.954045
-@ BETYMAX          %le  74690.599398
+@ BETXMAX          %le  42969.954046
+@ BETYMAX          %le  74690.599397
 @ XCORMS           %le      0.000000
 @ YCORMS           %le      0.000000
 @ DXRMS            %le      2.008653
@@ -40,9 +40,9 @@
 @ SYNCH_4          %le      0.000000
 @ SYNCH_5          %le      0.000000
 @ TITLE            %14s "V6.5 Thin Lens"
-@ ORIGIN           %23s "MAD-X 5.01.03 Darwin 64"
-@ DATE             %08s "15/10/13"
-@ TIME             %08s "10.34.08"
+@ ORIGIN           %17s "5.02.09 Darwin 64"
+@ DATE             %08s "18/04/16"
+@ TIME             %08s "18.19.16"
 * NAME                          S         BETX         BETY         ALFX         ALFY           DX          DPX          MUX          MUY            X           PX            Y           PY 
 $ %s                          %le          %le          %le          %le          %le          %le          %le          %le          %le          %le          %le          %le          %le 
  "IP1"                   0.000000    11.000000    11.000000     0.000000     0.000000     0.000000     0.000000     0.000000     0.000000     0.000000     0.000000     0.000000     0.000000

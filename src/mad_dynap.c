@@ -71,13 +71,13 @@ track_dynap(struct in_cmd* cmd)
   // twcpin_(oneturnmat,disp0,r0mat,&error); /* added for disp0 computation */
 
   // LD 2016.02.17: BUG, depends on the previous oneturnmap and disp0
-  adjust_probe(track_deltap); /* sets correct gamma, beta, etc. */
-  adjust_rfc(); /* sets freq in rf-cavities from probe */
+  adjust_probe_fp(track_deltap); /* sets correct gamma, beta, etc. */
+  // adjust_rfc(); /* sets freq in rf-cavities from probe */
   // if (get_option("debug")) print_probe();
 
-  zero_double(orbit0, 6);
+  // zero_double(orbit0, 6);
   // zero_double(disp0, 6);
-  zero_double(oneturnmat, 6*6);
+  // zero_double(oneturnmat, 6*6);
   // LD 2016.02.18: END
 
   if (get_option("onepass") == 0)

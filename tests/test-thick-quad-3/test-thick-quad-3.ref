@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.07  (64 bit, Darwin)      +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.09.24               +
-  + Execution date: 2015.10.13 12:11:29      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:22:08      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -28,8 +28,6 @@ select,flag=twiss,column=name,s,betx,alfx,dx,dpx,bety,alfy,dy,dpy,mux,muy,aperty
 twiss,sequence=fivecell,file="fivecell_thick.tfs";
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -79,8 +77,6 @@ use,period=fivecell;
 twiss,sequence=fivecell,file="fivecell_thin.tfs";
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -149,8 +145,6 @@ one pass is on
 
   run,   turns= 1;
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
 
 ++++++ table: tracksumm
 

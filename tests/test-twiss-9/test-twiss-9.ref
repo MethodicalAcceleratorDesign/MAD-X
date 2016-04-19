@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.08  (64 bit, Darwin)      +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.11.20               +
-  + Execution date: 2016.02.16 18:44:14      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:19:20      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -101,12 +101,43 @@ parameter: vector   double array: 1.000000e-04 1.000000e-04 1.000000e+00
 twiss, save, centre; 
 
 enter Twiss module
- Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
-updating probe_beam for deltap=0 => ds=   -0.61554925635823643
-  parameters: freq0= 0.00375226490803993572, alfa=7.70435135473932066e-06
+Twiss pre-init: adjusting probe and oneturnmat (fix point)
+updating probe_beam for deltap=0 => ds=  -0.615549256344715023
+  parameters: freq0= 0.00375226490803993572, alfa=7.70435135457008517e-06
               beta=   0.999999999995736744, gamma=    342466.471867040789, dtbyds=                      0
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
+Twiss pre-init: iteration 1, delta ds = -6.15549256e-01 (fix point)
+updating probe_beam for deltap=0 => ds=  -0.615549256344715023
+  parameters: freq0= 0.00375226490803993572, alfa=7.70435135457008517e-06
+              beta=   0.999999999995736744, gamma=    342466.471867040789, dtbyds=                      0
+Twiss pre-init: iteration 2, delta ds = 0.00000000e+00 (fix point)
+ 
+ Global parameters for electrons, radiate = F:
+
+ C                    79896.4 m          f0            0.003752264908 MHz
+ T0               266.5057038 musecs     alfa         7.704351355e-06 
+ eta          7.704342828e-06            gamma(tr)        360.2732023 
+ Bcurrent      0.005410611811 A/bunch    Kbunch             1 
+ Npart                  9e+12 /bunch     Energy                   175 GeV 
+ gamma            342466.4719            beta                       1
+ Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+Twiss pre-init: adjusting probe and oneturnmat (fix point)
+updating probe_beam for deltap=0 => ds=  -0.615549256344715023
+  parameters: freq0= 0.00375226490803993572, alfa=7.70435135457008517e-06
+              beta=   0.999999999995736744, gamma=    342466.471867040789, dtbyds=                      0
+Twiss pre-init: iteration 1, delta ds = -6.15549256e-01 (fix point)
+updating probe_beam for deltap=0 => ds=  -0.615549256344715023
+  parameters: freq0= 0.00375226490803993572, alfa=7.70435135457008517e-06
+              beta=   0.999999999995736744, gamma=    342466.471867040789, dtbyds=                      0
+Twiss pre-init: iteration 2, delta ds = 0.00000000e+00 (fix point)
+ 
+ Global parameters for electrons, radiate = F:
+
+ C                    79896.4 m          f0            0.003752264908 MHz
+ T0               266.5057038 musecs     alfa         7.704351355e-06 
+ eta          7.704342828e-06            gamma(tr)        360.2732023 
+ Bcurrent      0.005410611811 A/bunch    Kbunch             1 
+ Npart                  9e+12 /bunch     Energy                   175 GeV 
+ gamma            342466.4719            beta                       1
  
  Global parameters for electrons, radiate = F:
 
@@ -5524,7 +5555,7 @@ updating probe_beam for deltap=0 => ds=   -0.61554925635823643
 iteration:   1 error:   4.919639E-04 deltap:   0.000000E+00
 orbit:   2.502626E-06  2.178362E-05 -1.992044E-05 -5.056846E-06  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   6.136157E-11 deltap:   0.000000E+00
+iteration:   2 error:   6.136233E-11 deltap:   0.000000E+00
 orbit:   2.502581E-06  2.178362E-05 -1.992047E-05 -5.056848E-06  0.000000E+00  0.000000E+00
 
 ++++++ table: summ

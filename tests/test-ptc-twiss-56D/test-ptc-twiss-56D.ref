@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Linux)       +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.05.19 17:03:42      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:25:58      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -839,8 +839,6 @@ ptc_create_universe;
 
   ptc_twiss, table=twiss, icase=56, no=2, closed_orbit;
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
 
 ++++++ table: ptc_twiss_summary
 
@@ -884,16 +882,16 @@ ptc_create_universe;
                  0    1.168573345e-08                  0    3.059593723e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0     9.71179733e-09                  0    2.508645927e-08 
+                 0    9.711796548e-09                  0    2.508645927e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.106286922e-08                  0    2.153666726e-08 
+                 0    1.106286922e-08                  0    2.153666598e-08 
 
            ptcomax             xcomin             ycomin            pxcomin 
                  0   -1.447485988e-12                  0   -1.106286967e-08 
 
            pycomin             tcomin            ptcomin 
-                 0    -3.28542878e-09                  0 
+                 0   -3.285428943e-09                  0 
   write, table=twiss, file="leir.56d.ptc.twiss";
 
   write, table=ptc_twiss_summary, file="leir.56d.ptc.summ.twiss";
@@ -914,5 +912,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

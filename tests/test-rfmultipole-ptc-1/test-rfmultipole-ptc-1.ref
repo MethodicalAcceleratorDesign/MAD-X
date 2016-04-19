@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.08  (64 bit, Linux)       +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.11.20               +
-  + Execution date: 2015.12.04 16:42:02      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:26:17      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, 'RF-Dipole example';
 
@@ -35,7 +35,6 @@ select, flag = twiss, column=name,s,betx,alfx,mux, bety, alfy,muy,dx,dy;
 twiss, save, centre; 
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
   
 iteration:   1 error:   2.808186E-33 deltap:   0.000000E+00
 orbit:   8.417120E-34  4.970451E-34  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -104,7 +103,6 @@ ptc_create_universe;
 
     ptc_twiss, table=twiss,icase=5;
 
-++++++ info: Zero value of SIGT replaced by 1.
  ************ State Summary ****************
  MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
   Rectangular Bend: input arc length (rho alpha) 

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2014.11.14               +
-  + Execution date: 2015.03.11 15:01:38      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:23:36      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title,'testing BEAM definitions in MADX';
 
@@ -34,9 +34,9 @@ parameter: ex   double value:    7.818950713e-09
 parameter: exn   double value:           3.75e-06
 parameter: ey   double value:    7.818950713e-09
 parameter: eyn   double value:           3.75e-06
-parameter: et   double value:                  1
-parameter: sigt   double value:                  0
-parameter: sige   double value:                  0
+parameter: et   double value:              0.001
+parameter: sigt   double value:                  1
+parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0
@@ -62,8 +62,6 @@ select, flag=twiss, column=name,s,l,betx,bety,alfx,alfy,dx,dpx,mux,muy,n1;
 twiss, sequence=LHCCELL;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -109,9 +107,9 @@ parameter: ex   double value:    7.818950713e-09
 parameter: exn   double value:           3.75e-06
 parameter: ey   double value:    7.818950713e-09
 parameter: eyn   double value:           3.75e-06
-parameter: et   double value:                  1
-parameter: sigt   double value:                  0
-parameter: sige   double value:                  0
+parameter: et   double value:              0.001
+parameter: sigt   double value:                  1
+parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0
@@ -137,8 +135,6 @@ select, flag=twiss, column=name,s,l,betx,bety,alfx,alfy,dx,dpx,mux,muy,n1;
 twiss, sequence=LHCCELL;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -184,9 +180,9 @@ parameter: ex   double value:    7.818920119e-09
 parameter: exn   double value:           3.75e-06
 parameter: ey   double value:    7.818920119e-09
 parameter: eyn   double value:           3.75e-06
-parameter: et   double value:                  1
-parameter: sigt   double value:                  0
-parameter: sige   double value:                  0
+parameter: et   double value:              0.001
+parameter: sigt   double value:                  1
+parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0
@@ -212,8 +208,6 @@ select, flag=twiss, column=name,s,l,betx,bety,alfx,alfy,dx,dpx,mux,muy,n1;
 twiss, sequence=LHCCELL;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -259,9 +253,9 @@ parameter: ex   double value:    7.818950713e-09
 parameter: exn   double value:           3.75e-06
 parameter: ey   double value:    7.818950713e-09
 parameter: eyn   double value:           3.75e-06
-parameter: et   double value:                  1
-parameter: sigt   double value:                  0
-parameter: sige   double value:                  0
+parameter: et   double value:              0.001
+parameter: sigt   double value:                  1
+parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0
@@ -287,8 +281,6 @@ select, flag=twiss, column=name,s,l,betx,bety,alfx,alfy,dx,dpx,mux,muy,n1;
 twiss, sequence=LHCCELL;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -334,9 +326,9 @@ parameter: ex   double value:    7.818950713e-09
 parameter: exn   double value:           3.75e-06
 parameter: ey   double value:    7.818950713e-09
 parameter: eyn   double value:           3.75e-06
-parameter: et   double value:                  1
-parameter: sigt   double value:                  0
-parameter: sige   double value:                  0
+parameter: et   double value:              0.001
+parameter: sigt   double value:                  1
+parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0
@@ -362,8 +354,6 @@ select, flag=twiss, column=name,s,l,betx,bety,alfx,alfy,dx,dpx,mux,muy,n1;
 twiss, sequence=LHCCELL;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -409,9 +399,9 @@ parameter: ex   double value:    7.818950713e-09
 parameter: exn   double value:           3.75e-06
 parameter: ey   double value:    7.818950713e-09
 parameter: eyn   double value:           3.75e-06
-parameter: et   double value:                  1
-parameter: sigt   double value:                  0
-parameter: sige   double value:                  0
+parameter: et   double value:              0.001
+parameter: sigt   double value:                  1
+parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0
@@ -437,8 +427,6 @@ select, flag=twiss, column=name,s,l,betx,bety,alfx,alfy,dx,dpx,mux,muy,n1;
 twiss, sequence=LHCCELL;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -484,9 +472,9 @@ parameter: ex   double value:    7.818950713e-09
 parameter: exn   double value:           3.75e-06
 parameter: ey   double value:    7.818950713e-09
 parameter: eyn   double value:           3.75e-06
-parameter: et   double value:                  1
-parameter: sigt   double value:                  0
-parameter: sige   double value:                  0
+parameter: et   double value:              0.001
+parameter: sigt   double value:                  1
+parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0
@@ -512,8 +500,6 @@ select, flag=twiss, column=name,s,l,betx,bety,alfx,alfy,dx,dpx,mux,muy,n1;
 twiss, sequence=LHCCELL;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -559,9 +545,9 @@ parameter: ex   double value:    7.818950711e-09
 parameter: exn   double value:           3.75e-06
 parameter: ey   double value:    7.818950711e-09
 parameter: eyn   double value:           3.75e-06
-parameter: et   double value:                  1
-parameter: sigt   double value:                  0
-parameter: sige   double value:                  0
+parameter: et   double value:              0.001
+parameter: sigt   double value:                  1
+parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0
@@ -587,8 +573,6 @@ select, flag=twiss, column=name,s,l,betx,bety,alfx,alfy,dx,dpx,mux,muy,n1;
 twiss, sequence=LHCCELL;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.08  (64 bit, Darwin)      +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.11.20               +
-  + Execution date: 2016.04.04 12:14:30      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:27:19      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option, -echo;
 
@@ -41,16 +41,12 @@ select, flag=twiss, column=name,s,betx,bety,alfx,alfy,mux,muy,dx,dpx,dy,dpy,
 twiss, rmatrix, chrom, save;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
-iteration:   1 error:   1.178158E-04 deltap:   1.000000E-06
-orbit:  -7.037257E-06 -1.676362E-06  0.000000E+00  0.000000E+00 -1.960125E-06  3.016099E-07
+iteration:   1 error:   1.763227E-04 deltap:   1.000000E-06
+orbit:  -9.649253E-06 -2.298584E-06  0.000000E+00  0.000000E+00 -2.965937E-06  5.991433E-07
   
-iteration:   2 error:   5.695677E-10 deltap:   1.000000E-06
-orbit:  -7.037391E-06 -1.676328E-06  0.000000E+00  0.000000E+00 -1.508340E-06  3.016136E-07
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
+iteration:   2 error:   1.052580E-09 deltap:   1.000000E-06
+orbit:  -9.649474E-06 -2.298528E-06  0.000000E+00  0.000000E+00 -2.068187E-06  5.991503E-07
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -61,13 +57,13 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
        78.54370266                 -0       0.1241075638        2.838578276 
 
                 q1                dq1            betxmax              dxmax 
-       1.820059621       -3.734960278        15.12421277         20.6041956 
+       1.820059621       -5.030192681        15.12421277         20.6041956 
 
              dxrms             xcomax             xcorms                 q2 
        9.639962105                  0                  0         2.71982919 
 
                dq2            betymax              dymax              dyrms 
-      -7.573739495        20.07025727                  0                  0 
+      -10.39500532        20.07025727                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0        9.747887059 
@@ -79,8 +75,6 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 plot, haxis=s, vaxis=betx;
 
 Plot - default table plotted: twiss
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
 
  GXPLOT-X11  1.50 initialized
 
@@ -90,16 +84,12 @@ Plot - default table plotted: twiss
 plot, haxis=s, vaxis=betx, colour=100, title="sample plot";
 
 Plot - default table plotted: twiss
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  plot number =            2
 
 
 plot, haxis=s, vaxis=betx,bety, colour=100, title="two variables";
 
 Plot - default table plotted: twiss
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  plot number =            3
 
 
@@ -108,8 +98,6 @@ title, "two variables with range";
 plot, haxis=s, vaxis=betx,bety, colour=100, range=CtrS10/CtrS20;
 
 Plot - default table plotted: twiss
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  plot number =            4
 
 
@@ -118,8 +106,6 @@ title, "two variables with range and range_plot";
 plot, haxis=s, vaxis=betx,bety, colour=100, range_plot, range=CtrS10/CtrS20, noversion;
 
 Plot - default table plotted: twiss
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  plot number =            5
 
 
@@ -128,8 +114,6 @@ title, "two variables on vaxis2";
 plot, haxis=s, vaxis2=betx,bety, colour=100; ! test a single vaxis<i> but not in order
 
 Plot - default table plotted: twiss
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  plot number =            6
 
 
@@ -138,8 +122,6 @@ title, "two variables and some more options";
 plot, haxis=s, vaxis=betx,bety, colour=100, notitle, noversion, noline, interpolate;
 
 Plot - default table plotted: twiss
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  plot number =            7
 
 
@@ -148,8 +130,6 @@ title, "two axes; interpolate";
 plot, haxis=s, vaxis1=betx,bety, vaxis2=mux,muy, colour=100, interpolate, noversion;
 
 Plot - default table plotted: twiss
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  plot number =            8
 
 
@@ -158,8 +138,6 @@ title, "three axes; noversion";
 plot, haxis=s, vaxis1=betx,bety, vaxis2=mux,muy, vaxis3=alfx,alfy, colour=100, noversion;
 
 Plot - default table plotted: twiss
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  plot number =            9
 
 
@@ -168,8 +146,6 @@ title, "four axes; interpolate, noline, notitle, noversion ";
 plot, haxis=s, vaxis1=betx,bety, vaxis2=mux,muy, vaxis3=alfx,alfy, vaxis4=dx, colour=100, interpolate, noline, notitle, noversion;
 
 Plot - default table plotted: twiss
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  plot number =           10
 
 
@@ -178,8 +154,6 @@ title, "non-s horizontal axis";
 plot, haxis=mux, vaxis=betx, colour=100;
 
 Plot - default table plotted: twiss
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  plot number =           11
 
 
@@ -192,8 +166,6 @@ plot, haxis=s, colour=100 ,title="large # of variables on vaxis", noversion,
       vaxis= s,betx,bety,alfx,alfy,mux,muy,dx,dpx;
 
 Plot - default table plotted: twiss
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
 ++++++ warning: PLOT:  Array index larger than array limit; label is truncated
  plot number =           12
 
@@ -205,8 +177,6 @@ plot, haxis=s, colour=100, title="max # of variables on vaxis1", noversion,
       vaxis2= re21,re22,re23,re24;
 
 Plot - default table plotted: twiss
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  plot number =           13
 
 
@@ -224,150 +194,134 @@ plot, haxis=s, colour=100, title="overflow in number of variables to be plotted"
 
 Plot - default table plotted: twiss
 ++++++ warning: PLOT:   6 variables on VAXIS4 would overflow max number(10). all variables ignored.                                            
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  plot number =           14
 
 
 twiss, save, deltap=-.015:.02:.005;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
-iteration:   1 error:   1.758473E+00 deltap:  -1.500000E-02
-orbit:   1.376635E-01  1.618612E-02  0.000000E+00  0.000000E+00  2.126633E-01 -4.309372E-03
+iteration:   1 error:   2.721378E+00 deltap:  -1.500000E-02
+orbit:   1.985311E-01  2.082601E-02  0.000000E+00  0.000000E+00  3.227005E-01 -8.918398E-03
   
-iteration:   2 error:   8.206504E-02 deltap:  -1.500000E-02
-orbit:   9.773994E-02  2.679297E-02  0.000000E+00  0.000000E+00  1.805851E-02 -3.662174E-03
+iteration:   2 error:   1.257068E-01 deltap:  -1.500000E-02
+orbit:   1.303440E-01  3.884197E-02  0.000000E+00  0.000000E+00  1.235940E-02 -7.698123E-03
   
-iteration:   3 error:   2.150814E-03 deltap:  -1.500000E-02
-orbit:   9.926951E-02  2.639160E-02  0.000000E+00  0.000000E+00  2.585202E-02 -3.623701E-03
+iteration:   3 error:   7.955828E-03 deltap:  -1.500000E-02
+orbit:   1.360767E-01  3.738751E-02  0.000000E+00  0.000000E+00  3.835325E-02 -7.575515E-03
   
-iteration:   4 error:   7.135215E-06 deltap:  -1.500000E-02
-orbit:   9.926819E-02  2.639179E-02  0.000000E+00  0.000000E+00  2.590873E-02 -3.623680E-03
+iteration:   4 error:   8.854958E-05 deltap:  -1.500000E-02
+orbit:   1.360497E-01  3.739264E-02  0.000000E+00  0.000000E+00  3.845133E-02 -7.575246E-03
   
-iteration:   5 error:   3.022131E-10 deltap:  -1.500000E-02
-orbit:   9.926819E-02  2.639179E-02  0.000000E+00  0.000000E+00  2.590876E-02 -3.623680E-03
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
+iteration:   5 error:   1.468252E-08 deltap:  -1.500000E-02
+orbit:   1.360497E-01  3.739264E-02  0.000000E+00  0.000000E+00  3.845173E-02 -7.575246E-03
   
-iteration:   1 error:   1.945744E+00 deltap:  -1.000000E-02
-orbit:   1.262332E-01  1.858591E-02  0.000000E+00  0.000000E+00  1.554515E-01 -6.711720E-03
+iteration:   1 error:   1.797371E+00 deltap:  -1.000000E-02
+orbit:   1.179270E-01  1.754522E-02  0.000000E+00  0.000000E+00  1.440441E-01 -5.984768E-03
   
-iteration:   2 error:   8.299287E-02 deltap:  -1.000000E-02
-orbit:   9.692193E-02  2.623596E-02  0.000000E+00  0.000000E+00  1.893604E-02 -6.009401E-03
+iteration:   2 error:   7.446832E-02 deltap:  -1.000000E-02
+orbit:   9.138308E-02  2.449674E-02  0.000000E+00  0.000000E+00  1.850243E-02 -5.369985E-03
   
-iteration:   3 error:   9.887099E-04 deltap:  -1.000000E-02
-orbit:   9.814560E-02  2.592090E-02  0.000000E+00  0.000000E+00  2.541043E-02 -5.985148E-03
+iteration:   3 error:   7.846790E-04 deltap:  -1.000000E-02
+orbit:   9.232377E-02  2.425326E-02  0.000000E+00  0.000000E+00  2.362512E-02 -5.350535E-03
   
-iteration:   4 error:   3.810207E-06 deltap:  -1.000000E-02
-orbit:   9.814496E-02  2.592098E-02  0.000000E+00  0.000000E+00  2.544702E-02 -5.985136E-03
+iteration:   4 error:   2.316197E-06 deltap:  -1.000000E-02
+orbit:   9.232341E-02  2.425330E-02  0.000000E+00  0.000000E+00  2.365485E-02 -5.350528E-03
   
-iteration:   5 error:   6.676228E-11 deltap:  -1.000000E-02
-orbit:   9.814496E-02  2.592098E-02  0.000000E+00  0.000000E+00  2.544704E-02 -5.985136E-03
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
+iteration:   5 error:   2.896960E-11 deltap:  -1.000000E-02
+orbit:   9.232341E-02  2.425330E-02  0.000000E+00  0.000000E+00  2.365487E-02 -5.350528E-03
   
-iteration:   1 error:   9.757028E-01 deltap:  -5.000000E-03
-orbit:   5.732093E-02  1.103793E-02  0.000000E+00  0.000000E+00  4.530750E-02 -3.426170E-03
+iteration:   1 error:   8.901845E-01 deltap:  -5.000000E-03
+orbit:   5.305864E-02  1.027315E-02  0.000000E+00  0.000000E+00  4.132475E-02 -2.998748E-03
   
-iteration:   2 error:   2.623358E-02 deltap:  -5.000000E-03
-orbit:   5.062601E-02  1.275295E-02  0.000000E+00  0.000000E+00  1.135235E-02 -3.231152E-03
+iteration:   2 error:   2.277146E-02 deltap:  -5.000000E-03
+orbit:   4.707982E-02  1.181408E-02  0.000000E+00  0.000000E+00  1.055488E-02 -2.832456E-03
   
-iteration:   3 error:   4.792468E-05 deltap:  -5.000000E-03
-orbit:   5.068866E-02  1.273643E-02  0.000000E+00  0.000000E+00  1.194102E-02 -3.229832E-03
+iteration:   3 error:   3.708928E-05 deltap:  -5.000000E-03
+orbit:   4.712672E-02  1.180168E-02  0.000000E+00  0.000000E+00  1.102741E-02 -2.831432E-03
   
-iteration:   4 error:   9.826104E-09 deltap:  -5.000000E-03
-orbit:   5.068866E-02  1.273643E-02  0.000000E+00  0.000000E+00  1.194306E-02 -3.229832E-03
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
+iteration:   4 error:   5.619434E-09 deltap:  -5.000000E-03
+orbit:   4.712672E-02  1.180168E-02  0.000000E+00  0.000000E+00  1.102899E-02 -2.831432E-03
   
-iteration:   1 error:   3.221262E-16 deltap:   1.734723E-18
-orbit:  -1.746477E-17 -4.160193E-18  0.000000E+00  0.000000E+00 -5.426317E-18  1.122009E-18
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
+iteration:   1 error:   3.058718E-16 deltap:   1.734723E-18
+orbit:  -1.673909E-17 -3.987332E-18  0.000000E+00  0.000000E+00 -5.146787E-18  1.039348E-18
   
-iteration:   1 error:   8.830782E-01 deltap:   5.000000E-03
-orbit:  -4.475209E-02 -1.259717E-02  0.000000E+00  0.000000E+00  8.149703E-03  3.038562E-03
+iteration:   1 error:   8.729739E-01 deltap:   5.000000E-03
+orbit:  -4.434521E-02 -1.247473E-02  0.000000E+00  0.000000E+00  8.034406E-03  2.986378E-03
   
-iteration:   2 error:   2.976350E-02 deltap:   5.000000E-03
-orbit:  -5.005955E-02 -1.129655E-02  0.000000E+00  0.000000E+00 -1.024866E-02  3.226032E-03
+iteration:   2 error:   2.917782E-02 deltap:   5.000000E-03
+orbit:  -4.957170E-02 -1.119206E-02  0.000000E+00  0.000000E+00 -1.015056E-02  3.169983E-03
   
-iteration:   3 error:   3.365869E-05 deltap:   5.000000E-03
-orbit:  -5.002850E-02 -1.130517E-02  0.000000E+00  0.000000E+00 -9.820047E-03  3.226900E-03
+iteration:   3 error:   3.252444E-05 deltap:   5.000000E-03
+orbit:  -4.954169E-02 -1.120039E-02  0.000000E+00  0.000000E+00 -9.732713E-03  3.170823E-03
   
-iteration:   4 error:   1.863708E-09 deltap:   5.000000E-03
-orbit:  -5.002850E-02 -1.130517E-02  0.000000E+00  0.000000E+00 -9.818780E-03  3.226900E-03
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
+iteration:   4 error:   1.725632E-09 deltap:   5.000000E-03
+orbit:  -4.954169E-02 -1.120039E-02  0.000000E+00  0.000000E+00 -9.731488E-03  3.170823E-03
   
-iteration:   1 error:   1.685214E+00 deltap:   1.000000E-02
-orbit:  -8.080960E-02 -2.593353E-02  0.000000E+00  0.000000E+00  5.392856E-02  5.719568E-03
+iteration:   1 error:   1.728515E+00 deltap:   1.000000E-02
+orbit:  -8.239427E-02 -2.651450E-02  0.000000E+00  0.000000E+00  5.562233E-02  5.946367E-03
   
-iteration:   2 error:   1.202219E-01 deltap:   1.000000E-02
-orbit:  -1.001732E-01 -2.130765E-02  0.000000E+00  0.000000E+00 -2.094732E-02  6.445996E-03
+iteration:   2 error:   1.257750E-01 deltap:   1.000000E-02
+orbit:  -1.024680E-01 -2.173853E-02  0.000000E+00  0.000000E+00 -2.148097E-02  6.707674E-03
   
-iteration:   3 error:   4.661456E-04 deltap:   1.000000E-02
-orbit:  -9.981313E-02 -2.141053E-02  0.000000E+00  0.000000E+00 -1.804003E-02  6.457896E-03
+iteration:   3 error:   5.043947E-04 deltap:   1.000000E-02
+orbit:  -1.020806E-01 -2.184942E-02  0.000000E+00  0.000000E+00 -1.838019E-02  6.720550E-03
   
-iteration:   4 error:   3.786050E-07 deltap:   1.000000E-02
-orbit:  -9.981316E-02 -2.141053E-02  0.000000E+00  0.000000E+00 -1.802320E-02  6.457898E-03
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
+iteration:   4 error:   4.438291E-07 deltap:   1.000000E-02
+orbit:  -1.020806E-01 -2.184942E-02  0.000000E+00  0.000000E+00 -1.836202E-02  6.720552E-03
   
-iteration:   1 error:   2.417155E+00 deltap:   1.500000E-02
-orbit:  -1.110108E-01 -3.944691E-02  0.000000E+00  0.000000E+00  1.250676E-01  8.082165E-03
+iteration:   1 error:   2.566400E+00 deltap:   1.500000E-02
+orbit:  -1.160151E-01 -4.161953E-02  0.000000E+00  0.000000E+00  1.349035E-01  8.874213E-03
   
-iteration:   2 error:   2.676713E-01 deltap:   1.500000E-02
-orbit:  -1.511353E-01 -3.011842E-02  0.000000E+00  0.000000E+00 -3.450632E-02  9.660869E-03
+iteration:   2 error:   2.984785E-01 deltap:   1.500000E-02
+orbit:  -1.599449E-01 -3.152454E-02  0.000000E+00  0.000000E+00 -3.722504E-02  1.064218E-02
   
-iteration:   3 error:   2.057409E-03 deltap:   1.500000E-02
-orbit:  -1.497959E-01 -3.051391E-02  0.000000E+00  0.000000E+00 -2.503935E-02  9.713696E-03
+iteration:   3 error:   2.497224E-03 deltap:   1.500000E-02
+orbit:  -1.583597E-01 -3.199628E-02  0.000000E+00  0.000000E+00 -2.611001E-02  1.070657E-02
   
-iteration:   4 error:   6.483818E-06 deltap:   1.500000E-02
-orbit:  -1.497965E-01 -3.051392E-02  0.000000E+00  0.000000E+00 -2.496765E-02  9.713727E-03
+iteration:   4 error:   9.476161E-06 deltap:   1.500000E-02
+orbit:  -1.583606E-01 -3.199629E-02  0.000000E+00  0.000000E+00 -2.602355E-02  1.070661E-02
   
-iteration:   5 error:   3.823076E-10 deltap:   1.500000E-02
-orbit:  -1.497965E-01 -3.051392E-02  0.000000E+00  0.000000E+00 -2.496761E-02  9.713727E-03
+iteration:   5 error:   6.227363E-10 deltap:   1.500000E-02
+orbit:  -1.583606E-01 -3.199629E-02  0.000000E+00  0.000000E+00 -2.602349E-02  1.070661E-02
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-       78.54370266     -0.02590875876      0.02457588466        6.378894508 
-       78.54370266     -0.02544704014      0.01659221303        7.763326337 
-       78.54370266     -0.01194305771      0.07147557127        3.740426993 
-       78.54370266    5.426317226e-18       0.1241075638        2.838578276 
-       78.54370266     0.009818779942        0.170569425        2.421304489 
-       78.54370266      0.01802319856       0.2125083206        2.169262109 
-       78.54370266      0.02496760539       0.2511691688        1.995339665 
+       78.54370266     -0.03845172795     -0.03069227648       -5.708019513 
+       78.54370266     -0.02365486513      0.02485970852        6.342375983 
+       78.54370266     -0.01102899203      0.07605477532        3.626074779 
+       78.54370266    5.146787461e-18       0.1241075638        2.838578276 
+       78.54370266     0.009731488013       0.1700447204        2.425037304 
+       78.54370266      0.01836202079       0.2147749131         2.15778527 
+       78.54370266      0.02602348513       0.2591591797        1.964340187 
 
                 q1                dq1            betxmax              dxmax 
-       1.878870313       -5.641801327        19.37673803        23.56079048 
-       1.876238391       -5.516682988        19.12127515        23.60127623 
-       1.847584222       -4.812890115        16.64111644        22.00093189 
+       1.902855781       -6.580753514        22.93800808        25.13049025 
+       1.872765708       -5.418781431        18.74735793        23.37655812 
+       1.845673126       -4.778207384        16.50995674        21.88606285 
        1.820059621       -4.353246567        15.12421277         20.6041956 
-       1.794961908       -4.037587469        14.20130913        19.48330204 
-       1.771596509       -3.799798768        13.57234154        18.57015828 
-       1.749507512       -3.609123789        13.12236773        17.81548401 
+       1.795188366         -4.0398314        14.20883528        19.49427402 
+       1.770599606       -3.791825178        13.54710374        18.52722883 
+       1.745935941       -3.585203198        13.05184773        17.67909912 
 
              dxrms             xcomax             xcorms                 q2 
-       10.99911441       0.2440180351       0.1134940174        2.839736762 
-       11.01376262       0.2410661975       0.1121240343        2.837562259 
-       10.23242654       0.1217674348      0.05673378849        2.777173974 
-       9.639962105    4.098931316e-17    1.917744851e-17         2.71982919 
-       9.246191062       0.1148265831      0.05405237463        2.668151635 
-       8.995445558       0.2242492031       0.1063712427        2.620617896 
-       8.848159367       0.3296928815        0.157782419        2.576244685 
+       11.83203099       0.3401578821       0.1582549879         2.89535204 
+       10.89943091       0.2261578332       0.1051993146        2.829749095 
+        10.1800733       0.1130249921      0.05267193492        2.772963638 
+       9.639962105    3.928615951e-17    1.838060321e-17         2.71982919 
+       9.249783192       0.1137336882      0.05353426257        2.668639486 
+        8.98433568       0.2291212648       0.1087242234        2.618496135 
+       8.822437654       0.3473147968       0.1664921926        2.568741144 
 
                dq2            betymax              dymax              dyrms 
-      -12.64141184        24.65138258                  0                  0 
-      -12.45869733        24.60796511                  0                  0 
-       -10.6137463        21.57247523                  0                  0 
+      -16.16204515        31.60905423                  0                  0 
+      -12.16580323        24.05619932                  0                  0 
+         -10.52255        21.42288258                  0                  0 
       -9.482226679        20.07025727                  0                  0 
-      -8.695920733        19.26352284                  0                  0 
-      -8.086998443        18.80006037                  0                  0 
-      -7.585942837        18.54406193                  0                  0 
+      -8.701934666        19.27042089                  0                  0 
+      -8.064976362        18.77994462                  0                  0 
+      -7.518145862        18.49925692                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0             -0.015                  0 
@@ -394,8 +348,6 @@ plot, table="summ", haxis=deltap,vaxis1=q1,vaxis2=q2,
 
       colour=100,symbol=2,style=1,noversion, title="tunes vs deltap";
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  plot number =           15
 
 
@@ -407,16 +359,12 @@ Assigned alignment errors to 1 elements
 twiss, rmatrix, chrom, save;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   9.110727E-04 deltap:   1.000000E-06
-orbit:  -7.431791E-06 -1.580962E-06 -3.527664E-04 -1.117411E-04 -3.616661E-06  3.024851E-07
+orbit:  -1.004379E-05 -2.203183E-06 -3.527545E-04 -1.117392E-04 -4.622495E-06  6.000182E-07
   
-iteration:   2 error:   3.172464E-07 deltap:   1.000000E-06
-orbit:  -7.220412E-06 -1.626749E-06 -3.527782E-04 -1.117432E-04 -2.332031E-06  3.065380E-07
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
+iteration:   2 error:   3.168097E-07 deltap:   1.000000E-06
+orbit:  -9.832489E-06 -2.248951E-06 -3.527700E-04 -1.117415E-04 -2.891848E-06  6.040747E-07
   
 iteration:   1 error:   9.110582E-04 deltap:   0.000000E+00
 orbit:  -3.945560E-07  9.540872E-08 -3.528008E-04 -1.117479E-04 -1.656671E-06  8.757737E-10
@@ -430,13 +378,13 @@ orbit:  -1.830396E-07  4.958385E-08 -3.528003E-04 -1.117477E-04 -8.237753E-07  4
        78.54370266     8.23775251e-07       0.1241073494        2.838580728 
 
                 q1                dq1            betxmax              dxmax 
-       1.820059925       -3.734996857         15.1242288        20.60418541 
+       1.820059925       -5.030242886         15.1242288        20.60418541 
 
              dxrms             xcomax             xcorms                 q2 
         9.63996548    2.951973839e-07    1.617984962e-07        2.719828845 
 
                dq2            betymax              dymax              dyrms 
-      -7.573702113        20.07026075      0.03370810773      0.01449284256 
+      -10.39495408        20.07026075      0.03370810773      0.01449284256 
 
             ycomax             ycorms             deltap            synch_1 
    0.0007500437446    0.0003371120552                  0        9.747886825 
@@ -450,8 +398,6 @@ plot, haxis=s, vaxis=y, interpolate, range=QFN12/XFW11, noversion, hmin=10.5,hma
 title="interpolate orbit in drifts";
 
 Plot - default table plotted: twiss
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  plot number =           16
 
 

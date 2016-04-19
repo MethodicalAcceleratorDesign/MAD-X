@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Darwin)      +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.05.20 18:13:46      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:22:59      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, "LHC Version 6.503 -  July 2009 - version with RCOLLIMATORs" ;
 
@@ -74,8 +74,6 @@ select, flag=twiss, column=name,s,betx,bety,x,px,y,py,apertype,on_elem, class=rc
 twiss, sequence=lhcb1, file="twiss-table.out";
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   2.348867E-03 deltap:   0.000000E+00
 orbit:  -2.024091E-03  6.263101E-07  1.934669E-06  1.728349E-04  0.000000E+00  0.000000E+00
@@ -139,8 +137,6 @@ select, flag=ptc_twiss, column=name,s,betx,bety,x,px,y,py,apertype,on_elem, clas
 
 ptc_twiss,  closed_orbit, icase=6, no=3, file="ptc-twiss-table.out";
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
 ++++++ warning: return mystate:   no cavity - dimensionality reduced 6 -> 5 and 1/2
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
@@ -233,5 +229,5 @@ stop;
 0 in C and 1 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++
