@@ -4,7 +4,6 @@
 
 # env settings
 export PATH="`pwd`:/opt/local/bin:$PATH"
-export LANG=en_US.UTF-8
 
 # error handler
 check_error ()
