@@ -471,24 +471,6 @@ pro_embedded_twiss(struct command* current_global_twiss)
     set_value("twiss", "r21", &r21);       nl->inform[name_list_pos("r21",nl)] = 1;
     set_value("twiss", "r22", &r22);       nl->inform[name_list_pos("r22",nl)] = 1;
 
-    // LD 2016.02.18: START
-    zero_double(orbit0, 6);
-    /*  zero_double(disp0, 6); // why is it disabled? */
-    // zero_double(oneturnmat, 6*6);
-
-    adjust_beam();
-    probe_beam = clone_command(current_beam);
-    // adjust_rfc(); /* sets rf freq and harmon */ 
-
-    // int error = 0;
-    // double r0mat[4] = {0};
-    // tmrefe_(oneturnmat); /* one-turn linear transfer map */
-    // twcpin_(oneturnmat,disp0,r0mat,&error); /* added for disp0 computation, breaks on open lines */
-    // LD 2016.02.18: END
-
-    // 2015-Sep-25  17:59:16  ghislain: following suppressed as redundant and misplaced
-    //tmrefe_(oneturnmat); /* one-turn linear transfer map */
-
     summ_table = make_table("summ", "summ", summ_table_cols, summ_table_types, twiss_deltas->curr+1);
     add_to_table_list(summ_table, table_register);
 
@@ -508,6 +490,8 @@ pro_embedded_twiss(struct command* current_global_twiss)
 
     // 2014-May-30  12:33:48  ghislain: modified order of priority
     //              and added input for values given on command line
+    zero_double(orbit0, 6);
+
     if (guess_flag) {
       if (get_option("info"))
 	      printf(" Found initial orbit vector from coguess values. \n");
@@ -544,6 +528,10 @@ pro_embedded_twiss(struct command* current_global_twiss)
     if(twiss_deltas->curr <= 0)
       fatal_error("PRO_TWISS_EMBEDDED "," - No twiss deltas");
 
+    // LD 2016.04.19
+    adjust_beam();
+    probe_beam = clone_command(current_beam);
+
     for (i = 0; i < twiss_deltas->curr; i++) {
 
       const char *table_embedded_name = "embedded_twiss_table";
@@ -568,9 +556,8 @@ pro_embedded_twiss(struct command* current_global_twiss)
       current_node = current_sequ->range_start;
       set_option("twiss_inval", &inval);
 
-      // LD 2016.02.18: BUG, depends on the previous oneturnmap and disp0
+      // LD 2016.04.19
       adjust_probe_fp(twiss_deltas->a[i]); /* sets correct gamma, beta, etc. */
-      // adjust_rfc(); /* sets freq in rf-cavities from probe */
 
       // CALL TWISS
       twiss_(oneturnmat, disp0, tarr->i, dummy_arr->i); /* different call */
@@ -789,7 +776,7 @@ pro_twiss(void)
   int i, j, lp, k_orb = 0, u_orb = 0, pos, k_save = 1, k = 1, k_sect, w_file, beta_def;
   int chrom_flg;
   int orbit_input = 0; // counter of number of elements of initial orbit given on command line
-
+  int debug = get_option("debug");
   int keep_info = get_option("info");
   i = keep_info * get_option("twiss_print");
   set_option("info", &i);
@@ -958,54 +945,6 @@ pro_twiss(void)
 
   set_twiss_deltas(current_twiss);
 
-  // LD 2016.02.18: START
-  zero_double(orbit0, 6);
-  zero_double(disp0, 6); // LD: added 2016.03.08
-  zero_double(oneturnmat, 6*6);
-
-  adjust_beam();
-  probe_beam = clone_command(current_beam);
-  adjust_probe_fp(twiss_deltas->a[0]);
-
-//  adjust_rfc(); /* sets rf freq and harmon */ // LD: added 2016.03.08
-
-// #if 1 // LD: 2016.02.16 ORIG, set to 0 to enable the fix point search
-//  tmrefe_(oneturnmat); /* one-turn linear transfer map */
-  // I do not run twcpin:
-  //  - either a proposer computation of disp0 must be provided
-  //  - either disp0 should not be used by adjust_probe(dp) making a tiny error
-  //    when disp0 shoud not be zero for transverse planes
-  // twcpin_(oneturnmat,disp0,r0mat,&error); /* added for disp0 computation, unstable r0mat */
-//#else // LD: 2016.02.16 START
-//  double err0 = 0;
-//  double dp0 = twiss_deltas->a[0];
-//  double oneturnmat0[4] = {0}, r0mat[4] = {0};
-//  int fp_step = 0, error = 0;
-//
-//  if (get_option("debug"))
-//    printf("Twiss pre-init: adjusting probe and oneturnmat (fix point)\n");
-//
-//  do { // LD: search the fix point of the oneturnmat versus probe
-//    if (get_option("debug"))
-//      printf("Twiss pre-init: iteration %d (fix point)\n", ++fp_step);
-//
-//    tmrefe_(oneturnmat); /* one-turn linear transfer map */
-//    twcpin_(oneturnmat,disp0,r0mat,&error); /* added for disp0 computation, breaks on open lines */
-//
-//    adjust_probe(dp0);   /* sets correct gamma, beta, etc. */
-//    adjust_rfc();        /* sets rf freq and harmon */
-//
-//    err0 = 0;
-//    for (int i=0; i<4; i++) {
-//      err0 += fabs(oneturnmat[4+6*i] - oneturnmat0[i]); 
-//      oneturnmat0[i] = oneturnmat[4+6*i];
-//    }
-//  } while (dp0 != 0 && err0 > 1e-15);
-//
-//  if (get_option("debug")) print_probe();
-//#endif // LD: 2016.02.16 END
-  // LD 2016.02.18: END
-
   summ_table = make_table("summ", "summ", summ_table_cols, summ_table_types, twiss_deltas->curr+1);
   add_to_table_list(summ_table, table_register);
 
@@ -1027,6 +966,8 @@ pro_twiss(void)
 
   // 2014-May-30  12:33:48  ghislain: modified order of priority
   //              and added input for values given on command line
+  zero_double(orbit0, 6);
+
   if (guess_flag) {
     if (get_option("info"))
       printf(" Found initial orbit vector from coguess values. \n");
@@ -1055,9 +996,13 @@ pro_twiss(void)
   if (orbit_input > 0 && get_option("info"))
     printf(" Found %d initial orbit vector values from twiss command. \n", orbit_input);
 
-  if (get_option("debug"))
+  if (debug)
     printf(" Initial orbit: %e %e %e %e %e %e\n", orbit0[0], orbit0[1], orbit0[2], orbit0[3], orbit0[4], orbit0[5]);
   // 2014-May-30  12:33:48  ghislain: end of modifications
+
+  // LD 2016.04.19
+  adjust_beam();
+  probe_beam = clone_command(current_beam);
 
   for (i = 0; i < twiss_deltas->curr; i++) {
 
@@ -1073,9 +1018,8 @@ pro_twiss(void)
       current_sequ->tw_valid = 1;
       twiss_table->org_sequ = current_sequ;
       
-      // LD 2016.02.17: BUG, depends on the previous oneturnmap and disp0
+      // LD 2016.04.19
       adjust_probe_fp(twiss_deltas->a[i]+DQ_DELTAP);
-      // adjust_rfc(); /* sets freq in rf-cavities from probe */
       current_node = current_sequ->ex_start;
       
       twiss_(oneturnmat, disp0, tarr->i, tarr_sector->i); // CALL TWISS
@@ -1095,10 +1039,8 @@ pro_twiss(void)
       twiss_table->org_sequ = current_sequ;
     }
 
-    // LD 2016.02.17: BUG, depends on the previous oneturnmap and disp0
+    // LD 2016.04.19
     adjust_probe_fp(twiss_deltas->a[i]); /* sets correct gamma, beta, etc. */
-    // adjust_rfc(); /* sets freq in rf-cavities from probe */
-    if (get_option("debug")) print_probe();
     current_node = current_sequ->ex_start;
 
     twiss_(oneturnmat, disp0, tarr->i, tarr_sector->i);

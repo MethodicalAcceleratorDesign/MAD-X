@@ -43,15 +43,10 @@ pro_touschek(struct in_cmd* cmd)
       add_to_table_list(touschek_table, table_register);
     }
   
-  // LD 2016.02.18: START
+  // LD 2016.04.19
   adjust_beam();
   probe_beam = clone_command(current_beam);
-  // adjust_rfc(); /* sets freq in rf-cavities from probe */
-
-  // LD 2016.02.17: BUG, depends on the previous oneturnmap and disp0 -> alpha is wrong even with dp=0
   adjust_probe_fp(0); /* sets correct gamma, beta, etc. */
-  // adjust_rfc(); /* sets freq in rf-cavities from probe */
-  // LD 2016.02.18: END
 
   touschek_();
 

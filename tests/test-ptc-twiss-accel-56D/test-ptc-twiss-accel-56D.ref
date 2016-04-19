@@ -3,7 +3,7 @@
   +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:26:10      +
+  + Execution date: 2016.04.19 14:44:50      +
   ++++++++++++++++++++++++++++++++++++++++++++
 PTCNSTEPS=3;
 
@@ -65,6 +65,8 @@ ptc_create_universe;
 
    ptc_create_layout,resplit,xbend, model=2, method=6, nst=PTCNSTEPS, exact=true, closed_layout=false;
 
+ TWDISP: Unable to compute intial dispersion --- dispersion set to zero.
+ TWDISP: Unable to compute intial dispersion --- dispersion set to zero.
  MAD-X Beam Parameters
                   Energy : 0.200000E+00
           Kinetic Energy : 0.199489E+00

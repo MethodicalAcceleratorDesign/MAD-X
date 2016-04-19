@@ -388,7 +388,7 @@ attach_beam(struct sequence* sequ)
   return current_beam->beam_def;
 }
 
-void
+static void
 adjust_probe(double delta_p)
   /* adjusts beam parameters to the current deltap */
 {
@@ -416,7 +416,7 @@ adjust_probe(double delta_p)
   alfa = one / (gammas * gammas) + tmp;
   dtbyds = delta_p * tmp / betas;
 
-// LD: 2016.02.16
+  // LD: 2016.02.16
   if (get_option("debug"))
     printf("updating probe_beam for deltap=%g => ds=%23.18g\n"
            "  parameters: freq0=%23.18g, alfa=%23.18g\n"
@@ -465,7 +465,7 @@ adjust_probe(double delta_p)
   store_comm_par_value("sige", sige, probe_beam);
 }
 
-void
+static void
 adjust_rfc(void)
 {
   /* adjusts rfc frequency to given harmon number */

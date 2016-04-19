@@ -3,7 +3,7 @@
   +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:27:07      +
+  + Execution date: 2016.04.19 15:16:50      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -2635,24 +2635,6 @@ SELECT, FLAG=TWISS, COLUMN=name,L,s,betx,bety,alfx,alfy,dx,dpx,dy,dpy,x,px,y,py,
 TWISS, beta0=QF.60010.BETA,SAVE; !, FILE="twiss.all.tfs";
 
 enter Twiss module
-Twiss pre-init: adjusting probe and oneturnmat (fix point)
-updating probe_beam for deltap=0 => ds=   -2.42421663108115526
-  parameters: freq0=  0.0788970808426955883, alfa=0.000642332772159945374
-              beta=    0.99999782629243994, gamma=    479.606080229025906, dtbyds=                      0
-Twiss pre-init: iteration 1, delta ds = -2.42421663e+00 (fix point)
-updating probe_beam for deltap=0 => ds=   -2.42421663108115526
-  parameters: freq0=  0.0788970808426955883, alfa=0.000642332772159945374
-              beta=    0.99999782629243994, gamma=    479.606080229025906, dtbyds=                      0
-Twiss pre-init: iteration 2, delta ds = 0.00000000e+00 (fix point)
- 
- Global parameters for protons, radiate = F:
-
- C                3799.783251 m          f0             0.07889708084 MHz
- T0               12.67474017 musecs     alfa         0.0006423327722 
- eta          0.0006379853618            gamma(tr)        39.45662731 
- Bcurrent                   0 A/bunch    Kbunch             1 
- Npart                      0 /bunch     Energy           450.0009782 GeV 
- gamma            479.6060802            beta            0.9999978263
  Found 6 initial orbit vector values from twiss command. 
  Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
 Twiss pre-init: adjusting probe and oneturnmat (fix point)
@@ -2664,15 +2646,6 @@ updating probe_beam for deltap=0 => ds=   -2.42421663108115526
   parameters: freq0=  0.0788970808426955883, alfa=0.000642332772159945374
               beta=    0.99999782629243994, gamma=    479.606080229025906, dtbyds=                      0
 Twiss pre-init: iteration 2, delta ds = 0.00000000e+00 (fix point)
- 
- Global parameters for protons, radiate = F:
-
- C                3799.783251 m          f0             0.07889708084 MHz
- T0               12.67474017 musecs     alfa         0.0006423327722 
- eta          0.0006379853618            gamma(tr)        39.45662731 
- Bcurrent                   0 A/bunch    Kbunch             1 
- Npart                      0 /bunch     Energy           450.0009782 GeV 
- gamma            479.6060802            beta            0.9999978263
  
  Global parameters for protons, radiate = F:
 
