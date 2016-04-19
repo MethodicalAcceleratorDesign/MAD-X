@@ -22,7 +22,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   integer :: chrom, eflag 
   double precision :: orbit0(6), orbit(6), tt(6,6,6), ddisp0(6), r0mat(2,2)
   character(len=48) :: charconv
-  character(len=120) :: warnstr
+  character(len=150) :: warnstr
   logical :: fast_error_func
 
   double precision, external :: get_value
@@ -636,7 +636,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
 
   logical :: fmap
   character(len=28) :: tmptxt1, tmptxt2, tmptxt3
-  character(len=120) :: warnstr
+  character(len=150) :: warnstr
   character(len=name_len) :: c_name(2), p_name, el_name
   character(len=2) :: ptxt(2)=(/'x-','y-'/)
   integer :: j, code, n_align, nobs, node, old, poc_cnt, debug
@@ -1025,7 +1025,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   double precision :: arg, den, det, r_det, dtr, sinmu2
   double precision :: betx0=zero, alfx0=zero, amux0=zero
   double precision :: bety0=zero, alfy0=zero, amuy0=zero
-  character(len=120) :: msg
+  character(len=150) :: msg
 
   integer, external :: get_option
   double precision, external :: get_value
@@ -1188,7 +1188,7 @@ SUBROUTINE twcpin_talman(rt,disp0,r0mat,eflag)
   double precision :: arg, den, det, dtr, sinmu2, r_det
   double precision :: betx0=zero, alfx0=zero, amux0=zero
   double precision :: bety0=zero, alfy0=zero, amuy0=zero
-  character(len=120) :: msg
+  character(len=150) :: msg
 
   double precision :: det_e=zero, det_f=zero
   
@@ -1349,7 +1349,7 @@ SUBROUTINE twcpin_sagan(rt,disp0,r0mat, eflag)
   double precision :: arg, den, det, dtr, sinmu2, det_e, det_f
   double precision :: betx0=zero, alfx0=zero, amux0=zero
   double precision :: bety0=zero, alfy0=zero, amuy0=zero
-  character(len=120) :: msg
+  character(len=150) :: msg
 
   integer, external :: get_option
   double precision, external :: get_value
@@ -1819,7 +1819,7 @@ SUBROUTINE twcptk(re,orbit)
   double precision :: alfx0=zero, betx0=zero, amux0=zero, alfx_ini=zero, betx_ini=zero, amux_ini=zero
   double precision :: alfy0=zero, bety0=zero, amuy0=zero, alfy_ini=zero, bety_ini=zero, amuy_ini=zero
   character(len=name_len) :: name
-  character(len=120)      :: warnstr
+  character(len=150)      :: warnstr
   
   integer, external :: get_option
   double precision, parameter :: eps=1d-36
@@ -2235,7 +2235,7 @@ SUBROUTINE twcptk_sagan(re,orbit) ! new, RD matrix, talman, sagan
   double precision :: alfy0=zero, bety0=zero, amuy0=zero, alfy_ini=zero, bety_ini=zero
 
   character(len=name_len) :: name
-  character(len=120)      :: warnstr
+  character(len=150)      :: warnstr
   
   integer, external :: get_option
   double precision, parameter :: eps=1d-36
