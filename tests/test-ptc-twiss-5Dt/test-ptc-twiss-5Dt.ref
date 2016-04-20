@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:25:56      +
+  + Release   date: 2016.04.21               +
+  + Execution date: 2016.04.20 16:57:01      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -803,7 +803,7 @@ twiss, rmatrix, chrom, save;
 enter Twiss module
   
 iteration:   1 error:   1.763227E-04 deltap:   1.000000E-06
-orbit:  -9.649253E-06 -2.298584E-06  0.000000E+00  0.000000E+00 -2.965937E-06  5.991433E-07
+orbit:  -9.649253E-06 -2.298584E-06  0.000000E+00  0.000000E+00 -2.965938E-06  5.991433E-07
   
 iteration:   2 error:   1.052580E-09 deltap:   1.000000E-06
 orbit:  -9.649474E-06 -2.298528E-06  0.000000E+00  0.000000E+00 -2.068187E-06  5.991503E-07
@@ -887,49 +887,8 @@ ptc_create_universe;
 
 
 
-  ptc_printframes, file="leir.C", format=rootmacro;!this prints my visualisation with ROOT
+!  ptc_printframes, file="leir.C", format=rootmacro;!this prints my visualisation with ROOT
 
-mad_ptc.c: pro_ptc_printframes: format is rootmacro.
-          38 BA1HO.1                 All three reference frames are inline. DRAWING AS RBEND
-          41 BA1HI.1                 All three reference frames are inline. DRAWING AS RBEND
-          43 BI1PO.1                 All three reference frames are inline. DRAWING AS RBEND
-          45 BI1PM.1                 SBEND curvature is almost null. DRAWING AS RBEND
-          47 BI1PI.1                 All three reference frames are inline. DRAWING AS RBEND
-          51 BI2PI.1                 All three reference frames are inline. DRAWING AS RBEND
-          53 BI2PM.1                 All three reference frames are inline. DRAWING AS RBEND
-          55 BI2PO.1                 All three reference frames are inline. DRAWING AS RBEND
-          57 BA2HI.1                 All three reference frames are inline. DRAWING AS RBEND
-          60 BA2HO.1                 All three reference frames are inline. DRAWING AS RBEND
-         114 BA1HO.2                 All three reference frames are inline. DRAWING AS RBEND
-         117 BA1HI.2                 All three reference frames are inline. DRAWING AS RBEND
-         119 BI1PO.2                 All three reference frames are inline. DRAWING AS RBEND
-         121 BI1PM.2                 All three reference frames are inline. DRAWING AS RBEND
-         123 BI1PI.2                 All three reference frames are inline. DRAWING AS RBEND
-         127 BI2PI.2                 All three reference frames are inline. DRAWING AS RBEND
-         129 BI2PM.2                 All three reference frames are inline. DRAWING AS RBEND
-         131 BI2PO.2                 All three reference frames are inline. DRAWING AS RBEND
-         133 BA2HI.2                 All three reference frames are inline. DRAWING AS RBEND
-         136 BA2HO.2                 All three reference frames are inline. DRAWING AS RBEND
-         174 BA1HO.3                 All three reference frames are inline. DRAWING AS RBEND
-         177 BA1HI.3                 All three reference frames are inline. DRAWING AS RBEND
-         179 BI1PO.3                 All three reference frames are inline. DRAWING AS RBEND
-         181 BI1PM.3                 All three reference frames are inline. DRAWING AS RBEND
-         183 BI1PI.3                 All three reference frames are inline. DRAWING AS RBEND
-         187 BI2PI.3                 All three reference frames are inline. DRAWING AS RBEND
-         189 BI2PM.3                 All three reference frames are inline. DRAWING AS RBEND
-         191 BI2PO.3                 All three reference frames are inline. DRAWING AS RBEND
-         193 BA2HI.3                 All three reference frames are inline. DRAWING AS RBEND
-         196 BA2HO.3                 All three reference frames are inline. DRAWING AS RBEND
-         242 BA1HO.4                 All three reference frames are inline. DRAWING AS RBEND
-         245 BA1HI.4                 All three reference frames are inline. DRAWING AS RBEND
-         247 BI1PO.4                 All three reference frames are inline. DRAWING AS RBEND
-         249 BI1PM.4                 All three reference frames are inline. DRAWING AS RBEND
-         251 BI1PI.4                 All three reference frames are inline. DRAWING AS RBEND
-         255 BI2PI.4                 All three reference frames are inline. DRAWING AS RBEND
-         257 BI2PM.4                 All three reference frames are inline. DRAWING AS RBEND
-         259 BI2PO.4                 All three reference frames are inline. DRAWING AS RBEND
-         261 BA2HI.4                 All three reference frames are inline. DRAWING AS RBEND
-         264 BA2HO.4                 All three reference frames are inline. DRAWING AS RBEND
 
 
   !!!!!       T I M E   F A L S E,   T O T P A T H  F A L S E
@@ -1045,7 +1004,7 @@ ptc_end;
 
 
 
-removefile, file='leir.C';
+!removefile, file='leir.C';
 
 removefile, file='Maxwellian_bend_for_ptc.txt';
 
