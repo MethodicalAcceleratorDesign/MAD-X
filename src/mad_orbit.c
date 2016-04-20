@@ -1131,15 +1131,11 @@ static int pro_correct2_getorbit(struct in_cmd* cmd) {
     
     /* If correction to target orbit, subtract the wanted orbit ... */
     if (m->id_ttb[0] > 0) {
-      m->val.before[0] = m->p_node->other_bv * da1[9] [m->id_ttb[0]];
-      m->val.before[1] = m->p_node->other_bv * da1[11][m->id_ttb[0]];
-      m->val.before[0] = m->p_node->other_bv * da1[9] [m->id_ttb[0]] * 1000.;
-      m->val.before[1] = m->p_node->other_bv * da1[11][m->id_ttb[0]] * 1000.;
+      m->val.before[0] = m->p_node->other_bv * da1[9] [m->id_ttb[0]] * 1000;
+      m->val.before[1] = m->p_node->other_bv * da1[11][m->id_ttb[0]] * 1000;
     } else if (m->id_ttb[1] > 0) {
-      m->val.before[0] = m->p_node->other_bv * da2[9] [m->id_ttb[1]];
-      m->val.before[1] = m->p_node->other_bv * da2[11][m->id_ttb[1]];
-      m->val.before[0] = m->p_node->other_bv * da2[9] [m->id_ttb[1]] * 1000.;
-      m->val.before[1] = m->p_node->other_bv * da2[11][m->id_ttb[1]] * 1000.;
+      m->val.before[0] = m->p_node->other_bv * da2[9] [m->id_ttb[1]] * 1000;
+      m->val.before[1] = m->p_node->other_bv * da2[11][m->id_ttb[1]] * 1000;
     } else {
       fatal_error("Unforeseen case in pro_correct2_getorbit", ", MAD-X terminates ");
     }
@@ -2356,7 +2352,7 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
     jj++;
     yok = 0;
 
-    for (j = 1; j < (ttb->curr) + 1; j++) {
+    for (j = 1; j <= ttb->curr; j++) {
       string_from_table_row(ttb->name, "name", &j, name);
       strcpy(l3name, name);
       stolower(l3name);
