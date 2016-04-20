@@ -66,14 +66,16 @@ make all-linux64-gnu
 check_error "make all-linux64-gnu failed"
 
 echo -e "\n===== Intel build ====="
-icc      --version
-ifort    --version
 
 source compilervars.sh ia32
+icc      -V
+ifort    -V
 make all-linux32-intel
 check_error "make all-linux32-intel failed" "no-exit"
 
 source compilervars.sh intel64
+icc      -V
+ifort    -V
 make all-linux64-intel
 check_error "make all-linux64-intel failed" "no-exit"
 
