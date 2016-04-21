@@ -3,7 +3,7 @@
 # bash scripts/build-test-linux.sh [noecho] [cleanall] [notest]
 
 # env settings
-export PATH="`pwd`:/opt/intel/bin:$PATH"
+export PATH="`pwd`:$PATH"
 
 # error handler
 check_error ()
