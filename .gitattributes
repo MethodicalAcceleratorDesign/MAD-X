@@ -1929,6 +1929,9 @@ tests/test-survey/test-survey_1.tfs.cfg -text
 tests/test-survey/test-survey_1.tfs.ref -text
 tests/test-survey/test-survey_2.tfs.cfg -text
 tests/test-survey/test-survey_2.tfs.ref -text
+tests/test-table-2/test-table-2.cfg -text
+tests/test-table-2/test-table-2.madx -text
+tests/test-table-2/test-table-2.ref -text svneol=unset#application/x-gzip
 tests/test-table/test-table.cfg -text
 tests/test-table/test-table.madx -text
 tests/test-table/test-table.ref -text

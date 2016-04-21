@@ -334,7 +334,7 @@ pro_input(char* statement)
         *sem = '\0';
         this_cmd = new_in_cmd(400);
         pre_split(&statement[start], work, 1);
-        check_table(work->c); check_tabstring(work->c);
+        check_table(work->c); check_tabindex(work->c); check_tabstring(work->c);
         this_cmd->tok_list->curr = mysplit(work->c, this_cmd->tok_list);
         if ((type = decode_command()) < 0) /* error */
         {

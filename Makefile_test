@@ -39,7 +39,7 @@
 
 # tests order
 tests-all = \
-test-table \
+test-table test-table-2 \
 test-memory \
 \
 test-makethin test-makethin-2 test-makethin-3 \

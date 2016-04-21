@@ -1,0 +1,16 @@
+df: drift, l=1;
+cell: sequence l=10, refer=entry;
+df1: df, at=0;
+df2: df, at=2;
+df4: df, at=4;
+df6: df, at=6;
+endsequence ;
+beam;
+use period=cell;
+survey;
+a=tabindex(survey, name, 1, drift_1);
+b=tabindex(survey, name, 1, drift_0);
+c=tabindex(survey, name, 4, drift_0);
+d=tabindex(survey, name, 7, drift_0);
+f=tabindex(survey, keyword, 2, marker);
+value, a,b,c,d,f;

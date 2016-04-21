@@ -1,0 +1,50 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2016.04.21               +
+  + Execution date: 2016.04.21 17:24:44      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+df: drift, l=1;
+
+cell: sequence l=10, refer=entry;
+
+df1: df, at=0;
+
+df2: df, at=2;
+
+df4: df, at=4;
+
+df6: df, at=6;
+
+endsequence ;
+
+beam;
+
+use period=cell;
+
+survey;
+
+a=tabindex(survey, name, 1, drift_1);
+
+b=tabindex(survey, name, 1, drift_0);
+
+c=tabindex(survey, name, 4, drift_0);
+
+d=tabindex(survey, name, 7, drift_0);
+
+f=tabindex(survey, keyword, 2, marker);
+
+value, a,b,c,d,f;
+
+a =                  9 ;
+b =                  3 ;
+c =                  5 ;
+d =                  7 ;
+f =                 10 ;
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
