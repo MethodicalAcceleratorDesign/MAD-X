@@ -9,7 +9,7 @@ beam;
 use period=cell;
 survey;
 a=tabindex(survey, name, 1, drift_1);
-b=tabindex(survey, name, 1, drift_0);
+b=tabindex(survey, name,    drift_0); ! default row is one
 c=tabindex(survey, name, 4, drift_0);
 d=tabindex(survey, name, 7, drift_0);
 f=tabindex(survey, keyword, 2, marker);

@@ -49,31 +49,35 @@ get_table_string(char* left, char* right)
 static char*
 get_table_index(char* left, char* right)
 {
-// for command tabindex(table,column,row,name) where
+// for command tabindex(table,column,row,name) or
+//             tabindex(table,column,name) where
 // table = table name,
 // column = name of a column containing strings,
-// row is the starting row to search for,
-// name = name searched.
-  int col, ntok, pos;
+// row is the starting row to search for (default 1),
+// name = start of the name to search.
+  int ntok, pos;
   char** toks;
-  struct table* table;
+  
   *right = '\0';
   strcpy(c_dum->c, ++left);
   supp_char(',', c_dum->c);
   mysplit(c_dum->c, tmp_p_array);
   toks = tmp_p_array->p; ntok = tmp_p_array->curr;
-  if (ntok == 4 && (pos = name_list_pos(toks[0], table_register->names)) > -1)
+  if ((ntok == 3 || ntok == 4) &&
+      (pos = name_list_pos(toks[0], table_register->names)) > -1)
   {
-    table = table_register->tables[pos];
-    int len = strlen(toks[3]);
-    if ((col = name_list_pos(toks[1], table->columns)) > -1 && table->s_cols[col]) {
-      for (int row = atoi(toks[2]); row > 0 && row <= table->curr; row++)
-        if (strncmp(table->s_cols[col][row-1], toks[3], len) == 0) {
+    struct table* table = table_register->tables[pos];
+    char *name = toks[3 - (ntok == 3)]; // name is in position 2 or 3
+    int len = strlen(name);
+    int col = name_list_pos(toks[1], table->columns);
+    int row = ntok == 4 ? atoi(toks[2]) : 1; // row may or may not be present
+    if (col > -1 && row > 0 && table->s_cols[col]) {
+      for (; row <= table->curr; row++) {
+        if (strncmp(table->s_cols[col][row-1], name, len) == 0) {
           sprintf(c_dum->c, "%d", row);
           return permbuff(c_dum->c);
         }
-        /* else printf("get_table_index: %s[%s][%d] = %s != %s\n",
-                       toks[0], toks[1], row, table->s_cols[col][row-1], toks[3]); */
+      }
     }
   }
   return NULL;

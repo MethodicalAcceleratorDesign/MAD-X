@@ -2,8 +2,8 @@
   ++++++++++++++++++++++++++++++++++++++++++++
   +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.21               +
-  + Execution date: 2016.04.21 17:24:44      +
+  + Release   date: 2016.04.22               +
+  + Execution date: 2016.04.22 09:44:11      +
   ++++++++++++++++++++++++++++++++++++++++++++
 df: drift, l=1;
 
@@ -27,7 +27,7 @@ survey;
 
 a=tabindex(survey, name, 1, drift_1);
 
-b=tabindex(survey, name, 1, drift_0);
+b=tabindex(survey, name,    drift_0); ! default row is one
 
 c=tabindex(survey, name, 4, drift_0);
 
