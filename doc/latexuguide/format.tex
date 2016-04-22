@@ -353,9 +353,8 @@ random generator use the \hyperref[sec:eoption]{\texttt{EOPTION}} command.
 \label{subsubsec:table}
 
 \begin{madlist}
-  \ttitem{TABLE(x,z)} accesses value of the named table column "z"
-  of table "x"; example: table(summ,q1) returns the hor. tune of
-  the Twiss summary table "summ".  
+  \ttitem{TABLE(x,z)} identical to TABLE(x,z,1); example: table(summ,q1) returns the hor. tune of
+  the Twiss summary table "summ".
 
   \ttitem{TABLE(x,y,z)} accesses value of the named table column "z"
   for element "y" (first table row with that name) of table "x";
@@ -363,7 +362,7 @@ random generator use the \hyperref[sec:eoption]{\texttt{EOPTION}} command.
   element mb.12 from the Twiss table "twiss".   When the element
   is called with its proper name, as in the example above, the
   value is returned at the first occurrence of the element of
-  this name. If the value is needed at a occurrence number: NNN,
+  this name. If the value is needed at an occurrence number: NNN,
   then "[NNN]" has to be appended to the name, e.g. in the above
   example one obtains the betx of the 23th occurrence of the
   element "mb.12" by changing the example to:
@@ -371,33 +370,54 @@ random generator use the \hyperref[sec:eoption]{\texttt{EOPTION}} command.
   little known, form: "table(twiss,mb.12-\textgreater 23,betx)"
   continues to work. Lastly, if NNN exceeds the maximum
   occurrence number the return value is arbitrarily small.  
+
+  \ttitem{TABLE(x,z,N\_row)} accesses the value of the named table
+    column  "z" at the "N\_row" number of rows of table "x" (row
+    numbers start at  1); example: table(twiss,betx,370) returns
+    the beta\_x at row number  "370" of the Twiss table
+    "twiss". The return value is zero if "N\_row"  is outside of
+    the allowed range.
+
+  \ttitem{TABINDEX(x,z,key)} identical to TABINDEX(x,z,1,key).  
+
+  \ttitem{TABINDEX(x,z,N\_row,key)} returns the index of the first occurrence of a string starting by "key" in table column "z" (must be a column of strings) starting at the "N\_row" number of rows of table "x"; example: tabindex(survey,name,102,bpm) returns the row number of the first element found starting from row 102 with a "name" beginning by "bpm" in the table "survey".
+
+\ttitem{TABSTRING(x,z,N\_row)} accesses value of the named table
+ column "z" (must be a column of strings) at the "N\_row" number of rows of table "x";
+example: tabstring(survey,name,10) returns the name of
+the 10th element of the survey table "survey". Row count starts at 1. The
+function can be used in any context where a string appears; in case
+there is no match, it returns "\_void\_".  
 \end{madlist}
-
-Beware: 
-\begin{itemize}
-   \item  Unnamed Drifts are not included in the table name
-          database, so as to speed up the search for "real"
-          elements. Therefore, those  unnamed drifts cannot be
-          found. However, named drifts can be searched for.  
-   \item  Due to the importance of finding elements in the table
-          for a proper functioning of the \madx runs, the programs
-          throws a "fatal\_error" if an element cannot be found in the
-          table.   
-\end{itemize}
-
-There is a second option of this function with 3 entries  
-\begin{itemize}
-    \item table(x,z,N\_row): accesses the value of the named table
-          column  "z" at the "N\_row" number of rows of table "x" (row
-          numbers start at  1); example: table(twiss,betx,370) returns
-          the beta\_x at row number  "370" of the Twiss table
-          "twiss". The return value is zero if "N\_row"  is outside of
-          the allowed range.
-\end{itemize}
 
 Note that "N\_row" has to be a number and not a  variable. However, the
 \hyperref[sec:macro]{Macro} facility in \madx allows
 the use of a variable instead.   
+
+\begin{verbatim}
+gettab(tblname, colname, rowidx) : macro = {
+  gettab.val = table(tblname, colname, rowidx) ;
+}
+getidx(tblname, colname, rowidx, keyname) : macro = {
+  getidx.val = tabindex(tblname, colname, rowidx, keyname) ;
+}
+row = 10 ;
+exec, gettab(twiss,betx,$row) ;
+exec, getidx(twiss,name,$row,qf) ;
+value, gettab.val, getidx.val ;
+\end{verbatim}
+
+Beware: 
+\begin{itemize}
+	\item  Unnamed Drifts are not included in the table name
+	database, so as to speed up the search for "real"
+	elements. Therefore, those  unnamed drifts cannot be
+	found. However, named drifts can be searched for.  
+	\item  Due to the importance of finding elements in the table
+	for a proper functioning of the \madx runs, the programs
+	throws a "fatal\_error" if an element cannot be found in the
+	table.   
+\end{itemize}
 
 A typical example could look like this, in fact the square root of betx
 (user defined variable myvar) is added to the twiss table:  

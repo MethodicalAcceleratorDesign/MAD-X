@@ -1828,7 +1828,7 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
         if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " in " << rbend_el-> name << " has expression, use this " << parnam  << '\n';
         add_cmd_parameter_clone(sbend_cmd, return_param_recurse(parnam,rbend_el),parnam,1);
       }
-      else if( !strcmp(parnam,"aperture") || !strcmp(parnam,"apertype") ) // check also aperture and apertype
+      else if( !strcmp(parnam,"aperture") || !strcmp(parnam,"apertype") || !strcmp(parnam,"aper_tol") ) // check also aperture, apertype, aper_tol
       {
         if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " parnam " << parnam << " cmdi->expr=" << cmdi->expr << " cmdi " << my_dump_command_parameter(cmdi) << '\n';
         add_cmd_parameter_clone(sbend_cmd,return_param_recurse(parnam,rbend_el),parnam,1);
@@ -1843,8 +1843,8 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
         bool found=false;
         double default_val=my_get_int_or_double_value(rbend_el->base_type,parnam,found); // return the default values, works for int and double parameters
 
-        if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " rbend " << rbend_el->name << " parnam " << parnam << " " << sbend_name
-          << " cmdi=" << cmdi << " value=" << value << '\n';
+        if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " rbend " << rbend_el->name << " parnam " << setw(12) << parnam << " " << setw(12) << sbend_name
+          << " cmdi=" << cmdi << " value=" << value << " found=" << found << '\n';
         if( !strcmp(parnam, "l") && rbarc_fl() )
         {
           value = el_par_value(parnam,rbend_el); // special case rbend with option("rbarc"), get increased arc length value from el_par_value
