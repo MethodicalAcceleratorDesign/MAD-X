@@ -34,4 +34,7 @@ use,    sequence=lhcb1;
 twiss,  sequence=lhcb1, file=lhc_twiss_b1.dat, betx=beta.ip1, bety=beta.ip1, x=+x.ip1, y=+y.ip1, py=+py.ip1;
 save,sequence=lhcb1,file="V6.5.thin.b1.seq";
 
+show mbrc.4r2.b1..1;
+show mqxb.a2l2..2;
+
 stop;
