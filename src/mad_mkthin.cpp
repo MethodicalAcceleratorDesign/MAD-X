@@ -2200,12 +2200,19 @@ element* SeqElList::create_thin_solenoid(const element* thick_elem, int slice_no
       cmd->par->curr++;
     }
   }
+  //--- now the arguments which are copied from the thick element
   add_cmd_parameter_clone(cmd,return_param_recurse("apertype",thick_elem),"apertype",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("aperture",thick_elem),"aperture",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("aper_offset",thick_elem),"aper_offset",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("aper_tol",thick_elem),"aper_tol",1);
-  add_cmd_parameter_clone(cmd,return_param("bv",thick_elem),"bv",1);
-  add_cmd_parameter_clone(cmd,return_param("tilt",thick_elem),"tilt",1);
+  add_cmd_parameter_clone(cmd,return_param(        "bv",      thick_elem),"bv",      1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("tilt",    thick_elem),"tilt",    1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("kmax",    thick_elem),"kmax",    1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("kmin",    thick_elem),"kmin",    1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("calib",   thick_elem),"calib",   1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("polarity",thick_elem),"polarity",1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("mech_sep",thick_elem),"mech_sep",1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("v_pos",   thick_elem),"v_pos",   1);
   // create element with this command
   const char* thin_name;
   if (slices==1 && slice_no==1) thin_name=thick_elem->name;
@@ -2302,12 +2309,19 @@ element* SeqElList::create_thin_elseparator(const element* thick_elem, int slice
       cmd->par->curr++;
     }
   }
+  //--- now the arguments which are copied from the thick element
   add_cmd_parameter_clone(cmd,return_param_recurse("apertype",thick_elem),"apertype",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("aperture",thick_elem),"aperture",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("aper_offset",thick_elem),"aper_offset",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("aper_tol",thick_elem),"aper_tol",1);
-  add_cmd_parameter_clone(cmd,return_param("bv",thick_elem),"bv",1);
-  add_cmd_parameter_clone(cmd,return_param("tilt",thick_elem),"tilt",1);
+  add_cmd_parameter_clone(cmd,return_param(        "bv",      thick_elem),"bv",      1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("tilt",    thick_elem),"tilt",    1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("kmax",    thick_elem),"kmax",    1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("kmin",    thick_elem),"kmin",    1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("calib",   thick_elem),"calib",   1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("polarity",thick_elem),"polarity",1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("mech_sep",thick_elem),"mech_sep",1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("v_pos",   thick_elem),"v_pos",   1);
   // create element with this command
   const char* thin_name;
   if (slices==1 && slice_no==1) thin_name=thick_elem->name;
