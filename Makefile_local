@@ -86,7 +86,8 @@ madx-install:
 	$E "*** Installing madx"
 	$_ mkdir $(VERSION) $(VERSION)/reports && \
      cp -L $(FILES) $(VERSION) && \
-	   scp -r $(VERSION) mad@lxplus.cern.ch:madx/releases/ && \
+     echo "mad@lxplus" \
+	   scp -r $(VERSION) mad@lxplus.cern.ch:madx/releases && \
 	   rm -rf $(VERSION)
 
 #
