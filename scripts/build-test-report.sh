@@ -4,6 +4,7 @@
 
 # env settings
 export PATH="`pwd`:$PATH"
+export LANG="en_US.utf8"
 
 # I/O redirection
 rm -f build-test-report.log
@@ -111,6 +112,9 @@ build_test_remote ()
         if [ -s build-test-$arch.out ] ; then
             cat build-test-$arch.out | tr -d '\r' > build-test-$arch.tr
             mv -f build-test-$arch.tr build-test-$arch.out
+            # remove local copies to ensure proper scp (no -force option)
+            rm -f "$dir/madx-${arch}64-gnu*" "$dir/madx-${arch}32-gnu*"
+            rm -f "$dir/numdiff-${arch}64-gnu*" "$dir/numdiff-${arch}32-gnu*"
             # retrieve binaries for download of last builds
             scp -q -p "$dir/madx-${arch}64-gnu*" .
             scp -q -p "$dir/madx-${arch}32-gnu*" .
