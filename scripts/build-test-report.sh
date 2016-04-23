@@ -113,8 +113,8 @@ build_test_remote ()
             cat build-test-$arch.out | tr -d '\r' > build-test-$arch.tr
             mv -f build-test-$arch.tr build-test-$arch.out
             # remove local copies to ensure proper scp (no -force option)
-            rm -f "$dir/madx-${arch}64-gnu*" "$dir/madx-${arch}32-gnu*"
-            rm -f "$dir/numdiff-${arch}64-gnu*" "$dir/numdiff-${arch}32-gnu*"
+            rm -f madx-${arch}64-gnu* madx-${arch}32-gnu*
+            rm -f numdiff-${arch}64-gnu* numdiff-${arch}32-gnu*
             # retrieve binaries for download of last builds
             scp -q -p "$dir/madx-${arch}64-gnu*" .
             scp -q -p "$dir/madx-${arch}32-gnu*" .
