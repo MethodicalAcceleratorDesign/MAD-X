@@ -1749,7 +1749,8 @@ get_args(struct in_cmd* my_cmd)
     put_info("c6t - split flag selected","");
   if ((mangle_flag = command_par_value("mangle", my_cmd->clone)))
     put_info("c6t - mangle flag selected","");
-  if ((tmp_max_mult_ord = command_par_value("max_mult_ord", my_cmd->clone))>0)
+  if (mult_auto_off &&
+     (tmp_max_mult_ord = command_par_value("max_mult_ord", my_cmd->clone))>0)
   {
     max_mult_ord = tmp_max_mult_ord;
     printf("max_mult_ord set to : %d\n",max_mult_ord);
