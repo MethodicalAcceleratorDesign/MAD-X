@@ -1990,7 +1990,37 @@ contains
       orbit_probe = orbit
     end subroutine readreforbit
     !_________________________________________________________________
-
+    logical(dp) function checksymmetric(r)
+     implicit none
+     real(dp)                :: r(6,6)
+     integer i,j
+     character(1024)  :: msg
+     checksymmetric = .false.
+      print*,"++++++++++++++"
+      print*, r(1,:)
+      print*, r(2,:)
+      print*, r(3,:)
+      print*, r(4,:)
+      print*, r(5,:)
+      print*, r(6,:)
+     
+     do i=1,6
+       do j=i,6
+         if ( abs( r(i,j) - r(j,i) ) > 1e-24 ) then
+           print*,r(i,j),  r(j,i)
+           write(msg,'(a,i1,a,i1,a,G10.2,a,i1,a,i1,a,G10.2)') &
+              "checksymmetric re matrix re(",i,",",j,")=",r(i,j),&
+              "   not equal to re("            ,j,",",i,")=",r(j,i)
+           call fort_warn('ptc_twiss: ',msg(:len_trim(msg)))
+           checksymmetric = .true.
+           return
+         endif
+       enddo
+     enddo
+     
+     
+    end function checksymmetric
+    
     subroutine readinitialdistrib
       !reads covariance matrix of the initial distribution
       implicit none
@@ -2037,6 +2067,13 @@ contains
       print*, re(4,:)
       print*, re(5,:)
       print*, re(6,:)
+      
+      if ( checksymmetric(re(:6,:6)) ) then
+        call seterrorflag(11,"ptc_twiss ","The covariance matrix is not symmetric, bailing out.");
+        return;
+      endif
+      
+
 
       nd=2
       if(icase==6 .or. icase==56) nd=3
