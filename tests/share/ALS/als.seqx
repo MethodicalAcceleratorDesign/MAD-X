@@ -51,7 +51,8 @@ BEND : RBEND, L=LBEND, ANGLE=ALPHA, k1=-0.778741;
 BEND1 : RBEND,L= LBEND, ANGLE=ALPHA, k1=-0.778741;
  
 CAVM:MARKER;
-CAV:RFCAVITY,L=0.2000,VOLT=0.2d0,FREQ=500.;
+rfvolt = 0.2d0;
+CAV:RFCAVITY,L=0.2000,VOLT:=rfvolt,FREQ=500.;
 
  sfline: line = (1*sf);
  sdline: line = (1*sd);
