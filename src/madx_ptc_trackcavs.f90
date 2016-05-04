@@ -72,7 +72,10 @@ contains
     do i=1,b%n
        if(b%u(i)) cycle
        !x=b%x(i,:)
-       call track_probe_x(r,b%x(i,:),k, fibre1,fibre2,node1,node2)
+       !call track_probe_x(r,b%x(i,:),k, fibre1,fibre2,node1,node2)
+       
+       call propagate(r,b%x(i,:),k,node1=node1, node2=node2)
+       
        B%U(I)=.NOT.CHECK_STABLE
        !call X_IN_BEAM(B,X,I)
     enddo
@@ -351,7 +354,8 @@ contains
           endif
 
           call track_beam(my_ring,TheBeam,intstate, node1=ni, node2=ni+1)
-
+          
+          
           !if(associated(CURR_SLICE%PARENT_FIBRE%MAG%p%aperture)) then
           !  print*, 'Checking AP', p%mag%name
           !  CALL CHECK_APERTURE(p%mag%p%APERTURE,TheBeam%X(1,1:6))
@@ -995,8 +999,11 @@ contains
              
              !print*, p%mag%name
              !write(6,'(a10,1x,i8,1x,6(f12.9,1x))') 'Track ',n,x
+             
+             call propagate(my_ring,x,intstate,fibre1=e, fibre2=e+1)  ! (5)
 
-             call track(my_ring,x,e,e+1,intstate)
+             !call track(my_ring,x,e,e+1,intstate)
+             
              
              
              if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
