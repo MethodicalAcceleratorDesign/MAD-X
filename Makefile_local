@@ -85,10 +85,9 @@ FILES = $(wildcard madx-linux*-gnu   numdiff-linux*-gnu \
 madx-install:
 	$E "*** Installing madx"
 	$_ mkdir $(VERSION) $(VERSION)/reports && \
-     cp -L $(FILES) $(VERSION) && \
-     echo "mad@lxplus" \
-	   scp -r $(VERSION) mad@lxplus.cern.ch:madx/releases && \
-	   rm -rf $(VERSION)
+	cp -L $(FILES) $(VERSION) && \
+	scp -r $(VERSION) mad@lxplus.cern.ch:madx/releases && \
+	rm -rf $(VERSION)
 
 #
 # madx backup reports
