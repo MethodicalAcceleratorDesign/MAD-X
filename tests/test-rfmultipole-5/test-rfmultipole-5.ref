@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.08  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.11.20               +
-  + Execution date: 2016.04.04 16:26:15      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.05.20 22:19:52      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title, 'test of rf-multipole';
 
@@ -18,8 +18,8 @@ enter Twiss module
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-++++++ warning: TWCPTK:  Mode flip in the element m1                                              , nflips up to now =   1                       
-++++++ warning: TWCPTK:  Mode flip in the element m1                                              , nflips up to now =   2                       
+++++++ warning: TWCPTK:  Mode flip in the element m1                                              , nflips up to now =   1                                                     
+++++++ warning: TWCPTK:  Mode flip in the element m1                                              , nflips up to now =   2                                                     
 
 ++++++ table: summ
 
@@ -45,7 +45,6 @@ Assigned alignment errors to 4 elements
   +   c6t version 2.0        +
   ++++++++++++++++++++++++++++
 
-max_mult_ord set to : 11
 Reference radius set to : 0.017000
 ++++++ info: MADX sequence converted to c6t internal. 
 

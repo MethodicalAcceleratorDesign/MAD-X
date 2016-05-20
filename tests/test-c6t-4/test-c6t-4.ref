@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.07  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.09.24               +
-  + Execution date: 2015.11.03 17:06:26      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.05.20 22:13:45      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Title, "test-c6t-4 conversion of thick elements with apertures";
 
@@ -1511,7 +1511,6 @@ Sixtrack, aperture;
   ++++++++++++++++++++++++++++
 
 ++++++ info: c6t - aperture flag selected 
-max_mult_ord set to : 11
 Reference radius set to : 1.000000
 ++++++ info: MADX sequence converted to c6t internal. 
 

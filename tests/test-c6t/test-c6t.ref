@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (32 bit, Linux)       +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 08.02.13 12.15.02 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.05.20 22:07:35      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 ! Tracking test for 6-D closed orbit search with LHC thin seq V6.501
 
 ! tstTrack_6D_orbit_LHC.madx, Yipeng SUN, 01-12-2008
@@ -47,7 +47,6 @@ orbit:  -1.916441E-03 -1.261077E-04  6.460942E-04  3.861002E-05  0.000000E+00  0
   +   c6t version 2.0        +
   ++++++++++++++++++++++++++++
 
-max_mult_ord set to : 11
 Reference radius set to : 0.017000
 
 total block length: 26658.883200
@@ -62,5 +61,5 @@ c6t terminated - total number of elements: 14477
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (32 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++
