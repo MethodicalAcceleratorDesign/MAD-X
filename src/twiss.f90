@@ -1539,7 +1539,7 @@ SUBROUTINE twdisp_ini(rt,disp0)
 
   !---- Initial dispersion.
   if (get_option('twiss_inval ') .eq. 0) then
-     call twdisp(rt,rt(1,6),disp0)
+     call twdisp(rt,rt(:,6),disp0)
   else
      DISP0(1:4) = OPT_FUN(15:18)     
   endif
@@ -2518,7 +2518,7 @@ SUBROUTINE twbtin(rt,tt)
   endif
 
   !---- Initial dispersion.
-  call twdisp(rt,rt(1,6),disp0)
+  call twdisp(rt,rt(:,6),disp0)
   disp0(5) = zero ;  disp0(6) = one
 
   !---- Derivative of transfer matrix w.r.t. delta(p)/p.
