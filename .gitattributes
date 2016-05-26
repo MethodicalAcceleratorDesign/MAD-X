@@ -1657,8 +1657,6 @@ tests/test-ptc-twiss-1/twiss-table.cfg -text
 tests/test-ptc-twiss-1/twiss-table.ref -text
 tests/test-ptc-twiss-2/Maxwellian_bend_for_ptc.txt.cfg -text
 tests/test-ptc-twiss-2/Maxwellian_bend_for_ptc.txt.ref -text
-tests/test-ptc-twiss-2/fort.18.cfg -text
-tests/test-ptc-twiss-2/fort.18.ref -text
 tests/test-ptc-twiss-2/ptc-twiss-table.cfg -text
 tests/test-ptc-twiss-2/ptc-twiss-table.ref -text
 tests/test-ptc-twiss-2/test-ptc-twiss-2.cfg -text

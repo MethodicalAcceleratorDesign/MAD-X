@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.07  (64 bit, Linux)       +
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.09.24               +
-  + Execution date: 2015.09.25 11:23:38      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.05.26 16:09:27      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, "LHC Version 6.503 -  July 2009" ;
 
@@ -12,8 +12,6 @@ TITLE, "LHC Version 6.503 -  July 2009" ;
 option, -echo, warn, -info;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   2.348867E-03 deltap:   0.000000E+00
 orbit:  -2.024091E-03  6.263101E-07  1.934669E-06  1.728349E-04  0.000000E+00  0.000000E+00
@@ -64,8 +62,6 @@ orbit:  -2.000000E-03  1.739113E-11  3.774323E-11  1.700000E-04  0.000000E+00  0
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After    end:    1.2170341194819135E-004   2.9337307977728491E-014  -7.9690698434831120E-005
  HARMONIC NUMBER defined in the ring:        35640
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
 ++++++ warning: return mystate:   no cavity - dimensionality reduced 6 -> 5 and 1/2
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
@@ -96,19 +92,19 @@ orbit:  -2.000000E-03  1.739113E-11  3.774323E-11  1.700000E-04  0.000000E+00  0
         26658.8832    0.0003216320508           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000    0.0003172846404        55.75968864        0.280001024 
+          -1000000    0.0003172846404        55.75968864       0.2800010241 
 
                 q2                dq1                dq2                 qs 
-      0.3100006055                  0                  0                  0 
+      0.3100006055                  0                  0                 -0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        9.999992763        595.1202014        9.999993276        609.5257297 
 
          beta11min          beta11max          beta12min          beta12max 
-       9.999992763        595.1202014    1.661448535e-11    1.037287631e-09 
+       9.999992763        595.1202014    1.661448537e-11    1.037287634e-09 
 
          beta13min          beta13max          beta21min          beta21max 
-                 0                  0    1.550393837e-11    1.201026596e-09 
+                 0                  0    1.550393838e-11    1.201026598e-09 
 
          beta22min          beta22max          beta23min          beta23max 
        9.999993276        609.5257297                  0                  0 
@@ -117,58 +113,34 @@ orbit:  -2.000000E-03  1.739113E-11  3.774323E-11  1.700000E-04  0.000000E+00  0
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0       -2.745605263        2.816166303 
+                 0                  0       -2.745605262        2.816166303 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.0481230625      0.05033586141      -0.1856652009       0.1450797205 
+    -0.04812306249      0.05033586139      -0.1856652009       0.1450797205 
 
           disp4min           disp4max             deltap            orbit_x 
-   -0.005458863921     0.004780221885                  0    -0.001999999059 
+   -0.005458863921     0.004780221885                  0    -0.001999999063 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-  -6.480305555e-12   -6.470088529e-10    0.0001700000459                  0 
+  -5.598526146e-12   -6.470088555e-10    0.0001700000459                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    0.0007074564931     0.000713726789    2.376320076e-05 
+                -0    0.0007074564951     0.000713726789    2.376320083e-05 
 
            pycorms             tcorms            ptcorms             xcomax 
-   2.414012503e-05    6.321234672e-06                  0     0.007390738745 
+   2.414012503e-05    6.321234794e-06                  0     0.007390738764 
 
             ycomax            pxcomax            pycomax             tcomax 
-    0.008056958782    0.0004263339826    0.0004558719032    1.013617375e-05 
+    0.008056958782    0.0004263339841    0.0004558719032    1.067998078e-05 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0    -0.008477889811    -0.008499924562   -0.0004558717364 
+                 0    -0.008477889835    -0.008499924562   -0.0004558717377 
 
            pycomin             tcomin            ptcomin 
-  -0.0003912272041   -1.067998106e-05                  0 
-++++++ warning: return mystate:   no cavity - dimensionality reduced 6 -> 5 and 1/2
- ************ State Summary ****************
- MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
-  Rectangular Bend: input arc length (rho alpha) 
-  Default integration method     2
-  Default integration steps      2
- This is a proton 
-       EXACT_MODEL =  TRUE 
-       TOTALPATH   =     0
-       RADIATION   =  FALSE
-       STOCHASTIC  =  FALSE
-       ENVELOPE    =  FALSE
-       NOCAVITY    =  TRUE 
-       TIME        =  TRUE 
-       FRINGE      =  FALSE
-       PARA_IN     =  FALSE
-       ONLY_2D     =  FALSE
-       ONLY_4D     =  FALSE
-       DELTA       =  FALSE
-       SPIN        =  FALSE
-       MODULATION  =  FALSE
-       RAMPING     =  FALSE
-       ACCELERATE  =  FALSE
- Normal Form Type 1
+  -0.0003912272041   -1.013617428e-05                  0 
 
-  Number of warnings: 2
-0 in C and 2 in Fortran
+  Number of warnings: 1
+0 in C and 1 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +
