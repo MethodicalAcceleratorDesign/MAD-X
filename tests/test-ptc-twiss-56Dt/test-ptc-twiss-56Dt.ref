@@ -840,8 +840,6 @@ ptc_create_universe;
 
   ptc_twiss, table=twiss, icase=56, no=2, closed_orbit, rmatrix;
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
 
 ++++++ table: ptc_twiss_summary
 
