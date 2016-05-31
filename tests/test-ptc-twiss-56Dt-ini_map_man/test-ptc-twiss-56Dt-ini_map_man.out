@@ -3,7 +3,7 @@
   +     MAD-X 5.02.10  (32 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2016.04.23               +
-  + Execution date: 2016.05.31 17:13:43      +
+  + Execution date: 2016.05.31 18:35:53      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! test for ptc_twiss,initial_map_manual=true;
 
