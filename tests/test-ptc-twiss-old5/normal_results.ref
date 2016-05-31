@@ -1,10 +1,10 @@
 @ NAME             %14s "NORMAL_RESULTS"
 @ TYPE             %10s "NORMAL_RES"
 @ TITLE            %35s " Diamond Light Source Lattice 8.1.1"
-@ ORIGIN           %19s "MAD-X 4.01.41 Linux"
-@ DATE             %08s "04/02/11"
-@ TIME             %08s "17.23.03"
+@ ORIGIN           %17s "5.02.10 Darwin 64"
+@ DATE             %08s "31/05/16"
+@ TIME             %08s "19.05.45"
 * NAME                   ORDER1     ORDER2     ORDER3     ORDER4              VALUE 
 $ %s                         %d         %d         %d         %d                %le 
- "DQ1"                        1          0          0          0       -78.98623214
- "DQ2"                        1          0          0          0       -35.28688983
+ "DQ1"                        1          0          0          0       -78.98623213
+ "DQ2"                        1          0          0          0       -35.28688982

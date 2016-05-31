@@ -24,7 +24,7 @@ EMIT,DELTAP=0.;
 
 
 PTC_CREATE_UNIVERSE;
-PTC_CREATE_LAYOUT,model=2,method=6,nst=5,exact;
+PTC_CREATE_LAYOUT,model=2,method=6,nst=20,exact;
       
      SELECT, flag=ptc_twiss, clear;
 !    SELECT, flag=ptc_twiss, column=name, s, beta11,beta22,beta33,mu1,mu2,mu3;
