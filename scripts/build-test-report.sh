@@ -4,7 +4,6 @@
 
 # env settings
 export PATH="`pwd`:$PATH"
-export LANG="en_US.utf8"
 
 # I/O redirection
 rm -f build-test-report.log

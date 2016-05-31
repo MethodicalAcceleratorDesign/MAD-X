@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:23:36      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.05.20 22:18:23      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title, 'test of rf-multipole';
 
@@ -81,9 +81,9 @@ final orbit vector:     1.000000E+00  4.214857E-03  0.000000E+00  1.041119E-01  
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %20s "test of rf-multipole"
-@ ORIGIN           %17s "5.02.09 Darwin 64"
-@ DATE             %08s "18/04/16"
-@ TIME             %08s "18.23.36"
+@ ORIGIN           %17s "5.02.10 Darwin 64"
+@ DATE             %08s "20/05/16"
+@ TIME             %08s "22.18.23"
 * NAME                                S                  L                  X                 PX                  Y                 PY                  T                 PT                K0L 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "TEST_LINE$START"                    0                  0                  1                  0                  0                  0                  1                  0                  0
