@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (32 bit, Linux)       +
+  +     MAD-X 5.02.10  (32 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2016.04.23               +
-  + Execution date: 2016.05.31 18:35:53      +
+  + Execution date: 2016.05.31 16:46:41      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! test for ptc_twiss,initial_map_manual=true;
 
@@ -896,16 +896,16 @@ ptc_create_universe;
    3.650253905e-08    1.168573408e-08                  0    3.059593903e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0    5.340225143e-08                  0    2.508646069e-08 
+                 0    5.340225275e-08                  0    2.508646069e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.106287027e-08                  0   -2.993167439e-08 
+                 0    1.106287027e-08                  0   -2.993167509e-08 
 
            ptcomax             xcomin             ycomin            pxcomin 
                  0   -1.448634907e-12                  0   -1.106286994e-08 
 
            pycomin             tcomin            ptcomin 
-                 0   -7.957594697e-08                  0 
+                 0   -7.957594922e-08                  0 
 
 
   write, table=twiss, file="leir.56dt.ptc.twiss";
@@ -960,16 +960,16 @@ ptc_create_universe;
    3.650253905e-08    1.168573408e-08                  0    3.059593903e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0    5.340225143e-08                  0    2.508646069e-08 
+                 0    5.340225275e-08                  0    2.508646069e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.106287027e-08                  0   -2.993167439e-08 
+                 0    1.106287027e-08                  0   -2.993167509e-08 
 
            ptcomax             xcomin             ycomin            pxcomin 
                  0   -1.448634907e-12                  0   -1.106286994e-08 
 
            pycomin             tcomin            ptcomin 
-                 0   -7.957594697e-08                  0 
+                 0   -7.957594922e-08                  0 
   write, table=twiss, file="leir.56dt.ptc.mtx.twiss";
 
 
@@ -1020,16 +1020,16 @@ ptc_create_universe;
                  0    2.512911298e-08                  0    4.205036579e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0    3.754738844e-08                  0    5.077465404e-08 
+                 0    3.754738842e-08                  0    5.077465416e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.192583564e-08                  0    1.059678525e-07 
+                 0    1.192583567e-08                  0    1.059678522e-07 
 
            ptcomax             xcomin             ycomin            pxcomin 
                  0   -2.737736087e-08                  0   -1.115555338e-08 
 
            pycomin             tcomin            ptcomin 
-                 0   -2.737138363e-08                  0 
+                 0   -2.737138434e-08                  0 
   write, table=twiss, file="leir.56dt.ptc.noorb.twiss";
 
    

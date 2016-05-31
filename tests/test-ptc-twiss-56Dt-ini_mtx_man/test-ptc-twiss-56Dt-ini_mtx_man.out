@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (32 bit, Linux)       +
+  +     MAD-X 5.02.10  (32 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2016.04.23               +
-  + Execution date: 2016.05.31 18:35:56      +
+  + Execution date: 2016.05.31 16:46:44      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! reads the user privided one turn matrix via command parameters
 
@@ -967,16 +967,16 @@ ptc_create_universe;
                 -0    2.512911298e-08                  0    4.205036579e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0    3.754738844e-08                  0    5.077465404e-08 
+                 0    3.754738842e-08                  0    5.077465416e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.192583564e-08                  0    1.059678525e-07 
+                 0    1.192583567e-08                  0    1.059678522e-07 
 
            ptcomax             xcomin             ycomin            pxcomin 
                  0   -2.737736087e-08                  0   -1.115555338e-08 
 
            pycomin             tcomin            ptcomin 
-                 0   -2.737138363e-08                  0 
+                 0   -2.737138434e-08                  0 
   
 
   

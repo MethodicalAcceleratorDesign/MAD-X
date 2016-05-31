@@ -172,22 +172,22 @@ C10         :  RFCAVITY,  L=Z*2.39, VOLT:=VRF10, LAG=0.5,  HARMON=8;
 
 ! r.f. cavity  13/20 MHz
 ! The length should really be 1.0m, but MAD8 gives error.
-C13         :  RFCAVITY,  L=Z*0.99;
+C13         :  RFCAVITY,  L=Z*0.99, harmon=16;
 
 ! r.f. cavity 200 MHz
 ! The length should really be 0.4m, but MAD8 gives error.
-C02         :  RFCAVITY, L=Z*0.39, VOLT:=VRF02, LAG=0.5, HARMON=8;
+C02         :  RFCAVITY, L=Z*0.39, VOLT:=VRF02, LAG=0.5, HARMON=160;
 
 ! r.f. cavity 100 MHZ
 ! The length should really be 1.0m, but MAD8 gives error.
-C01         :  RFCAVITY, L=Z*0.99, VOLT:=VRF01, LAG=0.5, HARMON=8;
+C01         :  RFCAVITY, L=Z*0.99, VOLT:=VRF01, LAG=0.5, HARMON=80;
 
 ! r.f. cavity 40 MHZ
 ! The length should really be 1.0m, but MAD8 gives error.
-C40         :  RFCAVITY,  L=Z*0.99;
+C40         :  RFCAVITY,  L=Z*0.99, harmon=32;
 
 ! r.f. cavity 80 MHZ
-C80         :  RFCAVITY,  L=Z*1.0;
+C80         :  RFCAVITY,  L=Z*1.0, harmon=64;
 
 
 
