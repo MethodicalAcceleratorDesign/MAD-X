@@ -2,6 +2,33 @@
 
 // private functions
 
+static double
+mult_par(const char* par, struct element* el)
+  /* returns multipole parameter for par = "k0l" or "k0sl" etc. */
+{
+  double val = zero;
+  char tmp[12] ,*p;
+  strcpy(tmp, par);
+  if (*tmp == 'k' && (p = strchr(tmp, 'l')) != NULL)
+  {
+    *p = '\0';  /* suppress trailing l */
+    int skew = 0;
+    if ((p = strchr(tmp, 's')) != NULL)
+    {
+      skew = 1; *p = '\0';
+    }
+    int k = 0;
+    sscanf(&tmp[1], "%d", &k);
+    double vect[FIELD_MAX];
+    int l;
+    if (skew) l = element_vector(el, "ksl", vect);
+    else      l = element_vector(el, "knl", vect);
+    if (k < l) val = vect[k];
+  }
+  return val;
+}
+
+
 static void
 fill_beta0(struct command* beta0, struct node* node)
 {
@@ -353,10 +380,6 @@ pro_embedded_twiss(struct command* current_global_twiss)
     end of command decoding
   */
 
-  zero_double(orbit0, 6);
-  /*  zero_double(disp0, 6); */
-  zero_double(oneturnmat, 36);
-
   /* Initialise Twiss parameters */
 
   keep_twiss = current_twiss;
@@ -448,10 +471,6 @@ pro_embedded_twiss(struct command* current_global_twiss)
     set_value("twiss", "r21", &r21);       nl->inform[name_list_pos("r21",nl)] = 1;
     set_value("twiss", "r22", &r22);       nl->inform[name_list_pos("r22",nl)] = 1;
 
-    adjust_beam();
-    probe_beam = clone_command(current_beam);
-    tmrefe_(oneturnmat); /* one-turn linear transfer map */
-
     summ_table = make_table("summ", "summ", summ_table_cols, summ_table_types, twiss_deltas->curr+1);
     add_to_table_list(summ_table, table_register);
 
@@ -471,15 +490,17 @@ pro_embedded_twiss(struct command* current_global_twiss)
 
     // 2014-May-30  12:33:48  ghislain: modified order of priority
     //              and added input for values given on command line
+    zero_double(orbit0, 6);
+
     if (guess_flag) {
       if (get_option("info"))
-	printf(" Found initial orbit vector from coguess values. \n");
+	      printf(" Found initial orbit vector from coguess values. \n");
       copy_double(guess_orbit,orbit0,6);    
     }
     // if given, useorbit overrides coguess
     if (get_option("useorbit")) {
       if (get_option("info"))
-	printf(" Found initial orbit vector from twiss useorbit values. \n");
+	      printf(" Found initial orbit vector from twiss useorbit values. \n");
       copy_double(current_sequ->orbits->vectors[u_orb]->a, orbit0, 6);
     }
     // if given, orbit0 values from twiss command line modify individual values
@@ -507,18 +528,20 @@ pro_embedded_twiss(struct command* current_global_twiss)
     if(twiss_deltas->curr <= 0)
       fatal_error("PRO_TWISS_EMBEDDED "," - No twiss deltas");
 
+    // LD 2016.04.19
+    adjust_beam();
+    probe_beam = clone_command(current_beam);
+
     for (i = 0; i < twiss_deltas->curr; i++) {
 
       const char *table_embedded_name = "embedded_twiss_table";
       struct int_array* tarr;
       struct int_array* dummy_arr; /* for the new signature of the twiss() Fortran function*/
-      {
-        int l = strlen(table_embedded_name);
-        tarr = new_int_array(l+1);
-        conv_char(table_embedded_name, tarr);
-        dummy_arr = new_int_array(5+1);
-        conv_char("dummy",dummy_arr);
-      }
+
+      tarr = new_int_array(strlen(table_embedded_name)+1);
+      conv_char(table_embedded_name, tarr);
+      dummy_arr = new_int_array(5+1);
+      conv_char("dummy",dummy_arr);
      
       twiss_table = make_table(table_embedded_name, "twiss", twiss_table_cols,
                                twiss_table_types, current_sequ->n_nodes);
@@ -529,18 +552,19 @@ pro_embedded_twiss(struct command* current_global_twiss)
       current_sequ->tw_table = twiss_table;
 
       twiss_table->org_sequ = current_sequ;
-      adjust_probe(twiss_deltas->a[i]); /* sets correct gamma, beta, etc. */
 
-      adjust_rfc(); /* sets freq in rf-cavities from probe */
       current_node = current_sequ->range_start;
       set_option("twiss_inval", &inval);
+
+      // LD 2016.04.19
+      adjust_probe_fp(twiss_deltas->a[i]); /* sets correct gamma, beta, etc. */
 
       // CALL TWISS
       twiss_(oneturnmat, disp0, tarr->i, dummy_arr->i); /* different call */
 
       if ((twiss_success = get_option("twiss_success"))) {
         if (get_option("keeporbit"))  
-	  copy_double(orbit0, current_sequ->orbits->vectors[k_orb]->a, 6);
+	        copy_double(orbit0, current_sequ->orbits->vectors[k_orb]->a, 6);
         fill_twiss_header(twiss_table);
         if (i == 0) exec_savebeta(); /* fill beta0 at first delta_p only */
         if (w_file) out_table(table_embedded_name, twiss_table, filename);
@@ -587,9 +611,8 @@ set_twiss_deltas(struct command* comm)
   int i, k = 0, n = 0, pos;
   double s, sign = one, ar[3];
   struct name_list* nl = comm->par_names;
-  pos = name_list_pos("deltap", nl);
   twiss_deltas->curr = 1;
-  twiss_deltas->a[0] = zero;
+  twiss_deltas->a[0] = 0;
   if ((pos = name_list_pos("deltap", nl)) >= 0 && nl->inform[pos]
       && (string = comm->par->parameters[pos]->string) != NULL)
   {
@@ -750,11 +773,10 @@ pro_twiss(void)
   char dummy[NAME_L] = "dummy", *sector_table_name = dummy; /* second string required by) */
   /* will be set to a proper string in case twiss_sector option selected */
   double tol,tol_keep, q1_val_p = 0, q2_val_p = 0, q1_val, q2_val, dq1, dq2;
-  int i, j, lp, k_orb = 0, u_orb = 0, pos, k_save = 1, k = 1, k_sect, 
-      w_file, beta_def;
+  int i, j, lp, k_orb = 0, u_orb = 0, pos, k_save = 1, k = 1, k_sect, w_file, beta_def;
   int chrom_flg;
   int orbit_input = 0; // counter of number of elements of initial orbit given on command line
-
+  int debug = get_option("debug");
   int keep_info = get_option("info");
   i = keep_info * get_option("twiss_print");
   set_option("info", &i);
@@ -785,11 +807,9 @@ pro_twiss(void)
 				    this can be overridden with option "slow"
                                     on match command */
 
-  /*
-    start command decoding
-  */
+  /*    start command decoding  */
   pos = name_list_pos("sequence", nl);
-  if(nl->inform[pos]) { /* sequence specified */
+  if (nl->inform[pos]) { /* sequence specified */
     name = pl->parameters[pos]->string;
     if ((lp = name_list_pos(name, sequences->list)) > -1)
       current_sequ = sequences->sequs[lp];
@@ -894,8 +914,6 @@ pro_twiss(void)
     }
     if (filename == NULL) filename = permbuff("dummy");
     w_file = 1;
-    // 2015-Jul-31  11:41:59  ghislain: aperture twiss file for output of twiss table ! not needed
-    //strcpy(aptwfile,filename); /* IW 02.12.2004 */
   }
   else w_file = 0;
 
@@ -911,13 +929,7 @@ pro_twiss(void)
 
   if((pos = name_list_pos("notable", nl)) > -1 && nl->inform[pos]) k_save = 0;
 
-  /*
-    end of command decoding
-  */
-
-  zero_double(orbit0, 6);
-  /*  zero_double(disp0, 6); */
-  zero_double(oneturnmat, 36);
+  /*    end of command decoding  */
 
   if ((beta_def = twiss_input(current_twiss)) < 0) {
     if (beta_def == -1) warning("unknown beta0,", "Twiss ignored");
@@ -933,20 +945,13 @@ pro_twiss(void)
 
   set_twiss_deltas(current_twiss);
 
-  adjust_beam();
-  probe_beam = clone_command(current_beam);
-  tmrefe_(oneturnmat); /* one-turn linear transfer map */
-
   summ_table = make_table("summ", "summ", summ_table_cols, summ_table_types, twiss_deltas->curr+1);
   add_to_table_list(summ_table, table_register);
 
   /* now create the sector table */
   struct int_array* tarr_sector;
-  {
-    int l = strlen(sector_table_name);
-    tarr_sector = new_int_array(l+1);
-    conv_char(sector_table_name, tarr_sector);
-  }
+  tarr_sector = new_int_array(strlen(sector_table_name)+1);
+  conv_char(sector_table_name, tarr_sector);
 
   if (get_option("twiss_sector")) {
     reset_sector(current_sequ, 0);
@@ -959,18 +964,10 @@ pro_twiss(void)
     add_to_table_list(twiss_sector_table, table_register);
   }
 
-  // 2014-May-30  12:33:48  ghislain: suppressed
-  /* if (get_option("useorbit")) */
-  /*   copy_double(current_sequ->orbits->vectors[u_orb]->a, orbit0, 6); */
-  /* else if (guess_flag) { */
-  /*   for (i = 0; i < 6; i++) { */
-  /*     if (guess_orbit[i] != zero) orbit0[i] = guess_orbit[i]; */
-  /*   } */
-  /* } */
-
-  
   // 2014-May-30  12:33:48  ghislain: modified order of priority
   //              and added input for values given on command line
+  zero_double(orbit0, 6);
+
   if (guess_flag) {
     if (get_option("info"))
       printf(" Found initial orbit vector from coguess values. \n");
@@ -999,18 +996,19 @@ pro_twiss(void)
   if (orbit_input > 0 && get_option("info"))
     printf(" Found %d initial orbit vector values from twiss command. \n", orbit_input);
 
-  if (get_option("debug"))
+  if (debug)
     printf(" Initial orbit: %e %e %e %e %e %e\n", orbit0[0], orbit0[1], orbit0[2], orbit0[3], orbit0[4], orbit0[5]);
   // 2014-May-30  12:33:48  ghislain: end of modifications
+
+  // LD 2016.04.19
+  adjust_beam();
+  probe_beam = clone_command(current_beam);
 
   for (i = 0; i < twiss_deltas->curr; i++) {
 
     struct int_array* tarr;
-    {
-      int l = strlen(table_name);
-      tarr = new_int_array(l+1);
-      conv_char(table_name, tarr);
-    }
+    tarr = new_int_array(strlen(table_name)+1);
+    conv_char(table_name, tarr);
 
     if (chrom_flg) { /* calculate chromaticity from tune difference - HG 6.2.09*/
       twiss_table = make_table(table_name, "twiss", twiss_table_cols, twiss_table_types, current_sequ->n_nodes);
@@ -1019,11 +1017,13 @@ pro_twiss(void)
       current_sequ->tw_table = twiss_table;
       current_sequ->tw_valid = 1;
       twiss_table->org_sequ = current_sequ;
-      adjust_probe(twiss_deltas->a[i]+DQ_DELTAP);
-      adjust_rfc(); /* sets freq in rf-cavities from probe */
+      
+      // LD 2016.04.19
+      adjust_probe_fp(twiss_deltas->a[i]+DQ_DELTAP);
       current_node = current_sequ->ex_start;
-      // CALL TWISS
-      twiss_(oneturnmat, disp0, tarr->i, tarr_sector->i);
+      
+      twiss_(oneturnmat, disp0, tarr->i, tarr_sector->i); // CALL TWISS
+
       pos = name_list_pos("q1", summ_table->columns);
       q1_val_p = summ_table->d_cols[pos][i];
       pos = name_list_pos("q2", summ_table->columns);
@@ -1039,33 +1039,39 @@ pro_twiss(void)
       twiss_table->org_sequ = current_sequ;
     }
 
-    adjust_probe(twiss_deltas->a[i]); /* sets correct gamma, beta, etc. */
-    adjust_rfc(); /* sets freq in rf-cavities from probe */
+    // LD 2016.04.19
+    adjust_probe_fp(twiss_deltas->a[i]); /* sets correct gamma, beta, etc. */
     current_node = current_sequ->ex_start;
 
-    twiss_(oneturnmat, disp0, tarr->i,tarr_sector->i);
+    twiss_(oneturnmat, disp0, tarr->i, tarr_sector->i);
 
     augment_count("summ ");
 
     if ((twiss_success = get_option("twiss_success"))) {
       if (chrom_flg) { /* calculate chromaticity from tune difference - HG 6.2.09*/
-        pos = name_list_pos("q1", summ_table->columns);
+
+	      pos = name_list_pos("q1", summ_table->columns);
         q1_val = summ_table->d_cols[pos][i];
         pos = name_list_pos("q2", summ_table->columns);
         q2_val = summ_table->d_cols[pos][i];
+
         dq1 = (q1_val_p - q1_val) / DQ_DELTAP;
         dq2 = (q2_val_p - q2_val) / DQ_DELTAP;
+
         pos = name_list_pos("dq1", summ_table->columns);
         summ_table->d_cols[pos][i] = dq1;
         pos = name_list_pos("dq2", summ_table->columns);
         summ_table->d_cols[pos][i] = dq2;
       }
-      if (get_option("keeporbit"))  copy_double(orbit0, current_sequ->orbits->vectors[k_orb]->a, 6);
+
+      if (get_option("keeporbit")) copy_double(orbit0, current_sequ->orbits->vectors[k_orb]->a, 6);
+
       if (k_save) fill_twiss_header(twiss_table);
+
       if (i == 0) exec_savebeta(); /* fill beta0 at first delta_p only */
-        if (k_save && w_file) {
-        out_table(table_name, twiss_table, filename);
-      }
+
+      if (k_save && w_file) out_table(table_name, twiss_table, filename);
+
       if ((twiss_deltas->curr>1)&&(i<twiss_deltas->curr-1)) {
         struct table *t = detach_table_from_table_list(table_name, table_register);
         if (t) {
@@ -1076,21 +1082,22 @@ pro_twiss(void)
         }
       }
     }
+
     else {
       seterrorflag(1,"pro_twiss","TWISS failed");
       warning("Twiss failed: ", "MAD-X continues");
     }
+
     tarr = delete_int_array(tarr);
-  }
 
-  if (get_option("twiss_sector")){
-    out_table( sector_table_name, twiss_sector_table, sector_name );
-  }
-
+  } // i = 0 .. twiss_deltas->curr-1
+  
+  if (get_option("twiss_sector")) out_table( sector_table_name, twiss_sector_table, sector_name );
+  
   tarr_sector = delete_int_array(tarr_sector);
-
+  
   if (twiss_success && get_option("twiss_print")) print_table(summ_table);
-
+  
   /* cleanup */
   current_beam = keep_beam;
   probe_beam = delete_command(probe_beam);

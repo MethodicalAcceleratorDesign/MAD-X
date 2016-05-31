@@ -1,0 +1,176 @@
+# |
+# o---------------------------------------------------------------------o
+# |
+# | MAD makefile - personal post-makefile stuff
+# |
+# o---------------------------------------------------------------------o
+# |
+# | Methodical Accelerator Design
+# |
+# | Copyright (c) 2011+ CERN, mad@cern.ch
+# |
+# | For more information, see http://cern.ch/mad
+# |
+# o---------------------------------------------------------------------o
+# |
+# | $Id$
+# |
+
+# useful macros
+ismacsrv = $(and $(call eq,$(OSTYPE),Darwin),\
+                 $(or $(call eq,$(PWD),/Users/mad/madX),\
+                      $(call eq,$(PWD),/Users/ldeniau/Projects/madx/madx-src)),yes)
+islxplus = $(and $(call eq,$(OSTYPE),Linux),\
+                 $(findstring lxplus,$(HOSTNAME)),\
+                 $(wildcard /afs/cern.ch/eng/lhc/optics),yes)
+
+###################################
+# Build & Install
+
+.PHONY: madx-release
+
+ifeq ($(ismacsrv),yes)
+madx-release: madx-info madx-src madx-usrguide madx-install madx-mktag
+else ifeq ($(islxplus),yes)
+madx-release: madx-install madx-reports madx-activate
+endif
+
+#
+# madx info file
+#
+
+.PHONY: madx-info
+
+madx-info:
+	$E "*** Building $@"
+	$_ echo "release  $(VERSION)"                   > madx-info.txt ; \
+	   echo "`date '+date     %Y.%m.%d %H:%M:%S'`" >> madx-info.txt ; \
+	   echo "svn      `svn update`"                >> madx-info.txt ; \
+	   echo `grep svn madx-info.txt`
+
+#
+# madx src tarball
+#
+
+.PHONY: madx-src
+
+madx-src:
+	$E "*** Building $@"
+	$_ svn export http://svn.cern.ch/guest/madx/trunk/madX madx-$(VERSION) && \
+	   tar cvz --exclude madx-$(VERSION)/examples -f madx-src.tgz madx-$(VERSION) && \
+	   rm -rf madx-$(VERSION)
+
+#
+# madx latex user's guide
+#
+
+.PHONY: madx-usrguide
+
+madx-usrguide:
+	$E "*** Building $@"
+	$_ cd doc/latexuguide ; ./makelatexdoc && cd - && \
+	   cp doc/latexuguide/uguide.pdf madxuguide.pdf
+
+#
+# madx installation (Darwin and Linux only)
+#
+
+.PHONY: madx-install
+
+FILES = $(wildcard madx-linux*-gnu   numdiff-linux*-gnu \
+                   madx-macosx*-gnu  numdiff-macosx*-gnu \
+                   madx-win*-gnu.exe numdiff-win*-gnu.exe \
+                   madx-src.tgz madxuguide.pdf madx-info.txt)
+
+madx-install:
+	$E "*** Installing madx"
+	$_ mkdir $(VERSION) $(VERSION)/reports && \
+     cp -L $(FILES) $(VERSION) && \
+     echo "mad@lxplus" \
+	   scp -r $(VERSION) mad@lxplus.cern.ch:madx/releases && \
+	   rm -rf $(VERSION)
+
+#
+# madx backup reports
+#
+
+.PHONY: madx-reports
+
+madx-reports:
+	$E "*** Recording reports"
+	$_ scp tests/reports/`date "+%Y-%m-%d"`_build-test-*.out \
+	       mad@lxplus.cern.ch:madx/releases/$(VERSION)/reports
+
+
+#
+# madx backup trunk
+#
+
+.PHONY: madx-mktag
+
+madx-mktag:
+	$E "*** Tagging madx"
+	$_  svn copy https://svn.cern.ch/reps/madx/trunk/ \
+	             https://svn.cern.ch/reps/madx/tags/$(VERSION) -m "madx release tag $(VERSION)"
+
+#
+# madx activation
+#
+
+.PHONY: madx-activate
+
+madx-activate:
+	$E "*** Activating madx"
+	$_ pushd /afs/cern.ch/project/mad/madx/releases && \
+     ls -l . $(VERSION) && rm -i last-dev ; ln -s $(VERSION) last-dev && \
+     ls -l . last-dev   && popd
+
+#
+# libptc installation (Linux only)
+#
+
+.PHONY: libptc-install
+
+libptc-install:
+	$E "*** Installing libptc"
+	$_ scp libptc-* mad@lxplus.cern.ch:madx/releases/$(VERSION)
+
+#
+# numdiff installation (Linux only)
+#
+
+.PHONY: numdiff-install
+
+numdiff-install:
+	$E "*** Installing numdiff"
+	$_ scp numdiff-* mad@lxplus.cern.ch:madx/releases/$(VERSION)
+
+#
+# count number of builds
+#
+
+# ifeq  ($(MAKE_RESTARTS),)
+# ifneq ($(filter $(BUILDGOALS),$(MAKECMDGOALS)),)
+# ifneq ($(OSTYPE),Windows)
+
+# MY_CFIL := $(HOME)/.madx-build-cnt
+# MY_CTST := $(wildcard $(MY_CFIL))
+# MY_CVAL := $(if $(MY_CTST),$(shell $(CAT) $(MY_CFIL)),0)
+# MY_CVAL := $(if $(MY_CVAL),$(MY_CVAL),0)
+# MY_CINC := $(shell expr $(MY_CVAL) + 1 > $(MY_CFIL))
+# $(info *** Local build number #$(shell $(CAT) $(MY_CFIL)))
+
+# else # Windows
+
+# MY_CFIL := $(HOME)$/.madx-build-cnt
+# MY_CTST := $(wildcard $(call s1bs,$(MY_CFIL)))
+# MY_CVAL := $(if $(MY_CTST),$(shell $(CAT) "$(MY_CFIL)"),0)
+# MY_CVAL := $(if $(MY_CVAL),$(MY_CVAL),0)
+# MY_CINC := $(shell expr $(MY_CVAL) + 1 > "$(MY_CFIL)")
+# $(info *** Local build number #$(shell $(CAT) "$(MY_CFIL)"))
+
+# endif
+# endif
+# endif
+
+# end of makefile

@@ -16,10 +16,6 @@ void*   mad_stck;
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifndef _WIN32
-#include <unistd.h>
-#endif
-
 void _gfortran_set_args    (int, char *[]);
 void _gfortran_set_options (int, int   []);
 #else
@@ -69,22 +65,7 @@ mad_init(int argc, char *argv[])
 #ifdef _GFORTRAN
   _gfortran_set_args(argc, argv);
   _gfortran_set_options(0, 0);
-
-  // LD-2012: very ugly hack to make stdout unbuffered!!! any other idea?
-  if (argc && getenv("GFORTRAN_UNBUFFERED_PRECONNECTED") == 0) {
-#ifndef _WIN32
-    setenv("GFORTRAN_UNBUFFERED_PRECONNECTED", "y", 0);
-    execvp(argv[0], argv);
-    // should never be reached...
-    fprintf(stderr, "fatal error: unable to synchronize Fortran versus C I/O\n");
-#else
-    // int putenv(const char *string);
-    // putenv("GFORTRAN_UNBUFFERED_PRECONNECTED=y");
-    fprintf(stderr, "fatal error: set GFORTRAN_UNBUFFERED_PRECONNECTED=y to synchronize Fortran versus C I/O\n");
-#endif
-    exit(EXIT_FAILURE);
-  }
-#endif
+#endif // _GFORTRAN
 
 #ifdef _NAGFOR
   f90_init(argc, argv);
@@ -116,3 +97,32 @@ mad_fini(void)
   g95_runtime_stop();
 #endif
 }
+
+// Special environment setup for gfortran and I/O sync with C
+// Check addr: nm madx64 | grep -E -w -e "_?init_env" -e _init | sort
+// Check exec: export DYLD_PRINT_INITIALIZERS=1 ; ./madx64
+
+#ifdef _GFORTRAN
+
+#ifdef _DARWIN
+// on Darwin, linking order ensures init_env to be called before _init
+static void __attribute__((constructor))
+#else
+// on Linux|Win, linking order doesn't ensure any calling order, use priority
+static void __attribute__((constructor(101)))
+#endif
+init_env (void)
+{
+  if (getenv("GFORTRAN_UNBUFFERED_PRECONNECTED") == 0) {
+#ifndef _WIN32
+    // known to leak memory (duplicate the string)!
+    setenv("GFORTRAN_UNBUFFERED_PRECONNECTED", "y", 0);
+#else
+    // known to reference the string, use permanent buffer!
+    int putenv(const char *string);
+    putenv("GFORTRAN_UNBUFFERED_PRECONNECTED=y");
+#endif
+  }
+}
+
+#endif // _GFORTRAN

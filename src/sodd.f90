@@ -3003,3 +3003,28 @@ subroutine write_table(table_name,table_type,int_to_write,        &
 
 1000 return
 end subroutine write_table
+
+subroutine timex(r1)
+  implicit none
+  real r1,timestart,timenow
+  common /mytimes/timestart
+  save
+  call timest(0.0)
+  call cpu_time(timenow)
+  r1=timenow-timestart
+  return
+end subroutine timex
+
+subroutine timest(r1)
+  implicit none
+  real r1,timestart
+  logical start
+  common /mytimes/timestart
+  data start /.false./
+  save
+  if (.not.start) then
+     start=.true.
+     call cpu_time(timestart)
+  endif
+  return
+end subroutine timest

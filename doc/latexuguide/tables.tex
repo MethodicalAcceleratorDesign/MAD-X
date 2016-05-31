@@ -12,17 +12,9 @@ The table created is initially empty and can be subsequently
 \hyperref[sec:write]{written} to file in
 \hyperref[chap:tfs]{\texttt{TFS}} format.
 
-The special variable name attribute \texttt{\_name} adds
-the element name to the table at the specified column.
+The special variable name attribute \texttt{\_name} (name preceded by
+underscore) adds the element name to the table at the specified column. 
 
-%this replaces the
-%undocumented "withname" attribute that was not always working properly.  
-
-%% See the \href{../Introduction/select.html#ucreate}{user table I}
-%% example; 
-%% or an example of joining 2 tables of different length in one table
-%% including the element name:
-%% \href{../Introduction/select.html#screate}{user table II} 
 
 \section{DELETE}
 \label{sec:delete}
@@ -31,8 +23,8 @@ DELETE, SEQUENCE=seqname, TABLE=tabname;
 }
 deletes a sequence with name \texttt{seqname} or a table with name
 \texttt{tabname} from memory. The sequence deletion is done without
-influence on other sequences that may have elements that were in the
-deleted sequence.
+influence on other sequences that may have elements that werein common
+with the deleted sequence.
 
 \section{READTABLE}
 \label{sec:readtable}
@@ -40,9 +32,10 @@ deleted sequence.
 READTABLE, FILE="filename";
 }
 reads the \texttt{TFS} file \texttt{filename} containing a \mad table
-and loads the table into memory. The table can then be manipulated as
-any other table, \textsl{i.e.} its values can be accessed, its data can
-be plotted or changed, and it can be written out again.
+and loads the table into memory with the name specified in the
+information section of the TFS file. The table can then be manipulated
+as any other table, \textsl{i.e.} its values can be accessed, its data
+can be plotted or changed, and it can be written out again. 
 
 \section{READMYTABLE}
 \label{sec:readmytable}
@@ -60,19 +53,6 @@ command \hyperref[sec:readtable]{\texttt{READTABLE}} the table name is
 taken from the information section of the table itself.  
 This feature allows to store multiple tables of the same type in memory
 without overwriting existing ones.   
-
-\section{TABSTRING}
-\label{sec:tabstring}
-Note: this is not a command and should appear in the variables section
-\madbox{
-TABSTRING(arg1,arg2,arg3)
-}
-
-The "string function" TABSTRING(arg1,arg2,arg3) with exactly  three
-arguments; arg1 is a table name (string), arg2 is a column name
-(string), arg3 is a row number (integer), count starts at 0. The
-function can be used in any context where a string appears; in case
-there is no match, it returns "\_void\_".  
 
 \section{WRITE}
 \label{sec:write}

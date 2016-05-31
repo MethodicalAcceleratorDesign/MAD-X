@@ -628,7 +628,7 @@ contains
 
     if( closed_orbit .and. (icav .gt. 0) .and. (my_ring%closed .eqv. .false.)) then
        call fort_warn('return from ptc_twiss: ',' Closed orbit requested on not closed layout.')
-       call seterrorflag(3,"ptc_twiss ","Closed orbit requested on not closed layout.");
+       call seterrorflag(3,"ptc_twiss ","Closed orbit requested on not closed layout.")
        return
     endif
 
@@ -636,8 +636,8 @@ contains
 
        if ( .not. c_%stable_da) then
           call fort_warn('ptc_twiss: ','DA got unstable even before finding closed orbit')
-          call seterrorflag(10,"ptc_twiss ","DA got unstable even before finding closed orbit");
-          stop
+          call seterrorflag(10,"ptc_twiss ","DA got unstable even before finding closed orbit")
+          call aafail('ptc_twiss: ','DA got unstable even before finding closed orbit. program stops')
           !          return
        endif
 
@@ -646,7 +646,7 @@ contains
        orbit(2)=get_value('ptc_twiss ','px ')
        orbit(3)=get_value('ptc_twiss ','y ')
        orbit(4)=get_value('ptc_twiss ','py ')
-       orbit(6)=get_value('ptc_twiss ','t ')
+       orbit(6)=-get_value('ptc_twiss ','t ') ! swap of t sign
        orbit(5)=orbit(5)+get_value('ptc_twiss ','pt ')
 
        
@@ -701,7 +701,7 @@ contains
        call readinitialdistrib()
     endif
 
-    ! olf PTC
+    ! old PTC
     !call init(default,no,nda,BERZ,mynd2,npara)
     
     !new complex PTC
@@ -1089,6 +1089,10 @@ contains
            call propagate(my_ring,A_script_probe,default, fibre1=i,fibre2=i+1)
            
            !print*,"Skowron 2 ", current%mag%name,  check_stable, c_%stable_da, A_script_probe%x(1).sub.'100000'
+           !print*,"Skowron 2 ", current%mag%name,  check_stable, c_%stable_da, &
+           !                    'x=',  A_script_probe%x(1).sub.'000000', ' ', &
+!	           'dp=', A_script_probe%x(5).sub.'000000', ' ', & 
+!                               't=' , A_script_probe%x(6).sub.'000000'
            if (doTMtrack) then
              call propagate(my_ring,theTransferMap,default,fibre1=i,fibre2=i+1)
            endif
@@ -1985,7 +1989,9 @@ contains
       orbit(3)=get_value('ptc_twiss ','y ')
       orbit(4)=get_value('ptc_twiss ','py ')
       orbit(5)=get_value('ptc_twiss ','pt ')
-      orbit(6)=get_value('ptc_twiss ','t ')
+      orbit(6)=-get_value('ptc_twiss ','t ')
+
+      if(icase.eq.5 .or. icase.eq.56 ) orbit(5) = orbit(5) + dt
       
       orbit_probe = orbit
     end subroutine readreforbit
@@ -2507,7 +2513,7 @@ contains
       if (c_%nd == 3) then
          if (beta(3) <= zero) then
             call fort_warn("ptc_twiss","Fatal Error: 6D requested and betz is smaller then or equal to 0!")
-            stop
+            call aafail("ptc_twiss","Fatal Error: 6D requested and betz is smaller then or equal to 0! program stops")
          endif
 
          beta(3) = (one+alpha(3)**2)/beta(3)
@@ -2517,20 +2523,9 @@ contains
 
 
       orbit(:)=zero
-      orbit(1)=get_value('ptc_twiss ','x ')
-      orbit(2)=get_value('ptc_twiss ','px ')
-      orbit(3)=get_value('ptc_twiss ','y ')
-      orbit(4)=get_value('ptc_twiss ','py ')
-      !      orbit(5)=get_value('ptc_twiss ','t ')
-      !      orbit(6)=get_value('ptc_twiss ','pt ')
-      orbit(6)=get_value('ptc_twiss ','t ')
-      orbit(5)=get_value('ptc_twiss ','pt ')
-      !frs plug deltap
-      if(icase.eq.5 .or. icase.eq.56 ) orbit(5) = orbit(5) + dt
-
       
-      orbit_probe = orbit 
-       
+      call readreforbit()
+             
       if (getdebug() > 0 ) then
          CALL write_closed_orbit(icase,orbit)
       endif

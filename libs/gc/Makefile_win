@@ -1,7 +1,7 @@
 # |
 # o---------------------------------------------------------------------o
 # |
-# | MAD GC makefile for Linux
+# | MAD GC makefile for Mac OS X
 # |
 # o---------------------------------------------------------------------o
 # |
@@ -15,23 +15,22 @@
 # |
 
 #
-# Linux
+# win
 #
 
-$(PROJECT):         libgc-linux-gnu
+$(PROJECT):       libgc-win-gnu
 
-libgc-linux-gnu:    libgc-linux32-gnu   libgc-linux64-gnu
-libgc-linux-llvm:   libgc-linux32-llvm  libgc-linux64-llvm
-libgc-linux-intel:  libgc-linux32-intel libgc-linux64-intel
+libgc-win-gnu:    libgc-win32-gnu   libgc-win64-gnu
+libgc-win-intel:  libgc-win32-intel libgc-win64-intel
 
-libgc-linux32-%:    ARCH := 32
-libgc-linux64-%:    ARCH := 64
+libgc-win32-%:    ARCH := 32
+libgc-win64-%:    ARCH := 64
 
 cleanarch:
 	$E "** Cleaning binaries and libraries"
-	$_ $(RM) $(wildcard libgc32* libgc64* libgc-linux*)
+	$_ $(RM) $(wildcard libgc32* libgc64* libgc-win*)
 
-libgc-linux32-intel libgc-linux64-intel:
+libgc-win32-intel libgc-win64-intel:
 	$E "*** Building $@"
 	$_ cd $(GCDIR) ; \
 	env CC="icc -m$(ARCH) -DLARGE_CONFIG" ./configure --enable-static --disable-shared --with-pic \
@@ -39,18 +38,10 @@ libgc-linux32-intel libgc-linux64-intel:
 	make clean ; make ; make check ; cd - ; \
 	cp -f $(GCDIR)/.libs/libgc.a $@.a
 
-libgc-linux32-gnu libgc-linux64-gnu:
+libgc-win32-gnu libgc-win64-gnu:
 	$E "*** Building $@"
 	$_ cd $(GCDIR) ; \
 	env CC="gcc -m$(ARCH) -DLARGE_CONFIG" ./configure --enable-static --disable-shared --with-pic \
-	    $(if $(call eq,$(OPENMP),yes),--enable-threads=posix,--disable-threads) ; \
-	make clean ; make ; make check ; cd - ; \
-	cp -f $(GCDIR)/.libs/libgc.a $@.a
-
-libgc-linux32-llvm libgc-linux64-llvm:
-	$E "*** Building $@"
-	$_ cd $(GCDIR) ; \
-	env CC="clang -m$(ARCH) -DLARGE_CONFIG" ./configure --enable-static --disable-shared --with-pic \
 	    $(if $(call eq,$(OPENMP),yes),--enable-threads=posix,--disable-threads) ; \
 	make clean ; make ; make check ; cd - ; \
 	cp -f $(GCDIR)/.libs/libgc.a $@.a

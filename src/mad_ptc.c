@@ -291,7 +291,7 @@ pro_ptc_twiss(void)
   double ptc_deltap;
   const char *table_name = NULL, *summary_table_name = NULL;
   char *filename = NULL, *summary_filename = NULL; /* for summary table */
-  int j,l ,pos, w_file,beta_def;
+  int j, pos, w_file,beta_def;
   int w_file_summary; /* toggle to write the summary table into a file */
   struct table* nonlin_table = 0;
   
@@ -387,19 +387,21 @@ pro_ptc_twiss(void)
   }
 
   set_option("twiss_inval", &beta_def);
+  ptc_deltap = get_value(current_command->name,"deltap");
+
+  // LD 2016.04.19
   adjust_beam();
   probe_beam = clone_command(current_beam);
-  ptc_deltap = get_value(current_command->name,"deltap");
-  adjust_probe(ptc_deltap); /* sets correct gamma, beta, etc. */
-  adjust_rfc(); /* sets freq in rf-cavities from probe */
+
+  adjust_probe_fp(ptc_deltap); /* sets correct gamma, beta, etc. */
+
   
   nonlin_table = make_table("nonlin", "nonlin", nonlin_table_cols,
                            nonlin_table_types, current_sequ->n_nodes);
   /*nonlin_table->dynamic = 1;*/
   add_to_table_list(nonlin_table, table_register);
 
-  l = strlen(table_name);
-  tarr = new_int_array(l+1);
+  tarr = new_int_array(strlen(table_name)+1);
   conv_char(table_name, tarr);
 
   twiss_table = make_table(table_name, "twiss", twiss_table_cols,
@@ -416,8 +418,7 @@ pro_ptc_twiss(void)
   /* --- */
   /* create additional table to hold summary data after one-turn */
   /* such as momentum compaction factor, tune and chromaticities */
-  l = strlen(summary_table_name); /* reuse of l */
-  summary_tarr = new_int_array(l+1);
+  summary_tarr = new_int_array(strlen(summary_table_name)+1);
   conv_char(summary_table_name, summary_tarr);
 
   ptc_twiss_summary_table = make_table(summary_table_name, "twiss summary",
@@ -466,8 +467,11 @@ pro_ptc_create_layout(void)
   struct command* keep_beam = current_beam;
   if (attach_beam(current_sequ) == 0)
     fatal_error("ptc_create_layout - sequence without beam:", current_sequ->name);
+
+  // LD 2016.04.19
   adjust_beam();
   probe_beam = clone_command(current_beam);
+  adjust_probe_fp(0);
 
   if (name_list_pos("errors_dipole", table_register->names) <= -1) // (pos = not used
   {
@@ -515,8 +519,11 @@ pro_ptc_read_errors(void)
   struct command* keep_beam = current_beam;
   if (attach_beam(current_sequ) == 0)
     fatal_error("ptc_read_errors - sequence without beam:", current_sequ->name);
+
+  // LD 2016.04.19
   adjust_beam();
   probe_beam = clone_command(current_beam);
+  adjust_probe_fp(0);
 
   w_ptc_read_errors_();
   /* cleanup */
@@ -531,8 +538,11 @@ pro_ptc_refresh_k(void)
   struct command* keep_beam = current_beam;
   if (attach_beam(current_sequ) == 0)
     fatal_error("ptc_refresh_k - sequence without beam:", current_sequ->name);
+  
+  // LD 2016.04.19
   adjust_beam();
   probe_beam = clone_command(current_beam);
+  adjust_probe_fp(0);
 
   w_ptc_refresh_k_();
   /* cleanup */
@@ -792,11 +802,10 @@ pro_ptc_trackline(struct in_cmd* cmd)
      set_option("onetable", &ivalue);
    }
    
-
+  // LD 2016.04.19
   adjust_beam();
   probe_beam = clone_command(current_beam);
-  
-  adjust_rfc(); /* sets freq in rf-cavities from probe */
+  adjust_probe_fp(0);
 
   track_tables_delete(); /* deleting all track related tables*/
   

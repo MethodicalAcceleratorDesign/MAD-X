@@ -18,44 +18,41 @@
 # MacOSX
 #
 
-$(PROJECT):   libgc-gnu
+$(PROJECT):          libgc-macosx-gnu
 
-libgc-gnu:    libgc-gnu32   libgc-gnu64
-libgc-llvm:   libgc-llvm32  libgc-llvm64
-libgc-intel:  libgc-intel32 libgc-intel64
+libgc-macosx-gnu:    libgc-macosx32-gnu   libgc-macosx64-gnu
+libgc-macosx-llvm:   libgc-macosx32-llvm  libgc-macosx64-llvm
+libgc-macosx-intel:  libgc-macosx32-intel libgc-macosx64-intel
 
-libgc-%32:    ARCH := 32
-libgc-%64:    ARCH := 64
+libgc-macosx32-%:    ARCH := 32
+libgc-macosx64-%:    ARCH := 64
 
 cleanarch:
 	$E "** Cleaning binaries and libraries"
 	$_ $(RM) $(wildcard libgc32* libgc64* libgc-macosx*)
 
-libgc-intel32 libgc-intel64:
+libgc-macosx32-intel libgc-macosx64-intel:
 	$E "*** Building $@"
 	$_ cd $(GCDIR) ; \
 	env CC="icc -m$(ARCH) -DLARGE_CONFIG" ./configure --enable-static --disable-shared --with-pic \
 	    $(if $(call eq,$(OPENMP),yes),--enable-threads=posix,--disable-threads) ; \
 	make clean ; make ; make check ; cd - ; \
-	cp -f $(GCDIR)/.libs/libgc.a libgc-macosx$(ARCH)-intel.a ; \
-	ln -sf libgc-macosx$(ARCH)-intel.a libgc$(ARCH)-intel.a
+	cp -f $(GCDIR)/.libs/libgc.a $@.a
 
-libgc-gnu32 libgc-gnu64:
+libgc-macosx32-gnu libgc-macosx64-gnu:
 	$E "*** Building $@"
 	$_ cd $(GCDIR) ; \
 	env CC="gcc -m$(ARCH) -DLARGE_CONFIG" ./configure --enable-static --disable-shared --with-pic \
 	    $(if $(call eq,$(OPENMP),yes),--enable-threads=posix,--disable-threads) ; \
 	make clean ; make ; make check ; cd - ; \
-	cp -f $(GCDIR)/.libs/libgc.a libgc-macosx$(ARCH)-gnu.a ; \
-	ln -sf libgc-macosx$(ARCH)-gnu.a libgc$(ARCH)-gnu.a
+	cp -f $(GCDIR)/.libs/libgc.a $@.a
 
-libgc-llvm32 libgc-llvm64:
+libgc-macosx32-llvm libgc-macosx64-llvm:
 	$E "*** Building $@"
 	$_ cd $(GCDIR) ; \
 	env CC="clang -m$(ARCH) -DLARGE_CONFIG" ./configure --enable-static --disable-shared --with-pic \
 	    $(if $(call eq,$(OPENMP),yes),--enable-threads=posix,--disable-threads) ; \
 	make clean ; make ; make check ; cd - ; \
-	cp -f $(GCDIR)/.libs/libgc.a libgc-macosx$(ARCH)-llvm.a ; \
-	ln -sf libgc-macosx$(ARCH)-llvm.a libgc$(ARCH)-llvm.a
+	cp -f $(GCDIR)/.libs/libgc.a $@.a
 
 # end of makefile

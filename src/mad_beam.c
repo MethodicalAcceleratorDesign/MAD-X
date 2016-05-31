@@ -24,6 +24,33 @@ get_beam_value(char* name, char* par)
 }
 #endif
 
+
+static double
+rfc_slope(void)
+  /* calculates the accumulated "slope" of all cavities */
+{
+  double slope = zero, harmon, charge, pc;
+  struct node* c_node = current_sequ->range_start;
+  struct element* el;
+  charge = command_par_value("charge", current_beam);
+  pc = command_par_value("pc", current_beam);
+  do
+  {
+    el = c_node->p_elem;
+    if (strcmp(el->base_type->name, "rfcavity") == 0 &&
+        (harmon = command_par_value("harmon", el->def)) > zero)
+    {
+      double volt = command_par_value("volt", el->def);
+      double lag = command_par_value("lag", el->def);
+      slope += ten_m_3 * charge * volt * harmon * cos(twopi * lag) / pc;
+    }
+    if (c_node == current_sequ->range_end) break;
+    c_node = c_node->next;
+  }
+  while (c_node != NULL);
+  return slope;
+}
+
 // public interface
 
 void
@@ -336,7 +363,7 @@ adjust_beam(void)
   gamma = command_par_value("gamma", current_beam);
   alfa = one / (gamma * gamma);
 
-  freq0 = (beta * clight) / (ten_p_6 * circ);
+  freq0 = (beta * clight * ten_m_6) / circ;
 
   if (nl->inform[name_list_pos("bcurrent", nl)] &&
       (bcurrent = command_par_value("bcurrent", current_beam)) > zero)
@@ -359,5 +386,192 @@ attach_beam(struct sequence* sequ)
   if (!sequ || (current_beam = find_command(sequ->name, beam_list)) == NULL)
     current_beam = find_command("default_beam", beam_list);
   return current_beam->beam_def;
+}
+
+static void
+adjust_probe(double delta_p)
+  /* adjusts beam parameters to the current deltap */
+{
+  double etas, slope, qs, fact, tmp, ds;
+  double alfa, beta, gamma, dtbyds, circ, freq0; 
+  double betas, gammas, et, sigt, sige;
+
+  et = command_par_value("et", current_beam);
+  sigt = command_par_value("sigt", current_beam);
+  sige = command_par_value("sige", current_beam);
+  beta = command_par_value("beta", current_beam);
+  gamma = command_par_value("gamma", current_beam);
+  circ = command_par_value("circ", current_beam);
+
+  /* assume oneturnmap and disp0 already computed (see pro_twiss and pro_emit) */ 
+  ds = oneturnmat[4 + 6*5]; // uses disp0[5] = 1 -> dp/p = 1
+  for (int j=0; j < 4; j++) ds += oneturnmat[4 + 6*j] * disp0[j];
+
+  tmp = - beta * beta * ds / circ;
+  freq0 = (beta * clight * ten_m_6) / (circ * (one + tmp * delta_p));
+  etas = beta * gamma * (one + delta_p);
+  gammas = sqrt(one + etas * etas);
+  betas = etas / gammas;
+  tmp = - betas * betas * ds / circ;
+  alfa = one / (gammas * gammas) + tmp;
+  dtbyds = delta_p * tmp / betas;
+
+  // LD: 2016.02.16
+  if (get_option("debug"))
+    printf("updating probe_beam for deltap=%g => ds=%23.18g\n"
+           "  parameters: freq0=%23.18g, alfa=%23.18g\n"
+           "              beta=%23.18g, gamma=%23.18g, dtbyds=%23.18g\n",
+           delta_p, ds, freq0, alfa, betas, gammas, dtbyds);
+
+  store_comm_par_value("freq0", freq0, probe_beam);
+  store_comm_par_value("alfa", alfa, probe_beam);
+  store_comm_par_value("beta", betas, probe_beam);
+  store_comm_par_value("gamma", gammas, probe_beam);
+  store_comm_par_value("dtbyds", dtbyds, probe_beam);
+  store_comm_par_value("deltap", delta_p, probe_beam);
+
+  slope = -rfc_slope();
+  qs = sqrt(fabs((tmp * slope) / (twopi * betas)));
+
+  if (qs != zero) {
+    fact = (tmp * circ) / (twopi * qs);
+    if (et > zero) {
+      sigt = sqrt(fabs(et * fact));
+      sige = sqrt(fabs(et / fact));
+    }
+    else if (sigt > zero) {
+      sige = sigt / fact;
+      et = sige * sigt;
+    }
+    else if (sige > zero) {
+      sigt = sige * fact;
+      et = sige * sigt;
+    }
+  }
+
+  if (sigt < ten_m_15) {
+    put_info("Zero value of SIGT", "replaced by 1.");
+    sigt = one;
+  }
+  
+  if (sige < ten_m_15) {
+    put_info("Zero value of SIGE", "replaced by 1/1000.");
+    sigt = ten_m_3;
+  }
+  
+  store_comm_par_value("qs", qs, probe_beam);
+  store_comm_par_value("et", et, probe_beam);
+  store_comm_par_value("sigt", sigt, probe_beam);
+  store_comm_par_value("sige", sige, probe_beam);
+}
+
+static void
+adjust_rfc(void)
+{
+  /* adjusts rfc frequency to given harmon number */
+  double freq0, harmon, freq;
+  int i;
+  struct element* el;
+  freq0 = command_par_value("freq0", probe_beam);
+  for (i = 0; i < current_sequ->cavities->curr; i++)
+  {
+    el = current_sequ->cavities->elem[i];
+    if ((harmon = command_par_value("harmon", el->def)) > zero)
+    {
+      freq = freq0 * harmon;
+      store_comm_par_value("freq", freq, el->def);
+    }
+  }
+}
+
+void
+adjust_probe_fp(double dp) // fix point version of adjust_probe, includes adjust_rfc
+{
+  int fp_step = 0, debug = get_option("debug");
+  double ds = 0, ds0 = 0;
+
+  if (debug)
+    printf("Twiss pre-init: adjusting probe and oneturnmat (fix point)\n");
+
+  adjust_rfc();          /* pre-sets rf freq and harmon */
+
+  do {
+    tmrefe_(oneturnmat); /* one-turn linear transfer map */
+    twdisp_ini_(oneturnmat,disp0);  /* added for disp0 computation */
+
+    adjust_probe(dp);    /* sets correct gamma, beta, etc. */
+    adjust_rfc();        /* sets rf freq and harmon */
+
+    ds0 = ds;
+    ds = oneturnmat[4 + 6*5]; // must be same as adjust_probe!
+    for (int j=0; j < 4; j++) ds += oneturnmat[4 + 6*j] * disp0[j];
+
+    if (debug)
+      printf("Twiss pre-init: iteration %d, delta ds = %.8e (fix point)\n", ++fp_step, ds-ds0);
+
+  } while (fabs(ds-ds0) > 1e-6);
+
+  if (debug) print_probe();
+}
+
+void
+print_rfc(void)
+  /* prints the rf cavities present in sequ */
+{
+  double freq0, harmon, freq;
+  int i, n = current_sequ->cavities->curr;
+  struct element* el;
+
+  if (n == 0) return;
+
+  freq0 = command_par_value("freq0", probe_beam);
+  printf("\n RF system: \n");
+  printf(v_format(" %S %NFs %NFs %NFs %NFs %NFs\n"),
+         "Cavity","length[m]","voltage[MV]","lag","freq[MHz]","harmon");
+
+  for (i = 0; i < n; i++) {
+    el = current_sequ->cavities->elem[i];
+    if ((harmon = el_par_value("harmon", el)) > zero) {
+      freq = freq0 * harmon;
+      printf(v_format(" %S %F %F %F %F %F\n"),
+             el->name, el->length, el_par_value("volt", el),
+             el_par_value("lag", el), freq, harmon);
+    }
+  }
+}
+
+void
+print_probe(void)
+{
+  char tmp[NAME_L], trad[4];
+  double alfa = get_value("probe", "alfa");
+  double freq0 = get_value("probe", "freq0");
+  double gamma = get_value("probe", "gamma");
+  double beta = get_value("probe", "beta");
+  double circ = get_value("probe", "circ");
+  double bcurrent = get_value("probe", "bcurrent");
+  double npart = get_value("probe", "npart");
+  double energy = get_value("probe", "energy");
+  int kbunch = get_value("probe", "kbunch");
+  int rad = get_value("probe", "radiate");
+  double gamtr = zero, t0 = zero, eta;
+
+  get_string("probe", "particle", tmp);
+  if (rad) strcpy(trad, "T");
+  else     strcpy(trad, "F");
+  if (alfa > zero) gamtr = sqrt(one / alfa);
+  else if (alfa < zero) gamtr = sqrt(-one / alfa);
+  if (freq0 > zero) t0 = one / freq0;
+  eta = alfa - one / (gamma*gamma);
+  puts(" ");
+  printf(" Global parameters for %ss, radiate = %s:\n\n", tmp, trad);
+  // 2015-Apr-15  15:27:15  ghislain: proposal for more elegant statement avoiding the strcpy to extra variable
+  // printf(" Global parameters for %ss, radiate = %s:\n\n", tmp, rad ? "true" : "false"); 
+  printf(v_format(" C         %F m          f0        %F MHz\n"),circ, freq0);
+  printf(v_format(" T0        %F musecs     alfa      %F \n"), t0, alfa);
+  printf(v_format(" eta       %F            gamma(tr) %F \n"), eta, gamtr);
+  printf(v_format(" Bcurrent  %F A/bunch    Kbunch    %I \n"), bcurrent, kbunch);
+  printf(v_format(" Npart     %F /bunch     Energy    %F GeV \n"), npart,energy);
+  printf(v_format(" gamma     %F            beta      %F\n"), gamma, beta);
 }
 

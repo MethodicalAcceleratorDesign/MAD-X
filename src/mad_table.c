@@ -46,6 +46,43 @@ get_table_string(char* left, char* right)
   return NULL;
 }
 
+static char*
+get_table_index(char* left, char* right)
+{
+// for command tabindex(table,column,row,name) or
+//             tabindex(table,column,name) where
+// table = table name,
+// column = name of a column containing strings,
+// row is the starting row to search for (default 1),
+// name = start of the name to search.
+  int ntok, pos;
+  char** toks;
+  
+  *right = '\0';
+  strcpy(c_dum->c, ++left);
+  supp_char(',', c_dum->c);
+  mysplit(c_dum->c, tmp_p_array);
+  toks = tmp_p_array->p; ntok = tmp_p_array->curr;
+  if ((ntok == 3 || ntok == 4) &&
+      (pos = name_list_pos(toks[0], table_register->names)) > -1)
+  {
+    struct table* table = table_register->tables[pos];
+    char *name = toks[3 - (ntok == 3)]; // name is in position 2 or 3
+    int len = strlen(name);
+    int col = name_list_pos(toks[1], table->columns);
+    int row = ntok == 4 ? atoi(toks[2]) : 1; // row may or may not be present
+    if (col > -1 && row > 0 && table->s_cols[col]) {
+      for (; row <= table->curr; row++) {
+        if (strncmp(table->s_cols[col][row-1], name, len) == 0) {
+          sprintf(c_dum->c, "%d", row);
+          return permbuff(c_dum->c);
+        }
+      }
+    }
+  }
+  return NULL;
+}
+
 static int
 tab_name_code(const char* name, const char* t_name)
   /* returns 1 if name corresponds to t_name, else 0 */
@@ -604,6 +641,36 @@ check_table(char* string)
         strcat(string, " ( ");
         strcat(string, sv);
         strcat(string, " ) ");
+        strcat(string, ++pr);
+      }
+    }
+    pa = ++pb;
+  }
+}
+
+void
+check_tabindex(char* string)
+  /* replaces argument of "tabindex(tab_name, col_name, row_start, string)" if any by the row index
+     return 0 if not found
+   */
+{
+  char *pa, *pb, *pt, *pl, *pr, *sv;
+  pa = string;
+  while ((pb = strstr(pa, "tabindex")) != NULL)
+  {
+    if (is_token(pb, string, strlen("tabindex")))
+    {
+      if (quote_level(pa, pb) == 0)
+      {
+        mystrcpy(c_join, pa);                             // global var
+        pt = strstr(c_join->c, "tabindex");
+        if ((pl = strchr(pt, '(')) == NULL) return;
+        if ((pr = strchr(pl, ')')) == NULL) return;
+        if ((sv = get_table_index(pl,pr)) == NULL) sv = permbuff("0");
+        *pt = '\0';
+        *pa ='\0';
+        strcat(string, c_join->c);
+        strcat(string, sv);
         strcat(string, ++pr);
       }
     }

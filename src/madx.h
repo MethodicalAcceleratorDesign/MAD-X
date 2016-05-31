@@ -81,10 +81,9 @@
 // elements modules
 
 #include "mad_elem.h"
-#include "mad_elemmultp.h"
+//#include "mad_elemmultp.h"
 #include "mad_elemerr.h"
-#include "mad_elemprobe.h"
-#include "mad_elemrfc.h"
+//#include "mad_elemrfc.h"
 
 // physics modules
 

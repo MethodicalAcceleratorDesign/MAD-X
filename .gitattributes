@@ -6,10 +6,10 @@
 /Makefile_c -text
 /Makefile_cpp -text
 /Makefile_cxx -text
-/Makefile_cyg -text
 /Makefile_f90 -text
 /Makefile_lib -text
 /Makefile_lnx -text
+/Makefile_local -text
 /Makefile_mac -text
 /Makefile_post -text
 /Makefile_pre -text
@@ -41,8 +41,8 @@ cmake/ctestbase.cmake -text
 cmake/install_macros.cmake -text
 cmake/madX.gif -text svneol=unset#unset
 cmake/madxInit.cmake -text
-cmake/numdiff_macros.cmake -text
-cmake/numdifftests.cmake -text
+cmake/ndiff_macros.cmake -text
+cmake/ndifftests.cmake -text
 cmake/print_missing_tests.py -text
 cmake/setupArchSpecifics.cmake -text
 cmake/setupCompilerSpecifics.cmake -text
@@ -381,6 +381,7 @@ libs/gc/Makefile_lnx -text
 libs/gc/Makefile_mac -text
 libs/gc/Makefile_post -text
 libs/gc/Makefile_pre -text
+libs/gc/Makefile_win -text
 libs/gc/gc-7.2f/BCC_MAKEFILE -text
 libs/gc/gc-7.2f/CMakeLists.txt -text
 libs/gc/gc-7.2f/ChangeLog -text
@@ -782,17 +783,18 @@ make/make.act -text
 make/make.cfg -text
 make/make.inc -text
 make/make.lib -text
-make/system.Cygwin -text
 make/system.Darwin -text
 make/system.Linux -text
 make/system.Windows -text
 make/tester.numdiff -text
 make/tester.rules -text
 scripts/asan_symbolize.py -text
+scripts/build-test-linux.sh -text
 scripts/build-test-lxplus.sh -text
 scripts/build-test-macosx.sh -text
 scripts/build-test-report.sh -text
 scripts/build-test-win.bat -text
+scripts/build-test-win.sh -text
 scripts/test-valgrind.sh -text
 src/.htaccess -text
 src/CMakeLists.txt -text
@@ -836,12 +838,6 @@ src/mad_elem.c -text
 src/mad_elem.h -text
 src/mad_elemerr.c -text
 src/mad_elemerr.h -text
-src/mad_elemmultp.c -text
-src/mad_elemmultp.h -text
-src/mad_elemprobe.c -text
-src/mad_elemprobe.h -text
-src/mad_elemrfc.c -text
-src/mad_elemrfc.h -text
 src/mad_emit.c -text
 src/mad_emit.h -text
 src/mad_err.c -text
@@ -876,7 +872,6 @@ src/mad_math.c -text
 src/mad_math.h -text
 src/mad_mem.c -text
 src/mad_mem.h -text
-src/mad_mkthin.c- -text
 src/mad_mkthin.cpp -text
 src/mad_mkthin.h -text
 src/mad_name.c -text
@@ -963,13 +958,10 @@ src/matchsa.f90 -text
 src/orbf.f90 -text
 src/photoni.inc -text
 src/plot.f90 -text
-src/poisson.f90 -text
 src/ptc_export_xml.f90 -text
 src/resindex.f90 -text
 src/sodd.f90 -text
 src/survey.f90 -text
-src/timest.f90 -text
-src/timex.f90 -text
 src/touschek.f90 -text
 src/tpsa.cpp -text
 src/tpsa.h -text

@@ -14,7 +14,27 @@ version number where the change applies as well as the SVN
 release number for the change. 
 
 \begin{madlist}
-  \ttitem{2015-Nov-03} version 5.02.07, r5484\\
+  \ttitemn{2016-Apr-22} version 5.02.10, r5833\\
+  the function \hyperref[subsubsec:table]{TABINDEX} has been introduced and the section has been reschuffled.
+
+  \ttitemn{2016-Apr-19} version 5.02.10, r5816, r5817\\
+  the intialization of modules twiss, track, emit, touschek, dynap, plot, ibs has been reviewed with the introduction of the new fix point search for proper beam initialization. This affected the physics in the presence of RF with HARMON attributes or changes in deltap.
+
+  \ttitemn{2016-Apr-19} version 5.02.10, r5816\\
+  the defaults for \hyperref[sec:beam]{\texttt{BEAM}} attributes \texttt{ET, SIGT, SIGE} have been set to the values $10^{-3}, 1, 10^{-3}$ respectively (were $1, 0, 0$).
+
+  \ttitemn{2016-Apr-07} version 5.02.10, r5810\\
+  the attribute \hyperref[chap:twiss]{SECTORACC} has been added to the twiss command for sectormap computation.
+
+  \ttitemn{2016-Feb-14} version 5.02.08, r5673\\
+  fixed a bug in \hyperref[chap:emit]{\texttt{EMIT}} whereby the
+  coordinates of the orbit were mixed up (through Fortran equivalence
+  statements) between the vertical and longitudinal plane, leading to
+  wrong results in damping partition numbers and emittances. In all tests
+  in our test-suite the difference turned out to be very small but other
+  users might experience otherwise.
+
+  \ttitemn{2015-Nov-03} version 5.02.07, r5484\\
   the \hyperref[subsec:keyword]{keyword \texttt{VERSION}} has been introduced.
   
   \ttitemn{2015-Sep-15} version 5.02.07, r5407\\

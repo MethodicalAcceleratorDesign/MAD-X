@@ -715,15 +715,16 @@ const char* const trackloss_table_cols[] =
 const int dynap_table_types[] =
 {
   2,2,2,2,2,
-  2,2,2,2,2,
+  2,2,2,2,2,2,
   2,2,2,2,2
 };
 
 const char* const dynap_table_cols[] =
 {
   "dynapfrac", "dktrturns", "xend", "pxend", "yend",
-  "pyend", "tend", "wxmin", "wxmax", "wymin", "wymax",
-  "wxymin", "wxymax", "smear", "yapunov",
+  "pyend", "tend", "ptend", "wxmin", "wxmax", "wymin", "wymax",
+  //"wxymin", "wxymax", "smear", "yapunov",
+  "wxymin", "wxymax", "smear", "lyapunov",
   " "  /* blank terminates */
 };
 

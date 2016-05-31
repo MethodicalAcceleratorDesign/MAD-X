@@ -26,7 +26,7 @@
 struct logmsg_config logmsg_config = {
   .level  = inform_level,
   .locate = 0,
-  .flush  = 1             // always flush stdout
+  .flush  = 1             // always flush files
 };
 
 void
@@ -53,6 +53,8 @@ logmsg(unsigned level, const char *file, int line, const char *fmt, ...)
   va_end(ap);
 
   putc('\n', stderr);
+
+  if (logmsg_config.flush) fflush(stderr);
 
   switch(level) {
   case error_level: quit(EXIT_FAILURE);

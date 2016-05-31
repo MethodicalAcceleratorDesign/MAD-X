@@ -3,9 +3,10 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   use bbfi
   use twiss0fi
   use emitfi
+  use matrices, only : EYE
+  use math_constfi, only : zero, one, three, twopi
+  use code_constfi
   implicit none
-
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Compute emittances by A. Chao's method.                            *
@@ -30,53 +31,56 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   !   updatebeam (logical) flag to trigger BEAM update upon return
   !----------------------------------------------------------------------*
   !---- Communication area for radiation damping.
-  double precision orbit0(6), orbit(6), orbit2(6), em(6,6), rd(6,6), reval(6)
-  double precision aival(6), rt(6,6), orbit1(6), ek(6)
-  double precision emit_v(3), nemit_v(3), tunes(3), sig_v(4)
-  double precision u0, pdamp(3)
-  double precision bmax(3,3), gmax(3,3), dismax(4)
-  double precision em2(6,6), disp(6), disp0(6),al_errors(align_max)
-  double precision tol, deltap, get_value, arad, suml, gammas, el
-  double precision betas, bx, gx, re(6,6), te(6,6,6), tt(6,6,6)
-  double precision get_variable, node_value
-  integer i, j, j1, j2, k, k1, k2, eflag, restart_sequ, n_align
-  integer node_al_errors, code, advance_node
-  logical m66sta, fmap, stabx, staby, stabt, frad, updatebeam
-  double precision zero, one, three, twopi
-  parameter (zero = 0.0d0, one = 1.d0, three = 3.0d0)
 
-  twopi = get_variable('twopi ')
+  double precision, intent(IN) :: deltap, tol 
+  double precision, intent(IN) :: orbit0(6), disp0(6)
+  double precision, intent(IN OUT) :: rt(6,6)
+  double precision, intent(OUT) :: u0, emit_v(3), nemit_v(3) 
+  double precision, intent(OUT) :: bmax(3,3), gmax(3,3), dismax(4)
+  double precision, intent(OUT) :: tunes(3), sig_v(4), pdamp(3)
+  logical, intent(OUT) :: updatebeam
 
-  ORBIT = ORBIT0
-  DISP = DISP0
-  EMIT_V = zero
-  NEMIT_V = zero
-  BMAX  = zero
-  GMAX  = zero
-  DISMAX = zero
-  TUNES = zero
-  SIG_V = zero
-  PDAMP = zero
+  double precision :: orbit(6), orbit1(6), orbit2(6) 
+  double precision :: em(6,6), em2(6,6), rd(6,6) ! eigenvalues and damping matrices
+  double precision :: reval(6), aival(6), ek(6) ! re and im parts for damping and tunes
+  double precision :: disp(6)
+  double precision :: al_errors(align_max)
+  double precision :: arad, suml, gammas, el
+  double precision :: re(6,6), te(6,6,6), tt(6,6,6)
+  double precision :: betas, bx, gx
+
+  integer :: i, j, j1, j2, k, k1, k2, eflag, n_align, code
+  logical :: fmap, stabx, staby, stabt, radiate
+
+  integer, external :: restart_sequ, advance_node, node_al_errors
+  logical, external :: m66sta
+  double precision, external :: get_value, node_value
+  
+  ORBIT(:6) = ORBIT0(:6)
+  DISP(:6) = DISP0(:6)
+
+  EMIT_V(:3) = zero
+  NEMIT_V(:3) = zero
+  BMAX(:3,:3)  = zero
+  GMAX(:3,:3)  = zero
+  DISMAX(:4) = zero
+  TUNES(:3) = zero
+  SIG_V(:4) = zero
+  PDAMP(:3) = zero
   u0 = zero
 
   !---- Find eigenvectors at initial position.
   if (m66sta(rt)) then
-     !print *, 'Case static...'
      call laseig(rt, reval, aival, em)
      stabt = .false.     
-     !print '('' Static map, eigenvalues:'',(/1X,2E15.8))', &
-     !     (reval(i), aival(i), i = 1, 4)
   else
-     !print *, 'Case dynamic...' 
      call ladeig(rt, reval, aival, em)
-     stabt = reval(5)**2 + aival(5)**2 .le. tol  .and.               &
+     stabt = reval(5)**2 + aival(5)**2 .le. tol  .and.  &
              reval(6)**2 + aival(6)**2 .le. tol
-     !print '('' Dynamic map, eigenvalues:'',(/1X,2E15.8))', & 
-     !     (reval(i), aival(i), i = 1, 6)
   endif
-  stabx = reval(1)**2 + aival(1)**2 .le. tol  .and.                 &
+  stabx = reval(1)**2 + aival(1)**2 .le. tol  .and.     &
           reval(2)**2 + aival(2)**2 .le. tol
-  staby = reval(3)**2 + aival(3)**2 .le. tol  .and.                 &
+  staby = reval(3)**2 + aival(3)**2 .le. tol  .and.     &
           reval(4)**2 + aival(4)**2 .le. tol
 
   !---- Maximum extents.
@@ -95,18 +99,18 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   betas = get_value('probe ','beta ')
   gammas = get_value('probe ','gamma ')
   cg = arad * gammas**3 / three
-  frad = get_value('probe ','radiate ') .ne. zero
+  radiate = get_value('probe ','radiate ') .ne. zero
 
   !---- Initialize damping calculation.
-  if (frad .and. stabt) then
-     sum(1) = zero
-     sum(2) = zero
-     sum(3) = zero
+  if (radiate .and. stabt) then
+     SUM(:3) = zero
      sumu0 = zero
-     call m66one(rd)
+     RD = EYE 
   endif
-  call dzero(tt,216)
-  call m66one(rt)
+
+  TT = zero
+  RT = EYE  ! redefining RT
+
   eflag = 0
   suml = zero
   bbd_cnt=0
@@ -115,38 +119,44 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   i = restart_sequ()
 
 10 continue
-  bbd_pos=i
-  code = node_value('mad8_type ')
-  if(code.eq.39) code=15
-  if(code.eq.38) code=24
-  el = node_value('l ')
-  n_align = node_al_errors(al_errors)
-  if (n_align.ne.0)  then
-     call dcopy(orbit, orbit2, 6)
-     call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
-     if (.not. stabt) call m66byv(re, disp, disp)
-     call m66mpy(re, em, em)
-     if (frad .and. stabt) call m66mpy(re, rd, rd)
-  endif
-  !*---- Keep orbit at entrance.
-  call dcopy(orbit, orbit1, 6)
+   bbd_pos=i
+   el = node_value('l ')
+
+   code = node_value('mad8_type ')
+   if(code .eq. code_tkicker)     code = code_kicker 
+   if(code .eq. code_placeholder) code = code_instrument 
+
+   n_align = node_al_errors(al_errors)
+   if (n_align .ne. 0)  then
+      ORBIT2 = ORBIT
+      call tmali1(orbit2,al_errors,betas,gammas,orbit,re)
+      if (.not. stabt) DISP = matmul(RE,DISP)
+      EM = matmul(RE,EM) 
+      if (radiate .and. stabt) RD = matmul(RE,RD) 
+   endif
+
+  !---- Keep orbit at entrance.
+  ORBIT1 = ORBIT 
+
   !---- Element matrix and length.
   call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te)
+
   if (fmap) then
      !---- Advance dispersion.
      if (.not. stabt) then
-        call m66byv(re, disp, disp)
+        DISP = matmul(RE,DISP)        
         do j = 1, 4
            dismax(j) = max(abs(disp(j)),dismax(j))
         enddo
      endif
+
      !---- Radiation damping.
-     call m66mpy(re, em, em2)
-     if (frad .and. stabt) then
+     EM2 = matmul(RE,EM) 
+     if (radiate .and. stabt) then
         call emdamp(code, deltap, em, em2, orbit1, orbit, re)
-        call m66mpy(re, rd, rd)
+        RD = matmul(RE,RD) 
      endif
-     call dcopy(em2, em, 36)
+     EM = EM2
 
      !---- Compute beta and gamma.
      do j = 1, 3
@@ -163,38 +173,473 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
      enddo
      suml = suml + el
   endif
+
   if (n_align.ne.0)  then
-     call dcopy(orbit, orbit2, 6)
+     ORBIT2 = ORBIT 
      call tmali2(el,orbit2,al_errors,betas,gammas,orbit,re)
-     if (.not. stabt) call m66byv(re, disp, disp)
-     call m66mpy(re, em, em)
-     if (frad .and. stabt) call m66mpy(re, rd, rd)
+     if (.not. stabt) DISP = matmul(RE,DISP) 
+     EM = matmul(RE,EM) 
+     if (radiate .and. stabt) RD = matmul(RE,RD) 
   endif
+
   if (advance_node().ne.0)  then
      i=i+1
      goto 10
   endif
-  bbd_flag=0
-  !---- Undamped tunes and beam extents.
-  qx = atan2(aival(1), reval(1)) / twopi
-  if (qx .lt. zero) qx = qx + one
-  qy = atan2(aival(3), reval(3)) / twopi
-  if (qy .lt. zero) qy = qy + one
-  qs = atan2(aival(5), reval(5)) / twopi
-  if (qs .lt. zero) qs = - qs
-  !---- Summary output.
-  call emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,tunes,   &
-       sig_v,pdamp)
 
-  updatebeam = frad .and. stabt
+  bbd_flag=0
+
+  !---- Undamped tunes and beam extents.
+  qx = atan2(aival(1), reval(1)) / twopi ; if (qx .lt. zero) qx = qx + one 
+  qy = atan2(aival(3), reval(3)) / twopi ; if (qy .lt. zero) qy = qy + one
+  qs = atan2(aival(5), reval(5)) / twopi ; if (qs .lt. zero) qs = - qs
+
+  !---- Summary output.
+  call emsumm(rd,em,bmax,gmax,stabt,radiate,u0,emit_v,nemit_v,tunes,sig_v,pdamp)
+
+  updatebeam = radiate .and. stabt
 
 end subroutine emit
-subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,   &
-     tunes,sig_v,pdamp)
+
+subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
+  use twiss0fi
   use emitfi
+  use twtrrfi
+  use matrices
+  use math_constfi, only : zero, one, two, three, four, six, twelve, pi, half, ten3m, ten6p
+  use phys_constfi, only : clight
+  use code_constfi
   implicit none
+  !---------------------------------------------------------------------*
+  ! Purpose:                                                            *
+  !   Deal with radiation damping in an element.                        *
+  ! Input:                                                              *
+  !   code      (int)     MAD-8 element code                            *
+  !   deltap    (real)    momentum error                                *
+  !   EM1(6,6)  (real)    Matrix of eigenvectors at entrance.           *
+  !   EM2(6,6)  (real)    Matrix of eigenvectors at exit.               *
+  !   ORB1(6)   (real)    Orbit position at entrance.                   *
+  !   ORB2(6)   (real)    Orbit position at exit.                       *
+  ! Input/output:                                                       *
+  !   RE(6,6)   (real)    Transfer matrix for the element; changed on   *
+  !                       output to contain damping.                    *
+  !---------------------------------------------------------------------*
+  integer :: code
+  double precision :: deltap
+  double precision :: em1(6,6), em2(6,6), orb1(6), orb2(6), re(6,6)
+
+  integer :: i, j, ir, ii, n, n_ferr, iord, nn, ns, nd, nord
+  double precision  :: rw(6,6), tw(6,6,6), rw0(6,6), ferror(2)
+
+  double precision :: e1(6,6), e2(6,6)
+  double precision :: normal(0:maxmul), skew(0:maxmul)
+  double precision :: f_errors(0:maxferr)
+  
+  double precision :: o1(6), o2(6)
+  double precision :: rot(6,6)
+  double precision :: x1, y1, t1, px1, py1, pt1
+  double precision :: x2, y2, t2, px2, py2, pt2
+  
+  double precision :: el, tilt, bvk
+  double precision :: edg1, edg2, sk1, sk2, hgap, fint, sks, h, ct
+  double precision :: corr, hx, hy, hxx, hxy, hyy, h1, hcb1, hcbs1
+  double precision :: tedg1, fact1, fact1x, rfac1, rfac1x, rfac1y
+  double precision :: h2, hcb2, tedg2, fact2, fact2x, rfac2
+  double precision :: rfac2x, rfac2y, bi2gi2, betas, gammas
+  double precision :: e5sq1, e5sq2, e5sqs1, e5sqs2, x, y
+  double precision :: f1, f2, f1s, f2s, twon, str, st
+  double precision :: r1sq, r2sq, fh1, fh2, dr, di, drt
+  double precision :: rfv, rff, rfl, time
+  double precision :: xkick, ykick, dpx, dpy, an, hyx, hcbs2,hbi
+  double precision :: sk3, rfac, rfacx, rfacy, fh
+  
+  integer, external :: node_fd_errors
+  double precision, external  :: node_value, get_value
+  
+  
+  if (code .eq. code_multipole .or. code .eq. code_rfmultipole)  then
+     !--- thin multipole and thin RF multipole
+     el = node_value('lrad ')
+  else
+     el = node_value('l ')
+  endif
+
+  if (el.eq.zero .and. code.ne.code_rfcavity) return !- no damping
+  ! RF cavities with zero length still accepted beyond this point
+
+  betas  = get_value('probe ','beta ')
+  gammas = get_value('probe ','gamma ')
+
+  !---- Prepare data.
+  bvk = node_value('other_bv ')
+
+  ! Switch based on element code for element specific damping
+  select case (code)
+
+     case (code_rbend, code_sbend) !---- DIPOLE        
+        an = bvk * node_value('angle ') * el/node_value('l ') 
+        tilt = -node_value('tilt ')  
+        edg1 = bvk * node_value('e1 ')
+        edg2 = bvk * node_value('e2 ')
+        sk1 = bvk * node_value('k1 ')
+        sk2 = bvk * node_value('k2 ')
+        hgap = node_value('hgap ')
+        fint = node_value('fint ')
+        sks = zero
+        h = an / el
+        
+        !---- Refer orbit and eigenvectors to magnet midplane.
+        ct = cos(tilt)
+        st = sin(tilt)
+
+        ROT = reshape((/  ct, zero,   st, zero, zero, zero, &
+                        zero,   ct, zero,   st, zero, zero, &
+                         -st, zero,   ct, zero, zero, zero, &
+                        zero,  -st, zero,   ct, zero, zero, &
+                        zero, zero, zero, zero,  one, zero, &
+                        zero, zero, zero, zero, zero,  one /), shape(ROT))
+        
+        O1 = matmul(ROT, ORB1)
+        O2 = matmul(ROT, ORB2)
+
+        do i = 1, 6
+           e1(1,i) =   ct * em1(1,i) + st * em1(3,i)
+           e1(2,i) =   ct * em1(2,i) + st * em1(4,i)
+           e1(3,i) = - st * em1(1,i) + ct * em1(3,i)
+           e1(4,i) = - st * em1(2,i) + ct * em1(4,i)
+           e1(5,i) = em1(5,i)
+           e1(6,i) = em1(6,i)
+
+           e2(1,i) =   ct * em2(1,i) + st * em2(3,i)
+           e2(2,i) =   ct * em2(2,i) + st * em2(4,i)
+           e2(3,i) = - st * em2(1,i) + ct * em2(3,i)
+           e2(4,i) = - st * em2(2,i) + ct * em2(4,i)
+           e2(5,i) = em2(5,i)
+           e2(6,i) = em2(6,i)
+        enddo
+        
+        !---- Move orbit through fringing field;
+        !     Requested components of eigenvectors are not affected.
+        corr = (h + h) * hgap * fint
+        RW = EYE 
+        TW = zero 
+        call tmfrng(.false.,h,sk1,edg1,zero,+one,corr,rw,tw)
+        O1 = matmul(RW, O1) 
+
+        RW = EYE 
+        TW = zero 
+        call tmfrng(.false.,h,sk1,edg2,zero,-one,corr,rw,tw)
+        RW0 = RW 
+        RW = matmul(JMATT, matmul(transpose(RW0),JMAT)) !invert symplectic matrix
+        O2 = matmul(RW, O2) 
+
+        !--- For better readibility of following equations
+        x1 = o1(1); px1 = o1(2); y1 = o1(3); py1 = o1(4); t1 = o1(5); pt1 = o1(6)
+        x2 = o2(1); px2 = o2(2); y2 = o2(3); py2 = o2(4); t2 = o2(5); pt2 = o2(6)        
+        
+        !---- Local curvature and its derivatives,
+        !     Coefficients for damping matrix.
+        hx = sk1*x1 + sks*y1 + h + half*sk2 * (x1**2 - y1**2)
+        hy = sks*x1 - sk1*y1 - sk2*x1*y1
+        hxx = sk1 + sk2*x1
+        hxy = sks - sk2*y1
+        hyx = hxy
+        hyy = - hxx
+        h1 = sqrt(hx**2 + hy**2)
+        hcb1 = h1**3
+        hcbs1 = three*h1 * (hx * (hxx*px1 + hxy*py1) + hy * (hxy*px1 + hyy*py1))
+        
+        tedg1  = tan(edg1)
+        fact1  = (one + h*x1) * (one - tedg1*x1)
+        fact1x = h - tedg1 - 2.0*h*tedg1*x1
+        rfac1  = cg*el*h1**2*fact1
+        rfac1x = cg*el * (two*(hx*hxx+hy*hyx)*fact1 + h1**2*fact1x)
+        rfac1y = cg*el *  two*(hx*hxy+hy*hyy)*fact1
+        
+        hx = sk1*x2 + sks*y2 + h + half*sk2 * (x2**2 - y2**2)
+        hy = sks*x2 - sk1*y2 - sk2*x2*y2
+        hxx = sk1 + sk2*x2
+        hxy = sks - sk2*y2
+        hyx = hxy
+        hyy = - hxx
+        h2 = sqrt(hx**2 + hy**2)
+        hcb2 = h2**3
+        hcbs2 = three*h2 * (hx * (hxx*px2 + hxy*py2) + hy * (hxy*px2 + hyy*py2))
+        
+        tedg2  = tan(edg2)
+        fact2  = (one + h*x2) * (one - tedg2*x2)
+        fact2x = h - tedg2 - 2.0*h*tedg2*x2
+
+        rfac2  = cg*el*h2**2*fact2
+        rfac2x = cg*el * (two*(hx*hxx+hy*hyx)*fact2 + h2**2*fact2x)
+        rfac2y = cg*el *  two*(hx*hxy+hy*hyy)*fact2
+        
+        !---- Cubic integration over h**3 * E(i,5) * conjg(E(i,5)).
+        bi2gi2 = one / (betas * gammas)**2
+        hbi = h / betas
+        do i = 1, 3
+           ir = 2 * i - 1
+           ii = 2 * i
+           
+           !---- E(i,5) * conjg(E(i,5)) and its derivative w.r.t. S.
+           e5sq1 = e1(5,ir)**2 + e1(5,ii)**2
+           e5sq2 = e2(5,ir)**2 + e2(5,ii)**2
+           e5sqs1 = two * (e1(5,ir) * (bi2gi2*e1(6,ir) - hbi*e1(1,ir))     &
+                         + e1(5,ii) * (bi2gi2*e1(6,ii) - hbi*e1(1,ii)))
+           e5sqs2 = two * (e2(5,ir) * (bi2gi2*e2(6,ir) - hbi*e2(1,ir))     &
+                         + e2(5,ii) * (bi2gi2*e2(6,ii) - hbi*e2(1,ii)))
+           
+           !---- Integrand and its derivative w.r.t. S.
+           f1 = hcb1 * e5sq1
+           f2 = hcb2 * e5sq2
+           f1s = hcbs1 * e5sq1 + hcb1 * e5sqs1
+           f2s = hcbs2 * e5sq2 + hcb2 * e5sqs2
+           
+           !---- Actual integration.
+           sum(i) = sum(i) + half*el * (f1 + f2) - el**2 * (f2s - f1s) / twelve
+        enddo
+        
+        !---- Damping matrices.
+        !     Code common to bending magnet and pure multipoles.
+        RW = EYE 
+        rw(2,1) =     - rfac1x * (one + pt1) * px1
+        rw(2,2) = one - rfac1  * (one + pt1)
+        rw(2,3) =     - rfac1y * (one + pt1) * px1
+        rw(2,6) =     - rfac1                * px1
+        rw(4,1) =     - rfac1x * (one + pt1) * py1
+        rw(4,3) =     - rfac1y * (one + pt1) * py1
+        rw(4,4) = one - rfac1  * (one + pt1)
+        rw(4,6) =     - rfac1                * py1
+        rw(6,1) =     - rfac1x * (one + pt1)**2
+        rw(6,3) =     - rfac1y * (one + pt1)**2
+        rw(6,6) = one - two * rfac1 * (one + pt1)
+        RE = matmul(RE,RW) 
+
+        RW = EYE 
+        rw(2,1) =     - rfac2x * (one + pt2) * px2
+        rw(2,2) = one - rfac2  * (one + pt2)
+        rw(2,3) =     - rfac2y * (one + pt2) * px2
+        rw(2,6) =     - rfac2                * px2
+        rw(4,1) =     - rfac2x * (one + pt2) * py2
+        rw(4,3) =     - rfac2y * (one + pt2) * py2
+        rw(4,4) = one - rfac2  * (one + pt2)
+        rw(4,6) =     - rfac2                * py2
+        rw(6,1) =     - rfac2x * (one + pt2)**2
+        rw(6,3) =     - rfac2y * (one + pt2)**2
+        rw(6,6) = one - two * rfac2 * (one + pt2)
+        RE = matmul(RW,RE) 
+
+     case (code_quadrupole , code_sextupole, code_octupole) !---- Common to all pure multipoles.
+        select case (code)
+        case (code_quadrupole)  !---- Quadrupole
+           sk1 = bvk * node_value('k1 ')
+           str  = sk1
+           n    = 1
+           twon = two
+        case (code_sextupole)   !---- Sextupole
+           sk2 = bvk * node_value('k2 ')
+           str  = sk2 / two
+           n    = 2
+           twon = four
+        case (code_octupole)   !---- Octupole
+           sk3 = bvk * node_value('k2 ')
+           str  = sk3 / six
+           n    = 3
+           twon = six
+        end select
+
+        O1 = ORB1; O2 = ORB2
+        E1 = EM1;  E2 = EM2
+
+        !--- For better readibility of following equations
+        x1 = o1(1); px1 = o1(2); y1 = o1(3); py1 = o1(4); t1 = o1(5); pt1 = o1(6)
+        x2 = o2(1); px2 = o2(2); y2 = o2(3); py2 = o2(4); t2 = o2(5); pt2 = o2(6)        
+        
+        !---- Local curvature.
+        r1sq = x1**2 + y1**2
+        r2sq = x2**2 + y2**2
+        h1 = abs(str) * sqrt(r1sq)**n
+        h2 = abs(str) * sqrt(r2sq)**n
+        rfac = cg * str**2 * el
+        rfac1 = rfac * r1sq**n
+        rfac2 = rfac * r2sq**n
+        rfac1x = twon * rfac * r1sq**(n-1) * x1
+        rfac2x = twon * rfac * r1sq**(n-1) * x2
+        rfac1y = twon * rfac * r1sq**(n-1) * y1
+        rfac2y = twon * rfac * r1sq**(n-1) * y2
+        
+        !---- Trapezoidal integration over h**3 * E(k,5) * conjg(E(k,5)).
+        fh1 = half * el * h1**3
+        fh2 = half * el * h2**3
+        sum(1) = sum(1) + fh1 * (e1(5,1)**2 + e1(5,2)**2) + fh2 * (e2(5,1)**2 + e2(5,2)**2)
+        sum(2) = sum(2) + fh1 * (e1(5,3)**2 + e1(5,4)**2) + fh2 * (e2(5,3)**2 + e2(5,4)**2)
+        sum(3) = sum(3) + fh1 * (e1(5,5)**2 + e1(5,6)**2) + fh2 * (e2(5,5)**2 + e2(5,6)**2)
+
+        !---- Damping matrices.
+        !     Code common to bending magnet and pure multipoles.
+        RW = EYE 
+        rw(2,1) =     - rfac1x * (one + pt1) * px1
+        rw(2,2) = one - rfac1  * (one + pt1)
+        rw(2,3) =     - rfac1y * (one + pt1) * px1
+        rw(2,6) =     - rfac1                * px1
+        rw(4,1) =     - rfac1x * (one + pt1) * py1
+        rw(4,3) =     - rfac1y * (one + pt1) * py1
+        rw(4,4) = one - rfac1  * (one + pt1)
+        rw(4,6) =     - rfac1                * py1
+        rw(6,1) =     - rfac1x * (one + pt1)**2
+        rw(6,3) =     - rfac1y * (one + pt1)**2
+        rw(6,6) = one - two * rfac1 * (one + pt1)
+        RE = matmul(RE,RW) 
+        
+        RW = EYE 
+        rw(2,1) =     - rfac2x * (one + pt2) * px2
+        rw(2,2) = one - rfac2  * (one + pt2)
+        rw(2,3) =     - rfac2y * (one + pt2) * px2
+        rw(2,6) =     - rfac2                * px2
+        rw(4,1) =     - rfac2x * (one + pt2) * py2
+        rw(4,3) =     - rfac2y * (one + pt2) * py2
+        rw(4,4) = one - rfac2  * (one + pt2)
+        rw(4,6) =     - rfac2                * py2
+        rw(6,1) =     - rfac2x * (one + pt2)**2
+        rw(6,3) =     - rfac2y * (one + pt2)**2
+        rw(6,6) = one - two * rfac2 * (one + pt2)
+        RE = matmul(RW,RE) 
+
+        
+     case (code_multipole) !---- Thin multipoles
+        ! EL is ELRAD, the fictitious length for radiation.         
+        !---- Multipole components.
+        F_ERRORS(0:maxferr) = zero ; n_ferr = node_fd_errors(F_ERRORS)
+        
+        NORMAL(0:maxmul) = zero ; call get_node_vector('knl ',nn,normal)
+        SKEW(0:maxmul) = zero   ; call get_node_vector('ksl ',ns,skew)
+        
+        !---- Other components and errors.
+        nord = 0
+        do i = 0, max(nn, ns, n_ferr/2-1) 
+           f_errors(2*i)   = bvk * (normal(i) + f_errors(2*i))   / (one + deltap)
+           f_errors(2*i+1) = bvk * (skew(i)   + f_errors(2*i+1)) / (one + deltap)
+           ! get the maximum effective order; loop runs over maximum of user given values
+           if (f_errors(2*i) .ne. zero .or. f_errors(2*i+1) .ne. zero)  nord = i
+        enddo
+
+        !---- Multipole kick.
+        dr = zero
+        di = zero
+        do i = nord, 0, -1
+           drt = (dr * orb1(1) - di * orb1(3)) / float(i+1) + f_errors(2*i)
+           di  = (dr * orb1(3) + di * orb1(1)) / float(i+1) + f_errors(2*i+1)
+           dr  = drt
+        enddo
+
+        !---- H is local "curvature" due to multipole kick.
+        h  = sqrt(dr**2 + di**2) / el
+        sum(1) = sum(1) + half*el*h**3 * (em1(5,1)**2 + em1(5,2)**2 + em2(5,1)**2 + em2(5,2)**2)
+        sum(2) = sum(2) + half*el*h**3 * (em1(5,3)**2 + em1(5,4)**2 + em2(5,3)**2 + em2(5,4)**2)
+        sum(3) = sum(3) + half*el*h**3 * (em1(5,5)**2 + em1(5,6)**2 + em2(5,5)**2 + em2(5,6)**2)
+
+        !---- Damping matrix, is the same at both ends.
+        rfac  = cg * (dr**2 + di**2) / el
+        rfacx = cg * (- dr * re(2,1) + di * re(4,1)) / el
+        rfacy = cg * (- dr * re(2,3) + di * re(4,3)) / el
+        
+        RW = EYE 
+        rw(2,1) =     - rfacx * (one + orb1(6)) * orb1(2)
+        rw(2,2) = one - rfac  * (one + orb1(6))
+        rw(2,3) =     - rfacy * (one + orb1(6)) * orb1(2)
+        rw(2,6) =     - rfac                    * orb1(2)
+        rw(4,1) =     - rfacx * (one + orb1(6)) * orb1(4)
+        rw(4,3) =     - rfacy * (one + orb1(6)) * orb1(4)
+        rw(4,4) = one - rfac  * (one + orb1(6))
+        rw(4,6) =     - rfac                    * orb1(4)
+        rw(6,1) =     - rfacx * (one + orb1(6))
+        rw(6,3) =     - rfacy * (one + orb1(6))
+        rw(6,6) = one - two * rfac * (one + orb1(6))
+        
+        ! RE = RW * RE * RW
+        RE = matmul(RW, matmul(RE,RW)) 
 
 
+     case (code_rfcavity) !---- RF cavities.
+        rfv = node_value('volt ') * ten3m ! MV but u0 is in GeV
+        rff = node_value('freq ') * ten6p * two * pi / clight
+        rfl = node_value('lag ')  * two * pi
+        time = half * (orb1(5) + orb2(5))
+        sumu0 = sumu0 + rfv * sin(rfl - rff * time)
+
+
+     case (code_hkicker, code_kicker, code_vkicker, code_tkicker) !---- Orbit correctors.
+
+        n_ferr = node_fd_errors(f_errors)
+        
+        FERROR(1:2) = zero
+        
+        if (n_ferr .gt. 0) FERROR(:2) = F_ERRORS(:min(2,n_ferr)) 
+        
+        select case (code)
+        case (code_hkicker)
+           xkick = bvk * (node_value('kick ') + node_value('chkick ') + ferror(1))
+           ykick = zero
+        case (code_kicker, code_tkicker)
+           xkick = bvk * (node_value('hkick ') + node_value('chkick ') + ferror(1))
+           ykick = bvk * (node_value('vkick ') + node_value('cvkick ') + ferror(2))
+        case (code_vkicker)
+           xkick = zero
+           ykick = bvk * (node_value('kick ') + node_value('cvkick ') + ferror(2))
+        case default
+           xkick = zero
+           ykick = zero
+        end select
+        
+        !---- Sum up total kicks.
+        dpx = xkick / (one + deltap)
+        dpy = ykick / (one + deltap)
+        
+        !---- Local curvature.
+        hx = abs(dpx) / el
+        hy = abs(dpy) / el
+        rfac = cg * (hx**2 + hx**2) * el
+
+        !---- Trapezoidal integration over h**3*E(k,5)*E*(k,5).
+        fh = half * el * sqrt(hx**2 + hy**2)**3
+        sum(1) = sum(1) + fh * (em1(5,1)**2 + em1(5,2)**2 + em2(5,1)**2 + em2(5,2)**2)
+        sum(2) = sum(2) + fh * (em1(5,3)**2 + em1(5,4)**2 + em2(5,3)**2 + em2(5,4)**2)
+        sum(3) = sum(3) + fh * (em1(5,5)**2 + em1(5,6)**2 + em2(5,5)**2 + em2(5,6)**2)
+
+        !---- Damping matrices.
+        RW = EYE 
+        rw(2,2) = one - rfac * (one + orb1(6))
+        rw(2,6) =     - rfac * orb1(2)
+        rw(4,4) = one - rfac * (one + orb1(6))
+        rw(4,6) =     - rfac * orb1(4)
+        rw(6,6) = one - two * rfac * (one + orb1(6))
+        RE = matmul(RE,RW) 
+        
+        RW = EYE 
+        rw(2,2) = one - rfac * (one + orb2(6))
+        rw(2,6) =     - rfac * orb2(2)
+        rw(4,4) = one - rfac * (one + orb2(6))
+        rw(4,6) =     - rfac * orb2(4)
+        rw(6,6) = one - two * rfac * (one + orb2(6))
+        RE = matmul(RW,RE) 
+
+     case (code_rfmultipole)  !---- thin RF multipole        
+        ! should provide a combination of damping as for thin multipole and
+        ! energy gain as RF cavity
+
+     case default
+        ! nothing
+
+     end select
+
+end subroutine emdamp
+
+subroutine emsumm(rd,em,bmax,gmax,stabt,radiate,u0,emit_v,nemit_v, &
+                  tunes,sig_v,pdamp)
+  use emitfi
+  use math_constfi, only : zero, one, two, three, four, twopi
+  use phys_constfi, only : clight, hbar
+  implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Finish radiation damping calculation and print summary.            *
@@ -213,46 +658,43 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,   &
   !   pdamp      (real)   damping partition numbers
   !   sig_v      (real)   sigx, sigy, sigt, sige
   !----------------------------------------------------------------------*
-  integer j,j1,j2,k,k1,k2,iqpr2
-  double precision arad,gammas,clg,f0,sal,en0
-  double precision amass, clight, hbar, freq0, u0, betas
-  double precision ten3p,tenp6,tenp9,three,twopi,one,two,zero,four
-  double precision ex,ey,et,exn,eyn,sigx,sigy,sige,sigt
-  double precision rd(6,6), em(6,6), bmax(3,3), gmax(3,3),pdamp(3)
-  double precision get_variable,get_value
-  double precision emit_v(3), nemit_v(3), tunes(3), sig_v(4)
-  logical stabt, frad
-  double precision reval(6), aival(6), alj(3), tau(3), tune(3)
-  double precision sigma(6,6), bstar(3,3), gstar(3,3), dummy(6,6)
-  parameter (zero = 0.d0, one = 1.d0, two = 2.d0, three = 3.0d0)
-  parameter (iqpr2 = 6, four = 4.d0)
-  parameter (ten3p = 1.0d3, tenp6 = 1.0d6, tenp9 = 1.0d9)
+  double precision :: rd(6,6), em(6,6), bmax(3,3), gmax(3,3)
+  logical :: stabt, radiate
+  double precision :: u0
+  double precision :: emit_v(3), nemit_v(3), tunes(3), sig_v(4), pdamp(3)
 
-  call dzero(sigma,36)
-  ex=zero
-  ey=zero
-  et=zero
-  twopi=get_variable('twopi ')
-  clight = get_variable('clight ')
-  hbar = get_variable('hbar ')
-  arad = get_value('probe ','arad ')
-  betas = get_value('probe ','beta ')
+  integer :: j, j1, j2, k, k1, k2
+  double precision :: arad, gammas, clg, en0
+  double precision :: amass, freq0, betas
+  double precision :: ex, ey, et, exn, eyn, sigx, sigy, sige, sigt  
+  double precision :: reval(6), aival(6), alj(3), tau(3), tune(3)
+  double precision :: sigma(6,6), bstar(3,3), gstar(3,3), dummy(6,6)
+
+  double precision, external :: get_value
+  integer, parameter :: iqpr2 = 6
+  double precision, parameter :: ten3p=1.0d3, tenp6=1.0d6, tenp9=1.0d9
+
+  SIGMA(:6,:6) = zero 
+  ex=zero;  ey=zero;  et=zero
+
+  arad   = get_value('probe ','arad ')
+  betas  = get_value('probe ','beta ')
   gammas = get_value('probe ','gamma ')
-  amass = get_value('probe ','mass ')
-  freq0 = get_value('probe ','freq0 ')
+  amass  = get_value('probe ','mass ')
+  freq0  = get_value('probe ','freq0 ')
 
   !---- Synchrotron energy loss [GeV].
-  if (stabt .and. frad) then
+  if (stabt .and. radiate) then
      u0 = sumu0
 
      !---- Tunes.
      call ladeig(rd, reval, aival, dummy)
      tune(1) = atan2(aival(1), reval(1)) / twopi
-     if (tune(1) .lt. zero) tune(1) = tune(1) + one
+       if (tune(1) .lt. zero) tune(1) = tune(1) + one
      tune(2) = atan2(aival(3), reval(3)) / twopi
-     if (tune(2) .lt. zero) tune(2) = tune(2) + one
+       if (tune(2) .lt. zero) tune(2) = tune(2) + one
      tune(3) = atan2(aival(5), reval(5)) / twopi
-     if (tune(3) .lt. zero) tune(3) = - tune(3)
+       if (tune(3) .lt. zero) tune(3) = - tune(3)
 
      !---- Damping constants per turn.
      alj(1) = - log(reval(1)**2 + aival(1)**2) / two
@@ -261,25 +703,17 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,   &
 
      !---- Damping partition numbers.
      en0 = get_value('probe ','energy ')
-     sal = two * en0 / u0
-     pdamp(1) = alj(1) * sal
-     pdamp(2) = alj(2) * sal
-     pdamp(3) = alj(3) * sal
+     PDAMP(:) = ALJ(:) * two * en0 / u0
+
      !---- Emittances.
-     clg = ((55.d0 * hbar * clight) / (96.d0 * sqrt(three)))         &
-          * ((arad * gammas**5) / amass)
+     clg = ((55.d0*hbar*clight) / (96.d0*sqrt(three))) * ((arad * gammas**5) / amass)
      ex = clg * sum(1) / alj(1)
      ey = clg * sum(2) / alj(2)
      et = clg * sum(3) / alj(3)
 
      !---- Damping constants per second and damping times.
-     f0 = freq0 * tenp6
-     alj(1) = abs(alj(1) * f0)
-     alj(2) = abs(alj(2) * f0)
-     alj(3) = abs(alj(3) * f0)
-     tau(1) = one / alj(1)
-     tau(2) = one / alj(2)
-     tau(3) = one / alj(3)
+     ALJ(:) = abs(ALJ(:) * freq0 * tenp6)
+     TAU(:) = one / ALJ(:)
   endif
 
   !---- TRANSPORT sigma matrix.
@@ -303,46 +737,37 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,   &
   sigx = sqrt(abs(sigma(1,1)))
   sigy = sqrt(abs(sigma(3,3)))
   if (sigma(5,5) .gt. zero .or. sigma(6,6) .gt. zero)  then
-     sigt = sqrt(abs(sigma(5,5)))
-     sige = sqrt(abs(sigma(6,6)))
+     sigt = sqrt(abs(sigma(5,5)));     sige = sqrt(abs(sigma(6,6)))
   else
-     sigt = zero
-     sige = zero
+     sigt = zero;     sige = zero
   endif
-  tunes(1) = qx
-  tunes(2) = qy
-  tunes(3) = qs
-  emit_v(1) = ex
-  emit_v(2) = ey
-  emit_v(3) = et
-  nemit_v(1) = exn
-  nemit_v(2) = eyn
-  sig_v(1) = sigx
-  sig_v(2) = sigy
-  sig_v(3) = sigt
-  sig_v(4) = sige
+  tunes(1) = qx;    tunes(2) = qy;    tunes(3) = qs
+  emit_v(1) = ex;   emit_v(2) = ey;   emit_v(3) = et
+  nemit_v(1) = exn; nemit_v(2) = eyn
+  sig_v(1) = sigx;  sig_v(2) = sigy;  sig_v(3) = sigt;  sig_v(4) = sige
+  
   !---- Summary output; header and global parameters.
-  !---- Dynamic case.
-  if (stabt) then
-     if (frad) write (iqpr2, 910) ten3p * u0
+  
+  if (stabt) then !---- Dynamic case.
+     if (radiate) write (iqpr2, 910) ten3p * u0
      write (iqpr2, 920) 1, 2, 3
      write (iqpr2, 930) qx, qy, qs
-     if (frad) write (iqpr2, 940) tune
-     write (iqpr2, 950) ((bstar(j,k), j = 1, 3), k = 1, 3),          &
-          ((gstar(j,k), j = 1, 3), k = 1, 3),                               &
-          ((bmax(j,k), j = 1, 3), k = 1, 3),                                &
-          ((gmax(j,k), j = 1, 3), k = 1, 3)
-     if (frad) then
-        write (iqpr2, 960) pdamp, alj, (tau(j), j = 1, 3),            &
-             ex*tenp6, ey*tenp6, et*tenp6
+     if (radiate) write (iqpr2, 940) tune
+     write (iqpr2, 950) ((bstar(j,k), j = 1, 3), k = 1, 3), &
+                        ((gstar(j,k), j = 1, 3), k = 1, 3), &
+                        ((bmax(j,k), j = 1, 3), k = 1, 3),  &
+                        ((gmax(j,k), j = 1, 3), k = 1, 3) 
+     if (radiate) then
+        write (iqpr2, 960) pdamp, alj, (tau(j), j = 1, 3), &
+                           ex*tenp6, ey*tenp6, et*tenp6
      endif
-  else
+  else !---- Static case
      write (iqpr2, 920) 1, 2
      write (iqpr2, 930) qx, qy
-     write (iqpr2, 970) ((bstar(j,k), j = 1, 2), k = 1, 2),          &
-          ((gstar(j,k), j = 1, 2), k = 1, 2),                               &
-          ((bmax(j,k), j = 1, 2), k = 1, 2),                                &
-          ((gmax(j,k), j = 1, 2), k = 1, 2)
+     write (iqpr2, 970) ((bstar(j,k), j = 1, 2), k = 1, 2), &
+                        ((gstar(j,k), j = 1, 2), k = 1, 2), &
+                        ((bmax(j,k), j = 1, 2), k = 1, 2),  &
+                        ((gmax(j,k), j = 1, 2), k = 1, 2)
   endif
 
   !---- RF system.
@@ -370,6 +795,7 @@ subroutine emsumm(rd,em,bmax,gmax,stabt,frad,u0,emit_v,nemit_v,   &
        ' '/' gamma(max) [1/m]',t30,'px',t42,2e20.8/t30,'py',t42,2e20.8)
 
 end subroutine emsumm
+
 subroutine emce2i(stabt, em, ex, ey, et, sigma)
   implicit none
   !----------------------------------------------------------------------*
@@ -383,478 +809,45 @@ subroutine emce2i(stabt, em, ex, ey, et, sigma)
   ! Output:                                                              *
   !   SIGMA(6,6)(real)    Beam matrix in internal form.                  *
   !----------------------------------------------------------------------*
-  integer j,k
-  double precision et, ex, ey, em(6,6), sigma(6,6)
-  logical stabt
+  logical :: stabt
+  double precision :: ex, ey, et, em(6,6), sigma(6,6)
+
+  integer :: j, k
 
   do j = 1, 6
      do k = 1, 6
-        sigma(j,k) =                                                  &
-             ex * (em(j,1) * em(k,1) + em(j,2) * em(k,2)) +                    &
-             ey * (em(j,3) * em(k,3) + em(j,4) * em(k,4))
-        if (stabt) then
-           sigma(j,k) = sigma(j,k) +                                   &
-                et * (em(j,5) * em(k,5) + em(j,6) * em(k,6))
-        endif
+        sigma(j,k) = ex * (em(j,1)*em(k,1) + em(j,2)*em(k,2)) + &
+                     ey * (em(j,3)*em(k,3) + em(j,4)*em(k,4))
+        if (stabt) & 
+             sigma(j,k) = sigma(j,k) + et * (em(j,5)*em(k,5) + em(j,6)*em(k,6))
      enddo
   enddo
 end subroutine emce2i
-subroutine emdamp(code, deltap, em1, em2, orb1, orb2, re)
+
+subroutine getclor(orbit0, rt, tt, error)
+  !----------------------------------------------------------------------*
+  ! Purpose:
+  !   Get periodic closed orbit (e.g. at start of Twiss),
+  !   first + second order one-turn map
+  ! Called from mad_emit.c
+  ! Input:
+  !   orbit0(6)   (real)  initial guess
+  ! Output:
+  !   rt(6,6)     (real)  one-turn matrix
+  !   tt(6,6,6)   (real)  one-turn second-order map
+  !   error       (int)   error flag (0: OK, else != 0)
+  !----------------------------------------------------------------------*
   use twiss0fi
-  use emitfi
-  use twtrrfi
+  use matrices, only : EYE
+  use math_constfi, only : zero
   implicit none
 
+  double precision :: orbit0(6), rt(6,6), tt(6,6,6)
+  integer :: error
 
-  !---------------------------------------------------------------------*
-  ! Purpose:                                                            *
-  !   Deal with radiation damping in an element.                        *
-  ! Input:                                                              *
-  !   code      (int)     MAD-8 element code                            *
-  !   deltap    (real)    momentum error                                *
-  !   EM1(6,6)  (real)    Matrix of eigenvectors at entrance.           *
-  !   EM2(6,6)  (real)    Matrix of eigenvectors at exit.               *
-  !   ORB1(6)   (real)    Orbit position at entrance.                   *
-  !   ORB2(6)   (real)    Orbit position at exit.                       *
-  ! Input/output:                                                       *
-  !   RE(6,6)   (real)    Transfer matrix for the element; changed on   *
-  !                       output to contain damping.                    *
-  !---------------------------------------------------------------------*
-  integer code
-  double precision deltap
-  double precision em1(6,6), em2(6,6), orb1(6), orb2(6), re(6,6)
-  double precision ten3m, ten6p, zero, half, one, two, three, four
-  double precision six, twelve
-  parameter         (ten3m = 1.0d-3, ten6p = 1.0d+6)
-  parameter         (zero  = 0.0d0,  half  = 0.5d0)
-  parameter         (one   = 1.0d0,  two   = 2.0d0)
-  parameter         (three = 3.0d0,  twelve = 12.d0)
-  parameter         (four  = 4.0d0,  six   = 6.0d0)
-  integer i, j, ir, ii, n, n_ferr, iord, nn, ns, nd, nord
-  integer node_fd_errors
-  double precision  rw(6,6), tw(6,6,6), ferror(2), rw0(6,6)
-  double precision  normal(0:maxmul), skew(0:maxmul)
-  double precision  vals(2,0:maxmul), field(2,0:maxmul)
-  double precision  f_errors(0:50)
-  double precision  o1(6), e1(6,6), o2(6), e2(6,6)
-  double precision  x1, y1, t1, x2, y2, t2, px1, py1, pt1
-  double precision  px2, py2, pt2
-  equivalence       (x1, o1(1)), (px1, o1(2))
-  equivalence       (y1, o1(3)), (py1, o1(4))
-  equivalence       (t1, o1(3)), (pt1, o1(4))
-  equivalence       (x2, o2(1)), (px2, o2(2))
-  equivalence       (y2, o2(3)), (py2, o2(4))
-  equivalence       (t2, o2(3)), (pt2, o2(4))
-  double precision  el, node_value, tilt, bvk
-  double precision  edg1, edg2, sk1, sk2, hgap, fint, sks, h, ct
-  double precision  corr, hx, hy, hxx, hxy, hyy, h1, hcb1, hcbs1
-  double precision  tedg1, fact1, fact1x, rfac1, rfac1x, rfac1y
-  double precision  h2, hcb2, tedg2, fact2, fact2x, rfac2
-  double precision  rfac2x, rfac2y, bi2gi2, betas, gammas
-  double precision  get_value, e5sq1, e5sq2, e5sqs1, e5sqs2, x, y
-  double precision  f1, f2, f1s, f2s, twon, str, st, pi, clight
-  double precision  r1sq, r2sq, fh1, fh2, dr, di, drt, hcb
-  double precision  rfv, rff, rfl, rfvlt, rffrq, rflag, time
-  double precision  xkick, ykick, dpx, dpy, an, hyx, hcbs2,hbi
-  double precision  sk3, rfac, rfacx, rfacy
-  double precision  get_variable, fh
-  !      double precision  sk0, sk0s
-  if (code .eq. 8)  then
-     !--- multipole
-     el = node_value('lrad ')
-  else
-     el = node_value('l ')
-  endif
-  if (el .eq. zero.and.code .ne. 10) goto 500
-  betas = get_value('probe ','beta ')
-  gammas = get_value('probe ','gamma ')
-  !---- Prepare data.
-  bvk = node_value('other_bv ')
-  !---- Switch on element type.
-  go to (500,  20,  30, 500,  50,  60,  70,  80, 500, 100,          &
-       500, 500, 500, 140, 150, 160, 500, 500, 500, 500,                 &
-       500, 500, 500, 500, 500, 500, 500, 500, 500, 500,                 &
-       500, 500, 500, 500, 500, 500, 500, 500, 150, 500), code
-  go to 500
+  double precision :: opt(fundim)
 
-  !---- Dipole.
-20 continue
-30 continue
-
-  ! FRS 16.11.2004 This is still in the intermediate spirit of k0&k0s
-  !      an = node_value('angle ')
-  !      sk0 = an / el
-  !      sk0s = node_value('k0s ')
-  !      if (sk0s .eq. zero)  then
-  !        tilt = zero
-  !      else
-  !        tilt = atan2(sk0s, sk0)
-  !        sk0 = sqrt(sk0**2 + sk0s**2)
-  !        an = sk0 * el
-  !      endif
-  !      an = bvk * an
-  !      sk0 = bvk * sk0
-  !      sk0s = bvk * sk0s
-  ! FRS 16.11.2004 here the correction
-  an = bvk * node_value('angle ') * el/node_value('l ')
-  tilt = -node_value('tilt ')
-  edg1 = bvk * node_value('e1 ')
-  edg2 = bvk * node_value('e2 ')
-  sk1 = bvk * node_value('k1 ')
-  sk2 = bvk * node_value('k2 ')
-  hgap = node_value('hgap ')
-  fint = node_value('fint ')
-  sks = zero
-  h = an / el
-
-  !---- Refer orbit and eigenvectors to magnet midplane.
-  ct = cos(tilt)
-  st = sin(tilt)
-  o1(1) =   ct * orb1(1) + st * orb1(3)
-  o1(2) =   ct * orb1(2) + st * orb1(4)
-  o1(3) = - st * orb1(1) + ct * orb1(3)
-  o1(4) = - st * orb1(2) + ct * orb1(4)
-  o1(5) = orb1(5)
-  o1(6) = orb1(6)
-  o2(1) =   ct * orb2(1) + st * orb2(3)
-  o2(2) =   ct * orb2(2) + st * orb2(4)
-  o2(3) = - st * orb2(1) + ct * orb2(3)
-  o2(4) = - st * orb2(2) + ct * orb2(4)
-  o2(5) = orb2(5)
-  o2(6) = orb2(6)
-  do i = 1, 6
-     e1(1,i) =   ct * em1(1,i) + st * em1(3,i)
-     e1(2,i) =   ct * em1(2,i) + st * em1(4,i)
-     e1(3,i) = - st * em1(1,i) + ct * em1(3,i)
-     e1(4,i) = - st * em1(2,i) + ct * em1(4,i)
-     e1(5,i) = em1(5,i)
-     e1(6,i) = em1(6,i)
-     e2(1,i) =   ct * em2(1,i) + st * em2(3,i)
-     e2(2,i) =   ct * em2(2,i) + st * em2(4,i)
-     e2(3,i) = - st * em2(1,i) + ct * em2(3,i)
-     e2(4,i) = - st * em2(2,i) + ct * em2(4,i)
-     e2(5,i) = em2(5,i)
-     e2(6,i) = em2(6,i)
-  enddo
-  !---- Move through orbit through fringing field;
-  !     Requested components of eigenvectors are not affected.
-  corr = (h + h) * hgap * fint
-  call m66one(rw)
-  call dzero(tw,216)
-  call tmfrng(.false.,h,sk1,edg1,zero,+one,corr,rw,tw)
-  call m66byv(rw,o1,o1)
-  call m66one(rw)
-  call dzero(tw,216)
-  call tmfrng(.false.,h,sk1,edg2,zero,-one,corr,rw,tw)
-  call dcopy(rw,rw0,36)
-  call m66inv(rw0,rw)
-  call m66byv(rw,o2,o2)
-
-  !---- Local curvature and its derivatives,
-  !     Coefficients for damping matrix.
-  hx = sk1*x1 + sks*y1 + h + half*sk2 * (x1**2 - y1**2)
-  hy = sks*x1 - sk1*y1 - sk2*x1*y1
-  hxx = sk1 + sk2*x1
-  hxy = sks - sk2*y1
-  hyx = hxy
-  hyy = - hxx
-  h1 = sqrt(hx**2 + hy**2)
-  hcb1 = h1**3
-  hcbs1 = three*h1 *                                                &
-       (hx * (hxx*px1 + hxy*py1) + hy * (hxy*px1 + hyy*py1))
-
-  tedg1  = tan(edg1)
-  fact1  = (one + h*x1) * (one - tedg1*x1)
-  fact1x = h - tedg1 - 2.0*h*tedg1*x1
-  rfac1  = cg*el*h1**2*fact1
-  rfac1x = cg*el * (two*(hx*hxx+hy*hyx)*fact1 + h1**2*fact1x)
-  rfac1y = cg*el *  two*(hx*hxy+hy*hyy)*fact1
-
-  hx = sk1*x2 + sks*y2 + h + half*sk2 * (x2**2 - y2**2)
-  hy = sks*x2 - sk1*y2 - sk2*x2*y2
-  hxx = sk1 + sk2*x2
-  hxy = sks - sk2*y2
-  hyx = hxy
-  hyy = - hxx
-  h2 = sqrt(hx**2 + hy**2)
-  hcb2 = h2**3
-  hcbs2 = three*h2 *                                                &
-       (hx * (hxx*px2 + hxy*py2) + hy * (hxy*px2 + hyy*py2))
-
-  tedg2  = tan(edg2)
-  fact2  = (one + h*x2) * (one - tedg2*x2)
-  fact2x = h - tedg2 - 2.0*h*tedg2*x2
-  rfac2  = cg*el*h2**2*fact2
-  rfac2x = cg*el * (two*(hx*hxx+hy*hyx)*fact2 + h2**2*fact2x)
-  rfac2y = cg*el *  two*(hx*hxy+hy*hyy)*fact2
-
-  !---- Cubic integration over h**3 * E(i,5) * conjg(E(i,5)).
-  bi2gi2 = one / (betas * gammas)**2
-  hbi = h / betas
-  do i = 1, 3
-     ir = 2 * i - 1
-     ii = 2 * i
-
-     !---- E(i,5) * conjg(E(i,5)) and its derivative w.r.t. S.
-     e5sq1 = e1(5,ir)**2 + e1(5,ii)**2
-     e5sq2 = e2(5,ir)**2 + e2(5,ii)**2
-     e5sqs1 = two * (e1(5,ir) * (bi2gi2*e1(6,ir) - hbi*e1(1,ir))     &
-          + e1(5,ii) * (bi2gi2*e1(6,ii) - hbi*e1(1,ii)))
-     e5sqs2 = two * (e2(5,ir) * (bi2gi2*e2(6,ir) - hbi*e2(1,ir))     &
-          + e2(5,ii) * (bi2gi2*e2(6,ii) - hbi*e2(1,ii)))
-
-     !---- Integrand and its derivative w.r.t. S.
-     f1 = hcb1 * e5sq1
-     f2 = hcb2 * e5sq2
-     f1s = hcbs1 * e5sq1 + hcb1 * e5sqs1
-     f2s = hcbs2 * e5sq2 + hcb2 * e5sqs2
-
-     !---- Actual integration.
-     sum(i) = sum(i) + half * el * (f1 + f2) -                       &
-          el**2 * (f2s - f1s) / twelve
-  enddo
-  go to 77
-
-  !---- Quadrupole.
-50 continue
-  bvk = node_value('other_bv ')
-  sk1 = bvk * node_value('k1 ')
-  str  = sk1
-  n    = 1
-  twon = two
-  go to 75
-
-  !---- Sextupole.
-60 continue
-  bvk = node_value('other_bv ')
-  sk2 = bvk * node_value('k2 ')
-  str  = sk2 / two
-  n    = 2
-  twon = four
-  go to 75
-
-  !---- Octupole.
-70 continue
-  bvk = node_value('other_bv ')
-  sk3 = bvk * node_value('k2 ')
-  str  = sk3 / six
-  n    = 3
-  twon = six
-
-  !---- Common to all pure multipoles.
-75 continue
-  call dcopy(orb1, o1, 6)
-  call dcopy(orb2, o2, 6)
-  call dcopy(em1, e1, 36)
-  call dcopy(em2, e2, 36)
-
-  !---- Local curvature.
-  r1sq = orb1(1)**2 + orb1(3)**2
-  r2sq = orb2(1)**2 + orb2(3)**2
-  h1 = abs(str) * sqrt(r1sq)**n
-  h2 = abs(str) * sqrt(r2sq)**n
-  rfac = cg * str**2 * el
-  rfac1 = rfac * r1sq**n
-  rfac2 = rfac * r2sq**n
-  rfac1x = twon * rfac * r1sq**(n-1) * x1
-  rfac2x = twon * rfac * r1sq**(n-1) * x2
-  rfac1y = twon * rfac * r1sq**(n-1) * y1
-  rfac2y = twon * rfac * r1sq**(n-1) * y2
-
-  !---- Trapezoidal integration over h**3 * E(k,5) * conjg(E(k,5)).
-  fh1 = half * el * h1**3
-  fh2 = half * el * h2**3
-  sum(1) = sum(1) + fh1 * (e1(5,1)**2 + e1(5,2)**2)                 &
-       + fh2 * (e2(5,1)**2 + e2(5,2)**2)
-  sum(2) = sum(2) + fh1 * (e1(5,3)**2 + e1(5,4)**2)                 &
-       + fh2 * (e2(5,3)**2 + e2(5,4)**2)
-  sum(3) = sum(3) + fh1 * (e1(5,5)**2 + e1(5,6)**2)                 &
-       + fh2 * (e2(5,5)**2 + e2(5,6)**2)
-
-  !---- Damping matrices.
-  !     Code common to bending magnet and pure multipoles.
-77 call m66one(rw)
-  rw(2,1) =     - rfac1x * (one + pt1) * px1
-  rw(2,2) = one - rfac1  * (one + pt1)
-  rw(2,3) =     - rfac1y * (one + pt1) * px1
-  rw(2,6) =     - rfac1                * px1
-  rw(4,1) =     - rfac1x * (one + pt1) * py1
-  rw(4,3) =     - rfac1y * (one + pt1) * py1
-  rw(4,4) = one - rfac1  * (one + pt1)
-  rw(4,6) =     - rfac1                * py1
-  rw(6,1) =     - rfac1x * (one + pt1)**2
-  rw(6,3) =     - rfac1y * (one + pt1)**2
-  rw(6,6) = one - two * rfac1 * (one + pt1)
-  call m66mpy(re, rw, re)
-
-  call m66one(rw)
-  rw(2,1) =     - rfac2x * (one + pt2) * px2
-  rw(2,2) = one - rfac2  * (one + pt2)
-  rw(2,3) =     - rfac2y * (one + pt2) * px2
-  rw(2,6) =     - rfac2                * px2
-  rw(4,1) =     - rfac2x * (one + pt2) * py2
-  rw(4,3) =     - rfac2y * (one + pt2) * py2
-  rw(4,4) = one - rfac2  * (one + pt2)
-  rw(4,6) =     - rfac2                * py2
-  rw(6,1) =     - rfac2x * (one + pt2)**2
-  rw(6,3) =     - rfac2y * (one + pt2)**2
-  rw(6,6) = one - two * rfac2 * (one + pt2)
-  call m66mpy(rw, re, re)
-  go to 500
-
-  !---- Thin multipoles, EL is the fictitious length for radiation.
-80 continue
-  !---- Multipole components.
-  call dzero(f_errors,maxferr+1)
-  n_ferr = node_fd_errors(f_errors)
-  bvk = node_value('other_bv ')
-  call dzero(normal,maxmul+1)
-  call dzero(skew,maxmul+1)
-  call get_node_vector('knl ',nn,normal)
-  call get_node_vector('ksl ',ns,skew)
-  call dzero(vals,2*(maxmul+1))
-  do iord = 0, nn
-     vals(1,iord) = normal(iord)
-  enddo
-  do iord = 0, ns
-     vals(2,iord) = skew(iord)
-  enddo
-
-  !---- Field error vals.
-  call dzero(field,2*(maxmul+1))
-  if (n_ferr .gt. 0) then
-     call dcopy(f_errors,field,n_ferr)
-  endif
-  nd = 2 * max(nn, ns, n_ferr/2-1)
-
-  !---- Other components and errors.
-  nord = 0
-  do iord = 0, nd/2
-     do j = 1, 2
-        field(j,iord) = bvk * (vals(j,iord) + field(j,iord))          &
-             / (one + deltap)
-        if (field(j,iord) .ne. zero)  nord = iord
-     enddo
-  enddo
-
-  !---- Track orbit.
-  x = orb1(1)
-  y = orb1(3)
-
-  !---- Multipole kick.
-  dr = zero
-  di = zero
-  do iord = nord, 0, -1
-     drt = (dr * x - di * y) / float(iord+1) + field(1,iord)
-     di  = (dr * y + di * x) / float(iord+1) + field(2,iord)
-     dr  = drt
-  enddo
-
-  !---- H is local "curvature" due to multipole kick.
-  h  = sqrt(dr**2 + di**2) / el
-  hcb = half * el * h**3
-  sum(1)  = sum(1) + hcb *                                          &
-       (em1(5,1)**2 + em1(5,2)**2 + em2(5,1)**2 + em2(5,2)**2)
-  sum(2)  = sum(2) + hcb *                                          &
-       (em1(5,3)**2 + em1(5,4)**2 + em2(5,3)**2 + em2(5,4)**2)
-  sum(3)  = sum(3) + hcb *                                          &
-       (em1(5,5)**2 + em1(5,6)**2 + em2(5,5)**2 + em2(5,6)**2)
-
-  !---- Damping matrix, is the same at both ends.
-  rfac  = cg * (dr**2 + di**2) / el
-  rfacx = cg * (- dr * re(2,1) + di * re(4,1)) / el
-  rfacy = cg * (- dr * re(2,3) + di * re(4,3)) / el
-
-  call m66one(rw)
-  rw(2,1) = - rfacx * (one + orb1(6)) * orb1(2)
-  rw(2,2) = one - rfac * (one + orb1(6))
-  rw(2,3) = - rfacy * (one + orb1(6)) * orb1(2)
-  rw(2,6) = - rfac * orb1(2)
-  rw(4,1) = - rfacx * (one + orb1(6)) * orb1(4)
-  rw(4,3) = - rfacy * (one + orb1(6)) * orb1(4)
-  rw(4,4) = one - rfac * (one + orb1(6))
-  rw(4,6) = - rfac * orb1(4)
-  rw(6,1) = - rfacx * (one + orb1(6))
-  rw(6,3) = - rfacy * (one + orb1(6))
-  rw(6,6) = one - two * rfac * (one + orb1(6))
-  call m66mpy(re, rw, re)
-  call m66mpy(rw, re, re)
-  go to 500
-
-  !---- RF cavities.
-100 continue
-  rfv = node_value('volt ')
-  rff = node_value('freq ')
-  rfl = node_value('lag ')
-  pi = get_variable('pi ')
-  clight = get_variable('clight ')
-  rfvlt = ten3m * rfv
-  rffrq = rff * (ten6p * two * pi / clight)
-  rflag = two * pi * rfl
-  time = half * (orb1(5) + orb2(5))
-  sumu0 = sumu0 + rfvlt * sin(rflag - rffrq * time)
-  go to 500
-
-  !---- Orbit correctors.
-140 continue
-150 continue
-160 continue
-  n_ferr = node_fd_errors(f_errors)
-  do i = 1, 2
-     ferror(i) = zero
-  enddo
-  if (n_ferr .gt. 0) call dcopy(f_errors, ferror, min(2, n_ferr))
-  if(code.eq.14) then
-     xkick=bvk*(node_value('kick ')+node_value('chkick ')+           &
-          ferror(1))
-     ykick=zero
-  else if(code.eq.15.or.code.eq.39) then
-     xkick=bvk*(node_value('hkick ')+node_value('chkick ')+          &
-          ferror(1))
-     ykick=bvk*(node_value('vkick ')+node_value('cvkick ')+          &
-          ferror(2))
-  else if(code.eq.16) then
-     xkick=zero
-     ykick=bvk*(node_value('kick ')+node_value('cvkick ')+           &
-          ferror(2))
-  else
-     xkick=zero
-     ykick=zero
-  endif
-  !---- Sum up total kicks.
-  dpx = xkick / (one + deltap)
-  dpy = ykick / (one + deltap)
-
-  !---- Local curvature.
-  hx = abs(dpx) / el
-  hy = abs(dpy) / el
-  rfac = cg * (hx**2 + hx**2) * el
-
-  !---- Trapezoidal integration over h**3*E(k,5)*E*(k,5).
-  fh = half * el * sqrt(hx**2 + hy**2)**3
-  sum(1) = sum(1) + fh *                                            &
-       (em1(5,1)**2 + em1(5,2)**2 + em2(5,1)**2 + em2(5,2)**2)
-  sum(2) = sum(2) + fh *                                            &
-       (em1(5,3)**2 + em1(5,4)**2 + em2(5,3)**2 + em2(5,4)**2)
-  sum(3) = sum(3) + fh *                                            &
-       (em1(5,5)**2 + em1(5,6)**2 + em2(5,5)**2 + em2(5,6)**2)
-
-  !---- Damping matrices.
-  call m66one(rw)
-  rw(2,2) = one - rfac * (one + orb1(6))
-  rw(2,6) = - rfac * orb1(2)
-  rw(4,4) = one - rfac * (one + orb1(6))
-  rw(4,6) = - rfac * orb1(4)
-  rw(6,6) = one - two * rfac * (one + orb1(6))
-  call m66mpy(re, rw, re)
-
-  call m66one(rw)
-  rw(2,2) = one - rfac * (one + orb2(6))
-  rw(2,6) = - rfac * orb2(2)
-  rw(4,4) = one - rfac * (one + orb2(6))
-  rw(4,6) = - rfac * orb2(4)
-  rw(6,6) = one - two * rfac * (one + orb2(6))
-  call m66mpy(rw, re, re)
-500 continue
-
-end subroutine emdamp
+  RT  = EYE 
+  OPT = zero
+  call tmclor(orbit0, .true., .true., opt, rt, tt, error)
+end subroutine getclor

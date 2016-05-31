@@ -146,7 +146,7 @@
       call FCN(M,N,X,fvec,IFLAG)
       calls=calls+1
       if (iflag .ne. 0) then
-        call aawarn('JACOBIAN', ' stopped, possibly unstable')
+        call fort_warn('JACOBIAN', ' stopped, possibly unstable')
         info = - 1
         go to 300
       endif
@@ -166,7 +166,7 @@
       if (n .lt. 0                                                      &
      &.or. ftol .lt. zero .or. xtol .lt. zero .or. gtol .lt. zero       &
      &.or. call_lim .le. 0                      ) then
-        call aawarn('JACOBIAN', ' error in the input parameters')
+        call fort_warn('JACOBIAN', ' error in the input parameters')
         go to 300
       endif
 
@@ -174,7 +174,7 @@
 !---- Do not apply for calculating jacobian
       if (strategy.ne.2) then
         if (fmin .le. ftol) then
-          call aawarn('JACOBIAN', ' penalty function already ok')
+          call fort_warn('JACOBIAN', ' penalty function already ok')
           go to 300
         endif
       endif
@@ -273,7 +273,7 @@
 !      enddo
 !---- Debug
       if (info.lt.0) then
-        call aawarn('JACOBIAN', ' system solving routine failure')
+        call fort_warn('JACOBIAN', ' system solving routine failure')
         print *, '++++++++++ JACOBIAN ended: DGELSD failure'
         print *, '++++++++++ JACOBIAN ended: info = ', info
         goto 300

@@ -13,10 +13,10 @@ set LS="c:\gnuwin32\bin\ls"
 set MAKE="c:\gnuwin32\bin\make"
 set RM="c:\gnuwin32\bin\rm"
 set UNAME="c:\gnuwin32\bin\uname"
-set SCP="c:\msys\bin\scp"
-set GCC="c:\mingw64\bin\gcc"
-set GCXX="c:\mingw64\bin\g++"
-set GFC="c:\mingw64\bin\gfortran"
+set SCP="c:\msys64\usr\bin\scp"
+set GCC="c:\msys64\mingw64\bin\gcc"
+set GCXX="c:\msys64\mingw64\bin\g++"
+set GFC="c:\msys64\mingw64\bin\gfortran"
 set SVN="c:\Program Files\TortoiseSVN\bin\svn"
 
 REM settings
@@ -56,10 +56,10 @@ if ERRORLEVEL 1 (
 %echo% -e "\n===== Clean build ====="
 if "%1"=="cleanall" (
 REM cleanall not supported on windows (relies on find)
-  shift
-  %make% cleanbuild
+	shift
+	%make% cleanbuild
 ) else (
-  %echo% "Skipped (no explicit request)."
+	%echo% "Skipped (no explicit request)."
 )
 
 %echo% -e "\n===== Gnu build ====="

@@ -58,12 +58,8 @@ infoall: infoprj
 
 infobin:
 	$E "** Listing binaries and archives in $(DESTDIR)"
-ifneq ($(OSTYPE),Windows)
 	$_ $(FIND) $(DESTDIR) -type f -perm -a+x
 	$_ $(FIND) $(DESTDIR) -type f -name '*.a'
-else
-	$E "not supported on Windows platforms"
-endif
 
 infotestdep:
 	$E "** Computing tests pointless files"
@@ -78,24 +74,20 @@ infobindep:
 	$E "** Computing binaries dependencies in $(DESTDIR)"
 ifeq ($(OSTYPE),Linux)
 	$_ $(FIND) $(DESTDIR) -type f  \( -not -name 'lib*' \) -perm -a+x -print -exec ldd {} \;
-endif
-ifeq ($(OSTYPE),Darwin)
+else ifeq ($(OSTYPE),Darwin)
 	$_ $(FIND) $(DESTDIR) -type f  \( -not -name 'lib*' \) -perm -a+x -exec otool -L {} \;
-endif
-ifeq ($(OSTYPE),Windows)
-	$E "not supported on Windows platforms"
+else ifeq ($(OSTYPE),Windows)
+	$_ $(FIND) $(DESTDIR) -type f  \( -not -name 'lib*' \) -perm -a+x -print -exec ldd {} \;
 endif
 
 infolibdep:
 	$E "** Computing libraries dependencies in $(DESTDIR)"
 ifeq ($(OSTYPE),Linux)
 	$_ $(FIND) $(DESTDIR) -type f -name 'lib*' -perm -a+x -print -exec ldd {} \;
-endif
-ifeq ($(OSTYPE),Darwin)
+else ifeq ($(OSTYPE),Darwin)
 	$_ $(FIND) $(DESTDIR) -type f -name 'lib*' -perm -a+x -exec otool -L {} \;
-endif
-ifeq ($(OSTYPE),Windows)
-	$E "not supported on Windows platforms"
+else ifeq ($(OSTYPE),Windows)
+	$_ $(FIND) $(DESTDIR) -type f -name 'lib*' -perm -a+x -print -exec ldd {} \;
 endif
 
 # end of makefile

@@ -1,9 +1,9 @@
 #! /bin/bash
 # run:
-# bash scripts/build-test-macosx.sh [noecho] [cleanall] [notest]
+# bash scripts/build-test-linux.sh [noecho] [cleanall] [notest]
 
 # env settings
-export PATH="`pwd`:/opt/local/bin:$PATH"
+export PATH="`pwd`:/opt/intel/bin:$PATH"
 
 # error handler
 check_error ()
@@ -15,14 +15,14 @@ check_error ()
 }
 
 # I/O redirection
-rm -f build-test-macosx.out
+rm -f build-test-linux.out
 if [ "$1" = "noecho" ] ; then
 	shift
 	export NOCOLOR=yes
-	exec > build-test-macosx.out 2>&1
+	exec > build-test-linux.out 2>&1
 	check_error "redirection with noecho failed"
 else
-	exec > >(tee build-test-macosx.out) 2>&1
+	exec > >(tee build-test-linux.out) 2>&1
 	check_error "redirection with tee failed"
 fi
 
@@ -59,21 +59,25 @@ gcc      --version
 g++      --version
 gfortran --version
 
-make all-macosx32-gnu
-check_error "make all-macosx32-gnu failed" "no-exit"
+make all-linux32-gnu
+check_error "make all-linux32-gnu failed" "no-exit"
 
-make all-macosx64-gnu
-check_error "make all-macosx64-gnu failed"
+make all-linux64-gnu
+check_error "make all-linux64-gnu failed"
 
 echo -e "\n===== Intel build ====="
-icc      --version
-ifort    --version
 
-make all-macosx32-intel
-check_error "make all-macosx32-intel failed" "no-exit"
+source compilervars.sh ia32
+icc      -V
+ifort    -V
+make all-linux32-intel
+check_error "make all-linux32-intel failed" "no-exit"
 
-make all-macosx64-intel
-check_error "make all-macosx64-intel failed" "no-exit"
+source compilervars.sh intel64
+icc      -V
+ifort    -V
+make all-linux64-intel
+check_error "make all-linux64-intel failed" "no-exit"
 
 echo -e "\n===== Binaries dependencies ====="
 make infobindep
@@ -90,25 +94,25 @@ if [ "$1" = "notest" ] ; then
 else
 	echo ""
 
-	echo -e "\n===== Testing madx-macosx32-intel ====="
-	make madx-macosx32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=$NOCOLOR
-	check_error "make tests-all for madx-macosx32-intel failed" "no-exit"
+	echo -e "\n===== Testing madx-linux32-intel ====="
+	make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=$NOCOLOR
+	check_error "make tests-all for madx-linux32-intel failed" "no-exit"
 
-	echo -e "\n===== Testing madx-macosx64-intel ====="
-	make madx-macosx64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=$NOCOLOR
-	check_error "make tests-all for madx-macosx64-intel failed" "no-exit"
+	echo -e "\n===== Testing madx-linux64-intel ====="
+	make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=$NOCOLOR
+	check_error "make tests-all for madx-linux64-intel failed" "no-exit"
 
-	echo -e "\n===== Testing madx-macosx32-gnu ====="
-	make madx-macosx32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=$NOCOLOR
-	check_error "make tests-all for madx-macosx32-gnu failed" "no-exit"
+	echo -e "\n===== Testing madx-linux32-gnu ====="
+	make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=$NOCOLOR
+	check_error "make tests-all for madx-linux32-gnu failed" "no-exit"
 
-	echo -e "\n===== Testing madx-macosx64-gnu ====="
-	make madx-macosx64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=$NOCOLOR
-	check_error "make tests-all for madx-macosx64-gnu failed"
+	echo -e "\n===== Testing madx-linux64-gnu ====="
+	make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=$NOCOLOR
+	check_error "make tests-all for madx-linux64-gnu failed"
 fi
 
 # restore the default version
-make madx-macosx32-gnu > /dev/null && make madx-macosx64-gnu > /dev/null
+make madx-linux32-gnu > /dev/null && make madx-linux64-gnu > /dev/null
 check_error "unable to restore the default version"
 
 # date & end marker

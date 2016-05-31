@@ -20,6 +20,6 @@ endif()
 enable_testing()
 include(CTest)
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} -E LONG
-   DEPENDS numdiff madxbin
+   DEPENDS ndiff madxbin
    COMMENT "Running quick tests")
 

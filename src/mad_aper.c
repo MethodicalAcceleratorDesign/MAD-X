@@ -683,7 +683,7 @@ aper_e_d_read(char* e_d_name, struct aper_e_d** e_d_tabp, int* cnt, char* refnod
         i=fscanf(e_d_pt, "%s", e_d_tab[*cnt].name);
         /*next while-loop treats comments*/
         while ( e_d_tab[*cnt].name[0] == '!' && i != EOF) {
-          fgets(comment, 100, e_d_pt);
+          if (fgets(comment, 100, e_d_pt) == NULL) { /* discard */ ; }
           i=fscanf(e_d_pt, "%s", e_d_tab[*cnt].name);
         }
 	

@@ -11,7 +11,7 @@ else()
       ${CMAKE_SOURCE_DIR}/tests/share ${CMAKE_BINARY_DIR}/tests/share)
 endif()
 
-macro(numdiff_test testname islong)
+macro(ndiff_test testname islong)
    if(${islong})
       set(_testname ${testname}_LONG)
    else()
@@ -25,7 +25,7 @@ macro(numdiff_test testname islong)
       -DTEST_PROG=$<TARGET_FILE:madxbin>
       -DSOURCEDIR=${CMAKE_CURRENT_BINARY_DIR}/tests/${testname}
       -DTEST_NAME=${testname}
-      -DNUMDIFF=$<TARGET_FILE:numdiff>
+      -DNDIFF=$<TARGET_FILE:ndiff>
       -P ${CMAKE_SOURCE_DIR}/cmake/ctestbase.cmake)
    set_tests_properties (${_testname}
       PROPERTIES PASS_REGULAR_EXPRESSION ".*${testname}.*PASS")

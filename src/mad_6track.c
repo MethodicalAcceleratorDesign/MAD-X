@@ -848,12 +848,14 @@ att_crabcavity(struct c6t_element* el)
     el->out_1 = -23;
   else
     el->out_1 = 23;
-  if (cavall_flag == 0)
-  {
-    el->out_2 = total_voltage;
-    strcpy(el->name, "CAV");
-  }
-  else el->out_2 = el->value[1];
+  /* AL: Discussions with RdM lead to the conclusions that a CrabCavity shouldn't be considered as a regular accelerating cavity */
+  /* if (cavall_flag == 0) */
+  /* { */
+  /*   el->out_2 = total_voltage; */
+  /*   strcpy(el->name, "CAV"); */
+  /* } */
+  /* else */
+  el->out_2 = el->value[1];
   el->out_3 = el->value[4]; // freq = // not used
   if (lag < -0.5) lag +=1.;
   else if (lag > 0.5) lag -=1.;
@@ -1443,35 +1445,38 @@ convert_madx_to_c6t(struct node* p)
     /*
     ** In particular, for the RF multipoles:
     ** Name: any name
-    ** type: 26, 27 or 28 for quadrupole, sextupole and octupole, respectively (note there are
-    ** no skew elements yet).
+    ** type: (-)23, (-)26, (-)27 or (-)28
+    **       for dipole, quadrupole, sextupole and octupole, respectively.
     ** n1: Integrated multipole strength in the same units as the normal sixtrack elements
     ** n2: Frequency in MHz
     ** n3: RF phase in radians
-    */  
+    */
 
-    /* 
-    ** we have 18 parameters
+    /*
+    ** we have 19 parameters
     ** value[0]  = el_par_value_recurse("l",p->p_elem);
-    ** value[6]  = el_par_value_recurse("tilt",p->p_elem);
-    ** value[2]  = frequency in MhZ
-    ** value[15] = integrated dipole strength
-    ** value[3]  = integrated quadrupole strength
-    ** value[4]  = integrated sextupole strength
-    ** value[5]  = integrated octupole strength
-    ** value[16] = phase for dipole
-    ** value[1]  = phase for quadrupole
-    ** value[7]  = phase for sextupole
-    ** value[8]  = phase for octupole
-    ** value[9]  = integrated skew quadrupole strength
-    ** value[10] = integrated skew sextupole strength
-    ** value[11] = integrated skew octupole strength
-    ** value[12] = phase for skew quadrupole
-    ** value[13] = phase for skew sextupole
-    ** value[14] = phase for skew octupole
+    ** value[1]  = el_par_value_recurse("volt",p->p_elem);
+    ** value[2]  = el_par_value_recurse("tilt",p->p_elem);
+    ** value[3]  = frequency in MHz
+    ** value[4]  = integrated dipole strength
+    ** value[5]  = integrated quadrupole strength
+    ** value[6]  = integrated sextupole strength
+    ** value[7]  = integrated octupole strength
+    ** value[8]  = phase for dipole
+    ** value[9]  = phase for quadrupole
+    ** value[10] = phase for sextupole
+    ** value[11] = phase for octupole
+    ** value[18] = integrated skew dipole strength
+    ** value[12] = integrated skew quadrupole strength
+    ** value[13] = integrated skew sextupole strength
+    ** value[14] = integrated skew octupole strength
+    ** value[19] = phase for skew dipole
+    ** value[15] = phase for skew quadrupole
+    ** value[16] = phase for skew sextupole
+    ** value[17] = phase for skew octupole
     */ 
     
-    c6t_elem = new_c6t_element(17,t_name,p->base_name);
+    c6t_elem = new_c6t_element(19,t_name,p->base_name);
     clean_c6t_element(c6t_elem);
     strcpy(c6t_elem->org_name,t_name);
     // rf & general params
@@ -1489,12 +1494,21 @@ convert_madx_to_c6t(struct node* p)
     c6t_elem->value[10] = maxpn>2?(pn_param->double_array->a[2]):0.0;
     c6t_elem->value[11] = maxpn>3?(pn_param->double_array->a[3]):0.0;
     // skew component
+    c6t_elem->value[18] = maxks>0?(ks_param->double_array->a[0]):0.0;
     c6t_elem->value[12] = maxks>1?(ks_param->double_array->a[1]):0.0;
     c6t_elem->value[13] = maxks>2?(ks_param->double_array->a[2]):0.0;
     c6t_elem->value[14] = maxks>3?(ks_param->double_array->a[3]):0.0;
+    c6t_elem->value[19] = maxps>0?(ps_param->double_array->a[0]):0.0;
     c6t_elem->value[15] = maxps>1?(ps_param->double_array->a[1]):0.0;
     c6t_elem->value[16] = maxps>2?(ps_param->double_array->a[2]):0.0;
     c6t_elem->value[17] = maxps>3?(ps_param->double_array->a[3]):0.0;
+    
+    /*
+    printf("\t KN= %e %e %e %e (%i)\n",kn_param->double_array->a[0], kn_param->double_array->a[1], kn_param->double_array->a[2], kn_param->double_array->a[3], maxkn);
+    printf("\t PN= %e %e %e %e (%i)\n",pn_param->double_array->a[0], pn_param->double_array->a[1], pn_param->double_array->a[2], pn_param->double_array->a[3], maxpn);
+    printf("\t KS= %e %e %e %e (%i)\n",ks_param->double_array->a[0], ks_param->double_array->a[1], ks_param->double_array->a[2], ks_param->double_array->a[3], maxks);
+    printf("\t PS= %e %e %e %e (%i)\n",ps_param->double_array->a[0], ps_param->double_array->a[1], ps_param->double_array->a[2], ps_param->double_array->a[3], maxps);
+    */
   }
   else
   {
@@ -1735,7 +1749,8 @@ get_args(struct in_cmd* my_cmd)
     put_info("c6t - split flag selected","");
   if ((mangle_flag = command_par_value("mangle", my_cmd->clone)))
     put_info("c6t - mangle flag selected","");
-  if ((tmp_max_mult_ord = command_par_value("max_mult_ord", my_cmd->clone))>0)
+  if (mult_auto_off &&
+     (tmp_max_mult_ord = command_par_value("max_mult_ord", my_cmd->clone))>0)
   {
     max_mult_ord = tmp_max_mult_ord;
     printf("max_mult_ord set to : %d\n",max_mult_ord);
@@ -2706,7 +2721,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->value[7]
   };
   const double ksl[] = {
-    0.0,
+    el->value[18],
     el->value[12],
     el->value[13],
     el->value[14]
@@ -2723,7 +2738,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "d");
-    fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
+    fprintf(f2, "%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(knl[1])>eps_9) {
@@ -2734,7 +2749,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "q");
-    fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
+    fprintf(f2, "%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(knl[2])>eps_9) {
@@ -2745,7 +2760,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "s");
-    fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
+    fprintf(f2, "%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(knl[3])>eps_9) {
@@ -2756,7 +2771,19 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "o");
-    fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
+    fprintf(f2, "%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
+	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
+  }
+  if (fabs(ksl[0])>eps_9) {
+    double lag = 0.25-el->value[19];
+    double pc0 = get_value("beam", "pc"); // GeV/c
+    el->out_1 = -23; // ID
+    el->out_2 = ksl[0] * pc0 * 1e3; // rad * GeV/c * 1e3 == rad * MeV/c => MV
+    el->out_3 = freq; // freq
+    el->out_4 = 2.0 * M_PI * lag; // rad
+    strcpy(name, el->name);
+    strcat(name, "ds");
+    fprintf(f2, "%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(ksl[1])>eps_9) {
@@ -2767,7 +2794,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "qs");
-    fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
+    fprintf(f2, "%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(ksl[2])>eps_9) {
@@ -2778,7 +2805,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "ss");
-    fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
+    fprintf(f2, "%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
   if (fabs(ksl[3])>eps_9) {
@@ -2789,7 +2816,7 @@ static void write_rfmultipole(struct c6t_element* el)
     el->out_4 = 2.0 * M_PI * lag; // rad
     strcpy(name, el->name);
     strcat(name, "os");
-    fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
+    fprintf(f2, "%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
 	    name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
   }
 }
@@ -2801,8 +2828,8 @@ write_c6t_element(struct c6t_element* el)
     if (strcmp(el->base_name, "rfmultipole")==0) { 
       write_rfmultipole(el);
     } else {
-      fprintf(f2, "%-16s %2d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
-	      el->name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);      
+      fprintf(f2, "%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
+	      el->name, el->out_1, el->out_2, el->out_3, el->out_4, el->out_5, el->out_6, el->out_7);
     }
   }
   el->w_flag = 1;
@@ -3170,7 +3197,7 @@ rfmultipole_name(char *name, struct c6t_element* el)
     el->value[7]
   };
   const double ksl[] = {
-    0.0,
+    el->value[18],
     el->value[12],
     el->value[13],
     el->value[14]
@@ -3196,6 +3223,11 @@ rfmultipole_name(char *name, struct c6t_element* el)
     strcpy(tmp, el->name);
     strcat(tmp, "o");
     n += sprintf(name+n, "%-18s", tmp);
+  }
+  if (fabs(ksl[0])>eps_9) {
+    strcpy(tmp, el->name);
+    strcat(tmp, "ds");
+    n += sprintf(name+n, "%-18s", tmp);	
   }
   if (fabs(ksl[1])>eps_9) {
     strcpy(tmp, el->name);

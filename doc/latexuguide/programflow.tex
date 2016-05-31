@@ -123,12 +123,13 @@ execution. This is a powerful construct and should be handled with care.
 Simple example: 
 \madxmp{
 simple(xx,yy): MACRO = \{ xx = yy*yy + xx; VALUE, xx;\}; \\
-a = 3; \\
-b = 5; \\
-\\
+a = 3; b = 5; \\
 EXEC, simple(a,b);
 }
-
+yields
+\madxmp{
+a = 28 ;
+}
 
 \textbf{Passing arguments}\\
 In the following example we use the fact that a "\$" in front of an

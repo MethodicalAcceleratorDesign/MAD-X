@@ -39,7 +39,7 @@
 
 # tests order
 tests-all = \
-test-table \
+test-table test-table-2 \
 test-memory \
 \
 test-makethin test-makethin-2 test-makethin-3 \
@@ -65,7 +65,7 @@ test-beam \
 test-rfmultipole test-rfmultipole-2 test-rfmultipole-3 test-rfmultipole-4 test-rfmultipole-5 test-rfmultipole-6 \
 \
 test-ptc-twiss-1 test-ptc-twiss-2 test-ptc-twiss-3 \
-test-ptc-twiss-old1 test-ptc-twiss-old2 test-ptc-twiss-old3 test-ptc-twiss-old4 test-ptc-twiss-old5 $(call onwin,,test-ptc-twiss-old6) test-ptc-twiss-old7 \
+test-ptc-twiss-old1 test-ptc-twiss-old2 test-ptc-twiss-old3 test-ptc-twiss-old4 test-ptc-twiss-old5 test-ptc-twiss-old6 test-ptc-twiss-old7 \
 test-ptc-twiss-5D test-ptc-twiss-5Dt test-ptc-twiss-56D test-ptc-twiss-56Dt test-ptc-twiss-56Dl test-ptc-twiss-56Dtl test-ptc-twiss-6D test-ptc-twiss-6D-ALS \
 test-ptc-twiss-accel-56D test-ptc-twiss-56Dt-ini_map_man test-ptc-twiss-56Dt-ini_mtx_man test-ptc-twiss-56Dt-ini_mtx_tbl \
 test-ptc-normal test-ptc-twiss-normal-genfu test-ptc-twiss-maptable \
@@ -87,12 +87,12 @@ test-dynap \
 test-c6t-4 \
 test-match-6 test-match-7 \
 test-ptc-twiss-2 \
-$(call onwin,,test-ptc-twiss-old6) test-ptc-twiss-old7 \
+test-ptc-twiss-old6 test-ptc-twiss-old7 \
 test-touschek test-touschek-2 \
 \
 $(call onlxi64,$(user-cases))
 
-# user-cases are run only with tests-all on Lxplus + AFS + Intel 64 bit
+# user-cases are run only with tests-all on Lxplus + AFS + Gnu 64 bit
 user-cases = \
 test-lhc test-hllhc
 
@@ -127,7 +127,7 @@ test-ptc-twiss:      TESTSUITE := PTC Twiss testsuite
 test-rfmultipole:    TESTSUITE := RF Multipole testsuite
 test-sequence:	     TESTSUITE := Sequence testsuite
 test-survey:         TESTSUITE := Survey testsuite
-test-table:	     TESTSUITE := Table testsuite
+test-table:	         TESTSUITE := Table testsuite
 test-thick-quad:     TESTSUITE := Thick Element testsuite
 test-touschek:       TESTSUITE := Touschek testsuite
 test-track:          TESTSUITE := Track testsuite
@@ -138,11 +138,14 @@ test-twiss:          TESTSUITE := Twiss testsuite
 
 # useful macros
 onwin    = $(if       $(call eq,$(OSTYPE),Windows),$1,$2)
-onlxplus = $(if $(and $(call eq,$(OSTYPE),Linux),$(wildcard /afs/cern.ch/eng/lhc/optics)),$1,$2)
+onlxplus = $(if $(and $(call eq,$(OSTYPE),Linux),\
+                      $(findstring lxplus,$(HOSTNAME)),\
+                      $(wildcard /afs/cern.ch/eng/lhc/optics),yes),$1,$2)
 onlxi64  = $(if $(and $(call eq,$(OSTYPE),Linux),\
-                      $(call eq,$(COMP),intel),\
+                      $(call eq,$(COMP),gnu),\
                       $(call eq,$(ARCH),64),\
-                      $(wildcard /afs/cern.ch/eng/lhc/optics)),$1,$2)
+                      $(findstring lxplus,$(HOSTNAME)),\
+                      $(wildcard /afs/cern.ch/eng/lhc/optics),yes),$1,$2)
 
 # madx supported command for tests
 ifndef MADX

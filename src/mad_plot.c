@@ -398,10 +398,10 @@ exec_plot(struct in_cmd* cmd)
 
     if (ierr == 0) {
       if (p_table->origin == 0) {
+        // LD 2016.04.19
 	adjust_beam();
 	probe_beam = clone_command(current_beam);
-	adjust_probe(twiss_deltas->a[0]); /* sets correct gamma, beta, etc. */
-	adjust_rfc(); /* sets freq in rf-cavities from probe */
+	adjust_probe_fp(twiss_deltas->a[0]); /* sets correct gamma, beta, etc. */
       }
       pefill_(&ierr);
       pemima_();

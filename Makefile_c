@@ -43,20 +43,6 @@ mad_dict.o:   CFLAGS   += $(if $(call neq,$(CCNAME),gcc),,-Wno-overlength-string
 # special dependency
 mad_gcst.o: VERSION
 
-# garbage collector (Windows only)
-ifeq ($(USEGC),yes)
-ifeq ($(OSTYPE),Windows)
-vpath %.h libs/gc/$(GCDIR)/include
-vpath %.c libs/gc/$(GCDIR)
-
-CFLAGS += $(if $(call neq,$(CCNAME),icl),,/Qdiag-disable:344,869,1684,2312)
-CC_HDR += $(notdir $(wildcard libs/gc/$(GCDIR)/include/*.h))
-CC_SRC += alloc.c reclaim.c allchblk.c misc.c mach_dep.c os_dep.c mark_rts.c \
-          headers.c mark.c obj_map.c blacklst.c finalize.c new_hblk.c dbg_mlc.c \
-          malloc.c stubborn.c dyn_load.c typd_mlc.c ptr_chck.c mallocx.c
-endif
-endif
-
 #######################
 # C dependencies (case not automatic!)
 

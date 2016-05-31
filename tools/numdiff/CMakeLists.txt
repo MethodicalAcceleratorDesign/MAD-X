@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.4)
 
-PROJECT(numdiff C)
+PROJECT(ndiff C)
 
 if(NOT "${CMAKE_C_FLAGS}" MATCHES "std=c99")
    if(NOT (WIN32 AND CMAKE_C_COMPILER_ID STREQUAL "Intel"))
@@ -10,15 +10,15 @@ if(NOT "${CMAKE_C_FLAGS}" MATCHES "std=c99")
    endif()
 endif()
 
-file(GLOB numdiff_src src/*.c)
+file(GLOB ndiff_src src/*.c)
 
 include_directories(src)
-add_executable(numdiff ${numdiff_src})
+add_executable(ndiff ${ndiff_src})
 if(UNIX)
-   target_link_libraries(numdiff m)
+   target_link_libraries(ndiff m)
 endif()
 
-install(TARGETS numdiff
+install(TARGETS ndiff
    RUNTIME
    DESTINATION bin
    COMPONENT Runtime
@@ -28,8 +28,7 @@ install(TARGETS numdiff
 enable_testing()
 include(CTest)
 foreach(testname test-register test-register-2 test-register-3)
-    message("adding test ${testname}")
     set(testpath  "${CMAKE_SOURCE_DIR}/tests/${testname}/${testname}")
-    add_test(${testname} numdiff ${testpath}.nd.lhs ${testpath}.nd.rhs ${testpath}.nd.cfg)
+    add_test(${testname} ndiff ${testpath}.nd.lhs ${testpath}.nd.rhs ${testpath}.nd.cfg)
     set_tests_properties(${testname} PROPERTIES PASS_REGULAR_EXPRESSION "diffs detected over")
 endforeach()

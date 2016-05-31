@@ -20,18 +20,20 @@ track_observe(struct in_cmd* cmd)
     nodes[0]->obs_point = ++curr_obs_points;
     nodes[0]->obs_orbit = new_double_array(6);
     nodes[0]->obs_orbit->curr = 6;
-    adjust_beam();
-    if (probe_beam) probe_beam = delete_command(probe_beam);
-    probe_beam = clone_command(current_beam);
-    adjust_probe(track_deltap); /* sets correct gamma, beta, etc. */
-    adjust_rfc(); /* sets freq in rf-cavities from probe */
+
+    // LD 2016.04.19
     zero_double(orbit0, 6);
-    zero_double(oneturnmat, 36);
+    adjust_beam();
+    probe_beam = clone_command(current_beam);
+    adjust_probe_fp(track_deltap); /* sets correct gamma, beta, etc. */
+
     if (get_option("onepass") == 0)
     {
       tmrefo_(&curr_obs_points,orbit0,nodes[0]->obs_orbit->a,oneturnmat);
       /* closed orbit and one-turn linear transfer map */
     }
+
+    probe_beam = delete_command(probe_beam); // LD: added...
   }
   else
   {
@@ -62,13 +64,11 @@ track_run(struct in_cmd* cmd)
     return;
   }
 
-  adjust_beam();
-  if (probe_beam) probe_beam = delete_command(probe_beam);
-  probe_beam = clone_command(current_beam);
-  adjust_probe(track_deltap); /* sets correct gamma, beta, etc. */
-  adjust_rfc(); /* sets freq in rf-cavities from probe */
+  // LD 2016.04.19
   zero_double(orbit0, 6);
-  zero_double(oneturnmat, 36);
+  adjust_beam();
+  probe_beam = clone_command(current_beam);
+  adjust_probe_fp(track_deltap); /* sets correct gamma, beta, etc. */
 
   if (get_option("onepass") == 0) {
     tmrefo_(&izero,orbit0,orbit,oneturnmat);
@@ -101,12 +101,13 @@ track_run(struct in_cmd* cmd)
   if (get_option("info")) print_table(t);
   if (get_option("track_dump")) track_tables_dump();
 
+  probe_beam = delete_command(probe_beam); // LD: added 2016.02.17
+
   /* free buffers */
   myfree(rout_name, ibuf1);   myfree(rout_name, ibuf2);  myfree(rout_name, ibuf3);
   myfree(rout_name, buf_dxt); myfree(rout_name, buf_dyt);
   myfree(rout_name, buf1);    myfree(rout_name, buf2);  myfree(rout_name, buf3);
   myfree(rout_name, buf4);    myfree(rout_name, buf6);
-  fprintf(prt_file, "\n*****  end of trrun  *****\n");
 }
 
 static void
@@ -271,22 +272,23 @@ next_start(double* x,double* px,double* y,double* py,double* t,
      0 = none, else count */
 {
   struct command* comm;
+
   if (start_cnt == stored_track_start->curr)
   {
     start_cnt = 0; return 0;
   }
   comm = stored_track_start->commands[start_cnt];
-  *x = command_par_value("x", comm);
+  *x  = command_par_value("x", comm);
   *px = command_par_value("px", comm);
-  *y = command_par_value("y", comm);
+  *y  = command_par_value("y", comm);
   *py = command_par_value("py", comm);
-  *t = command_par_value("t", comm);
+  *t  = command_par_value("t", comm);
   *deltae = command_par_value("pt", comm);
-  *fx = command_par_value("fx", comm);
+  *fx   = command_par_value("fx", comm);
   *phix = command_par_value("phix", comm);
-  *fy = command_par_value("fy", comm);
+  *fy   = command_par_value("fy", comm);
   *phiy = command_par_value("phiy", comm);
-  *ft = command_par_value("ft", comm);
+  *ft   = command_par_value("ft", comm);
   *phit = command_par_value("phit", comm);
   return ++start_cnt;
 }
@@ -295,40 +297,20 @@ void
 pro_track(struct in_cmd* cmd)
   /* controls track module */
 {
-  if (current_sequ == NULL || current_sequ->ex_start == NULL)
-  {
+  if (current_sequ == NULL || current_sequ->ex_start == NULL) {
     warning("TRACK, but no active sequence:", "ignored");
     return;
   }
-  if (strcmp(cmd->tok_list->p[0], "track") == 0)
-  {
-    track_track(cmd);
-  }
-  if (strcmp(cmd->tok_list->p[0], "dynap") == 0)
-  {
-    track_dynap(cmd);
-  }
-  else if (strcmp(cmd->tok_list->p[0], "endtrack") == 0)
-  {
-    track_end(cmd);
-  }
-  else if (strcmp(cmd->tok_list->p[0], "observe") == 0)
-  {
-    track_observe(cmd);
-  }
-  else if (strcmp(cmd->tok_list->p[0], "run") == 0)
-  {
-    track_run(cmd);
-  }
-  else if (strcmp(cmd->tok_list->p[0], "ripple") == 0)
-  {
-    track_ripple(cmd);
-  }
-  else if (strcmp(cmd->tok_list->p[0], "start") == 0)
-  {
-    track_start(cmd->clone);
-    cmd->clone_flag = 1;
-  }
+
+  if (strcmp(cmd->tok_list->p[0], "track") == 0)         track_track(cmd);
+
+  if (strcmp(cmd->tok_list->p[0], "dynap") == 0)         track_dynap(cmd);
+  else if (strcmp(cmd->tok_list->p[0], "endtrack") == 0) track_end(cmd);
+  else if (strcmp(cmd->tok_list->p[0], "observe") == 0)  track_observe(cmd);
+  else if (strcmp(cmd->tok_list->p[0], "run") == 0)      track_run(cmd);
+  else if (strcmp(cmd->tok_list->p[0], "ripple") == 0)   track_ripple(cmd);
+  else if (strcmp(cmd->tok_list->p[0], "start") == 0)    track_start(cmd->clone); cmd->clone_flag = 1;
+
 }
 
 void

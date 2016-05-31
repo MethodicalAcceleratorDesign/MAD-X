@@ -1,36 +1,5 @@
-LOGICAL FUNCTION  is_thin()
-  double precision node_value, el
-  el = node_value('l ')
-  is_thin = el.eq.0d0;
-END FUNCTION is_thin
-
-LOGICAL FUNCTION  is_drift()
-  double precision node_value, code
-  code = node_value('mad8_type ')
-  is_drift = code.eq.1;
-END FUNCTION is_drift
-
-LOGICAL FUNCTION  is_dipole()
-  double precision node_value, code
-  code = node_value('mad8_type ')
-  is_dipole = code.eq.3;
-END FUNCTION is_dipole
-
-LOGICAL FUNCTION  is_matrix()
-  double precision node_value, code
-  code = node_value('mad8_type ')
-  is_matrix = code.eq.4;
-END FUNCTION is_matrix
-
-LOGICAL FUNCTION  is_quad()
-  double precision node_value, code
-  code = node_value('mad8_type ')
-  is_quad = code.eq.5;
-END FUNCTION is_quad
-
-subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
-     last_pos,z,dxt,dyt,last_orbit,eigen,coords,e_flag,code_buf,l_buf)
-
+subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
+                 z, dxt, dyt, last_orbit, eigen, coords, e_flag, code_buf, l_buf)
   use twtrrfi
   use bbfi
   use time_varfi
@@ -39,8 +8,10 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   use name_lenfi
   use trackfi
   use fasterror
+  use matrices, only : EYE
+  use math_constfi, only : zero, one, two
+  use code_constfi
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !          Interface RUN and DYNAP command to tracking routine         *
@@ -63,86 +34,90 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   !   code_buf    int(nelem)  local mad-8 code storage                   *
   !   l_buf       dp(nelem)   local length storage                       *
   !----------------------------------------------------------------------*
-  logical onepass,onetable,last_out,info,aperflag,doupdate,first,        &
-       bb_sxy_update,virgin_state,emittance_update,checkpnt_restart,     &
-       fast_error_func,exit_loss_turn
-  integer j,code,restart_sequ,advance_node,                              &
-       node_al_errors,n_align,nlm,jmax,j_tot,turn,turns,i,k,get_option,  &
-       ffile,SWITCH,nint,ndble,nchar,part_id(*),last_turn(*),char_l,     &
-       segment, e_flag, nobs,lobs,int_arr(1),tot_segm,code_buf(*),       &
-       tot_turn,max_part
-  parameter(max_part=20000)
-  integer part_id_keep(max_part),last_turn_keep(max_part)
-  double precision tmp_d,orbit0(6),orbit(6),el,rt(6,6),re(6,6),          &
-       al_errors(align_max),z(6,*),zz(6),dxt(*),dyt(*),eigen(6,6),sum,   &
-       node_value,get_variable,last_pos(*),last_orbit(6,*),              &
-       maxaper(6),get_value,obs_orb(6),coords(6,0:turns,*),l_buf(*),     &
-       betx_start,bety_start,alfx_start,alfy_start,gamx_start,gamy_start,&
-       dx_start,dpx_start,dy_start,dpy_start,deltap,                     &
-       N_ions_in_beam, Npart_gain, t_rms, pt_rms,                        &
-       N_ions_ini, n_ions_macro, sigma_z_ini, z_factor,                  &
-       N_ions_for_bb,z_keep(6,max_part),ex_rms0,ey_rms0,sigma_p0,sigma_z0
-  data ex_rms0,ey_rms0,sigma_p0,sigma_z0 / 0d0, 0d0, 0d0, 0d0 /
+  integer, intent(IN)  :: switch, turns
+  integer, intent(OUT) :: e_flag
 
-  character(12) tol_a, char_a
-  character(20) text
+  double precision, intent(IN) :: orbit0(6)
+  double precision, intent(IN OUT) :: rt(6,6)
+  double precision, intent(OUT) :: eigen(6,6), coords(6,0:turns,*)
+
+  integer :: part_id(*), last_turn(*), code_buf(*)
+  double precision :: last_pos(*), z(6,*), dxt(*), dyt(*)
+  double precision :: last_orbit(6,*),  l_buf(*)
+
+  logical :: onepass, onetable, last_out, info, aperflag, doupdate
+  logical :: run=.false.,dynap=.false. 
+  logical, save :: first=.true.
+  logical :: bb_sxy_update, virgin_state, emittance_update
+  logical :: checkpnt_restart, fast_error_func, exit_loss_turn
+  integer :: i, j, k, code, ffile
+  integer :: n_align, nlm, j_tot, turn, nobs, lobs 
+  integer :: nint, ndble, nchar, char_l, tot_segm, int_arr(1)
+  integer, save :: jmax, segment
+  integer, save :: tot_turn=0
+
+  integer, parameter :: max_part=20000
+  integer, save :: part_id_keep(max_part), last_turn_keep(max_part)
+
+  double precision :: orbit(6), el, re(6,6), deltap, sum, spos
+  double precision :: al_errors(align_max), zz(6), maxaper(6), obs_orb(6)
+
+  double precision, save :: betx_start=one, bety_start=one 
+  double precision, save :: alfx_start=zero, alfy_start=zero
+  double precision, save :: gamx_start=zero, gamy_start=zero 
+  double precision, save :: dx_start=zero,   dpx_start=zero
+  double precision, save :: dy_start=zero,   dpy_start=zero 
+  double precision, save :: ex_rms0=zero, ey_rms0=zero, sigma_p0=zero, sigma_z0=zero
+  double precision, save :: N_ions_in_beam, Npart_gain, N_ions_ini, n_ions_macro, N_ions_for_bb
+  double precision, save :: sigma_z_ini, z_factor, t_rms, pt_rms, z_keep(6,max_part)
+
+  character(len=12) :: tol_a='maxaper ', char_a=' '
+  character(len=name_len) :: el_name
+  character(len=4) :: vec_names(7)
+  data vec_names /'x', 'px', 'y', 'py', 't', 'pt', 's'/
+  character(len=20) :: text
 
 !VVK 20100321 -------------------------------------------------
-      integer i_part                      ! local counter
-      double precision   Summ_t_mean      ! local for mean value
-      double precision   Summ_t_square    ! local for rms value
+      integer :: i_part                     ! local counter
+      double precision  :: Summ_t_mean      ! local for mean value
+      double precision  :: Summ_t_square    ! local for rms value
 !-------------------------------------------------------------------
 
-  !hbu
-  double precision spos
-  !hbu
-  character(4) vec_names(7)
-  !hbu
-  character(name_len) el_name
-  character(120) msg
-  data tol_a,char_a / 'maxaper ', ' ' /
-  !hbu
-  data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
-  save first
-  data first / .true. /
-  save tot_turn
-  data tot_turn / 0 /
-  save betx_start, bety_start,                             &
-       alfx_start, alfy_start,                             &
-       gamx_start, gamy_start,                             &
-       dx_start,    dpx_start,                             &
-       dy_start,    dpy_start,                             &
-       N_ions_in_beam, Npart_gain, t_rms, pt_rms,          &
-       N_ions_ini, n_ions_macro, sigma_z_ini, z_factor,    &
-       N_ions_for_bb,z_keep,part_id_keep,                  &
-       last_turn_keep,jmax,segment,                        &
-       ex_rms0,ey_rms0,sigma_p0,sigma_z0
+  integer, external :: restart_sequ, advance_node, get_option, node_al_errors
+  double precision, external :: node_value, get_variable, get_value
 
-  data betx_start, bety_start,                             &
-       alfx_start, alfy_start,                             &
-       gamx_start, gamy_start,                             &
-       dx_start,    dpx_start,                             &
-       dy_start,    dpy_start / 1d0, 1d0, 0d0, 0d0,        &
-       0d0, 0d0, 0d0, 0d0, 0d0, 0d0 /
+  ! 2015-Jul-08  19:16:53  ghislain: make code more readable
+  run   = switch .eq. 1
+  dynap = switch .eq. 2
 
-  logical is_drift, is_thin, is_quad, is_matrix, is_dipole
+  !--- Initialize
+  deltap = get_value('probe ','deltap ')
+  betas  = get_value('probe ','beta ')
+  gammas = get_value('probe ','gamma ')
+  dtbyds = get_value('probe ','dtbyds ')
+  arad   = get_value('probe ','arad ')
+  radiate  = get_value('probe ','radiate ') .ne. zero
+
+  bet0  =  get_value('beam ','beta ')
+
+  bet0i  = one / bet0
+  beti   = one / betas
+
+  deltas = get_variable('track_deltap ')
+
+  damp = get_option('damp ') .ne. 0
+  quantum = get_option('quantum ') .ne. 0
 
   !-------added by Yipeng SUN 01-12-2008--------------
-  deltap = get_value('probe ','deltap ')
-
-  if(deltap.eq.0d0) then
+  if (deltap .eq. zero) then
      onepass = get_option('onepass ') .ne. 0
-     if(onepass)   then
-     else
-        call trclor(switch,orbit0)
-     endif
-  else
+     if (.not.onepass) call trclor(switch, orbit0)
   endif
 
   !---- Set fast_error_func flag to use faster error function
   !---- including tables. Thanks to late G. Erskine
   fast_error_func = get_option('fast_error_func ') .ne. 0
-  if(fast_error_func.and..not.fasterror_on) then
+  if (fast_error_func .and. .not.fasterror_on) then
      call wzset
      fasterror_on = .true.
   endif
@@ -150,35 +125,29 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   !---- get options for space charge variables
   exit_loss_turn = get_option('exit_loss_turn ') .ne. 0
   bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
-  checkpnt_restart = get_value('run ', 'checkpnt_restart ') .ne. 0d0
+  checkpnt_restart = get_value('run ', 'checkpnt_restart ') .ne. zero
   emittance_update = get_option('emittance_update ') .ne. 0
-  virgin_state = get_value('run ', 'virgin_state ') .ne. 0d0
+  virgin_state = get_value('run ', 'virgin_state ') .ne. zero
 
-  if(switch.eq.1) then
-     ! 2015-Feb-23  16:20:19  ghislain: open file only when necessary
-     if (bb_sxy_update) &
-          open(90,file='checkpoint_restart.dat',form='unformatted',status='unknown')
-  else
+  if (run .and. bb_sxy_update) then
+     open(90,file='checkpoint_restart.dat',form='unformatted',status='unknown')
+  else if (dynap) then
      bb_sxy_update = .false.
      checkpnt_restart = .false.
   endif
-  if(bb_sxy_update) then
-     if(virgin_state) first=.true.
 
-     call table_input(                                 &
-          betx_start, bety_start,                      &
-          alfx_start, alfy_start,                      &
-          gamx_start, gamy_start,                      &
-          dx_start,    dpx_start,                      &
-          dy_start,    dpy_start)
-
-     if(first) call make_bb6d_ixy(turns)
+  if (bb_sxy_update) then
+     if (virgin_state) first=.true.
+     call table_input( betx_start, bety_start, &
+                       alfx_start, alfy_start, &
+                       gamx_start, gamy_start, &
+                       dx_start,    dpx_start, &
+                       dy_start,    dpy_start)
+     if (first) call make_bb6d_ixy(turns)
   endif
 
-  if(fsecarb) then
-     write (msg,*) 'Second order terms of arbitrary Matrix not '//   &
-          'allowed for tracking.'
-     call aawarn('trrun: ',msg)
+  if (fsecarb) then
+     call fort_warn('TRRUN: ','Second order terms of arbitrary Matrix not allowed for tracking.')
      return
   endif
  
@@ -186,27 +155,26 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   e_flag = 0
   ! flag to avoid double entry of last line
   last_out = .false.
-  onepass = get_option('onepass ') .ne. 0
+  onepass  = get_option('onepass ') .ne. 0
   onetable = get_option('onetable ') .ne. 0
 
-  info = get_option('info ') * get_option('warn ') .gt. 0
+  info = get_option('info ') * get_option('warn ') .gt. 0 ! why not just respect info and warn ? 
 
-  if(onepass) call m66one(rt)
+  if (onepass) RT = EYE 
   call trbegn(rt,eigen)
-  if (switch .eq. 1)  then
+  if (run) then
      ffile = get_value('run ', 'ffile ')
-  else
+  else if (dynap) then
      ffile = 1
   endif
   ! for one_table case
-  if(first) then
-     segment = 0
-  endif
+  if (first) segment = 0
+
   tot_segm = turns / ffile + 1
   if (mod(turns, ffile) .ne. 0) tot_segm = tot_segm + 1
 
-  if(first) then
-     if(checkpnt_restart) then
+  if (first) then
+     if (checkpnt_restart) then
         read(90,END=100) jmax
         read(90,END=100) Ex_rms0
         read(90,END=100) Ey_rms0
@@ -218,6 +186,7 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
      else
         call trinicmd(switch,orbit0,eigen,jmax,z,turns,coords)
      endif
+
      !--- set particle id
 !$OMP PARALLEL PRIVATE(k)
 !$OMP DO
@@ -227,22 +196,21 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
 !$OMP END DO
 !$OMP END PARALLEL
   else
-     if(jmax.eq.0) then
-        call aawarn('trrun: ',&
-             'Particle Number equals zero: exit from trrun')
+     if (jmax .eq. 0) then
+        call fort_warn('TRRUN: ','Particle Number equals zero: exit from trrun')
         return
      endif
-     if(jmax.gt.max_part) then
-        write(text, '(1p,d20.12)') max_part
-        call aafail('TRRUN: ','Fatal: Maximum Particle Number exceeded =' // text)
+     if (jmax .gt. max_part) then
+        write(text,'(a,d20.12,a)') "Maximum number of particles (",max_part,") exceeded"
+        call fort_fail('TRRUN: ',text)
      endif
 !$OMP PARALLEL PRIVATE(i,j)
 !$OMP DO
      do i = 1, jmax
-        last_turn(i)=last_turn_keep(i)
-        part_id(i)=part_id_keep(i)
-        do j=1,6
-           z(j,i)=z_keep(j,i)
+        last_turn(i) = last_turn_keep(i)
+        part_id(i) = part_id_keep(i)
+        do j = 1,6
+           z(j,i) = z_keep(j,i)
         enddo
      enddo
 !$OMP END DO
@@ -254,360 +222,319 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   !--- get vector of six coordinate maxapers (both RUN and DYNAP)
   call comm_para(tol_a, nint, ndble, nchar, int_arr, maxaper, char_a, char_l)
   !hbu--- init info for tables initial s position is 0
-  !hbu initial s position is 0
-  spos=0
-  !hbu start of line, element 0
-  nlm=0
-  !hbu
-  el_name='start           '
+  spos=0 ; nlm=0 ; el_name='start           '
 
-  !---- Initialize kinematics and orbit
-  bet0  = get_value('beam ','beta ')
-  betas = get_value('probe ','beta ')
-  gammas= get_value('probe ','gamma ')
-  bet0i = 1d0 / bet0
-  beti   = 1d0 / betas
-  dtbyds = get_value('probe ','dtbyds ')
-  deltas = get_variable('track_deltap ')
-  arad = get_value('probe ','arad ')
-  dorad = get_value('probe ','radiate ') .ne. 0d0
-  dodamp = get_option('damp ') .ne. 0
-  dorand = get_option('quantum ') .ne. 0
-
-  if(first) then
+  if (first) then
      !--- enter start coordinates in summary table
-     if (switch .eq. 1)  then
-        t_max=get_value('probe ','circ ')/get_value('run ', 'track_harmon ')/betas
+     if (run) then
+        t_max = get_value('probe ','circ ') / get_value('run ', 'track_harmon ') / betas
         pt_max = get_value('run ', 'deltap_max ')
-        pt_max=(sqrt((betas*(pt_max+1d0))**2+1d0/gammas**2)-1d0)*beti
-     else
-        t_max=1d20
-        pt_max=1d20
+        pt_max = (sqrt( (betas*(pt_max + one))**2 + one/gammas**2) - one) * beti
+     else if (dynap) then
+        t_max  = 1d20
+        pt_max = 1d20
      endif
-     do  i = 1,j_tot
-        if(abs(z(5,i)).gt.t_max) then
+
+     do  i = 1, j_tot
+        if (abs(z(5,i)) .gt. t_max) then
            write(text, '(1p,d13.5,a1,i6)') t_max,"p",i
-           call aafail('TRACK_INITIAL: ','Fatal: T-Coordinate larger than' // text)
+           call fort_fail('TRACK_INITIAL: ','Fatal: T-Coordinate larger than' // text)
         endif
-        if(abs(z(6,i)).gt.pt_max) then
+        if (abs(z(6,i)).gt.pt_max) then
            write(text, '(1p,d13.5,a1,i6)') pt_max,"p",i
-           call aafail('TRACK_INITIAL: ','Fatal: PT-Coordinate larger than' // text)
+           call fort_fail('TRACK_INITIAL: ','Fatal: PT-Coordinate larger than' // text)
         endif
-        tmp_d = i
-        call double_to_table_curr('tracksumm ', 'number ', tmp_d)
-        tmp_d = tot_turn
-        call double_to_table_curr('tracksumm ', 'turn ', tmp_d)
+        call double_to_table_curr('tracksumm ', 'number ', dble(i))
+        call double_to_table_curr('tracksumm ', 'turn ', dble(tot_turn))
         do j = 1, 6
-           tmp_d = z(j,i) - orbit0(j)
-           call double_to_table_curr('tracksumm ', vec_names(j), tmp_d)
+           call double_to_table_curr('tracksumm ', vec_names(j), z(j,i) - orbit0(j)) 
         enddo
-        !hbu add s
-        call double_to_table_curr('tracksumm ',vec_names(7),spos)
+        call double_to_table_curr('tracksumm ', vec_names(7), spos)
         call augment_count('tracksumm ')
      enddo
   endif
+  
   !--- enter first turn, and possibly eigen in tables
-  if (switch .eq. 1)  then
+  if (run) then
      if (onetable)  then
-        if(first) then
+        if (first) then
            call track_pteigen(eigen)
-           !hbu add s, node id and name
-           call tt_putone(jmax, tot_turn, tot_segm, segment, part_id,           &
-                z, orbit0,spos,nlm,el_name)
+           call tt_putone(jmax, tot_turn, tot_segm, segment, part_id, &
+                z, orbit0, spos, nlm, el_name)
         endif
      else
         do i = 1, jmax
-           !hbu
-           call tt_puttab(part_id(i), 0, 1, z(1,i), orbit0,spos)
+           call tt_puttab(part_id(i), 0, 1, z(1,i), orbit0, spos)
         enddo
      endif
   endif
-  call dcopy(orbit0,orbit,6)
+
+  ORBIT = ORBIT0 
 
   doupdate = get_option('update ') .ne. 0
 
   !--- loop over turns
   nobs = 0
 
-  if(bb_sxy_update) then
-     trrun_nt=0
+  if (bb_sxy_update) then
+     trrun_nt = 0
 
-     if(first) then
-        time_var_m_cnt=0
-        time_var_p_cnt=0
-        time_var_c_cnt=0
-        !      <<N_macro_part_ini=N_macro_surv+N_macro_lost>>
-        N_ions_in_beam=get_value('probe ', 'npart ') !BEAM->NPART
-        if(N_ions_in_beam .LT. 0d0) call aafail('TRRUN: ','N_ions_in_beam .LE. 0.0')
+     if (first) then
+        time_var_m_cnt = 0 ; time_var_p_cnt = 0 ; time_var_c_cnt = 0
+        ! <<N_macro_part_ini = N_macro_surv + N_macro_lost>>
+        N_ions_in_beam = get_value('probe ', 'npart ') !BEAM->NPART
+        if (N_ions_in_beam .lt. zero) call fort_fail('TRRUN: ','N_ions_in_beam .lt. zero')
         Npart_gain = get_value('run ', 'n_part_gain ')
-        N_ions_ini=Npart_gain*N_ions_in_beam
-        N_macro_surv=jmax    ! = number of START lines submitted
-        n_ions_macro=N_ions_ini/N_macro_surv
+        N_ions_ini = Npart_gain * N_ions_in_beam
+        N_macro_surv = jmax    ! = number of START lines submitted
+        n_ions_macro = N_ions_ini/N_macro_surv
 
-        N_for_I=N_macro_surv ! at start (to be redefined in Ixy)
-        if(N_macro_surv .GT. N_macro_max) call aafail('TRRUN: ',&
-             'Number N_macro_surv exceeds N_macro_max (array size)')
-        if(N_macro_surv .GT. N_macro_surv) call aafail('TRRUN: ',&
-             'Number START-lines exceeds the initial number of macroparticles N_macro_surv')
-        t_rms = get_value('run ', 'sigma_z ')*beti
+        N_for_I = N_macro_surv ! at start (to be redefined in Ixy)
+        if (N_macro_surv .gt. N_macro_max) & 
+             call fort_fail('TRRUN: ', 'Number N_macro_surv exceeds N_macro_max (array size)')
+
+        ! 2015-Jul-03  18:07:00  ghislain: BUG or voluntary ? 
+        if (N_macro_surv .gt. N_macro_surv) &  
+             call fort_fail('TRRUN: ', 'Number START-lines exceeds the initial number of macroparticles N_macro_surv')
+
+        t_rms = get_value('run ', 'sigma_z ') * beti
         pt_rms = get_value('run ', 'deltap_rms ')
-        pt_rms=(sqrt((betas*(pt_rms+1d0))**2+1d0/gammas**2)-1d0)*beti
-        sigma_z_ini=t_rms !betas: BEAM->BETA
-        sigma_z=sigma_z_ini !at start (to be redefined in Ixy)
-        sigma_p=pt_rms       !default
-        z_factor=1d0 !at start sigma_z_ini/sigma_z
-        Ex_rms=get_value('probe ', 'ex ') !BEAM->Ex
-        Ey_rms=get_value('probe ', 'ey ') !BEAM->Ey
-        if(checkpnt_restart) then
-           Ex_rms=Ex_rms0
-           Ey_rms=Ey_rms0
+        pt_rms = (sqrt((betas * (pt_rms + one))**2 + one/gammas**2) - one) * beti
+        sigma_z_ini = t_rms !betas: BEAM->BETA
+        sigma_z = sigma_z_ini !at start (to be redefined in Ixy)
+        sigma_p = pt_rms       !default
+        z_factor = one !at start sigma_z_ini/sigma_z
+        Ex_rms = get_value('probe ', 'ex ') !BEAM->Ex
+        Ey_rms = get_value('probe ', 'ey ') !BEAM->Ey
+        if (checkpnt_restart) then
+           Ex_rms = Ex_rms0
+           Ey_rms = Ey_rms0
         endif
-!        write(8,'(4(g16.9,1x))') Ex_rms, Ey_rms,sigma_z,sigma_p
-        first=.false.
+
+        ! write(8,'(4(g16.9,1x))') Ex_rms, Ey_rms,sigma_z,sigma_p
+
+        first = .false.
      endif
   endif
 
-  do turn = 1, turns
+  turnloop: do turn = 1, turns
 
-!--- Write checkpoint_restart data - disable for speed reasons
-!     rewind 90
-!     write(90) jmax
-!     write(90) Ex_rms
-!     write(90) Ey_rms
-!     do i = 1, jmax
-!        do j=1,6
-!           write(90) z(j,i)
-!        enddo
-!     enddo
+     !--- Write checkpoint_restart data - disable for speed reasons
+     !     rewind 90
+     !     write(90) jmax
+     !     write(90) Ex_rms
+     !     write(90) Ey_rms
+     !     do i = 1, jmax
+     !        do j=1,6
+     !           write(90) z(j,i)
+     !        enddo
+     !     enddo
 
      if (doupdate) call trupdate(turn)
 
      j = restart_sequ()
 
-     if(bb_sxy_update) then
-        trrun_nt=turn
-        time_var_m_lnt=0
-        time_var_p_lnt=0
-        time_var_c_lnt=0
-
-        N_macro_surv=jmax
+     if (bb_sxy_update) then
+        trrun_nt = turn
+        time_var_m_lnt = 0 ; time_var_p_lnt = 0 ; time_var_c_lnt = 0
+        
+        N_macro_surv = jmax
         i_spch = 0 !a special spch-update counter
-
-        ex_rms0=ex_rms
-        ey_rms0=ey_rms
-        sigma_z0=sigma_z
-!sigma_p0 = sigma_p !CM, 3/11/14
+        
+        ex_rms0 = ex_rms
+        ey_rms0 = ey_rms
+        sigma_z0 = sigma_z
+        !sigma_p0 = sigma_p !CM, 3/11/14
         !fill, table=Ixy_unsorted; column=i_macro_part, Ix, Iy, dpi, z_part;
-!new on 3/31/14:
-        if (emittance_update) then
-
-        call ixy_calcs(betas, orbit0, z,                                &
-             betx_start, bety_start,                      &
-             alfx_start, alfy_start,                      &
-             gamx_start, gamy_start,                      &
-             dx_start,    dpx_start,                      &
-             dy_start,    dpy_start)
-        call ixy_fitting()
-
-        call double_to_table_curr('bb6d_ixy ', 'turn ', dble(tot_turn+turn))
-        call double_to_table_curr('bb6d_ixy ', 'n_macro_surv ', dble(n_macro_surv))
-        call double_to_table_curr('bb6d_ixy ', 'n_for_i ', dble(n_for_i))
-        call double_to_table_curr('bb6d_ixy ', 'ex_rms ', ex_rms)
-        call double_to_table_curr('bb6d_ixy ', 'ey_rms ', ey_rms)
-        call double_to_table_curr('bb6d_ixy ', 'sigma_p ', sigma_p)
-        call double_to_table_curr('bb6d_ixy ', 'sigma_z ', sigma_z)
-        call augment_count('bb6d_ixy ')
-
-        if(sigma_p0.eq.0d0) sigma_p0=sigma_p
-!new on 3/31/14:
+        !new on 3/31/14:
+        if (emittance_update) then           
+           call ixy_calcs(betas, orbit0, z, &
+                          betx_start, bety_start, &
+                          alfx_start, alfy_start, &
+                          gamx_start, gamy_start, &
+                          dx_start,    dpx_start, &
+                          dy_start,    dpy_start)
+           call ixy_fitting()
+           
+           call double_to_table_curr('bb6d_ixy ', 'turn ', dble(tot_turn+turn))
+           call double_to_table_curr('bb6d_ixy ', 'n_macro_surv ', dble(n_macro_surv))
+           call double_to_table_curr('bb6d_ixy ', 'n_for_i ', dble(n_for_i))
+           call double_to_table_curr('bb6d_ixy ', 'ex_rms ', ex_rms)
+           call double_to_table_curr('bb6d_ixy ', 'ey_rms ', ey_rms)
+           call double_to_table_curr('bb6d_ixy ', 'sigma_p ', sigma_p)
+           call double_to_table_curr('bb6d_ixy ', 'sigma_z ', sigma_z)
+           call augment_count('bb6d_ixy ')
+           
+           if (sigma_p0 .eq. zero) sigma_p0 = sigma_p
+           !new on 3/31/14:
         endif
 
-        if(.not.emittance_update) then
-           ex_rms=ex_rms0
-           ey_rms=ey_rms0
-           sigma_z=sigma_z0
-           sigma_p=sigma_p0
+        if (.not.emittance_update) then
+           ex_rms = ex_rms0
+           ey_rms = ey_rms0
+           sigma_z = sigma_z0
+           sigma_p = sigma_p0
         endif
-!        write(8,'(4(g16.9,1x))') Ex_rms, Ey_rms,sigma_z,sigma_p
-        if((sigma_z.GT.0d0).AND.(sigma_z_ini.GT.0d0)) then
-           z_factor=sigma_z_ini/sigma_z
+
+        z_factor = one
+        if ( sigma_z.gt.zero .and. sigma_z_ini.gt.zero) z_factor = sigma_z_ini/sigma_z
+        
+        N_ions_for_bb = n_ions_macro * N_for_I * z_factor
+        if (N_ions_in_beam .le. zero) then
+           rat_bb_n_ions = zero
         else
-           z_factor=1D0
+           rat_bb_n_ions = N_ions_for_bb/N_ions_in_beam
         endif
-
-        N_ions_for_bb=n_ions_macro*N_for_I*z_factor
-        if(N_ions_in_beam.le.0d0) then
-           rat_bb_n_ions=0d0
-        else
-           rat_bb_n_ions=N_ions_for_bb/N_ions_in_beam
-        endif
-
-        if(idnint(time_var_m_nt(time_var_m_cnt+1)).eq.tot_turn+turn) then
-           time_var_m=.true.
-        else
-           time_var_m=.false.
-        endif
-        if(idnint(time_var_p_nt(time_var_p_cnt+1)).eq.tot_turn+turn) then
-           time_var_p=.true.
-        else
-           time_var_p=.false.
-        endif
-        if(idnint(time_var_c_nt(time_var_c_cnt+1)).eq.tot_turn+turn) then
-           time_var_c=.true.
-        else
-           time_var_c=.false.
-        endif
-     endif
-
+        
+        time_var_m = .false. ; time_var_p = .false. ; time_var_c = .false.        
+        if (idnint(time_var_m_nt(time_var_m_cnt+1)) .eq. tot_turn+turn) time_var_m=.true.
+        if (idnint(time_var_p_nt(time_var_p_cnt+1)) .eq. tot_turn+turn) time_var_p=.true.
+        if (idnint(time_var_c_nt(time_var_c_cnt+1)) .eq. tot_turn+turn) time_var_c=.true.
+     endif ! bb_sxy_update
+     
      nlm = 0
-     sum=0d0
-
-     if((sigma_t.eq.0d0.or.emittance_update).and.bb_sxy_update) then
-!VVK 20100321 -------- Find RMS-value of t ----------------------
-! if we do 1-turn tracking, orbit0(5)=0 always
-        Summ_t_mean=0d0
-        do i_part=1, jmax
-           if (abs(z(5,i_part)) .GE. 0d0) then
-              Summ_t_mean=Summ_t_mean+z(5,i_part)
+     sum = zero
+     
+     if ( bb_sxy_update .and. (sigma_t.eq.zero .or. emittance_update) ) then
+        !VVK 20100321 -------- Find RMS-value of t ----------------------
+        ! if we do 1-turn tracking, orbit0(5)=0 always
+        Summ_t_mean = zero
+        do i_part = 1, jmax
+           if (abs(z(5,i_part)) .ge. zero) then
+              Summ_t_mean = Summ_t_mean + z(5,i_part)
            else
-              Print *, 'NaN z(5,i) ? :', i_part, z(5,i_part)
+              print *, 'NaN z(5,i) ? :', i_part, z(5,i_part)
            endif
         enddo
-        mean_t=Summ_t_mean/dble(jmax)
-
-        Summ_t_square=0d0
-        do i_part=1, jmax
-           if (abs(z(5,i_part)) .GE. 0d0) &
-                Summ_t_square=Summ_t_square+(z(5,i_part)-mean_t)**2
+        mean_t = Summ_t_mean/dble(jmax)
+        
+        Summ_t_square = zero
+        do i_part = 1, jmax
+           if (abs(z(5,i_part)) .ge. zero) &
+                Summ_t_square = Summ_t_square + (z(5,i_part) - mean_t)**2
         enddo
-        sigma_t=sqrt(Summ_t_square/dble(jmax))
-        if(abs(sigma_t).eq.0d0) then
-           sigma_t=t_max/2d0
-           call aawarn('TTRUN Frozen SC: sigma_t = zero: ','sigma_t set to L/track_harmon/betas/2')
-        endif
-!-----------------------------------------------------------------
-     endif
+        sigma_t = sqrt(Summ_t_square/dble(jmax))
 
-     !--- loop over nodes
-10   continue
-     bbd_pos=j
-     if (turn .eq. 1)  then
-        code = node_value('mad8_type ')
-        if(code.eq.39) code=15
-        if(code.eq.38) code=24
-        el = node_value('l ')
-        code_buf(nlm+1) = code
-        l_buf(nlm+1) = el
-        !hbu get current node name
-        call element_name(el_name,len(el_name))
-        if (.not.(is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix())) then
-           print*," "
-           print*,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
-           sum = node_value('name ')
-           print*," "
-           print*,"Track dies nicely"
-           print*,"Thick lenses will get nowhere"
-           print*,"MAKETHIN will save you"
-           print*," "
-           print*," "
-           !           Better to use stop. If use return, irrelevant tracking output
-           !           is printed
-           stop
-           !            call aafail('TRRUN: Fatal ',                                 &
-           !           '----element with length found : CONVERT STRUCTURE WITH '//   &
-           !           'MAKETHIN')
+        if (abs(sigma_t) .eq. zero) then
+           sigma_t=t_max/two
+           call fort_warn('TTRUN Frozen SC: sigma_t = zero: ','sigma_t set to L/track_harmon/betas/2')
         endif
-     else
-        el = l_buf(nlm+1)
-        code = code_buf(nlm+1)
-     endif
-     if (switch .eq. 1) then
-        nobs = node_value('obs_point ')
-     endif
-     !--------  Misalignment at beginning of element (from twissfs.f)
-     if (code .ne. 1)  then
-        call dzero(al_errors, align_max)
-        n_align = node_al_errors(al_errors)
-        !print *, "n_align = ", n_align
-        !print *, "align_max = ", align_max
-        if (n_align .ne. 0)  then
-           do i = 1, jmax
-              call dcopy(z(1,i),zz(1),6)
-              call tmali1(zz(1),al_errors, betas, gammas,z(1,i), re(1,1))
-           enddo
-        endif
-     endif
-     !-------- Track through element  // suppress dxt 13.12.04
-     call ttmap(switch,code,el,z,jmax,dxt,dyt,sum,tot_turn+turn,part_id,             &
-          last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors,onepass)
-     !--------  Misalignment at end of element (from twissfs.f)
-     if (bb_sxy_update .and. emittance_update .and. is_lost) then
-        call ixy_calcs(betas, orbit0, z,                                &
-             betx_start, bety_start,                      &
-             alfx_start, alfy_start,                      &
-             gamx_start, gamy_start,                      &
-             dx_start,    dpx_start,                      &
-             dy_start,    dpy_start)
-        call ixy_fitting()
-        is_lost = .false.
-     endif
-     if (code .ne. 1)  then
-        if (n_align .ne. 0)  then
-           do i = 1, jmax
-              call dcopy(z(1,i),zz(1),6)
-              call tmali2(el,zz(1),al_errors, betas, gammas,z(1,i),re(1,1))
-           enddo
-        endif
-     endif
-     nlm = nlm+1
-     if (nobs .gt. 0)  then
-        call dzero(obs_orb,6)
-        call get_node_vector('obs_orbit ', lobs, obs_orb)
-        if (lobs .lt. 6)                                              &
-             call aafail('TRACK: Fatal ', 'obs. point orbit not found')
-        if (onetable)  then
-           !hbu
-           spos=sum
-           !hbu get current node name
+        !-----------------------------------------------------------------
+     endif 
+     
+     do !--- loop over nodes
+
+        bbd_pos = j
+        if (turn .eq. 1)  then
+
+           code = node_value('mad8_type ')
+           if (code .eq. code_tkicker)     code = code_kicker
+           if (code .eq. code_placeholder) code = code_instrument
+
+           el = node_value('l ')
+           code_buf(nlm+1) = code
+           l_buf(nlm+1) = el
            call element_name(el_name,len(el_name))
-           !hbu
-           call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id,      &
-                z, obs_orb,spos,nlm,el_name)
+
+           if ( code.ne.code_drift .and. code.ne.code_quadrupole .and. code.ne.code_sbend & 
+                .and. code.ne.code_matrix .and. el.ne.zero ) then ! rbend missing ? 
+              !if (.not. (is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
+              print *," "
+              print *,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
+              print *," "
+              print *,"Track dies nicely"
+              print *,"Thick lenses will get nowhere"
+              print *,"MAKETHIN will save you"
+              print *," "
+              print *," "
+
+              sum = node_value('name ')
+              call fort_fail('TRRUN: Fatal ','----element with length found : CONVERT STRUCTURE WITH MAKETHIN')
+           endif
+
         else
-           if (mod(turn, ffile) .eq. 0)  then
+           el = l_buf(nlm+1)
+           code = code_buf(nlm+1)
+        endif
+
+        if (run) nobs = node_value('obs_point ')
+
+        !--------  Misalignment at beginning of element (from twissfs.f)
+        if (code .ne. code_drift)  then
+           AL_ERRORS = zero 
+           n_align = node_al_errors(al_errors)
+           if (n_align .ne. 0)  then
               do i = 1, jmax
-                 !hbu add spos
-                 call tt_puttab(part_id(i), turn, nobs, z(1,i), obs_orb,   &
-                      spos)
+                 ZZ(:) = Z(:,i)
+                 call tmali1(zz, al_errors, betas, gammas, z(1,i), re)
               enddo
            endif
         endif
-     endif
-     if (advance_node().ne.0)  then
-        j=j+1
-        go to 10
-     endif
 
-     !--- end of loop over nodes
-     if (switch .eq. 1)  then
+        !-------- Track through element  // suppress dxt 13.12.04
+        call ttmap(switch, code, el, z, jmax, dxt, dyt, sum, tot_turn+turn, part_id, &
+             last_turn, last_pos, last_orbit, aperflag, maxaper, al_errors, onepass)
+
+        !-------- Space Charge update
+        if (bb_sxy_update .and. emittance_update .and. is_lost) then
+           call ixy_calcs(betas, orbit0, z,       &
+                          betx_start, bety_start, &
+                          alfx_start, alfy_start, &
+                          gamx_start, gamy_start, &
+                          dx_start,    dpx_start, &
+                          dy_start,    dpy_start)
+           call ixy_fitting()
+           is_lost = .false.
+        endif
+        
+        !--------  Misalignment at end of element (from twissfs.f)
+        if (code .ne. code_drift .and. n_align.ne.0)  then
+           do i = 1, jmax
+              ZZ(:) = Z(:,i)
+              call tmali2(el, zz, al_errors, betas, gammas, z(1,i), re)
+           enddo
+        endif
+        
+        nlm = nlm + 1
+        if (nobs .gt. 0)  then
+           OBS_ORB = zero 
+           call get_node_vector('obs_orbit ', lobs, obs_orb)
+           if (lobs .lt. 6) &
+                call fort_fail('TRACK: Fatal ', 'obs. point orbit not found')
+           if (onetable)  then
+              spos = sum
+              call element_name(el_name,len(el_name))
+              call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id, &
+                   z, obs_orb,spos,nlm,el_name)
+           else
+              if (mod(turn, ffile) .eq. 0)  then
+                 do i = 1, jmax
+                    call tt_puttab(part_id(i), turn, nobs, z(1,i), obs_orb,spos)
+                 enddo
+              endif
+           endif
+        endif
+
+        if (advance_node() .eq. 0)  exit
+
+        j=j+1
+     end do !--- end of loop over nodes
+
+     if (run) then
         if (mod(turn, ffile) .eq. 0)  then
            if (turn .eq. turns)  last_out = .true.
            if (onetable)  then
-              !hbu
               spos=sum
-              !hbu spos added
-              !2013-Nov-05  15:05:33  ghislain: get current node name
               call element_name(el_name,len(el_name))
-              call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id,    &
+              call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id, &
                    z, orbit0,spos,nlm,el_name)
            else
               do i = 1, jmax
-                 !hbu
-                 call tt_puttab(part_id(i), turn, 1, z(1,i), orbit0,spos)
+                 call tt_puttab(part_id(i), turn, 1, z(1,i), orbit0, spos)
               enddo
            endif
         endif
-     else
+     else if (dynap) then
 !$OMP PARALLEL PRIVATE(i,j)
 !$OMP DO
         do i = 1, jmax
@@ -618,45 +545,42 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
 !$OMP END DO
 !$OMP END PARALLEL
      endif
-     if (jmax .eq. 0 .or. (switch .gt. 1 .and. jmax .lt. j_tot))     &
-          goto 20
-     if (switch .eq. 2 .and. info) then
-        if (mod(turn,100) .eq. 0) print *, 'turn :', turn
-     endif
 
-     if(exit_loss_turn .and. lost_in_turn) then
+     if (jmax .eq. 0 .or. (switch .gt. 1 .and. jmax .lt. j_tot)) goto 20 ! break loop over turns
+     if (dynap .and. info .and. mod(turn,100) .eq. 0) print *, 'turn :', turn
+
+     if (exit_loss_turn .and. lost_in_turn) then
         lost_in_turn = .false.
         write(text, '(i6)') turn
-        call aawarn('TRRUN Frozen SC: ',&
-             'Stop in Loss Turn: '//text)
-        goto 20
+        call fort_warn('TRRUN Frozen SC: ', 'Stop in Loss Turn: '//text)
+        goto 20 ! break loop over turns
      endif
+     
+  end do turnloop !--- end of loop over turns
 
-  enddo
-  !--- end of loop over turns
 20 continue
-  if (switch .gt. 1 .and. jmax .lt. j_tot)  then
+
+  if (dynap .and. jmax.lt.j_tot)  then
      e_flag = 1
      return
   endif
+
   do i = 1, jmax
      last_turn(part_id(i)) = min(turns+tot_turn, turn+tot_turn)
      last_pos(part_id(i)) = sum
-     do j = 1, 6
-        last_orbit(j,part_id(i)) = z(j,i)
-     enddo
+     last_orbit(1:6,part_id(i)) = z(1:6,i)
   enddo
   turn = min(turn, turns)
-
-  if(bb_sxy_update) then
-     tot_turn=tot_turn+turn
+  
+  if (bb_sxy_update) then
+     tot_turn = tot_turn + turn
 !$OMP PARALLEL PRIVATE(i,j)
 !$OMP DO
      do i = 1, jmax
-        part_id_keep(i)=part_id(i)
-        last_turn_keep(i)=last_turn(i)
+        part_id_keep(i) = part_id(i)
+        last_turn_keep(i) = last_turn(i)
         do j=1,6
-           z_keep(j,i)=z(j,i)
+           z_keep(j,i) = z(j,i)
         enddo
      enddo
 !$OMP END DO
@@ -664,69 +588,57 @@ subroutine trrun(switch,turns,orbit0,rt,part_id,last_turn,        &
   endif
 
   !--- enter last turn in tables if not done already
-  if (.not. last_out)  then
-     if (switch .eq. 1)  then
-        if (onetable)  then
-           !hbu
-           spos=sum
-           !hbu get current node name
-           call element_name(el_name,len(el_name))
-           !hbu spos added
-           call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id,      &
-                z, orbit0,spos,nlm,el_name)
-        else
-           do i = 1, jmax
-              !hbu
-              call tt_puttab(part_id(i), turn, 1, z(1,i), orbit0,spos)
-           enddo
-        endif
+  if (run .and. .not.last_out)  then
+     if (onetable)  then
+        spos = sum
+        call element_name(el_name,len(el_name))
+        call tt_putone(jmax, tot_turn+turn, tot_segm, segment, part_id, &
+             z, orbit0,spos,nlm,el_name)
+     else
+        do i = 1, jmax
+           call tt_puttab(part_id(i), turn, 1, z(1,i), orbit0,spos)
+        enddo
      endif
   endif
 
-!--- Write checkpoint_restart data
+  !--- Write checkpoint_restart data
   if (bb_sxy_update) then
      rewind 90
      write(90) jmax
      write(90) Ex_rms
      write(90) Ey_rms
      do i = 1, jmax
-        do j=1,6
+        do j = 1, 6
            write(90) z(j,i)
         enddo
      enddo
   endif
-
+  
   !--- enter last turn in summary table
-  do  i = 1,j_tot
-     tmp_d = i
-     call double_to_table_curr('tracksumm ', 'number ', tmp_d)
-     tmp_d = last_turn(i)
-     call double_to_table_curr('tracksumm ', 'turn ', tmp_d)
+  do  i = 1, j_tot
+     call double_to_table_curr('tracksumm ', 'number ', dble(i))
+     call double_to_table_curr('tracksumm ', 'turn ', dble(last_turn(i)))
      do j = 1, 6
-        tmp_d = last_orbit(j,i) - orbit0(j)
-        call double_to_table_curr('tracksumm ', vec_names(j), tmp_d)
+        call double_to_table_curr('tracksumm ', vec_names(j), last_orbit(j,i) - orbit0(j))
      enddo
-     !hbu
-     spos=last_pos(i)
-     !hbu
+     spos = last_pos(i)
      call double_to_table_curr('tracksumm ',vec_names(7),spos)
      call augment_count('tracksumm ')
   enddo
-  goto 101
-100 call aafail('TRACK: Fatal ', 'checkpoint_restart file corrupted')
-101 continue
+
+  return
+
+100 call fort_fail('TRACK: Fatal ', 'checkpoint_restart file corrupted')
 end subroutine trrun
 
-
-subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
-     last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors, onepass)
-
+subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
+     last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass)
   use twtrrfi
   use twiss0fi
   use name_lenfi
-  use warncolim
+  use math_constfi, only : zero, one
+  use code_constfi
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   -  Test apertures                                                  *
@@ -739,35 +651,50 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   !   NUMBER(*) (integer) Number of current track.                       *
   !   KTRACK    (integer) number of surviving tracks.                    *
   !----------------------------------------------------------------------*
-  logical aperflag,fmap,onepass
-  integer turn,code,ktrack,part_id(*),last_turn(*),nn,jtrk,         &
-       get_option, optiondebug, switch, i
-  double precision ap1,ap2,ap3,ap4,el,sum,node_value,track(6,*),        &
-       last_pos(*),last_orbit(6,*),parvec(26),get_value,ct,tmp,          &
-       aperture(maxnaper),one,maxaper(6),al_errors(align_max),st,  &
-       theta,ek(6),re(6,6),te(6,6,6),craporb(6),dxt(*),dyt(*),offset(2), &
-       offx,offy,min_double
-  character(name_len) aptype
-  parameter(one=1d0)
-  parameter(min_double = 1.e-36)
+  integer :: switch, code, ktrack
+  integer :: turn, part_id(*), last_turn(*)
+  double precision :: el, sum
+  double precision :: track(6,*), dxt(*), dyt(*), last_pos(*) 
+  double precision :: last_orbit(6,*), maxaper(6), al_errors(align_max)
+  logical :: aperflag, onepass
 
-  optiondebug = get_option('debug ')
+  logical :: fmap, debug
+  logical :: run=.false., dynap=.false. 
+  integer :: i, nn, jtrk
+  double precision :: ct, tmp, st, theta
+  double precision :: ap1, ap2, ap3, ap4, aperture(maxnaper)
+  double precision :: offset(2), offx, offy
+  double precision :: parvec(26)
+  double precision :: ek(6), re(6,6), te(6,6,6), craporb(6) 
+  character(len=name_len) :: aptype
+
+  integer, external :: get_option
+  double precision, external :: get_value, node_value
+
+  double precision, parameter :: min_double = 1.e-36
+
+  ! 2015-Jul-08  19:16:53  ghislain: make code more readable
+  run   = switch .eq. 1
+  dynap = switch .eq. 2
+
+  debug = get_option('debug ') .ne. 0
 
   fmap=.false.
-  call dzero(ek,6)
-  call dzero(craporb,6)
-  call dzero(re,36)
-  call dzero(te,216)
+  EK(:6) = zero 
+  CRAPORB(:6) = zero 
+  RE(:6,:6) = zero 
+  TE(:6,:6,:6) = zero 
 
-  !---- Drift space
-  if(code.eq.1) then
+  !---- Drift space; no rotation or aperture check, go straight to tracking and return
+  if (code .eq. code_drift) then
      call ttdrf(el,track,ktrack)
-     go to 502
+     sum = sum + el 
+     return
   endif
 
   !---- Rotate trajectory before entry
   theta = node_value('tilt ')
-  if (theta .ne. 0d0)  then
+  if (theta .ne. zero)  then
      st = sin(theta)
      ct = cos(theta)
      do jtrk = 1,ktrack
@@ -780,49 +707,18 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      enddo
   endif
 
-  !---- Translation of particles // AK 23.02.2006
-  !---- useful for combination of different transfer lines or rings
-  if(code.eq.36) then
-     if (onepass) then
-        call tttrans(track,ktrack)
-        go to 500
-     endif
-  endif
-
-  !---- Beam-beam,  standard 4D, no aperture
-  if(code.eq.22) then
-     parvec(5)=get_value('probe ', 'arad ')
-     parvec(6)=node_value('charge ') * get_value('probe ', 'npart ')
-     parvec(7)=get_value('probe ','gamma ')
-     call ttbb(track, ktrack, parvec)
-     go to 500
-  endif
-
-
-  !---- 2015-Mar-19  09:07:37  ghislain: 
-  if(code.eq.20 .and. warnede.eq.0) then 
-     call aawarn('trrun: found deprecated ECOLLIMATOR element;',' should be replaced by COLLIMATOR')
-     warnede = 1
-  endif
-  
-  if(code.eq.21 .and. warnedr.eq.0) then 
-     call aawarn('trrun: found deprecated RCOLLIMATOR element;',' should be replaced by COLLIMATOR')
-     warnedr = 1
-  endif
-     
-
-  !---- Test aperture. ALL ELEMENTS BUT DRIFTS
-  if(aperflag) then
+  !---- Test aperture. ALL ELEMENTS BUT DRIFTS and BEAMBEAM
+  if (aperflag .and. code.ne.code_beambeam) then
      nn=name_len
      call node_string('apertype ',aptype,nn)
 
-     call dzero(aperture,maxnaper)
+     APERTURE(:maxnaper) = zero 
      call get_node_vector('aperture ',nn,aperture)
 
-     call dzero(offset,2)
+     OFFSET = zero 
      call get_node_vector('aper_offset ',nn,offset)
 
-     if (optiondebug .ne. 0) then
+     if (debug) then
         print *, " aperture type       ", aptype
         print *, "          parameters ", (aperture(i),i=1,4)
         print *, "          offsets    ", (offset(i),i=1,2)
@@ -833,153 +729,89 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
      
      call trcoll(aptype, aperture, offset, al_errors,  maxaper, & 
           turn, sum, part_id, last_turn, last_pos, last_orbit, track, ktrack)
-  endif
+  endif ! Test aperture
 
- 
-  !-- switch on element type BUT DRIFT, COLLIMATORS, BEAM_BEAM / 13.03.03
-  !-- 500 has been specified at the relevant places in go to below
-  !-- code =1 for drift, treated above, go to 500 directly
-  !      print *,"   CODE    ",code
-  go to ( 500,  20,  30,  40,  50,  60,  70,  80,  90, 100, &
-          110, 120, 130, 140, 150, 160, 170, 180, 190, 500,    &
-          500, 500, 230, 240, 250, 260, 270, 280, 290, 300,    &
-          310, 320,     &
-  !     330, 500, 350, 360, 370,500,500,400,410,      500, 500, 500, 500), code
-  ! Use this line to enable non-linear thin lens
-  !     330, 500, 350, 360, 370,500,500,400,410, 420, 500, 500, 500, 500), code
-  ! Enable non-linear thin lens and RF-Multipole
-          330, 500, 350, 360, 370, 500, 500, 400, &
-          410, 420, 430, 500, 500, 500), code
-  !
-  !---- Make sure that nothing is executed if element is not known
-  go to 500
-  !
-  !---- Bending magnet.
-  !---- AL: use thick-dipole element
-20 continue  ! RBEND
-30 continue  ! SBEND
-  call tttdipole(track,ktrack)
-  go to 500
-  !---- Arbitrary matrix. OBSOLETE, to be kept for go to
-40 continue
-  call tmarb(.false.,.false.,craporb,fmap,ek,re,te)
-  call tttrak(ek,re,track,ktrack)
-  go to 500
-  !---- Quadrupole. OBSOLETE, to be kept for go to
-  !---- AL: not so fast, here is the thick quadrupole
-50 continue
-  call tttquad(track,ktrack)
-  go to 500
-  !---- Sextupole. OBSOLETE, to be kept for go to
-60 continue
-  go to 500
-  !---- Octupole. OBSOLETE, to be kept for go to
-70 continue
-  go to 500
-  !---- Monitors, beam instrument., MONITOR, HMONITOR, VMONITOR
-170 continue
-180 continue
-190 continue
-  go to 500
-  !---- Multipole
-80 continue
-  call ttmult(track,ktrack,dxt,dyt,turn)
-  go to 500
-  !---- Solenoid.
-90 continue
-  call trsol(track, ktrack)
-  go to 500
-  !---- RF cavity.
-100 continue
-  call ttrf(track,ktrack)
-  if (switch .eq. 1) then
-     call ttrfloss(turn, sum, part_id, last_turn, &
-       last_pos,last_orbit,track,ktrack)
-  endif
-  go to 500
-  !---- Electrostatic separator.
-110 continue
-  call ttsep(el, track, ktrack)
-  go to 500
-  !---- Rotation around s-axis.
-120 continue
-  call ttsrot(track, ktrack)
-  go to 500
-  !---- Rotation around y-axis.
-130 continue
-  !        call ttyrot(track, ktrack)
-  go to 500
-  !---- Correctors.
-140 continue
-150 continue
-160 continue
-  call ttcorr(el, track, ktrack, turn)
-  go to 500
-  !---- ECollimator, RCollimator, BeamBeam, Lump. ??
-230 continue
-  go to 500
-  !---- Instrument
-240 continue
-  go to 500
-  !---- Marker.
-250 continue
-  go to 500
-  !---- General bend (dipole, quadrupole, and skew quadrupole).
-260 continue
-  go to 500
-  !---- LCAV cavity.
-270 continue
-  !        call ttlcav(el, track, ktrack)
-  go to 500
-  !---- Reserved. (PROFILE,WIRE,SLMONITOR,BLMONITOR,IMONITOR)
-280 continue
-290 continue
-300 continue
-310 continue
-320 continue
-  go to 500
-  !---- Dipole edge
-330 continue
-  call ttdpdg(track,ktrack)
-  go to 500
-  !---- Changeref ???
-350 continue
-  go to 500
-  !---- Translation
-360 continue
-  go to 500
-  !---- Crab cavity.
-370 continue
-  call ttcrabrf(track,ktrack,turn)
-  go to 500
-  !---- h ac dipole.
-400 continue
-  call tthacdip(track,ktrack,turn)
-  go to 500
-  !---- v ac dipole.
-410 continue
-  call ttvacdip(track,ktrack,turn)
-  go to 500
-  !---- nonlinear elliptical lens
-420 continue
-  call ttnllens(track,ktrack)
-  go to 500
-  !---- rf multipoles
-430 continue
-  call ttrfmult(track,ktrack,turn)
-  go to 500
+  ! Switch based on element code for element specific tracking
+  select case (code)
 
-  !---- Solenoid.
-
-
-500 continue
-
+    case (code_rbend, code_sbend)
+       call tttdipole(track,ktrack)
+     
+    case (code_matrix)
+       call tmarb(.false.,.false.,craporb,fmap,ek,re,te)
+       call tttrak(ek,re,track,ktrack)
+       
+    case (code_quadrupole)
+       call tttquad(track,ktrack)
+       
+    case (code_multipole)
+       call ttmult(track,ktrack,dxt,dyt,turn)
+       
+    case (code_solenoid)
+       call trsol(track, ktrack)
+       
+    case (code_rfcavity)
+       call ttrf(track,ktrack)
+       if (run) &
+            call ttrfloss(turn,sum,part_id,last_turn,last_pos,last_orbit,track,ktrack)
+       
+    case (code_elseparator)
+       call ttsep(el, track, ktrack)
+       
+    case (code_srotation)
+       call ttsrot(track, ktrack)
+       
+    case (code_yrotation)
+       ! call ttyrot(track, ktrack)
+       
+    case (code_hkicker, code_vkicker, code_kicker)
+       call ttcorr(el, track, ktrack, turn)
+       
+    case (code_ecollimator)
+       call fort_warn('TRRUN: ','found deprecated ECOLLIMATOR element; should be replaced by COLLIMATOR')
+       
+    case (code_rcollimator)
+       call fort_warn('TRRUN: ','found deprecated RCOLLIMATOR element; should be replaced by COLLIMATOR')     
+       
+    case (code_beambeam)
+       parvec(5) = get_value('probe ', 'arad ')
+       parvec(6) = node_value('charge ') * get_value('probe ', 'npart ')
+       parvec(7) = get_value('probe ','gamma ')
+       call ttbb(track, ktrack, parvec)
+       
+    case (code_twcavity)
+       ! call ttlcav(el, track, ktrack)
+       
+    case (code_dipedge)
+       call ttdpdg(track,ktrack)
+       
+    case (code_translation)
+       if (onepass) call tttrans(track,ktrack)
+       
+    case (code_crabcavity)
+       call ttcrabrf(track,ktrack,turn)
+       
+    case (code_hacdipole)
+       call tthacdip(track,ktrack,turn)
+       
+    case (code_vacdipole)
+       call ttvacdip(track,ktrack,turn)
+       
+    case (code_nllens)
+       call ttnllens(track,ktrack)
+       
+    case (code_rfmultipole)
+       call ttrfmult(track,ktrack,turn)
+       
+    case default ! The rest: do nothing
+       
+  end select
+      
   ! This is where we should Test Aperture at exit of elements
   ! by calling trcoll again
 
-
   !---- Rotate trajectory at exit
-  if (theta .ne. 0d0)  then
+  if (theta .ne. zero)  then
      do jtrk = 1,ktrack
         tmp = track(1,jtrk)
         track(1,jtrk) = ct * tmp - st * track(3,jtrk)
@@ -991,18 +823,18 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id,   &
   endif
 
   !---- Accumulate length.
-502 sum = sum + el
+  sum = sum + el
+
   return
 end subroutine ttmap
 
-subroutine ttmult(track, ktrack,dxt,dyt,turn)
-
+subroutine ttmult(track,ktrack,dxt,dyt,turn)
   use twtrrfi
   use name_lenfi
   use trackfi
   use time_varfi
+  use math_constfi, only : zero, one, two, three
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !    Track particle through a general thin multipole.                  *
@@ -1012,189 +844,160 @@ subroutine ttmult(track, ktrack,dxt,dyt,turn)
   !   dxt       (double)  local buffer                                   *
   !   dyt       (double)  local buffer                                   *
   !----------------------------------------------------------------------*
-  logical first,time_var
-  integer iord,jtrk,nd,nord,ktrack,i,j,n_ferr,nn,ns,node_fd_errors,   &
-       store_no_fd_err,get_option,turn,noisemax,nn1,in,mylen
-  double precision     const,curv,dbi,dbr,dipi,dipr,dx,dy,elrad,    &
-       pt,px,py,rfac,rpt1,rpt2,rpx1,rpx2,rpy1,rpy2,                      &
-       f_errors(0:maxferr),field(2,0:maxmul),vals(2,0:maxmul),           &
-       ordinv(maxmul),track(6,*),dxt(*),dyt(*),normal(0:maxmul),         &
-       skew(0:maxmul),bvk,node_value,ttt,        &
-       npeak(100), nlag(100), ntune(100), temp,noise
+  double precision :: track(6,*), dxt(*), dyt(*)
+  integer :: ktrack, turn
 
-  character(name_len) name
+  logical, save :: first=.true.
+  logical ::  time_var
+  integer :: iord, jtrk, nd, nord, i, j, n_ferr, nn, ns, noisemax, nn1, in, mylen
+  double precision :: curv, dbi, dbr, dipi, dipr, dx, dy, elrad
+  double precision :: pt, px, py, rfac, rpt1, rpt2, rpx1, rpx2, rpy1, rpy2 
+  double precision :: f_errors(0:maxferr)
+  double precision :: field(2,0:maxmul)
+  !double precision :: vals(2,0:maxmul)
+  double precision :: normal(0:maxmul), skew(0:maxmul)
+  double precision, save :: ordinv(maxmul), const
+  double precision :: bvk, node_value, ttt
+  double precision :: npeak(100), nlag(100), ntune(100), temp, noise
+  character(len=name_len) name
 
-  save first,ordinv
-  data first / .true. /
+  integer :: node_fd_errors, store_no_fd_err, get_option
 
-  !---- Precompute reciprocals of orders.
+  !---- Precompute reciprocals of orders and radiation constant
   if (first) then
      do iord = 1, maxmul
-        ordinv(iord) = 1d0 / dble(iord)
+        ordinv(iord) = one / dble(iord)
      enddo
+     const = arad * gammas**3 / three
      first = .false.
   endif
-  call dzero(f_errors, maxferr+1)
+
+  F_ERRORS(0:maxferr) = zero 
   n_ferr = node_fd_errors(f_errors)
+
   bvk = node_value('other_bv ')
+
   !---- Multipole length for radiation.
   elrad = node_value('lrad ')
   noise = node_value('noise ')
-  !---- Multipole components.
-  call dzero(normal,maxmul+1)
-  call dzero(skew,maxmul+1)
-  call get_node_vector('knl ',nn,normal)
-  call get_node_vector('ksl ',ns,skew)
-  nd = 2 * max(nn, ns, n_ferr/2-1)
-  call dzero(vals,2*(maxmul+1))
 
-  if(noise .eq. 1)   then
-     nn1=name_len
+  !---- Multipole components.
+  NORMAL(0:maxmul) = zero ; call get_node_vector('knl ',nn,normal)
+  SKEW(0:maxmul) = zero   ; call get_node_vector('ksl ',ns,skew)
+
+  nd = 2 * max(nn, ns, n_ferr/2-1)
+
+  if (noise .eq. 1)   then
+     nn1 = name_len
      noisemax = node_value('noisemax ')
-     call dzero(npeak,noisemax)
-     call dzero(ntune,noisemax)
-     call dzero(nlag,noisemax)
-     call get_node_vector('npeak ',nn1,npeak)
-     call get_node_vector('ntune ',nn1,ntune)
-     call get_node_vector('nlag ',nn1,nlag)
+     ! 2015-Jun-11  12:37:29  ghislain: should insert a guard for noisemax < 100
+     NPEAK(:noisemax) = zero ; call get_node_vector('npeak ',nn1,npeak)
+     NTUNE(:noisemax) = zero ; call get_node_vector('ntune ',nn1,ntune)
+     NLAG(:noisemax) = zero  ; call get_node_vector('nlag ',nn1,nlag)
 
      temp = 0
      do in = 1, noisemax
         temp = temp + npeak(in) * sin(nlag(in) + ntune(in) * turn)
      enddo
-
-
-     !   temp = npeak * sin(nlag + ntune * turn)
-     do iord = 0, nn
-        vals(1,iord) = normal(iord) * (1+temp)
-     enddo
-     do iord = 0, ns
-        vals(2,iord) = skew(iord) * (1+temp)
-     enddo
-  else
-     do iord = 0, nn
-        vals(1,iord) = normal(iord)
-     enddo
-     do iord = 0, ns
-        vals(2,iord) = skew(iord)
-     enddo
+     NORMAL(:nn) = NORMAL(:nn) * (1+temp)
+     SKEW(:nn)   = SKEW(:nn)   * (1+temp)
   endif
+  
+  !--- Time variation for fields in matrix, multipole or RF-cavity
+  ! 2015-Jun-24  18:55:43  ghislain: DOC FIXME not documented!!!
+  time_var = node_value('time_var ') .ne. zero
 
-  !  do iord = 0, nn
-  !     vals(1,iord) = normal(iord)
-  !  enddo
-  !  do iord = 0, ns
-  !     vals(2,iord) = skew(iord)
-  !  enddo
-  !---- Field error vals.
-  call dzero(field,2*(maxmul+1))
-  time_var = node_value('time_var ') .ne. 0d0
-  if(time_var.and.time_var_m) then
-     time_var_m_cnt=time_var_m_cnt+1
-     time_var_m_lnt=time_var_m_lnt+1
-     if(idnint(time_var_m_ind(time_var_m_cnt)).ne.time_var_m_lnt)    then
-          call aafail('TTMULT: ', 'wrong index in Table: time_var_mul')
-       endif
+  if (time_var .and. time_var_m) then
+     time_var_m_cnt = time_var_m_cnt + 1
+     time_var_m_lnt = time_var_m_lnt + 1
+     if (idnint(time_var_m_ind(time_var_m_cnt)) .ne. time_var_m_lnt)    &
+          call fort_fail('TTMULT: ', 'wrong index in Table: time_var_mul')
+
      call element_name(name,len(name))
-     mylen=len_trim(name)
-     if(time_var_m_ch(time_var_m_cnt)(:mylen).ne.name(:mylen))       &
-          call aafail('TTMULT: ', 'wrong element name in Table: '//     &
-          'time_var_mul')
-     do i=maxmul,0,-1
-        if(abs(myfield(time_var_m_cnt,1,i)).gt.0d0.or.               &
-             abs(myfield(time_var_m_cnt,2,i)).gt.0d0) then
-           n_ferr=i
+     mylen = len_trim(name)
+     if (time_var_m_ch(time_var_m_cnt)(:mylen) .ne. name(:mylen)) &
+          call fort_fail('TTMULT: ', 'wrong element name in Table: time_var_mul')
+
+     !--- find maximum order for myfield
+     do i = maxmul, 0, -1
+        if (abs(myfield(time_var_m_cnt,1,i)) .gt. zero .or.   &
+           abs(myfield(time_var_m_cnt,2,i)) .gt. zero) then
+           n_ferr = i ! replacing the previous count of field-errors
            goto 101
         endif
      enddo
-101  n_ferr=2*n_ferr+2
+
+101  n_ferr = 2*n_ferr + 2
      do i=0,(n_ferr-2)/2
-        f_errors(i)=myfield(time_var_m_cnt,1,i)
-        f_errors(n_ferr/2+i)=myfield(time_var_m_cnt,2,i)
+        f_errors(i)          = myfield(time_var_m_cnt,1,i)
+        f_errors(n_ferr/2+i) = myfield(time_var_m_cnt,2,i)
      enddo
      nd = 2 * max(nn, ns, n_ferr/2-1)
      call dcopy(f_errors,field,nd+2)
      n_ferr = store_no_fd_err(f_errors,n_ferr)
-  else
-     if (n_ferr .gt. 0) then
-        call dcopy(f_errors,field,n_ferr)
-     endif
+
   endif
+
   !-----added FrankS, 10-12-2008
   !nd = 2 * max(nn, ns, n_ferr/2-1)
+
   !---- Dipole error.
-  !      dbr = bvk * field(1,0) / (1d0 + deltas)
-  !      dbi = bvk * field(2,0) / (1d0 + deltas)
-  dbr = bvk * field(1,0)
-  dbi = bvk * field(2,0)
+  !      dbr = bvk * field(1,0) / (one + deltas)
+  !      dbi = bvk * field(2,0) / (one + deltas)
+  dbr = bvk * f_errors(0) !field(1,0)
+  dbi = bvk * f_errors(1) !field(2,0)
+
   !---- Nominal dipole strength.
-  !      dipr = bvk * vals(1,0) / (1d0 + deltas)
-  !      dipi = bvk * vals(2,0) / (1d0 + deltas)
-  dipr = bvk * vals(1,0)
-  dipi = bvk * vals(2,0)
+  !      dipr = bvk * vals(1,0) / (one + deltas)
+  !      dipi = bvk * vals(2,0) / (one + deltas)
+  dipr = bvk * normal(0) !vals(1,0)
+  dipi = bvk * skew(0)   !vals(2,0)
+
   !---- Other components and errors.
   nord = 0
   do iord = 1, nd/2
-     do j = 1, 2
-        !          field(j,iord) = bvk * (vals(j,iord) + field(j,iord))          &
-        !     / (1d0 + deltas)
-        field(j,iord) = bvk * (vals(j,iord) + field(j,iord))
-        if (field(j,iord) .ne. 0d0)  nord = iord
-     enddo
+     f_errors(2*iord)   = bvk * (f_errors(2*iord) + normal(iord))
+     f_errors(2*iord+1) = bvk * (f_errors(2*iord+1) + skew(iord))
+     if (f_errors(2*iord).ne.zero .or. f_errors(2*iord+1).ne.zero) nord=iord
   enddo
+
   !---- Pure dipole: only quadrupole kicks according to lrad.
   if (nord .eq. 0) then
-     do jtrk = 1,ktrack
-        dxt(jtrk) = 0d0
-        dyt(jtrk) = 0d0
-     enddo
+     dxt(:ktrack) = zero
+     dyt(:ktrack) = zero
      !----------- introduction of dipole focusing
-     if(elrad.gt.0d0.and.get_option('thin_foc ').eq.1) then
-        do jtrk = 1,ktrack
-           dxt(jtrk) =  dipr*dipr*track(1,jtrk)/elrad
-           dyt(jtrk) =  dipi*dipi*track(3,jtrk)/elrad
-        enddo
+     if (elrad.gt.zero .and. get_option('thin_foc ').eq.1) then
+
+        DXT(:ktrack) = dipr*dipr*TRACK(1,:ktrack)/elrad
+        DYT(:ktrack) = dipi*dipi*TRACK(3,:ktrack)/elrad
      endif
-     !---- Accumulate multipole kick from highest multipole to quadrupole.
+  !---- Accumulate multipole kick from highest multipole to quadrupole.
   else
-     do jtrk = 1,ktrack
-        dxt(jtrk) =                                                   &
-             field(1,nord)*track(1,jtrk) - field(2,nord)*track(3,jtrk)
-        dyt(jtrk) =                                                   &
-             field(1,nord)*track(3,jtrk) + field(2,nord)*track(1,jtrk)
-     enddo
+     DXT(:ktrack) = f_errors(2*nord)*TRACK(1,:ktrack) - f_errors(2*nord+1)*TRACK(3,:ktrack)
+     DYT(:ktrack) = f_errors(2*nord)*TRACK(3,:ktrack) + f_errors(2*nord+1)*TRACK(1,:ktrack)
 
      do iord = nord - 1, 1, -1
         do jtrk = 1,ktrack
-           dx = dxt(jtrk)*ordinv(iord+1) + field(1,iord)
-           dy = dyt(jtrk)*ordinv(iord+1) + field(2,iord)
+           dx = dxt(jtrk)*ordinv(iord+1) + f_errors(2*iord)
+           dy = dyt(jtrk)*ordinv(iord+1) + f_errors(2*iord+1)           
            dxt(jtrk) = dx*track(1,jtrk) - dy*track(3,jtrk)
            dyt(jtrk) = dx*track(3,jtrk) + dy*track(1,jtrk)
         enddo
      enddo
-     !        do jtrk = 1,ktrack
-     !          dxt(jtrk) = dxt(jtrk) / (1d0 + deltas)
-     !          dyt(jtrk) = dyt(jtrk) / (1d0 + deltas)
-     !        enddo
-     if(elrad.gt.0d0.and.get_option('thin_foc ').eq.1) then
-        do jtrk = 1,ktrack
-           dxt(jtrk) = dxt(jtrk) + dipr*dipr*track(1,jtrk)/elrad
-           dyt(jtrk) = dyt(jtrk) + dipi*dipi*track(3,jtrk)/elrad
-        enddo
+     if (elrad.gt.zero .and. get_option('thin_foc ').eq.1) then
+        DXT(:ktrack) = DXT(:ktrack) + dipr*dipr*TRACK(1,:ktrack)/elrad
+        DYT(:ktrack) = DYT(:ktrack) + dipi*dipi*TRACK(3,:ktrack)/elrad
      endif
   endif
 
   !---- Radiation loss at entrance.
-  if (dorad .and. elrad .ne. 0) then
-     const = arad * gammas**3 / 3d0
-
+  if (radiate .and. elrad .ne. 0) then
      !---- Full damping.
-     if (dodamp) then
+     if (damp) then
         do jtrk = 1,ktrack
-           curv = sqrt((dipr + dxt(jtrk))**2 +                         &
-                (dipi + dyt(jtrk))**2) / elrad
+           curv = sqrt((dipr + dxt(jtrk))**2 + (dipi + dyt(jtrk))**2) / elrad
 
-           if (dorand) then
+           if (quantum) then
               call trphot(elrad,curv,rfac,deltas)
            else
               rfac = const * curv**2 * elrad
@@ -1203,58 +1006,50 @@ subroutine ttmult(track, ktrack,dxt,dyt,turn)
            px = track(2,jtrk)
            py = track(4,jtrk)
            pt = track(6,jtrk)
-           track(2,jtrk) = px - rfac * (1d0 + pt) * px
-           track(4,jtrk) = py - rfac * (1d0 + pt) * py
-           track(6,jtrk) = pt - rfac * (1d0 + pt) ** 2
+           track(2,jtrk) = px - rfac * (one + pt) * px
+           track(4,jtrk) = py - rfac * (one + pt) * py
+           track(6,jtrk) = pt - rfac * (one + pt) ** 2
         enddo
 
         !---- Energy loss like for closed orbit.
      else
 
         !---- Store energy loss on closed orbit.
+        ! 2016-Mar-16  18:45:41  ghislain: track(i,1) is not the closed orbit but the first particle!!!
         rfac = const * ((dipr + dxt(1))**2 + (dipi + dyt(1))**2)
-        rpx1 = rfac * (1d0 + track(6,1)) * track(2,1)
-        rpy1 = rfac * (1d0 + track(6,1)) * track(4,1)
-        rpt1 = rfac * (1d0 + track(6,1)) ** 2
+        rpx1 = rfac * (one + track(6,1)) * track(2,1)
+        rpy1 = rfac * (one + track(6,1)) * track(4,1)
+        rpt1 = rfac * (one + track(6,1)) ** 2
 
-        do jtrk = 1,ktrack
-           track(2,jtrk) = track(2,jtrk) - rpx1
-           track(4,jtrk) = track(4,jtrk) - rpy1
-           track(6,jtrk) = track(6,jtrk) - rpt1
-        enddo
-
+        TRACK(2,:ktrack) = TRACK(2,:ktrack) - rpx1 
+        TRACK(4,:ktrack) = TRACK(4,:ktrack) - rpy1 
+        TRACK(6,:ktrack) = TRACK(6,:ktrack) - rpt1 
+        
      endif
   endif
 
   !---- Apply multipole effect including dipole.
   do jtrk = 1,ktrack
      !       Added for correct Ripken implementation of formulae
-     ttt = sqrt(1d0+2d0*track(6,jtrk)*bet0i+track(6,jtrk)**2)
-     !        track(2,jtrk) = track(2,jtrk) -                                 &
-     !     (dbr + dxt(jtrk) - dipr * (deltas + beti*track(6,jtrk)))
-     !        track(4,jtrk) = track(4,jtrk) +                                 &
-     !     (dbi + dyt(jtrk) - dipi * (deltas + beti*track(6,jtrk)))
-     !        track(5,jtrk) = track(5,jtrk)                                   &
-     !     - (dipr*track(1,jtrk) - dipi*track(3,jtrk)) * beti
-     track(2,jtrk) = track(2,jtrk) -                                 &
-          (dbr + dxt(jtrk) - dipr * (ttt - 1d0))
-     track(4,jtrk) = track(4,jtrk) +                                 &
-          (dbi + dyt(jtrk) - dipi * (ttt - 1d0))
-     track(5,jtrk) = track(5,jtrk) -                                 &
-          (dipr*track(1,jtrk) - dipi*track(3,jtrk)) *                       &
-          ((1d0 + bet0*track(6,jtrk))/ttt)*bet0i
+     ttt = sqrt( one + two*track(6,jtrk)*bet0i + track(6,jtrk)**2 )
+     ! track(2,jtrk) = track(2,jtrk) - (dbr + dxt(jtrk) - dipr * (deltas + beti*track(6,jtrk)))
+     ! track(4,jtrk) = track(4,jtrk) + (dbi + dyt(jtrk) - dipi * (deltas + beti*track(6,jtrk)))
+     ! track(5,jtrk) = track(5,jtrk) - (dipr*track(1,jtrk) - dipi*track(3,jtrk)) * beti
+     track(2,jtrk) = track(2,jtrk) - (dbr + dxt(jtrk) - dipr * (ttt - one))
+     track(4,jtrk) = track(4,jtrk) + (dbi + dyt(jtrk) - dipi * (ttt - one))
+     track(5,jtrk) = track(5,jtrk) - &
+          (dipr*track(1,jtrk) - dipi*track(3,jtrk)) *   &
+          ((one + bet0*track(6,jtrk))/ttt) * bet0i
   enddo
 
   !---- Radiation loss at exit.
-  if (dorad .and. elrad .ne. 0) then
-
+  if (radiate .and. elrad .ne. 0) then
      !---- Full damping.
-     if (dodamp) then
+     if (damp) then
         do jtrk = 1,ktrack
-           curv = sqrt((dipr + dxt(jtrk))**2 +                         &
-                (dipi + dyt(jtrk))**2) / elrad
+           curv = sqrt((dipr + dxt(jtrk))**2 + (dipi + dyt(jtrk))**2) / elrad
 
-           if (dorand) then
+           if (quantum) then
               call trphot(elrad,curv,rfac,deltas)
            else
               rfac = const * curv**2 * elrad
@@ -1263,9 +1058,9 @@ subroutine ttmult(track, ktrack,dxt,dyt,turn)
            px = track(2,jtrk)
            py = track(4,jtrk)
            pt = track(6,jtrk)
-           track(2,jtrk) = px - rfac * (1d0 + pt) * px
-           track(4,jtrk) = py - rfac * (1d0 + pt) * py
-           track(6,jtrk) = pt - rfac * (1d0 + pt) ** 2
+           track(2,jtrk) = px - rfac * (one + pt) * px
+           track(4,jtrk) = py - rfac * (one + pt) * py
+           track(6,jtrk) = pt - rfac * (one + pt) ** 2
         enddo
 
         !---- Energy loss like for closed orbit.
@@ -1273,161 +1068,22 @@ subroutine ttmult(track, ktrack,dxt,dyt,turn)
 
         !---- Store energy loss on closed orbit.
         rfac = const * ((dipr + dxt(1))**2 + (dipi + dyt(1))**2)
-        rpx2 = rfac * (1d0 + track(6,1)) * track(2,1)
-        rpy2 = rfac * (1d0 + track(6,1)) * track(4,1)
-        rpt2 = rfac * (1d0 + track(6,1)) ** 2
+        rpx2 = rfac * (one + track(6,1)) * track(2,1)
+        rpy2 = rfac * (one + track(6,1)) * track(4,1)
+        rpt2 = rfac * (one + track(6,1)) ** 2
 
-        do jtrk = 1,ktrack
-           track(2,jtrk) = track(2,jtrk) - rpx2
-           track(4,jtrk) = track(4,jtrk) - rpy2
-           track(6,jtrk) = track(6,jtrk) - rpt2
-        enddo
+        TRACK(2,:ktrack) = TRACK(2,:ktrack) - rpx2
+        TRACK(4,:ktrack) = TRACK(4,:ktrack) - rpy2
+        TRACK(6,:ktrack) = TRACK(6,:ktrack) - rpt2
+
      endif
   endif
 
 end subroutine ttmult
-subroutine trphot(el,curv,rfac,deltap)
-
-  implicit none
-
-  !----------------------------------------------------------------------*
-  ! Purpose:                                                             *
-  !   Generate random energy loss for photons, using a look-up table to  *
-  !   invert the function Y.  Ultra-basic interpolation computed;        *
-  !   leads to an extrapolation outside the table using the two outmost  *
-  !   point on each side (low and high).                                 *
-  !   Assumes ultra-relativistic particles (beta = 1).                   *
-  ! Author: Ghislain Roy                                                 *
-  ! Input:                                                               *
-  !   EL     (double)       Element length.                              *
-  !   CURV   (double)       Local curvature of orbit.                    *
-  ! Output:                                                              *
-  !   RFAC   (double)       Relative energy loss due to photon emissions.*
-  !----------------------------------------------------------------------*
-  !---- Generate pseudo-random integers in batches of NR.                *
-  !     The random integers are generated in the range [0, MAXRAN).      *
-  !---- Table definition: maxtab, taby(maxtab), tabxi(maxtab)            *
-  !----------------------------------------------------------------------*
-  integer i,ierror,j,nphot,nr,maxran,maxtab
-  parameter(nr=55,maxran=1000000000,maxtab=101)
-  double precision amean,curv,dlogr,el,frndm,rfac,scalen,scaleu,         &
-       slope,ucrit,xi,deltap,hbar,clight,arad,pc,gamma,amass,real_am,    &
-       get_value,get_variable,tabxi(maxtab),taby(maxtab),five,twelve,fac1
-  parameter(five=5d0,twelve=12d0,fac1=3.256223d0)
-  character(20) text
-  data (taby(i), i = 1, 52)                                         &
-       / -1.14084005d0,  -0.903336763d0, -0.769135833d0, -0.601840854d0, &
-       -0.448812515d0, -0.345502228d0, -0.267485678d0, -0.204837948d0,   &
-       -0.107647471d0, -0.022640628d0,  0.044112321d0,  0.0842842236d0,  &
-       0.132941082d0,  0.169244036d0,  0.196492359d0,  0.230918407d0,    &
-       0.261785239d0,  0.289741248d0,  0.322174788d0,  0.351361096d0,    &
-       0.383441716d0,  0.412283719d0,  0.442963421d0,  0.472622454d0,    &
-       0.503019691d0,  0.53197819d0,   0.561058342d0,  0.588547111d0,    &
-       0.613393188d0,  0.636027336d0,  0.675921738d0,  0.710166812d0,    &
-       0.725589216d0,  0.753636241d0,  0.778558254d0,  0.811260045d0,    &
-       0.830520391d0,  0.856329501d0,  0.879087269d0,  0.905612588d0,    &
-       0.928626955d0,  0.948813677d0,  0.970829248d0,  0.989941061d0,    &
-       1.0097903d0,    1.02691281d0,   1.04411256d0,   1.06082714d0,     &
-       1.0750246d0,    1.08283985d0,   1.0899564d0,    1.09645379d0 /
-  data (taby(i), i = 53, 101)                                       &
-       /  1.10352755d0,   1.11475027d0,   1.12564385d0,   1.1306442d0,   &
-       1.13513422d0,   1.13971806d0,   1.14379156d0,   1.14741969d0,     &
-       1.15103698d0,   1.15455759d0,   1.15733826d0,   1.16005647d0,     &
-       1.16287541d0,   1.16509759d0,   1.16718769d0,   1.16911888d0,     &
-       1.17075884d0,   1.17225218d0,   1.17350936d0,   1.17428589d0,     &
-       1.17558432d0,   1.17660713d0,   1.17741513d0,   1.17805469d0,     &
-       1.17856193d0,   1.17896497d0,   1.17928565d0,   1.17954147d0,     &
-       1.17983139d0,   1.1799767d0,    1.18014216d0,   1.18026078d0,     &
-       1.18034601d0,   1.1804074d0,    1.18045175d0,   1.1804837d0,      &
-       1.18051291d0,   1.18053186d0,   1.18054426d0,   1.18055236d0,     &
-       1.18055761d0,   1.18056166d0,   1.18056381d0,   1.1805656d0,      &
-       1.18056655d0,   1.18056703d0,   1.18056726d0,   1.1805675d0,      &
-       1.18056762d0 /
-  data (tabxi(i), i = 1, 52)                                        &
-       / -7.60090017d0,  -6.90775537d0,  -6.50229025d0,  -5.99146461d0,  &
-       -5.52146101d0,  -5.20300722d0,  -4.96184492d0,  -4.76768923d0,    &
-       -4.46540833d0,  -4.19970512d0,  -3.98998451d0,  -3.86323285d0,    &
-       -3.70908213d0,  -3.59356928d0,  -3.50655794d0,  -3.39620972d0,    &
-       -3.29683733d0,  -3.20645332d0,  -3.10109282d0,  -3.0057826d0,     &
-       -2.9004221d0,   -2.80511189d0,  -2.70306253d0,  -2.60369015d0,    &
-       -2.50103593d0,  -2.4024055d0 ,  -2.30258512d0,  -2.20727491d0,    &
-       -2.12026358d0,  -2.04022098d0,  -1.89712d0   ,  -1.7719568d0,     &
-       -1.71479833d0,  -1.60943794d0,  -1.51412773d0,  -1.38629436d0,    &
-       -1.30933332d0,  -1.20397282d0,  -1.10866261d0,  -0.99425226d0,    &
-       -0.89159810d0,  -0.79850775d0,  -0.69314718d0,  -0.59783697d0,    &
-       -0.49429631d0,  -0.40047753d0,  -0.30110508d0,  -0.19845095d0,    &
-       -0.10536054d0,  -0.05129330d0,   0.0d0,          0.048790119d0 /
-  data (tabxi(i), i = 53, 101)                                      &
-       /  0.104360029d0,  0.198850885d0,  0.300104618d0,  0.350656837d0, &
-       0.398776114d0,  0.451075643d0,  0.500775278d0,  0.548121393d0,    &
-       0.598836541d0,  0.652325153d0,  0.69813472d0 ,  0.746687889d0,    &
-       0.802001595d0,  0.850150883d0,  0.900161386d0,  0.951657832d0,    &
-       1.00063193d0,   1.05082154d0,   1.09861231d0,   1.13140213d0,     &
-       1.1939224d0,    1.25276291d0,   1.3083328d0,    1.36097658d0,     &
-       1.4109869d0,    1.45861506d0,   1.50407743d0,   1.54756248d0,     &
-       1.60943794d0,   1.64865863d0,   1.70474803d0,   1.75785792d0,     &
-       1.80828881d0,   1.85629797d0,   1.90210748d0,   1.9459101d0,      &
-       2.0014801d0,    2.05412364d0,   2.10413408d0,   2.15176225d0,     &
-       2.19722462d0,   2.25129175d0,   2.29253483d0,   2.35137534d0,     &
-       2.40694523d0,   2.45100522d0,   2.501436d0,     2.60268974d0,     &
-       2.64617491d0 /
-
-  !Get constants
-  clight = get_variable('clight ')
-  hbar   = get_variable('hbar ')
-  arad   = get_value('probe ','arad ')
-  pc     = get_value('probe ','pc ')
-  amass  = get_value('probe ','mass ')
-  gamma  = get_value('probe ','gamma ')
-  deltap = get_value('probe ','deltap ')
-  scalen = five / (twelve * hbar * clight)
-  scaleu = hbar * 3d0 * clight / 2d0
-
-  !---- AMEAN is the average number of photons emitted.,
-  !     NPHOT is the integer number generated from Poisson's law.
-  amean = scalen * abs(arad*pc*(1d0+deltap)*el*curv) * sqrt(3d0)
-  rfac = 0d0
-  real_am = amean
-  if (real_am .gt. 0d0) then
-     call dpoissn(real_am, nphot, ierror)
-
-     if (ierror .ne. 0) then
-        write(text, '(1p,d20.12)') amean
-        call aafail('TRPHOT: ','Fatal: Poisson input mean =' // text)
-     endif
-
-     !---- For all photons, sum the radiated photon energy,
-     !     in units of UCRIT (relative to total energy).
-
-     if (nphot .ne. 0) then
-        ucrit = scaleu * gamma**2 * abs(curv) / amass
-        xi = 0d0
-        do i = 1, nphot
-
-           !---- Find a uniform random number in the range [ 0,3.256223 ].
-           !     Note that the upper limit is not exactly 15*sqrt(3)/8
-           !     because of imprecision in the integration of F.
-           dlogr = log(fac1 * frndm())
-
-           !---- Now look for the energy of the photon in the table TABY/TABXI
-           do j = 2, maxtab
-              if (dlogr .le. taby(j) ) go to 20
-           enddo
-
-           !---- Perform linear interpolation and sum up energy lost.
-20         slope = (dlogr - taby(j-1)) / (taby(j) - taby(j-1))
-           xi = dexp(tabxi(j-1) + slope * (tabxi(j) - tabxi(j-1)))
-           rfac = rfac + ucrit * xi
-        enddo
-     endif
-  endif
-end subroutine trphot
 
 subroutine ttsrot(track,ktrack)
-
   use trackfi
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Coordinate change due to rotation about s axis                     *
@@ -1435,28 +1091,29 @@ subroutine ttsrot(track,ktrack)
   !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
   !   KTRACK    (integer) number of surviving tracks.        tmsrot      *
   !----------------------------------------------------------------------*
-  integer itrack,ktrack,j
-  double precision track(6,*),psi,node_value,ct,st,trb(4)
+  double precision :: track(6,*)
+  integer :: ktrack
+
+  double precision :: psi, ct, st, trb(4)
+  integer :: i
+
+  double precision, external :: node_value
+
   psi = node_value('angle ')
   ct = cos(psi)
   st = -sin(psi)
-  do  itrack = 1, ktrack
-     do  j = 1,4
-        trb(j)=track(j,itrack)
-     enddo
-     track(1,itrack) = trb(1)*ct-trb(3)*st
-     track(2,itrack) = trb(2)*ct-trb(4)*st
-     track(3,itrack) = trb(1)*st+trb(3)*ct
-     track(4,itrack) = trb(2)*st+trb(4)*ct
+  do  i = 1, ktrack
+     TRB = TRACK(1:4,i) 
+     track(1,i) = trb(1)*ct - trb(3)*st
+     track(2,i) = trb(2)*ct - trb(4)*st
+     track(3,i) = trb(1)*st + trb(3)*ct
+     track(4,i) = trb(2)*st + trb(4)*ct
   enddo
 end subroutine ttsrot
 
-
 subroutine ttyrot(track,ktrack)
-
   use trackfi
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Coordinate change due to rotation about y axis                     *
@@ -1464,27 +1121,30 @@ subroutine ttyrot(track,ktrack)
   !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
   !   KTRACK    (integer) number of surviving tracks.        tmsrot      *
   !----------------------------------------------------------------------*
-  integer itrack,ktrack,j
-  double precision track(6,*),theta,node_value,ct,st,trb(6)
+  double precision :: track(6,*)
+  integer :: ktrack
+
+  integer :: i
+  double precision :: theta, ct, st, trb(6)
+
+  double precision :: node_value
+
   theta = node_value('angle ')
   ct = cos(theta)
   st = -sin(theta)
-  do  itrack = 1, ktrack
-     do  j = 1,6
-        trb(j)=track(j,itrack)
-     enddo
-     track(1,itrack) = trb(1)*ct-trb(5)*st
-     track(2,itrack) = trb(2)*ct-trb(6)*st
-     track(5,itrack) = trb(1)*st+trb(5)*ct
-     track(6,itrack) = trb(2)*st+trb(6)*ct
+  do  i = 1, ktrack
+     TRB = TRACK(1:6,i)
+     track(1,i) = trb(1)*ct - trb(5)*st
+     track(2,i) = trb(2)*ct - trb(6)*st
+     track(5,i) = trb(1)*st + trb(5)*ct
+     track(6,i) = trb(2)*st + trb(6)*ct
   enddo
 end subroutine ttyrot
 
 subroutine ttdrf(el,track,ktrack)
-
   use trackfi
+  use math_constfi, only : one, two
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Track a set of particle through a drift space.                     *
@@ -1494,37 +1154,40 @@ subroutine ttdrf(el,track,ktrack)
   ! Output:                                                              *
   !   EL        (double)    Length of drift.                             *
   !----------------------------------------------------------------------*
-  integer itrack,ktrack
-  double precision el,pt,px,py,track(6,*),l_pz
+  double precision :: el, track(6,*)
+  integer :: ktrack
+  
+  double precision :: pt, px, py, l_pz
+  integer :: i
 
-  ! picked from trturn in madx.ss
-!$OMP PARALLEL PRIVATE(itrack, px, py, pt, l_pz)
+! picked from trturn in madx.ss
+!$OMP PARALLEL PRIVATE(i, px, py, pt, l_pz)
 !$OMP DO
-  do  itrack = 1, ktrack
-     px = track(2,itrack)
-     py = track(4,itrack)
-     pt = track(6,itrack)
+  do  i = 1, ktrack
+     px = track(2,i)
+     py = track(4,i)
+     pt = track(6,i)
      ! L/pz
-     l_pz = el/sqrt(1d0+2d0*pt*bet0i+pt**2 - px**2 - py**2)
-     track(1,itrack) = track(1,itrack) + l_pz*px
-     track(3,itrack) = track(3,itrack) + l_pz*py
-     !        track(5,itrack) = track(5,itrack)                               &
-     !     + el*(beti + pt * dtbyds) - (beti+pt)*l_pz
+     l_pz = el / sqrt( one + two*pt*bet0i + pt**2 - px**2 - py**2)
+     track(1,i) = track(1,i) + l_pz*px
+     track(3,i) = track(3,i) + l_pz*py
+     ! track(5,i) = track(5,i) + el*(beti + pt*dtbyds) - (beti+pt)*l_pz
      !---- AK 20060413
      !---- Ripken DESY-95-189 p.36
-     track(5,itrack) = track(5,itrack) + bet0i*(el - (1d0 + bet0*pt) * l_pz)
+     track(5,i) = track(5,i) + bet0i*(el - (one + bet0*pt) * l_pz)
   enddo
 !$OMP END DO
 !$OMP END PARALLEL
 end subroutine ttdrf
-subroutine ttrf(track,ktrack)
 
+subroutine ttrf(track,ktrack)
   use twtrrfi
   use name_lenfi
   use time_varfi
   use trackfi
+  use math_constfi, only : zero, one, two, ten3m, ten6p, twopi
+  use phys_constfi, only : clight
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Track a set of trajectories through a thin cavity (zero length).   *
@@ -1540,18 +1203,16 @@ subroutine ttrf(track,ktrack)
   !   the logic and the nominal energy is not updated -- see routine     *
   !   TTLCAV to change the nominal energy                                *
   !----------------------------------------------------------------------*
-  logical time_var
-  integer itrack,ktrack,mylen
-  double precision omega,phirf,pt,rff,rfl,rfv,track(6,*),clight,    &
-       twopi,vrf,pc0,get_variable,node_value,get_value,bvk,    &
-       ten3m,ten6p
-  !      double precision px,py,ttt,beti,el1
-  parameter(ten3m=1d-3,ten6p=1d6)
-  character*(name_len) name
+  double precision :: track(6,*)
+  integer :: ktrack
 
-  !---- Initialize
-  clight=get_variable('clight ')
-  twopi=get_variable('twopi ')
+  logical :: time_var
+  integer :: i, mylen
+  double precision :: omega, phirf, pt, rff, rfl, rfv, vrf, pc0, bvk   
+  !      double precision px,py,ttt,beti,el1
+  character(len=name_len) :: name
+
+  double precision :: get_variable, node_value, get_value
 
   !---- BV flag
   bvk = node_value('other_bv ')
@@ -1560,24 +1221,24 @@ subroutine ttrf(track,ktrack)
   !      el = node_value('l ')
   !      el1 = node_value('l ')
   rfv = bvk * node_value('volt ')
-  time_var = node_value('time_var ') .ne. 0d0
-  if(time_var.and.time_var_c) then
-     time_var_c_cnt=time_var_c_cnt+1
-     time_var_c_lnt=time_var_c_lnt+1
-     if(idnint(time_var_c_ind(time_var_c_cnt)).ne.time_var_c_lnt)    &
-          call aafail('TMARB: ', 'wrong index in Table: time_var_cav')
+
+  !---- Time Variation
+  time_var = node_value('time_var ') .ne. zero
+  if (time_var.and.time_var_c) then
+     time_var_c_cnt = time_var_c_cnt + 1
+     time_var_c_lnt = time_var_c_lnt + 1
+     if (idnint(time_var_c_ind(time_var_c_cnt)) .ne. time_var_c_lnt)    &
+          call fort_fail('TTRF: ', 'wrong index in Table: time_var_cav')
      call element_name(name,len(name))
-     mylen=len_trim(name)
-     if(time_var_c_ch(time_var_c_cnt)(:mylen).ne.name(:mylen))       &
-          call aafail('TMARB: ', 'wrong element name in Table: '//   &
-          'time_var_cav')
-!---- Overwrite Volt
+     mylen = len_trim(name)
+     if (time_var_c_ch(time_var_c_cnt)(:mylen) .ne. name(:mylen))       &
+          call fort_fail('TTRF: ', 'wrong element name in Table: time_var_cav')
+     !---- Overwrite Volt
      rfv = cav_volt(time_var_c_cnt)
-!---- Store Volt
+     !---- Store Volt
      call store_node_value('volt ',rfv)
   endif
 
-!      rfv = node_value('volt ')
   rff = node_value('freq ')
   rfl = node_value('lag ')
   !      deltap = get_value('probe ','deltap ')
@@ -1608,8 +1269,8 @@ subroutine ttrf(track,ktrack)
 
   !*---- If there are wakefields split the cavity.
   !      if (lfile .ne. ' ' .or. tfile .ne. ' ') then
-  !        el1 = el / 2d0
-  !        rfv = rfv / 2d0
+  !        el1 = el / two
+  !        rfv = rfv / two
   !        lwake = .true.
   !      else
   !        el1 = el
@@ -1617,61 +1278,51 @@ subroutine ttrf(track,ktrack)
   !      endif
   !---- Set up.
   omega = rff * (ten6p * twopi / clight)
-  !      vrf   = rfv * ten3m / (pc * (1d0 + deltas))
-  vrf   = rfv * ten3m / pc0
+  ! vrf   = rfv * ten3m / (pc * (one + deltas))
+  vrf   = rfv * ten3m
   phirf = rfl * twopi
-  !      dl    = el * 5d-1
-  !      bi2gi2 = 1d0 / (betas * gammas) ** 2
-  !---- Loop for all particles.
-  !      do itrack = 1, ktrack
-  !        pt = track(6,itrack)
-  !        pt = pt + vrf * sin(phirf - omega * track(5,itrack))
-  !        track(6,itrack) = pt
-  !!      print *," pt ",pt, "   track(5,itrack)",track(5,itrack)
-  !      enddo
-  do itrack = 1, ktrack
-     pt = track(6,itrack)
-     pt = pt + vrf * sin(phirf - omega * track(5,itrack))
-     track(6,itrack) = pt
-     !      print *," pt ",pt, "   track(5,itrack)",track(5,itrack)
-  enddo
+  ! dl    = el / two
+  ! bi2gi2 = one / (betas * gammas) ** 2
+
+  TRACK(6,1:ktrack) = TRACK(6,1:ktrack) +  vrf * sin(phirf - omega*TRACK(5,1:ktrack)) / pc0
 
   !*---- If there were wakefields, track the wakes and then the 2nd half
   !*     of the cavity.
   !      if (lwake) then
-  !        call ttwake(2d0*el1, nbin, binmax, lfile, tfile, ener1, track,
+  !        call ttwake(two*el1, nbin, binmax, lfile, tfile, ener1, track,
   !     +              ktrack)
   !
   !*---- Track 2nd half of cavity -- loop for all particles.
-  !      do 20 itrack = 1, ktrack
+  !      do 20 i = 1, ktrack
   !
   !*---- Drift to centre.
-  !         px = track(2,itrack)
-  !         py = track(4,itrack)
-  !         pt = track(6,itrack)
-  !         ttt = 1d0/sqrt(1d0+2d0*pt*beti+pt**2 - px**2 - py**2)
-  !         track(1,itrack) = track(1,itrack) + dl*ttt*px
-  !         track(3,itrack) = track(3,itrack) + dl*ttt*py
-  !         track(5,itrack) = track(5,itrack)
+  !         px = track(2,i)
+  !         py = track(4,i)
+  !         pt = track(6,i)
+  !         ttt = one/sqrt(one+two*pt*beti+pt**2 - px**2 - py**2)
+  !         track(1,i) = track(1,i) + dl*ttt*px
+  !         track(3,i) = track(3,i) + dl*ttt*py
+  !         track(5,i) = track(5,i)
   !     +        + dl*(beti - (beti+pt)*ttt) + dl*pt*dtbyds
   !
   !*---- Acceleration.
-  !         pt = pt + vrf * sin(phirf - omega * track(5,itrack))
-  !         track(6,itrack) = pt
+  !         pt = pt + vrf * sin(phirf - omega * track(5,i))
+  !         track(6,i) = pt
   !
   !*---- Drift to end.
-  !         ttt = 1d0/sqrt(1d0+2d0*pt*beti+pt**2 - px**2 - py**2)
-  !         track(1,itrack) = track(1,itrack) + dl*ttt*px
-  !         track(3,itrack) = track(3,itrack) + dl*ttt*py
-  !         track(5,itrack) = track(5,itrack)
+  !         ttt = one/sqrt(one+two*pt*beti+pt**2 - px**2 - py**2)
+  !         track(1,i) = track(1,i) + dl*ttt*px
+  !         track(3,i) = track(3,i) + dl*ttt*py
+  !         track(5,i) = track(5,i)
   !     +        + dl*(beti - (beti+pt)*ttt) + dl*pt*dtbyds
   ! 20   continue
   !      endif
 end subroutine ttrf
+
 subroutine ttcrabrf(track,ktrack,turn)
-
+  use math_constfi, only : zero, ten3m, ten6p, twopi
+  use phys_constfi, only : clight
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Track a set of trajectories through a thin crab cavity (zero l.)   *
@@ -1684,15 +1335,16 @@ subroutine ttcrabrf(track,ktrack,turn)
   !----------------------------------------------------------------------*
   ! Added: R. Calaga/F. Zimmermann (10/06, 11/07, 09/10)                 *
   !----------------------------------------------------------------------*
-  integer itrack,ktrack,turn,t1,t2,t3,t4,p1,p2,bvk
-  double precision omega,phirf,pt,rff,rfl,rfv,eph,track(6,*),clight,twopi,vrf,pc0,  &
-       get_variable,node_value,get_value,ten3m,ten6p,px
+  double precision :: track(6,*)
+  integer :: ktrack, turn
+
+  integer :: i, t1, t2, t3, t4, p1, p2, bvk
+  double precision :: omega, phirf, pt, rff, rfl, rfv, eph, vrf, pc0,  px
   !      double precision px,py,ttt,beti,el1
-  parameter(ten3m=1d-3,ten6p=1d6)
+
+  double precision :: node_value, get_value
 
   !---- Initialize
-  clight=get_variable('clight ')
-  twopi=get_variable('twopi ')
   bvk = node_value('other_bv ')
 
   !---- Fetch data.
@@ -1716,47 +1368,36 @@ subroutine ttcrabrf(track,ktrack,turn)
   omega = rff * (ten6p * twopi / clight)
 
   if (turn .lt. t1)  then
-     vrf = 0d0
-  else if (turn .ge. t1 .and. turn .lt. t2) then
-     vrf = (turn-t1)*rfv*ten3m/pc0/(t2-t1)
-  else if (turn .ge. t2 .and. turn .lt. t3) then
-     vrf = rfv*ten3m/pc0
-  else if (turn .ge. t3 .and. turn .lt. t4) then
-     vrf = (t4-turn)*rfv*ten3m/pc0/(t4-t3)
+     vrf = zero
+  else if (turn .lt. t2) then
+     vrf = (turn-t1) * rfv * ten3m/pc0/(t2-t1)
+  else if (turn .lt. t3) then
+     vrf = rfv * ten3m/pc0
+  else if (turn .lt. t4) then
+     vrf = (t4-turn) * rfv * ten3m/pc0/(t4-t3)
   else
-     vrf = 0d0
+     vrf = zero
   endif
 
   !---- Set up phase ramp.
   if (turn .lt. p1)  then
-     phirf = rfl*twopi
-  else if (turn .ge. p1 .and. turn .lt. p2) then
-     phirf = (turn-p1)*eph*twopi/(p2-p1)
+     phirf = rfl * twopi
+  else if (turn .lt. p2) then
+     phirf = (turn-p1) * eph * twopi/(p2-p1)
   else
-     phirf= eph*twopi
+     phirf = eph * twopi
   endif
 
-  !  print*," turn: ",turn, " phase: ", phirf*360/twopi
+  TRACK(2,1:ktrack) = TRACK(2,1:ktrack) + vrf*sin(phirf - bvk*omega*TRACK(5,1:ktrack))
 
-  do itrack = 1, ktrack
-     px  = track(2,itrack)                                           &
-          + vrf * sin(phirf - bvk * omega * track(5,itrack))
-     pt = track(6,itrack)                                            &
-          - omega* vrf * track(1,itrack) *                                  &
-          cos(phirf - bvk * omega * track(5,itrack))
-
-     !---- track(2,jtrk) = track(2,jtrk)
-     !        pt = track(6,itrack)
-     !        pt = pt + vrf * sin(phirf - omega * track(5,itrack))
-
-     track(2,itrack) = px
-     track(6,itrack) = pt
-  enddo
+  TRACK(6,1:ktrack) = TRACK(6,1:ktrack) - & 
+       omega * vrf * TRACK(1,1:ktrack) * cos(phirf - bvk*omega*TRACK(5,1:ktrack))
+    
 end subroutine ttcrabrf
+
 subroutine tthacdip(track,ktrack,turn)
-
+  use math_constfi, only : zero, ten3m, ten6p, twopi
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Track a set of trajectories through a thin h ac dipole (zero l.)   *
@@ -1766,15 +1407,13 @@ subroutine tthacdip(track,ktrack,turn)
   !----------------------------------------------------------------------*
   ! Added by Yipeng SUN on 11 Nov 2009                                   *
   !----------------------------------------------------------------------*
-  integer itrack,ktrack,turn,turn1,turn2,turn3,turn4
-  double precision omega,phirf,rff,rfl,rfv,track(6,*),clight,twopi,vrf, &
-      pc0,get_variable,node_value,get_value,ten3m,ten6p,px
-  !      double precision px,py,ttt,beti,el1
-  parameter(ten3m=1d-3,ten6p=1d6)
+  double precision, intent(INOUT) :: track(6,*)
+  integer, intent(IN) :: ktrack, turn
 
-  !---- Initialize
-  clight=get_variable('clight ')
-  twopi=get_variable('twopi ')
+  integer :: turn1, turn2, turn3, turn4
+  double precision :: omega, phirf, rff, rfl, rfv, vrf, pc0
+
+  double precision :: node_value, get_value
 
   !---- Fetch data.
   rfv = node_value('volt ')
@@ -1786,40 +1425,31 @@ subroutine tthacdip(track,ktrack,turn)
   turn2 = node_value('ramp2 ')
   turn3 = node_value('ramp3 ')
   turn4 = node_value('ramp4 ')
+  
   !---- Set up.
   omega = rff * twopi
   vrf   = 300 * rfv * ten3m / pc0
   phirf = rfl * twopi
 
-  if (turn .lt. turn1)  then
-     vrf = 0
-  else if (turn .ge. turn1 .and. turn .lt. turn2) then
+  if (turn .lt. turn1)  then ! votage stable at zero
+     vrf = zero
+  else if (turn .lt. turn2) then ! ramping up the voltage
      vrf = (turn-turn1) * vrf / (turn2-turn1)
-  else if (turn .ge. turn2 .and. turn .lt. turn3) then
+  else if (turn .lt. turn3) then ! voltage stable at maximum
      vrf = vrf
-  else if (turn .ge. turn3 .and. turn .lt. turn4) then
+  else if (turn .lt. turn4) then ! ramping down the voltage
      vrf = (turn4-turn) * vrf / (turn4-turn3)
-  else
-     vrf = 0
+  else ! stable again at zero
+     vrf = zero
   endif
-  !      if (turn .le. 10 .or. turn .gt. 1990) then
-  !       print*," turn: ",turn, " vrf: ", vrf
-  !      endif
-  do itrack = 1, ktrack
-     px  = track(2,itrack)                                           &
-          + vrf * sin(phirf + omega * turn)
+  
+  TRACK(2,:ktrack) = TRACK(2,:ktrack) + vrf * sin(phirf + omega * turn)
 
-     !---- track(2,jtrk) = track(2,jtrk)
-     !        pt = track(6,itrack)
-     !        pt = pt + vrf * sin(phirf - omega * track(5,itrack))
-
-     track(2,itrack) = px
-  enddo
 end subroutine tthacdip
+
 subroutine ttvacdip(track,ktrack,turn)
-
+  use math_constfi, only : zero, ten3m, ten6p, twopi
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Track a set of trajectories through a thin v ac dipole (zero l.)   *
@@ -1829,15 +1459,13 @@ subroutine ttvacdip(track,ktrack,turn)
   !----------------------------------------------------------------------*
   ! Added by Yipeng SUN on 11 Nov 2009                                   *
   !----------------------------------------------------------------------*
-  integer itrack,ktrack,turn,turn1,turn2,turn3,turn4
-  double precision omega,phirf,rff,rfl,rfv,track(6,*),clight,twopi,vrf, &
-       pc0,get_variable,node_value,get_value,ten3m,ten6p,py
-  !      double precision px,py,ttt,beti,el1
-  parameter(ten3m=1d-3,ten6p=1d6)
+  double precision, intent(INOUT) :: track(6,*)
+  integer, intent(IN) :: ktrack, turn
 
-  !---- Initialize
-  clight=get_variable('clight ')
-  twopi=get_variable('twopi ')
+  integer :: turn1, turn2, turn3, turn4
+  double precision :: omega, phirf, rff, rfl, rfv, vrf, pc0
+
+  double precision :: node_value, get_value
 
   !---- Fetch data.
   rfv = node_value('volt ')
@@ -1849,44 +1477,34 @@ subroutine ttvacdip(track,ktrack,turn)
   turn2 = node_value('ramp2 ')
   turn3 = node_value('ramp3 ')
   turn4 = node_value('ramp4 ')
+
   !---- Set up.
   omega = rff * twopi
   vrf   = 300 * rfv * ten3m / pc0
   phirf = rfl * twopi
 
-
-  if (turn .lt. turn1)  then
-     vrf = 0
-  else if (turn .ge. turn1 .and. turn .lt. turn2) then
+  if (turn .lt. turn1)  then ! voltage stable at zero
+     vrf = zero
+  else if (turn .lt. turn2) then ! ramping up the voltage
      vrf = (turn-turn1) * vrf / (turn2-turn1)
-  else if (turn .ge. turn2 .and. turn .lt. turn3) then
+  else if (turn .lt. turn3) then ! voltage stable at maximum
      vrf = vrf
-  else if (turn .ge. turn3 .and. turn .lt. turn4) then
+  else if (turn .lt. turn4) then ! ramping down the voltage
      vrf = (turn4-turn) * vrf / (turn4-turn3)
-  else
-     vrf = 0
+  else ! stable again at zero
+     vrf = zero
   endif
-  !      if (turn .le. 10 .or. turn .gt. 1990) then
-  !       print*," turn: ",turn, " vrf: ", vrf
-  !      endif
-  do itrack = 1, ktrack
-     py  = track(4,itrack)                                           &
-          + vrf * sin(phirf + omega * turn)
 
-     !---- track(2,jtrk) = track(2,jtrk)
-     !        pt = track(6,itrack)
-     !        pt = pt + vrf * sin(phirf - omega * track(5,itrack))
+  TRACK(4,:ktrack) = TRACK(4,:ktrack) + vrf * sin(phirf + omega * turn)
 
-     track(4,itrack) = py
-  enddo
 end subroutine ttvacdip
+
 !FIXME Unused dummy argument 'el'
 subroutine ttsep(el,track,ktrack)
-
   use twtrrfi
   use trackfi
+  use math_constfi, only : one, ten3m
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   ! ttsep tracks particle through an electrostatic separator with an     *
@@ -1898,40 +1516,47 @@ subroutine ttsep(el,track,ktrack)
   ! Input/Output:                                                        *
   !   TRACK(6,*) (double)     Track coordinantes: (X, PX, Y, PY, T, PT)  *
   !----------------------------------------------------------------------*
-  integer ktrack,itrack
-  double precision track(6,*),node_value,get_value
-  double precision el,ex,ey,tilt,charge,mass,pc,beta,deltap,kick0
-  double precision cos_tilt,sin_tilt,efieldx,efieldy,pt
-  double precision one,ten3m
-  parameter(one=1d0,ten3m=1d-3)
-  !
-  ex=node_value('ex_l ')
-  ey=node_value('ey_l ')
-  tilt=node_value('tilt ')
-  cos_tilt=cos(tilt)
-  sin_tilt=sin(tilt)
+  double precision :: track(6,*)
+  integer :: ktrack 
 
-  charge=get_value('probe ','charge ')
-  mass  =get_value('probe ','mass ')
-  pc    =get_value('probe ','pc ')
-  beta  =get_value('probe ','beta ')
-  efieldx=ex*cos_tilt + ey*sin_tilt
-  efieldy=-ex*sin_tilt + ey*cos_tilt
-  do itrack = 1, ktrack
-     pt=track(6,itrack)
-     deltap=sqrt(1d0-1d0/beta/beta+(pt+1d0/beta)**2) - 1d0
-     kick0=charge*ten3m/pc/(1d0+deltap)/beta
-     track(2,itrack) = track(2,itrack) + kick0*efieldx
-     track(4,itrack) = track(4,itrack) + kick0*efieldy
+  integer :: i
+  double precision :: el, ex, ey, tilt, charge, mass, pc, beta, deltap, kick0
+  double precision :: cos_tilt, sin_tilt, efieldx, efieldy, pt
+  
+  double precision :: node_value, get_value
+  
+  ex = node_value('ex_l ')
+  ey = node_value('ey_l ')
+
+  charge = get_value('probe ','charge ')
+  !mass   = get_value('probe ','mass ')
+  pc     = get_value('probe ','pc ')
+  beta   = get_value('probe ','beta ')
+
+  ! 2016-Mar-17  09:16:12  ghislain: TILT was already taken into account before entrance of element!!!
+  tilt = node_value('tilt ')
+  cos_tilt = cos(tilt)
+  sin_tilt = sin(tilt)
+
+  efieldx =  ex*cos_tilt + ey*sin_tilt
+  efieldy = -ex*sin_tilt + ey*cos_tilt
+  ! end comment
+  
+  do i = 1, ktrack
+     deltap = sqrt(one - one/beta/beta + (track(6,i)+one/beta)**2) - one
+     kick0 = charge * ten3m / pc / (one+deltap) / beta
+     track(2,i) = track(2,i) + kick0*efieldx
+     track(4,i) = track(4,i) + kick0*efieldy
   end do
 
 end subroutine ttsep
-subroutine ttcorr(el,track,ktrack,turn)
 
+subroutine ttcorr(el,track,ktrack,turn)
   use twtrrfi
   use trackfi
+  use math_constfi, only : zero, one, two, three, twopi
+  use code_constfi
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Track particle through an orbit corrector.                         *
@@ -1942,252 +1567,207 @@ subroutine ttcorr(el,track,ktrack,turn)
   ! Output:                                                              *
   !   EL        (double)    Length of quadrupole.                        *
   !----------------------------------------------------------------------*
-  !      logical dorad,dodamp,dorand
-  integer itrack,ktrack,n_ferr,node_fd_errors,code,bvk,i,get_option
-  integer sinkick,turn
-  double precision bi2gi2,bil2,curv,dpx,dpy,el,pt,px,py,rfac,rpt,   &
-       rpx,rpy,track(6,*),xkick,ykick,                                   &
-       div,f_errors(0:maxferr),field(2),get_variable,get_value,          &
-       node_value,twopi
-  double precision dpxx,dpyy
-  double precision temp,sinpeak,sintune,sinphase
+  double precision :: el, track(6,*)
+  integer :: ktrack, turn
+
+  integer :: i, n_ferr, code, bvk, sinkick
+  double precision :: bi2gi2, bil2, curv, dpx, dpy, pt, px, py, rfac, rpt
+  double precision :: rpx, rpy, xkick, ykick, div, temp
+  double precision :: f_errors(0:maxferr), field(2)
+  double precision :: dpxx, dpyy
+  double precision :: sinpeak, sintune, sinphase
+  
+  integer :: node_fd_errors, get_option
+  double precision :: get_variable, get_value, node_value
 
   !---- Initialize.
-  twopi=get_variable('twopi ')
   bvk = node_value('other_bv ')
   deltas = get_variable('track_deltap ')
   arad = get_value('probe ','arad ')
   betas = get_value('probe ','beta ')
   gammas = get_value('probe ','gamma ')
   dtbyds = get_value('probe ','dtbyds ')
+  radiate = get_value('probe ','radiate ') .ne. zero
+  damp = get_option('damp ') .ne. 0
+  quantum = get_option('quantum ') .ne. 0
+
   code = node_value('mad8_type ')
-  if(code.eq.39) code=15
-  if(code.eq.38) code=24
-  call dzero(f_errors, maxferr+1)
-  n_ferr = node_fd_errors(f_errors)
-  dorad = get_value('probe ','radiate ') .ne. 0d0
-  dodamp = get_option('damp ') .ne. 0
-  dorand = get_option('quantum ') .ne. 0
-  if (el .eq. 0d0)  then
-     div = 1d0
+  if (code .eq. code_tkicker)      code = code_kicker
+  !if (code .eq. code_placeholder) code = code_instrument
+
+  F_ERRORS(0:maxferr) = zero ; n_ferr = node_fd_errors(f_errors)
+
+  if (el .eq. zero)  then
+     div = one
   else
      div = el
   endif
 
-  do i = 1, 2
-     field(i) = 0d0
-  enddo
-  if (n_ferr .gt. 0) call dcopy(f_errors, field, min(2, n_ferr))
-  if (code.eq.14) then
-     xkick=bvk*(node_value('kick ')+node_value('chkick ')+           &
-          field(1)/div)
-     ykick=0d0
-  else if (code.eq.15) then
-     xkick=bvk*(node_value('hkick ')+node_value('chkick ')+          &
-          field(1)/div)
-     ykick=bvk*(node_value('vkick ')+node_value('cvkick ')+          &
-          field(2)/div)
-  else if(code.eq.16) then
-     xkick=0d0
-     ykick=bvk*(node_value('kick ')+node_value('cvkick ')+           &
-          field(2)/div)
-  else
-     xkick=0d0
-     ykick=0d0
-  endif
+  FIELD(1:2) = zero
+  
+  select case (code)
+    case (code_hkicker)
+       xkick = bvk*(node_value('kick ')+node_value('chkick ')+field(1)/div)
+       ykick = zero
+    case (code_kicker)
+       xkick = bvk*(node_value('hkick ')+node_value('chkick ')+field(1)/div)
+       ykick = bvk*(node_value('vkick ')+node_value('cvkick ')+field(2)/div)
+    case (code_vkicker)
+       xkick = zero
+       ykick = bvk*(node_value('kick ')+node_value('cvkick ')+field(2)/div)
+    case default
+       xkick = zero
+       ykick = zero
+  end select
 
   !---- Sinusoidal kick
   sinkick = node_value('sinkick ')
-  if(sinkick.eq.1) then
+  if (sinkick .eq. 1) then
      sinpeak = node_value('sinpeak ')
      sintune = node_value('sintune ')
      sinphase = node_value('sinphase ')
-     temp = sinpeak * sin(sinphase + twopi * sintune * turn)
-     if (code.eq.14) then
-        xkick=xkick+temp
-     else if (code.eq.15) then
-        xkick=xkick+temp
-        ykick=ykick+temp
-     else if(code.eq.16) then
-        ykick=ykick+temp
-     endif
+     select case (code)
+       case (code_hkicker)
+          xkick = xkick + sinpeak * sin(sinphase + twopi * sintune * turn)
+       case (code_kicker)
+          xkick = xkick + sinpeak * sin(sinphase + twopi * sintune * turn)
+          ykick = ykick + sinpeak * sin(sinphase + twopi * sintune * turn)
+       case (code_vkicker)
+          ykick = ykick + sinpeak * sin(sinphase + twopi * sintune * turn)
+     end select
   endif
 
   !---- Sum up total kicks.
-  dpx = xkick / (1d0 + deltas)
-  dpy = ykick / (1d0 + deltas)
+  dpx = xkick / (one + deltas)
+  dpy = ykick / (one + deltas)
   !---- Thin lens 6D version
   dpxx = xkick
   dpyy = ykick
 
-  bil2 = el / (2d0 * betas)
-  bi2gi2 = 1d0 / (betas * gammas) ** 2
+  bil2 = el / (two * betas)
+  bi2gi2 = one / (betas * gammas) ** 2
 
   !---- Half radiation effects at entrance.
-  if (dorad  .and.  el .ne. 0) then
-     if (dodamp .and. dorand) then
+  if (radiate  .and.  el .ne. 0) then
+     if (damp .and. quantum) then
         curv = sqrt(dpx**2 + dpy**2) / el
      else
-        rfac = arad * gammas**3 * (dpx**2 + dpy**2) / (3d0 * el)
+        rfac = arad * gammas**3 * (dpx**2 + dpy**2) / (three * el)
      endif
 
-     !---- Full damping.
-     if (dodamp) then
-        do itrack = 1, ktrack
-           if (dorand) call trphot(el,curv,rfac,deltas)
-           px = track(2,itrack)
-           py = track(4,itrack)
-           pt = track(6,itrack)
-           track(2,itrack) = px - rfac * (1d0 + pt) * px
-           track(4,itrack) = py - rfac * (1d0 + pt) * py
-           track(6,itrack) = pt - rfac * (1d0 + pt) ** 2
-        enddo
-
-        !---- Energy loss as for closed orbit.
-     else
-        rpx = rfac * (1d0 + track(6,1)) * track(2,1)
-        rpy = rfac * (1d0 + track(6,1)) * track(4,1)
-        rpt = rfac * (1d0 + track(6,1)) ** 2
-
-        do itrack = 1, ktrack
-           track(2,itrack) = track(2,itrack) - rpx
-           track(4,itrack) = track(4,itrack) - rpy
-           track(6,itrack) = track(6,itrack) - rpt
+     if (damp) then !---- Full damping.
+        do i = 1, ktrack
+           if (quantum) call trphot(el,curv,rfac,deltas)
+           px = track(2,i)
+           py = track(4,i)
+           pt = track(6,i)
+           track(2,i) = px - rfac * (one + pt) * px
+           track(4,i) = py - rfac * (one + pt) * py
+           track(6,i) = pt - rfac * (one + pt) ** 2
+        enddo        
+     else !---- Energy loss as for closed orbit.
+        rpx = rfac * (one + track(6,1)) * track(2,1)
+        rpy = rfac * (one + track(6,1)) * track(4,1)
+        rpt = rfac * (one + track(6,1)) ** 2
+        do i = 1, ktrack
+           track(2,i) = track(2,i) - rpx
+           track(4,i) = track(4,i) - rpy
+           track(6,i) = track(6,i) - rpt
         enddo
      endif
   endif
 
   !---- Thick lens code taken out! AK 21.04.2006
   !!---- Half kick at entrance.
-  !      do itrack = 1, ktrack
-  !        px = track(2,itrack) + 5d-1 * dpx
-  !        py = track(4,itrack) + 5d-1 * dpy
-  !        pt = track(6,itrack)
+  !      do i = 1, ktrack
+  !        px = track(2,i) + dpx/two
+  !        py = track(4,i) + dpy/two
+  !        pt = track(6,i)
   !
   !!---- Drift through corrector.
-  !        d = (1d0 - pt / betas) * el
-  !        track(1,itrack) = track(1,itrack) + px * d
-  !        track(3,itrack) = track(3,itrack) + py * d
-  !        track(5,itrack) = track(5,itrack) + d * bi2gi2 * pt -           &
+  !        d = (one - pt / betas) * el
+  !        track(1,i) = track(1,i) + px * d
+  !        track(3,i) = track(3,i) + py * d
+  !        track(5,i) = track(5,i) + d * bi2gi2 * pt -           &
   !     bil2 * (px**2 + py**2 + bi2gi2*pt**2) + el*pt*dtbyds
   !
   !!---- Half kick at exit.
-  !        track(2,itrack) = px + 5d-1 * dpx
-  !        track(4,itrack) = py + 5d-1 * dpy
-  !        track(6,itrack) = pt
+  !        track(2,i) = px + dpx/two
+  !        track(4,i) = py + dpy/two
+  !        track(6,i) = pt
   !      enddo
 
   !---- Kick at dipole corrector magnet
   !     including PT-dependence
-  do itrack = 1, ktrack
-     px = track(2,itrack)
-     py = track(4,itrack)
-     pt = track(6,itrack)
-     !        ttt = sqrt(1d0+2d0*pt*bet0i+pt**2 - px**2 - py**2)
-     !        ddd = sqrt(1d0+2d0*pt*bet0i+pt**2)
-     !        track(2,itrack) = px + dpxx*ttt/ddd
-     !        track(4,itrack) = py + dpyy*ttt/ddd
-     !        ttt = sqrt(1d0+2d0*pt*bet0i+pt**2 - dpxx**2 - dpyy**2)
-     !        ddd = sqrt(1d0+2d0*pt*bet0i+pt**2)
-     !        track(2,itrack) = px + dpxx*ttt/ddd
-     !        track(4,itrack) = py + dpyy*ttt/ddd
+  do i = 1, ktrack
+     px = track(2,i)
+     py = track(4,i)
+     pt = track(6,i)
+     !        ttt = sqrt(one+two*pt*bet0i+pt**2 - px**2 - py**2)
+     !        ddd = sqrt(one+two*pt*bet0i+pt**2)
+     !        track(2,i) = px + dpxx*ttt/ddd
+     !        track(4,i) = py + dpyy*ttt/ddd
+     !        ttt = sqrt(one+two*pt*bet0i+pt**2 - dpxx**2 - dpyy**2)
+     !        ddd = sqrt(one+two*pt*bet0i+pt**2)
+     !        track(2,i) = px + dpxx*ttt/ddd
+     !        track(4,i) = py + dpyy*ttt/ddd
 
-     !        ttt = sqrt(1d0+2d0*pt*bet0i+pt**2 - px**2 - py**2)
-     !        ddd = sqrt(1d0+2d0*pt*bet0i+pt**2)
+     !        ttt = sqrt(one+two*pt*bet0i+pt**2 - px**2 - py**2)
+     !        ddd = sqrt(one+two*pt*bet0i+pt**2)
      !
      !        xp = px/ttt + dpxx/ddd  ! Apply kick in standard coordinates!
      !        yp = py/ttt + dpyy/ddd
      !
-     !        ttt = sqrt(1d0 + xp**2 + yp**2)
+     !        ttt = sqrt(one + xp**2 + yp**2)
      !
      !        px = xp*ddd/ttt ! Transform back to canonical coordinates
      !        py = yp*ddd/ttt
      !
-     !        track(2,itrack) = px
-     !        track(4,itrack) = py
+     !        track(2,i) = px
+     !        track(4,i) = py
 
-     track(2,itrack) = px + dpxx
-     track(4,itrack) = py + dpyy
+     track(2,i) = px + dpxx
+     track(4,i) = py + dpyy
 
      !       Add time of flight effects (stolen from Ripken-Dipole)
-     !        track(5,itrack) = track(5,itrack) -                             &
-     !        (dpxx*track(1,itrack) - dpyy*track(3,itrack)) *                &
-     !        ((1d0 + bet0*track(6,itrack))/ddd)*bet0i
+     !        track(5,i) = track(5,i) -                             &
+     !        (dpxx*track(1,i) - dpyy*track(3,i)) *                &
+     !        ((one + bet0*track(6,i))/ddd)*bet0i
 
   enddo
 
   !---- Half radiation effects at exit.
   !     If not random, use same RFAC as at entrance.
-  if (dorad  .and.  el .ne. 0) then
+  if (radiate  .and.  el .ne. 0) then
+     if (damp) then !---- Full damping.
+        do i = 1, ktrack
+           if (quantum) call trphot(el,curv,rfac,deltas)
+           px = track(2,i)
+           py = track(4,i)
+           pt = track(6,i)
+           track(2,i) = px - rfac * (one + pt) * px
+           track(4,i) = py - rfac * (one + pt) * py
+           track(6,i) = pt - rfac * (one + pt) ** 2
+        enddo        
+     else !---- Energy loss as for closed orbit.
+        rpx = rfac * (one + track(6,1)) * track(2,1)
+        rpy = rfac * (one + track(6,1)) * track(4,1)
+        rpt = rfac * (one + track(6,1)) ** 2
 
-     !---- Full damping.
-     if (dodamp) then
-        do itrack = 1, ktrack
-           if (dorand) call trphot(el,curv,rfac,deltas)
-           px = track(2,itrack)
-           py = track(4,itrack)
-           pt = track(6,itrack)
-           track(2,itrack) = px - rfac * (1d0 + pt) * px
-           track(4,itrack) = py - rfac * (1d0 + pt) * py
-           track(6,itrack) = pt - rfac * (1d0 + pt) ** 2
-        enddo
-
-        !---- Energy loss as for closed orbit.
-     else
-        rpx = rfac * (1d0 + track(6,1)) * track(2,1)
-        rpy = rfac * (1d0 + track(6,1)) * track(4,1)
-        rpt = rfac * (1d0 + track(6,1)) ** 2
-
-        do itrack = 1, ktrack
-           track(2,itrack) = track(2,itrack) - rpx
-           track(4,itrack) = track(4,itrack) - rpy
-           track(6,itrack) = track(6,itrack) - rpt
+        do i = 1, ktrack
+           track(2,i) = track(2,i) - rpx
+           track(4,i) = track(4,i) - rpy
+           track(6,i) = track(6,i) - rpt
         enddo
      endif
   endif
 
 end subroutine ttcorr
-subroutine dpoissn (amu,n,ierror)
 
-  implicit none
-
-  !----------------------------------------------------------------------*
-  !    POISSON GENERATOR                                                 *
-  !    CODED FROM LOS ALAMOS REPORT      LA-5061-MS                      *
-  !    PROB(N)=EXP(-AMU)*AMU**N/FACT(N)                                  *
-  !        WHERE FACT(N) STANDS FOR FACTORIAL OF N                       *
-  !    ON RETURN IERROR.EQ.0 NORMALLY                                    *
-  !              IERROR.EQ.1 IF AMU.LE.0.                                *
-  !----------------------------------------------------------------------*
-  integer n, ierror
-  double precision amu,ran,pir,frndm,grndm,expma,amax
-  !    AMAX IS THE VALUE ABOVE WHICH THE NORMAL DISTRIBUTION MUST BE USED
-  data amax/88d0/
-
-  ierror= 0
-  if(amu.le.0d0) then
-     !    MEAN SHOULD BE POSITIVE
-     ierror=1
-     n = 0
-     go to 999
-  endif
-  if(amu.gt.amax) then
-     !   NORMAL APPROXIMATION FOR AMU.GT.AMAX
-     ran = grndm()
-     n=ran*sqrt(amu)+amu+5d-1
-     goto 999
-  endif
-  expma=exp(-amu)
-  pir=1d0
-  n=-1
-10 n=n+1
-  pir=pir*frndm()
-  if(pir.gt.expma) go to 10
-999 end subroutine dpoissn
 subroutine ttbb(track,ktrack,parvec)
-
+  use bbfi, only : explim
+  use math_constfi, only : zero, one, two, half
   implicit none
-
   !----------------------------------------------------------------------*
   ! purpose:                                                             *
   !   track a set of particle through a beam-beam interaction region.    *
@@ -2197,16 +1777,18 @@ subroutine ttbb(track,ktrack,parvec)
   !   track(6,*)(double)  track coordinates: (x, px, y, py, t, pt).      *
   !   ktrack    (integer) number of tracks.                              *
   !----------------------------------------------------------------------*
-  integer ktrack,beamshape,b_dir_int,get_option
-  double precision track(6,*),parvec(*),fk,dp
-  double precision gamma0,beta0,beta_dp,ptot,b_dir
-  double precision q,q_prime,get_value,node_value,get_variable
-  double precision cme32
-  logical first,bb_ultra_relati
-  save first
-  data first / .true. /
-  parameter(cme32=1d-32)
-  !     if x > explim, exp(-x) is outside machine limits.
+  double precision :: track(6,*), parvec(*)
+  integer :: ktrack
+
+  integer :: beamshape, b_dir_int 
+  double precision :: fk, dp, q, q_prime
+  double precision :: gamma0, beta0, beta_dp, ptot, b_dir
+  logical :: bb_ultra_relati
+  logical, save :: first=.true.
+
+  integer :: get_option
+  double precision :: get_value, node_value, get_variable
+  double precision, parameter :: cme32=1d-32
 
   !---- Calculate momentum deviation and according changes
   !     of the relativistic factor beta0
@@ -2214,88 +1796,89 @@ subroutine ttbb(track,ktrack,parvec)
   q = get_value('probe ','charge ')
   q_prime = node_value('charge ')
   gamma0 = parvec(7)
-  beta0 = sqrt(1d0-1d0/gamma0**2)
-  ptot = beta0*gamma0*(1d0+dp)
-  beta_dp = ptot / sqrt(1d0 + ptot**2)
+  beta0 = sqrt(one - one/gamma0**2)
+  ptot = beta0*gamma0*(one+dp)
+  beta_dp = ptot / sqrt(one + ptot**2)
   b_dir_int = node_value('bbdir ')
-  b_dir=dble(b_dir_int)
+  b_dir = dble(b_dir_int)
   b_dir = b_dir/sqrt(b_dir*b_dir + cme32)
+
   !---- pre-factor, if zero, anything else does not need to be calculated
   bb_ultra_relati = get_option('bb_ultra_relati ') .ne. 0
-  if(bb_ultra_relati) then
-     fk = 2d0 * parvec(5) * parvec(6) / parvec(7)
+  if (bb_ultra_relati) then
+     fk = two * parvec(5) * parvec(6) / parvec(7)
   else
-     fk = 2d0*parvec(5)*parvec(6)/parvec(7)/beta0/(1d0+dp)/q*          &
-       (1d0-beta0*beta_dp*b_dir)/(beta_dp+5d-1*(b_dir-1d0)*b_dir*beta0)
+     fk = two*parvec(5)*parvec(6)/parvec(7)/beta0/(one+dp)/q*          &
+       (one-beta0*beta_dp*b_dir)/(beta_dp+half*(b_dir-one)*b_dir*beta0)
   endif
-  !
-  if (fk .eq. 0d0)  return
+  if (fk .eq. zero)  return
+
   !---- choose beamshape: 1-Gaussian, 2-flattop=trapezoidal, 3-hollow-parabolic
   beamshape = node_value('bbshape ')
-  if(beamshape.lt.1.or.beamshape.gt.3) then
-     beamshape=1
-     if(first) then
-        first = .false.
-        call aawarn('TTBB: ',                                         &
-             'beamshape out of range, set to default=1')
-     endif
-  endif
-  if(beamshape.eq.1) call ttbb_gauss(track,ktrack,fk)
-  if(beamshape.eq.2) call ttbb_flattop(track,ktrack,fk)
-  if(beamshape.eq.3) call ttbb_hollowparabolic(track,ktrack,fk)
-
+  select case (beamshape)
+    case (1)
+       call ttbb_gauss(track,ktrack,fk)
+    case (2)
+       call ttbb_flattop(track,ktrack,fk)
+    case (3)
+       call ttbb_hollowparabolic(track,ktrack,fk)
+    case default
+       if (first)  call fort_warn('TTBB: ','beamshape out of range, set to default=1')
+       first = .false.
+       call ttbb_gauss(track,ktrack,fk)
+  end select
+ 
 end subroutine ttbb
-subroutine ttbb_gauss(track,ktrack,fk)
 
+subroutine ttbb_gauss(track,ktrack,fk)
   use name_lenfi
   use bbfi
   use spch_bbfi
   use fasterror
+  use math_constfi, only : zero, one, two, half, ten3m, pi
   implicit none
-
   ! ---------------------------------------------------------------------*
   ! purpose: kicks the particles of the beam considered with a beam      *
   !          having a Gaussian perpendicular shape                       *
   ! input and output as those of subroutine ttbb                         *
   ! ---------------------------------------------------------------------*
-  logical bborbit,bb_sxy_update
-  integer ktrack,itrack,ipos,get_option,mylen
-  double precision track(6,*),pi,sx,sy,xm,ym,sx2,sy2,xs,                 &
-       ys,rho2,fk,tk,phix,phiy,rk,xb,yb,crx,cry,xr,yr,r,r2,cbx,cby,      &
-       get_variable,node_value,ten3m,explim
-  double precision xrv(ktrack), yrv(ktrack), crxv(ktrack), cryv(ktrack), &
-       xbv(ktrack), ybv(ktrack), cbxv(ktrack), cbyv(ktrack),tkv(ktrack), &
-       phixv(ktrack),phiyv(ktrack),xsv(ktrack),ysv(ktrack),rkv(ktrack)
-  parameter(ten3m=1d-3,explim=150d0)
- !VVK 20100321 ------------------------------------------------------
-      real  gauss_factor_t
-      character*20 text
-      character*(name_len) name
-!-------------------------------------------------------------------
+  double precision :: track(6,*), fk
+  integer, intent(IN) :: ktrack
 
- !     if x > explim, exp(-x) is outside machine limits.
-
+  integer :: i, ipos, mylen
+  double precision :: sx, sy, xm, ym, sx2, sy2, xs, ys, rho2, tk
+  double precision :: phix, phiy, rk, xb, yb, crx, cry, xr, yr, r, r2, cbx, cby
+  double precision :: xrv(ktrack), yrv(ktrack), crxv(ktrack), cryv(ktrack)
+  double precision :: xbv(ktrack), ybv(ktrack), cbxv(ktrack), cbyv(ktrack)
+  double precision :: tkv(ktrack), phixv(ktrack), phiyv(ktrack)
+  double precision :: xsv(ktrack), ysv(ktrack), rkv(ktrack)
+  logical :: bborbit, bb_sxy_update
+  !VVK 20100321 ------------------------------------------------------
+  double precision ::  gauss_factor_t ! promoted by GR from REAL
+  character(len=20) :: text
+  character(len=name_len) :: name
+  !-------------------------------------------------------------------
+  integer :: get_option
+  double precision :: node_value
+  
   !---- initialize.
-  bborbit = get_option('bborbit ') .ne. 0
-  pi=get_variable('pi ')
+  bborbit       = get_option('bborbit ') .ne. 0
   bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
-  if(bb_sxy_update) then
+  if (bb_sxy_update) then
      name=' '
      call element_name(name,len(name))
-     mylen=len_trim(name)
-     i_spch=i_spch+1
-     if(i_spch.gt.N_spch) then
+     mylen = len_trim(name)
+     i_spch = i_spch+1
+     if (i_spch .gt. N_spch) then
         write(text, '(1p,i8)') i_spch
-        call aafail('TTBB: ', 'Table with too few BB elements: '//  &
-             text)
+        call fort_fail('TTBB: ', 'Table with too few BB elements: '// text)
      endif
-     if(spch_bb_name(i_spch)(:mylen).ne.name(:mylen)) then
-        call aafail('TTBB: ', 'wrong element name in Table: '//     &
-             'spch_bb')
+     if (spch_bb_name(i_spch)(:mylen) .ne. name(:mylen)) then
+        call fort_fail('TTBB: ', 'wrong element name in Table: spch_bb')
      endif
 
-     sx=sqrt(betx_bb(i_spch)*Ex_rms+(dx_bb(i_spch)*sigma_p)**2)
-     sy=sqrt(bety_bb(i_spch)*Ey_rms+(dy_bb(i_spch)*sigma_p)**2)
+     sx = sqrt(betx_bb(i_spch)*Ex_rms+(dx_bb(i_spch)*sigma_p)**2)
+     sy = sqrt(bety_bb(i_spch)*Ey_rms+(dy_bb(i_spch)*sigma_p)**2)
   else
      sx = node_value('sigx ')
      sy = node_value('sigy ')
@@ -2303,8 +1886,10 @@ subroutine ttbb_gauss(track,ktrack,fk)
 
   xm = node_value('xma ')
   ym = node_value('yma ')
-  if(bb_sxy_update) fk = fk * rat_bb_n_ions !Ratio_for_bb_N_ions
-  if (fk .eq. 0d0)  return
+  if (bb_sxy_update) fk = fk * rat_bb_n_ions !Ratio_for_bb_N_ions
+
+  if (fk .eq. zero)  return
+
   ipos = 0
   if (.not. bborbit)  then
      !--- find position of closed orbit bb_kick
@@ -2314,46 +1899,44 @@ subroutine ttbb_gauss(track,ktrack,fk)
      ipos = 0
 1    continue
   endif
+
   sx2 = sx*sx
   sy2 = sy*sy
   !---- limit formulae for sigma(x) = sigma(y).
   if (abs(sx2 - sy2) .le. ten3m * (sx2 + sy2)) then
-!$OMP PARALLEL PRIVATE(itrack, xs, ys, rho2, tk, gauss_factor_t, phix, phiy)
+!$OMP PARALLEL PRIVATE(i, xs, ys, rho2, tk, gauss_factor_t, phix, phiy)
 !$OMP DO
-     do itrack = 1, ktrack
-        xs = track(1,itrack) - xm
-        ys = track(3,itrack) - ym
+     do i = 1, ktrack
+        xs = track(1,i) - xm
+        ys = track(3,i) - ym
         rho2 = xs * xs + ys * ys
-        tk = rho2 / (2d0 * sx2)
+        tk = rho2 / (two * sx2)
 
-        if(bb_sxy_update) then
-           gauss_factor_t=                                 &!VVK 20100321
-                exp(-5d-1*(track(5,itrack)-mean_t)**2/sigma_t**2)!VVK 20100321
+        if (bb_sxy_update) then
+           gauss_factor_t = exp(-half*(track(5,i)-mean_t)**2/sigma_t**2)!VVK 20100321
 
            if (tk .gt. explim) then
-              phix = xs * fk / rho2 &
-                   *gauss_factor_t !VVK 20100321
-              phiy = ys * fk / rho2 &
-                   *gauss_factor_t !VVK 20100321
-           else if (rho2 .ne. 0d0) then
-              phix = xs * fk / rho2 * (1d0 - exp(-tk) ) &
-                   *gauss_factor_t !VVK 20100321
-              phiy = ys * fk / rho2 * (1d0 - exp(-tk) ) &
-                   *gauss_factor_t !VVK 20100321
+              ! if x > explim, exp(-x) is outside machine limits.
+              phix = xs * fk / rho2 * gauss_factor_t !VVK 20100321
+              phiy = ys * fk / rho2 * gauss_factor_t !VVK 20100321
+           else if (rho2 .ne. zero) then
+              phix = xs * fk / rho2 * (one - exp(-tk) ) * gauss_factor_t !VVK 20100321
+              phiy = ys * fk / rho2 * (one - exp(-tk) ) * gauss_factor_t !VVK 20100321
            else
-              phix = 0d0
-              phiy = 0d0
+              phix = zero
+              phiy = zero
            endif
         else
            if (tk .gt. explim) then
+              ! if x > explim, exp(-x) is outside machine limits.
               phix = xs * fk / rho2
               phiy = ys * fk / rho2
-           else if (rho2 .ne. 0d0) then
-              phix = xs * fk / rho2 * (1d0 - exp(-tk) )
-              phiy = ys * fk / rho2 * (1d0 - exp(-tk) )
+           else if (rho2 .ne. zero) then
+              phix = xs * fk / rho2 * (one - exp(-tk) )
+              phiy = ys * fk / rho2 * (one - exp(-tk) )
            else
-              phix = 0d0
-              phiy = 0d0
+              phix = zero
+              phiy = zero
            endif
         endif
 
@@ -2362,80 +1945,80 @@ subroutine ttbb_gauss(track,ktrack,fk)
            phix = phix - bb_kick(1,ipos)
            phiy = phiy - bb_kick(2,ipos)
         endif
-        track(2,itrack) = track(2,itrack) + phix
-        track(4,itrack) = track(4,itrack) + phiy
+        track(2,i) = track(2,i) + phix
+        track(4,i) = track(4,i) + phiy
      enddo
 !$OMP END DO
 !$OMP END PARALLEL
 
      !---- case sigma(x) > sigma(y).
   else if (sx2 .gt. sy2) then
-     r2 = 2d0 * (sx2 - sy2)
+     r2 = two * (sx2 - sy2)
      r  = sqrt(r2)
- !        rk = fk * sqrt(pi) / r                 !VVK 20100321
+     ! rk = fk * sqrt(pi) / r                 !VVK 20100321
      rk = fk * sqrt(pi) / r
-     if(fasterror_on) then
-!$OMP PARALLEL PRIVATE(itrack, gauss_factor_t)
+     if (fasterror_on) then
+!$OMP PARALLEL PRIVATE(i, gauss_factor_t)
 !$OMP DO
-        do itrack = 1, ktrack
+        do i = 1, ktrack
 
-           if(bb_sxy_update) then
-              gauss_factor_t= &                                !VVK 20100321
-                   exp(-5d-1*(track(5,itrack)-mean_t)**2/sigma_t**2)!VVK 20100321
-              rkv(itrack) = fk * sqrt(pi) / r*gauss_factor_t !VVK 20100321
+           if (bb_sxy_update) then
+              gauss_factor_t = exp(-half*(track(5,i)-mean_t)**2/sigma_t**2)!VVK 20100321
+              rkv(i) = fk * sqrt(pi) / r*gauss_factor_t !VVK 20100321
            endif
 
-           xsv(itrack) = track(1,itrack) - xm
-           ysv(itrack) = track(3,itrack) - ym
-           xrv(itrack) = abs(xsv(itrack)) / r
-           yrv(itrack) = abs(ysv(itrack)) / r
-           tkv(itrack) = (xsv(itrack) * xsv(itrack) / sx2 + ysv(itrack) * ysv(itrack) / sy2) / 2d0
-           xbv(itrack) = (sy / sx) * xrv(itrack)
-           ybv(itrack) = (sx / sy) * yrv(itrack)
+           xsv(i) = track(1,i) - xm
+           ysv(i) = track(3,i) - ym
+           xrv(i) = abs(xsv(i)) / r
+           yrv(i) = abs(ysv(i)) / r
+           tkv(i) = (xsv(i) * xsv(i) / sx2 + ysv(i) * ysv(i) / sy2) / two
+           xbv(i) = (sy / sx) * xrv(i)
+           ybv(i) = (sx / sy) * yrv(i)
         enddo
 !$OMP END DO
 !$OMP END PARALLEL
         call wzsubv(ktrack,xrv, yrv, crxv, cryv)
         call wzsubv(ktrack,xbv, ybv, cbxv, cbyv)
-!        do itrack = 1, ktrack
-!           if (tkv(itrack) .gt. explim) then
-!              phixv(itrack) = rk * cryv(itrack)
-!              phiyv(itrack) = rk * crxv(itrack)
+!        do i = 1, ktrack
+!           if (tkv(i) .gt. explim) then
+               ! if x > explim, exp(-x) is outside machine limits.
+!              phixv(i) = rk * cryv(i)
+!              phiyv(i) = rk * crxv(i)
 !           endif
 !        enddo
-!$OMP PARALLEL PRIVATE(itrack)
+!$OMP PARALLEL PRIVATE(i)
 !$OMP DO
-        do itrack = 1, ktrack
-           phixv(itrack) = rkv(itrack) * (cryv(itrack) - exp(-tkv(itrack)) * cbyv(itrack))
-           phiyv(itrack) = rkv(itrack) * (crxv(itrack) - exp(-tkv(itrack)) * cbxv(itrack))
-           track(2,itrack) = track(2,itrack) + phixv(itrack) * sign(1d0,xsv(itrack))
-           track(4,itrack) = track(4,itrack) + phiyv(itrack) * sign(1d0,ysv(itrack))
+        do i = 1, ktrack
+           phixv(i) = rkv(i) * (cryv(i) - exp(-tkv(i)) * cbyv(i))
+           phiyv(i) = rkv(i) * (crxv(i) - exp(-tkv(i)) * cbxv(i))
+           track(2,i) = track(2,i) + phixv(i) * sign(one,xsv(i))
+           track(4,i) = track(4,i) + phiyv(i) * sign(one,ysv(i))
            if (ipos .ne. 0)  then
               !--- subtract closed orbit kick
-              track(2,itrack) = track(2,itrack) - bb_kick(1,ipos)
-              track(4,itrack) = track(4,itrack) - bb_kick(2,ipos)
+              track(2,i) = track(2,i) - bb_kick(1,ipos)
+              track(4,i) = track(4,i) - bb_kick(2,ipos)
            endif
         enddo
 !$OMP END DO
 !$OMP END PARALLEL
      else
-!$OMP PARALLEL PRIVATE(itrack, rk, xs, ys, xr, yr, tk, xb, yb, crx, cry, cbx, cby, gauss_factor_t, phix, phiy)
+!$OMP PARALLEL PRIVATE(i, rk, xs, ys, xr, yr, tk, xb, yb, crx, cry, cbx, cby, gauss_factor_t, phix, phiy)
 !$OMP DO
-        do itrack = 1, ktrack
+        do i = 1, ktrack
 
-           if(bb_sxy_update) then
-              gauss_factor_t= &                                !VVK 20100321
-                   exp(-5d-1*(track(5,itrack)-mean_t)**2/sigma_t**2)!VVK 20100321
+           if (bb_sxy_update) then
+              gauss_factor_t = exp(-half*(track(5,i)-mean_t)**2/sigma_t**2)!VVK 20100321
               rk = fk * sqrt(pi) / r*gauss_factor_t !VVK 20100321
            endif
 
-           xs = track(1,itrack) - xm
-           ys = track(3,itrack) - ym
+           xs = track(1,i) - xm
+           ys = track(3,i) - ym
            xr = abs(xs) / r
            yr = abs(ys) / r
            call ccperrf(xr, yr, crx, cry)
-           tk = (xs * xs / sx2 + ys * ys / sy2) / 2d0
+           tk = (xs * xs / sx2 + ys * ys / sy2) / two
            if (tk .gt. explim) then
+              ! if x > explim, exp(-x) is outside machine limits.
               phix = rk * cry
               phiy = rk * crx
            else
@@ -2445,12 +2028,12 @@ subroutine ttbb_gauss(track,ktrack,fk)
               phix = rk * (cry - exp(-tk) * cby)
               phiy = rk * (crx - exp(-tk) * cbx)
            endif
-           track(2,itrack) = track(2,itrack) + phix * sign(1d0,xs)
-           track(4,itrack) = track(4,itrack) + phiy * sign(1d0,ys)
+           track(2,i) = track(2,i) + phix * sign(one,xs)
+           track(4,i) = track(4,i) + phiy * sign(one,ys)
            if (ipos .ne. 0)  then
               !--- subtract closed orbit kick
-              track(2,itrack) = track(2,itrack) - bb_kick(1,ipos)
-              track(4,itrack) = track(4,itrack) - bb_kick(2,ipos)
+              track(2,i) = track(2,i) - bb_kick(1,ipos)
+              track(4,i) = track(4,i) - bb_kick(2,ipos)
            endif
         enddo
 !$OMP END DO
@@ -2460,40 +2043,40 @@ subroutine ttbb_gauss(track,ktrack,fk)
 
      !---- case sigma(x) < sigma(y).
   else
-     r2 = 2d0 * (sy2 - sx2)
+     r2 = two * (sy2 - sx2)
      r  = sqrt(r2)
-!        rk = fk * sqrt(pi) / r                 !VVK 20100321
+     ! rk = fk * sqrt(pi) / r                 !VVK 20100321
      rk = fk * sqrt(pi) / r
-!$OMP PARALLEL PRIVATE(itrack, rk, xs, ys, xr, yr, tk, xb, yb, crx, cry, cbx, cby, gauss_factor_t, phix, phiy)
+!$OMP PARALLEL PRIVATE(i, rk, xs, ys, xr, yr, tk, xb, yb, crx, cry, cbx, cby, gauss_factor_t, phix, phiy)
 !$OMP DO
-     do itrack = 1, ktrack
+     do i = 1, ktrack
 
-        if(bb_sxy_update) then
-           gauss_factor_t= &                                !VVK 20100321
-                exp(-5d-1*(track(5,itrack)-mean_t)**2/sigma_t**2)!VVK 20100321
+        if (bb_sxy_update) then
+           gauss_factor_t = exp(-half*(track(5,i)-mean_t)**2/sigma_t**2)!VVK 20100321
            rk = fk * sqrt(pi) / r*gauss_factor_t !VVK 20100321
         endif
 
-        xs = track(1,itrack) - xm
-        ys = track(3,itrack) - ym
+        xs = track(1,i) - xm
+        ys = track(3,i) - ym
         xr = abs(xs) / r
         yr = abs(ys) / r
 
-        if(fasterror_on) then
+        if (fasterror_on) then
            call wzsub(yr, xr, cry, crx)
         else
            call ccperrf(yr, xr, cry, crx)
         endif
 
-        tk = (xs * xs / sx2 + ys * ys / sy2) / 2d0
+        tk = (xs * xs / sx2 + ys * ys / sy2) / two
         if (tk .gt. explim) then
+           ! if x > explim, exp(-x) is outside machine limits.
            phix = rk * cry
            phiy = rk * crx
         else
            xb  = (sy / sx) * xr
            yb  = (sx / sy) * yr
 
-           if(fasterror_on) then
+           if (fasterror_on) then
               call wzsub(yb, xb, cby, cbx)
            else
               call ccperrf(yb, xb, cby, cbx)
@@ -2502,44 +2085,42 @@ subroutine ttbb_gauss(track,ktrack,fk)
            phix = rk * (cry - exp(-tk) * cby)
            phiy = rk * (crx - exp(-tk) * cbx)
         endif
-        track(2,itrack) = track(2,itrack) + phix * sign(1d0,xs)
-        track(4,itrack) = track(4,itrack) + phiy * sign(1d0,ys)
+        track(2,i) = track(2,i) + phix * sign(one,xs)
+        track(4,i) = track(4,i) + phiy * sign(one,ys)
         if (ipos .ne. 0)  then
            !--- subtract closed orbit kick
-           track(2,itrack) = track(2,itrack) - bb_kick(1,ipos)
-           track(4,itrack) = track(4,itrack) - bb_kick(2,ipos)
+           track(2,i) = track(2,i) - bb_kick(1,ipos)
+           track(4,i) = track(4,i) - bb_kick(2,ipos)
         endif
      enddo
 !$OMP END DO
 !$OMP END PARALLEL
   endif
 end subroutine ttbb_gauss
+
 subroutine ttbb_flattop(track,ktrack,fk)
-
   use bbfi
+  use math_constfi, only : one, two, three, four, six, eight, twelve, half, ten3m, pi
   implicit none
-
   ! ---------------------------------------------------------------------*
   ! purpose: kicks the particles of the beam considered with a beam      *
   !          having an trapezoidal and, so flat top radial profile       *
   ! input and output as those of subroutine ttbb                         *
   ! ---------------------------------------------------------------------*
-  logical bborbit,first
-  integer ktrack,itrack,ipos,get_option
-  double precision track(6,*),pi,r0x,r0y,wi,wx,wy,xm,ym,                   &
-       r0x2,r0y2,xs,ys,rho,rho2,fk,phir,phix,phiy,get_variable,            &
-       node_value,four,six,eight,twelve,twentyfour,     &
-       fortyeight,quarter,ten3m,explim,norm,r1,zz
-  parameter(four=4d0,six=6d0,eight=8d0,                                    &
-       twelve=12d0,twentyfour=24d0,fortyeight=48d0,quarter=25d-2,          &
-       ten3m=1d-3,explim=150d0)
-  save first
-  data first / .true. /
-  !     if x > explim, exp(-x) is outside machine limits.
+  double precision :: track(6,*), fk
+  integer :: ktrack
 
+  integer :: i, ipos
+  double precision :: r0x, r0y, wi, wx, wy, xm, ym, r0x2, r0y2, xs, ys
+  double precision :: rho, rho2, phir, phix, phiy, norm, r1, zz
+  logical :: bborbit
+  logical, save :: first= .true. 
+
+  integer :: get_option
+  double precision :: node_value
+ 
   !---- initialize.
   bborbit = get_option('bborbit ') .ne. 0
-  pi=get_variable('pi ')
   ! mean radii of the is given via variables sigx and sigy
   r0x = node_value('sigx ')
   r0y = node_value('sigy ')
@@ -2562,79 +2143,77 @@ subroutine ttbb_flattop(track,ktrack,fk)
   !---- limit formulae for mean radius(x) = mean radius(y),
   !-----      preliminary the only case considered.
   !
-  if (abs(r0x2 - r0y2) .gt. ten3m * (r0x2 + r0y2)) then
-     zz = 5d-1*(r0x + r0y)
-     r0x=zz
-     r0y=zz
-     r0x2=r0x*r0x
-     r0y2=r0y*r0y
-     if(first) then
-        first=.false.
-        call aawarn('TTBB_FLATTOP: ','beam is assumed to be circular')
-     endif
+  if (abs(r0x2 - r0y2) .gt. ten3m*(r0x2+r0y2)) then
+     zz = half*(r0x + r0y)
+     r0x = zz
+     r0y = zz
+     r0x2 = r0x*r0x
+     r0y2 = r0y*r0y
+     if (first) call fort_warn('TTBB_FLATTOP: ','beam is assumed to be circular')
+     first=.false.
   endif
-  norm = (twelve*r0x**2 + wx**2)/twentyfour
-  r1=r0x-wx/2d0
-!$OMP PARALLEL PRIVATE(itrack, xs, ys, rho, rho2, phir, phix, phiy)
+
+  norm = half*r0x**2 + wx**2/(six*four)
+  r1 = r0x - wx/two
+!$OMP PARALLEL PRIVATE(i, xs, ys, rho, rho2, phir, phix, phiy)
 !$OMP DO
-  do itrack = 1, ktrack
-     xs = track(1,itrack) - xm
-     ys = track(3,itrack) - ym
+  do i = 1, ktrack
+     xs = track(1,i) - xm
+     ys = track(3,i) - ym
      rho2 = xs * xs + ys * ys
      rho  = sqrt(rho2)
-     if(rho.le.r1) then
-        phir = 5d-1/norm
+     if (rho .le. r1) then
+        phir = half/norm
         phix = phir*xs
         phiy = phir*ys
-     else if(rho.gt.r1.and.rho.lt.r1+wx) then
-        phir = ((r0x**2/four - r0x**3/six/wx - r0x*wx/eight +            &
-             wx**2/fortyeight)/rho2 + quarter + 5d-1*r0x/wx -            &
-             rho/3d0/wx)/norm
+     else if (rho.gt.r1 .and. rho.lt.r1+wx) then
+        phir = ( (r0x**2/four - r0x**3/six/wx - r0x*wx/eight + wx**2/(six*eight))/rho2 &
+                + one/four + half*r0x/wx - rho/three/wx) / norm
         phix = phir*xs
         phiy = phir*ys
-     else if(rho.ge.r1+wx) then
-        phir = 1d0/rho2
+     else if (rho .ge. r1+wx) then
+        phir = one/rho2
         phix = xs*phir
         phiy = ys*phir
      endif
-     track(2,itrack) = track(2,itrack)+phix*fk
-     track(4,itrack) = track(4,itrack)+phiy*fk
+     track(2,i) = track(2,i)+phix*fk
+     track(4,i) = track(4,i)+phiy*fk
   end do
 !$OMP END DO
 !$OMP END PARALLEL
 
 end subroutine ttbb_flattop
+
 subroutine ttbb_hollowparabolic(track,ktrack,fk)
-
   use bbfi
+  use math_constfi, only : zero, one, two, three, four, twelve, half, ten3m, pi
   implicit none
-
   ! ---------------------------------------------------------------------*
   ! purpose: kicks the particles of the beam considered with a beam      *
   !          having a hollow-parabolic perpendicular shape               *
   ! input and output as those of subroutine ttbb                         *
   ! ---------------------------------------------------------------------*
-  logical bborbit,first
-  integer ktrack,itrack,ipos,get_option
-  double precision track(6,*),pi,r0x,r0y,wi,wx,wy,xm,ym,                   &
-       r0x2,r0y2,xs,ys,rho,rho2,fk,phir,phix,phiy,get_variable,            &
-       node_value,four,twelve,ten3m,  &
-       explim,zz
-  parameter(four=4d0,twelve=12d0,ten3m=1d-3,explim=150d0)
-  save first
-  data first / .true. /
-  !     if x > explim, exp(-x) is outside machine limits.
+  double precision :: track(6,*), fk
+  integer :: ktrack
 
+  integer :: i, ipos
+  double precision :: r0x, r0y, wi, wx, wy, xm, ym, r0x2, r0y2, xs, ys
+  double precision :: rho, rho2, phir, phix, phiy, norm, r1, zz
+  logical :: bborbit
+  logical, save :: first= .true. 
+
+  integer :: get_option
+  double precision :: node_value
+    
   !---- initialize.
   bborbit = get_option('bborbit ') .ne. 0
-  pi=get_variable('pi ')
   ! mean radii of the is given via variables sigx and sigy
   r0x = node_value('sigx ')
   r0y = node_value('sigy ')
   wi = node_value('width ')
   ! width is given as FWHM of parabolic density profile, but formulas were
   ! derived with half width at the bottom of the parabolic density profile
-  wi = wi/sqrt(2d0)
+  wi = wi/sqrt(two)
   xm = node_value('xma ')
   ym = node_value('yma ')
   ipos = 0
@@ -2654,194 +2233,60 @@ subroutine ttbb_hollowparabolic(track,ktrack,fk)
   !-----      preliminary the only case considered.
   !
   if (abs(r0x2 - r0y2) .gt. ten3m * (r0x2 + r0y2)) then
-     zz = 5d-1*(r0x + r0y)
-     r0x=zz
-     r0y=zz
-     r0x2=r0x*r0x
-     r0y2=r0y*r0y
-     if(first) then
-        first=.false.
-        call aawarn('TTBB_HOLLOWPARABOLIC: ',                         &
-             'beam is assumed to be circular')
-     endif
+     zz = half*(r0x + r0y)
+     r0x = zz
+     r0y = zz
+     r0x2 = r0x*r0x
+     r0y2 = r0y*r0y
+     if (first) call fort_warn('TTBB_HOLLOWPARABOLIC: ', 'beam is assumed to be circular')
+     first = .false.
   endif
-!$OMP PARALLEL PRIVATE(itrack, xs, ys, rho, rho2, phir, phix, phiy)
+
+!$OMP PARALLEL PRIVATE(i, xs, ys, rho, rho2, phir, phix, phiy)
 !$OMP DO
-  do itrack = 1, ktrack
-     xs = track(1,itrack) - xm
-     ys = track(3,itrack) - ym
+  do i = 1, ktrack
+     xs = track(1,i) - xm
+     ys = track(3,i) - ym
      rho2 = xs * xs + ys * ys
      rho  = sqrt(rho2)
-     if(rho.le.r0x-wx) then
-        phix = 0d0
-        phiy = 0d0
-     else if(rho.gt.r0x-wx.and.rho.lt.r0x+wx) then
-        phir=75d-2/wx/r0x/rho2*(r0x**4/twelve/wx**2 - r0x**2/2d0 +       &
-             2d0*r0x*wx/3d0 - wx**2/four + rho2/2d0*(1d0 -                    &
-             r0x**2/wx**2) + rho**3/3d0*2d0*r0x/wx**2 -                       &
-             rho**4/four/wx**2)
+     if (rho.le.r0x-wx) then
+        phix = zero
+        phiy = zero
+     else if (rho.gt.r0x-wx .and. rho.lt.r0x+wx) then
+        phir = three/four/wx/r0x/rho2 * (r0x**4/twelve/wx**2 - r0x**2/two + &
+             two*r0x*wx/three - wx**2/four + rho2/two*(one - r0x**2/wx**2) + & 
+             rho**3/three*two*r0x/wx**2 - rho**4/four/wx**2)
         phix = phir*xs
         phiy = phir*ys
      else
-        phir = 1d0/rho2
+        phir = one/rho2
         phix = xs*phir
         phiy = ys*phir
      endif
-     track(2,itrack) = track(2,itrack)+phix*fk
-     track(4,itrack) = track(4,itrack)+phiy*fk
+     track(2,i) = track(2,i) + phix*fk
+     track(4,i) = track(4,i) + phiy*fk
   end do
 !$OMP END DO
 !$OMP END PARALLEL
 
 end subroutine ttbb_hollowparabolic
-!!$subroutine ttbb_old(track,ktrack,parvec)
-!!$
-!!$  use bbfi
-!!$  implicit none
-!!$
-!!$  !----------------------------------------------------------------------*
-!!$  ! purpose:                                                             *
-!!$  !   track a set of particle through a beam-beam interaction region.    *
-!!$  !   see mad physicist's manual for the formulas used.                  *
-!!$  !input:                                                                *
-!!$  ! input/output:                                                        *
-!!$  !   track(6,*)(double)  track coordinates: (x, px, y, py, t, pt).      *
-!!$  !   ktrack    (integer) number of tracks.                              *
-!!$  !----------------------------------------------------------------------*
-!!$  logical bborbit
-!!$  integer ktrack,itrack,ipos,get_option
-!!$  double precision track(6,*),parvec(*),pi,sx,sy,xm,ym,sx2,sy2,xs,  &
-!!$       ys,rho2,fk,tk,phix,phiy,rk,xb,yb,crx,cry,xr,yr,r,r2,cbx,cby,      &
-!!$       get_variable,node_value,ten3m,explim
-!!$  parameter(ten3m=1d-3,          &
-!!$       explim=150d0)
-!!$  !     if x > explim, exp(-x) is outside machine limits.
-!!$
-!!$  !---- initialize.
-!!$  bborbit = get_option('bborbit ') .ne. 0
-!!$  pi=get_variable('pi ')
-!!$  sx = node_value('sigx ')
-!!$  sy = node_value('sigy ')
-!!$  xm = node_value('xma ')
-!!$  ym = node_value('yma ')
-!!$  fk = 2d0 * parvec(5) * parvec(6) / parvec(7)
-!!$  if (fk .eq. 0d0)  return
-!!$  ipos = 0
-!!$  if (.not. bborbit)  then
-!!$     !--- find position of closed orbit bb_kick
-!!$     do ipos = 1, bbd_cnt
-!!$        if (bbd_loc(ipos) .eq. bbd_pos)  goto 1
-!!$     enddo
-!!$     ipos = 0
-!!$1    continue
-!!$  endif
-!!$  sx2 = sx*sx
-!!$  sy2 = sy*sy
-!!$  !---- limit formulae for sigma(x) = sigma(y).
-!!$  if (abs(sx2 - sy2) .le. ten3m * (sx2 + sy2)) then
-!!$     do itrack = 1, ktrack
-!!$        xs = track(1,itrack) - xm
-!!$        ys = track(3,itrack) - ym
-!!$        rho2 = xs * xs + ys * ys
-!!$        tk = rho2 / (2d0 * sx2)
-!!$        if (tk .gt. explim) then
-!!$           phix = xs * fk / rho2
-!!$           phiy = ys * fk / rho2
-!!$        else if (rho2 .ne. 0d0) then
-!!$           phix = xs * fk / rho2 * (1d0 - exp(-tk) )
-!!$           phiy = ys * fk / rho2 * (1d0 - exp(-tk) )
-!!$        else
-!!$           phix = 0d0
-!!$           phiy = 0d0
-!!$        endif
-!!$        if (ipos .ne. 0)  then
-!!$           !--- subtract closed orbit kick
-!!$           phix = phix - bb_kick(1,ipos)
-!!$           phiy = phiy - bb_kick(2,ipos)
-!!$        endif
-!!$        track(2,itrack) = track(2,itrack) + phix
-!!$        track(4,itrack) = track(4,itrack) + phiy
-!!$     enddo
-!!$
-!!$     !---- case sigma(x) > sigma(y).
-!!$  else if (sx2 .gt. sy2) then
-!!$     r2 = 2d0 * (sx2 - sy2)
-!!$     r  = sqrt(r2)
-!!$     rk = fk * sqrt(pi) / r
-!!$     do itrack = 1, ktrack
-!!$        xs = track(1,itrack) - xm
-!!$        ys = track(3,itrack) - ym
-!!$        xr = abs(xs) / r
-!!$        yr = abs(ys) / r
-!!$        call ccperrf(xr, yr, crx, cry)
-!!$        tk = (xs * xs / sx2 + ys * ys / sy2) / 2d0
-!!$        if (tk .gt. explim) then
-!!$           phix = rk * cry
-!!$           phiy = rk * crx
-!!$        else
-!!$           xb = (sy / sx) * xr
-!!$           yb = (sx / sy) * yr
-!!$           call ccperrf(xb, yb, cbx, cby)
-!!$           phix = rk * (cry - exp(-tk) * cby)
-!!$           phiy = rk * (crx - exp(-tk) * cbx)
-!!$        endif
-!!$        track(2,itrack) = track(2,itrack) + phix * sign(1d0,xs)
-!!$        track(4,itrack) = track(4,itrack) + phiy * sign(1d0,ys)
-!!$        if (ipos .ne. 0)  then
-!!$           !--- subtract closed orbit kick
-!!$           track(2,itrack) = track(2,itrack) - bb_kick(1,ipos)
-!!$           track(4,itrack) = track(4,itrack) - bb_kick(2,ipos)
-!!$        endif
-!!$     enddo
-!!$
-!!$     !---- case sigma(x) < sigma(y).
-!!$  else
-!!$     r2 = 2d0 * (sy2 - sx2)
-!!$     r  = sqrt(r2)
-!!$     rk = fk * sqrt(pi) / r
-!!$     do itrack = 1, ktrack
-!!$        xs = track(1,itrack) - xm
-!!$        ys = track(3,itrack) - ym
-!!$        xr = abs(xs) / r
-!!$        yr = abs(ys) / r
-!!$        call ccperrf(yr, xr, cry, crx)
-!!$        tk = (xs * xs / sx2 + ys * ys / sy2) / 2d0
-!!$        if (tk .gt. explim) then
-!!$           phix = rk * cry
-!!$           phiy = rk * crx
-!!$        else
-!!$           xb  = (sy / sx) * xr
-!!$           yb  = (sx / sy) * yr
-!!$           call ccperrf(yb, xb, cby, cbx)
-!!$           phix = rk * (cry - exp(-tk) * cby)
-!!$           phiy = rk * (crx - exp(-tk) * cbx)
-!!$        endif
-!!$        track(2,itrack) = track(2,itrack) + phix * sign(1d0,xs)
-!!$        track(4,itrack) = track(4,itrack) + phiy * sign(1d0,ys)
-!!$        if (ipos .ne. 0)  then
-!!$           !--- subtract closed orbit kick
-!!$           track(2,itrack) = track(2,itrack) - bb_kick(1,ipos)
-!!$           track(4,itrack) = track(4,itrack) - bb_kick(2,ipos)
-!!$        endif
-!!$     enddo
-!!$  endif
-!!$end subroutine ttbb_old
 
-subroutine trkill(n, turn, sum, jmax, part_id,                    &
+subroutine trkill(n, turn, sum, jmax, part_id, &
      last_turn, last_pos, last_orbit, z, aptype)
-
   use name_lenfi
   use spch_bbfi
   implicit none
 
-  !hbu--- kill particle:  print, modify part_id list
-  logical recloss, exit_loss_turn
-  integer i,j,n,turn,part_id(*),jmax,last_turn(*),get_option
-  double precision sum, z(6,*), last_pos(*), last_orbit(6,*),       &
-       torb(6) !, theta, node_value, st, ct, tmp
-  character(name_len) aptype
-  !hbu
-  character(name_len) el_name
+  integer :: n, turn, jmax, part_id(*), last_turn(*)
+  double precision :: z(6,*), last_pos(*), last_orbit(6,*), sum
+  character(len=name_len) :: aptype
+
+  integer :: i, j
+  double precision :: torb(6) 
+  logical :: recloss, exit_loss_turn
+  character(len=name_len) :: el_name
+
+  integer, external :: get_option
 
   recloss = get_option('recloss ') .ne. 0
   exit_loss_turn = get_option('exit_loss_turn ') .ne. 0
@@ -2849,7 +2294,7 @@ subroutine trkill(n, turn, sum, jmax, part_id,                    &
   !!--- As elements might have a tilt we have to transform back
   !!--- into the original coordinate system!
   !      theta = node_value('tilt ')
-  !      if (theta .ne. 0d0)  then
+  !      if (theta .ne. zero)  then
   !          st = sin(theta)
   !          ct = cos(theta)
   !!--- rotate trajectory (at exit)
@@ -2863,44 +2308,33 @@ subroutine trkill(n, turn, sum, jmax, part_id,                    &
 
   last_turn(part_id(n)) = turn
   last_pos(part_id(n)) = sum
-  do j = 1, 6
-     torb(j) = z(j,n)
-     last_orbit(j,part_id(n)) = z(j,n)
-  enddo
+  TORB = Z(:,n)
+  LAST_ORBIT(:,part_id(n)) = Z(:,n)
 
-  !hbu
   call element_name(el_name,len(el_name))
-  !hbu
+
   write(6,'(''particle #'',i6,'' lost turn '',i6,''  at pos. s ='', f10.2,'' element='',a,'' aperture ='',a)') &
        part_id(n),turn,sum,el_name,aptype
   print *,"   X=",z(1,n),"  Y=",z(3,n),"  T=",z(5,n)
 
-  if(exit_loss_turn) then
+  if (exit_loss_turn) then
      lost_in_turn = .true.
      is_lost = .true.
   endif
  
-  if(recloss) then
-     call tt_ploss(part_id(n),turn,sum,torb,el_name)
-  endif
+  if (recloss) call tt_ploss(part_id(n),turn,sum,torb,el_name)
 
   do i = n+1, jmax
      part_id(i-1) = part_id(i)
-     do j = 1, 6
-        z(j,i-1) = z(j,i)
-     enddo
+     Z(:,i-1) = Z(:,i)
   enddo
   jmax = jmax - 1
 
 end subroutine trkill
 
-
 subroutine tt_ploss(npart,turn,spos,orbit,el_name)
-
   use name_lenfi
   implicit none
-
-  !hbu added spos
   !----------------------------------------------------------------------*
   !--- purpose: enter lost particle coordinates in table                 *
   !    input:                                                            *
@@ -2910,30 +2344,27 @@ subroutine tt_ploss(npart,turn,spos,orbit,el_name)
   !    orbit  (double array)  particle orbit                             *
   !    orbit0 (double array)  reference orbit                            *
   !----------------------------------------------------------------------*
-  integer npart,turn,j
-  double precision orbit(6),tmp,tt,tn
-  double precision energy,get_value
-  character(120) table
-  character(name_len) el_name
-  !hbu
-  double precision spos
-  !hbu
-  character(4) vec_names(7)
-  !hbu
+  integer :: npart, turn
+  double precision :: spos, orbit(6)
+  character(len=name_len) :: el_name
+
+  integer :: j
+  double precision :: tmp, tt, tn, energy
+  character(len=120) :: table='trackloss'
+  character(len=4) :: vec_names(7)
   data vec_names / 'x', 'px', 'y', 'py', 't', 'pt', 's' /
-  data table / 'trackloss' /
+
+  double precision, external :: get_value
 
   tn = npart
   tt = turn
 
   energy = get_value('probe ','energy ')
 
-
   ! the number of the current particle
   call double_to_table_curr(table, 'number ', tn)
   ! the number of the current turn
   call double_to_table_curr(table, 'turn ', tt)
-  !hbu spos
 
   call double_to_table_curr(table,vec_names(7),spos)
 
@@ -2941,20 +2372,17 @@ subroutine tt_ploss(npart,turn,spos,orbit,el_name)
      tmp = orbit(j)
      call double_to_table_curr(table, vec_names(j), tmp)
   enddo
+
   call double_to_table_curr(table, 'e ', energy)
   call string_to_table_curr(table, 'element ', el_name)
 
   call augment_count(table)
 end subroutine tt_ploss
 
-
 subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
-     spos,ielem,el_name)
-
+                     spos,ielem,el_name)
   use name_lenfi
   implicit none
-
-  !hbu added spos, ielem, el_name
   !----------------------------------------------------------------------*
   !--- purpose: enter all particle coordinates in one table              *
   !    input:                                                            *
@@ -2966,32 +2394,23 @@ subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
   !    z (double (6,*))       particle orbits                            *
   !    orbit0 (double array)  reference orbit                            *
   !----------------------------------------------------------------------*
-  logical first
-  integer i,j,npart,turn,tot_segm,segment,part_id(*),length
-  double precision z(6,*),orbit0(6),tmp,tt,ss
-  !hbu was *36 allow longer info
-  character(120) table,comment
-  !hbu
-  integer ielem
-  !hbu name of element
-  character(name_len) el_name
-  !hbu
-  double precision spos
-  !hbu
-  character(4) vec_names(7)
-  !hbu
-  data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
-  data table / 'trackone' /
-  save first
-  data first / .true. /
+  integer :: npart, turn, tot_segm, segment, part_id(*), ielem
+  double precision :: z(6,*), orbit0(6)
+  character(len=name_len) :: el_name
 
-  !hbu
+  logical, save :: first = .true.
+  integer :: i, j, length
+  double precision :: tmp, tt, ss, spos
+  character(len=120) :: table = 'trackone', comment
+  character(len=4) :: vec_names(7)
+  data vec_names / 'x', 'px', 'y', 'py', 't', 'pt','s' /
+
   length = len(comment)
   segment = segment + 1
-  !hbu
-  write(comment, '(''#segment'',4i8,1X,A)')                         &
-       segment,tot_segm,npart,ielem,el_name
-  if(first) call comment_to_table_curr(table, comment, length)
+
+  write(comment, '(''#segment'',4i8,1X,A)') segment, tot_segm, npart, ielem, el_name
+  if (first) call comment_to_table_curr(table, comment, length)
+
   tt = turn
   do i = 1, npart
      call double_to_table_curr(table, 'turn ', tt)
@@ -3001,19 +2420,13 @@ subroutine tt_putone(npart,turn,tot_segm,segment,part_id,z,orbit0,&
         tmp = z(j,i) - orbit0(j)
         call double_to_table_curr(table, vec_names(j), tmp)
      enddo
-     !hbu spos
      call double_to_table_curr(table,vec_names(7),spos)
      call augment_count(table)
   enddo
 end subroutine tt_putone
 
-
-
 subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
-
   implicit none
-
-  !hbu added spos
   !----------------------------------------------------------------------*
   !--- purpose: enter particle coordinates in table                      *
   !    input:                                                            *
@@ -3023,17 +2436,16 @@ subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
   !    orbit  (double array)  particle orbit                             *
   !    orbit0 (double array)  reference orbit                            *
   !----------------------------------------------------------------------*
-  integer npart,turn,j,nobs
-  double precision orbit(6),orbit0(6),tmp,tt,tn
-  double precision energy, get_value
-  character(36) table
-  !hbu
-  double precision spos
-  !hbu
-  character(4) vec_names(7)
-  !hbu
+  integer, intent(IN) :: npart, turn, nobs
+  double precision, intent(IN) :: orbit(6), orbit0(6), spos 
+
+  integer :: i
+  double precision :: energy, tmp, tt, tn
+  character(len=36) :: table='track.obs$$$$.p$$$$'
+  character(len=4) :: vec_names(7)
   data vec_names / 'x', 'px', 'y', 'py', 't', 'pt', 's' /
-  data table / 'track.obs$$$$.p$$$$' /
+
+  double precision, external :: get_value
 
   tt = turn
   tn = npart
@@ -3043,30 +2455,26 @@ subroutine tt_puttab(npart,turn,nobs,orbit,orbit0,spos)
 
   energy = get_value('probe ','energy ')
 
-  call double_to_table_curr(table, 'turn ', tt)   ! the number of the cur
-  call double_to_table_curr(table, 'number ', tn) ! the number of the cur
+  call double_to_table_curr(table, 'turn ', tt) 
+  call double_to_table_curr(table, 'number ', tn)
   call double_to_table_curr(table, 'e ', energy)
-
-  do j = 1, 6
-     tmp = orbit(j) - orbit0(j)
-     call double_to_table_curr(table, vec_names(j), tmp)
+  do i = 1, 6
+     tmp = orbit(i) - orbit0(i)
+     call double_to_table_curr(table, vec_names(i), tmp)
   enddo
-  !hbu spos
   call double_to_table_curr(table,vec_names(7),spos)
   call augment_count(table)
 end subroutine tt_puttab
 
 subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, & 
-     turn, sum, part_id, last_turn, last_pos, last_orbit, z, ntrk)
-
+                 turn, sum, part_id, last_turn, last_pos, last_orbit, z, ntrk)
   use twiss0fi
   use name_lenfi
   use Inf_NaN_Detection
+  use math_constfi, only : zero, one, pi
   implicit none
-
   ! 2015-Feb-20  18:46:05  ghislain: rewrite of trcoll
   ! 2015-Mar-09  14:50:37  ghislain: adapted to new racetrack parameter definition
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   test for aperture limit.                                           *
@@ -3091,48 +2499,41 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
   !   z(6,*)    (double)    track coordinates: (x, px, y, py, t, pt).    *
   !   ntrk      (integer) number of surviving tracks.                    *
   !----------------------------------------------------------------------*
+  character(len=name_len) :: apertype
+  double precision :: aperture(*), offset(2), al_errors(align_max), maxaper(6)
+  double precision :: sum, last_pos(*), last_orbit(6,*), z(6,*)
+  integer :: turn, part_id(*), last_turn(*), ntrk
 
-  integer turn, part_id(*), last_turn(*), ntrk, i, n, nn, get_option, optiondebug
+  integer :: i, n, nn
+  double precision :: ap1, ap2, ap3, ap4, x, y!, pi
+  logical :: lost, debug
 
-  double precision aperture(*),sum,last_pos(*),last_orbit(6,*),z(6,*), al_errors(align_max), offset(2), maxaper(6)
+  integer, external :: get_option
+  double precision, parameter :: min_double=1.d-36
 
-  double precision ap1, ap2, ap3, ap4, x, y, min_double, pi, zero, get_variable
-
-  character(name_len) apertype
-
-  logical lost
-
-  parameter(min_double = 1.e-36)
-  parameter(zero=0.d0)
-
-  pi=get_variable('pi ')
-
-  optiondebug = get_option('debug ')
+  debug = get_option('debug ') .ne. 0
 
   !--- First check aperture parameters  
-     ap1 = zero
-     ap2 = zero
-     ap3 = zero
-     ap4 = zero
+  ap1 = zero ; ap2 = zero ; ap3 = zero ; ap4 = zero
 
-     select case (apertype)
+  select case (apertype)
 
      case ("circle")
         ap1 = aperture(1)
-        if(ap1.lt.min_double) then
-           if (optiondebug .ne. 0) print *, " zero or negative circle radius ", ap1, " replaced by default ", maxaper(1)
+        if (ap1.lt.min_double) then
+           if (debug) print *, " zero or negative circle radius ", ap1, " replaced by default ", maxaper(1)
            ap1 = maxaper(1)
         endif
      
-     case("ellipse")
+     case ("ellipse")
         ap1 = aperture(1)
         ap2 = aperture(2)
-        if(ap1.lt.min_double) then
-           if (optiondebug .ne. 0) print *, " zero half-axis ellipse  ", ap1, " replaced by default ", maxaper(1)
+        if (ap1.lt.min_double) then
+           if (debug) print *, " zero half-axis ellipse  ", ap1, " replaced by default ", maxaper(1)
            ap1 = maxaper(1)
         endif
-        if(ap2.lt.min_double) then
-           if (optiondebug .ne. 0) print *, " zero half-axis ellipse  ", ap2, " replaced by default ", maxaper(3)
+        if (ap2.lt.min_double) then
+           if (debug) print *, " zero half-axis ellipse  ", ap2, " replaced by default ", maxaper(3)
            ap2 = maxaper(3)
         endif
 
@@ -3140,172 +2541,172 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
         ap1 = aperture(1)
         ap2 = aperture(2)
         if (ap1.lt.min_double) then
-           if (optiondebug .ne. 0) print *, " zero or negative horizontal extent ", ap1, " replaced by default ", maxaper(1)
+           if (debug) print *, " zero or negative horizontal extent ", ap1, " replaced by default ", maxaper(1)
            ap1 = maxaper(1)
         endif
         if (ap2.lt.min_double) then
-           if (optiondebug .ne. 0) print *, " zero or negative vertical extent ", ap2, " replaced by default ", maxaper(3)
+           if (debug) print *, " zero or negative vertical extent ", ap2, " replaced by default ", maxaper(3)
            ap2 = maxaper(3)
         endif
         
-     case("lhcscreen", "rectcircle")
+     case ("lhcscreen", "rectcircle")
         !*****         test circle
         ap3 = aperture(3)
-        if(ap3.lt.min_double) then
-           if (optiondebug .ne. 0) print *, " zero or negative circle radius ", ap3, " replaced by default ", maxaper(1)
+        if (ap3.lt.min_double) then
+           if (debug) print *, " zero or negative circle radius ", ap3, " replaced by default ", maxaper(1)
            ap3 = maxaper(1)
         endif
         !*****         test rectangle
         ap1 = aperture(1)
         ap2 = aperture(2)
         if (ap1.lt.min_double) then
-           if (optiondebug .ne. 0) print *, " zero or negative horizontal extent ", ap1, " replaced by default ", maxaper(1)
+           if (debug) print *, " zero or negative horizontal extent ", ap1, " replaced by default ", maxaper(1)
            ap1 = maxaper(1)
         endif
         if (ap2.lt.min_double) then
-           if (optiondebug .ne. 0) print *, " zero or negative vertical extent ", ap2, " replaced by default ", maxaper(3)
+           if (debug) print *, " zero or negative vertical extent ", ap2, " replaced by default ", maxaper(3)
            ap2 = maxaper(3)
         endif
            
-     case("rectellipse")
+     case ("rectellipse")
         !*****         test ellipse
         ap3 = aperture(3)
         ap4 = aperture(4)
-        if(ap3.lt.min_double) then
-           if (optiondebug .ne. 0) print *, " zero or negative ellipse half axis ", ap3, " replaced by default ", maxaper(1)
+        if (ap3.lt.min_double) then
+           if (debug) print *, " zero or negative ellipse half axis ", ap3, " replaced by default ", maxaper(1)
            ap3 = maxaper(1)
         endif
-        if(ap4.lt.min_double) then
-           if (optiondebug .ne. 0) print *, " zero or negative ellipse half axis ", ap4, " replaced by default ", maxaper(3)
+        if (ap4.lt.min_double) then
+           if (debug) print *, " zero or negative ellipse half axis ", ap4, " replaced by default ", maxaper(3)
            ap4 = maxaper(3)
         endif
         !*****         test rectangle
         ap1 = aperture(1)
         ap2 = aperture(2)
        if (ap1.lt.min_double) then
-           if (optiondebug .ne. 0) print *, " zero or negative horizontal extent ", ap1, " replaced by default ", maxaper(1)
+           if (debug) print *, " zero or negative horizontal extent ", ap1, " replaced by default ", maxaper(1)
            ap1 = maxaper(1)
         endif
         if (ap2.lt.min_double) then
-           if (optiondebug .ne. 0) print *, " zero or negative vertical extent ", ap2, " replaced by default ", maxaper(3)
+           if (debug) print *, " zero or negative vertical extent ", ap2, " replaced by default ", maxaper(3)
            ap2 = maxaper(3)
         endif
  
-     case("racetrack")
+     case ("racetrack")
         ap1 = aperture(1)
         ap2 = aperture(2)
         ap3 = aperture(3)
         ap4 = aperture(4)        
         if (ap1.lt.min_double) then
-           if (optiondebug .ne. 0) print *, " zero or negative horizontal extent ", ap1, " replaced by default ", maxaper(1)
+           if (debug) print *, " zero or negative horizontal extent ", ap1, " replaced by default ", maxaper(1)
            ap1 = maxaper(1)
         endif
         if (ap2.lt.min_double) then
-           if (optiondebug .ne. 0) print *, " zero or negative vertical extent ", ap2, " replaced by default ", maxaper(3)
+           if (debug) print *, " zero or negative vertical extent ", ap2, " replaced by default ", maxaper(3)
            ap2 = maxaper(3)
         endif
-        if (ap3.lt.0.d0) then ! zero extent of rounded corned is allowed
-           if (optiondebug .ne. 0) print *, " negative horizontal semi-axis ", ap3, & 
+        if (ap3.lt.zero) then ! zero extent of rounded corned is allowed
+           if (debug) print *, " negative horizontal semi-axis ", ap3, & 
                 "; horizontal semi-axis reset to horizontal extent", ap1
            ap3 = ap1
         endif
-        if (ap4.lt.0.d0) then ! zero extent of rounded corner is allowed
-           if (optiondebug .ne. 0) print *, " negative vertical semi-axis ", ap4, & 
+        if (ap4.lt.zero) then ! zero extent of rounded corner is allowed
+           if (debug) print *, " negative vertical semi-axis ", ap4, & 
                 "; horizontal semi-axis reset to horizontal extent", ap2
            ap4 = ap2
         endif
         if (ap3.gt.ap1) then
-           if (optiondebug .ne. 0) print *, " horizontal semi-axis ", ap3, " is larger than horizontal extent ", ap1, &
+           if (debug) print *, " horizontal semi-axis ", ap3, " is larger than horizontal extent ", ap1, &
                 "; horizontal semi-axis reset to horizontal extent"
            ap3 = ap1
         endif
         if (ap4.gt.ap2) then
-           if (optiondebug .ne. 0) print *, " vertical semi-axis", ap4, " is larger than vertical extent ", ap2, &
+           if (debug) print *, " vertical semi-axis", ap4, " is larger than vertical extent ", ap2, &
                 "; vertical semi-axis reset to vertical extent"           
            ap4 = ap2
         endif
         
-     case("octagon")
+     case ("octagon")
         ! 2015-Feb-20  18:42:26  ghislain: added octagon shape           
         ap1 = aperture(1)
         ap2 = aperture(2)
         ap3 = aperture(3)
         ap4 = aperture(4)
         if (ap1.lt.min_double) then
-           if (optiondebug .ne. 0) print *, " zero or negative horizontal extent ", ap1, " replaced by default ", maxaper(1)
+           if (debug) print *, " zero or negative horizontal extent ", ap1, " replaced by default ", maxaper(1)
            ap1 = maxaper(1)
         endif
         if (ap2.lt.min_double) then
-           if (optiondebug .ne. 0) print *, " zero or negative vertical extent ", ap2, " replaced by default ", maxaper(3)
+           if (debug) print *, " zero or negative vertical extent ", ap2, " replaced by default ", maxaper(3)
            ap2 = maxaper(3)
         endif
         if (ap3.lt.zero .or. ap3.gt.pi/2) then
-           if (optiondebug .ne. 0) print *, " first angle is not in first quadrant ", ap3, " replaced by default ", zero
+           if (debug) print *, " first angle is not in first quadrant ", ap3, " replaced by default ", zero
            ap3 = zero
         endif
         if (ap4.lt.zero .or. ap4.gt.pi/2) then
-           if (optiondebug .ne. 0) print *, " second angle is not in first quadrant ", ap4, " replaced by default ", pi/2
+           if (debug) print *, " second angle is not in first quadrant ", ap4, " replaced by default ", pi/2
            ap2 = pi/2
         endif
         if (ap3.gt.ap4) then
-           call aawarn('trcoll:','octagon aperture: first and second angles inverted. exit from trcoll')
+           call fort_warn('trcoll:','octagon aperture: first and second angles inverted. exit from trcoll')
            return
         endif
         
      case default
         ! add error case for un-identified aperture type; 
         ! this INCLUDES the case of aperture data given in file with input APERTYPE=filename!
-        call aawarn('trcoll:','called with unknown aperture type. Ignored')
+        call fort_warn('trcoll:','called with unknown aperture type. Ignored')
         
-     end select
+  end select
 
-!--- Then track through
+  !--- Then track through
 
   n = 1
 10 continue
 
   do i = n, ntrk
 
-     if (ISNAN(z(1,i)) .or. ISNAN(z(3,i)))  then 
-        lost = .true.
-        goto 99
+     if (ISNAN(z(1,i)) .or. ISNAN(z(3,i))) then
+        lost = .true. 
+        goto 99 ! lost...
      endif
 
      lost = .false. 
 
-     x = abs(z(1,i)-al_errors(11)-offset(1))
-     y = abs(z(3,i)-al_errors(12)-offset(2))
+     x = abs(z(1,i) - al_errors(11) - offset(1))
+     y = abs(z(3,i) - al_errors(12) - offset(2))
 
      select case (apertype)
 
      case ("circle")
-        lost = (x/ap1)**2 + (y/ap1)**2 .gt. 1d0  
+        lost = (x/ap1)**2 + (y/ap1)**2 .gt. one  
      
-     case("ellipse")
-        lost = (x/ap1)**2 + (y/ap2)**2 .gt. 1d0
+     case ("ellipse")
+        lost = (x/ap1)**2 + (y/ap2)**2 .gt. one
 
      case ("rectangle")
         lost =  x .gt. ap1 .or. y .gt. ap2
         
-     case("lhcscreen", "rectcircle")
-        lost = x .gt. ap1 .or. y .gt. ap2 .or. (x/ap3)**2 + (y/ap3)**2 .gt. 1d0 
+     case ("lhcscreen", "rectcircle")
+        lost = x .gt. ap1 .or. y .gt. ap2 .or. (x/ap3)**2 + (y/ap3)**2 .gt. one 
   
-     case("rectellipse")
-       lost =  x .gt. ap1 .or. y .gt. ap2 .or. (x/ap3)**2 + (y/ap4)**2 .gt. 1d0 
+     case ("rectellipse")
+       lost =  x .gt. ap1 .or. y .gt. ap2 .or. (x/ap3)**2 + (y/ap4)**2 .gt. one 
  
-     case("racetrack")
+     case ("racetrack")
         ! 2015-Mar-09  15:05:39  ghislain: adapted to new racetrack parameter definition
         !*** case of racetrack: test outer rectangle (ap1,ap2) first
         !    then test ellipse for corner part.
         lost =  x .gt. ap1 .or. y .gt. ap2 .or. &
              ( x .gt. ap1-ap3 .and. y .gt. ap2-ap3 .and. & 
-               ((x-(ap1-ap3)) / ap3)**2 + ((y-(ap2-ap3)) / ap4)**2 .gt. 1.d0 )
+               ((x-(ap1-ap3)) / ap3)**2 + ((y-(ap2-ap3)) / ap4)**2 .gt. one )
         
-     case("octagon")
+     case ("octagon")
         ! 2015-Feb-20  18:42:26  ghislain: added octagon shape           
         !*** case of octagon: test outer rectangle (ap1,ap2) then test cut corner.
         lost =  x .gt. ap1 .or. y .gt. ap2 .or. & 
-             (ap2*tan(pi/2 - ap4) - ap1)*(y - ap1*tan(ap3)) - (ap2 - ap1*tan(ap3))*(x - ap1) .lt. 0 
+             (ap2*tan(pi/2 - ap4) - ap1)*(y - ap1*tan(ap3)) - (ap2 - ap1*tan(ap3))*(x - ap1) .lt. zero 
 
      case default
         
@@ -3315,8 +2716,8 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
 99   if (lost) then 
         n = i
         call trkill(n, turn, sum, ntrk, part_id, last_turn, last_pos, last_orbit, z, apertype)
-        if(ntrk.eq.0) then
-           call aawarn('trcoll: ','Particle Number equals zero: exit from trcoll')
+        if (ntrk .eq. 0) then
+           call fort_warn('trcoll: ','Particle Number equals zero: exit from trcoll')
            return
         endif
         ! particle numbering has been reset by trkill, restart the loop with new paramaters.
@@ -3327,15 +2728,12 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
 end subroutine trcoll
 
 subroutine ttrfloss(turn, sum, part_id, last_turn, last_pos, last_orbit, z, ntrk)
-
   use twiss0fi
   use name_lenfi
   use trackfi
   use Inf_NaN_Detection
   implicit none
-
   ! FRS: August 2013
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Find particles outside the bucket.                                 *
@@ -3350,46 +2748,42 @@ subroutine ttrfloss(turn, sum, part_id, last_turn, last_pos, last_orbit, z, ntrk
   !   z(6,*)    (double)    track coordinates: (x, px, y, py, t, pt).    *
   !   ntrk      (integer) number of surviving tracks.                    *
   !----------------------------------------------------------------------*
-  integer turn,part_id(*),last_turn(*),ntrk,i,n,nn,  &
-       get_option, optiondebug
-  double precision sum,last_pos(*),last_orbit(6,*),z(6,*), &
-       al_errors(align_max),offx,offy
-  character(name_len) :: non_app="RF-Bucket"
-
-  optiondebug = get_option('debug ')
+  integer :: turn, part_id(*), last_turn(*), ntrk
+  double precision :: sum, last_pos(*), last_orbit(6,*), z(6,*)
+  
+  integer :: i, n, nn
+  double precision :: al_errors(align_max), offx, offy
+  character(len=name_len) :: non_app="RF-Bucket"
 
   n = 1
 10 continue
   do i = n, ntrk
 
      !---- Is particle outside the bucket?
-     if(ISNAN(z(5,i)).or.ISNAN(z(6,i))) goto 99
-     if(abs(z(5,i)).gt.t_max.or.abs(z(6,i)).gt.pt_max) goto 99
-     ! break if particle is inside aperture and continue the loop
-     go to 98
+     if (ISNAN(z(5,i)) .or. ISNAN(z(6,i))) goto 99
+     if (abs(z(5,i)).gt.t_max .or. abs(z(6,i)).gt.pt_max) goto 99
+     ! if particle is inside aperture, stop treatment and continue the loop
+     cycle
 
      ! lose particle if it is outside aperture
 99   n = i
-     nn=name_len
-     call trkill(n, turn, sum, ntrk, part_id,                        &
-          last_turn, last_pos, last_orbit, z, non_app)
-     if(ntrk.eq.0) then
-        call aawarn('ttrfloss: ',&
-             'Particle Number equals zero: exit from ttrfloss')
-        return
+     nn = name_len
+     call trkill(n, turn, sum, ntrk, part_id, last_turn, last_pos, last_orbit, z, non_app)
+     if (ntrk .eq. 0) then
+        call fort_warn('ttrfloss: ', 'Particle Number equals zero: exit from ttrfloss')
+        return 
      endif
-     goto 10
 
-98   continue
+     goto 10 ! restart loop starting where we had left off (n=i)
+
   enddo
 end subroutine ttrfloss
 
 subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
-
   use bbfi
   use trackfi
+  use math_constfi, only : zero, one, twopi
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Define initial conditions for all particles to be tracked          *
@@ -3404,150 +2798,126 @@ subroutine trinicmd(switch,orbit0,eigen,jend,z,turns,coords)
   !   z(6,jend) - Transformed cartesian coordinates incl. c.o.           *
   !   coords      dp(6,0:turns,npart) (only switch > 1) particle coords. *
   !----------------------------------------------------------------------*
-  logical zgiv,zngiv
-  integer j,jend,k,kp,kq,next_start,itype(23),switch,turns,jt
-  double precision phi,track(12),zstart(12),twopi,z(6,*),zn(6),     &
-       ex,ey,et,orbit0(6),eigen(6,6),x,px,y,py,t,deltae,fx,phix,fy,phiy, &
-       ft,phit,get_value,get_variable,deltax,coords(6,0:turns,*)
-  double precision deltap
-  character(120) msg(2)
+  integer :: switch, jend, turns 
+  double precision :: orbit0(6), eigen(6,6), z(6,*), coords(6,0:turns,*) 
+
+  logical :: run=.false., dynap=.false. 
+  logical :: zgiv, zngiv
+  integer :: j, k, kp, kq,  itype(23), jt
+  double precision :: track(12), zstart(12), zn(6)
+  double precision :: ex, ey, et, x, px, y, py, t, deltae
+  double precision :: fx, phix, fy, phiy, ft, phit
+  double precision :: deltax, deltap, phi
+
+  double precision, external :: get_value, get_variable
+  integer, external :: next_start
+
+  ! 2015-Jul-08  19:16:53  ghislain: make code more readable
+  run   = switch .eq. 1
+  dynap = switch .eq. 2
 
   deltap = get_variable('track_deltap ')
   !---- Initialise orbit, emittances and eigenvectors etc.
-  j = 0
-  twopi = get_variable('twopi ')
   ex = get_value('probe ','ex ')
   ey = get_value('probe ','ey ')
   et = get_value('probe ','et ')
-  
-!  print*, " "
-!  write(6,'(a16,1x,5ES8.1)') "EMITTANCES ",ex,ey,et, &
-!                           get_value('probe ','sigt '), get_value('probe ','sige ')
-  
   bet0  = get_value('beam ','beta ')
-  bet0i = 1d0 / bet0
+  bet0i = one / bet0
   !-----get x add-on for lyaponuv calculation from dynap table
   deltax = get_value('dynap ', 'lyapunov ')
-1 continue
-  jt  =  next_start(x,px,y,py,t,deltae,fx,phix,fy,phiy,ft,phit)
-  
-  if (switch.gt.1) then
-     j = 2*jt-1
-  else
-     j = jt
-  endif
-  if (j .ne. -1 .and. j.ne.0)  then
 
-!     print*, "SWITCH ", switch
-!     write(6,'(a16,1x,6ES8.1)') "trinicmd can",x,px,y,py,t,deltae
-!     write(6,'(a16,1x,6ES8.1)') "trinicmd fxs",fx,phix,fy,phiy,ft,phit
-  
-     if (switch .lt. 3 .or. j .eq. 1)  then
-        jend = j
-        if (switch.gt.1) jend=jend+1
-        !---- Get start coordinates
-        track(1) = x
-        track(2) = px
-        track(3) = y
-        track(4) = py
-        track(5) = t
-        !          track(6) = deltae
-        !---- Here we absorb deltap into the PT variable
-        track(6) = deltae + sqrt((1d0+deltap)**2+bet0i**2-1d0)-bet0i
-        track(7) = fx
-        track(8) = phix
-        track(9) = fy
-        track(10) = phiy
-        track(11) = ft
-        track(12) = phit
-        do k = 1,12
-           if(abs(track(k)).ne.0d0) then
-              itype(k) = 1
-           else
-              itype(k) = 0
-           endif
-        enddo
-        !---- Normalized coordinates.
-        do kq = 1, 5, 2
-           kp = kq + 1
-           phi = twopi * track(kq+7)
-           zn(kq) =   track(kq+6) * cos(phi)
-           zn(kp) = - track(kq+6) * sin(phi)
-        enddo
-        !---- Transform to unnormalized coordinates and refer to closed orbit.
-        zgiv = .false.
-        zngiv = .false.
-        do k = 1, 6
-           if (itype(k) .ne. 0) then
-             zgiv = .true.
-           endif
-           
-           if (itype(k+6) .ne. 0) then 
-             zngiv = .true.
-           endif  
-           
-           zstart(k) = track(k)                                        &
-                + sqrt(ex) * (eigen(k,1) * zn(1) + eigen(k,2) * zn(2))            &
-                + sqrt(ey) * (eigen(k,3) * zn(3) + eigen(k,4) * zn(4))            &
-                + sqrt(et) * (eigen(k,5) * zn(5) + eigen(k,6) * zn(6))
-        enddo
+  j = 0
 
-        !write(6,'(a8,1x,i3,6(1x,ES8.1),a4,6(1x,ES8.1))') "zstart ",j, zstart(1:6), " zn ",zn(1:6) 
-
-        if (switch .gt. 1)  then
-           !--- keep initial coordinates for dynap
-           do k = 1, 6
-              coords(k,0,j) = zstart(k)
-           enddo
+  do ! loop over particles to be STARTed
+     jt  =  next_start(x,px,y,py,t,deltae,fx,phix,fy,phiy,ft,phit)
+     
+     if (jt .eq. 0)  return
+     
+     j = jt   ; if (dynap) j = 2*jt - 1
+     jend = j ; if (dynap) jend = jend + 1
+     
+     !---- Get start coordinates
+     track(1) = x
+     track(2) = px
+     track(3) = y
+     track(4) = py
+     track(5) = t
+     ! track(6) = deltae
+     !---- Here we absorb deltap into the PT variable
+     track(6) = deltae + sqrt((one+deltap)**2+bet0i**2-one)-bet0i
+     track(7) = fx
+     track(8) = phix
+     track(9) = fy
+     track(10) = phiy
+     track(11) = ft
+     track(12) = phit
+     
+     do k = 1, 12
+        if (abs(track(k)) .ne. zero) then
+           itype(k) = 1
+        else
+           itype(k) = 0
         endif
-        !---- Warn user about possible data conflict.
-        if (zgiv .and. zngiv) then
-           msg(1) = 'Absolute and normalized coordinates given,'
-           msg(2) = 'Superposition used.'
-           call aawarn('START-1: ', msg(1))
-           call aawarn('START-2: ', msg(2))
-        endif
-        do k = 1, 6
-           z(k,j) = orbit0(k) + zstart(k)
-        enddo
-        if (switch.gt.1) then
-           do k = 1, 6
-              z(k,j+1) = z(k,j)
-              coords(k,0,j+1) = z(k,j+1)
-           enddo
-           z(1,j+1) = z(1,j) + deltax
-           coords(1,0,j+1) = z(1,j+1)
-        endif
+     enddo
+     
+     !---- Normalized coordinates.
+     do kq = 1, 5, 2
+        kp = kq + 1
+        phi = twopi * track(kq+7)
+        zn(kq) =   track(kq+6) * cos(phi)
+        zn(kp) = - track(kq+6) * sin(phi)
+     enddo
+     
+     !---- Transform to unnormalized coordinates and refer to closed orbit.
+     zgiv  = .false.
+     zngiv = .false.
+     do k = 1, 6
+        if (itype(k) .ne. 0)   zgiv  = .true.
+        if (itype(k+6) .ne. 0) zngiv = .true.
+        zstart(k) = track(k) &
+             + sqrt(ex) * (eigen(k,1) * zn(1) + eigen(k,2) * zn(2))  &
+             + sqrt(ey) * (eigen(k,3) * zn(3) + eigen(k,4) * zn(4))  &
+             + sqrt(et) * (eigen(k,5) * zn(5) + eigen(k,6) * zn(6))
+     enddo
+     
+     !--- keep initial coordinates for dynap        
+     if (dynap) COORDS(1:6,0,j) = ZSTART(1:6)
+     
+     if (zgiv .and. zngiv) & !---- Warn user about possible data conflict.
+          call fort_warn('START: ','Absolute and normalized coordinates given, superposition used.')
+     
+     Z(1:6,j) = ORBIT0(1:6) + ZSTART(1:6)
+     
+     if (dynap) then !--- build up paired partners with deltax difference in x
+        z(1,j+1)   = z(1,j)  + deltax
+        Z(2:6,j+1) = Z(2:6,j)
+        COORDS(1:6,0,j+1) = Z(1:6,j+1) 
      endif
-     goto 1
-  endif
-  !      if (switch .eq. 3)  then
-  !--- create second particle with x add-on
-  !        deltax = get_value('dynap ', 'lyapunov ')
-  !        jend = 2
-  !        z(1,jend) = z(1,1) + deltax
-  !        do k = 2, 6
-  !          z(k,jend) = z(k,1)
-  !        enddo
-  !      endif
+        
+  end do ! Loop broken with jt.eq.0 
+
 end subroutine trinicmd
+
 subroutine trbegn(rt,eigen)
-
+  use matrices, only : EYE
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Initialize tracking mode; TRACK command execution.                 *
   !----------------------------------------------------------------------*
-  logical m66sta,onepass
-  integer get_option
-  double precision rt(6,6),reval(6),aival(6),eigen(6,6)
+  double precision :: rt(6,6),eigen(6,6)
+
+  double precision :: reval(6), aival(6)
+  logical :: onepass
+
+  logical :: m66sta
+  integer :: get_option
 
   !---- Initialize
   onepass = get_option('onepass ') .ne. 0
   !---- One-pass system: Do not normalize.
   if (onepass) then
-     call m66one(eigen)
+     EIGEN = EYE 
   else
      !---- Find eigenvectors.
      if (m66sta(rt)) then
@@ -3557,52 +2927,61 @@ subroutine trbegn(rt,eigen)
      endif
   endif
 end subroutine trbegn
+
 subroutine ttdpdg_map(track, ktrack, e1, h, hgap, fint, tilt)
-
+  use matrices, only : EYE
+  use math_constfi, only : zero
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose: computes the effect of the dipole edge                      *
   ! Input/Output:  ktrack , number of surviving trajectories             *
   !                 track , trajectory coordinates                       *
   !----------------------------------------------------------------------*
-  integer ktrack,itrack
-  double precision fint,e1,h,hgap,corr,tilt,ek(6),rw(6,6),tw(6,6,6),track(6,*),&
-       node_value
+  integer :: ktrack
+  double precision :: track(6,*), e1, h, hgap, fint, tilt
 
-  call dzero(ek,6)
-  call m66one(rw)
-  call dzero(tw, 216)
+  double precision :: corr, ek(6), rw(6,6), tw(6,6,6)
+
+  double precision, external :: node_value
+
+  EK = zero 
+  RW = EYE 
+  TW = zero 
 
   corr = (h + h) * hgap * fint
-  !          print*,"------------------------------------------ "
+
   !---- Fringe fields effects computed from the TWISS routine tmfrng
   !     tmfrng returns the matrix elements rw(used) and tw(unused)
   !     No radiation effects as it is a pure thin lens with no lrad
-  call tmfrng(.false.,h,0d0,e1,0d0,0d0,corr,rw,tw)
-  call tmtilt(.false.,tilt,ek,rw,tw)
-  do itrack = 1, ktrack
-     track(2,itrack) = track(2,itrack) + rw(2,1)*track(1,itrack)
-     track(4,itrack) = track(4,itrack) + rw(4,3)*track(3,itrack)
-  enddo
+  call tmfrng(.false., h, zero, e1, zero, zero, corr, rw, tw)
+  call tmtilt(.false., tilt, ek, rw, tw)
+
+  TRACK(2,1:ktrack) = TRACK(2,1:ktrack) + RW(2,1) * TRACK(1,1:ktrack)
+  TRACK(4,1:ktrack) = TRACK(4,1:ktrack) + RW(4,3) * TRACK(3,1:ktrack)
+
   return
 end subroutine ttdpdg_map
+
 subroutine ttdpdg(track, ktrack)
-
+  use matrices, only : EYE
+  use math_constfi, only : zero
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose: computes the effect of the dipole edge                      *
   ! Input/Output:  ktrack , number of surviving trajectories             *
   !                 track , trajectory coordinates                       *
   !----------------------------------------------------------------------*
-  integer ktrack,itrack
-  double precision fint,e1,h,hgap,corr,tilt,ek(6),rw(6,6),tw(6,6,6),track(6,*),&
-       node_value
+  integer :: ktrack
+  double precision :: track(6,*)
 
-  call dzero(ek,6)
-  call m66one(rw)
-  call dzero(tw, 216)
+  double precision :: e1, h, hgap, fint, tilt, corr
+  double precision :: ek(6), rw(6,6), tw(6,6,6)
+
+  double precision :: node_value
+
+  EK = zero 
+  RW = EYE 
+  TW = zero 
 
   e1 = node_value('e1 ')
   h = node_value('h ')
@@ -3613,10 +2992,10 @@ subroutine ttdpdg(track, ktrack)
   call ttdpdg_map(track, ktrack, e1, h, hgap, fint, tilt);
 
 end subroutine ttdpdg
+
 subroutine trsol(track,ktrack)
-
+  use math_constfi, only : one, two, half
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Track a set of particles through a thin solenoid.                  *
@@ -3626,91 +3005,87 @@ subroutine trsol(track,ktrack)
   ! Output:                                                              *
   !   EL        (double)    Length of solenoid.                          *
   !----------------------------------------------------------------------*
-  integer itrack,ktrack
-  double precision beta
-  double precision get_value, node_value
-  double precision track(6,*)
-  double precision sk,skl,sks,sksl,cosTh,sinTh,Q,R,Z
-  double precision xf,yf,pxf,pyf,sigf,psigf,bvk
-  double precision onedp,fpsig,fppsig
-  !
+  double precision :: track(6,*)
+  integer :: ktrack
+
+  integer :: i
+  double precision :: beta
+  double precision :: sk, skl, sks, sksl, cosTh, sinTh, Q, R, Z
+  double precision :: xf, yf, pxf, pyf, sigf, psigf, bvk
+  double precision :: onedp, fpsig, fppsig
+
+  double precision :: get_value, node_value
+
   !---- Initialize.
-  !      dtbyds  = get_value('probe ','dtbyds ')
-  !      gamma   = get_value('probe ','gamma ')
-  beta    = get_value('probe ','beta ')
-  !      deltap  = get_value('probe ','deltap ')
+  ! dtbyds  = get_value('probe ','dtbyds ')
+  ! gamma   = get_value('probe ','gamma ')
+  beta = get_value('probe ','beta ')
+  ! deltap  = get_value('probe ','deltap ')
   !
   !---- Get solenoid parameters
-  !      elrad   = node_value('lrad ')
-  sksl    = node_value('ksi ')
-  sks     = node_value('ks ')
+  ! elrad   = node_value('lrad ')
+  sksl = node_value('ksi ')
+  sks  = node_value('ks ')
 
   !---- BV flag
   bvk = node_value('other_bv ')
-  sks = sks * bvk
+  sks  = sks  * bvk
   sksl = sksl * bvk
 
-  !
   !---- Set up strengths
-  !      sk    = sks / 2d0 / (1d0 + deltap)
-  sk    = sks / 2d0
-  skl   = sksl / 2d0
-  !
+  ! sk    = sks / two / (one + deltap)
+  sk    = sks / two
+  skl   = sksl / two
+
   !---- Loop over particles
-  !
-  do  itrack = 1, ktrack
-     !
+  do  i = 1, ktrack
      !     Ripken formulae p.28 (3.35 and 3.36)
-     xf   = track(1,itrack)
-     yf   = track(3,itrack)
-     psigf= track(6,itrack)/beta
-     !
+     xf    = track(1,i)
+     yf    = track(3,i)
+     psigf = track(6,i) / beta
+
      !     We do not use a constant deltap!!!!! WE use full 6D formulae!
-     onedp   = sqrt(1d0+2*psigf+(beta**2)*(psigf**2))
-     fpsig   = onedp - 1d0
-     fppsig  = (1d0+(beta**2)*psigf)/onedp
-     !
+     onedp   = sqrt( one + 2*psigf + (beta**2)*(psigf**2) )
+     fpsig   = onedp - one
+     fppsig  = ( one + (beta**2)*psigf ) / onedp
+
      !     Set up C,S, Q,R,Z
      cosTh = cos(skl/onedp)
      sinTh = sin(skl/onedp)
-     Q = -skl*sk/onedp
-     R = fppsig/(onedp**2)*skl*sk
-     Z = fppsig/(onedp**2)*skl
-     !
-     !
-     pxf  = track(2,itrack) + xf*Q
-     pyf  = track(4,itrack) + yf*Q
-     sigf = track(5,itrack)*beta - 5d-1*(xf**2 + yf**2)*R
+     Q = -skl * sk / onedp
+     R = fppsig / (onedp**2) * skl * sk
+     Z = fppsig / (onedp**2) * skl
+
+     pxf  = track(2,i) + xf*Q
+     pyf  = track(4,i) + yf*Q
+     sigf = track(5,i)*beta - half*(xf**2 + yf**2)*R
 
      !       Ripken formulae p.29 (3.37)
-     !
-     track(1,itrack) =  xf*cosTh  + yf*sinTh
-     track(2,itrack) =  pxf*cosTh + pyf*sinTh
-     track(3,itrack) = -xf*sinTh  + yf*cosTh
-     track(4,itrack) = -pxf*sinTh + pyf*cosTh
-     track(5,itrack) =  (sigf + (xf*pyf - yf*pxf)*Z)/beta
-     !        track(6,itrack) =  psigf*beta
+     track(1,i) =  xf  * cosTh  +  yf  * sinTh
+     track(2,i) =  pxf * cosTh  +  pyf * sinTh
+     track(3,i) = -xf  * sinTh  +  yf  * cosTh
+     track(4,i) = -pxf * sinTh  +  pyf * cosTh
+     track(5,i) =  (sigf + (xf*pyf - yf*pxf)*Z) / beta
+     ! track(6,i) =  psigf*beta
 
   enddo
 end subroutine trsol
 
 subroutine tttrans(track,ktrack)
-
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Translation of a set of particles.                                 *
   ! Input/output:                                                        *
   !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
   !----------------------------------------------------------------------*
-  integer itrack,ktrack
-  double precision node_value
-  double precision track(6,*)
-  double precision t_x,t_px,t_y,t_py,t_sig,t_psig
-  !
-  !---- Initialize.
-  !
+  double precision :: track(6,*)
+  integer :: ktrack
+
+  integer :: i
+  double precision :: t_x, t_px, t_y, t_py, t_sig, t_psig
+  double precision :: node_value
+  
   !---- Get translation parameters
   t_x    = node_value('x ')
   t_px   = node_value('px ')
@@ -3718,20 +3093,18 @@ subroutine tttrans(track,ktrack)
   t_py   = node_value('py ')
   t_sig  = node_value('t ')
   t_psig = node_value('pt ')
-  !
+  
   !---- Loop over particles
-  !
-!$OMP PARALLEL PRIVATE(itrack)
+!$OMP PARALLEL PRIVATE(i)
 !$OMP DO
-  do  itrack = 1, ktrack
-     !
-     !     Add vector to particle coordinates
-     track(1,itrack) = track(1,itrack) + t_x
-     track(2,itrack) = track(2,itrack) + t_px
-     track(3,itrack) = track(3,itrack) + t_y
-     track(4,itrack) = track(4,itrack) + t_py
-     track(5,itrack) = track(5,itrack) + t_sig
-     track(6,itrack) = track(6,itrack) + t_psig
+  do  i = 1, ktrack
+     ! Add vector to particle coordinates
+     track(1,i) = track(1,i) + t_x
+     track(2,i) = track(2,i) + t_px
+     track(3,i) = track(3,i) + t_y
+     track(4,i) = track(4,i) + t_py
+     track(5,i) = track(5,i) + t_sig
+     track(6,i) = track(6,i) + t_psig
      !
   enddo
 !$OMP END DO
@@ -3739,9 +3112,7 @@ subroutine tttrans(track,ktrack)
 end subroutine tttrans
 
 subroutine tttrak(ek,re,track,ktrack)
-
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Track a set of particle with a given TRANSPORT map.                *
@@ -3752,33 +3123,26 @@ subroutine tttrak(ek,re,track,ktrack)
   !   TRACK(6,*)(real)    Track coordinates: (X, PX, Y, PY, T, PT).      *
   !   KTRACK    (integer) number of surviving tracks.                    *
   !----------------------------------------------------------------------*
-  integer i,itrack,ktrack
-  double precision ek(6),re(36),temp(6),track(6,*)
-  !      double precision se(36)
+  double precision :: ek(6), re(36), track(6,*)
+  integer :: ktrack
 
-  do itrack = 1, ktrack
-     !        do i = 1, 36
-     !          se(i) = re(i)                                                 &
-     !           + te(i,1)*track(1,itrack) + te(i,2) * track(2,itrack)       &
-     !           + te(i,3)*track(3,itrack) + te(i,4) * track(4,itrack)       &
-     !           + te(i,5)*track(5,itrack) + te(i,6) * track(6,itrack)
-     !        enddo
-     do i = 1, 6
-        temp(i) = ek(i)                                               &
-             + re(i)    * track(1,itrack) + re(i+ 6) * track(2,itrack)         &
-             + re(i+12) * track(3,itrack) + re(i+18) * track(4,itrack)         &
-             + re(i+24) * track(5,itrack) + re(i+30) * track(6,itrack)
+  integer :: i, j
+  double precision :: temp(6)
+
+  do i = 1, ktrack
+     do j = 1, 6
+        temp(j) = ek(j)  &
+             + re(j)    * track(1,i) + re(j+ 6) * track(2,i)  &
+             + re(j+12) * track(3,i) + re(j+18) * track(4,i)  &
+             + re(j+24) * track(5,i) + re(j+30) * track(6,i)
      enddo
-     do i = 1, 6
-        track(i,itrack) = temp(i)
-     enddo
+     TRACK(1:6,i) = TEMP(1:6)
   enddo
+
 end subroutine tttrak
 
 subroutine trupdate(turn)
-
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Update global turnnumber-VARIABLE,                                 *
@@ -3786,8 +3150,8 @@ subroutine trupdate(turn)
   ! Input/output:                                                        *
   !   turn     (integer)    Current turn number.                         *
   !----------------------------------------------------------------------*
-  integer           turn
-  character(50)      cmd
+  integer       :: turn
+  character(len=50) :: cmd
 
   !---- call pro_input('TR$TURN := turn;')
   write(cmd, '(''tr$turni := '',i8,'' ; '')') turn
@@ -3797,12 +3161,13 @@ subroutine trupdate(turn)
 end subroutine trupdate
 
 subroutine trclor(switch,orbit0)
-
   use twiss0fi
   use name_lenfi
   use trackfi
+  use matrices, only : EYE
+  use math_constfi, only : zero, one
+  use code_constfi
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   -  Find 6D closed orbit                                            *
@@ -3813,273 +3178,191 @@ subroutine trclor(switch,orbit0)
   !   ORBIT0(6) (double)  Closed Orbit Coordinates @ sequence start      *
   !                       (X, PX, Y, PY, T, PT)                          *
   !----------------------------------------------------------------------*
-  double precision orbit0(6),z(6,7),zz(6),z0(6,7),z00(6,7),a(6,7),deltap,ddd(6)
-  integer itra, itmax, j, bbd_pos, j_tot
-  integer code,switch
-  double precision el,dxt(200),dyt(200)
-  integer restart_sequ
-  integer advance_node, get_option, node_al_errors
-  double precision node_value, get_value, get_variable
-  integer n_align
-  double precision al_errors(align_max)
-  double precision re(6,6)
+  integer :: switch
+  double precision :: orbit0(6)
 
-  logical aperflag, onepass
-  integer pmax, turn, turnmax, part_id(1),last_turn(1)
-  double precision sum, orbit(6)
-  double precision last_pos(6),last_orbit(6,1),maxaper(6)
+  logical :: aperflag, onepass
+  integer :: itra 
 
-  integer nint, ndble, nchar, int_arr(1), char_l
-  character(12) char_a
+  integer :: i, j, k, bbd_pos, j_tot, code, irank, n_align
+  integer :: pmax, turn, turnmax, part_id(1), last_turn(1)
+  integer :: nint, ndble, nchar, int_arr(1), char_l
+  double precision :: re(6,6)
+  double precision :: z(6,7), zz(6), z0(6,7), z00(6,7), a(6,7), ddd(6)
+  double precision :: cotol, err, deltap, el, dxt(200), dyt(200)
+  double precision :: al_errors(align_max)
+  double precision :: sum, orbit(6)
+  double precision :: last_pos(6), last_orbit(6,1), maxaper(6)
+  character(len=12) :: char_a
 
-  integer i,k, irank
+  integer, parameter :: itmax=10
+  
+  integer, external :: restart_sequ, advance_node, get_option, node_al_errors
+  double precision, external :: node_value, get_value, get_variable
 
-  double precision cotol, err
+  write (*,'(/a)')          'Full 6D closed orbit search.'
+  write (*,'(a)')           'Initial value of 6-D closed orbit from Twiss: '
+  write (*,'(a,1p,6e14.6)') 'orbit0 ', ORBIT0
 
-  logical is_drift, is_thin, is_quad, is_matrix, is_dipole
-
-  print *," "
-  !      print *," AK special version 2007/12/13"
-  !      print *," ============================="
-
-  !      print *," Modified by Yipeng SUN 19/11/2008 "
-  !      print *," ======================="
-  print *," Full 6D closed orbit search."
-  print*," Initial value of 6-D closed orbit from Twiss: "
-  print*," orbit0 ",orbit0
-
-  !---- Initialize needed variables
+  !---- Initialize variables
   turn    = 1
   turnmax = 1
-  itmax   = 10
   pmax    = 7
-  sum     = 0d0
+  sum     = zero
   aperflag  = .false.
   onepass   = .true.
 
-  do k=1,7
-     call dcopy(orbit0,z(1,k),6)
+  do k = 1, 7
+     Z(:,k) = ORBIT0 
   enddo
+  
+  DDD(1:6) = 1d-15
 
-  !      ddd(1) = orbit0(1)/100000
-  !      ddd(2) = orbit0(2)/100000
-  !      ddd(3) = orbit0(3)/100000
-  !      ddd(4) = orbit0(4)/100000
-  !      ddd(5) = orbit0(5)/100000
-  !      ddd(6) = orbit0(6)/100000
-
-  ! for on momentum pt =0
-  !      ddd(1) = 1e-15
-  !      ddd(2) = 1e-15
-  !      ddd(3) = 1e-15
-  !      ddd(4) = 1e-15
-  !      ddd(5) = 1e-15
-  !      ddd(6) = 1e-15
-  !--------------------------------------
-  ddd(1) = 1d-15
-  ddd(2) = 1d-15
-  ddd(3) = 1d-15
-  ddd(4) = 1d-15
-  ddd(5) = 1d-15
-  ddd(6) = 1d-15
-
-  !      do k=1,6
-  !        z(k,k+1) = z(k,k+1) + ddd(k)
-  !      enddo
-
-  do k=1,7
-     call dcopy(z(1,k),z0(1,k),6)
-     call dcopy(z(1,k),z00(1,k),6)
-  enddo
-
+  Z0  = Z
+  Z00 = Z
+  
   !--- jmax may be reduced by particle loss - keep number in j_tot
   j_tot = pmax
+
   !--- get vector of six coordinate maxapers (both RUN and DYNAP)
-  call comm_para('maxaper ',nint,ndble,nchar,int_arr,maxaper, char_a, char_l)
-  !--- set particle id
-
-
-
+  call comm_para('maxaper ', nint, ndble, nchar, int_arr, maxaper, char_a, char_l)
 
   cotol = get_variable('twiss_tol ')
 
   !---- Initialize kinematics and orbit
-  bet0  = get_value('beam ','beta ')
-  betas = get_value('probe ','beta ')
-  gammas= get_value('probe ','gamma ')
-  bet0i = 1d0 / bet0
-  beti   = 1d0 / betas
+  bet0   = get_value('beam ','beta ')
+  betas  = get_value('probe ','beta ')
+  gammas = get_value('probe ','gamma ')
+  bet0i  = one / bet0
+  beti   = one / betas
   dtbyds = get_value('probe ','dtbyds ')
   deltas = get_variable('track_deltap ')
   deltap = get_value('probe ','deltap ')
-  arad = get_value('probe ','arad ')
-  dorad = get_value('probe ','radiate ') .ne. 0d0
-  dodamp = get_option('damp ') .ne. 0
-  dorand = get_option('quantum ') .ne. 0
-  call dcopy(orbit0,orbit,6)
+  arad   = get_value('probe ','arad ')
+  radiate  = get_value('probe ','radiate ') .ne. zero
+  damp = get_option('damp ') .ne. 0
+  quantum = get_option('quantum ') .ne. 0
 
+  ORBIT = ORBIT0 
 
   !---- Iteration for closed orbit.
   do itra = 1, itmax
-     !        print*," before tracking "
-     !        print*," itra: ",itra, " z: ", z
      j = restart_sequ()
+     
+     do !---- loop over nodes
 
-     !---- loop over nodes
-10   continue
-
-
-     bbd_pos = j
-     code    = node_value('mad8_type ')
-     if(code.eq.39) code=15
-     if(code.eq.38) code=24
-     el      = node_value('l ')
-     if (itra .eq. 1)  then
-        if (.not.(is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix())) then
-           print*," "
-           print*,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
-           print*," "
-           print*,"Track dies nicely"
-           print*,"Thick lenses will get nowhere"
-           print*,"MAKETHIN will save you"
-           print*," "
-           print*," "
-           stop
+        bbd_pos = j
+        code    = node_value('mad8_type ')
+        if (code .eq. code_tkicker)     code = code_kicker
+        if (code .eq. code_placeholder) code = code_instrument
+        el      = node_value('l ')
+        if (itra .eq. 1 .and. & 
+             code.ne.code_drift .and. code.ne.code_quadrupole .and. code.ne.code_sbend & 
+             .and. code.ne.code_matrix .and. el.ne.zero ) then ! rbend missing ? 
+           !  .not.(is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
+           print *,"\ncode: ",code," el: ",el,"   THICK ELEMENT FOUND\n"
+           print *,"Track dies nicely"
+           print *,"Thick lenses will get nowhere"
+           print *,"MAKETHIN will save you\n\n"
+           call fort_fail('TRRUN: Fatal ','----element with length found : CONVERT STRUCTURE WITH MAKETHIN')
         endif
-     endif
-
-
-
-     !--------  Misalignment at beginning of element (from twissfs.f)
-     if (code .ne. 1)  then
-        call dzero(al_errors, align_max)
-        n_align = node_al_errors(al_errors)
-        if (n_align .ne. 0)  then
+        
+        !--------  Misalignment at beginning of element (from twissfs.f)
+        if (code .ne. code_drift)  then
+           AL_ERRORS(:align_max) = zero 
+           n_align = node_al_errors(al_errors)
+           if (n_align .ne. 0)  then
+              do i = 1, pmax
+                 ZZ = Z(:,i) 
+                 call tmali1(zz, al_errors, betas, gammas, z(1,i), re)
+              enddo
+           endif
+        endif
+        
+        !-------- Track through element
+        call ttmap(switch,code,el,z,pmax,dxt,dyt,sum,turn,part_id, &
+             last_turn,last_pos,last_orbit,aperflag,maxaper,al_errors,onepass)
+        
+        !--------  Misalignment at end of element (from twissfs.f)
+        if (code .ne. code_drift .and. n_align .ne. 0)  then
            do i = 1, pmax
-              call dcopy(z(1,i),zz,6)
-              call tmali1(zz,al_errors, betas, gammas,z(1,i), re)
+              ZZ = Z(:,i) 
+              call tmali2(el, zz, al_errors, betas, gammas, z(1,i), re)
            enddo
         endif
-     endif
 
-     !-------- Track through element
-     call ttmap(switch,code,el,z,pmax,dxt,dyt,sum,turn,part_id,             &
-          last_turn,last_pos, last_orbit,aperflag,maxaper,al_errors,onepass)
-
-     !--------  Misalignment at end of element (from twissfs.f)
-     if (code .ne. 1)  then
-        if (n_align .ne. 0)  then
-           do i = 1, pmax
-              call dcopy(z(1,i),zz,6)
-              call tmali2(el,zz, al_errors, betas, gammas,z(1,i), re)
-           enddo
-        endif
-     endif
-
-
-     if (advance_node().ne.0)  then
+        if (advance_node() .eq. 0) exit
+        
         j=j+1
-        goto 10
-     endif
-     !---- end of loop over nodes
-
+     end do !---- end of loop over nodes
 
      !---- construct one-turn map
      do k=1,6
-        do i=1,6
-           a(i,k) = (z(i,k+1) - z(i,1))/ddd(i)
-        enddo
+        A(:,k) = ( Z(:,k+1) - Z(:,1) ) / DDD(:)
      enddo
+
      !---- Solve for dynamic case.
-     err = 0d0
-     do i= 1,6
-        a(i,i) = a(i,i) - 1d0
-        a(i,7) = z(i,1) - z0(i,1)
-        err = max(abs(a(i,7)), err)
-     enddo
+     A(:6,:6) = A(:6,:6) - EYE
+     A(:6,7)  = Z(:6,1) - Z0(:6,1)
+     err = maxval(abs(A(:,7)))
 
      call solver(a,6,1,irank)
-     if (irank.lt.6) go to 100
-     do i = 1, 6
-        z0(i,1) = z0(i,1) - a(i,7)
-        z00(i,1) = z00(i,1) - a(i,7)
-     enddo
-     !---- Solve for dynamic case.
-     !      do i = 1, 6	
-     !      print*," a(i,7) ",a(i,7)
-     !      enddo
+     if (irank .lt. 6) go to 100
 
-     !      if (err.lt.cotol) then
+     Z0(:,1)  = Z0(:,1)  - A(:,7)
+     Z00(:,1) = Z00(:,1) - A(:,7)
 
-     !      print *, ' '
-     !      print '(''iteration: '',i3,'' error: '',1p,e14.6,'' deltap: ''    &
-     !     ,                                                                 &
-     !     1p,e14.6)',itra,err,deltap
-     !          print '(''orbit: '', 1p,6e14.6)', z0
-
-     !      goto 110
-
-     !      endif
-
-
-
-     do k=2,7
-        call dcopy(z00(1,1),z0(1,k),6)
+     do k = 2, 7
+        Z0(:,k) = Z00(:,1) 
      enddo
 
-     do k=1,6
+     do k = 1, 6
         z0(k,k+1) = z0(k,k+1) + ddd(k)
      enddo
 
-     do k=1,7
-        call dcopy(z0(1,k),z(1,k),6)
-     enddo
-
-
+     Z = Z0
+     
      !---- end of Iteration
   enddo
 
-  call dcopy(z0(1,1),orbit0,6)
-  !      print *,"madX::trrun.F::trclor()"
-  !      print *," Iteration maximum reached. NO convergence."
+  ORBIT0(1:6) = Z0(1:6,1) 
   goto 110
 
 100 continue
-  print *," Singular matrix occurred during closed orbit search."
+  write (*,'(a)') '  Singular matrix occurred during closed orbit search.'
 
 110 continue
-  print *, ' '
-  print *, '6D closed orbit found by subroutine trclor '
-  print '(''iteration: '',i3,'' error: '',1p,e14.6,'' deltap: '',1p,e14.6)',itra,err,deltap
-  print '(''orbit: '', 1p,6e14.6)', orbit0
-
+  write (*,'(/a)')                          '6D closed orbit found by subroutine trclor '
+  write (*,'(a,i3,a,1p,e14.6,a,1p,e14.6)')  'iteration: ',itra,' error: ',err,' deltap: ',deltap
+  write (*,'(a,1p,6e14.6)')                 'orbit: ', ORBIT0
+  
 end subroutine trclor
 
 subroutine ixy_fitting()
   use name_lenfi
   use bbfi
   use spch_bbfi
+  use math_constfi, only : zero, one
   implicit none
 
-  logical emittance_update
-  integer i, iii, jjj,get_option
-  ! n_lines_in_turn_table=1
-  double precision Summ_dpi_square, Summ_z_part_square
-  double precision Summ_x, Summ_y
-  double precision Ix(N_macro_max), Iy(N_macro_max),                &
-       dpi(N_macro_max), z_part(N_macro_max)
-  double precision Ix_sorted(N_macro_max), Iy_sorted(N_macro_max)
-  double precision Ix_min,Iy_min, Ix_min_last,Iy_min_last
+  logical :: emittance_update
+  integer :: i, iii, jjj
+  integer :: i_for_I
+  double precision :: Summ_dpi_square, Summ_z_part_square
+  double precision :: Summ_x, Summ_y
+  double precision :: Ix(N_macro_max), Iy(N_macro_max)
+  double precision :: dpi(N_macro_max), z_part(N_macro_max)
+  double precision :: Ix_sorted(N_macro_max), Iy_sorted(N_macro_max)
+  double precision :: Ix_min,Iy_min, Ix_min_last,Iy_min_last
   ! I_x/Ex_rms+I_y/Ey_rms <= I_div_E_sum_max
   ! limit for particles taken for Ix, Iy evaluations
-  double precision    Ix_i, Iy_i, dpi_i, z_part_i, Ixy_rel_summ,    &
-       N_for_I_dble
-  double precision get_value
-  double precision ce10
-  double precision c_sumx, y_sumx, t_sumx, c_sumy, y_sumy, t_sumy, a_sum
-  double precision :: J0x=0d0, J0y=0d0, Sum_Jx=0d0, Sum_Jy=0d0 
-  parameter(ce10=1d10)
-  integer i_for_I
+  double precision :: Ix_i, Iy_i, dpi_i, z_part_i, Ixy_rel_summ, N_for_I_dble
+  double precision :: c_sumx, y_sumx, t_sumx, c_sumy, y_sumy, t_sumy, a_sum
+  double precision :: J0x=zero, J0y=zero, Sum_Jx=zero, Sum_Jy=zero 
+  double precision, parameter :: ce10=1d10
+
+  integer, external :: get_option
+  double precision, external :: get_value
 
   !----------------------------------------------------------------------
   emittance_update = get_option('emittance_update ') .ne. 0
@@ -4102,9 +3385,8 @@ subroutine ixy_fitting()
         z_part(i_for_I)=z_part_i
      endif
   ENDDO
-  if(i_for_I.eq.0) then
-          call aawarn('trrun: ',&
-          'the RMS emittances cannot be calculated: exit from IXY_FITTING');
+  if (i_for_I.eq.0) then
+     call fort_warn('trrun: ','the RMS emittances cannot be calculated: exit from IXY_FITTING');
      return
   endif
   N_for_I=i_for_I
@@ -4112,34 +3394,32 @@ subroutine ixy_fitting()
   N_for_I_dble=dble(N_for_I)
 
   !     rms of the relative momentum
-  Summ_dpi_square=0d0
+  Summ_dpi_square = zero
   sigma_p_loop: DO iii=1, N_for_I
-     Summ_dpi_square=Summ_dpi_square+dpi(iii)**2
+     Summ_dpi_square = Summ_dpi_square + dpi(iii)**2
   ENDDO sigma_p_loop
-  Summ_dpi_square=Summ_dpi_square/N_for_I_dble
-  if (Summ_dpi_square .GE. 0d0) then
-     if(emittance_update) sigma_p=sqrt(Summ_dpi_square)
+
+  Summ_dpi_square = Summ_dpi_square / N_for_I_dble
+  if (Summ_dpi_square .ge. zero) then
+     if (emittance_update) sigma_p=sqrt(Summ_dpi_square)
   else
-     call aafail('IXY_FITTING: Fatal: ','Summ_dpi_square<0')
+     call fort_fail('IXY_FITTING: Fatal: ','Summ_dpi_square<0')
   endif
 
   !     rms of the bunch length
-  Summ_z_part_square=0d0
+  Summ_z_part_square = zero
   sigma_z_loop: DO iii=1, N_for_I
-     Summ_z_part_square=Summ_z_part_square+z_part(iii)**2
+     Summ_z_part_square = Summ_z_part_square + z_part(iii)**2
   ENDDO sigma_z_loop
-  Summ_z_part_square=Summ_z_part_square/N_for_I_dble
-  if (Summ_z_part_square .GE. 0d0) then
-     sigma_z=sqrt(Summ_z_part_square)
+  Summ_z_part_square = Summ_z_part_square / N_for_I_dble
+  if (Summ_z_part_square .ge. zero) then
+     sigma_z = sqrt(Summ_z_part_square)
   else
-     call aafail('IXY_FITTING: Fatal: ','Summ_z_part_square<0')
+     call fort_fail('IXY_FITTING: Fatal: ','Summ_z_part_square<0')
   endif
 
-
-
   !     SORTING Ix
-
-  Ix_min_last=0d0
+  Ix_min_last = zero
   iii_loop: DO iii=1, N_for_I
 
      Ix_min=ce10
@@ -4152,11 +3432,11 @@ subroutine ixy_fitting()
      ENDDO jjj_loop
 !$OMP END DO
 !$OMP END PARALLEL
-     Ix_sorted(iii)=Ix_min
-     Ix_min_last=Ix_min
+     Ix_sorted(iii) = Ix_min
+     Ix_min_last = Ix_min
   ENDDO iii_loop
 
-  Iy_min_last=0d0
+  Iy_min_last = zero
   iii_loop_y: DO iii=1, N_for_I
 
      Iy_min=ce10
@@ -4169,81 +3449,78 @@ subroutine ixy_fitting()
      ENDDO jjj_loop_y
 !$OMP END DO
 !$OMP END PARALLEL
-     Iy_sorted(iii)=Iy_min
-     Iy_min_last=Iy_min
+     Iy_sorted(iii) = Iy_min
+     Iy_min_last = Iy_min
   ENDDO iii_loop_y
 
 !New normalisation of the emittance calculation to exclude artificial collapses
 !R.Wasef
-  J0x=0d0
-  J0y=0d0
+  J0x = zero
+  J0y = zero
   jjj_loop_ray: DO jjj=1,N_for_I
-           J0x=J0x+Ix_sorted(jjj)
-           J0y=J0y+Iy_sorted(jjj)
+           J0x = J0x + Ix_sorted(jjj)
+           J0y = J0y + Iy_sorted(jjj)
   ENDDO jjj_loop_ray
-  J0x=J0x/(N_for_I_dble*N_for_I_dble)
-  J0y=J0y/(N_for_I_dble*N_for_I_dble)
-  J0x=J0x*J0x
-  J0y=J0y*J0y
+  J0x = J0x / (N_for_I_dble*N_for_I_dble)
+  J0y = J0y / (N_for_I_dble*N_for_I_dble)
+  J0x = J0x*J0x
+  J0y = J0y*J0y
   
-  Sum_Jx=0d0
-  Sum_Jy=0d0
+  Sum_Jx = zero
+  Sum_Jy = zero
   jjj_loop_ray2: DO jjj=1,N_for_I
-          Sum_Jx=Sum_Jx+( (Ix_sorted(jjj)*Ix_sorted(jjj)) /( J0x+(Ix_sorted(jjj)*Ix_sorted(jjj)) ) )
-          Sum_Jy=Sum_Jy+( (Iy_sorted(jjj)*Iy_sorted(jjj)) /( J0y+(Iy_sorted(jjj)*Iy_sorted(jjj)) ) )
+          Sum_Jx = Sum_Jx + ( (Ix_sorted(jjj)*Ix_sorted(jjj)) /( J0x+(Ix_sorted(jjj)*Ix_sorted(jjj)) ) )
+          Sum_Jy = Sum_Jy + ( (Iy_sorted(jjj)*Iy_sorted(jjj)) /( J0y+(Iy_sorted(jjj)*Iy_sorted(jjj)) ) )
   ENDDO jjj_loop_ray2
-
-
-
-
 
   !     Summ of step-function for Ex/Ey evaluation
   !     Kahan summation algorithm
-  Summ_x=0d0
-  Summ_y=0d0
-  c_sumx=0d0
-  c_sumy=0d0
+  Summ_x = zero
+  Summ_y = zero
+  c_sumx = zero
+  c_sumy = zero
   alpha = get_value('run ', 'alpha ')
 !!!!!$OMP PARALLEL PRIVATE(iii,a_sum,c_sumx,c_sumy,y_sumx,y_sumy,t_sumx,t_sumy)
 !!!!!$OMP DO REDUCTION(+:Summ_x,Summ_y)
   Summ_loop: DO iii=1,N_for_I    !!! the first particle is shifted
-     a_sum=Log(1d0-(alpha+dble(iii-1))/N_for_I_dble)
-     y_sumx=(Ix_sorted(iii)/(Ix_sorted(iii)*Ix_sorted(iii)+J0x))*a_sum/Sum_Jx-c_sumx
-     y_sumy=(Iy_sorted(iii)/(Iy_sorted(iii)*Iy_sorted(iii)+J0y))*a_sum/Sum_Jy-c_sumy
-     t_sumx=Summ_x+y_sumx
-     t_sumy=Summ_y+y_sumy
-     c_sumx=(t_sumx-Summ_x)-y_sumx
-     c_sumy=(t_sumy-Summ_y)-y_sumy
-     Summ_x=t_sumx
-     Summ_y=t_sumy
+     a_sum = Log(one-(alpha+dble(iii-1))/N_for_I_dble)
+     y_sumx = (Ix_sorted(iii)/(Ix_sorted(iii)*Ix_sorted(iii)+J0x))*a_sum/Sum_Jx-c_sumx
+     y_sumy = (Iy_sorted(iii)/(Iy_sorted(iii)*Iy_sorted(iii)+J0y))*a_sum/Sum_Jy-c_sumy
+     t_sumx = Summ_x + y_sumx
+     t_sumy = Summ_y + y_sumy
+     c_sumx = (t_sumx-Summ_x) - y_sumx
+     c_sumy = (t_sumy-Summ_y) - y_sumy
+     Summ_x = t_sumx
+     Summ_y = t_sumy
   ENDDO Summ_loop
 !!!!!$OMP END DO
 !!!!!$OMP END PARALLEL
-  Ey_rms=-1d0/Summ_y
-  Ex_rms=-1d0/Summ_x
+  Ey_rms = -one/Summ_y
+  Ex_rms = -one/Summ_x
 
   return
-
 END subroutine ixy_fitting
 
-subroutine ixy_calcs(betas, orbit, z,                             &
-     betax_start, betay_start,                    &
-     alfax_start, alfay_start,                    &
-     gamax_start, gamay_start,                    &
-     dx_start,    dpx_start,                      &
-     dy_start,    dpy_start)
+subroutine ixy_calcs(betas, orbit, z,          &
+                     betax_start, betay_start, &
+                     alfax_start, alfay_start, &
+                     gamax_start, gamay_start, &
+                     dx_start,    dpx_start,   &
+                     dy_start,    dpy_start)
   use name_lenfi
   use bbfi
   use spch_bbfi
+  use math_constfi, only : two 
   implicit none
+  double precision :: betas, orbit(6), z(6,N_macro_surv)
+  double precision :: betax_start, betay_start
+  double precision :: alfax_start, alfay_start
+  double precision :: gamax_start, gamay_start
+  double precision :: dx_start,    dpx_start
+  double precision :: dy_start,   dpy_start
 
-  integer i
-  double precision betas,                                           &
-       betax_start, betay_start, alfax_start, alfay_start,          &
-       gamax_start, gamay_start,                                    &
-       dx_start,    dpx_start,  dy_start,   dpy_start,              &
-       orbit(6), z(6,N_macro_surv)
-  double precision dpi,xi,pxi,yi,pyi
+  integer :: i
+  double precision :: dpi, xi, pxi, yi, pyi
   !-----------------------------------------------------------------------
 
   !      DPI=pt_000KK/beta_part_ini; z_part=t_000KK*beta_part_ini;
@@ -4254,414 +3531,255 @@ subroutine ixy_calcs(betas, orbit, z,                             &
 
   do i=1,N_macro_surv
      ! Exact formulation might be too computational time costly
-     !        DPI=(sqrt((1d0+z(6,i)*betas)**2-gammas**(-2)))/betas-1d0
-     DPI=(z(6,i)    - orbit(6)) / betas
-     XI =z(1,i)     - orbit(1) - dx_start  * DPI
-     PXI=z(2,i)     - orbit(2) - dpx_start * DPI
-     YI =z(3,i)     - orbit(3) - dy_start  * DPI
-     PYI=z(4,i)     - orbit(4) - dpy_start * DPI
+     !        DPI=(sqrt((one+z(6,i)*betas)**2-gammas**(-2)))/betas-one
+     DPI = (z(6,i) - orbit(6)) / betas
+     XI  =  z(1,i) - orbit(1) - dx_start  * DPI
+     PXI =  z(2,i) - orbit(2) - dpx_start * DPI
+     YI  =  z(3,i) - orbit(3) - dy_start  * DPI
+     PYI =  z(4,i) - orbit(4) - dpy_start * DPI
 
-     Ix_array(i)=(gamax_start*XI*XI+2d0*alfax_start*XI*PXI+         &
-          betax_start*PXI*PXI)/2d0
-     Iy_array(i)=(gamay_start*YI*YI+2d0*alfay_start*YI*PYI+         &
-          betay_start*PYI*PYI)/2d0
-     dpi_array(i)=DPI
-     z_part_array(i)=(z(5,i)-orbit(5))*betas
+     Ix_array(i) = (gamax_start*XI*XI + two*alfax_start*XI*PXI + betax_start*PXI*PXI) / two
+     Iy_array(i) = (gamay_start*YI*YI + two*alfay_start*YI*PYI + betay_start*PYI*PYI) / two
+     dpi_array(i) = DPI
+     z_part_array(i) = (z(5,i)-orbit(5))*betas
   enddo
 
 end subroutine ixy_calcs
 
-subroutine table_input(                                           &
-     betx_start, bety_start,                      &
-     alfx_start, alfy_start,                      &
-     gamx_start, gamy_start,                      &
-     dx_start,    dpx_start,                      &
-     dy_start,    dpy_start)
-
+subroutine table_input( betx_start, bety_start, &
+                        alfx_start, alfy_start, &
+                        gamx_start, gamy_start, &
+                        dx_start,    dpx_start, &
+                        dy_start,    dpy_start)
   use name_lenfi
   use bbfi
   use twtrrfi
   use time_varfi
   use spch_bbfi
+  use math_constfi, only : zero, one
   implicit none
-  integer i,ii,j,flag,range(2),string_from_table_row,advance_to_pos,          &
-       double_from_table_row
-  double precision position,                                        &
-       betx_start,bety_start,alfx_start,alfy_start,gamx_start,gamy_start,&
-       dx_start,dpx_start,dy_start,dpy_start
-  double precision cme10
-  parameter(cme10=1d-10)
-  character*(name_len) name
-  character*20 text
+  double precision :: betx_start, bety_start
+  double precision :: alfx_start, alfy_start 
+  double precision :: gamx_start, gamy_start
+  double precision :: dx_start,   dpx_start
+  double precision :: dy_start,   dpy_start
 
-  call dzero(myfield,n_time_var*2*(maxmul+1))
-  call dzero(phase_tromb,n_time_var*36)
-  call dzero(cav_volt,n_time_var)
-  call dzero(time_var_m_ind,n_time_var)
-  call dzero(time_var_p_ind,n_time_var)
-  call dzero(time_var_c_ind,n_time_var)
-  call dzero(time_var_m_nt,n_time_var)
-  call dzero(time_var_p_nt,n_time_var)
-  call dzero(time_var_c_nt,n_time_var)
+  integer :: i, ii, j, flag, range(2)
+  double precision :: position 
+  character(len=name_len) :: name
+  character(len=20) :: text
+
+  integer :: double_from_table_row, string_from_table_row, advance_to_pos
+  double precision, parameter :: cme10=1d-10
+
+  MYFIELD = zero 
+  PHASE_TROMB = zero 
+  CAV_VOLT = zero 
+  TIME_VAR_M_IND = zero 
+  TIME_VAR_P_IND = zero 
+  TIME_VAR_C_IND = zero 
+  TIME_VAR_M_NT  = zero 
+  TIME_VAR_P_NT  = zero 
+  TIME_VAR_C_NT  = zero 
 
   call table_range('spch_bb ', '#s/#e ', range)
   print *, 'Range for Table spch_bb : ', range(1), range(2)
-  if(range(1).eq.0.and.range(2).eq.0) then
-     print*," Info: Table spch_bb is empty "
-  endif
+  if (range(1).eq.0 .and. range(2).eq.0) print *," Info: Table spch_bb is empty "
+
   name=" "
-  if(range(2).gt.bbd_max) then
+  if (range(2).gt.bbd_max) then
      write(text, '(1p,i8)') bbd_max
-     call aafail('TRRUN: Fatal: ',                                   &
-          'overrun of the number of BB elements in table spch_bb =' //    &
-          text)
+     call fort_fail('TRRUN: Fatal: ', &
+          'overrun of the number of BB elements in table spch_bb =' // text)
   endif
   N_spch = range(2)-range(1)
-  if(N_spch.lt.1) then
-     call aafail('TRRUN: Fatal: ',                                  &
-          'Table: spch_bb holds no BB elements')
-  endif
-  do i=range(1),range(2)
+  if (N_spch.lt.1) &
+       call fort_fail('TRRUN: Fatal: ', 'Table: spch_bb holds no BB elements')
+
+  do i = range(1), range(2)
      j = advance_to_pos('spch_bb ', i)
-     if(i.eq.range(1)) then
-        flag = string_from_table_row('spch_bb ', 'name ', i, name)
-        if(flag.ne.0) goto 98
-        flag = double_from_table_row('spch_bb ', 's ',i, position)
-        if(flag.ne.0) goto 98
-        if(name(:10).ne."RING$START".and.position.ne.0d0) then
+     if (i .eq. range(1)) then
+        flag = string_from_table_row('spch_bb ', 'name ', i, name); if (flag.ne.0) goto 98
+        flag = double_from_table_row('spch_bb ', 's ',i, position); if (flag.ne.0) goto 98
+        if (name(:10).ne."RING$START" .and. position.ne.zero) then
            write(text, '(1p,i8)') i
-           call aafail('TRRUN: Fatal: ',                             &
+           call fort_fail('TRRUN: Fatal: ', &
                 'Global TWISS not readable from table spch_bb'// text)
         endif
-        flag = double_from_table_row('spch_bb ', 'betx ', i, betx_start)
-        if(flag.ne.0) goto 98
-        flag = double_from_table_row('spch_bb ', 'bety ', i, bety_start)
-        if(flag.ne.0) goto 98
-        if(abs(betx_start).lt.cme10.or.abs(bety_start).lt.cme10) then
+        flag = double_from_table_row('spch_bb ', 'betx ', i, betx_start); if (flag.ne.0) goto 98
+        flag = double_from_table_row('spch_bb ', 'bety ', i, bety_start); if (flag.ne.0) goto 98
+        if (abs(betx_start).lt.cme10 .or. abs(bety_start).lt.cme10) then
            write(text, '(1p,i8)') i
-           call aafail('TRRUN: Fatal: ',                             &
+           call fort_fail('TRRUN: Fatal: ', &
                 'start beta values from TWISS table smaller than '// &
                 '1e-10, location: ' // text)
         endif
-        flag = double_from_table_row('spch_bb ', 'alfx ', i, alfx_start)
-        if(flag.ne.0) goto 98
-        flag = double_from_table_row('spch_bb ', 'alfy ', i, alfy_start)
-        if(flag.ne.0) goto 98
-        gamx_start = (1d0+alfx_start*alfx_start)/betx_start
-        gamy_start = (1d0+alfy_start*alfy_start)/bety_start
-        flag = double_from_table_row('spch_bb ', 'dx ', i,  dx_start)
-        if(flag.ne.0) goto 98
-        flag = double_from_table_row('spch_bb ', 'dpx ', i, dpx_start)
-        if(flag.ne.0) goto 98
-        flag = double_from_table_row('spch_bb ', 'dy ', i,  dy_start)
-        if(flag.ne.0) goto 98
-        flag = double_from_table_row('spch_bb ', 'dpy ', i, dpy_start)
-        if(flag.ne.0) goto 98
+        flag = double_from_table_row('spch_bb ', 'alfx ', i, alfx_start); if (flag.ne.0) goto 98
+        flag = double_from_table_row('spch_bb ', 'alfy ', i, alfy_start); if (flag.ne.0) goto 98
+        gamx_start = (one+alfx_start*alfx_start)/betx_start
+        gamy_start = (one+alfy_start*alfy_start)/bety_start
+        flag = double_from_table_row('spch_bb ', 'dx ', i,  dx_start); if (flag.ne.0) goto 98
+        flag = double_from_table_row('spch_bb ', 'dpx ', i, dpx_start); if (flag.ne.0) goto 98
+        flag = double_from_table_row('spch_bb ', 'dy ', i,  dy_start); if (flag.ne.0) goto 98
+        flag = double_from_table_row('spch_bb ', 'dpy ', i, dpy_start); if (flag.ne.0) goto 98
      else
         ii=i-1
-        flag = string_from_table_row('spch_bb ', 'name ', i, spch_bb_name(ii))
-        if(flag.ne.0) goto 98
-        flag = double_from_table_row('spch_bb ', 'betx ', i, betx_bb(ii))
-        if(flag.ne.0) goto 98
-        flag = double_from_table_row('spch_bb ', 'bety ', i, bety_bb(ii))
-        if(flag.ne.0) goto 98
-        if(abs(betx_bb(ii)).lt.cme10.or.abs(bety_bb(ii)).lt.cme10) then
+        flag = string_from_table_row('spch_bb ', 'name ', i, spch_bb_name(ii)); if (flag.ne.0) goto 98
+        flag = double_from_table_row('spch_bb ', 'betx ', i, betx_bb(ii)); if (flag.ne.0) goto 98
+        flag = double_from_table_row('spch_bb ', 'bety ', i, bety_bb(ii)); if (flag.ne.0) goto 98
+        if (abs(betx_bb(ii)).lt.cme10 .or. abs(bety_bb(ii)).lt.cme10) then
            write(text, '(1p,i8)') i
-           call aafail('TRRUN: Fatal: ',                                &
-                'BB beta values from TWISS table smaller '//            &
+           call fort_fail('TRRUN: Fatal: ', &
+                'BB beta values from TWISS table smaller '// &
                 'than 1e-10 at location:  '//text)
         endif
-        flag = double_from_table_row('spch_bb ', 'alfx ', i, alfx_bb(ii))
-        if(flag.ne.0) goto 98
-        flag = double_from_table_row('spch_bb ', 'alfy ', i, alfy_bb(ii))
-        if(flag.ne.0) goto 98
-        gamx_bb(ii) = (1d0+alfx_bb(ii)*alfx_bb(ii))/betx_bb(ii)
-        gamy_bb(ii) = (1d0+alfy_bb(ii)*alfy_bb(ii))/bety_bb(ii)
-        flag = double_from_table_row('spch_bb ', 'dx ', i,  dx_bb(ii))
-        if(flag.ne.0) goto 98
-        flag = double_from_table_row('spch_bb ', 'dy ', i,  dy_bb(ii))
-        if(flag.ne.0) goto 98
+        flag = double_from_table_row('spch_bb ', 'alfx ', i, alfx_bb(ii)); if (flag.ne.0) goto 98
+        flag = double_from_table_row('spch_bb ', 'alfy ', i, alfy_bb(ii)); if (flag.ne.0) goto 98
+        gamx_bb(ii) = (one+alfx_bb(ii)*alfx_bb(ii))/betx_bb(ii)
+        gamy_bb(ii) = (one+alfy_bb(ii)*alfy_bb(ii))/bety_bb(ii)
+        flag = double_from_table_row('spch_bb ', 'dx ', i,  dx_bb(ii)); if (flag.ne.0) goto 98
+        flag = double_from_table_row('spch_bb ', 'dy ', i,  dy_bb(ii)); if (flag.ne.0) goto 98
      endif
   enddo
   goto 99
+
 98 write(text, '(1p,i8)') i
-  call aafail('TRRUN: Fatal: ',                                     &
-       'Table: spch_bb corrupted at row =' // text)
+   call fort_fail('TRRUN: Fatal: ', 'Table: spch_bb corrupted at row =' // text)
+
 99 continue
+   call table_range('time_var_mul ', '#s/#e ', range)
+   print *, 'Range for Table time_var_mul: ', range(1), range(2)
+   if (range(1).eq.0 .and. range(2).eq.0) then
+      print*," Info: Table time_var_mul is empty "
+      goto 102
+   endif
+   name=" "
+   if (range(2).gt.n_time_var) then
+      write(text, '(1p,i8)') n_time_var
+      call fort_fail('TRRUN: Fatal: ', 'overrun of time varying mult arrays =' // text)
+   endif
+   do i=range(1),range(2)
+      j = advance_to_pos('time_var_mul ', i)
+      flag = double_from_table_row('time_var_mul ', 'number ',i, time_var_m_ind(i)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'turn ',i, time_var_m_nt(i)); if (flag.ne.0) goto 101
+      flag = string_from_table_row('time_var_mul ', 'name ', i, time_var_m_ch(i)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dkn0 ',i, myfield(i,1,0)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dks0 ',i, myfield(i,1,1)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dkn1 ',i, myfield(i,1,2)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dks1 ',i, myfield(i,1,3)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dkn2 ',i, myfield(i,1,4)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dks2 ',i, myfield(i,1,5)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dkn3 ',i, myfield(i,1,6)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dks3 ',i, myfield(i,1,7)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dkn4 ',i, myfield(i,1,8)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dks4 ',i, myfield(i,1,9)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dkn5 ',i, myfield(i,1,10)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dks5 ',i, myfield(i,2,0)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dkn6 ',i, myfield(i,2,1)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dks6 ',i, myfield(i,2,2)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dkn7 ',i, myfield(i,2,3)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dks7 ',i, myfield(i,2,4)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dkn8 ',i, myfield(i,2,5)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dks8 ',i, myfield(i,2,6)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dkn9 ',i, myfield(i,2,7)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dks9 ',i, myfield(i,2,8)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dkn10 ',i, myfield(i,2,9)); if (flag.ne.0) goto 101
+      flag = double_from_table_row('time_var_mul ', 'dks10 ',i, myfield(i,2,10)); if (flag.ne.0) goto 101
+   enddo
+   goto 102
 
-  call table_range('time_var_mul ', '#s/#e ', range)
-  print *, 'Range for Table time_var_mul: ', range(1), range(2)
-  if(range(1).eq.0.and.range(2).eq.0) then
-     print*," Info: Table time_var_mul is empty "
-     goto 102
-  endif
-  name=" "
-  if(range(2).gt.n_time_var) then
-     write(text, '(1p,i8)') n_time_var
-     call aafail('TRRUN: Fatal: ',                                   &
-          'overrun of time varying mult arrays =' // text)
-  endif
-  do i=range(1),range(2)
-     j = advance_to_pos('time_var_mul ', i)
-     flag = double_from_table_row('time_var_mul ', 'number ',i,          &
-          time_var_m_ind(i))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'turn ',i,            &
-          time_var_m_nt(i))
-     if(flag.ne.0) goto 101
-     flag = string_from_table_row('time_var_mul ', 'name ', i,              &
-          time_var_m_ch(i))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dkn0 ',i,            &
-          myfield(i,1,0))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dks0 ',i,            &
-          myfield(i,1,1))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dkn1 ',i,            &
-          myfield(i,1,2))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dks1 ',i,            &
-          myfield(i,1,3))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dkn2 ',i,            &
-          myfield(i,1,4))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dks2 ',i,            &
-          myfield(i,1,5))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dkn3 ',i,            &
-          myfield(i,1,6))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dks3 ',i,            &
-          myfield(i,1,7))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dkn4 ',i,            &
-          myfield(i,1,8))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dks4 ',i,            &
-          myfield(i,1,9))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dkn5 ',i,            &
-          myfield(i,1,10))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dks5 ',i,            &
-          myfield(i,2,0))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dkn6 ',i,            &
-          myfield(i,2,1))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dks6 ',i,            &
-          myfield(i,2,2))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dkn7 ',i,            &
-          myfield(i,2,3))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dks7 ',i,            &
-          myfield(i,2,4))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dkn8 ',i,            &
-          myfield(i,2,5))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dks8 ',i,            &
-          myfield(i,2,6))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dkn9 ',i,            &
-          myfield(i,2,7))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dks9 ',i,            &
-          myfield(i,2,8))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dkn10 ',i,           &
-          myfield(i,2,9))
-     if(flag.ne.0) goto 101
-     flag = double_from_table_row('time_var_mul ', 'dks10 ',i,           &
-          myfield(i,2,10))
-     if(flag.ne.0) goto 101
-  enddo
-  goto 102
 101 write(text, '(1p,i8)') i
-  call aafail('TRRUN: Fatal: ',                                     &
-       'Table: time_var_mul corrupted at row =' // text)
+   call fort_fail('TRRUN: Fatal: ', 'Table: time_var_mul corrupted at row =' // text)
+
 102 continue
+    call table_range('time_var_pha ', '#s/#e ', range)
+    print *, 'Range for Table time_var_pha: ', range(1), range(2)
+    if (range(1).eq.0 .and. range(2).eq.0) then
+       print*," Info: Table time_var_pha is empty "
+       goto 104
+    endif
+    name=" "
+    if (range(2).gt.n_time_var) then
+       write(text, '(1p,i8)') n_time_var
+       call fort_fail('TRRUN: Fatal: ', 'overrun of time varying pha arrays =' // text)
+    endif
+    do i=range(1),range(2)
+       j = advance_to_pos('time_var_pha ', i)
+       flag = double_from_table_row('time_var_pha ', 'number ',i, time_var_p_ind(i)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'turn ',i, time_var_p_nt(i)); if (flag.ne.0) goto 103
+       flag = string_from_table_row('time_var_pha ', 'name ', i, time_var_p_ch(i)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm11 ',i, phase_tromb(i,1)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm12 ',i, phase_tromb(i,2)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm13 ',i, phase_tromb(i,3)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm14 ',i, phase_tromb(i,4)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm15 ',i, phase_tromb(i,5)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm16 ',i, phase_tromb(i,6)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm21 ',i, phase_tromb(i,7)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm22 ',i, phase_tromb(i,8)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm23 ',i, phase_tromb(i,9)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm24 ',i, phase_tromb(i,10)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm25 ',i, phase_tromb(i,11)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm26 ',i, phase_tromb(i,12)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm31 ',i, phase_tromb(i,13)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm32 ',i, phase_tromb(i,14)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm33 ',i, phase_tromb(i,15)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm34 ',i, phase_tromb(i,16)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm35 ',i, phase_tromb(i,17)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm36 ',i, phase_tromb(i,18)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm41 ',i, phase_tromb(i,19)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm42 ',i, phase_tromb(i,20)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm43 ',i, phase_tromb(i,21)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm44 ',i, phase_tromb(i,22)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm45 ',i, phase_tromb(i,23)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm46 ',i, phase_tromb(i,24)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm51 ',i, phase_tromb(i,25)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm52 ',i, phase_tromb(i,26)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm53 ',i, phase_tromb(i,27)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm54 ',i, phase_tromb(i,28)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm55 ',i, phase_tromb(i,29)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm56 ',i, phase_tromb(i,30)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm61 ',i, phase_tromb(i,31)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm62 ',i, phase_tromb(i,32)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm63 ',i, phase_tromb(i,33)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm64 ',i, phase_tromb(i,34)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm65 ',i, phase_tromb(i,35)); if (flag.ne.0) goto 103
+       flag = double_from_table_row('time_var_pha ', 'rm66 ',i, phase_tromb(i,36)); if (flag.ne.0) goto 103
+    enddo
+    goto 104
 
-  call table_range('time_var_pha ', '#s/#e ', range)
-  print *, 'Range for Table time_var_pha: ', range(1), range(2)
-  if(range(1).eq.0.and.range(2).eq.0) then
-     print*," Info: Table time_var_pha is empty "
-     goto 104
-  endif
-  name=" "
-  if(range(2).gt.n_time_var) then
-     write(text, '(1p,i8)') n_time_var
-     call aafail('TRRUN: Fatal: ',                                   &
-          'overrun of time varying pha arrays =' // text)
-  endif
-  do i=range(1),range(2)
-     j = advance_to_pos('time_var_pha ', i)
-     flag = double_from_table_row('time_var_pha ', 'number ',i,          &
-          time_var_p_ind(i))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'turn ',i,            &
-          time_var_p_nt(i))
-     if(flag.ne.0) goto 103
-     flag = string_from_table_row('time_var_pha ', 'name ', i,              &
-          time_var_p_ch(i))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm11 ',i,            &
-          phase_tromb(i,1))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm12 ',i,            &
-          phase_tromb(i,2))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm13 ',i,            &
-          phase_tromb(i,3))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm14 ',i,            &
-          phase_tromb(i,4))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm15 ',i,            &
-          phase_tromb(i,5))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm16 ',i,            &
-          phase_tromb(i,6))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm21 ',i,            &
-          phase_tromb(i,7))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm22 ',i,            &
-          phase_tromb(i,8))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm23 ',i,            &
-          phase_tromb(i,9))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm24 ',i,            &
-          phase_tromb(i,10))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm25 ',i,            &
-          phase_tromb(i,11))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm26 ',i,            &
-          phase_tromb(i,12))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm31 ',i,            &
-          phase_tromb(i,13))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm32 ',i,            &
-          phase_tromb(i,14))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm33 ',i,            &
-          phase_tromb(i,15))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm34 ',i,            &
-          phase_tromb(i,16))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm35 ',i,            &
-          phase_tromb(i,17))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm36 ',i,            &
-          phase_tromb(i,18))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm41 ',i,            &
-          phase_tromb(i,19))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm42 ',i,            &
-          phase_tromb(i,20))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm43 ',i,            &
-          phase_tromb(i,21))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm44 ',i,            &
-          phase_tromb(i,22))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm45 ',i,            &
-          phase_tromb(i,23))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm46 ',i,            &
-          phase_tromb(i,24))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm51 ',i,            &
-          phase_tromb(i,25))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm52 ',i,            &
-          phase_tromb(i,26))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm53 ',i,            &
-          phase_tromb(i,27))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm54 ',i,            &
-          phase_tromb(i,28))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm55 ',i,            &
-          phase_tromb(i,29))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm56 ',i,            &
-          phase_tromb(i,30))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm61 ',i,            &
-          phase_tromb(i,31))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm62 ',i,            &
-          phase_tromb(i,32))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm63 ',i,            &
-          phase_tromb(i,33))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm64 ',i,            &
-          phase_tromb(i,34))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm65 ',i,            &
-          phase_tromb(i,35))
-     if(flag.ne.0) goto 103
-     flag = double_from_table_row('time_var_pha ', 'rm66 ',i,            &
-          phase_tromb(i,36))
-     if(flag.ne.0) goto 103
-  enddo
-  goto 104
 103 write(text, '(1p,i8)') i
-  call aafail('TRRUN: Fatal: ',                                     &
-       'Table: time_var_pha corrupted at row =' // text)
+    call fort_fail('TRRUN: Fatal: ', 'Table: time_var_pha corrupted at row =' // text)
+
 104 continue
+    call table_range('time_var_cav ', '#s/#e ', range)
+    print *, 'Range for Table time_var_cav: ', range(1), range(2)
+    if (range(1).eq.0 .and. range(2).eq.0) then
+       print*," Info: Table time_var_cav is empty "
+       goto 106
+    endif
+    name=" "
+    if (range(2).gt.n_time_var) then
+       write(text, '(1p,i8)') n_time_var
+       call fort_fail('TRRUN: Fatal: ', 'overrun of time varying cav arrays =' // text)
+    endif
+    do i=range(1),range(2)
+       j = advance_to_pos('time_var_cav ', i)
+       flag = double_from_table_row('time_var_cav ', 'number ',i, time_var_c_ind(i)); if (flag.ne.0) goto 105 
+       flag = double_from_table_row('time_var_cav ', 'turn ',i, time_var_c_nt(i)); if (flag.ne.0) goto 105
+       flag = string_from_table_row('time_var_cav ', 'name ', i, time_var_c_ch(i)); if (flag.ne.0) goto 105
+       flag = double_from_table_row('time_var_cav ', 'volt ',i, cav_volt(i)); if (flag.ne.0) goto 105
+    enddo
+    goto 106
 
-  call table_range('time_var_cav ', '#s/#e ', range)
-  print *, 'Range for Table time_var_cav: ', range(1), range(2)
-  if(range(1).eq.0.and.range(2).eq.0) then
-     print*," Info: Table time_var_cav is empty "
-     goto 106
-  endif
-  name=" "
-  if(range(2).gt.n_time_var) then
-     write(text, '(1p,i8)') n_time_var
-     call aafail('TRRUN: Fatal: ',                                   &
-          'overrun of time varying cav arrays =' // text)
-  endif
-  do i=range(1),range(2)
-     j = advance_to_pos('time_var_cav ', i)
-     flag = double_from_table_row('time_var_cav ', 'number ',i,          &
-          time_var_c_ind(i))
-     if(flag.ne.0) goto 105
-     flag = double_from_table_row('time_var_cav ', 'turn ',i,            &
-          time_var_c_nt(i))
-     if(flag.ne.0) goto 105
-     flag = string_from_table_row('time_var_cav ', 'name ', i,              &
-          time_var_c_ch(i))
-     if(flag.ne.0) goto 105
-     flag = double_from_table_row('time_var_cav ', 'volt ',i,            &
-          cav_volt(i))
-     if(flag.ne.0) goto 105
-  enddo
-  goto 106
 105 write(text, '(1p,i8)') i
-  call aafail('TRRUN: Fatal: ',                                     &
-       'Table: time_var_cav corrupted at row =' // text)
-106 continue
+    call fort_fail('TRRUN: Fatal: ', 'Table: time_var_cav corrupted at row =' // text)
 
+106 continue
 end subroutine table_input
 
 subroutine ttnllens(track,ktrack)
-
+  use math_constfi, only : zero, one, two, half, pi
   implicit none
-
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
   !   Track a set of trajectories through a thin nonlinear lens          *
@@ -4671,52 +3789,53 @@ subroutine ttnllens(track,ktrack)
   !----------------------------------------------------------------------*
   ! Added by Alexander Valishev 22 Oct 2010                              *
   !----------------------------------------------------------------------*
-  integer itrack,ktrack
-  double precision track(6,*),node_value,get_variable,    &
-       pi,knll,cnll, &
-       dd, u, v, dUu, dUv, dux, duy, dvx, dvy, x, y
+  double precision :: track(6,*)
+  integer :: ktrack
 
-  cnll=node_value('cnll ')
-  knll=node_value('knll ')/cnll
-  pi=get_variable('pi ')
+  integer :: i
+  double precision :: knll, cnll, dd, u, v, dUu, dUv, dux, duy, dvx, dvy, x, y
+  double precision, external :: node_value
 
-  do itrack = 1, ktrack
+  cnll = node_value('cnll ')
+  knll = node_value('knll ') / cnll
 
-    x = track(1,itrack)/cnll
-    y = track(3,itrack)/cnll
+  do i = 1, ktrack
 
-    u=0.5*sqrt((x-1)**2+y**2)+0.5*sqrt((x+1)**2+y**2)
-    v=0.5*sqrt((x+1)**2+y**2)-0.5*sqrt((x-1)**2+y**2)
-    if (u.eq.1d0) then
-       dd=0
+    x = track(1,i) / cnll
+    y = track(3,i) / cnll
+
+    u = half*sqrt((x-one)**2+y**2) + half*sqrt((x+one)**2+y**2)
+    v = half*sqrt((x+one)**2+y**2) - half*sqrt((x-one)**2+y**2)
+    if (u .eq. one) then
+       dd = zero
     else
-       dd=u**2*log(u+sqrt(u*u-1))/sqrt(u**2-1)
+       dd = u**2 * log(u + sqrt(u*u-one))/sqrt(u**2-one)
     endif
-    dUu=(u+log(u+sqrt(u*u-1))*sqrt(u**2-1)+dd)/(u**2-v**2) &
-     -2*u*(u*log(u+sqrt(u*u-1))*sqrt(u**2-1) &
-     +v*(acos(v)-0.5*pi)*sqrt(1-v**2)) /(u**2-v**2)**2
-    dUv=2*v*(u*log(u+sqrt(u*u-1))*sqrt(u**2-1) &
-         +v*(acos(v)-0.5*pi)*sqrt(1-v**2)) /(u**2-v**2)**2 &
-         -(v-(acos(v)-0.5*pi)*sqrt(1-v**2)+v**2*(acos(v)-0.5*pi)/sqrt(1-v**2))&
-         /(u**2-v**2)
-    dux=0.5*(x-1)/sqrt((x-1)**2+y**2) +0.5*(x+1)/sqrt((x+1)**2+y**2)
-    duy=0.5*y/sqrt((x-1)**2+y**2) +0.5*y/sqrt((x+1)**2+y**2)
-    dvx=0.5*(x+1)/sqrt((x+1)**2+y**2) -0.5*(x-1)/sqrt((x-1)**2+y**2)
-    dvy=0.5*y/sqrt((x+1)**2+y**2) -0.5*y/sqrt((x-1)**2+y**2)
+    dUu = (u + log(u+sqrt(u*u-one))*sqrt(u**2-one) + dd)/(u**2-v**2) &
+         - two*u*(u*log(u+sqrt(u*u-one))*sqrt(u**2-one) &
+                + v*(acos(v)-pi/two)*sqrt(one-v**2)) /(u**2-v**2)**2
+    dUv = two*v*(u*log(u+sqrt(u*u-one))*sqrt(u**2-one) &
+               + v*(acos(v)-pi/two)*sqrt(one-v**2)) /(u**2-v**2)**2 &
+         - (v - (acos(v)-pi/two)*sqrt(one-v**2) + v**2*(acos(v)-pi/two)/sqrt(one-v**2)) &
+            / (u**2-v**2)
+    dux = half*(x-one)/sqrt((x-one)**2+y**2) + half*(x+one)/sqrt((x+one)**2+y**2)
+    duy = half*y/sqrt((x-one)**2+y**2) + half*y/sqrt((x+one)**2+y**2)
+    dvx = half*(x+one)/sqrt((x+one)**2+y**2) - half*(x-one)/sqrt((x-one)**2+y**2)
+    dvy = half*y/sqrt((x+one)**2+y**2) - half*y/sqrt((x-one)**2+y**2)
 
-    track(2,itrack)=track(2,itrack)+knll*(dUu*dux+dUv*dvx)
-    track(4,itrack)=track(4,itrack)+knll*(dUu*duy+dUv*dvy)
+    track(2,i) = track(2,i) + knll*(dUu*dux+dUv*dvx)
+    track(4,i) = track(4,i) + knll*(dUu*duy+dUv*dvy)
 
   enddo
 end subroutine ttnllens
 
 !FIXME Unused dummy argument 'turn'
 subroutine ttrfmult(track, ktrack, turn)
-
   use twtrrfi
   use trackfi
+  use math_constfi, only : zero, one, three, ten3m, ten6p, twopi
+  use phys_constfi, only : clight
   implicit none
-
   !--------------------*
   ! Andrea Latina 2012 *
   !--------------------*
@@ -4727,41 +3846,40 @@ subroutine ttrfmult(track, ktrack, turn)
   !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
   !   KTRACK    (integer)   Number of surviving tracks.                  *
   !----------------------------------------------------------------------*
-
-  double precision beta
-  double precision node_value, get_value
-  double precision bvk, deltap, elrad
-  double precision f_errors(0:maxferr)
-  integer n_ferr, jtrk, iord, nord
-
   ! BV-flag is applied as: P o inverse(M) o P
 
+  double precision :: track(6,*)
+  integer :: ktrack, turn
+  
+  integer :: n_ferr, jtrk, iord, nord
   !--- AL: RF-multipole
-  integer dummyi, nn, ns, node_fd_errors, turn, ktrack
-  double precision normal(0:maxmul), skew(0:maxmul)
-  double precision track(6,*), field(2,0:maxmul)
-  double precision field_cos(2,0:maxmul)
-  double precision field_sin(2,0:maxmul)
-  double precision pc, krf, rfac
-  double precision twopi, clight, ten3m, get_variable
-  double precision x, y, z, px, py, pt, dpx, dpy, dpt
-  double precision freq, volt, lag, harmon
-  double precision pnl(0:maxmul), psl(0:maxmul)
-  complex*16 ii, Cm2, Sm2, Cm1, Sm1, Cp0, Sp0, Cp1, Sp1
+  integer :: dummyi, nn, ns
+  double precision :: normal(0:maxmul), skew(0:maxmul)
+  double precision :: f_errors(0:maxferr)
+  double precision :: field(2,0:maxmul)
+  double precision :: field_cos(2,0:maxmul)
+  double precision :: field_sin(2,0:maxmul)
+  double precision :: pnl(0:maxmul), psl(0:maxmul)
+  double precision :: pc, krf, rfac
+  double precision :: x, y, z, px, py, pt, dpx, dpy, dpt
+  double precision :: freq, volt, lag, harmon
+  double precision :: beta, bvk, deltap, elrad
 
-  parameter ( ten3m=1d-3)
-  parameter ( ii=(0d0,1d0) )
+  ! LD: 2016.03.04 - use complex declaration compatible with Lahey
+  integer, parameter:: dp=kind(0.d0)
+  complex(kind=dp) :: Cm2, Sm2, Cm1, Sm1, Cp0, Sp0, Cp1, Sp1
 
-  twopi=get_variable('twopi ')  
-  clight=get_variable('clight ')
+  double precision, external :: node_value, get_value
+  integer, external :: node_fd_errors
+  complex(kind=dp), parameter :: ii=(0.0_dp,1.0_dp)
 
   !---- Zero the arrays
-  call dzero(normal,maxmul+1)
-  call dzero(skew,maxmul+1)
-  call dzero(pnl,maxmul+1)
-  call dzero(psl,maxmul+1)
-  call dzero(f_errors,maxferr+1)
-  call dzero(field,2*(maxmul+1))
+  NORMAL = zero 
+  SKEW = zero 
+  PNL = zero 
+  PSL = zero 
+  F_ERRORS = zero 
+  FIELD = zero 
 
   !---- Read-in the parameters
   freq = node_value('freq ');
@@ -4770,53 +3888,49 @@ subroutine ttrfmult(track, ktrack, turn)
   bvk = node_value('other_bv ')
   elrad = node_value('lrad ')
   deltap = get_value('probe ', 'deltap ')
-  dorad = get_value('probe ','radiate ') .ne. 0d0
+  radiate = get_value('probe ','radiate ') .ne. zero
   arad = get_value('probe ','arad ')
   gammas = get_value('probe ','gamma ')
   beta = get_value('probe ','beta ')
   pc = get_value('probe ','pc ')
-  n_ferr = node_fd_errors(f_errors);
+  
+  n_ferr = node_fd_errors(f_errors)
   call get_node_vector('knl ', nn, normal)
   call get_node_vector('ksl ', ns, skew)
-  call get_node_vector('pnl ', dummyi, pnl);
-  call get_node_vector('psl ', dummyi, psl);
+  call get_node_vector('pnl ', dummyi, pnl)
+  call get_node_vector('psl ', dummyi, psl)
 
-  rfac = 0d0
+  rfac = zero
 
   !---- Set-up some parameters
-  volt = bvk * node_value('volt ');
-  krf = twopi*freq*1d6/clight;
+  volt = bvk * node_value('volt ')
+  krf = twopi * freq * ten6p/clight
 
-  if (n_ferr.gt.0) then
-     call dcopy(f_errors,field,n_ferr)
-  endif
-  nord = max(nn, ns, n_ferr/2-1);
+  if (n_ferr .gt. 0) call dcopy(f_errors,field,n_ferr)
+
+  nord = max(nn, ns, n_ferr/2-1)
 
   !---- Prepare to calculate the kick and the matrix elements
   do jtrk = 1,ktrack
     ! apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
-    x  = bvk * track(1,jtrk);
-    px =       track(2,jtrk);
-    y  =       track(3,jtrk);
-    py = bvk * track(4,jtrk);
-    z  = bvk * track(5,jtrk);
-    pt =       track(6,jtrk);
+    x  = bvk * track(1,jtrk)
+    px =       track(2,jtrk)
+    y  =       track(3,jtrk)
+    py = bvk * track(4,jtrk)
+    z  = bvk * track(5,jtrk)
+    pt =       track(6,jtrk)
 
     !---- Vector with strengths + field errors
-    do iord = 0, nord;
-      field_cos(1,iord) = bvk * (normal(iord) * cos(pnl(iord) * twopi - krf * z) + field(1,iord));
-      field_sin(1,iord) = bvk * (normal(iord) * sin(pnl(iord) * twopi - krf * z));
-      field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * twopi - krf * z) + field(2,iord));
-      field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * twopi - krf * z));
+    do iord = 0, nord
+      field_cos(1,iord) = bvk * (normal(iord) * cos(pnl(iord) * twopi - krf * z) + field(1,iord))
+      field_sin(1,iord) = bvk * (normal(iord) * sin(pnl(iord) * twopi - krf * z))
+      field_cos(2,iord) = bvk * (skew(iord)   * cos(psl(iord) * twopi - krf * z) + field(2,iord))
+      field_sin(2,iord) = bvk * (skew(iord)   * sin(psl(iord) * twopi - krf * z))
     enddo
-    Cm2 = 0d0;
-    Sm2 = 0d0;
-    Cm1 = 0d0;
-    Sm1 = 0d0;
-    Cp0 = 0d0;
-    Sp0 = 0d0;
-    Cp1 = 0d0;
-    Sp1 = 0d0;
+
+    Cm2 = zero; Sm2 = zero; Cm1 = zero; Sm1 = zero; 
+    Cp0 = zero; Sp0 = zero; Cp1 = zero; Sp1 = zero;
+
     do iord = nord, 0, -1
       if (iord.ge.2) then
         Cm2 = Cm2 * (x+ii*y) / (iord-1) + field_cos(1,iord)+ii*field_cos(2,iord);
@@ -4841,11 +3955,11 @@ subroutine ttrfmult(track, ktrack, turn)
     dpt = (volt * ten3m * sin(lag * twopi - krf * z) / pc - krf * REAL(Sp1));
 
     !---- Radiation effects at entrance.
-    if (dorad  .and.  elrad .ne. 0d0) then
-      rfac = arad * gammas**3 * (dpx**2+dpy**2) / (3d0*elrad)
-      px = px - rfac * (1d0 + pt) * px
-      py = py - rfac * (1d0 + pt) * py
-      pt = pt - rfac * (1d0 + pt) ** 2
+    if (radiate  .and.  elrad .ne. zero) then
+      rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
+      px = px - rfac * (one + pt) * px
+      py = py - rfac * (one + pt) * py
+      pt = pt - rfac * (one + pt) ** 2
     endif
 
     !---- Apply the kick
@@ -4854,10 +3968,10 @@ subroutine ttrfmult(track, ktrack, turn)
     pt = pt + dpt
 
     !---- Radiation effects at exit.
-    if (dorad  .and.  elrad .ne. 0d0) then
-      px = px - rfac * (1d0 + pt) * px
-      py = py - rfac * (1d0 + pt) * py
-      pt = pt - rfac * (1d0 + pt) ** 2
+    if (radiate  .and.  elrad .ne. zero) then
+      px = px - rfac * (one + pt) * px
+      py = py - rfac * (one + pt) * py
+      pt = pt - rfac * (one + pt) ** 2
     endif
 
     ! apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
@@ -4873,11 +3987,10 @@ subroutine ttrfmult(track, ktrack, turn)
 end subroutine ttrfmult
 
 subroutine tttquad(track, ktrack)
-
   use twtrrfi
   use trackfi
+  use math_constfi, only : zero, one, two, half
   implicit none
-
   !-------------------------*
   ! Andrea Latina 2012-2013 *
   !-------------------------*
@@ -4888,26 +4001,24 @@ subroutine tttquad(track, ktrack)
   !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
   !   KTRACK    (integer)   Number of surviving tracks.                  *
   !----------------------------------------------------------------------*
+  double precision :: track(6,*)
+  integer :: ktrack
 
-  double precision track(6,*)
-  integer ktrack
+  double precision :: k1, k1s, length
+  double precision :: kk0, kk, ksqrt ! kk0 for the design momentum, kk for this particle's momentum
+  double precision :: x, px, y, py, z, pt
+  double precision :: x_, px_, y_, py_, z_, pt_
+  double precision :: C,  S,  ksqrt_S,  S_over_ksqrt
+  double precision :: Ch, Sh, ksqrt_Sh, Sh_over_ksqrt
+  double precision :: delta_p1
+  double precision :: bet0sqr
+  double precision :: ct, st
+  double precision :: tmp
+  logical :: skew
+  integer :: jtrk
 
-  double precision node_value
-  double precision k1, k1s, length
-  double precision kk0, kk, ksqrt ! kk0 for the design momentum, kk for this particle's momentum
-  double precision x, px, y, py, z, pt
-  double precision x_, px_, y_, py_, z_, pt_
-  double precision C,  S,  ksqrt_S,  S_over_ksqrt
-  double precision Ch, Sh, ksqrt_Sh, Sh_over_ksqrt
-  double precision delta_p1
-  double precision bet0sqr
-  double precision ct, st
-  double precision tmp
-  logical skew
-  integer jtrk
-
-  double precision sqrt2
-  parameter ( sqrt2=1.41421356237310d0 )
+  double precision, external :: node_value
+  double precision, parameter ::  sqrt2=1.41421356237310d0
 
   !---- Read-in the parameters
   bet0sqr = bet0*bet0;
@@ -4915,25 +4026,22 @@ subroutine tttquad(track, ktrack)
   k1s = node_value('k1s ');
   length = node_value('l ');
 
-  if ((k1.eq.0d0).and.(k1s.eq.0d0)) then
+  if (k1.eq.zero .and. k1s.eq.zero) then
      call ttdrf(length,track,ktrack);
      return
-  else if ((k1.ne.0d0).and.(k1s.ne.0d0)) then
-     call aawarn('trrun: ',&
-          'a quadrupole cannot have *both* K1 and K1S different than zero!');
+  else if (k1.ne.zero .and. k1s.ne.zero) then
+     call fort_warn('trrun: ','a quadrupole cannot have *both* K1 and K1S different from zero!');
      return
   endif
 
-  if (k1s.ne.0d0) then
-     kk0 = k1s;
-     skew = .true.
+  if (k1s .ne. zero) then
+     kk0 = k1s; skew = .true.
   else
-     kk0 = k1;
-     skew = .false.
+     kk0 = k1;  skew = .false.
   endif
 
   !---- Prepare to calculate the kick and the matrix elements
-  do jtrk = 1,ktrack
+  do jtrk = 1, ktrack
      !---- The particle position
      x  = track(1,jtrk);
      px = track(2,jtrk);
@@ -4943,17 +4051,17 @@ subroutine tttquad(track, ktrack)
      pt = track(6,jtrk);
 
 !!$    !---- Radiation effects at entrance.
-!!$    if (dorad  .and.  elrad .ne. 0d0) then
-!!$      rfac = arad * gammas**3 * (dpx**2+dpy**2) / (3d0*elrad)
-!!$      track(2,jtrk) = track(2,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(2,jtrk)
-!!$      track(4,jtrk) = track(4,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(4,jtrk)
-!!$      track(6,jtrk) = track(6,jtrk) - rfac * (1d0 + track(6,jtrk)) ** 2
+!!$    if (radiate  .and.  elrad .ne. zero) then
+!!$      rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
+!!$      track(2,jtrk) = track(2,jtrk) - rfac * (one + track(6,jtrk)) * track(2,jtrk)
+!!$      track(4,jtrk) = track(4,jtrk) - rfac * (one + track(6,jtrk)) * track(4,jtrk)
+!!$      track(6,jtrk) = track(6,jtrk) - rfac * (one + track(6,jtrk)) ** 2
 !!$    endif
 
      !---- If SKEW rotates by -45 degrees
      if (skew) then
-        ct =  sqrt2 / 2d0
-        st = -sqrt2 / 2d0
+        ct =  sqrt2 / two
+        st = -sqrt2 / two
         tmp = x
         x = ct * tmp + st * y
         y = ct * y   - st * tmp
@@ -4963,11 +4071,11 @@ subroutine tttquad(track, ktrack)
      endif
 
      !---- Computes 1+delta and kk
-     delta_p1 = sqrt(pt*pt+2d0*pt/bet0+1d0);
+     delta_p1 = sqrt(pt*pt + two*pt/bet0 + one);
      kk = kk0 / delta_p1;
 
      !---- Computes the kick
-     if (kk.gt.0d0) then
+     if (kk .gt. zero) then
         ksqrt = sqrt(kk);
         C = cos(ksqrt*length);
         S = sin(ksqrt*length);
@@ -4997,11 +4105,11 @@ subroutine tttquad(track, ktrack)
      y_  = Ch * y + Sh_over_ksqrt * py / delta_p1;
      py_ = -ksqrt_Sh * delta_p1 * y + Ch * py;
      !---- Z
-     z_ = z + pt*length*(1d0-bet0sqr)/bet0sqr - &
-          (0.5) * (bet0*pt+1d0)/bet0/(delta_p1*delta_p1) * &
-          (0.5 * kk0 * ((x*x)*(length-C*S_over_ksqrt) - (y*y)*(length-Ch*Sh_over_ksqrt)) + &
-          0.5 * ((px*px)*(length+C*S_over_ksqrt) + (py*py)*(length+Ch*Sh_over_ksqrt)) / delta_p1 - &
-          (x*px*(1d0-C*C)+y*py*(1d0-Ch*Ch)));
+     z_ = z + pt*length*(one-bet0sqr)/bet0sqr - &
+          half * (bet0*pt+one)/bet0/(delta_p1*delta_p1) * &
+          (half * kk0 * ((x*x)*(length-C*S_over_ksqrt) - (y*y)*(length-Ch*Sh_over_ksqrt)) + &
+          half * ((px*px)*(length+C*S_over_ksqrt) + (py*py)*(length+Ch*Sh_over_ksqrt)) / delta_p1 - &
+          (x*px*(one-C*C)+y*py*(one-Ch*Ch)));
      !pt_ = pt; ! unchanged
 
      x = x_;
@@ -5013,8 +4121,8 @@ subroutine tttquad(track, ktrack)
 
      !---- If SKEW rotates by +45 degrees
      if (skew) then
-        ct = sqrt2 / 2d0
-        st = sqrt2 / 2d0
+        ct = sqrt2 / two
+        st = sqrt2 / two
         tmp = x
         x = ct * tmp + st * y
         y = ct * y   - st * tmp
@@ -5031,12 +4139,11 @@ subroutine tttquad(track, ktrack)
      track(5,jtrk) = z
      !track(6,jtrk) = pt ! unchanged
 
-
 !!$    !---- Radiation effects at exit.
-!!$    if (dorad  .and.  elrad .ne. 0d0) then
-!!$      track(2,jtrk) = track(2,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(2,jtrk)
-!!$      track(4,jtrk) = track(4,jtrk) - rfac * (1d0 + track(6,jtrk)) * track(4,jtrk)
-!!$      track(6,jtrk) = track(6,jtrk) - rfac * (1d0 + track(6,jtrk)) ** 2
+!!$    if (radiate  .and.  elrad .ne. zero) then
+!!$      track(2,jtrk) = track(2,jtrk) - rfac * (one + track(6,jtrk)) * track(2,jtrk)
+!!$      track(4,jtrk) = track(4,jtrk) - rfac * (one + track(6,jtrk)) * track(4,jtrk)
+!!$      track(6,jtrk) = track(6,jtrk) - rfac * (one + track(6,jtrk)) ** 2
 !!$    endif
 
   enddo
@@ -5044,11 +4151,10 @@ subroutine tttquad(track, ktrack)
 end subroutine tttquad
 
 subroutine tttdipole(track, ktrack)
-  
   use twtrrfi
   use trackfi
+  use math_constfi, only : zero, one, two, three, five, seven, half
   implicit none
-  
   !-------------------------*
   ! Andrea Latina 2013-2014 *
   !-------------------------*
@@ -5060,44 +4166,38 @@ subroutine tttdipole(track, ktrack)
   !   KTRACK    (integer)   Number of surviving tracks.                  *
   !----------------------------------------------------------------------*
   
-  double precision track(6,*)
-  integer ktrack
+  double precision :: track(6,*)
+  integer :: ktrack
   
-  double precision node_value
-  double precision L, angle, rho, h, k0
-  double precision x, px, y, py, z, pt
-  double precision x_, px_, y_, py_, z_, pt_
-  double precision delta_plus_1, delta_plus_1_sqr, sqrt_delta_plus_1
-  double precision sqrt_h_sqrt_k0, sqrt_h_div_sqrt_k0, sqrt_k0_div_sqrt_h
-  double precision C, S, C_sqr
-  double precision gamma, hx, hy, get_value, rfac
+  integer :: jtrk
+  double precision :: L, angle, rho, h, k0
+  double precision :: x, px, y, py, z, pt
+  double precision :: x_, px_, y_, py_, z_, pt_
+  double precision :: delta_plus_1, delta_plus_1_sqr, sqrt_delta_plus_1
+  double precision :: sqrt_h_sqrt_k0, sqrt_h_div_sqrt_k0, sqrt_k0_div_sqrt_h
+  double precision :: C, S, C_sqr
+  double precision :: gamma, hx2, hy2, rfac
+  double precision :: bet0sqr
+  double precision :: e1, e2, h1, h2, hgap, fint, fintx
+  
+  double precision, external :: node_value, get_value 
 
-  double precision bet0sqr
-  integer jtrk, get_option, optiondebug
-  logical kill_ent_fringe, kill_exi_fringe
+  arad    = get_value('probe ','arad ')
+  gamma   = get_value('probe ','gamma ')
+  radiate = get_value('probe ','radiate ') .ne. zero
 
   !---- Read-in dipole edges angles
-
-  double precision e1, e2, h1, h2, hgap, fint, fintx
-  optiondebug = get_option('debug ')
-  e1 = node_value('e1 ');
-  e2 = node_value('e2 ');
-  h1 = node_value('h1 ')
-  h2 = node_value('h2 ')
-  hgap = node_value('hgap ')
-  fint = node_value('fint ')
+  e1    = node_value('e1 ');
+  e2    = node_value('e2 ');
+  h1    = node_value('h1 ')
+  h2    = node_value('h2 ')
+  hgap  = node_value('hgap ')
+  fint  = node_value('fint ')
   fintx = node_value('fintx ')
-  kill_ent_fringe = node_value('kill_ent_fringe ') .ne. 0d0
-  kill_exi_fringe = node_value('kill_exi_fringe ') .ne. 0d0
-  arad = get_value('probe ','arad ')
-  gamma = get_value('probe ','gamma ')
-  dorad = get_value('probe ','radiate ') .ne. 0d0
 
   !---- Apply entrance dipole edge effect
-
-  if (.not.kill_ent_fringe) then
-     call ttdpdg_map(track, ktrack, e1, h1, hgap, fint, 0d0)
-  endif
+  if (node_value('kill_ent_fringe ') .eq. zero) &
+       call ttdpdg_map(track, ktrack, e1, h1, hgap, fint, zero)
   
   !---- Read-in the parameters
   bet0sqr = bet0*bet0;
@@ -5118,81 +4218,265 @@ subroutine tttdipole(track, ktrack)
      pt = track(6,jtrk);
   
      !---- Radiation effects at entrance.
-     if (dorad) then
-        delta_plus_1_sqr = pt*pt+2d0*pt/bet0+1d0;
-        delta_plus_1 = sqrt(delta_plus_1_sqr);
-        hx = 1d0/(rho*delta_plus_1);
-        hy = 0d0;
-        rfac = (arad * gamma**3 * L / 3d0) * (hx**2 + hy**2) * (1d0 + h*x) * (1d0 - tan(e1)*x)
-        px = px - rfac * (1d0 + pt) * px
-        py = py - rfac * (1d0 + pt) * py
-        pt = pt - rfac * (1d0 + pt) ** 2
+     ! classical effect only with damping 
+     if (radiate) then
+        hx2 = one / (rho**2  *  (pt*pt + two*pt/bet0 + one));
+        hy2 = zero;
+        rfac = (arad * gamma**3 * L / three) * (hx2 + hy2) * (one + h*x) * (one - tan(e1)*x)
+        px = px - rfac * (one + pt) * px
+        py = py - rfac * (one + pt) * py
+        pt = pt - rfac * (one + pt) ** 2
      endif
 
-     delta_plus_1_sqr = pt*pt+2.0*pt/bet0+1;
+     delta_plus_1_sqr = pt*pt + two*pt/bet0 + one;
      delta_plus_1 = sqrt(delta_plus_1_sqr);
      sqrt_delta_plus_1 = sqrt(delta_plus_1);
      sqrt_h_sqrt_k0 = sign(sqrt(h*k0),k0);
      sqrt_h_div_sqrt_k0 = sqrt(h/k0);
      sqrt_k0_div_sqrt_h = sqrt(k0/h);
-     C=cos(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1);
-     S=sin(sqrt_h_sqrt_k0*L/sqrt_delta_plus_1);
+
+     C = cos(sqrt_h_sqrt_k0 * L / sqrt_delta_plus_1);
+     S = sin(sqrt_h_sqrt_k0 * L / sqrt_delta_plus_1);
      C_sqr = C*C;
-     x_ = px*S/(sqrt_delta_plus_1*sqrt_h_sqrt_k0)+x*C-delta_plus_1*C/k0+C/h+delta_plus_1/k0-1.0/h;
-     px_ = -sqrt_delta_plus_1*sqrt_h_sqrt_k0*x*S- &
-          sqrt_delta_plus_1*sqrt_k0_div_sqrt_h*S+delta_plus_1*sqrt_delta_plus_1*sqrt_h_div_sqrt_k0*S+px*C;
+     
+     x_  = px*S/(sqrt_delta_plus_1*sqrt_h_sqrt_k0)+x*C-delta_plus_1*C/k0+C/h+delta_plus_1/k0-one/h;
+     px_ = -sqrt_delta_plus_1*sqrt_h_sqrt_k0*x*S - &
+            sqrt_delta_plus_1*sqrt_k0_div_sqrt_h*S + &
+            delta_plus_1*sqrt_delta_plus_1*sqrt_h_div_sqrt_k0*S + px*C;
+     
      y_  = y + py * L / delta_plus_1; 
-     py_ = py; 
-     z_  = z + pt*L*(1.0-bet0sqr)/bet0sqr + &
-          (-(0.5)*(bet0*pt+1.0)/bet0/(delta_plus_1**3) * &
-          (x*x*delta_plus_1*(h*k0*L-sqrt_delta_plus_1*sqrt_h_sqrt_k0*C*S)*0.5 + &
-          px*px*(sqrt_delta_plus_1*C*S/sqrt_h_sqrt_k0+L)*0.5 + &
+     py_ = py; ! unchanged
+
+     z_  = z + pt*L*(one-bet0sqr)/bet0sqr + &
+          (-half*(bet0*pt+one)/bet0/(delta_plus_1**3) * &
+          (x*x*delta_plus_1*(h*k0*L-sqrt_delta_plus_1*sqrt_h_sqrt_k0*C*S)*half + &
+          px*px*(sqrt_delta_plus_1*C*S/sqrt_h_sqrt_k0+L)*half + &
           px*(-delta_plus_1_sqr*C_sqr/k0+delta_plus_1*C_sqr/h+delta_plus_1_sqr/k0-delta_plus_1/h) + &
-          x*(-delta_plus_1**(3.0*0.5)*sqrt_k0_div_sqrt_h*C*S+ &
-          delta_plus_1**(5.0*0.5)*sqrt_h_div_sqrt_k0*C*S+ &
+          x*(-delta_plus_1**(three*half)*sqrt_k0_div_sqrt_h*C*S+ &
+          delta_plus_1**(five*half)*sqrt_h_div_sqrt_k0*C*S+ &
           delta_plus_1*k0*L-delta_plus_1_sqr*h*L)+ &
-          x*px*delta_plus_1*(C_sqr-1.0) + &
+          x*px*delta_plus_1*(C_sqr-one) + &
           py*py*L + &
-          (-delta_plus_1**(3.0*0.5)*sqrt_k0_div_sqrt_h*C*S*0.5/h + &
-          delta_plus_1**(5.0*0.5)*C*S/(sqrt_h_sqrt_k0)+ &
-          (-delta_plus_1**(7.0*0.5)*sqrt_h_div_sqrt_k0*C*S*0.5/k0 + &
-          delta_plus_1*L*(delta_plus_1*(delta_plus_1*h/k0*0.5-1.0)+k0/h*0.5)))));
-     !pt_ = pt; ! unchanged
+          (-delta_plus_1**(three*half)*sqrt_k0_div_sqrt_h*C*S*half/h + &
+          delta_plus_1**(five*half)*C*S/(sqrt_h_sqrt_k0)+ &
+          (-delta_plus_1**(seven*half)*sqrt_h_div_sqrt_k0*C*S*half/k0 + &
+          delta_plus_1*L*(delta_plus_1*(delta_plus_1*h/k0*half-one)+k0/h*half)))));
+     pt_ = pt; ! unchanged
      
-     x = x_;
-     y = y_;
-     z = z_;
-     px = px_;
-     py = py_;
-     !pt = pt_; ! unchanged
+     x  = x_;     y = y_;     z = z_;
+     px = px_;   py = py_;   pt = pt_; 
      
+     !---- Radiation effects at exit.
+     if (radiate) then
+        hx2 = one / (rho**2  *  (pt*pt + two*pt/bet0 + one));
+        rfac = (arad * gamma**3 * L / three) * (hx2 + hy2) * (one + h*x) * (one - tan(e2)*x)
+        px = px - rfac * (one + pt) * px
+        py = py - rfac * (one + pt) * py
+        pt = pt - rfac * (one + pt) ** 2
+     endif
+
      !---- Applies the kick
      track(1,jtrk) = x
      track(2,jtrk) = px
      track(3,jtrk) = y
      track(4,jtrk) = py
      track(5,jtrk) = z
-     !track(6,jtrk) = pt ! unchanged
+     track(6,jtrk) = pt 
      
-     !---- Radiation effects at exit.
-     if (dorad) then
-        hx = 1d0/(rho*delta_plus_1);
-        rfac = (arad * gamma**3 * L / 3d0) * (hx**2 + hy**2) * (1d0 + h*x) * (1d0 - tan(e2)*x)
-        px = px - rfac * (1d0 + pt) * px
-        py = py - rfac * (1d0 + pt) * py
-        pt = pt - rfac * (1d0 + pt) ** 2
-     endif
   enddo
   
   !---- Apply exit dipole edge effect
-  if (.not.kill_exi_fringe) then
-     if (fintx.lt.0d0) then
-        fintx = fint;
-     endif
-     call ttdpdg_map(track, ktrack, e2, h2, hgap, fintx, 0d0)
+  if (node_value('kill_exi_fringe ') .eq. zero) then
+     if (fintx .lt. zero) fintx = fint
+     call ttdpdg_map(track, ktrack, e2, h2, hgap, fintx, zero)
   endif
   
 end subroutine tttdipole
+
+subroutine trphot(el,curv,rfac,deltap)
+  use math_constfi, only : zero, one, two, three, five, twelve
+  use phys_constfi, only : clight, hbar
+  implicit none
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   Generate random energy loss for photons, using a look-up table to  *
+  !   invert the function Y.  Ultra-basic interpolation computed;        *
+  !   leads to an extrapolation outside the table using the two outmost  *
+  !   point on each side (low and high).                                 *
+  !   Assumes ultra-relativistic particles (beta = 1).                   *
+  ! Author: Ghislain Roy                                                 *
+  ! Input:                                                               *
+  !   EL     (double)       Element length.                              *
+  !   CURV   (double)       Local curvature of orbit.                    *
+  ! Output:                                                              *
+  !   RFAC   (double)       Relative energy loss due to photon emissions.*
+  !----------------------------------------------------------------------*
+  !---- Generate pseudo-random integers in batches of NR.                *
+  !     The random integers are generated in the range [0, MAXRAN).      *
+  !---- Table definition: maxtab, taby(maxtab), tabxi(maxtab)            *
+  !----------------------------------------------------------------------*
+  double precision :: el, curv, rfac, deltap
+
+  integer :: i, ierror, j, nphot
+  double precision :: amean, dlogr, slope, ucrit, xi, sumxi
+  integer, parameter :: maxtab=101
+  double precision :: tabxi(maxtab),taby(maxtab)  
+  double precision :: arad, pc, gamma, amass
+  character(len=20) text
+
+  double precision :: get_value, frndm
+  double precision, parameter :: fac1=3.256223d0
+  ! integer, parameter :: maxran=1000000000
+
+  data (taby(i), i = 1, 101)                                         &
+       / -1.14084005d0,  -0.903336763d0, -0.769135833d0, -0.601840854d0, &
+       -0.448812515d0, -0.345502228d0, -0.267485678d0, -0.204837948d0,   &
+       -0.107647471d0, -0.022640628d0,  0.044112321d0,  0.0842842236d0,  &
+       0.132941082d0,  0.169244036d0,  0.196492359d0,  0.230918407d0,    &
+       0.261785239d0,  0.289741248d0,  0.322174788d0,  0.351361096d0,    &
+       0.383441716d0,  0.412283719d0,  0.442963421d0,  0.472622454d0,    &
+       0.503019691d0,  0.53197819d0,   0.561058342d0,  0.588547111d0,    &
+       0.613393188d0,  0.636027336d0,  0.675921738d0,  0.710166812d0,    &
+       0.725589216d0,  0.753636241d0,  0.778558254d0,  0.811260045d0,    &
+       0.830520391d0,  0.856329501d0,  0.879087269d0,  0.905612588d0,    &
+       0.928626955d0,  0.948813677d0,  0.970829248d0,  0.989941061d0,    &
+       1.0097903d0,    1.02691281d0,   1.04411256d0,   1.06082714d0,     &
+       1.0750246d0,    1.08283985d0,   1.0899564d0,    1.09645379d0,     &
+       1.10352755d0,   1.11475027d0,   1.12564385d0,   1.1306442d0,      &
+       1.13513422d0,   1.13971806d0,   1.14379156d0,   1.14741969d0,     &
+       1.15103698d0,   1.15455759d0,   1.15733826d0,   1.16005647d0,     &
+       1.16287541d0,   1.16509759d0,   1.16718769d0,   1.16911888d0,     &
+       1.17075884d0,   1.17225218d0,   1.17350936d0,   1.17428589d0,     &
+       1.17558432d0,   1.17660713d0,   1.17741513d0,   1.17805469d0,     &
+       1.17856193d0,   1.17896497d0,   1.17928565d0,   1.17954147d0,     &
+       1.17983139d0,   1.1799767d0,    1.18014216d0,   1.18026078d0,     &
+       1.18034601d0,   1.1804074d0,    1.18045175d0,   1.1804837d0,      &
+       1.18051291d0,   1.18053186d0,   1.18054426d0,   1.18055236d0,     &
+       1.18055761d0,   1.18056166d0,   1.18056381d0,   1.1805656d0,      &
+       1.18056655d0,   1.18056703d0,   1.18056726d0,   1.1805675d0,      &
+       1.18056762d0 /
+  data (tabxi(i), i = 1, 101)                                        &
+       / -7.60090017d0,  -6.90775537d0,  -6.50229025d0,  -5.99146461d0,  &
+       -5.52146101d0,  -5.20300722d0,  -4.96184492d0,  -4.76768923d0,    &
+       -4.46540833d0,  -4.19970512d0,  -3.98998451d0,  -3.86323285d0,    &
+       -3.70908213d0,  -3.59356928d0,  -3.50655794d0,  -3.39620972d0,    &
+       -3.29683733d0,  -3.20645332d0,  -3.10109282d0,  -3.0057826d0,     &
+       -2.9004221d0,   -2.80511189d0,  -2.70306253d0,  -2.60369015d0,    &
+       -2.50103593d0,  -2.4024055d0 ,  -2.30258512d0,  -2.20727491d0,    &
+       -2.12026358d0,  -2.04022098d0,  -1.89712d0   ,  -1.7719568d0,     &
+       -1.71479833d0,  -1.60943794d0,  -1.51412773d0,  -1.38629436d0,    &
+       -1.30933332d0,  -1.20397282d0,  -1.10866261d0,  -0.99425226d0,    &
+       -0.89159810d0,  -0.79850775d0,  -0.69314718d0,  -0.59783697d0,    &
+       -0.49429631d0,  -0.40047753d0,  -0.30110508d0,  -0.19845095d0,    &
+       -0.10536054d0,  -0.05129330d0,   0.0d0,          0.048790119d0,   &
+       0.104360029d0,  0.198850885d0,  0.300104618d0,  0.350656837d0,    &
+       0.398776114d0,  0.451075643d0,  0.500775278d0,  0.548121393d0,    &
+       0.598836541d0,  0.652325153d0,  0.69813472d0 ,  0.746687889d0,    &
+       0.802001595d0,  0.850150883d0,  0.900161386d0,  0.951657832d0,    &
+       1.00063193d0,   1.05082154d0,   1.09861231d0,   1.13140213d0,     &
+       1.1939224d0,    1.25276291d0,   1.3083328d0,    1.36097658d0,     &
+       1.4109869d0,    1.45861506d0,   1.50407743d0,   1.54756248d0,     &
+       1.60943794d0,   1.64865863d0,   1.70474803d0,   1.75785792d0,     &
+       1.80828881d0,   1.85629797d0,   1.90210748d0,   1.9459101d0,      &
+       2.0014801d0,    2.05412364d0,   2.10413408d0,   2.15176225d0,     &
+       2.19722462d0,   2.25129175d0,   2.29253483d0,   2.35137534d0,     &
+       2.40694523d0,   2.45100522d0,   2.501436d0,     2.60268974d0,     &
+       2.64617491d0 /
+
+  !Get constants
+  arad   = get_value('probe ','arad ')
+  pc     = get_value('probe ','pc ')
+  amass  = get_value('probe ','mass ')
+  gamma  = get_value('probe ','gamma ')
+  deltap = get_value('probe ','deltap ')
+
+  !---- AMEAN is the average number of photons emitted.,
+  !     NPHOT is the integer number generated from Poisson's law.
+  amean = five * sqrt(three) / (twelve * hbar * clight) * abs(arad * pc * (one+deltap) * el * curv) 
+  rfac = zero
+  if (amean .gt. zero) then
+     call dpoissn(amean, nphot, ierror)
+
+     if (ierror .ne. 0) then
+        write(text, '(1p,d20.12)') amean
+        call fort_fail('TRPHOT: ','Fatal: Poisson input mean =' // text)
+     endif
+
+     !---- For all photons, sum the radiated photon energy in units of UCRIT
+     if (nphot .ne. 0) then        
+        ucrit = three/two * hbar * clight * gamma**3 * abs(curv)
+
+        sumxi = zero
+        do i = 1, nphot
+
+           !---- Find a uniform random number in the range [ 0,3.256223 ].
+           !     Note that the upper limit is not exactly 15*sqrt(3)/8
+           !     because of imprecision in the integration of F.
+           dlogr = log(fac1 * frndm())
+
+           !---- Now look for the energy of the photon in the table TABY/TABXI
+           do j = 2, maxtab
+              if (dlogr .le. taby(j) ) go to 20
+           enddo
+
+           !---- Perform linear interpolation and sum up energy lost.
+20         slope = (dlogr - taby(j-1)) / (taby(j) - taby(j-1))
+           xi = dexp(tabxi(j-1) + slope * (tabxi(j) - tabxi(j-1)))
+           sumxi = sumxi + xi
+           ! write(60,*) xi ! 2016-Mar-16  18:22:30  ghislain: dump individual photons to file
+        enddo
+     endif
+  endif
+
+  ! normalize rfac to beam energy
+  rfac = sumxi * ucrit * curv**2 / (gamma*amass)
+  
+end subroutine trphot
+
+subroutine dpoissn (amu,n,ierror)
+  use math_constfi, only : zero, one, half
+  implicit none
+  !----------------------------------------------------------------------*
+  !    POISSON GENERATOR                                                 *
+  !    CODED FROM LOS ALAMOS REPORT      LA-5061-MS                      *
+  !    PROB(N)=EXP(-AMU)*AMU**N/FACT(N)                                  *
+  !        WHERE FACT(N) STANDS FOR FACTORIAL OF N                       *
+  !    ON RETURN IERROR.EQ.0 NORMALLY                                    *
+  !              IERROR.EQ.1 IF AMU.LE.0.                                *
+  !----------------------------------------------------------------------*
+  double precision, intent(IN) :: amu
+  integer, intent(OUT) :: n, ierror
+
+  double precision :: ran, pir, expma
+  double precision :: frndm, grndm
+  ! AMAX IS THE VALUE ABOVE WHICH THE NORMAL DISTRIBUTION MUST BE USED
+  double precision, parameter :: amax=88d0
+
+  ierror= 0
+
+  if (amu .le. zero) then
+     ! MEAN SHOULD BE POSITIVE
+     ierror = 1
+     n = 0
+     return
+  endif
+
+  if (amu .gt. amax) then
+     ! NORMAL APPROXIMATION FOR AMU.GT.AMAX
+     ran = grndm()
+     n = ran * sqrt(amu) + amu + half
+     return
+  endif
+
+   expma = exp(-amu)
+   pir = one
+   n = -1
+
+10 n = n + 1
+   pir = pir * frndm()
+   if (pir .gt. expma) go to 10
+
+end subroutine dpoissn
 
 subroutine wzset
   !  *********************************************************************
@@ -5218,9 +4502,9 @@ subroutine wzset
   !
   !  *********************************************************************
   use fasterror
-  integer i,j,k
-  double precision h,wi,wr,x,y
-  parameter ( h = 1.d0/63.d0 )
+  integer :: i,j,k
+  double precision :: wi, wr, x, y
+  double precision, parameter :: h=1.d0/63.d0
   save
   !-----------------------------------------------------------------------
   hrecip = 1.d0/h
@@ -5239,6 +4523,7 @@ subroutine wzset
      end do
   end do
 end subroutine wzset
+
 subroutine mywwerf(x,y,wr,wi)
   !  *********************************************************************
   !
@@ -5251,19 +4536,22 @@ subroutine mywwerf(x,y,wr,wi)
   !
   !  *********************************************************************
   implicit none
-  integer n
-  double precision c,c1,c2,c3,c4,hf,p,rr,ri,sr0,sr,si,tr,ti,vi,vr,  &
-       &wi,wr,x,xa,xl,y,ya,zhi,zhr,z1,z10
-  parameter (z1=1,hf=z1/2d0,z10=10d0)
-  parameter (c1=74d0/z10,c2=83d0/z10,c3=z10/32d0,c4=16d0/z10)
-  !     parameter (c=1.12837916709551257d0,p=(2d0*c4)**33)
-  parameter (c=1.12837916709551257d0,p=46768052394588893.3825d0)
-  dimension rr(37),ri(37)
+  double precision :: x, y, wr, wi
+
+  integer :: n
+  double precision :: rr(37), ri(37), sr0, sr, si, tr, ti, vi, vr, xa, xl, ya, zhi, zhr
+
+  double precision, parameter :: z1=1d0, hf=z1/2d0, z10=10d0
+  double precision, parameter :: c1=74d0/z10, c2=83d0/z10, c3=z10/32d0, c4=16d0/z10
+  !double precision, parameter :: c=1.12837916709551257d0, p=(2d0*c4)**33
+  double precision, parameter :: c=1.12837916709551257d0
+  double precision, parameter :: p=46768052394588893.3825d0
+
   save
   !-----------------------------------------------------------------------
   xa=abs(x)
   ya=abs(y)
-  if(ya.lt.c1.and.xa.lt.c2) then
+  if (ya.lt.c1 .and. xa.lt.c2) then
      !        zh=dcmplx(ya+c4,xa)
      zhr=ya+c4
      zhi=xa
@@ -5315,28 +4603,30 @@ subroutine mywwerf(x,y,wr,wi)
      vr=c*rr(1)
      vi=c*ri(1)
   endif
-  !hr05 if(ya.eq.0) then
-  if(ya.eq.0d0) then                                                 !hr05
+  !hr05 if (ya .eq. 0) then
+  if (ya .eq. 0d0) then                                                 !hr05
      !        v=dcmplx(exp(-xa**2),dimag(v))
      !hr05   vr=exp_rn(-xa**2)
      vr=exp(-1d0*xa**2)                                              !hr05
   endif
-  if(y.lt.0d0) then
+  if (y.lt.0d0) then
      !        v=2*exp(-dcmplx(xa,ya)**2)-v
      !hr05   vr=2d0*exp_rn(ya**2-xa**2)*cos_rn(2d0*xa*ya)-vr
      vr=(2d0*exp(ya**2-xa**2))*cos((2d0*xa)*ya)-vr              !hr05
      vi=(-2d0*exp(ya**2-xa**2))*sin((2d0*xa)*ya)-vi             !hr05
-     !hr05   if(x.gt.0) vi=-vi
-     if(x.gt.0d0) vi=-1d0*vi                                          !hr05
+     !hr05   if (x.gt.0) vi=-vi
+     if (x.gt.0d0) vi=-1d0*vi                                          !hr05
   else
-     !hr05   if(x.lt.0) vi=-vi
-     if(x.lt.0d0) vi=-1d0*vi                                          !hr05
+     !hr05   if (x.lt.0) vi=-vi
+     if (x.lt.0d0) vi=-1d0*vi                                          !hr05
   endif
   wr=vr
   wi=vi
   return
 end subroutine mywwerf
+
 subroutine wzsubv(n,vx,vy,vu,vv)
+  use math_constfi, only : one, two, half
   !  *********************************************************************
   !
   !  This subroutine sets u=real(w(z)) and v=imag(w(z)), where z=x+i*y and
@@ -5357,7 +4647,6 @@ subroutine wzsubv(n,vx,vy,vu,vv)
   !
   !  Vectorised for up to 64 argument values by E.McIntosh, 30.10.1997.
   !
-  !
   !  Third-order divided-difference interpolation over the corners of a
   !  square [e.g. formula (2.5.1) in "Introduction to Numerical Analysis"
   !  (F.B.Hildebrand New York, 1957), but with complex nodes and
@@ -5367,7 +4656,6 @@ subroutine wzsubv(n,vx,vy,vu,vv)
   !  ing (x,y) are numbered (0,0)=3, (h,0)=4, (h,h)=1, (0,h)=2.
   !  Identifiers d, dd and ddd denote divided-differences of orders 1, 2
   !  and 3 respectively, and a preceding 't' indicates twice the value.
-  !
   !
   !  Two-term rational approximation to w(z) [Footnote to Table 7.9
   !  in "Handbook of Mathematical Functions (eds. M.Abramowitz &
@@ -5381,33 +4669,34 @@ subroutine wzsubv(n,vx,vy,vu,vv)
   !
   !  *********************************************************************
   implicit none
-  dimension vx(*),vy(*),vu(*),vv(*)
-  integer i,j,k,n,vmu,vnu
-  double precision a1,a2,b1,b2,vd12i,vd12r,vd23i,vd23r,             &
-       &vd34i,vd34r,vp,vq,vqsq,vr,vsimag,vsreal,vt,vtdd13i,vtdd13r,       &
-       &vtdd24i,vtdd24r,vtdddi,vtdddr,vti,vtr,vu,vusum,vusum3,vv,         &
-       &vvsum,vvsum3,vw1i,vw1r,vw2i,vw2r,vw3i,vw3r,vw4i,vw4r,vx,          &
-       &vxh,vxhrel,vy,vyh,vyhrel
-  integer npart
-  parameter(npart = 64)
-  integer idim,kstep,nx,ny
-  double precision h,half,hrecip,one,wtimag,wtreal,xcut,ycut
-  parameter ( xcut = 7.77d0, ycut = 7.46d0 )
-  parameter ( h = 1.d0/63.d0 )
-  parameter ( nx = 490, ny = 470 )
-  parameter ( idim = (nx+2)*(ny+2) )
-  parameter ( half = 0.5d0, one = 1.d0 )
-  common /wzcom1/ hrecip, kstep
-  common /wzcom2/ wtreal(idim), wtimag(idim)
-  parameter ( a1 = 0.5124242248d0, a2 = 0.0517653588d0 )
-  parameter ( b1 = 0.2752551286d0, b2 = 2.7247448714d0 )
-  double precision xm,xx,yy
-  parameter (xm=1d120)
+  integer :: n
+  double precision :: vx(*), vy(*), vu(*), vv(*)
+
+  integer, parameter :: npart=64, nx=490, ny=470, idim=(nx+2)*(ny+2)
+
+  integer :: i, j, k, vmu, vnu, kstep
+  double precision :: vd12i, vd12r, vd23i, vd23r, vd34i, vd34r
+  double precision :: vp, vq, vqsq, vr, vsimag, vsreal 
+  double precision :: vt, vtdd13i, vtdd13r, vtdd24i, vtdd24r, vtdddi, vtdddr, vti, vtr
+  double precision :: vusum, vusum3, vvsum, vvsum3
+  double precision :: vw1i, vw1r, vw2i, vw2r, vw3i, vw3r, vw4i, vw4r
+  double precision :: vxh, vxhrel, vyh, vyhrel
+  double precision :: hrecip, wtimag(idim), wtreal(idim)
+  double precision :: xx, yy
+
+  double precision, parameter :: xcut=7.77d0, ycut=7.46d0 
+  double precision, parameter :: h=1.d0/63.d0
+  double precision, parameter :: a1=0.5124242248d0, a2=0.0517653588d0
+  double precision, parameter :: b1=0.2752551286d0, b2=2.7247448714d0
+  double precision, parameter :: xm=1d120
   !     temporary arrays to facilitate vectorisation
-  integer in,out,ins,outs
-  dimension ins(npart),outs(npart)
+  integer :: in, out, ins(npart), outs(npart)
+
+  !common /wzcom1/ hrecip, kstep
+  !common /wzcom2/ wtreal(idim), wtimag(idim)
+
   !-----------------------------------------------------------------------
-  integer ilo,ihi
+  integer :: ilo, ihi
   !$    integer nt,th,s
   !$    integer omp_get_num_threads,omp_get_thread_num
   !-----------------------------------------------------------------------
@@ -5419,15 +4708,15 @@ subroutine wzsubv(n,vx,vy,vu,vv)
   !$    s=n/nt
   !$    ilo=1+s*th
   !$    ihi=ilo+s-1
-  !$    if (th.eq.nt-1) ihi=n
+  !$    if (th .eq. nt-1) ihi=n
   !-----------------------------------------------------------------------
   in=0
   out=0
   do i=ilo,ihi
-     if (vx(i).ge.xcut.or.vy(i).ge.ycut) then
+     if (vx(i).ge.xcut .or. vy(i).ge.ycut) then
         out=out+1
         outs(out)=i
-        if (out.eq.npart) then
+        if (out .eq. npart) then
            !     everything outside the rectangle so approximate
            !     write (*,*) 'ALL outside'
            !     write (*,*) 'i=',i
@@ -5437,7 +4726,7 @@ subroutine wzsubv(n,vx,vy,vu,vv)
               if (xx.ge.xm) xx=xm
               if (yy.ge.xm) yy=xm
               vp=xx**2-yy**2
-              vq=(2.d0*xx)*yy
+              vq=(two*xx)*yy
               vqsq=vq**2
               !  First term.
               vt=vp-b1
@@ -5458,7 +4747,7 @@ subroutine wzsubv(n,vx,vy,vu,vv)
      else
         in=in+1
         ins(in)=i
-        if (in.eq.npart) then
+        if (in .eq. npart) then
            !     everything inside the square, so interpolate
            !     write (*,*) 'ALL inside'
            do j=1,in
@@ -5484,7 +4773,7 @@ subroutine wzsubv(n,vx,vy,vu,vv)
               vti = vd23i - vd34i
               vtdd24r = vti - vtr
               !hr05 vtdd24i(j) = - ( vtr(j) + vti(j) )
-              vtdd24i = -1d0* ( vtr + vti )                             !hr05
+              vtdd24i = -one * ( vtr + vti )                             !hr05
               k = k + 1
               vw1r = wtreal(k)
               vw1i = wtimag(k)
@@ -5499,10 +4788,8 @@ subroutine wzsubv(n,vx,vy,vu,vv)
               !  Evaluate polynomial.
               vxhrel = vxh - dble(vmu)
               vyhrel = vyh - dble(vnu)
-              vusum3=half*(vtdd13r+                                       &
-                   &(vxhrel*vtdddr-vyhrel*vtdddi))
-              vvsum3=half*(vtdd13i+                                       &
-                   &(vxhrel*vtdddi+vyhrel*vtdddr))
+              vusum3 = half * (vtdd13r + (vxhrel*vtdddr - vyhrel*vtdddi))
+              vvsum3 = half * (vtdd13i + (vxhrel*vtdddi + vyhrel*vtdddr))
               vyhrel = vyhrel - one
               vusum=vd12r+(vxhrel*vusum3-vyhrel*vvsum3)
               vvsum=vd12i+(vxhrel*vvsum3+vyhrel*vusum3)
@@ -5517,31 +4804,31 @@ subroutine wzsubv(n,vx,vy,vu,vv)
   !     everything outside the rectangle so approximate
   !     write (*,*) 'ALL outside'
   !     write (*,*) 'i=',i
-  do j=1,out
-     xx=vx(outs(j))
-     yy=vy(outs(j))
+  do j= 1,out
+     xx = vx(outs(j))
+     yy = vy(outs(j))
      if (xx.ge.xm) xx=xm
      if (yy.ge.xm) yy=xm
-     vp=xx**2-yy**2
-     vq=(2.d0*xx)*yy
-     vqsq=vq**2
+     vp = xx**2 - yy**2
+     vq = (two*xx)*yy
+     vqsq = vq**2
      !  First term.
-     vt=vp-b1
-     vr=a1/(vt**2+vqsq)
-     vsreal=vr*vt
-     vsimag=-vr*vq
+     vt = vp-b1
+     vr = a1/(vt**2+vqsq)
+     vsreal =  vr*vt
+     vsimag = -vr*vq
      !  Second term
-     vt=vp-b2
-     vr=a2/(vt**2+vqsq)
-     vsreal=vsreal+vr*vt
-     vsimag=vsimag-vr*vq
+     vt = vp-b2
+     vr = a2/(vt**2+vqsq)
+     vsreal = vsreal +vr*vt
+     vsimag = vsimag -vr*vq
      !  Multiply by i*z.
-     vu(outs(j))=-(yy*vsreal+xx*vsimag)
-     vv(outs(j))=xx*vsreal-yy*vsimag
+     vu(outs(j)) = -(yy*vsreal+xx*vsimag)
+     vv(outs(j)) =   xx*vsreal-yy*vsimag
   enddo
   !     everything inside the square, so interpolate
   !     write (*,*) 'ALL inside'
-  do j=1,in
+  do j= 1,in
      vxh = hrecip*vx(ins(j))
      vyh = hrecip*vy(ins(j))
      vmu = int(vxh)
@@ -5564,7 +4851,7 @@ subroutine wzsubv(n,vx,vy,vu,vv)
      vti = vd23i - vd34i
      vtdd24r = vti - vtr
      !hr05 vtdd24i(j) = - ( vtr(j) + vti(j) )
-     vtdd24i = -1d0* ( vtr + vti )                             !hr05
+     vtdd24i = -one * ( vtr + vti )                             !hr05
      k = k + 1
      vw1r = wtreal(k)
      vw1i = wtimag(k)
@@ -5579,21 +4866,21 @@ subroutine wzsubv(n,vx,vy,vu,vv)
      !  Evaluate polynomial.
      vxhrel = vxh - dble(vmu)
      vyhrel = vyh - dble(vnu)
-     vusum3=half*(vtdd13r+                                       &
-          &(vxhrel*vtdddr-vyhrel*vtdddi))
-     vvsum3=half*(vtdd13i+                                       &
-          &(vxhrel*vtdddi+vyhrel*vtdddr))
+     vusum3 = half * (vtdd13r + (vxhrel*vtdddr-vyhrel*vtdddi))
+     vvsum3 = half * (vtdd13i + (vxhrel*vtdddi+vyhrel*vtdddr))
      vyhrel = vyhrel - one
-     vusum=vd12r+(vxhrel*vusum3-vyhrel*vvsum3)
-     vvsum=vd12i+(vxhrel*vvsum3+vyhrel*vusum3)
+     vusum = vd12r + (vxhrel*vusum3-vyhrel*vvsum3)
+     vvsum = vd12i + (vxhrel*vvsum3+vyhrel*vusum3)
      vxhrel = vxhrel - one
-     vu(ins(j))=vw1r+(vxhrel*vusum-vyhrel*vvsum)
-     vv(ins(j))=vw1i+(vxhrel*vvsum+vyhrel*vusum)
+     vu(ins(j)) = vw1r + (vxhrel*vusum-vyhrel*vvsum)
+     vv(ins(j)) = vw1i + (vxhrel*vvsum+vyhrel*vusum)
   enddo
   !$OMP END PARALLEL
   return
 end subroutine wzsubv
+
 subroutine wzsub(x,y,u,v)
+  use math_constfi, only : one, two, half
   !  *********************************************************************
   !
   !  This subroutine sets u=real(w(z)) and v=imag(w(z)), where z=x+i*y and
@@ -5612,7 +4899,6 @@ subroutine wzsub(x,y,u,v)
   !
   !  (G.A.Erskine, 29.09.1997)
   !
-  !
   !  Third-order divided-difference interpolation over the corners of a
   !  square [e.g. formula (2.5.1) in "Introduction to Numerical Analysis"
   !  (F.B.Hildebrand New York, 1957), but with complex nodes and
@@ -5625,16 +4911,18 @@ subroutine wzsub(x,y,u,v)
   !
   !  *********************************************************************
   use fasterror
-  integer k,mu,nu
-  double precision a1,a2,b1,b2,d12i,d12r,d23i,d23r,d34i,d34r,p,           &
-       &q,qsq,r,simag,sreal,t,tdd13i,tdd13r,tdd24i,tdd24r,tdddi,tdddr,ti, &
-       &tr,u,usum,usum3,v,vsum,vsum3,w1i,w1r,w2i,w2r,w3i,w3r,w4i,w4r,x,xh,&
-       &xhrel,y,yh,yhrel
-  double precision half,one,xcut,ycut
-  parameter ( xcut = 7.77d0, ycut = 7.46d0 )
-  parameter ( half = 0.5d0, one = 1.d0 )
-  parameter ( a1 = 0.5124242248d0, a2 = 0.0517653588d0 )
-  parameter ( b1 = 0.2752551286d0, b2 = 2.7247448714d0 )
+  double precision :: x, y, u, v
+
+  integer :: k, mu, nu
+  double precision :: d12i, d12r, d23i, d23r, d34i, d34r, p, q, qsq, r
+  double precision :: simag, sreal, t, tdd13i, tdd13r, tdd24i, tdd24r, tdddi, tdddr, ti, tr
+  double precision :: usum, usum3, vsum, vsum3, w1i, w1r, w2i, w2r, w3i, w3r, w4i, w4r
+  double precision :: xh, xhrel, yh, yhrel
+
+  double precision, parameter :: xcut=7.77d0, ycut=7.46d0
+  double precision, parameter :: a1=0.5124242248d0, a2=0.0517653588d0
+  double precision, parameter :: b1=0.2752551286d0, b2=2.7247448714d0
+
   save
   !-----------------------------------------------------------------------
   if ( x.ge.xcut .or. y.ge.ycut ) goto 1000
@@ -5697,7 +4985,7 @@ subroutine wzsub(x,y,u,v)
   !
 1000 p=x**2-y**2
   !hr05 q=2.d0*x*y
-  q=(2.d0*x)*y                                                       !hr05
+  q=(two*x)*y                                                       !hr05
   qsq=q**2
   !  First term.
   t=p-b1

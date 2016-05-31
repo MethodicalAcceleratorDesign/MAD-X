@@ -1371,7 +1371,7 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
   {
     slice_style = pl->parameters[ipos_style]->string ;
     cout << "makethin: style chosen : " << slice_style << '\n';
-  } else slice_style = "teapot";
+  } else slice_style = "teapot"; // Should be "hybrid" for backward compatibility
 
   if(debug_fl() && kill_fringe_fl)   cout << "kill_fringe_fl="   << kill_fringe_fl   << " is on. Flags kill_ent_fringe kill_exi_fringe will be set to true for thick bend body slices" << '\n';
   if(debug_fl() && dipedge_h1_h2_fl) cout << "dipedge_h1_h2_fl=" << dipedge_h1_h2_fl << " is on. Higher order h1, h2 parameters will be kept. Tracking may become non-simplectic" << '\n';
@@ -1828,7 +1828,7 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
         if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " in " << rbend_el-> name << " has expression, use this " << parnam  << '\n';
         add_cmd_parameter_clone(sbend_cmd, return_param_recurse(parnam,rbend_el),parnam,1);
       }
-      else if( !strcmp(parnam,"aperture") || !strcmp(parnam,"apertype") ) // check also aperture and apertype
+      else if( !strcmp(parnam,"aperture") || !strcmp(parnam,"apertype") || !strcmp(parnam,"aper_tol") ) // check also aperture, apertype, aper_tol
       {
         if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " parnam " << parnam << " cmdi->expr=" << cmdi->expr << " cmdi " << my_dump_command_parameter(cmdi) << '\n';
         add_cmd_parameter_clone(sbend_cmd,return_param_recurse(parnam,rbend_el),parnam,1);
@@ -1843,8 +1843,8 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
         bool found=false;
         double default_val=my_get_int_or_double_value(rbend_el->base_type,parnam,found); // return the default values, works for int and double parameters
 
-        if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " rbend " << rbend_el->name << " parnam " << parnam << " " << sbend_name
-          << " cmdi=" << cmdi << " value=" << value << '\n';
+        if(verbose_fl()) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " rbend " << rbend_el->name << " parnam " << setw(12) << parnam << " " << setw(12) << sbend_name
+          << " cmdi=" << cmdi << " value=" << value << " found=" << found << '\n';
         if( !strcmp(parnam, "l") && rbarc_fl() )
         {
           value = el_par_value(parnam,rbend_el); // special case rbend with option("rbarc"), get increased arc length value from el_par_value
@@ -2200,12 +2200,19 @@ element* SeqElList::create_thin_solenoid(const element* thick_elem, int slice_no
       cmd->par->curr++;
     }
   }
+  //--- now the arguments which are copied from the thick element
   add_cmd_parameter_clone(cmd,return_param_recurse("apertype",thick_elem),"apertype",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("aperture",thick_elem),"aperture",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("aper_offset",thick_elem),"aper_offset",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("aper_tol",thick_elem),"aper_tol",1);
-  add_cmd_parameter_clone(cmd,return_param("bv",thick_elem),"bv",1);
-  add_cmd_parameter_clone(cmd,return_param("tilt",thick_elem),"tilt",1);
+  add_cmd_parameter_clone(cmd,return_param(        "bv",      thick_elem),"bv",      1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("tilt",    thick_elem),"tilt",    1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("kmax",    thick_elem),"kmax",    1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("kmin",    thick_elem),"kmin",    1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("calib",   thick_elem),"calib",   1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("polarity",thick_elem),"polarity",1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("mech_sep",thick_elem),"mech_sep",1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("v_pos",   thick_elem),"v_pos",   1);
   // create element with this command
   const char* thin_name;
   if (slices==1 && slice_no==1) thin_name=thick_elem->name;
@@ -2302,12 +2309,19 @@ element* SeqElList::create_thin_elseparator(const element* thick_elem, int slice
       cmd->par->curr++;
     }
   }
+  //--- now the arguments which are copied from the thick element
   add_cmd_parameter_clone(cmd,return_param_recurse("apertype",thick_elem),"apertype",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("aperture",thick_elem),"aperture",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("aper_offset",thick_elem),"aper_offset",1);
   add_cmd_parameter_clone(cmd,return_param_recurse("aper_tol",thick_elem),"aper_tol",1);
-  add_cmd_parameter_clone(cmd,return_param("bv",thick_elem),"bv",1);
-  add_cmd_parameter_clone(cmd,return_param("tilt",thick_elem),"tilt",1);
+  add_cmd_parameter_clone(cmd,return_param(        "bv",      thick_elem),"bv",      1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("tilt",    thick_elem),"tilt",    1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("kmax",    thick_elem),"kmax",    1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("kmin",    thick_elem),"kmin",    1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("calib",   thick_elem),"calib",   1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("polarity",thick_elem),"polarity",1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("mech_sep",thick_elem),"mech_sep",1);
+  add_cmd_parameter_clone(cmd,return_param_recurse("v_pos",   thick_elem),"v_pos",   1);
   // create element with this command
   const char* thin_name;
   if (slices==1 && slice_no==1) thin_name=thick_elem->name;
