@@ -840,8 +840,6 @@ ptc_create_universe;
 
   ptc_twiss, table=twiss, icase=5, no=3, closed_orbit, rmatrix, maptable;
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
 
 ++++++ table: ptc_twiss_summary
 
@@ -907,8 +905,6 @@ ptc_create_universe;
 
   ptc_twiss, table=twiss, icase=5, no=3, rmatrix, initial_matrix_table; 
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  Reduced SUMM Table (Inital parameters specified)
 
 ++++++ table: ptc_twiss_summary

@@ -74,8 +74,6 @@ select, flag=twiss, column=name,s,betx,bety,x,px,y,py,apertype,on_elem, class=rc
 twiss, sequence=lhcb1, file="twiss-table.out";
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   2.348867E-03 deltap:   0.000000E+00
 orbit:  -2.024091E-03  6.263101E-07  1.934669E-06  1.728349E-04  0.000000E+00  0.000000E+00
@@ -140,8 +138,6 @@ select, flag=ptc_twiss, column=name,s,betx,bety,x,px,y,py,apertype,on_elem, clas
 
 ptc_twiss,  closed_orbit, icase=6, no=3, file="ptc-twiss-table.out";
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
 ++++++ warning: return mystate:   no cavity - dimensionality reduced 6 -> 5 and 1/2
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
@@ -211,13 +207,13 @@ ptc_twiss,  closed_orbit, icase=6, no=3, file="ptc-twiss-table.out";
    2.414012503e-05    6.321234672e-06                  0     0.007390738745 
 
             ycomax            pxcomax            pycomax             tcomax 
-    0.008056958782    0.0004263339826    0.0004558719032    1.013617375e-05 
+    0.008056958782    0.0004263339826    0.0004558719032     1.067998106e-05
 
            ptcomax             xcomin             ycomin            pxcomin 
                  0    -0.008477889811    -0.008499924562   -0.0004558717364 
 
            pycomin             tcomin            ptcomin 
-  -0.0003912272041   -1.067998106e-05                  0 
+  -0.0003912272041   -1.013617375e-05                  0 
 
 
 ptc_end;

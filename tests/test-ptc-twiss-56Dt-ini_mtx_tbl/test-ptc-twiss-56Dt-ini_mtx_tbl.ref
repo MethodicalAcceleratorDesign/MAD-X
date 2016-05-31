@@ -862,8 +862,6 @@ ptc_create_universe;
 
   ptc_twiss,table="twiss", icase=56,no=2,initial_matrix_table;
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  Reduced SUMM Table (Inital parameters specified)
 
 ++++++ table: ptc_twiss_summary
@@ -928,8 +926,6 @@ ptc_create_universe;
 
   ptc_twiss,table="twiss", icase=56,no=2,initial_matrix_table, rmatrix;
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  Reduced SUMM Table (Inital parameters specified)
 
 ++++++ table: ptc_twiss_summary
@@ -990,8 +986,6 @@ ptc_create_universe;
 
   ptc_twiss,table="twiss", icase=56,no=2,initial_matrix_table, ignore_map_orbit;
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  Reduced SUMM Table (Inital parameters specified)
 
 ++++++ table: ptc_twiss_summary

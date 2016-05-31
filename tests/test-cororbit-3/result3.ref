@@ -9,12 +9,12 @@
 @ GAMMA            %le         479.6050377
 @ KBUNCH           %le                   1
 @ BCURRENT         %le                   0
-@ SIGE             %le                   0
-@ SIGT             %le                   0
+@ SIGE             %le               0.001
+@ SIGT             %le                   1
 @ NPART            %le                   0
 @ EX               %le                   1
 @ EY               %le                   1
-@ ET               %le                   1
+@ ET               %le               0.001
 @ LENGTH           %le               534.6
 @ ALFA             %le        0.7550575802
 @ ORBIT5           %le                  -0
@@ -40,9 +40,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %01s "s"
-@ ORIGIN           %17s "5.02.05 Darwin 64"
-@ DATE             %08s "23/06/15"
-@ TIME             %08s "17.35.26"
+@ ORIGIN           %17s "5.02.09 Darwin 64"
+@ DATE             %08s "18/04/16"
+@ TIME             %08s "18.19.51"
 * NAME                                S                  X                 PX                  Y                 PY               BETX               BETY               ALFX               ALFY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "FIVECELL$START"                     0    -0.002762161505   -5.728768244e-05                  0                  0        176.2388523        15.53413022       -2.392576694       0.3110043089

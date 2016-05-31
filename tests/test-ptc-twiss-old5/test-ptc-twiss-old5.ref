@@ -36,8 +36,6 @@ select,flag=twiss,column=name,s,betx,bety,dx,dy,mux,muy,x,y;!,re11,re12,re13,re1
 twiss, file=twiss_madx;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   3.396492E-04 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  3.100060E-02  0.000000E+00
@@ -72,8 +70,6 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  2.997565E-02  0
 EMIT,DELTAP=0.;
 
 enter EMIT module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  
  Global parameters for electrons, radiate = F:
 
@@ -163,8 +159,6 @@ obs_points pro_ptc_setswitch Done
 
      ptc_twiss,closed_orbit,icase=6,file="twiss_diamond.out";
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
   Rectangular Bend: input arc length (rho alpha) 

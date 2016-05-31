@@ -103,15 +103,13 @@ orbit:   4.955084E-05 -3.460423E-07  0.000000E+00  0.000000E+00  1.525348E-01  7
 iteration:   5 error:   1.102777E-07 deltap:   0.000000E+00
 orbit:   4.954688E-05 -3.462812E-07  0.000000E+00  0.000000E+00  1.525359E-01  7.169429E-04
   
-  Full 6D closed orbit search.
-  Initial value of 6-D closed orbit from Twiss: 
-  orbit0    4.9546879566648725E-005  -3.4628120925387573E-007   0.0000000000000000        0.0000000000000000       0.15253590951780999        7.1694287121548239E-004
+Full 6D closed orbit search.
+Initial value of 6-D closed orbit from Twiss: 
+orbit0   4.954688E-05 -3.462812E-07  0.000000E+00  0.000000E+00  1.525359E-01  7.169429E-04
   
- 6D closed orbit found by subroutine trclor 
+6D closed orbit found by subroutine trclor 
 iteration:  11 error:   1.436106E-06 deltap:   0.000000E+00
 orbit:   4.962471E-05 -3.415771E-07  0.000000E+00  0.000000E+00  1.525357E-01  7.165082E-04
-
-*****  end of trrun  *****
 exit TRACK module
 
 

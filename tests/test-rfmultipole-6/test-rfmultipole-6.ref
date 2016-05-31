@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.07  (32 bit, Darwin)      +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.09.24               +
-  + Execution date: 2015.10.12 19:04:23      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:23:36      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, 'RF-Dipole example';
 
@@ -41,10 +41,9 @@ select, flag = twiss, column=name,s,betx,alfx,mux, bety, alfy,muy,dx,dy;
 twiss, save, centre; 
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
   
 iteration:   1 error:   1.119543E-19 deltap:   0.000000E+00
-orbit:   2.023900E-36 -8.175075E-35  0.000000E+00  0.000000E+00 -2.434672E-16 -4.704045E-34
+orbit:  -3.277323E-36 -9.170400E-35  0.000000E+00  0.000000E+00 -2.434672E-16 -4.712506E-34
 
 ++++++ table: summ
 
@@ -85,7 +84,6 @@ start, x=0, px=0, y=0, py=0, t= 0.01, pt=0;
 
 run, turns=10;
 
-++++++ info: Zero value of SIGT replaced by 1.
 
 ++++++ table: tracksumm
 
@@ -93,9 +91,9 @@ run, turns=10;
          1          0                  0                  0 
          2          0                  0                  0 
          3          0                  0                  0 
-         1         10     8.27605611e-05   -3.798865354e-06 
+         1         10    8.276056109e-05   -3.798865354e-06 
          2         10      -1.549641e-20    -2.89511361e-20 
-         3         10   -8.276087595e-05    3.798671694e-06 
+         3         10   -8.276087594e-05    3.798671694e-06 
 
                  y                 py                  t                 pt 
                  0                  0              -0.01                  0 
@@ -112,8 +110,6 @@ run, turns=10;
                 48                  0 
                 48                  0 
                 48                  0 
-
-*****  end of trrun  *****
 endtrack;
 
 exit TRACK module

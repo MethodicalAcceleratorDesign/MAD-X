@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.06.19 16:45:30      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.05.20 22:10:32      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE;
 
@@ -20,8 +20,6 @@ select, flag=twiss, columns=name, s, betx, bety, mux, muy;
 twiss;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -52,7 +50,6 @@ sixtrack,split;
   ++++++++++++++++++++++++++++
 
 ++++++ info: c6t - split flag selected 
-max_mult_ord set to : 11
 Reference radius set to : 1.000000
 ++++++ info: MADX sequence converted to c6t internal. 
 
@@ -72,5 +69,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

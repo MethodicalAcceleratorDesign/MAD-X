@@ -9,12 +9,12 @@
 @ GAMMA            %le         1956.951268
 @ KBUNCH           %le                   1
 @ BCURRENT         %le                   0
-@ SIGE             %le                   0
-@ SIGT             %le                   0
+@ SIGE             %le               0.001
+@ SIGT             %le                   1
 @ NPART            %le                   0
 @ EX               %le                   1
 @ EY               %le                   1
-@ ET               %le                   1
+@ ET               %le               0.001
 @ LENGTH           %le               534.6
 @ ALFA             %le      0.000443530778
 @ ORBIT5           %le                  -0
@@ -40,9 +40,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %14s "Five cell test"
-@ ORIGIN           %23s "MAD-X 5.01.05 Darwin 64"
-@ DATE             %08s "18/12/13"
-@ TIME             %08s "11.06.58"
+@ ORIGIN           %17s "5.02.09 Darwin 64"
+@ DATE             %08s "18/04/16"
+@ TIME             %08s "18.22.08"
 * NAME                                S               BETX               ALFX                 DX                DPX               BETY               ALFY                 DY                DPY                MUX                MUY APERTYPE                       APER_1             APER_2 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le %s                                %le                %le 
  "FIVECELL$START"                     0        183.8472716       -2.496652717         2.18107552      0.02970955067        31.01817574       0.4682537217      0.05308715145   -0.0006928148561                  0                  0 "CIRCLE"                             0                  0

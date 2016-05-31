@@ -99,8 +99,8 @@ parameter: ex   double value:                  1
 parameter: exn   double value:         5328.94477
 parameter: ey   double value:                  1
 parameter: eyn   double value:         5328.94477
-parameter: et   double value:                  1
-parameter: sigt   double value:                  0
+parameter: et   double value:               0.001
+parameter: sigt   double value:                  1
 parameter: sige   double value:                  0
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
@@ -302,8 +302,6 @@ obs_points pro_ptc_setswitch Done
 
    ptc_twiss, closed_orbit,normal,icase=5,no=7;
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  ************ State Summary ****************
  MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
   Rectangular Bend: input arc length (rho alpha) 

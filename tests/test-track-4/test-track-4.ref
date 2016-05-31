@@ -18,8 +18,6 @@ one pass is on
 aperture tracking is on
 particle #    19 lost turn      1  at pos. s =      1.00 element=qd                                               aperture =racetrack                                       
     X=  2.790805224000000E-003   Y=  1.213134870000000E-003   T=  0.000000000000000E+000
-
-*****  end of trrun  *****
 exit TRACK module
 
 

@@ -1,17 +1,15 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.07  (64 bit, Darwin)      +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.09.24               +
-  + Execution date: 2015.10.13 11:36:15      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:22:08      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option, -debug, -echo;
 
 lstraight := lmb/factor ;
 lmb2 := lstraight ;
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -41,8 +39,6 @@ makethin: style chosen : teapot
 makethin: slicing sequence : myseq
 ++++++ warning: SAVE makes all previous USE invalid !  
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -69,8 +65,6 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
                      0                      0                      0                      0 
 enter TRACK module
 one pass is on
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
 
 ++++++ table: tracksumm
 
@@ -97,8 +91,6 @@ one pass is on
                     30                      0 
                     30                      0 
                     30                      0 
-
-*****  end of trrun  *****
 exit TRACK module
 
 

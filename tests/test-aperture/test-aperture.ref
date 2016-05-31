@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Darwin)      +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.06.19 16:36:35      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:22:59      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title,'LHC Cell APERTURE example';
 
@@ -50,7 +50,7 @@ offx = 3.e-3; offy = 1.e-3;
 
 MB: SBEND, L=l.MB, angle=ANGLE.MB;
 
-MQ: QUADRUPOLE, L=l.MQ, apertype=rectellipse,aperture = {a,b,h,v}, aper_tol = {tr,th,tv}
+MQ: QUADRUPOLE, L=l.MQ, apertype=rectellipse, aperture={a,b,h,v}, aper_tol={tr,th,tv}
 
                 aper_offset={offx, offy};
 
@@ -113,8 +113,6 @@ select, flag=twiss, column=name,s,l,betx,bety,alfx,alfy,dx,dpx,mux,muy,n1;
 twiss, sequence=LHCCELL;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -146,13 +144,13 @@ select, flag=aperture, clear;
 
 select, flag=aperture, column=name,s,betx,bety,dx,x,y,n1,apertype,xtol,ytol,rtol;
 
-aperture,offsetelem="input/offset.tfs", file="ap.tfs", 
+aperture, offsetelem="input/offset.tfs", file="ap.tfs", 
 
-         dqf=2.086, betaqfx=170.25, dp=0.0015, 
+          dqf=2.086, betaqfx=170.25, dp=0.0015, 
 
-         dparx=0.273, dpary=0.273, cor=0.004, bbeat=1.1, 
+          dparx=0.273, dpary=0.273, cor=0.004, bbeat=1.1, 
 
-         nco=5, interval=1, halo={6., 8.4, 7.3, 7.3};
+          nco=5, interval=1, halo={6., 8.4, 7.3, 7.3};
 
 
 Processing apertures from lhccell$start:1 to lhccell$end:1...
@@ -235,8 +233,6 @@ select, flag=twiss, column=name,s,l,betx,bety,alfx,alfy,dx,dpx,mux,muy,n1;
 twiss, sequence=LHCCEL2;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -282,47 +278,47 @@ Processing apertures from lhccel2$start:1 to lhccel2$end:1...
 +++ aper_rectellipse:    7.30000     7.30000     8.40000     8.40000 1
 quarterlength : 9
 +++ aper_fill_quadrants: quarterlength = 9
-  0     7.30000     4.15572 
-  1     7.03983     4.58266 
-  2     6.75473     4.99336 
-  3     6.44570     5.38637 
-  4     6.11383     5.76030 
-  5     5.76030     6.11383 
-  6     5.38637     6.44570 
-  7     4.99336     6.75473 
-  8     4.58266     7.03983 
-  9     4.15572     7.30000 
-  10    -4.15572     7.30000 
-  11    -4.58266     7.03983 
-  12    -4.99336     6.75473 
-  13    -5.38637     6.44570 
-  14    -5.76030     6.11383 
-  15    -6.11383     5.76030 
-  16    -6.44570     5.38637 
-  17    -6.75473     4.99336 
-  18    -7.03983     4.58266 
-  19    -7.30000     4.15572 
-  20    -7.30000    -4.15572 
-  21    -7.03983    -4.58266 
-  22    -6.75473    -4.99336 
-  23    -6.44570    -5.38637 
-  24    -6.11383    -5.76030 
-  25    -5.76030    -6.11383 
-  26    -5.38637    -6.44570 
-  27    -4.99336    -6.75473 
-  28    -4.58266    -7.03983 
-  29    -4.15572    -7.30000 
-  30     4.15572    -7.30000 
-  31     4.58266    -7.03983 
-  32     4.99336    -6.75473 
-  33     5.38637    -6.44570 
-  34     5.76030    -6.11383 
-  35     6.11383    -5.76030 
-  36     6.44570    -5.38637 
-  37     6.75473    -4.99336 
-  38     7.03983    -4.58266 
-  39     7.30000    -4.15572 
-  40     7.30000     4.15572 
+  0  7.30000e+00  4.15572e+00 
+  1  7.03983e+00  4.58266e+00 
+  2  6.75473e+00  4.99336e+00 
+  3  6.44570e+00  5.38637e+00 
+  4  6.11383e+00  5.76030e+00 
+  5  5.76030e+00  6.11383e+00 
+  6  5.38637e+00  6.44570e+00 
+  7  4.99336e+00  6.75473e+00 
+  8  4.58266e+00  7.03983e+00 
+  9  4.15572e+00  7.30000e+00 
+  10  -4.15572e+00  7.30000e+00 
+  11  -4.58266e+00  7.03983e+00 
+  12  -4.99336e+00  6.75473e+00 
+  13  -5.38637e+00  6.44570e+00 
+  14  -5.76030e+00  6.11383e+00 
+  15  -6.11383e+00  5.76030e+00 
+  16  -6.44570e+00  5.38637e+00 
+  17  -6.75473e+00  4.99336e+00 
+  18  -7.03983e+00  4.58266e+00 
+  19  -7.30000e+00  4.15572e+00 
+  20  -7.30000e+00  -4.15572e+00 
+  21  -7.03983e+00  -4.58266e+00 
+  22  -6.75473e+00  -4.99336e+00 
+  23  -6.44570e+00  -5.38637e+00 
+  24  -6.11383e+00  -5.76030e+00 
+  25  -5.76030e+00  -6.11383e+00 
+  26  -5.38637e+00  -6.44570e+00 
+  27  -4.99336e+00  -6.75473e+00 
+  28  -4.58266e+00  -7.03983e+00 
+  29  -4.15572e+00  -7.30000e+00 
+  30  4.15572e+00  -7.30000e+00 
+  31  4.58266e+00  -7.03983e+00 
+  32  4.99336e+00  -6.75473e+00 
+  33  5.38637e+00  -6.44570e+00 
+  34  5.76030e+00  -6.11383e+00 
+  35  6.11383e+00  -5.76030e+00 
+  36  6.44570e+00  -5.38637e+00 
+  37  6.75473e+00  -4.99336e+00 
+  38  7.03983e+00  -4.58266e+00 
+  39  7.30000e+00  -4.15572e+00 
+  40  7.30000e+00  4.15572e+00 
 
 
 name: lhccel2$start:1, ref: , do_survey: 0, true_flag: 0
@@ -428,5 +424,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

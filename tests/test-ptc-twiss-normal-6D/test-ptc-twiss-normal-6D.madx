@@ -39,7 +39,7 @@ ptc_create_universe;
 !  plot, table=ptc_twiss, vaxis=mu3, haxis=s;
 !  plot, table=ptc_twiss, vaxis=energy, haxis=s;
   
-  write, table=ptc_twiss, file="leir.6D.ptc.twiss";
+  write, table=twiss, file="leir.6D.ptc.twiss";
   write, table=ptc_twiss_summary, file="leir.6D.ptc.summ.twiss";
   write, table=nonlin, file="leir.6D.ptc.nonlin";
   

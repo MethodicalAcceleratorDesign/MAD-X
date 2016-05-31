@@ -17,7 +17,9 @@ beam, particle=positron, energy=2.86,bunched,npart=4.5E+11,
       kbunch=312, EX = 1.250699e-6, EY = 1.250699e-3, ET = 7.5E-05,
       SIGT=0.009, SIGE=0.015,radiate=TRUE;
 
+option, echo=false;
 call, file="input/pdr-ibs.seq";
+option, echo=true;
 
 SELECT,FLAG=TWISS,RANGE=#S/#E,
        COLUMN=NAME,KEYWORD,S,L,ANGLE,K1L,BETX,ALFX,MUX,BETY,ALFY,MUY,DX,DPX,DY,DPY;
@@ -39,3 +41,4 @@ beam->ey=5.36E-13;
 twiss,centre;
 ibs,file=ibs-table.tfs;
 
+stop;

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.04  (64 bit, Darwin)      +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2014.11.14               +
-  + Execution date: 2014.12.18 11:43:38      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:19:26      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! Test for MADX to calculate chromatic functions
 
@@ -46,14 +46,10 @@
  Twiss, betx=1, bety=0.001, deltap=0.0, file=twiss, chrom;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   1.000000E-06
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 final orbit vector:     1.243142E-07  2.961373E-11  0.000000E+00  0.000000E+00 -1.515577E-09  0.000000E+00
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -89,12 +85,10 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
  Twiss, betx=1, bety=0.001, deltap=deltapval, file=twiss2;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   1.000000E-06
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-final orbit vector:     1.243142E-07  2.961373E-11  0.000000E+00  0.000000E+00 -1.515577E-09  0.000000E+00
+final orbit vector:     1.243142E-07  2.961373E-11  0.000000E+00  0.000000E+00 -1.543207E-09  0.000000E+00
 
 ++++++ table: summ
 
@@ -118,8 +112,6 @@ final orbit vector:     1.243142E-07  2.961373E-11  0.000000E+00  0.000000E+00 -
  Twiss, betx=1, bety=0.001, deltap=0.0,       file=twiss1;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -241,5 +233,5 @@ Stop;
 4 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.04 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

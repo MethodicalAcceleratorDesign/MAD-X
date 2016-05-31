@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.01  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.04.25      +
-  + Execution Time Stamp: 24.06.14 17.11.49 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:26:26      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 Option, warn,info,echo;
 
 Title, "Compiling Optics for the LHC 6.5 lattice with MADX";
@@ -62,13 +62,13 @@ twiss, chrom, table;
 enter Twiss module
   
 iteration:   1 error:   1.738046E-03 deltap:   1.000000E-06
-orbit:  -6.431371E-06 -6.588372E-08 -2.089458E-06  1.698349E-04  8.711905E-06  8.989264E-07
+orbit:  -6.431373E-06 -6.588364E-08 -2.089444E-06  1.698349E-04  8.711918E-06  8.992262E-07
   
 iteration:   2 error:   6.902366E-06 deltap:   1.000000E-06
-orbit:  -1.827451E-08  7.227524E-10  3.484862E-08  1.699968E-04  9.294832E-06  1.465206E-06
+orbit:  -1.827675E-08  7.228384E-10  3.485285E-08  1.699968E-04  9.294845E-06  1.465506E-06
   
-iteration:   3 error:   1.327540E-10 deltap:   1.000000E-06
-orbit:  -1.818530E-08  7.313807E-10  3.474428E-08  1.699968E-04  9.294853E-06  1.465213E-06
+iteration:   3 error:   1.327537E-10 deltap:   1.000000E-06
+orbit:  -1.818754E-08  7.314667E-10  3.474850E-08  1.699968E-04  9.294866E-06  1.465513E-06
   
 iteration:   1 error:   1.738108E-03 deltap:   0.000000E+00
 orbit:  -6.424029E-06 -6.614752E-08 -2.103007E-06  1.698363E-04  8.669527E-06  9.126159E-07
@@ -85,13 +85,13 @@ orbit:  -1.080206E-08  4.485705E-10  2.083302E-08  1.699982E-04  9.252406E-06  1
         26658.8832    -9.25240598e-06    0.0003217284403        55.75133525 
 
                 q1                dq1            betxmax              dxmax 
-       64.28000354        1.984392128        595.1004272        2.840300983 
+       64.28000354        1.984995095        595.1004272        2.840300983 
 
              dxrms             xcomax             xcorms                 q2 
         1.39723574     0.008477929599    0.0006662814745        59.31000313 
 
                dq2            betymax              dymax              dyrms 
-       1.979539981        609.5283497       0.1889452564       0.0567110234 
+       1.980141967        609.5283497       0.1889452564       0.0567110234 
 
             ycomax             ycorms             deltap            synch_1 
     0.008499886944    0.0006743412007                  0        8.574427658 
@@ -118,8 +118,8 @@ touschek, tolerance=1.e-7, file="touschek_e.dat";
  Ex          7.8199999999999999E-009
  Ey          7.8199999999999999E-009
  Et          5.3019999999999997E-005
- sigt       0.11234062638502997     
- sige        4.7195748952193146E-004
+ sigt       0.11234064032688071     
+ sige        4.7195743095042200E-004
  parnum      115000000000.00000     
  circ        26658.883200000000     
  currnt      2.0719822106584157E-004
@@ -127,7 +127,7 @@ touschek, tolerance=1.e-7, file="touschek_e.dat";
  beta       0.99999782628298983     
  clight      299792458.00000000     
  arad        1.5346982692102026E-018
- alfa        3.2172843991467589E-004
+ alfa        3.2172859746692193E-004
  freq0       1.1245475066863811E-002
  kbunch              1
  deltap      0.0000000000000000     
@@ -135,9 +135,9 @@ touschek, tolerance=1.e-7, file="touschek_e.dat";
   TOUSCHEK will use optical functions at entrance and end of element
   
  Energy radiated per turn     1.1402143422321753E-007 [MeV]
- Touschek Inverse Lifetime    5.3026730499016427E-008 [seconds-1]
- Touschek Lifetime            18858413.305692092      [seconds]   
-                              5238.4481404700255      [hours]
+ Touschek Inverse Lifetime    5.3026760845494443E-008 [seconds-1]
+ Touschek Lifetime            18858402.513284341      [seconds]   
+                              5238.4451425789839      [hours]
 
 
 !--- repeat calculation with Twiss functions calculated at centre of elements 
@@ -174,13 +174,13 @@ twiss, chrom, table, centre;
 enter Twiss module
   
 iteration:   1 error:   1.738046E-03 deltap:   1.000000E-06
-orbit:  -6.431373E-06 -6.588364E-08 -2.089444E-06  1.698349E-04  8.711918E-06  8.992240E-07
+orbit:  -6.431373E-06 -6.588364E-08 -2.089444E-06  1.698349E-04  8.711918E-06  8.992262E-07
   
 iteration:   2 error:   6.902366E-06 deltap:   1.000000E-06
-orbit:  -1.827674E-08  7.228377E-10  3.485282E-08  1.699968E-04  9.294845E-06  1.465504E-06
+orbit:  -1.827675E-08  7.228384E-10  3.485285E-08  1.699968E-04  9.294845E-06  1.465506E-06
   
 iteration:   3 error:   1.327537E-10 deltap:   1.000000E-06
-orbit:  -1.818753E-08  7.314660E-10  3.474847E-08  1.699968E-04  9.294866E-06  1.465510E-06
+orbit:  -1.818754E-08  7.314667E-10  3.474850E-08  1.699968E-04  9.294866E-06  1.465513E-06
   
 iteration:   1 error:   1.738108E-03 deltap:   0.000000E+00
 orbit:  -6.424029E-06 -6.614752E-08 -2.103007E-06  1.698363E-04  8.669527E-06  9.126159E-07
@@ -197,13 +197,13 @@ orbit:  -1.080206E-08  4.485705E-10  2.083302E-08  1.699982E-04  9.252406E-06  1
         26658.8832    -9.25240598e-06    0.0003217284403        55.75133525 
 
                 q1                dq1            betxmax              dxmax 
-       64.28000354        1.984990377        604.4249425        2.840300983 
+       64.28000354        1.984994952        604.4249425        2.840300983 
 
              dxrms             xcomax             xcorms                 q2 
         1.39723574     0.008477929599    0.0006662814745        59.31000313 
 
                dq2            betymax              dymax              dyrms 
-       1.980136169        614.3195463       0.1889452564       0.0567110234 
+       1.980140681        614.3195463       0.1889452564       0.0567110234 
 
             ycomax             ycorms             deltap            synch_1 
     0.008499886944    0.0006743412007                  0        8.574427658 
@@ -228,8 +228,8 @@ touschek,tolerance=1.e-7,file="touschek_c.dat";
  Ex          7.8199999999999999E-009
  Ey          7.8199999999999999E-009
  Et          5.3019999999999997E-005
- sigt       0.11234062638502997     
- sige        4.7195748952193146E-004
+ sigt       0.11234064032688071     
+ sige        4.7195743095042200E-004
  parnum      115000000000.00000     
  circ        26658.883200000000     
  currnt      2.0719822106584157E-004
@@ -237,7 +237,7 @@ touschek,tolerance=1.e-7,file="touschek_c.dat";
  beta       0.99999782628298983     
  clight      299792458.00000000     
  arad        1.5346982692102026E-018
- alfa        3.2172843991467589E-004
+ alfa        3.2172859746692193E-004
  freq0       1.1245475066863811E-002
  kbunch              1
  deltap      0.0000000000000000     
@@ -245,12 +245,12 @@ touschek,tolerance=1.e-7,file="touschek_c.dat";
   TOUSCHEK will use optical functions at center of elements.
   
  Energy radiated per turn     1.1402143422321753E-007 [MeV]
- Touschek Inverse Lifetime    5.3100862864674959E-008 [seconds-1]
- Touschek Lifetime            18832085.696016897      [seconds]   
-                              5231.1349155602493      [hours]
+ Touschek Inverse Lifetime    5.3100893270233251E-008 [seconds-1]
+ Touschek Lifetime            18832074.912769303      [seconds]   
+                              5231.1319202136956      [hours]
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.01 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

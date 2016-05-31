@@ -1,7 +1,7 @@
 Option, -echo,-warn,-info;
 call,file="../share/LHC/LHCRing/V6.503/V6.5.seq";
 call,file="../share/LHC/LHCRing/V6.503/V6.5.inj.str";
-Option, warn,info;
+Option, echo, warn,info;
 
 select,flag=ibs,clear;
 select,flag=ibs,column=S,TLI,TXI,TYI;
@@ -12,3 +12,5 @@ twiss, sequence=lhcb1;
 Use, period=lhcb1;
 twiss;
 ibs,file="ibs-table.tfs";
+
+stop;

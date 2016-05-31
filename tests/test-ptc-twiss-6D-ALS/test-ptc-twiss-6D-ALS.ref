@@ -113,7 +113,9 @@ BEND1 : RBEND,L= LBEND, ANGLE=ALPHA, k1=-0.778741;
 
 CAVM:MARKER;
 
-CAV:RFCAVITY,L=0.2000,VOLT=0.2d0,FREQ=500.;
+rfvolt = 0.2d0;
+
+CAV:RFCAVITY,L=0.2000,VOLT:=rfvolt,FREQ=500.;
 
 
 
@@ -250,8 +252,6 @@ obs_points pro_ptc_setswitch Done
 
   ptc_twiss, icase=6, no=3, closed_orbit=true, rmatrix;
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
  ************ State Summary ****************
  MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
   Rectangular Bend: input arc length (rho alpha) 

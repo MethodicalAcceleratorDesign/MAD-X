@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Linux)       +
+  +     MAD-X 5.02.10  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.05.19 17:03:46      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.05.30 17:40:53      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -756,8 +756,9 @@ RETURN;
 
 
 
+kSk1     = 0.1;
 
-
+++++++ info: ksk1 redefined
 
 
 eg :=  0.938272+0.0042+10000; !  ... in GeV 
@@ -811,6 +812,7 @@ ptc_create_universe;
           Kinetic Energy : 0.145151E+00
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.541711E+00
+  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy           1.0834226784000001     
      method                   6
@@ -822,8 +824,10 @@ ptc_create_universe;
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -6.2727600891321345E-015   0.0000000000000000        8.4376949871511897E-015
+ After    end:   -6.2727600891321345E-015   4.2732595235822215E-031   8.4376949871511897E-015
+  
 
+!  ptc_knob, element=QFN24,   kn=0,1, exactmatch=false;
 
 !  ptc_printframes, file="leir.C", format=rootmacro;!this prints my visualisation with ROOT
 
@@ -835,63 +839,63 @@ ptc_create_universe;
 
   
 
-  ptc_twiss, icase=6, no=2, closed_orbit;
+  ptc_twiss, table=twiss, icase=6, no=4, closed_orbit, normal;
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
+ Normal Form Type 1
+ Normal Form Type 1 DONE
 
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-       78.54370266       0.4965578502           -1000000           -1000000 
+       78.54370266       0.4965446423           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000      -0.2534429227        1.419106777       0.8200596216 
+          -1000000      -0.2534561306         1.41912565       0.8215130801 
 
                 q2                dq1                dq2                 qs 
-      0.7198292865                  0                  0   -0.0001731096304 
+       0.721435539                  0                  0   -0.0001731096304 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-       3.282153623        15.12420813        1.633285391        20.07025823 
+       3.504898374        15.25837549        1.634881833        21.43991689 
 
          beta11min          beta11max          beta12min          beta12max 
-       3.282153623        15.12420813    2.195336145e-31    1.318063096e-29 
+       3.445191741        14.99693723      0.03869994933       0.2448471666 
 
          beta13min          beta13max          beta21min          beta21max 
-   3.501540065e-12     0.002348220166    4.180302112e-30    2.494029303e-28 
+   3.599036924e-12      0.00234823856       0.0254944911       0.3973420163 
 
          beta22min          beta22max          beta23min          beta23max 
-       1.633285391        20.07025823    4.079439997e-30    2.932649343e-25 
+       1.606869634        21.07435811    8.720557313e-20    7.210445876e-13 
 
          beta31min          beta31max          beta32min          beta32max 
-   2.824439971e-07        129.3455317    6.236946272e-29    4.929216503e-28 
+   2.999055239e-07        127.6624262    5.434193226e-10        2.058075721 
 
          beta33min          beta33max           disp1min           disp1max 
-       180788.7995        180788.8514       -20.60417203     0.001188273993 
+       180788.7996        180788.8514       -20.60425272      0.00126531802 
 
           disp2min           disp2max           disp3min           disp3max 
-      -9.086227448        9.086227448   -2.035615885e-13    2.904450649e-13 
+      -9.086258334        9.086258334   -0.0003610495694    0.0003610495636 
 
           disp4min           disp4max             deltap            orbit_x 
-  -1.173552408e-13    8.904050804e-14                  0    9.059201462e-09 
+  -0.0001188181905    0.0001548267728                  0    9.059202139e-09 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.157945448e-09                  0                  0    1.856310174e-10 
+   2.157958131e-09   -4.498409267e-14   -3.507810402e-14    1.856309791e-10 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-   2.389261311e-09    9.897890815e-09                  0    2.606798096e-09 
+   2.389371842e-09    9.897920105e-09    1.786279669e-13    2.606805901e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0    4.166272761e-09    1.856310174e-10    2.126168713e-08 
+    6.59526047e-14     4.16627198e-09    1.856309791e-10     2.12617721e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    9.376184562e-09                  0    8.917010214e-09 
+    3.71928939e-13    9.376216984e-09    1.226370633e-13     1.13524237e-08 
 
            ptcomax             xcomin             ycomin            pxcomin 
-   1.856310174e-10   -1.281665634e-10                  0   -9.376184081e-09 
+   1.856309791e-10   -1.282198451e-10   -3.728925295e-13   -9.376216146e-09 
 
            pycomin             tcomin            ptcomin 
-                 0   -1.135233839e-08    1.856310174e-10 
+  -1.597495497e-13   -8.917139388e-09    1.856309791e-10 
 !  ptc_twiss, icase=6, no=2, betx=10, bety=10,betz=10;
 
   
@@ -904,9 +908,28 @@ ptc_create_universe;
 
   
 
-  write, table=ptc_twiss, file="leir.6D.ptc.twiss";
+  write, table=twiss, file="leir.6D.ptc.twiss";
 
   write, table=ptc_twiss_summary, file="leir.6D.ptc.summ.twiss";
+
+  write, table=nonlin, file="leir.6D.ptc.nonlin";
+
+  
+
+  select_ptc_normal, gnfu=-2,0,0;
+
+  select_ptc_normal, gnfu= 2,0,0;
+
+  ptc_normal,closed_orbit,normal,maptable,icase=6,no=4;
+
+ Closed orbit:    9.0591977104837272E-009   2.1579588781801446E-009  -4.5857228878191798E-014  -3.5238882834480810E-014  -2.3893901864220443E-009   1.8563107982169989E-010
+
+
+  write, table=normal_results,file="ptc_normal_results.tfs"; 
+
+  write, table=map_table, file="ptc_map_table.tfs";
+
+
 
   
 
@@ -918,8 +941,13 @@ ptc_end;
 
 !plot, haxis=s, vaxis=beta11,beta22, colour=100;
 
-!plot, haxis=s, vaxis=disp1, colour=100;
+plot, haxis=s, vaxis=disp1, colour=100;
 
+Plot - default table plotted: twiss
+
+ GXPLOT-X11  1.50 initialized
+
+ plot number =            1
 !plot, haxis=s, vaxis=x, colour=100;
 
 
@@ -932,5 +960,5 @@ removefile, file='Maxwellian_bend_for_ptc.txt';
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

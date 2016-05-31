@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.06  (64 bit, Darwin)      +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.06.26               +
-  + Execution date: 2015.08.31 16:17:57      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:17:01      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---;
 
@@ -65,8 +65,6 @@ select, flag= twiss, class= rfcavity,  column= name,betx,bety,alfx,alfy,dx;
 TWISS,  file= "twissprb1.1";
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -117,12 +115,12 @@ enter TRACK module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-  
-  Full 6D closed orbit search.
-  Initial value of 6-D closed orbit from Twiss: 
-  orbit0    0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
-  
- 6D closed orbit found by subroutine trclor 
+
+Full 6D closed orbit search.
+Initial value of 6-D closed orbit from Twiss: 
+orbit0   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+6D closed orbit found by subroutine trclor 
 iteration:  11 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 
@@ -151,8 +149,6 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
         26658.8832                  0 
         26658.8832                  0 
         26658.8832                  0 
-
-*****  end of trrun  *****
 endtrack; 
 
 exit TRACK module
@@ -166,5 +162,5 @@ return;
 9 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.06 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

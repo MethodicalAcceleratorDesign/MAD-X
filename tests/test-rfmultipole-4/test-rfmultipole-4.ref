@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Darwin)      +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.05.15 16:14:36      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:23:36      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title, 'test of rf-multipole';
 
@@ -11,8 +11,6 @@ option, -debug, -echo;
 
 enter Twiss module
  Found 3 initial orbit vector values from twiss command. 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   1.000000E+00  1.000000E+00  0.000000E+00  0.000000E+00  1.000000E+00  0.000000E+00
@@ -41,5 +39,5 @@ final orbit vector:     1.000000E+00 -1.444615E-01  0.000000E+00 -1.072933E+00  
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

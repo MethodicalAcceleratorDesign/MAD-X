@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.02  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.07.01      +
-  + Execution Time Stamp: 01.07.14 14.22.44 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:22:09      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8;
 
 Option,  -warn,info;
@@ -44,8 +44,6 @@ savebeta, label = bini1ir8, place = s.cell.78.B1;
 twiss, sequence=lhcb1,save;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -80,8 +78,6 @@ savebeta, label = bini2ir8, place =e.cell.81.B1 ;
 twiss, sequence=lhcb1,save;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -123,8 +119,6 @@ twiss, sequence=lhcb1, beta0 = bini1ir8,save;
 
 enter Twiss module
  Found 6 initial orbit vector values from twiss command. 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -211,8 +205,6 @@ twiss, sequence=lhcb1, beta0=bini1ir8, save;
 
 enter Twiss module
  Found 6 initial orbit vector values from twiss command. 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -283,8 +275,6 @@ TWISS, beta0 = bir8b1,save;
 
 enter Twiss module
  Found 6 initial orbit vector values from twiss command. 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -327,8 +317,6 @@ TWISS,sequence=lhcb1,file=twiss.ir8.b1.data,beta0=bir8b1,save;
 
 enter Twiss module
  Found 6 initial orbit vector values from twiss command. 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -488,11 +476,11 @@ total constraints:      14
 START JACOBIAN:
 
  JACOBIAN Strategy =           3
-Initial Penalty Function =   0.3549501226825657E+02
+Initial Penalty Function =   0.3549501226825706E+02
 
 
  Solve system with           14 con,          20 var
- Rank            14   Condition number    1766.69353817593     
+ Rank            14   Condition number    1766.6935398752671     
  exclude parameter:kqt13.l8b1                                      hit maximum
  exclude parameter:kqtl11.r8b1                                     hit minimum
  Reset system to           14 con,          18 var
@@ -501,33 +489,33 @@ Initial Penalty Function =   0.3549501226825657E+02
 ! Suppressed many lines from output for NUMDIFF goto statements
 
  Solve system with           14 con,          20 var
- Rank            14   Condition number    1695.38088403304     
- Step length   3.942155548255870E-015
-call:    18 Dx =   0.39421555E-14  Penalty function =  0.8942499794253580E-25
+ Rank            14   Condition number    1695.3808860673503     
+ Step length    1.2200196940242204E-015
+call:    20 Dx =   0.12200197E-14  Penalty function =  0.4661667658158017E-24
  ++++++++++ JACOBIAN ended: converged successfully
- Final difference norm:  6.542308912182136E-002
+ Final difference norm:   6.5423089179203447E-002
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-ip8:1                      betx         4     6.00000000E+00     6.00000000E+00     6.63432021E-28
-ip8:1                      bety         4     6.00000000E+00     6.00000000E+00     4.93038066E-28
-ip8:1                      alfx         4     0.00000000E+00    -7.34628311E-15     5.39678755E-27
-ip8:1                      alfy         4     0.00000000E+00    -6.30464595E-15     3.97485606E-27
-ip8:1                      dx           4     0.00000000E+00    -7.80896615E-16     6.09799523E-29
-ip8:1                      dpx          4     0.00000000E+00    -3.38576010E-17     1.14633714E-29
-e.ds.r8.b1:1               betx         4     3.14155198E+01     3.14155198E+01     1.02236373E-27
-e.ds.r8.b1:1               alfx         4    -5.15245257E-01    -5.15245257E-01     9.66354609E-28
-e.ds.r8.b1:1               bety         4     1.72206230E+02     1.72206230E+02     5.16987883E-26
-e.ds.r8.b1:1               alfy         4     2.34715937E+00     2.34715937E+00     2.41588652E-26
-e.ds.r8.b1:1               dx           4     9.95758012E-01     9.95758012E-01     1.49144015E-28
-e.ds.r8.b1:1               dpx          4     1.28965195E-02     1.28965195E-02     2.03426350E-29
-e.ds.r8.b1:1               mux          4     3.20400000E+00     3.20400000E+00     3.15544362E-28
-e.ds.r8.b1:1               muy          4     2.80400000E+00     2.80400000E+00     4.93038066E-28
+ip8:1                      betx         4     6.00000000E+00     6.00000000E+00     9.54521695E-29
+ip8:1                      bety         4     6.00000000E+00     6.00000000E+00     1.33317493E-28
+ip8:1                      alfx         4     0.00000000E+00     4.11172562E-15     1.69062876E-27
+ip8:1                      alfy         4     0.00000000E+00    -9.37473441E-15     8.78856453E-27
+ip8:1                      dx           4     0.00000000E+00     1.76670744E-16     3.12125518E-30
+ip8:1                      dpx          4     0.00000000E+00     2.27851863E-17     5.19164714E-30
+e.ds.r8.b1:1               betx         4     3.14155198E+01     3.14155198E+01     1.78736948E-25
+e.ds.r8.b1:1               alfx         4    -5.15245257E-01    -5.15245257E-01     1.20806652E-26
+e.ds.r8.b1:1               bety         4     1.72206230E+02     1.72206230E+02     2.61725116E-25
+e.ds.r8.b1:1               alfy         4     2.34715937E+00     2.34715937E+00     1.97215226E-29
+e.ds.r8.b1:1               dx           4     9.95758012E-01     9.95758012E-01     3.15544362E-28
+e.ds.r8.b1:1               dpx          4     1.28965195E-02     1.28965195E-02     8.69677741E-30
+e.ds.r8.b1:1               mux          4     3.20400000E+00     3.20400000E+00     1.59744333E-27
+e.ds.r8.b1:1               muy          4     2.80400000E+00     2.80400000E+00     9.66354609E-28
 
 
-Final Penalty Function =   8.94249979e-26
+Final Penalty Function =   4.66166766e-25
 
 
 
@@ -558,7 +546,7 @@ kqt13.r8b1               -1.92425e-03 -3.61438e-03 -5.56771e-03  5.56771e-03
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   8.94249979e-26
+VARIABLE "TAR" SET TO   4.66166766e-25
 ++++++ info: n redefined
 ++++++ info: beta.ip8 redefined
 START MATCHING
@@ -574,50 +562,49 @@ total constraints:      14
 START JACOBIAN:
 
  JACOBIAN Strategy =           3
-Initial Penalty Function =   0.1151999999999977E+02
+Initial Penalty Function =   0.1151999999999990E+02
 
 
  Solve system with           14 con,          20 var
- Rank            14   Condition number    1695.38088274170     
+ Rank            14   Condition number    1695.3808858553143     
  exclude parameter:kqtl11.r8b1                                     hit minimum
  Reset system to           14 con,          19 var
  Solve system with           14 con,          19 var
- Rank            14   Condition number    1725.98338683079     
- Step length   4.904488596281927E-002
+ Rank            14   Condition number    1725.9833900663079     
+ Step length    4.9044885996952350E-002
  Bisec iteration            1
-call:     2 Dx =   0.48940709E-01  Penalty function =  0.1206669111372284E+02
+call:     2 Dx =   0.48940709E-01  Penalty function =  0.1206669112582590E+02
 
 ! Suppressed many lines from output for NUMDIFF goto statements
 
  Solve system with           14 con,          20 var
- Rank            14   Condition number    1789.12139649450     
- Step length   1.798193652693877E-015
- Bisec iteration            1
-call:     9 Dx =   0.17981937E-14  Penalty function =  0.5948961039597088E-24
+ Rank            14   Condition number    1789.1214031424956     
+ Step length    3.8824004403575866E-014
+call:     8 Dx =   0.38824004E-13  Penalty function =  0.4862382820239505E-24
  ++++++++++ JACOBIAN ended: converged successfully
- Final difference norm:  3.184119309717407E-002
+ Final difference norm:   3.1841193114393478E-002
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-ip8:1                      betx         4     3.60000000E+00     3.60000000E+00     4.35648435E-28
-ip8:1                      bety         4     3.60000000E+00     3.60000000E+00     3.64650953E-28
-ip8:1                      alfx         4     0.00000000E+00     2.31404138E-15     5.35478750E-28
-ip8:1                      alfy         4     0.00000000E+00     1.61982897E-14     2.62384588E-26
-ip8:1                      dx           4     0.00000000E+00     1.78025997E-16     3.16932555E-30
-ip8:1                      dpx          4     0.00000000E+00    -1.10114283E-17     1.21251554E-30
-e.ds.r8.b1:1               betx         4     3.14155198E+01     3.14155198E+01     1.78736948E-25
-e.ds.r8.b1:1               alfx         4    -5.15245257E-01    -5.15245257E-01     5.43574468E-26
-e.ds.r8.b1:1               bety         4     1.72206230E+02     1.72206230E+02     2.91613478E-25
-e.ds.r8.b1:1               alfy         4     2.34715937E+00     2.34715937E+00     4.17307419E-26
-e.ds.r8.b1:1               dx           4     9.95758012E-01     9.95758012E-01     5.43574468E-28
-e.ds.r8.b1:1               dpx          4     1.28965195E-02     1.28965195E-02     3.00926554E-32
-e.ds.r8.b1:1               mux          4     3.20400000E+00     3.20400000E+00     3.15544362E-28
-e.ds.r8.b1:1               muy          4     2.80400000E+00     2.80400000E+00     1.97215226E-29
+ip8:1                      betx         4     3.60000000E+00     3.60000000E+00     7.88860905E-29
+ip8:1                      bety         4     3.60000000E+00     3.60000000E+00     3.15544362E-30
+ip8:1                      alfx         4     0.00000000E+00    -1.56354147E-15     2.44466194E-28
+ip8:1                      alfy         4     0.00000000E+00    -1.62608313E-15     2.64414635E-28
+ip8:1                      dx           4     0.00000000E+00     3.31765865E-17     1.10068589E-31
+ip8:1                      dpx          4     0.00000000E+00     8.55418573E-18     7.31740936E-31
+e.ds.r8.b1:1               betx         4     3.14155198E+01     3.14155198E+01     1.02236373E-25
+e.ds.r8.b1:1               alfx         4    -5.15245257E-01    -5.15245257E-01     2.62739985E-26
+e.ds.r8.b1:1               bety         4     1.72206230E+02     1.72206230E+02     3.56236963E-25
+e.ds.r8.b1:1               alfy         4     2.34715937E+00     2.34715937E+00     1.77493704E-28
+e.ds.r8.b1:1               dx           4     9.95758012E-01     9.95758012E-01     2.08308583E-28
+e.ds.r8.b1:1               dpx          4     1.28965195E-02     1.28965195E-02     2.03426350E-29
+e.ds.r8.b1:1               mux          4     3.20400000E+00     3.20400000E+00     1.77493704E-28
+e.ds.r8.b1:1               muy          4     2.80400000E+00     2.80400000E+00     3.15544362E-28
 
 
-Final Penalty Function =   5.94896104e-25
+Final Penalty Function =   4.86238282e-25
 
 
 
@@ -648,7 +635,7 @@ kqt13.r8b1               -1.92742e-03 -1.92425e-03 -5.56771e-03  5.56771e-03
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   5.94896104e-25
+VARIABLE "TAR" SET TO   4.86238282e-25
 write,table=str.ip8.b1,file="str.ip8.b1.dat";
 
 stop;
@@ -657,5 +644,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.02 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

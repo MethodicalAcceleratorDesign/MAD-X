@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Darwin)      +
+  +     MAD-X 5.02.09  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.06.23 17:26:41      +
+  + Release   date: 2016.04.06               +
+  + Execution date: 2016.04.18 18:19:51      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, s='MAD-X test';
 
@@ -28,8 +28,6 @@ select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
 Twiss,table=my_model;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -78,9 +76,9 @@ Want to use model orbit from: my_model
 11 monitors and 10 correctors found in input
 11 monitors and 10 correctors enabled
 enter MICADO correction ...
-  
- start MICADO correction with            5  correctors
-  
+
+start MICADO correction with     5 correctors
+
 CORRECTION SUMMARY:   
 
                    average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
@@ -108,22 +106,20 @@ Max strength: 1.050701e+01
 Corrector:  Before:     After:    Difference:
              (mrad)     (mrad)       (mrad)  
 cbh.10:1 0.000000 -0.006158 -0.006158
-cbh.11:1 0.000000 0.000000 -0.000000
+cbh.11:1 0.000000 0.000000 0.000000
 cbh.20:1 0.000000 0.800941 0.800941
 cbh.21:1 0.000000 -0.781367 -0.781367
-cbh.30:1 0.000000 0.000000 -0.000000
-cbh.31:1 0.000000 0.000000 -0.000000
+cbh.30:1 0.000000 0.000000 0.000000
+cbh.31:1 0.000000 0.000000 0.000000
 cbh.40:1 0.000000 -10.426646 -10.426646
 cbh.41:1 0.000000 10.507007 10.507007
-cbh.50:1 0.000000 0.000000 -0.000000
-cbh.51:1 0.000000 0.000000 -0.000000
+cbh.50:1 0.000000 0.000000 0.000000
+cbh.51:1 0.000000 0.000000 0.000000
 
 
 Twiss, file=result1;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   9.607152E-04 deltap:   0.000000E+00
 orbit:  -2.692772E-03 -5.679301E-05  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -172,9 +168,9 @@ After SVD conditioning:
 
 Finally found 0 singular values
 enter MICADO correction ...
-  
- start MICADO correction with            5  correctors
-  
+
+start MICADO correction with     5 correctors
+
 CORRECTION SUMMARY:   
 
                    average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
@@ -210,8 +206,6 @@ cbh.51:1 0.000000 0.004547 0.004547
 Twiss, file=result2;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   8.148356E-04 deltap:   0.000000E+00
 orbit:  -2.762343E-03 -5.729142E-05  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -253,9 +247,9 @@ Want to use orbit from: orbint
 Want to use model orbit from: my_model
 11 monitors and 10 correctors found in input
 11 monitors and 10 correctors enabled
-  
- start SVD correction using           10  correctors
-  
+
+start SVD correction using    10 correctors
+
 CORRECTION SUMMARY:   
 
                    average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
@@ -296,8 +290,6 @@ cbh.51:1 0.000000 0.002280 0.002280
 Twiss, file=result3;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   8.148025E-04 deltap:   0.000000E+00
 orbit:  -2.762080E-03 -5.728621E-05  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -345,9 +337,9 @@ After SVD conditioning:
 11 monitors and 5 correctors enabled
 
 Finally found 0 singular values
-  
- start SVD correction using            5  correctors
-  
+
+start SVD correction using     5 correctors
+
 CORRECTION SUMMARY:   
 
                    average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
@@ -383,8 +375,6 @@ cbh.51:1 0.000000 0.004547 0.004547
 Twiss, file=result4;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   8.148356E-04 deltap:   0.000000E+00
 orbit:  -2.762343E-03 -5.729142E-05  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -426,12 +416,12 @@ Want to use orbit from: orbint
 Want to use model orbit from: my_model
 11 monitors and 10 correctors found in input
 11 monitors and 10 correctors enabled
-  
- start LEAST SQUARES correction with all correctors
-  
-  
- end LEAST SQUARES correction with all correctors
-  
+
+start LEAST SQUARES correction with all correctors
+
+
+end LEAST SQUARES correction with all correctors
+
 CORRECTION SUMMARY:   
 
                    average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
@@ -453,33 +443,31 @@ bpv4:1   -1.629     -0.000     1.629
 bph5:1   -3.700     0.000     3.700
 bpv5:1   -0.073     0.000     0.073
 bph1:1   2.491     0.000     -2.491
-Max strength: 9.911024e+01 should be less than corrector strength limit: 1.000000e+00
+Max strength: 9.911011e+01 should be less than corrector strength limit: 1.000000e+00
 ++++++ warning: maximum corrector strength larger than limit 
-Max strength: 9.911024e+01
+Max strength: 9.911011e+01
 Corrector:  Before:     After:    Difference:
              (mrad)     (mrad)       (mrad)  
-cbh.10:1 0.000000 -99.108198 -99.108198
-cbh.11:1 0.000000 99.110238 99.110238
+cbh.10:1 0.000000 -99.108073 -99.108073
+cbh.11:1 0.000000 99.110113 99.110113
 cbh.20:1 0.000000 0.463334 0.463334
-cbh.21:1 0.000000 -0.444529 -0.444529
+cbh.21:1 0.000000 -0.444530 -0.444530
 cbh.30:1 0.000000 1.604474 1.604474
 cbh.31:1 0.000000 -1.629254 -1.629254
-cbh.40:1 0.000000 -18.174706 -18.174706
-cbh.41:1 0.000000 18.275921 18.275921
-cbh.50:1 0.000000 -12.897325 -12.897325
-cbh.51:1 0.000000 12.910444 12.910444
+cbh.40:1 0.000000 -18.174707 -18.174707
+cbh.41:1 0.000000 18.275922 18.275922
+cbh.50:1 0.000000 -12.897323 -12.897323
+cbh.51:1 0.000000 12.910442 12.910442
 
 
 Twiss, file=result5;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
-iteration:   1 error:   2.771557E-05 deltap:   0.000000E+00
-orbit:  -2.531451E-03 -4.831852E-05  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+iteration:   1 error:   2.771558E-05 deltap:   0.000000E+00
+orbit:  -2.531451E-03 -4.831853E-05  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   5.015225E-08 deltap:   0.000000E+00
+iteration:   2 error:   5.015226E-08 deltap:   0.000000E+00
 orbit:  -2.531501E-03 -4.831920E-05  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
@@ -491,7 +479,7 @@ orbit:  -2.531501E-03 -4.831920E-05  0.000000E+00  0.000000E+00  0.000000E+00  0
        1.244737918        1.057577307        176.2740748        89.98937594 
 
              dxrms             xcomax             xcorms                 q2 
-       70.29135164     0.009247146938     0.003778945165        1.851577089 
+       70.29135164     0.009247146985     0.003778945169        1.851577089 
 
                dq2            betymax              dymax              dyrms 
       0.3300208738         184.980016                  0                  0 
@@ -522,12 +510,12 @@ After SVD conditioning:
 11 monitors and 5 correctors enabled
 
 Finally found 0 singular values
-  
- start LEAST SQUARES correction with all correctors
-  
-  
- end LEAST SQUARES correction with all correctors
-  
+
+start LEAST SQUARES correction with all correctors
+
+
+end LEAST SQUARES correction with all correctors
+
 CORRECTION SUMMARY:   
 
                    average [mm]   std.dev. [mm]      RMS [mm]        peak-to-peak [mm]
@@ -563,8 +551,6 @@ cbh.51:1 0.000000 0.004547 0.004547
 Twiss, file=result6;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
 iteration:   1 error:   8.148356E-04 deltap:   0.000000E+00
 orbit:  -2.762343E-03 -5.729142E-05  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -606,5 +592,5 @@ Stop;
 2 in C and 0 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

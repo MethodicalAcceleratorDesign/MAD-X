@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.06.24 11:41:00      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.05.20 22:12:28      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE;
 
@@ -64,7 +64,6 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
   +   c6t version 2.0        +
   ++++++++++++++++++++++++++++
 
-max_mult_ord set to : 11
 Reference radius set to : 1.000000
 
 total block length: 534.600000
@@ -79,5 +78,5 @@ c6t terminated - total number of elements: 276
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

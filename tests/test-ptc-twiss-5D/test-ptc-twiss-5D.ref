@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.08  (64 bit, Linux)       +
+  +     MAD-X 5.02.10  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.11.20               +
-  + Execution date: 2016.02.11 17:51:53      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.05.31 13:19:49      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -803,16 +803,12 @@ select, flag=twiss, column=name,s,betx,bety,alfx,alfy,mux,muy,dx,dpx,
 twiss, rmatrix, chrom, save;
 
 enter Twiss module
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
   
-iteration:   1 error:   1.178158E-04 deltap:   1.000000E-06
-orbit:  -7.037257E-06 -1.676362E-06  0.000000E+00  0.000000E+00 -1.960125E-06  3.016099E-07
+iteration:   1 error:   1.763227E-04 deltap:   1.000000E-06
+orbit:  -9.649253E-06 -2.298584E-06  0.000000E+00  0.000000E+00 -2.965937E-06  5.991433E-07
   
-iteration:   2 error:   5.695677E-10 deltap:   1.000000E-06
-orbit:  -7.037391E-06 -1.676328E-06  0.000000E+00  0.000000E+00 -1.508340E-06  3.016136E-07
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
+iteration:   2 error:   1.052580E-09 deltap:   1.000000E-06
+orbit:  -9.649474E-06 -2.298528E-06  0.000000E+00  0.000000E+00 -2.068187E-06  5.991503E-07
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
@@ -823,13 +819,13 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
        78.54370266                 -0       0.1241075638        2.838578276 
 
                 q1                dq1            betxmax              dxmax 
-       1.820059621       -3.734960278        15.12421277         20.6041956 
+       1.820059621       -5.030192682        15.12421277         20.6041956 
 
              dxrms             xcomax             xcorms                 q2 
        9.639962105                  0                  0         2.71982919 
 
                dq2            betymax              dymax              dyrms 
-      -7.573739495        20.07025727                  0                  0 
+      -10.39500532        20.07025727                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0        9.747887059 
@@ -887,64 +883,23 @@ ptc_create_universe;
                 Momentum : 0.541711E+00
   recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
-     energy           1.08342267840000     
+     energy           1.0834226784000001     
      method                   6
      Num. of steps            5
-     charge           1.00000000000000     
-  Length of machine:    78.5437026616777     
+     charge           1.0000000000000000     
+  Length of machine:    78.543702661677713     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After    end:  -6.272760089132134E-015  0.000000000000000E+000  8.437694987151190E-015
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -6.2727600891321345E-015   0.0000000000000000        8.4376949871511897E-015
 
 
 
 
-  ptc_printframes, file="leir.C", format=rootmacro;!this prints my visualisation with ROOT
+!  ptc_printframes, file="leir.C", format=rootmacro;!this prints my visualisation with ROOT
 
-mad_ptc.c: pro_ptc_printframes: format is rootmacro.
-          38 BA1HO.1                 All three reference frames are inline. DRAWING AS RBEND
-          41 BA1HI.1                 All three reference frames are inline. DRAWING AS RBEND
-          43 BI1PO.1                 All three reference frames are inline. DRAWING AS RBEND
-          45 BI1PM.1                 SBEND curvature is almost null. DRAWING AS RBEND
-          47 BI1PI.1                 All three reference frames are inline. DRAWING AS RBEND
-          51 BI2PI.1                 All three reference frames are inline. DRAWING AS RBEND
-          53 BI2PM.1                 All three reference frames are inline. DRAWING AS RBEND
-          55 BI2PO.1                 All three reference frames are inline. DRAWING AS RBEND
-          57 BA2HI.1                 All three reference frames are inline. DRAWING AS RBEND
-          60 BA2HO.1                 All three reference frames are inline. DRAWING AS RBEND
-         114 BA1HO.2                 All three reference frames are inline. DRAWING AS RBEND
-         117 BA1HI.2                 All three reference frames are inline. DRAWING AS RBEND
-         119 BI1PO.2                 All three reference frames are inline. DRAWING AS RBEND
-         121 BI1PM.2                 All three reference frames are inline. DRAWING AS RBEND
-         123 BI1PI.2                 All three reference frames are inline. DRAWING AS RBEND
-         127 BI2PI.2                 All three reference frames are inline. DRAWING AS RBEND
-         129 BI2PM.2                 All three reference frames are inline. DRAWING AS RBEND
-         131 BI2PO.2                 All three reference frames are inline. DRAWING AS RBEND
-         133 BA2HI.2                 All three reference frames are inline. DRAWING AS RBEND
-         136 BA2HO.2                 All three reference frames are inline. DRAWING AS RBEND
-         174 BA1HO.3                 All three reference frames are inline. DRAWING AS RBEND
-         177 BA1HI.3                 All three reference frames are inline. DRAWING AS RBEND
-         179 BI1PO.3                 All three reference frames are inline. DRAWING AS RBEND
-         181 BI1PM.3                 All three reference frames are inline. DRAWING AS RBEND
-         183 BI1PI.3                 All three reference frames are inline. DRAWING AS RBEND
-         187 BI2PI.3                 All three reference frames are inline. DRAWING AS RBEND
-         189 BI2PM.3                 All three reference frames are inline. DRAWING AS RBEND
-         191 BI2PO.3                 All three reference frames are inline. DRAWING AS RBEND
-         193 BA2HI.3                 All three reference frames are inline. DRAWING AS RBEND
-         196 BA2HO.3                 All three reference frames are inline. DRAWING AS RBEND
-         242 BA1HO.4                 All three reference frames are inline. DRAWING AS RBEND
-         245 BA1HI.4                 All three reference frames are inline. DRAWING AS RBEND
-         247 BI1PO.4                 All three reference frames are inline. DRAWING AS RBEND
-         249 BI1PM.4                 All three reference frames are inline. DRAWING AS RBEND
-         251 BI1PI.4                 All three reference frames are inline. DRAWING AS RBEND
-         255 BI2PI.4                 All three reference frames are inline. DRAWING AS RBEND
-         257 BI2PM.4                 All three reference frames are inline. DRAWING AS RBEND
-         259 BI2PO.4                 All three reference frames are inline. DRAWING AS RBEND
-         261 BA2HI.4                 All three reference frames are inline. DRAWING AS RBEND
-         264 BA2HO.4                 All three reference frames are inline. DRAWING AS RBEND
 
 
   !!!!!       T I M E   F A L S E,   T O T P A T H  F A L S E
@@ -957,8 +912,6 @@ mad_ptc.c: pro_ptc_printframes: format is rootmacro.
 
   ptc_twiss, table=twiss, icase=5, no=2, closed_orbit, rmatrix;
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
 
 ++++++ table: ptc_twiss_summary
 
@@ -999,7 +952,7 @@ mad_ptc.c: pro_ptc_printframes: format is rootmacro.
    2.546139122e-09                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    1.168573391e-08                  0    3.059593852e-09 
+                -0    1.168573391e-08                  0    3.059593852e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
                  0                  0                  0    2.508646064e-08 
@@ -1032,7 +985,7 @@ ptc_end;
 
 
 
-removefile, file='leir.C';
+!removefile, file='leir.C';
 
 removefile, file='Maxwellian_bend_for_ptc.txt';
 

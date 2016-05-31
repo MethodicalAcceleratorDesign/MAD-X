@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.08  (64 bit, Linux)       +
+  +     MAD-X 5.02.10  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.11.20               +
-  + Execution date: 2016.02.26 13:14:25      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.05.31 16:28:19      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! reads the user privided one turn matrix via command parameters
 
@@ -922,8 +922,6 @@ ptc_create_universe;
 
             ring_parameters;
 
-++++++ info: Zero value of SIGT replaced by 1.
-++++++ info: Zero value of SIGE replaced by 1/1000.
 ++++++ warning: ptc_twiss  Provided matrix has eigenvalue more than 1e-10 off the unit circle ! plane =            1  r^2 =    1.0000000004683138       delta =    4.6831383215817368E-010
 ++++++ warning: ptc_twiss  Provided matrix has eigenvalue more than 1e-10 off the unit circle ! plane =            2  r^2 =    1.0000000004683138       delta =    4.6831383215817368E-010
 
@@ -966,7 +964,7 @@ ptc_create_universe;
                  0                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    2.512911304e-08                  0    4.205036582e-09 
+                -0    2.512911304e-08                  0    4.205036582e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
                  0    3.754738803e-08                  0    5.077465416e-08 

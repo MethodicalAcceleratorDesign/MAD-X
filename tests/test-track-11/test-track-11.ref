@@ -499,15 +499,13 @@ enter TRACK module
 iteration:   1 error:   2.225376E-21 deltap:   0.000000E+00
 orbit:   8.908674E-22 -2.255121E-23 -9.785071E-22 -1.701329E-23 -1.456529E-17 -1.927238E-25
   
-  Full 6D closed orbit search.
-  Initial value of 6-D closed orbit from Twiss: 
-  orbit0   8.908673667871805E-022 -2.255121441933524E-023 -9.785070581722350E-022 -1.701328837670987E-023 -1.456528548256335E-017 -1.927237970196214E-025
+Full 6D closed orbit search.
+Initial value of 6-D closed orbit from Twiss: 
+orbit0   8.908674E-22 -2.255121E-23 -9.785071E-22 -1.701329E-23 -1.456529E-17 -1.927238E-25
   
- 6D closed orbit found by subroutine trclor 
+6D closed orbit found by subroutine trclor 
 iteration:  11 error:   2.799193E-22 deltap:   0.000000E+00
 orbit:  -1.178419E-69 -1.506185E-71  1.588057E-81  1.725567E-83 -4.073446E-17  2.797265E-22
-
-*****  end of trrun  *****
 exit TRACK module
 
 
