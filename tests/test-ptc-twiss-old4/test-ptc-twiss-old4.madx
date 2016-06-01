@@ -57,7 +57,7 @@ beam, particle = proton, energy =   eg        ,
 
 
 ptc_create_universe;
-ptc_create_layout,model=2,method=6,nst=5,exact;
+ptc_create_layout,model=2,method=6,nst=10,exact;
 ptc_align;
                                     
 ! Example 4: Input transfer matrix coef manually ========================
