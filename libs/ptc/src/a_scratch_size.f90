@@ -79,7 +79,7 @@ module precision_constants
   real(dp),parameter::A_ELECTRON=1.15965218111e-3_dp  !frs NIST CODATA 2006
   real(dp),parameter::A_MUON=1.16592069e-3_dp         !frs NIST CODATA 2006
   real(dp),parameter::A_PROTON=1.79284735e-0_dp       !frs (approx) NIST CODATA 2006
-  real(dp),parameter:: pmaMUON = 105.6583668E-3_DP    !frs NIST CODATA 2006
+  real(dp),parameter:: pmaMUON = 105.6583745E-3_DP    !frs NIST CODATA 2016
   real(dp) :: e_muon = 0.d0, volt_c=1.0e-3_dp, volt_i=1.0_dp
  !  real(dp),parameter:: pmadt = 1.875612793e0_dp    ! sateesh
   !  real(dp),parameter:: pmah3 = 2.808391e0_dp    ! sateesh
@@ -88,10 +88,10 @@ module precision_constants
   logical(lp),  public :: longprint = my_true
 
   real(dp) :: A_particle = A_ELECTRON
-  real(dp),parameter::pmae=5.10998910e-4_dp           !frs NIST CODATA 2006
+  real(dp),parameter::pmae=5.1099894610e-4_dp           !frs NIST CODATA 2016
   real(dp),parameter::pmae_amu=5.4461702177e-4_dp     !frs NIST CODATA 2006
   ![GeV]
-  real(dp),parameter::pmap=0.938272013e0_dp           !frs NIST CODATA 2006
+  real(dp),parameter::pmap=0.9382720813e0_dp           !frs NIST CODATA 2016
   ![GeV]
   real(dp),parameter::CLIGHT=2.99792458e8_dp          ! exact
   ![m/s]
@@ -155,6 +155,7 @@ module precision_constants
   real(dp),parameter::c_0_005=5e-3_dp,c_0_012=1.2e-2_dp,c_1_5=1.5e0_dp
   real(dp),parameter::c_0_002=2e-3_dp,c_0_05=5e-2_dp,c_0_216=0.216e0_dp
   real(dp),parameter::c_0_7=0.7e0_dp,c_1_2d_5=1.2e-5_dp,c_1d7=1e7_dp
+  real(dp),parameter:: suntao=1.6021766208e-19_dp/299792458.0_dp/9.10938356e-31_dp
   ! Constant Symplectic integrator schemes
   real(dp) YOSK(0:4), YOSD(4)    ! FIRST 6TH ORDER OF YOSHIDA
   real(dp),parameter::AAA=-0.25992104989487316476721060727823e0_dp  ! fourth order integrator

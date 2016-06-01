@@ -41,6 +41,7 @@ module S_status
   !  integer, parameter :: KINDFITTED = KIND23+1
   !  integer, parameter :: KINDUSER1 = KIND23+2
   !  integer, parameter :: KINDUSER2 = KIND23+3
+  integer, parameter :: KINDhel = KIND22
   integer, parameter :: KINDwiggler = KIND23+2
   !  integer, parameter :: KINDmu      = KIND23+3
   integer, parameter :: KINDpa     = KIND23+3
@@ -140,6 +141,7 @@ module S_status
   private track_TREE_G_complexr,track_TREE_G_complexp,track_TREE_probe_complexr,track_TREE_probe_complexp
   integer :: size_tree=15
   integer :: ind_spin(3,3),k1_spin(9),k2_spin(9)
+  real(dp),TARGET ::INITIAL_CHARGE=1
 
   TYPE B_CYL
      integer firsttime
@@ -300,6 +302,7 @@ CONTAINS
     nullify(P%EXACT);  !nullify(P%RADIATION);nullify(P%NOCAVITY);
     nullify(P%permFRINGE,p%highest_fringe);
     nullify(P%KILL_ENT_FRINGE);nullify(P%KILL_EXI_FRINGE);nullify(P%bend_fringe);  !nullify(P%TIME);
+    nullify(P%KILL_ENT_SPIN);nullify(P%KILL_EXI_SPIN);
     nullify(P%METHOD);nullify(P%NST);
     nullify(P%NMUL);  !nullify(P%spin);
     nullify(P%F);
@@ -336,6 +339,7 @@ CONTAINS
     ALLOCATE(P%EXACT);  !ALLOCATE(P%RADIATION);ALLOCATE(P%NOCAVITY);
         ALLOCATE(P%permFRINGE,p%highest_fringe);
     ALLOCATE(P%KILL_ENT_FRINGE);ALLOCATE(P%KILL_EXI_FRINGE);ALLOCATE(P%bend_fringe); !ALLOCATE(P%TIME);
+    ALLOCATE(P%KILL_ENT_SPIN);ALLOCATE(P%KILL_EXI_SPIN);
     ALLOCATE(P%METHOD);ALLOCATE(P%NST);P%METHOD=2;P%NST=1;
     ALLOCATE(P%NMUL);P%NMUL=0;
     !    ALLOCATE(P%spin);
@@ -344,6 +348,8 @@ CONTAINS
     p%highest_fringe=highest_fringe
     P%KILL_ENT_FRINGE=.FALSE.
     P%KILL_EXI_FRINGE=.FALSE.
+    P%KILL_ENT_SPIN=.FALSE.
+    P%KILL_EXI_SPIN=.FALSE.
     P%bend_fringe=.false.
     call alloc(p%f)
     ! if(junk) ccc=ccc+1
@@ -387,6 +393,8 @@ CONTAINS
     if(associated(p%highest_fringe))DEALLOCATE(p%highest_fringe);
     if(associated(p%KILL_ENT_FRINGE))DEALLOCATE(P%KILL_ENT_FRINGE);
     if(associated(p%KILL_EXI_FRINGE))DEALLOCATE(P%KILL_EXI_FRINGE);
+    if(associated(p%KILL_ENT_SPIN))DEALLOCATE(p%KILL_ENT_SPIN);
+    if(associated(p%KILL_EXI_SPIN))DEALLOCATE(p%KILL_EXI_SPIN);
     if(associated(p%bend_fringe))DEALLOCATE(P%bend_fringe); !DEALLOCATE(P%TIME);
     if(associated(p%METHOD))DEALLOCATE(P%METHOD);
     !DEALLOCATE(P%spin);
@@ -511,6 +519,8 @@ CONTAINS
 
     elp%KILL_ENT_FRINGE=el%KILL_ENT_FRINGE
     elp%KILL_EXI_FRINGE=el%KILL_EXI_FRINGE
+    elp%KILL_ENT_SPIN=elp%KILL_ENT_SPIN
+    elp%KILL_EXI_SPIN=el%KILL_EXI_SPIN
     elp%bend_fringe=el%bend_fringe
 
     elp%LD=el%LD
@@ -1057,7 +1067,8 @@ CONTAINS
        if(muon==1.0_dp)  then
           write(mf,*)"This is an electron (positron actually if charge=1) "
        else
-          write(mf,'((1X,a21,1x,G21.14,1x,A24))' ) "This a particle with ",muon, "times the electron mass "
+          write(mf,*)"This is a proton"
+          ! write(mf,'((1X,a21,1x,G21.14,1x,A24))' ) "This a particle with ",muon, "times the electron mass "
        endif
     else
        write(mf,*) "This is a proton "
@@ -1091,11 +1102,12 @@ CONTAINS
     IF(LOG) CONV="TRUE "
   END FUNCTION CONV
 
-  SUBROUTINE MAKE_STATES_m(muonfactor)
+  SUBROUTINE MAKE_STATES_m(muonfactor,ag,ne)
     USE   definition
     IMPLICIT NONE
     logical(lp) :: doneitt=.true.
     real(dp) muonfactor,MASSF
+    real(dp), optional :: ag,ne
     CALL MAKE_YOSHIDA
     muon=muonfactor
     MASSF=muon*pmae
@@ -1107,8 +1119,15 @@ CONTAINS
        A_PARTICLE=A_ELECTRON
     ELSEIF(ABS(MASSF-pmaMUON)/pmaMUON<0.01E0_DP) THEN
        A_PARTICLE=A_MUON
+    elseif(present(ag)) then
+     a_particle=ag
+    else 
+     write(6,*) "Cannot do spin : provide a=g-2. Now it is set to zero."
     ENDIF
-
+     initial_charge=1
+    if(present(ne)) then
+     initial_charge=ne
+    endif
   END  SUBROUTINE MAKE_STATES_m
 
   SUBROUTINE update_STATES
@@ -1365,9 +1384,9 @@ CONTAINS
        n_acc=1
     endif
 
-    IF(STATE%spin.or.STATE%modulation.or.STATE%radiation.or.STATE%envelope)  then
+   ! IF(STATE%spin.or.STATE%modulation.or.STATE%radiation.or.STATE%envelope)  then
        if(automatic_complex) use_complex_in_ptc=.true.
-    endif
+   ! endif
     !    write(6,*) NO1,ND1,NP1,NDEL,NDPT1
     !pause 678
     CALL INIT(NO1,ND1,NP1+NDEL,NDPT1,PACKAGE)
@@ -6400,7 +6419,7 @@ enddo
   end subroutine nul_coef
 
 !!!!!!!!!!!!!!!!!!!!   tree tracking for PTC using stuff in 
-  SUBROUTINE SET_TREE_G_complex(T,Ma)
+  SUBROUTINE SET_TREE_G_complex(T,Ma,factor)
     IMPLICIT NONE
     TYPE(TREE_ELEMENT), INTENT(INOUT) :: T(:)
     TYPE(c_damap), INTENT(INOUT) :: Ma
@@ -6409,8 +6428,10 @@ enddo
     TYPE(taylor), ALLOCATABLE :: M(:), MG(:)
     TYPE(damap) ms
     integer js(6)
- 
-
+    logical, optional :: factor
+    logical fact
+    fact=.false.
+    if(present(factor)) fact=factor
     
 !    np=ma%n+18
     if(ma%n/=6) then
@@ -6460,7 +6481,13 @@ enddo
       js=0
      js(1)=1;js(3)=1;js(5)=1; ! q_i(q_f,p_i) and p_f(q_f,p_i)
      call alloc(ms)
-     ms=ma
+     if(fact) then
+      ms=(ma.sub.1)**(-1)*ma
+     else
+       ms=ma
+     endif
+ 
+
      ms=ms**js
 !     do i=1,3
 !      mg(i)=ms%v(2*i-1)   !  q_i(q_f,p_i)
@@ -6483,12 +6510,89 @@ enddo
 
      call SET_TREE_g(T(3),mg(1:size_tree))
 
+     if(fact) then
+      t(3)%rad=ma
+     else
+       do i=1,6
+        t(3)%rad(i,i)=1.0_dp
+       enddo
+     endif
+
        mat=ma**(-1)
        t(1)%e_ij=matmul(matmul(mat,ma%e_ij),transpose(mat))
  
     deallocate(M)
 
   END SUBROUTINE SET_TREE_G_complex
+
+subroutine print_tree_element(t,mf)
+implicit none
+type(tree_element) t
+ 
+integer i,mf
+!   write(mf,'(a204)') t%file
+write(mf,'(3(1X,i8))') t%N,t%NP,t%no
+do i=1,t%n
+ write(mf,'(1X,G20.13,1x,i8,1x,i8)')  t%cc(i),t%jl(i),t%jv(i)
+enddo
+write(mf,'(2(1X,L1))') t%symptrack,t%usenonsymp
+write(mf,'(18(1X,G20.13))') t%fix0,t%fix,t%fixr
+do i=1,6
+ write(mf,'(6(1X,G20.13))') t%e_ij(i,1:6)
+enddo
+do i=1,6
+ write(mf,'(6(1X,G20.13))') t%rad(i,1:6)
+enddo
+ write(mf,'(3(1X,G20.13))') t%ds,t%beta0,t%eps
+
+end subroutine print_tree_element
+
+subroutine print_tree_elements(t,mf)
+implicit none
+type(tree_element) t(:)
+ 
+integer i,mf
+
+ do i=1,size(t)
+  call print_tree_element(t(i),mf)
+ enddo
+
+end subroutine print_tree_elements
+ 
+subroutine read_tree_element(t,mf)
+implicit none
+type(tree_element) t
+ 
+integer i,mf
+ 
+ ! read(mf,'(a204)') t%file
+!read(mf,*) t%N,t%NP,t%no
+do i=1,t%n
+ read(mf,*)  t%cc(i),t%jl(i),t%jv(i)
+enddo
+read(mf,*) t%symptrack,t%usenonsymp
+read(mf,'(18(1X,G20.13))') t%fix0,t%fix,t%fixr
+do i=1,6
+ read(mf,*) t%e_ij(i,1:6)
+enddo
+do i=1,6
+ read(mf,*) t%rad(i,1:6)
+enddo
+ read(mf,*) t%ds,t%beta0,t%eps
+
+end subroutine read_tree_element
+
+subroutine read_tree_elements(t,mf)
+implicit none
+type(tree_element) t(:)
+ 
+integer i,mf
+
+ do i=1,size(t)
+  call read_tree_element(t(i),mf)
+ enddo
+
+end subroutine read_tree_elements
 
   SUBROUTINE track_TREE_probe_complexr(T,xs,dofix0,dofix,sta,jump)
     use da_arrays
@@ -6605,6 +6709,8 @@ do is=1,nrmax
        x(2)=x0(2)
        x(4)=x0(4)
        x(6)=x0(6)       
+
+       x(1:6)=matmul(t(3)%rad,x(1:6))
        exit
      endif
      normb=norm
@@ -6861,8 +6967,17 @@ endif ! jumpnot
          x(i)=xs0%x(i)
         enddo
      endif
-
-
+       do i=1,6
+        x0(i)=0.0_dp
+       enddo
+       do i=1,6
+        do j=1,6
+       x0(i)=t(3)%rad(i,j)*x(j)+x0(i)
+       enddo
+      enddo
+        do i=1,6
+         x(i)=x0(i)
+        enddo
      else
        call track_TREE_G_complex(T(1),X(1:6))
      endif

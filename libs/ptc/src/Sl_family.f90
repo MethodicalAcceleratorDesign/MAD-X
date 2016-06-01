@@ -465,7 +465,9 @@ CONTAINS
     IMPLICIT NONE
     TYPE (FIBRE),target,INTENT(IN):: S1
     TYPE(WORK),INTENT(INOUT):: S2
-
+    electron=my_true
+    muon=s1%mass/pmae
+    s2%mass=s1%mass
     S2=S1%MAG
     IF(ABS(S1%MAG%P%P0C-S1%MAGP%P%P0C)>1e-10_dp) THEN
        W_P=0

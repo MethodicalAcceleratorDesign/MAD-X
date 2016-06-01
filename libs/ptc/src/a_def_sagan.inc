@@ -19,6 +19,7 @@ TYPE undu_R
    real(dp), DIMENSION(:), pointer :: F
    real(dp), DIMENSION(:), pointer :: x0
    real(dp), DIMENSION(:), pointer :: y0
+   real(dp), DIMENSION(:), pointer :: ex(:),ey(:)
    real(dp), pointer :: offset
    integer, DIMENSION(:), pointer :: FORM
 END TYPE undu_R
@@ -29,6 +30,7 @@ TYPE undu_p
    TYPE(REAL_8), DIMENSION(:), pointer :: F
    TYPE(REAL_8), DIMENSION(:), pointer :: x0
    TYPE(REAL_8), DIMENSION(:), pointer :: y0
+   real(dp), DIMENSION(:), pointer :: ex(:),ey(:)
    TYPE(REAL_8), pointer :: offset
    integer, DIMENSION(:), pointer :: FORM
 END TYPE undu_p

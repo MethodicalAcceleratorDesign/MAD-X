@@ -20,7 +20,7 @@ select, flag=ptc_twiss, column=name,s,Energy,x,y,pt,t,
 
 
 ptc_create_universe;
-  ptc_create_layout, model=1, method=2, nst=5, exact=false, closed_layout=true;
+  ptc_create_layout, model=1, method=2, nst=20, exact=false, closed_layout=true;
 
 !  ptc_printframes, file="ALS.C", format=rootmacro;!this prints my visualisation with ROOT
 

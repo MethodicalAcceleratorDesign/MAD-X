@@ -32,7 +32,7 @@ module tpsalie
 
   private A_OPT_gmap,k_OPT_gmap,allocgmap,KILLgmap,EQUALgMAP,IdentityEQUALgMAP,DAPRINTgMAP,concatorg
   private assgmap,concatg,DPEKgMAP,DPOKgMAP,gPOWMAP,trxgtaylorc,trxgtaylor,gPOWMAPtpsa,GETORDERgMAP,CUTORDERg
-  private matrixtMAPr,EQUALgMAPdamap
+  private matrixtMAPr,EQUALgMAPdamap,PRINT_for_bmad_parsem
 
   INTERFACE assignment (=)
      MODULE PROCEDURE EQUALMAP
@@ -173,6 +173,11 @@ module tpsalie
      MODULE PROCEDURE DAPRINTVEC
      MODULE PROCEDURE DAPRINTTAYLOR
      MODULE PROCEDURE DAPRINTpb
+  END INTERFACE
+
+
+  INTERFACE print_for_bmad
+     MODULE PROCEDURE print_for_bmad_parsem
   END INTERFACE
 
   ! Exponential of Lie Operators
@@ -745,78 +750,113 @@ contains
 
   END SUBROUTINE DAREAPB
 
-  SUBROUTINE  DAPRINTMAP(S1,MFILE,DEPS)
+  SUBROUTINE  DAPRINTMAP(S1,MFILE,PREC)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (damap),INTENT(IN)::S1
-    REAL(DP),OPTIONAL,INTENT(IN)::DEPS
+    REAL(DP),OPTIONAL,INTENT(IN)::PREC
     INTEGER I
-
+    
     DO I=1,ND2
-       CALL PRI(s1%V(I),MFILE,DEPS)
+       CALL PRI(s1%V(I),MFILE,PREC,ind=i)
     ENDDO
   END SUBROUTINE DAPRINTMAP
 
-  SUBROUTINE  DAPRINTgMAP(S1,MFILE,DEPS)
+  SUBROUTINE  PRINT_for_bmad_parsem(S1,MFILE,ref0,ref1,PREC)
+    implicit none
+    INTEGER,INTENT(IN)::MFILE
+    type (damap),INTENT(IN)::S1
+    REAL(DP),OPTIONAL,INTENT(IN)::PREC
+    REAL(DP),OPTIONAL,INTENT(IN)::ref0(6),ref1(6)
+    INTEGER I
+    type(damap) t,idf
+    character(255) line
+   
+    call alloc(t,idf)
+     t=s1
+     if(present(ref0)) then
+ !  adding orbit for bmad
+       do i=1,nd2
+        idf%v(i)=(1.d0.mono.i)-ref0(i)
+       enddo
+       do i=1,nd2 
+        t%v(i)=t%v(i)-(t%v(i).sub.'0')
+       enddo
+       t=t.o.idf 
+       do i=1,nd2 
+        t%v(i)=t%v(i)+ref1(i)
+       enddo
+       write(line,*) "ref_orbit=(",ref0(1),",",ref0(2),",",ref0(3),",",ref0(4),",",ref0(5),",",ref0(6),"),"
+     endif
+       call context(line)
+       line=adjustl(line)
+       write(MFILE,'(a255)') line
+    DO I=1,ND2
+       CALL PRINT_for_bmad_parser(t%V(I),MFILE,PREC,ind=i)
+    ENDDO
+    call KILL(t,idf)
+  END SUBROUTINE PRINT_for_bmad_parsem
+
+  SUBROUTINE  DAPRINTgMAP(S1,MFILE,PREC)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (gmap),INTENT(IN)::S1
-    REAL(DP),OPTIONAL,INTENT(IN)::DEPS
+    REAL(DP),OPTIONAL,INTENT(IN)::PREC
     INTEGER I
 
     DO I=1,s1%n
-       CALL PRI(s1%V(I),MFILE,DEPS)
+       CALL PRI(s1%V(I),MFILE,PREC)
     ENDDO
   END SUBROUTINE DAPRINTgMAP
 
-  SUBROUTINE  DAPRINTTAYLORS(S1,MFILE,DEPS)
+  SUBROUTINE  DAPRINTTAYLORS(S1,MFILE,PREC)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (TAYLOR),INTENT(IN)::S1(:)
-    REAL(DP),OPTIONAL,INTENT(IN)::DEPS
+    REAL(DP),OPTIONAL,INTENT(IN)::PREC
     INTEGER I
 
     DO I=1,size(S1)
        if(s1(i)%i>0) then
           if(size(S1)>1) write(MFILE,*) "Taylor #",i
-          CALL PRI(s1(i),MFILE,DEPS)
+          CALL PRI(s1(i),MFILE,PREC)
        endif
     ENDDO
   END SUBROUTINE DAPRINTTAYLORS
 
-  SUBROUTINE  DAPRINTVEC(S1,MFILE,DEPS)
+  SUBROUTINE  DAPRINTVEC(S1,MFILE,PREC)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (VECFIELD),INTENT(IN)::S1
-    REAL(DP),OPTIONAL,INTENT(IN)::DEPS
+    REAL(DP),OPTIONAL,INTENT(IN)::PREC
     INTEGER I
 
     write(mfile,*) s1%ifac,' Factorization represented'
     DO I=1,ND2
-       CALL PRI(s1%V(I),MFILE,DEPS)
+       CALL PRI(s1%V(I),MFILE,PREC)
     ENDDO
 
   END SUBROUTINE DAPRINTVEC
 
 
-  SUBROUTINE  DAPRINTPB(S1,MFILE,DEPS)
+  SUBROUTINE  DAPRINTPB(S1,MFILE,PREC)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (PBFIELD),INTENT(IN)::S1
-    REAL(DP),OPTIONAL,INTENT(IN)::DEPS
+    REAL(DP),OPTIONAL,INTENT(IN)::PREC
 
     write(mfile,*) s1%ifac,' Factorization represented'
-    CALL PRI(s1%H,MFILE,DEPS)
+    CALL PRI(s1%H,MFILE,PREC)
 
   END SUBROUTINE DAPRINTPB
 
-  SUBROUTINE  DAPRINTTAYLOR(S1,MFILE,DEPS)
+  SUBROUTINE  DAPRINTTAYLOR(S1,MFILE,PREC)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (TAYLOR),INTENT(IN)::S1
-    REAL(DP),OPTIONAL,INTENT(IN)::DEPS
+    REAL(DP),OPTIONAL,INTENT(IN)::PREC
 
-    CALL PRI(s1,MFILE,DEPS)
+    CALL PRI(s1,MFILE,PREC)
 
   END SUBROUTINE DAPRINTTAYLOR
 

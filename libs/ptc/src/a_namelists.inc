@@ -10,7 +10,7 @@ namelist / fibrename / fib0
  TYPE patchlist
      integer  A_X1,A_X2,B_X1,B_X2
      real(dp) A_D(3),B_D(3),A_ANG(3),B_ANG(3), A_T,B_T 
-     INTEGER(2)  ENERGY,TIME
+     INTEGER(2)  ENERGY,TIME,GEOMETRY
   END TYPE patchlist
 type(patchlist) patch0
 namelist / patchname / patch0
@@ -26,6 +26,7 @@ namelist / CHARTname / CHART0
     real(dp) TILTD_EDGE(3)   ! TILTD EDGE
     LOGICAL(Lp) KIN_KEX_BENDFRINGE_EXACT(4)  ! KILL_ENT_FRINGE, KILL_EXI_FRINGE, bend_fringe,EXACT
 	INTEGER METHOD_NST_NMUL_permfringe_highest(5)   ! METHOD,NST,NMUL,permfringr, highest_fringe
+    LOGICAL(Lp) kill_spin(2) 
   END TYPE MAGNET_CHARTLIST
 
 type(MAGNET_CHARTLIST) MAGL0
@@ -43,6 +44,9 @@ namelist / MAGLname / MAGL0
 	LOGICAL(LP) THIN 
     real(dp) fint_hgap_h1_h2_va_vs(6)
 	logical(lp) slowac_recut_even_electric_MIS(5)  
+     logical usebf_skipptcbf_do1bf(6)
+     character(204) filef
+      character(204) fileb
   END TYPE ele_list
 type(ele_list) ELE0
 namelist / ELEname / ELE0
@@ -58,6 +62,12 @@ namelist / ELEname / ELE0
   END TYPE cav_list
 type(cav_list) cav0
 namelist / CAVname / cav0
+ 
+  TYPE hel_list
+   integer N_BESSEL
+  END TYPE hel_list
+type(hel_list) hel0
+namelist / HELname / hel0
 
   TYPE thin3_list
    real(dp) thin_h_foc,thin_v_foc,thin_h_angle,thin_v_angle,hf,vf,ls
@@ -128,6 +138,7 @@ namelist / siamname / siam0
    real(dp) f(mode_max)   
    integer form(mode_max)
    real(dp) k(3,mode_max)
+   real(dp) ex(wiggler_suntao),ey(wiggler_suntao)
   END TYPE wig_list
 type(wig_list) wig0
 namelist / wigname / wig0

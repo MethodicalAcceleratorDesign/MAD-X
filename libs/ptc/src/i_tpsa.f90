@@ -21,7 +21,7 @@ MODULE TPSA
   private allocda,KILLda,A_OPT,K_opt
   private dexpt,dcost,dsint,dsqrtt,dtant,datanht,dtanht
   PRIVATE GETCHARnd2,GETintnd2,dputchar,dputint, filter,check_j,dsinHt,dCOSHt
-  private GETintnd2t
+  private GETintnd2t,print_for_bmad_parse
   PRIVATE DEQUAL,REQUAL,varf,varf001  !,CHARINT
   !  PUBLIC VAR,ASS
   private pbbra,full_absT,asstaylor,getcharnd2s,GETintnd2s,GETintk
@@ -41,11 +41,22 @@ MODULE TPSA
 
   PRIVATE null_it,Set_Up,de_Set_Up,LINE_L,RING_L,kill_DALEVEL,dealloc_DASCRATCH,set_up_level
   private insert_da,append_da,GETINTegrate
-
+INTEGER, private, PARAMETER :: I4B = SELECTED_INT_KIND(9)
+!INTEGER, private, PARAMETER :: DP = KIND(1.0D0)
+private bessi_se,bessi0_se,poly_e,bessi1_se,I_nt,I_nr,In_nt,In_enz
+real(dp) :: switch_bessel=0.001d0
 
   type(dalevel) scratchda(ndumt)   !scratch levels of DA using linked list
 
+  INTERFACE I_ns
+     MODULE PROCEDURE I_nr
+     MODULE PROCEDURE I_nt
+  END INTERFACE
 
+ INTERFACE I_n
+     MODULE PROCEDURE In_enz
+     MODULE PROCEDURE In_nt
+  END INTERFACE
 
   INTERFACE assignment (=)
      MODULE PROCEDURE EQUAL
@@ -64,6 +75,11 @@ MODULE TPSA
      MODULE PROCEDURE refill_uni
   end  INTERFACE
 
+
+
+  INTERFACE print_for_bmad_parser
+     MODULE PROCEDURE print_for_bmad_parse
+  END INTERFACE
 
 
   INTERFACE print
@@ -3236,19 +3252,111 @@ endif
 
   !  i/o routines
 
-  SUBROUTINE  pri(S1,MFILE,DEPS)
+  SUBROUTINE  print_for_bmad_parse(S1,MFILE,prec,ind)
     implicit none
     INTEGER,INTENT(IN)::MFILE
-    REAL(DP),OPTIONAL,INTENT(IN)::DEPS
+    REAL(DP),OPTIONAL,INTENT(IN)::prec
+    integer ,OPTIONAL,INTENT(IN)::ind
     type (TAYLOR),INTENT(IN)::S1
-    REAL(DP) PREC,depst
 
-    IF(PRESENT(DEPS)) THEN
-       PREC=-1.0_dp
-       depst=deps
-       CALL taylor_eps(PREC)
+     bmadparser=1
+    call pri(S1,MFILE,prec,ind)
+     bmadparser=0
+  
+  end SUBROUTINE  print_for_bmad_parse
+
+  SUBROUTINE  pri(S1,MFILE,prec,ind)
+    implicit none
+    INTEGER,INTENT(IN)::MFILE
+    REAL(DP),OPTIONAL,INTENT(IN)::prec
+    integer ,OPTIONAL,INTENT(IN)::ind
+    type (TAYLOR),INTENT(IN)::S1
+    REAL(DP) PREC1,depst,value
+    integer i,j,it,n,indo,k,kt,kl
+    integer, allocatable :: jc(:)
+    character(255) line,line0
+
+    IF(PRESENT(prec)) THEN
+       PREC1=-1.0_dp
+       depst=prec
+       CALL taylor_eps(PREC1)
        CALL taylor_eps(depst)
     ENDIF
+
+ if(bmadparser>0) then
+    IF(PRESENT(ind)) THEN
+     indo=ind
+    else
+     indo=0
+    endif
+
+    kt=0
+    allocate(jc(c_%nv))
+     call taylor_cycle(s1,size=n)
+    do i=1,n
+       call taylor_cycle(s1,ii=i,value=value,j=jc)
+
+       it=0
+       do j=c_%nd2+1,c_%nv
+          it=jc(i)+it
+       enddo
+       if(it==0.and.abs(value)>depst) then
+        kt=kt+1 
+       endif
+
+    enddo
+
+    deallocate(jc)
+
+    allocate(jc(c_%nv))
+    kl=0
+     call taylor_cycle(s1,size=n)
+    do i=1,n
+       call taylor_cycle(s1,ii=i,value=value,j=jc)
+
+       it=0
+       do j=c_%nd2+1,c_%nv
+          it=jc(i)+it
+       enddo
+       if(it==0.and.abs(value)>depst) then
+        kl=kl+1
+        write(line,*) "{",indo,":",value,","  
+        call context(line)
+        do j=1,c_%nd2
+         write(line(len_trim(line)+1:255),*)jc(j),"&"
+         call context(line)
+        enddo
+        if(kl==kt.and.indo==c_%nd2) then
+          write(line(len_trim(line)+1:255),*)"}"
+        else
+          write(line(len_trim(line)+1:255),*)"},"
+        endif
+         call context(line)
+         k=0
+         line0=' '
+         do j=1,len_trim(line)
+          if(line(j:j)/=' ') then
+           !line(j:j)=' '
+           !else
+          k=k+1
+           line0(k:k)=line(j:j)
+          endif
+         enddo
+         do j=1,len_trim(line0)
+          if(line0(j:j)=='&') line0(j:j)=' '
+         enddo
+        write(mfile,*) line0(1:len_trim(line0))
+       endif
+
+    enddo
+
+    deallocate(jc)
+
+
+   else
+   
+
+
 
     ! if(old) then
     if(print77) then
@@ -3256,19 +3364,10 @@ endif
     else
        CALL DAPRI(s1%i,MFILE)
     endif
-    !    else
-    !       if(newprint) then
-    !          CALL newDAPRI(s1%j,MFILE)
-    !       else
-    !          if(print77) then
-    !             CALL oldDAPRI77(s1%j,MFILE)
-    !          else
-    !             CALL oldDAPRI(s1%j,MFILE)
-    !          endif
-    !       endif
-    !    endif
+
     !
-    IF(PRESENT(DEPS))  CALL taylor_eps(PREC)
+endif
+    IF(PRESENT(prec))  CALL taylor_eps(PREC1)
 
   END SUBROUTINE pri
 
@@ -3796,17 +3895,7 @@ endif
        stop 123
     ENDIF
 
-    if(.not.no_ndum_check) then
-
-      if (master < 1) then
-        print*,"Error Error Error master is ", master
-        flush(6)
-      endif
-      
-      iass0user(master)=iass0user(master)+1
-    
-    endif
-      
+    if(.not.no_ndum_check) iass0user(master)=iass0user(master)+1
     if(iass0user(master)>scratchda(master)%n) then
        call INSERT_DA( scratchda(master) )
     ELSE
@@ -3961,7 +4050,583 @@ endif
 
   END SUBROUTINE clean_gmap
 
-  
+  !!! bessel
 
+		FUNCTION I_nr(n,x)
+        real(dp) I_nr
+		INTEGER(I4B), INTENT(IN) :: n
+		REAL(dp), INTENT(IN) :: x
+        if(n>=2)  then
+         I_nr=bessi_se(n,x)
+!         I_nr=bessi(n,x)
+
+        elseif(n==1) then
+         I_nr=bessi1_se(x)
+        elseif(n==0) then
+         I_nr=bessi0_se(x)
+        else
+         write(6,*) "n<0 in I_n "
+         stop
+        endif
+		END FUNCTION I_nr
+
+
+		FUNCTION I_nt(n,x)
+        type(taylor)  I_nt
+		INTEGER(I4B), INTENT(IN) :: n
+        type(taylor), INTENT(IN) :: x
+        integer localmaster,i,j
+        type(taylor)  dx,tx
+        real(dp) fac,x0
+!        real(dp) :: der(0:2*lno)
+!        real(dp) :: dder(0:2*lno),ddert(0:2*lno)
+         real(dp), allocatable :: ddert(:),dder(:),der(:)
+
+
+
+        localmaster=master
+        call ass(I_nt)
+             x0=(x.sub.'0')
+
+
+        if(c_%no==1) then
+         I_nt=I_ns(n,x0)+dI_n(n,x0)*(x-x0)
+         master=localmaster
+         return
+        endif
+        allocate(der(0:c_%no+n),dder(0:c_%no+n),ddert(0:c_%no+n))
+
+        der=0
+        der(0)=I_ns(n,x0)            
+ 
+        do i=n,c_%no+n
+         der(i)=I_ns(i,x0)
+        enddo
+        j=max(0,n-c_%no)
+
+        do i=n-1,j,-1
+         der(i)=I_ns(i,x0)
+        enddo
+
+       call alloc(dx,tx)
+
+          dder=0.0_dp
+          dx=x-x0
+          tx=dx
+          I_nt=I_ns(n,x0)
+          fac=1.0_dp
+          dder(n)=1.0_dp
+
+          do i=1,c_%no
+            ddert=0.0_dp
+          do j=max(n-(i-1),0),n+(i-1)
+           ddert(iabs(j-1))=0.5_dp*dder(iabs(j))+ddert(iabs(j-1))
+           ddert(iabs(j+1))=0.5_dp*dder(iabs(j))+ddert(iabs(j+1))
+          enddo
+
+            ddert=ddert/i
+            fac=0
+          do j=max(n-i,0),n+i
+            fac=fac+ddert(j)*der(j)
+          enddo
+            I_nt=I_nt+fac*tx
+            tx=tx*dx
+            dder=ddert
+          enddo  
+       call kill(dx,tx)
+        deallocate(der,dder,ddert)
+
+        master=localmaster
+
+		END FUNCTION I_nt
+
+		FUNCTION In_nt(n,x)
+        type(taylor)  in_nt
+		INTEGER(I4B), INTENT(IN) :: n
+        type(taylor), INTENT(IN) :: x
+        integer localmaster,i,j
+        type(taylor)  dx,tx
+        real(dp) fac,x0
+!        real(dp) :: der(0:2*lno)
+!        real(dp) :: dder(0:2*lno),ddert(0:2*lno)
+         real(dp), allocatable :: ddert(:),dder(:),der(:)
+
+
+
+        localmaster=master
+        call ass(in_nt)
+             x0=(x.sub.'0')
+
+
+        if(c_%no==1) then
+         in_nt=I_n(n,x0)+dI_n(n,x0)*(x-x0)
+         master=localmaster
+         return
+        endif
+        allocate(der(0:c_%no+n),dder(0:c_%no+n),ddert(0:c_%no+n))
+
+        der=0
+        der(0)=I_n(n,x0)            
+ 
+        do i=n,c_%no+n
+         der(i)=I_n(i,x0)
+        enddo
+        j=max(0,n-c_%no)
+
+        do i=n-1,j,-1
+         der(i)=I_n(i,x0)
+        enddo
+
+       call alloc(dx,tx)
+
+          dder=0.0_dp
+          dx=x-x0
+          tx=dx
+          in_nt=I_n(n,x0)
+          fac=1.0_dp
+          dder(n)=1.0_dp
+
+          do i=1,c_%no
+            ddert=0.0_dp
+          do j=max(n-(i-1),0),n+(i-1)
+           ddert(iabs(j-1))=0.5_dp*dder(iabs(j))+ddert(iabs(j-1))
+           ddert(iabs(j+1))=0.5_dp*dder(iabs(j))+ddert(iabs(j+1))
+          enddo
+
+            ddert=ddert/i
+            fac=0
+          do j=max(n-i,0),n+i
+            fac=fac+ddert(j)*der(j)
+          enddo
+            in_nt=in_nt+fac*tx
+            tx=tx*dx
+            dder=ddert
+          enddo  
+       call kill(dx,tx)
+        deallocate(der,dder,ddert)
+
+        master=localmaster
+
+		END FUNCTION In_nt
+
+	FUNCTION bessi_se(n,x)
+	IMPLICIT NONE
+	INTEGER(I4B), INTENT(IN) :: n
+	REAL(dp), INTENT(IN) :: x
+	REAL(dp) :: bessi_se
+	INTEGER(I4B), PARAMETER :: IACC=40,IEXP=maxexponent(x)/2
+	INTEGER(I4B) :: j,m
+	REAL(dp) :: bi,bim,bip,tox
+	bessi_se=0.0
+	if (x*x <= 8.0_dp*tiny(x)) RETURN
+	tox=2.0_dp/abs(x)
+	bip=0.0
+	bi=1.0
+	m=2*((n+int(sqrt(real(IACC*n,dp)))))
+	do j=m,1,-1
+		bim=bip+j*tox*bi
+		bip=bi
+		bi=bim
+		if (exponent(bi) > IEXP) then
+			bessi_se=scale(bessi_se,-IEXP)
+			bi=scale(bi,-IEXP)
+			bip=scale(bip,-IEXP)
+		end if
+		if (j == n) bessi_se=bip
+	end do
+	bessi_se=bessi_se*bessi0_se(x)/bi
+	if (x < 0.0 .and. mod(n,2) == 1) bessi_se=-bessi_se
+	END FUNCTION bessi_se
+
+	FUNCTION bessi0_se(x)
+	IMPLICIT NONE
+	REAL(dp), INTENT(IN) :: x
+	REAL(dp) :: bessi0_se
+	REAL(dp) :: ax
+	REAL(DP), DIMENSION(7) :: p = (/1.0_dp,3.5156229_dp,&
+		3.0899424_dp,1.2067492_dp,0.2659732_dp,0.360768e-1_dp,&
+		0.45813e-2_dp/)
+	REAL(DP), DIMENSION(9) :: q = (/0.39894228_dp,0.1328592e-1_dp,&
+		0.225319e-2_dp,-0.157565e-2_dp,0.916281e-2_dp,&
+		-0.2057706e-1_dp,0.2635537e-1_dp,-0.1647633e-1_dp,&
+		0.392377e-2_dp/)
+	ax=abs(x)
+	if (ax < 3.75) then
+		bessi0_se=poly_e(real((x/3.75_dp)**2,dp),p)
+	else  
+		bessi0_se=(exp(ax)/sqrt(ax))*poly_e(real(3.75_dp/ax,dp),q)
+	end if
+	END FUNCTION bessi0_se
+
+	FUNCTION poly_e(x,coeffs)
+! poly_rr
+INTEGER(I4B), PARAMETER :: NPAR_POLY=8
+	REAL(dp), INTENT(IN) :: x
+	REAL(dp), DIMENSION(:), INTENT(IN) :: coeffs
+	REAL(dp) :: poly_e
+	REAL(dp) :: pow
+	REAL(dp), DIMENSION(:), ALLOCATABLE :: vec
+	INTEGER(I4B) :: i,n,nn
+	n=size(coeffs)
+	if (n <= 0) then
+		poly_e=0.0_dp
+	else if (n < NPAR_POLY) then
+		poly_e=coeffs(n)
+		do i=n-1,1,-1
+			poly_e=x*poly_e+coeffs(i)
+		end do
+	else
+		allocate(vec(n+1))
+		pow=x
+		vec(1:n)=coeffs
+		do
+			vec(n+1)=0.0_dp
+			nn=ishft(n+1,-1)
+			vec(1:nn)=vec(1:n:2)+pow*vec(2:n+1:2)
+			if (nn == 1) exit
+			pow=pow*pow
+			n=nn
+		end do
+		poly_e=vec(1)
+		deallocate(vec)
+	end if
+	END FUNCTION poly_e
+
+	FUNCTION bessi1_se(x)
+	IMPLICIT NONE
+	REAL(dp), INTENT(IN) :: x
+	REAL(dp) :: bessi1_se
+	REAL(dp) :: ax
+	REAL(DP), DIMENSION(7) :: p = (/0.5_dp,0.87890594_dp,&
+		0.51498869_dp,0.15084934_dp,0.2658733e-1_dp,&
+		0.301532e-2_dp,0.32411e-3_dp/)
+	REAL(DP), DIMENSION(9) :: q = (/0.39894228_dp,-0.3988024e-1_dp,&
+		-0.362018e-2_dp,0.163801e-2_dp,-0.1031555e-1_dp,&
+		0.2282967e-1_dp,-0.2895312e-1_dp,0.1787654e-1_dp,&
+		-0.420059e-2_dp/)
+	ax=abs(x)
+	if (ax < 3.75) then
+		bessi1_se=ax*poly_e(real((x/3.75_dp)**2,dp),p)
+	else
+		bessi1_se=(exp(ax)/sqrt(ax))*poly_e(real(3.75_dp/ax,dp),q)
+	end if
+	if (x < 0.0) bessi1_se=-bessi1_se
+	END FUNCTION bessi1_se
+
+		FUNCTION dI_n(n,x)
+        real(dp) dI_n
+		INTEGER(I4B), INTENT(IN) :: n
+		REAL(dp), INTENT(IN) :: x
+        if(n>=1)  then
+         dI_n=0.5_dp*(I_n(n+1,x)+I_n(n-1,x))
+        elseif(n==0) then
+         dI_n=bessi1_se(x)
+        else
+         write(6,*) "n<0 in dI_n "
+         stop
+        endif
+		END FUNCTION dI_n
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Takuya OOURA  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! Bessel I_0(x) function in double precision
+!
+function dbesi0(x)
+ implicit none
+integer i,k
+ real(dp) a(0 : 64), b(0 : 69), c(0 : 44),w,x,dbesi0,y,t
+ data (a(i), i = 0, 12) /8.5246820682016865877d-11,2.5966600546497407288d-9,7.9689994568640180274d-8, &
+ 1.9906710409667748239d-6,4.0312469446528002532d-5,6.4499871606224265421d-4,7.9012345761930579108d-3, &
+ 7.1111111109207045212d-2,4.4444444444472490900d-1,1.7777777777777532045d0,4.0000000000000011182d0, &
+ 3.9999999999999999800d0,1.0000000000000000001d0 / 
+ data (a(i), i = 13, 25) /1.1520919130377195927d-10, 2.2287613013610985225d-9,8.1903951930694585113d-8, &
+ 1.9821560631611544984d-6,4.0335461940910133184d-5, 6.4495330974432203401d-4,7.9013012611467520626d-3, &
+ 7.1111038160875566622d-2,4.4444450319062699316d-1, 1.7777777439146450067d0,4.0000000132337935071d0, &
+ 3.9999999968569015366d0,1.0000000003426703174d0 / 
+ data (a(i), i = 26, 38) /1.5476870780515238488d-10, 1.2685004214732975355d-9,9.2776861851114223267d-8, &
+ 1.9063070109379044378d-6,4.0698004389917945832d-5, 6.4370447244298070713d-4,7.9044749458444976958d-3, &
+ 7.1105052411749363882d-2,4.4445280640924755082d-1, 1.7777694934432109713d0,4.0000055808824003386d0, &
+ 3.9999977081165740932d0,1.0000004333949319118d0 / 
+ data (a(i), i = 39, 51) /2.0675200625006793075d-10,-6.1689554705125681442d-10,1.2436765915401571654d-7, &
+ 1.5830429403520613423d-6,4.2947227560776583326d-5, 6.3249861665073441312d-4,7.9454472840953930811d-3, &
+ 7.0994327785661860575d-2,4.4467219586283000332d-1,1.7774588182255374745d0,4.0003038986252717972d0, &
+ 3.9998233869142057195d0,1.0000472932961288324d0 / 
+ data (a(i), i = 52, 64) /2.7475684794982708655d-10, -3.8991472076521332023d-9,1.9730170483976049388d-7, &
+ 5.9651531561967674521d-7,5.1992971474748995357d-5, 5.7327338675433770752d-4,8.2293143836530412024d-3, &
+ 6.9990934858728039037d-2,4.4726764292723985087d-1, 1.7726685170014087784d0,4.0062907863712704432d0, &
+ 3.9952750700487845355d0,1.0016354346654179322d0 / 
+ data (b(i), i = 0, 13) /6.7852367144945531383d-8, 4.6266061382821826854d-7,6.9703135812354071774d-6, &
+ 7.6637663462953234134d-5,7.9113515222612691636d-4, 7.3401204731103808981d-3,6.0677114958668837046d-2, &
+ 4.3994941411651569622d-1,2.7420017097661750609d0, 14.289661921740860534d0,59.820609640320710779d0, &
+ 188.78998681199150629d0,399.87313678256011180d0, 427.56411572180478514d0 / 
+ data (b(i), i = 14, 27) /1.8042097874891098754d-7, 1.2277164312044637357d-6,1.8484393221474274861d-5, &
+ 2.0293995900091309208d-4,2.0918539850246207459d-3, 1.9375315654033949297d-2, 1.5985869016767185908d-1, &
+ 1.1565260527420641724d0,7.1896341224206072113d0, 37.354773811947484532d0,155.80993164266268457d0, &
+ 489.52113711585409180d0,1030.9147225169564806d0, 1093.5883545113746958d0 / 
+ data (b(i), i = 28, 41) /4.8017305613187493564d-7, 3.2613178439123800740d-6,4.9073137508166159639d-5, &
+ 5.3806506676487583755d-4,5.5387918291051866561d-3, 5.1223717488786549025d-2,4.2190298621367914765d-1, &
+ 3.0463625987357355872d0,18.895299447327733204d0, 97.915189029455461554d0,407.13940115493494659d0, &
+ 1274.3088990480582632d0,2670.9883037012547506d0, 2815.7166284662544712d0 / 
+ data (b(i), i = 42, 55) /1.2789926338424623394d-6, 8.6718263067604918916d-6,1.3041508821299929489d-4, &
+ 1.4282247373727478920d-3,1.4684070635768789378d-2, 1.3561403190404185755d-1,1.1152592585977393953d0, &
+ 8.0387088559465389038d0,49.761318895895479206d0, 257.26842323135291380d0,1066.8543146269566231d0, &
+ 3328.3874581009636362d0,6948.8586598121634874d0, 7288.4893398212481055d0 / 
+ data (b(i), i = 56, 69) /3.4093503681970328930d-6, 2.3079025203103376076d-5,3.4691373283901830239d-4, &
+ 3.7949949772229085450d-3,3.8974209677945602145d-2, 3.5949483804148783710d-1,2.9522878893539528226d0, &
+ 21.246564609514287056d0,131.28727387146173141d0, 677.38107093296675421d0,2802.3724744545046518d0, &
+ 8718.5731420798254081d0,18141.348781638832286d0, 18948.925349296308859d0 / 
+ data (c(i), i = 0, 8) /2.5568678676452702768d-15, 3.0393953792305924324d-14,6.3343751991094840009d-13, &
+ 1.5041298011833009649d-11,4.4569436918556541414d-10, 1.7463930514271679510d-8,1.0059224011079852317d-6, &
+ 1.0729838945088577089d-4,5.1503226936425277380d-2 / 
+ data (c(i), i = 9, 17) /5.2527963991711562216d-15, 7.2021184814210056410d-15,7.2561421229904797156d-13, &
+ 1.4823121466731042510d-11,4.4602670450376245434d-10, 1.7463600061788679671d-8,1.0059226091322347560d-6, &
+ 1.0729838937545111487d-4,5.1503226936437300716d-2 / 
+ data (c(i), i = 18, 26) /1.3365917359358069908d-14, -1.2932643065888544835d-13,1.7450199447905602915d-12, &
+ 1.0419051209056979788d-11,4.5804788198059832600d-10, 1.7442405450073548966d-8,1.0059461453281292278d-6, &
+ 1.0729837434500161228d-4,5.1503226940658446941d-2 / 
+ data (c(i), i = 27, 35) /5.3771611477352308649d-14, -1.1396193006413731702d-12,1.2858641335221653409d-11, &
+ -5.9802086004570057703d-11,7.3666894305929510222d-10, 1.6731837150730356448d-8,1.0070831435812128922d-6, &
+ 1.0729733111203704813d-4,5.1503227360726294675d-2 / 
+ data (c(i), i = 36, 44) /3.7819492084858931093d-14, -4.8600496888588034879d-13,1.6898350504817224909d-12, &
+ 4.5884624327524255865d-11,1.2521615963377513729d-10, 1.8959658437754727957d-8,1.0020716710561353622d-6, &
+ 1.0730371198569275590d-4,5.1503223833002307750d-2 / 
+ w = abs(x)
+ if (w .lt. 8.5d0) then
+          t = w * w * 0.0625d0
+          k = 13 * (int(t))
+y = (((((((((((a(k) * t + a(k + 1)) * t +a(k + 2)) * t + a(k + 3)) * t + a(k + 4)) * t +  &
+a(k + 5)) * t + a(k + 6)) * t + a(k + 7)) * t + a(k + 8)) * t + a(k + 9)) * t + a(k + 10)) * t +  &
+a(k + 11)) * t + a(k + 12)
+      else if (w .lt. 12.5d0) then
+          k = int(w)
+          t = w - k
+          k = 14 * (k - 8)
+y = ((((((((((((b(k) * t + b(k + 1)) * t +b(k + 2)) * t + b(k + 3)) * t + b(k + 4)) * t +  &
+b(k + 5)) * t + b(k + 6)) * t + b(k + 7)) * t + b(k + 8)) * t + b(k + 9)) * t + b(k + 10)) * t +  &
+b(k + 11)) * t + b(k + 12)) * t + b(k + 13)
+      else
+          t = 60 / w
+          k = 9 * (int(t))
+y = ((((((((c(k) * t + c(k + 1)) * t + c(k + 2)) * t + c(k + 3)) * t + c(k + 4)) * t +  &
+c(k + 5)) * t + c(k + 6)) * t + c(k + 7)) * t + c(k + 8)) * sqrt(t) * exp(w)
+      end if
+      dbesi0 = y
+      end function dbesi0
+
+
+
+! Bessel I_1(x) function in double precision
+!
+function dbesi1(x)
+ implicit none
+ integer i
+ real(dp) a(0 : 59), b(0 : 69), c(0 : 44),x,t,k,dbesi1,w,y
+data (a(i), i = 0, 11) /1.2787464404046789181d-10, 3.5705860060088241077d-9,9.9611537619347335040d-8, 2.2395070088633043177d-6, &
+4.0312466928887462346d-5, 5.6437387840203722356d-4, 5.9259259312934746096d-3, 4.4444444443499008870d-2, 2.2222222222232042719d-1, &
+6.6666666666666139867d-1,1.0000000000000001106d0, 4.9999999999999999962d-1 / 
+data (a(i), i = 12, 23) /1.7281952384448634449d-10, 3.0647204559976390130d-9,1.0237662138842827028d-7, 2.2299494417341498163d-6, & 
+4.0335364374929326943d-5, 5.6433440269141349899d-4,5.9259754885893798654d-3, 4.4444399410880397870d-2, & 
+2.2222225112835026730d-1, 6.6666665422146063244d-1,1.0000000032274936821d0, 4.9999999961866867205d-1 / 
+data (a(i), i = 24, 35) /2.3216048939948030996d-10, 1.7443372702334489579d-9,1.1596478963485415499d-7, 2.1446755518623035147d-6, & 
+4.0697440347437076195d-5, 5.6324394900433192204d-4,5.9283484996093060678d-3, 4.4440673899150997921d-2, & 
+2.2222638016852657860d-1, 6.6666358151576732094d-1,1.0000013834029985337d0, 4.9999971643129650249d-1 / 
+data (a(i), i = 36, 47) /3.1013758938255172562d-10, -8.4813676145611694984d-10,1.5544980187411802596d-7, 1.7811109378708045726d-6, & 
+4.2945322199060856985d-5, 5.5344850176852353639d-4,5.9590327716950614802d-3, 4.4371611097707060659d-2, & 
+2.2233578241986401111d-1, 6.6654747300463315310d-1,1.0000756505206705927d0, 4.9997803664415994554d-1 / 
+data (a(i), i = 48, 59) /4.1214758313965020365d-10, -5.3613317735347429440d-9,2.4661360807517345161d-7, 6.7144593918926723203d-7, & 
+5.1988027944945587571d-5, 5.0165568586065803067d-4,6.1717530047005289953d-3, 4.3745229577317251404d-2, & 
+2.2363147971477747996d-1, 6.6475469131117660240d-1, 1.0015686689447547657d0, 4.9941120439785391891d-1 / 
+data (b(i), i = 0, 13) /6.6324787943143095845d-8, 4.5125928898466638619d-7, 6.7937793134877246623d-6, 7.4580507871505926302d-5,  &
+7.6866382927334005919d-4, 7.1185174803491859307d-3, 5.8721838073486424416d-2, 4.2473949281714196041d-1,  &
+2.6396965606282079123d0, 13.710008536637016903d0, 57.158647688180932003d0, 179.46182892089389037d0,  &
+377.57997362398478619d0, 399.87313678256009819d0 / 
+data (b(i), i = 14, 27) /1.7652713206027939711d-7, 1.1988179244834708057d-6, 1.8037851545747139231d-5, 1.9775785516370314656d-4,  &
+2.0354870702829387283d-3, 1.8822164191032253600d-2, 1.5500485219010424263d-1, 1.1190100010560573210d0,  &
+6.9391565185406617552d0, 35.948170579648649345d0, 149.41909525103032616d0, 467.42979492780642582d0,  &
+979.04227423171290408d0, 1030.9147225169564443d0 / 
+data (b(i), i = 28, 41) /4.7022299276154507603d-7, 3.1878571710170115972d-6, 4.7940153875711448496d-5, 5.2496623508411440227d-4,  &
+5.3968661134780824779d-3, 4.9837081920693776234d-2, 4.0979593830387765545d-1, 2.9533186922862948404d0,  &
+18.278176130722516369d0, 94.476497150189121070d0, 391.66075612645333624d0, 1221.4182034643210345d0,  &
+2548.6177980961291004d0, 2670.9883037012546541d0 / 
+data (b(i), i = 42, 55) / 1.2535083724002034147d-6, 8.4845871420655708250d-6, 1.2753227372734042108d-4, 1.3950105363562648921d-3,  &
+1.4325473993765291906d-2, 1.3212452778932829125d-1, 1.0849287786885151432d0, 7.8068089156260172673d0,  &
+48.232254570679165833d0, 248.80659424902394371d0, 1029.0736929484210803d0, 3200.5629438795801652d0,  &
+6656.7749162019607914d0, 6948.8586598121632302d0 / 
+data (b(i), i = 56, 69) / 3.3439394490599745013d-6, 2.2600596902211837757d-5, 3.3955927589987356838d-4, 3.7105306061050972474d-3,  &
+3.8065263634919156421d-2, 3.5068223415665236079d-1, 2.8760027832105027316d0, 20.665999500843274339d0,  &
+127.47939148516390205d0, 656.43636874254000885d0, 2709.5242837932479920d0, 8407.1174233600734871d0,  &
+17437.146284159740233d0, 18141.348781638831600d0 / 
+data (c(i), i = 0, 8) / -2.8849790431465382128d-15, -3.5125350943844774657d-14, &
+                        -7.4850867013707419750d-13, -1.8383904048277485153d-11, &
+                        -5.7303556446977223342d-10, -2.4449502737311496525d-8, -1.6765373351766929724d-6, &
+                        -3.2189516835265773471d-4, 5.1503226936425277377d-2/ 
+data (c(i), i = 9, 17) /-5.8674306822281631119d-15, -9.4884898451194085565d-15, &
+ -8.5033865136600364340d-13, -1.8142997866945285736d-11,  &
+-5.7340238386338193949d-10, -2.4449138101742183665d-8, -1.6765375646678855842d-6, &
+-3.2189516826945356325d-4,5.1503226936412017608d-2 / 
+ data (c(i), i = 18, 26) /-1.4723362506764340882d-14, 1.3945147385179042899d-13, &
+                          -1.9618041857586930923d-12, -1.3343606394065121821d-11, & 
+                          -5.8649674606973244159d-10, -2.4426060539669553778d-8, -1.6765631828366988006d-6, &
+                          -3.2189515191449587253d-4, 5.1503226931820146445d-2 / 
+ data (c(i), i = 27, 35) / -5.8203519372580372987d-14, 1.2266326995309845825d-12, &
+                           -1.3921625844526453237d-11, 6.2228025878281625469d-11, & 
+                           -8.8636681342142794023d-10, -2.3661241616744818608d-8, &
+	       -1.6777870960740520557d-6, -3.2189402882677074318d-4, 5.1503226479551959376d-2 / 
+data (c(i), i = 36, 44) /-4.5801527369223291722d-14, 6.7998819697143727209d-13, &
+                        -4.1624857909290468421d-12, -3.2849009406112440998d-11, & 
+        -3.2478275690431118270d-10, -2.5739209934053714983d-8, -1.6730566573215739195d-6, &
+         -3.2190010909008684076d-4, 5.1503229866932077150d-2 / 
+      w = abs(x)
+      if (w .lt. 8.5d0) then
+          t = w * w * 0.0625d0
+          k = 12 * (int(t))
+y=(((((((((((a(k)*t+a(k+1))*t+a(k+2))*t+a(k+3))*t+a(k+4))*t+a(k+5))*t+a(k+6))*t+a(k+7))*t+a(k+8))*t+a(k+9))*t+a(k+10))*t+a(k+11))*w
+elseif(w.lt.12.5d0)then
+k=int(w)
+t=w-k
+k=14*(k-8)
+y=((((((((((((b(k)*t+b(k+1))*t+b(k+2))*t+b(k+3))*t+b(k+4))*t+b(k+5))*t+b(k+6))*t+b(k+7))*t+b(k+8))*t+b(k+9))*t+b(k+10))*t+ &
+b(k+11))*t+b(k+12))*t+b(k+13)
+else
+t=60/w
+k=9*(int(t))
+y=((((((((c(k)*t+c(k+1))*t+c(k+2))*t+c(k+3))*t+c(k+4))*t+c(k+5))*t+c(k+6))*t+c(k+7))*t+c(k + 8)) * sqrt(t) * exp(w)
+      end if
+      if (x .lt. 0) y = -y
+      dbesi1 = y
+end function dbesi1
+!
+function I_ent(n,x,nt)
+ implicit none
+ integer i,n,nt,m
+ real(dp) I_ent,x,xh,xt,I_entb,eps,i0,di0,i1
+logical doit
+
+
+
+  if(x==0) then
+   I_ent=0
+   return
+  endif
+
+doit=.true.
+eps=1.d-6
+
+I_entb=i_ns(n,x)
+
+ xh=x/2
+ xt=1
+ do i=1,n
+  xt=xh*xt/i
+ enddo 
+
+ I_ent=xt
+ xh=xh**2
+ i0=I_ent
+ di0=1.d38
+ do m=1,nt
+  xt=xt*xh/m/(m+n)
+  I_ent= I_ent + xt
+  i1=abs(i0-I_ent)
+  i0=I_ent
+!write(6,*) i0,i1,di0,doit
+!pause 333
+ if(doit) then
+   if((abs(I_entb-I_ent)/abs(I_entb)) <eps) then
+    doit=.false.
+   endif 
+  di0=i1
+else
+    if(i1>=di0) then
+      return
+     else
+      di0=i1
+    endif
+endif
+enddo
+
+Write(6,*) " I_ent did not converge "
+stop
+
+end function I_ent
+
+
+function In_en(n,x)
+ implicit none
+ integer i,n
+ real(dp) In_en,x,i0,i1
+
+ if(x==0) then
+  In_en=0
+  return
+ endif
+ if(n==0) then
+  In_en=dbesi0(x)
+   return
+ elseif(n==1) then
+  In_en=dbesi1(x)
+  return
+ endif
+
+i0=dbesi0(x)
+i1=dbesi1(x)
+
+do i=2,n
+ In_en=i0-2*(i-1)*i1/x
+ i0=i1
+ i1=In_en
+enddo
+
+end function In_en
+
+
+function In_enz(n,x)
+ implicit none
+ integer i,n
+ real(dp) In_enz,x,p0,p1,p,q,q0,q1
+
+  if(x==0) then
+   In_enz=0
+   return
+  endif
+
+ if(n==0) then
+  In_enz=dbesi0(x)
+   return
+ elseif(n==1) then
+  In_enz=dbesi1(x)
+  return
+ endif
+
+!i0=dbesi0(x)
+!i1=dbesi1(x)
+
+p0=1
+p1=0
+q0=0
+q1=1
+
+do i=2,n
+ p=p0-2*(i-1)*p1/x
+ q=q0-2*(i-1)*q1/x
+ p0=p1
+ p1=p
+ q0=q1
+ q1=q
+enddo
+
+p0=p*dbesi0(x)
+q0=q*dbesi1(x)
+
+q1=abs(p0+q0)/(abs(p0)+abs(q0))
+
+
+if(q1>switch_bessel) then
+  In_enz=p0+q0
+else
+  In_enz=I_ent(n,x,1000)
+endif
+
+end function In_enz
 
 END MODULE  tpsa

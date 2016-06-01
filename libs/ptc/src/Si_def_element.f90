@@ -199,10 +199,8 @@ CONTAINS
        call TRACK(EL%SDR,X,k,MID)
 
     case default
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1((1X,a72)))'
-       write(w_p%c(1),'(1x,i4,a21)') el%kind," not supported TRACKR"
+ 
+       write(6,'(1x,i4,a21)') el%kind," not supported TRACKR"
        ! call !write_e(0)
     END SELECT
     if(associated(el%p%aperture)) then
@@ -264,10 +262,7 @@ CONTAINS
     case(kindsuper1)
        call TRACK(EL%SDR,X,k)
     case default
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1((1X,a72)))'
-       write(w_p%c(1),'(1x,i4,a21)') el%kind," not supported TRACKP"
+       write(6,'(1x,i4,a21)') el%kind," not supported TRACKP"
        ! call !write_e(0)
     END SELECT
     if(associated(el%p%aperture)) then
@@ -284,6 +279,7 @@ CONTAINS
   !
   !    if(j_global==1) return  ! skipping OBJECT OF ZGOUBI = TRACKING COMMAND INTERNAL TO ZGOUBI
   !    icharef=0
+
   !
   !    x(1)=x(1)*c_100
   !    x(3)=x(3)*c_100
@@ -490,13 +486,7 @@ CONTAINS
     implicit none
     integer, intent(in) :: i,j
     integer k
-    if(j<=0) then
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1((1X,A72)))'
-       write(w_p%c(1),'(A4,1X,I4)') "j = ",j
-       ! call !write_e(812)
-    endif
+ 
     k=i
     if(i<1) then
        do while(k<1)
@@ -522,17 +512,11 @@ CONTAINS
        s2%nmul=S1
        s2%ADD=0
     ELSEIF(S1>NMAX) THEN
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1((1X,A72)))'
-       write(w_p%c(1),'(A38,1X,I4)') " NMAX NOT BIG ENOUGH: PLEASE INCREASE ",NMAX
-       ! call !write_e(100)
+ 
+       write(6,'(A38,1X,I4)') " NMAX NOT BIG ENOUGH: PLEASE INCREASE ",NMAX
+ 
     ELSE
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1((1X,A72)))'
-       w_p%c(1) = " UNDEFINED  ASSIGNMENT IN BL_0"
-       ! call !write_e(101)
+      stop 135
     ENDIF
 
   END SUBROUTINE bL_0
@@ -1017,12 +1001,12 @@ CONTAINS
 
 
   !  SUBROUTINE SETFAMILYR(EL,T,t_ax,t_ay,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
-  SUBROUTINE SETFAMILYR(EL,T)  !,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
+  SUBROUTINE SETFAMILYR(EL,T,angc,xc,dc,h)  !,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
     IMPLICIT NONE
     TYPE(ELEMENT), INTENT(INOUT) ::EL
     !    INTEGER,OPTIONAL :: NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2
     type(tree_element),OPTIONAL :: T(:) !,t_ax(:),t_ay(:)
-
+    real(dp), optional :: angc,xc,dc,h
    ! EL%P%permfringe=>EL%permfringe
     SELECT CASE(EL%KIND)
     CASE(KIND1)
@@ -1171,6 +1155,7 @@ CONTAINS
        EL%HE22%BN=>EL%BN
        EL%HE22%FREQ=>EL%FREQ
        EL%HE22%PHAS=>EL%PHAS
+       ALLOCATE(EL%HE22%N_BESSEL);EL%HE22%N_BESSEL=0
     CASE(KIND5)
        if(.not.ASSOCIATED(EL%S5)) THEN
           ALLOCATE(EL%S5)
@@ -1478,18 +1463,18 @@ CONTAINS
        !       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
        !       EL%mu%AN=>EL%AN
        !       EL%mu%BN=>EL%BN
-       CALL POINTERS_pancake(EL%pa,T) !,t_ax,t_ay)
+       CALL POINTERS_pancake(EL%pa,T) !,angc,xc,dc,h) !,t_ax,t_ay)
     END SELECT
   END SUBROUTINE SETFAMILYR
 
 
-  SUBROUTINE SETFAMILYP(EL,T)  !,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
+  SUBROUTINE SETFAMILYP(EL,T,angc,xc,dc,h)  !,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
     !  SUBROUTINE SETFAMILYP(EL,T,t_ax,t_ay,NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2)
     IMPLICIT NONE
     TYPE(ELEMENTP), INTENT(INOUT) ::EL
     !    INTEGER,OPTIONAL :: NTOT,ntot_rad,NTOT_REV,ntot_rad_REV,ND2
     type(tree_element),OPTIONAL :: T(:) !,t_ax(:),t_ay(:)
-
+    real(dp), optional :: angc,xc,dc,h
 !    EL%P%permfringe=>EL%permfringe
     SELECT CASE(EL%KIND)
     CASE(KIND1)
@@ -1637,6 +1622,7 @@ CONTAINS
        EL%HE22%BN=>EL%BN
        EL%HE22%FREQ=>EL%FREQ
        EL%HE22%PHAS=>EL%PHAS
+       ALLOCATE(EL%HE22%N_BESSEL);EL%HE22%N_BESSEL=0
     CASE(KIND5)
        if(.not.ASSOCIATED(EL%S5)) THEN
           ALLOCATE(EL%S5)
@@ -1991,7 +1977,7 @@ CONTAINS
        !       IF(EL%P%NMUL==0) CALL ZERO_ANBN(EL,1)
        !       EL%mu%AN=>EL%AN
        !       EL%mu%BN=>EL%BN
-       CALL POINTERS_pancake(EL%pa,T)  !,t_ax,t_ay)
+       CALL POINTERS_pancake(EL%pa,T) !,angc,xc,dc,h)  !,t_ax,t_ay)
        CALL ALLOC(EL%pa%SCALE)
     END SELECT
 
@@ -2493,7 +2479,7 @@ ENDIF
     nullify(EL%KIND);
     nullify(EL%PLOT);
     nullify(EL%NAME);nullify(EL%vorname);nullify(EL%electric);
-
+nullify(EL%filef,el%fileb);
 !    nullify(EL%PERMFRINGE);
     nullify(EL%L);
     nullify(EL%AN);nullify(EL%BN);
@@ -2610,7 +2596,7 @@ ENDIF
        DEALLOCATE(EL%even);
        DEALLOCATE(EL%NAME);DEALLOCATE(EL%VORNAME);DEALLOCATE(EL%electric);
        DEALLOCATE(EL%L);
-       DEALLOCATE(EL%skip_ptc_f);       DEALLOCATE(EL%skip_ptc_b); DEALLOCATE(el%do1mapf,el%do1mapb);
+        DEALLOCATE(EL%filef,el%fileb);
        DEALLOCATE(EL%MIS); !DEALLOCATE(EL%EXACTMIS);
        call kill(EL%P)    ! AIMIN MS 4.0
 !       DEALLOCATE(EL%PERMFRINGE);
@@ -2732,20 +2718,20 @@ ENDIF
        IF(ASSOCIATED(EL%forward))        then
           call kill(EL%forward)     
           DEALLOCATE(EL%forward)
-          DEALLOCATE(EL%usef)
        ENDIF
 
 
        IF(ASSOCIATED(EL%backWARD))        then
           call kill(EL%backWARD)     
           DEALLOCATE(EL%backWARD)
-          DEALLOCATE(EL%useb)
        ENDIF
 
     IF(ASSOCIATED(EL%skip_ptc_f))DEALLOCATE(EL%skip_ptc_f)
     IF(ASSOCIATED(EL%skip_ptc_b))DEALLOCATE(EL%skip_ptc_b)
     IF(ASSOCIATED(el%do1mapf))DEALLOCATE(el%do1mapf)
     IF(ASSOCIATED(el%do1mapb))DEALLOCATE(el%do1mapb)
+    IF(ASSOCIATED(el%usef))DEALLOCATE(el%usef)
+    IF(ASSOCIATED(el%useb))DEALLOCATE(el%useb)
 
        IF(ASSOCIATED(EL%ramp))        then
           el%ramp=-1     !USER DEFINED MAGNET
@@ -2783,11 +2769,13 @@ ENDIF
        ALLOCATE(EL%RECUT);EL%RECUT=MY_TRUE;
        ALLOCATE(EL%even);EL%even=MY_false;
        ALLOCATE(EL%NAME);ALLOCATE(EL%VORNAME);ALLOCATE(EL%electric);
+       ALLOCATE(EL%filef,el%fileb);
        ALLOCATE(EL%skip_ptc_f);   EL%skip_ptc_f=.false. ;   ALLOCATE(EL%skip_ptc_b);EL%skip_ptc_b=.false.  ;
        ALLOCATE(el%do1mapf);   el%do1mapf=.false. ;   ALLOCATE(el%do1mapb);el%do1mapb=.false.  ;
+  ALLOCATE(el%usef);   el%usef=.false. ;   ALLOCATE(el%useb);el%useb=.false.  ;
 
        EL%NAME=' ';EL%NAME=TRIM(ADJUSTL(EL%NAME));
-       EL%VORNAME=' ';EL%VORNAME=TRIM(ADJUSTL(EL%VORNAME));
+       EL%VORNAME=' ';EL%VORNAME=TRIM(ADJUSTL(EL%VORNAME));el%filef=' ';el%fileb=' ';
        EL%electric=solve_electric
 !       ALLOCATE(EL%PERMFRINGE);EL%PERMFRINGE=.FALSE.;  ! PART OF A STATE INITIALIZED BY EL=DEFAULT
        ALLOCATE(EL%L);EL%L=0.0_dp;
@@ -2955,19 +2943,19 @@ ENDIF
        IF(ASSOCIATED(EL%forward))        then
           call kill(EL%forward)     
           DEALLOCATE(EL%forward)
-          DEALLOCATE(EL%usef)
        ENDIF
 
        IF(ASSOCIATED(EL%backWARD))        then
           call kill(EL%backWARD)     
           DEALLOCATE(EL%backWARD)
-          DEALLOCATE(EL%useb)
        ENDIF
 
     IF(ASSOCIATED(EL%skip_ptc_f))DEALLOCATE(EL%skip_ptc_f)
     IF(ASSOCIATED(EL%skip_ptc_b))DEALLOCATE(EL%skip_ptc_b)    
     IF(ASSOCIATED(el%do1mapb))DEALLOCATE(el%do1mapb)
     IF(ASSOCIATED(el%do1mapf))DEALLOCATE(el%do1mapf)
+    IF(ASSOCIATED(el%usef))DEALLOCATE(el%usef)
+    IF(ASSOCIATED(el%useb))DEALLOCATE(el%useb)
 
        IF(ASSOCIATED(EL%ramp))        then
           el%ramp=-1     !USER DEFINED MAGNET
@@ -3055,6 +3043,7 @@ ENDIF
        ALLOCATE(EL%NAME);ALLOCATE(EL%VORNAME);ALLOCATE(EL%electric);
        ALLOCATE(EL%skip_ptc_f);   EL%skip_ptc_f=.false. ;   ALLOCATE(EL%skip_ptc_b);EL%skip_ptc_b=.false.  ;
        ALLOCATE(el%do1mapb);   el%do1mapb=.false. ;   ALLOCATE(el%do1mapf);el%do1mapf=.false.  ;
+  ALLOCATE(el%usef);   el%usef=.false. ;   ALLOCATE(el%useb);el%useb=.false.  ;
 
        EL%NAME=' ';EL%NAME=TRIM(ADJUSTL(EL%NAME));
        EL%VORNAME=' ';EL%VORNAME=TRIM(ADJUSTL(EL%VORNAME));
@@ -3325,6 +3314,7 @@ ENDIF
        ELP%FREQ = EL%FREQ
        ELP%PHAS = EL%PHAS
        CALL SETFAMILY(ELP)
+       ELp%HE22%N_BESSEL=EL%HE22%N_BESSEL
     ENDIF
 
     IF(EL%KIND==KIND5) THEN         !
@@ -3456,7 +3446,7 @@ ENDIF
     
     
     IF(EL%KIND==KINDPA) THEN         !
-       CALL SETFAMILY(ELP,EL%PA%B)  !,EL%PA%ax,EL%PA%ay)
+       CALL SETFAMILY(ELP,EL%PA%B)  !,EL%PA%angc,EL%PA%xc,EL%PA%dc,EL%PA%h)  !,EL%PA%ax,EL%PA%ay)
        CALL COPY(EL%PA,ELP%PA)
     ENDIF
     !    IF(ASSOCIATED(EL%PARENT_FIBRE))        then
@@ -3470,12 +3460,12 @@ ENDIF
          endif
          allocate(ELp%backWARD(3))
          do i=1,3
-         call alloc_tree(ELp%backWARD(i),ELp%backWARD(i)%n,ELp%backWARD(i)%np)
+         call alloc_tree(ELp%backWARD(i),EL%backWARD(i)%n,EL%backWARD(i)%np)
          enddo
          call COPY_TREE_N(EL%backWARD,ELp%backWARD)
-         ELp%useb= EL%useb
+
        ENDIF
- 
+
 
        IF(ASSOCIATED(EL%forward))        then
          if(associated(elp%forward)) then
@@ -3484,17 +3474,17 @@ ENDIF
          endif
          allocate(elp%forward(3))
          do i=1,3
-         call alloc_tree(elp%forward(i),el%forward(i)%n,elp%forward(i)%np)
+         call alloc_tree(elp%forward(i),el%forward(i)%n,el%forward(i)%np)
          enddo
          call COPY_TREE_N(EL%forward,ELp%forward)
-         ELp%usef= EL%usef
+
        ENDIF
        ELp%skip_ptc_f=EL%skip_ptc_f
        ELp%skip_ptc_b=EL%skip_ptc_b
        elp%do1mapf=el%do1mapf
        elp%do1mapb=el%do1mapb
- 
-
+          ELp%usef= EL%usef
+          ELp%useb= EL%useb
   END SUBROUTINE copy_el_elp
 
 
@@ -3701,6 +3691,7 @@ ENDIF
        ELP%FREQ = EL%FREQ
        ELP%PHAS = EL%PHAS
        CALL SETFAMILY(ELP)
+       ELp%HE22%N_BESSEL=EL%HE22%N_BESSEL
     ENDIF
 
     IF(EL%KIND==KIND5) THEN         !
@@ -3832,7 +3823,7 @@ ENDIF
     ENDIF
  
     IF(EL%KIND==KINDPA) THEN         !
-       CALL SETFAMILY(ELP,EL%PA%B) !,EL%PA%ax,EL%PA%ay)
+       CALL SETFAMILY(ELP,EL%PA%B) !,EL%PA%angc,EL%PA%xc,EL%PA%dc,EL%PA%h)  !,EL%PA%ax,EL%PA%ay)
        CALL COPY(EL%PA,ELP%PA)
     ENDIF
 
@@ -3844,10 +3835,10 @@ ENDIF
          endif
          allocate(ELp%backWARD(3))
          do i=1,3
-         call alloc_tree(ELp%backWARD(i),ELp%backWARD(i)%n,ELp%backWARD(i)%np)
+         call alloc_tree(ELp%backWARD(i),EL%backWARD(i)%n,EL%backWARD(i)%np)
          enddo
          call COPY_TREE_N(EL%backWARD,ELp%backWARD)
-         ELp%useb= EL%useb
+ 
        ENDIF
  
 
@@ -3858,15 +3849,17 @@ ENDIF
          endif
          allocate(ELp%forward(3))
          do i=1,3
-         call alloc_tree(ELp%forward(i),ELp%forward(i)%n,ELp%forward(i)%np)
+         call alloc_tree(ELp%forward(i),EL%forward(i)%n,EL%forward(i)%np)
          enddo
          call COPY_TREE_N(EL%forward,ELp%forward)
-         ELp%usef= EL%usef
+ 
        ENDIF
        ELp%skip_ptc_f=EL%skip_ptc_f
        ELp%skip_ptc_b=EL%skip_ptc_b
        elp%do1mapf=el%do1mapf
        elp%do1mapb=el%do1mapb
+          ELp%usef= EL%usef
+          ELp%useb= EL%useb
   END SUBROUTINE copy_elp_el
 
 
@@ -3896,6 +3889,8 @@ ENDIF
     ELP%VA=EL%VA
     ELP%VS=EL%VS
     ELP%slow_ac=EL%slow_ac
+        ELp%filef=EL%filef
+        elp%fileb=EL%fileb
 
     IF(ASSOCIATED(EL%a_ac)) then
        ELP%a_ac=EL%a_ac
@@ -4076,6 +4071,7 @@ ENDIF
        ELP%FREQ = EL%FREQ
        ELP%PHAS = EL%PHAS
        CALL SETFAMILY(ELP)
+       ELp%HE22%N_BESSEL=EL%HE22%N_BESSEL
     ENDIF
 
     IF(EL%KIND==KIND5) THEN         !
@@ -4204,7 +4200,7 @@ ENDIF
     ENDIF    
     
     IF(EL%KIND==KINDPA) THEN         !
-       CALL SETFAMILY(ELP,EL%PA%B)  !,EL%PA%ax,EL%PA%ay)
+       CALL SETFAMILY(ELP,EL%PA%B) !,EL%PA%angc,EL%PA%xc,EL%PA%dc,EL%PA%h)   !,EL%PA%ax,EL%PA%ay)
        CALL COPY(EL%PA,ELP%PA)
     ENDIF
 
@@ -4220,10 +4216,10 @@ ENDIF
          endif
          allocate(ELp%backWARD(3))
          do i=1,3
-         call alloc_tree(ELp%backWARD(i),ELp%backWARD(i)%n,ELp%backWARD(i)%np)
+         call alloc_tree(ELp%backWARD(i),EL%backWARD(i)%n,EL%backWARD(i)%np)
          enddo
          call COPY_TREE_N(EL%backWARD,ELp%backWARD)
-         ELp%useb= EL%useb
+
        ENDIF
  
 
@@ -4234,13 +4230,19 @@ ENDIF
          endif
          allocate(ELp%forward(3))
          do i=1,3
-         call alloc_tree(ELp%forward(i),ELp%forward(i)%n,ELp%forward(i)%np)
+         call alloc_tree(ELp%forward(i),EL%forward(i)%n,EL%forward(i)%np)
          enddo
          call COPY_TREE_N(EL%forward,ELp%forward)
-         ELp%usef= EL%usef
+
        ENDIF
+
+
        ELp%skip_ptc_f=EL%skip_ptc_f
        ELp%skip_ptc_b=EL%skip_ptc_b
+       elp%do1mapf=el%do1mapf
+       elp%do1mapb=el%do1mapb
+          ELp%usef= EL%usef
+          ELp%useb= EL%useb
   END SUBROUTINE copy_el_el
 
 
@@ -4381,15 +4383,11 @@ ENDIF
     PROTON=.NOT.ELECTRON
     cl=(clight/1e8_dp)
     CU=55.0_dp/24.0_dp/SQRT(3.0_dp)
-    w_p=0
-    w_p%nc=8
-    w_p%fc='(7((1X,A72,/)),1X,A72)'
+
     if(electron) then
        XMC2=muon*pmae
-       w_p%c(1)=" This is an electron "
     elseif(proton) then
        XMC2=pmap
-       w_p%c(1)=" This is a proton! "
     endif
     if(ENERGY1<0) then
        ENERGY1=-ENERGY1
@@ -4425,24 +4423,19 @@ ENDIF
     BETa01=SQRT(kinetic1**2+2.0_dp*kinetic1*XMC2)/erg
     beta0i=1.0_dp/BETa01
     GAMMA0=erg/XMC2
-    write(W_P%C(2),'(A16,g21.14)') ' Kinetic Energy ',kinetic1
-    write(W_P%C(3),'(A7,g21.14)') ' gamma ',gamma0
-    write(W_P%C(4),'(A7,g21.14)')' beta0 ',BETa01
+ 
     CON=3.0_dp*CU*CGAM*HBC/2.0_dp*TWOPII/XMC2**3
     CRAD=CGAM*TWOPII   !*ERG**3
     CFLUC=CON  !*ERG**5
     GAMMA2=erg**2/XMC2**2
     brho1=SQRT(ERG**2-XMC2**2)*10.0_dp/cl
     if(verbose) then
-       write(W_P%C(5),'(A7,g21.14)') ' p0c = ',p0c1
-       write(W_P%C(6),'(A9,g21.14)')' GAMMA0 = ',SQRT(GAMMA2)
-       write(W_P%C(7),'(A8,g21.14)')' BRHO = ',brho1
-       write(W_P%C(8),'(A15,G21.14,1X,g21.14)')"CRAD AND CFLUC ", crad ,CFLUC
+       write(6,*) ' p0c = ',p0c1
+       write(6,*)' GAMMA0 = ',SQRT(GAMMA2)
+       write(6,*)' BRHO = ',brho1
+      write(6,*)"CRAD AND CFLUC ", crad ,CFLUC
     endif
-    !    IF(VERBOSE) ! call ! WRITE_I
-    !END OF SET RADIATION STUFF  AND TIME OF FLIGHT SUFF
-    !    gamma0I=SQRT(one-beta0**2)
-    !    gambet =(gamma0I/beta0)**2
+ 
     gamma0I=XMC2*BETa01/p0c1
     GAMBET=(XMC2/p0c1)**2
 

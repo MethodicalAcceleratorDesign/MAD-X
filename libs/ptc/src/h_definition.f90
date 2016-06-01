@@ -50,7 +50,8 @@ module definition
   logical(lp) :: doing_ac_modulation_in_ptc=.false.
   integer, target :: nb_ =0   ! global group index
   integer, parameter :: ndim2t=10   ! maximum complex size
-  !
+  integer, parameter :: wiggler_suntao=24
+  integer :: bmadparser = 0
   TYPE sub_taylor
      INTEGER j(lnv)
      INTEGER min,max
@@ -257,6 +258,7 @@ module definition
 
   !@3 ---------------------------------------------</br>
   type  tree_element   !@1  USED FOR FAST TRACKING IN O_TREE_ELEMENT.F90
+  !   character(204) , pointer :: file
      real(dp) ,  DIMENSION(:), POINTER :: CC
      real(dp) ,  DIMENSION(:), POINTER :: fixr,fix,fix0
      integer,  DIMENSION(:), POINTER :: JL,JV
@@ -406,7 +408,64 @@ type(c_taylor) c_temp
   complex(dp) x(lnv)
   complex(dp) s1(3),s2(3),s3(3)
  end type c_ray
+
+
+TYPE fibre_array
+   type(fibre), pointer :: p  => null()
+   integer, pointer :: pos  => null()
+   real(dp),pointer :: v=> null() , vmax=> null(); 
+   real(dp), pointer :: s(:)=> null()
+   real(dp), pointer :: err=> null()
+END TYPE fibre_array
+
+
+TYPE node_array
+   type(integration_node), pointer :: t  => null()
+   integer, pointer :: pos  => null()
+   real(dp),pointer :: v=> null() , vmax=> null(); 
+   complex(dp), pointer :: s(:)=> null()
+   real(dp), pointer :: err=> null()
+   type(c_vector_field), pointer :: f => null()
+   type(c_damap), pointer :: m => null()
+END TYPE node_array
+
+
 contains
+
+
+
+
+
+
+
+ subroutine alloc_fibre_array(a,n,m)
+ implicit none
+ type(fibre_array), allocatable :: a(:)
+ integer i,n,m
+
+ allocate(a(n))
+
+ do i=1,n
+   allocate(a(i)%pos)
+   allocate(a(i)%v,a(i)%vmax,a(i)%err,a(i)%s(m))
+   a(i)%s=0.0_dp
+   a(i)%v=0.0_dp;a(i)%vmax=1.d38;
+   a(i)%pos=0
+ enddo
+
+ end  subroutine alloc_fibre_array
+
+ subroutine kill_fibre_array(a)
+ implicit none
+ type(fibre_array), allocatable :: a(:)
+ integer i
+
+ do i=1,size(a)
+   deallocate(a(i)%pos)
+   deallocate(a(i)%v,a(i)%vmax,a(i)%err,a(i)%s)
+ enddo
+
+ end  subroutine kill_fibre_array
 
   SUBROUTINE RESET_APERTURE_FLAG(complete)
     IMPLICIT NONE
@@ -463,14 +522,7 @@ contains
        ROOT=1.0_dp
        return
     endif
-    IF(X<0.0_dp)then
-      messagelost=" "
-    endif
-    
-    if (c_%ROOT_CHECK) THEN
-      messagelost=" "
-    endif
-    
+
     IF((X<0.0_dp).AND.c_%ROOT_CHECK) THEN
        ROOT=1.0_dp
        c_%CHECK_STABLE=.FALSE.

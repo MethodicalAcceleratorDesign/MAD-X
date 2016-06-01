@@ -2078,7 +2078,7 @@ do i=1,ring%n
   call fib_fib0(f,my_true,mf)
   CALL MC_MC0(f%MAG%P,my_true,mf)
   CALL print_ElementLIST(f%mag,MY_TRUE,mf)
-  if(f%patch%patch/=0) call patch_patch0(f%patch,my_true,mf)
+  if(f%patch%patch/=0.or.f%patch%time/=0.or.f%patch%energy/=0) call patch_patch0(f%patch,my_true,mf)
   if(f%mag%mis) call CHART_CHART0(f%chart,my_true,mf)
  write(mf,*) " $$$$$$$$$$$$$$$$$ END OF FIBRE $$$$$$$$$$$$$$$$$"
  f=>f%next    
@@ -2582,10 +2582,12 @@ if(ele0%slowac_recut_even_electric_MIS(5)) read(mf,NML=CHARTname)  ! reading mis
        s22%CHART=0
        s22%PATCH=0
      if(fib0%patch/=0) then
-       s22%PATCH%patch=fib0%patch
+       !s22%PATCH%patch=fib0%patch
       call patch_patch0(s22%patch,my_false)
     endif
    if(ele0%slowac_recut_even_electric_MIS(5)) call CHART_CHART0(s22%chart,my_false)
+
+
 
 
 
@@ -2634,7 +2636,7 @@ end subroutine read_lattice
 
 
     select case(kind)
-    CASE(KIND0,KIND1,kind2,kind6,kind7,kind8,kind9,KIND11:KIND15,kind17,KIND22)
+    CASE(KIND0,KIND1,kind2,kind6,kind7,kind8,kind9,KIND11:KIND15,kind17)
   case(kind3)
      read(mf,NML=thin30name)
     case(kind4)
@@ -2652,6 +2654,9 @@ end subroutine read_lattice
 
     case(kind19)
 
+
+    case(kindhel)
+      read(mf,NML=helname)
     case(kind21)
      read(mf,NML=tCAVname)
     case(KINDWIGGLER)
@@ -2683,9 +2688,8 @@ if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
  fib0%GAMMA0I_GAMBET_MASS_AG(4)=f%AG
  fib0%DIR=f%DIR
  fib0%CHARGE=f%CHARGE
- fib0%patch=f%patch%patch
- !fib0%pos=f%pos
- !fib0%loc=f%loc
+ fib0%patch=f%patch%patch+7*f%patch%energy+49*f%patch%time
+ 
     if(present(mf)) then
      write(mf,NML=fibrename)
     endif   
@@ -2704,6 +2708,7 @@ else
  !f%patch%patch=fib0%patch     ! f%patch%patch is not yet allocated
 endif
 endif
+
 end subroutine fib_fib0
 
 subroutine  patch_patch0(f,dir,mf)
@@ -2728,6 +2733,7 @@ if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
  patch0%B_T=f%B_T
  patch0%ENERGY=f%ENERGY
  patch0%TIME=f%TIME
+ patch0%geometry=f%patch
 
     if(present(mf)) then
      write(mf,NML=patchname)
@@ -2750,6 +2756,7 @@ f%B_X2= patch0%B_X2
  f%B_T=patch0%B_T
  f%ENERGY=patch0%ENERGY
  f%TIME=patch0%TIME
+ f%patch=patch0%geometry
 
 endif
 endif
@@ -2807,6 +2814,9 @@ if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
  MAGL0%TILTD_EDGE(2)=f%EDGE(1)
  MAGL0%TILTD_EDGE(3)=f%EDGE(2)
 
+ MAGL0%KILL_SPIN(1)=f%KILL_ENT_SPIN
+ MAGL0%KILL_SPIN(2)=f%KILL_EXI_SPIN
+
  MAGL0%KIN_KEX_BENDFRINGE_EXACT(1)=f%KILL_ENT_FRINGE
  MAGL0%KIN_KEX_BENDFRINGE_EXACT(2)=f%KILL_EXI_FRINGE
  MAGL0%KIN_KEX_BENDFRINGE_EXACT(3)=f%bend_fringe
@@ -2834,6 +2844,9 @@ else
  f%EDGE(1)=MAGL0%TILTD_EDGE(2)
  f%EDGE(2)=MAGL0%TILTD_EDGE(3)
 
+ f%KILL_ENT_SPIN=MAGL0%KILL_SPIN(1)
+ f%KILL_EXI_SPIN=MAGL0%KILL_SPIN(2)
+
  f%KILL_ENT_FRINGE=MAGL0%KIN_KEX_BENDFRINGE_EXACT(1)
  f%KILL_EXI_FRINGE=MAGL0%KIN_KEX_BENDFRINGE_EXACT(2)
  f%bend_fringe=MAGL0%KIN_KEX_BENDFRINGE_EXACT(3)
@@ -2855,6 +2868,7 @@ type(element), target :: f
 logical(lp),optional ::  dir
 integer,optional :: mf
 character(nlp+3) nname
+integer n,np,no,inf,i
 
 if(present(dir)) then
 if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
@@ -2871,7 +2885,7 @@ if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
   call context(ELE0%name_vorname(2),dollar=my_true)
  endif
  ele0%an=0.0_dp
- ele0%an=0.0_dp
+ ele0%bn=0.0_dp
 if(f%p%nmul>0) then
   ele0%an(1:f%p%nmul)=f%an(1:f%p%nmul)
   ele0%bn(1:f%p%nmul)=f%bn(1:f%p%nmul)
@@ -2901,12 +2915,39 @@ ele0%slowac_recut_even_electric_MIS(2) = f%recut
 ele0%slowac_recut_even_electric_MIS(3) = f%even
 ele0%slowac_recut_even_electric_MIS(4) = f%electric
 ele0%slowac_recut_even_electric_MIS(5) = f%MIS
- 
+ ele0%usebf_skipptcbf_do1bf(1)=f%useb
+ ele0%usebf_skipptcbf_do1bf(2)=f%usef 
+ ele0%usebf_skipptcbf_do1bf(3)=f%skip_ptc_b 
+ ele0%usebf_skipptcbf_do1bf(4)=f%skip_ptc_f 
+ ele0%usebf_skipptcbf_do1bf(5)=f%do1mapb 
+ ele0%usebf_skipptcbf_do1bf(6)=f%do1mapf
+ ele0%filef=' '
+ ele0%fileb=' '
+if(associated(f%forward)) then
+ ele0%filef=f%filef
+
+  if(present(mf)) then
+   call kanalnummer(inf,f%filef)
+    call print_tree_elements(f%forward,inf)
+   close(inf)
+ endif
+endif
+if(associated(f%backward)) then
+ ele0%fileb=f%fileb
+ if(present(mf)) then
+   call kanalnummer(inf,f%fileb)
+    call print_tree_elements(f%backward,inf)
+   close(inf)
+ endif
+endif
     if(present(mf)) then
      write(mf,NML=ELEname)
     endif   
 else
- 
+ ele0%filef=' '
+ ele0%fileb=' '
+ele0%usebf_skipptcbf_do1bf=0
+
     if(present(mf)) then
      read(mf,NML=ELEname)
     endif   
@@ -2965,6 +3006,46 @@ endif
  solve_electric=f%electric
    F%L=ele0%L
 
+ f%useb=ele0%usebf_skipptcbf_do1bf(1)
+ f%usef=ele0%usebf_skipptcbf_do1bf(2)
+ f%skip_ptc_b=ele0%usebf_skipptcbf_do1bf(3)
+ f%skip_ptc_f=ele0%usebf_skipptcbf_do1bf(4)
+ f%do1mapb=ele0%usebf_skipptcbf_do1bf(5) 
+ f%do1mapf=ele0%usebf_skipptcbf_do1bf(6)
+
+if(ele0%filef/=' ') then
+ if(.not.associated(f%forward)) then 
+  allocate(f%forward(3))
+ endif
+ call kanalnummer(inf,ele0%filef)
+
+  do i=1,3
+    read(inf,*) n,np,no
+    CALL ALLOC_TREE(f%forward(i),N,NP)
+    f%forward(i)%N=n
+    f%forward(i)%NP=np
+    f%forward(i)%no=no
+    call read_tree_element(f%forward(i),inf)
+  enddo
+close(inf)
+endif
+
+if(ele0%fileb/=' ') then
+ if(.not.associated(f%backward)) then 
+  allocate(f%backward(3))
+ endif
+ call kanalnummer(inf,ele0%fileb)
+
+  do i=1,3
+    read(inf,*) n,np,no
+    CALL ALLOC_TREE(f%backward(i),N,NP)
+    f%backward(i)%N=n
+    f%backward(i)%NP=np
+    f%backward(i)%no=no
+    call read_tree_element(f%backward(i),inf)
+  enddo
+close(inf)
+ endif
    
     if(f%kind==kind3.or.f%kind==kind5) then   
         IF(.not.ASSOCIATED(f%B_SOL)) ALLOCATE(f%B_SOL);
@@ -2977,6 +3058,7 @@ endif
 end subroutine el_el0
 
 
+
   subroutine print_ElementLIST(el,dir,mf)
     implicit none
     type(element), pointer :: el
@@ -2987,7 +3069,7 @@ end subroutine el_el0
 
 
     select case(el%kind)
-    CASE(KIND0,KIND1,kind2,kind6,kind7,kind8,kind9,KIND11:KIND15,kind17,KIND22)
+    CASE(KIND0,KIND1,kind2,kind6,kind7,kind8,kind9,KIND11:KIND15,kind17)
   case(kind3)
      call thin3_thin30(el,dir,mf)
     case(kind4)
@@ -3006,6 +3088,8 @@ end subroutine el_el0
     case(kind19)
 !       WRITE(MF,*) " ECOLLIMATOR HAS AN INTRINSIC APERTURE "
 !       CALL print_aperture(EL%ECOL19%A,mf)
+    case(kindhel)
+        call hel_hel0(EL,dir,mf)
     case(kind21)
         call tcav4_tcav40(EL,dir,mf)
 !       WRITE(MF,*) el%cav21%PSI,el%cav21%DPHAS,el%cav21%DVDS
@@ -3075,6 +3159,35 @@ endif
 endif
 end subroutine cav4_cav40
 
+subroutine  hel_hel0(f,dir,mf)
+implicit none
+type(element), target :: f
+logical(lp),optional ::  dir
+integer,optional :: mf
+
+if(present(dir)) then
+if(dir) then   !BETA0,GAMMA0I,GAMBET,MASS ,AG
+
+
+
+hel0%N_BESSEL=F%he22%N_BESSEL
+
+    if(present(mf)) then
+     write(mf,NML=helname)
+    endif   
+ 
+ else
+    if(present(mf)) then
+     read(mf,NML=helname)
+    endif   
+ 
+CALL SETFAMILY(f)
+ F%he22%N_BESSEL=hel0%N_BESSEL
+
+endif
+endif
+end subroutine hel_hel0
+
 subroutine  wig_wig0(f,dir,mf)
 implicit none
 type(element), target :: f
@@ -3097,6 +3210,8 @@ wig0%a(1:n)=f%wi%w%a(1:n)
 wig0%f(1:n)=f%wi%w%f(1:n)
 wig0%form(1:n)=f%wi%w%form(1:n)
 wig0%k(1:3,1:n)=f%wi%w%k(1:3,1:n)
+wig0%ex=f%wi%w%ex
+wig0%ey=f%wi%w%ey
     if(present(mf)) then
      write(mf,NML=wigname)
     endif   
@@ -3115,6 +3230,8 @@ wig0%k(1:3,1:n)=f%wi%w%k(1:3,1:n)
  F%wi%w%f(1:N)=wig0%f(1:N)
  F%wi%w%form(1:N)=wig0%form(1:N)
  F%wi%w%k(1:3,1:N)=wig0%k(1:3,1:N)
+ F%wi%w%ex=wig0%ex
+ F%wi%w%ey=wig0%ey
 
 endif
 endif

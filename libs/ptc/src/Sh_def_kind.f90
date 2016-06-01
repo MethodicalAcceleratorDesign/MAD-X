@@ -99,7 +99,7 @@ MODULE S_DEF_KIND
   private INTER_TKTF,INTEP_TKTF
   private ADJUSTR_TIME_CAV_TRAV_OUT,ADJUSTP_TIME_CAV_TRAV_OUT
   private FRINGE_CAV_TRAVR,FRINGE_CAV_TRAVp,INTER_CAV_TRAV,INTEP_CAV_TRAV
-  private INTER_PANCAKE,INTEP_PANCAKE,ADJUSTR_PANCAKE,ADJUSTP_PANCAKE
+  private INTER_PANCAKE,INTEP_PANCAKE,ADJUST_PANCAKER,ADJUST_PANCAKEP
   private elliptical_b_r,elliptical_b_p  ! valishev
   PRIVATE TRACK_SUPER_FRINGER,TRACK_SUPER_FRINGEP
 
@@ -196,8 +196,8 @@ MODULE S_DEF_KIND
   END INTERFACE
 
   INTERFACE ADJUST_PANCAKE
-     MODULE PROCEDURE ADJUSTR_PANCAKE
-     MODULE PROCEDURE ADJUSTP_PANCAKE
+     MODULE PROCEDURE ADJUST_PANCAKER
+     MODULE PROCEDURE ADJUST_PANCAKEP
   END INTERFACE
 
   INTERFACE TRACK_FRINGE
@@ -1441,12 +1441,7 @@ endif
 
     IF(J==1) THEN
        EL%DELTA_E=X(5)
-       !IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
-       !skowron: missing X(6) treatment for J==1
-       IF(k%NOCAVITY.and.(.not.EL%always_on)) then 
-         !print*,'Skowron: Cavity ignored in Sh_def_kind.f90::ADJUSTR_TIME_CAV4'
-         RETURN
-       endif
+       IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
 
        IF(EL%THIN) THEN
           CALL CAVITY(EL,X,k)
@@ -1477,11 +1472,7 @@ endif
 
     IF(J==1) THEN
        EL%DELTA_E=X(5)
-       !IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
-       IF(k%NOCAVITY.and.(.not.EL%always_on)) then 
-         !print*,'Skowron: Cavity ignored in Sh_def_kind.f90::ADJUSTP_TIME_CAV4'
-         RETURN
-       endif
+       IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
 
        IF(EL%THIN) THEN
           CALL CAVITY(EL,X,k)
@@ -1782,6 +1773,9 @@ endif
     integer :: nlim(1:6) =(/0,1,0,3,0,7/)  ! multiplicative factors  
     integer :: nlimit(1:4) , k
 
+    EL=>f%magp%c4
+    EL%P%CHARGE=>f%charge
+    EL%P%dir=>f%dir
 
      if(symplectic_check==0.0_dp) then
        if(metcav>0.and.nstcav>0) then
@@ -1800,9 +1794,7 @@ endif
      nlimit(2)=1*limit_int0(1)
      nlimit(4)=3*limit_int0(2)   
      
-    EL=>f%magp%c4
-    EL%P%CHARGE=>f%charge
-    EL%P%dir=>f%dir
+
     tpsa=my_true
        if(present(turn_off_tpsa)) tpsa=.not.turn_off_tpsa
     met0=el%p%method
@@ -1909,12 +1901,7 @@ CALL FRINGECAV(EL,X,k,2)
     real(dp) O,X1,X3,BBYTWT,BBYTW,BBXTW
     integer j,ko
     real(dp) dir
-    IF(k%NOCAVITY.and.(.not.EL%always_on)) then 
-      !print*,'Skowron: Cavity ignored in Sh_def_kind.f90::CAVITYR'
-      RETURN
-    endif
-
-    
+    IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
     !    EL%DELTA_E=x(5)
     IF(.NOT.PRESENT(MID)) then
@@ -1993,11 +1980,7 @@ CALL FRINGECAV(EL,X,k,2)
     type(real_8) O,X1,X3,BBYTWT,BBYTW,BBXTW
     INTEGER J,ko
     real(dp) dir
-    
-    IF(k%NOCAVITY.and.(.not.EL%always_on)) then 
-      !print*,'Skowron: Cavity ignored in Sh_def_kind.f90::CAVITYP'
-      RETURN
-    endif
+    IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
     !    IF(PRESENT(MID)) CALL XMID(MID,X,0)
     !    EL%DELTA_E=x(5)
     call alloc(BBYTWT,BBXTW,BBYTW,x1,x3,O)
@@ -2066,7 +2049,7 @@ CALL FRINGECAV(EL,X,k,2)
   SUBROUTINE Abmad_TRANSR(EL,Z,X,k,A,AD,B,E)    ! EXP(-I:(X^2+Y^2)/2*A_TRANS:)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
-    real(dp),INTENT(INOUT):: Z,A(3),AD(2)
+    real(dp),INTENT(INOUT):: Z,A(3),AD(3)
     real(dp),optional,INTENT(INOUT)::B(3),E(3)
     TYPE(CAV4),INTENT(INOUT):: EL
     real(dp) C1,S1,V,O,dad1dz
@@ -2074,12 +2057,7 @@ CALL FRINGECAV(EL,X,k,2)
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     if(el%N_BESSEL/=-1) return
-    !IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
-    IF(k%NOCAVITY.and.(.not.EL%always_on)) then 
-      !print*,'Skowron: Cavity ignored in Sh_def_kind.f90::Abmad_TRANSR'
-      RETURN
-    endif
-
+    IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
     IF(EL%THIN) RETURN
 
 
@@ -2093,14 +2071,13 @@ CALL FRINGECAV(EL,X,k,2)
 
     A=0.0_dp
     ad=0.0_dp
-    dad1dz=0.0_dp
    do ko=1,el%nf    ! over modes
    
     C1=el%f(ko)*V*sin(ko*O*z)*COS(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))*0.5_dp
     S1=el%f(ko)*(ko*O)*V*sin(ko*O*z)*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))/2.0_dp
     AD(1)=-C1+AD(1)
     AD(2)=S1+AD(2)
-    dad1dz=dad1dz-(ko*O)*el%f(ko)*V*cos(ko*O*z)*COS(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))*0.5_dp
+    ad(3)=ad(3)-(ko*O)*el%f(ko)*V*cos(ko*O*z)*COS(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))*0.5_dp
 
 !!!   DA_3/DT FOR KICK IN X(5)    
     A(3)=A(3)-EL%P%DIR*el%f(ko)*V*COS(ko*O*z)*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
@@ -2110,14 +2087,14 @@ CALL FRINGECAV(EL,X,k,2)
     A(2)=AD(1)*X(3)  ! A_y
 
      if(present(b)) then
-     b(1)=-dad1dz*x(3)/EL%P%CHARGE
-     b(2)= dad1dz*x(1)/EL%P%CHARGE
+     b(1)=-ad(3)*x(3)/EL%P%CHARGE
+     b(2)= ad(3)*x(1)/EL%P%CHARGE
      b(3)=0.0_dp
     endif
 
     if(present(e)) then
-     E(1)=-dad1dz*x(3)/EL%P%CHARGE
-     E(2)= dad1dz*x(1)/EL%P%CHARGE
+     E(1)=-ad(2)*x(1)/EL%P%CHARGE
+     E(2)=-ad(2)*x(3)/EL%P%CHARGE
      E(3)=A(3)/EL%P%CHARGE
     endif
 
@@ -2126,7 +2103,7 @@ CALL FRINGECAV(EL,X,k,2)
  SUBROUTINE Abmad_TRANSP(EL,Z,X,k,A,AD,B,E)    ! EXP(-I:(X^2+Y^2)/2*A_TRANS:)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(REAL_8),INTENT(INOUT):: Z,A(3),AD(2)
+    TYPE(REAL_8),INTENT(INOUT):: Z,A(3),AD(3)
     TYPE(CAV4P),INTENT(INOUT):: EL
     TYPE(REAL_8),optional,INTENT(INOUT):: B(3),E(3)
     TYPE(REAL_8) C1,S1,V,O,dad1dz
@@ -2134,15 +2111,10 @@ CALL FRINGECAV(EL,X,k,2)
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     if(el%N_BESSEL/=-1) return
-    !IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
-    IF(k%NOCAVITY.and.(.not.EL%always_on)) then 
-      !print*,'Skowron: Cavity ignored in Sh_def_kind.f90::Abmad_TRANSP'
-      RETURN
-    endif
-
+    IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
     IF(EL%THIN) RETURN
     
-    CALL ALLOC(C1,S1,V,O,dad1dz)
+    CALL ALLOC(C1,S1,V,O)
 
     O=EL%freq*twopi/CLIGHT
     if(.not.k%TIME.and.piotr_freq) then
@@ -2154,11 +2126,11 @@ CALL FRINGECAV(EL,X,k,2)
     DO KO=1,3
      A(KO)=0.0_dp
     ENDDO
-    DO KO=1,2
+    DO KO=1,3
      AD(KO)=0.0_dp
     ENDDO
 
-    dad1dz=0.0_dp
+  
 
    do ko=1,el%nf    ! over modes
    
@@ -2168,7 +2140,7 @@ CALL FRINGECAV(EL,X,k,2)
     AD(1)=-C1+AD(1)
     AD(2)=S1+AD(2)
 
-    dad1dz=dad1dz-(ko*O)*el%f(ko)*V*cos(ko*O*z)*COS(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))*0.5_dp
+    ad(3)=ad(3)-(ko*O)*el%f(ko)*V*cos(ko*O*z)*COS(ko*O*(x(6)+EL%t)+EL%PHAS+EL%phase0+EL%PH(KO))*0.5_dp
 
 !!!   DA_3/DT FOR KICK IN X(5)    
     A(3)=A(3)-EL%P%DIR*el%f(ko)*V*COS(ko*O*z)*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
@@ -2178,18 +2150,18 @@ CALL FRINGECAV(EL,X,k,2)
     A(2)=AD(1)*X(3)
  
      if(present(b)) then
-     b(1)=-dad1dz*x(3)/EL%P%CHARGE
-     b(2)= dad1dz*x(1)/EL%P%CHARGE
+     b(1)=-ad(3)*x(3)/EL%P%CHARGE
+     b(2)= ad(3)*x(1)/EL%P%CHARGE
      b(3)=0.0_dp
     endif
 
     if(present(e)) then
-     E(1)=-dad1dz*x(3)/EL%P%CHARGE
-     E(2)= dad1dz*x(1)/EL%P%CHARGE
+     E(1)=-ad(2)*x(1)/EL%P%CHARGE
+     E(2)=-ad(2)*x(3)/EL%P%CHARGE
      E(3)=A(3)/EL%P%CHARGE
     endif
 
-    CALL KILL(C1,S1,V,O,dad1dz)
+    CALL KILL(C1,S1,V,O)
 
 
   END SUBROUTINE Abmad_TRANSP
@@ -2199,7 +2171,7 @@ CALL FRINGECAV(EL,X,k,2)
     real(dp), INTENT(INout) :: X(6)
     real(dp),INTENT(INOUT):: Z0
     real(dp), INTENT(INOUT) :: F(6)
-    REAL(DP) A(3),AD(2),PZ
+    REAL(DP) A(3),AD(3),PZ
     TYPE(CAV4),  INTENT(INOUT) :: D
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -2258,12 +2230,12 @@ CALL FRINGECAV(EL,X,k,2)
     TYPE(REAL_8), INTENT(INout) :: X(6)
     TYPE(REAL_8),INTENT(INOUT):: Z0
     TYPE(REAL_8), INTENT(INOUT) :: F(6)
-    TYPE(REAL_8)  A(3),AD(2),PZ
+    TYPE(REAL_8)  A(3),AD(3),PZ
     TYPE(CAV4P),  INTENT(INOUT) :: D
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
-    call alloc(A,3)
-    call alloc(AD,2)
+    call alloc(A)
+    call alloc(AD)
     call alloc(PZ)
 
     CALL Abmad_TRANS(D,Z0,X,k,A,AD)
@@ -2312,8 +2284,8 @@ CALL FRINGECAV(EL,X,k,2)
     X(2)=X(2)+A(1)
     X(4)=X(4)+A(2)
 
-    call KILL(A,3)
-    call KILL(AD,2)
+    call KILL(A)
+    call KILL(AD)
     call KILL(PZ)
   END subroutine feval_CAV_bmadp
 
@@ -14779,7 +14751,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
 
 !!!!!!!!!!!!!! Pancake starts here !!!!!!!!!!!!!!!
 
-  subroutine fxr(f,x,k,b,p)
+  subroutine fxr(f,x,k,b,p,hcurv)
     implicit none
 
     real(dp)  d(3),c(6),BETA0,GAMMA0I,hcurv
@@ -14794,8 +14766,6 @@ SUBROUTINE ZEROr_teapot(EL,I)
     else
        beta0=1.0_dp;GAMMA0I=0.0_dp;
     endif
-
-    hcurv=p%b0
 
     d(1)=root(x(2)**2+x(4)**2+(1.0_dp+hcurv*x(1))**2)
     d(2)=(d(1)**3)/root(1.0_dp+2*x(5)/beta0+x(5)**2)
@@ -14833,7 +14803,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
 
   end subroutine fxr
 
-  subroutine fxp(f,x,k,b,p)
+  subroutine fxp(f,x,k,b,p,hcurv)
     implicit none
 
     type(real_8)  d(3),c(6)
@@ -14846,7 +14816,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
 
     call alloc(d,3)
     call alloc(c,6)
-    hcurv=p%b0
+
     if(k%time) then
        beta0=p%beta0;GAMMA0I=p%GAMMA0I;
     else
@@ -14898,7 +14868,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
           !          deallocate(EL%Ax)
           !          deallocate(EL%Ay)
 
-          deallocate(EL%SCALE)
+          deallocate(EL%SCALE,el%angc,el%hc,el%dc,el%xc)
           !          deallocate(EL%D_IN)
           !          deallocate(EL%D_OUT)
           !          deallocate(EL%ANG_IN)
@@ -14908,7 +14878,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
     elseif(i==0)       then          ! nullifies
 
        NULLIFY(EL%B)
-       NULLIFY(EL%SCALE)
+       NULLIFY(EL%SCALE,el%angc,el%hc,el%dc,el%xc)
        !       NULLIFY(EL%Ax)
        !       NULLIFY(EL%Ay)
        !       NULLIFY(EL%D_IN)
@@ -14934,7 +14904,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
           !          deallocate(EL%Ax)
           !          deallocate(EL%Ay)
           deallocate(EL%B)
-          deallocate(EL%SCALE)
+          deallocate(EL%SCALE,el%angc,el%hc,el%dc,el%xc)
           !          deallocate(EL%D_IN)
           !          deallocate(EL%D_OUT)
           !          deallocate(EL%ANG_IN)
@@ -14946,7 +14916,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
        NULLIFY(EL%B)
        !       NULLIFY(EL%Ax)
        !       NULLIFY(EL%Ay)
-       NULLIFY(EL%SCALE)
+       NULLIFY(EL%SCALE,el%angc,el%hc,el%dc,el%xc)
        !       NULLIFY(EL%D_IN)
        !       NULLIFY(EL%D_OUT)
        !       NULLIFY(EL%ANG_IN)
@@ -14964,7 +14934,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
     ALLOCATE(EL%B(2*el%p%NST+1))
     !    ALLOCATE(EL%Ax(el%p%NST))
     !    ALLOCATE(EL%Ay(el%p%NST))
-    ALLOCATE(  EL%SCALE )
+    ALLOCATE(  EL%SCALE,el%angc,el%dc,el%hc ,el%xc)
     !    ALLOCATE(  EL%D_IN(3) )
     !    ALLOCATE(  EL%D_OUT(3) )
     !    ALLOCATE(  EL%ANG_IN(3) )
@@ -14980,22 +14950,13 @@ SUBROUTINE ZEROr_teapot(EL,I)
        EL%B(I)%N=T(I)%N
        EL%B(I)%NP=T(I)%NP
        EL%B(I)%no=T(I)%no
-       !       EL%ax(I)%CC=t_ax(I)%CC
-       !       EL%ax(I)%JL=t_ax(I)%JL
-       !       EL%ax(I)%JV=t_ax(I)%JV
-       !       EL%ax(I)%N=t_ax(I)%N
-       !       EL%ax(I)%ND2=t_ax(I)%ND2
-       !
-       !       EL%ay(I)%CC=t_ay(I)%CC
-       !       EL%ay(I)%JL=t_ay(I)%JL
-       !       EL%ay(I)%JV=t_ay(I)%JV
-       !       EL%ay(I)%N=t_ay(I)%N
-       !       EL%ay(I)%ND2=t_ay(I)%ND2
+
     ENDDO
 
 
 
     EL%SCALE=1.0_dp
+    el%angc=0.0_dp; el%dc=0.0_dp; el%hc=0.0_dp; el%xc=0.0_dp
     !    EL%D_IN=ZERO
     !    EL%D_OUT=ZERO
     !    EL%ANG_IN=ZERO
@@ -15012,44 +14973,26 @@ SUBROUTINE ZEROr_teapot(EL,I)
 
 
     ALLOCATE(EL%B(2*el%p%NST+1))
-    !    ALLOCATE(EL%Ax(el%p%NST))
-    !    ALLOCATE(EL%Ay(el%p%NST))
-    ALLOCATE(  EL%SCALE )
-    !    ALLOCATE(  EL%D_IN(3) )
-    !    ALLOCATE(  EL%D_OUT(3) )
-    !    ALLOCATE(  EL%ANG_IN(3) )
-    !    ALLOCATE(  EL%ANG_OUT(3) )
+
+    ALLOCATE(  EL%SCALE,el%angc,el%dc,el%hc,el%xc )
 
     DO I=1,2*el%p%NST+1
        CALL ALLOC_TREE(EL%B(I),T(I)%N,3)
-       !       CALL ALLOC_TREE(EL%Ax(I),T_ax(I)%N,2)
-       !       CALL ALLOC_TREE(EL%Ay(I),T_ay(I)%N,2)
        EL%B(I)%CC=T(I)%CC
        EL%B(I)%JL=T(I)%JL
        EL%B(I)%JV=T(I)%JV
        EL%B(I)%N=T(I)%N
        EL%B(I)%NP=T(I)%NP
        EL%B(I)%no=T(I)%no
-       !       EL%ax(I)%CC=t_ax(I)%CC
-       !       EL%ax(I)%JL=t_ax(I)%JL
-       !       EL%ax(I)%JV=t_ax(I)%JV
-       !       EL%ax(I)%N=t_ax(I)%N
-       !       EL%ax(I)%ND2=t_ax(I)%ND2
-       !
-       !       EL%ay(I)%CC=t_ay(I)%CC
-       !       EL%ay(I)%JL=t_ay(I)%JL
-       !       EL%ay(I)%JV=t_ay(I)%JV
-       !       EL%ay(I)%N=t_ay(I)%N
-       !       EL%ay(I)%ND2=t_ay(I)%ND2
+
     ENDDO
 
+    EL%SCALE=1.0_dp
+    el%angc=0.0_dp; 
+    el%dc=0.0_dp; 
+     el%hc=0.0_dp; 
+    el%xc=0.0_dp;
 
-
-    !    EL%D_IN=ZERO
-    !    EL%D_OUT=ZERO
-    !    EL%ANG_IN=ZERO
-    !    EL%ANG_OUT=ZERO
-    ! EL%SCALE MUST BE CREATED IN SETFAMILYP
   END SUBROUTINE POINTERS_PANCAKEP
 
   SUBROUTINE copyPANCAKE_el_elp(EL,ELP)
@@ -15058,14 +15001,13 @@ SUBROUTINE ZEROr_teapot(EL,I)
     TYPE(PANCAKEP), INTENT(inout)::ELP
 
     CALL COPY_TREE_N(EL%B,ELP%B)
-    !    CALL COPY_TREE_N(EL%ax,ELP%ax)
-    !    CALL COPY_TREE_N(EL%ay,ELP%ay)
-    !
-    !!    ELP%D_IN    =  EL%D_IN
-    !    ELP%D_OUT    =  EL%D_OUT
-    !    ELP%ANG_IN    =  EL%ANG_IN
-    !    ELP%ANG_OUT    =  EL%ANG_OUT
+
     ELP%SCALE  = EL%SCALE
+    ELP%angc  = EL%angc
+    ELP%dc  = EL%dc
+    ELP%xc  = EL%xc
+    ELP%hc  = EL%hc
+ 
   END SUBROUTINE copyPANCAKE_el_elp
 
   SUBROUTINE copyPANCAKE_el_el(EL,ELP)
@@ -15074,14 +15016,12 @@ SUBROUTINE ZEROr_teapot(EL,I)
     TYPE(PANCAKE), INTENT(inout)::ELP
 
     CALL COPY_TREE_N(EL%B,ELP%B)
-    !    CALL COPY_TREE_N(EL%ax,ELP%ax)
-    !    CALL COPY_TREE_N(EL%ay,ELP%ay)
-    !
-    !!    ELP%D_IN    =  EL%D_IN
-    !    ELP%D_OUT    =  EL%D_OUT
-    !    ELP%ANG_IN    =  EL%ANG_IN
-    !    ELP%ANG_OUT    =  EL%ANG_OUT
+
     ELP%SCALE  = EL%SCALE
+    ELP%angc  = EL%angc
+    ELP%dc  = EL%dc
+     ELP%xc  = EL%xc
+    ELP%hc  = EL%hc
   END SUBROUTINE copyPANCAKE_el_el
 
   SUBROUTINE copyPANCAKE_elP_el(EL,ELP)
@@ -15090,14 +15030,12 @@ SUBROUTINE ZEROr_teapot(EL,I)
     TYPE(PANCAKE), INTENT(inout)::ELP
 
     CALL COPY_TREE_N(EL%B,ELP%B)
-    !    CALL COPY_TREE_N(EL%ax,ELP%ax)
-    !    CALL COPY_TREE_N(EL%ay,ELP%ay)
-    !
-    !!    ELP%D_IN    =  EL%D_IN
-    !    ELP%D_OUT    =  EL%D_OUT
-    !    ELP%ANG_IN    =  EL%ANG_IN
-    !    ELP%ANG_OUT    =  EL%ANG_OUT
+
     ELP%SCALE  = EL%SCALE
+    ELP%angc  = EL%angc
+    ELP%dc  = EL%dc
+     ELP%xc  = EL%xc
+    ELP%hc  = EL%hc
   END SUBROUTINE copyPANCAKE_elP_el
 
   SUBROUTINE reset_pa(EL)
@@ -15130,7 +15068,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
     !    b(3)=EL%SCALE*el%p%charge*el%p%dir*b(3)
     b(3)=EL%SCALE*el%p%charge*b(3)
 
-    CALL f_M(f,x,k,b,EL%p)
+    CALL f_M(f,x,k,b,EL%p,el%hc)
 
   END subroutine feval_PANCAkEr
 
@@ -15155,7 +15093,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
     !    b(3)=EL%SCALE*el%p%charge*el%p%dir*b(3)
     b(3)=EL%SCALE*el%p%charge*b(3)
 
-    CALL f_M(f,x,k,b,EL%p)
+    CALL f_M(f,x,k,b,EL%p,el%hc)
 
     CALL KILL(B)
 
@@ -15308,12 +15246,12 @@ SUBROUTINE ZEROr_teapot(EL,I)
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     if(k%TIME) then
        ti=ROOT(1.0_dp+2.0_dp*X(5)/el%p%beta0+x(5)**2-X(2)**2-X(4)**2)
-       x(2)=(1.0_dp+el%p%B0*X(1))*x(2)/ti
-       x(4)=(1.0_dp+el%p%B0*X(1))*x(4)/ti
+       x(2)=(1.0_dp+el%hc*X(1))*x(2)/ti
+       x(4)=(1.0_dp+el%hc*X(1))*x(4)/ti
     else
        ti=ROOT((1.0_dp+x(5))**2-X(2)**2-X(4)**2)
-       x(2)=(1.0_dp+el%p%B0*X(1))*x(2)/ti
-       x(4)=(1.0_dp+el%p%B0*X(1))*x(4)/ti
+       x(2)=(1.0_dp+el%hc*X(1))*x(2)/ti
+       x(4)=(1.0_dp+el%hc*X(1))*x(4)/ti
     endif
 
   end SUBROUTINE conv_to_xpr
@@ -15327,12 +15265,12 @@ SUBROUTINE ZEROr_teapot(EL,I)
     call alloc(ti)
     if(k%TIME) then
        ti=sqrt(1.0_dp+2.0_dp*X(5)/el%p%beta0+x(5)**2-X(2)**2-X(4)**2)
-       x(2)=(1.0_dp+el%p%B0*X(1))*x(2)/ti
-       x(4)=(1.0_dp+el%p%B0*X(1))*x(4)/ti
+       x(2)=(1.0_dp+el%hc*X(1))*x(2)/ti
+       x(4)=(1.0_dp+el%hc*X(1))*x(4)/ti
     else
        ti=sqrt((1.0_dp+x(5))**2-X(2)**2-X(4)**2)
-       x(2)=(1.0_dp+el%p%B0*X(1))*x(2)/ti
-       x(4)=(1.0_dp+el%p%B0*X(1))*x(4)/ti
+       x(2)=(1.0_dp+el%hc*X(1))*x(2)/ti
+       x(4)=(1.0_dp+el%hc*X(1))*x(4)/ti
     endif
     call kill(ti)
 
@@ -15344,7 +15282,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
     TYPE(PANCAKE),INTENT(INOUT):: EL
     real(dp) ti
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
-    ti=ROOT((1.0_dp+el%p%B0*X(1))**2+X(2)**2+X(4)**2)
+    ti=ROOT((1.0_dp+el%hc*X(1))**2+X(2)**2+X(4)**2)
     if(k%TIME) then
        x(2)=x(2)*ROOT(1.0_dp+2.0_dp*X(5)/el%p%beta0+x(5)**2)/ti
        x(4)=x(4)*ROOT(1.0_dp+2.0_dp*X(5)/el%p%beta0+x(5)**2)/ti
@@ -15361,7 +15299,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
     type(real_8) ti
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     call alloc(ti)
-    ti=SQRT((1.0_dp+el%p%B0*X(1))**2+X(2)**2+X(4)**2)
+    ti=SQRT((1.0_dp+el%hc*X(1))**2+X(2)**2+X(4)**2)
     if(k%TIME) then
        x(2)=x(2)*sqrt(1.0_dp+2.0_dp*X(5)/el%p%beta0+x(5)**2)/ti
        x(4)=x(4)*sqrt(1.0_dp+2.0_dp*X(5)/el%p%beta0+x(5)**2)/ti
@@ -15376,37 +15314,91 @@ SUBROUTINE ZEROr_teapot(EL,I)
 
   ! ETIENNE_PANCAKE
 
-  SUBROUTINE ADJUSTR_PANCAKE(EL,X,k,J)
+  SUBROUTINE ADJUST_PANCAKER(EL,X,k,J)
     IMPLICIT NONE
     real(dp), INTENT(INOUT) :: X(6)
     TYPE(PANCAKE),INTENT(INOUT):: EL
-
+    real(dp) d(3) 
     INTEGER, INTENT(IN) :: J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    if(el%hc==0.0_dp) then
+    d=0
+    d(1)=el%xc
+    d(3)=el%dc
     IF(J==1) then
+        CALL ROT_XZ(el%angc,x,el%p%BETA0,el%p%exact,k%time)
+        CALL TRANS(d,x,el%p%BETA0,el%p%exact,k%time)
        call conv_to_xp(el,x,k)
     else
+    d(1)=-el%xc
+    d(3)=el%dc
        call conv_to_px(el,x,k)
+        CALL TRANS(d,x,el%p%BETA0,el%p%exact,k%time)
+        CALL ROT_XZ(el%angc,x,el%p%BETA0,el%p%exact,k%time)
+    endif
+    else
+    d=0
+    IF(J==1) then
+    d(1)=el%xc
+    d(3)=el%dc
+        CALL TRANS(d,x,el%p%BETA0,el%p%exact,k%time)
+        CALL ROT_XZ(el%angc,x,el%p%BETA0,el%p%exact,k%time)
+       call conv_to_xp(el,x,k)
+    else
+    d(1)=-el%xc
+    d(3)=el%dc
+       call conv_to_px(el,x,k)
+        CALL ROT_XZ(el%angc,x,el%p%BETA0,el%p%exact,k%time)
+        CALL TRANS(d,x,el%p%BETA0,el%p%exact,k%time)
     endif
 
-  END SUBROUTINE ADJUSTR_PANCAKE
+    endif
+  END SUBROUTINE ADJUST_PANCAKER
 
-  SUBROUTINE ADJUSTP_PANCAKE(EL,X,k,J)
+  SUBROUTINE ADJUST_PANCAKEP(EL,X,k,J)
     IMPLICIT NONE
     TYPE(REAL_8), INTENT(INOUT) :: X(6)
     TYPE(PANCAKEP),INTENT(INOUT):: EL
-
+    real(dp) d(3) 
     INTEGER, INTENT(IN) :: J
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
+    if(el%hc==0.0_dp) then
+    d=0
+    d(1)=el%xc
+    d(3)=el%dc
     IF(J==1) then
+        CALL ROT_XZ(el%angc,x,el%p%BETA0,el%p%exact,k%time)
+        CALL TRANS(d,x,el%p%BETA0,el%p%exact,k%time)
        call conv_to_xp(el,x,k)
     else
+    d(1)=-el%xc
+    d(3)=el%dc
        call conv_to_px(el,x,k)
+        CALL TRANS(d,x,el%p%BETA0,el%p%exact,k%time)
+        CALL ROT_XZ(el%angc,x,el%p%BETA0,el%p%exact,k%time)
+    endif
+    else
+    d=0
+    IF(J==1) then
+    d(1)=el%xc
+    d(3)=el%dc
+ 
+        CALL TRANS(d,x,el%p%BETA0,el%p%exact,k%time)
+        CALL ROT_XZ(el%angc,x,el%p%BETA0,el%p%exact,k%time)
+       call conv_to_xp(el,x,k)
+    else
+    d(1)=-el%xc
+    d(3)=el%dc
+       call conv_to_px(el,x,k)
+        CALL ROT_XZ(el%angc,x,el%p%BETA0,el%p%exact,k%time)
+        CALL TRANS(d,x,el%p%BETA0,el%p%exact,k%time)
     endif
 
-  END SUBROUTINE ADJUSTP_PANCAKE
+    endif
+
+  END SUBROUTINE ADJUST_PANCAKEP
 
   SUBROUTINE INTER_PANCAKE(EL,X,k,POS)
     IMPLICIT NONE
@@ -15492,13 +15484,16 @@ SUBROUTINE ZEROr_teapot(EL,I)
 
     SELECT CASE(EL%P%METHOD)
     CASE(4)
-       call conv_to_xp(EL,X,k)
+
+!       call conv_to_xp(EL,X,k)
        IF(EL%P%DIR==1) THEN
+       call ADJUST_PANCAKE(EL,X,k,1)
           IS=1
           DO I=1,el%p%NST
              IF(.NOT.PRESENT(MID)) call rk4_m(IS,h,el,X,k)
              IF(PRESENT(MID)) CALL XMID(MID,X,I)
           ENDDO
+       call ADJUST_PANCAKE(EL,X,k,2)
        else
           IS=2*el%p%NST+1
           DO I=1,el%p%NST
@@ -15507,7 +15502,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
           ENDDO
 
        ENDIF
-       call conv_to_px(EL,X,k)
+!       call conv_to_px(EL,X,k)
 
     CASE DEFAULT
        w_p=0
@@ -15543,12 +15538,15 @@ SUBROUTINE ZEROr_teapot(EL,I)
 
     SELECT CASE(EL%P%METHOD)
     CASE(4)
-       call conv_to_xp(EL,X,k)
+!       call conv_to_xp(EL,X,k)
+
        IF(EL%P%DIR==1) THEN
+       call ADJUST_PANCAKE(EL,X,k,1)
           IS=1
           DO I=1,el%p%NST
              call rk4_m(IS,h,el,X,k)
           ENDDO
+       call ADJUST_PANCAKE(EL,X,k,2)
        else
           IS=2*el%p%NST+1
           DO I=1,el%p%NST
@@ -15557,32 +15555,6 @@ SUBROUTINE ZEROr_teapot(EL,I)
 
        ENDIF
 
-
-       call conv_to_px(EL,X,k)
-       !       CASE(2)
-       !          IS=1
-       !          call DRIFT_pancake(EL,hh,is,1,X,k)
-       !          call DRIFT_pancake(EL,hh,is,2,X,k)
-       !          call KICKPATH(EL,hf,X,k)
-       !          DO I=1,el%p%NST-2
-       !             IS=is+1
-       !             call DRIFT_pancake(EL,hh,is,2,X,k)
-       !             call DRIFT_pancake(EL,hf,is,1,X,k)
-       !             call DRIFT_pancake(EL,hh,is,2,X,k)
-       !             call KICKPATH(EL,hf,X,k)
-       !          ENDDO
-       !          IS=is+1
-       !          call DRIFT_pancake(EL,hh,is,2,X,k)
-       !          call DRIFT_pancake(EL,hf,is,1,X,k)
-       !          a(1)=x(1)
-       !          a(2)=x(3)
-       !          CALL trackg(EL%ax(is),A)
-       !          X(2)=X(2)-EL%SCALE*el%p%charge*A(1)
-       !          a(1)=x(1)
-       !          a(2)=x(3)
-       !          CALL trackg(EL%ay(is),A)
-       !          X(4)=X(4)-EL%SCALE*el%p%charge*A(1)
-       !
 
     CASE DEFAULT
        w_p=0
@@ -15607,7 +15579,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
     real(dp), INTENT(INout) :: X(6)
     real(dp),INTENT(INOUT):: Z0
     real(dp), INTENT(INOUT) :: F(6)
-    REAL(DP) A(3),AD(2),PZ
+    REAL(DP) A(3),AD(3),PZ
     TYPE(CAV_TRAV),  INTENT(INOUT) :: D
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -15665,7 +15637,7 @@ SUBROUTINE ZEROr_teapot(EL,I)
     TYPE(REAL_8), INTENT(INout) :: X(6)
     TYPE(REAL_8), INTENT(INOUT):: Z0
     TYPE(REAL_8), INTENT(INOUT) :: F(6)
-    TYPE(REAL_8)  A(3),AD(2),PZ
+    TYPE(REAL_8)  A(3),AD(3),PZ
     TYPE(CAV_TRAVp),  INTENT(INOUT) :: D
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
@@ -15727,21 +15699,18 @@ SUBROUTINE ZEROr_teapot(EL,I)
 
   END subroutine feval_CAVP
 
-  SUBROUTINE A_TRANSR(EL,Z0,X,k,A,AD)    ! EXP(-I:(X^2+Y^2)/2*A_TRANS:)
+  SUBROUTINE A_TRANSR(EL,Z0,X,k,A,AD,B,E)    ! EXP(-I:(X^2+Y^2)/2*A_TRANS:)
     IMPLICIT NONE
     real(dp),INTENT(INOUT):: X(6)
-    real(dp),INTENT(INOUT):: Z0,A(3),ad(2)
+    real(dp),INTENT(INOUT):: Z0,A(3),ad(3)
+    real(dp),optional,INTENT(INOUT)::B(3),E(3)
     TYPE(CAV_TRAV),INTENT(INOUT):: EL
+
     real(dp) C1,S1,C2,S2,V,O
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
     !    IF(k%NOCAVITY.OR.(.NOT.k%FRINGE)) RETURN
-    !IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
-    IF(k%NOCAVITY.and.(.not.EL%always_on)) then 
-      !print*,'Skowron: Cavity ignored in Sh_def_kind.f90::A_TRANSR'
-      RETURN
-    endif
-
+    IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
 !    IF(k%NOCAVITY) RETURN
 
     O=EL%freq*twopi/CLIGHT
@@ -15758,27 +15727,37 @@ SUBROUTINE ZEROr_teapot(EL,I)
 
     AD(1)=0.5_dp*V*(COS(EL%PSI)*S1-SIN(EL%PSI)*S2)
     AD(2)=O*0.5_dp*V*(COS(EL%PSI)*C1-SIN(EL%PSI)*C2)
+    AD(3)=O*0.5_dp*V*(-COS(EL%PSI)*C1-SIN(EL%PSI)*C2)
     A(1)=AD(1)*X(1)
     A(2)=AD(1)*X(3)
     A(3)=-EL%P%DIR*V*(COS(EL%PSI)*S1+SIN(EL%PSI)*S2)
 
+     if(present(b)) then
+     b(1)=-ad(3)*x(3)/EL%P%CHARGE
+     b(2)= ad(3)*x(1)/EL%P%CHARGE
+     b(3)=0.0_dp
+    endif
+
+    if(present(e)) then
+     E(1)=-ad(2)*x(1)/EL%P%CHARGE
+     E(2)=-ad(2)*x(3)/EL%P%CHARGE
+     E(3)=EL%P%DIR*A(3)/EL%P%CHARGE
+    endif
 
   END SUBROUTINE A_TRANSR
 
 
-  SUBROUTINE A_TRANSP(EL,Z0,X,k,A,AD)    ! EXP(-I:(X^2+Y^2)/2*A_TRANS:)
+  SUBROUTINE A_TRANSP(EL,Z0,X,k,A,AD,B,E)    ! EXP(-I:(X^2+Y^2)/2*A_TRANS:)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(REAL_8),INTENT(INOUT):: Z0,A(3),ad(2)
+    TYPE(REAL_8),INTENT(INOUT):: Z0,A(3),ad(3)
+    TYPE(REAL_8),optional,INTENT(INOUT)::B(3),E(3)
     TYPE(CAV_TRAVP),INTENT(INOUT):: EL
     TYPE(REAL_8) C1,S1,C2,S2,V,O
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
 
-!    IF(k%NOCAVITY.OR.(.NOT.k%FRINGE)) RETURN
-    IF(k%NOCAVITY.and.(.not.EL%always_on)) then 
-      !print*,'Skowron: Cavity ignored in Sh_def_kind.f90::A_TRANSP'
-      RETURN
-    endif
+    IF(k%NOCAVITY.OR.(.NOT.k%FRINGE)) RETURN
+!    IF(k%NOCAVITY) RETURN
 
     CALL ALLOC(C1,S1,C2,S2,V,O)
     O=EL%freq*twopi/CLIGHT
@@ -15795,9 +15774,22 @@ SUBROUTINE ZEROr_teapot(EL,I)
 
     AD(1)=0.5_dp*V*(COS(EL%PSI)*S1-SIN(EL%PSI)*S2)
     AD(2)=O*0.5_dp*V*(COS(EL%PSI)*C1-SIN(EL%PSI)*C2)
+    AD(3)=O*0.5_dp*V*(-COS(EL%PSI)*C1-SIN(EL%PSI)*C2)
     A(1)=AD(1)*X(1)
     A(2)=AD(1)*X(3)
     A(3)=-EL%P%DIR*V*(COS(EL%PSI)*S1+SIN(EL%PSI)*S2)
+
+     if(present(b)) then
+     b(1)=-ad(3)*x(3)/EL%P%CHARGE
+     b(2)= ad(3)*x(1)/EL%P%CHARGE
+     b(3)=0.0_dp
+    endif
+
+    if(present(e)) then
+     E(1)=-ad(2)*x(1)/EL%P%CHARGE
+     E(2)=-ad(2)*x(3)/EL%P%CHARGE
+     E(3)=EL%P%DIR*A(3)/EL%P%CHARGE
+    endif
 
     CALL KILL(C1,S1,C2,S2,V,O)
 

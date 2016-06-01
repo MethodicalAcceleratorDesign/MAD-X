@@ -59,7 +59,16 @@ module polymorphic_taylor
   ! PROBE_8 STUFF
   real(dp) :: sinhx_x_min=1e-4_dp
   real(dp) :: sinhx_x_minp=1.0_dp  !  1.e-9  !c_0_0001
+ private I_np,I_npp
+INTEGER, private, PARAMETER :: I4B = SELECTED_INT_KIND(9)
 
+  INTERFACE I_n_polymorph
+     MODULE PROCEDURE I_np
+  END INTERFACE
+
+  INTERFACE I_n 
+     MODULE PROCEDURE I_npp
+  END INTERFACE
 
   INTERFACE assignment (=)
      MODULE PROCEDURE EQUAL   ! 2002.10.9
@@ -560,6 +569,7 @@ module polymorphic_taylor
   INTERFACE exp
      MODULE PROCEDURE dexpt
   END INTERFACE
+
   INTERFACE dexp
      MODULE PROCEDURE dexpt
   END INTERFACE
@@ -2185,6 +2195,48 @@ contains
        ! call !write_e(0)
     end select
   END FUNCTION dexpt
+
+  FUNCTION I_npp( n,S1 )
+    implicit none
+    TYPE (real_8) I_npp
+    TYPE (real_8), INTENT (IN) :: S1
+    INTEGER(I4B), INTENT(IN) :: n
+
+    integer localmaster
+
+    select case(s1%kind)
+    case(m1)
+       I_npp%r=I_n(n,s1%r)
+       I_npp%kind=1
+    case(m2)
+       localmaster=master
+       call ass(I_npp)
+       I_npp%t= I_n(n,s1%t)
+       master=localmaster
+    case(m3)
+       if(knob) then
+          localmaster=master
+          call ass(I_npp)
+
+          call varfk1(S1)
+          I_npp%t= I_n(n,varf1)
+          master=localmaster
+       else
+          I_npp%r= I_n(n,S1%r)
+          I_npp%kind=1
+       endif
+
+    case default
+       w_p=0
+       w_p%nc=2
+       w_p%fc='((1X,A72,/,1x,a72))'
+       w_p%fi='(2((1X,i4)))'
+       w_p%c(1)= " trouble in I_npp "
+       w_p%c(2)= "s1%kind   "
+       w_p=(/s1%kind  /)
+       ! call !write_e(0)
+    end select
+  END FUNCTION I_npp
 
   FUNCTION abst( S1 )
     implicit none
@@ -6466,6 +6518,85 @@ contains
        call flip_taylor(S1%t,S2%t,i)
     endif
   end SUBROUTINE  flip_real_8
+
+
+!  bessel numerical recipes
+
+
+
+
+
+		FUNCTION I_np(n,x)
+        type(real_8)  I_np
+		INTEGER(I4B), INTENT(IN) :: n
+        type(real_8), INTENT(IN) :: x
+        integer localmaster,i,j
+        type(real_8)  dx,tx
+        real(dp) fac,x0
+!        real(dp) :: der(0:2*lno)
+!        real(dp) :: dder(0:2*lno),ddert(0:2*lno)
+         real(dp), allocatable :: ddert(:),dder(:),der(:)
+
+        if(x%kind==mmmmmm1) then
+            I_np=I_n(n,x%r)
+         return
+        endif  
+
+        localmaster=master
+        call ass(I_np)
+             x0=(x.sub.'0')
+
+
+        if(c_%no==1) then
+         I_np=I_n(n,x0)+dI_n(n,x0)*(x-x0)
+         master=localmaster
+         return
+        endif
+        allocate(der(0:c_%no+n),dder(0:c_%no+n),ddert(0:c_%no+n))
+
+        der=0
+        der(0)=I_n(n,x0)            
+ 
+        do i=n,c_%no+n
+         der(i)=I_n(i,x0)
+        enddo
+        j=max(0,n-c_%no)
+
+        do i=n-1,j,-1
+         der(i)=I_n(i,x0)
+        enddo
+
+       call alloc(dx,tx)
+
+          dder=0.0_dp
+          dx=x-x0
+          tx=dx
+          I_np=I_n(n,x0)
+          fac=1.0_dp
+          dder(n)=1.0_dp
+
+          do i=1,c_%no
+            ddert=0.0_dp
+          do j=max(n-(i-1),0),n+(i-1)
+           ddert(iabs(j-1))=0.5_dp*dder(iabs(j))+ddert(iabs(j-1))
+           ddert(iabs(j+1))=0.5_dp*dder(iabs(j))+ddert(iabs(j+1))
+          enddo
+
+            ddert=ddert/i
+            fac=0
+          do j=max(n-i,0),n+i
+            fac=fac+ddert(j)*der(j)
+          enddo
+            I_np=I_np+fac*tx
+            tx=tx*dx
+            dder=ddert
+          enddo  
+       call kill(dx,tx)
+        deallocate(der,dder,ddert)
+
+        master=localmaster
+
+		END FUNCTION I_np
 
 
 end module  polymorphic_taylor

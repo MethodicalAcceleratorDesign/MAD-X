@@ -285,7 +285,7 @@ CONTAINS
     U%FIX0=T%FIX0
     U%e_ij=T%e_ij
     U%rad=T%rad
-
+!    U%file=T%file
     U%eps=T%eps
     U%symptrack=T%symptrack
     U%usenonsymp=T%usenonsymp
@@ -310,7 +310,7 @@ CONTAINS
     IMPLICIT NONE
     TYPE(TREE_ELEMENT), INTENT(INOUT) :: T
 
-    NULLIFY(T%CC,T%JL,T%JV,T%N,T%NP,T%no,t%fixr,t%fix,t%fix0,t%beta0,t%e_ij,t%rad,t%ds)
+    NULLIFY(T%CC,T%JL,T%JV,T%N,T%NP,T%no,t%fixr,t%fix,t%fix0,t%beta0,t%e_ij,t%rad,t%ds)  !,t%file)
 
   END SUBROUTINE NULL_TREE
 
@@ -324,7 +324,7 @@ CONTAINS
 
 
     ALLOCATE(T%CC(N),T%fix0(np),T%fix(np),T%fixr(np),T%JL(N),T%JV(N),T%N,T%ds,T%beta0,T%np,T%no, & 
-    t%e_ij(c_%nd2,c_%nd2),T%rad(c_%nd2,c_%nd2),t%usenonsymp, t%symptrack, t%eps)
+    t%e_ij(c_%nd2,c_%nd2),T%rad(c_%nd2,c_%nd2),t%usenonsymp, t%symptrack, t%eps)  !,t%file)
     T%N=N
     T%np=np
     T%no=0
@@ -335,6 +335,7 @@ CONTAINS
     T%ds=0.0_dp
     T%beta0=0.0_dp
     T%rad=0.0_dp
+!    T%file=' '
     do i=1,c_%nd2
      T%rad(i,i)=1.0_dp
     enddo
@@ -499,7 +500,7 @@ CONTAINS
 
 
      IF(ASSOCIATED(T%CC))DEALLOCATE(T%CC,T%fix0,T%fix,T%fixr,t%ds,t%beta0,T%JL,T%JV,T%N,T%NP, &
-    T%No,t%e_ij,t%rad,t%eps,t%symptrack,t%usenonsymp)
+    T%No,t%e_ij,t%rad,t%eps,t%symptrack,t%usenonsymp)  !,t%file)
 
 
   END SUBROUTINE KILL_TREE

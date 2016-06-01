@@ -36,7 +36,7 @@ module c_da_arrays
   integer c_nst0,c_nomax,c_nvmax,c_nmmax,c_nocut,c_lfi
  ! real(dp) c_facint(0:c_lno)
   integer c_nhole
-  integer,TARGET :: c_lda_used =15000
+  integer,TARGET :: c_lda_used =30000
 
 contains
 

@@ -56,11 +56,11 @@ contains
     read77 =.true.
 
     my_ering => m_u%start
-    m_u_t=.true.
-    if(m_t%n>0) then
+m_u_t=.true.
+if(m_t%n>0) then
     my_ering => m_t%end
     m_u_t=.false.
-    endif
+endif
     if(associated(my_estate)) then
     !  my_estate=>my_old_state
       etat=my_estate
@@ -116,7 +116,7 @@ contains
     ! fitting and scanning tunes
     real(dp) tune_ini(2),tune_fin(2),dtu(2),fint,hgap
     integer nstep(2),i1,i2,I3,n_bessel
-    LOGICAL(LP) STRAIGHT,skip,fixp,skipcav
+    LOGICAL(LP) STRAIGHT,skip,fixp,skipcav,fact
     ! end
     ! TRACK 4D NORMALIZED
     INTEGER POS,NTURN,resmax
@@ -1286,9 +1286,11 @@ contains
           READ(MF,*) NAME
           READ(MF,*) I1  ! ORDER OF THE MAP
           READ(MF,*)  onemap  ! use one map : no cutting
-          READ(MF,*) fixp  !  SYMPLECTIC 
+          READ(MF,*) fixp,fact  !  SYMPLECTIC , factored
           if(.not.associated(my_ering%t)) call make_node_layout(my_ering)
           x_ref=0.0_DP
+          READ(MF,*) x_ref
+          n_ac=0
           CALL CONTEXT(NAME)
           N_NAME=0
           IF(NAME(1:2)=='NO') THEN
@@ -1308,11 +1310,21 @@ contains
 
              IF(FOUND_IT) THEN
                 write(6,*) "  magnet found FOR MAP REPLACEMENT ",P%MAG%name
-                call fill_tree_element(p,I1,x_REF,onemap)
+                call fill_tree_element(p,I1,x_REF,onemap,fact)
+                 n_ac=n_ac+1
+
                    IF(P%DIR==1) THEN
                     p%mag%forward(3)%symptrack=FIXP
                     p%magP%forward(3)%symptrack=FIXP
+                do i2=1,3
+                 write(p%mag%filef,*) "map",n_ac,".txt"
+                 call context(p%mag%filef)
+                enddo
                    ELSE
+                do i2=1,3
+                 write(p%mag%fileb,*) "map",n_ac,".txt"
+                 call context(p%mag%fileb)
+                enddo
                     p%mag%BACKward(3)%symptrack=FIXP
                     p%magP%BACKward(3)%symptrack=FIXP
                    ENDIF
@@ -1324,25 +1336,39 @@ contains
        case('MAKEALLMAP','TRACKALLWITHMAP')
           READ(MF,*) I1  ! ORDER OF THE MAP
           READ(MF,*)  onemap  ! use one map : no cutting
-          READ(MF,*) fixp  !  SYMPLECTIC 
+          READ(MF,*) fixp,fact  !  SYMPLECTIC 
           READ(MF,*) skipcav  !  skip cavity 
           x_ref=0.0_DP
- 
+           n_ac=0
           if(.not.associated(my_ering%t)) call make_node_layout(my_ering)
           p=>my_ering%start
           do ii=1,my_ering%N
    
 
-             IF(p%mag%kind/=kind0.or.(skipcav.and.(p%mag%kind/=kind4.and.p%mag%kind/=kind21))) THEN
+             IF(p%mag%kind/=kind0) THEN
+              if(.not.skipcav.or.(p%mag%kind/=kind4.and.p%mag%kind/=kind21)) then
                 write(6,*) "  magnet found FOR MAP REPLACEMENT ",P%MAG%name
-                call fill_tree_element(p,I1,x_REF,onemap)
+                 n_ac=n_ac+1
+                call fill_tree_element(p,I1,x_REF,onemap,fact)
                    IF(P%DIR==1) THEN
                     p%mag%forward(3)%symptrack=FIXP
                     p%magP%forward(3)%symptrack=FIXP
+                do i2=1,3
+                 write(p%mag%filef,*) "map",n_ac,".txt"
+                 call context(p%mag%filef)
+ 
+                enddo
                    ELSE
+                do i2=1,3
+                 write(p%mag%fileb,*) "map",n_ac,".txt"
+                 call context(p%mag%fileb)
+
+                enddo
                     p%mag%BACKward(3)%symptrack=FIXP
                     p%magP%BACKward(3)%symptrack=FIXP
                    ENDIF
+  
+              endif
              ENDIF
 
 
@@ -1446,10 +1472,10 @@ contains
 
     !      call compute_twiss(my_ering,my_estate,filename,1,del,1,integrated,name,my_true,my_false)
        case('PTCTWISS','TWISS','PTCTWISSRIPKEN','TWISSRIPKEN')  !
-          !read(mf,*) filename, NAME, integrated
-          !read(mf,*) del
+          read(mf,*) filename, NAME, integrated
+          read(mf,*) del
 
-          call compute_twiss(my_ering,6,3)
+       !   call compute_twiss(my_ering,my_estate,filename,1,del,1,integrated,name,my_false,my_false)
 
        case('PTCTWISSSASHA','TWISSSASHA','PTCTWISSRIPKENSASHA','TWISSRIPKENSASHA')  !
           read(mf,*) filename, NAME, integrated

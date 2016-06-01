@@ -17,7 +17,6 @@ MODULE c_TPSA
   integer,private::ndel ,nd2par,nd2part,nd2partt
   integer,private,dimension(lnv)::jfil,jfilt
 
-  public equal_c_tayls
   private equal,DAABSEQUAL,Dequaldacon ,equaldacon ,Iequaldacon  !,AABSEQUAL 2002.10.17
   private pow, GETORDER,CUTORDER,getchar,GETint,GETORDERMAP,c_exp_vectorfield_on_spinmatrix  !, c_bra_v_spinmatrix
   private getdiff,getdATRA  ,mul,dmulsc,dscmul,c_spinor_spinmatrix
@@ -40,7 +39,7 @@ MODULE c_TPSA
   integer NP,NO,ND,ND2,NDPT,NV,ndptb,rf
   private nd_used
   integer nd_used
-  logical(lp):: extra_terms_log=.false.,do_linear_ac_longitudinal=.true.
+  logical(lp):: do_linear_ac_longitudinal=.true.
   private old
   logical(lp) :: old ,testing_new=.true.
   logical(lp),target  :: c_real_warning =.true.
@@ -67,7 +66,7 @@ integer, private :: nd2t=6,ndt=3,ndc2t=2,ndct=1,nd2harm,ndharm
 logical(lp), private ::   c_similarity=my_false
 logical(lp) :: symp =my_false
 logical(lp) :: c_normal_auto=my_true,c_verbose=my_true
-integer :: spin_tune_def=-1,spin_def=-1   !, private 
+integer :: spin_def_tune=1,spin_def_L=1, spin_def_cor=1;   !, private 
 integer :: order_gofix=1
 logical(lp) :: time_lie_choice=my_false,courant_snyder_teng_edwards=my_true,dosymp=my_false
   private copy_damap_matrix,copy_matrix_matrix,invert_22,ALLOC_33t,kill_33t,matmul_33
@@ -80,12 +79,14 @@ private GETORDER_par,GETORDERMAP_par,GETORDERSPINMATRIX_par,liebraspinor
 integer,private,parameter::ndd=6
 private c_concat_vector_field_ray,CUTORDERVEC,kill_c_vector_field_fourier,alloc_c_vector_field_fourier
 private complex_mul_vec,equal_c_vector_field_fourier,c_IdentityEQUALVECfourier,c_vector_field_spinmatrix
-private c_add_map,c_sub_map
+private c_add_map,c_sub_map,c_read_spinor,flatten_c_factored_lie_r
 integer :: n_fourier=12,n_extra=0
 logical :: remove_tune_shift=.false.
 complex(dp) :: n_cai=-2*i_
 integer :: complex_extra_order=0
 logical :: special_extra_order_1=.true.
+real(dp) :: epso_factor =1000.d0 ! for log
+  logical(lp):: extra_terms_log=.false. 
 
   INTERFACE assignment (=)
      MODULE PROCEDURE EQUAL
@@ -132,6 +133,7 @@ logical :: special_extra_order_1=.true.
       MODULE PROCEDURE equalc_ray_ray
       MODULE PROCEDURE equal_c_vector_field_fourier
       MODULE PROCEDURE equalc_spinor_cspinor
+      MODULE PROCEDURE flatten_c_factored_lie_r ! same as       flatten_c_factored_lie
   end  INTERFACE
 
 
@@ -248,6 +250,14 @@ logical :: special_extra_order_1=.true.
      MODULE PROCEDURE powmaps
   END INTERFACE
 
+
+  INTERFACE clean
+!     MODULE PROCEDURE c_clean
+     MODULE PROCEDURE c_clean_taylor
+     MODULE PROCEDURE c_clean_spinmatrix
+     MODULE PROCEDURE c_clean_damap
+     MODULE PROCEDURE c_clean_vector_field
+  end INTERFACE clean
   ! Exponential of Lie Operators
 
  
@@ -478,12 +488,14 @@ logical :: special_extra_order_1=.true.
        MODULE PROCEDURE c_rea
        module procedure c_read_spinmatrix
        module procedure c_read_map
+       MODULE PROCEDURE c_read_spinor
     END INTERFACE
 
     INTERFACE read
        MODULE PROCEDURE c_rea
        module procedure c_read_spinmatrix
        module procedure c_read_map
+       MODULE PROCEDURE c_read_spinor
     END INTERFACE
 
     INTERFACE daprint
@@ -569,21 +581,21 @@ logical :: special_extra_order_1=.true.
 CONTAINS
 
  subroutine c_get_indices(n,mf)
-!$general: information
-!$ In the arrary n(>11), important parameters of the normal
-!$ form can be retrieved.
-!$ If mf/=0, they are printed on file mf.
-!$ n(1)=NO
-!$ n(2)=ND
-!$ n(3)=ND2
-!$ n(4)=NV
-!$ n(5)=Ndpt
-!$ n(6)=ndptb
-!$ n(7)=np
-!$ n(8)=rf*2
-!$ n(9)=ndc2t
-!$ n(10)=nd2t
-!$ n(11)=nd2harm
+!#general: information
+!# In the arrary n(>11), important parameters of the normal
+!# form can be retrieved.
+!# If mf/=0, they are printed on file mf.
+!# n(1)=NO
+!# n(2)=ND
+!# n(3)=ND2
+!# n(4)=NV
+!# n(5)=Ndpt
+!# n(6)=ndptb
+!# n(7)=np
+!# n(8)=rf*2
+!# n(9)=ndc2t
+!# n(10)=nd2t
+!# n(11)=nd2harm
  implicit none
  integer n(:),mf
 
@@ -613,9 +625,9 @@ end subroutine c_get_indices
 
 
   subroutine c_count_taylor(n,ns,ne)
-!$restricted : information
-!$ Counts number of c_taylor allocated;
-!$ it is used for debugging purposes.
+!#restricted : information
+!# Counts number of c_taylor allocated;
+!# it is used for debugging purposes.
     implicit none
     integer n,ns,ne,i
     call c_count_da(n)
@@ -1023,8 +1035,8 @@ end subroutine c_get_indices
   END FUNCTION unarySUB_spinor
 
  subroutine normalise_spinor(n1) 
-!$general: manipulation
-!$ The c_spinor n1 is normalised.
+!#general: manipulation
+!# The c_spinor n1 is normalised.
     implicit none
     type(c_spinor), intent(inout) :: n1
     type(c_taylor) norm
@@ -1040,9 +1052,9 @@ end subroutine c_get_indices
  end subroutine normalise_spinor 
 
   subroutine orthogonalise_spin_matrix(s) 
-!$general: manipulation
-!$ The c_spinmatrix s is normalised, that is to say
-!$ forced into O(3).
+!#general: manipulation
+!# The c_spinmatrix s is normalised, that is to say
+!# forced into O(3).
 
     implicit none
     TYPE (c_spinmatrix) s
@@ -2040,8 +2052,8 @@ end subroutine c_get_indices
     !    endif
   END SUBROUTINE c_DPOKMAP
 
-!*
   SUBROUTINE  EQUAL(S2,S1)
+!*
     implicit none
     type (c_taylor),INTENT(inOUT)::S2
     type (c_taylor),INTENT(IN)::S1
@@ -2261,25 +2273,34 @@ end subroutine c_get_indices
 
   END FUNCTION c_logt
 
-  SUBROUTINE  flatten_c_factored_lie(S1,S2)
-!$general: manipulation
-!$ Type c_factored_lie is a product of Lie exponents.
-!$ Lie map=exp(s1%f(1).grad)...exp(s1%f(s1%n).grad) if s1%dir=1.
-!$ or Lie map=exp(s1%f(s1%n).grad)...exp(s1%f(1).grad) if s1%dir=-1.
-!$ In some cases, these exponents commute and can be added; for example
-!$ if the map is a rotation.
-!$ s2 = s1%f(1)+...+s1%f(s1%n)
+  SUBROUTINE  flatten_c_factored_lie_r(St,S1)
   implicit none
-  type (c_factored_lie),INTENT(INOUT) :: S1
-  type (c_vector_field),INTENT(inOUT) :: S2
-  integer i,j
+  type (c_factored_lie),INTENT(IN) :: S1
+  type (c_vector_field),INTENT(inOUT) :: ST
+  call flatten_c_factored_lie(S1,ST)
+end  SUBROUTINE  flatten_c_factored_lie_r
 
+  SUBROUTINE  flatten_c_factored_lie(S1,ST)
+!#general: manipulation
+!# Type c_factored_lie is a product of Lie exponents.
+!# Lie map=exp(s1%f(1).grad)...exp(s1%f(s1%n).grad) if s1%dir=1.
+!# or Lie map=exp(s1%f(s1%n).grad)...exp(s1%f(1).grad) if s1%dir=-1.
+!# In some cases, these exponents commute and can be added; for example
+!# if the map is a rotation.
+!# s2 = s1%f(1)+...+s1%f(s1%n)
+  implicit none
+  type (c_factored_lie),INTENT(IN) :: S1
+  type (c_vector_field),INTENT(inOUT) :: ST
+  integer i,j
+  type (c_vector_field) S2
 !  This routine assumes commutation of all the factored Lie exponents
     
+    s2%n = s1%f(1)%n
+    call alloc(s2)
 
     s2%eps   = s1%f(1)%eps
     s2%nrmax = s1%f(1)%nrmax
-    s2%n = s1%f(1)%n
+    
  
     s2=0
     do j=1,s1%n
@@ -2288,8 +2309,9 @@ end subroutine c_get_indices
        s2%v(i)=s2%v(i)+s1%f(j)%v(i)
       enddo      
     enddo
+    st=s2
   if(complex_extra_order==1.and.special_extra_order_1) s2=s2.cut.no
-
+   call kill(s2)
   END SUBROUTINE flatten_c_factored_lie
 
   FUNCTION c_logf_spin( s1,h,epso,n,tpsa )
@@ -2333,7 +2355,7 @@ end subroutine c_get_indices
     if(present(epso)) then
      epsone= epso
     else
-     epsone= xnorm1/1000
+     epsone= xnorm1/epso_factor
     endif
  
 !     eps=abs(epsone)/2  !1.d5
@@ -2380,16 +2402,16 @@ end subroutine c_get_indices
   END FUNCTION c_logf_spin
 
   FUNCTION c_logf( s1,h,epso,n,tpsa )
-!$internal: manipulation
-!$ Accessable with the interface log if desired.
-!$ Takes the logarithm of a nonlinear map s1
-!$ s1=exp(log(s1).grad) I
-!$ The map must be near the identity.
-!$ H, epso and n are optional.
-!$ epso is a small positive number estimated automatically.
-!$ The algorithm goes nonlinear when the norm of the correction
-!$ is smaller than epso. See Chap.11.
-!$ H is a guess for the logarithm: optional.
+!#internal: manipulation
+!# Accessable with the interface log if desired.
+!# Takes the logarithm of a nonlinear map s1
+!# s1=exp(log(s1).grad) I
+!# The map must be near the identity.
+!# H, epso and n are optional.
+!# epso is a small positive number estimated automatically.
+!# The algorithm goes nonlinear when the norm of the correction
+!# is smaller than epso. See Chap.11.
+!# H is a guess for the logarithm: optional.
 
     implicit none
     TYPE (c_vector_field) c_logf
@@ -2444,10 +2466,10 @@ end subroutine c_get_indices
   END FUNCTION c_logc
 
   FUNCTION FULL_ABST( S1 )
-!$general: manipulation
-!$ This routine computes the norm of the c_taylor s1.
-!$ This routine is called with the interface
-!$ full_abs(s1) where s1 is a c_taylor. 
+!#general: manipulation
+!# This routine computes the norm of the c_taylor s1.
+!# This routine is called with the interface
+!# full_abs(s1) where s1 is a c_taylor. 
     implicit none
     real(dp) FULL_ABST
     TYPE (c_taylor), INTENT (IN) :: S1
@@ -5660,6 +5682,28 @@ cgetvectorfield=0
   END SUBROUTINE c_pri_spinor
 
 
+  SUBROUTINE  c_read_spinor(S1,MFILE) ! spin routine
+    implicit none
+    INTEGER,INTENT(IN)::MFILE
+    type (c_spinor),INTENT(IN)::S1
+    integer i
+    character(120) line
+
+     ! write(mfile,*) " Complex Spinor "
+      read(mfile,'(a120)') line
+    do i=1,3
+ 
+      read(mfile,'(a120)') line
+      read(mfile,'(a120)') line
+      read(mfile,'(a120)') line
+
+     call c_rea(s1%v(i),mfile)
+
+    enddo
+
+ 
+  END SUBROUTINE c_read_spinor
+
   SUBROUTINE  c_pri(S1,MFILE,DEPS)
     implicit none
     INTEGER,INTENT(IN)::MFILE
@@ -6168,6 +6212,35 @@ cgetvectorfield=0
 
   end subroutine c_ass_vector_field
 
+ SUBROUTINE  c_norm(S1,S2,prec)
+    implicit none
+    type (c_taylor),INTENT(INOUT)::S2
+    type (c_taylor), intent(INOUT):: s1
+    real(dp) prec
+    INTEGER ipresent,n,I,illa
+    complex(dp) value,v
+    INTEGER, allocatable :: j(:)
+    type (c_taylor) t
+
+    call alloc(t)
+    t=0.0_dp
+    ipresent=1
+    call c_dacycle(S1%I,ipresent,value,n)
+
+    allocate(j(nv))
+
+    do i=1,N
+       call c_dacycle(S1%I,i,value,illa,j)
+       v=0.0_dp
+       if(abs(value)>prec) v=abs(value)
+          t=t+(v.cmono.j)
+!       endif
+    ENDDO
+    s2=t
+    deallocate(j)
+    call kill(t)
+
+  END SUBROUTINE c_norm
 
   ! remove small numbers
 
@@ -6230,7 +6303,7 @@ cgetvectorfield=0
 
     do i=1,3
     do j=1,3
-       call c_clean_taylor(s1%s(i,j),s2%s(i,j),prec)
+       call clean(s1%s(i,j),s2%s(i,j),prec)
     enddo
     enddo
 
@@ -6247,7 +6320,6 @@ cgetvectorfield=0
     do i=1,3
        call c_clean_taylor(s1%v(i),s2%v(i),prec)
     enddo
-
 
   END SUBROUTINE c_clean_spinor
 
@@ -7847,13 +7919,13 @@ endif
 
 !!!!!!!!!!  TPSA LIE PART !!!!!!!
 subroutine c_linear_a(xy,a1)
-!$internal: normal
-!$ This routine linearises the linear part of the map ONLY.
-!$ For a full harmonic system the call c_linear_a(xy,a1) will result in
-!$ R=a1**(-1)*xy*a1.
-!$ The map R can be an amplitude dependent rotation, or a rotation followed by a drift
-!$ in the energy plane, or even a rotation sink if radiation is present. 
-!$ R can also have rotations for clocks concerning AC modulation. (See Chap.4 of my Springer book)
+!#internal: normal
+!# This routine linearises the linear part of the map ONLY.
+!# For a full harmonic system the call c_linear_a(xy,a1) will result in
+!# R=a1**(-1)*xy*a1.
+!# The map R can be an amplitude dependent rotation, or a rotation followed by a drift
+!# in the energy plane, or even a rotation sink if radiation is present. 
+!# R can also have rotations for clocks concerning AC modulation. (See Chap.4 of my Springer book)
     implicit none
     integer i,j
     type(c_damap), intent(inout) ::  xy,a1 
@@ -7890,8 +7962,8 @@ subroutine c_linear_a(xy,a1)
      if(ndpt==0) then
        fm0(1:nd2,1:nd2)=transpose(fm(1:nd2,1:nd2))
      else
-!write(6,*) " nd2t,nd2,nd2harm "
-!write(6,*) nd2t,nd2,nd2harm
+write(6,*) " nd2t,nd2,nd2harm "
+write(6,*) nd2t,nd2,nd2harm
 ! Consider the following example
 ! ndc2t,nd2t,nd2harm,nd2
 !           2           4           6           8
@@ -7957,42 +8029,34 @@ if(.not.c_normal_auto) then
  write(6,*) " "
 
     do i=1,nd2harm  !t
-       write(6,'(i2,2(1x,G21.14))') i, reval(i),imval(i)
+     write(6,'(i2,2(1x,G21.14))') i, reval(i),imval(i)
     enddo
-    
     call c_locate_planes(vr,vi,idef)
-    
-    if(i_piotr(1)==0.and.nd<=ndharm) then
-       write(6,'(a82)') " The order of the planes has been guessed using the algorithm in c_locate_planes "
-       write(6,'(a41)') " Hopefully it is correct! Please check! "
-       write(6,'(a18,100(i2,1x))') " Order guessed -> ",idef(1:ndharm)
+if(i_piotr(1)==0.and.nd<=ndharm) then
+  write(6,'(a82)') " The order of the planes has been guessed using the algorithm in c_locate_planes "
+  write(6,'(a41)') " Hopefully it is correct! Please check! "
+  write(6,'(a18,100(i2,1x))') " Order guessed -> ",idef(1:ndharm)
 
-       write(6,*) " Manually identify the location of distinct tunes in the order you like "
-       read(5,*) idef(1:ndharm)
-
-    else
-      do j=1,ndharm
-        idef(j)=i_piotr(j)
-      enddo
-    endif
+  write(6,*) " Manually identify the location of distinct tunes in the order you like "
+ read(5,*) idef(1:ndharm)
+ else
+  do j=1,size(i_piotr)
+    idef(j)=i_piotr(j)
+  enddo
+ endif
 else
 !!  c_locate_planes tries to locate the planes: important if there is little coupling
 !! I suppose that this routine can be refined
    call c_locate_planes(vr,vi,idef)
-   if(c_verbose) then
-      do i=1,nd2harm  !t
-        write(6,'(i2,2(1x,G21.14))') i, reval(i),imval(i)
-      enddo
-      
-      write(6,'(a82)') " The order of the planes has been guessed using the algorithm in c_locate_planes "
-      write(6,'(a41)') " Hopefully it is correct! Please check! "
-      write(6,'(a18,100(i2,1x))') " Order guessed -> ",idef(1:ndharm)
-   endif
+if(c_verbose) then
+    do i=1,nd2harm  !t
+     write(6,'(i2,2(1x,G21.14))') i, reval(i),imval(i)
+    enddo
+ write(6,'(a82)') " The order of the planes has been guessed using the algorithm in c_locate_planes "
+ write(6,'(a41)') " Hopefully it is correct! Please check! "
+ write(6,'(a18,100(i2,1x))') " Order guessed -> ",idef(1:ndharm)
+ endif
 endif 
-
-!do j=1,ndharm
-!  i_piotr(j) = idef(j)
-!enddo
 
 if(c_mess_up_vector) then
  vrt= a_mess*vr-b_mess*vi
@@ -8096,11 +8160,11 @@ endif
 
 
 subroutine c_locate_planes(vr,vi,idef)
-!$restricted: normal
-!$ Tries to locate the planes in c_linear_a, 
-!$ so that if decoupled Qx correspounds to Q1 it is properly identified.
-!$ If c_normal_auto.false. it is not called and the user is 
-!$ asked to choose planes manually. 
+!#restricted: normal
+!# Tries to locate the planes in c_linear_a, 
+!# so that if decoupled Qx correspounds to Q1 it is properly identified.
+!# If c_normal_auto.false. it is not called and the user is 
+!# asked to choose planes manually. 
     implicit none
     real(dp), intent(in) ::  vr(ndim2t,ndim2t),vi(ndim2t,ndim2t)
     real(dp) t(ndim2t,ndim2t)
@@ -8112,10 +8176,6 @@ subroutine c_locate_planes(vr,vi,idef)
 ! write(6,*) " nd2,ndc2t ",nd2,ndc2t 
 !pause 
 !      do j=2,nd2-ndc2t,2
-     
-     
-     !print*,"Skowron: T mtx:"
-
      do j=1,nd-ndct-rf
  !      rmax=0
  !      kmax=0
@@ -8125,18 +8185,17 @@ subroutine c_locate_planes(vr,vi,idef)
 
 
        enddo
-       
-       !print*,"Skowron: t(",j,",:)=",t(j,1:(nd2-ndc2t)/2)
-       
   !    idef(j/2)=2*kmax-1
     enddo
    
 
-    do k=1,(nd2-ndc2t)/2
+do k=1,(nd2-ndc2t)/2
        rmax=0
        jmax=0
-       do j=1,nd-ndct*rf
-          r=t(j,k) 
+     do j=1,nd-ndct*rf
+
+
+        r=t(j,k) 
 
           if(r>rmax) then
             rmax=r
@@ -8148,26 +8207,21 @@ subroutine c_locate_planes(vr,vi,idef)
        idef(k)=2*jmax-1
      enddo
 
-     !print*,"Skowron c_locate_planes: ",nd-ndct-rf, (nd2-ndc2t)/2, " planes order: ", idef
-     
+
  !!!! checking   maybe equal tunes....
       doit=.false.
       do j=1,(nd2-ndc2t-2*rf )/2
-        do k=1,(nd2-ndc2t-2*rf )/2
-          if(j==k) cycle
-          if(idef(j)==idef(k)) then 
-            
-            doit=.true.
-            
-           endif 
+      do k=1,(nd2-ndc2t-2*rf )/2
+ 
+         if(j==k) cycle
+        if(idef(j)==idef(k)) doit=.true.
      
-          if(doit) exit
-        enddo
+        if(doit) exit
+      enddo
       enddo
 
      if(doit) then
-       !if(c_verbose) 
-       write(6,*) "warning : trouble locating planes, so chosen arbitrarily Skowron"
+       if(c_verbose) write(6,*) "warning : trouble locating planes, so chosen arbitrarily "
        do k=1,(nd2-ndc2t-2*rf )/2
         idef(k)=2*k-1
         enddo
@@ -8179,7 +8233,7 @@ subroutine c_locate_planes(vr,vi,idef)
 end subroutine c_locate_planes
 
 subroutine c_locate_modulated_magnet_planes(fm0,idef,reval)
-!$restricted: normal
+!#restricted: normal
 ! It locates modulated magnet planes in c_linear_a.
     implicit none
     real(dp), intent(in) ::  fm0(ndim2t,ndim2t)
@@ -8204,10 +8258,10 @@ subroutine c_locate_modulated_magnet_planes(fm0,idef,reval)
 end subroutine c_locate_modulated_magnet_planes
 
 subroutine c_linear_ac_longitudinal(xy,a1,ac)
-!$internal:  normal
-!$ This routine fixes the linear normal form when a Jordan normal form is mixed with 
-!$ an ac-modulated clock.
-!$ This routines makes the adjustements described in Sec.4.7.4 of my Springer book.
+!#internal:  normal
+!# This routine fixes the linear normal form when a Jordan normal form is mixed with 
+!# an ac-modulated clock.
+!# This routines makes the adjustements described in Sec.4.7.4 of my Springer book.
     implicit none
     integer i
     type(c_damap), intent(inout) ::  xy,a1,ac 
@@ -8261,14 +8315,14 @@ subroutine c_linear_ac_longitudinal(xy,a1,ac)
 
 
  subroutine c_gofix(xy,a1)
-!$restricted:  normal 
-!$ The routine c_gofix computes a1 such that 
-!$ "call c_gofix(m,a1)" produces
-!$ m0=a1**(-1)*xy*a1 to order "order_gofix" around the parameter dependent fixed point.
-!$ order_gofix is defaulted to 1.
-!$ dosymp is defaulted to false. 
-!$ dosymp should be true if order_gofix > 1 (if c_gofix is used on its own).
-!$ c_canonise will take care of a1 if needed to higher order.
+!#restricted:  normal 
+!# The routine c_gofix computes a1 such that 
+!# "call c_gofix(m,a1)" produces
+!# m0=a1**(-1)*xy*a1 to order "order_gofix" around the parameter dependent fixed point.
+!# order_gofix is defaulted to 1.
+!# dosymp is defaulted to false. 
+!# dosymp should be true if order_gofix > 1 (if c_gofix is used on its own).
+!# c_canonise will take care of a1 if needed to higher order.
 
     implicit none
     integer i,j,ndloc
@@ -8432,11 +8486,11 @@ endif
 
  
 subroutine c_factor_map(m,l,f,dir,cas)  
-!$general: manipulation
-!$  This routine factors a map m as:
-!$  m= l exp(f.grad) if dir=1
-!$  m= exp(f.grad) l if dir =-1
-!$  l is assumed to be a linear composition operator https://en.wikipedia.org/wiki/Composition_operator .
+!#general: manipulation
+!#  This routine factors a map m as:
+!#  m= l exp(f.grad) if dir=1
+!#  m= exp(f.grad) l if dir =-1
+!#  l is assumed to be a linear composition operator https://en.wikipedia.org/wiki/Composition_operator .
 implicit none
     type(c_damap) , intent(inout) :: m,l
     type(c_vector_field), intent(inout) :: f
@@ -8472,14 +8526,14 @@ implicit none
 end subroutine c_factor_map
 !!  no spin here
 subroutine c_canonise(at,a_cs,a0,a1,a2,phase) 
-!$general: manipulation
-!$ This routine is of great pedagogical importance.
-!$ It is restricted to the orbital motion,
-!$ c_full_canonise also includes spin.
-!$ It factors a canonical transformation as
-!$ at=a_cs o rotation(phase) as explaned in Chap.7 of my Springer book.
-!$ a_cs = a_0 o a_1 o a_2
-!$ The flag courant_snyder_teng_edwards, defaulted to true, controls the linear part of a_cs.
+!#general: manipulation
+!# This routine is of great pedagogical importance.
+!# It is restricted to the orbital motion,
+!# c_full_canonise also includes spin.
+!# It factors a canonical transformation as
+!# at=a_cs o rotation(phase) as explaned in Chap.7 of my Springer book.
+!# a_cs = a_0 o a_1 o a_2
+!# The flag courant_snyder_teng_edwards, defaulted to true, controls the linear part of a_cs.
     implicit none                             
     type(c_damap) , intent(inout) :: at,a_cs 
     type(c_damap) , optional, intent(inout) :: a2,a1,a0
@@ -8490,11 +8544,11 @@ subroutine c_canonise(at,a_cs,a0,a1,a2,phase)
 end subroutine c_canonise
 
 subroutine c_full_canonise(at,a_cs,as,a0,a1,a2,rotation,phase,nu_spin) 
-!$general: manipulation
-!$ This routine is of great pedagogical importance.
-!$ It factors a canonical transformation as
-!$ at=a_cs o rotation(phase,nu_spin) as explained in Chap.7 of my Springer book.
-!$ a_cs = a_s o a_0 o a_1 o a_2
+!#general: manipulation
+!# This routine is of great pedagogical importance.
+!# It factors a canonical transformation as
+!# at=a_cs o rotation(phase,nu_spin) as explained in Chap.7 of my Springer book.
+!# a_cs = a_s o a_0 o a_1 o a_2
     implicit none
     type(c_damap) , intent(inout) :: at,a_cs 
     type(c_damap) , optional, intent(inout) :: as,a2,a1,a0,rotation
@@ -8614,14 +8668,14 @@ end subroutine c_full_canonise
 
 
  subroutine c_normal(xy,n,dospin,no_used)
-!$general:  normal
-!$ This routine normalises the map xy
-!$ xy = n%a_t**(-1)*r*n%a_t 
-!$ The linear part of r is described in Chap.4 for the orbital part
-!$ and in Chap.6 for the spin. The nonlinear parts are in Chap.5 and 6.
-!$ Dospin must be set to .true. if spin is to be normalised.
-!$ Resonances can be left in the map. Thir number is in n%nres.
-!$ They are nres rosnances The kth resonance is n%m(i,k).Q_i+n%ms(k)=integer
+!#general:  normal
+!# This routine normalises the map xy
+!# xy = n%a_t**(-1)*r*n%a_t 
+!# The linear part of r is described in Chap.4 for the orbital part
+!# and in Chap.6 for the spin. The nonlinear parts are in Chap.5 and 6.
+!# Dospin must be set to .true. if spin is to be normalised.
+!# Resonances can be left in the map. Thir number is in n%nres.
+!# They are nres rosnances The kth resonance is n%m(i,k).Q_i+n%ms(k)=integer
 
     implicit none
     type(c_damap) , intent(inout) :: xy
@@ -8798,8 +8852,8 @@ end subroutine c_full_canonise
         egspin(3)=ri%s%s(1,1)-i_*ri%s%s(1,3)
         egspin(2)=1.0_dp
         egspin(1)=ri%s%s(1,1)+i_*ri%s%s(1,3)
-!!! tune is taken from egspin(1) or egspin(3)   spin_tune_def= +/- 1
-        n%spin_tune=aimag(log(egspin(2-spin_tune_def))/twopi)   
+!!! tune is taken from egspin(1) or egspin(3)   spin_def_tune= +/- 1
+        n%spin_tune=aimag(log(egspin(2-spin_def_tune))/twopi)   
 ! because  exp(a L_y) x = x- a z + O(a**2)
         ri=ri**(-1) ! exp(-alpha_0 L_y)   (3)
 
@@ -8871,11 +8925,11 @@ end subroutine c_full_canonise
 
 
   subroutine c_normal_spin_linear(m_in,m_out,as,n0,as_ext) 
-!$restricted: normal
-!$ This routine normalises the constant part of the spin matrix. 
-!$ m_out=as**(-1)*m_in*as
-!$ n0 is the invariant spin direction of type c_spinor.
-!$ Optional map as_ext is for a crazy Stern-Gerlach extension (not used).
+!#restricted: normal
+!# This routine normalises the constant part of the spin matrix. 
+!# m_out=as**(-1)*m_in*as
+!# n0 is the invariant spin direction of type c_spinor.
+!# Optional map as_ext is for a crazy Stern-Gerlach extension (not used).
   implicit none
   type(c_damap), intent(inout) :: m_in,m_out,as
   type(c_damap), optional :: as_ext
@@ -8916,9 +8970,9 @@ end subroutine c_full_canonise
  end  subroutine c_normal_spin_linear
 
  subroutine c_convert_spin(xy,m1) 
-!$general: Stern-Gerlach
-!$ Bizarre routine to convert a spectator spin
-!$ into a Stern-Gerlach type map.
+!#general: Stern-Gerlach
+!# Bizarre routine to convert a spectator spin
+!# into a Stern-Gerlach type map.
     implicit none
     type(c_damap) , intent(inout) :: xy,m1
     type(c_taylor) s(3)
@@ -8961,10 +9015,10 @@ end subroutine c_full_canonise
     end function coast
 
  subroutine c_normal_radiation(m1,n)
-!$general:  normal
-!$ This routine normalises a beam envelope.
-!$ The map m1 enters already in phasors basis
-!$ therefore c_normal_radiation is unlikely to be used on its own.
+!#general:  normal
+!# This routine normalises a beam envelope.
+!# The map m1 enters already in phasors basis
+!# therefore c_normal_radiation is unlikely to be used on its own.
     implicit none
     type(c_damap) , intent(inout) :: m1
     type(c_normal_form), intent(inout) ::  n
@@ -8989,13 +9043,13 @@ end subroutine c_full_canonise
    end  subroutine  c_normal_radiation 
 
     subroutine check_kernel(k,n,je,removeit)
-!$internal: normal
-!$ This routine identifies terms in an orbital vector field that
-!$ are not in the kernel of a complete normalisation.
-!$ Namely it preserves generators of rotation.
-!$ Due to the vagueries of accelerator physics,
-!$ it leaves non-linear generators of rotations even in the
-!$ case of a damped oscillator.
+!#internal: normal
+!# This routine identifies terms in an orbital vector field that
+!# are not in the kernel of a complete normalisation.
+!# Namely it preserves generators of rotation.
+!# Due to the vagueries of accelerator physics,
+!# it leaves non-linear generators of rotations even in the
+!# case of a damped oscillator.
     implicit none
     logical(lp) removeit
     integer i,k,n,je(:),t,o
@@ -9027,9 +9081,9 @@ end subroutine c_full_canonise
 
 
     subroutine check_kernel_spin(k,n,je,removeit)
-!$internal: normal
-!$ This routine identifies terms in spin-orbital vector field that
-!$ are not in the kernel of a complete normalisation.
+!#internal: normal
+!# This routine identifies terms in spin-orbital vector field that
+!# are not in the kernel of a complete normalisation.
 
     implicit none
     logical(lp) removeit
@@ -9052,11 +9106,11 @@ end subroutine c_full_canonise
     end subroutine check_kernel_spin
 
     subroutine check_resonance(k,n,je,kr,m,removeit)
-!$internal: normal
-!$ This routine identifies terms in an orbital vector field that
-!$ are left per user's request.
-!$ This is used if a resonance family is to be left in the map.
-!$ See Sec.5.4 of Springer book.
+!#internal: normal
+!# This routine identifies terms in an orbital vector field that
+!# are left per user's request.
+!# This is used if a resonance family is to be left in the map.
+!# See Sec.5.4 of Springer book.
 
     implicit none
     logical(lp) removeit
@@ -9078,11 +9132,11 @@ end subroutine c_full_canonise
     end subroutine check_resonance
 
     subroutine check_resonance_spin(k,n,je,kr,ms,m,removeit) 
-!$internal: normal
-!$ This routine identifies terms in a spin-orbital orbital vector field that
-!$ are left per user's request.
-!$ This is used if a spin resonance family is to be left in the map.
-!$ See Sec.6.4 of Springer book.
+!#internal: normal
+!# This routine identifies terms in a spin-orbital orbital vector field that
+!# are left per user's request.
+!# This is used if a spin resonance family is to be left in the map.
+!# See Sec.6.4 of Springer book.
     implicit none
     logical(lp) removeit
     integer i,k,n,je(:),t1,t2,j,kr,ms(:),m(:,:)
@@ -9098,11 +9152,11 @@ end subroutine c_full_canonise
      t2=t2+abs(je(i)-je(i+1)-m(j,kr))
     enddo
         if(k==1) then
-         t1=t1+iabs(-spin_tune_def-ms(kr))
-         t2=t2+iabs(-spin_tune_def+ms(kr))
+         t1=t1+iabs(-spin_def_tune-ms(kr))
+         t2=t2+iabs(-spin_def_tune+ms(kr))
         elseif(k==3) then
-         t1=t1+iabs(spin_tune_def-ms(kr))
-         t2=t2+iabs(spin_tune_def+ms(kr))
+         t1=t1+iabs(spin_def_tune-ms(kr))
+         t2=t2+iabs(spin_def_tune+ms(kr))
         else
          t1=t1+iabs(ms(kr))
          t2=t2+iabs(ms(kr))
@@ -9112,10 +9166,10 @@ end subroutine c_full_canonise
     end subroutine check_resonance_spin
 
    SUBROUTINE C_AVERAGE(F,A,F_FLOQUET) 
-!$internal: normal
-!$ This routine averages a function F using the canonical trnsformation A.
-!$ This is explained in Sec.2.2.1 of my Springer book.
-!$ The result expressed in phasor's basis is in F_FLOQUET
+!#internal: normal
+!# This routine averages a function F using the canonical trnsformation A.
+!# This is explained in Sec.2.2.1 of my Springer book.
+!# The result expressed in phasor's basis is in F_FLOQUET
     IMPLICIT NONE
     TYPE(c_damap) A
     TYPE(c_TAYLOR) F,F_FLOQUET,FQ
@@ -9308,9 +9362,9 @@ end subroutine c_full_canonise
     
     call c_full_norm_spin(s1%s,i,norm)
     if(i/=0) then
-     c_1_vf%om%v(1)=s1%s%s(3,2)*spin_def
-     c_1_vf%om%v(2)=s1%s%s(1,3)*spin_def
-     c_1_vf%om%v(3)=s1%s%s(2,1)*spin_def
+     c_1_vf%om%v(1)=s1%s%s(3,2)*spin_def_L
+     c_1_vf%om%v(2)=s1%s%s(1,3)*spin_def_L
+     c_1_vf%om%v(3)=s1%s%s(2,1)*spin_def_L*spin_def_cor
     endif
     
     c_master=localmaster
@@ -9738,8 +9792,8 @@ prec=1.d-8
   end function c_expflo
   
    subroutine c_flofacg(xy0,h,epso,n)
-!$internal: manipulation
-!$ Use preferably function c_logf or its interface
+!#internal: manipulation
+!# Use preferably function c_logf or its interface
     implicit none
     ! GENERAL ONE EXPONENT FACTORIZATION
     logical(lp) more
@@ -9796,7 +9850,7 @@ prec=1.d-8
     if(present(epso)) then
      epsone= epso
     else
-     epsone= xnorm1/1000
+     epsone= xnorm1/epso_factor
     endif
     xnbefore=1e36_dp
     more=.false.
@@ -9836,7 +9890,7 @@ prec=1.d-8
 
           if(xn.lt.epsone) then  !!! Quasi quadratic after some convergence obtained
              if(lielib_print(3)==1) then
-                write(6,'(a28,i4,g21.14)') " Norm of   CBH  iteration # ",k,xn
+                write(6,'(a28,i4,g21.14,1x,g21.14)') " Norm of   CBH  iteration # ",k,xn,epsone 
              endif
   
              do k1=1,xy%n
@@ -9903,7 +9957,7 @@ prec=1.d-8
           enddo
           xn=xnorm/xnorm1
           if(xn.ge.epsone.and.(lielib_print(3)==1)) then
-             write(6,'(a28,i4,g21.14)') " Norm of linear iteration # ",k,xn
+             write(6,'(a28,i4,g21.14,1x,g21.14)') " Norm of linear iteration # ",k,xn,epsone
           endif
  !         if(xn.lt.eps.or.more) then
          if(xn.lt.epsone.or.more) then
@@ -9935,7 +9989,7 @@ prec=1.d-8
                    do k1=1,xy%n
                     t%v(k1)=x%v(k1)-v%v(k1) 
                    enddo  
-          ! write(20,*) "$$$$$$$$$$$$$$",k,"$$$$$$$$$$$$$$$$$$$$"
+
 
                    do k1=1,xy%n
                     h%v(k1)=t%v(k1)+h%v(k1) 
@@ -9971,15 +10025,15 @@ prec=1.d-8
 !!!!!!!!!!!!!!!!!!!!! spin
 
   subroutine c_find_n0(s0,n0,linear) 
-!$general: manipulation & normal
-!$ This routine finds the invariant vector n0
-!$ if the rotation s0 of type c_spinmatrix.
-!$ If linear is true, only the constant part of 
-!$ s0 is used. Thus s0_constant =exp(theta n0.L) where n0 is a 
-!$ vector of length one. This is the n0 of the normal form.
-!$ If linear is false, then s0=exp(theta n0.L) but this is NOT
-!$ the invariant ISF n. See Sec.6.3.2. where I explained why this n0
-!$ cannot be the ISF vector n.
+!#general: manipulation & normal
+!# This routine finds the invariant vector n0
+!# if the rotation s0 of type c_spinmatrix.
+!# If linear is true, only the constant part of 
+!# s0 is used. Thus s0_constant =exp(theta n0.L) where n0 is a 
+!# vector of length one. This is the n0 of the normal form.
+!# If linear is false, then s0=exp(theta n0.L) but this is NOT
+!# the invariant ISF n. See Sec.6.3.2. where I explained why this n0
+!# cannot be the ISF vector n.
     implicit none
     type(c_spinmatrix),intent(inout) :: s0
     type(c_spinor), intent(inout) :: n0
@@ -10062,12 +10116,12 @@ prec=1.d-8
   end subroutine c_find_n0
 
   subroutine c_n0_to_nr(n0,nr)  
-!$general: manipulation & normal
-!$ Puts an vector n0 into the eigenoperators of L_y
-!$ nt%v(2)=n0%v(2)
-!$ nt%v(1)=n0%v(1)-i_*n0%v(3) ! coefficient of  1/2(L_x + i L_z) 
-!$ nt%v(3)=n0%v(1)+i_*n0%v(3) ! coefficient of  1/2(L_x - i L_z)
-!$ The inverse routine is c_nr_to_n0
+!#general: manipulation & normal
+!# Puts an vector n0 into the eigenoperators of L_y
+!# nt%v(2)=n0%v(2)
+!# nt%v(1)=n0%v(1)-i_*n0%v(3) ! coefficient of  1/2(L_x + i L_z) 
+!# nt%v(3)=n0%v(1)+i_*n0%v(3) ! coefficient of  1/2(L_x - i L_z)
+!# The inverse routine is c_nr_to_n0
 
     implicit none
     TYPE(c_spinor), INTENT(INout) :: n0,nr
@@ -10084,13 +10138,13 @@ prec=1.d-8
   end subroutine c_n0_to_nr
 
   subroutine c_nr_to_n0(nr,n0) 
-!$general: manipulation & normal
-!$ Puts an eigenoperators vector nr into the cartesian basis
-!$ (L_x,L_y,L_z).
-!$ nt%v(2)=nr%v(2)
-!$ nt%v(1)=(nr%v(1)+nr%v(3))/2.0_dp    ! coefficient of L_x 
-!$ nt%v(3)=i_*(nr%v(1)-nr%v(3))/2.0_dp ! coefficient of L_z
-!$ The inverse routine is c_n0_to_nr.
+!#general: manipulation & normal
+!# Puts an eigenoperators vector nr into the cartesian basis
+!# (L_x,L_y,L_z).
+!# nt%v(2)=nr%v(2)
+!# nt%v(1)=(nr%v(1)+nr%v(3))/2.0_dp    ! coefficient of L_x 
+!# nt%v(3)=i_*(nr%v(1)-nr%v(3))/2.0_dp ! coefficient of L_z
+!# The inverse routine is c_n0_to_nr.
     implicit none
     TYPE(c_spinor), INTENT(INout) :: n0,nr
     TYPE(c_spinor) nt
@@ -10106,13 +10160,13 @@ prec=1.d-8
   end subroutine c_nr_to_n0
 
   subroutine c_find_om_da(S,om,n) 
-!$restricted : normal
-!$ This routine finds om such that the c_spinmatrix S= exp(om.L).
-!$ However it does it in "n" steps if n is specified.
-!$ Otherwise it does it in no steps, no is the order of the complex
-!$ TPSA package. 
-!$ This routine works only if the matrix S does not have constant parts.
-!$ It is used in the normal form algorithm for the spin.
+!#restricted : normal
+!# This routine finds om such that the c_spinmatrix S= exp(om.L).
+!# However it does it in "n" steps if n is specified.
+!# Otherwise it does it in no steps, no is the order of the complex
+!# TPSA package. 
+!# This routine works only if the matrix S does not have constant parts.
+!# It is used in the normal form algorithm for the spin.
     implicit none
     TYPE(c_spinmatrix), INTENT(INout) :: S
     TYPE(c_spinor), INTENT(INout) :: om
@@ -10142,9 +10196,9 @@ prec=1.d-8
        c=-c
     enddo
 
-    om%v(1)=spin_def*h%s(3,2)
-    om%v(2)=spin_def*h%s(1,3)
-    om%v(3)=spin_def*h%s(2,1)
+    om%v(1)=spin_def_L*h%s(3,2)
+    om%v(2)=spin_def_L*h%s(1,3)
+    om%v(3)=spin_def_L*h%s(2,1)*spin_def_cor
 
     call kill(h)
     call kill(dh)
@@ -10153,10 +10207,10 @@ prec=1.d-8
   end subroutine c_find_om_da
 
   subroutine c_find_as(n2,a) 
-!$general : normal & manipulation
-!$ Find the c_spinmatrix "a" such that
-!$ e_y = (0,1,0)= a**(-1)*n0
-!$ because a*exp(theta n0.L)*a**(-1)= exp(theta (a*n0).L). See Sec.6.5.2.
+!#general : normal & manipulation
+!# Find the c_spinmatrix "a" such that
+!# e_y = (0,1,0)= a**(-1)*n0
+!# because a*exp(theta n0.L)*a**(-1)= exp(theta (a*n0).L). See Sec.6.5.2.
 
     implicit none
     type(c_spinor), intent(inout) ::  n2 
@@ -10242,9 +10296,9 @@ endif
   end subroutine c_find_as
 
   subroutine c_inv_as(m,mi)  
-!$internal : manipulation
-!$ Trivially inverts an O(3) rotation by taking the transpose.
-!$ mi=m**(-1)=m^t.
+!#internal : manipulation
+!# Trivially inverts an O(3) rotation by taking the transpose.
+!# mi=m**(-1)=m^t.
     implicit none
     integer i,j
     TYPE (c_spinmatrix), intent (inout):: m,mi
@@ -10271,9 +10325,9 @@ endif
 
 
   subroutine c_find_spin_angle(S,tune,radian)  
-!$restricted : normal
-!$ Find the tune of a spin rotation S
-!$ which is a rotation around the y-axis.
+!#restricted : normal
+!# Find the tune of a spin rotation S
+!# which is a rotation around the y-axis.
     implicit none
 
     TYPE (c_spinmatrix), intent (inout):: S
@@ -10285,7 +10339,7 @@ endif
       if(present(radian)) rad=radian
      tune=S%s(1,1)+i_*S%s(1,3)
 
-     tune=-i_*log(tune)*spin_def
+     tune=-i_*log(tune)*spin_def_L
 
      if(.not.rad) tune=tune/twopi
 
@@ -10374,12 +10428,12 @@ endif
       call c_ass_spinmatrix(c_spinor_spinmatrix)
       call alloc(dh)
 
-    dh%s(3,1)=-spin_def*h_axis%v(2)
-    dh%s(2,1)=spin_def*h_axis%v(3)
-    dh%s(1,3)=spin_def*h_axis%v(2)
-    dh%s(3,2)=spin_def*h_axis%v(1)
-    dh%s(1,2)=-spin_def*h_axis%v(3)
-    dh%s(2,3)=-spin_def*h_axis%v(1)
+    dh%s(3,1)=-spin_def_L*h_axis%v(2)
+    dh%s(2,1)=spin_def_L*h_axis%v(3)*spin_def_cor
+    dh%s(1,3)=spin_def_L*h_axis%v(2)
+    dh%s(3,2)=spin_def_L*h_axis%v(1)
+    dh%s(1,2)=-spin_def_L*h_axis%v(3)*spin_def_cor
+    dh%s(2,3)=-spin_def_L*h_axis%v(1)
     
 !    c_spinor_spinmatrix=dh*ds
 !    Lie operator order
@@ -10464,12 +10518,12 @@ endif
      c_exp_spinmatrix=1
   
     dh=0
-    dh%s(2,1)=spin_def*h_axis%v(3)
-    dh%s(1,3)=spin_def*h_axis%v(2)
-    dh%s(3,2)=spin_def*h_axis%v(1)
-    dh%s(1,2)=-spin_def*h_axis%v(3)
-    dh%s(3,1)=-spin_def*h_axis%v(2)
-    dh%s(2,3)=-spin_def*h_axis%v(1)
+    dh%s(2,1)=spin_def_L*h_axis%v(3)*spin_def_cor
+    dh%s(1,3)=spin_def_L*h_axis%v(2)
+    dh%s(3,2)=spin_def_L*h_axis%v(1)
+    dh%s(1,2)=-spin_def_L*h_axis%v(3)*spin_def_cor
+    dh%s(3,1)=-spin_def_L*h_axis%v(2)
+    dh%s(2,3)=-spin_def_L*h_axis%v(1)
 
     dhn=1
     c=1.0_dp
@@ -11488,15 +11542,15 @@ endif
  
 
 subroutine teng_edwards_a1(a1,R_TE,CS_TE,COSLIKE,t_e)
-!$general: normal
-!$ This is the famous Teng-Edwards factorisation 
-!$ a1= R_TE * CS_TE
-!$ If the flag t_e is false, then the factorisation failed.
-!$ This is NOT a global representation of a 4x4 symplectic matrix
-!$ and it fails for large coupling. 
-!$ The parameter coslike is true if the R_TE(1,1) entry of the matrix
-!$ is between -1 and 1. If it is "hyperbolic", then coslike is false.
-!$ I am not a big fan of this factorisation, but it works for small couplings.
+!#general: normal
+!# This is the famous Teng-Edwards factorisation 
+!# a1= R_TE * CS_TE
+!# If the flag t_e is false, then the factorisation failed.
+!# This is NOT a global representation of a 4x4 symplectic matrix
+!# and it fails for large coupling. 
+!# The parameter coslike is true if the R_TE(1,1) entry of the matrix
+!# is between -1 and 1. If it is "hyperbolic", then coslike is false.
+!# I am not a big fan of this factorisation, but it works for small couplings.
 
 
     implicit none
@@ -11939,8 +11993,8 @@ subroutine extract_linear_from_normalised(m,a1,phi1,f1,f2,integer_part)
 end subroutine extract_linear_from_normalised
 
 subroutine extract_a0(a,a0)
-!$internal: manipulation
-!$ This routines extracts a0: the full fixed point map.
+!#internal: manipulation
+!# This routines extracts a0: the full fixed point map.
     implicit none
     type(c_damap) , intent(inout) :: a,a0
  
@@ -12023,12 +12077,12 @@ end subroutine extract_a0
 
 
  subroutine extract_a1(a,a1,phi1)
-!$internal: manipulation
-!$ This routines extracts a1: the full linear canonical transformation.
-!$ Teng-Edward A_12=0 is imposed  or, for fun, Anti-Teng-Edwards A_21=0
-!$ based on the flag courant_snyder_teng_edwards (defaulted to true).
-!$ See Sec.7.4 of my Springer book. Phi1 is the phase advanced induced
-!$ by the choice of canonical transformation. Sec 2.4 gives a review in 1-d-f.
+!#internal: manipulation
+!# This routines extracts a1: the full linear canonical transformation.
+!# Teng-Edward A_12=0 is imposed  or, for fun, Anti-Teng-Edwards A_21=0
+!# based on the flag courant_snyder_teng_edwards (defaulted to true).
+!# See Sec.7.4 of my Springer book. Phi1 is the phase advanced induced
+!# by the choice of canonical transformation. Sec 2.4 gives a review in 1-d-f.
     implicit none
     type(c_damap) , intent(inout) :: a,a1
     type(c_damap),optional , intent(inout) :: phi1
@@ -12422,7 +12476,7 @@ end subroutine extract_a2
     endif
        if(present(tune)) then
         tune=0.0_dp
-        tune=spin_tune_def*spin_def*tune0%v(2)   ! in phasors
+        tune=spin_def_tune*spin_def_L*tune0%v(2)   ! in phasors
        endif
 
     call kill(n_expo)
@@ -12544,7 +12598,7 @@ end subroutine produce_orthogonal
 
 
        if(mod(k,kp)==0) then  ! kp
-          write(mff,*) k,"$$$$$$$$$$$$$$$$$$$$$$$$$"
+          write(mff,*) k,"#########################"
           do i=1,3
              norm=root(xst%s(1)%x(i)**2+xst%s(2)%x(i)**2+xst%s(3)%x(i)**2)
              if(norm>=0.0_dp) then
@@ -12802,6 +12856,28 @@ subroutine print_vector_field_fourier(s1,mf)
 
 end subroutine print_vector_field_fourier
 
+subroutine print_poisson_bracket_fourier(s1,mf)
+    implicit none
+    TYPE (c_vector_field_fourier), INTENT (INout) :: S1 
+    type(c_taylor) h
+    INTEGER I,mf
+    call alloc(h)
+     write(mf,*) 0,"th mode"
+!     call print(s1%f(0),mf)
+      h=cgetpb(s1%f(0))
+      call print(h,mf)
+    do i=1,n_fourier
+     write(mf,*) i,"th mode"
+      h=cgetpb(s1%f(i))
+      call print(h,mf)
+      h=cgetpb(s1%f(-i))
+      call print(h,mf)
+  !   call print(s1%f(i),mf)
+  !   call print(s1%f(-i),mf)
+    enddo
+    call kill(h)
+end subroutine print_poisson_bracket_fourier
+
 subroutine bra_vector_field_fourier(s1,s2,r)
     implicit none
     TYPE (c_vector_field_fourier), INTENT (INout) :: S1,s2,r
@@ -12892,7 +12968,6 @@ end subroutine mulc_vector_field_fourier
     enddo
 
   END SUBROUTINE c_evaluate_vector_field_fourier
-
 
   subroutine normalise_vector_field_fourier(H,F,K,F1)
     implicit none
@@ -13073,11 +13148,12 @@ end  subroutine normalise_vector_field_fourier
  
 end  subroutine normalise_vector_field_fourier_factored
 
-subroutine symplectify_for_sethna(m,ms,eps_and_norm)
+subroutine symplectify_for_sethna(m,ms,a1,a2,eps_and_norm)
 implicit none
 TYPE(c_damap),intent(inout):: m,ms
+TYPE(c_damap),optional,intent(inout):: a1,a2
 real(dp),optional:: eps_and_norm
-TYPE(c_damap) mt,l
+TYPE(c_damap) mt,l,b1,b2
 type(damap) mm
 type(c_vector_field) f,fs
 complex(dp) v
@@ -13091,9 +13167,18 @@ call c_get_indices(n,0)
 nv=n(4)
 nd2=n(3)
 
-call alloc(mt);call alloc(l); call alloc(f);call alloc(fs);
+call alloc(mt,l,b1,b2);call alloc(f);call alloc(fs);
 call alloc(mm);call alloc(t,dt)
 
+b1=1
+b2=1
+if(present(a1)) b1=a1
+if(present(a2)) then
+b2=a2
+else
+ b2=b1
+endif
+m=b2**(-1)*m*b1
 allocate(mat(m%n,m%n),matt(m%n,m%n),S(m%n,m%n),id(m%n,m%n))
 mat=0
 matt=0
@@ -13193,12 +13278,13 @@ do i=1,l%n
        
           normb=abs(m%v(i).sub.je)
           norm=abs(v)
-          if(norm>eps_and_norm) then
-          norma=norm/normb+norma
+  !        if(norm>eps_and_norm) then
+ !         norma=norm/normb+norma
+           norma=norm+norma
       !    write(16,*) je
       !    write(16,*) norma,norm,normb
           k=k+1
-          endif
+   !       endif
 
 
         enddo
@@ -13214,12 +13300,13 @@ endif
 ms=mt
 
 
-
+ms=b2*ms*b1**(-1)
+m=b2*m*b1**(-1)
 
 
 
 deallocate(je)
-call kill(mt);call kill(l); call kill(f);call kill(fs);
+call kill(mt,l,b1,b2); call kill(f);call kill(fs);
 call kill(mm);call kill(t,dt)
 
 end subroutine symplectify_for_sethna
@@ -13306,6 +13393,61 @@ call kill(f)
 call kill(dm)
 
 end subroutine nth_root
+
+!!!!!   stuff for arrays of nodes
+
+ subroutine alloc_node_array_tpsa(a)
+ implicit none
+ type(node_array), allocatable :: a(:)
+ integer i
+
+ do i=1,size(a)
+   call alloc(a(i)%f)
+   call alloc(a(i)%m)
+ enddo
+
+ end  subroutine alloc_node_array_tpsa
+
+ subroutine kill_node_array_tpsa(a)
+ implicit none
+ type(node_array), allocatable :: a(:)
+ integer i
+
+ do i=1,size(a)
+   call kill(a(i)%f)
+   call kill(a(i)%m)
+ enddo
+
+ end  subroutine kill_node_array_tpsa
+
+ subroutine kill_node_array(a)
+ implicit none
+ type(node_array), allocatable :: a(:)
+ integer i
+
+ do i=1,size(a)
+   deallocate(a(i)%pos,a(i)%f)
+   deallocate(a(i)%v,a(i)%vmax,a(i)%err,a(i)%s)
+ enddo
+
+ end  subroutine kill_node_array
+
+ subroutine alloc_node_array(a,n,m)
+ implicit none
+ type(node_array), allocatable :: a(:)
+ integer i,n,m
+
+ allocate(a(n))
+
+ do i=1,n
+   allocate(a(i)%pos,a(i)%f,a(i)%m)
+   allocate(a(i)%v,a(i)%vmax,a(i)%err,a(i)%s(m))
+   a(i)%s=0.0_dp
+   a(i)%v=0.0_dp;a(i)%vmax=1.d38;
+   a(i)%pos=0
+ enddo
+
+ end  subroutine alloc_node_array
 
 
   END MODULE  c_tpsa

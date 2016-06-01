@@ -8,7 +8,7 @@ module Mad_like
   IMPLICIT NONE
   public
 
-  private QUADTILT, SOLTILT, EL_Q,EL_0,arbitrary_tilt
+  private QUADTILT, SOLTILT, EL_Q,EL_0,pancake_tilt
   private drft,r_r !,rot,mark
   PRIVATE SEXTTILT,OCTUTILT
   private HKICKTILT,VKICKTILT,GKICKTILT
@@ -32,11 +32,11 @@ module Mad_like
   logical(lp),TARGET ::FIBRE_flip=.true.
   !  logical(lp) :: FIBRE_SURVEY=.true.
   INTEGER,TARGET ::FIBRE_DIR=1
-  real(dp),TARGET ::INITIAL_CHARGE=1
+
   real(dp),PRIVATE::ENERGY,P0C,BRHO,KINETIC,gamma0I,gamBET,beta0,MC2
 
   !real(dp),PRIVATE::TOTAL_EPS
-  character(80) file_fitted
+  !character(80) file_fitted
   !  type(layout),save::mad_list
   type(layout),target, private::mad_list
   LOGICAL(LP) :: CURVED_ELEMENT=.FALSE.  !  TO SET UP BEND_FRINGE CORRECTLY FOR EXACT
@@ -48,7 +48,10 @@ module Mad_like
   integer :: symplectic_order = 0
   REAL(DP) :: symplectic_eps = -1.0_dp
   REAL(DP)  MAD_TREE_LD , MAD_TREE_ANGLE
-  type(tree_element), private, allocatable :: t_e(:),t_ax(:),t_ay(:)
+  type(tree_element), private, allocatable :: t_e(:) !,t_ax(:),t_ay(:)
+
+  real(dp), private ::  angc,xc,dc,hc,LC
+   character(vp) , private :: filec
   logical(lp) :: set_ap=my_false
   TYPE EL_LIST
      real(dp) L,LD,LC,K(NMAX),KS(NMAX)
@@ -69,6 +72,7 @@ module Mad_like
      INTEGER APERTURE_KIND
      REAL(DP) APERTURE_R(2),APERTURE_X,APERTURE_Y
      LOGICAL(LP) KILL_ENT_FRINGE,KILL_EXI_FRINGE,BEND_FRINGE
+     LOGICAL(LP) KILL_ENT_SPIN,KILL_EXI_SPIN
      integer PERMFRINGE,highest_fringe
      REAL(DP) DPHAS,PSI,dvds
      logical(lp) usethin
@@ -334,8 +338,8 @@ module Mad_like
 
 
 
-  INTERFACE arbitrary
-     MODULE PROCEDURE arbitrary_tilt
+  INTERFACE pancake
+     MODULE PROCEDURE pancake_tilt
   end  INTERFACE
 
   !  Taylor map
@@ -707,6 +711,8 @@ CONTAINS
        S2%APERTURE_Y=absolute_aperture
        s2%KILL_ENT_FRINGE=my_false
        s2%KILL_EXI_FRINGE=my_false
+       s2%KILL_ENT_SPIN=my_false
+       s2%KILL_EXI_SPIN=my_false
        s2%BEND_FRINGE=my_false
        s2%PERMFRINGE=0
        s2%highest_fringe=highest_fringe
@@ -1946,6 +1952,8 @@ CONTAINS
        rectaETILT%APERTURE_Y=list%APERTURE_Y
        rectaETILT%KILL_ENT_FRINGE=list%KILL_ENT_FRINGE
        rectaETILT%KILL_EXI_FRINGE=list%KILL_EXI_FRINGE
+       rectaETILT%KILL_ENT_SPIN=list%KILL_ENT_SPIN
+       rectaETILT%KILL_EXI_SPIN=list%KILL_EXI_SPIN
        rectaETILT%BEND_FRINGE=list%BEND_FRINGE
        rectaETILT%PERMFRINGE=list%PERMFRINGE
        rectaETILT%highest_fringe=list%highest_fringe
@@ -2726,6 +2734,8 @@ CONTAINS
     S2%p%highest_fringe=S1%highest_fringe
     S2%P%KILL_EXI_FRINGE=S1%KILL_EXI_FRINGE
     S2%P%KILL_ENT_FRINGE=S1%KILL_ENT_FRINGE
+    S2%P%KILL_EXI_SPIN=S1%KILL_EXI_SPIN
+    S2%P%KILL_ENT_SPIN=S1%KILL_ENT_SPIN
     !    S2%P%BEND_FRINGE=S1%BEND_FRINGE    ! SET ON THE BASIS OF B0
 
     DO I=1,S2%P%NMUL
@@ -2836,7 +2846,12 @@ CONTAINS
     else
        CALL SETFAMILY(S2,t=T_E)  !,T_ax=T_ax,T_ay=T_ay)
        S2%P%METHOD=4
-       deallocate(T_E,t_ax,t_ay)
+       s2%pa%angc=angc
+       s2%pa%xc=xc
+       s2%pa%dc=dc
+       s2%pa%hc=hc
+       s2%vorname=filec
+       deallocate(T_E)
     endif
 
     IF(S2%KIND==KIND4) THEN
@@ -3303,15 +3318,11 @@ CONTAINS
     PROTON=.NOT.ELECTRON
     cl=(clight/1e8_dp)
     CU=55.0_dp/24.0_dp/SQRT(3.0_dp)
-    w_p=0
-    w_p%nc=8
-    w_p%fc='(7((1X,A72,/)),1X,A72)'
+
     if(electron) then
        XMC2=muon*pmae
-       w_p%c(1)=" This is an electron "
     elseif(proton) then
        XMC2=pmap
-       w_p%c(2)=" This is a proton! "
     endif
     if(energy<0) then
        energy=-energy
@@ -3330,14 +3341,6 @@ CONTAINS
     if(beta0<0) then
        beta0=-beta0
        p0c=(1.0_dp-beta0**2)
-       if(p0c<=0.0_dp) then
-          w_p=0
-          w_p%nc=2
-          w_p%fc='(((1X,A72,/)),1X,A72)'
-          write(w_p%c(1),'(a9,1x,g21.14)') " Beta0 = ",beta0
-          w_p%c(2) ="Beta0 is too close to 1 "
-          ! call !write_e(-567)
-       endif
        p0c=xmc2*beta0/SQRT(p0c)
     endif
     if(p0c<0) p0c=-p0c
@@ -3347,18 +3350,13 @@ CONTAINS
     beta0=SQRT(KINETIC**2+2.0_dp*KINETIC*XMC2)/erg
     beta0i=1.0_dp/beta0
     GAMMA=erg/XMC2
-    write(W_P%C(2),'(A16,g21.14)') ' Kinetic Energy ',kinetic
-    write(W_P%C(3),'(A7,g21.14)') ' gamma ',gamma
-    write(W_P%C(4),'(A7,g21.14)')' beta0 ',BETa0
+
     CON=3.0_dp*CU*CGAM*HBC/2.0_dp*TWOPII/XMC2**3
     CRAD=CGAM*TWOPII   !*ERG**3
     CFLUC=CON  !*ERG**5
     GAMMA2=erg**2/XMC2**2
     BRHO=SQRT(ERG**2-XMC2**2)*10.0_dp/cl
-    write(W_P%C(5),'(A7,g21.14)') ' p0c = ',p0c
-    write(W_P%C(6),'(A9,g21.14)')' GAMMA = ',SQRT(GAMMA2)
-    write(W_P%C(7),'(A8,g21.14)')' BRHO = ',brho
-    write(W_P%C(8),'(A15,G21.14,1X,g21.14)')"CRAD AND CFLUC ", crad ,CFLUC
+
     ! call ! WRITE_I
     !END OF SET RADIATION STUFF  AND TIME OF FLIGHT SUFF
 
@@ -3369,68 +3367,82 @@ CONTAINS
 
 
 
-  FUNCTION  arbitrary_tilt(NAME,file,T,no)
+  FUNCTION  pancake_tilt(NAME,file,no,T)
     implicit none
-    type (EL_LIST) arbitrary_tilt
+    type (EL_LIST) pancake_tilt
     CHARACTER(*), INTENT(IN):: NAME,file
     type (TILTING),optional, INTENT(IN):: T
-    real(dp) L,ANGLE,HC
-    integer mf,nst,I,ORDER
+    real(dp) L,ANGLE,HD,LD
+    integer mf,nst,I,ORDER,ii
     integer, optional :: no
     LOGICAL(LP) REPEAT
-    TYPE(TAYLOR) B(3),ax(2),ay(2)
+    TYPE(TAYLOR) B(3)  !,ax(2),ay(2)
 
-    file_fitted=file
-    arbitrary_tilt=0
+   ! file_fitted=file
+    pancake_tilt=0
+    if(len(file)<=vp) then
+     filec=file
+    else
+     filec=file(1:vp)
+     write(6,*) "warning: pancake name too long for length storage ", vp
+    endif
 
     call kanalnummer(mf)
-    open(unit=mf,file=file_fitted)
-    read(mf,*) nst,L,hc, ORDER,REPEAT
+    open(unit=mf,file=file)
+    read(mf,*) LD,hD, ORDER,REPEAT   ! L and Hc are geometric
+    read(mf,*) nst,LC,angc 
+    read(mf,*) dc,xc,hc
+      ! s2%pa%angc=angc
+      ! s2%pa%xc=xc
+      ! s2%pa%dc=dc
+      ! s2%pa%h=h
     if(present(no)) order=no
     CALL INIT(ORDER,2)
     CALL ALLOC(B)
-    CALL ALLOC(ax)
-    CALL ALLOC(ay)
+  !  CALL ALLOC(ax)
+   ! CALL ALLOC(ay)
 
     IF(REPEAT.AND.NST==0) NST=NSTD
 
-    ALLOCATE(T_E(NST),T_ax(NST),T_ay(NST))
+    ALLOCATE(T_E(NST))  !,T_ax(NST),T_ay(NST))
 
     DO I=1,NST
+    read(mf,*) ii 
+ 
        IF(I==1.or.(.not.repeat)) THEN
           CALL READ(B(1),mf);CALL READ(B(2),mf);CALL READ(B(3),mf);
           !          CALL READ(Ax(1),mf);CALL READ(Ay(1),mf);CALL READ(Ax(2),mf);CALL READ(Ay(2),mf);
           B(1)=B(1)/BRHO
           B(2)=B(2)/BRHO
           B(3)=B(3)/BRHO
-          Ax(1)=Ax(1)/BRHO
-          Ax(2)=Ax(2)/BRHO
-          Ay(1)=Ay(1)/BRHO
-          Ay(2)=Ay(2)/BRHO
+         ! Ax(1)=Ax(1)/BRHO
+         ! Ax(2)=Ax(2)/BRHO
+         ! Ay(1)=Ay(1)/BRHO
+         ! Ay(2)=Ay(2)/BRHO
        ENDIF
        CALL SET_TREE_g(T_E(i),B)
        !       CALL SET_TREE_g(T_ax(i),ax)
        !       CALL SET_TREE_g(T_ay(i),ay)
     enddo
     call KILL(B)
-    CALL KILL(ax)
-    CALL KILL(ay)
+  !  CALL KILL(ax)
+  !  CALL KILL(ay)
 
     close(MF)
 
 
-    ANGLE=L*HC
+    ANGLE=LD*HD
 
 
     !    IF(ANG/=zero.AND.R/=zero) THEN
     if(hc/=0.0_dp) then
-       arbitrary_tilt%LC=2.0_dp*SIN(ANGLE/2.0_dp)/hc
+       pancake_tilt%LC=2.0_dp*SIN(ANGLE/2.0_dp)/hD
     else
-       arbitrary_tilt%LC=L
+       pancake_tilt%LC=LD
     endif
-    arbitrary_tilt%B0=hc                     !COS(ANG/two)/R
-    arbitrary_tilt%LD=L
-    arbitrary_tilt%L=arbitrary_tilt%LD
+    pancake_tilt%B0=hD                     !COS(ANG/two)/R
+    pancake_tilt%LD=LD
+    pancake_tilt%L=lc
 
     IF(LEN(NAME)>nlp) THEN
        w_p=0
@@ -3439,25 +3451,25 @@ CONTAINS
        w_p%c(1)=name
        WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
-       arbitrary_tilt%NAME=NAME(1:16)
+       pancake_tilt%NAME=NAME(1:nlp)
     ELSE
-       arbitrary_tilt%NAME=NAME
+       pancake_tilt%NAME=NAME
     ENDIF
-
+    
     IF(NST<3.OR.MOD(NST,2)/=1) THEN
-       WRITE(6,*) "NUMBER OF SLICES IN 'arbitrary'  MUST BE ODD AND >= 3 ",NST
+       WRITE(6,*) "NUMBER OF SLICES IN 'pancake'  MUST BE ODD AND >= 3 ",NST
        STOP 101
     ENDIF
-    arbitrary_tilt%nst=(NST-1)/2
-    arbitrary_tilt%KIND=KINDPA
+    pancake_tilt%nst=(NST-1)/2
+    pancake_tilt%KIND=KINDPA
     IF(PRESENT(t)) then
        IF(T%NATURAL) THEN
-          arbitrary_tilt%tilt=t%tilt(1)
+          pancake_tilt%tilt=t%tilt(1)
        ELSE
-          arbitrary_tilt%tilt=t%tilt(0)
+          pancake_tilt%tilt=t%tilt(0)
        ENDIF
     ENDIF
-  END FUNCTION arbitrary_tilt
+  END FUNCTION pancake_tilt
   ! linked
 
 

@@ -1146,19 +1146,19 @@ contains
 
 
 
-  SUBROUTINE  DAPRINTonelie(S1,MFILE,DEPS)
+  SUBROUTINE  DAPRINTonelie(S1,MFILE,PREC)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (ONELIEEXPONENT),INTENT(IN)::S1
-    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
+    REAL(DP),OPTIONAL,INTENT(INOUT)::PREC
 
     write(mfile,*) s1%eps, " Convergence Test Number"
     !do i=1,nd2
     !write(mfile,*) s1%constant(i)
     !enddo
 
-    CALL DAPRINT(s1%VECTOR,MFILE,DEPS)
-    CALL DAPRINT(s1%pb,MFILE,DEPS)
+    CALL DAPRINT(s1%VECTOR,MFILE,PREC)
+    CALL DAPRINT(s1%pb,MFILE,PREC)
 
   END SUBROUTINE DAPRINTonelie
 
@@ -1178,13 +1178,13 @@ contains
   END SUBROUTINE DAreadonelie
 
 
-  SUBROUTINE  DAPRINTvecres(S1,MFILE,DEPS)
+  SUBROUTINE  DAPRINTvecres(S1,MFILE,PREC)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (vecresonance),INTENT(IN)::S1
-    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
-    CALL DAPRINT(s1%cos,MFILE,DEPS)
-    CALL DAPRINT(s1%sin,MFILE,DEPS)
+    REAL(DP),OPTIONAL,INTENT(INOUT)::PREC
+    CALL DAPRINT(s1%cos,MFILE,PREC)
+    CALL DAPRINT(s1%sin,MFILE,PREC)
 
   END SUBROUTINE DAPRINTvecres
 
@@ -1197,17 +1197,17 @@ contains
 
   END SUBROUTINE DAreadvecres
 
-  SUBROUTINE  DAPRINTdf(S1,MFILE,DEPS)
+  SUBROUTINE  DAPRINTdf(S1,MFILE,PREC)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (dragtfinn),INTENT(IN)::S1
-    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
+    REAL(DP),OPTIONAL,INTENT(INOUT)::PREC
     integer i
     do i=1,nd2
        write(mfile,*) s1%constant(i)
     enddo
-    CALL DAPRINT(s1%linear,MFILE,DEPS)
-    CALL DAPRINT(s1%nonlinear,MFILE,DEPS)
+    CALL DAPRINT(s1%linear,MFILE,PREC)
+    CALL DAPRINT(s1%nonlinear,MFILE,PREC)
 
   END SUBROUTINE DAPRINTdf
 
@@ -1224,17 +1224,17 @@ contains
 
   END SUBROUTINE dareaddf
 
-  SUBROUTINE  DAPRINTrevdf(S1,MFILE,DEPS)
+  SUBROUTINE  DAPRINTrevdf(S1,MFILE,PREC)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (reversedragtfinn),INTENT(inout)::S1
-    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
+    REAL(DP),OPTIONAL,INTENT(INOUT)::PREC
     integer i
     do i=1,nd2
        write(mfile,*) s1%constant(i)
     enddo
-    CALL DAPRINT(s1%linear,MFILE,DEPS)
-    CALL DAPRINT(s1%nonlinear,MFILE,DEPS)
+    CALL DAPRINT(s1%linear,MFILE,PREC)
+    CALL DAPRINT(s1%nonlinear,MFILE,PREC)
 
   END SUBROUTINE DAPRINTrevdf
 
@@ -1251,13 +1251,13 @@ contains
 
   END SUBROUTINE DAreadrevdf
 
-  SUBROUTINE  DAPRINTpbres(S1,MFILE,DEPS)
+  SUBROUTINE  DAPRINTpbres(S1,MFILE,PREC)
     implicit none
     INTEGER,INTENT(IN)::MFILE
     type (pbresonance),INTENT(IN)::S1
-    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
-    CALL DAPRINT(s1%cos,MFILE,DEPS)
-    CALL DAPRINT(s1%sin,MFILE,DEPS)
+    REAL(DP),OPTIONAL,INTENT(INOUT)::PREC
+    CALL DAPRINT(s1%cos,MFILE,PREC)
+    CALL DAPRINT(s1%sin,MFILE,PREC)
 
   END SUBROUTINE DAPRINTpbres
 

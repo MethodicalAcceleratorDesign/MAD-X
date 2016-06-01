@@ -1525,14 +1525,14 @@ contains
     if(present(s10))call KILL(s10)
   END SUBROUTINE K_opt
 
-  SUBROUTINE  printcomplex(S2,i,deps)
+  SUBROUTINE  printcomplex(S2,i,PREC)
     implicit none
     type (complextaylor),INTENT(INOUT)::S2
     integer i
-    REAL(DP),OPTIONAL,INTENT(INOUT)::DEPS
+    REAL(DP),OPTIONAL,INTENT(INOUT)::PREC
 
-    call daprint(s2%r,i,deps)
-    call daprint(s2%i,i,deps)
+    call daprint(s2%r,i,PREC)
+    call daprint(s2%i,i,PREC)
   END SUBROUTINE printcomplex
 
   SUBROUTINE  inputcomplex(S2,i)
