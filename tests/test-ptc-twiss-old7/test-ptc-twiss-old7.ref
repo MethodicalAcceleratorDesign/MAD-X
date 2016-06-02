@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.07  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.09.24               +
-  + Execution date: 2015.09.23 20:54:38      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.06.02 17:57:59      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
@@ -243,9 +243,9 @@ parameter: ddpx   double value:                  0
 parameter: ddy   double value:                  0
 parameter: ddpy   double value:                  0
 parameter: r11   double value:                 -0
-parameter: r12   double value:                  0
+parameter: r12   double value:                 -0
 parameter: r21   double value:                 -0
-parameter: r22   double value:                  0
+parameter: r22   double value:                 -0
 parameter: energy   double value:                100
 
 
@@ -321,13 +321,13 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,summary_file=twiss_ptc_summar
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-             534.6    0.0004430990925   -0.0001937066866           -1000000 
+             534.6    0.0004430990797    -0.000193706725           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000    0.0003550636492        47.50612091       0.2546759882 
+          -1000000    0.0003550636364        47.50612159       0.2546759882 
 
                 q2                dq1                dq2                 qs 
-      0.2546749559         1.05106564        1.046759439                  0 
+       0.254674956         1.05106564        1.046759439                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        32.03433146        177.7089538        32.03308004        177.7231017 
@@ -351,25 +351,25 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,summary_file=twiss_ptc_summar
      -0.0296661037      0.02965905227                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    0.0003260715893 
+                 0                  0                  0    0.0003260716069 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.596346259e-06                  0                  0                  0 
+   2.596346496e-06                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    0.0002136648529                  0    3.396649391e-06 
+                -0    0.0002136648539                  0    3.396649362e-06 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    0.0003315824884 
+                 0                  0                  0    0.0003315824915 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0     5.31027193e-06                  0                  0 
+                 0     5.31027159e-06                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -0.0001525456102                  0   -6.256318806e-06 
+                 0    -0.000152545601                  0   -6.256318909e-06 
 
            pycomin             tcomin            ptcomin 
-                 0                  0                  0 
+                 0                 -0                  0 
 ptc_twiss,closed_orbit,icase=5,slice_magnets,file=twiss_ptc_ring_slices,no=4;
 
  ************ State Summary ****************
@@ -377,7 +377,7 @@ ptc_twiss,closed_orbit,icase=5,slice_magnets,file=twiss_ptc_ring_slices,no=4;
   Rectangular Bend: input arc length (rho alpha) 
   Default integration method     6
   Default integration steps     10
- This is a proton 
+ This is a proton
        EXACT_MODEL =  TRUE 
        TOTALPATH   =     0
        RADIATION   =  FALSE
@@ -398,19 +398,19 @@ ptc_twiss,closed_orbit,icase=5,slice_magnets,file=twiss_ptc_ring_slices,no=4;
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-             534.6    0.0004430990925   -0.0001937066866           -1000000 
+             534.6    0.0004430990797    -0.000193706725           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000    0.0003550636492        47.50612091       0.2546759882 
+          -1000000    0.0003550636364        47.50612159       0.2546759882 
 
                 q2                dq1                dq2                 qs 
-      0.2546749559         1.05106564        1.046759439                  0 
+       0.254674956         1.05106564        1.046759439                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-       31.29632881        181.4719986         31.2954739        181.4881854 
+       31.29632882        181.4719986         31.2954739        181.4881854 
 
          beta11min          beta11max          beta12min          beta12max 
-       31.29632881        181.4719986                  0                  0 
+       31.29632882        181.4719986                  0                  0 
 
          beta13min          beta13max          beta21min          beta21max 
                  0                  0                  0                  0 
@@ -428,25 +428,25 @@ ptc_twiss,closed_orbit,icase=5,slice_magnets,file=twiss_ptc_ring_slices,no=4;
      -0.0296661037      0.02965905227                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    0.0003260715893 
+                 0                  0                  0    0.0003260716069 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.596346259e-06                  0                  0                  0 
+   2.596346496e-06                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    0.0002072674697                  0    3.347072503e-06 
+                -0    0.0002072674695                  0    3.347072467e-06 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    0.0003328421417 
+                 0                  0                  0    0.0003328421449 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0     5.31027193e-06                  0                  0 
+                 0     5.31027159e-06                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -0.0001525583756                  0   -6.256318806e-06 
+                 0   -0.0001525583663                  0   -6.256318909e-06 
 
            pycomin             tcomin            ptcomin 
-                 0                  0                  0 
+                 0                 -0                  0 
 
 
 PTC_NORMAL,closed_orbit,maptable,icase=5,no=4;
@@ -456,7 +456,7 @@ PTC_NORMAL,closed_orbit,maptable,icase=5,no=4;
   Rectangular Bend: input arc length (rho alpha) 
   Default integration method     6
   Default integration steps     10
- This is a proton 
+ This is a proton
        EXACT_MODEL =  TRUE 
        TOTALPATH   =     0
        RADIATION   =  FALSE
@@ -523,7 +523,7 @@ call, file = "../share/line_lattice/line.seq";
   Rectangular Bend: input arc length (rho alpha) 
   Default integration method     6
   Default integration steps      5
- This is an electron (positron actually if charge=1) 
+ This is a proton
        EXACT_MODEL =  TRUE 
        TOTALPATH   =     0
        RADIATION   =  FALSE
@@ -570,31 +570,31 @@ call, file = "../share/line_lattice/line.seq";
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0                  0        2.176577175 
+                 0                  0                  0        2.176592103 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.0296661037      0.02965091569   -0.0003758523224    0.0004199605323 
+     -0.0296661037      0.02965103639   -0.0003758557619    0.0004199633836 
 
           disp4min           disp4max             deltap            orbit_x 
-  -8.877942902e-06    6.666894789e-06                  0    8.897806712e-05 
+  -8.878003535e-06    6.666922432e-06                  0    8.897806712e-05 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
    7.283918353e-07    5.216050332e-05   -6.748041063e-07                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    7.160177351e-05    6.445516048e-05     8.58579163e-07 
+                -0    7.160177351e-05    6.445516048e-05     8.58579163e-07 
 
            pycorms             tcorms            ptcorms             xcomax 
    1.291700295e-06                  0                  0    8.897806712e-05 
 
             ycomax            pxcomax            pycomax             tcomax 
-   8.888674758e-05    7.288762409e-07    1.668353298e-06                  0 
+   8.888674758e-05    7.288762409e-07    1.668353298e-06                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
                  0    5.216764517e-05   -8.789652925e-05   -1.675547184e-06 
 
            pycomin             tcomin            ptcomin 
-  -1.674289292e-06                  0                  0 
+  -1.674289292e-06                 -0                  0 
 
   Number of warnings: 0
 
