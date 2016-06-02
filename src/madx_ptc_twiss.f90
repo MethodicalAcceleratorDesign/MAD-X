@@ -2905,6 +2905,7 @@ contains
       
       !call daprint(theNormalForm%dhdj,6) 
 
+      gamma_tr = zero
       
       if ( (icase.gt.4)  .and. (default%time) ) then
          
@@ -2924,7 +2925,7 @@ contains
 
          eta_c = -sd * betaRelativistic**2 / suml 
          alpha_c = one / gammaRelativistic**2 + eta_c
-         gamma_tr = one / sqrt(alpha_c) 
+         
 
          !print*,'eta_c',eta_c,' gamma_tr=',gamma_tr
 
@@ -2943,7 +2944,6 @@ contains
          !print*,'sd(f)',sd
          alpha_c = sd/suml
          eta_c = alpha_c - one / gammaRelativistic**2
-         gamma_tr = one / sqrt(alpha_c)
          
       elseif( (icase.eq.56)  .and. (default%time .eqv. .false.) ) then
 
@@ -2959,7 +2959,6 @@ contains
          
          !write(0,*) 'for yy, c_%nd2 is ',c_%nd2 ! 0 is stderr
          alpha_c    = (yy%v(6).sub.'000010')/suml
-         gamma_tr = one / sqrt(alpha_c)! overwrite the value obtained from the Twiss formula
          eta_c = alpha_c - one / gammaRelativistic**2
 
          alpha_c_p  = 2.0*(yy%v(6).sub.'000020')/suml
@@ -2975,6 +2974,10 @@ contains
 
          call kill(yy)
 
+      endif
+
+      if (alpha_c .gt. zero) then
+        gamma_tr = one / sqrt(alpha_c)
       endif
       
      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

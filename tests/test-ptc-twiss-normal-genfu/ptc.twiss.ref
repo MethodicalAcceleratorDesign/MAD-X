@@ -22,7 +22,7 @@
 @ ALPHA_C_P2       %le            -1000000
 @ ALPHA_C_P3       %le            -1000000
 @ ETA_C            %le    -2.083679233e-08
-@ GAMMA_TR         %le                -nan
+@ GAMMA_TR         %le                   0
 @ Q1               %le        0.3631575976
 @ Q2               %le        0.3363625015
 @ DQ1              %le       -0.3603189292
@@ -85,7 +85,7 @@
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.02.10 Linux 64"
 @ DATE             %08s "02/06/16"
-@ TIME             %08s "12.33.35"
+@ TIME             %08s "15.56.49"
 * NAME                                S             ENERGY             BETA11             BETA22             BETA33             ALFA11             ALFA22                MU1                MU2                MU3              DISP1              DISP2               RE11               RE12               RE13               RE14               RE15               RE16               RE21               RE22               RE23               RE24               RE25               RE26               RE31               RE32               RE33               RE34               RE35               RE36               RE41               RE42               RE43               RE44               RE45               RE46               RE51               RE52               RE53               RE54               RE55               RE56               RE61               RE62               RE63               RE64               RE65               RE66 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "MYLINE$START"                       0               6500        5.101393279        3.242693402                  0       -1.307466217       0.8458101331                  0                  0                  0                  0                  0                  1                  0                  0                  0                  0                  0                  0                  1                  0                  0                  0                  0                  0                  0                  1                  0                  0                  0                  0                  0                  0                  1                  0                  0                  0                  0                  0                  0                  0                  0                  0                  0                  0                  0                  0                  1

@@ -3,7 +3,7 @@
   +     MAD-X 5.02.10  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2016.04.23               +
-  + Execution date: 2016.06.02 12:33:35      +
+  + Execution date: 2016.06.02 15:56:49      +
   ++++++++++++++++++++++++++++++++++++++++++++
 mydrift: drift, l=1;
 
@@ -159,7 +159,7 @@ obs_points pro_ptc_setswitch Done
               8.81   -1.031551902e-15    -6.25103774e-08           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000   -2.083679233e-08               -nan       0.3631575976 
+          -1000000   -2.083679233e-08                  0       0.3631575976 
 
                 q2                dq1                dq2                 qs 
       0.3363625015      -0.3603189292      -0.3583420444                  0 
