@@ -78,8 +78,8 @@
 @ YCOMAX           %le      0.008056958782
 @ PYCOMIN          %le    -0.0003912272041
 @ PYCOMAX          %le     0.0004558719032
-@ TCOMIN           %le    -1.067997988e-05
-@ TCOMAX           %le     1.013617463e-05
+@ TCOMIN           %le    -1.013617463e-05
+@ TCOMAX           %le     1.067997988e-05
 @ PTCOMIN          %le                   0
 @ PTCOMAX          %le                   0
 @ TITLE            %58s "LHC Version 6.503 -  July 2009 - version with RCOLLIMATORs"

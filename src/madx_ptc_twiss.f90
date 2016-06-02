@@ -142,7 +142,6 @@ contains
     type(damap)  :: amap 
     real(dp)  :: amatrix(6,6)
     real(dp) ::amatrix_inv(6,6),Ha(6,6,3)
-    integer Ia(6,6,3)
     integer i
     ! H based dispersion as in Chao-Sands paper
     
@@ -2853,20 +2852,29 @@ contains
         call print(theNormalForm%a1,mf)
         close(mf)
 
-         ! according to h_definition.f90: type normalform contains A1 as dispersion
-         ! (would need to go through DHDJ to get the tune...)
       endif
-      ! first order dispersions !?
-      ! (at least checked that these values match those computed in twiss.F)
+
       !skowron: old ptc
       !print*, "Cplx dispersion A1(1,5)", theNormalForm%A1%v(1).sub.'000010'
       
-      dispersion(1) = real(theNormalForm%A_t%v(1).sub.'000010')
-      dispersion(2) = real(theNormalForm%A_t%v(2).sub.'000010')
-      dispersion(3) = real(theNormalForm%A_t%v(3).sub.'000010')
-      dispersion(4) = real(theNormalForm%A_t%v(4).sub.'000010')
+
+      if( (c_%npara==5)       .or.  (c_%ndpt/=0)  ) then
+         !when there is no cavity it gives us dispersions
+         dispersion(1) = real(theNormalForm%A_t%v(1).sub.'000010')
+         dispersion(2) = real(theNormalForm%A_t%v(2).sub.'000010')
+         dispersion(3) = real(theNormalForm%A_t%v(3).sub.'000010')
+         dispersion(4) = real(theNormalForm%A_t%v(4).sub.'000010')
+      elseif (c_%nd2 == 6) then
+        !faster to use the A_script then normal form
+        ! because the normal form A_t must be canonised to C-S and moved from cmplx to real_8
+        call dispesion6D(theAscript,dispersion)
+        
+      else
+         do i=1,4
+            dispersion(i)=zero
+         enddo
+      endif
       
-      !print*, "Dispersion: ", dispersion
       
       if (debugFiles .eq. 1) then
          do i=1,4
@@ -2908,7 +2916,7 @@ contains
          sd = -1.0*(oneTurnMap%x(6).sub.fo(5,:)) ! 5/6 swap MADX/PTC
          !print*,'sd(0)',sd
          do i=1,4
-            !print*, 'Disp',i,'=', dispersion(i)
+            !print*, 'Disp',i,'=', dispersion(i), ' oneTurnMap%x(6).sub.fo(i,:) = ', oneTurnMap%x(6).sub.fo(i,:)
             sd = sd - (oneTurnMap%x(6).sub.fo(i,:))*dispersion(i)
             !print*,'sd(',i,')',sd
          enddo
@@ -2918,6 +2926,8 @@ contains
          alpha_c = one / gammaRelativistic**2 + eta_c
          gamma_tr = one / sqrt(alpha_c) 
 
+         !print*,'eta_c',eta_c,' gamma_tr=',gamma_tr
+
       elseif( (icase.eq.5)  .and. (default%time .eqv. .false.) ) then
 
          ! Here R56 is dL/ddelta 
@@ -2926,9 +2936,9 @@ contains
          sd = +1.0*(oneTurnMap%x(6).sub.fo(5,:)) ! 5/6 swap MADX/PTC
          !print*,'sd(0)',sd
          do i=1,4
-           ! print*, 'Disp',i,'=', dispersion(i)
+            !print*, 'Disp',i,'=', dispersion(i)
             sd = sd + (oneTurnMap%x(6).sub.fo(i,:))*dispersion(i)
-           ! print*,'sd(',i,')',sd
+            !print*,'sd(',i,')',sd
          enddo
          !print*,'sd(f)',sd
          alpha_c = sd/suml

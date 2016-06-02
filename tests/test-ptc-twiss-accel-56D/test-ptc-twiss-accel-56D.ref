@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.08  (64 bit, Linux)       +
+  +     MAD-X 5.02.10  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.11.20               +
-  + Execution date: 2016.02.12 18:14:15      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.06.02 12:32:54      +
   ++++++++++++++++++++++++++++++++++++++++++++
 PTCNSTEPS=3;
 
@@ -74,20 +74,20 @@ ptc_create_universe;
                 Momentum : 0.199999E+00
   recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
-     energy          0.200000000000000     
+     energy          0.20000000000000001     
      method                   6
      Num. of steps            3
-     charge           1.00000000000000     
-  Length of machine:    1.20000000000000     
+     charge           1.0000000000000000     
+  Length of machine:    1.2000000000000002     
  The machine is a LINE
  Total NST due to Bend Closed Orbit            0
  Total NST due to Sextupoles            0
- Biggest ds   5.000000000000000E-002
+ Biggest ds    5.0000000000000003E-002
  ------------------------------------ PTC Survey ------------------------------------
- Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
- After    end:   0.000000000000000E+000  0.000000000000000E+000   1.20000000000000     
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        1.2000000000000002     
    ptc_setswitch, debuglevel=0, nocavity=false, 
 
                   maxacceleration=true, fringe=true, exact_mis=true, time=true, totalpath=true;
@@ -137,10 +137,10 @@ ptc_create_universe;
                  0                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0                  0                  0                  0 
+                -0                  0                  0                  0 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0       0.8717825051    1.678494472e-16                  0 
+                 0       0.8717825051                  0                  0 
 
             ycomax            pxcomax            pycomax             tcomax 
                  0                  0                  0        1.200003731 
@@ -149,7 +149,7 @@ ptc_create_universe;
                  0                  0                  0                  0 
 
            pycomin             tcomin            ptcomin 
-                 0                  0   -2.220439476e-16 
+                 0                  0                  0 
 
 
  write, table=twiss, file="ptc.twiss";

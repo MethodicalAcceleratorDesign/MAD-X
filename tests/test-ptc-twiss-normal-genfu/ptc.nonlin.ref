@@ -1,9 +1,9 @@
 @ NAME             %06s "NONLIN"
 @ TYPE             %06s "NONLIN"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.02.08 Linux 64"
-@ DATE             %08s "01/02/16"
-@ TIME             %08s "12.20.08"
+@ ORIGIN           %16s "5.02.10 Linux 64"
+@ DATE             %08s "02/06/16"
+@ TIME             %08s "12.33.35"
 * NAME               NICKNAME           BASEVARIABLE                    VALUE      ORDER    ORDER_X   ORDER_PX    ORDER_Y   ORDER_PY   ORDER_PT    ORDER_T 
 $ %s                 %s                 %s                                %le         %d         %d         %d         %d         %d         %d         %d 
  "Q1"                "Q1"                "Q1"                      0.3631575976          0          0          0          0          0          0          0

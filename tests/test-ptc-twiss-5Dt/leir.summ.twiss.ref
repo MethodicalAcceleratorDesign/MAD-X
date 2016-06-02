@@ -2,8 +2,8 @@
 @ TYPE             %04s "SUMM"
 @ TITLE            %08s "no-title"
 @ ORIGIN           %16s "5.02.10 Linux 64"
-@ DATE             %08s "30/05/16"
-@ TIME             %08s "18.32.02"
+@ DATE             %08s "02/06/16"
+@ TIME             %08s "09.29.29"
 *             LENGTH             ORBIT5               ALFA            GAMMATR                 Q1                DQ1            BETXMAX              DXMAX              DXRMS             XCOMAX             XCORMS                 Q2                DQ2            BETYMAX              DYMAX              DYRMS             YCOMAX             YCORMS             DELTAP            SYNCH_1            SYNCH_2            SYNCH_3            SYNCH_4            SYNCH_5 
 $                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
         78.54370266                 -0       0.1241075638        2.838578276        1.820059621       -5.030192682        15.12421277         20.6041956        9.639962105                  0                  0         2.71982919       -10.39500532        20.07025727                  0                  0                  0                  0                  0        9.747887059        1.526297364       0.3728165258       0.5042000294        4.147872957

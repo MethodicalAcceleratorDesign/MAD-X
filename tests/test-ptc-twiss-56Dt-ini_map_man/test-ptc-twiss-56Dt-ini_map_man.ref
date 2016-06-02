@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.08  (64 bit, Linux)       +
+  +     MAD-X 5.02.10  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.11.20               +
-  + Execution date: 2016.03.01 18:37:54      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.06.02 10:03:52      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! test for ptc_twiss,initial_map_manual=true;
 
@@ -820,7 +820,7 @@ select, flag=twiss, column=name,s,beta11,beta22,alfa11,alfa22,mu1,mu2,disp1,disp
 
 ptc_create_universe;
 
-  ptc_create_layout, model=1, method=6, nst=5, exact=true, closed_layout=true;
+  ptc_create_layout, model=1, method=6, nst=10, exact=true, closed_layout=true;
 
  MAD-X Beam Parameters
                   Energy : 0.108342E+01
@@ -831,7 +831,7 @@ ptc_create_universe;
  Setting MADx with 
      energy           1.0834226784000001     
      method                   6
-     Num. of steps            5
+     Num. of steps           10
      charge           1.0000000000000000     
   Length of machine:    78.543702661677713     
  The machine is a RING
@@ -860,31 +860,31 @@ ptc_create_universe;
        78.54370266           -1000000           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000           -1000000           -1000000        1.820059622 
+          -1000000           -1000000           -1000000        1.820059586 
 
                 q2                dq1                dq2                 qs 
-       2.719829288           -1000000           -1000000           -1000000 
+       2.719829203           -1000000           -1000000           -1000000 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-       3.282153615        15.12420817        1.633285387        20.07025827 
+       3.282153742        15.12420849        1.633285447        20.07025832 
 
          beta11min          beta11max          beta12min          beta12max 
-       3.282153615        15.12420817                  0                  0 
+       3.282153742        15.12420849                  0                  0 
 
          beta13min          beta13max          beta21min          beta21max 
-   6.330852252e-07        424.5319067                  0                  0 
+   6.252625153e-07        424.5320293                  0                  0 
 
          beta22min          beta22max          beta23min          beta23max 
-       1.633285387        20.07025827                  0                  0 
+       1.633285447        20.07025832                  0                  0 
 
          beta31min          beta31max          beta32min          beta32max 
-   2.824648177e-07        129.3455325                  0                  0 
+   2.799089335e-07        129.3455325                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 1        38793.07894       -20.60417207     0.001188317683 
+                 1        38793.11645       -20.60417504     0.001186533499 
 
           disp2min           disp2max           disp3min           disp3max 
-      -9.086227467        9.086227467                  0                  0 
+      -9.086228277        9.086227667                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0    1.068886484e-08 
@@ -893,19 +893,19 @@ ptc_create_universe;
    2.546139162e-09                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-   3.650253905e-08    1.168573408e-08                  0    3.059593903e-09 
+   3.650253905e-08    2.618629597e-08                  0    5.157243422e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0    5.340225396e-08                  0    2.508646069e-08 
+                 0     7.43487202e-08                  0    3.700765924e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.106287027e-08                  0   -2.993167544e-08 
+                 0    1.106287032e-08                  0   -2.790402201e-08 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -1.448637497e-12                  0   -1.106286994e-08 
+                 0    -4.99843157e-08                  0   -1.274910961e-08 
 
            pycomin             tcomin            ptcomin 
-                 0   -7.957595122e-08                  0 
+                 0   -1.773242698e-07                  0 
 
 
   write, table=twiss, file="leir.56dt.ptc.twiss";
@@ -924,31 +924,31 @@ ptc_create_universe;
        78.54370266           -1000000           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000           -1000000           -1000000        1.820059622 
+          -1000000           -1000000           -1000000        1.820059586 
 
                 q2                dq1                dq2                 qs 
-       2.719829288           -1000000           -1000000           -1000000 
+       2.719829203           -1000000           -1000000           -1000000 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-       3.282153615        15.12420817        1.633285387        20.07025827 
+       3.282153742        15.12420849        1.633285447        20.07025832 
 
          beta11min          beta11max          beta12min          beta12max 
-       3.282153615        15.12420817                  0                  0 
+       3.282153742        15.12420849                  0                  0 
 
          beta13min          beta13max          beta21min          beta21max 
-   6.330852252e-07        424.5319067                  0                  0 
+   6.252625153e-07        424.5320293                  0                  0 
 
          beta22min          beta22max          beta23min          beta23max 
-       1.633285387        20.07025827                  0                  0 
+       1.633285447        20.07025832                  0                  0 
 
          beta31min          beta31max          beta32min          beta32max 
-   2.824648177e-07        129.3455325                  0                  0 
+   2.799089335e-07        129.3455325                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 1        38793.07894       -20.60417207     0.001188317683 
+                 1        38793.11645       -20.60417504     0.001186533499 
 
           disp2min           disp2max           disp3min           disp3max 
-      -9.086227467        9.086227467                  0                  0 
+      -9.086228277        9.086227667                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0    1.068886484e-08 
@@ -957,19 +957,19 @@ ptc_create_universe;
    2.546139162e-09                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-   3.650253905e-08    1.168573408e-08                  0    3.059593903e-09 
+   3.650253905e-08    2.618629597e-08                  0    5.157243422e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0    5.340225396e-08                  0    2.508646069e-08 
+                 0     7.43487202e-08                  0    3.700765924e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.106287027e-08                  0   -2.993167544e-08 
+                 0    1.106287032e-08                  0   -2.790402201e-08 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -1.448637497e-12                  0   -1.106286994e-08 
+                 0    -4.99843157e-08                  0   -1.274910961e-08 
 
            pycomin             tcomin            ptcomin 
-                 0   -7.957595122e-08                  0 
+                 0   -1.773242698e-07                  0 
   write, table=twiss, file="leir.56dt.ptc.mtx.twiss";
 
 
@@ -984,31 +984,31 @@ ptc_create_universe;
        78.54370266           -1000000           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000           -1000000           -1000000        1.820059621 
+          -1000000           -1000000           -1000000        1.820059584 
 
                 q2                dq1                dq2                 qs 
-       2.719829283           -1000000           -1000000           -1000000 
+       2.719829197           -1000000           -1000000           -1000000 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-       3.282153606        15.12420824        1.633285387        20.07025827 
+       3.282153742        15.12420843        1.633285458        20.07025827 
 
          beta11min          beta11max          beta12min          beta12max 
-       3.282153606        15.12420824                  0                  0 
+       3.282153742        15.12420843                  0                  0 
 
          beta13min          beta13max          beta21min          beta21max 
-   6.325073174e-07        424.5319083                  0                  0 
+   6.249127795e-07        424.5320149                  0                  0 
 
          beta22min          beta22max          beta23min          beta23max 
-       1.633285387        20.07025827                  0                  0 
+       1.633285458        20.07025827                  0                  0 
 
          beta31min          beta31max          beta32min          beta32max 
-   2.822058233e-07        129.3455324                  0                  0 
+   2.799156765e-07        129.3455324                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 1        38793.07824       -20.60417211     0.001188384471 
+                 1        38793.11575       -20.60417504     0.001186021459 
 
           disp2min           disp2max           disp3min           disp3max 
-      -9.086227467        9.086227477                  0                  0 
+      -9.086228277        9.086227678                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0                  0 
@@ -1017,19 +1017,19 @@ ptc_create_universe;
                  0                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    2.512911304e-08                  0    4.205036582e-09 
+                 0    3.908422753e-10                  0    6.540246179e-11 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0    3.754738803e-08                  0    5.077465416e-08 
+                 0    5.840861881e-10                  0    7.897167283e-10 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.192583567e-08                  0    1.059678503e-07 
+                 0    1.854868291e-10                  0    1.648691738e-09 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -2.737736087e-08                  0   -1.115555338e-08 
+                 0   -4.258097151e-10                  0   -1.735064656e-10 
 
            pycomin             tcomin            ptcomin 
-                 0   -2.737138567e-08                  0 
+                 0   -4.253175589e-10                  0 
   write, table=twiss, file="leir.56dt.ptc.noorb.twiss";
 
    
