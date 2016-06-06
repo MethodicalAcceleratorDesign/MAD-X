@@ -314,6 +314,15 @@ The attributes are:
   \hyperref[subsec:tables-canon]{canonical} coordinates of the initial
   orbit. \\ (Default: 0.0) \\
   
+  \ttitem{NORMAL} a logical flag that triggers saving of the normal form results 
+  (the closed solution) into dedicated table called nonlin.   It is identical to \texttt{ptc_noramal}.
+   However, the nonlin table has format such that its coefficients can be accessed within the script using 
+   \texttt{table} command (and therefore matched). Also, all available orders are calculated and 
+   no \texttt{select_ptc_normal} is required.
+   Currently are calculated: tunes (and all their derivatives), 
+   dipsersions (and all their derivatives), eigen values, transfer map, resonance driving terms (generating functions).
+   
+  
 \end{madlist}
 
 
