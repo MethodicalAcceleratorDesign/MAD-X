@@ -18,8 +18,7 @@ module polymorphic_taylor
        m31=m3+ms*m1,m32=m3+ms*m2,m33=m3+ms*m3
   logical(lp),private::old
   private resetpoly,resetpolyn ,resetpoly0,resetpolyn0 ,allocpoly,allocpolyn,resetpoly_R,resetpoly_Rn
-  PRIVATE K_OPT,A_OPT,e_OPT,ke_OPT
-  private allocenv,allocenvn,resetenv,resetenvn
+  PRIVATE K_OPT,A_OPT
   private equal,Dequaldacon,equaldacon,iequaldacon ,realEQUAL,singleequal
   private taylorEQUAL,EQUALtaylor,complexreal_8
   private real_8univ,univreal_8
@@ -39,10 +38,10 @@ module polymorphic_taylor
   private eq,deqsc,dsceq,eqsc,sceq,ieqsc,isceq
   private neq,dneqsc,dscneq,neqsc,scneq,ineqsc,iscneq
   PRIVATE GETCHARnd2,GETintnd2,getchar,GETint,GETORDER,CUTORDER
-  private  real_8ENV,ENVreal_8 ,RADTAYLORENV_8, ENV_8RADTAYLOR ,beamENV_8,normal_p
+  private  normal_p !,beamENV_8
   private absoftdatan2dr,absoftdcosdr,absoftdsindr,absoftdtandr,absoftdatandr
   !complex stuff
-  private datant,datanDt,datan2t,dasint,dacost,dtant,dtandt,datanht
+  private datant,datanDt,datan2t,dasint,dacost,dtant,dtandt,datanht,datan2tt
   private dcosht,dsinht,dtanht,SINX_XT,SINHX_XT,polymorpht
   ! PRIVATE EQUAL1D,EQUAL2D
   ! end complex stuff
@@ -58,10 +57,18 @@ module polymorphic_taylor
   PRIVATE SINH_HR
   PRIVATE SIN_HR
   ! PROBE_8 STUFF
-  PRIVATE RADTAYLORprobe_8,beamprobe_8
   real(dp) :: sinhx_x_min=1e-4_dp
   real(dp) :: sinhx_x_minp=1.0_dp  !  1.e-9  !c_0_0001
+ private I_np,I_npp
+INTEGER, private, PARAMETER :: I4B = SELECTED_INT_KIND(9)
 
+  INTERFACE I_n_polymorph
+     MODULE PROCEDURE I_np
+  END INTERFACE
+
+  INTERFACE I_n 
+     MODULE PROCEDURE I_npp
+  END INTERFACE
 
   INTERFACE assignment (=)
      MODULE PROCEDURE EQUAL   ! 2002.10.9
@@ -84,17 +91,12 @@ module polymorphic_taylor
      ! for damap
      MODULE PROCEDURE MAPreal_8
      MODULE PROCEDURE real_8MAP
-     ! FOR RADIATION
-     MODULE PROCEDURE real_8ENV
-     MODULE PROCEDURE ENVreal_8
-     MODULE PROCEDURE  RADTAYLORENV_8
-     MODULE PROCEDURE ENV_8RADTAYLOR
+
 
      !  allowing normalization of polymorphic arrays directly
-     MODULE PROCEDURE beamENV_8
+!     MODULE PROCEDURE beamENV_8
      MODULE PROCEDURE normal_p
-     MODULE PROCEDURE RADTAYLORprobe_8
-     MODULE PROCEDURE beamprobe_8
+
   end  INTERFACE
 
 
@@ -567,6 +569,7 @@ module polymorphic_taylor
   INTERFACE exp
      MODULE PROCEDURE dexpt
   END INTERFACE
+
   INTERFACE dexp
      MODULE PROCEDURE dexpt
   END INTERFACE
@@ -683,9 +686,11 @@ module polymorphic_taylor
 
   INTERFACE atan2
      MODULE PROCEDURE datan2t
+     MODULE PROCEDURE datan2tt
   END INTERFACE
   INTERFACE datan2
      MODULE PROCEDURE datan2t
+     MODULE PROCEDURE datan2tt
   END INTERFACE
 
   INTERFACE atan2d
@@ -783,29 +788,19 @@ module polymorphic_taylor
   INTERFACE alloc
      MODULE PROCEDURE A_OPT    !allocpoly   !
      MODULE PROCEDURE allocpolyn  !
-     !radiation
-     MODULE PROCEDURE e_opt   !
-     !     MODULE PROCEDURE allocenv   !
-     MODULE PROCEDURE allocenvn   !
+
   END INTERFACE
 
   INTERFACE kill
-     MODULE PROCEDURE K_OPT    !resetpoly0   !
-     MODULE PROCEDURE Ke_OPT    !resetpoly0   !
+     MODULE PROCEDURE k_opt
      MODULE PROCEDURE resetpolyn0  !
      MODULE PROCEDURE resetpoly_R
      MODULE PROCEDURE resetpoly_RN
-     !radiation
-     !     MODULE PROCEDURE resetenv   !
-     MODULE PROCEDURE resetenvn   !
   END INTERFACE
 
   INTERFACE reset
      MODULE PROCEDURE resetpoly   !
      MODULE PROCEDURE resetpolyn  !
-     !radiation
-     MODULE PROCEDURE resetenv   !
-     MODULE PROCEDURE resetenvn   !
   END INTERFACE
 
   ! Managing
@@ -2200,6 +2195,48 @@ contains
        ! call !write_e(0)
     end select
   END FUNCTION dexpt
+
+  FUNCTION I_npp( n,S1 )
+    implicit none
+    TYPE (real_8) I_npp
+    TYPE (real_8), INTENT (IN) :: S1
+    INTEGER(I4B), INTENT(IN) :: n
+
+    integer localmaster
+
+    select case(s1%kind)
+    case(m1)
+       I_npp%r=I_n(n,s1%r)
+       I_npp%kind=1
+    case(m2)
+       localmaster=master
+       call ass(I_npp)
+       I_npp%t= I_n(n,s1%t)
+       master=localmaster
+    case(m3)
+       if(knob) then
+          localmaster=master
+          call ass(I_npp)
+
+          call varfk1(S1)
+          I_npp%t= I_n(n,varf1)
+          master=localmaster
+       else
+          I_npp%r= I_n(n,S1%r)
+          I_npp%kind=1
+       endif
+
+    case default
+       w_p=0
+       w_p%nc=2
+       w_p%fc='((1X,A72,/,1x,a72))'
+       w_p%fi='(2((1X,i4)))'
+       w_p%c(1)= " trouble in I_npp "
+       w_p%c(2)= "s1%kind   "
+       w_p=(/s1%kind  /)
+       ! call !write_e(0)
+    end select
+  END FUNCTION I_npp
 
   FUNCTION abst( S1 )
     implicit none
@@ -4363,21 +4400,6 @@ contains
   END SUBROUTINE K_OPT
 
 
-  SUBROUTINE  Ke_OPT(S1,S2,s3,s4,s5,s6,s7,s8,s9,s10)
-    implicit none
-    type (env_8),INTENT(INout)::S1
-    type (env_8),optional, INTENT(INout):: S2,s3,s4,s5,s6,s7,s8,s9,s10
-    call resetenv(s1)
-    if(present(s2)) call resetenv(s2)
-    if(present(s3)) call resetenv(s3)
-    if(present(s4)) call resetenv(s4)
-    if(present(s5)) call resetenv(s5)
-    if(present(s6)) call resetenv(s6)
-    if(present(s7)) call resetenv(s7)
-    if(present(s8)) call resetenv(s8)
-    if(present(s9)) call resetenv(s9)
-    if(present(s10))call resetenv(s10)
-  END SUBROUTINE Ke_OPT
 
 
 
@@ -5540,6 +5562,31 @@ contains
 
   END FUNCTION datan2t
 
+  FUNCTION datan2tt( S2,S1 )
+    implicit none
+ 
+    TYPE (taylor) datan2tt
+    TYPE (taylor), INTENT (IN) :: S2,S1
+    TYPE (real_8) temp,s1_8,s2_8
+    integer localmaster 
+    
+
+    localmaster=master
+    call ass(datan2tt)
+     call alloc(temp,s1_8,s2_8)   
+
+     s1_8=morph(S1)
+     s2_8=morph(S2)
+
+     temp=atan2(s2_8,s1_8)
+    
+     datan2tt=temp%t
+     
+    master=localmaster
+    call kill(temp,s1_8,s2_8)
+
+  END FUNCTION datan2tt
+
   FUNCTION datan2dt( S2,S1 )
     implicit none
     integer ipause, mypauses
@@ -6068,245 +6115,6 @@ contains
   END SUBROUTINE real_8MAP
 
 
-  !  radiation
-  SUBROUTINE  ENVreal_8(S2,S1)
-    implicit none
-    type (ENV_8),INTENT(inout),dimension(:)::S2
-    type (real_8),INTENT(IN),dimension(:)::S1
-    integer i
-
-    call check_snake
-
-    do i=1,nd2
-       s2(i)%v=s1(i)          !%t
-    enddo
-  END SUBROUTINE ENVreal_8
-
-  SUBROUTINE  real_8ENV(S1,S2)
-    implicit none
-    type (ENV_8),INTENT(in),dimension(:)::S2
-    type (real_8),INTENT(inout),dimension(:)::S1
-    integer i
-
-    call check_snake
-
-    do i=1,nd2
-       s1(i)=s2(i)%v
-    enddo
-  END SUBROUTINE real_8ENV
-
-  SUBROUTINE  ENV_8RADTAYLOR(S2,S1)
-    implicit none
-    type (ENV_8),INTENT(inout),dimension(:)::S2
-    type (RADTAYLOR),INTENT(IN),dimension(:)::S1
-    integer i,J
-
-    call check_snake
-
-    do i=1,nd2
-       s2(i)%v=s1(i)%V          !%t
-    enddo
-    do i=1,nd2
-       do J=1,nd2
-          s2(i)%E(J)=s1(i)%E(J)          !%t
-       enddo
-    enddo
-
-  END SUBROUTINE ENV_8RADTAYLOR
-
-  SUBROUTINE  RADTAYLORENV_8(S1,S2)
-    implicit none
-    type (ENV_8),INTENT(in),dimension(:)::S2
-    type (RADTAYLOR),INTENT(inout),dimension(:)::S1
-    integer i,J
-
-    call check_snake
-
-    do i=1,nd2
-       s1(i)%V= s2(i)%v         !%t
-    enddo
-    do i=1,nd2
-       do J=1,nd2
-          s1(i)%E(J)=s2(i)%E(J)          !%t
-       enddo
-    enddo
-
-  END SUBROUTINE RADTAYLORENV_8
-
-  SUBROUTINE  RADTAYLORprobe_8(S1,S2)
-    implicit none
-    type (probe_8),INTENT(in) ::S2
-    type (RADTAYLOR),INTENT(inout),dimension(:)::S1
-    integer i,J
-
-    call check_snake
-
-    do i=1,nd2
-       s1(i)%V= s2%X(I)        !%t
-    enddo
-    do i=1,nd2
-       do J=1,nd2
-          s1(i)%E(J)=s2%E_IJ(i,J)          !%t
-       enddo
-    enddo
-
-  END SUBROUTINE RADTAYLORprobe_8
-
-  SUBROUTINE  beamprobe_8(S2,Sprobe_8)
-    implicit none
-    type (beamenvelope),INTENT(inout)::S2
-    type (radtaylor) S1(ndim2)
-    type (probe_8),INTENT(IN)::Sprobe_8
-
-    call alloc(s1,nd2)
-
-    call check_snake
-
-    S1=Sprobe_8
-
-
-    s2=s1
-
-    call kill(s1,nd2)
-
-
-  END SUBROUTINE beamprobe_8
-
-  SUBROUTINE  resetenv(S2)
-    implicit none
-    type (env_8),INTENT(INOUT)::S2
-    integer i
-
-    call resetpoly(s2%v)
-    do i=1,nd2
-       call resetpoly(s2%e(i))
-       call resetpoly(s2%sigma0(i))
-       call resetpoly(s2%sigmaf(i))
-    enddo
-
-  END SUBROUTINE resetenv
-
-
-  SUBROUTINE  allocenv(S2)
-    implicit none
-    type (env_8),INTENT(INOUT)::S2
-    integer i
-
-    call alloc(s2%v)
-    do i=1,nd2
-       call alloc(s2%e(i))
-       call alloc(s2%sigma0(i))
-       call alloc(s2%sigmaf(i))
-    enddo
-
-  END SUBROUTINE allocenv
-
-  SUBROUTINE  allocenvn(S2,K)
-    implicit none
-    type (env_8),INTENT(INOUT),dimension(:)::S2
-    INTEGER,optional,INTENT(IN)::k
-    INTEGER J,i,N
-
-    if(present(k)) then
-       I=LBOUND(S2,DIM=1)
-       N=LBOUND(S2,DIM=1)+K-1
-    else
-       I=LBOUND(S2,DIM=1)
-       N=UBOUND(S2,DIM=1)
-    endif
-
-    DO   J=I,N
-       call allocenv(s2(j))
-    enddo
-
-
-  END SUBROUTINE allocenvn
-
-  SUBROUTINE  e_OPT(S1,S2,s3,s4,s5,s6,s7,s8,s9,s10)
-    implicit none
-    type (env_8),INTENT(INout)::S1
-    type (env_8),optional, INTENT(INout):: S2,s3,s4,s5,s6,s7,s8,s9,s10
-    call allocenv(s1)
-    if(present(s2)) call allocenv(s2)
-    if(present(s3)) call allocenv(s3)
-    if(present(s4)) call allocenv(s4)
-    if(present(s5)) call allocenv(s5)
-    if(present(s6)) call allocenv(s6)
-    if(present(s7)) call allocenv(s7)
-    if(present(s8)) call allocenv(s8)
-    if(present(s9)) call allocenv(s9)
-    if(present(s10))call allocenv(s10)
-  END SUBROUTINE e_opt
-
-
-  !  SUBROUTINE  allocenvn(S2,n)
-  !    implicit none
-  !    type (env_8),INTENT(INOUT),dimension(:)::S2
-  !    integer, INTENT(IN)::n
-  !    integer i
-  !
-  !    do i=1,n
-  !       call allocenv(s2(i))
-  !    enddo
-
-  !  END SUBROUTINE allocenvn
-
-  SUBROUTINE  resetenvn(S2,K)
-    implicit none
-    type (env_8),INTENT(INOUT),dimension(:)::S2
-    INTEGER,optional,INTENT(IN)::k
-    INTEGER J,i,N
-
-    if(present(k)) then
-       I=LBOUND(S2,DIM=1)
-       N=LBOUND(S2,DIM=1)+K-1
-    else
-       I=LBOUND(S2,DIM=1)
-       N=UBOUND(S2,DIM=1)
-    endif
-
-    DO   J=I,N
-       call resetenv(s2(j))
-    enddo
-
-
-  END SUBROUTINE resetenvn
-
-  !  SUBROUTINE  resetenvn(S2,n)
-  !    implicit none
-  !    type (env_8),INTENT(INOUT),dimension(:)::S2
-  !    integer, INTENT(IN)::n
-  !    integer i
-  !
-  !    do i=1,n
-  !       call resetenv(s2(i))
-  !    enddo
-  !
-  !
-  !  END SUBROUTINE resetenvn
-
-
-
-  SUBROUTINE  beamENV_8(S2,SENV_8)
-    implicit none
-    type (beamenvelope),INTENT(inout)::S2
-    type (radtaylor) S1(ndim2)
-    !    type (ENV_8),INTENT(IN)::SENV_8(ndim2)
-    type (ENV_8),INTENT(IN)::SENV_8(6)
-
-    call alloc(s1,nd2)
-
-    call check_snake
-
-    S1=SENV_8
-
-
-    s2=s1
-
-    call kill(s1,nd2)
-
-
-  END SUBROUTINE beamENV_8
 
 
   SUBROUTINE  varfk1(S2)
@@ -6671,7 +6479,6 @@ contains
     type (real_8),INTENT(INOUT)::S2
     type (real_8), intent(INOUT):: s1
     real(dp) prec
-    integer i
     type(real_8) t
 
     call alloc(t)
@@ -6711,6 +6518,85 @@ contains
        call flip_taylor(S1%t,S2%t,i)
     endif
   end SUBROUTINE  flip_real_8
+
+
+!  bessel numerical recipes
+
+
+
+
+
+		FUNCTION I_np(n,x)
+        type(real_8)  I_np
+		INTEGER(I4B), INTENT(IN) :: n
+        type(real_8), INTENT(IN) :: x
+        integer localmaster,i,j
+        type(real_8)  dx,tx
+        real(dp) fac,x0
+!        real(dp) :: der(0:2*lno)
+!        real(dp) :: dder(0:2*lno),ddert(0:2*lno)
+         real(dp), allocatable :: ddert(:),dder(:),der(:)
+
+        if(x%kind==mmmmmm1) then
+            I_np=I_n(n,x%r)
+         return
+        endif  
+
+        localmaster=master
+        call ass(I_np)
+             x0=(x.sub.'0')
+
+
+        if(c_%no==1) then
+         I_np=I_n(n,x0)+dI_n(n,x0)*(x-x0)
+         master=localmaster
+         return
+        endif
+        allocate(der(0:c_%no+n),dder(0:c_%no+n),ddert(0:c_%no+n))
+
+        der=0
+        der(0)=I_n(n,x0)            
+ 
+        do i=n,c_%no+n
+         der(i)=I_n(i,x0)
+        enddo
+        j=max(0,n-c_%no)
+
+        do i=n-1,j,-1
+         der(i)=I_n(i,x0)
+        enddo
+
+       call alloc(dx,tx)
+
+          dder=0.0_dp
+          dx=x-x0
+          tx=dx
+          I_np=I_n(n,x0)
+          fac=1.0_dp
+          dder(n)=1.0_dp
+
+          do i=1,c_%no
+            ddert=0.0_dp
+          do j=max(n-(i-1),0),n+(i-1)
+           ddert(iabs(j-1))=0.5_dp*dder(iabs(j))+ddert(iabs(j-1))
+           ddert(iabs(j+1))=0.5_dp*dder(iabs(j))+ddert(iabs(j+1))
+          enddo
+
+            ddert=ddert/i
+            fac=0
+          do j=max(n-i,0),n+i
+            fac=fac+ddert(j)*der(j)
+          enddo
+            I_np=I_np+fac*tx
+            tx=tx*dx
+            dder=ddert
+          enddo  
+       call kill(dx,tx)
+        deallocate(der,dder,ddert)
+
+        master=localmaster
+
+		END FUNCTION I_np
 
 
 end module  polymorphic_taylor

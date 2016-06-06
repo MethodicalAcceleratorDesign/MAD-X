@@ -17,6 +17,9 @@ TYPE undu_R
    real(dp), DIMENSION(:,:), pointer :: K
    real(dp), DIMENSION(:), pointer :: A
    real(dp), DIMENSION(:), pointer :: F
+   real(dp), DIMENSION(:), pointer :: x0
+   real(dp), DIMENSION(:), pointer :: y0
+   real(dp), DIMENSION(:), pointer :: ex(:),ey(:)
    real(dp), pointer :: offset
    integer, DIMENSION(:), pointer :: FORM
 END TYPE undu_R
@@ -25,6 +28,9 @@ TYPE undu_p
    TYPE(REAL_8), DIMENSION(:,:), pointer :: K
    TYPE(REAL_8), DIMENSION(:), pointer :: A
    TYPE(REAL_8), DIMENSION(:), pointer :: F
+   TYPE(REAL_8), DIMENSION(:), pointer :: x0
+   TYPE(REAL_8), DIMENSION(:), pointer :: y0
+   real(dp), DIMENSION(:), pointer :: ex(:),ey(:)
    TYPE(REAL_8), pointer :: offset
    integer, DIMENSION(:), pointer :: FORM
 END TYPE undu_p
@@ -32,6 +38,7 @@ END TYPE undu_p
 TYPE SAGAN
    TYPE(MAGNET_CHART), POINTER :: P
    real(dp), POINTER ::L      !  MUST ALWAYS BE THERE
+   integer, pointer :: n_min
    real(dp),  DIMENSION(:), POINTER :: AN,BN         !Multipole component (OPTIONAL)
    !   ADD INTERNAL STUFF HERE AS POINTERS
    real(dp),  DIMENSION(:),  POINTER ::INTERNAL       ! INTERNAL IS AN EXAMPLE
@@ -41,6 +48,7 @@ END  TYPE SAGAN
 TYPE SAGANP
    TYPE(MAGNET_CHART), POINTER :: P
    TYPE(REAL_8), POINTER ::L       !  MUST ALWAYS BE THERE
+   integer, pointer :: n_min
    TYPE(REAL_8),  DIMENSION(:), POINTER :: AN,BN         !Multipole component (OPTIONAL)
    !   ADD INTERNAL STUFF HERE AS POINTERS
    TYPE(REAL_8), DIMENSION(:),POINTER ::INTERNAL        ! INTERNAL IS AN EXAMPLE

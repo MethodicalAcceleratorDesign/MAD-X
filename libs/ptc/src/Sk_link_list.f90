@@ -20,7 +20,7 @@ MODULE S_FIBRE_BUNDLE
   private FIND_POS_in_universe,FIND_POS_in_layout,super_dealloc_fibre
   TYPE(LAYOUT), PRIVATE, POINTER:: LC
   logical :: superkill=.false.
-  logical(lp),TARGET :: use_info=.false.
+  logical(lp),TARGET :: use_info=.true., use_info_m=.false.
   integer, target :: nsize_info = 70
   private zero_fibre
   INTEGER :: INDEX_0=0, INDEX_1=0
@@ -28,6 +28,7 @@ MODULE S_FIBRE_BUNDLE
   logical(lp),PRIVATE,PARAMETER::T=.TRUE.,F=.FALSE.
   real(dp),target :: eps_pos=1e-10_dp
   integer(2),parameter::it0=0,it1=1,it2=2,it3=3,it4=4,it5=5,it6=6,it7=7,it8=8,it9=9
+  INTEGER,parameter :: IPOS =1000
 
   INTERFACE kill
      MODULE PROCEDURE kill_layout
@@ -102,7 +103,10 @@ CONTAINS
     allocate(c%fix(6));c%fix=0.0_dp;
     allocate(c%fix0(6));c%fix0=0.0_dp;
     allocate(c%pos(2));c%pos=0.0_dp;
-
+    if(use_info_m) then 
+      allocate(c%m(6,6))
+      c%m=0
+    endif
 
   end SUBROUTINE alloc_info
 
@@ -117,7 +121,7 @@ CONTAINS
     d%fix=c%fix
     d%fix0=c%fix0
     d%pos=c%pos
-
+    if(associated(c%m))d%m=c%m
   end SUBROUTINE copy_info
 
   SUBROUTINE kill_info( c ) ! Does the full allocation of fibre and initialization of internal variables
@@ -130,6 +134,7 @@ CONTAINS
     deallocate(c%fix0)
     deallocate(c%beta)
     deallocate(c%pos)
+    if(associated(c%m)) deallocate(c%m)
 
   end SUBROUTINE kill_info
 
@@ -186,23 +191,23 @@ CONTAINS
     ENDIF
     IF(ASSOCIATED(L%DNA)) THEN
        DEALLOCATE(L%DNA)
-       if(lielib_print(12)==1) WRITE(6,*) " DNA CONTENT HAS BEEN DEALLOCATED "
+       if(lielib_print(12)==1)  WRITE(6,*) " DNA CONTENT HAS BEEN DEALLOCATED "
     ENDIF
     !    IF(ASSOCIATED(L%con)) THEN
     !       DEALLOCATE(L%con)
-    !       WRITE(6,*) " CONNECTOR CONTENT HAS BEEN KILLED "
+    !       if(lielib_print(12)==1) WRITE(6,*) " CONNECTOR CONTENT HAS BEEN KILLED "
     !    ENDIF
     !    IF(ASSOCIATED(L%con1)) THEN
     !       DEALLOCATE(L%con1)
-    !       WRITE(6,*) " CONNECTOR CONTENT HAS BEEN DEALLOCATED "
+    !       if(lielib_print(12)==1) WRITE(6,*) " CONNECTOR CONTENT HAS BEEN DEALLOCATED "
     !    ENDIF
     !    IF(ASSOCIATED(L%con2)) THEN
     !       DEALLOCATE(L%con2)
-    !       WRITE(6,*) " CONNECTOR CONTENT HAS BEEN DEALLOCATED "
+    !       if(lielib_print(12)==1) WRITE(6,*) " CONNECTOR CONTENT HAS BEEN DEALLOCATED "
     !    ENDIF
     !    IF(ASSOCIATED(L%girder)) THEN
     !       DEALLOCATE(L%girder)
-    !       WRITE(6,*) " GIRDER CONTENT HAS BEEN DEALLOCATED "
+    !       if(lielib_print(12)==1) WRITE(6,*) " GIRDER CONTENT HAS BEEN DEALLOCATED "
     !    ENDIF
 
     LC=> L  ! USED TO AVOID DNA MEMBERS
@@ -604,7 +609,9 @@ CONTAINS
     type(mad_universe), pointer :: madu
 !  new 2012.9.7
     nullify(madu)
-   if(associated(L%parent_universe) ) madu=>L%parent_universe
+    if( associated(L%parent_universe) ) then 
+      madu=>L%parent_universe
+    endif
 !    
 
     CALL NULLIFY_LAYOUT(L)
@@ -932,6 +939,7 @@ CONTAINS
     implicit none
     type(fibre),target,intent(inout):: c
     integer, intent(in) :: i
+    logical :: proceed=.false.
     if(i==0) then
        c%DIR=1
        !    C%P0C = ONE
@@ -948,7 +956,16 @@ CONTAINS
        if(associated(c%CHART)) c%CHART=0
        if(associated(c%PATCH)) c%PATCH=0
     elseif(i==-1) then
-       IF(ASSOCIATED(LC,c%mag%PARENT_FIBRE%PARENT_LAYOUT).or.superkill) THEN    ! ORDINARY
+       !if (.not.ASSOCIATED(LC) ) print*,"Skowron zero_fibre: LC==0x0"
+       !if (.not.ASSOCIATED(c%mag) ) print*,"Skowron zero_fibre: c%mag==0x0"
+       !if (.not.ASSOCIATED(c%mag%PARENT_FIBRE) ) print*,"Skowron zero_fibre: c%mag%PARENT_FIBRE==0x0"
+       
+       !if LC is c%mag%PARENT_FIBRE%PARENT_LAYOUT or superkill
+       IF(  (associated(c%mag) .and. &
+             associated(c%mag%PARENT_FIBRE) .and. & 
+             ASSOCIATED(LC,c%mag%PARENT_FIBRE%PARENT_LAYOUT)) &
+         .or.superkill) THEN    ! ORDINARY
+             
           IF(ASSOCIATED(c%magP)) then  !  2010_1
              c%magp=-1;
              deallocate(c%magP);
@@ -966,11 +983,30 @@ CONTAINS
              deallocate(c%PATCH);
           ENDIF
        ELSE   ! POINTED LAYOUT
-          IF(.NOT.ASSOCIATED(c%mag%PARENT_FIBRE%CHART,c%CHART)) then
+          proceed = .false.
+          IF(     .NOT.ASSOCIATED(c%mag)) then
+            proceed = .true.
+          else IF(.NOT.ASSOCIATED(c%mag%PARENT_FIBRE)) then
+            proceed = .true.
+          else IF(.NOT.ASSOCIATED(c%mag%PARENT_FIBRE%CHART,c%CHART)) then
+            proceed = .true.
+          endif
+            
+          IF(proceed) then
              C%CHART=-1
              deallocate(c%CHART);
           ENDIF
-          IF(.NOT.ASSOCIATED(c%mag%PARENT_FIBRE%PATCH,c%PATCH)) then
+          
+          proceed = .false.
+          IF(     .NOT.ASSOCIATED(c%mag)) then
+            proceed = .true.
+          else IF(.NOT.ASSOCIATED(c%mag%PARENT_FIBRE)) then
+            proceed = .true.
+          else IF(.NOT.ASSOCIATED(c%mag%PARENT_FIBRE%PATCH,c%PATCH)) then
+            proceed = .true.
+          endif
+          
+          IF(proceed) then
              C%PATCH=-1
              deallocate(c%PATCH);
           ENDIF
@@ -1236,11 +1272,18 @@ CONTAINS
 
     CALL FIND_PATCH(B,EXI,A,ENT,D,ANG)
 
+  ! if(a_xz==-1.or.a_yz==-1) then
+  !   write(6,*) "  discrete ",  a_xz,A_YZ
+  !  endif
+
+
     NORM=0.0_dp
     DO I=1,3
        NORM=NORM+ABS(D(I))
     ENDDO
+ 
     IF(NORM>=PREC) THEN
+       if(global_verbose)  Write(6,'(a20,1x,3(1x,g12.5))') " Patch Translations ",d
        D=0.0_dp
        PATCH_NEEDED=PATCH_NEEDED+1
     ENDIF
@@ -1250,26 +1293,34 @@ CONTAINS
     ENDDO
     ene=(NORM<=PREC.and.(A_XZ==1.and.A_YZ==1)).or.(NORM<=PREC.and.(A_XZ==-1.and.A_YZ==-1))
     IF(.not.ene) THEN
-       ANG=0.0_dp
+        if(global_verbose) Write(6,'(a20,1x,3(1x,g12.5))') "  Patch rotations  ",ang
+        ANG=0.0_dp
        PATCH_NEEDED=PATCH_NEEDED+10
     ENDIF
 
 
-    if(ABS((EL2%MAG%P%P0C-EL1%MAG%P%P0C)/EL1%MAG%P%P0C)>PREC) PATCH_NEEDED=PATCH_NEEDED+100
-
+    if(ABS((EL2%MAG%P%P0C-EL1%MAG%P%P0C)/EL1%MAG%P%P0C)>PREC) then
+     if(global_verbose) Write(6,'(a20,1x,1(1x,g12.5))') "  Patch Energy      ", &
+      ABS((EL2%MAG%P%P0C-EL1%MAG%P%P0C)/EL1%MAG%P%P0C)
+     PATCH_NEEDED=PATCH_NEEDED+100
+    endif
 
     DISCRETE=.false.
     IF(ANG(1)/TWOPI<-0.25_dp) THEN
+       write(6,*) " #1 Discrete IMPOSSIBLE ANG(1)/TWOPI<-0.25_dp"
        DISCRETE=.TRUE.
     ENDIF
     IF(ANG(1)/TWOPI>0.25_dp) THEN
-       DISCRETE=.TRUE.
+       write(6,*) " #2 Discrete IMPOSSIBLE  ANG(1)/TWOPI>0.25_dp"
+        DISCRETE=.TRUE.
     ENDIF
     IF(ANG(2)/TWOPI<-0.25_dp) THEN
-       DISCRETE=.TRUE.
+       write(6,*) " #3 Discrete IMPOSSIBLE ANG(2)/TWOPI<-0.25_dp"
+        DISCRETE=.TRUE.
     ENDIF
     IF(ANG(1)/TWOPI>0.25_dp) THEN
-       DISCRETE=.TRUE.
+       write(6,*) " #4 Discrete IMPOSSIBLE  ANG(1)/TWOPI>0.25_dp"
+        DISCRETE=.TRUE.
     ENDIF
 
     !    IF(DISCRETE) THEN
@@ -1281,12 +1332,12 @@ CONTAINS
        PATCH_NEEDED=PATCH_NEEDED-1000
     endif
 
-    norm=abs(el1%mag%p%p0c-el2%mag%p%p0c)
-    ene=(norm>prec)
+   ! norm=abs(el1%mag%p%p0c-el2%mag%p%p0c)
+   ! ene=(norm>prec)
 
-    if(ene) then
-       PATCH_NEEDED=PATCH_NEEDED+100
-    endif
+!    if(ene) then
+!       PATCH_NEEDED=PATCH_NEEDED+100
+!    endif
 
   END SUBROUTINE CHECK_NEED_PATCH
 
@@ -1315,7 +1366,7 @@ CONTAINS
 
   end SUBROUTINE remove_patch
 
-  SUBROUTINE FIND_PATCH_P_new(EL1,EL2_NEXT,D,ANG,DIR,ENERGY_PATCH,PREC) ! COMPUTES PATCHES
+  SUBROUTINE FIND_PATCH_P_new(EL1,EL2_NEXT,D,ANG,DIR,ENERGY_PATCH,PREC,patching) ! COMPUTES PATCHES
     IMPLICIT NONE
     TYPE (FIBRE), INTENT(INOUT) :: EL1
     TYPE (FIBRE),TARGET,OPTIONAL, INTENT(INOUT) :: EL2_NEXT
@@ -1325,6 +1376,8 @@ CONTAINS
     REAL(DP), POINTER,DIMENSION(:)::A,B
     INTEGER, INTENT(IN) ::  DIR
     LOGICAL(LP), OPTIONAL, INTENT(IN) ::  ENERGY_PATCH
+
+    LOGICAL(LP), OPTIONAL, INTENT(out) ::  patching
     REAL(DP), OPTIONAL, INTENT(IN) ::  PREC
     INTEGER A_YZ,A_XZ
     LOGICAL(LP) ENE,DOIT,DISCRETE
@@ -1419,7 +1472,7 @@ CONTAINS
           ENDIF
        ENDIF
        if(PRESENT(PREC)) then
-          norm=abs(el1%mag%p%p0c-el2%mag%p%p0c)
+          norm=abs(2*(el1%mag%p%p0c-el2%mag%p%p0c)/(el1%mag%p%p0c+el2%mag%p%p0c))
           ene=ene.and.(norm>prec)
        endif
 
@@ -1488,11 +1541,7 @@ CONTAINS
                 END SELECT
              ENDIF
           ELSE
-             W_P=0
-             W_P%NC=1
-             W_P%FC='((1X,A72))'
-             W_P%C(1)= " NOT EVEN ENERGY PATCH POSSIBLE ON ELEMENT 2 "
-             ! call ! WRITE_I
+           write(6,*) " NOT EVEN ENERGY PATCH POSSIBLE ON ELEMENT 1 "
           ENDIF
 
        ELSEIF(DIR==-1) THEN
@@ -1507,11 +1556,7 @@ CONTAINS
                 END SELECT
              ENDIF
           ELSE
-             W_P=0
-             W_P%NC=1
-             W_P%FC='((1X,A72))'
-             W_P%C(1)= " NOT EVEN ENERGY PATCH POSSIBLE ON ELEMENT 1 "
-             ! call ! WRITE_I
+           write(6,*) " NOT EVEN ENERGY PATCH POSSIBLE ON ELEMENT 1 "
           ENDIF
        ENDIF
 
@@ -1532,17 +1577,14 @@ CONTAINS
     ENDIF
 
     IF(DISCRETE) THEN
-       W_P=0
-       W_P%NC=1
-       W_P%FC='(2(1X,A72,/),(1X,A72))'
-       W_P%C(1)= " NO GEOMETRIC PATCHING POSSIBLE : MORE THAN 90 DEGREES BETWEEN FACES "
-       ! call ! WRITE_I
+        write(6,*) " NO GEOMETRIC PATCHING POSSIBLE : MORE THAN 90 DEGREES BETWEEN FACES "
     ENDIF
 
+    if(present(patching)) patching=.not.discrete
 
   END SUBROUTINE FIND_PATCH_P_new
 
-  SUBROUTINE FIND_PATCH_0(EL1,EL2_NEXT,NEXT,ENERGY_PATCH,PREC) ! COMPUTES PATCHES
+  SUBROUTINE FIND_PATCH_0(EL1,EL2_NEXT,NEXT,ENERGY_PATCH,PREC,patching) ! COMPUTES PATCHES
     IMPLICIT NONE
     TYPE (FIBRE),pointer :: EL1
     TYPE (FIBRE),TARGET,OPTIONAL, INTENT(INOUT) :: EL2_NEXT
@@ -1552,7 +1594,7 @@ CONTAINS
     LOGICAL(LP), OPTIONAL, INTENT(IN) ::  NEXT,ENERGY_PATCH
     INTEGER DIR
     LOGICAL(LP) ENE,NEX
-
+    LOGICAL(LP), OPTIONAL, INTENT(out) ::  patching
     IF(PRESENT(EL2_NEXT)) THEN
        EL2=>EL2_NEXT
     ELSE
@@ -1634,7 +1676,7 @@ CONTAINS
     DIR=-1  ; IF(NEX) DIR=1;
     D=0.0_dp;ANG=0.0_dp;
 
-    CALL FIND_PATCH_P_new(EL1,EL2,D,ANG,DIR,ENERGY_PATCH=ENE,prec=PREC)
+    CALL FIND_PATCH_P_new(EL1,EL2,D,ANG,DIR,ENERGY_PATCH=ENE,prec=PREC,patching=patching)
 
 
   END SUBROUTINE FIND_PATCH_0
@@ -2145,7 +2187,7 @@ CONTAINS
     NULLIFY(T%NEXT)
     NULLIFY(T%PREVIOUS)
     NULLIFY(T%BB)
-    NULLIFY(T%T)
+!    NULLIFY(T%T)
     !    NULLIFY(T%WORK)
     !    NULLIFY(T%USE_TPSA_MAP)
     !    NULLIFY(T%TPSA_MAP)
@@ -2324,6 +2366,11 @@ CONTAINS
     !      CALL KILL(t%bb)
     !      DEALLOCATE(T%bb)
     !    endif
+
+    IF(ASSOCIATED(T%TEAPOT_LIKE)) DEALLOCATE(T%TEAPOT_LIKE)
+    IF(ASSOCIATED(T%delta_rad_in)) DEALLOCATE(T%delta_rad_in)
+    IF(ASSOCIATED(T%delta_rad_out)) DEALLOCATE(T%delta_rad_out)
+    IF(ASSOCIATED(T%ref)) DEALLOCATE(T%ref)
     IF(ASSOCIATED(T%a)) DEALLOCATE(T%a)
     IF(ASSOCIATED(T%ent)) DEALLOCATE(T%ent)
     IF(ASSOCIATED(T%b)) DEALLOCATE(T%b)
@@ -2339,10 +2386,10 @@ CONTAINS
        CALL KILL(T%BB)
        DEALLOCATE(T%BB)
     ENDIF
-    IF(ASSOCIATED(T%T)) THEN
-       CALL KILL(T%T)
-       DEALLOCATE(T%T)
-    ENDIF
+!    IF(ASSOCIATED(T%T)) THEN
+!       CALL KILL(T%T)
+!       DEALLOCATE(T%T)
+!    ENDIF
     !    IF(ASSOCIATED(T%TPSA_MAP)) THEN
     !       CALL KILL(T%TPSA_MAP)
     !       DEALLOCATE(T%TPSA_MAP)
@@ -2369,7 +2416,7 @@ CONTAINS
     IF(ASSOCIATED(L%ORBIT_LATTICE)) THEN
        CALL de_Set_Up_ORBIT_LATTICE(L%ORBIT_LATTICE)  !  KILLING ORBIT LATTICE
        !(NO LINKED LIST DE_SET_UP_... = KILL_... )
-       WRITE(6,*) " ORBIT LATTICE HAS BEEN KILLED "
+       if(lielib_print(12)==1) WRITE(6,*) " ORBIT LATTICE HAS BEEN KILLED "
     ENDIF
 
 
@@ -2630,5 +2677,121 @@ CONTAINS
   !  DEALLOCATE(B)
 
   END SUBROUTINE KILL_BEAM_BEAM_NODE
+!!!!  aperture stuff
+
+  SUBROUTINE assign_aperture(p,kindaper,R,X,Y,dx,dy,pos)
+    IMPLICIT NONE
+    integer, optional :: pos
+    integer kindaper
+    REAL(DP) R(:),X,Y,dx,dy
+    type(fibre), pointer :: P
+
+    if(.NOT.ASSOCIATED(P%MAG%p%aperture)) THEN
+       call alloc(P%MAG%p%aperture)
+       call alloc(P%MAGP%p%aperture)
+    ENDIF
+    if(kindaper/=0) then
+       P%MAG%p%aperture%kind = kindaper
+       P%MAGP%p%aperture%kind = kindaper
+       P%MAG%p%aperture%r    = R
+       P%MAG%p%aperture%x    = X
+       P%MAG%p%aperture%y    = y
+       P%MAG%p%aperture%dx    = dX
+       P%MAG%p%aperture%dy    = dy
+       P%MAGP%p%aperture%r    = R
+       P%MAGP%p%aperture%x    = X
+       P%MAGP%p%aperture%y    = y
+       P%MAGP%p%aperture%dx    = dX
+       P%MAGP%p%aperture%dy    = dy
+       if(present(pos)) then
+          P%MAG%p%aperture%pos=pos
+         P%MAGP%p%aperture%pos=pos
+       endif
+    endif
+
+  end SUBROUTINE assign_aperture
+
+  SUBROUTINE assign_one_aperture(L,mpos,kindaper,R,X,Y,dx,dy,pos)
+    IMPLICIT NONE
+    TYPE(LAYOUT),TARGET :: L
+    integer, optional :: pos
+    integer mpos,kindaper
+    REAL(DP) R(:),X,Y,dx,dy
+    type(fibre), pointer :: P
+
+    call move_to(L,p,mpos)
+
+    call assign_aperture(p,kindaper,R,X,Y,dx,dy,pos)
+
+  end SUBROUTINE assign_one_aperture
+
+ SUBROUTINE toggle_ONE_aperture(p)
+    IMPLICIT NONE
+    integer pos
+    type(fibre), pointer :: P
+
+
+    if(ASSOCIATED(P%MAG%p%aperture)) THEN
+       P%MAG%p%aperture%kind = -P%MAG%p%aperture%kind
+       P%MAGP%p%aperture%kind = P%MAG%p%aperture%kind
+    ENDIF
+
+  end SUBROUTINE toggle_ONE_aperture
+
+ SUBROUTINE TURN_OFF_ONE_aperture(R,pos)
+    IMPLICIT NONE
+    TYPE(LAYOUT),TARGET :: R
+    integer pos
+    type(fibre), pointer :: P
+
+    call toggle_ONE_aperture(p)
+
+
+
+  end SUBROUTINE TURN_OFF_ONE_aperture 
+
+
+
+ SUBROUTINE toggle_aperture(R,pos)
+    IMPLICIT NONE
+    TYPE(LAYOUT),TARGET :: R
+    integer pos
+    type(fibre), pointer :: P
+
+    call toggle_ONE_aperture(p)
+
+  end SUBROUTINE toggle_aperture
+
+ SUBROUTINE turn_off_aperture(p)
+    IMPLICIT NONE
+    type(fibre), pointer :: P
+
+    if(ASSOCIATED(P%MAG%p%aperture)) THEN
+       IF(P%MAG%p%aperture%pos<IPOS/2) THEN
+        P%MAG%p%aperture%pos = ipos+P%MAG%p%aperture%pos 
+        P%MAGP%p%aperture%pos  = ipos+P%MAG%p%aperture%pos 
+       ELSE
+        WRITE(6,*) " ERROR APERTURE OFF ALREADY IN ", P%POS,P%MAG%NAME
+       ENDIF
+    ENDIF
+
+  end SUBROUTINE turn_off_aperture
+
+ SUBROUTINE turn_ON_aperture(p)
+    IMPLICIT NONE
+    type(fibre), pointer :: P
+
+    if(ASSOCIATED(P%MAG%p%aperture)) THEN
+       IF(P%MAG%p%aperture%pos>IPOS/2) THEN
+         P%MAG%p%aperture%pos =  P%MAG%p%aperture%pos - IPOS
+         P%MAGP%p%aperture%pos  = P%MAG%p%aperture%pos - IPOS
+       ELSE
+        WRITE(6,*) " ERROR APERTURE ON ALREADY IN ", P%POS,P%MAG%NAME
+       ENDIF
+    ENDIF
+ 
+
+  end SUBROUTINE turn_ON_aperture
+
 
 END MODULE S_FIBRE_BUNDLE

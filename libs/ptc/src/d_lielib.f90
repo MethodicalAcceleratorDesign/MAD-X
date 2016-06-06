@@ -43,7 +43,6 @@ module lielib_yang_berz
   logical :: frankheader=.true.
   logical :: new_ndpt = .true.
   integer,private :: nt_pos,npt_pos
-  logical :: perform_flip = .true.
   integer time_plane
   real(dp), private :: stmem(ndim)
   logical(lp) :: courant_snyder=.true.
@@ -62,7 +61,6 @@ contains
     integer i,nd1,ndc1,ndpt1,no1,nv1      !,nis
     real(dp),dimension(ndim)::ang,ra,st
     integer, optional :: time_pos
-    integer ipause,mypauses
     logical, optional :: da_init
     logical dai
     dai=.true.
@@ -123,11 +121,6 @@ contains
              nt_pos=npt_pos-1
           else
              nt_pos=npt_pos+1
-          endif
-          if(nt_pos==nd2.or.nt_pos==nd2-1) then
-             perform_flip=.false.
-          else
-             perform_flip=.true.
           endif
           if(npt_pos<3.or.npt_pos>nd2) then
              line=' LETHAL ERROR IN LIEINIT'
@@ -671,16 +664,9 @@ contains
     integer,dimension(2)::b,c
     integer,dimension(4)::t
     real(dp),external::f1,f2
-    logical doflip
+
     if(.not.c_%stable_da) return
-    if(perform_flip.and.new_ndpt.and.ndpt/=0) then
-       perform_flip=.false.
-       call flip_i(b(1),b(1),1)
-       call flip_i(b(2),b(2),1)
-       doflip=.true.
-    else
-       doflip=.false.
-    endif
+
 
 
     call etall(t,4)
@@ -693,13 +679,7 @@ contains
     call dasub(t(1),t(4),c(1))
     call daadd(t(2),t(3),c(2))
     call dadal(t,4)
-    if(doflip) then
-       call flip_i(b(1),b(1),-1)
-       call flip_i(b(2),b(2),-1)
-       if(c(1)/=b(1).and.c(1)/=b(2)) call flip_i(c(1),c(1),-1)
-       if(c(2)/=b(1).and.c(2)/=b(2).and.c(2)/=c(1)) call flip_i(c(2),c(2),-1)
-       perform_flip=.true.
-    endif
+
     return
   end subroutine comcfu
 
@@ -1529,15 +1509,7 @@ contains
     integer,dimension(ndim2)::a1i,a2i
     integer,dimension(:)::x,a1,a2,ft,xy,h
     real(dp),dimension(ndim)::angle,rad,st,p
-    logical doflip
     if(.not.c_%stable_da) return
-    if(perform_flip.and.new_ndpt.and.ndpt/=0) then
-       perform_flip=.false.
-       call flip(x,x)
-       doflip=.true.
-    else
-       doflip=.false.
-    endif
 
     call etallnom(a1i,nd2) !  ,'A1I       ')
     call etallnom(a2i,nd2) !  ,'A2I       ')
@@ -1613,15 +1585,7 @@ contains
     call taked(a2i,1,a1i)
     call etcct(xy,a1i,xy)
 
-    if(doflip) then
-       call flip(x,x)
-       call flip(a2,a2)
-       call flip(a1,a1)
-       call flip(xy,xy)
-       call flipflo(ft,ft,-1)
-       call flipflo(h,h,-1)
-       perform_flip=.true.
-    endif
+
     call dadal(a2i,nd2)
     call dadal(a1i,nd2)
     return
@@ -1636,7 +1600,7 @@ contains
 
   subroutine flip(xy,xyf)
     implicit none
-    integer i,nord
+
     integer,dimension(:):: xy,xyf
     integer,dimension(ndim2)::x,xi
     if(.not.c_%stable_da) return
@@ -1699,7 +1663,7 @@ contains
 
   subroutine flip_resonance(xy,xyf,i)
     implicit none
-    integer i,NRES,j
+    integer i,j
     integer,dimension(:,:):: xy,xyf
     integer,dimension(NDIM,NRESO) ::x
     if(.not.c_%stable_da) return
@@ -1768,7 +1732,7 @@ contains
 
   subroutine flip_i(xy,xyf,i)
     implicit none
-    integer i,nord
+    integer i
     integer  xy,xyf
     integer,dimension(ndim2)::x,xi
     if(.not.c_%stable_da) return
@@ -1813,7 +1777,6 @@ contains
     integer,dimension(:)::xy,a1,a1i
     integer,dimension(ndim2)::x,w,v,rel
     real(dp) xic
-    logical doflip
     if(.not.c_%stable_da) return
 
 
@@ -1826,13 +1789,7 @@ contains
 
     ! COMPUTATION OF A1 AND A1I USING DAINV
 
-    if(perform_flip.and.new_ndpt.and.ndpt/=0) then
-       perform_flip=.false.
-       call flip(xy,xy)
-       doflip=.true.
-    else
-       doflip=.false.
-    endif
+
 
     call etini(rel)
 
@@ -1898,12 +1855,6 @@ contains
        call datruncd(a1,nord+1,a1)
        call etinv(a1,a1i)
        call datruncd(a1i,nord+1,a1i)
-    endif
-    if(doflip) then
-       call flip(xy,xy)
-       call flip(a1,a1)
-       call flip(a1i,a1i)
-       perform_flip=.true.
     endif
 
 
@@ -2189,16 +2140,9 @@ contains
     integer i,bb1,bb2,j1,j2
     integer,dimension(:)::h,t
     integer,dimension(ndim2)::b1,b2,temp
-    logical doflip
+ 
     if(.not.c_%stable_da) return
 
-    if(perform_flip.and.new_ndpt.and.ndpt/=0) then
-       perform_flip=.false.
-       call flipflo(h,h,1)
-       doflip=.true.
-    else
-       doflip=.false.
-    endif
 
 
     call etall(b1,nd2)
@@ -2220,34 +2164,6 @@ contains
     if(ndpt.ne.0) then
        call dacop(h(ndt),t(nd))
        call dacop(b1(ndt),t(nd2))
-    endif
-
-    if(doflip) then
-       call flipflo(h,h,-1)
-       call etall(temp,nd2)
-       do i=1,nd2
-          call flip_i(t(i),temp(i),-1)
-       enddo
-
-       if(mod(ndpt,2)==0) then
-          j1=ndpt/2
-          j2=npt_pos/2
-       else
-          j1=(ndpt+1)/2
-          j2=(npt_pos+1)/2
-       endif
-
-       do i=1,nd2
-          call dacop(temp(i),t(i))
-       enddo
-
-       call dacop(temp(j1),t(j2))
-       call dacop(temp(j1+nd),t(j2+nd))
-       call dacop(temp(j2),t(j1))
-       call dacop(temp(j2+nd),t(j1+nd))
-
-       call dadal(temp,nd2)
-       perform_flip=.true.
     endif
 
     call dadal1(bb2)
@@ -2301,7 +2217,7 @@ contains
        call dapok(h(ndt),j,ang(nd))
     elseif(ndpt.eq.nd2) then
        j(ndpt)=1
-       call dapok(h(ndt),j,-ang(nd))
+       call dapok(h(ndt),j,ang(nd))     !!!! correct 2014.2.12 with David Sagan and Chris Mayes
     endif
     return
   end subroutine h2pluflo
@@ -2435,16 +2351,10 @@ contains
     !   C1------> R2+I R1
     integer c1,r2,i2,b1,b2
     integer,dimension(ndim2)::x
-    logical doflip
+
     if(.not.c_%stable_da) return
 
-    if(perform_flip.and.new_ndpt.and.ndpt/=0) then
-       perform_flip=.false.
-       call flip_i(c1,c1,1)
-       doflip=.true.
-    else
-       doflip=.false.
-    endif
+
 
     call etall1(b1)
     call etall1(b2)
@@ -2457,12 +2367,6 @@ contains
     call dalin(b1,0.5_dp,b2,0.5_dp,r2)
     call dalin(b1,0.5_dp,b2,-0.5_dp,i2)
 
-    if(doflip) then
-       call flip_i(c1,c1,-1)
-       if(r2/=c1) call flip_i(r2,r2,-1)
-       if(i2/=c1.and.i2/=r2) call flip_i(i2,i2,-1)
-       perform_flip=.true.
-    endif
 
 
     call dadal(x,nd2)
@@ -2474,17 +2378,10 @@ contains
     implicit none
     !  INVERSE OF CTOR
     integer c2,r1,i1,b1
-    logical doflip
+
     if(.not.c_%stable_da) return
 
-    if(perform_flip.and.new_ndpt.and.ndpt/=0) then
-       perform_flip=.false.
-       call flip_i(r1,r1,1)
-       call flip_i(i1,i1,1)
-       doflip=.true.
-    else
-       doflip=.false.
-    endif
+
 
     call etall1(b1)
 
@@ -2493,12 +2390,7 @@ contains
     call dadal1(b1)
 
 
-    if(doflip) then
-       call flip_i(r1,r1,-1)
-       if(i1/=r1) call flip_i(i1,i1,-1)
-       if(c2/=r1.and.c2/=i1) call flip_i(c2,c2,-1)
-       perform_flip=.true.
-    endif
+
 
     return
   end subroutine rtoc
@@ -2563,16 +2455,9 @@ contains
     integer i
     integer,dimension(:)::ci,cr
     integer,dimension(2)::tr,ti
-    logical doflip
+
     if(.not.c_%stable_da) return
-    if(perform_flip.and.new_ndpt.and.ndpt/=0) then
-       perform_flip=.false.
-       call flipflo(cr,cr,1)
-       call flipflo(ci,ci,1)
-       doflip=.true.
-    else
-       doflip=.false.
-    endif
+
 
     call etall(tr,2)
     call etall(ti,2)
@@ -2604,11 +2489,6 @@ contains
     !       call dacop(ci(i),di(i))
     !    enddo
 
-    if(doflip) then
-       call flipflo(cr,cr,-1)
-       call flipflo(ci,ci,-1)
-       perform_flip=.true.
-    endif
 
     call dadal(tr,2)
     call dadal(ti,2)
@@ -2621,17 +2501,10 @@ contains
     integer i
     integer,dimension(:)::c,ci,f,fi
     integer,dimension(ndim2)::e,ei
-    logical doflip
+ 
     if(.not.c_%stable_da) return
 
-    if(perform_flip.and.new_ndpt.and.ndpt/=0) then
-       perform_flip=.false.
-       call flipflo(c,c,1)
-       call flipflo(ci,ci,1)
-       doflip=.true.
-    else
-       doflip=.false.
-    endif
+ 
 
     call etall(e,nd2)
     call etall(ei,nd2)
@@ -2659,17 +2532,7 @@ contains
     call dadal(e,nd2)
     call dadal(ei,nd2)
 
-    if(doflip) then
-       call flipflo(c,c,-1)
-       call flipflo(ci,ci,-1)
-       if(c(1)/=f(1).and.ci(1)/=f(1)) then
-          call flipflo(f,f,-1)
-       endif
-       if(c(1)/=fi(1).and.ci(1)/=fi(1)) then
-          call flipflo(fi,fi,-1)
-       endif
-       perform_flip=.true.
-    endif
+ 
 
     return
   end subroutine reelflo
@@ -2781,7 +2644,7 @@ contains
     ! ---------------------
     integer i,ier,iunst,j,l,n1
     integer,dimension(ndim)::n
-    real(dp) ap,ax,rd,rd1,xd,xsu
+    real(dp) ap,ax,rd,rd1,xd,xsu,xsus
     real(dp),dimension(ndim2,ndim2)::cr,xj,sa,sai,cm,w,vr,vi,s1
     real(dp),dimension(ndim)::x,xx,st
     real(dp),dimension(ndim2)::rr,ri,p
@@ -2819,17 +2682,10 @@ contains
     endif
     call mulnd2(xj,w)
     call mulnd2(cr,w)
-    if(lielib_print(6)==1) then
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1((1X,A72),/))'
-       w_p%c(1)= 'Check of the symplectic condition on the linear part'
-       !CALL !WRITE_a
+
+
        xsu=0.0_dp
        do i=1,nd2
-          w_p=0
-          w_p%nr=nd2
-          w_p%fr='(6(2x,g23.16))'
           do j=1,nd2
              w_p%r(j)=w(i,j)
           enddo
@@ -2839,11 +2695,10 @@ contains
              xsu=xsu+abs(w(i,j)-XJ(I,J))
           enddo
        enddo
-       w_p=0
-       w_p%nc=1
-       w_p%fc='((1X,A120))'
+xsus=(xsu)/ND2
+  if(lielib_print(6)==1) then
        !     write(w_p%c(1),'(a29,g23.16,a2)') 'Deviation from symplecticity ',c_100*(xsu)/ND2, ' %'
-       if(lielib_print(9)==1) write(6,'(a29,g23.16,a2)') 'Deviation from symplecticity ',100.0_dp*(xsu)/ND2, ' %'
+      if(lielib_print(9)==1)  write(6,'(a29,g23.16,a2)') 'Deviation from symplecticity ',100.0_dp*(xsu)/ND2, ' %'
        !CALL !WRITE_a
     endif
     call eig6(cr,rr,ri,vr,vi)
@@ -2858,7 +2713,6 @@ contains
              hyp=.true.
              c_%stable_da=.false.
              c_%check_stable=.false.
-             messagelost="d_lielib.f90 mapflol : one of ri components is 0"
           endif
        enddo       
 
@@ -2890,7 +2744,7 @@ if(check_krein.and.(.not.hyp)) then
         xd=abs(log(rr(i)**2+ri(i)**2))+xd
        enddo
  
-       if(xsu>=0.and.xd>size_krein) then
+       if(xsu>=0.and.xd>size_krein.and.xsus<=size_krein) then
          write(6,*) " A Krein collision seemed to have happened "
          write(6,*) " All calculations interrupted "
        do i=1,nd2-ndc
@@ -2902,10 +2756,9 @@ if(check_krein.and.(.not.hyp)) then
        do i=1,nd2
         write(6,*)"eigenvalues ",  rr(i),ri(i)
        enddo
+          c_%stable_da=.false.
+          c_%check_stable=.false.
        
-       c_%stable_da=.false.
-       c_%check_stable=.false.
-       messagelost="d_lielib.f90 mapflol : check_krein failed"    
        endif
        
      endif  
@@ -4494,10 +4347,10 @@ endif
     implicit none
 
 
-    integer i,j
+    integer i
     real(dp) a(6,6),ai(6,6),b(6,6)
 
-    real(dp) xj(6,6),mj(6,6),xn,jb(6,6),kick(3),br(6,6)
+    real(dp) xj(6,6),xn,jb(6,6),kick(3),br(6,6)
 
 
 
@@ -4537,12 +4390,11 @@ endif
     !---- FROM TRACKING CODE
     ! ---------------------
     integer, parameter :: ndimt=3,ndimt2=6
-    integer i,ier,iunst,j,l,n1,n(ndimt)
-    real(dp) ap,ax,rd,rd1,xd,xsu
+    integer i,ier,iunst,j,n1,n(ndimt)
     real(dp),dimension(ndimt2,ndimt2)::cr,xj,sa,sai,cm,w,vr,vi,s1
     real(dp),dimension(ndimt)::x,xx,st
-    real(dp),dimension(ndimt2)::rr,ri,p
-    logical hyp
+    real(dp),dimension(ndimt2)::rr,ri
+
     if(.not.c_%stable_da) return
 
     n1=0
@@ -4649,7 +4501,7 @@ endif
     integer jet,nn,i,i1,ilo,ihi,mdim,info
     real(dp),dimension(ndimt2)::reval,aieval,ort
     real(dp),dimension(ndimt2,ndimt2)::revec,aievec,fm,aa,vv
-    INTEGER IPAUSE,MYPAUSES
+
     if(.not.c_%stable_da) return
 
     !  copy matrix to temporary storage (the matrix aa is destroyed)

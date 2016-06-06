@@ -32,7 +32,8 @@ ptc_align;
 select,flag=ptc_twiss,column=name,s,beta11,beta21,
                                   beta12,beta22,disp1,disp3,x,px,y,py;
 
-ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2;
+ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2,rmatrix;
+
 
 PTC_NORMAL,closed_orbit,maptable,icase=5,no=2;
 
@@ -56,7 +57,7 @@ beam, particle = proton, energy =   eg        ,
 
 
 ptc_create_universe;
-ptc_create_layout,model=2,method=6,nst=5,exact;
+ptc_create_layout,model=2,method=6,nst=10,exact;
 ptc_align;
                                     
 ! Example 4: Input transfer matrix coef manually ========================
@@ -67,8 +68,6 @@ ptc_align;
 ptc_twiss,icase=5,no=2, initial_matrix_manual,  
     re11 = -2.440906515,
     re12 =  177.6244021,
-    re13 =  0,
-    re14 =  0,
     re16 =  2.219772938,
     re21 = -0.03836532036,
     re22 =  2.382154768,
@@ -77,6 +76,10 @@ ptc_twiss,icase=5,no=2, initial_matrix_manual,
     re34 =  32.02065712,
     re43 = -0.03838049208,
     re44 = -0.50877646,
+    re51 = -0.01852016683 ,
+    re52 = 2.257114914  ,             
+    re56 = 0.1632326785 ,                 
+    re55 = 0,
     re66 =  1,
     x    =  0.0003260715489,
     px   =  2.596345986e-06,

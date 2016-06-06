@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:26:17      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.06.02 12:34:53      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, 'RF-Dipole example';
 
@@ -84,6 +84,7 @@ ptc_create_universe;
           Kinetic Energy : 0.906173E+01
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.995588E+01
+  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy           10.000000000000000     
      method                   6
@@ -118,6 +119,7 @@ ptc_create_universe;
        TIME        =  TRUE 
        FRINGE      =  FALSE
        PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
        ONLY_4D     =  TRUE 
        DELTA       =  TRUE 
        SPIN        =  FALSE
@@ -128,13 +130,13 @@ ptc_create_universe;
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-              24.2       0.3931569167       -1.510062196           -1000000 
+              24.2       0.3931569159       -1.510062195           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000       0.3843533724        1.594839707       0.6356419808 
+          -1000000       0.3843533716        1.594839708       0.6356419808 
 
                 q2                dq1                dq2                 qs 
-       0.732977059                  0                  0                  0 
+       0.732977059                 -0                 -0                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        1.506312053        3.820527079        3.689249822        7.708973525 
@@ -152,10 +154,10 @@ ptc_create_universe;
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0                  0        1.834664738 
+                 0                  0                  0        1.834664739 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.3644916488       0.3644916376                  0                  0 
+     -0.3644916491       0.3644916378                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0                  0 
@@ -164,19 +166,19 @@ ptc_create_universe;
                  0                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    6.655669628e-08                  0    1.905024366e-08 
+                 0    6.655669633e-08                  0    1.905024369e-08 
 
            pycorms             tcorms            ptcorms             xcomax 
                  0                  0                  0                  0 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    3.713213909e-08                  0                  0 
+                 0    3.713213905e-08                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -1.221075655e-07                  0   -3.470539734e-08 
+                 0   -1.221075657e-07                  0    -3.47053975e-08 
 
            pycomin             tcomin            ptcomin 
-                 0                  0                  0 
+                 0                 -0                  0 
     q1ptc = table(twiss, my_seq$end, mu1);
 
     q1ptc = q1ptc - floor(q1ptc);
@@ -256,7 +258,7 @@ obs_points: 2
   Rectangular Bend: input arc length (rho alpha) 
   Default integration method     6
   Default integration steps      5
- This is a proton 
+ This is a proton
        EXACT_MODEL =  TRUE 
        TOTALPATH   =     1
        RADIATION   =  FALSE
@@ -266,6 +268,7 @@ obs_points: 2
        TIME        =  FALSE
        FRINGE      =  FALSE
        PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
        ONLY_4D     =  FALSE
        DELTA       =  FALSE
        SPIN        =  FALSE

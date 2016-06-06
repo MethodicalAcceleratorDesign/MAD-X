@@ -78,14 +78,14 @@
 @ YCOMAX           %le      0.008056958782
 @ PYCOMIN          %le    -0.0003912272041
 @ PYCOMAX          %le     0.0004558719032
-@ TCOMIN           %le    -1.067997988e-05
-@ TCOMAX           %le     1.013617463e-05
+@ TCOMIN           %le    -1.013617463e-05
+@ TCOMAX           %le     1.067997988e-05
 @ PTCOMIN          %le                   0
 @ PTCOMAX          %le                   0
 @ TITLE            %58s "LHC Version 6.503 -  July 2009 - version with RCOLLIMATORs"
-@ ORIGIN           %17s "5.02.09 Darwin 64"
-@ DATE             %08s "18/04/16"
-@ TIME             %08s "18.23.35"
+@ ORIGIN           %17s "5.02.04 Darwin 64"
+@ DATE             %08s "18/03/15"
+@ TIME             %08s "17.51.56"
 * NAME                                S               BETX               BETY                  X                 PX                  Y                 PY APERTYPE                       APER_1            ON_ELEM 
 $ %s                                %le                %le                %le                %le                %le                %le                %le %s                                %le                %le 
  "TAS.1R1"                       20.915        50.76701738        50.76706145    -0.001999999199   -5.887463714e-12     0.003555550365    0.0001700000459 "CIRCLE"                             0                  0

@@ -183,6 +183,8 @@ CONTAINS
 
        B%A_T=A%A_T
        B%B_T=A%B_T
+       B%b0b=A%b0b
+       B%p0b=A%p0b
        B%A_X1=A%A_X1
        B%B_X1=A%B_X1
        B%A_X2=A%A_X2
@@ -256,13 +258,13 @@ CONTAINS
 
     IF(R==0.or.R==1) THEN    !
        NULLIFY(F%A_T,F%B_T,F%A_D,  F%B_D,   F%A_ANG,F%B_ANG)
-       NULLIFY(F%A_X1,F%A_X2,F%B_X1,F%B_X2)
+       NULLIFY(F%A_X1,F%A_X2,F%B_X1,F%B_X2,F%p0b,F%B0b)
 
        NULLIFY(F%TIME,F%ENERGY,F%PATCH)
        ALLOCATE(F%A_D(3),F%B_D(3),F%A_ANG(3),F%B_ANG(3))
        ALLOCATE(F%A_T,F%B_T)
        ALLOCATE(F%A_X1,F%A_X2,F%B_X1,F%B_X2)
-       ALLOCATE(F%TIME,F%ENERGY,F%PATCH)
+       ALLOCATE(F%TIME,F%ENERGY,F%PATCH,F%p0b,F%B0b)
        F%A_T=0.0_dp
        F%B_T=0.0_dp
        F%A_X1=1; F%A_X2=1; F%B_X1=1; F%B_X2=1;
@@ -270,15 +272,17 @@ CONTAINS
        F%B_D=0.0_dp
        F%A_ANG=0.0_dp
        F%B_ANG=0.0_dp
+       F%p0b=0.0_dp
+       F%B0b=0.0_dp
        f%patch=0
        f%ENERGY=0
        f%TIME=0
     ELSEIF(R==-1) THEN
-       DEALLOCATE(F%A_D,F%B_D,F%A_ANG,F%B_ANG)
+       DEALLOCATE(F%A_D,F%B_D,F%A_ANG,F%B_ANG,F%p0b,F%B0b)
        DEALLOCATE(F%A_T,F%B_T)
        DEALLOCATE(F%A_X1,F%A_X2,F%B_X1,F%B_X2)
        DEALLOCATE(F%TIME,F%ENERGY,F%PATCH)
-       nullify(F%A_D,F%B_D,F%A_ANG,F%B_ANG)
+       nullify(F%A_D,F%B_D,F%A_ANG,F%B_ANG,F%p0b,F%B0b)
        nullify(F%A_T,F%B_T)
        nullify(F%A_X1,F%A_X2,F%B_X1,F%B_X2)
        nullify(F%TIME,F%ENERGY,F%PATCH)
@@ -556,6 +560,28 @@ CONTAINS
 
   END SUBROUTINE TRANSLATE_FRAME
 
+  SUBROUTINE  TRANSLATE_point(R,D,ORDER,BASIS) ! TRANSLATES A FRAME
+    IMPLICIT NONE
+    REAL(DP),TARGET, INTENT(INOUT):: R(3)
+    REAL(DP),INTENT(IN):: D(3)
+    REAL(DP), OPTIONAL :: BASIS(3,3)
+    INTEGER IORDER
+    INTEGER, OPTIONAL, INTENT(IN) :: ORDER
+    REAL(DP) DD(3)
+
+    ! THIS ROUTINE TRANSLATE r(3)BY A(3) IN STANDARD ORDER USING THE
+    ! GLOBAL FRAME TO DEFINE D
+
+    IORDER=1
+    DD=D
+    IF(PRESENT(ORDER)) IORDER=ORDER
+    IF(PRESENT(BASIS)) THEN
+       CALL CHANGE_BASIS(D,BASIS,DD,GLOBAL_FRAME)
+    ENDIF
+
+    r=r+IORDER*DD
+ 
+  END SUBROUTINE TRANSLATE_point
 
 
   SUBROUTINE make_rot_x(r,a)
@@ -767,7 +793,7 @@ CONTAINS
     endif
   end subroutine make_normal
 
-  SUBROUTINE COMPUTE_ENTRANCE_ANGLE(ENTL,ENTB,A)
+   SUBROUTINE COMPUTE_ENTRANCE_ANGLE(ENTL,ENTB,A)
     ! COMPUTES PTC'S ANGLES IN FRAME OF ENTL
     IMPLICIT NONE
     REAL(DP),INTENT(IN):: ENTL(3,3), ENTB(3,3)
@@ -821,9 +847,9 @@ CONTAINS
        A(3)=ATAN2(S_IJ,S_JJ)
     endif
     !    A(3)=ATAN2(S_IJ,S_JJ)
-    AT=0.0_dp;AT(3)=A(3);
+   ! AT=0.0_dp;AT(3)=A(3);
 
-    CALL GEO_ROT(T10,T1,AT,T2)
+   ! CALL GEO_ROT(T10,T1,AT,T2)
     !   T2=T1
     !   write(16,*) t2-entb
 
@@ -842,16 +868,17 @@ CONTAINS
     T10=ENTL
     T2=ENTL
 
-    CALL COMPUTE_SCALAR(T1,2,ENTB,1,S_IJ)
-    CALL COMPUTE_SCALAR(T1,1,ENTB,1,S_JJ)
+
+    CALL COMPUTE_SCALAR(T1,1,ENTB,3,S_IJ)
+    CALL COMPUTE_SCALAR(T1,3,ENTB,3,S_JJ)
 
     if(S_IJ==0.0_dp.and.S_JJ==0.0_dp) then
-       A(3)=0.0_dp
+       A(2)=0.0_dp
     else
-       A(3)=ATAN2(S_IJ,S_JJ)
+       A(2)=ATAN2(-S_IJ,S_JJ)
     endif
-    !    A(3)=ATAN2(S_IJ,S_JJ)
-    AT=0.0_dp;AT(3)=A(3);
+    AT=0.0_dp;AT(2)=A(2);
+
 
     CALL GEO_ROT(T10,T1,AT,T2)
     T2=T1
@@ -867,35 +894,31 @@ CONTAINS
        A(1)=ATAN2(-S_IJ,S_JJ)
     endif
 
-    !   A(1)=ATAN2(-S_IJ,S_JJ)
+ 
     AT=0.0_dp;AT(1)=A(1);
 
     CALL GEO_ROT(T10,T1,AT,T2)
     T2=T1
     T10=T1
 
-    CALL COMPUTE_SCALAR(T1,1,ENTB,3,S_IJ)
-    CALL COMPUTE_SCALAR(T1,3,ENTB,3,S_JJ)
+
+    CALL COMPUTE_SCALAR(T1,2,ENTB,1,S_IJ)
+    CALL COMPUTE_SCALAR(T1,1,ENTB,1,S_JJ)
 
     if(S_IJ==0.0_dp.and.S_JJ==0.0_dp) then
-       A(2)=0.0_dp
+       A(3)=0.0_dp
     else
-       A(2)=ATAN2(-S_IJ,S_JJ)
+       A(3)=ATAN2(S_IJ,S_JJ)
     endif
 
-    !    A(2)=ATAN2(-S_IJ,S_JJ)
-    AT=0.0_dp;AT(2)=A(2);
+  !  AT=0.0_dp;AT(3)=A(3);
 
-    CALL GEO_ROT(T10,T1,AT,T2)
-    T2=T1
-    T10=T1
     a(1:2)=-a(1:2)
 
-    !   T2=T1
-    !   write(16,*) t2-entb
 
 
-  END SUBROUTINE COMPUTE_ENTRANCE_ANGLE_bmad
+
+  END SUBROUTINE COMPUTE_ENTRANCE_ANGLE_bmad 
 
   SUBROUTINE  COMPUTE_SCALAR(ENTL,I,ENTB,J,S_IJ) ! Adjusts frames of magnet_chart on the basis of the misalignments
     IMPLICIT NONE
@@ -979,12 +1002,12 @@ CONTAINS
     an(3)=ang(3)
     CALL GEO_ROT(EXI,AN,1,basis=ENT)
     
-    ENT=EXI
+    !ENT=EXI
     an=0
     an(1)=-ang(1)
     CALL GEO_ROT(EXI,AN,1,basis=ENT)
 
-    ENT=EXI
+    !ENT=EXI
     an=0
     an(2)=-ang(2)
     CALL GEO_ROT(EXI,AN,1,basis=ENT)

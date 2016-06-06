@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  +     MAD-X 5.02.08  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:26:03      +
+  + Release   date: 2015.11.20               +
+  + Execution date: 2016.02.11 17:56:03      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -815,18 +815,19 @@ ptc_create_universe;
           Kinetic Energy : 0.145151E+00
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.541711E+00
+  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
-     energy           1.0834226784000001     
+     energy           1.08342267840000     
      method                   6
      Num. of steps            5
-     charge           1.0000000000000000     
-  Length of machine:    78.543702661677713     
+     charge           1.00000000000000     
+  Length of machine:    78.5437026616777     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
- Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -6.2727600891321345E-015   0.0000000000000000        8.4376949871511897E-015
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:  -6.272760089132134E-015  0.000000000000000E+000  8.437694987151190E-015
 
 
   !!!!!       T I M E   F A L S E,   T O T P A T H  T R U E
@@ -846,7 +847,7 @@ obs_points pro_ptc_setswitch Done
 
   
 
-  ptc_twiss, table=twiss, icase=56, no=2, closed_orbit;
+  ptc_twiss, table=twiss, icase=56, no=2, closed_orbit, rmatrix;
 
  ************ State Summary ****************
  MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
@@ -863,6 +864,7 @@ obs_points pro_ptc_setswitch Done
        TIME        =  FALSE
        FRINGE      =  FALSE
        PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
        ONLY_4D     =  FALSE
        DELTA       =  FALSE
        SPIN        =  FALSE
@@ -897,28 +899,28 @@ obs_points pro_ptc_setswitch Done
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0        -10.3020712    0.0005941579859 
+                 0                  0        -10.3020712    0.0005941579858 
 
           disp2min           disp2max           disp3min           disp3max 
        -4.54310719         4.54310719                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    1.068886127e-08 
+                 0                  0                  0    1.068886442e-08 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.546139786e-09                  0                  0                  0 
+   2.546139122e-09                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    1.168573345e-08                  0    3.059593723e-09 
+                 0    1.168573391e-08                  0    3.059593852e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0        46.00166095                  0    2.508645927e-08 
+                 0        46.00166095                  0    2.508646064e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.106286922e-08                  0        78.54370268 
+                 0    1.106287025e-08                  0        78.54370268 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -1.447485988e-12                  0   -1.106286967e-08 
+                 0   -1.449191389e-12                  0   -1.106286975e-08 
 
            pycomin             tcomin            ptcomin 
                  0                  0                  0 

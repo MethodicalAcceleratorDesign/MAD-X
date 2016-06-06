@@ -1,0 +1,78 @@
+L1 : drift, L=  2.832695;
+L2 : drift, L=  0.45698;
+L3 : drift, L=  0.08902;
+L4 : drift, L=  0.2155;
+L5 : drift, L=  0.219;
+L6 : drift, L=  0.107078;
+L7 : drift, L=  0.105716;
+L8 : drift, L=  0.135904;
+L9 : drift, L=  0.2156993;
+L10: drift, L= 0.089084;
+L11: drift, L= 0.235416;
+L12: drift, L= 0.1245;
+L13: drift, L= 0.511844;
+L14: drift, L= 0.1788541;
+L15: drift, L= 0.1788483;
+L16: drift, L= 0.511849;
+L17: drift, L= 0.1245;
+L18: drift, L= 0.235405;
+L19: drift, L= 0.089095;
+L20: drift, L= 0.2157007;
+L21: drift, L= 0.177716;
+L22: drift, L= 0.170981;
+L23: drift, L= 0.218997;
+L24: drift, L=0.215503;
+L25: drift, L=0.0890187;
+L26: drift, L=0.45698;
+L27: drift, L=2.832696;
+L27c: drift, L=2.832696-0.2;
+ds : drift, L=0.1015;
+
+QF1 : QUADRUPOLE,L=0.344, K1= 2.2474D0+6.447435260914397e-03;
+QF2 : QUADRUPOLE,L=0.344, K1= 2.2474;
+QD1 : QUADRUPOLE,L=0.187, K1= -2.3368D0-2.593018157427161e-02; 
+QD2 : QUADRUPOLE,L=0.187, K1= -2.3368;  
+QFA1: QUADRUPOLE,L=0.448, K1= 2.8856;  
+QFA2: QUADRUPOLE,L=0.448, K1= 2.8856;  
+
+!!! 1/2 mad-x value
+ksf=-41.3355516397069748d0;
+ksd=56.2564709584745489d0;
+
+sf:sextupole,l=2*0.1015d0, K2= ksf;
+sd: sextupole,l=2*0.1015d0, K2= ksd;
+
+VC5:marker;
+ALPHA=0.17453292519943295769236907684886d0;
+ 
+LBEND=0.86621d0;
+ 
+BEND : RBEND, L=LBEND, ANGLE=ALPHA, k1=-0.778741;
+BEND1 : RBEND,L= LBEND, ANGLE=ALPHA, k1=-0.778741;
+ 
+CAVM:MARKER;
+rfvolt = 0.2d0;
+CAV:RFCAVITY,L=0.2000,VOLT:=rfvolt,FREQ=500.;
+
+ sfline: line = (1*sf);
+ sdline: line = (1*sd);
+
+SUP1: line =(L1+L2+L3+QF1+VC5+L4+L5+QD1+L6+L7+L8+VC5+BEND+VC5+L9+sfline+L10+
+           L11+QFA1+L12+sdline+L13+ 
+           L14+BEND+L15+L16+sdline+L17+ 
+           QFA2+L18+L19+sfline+L20+BEND+L21+
+           L22+QD2+L23+L24+QF2+L25+ 
+           L26+VC5+L27+cavm);
+
+SUPb: line=(L1+L2+L3+QF1+VC5+L4+L5+QD1+L6+L7+L8+VC5+BEND+VC5+L9+sfline+L10+
+           L11+QFA1+L12+sdline+L13+ 
+           L14+BEND+L15+L16+sdline+L17+ 
+           QFA2+L18+L19+sfline+L20+BEND1+L21+
+           L22+QD2+L23+L24+QF2+L25+ 
+           L26+VC5+L27c+cav);
+
+
+SSTART: marker; !to get compatible with lattice build in F90 code (pure PTC example)
+
+ALS: line = (SSTART + 11*sup1 + supb);
+

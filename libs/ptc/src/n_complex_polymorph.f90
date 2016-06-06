@@ -5466,7 +5466,7 @@ contains
     type (double_complex),INTENT(INOUT)::S2
     type (double_complex), intent(INOUT):: s1
     real(dp) prec
-    integer i
+ 
     type(double_complex) t
 
     call alloc(t)

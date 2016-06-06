@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:26:05      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.06.02 10:00:52      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -815,6 +815,7 @@ ptc_create_universe;
           Kinetic Energy : 0.145151E+00
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.541711E+00
+  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy           1.0834226784000001     
      method                   6
@@ -846,7 +847,7 @@ obs_points pro_ptc_setswitch Done
 
   
 
-  ptc_twiss, table=twiss, icase=56, no=2, closed_orbit;
+  ptc_twiss, table=twiss, icase=56, no=2, closed_orbit, rmatrix;
 
  ************ State Summary ****************
  MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
@@ -863,6 +864,7 @@ obs_points pro_ptc_setswitch Done
        TIME        =  TRUE 
        FRINGE      =  FALSE
        PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
        ONLY_4D     =  FALSE
        DELTA       =  FALSE
        SPIN        =  FALSE
@@ -873,13 +875,13 @@ obs_points pro_ptc_setswitch Done
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-       78.54370266       0.1241079695       -41.13731262           -1000000 
+       78.54370266        0.124107587       -41.13734187           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000      -0.6258928034        2.838573636       0.8200596224 
+          -1000000      -0.6258931859        2.838578011       0.8200596224 
 
                 q2                dq1                dq2                 qs 
-      0.7198292883       -4.353246537       -9.482228978                  0 
+      0.7198292883       -4.353247487       -9.482231049                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        3.282153615        15.12420817        1.633285387        20.07025827 
@@ -897,28 +899,28 @@ obs_points pro_ptc_setswitch Done
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0       -20.60417207     0.001188317683 
+                 0                  0       -20.60417657     0.001188317943 
 
           disp2min           disp2max           disp3min           disp3max 
-      -9.086227467        9.086227467                  0                  0 
+      -9.086229451        9.086229451                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    1.068886127e-08 
+                 0                  0                  0    1.068886442e-08 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.546139786e-09                  0                  0                  0 
+   2.546139122e-09                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    1.168573345e-08                  0    3.059593723e-09 
+                -0    1.168573391e-08                  0    3.059593852e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0        92.00345441                  0    2.508645927e-08 
+                 0        92.00347451                  0    2.508646064e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.106286922e-08                  0        157.0876316 
+                 0    1.106287025e-08                  0        157.0876659 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -1.447485988e-12                  0   -1.106286967e-08 
+                 0   -1.449191389e-12                  0   -1.106286975e-08 
 
            pycomin             tcomin            ptcomin 
                  0                  0                  0 

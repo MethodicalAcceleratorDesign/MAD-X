@@ -1,0 +1,1054 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.10  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.06.02 10:03:52      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+! test for ptc_twiss,initial_map_manual=true;
+
+! it 
+
+! 1. reads provided fort.18 with one turn map
+
+! 2. calculates the corresponding closed solution (via normal form)
+
+! 3. tracks this solution through the layout
+
+! 
+
+!Good for passing initial conditions from ring to transfer line calculations, for example
+
+
+
+call, file="../share/LEIR/LEIR.seqx";
+
+! LEIR Lattice definitions
+
+
+
+! Input parameter to be provided before calling :
+
+
+
+!  LSSH  .... half length of straight section from "mire to mire"
+
+
+
+!  dLSext ... Quad length reduction due to a Sextupole close to it
+
+!  dLBmp  ... Quad length reduction due to a Bumper close to it
+
+!  dLDip  ... Quad length reduction due to a Dipole close to it
+
+!  dLSol  ... Quad length reduction due to a Correction solenoid close
+
+!  dLSkew ... Quad length reduction due to a Skew Quad close to it
+
+!  KickEC ... Flag (multiplier) wheter if kicks due to toroid should be taken into account (=1)
+
+
+
+  TuneH  =  1.82;
+
+  TuneV  =  2.72;
+
+  DisEC  = -0.00;
+
+  BetHEC =  5.00;
+
+  BetVEC =  5.00;
+
+  kEddy  =  0.00;
+
+
+
+ ! Define lattice .... first parameter, then CALL a routine
+
+
+
+ ! LSSH = ((25.-2*4.17)*Pi - .0052)/8. ! To have a circumf. of 25 Pi m
+
+  LSSH = 6.5422;	                ! From fit to survey data
+
+  DFD = 0.;  !  Flag, if 1 DFD, if 0 FDF
+
+  dLSext = 0.005;  ! Mag. length decrease of Quads due to adjacent X-Pole
+
+  dLBmp  = 0.000;  ! Mag. length decrease of Quads due to adjacent Bumper
+
+  dLDip  = 0.000;  ! Mag. length decrease of Quads due to adjacent Dipole
+
+  dLSol  = 0.000;  ! Mag. length decrease of Quads due to adjacent correct. Sol.
+
+  dLSkew = 0.005;  ! Mag. length decrease of Quads due to adjacent Skew Quad
+
+  KickEC = 1.;     ! Flag whether kick due to cooler is taken into account (=1) or not (-0)   
+
+
+
+
+
+  kD1030   =-1.1303*(1-DFD) - 1.2003*DFD;
+
+  kF1030   = 0.9041*(1-DFD) + 0.9286*DFD;
+
+  kF2040   = .30876*(1-DFD) - 1.2094*DFD;
+
+  kD2040   =-1.3181*(1-DFD) + 0.9226*DFD;
+
+  kF2344   = 0.7167*(1-DFD) - 0.0918*DFD;
+
+  dkFT20   = 0.0;
+
+  dkDT20   = 0.0; 
+
+  dkFT23   = 0.0;  ! strictly applies for ER.QFN24 and ER.QFN23
+
+  Msol     = 0.0;
+
+  MsolC    = 0.0;
+
+  kSk1     = 0.0;
+
+  kEddy    = 0.0;
+
+++++++ info: keddy redefined
+
+
+  LFrMir =  1.11684*((1 - cos(0.240964) + sin(0.240964))/0.240964) +       
+
+            0.01575*(sin(0.240964) + cos(0.240964)) +                      
+
+            2.13554*((cos(0.240964) - Sin(0.240964))/(Pi/4. - 0.240964)) + 
+
+            0.07299*sqrt(2.) - 4.17;
+
+  LstrH = LSSH - LFrMir;
+
+  LbenH = 1.11684 + 0.01575 + 2.13554 + 0.07299;
+
+
+
+! RF system (my test) ... for CHARGE=1 ... VOLTAGE should be scale --> devided by 54
+
+! Vrf=2.2kV / H=2 / Fsynch = 1.567kHz
+
+!  CAV: RFCAVITY, L=1.0, VOLT=0.0022/54, HARMON=2, LAG=0, no_cavity_totalpath;  
+
+  CAV: RFCAVITY, L=1.0, VOLT=0.0022/54, FREQ=3.816881762, LAG=0, no_cavity_totalpath;  
+
+
+
+! 3816881.7619258035
+
+
+
+! Definitions for bending blocks
+
+  ED1 =-0.01157;
+
+  ED2 = 0.01500;
+
+  ED3 = 0.09557;
+
+  BA1HO :  SBEND, L=1.11684/2.,            ANGLE=-0.240964/2.,                                  K1:=kEddy, K2:=sEddy, E1=-ED1, E2= 0   ;
+
+  BA1HI :  SBEND, L=1.11684/2.,            ANGLE=-0.240964/2.,                                  K1:=kEddy, K2:=sEddy, E1= 0,   E2=-ED2 ;
+
+  BI1PO :  SBEND, L=2.13554-0.2620-1.4778, ANGLE=-(Pi/4.-0.240964)*(1-(1.4778+0.2620)/2.13554), K1:=kEddy, K2:=sEddy, E1= 0,   E2= 0   ;
+
+  BI1PM :  SBEND, L=0.2620,                ANGLE=-(Pi/4.-0.240964)*0.2620/2.13554,              K1:=kEddy, K2:=sEddy, E1= 0,   E2= 0   ;
+
+  BI1PI :  SBEND, L=1.4778,                ANGLE=-(Pi/4.-0.240964)*1.4778/2.13554,              K1:=kEddy, K2:=sEddy, E1= 0,   E2=-ED3 ;
+
+  BI2PI :  SBEND, L=1.4778,                ANGLE=-(Pi/4.-0.240964)*1.4778/2.13554,              K1:=kEddy, K2:=sEddy, E1=-ED3, E2= 0   ;
+
+  BI2PM :  SBEND, L=0.2620,                ANGLE=-(Pi/4.-0.240964)*0.2620/2.13554,              K1:=kEddy, K2:=sEddy, E1= 0,   E2= 0   ;
+
+  BI2PO :  SBEND, L=2.13554-0.2620-1.4778, ANGLE=-(Pi/4.-0.240964)*(1-(1.4778+0.2620)/2.13554), K1:=kEddy, K2:=sEddy, E1= 0,   E2= 0   ;
+
+  BA2HI :  SBEND, L=1.11684/2.,            ANGLE=-0.240964/2.,                                  K1:=kEddy, K2:=sEddy, E1=-ED2, E2= 0   ;
+
+  BA2HO :  SBEND, L=1.11684/2.,            ANGLE=-0.240964/2.,                                  K1:=kEddy, K2:=sEddy, E1= 0,   E2=-ED1 ;
+
+  DBA   :  DRIFT, L=0.01575;
+
+  DBI   :  DRIFT, L=0.07299;
+
+
+
+! Quadrupole families
+
+  QDN1030 : QUADRUPOLE, L=0.5172, K1 := kD1030;
+
+  QFN1030 : QUADRUPOLE, L=0.5172, K1 := kF1030;
+
+
+
+  QFN2040 : QUADRUPOLE, L=0.5172, K1 := kF2040;
+
+  QDN2040 : QUADRUPOLE, L=0.5172, K1 := kD2040;
+
+  QFN2344 : QUADRUPOLE, L=0.5172, K1 := kF2344;
+
+
+
+  QFT20   : QUADRUPOLE, L=0.5172, K1 := kF2040 + dkFT20;
+
+  QDT20   : QUADRUPOLE, L=0.5172, K1 := kD2040 + dkDT20;
+
+  QFT23   : QUADRUPOLE, L=0.5172, K1 := kF2344 + dkFT23;
+
+  QFT24   : QUADRUPOLE, L=0.5172, K1 := kF2344 + dkFT23;
+
+
+
+! Sextupoles
+
+  XFW01   : MULTIPOLE, KNL := {0, 0, 1.11684*sW01};  
+
+  XFW02   : MULTIPOLE, KNL := {0, 0, 1.11684*sW02};  
+
+
+
+  XDN11   : SEXTUPOLE, L=0.33535, K2 := sD1030;
+
+  XFN11   : SEXTUPOLE, L=0.33535, K2 := sF1030;
+
+  XFN12   : SEXTUPOLE, L=0.33535, K2 := sF1030;
+
+  XDN12   : SEXTUPOLE, L=0.33535, K2 := sD1030;
+
+
+
+  XDN31   : SEXTUPOLE, L=0.33535, K2 := sD1030; 
+
+  XFN31   : SEXTUPOLE, L=0.33535, K2 := sF1030;
+
+  XFN32   : SEXTUPOLE, L=0.33535, K2 := sF1030;
+
+  XDN32   : SEXTUPOLE, L=0.33535, K2 := sD1030;
+
+
+
+  XFLS41 : SEXTUPOLE, L=0.33535, K2 := sF40;  
+
+  XFLS42 : SEXTUPOLE, L=0.33535, K2 := sF40;  
+
+
+
+! Dipoles, Bumpers and (extraction) Kicker :
+
+  DWHV11 : KICKER;
+
+  DFH11  : HKICKER, KICK := dBmpI;
+
+  DHV12  : KICKER;
+
+  DFH12  : HKICKER, KICK := dBmpI;
+
+  DWHV12 : KICKER;
+
+
+
+  DWHV21 : KICKER;
+
+  DFH21  : HKICKER, KICK := dBmpO;
+
+  DEHV21 : KICKER;
+
+  DEHV22 : KICKER;
+
+  DWHV22 : KICKER;
+
+
+
+  DWHV31 : KICKER;
+
+  KFH31  : HKICKER;  ! "extraction" kicker
+
+  DHV31  : KICKER;
+
+  KFH3234: HKICKER;  ! extraction kicker
+
+  DWHV32 : KICKER;
+
+
+
+  DHV41  : KICKER;
+
+  DHV42  : KICKER;
+
+  DFH42  : HKICKER, KICK := dBmpO;
+
+  DWHV41 : KICKER;
+
+  DWHV42 : KICKER;
+
+
+
+! Pick-ups all defined in "SEQUENCE" command 
+
+
+
+! Solenoid and compensation Elements (Skew-Quads + Solenoids)
+
+!  Modeling of Cooler + Compensators provided by J. Pasternak
+
+  EC0    : SOLENOID,   L=0.18787, KS := 0.1059*Msol;
+
+  ECDH1  : HKICKER,    KICK :=  KickEC*0.022919*Msol*1.138/0.0756;
+
+  EC1    : SOLENOID,   L=0.48451, KS := 0.549*Msol;
+
+  ECQSI1 : MULTIPOLE,             KSL:={0, -(1/59.5808)*Msol*1.138/0.0756};
+
+  EC2    : SOLENOID,   L=0.15578, KS := 0.74*Msol;
+
+  ECQSI2 : MULTIPOLE,             KSL:={0, -(1/55.8782)*Msol*1.138/0.0756};
+
+  EC3    : SOLENOID,   L=0.53184, KS := 0.9*Msol;
+
+  EC4    : SOLENOID,   L=0.110,   KS := 1.02*Msol;
+
+  EC5H   : SOLENOID,   L=1.089,   KS := Msol;
+
+  ECQS01 : MULTIPOLE,             KSL:={0, (1/59.5808)*Msol*1.138/0.0756};
+
+  ECQS02 : MULTIPOLE,             KSL:={0, (1/55.8782)*Msol*1.138/0.0756};
+
+  ECDH2  : HKICKER,    KICK := -KickEC*0.022919*Msol*1.138/0.0756;
+
+
+
+  QSK21  : QUADRUPOLE, L=0.32,   K1S := kSk1;
+
+  SOL21  : SOLENOID,   L=0.427,  KS  := MsolC;
+
+  SOL22  : SOLENOID,   L=0.427,  KS  := MsolC;
+
+  QSK22  : QUADRUPOLE, L=0.32,   K1S :=-kSk1;
+
+
+
+! RF cavities
+
+!  CRF41  : MARKER;
+
+  CRF43  : MARKER;
+
+
+
+! Special Diagnostics
+
+  MPIV42 : MONITOR;
+
+  MSH42  : MONITOR;
+
+  MSV42  : MONITOR;
+
+
+
+! Put pieces together to form Arcs 
+
+  Arc10  : SEQUENCE, l=2*LbenH;
+
+    BA1HO.1 : BA1HO,    AT=1.11684/4.; 
+
+    DWHV11,             AT=1.11684/2.;
+
+    XFW11   : XFW01,    AT=1.11684/2.;
+
+    BA1HI.1 : BA1HI,    AT=1.11684*(3./4.);
+
+    BI1PO.1 : BI1PO,    AT=LbenH - (0.07299 + 1.4778 + 0.2620 + (2.13554-0.2620-1.4778)/2);
+
+    UEV13   : VMONITOR, AT=LbenH - (0.07299 + 1.4778 + 0.2620);
+
+    BI1PM.1 : BI1PM,    AT=LbenH - (0.07299 + 1.4778 + 0.2620/2);
+
+    UEH13   : HMONITOR, AT=LbenH - (0.07299 + 1.4778);
+
+    BI1PI.1 : BI1PI,    AT=LbenH - (0.07299 + 1.4778/2); 
+
+    CtrBHN10: MARKER,   AT=LbenH;
+
+    BI2PI.1 : BI2PI,    AT=LbenH + (0.07299 + 1.4778/2);
+
+    UEH14   : HMONITOR, AT=LbenH + (0.07299 + 1.4778);
+
+    BI2PM.1 : BI2PM,    AT=LbenH + (0.07299 + 1.4778 + 0.2620/2);
+
+    UEV14   : VMONITOR, AT=LbenH + (0.07299 + 1.4778 + 0.2620);
+
+    BI2PO.1 : BI2PO,    AT=LbenH + (0.07299 + 1.4778 + 0.2620 + (2.13554-0.2620-1.4778)/2);
+
+    BA2HI.1 : BA2HI,    AT=2*LbenH - 1.11684*(3./4.);
+
+    XFW12   : XFW02,    AT=2*LbenH - 1.11684/2.;
+
+    DWHV12,             AT=2*LbenH - 1.11684/2.; 
+
+    BA2HO.1 : BA2HO,    AT=2*LbenH - 1.11684/4.;
+
+  ENDSEQUENCE;
+
+  Arc20  : SEQUENCE, l=2*LbenH;
+
+    BA1HO.2 : BA1HO,    AT=1.11684/4.;
+
+    DWHV21,             AT=1.11684/2.;
+
+    XFW21   : XFW02,    AT=1.11684/2.;
+
+    BA1HI.2 : BA1HI,    AT=1.11684*(3./4.);
+
+    BI1PO.2 : BI1PO,    AT=LbenH - (0.07299 + 1.4778 + 0.2620 + (2.13554-0.2620-1.4778)/2);
+
+    UEV23   : VMONITOR, AT=LbenH - (0.07299 + 1.4778 + 0.2620);
+
+    BI1PM.2 : BI1PM,    AT=LbenH - (0.07299 + 1.4778 + 0.2620/2);
+
+    UEH23   : HMONITOR, AT=LbenH - (0.07299 + 1.4778);
+
+    BI1PI.2 : BI1PI,    AT=LbenH - (0.07299 + 1.4778/2);
+
+    CtrBHN20: MARKER,   AT=LbenH;
+
+    BI2PI.2 : BI2PI,    AT=LbenH + (0.07299 + 1.4778/2);
+
+    UEH24   : HMONITOR, AT=LbenH + (0.07299 + 1.4778);
+
+    BI2PM.2 : BI2PM,    AT=LbenH + (0.07299 + 1.4778 + 0.2620/2);
+
+    UEV24   : VMONITOR, AT=LbenH + (0.07299 + 1.4778 + 0.2620);
+
+    BI2PO.2 : BI2PO,    AT=LbenH + (0.07299 + 1.4778 + 0.2620 + (2.13554-0.2620-1.4778)/2);
+
+    BA2HI.2 : BA2HI,    AT=2*LbenH - 1.11684*(3./4.);
+
+    XFW22   : XFW01,    AT=2*LbenH - 1.11684/2.;
+
+    DWHV22,             AT=2*LbenH - 1.11684/2.;
+
+    BA2HO.2 : BA2HO,    AT=2*LbenH - 1.11684/4.;
+
+  ENDSEQUENCE;
+
+  Arc30  : SEQUENCE, l=2*LbenH;
+
+    BA1HO.3 : BA1HO,    AT=1.11684/4.;
+
+    DWHV31,             AT=1.11684/2.;
+
+    XFW31   : XFW01,    AT=1.11684/2.;
+
+    BA1HI.3 : BA1HI,    AT=1.11684*(3./4.);
+
+    BI1PO.3 : BI1PO,    AT=LbenH - (0.07299 + 1.4778 + 0.2620 + (2.13554-0.2620-1.4778)/2);
+
+    UEV33   : VMONITOR, AT=LbenH - (0.07299 + 1.4778 + 0.2620);
+
+    BI1PM.3 : BI1PM,    AT=LbenH - (0.07299 + 1.4778 + 0.2620/2);
+
+    UEH33   : HMONITOR, AT=LbenH - (0.07299 + 1.4778);
+
+    BI1PI.3 : BI1PI,    AT=LbenH - (0.07299 + 1.4778/2);
+
+    CtrBHN30: MARKER,   AT=LbenH;
+
+    BI2PI.3 : BI2PI,    AT=LbenH + (0.07299 + 1.4778/2);
+
+    UEH34   : HMONITOR, AT=LbenH + (0.07299 + 1.4778);
+
+    BI2PM.3 : BI2PM,    AT=LbenH + (0.07299 + 1.4778 + 0.2620/2);
+
+    UEV34   : VMONITOR, AT=LbenH + (0.07299 + 1.4778 + 0.2620);
+
+    BI2PO.3 : BI2PO,    AT=LbenH + (0.07299 + 1.4778 + 0.2620 + (2.13554-0.2620-1.4778)/2);
+
+    BA2HI.3 : BA2HI,    AT=2*LbenH - 1.11684*(3./4.);
+
+    XFW32   : XFW02,    AT=2*LbenH - 1.11684/2.;
+
+    DWHV32,             AT=2*LbenH - 1.11684/2.;
+
+    BA2HO.3 : BA2HO,    AT=2*LbenH - 1.11684/4.;
+
+  ENDSEQUENCE;
+
+  Arc40  : SEQUENCE, l=2*LbenH;
+
+    BA1HO.4 : BA1HO,    AT=1.11684/4.;
+
+    DWHV41,             AT=1.11684/2.;
+
+    XFW41,  : XFW02,    AT=1.11684/2.;
+
+    BA1HI.4 : BA1HI,    AT=1.11684*(3./4.);
+
+    BI1PO.4 : BI1PO,    AT=LbenH - (0.07299 + 1.4778 + 0.2620 + (2.13554-0.2620-1.4778)/2);
+
+    UEV43   : VMONITOR, AT=LbenH - (0.07299 + 1.4778 + 0.2620);
+
+    BI1PM.4 : BI1PM,    AT=LbenH - (0.07299 + 1.4778 + 0.2620/2);
+
+    UEH43   : HMONITOR, AT=LbenH - (0.07299 + 1.4778);
+
+    BI1PI.4 : BI1PI,    AT=LbenH - (0.07299 + 1.4778/2);
+
+    CtrBHN40: MARKER,   AT=LbenH;
+
+    BI2PI.4 : BI2PI,    AT=LbenH + (0.07299 + 1.4778/2);
+
+    UEH44   : HMONITOR, AT=LbenH + (0.07299 + 1.4778);
+
+    BI2PM.4 : BI2PM,    AT=LbenH + (0.07299 + 1.4778 + 0.2620/2);
+
+    UEV44   : VMONITOR, AT=LbenH + (0.07299 + 1.4778 + 0.2620);
+
+    BI2PO.4 : BI2PO,    AT=LbenH + (0.07299 + 1.4778 + 0.2620 + (2.13554-0.2620-1.4778)/2);
+
+    BA2HI.4 : BA2HI,    AT=2*LbenH - 1.11684*(3./4.);
+
+    XFW42   : XFW01,    AT=2*LbenH - 1.11684/2.;
+
+    DWHV42,             AT=2*LbenH - 1.11684/2.;
+
+    BA2HO.4 : BA2HO,    AT=2*LbenH - 1.11684/4.;
+
+  ENDSEQUENCE;
+
+
+
+! Put pieces together to form Straight Sections
+
+  BEAM; 
+
+  SS10   : SEQUENCE, L=2*LstrH;
+
+    DFH11,             AT=LstrH - 5.7725;
+
+    QDN11  : QDN1030,  AT=LstrH - (5.1645-.5*dLBmp+.5*dLSext), L=0.5172-dLBmp-dLSext;
+
+    XDN11,             AT=LstrH - 4.6645;
+
+    QFN11  : QFN1030,  AT=LstrH - 4.1645,                      L=0.5172-2*dLSext;
+
+    XFN11,             AT=LstrH - 3.6345;
+
+    UEH11  : HMONITOR, AT=LstrH - 2.904;
+
+    UEV11  : VMONITOR, AT=LstrH - 2.814;
+
+    CtrS10 : MARKER,   AT=LstrH;
+
+    DHV12,             AT=LstrH + 0.746;
+
+    UEH12  : HMONITOR, AT=LstrH + 1.3245;
+
+    UEV12  : VMONITOR, AT=LstrH + 1.4145;
+
+    XFN12,             AT=LstrH + 3.6345;
+
+    QFN12  : QFN1030,  AT=LstrH + 4.1645,                      L=0.5172-2*dLSext;
+
+    XDN12,             AT=LstrH + 4.6645;
+
+    QDN12  : QDN1030,  AT=LstrH + (5.1645-.5*dLBmp+.5*dLSext), L=0.5172-dLSext-dLBmp;
+
+    DFH12,             AT=LstrH + 5.7725;
+
+  ENDSEQUENCE;
+
+
+
+  SS20 : SEQUENCE, L=2*LstrH;  !  Note first R than L !!!
+
+    QFN21  : QFT20,    AT=LstrH - (5.6745+.5*dLBmp),           L=0.5172-dLBmp;
+
+    DFH21,             AT=LstrH - 5.2145;
+
+    QDN21  : QDT20,    AT=LstrH - (4.7545-.5*dLBmp+.5*dLSkew), L=0.5172-dLBmp-dLSkew;
+
+    QSK21,             AT=LstrH - 4.25;
+
+    QFN23  : QFT23,    AT=LstrH - (3.7545-.5*dLSkew+.5*dLSol), L=0.5172-dLSkew-dLSol;
+
+    SOL21,             AT=LstrH - 3.124;
+
+    DEHV21,            AT=LstrH - 2.559;
+
+    EC0.R  : EC0,      AT=LstrH - 2.465065;
+
+    ECQSI1,            AT=LstrH - 2.37113;
+
+    EC1.R  : EC1,      AT=LstrH - 2.128875;
+
+    ECDH1,             AT=LstrH - 1.88662;
+
+    EC2.R  : EC2,      AT=LstrH - 1.80873;
+
+    ECQSI2,            AT=LstrH - 1.73084;
+
+    EC3.R  : EC3,      AT=LstrH - 1.46492;
+
+    UEV21  : VMONITOR, AT=LstrH - 1.199;
+
+    EC4.R  : EC4,      AT=LstrH - 1.144;
+
+    UEH21  : HMONITOR, AT=LstrH - 1.089;
+
+    EC5H.R : EC5H,     AT=LstrH - 0.5445;
+
+    CtrS20 : MARKER,   AT=LstrH;
+
+    EC5H.L : EC5H,     AT=LstrH + 0.5445;
+
+    UEH22  : HMONITOR, AT=LstrH + 1.089;
+
+    EC4.L  : EC4,      AT=LstrH + 1.144;
+
+    UEV22  : VMONITOR, AT=LstrH + 1.199;
+
+    EC3.L  : EC3,      AT=LstrH + 1.46492;
+
+    ECQS02,            AT=LstrH + 1.73084;
+
+    EC2.L  : EC2,      AT=LstrH + 1.80873;
+
+    ECDH2,             AT=LstrH + 1.88662;
+
+    EC1.L  : EC1,      AT=LstrH + 2.128875;
+
+    ECQS01,            AT=LstrH + 2.37113;
+
+    EC0.L  : EC0,      AT=LstrH + 2.465065;
+
+    DEHV22,            AT=LstrH + 2.559;
+
+    SOL22,             AT=LstrH + 3.124;
+
+    QFN24  : QFT24,    AT=LstrH + (3.7545-.5*dLSkew+.5*dLSol), L=0.5172-dLSol-dLSkew;
+
+    QSK22,             AT=LstrH + 4.25;
+
+    QDN22  : QDT20,    AT=LstrH + (4.7545+.5*dLSkew),          L=0.5172-dLSkew;
+
+    QFN22  : QFT20,    AT=LstrH + 5.6745,                      L=0.5172;
+
+  ENDSEQUENCE;
+
+
+
+  SS30 : SEQUENCE, L=2*LstrH; 
+
+    QDN31  : QDN1030,  AT=LstrH - (5.1645+.5*dLSext), L=0.5172-dLSext; 
+
+    XDN31,             AT=LstrH - 4.6645;
+
+    QFN31  : QFN1030,  AT=LstrH - 4.1645,             L=0.5172-2*dLSext;
+
+    XFN31,             AT=LstrH - 3.6345;
+
+    KFH31,             AT=LstrH - 3.0085;
+
+    UEH31  : HMONITOR, AT=LstrH - 2.5735;
+
+    UEV31  : VMONITOR, AT=LstrH - 2.4835;
+
+    DHV31,             AT=LstrH - 1.7500;
+
+
+
+    CtrS30 : MARKER,   AT=LstrH;
+
+   
+
+    
+
+    UEH32  : HMONITOR, AT=LstrH + 1.6885 -1.0;
+
+    
+
+    UEV32  : VMONITOR, AT=LstrH + 1.7785;
+
+    KFH3234,           AT=LstrH + 2.7585;
+
+    XFN32,             AT=LstrH + 3.6345;
+
+    QFN32  : QFN1030,  AT=LstrH + 4.1645,             L=0.5172-2*dLSext;
+
+    XDN32,             AT=LstrH + 4.6645; 
+
+    QDN32  : QDN1030,  AT=LstrH + (5.1645+.5*dLSext), L=0.5172-dLSext;
+
+  ENDSEQUENCE;
+
+
+
+  SS40 : SEQUENCE, L=2*LstrH;
+
+    QFN41  : QFN2040,  AT=LstrH - 5.6745,                      L=0.5172;
+
+    QDN41  : QDN2040,  AT=LstrH - (4.7545+.5*dLSext),          L=0.5172-dLSext;
+
+    XFLS41,            AT=LstrH - 4.2545;
+
+    QFN43  : QFN2344,  AT=LstrH - (3.7545-.5*dLSext),          L=0.5172-dLSext;
+
+    UEH41  : HMONITOR, AT=LstrH - 3.1205;
+
+    UEV41  : VMONITOR, AT=LstrH - 3.0305;
+
+    DHV41,             AT=LstrH - 2.8085;
+
+  !  CRF41,             AT=LstrH - 2.1865;
+
+  
+
+    CRF41:  CAV,        AT=LstrH - 2.1865,  L = 1.00;
+
+  
+
+    CRF43,             AT=LstrH - 1.0865;
+
+    CtrS40 : MARKER,   AT=LstrH;
+
+    DHV42,             AT=LstrH + 1.7425;
+
+    UEV42  : VMONITOR, AT=LstrH + 1.9645;
+
+    UEH42  : HMONITOR, AT=LstrH + 2.0545;
+
+    MSH42,             AT=LstrH + 3.0795;                             ! moved downstream by 3 mm
+
+    MSV42,             AT=LstrH + 3.2755;                             !   3 mm on Nov. 5th, 2004.
+
+    QFN44  : QFN2344,  AT=LstrH + (3.7545-.5*dLSext),          L=0.5172-dLSext;
+
+    XFLS42,            AT=LstrH + 4.2545;
+
+    QDN42  : QDN2040,  AT=LstrH + (4.7545+.5*dLSext-.5*dLBmp), L=0.5172-dLSext-dLBmp;
+
+    DFH42,             AT=LstrH + 5.2145;
+
+    QFN42  : QFN2040,  AT=LstrH + (5.6745+.5*dLBmp),           L=0.5172-dLBmp;
+
+  ENDSEQUENCE;
+
+
+
+! Finally the whole LEIR ring
+
+  LEIR : SEQUENCE, REFER=ENTRY, L=8*(LstrH + LbenH);
+
+    SS10,  AT= 0; 
+
+    Arc10, AT= 2*LstrH; 
+
+    SS20,  AT= 2*LstrH + 2*LbenH;
+
+    Arc20, AT= 4*LstrH + 2*LbenH;
+
+    SS30,  AT= 4*LstrH + 4*LbenH;
+
+    Arc30, AT= 6*LstrH + 4*LbenH;
+
+    SS40,  AT= 6*LstrH + 6*LbenH;
+
+    Arc40, AT= 8*LstrH + 6*LbenH;
+
+  ENDSEQUENCE;
+
+
+
+
+
+RETURN;
+
+
+
+
+
+eg :=  0.938272+0.0042+10000; !  ... in GeV 
+
+
+
+eg :=  0.938272*2.8385; !  ... in GeV on transition
+
+++++++ info: eg redefined
+eg :=  0.938272*1.1547; !  ... in GeV beta = 0.5
+
+++++++ info: eg redefined
+
+
+beam, particle = proton, energy = eg;  
+
+
+
+use, period=LEIR;
+
+
+
+
+
+select,flag=twiss,clear;
+
+select, flag=twiss, column=name,s,beta11,beta22,alfa11,alfa22,mu1,mu2,disp1,disp2,
+
+                          x,px,y,py,t,pt,
+
+                          re11,re12,re13,re14,re15,re16,
+
+                          re21,re22,re23,re24,re25,re26,
+
+                          re31,re32,re33,re34,re35,re36,
+
+                          re41,re42,re43,re44,re45,re46,
+
+                          re51,re52,re53,re54,re55,re56,
+
+                          re61,re62,re63,re64,re65,re66;
+
+
+
+
+
+
+
+ptc_create_universe;
+
+  ptc_create_layout, model=1, method=6, nst=10, exact=true, closed_layout=true;
+
+ MAD-X Beam Parameters
+                  Energy : 0.108342E+01
+          Kinetic Energy : 0.145151E+00
+      Particle Rest Mass : 0.938272E+00
+                Momentum : 0.541711E+00
+  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
+ Setting MADx with 
+     energy           1.0834226784000001     
+     method                   6
+     Num. of steps           10
+     charge           1.0000000000000000     
+  Length of machine:    78.543702661677713     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -6.2727600891321345E-015   0.0000000000000000        8.4376949871511897E-015
+
+
+  !!!!!       T I M E   F A L S E,   T O T P A T H  F A L S E
+
+  ptc_setswitch, debuglevel=0, exact_mis=true, time=true, totalpath=false;
+
+  
+
+  
+
+  ptc_twiss,table="twiss", icase=56,no=2,initial_map_manual;
+
+ Reduced SUMM Table (Inital parameters specified)
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+       78.54370266           -1000000           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000           -1000000           -1000000        1.820059586 
+
+                q2                dq1                dq2                 qs 
+       2.719829203           -1000000           -1000000           -1000000 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+       3.282153742        15.12420849        1.633285447        20.07025832 
+
+         beta11min          beta11max          beta12min          beta12max 
+       3.282153742        15.12420849                  0                  0 
+
+         beta13min          beta13max          beta21min          beta21max 
+   6.252625153e-07        424.5320293                  0                  0 
+
+         beta22min          beta22max          beta23min          beta23max 
+       1.633285447        20.07025832                  0                  0 
+
+         beta31min          beta31max          beta32min          beta32max 
+   2.799089335e-07        129.3455325                  0                  0 
+
+         beta33min          beta33max           disp1min           disp1max 
+                 1        38793.11645       -20.60417504     0.001186533499 
+
+          disp2min           disp2max           disp3min           disp3max 
+      -9.086228277        9.086227667                  0                  0 
+
+          disp4min           disp4max             deltap            orbit_x 
+                 0                  0                  0    1.068886484e-08 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+   2.546139162e-09                  0                  0                  0 
+
+         orbit_-cT             xcorms             ycorms            pxcorms 
+   3.650253905e-08    2.618629597e-08                  0    5.157243422e-09 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0     7.43487202e-08                  0    3.700765924e-08 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0    1.106287032e-08                  0   -2.790402201e-08 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+                 0    -4.99843157e-08                  0   -1.274910961e-08 
+
+           pycomin             tcomin            ptcomin 
+                 0   -1.773242698e-07                  0 
+
+
+  write, table=twiss, file="leir.56dt.ptc.twiss";
+
+  write, table=ptc_twiss_summary, file="leir.56dt.ptc.summ.twiss";
+
+
+
+  ptc_twiss,table="twiss", icase=56,no=2,initial_map_manual, rmatrix;
+
+ Reduced SUMM Table (Inital parameters specified)
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+       78.54370266           -1000000           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000           -1000000           -1000000        1.820059586 
+
+                q2                dq1                dq2                 qs 
+       2.719829203           -1000000           -1000000           -1000000 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+       3.282153742        15.12420849        1.633285447        20.07025832 
+
+         beta11min          beta11max          beta12min          beta12max 
+       3.282153742        15.12420849                  0                  0 
+
+         beta13min          beta13max          beta21min          beta21max 
+   6.252625153e-07        424.5320293                  0                  0 
+
+         beta22min          beta22max          beta23min          beta23max 
+       1.633285447        20.07025832                  0                  0 
+
+         beta31min          beta31max          beta32min          beta32max 
+   2.799089335e-07        129.3455325                  0                  0 
+
+         beta33min          beta33max           disp1min           disp1max 
+                 1        38793.11645       -20.60417504     0.001186533499 
+
+          disp2min           disp2max           disp3min           disp3max 
+      -9.086228277        9.086227667                  0                  0 
+
+          disp4min           disp4max             deltap            orbit_x 
+                 0                  0                  0    1.068886484e-08 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+   2.546139162e-09                  0                  0                  0 
+
+         orbit_-cT             xcorms             ycorms            pxcorms 
+   3.650253905e-08    2.618629597e-08                  0    5.157243422e-09 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0     7.43487202e-08                  0    3.700765924e-08 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0    1.106287032e-08                  0   -2.790402201e-08 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+                 0    -4.99843157e-08                  0   -1.274910961e-08 
+
+           pycomin             tcomin            ptcomin 
+                 0   -1.773242698e-07                  0 
+  write, table=twiss, file="leir.56dt.ptc.mtx.twiss";
+
+
+
+  ptc_twiss,table="twiss", icase=56,no=2,initial_map_manual, ignore_map_orbit;
+
+ Reduced SUMM Table (Inital parameters specified)
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+       78.54370266           -1000000           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000           -1000000           -1000000        1.820059584 
+
+                q2                dq1                dq2                 qs 
+       2.719829197           -1000000           -1000000           -1000000 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+       3.282153742        15.12420843        1.633285458        20.07025827 
+
+         beta11min          beta11max          beta12min          beta12max 
+       3.282153742        15.12420843                  0                  0 
+
+         beta13min          beta13max          beta21min          beta21max 
+   6.249127795e-07        424.5320149                  0                  0 
+
+         beta22min          beta22max          beta23min          beta23max 
+       1.633285458        20.07025827                  0                  0 
+
+         beta31min          beta31max          beta32min          beta32max 
+   2.799156765e-07        129.3455324                  0                  0 
+
+         beta33min          beta33max           disp1min           disp1max 
+                 1        38793.11575       -20.60417504     0.001186021459 
+
+          disp2min           disp2max           disp3min           disp3max 
+      -9.086228277        9.086227678                  0                  0 
+
+          disp4min           disp4max             deltap            orbit_x 
+                 0                  0                  0                  0 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+                 0                  0                  0                  0 
+
+         orbit_-cT             xcorms             ycorms            pxcorms 
+                 0    3.908422753e-10                  0    6.540246179e-11 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0    5.840861881e-10                  0    7.897167283e-10 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0    1.854868291e-10                  0    1.648691738e-09 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+                 0   -4.258097151e-10                  0   -1.735064656e-10 
+
+           pycomin             tcomin            ptcomin 
+                 0   -4.253175589e-10                  0 
+  write, table=twiss, file="leir.56dt.ptc.noorb.twiss";
+
+   
+
+  
+
+ptc_end;
+
+
+
+removefile, file="Maxwellian_bend_for_ptc.txt";
+
+
+
+stop;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

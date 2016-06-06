@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:24:57      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.06.02 13:16:47      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Title " Diamond Light Source Lattice 8.1.1";
 
@@ -19,9 +19,9 @@ use, period=DIAMOND;
 
 
 
-     SELECT, flag=twiss, clear;
+SELECT, flag=twiss, clear;
 
-select,flag=twiss,column=name,s,betx,bety;!,re11,re12,re13,re14,re15,re16,
+select,flag=twiss,column=name,s,betx,bety,dx,dy,mux,muy,x,y;!,re11,re12,re13,re14,re15,re16,
 
 !re21,re22,re23,re24,re25,re26,
 
@@ -58,7 +58,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  2.997565E-02  0
       0.1500939535                  0                  0        12.36315219 
 
                dq2            betymax              dymax              dyrms 
-      -35.28688982        26.58355136                 -0                  0 
+      -35.28688982        26.58355136                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0                  0 
@@ -83,21 +83,21 @@ enter EMIT module
                                                   M o d e   1         M o d e   2         M o d e   3
  Fractional tunes            undamped              0.22562273          0.36315219          0.00529040
  
- beta* [m]                   x                 0.99787539E+01      0.10258130E-39      0.52163791E-03
-                             y                 0.19794976E-31      0.58315566E+01      0.50284706E-31
-                             t                 0.18036549E-02      0.13355712E-29      0.28859713E+01
+ beta* [m]                   x                 0.99787539E+01      0.24608235E-38      0.52163791E-03
+                             y                 0.39802064E-31      0.58315566E+01      0.52655554E-31
+                             t                 0.18036549E-02      0.60298163E-29      0.28859713E+01
  
- gamma* [1/m]                px                0.10021362E+00      0.26659145E-43      0.40838536E-07
-                             py                0.10103015E-33      0.17148080E+00      0.44414834E-30
-                             pt                0.68064820E-08      0.34709236E-33      0.34660196E+00
+ gamma* [1/m]                px                0.10021362E+00      0.49802515E-40      0.40838536E-07
+                             py                0.47959760E-34      0.17148080E+00      0.39326697E-30
+                             pt                0.68064820E-08      0.51009491E-31      0.34660196E+00
  
- beta(max) [m]               x                 0.22590475E+02      0.47168864E-39      0.46428499E-02
-                             y                 0.15299554E-30      0.26583551E+02      0.51100172E-31
-                             t                 0.33692103E-01      0.61412143E-29      0.28859713E+01
+ beta(max) [m]               x                 0.22590475E+02      0.18909518E-37      0.46428499E-02
+                             y                 0.14720164E-30      0.26583551E+02      0.54014164E-31
+                             t                 0.33692103E-01      0.35337556E-28      0.28859713E+01
  
- gamma(max) [1/m]            px                0.57593183E+01      0.52801223E-40      0.40838536E-07
-                             py                0.37980531E-31      0.29767840E+01      0.44714281E-30
-                             pt                0.83341187E-02      0.68745269E-30      0.34660196E+00
+ gamma(max) [1/m]            px                0.57593183E+01      0.21173435E-38      0.40838536E-07
+                             py                0.36635826E-31      0.29767840E+01      0.39476178E-30
+                             pt                0.83341187E-02      0.39462843E-29      0.34660196E+00
 ++++++ warning: EMIT: beam not updated, RADIATE is false or longitudinal stability not ensured. 
 
  RF system: 
@@ -106,19 +106,26 @@ enter EMIT module
 
 
 
+
+
+
+
+
+
 PTC_CREATE_UNIVERSE;
 
-PTC_CREATE_LAYOUT,model=2,method=6,nst=5,exact;
+PTC_CREATE_LAYOUT,model=2,method=6,nst=20,exact;
 
  MAD-X Beam Parameters
                   Energy : 0.300000E+01
           Kinetic Energy : 0.299949E+01
       Particle Rest Mass : 0.510999E-03
                 Momentum : 0.300000E+01
+  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy           3.0000000000000000     
      method                   6
-     Num. of steps            5
+     Num. of steps           20
      charge          -1.0000000000000000     
   Length of machine:    561.59999999999889     
  The machine is a RING
@@ -127,21 +134,36 @@ PTC_CREATE_LAYOUT,model=2,method=6,nst=5,exact;
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After    end:    3.8819295000713786E-014   0.0000000000000000        7.9936057773011271E-015
-
+      
 
      SELECT, flag=ptc_twiss, clear;
 
 !    SELECT, flag=ptc_twiss, column=name, s, beta11,beta22,beta33,mu1,mu2,mu3;
 
-    SELECT, flag=ptc_twiss, column=name, s, beta11,mu1,mu2,mu3;
+     select,flag=ptc_twiss,column=name,s,betx,bety,beta11,beta22,disp1,disp3,mu1,mu2,x,y;!,re11,re12,re13,re14,re15,re16,
 
-ptc_twiss,closed_orbit,icase=6,file="twiss_diamond.out";
+     
+
+     ptc_setswitch, debuglevel=1, exact_mis=true, time=true, totalpath=false;
+
+ Setting debug level to           1
+maxaccel is found and its value is 1.000000
+exact_mis is found and its value is 1.000000
+radiation is found and its value is 0.000000
+fringe is found and its value is 0.000000
+totalpath is found and its value is 0.000000
+time is found and its value is 1.000000
+nocavity is found and its value is 1.000000
+obs_points pro_ptc_setswitch Done
+     
+
+     ptc_twiss,closed_orbit,icase=6,file="twiss_diamond.out";
 
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
   Rectangular Bend: input arc length (rho alpha) 
   Default integration method     6
-  Default integration steps      5
+  Default integration steps     20
  This is an electron (positron actually if charge=1) 
        EXACT_MODEL =  TRUE 
        TOTALPATH   =     0
@@ -152,6 +174,7 @@ ptc_twiss,closed_orbit,icase=6,file="twiss_diamond.out";
        TIME        =  TRUE 
        FRINGE      =  FALSE
        PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
        ONLY_4D     =  FALSE
        DELTA       =  FALSE
        SPIN        =  FALSE
@@ -162,68 +185,66 @@ ptc_twiss,closed_orbit,icase=6,file="twiss_diamond.out";
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-             561.6    0.0001698973912           -1000000           -1000000 
+             561.6    0.0001708147611           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000    0.0001698683779        76.71965564       0.2256227262 
+          -1000000    0.0001707857478        76.51336477       0.2256227263 
 
                 q2                dq1                dq2                 qs 
       0.3631521852                  0                  0      0.00529039829 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-      0.6702574752        22.59047529        1.532193729        26.58355136 
+      0.6702574753        22.59047529        1.532193729        26.58355135 
 
          beta11min          beta11max          beta12min          beta12max 
-      0.6702574752        22.59047529    8.204672567e-37     2.79248368e-33 
+      0.6702574753        22.59047529    2.214372989e-36    2.350981308e-32 
 
          beta13min          beta13max          beta21min          beta21max 
-   1.355372216e-05      0.03369210324    7.440771381e-35    1.519545712e-32 
+   1.355372216e-05      0.03369210324    6.334820643e-35    3.884174255e-33 
 
          beta22min          beta22max          beta23min          beta23max 
-       1.532193729        26.58355136    1.744110635e-34     5.64154043e-29 
+       1.532193729        26.58355135     1.09938822e-32    8.106956721e-30 
 
          beta31min          beta31max          beta32min          beta32max 
-   0.0005203652666      0.00464284994    6.260049225e-35     3.58750499e-34 
+   0.0005203652667     0.004642849939     4.42179066e-34    2.175437997e-33 
 
          beta33min          beta33max           disp1min           disp1max 
-       2.885127313        2.885971271                  0       0.3126500258 
+       2.885127313        2.885971271                  0       0.3117654986 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.1554930411       0.1555022175   -5.622336243e-15    5.622443662e-15 
+     -0.1550570881       0.1550570881   -7.446891715e-16    7.420478414e-16 
 
           disp4min           disp4max             deltap            orbit_x 
-  -1.848372938e-15    1.875540723e-15                  0   -6.105683002e-16 
+  -2.476435307e-16    2.463962659e-16                  0   -8.329636574e-14 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-  -1.085482614e-15                  0                  0   -5.377742431e-14 
+   6.446646283e-16                  0                  0   -1.191323247e-12 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-     0.02997564577     9.30379402e-15                  0    4.607287562e-15 
+     0.02997564577    1.797167734e-13                  0    8.960733943e-14 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0      0.02997564577     5.37788948e-14    9.790994233e-15 
+                 0      0.02997564577    1.191323591e-12   -2.601057849e-15 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0     1.45554986e-14                  0      0.02997564577 
+                 0    1.950359067e-13                  0     -0.02997564577 
 
            ptcomax             xcomin             ycomin            pxcomin 
-  -5.377742431e-14   -2.911889075e-14                  0   -1.432672996e-14 
+  -1.191323247e-12   -3.920810629e-13                  0   -1.945752454e-13 
 
            pycomin             tcomin            ptcomin 
-                 0      0.02997564577    -5.53877836e-14 
+                 0     -0.02997564577   -1.191705522e-12 
 
 
-	select_ptc_normal, dq1,dq2;
+     select_ptc_normal, dq1,dq2;
 
-			
-
-   ptc_normal,normal,icase=5,no=2;
+     ptc_normal,normal,icase=5,no=2;
 
  ************ State Summary ****************
  MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
   Rectangular Bend: input arc length (rho alpha) 
   Default integration method     6
-  Default integration steps      5
+  Default integration steps     20
  This is an electron (positron actually if charge=1) 
        EXACT_MODEL =  TRUE 
        TOTALPATH   =     0
@@ -234,6 +255,7 @@ ptc_twiss,closed_orbit,icase=6,file="twiss_diamond.out";
        TIME        =  TRUE 
        FRINGE      =  FALSE
        PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
        ONLY_4D     =  TRUE 
        DELTA       =  TRUE 
        SPIN        =  FALSE
@@ -241,7 +263,7 @@ ptc_twiss,closed_orbit,icase=6,file="twiss_diamond.out";
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
  Normal Form Type 1
-   write, table=normal_results,file=normal_results; 
+     write, table=normal_results,file=normal_results; 
 
 
 

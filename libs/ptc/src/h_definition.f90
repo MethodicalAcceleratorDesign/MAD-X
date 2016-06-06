@@ -8,7 +8,7 @@ module definition
   !  use DABNEW
   !  use my_own_1D_TPSA
   use lielib_yang_berz, junk_no=>no,junk_nd=>nd,junk_nd2=>nd2,junk_ndpt=>ndpt,junk_nv=>nv
- !use c_dabnew
+  use c_dabnew
   !  use newda
   !  USE LIELIB_ETIENNE
   implicit none
@@ -42,7 +42,7 @@ module definition
   logical(lp) :: knob_numerical=.false.
   real(dp) ::  knob_eps(lnv)=1e-6_dp
   integer ::  knob_i =0
-  INTEGER,PARAMETER::NMAX=20
+  INTEGER,PARAMETER::NMAX=22
   integer,private,parameter::n_max=10   ! sagan stuff
   INTEGER, PARAMETER :: CASE1=1,CASE2=2, CASE0=0, CASEP1=-1,CASEP2=-2
   INTEGER, PARAMETER :: CASET=3,CASETF1=4,CASETF2=5
@@ -50,7 +50,8 @@ module definition
   logical(lp) :: doing_ac_modulation_in_ptc=.false.
   integer, target :: nb_ =0   ! global group index
   integer, parameter :: ndim2t=10   ! maximum complex size
-  !
+  integer, parameter :: wiggler_suntao=24
+  integer :: bmadparser = 0
   TYPE sub_taylor
      INTEGER j(lnv)
      INTEGER min,max
@@ -107,25 +108,20 @@ module definition
   type(complextaylor) varc1,varc2
 
   !Radiation
-  TYPE ENV_8
-     type (REAL_8) v
-     type (REAL_8) e(ndim2)
-     type (REAL_8) sigma0(ndim2)
-     type (REAL_8) sigmaf(ndim2)
-  END TYPE ENV_8
+ ! TYPE ENV_8
+ !    type (REAL_8) v
+ !    type (REAL_8) e(ndim2)
+ !    type (REAL_8) sigma0(ndim2)
+ !    type (REAL_8) sigmaf(ndim2)
+ ! END TYPE ENV_8
 
   type spinor
-     real(dp) x(3)
-     !  real(dp) G
+         real(dp) x(3)  ! x(3) = (s_x, s_y, s_z)   with  |s|=1   
   end type spinor
 
   type spinor_8
-     type(real_8) x(3)
+     type(real_8) x(3)  ! x(3) = (s_x, s_y, s_z)   with  |s|=1
   end type spinor_8
-
-  type res_spinor_8
-     type(double_complex) x(3)
-  end type res_spinor_8
 
   !    scratch levels of DA using linked list
 
@@ -247,103 +243,82 @@ module definition
      type (taylor)  cos,sin
   END TYPE taylorresonance
 
-  TYPE beamenvelope   !@2 A kind of Normal Form for Radiative Envelope
+!  TYPE beamenvelope   !@2 A kind of Normal Form for Radiative Envelope
      ! radiation normalization
-     type (damap) transpose    ! Transpose of map which acts on polynomials
-     type (taylor) bij         !  Represents the stochastic kick at the end of the turn  Env_f=M Env_f M^t + B
-     TYPE (pbresonance) bijnr   !  Equilibrium beam sizes in resonance basis
-     real(dp) s_ij0(6,6)  !  equilibrium beam sizes
-     type (taylor) sij0  !  equilibrium beam sizes
-     real(dp) emittance(3),tune(3),damping(3)
-     logical(lp) AUTO,STOCHASTIC
-     real(dp)  KICK(3)   ! fake kicks for tracking stochastically
-     type (damap) STOCH  ! Diagonalized of stochastic part of map for tracking stochastically
-  END TYPE beamenvelope
+!     type (damap) transpose    ! Transpose of map which acts on polynomials
+!     type (taylor) bij         !  Represents the stochastic kick at the end of the turn  Env_f=M Env_f M^t + B
+!     TYPE (pbresonance) bijnr   !  Equilibrium beam sizes in resonance basis
+!     real(dp) s_ij0(6,6)  !  equilibrium beam sizes
+!     type (taylor) sij0  !  equilibrium beam sizes
+!     real(dp) emittance(3),tune(3),damping(3)
+!     logical(lp) AUTO,STOCHASTIC
+!     real(dp)  KICK(3)   ! fake kicks for tracking stochastically
+!     type (damap) STOCH  ! Diagonalized of stochastic part of map for tracking stochastically
+!  END TYPE beamenvelope
 
-
+  !@3 ---------------------------------------------</br>
   type  tree_element   !@1  USED FOR FAST TRACKING IN O_TREE_ELEMENT.F90
+  !   character(204) , pointer :: file
      real(dp) ,  DIMENSION(:), POINTER :: CC
-     real(dp) ,  DIMENSION(:), POINTER :: fix
+     real(dp) ,  DIMENSION(:), POINTER :: fixr,fix,fix0
      integer,  DIMENSION(:), POINTER :: JL,JV
-     INTEGER,POINTER :: N,ND2,no
+     INTEGER,POINTER :: N,NP,no
+     real(dp), pointer :: e_ij(:,:)
+     real(dp), pointer :: rad(:,:)
+     real(dp), pointer :: ds,beta0,eps
+     logical, pointer :: symptrack,usenonsymp
   end  type tree_element
+  !@3 ---------------------------------------------</br>
+ 
+  !@3 ---------------------------------------------</br>
+ 
+  !@3 ---------------------------------------------</br>
 
-  type spinmatrix
-     type(real_8) s(3,3)
-  end type spinmatrix
-
-  type damapspin
-     type(damap) M
-     type(spinmatrix) s
-     real(dp) e_ij(6,6) ! stochastic envelope
-  end type damapspin
-
-  type normal_spin
-     type(normalform) N   ! regular orbital normal form
-     type(damapspin) a1   ! brings to fixed point
-     type(damapspin) ar   ! normalises around the fixed point
-     type(damapspin) as   ! pure spin map
-     type(damapspin) a_t  ! !! (a_t%m,a_t%s) 
-!!!  extra spin info
-     integer M(NDIM,NRESO),MS(NRESO),NRES  ! orbital and spin resonances to be left in the map
-     type(real_8) n0(3)     ! n0 vector
-     type(real_8) theta0    !  angle for the matrix around the orbit (analogous to linear tunes)
-     real(dp) nu    !  spin tune
-!!!Envelope radiation stuff to normalise radiation (Sands's like theory)
-     real(dp) s_ij0(6,6)  !  equilibrium beam sizes
-     complex(dp) s_ijr(6,6)  !  equilibrium beam sizes in resonance basis
-! equilibrium emittances (partially well defined only for infinitesimal damping)
-     real(dp) emittance(3),tune(3),damping(3)   
-     logical(lp) AUTO,STOCHASTIC
-     real(dp)  KICK(3)   ! fake kicks for tracking stochastically
-     real(dp)  STOCH(6,6)  ! Diagonalized stochastic part of map for tracking stochastically
-     real(dp)  STOCH_inv(6,6)  ! Diagonalized stochastic part of map for tracking stochastically
-  end type normal_spin
-
+  !@3 ---------------------------------------------</br>
   include "a_def_frame_patch_chart.inc"
   include "a_def_all_kind.inc"
   include "a_def_sagan.inc"
   include "a_def_element_fibre_layout.inc"
-
-  type(fibre), pointer :: lost_fibre
-  type(integration_node), pointer :: lost_node
+  !@3 ---------------------------------------------</br>
+  type(fibre), pointer :: lost_fibre=>null()
+  type(integration_node), pointer :: lost_node=>null()
 
   type rf_phasor
      real(dp) x(2)
      real(dp) om
      real(dp) t
   end type rf_phasor
-
+  !@3 ---------------------------------------------</br>
   type rf_phasor_8
-     type(real_8)  x(2)
-     type(real_8) om
-     reaL(DP) t
+     type(real_8)  x(2)  ! The two hands of the clock
+     type(real_8) om     ! the omega of the modulation
+     real(dp) t          ! the pseudo-time
   end type rf_phasor_8
-
+  !@3 ---------------------------------------------</br>
   type probe
      real(dp) x(6)
-     type(spinor) s(ISPIN0R:ISPIN1R)
      type(rf_phasor) AC
+     type(spinor) s(3)
      logical u
-     type(integration_node),pointer :: lost_node
+     type(integration_node),pointer :: lost_node=>null()
   end type probe
-
+  !@3 ---------------------------------------------</br>
   type probe_8
      type(real_8) x(6)     ! Polymorphic orbital ray
-     type(spinor_8) s(ISPIN0R:ISPIN1R)   ! Polymorphic spin s(1:3)
      type(rf_phasor_8) AC  ! Modulation of magnet
      real(dp) E_ij(6,6)   !  Envelope for stochastic radiation
+     type(spinor_8) s(3)   ! Polymorphic spin s(1:3)
      !   stuff for exception
      logical u
-     type(integration_node),pointer :: lost_node
+     type(integration_node),pointer :: lost_node=>null()
   end type probe_8
-
+  !@3 ---------------------------------------------</br>
   type TEMPORAL_PROBE
      TYPE(probe)  XS
      TYPE(INTEGRATION_NODE), POINTER :: NODE
      real(DP)  DS,POS(6)
   END type TEMPORAL_PROBE
-
+  !@3 ---------------------------------------------</br>
   type TEMPORAL_BEAM
      TYPE(TEMPORAL_PROBE), pointer :: TP(:)
      real(DP) a(3),ent(3,3),p0c,total_time
@@ -351,17 +326,17 @@ module definition
      type(integration_node),pointer :: c   ! pointer close to a(3)
      type(internal_state)  state
   END type TEMPORAL_BEAM
-
+  !@3 ---------------------------------------------</br>
   TYPE C_taylor
      INTEGER I !@1  integer I is a pointer to the complexified Berz package
   END TYPE C_taylor
-
+  !@3 ---------------------------------------------</br>
   type c_dascratch
      type(c_taylor), pointer :: t
      TYPE (c_dascratch),POINTER :: PREVIOUS
      TYPE (c_dascratch),POINTER :: NEXT
   end type c_dascratch
-
+  !@3 ---------------------------------------------</br>
   TYPE c_dalevel
      INTEGER,  POINTER :: N     ! TOTAL ELEMENT IN THE CHAIN
      !
@@ -372,60 +347,125 @@ module definition
      TYPE (c_dascratch), POINTER :: START_GROUND ! STORE THE GROUNDED VALUE OF START DURING CIRCULAR SCANNING
      TYPE (c_dascratch), POINTER :: END_GROUND ! STORE THE GROUNDED VALUE OF END DURING CIRCULAR SCANNING
   END TYPE c_dalevel
-
+  !@3 ---------------------------------------------</br>
   type c_spinmatrix
      type(c_taylor) s(3,3)
   end type c_spinmatrix
-
+  !@3 ---------------------------------------------</br>
   type c_spinor
      type(c_taylor) v(3)
   end type c_spinor
-
+  !@3 ---------------------------------------------</br>
 
 
 
   TYPE c_DAMAP
-     TYPE (c_TAYLOR) V(LNV) 
-     type(c_spinmatrix) s
-     complex(dp) e_ij(6,6)
-     integer :: N=0
+     TYPE (c_TAYLOR) V(LNV) !@1 Orbital part of the map 
+     integer :: N=0  !@1 Number of plane allocated
+     type(c_spinmatrix) s !@1 Spin matrix
+     complex(dp) e_ij(6,6) !@1 Stochastic fluctuation in radiation theory
   END TYPE c_DAMAP
-
-  TYPE c_vector_field
-      integer :: n=0,nrmax
-      real(dp) eps    
-      type (c_taylor) v(lnv)                        
+  !@3 ---------------------------------------------</br>
+  TYPE c_vector_field  !@1 
+      integer :: n=0,nrmax !@1 n dimension used v(1:n) (nd2 by default) ; nrmax some big integer if eps<1 
+      real(dp) eps !@1 if eps=-integer  then |eps| Lie brackets are taken ; otherwise eps=eps_tpsalie=10^-9
+      type (c_taylor) v(lnv)  
+      type(c_spinor) om                      
   END TYPE c_vector_field
-
+  !@3 ---------------------------------------------</br>
+  TYPE c_vector_field_fourier  !@1 
+      integer :: n=0
+      type (c_vector_field), pointer :: f(:)  =>null()                       
+  END TYPE c_vector_field_fourier
+  !@3 ---------------------------------------------</br>
   TYPE c_factored_lie
-      integer :: n= 0   
+      integer :: n = 0   
       integer :: dir= 0     
-       type (c_vector_field), allocatable :: f(:)                   
+       type (c_vector_field), pointer :: f(:)=>null()                   
   END TYPE c_factored_lie
-
+  !@3 ---------------------------------------------</br>
   TYPE c_normal_form
-      type(c_damap) a1
-      type(c_damap) a2
-      type(c_factored_lie) g   ! nonlinear part of a in phasors
-      type(c_factored_lie) ker !  kernel i.e. normal form in phasors
-      type(c_damap) a_t ! transformation a (m=a n a^-1) 
-      type(c_damap) n   ! transformation n (m=a n a^-1)      
-      type(c_damap) As  !  For Spin   (m = As a n a^-1 As^-1)  
-      integer NRES,M(NDIM2t/2,NRESO),ms(NDIM2t/2)
-      real(dp) tune(NDIM2t/2),damping(NDIM2t/2),spin_tune
+      type(c_damap) a1   !@1 brings to fix point at least linear
+      type(c_damap) a2   !@1 linear normal form 
+      type(c_factored_lie) g   !@1 nonlinear part of a in phasors
+      type(c_factored_lie) ker !@1  kernel i.e. normal form in phasors
+      type(c_damap) a_t !@1 transformation a (m=a n a^-1) 
+      type(c_damap) n   !@1 transformation n (m=a n a^-1)      
+      type(c_damap) As  !@1  For Spin   (m = As a n a^-1 As^-1)  
+      integer NRES,M(NDIM2t/2,NRESO),ms(NRESO) !@1 stores resonances to be left in the map, including spin (ms)
+      real(dp) tune(NDIM2t/2),damping(NDIM2t/2),spin_tune !@1 Stores simple information
+      logical positive ! forces positive tunes (close to 1 if <0)
 !!!Envelope radiation stuff to normalise radiation (Sand's like theory)
-     complex(dp) s_ij0(6,6)  !  equilibrium beam sizes
-     complex(dp) s_ijr(6,6)  !  equilibrium beam sizes in resonance basis
-     real(dp) emittance(3)
+     complex(dp) s_ij0(6,6)  !@1  equilibrium beam sizes
+     complex(dp) s_ijr(6,6)  !@1  equilibrium beam sizes in resonance basis
+     real(dp) emittance(3)   !@1  Equilibrium emittances as defined by Chao (computed from s_ijr(2*i-1,2*i) i=1,2,3 )
   END TYPE c_normal_form
-
- TYPE C_GMAP
-     TYPE (C_TAYLOR) V(lnv)    !
-     integer N
-  END TYPE C_GMAP
-
+  !@2 the routine c_canonize(at,a_cs,a0,a1,a2,phase) factors neatly the map "at"
+  !@2 at= a_cs o rotation(phase) where  a_cs = a0 o a1 o a2 ; this gives the phase advance even nonlinear!
+  !@3 ---------------------------------------------</br>
 type(c_taylor) c_temp
+ TYPE c_ray
+  complex(dp) x(lnv)
+  complex(dp) s1(3),s2(3),s3(3)
+ end type c_ray
+
+
+TYPE fibre_array
+   type(fibre), pointer :: p  => null()
+   integer, pointer :: pos  => null()
+   real(dp),pointer :: v=> null() , vmax=> null(); 
+   real(dp), pointer :: s(:)=> null()
+   real(dp), pointer :: err=> null()
+END TYPE fibre_array
+
+
+TYPE node_array
+   type(integration_node), pointer :: t  => null()
+   integer, pointer :: pos  => null()
+   real(dp),pointer :: v=> null() , vmax=> null(); 
+   complex(dp), pointer :: s(:)=> null()
+   real(dp), pointer :: err=> null()
+   type(c_vector_field), pointer :: f => null()
+   type(c_damap), pointer :: m => null()
+END TYPE node_array
+
+
 contains
+
+
+
+
+
+
+
+ subroutine alloc_fibre_array(a,n,m)
+ implicit none
+ type(fibre_array), allocatable :: a(:)
+ integer i,n,m
+
+ allocate(a(n))
+
+ do i=1,n
+   allocate(a(i)%pos)
+   allocate(a(i)%v,a(i)%vmax,a(i)%err,a(i)%s(m))
+   a(i)%s=0.0_dp
+   a(i)%v=0.0_dp;a(i)%vmax=1.d38;
+   a(i)%pos=0
+ enddo
+
+ end  subroutine alloc_fibre_array
+
+ subroutine kill_fibre_array(a)
+ implicit none
+ type(fibre_array), allocatable :: a(:)
+ integer i
+
+ do i=1,size(a)
+   deallocate(a(i)%pos)
+   deallocate(a(i)%v,a(i)%vmax,a(i)%err,a(i)%s)
+ enddo
+
+ end  subroutine kill_fibre_array
 
   SUBROUTINE RESET_APERTURE_FLAG(complete)
     IMPLICIT NONE
@@ -486,13 +526,12 @@ contains
     IF((X<0.0_dp).AND.c_%ROOT_CHECK) THEN
        ROOT=1.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="h_definition.f90 root : negative argument "
+       messagelost="Root undefined "
     ELSEIF(X>=0.0_dp) THEN
        ROOT=SQRT(X)
     ELSE      !  IF X IS NOT A NUMBER
        ROOT=1.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="h_definition.f90 root : negative arument "
     ENDIF
 
   END FUNCTION ROOT
@@ -507,14 +546,12 @@ contains
     IF((ABS(X)>1.0_dp).AND.c_%ROOT_CHECK) THEN
        ARCSIN=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       
-       messagelost="h_definition.f90 arcsin : abs(x)>1 "
+       messagelost="Arcsin undefined "
     ELSEIF(ABS(X)<=1.0_dp) THEN
        ARCSIN=ASIN(X)
     ELSE      !  IF X IS NOT A NUMBER
        ARCSIN=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="h_definition.f90 arcsin : abs(x)>1 "
     ENDIF
 
   END FUNCTION ARCSIN
@@ -529,14 +566,12 @@ contains
     IF((ABS(X)>1.0_dp).AND.c_%ROOT_CHECK) THEN
        ARCCOS=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       
-       messagelost="h_definition.f90 arccos : abs(x)>1 "
+       messagelost="Arccos undefined "
     ELSEIF(ABS(X)<=1.0_dp) THEN
        ARCCOS=ACOS(X)
     ELSE      !  IF X IS NOT A NUMBER
        ARCCOS=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="h_definition.f90 arccos : abs(x)>1 "
     ENDIF
 
   END FUNCTION ARCCOS
@@ -552,8 +587,7 @@ contains
     IF(X<=0.0_dp.AND.c_%ROOT_CHECK) THEN
        LOGE=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       
-       messagelost="h_definition.f90 loge : x < 0 "
+       messagelost="Log undefined "
     ELSE
        LOGE=LOG(X)
     ENDIF
@@ -573,14 +607,12 @@ contains
     IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
        COSEH=1.0_dp
        c_%CHECK_STABLE=.FALSE.
-       
-       messagelost="h_definition.f90 coseh : abs(x)>1 "
+       messagelost="Coseh undefined "
     ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
        COSEH=COSH(X)
     ELSE      !  IF X IS NOT A NUMBER
        COSEH=1.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="h_definition.f90 coseh : abs(x)>1 "
     ENDIF
 
   END FUNCTION COSEH
@@ -596,14 +628,12 @@ contains
     IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
        SINEH=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-    
-       messagelost="h_definition.f90 sineh : abs(x)>1 "
+       messagelost="Sineh undefined "
     ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
        SINEH=SINH(X)
     ELSE      !  IF X IS NOT A NUMBER
        SINEH=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="h_definition.f90 sineh : abs(x)>1 "
     ENDIF
 
   END FUNCTION SINEH
@@ -619,14 +649,12 @@ contains
     IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
        arctan=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       
-       messagelost="h_definition.f90 arctan : abs(x)>1 "
+       messagelost="Arctan undefined "
     ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
        arctan=atan(X)
     ELSE      !  IF X IS NOT A NUMBER
        arctan=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="h_definition.f90 arctan : abs(x)>1 "
     ENDIF
 
   END FUNCTION arctan

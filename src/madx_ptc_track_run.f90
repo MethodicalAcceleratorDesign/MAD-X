@@ -8,7 +8,6 @@ MODULE madx_ptc_track_run_module
                                 ! shorts for <double precision>, <logical>, 0D0 etc.
        doublenum ! am temprorary double number for I/O with C-procedures
   USE madx_ptc_intstate_module, ONLY: getdebug  ! new debug control by PS (from 2006.03.20)
-
   use name_lenfi
   use definition
   implicit none
@@ -109,15 +108,13 @@ CONTAINS
          NORMALFORM, & ! type for normalform                                               !
          REAL_8, &     ! type for map                                                      !
          damap, &      ! type for diff algebra                                             !
-         RADIATION, & ! STOCH_IN_REC, & ! type for radiation with quadrupoles in PTC       !
-         BEAMENVELOPE, ENV_8        ! For beam envelope                                    !
+         RADIATION ! STOCH_IN_REC, & ! type for radiation with quadrupoles in PTC       !
     ! ======== functions ==================================================================!
     USE  madx_ptc_module, ONLY: &                                                          !
          print, find_orbit,FIND_ORBIT_x, track,track_probe_x,UPDATE_STATES, my_state, &    !
          PRODUCE_APERTURE_FLAG, ANALYSE_APERTURE_FLAG, &                                   !
          kill, daprint, alloc, Get_one, &                                                  !
          assignment(=), operator(+), operator(*), operator(.sub.), &                       !
-         Find_Envelope, &                                                                  !
          ! Coord_MAD_to_PTC, Coord_PTC_to_MAD,  & => at the end of this module             !
          write_closed_orbit,Convert_dp_to_dt,mytime                                        !
     !======================================================================================!
@@ -428,21 +425,27 @@ CONTAINS
         Print *, 'Come to : <! Calculate beam envelope with PTC>'
     endif
 
-    Beam_envelope_with_PTC: IF (beam_envelope) THEN !###############################!
-       Radiat_PTC: IF ( Radiation_PTC) THEN !====================================!  !
-          icase_6: IF (icase_ptc .EQ. 6 .AND.closed_orbit) THEN !--!             !  !
-             Call  beam_enevelope_with_PTC                         !             !  !
-          ELSE !---------------------------------------------------!             !  !
-             Print *, ' Warning !: Option BEAM_ENVELOPE', &        !             !  !
-                  ' require option ICASE=6', &                     !             !  !
-                  ' and option CLOSED_ORBIT '                      !             !  !
-             Print *, '    The code ignores BEAM_ENVELOPE option ' !             !  !
-          ENDIF icase_6 !------------------------------------------!             !  !
-       ELSE !====================================================================!  !
-          Print *, ' Warning !!!: Option BEAM_ENVELOPE require option Radiation' !  !
-          Print *, '              The code ignores BEAM_ENVELOPE option '        !  !
-       ENDIF Radiat_PTC !========================================================!  !
-    ENDIF Beam_envelope_with_PTC !##################################################!
+
+
+     Beam_envelope_with_PTC: IF (beam_envelope) THEN 
+         call fort_warn('ptc_track: ',' For the time being not available, please contact mad.support@cern.ch if you need it')
+     endif Beam_envelope_with_PTC
+
+!     Beam_envelope_with_PTC: IF (beam_envelope) THEN !###############################!
+!        Radiat_PTC: IF ( Radiation_PTC) THEN !====================================!  !
+!           icase_6: IF (icase_ptc .EQ. 6 .AND.closed_orbit) THEN !--!             !  !
+!              Call  beam_enevelope_with_PTC                         !             !  !
+!           ELSE !---------------------------------------------------!             !  !
+!              Print *, ' Warning !: Option BEAM_ENVELOPE', &        !             !  !
+!                   ' require option ICASE=6', &                     !             !  !
+!                   ' and option CLOSED_ORBIT '                      !             !  !
+!              Print *, '    The code ignores BEAM_ENVELOPE option ' !             !  !
+!           ENDIF icase_6 !------------------------------------------!             !  !
+!        ELSE !====================================================================!  !
+!           Print *, ' Warning !!!: Option BEAM_ENVELOPE require option Radiation' !  !
+!           Print *, '              The code ignores BEAM_ENVELOPE option '        !  !
+!        ENDIF Radiat_PTC !========================================================!  !
+!     ENDIF Beam_envelope_with_PTC !##################################################!
 
     c_%watch_user=.false.
 
@@ -2600,86 +2603,87 @@ CONTAINS
     !==============================================================================
 
 
+!Do not know how to implement it with new PTC, need to ask Etienne
     !==============================================================================
-    SUBROUTINE beam_enevelope_with_PTC
-      use madx_ptc_module, ONLY:ENVELOPE0,track_probe,track_probe_x,get_loss,&
-           FIND_ORBIT_x,init,print,alloc,kill
-      implicit none
-
-      TYPE (REAL_8) :: Y(6)
-      TYPE(INTERNAL_STATE) MYSTATE_ENV
-      type(damap) id
-      type(normalform) normal
-      TYPE (PROBE) XS0
-      TYPE (PROBE_8) XS
-      TYPE (DAMAPSPIN) M
-      TYPE (NORMAL_SPIN) nf
-      real(dp) x(6),energy,deltap
-
-      CALL INIT(MYSTATE,1,0)
-      call alloc(id)
-      call alloc(y)
-      call alloc(normal)
-      !nf%stochastic=my_true
-
-      x=zero
-      CALL FIND_ORBIT_x(my_ring,X,MYSTATE,1.0e-7_dp,fibre1=1)
-      WRITE(6,'(A)') " Closed orbit with Radiation "
-      WRITE(6,'(6(1x,E15.8))') x
-      call GET_loss(my_ring,energy,deltap)
-      write(6,'(a32,2(1x,E15.8))') "Energy loss: GEV and DeltaP/p0c ",energy,deltap
-
-      id=1
-      y=x+id
-
-      call TRACK_PROBE_X(my_ring,y,MYSTATE, FIBRE1=1)
-
-      id=y
-      normal=id   ! Normal is a regular Normalform type
-      write(6,*) "Tunes "
-      write(6,*) normal%tune(1:3)
-      write(6,*) "Damping decrements"
-      write(6,*) normal%damping(1:3)
-
-      call kill(id)
-      call kill(y)
-      call kill(normal)
-
-      MYSTATE_ENV=MYSTATE+ENVELOPE0
-      CALL INIT(mystate_env,2,0)
-      call alloc(m)
-      call alloc(xs)
-      call alloc(nf)
-      
-      if (getdebug() > 1) then
-        PRINT*," "
-        WRITE(6,'(A)') " Print the state: MYSTATE_ENV "
-        PRINT*," "
-        call print(MYSTATE_ENV,6)
-      endif
-      
-      xs0=x
-      m=1        ! damapspin set to identity
-      xs=xs0+m   ! Probe_8 = closed orbit probe + Identity
-
-      call track_probe(my_ring,xs,MYSTATE_ENV,fibre1=1)
-
-      m=xs       ! damapspin = Probe_8 
-      nf=m       ! normal_spin = damapspin (Normalization including spin (if present) or radiation
-      ! envelope if present. (Spin without radiation)
-      write(6,*) ' Tunes : '
-      write(6,*) nf%n%tune(1:3)
-      write(6,*) ' The equilibrium emittances are : '
-      write(6,*) nf%emittance
-      write(6,*) ' nf%s_ij0(1,1),nf%s_ij0(5,5) : '
-      write(6,*) nf%s_ij0(1,1),nf%s_ij0(5,5)
-
-      call kill(m)
-      call kill(xs)
-      call kill(nf)
-
-    END SUBROUTINE beam_enevelope_with_PTC
-    !==============================================================================
+!     SUBROUTINE beam_enevelope_with_PTC
+!       use ptc_spin
+!       use madx_ptc_module, ONLY:ENVELOPE0,track_probe,track_probe_x,get_loss,&
+!            FIND_ORBIT_x,init,print,alloc,kill
+!       implicit none
+!       TYPE (REAL_8) :: Y(6)
+!       TYPE(INTERNAL_STATE) MYSTATE_ENV
+!       type(damap) id
+!       type(normalform) normal
+!       TYPE (PROBE) XS0
+!       TYPE (PROBE_8) XS
+!       TYPE (DAMAPSPIN) M
+!       TYPE (NORMAL_SPIN) nf
+!       real(dp) x(6),energy,deltap
+! 
+!       CALL INIT(MYSTATE,1,0)
+!       call alloc(id)
+!       call alloc(y)
+!       call alloc(normal)
+!       !nf%stochastic=my_true
+! 
+!       x=zero
+!       CALL FIND_ORBIT_x(my_ring,X,MYSTATE,1.0e-7_dp,fibre1=1)
+!       WRITE(6,'(A)') " Closed orbit with Radiation "
+!       WRITE(6,'(6(1x,E15.8))') x
+!       call GET_loss(my_ring,energy,deltap)
+!       write(6,'(a32,2(1x,E15.8))') "Energy loss: GEV and DeltaP/p0c ",energy,deltap
+! 
+!       id=1
+!       y=x+id
+! 
+!       call TRACK_PROBE_X(my_ring,y,MYSTATE, FIBRE1=1)
+! 
+!       id=y
+!       normal=id   ! Normal is a regular Normalform type
+!       write(6,*) "Tunes "
+!       write(6,*) normal%tune(1:3)
+!       write(6,*) "Damping decrements"
+!       write(6,*) normal%damping(1:3)
+! 
+!       call kill(id)
+!       call kill(y)
+!       call kill(normal)
+! 
+!       MYSTATE_ENV=MYSTATE+ENVELOPE0
+!       CALL INIT(mystate_env,2,0)
+!       call alloc(m)
+!       call alloc(xs)
+!       call alloc(nf)
+!       
+!       if (getdebug() > 1) then
+!         PRINT*," "
+!         WRITE(6,'(A)') " Print the state: MYSTATE_ENV "
+!         PRINT*," "
+!         call print(MYSTATE_ENV,6)
+!       endif
+!       
+!       xs0=x
+!       m=1        ! damapspin set to identity
+!       xs=xs0+m   ! Probe_8 = closed orbit probe + Identity
+! 
+!       call track_probe(my_ring,xs,MYSTATE_ENV,fibre1=1)
+! 
+!       m=xs       ! damapspin = Probe_8 
+!       nf=m       ! normal_spin = damapspin (Normalization including spin (if present) or radiation
+!       ! envelope if present. (Spin without radiation)
+!       write(6,*) ' Tunes : '
+!       write(6,*) nf%n%tune(1:3)
+!       write(6,*) ' The equilibrium emittances are : '
+!       write(6,*) nf%emittance
+!       write(6,*) ' nf%s_ij0(1,1),nf%s_ij0(5,5) : '
+!       write(6,*) nf%s_ij0(1,1),nf%s_ij0(5,5)
+! 
+!       call kill(m)
+!       call kill(xs)
+!       call kill(nf)
+! 
+!     END SUBROUTINE beam_enevelope_with_PTC
+!     !==============================================================================
 
 
     !=============================================================================

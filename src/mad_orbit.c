@@ -2369,6 +2369,10 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
       }
     }
 
+
+
+
+
     if (debug)
       printf("jjx, jjy, yok : %d %d %d\n", jjx, jjy, yok);
 
@@ -2697,8 +2701,8 @@ pro_correct_response_ring(int ip, int nc, int nm) {
       m = correct_orbit->mon_table;
       im = 0;
       while (m) {
-	if (debug)
-	  printf("monitor flag: %d\n", m->enable);
+        if (debug)
+        printf("monitor flag: %d\n", m->enable);
 	if (m->enable == 1) {
 	  bx_m = da1[3][m->id_ttb];
 	  by_m = da1[6][m->id_ttb];
@@ -3029,6 +3033,11 @@ static void pro_correct_write_results(double *monvec, double *resvec, double *co
   } else {
     printf("Max strength: %e is below corrector strength limit: %e\n", corrm, corrl);
   }
+  
+  //mattias
+  char *shortname;
+  size_t sz;
+  // mattias
 
   set_variable("corrmax", &corrm);
   if (print_correct_opt > 1) {
@@ -3051,19 +3060,22 @@ static void pro_correct_write_results(double *monvec, double *resvec, double *co
     c[nc[i]].val.after[ip - 1] = corvec[nx[i] - 1];
     if (ip == 1) {
       c[nc[i]].p_node->chkick += c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1];
-      pro_correct_fill_corr_table(ip, c[nc[i]].p_node->name,
-				  c[nc[i]].val.before[ip - 1] * 0.001,
-				  c[nc[i]].p_node->chkick);
+      pro_correct_fill_corr_table(ip, c[nc[i]].p_node->name,  
+                                       c[nc[i]].val.before[ip - 1] * 0.001,
+                                       c[nc[i]].p_node->chkick);
       /*                          c[nc[i]].p_node->other_bv*0.001*corvec[nx[i]-1]); */
+
       if (fcdata != NULL ) {
 	fprintf(fcdata, "%s->hkick = %e; \t! %d\n", strip(c[nc[i]].p_node->name),
 		c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1], resout);
       }
+      
+      
     } else if (ip == 2) {
       c[nc[i]].p_node->cvkick += c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1];
       pro_correct_fill_corr_table(ip, c[nc[i]].p_node->name,
-				  c[nc[i]].val.before[ip - 1] * 0.001,
-				  c[nc[i]].p_node->cvkick);
+                                      c[nc[i]].val.before[ip - 1] * 0.001,
+                                      c[nc[i]].p_node->cvkick);
       /*                          c[nc[i]].p_node->other_bv*0.001*corvec[nx[i]-1]); */
       if (fcdata != NULL ) {
 	fprintf(fcdata, "%s->vkick = %e; \t! %d\n", strip(c[nc[i]].p_node->name),	

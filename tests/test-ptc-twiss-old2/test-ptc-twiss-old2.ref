@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Linux)       +
+  +     MAD-X 5.02.10  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.05.19 17:03:28      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.06.02 12:28:17      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
@@ -237,9 +237,9 @@ parameter: ddpx   double value:                  0
 parameter: ddy   double value:                  0
 parameter: ddpy   double value:                  0
 parameter: r11   double value:                 -0
-parameter: r12   double value:                  0
+parameter: r12   double value:                 -0
 parameter: r21   double value:                 -0
-parameter: r22   double value:                  0
+parameter: r22   double value:                 -0
 parameter: energy   double value:                100
 
 
@@ -256,6 +256,7 @@ ptc_create_layout,model=2,method=6,nst=10,exact;
           Kinetic Energy : 0.990617E+02
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.999956E+02
+  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy           100.00000000000000     
      method                   6
@@ -295,6 +296,7 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=1;
        TIME        =  TRUE 
        FRINGE      =  FALSE
        PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
        ONLY_4D     =  TRUE 
        DELTA       =  TRUE 
        SPIN        =  FALSE
@@ -305,13 +307,13 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=1;
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-             534.6    0.0004430990925     -0.00189027077           -1000000 
+             534.6    0.0004430990797    -0.001890270714           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000    0.0003550636492        47.50612091       0.2546759882 
+          -1000000    0.0003550636364        47.50612159       0.2546759882 
 
                 q2                dq1                dq2                 qs 
-      0.2546749559                  0                  0                  0 
+       0.254674956                 -0                 -0                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        32.03433146        177.7089539        32.03308004        177.7231017 
@@ -335,25 +337,25 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=1;
      -0.0296661037      0.02965905227                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    0.0003260715893 
+                 0                  0                  0    0.0003260716069 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.596346259e-06                  0                  0                  0 
+   2.596346496e-06                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    0.0002136648593                  0    3.396649456e-06 
+                -0    0.0002136648719                  0    3.396649653e-06 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    0.0003315825523 
+                 0                  0                  0    0.0003315825591 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    5.310270774e-06                  0                  0 
+                 0    5.310271062e-06                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -0.0001525456102                  0   -6.256320034e-06 
+                 0   -0.0001525456243                  0   -6.256320257e-06 
 
            pycomin             tcomin            ptcomin 
-                 0                  0                  0 
+                 0                 -0                  0 
 
 
 PTC_NORMAL,closed_orbit,maptable,icase=5,no=1;
@@ -363,7 +365,7 @@ PTC_NORMAL,closed_orbit,maptable,icase=5,no=1;
   Rectangular Bend: input arc length (rho alpha) 
   Default integration method     6
   Default integration steps     10
- This is a proton 
+ This is a proton
        EXACT_MODEL =  TRUE 
        TOTALPATH   =     0
        RADIATION   =  FALSE
@@ -373,13 +375,14 @@ PTC_NORMAL,closed_orbit,maptable,icase=5,no=1;
        TIME        =  TRUE 
        FRINGE      =  FALSE
        PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
        ONLY_4D     =  TRUE 
        DELTA       =  TRUE 
        SPIN        =  FALSE
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    3.2607158925373049E-004   2.5963462592936979E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Closed orbit:    3.2607158926246916E-004   2.5963462593228193E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
 
 
 ptc_end;
@@ -457,7 +460,7 @@ ptc_twiss,icase=5,no=1,
   Rectangular Bend: input arc length (rho alpha) 
   Default integration method     6
   Default integration steps      5
- This is an electron (positron actually if charge=1) 
+ This is a proton
        EXACT_MODEL =  TRUE 
        TOTALPATH   =     0
        RADIATION   =  FALSE
@@ -467,6 +470,7 @@ ptc_twiss,icase=5,no=1,
        TIME        =  TRUE 
        FRINGE      =  FALSE
        PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
        ONLY_4D     =  TRUE 
        DELTA       =  TRUE 
        SPIN        =  FALSE
@@ -503,31 +507,31 @@ ptc_twiss,icase=5,no=1,
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0                  0        2.176577175 
+                 0                  0                  0        2.176592103 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.0296661037       0.0296509157   -0.0003758523225    0.0004199605323 
+     -0.0296661037      0.02965103639    -0.000375855762    0.0004199633837 
 
           disp4min           disp4max             deltap            orbit_x 
-  -8.877942903e-06     6.66689479e-06                  0    8.897806712e-05 
+  -8.878003536e-06    6.666922433e-06                  0    8.897806712e-05 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
    7.283918353e-07    5.216050332e-05   -6.748041063e-07                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    7.160178353e-05    6.445516048e-05    8.585792273e-07 
+                -0    7.160178353e-05    6.445516048e-05    8.585792273e-07 
 
            pycorms             tcorms            ptcorms             xcomax 
    1.291700295e-06                  0                  0      8.8978152e-05 
 
             ycomax            pxcomax            pycomax             tcomax 
-   8.888674758e-05    7.288779998e-07    1.668353298e-06                  0 
+   8.888674758e-05    7.288779998e-07    1.668353298e-06                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
                  0    5.216759047e-05   -8.789652925e-05   -1.675548111e-06 
 
            pycomin             tcomin            ptcomin 
-  -1.674289292e-06                  0                  0 
+  -1.674289292e-06                 -0                  0 
 ptc_end;
 
 
@@ -540,5 +544,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

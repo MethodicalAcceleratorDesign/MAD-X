@@ -14,6 +14,15 @@ module madx_ptc_trackline_module
   logical(lp)          :: onetable
 
   character(1200),private   :: whymsg
+
+  TYPE BEAM
+     REAL(DP), POINTER :: X(:,:)
+     LOGICAL(LP), POINTER :: U(:)
+     TYPE(BEAM_LOCATION), POINTER::POS(:)
+     INTEGER, POINTER :: N,LOST
+     REAL(DP), POINTER :: A(:),D(:)
+  END TYPE BEAM
+
   
 
   !********************************************************************************************
@@ -22,6 +31,56 @@ module madx_ptc_trackline_module
 
 contains
 
+  SUBROUTINE KILL_BEAM(B)
+    IMPLICIT NONE
+    TYPE(BEAM) , INTENT (INOUT) :: B
+    IF(ASSOCIATED(B%N)) THEN
+       DEALLOCATE(B%N,B%LOST,B%X,B%U,B%POS)
+    ENDIF
+  END SUBROUTINE KILL_BEAM
+
+  SUBROUTINE ALLOCATE_BEAM(B,N)
+    IMPLICIT NONE
+    TYPE(BEAM) , INTENT (INOUT) :: B
+    INTEGER , INTENT (IN) :: N
+    INTEGER I
+
+    ALLOCATE(B%N,B%LOST)
+
+    B%N=N
+    B%LOST=0
+    ALLOCATE(B%X(N,7))
+    ALLOCATE(B%U(0:N))
+    ALLOCATE(B%POS(0:N))
+    DO I=0,N
+       NULLIFY(B%POS(i)%NODE)
+    ENDDO
+
+    B%X  = 0.0_dp
+    B%U  = .FALSE.
+  END SUBROUTINE ALLOCATE_BEAM
+
+  SUBROUTINE TRACK_beam(r,b,k, fibre1,fibre2,node1,node2) ! fibre i1 to i2
+    IMPLICIT NONE
+    TYPE(layout),target,INTENT(INOUT):: r
+    real(dp) x(6)
+    type(beam),intent(INOUT) ::  b
+    TYPE(INTERNAL_STATE) K
+    integer,optional:: fibre1,fibre2,node1,node2
+    integer i
+
+    do i=1,b%n
+       if(b%u(i)) cycle
+       !x=b%x(i,:)
+       !call track_probe_x(r,b%x(i,:),k, fibre1,fibre2,node1,node2)
+       
+       call propagate(r,b%x(i,:),k,node1=node1, node2=node2)
+       
+       B%U(I)=.NOT.CHECK_STABLE
+       !call X_IN_BEAM(B,X,I)
+    enddo
+    !          call track_beam(my_ring,TheBeam,getintstate(), pos1=ni, pos2=ni+1)
+  end SUBROUTINE TRACK_beam
 
 
   subroutine ptc_track_everystep(nobs)
@@ -235,12 +294,7 @@ contains
         call print(getintstate(),6)
     endif
 
-    !     IF(.NOT.ASSOCIATED(TheBeam%N)) THEN
     CALL ALLOCATE_BEAM(TheBeam,npart)
-    !     ELSEIF(TheBeam%N/=npart) THEN
-    !        CALL KILL_BEAM(TheBeam)
-    !        CALL ALLOCATE_BEAM(TheBeam,npart)
-    !     ENDIF
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!    READS DATA FROM MADX         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -300,7 +354,8 @@ contains
           endif
 
           call track_beam(my_ring,TheBeam,intstate, node1=ni, node2=ni+1)
-
+          
+          
           !if(associated(CURR_SLICE%PARENT_FIBRE%MAG%p%aperture)) then
           !  print*, 'Checking AP', p%mag%name
           !  CALL CHECK_APERTURE(p%mag%p%APERTURE,TheBeam%X(1,1:6))
@@ -944,8 +999,11 @@ contains
              
              !print*, p%mag%name
              !write(6,'(a10,1x,i8,1x,6(f12.9,1x))') 'Track ',n,x
+             
+             call propagate(my_ring,x,intstate,fibre1=e, fibre2=e+1)  ! (5)
 
-             call track(my_ring,x,e,e+1,intstate)
+             !call track(my_ring,x,e,e+1,intstate)
+             
              
              
              if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then

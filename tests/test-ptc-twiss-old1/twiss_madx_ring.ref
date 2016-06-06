@@ -40,9 +40,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %23s "MAD-X 5.01.03 Darwin 64"
-@ DATE             %08s "15/10/13"
-@ TIME             %08s "19.41.54"
+@ ORIGIN           %16s "5.02.10 Linux 64"
+@ DATE             %08s "02/06/16"
+@ TIME             %08s "12.28.14"
 * NAME                                S               BETX               BETY                 DX                 DY 
 $ %s                                %le                %le                %le                %le                %le 
  "FIVECELL$START"                     0        177.7010914         32.0344759        2.174564191                  0

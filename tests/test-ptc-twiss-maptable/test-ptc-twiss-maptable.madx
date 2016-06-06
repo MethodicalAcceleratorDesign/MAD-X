@@ -32,13 +32,13 @@ ptc_create_universe;
   !!!!!       T I M E   F A L S E,   T O T P A T H  F A L S E
   ptc_setswitch, debuglevel=0, exact_mis=true, time=false, totalpath=false;
   
-  ptc_twiss, table=twiss, icase=5, no=3, closed_orbit, maptable;
+  ptc_twiss, table=twiss, icase=5, no=3, closed_orbit, rmatrix, maptable;
   write, table=twiss, file="leir.5d.ptc.twiss";
   write, table=ptc_twiss_summary, file="leir.5d.ptc.summ.twiss";
   write, table=map_table,file="map_table.tfs";
 
   !another turn but use as the starting conditions the map produced by the above twiss
-  ptc_twiss, table=twiss, icase=5, no=3, initial_matrix_table; 
+  ptc_twiss, table=twiss, icase=5, no=3, rmatrix, initial_matrix_table; 
   write, table=twiss, file="leir.5d.inimap.ptc.twiss";
     
 ptc_end;

@@ -699,6 +699,7 @@ libs/ptc/Makefile -text
 libs/ptc/Makefile_f90 -text
 libs/ptc/Makefile_lib -text
 libs/ptc/src/CMakeLists.txt -text
+libs/ptc/src/Ci_tpsa.f90 -text
 libs/ptc/src/Sa_extend_poly.f90 -text
 libs/ptc/src/Sb_sagan_pol_arbitrary.f90 -text
 libs/ptc/src/Sc_euclidean.f90 -text
@@ -731,6 +732,8 @@ libs/ptc/src/a_namelists.inc -text
 libs/ptc/src/a_scratch_size.f90 -text
 libs/ptc/src/b_da_arrays_all.f90 -text
 libs/ptc/src/c_dabnew.f90 -text
+libs/ptc/src/cb_da_arrays_all.f90 -text
+libs/ptc/src/cc_dabnew.f90 -text
 libs/ptc/src/d_lielib.f90 -text
 libs/ptc/src/h_definition.f90 -text
 libs/ptc/src/i_tpsa.f90 -text
@@ -1016,6 +1019,7 @@ tests/share/AD/ad_new.seq -text
 tests/share/AD/ad_quads_3837_ffe.str -text
 tests/share/ALBA/ALBA-25.4th.seq -text
 tests/share/ALBA/ALBA-25.4th_v2.seq -text
+tests/share/ALS/als.seqx -text
 tests/share/CLIC-DR/clicdr.madx -text
 tests/share/DIAMOND/dls811.seq -text
 tests/share/FCCe/fcc-ee_v14.seq -text
@@ -1589,6 +1593,8 @@ tests/test-ptc-normal/Maxwellian_bend_for_ptc.txt.cfg -text
 tests/test-ptc-normal/Maxwellian_bend_for_ptc.txt.ref -text
 tests/test-ptc-normal/fort.18.cfg -text
 tests/test-ptc-normal/fort.18.ref -text
+tests/test-ptc-normal/ptc.nonlin.cfg -text
+tests/test-ptc-normal/ptc.nonlin.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-normal/ptc_map_table.tfs.cfg -text
 tests/test-ptc-normal/ptc_map_table.tfs.ref -text
 tests/test-ptc-normal/ptc_normal_results.tfs.cfg -text
@@ -1621,8 +1627,6 @@ tests/test-ptc-twiss-1/twiss-table.cfg -text
 tests/test-ptc-twiss-1/twiss-table.ref -text
 tests/test-ptc-twiss-2/Maxwellian_bend_for_ptc.txt.cfg -text
 tests/test-ptc-twiss-2/Maxwellian_bend_for_ptc.txt.ref -text
-tests/test-ptc-twiss-2/fort.18.cfg -text
-tests/test-ptc-twiss-2/fort.18.ref -text
 tests/test-ptc-twiss-2/ptc-twiss-table.cfg -text
 tests/test-ptc-twiss-2/ptc-twiss-table.ref -text
 tests/test-ptc-twiss-2/test-ptc-twiss-2.cfg -text
@@ -1657,6 +1661,36 @@ tests/test-ptc-twiss-56Dl/leir.56dl.ptc.twiss.ref -text
 tests/test-ptc-twiss-56Dl/test-ptc-twiss-56Dl.cfg -text
 tests/test-ptc-twiss-56Dl/test-ptc-twiss-56Dl.madx -text
 tests/test-ptc-twiss-56Dl/test-ptc-twiss-56Dl.ref -text
+tests/test-ptc-twiss-56Dt-ini_map_man/fort.18 -text
+tests/test-ptc-twiss-56Dt-ini_map_man/leir.56dt.ptc.mtx.twiss.cfg -text
+tests/test-ptc-twiss-56Dt-ini_map_man/leir.56dt.ptc.mtx.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-56Dt-ini_map_man/leir.56dt.ptc.noorb.twiss.cfg -text
+tests/test-ptc-twiss-56Dt-ini_map_man/leir.56dt.ptc.noorb.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-56Dt-ini_map_man/leir.56dt.ptc.summ.twiss.cfg -text
+tests/test-ptc-twiss-56Dt-ini_map_man/leir.56dt.ptc.summ.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-56Dt-ini_map_man/leir.56dt.ptc.twiss.cfg -text
+tests/test-ptc-twiss-56Dt-ini_map_man/leir.56dt.ptc.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-56Dt-ini_map_man/test-ptc-twiss-56Dt-ini_map_man.cfg -text
+tests/test-ptc-twiss-56Dt-ini_map_man/test-ptc-twiss-56Dt-ini_map_man.madx -text
+tests/test-ptc-twiss-56Dt-ini_map_man/test-ptc-twiss-56Dt-ini_map_man.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-56Dt-ini_mtx_man/leir.56dt.ptc.summ.twiss.cfg -text
+tests/test-ptc-twiss-56Dt-ini_mtx_man/leir.56dt.ptc.summ.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-56Dt-ini_mtx_man/leir.56dt.ptc.twiss.cfg -text
+tests/test-ptc-twiss-56Dt-ini_mtx_man/leir.56dt.ptc.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-56Dt-ini_mtx_man/test-ptc-twiss-56Dt-ini_mtx_man.cfg -text
+tests/test-ptc-twiss-56Dt-ini_mtx_man/test-ptc-twiss-56Dt-ini_mtx_man.madx -text
+tests/test-ptc-twiss-56Dt-ini_mtx_man/test-ptc-twiss-56Dt-ini_mtx_man.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/fort.18.cfg -text
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/fort.18.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/leir.56dt.ptc.mtx.twiss.cfg -text
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/leir.56dt.ptc.mtx.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/leir.56dt.ptc.summ.twiss.cfg -text
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/leir.56dt.ptc.summ.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/leir.56dt.ptc.twiss.cfg -text
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/leir.56dt.ptc.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/test-ptc-twiss-56Dt-ini_mtx_tbl.cfg -text
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/test-ptc-twiss-56Dt-ini_mtx_tbl.madx -text
+tests/test-ptc-twiss-56Dt-ini_mtx_tbl/test-ptc-twiss-56Dt-ini_mtx_tbl.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-56Dt/leir.56dt.ptc.summ.twiss.cfg -text
 tests/test-ptc-twiss-56Dt/leir.56dt.ptc.summ.twiss.ref -text
 tests/test-ptc-twiss-56Dt/leir.56dt.ptc.twiss.cfg -text
@@ -1693,6 +1727,13 @@ tests/test-ptc-twiss-5Dt/leir.twiss.ref -text
 tests/test-ptc-twiss-5Dt/test-ptc-twiss-5Dt.cfg -text
 tests/test-ptc-twiss-5Dt/test-ptc-twiss-5Dt.madx -text
 tests/test-ptc-twiss-5Dt/test-ptc-twiss-5Dt.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-6D-ALS/ALS.6D.ptc.summ.twiss.cfg -text
+tests/test-ptc-twiss-6D-ALS/ALS.6D.ptc.summ.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-6D-ALS/ALS.6D.ptc.twiss.cfg -text
+tests/test-ptc-twiss-6D-ALS/ALS.6D.ptc.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-6D-ALS/test-ptc-twiss-6D-ALS.cfg -text
+tests/test-ptc-twiss-6D-ALS/test-ptc-twiss-6D-ALS.madx -text
+tests/test-ptc-twiss-6D-ALS/test-ptc-twiss-6D-ALS.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-6D/leir.6D.ptc.summ.twiss.cfg -text
 tests/test-ptc-twiss-6D/leir.6D.ptc.summ.twiss.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-6D/leir.6D.ptc.twiss.cfg -text
@@ -1716,6 +1757,23 @@ tests/test-ptc-twiss-maptable/map_table.tfs.ref -text
 tests/test-ptc-twiss-maptable/test-ptc-twiss-maptable.cfg -text
 tests/test-ptc-twiss-maptable/test-ptc-twiss-maptable.madx -text
 tests/test-ptc-twiss-maptable/test-ptc-twiss-maptable.ref -text
+tests/test-ptc-twiss-normal-6D/leir.6D.ptc.summ.twiss.cfg -text
+tests/test-ptc-twiss-normal-6D/leir.6D.ptc.summ.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-6D/leir.6D.ptc.twiss.cfg -text
+tests/test-ptc-twiss-normal-6D/leir.6D.ptc.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-6D/test-ptc-twiss-normal-6D.cfg -text
+tests/test-ptc-twiss-normal-6D/test-ptc-twiss-normal-6D.madx -text
+tests/test-ptc-twiss-normal-6D/test-ptc-twiss-normal-6D.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-genfu/normal.tfs -text
+tests/test-ptc-twiss-normal-genfu/ptc.nonlin.cfg -text
+tests/test-ptc-twiss-normal-genfu/ptc.nonlin.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-genfu/ptc.summ.twiss.cfg -text
+tests/test-ptc-twiss-normal-genfu/ptc.summ.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-genfu/ptc.twiss.cfg -text
+tests/test-ptc-twiss-normal-genfu/ptc.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-genfu/test-ptc-twiss-normal-genfu.cfg -text
+tests/test-ptc-twiss-normal-genfu/test-ptc-twiss-normal-genfu.madx -text
+tests/test-ptc-twiss-normal-genfu/test-ptc-twiss-normal-genfu.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-old1/README -text
 tests/test-ptc-twiss-old1/fort.18.cfg -text
 tests/test-ptc-twiss-old1/fort.18.ref -text

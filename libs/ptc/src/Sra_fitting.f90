@@ -24,6 +24,265 @@ module S_fitting_new
 
 contains
 
+
+
+
+subroutine find_time_patch(kekb,my_default,emax,bmadpatch,wipeout,kf,kb)
+implicit none
+type(layout), pointer :: kekb
+real(dp) closed_orbit(6),ee
+integer, optional :: kf,kb
+integer kc,ke,i,cc,jc
+type(internal_state) my_default,state
+type(fibre), pointer :: f,f1,f2
+logical, optional :: bmadpatch,wipeout
+logical bm,wi
+real(dp), optional :: emax
+
+ee=1.d40
+if(present(emax)) ee=emax
+
+bm=.true.
+wi=.false.
+if(present(bmadpatch)) bm =bmadpatch
+if(present(bmadpatch)) wi =wipeout
+ke=0
+kc=0
+if(wi) then
+ f=> kekb%start
+ do i=1,kekb%n
+  f%patch%time=0
+  f%patch%a_t=0
+  f%patch%b_t=0
+ f=>f%next
+ enddo
+endif
+
+
+state=(my_default+nocavity0)-radiation0-spin0-time0
+closed_orbit=0.d0
+
+call find_orbit_x(kekb,closed_orbit,STATE,1.e-8_dp,fibre1=1)  
+
+!call propagate(kekb,closed_orbit,state,fibre1=1)
+closed_orbit(6)=0.d0
+
+f1=> kekb%start
+if(bm) then
+f=> kekb%start
+ do i=1,kekb%n
+   if(f%mag%kind==kind4) then 
+     cc=cc+1
+     if(cc==1) then 
+      f1=>f
+      jc=i
+     endif
+     f2=>f
+   endif
+   f=>f%next
+ enddo
+endif
+
+
+f=> kekb%start
+do i=1,kekb%n
+
+call propagate(kekb,closed_orbit,state,fibre1=i,fibre2=i+1)
+
+
+if(bm) then
+
+ if(f%next%mag%kind==kind4) then
+  f%patch%time=2
+  f%patch%B_T=closed_orbit(6)+f%patch%B_T
+ ke=ke+1
+ elseif(f%mag%kind==kind4) then
+  if(associated(f,f2)) then
+   f%next%patch%time=1
+   f%patch%A_T=closed_orbit(6)+f%patch%A_T
+  kc=kc+1
+  endif
+ closed_orbit(6)=0.d0
+ endif
+
+else
+
+if(abs(closed_orbit(6))>ee.or.f%next%mag%kind==kind4.or.f%mag%kind==kind4) then
+
+ if(f%next%mag%kind==kind4) then
+  f%next%patch%time=1
+  f%next%patch%A_T=closed_orbit(6)+f%next%patch%A_T
+ kc=kc+1
+ elseif(f%mag%kind==kind4) then
+  f%patch%time=3
+  f%patch%B_T=closed_orbit(6)+f%patch%B_T
+  ke=ke+1
+ closed_orbit(6)=0.d0
+ else
+  f%patch%time=2
+  f%patch%B_T=closed_orbit(6)+f%patch%B_T
+  ke=ke+1
+  closed_orbit(6)=0.d0
+ endif
+
+endif
+
+endif
+ 
+
+f=>f%next
+enddo
+
+
+if(bm) then
+  f2%next%patch%A_T=closed_orbit(6)+f2%next%patch%A_T
+else
+f=> kekb%end
+  f%patch%time=2
+  f%patch%B_T=closed_orbit(6)+f%patch%B_T
+  ke=ke+1
+endif
+ 
+if(present(kb)) kb=ke
+if(present(kf)) kf=kc
+
+end subroutine find_time_patch
+
+  subroutine compute_linear_one_magnet_maps(f,state,del)
+    implicit none
+    TYPE(fibre), pointer, intent(inout):: f
+    TYPE(layout), pointer :: als
+    type(internal_state) state
+    integer i,no
+    logical rad
+    real(dp), optional :: del
+    real(dp) closed(6),m(6,6) 
+    type(c_damap) c_map,d_map,id_s
+    type(probe) xs0
+    type(probe_8) xs
+    TYPE(fibre), pointer :: f1
+    rad=state%radiation
+    closed=0.d0
+    no=1
+    als=>f%parent_layout
+
+    if(present(del)) closed(5+ndpt_bmad)=del
+    call find_orbit_x(CLOSED,STATE,1.e-8_dp,fibre1=f)       
+    call init_all(STATE,no,0)
+call alloc(c_map,d_map)
+call alloc(id_s)
+ 
+   m=0.0_dp
+ 
+!!!! Polymorphic probe is created in the usual manner 
+
+
+
+
+
+! Copy probe_8 into a complex damap 
+
+
+f1=>f
+do i=1,als%n
+   XS0=CLOSED    
+   ID_S=1        
+   XS=XS0+ID_S 
+f1%i%fix0=xs%x
+ CALL propagate(XS,STATE,FIBRE1=f1,fibre2=f1%next)
+f1%i%fix=xs%x
+d_map=xs
+f1%i%m=d_map
+CLOSED=xs%x
+
+f1=>f1%next
+
+enddo
+
+
+
+call kill(c_map,d_map)
+call kill(id_s)
+
+end subroutine compute_linear_one_magnet_maps
+
+  subroutine compute_linear_one_turn_maps(f,state,del)
+    implicit none
+    TYPE(fibre), pointer, intent(inout):: f
+    TYPE(layout), pointer :: als
+    type(internal_state) state
+    integer i,no
+    logical rad
+    real(dp), optional :: del
+    real(dp) closed(6),m(6,6),s(6,6)
+    type(c_normal_form) c_n
+    type(c_damap) c_map,d_map,id_s
+    type(probe) xs0
+    type(probe_8) xs
+    TYPE(fibre), pointer :: f1
+    rad=state%radiation
+    closed=0.d0
+    no=1
+    als=>f%parent_layout
+
+    if(present(del)) closed(5+ndpt_bmad)=del
+    call find_orbit_x(CLOSED,STATE,1.e-8_dp,fibre1=f)    
+    call init_all(STATE,no,0)
+call alloc(c_map,d_map)
+call alloc(c_n)
+call alloc(id_s)
+   s=0.0_dp
+   m=0.0_dp
+do i=1,3
+ S(2*i-1,2*i) = 1.d0; S(2*i,2*i-1) = -1.d0;
+enddo
+!!!! Polymorphic probe is created in the usual manner 
+   XS0=CLOSED    
+   ID_S=1        
+   XS=XS0+ID_S 
+
+!!!! get spin polymorphic probe after one turn   
+CALL propagate(XS,STATE,FIBRE1=f)  ! (4)
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+
+! Copy probe_8 into a complex damap 
+c_map=XS ! (5)
+m=c_map
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+ 
+!call c_normal(c_map,c_n,dospin=state%spin)  ! (6)
+! write(6,'(4(1x,g21.14))') c_n%tune(1:3), c_n%spin_tune
+f%i%m=m
+f%i%fix0=xs%x
+
+   XS0=CLOSED    
+   ID_S=1        
+   XS=XS0+ID_S 
+
+f1=>f
+do i=1,als%n
+ 
+ CALL propagate(XS,STATE,FIBRE1=f1,fibre2=f1%next)
+f1=>f1%next
+d_map=xs
+f1%i%fix0=xs%x
+if(.not.state%radiation) then
+f1%i%m=d_map
+f1%i%m=matmul(f1%i%m, matmul(m,matmul(S,matmul(transpose(f1%i%m),transpose(S)))))
+else
+f1%i%m=d_map*c_map*d_map**(-1)
+endif
+
+enddo
+
+
+
+call kill(c_map,d_map)
+call kill(c_n)
+call kill(id_s)
+
+end subroutine compute_linear_one_turn_maps
+
   subroutine special_alex_main_ring(r,n_name,targ,sc)
     implicit none
     TYPE(layout), target, intent(inout):: R
@@ -2112,228 +2371,7 @@ write(6,*) size(monitors), "monitors "
 
   end   subroutine  alex_read_r
 
-  SUBROUTINE compute_twiss(r,my_state,filename,pos,del,no,thinlens,name,teng,notusingteng)
-    IMPLICIT NONE
-    TYPE(layout),target,INTENT(INOUT):: r
-    TYPE(internal_state), intent(in):: my_state
-    integer pos,no,I,mf,ind,j
-    TYPE(internal_state) state
-    real(dp) closed(6),del,bx,by,ax,ay,s,px,py,ex,exp,dpx,dpy,phi,E1(6,6),E2(6,6)
-    type(DAMAP) ID,a_f,a_l,a_nl,DR,R_TE,cs_te
-    logical(lp) COSLIKE,thinlens, doname, printres
-    TYPE(REAL_8) Y(6)
-    CHARACTER(*) FILENAME
-    TYPE(FIBRE), POINTER :: P
-    TYPE(integration_node), POINTER :: t
-    TYPE(NORMALFORM) NORM
-    character(nlp) name
-    character(9) typec
-    logical(lp) printmap,teng,notusingteng
-    printmap=my_false
-    if(.not.associated(r%t)) then
-       call make_node_layout(r)
-    endif
-    printres=my_false
-    doname=my_true
-    call context(name)
-    if(index(name,'###')/=0) then
-       doname=my_false
-       printres=my_true
-    endif
-    typec=' '
-    call kanalnummer(mf,filename)
-
-    STATE=my_state+nocavity0
-    call print(state,6)
-   ! pause 777
-    closed=0.0_dp
-    closed(5)=del
-    CALL FIND_ORBIT(R,CLOSED,pos,STATE,1e-5_dp)
-    write(6,*) "closed orbit "
-    write(6,*) CLOSED
-
-    CALL INIT(STATE,no,0)
-    CALL ALLOC(Y);   CALL ALLOC(NORM)
-    call alloc(id,a_f,a_l,a_nl,DR,R_TE,cs_te)
-    id=1
-    Y=CLOSED+id
-
-    CALL TRACK(R,Y,pos,STATE)
-    id=y
-    if(index(filename,'MAP')/=0.or.index(filename,'map')/=0) then
-      printmap=my_true
-    endif
-
-    NORM=ID
-    write(mf,*) " fractional tunes ",norm%tune(1:2)
-    p=>r%start
-    s=0.0_dp
-    do i=1,pos-1
-       s=s+p%mag%p%ld
-       p=>p%next
-    enddo
-    px=0.0_dp
-    py=0.0_dp
-    if(teng) then
-     call factor(norm%a_t,a_f,a_l,a_nl,DR=dr,r_te=r_te,cs_te=cs_te,COSLIKE=COSLIKE)
-    else
-     if(notusingteng) then
-      call factor_am_special(norm%a_t,a_f,a_l,a_nl,DR=dr)
-       else
-      call factor(norm%a_t,a_f,a_l,a_nl,DR=dr)
-     endif
-    endif
-    
-    Y=CLOSED+norm%a_t
-    !    bx,by,ay,ay,s,px,py
-    bx=(norm%a_t%v(1).sub.'1')**2+(norm%a_t%v(1).sub.'01')**2
-    by=(norm%a_t%v(3).sub.'001')**2+(norm%a_t%v(3).sub.'0001')**2
-    ax=-(norm%a_t%v(1).sub.'1')*(norm%a_t%v(2).sub.'1')-(norm%a_t%v(1).sub.'01')*(norm%a_t%v(2).sub.'01')
-    ay=-(norm%a_t%v(3).sub.'001')*(norm%a_t%v(4).sub.'001')-(norm%a_t%v(3).sub.'0001')*(norm%a_t%v(4).sub.'0001')
-    ex=a_f%v(1).sub.'00001'
-    exp=a_f%v(2).sub.'00001'
-    if(teng) then
-     phi=(r_te%v(1).sub.'1')-1.0_dp   !acos
-    else
-     phi=(norm%a_t%v(1).sub.'001')**2+(norm%a_t%v(1).sub.'0001')**2
-    endif
-    if(abs(phi)<epsflo) phi=0.0_dp
-    if(teng) then
-     if(COSLIKE) then
-       typec=' = COS-1 '
-     else
-       typec=' = COSH-1'
-     endif
-    endif
-    if(doname) then
-       if(index(p%mag%name,name(1:len_trim(name)))/=0) then
-          printres=my_true
-       endif
-    endif
-    if(teng) then
-    write(mf,'(6x,a4,6x,(6x,a1,6x),2(4x,a5,4x),2(4x,a6,3x),2(4x,a6,3x),2(3x,a7,3x),a25)') &
-         "name", "s", "betax","betay","alphax","alphay","eta_x ","etap_x","Phase x","Phase y","Teng-Edwards Cos or Cosh "
-    else
-    write(mf,'(6x,a4,6x,(6x,a1,6x),2(4x,a5,4x),2(4x,a6,3x),2(4x,a6,3x),2(3x,a7,3x),a25)') &
-         "name", "s", "betax","betay","alphax","alphay","eta_x ","etap_x","Phase x","Phase y","  d<x**2>/de_y (Ripken)  "
-    endif
-    if(printres) write(mf,'(a16,10(1x,g12.5),1x,a9)') p%mag%name(1:16),s,bx,by,ax,ay,ex,exp,px,py,phi,typec
-    if(doname) printres=my_false
-
-    do i=pos,pos+r%n-1
-       t=>p%t1
-       do while(.not.associated(t,p%t2%next))
-          if(thinlens) then
-             call track_probe_x(y,STATE, node1=t,node2=t%next)
-          else
-             call track_probe_x(y,STATE, node1=t,node2=p%t2%next)
-          endif
-          closed=y
-          norm%a_t=y
-        if(teng) then
-         call factor(norm%a_t,a_f,a_l,a_nl,DR=dr,r_te=r_te,cs_te=cs_te,COSLIKE=COSLIKE)
-        else
-          if(notusingteng) then
-           call factor_am_special(norm%a_t,a_f,a_l,a_nl,DR=dr)
-            else
-           call factor(norm%a_t,a_f,a_l,a_nl,DR=dr)
-          endif        
-        endif
-
-!          call factor(norm%a_t,a_f,a_l,a_nl,DR=dr,r_te=r_te,cs_te=cs_te,COSLIKE=COSLIKE)
-          px=px+asin(dr%v(1).sub.'01')/twopi
-          py=py+asin(dr%v(3).sub.'0001')/twopi
-          Y=CLOSED+norm%a_t
-
-          if(thinlens) then
-             t=>t%next
-          else
-             t=>p%t2%next
-          endif
-       enddo
-       s=s+p%mag%p%ld
-       p=>p%next
-
-       bx=(norm%a_t%v(1).sub.'1')**2+(norm%a_t%v(1).sub.'01')**2
-       by=(norm%a_t%v(3).sub.'001')**2+(norm%a_t%v(3).sub.'0001')**2
-       ax=-(norm%a_t%v(1).sub.'1')*(norm%a_t%v(2).sub.'1')-(norm%a_t%v(1).sub.'01')*(norm%a_t%v(2).sub.'01')
-       ay=-(norm%a_t%v(3).sub.'001')*(norm%a_t%v(4).sub.'001')-(norm%a_t%v(3).sub.'0001')*(norm%a_t%v(4).sub.'0001')
-       ex=a_f%v(1).sub.'00001'
-       exp=a_f%v(2).sub.'00001'
-       if(teng) then
-        phi=(r_te%v(1).sub.'1')-1.0_dp   !acos
-       else
-        phi=(norm%a_t%v(1).sub.'001')**2+(norm%a_t%v(1).sub.'0001')**2
-       endif
-       if(abs(phi)<epsflo) phi=0.0_dp
-        if(teng) then
-         if(COSLIKE) then
-           typec=' = COS-1 '
-         else
-           typec=' = COSH-1'
-         endif
-        endif
-       if(doname) then
-          if(index(p%mag%name,name(1:len_trim(name)))/=0) then
-             printres=my_true
-          endif
-       endif
-       if(printres) write(mf,'(a16,10(1x,g12.5),1x,a9)') p%mag%name(1:16),s,bx,by,ax,ay,ex,exp,px,py,phi,typec
-       if(doname) printres=my_false
-    enddo
-    if(printmap) then
-        write(6,*) "stable_da, check_stable",stable_da, check_stable
-        stable_da=my_true
-        check_stable=my_true
-        call print(id,mf)
-    endif
-
-    a_l=norm%a_t
-    a_f=a_l**(-1)
-    a_nl=0
-    a_nl%v(1)=1.0_dp.mono.2
-    a_nl%v(2)=-(1.0_dp.mono.1)
-    a_nl%v(3)=1.0_dp.mono.4
-    a_nl%v(4)=-(1.0_dp.mono.3)
-    
-    id=1
-    id%v(3)=0
-    id%v(4)=0    
-    DR=A_l*a_nl*id*a_f*a_nl
-    e1=dr
-    e1=-e1
-    id=1
-    id%v(1)=0
-    id%v(2)=0    
-    DR=A_l*a_nl*id*a_f*a_nl
-    e2=dr
-    e2=-e2
-    
-  !! write(mf,'(6x,a4,6x,(6x,a1,6x),2(4x,a5,4x),2(4x,a6,3x),2(4x,a6,3x),2(3x,a7,3x),a25)')
-          write(mf,*)  "   "
-          write(mf,*)  "  All 4x4 Ripken Lattice Functions  "
-          write(mf,*)  "   "
-          write(mf,*)  " i , j, d<x_i x_j>/dJ_1  , d<x_i x_j>/dJ_2  "
-    do i=1,4
-    do j=i,4
-        write(mf,'(1x,i2,2x,i2,2x,(1x,g12.5),(9x,g12.5))')  i,j,e1(i,j),e2(i,j)
-    enddo
-    enddo
-          write(mf,*)  "   "
-          write(mf,*)  "   4x4 Dispersions  "
-          write(mf,*)  "   "
-     do i=1,4
-         e1(1,1)=a_l%v(i).sub.'00001'
-        write(mf,'(1x,i2,(1x,g12.5))')  i,e1(1,1)
-    enddo
-    
-    CLOSE(mf)
  
-    CALL kill(Y)
-    call kill(NORM)
-    call kill(id,a_f,a_l,a_nl,DR,R_TE,cs_te)
-
-  end SUBROUTINE compute_twiss
   
 !!!! special rcs
 

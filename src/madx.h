@@ -8,6 +8,8 @@
 // standard headers
 
 #include <assert.h>
+#define DEBUG_BREAK asm("int $3")
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>

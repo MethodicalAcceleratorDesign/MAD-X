@@ -79,19 +79,19 @@ module precision_constants
   real(dp),parameter::A_ELECTRON=1.15965218111e-3_dp  !frs NIST CODATA 2006
   real(dp),parameter::A_MUON=1.16592069e-3_dp         !frs NIST CODATA 2006
   real(dp),parameter::A_PROTON=1.79284735e-0_dp       !frs (approx) NIST CODATA 2006
-  real(dp),parameter:: pmaMUON = 105.6583668E-3_DP    !frs NIST CODATA 2006
-  real(dp) :: e_muon = 0.d0
+  real(dp),parameter:: pmaMUON = 105.6583745E-3_DP    !frs NIST CODATA 2016
+  real(dp) :: e_muon = 0.d0, volt_c=1.0e-3_dp, volt_i=1.0_dp
  !  real(dp),parameter:: pmadt = 1.875612793e0_dp    ! sateesh
   !  real(dp),parameter:: pmah3 = 2.808391e0_dp    ! sateesh
   !  real(dp),parameter:: A_dt = -0.142987272e0_dp    ! sateesh
   !  real(dp),parameter:: a_h3 =-4.183963e0_dp    ! sateesh
-
+  logical(lp),  public :: longprint = my_true
 
   real(dp) :: A_particle = A_ELECTRON
-  real(dp),parameter::pmae=5.10998910e-4_dp           !frs NIST CODATA 2006
+  real(dp),parameter::pmae=5.1099894610e-4_dp           !frs NIST CODATA 2016
   real(dp),parameter::pmae_amu=5.4461702177e-4_dp     !frs NIST CODATA 2006
   ![GeV]
-  real(dp),parameter::pmap=0.938272013e0_dp           !frs NIST CODATA 2006
+  real(dp),parameter::pmap=0.9382720813e0_dp           !frs NIST CODATA 2016
   ![GeV]
   real(dp),parameter::CLIGHT=2.99792458e8_dp          ! exact
   ![m/s]
@@ -155,6 +155,7 @@ module precision_constants
   real(dp),parameter::c_0_005=5e-3_dp,c_0_012=1.2e-2_dp,c_1_5=1.5e0_dp
   real(dp),parameter::c_0_002=2e-3_dp,c_0_05=5e-2_dp,c_0_216=0.216e0_dp
   real(dp),parameter::c_0_7=0.7e0_dp,c_1_2d_5=1.2e-5_dp,c_1d7=1e7_dp
+  real(dp),parameter:: suntao=1.6021766208e-19_dp/299792458.0_dp/9.10938356e-31_dp
   ! Constant Symplectic integrator schemes
   real(dp) YOSK(0:4), YOSD(4)    ! FIRST 6TH ORDER OF YOSHIDA
   real(dp),parameter::AAA=-0.25992104989487316476721060727823e0_dp  ! fourth order integrator
@@ -171,7 +172,7 @@ module precision_constants
   LOGICAL(lp),TARGET  :: CHECK_MADX_APERTURE=.TRUE.
   LOGICAL(lp),TARGET  :: APERTURE_FLAG=.true.
 
-  REAL(dp),TARGET   :: absolute_aperture=1.0_dp
+  REAL(dp),TARGET   :: absolute_aperture=1.0_dp, t_aperture =1.d6
   integer,TARGET :: wherelost=0
   logical(lp),TARGET :: stable_da =.true.
   logical(lp),TARGET :: check_da =.true.
@@ -179,7 +180,7 @@ module precision_constants
   logical(lp),TARGET :: sixtrack_compatible =.false.
   integer ,target ::  spin_normal_position=2
   real(dp),target ::  da_absolute_aperture=1e6_dp
-  real(dp),pointer :: crash
+  real(dp),pointer :: crash => null()
   INTEGER,  TARGET :: NPARA_original
   logical  :: default_tpsa=.false.
   logical, target :: lingyun_yang=.false.
@@ -195,14 +196,16 @@ module precision_constants
   logical(lp) :: printdainfo=my_false
   integer   lielib_print(12)
   DATA lielib_print /0,0,0,0,0,0,0,0,0,0,0,1/
-  INTEGER,TARGET :: SECTOR_NMUL_MAX=10
-  INTEGER, target :: SECTOR_NMUL = 10
-  integer, parameter :: no_e=5  !  electric 
-
+  integer :: SECTOR_NMUL_MAX=22
+  INTEGER, target :: SECTOR_NMUL = 11
+!  integer, parameter :: no_e=5  !  electric 
+  logical(lp) :: use_complex_in_ptc=.false.
   logical(lp) :: change_sector=my_true
   real(dp) :: xlost(6)=0.0_dp
+  integer :: limit_int0(2) =(/4,18/)
   character(1024) :: messagelost
-  
+  integer, target :: ndpt_bmad = 0, only2d =0, addclock=0
+  integer,TARGET :: HIGHEST_FRINGE=2
   !  logical(lp) :: fixed_found
   !  lielib_print(1)=1   lieinit prints info
   !  lielib_print(2)=1   expflo warning if no convergence
@@ -231,85 +234,86 @@ module precision_constants
 
   type CONTROL
      ! Da stuff
-     real(dp),pointer :: total_da_size !  in megabytes
-     integer,pointer :: lda_used       !  maximum number of da variables in Berz's
-     logical(lp),pointer  :: OLD    ! = true  = bERZ
-     logical(lp),pointer  :: real_warning  ! = true
-     integer,pointer :: no       ! order of da
-     integer,pointer :: nv       ! number of variables
-     integer,pointer :: nd       ! degrees of freedom
-     integer,pointer :: nd2      ! phase space dimension
-     integer,pointer :: np       ! number of parameters in fpp
-     integer,pointer :: nspin       ! number of spin variables (0 or 3)
-     integer,pointer :: SPIN_pos       ! position of spin variables (0 or 3)
-     integer,pointer :: ndpt     ! constant energy variable position is different from zero
-     integer,pointer :: NPARA     ! PARAMETER LOCATION IN PTC in fpp
-     integer,pointer :: npara_fpp     ! PARAMETER LOCATION IN FPP or PTC
-     integer,pointer :: np_pol     ! parameters produced through pol_block
-     logical(lp),pointer :: knob
-     logical(lp),pointer :: valishev
+     real(dp),pointer :: total_da_size => null() !  in megabytes
+     integer,pointer :: lda_used => null()       !  maximum number of da variables in Berz's
+     logical(lp),pointer  :: OLD => null()    ! = true  = bERZ
+     logical(lp),pointer  :: real_warning => null()  ! = true
+     integer,pointer :: no  => null()      ! order of da
+     integer,pointer :: nv  => null()      ! number of variables
+     integer,pointer :: nd  => null()      ! degrees of freedom
+     integer,pointer :: nd2 => null()      ! phase space dimension
+     integer,pointer :: np  => null()      ! number of parameters in fpp
+     integer,pointer :: nspin => null()       ! number of spin variables (0 or 3)
+     integer,pointer :: SPIN_pos => null()       ! position of spin variables (0 or 3)
+     integer,pointer :: ndpt     => null() ! constant energy variable position is different from zero
+     integer,pointer :: NPARA    => null() ! PARAMETER LOCATION IN PTC in fpp
+     integer,pointer :: npara_fpp=> null()     ! PARAMETER LOCATION IN FPP or PTC
+     integer,pointer :: np_pol   => null()  ! parameters produced through pol_block
+     logical(lp),pointer :: knob => null()
+     logical(lp),pointer :: valishev => null()
      !     integer, pointer :: NDPT_OTHER
-     logical(lp), pointer :: setknob
-     REAL(dp),pointer     :: da_absolute_aperture  ! in case one tracks with da.
+     logical(lp), pointer :: setknob => null()
+     REAL(dp),pointer     :: da_absolute_aperture => null()  ! in case one tracks with da.
      !
 
-     integer,pointer :: wherelost     ! counting lost particles in integration nodes
-     logical(lp),pointer  :: ROOT_CHECK   !=.TRUE. performs check in roots and hyperbolic if true
-     logical(lp),pointer  :: CHECK_STABLE !=.TRUE. particle status
-     logical(lp),pointer  :: CHECK_MADX_APERTURE  !=.TRUE. false means particle lost in aperture
-     logical(lp),pointer  :: APERTURE_FLAG       !=.TRUE. aperture checks globally done (default)
-     logical(lp),pointer  :: s_aperture_CHECK       !=.TRUE. aperture checks globally done (default)
+     integer,pointer :: wherelost => null()     ! counting lost particles in integration nodes
+     logical(lp),pointer  :: ROOT_CHECK => null()   !=.TRUE. performs check in roots and hyperbolic if true
+     logical(lp),pointer  :: CHECK_STABLE => null() !=.TRUE. particle status
+     logical(lp),pointer  :: CHECK_MADX_APERTURE => null()  !=.TRUE. false means particle lost in aperture
+     logical(lp),pointer  :: APERTURE_FLAG => null()       !=.TRUE. aperture checks globally done (default)
+     logical(lp),pointer  :: s_aperture_CHECK => null()       !=.TRUE. aperture checks globally done (default)
 
 
-     logical(lp),pointer  :: WATCH_USER     ! FALSE NORMALLY : WATCHES USER FOR FAILING TO CHECK APERTURES
+     logical(lp),pointer  :: WATCH_USER => null()     ! FALSE NORMALLY : WATCHES USER FOR FAILING TO CHECK APERTURES
 
-     REAL(dp),pointer     :: absolute_aperture     !=1e3_dp generic aperture check
-     real(dp),pointer :: hyperbolic_aperture  ! controls crashes in exponentials
+     REAL(dp),pointer     :: absolute_aperture => null()     !=1e3_dp generic aperture check
+     real(dp),pointer :: hyperbolic_aperture => null()  ! controls crashes in exponentials
 
 
      ! influence fibre creation
 
-     integer, pointer :: MADTHICK        !
-     integer, pointer :: MADTHIN_NORMAL
-     integer, pointer :: MADTHIN_SKEW
-     integer, pointer::  NSTD,METD       ! number of steps and integration method
-     logical(lp), pointer :: MADLENGTH   ! =.false. rbend crazy length in mad8 as input
-     logical(lp), pointer :: MAD         !=.false. mad definition of multipole for input only
-     logical(lp), pointer :: EXACT_MODEL != .false. exact model used
-     logical(lp), pointer :: ALWAYS_EXACTMIS  !=.TRUE. exact formula in tracking used for that element
-     logical(lp),pointer :: ALWAYS_knobs  !=.false. ptc knob default status
-     logical(lp),pointer :: recirculator_cheat  ! =.false.  if true energy patches use the time formula always
-     logical(lp),pointer :: sixtrack_compatible !  to insure some sixtrack compatibility default=false
-     integer, pointer:: CAVITY_TOTALPATH ! REAL PILL B0X =1 , FAKE =0  default
-     integer,pointer :: HIGHEST_FRINGE !=2  quadrupole fringe ON IF FRINGE PRESENT
-     logical(lp),pointer :: do_beam_beam   ! obvious meaning: false normally
+     integer, pointer :: MADTHICK => null()        !
+     integer, pointer :: MADTHIN_NORMAL => null()
+     integer, pointer :: MADTHIN_SKEW => null()
+     integer, pointer::  NSTD => null(),METD => null()       ! number of steps and integration method
+     logical(lp), pointer :: MADLENGTH => null()   ! =.false. rbend crazy length in mad8 as input
+     logical(lp), pointer :: MAD       => null()   !=.false. mad definition of multipole for input only
+     logical(lp), pointer :: EXACT_MODEL => null() != .false. exact model used
+     logical(lp), pointer :: ALWAYS_EXACTMIS => null()  !=.TRUE. exact formula in tracking used for that element
+     logical(lp),pointer :: ALWAYS_knobs => null()  !=.false. ptc knob default status
+     logical(lp),pointer :: recirculator_cheat => null()  ! =.false.  if true energy patches use the time formula always
+     logical(lp),pointer :: sixtrack_compatible => null() !  to insure some sixtrack compatibility default=false
+     integer, pointer:: CAVITY_TOTALPATH => null() ! REAL PILL B0X =1 , FAKE =0  default
+     integer,pointer :: HIGHEST_FRINGE => null() !=2  quadrupole fringe ON IF FRINGE PRESENT
+     logical(lp),pointer :: do_beam_beam => null()   ! obvious meaning: false normally
      ! creates a reverse propagator
-     integer,pointer ::FIBRE_DIR         !=1 or -1 for reversed
-     real(dp),pointer ::INITIAL_CHARGE         ! =1 or -1 AND  ADJUST THE MASS IS THE PREFERED MODE
+     integer,pointer ::FIBRE_DIR => null()         !=1 or -1 for reversed
+     real(dp),pointer ::INITIAL_CHARGE => null()         ! =1 or -1 AND  ADJUST THE MASS IS THE PREFERED MODE
      ! creates a reverse propagator and a reversed ring in combination with above
-     logical(lp),pointer ::FIBRE_flip    !=.true.
+     logical(lp),pointer ::FIBRE_flip => null()    !=.true.
      !  x_prime true means noncanonical outside magnets. x(5) variables stays the same.
-     real(dp), pointer :: eps_pos
+     real(dp), pointer :: eps_pos => null()
      ! fill once and never touch again
 
-     integer, pointer :: SECTOR_NMUL_MAX     != 10 maxwell equations is solved to order 10 in exact sectors
-     integer, pointer :: SECTOR_NMUL     != 4  MULTIPOLES IN TEAPOT BEND ALLOWED BY DEFAULT
-     real(dp), pointer :: wedge_coeff(:)     ! QUAD_KICK IN WEDGE
-     logical(lp), pointer :: MAD8_WEDGE      ! QUAD_KICK + FRINGE IF FRINGE IS OUT.
+     integer, pointer :: SECTOR_NMUL_MAX => null()     != 10 maxwell equations is solved to order 10 in exact sectors
+     integer, pointer :: SECTOR_NMUL     => null() != 4  MULTIPOLES IN TEAPOT BEND ALLOWED BY DEFAULT
+     real(dp), pointer :: wedge_coeff(:) => null()     ! QUAD_KICK IN WEDGE
+     logical(lp), pointer :: MAD8_WEDGE  => null()     ! QUAD_KICK + FRINGE IF FRINGE IS OUT.
 
-     logical(lp), pointer:: electron     !  electron if true otherwise proton
-     real(dp), pointer :: massfactor     !=one  sets variable muon and electron must be true
+     logical(lp), pointer:: electron     => null()!  electron if true otherwise proton
+     real(dp), pointer :: massfactor     => null()!=one  sets variable muon and electron must be true
      ! global on the fly
-     logical(lp), pointer :: compute_stoch_kick != .false. store stochastic kick for stochastic tracking
-     logical(lp),pointer :: FEED_P0C   !=.FALSE.  work takes p0c instead of energy
-     logical(lp),pointer :: ALWAYS_EXACT_PATCHING  !=.TRUE. patching done correctly
+     logical(lp), pointer :: compute_stoch_kick => null() != .false. store stochastic kick for stochastic tracking
+     logical(lp),pointer :: FEED_P0C => null()   !=.FALSE.  work takes p0c instead of energy
+     logical(lp),pointer :: ALWAYS_EXACT_PATCHING => null()  !=.TRUE. patching done correctly
      ! used to output horror messages
-     logical(lp),pointer :: stable_da !=.true.  interrupts DA if check_da is true
-     logical(lp),pointer :: check_da  !=.true.
-     logical(lp),pointer :: OLD_IMPLEMENTATION_OF_SIXTRACK  !=.true.
-     real(dp),pointer :: phase0 ! default phase in cavity
-     logical(lp), pointer :: global_verbose
-     logical(lp), pointer :: no_hyperbolic_in_normal_form ! unstable produces exception
+     logical(lp),pointer :: stable_da => null() !=.true.  interrupts DA if check_da is true
+     logical(lp),pointer :: check_da  => null() !=.true.
+     logical(lp),pointer :: OLD_IMPLEMENTATION_OF_SIXTRACK => null()  !=.true.
+     real(dp),pointer :: phase0  => null()! default phase in cavity
+     logical(lp), pointer :: global_verbose => null()
+     logical(lp), pointer :: no_hyperbolic_in_normal_form => null()! unstable produces exception
+     integer, pointer :: ndpt_bmad => null() 
   end type CONTROL
 
   type(control) c_
@@ -317,8 +321,8 @@ module precision_constants
   type(info_window),TARGET:: w_i
   type(info_window),TARGET:: w_ii
   type(info_window),TARGET::  r_i
-  type(info_window),pointer:: W_P
-  type(info_window),pointer:: R_P
+  type(info_window),pointer:: W_P => null()
+  type(info_window),pointer:: R_P => null()
 
   INTERFACE assignment (=)
      MODULE PROCEDURE EQUAL_Si
@@ -378,21 +382,7 @@ contains
 
   end function mat_norm
 
-  SUBROUTINE  check_stability(S1)
-    implicit none
-    REAL(DP),INTENT(INOUT)::S1(6)
-    INTEGER I
 
-    DO I=1,5
-       IF(ABS(S1(I))>C_%ABSOLUTE_APERTURE) THEN
-          S1=PUNY
-          C_%CHECK_STABLE=.FALSE.
-          messagelost="a_scratch_size.f90 check_stability: aperture"
-          EXIT
-       ENDIF
-    ENDDO
-
-  end   SUBROUTINE check_stability
 
   ! Symplectic integrator routines setting coefficients
 
@@ -431,13 +421,13 @@ contains
 
     if(ttt) then
        if(change_sector) then
-          write(6,*) " SECTOR_NMUL_MAX is changed from ",SECTOR_NMUL_MAX," to ",se1
+  !        write(6,*) " SECTOR_NMUL_MAX is changed from ",SECTOR_NMUL_MAX," to ",se1
           write(6,*) " SECTOR_NMUL is changed from ",SECTOR_NMUL," to ",se2
           write(6,*) " GLOBAL VARIABLES that can no longer be changed"
           SECTOR_NMUL_MAX=se1
           SECTOR_NMUL=se2
        else
-          if(t1) write(6,*) " sector_nmul_max CANNOT be changed from ",SECTOR_NMUL_MAX," to ",se1
+ !         if(t1) write(6,*) " sector_nmul_max CANNOT be changed from ",SECTOR_NMUL_MAX," to ",se1
           if(t2) write(6,*) " sector_nmul CANNOT be changed from ",SECTOR_NMUL," to ",se2
           write(6,*) " Watch out : The are GLOBAL VARIABLES "
        endif
@@ -510,58 +500,6 @@ contains
        s2%c(i)=s1(i)
     enddo
   END SUBROUTINE EQUAL_c
-
-  !  SUBROUTINE WRITE_G(IEX)
-  !    IMPLICIT NONE
-  !    integer, OPTIONAL :: IEX
-  !    integer I,MYPAUSE,IPAUSE
-  !    if(.not.global_verbose) return
-  !    IF(W_P%NC/=0) THEN
-  !       if(W_P%FC/=' ') then
-  !          WRITE(6,W_P%FC,advance=W_P%ADV) (W_P%C(I), I=1,W_P%NC)
-  !       else
-  !          do i=1,W_P%NC
-  !             WRITE(6,*) W_P%C(I)
-  !          enddo
-  !       endif
-  !    ENDIF
-  !    IF(W_P%NI/=0) THEN
-  !       if(W_P%FI/=' ') then
-  !          WRITE(6,W_P%FI,advance=W_P%ADV) (W_P%I(I), I=1,W_P%NI )
-  !       else
-  !          do i=1,W_P%NI
-  !             WRITE(6,*) W_P%I(I)
-  !          enddo
-  !       endif
-  !    ENDIF
-  !    IF(W_P%NR/=0) THEN
-  !       if(W_P%FR/=' ') then
-  !          WRITE(6,W_P%FR,advance=W_P%ADV) (W_P%R(I), I=1,W_P%NR)
-  !       else
-  !          do i=1,W_P%NR
-  !             WRITE(6,*) W_P%R(I)
-  !          enddo
-  !       endif
-  !    ENDIF
-  !    if(W_P%ADV=='NO') then
-  !       WRITE(6,*) " "
-  !    endif
-  !    IF(PRESENT(IEX)) THEN
-  !       if(iex==-1) stop
-  !       IPAUSE=MYPAUSE(IEX)
-  !    ENDIF
-  !  END SUBROUTINE WRITE_G
-  !
-  !  SUBROUTINE WRITE_a(IEX)
-  !    IMPLICIT NONE
-  !    integer, OPTIONAL :: IEX
-  !    logical(lp) temp
-  !    temp=global_verbose
-  !    global_verbose=.true.
-  !    ! call ! WRITE_I(IEX)
-  !    global_verbose=temp
-  !
-  !  END SUBROUTINE WRITE_a
   !
   SUBROUTINE read_int(IEX)
     IMPLICIT NONE
@@ -602,13 +540,11 @@ contains
     IF((ABS(X)>1.0_dp).AND.c_%ROOT_CHECK) THEN
        ARCCOS_lielib=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="a_scratch_size.f90 ARCCOS_lielib: abs(x)>1"
     ELSEIF(ABS(X)<=1.0_dp) THEN
        ARCCOS_lielib=ACOS(X)
     ELSE      !  IF X IS NOT A NUMBER
        ARCCOS_lielib=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="a_scratch_size.f90 ARCCOS_lielib: abs(x)>1"
     ENDIF
 
   END FUNCTION ARCCOS_lielib
@@ -624,13 +560,94 @@ contains
     IF(X<=0.0_dp.AND.c_%ROOT_CHECK) THEN
        LOGE_lielib=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="a_scratch_size.f90 LOGE_lielib: x<0"
     ELSE
        LOGE_lielib=LOG(X)
     ENDIF
 
   END FUNCTION LOGE_lielib
 
+ subroutine dofma(nt,dt,xlist,pxlist,q0,qmean,qvar)
+! demin's Laskar routine
+! nt number of turns (periods) nt=2048
+! time winows in units of turns   dt=512   max dt=nt/2
+! xlist(1:nt), pxlist(1:nt) one-plane data usually x-px
+! q0 closed orbit tune in x-px plane in revolutions
+! output qmean average tune in nt window
+! qvar = variance of measured tune
+!
+      implicit none
+      
+      ! Input parameters
+      integer nt, dt
+      real(dp) :: xlist(1:nt), pxlist(1:nt)
+      real(dp) q0 
+      
+      ! Output
+      real(dp) qmean, qvar
+      
+      ! Local
+      real(dp) qmin, qmax, afind, bfind, stepfind, find, findnu, xnu
+      real(dp) sumr, sumi, tw, rr, sumnorm
+      real(dp), allocatable :: nulist(:)
+      integer np, nwindow, iw, ik, ik1, i
+      
+      ! Preparations
+      qmin = floor(q0*2.0)/2.0+0.001
+      qmax = qmin + 0.498
+      np = nt/2
+      nwindow = (nt-np)/dt + 1
+      allocate(nulist(1:nwindow))
+      qmean = 0.0
+      qvar = 0.0
+      
+      ! FMA calculation, Ref. D. Shatilov, Phys. Rev. ST Accel. Beams 14, 014001 (2011)
+      do iw = 0, nwindow-1
+        afind = qmax
+        bfind = qmin
+        stepfind = 0.002
+        do while(stepfind>1.0e-12)
+          find = 0.0
+          findnu = 0.0
+          xnu = afind
+          do while(xnu .ge. bfind)
+            sumr = 0.0
+            sumi = 0.0
+            ik = 0
+            do while(ik .le. np)
+              tw = 2.0 * dble(ik) / np - 1.0
+              rr = twopi * ik * xnu
+              ik1 = ik + iw * dt + 1
+              sumr = sumr + (xlist(ik1) * cos(rr) + pxlist(ik1) * sin(rr)) * (1.0 + cos(pi*tw))
+              sumi = sumi + (-xlist(ik1) * sin(rr) + pxlist(ik1) * cos(rr)) * (1.0 + cos(pi*tw))
+              ik = ik + 1
+            enddo
+            sumnorm = sqrt((sumr*sumr+sumi*sumi)/np)
+            if(find < sumnorm) then
+              find = sumnorm
+              findnu = xnu  
+            end if
+            xnu = xnu - stepfind
+          enddo
+          afind = findnu + stepfind
+          bfind = findnu - stepfind
+          stepfind = stepfind / 10.0
+        enddo
+        nulist(iw+1) = findnu
+      enddo
+      
+      do i = 1, nwindow
+        qmean = qmean + nulist(i)
+      enddo
+      qmean = qmean/nwindow
+      
+      do i = 1, nwindow
+        qvar = qvar + (nulist(i)-qmean) * (nulist(i)-qmean)
+      enddo
+      qvar = sqrt(qvar/nwindow)
+
+      return
+      
+   end subroutine dofma
 end module precision_constants
 
 
@@ -802,18 +819,25 @@ CONTAINS
   END SUBROUTINE ReportOpenFiles
 
 
-  SUBROUTINE CONTEXT( STRING, nb )
+  SUBROUTINE CONTEXT( STRING, nb,dollar )
     IMPLICIT NONE
     CHARACTER(*) STRING
     CHARACTER(1) C1
     integer, optional :: nb
+    logical(lp), optional :: dollar
     integer I,J,K,nb0,count
+     logical(lp) dol
     nb0=0
+    dol=.false.
     if(present(nb)) nb0=1
+    if(present(dollar)) dol=dollar
     J = 0
     count=0
     DO I = 1, LEN (STRING)
        C1 = STRING(I:I)
+       if(dol) then
+        if(c1=='$') c1="_"
+       endif
        STRING(I:I) = ' '
        IF( C1 .NE. ' ' ) THEN
           if(count/=0.and.nb0==1) then
@@ -1226,7 +1250,7 @@ contains
 
   FUNCTION DSQRTT( S1 )
     implicit none
-    type (my_1D_taylor) DSQRTT,t
+    type (my_1D_taylor) DSQRTT 
     type (my_1D_taylor), INTENT (IN) :: S1
     ! WRITE(6,*) " MARDE "
     ! STOP 666
@@ -1342,7 +1366,7 @@ integer function mypause(i)
   w_p%c(1)=' ipause=mypause(0)  ';w_p%fc='((A8,1x))'
 
   ! call ! WRITE_I
-  ! read(*,*) I
+   read(5,*) I
   mypause=i
   ! mypause=sqrt(dble(-i))
 end function mypause

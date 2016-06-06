@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.19 14:44:50      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.06.02 12:32:54      +
   ++++++++++++++++++++++++++++++++++++++++++++
 PTCNSTEPS=3;
 
@@ -72,6 +72,7 @@ ptc_create_universe;
           Kinetic Energy : 0.199489E+00
       Particle Rest Mass : 0.510999E-03
                 Momentum : 0.199999E+00
+  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy          0.20000000000000001     
      method                   6
@@ -79,6 +80,9 @@ ptc_create_universe;
      charge           1.0000000000000000     
   Length of machine:    1.2000000000000002     
  The machine is a LINE
+ Total NST due to Bend Closed Orbit            0
+ Total NST due to Sextupoles            0
+ Biggest ds    5.0000000000000003E-002
  ------------------------------------ PTC Survey ------------------------------------
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
@@ -90,7 +94,7 @@ ptc_create_universe;
 
 
 
- PTC_TWISS, table=twiss, icase=56, no=2, betz=1.0, betx=10, bety=10;
+ PTC_TWISS, table=twiss, icase=6, no=2, rmatrix, betz=1.0, betx=10, bety=10;
 
  Reduced SUMM Table (Inital parameters specified)
 
@@ -133,10 +137,10 @@ ptc_create_universe;
                  0                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0                  0                  0                  0 
+                -0                  0                  0                  0 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0       0.8717825051    1.678494472e-16                  0 
+                 0       0.8717825051                  0                  0 
 
             ycomax            pxcomax            pycomax             tcomax 
                  0                  0                  0        1.200003731 
@@ -145,7 +149,7 @@ ptc_create_universe;
                  0                  0                  0                  0 
 
            pycomin             tcomin            ptcomin 
-                 0                  0   -2.220439476e-16 
+                 0                  0                  0 
 
 
  write, table=twiss, file="ptc.twiss";

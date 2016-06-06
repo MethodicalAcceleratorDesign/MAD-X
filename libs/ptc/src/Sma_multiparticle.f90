@@ -20,19 +20,32 @@ module ptc_multiparticle
   !  LOGICAL :: OLD_MOD=.TRUE.
 
   logical(lp),private, parameter :: dobb=.true.
-  
-  !flag for tracking in slices to check aperture at every regular integration step
-  logical(lp),public, parameter :: aperture_all_case0=.true.
-  type(probe) :: xsm,xsm0
+  logical(lp),private, parameter :: aperture_all_case0=.true.
+ ! type(probe) :: xsm,xsm0
+  real(dp) :: xsm0t=0.0_dp,xsmt=0.0_dp
   !real(dp) :: unit_time =1.0e-3_dp
   REAL(dp) :: x_orbit_sync(6)= 0.0_dp,dt_orbit_sync=0.0_dp
-  
+    logical(lp) :: use_bmad_units=.false.
+
   INTERFACE TRACK_NODE_SINGLE
      MODULE PROCEDURE TRACKR_NODE_SINGLE     !@1  t,x,state,charge
      MODULE PROCEDURE TRACKP_NODE_SINGLE     !@1  t,y,state,charge
      MODULE PROCEDURE TRACKV_NODE_SINGLE     !@1  t,v,state,charge
   END INTERFACE
 
+  INTERFACE convert_bmad_to_ptc
+     MODULE PROCEDURE convert_bmad_to_ptcr
+     MODULE PROCEDURE convert_bmad_to_ptcp
+     MODULE PROCEDURE convert_bmad_to_ptcar
+     MODULE PROCEDURE convert_bmad_to_ptcap
+  END INTERFACE
+
+  INTERFACE convert_ptc_to_bmad
+     MODULE PROCEDURE convert_ptc_to_bmadr
+     MODULE PROCEDURE convert_ptc_to_bmadp
+     MODULE PROCEDURE convert_ptc_to_bmadar
+     MODULE PROCEDURE convert_ptc_to_bmadap
+  END INTERFACE
 
 
 
@@ -51,10 +64,7 @@ module ptc_multiparticle
      MODULE PROCEDURE TRACK_FIBRE_BACKP
   END INTERFACE
 
-  INTERFACE COPY
-     MODULE PROCEDURE COPY_BEAM
-  END INTERFACE
-
+ 
   INTERFACE OPERATOR (.feq.)
      MODULE PROCEDURE fuzzy_eq
   END INTERFACE
@@ -136,8 +146,7 @@ CONTAINS
        V=EL%DC_ac
        DV=0.0_dp
        call set_ramp(C,t)
-
-    CALL transfer_ANBN(EL,ELP,VR=V,DVR=DV)
+    CALL transfer_ANBN(EL,ELP,VR=V,DVR=DV,t=T)
 
 
   END   SUBROUTINE do_ramping_R
@@ -532,7 +541,7 @@ CONTAINS
     implicit none
     logical(lp) :: doneitt=.true.
     TYPE(FIBRE),TARGET,INTENT(INOUT):: C
-    !    TYPE(BEAM),TARGET,INTENT(INOUT):: B
+
     real(dp), INTENT(INOUT) :: X(6)
     TYPE(INTERNAL_STATE)  K
     !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
@@ -540,6 +549,7 @@ CONTAINS
     INTEGER(2) PATCHT,PATCHG,PATCHE
     TYPE (fibre), POINTER :: CN
     real(dp), POINTER :: P0,B0
+    real(dp) b1
 
     !FRONTAL PATCH
     !    IF(ASSOCIATED(C%PATCH)) THEN
@@ -551,17 +561,17 @@ CONTAINS
     ! PUSHING BEAM
     !
 
+    b1=C%BETA0
 
-
-    IF(PATCHE/=0.AND.PATCHE/=2) THEN
+    IF(PATCHE/=0.AND.PATCHE/=2.AND.PATCHE/=5) THEN
        NULLIFY(P0);NULLIFY(B0);
        CN=>C%PREVIOUS
-       IF(ASSOCIATED(CN)) THEN ! ASSOCIATED
+       IF(ASSOCIATED(CN).and.PATCHE/=4) THEN ! ASSOCIATED
           !          IF(.NOT.CN%PATCH%ENERGY) THEN     ! No need to patch IF PATCHED BEFORE
-          IF(CN%PATCH%ENERGY==0) THEN     ! No need to patch IF PATCHED BEFORE
+          IF(CN%PATCH%ENERGY==0.or.CN%PATCH%ENERGY==1.or.CN%PATCH%ENERGY==4) THEN     ! No need to patch IF PATCHED BEFORE
              P0=>CN%MAG%P%P0C
              B0=>CN%MAG%P%BETA0
-
+ 
              X(2)=X(2)*P0/C%MAG%P%P0C
              X(4)=X(4)*P0/C%MAG%P%P0C
              IF(k%TIME.or.recirculator_cheat)THEN
@@ -572,8 +582,21 @@ CONTAINS
                 X(5)=(1.0_dp+X(5))*P0/C%MAG%P%P0C-1.0_dp
              ENDIF
           ENDIF ! No need to patch
+       else  ! associated   
+             P0=>C%PATCH%P0b
+             B0=>C%PATCH%B0b
+ 
+             X(2)=X(2)*P0/C%MAG%P%P0C
+             X(4)=X(4)*P0/C%MAG%P%P0C
+             IF(k%TIME.or.recirculator_cheat)THEN
+                X(5)=root(1.0_dp+2.0_dp*X(5)/B0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
+                X(5)=X(5)*P0/C%MAG%P%P0C-1.0_dp !X(5) = DP/P0C_NEW
+                X(5)=(2.0_dp*X(5)+X(5)**2)/(root(1.0_dp/C%MAG%P%BETA0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/C%MAG%P%BETA0)
+             ELSE
+                X(5)=(1.0_dp+X(5))*P0/C%MAG%P%P0C-1.0_dp
+             ENDIF           
        ENDIF ! ASSOCIATED
-
+ 
     ENDIF
 
     ! The chart frame of reference is located here implicitely
@@ -590,7 +613,7 @@ CONTAINS
       endif
     ENDIF
 
-    CALL DTILTD(C%DIR,C%MAG%P%TILTD,1,X)
+    CALL DTILTD(C%MAG%P%TILTD,1,X)
     ! The magnet frame of reference is located here implicitely before misalignments
 
     !      CALL TRACK(C,X,EXACTMIS=K%EXACTMIS)
@@ -598,14 +621,13 @@ CONTAINS
        ou = ALWAYS_EXACTMIS  !K%EXACTMIS.or.
        CALL MIS_FIB(C,X,k,OU,DONEITT)
     ENDIF
-
+ 
   END SUBROUTINE TRACK_FIBRE_FRONTR
 
   SUBROUTINE TRACK_FIBRE_FRONTP(C,X,K)
     implicit none
     logical(lp) :: doneitt=.true.
     TYPE(FIBRE),TARGET,INTENT(INOUT):: C
-    !    TYPE(BEAM),TARGET,INTENT(INOUT):: B
     TYPE(REAL_8), INTENT(INOUT) :: X(6)
     TYPE(INTERNAL_STATE)  K
     !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
@@ -613,7 +635,7 @@ CONTAINS
     INTEGER(2) PATCHT,PATCHG,PATCHE
     TYPE (fibre), POINTER :: CN
     real(dp), POINTER :: P0,B0
-
+    real(dp) b1
 
     !FRONTAL PATCH
     !    IF(ASSOCIATED(C%PATCH)) THEN
@@ -624,18 +646,19 @@ CONTAINS
 
     ! PUSHING BEAM
     !
+    b1=C%BETA0
 
 
-
-    IF(PATCHE/=0.AND.PATCHE/=2) THEN
+    IF(PATCHE/=0.AND.PATCHE/=2.AND.PATCHE/=5) THEN
        NULLIFY(P0);NULLIFY(B0);
        CN=>C%PREVIOUS
-       IF(ASSOCIATED(CN)) THEN ! ASSOCIATED
+       IF(ASSOCIATED(CN).and.PATCHE/=4) THEN ! ASSOCIATED
           !          IF(.NOT.CN%PATCH%ENERGY) THEN     ! No need to patch IF PATCHED BEFORE
-          IF(CN%PATCH%ENERGY==0) THEN     ! No need to patch IF PATCHED BEFORE
+          IF(CN%PATCH%ENERGY==0.or.CN%PATCH%ENERGY==1.or.CN%PATCH%ENERGY==4) THEN     ! No need to patch IF PATCHED BEFORE
              P0=>CN%MAGP%P%P0C
              B0=>CN%MAGP%P%BETA0
-
+ 
+ 
              X(2)=X(2)*P0/C%MAGP%P%P0C
              X(4)=X(4)*P0/C%MAGP%P%P0C
              IF(k%TIME.or.recirculator_cheat)THEN
@@ -646,8 +669,21 @@ CONTAINS
                 X(5)=(1.0_dp+X(5))*P0/C%MAGP%P%P0C-1.0_dp
              ENDIF
           ENDIF ! No need to patch
+       else  ! associated 
+             P0=>C%PATCH%P0b
+             B0=>C%PATCH%B0b
+ 
+             X(2)=X(2)*P0/C%MAGP%P%P0C
+             X(4)=X(4)*P0/C%MAGP%P%P0C
+             IF(k%TIME.or.recirculator_cheat)THEN
+                X(5)=SQRT(1.0_dp+2.0_dp*X(5)/B0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
+                X(5)=X(5)*P0/C%MAGP%P%P0C-1.0_dp !X(5) = DP/P0C_NEW
+                X(5)=(2.0_dp*X(5)+X(5)**2)/(SQRT(1.0_dp/C%MAGP%P%BETA0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/C%MAGP%P%BETA0)
+             ELSE
+                X(5)=(1.0_dp+X(5))*P0/C%MAGP%P%P0C-1.0_dp
+             ENDIF           
        ENDIF ! ASSOCIATED
-
+ 
     ENDIF
 
     ! The chart frame of reference is located here implicitely
@@ -664,7 +700,7 @@ CONTAINS
       endif
     ENDIF
 
-    CALL DTILTD(C%DIR,C%MAGP%P%TILTD,1,X)
+    CALL DTILTD(C%MAGP%P%TILTD,1,X)
     ! The magnet frame of reference is located here implicitely before misalignments
 
     !      CALL TRACK(C,X,EXACTMIS=K%EXACTMIS)
@@ -673,7 +709,7 @@ CONTAINS
        CALL MIS_FIB(C,X,k,OU,DONEITT)
     ENDIF
 
-
+ 
   END SUBROUTINE TRACK_FIBRE_FRONTP
 
 
@@ -683,7 +719,6 @@ CONTAINS
     implicit none
     logical(lp) :: doneitf=.false.
     TYPE(FIBRE),TARGET,INTENT(INOUT):: C
-    !    TYPE(BEAM),TARGET,INTENT(INOUT):: B
     real(dp), INTENT(INOUT) :: X(6)
     TYPE(INTERNAL_STATE)  K
     !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
@@ -691,7 +726,7 @@ CONTAINS
     INTEGER(2) PATCHT,PATCHG,PATCHE
     TYPE (fibre), POINTER :: CN
     real(dp), POINTER :: P0,B0
-
+    real(dp) b1
 
     IF(ASSOCIATED(C%PATCH)) THEN
        PATCHT=C%PATCH%TIME ;PATCHE=C%PATCH%ENERGY ;PATCHG=C%PATCH%PATCH;
@@ -699,14 +734,13 @@ CONTAINS
        PATCHT=0 ; PATCHE=0 ;PATCHG=0;
     ENDIF
 
-
-
+ 
     IF(C%MAG%MIS) THEN
        ou = ALWAYS_EXACTMIS  !K%EXACTMIS.or.
        CALL MIS_FIB(C,X,k,OU,DONEITF)
     ENDIF
     ! The magnet frame of reference is located here implicitely before misalignments
-    CALL DTILTD(C%DIR,C%MAG%P%TILTD,2,X)
+    CALL DTILTD(C%MAG%P%TILTD,2,X)
 
     IF(PATCHT/=0.AND.PATCHT/=1.AND.(K%TOTALPATH==0)) THEN
       if(K%time) then
@@ -722,15 +756,18 @@ CONTAINS
     ENDIF
 
     ! The CHART frame of reference is located here implicitely
+    b1=C%BETA0
 
-    IF(PATCHE/=0.AND.PATCHE/=1) THEN
+    IF(PATCHE/=0.AND.PATCHE/=1.AND.PATCHE/=4) THEN
        NULLIFY(P0);NULLIFY(B0);
-       CN=>C%NEXT
-       IF(.NOT.ASSOCIATED(CN)) CN=>C
+       CN=>C%NEXT 
+!       IF(.NOT.ASSOCIATED(CN)) CN=>C
+       IF(ASSOCIATED(CN).AND.PATCHE/=5) then
        !       P0=>CN%MAG%P%P0C
        !       B0=>CN%MAG%P%BETA0
        P0=>CN%MAG%P%P0C
        B0=>CN%BETA0
+       b1=b0
        X(2)=X(2)*C%MAG%P%P0C/P0
        X(4)=X(4)*C%MAG%P%P0C/P0
        IF(k%TIME.or.recirculator_cheat)THEN
@@ -740,18 +777,31 @@ CONTAINS
        ELSE
           X(5)=(1.0_dp+X(5))*C%MAG%P%P0C/P0-1.0_dp
        ENDIF
-    ENDIF
+    
+    else
+             P0=>C%PATCH%P0b
+             B0=>C%PATCH%B0b
+             b1=b0
+             X(2)=X(2)*P0/C%MAG%P%P0C
+             X(4)=X(4)*P0/C%MAG%P%P0C
+             IF(k%TIME.or.recirculator_cheat)THEN
+                X(5)=root(1.0_dp+2.0_dp*X(5)/B0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
+                X(5)=X(5)*P0/C%MAG%P%P0C-1.0_dp !X(5) = DP/P0C_NEW
+                X(5)=(2.0_dp*X(5)+X(5)**2)/(root(1.0_dp/C%MAG%P%BETA0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/C%MAG%P%BETA0)
+             ELSE
+                X(5)=(1.0_dp+X(5))*P0/C%MAG%P%P0C-1.0_dp
+             ENDIF      
+    endif
+ENDIF
 
-
-
-
+ 
+  
   END SUBROUTINE TRACK_FIBRE_BACKR
 
   SUBROUTINE TRACK_FIBRE_BACKP(C,X,K)
     implicit none
     logical(lp) :: doneitf=.false.
     TYPE(FIBRE),TARGET,INTENT(INOUT):: C
-    !    TYPE(BEAM),TARGET,INTENT(INOUT):: B
     type(real_8), INTENT(INOUT) :: X(6)
     TYPE(INTERNAL_STATE)  K
     !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
@@ -759,7 +809,7 @@ CONTAINS
     INTEGER(2) PATCHT,PATCHG,PATCHE
     TYPE (fibre), POINTER :: CN
     real(dp), POINTER :: P0,B0
-
+    real(dp) b1
 
     IF(ASSOCIATED(C%PATCH)) THEN
        PATCHT=C%PATCH%TIME ;PATCHE=C%PATCH%ENERGY ;PATCHG=C%PATCH%PATCH;
@@ -767,14 +817,14 @@ CONTAINS
        PATCHT=0 ; PATCHE=0 ;PATCHG=0;
     ENDIF
 
-
+ 
 
     IF(C%MAGP%MIS) THEN
        ou = ALWAYS_EXACTMIS   !K%EXACTMIS.or.
        CALL MIS_FIB(C,X,k,OU,DONEITF)
     ENDIF
     ! The magnet frame of reference is located here implicitely before misalignments
-    CALL DTILTD(C%DIR,C%MAGP%P%TILTD,2,X)
+    CALL DTILTD(C%MAGP%P%TILTD,2,X)
 
     IF(PATCHT/=0.AND.PATCHT/=1.AND.(K%TOTALPATH==0)) THEN
       if(K%time) then
@@ -790,15 +840,17 @@ CONTAINS
     ENDIF
 
     ! The CHART frame of reference is located here implicitely
-
-    IF(PATCHE/=0.AND.PATCHE/=1) THEN
+    b1=C%BETA0
+    IF(PATCHE/=0.AND.PATCHE/=1.AND.PATCHE/=4) THEN
        NULLIFY(P0);NULLIFY(B0);
        CN=>C%NEXT
-       IF(.NOT.ASSOCIATED(CN)) CN=>C
+!       IF(.NOT.ASSOCIATED(CN)) CN=>C
+       IF(ASSOCIATED(CN).and.PATCHE/=5) then
        !       P0=>CN%MAGP%P%P0C
        !       B0=>CN%MAGP%P%BETA0
        P0=>CN%MAGP%P%P0C
        B0=>CN%BETA0
+       b1=b0
        X(2)=X(2)*C%MAGP%P%P0C/P0
        X(4)=X(4)*C%MAGP%P%P0C/P0
        IF(k%TIME.or.recirculator_cheat)THEN
@@ -808,7 +860,23 @@ CONTAINS
        ELSE
           X(5)=(1.0_dp+X(5))*C%MAGP%P%P0C/P0-1.0_dp
        ENDIF
+    
+    else
+             P0=>C%PATCH%P0b
+             B0=>C%PATCH%B0b
+             b1=b0
+             X(2)=X(2)*P0/C%MAGP%P%P0C
+             X(4)=X(4)*P0/C%MAGP%P%P0C
+             IF(k%TIME.or.recirculator_cheat)THEN
+                X(5)=SQRT(1.0_dp+2.0_dp*X(5)/B0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
+                X(5)=X(5)*P0/C%MAGP%P%P0C-1.0_dp !X(5) = DP/P0C_NEW
+                X(5)=(2.0_dp*X(5)+X(5)**2)/(SQRT(1.0_dp/C%MAGP%P%BETA0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/C%MAGP%P%BETA0)
+             ELSE
+                X(5)=(1.0_dp+X(5))*P0/C%MAGP%P%P0C-1.0_dp
+             ENDIF           
     ENDIF
+endif
+ 
 
   END SUBROUTINE TRACK_FIBRE_BACKP
 
@@ -827,16 +895,16 @@ CONTAINS
     !       CALL RESET_APERTURE_FLAG
     !    endif
 
-    if(abs(x(1))+abs(x(3))>absolute_aperture) then
-       messageLOST="Sma_multiparticle.f90 TRACKV_NODE_SINGLE : exceed absolute_aperture in TRACKV_NODE_SINGLE"
+    x=V%X
+    if(abs(x(1))+abs(x(3))>absolute_aperture.or.abs(x(6))>t_aperture) then
+       messageLOST="exceed absolute_aperture in TRACKV_NODE_SINGLE"
        lost_node=>t
        lost_fibre=>t%parent_fibre
        xlost=x
        CHECK_STABLE=.false.
-      
     endif
 
-    x=V%X
+
     reference_ray=V%reference_ray
 
     CALL TRACK_NODE_SINGLE(T,V%X,K)
@@ -889,18 +957,17 @@ CONTAINS
     TYPE(INTERNAL_STATE)  K
     !    TYPE(INTERNAL_STATE), INTENT(IN) :: K
     type(element),pointer :: el
-
+    LOGICAL TA
     IF(.NOT.CHECK_STABLE) return
     !       CALL RESET_APERTURE_FLAG
     !    endif
 
-    if(abs(x(1))+abs(x(3))>absolute_aperture) then   !.or.(.not.CHECK_MADX_APERTURE)) then
-       messageLOST="Sma_multiparticle.f90 TRACKR_NODE_SINGLE : exceed absolute_aperture in TRACKR_NODE_SINGLE"
+    if(abs(x(1))+abs(x(3))>absolute_aperture.or.abs(x(6))>t_aperture) then   !.or.(.not.CHECK_MADX_APERTURE)) then
+       messageLOST="exceed absolute_aperture in TRACKR_NODE_SINGLE"
        lost_node=>t
        lost_fibre=>t%parent_fibre
        xlost=x
        CHECK_STABLE=.false.
-       
     endif
 
 
@@ -921,8 +988,15 @@ CONTAINS
     SELECT CASE(T%CAS)
     CASE(CASEP1)
        CALL TRACK_FIBRE_FRONT(T%PARENT_FIBRE,X,K)
-       if(associated(T%PARENT_FIBRE%MAG%p%aperture)) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
+     if(associated(T%PARENT_FIBRE%MAG%p%aperture)) then
+TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==-1.OR.T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==0
+          if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
+     endif
     CASE(CASEP2)
+     if(associated(T%PARENT_FIBRE%MAG%p%aperture)) then
+TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==0
+          if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
+     endif
        CALL TRACK_FIBRE_BACK(T%PARENT_FIBRE,X,K)
 
     CASE(CASE1,CASE2)
@@ -958,7 +1032,7 @@ CONTAINS
           CALL FRINGE_CAV_TRAV(EL%CAV21,X=X,k=k,J=T%CAS)
           CALL ADJUST_TIME_CAV_TRAV_OUT(EL%CAV21,X,k,T%CAS)   ! ONLY DOES SOMETHING IF J==2
        case(KINDWIGGLER)
-          CALL ADJUST_WI(EL%WI,X,T%CAS)   ! ONLY DOES SOMETHING IF J==2
+          CALL ADJUST_WI(EL%WI,X,k,T%CAS)   ! ONLY DOES SOMETHING IF J==2
        case(KINDPA)
           CALL ADJUST_PANCAKE(EL%PA,X,k,T%CAS)
        CASE DEFAULT
@@ -977,11 +1051,11 @@ CONTAINS
           if(t%bb%patch)call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_false)
 
        endif
-
+ 
        SELECT CASE(EL%KIND)
        CASE(KIND0)
        case(KIND1)
-          CALL TRACK_SLICE(EL%D0,X,K) ! DRIFTL INTER_DRIFT1
+          CALL TRACK_SLICE(EL%D0,X,K)
        case(KIND2)
           CALL TRACK_SLICE(EL%K2,X,K,t%POS_IN_FIBRE-2)
        case(KIND3)
@@ -1028,7 +1102,6 @@ CONTAINS
           WRITE(6,*) "NOT IMPLEMENTED ",EL%KIND
           stop 999
        END SELECT
-       
        if(associated(T%PARENT_FIBRE%MAG%p%aperture).and.aperture_all_case0) &
             call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
 
@@ -1040,10 +1113,10 @@ CONTAINS
           call BBKICK(t%bb,X)
           if(t%bb%patch)call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_false)
        endif
-       IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
+!       IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
     case(CASETF1,CASETF2)
 
-       IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
+!       IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
 
 
     END SELECT
@@ -1069,18 +1142,17 @@ CONTAINS
     logical(lp) BN2,L
     logical(lp) CHECK_KNOB
     integer(2), pointer,dimension(:)::AN,BN
-
+     logical TA
     IF(.NOT.CHECK_STABLE) return
     !       CALL RESET_APERTURE_FLAG
     !    endif
 
-    if(abs(x(1))+abs(x(3))>absolute_aperture) then
-       messageLOST="Sma_multiparticle.f90 TRACKP_NODE_SINGLE : exceed absolute_aperture in TRACKP_NODE_SINGLE"
+    if(abs(x(1))+abs(x(3))>absolute_aperture.or.abs(x(6))>t_aperture) then
+       messageLOST="exceed absolute_aperture in TRACKP_NODE_SINGLE"
        lost_node=>t
        lost_fibre=>t%parent_fibre
        xlost=x
        CHECK_STABLE=.false.
-       
     endif
 
     !   T%PARENT_FIBRE%MAGP=K
@@ -1098,11 +1170,15 @@ CONTAINS
     SELECT CASE(T%CAS)
     CASE(CASEP1)
        CALL TRACK_FIBRE_FRONT(T%PARENT_FIBRE,X,K)
-       if(associated(T%PARENT_FIBRE%MAGP%p%aperture)) call CHECK_APERTURE(T%PARENT_FIBRE%MAGP%p%aperture,X)
+     if(associated(T%PARENT_FIBRE%MAG%p%aperture)) then
+TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==-1.OR.T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==0
+          if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
+     endif
     CASE(CASEP2)
-       !    if(abs(x(1))+abs(x(3))>absolute_aperture.or.(.not.CHECK_MADX_APERTURE)) then ! new 2010
-       !       CHECK_STABLE=.false.
-       !    endif
+     if(associated(T%PARENT_FIBRE%MAG%p%aperture)) then
+TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==0
+          if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
+     endif
        CALL TRACK_FIBRE_BACK(T%PARENT_FIBRE,X,K)
 
     CASE(CASE1,CASE2)
@@ -1139,7 +1215,7 @@ CONTAINS
           CALL FRINGE_CAV_TRAV(EL%CAV21,X=X,k=k,J=T%CAS)
           CALL ADJUST_TIME_CAV_TRAV_OUT(EL%CAV21,X,k,T%CAS)   ! ONLY DOES SOMETHING IF J==2
        case(KINDWIGGLER)
-          CALL ADJUST_WI(EL%WI,X,T%CAS)   ! ONLY DOES SOMETHING IF J==2
+          CALL ADJUST_WI(EL%WI,X,k,T%CAS)   ! ONLY DOES SOMETHING IF J==2
        case(KINDPA)
           CALL ADJUST_PANCAKE(EL%PA,X,k,T%CAS)   ! ONLY DOES SOMETHING IF J==2
        CASE DEFAULT
@@ -1242,10 +1318,10 @@ CONTAINS
           call BBKICK(t%bb,X)
           if(t%bb%patch)call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_false)
        endif
-       IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
+ !      IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
     case(CASETF1,CASETF2)
 
-       IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
+ !      IF(ASSOCIATED(T%T)) CALL TRACK(T%T,X)
 
 
 
@@ -1771,328 +1847,7 @@ CONTAINS
   end  subroutine fill_survey_data_in_NODE_LAYOUT
 
 
-  ! BEAM STUFF
 
-  subroutine create_beam(B,N,CUT,SIG,A,C,T)
-    USE gauss_dis
-    implicit none
-    INTEGER N,I,J,K
-    REAL(DP) CUT,SIG(6),X
-    TYPE(BEAM) B
-    REAL(DP), OPTIONAL :: A(6,6),C(6)
-    REAL(DP)  AS(6,6),CL(6),XT(6)
-    TYPE (INTEGRATION_NODE),optional,target::  T
-
-    IF(.NOT.ASSOCIATED(B%N)) THEN
-       CALL ALLOCATE_BEAM(B,N)
-    ELSEIF(B%N/=N) THEN
-       CALL KILL_BEAM(B)
-       CALL ALLOCATE_BEAM(B,N)
-    ENDIF
-
-    CL=0.0_dp; AS=0.0_dp;
-    DO I=1,6
-       AS(I,I)=1.0_dp
-    ENDDO
-
-    IF(PRESENT(A)) AS=A
-    IF(PRESENT(C)) CL=C
-
-    DO I=1,N
-       DO J=1,6
-          CALL GRNF(X,cut)
-          XT(J)=X*SIG(J)
-       ENDDO
-       B%X(I,1:6)=CL(:)
-       DO J=1,6
-          DO K=1,6
-             B%X(I,J)=AS(J,K)*XT(K)+B%X(I,J)
-          ENDDO
-
-       ENDDO
-    ENDDO
-
-
-    if(present(t)) then
-       DO I=1,N
-          ! if(associated(B%POS(I)%NODE))then
-          B%POS(I)%NODE=>T
-          ! endif
-       ENDDO
-
-    endif
-
-  end    subroutine create_beam
-
-  subroutine create_PANCAKE(B,N,CUT,SIG,T,A)
-    USE gauss_dis
-    implicit none
-    INTEGER N,I,J
-    REAL(DP) CUT,SIG(6),X,Y(LNV),beta(2)
-    TYPE(BEAM) B
-    TYPE (INTEGRATION_NODE),optional,target::  T
-    TYPE (DAMAP),OPTIONAL :: A
-    TYPE (tree) monkey
-
-    IF(.NOT.ASSOCIATED(B%N)) THEN
-       CALL ALLOCATE_BEAM(B,N)
-    ELSEIF(B%N/=N) THEN
-       CALL KILL_BEAM(B)
-       CALL ALLOCATE_BEAM(B,N)
-    ENDIF
-    write(6,*) n," particles created"
-    Y=0.0_dp
-    IF(.not.PRESENT(A)) THEN
-
-       DO I=1,N
-          DO J=1,6
-             CALL GRNF(X,cut)
-             B%X(I,J)=X*SIG(J)
-          ENDDO
-          B%X(I,7)=0.0_dp
-       enddo
-    ELSE
-       call alloc(monkey)
-       beta(1)=(a%v(1).sub.'1')**2+(a%v(1).sub.'01')**2
-       beta(2)=(a%v(3).sub.'001')**2+(a%v(3).sub.'0001')**2
-       write(6,*) " Betas in create_PANCAKE ",beta
-       monkey=A
-       DO I=1,N
-          DO J=1,C_%ND
-             CALL GRNF(X,cut)
-             Y(2*j-1)=X*sqrt(SIG(j)/2.0_dp)
-             CALL GRNF(X,cut)
-             Y(2*j)=X*sqrt(SIG(j)/2.0_dp)
-          ENDDO
-          y=monkey*Y
-          B%X(I,1:C_%ND2)=y(1:c_%nd2)
-
-          DO J=C_%ND2+1,6
-             CALL GRNF(X,cut)
-             B%X(I,J)=X*SIG(J)
-          ENDDO
-          B%X(I,7)=0.0_dp
-       enddo
-       CALL KILL(MONKEY)
-    ENDIF
-
-
-
-
-    if(present(t)) then
-       DO I=1,N
-          if(associated(B%POS(I)%NODE))then
-             B%POS(I)%NODE=>T
-          endif
-       ENDDO
-
-    endif
-  end    subroutine create_PANCAKE
-
-  subroutine copy_beam(B1,B2)
-    implicit none
-    INTEGER I
-    TYPE(BEAM), INTENT(INOUT) :: B1,B2
-
-    IF(.NOT.ASSOCIATED(B2%N)) THEN
-       CALL ALLOCATE_BEAM(B2,B1%N)
-    ELSEIF(B1%N/=B2%N) THEN
-       CALL KILL_BEAM(B2)
-       CALL ALLOCATE_BEAM(B2,B1%N)
-    ENDIF
-
-    B2%X=B1%X
-    B2%U=B1%U
-    B2%N=B1%N
-    !    B2%CHARGE=B1%CHARGE
-    B2%LOST=B1%LOST
-    DO I=0,B1%N
-       if(associated(B1%POS(I)%NODE))then
-          B2%POS(I)%NODE=>B1%POS(I)%NODE
-       endif
-    ENDDO
-
-  END subroutine copy_beam
-
-  subroutine READ_beam_raw(B,MF)
-    implicit none
-    INTEGER k,mf
-    TYPE(BEAM), INTENT(IN):: B
-
-    DO K=1,b%n
-       IF(.not.B%U(K)) THEN
-          if(associated(b%pos(k)%NODE)) then
-             WRITE(MF,100) B%X(K,1:6),b%pos(k)%NODE%s(3)+B%X(K,7)
-          else
-             WRITE(MF,100) B%X(K,1:6),B%X(K,7)
-          endif
-       ENDIF
-    ENDDO
-100 FORMAT(7(1x,e13.6))
-  END subroutine READ_beam_raw
-
-  subroutine PRINT_beam_raw(B,MF)
-    implicit none
-    INTEGER k,mf
-    TYPE(BEAM), INTENT(IN):: B
-
-    DO K=1,b%n
-       IF(.not.B%U(K)) THEN
-          if(associated(b%pos(k)%NODE)) then
-             WRITE(MF,100) B%X(K,1:6),b%pos(k)%NODE%s(3)+B%X(K,7)
-          else
-             WRITE(MF,100) B%X(K,1:6),B%X(K,7)
-          endif
-       ENDIF
-    ENDDO
-100 FORMAT(7(1x,e13.6))
-  END subroutine PRINT_beam_raw
-
-  subroutine stat_beam_raw(B,n,MF,xm)
-    implicit none
-    INTEGER i,j,k,mf,NOTlost,N
-    TYPE(BEAM), INTENT(IN):: B
-    real(dp), optional :: xm(6)
-    real(dp), allocatable :: av(:,:)
-    real(dp) em(2),beta(2),xma(6)
-    allocate(av(n,n))
-    av=0.0_dp
-    notlost=0
-    xma(:)=-1.0_dp
-    DO K=1,b%n
-       IF(.not.B%U(K)) THEN
-          do i=1,6
-             if(abs(b%x(k,i))>xma(i)) xma(i)=abs(b%x(k,i))
-          enddo
-
-          do i=1,n
-             do j=i,n
-                av(i,j)= b%x(k,i)*b%x(k,j)+av(i,j)
-             enddo
-          enddo
-          notlost=notlost+1
-       ENDIF
-    ENDDO
-    IF(NOTLOST==0) THEN
-       if(mf/=6) then
-          WRITE(mf,*) " ALL PARTICLES ARE LOST "
-          WRITE(mf,*) " NO STATISTICS "
-       else
-          WRITE(6,*) " ALL PARTICLES ARE LOST "
-          WRITE(6,*) " NO STATISTICS "
-       endif
-       deallocate(av)
-       RETURN
-    ENDIF
-    if(notlost/=b%n-b%lost) then
-       Write(6,*) " Error keeping track of lost particles "
-       stop 999
-    endif
-
-    WRITE(MF,*) " NUMBER LEFT ",B%N-B%LOST
-    if(mf/=6)WRITE(6,*) " NUMBER LEFT ",B%N-B%LOST
-    WRITE(MF,*) " LOST ",B%LOST
-    if(mf/=6)WRITE(6,*) " LOST ",B%LOST
-    av=av/notlost
-    em(1)=2.0_dp*sqrt(av(1,1)*av(2,2)-av(1,2)**2)
-    em(2)=2.0_dp*sqrt(av(3,3)*av(4,4)-av(3,4)**2)
-    beta(1)=2.0_dp*av(1,1)/em(1)
-    beta(2)=2.0_dp*av(3,3)/em(2)
-
-    write(mf,*) " average arrays "
-    write(mf,*) "betas ",beta
-    write(mf,*) "emittances ",em
-    if(mf/=6) then
-       write(6,*) " average arrays "
-       write(6,*) "betas ",beta
-       write(6,*) "emittances ",em
-    endif
-    write(6,*) " limits "
-    write(6,*) xma(1:2)
-    write(6,*) xma(3:4)
-    write(6,*) xma(5:6)
-    if(present(xm)) xm=xma
-
-100 FORMAT(7(1x,e13.6))
-
-    deallocate(av)
-  END subroutine stat_beam_raw
-
-
-  subroutine PRINT_beam(B,MF,I)
-    implicit none
-    INTEGER K,MF,I1,I2
-    INTEGER,OPTIONAL:: I
-    TYPE(BEAM), INTENT(IN):: B
-    TYPE(INTEGRATION_NODE),POINTER::T
-    TYPE(FIBRE),POINTER::F
-
-    I1=1
-    I2=B%N
-
-    IF(PRESENT(I)) THEN
-       I1=I
-       I2=I
-    ENDIF
-    !    IF(B%TIME_INSTEAD_OF_S) THEN
-    !       WRITE(MF,*) "____________________________ TIME TRACKED BEAM __________________________________"
-    !    ELSE
-    WRITE(MF,*) "_________________ POSITION TRACKED BEAM (AS IN PTC PROPER)_______________________"
-    !    ENDIF
-
-    DO K=I1,I2
-       IF(B%U(K)) THEN
-          WRITE(MF,*) " PARTICLE # ",K, " IS LOST "
-       ELSE
-          T=>B%POS(K)%NODE
-          F=>T%PARENT_FIBRE
-          WRITE(MF,*) "_________________________________________________________________________"
-          WRITE(MF,*) " PARTICLE # ",K, " IS LOCATED AT SLICE # ",T%POS," IN FIBRE  ",F%MAG%NAME
-          WRITE(MF,*) " IN THE FIBRE POSITION  ",T%pos_in_fibre
-          WRITE(MF,*) " IN ",CASE_NAME(T%CAS)
-          IF(T%CAS==CASE0)WRITE(MF,*) " AT THE STEP NUMBER ",T%pos_in_fibre-2
-
-          WRITE(MF,*) "........................................................................."
-          !          IF(B%TIME_INSTEAD_OF_S) THEN
-          !             WRITE(MF,*) " TIME AND POSITION AFTER THIN SLICE = ",B%X(K,6:7)
-          !          ELSE
-          WRITE(MF,*) " TIME AND POSITION  = ",B%X(K,6:7)
-          !          ENDIF
-          WRITE(MF,*) " X,Y = ",B%X(K,1),B%X(K,3)
-          WRITE(MF,*) " PX,PY = ",B%X(K,2),B%X(K,4)
-          WRITE(MF,*) " ENERGY VARIABLE = ",B%X(K,5)
-       ENDIF
-       WRITE(MF,*) "_________________________________________________________________________"
-    ENDDO
-
-  END subroutine PRINT_beam
-
-
-
-  SUBROUTINE NULLIFY_BEAM(B)
-    IMPLICIT NONE
-    TYPE(BEAM) , INTENT (INOUT) :: B
-    NULLIFY(B%N,B%LOST)
-    !    NULLIFY(B%Y)
-    NULLIFY(B%X)
-    NULLIFY(B%U)
-    NULLIFY(B%POS)
-    !    NULLIFY(B%CHARGE)
-    !    NULLIFY(B%TIME_INSTEAD_OF_S)
-    !    NULLIFY(B%SIGMA)
-    !    NULLIFY(B%DX,B%ORBIT)
-    !    NULLIFY(B%BBPAR,B%BEAM_BEAM,B%BBORBIT)
-  END SUBROUTINE NULLIFY_BEAM
-
-  SUBROUTINE NULLIFY_BEAMS(B)
-    IMPLICIT NONE
-    TYPE(BEAM) , INTENT (INOUT) :: B(:)
-    INTEGER I
-    DO I=1,SIZE(B)
-       CALL NULLIFY_BEAM(B(i))
-    ENDDO
-
-  END SUBROUTINE NULLIFY_BEAMS
 
   subroutine alloc_three_d_info(v)
     IMPLICIT NONE
@@ -2114,102 +1869,6 @@ CONTAINS
 
   end subroutine alloc_three_d_info
 
-  SUBROUTINE ALLOCATE_BEAM(B,N)
-    IMPLICIT NONE
-    TYPE(BEAM) , INTENT (INOUT) :: B
-    INTEGER , INTENT (IN) :: N
-    INTEGER I
-
-    ALLOCATE(B%N,B%LOST)
-
-    B%N=N
-    B%LOST=0
-    !    NULLIFY(B%Y)
-    !    IF(PRESENT(POLYMORPH)) THEN
-    !       IF(POLYMORPH) then
-    !          ALLOCATE(B%Y(6))
-    !          CALL ALLOC(B%Y)
-    !       endif
-    !    ENDIF
-    ALLOCATE(B%X(N,7))
-    ALLOCATE(B%U(0:N))
-    ALLOCATE(B%POS(0:N))
-    !    ALLOCATE(B%SIGMA(6))
-    !    ALLOCATE(B%DX(3))
-    !    ALLOCATE(B%ORBIT(6))
-    !    ALLOCATE(B%BBPAR,B%BEAM_BEAM,B%BBORBIT)
-    DO I=0,N
-       NULLIFY(B%POS(i)%NODE)
-    ENDDO
-    !   ALLOCATE(B%CHARGE)
-    !   ALLOCATE(B%TIME_INSTEAD_OF_S)
-
-    B%X  = 0.0_dp
-    B%U  = .FALSE.
-    !    B%CHARGE=1
-    !    B%TIME_INSTEAD_OF_S=.FALSE.
-
-    !    B%SIGMA=ZERO
-    !    B%DX=ZERO
-    !    B%BBPAR=ZERO
-    !    B%ORBIT=ZERO
-    !    B%BEAM_BEAM=MY_FALSE
-    !    B%BBORBIT=MY_FALSE
-  END SUBROUTINE ALLOCATE_BEAM
-
-  SUBROUTINE KILL_BEAM(B)
-    IMPLICIT NONE
-    TYPE(BEAM) , INTENT (INOUT) :: B
-    !    IF(ASSOCIATED(B%Y)) THEN
-    !       CALL KILL(B%Y)
-    !       DEALLOCATE(B%Y)
-    !    ENDIF
-    IF(ASSOCIATED(B%N)) THEN
-       DEALLOCATE(B%N,B%LOST,B%X,B%U,B%POS)
-       !       DEALLOCATE(B%N,B%LOST,B%X,B%U,B%POS,B%CHARGE,B%TIME_INSTEAD_OF_S)
-       !      DEALLOCATE(B%SIGMA,B%DX,B%BBPAR,B%ORBIT,B%BEAM_BEAM,B%BBORBIT)
-    ENDIF
-  END SUBROUTINE KILL_BEAM
-
-  SUBROUTINE KILL_BEAMS(B)
-    IMPLICIT NONE
-    TYPE(BEAM) , INTENT (INOUT) :: B(:)
-    INTEGER I
-    DO I=1,SIZE(B)
-       CALL KILL_BEAM(B(i))
-    ENDDO
-  END SUBROUTINE KILL_BEAMS
-
-
-  FUNCTION BEAM_IN_X(B,I)
-    IMPLICIT NONE
-    REAL(DP) BEAM_IN_X(6)
-    TYPE(BEAM), INTENT(INOUT) ::B
-    INTEGER, INTENT(IN) :: I
-
-    BEAM_IN_X=B%X(I,1:6)
-
-  END  FUNCTION BEAM_IN_X
-
-  SUBROUTINE X_IN_BEAM(B,X,I,DL,T)
-    IMPLICIT NONE
-    REAL(DP),OPTIONAL:: X(6)
-    REAL(DP),OPTIONAL:: DL
-    TYPE(BEAM), INTENT(INOUT) ::B
-    TYPE(INTEGRATION_NODE),OPTIONAL,POINTER :: T
-    INTEGER, INTENT(IN) :: I
-
-    if(PRESENT(X)) B%X(I,1:6)=X(1:6)
-    IF(PRESENT(DL)) B%X(I,7)=DL
-    IF(PRESENT(T)) B%POS(I)%NODE=>T
-    if(.not.CHECK_STABLE) then
-       !       write(6,*) "unstable "
-       CALL RESET_APERTURE_FLAG
-       b%u(I)=.true.
-       B%LOST=B%LOST+1
-    endif
-
-  END  SUBROUTINE X_IN_BEAM
 
   !  Beam Beam stuff
 
@@ -2310,5 +1969,197 @@ CONTAINS
     if(b_b.and.(.not.associated(tl%BB))) call alloc(tl%BB)
 
   end  subroutine locate_beam_beam
+
+    subroutine convert_bmad_to_ptcar(z,b1,time)
+    IMPLICIT NONE
+    real(dp),target,intent(INOUT) ::  z(6)
+    real(dp) b0,t,b1
+     logical(lp)  time
+
+    if(time) then
+     b0=b1
+    else
+     b0=1
+    endif 
+
+     t=z(6)
+     z(6)=-z(5)*sqrt(1.d0/b0**2+2*t+t**2)/(1.d0+t)
+     z(5)=sqrt(1.d0/b0**2+2*t+t**2)-1.d0/b0
+
+     end subroutine convert_bmad_to_ptcar
+
+    subroutine convert_bmad_to_ptcap(z,b1,time)
+    IMPLICIT NONE
+    type(real_8),target,intent(INOUT) ::  z(6)
+    type(real_8) t
+    real(dp) b0,b1
+     logical(lp)  time
+
+    if(time) then
+     b0=b1
+    else
+     b0=1
+    endif 
+
+     call alloc(t)
+     t=z(6)
+
+     z(6)=-z(5)*sqrt(1.d0/b0**2+2*t+t**2)/(1.d0+t)
+     z(5)=sqrt(1.d0/b0**2+2*t+t**2)-1.d0/b0
+    
+     call kill(t)
+
+     end subroutine convert_bmad_to_ptcap 
+
+    subroutine convert_ptc_to_bmadar(z,b1,time,LD)
+    IMPLICIT NONE
+    real(dp),target,intent(INOUT) :: z(6)
+    real(dp), optional :: LD
+    real(dp) b0,t,b1,l
+     logical(lp)  time
+    l=0
+    if(present(ld)) l=ld
+    if(time) then
+     b0=b1 
+     l=l/b1
+    else
+     b0=1
+    endif 
+
+     t=z(5)
+      z(5)=-(z(6)-l)*sqrt(1.d0 +2*t/b0+t**2)/(1.d0/b0+t)
+      z(6)=sqrt(1.d0 +2*t/b0+t**2)-1.d0 
+
+     end subroutine convert_ptc_to_bmadar   
+
+
+    subroutine convert_ptc_to_bmadap(z,b1,time,ld)
+    IMPLICIT NONE
+    type(real_8),target,intent(INOUT) ::  z(6)
+    type(real_8) t 
+     real(dp), optional :: LD
+     real(dp) b0,b1,l
+     logical(lp)  time
+
+     l=0
+    if(present(ld)) l=ld
+    if(time) then
+     b0=b1
+     l=l/b1
+    else
+     b0=1
+    endif 
+
+    
+     call alloc(t)
+      t=z(5)
+      z(5)=-(z(6)-l)*sqrt(1.d0 +2*t/b0+t**2)/(1.d0/b0+t)
+      z(6)=sqrt(1.d0 +2*t/b0+t**2)-1.d0 
+    
+     call kill(t)
+
+     end subroutine convert_ptc_to_bmadap  
+
+
+    subroutine convert_bmad_to_ptcr(z,b1,time)
+    IMPLICIT NONE
+    type(probe),target,intent(INOUT) ::  z
+    real(dp) b0,t,b1
+     logical(lp) time
+
+    if(time) then
+     b0=b1
+    else
+     b0=1
+    endif 
+
+     t=z%x(6)
+     z%x(6)=-z%x(5)*sqrt(1.d0/b0**2+2*t+t**2)/(1.d0+t)
+     z%x(5)=sqrt(1.d0/b0**2+2*t+t**2)-1.d0/b0
+
+     end subroutine convert_bmad_to_ptcr   
+
+
+    subroutine convert_bmad_to_ptcp(z,b1,time)
+    IMPLICIT NONE
+    type(probe_8),target,intent(INOUT) ::  z
+    type(real_8) t
+    real(dp) b0,b1
+    logical(lp)  time
+    if(time) then
+     b0=b1
+    else
+     b0=1
+    endif 
+     call alloc(t)
+     t=z%x(6)
+
+     z%x(6)=-z%x(5)*sqrt(1.d0/b0**2+2*t+t**2)/(1.d0+t)
+     z%x(5)=sqrt(1.d0/b0**2+2*t+t**2)-1.d0/b0
+    
+     call kill(t)
+
+     end subroutine convert_bmad_to_ptcp   
+
+    subroutine convert_ptc_to_bmadr(z,b1,time,LD)
+    IMPLICIT NONE
+    type(probe),target,intent(INOUT) :: z
+    real(dp) b0,t,b1,l
+    logical(lp)  time
+     real(dp), optional :: LD
+
+     l=0
+    if(present(ld)) l=ld
+    if(time) then
+     b0=b1
+     l=l/b1
+    else
+     b0=1
+    endif 
+     t=z%x(5)
+      z%x(5)=-(z%x(6)-l)*sqrt(1.d0 +2*t/b0+t**2)/(1.d0/b0+t)
+      z%x(6)=sqrt(1.d0 +2*t/b0+t**2)-1.d0 
+
+     end subroutine convert_ptc_to_bmadr   
+
+
+   subroutine convert_ptc_to_bmadp(z,b1,time,LD)
+    IMPLICIT NONE
+    type(probe_8),target,intent(INOUT) ::  z
+    type(real_8) t
+    real(dp) b0,b1,l
+    logical(lp)  time
+     real(dp), optional :: LD
+
+     l=0
+    if(present(ld)) l=ld
+    if(time) then
+     b0=b1
+     l=l/b1
+    else
+     b0=1
+    endif 
+     call alloc(t)
+
+      t=z%x(5)
+      z%x(5)=-(z%x(6)-l)*sqrt(1.d0 +2*t/b0+t**2)/(1.d0/b0+t)
+      z%x(6)=sqrt(1.d0 +2*t/b0+t**2)-1.d0 
+    
+     call kill(t)
+
+
+     end subroutine convert_ptc_to_bmadp 
+
+     subroutine in_bmad_units
+     implicit none  
+      use_bmad_units=.true.
+      ndpt_bmad=1
+     end subroutine in_bmad_units
+
+     subroutine in_ptc_units
+     implicit none  
+      use_bmad_units=.false.
+      ndpt_bmad=0
+     end subroutine in_ptc_units
 
 end module ptc_multiparticle

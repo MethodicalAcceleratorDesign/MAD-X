@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  +     MAD-X 5.02.08  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:26:11      +
+  + Release   date: 2015.11.20               +
+  + Execution date: 2016.02.26 09:50:40      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -813,6 +813,7 @@ ptc_create_universe;
           Kinetic Energy : 0.145151E+00
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.541711E+00
+  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy           1.0834226784000001     
      method                   6
@@ -837,7 +838,7 @@ ptc_create_universe;
 
   
 
-  ptc_twiss, table=twiss, icase=5, no=3, closed_orbit, maptable;
+  ptc_twiss, table=twiss, icase=5, no=3, closed_orbit, rmatrix, maptable;
 
 
 ++++++ table: ptc_twiss_summary
@@ -867,31 +868,31 @@ ptc_create_universe;
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0        -10.3020712    0.0005941579859 
+                 0                  0        -10.3020712    0.0005941579858 
 
           disp2min           disp2max           disp3min           disp3max 
        -4.54310719         4.54310719                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    1.068886127e-08 
+                 0                  0                  0    1.068886442e-08 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.546139786e-09                  0                  0                  0 
+   2.546139122e-09                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    1.168573345e-08                  0    3.059593723e-09 
+                 0    1.168573391e-08                  0    3.059593852e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0    2.508645927e-08 
+                 0                  0                  0    2.508646064e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.106286922e-08                  0                  0 
+                 0    1.106287025e-08                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -1.447485988e-12                  0   -1.106286967e-08 
+                 0   -1.449191389e-12                  0   -1.106286975e-08 
 
            pycomin             tcomin            ptcomin 
-                 0                  0                  0 
+                 0                 -0                  0 
   write, table=twiss, file="leir.5d.ptc.twiss";
 
   write, table=ptc_twiss_summary, file="leir.5d.ptc.summ.twiss";
@@ -902,7 +903,7 @@ ptc_create_universe;
 
   !another turn but use as the starting conditions the map produced by the above twiss
 
-  ptc_twiss, table=twiss, icase=5, no=3, initial_matrix_table; 
+  ptc_twiss, table=twiss, icase=5, no=3, rmatrix, initial_matrix_table; 
 
  Reduced SUMM Table (Inital parameters specified)
 
@@ -939,25 +940,25 @@ ptc_create_universe;
        -4.54310719         4.54310719                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    1.068886158e-08 
+                 0                  0                  0    1.068886393e-08 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.546139646e-09                  0                  0                  0 
+   2.546139617e-09                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    1.168573333e-08                  0    3.059593678e-09 
+                 0    1.168573429e-08                  0    3.059593993e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0                  0                  0     2.50864586e-08 
+                 0                  0                  0    2.508646099e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.106286924e-08                  0                  0 
+                 0     1.10628705e-08                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -1.446528918e-12                  0   -1.106286945e-08 
+                 0   -1.449256918e-12                  0   -1.106287044e-08 
 
            pycomin             tcomin            ptcomin 
-                 0                  0                  0 
+                 0                 -0                  0 
   write, table=twiss, file="leir.5d.inimap.ptc.twiss";
 
     

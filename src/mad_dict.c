@@ -624,6 +624,7 @@ char command_def[] =
 "closed_orbit = [l, false, true], "
 "rmatrix  = [l, false, true], "
 "ring_parameters  = [l, false, true], "   /* forces ring parametersd (skowron on 140120)*/
+"normal  = [l, false, true], "   /* runs normal form analysis (skowron on 150903)*/
 "initial_matrix_table = [l, false, true], " /* reads table map_table cooked by ptc_normal */ 
 "initial_matrix_manual = [l, false, true], "
 "initial_map_manual = [l, false, true], "

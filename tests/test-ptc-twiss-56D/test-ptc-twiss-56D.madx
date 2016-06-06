@@ -26,13 +26,13 @@ select, flag=twiss, column=name,s,beta11,beta22,alfa11,alfa22,mu1,mu2,disp1,disp
 
 
 ptc_create_universe;
-  ptc_create_layout, model=1, method=6, nst=5, exact=true, closed_layout=true;
+  ptc_create_layout, model=1, method=6, nst=10, exact=true, closed_layout=true;
 
   !!!!!       T I M E   F A L S E,   T O T P A T H  F A L S E
   ptc_setswitch, debuglevel=0, exact_mis=true, time=false, totalpath=false;
   
   
-  ptc_twiss, table=twiss, icase=56, no=2, closed_orbit;
+  ptc_twiss, table=twiss, icase=56, no=2, closed_orbit, rmatrix;
   write, table=twiss, file="leir.56d.ptc.twiss";
   write, table=ptc_twiss_summary, file="leir.56d.ptc.summ.twiss";
   

@@ -2013,6 +2013,12 @@ subroutine peschm (nel, ityp, hr, es, ee, actwin)
 50 continue 
 
   call jsln(1)
+
+  if (j_nodrift .lt. 1) then
+   print*, "plot.f90 peschm j_nodrift must be > 0 and it is ", j_nodrift 
+   stop;
+  endif
+  
   j = i_nodrift(j_nodrift)
   if (ee(j) .lt. hr(2))  then
      txp(1) = ee(j)

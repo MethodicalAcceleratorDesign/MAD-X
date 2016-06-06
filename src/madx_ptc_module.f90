@@ -6,8 +6,8 @@ MODULE ptc_results
   integer :: order = 20
   character(len = 2), dimension(6) :: ptc_variables = (/'x ','xp','y ','yp','z ','dp'/)
   character(len = 2) :: ptc_var
-  type(normalform) n
-  type (pbresonance) pbrg,pbrh
+  !type(normalform) n            ! with the new complex da it goes local to the modules
+  !type (pbresonance) pbrg,pbrh  ! with the new complex da it goes local to the modules
 END MODULE ptc_results
 
 MODULE madx_ptc_module
@@ -27,8 +27,8 @@ MODULE madx_ptc_module
   integer ipause
   integer,external :: mypause
   real(kind(1d0)) get_value,node_value
-  type(layout),pointer :: my_ring, bmadl
-  type(mad_universe),target ::  m_u,m_t
+  type(layout),pointer :: my_ring=>null(), bmadl=>null()
+  type(mad_universe),pointer ::  m_u=>null(),m_t=>null()
   integer, private, parameter :: mynreso=20
   integer, private, dimension(4) :: iia,icoast
   real(dp) :: mux_default=c_0_28, muy_default=c_0_31, muz_default=c_1d_3
@@ -55,7 +55,9 @@ CONTAINS
   subroutine ptc_create_universe()
     implicit none
     real(kind(1d0)) get_value
-
+   
+    piotr_freq=.true. ! flag introduced in PTC cavity tracking to have correct phasing with time=false
+  
     print77=.false.
     read77 =.false.
     lingyun_yang=get_value('ptc_create_universe ','ntpsa ').ne.0
@@ -100,8 +102,20 @@ CONTAINS
        call aafail('sector_nmul_max must be larger than sector_nmul: ',&
             'check your ptc_create_universe input')
     endif
+    
+    ! copy from Ss_fake_mad.f90:ptc_ini_no_append
+    allocate(m_u)
     call set_up_universe(m_u)
+    allocate(m_t)
+    call set_up_universe(m_t)
+    
     universe=universe+1
+    
+    allocate(bmadl)
+    call set_up(bmadl)
+    bmadl%NAME='BMAD REUSED FIBRE LAYOUT'
+    call point_m_u(m_u,m_t)
+
 
 
   end subroutine ptc_create_universe
@@ -111,12 +125,15 @@ CONTAINS
     implicit none
     real(kind(1d0)) get_value
 
-    if(universe.le.0.or.EXCEPTION.ne.0) then
+    if(universe.le.0 .or. EXCEPTION.ne.0) then
        call fort_warn('return from ptc_create_layout: ',' no universe created')
        return
     endif
 
     call append_empty_layout(m_u)
+    call append_empty_layout(m_t)
+    
+    
     index_mad=index_mad+1
     my_ring=>m_u%end
 
@@ -200,7 +217,7 @@ CONTAINS
     !  Etienne helical
     character(nlp) heli(100)
     integer mheli,helit,ihelit
-    type(fibre), pointer :: p
+    type(fibre), pointer :: p => null()
     
     double precision, parameter :: zero=0.d0
     
@@ -258,6 +275,7 @@ CONTAINS
     call setintstate(default)
     !valid October 2002: oldscheme=.false.
     !!valid October 2002: oldscheme=.true.
+    
 
     if (getdebug()==0) global_verbose = .false.
 
@@ -519,13 +537,14 @@ CONTAINS
     call node_string('apertype ',aptype,nn)
     APERTURE = zero 
     call get_node_vector('aperture ',nn,aperture)
-    !print*, name,' Got for aperture nn=',nn, aperture(1), aperture(2) 
     
-    if(.not.((aptype.eq."circle".and.aperture(1).eq.zero).or.aptype.eq." ")) then       
+    !print*, name,'madx_ptc_module: Got for aperture nn=',nn, aperture(1), aperture(2) 
+    
+    if(.not.((aptype.eq."circle".and.aperture(1).eq.zero).or.aptype.eq." ")) then
        
        c_%APERTURE_FLAG=.true.
        select case(aptype)
-       case("circle")
+       case("circle") 
           key%list%aperture_on=.true.
           key%list%aperture_kind=1
           key%list%aperture_r(1)=aperture(1)
@@ -599,30 +618,7 @@ CONTAINS
     case(22)
        call fort_warn('ptc_input: ','Element Beam-Beam, must use slice tracking to get effect')
        key%magnet="marker"
-
-!     case(40) !AC dipoles
-!        key%magnet="marker"
-!        idx = nt
-!        plane = 0
-!        ampl = node_value('volt ')
-!        freq = node_value('freq ')
-!        ramp1 = node_value('ramp1 ')
-!        ramp2 = node_value('ramp2 ')
-!        ramp3 = node_value('ramp3 ')
-!        ramp4 = node_value('ramp4 ')
-!        
-!     case(41) !AC dipoles
-!        key%magnet="marker"
-!        idx = nt
-!        plane = 1
-!        ampl = node_value('volt ')
-!        freq = node_value('freq ')
-!        ramp1 = node_value('ramp1 ')
-!        ramp2 = node_value('ramp2 ')
-!        ramp3 = node_value('ramp3 ')
-!        ramp4 = node_value('ramp4 ')
-!        
-       !key%magnet="acdipole_h"
+    !case(1,11)
     case(1,11,20,21,44)
        key%magnet="drift"
        CALL CONTEXT(key%list%name)
@@ -1002,7 +998,7 @@ CONTAINS
        else
           key%list%cavity_totalpath=1
        endif
-
+       
 !       print*,"madx_ptc_module::input volt: ", key%list%volt, &
 !                                    " lag : ", key%list%lag, &
 !                                    " harm: ", key%list%harmon, &
@@ -1092,6 +1088,11 @@ CONTAINS
        !     key%list%x_col=node_value('xsize ')
        !     key%list%y_col=node_value('ysize ')
        !     key%tiltd=node_value('tilt ')
+    !case(20,21,44)
+    !        key%magnet="madcollimator"
+    !        key%list%x_col=1e3
+    !        key%list%y_col=1e3
+    !        key%tiltd=node_value('tilt ')
     case(33)
        !---- This is the dipedge element
        edge= node_value('e1 ')
@@ -2152,10 +2153,12 @@ CONTAINS
     call kill_universe(m_u)
     nullify(my_ring)
     call kill_tpsa
-    do i=1,size(s_b)
-       call nul_coef(s_b(i))
-    enddo
-    deallocate(s_b)
+!    do i=1,size(s_b)
+!       call nul_coef(s_b(i))
+!    enddo
+!    deallocate(s_b)
+
+
     firsttime_coef=.true.
 
     universe=universe-1

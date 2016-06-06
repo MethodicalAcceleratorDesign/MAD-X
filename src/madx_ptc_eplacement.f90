@@ -361,7 +361,7 @@ contains
           call drawsbend(p,mf)
 
        case(32) !SBEND (Multipole) with model 1 ( Kick Drift Kick) and NON-exact
-          print*,"This is type 32"
+          !print*,"This is type 32"
           call drawsbend(p,mf)
 
        case(kind20) !stright exact bend

@@ -436,7 +436,19 @@ module name_lenfi
   integer, parameter :: name_len=48
 end module name_lenfi
 
+module warncolim
+  implicit none
+  public
+  integer :: warnede = 0
+  integer :: warnedr = 0
+end module warncolim
 
+module physconsfi
+  implicit none
+  public
+  double precision :: amu0=0.d0,elamda=0.d0,emass=0.d0,eps0=0.d0,erad=0.d0,&
+       hbar=0.d0,plamda=0.d0,pmass=0.d0,prad=0.d0,qelect=0.d0,mumass=0.d0
+end module physconsfi
 module touschekfi
   implicit none
   public
