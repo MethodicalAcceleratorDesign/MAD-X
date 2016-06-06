@@ -1661,7 +1661,6 @@ tests/test-ptc-twiss-56Dl/leir.56dl.ptc.twiss.ref -text
 tests/test-ptc-twiss-56Dl/test-ptc-twiss-56Dl.cfg -text
 tests/test-ptc-twiss-56Dl/test-ptc-twiss-56Dl.madx -text
 tests/test-ptc-twiss-56Dl/test-ptc-twiss-56Dl.ref -text
-tests/test-ptc-twiss-56Dt-ini_map_man/Maxwellian_bend_for_ptc_electric.txt -text
 tests/test-ptc-twiss-56Dt-ini_map_man/fort.18 -text
 tests/test-ptc-twiss-56Dt-ini_map_man/leir.56dt.ptc.mtx.twiss.cfg -text
 tests/test-ptc-twiss-56Dt-ini_map_man/leir.56dt.ptc.mtx.twiss.ref -text svneol=unset#application/x-gzip
@@ -1674,7 +1673,6 @@ tests/test-ptc-twiss-56Dt-ini_map_man/leir.56dt.ptc.twiss.ref -text svneol=unset
 tests/test-ptc-twiss-56Dt-ini_map_man/test-ptc-twiss-56Dt-ini_map_man.cfg -text
 tests/test-ptc-twiss-56Dt-ini_map_man/test-ptc-twiss-56Dt-ini_map_man.madx -text
 tests/test-ptc-twiss-56Dt-ini_map_man/test-ptc-twiss-56Dt-ini_map_man.ref -text svneol=unset#application/x-gzip
-tests/test-ptc-twiss-56Dt-ini_mtx_man/Maxwellian_bend_for_ptc_electric.txt -text
 tests/test-ptc-twiss-56Dt-ini_mtx_man/leir.56dt.ptc.summ.twiss.cfg -text
 tests/test-ptc-twiss-56Dt-ini_mtx_man/leir.56dt.ptc.summ.twiss.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-56Dt-ini_mtx_man/leir.56dt.ptc.twiss.cfg -text
