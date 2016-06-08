@@ -57,7 +57,7 @@ get_table_index(char* left, char* right)
 // name = start of the name to search.
   int ntok, pos;
   char** toks;
-  
+
   *right = '\0';
   strcpy(c_dum->c, ++left);
   supp_char(',', c_dum->c);
@@ -73,7 +73,7 @@ get_table_index(char* left, char* right)
     int row = ntok == 4 ? atoi(toks[2]) : 1; // row may or may not be present
     if (col > -1 && row > 0 && table->s_cols[col]) {
       for (; row <= table->curr; row++) {
-        if (strncmp(table->s_cols[col][row-1], name, len) == 0) {
+        if (strncasecmp(table->s_cols[col][row-1], name, len) == 0) {
           sprintf(c_dum->c, "%d", row);
           return permbuff(c_dum->c);
         }
@@ -203,7 +203,7 @@ add_to_table_list_list(struct table_list* table_list, struct table_list_list* tl
   /* adds a table_list to a list of table_lists */
 {
   int j;
-  for (j = 0; j < tll->curr; j++) 
+  for (j = 0; j < tll->curr; j++)
     if (tll->table_lists[j] == table_list) return;
   if (tll->curr == tll->max) grow_table_list_list(tll);
   tll->table_lists[tll->curr++] = table_list;
@@ -716,7 +716,7 @@ table_value(void)
   char** toks;
   struct table* table;
   char temp[NAME_L];
-  
+
   if (current_variable != NULL && current_variable->string != NULL) {
     strcpy(c_dum->c, current_variable->string);
     supp_char(',', c_dum->c);
@@ -726,19 +726,19 @@ table_value(void)
        toks[1] -> row name
        toks[2] -> col name
     */
-    if (ntok > 1) 
+    if (ntok > 1)
      {
-      if ((pos = name_list_pos(toks[0], table_register->names)) > -1) 
+      if ((pos = name_list_pos(toks[0], table_register->names)) > -1)
        {
         table = table_register->tables[pos];
-        if ((col = name_list_pos(toks[ntok-1], table->columns)) > -1) 
+        if ((col = name_list_pos(toks[ntok-1], table->columns)) > -1)
          {
-          if (ntok > 2) 
+          if (ntok > 2)
            { /* find row - else current (dynamic), or 0 */
             /* start mod - HG 26.3.2011 */
-            if (ntok > 5) 
+            if (ntok > 5)
              { /* check for [ count ] and convert to ->count */
-               if (*toks[2] == '[' && *toks[4] == ']') 
+               if (*toks[2] == '[' && *toks[4] == ']')
                 {
                    strcat(toks[1], "->");
                    strcat(toks[1], toks[3]);
@@ -747,18 +747,18 @@ table_value(void)
             /* end mod - HG 26.3.2011 */
             row = table_row(table, toks[1]);
            }
-          else 
+          else
            {
-             if (table->dynamic) 
+             if (table->dynamic)
               {
                 row = table->curr;
-              }  
-             else 
+              }
+             else
               {
                 row = 0;
-              }  
+              }
            }
-           
+
           if (row >= 0) /*in case table_row(table, toks[1]); returns  -1 == row not found*/
            {
              if (col >= table->num_cols)
@@ -778,28 +778,28 @@ table_value(void)
              /*printf("val %f         col %d of %d >>>>  row %d of %d ",val, col, table->num_cols, row, table->max);  */
              val = table->d_cols[col][row];
            }
-          
+
         }/*column found*/
-        else if ((ntok == 3) && ((col = name_list_pos(toks[1], table->columns)) > -1)) 
+        else if ((ntok == 3) && ((col = name_list_pos(toks[1], table->columns)) > -1))
          {
           row = atoi(toks[2])-1;
-          if(row < table->curr) 
+          if(row < table->curr)
            {
             val = table->d_cols[col][row];
-           } 
+           }
         }
-        else if(ntok == 2) 
+        else if(ntok == 2)
          {
           strncpy(temp, toks[1], NAME_L);
-          if (strcmp(stolower(temp), "tablelength") == 0) 
+          if (strcasecmp(temp, "tablelength") == 0)
            {
              val = table->curr;
-           } 
+           }
          }
       } /*pos > -1, table name found in the list*/
     } /*ntok > 0*/
   }/*current variable*/
-  
+
   return val;
 }
 
@@ -917,9 +917,9 @@ detach_table_from_table_list(const char *name, struct table_list* tl)
   {
     int k = remove_from_name_list(tl->tables[pos]->name,
                                   tl->names);
-    
+
     retval = tl->tables[pos];
-                
+
     tl->tables[k] = tl->tables[--tl->curr];
   }
   return retval;
@@ -959,7 +959,7 @@ add_vars_to_table(struct table* t)
        char* p = command_par_string(t->columns->names[i], current_node->p_elem->def) ;
        t->s_cols[i][t->curr] = tmpbuff(p ? p : "none");
      }
-    else 
+    else
      {
        t->s_cols[i][t->curr] = tmpbuff(get_varstring(t->columns->names[i]));
      }
@@ -1013,17 +1013,17 @@ delete_table(struct table* t)
   }
 
   if (t->s_cols) {
-    for (i = 0; i < t->num_cols; i++) 
+    for (i = 0; i < t->num_cols; i++)
      {
-       if (t->columns->inform[i] == 3 && t->s_cols[i]) 
+       if (t->columns->inform[i] == 3 && t->s_cols[i])
        {
          for (j = 0; j < t->curr; j++)
            {
-              /*printf("%d %d %s %#x\n",i,j,t->s_cols[i][j], t->s_cols[i][j]); */  
+              /*printf("%d %d %s %#x\n",i,j,t->s_cols[i][j], t->s_cols[i][j]); */
               myfree(rout_name, t->s_cols[i][j]);
            }
          /*printf("Deleting column  %d %#x\n",i,t->s_cols[i]);*/
-        
+
          myfree(rout_name, t->s_cols[i]);
        }
     }
@@ -1136,20 +1136,20 @@ make_map_table(int* map_table_max_rows)
 {
   assert(map_table_max_rows);
   assert(table_register->names);
-  
+
   remove_table_from_table_list("map_table", table_register);
 
   /* initialise table */
   map_table = make_table("map_table", "map_tab", map_tab_cols,
                          map_tab_types, *map_table_max_rows);
-  
+
   assert(map_table);
   assert(table_register);
-       
+
   add_to_table_list(map_table, table_register);
   map_table->dynamic = 1;
   reset_count("map_table");
-  
+
   /*
   printf("Creating map table  Done \n");
   pos = name_list_pos("map_table", table_register->names);
@@ -1507,7 +1507,7 @@ table_range(char* table, char* range, int* rows)
   int pos;
   struct table* t;
   char buf[5*NAME_L];
-  
+
   rows[0] = rows[1] = 0;
   stolower(mycpy(buf, table));
 
@@ -1641,11 +1641,11 @@ read_my_table(struct in_cmd* cmd)
         {
          if (t->curr == t->max) grow_table(t);
          tmp = tcpa->p[i];
-           if (strcmp(tmp,"%s") == 0) 
+           if (strcmp(tmp,"%s") == 0)
             {
               t->s_cols[i][t->curr] = stolower(tmpbuff(cc));
               /*printf("read_my_table coln [%d %d]=%s\n",i,t->curr,t->s_cols[i][t->curr]);*/
-            } 
+            }
            else if (strcmp(tmp,"%d") == 0 )
            {
             sscanf(cc, tmp, &k); t->d_cols[i][t->curr] = k;
@@ -1922,7 +1922,7 @@ table_header_exists(const char* table, const char *name)
   if ((pos = name_list_pos(tbl_s, table_register->names)) < 0 ||
      !(tbl = table_register->tables[pos]))
     return 0;
- 
+
   mycpy(hdr_s, name);
   if (tbl->header) {
     for (hdr = 0; hdr < tbl->header->curr; hdr++) {
@@ -1997,7 +1997,7 @@ double_from_table_row(const char* table, const char* name, const int* row, doubl
   int pos, col;
 
   *val = 0.0;
-  
+
   mycpy(tbl_s, table);
   if ((pos = name_list_pos(tbl_s, table_register->names)) < 0 ||
      !(tbl = table_register->tables[pos])) {
@@ -2210,8 +2210,8 @@ vector_to_table_curr(const char* table, const char* name, const double* vals, co
     warning("vector_to_table_curr: table not found:", tbl_s);
     return -1;
   }
- 
-  
+
+
   mycpy(col_s, name);
   if ((col = name_list_pos(col_s, tbl->columns)) < 0) {
     warning("vector_to_table_curr: column not found: ", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
@@ -2261,8 +2261,8 @@ string_to_table_curr(const char* table, const char* name, const char* string)
     warning("string_to_table_curr: table not found:", tbl_s);
     return -1;
   }
-  
-  
+
+
   mycpy(col_s, name);
   if ((col = name_list_pos(col_s, tbl->columns)) < 0) {
     warning("string_to_table_curr: column not found:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
