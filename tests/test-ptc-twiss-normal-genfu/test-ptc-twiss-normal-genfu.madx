@@ -109,6 +109,7 @@ value, f1001_re, f1001_im;
 value, f3000_re, f3000_im;
 value, f1200_re, f1200_im;
 
-value, table("nonlin", "GNFC_3_0_0_0_1_0" ,value),table(nonlin, "GNFS_3_0_0_0_0_0","value");
+value, table(nonlin, GNFC_3_0_0_0_1_0 ,value),
+       table(nonlin, GNFS_3_0_0_0_0_0,value);
 
 ptc_end;
