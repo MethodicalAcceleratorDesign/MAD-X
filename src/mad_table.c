@@ -1,4 +1,6 @@
 #include "madx.h"
+#include <strings.h>
+
 #ifndef _WIN32
 #include <sys/utsname.h> // for uname
 #endif
