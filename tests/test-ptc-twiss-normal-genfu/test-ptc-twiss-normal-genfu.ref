@@ -3,7 +3,7 @@
   +     MAD-X 5.02.10  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2016.04.23               +
-  + Execution date: 2016.06.02 15:56:49      +
+  + Execution date: 2016.06.09 10:46:26      +
   ++++++++++++++++++++++++++++++++++++++++++++
 mydrift: drift, l=1;
 
@@ -29,13 +29,17 @@ m1: marker;
 
 
 
-qs: quadrupole, l=0.01, k1s:=1e-4;
+sx1_l = 0.01;
 
-sx1: sextupole, l=0.01, k2:=0.2;
+sx1_k2 = 0.2;
 
 
 
-myline: line:=(l1, l1, l1, l1, m,sx1);
+sx1: sextupole, l:=sx1_l, k2:=sx1_k2;
+
+
+
+myline: line:=(l1, l1, l1, l1, m, sx1);
 
 
 
@@ -260,56 +264,18 @@ qy = table(twiss, myline$end, mu2);
 
 
 
-k1s_l = 0.1*0.01;
-
-
-
-na = k1s_l*sqrt(bx*by);
-
-
-
-dc = 4*(1-cos(2*pi*(qx-qy)));
-
-dd = 4*sin(2*pi*(qx-qy));
 
 
 
 
+na = sx1_k2*sx1_l*sqrt(bx*bx*bx);
 
-f1001_de = dc*dc+dd*dd;
-
-
-
-value, dc, dd, f1001_de, qx, qy;
-
-dc =      0.05655542935 ;
-dd =       0.6702573523 ;
-f1001_de =       0.4524434348 ;
-qx =       0.3631575976 ;
-qy =       0.3363625015 ;
-
-
-
-
-f1001_re = na*dc/f1001_de;
-
-f1001_im = -na*dd/f1001_de;
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!1
-
-
-
-na = 0.2*0.01*sqrt(bx*bx*bx);
-
-++++++ info: na redefined
 
 
 dc = 48*(1-cos(2*pi*3*qx));
 
-++++++ info: dc redefined
 dd = -48*sin(2*pi*3*qx);
 
-++++++ info: dd redefined
 
 
 f3000_de = dc*dc+dd*dd;
@@ -338,26 +304,38 @@ f1200_im = -1*(-na*dd/f1200_de);
 
 
 
-value, f1001_re, f1001_im;
-
-f1001_re =    0.0005084251965 ;
-f1001_im =    -0.006025517442 ;
 
 
-value, f3000_re, f3000_im;
+value, f3000_re, table(nonlin, GNFC_3_0_0_0_0_0,value), f3000_re - table(nonlin, GNFC_3_0_0_0_0_0,value);
 
 f3000_re =   -0.0002382050496 ;
+table( nonlin  gnfc_3_0_0_0_0_0 value ) =   -0.0002366862262 ;
+f3000_re-table( nonlin  gnfc_3_0_0_0_0_0 value ) =   -1.518823391e-06 ;
+
+
+value, f3000_im, table(nonlin, GNFS_3_0_0_0_0_0,value), f3000_im - table(nonlin, GNFS_3_0_0_0_0_0,value);
+
 f3000_im =   -0.0008250049825 ;
-value, f1200_re, f1200_im;
+table( nonlin  gnfs_3_0_0_0_0_0 value ) =   -0.0008288856879 ;
+f3000_im-table( nonlin  gnfs_3_0_0_0_0_0 value ) =    3.880705458e-06 ;
+
+
+
+
+value, f1200_re, table(nonlin, GNFC_1_2_0_0_0_0,value), f1200_re - table(nonlin, GNFC_1_2_0_0_0_0,value);
 
 f1200_re =   -0.0007146151489 ;
+table( nonlin  gnfc_1_2_0_0_0_0 value ) =   -0.0007170484709 ;
+f1200_re-table( nonlin  gnfc_1_2_0_0_0_0 value ) =    2.433321965e-06 ;
+
+
+value, f1200_im, table(nonlin, GNFS_1_2_0_0_0_0,value), f1200_im - table(nonlin, GNFS_1_2_0_0_0_0,value);
+
 f1200_im =    0.0003276537117 ;
+table( nonlin  gnfs_1_2_0_0_0_0 value ) =    0.0003296206867 ;
+f1200_im-table( nonlin  gnfs_1_2_0_0_0_0 value ) =   -1.966974994e-06 ;
 
 
-value, table("nonlin", "GNFC_3_0_0_0_1_0" ,value),table(nonlin, "GNFS_3_0_0_0_0_0","value");
-
-table(  "nonlin"    "GNFC_3_0_0_0_1_0"   value ) =                  0 ;
-table( nonlin   "GNFS_3_0_0_0_0_0"   "value"  ) =                  0 ;
 
 
 ptc_end;

@@ -10,10 +10,12 @@ l1: line:=(qf, mydrift, qd, m1, mydrift);
 m: marker;
 m1: marker;
 
-qs: quadrupole, l=0.01, k1s:=1e-4;
-sx1: sextupole, l=0.01, k2:=0.2;
+sx1_l = 0.01;
+sx1_k2 = 0.2;
 
-myline: line:=(l1, l1, l1, l1, m,sx1);
+sx1: sextupole, l:=sx1_l, k2:=sx1_k2;
+
+myline: line:=(l1, l1, l1, l1, m, sx1);
 
 
 
@@ -70,24 +72,9 @@ by = table(twiss, m, beta22);
 qx = table(twiss, myline$end, mu1);
 qy = table(twiss, myline$end, mu2);
 
-k1s_l = 0.1*0.01;
-
-na = k1s_l*sqrt(bx*by);
-
-dc = 4*(1-cos(2*pi*(qx-qy)));
-dd = 4*sin(2*pi*(qx-qy));
 
 
-f1001_de = dc*dc+dd*dd;
-
-value, dc, dd, f1001_de, qx, qy;
-
-
-f1001_re = na*dc/f1001_de;
-f1001_im = -na*dd/f1001_de;
-!!!!!!!!!!!!!!!!!!!!!!!!!!1
-
-na = 0.2*0.01*sqrt(bx*bx*bx);
+na = sx1_k2*sx1_l*sqrt(bx*bx*bx);
 
 dc = 48*(1-cos(2*pi*3*qx));
 dd = -48*sin(2*pi*3*qx);
@@ -104,12 +91,15 @@ f1200_re = -1*(na*dc/f1200_de);
 f1200_im = -1*(-na*dd/f1200_de);
 
 
-value, f1001_re, f1001_im;
 
-value, f3000_re, f3000_im;
-value, f1200_re, f1200_im;
+value, f3000_re, table(nonlin, GNFC_3_0_0_0_0_0,value), f3000_re - table(nonlin, GNFC_3_0_0_0_0_0,value);
 
-value, table(nonlin, GNFC_3_0_0_0_1_0 ,value),
-       table(nonlin, GNFS_3_0_0_0_0_0,value);
+value, f3000_im, table(nonlin, GNFS_3_0_0_0_0_0,value), f3000_im - table(nonlin, GNFS_3_0_0_0_0_0,value);
+
+
+value, f1200_re, table(nonlin, GNFC_1_2_0_0_0_0,value), f1200_re - table(nonlin, GNFC_1_2_0_0_0_0,value);
+
+value, f1200_im, table(nonlin, GNFS_1_2_0_0_0_0,value), f1200_im - table(nonlin, GNFS_1_2_0_0_0_0,value);
+
 
 ptc_end;

@@ -3738,11 +3738,16 @@ contains
     call putQnormaltable(vf_kernel%v(1),1) 
     call putQnormaltable(vf_kernel%v(3),2)
     
-    !this does not work with 6D dispersion 
-    do i=1,4
-      call putDnormaltable(theNormalForm%A_t%V(i),i)
-    enddo
-
+    if (c_%nd2 == 6) then
+      ! to be implemented
+      !call dispesion6D(theAscript,dispersion)
+      
+    else
+      !this does not work with 6D dispersion 
+      do i=1,4
+        call putDnormaltable(theNormalForm%A_t%V(i),i)
+      enddo
+    endif
     !EIGN
     do i=1,c_%nd2 !from damap type def: Ndim2=6 but allocated to nd2=2,4,6
       call putEnormaltable(theNormalForm%A_t%V(i),i)
@@ -3832,6 +3837,7 @@ contains
       call ch16cterm(nick)
       call ch16cterm(basevar)
       !print*,"Nick out: ", nick
+      !print*,"name nick basevar Nick out: ", name, nick, basevar
       
       call string_to_table_curr(nl_table_name, 'name ', name)
       call string_to_table_curr(nl_table_name, 'nickname ', nick)
@@ -3892,8 +3898,8 @@ contains
              !print*, 'M',j,'_',ind(1),'_',ind(2),'_',ind(3), &
              !              '_',ind(4),'_',ind(5),'_',ind(6), d_val
              
-             write(basevar,'(a1,i1)') 'M',j
-             write(nn,'(a1,i1,6(a1,i1))') 'M',j,'_',ind(1),'_',ind(2),'_',ind(3), &
+             write(basevar,'(a1,i1)') 'm',j
+             write(nn,'(a1,i1,6(a1,i1))') 'm',j,'_',ind(1),'_',ind(2),'_',ind(3), &
                                                 '_',ind(4),'_',ind(5),'_',ind(6)
              
              if (getdebug() > 2) then
@@ -3906,7 +3912,7 @@ contains
           enddo
         else
           if (vv(j)%kind == 0) then
-             write(nn,'(a4,i1,a12)') 'M',j,'_0_0_0_0_0_0'
+             write(nn,'(a4,i1,a12)') 'm',j,'_0_0_0_0_0_0'
             
           endif
         endif        
@@ -3921,7 +3927,7 @@ contains
       integer planei !1...6, 1=dx, 2=dpx
       character(len=1) :: planec
       character(len=17) :: planel 
-      character(len=4) :: d='Disp'
+      character(len=4) :: d='disp'
       character(len=17):: parname
       character(len=17):: nn, ni
       integer     :: ind(10), cnv, illa, n,nw, order, i
@@ -3958,13 +3964,16 @@ contains
       
       call c_taylor_cycle(v,size=N)
       
-      !print*, "There is ", N ," coefficioents"
+      !print*, "There is ", N ," coefficients of dispersion plane ", planei
       do i=1,N
 
          call c_taylor_cycle(v,ii=i,value=c_val,j=ind(1:c_%nv))
          d_val = real(c_val)
 
          order = sum(ind(1:cnv))
+         
+         !print*, 'putDnormaltable, plane=',planei,' i=',i,' order=',order,' ind(5)=',ind(5)
+         
          if (order /= ind(5)) then
            !it is the first order term that stays in the calculation with 1.0 coeff
            cycle
@@ -3973,7 +3982,7 @@ contains
          !print*, 'putDnormaltable, plane=',planei,' i=',i,' Value=',d_val,  ind(1:c_%nv)
          
          nn = parname
-         ni = 'D'//trim(planel)
+         ni = 'd'//trim(planel)
   
          if (order > 1) then 
            nn = trim(nn) // '_p'
@@ -3994,8 +4003,8 @@ contains
       enddo 
       
       if (nw == 0) then
-         !print*,"there was nothing written, it means there is no dispersin. Put zero to the table"
-         ni = 'D'//trim(planel)
+         !print*,"there was nothing written, it means there is no dispersion. Put zero to the table"
+         ni = 'd'//trim(planel)
          ind(:)=0
          ind(5)=1
          
@@ -4038,9 +4047,9 @@ contains
         endif
         
         !!!!!!!!!!!!!!!!!!!!!!!!
-        write(nn,'(a4,6(a1,i1))') 'HAMA','_',ind(1),'_',ind(2),'_',ind(3), &
+        write(nn,'(a4,6(a1,i1))') 'hama','_',ind(1),'_',ind(2),'_',ind(3), &
                                         '_',ind(4),'_',ind(5),'_',ind(6)
-        write(nick,'(a4,3(a1,SP,i2))') 'HAMA','_',ind(1)-ind(2),'_',ind(3)-ind(4),'_',ind(5)-ind(6)
+        write(nick,'(a4,3(a1,SP,i2))') 'hama','_',ind(1)-ind(2),'_',ind(3)-ind(4),'_',ind(5)-ind(6)
 		
         if (getdebug() > 2) then
           write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
@@ -4051,9 +4060,9 @@ contains
         
         !!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-        write(nn,'(a4,6(a1,i1))') 'HAMS','_',ind(1),'_',ind(2),'_',ind(3), &
+        write(nn,'(a4,6(a1,i1))') 'hams','_',ind(1),'_',ind(2),'_',ind(3), &
                                         '_',ind(4),'_',ind(5),'_',ind(6)
-        write(nick,'(a4,3(a1,SP,i2))') 'HAMS','_',ind(1)-ind(2),'_',ind(3)-ind(4),'_',ind(5)-ind(6)
+        write(nick,'(a4,3(a1,SP,i2))') 'hams','_',ind(1)-ind(2),'_',ind(3)-ind(4),'_',ind(5)-ind(6)
         
         if (getdebug() > 2) then
           write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
@@ -4063,9 +4072,9 @@ contains
         call puttonormaltable(nn,nick,bv,re_val,order,ind)
 
 
-        write(nn,'(a4,6(a1,i1))') 'HAMC','_',ind(1),'_',ind(2),'_',ind(3), &
+        write(nn,'(a4,6(a1,i1))') 'hamc','_',ind(1),'_',ind(2),'_',ind(3), &
                                         '_',ind(4),'_',ind(5),'_',ind(6)
-        write(nick,'(a4,3(a1,SP,i2))') 'HAMC','_',ind(1)-ind(2),'_',ind(3)-ind(4),'_',ind(5)-ind(6)
+        write(nick,'(a4,3(a1,SP,i2))') 'hamc','_',ind(1)-ind(2),'_',ind(3)-ind(4),'_',ind(5)-ind(6)
 
         if (getdebug() > 2) then
           write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
@@ -4085,9 +4094,9 @@ contains
       integer     :: order
       integer     :: ind(10), i
       character(len=17):: nn, nick
-      character(len=17):: genfunsin='GEN_FUN_SIN'
-      character(len=17):: genfuncos='GEN_FUN_COS'
-      character(len=17):: genfunamp='GEN_FUN_AMP'
+      character(len=17):: genfunsin='gen_fun_sin'
+      character(len=17):: genfuncos='gen_fun_cos'
+      character(len=17):: genfunamp='gen_fun_amp'
       logical skew
       integer     	:: r, myn1,myn2,indexa(mnres,4),mynres, illa
       complex(dp)   :: c_val
@@ -4122,7 +4131,7 @@ contains
         
         order = sum(ind(1:6))
         
-        write(nn,'(a4,6(a1,i1))') 'GNFA','_',ind(1),'_',ind(2),'_',ind(3), &
+        write(nn,'(a4,6(a1,i1))') 'gnfa','_',ind(1),'_',ind(2),'_',ind(3), &
                                         '_',ind(4),'_',ind(5),'_',ind(6)
         
         write(nick,'(a2,6(i1))') 'f_',ind(1),ind(2),ind(3), &
@@ -4139,7 +4148,7 @@ contains
 
 
         
-        write(nn,'(a4,6(a1,i1))') 'GNFS','_',ind(1),'_',ind(2),'_',ind(3), &
+        write(nn,'(a4,6(a1,i1))') 'gnfs','_',ind(1),'_',ind(2),'_',ind(3), &
                                         '_',ind(4),'_',ind(5),'_',ind(6)
         write(nick,'(a2,6(i1),a3)') 'f_',ind(1),ind(2),ind(3), &
                                          ind(4),ind(5),ind(6),'_im'
@@ -4147,7 +4156,7 @@ contains
         !               im_val, order, ind(1:6)
         call puttonormaltable(nn,nick,genfunsin,im_val,order,ind)
 
-        write(nn,'(a4,6(a1,i1))') 'GNFC','_',ind(1),'_',ind(2),'_',ind(3), &
+        write(nn,'(a4,6(a1,i1))') 'gnfc','_',ind(1),'_',ind(2),'_',ind(3), &
                                         '_',ind(4),'_',ind(5),'_',ind(6)
         write(nick,'(a2,6(i1),a3)') 'f_',ind(1),ind(2),ind(3), &
                                          ind(4),ind(5),ind(6),'_re'
@@ -4176,13 +4185,13 @@ contains
       integer     :: ind(10), i ! ind has 10 elements for extension to knobs and clocks
       real(dp)    :: d_val
       character(len=17):: nn
-      character(len=17):: bv = 'A_t'
+      character(len=17):: bv = 'a_t'
       
       ind(:) = 0
       do i=1,c_%nv
          ind(i)=1
          d_val = real(v.sub.ind(1:6))
-         write(nn,'(a4,2i1)') 'EIGN',planei,i
+         write(nn,'(a4,2i1)') 'eign',planei,i
          
          if (getdebug() > 2) then
             write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
@@ -4269,9 +4278,9 @@ contains
            orderT = ind(6)
 
 
-           if (orderX > 0) nn = trim(nn) // '_Jx'
+           if (orderX > 0) nn = trim(nn) // '_jx'
            if (orderX > 1) write(nn,'(a,i1)') trim(nn),orderX
-           if (orderY > 0) nn = trim(nn) // '_Jy'
+           if (orderY > 0) nn = trim(nn) // '_jy'
            if (orderY > 1) write(nn,'(a,i1)') trim(nn),orderY
            if (orderPT> 0) nn = trim(nn) // '_p'
            if (orderPT > 1) write(nn,'(a,i1)') trim(nn),orderPT
@@ -4291,13 +4300,13 @@ contains
            endif
 
            if ( order == (sum( ind(2*planei-1:2*planei))) ) then
-             nick = 'ANH'//planel
+             nick = 'anh'//planel
              if (order > 2) then
                 write(nick,'(a,a1,i1)') trim(nick),'_',order/2 !qN_JxM
              endif
            else 
              if ( (order==2) .and. (sum(ind(5:6)) == 0) ) then
-                nick = 'ANHc' 
+                nick = 'anhc' 
              endif
            endif
 
