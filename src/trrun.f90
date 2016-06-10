@@ -183,6 +183,10 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
               read(90,END=100) z(j,i)
            enddo
         enddo
+!frs on 07.06.2016 - fixing
+!  longitudinal plane must be frozen too!
+        read(90,END=100) sigma_t
+        read(90,END=100) mean_t
      else
         call trinicmd(switch,orbit0,eigen,jmax,z,turns,coords)
      endif
@@ -306,7 +310,7 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         z_factor = one !at start sigma_z_ini/sigma_z
         Ex_rms = get_value('probe ', 'ex ') !BEAM->Ex
         Ey_rms = get_value('probe ', 'ey ') !BEAM->Ey
-        if (checkpnt_restart) then
+        if (checkpnt_restart.and.emittance_update) then
            Ex_rms = Ex_rms0
            Ey_rms = Ey_rms0
         endif
@@ -344,10 +348,17 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
         ex_rms0 = ex_rms
         ey_rms0 = ey_rms
         sigma_z0 = sigma_z
+        sigma_p0=sigma_p
         !sigma_p0 = sigma_p !CM, 3/11/14
         !fill, table=Ixy_unsorted; column=i_macro_part, Ix, Iy, dpi, z_part;
         !new on 3/31/14:
-        if (emittance_update) then           
+!frs on 04.06.2016 - fixing
+!a) bug concerning sigma_p
+!b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
+!   obviously without update!
+!c) Fixing checkpnt_restart for "emittance_update = .false." which
+!   worked for ".true." alright.
+!        if (emittance_update) then           
            call ixy_calcs(betas, orbit0, z, &
                           betx_start, bety_start, &
                           alfx_start, alfy_start, &
@@ -366,8 +377,14 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            call augment_count('bb6d_ixy ')
            
            if (sigma_p0 .eq. zero) sigma_p0 = sigma_p
+!frs on 04.06.2016 - fixing
+!a) bug concerning sigma_p
+!b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
+!   obviously without update!
+!c) Fixing checkpnt_restart for "emittance_update = .false." which
+!   worked for ".true." alright.
            !new on 3/31/14:
-        endif
+!        endif
 
         if (.not.emittance_update) then
            ex_rms = ex_rms0
@@ -375,7 +392,13 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            sigma_z = sigma_z0
            sigma_p = sigma_p0
         endif
-
+!frs on 04.06.2016 - fixing
+!a) bug concerning sigma_p
+!b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
+!   obviously without update!
+!c) Fixing checkpnt_restart for "emittance_update = .false." which
+!   worked for ".true." alright.
+!           sigma_p=sigma_p0
         z_factor = one
         if ( sigma_z.gt.zero .and. sigma_z_ini.gt.zero) z_factor = sigma_z_ini/sigma_z
         
@@ -395,33 +418,43 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
      nlm = 0
      sum = zero
      
-     if ( bb_sxy_update .and. (sigma_t.eq.zero .or. emittance_update) ) then
+!frs on 04.06.2016 - fixing
+!a) bug concerning sigma_p
+!b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
+!   obviously without update!
+!c) Fixing checkpnt_restart for "emittance_update = .false." which
+!   worked for ".true." alright.
+!frs on 07.06.2016 - fixing
+!  longitudinal plane must be frozen too!
+     if (bb_sxy_update) then
+        if(emittance_update.or.(.not.emittance_update.and.mean_t.eq.0d0.and.sigma_t.eq.0d0)) then
         !VVK 20100321 -------- Find RMS-value of t ----------------------
         ! if we do 1-turn tracking, orbit0(5)=0 always
-        Summ_t_mean = zero
-        do i_part = 1, jmax
-           if (abs(z(5,i_part)) .ge. zero) then
-              Summ_t_mean = Summ_t_mean + z(5,i_part)
-           else
-              print *, 'NaN z(5,i) ? :', i_part, z(5,i_part)
-           endif
-        enddo
-        mean_t = Summ_t_mean/dble(jmax)
-        
-        Summ_t_square = zero
-        do i_part = 1, jmax
-           if (abs(z(5,i_part)) .ge. zero) &
-                Summ_t_square = Summ_t_square + (z(5,i_part) - mean_t)**2
-        enddo
-        sigma_t = sqrt(Summ_t_square/dble(jmax))
+           Summ_t_mean = zero
+           do i_part = 1, jmax
+              if (abs(z(5,i_part)) .ge. zero) then
+                 Summ_t_mean = Summ_t_mean + z(5,i_part)
+              else
+                 print *, 'NaN z(5,i) ? :', i_part, z(5,i_part)
+              endif
+           enddo
+           mean_t = Summ_t_mean/dble(jmax)
 
-        if (abs(sigma_t) .eq. zero) then
-           sigma_t=t_max/two
-           call fort_warn('TTRUN Frozen SC: sigma_t = zero: ','sigma_t set to L/track_harmon/betas/2')
+           Summ_t_square = zero
+           do i_part = 1, jmax
+              if (abs(z(5,i_part)) .ge. zero) &
+                   Summ_t_square = Summ_t_square + (z(5,i_part) - mean_t)**2
+           enddo
+           sigma_t = sqrt(Summ_t_square/dble(jmax))
+
+           if (abs(sigma_t) .eq. zero) then
+              sigma_t=t_max/two
+              call fort_warn('TTRUN Frozen SC: sigma_t = zero: ','sigma_t set to L/track_harmon/betas/2')
+           endif
         endif
         !-----------------------------------------------------------------
-     endif 
-     
+     endif
+
      do !--- loop over nodes
 
         bbd_pos = j
@@ -476,7 +509,17 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
              last_turn, last_pos, last_orbit, aperflag, maxaper, al_errors, onepass)
 
         !-------- Space Charge update
-        if (bb_sxy_update .and. emittance_update .and. is_lost) then
+!frs on 04.06.2016 - fixing
+!a) bug concerning sigma_p
+!b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
+!   obviously without update!
+!c) Fixing checkpnt_restart for "emittance_update = .false." which
+!   worked for ".true." alright.
+        ex_rms0=ex_rms
+        ey_rms0=ey_rms
+        sigma_z0=sigma_z
+        sigma_p0=sigma_p
+        if (bb_sxy_update .and. is_lost) then
            call ixy_calcs(betas, orbit0, z,       &
                           betx_start, bety_start, &
                           alfx_start, alfy_start, &
@@ -486,6 +529,18 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            call ixy_fitting()
            is_lost = .false.
         endif
+        if( .not. emittance_update) then
+           ex_rms=ex_rms0
+           ey_rms=ey_rms0
+           sigma_z=sigma_z0
+           sigma_p=sigma_p0
+        endif
+!frs on 04.06.2016 - fixing
+!a) bug concerning sigma_p
+!b) Filling data in file bb6d_ixy.txt even for "emittance_update = .false.",
+!   obviously without update!
+!c) Fixing checkpnt_restart for "emittance_update = .false." which
+!   worked for ".true." alright.
         
         !--------  Misalignment at end of element (from twissfs.f)
         if (code .ne. code_drift .and. n_align.ne.0)  then
@@ -612,6 +667,10 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            write(90) z(j,i)
         enddo
      enddo
+!frs on 07.06.2016 - fixing
+!  longitudinal plane must be frozen too!
+     write(90) sigma_t
+     write(90) mean_t
   endif
   
   !--- enter last turn in summary table
@@ -3345,7 +3404,6 @@ subroutine ixy_fitting()
   use math_constfi, only : zero, one
   implicit none
 
-  logical :: emittance_update
   integer :: i, iii, jjj
   integer :: i_for_I
   double precision :: Summ_dpi_square, Summ_z_part_square
@@ -3365,7 +3423,6 @@ subroutine ixy_fitting()
   double precision, external :: get_value
 
   !----------------------------------------------------------------------
-  emittance_update = get_option('emittance_update ') .ne. 0
 
   i_for_I=0     ! I-evaluations
   I_div_E_sum_max = get_value('run ', 'i_div_e_sum_max ')
@@ -3401,7 +3458,7 @@ subroutine ixy_fitting()
 
   Summ_dpi_square = Summ_dpi_square / N_for_I_dble
   if (Summ_dpi_square .ge. zero) then
-     if (emittance_update) sigma_p=sqrt(Summ_dpi_square)
+     sigma_p=sqrt(Summ_dpi_square)
   else
      call fort_fail('IXY_FITTING: Fatal: ','Summ_dpi_square<0')
   endif

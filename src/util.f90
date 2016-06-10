@@ -502,7 +502,7 @@ module spch_bbfi
                             gamx_bb(bbd_max), gamy_bb(bbd_max), &
                             dx_bb(bbd_max),   dy_bb(bbd_max)
   double precision,save :: rat_bb_n_ions=1d0
-  double precision, save :: sigma_t, mean_t  ! calculate and transfer to BB
+  double precision, save :: sigma_t=0.d0, mean_t=0.d0  ! calculate and transfer to BB
   character(len=name_len), save :: spch_bb_name(bbd_max)
 end module spch_bbfi
 

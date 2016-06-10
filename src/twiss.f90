@@ -6396,7 +6396,9 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
   fmap = .true.
 
   bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
-  if (bb_sxy_update) then
+!frs on 06.06.2016
+!  safeguard TWISS from failing due to undefined SC elements
+  if (bb_sxy_update.and.N_spch.gt.0) then
      fk = fk * rat_bb_n_ions !Ratio_for_bb_N_ions
      name=' '
      call element_name(name,len(name))
