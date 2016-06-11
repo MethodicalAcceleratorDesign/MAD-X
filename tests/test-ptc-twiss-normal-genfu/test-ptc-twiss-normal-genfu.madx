@@ -91,15 +91,18 @@ f1200_re = -1*(na*dc/f1200_de);
 f1200_im = -1*(-na*dd/f1200_de);
 
 
+ff3000_re = table(nonlin, GNFC_3_0_0_0_0_0,value);
+ff3000_im = table(nonlin, GNFS_3_0_0_0_0_0,value);
 
-value, f3000_re, table(nonlin, GNFC_3_0_0_0_0_0,value), f3000_re - table(nonlin, GNFC_3_0_0_0_0_0,value);
+value, f3000_re, ff3000_re, f3000_re - ff3000_re;
 
-value, f3000_im, table(nonlin, GNFS_3_0_0_0_0_0,value), f3000_im - table(nonlin, GNFS_3_0_0_0_0_0,value);
+value, f3000_im, ff3000_im, f3000_im - ff3000_im;
 
+ff1200_re = table(nonlin, GNFC_1_2_0_0_0_0,value);
+ff1200_im = table(nonlin, GNFS_1_2_0_0_0_0,value);
 
-value, f1200_re, table(nonlin, GNFC_1_2_0_0_0_0,value), f1200_re - table(nonlin, GNFC_1_2_0_0_0_0,value);
-
-value, f1200_im, table(nonlin, GNFS_1_2_0_0_0_0,value), f1200_im - table(nonlin, GNFS_1_2_0_0_0_0,value);
+value, f1200_re, ff1200_re, f1200_re - ff1200_re
+value, f1200_im, ff1200_im, f1200_im - ff1200_im;
 
 
 ptc_end;
