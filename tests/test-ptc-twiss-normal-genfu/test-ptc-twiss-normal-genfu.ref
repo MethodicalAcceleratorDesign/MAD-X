@@ -326,17 +326,17 @@ f3000_im-ff3000_im =    3.880705458e-06 ;
 
 ff1200_re = table(nonlin, GNFC_1_2_0_0_0_0,value);
 
-ff1200_im =  table(nonlin, GNFS_1_2_0_0_0_0,value);
+ff1200_im = table(nonlin, GNFS_1_2_0_0_0_0,value);
 
 
 
-value, f1200_re, ff1200_re, f1200_re - ff1200_re
-
-value, f1200_im, ff1200_im, f1200_im - ff1200_im;
+value, f1200_re, ff1200_re, f1200_re - ff1200_re;
 
 f1200_re =   -0.0007146151489 ;
 ff1200_re =   -0.0007170484709 ;
-f1200_re-ff1200_revalue =   -0.0007146151489 ;
+f1200_re-ff1200_re =    2.433321965e-06 ;
+value, f1200_im, ff1200_im, f1200_im - ff1200_im;
+
 f1200_im =    0.0003276537117 ;
 ff1200_im =    0.0003296206867 ;
 f1200_im-ff1200_im =   -1.966974994e-06 ;
