@@ -324,12 +324,19 @@ const char* const twiss_table_cols[] =
   "disp1p3", "disp2p3", "disp3p3", "disp4p3", /* third order derivatives */
   /* end of dispersion derivatives w.r.t. delta_p */
   "mu1", "mu2", "mu3",
-  "eign11", "eign12", "eign13", "eign14", "eign15", "eign16",
-  "eign21", "eign22", "eign23", "eign24", "eign25", "eign26",
-  "eign31", "eign32", "eign33", "eign34", "eign35", "eign36",
-  "eign41", "eign42", "eign43", "eign44", "eign45", "eign46",
-  "eign51", "eign52", "eign53", "eign54", "eign55", "eign56",
-  "eign61", "eign62", "eign63", "eign64", "eign65", "eign66",
+  /* IT  sigma matrix */
+  "sig11", "sig12", "sig13", "sig14", "sig15", "sig16",
+  "sig21", "sig22", "sig23", "sig24", "sig25", "sig26",
+  "sig31", "sig32", "sig33", "sig34", "sig35", "sig36",
+  "sig41", "sig42", "sig43", "sig44", "sig45", "sig46",
+  "sig51", "sig52", "sig53", "sig54", "sig55", "sig56",
+  "sig61", "sig62", "sig63", "sig64", "sig65", "sig66",
+  /*  "eign11", "eign12", "eign13", "eign14", "eign15", "eign16",
+      "eign21", "eign22", "eign23", "eign24", "eign25", "eign26",
+      "eign31", "eign32", "eign33", "eign34", "eign35", "eign36",
+      "eign41", "eign42", "eign43", "eign44", "eign45", "eign46",
+      "eign51", "eign52", "eign53", "eign54", "eign55", "eign56",
+      "eign61", "eign62", "eign63", "eign64", "eign65", "eign66",*/
   "n1",
   " "  /* blank terminates */
 };

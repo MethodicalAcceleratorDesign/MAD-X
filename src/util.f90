@@ -305,7 +305,10 @@ end module tunesfi
 module twiss0fi
   implicit none
   public
-  integer, parameter :: align_max=14, fundim=74
+  !integer, parameter :: align_max=14, fundim=74
+  !IT increase fundim to 110 to fit in sigma matrices 6x6
+  integer, parameter :: align_max=14, fundim=110
+
 end module twiss0fi
 
 module twissafi
@@ -331,6 +334,7 @@ module twisscfi
   double precision :: opt_fun0(fundim)=0.d0, opt_fun(fundim)=0.d0
   double precision :: disp(6)=0.d0, ddisp(6)=0.d0
   double precision :: rmat(2,2)=0.d0
+  double precision :: sigmat(6,6)=0.d0
   double precision :: betx=0.d0, alfx=0.d0, amux=0.d0, cosmux=0.d0, sinmux=0.d0, qx=0.d0
   double precision :: bety=0.d0, alfy=0.d0, amuy=0.d0, cosmuy=0.d0, sinmuy=0.d0, qy=0.d0
   double precision :: bxmax=0.d0, dxmax=0.d0, bymax=0.d0, dymax=0.d0

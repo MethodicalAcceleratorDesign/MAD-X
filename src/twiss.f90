@@ -18,9 +18,10 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   integer :: tab_name(*)
   integer :: sector_tab_name(*) ! holds sectormap data
 
-  integer :: i, ithr_on
+  integer :: i, j, ithr_on
   integer :: chrom, eflag 
   double precision :: orbit0(6), orbit(6), tt(6,6,6), ddisp0(6), r0mat(2,2)
+  double precision :: s0mat(6,6) ! initial sigma matrix
   character(len=48) :: charconv
   character(len=150) :: warnstr
   logical :: fast_error_func
@@ -45,13 +46,14 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   TT = zero 
   call get_disp0(disp0)
   DDISP0 = zero 
-  R0MAT = zero 
+  R0MAT = zero
+  S0MAT = zero
   OPT_FUN0 = zero 
   OPT_FUN = zero 
   DISP = zero 
   DDISP = zero 
   RMAT = zero 
-
+  SIGMAT = zero
   betx=zero; alfx=zero; amux=zero; bxmax=zero; dxmax=zero; xcomax=zero
   sigxco=zero; sigdx=zero; cosmux=zero; wx=zero; phix=zero; dmux=zero
   qx=zero; sinmux=zero; xix=zero
@@ -60,9 +62,9 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   sigyco=zero; sigdy=zero; cosmuy=zero; wy=zero; phiy=zero; dmuy=zero
   qy=zero; sinmuy=zero; xiy=zero
 
-   gammacp=one
-   nmode_flip = 0
-   mode_flip  =.false.
+  gammacp=one
+  nmode_flip = 0
+  mode_flip  =.false.
 
   synch_1=zero;  synch_2=zero;  synch_3=zero;  synch_4=zero;  synch_5=zero
 
@@ -132,6 +134,20 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
      SRMAT = EYE 
      STMAT = zero 
   endif
+
+  !IT: SIGMA MATRIX
+  ! tmsigma - based on standard [b -a ; -a gamma] matrix;
+  ! tmsig_emit -based on eigenvalues like in emit.c , needs verification of emmitance calcluation
+  call tmsigma( opt_fun0(3), opt_fun0(6), opt_fun0(4), opt_fun0(7), s0mat)
+  !call tmsigma_emit(rt, s0mat)
+  
+  ! sigma matrix
+  do i= 1,6
+     do j= 1,6
+        opt_fun0(74 + (i-1)*6 + j) = s0mat(i,j)
+     enddo
+  enddo
+  sigmat = s0mat
 
   !---- Build table of lattice functions, coupled.
   call twcpgo(rt,orbit0)
@@ -422,13 +438,15 @@ SUBROUTINE twfill(case,opt_fun,position)
   if (case .eq. 1) then
      call vector_to_table_curr(table_name, 's ',    opt_fun(2), 17) ! fill 17 values starting with s
      call vector_to_table_curr(table_name, 'r11 ',  opt_fun(29), 5) ! fill 5 values starting with r11
+     !IT
+     call vector_to_table_curr(table_name, 'sig11 ', opt_fun(75), 36) ! fill 36 values starting with sigmat11
      call vector_to_table_curr(table_name, 'kmax ', opt_fun(70), 5) ! fill 5 values starting with kmax
      if (rmatrix) call vector_to_table_curr(table_name, 're11 ', opt_fun(34), 36) ! fill Rmatrix
      if (ripken)  call twfill_ripken(opt_fun)
   elseif (case .eq. 2) then
      call vector_to_table_curr(table_name, 'wx ', opt_fun(19), 10) ! fill 10 values starting with wx
   endif
-
+  
   !---- Augment table twiss
   call augment_count(table_name)
 
@@ -1031,6 +1049,11 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   double precision, external :: get_value
   double precision, parameter :: eps=1d-8
 
+  double precision  :: em(6,6),  cosmux_eig=zero, cosmuy_eig=zero, diff_cos = 1d-4
+  double precision  :: reval(6), aival(6) ! re and im parts 
+  logical, external :: m66sta  
+  character(len=150):: warnstr
+
   !--- initialize deltap because twcpin can be called directly from mad_emit
   deltap = get_value('probe ','deltap ')
 
@@ -1124,6 +1147,22 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
 
   endif
 
+  !---- Find eigenvectors at initial position.
+  reval = zero
+  aival = zero
+  
+  if (m66sta(rt)) then
+     call laseig(rt, reval, aival, em)
+  else
+     call ladeig(rt, reval, aival, em)
+  endif
+
+  cosmux_eig = ( reval(1)+aival(1) + reval(2) + aival(2) )/ 2
+  if ((cosmux - cosmux_eig) .gt. diff_cos) then
+     write (warnstr,'(a,e13.6)') "Difference in the calculation of cosmux: cosmux - cosmux_eig =  ", cosmux -cosmux_eig
+     call fort_warn('TWCPTK: ', warnstr)
+  endif
+  
   ! call twcpin_print(rt,r0mat)
 
   !---- Give message, if unstable.
@@ -1969,7 +2008,8 @@ SUBROUTINE twcptk(re,orbit)
     ! print *, '+++ negative beta: name', name, 'betx=', betx, ', bety=', bety 
   endif
      
-     
+  sigmat = matmul(RE, matmul(sigmat,transpose(RE)))
+  
      ! !---- Auxiliary matrices.
      ! !LD:  a = re_x - re_xy*rmat
      ! a(1,1) = re(1,1) - (re(1,3) * rmat(1,1) + re(1,4) * rmat(2,1))
@@ -2041,8 +2081,17 @@ SUBROUTINE twcptk(re,orbit)
      opt_fun(30) = rmat(1,2)
      opt_fun(31) = rmat(2,1)
      opt_fun(32) = rmat(2,2)
-  endif
 
+     ! !IT sigma matrix(1:6, 1:6) = opt_fun(75:110)
+     do i1=1,6
+        do i2=1,6
+           opt_fun(74 + (i1-1)*4 + i2) = sigmat(i1,i2)
+        enddo
+     enddo
+
+  endif
+  
+  
   if (rmatrix) then
      do i1=1,6
         do i2=1,6
@@ -2050,7 +2099,7 @@ SUBROUTINE twcptk(re,orbit)
         enddo
      enddo
   endif
-
+  
   if (centre_cptk) then
      OPT_FUN(9:14) = ORBIT
      alfx = alfx0
@@ -2135,6 +2184,95 @@ SUBROUTINE twcptk_twiss(matx, maty, error)
   
   error = .false.
 end SUBROUTINE twcptk_twiss
+SUBROUTINE tmsigma(betx0, bety0, alfx0, alfy0, s0mat)
+  use twiss0fi
+  use twisslfi
+  use twisscfi
+  use twissotmfi
+  use math_constfi, only : zero, twopi
+  use name_lenfi 
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Calculation of sigma (beam) by Irina Tecker                      *
+  !     Input:                                                           *
+  !     betx,bety, alfx,alfy  (double)   decoupled twiss parameters      *
+  !     Output:                                                          *
+  !     sigma(6,6)  - initial sigma beam matrix                          *
+  !     sigma(6,6)  - [(beta, -alpha) (-alpha, gamma)]                   *
+  !                   where beta*gamma-alpha**2 =1                       *
+  !----------------------------------------------------------------------*
+  double precision, intent (IN) :: betx0, alfx0
+  double precision, intent (IN) :: bety0, alfy0
+  double precision, intent (OUT) :: s0mat(6, 6)
+  double precision, external :: get_value
+  double precision :: e1, e2
+  
+  e1 = get_value('probe ','ex ')!BEAM->Ex
+  e2 = get_value('probe ','ey ')!BEAM->Ey
+
+  
+  s0mat(1, 1) =  e1*betx0 
+  s0mat(2, 2) =  e1*(1 + alfx0**2)/betx0
+  s0mat(1, 2) =  -e1*alfx0
+  s0mat(2, 1) = s0mat(1, 2) 
+
+  s0mat(3, 3) =  e2*bety0
+  s0mat(4, 4) =  e2*(1 + alfy0**2)/bety0
+  s0mat(4, 3) =  -e2*alfy0
+  s0mat(3, 4) = s0mat(4, 3)
+
+end SUBROUTINE tmsigma
+SUBROUTINE tmsigma_emit(rt, s0mat)
+!subroutine emce2i(stabt, em, ex, ey, et, sigma)
+  use twiss0fi
+  use twisslfi
+  use twisscfi
+  use twissotmfi
+  use math_constfi, only : zero, twopi
+  use name_lenfi 
+  implicit none
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   Convert eigenvectors to internal sigma matrix form.                *
+  ! Input:                                                               *
+  !   EM(6,6)   (real)    Eigenvector matrix.                            *
+  !   EX        (real)    Horizontal emittance.                          *
+  !   EY        (real)    Vertical emittance.                            *
+  !   ET        (real)    Longitudinal emittance.                        *
+  ! Output:                                                              *
+  !   SIGMA(6,6)(real)    Beam matrix in internal form.                  *
+  !----------------------------------------------------------------------*
+  double precision, intent(IN)  :: rt(6,6)
+  double precision :: ex, ey, et, em(6,6), s0mat(6,6)
+  double precision :: reval(6), aival(6) ! re and im parts 
+  double precision, external :: get_value
+  logical, external :: m66sta  
+  
+  integer :: j, k
+
+  !---- Find eigenvectors at initial position.
+  if (m66sta(rt)) then
+     call laseig(rt, reval, aival, em)
+  else
+     call ladeig(rt, reval, aival, em)
+  endif
+
+  ex = get_value('probe ','ex ')!BEAM->Ex
+  ey = get_value('probe ','ey ')!BEAM->Ey
+  et = get_value('probe ','et ')!BEAM->Ez
+  
+  do j = 1, 6
+     do k = 1, 6
+        s0mat(j,k) = ex * (em(j,1)*em(k,1) + em(j,2)*em(k,2)) + &
+                     ey * (em(j,3)*em(k,3) + em(j,4)*em(k,4))
+!        if (stabt) &
+        if (.not.m66sta(rt)) &
+             s0mat(j,k) = s0mat(j,k) + et * (em(j,5)*em(k,5) + em(j,6)*em(k,6))         !---- Solve for dynamic case
+     enddo
+  enddo
+
+end SUBROUTINE tmsigma_emit
 SUBROUTINE twcptk_twiss_new(matx, maty, error)
   use twiss0fi
   use twisslfi
