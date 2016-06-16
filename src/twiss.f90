@@ -2085,7 +2085,7 @@ SUBROUTINE twcptk(re,orbit)
      ! !IT sigma matrix(1:6, 1:6) = opt_fun(75:110)
      do i1=1,6
         do i2=1,6
-           opt_fun(74 + (i1-1)*4 + i2) = sigmat(i1,i2)
+           opt_fun(74 + (i1-1)*6 + i2) = sigmat(i1,i2)
         enddo
      enddo
 
