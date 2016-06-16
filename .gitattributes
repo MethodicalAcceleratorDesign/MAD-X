@@ -2184,6 +2184,13 @@ tests/test-twiss-11/twiss_2.cfg -text
 tests/test-twiss-11/twiss_2.ref -text
 tests/test-twiss-11/twiss_3.cfg -text
 tests/test-twiss-11/twiss_3.ref -text
+tests/test-twiss-12/test-twiss-12.cfg -text
+tests/test-twiss-12/test-twiss-12.madx -text
+tests/test-twiss-12/test-twiss-12.out -text
+tests/test-twiss-12/test-twiss-12.ref -text
+tests/test-twiss-12/test-twiss-12.tfs -text
+tests/test-twiss-12/test-twiss-12.tfs.cfg -text
+tests/test-twiss-12/test-twiss-12.tfs.ref -text
 tests/test-twiss-2/README -text
 tests/test-twiss-2/my_sect_file.cfg -text
 tests/test-twiss-2/my_sect_file.ref -text

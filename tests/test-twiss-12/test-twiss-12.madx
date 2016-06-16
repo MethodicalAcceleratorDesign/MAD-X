@@ -1,0 +1,48 @@
+! test-sigma
+OPTION, -ECHO, -WARN, INFO;
+
+BEAM, PARTICLE=ELECTRON, ENERGY=1, EXN=550.0e-9, EYN=10.0e-9, SIGE=0.042, SIGT=0.044e-3;
+
+// elements definitions
+
+Lc = 8;
+Lqd = 0.20;
+Lqf = 0.40;
+Kf =  0.1;
+Kd = -0.2;
+
+qf: QUADRUPOLE, L=Lqf, K1 := Kf;
+qd: QUADRUPOLE, L=Lqd, K1 := Kd;
+ec: DRIFT, L=1.5;
+mk: marker;
+
+// sequence declaration
+
+periodic_cell: sequence, refer=centre, l=Lc;
+qd: qd, at=Lqd/2;
+qf: qf, at=1;
+ec: ec, at=Lc/2 - 1.5/2;
+mk: mk, at=Lc/2;
+ec: ec, at=Lc/2 + 1.5/2;
+qf: qf, at=Lc-1;
+qd: qd, at=Lc-Lqd/2;
+endsequence;
+
+OPTION, ECHO, WARN, INFO;
+
+USE, PERIOD=periodic_cell;
+
+match, sequence=periodic_cell;
+CONSTRAINT, SEQUENCE=periodic_cell, RANGE='mk', BETX=5.0, BETY=5.0;
+vary, name=Kf, step=1e-6;
+vary, name=Kd, step=1e-6;
+lmdif, calls=10000, tolerance=1e-21;
+endmatch;
+
+select, flag=twiss, column=s, name,betx, bety, sig11, sig12, sig13, sig14, sig15, sig16, sig21, sig22, sig23, sig24, sig25, sig26, sig31, sig32, sig33, sig34, sig35, sig36, sig41, sig42, sig43, sig44, sig45, sig46, sig51, sig52, sig53, sig54, sig55, sig56, sig61, sig62, sig63, sig64, sig65, sig66 ;
+!select, flag=twiss, column=s, name,betx, bety, sig11, sig12, sig21, sig22 ;
+twiss,file='test-twiss-12.tfs';
+!savebeta, label=tw, place=#s;
+!plot, haxis=s, vaxis1=betx, sig11, colour=100, interpolate=true;
+
+return;
