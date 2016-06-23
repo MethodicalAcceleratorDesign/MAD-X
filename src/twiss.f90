@@ -1615,7 +1615,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   integer :: i, iecnt, code, save, n_align, elpar_vl
   double precision :: ek(6), re(6,6), rwi(6,6), rc(6,6), te(6,6,6)
   double precision :: orbit(6), orbit2(6)
-  double precision :: bvk, sumloc=0.d0, pos0=0.d0, sd, el
+  double precision :: bvk, sumloc, pos0, sd, el
   double precision :: al_errors(align_max)
   character(len=name_len) :: bxmax_name='nil ', bymax_name='nil '
   character(len=name_len) :: dxmax_name='nil ', dymax_name='nil '
@@ -1626,6 +1626,8 @@ SUBROUTINE twcpgo(rt,orbit0)
   double precision, external :: node_value, get_value
 
   !---- Initialization
+  sumloc=zero
+  pos0=zero
   amux=zero
   amuy=zero
   currpos=zero
