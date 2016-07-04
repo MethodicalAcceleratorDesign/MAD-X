@@ -3068,7 +3068,8 @@ SUBROUTINE tw_summ(rt,tt)
   double precision :: sd, detl, f, tb, t2
   double precision :: disp0(6), frt(6,6), frtp(6,6), rtp(6,6)
   double precision :: bx0, ax0, by0, ay0, sx, sy, orbit5
-
+  double precision, parameter :: eps=1d-8
+  
   integer, external :: get_option
 
   !---- Initialization chromatic part
@@ -3129,7 +3130,9 @@ SUBROUTINE tw_summ(rt,tt)
      eta = - sd * beta**2 / suml
 
      alfa = one / gamma**2 + eta
-     if (alfa .eq. zero) then
+!     if (alfa .eq. zero) then
+     if (abs(alfa) .lt. eps) then
+        alfa  = zero
         gamtr = zero
      else
         gamtr = sign(one,alfa) * sqrt( one / abs(alfa))
