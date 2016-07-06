@@ -3416,14 +3416,17 @@ subroutine ixy_fitting()
   ! limit for particles taken for Ix, Iy evaluations
   double precision :: Ix_i, Iy_i, dpi_i, z_part_i, Ixy_rel_summ, N_for_I_dble
   double precision :: c_sumx, y_sumx, t_sumx, c_sumy, y_sumy, t_sumy, a_sum
-  double precision :: J0x=zero, J0y=zero, Sum_Jx=zero, Sum_Jy=zero 
+  double precision :: J0x, J0y, Sum_Jx, Sum_Jy 
   double precision, parameter :: ce10=1d10
 
   integer, external :: get_option
   double precision, external :: get_value
 
   !----------------------------------------------------------------------
+  J0x=zero; J0y=zero; Sum_Jx=zero; Sum_Jy=zero 
 
+
+  
   i_for_I=0     ! I-evaluations
   I_div_E_sum_max = get_value('run ', 'i_div_e_sum_max ')
   DO i=1,N_macro_surv

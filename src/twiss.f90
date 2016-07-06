@@ -30,7 +30,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   integer, external :: get_option
 
   integer, parameter :: izero=0, ione=1
- 
+
   !---- Initialization
   table_name = charconv(tab_name)
   sectorTableName = charconv(sector_tab_name)
@@ -1037,19 +1037,19 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   double precision, intent(OUT) :: disp0(6), r0mat(2,2)
   integer, intent(OUT) :: eflag
   
-  logical :: stabx=.false., staby=.false.
+  logical :: stabx, staby
   double precision :: a(2,2), b(2,2), c(2,2), d(2,2), ra(6,6)
   double precision :: e(2,2), aux(2,2), f(2,2), bbar(2,2)
   double precision :: arg, den, det, r_det, dtr, sinmu2
-  double precision :: betx0=zero, alfx0=zero, amux0=zero
-  double precision :: bety0=zero, alfy0=zero, amuy0=zero
+  double precision :: betx0, alfx0, amux0
+  double precision :: bety0, alfy0, amuy0
   character(len=150) :: msg
 
   integer, external :: get_option
   double precision, external :: get_value
-  double precision, parameter :: eps=1d-8
+  double precision, parameter :: eps=1d-8, diff_cos = 1d-4
 
-  double precision  :: em(6,6),  cosmux_eig=zero, cosmuy_eig=zero, diff_cos = 1d-4
+  double precision  :: em(6,6),  cosmux_eig, cosmuy_eig 
   double precision  :: reval(6), aival(6) ! re and im parts 
   logical, external :: m66sta  
   character(len=150):: warnstr
@@ -1061,6 +1061,10 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   eflag   = 0
   gammacp = one
   RA = RT
+  betx0=zero; alfx0=zero; amux0=zero
+  bety0=zero; alfy0=zero; amuy0=zero
+  cosmux_eig=zero; cosmuy_eig=zero
+  stabx=.false.; staby=.false.
 
   call tmsymp(RA)
   ! RA(1:4,1:4) = ( A , B
@@ -1220,16 +1224,16 @@ SUBROUTINE twcpin_talman(rt,disp0,r0mat,eflag)
   double precision, intent(OUT) :: disp0(6), r0mat(2,2)
   integer, intent(OUT) :: eflag
   
-  logical :: stabx=.false., staby=.false.
+  logical :: stabx, staby
   double precision :: a(2,2),  b(2,2),  c(2,2),  d(2,2)
   double precision :: bbar(2,2), r0mat_bar(2,2)
   double precision :: e(2,2), aux(2,2), f(2,2)
   double precision :: arg, den, det, dtr, sinmu2, r_det
-  double precision :: betx0=zero, alfx0=zero, amux0=zero
-  double precision :: bety0=zero, alfy0=zero, amuy0=zero
+  double precision :: betx0, alfx0, amux0
+  double precision :: bety0, alfy0, amuy0
   character(len=150) :: msg
 
-  double precision :: det_e=zero, det_f=zero
+  double precision :: det_e, det_f
   
   integer, external :: get_option
   double precision, external :: get_value
@@ -1239,8 +1243,12 @@ SUBROUTINE twcpin_talman(rt,disp0,r0mat,eflag)
   deltap = get_value('probe ','deltap ')
 
   !---- Initialization
+  stabx=.false.; staby=.false.
   eflag=0
   gammacp=one
+  betx0=zero; alfx0=zero; amux0=zero
+  bety0=zero; alfy0=zero; amuy0=zero
+  det_e=zero; det_f=zero
 
   !---- Initial dispersion.
   call twdisp_ini(rt,disp0) !-- LD: 2016.04.18
@@ -1381,13 +1389,13 @@ SUBROUTINE twcpin_sagan(rt,disp0,r0mat, eflag)
   double precision, intent(OUT) :: disp0(6), r0mat(2,2)
   integer, intent(OUT) :: eflag
   integer :: i
-  logical :: stabx=.false., staby=.false.
+  logical :: stabx, staby
   double precision :: e(2,2), aux(2,2), f(2,2), r0mat_bar(2,2)      
   double precision :: a(2,2), b(2,2), c(2,2), d(2,2), cbar(2,2)
   double precision :: v(4, 4), u (4,4), vbar(4,4)
   double precision :: arg, den, det, dtr, sinmu2, det_e, det_f
-  double precision :: betx0=zero, alfx0=zero, amux0=zero
-  double precision :: bety0=zero, alfy0=zero, amuy0=zero
+  double precision :: betx0, alfx0, amux0
+  double precision :: bety0, alfy0, amuy0
   character(len=150) :: msg
 
   integer, external :: get_option
@@ -1395,8 +1403,11 @@ SUBROUTINE twcpin_sagan(rt,disp0,r0mat, eflag)
   double precision, parameter :: eps=1d-8
 
   !---- Initialization
+  stabx=.false.; staby=.false.
   eflag = 0
   gammacp = one
+  betx0=zero; alfx0=zero; amux0=zero
+  bety0=zero; alfy0=zero; amuy0=zero
   deltap   = get_value('probe ','deltap ')
 
   !---- Initial dispersion.
@@ -1611,7 +1622,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   !----------------------------------------------------------------------*
   double precision :: rt(6,6), orbit0(6)
 
-  logical :: fmap, cplxy=.false., cplxt=.false., sector_sel, mycentre_cptk
+  logical :: fmap, cplxy, cplxt, sector_sel, mycentre_cptk
   integer :: i, iecnt, code, save, n_align, elpar_vl
   double precision :: ek(6), re(6,6), rwi(6,6), rc(6,6), te(6,6,6)
   double precision :: orbit(6), orbit2(6)
@@ -1634,7 +1645,8 @@ SUBROUTINE twcpgo(rt,orbit0)
   centre = get_value('twiss ','centre ').ne.zero
   RWI = EYE 
   RC = EYE 
-
+  cplxy=.false.; cplxt=.false.
+  
   !---- Store one-turn-map
   ROTM = RT 
 
@@ -1857,18 +1869,26 @@ SUBROUTINE twcptk(re,orbit)
   double precision :: rmat0(2,2), e(2,2), f(2,2), cd(2,2), tmp(2,2)
   double precision :: rmat_bar(2,2), ebar(2,2), fbar(2,2), hmat(2,2)
   double precision :: edet, fdet, tempa, tempb, det
-  double precision :: alfx0=zero, betx0=zero, amux0=zero, alfx_ini=zero, betx_ini=zero, amux_ini=zero
-  double precision :: alfy0=zero, bety0=zero, amuy0=zero, alfy_ini=zero, bety_ini=zero, amuy_ini=zero
+  double precision :: alfx0, betx0, amux0, alfx_ini, betx_ini, amux_ini
+  double precision :: alfy0, bety0, amuy0, alfy_ini, bety_ini, amuy_ini
   character(len=name_len) :: name
   character(len=150)      :: warnstr
   
   integer, external :: get_option
   double precision, parameter :: eps=1d-36
 
-  logical :: mode_flip_ele =.false.
-  logical :: cp_error=.false.
+  logical :: mode_flip_ele
+  logical :: cp_error
+
+  !---- Initialization
+
+  alfx0=zero; betx0=zero; amux0=zero; alfx_ini=zero; betx_ini=zero; amux_ini=zero
+  alfy0=zero; bety0=zero; amuy0=zero; alfy_ini=zero; bety_ini=zero; amuy_ini=zero
+  mode_flip_ele =.false.
+  cp_error=.false.
 
   call element_name(name,len(name))
+
   !---- Dispersion.
   DT = matmul(RE, DISP)
 
@@ -2137,12 +2157,16 @@ SUBROUTINE twcptk_twiss(matx, maty, error)
   double precision :: matx(2,2), maty(2,2)
   double precision :: matx11, matx12, matx21, matx22
   double precision :: maty11, maty12, maty21, maty22
-  double precision :: alfx_ini=zero, betx_ini=zero, tempa
-  double precision :: alfy_ini=zero, bety_ini=zero, tempb
+  double precision :: alfx_ini, betx_ini, tempa
+  double precision :: alfy_ini, bety_ini, tempb
   double precision :: detx, dety 
   logical          :: error
   double precision, parameter :: eps=1d-36
   character(len=name_len) :: name
+
+  alfx_ini=zero; betx_ini=zero
+  alfy_ini=zero; bety_ini=zero
+
   error = .true.
   
   detx = matx(1,1) * matx(2,2) - matx(1,2) * matx(2,1)
@@ -2297,12 +2321,16 @@ SUBROUTINE twcptk_twiss_new(matx, maty, error)
   double precision :: matx(2,2), maty(2,2)
   double precision :: matx11, matx12, matx21, matx22
   double precision :: maty11, maty12, maty21, maty22
-  double precision :: alfx_ini=zero, betx_ini=zero, tempa
-  double precision :: alfy_ini=zero, bety_ini=zero, tempb
+  double precision :: alfx_ini, betx_ini, tempa
+  double precision :: alfy_ini, bety_ini, tempb
   double precision :: detx, dety 
   logical          :: error
   double precision, parameter :: eps=1d-36
   character(len=name_len) :: name
+
+  !---Initialization
+  alfx_ini=zero; betx_ini=zero
+  alfy_ini=zero; bety_ini=zero
   error = .true.
   
   detx = matx(1,1) * matx(2,2) - matx(1,2) * matx(2,1)
@@ -2371,8 +2399,8 @@ SUBROUTINE twcptk_sagan(re,orbit) ! new, RD matrix, talman, sagan
   double precision :: rmat0(2,2), e(2,2), f(2,2), cd(2,2), tmp(2,2)
   double precision :: rmat_bar(2,2), ebar(2,2), fbar(2,2), dbar(2,2)
   double precision :: edet, fdet, tempa, tempb, det, det44, gamma_2
-  double precision :: alfx0=zero, betx0=zero, amux0=zero, alfx_ini=zero, betx_ini=zero
-  double precision :: alfy0=zero, bety0=zero, amuy0=zero, alfy_ini=zero, bety_ini=zero
+  double precision :: alfx0, betx0, amux0, alfx_ini, betx_ini
+  double precision :: alfy0, bety0, amuy0, alfy_ini, bety_ini
 
   character(len=name_len) :: name
   character(len=150)      :: warnstr
@@ -2382,6 +2410,10 @@ SUBROUTINE twcptk_sagan(re,orbit) ! new, RD matrix, talman, sagan
   logical :: mode_flip_ele =.false.
   logical :: cp_error=.false.
   
+  !---Initialization
+  alfx0=zero; betx0=zero; amux0=zero; alfx_ini=zero; betx_ini=zero
+  alfy0=zero; bety0=zero; amuy0=zero; alfy_ini=zero; bety_ini=zero
+
   call element_name(name,len(name))
   !---- Dispersion.
   DT = matmul(RE, DISP)
@@ -2737,7 +2769,7 @@ SUBROUTINE twchgo
   !     Purpose:                                                         *
   !     Track Chromatic functions.                                       *
   !----------------------------------------------------------------------*
-  logical :: fmap, cplxy=.false., cplxt=.false., mycentre_bttk
+  logical :: fmap, cplxy, cplxt, mycentre_bttk
   integer :: i, code, save, n_align
   double precision :: orbit(6), orbit2(6), ek(6), re(6,6), te(6,6,6)
   double precision :: al_errors(align_max), el, pos0
@@ -2760,7 +2792,8 @@ SUBROUTINE twchgo
   DISP(1:4) = OPT_FUN0(15:18)
   disp(5) = zero
   disp(6) = one
-  TE = zero 
+  TE      = zero 
+  cplxy = .false.; cplxt = .false.
 
   !---- Initial values for chromatic functions.
   opt_fun(19) = wx
@@ -2891,8 +2924,8 @@ SUBROUTINE twbttk(re,te)
   double precision :: rmat0(2,2)
   double precision :: ax1, ax2, ay1, ay2, bx1, bx2, by1, by2 
   double precision :: t2, ta, tb, temp, tg
-  double precision :: alfx0=0.d0, alfy0=0.d0, betx0=0.d0, bety0=0.d0, amux0=0.d0, amuy0=0.d0
-  double precision :: wx0=0.d0, wy0=0.d0, dmux0=0.d0, dmuy0=0.d0, phix0=0.d0, phiy0=0.d0
+  double precision :: alfx0, alfy0, betx0, bety0, amux0, amuy0
+  double precision :: wx0, wy0, dmux0, dmuy0, phix0, phiy0
   double precision :: an, e1, e2, sk1, curlyh, detl, f, rhoinv, blen
   double precision :: syncint(5)
 
@@ -2904,6 +2937,8 @@ SUBROUTINE twbttk(re,te)
   save = get_option('twiss_save ')
 
   !---- Initialisation
+  alfx0=0.d0; alfy0=0.d0; betx0=0.d0; bety0=0.d0; amux0=0.d0; amuy0=0.d0
+  wx0=0.d0; wy0=0.d0; dmux0=0.d0; dmuy0=0.d0; phix0=0.d0; phiy0=0.d0
   blen = node_value('blen ')
   rhoinv = node_value('rhoinv ')
   sk1 = node_value('k1 ')
@@ -3360,7 +3395,7 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   double precision :: rw(6,6), tw(6,6,6), ek0(6), orbit0(6)
   double precision :: x, y
   double precision :: an, sk1, sk2, sks, tilt, e1, e2, h, h1, h2, hgap, fint, fintx, rhoinv, blen, bvk
-  double precision :: dh, corr, ct=0.d0, st=0.d0, hx, hy, rfac, pt, el0
+  double precision :: dh, corr, ct, st, hx, hy, rfac, pt, el0
   double precision :: orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
 
   integer, external :: el_par_vector, node_fd_errors
@@ -3370,6 +3405,7 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   EK0 = zero 
   RW = EYE 
   TW = zero 
+  ct=0.d0; st=0.d0
 
   code = node_value('mad8_type ')
   kill_ent_fringe = node_value('kill_ent_fringe ') .ne. 0d0
@@ -3924,12 +3960,15 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
   logical :: cplxy
   integer :: i, code, n_ferr
   double precision :: f_errors(0:maxferr)
-  double precision :: rfac=0.d0, pt, tilt, bvk
+  double precision :: rfac, pt, tilt, bvk
   double precision :: xkick, ykick, dpx, dpy, xau, div 
 
   integer, external :: node_fd_errors
   double precision, external :: node_value
 
+  !--- Initialization
+  rfac=0.d0
+  
   if ( .not. ftrk) then
      !---- No orbit track desired, use drift map.
      call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
@@ -4263,10 +4302,13 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
   double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   double precision :: rw(6,6), tw(6,6,6) 
   double precision :: sk3, sk3l, sk3s, octr, octi, posr, posi, cr, ci, el0 
-  double precision :: rfac=0.d0, pt, bvk, tilt4  
+  double precision :: rfac, pt, bvk, tilt4  
   
   integer, external :: node_fd_errors, el_par_vector
   double precision, external :: node_value
+
+  !---Initializasion
+  rfac=0.d0
   
   if ( .not. ftrk) then
      !---- No orbit track requested, use drift map and return
@@ -7280,7 +7322,9 @@ SUBROUTINE twwmap(pos, orbit)
   integer :: i, k, l
   double precision :: sum1, sum2, ek(6)
   double precision, external :: get_value
-  logical :: accmap=.false.
+  logical :: accmap
+  
+  accmap=.false.
 
   !---- Track ORBIT0 using zero kick.
   do i = 1, 6
@@ -8176,11 +8220,11 @@ SUBROUTINE twcpin_print(rt,r0mat )
   !     rt(6,6)      (double)  one turn transfer matrix.                 *
   !----------------------------------------------------------------------*
   double precision, intent(IN)  :: rt(6,6), r0mat(2,2)
-  double precision :: e(2,2),  f(2,2), edet =zero, fdet = zero, r0mat_bar(2,2)
-  double precision :: e1(2,2),  f1(2,2), e1det =zero, f1det = zero
-  double precision :: e11(2,2),  f11(2,2), e11det =zero, f11det = zero
-  double precision :: et(2,2),  ft(2,2), etdet =zero, ftdet = zero
-  double precision :: em(2,2),  fm(2,2), emdet =zero, fmdet = zero
+  double precision :: e(2,2),  f(2,2), edet, fdet, r0mat_bar(2,2)
+  double precision :: e1(2,2),  f1(2,2),  e1det ,  f1det 
+  double precision :: e11(2,2), f11(2,2), e11det , f11det 
+  double precision :: et(2,2),  ft(2,2),  etdet ,  ftdet 
+  double precision :: em(2,2),  fm(2,2),  emdet ,  fmdet 
   double precision :: e_12(2,2), e_21(2,2)
   double precision :: f_12(2,2), f_21(2,2)
   double precision :: e1_12(2,2), e1_21(2,2)
@@ -8194,8 +8238,16 @@ SUBROUTINE twcpin_print(rt,r0mat )
   double precision :: a(2,2), b(2,2), c(2,2), d(2,2)
   double precision :: ra(4,4), ss(4,4)
   double precision :: u(4,4), v(4,4), vbar(4,4), vu (4,4), tmp(2,2), r_Det
-  double precision :: gamma=one
+  double precision :: gamma
 
+  edet   = zero; fdet   = zero
+  e1det  = zero; f1det  = zero
+  e11det = zero; f11det = zero
+  etdet  = zero; ftdet  = zero
+  emdet  = zero; fmdet  = zero
+  gamma  = one
+
+  
   open (unit = 2, file = "afterclean_twcpin.out")
   write(2,*) "After clean fort "
   !-- simplecticity
@@ -8311,10 +8363,11 @@ SUBROUTINE twcptk_print(re,r0mat, e, f)
   !     eflag        (integer) error flag.                               *
   !----------------------------------------------------------------------*
   double precision, intent(IN) :: re(6,6), r0mat(2,2), e(2,2), f(2,2)
-  double precision ::  edet =zero, fdet = zero, r0mat_bar(2,2)
+  double precision ::  edet, fdet, r0mat_bar(2,2)
   double precision :: a(2,2), b(2,2), c(2,2), d(2,2)
   double precision :: ra(4,4), ss(4,4)
 
+  edet = zero; fdet = zero
   
   open (unit = 3, file = "afterclean_twcptk.out")
   write(3,*) "After clean fort tk "
