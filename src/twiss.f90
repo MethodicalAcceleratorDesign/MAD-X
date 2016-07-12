@@ -1884,7 +1884,7 @@ SUBROUTINE twcptk(re,orbit)
 
   alfx0=zero; betx0=zero; amux0=zero; alfx_ini=zero; betx_ini=zero; amux_ini=zero
   alfy0=zero; bety0=zero; amuy0=zero; alfy_ini=zero; bety_ini=zero; amuy_ini=zero
-  mode_flip_ele =.false.
+  mode_flip_ele = mode_flip
   cp_error=.false.
 
   call element_name(name,len(name))
