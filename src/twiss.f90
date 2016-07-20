@@ -3103,7 +3103,7 @@ SUBROUTINE tw_summ(rt,tt)
   double precision :: sd, detl, f, tb, t2
   double precision :: disp0(6), frt(6,6), frtp(6,6), rtp(6,6)
   double precision :: bx0, ax0, by0, ay0, sx, sy, orbit5
-  double precision, parameter :: eps=1d-8
+  double precision, parameter :: eps=1d-16
   
   integer, external :: get_option
 
