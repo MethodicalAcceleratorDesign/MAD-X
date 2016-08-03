@@ -973,8 +973,6 @@ src/wrap.f90 -text
 syntax/.htaccess -text
 syntax/CMakeLists.txt -text
 syntax/README.txt -text
-syntax/emacs/.emacs -text
-syntax/emacs/README -text
 syntax/emacs/madx.el -text
 syntax/kate/madx.xml -text
 syntax/vim/madx.vim -text
