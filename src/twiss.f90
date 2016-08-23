@@ -1049,7 +1049,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   double precision, external :: get_value
   double precision, parameter :: eps=1d-8, diff_cos = 1d-4
 
-  double precision  :: em(6,6),  cosmux_eig, cosmuy_eig 
+  double precision  :: em(6,6),  cosmux_eig, cosmuy_eig
   double precision  :: reval(6), aival(6) ! re and im parts 
   logical, external :: m66sta  
   character(len=150):: warnstr
@@ -1163,10 +1163,16 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
 
   cosmux_eig = ( reval(1)+aival(1) + reval(2) + aival(2) )/ 2
   if ((cosmux - cosmux_eig) .gt. diff_cos) then
-     write (warnstr,'(a,e13.6)') "Difference in the calculation of cosmux: cosmux - cosmux_eig =  ", cosmux -cosmux_eig
-     call fort_warn('TWCPTK: ', warnstr)
+     write (warnstr,'(a,e13.6)') "Difference in the calculation of cosmux: cosmux - cosmux_eig =  ", cosmux - cosmux_eig
+     call fort_warn('TWCPIN: ', warnstr)
   endif
-  
+
+  cosmuy_eig = ( reval(3)+aival(3) + reval(4) + aival(4) )/ 2
+  if ((cosmuy - cosmuy_eig) .gt. diff_cos) then
+     write (warnstr,'(a,e13.6)') "Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =  ", cosmuy - cosmuy_eig
+     call fort_warn('TWCPIN: ', warnstr)
+  endif
+
   ! call twcpin_print(rt,r0mat)
 
   !---- Give message, if unstable.
@@ -1635,7 +1641,8 @@ SUBROUTINE twcpgo(rt,orbit0)
 
   integer, external :: el_par_vector, advance_node, restart_sequ, get_option, node_al_errors
   double precision, external :: node_value, get_value
-
+  double precision, parameter :: eps=1d-16
+  
   !---- Initialization
   sumloc=zero
   pos0=zero
@@ -1704,6 +1711,8 @@ SUBROUTINE twcpgo(rt,orbit0)
   bvk = node_value('other_bv ')
   elpar_vl = el_par_vector(g_polarity, g_elpar)
   el = node_value('l ')
+  ele_body = .false. 
+  if ( el .gt. eps) ele_body = .true.
 
   !--- 2013-Nov-14  10:34:00  ghislain: add acquisition of name of element here.  
   call element_name(el_name,len(el_name))
@@ -1716,6 +1725,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   n_align = node_al_errors(al_errors)
   if (n_align .ne. 0)  then
      !print*, "coupl1: Element = ", el_name
+     ele_body = .false.  
      ORBIT2 = ORBIT 
      call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
      mycentre_cptk = centre_cptk
@@ -1749,6 +1759,7 @@ SUBROUTINE twcpgo(rt,orbit0)
 
   if (n_align .ne. 0)  then
      !print*, "coupl2: Element = ", el_name
+     ele_body = .false.  
      ORBIT2 = ORBIT 
      call tmali2(el,orbit2,al_errors,beta,gamma,orbit,re)
      mycentre_cptk = centre_cptk
@@ -1872,7 +1883,7 @@ SUBROUTINE twcptk(re,orbit)
   double precision :: alfx0, betx0, amux0, alfx_ini, betx_ini, amux_ini
   double precision :: alfy0, bety0, amuy0, alfy_ini, bety_ini, amuy_ini
   character(len=name_len) :: name
-  character(len=150)      :: warnstr
+  character(len=200)      :: warnstr
   
   integer, external :: get_option
   double precision, parameter :: eps=1d-36
@@ -1880,13 +1891,17 @@ SUBROUTINE twcptk(re,orbit)
   logical :: mode_flip_ele
   logical :: cp_error
 
+  double precision :: trace_e, trace_f, trace_tmp
+  integer eflag
+  integer, parameter :: izero = 0
   !---- Initialization
 
   alfx0=zero; betx0=zero; amux0=zero; alfx_ini=zero; betx_ini=zero; amux_ini=zero
   alfy0=zero; bety0=zero; amuy0=zero; alfy_ini=zero; bety_ini=zero; amuy_ini=zero
   mode_flip_ele = mode_flip
   cp_error=.false.
-
+  eflag = 0
+  
   call element_name(name,len(name))
 
   !---- Dispersion.
@@ -1941,7 +1956,7 @@ SUBROUTINE twcptk(re,orbit)
      RMAT = - matmul(CD, EBAR) / edet 
      
   else
-     
+
      ! invert symplectic matrix
      RMAT_BAR  = matmul(SMAT, matmul(transpose(RMAT),SMATT))
      TMP       = gammacp*(A -  matmul(B,RMAT))                         
@@ -1985,6 +2000,17 @@ SUBROUTINE twcptk(re,orbit)
      endif
   endif
 
+  trace_e = E(1,1)+E(2,2)
+  trace_f = F(1,1)+F(2,2)
+  trace_tmp = ( TMP(1,1)+ TMP(2,2))/gammacp**2
+ if ( abs (trace_tmp) .ge. 2.0001 .and. gammacp .ge. 1.001) then
+     write (warnstr, '(a, a, a)') ' Lattice is unstable due to ', name, '.  Twiss parameter might be unphysical!'
+     call fort_warn('TWCPTK: ', warnstr)
+     write (warnstr, '( a, e13.6, a, e13.6)') ' gammacp = ', gammacp, '; trace of decoupled matrix is ', trace_tmp
+     call fort_warn('TWCPTK: ', warnstr)
+  endif
+  
+  
   amux_ini = amux
   amuy_ini = amuy
   
@@ -2002,25 +2028,25 @@ SUBROUTINE twcptk(re,orbit)
   
   ! When we are comming out of a flipped mode, the phase is often off by a factor of twopi.
   ! Unfortunately there is no definitive way to calcuate what the "right" way to handle this is but "-twopi" is better than nothing ((c), Sagan)
-  if(mode_flip .and. .not. mode_flip_ele ) then
+  ! if(mode_flip .and. .not. mode_flip_ele ) then
 
-    if ((amux-amux_ini) .ge. twopi ) then
-      amux = amux - twopi
-    elseif ((amux-amux_ini) .lt. zero) then
-      write (warnstr,'(a,e13.6,a,a)') "Negative phase advance in x-plane (mode flip) of ", amux-amux_ini, " in element ", name
-      call fort_warn('TWCPTK: ', warnstr)
-      amux = amux + twopi
-    endif
+  !   if ((amux-amux_ini) .ge. twopi ) then
+  !     amux = amux - twopi
+  !   elseif ((amux-amux_ini) .lt. zero) then
+  !     write (warnstr,'(a,e13.6,a,a)') "Negative phase advance in x-plane (mode flip) of ", amux-amux_ini, " in element ", name
+  !     call fort_warn('TWCPTK: ', warnstr)
+  !     amux = amux + twopi
+  !   endif
 
-    if ((amuy-amuy_ini) .ge. twopi ) then
-      amuy = amuy - twopi
-    elseif ((amuy-amuy_ini) .lt. zero) then
-      write (warnstr,'(a,e13.6,a,a)') "Negative phase advance in y-plane (mode flip) of ", amuy-amuy_ini, " in element ", name
-      call fort_warn('TWCPTK: ', warnstr)
-      amuy = amuy + twopi
-    endif
+  !   if ((amuy-amuy_ini) .ge. twopi ) then
+  !     amuy = amuy - twopi
+  !   elseif ((amuy-amuy_ini) .lt. zero) then
+  !     write (warnstr,'(a,e13.6,a,a)') "Negative phase advance in y-plane (mode flip) of ", amuy-amuy_ini, " in element ", name
+  !     call fort_warn('TWCPTK: ', warnstr)
+  !     amuy = amuy + twopi
+  !   endif
 
-  endif
+  ! endif
   
   mode_flip = mode_flip_ele
   
@@ -2113,7 +2139,6 @@ SUBROUTINE twcptk(re,orbit)
 
   endif
   
-  
   if (rmatrix) then
      do i1=1,6
         do i2=1,6
@@ -2133,7 +2158,7 @@ SUBROUTINE twcptk(re,orbit)
      RMAT = RMAT0 
      if (rmatrix) RW = RW0
   endif
-
+  
 end SUBROUTINE twcptk
 SUBROUTINE twcptk_twiss(matx, maty, error)
   use twiss0fi
@@ -2163,7 +2188,7 @@ SUBROUTINE twcptk_twiss(matx, maty, error)
   logical          :: error
   double precision, parameter :: eps=1d-36
   character(len=name_len) :: name
-
+  character(len=180)      :: warnstr
   alfx_ini=zero; betx_ini=zero
   alfy_ini=zero; bety_ini=zero
 
@@ -2195,18 +2220,47 @@ SUBROUTINE twcptk_twiss(matx, maty, error)
   tempa = matx21 * betx_ini - matx22 * alfx_ini
   alfx = - (tempa * tempb + matx12 * matx22) / (detx*betx_ini)
   betx =   (tempb * tempb + matx12 * matx12) / (detx*betx_ini)
-!  alfx = - (tempa * tempb + matx12 * matx22) / (betx_ini)
-!  betx =   (tempb * tempb + matx12 * matx12) / (betx_ini)
-  if (abs(matx12).gt.eps) amux = amux + atan2(matx12,tempb)
+  !if (abs(matx12).gt.eps) amux = amux + atan2(matx12,tempb)
+  if (abs(matx12).gt.eps) then
+     amux = amux + atan2(matx12,tempb)
+     
+     if (atan2(matx12,tempb) .lt. zero)then
+        if (ele_body .and. abs(atan2(matx12,tempb)) > 0.1) then
+           write (warnstr,'(a,e13.6,a,a)') "Negative phase advance in x-plane ", &
+                atan2(matx12,tempb), " in the element ", name
+           call fort_warn('TWCPTK_TWISS: ', warnstr)
+           ! amux = amux + twopi
+           ! print*, " matx12 =", matx12, " tempb = ", tempb , "matx11 * betx_ini =",  matx11 * betx_ini, &
+           !      "  matx12 * alfx_ini = ",  matx12 * alfx_ini
+           ! print*, " betx_ ini = " , betx_ini, " alfx_ini = ", alfx_ini
+        endif
+     endif
+  endif
+
+
+
   
   !---- Mode 2.
   tempb = maty11 * bety_ini - maty12 * alfy_ini
   tempa = maty21 * bety_ini - maty22 * alfy_ini
   alfy = - (tempa * tempb + maty12 * maty22) / (detx*bety_ini)
   bety =   (tempb * tempb + maty12 * maty12) / (detx*bety_ini)
-!  alfy = - (tempa * tempb + maty12 * maty22) / (bety_ini)
-!  bety =   (tempb * tempb + maty12 * maty12) / (bety_ini)
-  if (abs(maty12).gt.eps) amuy = amuy + atan2(maty12,tempb)
+!  if (abs(maty12).gt.eps) amuy = amuy + atan2(maty12,tempb)
+  if (abs(maty12).gt.eps) then
+     amuy = amuy + atan2(maty12,tempb)
+     
+     if (atan2(maty12,tempb) .lt. zero) then
+        if (ele_body .and. abs(atan2(maty12,tempb)) > 0.1 ) then
+           write (warnstr,'(a,e13.6,a,a)') "Negative phase advance in y-plane ", &
+                atan2(maty12,tempb), " in the element ", name
+           call fort_warn('TWCPTK_TWISS: ', warnstr)
+           ! print*, " maty12 =", maty12, " tempb = ", tempb , "maty11 * bety_ini =",  maty11 * bety_ini, &
+           !      "  maty12 * alfy_ini = ",  maty12 * alfy_ini
+           ! print*, " bety_ ini = " , bety_ini, " alfy_ini = ", alfy_ini
+
+        endif
+     endif
+  endif
   
   error = .false.
 end SUBROUTINE twcptk_twiss

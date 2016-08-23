@@ -324,6 +324,7 @@ module twisslfi
   logical :: centre=.false., centre_cptk=.false., centre_bttk=.false., first
   logical :: rmatrix=.false., sectormap=.false., ripken=.false.
   logical :: mode_flip=.false.
+  logical :: ele_body=.false.
   
 end module twisslfi
 
