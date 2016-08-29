@@ -58,8 +58,8 @@ static void correct_setcorr(struct in_cmd*);
 static void correct_correct1(struct in_cmd*);
 static int pro_correct_getactive(int ip, int *nm, int *nx, int *nc,
 				 double *corvec, double *monvec, char *conm);
-static void pro_correct_write_results(double *monvec, double *resvec, double *corvec, 
-				      int *nx, int *nc, int *nm, int imon, int icor, int ip, 
+static void pro_correct_write_results(double *monvec, double *resvec, double *corvec,
+				      int *nx, int *nc, int *nm, int imon, int icor, int ip,
 				      int resout);
 static void pro_correct_fill_mon_table(int ip, char *name, double old, double new_);
 static void pro_correct_fill_corr_table(int ip, char *name, double old, double new_);
@@ -88,7 +88,7 @@ static int pro_correct2_getactive(int ip, int *nm, int *nx, int *nc,
 static int pro_correct2_getcorrs(struct in_cmd*);
 static int pro_correct2_getorbit(struct in_cmd*);
 static int pro_correct2_gettables(int iplane, struct in_cmd*);
-static void pro_correct2_write_results(double *monvec, double *resvec, double *corvec, 
+static void pro_correct2_write_results(double *monvec, double *resvec, double *corvec,
 				       int *nx, int *nc, int *nm, int imon, int icor, int ip,
 				       int resout);
 
@@ -152,14 +152,14 @@ static double cptp(double *r, int m) {
     if (r[i] > xhi) xhi = r[i];
   }
   xptp = xhi - xlo;
-  
+
   return (xptp);
 }
 
 static double copk(double *r, int m) {
   double xpk = { -9999. };
   int i;
-  
+
   for (i = 0; i < m; i++) {
     if (fabs(r[i]) > xpk) xpk = fabs(r[i]);
   }
@@ -202,7 +202,7 @@ static int c_micit(double *dmat, char *conm, double *monvec, double *corvec,
   myfree(rout_name, xrms);
   myfree(rout_name, xptp);
   myfree(rout_name, xiter);
-  
+
   return (ifail);
 }
 
@@ -228,7 +228,7 @@ static void c_haveit(double *dmat, double *monvec, double *corvec,
   myfree(rout_name, xd);
 }
 
-static int c_svddec(double *dmat, int imon, int icor, int *sing, 
+static int c_svddec(double *dmat, int imon, int icor, int *sing,
 		     double *sngcut, double *sngval) {
   const char *rout_name = "c_svddec";
   int flag;
@@ -245,7 +245,7 @@ static int c_svddec(double *dmat, int imon, int icor, int *sing,
   wv = mycalloc_atomic("c_svddec_wv", icor , sizeof *wv);
   sw = mycalloc_atomic("c_svddec_sw", icor , sizeof *sw);
 
-  svddec_(dmat, s, u, v, ws, wv, sw, sngcut, sngval, 
+  svddec_(dmat, s, u, v, ws, wv, sw, sngcut, sngval,
 	  &imon, &icor, &flag, sing, &debug);
 
   myfree(rout_name, s);
@@ -296,7 +296,7 @@ static int c_svdcorr(double *dmat, double *xin, double *cor, double *res,
   myfree(rout_name, xp);
   myfree(rout_name, ws);
   myfree(rout_name, wv);
-  
+
   return flag;
 }
 
@@ -309,14 +309,14 @@ static void fill_orbit_table(struct table* t_out, struct table* t_in)
     if (strstr(t_in->s_cols[1][i], "monitor")) {
       for (j = 0; j < t_out->num_cols; j++) {
   if ((pos = name_list_pos(t_out->columns->names[j], t_in->columns)) > -1) {
-    if (t_out->columns->inform[j] < 3) 
+    if (t_out->columns->inform[j] < 3)
       t_out->d_cols[j][t_out->curr] = t_in->d_cols[pos][i];
-    else 
+    else
       t_out->s_cols[j][t_out->curr] = tmpbuff( t_in->s_cols[pos][i]);
   } else {
-    if (t_out->columns->inform[j] < 3) 
+    if (t_out->columns->inform[j] < 3)
       t_out->d_cols[j][t_out->curr] = zero;
-    else 
+    else
       t_out->s_cols[j][t_out->curr] = tmpbuff(blank);
   }
       }
@@ -327,7 +327,7 @@ static void fill_orbit_table(struct table* t_out, struct table* t_in)
 
 static void correct_setcorr(struct in_cmd* cmd) {
   // 2013-Dec-04  08:56:16  ghislain: The command SETCORR is not documented.
-  
+
   /* read the correctors from named table and stores
      them in the nodes of the sequence at
      "->chkick" and "->cvkick". Subsequent Twiss will
@@ -365,7 +365,7 @@ static void correct_setcorr(struct in_cmd* cmd) {
 
   if ((namtab = command_par_string("table", cmd->clone)) != NULL ) {
     printf("Want to use named table: %s\n", namtab);
-    if (name_list_pos(namtab, table_register->names) > -1) { 
+    if (name_list_pos(namtab, table_register->names) > -1) {
       printf("The table ==> %s <=== was found \n", namtab);
     } else {
       /* fatal_error("Corrector table requested, but not existing:",namtab); */
@@ -390,24 +390,24 @@ static void correct_setcorr(struct in_cmd* cmd) {
     ix += double_from_table_row(namtab, "px.correction", &i, &xnew);
     ix += double_from_table_row(namtab, "py.correction", &i, &ynew);
 
-    if (ix == 0) { // 2013-Dec-02  18:19:55  ghislain: what was that supposed to test ? 
-                   // Before: just the last return value above, Now: any of the above return values ? 
+    if (ix == 0) { // 2013-Dec-02  18:19:55  ghislain: what was that supposed to test ?
+                   // Before: just the last return value above, Now: any of the above return values ?
       stolower(name);
       strcpy(slname, strip(name));
       supp_tb(slname);
-      
+
       /* printf("corrs: %s %d %e %e %e %e\n",name,ix,xold,yold,xnew,ynew); */
       nextnode = mysequ->ex_start;
       while (nextnode != ndexe) {
 	stolower(name);
 	strcpy(slname, strip(name));
 	supp_tb(slname);
-	
+
 	strcpy(nname, nextnode->name);
 	stolower(nname);
 	strcpy(slnname, strip(nname));
 	supp_tb(slnname);
-		
+
 	if (strcmp(slname, slnname) == 0) {
 	  nextnode->chkick += xnew;
 	  nextnode->cvkick += ynew;
@@ -415,7 +415,7 @@ static void correct_setcorr(struct in_cmd* cmd) {
 	} else {
 	  nextnode = nextnode->next;
 	}
-      }      
+      }
     }
     i++;
   }
@@ -430,11 +430,11 @@ static void correct_readcorr(struct in_cmd* cmd) {
      "->chkick" and "->cvkick". Subsequent Twiss will
      use them correctly.
      ===> Must be preceded by a call to "read_table"
-     
+
      ===> Watch out, does not yet take care of existing corrector
      ===> settings already present in sequence
      2013-Dec-04  10:43:32  ghislain: I think this is done already (see code)
-     
+
      ===> Always uses table with name "corr", will change ...
   */
 
@@ -466,16 +466,16 @@ static void correct_readcorr(struct in_cmd* cmd) {
   i = 1;
   ix = 0;
 
-  while (ix == 0) { 
+  while (ix == 0) {
     // loop over all elements in table corr (indexed with i)
-    
+
     // 2013-Dec-04  10:48:48  ghislain: changed ix= into ix+=
     ix += string_from_table_row("corr", "name", &i, name);
     ix += double_from_table_row("corr", "px.correction", &i, &xnew);
     ix += double_from_table_row("corr", "py.correction", &i, &ynew);
 
-    if (ix == 0) { // 2013-Dec-02  18:19:55  ghislain: what was that supposed to test ? 
-                   // Before: just the last return value above, Now: any of the above return values ? 
+    if (ix == 0) { // 2013-Dec-02  18:19:55  ghislain: what was that supposed to test ?
+                   // Before: just the last return value above, Now: any of the above return values ?
       nextnode = mysequ->ex_start;
       while (nextnode != ndexe) {
 	// loop over all elements in the sequence; look for the corrector "name"
@@ -483,23 +483,23 @@ static void correct_readcorr(struct in_cmd* cmd) {
 	stolower(lname);
 	strcpy(slname, strip(lname));
 	uslname = supp_tb(slname);
-	
+
 	strcpy(nname, nextnode->name);
 	strcpy(lnname, nname);
 	stolower(lnname);
 	strcpy(slnname, strip(lnname));
 	uslnname = supp_tb(slnname);
-	
+
 	if (strcmp(uslname, uslnname) == 0) {
 	  // found element "nname" matches the corrector "name"
-	  // add the kicks read from corr table for corrector "name" to the 
+	  // add the kicks read from corr table for corrector "name" to the
 	  // already existing kick values for element "nname"
 	  nextnode->chkick += xnew;
 	  nextnode->cvkick += ynew;
-	  // and call it quit for this corrector by placing ourselves at end of sequence 
-	  // which will break the loop over sequence nodes. 
+	  // and call it quit for this corrector by placing ourselves at end of sequence
+	  // which will break the loop over sequence nodes.
 	  nextnode = ndexe;
-	} else 
+	} else
 	  {
 	    // the "nname" element does not match the "name" corector; continue along the sequence.
 	    nextnode = nextnode->next;
@@ -556,7 +556,7 @@ static void correct_prtcorr(struct in_cmd* cmd)
       double_to_table_curr("seqcorr","px.correction",&nextnode->chkick);
       //double_to_table_curr("seqcorr","vkick",&nextnode->cvkick);
       double_to_table_curr("seqcorr","py.correction",&nextnode->cvkick);
-      augment_count("seqcorr");  
+      augment_count("seqcorr");
     }
     nextnode = nextnode->next;
   }
@@ -588,7 +588,7 @@ static void correct_correct2(struct in_cmd* cmd)
     double  sigcut;
   */
 
-  int ix, im, ip; 
+  int ix, im, ip;
   int i, j, nnnseq;
   int imon, icor;
   int ncorr, nmon;
@@ -612,20 +612,20 @@ static void correct_correct2(struct in_cmd* cmd)
   //    struct id_mic2   *m;
 
   int debug = get_option("debug");
-  
+
   /* If only Twiss summary is required prepare and write it */
   if ((twism = command_par_value("twissum", cmd->clone)) > 0) {
 
-    if (!ftdata && !(ftdata = fopen("twiss.sum" , "w"))) 
+    if (!ftdata && !(ftdata = fopen("twiss.sum" , "w")))
       fatal_error("Cannot open file twiss.sum with write access", ", MAD-X terminates ");
 
     j = 1;
     if ((nnnseq = get_variable("n")) == 0)   nnnseq = twism;
-    
-    double_from_table_row("summ", "xcomax", &j, &tmp1); 
-    double_from_table_row("summ", "xcorms", &j, &tmp2); 
-    double_from_table_row("summ", "ycomax", &j, &tmp3); 
-    double_from_table_row("summ", "ycorms", &j, &tmp4); 
+
+    double_from_table_row("summ", "xcomax", &j, &tmp1);
+    double_from_table_row("summ", "xcorms", &j, &tmp2);
+    double_from_table_row("summ", "ycomax", &j, &tmp3);
+    double_from_table_row("summ", "ycorms", &j, &tmp4);
     fprintf(ftdata, " T: %d %e %e %e %e\n", nnnseq, tmp1, tmp2, tmp3, tmp4);
     printf("TWISSUM: Data from twiss summary written to twiss.summ; aborting correction\n");
     fflush(ftdata);
@@ -656,11 +656,11 @@ static void correct_correct2(struct in_cmd* cmd)
   /* Prepare file descriptors for the output */
   resout = command_par_value("resout", cmd->clone);
   if (resout > 0) {
-    if (!fddata && !(fddata = fopen("corr.out" , "w"))) 
+    if (!fddata && !(fddata = fopen("corr.out" , "w")))
       fatal_error("Cannot open file corr.out with write access", ", MAD-X terminates ");
-    if (!fcdata && !(fcdata = fopen("stren.out", "w")))   
+    if (!fcdata && !(fcdata = fopen("stren.out", "w")))
       fatal_error("Cannot open file stren.out with write access", ", MAD-X terminates ");
-    if (!fgdata && !(fgdata = fopen("plot.orb", "w")))  
+    if (!fgdata && !(fgdata = fopen("plot.orb", "w")))
       fatal_error("Cannot open file plot.orb with write access", ", MAD-X terminates ");
   }
 
@@ -675,10 +675,10 @@ static void correct_correct2(struct in_cmd* cmd)
   conm =   mycalloc_atomic("correct_correct2_conm",   ncorr*16, sizeof *conm);
 
   /* get original settings of correctors from input Twiss-table */
-  pro_correct2_getcorrs(cmd); 
+  pro_correct2_getcorrs(cmd);
 
   /* get input orbit, default is from input Twiss-table */
-  pro_correct2_getorbit(cmd); 
+  pro_correct2_getorbit(cmd);
 
   /* find and prepare enabled correctors and monitors, may be repeated */
   ix = pro_correct2_getactive(ip, nm, nx, nc, corvec, monvec, conm);
@@ -725,7 +725,7 @@ static void correct_correct2(struct in_cmd* cmd)
     }
 
     rms = 1000.0 * command_par_value("error", cmd->clone);
-    
+
     ifail = c_micit(dmat, conm, monvec, corvec, resvec, nx, rms, imon, icor, niter);
     if (debug) printf("Back from micado %d\n", ifail);
 
@@ -745,7 +745,7 @@ static void correct_correct2(struct in_cmd* cmd)
       }
       fflush(fgdata);
     }
-  
+
     c = correct_orbit12->cor_table;
     for (i = 0; i < icor; i++) {
       printf("%s %e\n", c[nc[i]].p_node->name, corvec[nx[i] - 1]);
@@ -793,27 +793,27 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
   struct id_mic2 *mon_l1, *mon_l2;
   struct id_mic2 *cor_l12, *mon_l12;
   struct id_mic2 *prt;
-  
+
   // struct table *ttb; // not used
-  
+
   struct table *b1 = NULL;
   struct table *b2 = NULL;
-  
+
   char* orbtab1;
   char* orbtab2;
-  
+
   int t1, t2;
   int ebl1, ebl2;
-  
+
   int j, k;
-  
+
   int cntm1 = 0;
   int cntc1 = 0;
   int cntm2 = 0;
   int cntc2 = 0;
   int cntm12 = 0;
   int cntc12 = 0;
-  
+
   double ounits;
 
   /*
@@ -915,7 +915,7 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
 	  if (iplane == 2)
 	    cor_l1->p_node_s1->cvkick = 0.0;
 	}
-	
+
 	cor_l1->next = cor_l1;
 	cor_l1->next++;
 	cor_l1++;
@@ -925,10 +925,10 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
       }
     }
   }
-  
+
   mon_l2 = mon_l1;
   cor_l2 = cor_l1;
-  
+
   for (j = 0; j < b2->curr; j++) {
     if ((strncmp(atm[iplane - 1], b2->p_nodes[j]->base_name, 4) == 0)
 	|| (strncmp(atm[2], b2->p_nodes[j]->base_name, 4) == 0)) {
@@ -957,14 +957,14 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
 	cor_l2->p_node = b2->p_nodes[j];
 	cor_l2->p_node_s2 = b2->p_nodes[j];
 	cor_l2->p_node_s1 = NULL;
-	
+
 	if (command_par_value("corzero", cmd->clone) > 0) {
 	  if (iplane == 1)
 	    cor_l2->p_node_s2->chkick = 0.0;
 	  if (iplane == 2)
 	    cor_l2->p_node_s2->cvkick = 0.0;
 	}
-	
+
 	cor_l2->next = cor_l2;
 	cor_l2->next++;
 	cor_l2++;
@@ -974,7 +974,7 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
       }
     }
   }
-  
+
   mon_l12 = mon_l2;
   cor_l12 = cor_l2;
   for (j = 0; j < b1->curr; j++) {
@@ -1016,14 +1016,14 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
 	ebl1 = b1->p_nodes[cor_l12->id_ttb[0]]->enable;
 	ebl2 = b2->p_nodes[cor_l12->id_ttb[1]]->enable;
 	cor_l12->enable = ebl1*ebl2;
-	
+
 	if (command_par_value("corzero", cmd->clone) > 0) {
 	  if(iplane == 1) cor_l12->p_node_s1->chkick = 0.0;
 	  if(iplane == 2) cor_l12->p_node_s1->cvkick = 0.0;
 	  if(iplane == 1) cor_l12->p_node_s2->chkick = 0.0;
 	  if(iplane == 2) cor_l12->p_node_s2->cvkick = 0.0;
 	}
-	
+
 	cor_l12->next = cor_l12;
 	cor_l12->next++; cor_l12++;
 	cntc12++;
@@ -1032,7 +1032,7 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
       }
     }
   }
-  
+
   /* terminate linked list   */
   mon_l12--;
   mon_l12->next = NULL;
@@ -1042,7 +1042,7 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
   printf("mons and corrs (beam 1)   : %ld %ld\n", (long int) cntm1,  (long int) cntc1);
   printf("mons and corrs (beam 2)   : %ld %ld\n", (long int) cntm2,  (long int) cntc2);
   printf("mons and corrs (beam 1+2) : %ld %ld\n", (long int) cntm12, (long int) cntc12);
-  
+
   if (get_option("debug")) {
     prt = correct_orbit12->mon_table;
     while (prt != NULL ) {
@@ -1050,7 +1050,7 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
 	     (long int) prt->id_ttb[0], (long int) prt->id_ttb[1]);
       prt = prt->next;
     }
-    
+
     prt = correct_orbit12->cor_table;
     while (prt != NULL ) {
       printf("Correctors beam12: %s %ld %ld\n", prt->p_node->name,
@@ -1068,18 +1068,18 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
     corr_table2 = make_table("corr2", "corr2", corr_table_cols, corr_table_types, 15000);
     add_to_table_list(corr_table2, table_register);
   }
-  
+
   pro_correct2_make_corr_table();
-  
+
   if (mon_table == NULL ) {
     mon_table = make_table("mon", "mon", mon_table_cols, mon_table_types, 15000);
     add_to_table_list(mon_table, table_register);
     pro_correct2_make_mon_table();
   }
-  
-  // 2013-Jun-24  12:21:49  ghislain: 
-  // following is a kludge to return a single value but has to be decoded on other side.    
-  if( cntc1+cntc2+cntc12 >= 30000) 
+
+  // 2013-Jun-24  12:21:49  ghislain:
+  // following is a kludge to return a single value but has to be decoded on other side.
+  if( cntc1+cntc2+cntc12 >= 30000)
     fatal_error("Found more than 30000 correctors; decoding in mad_orbit.c will fail",
     "Please report this issue to MAD developpers (mad@cern.ch)");
   return 30000 * (cntm1 + cntm2 + cntm12) + cntc1 + cntc2 + cntc12;
@@ -1088,7 +1088,7 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
 static int pro_correct2_getorbit(struct in_cmd* cmd) {
   struct name_list* nl;
   int pos;
-  
+
   struct id_mic2 *m; /* access to tables for monitors and correctors */
   double **da1;
   double **da2;
@@ -1105,30 +1105,30 @@ static int pro_correct2_getorbit(struct in_cmd* cmd) {
   da2 = twiss_table_beam2->d_cols;
 
   nl = cmd->clone->par_names;
-  
+
   m = correct_orbit12->mon_table;
-  
+
   strcpy(strx, "x");
   strcpy(stry, "y");
-  
-  if ((posx = name_list_pos(strx, twiss_table_beam1->columns)) < 0) 
+
+  if ((posx = name_list_pos(strx, twiss_table_beam1->columns)) < 0)
     fatal_error("orbit x not found in input table", ", MAD-X terminates ");
-  
-  if ((posy = name_list_pos(stry, twiss_table_beam1->columns)) < 0) 
+
+  if ((posy = name_list_pos(stry, twiss_table_beam1->columns)) < 0)
     fatal_error("orbit y not found in input table", ", MAD-X terminates ");
-  
+
   if (debug) {
-    if ((pospx = name_list_pos("px", twiss_table_beam1->columns)) < 0) 
+    if ((pospx = name_list_pos("px", twiss_table_beam1->columns)) < 0)
       warning("orbit px not found in input table", ", MAD-X continues ");
-    
-    if ((pospy = name_list_pos("py", twiss_table_beam1->columns)) < 0) 
+
+    if ((pospy = name_list_pos("py", twiss_table_beam1->columns)) < 0)
       warning("orbit py not found in input table", ", MAD-X continues ");
-    
+
     printf("====c1===>  %d %d %d %d \n", posx, posy, pospx, pospy);
   }
-  
+
   while (m) {
-    
+
     /* If correction to target orbit, subtract the wanted orbit ... */
     if (m->id_ttb[0] > 0) {
       m->val.before[0] = m->p_node->other_bv * da1[9] [m->id_ttb[0]] * 1000;
@@ -1139,7 +1139,7 @@ static int pro_correct2_getorbit(struct in_cmd* cmd) {
     } else {
       fatal_error("Unforeseen case in pro_correct2_getorbit", ", MAD-X terminates ");
     }
-    
+
     pos = name_list_pos("monon", nl);
     if (nl->inform[pos] > 0) {
       xlimit = command_par_value("monon", cmd->clone);
@@ -1148,7 +1148,7 @@ static int pro_correct2_getorbit(struct in_cmd* cmd) {
 	printf("Monitor %s disabled\n", m->p_node->name);
       }
     }
-    
+
     if (debug) {
       printf("m-list: %d %d %s %s\n", m->id_ttb[0], m->id_ttb[1], m->p_node->name, m->p_node->base_name);
       printf("initial reading: %e %e\n\n", m->val.before[0], m->val.before[1]);
@@ -1234,13 +1234,13 @@ static int pro_correct2_getactive(int ip, int *nm, int *nx, int *nc,
     icora++;
     c = c->next;
   };
-  
-  // 2013-Jun-24  12:21:49  ghislain: 
-  // following is a kludge to return a single value but has to be decoded on other side.    
-  if(icor >= 30000) 
+
+  // 2013-Jun-24  12:21:49  ghislain:
+  // following is a kludge to return a single value but has to be decoded on other side.
+  if(icor >= 30000)
     fatal_error("Found more than 30000 correctors; decoding in mad_orbit.c will fail",
     "Please report this issue to MAD developpers (mad@cern.ch)");
-  
+
   return (30000 * imon + icor);
 }
 
@@ -1260,7 +1260,7 @@ static double* pro_correct2_response_ring(int ip, int nc, int nm) {
   int i_zero, i_one;
   int icb;
   int i, j;
-  
+
   int debug = get_option("debug");
 
   ic = 0;
@@ -1287,12 +1287,12 @@ static double* pro_correct2_response_ring(int ip, int nc, int nm) {
   while (c) {
     if (debug)
       printf("corrector flag: %d\n", c->enable);
-    
+
     if (c->enable == 1) {
-      
+
       for (icb = 0; icb < 2; icb++) { // correcting for two beams respectively 0 and 1
 	if (c->id_ttb[icb] > 0) {
-	  
+
 	  if (icb == 0) { // beam1
 	    correct_orbit12->qx0 = da1[5][twiss_table_beam1->curr - 1];
 	    correct_orbit12->qy0 = da1[8][twiss_table_beam1->curr - 1];
@@ -1326,10 +1326,10 @@ static double* pro_correct2_response_ring(int ip, int nc, int nm) {
 	      piy_c = 0.0;
 	    }
 	  }
-	  
+
 	  m = correct_orbit12->mon_table;
 	  im = 0;
-	  
+
 	  while (m) {
 	    if (debug)
 	      printf("monitor flag: %d\n", m->enable);
@@ -1342,7 +1342,7 @@ static double* pro_correct2_response_ring(int ip, int nc, int nm) {
 		    by_m = da1[6][mp];
 		    pix_m = da1[5][mp];
 		    piy_m = da1[8][mp];
-		  } else { // beam2 
+		  } else { // beam2
 		    mp = m->id_ttb[icb];
 		    bx_m = da2[3][mp];
 		    by_m = da2[6][mp];
@@ -1354,11 +1354,11 @@ static double* pro_correct2_response_ring(int ip, int nc, int nm) {
 		  by_m = 0.0;
 		  pix_m = 0.0;
 		  piy_m = 0.0;
-		}   
-		
+		}
+
 		respx = 0.0;
 		respy = 0.0;
-		
+
 		/*  print Twiss parameters ... */
 		if (debug) {
 		  printf("%s %d %e %e %e %e -- %s %e %e %e %e\n",
@@ -1366,7 +1366,7 @@ static double* pro_correct2_response_ring(int ip, int nc, int nm) {
 			 pix_c, piy_c, m->p_node->name, bx_m,
 			 by_m, pix_m, piy_m);
 		}
-		
+
 		if (ip == 1) { // x plane
 		  respx = sqrt(bx_m * bx_c) / (2.0 * sin(pi * qx0) ) * cos((fabs(pix_m - pix_c) * twopi) - qx0 * pi);
 		  setup_(&respx, dmat, &im, &ic, &nm, &nc);
@@ -1374,7 +1374,7 @@ static double* pro_correct2_response_ring(int ip, int nc, int nm) {
 		  respy = sqrt(by_m * by_c) / (2.0 * sin(pi * qy0)) * cos((fabs(piy_m - piy_c) * twopi) - qy0 * pi);
 		  setup_(&respy, dmat, &im, &ic, &nm, &nc);
 		}
-		
+
 		if ((fabs(respy) > 0.000006) || (fabs(respx) > 0.000006)) {
 		  if (debug) printf("true %d %d\n", ic, im);
 		  setupi_(&i_one, imat, &im, &ic, &nm, &nc);
@@ -1382,9 +1382,9 @@ static double* pro_correct2_response_ring(int ip, int nc, int nm) {
 		  if (debug) printf("false \n");
 		  setupi_(&i_zero, imat, &im, &ic, &nm, &nc);
 		}
-		
+
 		if (debug) printf("Response:  %d %d %e %e %e \n", ic, im, respx, respy, fabs(respy));
-		
+
 	      }
 	      im++;
 	    }
@@ -1396,7 +1396,7 @@ static double* pro_correct2_response_ring(int ip, int nc, int nm) {
     }
     c = c->next;
   }
-  
+
   if (debug) {
     printf("\n");
     primat_(imat, &nm, &nc);
@@ -1405,15 +1405,15 @@ static double* pro_correct2_response_ring(int ip, int nc, int nm) {
     printf("\n");
     printf("\n");
   }
-  
+
   myfree("pro_correct2_response_ring", imat);
-  
+
   return dmat;
 }
 
-static void pro_correct2_write_results(double *monvec, double *resvec, double *corvec, 
-				       int *nx, int *nc, int *nm, int imon, int icor, int ip, 
-				       int resout) 
+static void pro_correct2_write_results(double *monvec, double *resvec, double *corvec,
+				       int *nx, int *nc, int *nm, int imon, int icor, int ip,
+				       int resout)
 {
   /*                                              */
   /* Writes a summary of the correction           */
@@ -1444,7 +1444,7 @@ static void pro_correct2_write_results(double *monvec, double *resvec, double *c
 	   caverage(monvec,imon), cstddev(monvec,imon), crms(monvec, imon), cptp(monvec, imon));
     printf("after correction:  %f        %f          %f        %f \n\n\n",
 	   caverage(resvec,imon), cstddev(resvec,imon), crms(resvec, imon), cptp(resvec, imon));
-  }  
+  }
 
   if (print_correct_opt > 1) {
     printf("Monitor:  Before:     After:    Difference:\n");
@@ -1452,10 +1452,10 @@ static void pro_correct2_write_results(double *monvec, double *resvec, double *c
   }
 
   for (i = 0; i < imon; i++) {
-    if (print_correct_opt > 1) 
-      printf("%s   %-4.3f     %-4.3f     %-4.3f\n", 
+    if (print_correct_opt > 1)
+      printf("%s   %-4.3f     %-4.3f     %-4.3f\n",
 	     m[nm[i]].p_node->name, monvec[i], resvec[i], resvec[i] - monvec[i]);
-    
+
     m[nm[i]].val.after[ip - 1] = resvec[i];
     pro_correct2_fill_mon_table(ip, m[nm[i]].p_node->name, monvec[i], resvec[i]);
   }
@@ -1468,7 +1468,7 @@ static void pro_correct2_write_results(double *monvec, double *resvec, double *c
   } else {
     printf("Max strength: %e is below corrector strength limit: %e\n", corrm, corrl);
   }
-  
+
   set_variable("corrmax", &corrm);
 
   if (print_correct_opt > 1) {
@@ -1491,7 +1491,7 @@ static void pro_correct2_write_results(double *monvec, double *resvec, double *c
       /* Fill horizontal corrections for beam 1  */
       if (c[nc[i]].id_ttb[0] > 0) {
 	c[nc[i]].p_node_s1->chkick += c[nc[i]].p_node_s1->other_bv * 0.001 * corvec[nx[i] - 1];
-	pro_correct2_fill_corr_table(0, ip, c[nc[i]].p_node->name, c[nc[i]].val.before[ip - 1] * 0.001, 
+	pro_correct2_fill_corr_table(0, ip, c[nc[i]].p_node->name, c[nc[i]].val.before[ip - 1] * 0.001,
 				     c[nc[i]].p_node_s1->chkick);
 	/* ??? c[nc[i]].p_node_s1->other_bv*0.001*corvec[nx[i]-1]); */
 	if (fcdata != NULL ) {
@@ -1506,7 +1506,7 @@ static void pro_correct2_write_results(double *monvec, double *resvec, double *c
 				     c[nc[i]].p_node_s2->chkick);
 	/* ??? c[nc[i]].p_node_s2->other_bv*0.001*corvec[nx[i]-1]); */
 	if (fcdata != NULL ) {
-	  fprintf(fcdata, "%s->hkick = %e; \t! [2] %d\n", strip(c[nc[i]].p_node->name), 
+	  fprintf(fcdata, "%s->hkick = %e; \t! [2] %d\n", strip(c[nc[i]].p_node->name),
 		  0.001 * corvec[nx[i] - 1], resout);
 	}
       }
@@ -1530,32 +1530,32 @@ static void pro_correct2_write_results(double *monvec, double *resvec, double *c
 				     c[nc[i]].p_node_s2->cvkick);
 	/* ??? c[nc[i]].p_node_s2->other_bv*0.001*corvec[nx[i]-1]); */
 	if (fcdata != NULL ) {
-	  fprintf(fcdata, "%s->vkick = %e; \t! [2] %d\n", strip(c[nc[i]].p_node->name), 
+	  fprintf(fcdata, "%s->vkick = %e; \t! [2] %d\n", strip(c[nc[i]].p_node->name),
 		  0.001 * corvec[nx[i] - 1], resout);
 	}
       }
     }
-    
+
   } /* end loop over correctors */
-  
+
   if (fcdata != NULL ) fflush(fcdata);
-  if (fddata != NULL ) fflush(fddata);  
-  
+  if (fddata != NULL ) fflush(fddata);
+
 }
 
 static void correct_correct1(struct in_cmd* cmd)
 /* Steering routine for orbit corrections of one beam */
 {
   const char *rout_name = "correct_correct";
-  int ix, im, ip, idrop; 
-  int j, nnnseq; 
+  int ix, im, ip, idrop;
+  int j, nnnseq;
   int imon, icor;
   int ncorr, nmon;
   int niter;
   int resout;
 
   int twism;
-  int ifail, sflag; 
+  int ifail, sflag;
   double rms;
   double sngcut, sngval;
   double tmp1, tmp2, tmp3, tmp4;
@@ -1578,13 +1578,13 @@ static void correct_correct1(struct in_cmd* cmd)
 	fatal_error("Cannot open file twiss.summ with write access", ", MAD-X terminates ");
     }
     j = 1;
-    if ((nnnseq = get_variable("n")) == 0) 
+    if ((nnnseq = get_variable("n")) == 0)
       nnnseq = twism;
-    
-    double_from_table_row("summ", "xcomax", &j, &tmp1); 
-    double_from_table_row("summ", "xcorms", &j, &tmp2); 
-    double_from_table_row("summ", "ycomax", &j, &tmp3); 
-    double_from_table_row("summ", "ycorms", &j, &tmp4); 
+
+    double_from_table_row("summ", "xcomax", &j, &tmp1);
+    double_from_table_row("summ", "xcorms", &j, &tmp2);
+    double_from_table_row("summ", "ycomax", &j, &tmp3);
+    double_from_table_row("summ", "ycorms", &j, &tmp4);
     fprintf(ftdata, " T: %d %e %e %e %e\n", nnnseq, tmp1, tmp2, tmp3, tmp4);
     printf("TWISSUM: Data from twiss summary written to twiss.summ; aborting correction\n");
     fflush(ftdata);
@@ -1596,12 +1596,12 @@ static void correct_correct1(struct in_cmd* cmd)
   ncorr = im % 30000;
   nmon = im / 30000;
   printf("%d monitors and %d correctors found in input\n", nmon, ncorr);
-  
+
   if (nmon == 0) {
     printf("No monitor found in input, no correction done\n");
     return;
   }
-  
+
   if (ncorr == 0) {
     printf("No corrector found in input, no correction done\n");
     return;
@@ -1610,9 +1610,9 @@ static void correct_correct1(struct in_cmd* cmd)
   /* Prepare file descriptors for the output */
   resout = command_par_value("resout", cmd->clone);
   if (resout > 0) {
-    if (!fddata && !(fddata = fopen("corr.out" , "w"))) 
+    if (!fddata && !(fddata = fopen("corr.out" , "w")))
       fatal_error("Cannot open file corr.out with write access", ", MAD-X terminates ");
-    if (!fcdata && !(fcdata = fopen("stren.out", "w")))   
+    if (!fcdata && !(fcdata = fopen("stren.out", "w")))
       fatal_error("Cannot open file stren.out with write access", ", MAD-X terminates ");
   }
 
@@ -1625,23 +1625,23 @@ static void correct_correct1(struct in_cmd* cmd)
   monvec = mycalloc("correct_correct_monvec",nmon,    sizeof(double));
   resvec = mycalloc("correct_correct_resvec",nmon,    sizeof(double));
   conm =   mycalloc("correct_correct_conm",  ncorr*16,sizeof(char));
-  
+
   /* get original settings of correctors from input Twiss-table */
-  pro_correct_getcorrs(cmd); 
-  
+  pro_correct_getcorrs(cmd);
+
   /* get input orbit, default is from input Twiss-table */
   /* if flag "extern" is true: can be from external table */
   if (command_par_value("extern", cmd->clone))
-    pro_correct_getorbit_ext(cmd); 
+    pro_correct_getorbit_ext(cmd);
   else
-    pro_correct_getorbit(cmd); 
+    pro_correct_getorbit(cmd);
 
   /* find and prepare enabled correctors and monitors, may be repeated */
   ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
   icor = ix % 30000;
   imon = ix / 30000;
   printf("%d monitors and %d correctors enabled\n", imon, icor);
-  
+
   /* normalized cut on beam position, if requested */
   if ((sigcut = command_par_value("moncut", cmd->clone)) > 0) {
     idrop = pro_correct_filter(ip, sigcut);
@@ -1652,7 +1652,7 @@ static void correct_correct1(struct in_cmd* cmd)
     printf("After filter of %-2.2f sigma:\n", sigcut);
     printf("%d monitors and %d correctors enabled\n", imon, icor);
   }
-  
+
   /* set up response matrix for ring or line */
   corl = correct_orbit->cor_table;
 
@@ -1661,57 +1661,57 @@ static void correct_correct1(struct in_cmd* cmd)
     if (dmat != NULL ) myfree(rout_name, dmat);
     /* icor and imon used to set up correct matrix size !! */
     dmat = pro_correct_response_ring(ip, icor, imon);
-    
-    // SVD CONDITIONING 
-    if (command_par_value("cond", cmd->clone) == 1) { 
+
+    // SVD CONDITIONING
+    if (command_par_value("cond", cmd->clone) == 1) {
       sngcut = command_par_value("sngcut", cmd->clone);
       sngval = command_par_value("sngval", cmd->clone);
       printf("SVD conditioning requested ...\n");
       if (debug) printf("Conditioning parameters: %e %e\n", sngcut, sngval);
-      
+
       sflag = c_svddec(dmat, imon, icor, sing, &sngcut, &sngval);
       printf("Initially found %d singular values\n", sflag);
-      
+
       for (ix = 0; ix < sflag; ix++) {
 	corl[nx[sing[2 * ix + 0]]].enable = 0;
 	if (debug)
 	  printf("Removed:   %d %s\n", nx[sing[2 * ix + 0]], corl[nx[sing[2 * ix + 0]]].p_node->name);
       }
-      
+
       /* find and prepare enabled correctors and monitors, may be repeated */
       ix = pro_correct_getactive(ip, nm, nx, nc, corvec, monvec, conm);
       icor = ix % 30000;
-      imon = ix / 30000;      
+      imon = ix / 30000;
       printf("After SVD conditioning:             \n");
       printf("%d monitors and %d correctors enabled\n\n", imon, icor);
-      
+
       if (dmat != NULL ) myfree(rout_name, dmat);
-      
+
       /* icor and imon used to set up correct matrix size !! */
       dmat = pro_correct_response_ring(ip, icor, imon);
       sflag = c_svddec(dmat, imon, icor, sing, &sngcut, &sngval);
       printf("Finally found %d singular values\n", sflag);
     } //end SVD Conditioning
-    
+
   } // END RING
 
-  // LINE  
+  // LINE
   else if (strcmp("line", command_par_string("flag", cmd->clone)) == 0) {
     if (dmat != NULL ) myfree(rout_name, dmat);
     printf("make response for line\n");
     dmat = pro_correct_response_line(ip, icor, imon);
-    
+
     // SVD CONDITIONING
-    if (command_par_value("cond", cmd->clone) == 1) { 
+    if (command_par_value("cond", cmd->clone) == 1) {
       sngcut = command_par_value("sngcut", cmd->clone);
       sngval = command_par_value("sngval", cmd->clone);
       printf("SVD conditioning requested ...\n");
       if (debug)
 	printf("Conditioning parameters: %e %e\n", sngcut, sngval);
-      
+
       sflag = c_svddec(dmat, imon, icor, sing, &sngcut, &sngval);
       printf("Initially found %d singular values\n", sflag);
-      
+
       for (ix = 0; ix < sflag; ix++) {
 	corl[nx[sing[2 * ix + 0]]].enable = 0;
 	if (debug)
@@ -1762,7 +1762,7 @@ static void correct_correct1(struct in_cmd* cmd)
   /* MICADO correction, get desired number of correctors from command */
   else if (strcmp("micado", command_par_string("mode", cmd->clone)) == 0) {
     printf("enter MICADO correction ...\n");
-    
+
     niter = command_par_value("ncorr", cmd->clone);
     if (niter == 0) {
       printf("Requested %d correctors (\?\?\?) set to %d\n", niter, icor);
@@ -1776,10 +1776,10 @@ static void correct_correct1(struct in_cmd* cmd)
       printf("ncorr reset to %d\n", icor);
       niter = icor;
     }
-    
+
     /* specifies the maximum RMS value of the orbit to be reached by the correction algorithm.*/
     rms = 1000.0 * command_par_value("error", cmd->clone);
-    
+
     ifail = c_micit(dmat, conm, monvec, corvec, resvec, nx, rms, imon, icor, niter);
 
     if (ifail == 0)
@@ -1789,7 +1789,7 @@ static void correct_correct1(struct in_cmd* cmd)
       warning("MICADO back with error", ", no correction done");
     }
   }
-  
+
   else { // neither LSQ, nor SVD, nor MICADO correction type
     fatal_error("Invalid correction mode in CORRECT command", ", MAD-X terminates ");
   }
@@ -1833,18 +1833,18 @@ static void correct_correct(struct in_cmd* cmd)
       fatal_error("Two beam correction requested but no table supplied for beam 2", orbtab2);
 
     printf("Want to use orbits from: %s and : %s\n", orbtab1, orbtab2);
-    
+
     correct_correct2(cmd);
 
   } else {
     printf("Want to correct orbit of a single ring\n");
 
-    if ((orbtab1 = command_par_string("beam1tab", cmd->clone)) != NULL ) 
+    if ((orbtab1 = command_par_string("beam1tab", cmd->clone)) != NULL )
       warning("Single beam correction requested but beam 1 table supplied; specified table ignored:", orbtab1);
- 
-    if ((orbtab2 = command_par_string("beam2tab", cmd->clone)) != NULL ) 
+
+    if ((orbtab2 = command_par_string("beam2tab", cmd->clone)) != NULL )
       warning("Single beam correction requested but beam 2 table supplied; specified table ignored:", orbtab2);
-    
+
     correct_correct1(cmd);
   }
 }
@@ -1856,7 +1856,7 @@ static void pro_correct_option(struct in_cmd* cmd)
   int i;
   int val, pos, seed;
 
-  int debug = get_option("debug"); 
+  int debug = get_option("debug");
 
   if (debug) {
     fprintf(prt_file, "in coption routine\n");
@@ -1864,7 +1864,7 @@ static void pro_correct_option(struct in_cmd* cmd)
       fprintf(prt_file, "command(s): %s\n",cmd->tok_list->p[i]);
     }
   }
-  
+
   if ((pos = name_list_pos("seed", nl)) > -1)
     {
       if (nl->inform[pos])
@@ -1901,7 +1901,7 @@ static int pro_correct_getcommands(struct in_cmd* cmd) {
     warning("CORRECT, but no active sequence:", "ignored");
     return (-1);
   }
-  
+
   strcpy(plane, command_par_string(att[1], cmd->clone));
   if      (strcmp("x", plane) == 0) iplane = 1;
   else if (strcmp("y", plane) == 0) iplane = 2;
@@ -1911,7 +1911,7 @@ static int pro_correct_getcommands(struct in_cmd* cmd) {
     printf("No valid plane specified, x plane used \n");
     iplane = 1;
   }
-  
+
   return (iplane);
 }
 
@@ -1974,7 +1974,7 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
     if (debug)
       printf("No target orbit requested\n");
   }
- 
+
   if ((modtab = command_par_string("model", cmd->clone)) != NULL ) {
     printf("Want to use model orbit from: %s\n", modtab);
     if ((ppt = name_list_pos(modtab, table_register->names)) > -1) {
@@ -1995,34 +1995,34 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
   if (debug)
     printf( "The orbit, twiss, target and model tables are at addresses: %p %p %p %p\n",
 	    (void*) orbin_table, (void*) twiss_table, (void*) target_table, (void*) model_table);
-  
+
   if (correct_orbit == NULL )
     correct_orbit = mycalloc("pro_correct_gettables", 1, sizeof *correct_orbit);
-  
+
   if (debug) printf("-0-\n");
-  // if(corr_table == NULL) {   
+  // if(corr_table == NULL) {
   corr_table = make_table("corr", "corr", corr_table_cols, corr_table_types, 15000);
   add_to_table_list(corr_table, table_register);
   pro_correct_make_corr_table();
-  // } 
+  // }
 
   if (debug) printf("-1-\n");
   // if(mon_table == NULL) {
   mon_table = make_table("mon", "mon", mon_table_cols, mon_table_types, 15000);
   add_to_table_list(mon_table, table_register);
   pro_correct_make_mon_table();
-  // } 
-  
+  // }
+
   if (debug) printf("-2-\n");
-  
+
   if (correct_orbit->cor_table != NULL ) myfree(rout_name, correct_orbit->cor_table);
   if (correct_orbit->mon_table != NULL ) myfree(rout_name, correct_orbit->mon_table);
   correct_orbit->cor_table = mycalloc("pro_correct_gettables_cor", 30200, sizeof *correct_orbit->cor_table);
   correct_orbit->mon_table = mycalloc("pro_correct_gettables_mon", 30200, sizeof *correct_orbit->mon_table);
-  
+
   /* orbit table available, get units, if defined */
   //  2013-Jun-24  12:06:03  ghislain: FIXME - units option of CORRECT command is only partially documented!!!
-  if ((ounits = command_par_value("units", cmd->clone)) > 0) 
+  if ((ounits = command_par_value("units", cmd->clone)) > 0)
     correct_orbit->units = ounits;
   else correct_orbit->units = 1.0;
 
@@ -2031,9 +2031,9 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
   correct_orbit->mon_table->next = NULL;
   correct_orbit->cor_table->previous = NULL;
   correct_orbit->cor_table->next = NULL;
-  
+
   if (debug) printf("-3-\n");
-  
+
   mon_l = correct_orbit->mon_table;
   cor_l = correct_orbit->cor_table;
 
@@ -2057,31 +2057,31 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
       cor_l->id_ttb = j;
       cor_l->enable = ttb->p_nodes[j]->enable;
       cor_l->p_node = ttb->p_nodes[j];
-      
+
       if (corzero > 0) {
         if (iplane == 1) cor_l->p_node->chkick = 0.0;
         if (iplane == 2) cor_l->p_node->cvkick = 0.0;
       }
-      
+
       cor_l->next = cor_l;
       cor_l->next++;
       cor_l++;
       cntc++;
     }
   }
-  
+
   if (debug) printf("-4-\n");
 
   mon_l--;
   mon_l->next = NULL;
   cor_l--;
   cor_l->next = NULL;
-  
+
   if (debug) printf("done: %d %d\n", cntm, cntc);
 
-  // 2013-Jun-24  12:21:49  ghislain: 
-  // following is a kludge to return a single value but has to be decoded on other side.    
-  if(cntc >= 30000) 
+  // 2013-Jun-24  12:21:49  ghislain:
+  // following is a kludge to return a single value but has to be decoded on other side.
+  if(cntc >= 30000)
     fatal_error("Found more than 30000 correctors; decoding in mad_orbit.c will fail",
 		"Please report this issue to MAD developpers (mad@cern.ch)");
   return (30000 * cntm + cntc);
@@ -2089,7 +2089,7 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
 
 static int pro_correct_getorbit(struct in_cmd* cmd) {
   struct name_list* nl;
- 
+
   int pos;
   struct id_mic *m; /* access to tables for monitors and correctors */
   struct table *ttb;
@@ -2098,7 +2098,7 @@ static int pro_correct_getorbit(struct in_cmd* cmd) {
   double **da2 = NULL;
   double xlimit;
   double rx, ry, dpsi;
-  
+
   char strx[40];
   char stry[40];
 
@@ -2106,7 +2106,7 @@ static int pro_correct_getorbit(struct in_cmd* cmd) {
   int tosx = -1;
   int tosy = -1;
   int tospx, tospy;
-  
+
   int debug = get_option("debug");
 
   ttb = orbin_table;
@@ -2126,34 +2126,34 @@ static int pro_correct_getorbit(struct in_cmd* cmd) {
 
   if ((posx = name_list_pos(strx, ttb->columns)) < 0)
     fatal_error("orbit x not found in input table", ", MAD-X terminates ");
-  
-  if ((posy = name_list_pos(stry, ttb->columns)) < 0) 
+
+  if ((posy = name_list_pos(stry, ttb->columns)) < 0)
     fatal_error("orbit y not found in input table", ", MAD-X terminates ");
-  
+
   if (debug) {
-    if ((pospx = name_list_pos("px", ttb->columns)) < 0) 
+    if ((pospx = name_list_pos("px", ttb->columns)) < 0)
       fatal_error("orbit px not found in input table", ", MAD-X terminates ");
-    
-    if ((pospy = name_list_pos("py", ttb->columns)) < 0) 
+
+    if ((pospy = name_list_pos("py", ttb->columns)) < 0)
       fatal_error("orbit py not found in input table", ", MAD-X terminates ");
-    
-    printf("====c1===>  %d %d %d %d \n", posx, posy, pospx, pospy); 
+
+    printf("====c1===>  %d %d %d %d \n", posx, posy, pospx, pospy);
   }
 
   if (command_par_string("target", cmd->clone) != NULL ) {
-    if ((tosx = name_list_pos("x", tar->columns)) < 0) 
+    if ((tosx = name_list_pos("x", tar->columns)) < 0)
       fatal_error("target orbit x not found in table", ", MAD-X terminates ");
-    
-    if ((tosy = name_list_pos("y", tar->columns)) < 0) 
+
+    if ((tosy = name_list_pos("y", tar->columns)) < 0)
       fatal_error("target orbit y not found in table", ", MAD-X terminates ");
-    
+
     if (debug) {
-      if ((tospx = name_list_pos("px", tar->columns)) < 0) 
+      if ((tospx = name_list_pos("px", tar->columns)) < 0)
   fatal_error("target orbit px not found in table", ", MAD-X terminates ");
-      
-      if ((tospy = name_list_pos("py", tar->columns)) < 0) 
+
+      if ((tospy = name_list_pos("py", tar->columns)) < 0)
   fatal_error("target orbit px not found in table", ", MAD-X terminates ");
-      
+
       printf("====c1===>  %d %d %d %d \n", tosx, tosy, tospx, tospy);
     }
   }
@@ -2168,7 +2168,7 @@ static int pro_correct_getorbit(struct in_cmd* cmd) {
       m->val.before[0] = da1[posx][m->id_ttb] * 1000. * correct_orbit->units;
       m->val.before[1] = da1[posy][m->id_ttb] * 1000. * correct_orbit->units;
     }
-    
+
     /* monon=xlimit determines the fraction of available monitors */
     pos = name_list_pos("monon", nl);
     if (nl->inform[pos] > 0) {
@@ -2240,15 +2240,15 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
   char l3name[NAME_L];
   char l4name[NAME_L];
   double rx, ry, dpsi;
-  
+
   char *nam_col;
   char *x_col;
   char *y_col;
-  
+
   char strx[40];
   char stry[40];
   char strn[40];
-  
+
   int posx, posy, pospx, pospy;
   int tosx = -1;
   int tosy = -1;
@@ -2294,36 +2294,36 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
     strcpy(strn, "name");
   }
 
-  if ((posx = name_list_pos(strx, ttb->columns)) < 0) 
+  if ((posx = name_list_pos(strx, ttb->columns)) < 0)
     fatal_error("orbit x not found in input table", ", MAD-X terminates ");
-  
-  if ((posy = name_list_pos(stry, ttb->columns)) < 0) 
+
+  if ((posy = name_list_pos(stry, ttb->columns)) < 0)
     fatal_error("orbit y not found in input table", ", MAD-X terminates ");
-  
+
   if (debug) {
-    if ((pospx = name_list_pos("px", ttb->columns)) < 0) 
+    if ((pospx = name_list_pos("px", ttb->columns)) < 0)
       warning("orbit px not found in input table", ", MAD-X continues ");
-    
-    if ((pospy = name_list_pos("py", ttb->columns)) < 0) 
+
+    if ((pospy = name_list_pos("py", ttb->columns)) < 0)
       warning("orbit py not found in input table", ", MAD-X continues ");
-    
+
     printf("====c1===>  %d %d %d %d \n", posx, posy, pospx, pospy);
   }
 
   if (command_par_string("target", cmd->clone) != NULL ) {
-    if ((tosx = name_list_pos("x", tar->columns)) < 0) 
+    if ((tosx = name_list_pos("x", tar->columns)) < 0)
       fatal_error("target orbit x not found in table", ", MAD-X terminates ");
-    
-    if ((tosy = name_list_pos("y", tar->columns)) < 0) 
+
+    if ((tosy = name_list_pos("y", tar->columns)) < 0)
       fatal_error("target orbit y not found in table", ", MAD-X terminates ");
-    
+
     if (debug) {
-      if ((tospx = name_list_pos("px", tar->columns)) < 0) 
+      if ((tospx = name_list_pos("px", tar->columns)) < 0)
        warning("target orbit px not found in table", ", MAD-X continues ");
-      
-      if ((tospy = name_list_pos("py", tar->columns)) < 0) 
+
+      if ((tospy = name_list_pos("py", tar->columns)) < 0)
        warning("target orbit py not found in table", ", MAD-X continues ");
-      
+
       printf("====c1===>  %d %d %d %d \n", tosx, tosy, tospx, tospy);
     }
   }
@@ -2335,7 +2335,7 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
     //   string_from_table_row(ttb->name, "name", &j, name);
     // }
   }
-  
+
   jj = 0;
 
   while (m) { // loop over the monitors
@@ -2388,10 +2388,10 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
 
         m->val.before[0] = (da1[posx][jjx] - da2[tosx][jjy]) * 1000. * correct_orbit->units;
         m->val.before[1] = (da1[posy][jjx] - da2[tosy][jjy]) * 1000. * correct_orbit->units;
-  
-        if (debug) 
+
+        if (debug)
           printf("bxy ==> %s %d %e %e\n", m->p_node->name, jjx, m->val.before[0], m->val.before[1]);
-  
+
       } else { // no target was given
 
         if (debug) {
@@ -2402,8 +2402,8 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
         m->val.before[0] = da1[posx][jjx] * 1000. * correct_orbit->units;
         m->val.before[1] = da1[posy][jjx] * 1000. * correct_orbit->units;
 
-        if (debug) 
-          printf("bxy ==> %s %d %e %e\n", m->p_node->name, jjx, m->val.before[0], m->val.before[1]);  
+        if (debug)
+          printf("bxy ==> %s %d %e %e\n", m->p_node->name, jjx, m->val.before[0], m->val.before[1]);
       }
 
       /* monon=xlimit determines the fraction of available monitors */
@@ -2508,7 +2508,7 @@ static void pro_correct_prtwiss(void) {
   ttb = model_table;
 
   printf(" %d %d\n", ttb->curr, ttb->num_cols);
-  for (i = 0; i < ttb->curr; i++) {    
+  for (i = 0; i < ttb->curr; i++) {
     printf(" %s %s\n", ttb->s_cols[0][i], ttb->s_cols[1][i]);
   }
 
@@ -2569,29 +2569,29 @@ static int pro_correct_filter(int iplane, double sigcut) {
   double **da1;
   double bx_m = -9999.;
   double xsig;
-  double xmea; 
+  double xmea;
   double xn;
 
   int debug = get_option("debug");
- 
+
   ttb = model_table;
   da1 = ttb->d_cols;
   im = 0;
-  icnt = 0; 
+  icnt = 0;
   ip = iplane - 1;
-  
+
   printf("A (normalized) cut of %-2.2f is requested\n", sigcut);
 
   m = correct_orbit->mon_table;
-  xmea = 0.0; 
+  xmea = 0.0;
   while (m) {
-    if (debug) 
+    if (debug)
       printf("monitor flag: %d\n", m->enable);
-    
+
     if (m->enable == 1) {
-      if (ip == 0) 
+      if (ip == 0)
 	bx_m = da1[3][m->id_ttb];
-      else if (ip == 1) 
+      else if (ip == 1)
 	bx_m = da1[6][m->id_ttb];
       else {
 	// 2013-Dec-06  17:01:03  ghislain: failure case
@@ -2609,7 +2609,7 @@ static int pro_correct_filter(int iplane, double sigcut) {
   }
 
   xmea = xmea / im;
-  if (debug) 
+  if (debug)
     printf("Mean values: %-4.3f \n", xmea);
 
   m = correct_orbit->mon_table;
@@ -2617,11 +2617,11 @@ static int pro_correct_filter(int iplane, double sigcut) {
   xsig = 0.0;
   while (m) {
     if (m->enable == 1) {
-      if (ip == 0) 
+      if (ip == 0)
 	bx_m = da1[3][m->id_ttb];
-      else if (ip == 1) 
+      else if (ip == 1)
 	bx_m = da1[6][m->id_ttb];
-      else { 
+      else {
 	// 2013-Dec-06  17:02:41  ghislain: failure case
       }
       xn = m->val.before[ip] / sqrt(bx_m);
@@ -2632,15 +2632,15 @@ static int pro_correct_filter(int iplane, double sigcut) {
   }
 
   xsig = sqrt(xsig / im);
-  if (debug) 
+  if (debug)
     printf("Sigma values: %-4.3f \n", xsig);
 
   m = correct_orbit->mon_table;
   while (m) {
     if (m->enable == 1) {
-      if (ip == 0) 
+      if (ip == 0)
 	bx_m = da1[3][m->id_ttb];
-      else if (ip == 1) 
+      else if (ip == 1)
 	bx_m = da1[6][m->id_ttb];
       else {
 	// 2013-Dec-06  17:03:47  ghislain: failure case
@@ -2655,7 +2655,7 @@ static int pro_correct_filter(int iplane, double sigcut) {
     }
     m = m->next;
   }
-  
+
   return (icnt);
 }
 
@@ -2671,16 +2671,16 @@ pro_correct_response_ring(int ip, int nc, int nm) {
   double qx0, qy0;
   double respx, respy;
   double *dmat;
-  
+
   int debug = get_option("debug");
-  
+
   ttb = model_table;
   da1 = ttb->d_cols;
   ic = 0;
   im = 0;
-  
+
   dmat = mycalloc_atomic("pro_correct_response_ring", nc*nm, sizeof *dmat);
-  
+
   correct_orbit->qx0 = da1[5][ttb->curr - 1];
   correct_orbit->qy0 = da1[8][ttb->curr - 1];
   qx0 = correct_orbit->qx0;
@@ -2688,11 +2688,11 @@ pro_correct_response_ring(int ip, int nc, int nm) {
 
   c = correct_orbit->cor_table;
   ic = 0;
-  
+
   while (c) {
     if (debug)
       printf("corrector flag: %d\n", c->enable);
-    
+
     if (c->enable == 1) {
       bx_c = da1[3][c->id_ttb];
       by_c = da1[6][c->id_ttb];
@@ -2725,7 +2725,7 @@ pro_correct_response_ring(int ip, int nc, int nm) {
     }
     c = c->next;
   }
-  
+
   return dmat;
 }
 
@@ -2792,7 +2792,7 @@ pro_correct_response_line(int ip, int nc, int nm) {
     }
     c = c->next;
   }
-  
+
   return dmat;
 }
 
@@ -2805,9 +2805,9 @@ static void pro_correct_make_corr_table(void) {
   /*
     ttb = orbin_table;
   */
-  
+
   ttb = model_table;
-  
+
   if(model_table == 0x0)
    {
      fatal_error("pro_correct_make_corr_table "," Model table does not exist");
@@ -2818,22 +2818,22 @@ static void pro_correct_make_corr_table(void) {
        printf("pro_correct_make_corr_table model table name %s\n",model_table->name);
        printf("pro_correct_make_corr_table model table type %s\n",model_table->type);
        printf("pro_correct_make_corr_table model table curr %d\n",model_table->curr);
-       
+
        }
   */
-  for (j = 0; j < ttb->curr; j++) 
+  for (j = 0; j < ttb->curr; j++)
     {
-      /* 
+      /*
 	 printf("pro_correct_make_corr_table node %d \n",j);
 	 printf("                         node_addr %#x\n",ttb->p_nodes[j]);
 	 printf("                         base_name %#x\n",ttb->p_nodes[j]->base_name);
-	 
-      */    
-      if (!ttb->p_nodes[j]->base_name) 
+
+      */
+      if (!ttb->p_nodes[j]->base_name)
 	{
 	  continue;
 	}
-      
+
       if ( (strncmp(atc[0], ttb->p_nodes[j]->base_name, 4) == 0)
 	   || (strncmp(atc[1], ttb->p_nodes[j]->base_name, 4) == 0)
 	   || (strncmp(atc[2], ttb->p_nodes[j]->base_name, 4) == 0)) {
@@ -2859,7 +2859,7 @@ static void pro_correct2_make_corr_table(void) {
         string_to_table_curr("corr1", "name", ttb->p_node->name);
         augment_count("corr1");
       }
-      
+
       if (ttb->id_ttb[1] > 0) {
         string_to_table_curr("corr2", "name", ttb->p_node->name);
         augment_count("corr2");
@@ -2962,11 +2962,11 @@ static void pro_correct_fill_mon_table(int ip, char *name, double old, double ne
 
 static void pro_correct2_fill_mon_table(int ip, char *name, double old, double new) {
   struct table *mon;
-  
+
   int j;
-  
+
   mon = mon_table;
-  
+
   for (j = 0; j < mon->curr; j++) {
     if (strcmp(name, mon->s_cols[0][j]) == 0) {
       mon->d_cols[ip][j] = old * 0.001;
@@ -2975,8 +2975,8 @@ static void pro_correct2_fill_mon_table(int ip, char *name, double old, double n
   }
 }
 
-static void pro_correct_write_results(double *monvec, double *resvec, double *corvec, 
-				      int *nx, int *nc, int *nm, int imon, int icor, int ip, 
+static void pro_correct_write_results(double *monvec, double *resvec, double *corvec,
+				      int *nx, int *nc, int *nm, int imon, int icor, int ip,
 				      int resout)
 /*                                              */
 /* Writes a summary of the correction           */
@@ -3009,7 +3009,7 @@ static void pro_correct_write_results(double *monvec, double *resvec, double *co
      caverage(monvec,imon), cstddev(monvec,imon), crms(monvec, imon), cptp(monvec, imon));
     printf("after correction:  %f        %f          %f        %f \n\n\n",
      caverage(resvec,imon), cstddev(resvec,imon), crms(resvec, imon), cptp(resvec, imon));
-  }  
+  }
 
   if (print_correct_opt > 1) {
     printf("Monitor:  Before:     After:    Difference:\n");
@@ -3033,11 +3033,6 @@ static void pro_correct_write_results(double *monvec, double *resvec, double *co
   } else {
     printf("Max strength: %e is below corrector strength limit: %e\n", corrm, corrl);
   }
-  
-  //mattias
-  char *shortname;
-  size_t sz;
-  // mattias
 
   set_variable("corrmax", &corrm);
   if (print_correct_opt > 1) {
@@ -3060,7 +3055,7 @@ static void pro_correct_write_results(double *monvec, double *resvec, double *co
     c[nc[i]].val.after[ip - 1] = corvec[nx[i] - 1];
     if (ip == 1) {
       c[nc[i]].p_node->chkick += c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1];
-      pro_correct_fill_corr_table(ip, c[nc[i]].p_node->name,  
+      pro_correct_fill_corr_table(ip, c[nc[i]].p_node->name,
                                        c[nc[i]].val.before[ip - 1] * 0.001,
                                        c[nc[i]].p_node->chkick);
       /*                          c[nc[i]].p_node->other_bv*0.001*corvec[nx[i]-1]); */
@@ -3069,8 +3064,8 @@ static void pro_correct_write_results(double *monvec, double *resvec, double *co
 	fprintf(fcdata, "%s->hkick = %e; \t! %d\n", strip(c[nc[i]].p_node->name),
 		c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1], resout);
       }
-      
-      
+
+
     } else if (ip == 2) {
       c[nc[i]].p_node->cvkick += c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1];
       pro_correct_fill_corr_table(ip, c[nc[i]].p_node->name,
@@ -3078,12 +3073,12 @@ static void pro_correct_write_results(double *monvec, double *resvec, double *co
                                       c[nc[i]].p_node->cvkick);
       /*                          c[nc[i]].p_node->other_bv*0.001*corvec[nx[i]-1]); */
       if (fcdata != NULL ) {
-	fprintf(fcdata, "%s->vkick = %e; \t! %d\n", strip(c[nc[i]].p_node->name),	
+	fprintf(fcdata, "%s->vkick = %e; \t! %d\n", strip(c[nc[i]].p_node->name),
 		c[nc[i]].p_node->other_bv * 0.001 * corvec[nx[i] - 1], resout);
       }
     }
   } /* end of loop over correctors */
-  
+
   if (fcdata != NULL ) fflush(fcdata);
   if (fddata != NULL ) fflush(fddata);
 
@@ -3096,7 +3091,7 @@ static int pro_correct_getactive(int ip, int *nm, int *nx, int *nc,
   struct id_mic *m, *c;
 
   int debug = get_option("debug");
-    
+
   m = correct_orbit->mon_table;
   imon = 0;
   imona = 0;
@@ -3134,9 +3129,9 @@ static int pro_correct_getactive(int ip, int *nm, int *nx, int *nc,
     c = c->next;
   }
 
-  // 2013-Jun-24  12:21:49  ghislain: 
-  // following is a kludge to return a single value but has to be decoded on other side.    
-  if(icor >= 30000) 
+  // 2013-Jun-24  12:21:49  ghislain:
+  // following is a kludge to return a single value but has to be decoded on other side.
+  if(icor >= 30000)
     fatal_error("Found more than 30000 correctors; decoding in mad_orbit.c will fail",
     "Please report this issue to MAD developpers (mad@cern.ch)");
   return (30000 * imon + icor);
@@ -3144,7 +3139,7 @@ static int pro_correct_getactive(int ip, int *nm, int *nx, int *nc,
 
 static void correct_option(struct in_cmd* cmd) {
   struct name_list* nl = cmd->clone->par_names;
-  int i; 
+  int i;
   int pos, seed;
 
   int debug = get_option("debug");
@@ -3190,9 +3185,9 @@ static void correct_putorbit(struct in_cmd* cmd) {
   nl = current_twiss->par_names;
   for (i = 0; i < nl->curr; i++)
     nl->inform[i] = 0;
- 
+
   pro_twiss();
-  
+
   table_name = permbuff("orbit");
   orbit_table = make_table(table_name, "orbit", orbit_table_cols, orbit_table_types, current_sequ->n_nodes);
   add_to_table_list(orbit_table, table_register);
@@ -3243,7 +3238,7 @@ void pro_correct(struct in_cmd* cmd) {
 
 void f_ctof(int *j, char *string, int *nel) {
   long i, flg = 0;
-  
+
   for (i = 0; i < *nel; i++) {
     if (flg == 1) {
       string[i] = ' ';
