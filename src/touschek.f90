@@ -1,16 +1,16 @@
 subroutine touschek
-  !--- 2013-Nov-26  15:41:21  ghislain: 
+  !--- 2013-Nov-26  15:41:21  ghislain:
   !    rewrite of the original touschek routine (F.Zimmermann, C. Milardi) with different logic:
   !    instead of calculating an exact inverse lifetime based on the average of
-  !    beam parameters (beta,alfa,dispersion,derivative of dispersion) across the element, 
-  !    we either (w/o centre flag in twiss) calculate the exact inverse lifetime 
-  !      at entrance and exit of element, based on exact beam parameters at both locations , 
-  !      and then only take the average inverse lifetime between entrance and exit, 
-  !    or (w centre flag in twiss) calculate the exact inverse lifetime 
+  !    beam parameters (beta,alfa,dispersion,derivative of dispersion) across the element,
+  !    we either (w/o centre flag in twiss) calculate the exact inverse lifetime
+  !      at entrance and exit of element, based on exact beam parameters at both locations ,
+  !      and then only take the average inverse lifetime between entrance and exit,
+  !    or (w centre flag in twiss) calculate the exact inverse lifetime
   !      at the center of the element, based on exact beam parameters at the center.
-  !      
-  !    The integration of the inverse lifetime along the elememt is then performed 
-  !      considering a constant inverse lifetime along the element (see above) 
+  !
+  !    The integration of the inverse lifetime along the elememt is then performed
+  !      considering a constant inverse lifetime along the element (see above)
   !      and the length of the element
   use name_lenfi
   use touschekfi
@@ -25,7 +25,7 @@ subroutine touschek
   ! Attribute:                                                           *
   !   TABLE     (name)    Name of Twiss table.                           *
   !----------------------------------------------------------------------*
-  integer :: i, j, flag, iflag, range(2), table_output, lp, centre 
+  integer :: i, j, flag, iflag, range(2), table_output, lp, centre
   double precision :: ccost, fact, rr, beta2, gamma2, tolerance, pi2
   double precision :: uloss, km, um, bx, by, ax, ay, dx, dpx, dy, dpy, l, s
   double precision :: sigx2, sigy2, ddx2, ddy2, sigh2
@@ -35,7 +35,7 @@ subroutine touschek
   integer, external :: get_option, double_from_table_row, restart_sequ
   integer, external :: string_from_table_row, advance_to_pos, get_string
   double precision, external ::  get_value, DGAUSS, ftousch
-  
+
   ! ************* Get the parameters for the common blocks *************
   ! *************         /machin/ and /beamdb/            *************
 
@@ -88,7 +88,7 @@ subroutine touschek
   print *, 'kbunch   ', bunch
   print *, 'deltap   ', deltap
   print *, ''
-  
+
   beta2  = beta*beta
   gamma2 = gamma*gamma
   ccost  = arad*arad * clight * parnum / (eight*sqrt(pi) * gamma2*gamma2 * beta2)
@@ -102,8 +102,8 @@ subroutine touschek
   else
      print *, ' TOUSCHEK will use optical functions at entrance and end of element'
   endif
-  
-  !--- Look for RF cavities and setup RF-bucket boundaries 
+
+  !--- Look for RF cavities and setup RF-bucket boundaries
   call cavtouschek(um,uloss,iflag)
   um1 = um
   !--- setup boundaries for numerical integration
@@ -114,11 +114,11 @@ subroutine touschek
      call fort_warn('TOUSCHEK ', '  rf voltage = 0, rest skipped ')
      return
   endif
-        
+
   if (iflag .eq.1) then
      call fort_warn('TOUSCHEK ', ' uloss = 0 missing chrom in twiss ')
      return
-  endif  
+  endif
 
   !--- Start new Twiss Table reading
   call table_range('twiss ', '#s/#e ', range)
@@ -129,21 +129,21 @@ subroutine touschek
   j = restart_sequ()
 
   !--- Initialization (p indices stands for previous element)
-  !    A zero value for previous inverse lifetime here does not matter because 
-  !    first element in sequence is always a marker of zero length whose 
+  !    A zero value for previous inverse lifetime here does not matter because
+  !    first element in sequence is always a marker of zero length whose
   !    contribution will be zero by integration over the length.
   tlitouschek = zero
   litousch  = zero
   litouschp = zero
   litouschw = zero
-  
+
   !--- Start loop over elements in range
   do i = range(1), range(2)
      j = advance_to_pos('twiss ', i)
-     
+
      if (string_from_table_row('twiss ', 'name ', i, name) .ne. 0) goto 102
-     if (double_from_table_row('twiss ', 's ',    i, s)   .ne. 0) goto 102 
-     if (double_from_table_row('twiss ', 'betx ', i, bx)  .ne. 0) goto 102 
+     if (double_from_table_row('twiss ', 's ',    i, s)   .ne. 0) goto 102
+     if (double_from_table_row('twiss ', 'betx ', i, bx)  .ne. 0) goto 102
      if (double_from_table_row('twiss ', 'bety ', i, by)  .ne. 0) goto 102
      if (double_from_table_row('twiss ', 'alfx ', i, ax)  .ne. 0) goto 102
      if (double_from_table_row('twiss ', 'alfy ', i, ay)  .ne. 0) goto 102
@@ -151,7 +151,7 @@ subroutine touschek
      if (double_from_table_row('twiss ', 'dpx ',  i, dpx) .ne. 0) goto 102
      if (double_from_table_row('twiss ', 'dy ',   i, dy)  .ne. 0) goto 102
      if (double_from_table_row('twiss ', 'dpy ',  i, dpy) .ne. 0) goto 102
-     if (double_from_table_row('twiss ', 'l ',    i, l)   .ne. 0) goto 102 
+     if (double_from_table_row('twiss ', 'l ',    i, l)   .ne. 0) goto 102
 
      !--- Calculate factors and arguments to numerical integrator
      sigx2 = ex*bx
@@ -163,14 +163,15 @@ subroutine touschek
      sigh2 = one / ((one/sige**2)+((dx**2+ddx2)/sigx2)+((dy**2+ddy2)/sigy2))
 
      fact = sqrt(sigh2)/(sigt*sige*ex*ey)
-     
-     !--- Setup the parameters B1 and B2. 
+
+     !--- Setup the parameters B1 and B2.
      !    They will be used inside the ftousch routine that will be integrated numerically
 
      fb1 = ( (sigx2-sigh2*ddx2) / ex**2 + (sigy2-sigh2*ddy2) / ey**2 )  &
             / (two*beta2*gamma2)
 
-     fb2 = sqrt( & 
+     ! LD: use first version of eq. 34, more stable for B_2^2 (improvement from G. Roy)
+     fb2 = sqrt( &
           ( ( (sigx2-sigh2*ddx2) / ex**2 - (sigy2-sigh2*ddy2) / ey**2 )**2 &
             + (four * sigh2**2 * ddx2 * ddy2) / (ex**2 * ey**2) ) &
             / (four * beta2**2 * gamma2**2) )
@@ -182,25 +183,25 @@ subroutine touschek
      litousch = ccost * fact * DGAUSS(ftousch,km,pi2,tolerance)
 
      if (centre .ne. 0) then
-        !--- Calculate contribution of current element by taking Loss Rate 
+        !--- Calculate contribution of current element by taking Loss Rate
         !    calculated at centre of element, and normalising by element length
         !    over total length of beamline
-        litouschw = litousch * l / circ        
+        litouschw = litousch * l / circ
         if ( get_option('debug ') .ne. 0 ) &
              write (7,*)  s, litousch, zero, l, litouschw * circ, fb1, fb2
      else
-        !--- Calculate contribution of current element by averaging Loss Rate 
-        !    between exit of current element and entrance of current element, 
+        !--- Calculate contribution of current element by averaging Loss Rate
+        !    between exit of current element and entrance of current element,
         !    or end of previous element, and normalising by element length
         !    over total length of beamline
-        litouschw = half*(litousch + litouschp) * l / circ        
+        litouschw = half*(litousch + litouschp) * l / circ
         if ( get_option('debug ') .ne. 0 ) &
              write (8,*)  s, litousch, litouschp, l, litouschw * circ, fb1, fb2
      endif
 
      !---- Accumulate contributions.
      tlitouschek = tlitouschek + litouschw
-        
+
      ! *************** Fill "touschek_table"  *********************
 
      if(table_output.ne.0) then
@@ -208,7 +209,7 @@ subroutine touschek
         call double_to_table_curr('touschek ','s ', s)               ! position of calculation (end or centre)
         call double_to_table_curr('touschek ','tli ', litousch)      ! Loss rate at current location
         call double_to_table_curr('touschek ','tliw ', litouschw)    ! Weighted Loss Rate contribution of element
-        call double_to_table_curr('touschek ','tlitot ', tlitouschek)! Accumulated Loss Rate to present element 
+        call double_to_table_curr('touschek ','tlitot ', tlitouschek)! Accumulated Loss Rate to present element
         call augment_count('touschek ')
      endif
 
@@ -230,7 +231,7 @@ subroutine touschek
 102 continue
   call fort_warn('TOUSCHEK ', 'table value not found, rest skipped ')
   return
-  
+
 end subroutine touschek
 
 subroutine cavtouschek (um,uloss,iflag)
@@ -243,7 +244,7 @@ subroutine cavtouschek (um,uloss,iflag)
 
   double precision, intent(OUT) :: um, uloss
   integer, intent(OUT) :: iflag
-  
+
   integer :: i, lg, code, flagerr
   double precision :: el, rfv, rff, rfl, harmonl, phirf, c0, vrf, pc, omega, orbit5
   double precision :: eta, qover, fq, vrfsum, harmonlm, umt, synch_2
@@ -259,7 +260,7 @@ subroutine cavtouschek (um,uloss,iflag)
   umt = zero
   iflag = 0
   um = zero
-  
+
   flagerr = double_from_table_row('summ ','synch_2 ',1,synch_2)
   if (synch_2 .eq. zero) then
       uloss = zero ;     iflag = 1
@@ -280,7 +281,7 @@ subroutine cavtouschek (um,uloss,iflag)
      rfl = node_value('lag ')
 
      if (rff.eq.zero .or. rfv.eq.zero) goto 11 ! skip
- 
+
      harmonl = ten6p * rff * circ/clight
 
      pc = get_value('probe ','pc ')
@@ -294,13 +295,13 @@ subroutine cavtouschek (um,uloss,iflag)
      if (cos(phirf) .lt. 0) vrf = -vrf
      eta = alfa - one / gammas**2
      if (uloss .ne. zero) then
-        qover = qover + charge * rfv/uloss 
+        qover = qover + charge * rfv/uloss
         vrfsum = vrfsum + charge * rfv/harmonl
         harmonlm = min(harmonl, harmonlm)
      else
-        umt = umt + (two * c0) / (harmonl * eta * pi) 
+        umt = umt + (two * c0) / (harmonl * eta * pi)
      endif
-     
+
   endif
 
 11 if (advance_node().ne.0)  goto 10
@@ -313,7 +314,7 @@ subroutine cavtouschek (um,uloss,iflag)
   endif
 
   um = abs(um) * beta**2
-  
+
 END subroutine cavtouschek
 
 double precision function ftousch(k)
@@ -334,16 +335,16 @@ double precision function ftousch(k)
 
   call CJYDBB(ZR, ZI, BJOR, BJOI, BJIR, BJII, BYOR, BYOI, BYIR, BYII, IFLAG)
 
-  aftoush = two * sqrt(one+z) * & 
+  aftoush = two * sqrt(one+z) * &
        ( ((two*z+one)**2 * (z/um1/(one+z) - one)/z) + z - &
-       sqrt(z*um1*(one+z)) - (two + one/(two*z))*log(z/um1/(one+z)) ) 
+       sqrt(z*um1*(one+z)) - (two + one/(two*z))*log(z/um1/(one+z)) )
 
   if (iflag .eq. 0) then
      ftousch = aftoush * exp(-fb1*z) * BJOR
   else
      ftousch = aftoush * BJOR * (exp(-(fb1-fb2)*z) + exp(-(fb1+fb2)*z))/two
   end if
-  
+
   return
 end function ftousch
 
@@ -633,35 +634,35 @@ SUBROUTINE CJYDBB(ZR,ZI,BJOR,BJOI,BJIR,BJII,BYOR,BYOI,BYIR,BYII,IFLAG)
   DOUBLE PRECISION, DIMENSION(18) :: CJOR, CJOI, CJIR, CJII
   DOUBLE PRECISION, DIMENSION(18) :: CYOR, CYOI, CYIR, CYII
 
-  DOUBLE PRECISION, DIMENSION(12) :: CPO, CPI, CPOR, CPOI, CPIR, CPII 
+  DOUBLE PRECISION, DIMENSION(12) :: CPO, CPI, CPOR, CPOI, CPIR, CPII
   DOUBLE PRECISION, DIMENSION(12) :: CQO, CQI, CQOR, CQOI, CQIR, CQII
 
   DOUBLE PRECISION, PARAMETER :: zero=0.d0
 
   !---- Initialize.
-  CJOR = zero 
-  CJOI = zero 
-  CJIR = zero 
-  CJII = zero 
+  CJOR = zero
+  CJOI = zero
+  CJIR = zero
+  CJII = zero
 
-  CYOR = zero 
-  CYOI = zero 
-  CYIR = zero 
-  CYII = zero 
+  CYOR = zero
+  CYOI = zero
+  CYIR = zero
+  CYII = zero
 
-  CPO  = zero 
-  CPI  = zero 
-  CPOR = zero 
-  CPOI = zero 
-  CPIR = zero 
-  CPII = zero 
+  CPO  = zero
+  CPI  = zero
+  CPOR = zero
+  CPOI = zero
+  CPIR = zero
+  CPII = zero
 
-  CQO  = zero 
-  CQI  = zero 
-  CQOR = zero 
-  CQOI = zero 
-  CQIR = zero 
-  CQII = zero 
+  CQO  = zero
+  CQI  = zero
+  CQOR = zero
+  CQOI = zero
+  CQIR = zero
+  CQII = zero
 
   iflag = 0
 
