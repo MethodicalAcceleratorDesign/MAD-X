@@ -17,6 +17,7 @@ PROJECT(madX C CXX Fortran)
 # warnings we do not want..
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
+  cmake_policy(SET CMP0042 NEW)
 endif(COMMAND cmake_policy)
 
 # add source dir as a place for CMake modules (e.g. FindGSL.cmake)
