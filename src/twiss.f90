@@ -151,7 +151,14 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
 
   !---- Build table of lattice functions, coupled.
   call twcpgo(rt,orbit0)
+  if(.not. flipping) then
+     write (warnstr, '(a)') 'Modes flip is not possible for this lattice'
+     call fort_warn('TWISS: ', warnstr)
+     !goto 900
+  endif
 
+
+  
   !---- List chromatic functions.
   if (chrom .ne. 0) then
      call twbtin(rt,tt)
@@ -159,9 +166,11 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   endif
 
   !---- Print summary
+!  call double_to_table_curr('summ ','nflips ' , dble(nmode_flip))
+
   if (MOD(nmode_flip, 2).ne.0) then
-     write (warnstr, '(a,i5)') 'Total number of mode flips is not even! Nflips = ', nmode_flip
-     print*, 'Total number of mode flips is not even! Nflips = ', nmode_flip
+     write (warnstr, '(a,i5)') 'Total number of modes flips is not even! Nflips = ', nmode_flip
+     print*, 'Total number of modes flips is not even! Nflips = ', nmode_flip
   endif
 
   if (get_option('twiss_summ ') .ne. 0) call tw_summ(rt,tt)
@@ -762,7 +771,6 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
         call element_name(el_name,len(el_name))
         write (warnstr,'(a,e13.6,a,a)') "The column norm is ", nrm, " in element ", el_name
         call fort_warn('THREADER-1: ', warnstr)
-        !call tmsymp(rt)
       endif
     endif
   endif
@@ -781,7 +789,6 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
         call element_name(el_name,len(el_name))
         write (warnstr,'(a,e13.6,a,a)') "The column norm is ", nrm, " in element ", el_name
         call fort_warn('THREADER-M: ', warnstr)
-        !call tmsymp(rt)
       endif
     endif
   endif
@@ -797,7 +804,6 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
         call element_name(el_name,len(el_name))
         write (warnstr,'(a,e13.6,a,a)') "The column norm is ", nrm, " in element ", el_name
         call fort_warn('THREADER-2: ', warnstr)
-        !call tmsymp(rt)
       endif
     endif
   endif
@@ -1053,7 +1059,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   double precision  :: reval(6), aival(6) ! re and im parts 
   logical, external :: m66sta  
   character(len=150):: warnstr
-
+  logical :: error
   !--- initialize deltap because twcpin can be called directly from mad_emit
   deltap = get_value('probe ','deltap ')
 
@@ -1065,8 +1071,15 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   bety0=zero; alfy0=zero; amuy0=zero
   cosmux_eig=zero; cosmuy_eig=zero
   stabx=.false.; staby=.false.
+  error = .false.
 
-  call tmsymp(RA)
+  call tmsymp(RA, error)
+  if (error) then
+     eflag = 1
+     write (warnstr,'(a)') "One-turn map can't be symplified!"
+     call fort_warn('TWCPIN: ', warnstr)
+  endif
+
   ! RA(1:4,1:4) = ( A , B
   !                 C , D)
   A = RA(1:2,1:2) ; B = RA(1:2,3:4)
@@ -2003,10 +2016,11 @@ SUBROUTINE twcptk(re,orbit)
   trace_e = E(1,1)+E(2,2)
   trace_f = F(1,1)+F(2,2)
   trace_tmp = ( TMP(1,1)+ TMP(2,2))/gammacp**2
- if ( abs (trace_tmp) .ge. 2.0001 .and. gammacp .ge. 1.001) then
+  if ( abs (trace_tmp) .ge. 2.0001 .and. gammacp .ge. 1.001) then
+     flipping = .false.
      write (warnstr, '(a, a, a)') ' Lattice is unstable due to ', name, '.  Twiss parameter might be unphysical!'
      call fort_warn('TWCPTK: ', warnstr)
-     write (warnstr, '( a, e13.6, a, e13.6)') ' gammacp = ', gammacp, '; trace of decoupled matrix is ', trace_tmp
+     write (warnstr, '( a, e13.6, a, e13.6)') ' g = ', gammacp, '; trace of decoupled matrix is ', trace_tmp
      call fort_warn('TWCPTK: ', warnstr)
   endif
   
@@ -6201,7 +6215,10 @@ SUBROUTINE tmtrak(ek,re,te,orb1,orb2)
   double precision :: sum1, sum2, temp(6)
   
   integer, external :: get_option
- 
+
+  logical :: error
+
+  error = .false. 
   do i = 1, 6
      sum2 = ek(i)
      do k = 1, 6
@@ -6218,11 +6235,11 @@ SUBROUTINE tmtrak(ek,re,te,orb1,orb2)
   ORB2(1:6) = TEMP(1:6) 
 
   !---- Symplectify transfer matrix.
-  if (get_option('sympl ') .ne. 0) call tmsymp(re)
+  if (get_option('sympl ') .ne. 0) call tmsymp(re, error)
 
 end SUBROUTINE tmtrak
 
-SUBROUTINE tmsymp(r)
+SUBROUTINE tmsymp(r, error)
   use matrices
   use math_constfi, only : zero, two
   implicit none
@@ -6237,7 +6254,7 @@ SUBROUTINE tmsymp(r)
   !----------------------------------------------------------------------*
   double precision, intent(IN OUT) :: r(6,6)
 
-  logical :: eflag
+  logical :: eflag, error
   integer :: i, j
   double precision :: a(6,6), b(6,6), v(6,6), nrm
 
@@ -6262,11 +6279,12 @@ SUBROUTINE tmsymp(r)
   return
 
 100 continue
-    call m66symp(r,nrm)
-    if (nrm .gt. zero) then
-       print *," Singular matrix occurred during symplectification of R (left unchanged)."
-       print *," The column norm of R'*J*R-J is ",nrm
-    endif
+  call m66symp(r,nrm)
+  if (nrm .gt. zero) then
+     print *," Singular matrix occurred during symplectification of R (left unchanged)."
+     print *," The column norm of R'*J*R-J is ",nrm
+     error = .true.
+  endif
 
 end SUBROUTINE tmsymp
 
