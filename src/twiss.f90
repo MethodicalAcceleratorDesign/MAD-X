@@ -6257,7 +6257,7 @@ SUBROUTINE tmsymp(r, error)
   logical :: eflag, error
   integer :: i, j
   double precision :: a(6,6), b(6,6), v(6,6), nrm
-
+  double precision, parameter :: eps=1d-12
   A = -R + EYE
   B =  R + EYE
   
@@ -6283,7 +6283,7 @@ SUBROUTINE tmsymp(r, error)
   if (nrm .gt. zero) then
      print *," Singular matrix occurred during symplectification of R (left unchanged)."
      print *," The column norm of R'*J*R-J is ",nrm
-     error = .true.
+     if (nrm .gt. eps) error = .true.
   endif
 
 end SUBROUTINE tmsymp
