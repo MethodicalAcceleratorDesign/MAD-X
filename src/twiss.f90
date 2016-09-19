@@ -1053,13 +1053,13 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
 
   integer, external :: get_option
   double precision, external :: get_value
-  double precision, parameter :: eps=1d-8, diff_cos = 1d-4
+  double precision, parameter :: eps=1d-8, diff_cos = 1d-4, symp_thrd=1d-11 ! FCC2 needs a bit more than 1e-12
 
-  double precision  :: em(6,6),  cosmux_eig, cosmuy_eig
+  double precision  :: em(6,6),  cosmux_eig, cosmuy_eig, nrm
   double precision  :: reval(6), aival(6) ! re and im parts 
   logical, external :: m66sta  
   character(len=150):: warnstr
-  logical :: error
+
   !--- initialize deltap because twcpin can be called directly from mad_emit
   deltap = get_value('probe ','deltap ')
 
@@ -1071,15 +1071,16 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   bety0=zero; alfy0=zero; amuy0=zero
   cosmux_eig=zero; cosmuy_eig=zero
   stabx=.false.; staby=.false.
-  error = .false.
 
-  call tmsymp(RA, error)
-  if (error) then
+  call m66symp(rt,nrm)
+  if (nrm .gt. symp_thrd) then
      eflag = 1
      write (warnstr,'(a)') "One-turn map can't be symplified!"
      call fort_warn('TWCPIN: ', warnstr)
+  else
+     call tmsymp(RA)
   endif
-
+  
   ! RA(1:4,1:4) = ( A , B
   !                 C , D)
   A = RA(1:2,1:2) ; B = RA(1:2,3:4)
@@ -6216,9 +6217,6 @@ SUBROUTINE tmtrak(ek,re,te,orb1,orb2)
   
   integer, external :: get_option
 
-  logical :: error
-
-  error = .false. 
   do i = 1, 6
      sum2 = ek(i)
      do k = 1, 6
@@ -6235,11 +6233,11 @@ SUBROUTINE tmtrak(ek,re,te,orb1,orb2)
   ORB2(1:6) = TEMP(1:6) 
 
   !---- Symplectify transfer matrix.
-  if (get_option('sympl ') .ne. 0) call tmsymp(re, error)
+  if (get_option('sympl ') .ne. 0) call tmsymp(re)
 
 end SUBROUTINE tmtrak
 
-SUBROUTINE tmsymp(r, error)
+SUBROUTINE tmsymp(r)
   use matrices
   use math_constfi, only : zero, two
   implicit none
@@ -6257,7 +6255,7 @@ SUBROUTINE tmsymp(r, error)
   logical :: eflag, error
   integer :: i, j
   double precision :: a(6,6), b(6,6), v(6,6), nrm
-  double precision, parameter :: eps=1d-12
+
   A = -R + EYE
   B =  R + EYE
   
@@ -6283,7 +6281,6 @@ SUBROUTINE tmsymp(r, error)
   if (nrm .gt. zero) then
      print *," Singular matrix occurred during symplectification of R (left unchanged)."
      print *," The column norm of R'*J*R-J is ",nrm
-     if (nrm .gt. eps) error = .true.
   endif
 
 end SUBROUTINE tmsymp
