@@ -17,8 +17,10 @@ PROJECT(madX C CXX Fortran)
 # warnings we do not want..
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
-  cmake_policy(SET CMP0042 NEW)
-endif(COMMAND cmake_policy)
+  if(${CMAKE_VERSION} VERSION_GREATER 2.9)
+    cmake_policy(SET CMP0042 NEW)
+  endif()
+endif()
 
 # add source dir as a place for CMake modules (e.g. FindGSL.cmake)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake") 
