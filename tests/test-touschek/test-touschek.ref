@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:26:18      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.09.22 10:12:06      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option, -info, warn, -echo;
 
@@ -34,6 +34,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
        4.507883438       0.9276843614   -0.0003629111388    4.011207208e-05 
+
+            nflips 
+                 0 
  
  TOUSCHEK MODULE PARAMETERS
  
@@ -93,6 +96,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
        4.507883438       0.9276843614   -0.0003629111388    4.011207208e-05 
+
+            nflips 
+                 0 
  
  TOUSCHEK MODULE PARAMETERS
  

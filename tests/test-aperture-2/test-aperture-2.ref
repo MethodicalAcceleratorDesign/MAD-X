@@ -104,6 +104,9 @@ orbit:  -2.000000E-03  1.739113E-11  3.774323E-11  1.700000E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
+            nflips 
+                 0 
+
 
 ! Initialize PTC
 

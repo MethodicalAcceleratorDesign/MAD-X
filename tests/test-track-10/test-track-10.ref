@@ -46,6 +46,9 @@ orbit:   4.954587E-05 -4.291723E-07  0.000000E+00  0.000000E+00  1.525203E-01  7
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 makethin: style chosen : hybrid
 makethin: slicing sequence : lep
 enter Twiss module
@@ -85,6 +88,9 @@ orbit:   4.954688E-05 -3.462812E-07  0.000000E+00  0.000000E+00  1.525359E-01  7
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 enter TRACK module
 damp is on
   

@@ -47,6 +47,9 @@ orbit:  -5.000000E-04  4.852583E-15  6.363372E-15  1.425000E-04  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 enter Twiss module
   
 iteration:   1 error:   8.560154E-04 deltap:   0.000000E+00
@@ -77,6 +80,9 @@ orbit:   5.000000E-04 -5.001955E-14 -8.221311E-15 -1.425000E-04  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 assign,echo="temp.bb.install",truncate;
 
 
@@ -961,6 +967,9 @@ orbit:  -4.916159E-13  2.718783E-15 -8.248169E-13  9.167213E-15  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 !--- separation for halo collisions at IP2
 
 on_sep2 = 2.118 * sqrt(epsx * r2ip2->betx) / 0.0007999979093;

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:20:08      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.09.21 16:07:45      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Beam, SEQUENCE=Machine, PARTICLE=electron, energy=3, RADIATE=True;
 
@@ -82,6 +82,9 @@ orbit:   7.784384E-10 -1.536909E-07  1.158311E-20 -5.552102E-22 -2.156959E-03  3
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 Emit, DELTAP=0.0 ;
 
 enter EMIT module
@@ -244,6 +247,9 @@ orbit:   9.905473E-10 -1.527012E-07  3.538555E-20 -3.881574E-21 -2.156963E-03  3
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 Emit, DELTAP=0.0 ;
 
 enter EMIT module
@@ -369,6 +375,9 @@ orbit:   7.784384E-10 -1.536909E-07  1.158311E-20 -5.552102E-22 -2.156959E-03  3
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 
 
 stop;

@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.01  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.04.25      +
-  + Execution Time Stamp: 11.06.14 14.00.37 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.09.21 16:07:00      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 ! Threader example
 
 OPTION, -ECHO, -WARN, INFO;
@@ -111,6 +111,9 @@ orbit:   1.302335E-01  1.974439E-03  2.736300E-02  1.294316E-03  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
+            nflips 
+                 0 
+
 
 !acbv1:=1.e-4;
 
@@ -125,10 +128,10 @@ option,threader;
 twiss, file = twiss.2;
 enter Twiss module
  Found initial orbit vector from coguess values. 
-++++++ info: -threader- pickup: bph[ 1]  kicker: cbh[ 1] total x-kick:  -9.813651E-04              
-++++++ info: -threader- pickup: bpv[ 1]  kicker: cbv[ 1] total y-kick:  -1.000000E-03              
-++++++ info: -threader- pickup: bph[ 2]  kicker: cbh.2[ 1] total x-kick:  -9.816179E-04              
-++++++ info: -threader- pickup: bpv[ 2]  kicker: cbv.2[ 1] total y-kick:  -1.000000E-03              
+++++++ info: -threader- pickup: bph[ 1]  kicker: cbh[ 1] total x-kick: -9.813651E-04              
+++++++ info: -threader- pickup: bpv[ 1]  kicker: cbv[ 1] total y-kick: -1.000000E-03              
+++++++ info: -threader- pickup: bph[ 2]  kicker: cbh.2[ 1] total x-kick: -9.816179E-04              
+++++++ info: -threader- pickup: bpv[ 2]  kicker: cbv.2[ 1] total y-kick: -1.000000E-03              
   
 iteration:   1 error:   3.244315E-03 deltap:   0.000000E+00
 orbit:   2.577913E-03  3.848409E-05 -2.267222E-08 -3.819306E-10  0.000000E+00  0.000000E+00
@@ -156,8 +159,11 @@ orbit:   2.578233E-03  3.848899E-05 -2.257435E-08 -3.834450E-10  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
+            nflips 
+                 0 
+
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.01 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

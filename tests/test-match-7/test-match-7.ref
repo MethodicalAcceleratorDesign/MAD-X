@@ -98,6 +98,9 @@ orbit:  -4.999999E-04  1.982147E-10  8.002226E-12  1.425000E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
+            nflips 
+                 0 
+
 
 ! Match the tune:
 
@@ -251,6 +254,9 @@ orbit:  -4.999999E-04  2.133986E-10  8.054964E-12  1.425000E-04  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 
 
 stop;

@@ -30,7 +30,6 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   integer, external :: get_option
 
   integer, parameter :: izero=0, ione=1
-
   !---- Initialization
   table_name = charconv(tab_name)
   sectorTableName = charconv(sector_tab_name)
@@ -124,7 +123,6 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
      !----IrinaTecker: For Sagan-Rubin and Talman versions of coupling
      !call twcpin_sagan(rt,disp0,r0mat, eflag);                       if (eflag.ne.0) go to 900 
      !call twcpin_talman(rt,disp0,r0mat, eflag);                       if (eflag.ne.0) go to 900 
-
      !---- Initialize opt_fun0
      call twinifun(opt_fun0,rt)
   endif
@@ -137,9 +135,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
 
   !IT: SIGMA MATRIX
   ! tmsigma - based on standard [b -a ; -a gamma] matrix;
-  ! tmsig_emit -based on eigenvalues like in emit.c , needs verification of emmitance calcluation
   call tmsigma( opt_fun0(3), opt_fun0(6), opt_fun0(4), opt_fun0(7), s0mat)
-  !call tmsigma_emit(rt, s0mat)
   
   ! sigma matrix
   do i= 1,6
@@ -149,16 +145,15 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   enddo
   sigmat = s0mat
 
+  
   !---- Build table of lattice functions, coupled.
   call twcpgo(rt,orbit0)
   if(.not. flipping) then
      write (warnstr, '(a)') 'Modes flip is not possible for this lattice'
      call fort_warn('TWISS: ', warnstr)
-     !goto 900
+     goto 900
   endif
 
-
-  
   !---- List chromatic functions.
   if (chrom .ne. 0) then
      call twbtin(rt,tt)
@@ -166,7 +161,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   endif
 
   !---- Print summary
-!  call double_to_table_curr('summ ','nflips ' , dble(nmode_flip))
+  call double_to_table_curr('summ ','nflips ' , dble(nmode_flip))
 
   if (MOD(nmode_flip, 2).ne.0) then
      write (warnstr, '(a,i5)') 'Total number of modes flips is not even! Nflips = ', nmode_flip
@@ -1179,11 +1174,15 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   if ((cosmux - cosmux_eig) .gt. diff_cos) then
      write (warnstr,'(a,e13.6)') "Difference in the calculation of cosmux: cosmux - cosmux_eig =  ", cosmux - cosmux_eig
      call fort_warn('TWCPIN: ', warnstr)
+     write (warnstr,'(a,e13.6,a,e13.6)') "cosmux  =  ", cosmux, ", cosmux_eig =", cosmux_eig
+     call fort_warn('TWCPIN: ', warnstr)
   endif
 
   cosmuy_eig = ( reval(3)+aival(3) + reval(4) + aival(4) )/ 2
   if ((cosmuy - cosmuy_eig) .gt. diff_cos) then
      write (warnstr,'(a,e13.6)') "Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =  ", cosmuy - cosmuy_eig
+     call fort_warn('TWCPIN: ', warnstr)
+     write (warnstr,'(a,e13.6,a,e13.6)') "cosmuy  =  ", cosmuy, ", cosmuy_eig =", cosmuy_eig
      call fort_warn('TWCPIN: ', warnstr)
   endif
 
@@ -3172,7 +3171,8 @@ SUBROUTINE tw_summ(rt,tt)
   double precision :: sd, detl, f, tb, t2
   double precision :: disp0(6), frt(6,6), frtp(6,6), rtp(6,6)
   double precision :: bx0, ax0, by0, ay0, sx, sy, orbit5
-  double precision, parameter :: eps=1d-16
+  double precision, parameter :: eps=1d-16, diff_cos =1d-4
+  character(len=150) :: warnstr
   
   integer, external :: get_option
 
@@ -3242,6 +3242,23 @@ SUBROUTINE tw_summ(rt,tt)
         gamtr = sign(one,alfa) * sqrt( one / abs(alfa))
      endif
 
+     if (cosmux .gt. zero .and. cos(amux) .gt. zero ) then
+        if ((cosmux - cos(amux)) .gt. diff_cos) then
+           !print*,  "Difference in the calculation of cosmux: cosmux - cos(amux) =  ", cosmux - cos(amux)
+           write (warnstr,'(a,e13.6)') "Difference in the calculation of cosmux: cosmux - cos(amux) =  ", cosmux - cos(amux)
+           call fort_warn('TW_SUMM: ', warnstr)
+           write (warnstr,'(a,e13.6,a,e13.6)') "cosmux  =  ", cosmux, ", cos(amuy/twopi) = ", cos(amux)
+           call fort_warn('TW_SUMM: ', warnstr)
+        endif
+     endif
+     if (cosmuy .gt. zero .and. cos(amuy) .gt. zero ) then
+        if ( (cosmuy - cos(amuy)) .gt. diff_cos) then
+           write (warnstr,'(a,e13.6)') "Difference in the calculation of cosmuy: cosmuy - cos(amuy) =  ", cosmuy - cos(amuy)
+           call fort_warn('TW_SUMM: ', warnstr)
+           write (warnstr,'(a,e13.6,a,e13.6)') "cosmuy  =  ", cosmuy, ", cos(amuy) = ", cos(amuy)
+           call fort_warn('TW_SUMM: ', warnstr)
+        endif
+     endif
   endif
 
   !---- Initialization transverse 
@@ -3256,7 +3273,7 @@ SUBROUTINE tw_summ(rt,tt)
   alfy    = opt_fun0(7)
 
   amuy    = opt_fun(8)
-
+  
   qx = amux / twopi
   qy = amuy / twopi
 

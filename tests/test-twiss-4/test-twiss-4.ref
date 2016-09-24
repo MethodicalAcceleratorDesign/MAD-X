@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:19:13      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.09.21 16:06:54      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! Based on : ../../examples/twiss/job.sample.thin.new.madx
 
@@ -98,6 +98,9 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
      synch_2      synch_3      synch_4      synch_5 
     0.000000     0.000000     0.000000     0.000000 
 
+      nflips 
+    0.000000 
+
 
  use,    period=lhcb2;
 
@@ -139,6 +142,9 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 
      synch_2      synch_3      synch_4      synch_5 
     0.000000     0.000000     0.000000     0.000000 
+
+      nflips 
+    0.000000 
 
 
 stop;

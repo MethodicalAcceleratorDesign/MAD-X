@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.06  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.06.26               +
-  + Execution date: 2015.09.07 18:25:12      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.09.21 16:06:11      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2012
 
@@ -106,6 +106,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 beta.ip1 =                  0 ;
 enter Twiss module
   
@@ -131,6 +134,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -155,6 +161,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 on_x1 =                  0 ;
 on_x2 =                  0 ;
 on_x5 =                  0 ;
@@ -494,18 +503,21 @@ orbit:   8.908674E-22 -2.255121E-23 -9.785071E-22 -1.701329E-23 -1.456529E-17 -1
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 enter TRACK module
   
 iteration:   1 error:   2.225376E-21 deltap:   0.000000E+00
 orbit:   8.908674E-22 -2.255121E-23 -9.785071E-22 -1.701329E-23 -1.456529E-17 -1.927238E-25
-  
+
 Full 6D closed orbit search.
 Initial value of 6-D closed orbit from Twiss: 
 orbit0   8.908674E-22 -2.255121E-23 -9.785071E-22 -1.701329E-23 -1.456529E-17 -1.927238E-25
-  
+
 6D closed orbit found by subroutine trclor 
 iteration:  11 error:   2.799193E-22 deltap:   0.000000E+00
-orbit:  -1.178419E-69 -1.506185E-71  1.588057E-81  1.725567E-83 -4.073446E-17  2.797265E-22
+orbit:  -5.149685E-70 -6.582024E-72  3.585969E-82  3.004261E-84 -4.073446E-17  2.797265E-22
 exit TRACK module
 
 

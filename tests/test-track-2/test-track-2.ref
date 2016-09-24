@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (64 bit, Linux)       +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.07      +
-  + Execution Time Stamp: 12.12.12 11.28.33 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.09.21 16:04:37      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 ! Tracking test for 6-D closed orbit search with LHC thin seq V6.501
 
 ! tstTrack_6D_orbit_LHC.madx, Yipeng SUN, 01-12-2008
@@ -43,6 +43,9 @@ orbit:  -1.916441E-03 -1.261077E-04  6.460942E-04  3.861002E-05  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 enter TRACK module
 one pass is on
 exit TRACK module
@@ -51,5 +54,5 @@ exit TRACK module
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

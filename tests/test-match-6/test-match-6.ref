@@ -96,6 +96,9 @@ orbit:  -4.999999E-04  1.982147E-10  8.002226E-12  1.425000E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
+            nflips 
+                 0 
+
 
 ! Select beam2:
 
@@ -141,6 +144,9 @@ orbit:   5.000001E-04  2.337570E-10  1.228120E-12 -1.425000E-04  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 
 
 ! Match the chromaticity:
@@ -252,6 +258,9 @@ orbit:  -4.999999E-04  1.982147E-10  8.002227E-12  1.425000E-04  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
+            nflips 
+                 0 
+
 
 ! Generate a TWISS table:
 
@@ -291,6 +300,9 @@ orbit:   5.000001E-04  2.337570E-10  1.228122E-12 -1.425000E-04  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 
 
 stop;

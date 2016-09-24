@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:26:26      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.09.22 14:33:49      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option, warn,info,echo;
 
@@ -98,6 +98,9 @@ orbit:  -1.080206E-08  4.485705E-10  2.083302E-08  1.699982E-04  9.252406E-06  1
 
            synch_2            synch_3            synch_4            synch_5 
     0.002244883795     7.99769003e-07     1.09064177e-06    2.114259357e-08 
+
+            nflips 
+                 0 
 
 
 ! reduce size of output table:
@@ -210,6 +213,9 @@ orbit:  -1.080206E-08  4.485705E-10  2.083302E-08  1.699982E-04  9.252406E-06  1
 
            synch_2            synch_3            synch_4            synch_5 
     0.002244883795     7.99769003e-07     1.09064177e-06    2.114259357e-08 
+
+            nflips 
+                 0 
 
 
 select, flag=touschek, column= name, S, TLI, TLIW, TLITOT;

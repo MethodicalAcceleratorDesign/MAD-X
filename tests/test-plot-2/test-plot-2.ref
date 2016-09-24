@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:27:19      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.09.22 10:13:02      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option, -echo;
 
@@ -70,6 +70,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
        1.526297364       0.3728165258       0.5042000294        4.147872957 
+
+            nflips 
+                 0 
 
 
 plot, haxis=s, vaxis=betx;
@@ -341,6 +344,15 @@ orbit:  -1.583606E-01 -3.199629E-02  0.000000E+00  0.000000E+00 -2.602349E-02  1
                  0                  0                  0                  0 
                  0                  0                  0                  0 
 
+            nflips 
+                 0 
+                 0 
+                 0 
+                 0 
+                 0 
+                 0 
+                 0 
+
 
 plot, table="summ", haxis=deltap,vaxis1=q1,vaxis2=q2,
 
@@ -391,6 +403,9 @@ orbit:  -1.830396E-07  4.958385E-08 -3.528003E-04 -1.117477E-04 -8.237753E-07  4
 
            synch_2            synch_3            synch_4            synch_5 
        1.526297364       0.3728165258       0.5042000195        4.147876677 
+
+            nflips 
+                 0 
 
 
 plot, haxis=s, vaxis=y, interpolate, range=QFN12/XFW11, noversion, hmin=10.5,hmax=14.0,

@@ -3,7 +3,7 @@
   +     MAD-X 5.02.10  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2016.04.23               +
-  + Execution date: 2016.05.20 23:44:53      +
+  + Execution date: 2016.09.23 17:52:23      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2012
 
@@ -652,6 +652,9 @@ orbit:  -2.032317E-13  4.164135E-15 -2.646832E-13 -3.010133E-15  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 xnom1 =            0.00075 ;
 xnom2 =              0.002 ;
 xnom5 =    2.095654379e-15 ;
@@ -692,6 +695,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 beta.ip1 =       0.1499911845 ;
 enter Twiss module
   
@@ -717,6 +723,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -741,6 +750,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 Running survey for aligment calculations...
 mbrc_mech_sep =                188 ;
 mbrd_mech_sep =                186 ;
@@ -2976,21 +2988,79 @@ call:       7   Penalty function =   0.14417180E-02
 call:      12   Penalty function =   0.13544433E-02
 call:      16   Penalty function =   0.13362926E-02
 call:      19   Penalty function =   0.13332025E-02
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297562E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382144E+00, cosmuy_eig =-0.411901E+00                                                                                                   
 call:      23   Penalty function =   0.13314671E-02
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297564E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382169E+00, cosmuy_eig =-0.411925E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297561E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382132E+00, cosmuy_eig =-0.411889E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297559E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382110E+00, cosmuy_eig =-0.411866E+00                                                                                                   
 call:      27   Penalty function =   0.13314389E-02
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297562E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382134E+00, cosmuy_eig =-0.411891E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297559E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382098E+00, cosmuy_eig =-0.411854E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297558E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382088E+00, cosmuy_eig =-0.411844E+00                                                                                                   
 call:      31   Penalty function =   0.13314287E-02
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297560E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382113E+00, cosmuy_eig =-0.411869E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297557E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382076E+00, cosmuy_eig =-0.411832E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297556E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382062E+00, cosmuy_eig =-0.411818E+00                                                                                                   
 call:      34   Penalty function =   0.13314241E-02
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297558E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382086E+00, cosmuy_eig =-0.411842E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297555E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382050E+00, cosmuy_eig =-0.411806E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297556E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382053E+00, cosmuy_eig =-0.411809E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297556E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382059E+00, cosmuy_eig =-0.411815E+00                                                                                                   
 call:      38   Penalty function =   0.13314237E-02
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297558E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382083E+00, cosmuy_eig =-0.411839E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297555E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382047E+00, cosmuy_eig =-0.411803E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297556E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382056E+00, cosmuy_eig =-0.411811E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297556E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382058E+00, cosmuy_eig =-0.411814E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297556E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382059E+00, cosmuy_eig =-0.411814E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297556E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382059E+00, cosmuy_eig =-0.411815E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297556E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382059E+00, cosmuy_eig =-0.411815E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297556E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382059E+00, cosmuy_eig =-0.411815E+00                                                                                                   
 call:      46   Penalty function =   0.13314237E-02
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297558E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382083E+00, cosmuy_eig =-0.411839E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297555E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382047E+00, cosmuy_eig =-0.411803E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297556E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382059E+00, cosmuy_eig =-0.411815E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297556E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382059E+00, cosmuy_eig =-0.411815E+00                                                                                                   
  ++++++++++ LMDIF ended: converged without success
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297556E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382059E+00, cosmuy_eig =-0.411815E+00                                                                                                   
 call:      50   Penalty function =   0.13314237E-02
  endmatch;
 
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297556E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382059E+00, cosmuy_eig =-0.411815E+00                                                                                                   
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297556E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382059E+00, cosmuy_eig =-0.411815E+00                                                                                                   
 Global constraint:         q1           4     6.23150000E+01     6.23175525E+01     6.51501277E-04
 Global constraint:         q2           4     6.03150000E+01     6.03123925E+01     6.79922407E-04
 
@@ -3033,6 +3103,8 @@ orbit:   2.021228E-05 -5.756619E-06 -6.459268E-04 -7.091840E-06  0.000000E+00  0
   
 iteration:   3 error:   1.269879E-10 deltap:   0.000000E+00
 orbit:   2.021215E-05 -5.756617E-06 -6.459268E-04 -7.091840E-06  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.297556E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.382059E+00, cosmuy_eig =-0.411815E+00                                                                                                   
 
 ++++++ table: summ
 
@@ -3053,6 +3125,9 @@ orbit:   2.021215E-05 -5.756617E-06 -6.459268E-04 -7.091840E-06  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
  cta0     = abs(qx-qy-tsplit);
 
  closest0 = cta0;
@@ -3073,6 +3148,8 @@ orbit:   2.205922E-05 -5.796629E-06 -6.456138E-04 -7.067556E-06  0.000000E+00  0
   
 iteration:   3 error:   1.330829E-10 deltap:   0.000000E+00
 orbit:   2.205908E-05 -5.796627E-06 -6.456137E-04 -7.067555E-06  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.264365E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.383694E+00, cosmuy_eig =-0.410131E+00                                                                                                   
 
 ++++++ table: summ
 
@@ -3093,6 +3170,9 @@ orbit:   2.205908E-05 -5.796627E-06 -6.456137E-04 -7.067555E-06  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
  ctap     = abs(qx-qy-tsplit);
 
  
@@ -3131,6 +3211,9 @@ orbit:   1.837081E-05 -5.716815E-06 -6.462587E-04 -7.116321E-06  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
  ctam     = abs(qx-qy-tsplit);
 
  
@@ -3149,6 +3232,8 @@ orbit:   2.194719E-05 -5.794200E-06 -6.456322E-04 -7.069021E-06  0.000000E+00  0
   
 iteration:   3 error:   1.327115E-10 deltap:   0.000000E+00
 orbit:   2.194705E-05 -5.794197E-06 -6.456322E-04 -7.069020E-06  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.264034E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.383713E+00, cosmuy_eig =-0.410116E+00                                                                                                   
 
 ++++++ table: summ
 
@@ -3169,6 +3254,9 @@ orbit:   2.194705E-05 -5.794197E-06 -6.456322E-04 -7.069020E-06  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
  cta0     = abs(qx-qy-tsplit);
 
  
@@ -3187,6 +3275,8 @@ orbit:   2.309364E-05 -5.781926E-06 -6.479470E-04 -7.095668E-06  0.000000E+00  0
   
 iteration:   3 error:   1.320576E-10 deltap:   0.000000E+00
 orbit:   2.309351E-05 -5.781923E-06 -6.479470E-04 -7.095668E-06  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.153939E-01                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.389155E+00, cosmuy_eig =-0.404549E+00                                                                                                   
 
 ++++++ table: summ
 
@@ -3207,6 +3297,9 @@ orbit:   2.309351E-05 -5.781923E-06 -6.479470E-04 -7.095668E-06  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
  ctap     = abs(qx-qy-tsplit);
 
  
@@ -3245,6 +3338,9 @@ orbit:   2.073852E-05 -5.805199E-06 -6.432717E-04 -7.042061E-06  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
  ctam     = abs(qx-qy-tsplit);
 
  
@@ -3263,6 +3359,8 @@ orbit:   2.382856E-05 -5.772974E-06 -6.494753E-04 -7.113378E-06  0.000000E+00  0
   
 iteration:   3 error:   1.314760E-10 deltap:   0.000000E+00
 orbit:   2.382842E-05 -5.772972E-06 -6.494753E-04 -7.113378E-06  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807321E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.392768E+00, cosmuy_eig =-0.400841E+00                                                                                                   
 
 ++++++ table: summ
 
@@ -3284,6 +3382,9 @@ orbit:   2.382842E-05 -5.772972E-06 -6.494753E-04 -7.113378E-06  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
+            nflips 
+                 0 
+
 
  closest1 =abs(qx-qy-tsplit);
 
@@ -3297,6 +3398,8 @@ orbit:   2.382842E-05 -5.772972E-06 -6.494753E-04 -7.113378E-06  0.000000E+00  0
 
 START MATCHING
 
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807321E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.392768E+00, cosmuy_eig =-0.400841E+00                                                                                                   
  global, q1=qx00+qmid, q2=qy00+qmid;
 
  vary,   name=kqtf, step=1.E-9;
@@ -3311,26 +3414,74 @@ total constraints:      2
 
 START LMDIF:
 
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807321E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.392768E+00, cosmuy_eig =-0.400841E+00                                                                                                   
 Initial Penalty Function =   0.98666344E-04
 
 
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807284E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.392793E+00, cosmuy_eig =-0.400866E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807263E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.392756E+00, cosmuy_eig =-0.400829E+00                                                                                                   
 call:       7   Penalty function =   0.98315384E-04
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807548E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393012E+00, cosmuy_eig =-0.401088E+00                                                                                                   
 call:      11   Penalty function =   0.98105710E-04
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807567E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393026E+00, cosmuy_eig =-0.401101E+00                                                                                                   
 call:      15   Penalty function =   0.98097330E-04
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807549E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393014E+00, cosmuy_eig =-0.401089E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807603E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393052E+00, cosmuy_eig =-0.401128E+00                                                                                                   
 call:      18   Penalty function =   0.98086779E-04
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807582E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393040E+00, cosmuy_eig =-0.401116E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807607E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393058E+00, cosmuy_eig =-0.401134E+00                                                                                                   
 call:      22   Penalty function =   0.98084925E-04
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807589E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393046E+00, cosmuy_eig =-0.401122E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807631E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393066E+00, cosmuy_eig =-0.401143E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807610E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393060E+00, cosmuy_eig =-0.401136E+00                                                                                                   
 call:      26   Penalty function =   0.98084615E-04
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807592E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393048E+00, cosmuy_eig =-0.401124E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807616E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393065E+00, cosmuy_eig =-0.401141E+00                                                                                                   
 call:      29   Penalty function =   0.98084108E-04
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807597E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393053E+00, cosmuy_eig =-0.401129E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807615E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393067E+00, cosmuy_eig =-0.401143E+00                                                                                                   
 call:      32   Penalty function =   0.98082785E-04
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807635E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393067E+00, cosmuy_eig =-0.401144E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807616E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393067E+00, cosmuy_eig =-0.401143E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807615E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393067E+00, cosmuy_eig =-0.401143E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807615E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393067E+00, cosmuy_eig =-0.401143E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807615E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393067E+00, cosmuy_eig =-0.401143E+00                                                                                                   
  ++++++++++ LMDIF ended: converged: info =            1
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807615E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393067E+00, cosmuy_eig =-0.401143E+00                                                                                                   
 call:      39   Penalty function =   0.98082785E-04
  endmatch;
 
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807615E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393067E+00, cosmuy_eig =-0.401143E+00                                                                                                   
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807615E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393067E+00, cosmuy_eig =-0.401143E+00                                                                                                   
 Global constraint:         q1           4     6.23150000E+01     6.23156935E+01     4.80977797E-05
 Global constraint:         q2           4     6.03150000E+01     6.03142930E+01     4.99850049E-05
 
@@ -3355,6 +3506,8 @@ VARIABLE "TAR" SET TO   9.80827846e-05
 
 START MATCHING
 
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807615E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393067E+00, cosmuy_eig =-0.401143E+00                                                                                                   
  global, q1=qx00+qmid, q2=qy00+qmid;
 
  vary,   name=cmrskew, step=1.E-9;
@@ -3369,13 +3522,25 @@ total constraints:      2
 
 START LMDIF:
 
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807615E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393067E+00, cosmuy_eig =-0.401143E+00                                                                                                   
 Initial Penalty Function =   0.98082785E-04
 
 
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807640E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393067E+00, cosmuy_eig =-0.401143E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.807435E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.393068E+00, cosmuy_eig =-0.401142E+00                                                                                                   
 call:       5   Penalty function =   0.86995887E-04
 call:       8   Penalty function =   0.69044202E-04
 call:      11   Penalty function =   0.40905013E-04
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.397624E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.395076E+00, cosmuy_eig =-0.399052E+00                                                                                                   
 call:      14   Penalty function =   0.23813506E-04
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.397757E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.395075E+00, cosmuy_eig =-0.399053E+00                                                                                                   
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.397502E-02                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.395077E+00, cosmuy_eig =-0.399052E+00                                                                                                   
 call:      17   Penalty function =   0.93440247E-06
  ++++++++++ LMDIF ended: converged successfully
 call:      17   Penalty function =   0.93440247E-06
@@ -3587,15 +3752,31 @@ Initial Penalty Function =   0.85291858E-06
 
 
 call:       5   Penalty function =   0.84888782E-06
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.744521E-03                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.396768E+00, cosmuy_eig =-0.397513E+00                                                                                                   
 call:       8   Penalty function =   0.84488537E-06
 call:      11   Penalty function =   0.84336958E-06
 call:      14   Penalty function =   0.84268520E-06
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.744099E-03                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.396734E+00, cosmuy_eig =-0.397478E+00                                                                                                   
 call:      17   Penalty function =   0.84243923E-06
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.744068E-03                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.396734E+00, cosmuy_eig =-0.397478E+00                                                                                                   
 call:      20   Penalty function =   0.84231514E-06
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.744053E-03                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.396734E+00, cosmuy_eig =-0.397478E+00                                                                                                   
 call:      23   Penalty function =   0.84225283E-06
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.744045E-03                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.396734E+00, cosmuy_eig =-0.397478E+00                                                                                                   
 call:      26   Penalty function =   0.84222160E-06
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.744042E-03                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.396734E+00, cosmuy_eig =-0.397478E+00                                                                                                   
 call:      29   Penalty function =   0.84220597E-06
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.744040E-03                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.396734E+00, cosmuy_eig =-0.397478E+00                                                                                                   
 call:      32   Penalty function =   0.84219815E-06
+++++++ warning: TWCPIN:  Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =   0.744039E-03                                                                         
+++++++ warning: TWCPIN:  cosmuy  =  -0.396734E+00, cosmuy_eig =-0.397478E+00                                                                                                   
 call:      35   Penalty function =   0.84219425E-06
  ++++++++++ LMDIF ended: converged without success
 call:      35   Penalty function =   0.84219425E-06
@@ -3658,6 +3839,9 @@ orbit:   2.422786E-05 -5.757073E-06 -6.509601E-04 -7.133369E-06  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
  closest2=abs(qx-qy-tsplit);
 
  value, closest0, closest1, closest2, cmrskew, cmiskew;
@@ -5687,6 +5871,9 @@ orbit:   3.367340E-06 -1.485247E-07 -3.333567E-06 -4.068063E-08  4.905949E-06  4
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 !emit;
 
  value, table(summ,q1);
@@ -5752,6 +5939,9 @@ orbit:   3.367340E-06 -1.485247E-07 -3.333567E-06 -4.068063E-08  4.905949E-06  4
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 system,"gzip -f last_twiss.20";
 
 
@@ -5771,8 +5961,8 @@ system, "rm -rf temp" ;
 stop;
 
 
-  Number of warnings: 377
-377 in C and 0 in Fortran
+  Number of warnings: 525
+377 in C and 148 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

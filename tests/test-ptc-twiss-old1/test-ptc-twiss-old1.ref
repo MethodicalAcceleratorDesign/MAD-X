@@ -206,6 +206,9 @@ orbit:   3.260716E-04  2.596347E-06  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
+            nflips 
+                 0 
+
 
 SHOW,TWSSip;     ! SHOW parameters (see "*.out" file)
 

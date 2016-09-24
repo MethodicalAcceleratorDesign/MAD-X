@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:19:26      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.09.21 16:07:06      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! Test for MADX to calculate chromatic functions
 
@@ -75,6 +75,9 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
            synch_2            synch_3            synch_4            synch_5 
    1.635877847e-06    1.437380739e-10    1.254698259e-11    3.188233667e-14 
 
+            nflips 
+                 0 
+
 
 ! Calculate chromatic functions from two twiss tables
 
@@ -109,6 +112,9 @@ final orbit vector:     1.243142E-07  2.961373E-11  0.000000E+00  0.000000E+00 -
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
  Twiss, betx=1, bety=0.001, deltap=0.0,       file=twiss1;
 
 enter Twiss module
@@ -136,6 +142,9 @@ final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 
 
  Readmytable, table=twiss1, file=twiss1;

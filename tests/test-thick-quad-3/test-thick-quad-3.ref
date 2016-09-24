@@ -3,7 +3,7 @@
   +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2016.04.23               +
-  + Execution date: 2016.05.20 22:17:07      +
+  + Execution date: 2016.09.22 10:07:24      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -51,6 +51,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 
 
 !--- quads
@@ -100,6 +103,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 
 
 save,sequence=fivecell,file="fivecell_thin.seq";

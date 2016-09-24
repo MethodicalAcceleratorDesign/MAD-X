@@ -3,7 +3,7 @@
   +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2016.04.23               +
-  + Execution date: 2016.05.20 22:12:28      +
+  + Execution date: 2016.09.22 10:06:47      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE;
 
@@ -33,6 +33,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 makethin: style chosen : teapot
 makethin: slicing sequence : fivecell
 makethin: slicing sequence : ins
@@ -60,6 +63,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
   ++++++++++++++++++++++++++++
   +   c6t version 2.0        +
   ++++++++++++++++++++++++++++

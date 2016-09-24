@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:22:59      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.09.22 10:08:10      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title,'LHC Cell APERTURE example';
 
@@ -137,6 +137,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
   synch_2   synch_3   synch_4   synch_5 
   0.00000   0.00000   0.00000   0.00000 
 
+   nflips 
+  0.00000 
+
 
 !!! uses default beam and halo data (lhc at injection)
 
@@ -256,6 +259,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
   synch_2   synch_3   synch_4   synch_5 
   0.00000   0.00000   0.00000   0.00000 
+
+   nflips 
+  0.00000 
 
 
 !!! uses default beam and halo data (lhc at injection)

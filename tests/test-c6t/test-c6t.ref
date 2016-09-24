@@ -3,7 +3,7 @@
   +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2016.04.23               +
-  + Execution date: 2016.05.20 22:07:35      +
+  + Execution date: 2016.09.22 10:06:44      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! Tracking test for 6-D closed orbit search with LHC thin seq V6.501
 
@@ -43,6 +43,9 @@ orbit:  -1.916441E-03 -1.261077E-04  6.460942E-04  3.861002E-05  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
   ++++++++++++++++++++++++++++
   +   c6t version 2.0        +
   ++++++++++++++++++++++++++++

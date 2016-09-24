@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:19:19      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.09.21 16:07:00      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ang:=-PI/2;             !     0.000974144    -0.00864182        before bug fix was   0.000974144       -1.41323
 
@@ -57,6 +57,9 @@ final orbit vector:     1.799465E-19  1.693624E-19  7.061250E-03 -2.776802E-03 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
+            nflips 
+                 0 
+
 
   select, flag=makethin, class=sbend, slice=100;
 
@@ -100,6 +103,9 @@ final orbit vector:     0.000000E+00  0.000000E+00  7.071038E-03 -2.773820E-03  
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 
 
 save, sequence=SingleBend, file="thin.seq";

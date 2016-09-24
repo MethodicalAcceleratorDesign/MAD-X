@@ -65,6 +65,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  2.997565E-02  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 !survey,file=diamond_survey;
 
 EMIT,DELTAP=0.;

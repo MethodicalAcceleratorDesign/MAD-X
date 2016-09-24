@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:20:09      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.09.21 16:07:46      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !! **************************************************************************************
 
@@ -131,6 +131,9 @@ orbit:  -8.359839E-07 -1.313307E-07  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
+            nflips 
+                 0 
+
 
 !plot,haxis=s,vaxis1=betx,bety,vaxis2=dx,colour=100,title="TME cell",noversion=true;!,interpolate=true;
 
@@ -173,6 +176,9 @@ orbit:  -8.359839E-07 -1.313307E-07  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 ibs,file=ibs-table.tfs;
 
  sige    1.5000000478849657E-002

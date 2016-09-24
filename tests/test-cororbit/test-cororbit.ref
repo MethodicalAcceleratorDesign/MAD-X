@@ -74,6 +74,9 @@ orbit:  -5.000000E-04  5.614767E-12 -4.453718E-12 -3.996141E-12  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
+            nflips 
+                 0 
+
 
 // Now a machine with the bumps as a target orbit 
 
@@ -125,6 +128,9 @@ orbit:  -4.999999E-04  1.982147E-10  8.002225E-12  1.425000E-04  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 !plot,table=my_target1,title="Target orbit 1 x...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=x;
 
 !plot,table=my_target1,title="Target orbit 1 y...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=y;
@@ -181,6 +187,9 @@ orbit:  -4.999999E-04  1.297340E-10  1.748623E-12  1.425000E-04  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 !plot,table=my_target2,title="Target orbit 2 x...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=x;
 
 !plot,table=my_target2,title="Target orbit 2 y...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=y;
@@ -253,6 +262,9 @@ orbit:  -3.439231E-04 -7.342955E-05  2.348867E-04  2.504448E-05  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 !plot,table=my_orbit,title="Uncorrected orbit x...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=x;
 
 !plot,table=my_orbit,title="Uncorrected orbit y...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=y;
@@ -2064,6 +2076,9 @@ orbit:  -2.464425E-06 -6.064010E-06  1.416695E-06  1.815024E-06  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 !plot,title="Corrected orbit x...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=x;
 
 !plot,title="Corrected orbit y...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=y;
@@ -3874,6 +3889,9 @@ orbit:  -4.984988E-04 -8.659301E-06  4.787570E-06  1.384923E-04  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 !plot,title="Corrected orbit target 1 x...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=x;
 
 !plot,title="Corrected orbit target 1 y...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=y;
@@ -5702,6 +5720,9 @@ orbit:  -5.007140E-04 -7.332293E-06  4.787686E-06  1.383023E-04  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 !plot,title="Corrected orbit target 2 x...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=x;
 
 !plot,title="Corrected orbit target 2 y...",noline=true,vmin=-0.012,vmax=0.012,haxis=s,vaxis=y;

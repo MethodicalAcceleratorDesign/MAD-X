@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.05  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.04.06               +
-  + Execution date: 2015.06.16 11:22:57      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.09.21 16:07:22      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option,  warn,info,echo;
 
@@ -275,6 +275,9 @@ orbit:  -2.814728E-05  8.594499E-05  7.406703E-05  5.662320E-06  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
+            nflips 
+                 0 
+
 
 // calculate TWISS table for correction, beam 2 
 
@@ -308,6 +311,9 @@ orbit:   3.018352E-05 -1.061182E-04 -5.422462E-05  2.539827E-05  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
+            nflips 
+                 0 
+
 
 Coption,print=1;
 
@@ -330,9 +336,9 @@ mons and corrs (beam 1+2) : 2 24
 1091 monitors and 24 correctors found in input
 1091 monitors and 10 correctors enabled
 enter MICADO correction ...
-  
- start MICADO correction with            4  correctors
-  
+
+start MICADO correction with     4 correctors
+
 RMS before 9.588756e-01
 RMS after  9.004522e-02
 mcbxh.1r1:1 -1.115765e-03
@@ -386,6 +392,9 @@ orbit:  -2.742858E-05 -6.552713E-07  7.390359E-05  5.661291E-06  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 TWISS, file=resultb2, sequence=lhcb2;
 
 enter Twiss module
@@ -416,6 +425,9 @@ orbit:   3.932112E-05 -8.382908E-07 -5.420823E-05  2.537128E-05  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
+            nflips 
+                 0 
+
 
 removefile, file='fort.61';
 
@@ -423,5 +435,5 @@ removefile, file='fort.61';
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.05 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

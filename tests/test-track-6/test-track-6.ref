@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.01  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.04.25      +
-  + Execution Time Stamp: 11.06.14 16.56.45 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.09.21 16:04:47      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 ! Simple tracking test of tracking with a matrix.
 
 ! tstTrack_matrix.madx
@@ -37,6 +37,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 dxx1 =        477.7717946 ;
 dxxp1 =        2.391247832 ;
 r111 =       0.9997075052 ;
@@ -85,6 +88,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 
 
 ! ********** Create user defined table
@@ -201,6 +207,9 @@ final orbit vector:     9.569931E-04  3.268034E-06  0.000000E+00  0.000000E+00 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
+            nflips 
+                 0 
+
 
 method = 2; ! 2 for "TWISS";
 
@@ -262,6 +271,9 @@ final orbit vector:     9.569931E-02  3.268034E-04  0.000000E+00  0.000000E+00 -
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
+            nflips 
+                 0 
+
 
 method = 2; ! 2 for "TWISS";
 
@@ -301,5 +313,5 @@ return;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.01 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

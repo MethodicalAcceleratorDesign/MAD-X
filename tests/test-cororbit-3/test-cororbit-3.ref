@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  +     MAD-X 5.02.10  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:19:51      +
+  + Release   date: 2016.04.23               +
+  + Execution date: 2016.09.22 10:05:10      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, s='MAD-X test';
 
@@ -51,6 +51,9 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 
 
 Readmytable,file="input/orbps.in",table=orbint;
@@ -147,6 +150,9 @@ orbit:  -2.692856E-03 -5.679458E-05  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
+            nflips 
+                 0 
+
 
 ! MICADO with SVD conditioning
 
@@ -233,6 +239,9 @@ orbit:  -2.762425E-03 -5.729290E-05  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
+            nflips 
+                 0 
+
 
 ! SVD without SVD conditioning
 
@@ -316,6 +325,9 @@ orbit:  -2.762162E-03 -5.728768E-05  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 
 
 ! SVD with SVD conditioning
@@ -401,6 +413,9 @@ orbit:  -2.762425E-03 -5.729290E-05  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 
 
 ! LSQ without SVD conditioning
@@ -490,6 +505,9 @@ orbit:  -2.531501E-03 -4.831920E-05  0.000000E+00  0.000000E+00  0.000000E+00  0
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
 
+            nflips 
+                 0 
+
 
 ! LSQ with SVD conditioning
 
@@ -577,6 +595,9 @@ orbit:  -2.762425E-03 -5.729290E-05  0.000000E+00  0.000000E+00  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
+
+            nflips 
+                 0 
 
 
 

@@ -41,7 +41,10 @@ orbit:  -2.000000E-03  1.739113E-11  3.774323E-11  1.700000E-04  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
- MAD-X Beam Parameters
+ 
+            nflips 
+                 0 
+MAD-X Beam Parameters
                   Energy : 0.450001E+03
           Kinetic Energy : 0.449063E+03
       Particle Rest Mass : 0.938272E+00
