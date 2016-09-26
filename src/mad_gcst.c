@@ -92,7 +92,7 @@ const char* const ap_table_cols[] =
 {
   "name", "n1", "n1x_m", "n1y_m", "apertype",
   "aper_1", "aper_2", "aper_3", "aper_4",
-  "rtol", "xtol", "ytol", "xoffset", "yoffset", 
+  "rtol", "xtol", "ytol", "xoffset", "yoffset",
   "s", "betx", "bety", "dx", "dy", "x", "y", "px", "py",
   "on_ap", "on_elem", "spec",
   " "  /* blank terminates */
@@ -217,7 +217,7 @@ const int twiss_table_types[] =
   2, 2, 2, 2, 2,
   2, 2, 2, 2,
   2, 2, 2, 2,
-  1, 1, 2, 
+  1, 1, 2,
   2, /* v_pos */
   2, 3,
   2, 2, 2, 2, 2, 2,
@@ -276,11 +276,11 @@ const char* const twiss_table_cols[] =
   "k2l", "k2sl", "k3l", "k3sl", "k4l",
   "k4sl", "k5l", "k5sl", "k6l", "k6sl",
   "k7l", "k7sl", "k8l", "k8sl", "k9l",
-  "k9sl", "k10l", "k10sl", "k11l", "k11sl", 
-  "k12l", "k12sl", "k13l", "k13sl", 
-  "k14l", "k14sl", "k15l", "k15sl", 
-  "k16l", "k16sl", "k17l", "k17sl", 
-  "k18l", "k18sl", "k19l", "k19sl", 
+  "k9sl", "k10l", "k10sl", "k11l", "k11sl",
+  "k12l", "k12sl", "k13l", "k13sl",
+  "k14l", "k14sl", "k15l", "k15sl",
+  "k16l", "k16sl", "k17l", "k17sl",
+  "k18l", "k18sl", "k19l", "k19sl",
   "k20l", "k20sl", "ksi", "hkick",
   "vkick", "tilt", "e1", "e2", "h1",
   "h2", "hgap", "fint", "fintx",
@@ -345,48 +345,48 @@ const int twiss_sector_table_types[] = {
   3, 2,
   2, 2, 2, 2, 2, 2,
   /* 36 elements for the R-matrix */
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
   /* 216 elements for the T-matrix */
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
-  2, 2, 2, 2, 2, 2, 
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
+  2, 2, 2, 2, 2, 2,
   2, 2, 2, 2, 2, 2
 };
 
@@ -434,7 +434,7 @@ const char* const twiss_sector_table_cols[] = {
   "t136", "t236", "t336", "t436", "t536", "t636",
   "t146", "t246", "t346", "t446", "t546", "t646",
   "t156", "t256", "t356", "t456", "t556", "t656",
-  "t166", "t266", "t366", "t466", "t566", "t666", 
+  "t166", "t266", "t366", "t466", "t566", "t666",
   " " /* blank terminates */
 };
 
@@ -463,10 +463,10 @@ const int ptc_twiss_summary_table_types[] =
     2,2,2,	    /* "orbit_py","orbit_pt","orbit_-cT", */
     2,2,2,2,2,2,	    /* "xcorms","ycorms","pxcorms","pycorms","tcorms","ptcorms", */
     2,2,2,2,2,2,	    /* "xcomax","ycomax","pxcomax","pycomax","tcomax","ptcomax", */
-    2,2,2,2,2,2	    /* "xcomin","ycomin","pxcomin","pycomin","tcomin","ptcomin", */ 
-  }; 
+    2,2,2,2,2,2	    /* "xcomin","ycomin","pxcomin","pycomin","tcomin","ptcomin", */
+  };
 const char* const ptc_twiss_summary_table_cols[] = {
-  "length", "alpha_c", "alpha_c_p", "alpha_c_p2", "alpha_c_p3", "eta_c", "gamma_tr", 
+  "length", "alpha_c", "alpha_c_p", "alpha_c_p2", "alpha_c_p3", "eta_c", "gamma_tr",
   "q1", "q2", "dq1", "dq2", "qs",
   "beta_x_min","beta_x_max",
   "beta_y_min","beta_y_max",
@@ -643,16 +643,16 @@ const int summ_table_types[] =
   2, 2, 2, 2, 2,
   2, 2, 2, 2, 2,
   //2, 2, 2, 2, 2,
-  2, 2, 2, 2, 2, //for nflips 
+  2, 2, 2, 2, 2, //for nflips
 };
 
 const char* const summ_table_cols[] =
 {
   "length", "orbit5", "alfa", "gammatr", "q1",
-  "dq1", "betxmax", "dxmax", "dxrms", "xcomax", 
-  "xcorms", "q2", "dq2", "betymax", "dymax", 
-  "dyrms", "ycomax", "ycorms", "deltap", 
-  //"synch_1","synch_2","synch_3","synch_4","synch_5", 
+  "dq1", "betxmax", "dxmax", "dxrms", "xcomax",
+  "xcorms", "q2", "dq2", "betymax", "dymax",
+  "dyrms", "ycomax", "ycorms", "deltap",
+  //"synch_1","synch_2","synch_3","synch_4","synch_5",
   "synch_1","synch_2","synch_3","synch_4","synch_5", "nflips", //for nflips
   " "  /* blank terminates */
 };
@@ -665,7 +665,7 @@ const char* const summ_table_cols[] =
 //   "q2", "dq2", "betymax", "dymax", "dyrms", "ycomax", "ycorms",
 //   "synch_1","synch_2","synch_3","synch_4","synch_5",
 //   " "  /* blank terminates */
-// }; 
+// };
 
 const int trackone_table_types[] =
 {
@@ -754,12 +754,12 @@ const char* const names[]=
   "dx","dpx","dy","dpy","q1","q2","dq1","dq2","anhx","anhy","haml","gnfu","eign"," "
 };
 
-const char* const atm[] = 
+const char* const atm[] =
 {
  "hmon","vmon","moni"," "
 };
 
-const char* const atc[] = 
+const char* const atc[] =
 {
  "hkic","vkic","kick"," "
 };
@@ -773,15 +773,15 @@ int   atm_flag = 0;
 
 const char* const nonlin_table_cols[] =
 {
-  "name", "nickname", "basevariable", "value", 
+  "name", "nickname", "basevariable", "value",
   "order", "order_x", "order_px","order_y",
-           "order_py","order_pt","order_t", " "      
+           "order_py","order_pt","order_t", " "
 };
 
 const int nonlin_table_types[] =
 {
-  3, 3, 3, 2, 
+  3, 3, 3, 2,
   1, 1, 1, 1,
      1, 1, 1
 };
-     
+
