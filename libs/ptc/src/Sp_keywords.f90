@@ -2946,7 +2946,7 @@ endif
 else
  ele0%filef=' '
  ele0%fileb=' '
-ele0%usebf_skipptcbf_do1bf=0
+ ele0%usebf_skipptcbf_do1bf=.false.
 
     if(present(mf)) then
      read(mf,NML=ELEname)

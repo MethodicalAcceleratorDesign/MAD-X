@@ -8,8 +8,8 @@ END TYPE POL_sagan
 
 
 TYPE POL_BLOCK_sagan
-   INTEGER Iinternal(2)
-   real(dp) SInternal(2)
+   INTEGER Iinternal(6)
+   real(dp) SInternal(6)
    type(POL_sagan) w
 END TYPE POL_BLOCK_sagan
 
