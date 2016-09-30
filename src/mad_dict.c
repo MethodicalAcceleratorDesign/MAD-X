@@ -1,6 +1,6 @@
 #include "mad_dict.h"
 
-/* constants (pre-defined variables)  PDG 2010 
+/* constants (pre-defined variables)  PDG 2010
    nmass is the unified atomic mass unit [GeV/(c**2)] */
 /*char constant_def[] =
 "const pi = 4 * atan(1.); "
@@ -9,14 +9,14 @@
 "const raddeg = pi / 180; "
 "const e = exp(1.); "
 "const amu0 = 4.e-7 * pi; "
-"const emass = 0.510998910e-3; "  
-"const mumass = 0.1056583668; "   
-"const nmass = 0.931494028; " 
-"const pmass = 0.938272013; "     
-"const clight = 299792458.; "     
-"const qelect = 1.602176487e-19; " 
-"const hbar = 6.58211899e-25; "    
-"const erad = 2.8179402894e-15; "  
+"const emass = 0.510998910e-3; "
+"const mumass = 0.1056583668; "
+"const nmass = 0.931494028; "
+"const pmass = 0.938272013; "
+"const clight = 299792458.; "
+"const qelect = 1.602176487e-19; "
+"const hbar = 6.58211899e-25; "
+"const erad = 2.8179402894e-15; "
 "const prad = erad*emass/pmass; "; */
 
 /*  J. Beringer et al. (Particle Data Group), Phys. Rev. D86, 010001 (2012). = PDG 2012 */
@@ -37,19 +37,19 @@ char constant_def[] =
 "const raddeg = pi / 180; "
 "const e = exp(1.); "
 "const amu0 = 4.e-7 * pi; "
-"const emass = 0.510998928e-3; "  
-"const mumass = 0.1056583715; "   
-"const nmass = 0.931494061; " 
-"const pmass = 0.938272046; " 
-"const clight = 299792458.; "     
+"const emass = 0.510998928e-3; "
+"const mumass = 0.1056583715; "
+"const nmass = 0.931494061; "
+"const pmass = 0.938272046; "
+"const clight = 299792458.; "
 "const qelect = 1.602176565e-19; "
 "const hbar = 6.58211928e-25; " // GeV.s
-"const erad = 2.8179403267e-15; " 
+"const erad = 2.8179403267e-15; "
 "const prad = erad*emass/pmass; ";
 
 /* mods HG090508 - speed-up twiss
    all new elements must start with at, l, kmax, kmin, calib, polarity
-   exactly as the existing ones. Existing elements can only be extended 
+   exactly as the existing ones. Existing elements can only be extended
    at the end. */
 
 /* command definitions, sorted by module resp. type */
@@ -457,6 +457,7 @@ char command_def[] =
 "sixtrack: c6t none 0 0 "
 "mult_auto_off = [l, false, true], "
 "cavall        = [l, false, true], "
+"markall       = [l, false, true], "
 "aperture      = [l, false, true], "
 "split         = [l, false, true], "
 "mangle        = [l, false, true], "
@@ -625,7 +626,7 @@ char command_def[] =
 "rmatrix  = [l, false, true], "
 "ring_parameters  = [l, false, true], "   /* forces ring parametersd (skowron on 140120)*/
 "normal  = [l, false, true], "   /* runs normal form analysis (skowron on 150903)*/
-"initial_matrix_table = [l, false, true], " /* reads table map_table cooked by ptc_normal */ 
+"initial_matrix_table = [l, false, true], " /* reads table map_table cooked by ptc_normal */
 "initial_matrix_manual = [l, false, true], "
 "initial_map_manual = [l, false, true], "
 "ignore_map_orbit = [l, false, true], "   /* Ignores orbit in the map table and uses the closed or specified x,px,y... (skowron on 140120)*/
@@ -643,7 +644,7 @@ char command_def[] =
 "re61     = [r, 0], re62     = [r, 0], re63     = [r, 0], "
 "re64     = [r, 0], re65     = [r, 0], re66     = [r, 1], "
 "betz     = [r, 0], alfz     = [r, 0], muz      = [r, 0], "
-"maptable = [l, false, true], " 
+"maptable = [l, false, true], "
 "beta0    = [s, none, beta0]; "
 " "
 "ptc_moments: ptc_moments none 0 0 "
@@ -1643,8 +1644,8 @@ char command_def[] =
 "aperture = [r, {0}],  "
 "aper_offset = [r, {0}], "
 "aper_tol = [r, {0, 0, 0}], "
-"xsize    = [r, 0],  " 
-"ysize    = [r, 0], " 
+"xsize    = [r, 0],  "
+"ysize    = [r, 0], "
 "slot_id  = [i, none], "
 "assembly_id = [i, none], "
 "mech_sep = [r, 0], "
@@ -1674,8 +1675,8 @@ char command_def[] =
 "aperture = [r, {0}],  "
 "aper_offset = [r, {0}], "
 "aper_tol = [r, {0, 0, 0}], "
-"xsize    = [r, 0],  " 
-"ysize    = [r, 0], " 
+"xsize    = [r, 0],  "
+"ysize    = [r, 0], "
 "slot_id  = [i, none], "
 "assembly_id = [i, none], "
 "mech_sep = [r, 0], "
@@ -2165,7 +2166,7 @@ char command_def[] =
 "kill_exi_fringe = [l, false, true], "
 "n_bessel        = [i, 0], "
 "tilt     = [r, 0];  "
-" " 
+" "
 "placeholder: element none 0 38 "
 "at       = [r, 1.e20], "
 "l        = [r, 0], "
@@ -2398,7 +2399,7 @@ char command_def[] =
 "harmon     = [i, 0], "   // RF-Multipole
 "pnl        = [r, {0}], " // RF-Multipole
 "psl        = [r, {0}]; " // RF-Multipole
-" "  
+" "
 "collimator: element none 0 44 "
 "at       = [r, 1.e20], "
 "l        = [r, 0],  "

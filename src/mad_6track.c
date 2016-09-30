@@ -92,9 +92,9 @@
 
 // types
 
-/* MADX name and internal codes    : 
-   circle=1=CR, rectangle=2=RE, ellipse=3=EL, rectcircle=lhcscreen=4=RC, 
-   rectellipse=5=RL, racetrack=6=RT, octagon=7=OC */ 
+/* MADX name and internal codes    :
+   circle=1=CR, rectangle=2=RE, ellipse=3=EL, rectcircle=lhcscreen=4=RC,
+   rectellipse=5=RL, racetrack=6=RT, octagon=7=OC */
 struct aper_struct {
     int apply;
     char name[255];
@@ -444,14 +444,13 @@ static char el_info[N_TYPES][60] = /* see type_info definition */
  "rfoctupole   2       0       2       0       0       2"
 };
 
-static char keep_these[MM_KEEP][24] = {"ip", "mt_"};
 static char mpole_names[][16] = {"dipole", "quadrupole", "sextupole",
                           "octupole", "decapole", "multipole"};
 static char acro_list[20];   /* list for name starts */
 static int acro_cnt[20];    /* counters for name starts */
 static char tmp_name[KEY_LENGTH];
 
-static int 
+static int
   block_count = 0,     /* current block count for naming */
   elem_cnt = 0,        /* element count */
   acro_occ = 0,        /* acro list occupation */
@@ -463,7 +462,8 @@ static int
   f16_cnt = 0,         /* f16 write count */
   f34_cnt = 0,         /* f34 write count */
   special_flag = 1,    /* produce special output file from twiss */
-  cavall_flag = 0,     /* if 0 lump all cavities into first */
+  cavall_flag = 0,     /* if 0 dump all cavities into first */
+  markall_flag = 0,    /* if 1 dump all markers into first */
   aperture_flag = 0,   /* if 1 insert apertures into structure */
 //  radius_flag = 0, // not used    /* change the default reference radius */
   split_flag = 0,      /* if 1 keep zero multipoles after split */
@@ -605,14 +605,14 @@ assign_att(void)
 {
   struct c6t_element *el;
   int i, j;
-  
+
   for (i = 0; i < types.curr; i++)  /* loop over base types */
   {
     for (j = 0; j < types.member[i]->curr; j++) /* loop over el. in type */
     {
       el = types.member[i]->elem[j];
       if (el->flag > 0 && el->equiv == el)  /* all others ignored */
-      {	
+      {
         if      (strcmp(el->base_name, "aperture") == 0) att_aperture(el);
         else if (strcmp(el->base_name, "beambeam") == 0) att_beambeam(el);
         else if (strcmp(el->base_name, "collimator") == 0) att_colli(el);
@@ -953,7 +953,7 @@ att_vkicker(struct c6t_element* el)
   el->out_1 = -1; el->out_2 = el->value[13];
 }
 
-static void 
+static void
 att_undefined(struct c6t_element* el)
 {
   el->out_4 = el->value[0];
@@ -1108,7 +1108,7 @@ clean_c6t_element(struct c6t_element* cleanme)
 }
 
 static struct c6t_element*
-create_aperture(const char* name, const char* type, double ap1, double ap2, double ap3, double ap4, 
+create_aperture(const char* name, const char* type, double ap1, double ap2, double ap3, double ap4,
 		double offx, double offy, double tilt, struct double_array* p_al_err)
 {
   struct c6t_element* aper_element;
@@ -1116,31 +1116,31 @@ create_aperture(const char* name, const char* type, double ap1, double ap2, doub
   clean_c6t_element(aper_element);
   strcpy(aper_element->org_name,name);
 
-  // type of element is coded by integer...  
-  if      (strcmp(type,"CR")==0) aper_element->value[1] = 1; 
+  // type of element is coded by integer...
+  if      (strcmp(type,"CR")==0) aper_element->value[1] = 1;
   else if (strcmp(type,"RE")==0) aper_element->value[1] = 2;
   else if (strcmp(type,"EL")==0) aper_element->value[1] = 3;
   else if (strcmp(type,"RC")==0) aper_element->value[1] = 4;
   else if (strcmp(type,"RL")==0) aper_element->value[1] = 5;
   else if (strcmp(type,"RT")==0) aper_element->value[1] = 6;
   else if (strcmp(type,"OC")==0) aper_element->value[1] = 7;
-  else aper_element->value[1] = 0; 
+  else aper_element->value[1] = 0;
 
-  aper_element->value[0] = 0.0; // zero length ? 
+  aper_element->value[0] = 0.0; // zero length ?
   aper_element->value[2] = ap1 * 1e3; // sixtrack units are mm
-  aper_element->value[3] = ap2 * 1e3; 
+  aper_element->value[3] = ap2 * 1e3;
   aper_element->value[4] = ap3 * 1e3;
   aper_element->value[5] = ap4 * 1e3;
   aper_element->value[6] = offx * 1e3;
   aper_element->value[7] = offy * 1e3;
   aper_element->value[8] = tilt / M_PI * 180; // sixtrack units are degrees
- 
+
   if (aper_element->value[1] == 7) // Octagon
-  {   
+  {
     aper_element->value[4] = ap3 / M_PI * 180; // sixtrack units are degrees
     aper_element->value[5] = ap4 / M_PI * 180;
   }
-    
+
   aper_element->keep_in=1;
   /* alignment errors of aperture are to be copied to alignment errors of element */
   if (p_al_err && p_al_err->curr>11)
@@ -1170,7 +1170,7 @@ convert_madx_to_c6t(struct node* p)
     NameMangler_mangle(p->name, t_name);
   else
     strcpy(t_name, p->name);
-  
+
   if ((cp = strchr(t_name, ':')) != NULL) *cp = '\0';
   if ((strcmp(p->base_name,"rbend") == 0)      ||
       (strcmp(p->base_name,"sbend") == 0)      ||
@@ -1441,7 +1441,7 @@ convert_madx_to_c6t(struct node* p)
     if (maxkn>3 || maxks>3) {
     	printf("warning while converting rfmultipole: components beyond octupole are ignored\n");
     }
-    
+
     /*
     ** In particular, for the RF multipoles:
     ** Name: any name
@@ -1474,8 +1474,8 @@ convert_madx_to_c6t(struct node* p)
     ** value[15] = phase for skew quadrupole
     ** value[16] = phase for skew sextupole
     ** value[17] = phase for skew octupole
-    */ 
-    
+    */
+
     c6t_elem = new_c6t_element(19,t_name,p->base_name);
     clean_c6t_element(c6t_elem);
     strcpy(c6t_elem->org_name,t_name);
@@ -1502,7 +1502,7 @@ convert_madx_to_c6t(struct node* p)
     c6t_elem->value[15] = maxps>1?(ps_param->double_array->a[1]):0.0;
     c6t_elem->value[16] = maxps>2?(ps_param->double_array->a[2]):0.0;
     c6t_elem->value[17] = maxps>3?(ps_param->double_array->a[3]):0.0;
-    
+
     /*
     printf("\t KN= %e %e %e %e (%i)\n",kn_param->double_array->a[0], kn_param->double_array->a[1], kn_param->double_array->a[2], kn_param->double_array->a[3], maxkn);
     printf("\t PN= %e %e %e %e (%i)\n",pn_param->double_array->a[0], pn_param->double_array->a[1], pn_param->double_array->a[2], pn_param->double_array->a[3], maxpn);
@@ -1521,7 +1521,7 @@ convert_madx_to_c6t(struct node* p)
     for (j = 0; j < c6t_elem->n_values; j++)
       if (fabs(c6t_elem->value[j]) < eps_12)
         c6t_elem->value[j] = 0.0;
-    
+
     /* check to see if this has an aperture assigned, check for aperture flag */
     if ((aperture_flag)
         && (aper_param = return_param_recurse("apertype", p->p_elem)))
@@ -1537,7 +1537,7 @@ convert_madx_to_c6t(struct node* p)
         if (aper_param->expr_list != NULL)
           update_vector(aper_param->expr_list, aper_param->double_array);
 	j = 4;
-	if (aper_param->double_array->curr < 4) j = aper_param->double_array->curr;	
+	if (aper_param->double_array->curr < 4) j = aper_param->double_array->curr;
         for(i=1; i<=j; i++) tag_aperture.value[i] = aper_param->double_array->a[i-1];
       }
 
@@ -1546,7 +1546,7 @@ convert_madx_to_c6t(struct node* p)
         if (aper_param->expr_list != NULL)
           update_vector(aper_param->expr_list, aper_param->double_array);
 	j = 2;
-	if (aper_param->double_array->curr < 2) j = aper_param->double_array->curr;	
+	if (aper_param->double_array->curr < 2) j = aper_param->double_array->curr;
         for(i=1; i<=j; i++) tag_aperture.value[i+4] = aper_param->double_array->a[i-1];
       }
 
@@ -1743,6 +1743,8 @@ get_args(struct in_cmd* my_cmd)
     put_info("c6t - aperture flag selected","");
   if ((cavall_flag = command_par_value("cavall", my_cmd->clone)))
     put_info("c6t - cavall flag selected","");
+  if ((markall_flag = command_par_value("markall", my_cmd->clone)))
+    put_info("c6t - markall flag selected","");
   if ((mult_auto_off = command_par_value("mult_auto_off", my_cmd->clone)))
     put_info("c6t - mult_auto_off flag selected","");
   if ((split_flag = command_par_value("split", my_cmd->clone)))
@@ -1926,8 +1928,11 @@ ident_zero(struct c6t_element* el)
 static int
 in_keep_list(struct c6t_element* el)
 {
+  static char keep_these[MM_KEEP][24] = {"ip", "mt_"};
   char temp[24];
   int j;
+
+  if (markall_flag) return 2;
 
   strcpy(temp, el->name); stolower(temp);
   for (j = 0; j < MM_KEEP; j++)
@@ -2337,7 +2342,7 @@ pro_elem(struct node* cnode)
   else if (strcmp(cnode->base_name, "rfcavity") == 0)    mod_rfcavity(current_element);
   else if (strcmp(cnode->base_name, "crabcavity") == 0)  mod_crabcavity(current_element);
   else if (strcmp(cnode->base_name, "rfmultipole") == 0) mod_rfmultipole(current_element);
-  
+
   if (strstr(cnode->base_name, "kicker") || strstr(cnode->base_name, "tkicker"))
   {
     if (cnode->p_elem)
@@ -2389,25 +2394,25 @@ pro_elem(struct node* cnode)
     align_cnt++;
     current_element->tilt_err = 1;
   }
-  
+
   // store the aperture type as keyword
   char keyword[3]="00";
-  if (tag_aperture.apply == 1 ) {    
-    if      (0 == strcmp(tag_aperture.style,"circle"))      strcpy(keyword, "CR"); 
-    else if (0 == strcmp(tag_aperture.style,"ellipse"))     strcpy(keyword, "EL");  
-    else if (0 == strcmp(tag_aperture.style,"rectangle"))   strcpy(keyword, "RE");   
-    else if (0 == strcmp(tag_aperture.style,"rectcircle") ||  
-	     0 == strcmp(tag_aperture.style,"lhcscreen"))   strcpy(keyword, "RC");    
-    else if (0 == strcmp(tag_aperture.style,"rectellipse")) strcpy(keyword, "RL");    
-    else if (0 == strcmp(tag_aperture.style,"racetrack"))   strcpy(keyword, "RT");    
-    else if (0 == strcmp(tag_aperture.style,"octagon"))     strcpy(keyword, "OC");    
+  if (tag_aperture.apply == 1 ) {
+    if      (0 == strcmp(tag_aperture.style,"circle"))      strcpy(keyword, "CR");
+    else if (0 == strcmp(tag_aperture.style,"ellipse"))     strcpy(keyword, "EL");
+    else if (0 == strcmp(tag_aperture.style,"rectangle"))   strcpy(keyword, "RE");
+    else if (0 == strcmp(tag_aperture.style,"rectcircle") ||
+	     0 == strcmp(tag_aperture.style,"lhcscreen"))   strcpy(keyword, "RC");
+    else if (0 == strcmp(tag_aperture.style,"rectellipse")) strcpy(keyword, "RL");
+    else if (0 == strcmp(tag_aperture.style,"racetrack"))   strcpy(keyword, "RT");
+    else if (0 == strcmp(tag_aperture.style,"octagon"))     strcpy(keyword, "OC");
     else warning("general aperture element not supported in sixtrack",tag_aperture.name);
  }
-  
+
   // 2015-Oct-13  16:10:42  ghislain: before we add the current element to element list
   // check whether the element is long and has an aperture, and therefore
   // whether we should insert an aperture marker before the current element
-  if (strcmp(keyword,"00") != 0 && current_element->value[0] > 0.) {    
+  if (strcmp(keyword,"00") != 0 && current_element->value[0] > 0.) {
     tmp_element = current_element;
     tag_element = create_aperture(tag_aperture.name, keyword,
   				  tag_aperture.value[1], tag_aperture.value[2],
@@ -2418,27 +2423,27 @@ pro_elem(struct node* cnode)
 
     tag_element->previous = prev_element;
     prev_element->next = tag_element;
-    tag_element->position = cnode->position - current_element->value[0] / 2.; 
+    tag_element->position = cnode->position - current_element->value[0] / 2.;
 
     current_element = tag_element;
     add_to_ellist(current_element);
-    
+
     tmp_element->previous = current_element;
     current_element->next = tmp_element;
-    tmp_element->position = cnode->position;    
-    
+    tmp_element->position = cnode->position;
+
     prev_element = current_element;
     current_element = tmp_element;
-    
+
   }
 
 
-  add_to_ellist(current_element); 
+  add_to_ellist(current_element);
 
-  
+
   /* add aperture element if necessary */
   if (strcmp(keyword,"00") != 0) {
-    tag_element = create_aperture(tag_aperture.name, keyword, 
+    tag_element = create_aperture(tag_aperture.name, keyword,
 				  tag_aperture.value[1], tag_aperture.value[2],
 				  tag_aperture.value[3], tag_aperture.value[4],
 				  tag_aperture.value[5], tag_aperture.value[6],
@@ -2449,9 +2454,9 @@ pro_elem(struct node* cnode)
     current_element->next = tag_element;
 
     prev_element = current_element;
-    current_element = tag_element;      
+    current_element = tag_element;
     // 2015-Oct-13  15:45:58  ghislain: add half the prev_element length to account for thick elements
-    current_element->position = cnode->position + prev_element->value[0] / 2.; 
+    current_element->position = cnode->position + prev_element->value[0] / 2.;
     add_to_ellist(current_element);
   }
 }
@@ -2825,7 +2830,7 @@ static void
 write_c6t_element(struct c6t_element* el)
 {
   if (strcmp(el->name, "CAV") != 0) {
-    if (strcmp(el->base_name, "rfmultipole")==0) { 
+    if (strcmp(el->base_name, "rfmultipole")==0) {
       write_rfmultipole(el);
     } else {
       fprintf(f2, "%-16s %3d  %16.9e %17.9e  %17.9e  %17.9e  %17.9e  %17.9e\n",
@@ -3036,7 +3041,7 @@ write_f3_aper(void)
       {
         f3aper  = fopen("fc.3.aper", "w");
         fprintf(f3aper,"LIMI\n");
-      }	
+      }
       if      (current_element->value[1] == 1) strcpy(keyword, "CR") ;
       else if (current_element->value[1] == 2) strcpy(keyword, "RE") ;
       else if (current_element->value[1] == 3) strcpy(keyword, "EL") ;
@@ -3045,10 +3050,10 @@ write_f3_aper(void)
       else if (current_element->value[1] == 6) strcpy(keyword, "RT") ;
       else if (current_element->value[1] == 7) strcpy(keyword, "OC") ;
       else strcpy(keyword, "UK") ; // unknown aperture type
-      
+
       fprintf(f3aper,"%s   %s %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f %10.3f\n",
 	      current_element->name, keyword,
-	      current_element->value[2], current_element->value[3], 
+	      current_element->value[2], current_element->value[3],
 	      current_element->value[4], current_element->value[5],
       	      current_element->value[6], current_element->value[7],
 	      current_element->value[8]);
@@ -3217,7 +3222,7 @@ rfmultipole_name(char *name, struct c6t_element* el)
   if (fabs(knl[2])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "s");
-    n += sprintf(name+n, "%-18s", tmp);	
+    n += sprintf(name+n, "%-18s", tmp);
   }
   if (fabs(knl[3])>eps_9) {
     strcpy(tmp, el->name);
@@ -3227,12 +3232,12 @@ rfmultipole_name(char *name, struct c6t_element* el)
   if (fabs(ksl[0])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "ds");
-    n += sprintf(name+n, "%-18s", tmp);	
+    n += sprintf(name+n, "%-18s", tmp);
   }
   if (fabs(ksl[1])>eps_9) {
     strcpy(tmp, el->name);
     strcat(tmp, "qs");
-    n += sprintf(name+n, "%-18s", tmp);	
+    n += sprintf(name+n, "%-18s", tmp);
   }
   if (fabs(ksl[2])>eps_9) {
     strcpy(tmp, el->name);
@@ -3341,7 +3346,7 @@ c6t_finish(void)
     }
     myfree(rout_name, types.member[i]);
   }
-  types.curr=0; first_in_sequ = NULL; last_in_sequ_org = NULL; // last_in_sequ = NULL; // not used 
+  types.curr=0; first_in_sequ = NULL; last_in_sequ_org = NULL; // last_in_sequ = NULL; // not used
   current_element=NULL;
   /* remove blocks */
   p = first_block;
@@ -3350,7 +3355,7 @@ c6t_finish(void)
     p = p->next;
     if (p) myfree(rout_name, p->previous);
   }
-  first_block = NULL; prev_block=NULL; // last_block=NULL; not used 
+  first_block = NULL; prev_block=NULL; // last_block=NULL; not used
   current_block = NULL;
   /* remove split_list */
   if (split_list)
@@ -3413,7 +3418,8 @@ c6t_init(void)
   f34_cnt = 0;         /* f34 write count */
   special_flag = 1;    /* produce special output file from twiss */
   aperture_flag = 0;   /* if 1 insert apertures into structure */
-  cavall_flag = 0;     /* if 0 lump all cavities into first */
+  cavall_flag = 0;     /* if 0 dump all cavities into first */
+  markall_flag = 0;    /* if 0 dump all marker into first */
 //  radius_flag = 0; // not used    /* change the default reference radius */
   split_flag = 0;      /* if 1 keep zero multipoles after split */
   mangle_flag = 0;     /* if 1 truncate to 14 chars and mangle names */
