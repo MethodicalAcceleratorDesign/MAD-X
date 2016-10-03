@@ -406,7 +406,7 @@ read_his_table(struct in_cmd* cmd)
   int pos = name_list_pos("file", nl);
   int i, k, error = 0;
   char *cc, *filename, *type = NULL, *tmp, *name;
-
+  
   if(nl->inform[pos] && (filename = pl->parameters[pos]->string) != NULL)
   {
     if ((tab_file = fopen(filename, "r")) == NULL)
@@ -495,15 +495,15 @@ read_his_table(struct in_cmd* cmd)
         if (strcmp(tmp,"%s") == 0)
           t->s_cols[i][t->curr] = tmpbuff(stolower(cc));
         else if (strcmp(tmp,"%d") == 0 || strcmp(tmp,"%hd") == 0)
-        {
+         {
           sscanf(cc, tmp, &k); t->d_cols[i][t->curr] = k;
-        }
+         }
         else sscanf(cc, tmp, &t->d_cols[i][t->curr]);
         if (i+1 < tnl->curr)
         {
           if ((cc =strtok(NULL, " \"\n")) == NULL)
           {
-            warning("incomplete table line starting with:", aux_buff->c);
+            warning("read_his_table: incomplete table line starting with:", aux_buff->c);
             return NULL;
           }
         }
@@ -1416,7 +1416,7 @@ read_table(struct in_cmd* cmd)
         {
           if ((cc =strtok(NULL, " \"\n")) == NULL)
           {
-            warning("incomplete table line starting with:", aux_buff->c);
+            warning("read_table: incomplete table line starting with:", aux_buff->c);
             return NULL;
           }
         }
@@ -1540,7 +1540,7 @@ read_my_table(struct in_cmd* cmd)
   int i, k, error = 0;
   short  sk;
   char *cc, *filename, *type = NULL, *tmp, *name;
-
+  double tmpd;
   char* namtab;
 
   if ((namtab = command_par_string("table",cmd->clone)) != NULL) {
@@ -1643,25 +1643,47 @@ read_my_table(struct in_cmd* cmd)
         {
          if (t->curr == t->max) grow_table(t);
          tmp = tcpa->p[i];
-           if (strcmp(tmp,"%s") == 0)
+        
+        /* 
+         printf("read_my_table %d <%s> <%s> \n", i, tcpa->p[i], tnl->names[i] );
+        */
+         
+         if (strcmp(tmp,"%s") == 0)
             {
-              t->s_cols[i][t->curr] = stolower(tmpbuff(cc));
+             /* printf("reading format %s \n", tmp); */
+             t->s_cols[i][t->curr] = stolower(tmpbuff(cc));
+             /* printf("read %d %d = %s \n", i,t->curr, t->s_cols[i][t->curr]); */
+             
               /*printf("read_my_table coln [%d %d]=%s\n",i,t->curr,t->s_cols[i][t->curr]);*/
             }
            else if (strcmp(tmp,"%d") == 0 )
            {
-            sscanf(cc, tmp, &k); t->d_cols[i][t->curr] = k;
+             /* printf("reading format %s \n", tmp); */
+             sscanf(cc, tmp, &k); 
+             /* printf("read %d %d = %d \n", i,t->curr, k); */
+             t->d_cols[i][t->curr] = k;
            }
            else if (strcmp(tmp,"%hd") == 0 )
            {
-            sscanf(cc, tmp, &sk); t->d_cols[i][t->curr] = sk;
+              /* printf("reading format %s \n", tmp); */
+              sscanf(cc, tmp, &sk); 
+              /* printf("read %d %d = %d \n", i,t->curr, sk); */
+              t->d_cols[i][t->curr] = sk;
            }
-           else sscanf(cc, tmp, &t->d_cols[i][t->curr]);
+           else 
+           {
+              /* printf("reading format %s \n", tmp); */
+              sscanf(cc, tmp, &tmpd);
+              /* printf("read %d %d = %f \n", i,t->curr, tmpd); */
+              t->d_cols[i][t->curr] = tmpd;
+           }  
+           
+           
            if (i+1 < tnl->curr)
            {
-              if ((cc =strtok(NULL, " \"\n")) == NULL)
+             if ((cc =strtok(NULL, " \"\n")) == NULL)
               {
-               warning("incomplete table line starting with:", aux_buff->c);
+               warning("read_my_table: incomplete table line starting with:", aux_buff->c);
                  return NULL;
               }
            }

@@ -10,6 +10,17 @@ find_index_in_table(const char * const cols[], const char *name )
   return -1; // not found
 }
 
+static int
+find_index_in_table2(const char * const cols[], int ncols, const char *name )
+{
+  for (int i = 0; i<ncols; i++)
+    if (string_icmp(cols[i], name) == 0)
+      return i;
+
+  return -1; // not found
+}
+
+
 static void
 pro_error_make_efield_table(void)
 {
@@ -130,7 +141,42 @@ error_seterr(struct in_cmd* cmd)
  
   err = table_register->tables[t1];
 
-  for (row = 1; row <= err->curr; row++) {
+  /* check that the table has all the columns that we expect*/
+  from_col = find_index_in_table(efield_table_cols, "k0l");
+  to_col   = find_index_in_table(efield_table_cols, "p20sl");
+  
+  int idx = 0;
+  char errmsg[1200];
+  for ( i=from_col; i<=to_col; i++ )
+   {
+     /*printf("Check if %d  %s exists \n", i, efield_table_cols[i]);*/
+     idx = find_index_in_table2(err->columns->names, err->num_cols, efield_table_cols[i]);
+     
+     if (idx <= 0 )
+      {/* did not find this column in the input table*/
+        if (i < err->num_cols)
+         { /* column number i exists in the err table, but has different name */
+           sprintf(errmsg,"ERROR, the table %s is missing column %s",namtab, efield_table_cols[i]);
+           warning(errmsg, "bailing out");
+           return;
+         }
+        else
+         {/*The table is truncated (column wise), which is OK for the current algorithm*/
+           continue;
+         }  
+      }
+
+     if (idx != i)
+      {
+        sprintf(errmsg,"ERROR, the table %s has column %s at position %d instead of %d",namtab, efield_table_cols[i],idx,i);
+        warning(errmsg, "bailing out");
+        return;
+      }
+     
+   }
+
+  for (row = 1; row <= err->curr; row++) 
+   {
     if (string_from_table_row(namtab, "name", &row, name)) break;
 
     // probably useless...
@@ -147,7 +193,8 @@ error_seterr(struct in_cmd* cmd)
 
       if(strcmp(slname, slnname) == 0) break;
     }
-
+    
+    
     /* We have now the input and the node, generate array and selection flag */
     if (!strcmp(slname, slnname)) {
       node->sel_err = 1;
@@ -161,16 +208,20 @@ error_seterr(struct in_cmd* cmd)
       node->p_ph_err = new_double_array(RFPHASE_MAX); // zero initialized
       node->p_ph_err->curr = RFPHASE_MAX;
 
+      
       from_col = find_index_in_table(efield_table_cols, "k0l");
       to_col   = find_index_in_table(efield_table_cols, "k20sl");
+      
       if (from_col > 0 && to_col > 0)
-        for (i=0, col=from_col; col <= to_col && col < err->num_cols; col++, i++)
-          node->p_fd_err->a[i] = err->d_cols[col][row-1];
+        for (i=0, col=from_col; col <= to_col && (col < err->num_cols) ; col++, i++)
+         {
+           node->p_fd_err->a[i] = err->d_cols[col][row-1];
+         }  
 
       from_col = find_index_in_table(efield_table_cols, "dx");
       to_col   = find_index_in_table(efield_table_cols, "mscaly");
       if (from_col > 0 && to_col > 0)
-        for (i=0, col=from_col; col <= to_col && col < err->num_cols; col++, i++)
+        for (i=0, col=from_col; col <= to_col && col < err->num_cols ; col++, i++)
           node->p_al_err->a[i] = err->d_cols[col][row-1];
 
       col = find_index_in_table(efield_table_cols, "rfm_freq");
@@ -185,7 +236,7 @@ error_seterr(struct in_cmd* cmd)
       from_col = find_index_in_table(efield_table_cols, "p0l");
       to_col   = find_index_in_table(efield_table_cols, "p20sl");
       if (from_col > 0 && to_col > 0)
-        for (i=0, col=from_col; col <= to_col && col < err->num_cols; col++, i++)
+        for (i=0, col=from_col; col <= to_col && col < err->num_cols ; col++, i++)
           node->p_ph_err->a[i] = err->d_cols[col][row-1];
     }
   }
