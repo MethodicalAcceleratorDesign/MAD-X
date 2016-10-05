@@ -528,7 +528,7 @@ CONTAINS
     endif
 
     !special node keys
-    key%list%permfringe=node_value("permfringe ") .ne. zero
+    key%list%permfringe=transfer(node_value("permfringe ") .ne. zero, key%list%permfringe)
     key%list%kill_ent_fringe=node_value("kill_ent_fringe ") .ne. zero
     key%list%kill_exi_fringe=node_value("kill_exi_fringe ") .ne. zero
     key%list%bend_fringe=node_value("bend_fringe ") .ne. zero
