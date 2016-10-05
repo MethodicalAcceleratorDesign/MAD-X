@@ -156,6 +156,10 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
 
   !---- List chromatic functions.
   if (chrom .ne. 0) then
+     if (all( rt(1:2,3:4) .ne. zero  .or.  rt(3:4,1:2) .ne. zero)) then
+        write (warnstr, '(a)') 'Coupled lattice! The calculation of the chromatic functions could be inaccurate!'
+        call fort_warn('TWISS: ', warnstr)
+     endif
      call twbtin(rt,tt)
      call twchgo
   endif
