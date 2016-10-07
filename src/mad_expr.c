@@ -25,7 +25,7 @@ comb_param(struct command_parameter* param1, char* op, struct command_parameter*
 #endif
 
 static double
-combine_expr_expr(struct expression* exp1, const char* oper, 
+combine_expr_expr(struct expression* exp1, const char* oper,
                   struct expression* exp2, struct expression** comb_exp)
 {
   strcpy(c_dum->c, exp1->string);
@@ -195,8 +195,8 @@ dump_expression(struct expression* ex)
 }
 
 double
-expr_combine(struct expression* exp1, double val1, const char* oper, 
-             struct expression*  exp2, double val2, 
+expr_combine(struct expression* exp1, double val1, const char* oper,
+             struct expression*  exp2, double val2,
              struct expression** exp_comb)
 {
   double val = 0;
@@ -249,7 +249,7 @@ fill_expr_list(char** toks, int s_start, int s_end, struct expr_list* p)
   p->curr = cnt;
 }
 
-void 
+void
 fill_expr_var_list(struct el_list* ell, struct expression* expr, struct var_list* varl)
   /* puts all variables an expression depends on, in a list */
 {
@@ -300,20 +300,15 @@ loc_expr(char** items, int nit, int start, int* end)
   char c;
   int i, e_type = 1, par_level = 0, ltog = -1;
   *end = start - 1;
-  if (nit > start && is_expr_start(*items[start]))
-  {
-    c = *items[start];
-    for (i = start; i < nit; i++)
-    {
+  if (nit > start && is_expr_start(*items[start])) {
+    for (i = start; i < nit; i++) {
       c = *items[i];
-      if (c == '(')  {par_level++; e_type = 2;}
-      else if (c == ')')
-      {
+      if (c == '(')  { par_level++; e_type = 2; }
+      else if (c == ')') {
         if (par_level == 0) return 0;
         par_level--; ltog = 0;
       }
-      else if (par_level == 0)
-      {
+      else if (par_level == 0) {
         if (ltog < 0)  ltog = is_operator(c) ? 1 : 0;
         else if ((ltog == 0 && is_operator(c))
                  || (ltog != 0 && is_operand(c)))  ltog = 1 - ltog;

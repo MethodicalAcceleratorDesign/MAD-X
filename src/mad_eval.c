@@ -5,7 +5,7 @@ act_value(int pos, const struct name_list* chunks)
   /* returns the actual value of a variable, element, or command parameter */
 {
   const char* name = chunks->names[pos];
-  const char *n = name, *p; 
+  const char *n = name, *p;
   char comm[NAME_L];
   char par[NAME_L];
   char *q = comm;
@@ -721,28 +721,27 @@ print_value(struct in_cmd* cmd)
 {
   char** toks = &cmd->tok_list->p[cmd->decl_start];
   int n = cmd->tok_list->curr - cmd->decl_start;
-  int j, s_start = 0, end, nitem; // , type // not used
-  while (s_start < n)
+  int start=0, end, j;
+  while (start < n)
   {
-    for (j = s_start; j < n; j++) if (*toks[j] == ',') break;
-    if (loc_expr(toks, j, s_start, &end) > 0) // type = // not used 
-    {
-      nitem = end + 1 - s_start;
-      if (polish_expr(nitem, &toks[s_start]) == 0) {
+    for (j = start; j < n; j++)
+      if (*toks[j] == ',') break;
+    if (loc_expr(toks, j, start, &end) > 0) {
+      int nitem = end - start + 1;
+      if (polish_expr(nitem, &toks[start]) == 0) {
         fprintf(prt_file, v_format("%s = %F ;\n"),
-                spec_join(&toks[s_start], nitem), 
-                polish_value(deco, join(&toks[s_start], nitem)));
-      } 
+                spec_join(&toks[start], nitem),
+                polish_value(deco, join(&toks[start], nitem)));
+      }
       else {
-        warning("invalid expression:", spec_join(&toks[s_start], nitem));
+        warning("invalid expression:", spec_join(&toks[start], nitem));
         return;
       }
-      s_start = end+1;
-      if (s_start < n-1 && *toks[s_start] == ',') s_start++;
+      start = end+1;
+      if (start < n-1 && *toks[start] == ',') start++;
     }
-    else
-    {
-      warning("invalid expression:", spec_join(&toks[s_start], n));
+    else {
+      warning("invalid expression:", spec_join(&toks[start], n-start));
       return;
     }
   }
