@@ -18,7 +18,7 @@ from a sequence loaded in \madx.
 \madbox{
   SIXTRACK, \=CAVALL=logical, \\
             \>MULT\_AUTO\_OFF=logical, MAX\_MULT\_ORD=integer, \\
-            \>SPLIT=logical, APERTURE=logical, RADIUS=real;
+            \>SPLIT=logical, APERTURE=logical, RADIUS=real, MARKALL=logical;
 }
  
 The parameters are defined as: 
@@ -53,7 +53,9 @@ The parameters are defined as:
 
    \ttitem{RADIUS} (optional, default value is 1~m). This sets the
    reference  radius for the magnets. This argument is optional but
-   should normally be set.  
+   should normally be set. 
+
+   \ttitem{MARKALL} (optional flag, default false) flag to convert all markers through the conversion. If false, only markers with names beginning with "ip" or "mt\_" are kept. 
 \end{madlist}
 
 \textbf{Important Notes:}
