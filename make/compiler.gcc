@@ -39,7 +39,7 @@ CFLAGS = -m$(ARCH) -O$(NOPT) -std=c99 -Wall -W -Wextra -pedantic -c
 #
 
 ifeq ($(DEBUG),yes)
-CFLAGS += -g -ggdb 
+CFLAGS += -g -ggdb
 endif
 
 ifeq ($(PROFILE),yes)
@@ -63,16 +63,16 @@ endif
 #
 
 CFLAGS += -pipe
- 
+
 #
 # diagnostics (gcc is the reference)
 #
 
 CFLAGS += -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations \
-          -Wchar-subscripts -Wwrite-strings -Wconversion -Wno-conversion -Winline \
+          -Wchar-subscripts -Wwrite-strings -Wconversion -Wno-conversion \
           -Wpointer-arith -Wbad-function-cast -Wcast-align -Wcast-qual \
           -Wimplicit-function-declaration
 
-#         -Wfloat-equal -Wformat-nonliteral # not compatible with ugly MAD-X code...
+#         -Winline -Wfloat-equal -Wformat-nonliteral # not compatible with ugly MAD-X code...
 
 # end of makefile
