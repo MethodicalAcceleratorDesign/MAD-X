@@ -1,0 +1,103 @@
+! test case for coupling calculations
+! extracted from P4-T lattice
+! iagapov 14.10.2016
+
+/*** arc cell ***/
+
+bk1 = -1.3755;
+bk2 = -1.3755;
+
+m1 : marker;
+m2 : marker;
+m3 : marker;
+mcellee : marker;
+
+d1 : drift, l=0.18835;
+
+d2 : drift, l=1.0359;
+!d2 : drift, l=1.045; ! try to have a different phase advance
+
+d3 : drift, l=0.7534;
+d4 : drift, l=0.0471;
+
+d3e : drift, l=1.26870121472;
+
+qd1 : quadrupole, l=0.0471, k1=-8.2983;
+qd2 : quadrupole, l=0.18835, k1=-2.007;
+
+qf1 : quadrupole, l=0.18835, k1=2.5594;
+qf2 : quadrupole, l=0.09418, k1=3.890;
+
+qmd2e : quadrupole, l=0.2, k1=-1.74472371472;
+
+qf0 : quadrupole, l=0.18835, k1=3.0104;
+!b0 : sbend, l=0.09418, angle=0.000972, k1=bk1;
+!b1 : sbend, l=0.09418, angle=0.000972, k1=0;
+
+b0 : sbend, l=0.09418, angle=0.0009714807878856411, k1=bk1;
+b1 : sbend, l=0.09418, angle=0.0009714807878856411, k1=0;
+
+
+b2 :  sbend, l=0.09418, angle=0.0010, k1=0;
+b2e : sbend, l=0.1, angle=0.0010, k1=0.00;
+
+
+!sf1 : sextupole, l=0.2825, k2= 221.5;
+!sf2 : sextupole, l=0.2825, k2= 221.5;
+
+sf1 : sextupole, l=0.2825, k2= 216;
+sf2 : sextupole, l=0.2825, k2= 225;
+
+
+be0 : line =(b0,b0,b0,b0,b0,b0,b0,b0);
+
+!be01 = (b01,b01,b01,b01,b01,b01,b01,b01)
+
+be1 : line = (b1,b1,b1,b1,qd1,qd1,b1,b1,b1,b1);
+
+block1 : line = (qf0,d1,be0,d1,qf1);
+
+!block2 =(bf1,d1,be0,d1,bf1);
+block3(sf) : line = (qf1,d1,be1,d2,qf2,d4,sf,d4,qf2,d3,b2,b2,b2,b2,b2,b2,b2,b2,b2,d1,qd2);
+block3e(sf) : line = (qf1,d1,be1,d2,qf2,d4,sf,d4,qf2,d3e,qmd2e, d3e, b2e,b2e,b2e,b2e,b2e,b2e,b2e,b2e,b2e,d1);
+
+!celarc : line = (-block3(sf1),-block1,block1,block3(sf1));
+!celarce : line = (-block3(sf1),-block1,block1,block3e(sf1), mcellee);
+!celarcs : line = (-block3e(sf1),-block1,block1,block3(sf1));
+
+celarc.a : line = (-block3(sf1),-block1,block1,block3(sf1));
+celarce.a : line = (-block3(sf1),-block1,block1,block3e(sf1), mcellee);
+celarcs.a : line = (-block3e(sf1),-block1,block1,block3(sf1));
+
+celarc.b : line = (-block3(sf2),-block1,block1,block3(sf2));
+celarce.b : line = (-block3(sf2),-block1,block1,block3e(sf2), mcellee);
+celarcs.b : line = (-block3e(sf2),-block1,block1,block3(sf2));
+
+
+
+d3e->l= 1.26870121474;
+
+
+/*** twist ***/
+
+qt1 : quadrupole, l=0.2, k1=0., k1s=-0.975884302005;
+qt2 : quadrupole, l=0.2, k1=0., k1s=1.44608216019;
+qt3 : quadrupole, l=0.2, k1=0., k1s=-1.96667625127;
+dt : drift, l=3.22648764423;
+
+
+twst : line = (qt1, dt, qt2, dt, qt3, dt, qt2, dt, qt3, dt, qt2, dt, qt3, dt, qt2, dt, qt1);
+
+db0 : drift, l=1.0;
+db1 : drift, l=0.076;
+db2 : drift, l=1.0;
+
+qb0 : quadrupole, l=0.1, k1=-11.0260791282;
+qb1 : quadrupole, l=0.1, k1=11.4754415828;
+
+
+doublet : line = (db0,qb0,db1,qb1,db2);
+
+
+t_insertion.a : line = (celarc.a, celarce.a, doublet, twst, -doublet, celarcs.b, celarc.b);
+t_insertion.b : line = (celarc.b, celarce.b, doublet, twst, -doublet, celarcs.a, celarc.a);

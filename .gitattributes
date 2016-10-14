@@ -1052,6 +1052,7 @@ tests/share/PSBooster/psb.dbx -text
 tests/share/PSBooster/psb.ele -text
 tests/share/PSBooster/psb_extraction.str -text
 tests/share/PSBooster/psb_new.seq -text
+tests/share/Petra/petra.seq -text
 tests/share/RHIC/rhic.madx -text
 tests/share/SPS/SPS_simple.seq -text
 tests/share/SPS/elements.str -text
@@ -1645,6 +1646,10 @@ tests/test-ptc-twiss-3/test-ptc-twiss-3.madx -text
 tests/test-ptc-twiss-3/test-ptc-twiss-3.ref -text
 tests/test-ptc-twiss-3/twiss-table.cfg -text
 tests/test-ptc-twiss-3/twiss-table.ref -text
+tests/test-ptc-twiss-4/p4_ptc.tfs -text
+tests/test-ptc-twiss-4/test-ptc-twiss-4.cfg -text
+tests/test-ptc-twiss-4/test-ptc-twiss-4.madx -text
+tests/test-ptc-twiss-4/test-ptc-twiss-4.ref -text
 tests/test-ptc-twiss-56D/leir.56d.ptc.summ.twiss.cfg -text
 tests/test-ptc-twiss-56D/leir.56d.ptc.summ.twiss.ref -text
 tests/test-ptc-twiss-56D/leir.56d.ptc.twiss.cfg -text
@@ -2187,6 +2192,10 @@ tests/test-twiss-12/test-twiss-12.madx -text
 tests/test-twiss-12/test-twiss-12.ref -text
 tests/test-twiss-12/test-twiss-12.tfs.cfg -text
 tests/test-twiss-12/test-twiss-12.tfs.ref -text
+tests/test-twiss-13/test-twiss-13.cfg -text
+tests/test-twiss-13/test-twiss-13.madx -text
+tests/test-twiss-13/test-twiss-13.ref -text
+tests/test-twiss-13/twiss.tsf -text
 tests/test-twiss-2/README -text
 tests/test-twiss-2/my_sect_file.cfg -text
 tests/test-twiss-2/my_sect_file.ref -text

@@ -1,0 +1,10 @@
+! test case for coupling calculations
+! extracted from P4-T lattice
+! iagapov 14.10.2016
+
+call, file="../share/Petra/petra.seq";
+
+beam, sequence=t_insertion.a, particle=electron, energy=6.0, radiate=false;
+use, period=t_insertion.a;
+select flag=twiss,column=name,s,betx,beta11,bety,beta22,beta12,beta21,mu1,mu2;
+twiss, ripken, file="twiss.tsf";

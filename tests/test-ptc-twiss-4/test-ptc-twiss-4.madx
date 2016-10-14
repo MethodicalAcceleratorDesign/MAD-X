@@ -1,0 +1,18 @@
+! test case for coupling calculations
+! extracted from P4-T lattice
+! iagapov 14.10.2016
+
+call, file="../share/Petra/petra.seq";
+
+beam, sequence=t_insertion.a, particle=electron, energy=6.0, radiate=false;
+use, period=t_insertion.a;
+ptc_create_universe;
+ptc_create_layout,model=2,method=6,nst=1,exact;
+select flag=ptc_twiss,column=name,s,betx,beta11,bety,beta22,beta12,beta21,mu1,mu2,beta11p,beta21p,beta22p,beta12p,disp1,disp1p;
+ptc_twiss, deltap=0.0,closed_orbit,icase=5,file="p4_ptc.tfs",no=3;
+ptc_end;
+
+! ptc cleaning
+removefile, file="Maxwellian_bend_for_ptc.txt";
+removefile, file="Maxwellian_bend_for_ptc_electric.txt";
+removefile, file="internal_mag_pot.txt";
