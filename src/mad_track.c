@@ -304,15 +304,13 @@ pro_track(struct in_cmd* cmd)
     return;
   }
 
-  if (strcmp(cmd->tok_list->p[0], "track") == 0)         track_track(cmd);
-
-  if (strcmp(cmd->tok_list->p[0], "dynap") == 0)         track_dynap(cmd);
-  else if (strcmp(cmd->tok_list->p[0], "endtrack") == 0) track_end(cmd);
-  else if (strcmp(cmd->tok_list->p[0], "observe") == 0)  track_observe(cmd);
-  else if (strcmp(cmd->tok_list->p[0], "run") == 0)      track_run(cmd);
-  else if (strcmp(cmd->tok_list->p[0], "ripple") == 0)   track_ripple(cmd);
-  else if (strcmp(cmd->tok_list->p[0], "start") == 0)    track_start(cmd->clone); cmd->clone_flag = 1;
-
+       if (strcmp(cmd->tok_list->p[0], "track"   ) == 0) track_track  (cmd);
+  else if (strcmp(cmd->tok_list->p[0], "dynap"   ) == 0) track_dynap  (cmd);
+  else if (strcmp(cmd->tok_list->p[0], "endtrack") == 0) track_end    (cmd);
+  else if (strcmp(cmd->tok_list->p[0], "observe" ) == 0) track_observe(cmd);
+  else if (strcmp(cmd->tok_list->p[0], "run"     ) == 0) track_run    (cmd);
+  else if (strcmp(cmd->tok_list->p[0], "ripple"  ) == 0) track_ripple (cmd);
+  else if (strcmp(cmd->tok_list->p[0], "start"   ) == 0) track_start  (cmd->clone), cmd->clone_flag = 1;
 }
 
 void
