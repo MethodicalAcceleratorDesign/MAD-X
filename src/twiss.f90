@@ -2013,21 +2013,20 @@ SUBROUTINE twcptk(re,orbit)
 
         write (warnstr, '(a, a, a, i3)') 'Mode flip in the element ', name, ', nflips up to now = ', nmode_flip
         call fort_warn('TWCPTK: ', warnstr)
-        ! print *, '+++ mode flip in the element ', name, ", nflips up to now = ", nmode_flip
+
+        trace_e = E(1,1)+E(2,2)
+        trace_f = F(1,1)+F(2,2)
+        trace_tmp = ( TMP(1,1)+ TMP(2,2))/gammacp**2
+        if ( abs (trace_tmp) .ge. 2.0001 .and. gammacp .ge. 1.001) then
+           flipping = .false.
+           write (warnstr, '(a, a, a)') ' Lattice is unstable due to ', name, '.  Twiss parameter might be unphysical!'
+           call fort_warn('TWCPTK: ', warnstr)
+           write (warnstr, '( a, e13.6, a, e13.6)') ' g = ', gammacp, '; trace of decoupled matrix is ', trace_tmp
+           call fort_warn('TWCPTK: ', warnstr)
+        endif
+        
      endif
   endif
-
-  trace_e = E(1,1)+E(2,2)
-  trace_f = F(1,1)+F(2,2)
-  trace_tmp = ( TMP(1,1)+ TMP(2,2))/gammacp**2
-  if ( abs (trace_tmp) .ge. 2.0001 .and. gammacp .ge. 1.001) then
-     flipping = .false.
-     write (warnstr, '(a, a, a)') ' Lattice is unstable due to ', name, '.  Twiss parameter might be unphysical!'
-     call fort_warn('TWCPTK: ', warnstr)
-     write (warnstr, '( a, e13.6, a, e13.6)') ' g = ', gammacp, '; trace of decoupled matrix is ', trace_tmp
-     call fort_warn('TWCPTK: ', warnstr)
-  endif
-
 
   amux_ini = amux
   amuy_ini = amuy
