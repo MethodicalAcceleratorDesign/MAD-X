@@ -3,8 +3,9 @@
 %  Changed by: Frank Schmidt, 11-Jul-2002 
 %  Changed by: Hans Grote, 15-Jan-2003 
 %  Changed by: Frank Schmidt, 06-APR-2003 
+%  Changed by: ghislain 18-JUN-2014   
 
-%  Last changed: 2014-Jun-18  09:42:23  ghislain
+%  Last changed: Irina Tecker, 12-OCT-2016 
 
 \chapter{Twiss Module}
 \label{chap:twiss}
@@ -65,8 +66,10 @@ The  attributes of the \texttt{TWISS} command are:
   \ttitem{CHROM} a logical flag to trigger computation of the
   \hyperref[subsec:tables-chrom]{chromatic functions} as well as the radiation 
   synchrotron integrals. \\
-  \textit{Please note that this option is needed for a proper
-    calculation of the chromaticities in the presence of coupling!}\\
+   %irina
+  \textit{Please note that the calculation is done without taking coupling into 
+  account. In case of coupled lattice the warning isissued that the calculation 
+  of chromatic functions can be inaccurate!}\\
   \textit{Please note that this option also changes the way that the
     chromaticities are calculated: The chromaticities are normally
     calculated from the analysis of the first and second order
@@ -187,9 +190,9 @@ The tables are suitable for \hyperref[chap:plot]{\texttt{PLOT}}.
 After a successful \texttt{TWISS} run \madx creates a 
 table of summary parameters named "SUMM" which includes tunes,
 chromaticities, etc. versus the selected values of \texttt{DELTAP}.
-Please note that the \texttt{CHROM} attribute is needed
-for a proper calculation of the chromaticities in the presence of
-coupling!
+Please note that with the \texttt{CHROM} attribute the calculation is done without
+taking coupling into account. In case of coupled lattice the warning isissued that
+the calculation of chromatic functions can be inaccurate!
 
 Notice also that in \madx, \texttt{DELTAP} is converted to \texttt{PT},
 which is used as longitudinal variable. 
@@ -672,7 +675,19 @@ COGUESS, CLEAR; \\
 TWISS; \\
 ... \\
 }
+\section{Coupling}
+\label{sec:coupling}
 
+In order to calculate Twiss parameters ($\beta$, $\alpha$ and $\phi$) MAD-X uses Edwards-Teng approach.
+
+For coupled motion the matrix transformation can be written in a form $M = VUV^{-1}$, where $M$ is a symplectic 1-turn map, $U$ is a symplectic decoupled block-diagonal matrix, $V$ is a symplectic "rotation" matrix. Initial coupling parameters are calclulated based on decoupled $U$ matrix. 
+  
+Given that $M_1$ is the one-turn matrix at point 1, $M_2$ is the one-turn matrix at point 2 , and we know $M_{12}$, the transfer matrix between points 1 and 2, we can express the change of the one-turn map from point 1 to point 2 by {\color{blue} $M_2 = M_{12}M_1M^{-1}_{12}$}. Then $U_2 = V_2^{-1}M_2V_2 = V_2^{-1} {\color{blue}M_{12}M_1M^{-1}_{12}} V_2 = ( V_2^{-1} M_{12} {\color{blue}V_1) U_1 (V_1^{-1}} M^{-1}_{12} V_2)$.
+
+So,  $U_2 = W_{12} U_1 W_{12}^{-1} \textrm{, where } W_{12} \equiv V_2^{-1} M_{12}  V_1 $
+Knowing $V_1$ and $M_{12}$  (transfer matrix of the element), we can calculate $V_2 W_{12} = M_{12} V_1,$ where we use $V_{2}$ for computing the coupling parameters and $W_{12}$ to propagate to the end of the element. One can find $V_2$ such that $W_{12}$ is block-diagonal or off block-diagonal. 
+  
+For weakly coupled lattice MAD-X always uses \textbf{block-diagonal} solution, i.e. large tune (mode1) is associated with x-plane, and smaller tune (mode2) is associated with y-plane by convention. For a highly coupled lattice, it may happen at some places in the lattice that mode1 is associated with y-plane, and mode2 with x-plane. Switching the association of mode1 and mode2 with x and y-planes as one propagates the twiss parameters through the lattice is called "modes flip" (use \textbf{off-block diagonal} solution for $W_{12}$). In case the modes flip is triggered, there is an additional stability check, either the calculation of twiss parameters can be done with modes flip or not. 
 
 
 %% EOF
