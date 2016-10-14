@@ -2803,6 +2803,7 @@ char command_def[] =
 "aperture = [l, false, true], "
 "onetable = [l, false, true], "
 "recloss  = [l, false, true], "
+"keeptrack= [l, false, true], "
 "file     = [s, track, track], "
 "extension= [s, none, none]; "
 " "
