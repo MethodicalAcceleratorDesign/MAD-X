@@ -82,12 +82,21 @@ FILES = $(wildcard madx-linux*-gnu   numdiff-linux*-gnu \
                    madx-win*-gnu.exe numdiff-win*-gnu.exe \
                    madx-src.tgz madxuguide.pdf madx-info.txt)
 
+madx-release: madx-info madx-src madx-usrguide madx-install madx-mktag
+else ifeq ($(islxplus),yes)
+madx-release: madx-install madx-reports madx-activate
+endif
+
+
 madx-install:
 	$E "*** Installing madx"
-	$_ mkdir $(VERSION) $(VERSION)/reports && \
+  $_ rm -rf $(VERSION) && \
+	mkdir $(VERSION) $(VERSION)/reports && \
 	cp -L $(FILES) $(VERSION) && \
+ifeq ($(islxplus),yes)
+  scp -r mad@macserv15865:madX/$(VERSION) mad@lxplus.cern.ch:madx/releases && \
 	scp -r $(VERSION) mad@lxplus.cern.ch:madx/releases && \
-	rm -rf $(VERSION)
+endif
 
 #
 # madx backup reports
