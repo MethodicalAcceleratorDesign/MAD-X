@@ -82,12 +82,6 @@ FILES = $(wildcard madx-linux*-gnu   numdiff-linux*-gnu \
                    madx-win*-gnu.exe numdiff-win*-gnu.exe \
                    madx-src.tgz madxuguide.pdf madx-info.txt)
 
-madx-release: madx-info madx-src madx-usrguide madx-install madx-mktag
-else ifeq ($(islxplus),yes)
-madx-release: madx-install madx-reports madx-activate
-endif
-
-
 madx-install:
 	$E "*** Installing madx"
   $_ rm -rf $(VERSION) && \
