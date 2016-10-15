@@ -19,18 +19,18 @@
 #
 # all
 #
-all-macosx-gnu:     all-macosx32-gnu    all-macosx64-gnu
-all-macosx-llvm:    all-macosx32-llvm   all-macosx64-llvm
-all-macosx-intel:   all-macosx32-intel  all-macosx64-intel
+all-macosx-gnu:     all-macosx64-gnu    all-macosx32-gnu
+all-macosx-llvm:    all-macosx64-llvm   all-macosx32-llvm
+all-macosx-intel:   all-macosx64-intel  all-macosx32-intel
 
-all-macosx32-gnu:   madx-macosx32-gnu libmadx-macosx32-gnu libptc-macosx32-gnu numdiff-macosx32-gnu
-all-macosx64-gnu:   madx-macosx64-gnu libmadx-macosx64-gnu libptc-macosx64-gnu numdiff-macosx64-gnu
+all-macosx32-gnu:   madx-macosx32-gnu numdiff-macosx32-gnu libmadx-macosx32-gnu libptc-macosx32-gnu
+all-macosx64-gnu:   madx-macosx64-gnu numdiff-macosx64-gnu libmadx-macosx64-gnu libptc-macosx64-gnu
 
-all-macosx32-llvm:  madx-macosx32-llvm libmadx-macosx32-llvm libptc-macosx32-llvm numdiff-macosx32-llvm
-all-macosx64-llvm:  madx-macosx64-llvm libmadx-macosx64-llvm libptc-macosx64-llvm numdiff-macosx64-llvm
+all-macosx32-llvm:  madx-macosx32-llvm numdiff-macosx32-llvm libmadx-macosx32-llvm libptc-macosx32-llvm
+all-macosx64-llvm:  madx-macosx64-llvm numdiff-macosx64-llvm libmadx-macosx64-llvm libptc-macosx64-llvm
 
-all-macosx32-intel: madx-macosx32-intel libmadx-macosx32-intel libptc-macosx32-intel numdiff-macosx32-intel
-all-macosx64-intel: madx-macosx64-intel libmadx-macosx64-intel libptc-macosx64-intel numdiff-macosx64-intel
+all-macosx32-intel: madx-macosx32-intel numdiff-macosx32-intel libmadx-macosx32-intel libptc-macosx32-intel
+all-macosx64-intel: madx-macosx64-intel numdiff-macosx64-intel libmadx-macosx64-intel libptc-macosx64-intel
 
 #
 # cleanbuild platform specific
@@ -43,9 +43,9 @@ cleanarch:
 #
 # madx
 #
-madx-macosx-gnu:    madx-macosx32-gnu     madx-macosx64-gnu
-madx-macosx-llvm:   madx-macosx32-llvm    madx-macosx64-llvm
-madx-macosx-intel:  madx-macosx32-intel   madx-macosx64-intel
+madx-macosx-gnu:    madx-macosx64-gnu    madx-macosx32-gnu
+madx-macosx-llvm:   madx-macosx64-llvm   madx-macosx32-llvm
+madx-macosx-intel:  madx-macosx64-intel  madx-macosx32-intel
 
 .PHONY: madx-macosx32-gnu   madx-macosx64-gnu
 .PHONY: madx-macosx32-llvm  madx-macosx64-llvm
@@ -111,9 +111,9 @@ libs/gc/libgc-macosx64-llvm.a:
 #
 # libmadx
 #
-libmadx-macosx-gnu:   libmadx-macosx32-gnu    libmadx-macosx64-gnu
-libmadx-macosx-llvm:  libmadx-macosx32-llvm   libmadx-macosx64-llvm
-libmadx-macosx-intel: libmadx-macosx32-intel  libmadx-macosx64-intel
+libmadx-macosx-gnu:   libmadx-macosx64-gnu     libmadx-macosx32-gnu
+libmadx-macosx-llvm:  libmadx-macosx64-llvm    libmadx-macosx32-llvm
+libmadx-macosx-intel: libmadx-macosx64-intel   libmadx-macosx32-intel
 
 libmadx-macosx%: DESTDIR   := $(DESTDIR)libs/madx/
 libmadx-macosx%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) ONLINE=no STATIC=no USEGC=yes APPENDLD=yes
@@ -147,9 +147,9 @@ libmadx-macosx64-llvm:
 #
 # libptc
 #
-libptc-macosx-gnu:    libptc-macosx32-gnu    libptc-macosx64-gnu
-libptc-macosx-llvm:   libptc-macosx32-llvm   libptc-macosx64-llvm
-libptc-macosx-intel:  libptc-macosx32-intel  libptc-macosx64-intel
+libptc-macosx-gnu:    libptc-macosx64-gnu     libptc-macosx32-gnu
+libptc-macosx-llvm:   libptc-macosx64-llvm    libptc-macosx32-llvm
+libptc-macosx-intel:  libptc-macosx64-intel   libptc-macosx32-intel
 
 libptc-macosx%: DESTDIR   := $(DESTDIR)libs/ptc/
 libptc-macosx%: MAKE_ARGS  = PRJNAME=$@ DESTDIR=../../$(DESTDIR) STATIC=no APPENDLD=yes
@@ -183,9 +183,9 @@ libptc-macosx64-llvm:
 #
 # numdiff
 #
-numdiff-macosx-gnu:   numdiff-macosx32-gnu    numdiff-macosx64-gnu
-numdiff-macosx-llvm:  numdiff-macosx32-llvm   numdiff-macosx64-llvm
-numdiff-macosx-intel: numdiff-macosx32-intel  numdiff-macosx64-intel
+numdiff-macosx-gnu:   numdiff-macosx64-gnu    numdiff-macosx32-gnu
+numdiff-macosx-llvm:  numdiff-macosx64-llvm   numdiff-macosx32-llvm
+numdiff-macosx-intel: numdiff-macosx64-intel  numdiff-macosx32-intel
 
 numdiff-macosx%: DESTDIR  := $(DESTDIR)tools/numdiff/
 numdiff-macosx%: MAKE_ARGS = PRJNAME=$@ DESTDIR=../../$(DESTDIR) STATIC=yes APPENDLD=yes
