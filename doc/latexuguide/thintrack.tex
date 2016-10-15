@@ -404,21 +404,26 @@ filename for the first obseration point and first particle looks like
 The actual tracking is triggered by the \texttt{RUN} command.
 
 \madbox{
-RUN, TURNS=integer, MAXAPER=real\_array, FFILE=integer;
+RUN, TURNS=integer, MAXAPER=real\_array, FFILE=integer, KEEPTRACK=logical;
 }
 
 The \texttt{RUN} command has three attributes:
 
 \begin{madlist}
   \ttitem{TURNS} number of turns to be tracked.
+
   \ttitem{MAXAPER} upper limits for the six coordinates.\\
   (Default: \{0.1, 0.01, 0.1, 0.01, 1.0, 0.1\} \\
   The limits defined by the \texttt{MAXAPER} option are only being taken
   into account if the \texttt{APERTURE} option of the \texttt{TRACK}
   command is used.
+
   \ttitem{FFILE} defines the turn periodicity for printing coordinates at
    observation points. (Default:~1)\\
+
    \texttt{FFILE=n} will print coordinates every n-th turn only. 
+
+   \ttitem{KEEPTRACK} a logical flag to keep data from previous tracking and append new results to tables. (Default:~false)
 \end{madlist}
 
 
