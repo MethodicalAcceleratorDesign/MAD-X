@@ -84,10 +84,14 @@ FILES = $(wildcard madx-linux*-gnu   numdiff-linux*-gnu \
 
 madx-install:
 	$E "*** Installing madx"
+ifeq ($(ismacsrv),yes)
+	$_ rm -rf $(VERSION) && \
+	mkdir $(VERSION) $(VERSION)/reports && \
+	cp -L $(FILES) $(VERSION)
+else ifeq ($(islxplus),yes)
 	$_ rm -rf $(VERSION) && \
 	mkdir $(VERSION) $(VERSION)/reports && \
 	cp -L $(FILES) $(VERSION) && \
-ifeq ($(islxplus),yes)
 	scp -r mad@macserv15865:madX/$(VERSION) mad@lxplus.cern.ch:madx/releases && \
 	scp -r $(VERSION) mad@lxplus.cern.ch:madx/releases
 endif
