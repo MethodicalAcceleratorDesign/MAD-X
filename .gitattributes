@@ -2194,8 +2194,9 @@ tests/test-twiss-12/test-twiss-12.tfs.cfg -text
 tests/test-twiss-12/test-twiss-12.tfs.ref -text
 tests/test-twiss-13/test-twiss-13.cfg -text
 tests/test-twiss-13/test-twiss-13.madx -text
-tests/test-twiss-13/test-twiss-13.ref -text
-tests/test-twiss-13/twiss.tsf -text
+tests/test-twiss-13/test-twiss-13.ref -text svneol=unset#application/x-gzip
+tests/test-twiss-13/twiss.tsf.cfg -text
+tests/test-twiss-13/twiss.tsf.ref -text svneol=unset#application/x-gzip
 tests/test-twiss-2/README -text
 tests/test-twiss-2/my_sect_file.cfg -text
 tests/test-twiss-2/my_sect_file.ref -text
