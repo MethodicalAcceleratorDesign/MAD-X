@@ -14,162 +14,162 @@
 
 
 //---------------------- HKICKER        ---------------------------------------------
-MDH       : HKICKER     , L := .25;       ! Correcting dipole, horizontal deflection
-MDHA      : HKICKER     , L := .306;      ! Correcting dipole, horizontal deflection, enlarged
-MDHB      : HKICKER     , L := .402;      ! Correcting dipole, horizontal deflection, turned MDVA
-MDHD      : HKICKER     , L := .36;       ! Correcting dipole, horizontal deflection, special type D
-MDHW      : HKICKER     , L := .526;      ! Wiggler dipole, e- cloud experiment (IMHH from ISR, TI)
-MDPH      : HKICKER     , L := .25;
-MDSH      : HKICKER     , L := .7;        ! correcting dipole, BT line, short, horizontal deflection
-MKDHA     : HKICKER     , L := 1.6;       ! Kicker magnet, horizontal sweeping for dumping, A-type
-MKDHB     : HKICKER     , L := 1.6;       ! Kicker magnet, horizontal sweeping for dumping, B-type
-MKEL      : HKICKER     , L := 2.014;     ! Kicker magnet, extraction, L-type
-MKES      : HKICKER     , L := 2.014;     ! Kicker magnet, extraction, S-type
-MKP       : HKICKER     , L := 3.423;     ! Kicker magnet, proton injection
-MKPA      : HKICKER     , L := 3.423;
-MKPC      : HKICKER     , L := 1.78;      ! Kicker magnet, proton injection, short MKP (former MKA for ppbar)
-MKQH      : HKICKER     , L := .96;       ! Kicker magnet, Q-measurement, horizontal
-MPLH      : HKICKER     , L := 2.06;      ! Bumper magnet, pulsed, long, horizontal deflection
-MPNH      : HKICKER     , L := 2.04;      ! Bumper magnet, pulsed, normal, horizontal deflection
-MPSH      : HKICKER     , L := .714;      ! Bumper magnet, pulsed, short, horizontal deflection
-MSE       : HKICKER     , L := 2.38;      ! Septum magnet, extractor
-MST       : HKICKER     , L := 2.38;      ! Septum magnet, thin
-ZKHA      : HKICKER     , L := 1;         ! Electrostatic kicker, horizontal, enlarged (RF group)
-ZS        : HKICKER     , L := 3.13;      ! Electrostatic septum
+MDH       : HKICKER     , L = .25;       ! Correcting dipole, horizontal deflection
+MDHA      : HKICKER     , L = .306;      ! Correcting dipole, horizontal deflection, enlarged
+MDHB      : HKICKER     , L = .402;      ! Correcting dipole, horizontal deflection, turned MDVA
+MDHD      : HKICKER     , L = .36;       ! Correcting dipole, horizontal deflection, special type D
+MDHW      : HKICKER     , L = .526;      ! Wiggler dipole, e- cloud experiment (IMHH from ISR, TI)
+MDPH      : HKICKER     , L = .25;
+MDSH      : HKICKER     , L = .7;        ! correcting dipole, BT line, short, horizontal deflection
+MKDHA     : HKICKER     , L = 1.6;       ! Kicker magnet, horizontal sweeping for dumping, A-type
+MKDHB     : HKICKER     , L = 1.6;       ! Kicker magnet, horizontal sweeping for dumping, B-type
+MKEL      : HKICKER     , L = 2.014;     ! Kicker magnet, extraction, L-type
+MKES      : HKICKER     , L = 2.014;     ! Kicker magnet, extraction, S-type
+MKP       : HKICKER     , L = 3.423;     ! Kicker magnet, proton injection
+MKPA      : HKICKER     , L = 3.423;
+MKPC      : HKICKER     , L = 1.78;      ! Kicker magnet, proton injection, short MKP (former MKA for ppbar)
+MKQH      : HKICKER     , L = .96;       ! Kicker magnet, Q-measurement, horizontal
+MPLH      : HKICKER     , L = 2.06;      ! Bumper magnet, pulsed, long, horizontal deflection
+MPNH      : HKICKER     , L = 2.04;      ! Bumper magnet, pulsed, normal, horizontal deflection
+MPSH      : HKICKER     , L = .714;      ! Bumper magnet, pulsed, short, horizontal deflection
+MSE       : HKICKER     , L = 2.38;      ! Septum magnet, extractor
+MST       : HKICKER     , L = 2.38;      ! Septum magnet, thin
+ZKHA      : HKICKER     , L = 1;         ! Electrostatic kicker, horizontal, enlarged (RF group)
+ZS        : HKICKER     , L = 3.13;      ! Electrostatic septum
 //---------------------- HMONITOR       ---------------------------------------------
-AERB      : HMONITOR    , L := .685;      ! RF pick-up electrode, radial, type B
-BDH       : HMONITOR    , L := 2.32;      ! Beam damper horizontal (RF equipment)
-BPH       : HMONITOR    , L := .275;      ! Beam position, horizontal
-BPNB      : HMONITOR    , L := .364;      ! Beam position, directional coupler, type B, BPCN with length 363.7
-BPNC      : HMONITOR    , L := .562;      ! Beam position, directional coupler, type C, BPCN with length 562
-BPSH      : HMONITOR    , L := 3.38;      ! Beam position, Schottky, horizontal (RF group)
+AERB      : HMONITOR    , L = .685;      ! RF pick-up electrode, radial, type B
+BDH       : HMONITOR    , L = 2.32;      ! Beam damper horizontal (RF equipment)
+BPH       : HMONITOR    , L = .275;      ! Beam position, horizontal
+BPNB      : HMONITOR    , L = .364;      ! Beam position, directional coupler, type B, BPCN with length 363.7
+BPNC      : HMONITOR    , L = .562;      ! Beam position, directional coupler, type C, BPCN with length 562
+BPSH      : HMONITOR    , L = 3.38;      ! Beam position, Schottky, horizontal (RF group)
 //---------------------- INSTRUMENT     ---------------------------------------------
-AEG       : INSTRUMENT  , L := .5593;     ! RF pick-up electrode, 1 GHz bandwith
-AEP       : INSTRUMENT  , L := 1;         ! RF pick-up electrode, for phase detection
-AEPA      : INSTRUMENT  , L := .722;      ! RF pick-up electrode, for phase detection, type A
-AEPC      : INSTRUMENT  , L := .722;      ! RF pick-up electrode, for phase detection, type C
-AESA      : INSTRUMENT  , L := .2305;     ! RF pick-up electrode, electrostatic, type A
-AETA      : INSTRUMENT  , L := .21;       ! RF mode trap, type A
-AEW       : INSTRUMENT  , L := .5105;     ! RF pick-up electrode, wide band
-AEWA      : INSTRUMENT  , L := .5105;     ! RF pick-up electrode, wide band, type A
-AEWB      : INSTRUMENT  , L := .5661;     ! RF pick-up electrode, wide band, type B
-APWL      : INSTRUMENT  , L := .776;
-BBSR      : INSTRUMENT  , L := .41;       ! Beam mini scanner, ring measurements, 2 horizontal + 2 vertical
-BCTDC     : INSTRUMENT  , L := 0;         ! Beam Current Transformer, DC current
-BCTFR     : INSTRUMENT  , L := 0;         ! Beam Current Transformer, Fast, Ring
-BCTFS     : INSTRUMENT  , L := 0;         ! Beam Current Transformer, Fast, for Synchronization
-BRSF      : INSTRUMENT  , L := .112;
-BSMH      : INSTRUMENT  , L := .61;       ! SEM position, moveable, horizontal
-BSMH1     : INSTRUMENT  , L := .255;      ! SEM position, moveable, horizontal, type 1 (?)
-BSPV      : INSTRUMENT  , L := .275;      ! SEM position, vertical
-BTV       : INSTRUMENT  , L := .45;       ! Beam Observation TV Monitors based on Screens
-BTVEL     : INSTRUMENT  , L := .53;       ! Light screen monitor, extraction, long
-BTVES     : INSTRUMENT  , L := .33;       ! Light screen monitor, extraction, short
-BTVS      : INSTRUMENT  , L := .53;       ! Light screen monitor, step mechanism
-BWSA      : INSTRUMENT  , L := .98;       ! Beam wire scanner, rotational, long. Drawing SPS8034420033.
-BWSB      : INSTRUMENT  , L := .75;       ! Beam wire scanner, rotational, short
-BWSD      : INSTRUMENT  , L := .45;       ! Beam wire scanner, linear, second generation
-TEC       : INSTRUMENT  , L := 3.4;       ! Extraction Crystal
-TECS      : INSTRUMENT  , L := .9;        ! Extraction Crystal Short tank from IHEP. Drawing SPSTCSTV0024.
-TFDH      : INSTRUMENT  , L := 1.25;      ! Beam dump monitor, for TIDH
-TFDV      : INSTRUMENT  , L := 1.4;       ! Beam dump monitor
-VVFA      : INSTRUMENT  , L := .334;      ! Vacuum valve, safety, fast action, diameter 150 mm. Drawing SPS8094007320.
-VVFB      : INSTRUMENT  , L := .37;       ! Vacuum valve, safety, fast action, diameter 250 mm. Drawing SPS8094007386.
-VVSA      : INSTRUMENT  , L := .175;      ! Vacuum valve, sector, diameter 100 mm. Drawing SPS8094007529.
-VVSB      : INSTRUMENT  , L := .175;      ! Vacuum valve, sector, diameter 150 mm. Drawing SPS8094007487.
-VVSE      : INSTRUMENT  , L := .12;       ! Vacuum valve, sector, bakeable, diameter 250 mm. Drawing SPS8094007350.
-VVSF      : INSTRUMENT  , L := .18;       ! Vacuum valve, sector, bakeable, diameter 400 mm. Drawing SPS8094007457.
-XCLD      : INSTRUMENT  , L := 10.272;    ! COLDEX Cryogenic Experiment
-XRP       : INSTRUMENT  , L := .586;      ! Roman Pot Horizontal and Vertical
-XRPH      : INSTRUMENT  , L := .586;      ! Roman Pot Horizontal plane only
+AEG       : INSTRUMENT  , L = .5593;     ! RF pick-up electrode, 1 GHz bandwith
+AEP       : INSTRUMENT  , L = 1;         ! RF pick-up electrode, for phase detection
+AEPA      : INSTRUMENT  , L = .722;      ! RF pick-up electrode, for phase detection, type A
+AEPC      : INSTRUMENT  , L = .722;      ! RF pick-up electrode, for phase detection, type C
+AESA      : INSTRUMENT  , L = .2305;     ! RF pick-up electrode, electrostatic, type A
+AETA      : INSTRUMENT  , L = .21;       ! RF mode trap, type A
+AEW       : INSTRUMENT  , L = .5105;     ! RF pick-up electrode, wide band
+AEWA      : INSTRUMENT  , L = .5105;     ! RF pick-up electrode, wide band, type A
+AEWB      : INSTRUMENT  , L = .5661;     ! RF pick-up electrode, wide band, type B
+APWL      : INSTRUMENT  , L = .776;
+BBSR      : INSTRUMENT  , L = .41;       ! Beam mini scanner, ring measurements, 2 horizontal + 2 vertical
+BCTDC     : INSTRUMENT  , L = 0;         ! Beam Current Transformer, DC current
+BCTFR     : INSTRUMENT  , L = 0;         ! Beam Current Transformer, Fast, Ring
+BCTFS     : INSTRUMENT  , L = 0;         ! Beam Current Transformer, Fast, for Synchronization
+BRSF      : INSTRUMENT  , L = .112;
+BSMH      : INSTRUMENT  , L = .61;       ! SEM position, moveable, horizontal
+BSMH1     : INSTRUMENT  , L = .255;      ! SEM position, moveable, horizontal, type 1 (?)
+BSPV      : INSTRUMENT  , L = .275;      ! SEM position, vertical
+BTV       : INSTRUMENT  , L = .45;       ! Beam Observation TV Monitors based on Screens
+BTVEL     : INSTRUMENT  , L = .53;       ! Light screen monitor, extraction, long
+BTVES     : INSTRUMENT  , L = .33;       ! Light screen monitor, extraction, short
+BTVS      : INSTRUMENT  , L = .53;       ! Light screen monitor, step mechanism
+BWSA      : INSTRUMENT  , L = .98;       ! Beam wire scanner, rotational, long. Drawing SPS8034420033.
+BWSB      : INSTRUMENT  , L = .75;       ! Beam wire scanner, rotational, short
+BWSD      : INSTRUMENT  , L = .45;       ! Beam wire scanner, linear, second generation
+TEC       : INSTRUMENT  , L = 3.4;       ! Extraction Crystal
+TECS      : INSTRUMENT  , L = .9;        ! Extraction Crystal Short tank from IHEP. Drawing SPSTCSTV0024.
+TFDH      : INSTRUMENT  , L = 1.25;      ! Beam dump monitor, for TIDH
+TFDV      : INSTRUMENT  , L = 1.4;       ! Beam dump monitor
+VVFA      : INSTRUMENT  , L = .334;      ! Vacuum valve, safety, fast action, diameter 150 mm. Drawing SPS8094007320.
+VVFB      : INSTRUMENT  , L = .37;       ! Vacuum valve, safety, fast action, diameter 250 mm. Drawing SPS8094007386.
+VVSA      : INSTRUMENT  , L = .175;      ! Vacuum valve, sector, diameter 100 mm. Drawing SPS8094007529.
+VVSB      : INSTRUMENT  , L = .175;      ! Vacuum valve, sector, diameter 150 mm. Drawing SPS8094007487.
+VVSE      : INSTRUMENT  , L = .12;       ! Vacuum valve, sector, bakeable, diameter 250 mm. Drawing SPS8094007350.
+VVSF      : INSTRUMENT  , L = .18;       ! Vacuum valve, sector, bakeable, diameter 400 mm. Drawing SPS8094007457.
+XCLD      : INSTRUMENT  , L = 10.272;    ! COLDEX Cryogenic Experiment
+XRP       : INSTRUMENT  , L = .586;      ! Roman Pot Horizontal and Vertical
+XRPH      : INSTRUMENT  , L = .586;      ! Roman Pot Horizontal plane only
 //---------------------- MARKER         ---------------------------------------------
-ENDOFSPS  : MARKER      , L := 0;
-QSPLIT    : MARKER      , L := 0;
-STARTSPS  : MARKER      , L := 0;
+ENDOFSPS  : MARKER      , L = 0;
+QSPLIT    : MARKER      , L = 0;
+STARTSPS  : MARKER      , L = 0;
 //---------------------- MONITOR        ---------------------------------------------
-BBLR      : MONITOR     , L := .72;       ! Beam beam long range
-BBLRM     : MONITOR     , L := .8;        ! Beam beam long range, moveable
-BMO       : MONITOR     , L := .45;       ! Beam matching monitor, OTR
-BPCE      : MONITOR     , L := .4;        ! Beam position, directional coupler, E type (?)
-BPCL      : MONITOR     , L := .72;       ! Beam position coupler, large
-BPCN      : MONITOR     , L := .236;      ! Beam position, directional coupler, normal
-BPCR      : MONITOR     , L := .598;      ! Beam position, directional coupler, chromaticity measurement (RF group)
-BPD       : MONITOR     , L := .4;        ! Beam position directional, horizontal + vertical
-BPHA      : MONITOR     , L := .5;        ! Beam position, horizontal, enlarged
-BPL       : MONITOR     , L := .45;       ! Beam position, luminescence
-BPLT      : MONITOR     , L := .681;      ! Beam position, N2-luminescence, Cornemuse
-BPMBH     : MONITOR     , L := .13;       ! Beam position monitor, with buttons, horizontal, 156mm diameter
-BPMBV     : MONITOR     , L := .13;       ! Beam position monitor, with buttons, vertical, 83mm diameter
-BPVA      : MONITOR     , L := .5;        ! Beam position, vertical, enlarged
-BRSC      : MONITOR     , L := .53;       ! Synchrotron radiation monitor, type C
+BBLR      : MONITOR     , L = .72;       ! Beam beam long range
+BBLRM     : MONITOR     , L = .8;        ! Beam beam long range, moveable
+BMO       : MONITOR     , L = .45;       ! Beam matching monitor, OTR
+BPCE      : MONITOR     , L = .4;        ! Beam position, directional coupler, E type (?)
+BPCL      : MONITOR     , L = .72;       ! Beam position coupler, large
+BPCN      : MONITOR     , L = .236;      ! Beam position, directional coupler, normal
+BPCR      : MONITOR     , L = .598;      ! Beam position, directional coupler, chromaticity measurement (RF group)
+BPD       : MONITOR     , L = .4;        ! Beam position directional, horizontal + vertical
+BPHA      : MONITOR     , L = .5;        ! Beam position, horizontal, enlarged
+BPL       : MONITOR     , L = .45;       ! Beam position, luminescence
+BPLT      : MONITOR     , L = .681;      ! Beam position, N2-luminescence, Cornemuse
+BPMBH     : MONITOR     , L = .13;       ! Beam position monitor, with buttons, horizontal, 156mm diameter
+BPMBV     : MONITOR     , L = .13;       ! Beam position monitor, with buttons, vertical, 83mm diameter
+BPVA      : MONITOR     , L = .5;        ! Beam position, vertical, enlarged
+BRSC      : MONITOR     , L = .53;       ! Synchrotron radiation monitor, type C
 //---------------------- OCTUPOLE       ---------------------------------------------
-LOD       : OCTUPOLE    , L := .677;      ! Octupole lens, Landau damping
-LODOUT    : OCTUPOLE    , L := .677;
-LOE       : OCTUPOLE    , L := .74;       ! Octupole lens, extraction
-LOEN      : OCTUPOLE    , L := .656;      ! Octupole lens, extraction, new magnet
-LOF       : OCTUPOLE    , L := .705;      ! Octupole lens, focussing
-LOFOUT    : OCTUPOLE    , L := .705;
+LOD       : OCTUPOLE    , L = .677;      ! Octupole lens, Landau damping
+LODOUT    : OCTUPOLE    , L = .677;
+LOE       : OCTUPOLE    , L = .74;       ! Octupole lens, extraction
+LOEN      : OCTUPOLE    , L = .656;      ! Octupole lens, extraction, new magnet
+LOF       : OCTUPOLE    , L = .705;      ! Octupole lens, focussing
+LOFOUT    : OCTUPOLE    , L = .705;
 //---------------------- QUADRUPOLE     ---------------------------------------------
-LQSA      : QUADRUPOLE  , L := .542;      ! Quadrupole lens, harmonic corrector, skew
-QD        : QUADRUPOLE  , L := 3.085;     ! Quadrupole, main ring
-QDA       : QUADRUPOLE  , L := 3.791;     ! Quadrupole, main ring, type A (antiproton)
-QE        : QUADRUPOLE  , L := .698;      ! Quadrupole, extraction
-QECD      : QUADRUPOLE  , L := .698;      ! Quadrupole, extraction
-QF        : QUADRUPOLE  , L := 3.085;     ! Quadrupole, main ring
-QFA       : QUADRUPOLE  , L := 3.791;     ! Quadrupole, main ring, type A (antiproton)
-QMS       : QUADRUPOLE  , L := .705;      ! Quadrupole, main ring, short
-QSE       : QUADRUPOLE  , L := .42;       ! Quadrupole with strip and electron cloud detector
+LQSA      : QUADRUPOLE  , L = .542;      ! Quadrupole lens, harmonic corrector, skew
+QD        : QUADRUPOLE  , L = 3.085;     ! Quadrupole, main ring
+QDA       : QUADRUPOLE  , L = 3.791;     ! Quadrupole, main ring, type A (antiproton)
+QE        : QUADRUPOLE  , L = .698;      ! Quadrupole, extraction
+QECD      : QUADRUPOLE  , L = .698;      ! Quadrupole, extraction
+QF        : QUADRUPOLE  , L = 3.085;     ! Quadrupole, main ring
+QFA       : QUADRUPOLE  , L = 3.791;     ! Quadrupole, main ring, type A (antiproton)
+QMS       : QUADRUPOLE  , L = .705;      ! Quadrupole, main ring, short
+QSE       : QUADRUPOLE  , L = .42;       ! Quadrupole with strip and electron cloud detector
 //---------------------- RBEND          ---------------------------------------------
-MBA       : RBEND       , L := 6.26;      ! Bending magnet, type B1
-MBB       : RBEND       , L := 6.26;      ! Bending Magnet, type B2
+MBA       : RBEND       , L = 6.26;      ! Bending magnet, type B1
+MBB       : RBEND       , L = 6.26;      ! Bending Magnet, type B2
 //---------------------- RCOLLIMATOR    ---------------------------------------------
-BRCH      : COLLIMATOR , L := .6 , APERTYPE=RECTANGLE;        ! Collimator horizontal (from LEP)
-BRCV      : COLLIMATOR , L := .6 , APERTYPE=RECTANGLE;        ! Collimator vertical (from LEP)
-BRCZ      : COLLIMATOR , L := .36 , APERTYPE=RECTANGLE;       ! Collimator (from LEP)
-BSHV      : COLLIMATOR , L := .45 , APERTYPE=RECTANGLE;       ! Beam scraper, horizontal + vertical (test)
-TACW      : COLLIMATOR , L := .848 , APERTYPE=RECTANGLE;      ! Aperture Collimator with Tungsten jaw
-TAL       : COLLIMATOR , L := 1.25 , APERTYPE=RECTANGLE;      ! Tungsten absorber - Secondary collimator. Drawing SPSTCSTV0026.
-TBSJ      : COLLIMATOR , L := 2.1 , APERTYPE=RECTANGLE;       ! Beam stopper, before inflector, type B (?)
-TBSM      : COLLIMATOR , L := 2 , APERTYPE=RECTANGLE;         ! Beam stopper, first turn
-TCE       : COLLIMATOR , L := 2.7 , APERTYPE=RECTANGLE;       ! Collimator, extraction
-TCSM      : COLLIMATOR , L := 1.83 , APERTYPE=RECTANGLE;      ! Simplified Phase I collimator prototype (Glidcop jaw with graphite inserts) with integrated BPMs
-TIDH      : COLLIMATOR , L := 4.3 , APERTYPE=RECTANGLE;       ! Internal beam dump, horizontal
-TIDP      : COLLIMATOR , L := 4.3 , APERTYPE=RECTANGLE;       ! Internal beam dump, momentum
-TIDV      : COLLIMATOR , L := 4.3 , APERTYPE=RECTANGLE;       ! Internal beam dump, vertical
-TPSG      : COLLIMATOR , L := 3 , APERTYPE=RECTANGLE;         ! Protection shield for septum magnet MSE, graphite
-TPSGS     : COLLIMATOR , L := 1.853 , APERTYPE=RECTANGLE;
-TPST      : COLLIMATOR , L := 2.52 , APERTYPE=RECTANGLE;      ! Protection shield for septum magnet MST
+BRCH      : COLLIMATOR , L = .6 , APERTYPE=RECTANGLE;        ! Collimator horizontal (from LEP)
+BRCV      : COLLIMATOR , L = .6 , APERTYPE=RECTANGLE;        ! Collimator vertical (from LEP)
+BRCZ      : COLLIMATOR , L = .36 , APERTYPE=RECTANGLE;       ! Collimator (from LEP)
+BSHV      : COLLIMATOR , L = .45 , APERTYPE=RECTANGLE;       ! Beam scraper, horizontal + vertical (test)
+TACW      : COLLIMATOR , L = .848 , APERTYPE=RECTANGLE;      ! Aperture Collimator with Tungsten jaw
+TAL       : COLLIMATOR , L = 1.25 , APERTYPE=RECTANGLE;      ! Tungsten absorber - Secondary collimator. Drawing SPSTCSTV0026.
+TBSJ      : COLLIMATOR , L = 2.1 , APERTYPE=RECTANGLE;       ! Beam stopper, before inflector, type B (?)
+TBSM      : COLLIMATOR , L = 2 , APERTYPE=RECTANGLE;         ! Beam stopper, first turn
+TCE       : COLLIMATOR , L = 2.7 , APERTYPE=RECTANGLE;       ! Collimator, extraction
+TCSM      : COLLIMATOR , L = 1.83 , APERTYPE=RECTANGLE;      ! Simplified Phase I collimator prototype (Glidcop jaw with graphite inserts) with integrated BPMs
+TIDH      : COLLIMATOR , L = 4.3 , APERTYPE=RECTANGLE;       ! Internal beam dump, horizontal
+TIDP      : COLLIMATOR , L = 4.3 , APERTYPE=RECTANGLE;       ! Internal beam dump, momentum
+TIDV      : COLLIMATOR , L = 4.3 , APERTYPE=RECTANGLE;       ! Internal beam dump, vertical
+TPSG      : COLLIMATOR , L = 3 , APERTYPE=RECTANGLE;         ! Protection shield for septum magnet MSE, graphite
+TPSGS     : COLLIMATOR , L = 1.853 , APERTYPE=RECTANGLE;
+TPST      : COLLIMATOR , L = 2.52 , APERTYPE=RECTANGLE;      ! Protection shield for septum magnet MST
 //---------------------- RFCAVITY       ---------------------------------------------
-ACL       : RFCAVITY    , L := 3.52913;   ! Accelerating cavity, Landau damping, travelling wave 800 MHz, Valvo
-ACTA      : RFCAVITY    , L := 17.782;    ! Accelerating cavity, travelling wave 200 MHz, type A (4 modules, 43 cells)
-ACTB      : RFCAVITY    , L := 17.782;    ! Accelerating cavity, travelling wave 200 MHz, type B (4 modules, 43 cells)
-ACTC      : RFCAVITY    , L := 21.896;    ! Accelerating cavity, travelling wave 200 MHz, type C (5 modules, 54 cells)
-ACTD      : RFCAVITY    , L := 21.896;    ! Accelerating cavity, travelling wave 200 MHz, type D (5 modules, 54 cells)
+ACL       : RFCAVITY    , L = 3.52913;   ! Accelerating cavity, Landau damping, travelling wave 800 MHz, Valvo
+ACTA      : RFCAVITY    , L = 17.782;    ! Accelerating cavity, travelling wave 200 MHz, type A (4 modules, 43 cells)
+ACTB      : RFCAVITY    , L = 17.782;    ! Accelerating cavity, travelling wave 200 MHz, type B (4 modules, 43 cells)
+ACTC      : RFCAVITY    , L = 21.896;    ! Accelerating cavity, travelling wave 200 MHz, type C (5 modules, 54 cells)
+ACTD      : RFCAVITY    , L = 21.896;    ! Accelerating cavity, travelling wave 200 MHz, type D (5 modules, 54 cells)
 //---------------------- SEXTUPOLE      ---------------------------------------------
-LSD       : SEXTUPOLE   , L := .42;       ! Sextupole lens, chromaticity correction, defocussing
-LSE       : SEXTUPOLE   , L := .74;       ! Sextupole lens, extraction
-LSEN      : SEXTUPOLE   , L := .72;       ! Sextupole lens, extraction, new magnet
-LSF       : SEXTUPOLE   , L := .423;      ! Sextupole lens, chromaticity correction, focussing
+LSD       : SEXTUPOLE   , L = .42;       ! Sextupole lens, chromaticity correction, defocussing
+LSE       : SEXTUPOLE   , L = .74;       ! Sextupole lens, extraction
+LSEN      : SEXTUPOLE   , L = .72;       ! Sextupole lens, extraction, new magnet
+LSF       : SEXTUPOLE   , L = .423;      ! Sextupole lens, chromaticity correction, focussing
 //---------------------- VKICKER        ---------------------------------------------
-MDV       : VKICKER     , L := .25;       ! Correcting dipole, vertical deflection
-MDVA      : VKICKER     , L := .424;      ! Correcting dipole, vertical deflection, enlarged
-MDVB      : VKICKER     , L := .41;       ! Correcting dipole, vertical deflection, enlarged, for BIPV upstream
-MDVW      : VKICKER     , L := .526;      ! Correcting dipole, vertical deflection  (former IMHV ISR,TI)
-MKDVA     : VKICKER     , L := 2.892;     ! Kicker magnet, vertical deflection for dumping, A-type
-MKDVB     : VKICKER     , L := 2.892;     ! Kicker magnet, vertical deflection for dumping, B-type
-MKQV      : VKICKER     , L := 1.416;     ! Kicker magnet, Q-measurement, vertical
-MPLV      : VKICKER     , L := .555;      ! Bumper magnet, pulsed, long, vertical deflection
-MPSV      : VKICKER     , L := .275;      ! Bumper magnet, pulsed, short, vertical deflection
-ZKV       : VKICKER     , L := 1.002;     ! Electrostatic kicker, vertical (RF group)
+MDV       : VKICKER     , L = .25;       ! Correcting dipole, vertical deflection
+MDVA      : VKICKER     , L = .424;      ! Correcting dipole, vertical deflection, enlarged
+MDVB      : VKICKER     , L = .41;       ! Correcting dipole, vertical deflection, enlarged, for BIPV upstream
+MDVW      : VKICKER     , L = .526;      ! Correcting dipole, vertical deflection  (former IMHV ISR,TI)
+MKDVA     : VKICKER     , L = 2.892;     ! Kicker magnet, vertical deflection for dumping, A-type
+MKDVB     : VKICKER     , L = 2.892;     ! Kicker magnet, vertical deflection for dumping, B-type
+MKQV      : VKICKER     , L = 1.416;     ! Kicker magnet, Q-measurement, vertical
+MPLV      : VKICKER     , L = .555;      ! Bumper magnet, pulsed, long, vertical deflection
+MPSV      : VKICKER     , L = .275;      ! Bumper magnet, pulsed, short, vertical deflection
+ZKV       : VKICKER     , L = 1.002;     ! Electrostatic kicker, vertical (RF group)
 //---------------------- VMONITOR       ---------------------------------------------
-BDV       : VMONITOR    , L := 1.46;      ! Beam damper vertical (RF equipment)
-BPSV      : VMONITOR    , L := 3.38;      ! Beam position, Schottky, vertical (RF group)
-BPV       : VMONITOR    , L := .275;      ! Beam position, vertical
-BPVC      : VMONITOR    , L := .562;      ! Beam position, vertical, short 562
-BPVT      : VMONITOR    , L := .4;        ! Beam position, vertical, special short
-BPW       : VMONITOR    , L := .86;       ! Pick-up station, wide band (RF group)
-BPWA      : VMONITOR    , L := .86;       ! Pick-up station, wide band (RF group)
-BPWB      : VMONITOR    , L := .86;       ! Pick-up station, wide band (RF group)
+BDV       : VMONITOR    , L = 1.46;      ! Beam damper vertical (RF equipment)
+BPSV      : VMONITOR    , L = 3.38;      ! Beam position, Schottky, vertical (RF group)
+BPV       : VMONITOR    , L = .275;      ! Beam position, vertical
+BPVC      : VMONITOR    , L = .562;      ! Beam position, vertical, short 562
+BPVT      : VMONITOR    , L = .4;        ! Beam position, vertical, special short
+BPW       : VMONITOR    , L = .86;       ! Pick-up station, wide band (RF group)
+BPWA      : VMONITOR    , L = .86;       ! Pick-up station, wide band (RF group)
+BPWB      : VMONITOR    , L = .86;       ! Pick-up station, wide band (RF group)
 
  return;
 
