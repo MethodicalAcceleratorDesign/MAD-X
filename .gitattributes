@@ -1564,6 +1564,9 @@ tests/test-match-7/twiss.b1.data.ref -text
 tests/test-match-8/test-match-8.cfg -text
 tests/test-match-8/test-match-8.madx -text
 tests/test-match-8/test-match-8.ref -text
+tests/test-match-9/test-match-9.cfg -text
+tests/test-match-9/test-match-9.madx -text
+tests/test-match-9/test-match-9.ref -text
 tests/test-match/test-match.cfg -text
 tests/test-match/test-match.madx -text
 tests/test-match/test-match.ref -text

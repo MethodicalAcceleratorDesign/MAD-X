@@ -1,0 +1,25 @@
+TITLE,'FIVECELL matching with MAD-X. Vlength option';
+
+option,info;
+
+call file="../share/ring_lattice_alt/fv9.opt";
+call file="../share/ring_lattice_alt/fv9.seq";
+
+kqf = 0.009077570142;
+kqd = -0.01092574987;
+
+Beam, particle = proton, sequence=fivecell, energy = 450.0,
+          NPART=1.05E11, sige=      4.5e-4 ;
+
+use,period=fivecell;
+
+match,sequence=fivecell, vlength;
+constraint,sequence=fivecell,range=#e,mux=1.27,muy=1.77, betx=205.9;
+vary,name=mq->l, lower=0.1, upper=2.95, step=1.e-6;
+vary,name=kqf,step=1.0e-6;
+vary,name=kqd,step=1.0e-6;
+jacobian,calls=20,tolerance=1.e-21;
+endmatch;
+
+stop;
+
