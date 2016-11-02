@@ -84,8 +84,8 @@
 @ PTCOMAX          %le                   0
 @ TITLE            %08s "no-title"
 @ ORIGIN           %17s "5.02.12 Darwin 64"
-@ DATE             %08s "14/10/16"
-@ TIME             %08s "14.17.38"
+@ DATE             %08s "02/11/16"
+@ TIME             %08s "11.37.52"
 * NAME                                S               BETX             BETA11               BETY             BETA22             BETA12             BETA21                MU1                MU2            BETA11P            BETA21P            BETA22P            BETA12P              DISP1             DISP1P 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "T_INSERTION.A$START"                   0        1.110269699       0.5553009471        10.48887011        5.246004201       0.5548341879        5.244137457                  0                  0                  0                  0                  0                  0      0.01508070688                  0
