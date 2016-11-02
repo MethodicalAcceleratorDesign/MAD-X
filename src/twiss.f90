@@ -721,7 +721,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
 
   code = node_value('mad8_type ')
 
-  if (code .eq. code_tkicker)     code = code_kicker ! TKICKER treated as KICKER
+!  if (code .eq. code_tkicker)     code = code_kicker ! TKICKER treated as KICKER
   if (code .eq. code_placeholder) code = code_instrument ! PLACEHOLDER treated as INSTRUMENT
 
   if (thr_on .gt. 0)  then
@@ -979,7 +979,7 @@ SUBROUTINE tmthrd(kpro,dorb,cmatr,pmatr,thrvec,node,cick,error)
   node = node - 1
   code = node_value('mad8_type ')
 
-  if (code .eq. code_tkicker)     code = code_kicker
+!  if (code .eq. code_tkicker)     code = code_kicker
   if (code .eq. code_placeholder) code = code_instrument
 
   !-- if wrong corrector or not a corrector, loop
@@ -1723,7 +1723,7 @@ SUBROUTINE twcpgo(rt,orbit0)
 
   sector_sel = node_value('sel_sector ') .ne. zero .and. sectormap
   code = node_value('mad8_type ')
-  if (code .eq. code_tkicker)     code = code_kicker
+!  if (code .eq. code_tkicker)     code = code_kicker
   if (code .eq. code_placeholder) code = code_instrument
   bvk = node_value('other_bv ')
   elpar_vl = el_par_vector(g_polarity, g_elpar)
@@ -2890,7 +2890,7 @@ SUBROUTINE twchgo
   el = node_value('l ')
 
   code = node_value('mad8_type ')
-  if (code .eq. code_tkicker)     code = code_kicker ! TKICKER is a KICKER
+!  if (code .eq. code_tkicker)     code = code_kicker ! TKICKER is a KICKER
   if (code .eq. code_placeholder) code = code_instrument ! PLACEHOLDER is an INSTRUMENT
 
   !---- Physical element.
@@ -4080,7 +4080,7 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
           xkick=bvk*(node_value('kick ')+node_value('chkick ')+f_errors(0)/div)
           ykick=zero
 
-       case (code_kicker)
+       case (code_kicker, code_tkicker)
           xkick=bvk*(node_value('hkick ')+node_value('chkick ')+f_errors(0)/div)
           ykick=bvk*(node_value('vkick ')+node_value('cvkick ')+f_errors(1)/div)
 
