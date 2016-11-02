@@ -145,7 +145,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   enddo
   sigmat = s0mat
 
-  
+
   !---- Build table of lattice functions, coupled.
   call twcpgo(rt,orbit0)
   if(.not. flipping) then
@@ -1079,7 +1079,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   else
      call tmsymp(RA)
   endif
-  
+
   ! RA(1:4,1:4) = ( A , B
   !                 C , D)
   A = RA(1:2,1:2) ; B = RA(1:2,3:4)
@@ -2024,7 +2024,7 @@ SUBROUTINE twcptk(re,orbit)
            write (warnstr, '( a, e13.6, a, e13.6)') ' g = ', gammacp, '; trace of decoupled matrix is ', trace_tmp
            call fort_warn('TWCPTK: ', warnstr)
         endif
-        
+
      endif
   endif
 
@@ -3276,7 +3276,7 @@ SUBROUTINE tw_summ(rt,tt)
   alfy    = opt_fun0(7)
 
   amuy    = opt_fun(8)
-  
+
   qx = amux / twopi
   qy = amuy / twopi
 
@@ -3409,7 +3409,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
      case (code_yrotation)
         call tmyrot(ftrk,orbit,fmap,ek,re,te)
 
-     case (code_hkicker, code_kicker, code_vkicker)
+     case (code_hkicker, code_vkicker, code_kicker, code_tkicker)
         call tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
      case (code_beambeam)
@@ -3434,7 +3434,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
      case (code_crabcavity)
         call tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
-     case (code_tkicker, code_hacdipole, code_vacdipole)
+     case (code_hacdipole, code_vacdipole)
         ! nothing in MAD-X only used for conversion to sixtrack
 
      case (code_nllens)
