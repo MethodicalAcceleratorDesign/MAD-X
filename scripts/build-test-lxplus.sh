@@ -54,7 +54,7 @@ if [ "$1" = "cleanall" ] ; then
 	check_error "make cleanall failed"
 else
 	echo "Skipped (no explicit request)."
-fi 
+fi
 
 echo -e "\n===== Gnu build ====="
 source /afs/cern.ch/sw/lcg/contrib/gcc/max/i686-slc6/setup.sh
@@ -111,11 +111,11 @@ check_error "make madx-linux32-lahey failed" "no-exit"
 
 echo -e "\n===== Binaries dependencies ====="
 make infobindep
-check_error "make infobindep failed"
+check_error "make infobindep failed" "no-exit"
 
 echo -e "\n===== Tests pointless files ====="
 make cleantest && make infotestdep
-check_error "make infotestdep failed"
+check_error "make infotestdep failed" "no-exit"
 
 echo -e "\n===== Running tests (long) ====="
 if [ "$1" = "notest" ] ; then
@@ -130,7 +130,7 @@ else
 
 	echo -e "\n===== Testing madx-linux64-intel ====="
 	make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=yes
-	check_error "make tests-all for madx-linux64-intel failed"
+	check_error "make tests-all for madx-linux64-intel failed" "no-exit"
 
 	echo -e "\n===== Testing madx-linux32-gnu ====="
 	make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=yes

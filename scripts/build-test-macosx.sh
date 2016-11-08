@@ -52,7 +52,7 @@ if [ "$1" = "cleanall" ] ; then
 	check_error "make cleanall failed"
 else
 	echo "Skipped (no explicit request)."
-fi 
+fi
 
 echo -e "\n===== Gnu build ====="
 gcc      --version
@@ -63,7 +63,7 @@ make all-macosx32-gnu
 check_error "make all-macosx32-gnu failed" "no-exit"
 
 make all-macosx64-gnu
-check_error "make all-macosx64-gnu failed"
+check_error "make all-macosx64-gnu failed" "no-exit"
 
 echo -e "\n===== Intel build ====="
 icc      --version
@@ -104,7 +104,7 @@ else
 
 	echo -e "\n===== Testing madx-macosx64-gnu ====="
 	make madx-macosx64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=$NOCOLOR
-	check_error "make tests-all for madx-macosx64-gnu failed"
+	check_error "make tests-all for madx-macosx64-gnu failed" "no-exit"
 fi
 
 # restore the default version

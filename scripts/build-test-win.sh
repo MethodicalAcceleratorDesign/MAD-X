@@ -72,7 +72,7 @@ if [ "$1" = "cleanall" ] ; then
 	check_error "make cleanall failed"
 else
 	echo "Skipped (no explicit request)."
-fi 
+fi
 
 echo -e "\n===== Gnu build ====="
 set_env 64
@@ -86,7 +86,7 @@ check_error "make all-win32-gnu failed" "no-exit"
 
 set_env 64
 make all-win64-gnu
-check_error "make all-win64-gnu failed"
+check_error "make all-win64-gnu failed" "no-exit"
 
 echo -e "\n===== Binaries dependencies ====="
 make infobindep
@@ -109,7 +109,7 @@ else
 
 	echo -e "\n===== Testing madx-win64-gnu ====="
 	make madx-win64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=$NOCOLOR
-	check_error "make tests-all for madx-win64-gnu failed"
+	check_error "make tests-all for madx-win64-gnu failed" "no-exit"
 fi
 
 # restore the default version
