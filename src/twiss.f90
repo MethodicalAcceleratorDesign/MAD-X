@@ -1052,7 +1052,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
 
   integer, external :: get_option
   double precision, external :: get_value
-  double precision, parameter :: eps=1d-8, diff_cos = 1d-4, symp_thrd=1d-11 ! FCC2 needs a bit more than 1e-12
+  double precision, parameter :: eps=1d-8, diff_cos = 1d-5, symp_thrd=1d-11 ! FCC2 needs a bit more than 1e-12
 
   double precision  :: em(6,6),  cosmux_eig, cosmuy_eig, nrm
   double precision  :: reval(6), aival(6) ! re and im parts
