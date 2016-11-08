@@ -1043,7 +1043,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   integer, intent(OUT) :: eflag
 
   logical :: stabx, staby
-  double precision :: a(2,2), b(2,2), c(2,2), d(2,2), ra(6,6)
+  double precision :: a(2,2), b(2,2), c(2,2), d(2,2), ra(6,6), r_eig(6,6)
   double precision :: e(2,2), aux(2,2), f(2,2), bbar(2,2)
   double precision :: arg, den, det, r_det, dtr, sinmu2
   double precision :: betx0, alfx0, amux0
@@ -1066,6 +1066,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   eflag   = 0
   gammacp = one
   RA = RT
+  R_EIG = eye
   betx0=zero; alfx0=zero; amux0=zero
   bety0=zero; alfy0=zero; amuy0=zero
   cosmux_eig=zero; cosmuy_eig=zero
@@ -1164,14 +1165,18 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
 
   endif
 
+  !Create decoupled matrix REIG =[E 0; 0 F ] for eigenvalues calculation
+  R_EIG(1:2, 1:2) = E
+  R_EIG(3:4, 3:4) = F
+  
   !---- Find eigenvectors at initial position.
   reval = zero
   aival = zero
 
-  if (m66sta(rt)) then
-     call laseig(rt, reval, aival, em)
+  if (m66sta(r_eig)) then
+     call laseig(r_eig, reval, aival, em)
   else
-     call ladeig(rt, reval, aival, em)
+     call ladeig(r_eig, reval, aival, em)
   endif
 
   cosmux_eig = ( reval(1)+aival(1) + reval(2) + aival(2) )/ 2
