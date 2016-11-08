@@ -285,6 +285,7 @@ char command_def[] =
 "debug      = [l, false, true], "
 "verbose    = [l, false, true], " /*hbu */
 "rbarc      = [l, true, true], "
+"bendcf     = [l, true, true], " /* bending magnet with combined functions */
 "thin_foc   = [l, true, true], "
 "sympl      = [l, true, true], "
 "tell       = [l, false, true], "
