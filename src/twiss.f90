@@ -1054,10 +1054,10 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   double precision, external :: get_value
   double precision, parameter :: eps=1d-8, diff_cos = 1d-5, symp_thrd=1d-11 ! FCC2 needs a bit more than 1e-12
 
-  double precision  :: em(6,6),  cosmux_eig, cosmuy_eig, nrm
+  double precision  :: em(6,6),  cosmu1_eig, cosmu2_eig, nrm
   double precision  :: reval(6), aival(6) ! re and im parts
   logical, external :: m66sta
-  character(len=150):: warnstr
+  character(len=180):: warnstr
 
   !--- initialize deltap because twcpin can be called directly from mad_emit
   deltap = get_value('probe ','deltap ')
@@ -1069,7 +1069,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   R_EIG = eye
   betx0=zero; alfx0=zero; amux0=zero
   bety0=zero; alfy0=zero; amuy0=zero
-  cosmux_eig=zero; cosmuy_eig=zero
+  cosmu1_eig=zero; cosmu2_eig=zero
   stabx=.false.; staby=.false.
 
   call m66symp(rt,nrm)
@@ -1165,36 +1165,37 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
 
   endif
 
-  !Create decoupled matrix REIG =[E 0; 0 F ] for eigenvalues calculation
-  R_EIG(1:2, 1:2) = E
-  R_EIG(3:4, 3:4) = F
-  
+  ! Create decoupled matrix R_EIG =[E 0; 0 F ] for eigenvalues calculation
+   R_EIG(1:2, 1:2) = E
+   R_EIG(3:4, 3:4) = F
+
   !---- Find eigenvectors at initial position.
   reval = zero
   aival = zero
 
-  if (m66sta(r_eig)) then
-     call laseig(r_eig, reval, aival, em)
-  else
-     call ladeig(r_eig, reval, aival, em)
-  endif
+  call laseig(r_eig, reval, aival, em)
 
-  cosmux_eig = ( reval(1)+aival(1) + reval(2) + aival(2) )/ 2
-  if ((cosmux - cosmux_eig) .gt. diff_cos) then
-     write (warnstr,'(a,e13.6)') "Difference in the calculation of cosmux: cosmux - cosmux_eig =  ", cosmux - cosmux_eig
-     call fort_warn('TWCPIN: ', warnstr)
-     write (warnstr,'(a,e13.6,a,e13.6)') "cosmux  =  ", cosmux, ", cosmux_eig =", cosmux_eig
-     call fort_warn('TWCPIN: ', warnstr)
-  endif
+  cosmu1_eig = ( reval(1)+ aival(1) + reval(2) + aival(2) )/ 2
+  cosmu2_eig = ( reval(3)+ aival(3) + reval(4) + aival(4) )/ 2
 
-  cosmuy_eig = ( reval(3)+aival(3) + reval(4) + aival(4) )/ 2
-  if ((cosmuy - cosmuy_eig) .gt. diff_cos) then
-     write (warnstr,'(a,e13.6)') "Difference in the calculation of cosmuy: cosmuy - cosmuy_eig =  ", cosmuy - cosmuy_eig
+  if (abs(cosmux - cosmu1_eig) .gt. diff_cos .and. abs(cosmux - cosmu2_eig) .gt. diff_cos) then
+     write (warnstr,'(a)') "Difference in the calculation of cosmux based of R_EIG eigen values!!!  "
      call fort_warn('TWCPIN: ', warnstr)
-     write (warnstr,'(a,e13.6,a,e13.6)') "cosmuy  =  ", cosmuy, ", cosmuy_eig =", cosmuy_eig
+     write (warnstr,'(a,e13.6, a, e13.6)') "cosmux-cosmu1_eig =", cosmux - cosmu1_eig, "cosmux-cosmu2_eig =", cosmux - cosmu2_eig
+     call fort_warn('TWCPIN: ', warnstr)
+     write (warnstr,'(a,e13.6,a,e13.6, a, e13.6)') "cosmux =  ", cosmux, ", cosmu1_eig =", cosmu1_eig,  ", cosmu2_eig =", cosmu2_eig
      call fort_warn('TWCPIN: ', warnstr)
   endif
 
+  if (abs(cosmuy - cosmu1_eig) .gt. diff_cos .and. abs(cosmuy - cosmu2_eig) .gt. diff_cos) then
+     write (warnstr,'(a)') "Difference in the calculation of cosmuy based of R_EIG eigen values!!!  "
+     call fort_warn('TWCPIN: ', warnstr)
+     write (warnstr,'(a,e13.6, a, e13.6)') "cosmuy-cosmu1_eig = ", cosmuy - cosmu1_eig, "cosmuy-cosmu2_eig = ", cosmuy - cosmu2_eig
+     call fort_warn('TWCPIN: ', warnstr)
+     write (warnstr,'(a,e13.6,a,e13.6, a, e13.6)') "cosmuy =  ", cosmuy, ", cosmu1_eig =", cosmu1_eig,  ", cosmu2_eig =", cosmu2_eig
+     call fort_warn('TWCPIN: ', warnstr)
+  endif
+  
   ! call twcpin_print(rt,r0mat)
 
   !---- Give message, if unstable.
