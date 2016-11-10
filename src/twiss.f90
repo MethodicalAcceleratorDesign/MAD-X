@@ -1178,23 +1178,38 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   cosmu1_eig = ( reval(1)+ aival(1) + reval(2) + aival(2) )/ 2
   cosmu2_eig = ( reval(3)+ aival(3) + reval(4) + aival(4) )/ 2
 
-  if (abs(cosmux - cosmu1_eig) .gt. diff_cos .and. abs(cosmux - cosmu2_eig) .gt. diff_cos) then
-     write (warnstr,'(a)') "Difference in the calculation of cosmux based of R_EIG eigen values!!!  "
+  if (.not. ((abs(cosmux - cosmu1_eig) .lt. diff_cos .and. abs(cosmuy - cosmu2_eig) .lt. diff_cos) .or.  &
+             (abs(cosmuy - cosmu1_eig) .lt. diff_cos .and. abs(cosmux - cosmu2_eig) .lt. diff_cos))) then 
+     write (warnstr,'(a)') "Difference in the calculation of cosmux/cosmuy based of R_EIG eigen values!!!  "
      call fort_warn('TWCPIN: ', warnstr)
-     write (warnstr,'(a,e13.6, a, e13.6)') "cosmux-cosmu1_eig =", cosmux - cosmu1_eig, "cosmux-cosmu2_eig =", cosmux - cosmu2_eig
+     write (warnstr,'(a,e13.6, a, e13.6)') "cosmux-cosmu1_eig =", cosmux-cosmu1_eig, "cosmux-cosmu2_eig =", cosmux-cosmu2_eig
      call fort_warn('TWCPIN: ', warnstr)
-     write (warnstr,'(a,e13.6,a,e13.6, a, e13.6)') "cosmux =  ", cosmux, ", cosmu1_eig =", cosmu1_eig,  ", cosmu2_eig =", cosmu2_eig
+     write (warnstr,'(a,e13.6, a, e13.6)') "cosmuy-cosmu1_eig =", cosmuy-cosmu1_eig, "cosmuy-cosmu2_eig =", cosmuy-cosmu2_eig
+     call fort_warn('TWCPIN: ', warnstr)
+     write (warnstr,'(a,e13.6,a,e13.6)') "cosmux =  ", cosmux, ", cosmuy =", cosmuy
+     call fort_warn('TWCPIN: ', warnstr)
+     write (warnstr,'(a,e13.6,a,e13.6)')  "cosmu1_eig =", cosmu1_eig,  ", cosmu2_eig =", cosmu2_eig
      call fort_warn('TWCPIN: ', warnstr)
   endif
+  
+  
+  ! if (abs(cosmux - cosmu1_eig) .gt. diff_cos .and. abs(cosmux - cosmu2_eig) .gt. diff_cos) then
+  !    write (warnstr,'(a)') "Difference in the calculation of cosmux based of R_EIG eigen values!!!  "
+  !    call fort_warn('TWCPIN: ', warnstr)
+  !    write (warnstr,'(a,e13.6, a, e13.6)') "cosmux-cosmu1_eig =", cosmux - cosmu1_eig, "cosmux-cosmu2_eig =", cosmux - cosmu2_eig
+  !    call fort_warn('TWCPIN: ', warnstr)
+  !    write (warnstr,'(a,e13.6,a,e13.6, a, e13.6)') "cosmux =  ", cosmux, ", cosmu1_eig =", cosmu1_eig,  ", cosmu2_eig =", cosmu2_eig
+  !    call fort_warn('TWCPIN: ', warnstr)
+  ! endif
 
-  if (abs(cosmuy - cosmu1_eig) .gt. diff_cos .and. abs(cosmuy - cosmu2_eig) .gt. diff_cos) then
-     write (warnstr,'(a)') "Difference in the calculation of cosmuy based of R_EIG eigen values!!!  "
-     call fort_warn('TWCPIN: ', warnstr)
-     write (warnstr,'(a,e13.6, a, e13.6)') "cosmuy-cosmu1_eig = ", cosmuy - cosmu1_eig, "cosmuy-cosmu2_eig = ", cosmuy - cosmu2_eig
-     call fort_warn('TWCPIN: ', warnstr)
-     write (warnstr,'(a,e13.6,a,e13.6, a, e13.6)') "cosmuy =  ", cosmuy, ", cosmu1_eig =", cosmu1_eig,  ", cosmu2_eig =", cosmu2_eig
-     call fort_warn('TWCPIN: ', warnstr)
-  endif
+  ! if (abs(cosmuy - cosmu1_eig) .gt. diff_cos .and. abs(cosmuy - cosmu2_eig) .gt. diff_cos) then
+  !    write (warnstr,'(a)') "Difference in the calculation of cosmuy based of R_EIG eigen values!!!  "
+  !    call fort_warn('TWCPIN: ', warnstr)
+  !    write (warnstr,'(a,e13.6, a, e13.6)') "cosmuy-cosmu1_eig = ", cosmuy - cosmu1_eig, "cosmuy-cosmu2_eig = ", cosmuy - cosmu2_eig
+  !    call fort_warn('TWCPIN: ', warnstr)
+  !    write (warnstr,'(a,e13.6,a,e13.6, a, e13.6)') "cosmuy =  ", cosmuy, ", cosmu1_eig =", cosmu1_eig,  ", cosmu2_eig =", cosmu2_eig
+  !    call fort_warn('TWCPIN: ', warnstr)
+  ! endif
   
   ! call twcpin_print(rt,r0mat)
 
