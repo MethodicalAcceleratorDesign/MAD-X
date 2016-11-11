@@ -1075,7 +1075,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   call m66symp(rt,nrm)
   if (nrm .gt. symp_thrd) then
      eflag = 1
-     write (warnstr,'(a)') "One-turn map can't be symplified!"
+     write (warnstr,'(a, e13.6)') "One-turn map can't be symplified! nrm = ", nrm
      call fort_warn('TWCPIN: ', warnstr)
   else
      call tmsymp(RA)
