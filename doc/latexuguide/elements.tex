@@ -59,14 +59,14 @@ distinguished only by the reference system used:
 Bendig magnets are defined by the statements: 
 \madbox{
 label: SBEND, \= L=real, ANGLE=real, TILT=real, \\
-              \> K0=real, K1=real, K2=real, KS=real,\\
+              \> K0=real, K1=real, K2=real, K1S=real,\\
               \> E1=real, E2=real, FINT=real, FINTX=real,\\ 
               \> HGAP=real, H1=real, H2=real,\\
               \> THICK=logical;\\
               \> \\
               \> \\
 label: RBEND, \> L=real, ANGLE=real, TILT=real, \\
-              \> K0=real, K1=real, K2=real, KS=real,\\
+              \> K0=real, K1=real, K2=real, K1S=real,\\
               \> E1=real, E2=real, FINT=real, FINTX=real, \\
               \> HGAP=real, H1=real, H2=real, \\
               \> THICK=logical, \\
@@ -137,7 +137,7 @@ Bending magnets have the following attributes:
    \ttitem{K2} The sextupole coefficient. (Default: 0 m$^{-3}$) \\ 
    $K_2 = (1/B\rho) (\partial^2 B_y / \partial x^2)$.   
 
-  \ttitem{KS} The skew quadrupole coefficient 
+  \ttitem{K1S} The skew quadrupole coefficient 
    $K_{s} = 1/(2 B \rho) (\partial B_x / \partial x - \partial B_y / \partial y)$\\  
     where (x,y) is a coordinate system rotated by $-45^\circ$ around s
     with respect to the normal one. The default is 0 m$^{-2}$. A
@@ -153,8 +153,7 @@ Bending magnets have the following attributes:
    component; i.e. for positive \texttt{H1} and \texttt{H2} the centres
    of curvature of the pole faces are placed inside the magnet. 
 
-   \ttitem{K0} \textbf{OBSOLETE} \\
-   Please take note that $K_0$ and $K_0s$ are left in the
+   \ttitem{K0} Please take note that $K_0$ and $K_0s$ are left in the
    data base but are no longer used for the MAP of the bends,
    instead \texttt{ANGLE} and \texttt{TILT} are used exclusively. \\
    However, specifying \texttt{K0} is required in order to be able to
@@ -383,8 +382,8 @@ Example:
 
 %irina 
 \textbf{Note:} Sextupole doesn't carry any attributes of bending magnet or quadrupole,
- i.e. $K_0$ or $K_1$t. In case these have to be considered in the element, please use 
- multipole or bending magnet as a type of an element.
+ i.e. $K_0$ or $K_1$. In case these have to be considered in the element, please use 
+ multipole as a type of an element.
 
 
 \textbf{Note:} Additional attributes can be given to sextupoles; They
