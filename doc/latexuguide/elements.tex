@@ -464,6 +464,16 @@ label: MULTIPOLE, \= LRAD=real, TILT=real, \\
                   \> KNL=\{real, \ldots \}, KSL=\{real, \ldots \};
 }
 
+The deflection imparted by a
+magnetic multipole on a particle is expressed as \textit{integrated
+  multipole magnetic strength}.
+The $n$-th order integrated normal- and skew- magnetic strengths, respectively $K_{\textnormal{N},n}L$  and $K_{\textnormal{S},n}L$, are defined as:
+\begin{equation}
+\begin{aligned}K_{\textnormal{N},n}L & =\frac{L}{B\rho}\frac{\partial^{n}B_{y}}{\partial x^{n}};\quad\text{and}\quad K_{\textnormal{S,}n}L=\frac{L}{B\rho}\frac{\partial^{n}B_{x}}{\partial x^{n}},\end{aligned}
+\label{eq:STRENGHT-1}
+\end{equation}
+  as mentioned in section \ref{sec:normalskew}.
+They are both expressed in $[\mathrm{m}^{-n}]$.
 \begin{madlist}
     \ttitem{LRAD} A fictitious length, originally only used to
       compute synchrotron radiation effects. \\
