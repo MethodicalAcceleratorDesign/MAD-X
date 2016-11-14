@@ -4079,16 +4079,16 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
      select case (code)
 
        case (code_hkicker)
-          xkick=bvk*(node_value('kick ')+node_value('chkick ')+f_errors(0)/div)
+          xkick=bvk*(node_value('kick ')+node_value('chkick '))
           ykick=zero
 
        case (code_kicker, code_tkicker)
-          xkick=bvk*(node_value('hkick ')+node_value('chkick ')+f_errors(0)/div)
-          ykick=bvk*(node_value('vkick ')+node_value('cvkick ')+f_errors(1)/div)
+          xkick=bvk*(node_value('hkick ')+node_value('chkick '))
+          ykick=bvk*(node_value('vkick ')+node_value('cvkick '))
 
        case (code_vkicker)
           xkick=zero
-          ykick=bvk*(node_value('kick ')+node_value('cvkick ')+f_errors(1)/div)
+          ykick=bvk*(node_value('kick ')+node_value('cvkick '))
 
        case default
           xkick=zero
@@ -4096,6 +4096,9 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
      end select
 
+     xkick=xkick+bvk*(f_errors(0)/div);
+     ykick=ykick+bvk*(f_errors(1)/div);
+     
      xau = xkick
      xkick = xkick*cos(tilt)+ykick*sin(tilt)
      ykick =  -xau*sin(tilt)+ykick*cos(tilt)
