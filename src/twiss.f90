@@ -14,7 +14,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   !     Purpose:                                                         *
   !     TWISS command: Track linear lattice parameters.                  *
   !----------------------------------------------------------------------*
-  double precision :: rt(6,6), disp0(6)
+  double precision :: rt(6,6), disp0(6), cp_thrd=1d-12 ! coupling limit 
   integer :: tab_name(*)
   integer :: sector_tab_name(*) ! holds sectormap data
 
@@ -156,7 +156,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
 
   !---- List chromatic functions.
   if (chrom .ne. 0) then
-     if (all( rt(1:2,3:4) .ne. zero  .or.  rt(3:4,1:2) .ne. zero)) then
+    if ( any(rt(1:2,3:4) .gt. cp_thrd)  .or.  any(rt(3:4,1:2) .gt. cp_thrd) ) then
         write (warnstr, '(a)') 'Coupled lattice! The calculation of the chromatic functions could be inaccurate!'
         call fort_warn('TWISS: ', warnstr)
      endif
