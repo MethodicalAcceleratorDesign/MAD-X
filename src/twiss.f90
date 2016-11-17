@@ -3176,7 +3176,7 @@ SUBROUTINE tw_summ(rt,tt)
   double precision :: sd, detl, f, tb, t2
   double precision :: disp0(6), frt(6,6), frtp(6,6), rtp(6,6)
   double precision :: bx0, ax0, by0, ay0, sx, sy, orbit5
-  double precision, parameter :: eps=1d-16, diff_cos =1d-4
+  double precision, parameter :: eps=1d-16
   character(len=150) :: warnstr
 
   integer, external :: get_option
@@ -3247,23 +3247,6 @@ SUBROUTINE tw_summ(rt,tt)
         gamtr = sign(one,alfa) * sqrt( one / abs(alfa))
      endif
 
-     if (cosmux .gt. zero .and. cos(amux) .gt. zero ) then
-        if ((cosmux - cos(amux)) .gt. diff_cos) then
-           !print*,  "Difference in the calculation of cosmux: cosmux - cos(amux) =  ", cosmux - cos(amux)
-           write (warnstr,'(a,e13.6)') "Difference in the calculation of cosmux: cosmux - cos(amux) =  ", cosmux - cos(amux)
-           call fort_warn('TW_SUMM: ', warnstr)
-           write (warnstr,'(a,e13.6,a,e13.6)') "cosmux  =  ", cosmux, ", cos(amuy/twopi) = ", cos(amux)
-           call fort_warn('TW_SUMM: ', warnstr)
-        endif
-     endif
-     if (cosmuy .gt. zero .and. cos(amuy) .gt. zero ) then
-        if ( (cosmuy - cos(amuy)) .gt. diff_cos) then
-           write (warnstr,'(a,e13.6)') "Difference in the calculation of cosmuy: cosmuy - cos(amuy) =  ", cosmuy - cos(amuy)
-           call fort_warn('TW_SUMM: ', warnstr)
-           write (warnstr,'(a,e13.6,a,e13.6)') "cosmuy  =  ", cosmuy, ", cos(amuy) = ", cos(amuy)
-           call fort_warn('TW_SUMM: ', warnstr)
-        endif
-     endif
   endif
 
   !---- Initialization transverse
