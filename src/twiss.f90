@@ -145,7 +145,6 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   enddo
   sigmat = s0mat
 
-
   !---- Build table of lattice functions, coupled.
   call twcpgo(rt,orbit0)
   if(.not. flipping) then
@@ -1855,21 +1854,14 @@ SUBROUTINE twcpgo(rt,orbit0)
   sigyco = sqrt(sigyco / wgt)
   sigdx  = sqrt(sigdx / wgt)
   sigdy  = sqrt(sigdy / wgt)
-  cosmux = (rt(1,1) + rt(2,2)) / two
-  cosmuy = (rt(3,3) + rt(4,4)) / two
-
+  ! IT. remove cosmux/cosmuy calculation here as it's not used anywhere and only messes up check for coupled periodic lattices
+  ! cosmux = (rt(1,1) + rt(2,2)) / two
+  ! cosmuy = (rt(3,3) + rt(4,4)) / two
+  
   !---- Warning messages.
   if (cplxt .or. radiate) &
        call fort_warn('TWCPGO: ','TWISS uses the RF system or synchrotron radiation only '// &
                        'to find the closed orbit, for optical calculations it ignores both.')
-
-  ! write (6,*) bxmax, bxmax_name
-  ! write (6,*) bymax, bymax_name
-  ! write (6,*) dxmax, dxmax_name
-  ! write (6,*) dymax, dymax_name
-  ! write (6,*) xcomax, xcomax_name
-  ! write (6,*) ycomax, ycomax_name
-
 end SUBROUTINE twcpgo
 
 SUBROUTINE twcptk(re,orbit)
@@ -3176,7 +3168,7 @@ SUBROUTINE tw_summ(rt,tt)
   double precision :: sd, detl, f, tb, t2
   double precision :: disp0(6), frt(6,6), frtp(6,6), rtp(6,6)
   double precision :: bx0, ax0, by0, ay0, sx, sy, orbit5
-  double precision, parameter :: eps=1d-16
+  double precision, parameter :: eps=1d-16, diff_cos=5d-5
   character(len=150) :: warnstr
 
   integer, external :: get_option
@@ -3239,14 +3231,26 @@ SUBROUTINE tw_summ(rt,tt)
      eta = - sd * beta**2 / suml
 
      alfa = one / gamma**2 + eta
-!     if (alfa .eq. zero) then
+
      if (abs(alfa) .lt. eps) then
         alfa  = zero
         gamtr = zero
      else
         gamtr = sign(one,alfa) * sqrt( one / abs(alfa))
      endif
-
+     
+     if (abs(cosmux - cos(amux)) .gt. diff_cos) then
+        write (warnstr,'(a,e13.6)') "Difference in the calculation of cosmux: cosmux - cos(amux) =  ", cosmux - cos(amux)
+        call fort_warn('TW_SUMM: ', warnstr)
+        write (warnstr,'(a,e13.6,a,e13.6)') "cosmux  =  ", cosmux, ", cos(amux) = ", cos(amux)
+        call fort_warn('TW_SUMM: ', warnstr)
+     endif
+     if ( abs(cosmuy - cos(amuy)) .gt. diff_cos) then
+        write (warnstr,'(a,e13.6)') "Difference in the calculation of cosmuy: cosmuy - cos(amuy) =  ", cosmuy - cos(amuy)
+        call fort_warn('TW_SUMM: ', warnstr)
+        write (warnstr,'(a,e13.6,a,e13.6)') "cosmuy  =  ", cosmuy, ", cos(amuy) = ", cos(amuy)
+        call fort_warn('TW_SUMM: ', warnstr)
+     endif
   endif
 
   !---- Initialization transverse
