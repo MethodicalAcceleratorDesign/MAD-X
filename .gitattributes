@@ -1649,7 +1649,6 @@ tests/test-ptc-twiss-3/test-ptc-twiss-3.madx -text
 tests/test-ptc-twiss-3/test-ptc-twiss-3.ref -text
 tests/test-ptc-twiss-3/twiss-table.cfg -text
 tests/test-ptc-twiss-3/twiss-table.ref -text
-tests/test-ptc-twiss-4/p4_ptc.tfs -text
 tests/test-ptc-twiss-4/test-ptc-twiss-4.cfg -text
 tests/test-ptc-twiss-4/test-ptc-twiss-4.madx -text
 tests/test-ptc-twiss-4/test-ptc-twiss-4.ref -text
