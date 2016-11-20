@@ -46,6 +46,15 @@ die ()
     [ "$force" != "force" ] && exit 1
 }
 
+# error handler
+check_error ()
+{
+    if [ "$?" != "0" ] ; then
+        echo -e "\nERROR: $1"
+        [ "$2" != "no-exit" ] && die
+    fi
+}
+
 # clean all and die
 [ "$clean" == "clean" ] && rm -f build-test-*.tmp build-test-*.out && die
 
@@ -60,23 +69,17 @@ readonly windir="mad@macserv15865W10.cern.ch:madX"
 readonly linuxdir="mad@macserv15865LX.cern.ch:madX"
 readonly macosxdir="mad@macserv15865.cern.ch:madX"
 
-# error handler
-check_error ()
-{
-    [ "$?" != "0" ] && echo "ERROR: $1" && die
-}
-
 # clean tempory files
 clean_tmp ()
 {
     rm -f build-test-*.tmp
 }
 
-# clear reports older than 51 days
+# keep 1 year of reports
 clear_old_reports ()
 {
-    find tests/reports -ctime +51  -name '*_build-test-[lmw][aix]*.out' -exec rm {} \;
-    find tests/reports -ctime +501 -name '*_build-test-report.out' -exec rm {} \;
+    find tests/reports -ctime +366 -name '*_build-test-[lmw][aix]*.out' -exec rm {} \;
+    find tests/reports -ctime +366 -name '*_build-test-report.out' -exec rm {} \;
 }
 
 # check for completed jobs [lxplus | macosx | linux | win]
@@ -87,7 +90,7 @@ build_test_completed ()
     for arch in "$@" ; do
         if [ -s build-test-$arch.out ] ; then
             marker=`perl -ne '/===== End of build and tests =====/ && print "found"' build-test-$arch.out`
-            check_error "unable to search for end marker (perl)"
+            check_error "unable to search for end marker (perl)" "no-exit"
         fi
         [ "$marker" != "found" ] && incomplete="incomplete, " && return 1
     done
@@ -107,7 +110,7 @@ build_test_remote ()
     for arch in "$@" ; do
         eval dir=\$${arch}dir
         scp -q -p "$dir/build-test-$arch.out" build-test-$arch.out
-        check_error "unable to retrieve $arch remote report (scp)"
+        check_error "unable to retrieve $arch remote report (scp)" "no-exit"
         if [ -s build-test-$arch.out ] ; then
             cat build-test-$arch.out | tr -d '\r' > build-test-$arch.tr
             mv -f build-test-$arch.tr build-test-$arch.out
@@ -135,14 +138,14 @@ build_test_report ()
 
         if [ -s build-test-$arch.out ] ; then
             cp -f build-test-$arch.out tests/reports/${thedate}_build-test-$arch.out
-            check_error "backup of build-test-$arch.out failed (cp)"
+            check_error "backup of build-test-$arch.out failed (cp)" "no-exit"
 
             perl -ne '/: FAIL$|^ERROR: / && print' build-test-$arch.out >> build-test-failed.tmp
-            check_error "unable to search for failures or errors (perl)"
+            check_error "unable to search for failures or errors (perl)" "no-exit"
 
             perl -ne '/: FAIL$|^ERROR: / && print ;
                       /===== Testing (madx-\S+) =====/ && print "\n$1:\n"' build-test-$arch.out >> build-test-result.tmp
-            check_error "unable to build report summary (perl)"
+            check_error "unable to build report summary (perl)" "no-exit"
         else
             echo "ERROR: report build-test-$arch.out not found (or empty) for platform $arch"
         fi
@@ -175,11 +178,11 @@ build_test_send ()
     cat build-test-result.tmp                                                 >> build-test-report.out
 
     cp -f build-test-report.out tests/reports/${thedate}_build-test-report.out
-    check_error "backup of build-test-report.out failed (cp)"
+    check_error "backup of build-test-report.out failed (cp)" "no-exit"
 
     if [ "$nomail" != "nomail" ] ; then
         cat -v build-test-report.out | mail -s "MAD-X builds and tests report ${thedate}: $status" mad-src@cern.ch
-        check_error "unable to email report summary (mail)"
+        check_error "unable to email report summary (mail)" "no-exit"
     fi
     return 0
 }
@@ -205,7 +208,7 @@ build_test_send   lxplus macosx linux win
 # report errors by email if any
 if [ "$nomail" != "nomail" -a -s build-test-report.log ] ; then
     cat -v build-test-report.log | mail -s "MAD-X builds and tests report errors (${thedate})" mad@cern.ch
-    check_error "unable to email report errors (check mail)"
+    check_error "unable to email report errors (check mail)" "no-exit"
 fi
 
 # backup last-build
