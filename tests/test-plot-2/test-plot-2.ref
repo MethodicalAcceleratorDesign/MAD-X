@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  +     MAD-X 5.02.12  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.10.05 13:27:07      +
+  + Release   date: 2016.10.15               +
+  + Execution date: 2016.11.20 20:30:49      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option, -echo;
 
@@ -377,14 +377,14 @@ orbit:  -1.004379E-05 -2.203183E-06 -3.527545E-04 -1.117392E-04 -4.622495E-06  6
   
 iteration:   2 error:   3.168097E-07 deltap:   1.000000E-06
 orbit:  -9.832489E-06 -2.248951E-06 -3.527700E-04 -1.117415E-04 -2.891848E-06  6.040747E-07
-++++++ warning: TWISS:  Coupled lattice! The calculation of the chromatic functions could be inaccurate!                                                                      
+++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
 iteration:   1 error:   9.110582E-04 deltap:   0.000000E+00
 orbit:  -3.945560E-07  9.540872E-08 -3.528008E-04 -1.117479E-04 -1.656671E-06  8.757737E-10
   
 iteration:   2 error:   3.177433E-07 deltap:   0.000000E+00
 orbit:  -1.830396E-07  4.958385E-08 -3.528003E-04 -1.117477E-04 -8.237753E-07  4.924750E-09
-++++++ warning: TWISS:  Coupled lattice! The calculation of the chromatic functions could be inaccurate!                                                                      
+++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
 

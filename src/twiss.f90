@@ -156,7 +156,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   !---- List chromatic functions.
   if (chrom .ne. 0) then
     if ( any(rt(1:2,3:4) .gt. cp_thrd)  .or.  any(rt(3:4,1:2) .gt. cp_thrd) ) then
-        write (warnstr, '(a)') 'Coupled lattice! The calculation of the chromatic functions could be inaccurate!'
+        write (warnstr, '(a)') 'Calculation of Wx, Wy etc. could be inaccurate due to coupling!'
         call fort_warn('TWISS: ', warnstr)
      endif
      call twbtin(rt,tt)
@@ -1176,21 +1176,22 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
 
   cosmu1_eig = ( reval(1)+ aival(1) + reval(2) + aival(2) )/ 2
   cosmu2_eig = ( reval(3)+ aival(3) + reval(4) + aival(4) )/ 2
-
-  if (.not. ((abs(cosmux - cosmu1_eig) .lt. diff_cos .and. abs(cosmuy - cosmu2_eig) .lt. diff_cos) .or.  &
-             (abs(cosmuy - cosmu1_eig) .lt. diff_cos .and. abs(cosmux - cosmu2_eig) .lt. diff_cos))) then 
-     write (warnstr,'(a)') "Difference in the calculation of cosmux/cosmuy based of R_EIG eigen values!!!  "
-     call fort_warn('TWCPIN: ', warnstr)
-     write (warnstr,'(a,e13.6, a, e13.6)') "cosmux-cosmu1_eig =", cosmux-cosmu1_eig, "cosmux-cosmu2_eig =", cosmux-cosmu2_eig
-     call fort_warn('TWCPIN: ', warnstr)
-     write (warnstr,'(a,e13.6, a, e13.6)') "cosmuy-cosmu1_eig =", cosmuy-cosmu1_eig, "cosmuy-cosmu2_eig =", cosmuy-cosmu2_eig
-     call fort_warn('TWCPIN: ', warnstr)
-     write (warnstr,'(a,e13.6,a,e13.6)') "cosmux =  ", cosmux, ", cosmuy =", cosmuy
-     call fort_warn('TWCPIN: ', warnstr)
-     write (warnstr,'(a,e13.6,a,e13.6)')  "cosmu1_eig =", cosmu1_eig,  ", cosmu2_eig =", cosmu2_eig
-     call fort_warn('TWCPIN: ', warnstr)
+  if (get_option('info  ') .ne. 0) then
+     if (.not. ((abs(cosmux - cosmu1_eig) .lt. diff_cos .and. abs(cosmuy - cosmu2_eig) .lt. diff_cos) .or.  &
+          (abs(cosmuy - cosmu1_eig) .lt. diff_cos .and. abs(cosmux - cosmu2_eig) .lt. diff_cos))) then 
+        write (warnstr,'(a)') "Difference in the calculation of cosmux/cosmuy based of R_EIG eigen values!  "
+        call fort_warn('TWCPIN: ', warnstr)
+        write (warnstr,'(a,e13.6, a, e13.6)') "cosmux-cosmu1_eig =", cosmux-cosmu1_eig, "cosmux-cosmu2_eig =", cosmux-cosmu2_eig
+        call fort_warn('TWCPIN: ', warnstr)
+        write (warnstr,'(a,e13.6, a, e13.6)') "cosmuy-cosmu1_eig =", cosmuy-cosmu1_eig, "cosmuy-cosmu2_eig =", cosmuy-cosmu2_eig
+        call fort_warn('TWCPIN: ', warnstr)
+        write (warnstr,'(a,e13.6,a,e13.6)') "cosmux =  ", cosmux, ", cosmuy =", cosmuy
+        call fort_warn('TWCPIN: ', warnstr)
+        write (warnstr,'(a,e13.6,a,e13.6)')  "cosmu1_eig =", cosmu1_eig,  ", cosmu2_eig =", cosmu2_eig
+        call fort_warn('TWCPIN: ', warnstr)
+     endif
   endif
- 
+  
   ! call twcpin_print(rt,r0mat)
 
   !---- Give message, if unstable.
@@ -3238,19 +3239,22 @@ SUBROUTINE tw_summ(rt,tt)
      else
         gamtr = sign(one,alfa) * sqrt( one / abs(alfa))
      endif
-     
-     if (abs(cosmux - cos(amux)) .gt. diff_cos) then
-        write (warnstr,'(a,e13.6)') "Difference in the calculation of cosmux: cosmux - cos(amux) =  ", cosmux - cos(amux)
-        call fort_warn('TW_SUMM: ', warnstr)
-        write (warnstr,'(a,e13.6,a,e13.6)') "cosmux  =  ", cosmux, ", cos(amux) = ", cos(amux)
-        call fort_warn('TW_SUMM: ', warnstr)
+
+     if (get_option('info  ') .ne. 0) then
+        if (abs(cosmux - cos(amux)) .gt. diff_cos) then
+           write (warnstr,'(a,e13.6)') "Difference in the calculation of cosmux: cosmux - cos(amux) =  ", cosmux - cos(amux)
+           call fort_warn('TW_SUMM: ', warnstr)
+           write (warnstr,'(a,e13.6,a,e13.6)') "cosmux  =  ", cosmux, ", cos(amux) = ", cos(amux)
+           call fort_warn('TW_SUMM: ', warnstr)
+        endif
+        if ( abs(cosmuy - cos(amuy)) .gt. diff_cos) then
+           write (warnstr,'(a,e13.6)') "Difference in the calculation of cosmuy: cosmuy - cos(amuy) =  ", cosmuy - cos(amuy)
+           call fort_warn('TW_SUMM: ', warnstr)
+           write (warnstr,'(a,e13.6,a,e13.6)') "cosmuy  =  ", cosmuy, ", cos(amuy) = ", cos(amuy)
+           call fort_warn('TW_SUMM: ', warnstr)
+        endif
      endif
-     if ( abs(cosmuy - cos(amuy)) .gt. diff_cos) then
-        write (warnstr,'(a,e13.6)') "Difference in the calculation of cosmuy: cosmuy - cos(amuy) =  ", cosmuy - cos(amuy)
-        call fort_warn('TW_SUMM: ', warnstr)
-        write (warnstr,'(a,e13.6,a,e13.6)') "cosmuy  =  ", cosmuy, ", cos(amuy) = ", cos(amuy)
-        call fort_warn('TW_SUMM: ', warnstr)
-     endif
+  
   endif
 
   !---- Initialization transverse

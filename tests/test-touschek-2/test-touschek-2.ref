@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  +     MAD-X 5.02.12  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.10.05 13:26:20      +
+  + Release   date: 2016.10.15               +
+  + Execution date: 2016.11.20 20:30:02      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option, warn,info,echo;
 
@@ -69,7 +69,7 @@ orbit:  -1.827675E-08  7.228384E-10  3.485285E-08  1.699968E-04  9.294845E-06  1
   
 iteration:   3 error:   1.327537E-10 deltap:   1.000000E-06
 orbit:  -1.818754E-08  7.314667E-10  3.474850E-08  1.699968E-04  9.294866E-06  1.465513E-06
-++++++ warning: TWISS:  Coupled lattice! The calculation of the chromatic functions could be inaccurate!                                                                      
+++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
 iteration:   1 error:   1.738108E-03 deltap:   0.000000E+00
 orbit:  -6.424029E-06 -6.614752E-08 -2.103007E-06  1.698363E-04  8.669527E-06  9.126159E-07
@@ -79,7 +79,7 @@ orbit:  -1.089125E-08  4.399425E-10  2.093736E-08  1.699982E-04  9.252385E-06  1
   
 iteration:   3 error:   1.327558E-10 deltap:   0.000000E+00
 orbit:  -1.080206E-08  4.485705E-10  2.083302E-08  1.699982E-04  9.252406E-06  1.478913E-06
-++++++ warning: TWISS:  Coupled lattice! The calculation of the chromatic functions could be inaccurate!                                                                      
+++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
 
@@ -186,7 +186,7 @@ orbit:  -1.827675E-08  7.228384E-10  3.485285E-08  1.699968E-04  9.294845E-06  1
   
 iteration:   3 error:   1.327537E-10 deltap:   1.000000E-06
 orbit:  -1.818754E-08  7.314667E-10  3.474850E-08  1.699968E-04  9.294866E-06  1.465513E-06
-++++++ warning: TWISS:  Coupled lattice! The calculation of the chromatic functions could be inaccurate!                                                                      
+++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
   
 iteration:   1 error:   1.738108E-03 deltap:   0.000000E+00
 orbit:  -6.424029E-06 -6.614752E-08 -2.103007E-06  1.698363E-04  8.669527E-06  9.126159E-07
@@ -196,7 +196,7 @@ orbit:  -1.089125E-08  4.399425E-10  2.093736E-08  1.699982E-04  9.252385E-06  1
   
 iteration:   3 error:   1.327558E-10 deltap:   0.000000E+00
 orbit:  -1.080206E-08  4.485705E-10  2.083302E-08  1.699982E-04  9.252406E-06  1.478913E-06
-++++++ warning: TWISS:  Coupled lattice! The calculation of the chromatic functions could be inaccurate!                                                                      
+++++++ warning: TWISS:  Calculation of Wx, Wy etc. could be inaccurate due to coupling!                                                                                       
 
 ++++++ table: summ
 
