@@ -262,6 +262,7 @@ extern int keep_tw_print;          /* previous twiss print flag (match) */
 // extern int loop_cnt;               /* used to detect infinite loops ; removed 2014-Mar-20  16:20:13  ghislain */
 extern int match_calls;            /* command call limit in match */
 extern int match_is_on;            /* true when inside match command */
+extern int chrom_match;            /* true when the match summary*/
 extern int match_num_beta;
 extern int match_num_range;
 extern int match_num_seqs;

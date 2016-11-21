@@ -257,6 +257,7 @@ int keep_tw_print;          /* previous twiss print flag (match) */
 // int loop_cnt = 0;           /* used to detect infinite loops ; removed 2014-Mar-20  16:20:13  ghislain */
 int match_calls = 0;        /* command call limit in match */
 int match_is_on = 0;        /* true when inside match command */
+int chrom_match = 0;        /* true when the match summary*/
 int match_num_beta = 0;
 int match_num_range = 0;
 int match_num_seqs = 0;

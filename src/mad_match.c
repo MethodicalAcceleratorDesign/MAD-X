@@ -390,6 +390,7 @@ match_end(struct in_cmd* cmd)
   int i;
   struct node* c_node;
   int izero = 0;
+  int ione  = 1;
   if (fun_vect == NULL )
   {
     fprintf(prt_file, "WARNING: No matching method selected.\n");
@@ -418,6 +419,7 @@ match_end(struct in_cmd* cmd)
   fprintf(prt_file, "--------------------------------------------------------------------------------------------------\n");
   print_match_summary = 1;
   set_option("match_summary", &print_match_summary);
+  set_option("chrom_match", &ione);
   for (i = 0; i < match_num_seqs; i++)
   {
     current_twiss = local_twiss[i]->clone;
@@ -446,6 +448,7 @@ match_end(struct in_cmd* cmd)
   fprintf(prt_file, "END MATCH SUMMARY\n\n");
   print_match_summary = 0;
   set_option("match_summary", &print_match_summary);
+  set_option("chrom_match", &izero);
   i = 0; set_option("match_local", &i); /* flag */
   /* End summary of matching job */
 

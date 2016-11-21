@@ -19,7 +19,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   integer :: sector_tab_name(*) ! holds sectormap data
 
   integer :: i, j, ithr_on
-  integer :: chrom, eflag
+  integer :: chrom, eflag, chrom_warn
   double precision :: orbit0(6), orbit(6), tt(6,6,6), ddisp0(6), r0mat(2,2)
   double precision :: s0mat(6,6) ! initial sigma matrix
   character(len=48) :: charconv
@@ -34,6 +34,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   table_name = charconv(tab_name)
   sectorTableName = charconv(sector_tab_name)
   chrom=0
+  chrom_warn=1
   eflag=0
   ithr_on=0
   fsecarb=.false.
@@ -64,22 +65,23 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   gammacp=one
   nmode_flip = 0
   mode_flip  =.false.
-
+  
   synch_1=zero;  synch_2=zero;  synch_3=zero;  synch_4=zero;  synch_5=zero
 
   suml=zero; circ=zero; eta=zero; alfa=zero; gamtr=zero; wgt=zero
-
+  
   !---- Track chromatic functions
   chrom = get_option('twiss_chrom ')
-
+  
   !---- flag if called from match process
   !---- get match flag for storing variables in nodes
   match_is_on = get_option('match_is_on ') .ne. 0
-
+  if (match_is_on) chrom_warn = get_option('chrom_match ')
+  
   !---- flags for writing cumulative or lumped matrices
   rmatrix = get_value('twiss ','rmatrix ').ne.zero
   sectormap = get_option('twiss_sector ').ne.zero
-
+  
   !---- Get circumference
   circ   = get_value('probe ','circ ')
   if (circ .eq. zero) call fort_fail('TWISS: ', 'Zero length sequence.')
@@ -156,9 +158,11 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   !---- List chromatic functions.
   if (chrom .ne. 0) then
     if ( any(rt(1:2,3:4) .gt. cp_thrd)  .or.  any(rt(3:4,1:2) .gt. cp_thrd) ) then
-        write (warnstr, '(a)') 'Calculation of Wx, Wy etc. could be inaccurate due to coupling!'
-        call fort_warn('TWISS: ', warnstr)
-     endif
+       if (chrom_warn .eq. 1) then
+          write (warnstr, '(a)') 'Calculation of Wx, Wy etc. could be inaccurate due to coupling!'
+          call fort_warn('TWISS: ', warnstr)
+       endif
+    endif
      call twbtin(rt,tt)
      call twchgo
   endif
