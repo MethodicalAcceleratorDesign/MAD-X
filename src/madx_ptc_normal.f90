@@ -519,6 +519,7 @@ contains
        if (name_l) then
           SELECT CASE (name_var)
           CASE ('anhx')
+             print*, 'anhx'
              k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
              do j = 1,2
                 ind(j) =  int(doublenum)
@@ -533,9 +534,9 @@ contains
              ind(1) = ind(1) + 1
              c_val=vf_kernel%v(1).sub.ind 
              d_val = -aimag(c_val)/(2.*pi)
-             
-             
+             ind(1) = ind(1) - 1 ! need to subtract it back to get factorial factor correct
           CASE ('anhy')
+             print*, 'anhy'
              k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
              do j = 1,2
                 ind(j) = int(doublenum)
@@ -550,6 +551,7 @@ contains
              ind(3) = ind(3) + 1
              c_val=vf_kernel%v(3).sub.ind 
              d_val = -aimag(c_val)/(2.*pi)
+             ind(3) = ind(3) - 1 ! need to subtract it back to get factorial factor correct
           CASE ('eign')
              ii=(icase/2)*2
              k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
@@ -624,7 +626,13 @@ contains
              print *,"--Error in the table normal_results-- Unknown input: ",name_var
           END SELECT
        endif
+       
+     !  print*,'Indexes 1 3 5', ind(1), ind(3), ind(5)
+     !  print*,'Indexes 2 4 6', ind(2), ind(4), ind(6)
+     !  print*,'Factria 1 3 5', factorial(ind(1)), factorial(ind(3)), factorial(ind(5))
+       
        double_from_normal_t1 = d_val*(factorial(ind(1))*factorial(ind(3))*factorial(ind(5)))
+     
      END FUNCTION double_from_normal_t1
    !________________________________________________
    !Extraction of normal type 2 variables: hamiltonian and generating functions
