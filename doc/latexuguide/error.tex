@@ -465,7 +465,14 @@ The attributes are:
   (2i+2) poles. (Default:~0~m$^{-i}$).  
 \end{madlist}
 
-
+ Please note that even though that any order of field errors can be specified 
+ for all elements, only those which are defined for an element will be taken into account.
+ Only \texttt{K0} and  \texttt{K1} are be considered for  \hyperref[sec:bend]{\texttt{BEND}} 
+ transfer map, and, in addition, \texttt{K2} and \texttt{K1S} for radiation effect. Only 
+ \texttt{K1} and \texttt{K1S} are considered for  \hyperref[sec:quadrupole]{\texttt{QUADRUPOLE}}; 
+ \texttt{K2}  and \texttt{K2S} - for \hyperref[sec:sextupole]{\texttt{SEXTUPOLE}}. Only 
+ \hyperref[sec:multipole]{\texttt{THIN MULTIPOLE}} considers the erros of all orders. 
+ 
 \textbf{Time memory effects:}
 
 The relative errors can be corrected for possible time memory effects. A
