@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.08  (64 bit, Linux)       +
+  +     MAD-X 5.02.12  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2015.11.20               +
-  + Execution date: 2016.02.01 18:56:12      +
+  + Release   date: 2016.10.15               +
+  + Execution date: 2016.11.24 10:51:16      +
   ++++++++++++++++++++++++++++++++++++++++++++
    !                     FODO for MAD-X
 
@@ -35,7 +35,7 @@
 
    RB: SBEND,L=LL,ANGLE= ALPHA;!,E1= PFR,E2=PFR,HGAP= 0.035,FINT= FI;
 
-ksf = .0198492943e1;
+   
 
    ! ------------------- horizontal quadrupole ----------------------------
 
@@ -47,11 +47,13 @@ ksf = .0198492943e1;
 
 !   hk:  hkicker, hkick=0e-3;
 
-mscbh: sextupole, l=1.1, k2:=0.0;!ksf;
+   ksf = .0198492943e1;
+
+   mscbh: sextupole, l=1.1, k2:=ksf;
 
 !
 
-mb1: multipole;
+   mb1: multipole;
 
 !
 
@@ -99,9 +101,9 @@ parameter: ex   double value:                  1
 parameter: exn   double value:         5328.94477
 parameter: ey   double value:                  1
 parameter: eyn   double value:         5328.94477
-parameter: et   double value:               0.001
+parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
-parameter: sige   double value:                  0
+parameter: sige   double value:              0.001
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0
@@ -211,43 +213,59 @@ Assigned field errors to 1 elements
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After    end:    0.0000000000000000        0.0000000000000000        19.099987755980202     
-!	select_ptc_normal, dx=1, dpx=1;
+   ptc_align;
 
-!	select_ptc_normal, dy=1, dpy=1;	
 
-!	select_ptc_normal, q1=0, q2=0;
 
-!	select_ptc_normal, dq1=1, dq2=1;
+     select_ptc_normal, dx=1, dpx=1;
 
-!	select_ptc_normal, dq1=2, dq2=2;
+     select_ptc_normal, dy=1, dpy=1;	
 
-!	select_ptc_normal, anhx=1,0,0;
 
-!	select_ptc_normal, anhy=1,0,0;
 
-!	select_ptc_normal, anhx=1,0,1;
+     select_ptc_normal,  q1=0, q2=0;
 
-!	select_ptc_normal, anhy=1,0,1;
+     select_ptc_normal, dq1=1,dq2=1;
 
-!	select_ptc_normal, anhx=0,0,2;
+     select_ptc_normal, dq1=2,dq2=2;
 
-!	select_ptc_normal, anhy=0,0,2;
+     select_ptc_normal, dq1=3,dq2=3;
 
-!	select_ptc_normal, anhx=2,0,0;
 
-!	select_ptc_normal, anhy=2,0,0;
 
-!	select_ptc_normal, anhx=1,1,0;
+     select_ptc_normal, anhx=1,0,0; ! dQx/dex
 
-!	select_ptc_normal, anhy=1,1,0;	
+     select_ptc_normal, anhy=0,1,0; ! dQy/dey
 
-!	select_ptc_normal, haml=1,0,0;
+     select_ptc_normal, anhx=0,1,0;
 
-!	select_ptc_normal, haml=3,0,0;
+     select_ptc_normal, anhy=1,0,0;
 
-!	select_ptc_normal, haml=1,2,0;
+     select_ptc_normal, anhx=2,0,0; ! d2Qx/dex^2
 
- 	select_ptc_normal, gnfu=-5,0,0;
+     select_ptc_normal, anhx=3,0,0; ! d3Qx/dex^3
+
+     select_ptc_normal, anhx=1,1,0; ! d2Qx/dexdey
+
+     select_ptc_normal, anhx=0,2,0; ! d2Qx/dey^2
+
+     select_ptc_normal, anhy=0,2,0; ! d2Qy/dey^2
+
+     select_ptc_normal, anhy=1,1,0; ! d2Qy/dexdy
+
+     select_ptc_normal, anhy=2,0,0; ! d2Qy/dex^2
+
+     select_ptc_normal, anhy=3,0,0; ! d3Qx/dex^3
+
+
+
+!     select_ptc_normal, haml=1,0,0;
+
+!     select_ptc_normal, haml=3,0,0;
+
+!     select_ptc_normal, haml=1,2,0;
+
+     select_ptc_normal, gnfu=-5,0,0;
 
    
 
@@ -264,11 +282,9 @@ totalpath is found and its value is 0.000000
 time is found and its value is 1.000000
 nocavity is found and its value is 1.000000
 obs_points pro_ptc_setswitch Done
-   
-
    			
 
-   ptc_normal,closed_orbit,normal,maptable,icase=5,no=7;
+   ptc_normal,closed_orbit,normal,maptable,icase=5,no=9;
 
  ************ State Summary ****************
  MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
@@ -294,13 +310,25 @@ obs_points pro_ptc_setswitch Done
        ACCELERATE  =  FALSE
  Closed orbit:    0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Normal Form Type 1
-   write, table=normal_results,file=ptc_normal_results.tfs; 
+ anhx
+ anhy
+ anhx
+ anhy
+ anhx
+ anhx
+ anhx
+ anhx
+ anhy
+ anhy
+ anhy
+ anhy
+   write, table=normal_results,file="ptc_normal_results.tfs"; 
 
    write, table=map_table, file=ptc_map_table.tfs;
 
    
 
-   ptc_twiss, closed_orbit,normal,icase=5,no=7;
+   ptc_twiss, closed_orbit,normal,icase=5,no=9;
 
  ************ State Summary ****************
  MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
@@ -330,13 +358,13 @@ obs_points pro_ptc_setswitch Done
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-       19.09998776      0.07360632992      -0.1830674016           -1000000 
+       19.09998776      0.07360632992     -0.07619005561           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
           -1000000      0.07360629471        3.685890406       0.3642635312 
 
                 q2                dq1                dq2                 qs 
-      0.2988958103      -0.5650132384      -0.4328308235                  0 
+      0.2988958103      -0.3619743413       -1.355575333                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        2.611589832        36.91316294        4.077530498        34.07505989 
@@ -366,7 +394,7 @@ obs_points pro_ptc_setswitch Done
                  0                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0                  0                  0                  0 
+                -0                  0                  0                  0 
 
            pycorms             tcorms            ptcorms             xcomax 
                  0                  0                  0                  0 
@@ -379,6 +407,10 @@ obs_points pro_ptc_setswitch Done
 
            pycomin             tcomin            ptcomin 
                  0                 -0                  0 
+
+
+   set, format="22.14e";
+
    write, table=nonlin, file="ptc.nonlin";
 
 
