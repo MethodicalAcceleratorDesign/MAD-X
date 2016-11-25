@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.4)
 
-PROJECT(ndiff C)
+project(ndiff C)
+
+option( INSTALL_NDIFF "Add ndiff install target" ON)
 
 if(NOT "${CMAKE_C_FLAGS}" MATCHES "std=c99")
    if(NOT (WIN32 AND CMAKE_C_COMPILER_ID STREQUAL "Intel"))
@@ -18,15 +20,16 @@ if(UNIX)
    target_link_libraries(ndiff m)
 endif()
 
-install(TARGETS ndiff
-   RUNTIME
-   DESTINATION bin
-   COMPONENT Runtime
-   )
+if(INSTALL_NDIFF)
+   install(TARGETS ndiff
+      RUNTIME
+      DESTINATION bin
+      COMPONENT Runtime
+      )
+endif()
 
 # Define tests (without using config from parent folder)
 enable_testing()
-include(CTest)
 foreach(testname test-register test-register-2 test-register-3)
     set(testpath  "${CMAKE_SOURCE_DIR}/tests/${testname}/${testname}")
     add_test(${testname} ndiff ${testpath}.nd.lhs ${testpath}.nd.rhs ${testpath}.nd.cfg)

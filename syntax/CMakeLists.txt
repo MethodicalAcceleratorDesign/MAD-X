@@ -7,7 +7,7 @@ if(UNIX)
       OPTIONAL)
   endif()
   install(FILES emacs/madx.el
-    DESTINATION "share/emacs/site-lisp/"
+    DESTINATION "share/emacs/site-lisp/mad-x/"
     OPTIONAL)
   install(FILES vim/madx.vim
     DESTINATION "share/vim/vimfiles/syntax/"
