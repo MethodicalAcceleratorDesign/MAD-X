@@ -1,10 +1,10 @@
 @ NAME             %19s "TRACK.OBS0001.P0003"
 @ TYPE             %08s "TRACKOBS"
 @ TITLE            %26s "thick-dipole tracking test"
-@ ORIGIN           %23s "MAD-X 5.02.01 Darwin 64"
-@ DATE             %08s "23/06/14"
-@ TIME             %08s "16.45.47"
+@ ORIGIN           %17s "5.02.12 Darwin 64"
+@ DATE             %08s "28/11/16"
+@ TIME             %08s "23.36.45"
 *     NUMBER       TURN                  X                 PX                  Y                 PY                  T                 PT                  S                  E 
 $         %d         %d                %le                %le                %le                %le                %le                %le                %le                %le 
           3          0                  0                  0              1e-06                  0                  0               0.01                  0            1000000
-          3          1    0.0004950454204    9.999834984e-05              1e-06                  0   -1.633794451e-08               0.01                  0            1000000
+          3          1    0.0004950454204    9.900826717e-05              1e-06                  0   -1.601602192e-08               0.01                  0            1000000

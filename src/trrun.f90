@@ -4230,15 +4230,17 @@ subroutine tttdipole(track, ktrack)
   integer :: ktrack
 
   integer :: jtrk
-  double precision :: L, angle, rho, h, k0
+  double precision :: L, angle, rho, h, k0, k1
   double precision :: x, px, y, py, z, pt
-  double precision :: x_, px_, y_, py_, z_, pt_
+  double precision :: x_, px_, y_, py_, z_
   double precision :: delta_plus_1, delta_plus_1_sqr, sqrt_delta_plus_1
-  double precision :: sqrt_h_sqrt_k0, sqrt_h_div_sqrt_k0, sqrt_k0_div_sqrt_h
-  double precision :: C, S, C_sqr
+  double precision :: Cx, Sx
+  double precision :: Cy, Sy
+  double precision :: A, B, C, D
   double precision :: gamma, hx2, hy2, rfac
-  double precision :: bet0sqr
+  double precision :: bet0sqr, kx_sqr, ky_sqr
   double precision :: e1, e2, h1, h2, hgap, fint, fintx
+  double complex :: kx, ky
 
   double precision, external :: node_value, get_value
 
@@ -4266,6 +4268,7 @@ subroutine tttdipole(track, ktrack)
   rho = abs(L/angle);
   h = angle/L;
   k0 = h;
+  k1 = node_value('k1 ');
 
   !---- Prepare to calculate the kick and the matrix elements
   do jtrk = 1,ktrack
@@ -4277,58 +4280,75 @@ subroutine tttdipole(track, ktrack)
      z  = track(5,jtrk);
      pt = track(6,jtrk);
 
+     delta_plus_1_sqr = pt*pt + two*pt/bet0 + one;
+     delta_plus_1 = sqrt(delta_plus_1_sqr);
+     sqrt_delta_plus_1 = sqrt(delta_plus_1);
+
      !---- Radiation effects at entrance.
      ! classical effect only with damping
      if (radiate) then
-        hx2 = one / (rho**2  *  (pt*pt + two*pt/bet0 + one));
-        hy2 = zero;
+        !hx2 = one / (rho**2 * (pt*pt + two*pt/bet0 + one));
+        hx2 = (k0*h+k1**2*(x**2+y**2)) / delta_plus_1; ! 1/m^2
+        hy2 = k1**2*(x**2+y**2) / delta_plus_1; ! 1/m^2
         rfac = (arad * gamma**3 * L / three) * (hx2 + hy2) * (one + h*x) * (one - tan(e1)*x)
         px = px - rfac * (one + pt) * px
         py = py - rfac * (one + pt) * py
         pt = pt - rfac * (one + pt) ** 2
      endif
 
-     delta_plus_1_sqr = pt*pt + two*pt/bet0 + one;
-     delta_plus_1 = sqrt(delta_plus_1_sqr);
-     sqrt_delta_plus_1 = sqrt(delta_plus_1);
-     sqrt_h_sqrt_k0 = sign(sqrt(h*k0),k0);
-     sqrt_h_div_sqrt_k0 = sqrt(h/k0);
-     sqrt_k0_div_sqrt_h = sqrt(k0/h);
+     kx_sqr = (k0*h+k1) / delta_plus_1; ! 1/m^2
+     ky_sqr = -k1 / delta_plus_1; ! 1/m^2
+     kx = cdsqrt(DCMPLX(kx_sqr)); ! 1/m
+     ky = cdsqrt(DCMPLX(ky_sqr)); ! 1/m
+     Cx = dreal(cdcos(kx*L)); ! 1
+     Cy = dreal(cdcos(ky*L)); ! 1
+     if (kx_sqr.ne.zero) then ; Sx = dreal(cdsin(kx*L) / kx); else ; Sx = L; endif;
+     if (ky_sqr.ne.zero) then ; Sy = dreal(cdsin(ky*L) / ky); else ; Sy = L; endif;
+        
+     ! useful constants
+     A = ((delta_plus_1-k0*x)*h-k1*x-k0)/delta_plus_1;
+     B = px;
+     C = -(k1*y)/delta_plus_1;
+     D = py;   
+        
+     ! transverse map
+     x_ = x*Cx + px*Sx + ((k0-delta_plus_1*h)*(Cx-one))/(k1+h*k0);
+     y_ = y*Cy + py*Sy;
+     px_ = A*Sx + B*Cx;
+     py_ = C*Sy + D*Cy;     
+     !px_ = -x*Sx*(k0*h+k1) / delta_plus_1 + px*Cx -((k0-delta_plus_1*h)*Sx) / delta_plus_1;
+     !py_ = -y*Sy*k1        / delta_plus_1 + py*Cy;
+     
+     z_ = z + pt*(one-bet0sqr)/bet0sqr*L + (pt+one/bet0)/delta_plus_1*h*x;
+     if (kx_sqr.ne.zero) then
+        z_ = z_ -half*(pt+one/bet0)/(delta_plus_1**3) * & 
+             (((kx_sqr*B**2-A**2)*Cx*Sx)/(two*kx_sqr) - &
+             (A*B*Cx**2)/kx_sqr+(B**2*L)*half+(A**2*L)/(two*kx_sqr)+(A*B)/kx_sqr);
+     else
+        z_ = z_ -half*(pt+one/bet0)/(delta_plus_1**3) * & 
+             (A**2*L**3+three*A*B*L**2+three*B**2*L)/three;
+     endif
+     if (ky_sqr.ne.zero) then
+        z_ = z_ -half*(pt+one/bet0)/(delta_plus_1**3) * & 
+             (((ky_sqr*D**2-C**2)*Cy*Sy)/(two*ky_sqr) - &
+             (two*C*D*Cx**2+(-ky_sqr*D**2-C**2)*L-two*C*D)/(two*ky_sqr));
+     else
+        z_ = z_ -half*(pt+one/bet0)/(delta_plus_1**3) * & 
+             (C**2*L**3+three*C*D*L**2+three*D**2*L)/three;
+     endif
 
-     C = cos(sqrt_h_sqrt_k0 * L / sqrt_delta_plus_1);
-     S = sin(sqrt_h_sqrt_k0 * L / sqrt_delta_plus_1);
-     C_sqr = C*C;
-
-     x_  = px*S/(sqrt_delta_plus_1*sqrt_h_sqrt_k0)+x*C-delta_plus_1*C/k0+C/h+delta_plus_1/k0-one/h;
-     px_ = -sqrt_delta_plus_1*sqrt_h_sqrt_k0*x*S - &
-            sqrt_delta_plus_1*sqrt_k0_div_sqrt_h*S + &
-            delta_plus_1*sqrt_delta_plus_1*sqrt_h_div_sqrt_k0*S + px*C;
-
-     y_  = y + py * L / delta_plus_1;
-     py_ = py; ! unchanged
-
-     z_  = z + pt*L*(one-bet0sqr)/bet0sqr + &
-          (-half*(bet0*pt+one)/bet0/(delta_plus_1**3) * &
-          (x*x*delta_plus_1*(h*k0*L-sqrt_delta_plus_1*sqrt_h_sqrt_k0*C*S)*half + &
-          px*px*(sqrt_delta_plus_1*C*S/sqrt_h_sqrt_k0+L)*half + &
-          px*(-delta_plus_1_sqr*C_sqr/k0+delta_plus_1*C_sqr/h+delta_plus_1_sqr/k0-delta_plus_1/h) + &
-          x*(-delta_plus_1**(three*half)*sqrt_k0_div_sqrt_h*C*S+ &
-          delta_plus_1**(five*half)*sqrt_h_div_sqrt_k0*C*S+ &
-          delta_plus_1*k0*L-delta_plus_1_sqr*h*L)+ &
-          x*px*delta_plus_1*(C_sqr-one) + &
-          py*py*L + &
-          (-delta_plus_1**(three*half)*sqrt_k0_div_sqrt_h*C*S*half/h + &
-          delta_plus_1**(five*half)*C*S/(sqrt_h_sqrt_k0)+ &
-          (-delta_plus_1**(seven*half)*sqrt_h_div_sqrt_k0*C*S*half/k0 + &
-          delta_plus_1*L*(delta_plus_1*(delta_plus_1*h/k0*half-one)+k0/h*half)))));
-     pt_ = pt; ! unchanged
-
-     x  = x_;     y = y_;     z = z_;
-     px = px_;   py = py_;   pt = pt_;
+     x = x_;
+     px = px_;
+     y = y_;
+     py = py_;
+     z = z_;
+     ! pt = pt; ! unchanged
 
      !---- Radiation effects at exit.
      if (radiate) then
-        hx2 = one / (rho**2  *  (pt*pt + two*pt/bet0 + one));
+        !hx2 = one / (rho**2  *  (pt*pt + two*pt/bet0 + one));
+        hx2 = (k0*h+k1**2*(x**2+y**2)) / delta_plus_1; ! 1/m^2
+        hy2 = k1**2*(x**2+y**2) / delta_plus_1; ! 1/m^2
         rfac = (arad * gamma**3 * L / three) * (hx2 + hy2) * (one + h*x) * (one - tan(e2)*x)
         px = px - rfac * (one + pt) * px
         py = py - rfac * (one + pt) * py
