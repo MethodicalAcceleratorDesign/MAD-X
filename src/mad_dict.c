@@ -285,7 +285,7 @@ char command_def[] =
 "debug      = [l, false, true], "
 "verbose    = [l, false, true], " /*hbu */
 "rbarc      = [l, true, true], "
-"bendcf     = [l, true, true], " /* bending magnet with combined functions */
+"cfsbend    = [l, true, true], " /* combined function sbend */
 "thin_foc   = [l, true, true], "
 "sympl      = [l, true, true], "
 "tell       = [l, false, true], "
@@ -301,7 +301,9 @@ char command_def[] =
 "bb_sxy_update    = [l, false, true], " /* frs */
 "emittance_update = [l, true,  true], " /* frs */
 "fast_error_func  = [l, false, true], " /* frs */
-"exit_loss_turn   = [l, false, true]; " /* frs */
+"exit_loss_turn   = [l, false, true], " /* frs */
+"bucket_swap      = [l, false, true], " // frs add-on
+"sc_chrom_fix     = [l, false, true]; " // frs add-on
 " "
 "plot: control none 0 0 "
 "vaxis    = [s, {none}], "
@@ -1736,14 +1738,15 @@ char command_def[] =
 "mech_sep = [r, 0], "
 "v_pos = [r, 0], "
 "bbdir = [i, -1], "
-"model           = [i, -1], "
-"method          = [i, -1], "
-"exact           = [i, -1, 1], "
-"nst             = [i, -1], "
-"permfringe      = [l, false, true], "
-"bend_fringe     = [l, false, true], "
-"kill_ent_fringe = [l, false, true], "
-"kill_exi_fringe = [l, false, true]; "
+"long_coup_off    = [l, false, true], " // frs add-on
+"model            = [i, -1], "
+"method           = [i, -1], "
+"exact            = [i, -1, 1], "
+"nst              = [i, -1], "
+"permfringe       = [l, false, true], "
+"bend_fringe      = [l, false, true], "
+"kill_ent_fringe  = [l, false, true], "
+"kill_exi_fringe  = [l, false, true]; "
 " "
 "instrument: element none 0 24 "
 "at       = [r, 1.e20], "

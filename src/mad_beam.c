@@ -68,7 +68,7 @@ exec_beam(struct in_cmd* cmd, int flag)
   if (nl->inform[pos]) {
     name = pl->parameters[pos]->string;
     if ((current_beam = find_command(name, beam_list)) == NULL) {
-      set_defaults("beam"); 
+      set_defaults("beam");
       add_to_command_list(name, current_beam, beam_list, 0);
     }
   }
@@ -78,7 +78,7 @@ exec_beam(struct in_cmd* cmd, int flag)
   }
   current_beam->par->parameters[bpos]->string = permbuff(name);
   current_beam->beam_def = 1;
-  if (flag == 0) update_beam(cmd->clone); 
+  if (flag == 0) update_beam(cmd->clone);
   else if (flag == 1)  set_defaults("beam"); // resbeam
   current_beam = keep_beam;
 }
@@ -178,7 +178,7 @@ update_beam(struct command* comm)
       charge = 1;
     }
   }
-  else name = pl->parameters[pos]->string; 
+  else name = pl->parameters[pos]->string;
 
   if (strcmp(name, "ion") == 0) {
     pos = name_list_pos("mass", nlc);
@@ -194,7 +194,7 @@ update_beam(struct command* comm)
 
   arad = ten_m_16 * charge * charge * get_variable("qelect") * clight * clight / mass;
 
-  // energy related 
+  // energy related
   if ((pos = name_list_pos("energy", nlc)) > -1 && nlc->inform[pos]) {
     energy = command_par_value("energy", comm);
     if (energy <= mass) fatal_error("energy must be","> mass");
@@ -215,7 +215,7 @@ update_beam(struct command* comm)
     energy = gamma * mass;
     pc = sqrt(energy*energy - mass*mass);
     beta = pc / energy;
-    brho = pc / ( fabs(charge) * clight * 1.e-9); 
+    brho = pc / ( fabs(charge) * clight * 1.e-9);
   }
   else if((pos = name_list_pos("beta", nlc)) > -1 && nlc->inform[pos]) {
     if ((beta = command_par_value("beta", comm)) >= one) fatal_error("beta must be","< 1");
@@ -225,7 +225,7 @@ update_beam(struct command* comm)
     brho = pc / ( fabs(charge) * clight * 1.e-9);
   }
   else if((pos = name_list_pos("brho", nlc)) > -1 && nlc->inform[pos]) {
-    if ((brho = command_par_value("brho", comm)) < zero) fatal_error("brho must be","> 0");    
+    if ((brho = command_par_value("brho", comm)) < zero) fatal_error("brho must be","> 0");
     pc = brho * fabs(charge) * clight * 1.e-9;
     energy = sqrt(pc*pc + mass*mass);
     gamma = energy / mass;
@@ -241,8 +241,8 @@ update_beam(struct command* comm)
   }
 
   // emittance related
-  // 2015-Mar-11  15:27:31  ghislain: changed emittance definition: 
-  //                        was exn = ex * 4 * beta * gamma 
+  // 2015-Mar-11  15:27:31  ghislain: changed emittance definition:
+  //                        was exn = ex * 4 * beta * gamma
   if (nlc->inform[name_list_pos("ex", nlc)]) {
     ex = command_par_value("ex", comm);
     exn = ex * beta * gamma;
@@ -284,7 +284,7 @@ update_beam(struct command* comm)
     store_comm_par_value("freq0", freq0, current_beam);
     store_comm_par_value("circ", circ, current_beam);
   }
-  
+
   // intensity related
   if (nlc->inform[name_list_pos("bcurrent", nlc)]) {
     bcurrent = command_par_value("bcurrent", comm);
@@ -307,7 +307,7 @@ update_beam(struct command* comm)
   pos = name_list_pos("radiate", nlc);
   if (nlc->inform[pos])
     pl->parameters[pos]->double_value = plc->parameters[pos]->double_value;
-  
+
   pos = name_list_pos("et", nlc);
   if (nlc->inform[pos])
     pl->parameters[pos]->double_value = plc->parameters[pos]->double_value;
@@ -367,10 +367,10 @@ adjust_beam(void)
 
   if (nl->inform[name_list_pos("bcurrent", nl)] &&
       (bcurrent = command_par_value("bcurrent", current_beam)) > zero)
-    npart = bcurrent / (freq0 * ten_p_6 * get_variable("qelect"));
+    npart = bcurrent / (beta * freq0 * ten_p_6 * get_variable("qelect")); // frs add-on
   else if (nl->inform[name_list_pos("npart", nl)] &&
            (npart = command_par_value("npart", current_beam)) > zero)
-    bcurrent = npart * freq0 * ten_p_6 * get_variable("qelect");
+    bcurrent = npart * beta * freq0 * ten_p_6 * get_variable("qelect"); // frs add-on
 
   store_comm_par_value("alfa", alfa, current_beam);
   store_comm_par_value("freq0", freq0, current_beam);
@@ -393,7 +393,7 @@ adjust_probe(double delta_p)
   /* adjusts beam parameters to the current deltap */
 {
   double etas, slope, qs, fact, tmp, ds;
-  double alfa, beta, gamma, dtbyds, circ, freq0; 
+  double alfa, beta, gamma, dtbyds, circ, freq0;
   double betas, gammas, et, sigt, sige;
 
   et = command_par_value("et", current_beam);
@@ -403,7 +403,7 @@ adjust_probe(double delta_p)
   gamma = command_par_value("gamma", current_beam);
   circ = command_par_value("circ", current_beam);
 
-  /* assume oneturnmap and disp0 already computed (see pro_twiss and pro_emit) */ 
+  /* assume oneturnmap and disp0 already computed (see pro_twiss and pro_emit) */
   ds = oneturnmat[4 + 6*5]; // uses disp0[5] = 1 -> dp/p = 1
   for (int j=0; j < 4; j++) ds += oneturnmat[4 + 6*j] * disp0[j];
 
@@ -453,12 +453,12 @@ adjust_probe(double delta_p)
     put_info("Zero value of SIGT", "replaced by 1.");
     sigt = one;
   }
-  
+
   if (sige < ten_m_15) {
     put_info("Zero value of SIGE", "replaced by 1/1000.");
     sigt = ten_m_3;
   }
-  
+
   store_comm_par_value("qs", qs, probe_beam);
   store_comm_par_value("et", et, probe_beam);
   store_comm_par_value("sigt", sigt, probe_beam);
@@ -566,7 +566,7 @@ print_probe(void)
   puts(" ");
   printf(" Global parameters for %ss, radiate = %s:\n\n", tmp, trad);
   // 2015-Apr-15  15:27:15  ghislain: proposal for more elegant statement avoiding the strcpy to extra variable
-  // printf(" Global parameters for %ss, radiate = %s:\n\n", tmp, rad ? "true" : "false"); 
+  // printf(" Global parameters for %ss, radiate = %s:\n\n", tmp, rad ? "true" : "false");
   printf(v_format(" C         %F m          f0        %F MHz\n"),circ, freq0);
   printf(v_format(" T0        %F musecs     alfa      %F \n"), t0, alfa);
   printf(v_format(" eta       %F            gamma(tr) %F \n"), eta, gamtr);

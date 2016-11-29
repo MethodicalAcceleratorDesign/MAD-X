@@ -47,17 +47,17 @@ MODULE madx_ptc_module
   integer                   :: mapsorder = 0  !order of the buffered maps, if 0 maps no maps buffered
   integer                   :: mapsicase = 0
 
-  
+
   character(1000), private  :: whymsg
-     
+
 CONTAINS
 
   subroutine ptc_create_universe()
     implicit none
     real(kind(1d0)) get_value
-   
+
     piotr_freq=.true. ! flag introduced in PTC cavity tracking to have correct phasing with time=false
-  
+
     print77=.false.
     read77 =.false.
     lingyun_yang=get_value('ptc_create_universe ','ntpsa ').ne.0
@@ -102,15 +102,15 @@ CONTAINS
        call aafail('sector_nmul_max must be larger than sector_nmul: ',&
             'check your ptc_create_universe input')
     endif
-    
+
     ! copy from Ss_fake_mad.f90:ptc_ini_no_append
     allocate(m_u)
     call set_up_universe(m_u)
     allocate(m_t)
     call set_up_universe(m_t)
-    
+
     universe=universe+1
-    
+
     allocate(bmadl)
     call set_up(bmadl)
     bmadl%NAME='BMAD REUSED FIBRE LAYOUT'
@@ -132,8 +132,8 @@ CONTAINS
 
     call append_empty_layout(m_u)
     call append_empty_layout(m_t)
-    
-    
+
+
     index_mad=index_mad+1
     my_ring=>m_u%end
 
@@ -218,9 +218,9 @@ CONTAINS
     character(nlp) heli(100)
     integer mheli,helit,ihelit
     type(fibre), pointer :: p => null()
-    
+
     double precision, parameter :: zero=0.d0
-    
+
     !---------------------------------------------------------------
     !---------------------------------------------------------------
     if (getdebug() > 1) then
@@ -275,7 +275,7 @@ CONTAINS
     call setintstate(default)
     !valid October 2002: oldscheme=.false.
     !!valid October 2002: oldscheme=.true.
-    
+
 
     if (getdebug()==0) global_verbose = .false.
 
@@ -450,7 +450,7 @@ CONTAINS
     errors_out = get_value('ptc_create_layout ','errors_out ').ne.0
     magnet_name=" "
     if(errors_out) mg = get_string('ptc_create_layout ','magnet_name ',magnet_name)
-    
+
     ! it is safe for MADX because default for all magnets is 1m
     ! so if user defines it otherwise it means it knows what he is doing
     absolute_aperture = 1e6_dp
@@ -532,19 +532,19 @@ CONTAINS
     key%list%kill_ent_fringe=node_value("kill_ent_fringe ") .ne. zero
     key%list%kill_exi_fringe=node_value("kill_exi_fringe ") .ne. zero
     key%list%bend_fringe=node_value("bend_fringe ") .ne. zero
-    
+
     nn=name_len
     call node_string('apertype ',aptype,nn)
-    APERTURE = zero 
+    APERTURE = zero
     call get_node_vector('aperture ',nn,aperture)
-    
-    !print*, name,'madx_ptc_module: Got for aperture nn=',nn, aperture(1), aperture(2) 
-    
+
+    !print*, name,'madx_ptc_module: Got for aperture nn=',nn, aperture(1), aperture(2)
+
     if(.not.((aptype.eq."circle".and.aperture(1).eq.zero).or.aptype.eq." ")) then
-       
+
        c_%APERTURE_FLAG=.true.
        select case(aptype)
-       case("circle") 
+       case("circle")
           key%list%aperture_on=.true.
           key%list%aperture_kind=1
           key%list%aperture_r(1)=aperture(1)
@@ -559,7 +559,7 @@ CONTAINS
           key%list%aperture_kind=2
           key%list%aperture_x=aperture(1)
           key%list%aperture_y=aperture(2)
-       case("lhcscreen") ! 2015-Mar-10  14:28:41  ghislain: added 
+       case("lhcscreen") ! 2015-Mar-10  14:28:41  ghislain: added
           key%list%aperture_on=.true.
           key%list%aperture_kind=3
           key%list%aperture_x=aperture(1)
@@ -592,7 +592,7 @@ CONTAINS
           key%list%aperture_kind=6
           key%list%aperture_x=aperture(1)
           key%list%aperture_y=aperture(2)
-          key%list%aperture_r(1)=aperture(3)          
+          key%list%aperture_r(1)=aperture(3)
           key%list%aperture_r(2)=aperture(4)
        case("general") ! 2015-Mar-10  14:25:48  ghislain: kind was 6
           key%list%aperture_kind=7
@@ -602,16 +602,16 @@ CONTAINS
   !  else
   !   if( .not. ((code.eq.1) .or. (code.eq.4)) ) then
   !     write(*,'(a10,1x,a16,1x,a14,1x,6f10.6)') 'Aperture: ',aptype(1:16),'aperture pars:', aperture(1:6)
-  !     write(whymsg,*) 'Aperture: ',aptype,' at magnet ',name(:len_trim(name)),' not supported by PTC'       
+  !     write(whymsg,*) 'Aperture: ',aptype,' at magnet ',name(:len_trim(name)),' not supported by PTC'
   !     call fort_warn('ptc_createlayout: ',whymsg(:len_trim(whymsg)))
-  !     
+  !
   !   endif
-       
+
     endif
     call append_empty(my_ring)
-    
+
    ! print *,'Element code is ',code
-    
+
     select case(code)
     case(0,4,25)
        key%magnet="marker"
@@ -786,12 +786,12 @@ CONTAINS
        tilt=node_value('tilt ')
        dum1=key%list%k(2)-normal_0123(1)
        dum2=key%list%ks(2)-skew_0123(1)
-       
+
        !print*,'normal_0123', normal_0123
        !print*,'skew_0123', skew_0123
        !print*,'sk1 sk1s dum1 dum2'
        !print*, sk1, sk1s, dum1, dum2
-       
+
        if(dum1.ne.zero.or.dum2.ne.zero) then                      !
           sk1= sk1 +dum1                                          !
           sk1s=sk1s+dum2                                          !
@@ -878,10 +878,10 @@ CONTAINS
     case(8)
        key%magnet="multipole"
        !---- Multipole components.
-       F_ERRORS = zero 
+       F_ERRORS = zero
        n_ferr = node_fd_errors(f_errors)
-       NORMAL = zero 
-       SKEW = zero 
+       NORMAL = zero
+       SKEW = zero
        call get_node_vector('knl ',nn,normal)
        call get_node_vector('ksl ',ns,skew)
        if(nn.ge.NMAX) nn=NMAX-1
@@ -908,7 +908,7 @@ CONTAINS
              key%list%ks(i+1)=skew(i)
           enddo
        endif
-       FIELD = zero 
+       FIELD = zero
        if (n_ferr .gt. 0) then
           call dcopy(f_errors,field,n_ferr)
        endif
@@ -964,7 +964,7 @@ CONTAINS
        endif
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
- 
+
     case(10)
        key%magnet="rfcavity"
        key%list%volt=bvk*node_value('volt ')
@@ -975,12 +975,12 @@ CONTAINS
 
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
        if(offset_deltap.ne.zero) then
-          
+
           default = getintstate()
           default=default+totalpath0
           call setintstate(default)
           freq=freq*((gammatr2-gamma2)*offset_deltap/gammatr2/gamma2+one) !regular twiss values
-          
+
        endif
        key%list%freq0=freq
        key%list%n_bessel=node_value('n_bessel ')
@@ -998,18 +998,18 @@ CONTAINS
        else
           key%list%cavity_totalpath=1
        endif
-       
+
 !       print*,"madx_ptc_module::input volt: ", key%list%volt, &
 !                                    " lag : ", key%list%lag, &
 !                                    " harm: ", key%list%harmon, &
-!                                    " freq: ", key%list%freq0 
-       
-       
+!                                    " freq: ", key%list%freq0
+
+
     case(12)
        ! actually our SROT element
        key%magnet="CHANGEREF"
-       PATCH_ANG = zero 
-       PATCH_TRANS = zero 
+       PATCH_ANG = zero
+       PATCH_TRANS = zero
        patch_ang(3)=node_value('angle ')
        key%list%patchg=2
        do i=1,3
@@ -1019,8 +1019,8 @@ CONTAINS
     case(13)
        ! actually our YROT element
        key%magnet="CHANGEREF"
-       PATCH_ANG = zero 
-       PATCH_TRANS = zero 
+       PATCH_ANG = zero
+       PATCH_TRANS = zero
        patch_ang(2)=-node_value('angle ')
        key%list%patchg=2
        do i=1,3
@@ -1029,7 +1029,7 @@ CONTAINS
        enddo
     case(14,15,16) ! PTC accepts mults
        ! kickers (corrector magnets)
-       F_ERRORS = zero 
+       F_ERRORS = zero
        n_ferr = node_fd_errors(f_errors)
        do i=1,NMAX
           key%list%k(i)=zero
@@ -1107,6 +1107,7 @@ CONTAINS
           psip = edge - corr * secedg * (one + sin(edge)**2)
           key%list%hf= rhoi * tanedg
           key%list%vf= -rhoi * tan(psip)
+          key%tiltd=node_value('tilt ') !! frs add-on
        else
           key%magnet="marker"
        endif
@@ -1130,8 +1131,8 @@ CONTAINS
        if(key%list%volt.ne.zero.and.key%list%freq0.ne.zero) icav=1
     case(35)
        key%magnet="CHANGEREF"
-       PATCH_ANG = zero 
-       PATCH_TRANS = zero 
+       PATCH_ANG = zero
+       PATCH_TRANS = zero
        call get_node_vector('patch_ang ',3,patch_ang)
        call get_node_vector('patch_trans ',3,patch_trans)
        key%list%patchg=2
@@ -1177,17 +1178,17 @@ CONTAINS
 
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
        if(offset_deltap.ne.zero) then
-          
+
           default = getintstate()
           default=default+totalpath0
           call setintstate(default)
           freq=freq*((gammatr2-gamma2)*offset_deltap/gammatr2/gamma2+one) !regular twiss values
-          
+
        endif
        key%list%freq0=freq
        key%list%n_bessel=node_value('n_bessel ')
        key%list%harmon=one ! it is ignored by PTC because it does not know the circumference
-       
+
        key%list%k(:)=zero
        key%list%ks(:)=zero
 
@@ -1257,10 +1258,10 @@ CONTAINS
              call augment_count('errors_total ')
           endif
        endif
-       
-       
+
+
        if(key%list%volt.ne.zero.and.key%list%freq0.ne.zero) icav=1
-       
+
        m_u%end%HARMONIC_NUMBER=node_value('harmon ')   ! etienne_harmon
        no_cavity_totalpath=node_value('no_cavity_totalpath ').ne.0
        if(no_cavity_totalpath) then
@@ -1272,9 +1273,9 @@ CONTAINS
 !       print*,"madx_ptc_module::input volt: ", key%list%volt, &
 !                                    " lag : ", key%list%lag, &
 !                                    " harm: ", key%list%harmon, &
-!                                    " freq: ", key%list%freq0 
-       
-       
+!                                    " freq: ", key%list%freq0
+
+
 
     case default
        print*,"Element: ",name, "of type ",code," not implemented in PTC"
@@ -1289,15 +1290,15 @@ CONTAINS
        enddo
 
 !    endif
-    call create_fibre(my_ring%end,key,EXCEPTION) !in ../libs/ptc/src/Sp_keywords.f90 
+    call create_fibre(my_ring%end,key,EXCEPTION) !in ../libs/ptc/src/Sp_keywords.f90
 
     if(advance_node().ne.0)  goto 10
-    
-    
+
+
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !!! END OF ELEMENTS LOOP    !!!
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    
+
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
@@ -1352,20 +1353,20 @@ CONTAINS
 
        j=restart_sequ()
        p=>my_ring%start
-       
+
        do i=1,my_ring%n
           if(p%mag%kind==kind4) then
              if(p%mag%freq==zero) then
-                 
+
                 tempdp = node_value('harmon ')
-                 
+
                 p%mag%freq=clight*tempdp*BETA0/l
                 p%magp%freq=p%mag%freq
-                 
+
                 ! watch the msg buffer is 1024
                 write(msg,*) " Cavity ",p%mag%name," defined with harmonic number ",tempdp,". Using SUM(LD) as ring length: ", l, &
                              " instead of real orbit length. Obtained freq. = ",p%mag%freq," Hz"
-	         
+
                 call fort_warn("ptc_input",msg(:len_trim(msg)))
                 if (p%mag%volt .ne. zero) icav=1
              endif
@@ -1540,7 +1541,7 @@ CONTAINS
        NORMAL = NORMAL / l
        SKEW = SKEW / l
        !do i=0,maxmul
-       !   normal(i)=normal(i)/l  
+       !   normal(i)=normal(i)/l
        !   skew(i)=skew(i)/l
        !enddo
     endif
@@ -1550,7 +1551,7 @@ CONTAINS
     !   normal_0123(i)=normal(i)
     !   skew_0123(i)=skew(i)
     !enddo
-    
+
     ! get errors                                                !
     F_ERRORS = zero                                             !
     n_ferr = node_fd_errors(f_errors) !                         !
@@ -2367,7 +2368,7 @@ CONTAINS
        if (getdebug()>2) then
          print*,"icav=",icav," my_ring%closed=",my_ring%closed," getenforce6D()=",getenforce6D()
        endif
-       
+
        if ( (icav==0) .and. my_ring%closed .and. (getenforce6D() .eqv. .false.)) then
           default = default - delta0 - only_4d0 + NOCAVITY0
           call fort_warn('return mystate: ',' no cavity - dimensionality reduced 6 -> 5 and 1/2')
@@ -2385,7 +2386,7 @@ CONTAINS
       !print*, "Resulting state"
       call print(default,6)
     endif
-    
+
     icase = i
 
   end subroutine my_state
@@ -2480,7 +2481,7 @@ CONTAINS
     real(kind(1d0))   :: get_value
     character(len=10)  :: coeffCode="c0_000000"//CHAR(0) ! polynomial no + "_" + monomial code + space(end of line)
 
-    
+
     !    type(universal_taylor) :: ut
 
     !    write(0,*) "MAP_TABLE"
@@ -2853,21 +2854,21 @@ CONTAINS
     gamma0 = get_value('probe ','gamma ')
     arad=get_value('probe ', 'arad ')
     totch=node_value('charge ') * get_value('probe ', 'npart ')
-    
+
     if (getdebug()>1) then
       print*, 'charge npart ',node_value('charge '), get_value('probe ', 'npart ')
       print*, 'gamma0, arad, totch ',gamma0, arad, totch
     endif
 
-    
+
     dpp  = get_variable('track_deltap ')
     q = get_value('probe ','charge ')
     q_prime = node_value('charge ')
-    
+
     if (getdebug()>1) then
       print*, 'dpp q q_prime',dpp, q, q_prime
     endif
-    
+
     beta0 = sqrt(one-one/gamma0**2)
     ptot = beta0*gamma0*(one+dpp)
     beta_dp = ptot / sqrt(one + ptot**2)
@@ -2894,30 +2895,30 @@ CONTAINS
     real(kind(1d0)), external :: get_variable
     integer, external         :: get_option
     REAL(KIND(1d0)), external :: node_value  !/*returns value for parameter par of current element */
-    
+
     s    = get_value('ptc_putbeambeam ','global_s ')
     xma  = get_value('ptc_putbeambeam ','xma ')
     yma  = get_value('ptc_putbeambeam ','yma ')
     sigx = get_value('ptc_putbeambeam ','sigx ')
     sigy = get_value('ptc_putbeambeam ','sigy ')
-    
+
     print*, 'Input   xma, yma, sigx, sigy, s'
     print*, 'Input', xma, yma, sigx, sigy, s
 
     if(.not.associated(my_ring%t))  then
        CALL MAKE_node_LAYOUT(my_ring)
     endif
-    
+
     elno = 0
     call s_locate_beam_beam(my_ring,s,elno,node,found)
-    
+
     if (.not. found) then
       print*,"could not find a node for beam-beam"
       return
     endif
-    
+
     print*, 'Name of element in PTC: ', node%PARENT_FIBRE%mag%name
-    
+
     write(6,*) 'node%a:',node%a            ! node entrance position
     write(6,*) 'node%ent(1,1:3):',node%ent(1,1:3)   ! node entrance e_1 vector
     write(6,*) 'node%ent(2,1:3):',node%ent(2,1:3)   ! node entrance e_2 vector
@@ -2926,7 +2927,7 @@ CONTAINS
     write(6,*) s, node%s(1),node%next%s(1), s - node%s(1), s - node%next%s(1)
 
 
-    
+
     if(((node%cas==case0).or.(node%cas==caset))) then !must be 0 or 3
 
       if(.not.associated(node%BB)) call alloc(node%BB)
@@ -2950,12 +2951,12 @@ CONTAINS
 
     else
       call fort_warn('getBeamBeam: ','Bad node case for BeamBeam')
-    endif 
-  
-    
-    !N.B. If nothing else is done, the beam-beam kick is placed at the entrance of the node. 
-    !The call FIND_PATCH(t%a,t%ent,o ,mid,D,ANG) needs to be invoked to place the beam-beam kick 
-    
+    endif
+
+
+    !N.B. If nothing else is done, the beam-beam kick is placed at the entrance of the node.
+    !The call FIND_PATCH(t%a,t%ent,o ,mid,D,ANG) needs to be invoked to place the beam-beam kick
+
   end subroutine putbeambeam
 
 END MODULE madx_ptc_module

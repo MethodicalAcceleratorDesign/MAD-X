@@ -14,7 +14,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   !     Purpose:                                                         *
   !     TWISS command: Track linear lattice parameters.                  *
   !----------------------------------------------------------------------*
-  double precision :: rt(6,6), disp0(6), cp_thrd=1d-12 ! coupling limit 
+  double precision :: rt(6,6), disp0(6), cp_thrd=1d-12 ! coupling limit
   integer :: tab_name(*)
   integer :: sector_tab_name(*) ! holds sectormap data
 
@@ -65,23 +65,23 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
   gammacp=one
   nmode_flip = 0
   mode_flip  =.false.
-  
+
   synch_1=zero;  synch_2=zero;  synch_3=zero;  synch_4=zero;  synch_5=zero
 
   suml=zero; circ=zero; eta=zero; alfa=zero; gamtr=zero; wgt=zero
-  
+
   !---- Track chromatic functions
   chrom = get_option('twiss_chrom ')
-  
+
   !---- flag if called from match process
   !---- get match flag for storing variables in nodes
   match_is_on = get_option('match_is_on ') .ne. 0
   if (match_is_on) chrom_warn = get_option('chrom_match ')
-  
+
   !---- flags for writing cumulative or lumped matrices
   rmatrix = get_value('twiss ','rmatrix ').ne.zero
   sectormap = get_option('twiss_sector ').ne.zero
-  
+
   !---- Get circumference
   circ   = get_value('probe ','circ ')
   if (circ .eq. zero) call fort_fail('TWISS: ', 'Zero length sequence.')
@@ -1182,7 +1182,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   cosmu2_eig = ( reval(3)+ aival(3) + reval(4) + aival(4) )/ 2
   if (get_option('info  ') .ne. 0) then
      if (.not. ((abs(cosmux - cosmu1_eig) .lt. diff_cos .and. abs(cosmuy - cosmu2_eig) .lt. diff_cos) .or.  &
-          (abs(cosmuy - cosmu1_eig) .lt. diff_cos .and. abs(cosmux - cosmu2_eig) .lt. diff_cos))) then 
+          (abs(cosmuy - cosmu1_eig) .lt. diff_cos .and. abs(cosmux - cosmu2_eig) .lt. diff_cos))) then
         write (warnstr,'(a)') "Difference in the calculation of cosmux/cosmuy based of R_EIG eigen values!  "
         call fort_warn('TWCPIN: ', warnstr)
         write (warnstr,'(a,e13.6, a, e13.6)') "cosmux-cosmu1_eig =", cosmux-cosmu1_eig, "cosmux-cosmu2_eig =", cosmux-cosmu2_eig
@@ -1195,7 +1195,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
         call fort_warn('TWCPIN: ', warnstr)
      endif
   endif
-  
+
   ! call twcpin_print(rt,r0mat)
 
   !---- Give message, if unstable.
@@ -1862,7 +1862,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   ! IT. remove cosmux/cosmuy calculation here as it's not used anywhere and only messes up check for coupled periodic lattices
   ! cosmux = (rt(1,1) + rt(2,2)) / two
   ! cosmuy = (rt(3,3) + rt(4,4)) / two
-  
+
   !---- Warning messages.
   if (cplxt .or. radiate) &
        call fort_warn('TWCPGO: ','TWISS uses the RF system or synchrotron radiation only '// &
@@ -3258,7 +3258,7 @@ SUBROUTINE tw_summ(rt,tt)
            call fort_warn('TW_SUMM: ', warnstr)
         endif
      endif
-  
+
   endif
 
   !---- Initialization transverse
@@ -4093,7 +4093,7 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
      xkick=xkick+bvk*(f_errors(0)/div);
      ykick=ykick+bvk*(f_errors(1)/div);
-     
+
      xau = xkick
      xkick = xkick*cos(tilt)+ykick*sin(tilt)
      ykick =  -xau*sin(tilt)+ykick*cos(tilt)
@@ -6640,7 +6640,7 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
   logical :: fsec, ftrk, fmap
   double precision :: orbit(6), re(6,6), te(6,6,6)
 
-  logical :: bborbit, bb_sxy_update
+  logical :: bborbit, bb_sxy_update, long_coup_on
   integer :: mylen
   double precision :: sx,sy, xm, ym, sx2, sy2, xs, ys, rho2, fk, tk, exk
   double precision :: phix, phiy, rho4, phixx, phixy, phiyy, rho6, rk, exkc
@@ -6670,9 +6670,11 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
   fmap = .true.
 
   bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
+  long_coup_on  = get_option('long_coup_off ') .eq. 0
+
 !frs on 06.06.2016
 !  safeguard TWISS from failing due to undefined SC elements
-  if (bb_sxy_update.and.N_spch.gt.0) then
+  if (bb_sxy_update .and. long_coup_on .and. N_spch .gt. 0) then
      fk = fk * rat_bb_n_ions !Ratio_for_bb_N_ions
      name=' '
      call element_name(name,len(name))

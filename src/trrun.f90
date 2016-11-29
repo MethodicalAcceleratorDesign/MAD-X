@@ -1263,11 +1263,11 @@ subroutine ttrf(track,ktrack)
   !   TTLCAV to change the nominal energy                                *
   !----------------------------------------------------------------------*
   double precision :: track(6,*)
-  integer :: ktrack
-
+  integer :: ktrack, itrack, get_option
   logical :: time_var
   integer :: i, mylen
   double precision :: omega, phirf, pt, rff, rfl, rfv, vrf, pc0, bvk
+  double precision :: bucket_half_length, dummy
   !      double precision px,py,ttt,beti,el1
   character(len=name_len) :: name
 
@@ -1376,6 +1376,20 @@ subroutine ttrf(track,ktrack)
   !     +        + dl*(beti - (beti+pt)*ttt) + dl*pt*dtbyds
   ! 20   continue
   !      endif
+
+  !! frs add-on (bring lost particules back to the bucket long-term studies)
+  if(get_option('bucket_swap ').eq.1) then
+    bucket_half_length = &
+      get_value('probe ','circ ') / (two * get_value('probe ', 'beta ') &
+                                     * node_value('harmon '));
+    do itrack = 1, ktrack
+      if (abs(track(5,itrack)) .gt. bucket_half_length) then
+         dummy = mod((abs(track(5,itrack)) + bucket_half_length), bucket_half_length*2)
+         track(5,itrack)=sign(1d0,track(5,itrack))*(dummy-bucket_half_length)
+      endif
+    enddo
+  endif
+  !! frs add-on end
 end subroutine ttrf
 
 subroutine ttcrabrf(track,ktrack,turn)
@@ -1911,7 +1925,7 @@ subroutine ttbb_gauss(track,ktrack,fk)
   double precision :: xbv(ktrack), ybv(ktrack), cbxv(ktrack), cbyv(ktrack)
   double precision :: tkv(ktrack), phixv(ktrack), phiyv(ktrack)
   double precision :: xsv(ktrack), ysv(ktrack), rkv(ktrack)
-  logical :: bborbit, bb_sxy_update
+  logical :: bborbit, bb_sxy_update, long_coup_on
   !VVK 20100321 ------------------------------------------------------
   double precision ::  gauss_factor_t ! promoted by GR from REAL
   character(len=20) :: text
@@ -1923,6 +1937,7 @@ subroutine ttbb_gauss(track,ktrack,fk)
   !---- initialize.
   bborbit       = get_option('bborbit ') .ne. 0
   bb_sxy_update = get_option('bb_sxy_update ') .ne. 0
+  long_coup_on  = get_option('long_coup_off ') .eq. 0
   if (bb_sxy_update) then
      name=' '
      call element_name(name,len(name))
@@ -1971,7 +1986,7 @@ subroutine ttbb_gauss(track,ktrack,fk)
         rho2 = xs * xs + ys * ys
         tk = rho2 / (two * sx2)
 
-        if (bb_sxy_update) then
+        if (bb_sxy_update .and. long_coup_on) then
            gauss_factor_t = exp(-half*(track(5,i)-mean_t)**2/sigma_t**2)!VVK 20100321
 
            if (tk .gt. explim) then
@@ -3013,7 +3028,7 @@ subroutine ttdpdg_map(track, ktrack, e1, h, hgap, fint, tilt)
   !     tmfrng returns the matrix elements rw(used) and tw(unused)
   !     No radiation effects as it is a pure thin lens with no lrad
   call tmfrng(.false., h, zero, e1, zero, zero, corr, rw, tw)
-  call tmtilt(.false., tilt, ek, rw, tw)
+!  call tmtilt(.false., tilt, ek, rw, tw) !! frs add-off
 
   TRACK(2,1:ktrack) = TRACK(2,1:ktrack) + RW(2,1) * TRACK(1,1:ktrack)
   TRACK(4,1:ktrack) = TRACK(4,1:ktrack) + RW(4,3) * TRACK(3,1:ktrack)
@@ -3033,7 +3048,7 @@ subroutine ttdpdg(track, ktrack)
   integer :: ktrack
   double precision :: track(6,*)
 
-  double precision :: e1, h, hgap, fint, tilt, corr
+  double precision :: e1, h, hgap, fint, tilt, corr, bvk
   double precision :: ek(6), rw(6,6), tw(6,6,6)
 
   double precision :: node_value
@@ -3044,9 +3059,11 @@ subroutine ttdpdg(track, ktrack)
 
   e1 = node_value('e1 ')
   h = node_value('h ')
+  bvk = node_value('other_bv ') !! frs add-on
   hgap = node_value('hgap ')
   fint = node_value('fint ')
   tilt = node_value('tilt ')
+  h = bvk * h                   !! frs add-on
 
   call ttdpdg_map(track, ktrack, e1, h, hgap, fint, tilt);
 
@@ -3578,6 +3595,8 @@ subroutine ixy_calcs(betas, orbit, z,          &
   double precision :: gamax_start, gamay_start
   double precision :: dx_start,    dpx_start
   double precision :: dy_start,   dpy_start
+  logical :: sc_chrom_fix
+  integer :: get_option
 
   integer :: i
   double precision :: dpi, xi, pxi, yi, pyi
@@ -3589,10 +3608,15 @@ subroutine ixy_calcs(betas, orbit, z,          &
   !      Ix=(gamax_start*XI*XI+2*alfax_start*XI*PXI+betax_start*PXI*PXI)/2;
   !      Iy=(gamay_start*YI*YI+2*alfay_start*YI*PYI+betay_start*PYI*PYI)/2;
 
+  sc_chrom_fix = get_option('sc_chrom_fix ') .ne. 0 !! frs add-on
   do i=1,N_macro_surv
      ! Exact formulation might be too computational time costly
      !        DPI=(sqrt((one+z(6,i)*betas)**2-gammas**(-2)))/betas-one
-     DPI = (z(6,i) - orbit(6)) / betas
+     if(sc_chrom_fix .eqv. .true.) then !! frs add-on
+        DPI = z(6,i) - orbit(6)
+     else
+        DPI = (z(6,i) - orbit(6)) / betas !! orignal
+     endif
      XI  =  z(1,i) - orbit(1) - dx_start  * DPI
      PXI =  z(2,i) - orbit(2) - dpx_start * DPI
      YI  =  z(3,i) - orbit(3) - dy_start  * DPI
@@ -3601,7 +3625,11 @@ subroutine ixy_calcs(betas, orbit, z,          &
      Ix_array(i) = (gamax_start*XI*XI + two*alfax_start*XI*PXI + betax_start*PXI*PXI) / two
      Iy_array(i) = (gamay_start*YI*YI + two*alfay_start*YI*PYI + betay_start*PYI*PYI) / two
      dpi_array(i) = DPI
-     z_part_array(i) = (z(5,i)-orbit(5))*betas
+     if(sc_chrom_fix .eqv. .true.) then !! frs add-on
+       z_part_array(i)=z(5,i) - orbit(5)
+     else
+       z_part_array(i) = (z(5,i)-orbit(5))*betas !! orignal
+     endif
   enddo
 
 end subroutine ixy_calcs
@@ -4304,36 +4332,36 @@ subroutine tttdipole(track, ktrack)
      Cy = dreal(cdcos(ky*L)); ! 1
      if (kx_sqr.ne.zero) then ; Sx = dreal(cdsin(kx*L) / kx); else ; Sx = L; endif;
      if (ky_sqr.ne.zero) then ; Sy = dreal(cdsin(ky*L) / ky); else ; Sy = L; endif;
-        
+
      ! useful constants
      A = ((delta_plus_1-k0*x)*h-k1*x-k0)/delta_plus_1;
      B = px;
      C = -(k1*y)/delta_plus_1;
-     D = py;   
-        
+     D = py;
+
      ! transverse map
      x_ = x*Cx + px*Sx + ((k0-delta_plus_1*h)*(Cx-one))/(k1+h*k0);
      y_ = y*Cy + py*Sy;
      px_ = A*Sx + B*Cx;
-     py_ = C*Sy + D*Cy;     
+     py_ = C*Sy + D*Cy;
      !px_ = -x*Sx*(k0*h+k1) / delta_plus_1 + px*Cx -((k0-delta_plus_1*h)*Sx) / delta_plus_1;
      !py_ = -y*Sy*k1        / delta_plus_1 + py*Cy;
-     
+
      z_ = z + pt*(one-bet0sqr)/bet0sqr*L + (pt+one/bet0)/delta_plus_1*h*x;
      if (kx_sqr.ne.zero) then
-        z_ = z_ -half*(pt+one/bet0)/(delta_plus_1**3) * & 
+        z_ = z_ -half*(pt+one/bet0)/(delta_plus_1**3) * &
              (((kx_sqr*B**2-A**2)*Cx*Sx)/(two*kx_sqr) - &
              (A*B*Cx**2)/kx_sqr+(B**2*L)*half+(A**2*L)/(two*kx_sqr)+(A*B)/kx_sqr);
      else
-        z_ = z_ -half*(pt+one/bet0)/(delta_plus_1**3) * & 
+        z_ = z_ -half*(pt+one/bet0)/(delta_plus_1**3) * &
              (A**2*L**3+three*A*B*L**2+three*B**2*L)/three;
      endif
      if (ky_sqr.ne.zero) then
-        z_ = z_ -half*(pt+one/bet0)/(delta_plus_1**3) * & 
+        z_ = z_ -half*(pt+one/bet0)/(delta_plus_1**3) * &
              (((ky_sqr*D**2-C**2)*Cy*Sy)/(two*ky_sqr) - &
              (two*C*D*Cx**2+(-ky_sqr*D**2-C**2)*L-two*C*D)/(two*ky_sqr));
      else
-        z_ = z_ -half*(pt+one/bet0)/(delta_plus_1**3) * & 
+        z_ = z_ -half*(pt+one/bet0)/(delta_plus_1**3) * &
              (C**2*L**3+three*C*D*L**2+three*D**2*L)/three;
      endif
 
