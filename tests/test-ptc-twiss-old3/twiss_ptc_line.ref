@@ -8,7 +8,7 @@
 @ PC               %le         99.99559813
 @ GAMMA            %le         106.5788973
 @ KBUNCH           %le                  10
-@ BCURRENT         %le      0.009433488082
+@ BCURRENT         %le      0.009433072832
 @ SIGE             %le             0.00011
 @ SIGT             %le               0.077
 @ NPART            %le            1.05e+11
@@ -83,9 +83,9 @@
 @ PTCOMIN          %le                   0
 @ PTCOMAX          %le                   0
 @ TITLE            %01s "s"
-@ ORIGIN           %16s "5.02.10 Linux 64"
-@ DATE             %08s "02/06/16"
-@ TIME             %08s "13.00.35"
+@ ORIGIN           %17s "5.02.12 Darwin 64"
+@ DATE             %08s "30/11/16"
+@ TIME             %08s "11.32.10"
 * NAME                                S              ANGLE             BETA11             BETA21             BETA12             BETA22              DISP1              DISP3                  X                 PX                  Y                 PY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "FIVECELL$START"                     0                  0        177.7010915                  0                  0        32.03447595        2.174564202                  0    0.0003260715263    2.596345499e-06                  0                  0

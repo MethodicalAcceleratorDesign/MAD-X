@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  +     MAD-X 5.02.12  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.09.21 16:07:45      +
+  + Release   date: 2016.10.15               +
+  + Execution date: 2016.11.30 11:27:30      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !! **************************************************************************************
 
@@ -118,7 +118,7 @@ enter EMIT module
  C                389.1501964 m          f0              0.7703772373 MHz
  T0               1.298065352 musecs     alfa          0.003606052228 
  eta           0.003606020305            gamma(tr)        16.65267452 
- Bcurrent       0.05554261601 A/bunch    Kbunch           312 
+ Bcurrent       0.05554261513 A/bunch    Kbunch           312 
  Npart                4.5e+11 /bunch     Energy                  2.86 GeV 
  gamma            5596.880626            beta             0.999999984
      U0              2.749529 [MeV/turn]

@@ -8,7 +8,7 @@
 @ PC               %le         6999.999937
 @ GAMMA            %le         7460.522809
 @ KBUNCH           %le                   1
-@ BCURRENT         %le     0.0001981900318
+@ BCURRENT         %le       0.00019819003
 @ SIGE             %le             0.00011
 @ SIGT             %le               0.077
 @ NPART            %le             1.1e+11
@@ -40,9 +40,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %17s "5.02.09 Darwin 64"
-@ DATE             %08s "18/04/16"
-@ TIME             %08s "18.20.23"
+@ ORIGIN           %17s "5.02.12 Darwin 64"
+@ DATE             %08s "30/11/16"
+@ TIME             %08s "14.57.09"
 * NAME                                X                  Y               BETX               BETY 
 $ %s                                %le                %le                %le                %le 
  "LHCB1$START"                  -0.0005     6.35876145e-15               0.55               0.55

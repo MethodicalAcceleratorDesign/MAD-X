@@ -652,7 +652,7 @@ enter EMIT module
  C                 26658.8832 m          f0             0.01124547507 MHz
  T0               88.92465583 musecs     alfa         0.0003167666893 
  eta            0.00031241926            gamma(tr)        56.18627587 
- Bcurrent     0.0001891809845 A/bunch    Kbunch             1 
+ Bcurrent     0.0001891805732 A/bunch    Kbunch             1 
  Npart               1.05e+11 /bunch     Energy                   450 GeV 
  gamma            479.6050377            beta            0.9999978263
  

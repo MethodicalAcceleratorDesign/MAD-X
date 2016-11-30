@@ -3,7 +3,7 @@
   +     MAD-X 5.02.12  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2016.10.15               +
-  + Execution date: 2016.11.20 20:30:02      +
+  + Execution date: 2016.11.30 14:52:02      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option, warn,info,echo;
 
@@ -127,7 +127,7 @@ touschek, tolerance=1.e-7, file="touschek_e.dat";
  sige        4.7195743095042200E-004
  parnum      115000000000.00000     
  circ        26658.883200000000     
- currnt      2.0719822106584157E-004
+ currnt      2.0719777067554395E-004
  betas      0.99999782628298983     
  beta       0.99999782628298983     
  clight      299792458.00000000     
@@ -242,7 +242,7 @@ touschek,tolerance=1.e-7,file="touschek_c.dat";
  sige        4.7195743095042200E-004
  parnum      115000000000.00000     
  circ        26658.883200000000     
- currnt      2.0719822106584157E-004
+ currnt      2.0719777067554395E-004
  betas      0.99999782628298983     
  beta       0.99999782628298983     
  clight      299792458.00000000     
