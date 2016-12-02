@@ -2746,6 +2746,8 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
         goto 99 ! lost...
      endif
 
+
+     
      lost = .false.
 
      x = abs(z(1,i) - al_errors(11) - offset(1))
@@ -2786,6 +2788,15 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
 
      end select
 
+     if (.not. lost) then
+        lost =  ISNAN(z(2,i)) .or. ISNAN(z(4,i))                      .or. &
+                ISNAN(z(5,i)) .or. ISNAN(z(6,i))                      .or. &
+                z(1, i) .gt. maxaper(1) .or.  z(2, i) .gt. maxaper(2) .or. &
+                z(3, i) .gt. maxaper(3) .or.  z(4, i) .gt. maxaper(4) .or. &
+                z(5, i) .gt. maxaper(5) .or.  z(6, i) .gt. maxaper(6)
+     endif
+     
+     
      ! lose particle if it is outside aperture
 99   if (lost) then
         n = i
