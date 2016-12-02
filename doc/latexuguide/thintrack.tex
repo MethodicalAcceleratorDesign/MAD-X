@@ -412,11 +412,13 @@ The \texttt{RUN} command has three attributes:
 \begin{madlist}
   \ttitem{TURNS} number of turns to be tracked.
 
-  \ttitem{MAXAPER} upper limits for the six coordinates.\\
+  \ttitem{MAXAPER} defines the maximum aperture (by
+  aperture type) beyond which the particle is considered
+  to be lost upper and, in addition, limits for the six coordinates.\\
   (Default: \{0.1, 0.01, 0.1, 0.01, 1.0, 0.1\} \\
   The limits defined by the \texttt{MAXAPER} option are only being taken
   into account if the \texttt{APERTURE} option of the \texttt{TRACK}
-  command is used.
+  command is used. 
 
   \ttitem{FFILE} defines the turn periodicity for printing coordinates at
    observation points. (Default:~1)\\
