@@ -2789,11 +2789,11 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
      end select
 
      if (.not. lost) then
-        lost =  ISNAN(z(2,i)) .or. ISNAN(z(4,i))                      .or. &
-                ISNAN(z(5,i)) .or. ISNAN(z(6,i))                      .or. &
-                z(1, i) .gt. maxaper(1) .or.  z(2, i) .gt. maxaper(2) .or. &
-                z(3, i) .gt. maxaper(3) .or.  z(4, i) .gt. maxaper(4) .or. &
-                z(5, i) .gt. maxaper(5) .or.  z(6, i) .gt. maxaper(6)
+        lost =  ISNAN(z(2,i)) .or. ISNAN(z(4,i))                                .or. &
+                ISNAN(z(5,i)) .or. ISNAN(z(6,i))                                .or. &
+                abs(z(1, i)) .gt. maxaper(1) .or.  abs(z(2, i)) .gt. maxaper(2) .or. &
+                abs(z(3, i)) .gt. maxaper(3) .or.  abs(z(4, i)) .gt. maxaper(4) .or. &
+                abs(z(5, i)) .gt. maxaper(5) .or.  abs(z(6, i)) .gt. maxaper(6)
      endif
      
      
