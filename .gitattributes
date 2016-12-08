@@ -1076,10 +1076,6 @@ tests/share/ring_lattice/fv9_rbend.opt -text
 tests/share/ring_lattice/ring.seq -text
 tests/share/ring_lattice_alt/fv9.opt -text
 tests/share/ring_lattice_alt/fv9.seq -text
-tests/test-addknob/input/test.tfs -text
-tests/test-addknob/test-addknob.cfg -text
-tests/test-addknob/test-addknob.madx -text
-tests/test-addknob/test-addknob.ref -text
 tests/test-aperture-2/ptc-twiss-table.cfg -text
 tests/test-aperture-2/ptc-twiss-table.ref -text
 tests/test-aperture-2/test-aperture-2.cfg -text

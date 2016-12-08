@@ -72,7 +72,7 @@ vary,name=KQ10.R8B1,step=1.0e-6,LOWER=-qtlimit2,UPPER=qtlimit2;
 vary,name=KQTL11.R8B1,step=1.0e-6,LOWER=-qtlimit3,UPPER=qtlimit3;
 vary,name=KQT12.R8B1,step=1.0e-6,LOWER=-qtlimit3,UPPER=qtlimit3;
 vary,name=KQT13.R8B1,step=1.0e-6,LOWER=-qtlimit3,UPPER=qtlimit3;
-jacobian,calls=30,tolerance=1.e-24,strategy=2,jacfile=ttt;
+jacobian,calls=30,tolerance=1.e-24;
 endmatch;
 fill,table=str.ip8.b1;
 };

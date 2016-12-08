@@ -297,7 +297,7 @@
 
 
 !     Check for slope and limits and set the results in varinfo and
-!     the number of effective variables in effvar (if at the extreme just freeze to the maximum)
+!     the number of effective variables in effvar
       if(strategy.eq.3) then
         call mtvarinfo(x,xstart,varinfo,effvar)
       endif
@@ -528,7 +528,6 @@
               endif
               flag=string_from_table_row('twiss ','name ',pos,node_name)
               do nvar=1,n
-                write(*,*) 'fdsafas',i,j,nvar
  22             ivar=next_vary(namevar,name_len,c_min,c_max,step,slope,opt)
                 if (ivar.eq.0) then
                   goto 22
@@ -694,13 +693,11 @@
         if (val.lt.c_min) then
           write(*,*) "exclude parameter:",name,"hit minimum"
           varinfo(j)=1
-          x(j)=c_min
           effvar=effvar-1
         endif
         if (val.gt.c_max) then
           write(*,*) "exclude parameter:",name,"hit maximum"
           varinfo(j)=1
-          x(j)=c_max
           effvar=effvar-1
         endif
         goto 1
