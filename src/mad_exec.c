@@ -251,7 +251,7 @@ exec_show(struct in_cmd* cmd)
         dump_element(el);
       else if ((var = find_variable(toks[i], variable_list))) {
         if (var->expr)
-          fprintf(prt_file, v_format("%S := %s ;\n"), toks[i], var->expr->string);
+          fprintf(prt_file, v_format("%S := %S ;\n"), toks[i], var->expr->string);
         else
           fprintf(prt_file, v_format("%S  = %F ;\n"), toks[i], var->value);
       }
@@ -596,6 +596,75 @@ exec_setvars_lin_table(struct in_cmd* cmd)
       pro_input(expr);
     } else if (t->columns->inform[i] == 3) {
       set_stringvar(t->columns->names[i],t->s_cols[i][row1-1]) ;
+    }
+  }
+}
+
+void
+exec_addknob_table(struct in_cmd* cmd)
+  /* add knob to variables with weights from a table*/
+{
+  struct table* t;
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  int pos = name_list_pos("table", nl);
+  char* name = NULL;
+  char* knob = NULL;
+  char expr[10000];
+  char subexpr[100];
+  int row1;
+  struct variable* var;
+
+  if (nl->inform[pos] == 0) {
+    warning("no table name:", "ignored");
+    return;
+  }
+
+  if ((name = pl->parameters[pos]->string) == NULL) {
+    warning("no table name: ", "ignored");
+    return;
+  }
+
+  current_node = NULL; /* to distinguish from other table fills */
+
+  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+    warning("table name not found:", "ignored");
+    return;
+  }
+  t = table_register->tables[pos];
+
+  pos=name_list_pos("row", nl);
+  row1=(int) pl->parameters[pos]->double_value;
+  pos = name_list_pos("knob", nl);
+  knob = pl->parameters[pos]->string;
+
+  if (abs(row1) > t->curr || row1 == 0){
+    warning("row1 index out of bounds:", " ignored");
+    return;
+  }
+
+  /* negative row numbers are counting backwards from last row */
+  /* transform into positive values */
+  if (row1<0) row1=t->curr + 1 + row1;
+
+  for (int i = 0; i < t->num_cols; i++) {
+    if (t->columns->inform[i] < 3) {
+      const char *colname = t->columns->names[i];
+      double val = t->d_cols[i][row1-1];
+      sprintf(subexpr,"%+20.16g*%s",val, knob);
+      if ((var = find_variable(colname, variable_list))){
+          if (var->expr){
+             sprintf(expr, "%s := %s %s;",
+                          colname,   var->expr->string, subexpr);
+          } else {
+             sprintf(expr, "%s := %+20.16g %s;",
+                          colname,   var->value, subexpr);
+          }
+      } else {
+             sprintf(expr, "%s := %s;",
+                          colname,  subexpr);
+      }
+      pro_input(expr);
     }
   }
 }

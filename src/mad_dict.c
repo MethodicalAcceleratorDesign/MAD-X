@@ -2868,4 +2868,9 @@ char command_def[] =
 "row2 = [i, 0], "
 "param = [s, interp]; " // change default t to interp
 " "
+"addknob: control none 0 0 "
+"table = [s, none], "
+"knob = [s, knob], " // change default t to interp
+"row = [i, -1]; "
+" "
 ;

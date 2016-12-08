@@ -24,6 +24,7 @@ void exec_renamefile(struct in_cmd*);
 void exec_copyfile(struct in_cmd* cmd);
 void exec_setvars_table(struct in_cmd*);
 void exec_setvars_lin_table(struct in_cmd*);
+void exec_addknob_table(struct in_cmd*);
 void exec_store_coguess(struct in_cmd*);
 void exec_delete_table(const char* name);
 
