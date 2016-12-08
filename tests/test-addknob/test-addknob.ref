@@ -1,0 +1,59 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.12  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2016.10.15               +
+  + Execution date: 2016.12.08 15:23:33      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+Option, -info; // avoid redefinition info
+
+
+
+readtable,file="input/test.tfs";
+
+
+
+a = 43;
+
+b:=-43*tt ;
+
+
+
+show, a,b,c;
+
+a                   =                 43 ;
+b                  := -43*tt             ;
+c not found
+
+
+addknob, table=test, knob=k1;
+
+show, a,b,c;
+
+a                  := +43-1.3*k1         ;
+b                  := -43*tt+5*k1        ;
+c                  := -6*k1              ;
+
+
+addknob, table=test, knob=k2,row=1;
+
+show, a,b,c;
+
+a                  := +43-1.3*k1+1*k2    ;
+b                  := -43*tt+5*k1+2e-16*k2 ;
+c                  := -6*k1+3*k2         ;
+
+
+addknob, table=test, knob=k3,row=2;
+
+show, a,b,c;
+
+a                  := +43-1.3*k1+1*k2-1.3*k3 ;
+b                  := -43*tt+5*k1+2e-16*k2+5*k3 ;
+c                  := -6*k1+3*k2-6*k3    ;
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
