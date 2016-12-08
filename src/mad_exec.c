@@ -14,7 +14,7 @@ exec_delete_sequ(char* name)
     }
     sequences->sequs[spos] = delete_sequence(current_sequ);
     remove_from_sequ_list(current_sequ, sequences);
-    current_sequ = keep;  
+    current_sequ = keep;
   }
   else warning("sequence to be deleted does not exist:", name);
   return;
@@ -110,7 +110,7 @@ exec_assign(struct in_cmd* cmd)
         prt_file = fopen(p, "a");
       else
         prt_file = fopen(p, "w");
-  
+
       if (!prt_file) {
         warning("unable to open assigned file: ", p);
         prt_file = stdout;
@@ -128,7 +128,7 @@ exec_removefile(struct in_cmd* cmd)
   int pos = name_list_pos("file", nl);
 
   if (nl->inform[pos]) {
-    char *src = str2path(pl->parameters[pos]->string); 
+    char *src = str2path(pl->parameters[pos]->string);
     if (remove(src))
       warning("unable to remove file: ", pl->parameters[pos]->string);
   }
@@ -198,7 +198,7 @@ exec_call(struct in_cmd* cmd)
   struct name_list* nl = cmd->clone->par_names;
   int pos = name_list_pos("file", nl);
   int top = in->curr;
-  
+
   if (nl->inform[pos]) {
     if (down_unit(pl->parameters[pos]->string)) madx_input(top);
   }
@@ -250,8 +250,10 @@ exec_show(struct in_cmd* cmd)
       else if ((el = find_element(toks[i], element_list)) != NULL)
         dump_element(el);
       else if ((var = find_variable(toks[i], variable_list))) {
-        if (var->expr)  fprintf(prt_file, "%s := %s ;\n", toks[i], var->expr->string);
-        else fprintf(prt_file, v_format("%s = %F ;\n"), toks[i], var->value);
+        if (var->expr)
+          fprintf(prt_file, v_format("%S := %s ;\n"), toks[i], var->expr->string);
+        else
+          fprintf(prt_file, v_format("%S  = %F ;\n"), toks[i], var->value);
       }
       else fprintf(prt_file, "%s not found\n", toks[i]);
     }
@@ -319,7 +321,7 @@ exec_create_table(struct in_cmd* cmd)
   add_to_table_list(t, table_register);
   myfree(rout_name, t_c); myfree(rout_name, t_types);
   t->dynamic = 1;
-  
+
   return;
 }
 
@@ -467,11 +469,11 @@ exec_fill_table(struct in_cmd* cmd)
     return;
   }
 
-  // 2014-Aug-18  17:05:33  ghislain: allow for negative row numbers; 
+  // 2014-Aug-18  17:05:33  ghislain: allow for negative row numbers;
   // -1 indexes last row and negative numbers count row numbers backwards from end
   // -2 denoting the one before last and so on
-  if (row < 0) row = t->curr + 1 + row; 
-  
+  if (row < 0) row = t->curr + 1 + row;
+
   { int cols = t->org_cols ; t->org_cols = 0;
     int curr = t->curr; t->curr = row - 1;
     add_vars_to_table(t);
@@ -517,11 +519,11 @@ exec_setvars_table(struct in_cmd* cmd)
     return;
   }
 
-  // 2014-Aug-18  17:05:33  ghislain: allow for negative row numbers; 
+  // 2014-Aug-18  17:05:33  ghislain: allow for negative row numbers;
   // -1 indexes last row and negative numbers count row numbers backwards from end
   // -2 denoting the one before last and so on
-  if (row < 0) row = t->curr + 1 + row; 
-  
+  if (row < 0) row = t->curr + 1 + row;
+
   int curr = t->curr; t->curr = row - 1;
   set_vars_from_table(t);
   t->curr = curr;
@@ -574,10 +576,10 @@ exec_setvars_lin_table(struct in_cmd* cmd)
     warning("row2 index out of bounds:", " ignored");
     return;
   }
-  
+
   /* negative row numbers are counting backwards from last row */
   /* transform into positive values */
-  if (row1<0) row1=t->curr + 1 + row1; 
+  if (row1<0) row1=t->curr + 1 + row1;
   if (row2<0) row2=t->curr + 1 + row2;
 
   for (int i = 0; i < t->num_cols; i++) {
@@ -585,10 +587,10 @@ exec_setvars_lin_table(struct in_cmd* cmd)
       const char *colname = t->columns->names[i];
       double val1 = t->d_cols[i][row1-1];
       double val2 = t->d_cols[i][row2-1];
-      // 2014-Aug-18  17:15:08  ghislain: 
-      // value := val1*param + val2*(1-param) ; 
+      // 2014-Aug-18  17:15:08  ghislain:
+      // value := val1*param + val2*(1-param) ;
       // sprintf(expr,"%s:=%10.16g*(%s)%+10.16g*(1-(%s));", colname,val1,param,val2,param);
-      // is counterintuitve for interpolation between val1 and val2 and should instead be 
+      // is counterintuitve for interpolation between val1 and val2 and should instead be
       // value := val1 + param*(val2-val1) = val1*(1-param) + val2*param;
       sprintf(expr, "%s:=%10.16g*(1-(%s))%+10.16g*(%s);", colname, val1, param, val2, param);
       pro_input(expr);
@@ -626,7 +628,7 @@ exec_printf(struct in_cmd* cmd)
   // retrieve vector of values from value=...
   int val_n = command_par_vector("value", cmd->clone, NULL);
   if (val_n < 100) val_n = 100;
-  double val[val_n]; 
+  double val[val_n];
   command_par_vector("value", cmd->clone, val);
 
   // enough to print a full twiss row, anyway C limits is 127, and var_form is long enough

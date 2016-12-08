@@ -504,9 +504,9 @@ They are both expressed in $[\mathrm{m}^{-n}]$.
      starting from order zero and up to the maximum order (currently 20). The
      parameters are positional in the array, therefore zeros must be
      filled in for components that do not exist. 
-     Hence the first argument of the array, the argument for a skew
-     multipole of order zero, $K_0 L = B_0 . L / (B\rho)$ is equal to
-     the skew or vertical rotation angle of the thin dipole.
+%     Hence the first argument of the array, the argument for a skew
+%     multipole of order zero, $K_0 L = B_0 . L / (B\rho)$ is equal to
+%    the skew or vertical rotation angle of the thin dipole.
  
 \end{madlist}
 
@@ -524,11 +524,12 @@ A multipole with no dipole component has no effect on the reference
 orbit, i.e. the reference system at its exit is the same as at its
 entrance. If it includes a dipole component, it has the same effect on
 the reference orbit as a dipole with zero length, total deflection 
-\texttt{angle} and \texttt{tilt} defined by:
+\texttt{angle} defined by: %and \texttt{tilt} defined by:
 \begin{equation}
   \begin{aligned}
-    \mathtt{angle} &= \sqrt{ \mathtt{KNL}(0)^2 + \mathtt{KSL}(0)^2 }\\
-    \mathtt{tilt}  &= \arctan (\mathtt{KSL}(0) / \mathtt{KNL}(0))  
+    \mathtt{angle} &=  \mathtt{KNL}(0) \\
+% \mathtt{angle} &=  \sqrt{ \mathtt{KNL}(0)^2 + \mathtt{KSL}(0)^2 }\\
+% \mathtt{tilt}     &= \arctan (\mathtt{KSL}(0) / \mathtt{KNL}(0))  
   \end{aligned}
 \end{equation}
 Note that the global \texttt{TILT} attribute of the \texttt{MULTIPOLE}

@@ -729,7 +729,7 @@ print_value(struct in_cmd* cmd)
     if (loc_expr(toks, j, start, &end) > 0) {
       int nitem = end - start + 1;
       if (polish_expr(nitem, &toks[start]) == 0) {
-        fprintf(prt_file, v_format("%s = %F ;\n"),
+        fprintf(prt_file, v_format("%S = %F ;\n"),
                 spec_join(&toks[start], nitem),
                 polish_value(deco, join(&toks[start], nitem)));
       }
