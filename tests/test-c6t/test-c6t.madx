@@ -69,6 +69,7 @@ TWISS;
 ! ----------- Twiss
 use, sequence= lhcb1;
 sixtrack, radius=0.017;
+sixtrack, radius=0.017,aperture;
 
 removefile, file="fc.3";
 

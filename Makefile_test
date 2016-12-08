@@ -77,6 +77,7 @@ test-touschek test-touschek-2 \
 test-sequence test-sequence-2 test-sequence-3 test-sequence-4 test-sequence-5 test-sequence-6 \
 test-line \
 test-plot test-plot-2 \
+test-addknob \
 \
 $(call onlxi64,$(user-cases),)
 

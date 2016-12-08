@@ -259,4 +259,7 @@ track, dump;
   run,   turns= 400, ffile=20; 
 endtrack; 
 
+sixtrack, radius=0.017;
+
+
 stop;
