@@ -1,0 +1,12 @@
+option, -echo;
+
+a:=3+1*t;
+b:=3-2*t;
+
+create,table=ttt,column=a,b;
+
+fillknob,table=ttt,knob=t;
+
+write,table=ttt;
+
+

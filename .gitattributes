@@ -1312,6 +1312,9 @@ tests/test-error/efield.tab5.ref -text
 tests/test-error/test-error.cfg -text
 tests/test-error/test-error.madx -text
 tests/test-error/test-error.ref -text
+tests/test-fillknob/test-fillknob.cfg -text
+tests/test-fillknob/test-fillknob.madx -text
+tests/test-fillknob/test-fillknob.ref -text
 tests/test-hllhc/fc.16.ref -text
 tests/test-hllhc/fc.2.ref -text
 tests/test-hllhc/fc.3.aux.ref -text

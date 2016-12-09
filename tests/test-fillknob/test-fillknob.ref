@@ -1,0 +1,24 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.12  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2016.10.15               +
+  + Execution date: 2016.12.09 10:24:35      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+option, -echo;
+
+@ NAME             %03s "TTT"
+@ TYPE             %04s "USER"
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.02.12 Linux 64"
+@ DATE             %08s "09/12/16"
+@ TIME             %08s "10.24.35"
+*                  A                  B 
+$                %le                %le 
+                  1                 -2
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
