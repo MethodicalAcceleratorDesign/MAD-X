@@ -2870,7 +2870,12 @@ char command_def[] =
 " "
 "addknob: control none 0 0 "
 "table = [s, none], "
-"knob = [s, knob], " // change default t to interp
+"knob = [s, none], " // change default t to interp
 "row = [i, -1]; "
+" "
+"fillknob: control none 0 0 "
+"table = [s, none], "
+"knob = [s, none], " // change default t to interp
+"row = [i, 0]; "
 " "
 ;

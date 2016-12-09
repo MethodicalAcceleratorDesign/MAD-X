@@ -670,6 +670,87 @@ exec_addknob_table(struct in_cmd* cmd)
 }
 
 void
+exec_fillknob_table(struct in_cmd* cmd)
+  /* add knob to variables with weights from a table*/
+{
+  struct table* t;
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  int pos = name_list_pos("table", nl);
+  char* name = NULL;
+  char* knob = NULL;
+  double varvalue[10000];
+  double knobvalue;
+  int row;
+
+  if (nl->inform[pos] == 0) {
+    warning("no table name:", "ignored");
+    return;
+  }
+
+  if ((name = pl->parameters[pos]->string) == NULL) {
+    warning("no table name: ", "ignored");
+    return;
+  }
+
+  current_node = NULL; /* to distinguish from other table fills */
+
+  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+    warning("table name not found:", "ignored");
+    return;
+  }
+  t = table_register->tables[pos];
+
+  pos=name_list_pos("row", nl);
+
+  row = pos >=0 ? pl->parameters[pos]->double_value : t->curr + 1;
+
+  if (row==0 || row == t->curr + 1) { // add row to table and fill
+    if (++t->curr == t->max) grow_table(t);
+    row=t->curr;
+  }
+
+  if (abs(row) > t->curr) { // bounds check
+    // note: cases row=0 and row=t->curr+1 already treated
+    warning("row index out of bounds:", " ignored");
+    return;
+  }
+
+  pos = name_list_pos("knob", nl);
+  knob = pl->parameters[pos]->string;
+
+  /* negative row numbers are counting backwards from last row */
+  /* transform into positive values */
+
+  for (int i = 0; i < t->num_cols; i++) {
+    if (t->columns->inform[i] < 3) {
+      const char *colname = t->columns->names[i];
+      varvalue[i]=get_variable(colname);
+      //printf("--%s--%g--\n",colname,varvalue[i]);
+    }
+  }
+  knobvalue=get_variable(knob)+1;
+  set_variable(knob,&knobvalue);
+  //printf("--%s--%g--\n",knob,knobvalue);
+
+  if (row < 0) row = t->curr + 1 + row;
+  int curr = t->curr; t->curr = row - 1;
+  int cols = t->org_cols ; t->org_cols = 0;
+
+  for (int i = 0; i < t->num_cols; i++) {
+    if (t->columns->inform[i] < 3) {
+      const char *colname = t->columns->names[i];
+      t->d_cols[i][row-1]=get_variable(colname)-varvalue[i];
+      //printf("%d\n",row-1);
+    }
+  }
+  t->curr = curr;
+  t->org_cols = cols;
+  knobvalue-=1;
+  set_variable(knob,&knobvalue);
+}
+
+void
 exec_print(struct in_cmd* cmd)
   /* prints text from "print" command to current output unit */
 {
