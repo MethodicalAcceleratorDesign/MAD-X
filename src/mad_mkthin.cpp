@@ -2463,8 +2463,9 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
         if(verbose>1) cout << __FILE__<< " " << __FUNCTION__ << " line " << setw(4) << __LINE__ << " ThickSLice, nslices=" << nslices << " create thick slices _en, _bo, _ex sliced_elem->name=" << sliced_elem->name << '\n';
         en =               create_thick_slice(thick_elem,0); // entry slice
         if(nslices>2) bo = create_thick_slice(thick_elem,1); // body slices,   last parameter = 1     since there will be only one type of body
-        if(ThickSLice && IsQuad) ex=en; // for quad entry/exit are the same
-        else ex =          create_thick_slice(thick_elem,2); // exit slice
+        //if(ThickSLice && IsQuad) ex=en; // for quad entry/exit are the same
+        //else
+	 ex =          create_thick_slice(thick_elem,2); // exit slice
       }
     }
   } // done with create_thin or create_thick.  Next is positioning slices as node
