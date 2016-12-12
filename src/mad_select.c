@@ -11,7 +11,7 @@ get_select_ex_ranges(struct sequence* sequ, struct command_list* select, struct 
   struct command* cd;
   struct command_parameter_list* pl;
   char* name;
-  int full = 0, i, pos; // k, // not used 
+  int full = 0, i, pos; // k, // not used
   struct node* c_node;
   struct node* nodes[2];
   if (sequ == NULL) return 0;
@@ -62,6 +62,7 @@ pass_select(char* name, struct command* sc)
   struct element* el = find_element(strip(name), element_list);
   int pos, in = 0, any = 0;
   char *class, *pattern;
+
   pos = name_list_pos("class", nl);
   if (pos > -1 && nl->inform[pos])  /* parameter has been read */
   {

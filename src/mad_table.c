@@ -215,9 +215,8 @@ static void
 write_table(struct table* t, const char* filename)
   /* writes rows with columns listed in row and col */
 {
+  assert(t && filename);
   char l_name[NAME_L];
-  char t_pc[2*NAME_L];
-  char* pc = t_pc;
   struct int_array* col = t->col_out;
   struct int_array* row = t->row_out;
   int i, j, k, tmp, n;
@@ -284,6 +283,8 @@ write_table(struct table* t, const char* filename)
     for (i = 0; i < col->curr; i++)
     {
       strcpy(l_name, t->columns->names[col->i[i]]);
+//      printf("name: col %d->%d:%s\n",i, col->i[i], l_name);
+
       if (t->columns->inform[col->i[i]] == 1)
         fprintf(out_file, v_format("%NIs "), stoupper(l_name));
       else if (t->columns->inform[col->i[i]] == 2)
@@ -296,6 +297,8 @@ write_table(struct table* t, const char* filename)
     fprintf(out_file, "$ ");
     for (i = 0; i < col->curr; i++)
     {
+//      printf("type: col %d->%d:%d\n",i, col->i[i], t->columns->inform[col->i[i]]);
+
       if (t->columns->inform[col->i[i]] == 1)
         fprintf(out_file, v_format("%NIs "),"%d");
       else if (t->columns->inform[col->i[i]] == 2)
@@ -316,25 +319,26 @@ write_table(struct table* t, const char* filename)
         }
         for (i = 0; i < col->curr; i++)
         {
-/*          printf("row %d col %d datatype %d \n",j,i, t->columns->inform[col->i[i]] );*/
+//          printf("row %d col %d datatype %d \n",j,i, t->columns->inform[col->i[i]] );
           if (t->columns->inform[col->i[i]] == 1) {
             tmp = t->d_cols[col->i[i]][j];
             fprintf(out_file, v_format(" %I"), tmp);
           }
           else if (t->columns->inform[col->i[i]] == 2) {
             fprintf(out_file, v_format(" %F"), t->d_cols[col->i[i]][j]);
-            /*printf("%s[%2d,%2d]=%+8.5f    ",t->name,col->i[i],j,t->d_cols[col->i[i]][j]);*/
+//          printf("%s[%2d,%2d]=%+8.5f    ",t->name,col->i[i],j,t->d_cols[col->i[i]][j]);
           }
           else if (t->columns->inform[col->i[i]] == 3) {
-            pc[0] = c_dum->c[0] = '\"';
+            char *pc = c_dum->c;
+            pc[0]='"', k=1;
             if (t->s_cols[col->i[i]][j] != NULL) {
+//              printf("%s[%2d,%2d]=%s    ",t->name,col->i[i],j, t->s_cols[col->i[i]][j]);
               strcpy(&c_dum->c[1], t->s_cols[col->i[i]][j]);
               stoupper(c_dum->c);
               pc = strip(c_dum->c); /* remove :<occ_count> */
               k = strlen(pc);
             }
-            else k = 1;
-            pc[k++] = '\"'; pc[k] = '\0';
+            pc[k++] = '"'; pc[k] = '\0';
             fprintf(out_file, v_format(" %S "), pc);
           }
         }
@@ -406,7 +410,7 @@ read_his_table(struct in_cmd* cmd)
   int pos = name_list_pos("file", nl);
   int i, k, error = 0;
   char *cc, *filename, *type = NULL, *tmp, *name;
-  
+
   if(nl->inform[pos] && (filename = pl->parameters[pos]->string) != NULL)
   {
     if ((tab_file = fopen(filename, "r")) == NULL)
@@ -532,26 +536,28 @@ set_selected_rows(struct table* t, struct command_list* select, struct command_l
   c_range_end = get_node_count(current_sequ->range_end);
 
   get_select_t_ranges(select, deselect, t);
-  if (select != 0)
-  {
+  if (select != NULL) {
     for (j = 0; j < t->curr; j++)  t->row_out->i[j] = 0;
-    for (i = 0; i < select->curr; i++)
-    {
-      for (j = s_range->i[i]; j <= e_range->i[i]; j++)
-      {
-        if (t->row_out->i[j] == 0) t->row_out->i[j]
-                                     = pass_select(t->s_cols[0][j], select->commands[i]);
+    for (i = 0; i < select->curr; i++) {
+      for (j = s_range->i[i]; j <= e_range->i[i]; j++) {
+        if (t->row_out->i[j] == 0) {
+          if (!t->s_cols[0])
+            warning("Invalid column type (string expected)", t->name);
+          else
+            t->row_out->i[j] = pass_select(t->s_cols[0][j], select->commands[i]);
+        }
       }
     }
   }
-  if (deselect != NULL)
-  {
-    for (i = 0; i < deselect->curr; i++)
-    {
-      for (j = sd_range->i[i]; j <= ed_range->i[i]; j++)
-      {
-        if (t->row_out->i[j] == 1) t->row_out->i[j]
-                                     = 1 - pass_select(t->s_cols[0][j], deselect->commands[i]);
+  if (deselect != NULL) {
+    for (i = 0; i < deselect->curr; i++) {
+      for (j = sd_range->i[i]; j <= ed_range->i[i]; j++) {
+        if (t->row_out->i[j] == 1) {
+          if (!t->s_cols[0])
+            warning("Invalid column type (string expected)", t->name);
+          else
+            t->row_out->i[j] = 1 - pass_select(t->s_cols[0][j], deselect->commands[i]);
+        }
       }
     }
   }
@@ -1643,42 +1649,42 @@ read_my_table(struct in_cmd* cmd)
         {
          if (t->curr == t->max) grow_table(t);
          tmp = tcpa->p[i];
-        
-        /* 
+
+        /*
          printf("read_my_table %d <%s> <%s> \n", i, tcpa->p[i], tnl->names[i] );
         */
-         
+
          if (strcmp(tmp,"%s") == 0)
             {
              /* printf("reading format %s \n", tmp); */
              t->s_cols[i][t->curr] = stolower(tmpbuff(cc));
              /* printf("read %d %d = %s \n", i,t->curr, t->s_cols[i][t->curr]); */
-             
+
               /*printf("read_my_table coln [%d %d]=%s\n",i,t->curr,t->s_cols[i][t->curr]);*/
             }
            else if (strcmp(tmp,"%d") == 0 )
            {
              /* printf("reading format %s \n", tmp); */
-             sscanf(cc, tmp, &k); 
+             sscanf(cc, tmp, &k);
              /* printf("read %d %d = %d \n", i,t->curr, k); */
              t->d_cols[i][t->curr] = k;
            }
            else if (strcmp(tmp,"%hd") == 0 )
            {
               /* printf("reading format %s \n", tmp); */
-              sscanf(cc, tmp, &sk); 
+              sscanf(cc, tmp, &sk);
               /* printf("read %d %d = %d \n", i,t->curr, sk); */
               t->d_cols[i][t->curr] = sk;
            }
-           else 
+           else
            {
               /* printf("reading format %s \n", tmp); */
               sscanf(cc, tmp, &tmpd);
               /* printf("read %d %d = %f \n", i,t->curr, tmpd); */
               t->d_cols[i][t->curr] = tmpd;
-           }  
-           
-           
+           }
+
+
            if (i+1 < tnl->curr)
            {
              if ((cc =strtok(NULL, " \"\n")) == NULL)

@@ -354,31 +354,30 @@ void
 exec_dump(struct in_cmd* cmd)
   /* write a table out */
 {
-  struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
-  int pos = name_list_pos("table", nl);
-  char* name = NULL;
-  char *f, filename[FNAME_L];
+  struct name_list* nl = cmd->clone->par_names;
+  char *f, filename[FNAME_L], *name = NULL;
+  int pos;
 
   // get "table" command parameter
-  if (pos < 0 || nl->inform[pos] == 0 || (name = pl->parameters[pos]->string) == NULL) {
+  if ((pos = name_list_pos("table", nl) < 0) || nl->inform[pos] == 0 ||
+      (name = pl->parameters[pos]->string) == NULL) {
     warning("dump without table name:", "ignored");
     return;
   }
 
   // get "file" command parameter
-  pos = name_list_pos("file", nl);
-  if (nl->inform[pos] == 0)
+  ;
+  if ((pos = name_list_pos("file", nl)) < 0 || nl->inform[pos] == 0)
     strcpy(filename, "terminal"); // write to console
   else if ((f = pl->parameters[pos]->string) == NULL || *f == '\0')
     strcpy(filename, name); // write to file with same name as table
   else
     strcpy(filename,f);
 
-
   // get table from registered tables
   if ((pos = name_list_pos(name, table_register->names)) < 0) {
-    warning("table name not found:", "ignored");
+    warning("table not found:", "ignored");
     return;
   }
 
@@ -430,101 +429,150 @@ void
 exec_fill_table(struct in_cmd* cmd)
   /* adds variables to a table */
 {
-  struct table* t;
-  struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
-  int pos = name_list_pos("table", nl);
+  struct name_list* nl = cmd->clone->par_names;
   char* name = NULL;
-  int row;
-  if (nl->inform[pos] == 0) {
+  int pos, row;
+
+  if ((pos = name_list_pos("table", nl)) < 0 || nl->inform[pos] == 0 ||
+      (name = pl->parameters[pos]->string) == NULL) {
     warning("no table name:", "ignored");
     return;
   }
 
-  if ((name = pl->parameters[pos]->string) == NULL) {
-    warning("no table name: ", "ignored");
+  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+    warning("table not found:", "ignored");
+    return;
+  }
+
+  struct table* t = table_register->tables[pos];
+
+  if ((pos = name_list_pos("row", nl)) < 0)
+    row = t->curr+1;
+  else {
+    row = pl->parameters[pos]->double_value;
+    if (row < 1) row = t->curr+row+1;   // reflect negative index
+    if (row < 1 || row > t->curr+1) {   // bounds check
+      warning("row index out of bounds:", " ignored");
+      return;
+    }
+  }
+  int cols = t->org_cols, curr = t->curr;
+  t->org_cols = 0;    t->curr = row - 1;
+  add_vars_to_table(t);
+  t->org_cols = cols; t->curr = curr;
+
+//   printf("table fill: %s [%d/%d]\n", name, t->curr, t->max);
+
+  if (row == t->curr+1) // enlarge if needed
+    if (++t->curr == t->max) grow_table(t);
+}
+
+void
+exec_fillknob_table(struct in_cmd* cmd)
+  /* add knob to variables with weights from a table*/
+{
+  struct command_parameter_list* pl = cmd->clone->par;
+  struct name_list* nl = cmd->clone->par_names;
+  const char* name = NULL, *knob = NULL;
+  int pos, row;
+
+  if ((pos = name_list_pos("table", nl)) < 0 || nl->inform[pos] == 0 ||
+      (name = pl->parameters[pos]->string) == NULL) {
+    warning("no table name:", "ignored");
     return;
   }
 
   if ((pos = name_list_pos(name, table_register->names)) < 0) {
-    warning("table name not found:", "ignored");
+    warning("table not found:", "ignored");
     return;
   }
-  t = table_register->tables[pos];
 
-  pos = name_list_pos("row", nl);
-  row = pos >=0 ? pl->parameters[pos]->double_value : t->curr + 1;
+  struct table* t = table_register->tables[pos];
 
-  if (row==0 || row == t->curr + 1) { // add row to table and fill
-    int cols = t->org_cols ; t->org_cols = 0;
-    add_vars_to_table(t);
-    t->org_cols = cols;
+  if ((pos = name_list_pos("row", nl)) < 0)
+    row = t->curr+1;
+  else {
+    row = pl->parameters[pos]->double_value;
+    if (row < 1) row = t->curr+row+1;   // reflect negative index
+    if (row < 1 || row > t->curr+1) {   // bounds check
+      warning("row index out of bounds:", " ignored");
+      return;
+    }
+  }
+
+  pos = name_list_pos("knob", nl);
+  knob = pos >= 0 ? pl->parameters[pos]->string : NULL;
+
+  if (knob == NULL) {
+    warning("invalid knob, not found:", " ignored");
+    return;
+  }
+
+  double varvalue[t->num_cols];
+  for (int i = 0; i < t->num_cols; i++) {
+    if (t->columns->inform[i] < 3) {
+      varvalue[i] = get_variable(t->columns->names[i]);
+      //printf("--%s--%g--\n",t->columns->names[i],varvalue[i]);
+    }
+  }
+  //printf("--%s--%g--\n",knob,knobvalue);
+
+  double knobvalue = get_variable(knob)+1;
+  set_variable(knob, &knobvalue);
+
+  int cols = t->org_cols, curr = t->curr;
+  t->org_cols = 0;    t->curr = row - 1;
+  for (int i = 0; i < t->num_cols; i++) {
+    if (t->columns->inform[i] < 3) {
+      t->d_cols[i][row-1] = get_variable(t->columns->names[i]) - varvalue[i];
+      //printf("%d\n",row-1);
+    }
+  }
+  t->org_cols = cols; t->curr = curr;
+  knobvalue -= 1;
+  set_variable(knob, &knobvalue);
+
+  if (row == t->curr+1) // enlarge if needed
     if (++t->curr == t->max) grow_table(t);
-    return;
-  }
-
-  if (abs(row) > t->curr) { // bounds check
-    // note: cases row=0 and row=t->curr+1 already treated
-    warning("row index out of bounds:", " ignored");
-    return;
-  }
-
-  // 2014-Aug-18  17:05:33  ghislain: allow for negative row numbers;
-  // -1 indexes last row and negative numbers count row numbers backwards from end
-  // -2 denoting the one before last and so on
-  if (row < 0) row = t->curr + 1 + row;
-
-  { int cols = t->org_cols ; t->org_cols = 0;
-    int curr = t->curr; t->curr = row - 1;
-    add_vars_to_table(t);
-    t->curr = curr;
-    t->org_cols = cols;
-  }
 }
 
 void
 exec_setvars_table(struct in_cmd* cmd)
   /* set variables from a table */
 {
-  struct table* t;
-  struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
-  int pos = name_list_pos("table", nl);
-  char* name = NULL;
-  int row;
+  struct name_list* nl = cmd->clone->par_names;
+  const char* name = NULL;
+  int pos, row;
 
-  if (nl->inform[pos] == 0) {
+  if ((pos = name_list_pos("table", nl)) < 0 || nl->inform[pos] == 0 ||
+      (name = pl->parameters[pos]->string) == NULL) {
     warning("no table name:", "ignored");
     return;
   }
 
-  if ((name = pl->parameters[pos]->string) == NULL) {
-    warning("no table name: ", "ignored");
-    return;
-  }
-
-  current_node = NULL; /* to distinguish from other table fills */
-
   if ((pos = name_list_pos(name, table_register->names)) < 0) {
-    warning("table name not found:", "ignored");
-    return;
-  }
-  t = table_register->tables[pos];
-
-  pos=name_list_pos("row", nl);
-  row=(int) pl->parameters[pos]->double_value;
-
-  if (abs(row) > t->curr || row == 0){
-    warning("row index out of bounds:", " ignored");
+    warning("table not found:", "ignored");
     return;
   }
 
-  // 2014-Aug-18  17:05:33  ghislain: allow for negative row numbers;
-  // -1 indexes last row and negative numbers count row numbers backwards from end
-  // -2 denoting the one before last and so on
-  if (row < 0) row = t->curr + 1 + row;
+  struct table* t = table_register->tables[pos];
 
-  int curr = t->curr; t->curr = row - 1;
+  if ((pos = name_list_pos("row", nl)) < 0)
+    row = t->curr;
+  else {
+    row = (int) pl->parameters[pos]->double_value;
+    if (row < 1) row = t->curr+row+1;  // reflect negative index
+    if (row < 1 || row > t->curr) {    // bounds check
+      warning("row index out of bounds:", " ignored");
+      return;
+    }
+  }
+
+  current_node = NULL; /* to distinguish from other table fills, remanent! */
+  int curr = t->curr;
+  t->curr = row - 1;
   set_vars_from_table(t);
   t->curr = curr;
 }
@@ -534,39 +582,31 @@ void
 exec_setvars_lin_table(struct in_cmd* cmd)
   /* set variables from a table by linear interpolation between values in two rows */
 {
-  struct table* t;
-  struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
-  int pos = name_list_pos("table", nl);
-  char* name = NULL;
-  char* param = NULL;
+  struct name_list* nl = cmd->clone->par_names;
+  const char* name = NULL, *param = NULL;
   char expr[10*NAME_L];
-  int row1, row2;
+  int pos, row1, row2;
 
-  if (nl->inform[pos] == 0) {
+  if ((pos = name_list_pos("table", nl)) < 0 || nl->inform[pos] == 0 ||
+      (name = pl->parameters[pos]->string) == NULL) {
     warning("no table name:", "ignored");
     return;
   }
 
-  if ((name = pl->parameters[pos]->string) == NULL) {
-    warning("no table name: ", "ignored");
-    return;
-  }
-
-  current_node = NULL; /* to distinguish from other table fills */
-
   if ((pos = name_list_pos(name, table_register->names)) < 0) {
-    warning("table name not found:", "ignored");
+    warning("table not found:", "ignored");
     return;
   }
-  t = table_register->tables[pos];
 
-  pos=name_list_pos("row1", nl);
-  row1=(int) pl->parameters[pos]->double_value;
-  pos=name_list_pos("row2", nl);
-  row2=(int) pl->parameters[pos]->double_value;
-  pos = name_list_pos("param", nl);
-  param = pl->parameters[pos]->string;
+  struct table* t = table_register->tables[pos];
+
+  pos  = name_list_pos("row1", nl);
+  row1 = pos >= 0 ? (int) pl->parameters[pos]->double_value : t->curr;
+  pos  = name_list_pos("row2", nl);
+  row2 = pos >= 0 ? (int) pl->parameters[pos]->double_value : t->curr;
+  pos  = name_list_pos("param", nl);
+  param = pos >= 0 ? pl->parameters[pos]->string : "interp";
 
   if (abs(row1) > t->curr || row1 == 0){
     warning("row1 index out of bounds:", " ignored");
@@ -579,8 +619,10 @@ exec_setvars_lin_table(struct in_cmd* cmd)
 
   /* negative row numbers are counting backwards from last row */
   /* transform into positive values */
-  if (row1<0) row1=t->curr + 1 + row1;
-  if (row2<0) row2=t->curr + 1 + row2;
+  if (row1 < 0) row1 = t->curr+row1+1;
+  if (row2 < 0) row2 = t->curr+row2+1;
+
+  current_node = NULL; /* to distinguish from other table fills, remanent! */
 
   for (int i = 0; i < t->num_cols; i++) {
     if (t->columns->inform[i] < 3) {
@@ -601,153 +643,67 @@ exec_setvars_lin_table(struct in_cmd* cmd)
 }
 
 void
-exec_addknob_table(struct in_cmd* cmd)
+exec_setvars_knob_table(struct in_cmd* cmd)
   /* add knob to variables with weights from a table*/
 {
-  struct table* t;
-  struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
-  int pos = name_list_pos("table", nl);
-  char* name = NULL;
-  char* knob = NULL;
+  struct name_list* nl = cmd->clone->par_names;
+  const char* name = NULL, *knob = NULL;
   char expr[10000];
   char subexpr[100];
-  int row1;
-  struct variable* var;
+  int pos, row;
 
-  if (nl->inform[pos] == 0) {
+  if ((pos = name_list_pos("table", nl)) < 0 || nl->inform[pos] == 0 ||
+      (name = pl->parameters[pos]->string) == NULL) {
     warning("no table name:", "ignored");
     return;
   }
 
-  if ((name = pl->parameters[pos]->string) == NULL) {
-    warning("no table name: ", "ignored");
-    return;
-  }
-
-  current_node = NULL; /* to distinguish from other table fills */
-
   if ((pos = name_list_pos(name, table_register->names)) < 0) {
-    warning("table name not found:", "ignored");
-    return;
-  }
-  t = table_register->tables[pos];
-
-  pos=name_list_pos("row", nl);
-  row1=(int) pl->parameters[pos]->double_value;
-  pos = name_list_pos("knob", nl);
-  knob = pl->parameters[pos]->string;
-
-  if (abs(row1) > t->curr || row1 == 0){
-    warning("row1 index out of bounds:", " ignored");
+    warning("table not found:", "ignored");
     return;
   }
 
-  /* negative row numbers are counting backwards from last row */
-  /* transform into positive values */
-  if (row1<0) row1=t->curr + 1 + row1;
+  struct table* t = table_register->tables[pos];
 
-  for (int i = 0; i < t->num_cols; i++) {
-    if (t->columns->inform[i] < 3) {
-      const char *colname = t->columns->names[i];
-      double val = t->d_cols[i][row1-1];
-      sprintf(subexpr,"%+20.16g*%s",val, knob);
-      if ((var = find_variable(colname, variable_list))){
-          if (var->expr){
-             sprintf(expr, "%s := %s %s;",
-                          colname,   var->expr->string, subexpr);
-          } else {
-             sprintf(expr, "%s := %+20.16g %s;",
-                          colname,   var->value, subexpr);
-          }
-      } else {
-             sprintf(expr, "%s := %s;",
-                          colname,  subexpr);
-      }
-      pro_input(expr);
-    }
-  }
-}
+  pos  = name_list_pos("row", nl);
+  row  = pos >= 0 ? (int) pl->parameters[pos]->double_value : t->curr;
+  pos  = name_list_pos("knob", nl);
+  knob = pos >= 0 ? pl->parameters[pos]->string : NULL;
 
-void
-exec_fillknob_table(struct in_cmd* cmd)
-  /* add knob to variables with weights from a table*/
-{
-  struct table* t;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  int pos = name_list_pos("table", nl);
-  char* name = NULL;
-  char* knob = NULL;
-  double varvalue[10000];
-  double knobvalue;
-  int row;
-
-  if (nl->inform[pos] == 0) {
-    warning("no table name:", "ignored");
-    return;
-  }
-
-  if ((name = pl->parameters[pos]->string) == NULL) {
-    warning("no table name: ", "ignored");
-    return;
-  }
-
-  current_node = NULL; /* to distinguish from other table fills */
-
-  if ((pos = name_list_pos(name, table_register->names)) < 0) {
-    warning("table name not found:", "ignored");
-    return;
-  }
-  t = table_register->tables[pos];
-
-  pos=name_list_pos("row", nl);
-
-  row = pos >=0 ? pl->parameters[pos]->double_value : t->curr + 1;
-
-  if (row==0 || row == t->curr + 1) { // add row to table and fill
-    if (++t->curr == t->max) grow_table(t);
-    row=t->curr;
-  }
-
-  if (abs(row) > t->curr) { // bounds check
-    // note: cases row=0 and row=t->curr+1 already treated
+  if (abs(row) > t->curr || row == 0) {
     warning("row index out of bounds:", " ignored");
     return;
   }
 
-  pos = name_list_pos("knob", nl);
-  knob = pl->parameters[pos]->string;
+  if (knob == NULL) {
+    warning("invalid knob, not found:", " ignored");
+    return;
+  }
 
   /* negative row numbers are counting backwards from last row */
   /* transform into positive values */
-
-  for (int i = 0; i < t->num_cols; i++) {
-    if (t->columns->inform[i] < 3) {
-      const char *colname = t->columns->names[i];
-      varvalue[i]=get_variable(colname);
-      //printf("--%s--%g--\n",colname,varvalue[i]);
-    }
-  }
-  knobvalue=get_variable(knob)+1;
-  set_variable(knob,&knobvalue);
-  //printf("--%s--%g--\n",knob,knobvalue);
-
   if (row < 0) row = t->curr + 1 + row;
-  int curr = t->curr; t->curr = row - 1;
-  int cols = t->org_cols ; t->org_cols = 0;
 
+  current_node = NULL; /* to distinguish from other table fills, remament! */
+
+  struct variable* var = NULL;
   for (int i = 0; i < t->num_cols; i++) {
     if (t->columns->inform[i] < 3) {
       const char *colname = t->columns->names[i];
-      t->d_cols[i][row-1]=get_variable(colname)-varvalue[i];
-      //printf("%d\n",row-1);
+      double val = t->d_cols[i][row-1];
+      sprintf(subexpr,"%+20.16g*%s", val, knob);
+      if ((var = find_variable(colname, variable_list))) {
+        if (var->expr)
+          sprintf(expr, "%s := %s %s;", colname, var->expr->string, subexpr);
+        else
+          sprintf(expr, "%s := %+20.16g %s;", colname, var->value, subexpr);
+      } else
+          sprintf(expr, "%s := %s;", colname, subexpr);
+
+      pro_input(expr);
     }
   }
-  t->curr = curr;
-  t->org_cols = cols;
-  knobvalue-=1;
-  set_variable(knob,&knobvalue);
 }
 
 void

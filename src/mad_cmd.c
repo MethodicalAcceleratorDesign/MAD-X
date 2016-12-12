@@ -81,7 +81,7 @@ control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "shrink")      == 0) exec_shrink_table(cmd);
   else if (strcmp(toks[k], "setvars")     == 0) exec_setvars_table(cmd);
   else if (strcmp(toks[k], "setvars_lin") == 0) exec_setvars_lin_table(cmd);
-  else if (strcmp(toks[k], "addknob")     == 0) exec_addknob_table(cmd);
+  else if (strcmp(toks[k], "setvars_knob")== 0) exec_setvars_knob_table(cmd);
   else if (strcmp(toks[k], "fillknob")    == 0) exec_fillknob_table(cmd);
   else if (strcmp(toks[k], "help")        == 0) ;
   else if (strcmp(toks[k], "option")      == 0) exec_option();
@@ -138,8 +138,8 @@ exec_command(void)
     toks = p->tok_list->p;
     cmd_name = p->cmd_def->name;
 
-    if (strcmp(cmd_name, "stop") == 0 || 
-        strcmp(cmd_name, "quit") == 0 || 
+    if (strcmp(cmd_name, "stop") == 0 ||
+        strcmp(cmd_name, "quit") == 0 ||
         strcmp(cmd_name, "exit") == 0) {
         madx_finish(); stop_flag = 1; return;
     }
@@ -147,13 +147,13 @@ exec_command(void)
     else if (strcmp(cmd_name, "help") == 0)    exec_help(p);
     else if (strcmp(cmd_name, "show") == 0)    exec_show(p);
     else if (strcmp(cmd_name, "return") == 0)  return_flag = 1;
-    else if (strcmp(cmd_name, "value") == 0)   print_value(p);   
+    else if (strcmp(cmd_name, "value") == 0)   print_value(p);
     else if (strcmp(cmd_name, "system") == 0)  {
       char *pp = noquote(toks[p->decl_start]);
       if (get_option("echosystem")) printf("=== echoing system(\"%s\")\n", pp);
       if (system(pp) == -1)
         warning("system failed to run the command: ", pp);
-    } 
+    }
     else if (strcmp(cmd_name, "title") == 0)   title = permbuff(noquote(toks[p->decl_start]));
     else if (strcmp(cmd_name, "resplot") == 0) {
       plot_options = delete_command(plot_options);
@@ -209,7 +209,7 @@ exec_command(void)
           curr_obs_points = 1;  /* default: always observe at machine end */
         }
       }
-      else if (strcmp(p->cmd_def->module, "ptc_export_xml") == 0) pro_ptc_export_xml(p); 
+      else if (strcmp(p->cmd_def->module, "ptc_export_xml") == 0) pro_ptc_export_xml(p);
       else if (strcmp(p->cmd_def->module, "ptc_create_layout") == 0) {
         if (match_is_on == kMatch_PTCknobs) madx_mpk_setcreatelayout(p);
         else {
@@ -222,7 +222,7 @@ exec_command(void)
       }
       else if (strcmp(p->cmd_def->module, "ptc_move_to_layout") == 0) w_ptc_move_to_layout_();
       else if (strcmp(p->cmd_def->module, "ptc_read_errors") == 0)    pro_ptc_read_errors();
-      else if (strcmp(p->cmd_def->module, "ptc_refresh_k") == 0)      pro_ptc_refresh_k();      
+      else if (strcmp(p->cmd_def->module, "ptc_refresh_k") == 0)      pro_ptc_refresh_k();
       else if (strcmp(p->cmd_def->module, "ptc_align") == 0)          w_ptc_align_();
       else if (strcmp(p->cmd_def->module, "ptc_twiss") == 0) {
         if (match_is_on == kMatch_PTCknobs) madx_mpk_setcalc(p);
@@ -389,7 +389,7 @@ get_stmt(FILE* file, int supp_flag)
     {
       c_cc = c_cc < c_ex ? c_cc : c_ex; *c_cc = '\0';
     }
-    else if(c_cc != NULL 
+    else if(c_cc != NULL
       &&(c_st == NULL || c_cc < c_st))
     {
       if (c_cc == &ca->c[ca->curr]) goto next;
@@ -432,7 +432,7 @@ get_stmt(FILE* file, int supp_flag)
   return 1;
 }
 
-int 
+int
 decode_command(void)  /* compares command with templates, fills this_cmd
                          return: 0 command from list (except below);
                          1 element definition (as well inside sequence);
@@ -591,18 +591,18 @@ struct command_list_list*
 delete_command_list_list( struct command_list_list* ll)
 {
   const char *rout_name = "delete_command_list_list";
-  
+
   int i;
-  
+
   if (ll == 0x0) return 0x0;
-  
+
   for (i = 0; i < ll->curr; i++)
   {
     delete_command_list(ll->command_lists[i]);
   }
 
   myfree(rout_name, ll->command_lists );
-  
+
   delete_name_list(ll->list);
 
   myfree(rout_name, ll );
