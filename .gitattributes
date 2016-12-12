@@ -1076,10 +1076,6 @@ tests/share/ring_lattice/fv9_rbend.opt -text
 tests/share/ring_lattice/ring.seq -text
 tests/share/ring_lattice_alt/fv9.opt -text
 tests/share/ring_lattice_alt/fv9.seq -text
-tests/test-addknob/input/test.tfs -text
-tests/test-addknob/test-addknob.cfg -text
-tests/test-addknob/test-addknob.madx -text
-tests/test-addknob/test-addknob.ref -text
 tests/test-aperture-2/ptc-twiss-table.cfg -text
 tests/test-aperture-2/ptc-twiss-table.ref -text
 tests/test-aperture-2/test-aperture-2.cfg -text
@@ -1314,7 +1310,7 @@ tests/test-error/test-error.madx -text
 tests/test-error/test-error.ref -text
 tests/test-fillknob/test-fillknob.cfg -text
 tests/test-fillknob/test-fillknob.madx -text
-tests/test-fillknob/test-fillknob.ref -text
+tests/test-fillknob/test-fillknob.ref -text svneol=unset#application/x-gzip
 tests/test-hllhc/fc.16.ref -text
 tests/test-hllhc/fc.2.ref -text
 tests/test-hllhc/fc.3.aux.ref -text
@@ -1987,6 +1983,10 @@ tests/test-sequence/test-sequence.madx -text
 tests/test-sequence/test-sequence.ref -text
 tests/test-sequence/test-sequence.tfs.cfg -text
 tests/test-sequence/test-sequence.tfs.ref -text
+tests/test-setknob/input/test.tfs -text
+tests/test-setknob/test-setknob.cfg -text
+tests/test-setknob/test-setknob.madx -text
+tests/test-setknob/test-setknob.ref -text
 tests/test-survey-2/test-survey-2.cfg -text
 tests/test-survey-2/test-survey-2.madx -text
 tests/test-survey-2/test-survey-2.ref -text

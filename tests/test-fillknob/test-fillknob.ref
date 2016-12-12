@@ -1,18 +1,18 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.12  (64 bit, Linux)       +
+  +     MAD-X 5.02.12  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2016.10.15               +
-  + Execution date: 2016.12.09 10:24:35      +
+  + Execution date: 2016.12.12 11:58:41      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option, -echo;
 
 @ NAME             %03s "TTT"
 @ TYPE             %04s "USER"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.02.12 Linux 64"
-@ DATE             %08s "09/12/16"
-@ TIME             %08s "10.24.35"
+@ ORIGIN           %17s "5.02.12 Darwin 64"
+@ DATE             %08s "12/12/16"
+@ TIME             %08s "11.58.41"
 *                  A                  B 
 $                %le                %le 
                   1                 -2

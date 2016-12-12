@@ -7,11 +7,11 @@ b:=-43*tt ;
 
 show, a,b,c;
 
-addknob, table=test, knob=k1;
+setvars_knob, table=test, knob=k1;
 show, a,b,c;
 
-addknob, table=test, knob=k2,row=1;
+setvars_knob, table=test, knob=k2,row=1;
 show, a,b,c;
 
-addknob, table=test, knob=k3,row=2;
+setvars_knob, table=test, knob=k3,row=2;
 show, a,b,c;
