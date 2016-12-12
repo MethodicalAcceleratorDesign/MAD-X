@@ -201,11 +201,13 @@ The generated thin lens sequence has the following properties:
   original ones. 
 \item Any element transformed into a single thin lens element has the
   same name as the original. 
-\item If an element is sliced into more than one slice, the individual
+\item If an element is sliced into more than one \textbf{thin} slices, the individual
   slices have the same basename as the original element plus a suffix 
-  \texttt{..1}, \texttt{..2}, etc. and a marker, with the name of the
-  original element, is placed at the location of the center of the
+  \texttt{..1}, \texttt{..2}, etc. and a marker with the name of the
+  original element is placed at the location of the center of the
   original element. 
+\item If an element is sliced into more than one \textbf{thick} slices, the individual
+  slices have the same basename as the original element plus a suffix \texttt{\_EN} the first one, a suffix \texttt{\_EX} the last one, and a suffix \texttt{\_BO} the ones in between.
 \end{itemize}
 
 
