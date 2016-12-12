@@ -469,7 +469,7 @@ exec_fill_table(struct in_cmd* cmd)
 }
 
 void
-exec_fillknob_table(struct in_cmd* cmd)
+exec_fill_knob_table(struct in_cmd* cmd)
   /* add knob to variables with weights from a table*/
 {
   struct command_parameter_list* pl = cmd->clone->par;

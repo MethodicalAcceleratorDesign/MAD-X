@@ -2873,7 +2873,7 @@ char command_def[] =
 "knob = [s, none], "
 "row = [i, -1]; "
 " "
-"fillknob: control none 0 0 "
+"fill_knob: control none 0 0 "
 "table = [s, none], "
 "knob = [s, none], "
 "row = [i, 0]; "
