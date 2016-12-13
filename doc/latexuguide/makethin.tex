@@ -10,6 +10,8 @@ with similar functionality but composed of
 thin (zero length) element slices or simplified thick slices as required
 by \madx tracking or conversion to \texttt{SIXTRACK} input format.
 
+DISCLAIMER: Several \madx commands such as {\texttt{ELIGN}}, {\texttt{EFCOMP}} won't directly work on sequences produced by {\texttt{MKTHIN}}. In order to use such commands on a thin sequence, it is advisable to save the sequence on a file, and then re-load it.
+
 \section{MAKETHIN}
 \label{sec:makethin}
 
