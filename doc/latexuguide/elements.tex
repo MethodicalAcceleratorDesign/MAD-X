@@ -527,14 +527,13 @@ the reference orbit as a dipole with zero length, total deflection
 \texttt{angle} defined by: %and \texttt{tilt} defined by:
 \begin{equation}
   \begin{aligned}
-    \mathtt{angle} &=  \mathtt{KNL}(0) \\
-% \mathtt{angle} &=  \sqrt{ \mathtt{KNL}(0)^2 + \mathtt{KSL}(0)^2 }\\
-% \mathtt{tilt}     &= \arctan (\mathtt{KSL}(0) / \mathtt{KNL}(0))  
+%    \mathtt{angle} &=  \mathtt{KNL}(0) \\
+ \mathtt{angle} &=  \sqrt{ \mathtt{KNL}(0)^2 + \mathtt{KSL}(0)^2 }\\
+ \mathtt{tilt}     &= \mathtt{TILT} - \arctan (\mathtt{KSL}(0) / \mathtt{KNL}(0))  
   \end{aligned}
 \end{equation}
-Note that the global \texttt{TILT} attribute of the \texttt{MULTIPOLE}
-is then added to the intrinsic \texttt{tilt} calculated from
-\texttt{KNL} and \texttt{KSL}. 
+Note that the \texttt{TILT} attribute of the \texttt{MULTIPOLE}
+is added to the intrinsic tilt calculated from \texttt{KNL} and \texttt{KSL}. 
 
 %In order to know the current maximum order of a given multipole, use the
 %command \texttt{HELP, MULTIPOLE;} and count.

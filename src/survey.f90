@@ -59,7 +59,7 @@ subroutine survey
      node_count = 0
 
 10   continue
-     !---- loop over elements  
+     !---- loop over elements
      node_count = node_count + 1
      if (passes .gt. 0)  then
         call get_node_vector('add_angle ',n_add_angle,add_angle)
@@ -113,7 +113,7 @@ subroutine survey
   endif
   if (set_cont_sequence() .ne. 0)  goto 5
 
-  !---- Centre of machine.
+  !---- Centre of machine. ! 2016.12.14 ldeniau: vars below are never used.
   TX = V - V0
   dtheta = theta - proxim(theta0, theta)
   dphi = phi - proxim(phi0, phi)
@@ -159,7 +159,7 @@ subroutine sumtrx(theta, phi, psi, w)
   !   W(3,3)    (real)    Rotation matrix.                               *
   !----------------------------------------------------------------------*
   double precision, intent(IN) :: theta, phi, psi
-  double precision, intent(OUT) :: w(3,3) 
+  double precision, intent(OUT) :: w(3,3)
 
   double precision :: cosphi, cospsi, costhe, sinphi, sinpsi, sinthe
 
@@ -215,14 +215,14 @@ subroutine suelem(el, ve, we, tilt)
   angle = zero
   dx = zero
   ds = zero
-  
+
   VE(1:2) = zero ; ve(3) = el
   WE = EYE(:3,:3)
 
   code = node_value('mad8_type ')
 
   select case (code)
- 
+
      case (code_rbend, code_sbend, code_gbend) !---- RBEND, SBEND, GBEND
         angle = node_value('angle ')*node_value('other_bv ')
        if (abs(angle) .ge. 1d-13) then
@@ -249,9 +249,9 @@ subroutine suelem(el, ve, we, tilt)
         we(1,3) = - we(3,1)
         we(2,3) = - we(3,2)
         we(3,3) = costhe
-        
 
-     case (code_multipole) !---- MULTIPOLE (thin, no length) 
+
+     case (code_multipole) !---- MULTIPOLE (thin, no length)
         ! introduced  17.09.02 / AV, extended LD 2014.10.15
         !---- waste of CPU cycles removed
         normal(0) = zero ; call get_node_vector('knl ', nn, normal)
@@ -263,7 +263,7 @@ subroutine suelem(el, ve, we, tilt)
 
         if (abs(angle) .gt. 1d-13) then
            tilt = node_value('tilt ') - atan2(skew(0),normal(0))
-        endif        
+        endif
 
         cospsi = cos(tilt);  sinpsi = sin(tilt)
         costhe = cos(angle); sinthe = sin(angle)
@@ -305,14 +305,14 @@ subroutine suelem(el, ve, we, tilt)
         we(2,3) = zero
         we(3,3) = cos(dx)
 
-     
+
      case default ! all straight elements and catch all; use default VE and WE
         !---- get tilt attribute
         !---- checked to work also for elements without this attribute (FT 17.2.05)
         tilt =  node_value('tilt ')
 
      end select
-     
+
 end subroutine suelem
 
 subroutine sufill(suml, v, theta, phi, psi, globaltilt)
@@ -338,7 +338,7 @@ subroutine sufill(suml, v, theta, phi, psi, globaltilt)
 
   el = node_value('l ')
   call string_to_table_curr('survey ', 'name ', 'name ')
-  call string_to_table_curr('survey ', 'keyword ', 'base_name ')  
+  call string_to_table_curr('survey ', 'keyword ', 'base_name ')
   call double_to_table_curr('survey ', 's ',suml )
   call double_to_table_curr('survey ', 'l ',el )
   call double_to_table_curr('survey ', 'x ',v(1) )
@@ -366,7 +366,7 @@ subroutine sufill(suml, v, theta, phi, psi, globaltilt)
 
   code = node_value('mad8_type ')
 
-  ang = zero  
+  ang = zero
   if (code .eq. code_rbend .or. code .eq. code_sbend) then ! RBEND or SBEND
      ang = node_value('angle ') * node_value('other_bv ')
   else if (code .eq. code_multipole) then ! multipoles (LD 2014.10.15)
