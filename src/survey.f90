@@ -205,7 +205,7 @@ subroutine suelem(el, ve, we, tilt)
   double precision, intent(OUT) :: ve(3), we(3,3), tilt
 
   integer :: code, nn, ns
-  double precision :: angle, cospsi, costhe, sinpsi, sinthe,  ds, dx
+  double precision :: angle, cospsi, costhe, sinpsi, sinthe,  ds, dx, bv
   double precision :: normal(0:maxmul), skew(0:maxmul)
 
   double precision, external :: node_value
@@ -220,13 +220,14 @@ subroutine suelem(el, ve, we, tilt)
   WE = EYE(:3,:3)
 
   code = node_value('mad8_type ')
+  bv   = node_value('other_bv ')
 
   select case (code)
 
      case (code_rbend, code_sbend, code_gbend) !---- RBEND, SBEND, GBEND
-        angle = node_value('angle ')*node_value('other_bv ')
-       if (abs(angle) .ge. 1d-13) then
-           tilt =  node_value('tilt ')
+        angle = node_value('angle ') * bv
+        if (abs(angle) .ge. 1d-13) then
+           tilt =  node_value('tilt ') * bv
            dx = el * (cos(angle)-one)/angle
            ds = el * sin(angle)/angle
         else
@@ -258,11 +259,11 @@ subroutine suelem(el, ve, we, tilt)
         skew(0) = zero   ; call get_node_vector('ksl ', ns, skew)
         ! ks0l processing added (LD 15.10.2014)
         if (nn.ne.0 .or. ns.ne.0) then
-           angle = sqrt(normal(0)**2 + skew(0)**2) * node_value('other_bv ')
+           angle = sqrt(normal(0)**2 + skew(0)**2) * bv
         endif
 
         if (abs(angle) .gt. 1d-13) then
-           tilt = node_value('tilt ') - atan2(skew(0),normal(0))
+           tilt = (node_value('tilt ') - atan2(skew(0),normal(0))) * bv
         endif
 
         cospsi = cos(tilt);  sinpsi = sin(tilt)
@@ -282,7 +283,7 @@ subroutine suelem(el, ve, we, tilt)
 
 
      case (code_srotation) !---- Rotation around S-axis. SPECIAL CASE
-        tilt = node_value('angle ')
+        tilt = node_value('angle ') * bv
         we(1,1) =  cos(tilt)
         we(2,1) =  sin(tilt)
         we(3,1) = zero
@@ -294,7 +295,7 @@ subroutine suelem(el, ve, we, tilt)
         we(3,3) = one
 
      case (code_yrotation) !---- Rotation around Y-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!
-        dx = node_value('angle ')
+        dx = node_value('angle ') * bv
         we(1,1) = cos(dx)
         we(2,1) = zero
         we(3,1) = sin(dx)
@@ -309,7 +310,7 @@ subroutine suelem(el, ve, we, tilt)
      case default ! all straight elements and catch all; use default VE and WE
         !---- get tilt attribute
         !---- checked to work also for elements without this attribute (FT 17.2.05)
-        tilt =  node_value('tilt ')
+        tilt =  node_value('tilt ') * bv
 
      end select
 
