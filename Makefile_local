@@ -92,8 +92,9 @@ else ifeq ($(islxplus),yes)
 	$_ rm -rf $(VERSION) && \
 	mkdir $(VERSION) $(VERSION)/reports && \
 	cp -L $(FILES) $(VERSION) && \
-	scp -r mad@macserv15865:madX/$(VERSION) mad@lxplus.cern.ch:madx/releases && \
-	scp -r $(VERSION) mad@lxplus.cern.ch:madx/releases
+	scp -r -o PubkeyAuthentication=no \
+	    mad@macserv15865:madX/$(VERSION) mad@lxplus.cern.ch:madx/releases && \
+	scp -r -o PubkeyAuthentication=no $(VERSION) mad@lxplus.cern.ch:madx/releases
 endif
 
 #
@@ -104,7 +105,8 @@ endif
 
 madx-reports:
 	$E "*** Recording reports"
-	$_ scp tests/reports/`date "+%Y-%m-%d"`_build-test-*.out \
+	$_ scp -o PubkeyAuthentication=no \
+	       tests/reports/`date "+%Y-%m-%d"`_build-test-*.out \
 	       mad@lxplus.cern.ch:madx/releases/$(VERSION)/reports
 
 
@@ -139,7 +141,8 @@ madx-activate:
 
 libptc-install:
 	$E "*** Installing libptc"
-	$_ scp libptc-* mad@lxplus.cern.ch:madx/releases/$(VERSION)
+	$_ scp -o PubkeyAuthentication=no \
+	       libptc-* mad@lxplus.cern.ch:madx/releases/$(VERSION)
 
 #
 # numdiff installation (Linux only)
@@ -149,7 +152,8 @@ libptc-install:
 
 numdiff-install:
 	$E "*** Installing numdiff"
-	$_ scp numdiff-* mad@lxplus.cern.ch:madx/releases/$(VERSION)
+	$_ scp -o PubkeyAuthentication=no \
+	       numdiff-* mad@lxplus.cern.ch:madx/releases/$(VERSION)
 
 #
 # count number of builds
