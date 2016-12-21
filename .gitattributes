@@ -1062,6 +1062,7 @@ tests/share/SPS/sps2010.seq -text
 tests/share/TransferLines/TI2/TI2.seq -text
 tests/share/TransferLines/TI2/TI2.str -text
 tests/share/TransferLines/TI8/TI8.seq -text
+tests/share/TransferLines/TI8/TI8.seq.old -text
 tests/share/fivecell/fivecell.seq -text
 tests/share/line_lattice/README -text
 tests/share/line_lattice/ebsy.madx -text
