@@ -35,6 +35,7 @@ mtjacprint(int m, int n,double* jac,struct in_cmd* cmd)
   char *knobfilename, *jacfilename;
   FILE *knobfile=NULL, *jacfile=NULL;
   k=0;
+  l=0;
   jacfilename=command_par_string("jacfile",cmd->clone);
   knobfilename=command_par_string("knobfile",cmd->clone);
   if (jacfilename) jacfile=fopen(jacfilename,"w");
@@ -186,7 +187,7 @@ match_action(struct in_cmd* cmd)
 
   local_call_lim = command_par_value("calls", cmd->clone);
   local_calls = 0;
-	
+
   if (strcmp(cmd->tok_list->p[0], "lmdif") == 0 && total_vars > total_const)
   {
     print_match_summary = 0;
@@ -217,7 +218,7 @@ match_action(struct in_cmd* cmd)
   else if (strcmp(cmd->tok_list->p[0], "jacobian") == 0)
   {
     print_match_summary = 0;
-	
+
     jac_strategy = command_par_value("strategy", cmd->clone);
     jac_cool = command_par_value("cool", cmd->clone);
     jac_repeat = command_par_value("repeat", cmd->clone);
@@ -397,7 +398,7 @@ match_end(struct in_cmd* cmd)
     return;
   }
 
-  
+
   if (match_is_on==kMatch_UseMacro) {
     match2_end(cmd);
     return;
@@ -602,7 +603,7 @@ match_match(struct in_cmd* cmd)
   match_is_on = 1;
   pos = name_list_pos("sequence", nl);
   fprintf(prt_file, "START MATCHING\n\n");
-  
+
   if((pos>=0)?nl->inform[pos]:0) /* sequence specified */
   {
     cp = cmd->clone->par->parameters[pos];
@@ -671,7 +672,7 @@ match_match(struct in_cmd* cmd)
           = clone_command(find_command("twiss", defined_commands));
         tnl = local_twiss[i]->cmd_def->par_names;
         tpos = name_list_pos("sequence", tnl);
-        
+
         local_twiss[i]->cmd_def->par->parameters[tpos]->string = match_seqs[i];
         local_twiss[i]->cmd_def->par_names->inform[tpos] = 1;
         if (slow)
@@ -724,7 +725,7 @@ match_match(struct in_cmd* cmd)
       tpos = name_list_pos("sequence", tnl);
       if (slow) spos = name_list_pos("save", tnl);
       else      spos = -1;
-      if (j != tpos  && j != spos) 
+      if (j != tpos  && j != spos)
       local_twiss[i]->cmd_def->par_names->inform[j] = 0;
     }
   }
@@ -832,10 +833,10 @@ match_match(struct in_cmd* cmd)
      chrom_flg = cmd->clone->par->parameters[pos]->double_value;
    }
   else
-   { 
+   {
      chrom_flg = 0;
    }
-      
+
   if(chrom_flg) /* chrom specified */
   {
     for (i = 0; i < match_num_seqs; i++)
