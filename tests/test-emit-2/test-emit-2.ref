@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  +     MAD-X 5.02.13  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.09.21 16:07:45      +
+  + Release   date: 2016.12.20               +
+  + Execution date: 2017.01.10 15:11:54      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Beam, SEQUENCE=Machine, PARTICLE=electron, energy=3, RADIATE=True;
 
@@ -122,7 +122,7 @@ enter EMIT module
  Damping partition numbers                         1.49532943          0.99999809          1.50467012
  Damping constants [1/s]                           0.28262937E+03      0.18900774E+03      0.28439484E+03
  Damping times [s]                                 0.35382027E-02      0.52907887E-02      0.35162382E-02
- Emittances [pi micro m]                       0.11259323E-02      0.10314885E-29      0.95690425E+00
+ Emittances [pi micro m]                       0.11259323E-02      0.10314885E-29      0.95690426E+00
 
  EMIT: beam parameters have been updated.
 
@@ -143,13 +143,13 @@ parameter: pc   double value:        2.999999956
 parameter: gamma   double value:        5870.853803
 parameter: beta   double value:       0.9999999855
 parameter: brho   double value:        10.00692271
-parameter: ex   double value:    1.125932316e-09
-parameter: exn   double value:    6.610183922e-06
-parameter: ey   double value:    1.031488532e-36
-parameter: eyn   double value:    6.055718286e-33
-parameter: et   double value:    9.569042528e-07
-parameter: sigt   double value:     0.000857839738
-parameter: sige   double value:     0.001115467834
+parameter: ex   double value:    1.125932322e-09
+parameter: exn   double value:    6.610183957e-06
+parameter: ey   double value:    1.031488538e-36
+parameter: eyn   double value:    6.055718318e-33
+parameter: et   double value:    9.569042579e-07
+parameter: sigt   double value:    0.0008578397402
+parameter: sige   double value:     0.001115467837
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0
@@ -314,13 +314,13 @@ parameter: pc   double value:        2.999999956
 parameter: gamma   double value:        5870.853803
 parameter: beta   double value:       0.9999999855
 parameter: brho   double value:        10.00692271
-parameter: ex   double value:    4.484531075e-09
-parameter: exn   double value:    2.632802594e-05
-parameter: ey   double value:    8.468424252e-38
-parameter: eyn   double value:    4.971688001e-34
-parameter: et   double value:    8.450986385e-07
-parameter: sigt   double value:    0.0008061722617
-parameter: sige   double value:     0.001048278095
+parameter: ex   double value:    4.484531099e-09
+parameter: exn   double value:    2.632802608e-05
+parameter: ey   double value:    8.468424296e-38
+parameter: eyn   double value:    4.971688027e-34
+parameter: et   double value:     8.45098643e-07
+parameter: sigt   double value:    0.0008061722638
+parameter: sige   double value:     0.001048278098
 parameter: kbunch   double value:                  1
 parameter: npart   double value:                  0
 parameter: bcurrent   double value:                  0

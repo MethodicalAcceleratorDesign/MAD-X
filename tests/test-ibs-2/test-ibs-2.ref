@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  +     MAD-X 5.02.13  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.09.21 16:07:46      +
+  + Release   date: 2016.12.20               +
+  + Execution date: 2017.01.10 15:13:03      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !! **************************************************************************************
 
@@ -145,8 +145,8 @@ muy=table(summ,q2);
 
 show, mux, muy;
 
-mux =        0.294117647 ;
-muy =       0.1764705882 ;
+mux                 =        0.294117647 ;
+muy                 =       0.1764705882 ;
 
 
 twiss,centre;
@@ -216,7 +216,7 @@ sequence name: tme
      Bunch length        =       0.009000 m
 
      Particles per bunch =   4.500000E+11
-     Bunch current       =   4.067091E+00 A
+     Bunch current       =   4.067092E+00 A
 
  Ring average values (m) 
 

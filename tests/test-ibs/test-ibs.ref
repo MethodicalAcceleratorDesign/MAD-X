@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.12  (64 bit, Darwin)      +
+  +     MAD-X 5.02.13  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.10.15               +
-  + Execution date: 2016.11.30 11:27:30      +
+  + Release   date: 2016.12.20               +
+  + Execution date: 2017.01.10 15:13:58      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !! **************************************************************************************
 
@@ -105,8 +105,8 @@ Qy=table(summ,q2);
 
 show, Qx, Qy;
 
-qx =        16.38588229 ;
-qy =        12.26536813 ;
+qx                  =        16.38588229 ;
+qy                  =        12.26536813 ;
 
 
 emit;
@@ -146,7 +146,7 @@ enter EMIT module
  Damping partition numbers                         0.99327480          0.99982370          2.00619710
  Damping constants [1/s]                           0.36781978E+03      0.37024490E+03      0.74291523E+03
  Damping times [s]                                 0.27187227E-02      0.27009150E-02      0.13460486E-02
- Emittances [pi micro m]                       0.96264795E-02      0.49416035E-31      0.48338891E+01
+ Emittances [pi micro m]                       0.96264796E-02      0.49416036E-31      0.48338891E+01
 
  EMIT: beam parameters have been updated.
 
@@ -197,7 +197,7 @@ orbit:   2.224308E-06  3.094511E-07  0.000000E+00  0.000000E+00  1.311766E-02  1
                  0 
 ibs,file=ibs-table.tfs;
 
- sige    1.0510050939366591E-003
+ sige    1.0510050967036783E-003
  Twiss was calculated at the center of the elements. No interpolation is used
 
  Global parameters for the machine: 
