@@ -959,8 +959,8 @@ An \texttt{RFMULTIPOLE} requires the particle
 performed.  
 
 Contrary to the regular multipole, where the dipole
-component has no effect on the reference orbit, an RF-Multipole that
-includes a dipole component bends also the reference orbit.      
+component has an effect on the reference orbit, an RF-Multipole that
+includes a dipole component does not bend the reference orbit.      
  
 \begin{madlist}
    \ttitem{VOLT} The peak voltage of the RF accelerating mode (DEFAULT: 0 MV).
@@ -974,9 +974,7 @@ includes a dipole component bends also the reference orbit.
    \ttitem{HARMON} The harmonic number h (no DEFAULT). Only if the
      frequency is not given. 
    \ttitem{LRAD} A fictitious length, which was originally just used to
-     compute synchrotron radiation effects. A non-zero \texttt{LRAD} in
-     conjunction with \hyperref[sec:option]{\texttt{OPTION, thin\_foc =
-     true;}} takes into account the weak focussing of bending magnets.  
+     compute synchrotron radiation effects.  
    \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
      rad). A positive angle represents a clockwise rotation of the
      multipole element.            
