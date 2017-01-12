@@ -3959,7 +3959,7 @@ subroutine ttrfmult(track, ktrack, turn)
   double precision :: field_cos(2,0:maxmul)
   double precision :: field_sin(2,0:maxmul)
   double precision :: pnl(0:maxmul), psl(0:maxmul)
-  double precision :: pc, krf, rfac
+  double precision :: pc, krf, rfac, curv
   double precision :: x, y, z, px, py, pt, dpx, dpy, dpt
   double precision :: freq, volt, lag, harmon
   double precision :: beta, bvk, deltap, elrad
@@ -4055,10 +4055,15 @@ subroutine ttrfmult(track, ktrack, turn)
 
     !---- Radiation effects at entrance.
     if (radiate  .and.  elrad .ne. zero) then
-      rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
-      px = px - rfac * (one + pt) * px
-      py = py - rfac * (one + pt) * py
-      pt = pt - rfac * (one + pt) ** 2
+       if (quantum) then
+          curv = sqrt(dpx**2+dpy**2) / elrad;
+          call trphot(elrad,curv,rfac,deltas)
+       else
+          rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
+       endif
+       px = px - rfac * (one + pt) * px
+       py = py - rfac * (one + pt) * py
+       pt = pt - rfac * (one + pt) ** 2
     endif
 
     !---- Apply the kick
@@ -4068,9 +4073,15 @@ subroutine ttrfmult(track, ktrack, turn)
 
     !---- Radiation effects at exit.
     if (radiate  .and.  elrad .ne. zero) then
-      px = px - rfac * (one + pt) * px
-      py = py - rfac * (one + pt) * py
-      pt = pt - rfac * (one + pt) ** 2
+       if (quantum) then
+          curv = sqrt(dpx**2+dpy**2) / elrad;
+          call trphot(elrad,curv,rfac,deltas)
+       else
+          rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
+       endif
+       px = px - rfac * (one + pt) * px
+       py = py - rfac * (one + pt) * py
+       pt = pt - rfac * (one + pt) ** 2
     endif
 
     ! apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
@@ -4113,12 +4124,17 @@ subroutine tttquad(track, ktrack)
   double precision :: bet0sqr
   double precision :: ct, st
   double precision :: tmp
+  double precision :: hx, hy, rfac, gamma, curv
   logical :: skew
   integer :: jtrk
 
   double precision, external :: node_value
-  double precision, parameter ::  sqrt2=1.41421356237310d0
+  double precision, parameter ::  sqrt2=1.41421356237310d0, three=3d0
 
+  double precision, external :: get_value
+
+  gamma   = get_value('probe ','gamma ')
+  
   !---- Read-in the parameters
   bet0sqr = bet0*bet0;
   k1 = node_value('k1 ');
@@ -4149,14 +4165,6 @@ subroutine tttquad(track, ktrack)
      z  = track(5,jtrk);
      pt = track(6,jtrk);
 
-!!$    !---- Radiation effects at entrance.
-!!$    if (radiate  .and.  elrad .ne. zero) then
-!!$      rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
-!!$      track(2,jtrk) = track(2,jtrk) - rfac * (one + track(6,jtrk)) * track(2,jtrk)
-!!$      track(4,jtrk) = track(4,jtrk) - rfac * (one + track(6,jtrk)) * track(4,jtrk)
-!!$      track(6,jtrk) = track(6,jtrk) - rfac * (one + track(6,jtrk)) ** 2
-!!$    endif
-
      !---- If SKEW rotates by -45 degrees
      if (skew) then
         ct =  sqrt2 / two
@@ -4173,6 +4181,21 @@ subroutine tttquad(track, ktrack)
      delta_p1 = sqrt(pt*pt + two*pt/bet0 + one);
      kk = kk0 / delta_p1;
 
+     !---- Radiation effects at entrance
+     if (radiate) then
+        hx = (-kk*x);
+        hy = ( kk*y);
+        if (quantum) then
+           curv = sqrt(hx**2+hy**2);
+           call trphot(length,curv,rfac,deltas)
+        else
+           rfac = (arad * gamma**3 * length / three) * (hx**2 + hy**2);
+        endif
+        px = px - rfac * (one + pt) * px
+        py = py - rfac * (one + pt) * py
+        pt = pt - rfac * (one + pt) ** 2
+     endif
+     
      !---- Computes the kick
      if (kk .gt. zero) then
         ksqrt = sqrt(kk);
@@ -4218,6 +4241,21 @@ subroutine tttquad(track, ktrack)
      py = py_;
      !pt = pt_; ! unchanged
 
+     !---- Radiation effects at exit
+     if (radiate) then
+        hx = (-kk*x);
+        hy = ( kk*y);
+        if (quantum) then
+           curv = sqrt(hx**2+hy**2);
+           call trphot(length,curv,rfac,deltas)
+        else
+           rfac = (arad * gamma**3 * length / three) * (hx**2 + hy**2);
+        endif
+        px = px - rfac * (one + pt) * px
+        py = py - rfac * (one + pt) * py
+        pt = pt - rfac * (one + pt) ** 2
+     endif
+
      !---- If SKEW rotates by +45 degrees
      if (skew) then
         ct = sqrt2 / two
@@ -4236,14 +4274,7 @@ subroutine tttquad(track, ktrack)
      track(3,jtrk) = y
      track(4,jtrk) = py
      track(5,jtrk) = z
-     !track(6,jtrk) = pt ! unchanged
-
-!!$    !---- Radiation effects at exit.
-!!$    if (radiate  .and.  elrad .ne. zero) then
-!!$      track(2,jtrk) = track(2,jtrk) - rfac * (one + track(6,jtrk)) * track(2,jtrk)
-!!$      track(4,jtrk) = track(4,jtrk) - rfac * (one + track(6,jtrk)) * track(4,jtrk)
-!!$      track(6,jtrk) = track(6,jtrk) - rfac * (one + track(6,jtrk)) ** 2
-!!$    endif
+     track(6,jtrk) = pt
 
   enddo
 
@@ -4276,7 +4307,7 @@ subroutine tttdipole(track, ktrack)
   double precision :: Cx, Sx
   double precision :: Cy, Sy
   double precision :: A, B, C, D
-  double precision :: gamma, hx2, hy2, rfac
+  double precision :: gamma, hx, hy, rfac, curv
   double precision :: bet0sqr, kx_sqr, ky_sqr
   double precision :: e1, e2, h1, h2, hgap, fint, fintx
   double complex :: kx, ky
@@ -4324,12 +4355,17 @@ subroutine tttdipole(track, ktrack)
      sqrt_delta_plus_1 = sqrt(delta_plus_1);
 
      !---- Radiation effects at entrance.
-     ! classical effect only with damping
      if (radiate) then
-        !hx2 = one / (rho**2 * (pt*pt + two*pt/bet0 + one));
-        hx2 = (k0*h+k1**2*(x**2+y**2)) / delta_plus_1; ! 1/m^2
-        hy2 = k1**2*(x**2+y**2) / delta_plus_1; ! 1/m^2
-        rfac = (arad * gamma**3 * L / three) * (hx2 + hy2) * (one + h*x) * (one - tan(e1)*x)
+        !hx = (-k0 -k1*x + k1s*y  - k2*(x*x - y*y) + k2s*x*y) / delta_plus_1; ! if there were k1s k2 and k2s
+        !hy = (     k1*y + k1s*x  + k2*x*y + k2s*(x*x - y*y)) / delta_plus_1;
+        hx = (-k0 -k1*x) / delta_plus_1;
+        hy = (     k1*y) / delta_plus_1;
+        if (quantum) then
+           curv = sqrt(hx**2+hy**2);
+           call trphot(L * (one + h*x) * (one - tan(e1)*x), curv, rfac, deltas);
+        else
+           rfac = (arad * gamma**3 * L / three) * (hx**2 + hy**2) * (one + h*x) * (one - tan(e1)*x)
+        endif
         px = px - rfac * (one + pt) * px
         py = py - rfac * (one + pt) * py
         pt = pt - rfac * (one + pt) ** 2
@@ -4385,10 +4421,16 @@ subroutine tttdipole(track, ktrack)
 
      !---- Radiation effects at exit.
      if (radiate) then
-        !hx2 = one / (rho**2  *  (pt*pt + two*pt/bet0 + one));
-        hx2 = (k0*h+k1**2*(x**2+y**2)) / delta_plus_1; ! 1/m^2
-        hy2 = k1**2*(x**2+y**2) / delta_plus_1; ! 1/m^2
-        rfac = (arad * gamma**3 * L / three) * (hx2 + hy2) * (one + h*x) * (one - tan(e2)*x)
+        !hx = (-k0 -k1*x + k1s*y  - k2*(x*x - y*y) + k2s*x*y) / delta_plus_1; ! if there were k1s k2 and k2s
+        !hy = (     k1*y + k1s*x  + k2*x*y + k2s*(x*x - y*y)) / delta_plus_1;
+        hx = (-k0 -k1*x) / delta_plus_1;
+        hy = (     k1*y) / delta_plus_1;
+        if (quantum) then
+           curv = sqrt(hx**2+hy**2);
+           call trphot(L * (one + h*x) * (one - tan(e2)*x), curv, rfac, deltas);
+        else
+           rfac = (arad * gamma**3 * L / three) * (hx**2 + hy**2) * (one + h*x) * (one - tan(e2)*x)
+        endif
         px = px - rfac * (one + pt) * px
         py = py - rfac * (one + pt) * py
         pt = pt - rfac * (one + pt) ** 2
