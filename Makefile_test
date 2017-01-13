@@ -20,7 +20,8 @@
 #		 reinstated test-ptc-twiss that had disappeared from this file
 # 	         merged test-twiss-7 with test-emit-2 and suppressed test-emit-2
 # 2014-Aug-18  16:09:41  ghislain:
-#                added test-line testsuite with first test for repetition count
+#                added test-line testsuite with
+# tests      : runs tests-all not in tests-long first test for repetition count
 #                for element vs line
 #
 # 2015-Apr-01  17:47:56  ghislain:
@@ -70,7 +71,7 @@ test-ptc-twiss-1 test-ptc-twiss-2 test-ptc-twiss-3 test-ptc-twiss-4 \
 test-ptc-twiss-old1 test-ptc-twiss-old2 test-ptc-twiss-old3 test-ptc-twiss-old4 test-ptc-twiss-old5 test-ptc-twiss-old6 test-ptc-twiss-old7 \
 test-ptc-twiss-5D test-ptc-twiss-5Dt test-ptc-twiss-56D test-ptc-twiss-56Dt test-ptc-twiss-56Dl test-ptc-twiss-56Dtl test-ptc-twiss-6D test-ptc-twiss-6D-ALS \
 test-ptc-twiss-accel-56D test-ptc-twiss-56Dt-ini_map_man test-ptc-twiss-56Dt-ini_mtx_man test-ptc-twiss-56Dt-ini_mtx_tbl \
-test-ptc-normal test-ptc-twiss-normal-genfu test-ptc-twiss-maptable \
+test-ptc-normal test-ptc-twiss-normal-genfu test-ptc-twiss-normal-5D test-ptc-twiss-normal-6D test-ptc-twiss-maptable \
 test-ptc-trackline test-ptc-trackline-2 \
 test-rfmultipole-ptc-1 \
 test-touschek test-touschek-2 \
