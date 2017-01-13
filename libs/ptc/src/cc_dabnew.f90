@@ -477,11 +477,6 @@ contains
     do i=1, c_lda
        if(c_allvec(i)) c_ldanow=c_ldanow+1
     enddo
-    w_p=0
-    w_p%nc=1
-    write(w_p%c(1),'(a11,i8)') ' ALLOCATED ',c_ldanow
-    w_p%fc='(1((1X,A72)))'
-    !CALL WRITE_i
     return
   end subroutine dalc_lsta
   !
@@ -628,15 +623,6 @@ contains
        endif
        !
        if(c_nst0.gt.c_lst) then
-          w_p=0
-          w_p%nc=5
-          w_p%fc='(4(1X,a72,/),(1X,a72))'
-          w_p%c(1)= 'ERROR IN DAALL, STACK EXHAUSTED '
-          w_p%c(2)=  ' c_nst0,c_lst '
-          write(w_p%c(3),'(i8,1x,i8)') c_nst0,c_lst
-          w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
-          write(w_p%c(5),'(i8,1x,i8,1x,i8)') c_nda_dab,ndanum,c_nda_dab*ndanum
-          !CALL WRITE_E(125)(125)
           call dadeb !(31,'ERR DAALL ',1)
        endif
        !
@@ -739,15 +725,7 @@ contains
           endif
           !
           if(c_nst0.gt.c_lst) then
-             w_p=0
-             w_p%nc=5
-             w_p%fc='(4(1X,a72,/),(1X,a72))'
-             w_p%c(1)= 'ERROR IN DAALL, STACK EXHAUSTED '
-             w_p%c(2)=  ' NST,c_lst '
-             write(w_p%c(3),'(i8,1x,i8)') c_nst0,c_lst
-             w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
-             write(w_p%c(5),'(i8,1x,i8,1x,i8)') c_nda_dab,ndanum,c_nda_dab*ndanum
-             !CALL WRITE_E(125)(126)
+
              call dadeb !(31,'ERR DAALL ',1)
           endif
           !
@@ -847,15 +825,7 @@ contains
        endif
        !
        if(c_nst0.gt.c_lst) then
-          w_p=0
-          w_p%nc=5
-          w_p%fc='(4(1X,a72,/),(1X,a72))'
-          w_p%c(1)= 'ERROR IN DAALL, STACK EXHAUSTED '
-          w_p%c(2)=  ' NST,c_lst '
-          write(w_p%c(3),'(i8,1x,i8)') c_nst0,c_lst
-          w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
-          write(w_p%c(5),'(i8,1x,i8,1x,i8)') c_nda_dab,ndanum,c_nda_dab*ndanum
-          !CALL WRITE_E(125)(127)
+
           call dadeb !(31,'ERR DAALL ',1)
        endif
        !
@@ -965,15 +935,7 @@ contains
        endif
        !
        if(c_nst0.gt.c_lst) then
-          w_p=0
-          w_p%nc=5
-          w_p%fc='(4(1X,a72,/),(1X,a72))'
-          w_p%c(1)= 'ERROR IN DAALL, STACK EXHAUSTED '
-          w_p%c(2)=  ' NST,c_lst '
-          write(w_p%c(3),'(i8,1x,i8)') c_nst0,c_lst
-          w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
-          write(w_p%c(5),'(i8,1x,i8,1x,i8)') c_nda_dab,ndanum,c_nda_dab*ndanum
-          !CALL WRITE_E(125)(127)
+
           call dadeb !(31,'ERR DAALL ',1)
        endif
        !
@@ -1406,8 +1368,7 @@ contains
     !
     if((.not.C_STABLE_DA)) then
        if(C_watch_user) then
-          write(6,*) "big problem in dabnew, going to crash "
-          write(6,*) sqrt(crash)
+          write(6,*) "big problem in dabnew ", sqrt(crash)
        endif
        return
     endif
@@ -1419,8 +1380,7 @@ contains
     call dainf(ina,inoa,inva,ipoa,ilma,illa)
     if((.not.C_STABLE_DA)) then
        if(C_watch_user) then
-          write(6,*) "big problem in dabnew, going to crash "
-          write(6,*) sqrt(crash)
+          write(6,*) "big problem in dabnew ", sqrt(crash)
        endif
        return
     endif
@@ -3291,7 +3251,6 @@ contains
     do i=1,c_lnv
        jj(i)=0
     enddo
-    
     if(ma(1).eq.mb(1)) then
        call dainf(mb(1),inob,invb,ipob,ilmb,illb)
        if((.not.C_STABLE_DA)) then
@@ -3313,18 +3272,11 @@ contains
        enddo
        call dadal(ml,ib)
     else
-      
        do i=1,ia
           call c_dapek(ma(i),jj,x(i))
           call c_dapok(ma(i),jj,(0.0_dp,0.0_dp))
        enddo
-
        call dainvt(ma,ia,mb,ib)
-       if((.not.C_STABLE_DA)) then 
-         print*,"cc_dabmew.f90: c_dainv unstable at 4"
-         return
-       endif
-       
        do i=1,ia
           call c_dapok(ma(i),jj,x(i))
        enddo

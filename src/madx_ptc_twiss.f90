@@ -154,13 +154,13 @@ contains
     
     do i=1,c_%nd
    
-     Ha(1:6,1:6,i)=matmul(matmul(amatrix,Iaa(1:6,1:6,i)),amatrix_inv)  ! (15b)
+      Ha(1:6,1:6,i)=matmul(matmul(amatrix,Iaa(1:6,1:6,i)),amatrix_inv)  ! (15b)
      
-     !do ii=1,6
-     !  print*,"        ",Ha(1:6,ii,i)
-     !enddo
+      !do ii=1,6
+      !  print*,"        ",Ha(1:6,ii,i)
+      !enddo
      
-   enddo
+    enddo
 
    do i=1,4
      disp(i) = Ha(i,5,3)/Ha(5,5,3)
@@ -169,8 +169,91 @@ contains
    call kill(amap) 
    
   end subroutine dispesion6D
+
+ !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+  
+  !version on polynomials to non-linear dispersion
+  subroutine dispesion6Dp(A_script,disp)
+    implicit none
+!    type(probe_8), intent(in)::A_script_probe
+    type(real_8) ::A_script(6)
+    real(dp), intent(out)  :: disp(4)
+    type(taylor)  dispT(4)
+    type(damap)  :: amap, dispMap
+    type(damap)  :: Iaa_map 
+    real(dp)  :: amatrix(6,6)
+    real(dp) ::amatrix_inv(6,6),Ha(6,6,3), v
+    integer i,j,k
+    ! H based dispersion as in Chao-Sands paper
+
+    
+    call alloc(dispMap)
+    call alloc(dispT)
+    call alloc(amap)
+    amap = A_script ! move the transformation to type damap
+
+    print*,"++++++++++++++"
+    print*, "amap"
+    call print(amap,6)
+    
+    amatrix    =amap       ! now we can copy to simple 6:6 matrix
+    amatrix_inv=amap**(-1) ! and invert it and copy to 6:6 matrixs
+    
+    call alloc(Iaa_map)
+        
+    do i=1,c_%nd
+   
+      Ha(1:6,1:6,i)=matmul(matmul(amatrix,Iaa(1:6,1:6,i)),amatrix_inv)  ! (15b)
+
+    enddo
+      
+    do i=3,3 ! i=1,c_%nd
+      Iaa_map = zero;
+      do j=1,6
+        print*, Iaa(j,:,i)
+        do k=1,6
+          v = Iaa(j,k,i)
+          Iaa_map%v(j) = Iaa_map%v(j) + v*(1.0_dp.mono.fo(k,:))
+        enddo
+      enddo 
+      print*,"++++++++++++++"
+      print*, "Iaa ", i
+      call print(Iaa_map,6)
+      
+      dispMap = amap * Iaa_map * amap**(-1)
+      
+     
+      !do ii=1,6
+      !  print*,"        ",Ha(1:6,ii,i)
+      !enddo
+     
+    enddo
+
+   
+   dispMap = dispMap * (1.0_dp /  Ha(5,5,3));
+
+    print*,"++++++++++++++"
+    print*, "dispMap"
+    call print(dispMap,6)
+   
+
+   do i=1,4
+     disp(i) = Ha(i,5,3)/Ha(5,5,3)
+     
+     dispT(i) = dispMap%v(i).par.fo(5,:)
+     
+     print*, 'Disp ', i, ' R', disp(i) , ' Map ', dispMap%v(i).sub.fo(5,:)
+     print*, "Taylor "
+     call print(dispT(i),6)
+     
+   enddo    
+    
+   call kill(amap) 
+   
+  end subroutine dispesion6Dp
     
  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+
   subroutine equaltwiss(s1,A_script)
     implicit none
     type(twiss), intent(inout)::s1
@@ -499,7 +582,6 @@ contains
       endif
     endif
 
-
     call resetBetaExtremas()
     call initIaaMatrix()
     
@@ -682,6 +764,7 @@ contains
        print*, "Closed orbit specified by the user!"
        !CALL write_closed_orbit(icase,x) at this position it isn't read
     endif
+
     
     orbit_probe = orbit
     
@@ -759,6 +842,7 @@ contains
     !
     call initmap(dt,slice)
 
+
     if (geterrorflag() /= 0) then
        !if arror occured then return
        return
@@ -818,6 +902,7 @@ contains
       
     endif
 
+
     
     !############################################################################
     !############################################################################
@@ -836,14 +921,18 @@ contains
        return
     endif
    
-    
-    
     phase = zero !we have to do it after the very initial twiss params calculation above
-
     current=>MY_RING%start
     startfen = 0
+!    print*,'Check 5'
+!    call print(default,6)
+!    print*,'my_state'
     startfen = current!setting up start energy for record
+!    print*,'Check 6'
+!    call print(default,6)
+!    print*,'my_state'
     suml=zero
+
     iii=restart_sequ()
     print77=.false.
     read77=.false.
@@ -875,7 +964,6 @@ contains
     resetBetaExtrema = .true.;
     resetOrbitExtrema = .true.;
 
-
     if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
       write(whymsg,*) 'DA got unstable during initialization: The closed solution does not exist. PTC msg: ', &
                        messagelost(:len_trim(messagelost))
@@ -892,6 +980,7 @@ contains
        return
     endif
 
+   
    
    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
    !                              !
@@ -1215,7 +1304,7 @@ contains
 
     endif
 
-   
+
     !must be after initmap that sets the isRing
     ring_parameters = get_value('ptc_twiss ','ring_parameters ') .ne. 0
     if (ring_parameters) then
@@ -1280,7 +1369,7 @@ contains
 !    call f90flush(20,my_false)
 
     if (getdebug() > 2) close(mf1)
-
+     
     !****************************************************************************************
     !*********  E N D   O F   PTC_TWISS      ************************************************
     !****************************************************************************************
@@ -1581,6 +1670,7 @@ contains
       
       ioptfun=6
       call vector_to_table_curr(table_name, 'x ', opt_fun(1), ioptfun)
+      opt_fun(:)=zero ! reset it
       
       if (rmatrix) then
         if (present(transfermapSaved)) then
@@ -1651,6 +1741,8 @@ contains
 
         ioptfun=36
         call vector_to_table_curr(table_name, 're11 ', opt_fun(1), ioptfun)
+        opt_fun(:)=zero ! reset it
+
       endif
       
       deltap = A_script_probe%x(5).sub.'0'
@@ -1752,34 +1844,37 @@ contains
          opt_fun(disp4p3) = tw%disp_p3(4)
       endif
 
-      ! JLUC TODO
-      ! opt_fun(61)=zero disp4 is now 61 in madx_ptc_knobs.inc
-      ! jluc: left the following umodified, except 36->62
-      opt_fun(62+4+8+6)=zero ! was 36 instead of 62 => on 9 march add 4 => on 3 July 2009 add 4 => on 3 November 2010 add 6
-      do i1=1,6
-         if(i1.le.4) then
-            i1a=i1
-         elseif(i1.eq.5) then
-            i1a=6
-         else
-            i1a=5
-         endif
-         do i2=1,6
-            if(i2.le.4) then
-               i2a=i2
-            elseif(i2.eq.5) then
-               i2a=6
-            else
-               i2a=5
-            endif
-! idiotic counting reset (62+4+8+6) ==> 73
-            ii=73+(i1a-1)*6+i2a ! was 36 instead of 62 => now (62+4) instead of 62 => 62+4+4
-            opt_fun(ii)=tw%eigen(i1,i2) * deltae
-            ! where do these eigen values go? no such dedicated column defined in madx_ptc_knobs.inc
-            if(mytime.and.i2a.eq.6) opt_fun(ii)=-opt_fun(ii)
-         enddo
-      enddo
-
+      
+      !skowron: 2017 Jan, twiss table has sigma matrix in this place
+      !
+      !     opt_fun(62+4+8+6)=zero ! was 36 instead of 62 => on 9 march add 4 => on 3 July 2009 add 4 => on 3 November 2010 add 6
+      !     do i1=1,6
+      !        if(i1.le.4) then
+      !           i1a=i1
+      !        elseif(i1.eq.5) then
+      !           i1a=6
+      !        else
+      !           i1a=5
+      !        endif
+      !        do i2=1,6
+      !          if(i2.le.4) then
+      !	 i2a=i2
+      !           elseif(i2.eq.5) then
+      !	 i2a=6
+      !           else
+      !	 i2a=5
+      !           endif
+      !           ! idiotic counting reset (62+4+8+6) ==> 73
+      !           ii=73+(i1a-1)*6+i2a ! was 36 instead of 62 => now (62+4) instead of 62 => 62+4+4
+      !
+      !           opt_fun(ii)=tw%eigen(i1,i2) * deltae
+      !           ! where do these eigen values go? no such dedicated column defined in madx_ptc_knobs.inc
+      !           if(mytime.and.i2a.eq.6) opt_fun(ii)=-opt_fun(ii)
+      !
+      !        enddo
+      !     enddo
+      
+      
       if (getdebug() > 2)  then
          ! this part of the code is out of sync with the rest
          !j(:)=0
@@ -1815,7 +1910,8 @@ contains
       !      eigenvalue seems to be retrieved ~50 lines above...
       ioptfun = 18*3+16+3+36+1 ! = 110
       call vector_to_table_curr(table_name, 'beta11 ', opt_fun(1), ioptfun)
-
+      opt_fun(:)=zero 
+      
       ! convert between the Ripken and Edwards-Teng parametrization
       ! according to the formulas in "BETATRON MOTION WITH COUPLING OF HORIZONTAL AND VERTICAL DEGREES OF FREEDOM"
       ! from V. A. Lebedev    and  S. A. Bogacz
@@ -3636,17 +3732,18 @@ contains
     type(probe_8),target :: oneTurnMap,theAscript
     real(dp),    target :: startorbit(6) 
     real(dp) :: suml ! cumulative length along the ring
+    real(dp) :: disp1stOrder(4) ! for 6D algo
+    type(c_taylor) :: tempTaylor ! for 6D algo
     type(c_normal_form) theNormalForm
     integer     :: mf, filecode ! output file
     integer     :: i,o ! output file
     character(len=250)   :: fmt
     integer     	:: io,r, myn1,myn2,indexa(mnres,4),mynres,ind(10)
-    type(c_damap)  :: c_Map
+    type(c_damap)  :: c_Map, c_Map2, q_Map, a_cs
     type(c_taylor)  :: nrmlzdPseudoHam, g_io
     type(c_vector_field) vf, vf_kernel
      
      !use_complex_in_ptc=my_true
-     
      
      call alloc(c_Map)
      
@@ -3654,11 +3751,7 @@ contains
      
      call alloc(theNormalForm) 
 
-     print*,"Normal Form Type 1"
-     
      call  c_normal(c_Map,theNormalForm)       ! (4)
-
-     print*,"Normal Form Type 1 DONE"
 
      !theNormalForm=oneTurnMap !! HERE WE DO NORMAL FORM TYPE 1
 
@@ -3740,7 +3833,19 @@ contains
     
     if (c_%nd2 == 6) then
       ! to be implemented
-      !call dispesion6D(theAscript,dispersion)
+      call dispesion6D(theAscript%x,disp1stOrder)
+      call alloc(tempTaylor)
+      do i=1,4
+        tempTaylor = disp1stOrder(i)
+        call putDnormaltable(tempTaylor,i)
+      enddo
+      
+     ! call dispesion6Dp(theAscript%x,disp1stOrder)
+      
+      call kill(tempTaylor)
+      
+      
+      
       
     else
       !this does not work with 6D dispersion 
@@ -3762,11 +3867,19 @@ contains
     !n%g is the vecotor field for the transformation 
     !from resonance basis (action angle coordinate system, (x+ipx),(x-ipx)) back to cartesion X,Y
     !the ndim polynomials need to be flattened to get RDT's
+
+        ! from c_normal
+        !    n%a1=a1
+        !    n%a2=a2
+        !    n%a_t=a1*a2*from_phasor()*texp(n%g)*from_phasor(-1)
+
     call alloc(vf);
     call alloc(g_io);
-    call flatten_c_factored_lie(theNormalForm%G,vf)
-    g_io =-cgetpb(vf)
-    call putGnormaltable(g_io)
+    
+    
+      call flatten_c_factored_lie(theNormalForm%G,vf)
+      g_io =-cgetpb(vf)
+      call putGnormaltable(g_io)
     
   !  write(99,*); write(99,*) " Normalised Generating Function  ";write(99,*); 
   !      call print(g_io,99)
@@ -3777,26 +3890,44 @@ contains
     !HAMILTONIAN
     !!!!!!!!!!!!!! Normalised Pseudo-Hamiltonian !!!!!!!!!!!!!!!        
 
+    call alloc(a_CS)
 
-    call alloc(nrmlzdPseudoHam);
-    nrmlzdPseudoHam=-cgetpb(vf_kernel)
-     !nrmlzdPseudoHam=-cgetpb(vf)/dt                ! (6c)
+    call c_canonise(theNormalForm%a_t,a_CS)
 
-  !  write(99,*) " Normalised Pseudo-Hamiltonian  ";
-  !  write(99,*); 
-  !  call print(nrmlzdPseudoHam,99)
-  !  write(99,*) "--------------------------------------" 
+    a_CS = a_CS.sub.1
+    call c_canonise(a_CS,a_CS)
+
+    call alloc(c_Map2)
+    c_Map2 = a_CS**(-1)*c_Map*a_CS
+
+    call alloc(q_Map)
+    call c_factor_map(c_Map2,q_Map,vf,dir=1) 
 
 
+    vf=from_phasor()*vf
+
+    call alloc(nrmlzdPseudoHam)
+    nrmlzdPseudoHam = cgetpb(vf)
+    call putHnormaltable(nrmlzdPseudoHam)
+  
+    !!!!!!!!!!!!!!!!!!!!!!
+    !ONE TURN MAP
+    
     call putMnormaltable(oneTurnMap%x)
     
+    !!!!!!!!!!!!!!!!!!!!!!
+    !CLEANING
     
     call kill(vf)  
     call kill(vf_kernel)
     call kill(g_io)
-    call kill(nrmlzdPseudoHam)
     
     call kill(c_Map)
+    call kill(c_Map2)
+    call kill(q_Map)
+    call kill(a_CS)    
+    call kill(nrmlzdPseudoHam)
+    
     call kill(theNormalForm)
    !if (icase.eq.5 .or. icase.eq.56) then
    !
@@ -4022,68 +4153,97 @@ contains
     end subroutine putDnormaltable
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
     
-    subroutine putHnormaltable(sinham,cosham,ind)
-    !gets generating function that are the linear part of A_t
+    subroutine putHnormaltable(nrmlzdPseudoHam)
       implicit none
+      type(c_taylor) :: nrmlzdPseudoHam
       type(taylor) :: sinham,cosham
       integer      :: ind(10)
       integer      :: order
-      character(len=17):: nn, nick, bv='H'
+      character(len=17):: nn, nick, bv='HAMILTONIAN'
+      character(len=17):: hamiltsin='hamilt_sin'
+      character(len=17):: hamiltcos='hamilt_cos'
+      character(len=17):: hamiltamp='hamilt_amp'
+      
       integer     	:: i,r, myn1,myn2,indexa(mnres,4),mynres
+      complex(dp)   :: c_val
       real(dp)    :: im_val, re_val, d_val, eps=1e-12
       
-      order = sum(ind(1:4))
-      
-        !print*,"HAML order ",order, ind(:)
+      ind(:) = 0
+      myn1 = 0
+      myn2 = 0
+      mynres = 0
+      i=1
+      call c_taylor_cycle(nrmlzdPseudoHam,size=mynres)
+
+      do r=1,mynres
         
-        re_val = sinham.sub.ind
-        im_val = cosham.sub.ind
+        call c_taylor_cycle(nrmlzdPseudoHam,ii=r,value=c_val,j=ind(1:c_%nv))
+        
+        re_val = real(c_val)
+        im_val = imag(c_val)
         d_val  = hypot(re_val, im_val)
-        
+
         ! if amplitude is close to zero then it is not worth to output
         if (d_val .lt. eps) then
-          print*,"Ampl of the main coef is 0"
-          return
-        endif
+         
+          if (getdebug()>2) then
+            print*,"putHnormaltable idx=",r," ",d_val," smaller then eps=",eps, " skipping "
+          endif  
+         
+          cycle
         
+        endif
+
+        order = sum(ind(1:6))
+
+        !print*,"HAML order ",order, ind(:)
+        !print*,'       im=',im_val , ' re=',re_val  , ' amp=', d_val
+
+
         !!!!!!!!!!!!!!!!!!!!!!!!
         write(nn,'(a4,6(a1,i1))') 'hama','_',ind(1),'_',ind(2),'_',ind(3), &
-                                        '_',ind(4),'_',ind(5),'_',ind(6)
-        write(nick,'(a4,3(a1,SP,i2))') 'hama','_',ind(1)-ind(2),'_',ind(3)-ind(4),'_',ind(5)-ind(6)
-		
+                                       '_',ind(4),'_',ind(5),'_',ind(6)
+        write(nick,'(a2,6(i1))') 'h_',ind(1),ind(2),ind(3), &
+                                      ind(4),ind(5),ind(6)
+
         if (getdebug() > 2) then
-          write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
-                         d_val, order, ind(1:6)
+         write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
+	    d_val, order, ind(1:6)
         endif
-            
-        call puttonormaltable(nn,nick,bv,d_val,order,ind)
-        
+
+        call puttonormaltable(nn,nick,hamiltamp,d_val,order,ind)
+
         !!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         write(nn,'(a4,6(a1,i1))') 'hams','_',ind(1),'_',ind(2),'_',ind(3), &
-                                        '_',ind(4),'_',ind(5),'_',ind(6)
+                                       '_',ind(4),'_',ind(5),'_',ind(6)
         write(nick,'(a4,3(a1,SP,i2))') 'hams','_',ind(1)-ind(2),'_',ind(3)-ind(4),'_',ind(5)-ind(6)
-        
+
+        write(nick,'(a2,6(i1),a3)') 'h_',ind(1),ind(2),ind(3),ind(4),ind(5),ind(6),'_IM'
+
         if (getdebug() > 2) then
-          write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
-                         re_val, order, ind(1:6)
+         write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
+	    re_val, order, ind(1:6)
         endif
-        
-        call puttonormaltable(nn,nick,bv,re_val,order,ind)
+
+        call puttonormaltable(nn,nick,hamiltsin,im_val,order,ind)
 
 
         write(nn,'(a4,6(a1,i1))') 'hamc','_',ind(1),'_',ind(2),'_',ind(3), &
-                                        '_',ind(4),'_',ind(5),'_',ind(6)
-        write(nick,'(a4,3(a1,SP,i2))') 'hamc','_',ind(1)-ind(2),'_',ind(3)-ind(4),'_',ind(5)-ind(6)
+                                       '_',ind(4),'_',ind(5),'_',ind(6)
+        write(nick,'(a2,6(i1),a3)') 'h_',ind(1),ind(2),ind(3),ind(4),ind(5),ind(6),'_RE'
 
         if (getdebug() > 2) then
-          write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
-                         im_val, order, ind(1:6)
+         write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nick), &
+	    im_val, order, ind(1:6)
         endif
-            
-        call puttonormaltable(nn,nick,bv,im_val,order,ind)
+
+        call puttonormaltable(nn,nick,hamiltcos,re_val,order,ind)
+
+      enddo
     
     end subroutine putHnormaltable
+
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 
@@ -4103,8 +4263,6 @@ contains
       real(dp)    :: im_val, re_val, d_val,  eps=1e-12
 
       ind(:) = 0
-
-      
       myn1 = 0
       myn2 = 0
       mynres = 0

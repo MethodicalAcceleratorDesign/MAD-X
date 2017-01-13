@@ -50,4 +50,3 @@ ptc_end;
 !plot, haxis=s, vaxis=disp1, colour=100;
 !plot, haxis=s, vaxis=x, colour=100;
 
-removefile, file='Maxwellian_bend_for_ptc.txt';

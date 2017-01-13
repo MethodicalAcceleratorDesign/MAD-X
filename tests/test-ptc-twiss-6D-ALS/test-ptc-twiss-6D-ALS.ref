@@ -212,7 +212,6 @@ ptc_create_universe;
           Kinetic Energy : 0.149949E+01
       Particle Rest Mass : 0.510999E-03
                 Momentum : 0.150000E+01
-  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy           1.5000000870399657     
      method                   2
@@ -378,8 +377,6 @@ ptc_end;
 
 
 !removefile, file='ALS.C';
-
-removefile, file='Maxwellian_bend_for_ptc.txt';
 
 
   Number of warnings: 0

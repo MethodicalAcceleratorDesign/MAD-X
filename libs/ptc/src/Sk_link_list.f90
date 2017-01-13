@@ -28,7 +28,7 @@ MODULE S_FIBRE_BUNDLE
   logical(lp),PRIVATE,PARAMETER::T=.TRUE.,F=.FALSE.
   real(dp),target :: eps_pos=1e-10_dp
   integer(2),parameter::it0=0,it1=1,it2=2,it3=3,it4=4,it5=5,it6=6,it7=7,it8=8,it9=9
-  INTEGER,parameter :: IPOS =1000
+  INTEGER,private,parameter :: IPOS =1000
 
   INTERFACE kill
      MODULE PROCEDURE kill_layout
@@ -191,7 +191,7 @@ CONTAINS
     ENDIF
     IF(ASSOCIATED(L%DNA)) THEN
        DEALLOCATE(L%DNA)
-       if(lielib_print(12)==1)  WRITE(6,*) " DNA CONTENT HAS BEEN DEALLOCATED "
+       if(lielib_print(12)==1) WRITE(6,*) " DNA CONTENT HAS BEEN DEALLOCATED "
     ENDIF
     !    IF(ASSOCIATED(L%con)) THEN
     !       DEALLOCATE(L%con)
@@ -339,11 +339,11 @@ CONTAINS
     !    CALL LINE_L(L,doneit)  !TGV
     I=mod_n(POS,L%N)
     IF(L%LASTPOS==0) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1X,a72))'
-       w_p%c(1)= " L%LASTPOS=0 : ABNORMAL UNLESS LINE EMPTY"
-       write(w_p%c(2),'(a7,i4)')" L%N = ",L%N
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1X,a72))'
+       write(6,*) " L%LASTPOS=0 : ABNORMAL UNLESS LINE EMPTY"
+       write(*,'(a7,i4)')" L%N = ",L%N
        ! call !write_e(-124)
     ENDIF
 
@@ -395,10 +395,10 @@ CONTAINS
     logical(lp),optional :: reset    
     TYPE (fibre), POINTER :: Current
     TYPE (layout), TARGET, intent(inout):: L
-    integer, intent(inout):: pos
+    integer, optional, intent(inout):: pos
     character(*), intent(in):: name
     CHARACTER(nlp) S1NAME
-    integer i
+    integer i,poss
 
     logical(lp) foundit
     TYPE (fibre), POINTER :: p
@@ -429,23 +429,24 @@ CONTAINS
 100 continue
     if(foundit) then
        current=>p
-       pos=mod_n(l%lastpos+i,l%n)
-       l%lastpos=pos
+       poss=mod_n(l%lastpos+i,l%n)
+       l%lastpos=poss
        l%last=>current
     else
-       pos=0
+       poss=0
        WRITE(6,*) " Fibre not found in move_to_name_old ",S1name
     endif
+    if(present(pos)) pos=poss
   END SUBROUTINE move_to_name_old
 
   SUBROUTINE move_to_partial( L,current,name,pos) ! moves to next one in list called name
     implicit none
     TYPE (fibre), POINTER :: Current
     TYPE (layout), TARGET, intent(inout):: L
-    integer, intent(inout):: pos
+    integer,optional, intent(inout):: pos
     character(*), intent(in):: name
     CHARACTER(nlp) S1NAME
-    integer i
+    integer i,poss
 
     logical(lp) foundit
     TYPE (fibre), POINTER :: p
@@ -469,12 +470,14 @@ CONTAINS
 100 continue
     if(foundit) then
        current=>p
-       pos=mod_n(l%lastpos+i,l%n)
+       poss=mod_n(l%lastpos+i,l%n)
        l%lastpos=pos
        l%last=>current
     else
-       pos=0
+       poss=0
     endif
+ if(present(pos)) pos=poss
+
   END SUBROUTINE move_to_partial
 
   SUBROUTINE move_to_name_FIRSTNAME( L,current,name,VORNAME,pos) ! moves to next one in list called name
@@ -609,9 +612,7 @@ CONTAINS
     type(mad_universe), pointer :: madu
 !  new 2012.9.7
     nullify(madu)
-    if( associated(L%parent_universe) ) then 
-      madu=>L%parent_universe
-    endif
+   if(associated(L%parent_universe) ) madu=>L%parent_universe
 !    
 
     CALL NULLIFY_LAYOUT(L)
@@ -674,10 +675,10 @@ CONTAINS
     !   nullify(L%PREVIOUS )! STORE THE GROUNDED VALUE OF END DURING CIRCULAR SCANNING
     !  nullify(L%parent_universe ) ! left out
     !  else
-    !    w_p=0
-    !    w_p%nc=1
-    !    w_p%fc='(1((1X,a72)))'
-    !    w_p%c(1)= " Only =0 permitted (nullify) "
+    !    !w_p=0
+    !    !w_p%nc=1
+    !    !w_p%fc='(1((1X,a72)))'
+    !    write(6,*) " Only =0 permitted (nullify) "
     !    ! call !write_e(100)
     ! endif
   END SUBROUTINE nullIFY_LAYOUT
@@ -939,7 +940,6 @@ CONTAINS
     implicit none
     type(fibre),target,intent(inout):: c
     integer, intent(in) :: i
-    logical :: proceed=.false.
     if(i==0) then
        c%DIR=1
        !    C%P0C = ONE
@@ -956,16 +956,7 @@ CONTAINS
        if(associated(c%CHART)) c%CHART=0
        if(associated(c%PATCH)) c%PATCH=0
     elseif(i==-1) then
-       !if (.not.ASSOCIATED(LC) ) print*,"Skowron zero_fibre: LC==0x0"
-       !if (.not.ASSOCIATED(c%mag) ) print*,"Skowron zero_fibre: c%mag==0x0"
-       !if (.not.ASSOCIATED(c%mag%PARENT_FIBRE) ) print*,"Skowron zero_fibre: c%mag%PARENT_FIBRE==0x0"
-       
-       !if LC is c%mag%PARENT_FIBRE%PARENT_LAYOUT or superkill
-       IF(  (associated(c%mag) .and. &
-             associated(c%mag%PARENT_FIBRE) .and. & 
-             ASSOCIATED(LC,c%mag%PARENT_FIBRE%PARENT_LAYOUT)) &
-         .or.superkill) THEN    ! ORDINARY
-             
+       IF(ASSOCIATED(LC,c%mag%PARENT_FIBRE%PARENT_LAYOUT).or.superkill) THEN    ! ORDINARY
           IF(ASSOCIATED(c%magP)) then  !  2010_1
              c%magp=-1;
              deallocate(c%magP);
@@ -983,30 +974,11 @@ CONTAINS
              deallocate(c%PATCH);
           ENDIF
        ELSE   ! POINTED LAYOUT
-          proceed = .false.
-          IF(     .NOT.ASSOCIATED(c%mag)) then
-            proceed = .true.
-          else IF(.NOT.ASSOCIATED(c%mag%PARENT_FIBRE)) then
-            proceed = .true.
-          else IF(.NOT.ASSOCIATED(c%mag%PARENT_FIBRE%CHART,c%CHART)) then
-            proceed = .true.
-          endif
-            
-          IF(proceed) then
+          IF(.NOT.ASSOCIATED(c%mag%PARENT_FIBRE%CHART,c%CHART)) then
              C%CHART=-1
              deallocate(c%CHART);
           ENDIF
-          
-          proceed = .false.
-          IF(     .NOT.ASSOCIATED(c%mag)) then
-            proceed = .true.
-          else IF(.NOT.ASSOCIATED(c%mag%PARENT_FIBRE)) then
-            proceed = .true.
-          else IF(.NOT.ASSOCIATED(c%mag%PARENT_FIBRE%PATCH,c%PATCH)) then
-            proceed = .true.
-          endif
-          
-          IF(proceed) then
+          IF(.NOT.ASSOCIATED(c%mag%PARENT_FIBRE%PATCH,c%PATCH)) then
              C%PATCH=-1
              deallocate(c%PATCH);
           ENDIF
@@ -1066,10 +1038,10 @@ CONTAINS
        ENDIF
 
     else
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1((1X,a72)))'
-       w_p%c(1)= "Error in zero_fibre "
+       !w_p=0
+       !w_p%nc=1
+       !w_p%fc='(1((1X,a72)))'
+       write(6,*) "Error in zero_fibre "
        ! call !write_e(100)
     endif
   end SUBROUTINE zero_fibre
@@ -1151,10 +1123,10 @@ CONTAINS
        IF(ASSOCIATED(c%loc)) deallocate(c%loc);
 
     else
-       w_p=0
-       w_p%nc=1
-       w_p%fc='(1((1X,a72)))'
-       w_p%c(1)= "Error in zero_fibre "
+       !w_p=0
+       !w_p%nc=1
+       !w_p%fc='(1((1X,a72)))'
+       write(6,*) "Error in zero_fibre "
        ! call !write_e(100)
     endif
   end SUBROUTINE SUPER_zero_fibre
@@ -1521,12 +1493,12 @@ CONTAINS
        ENDIF
     ELSE ! NO FRAME
 
-       W_P=0
-       W_P%NC=3
-       W_P%FC='(2(1X,A72,/),(1X,A72))'
-       W_P%C(1)= " NO GEOMETRIC PATCHING POSSIBLE : EITHER NO FRAMES IN PTC OR NO PATCHES "
-       WRITE(W_P%C(2),'(A16,1X,L1,1X,L1)')  " CHARTS 1 AND 2 ", ASSOCIATED(EL1%CHART%F), ASSOCIATED(EL2%CHART%F)
-       WRITE(W_P%C(3),'(A16,1X,L1,1X,L1)')  "PATCHES 1 AND 2 ", ASSOCIATED(EL1%PATCH), ASSOCIATED(EL2%PATCH)
+       !w_p=0
+       !w_p%NC=3
+       !w_p%FC='(2(1X,A72,/),(1X,A72))'
+       write(6,*) " NO GEOMETRIC PATCHING POSSIBLE : EITHER NO FRAMES IN PTC OR NO PATCHES "
+       write(6,'(A16,1X,L1,1X,L1)')  " CHARTS 1 AND 2 ", ASSOCIATED(EL1%CHART%F), ASSOCIATED(EL2%CHART%F)
+       WRITE(6,'(A16,1X,L1,1X,L1)')  "PATCHES 1 AND 2 ", ASSOCIATED(EL1%PATCH), ASSOCIATED(EL2%PATCH)
        ! call ! WRITE_I
 
        IF(DIR==1) THEN
@@ -2578,11 +2550,11 @@ CONTAINS
     !    CALL LINE_L_THIN(L,doneit)   ! TGV
 
     IF(L%LASTPOS==0) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1X,a72))'
-       w_p%c(1)= " L%LASTPOS=0 : ABNORMAL UNLESS LINE EMPTY"
-       write(w_p%c(2),'(a7,i4)')" L%N = ",L%N
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1X,a72))'
+       write(6,*) " L%LASTPOS=0 : ABNORMAL UNLESS LINE EMPTY"
+       write(*,'(a7,i4)')" L%N = ",L%N
        ! call !write_e(-124)
     ENDIF
 

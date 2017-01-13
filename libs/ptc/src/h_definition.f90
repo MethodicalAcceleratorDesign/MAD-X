@@ -52,6 +52,7 @@ module definition
   integer, parameter :: ndim2t=10   ! maximum complex size
   integer, parameter :: wiggler_suntao=24
   integer :: bmadparser = 0
+  logical :: tangent = .false.,force_rescale=.false.   ! force_rescale for vorname=HELICAL see fibre_work routine
   TYPE sub_taylor
      INTEGER j(lnv)
      INTEGER min,max
@@ -156,6 +157,7 @@ module definition
 
   !&4
   TYPE vecfield
+  !
      type (taylor) v(ndim2)          !@1 <font face="Times New Roman">V<sub>i</sub>&#8706;<sub>i</sub></font> Operator
      integer ifac                    !@1 Type of Factorization 0,1,-1 (One exponent, Dragt-Finn, Reversed Dragt-Finn)
   END TYPE vecfield
@@ -300,7 +302,7 @@ module definition
      type(rf_phasor) AC
      type(spinor) s(3)
      logical u
-     type(integration_node),pointer :: lost_node=>null()
+     type(integration_node),pointer :: last_node=>null()
   end type probe
   !@3 ---------------------------------------------</br>
   type probe_8
@@ -310,13 +312,16 @@ module definition
      type(spinor_8) s(3)   ! Polymorphic spin s(1:3)
      !   stuff for exception
      logical u
-     type(integration_node),pointer :: lost_node=>null()
+     type(integration_node),pointer :: last_node=>null()
   end type probe_8
   !@3 ---------------------------------------------</br>
   type TEMPORAL_PROBE
-     TYPE(probe)  XS
+     TYPE(probe)  XS   ! probe at r=0
      TYPE(INTEGRATION_NODE), POINTER :: NODE
-     real(DP)  DS,POS(6)
+     real(DP)  r, dt0   !  penetration ration, penetration time
+     real(DP)   POS(6),T  ! (x,y,z,px,py,pz) at dt0 and total time
+     real(DP)   IC(3)  ! (x,y,z,px,py,pz) at dt0
+     type(spinor) s(3) ! spin vectors at dt0
   END type TEMPORAL_PROBE
   !@3 ---------------------------------------------</br>
   type TEMPORAL_BEAM
@@ -359,12 +364,13 @@ module definition
 
 
 
-  TYPE c_DAMAP
-     TYPE (c_TAYLOR) V(LNV) !@1 Orbital part of the map 
-     integer :: N=0  !@1 Number of plane allocated
-     type(c_spinmatrix) s !@1 Spin matrix
-     complex(dp) e_ij(6,6) !@1 Stochastic fluctuation in radiation theory
-  END TYPE c_DAMAP
+type c_damap
+ type (c_taylor) v(lnv) !@1 orbital part of the map 
+ integer :: n=0 !@1 number of plane allocated
+ type(c_spinmatrix) s !@1 spin matrix
+ complex(dp) e_ij(6,6) !@1 stochastic fluctuation in radiation theory
+end type c_damap
+
   !@3 ---------------------------------------------</br>
   TYPE c_vector_field  !@1 
       integer :: n=0,nrmax !@1 n dimension used v(1:n) (nd2 by default) ; nrmax some big integer if eps<1 
@@ -392,6 +398,7 @@ module definition
       type(c_damap) a_t !@1 transformation a (m=a n a^-1) 
       type(c_damap) n   !@1 transformation n (m=a n a^-1)      
       type(c_damap) As  !@1  For Spin   (m = As a n a^-1 As^-1)  
+      type(c_damap) Atot  !@1  For Spin   (m = Atot n Atot^-1)  
       integer NRES,M(NDIM2t/2,NRESO),ms(NRESO) !@1 stores resonances to be left in the map, including spin (ms)
       real(dp) tune(NDIM2t/2),damping(NDIM2t/2),spin_tune !@1 Stores simple information
       logical positive ! forces positive tunes (close to 1 if <0)
@@ -404,9 +411,10 @@ module definition
   !@2 at= a_cs o rotation(phase) where  a_cs = a0 o a1 o a2 ; this gives the phase advance even nonlinear!
   !@3 ---------------------------------------------</br>
 type(c_taylor) c_temp
+
  TYPE c_ray
-  complex(dp) x(lnv)
-  complex(dp) s1(3),s2(3),s3(3)
+  complex(dp) x(lnv)            !# orbital and/or magnet modulation clocks
+  complex(dp) s1(3),s2(3),s3(3) !# 3 spin directions
  end type c_ray
 
 
@@ -662,3 +670,4 @@ contains
 
 
 end module definition
+

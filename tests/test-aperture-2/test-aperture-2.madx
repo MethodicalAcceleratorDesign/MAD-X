@@ -57,6 +57,5 @@ ptc_twiss,  closed_orbit, icase=6, no=3, file="ptc-twiss-table.out";
 
 ptc_end;
 
-removefile, file="Maxwellian_bend_for_ptc.txt";
 
 stop;

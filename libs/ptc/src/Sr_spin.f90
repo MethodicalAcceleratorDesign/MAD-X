@@ -14,7 +14,7 @@ module ptc_spin
   private B_PANCAkEr,B_PANCAkEp,B_PANCAkE
   PRIVATE DIRECTION_VR,DIRECTION_VP,DIRECTION_V
   PRIVATE  B_PARA_PERPr,B_PARA_PERPp,B_PARA_PERP
-  PRIVATE get_omega_spinR,get_omega_spinP ,get_omega_spin
+  PRIVATE get_omega_spinR,get_omega_spinP,get_omega_spin
   PRIVATE PUSH_SPINR,PUSH_SPINP !,PUSH_SPIN
   PRIVATE TRACK_FRINGE_spin_R,TRACK_FRINGE_spin_P,TRACK_FRINGE_spin
   PRIVATE TRACK_NODE_LAYOUT_FLAG_pr_s12_R,TRACK_NODE_LAYOUT_FLAG_pr_s12_P
@@ -23,7 +23,7 @@ module ptc_spin
   private rot_spin_yr,rot_spin_yp,rot_spin_y
   private PATCH_SPINR,PATCH_SPINP,PATCH_SPIN
   private MIS_SPINR,MIS_SPINP,MIS_SPIN
-  private DTILTR_SPIN,DTILTP_SPIN,DTILT_SPIN
+  private DTILT_SPINR,DTILT_SPINP,DTILT_SPIN
   PRIVATE TRACK_SPIN_FRONTR,TRACK_SPIN_FRONTP,TRACK_SPIN_FRONT
   PRIVATE TRACK_SPIN_BACKR,TRACK_SPIN_BACKP,TRACK_SPIN_BACK
   !  private PUSH_SPIN_RAY8
@@ -39,11 +39,16 @@ module ptc_spin
   private alloc_temporal_probe,GET_BZ_fringe,GET_BZ_fringer,GET_BZ_fringep
   private TRACK_rotate_spin_r,TRACK_rotate_spin_p,TRACK_rotate_spin
   private TRACK_FRINGE_multipole_r,TRACK_FRINGE_multipole_p,TRACK_FRINGE_multipole
-  private TRACK_wedge_spin_R,TRACK_wedge_spin_p,TRACK_wedge_spin
+  private TRACK_wedge_spin_R,TRACK_wedge_spin_p,TRACK_wedge_spin, find_as,find_frac_r,find_n0
   !REAL(DP) :: AG=A_ELECTRON
-  REAL(DP) :: bran_init=pi
-
+  REAL(DP) :: bran_init=pi 
+  logical :: locate_with_no_cavity = .false.
   !  INTEGER, PRIVATE :: ISPIN0P=0,ISPIN1P=3
+
+
+  INTERFACE assignment (=)
+     MODULE PROCEDURE equal_temporal
+  end  INTERFACE
 
   INTERFACE alloc
      MODULE PROCEDURE alloc_temporal_probe
@@ -131,8 +136,8 @@ module ptc_spin
   END INTERFACE
 
   INTERFACE DTILT_SPIN
-     MODULE PROCEDURE DTILTR_SPIN
-     MODULE PROCEDURE DTILTP_SPIN
+     MODULE PROCEDURE DTILT_SPINR
+     MODULE PROCEDURE DTILT_SPINP
   END INTERFACE
 
   INTERFACE TRACK_SPIN_FRONT
@@ -980,62 +985,63 @@ contains
     xp(1)=x(2)
     xp(2)=x(4)   !  to prevent a crash in monitors, etc... CERN june 2010
     dlds=0.0_dp
+    del=x(5)
     CALL get_field(EL,B,E,phi,X,k,POS)
-
-    SELECT CASE(EL%KIND)
+    SELECT CASE(EL%KIND) 
     case(KIND2,kind3,kind5:kind7,kindwiggler) ! Straight for all practical purposes
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,ed,pos=POS)
        IF(k%TIME) THEN
-          DLDS=1.0_dp/root(1.0_dp+2.0_dp*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
+          DLDS=1.0_dp/root(1.0_dp+2.0_dp*del/P%BETA0+del**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
        ELSE
-          DLDS=1.0_dp/root((1.0_dp+X(5))**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
+          DLDS=1.0_dp/root((1.0_dp+del)**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
        ENDIF
-
-       if(pos>=0) OM(2)=P%b0   ! not fake fringe
+       if(pos>=0) OM(2)=p%dir*P%b0   ! not fake fringe
     case(KIND4) ! CAVITY
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,ed,E,EB,EFD,pos=POS)
        IF(k%TIME) THEN
-          DLDS=1.0_dp/root(1.0_dp+2.0_dp*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
+          DLDS=1.0_dp/root(1.0_dp+2.0_dp*del/P%BETA0+del**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
        ELSE
-          DLDS=1.0_dp/root((1.0_dp+X(5))**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
+          DLDS=1.0_dp/root((1.0_dp+del)**2-X(2)**2-X(4)**2)*(1.0_dp+P%b0*X(1))
        ENDIF
     case(KIND16:kind17,KIND20)
-       CALL B_PARA_PERP(k,EL,0,X,B,BPA,BPE,XP,XPA,ed,pos=POS)
+       CALL B_PARA_PERP(k,el,0,X,B,BPA,BPE,XP,XPA,ed,pos=POS)
        IF(k%TIME) THEN
-          DLDS=1.0_dp/root(1.0_dp+2.0_dp*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)
+          DLDS=1.0_dp/root(1.0_dp+2.0_dp*del/P%BETA0+del**2-XPA(2)**2-XPA(1)**2)
        ELSE
-          DLDS=1.0_dp/root((1.0_dp+X(5))**2-XPA(2)**2-XPA(1)**2)
+          DLDS=1.0_dp/root((1.0_dp+del)**2-XPA(2)**2-XPA(1)**2)
        ENDIF
     case(kind10)     ! TEAPOT real curvilinear
+       x(5)=x(5)-phi*EL%P%CHARGE
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,ed,E,EB,EFD,pos=POS)
+       x(5)=x(5)+phi*EL%P%CHARGE   
+
            DEL=x(5)-phi*EL%P%CHARGE
        IF(k%TIME) THEN
           DLDS=1.0_dp/root(1.0_dp+2.0_dp*del/P%BETA0+del**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
        ELSE
           DLDS=1.0_dp/root((1.0_dp+del)**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
        ENDIF
-
-       if(pos>=0) OM(2)=P%b0   ! not fake fringe
+       if(pos>=0) OM(2)=p%dir*P%b0   ! not fake fringe
     case(KINDPA)     ! fitted field for real magnet
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,ed,pos=POS)
        if(k%time) then
           beta0=p%beta0;GAMMA0I=p%GAMMA0I;
        else
-          beta0=1.0_dp;GAMMA0I=0.0_dp;
+          beta0=1.0_dp;GAMMA0I=0.0_dp;  
        endif
        d1=root(x(2)**2+x(4)**2+(1.0_dp+el%pa%hc*x(1))**2)
-       d2=1.0_dp+2.0_dp*x(5)/beta0+x(5)**2
+       d2=1.0_dp+2.0_dp*del/beta0+del**2
        d2=gamma0I/beta0/d2
-       DLDS=root((1.0_dp+d2**2))*d1/(1.0_dp/BETA0+X(5))
-       OM(2)=el%pa%hc
+       DLDS=root((1.0_dp+d2**2))*d1/(1.0_dp/BETA0+del)
+       OM(2)=p%dir*el%pa%hc
     CASE(KIND21)     ! travelling wave cavity
        WRITE(6,*) EL%KIND,EL%NAME," NOT DONE "
     case(KIND22)
        CALL B_PARA_PERP(k,EL,0,X,B,BPA,BPE,XP,XPA,ed,pos=POS)
        IF(k%TIME) THEN
-          DLDS=1.0_dp/root(1.0_dp+2.0_dp*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)
+          DLDS=1.0_dp/root(1.0_dp+2.0_dp*del/P%BETA0+del**2-XPA(2)**2-XPA(1)**2)
        ELSE
-          DLDS=1.0_dp/root((1.0_dp+X(5))**2-XPA(2)**2-XPA(1)**2)
+          DLDS=1.0_dp/root((1.0_dp+del)**2-XPA(2)**2-XPA(1)**2)
        ENDIF
     case default
        OM(1)=0.0_dp
@@ -1044,24 +1050,25 @@ contains
     END SELECT
 
     IF(.not.k%TIME) THEN
-      x(5)=(2*x(5)+x(5)**2)/(sqrt(1.0_dp/p%beta0**2+2.0_dp*x(5)+x(5)**2)+1.0_dp/p%beta0)
+      del=(2*del+del**2)/(root(1.0_dp/p%beta0**2+2.0_dp*del+del**2)+1.0_dp/p%beta0)
     endif
 
     !  MUST ALWAYS COMPUTER GAMMA EVEN IF TIME=FALSE.
-    GAMMA=P%BETA0/P%GAMMA0I*( 1.0_dp/P%BETA0 + X(5) )
-    beta=sqrt(1.0_dp+2.0_dp*x(5)/p%beta0+x(5)**2)/(1.0_dp/P%BETA0 + x(5))  ! replaced  
+    GAMMA=P%BETA0/P%GAMMA0I*( 1.0_dp/P%BETA0 + del )
 
-    OM(1)=-DLDS*( (1.0_dp+p%AG*GAMMA)*BPE(1) + (1.0_dp+p%AG)*BPA(1) )
-    OM(2)=-DLDS*( (1.0_dp+p%AG*GAMMA)*BPE(2) + (1.0_dp+p%AG)*BPA(2) )+OM(2)
-    OM(3)=-DLDS*( (1.0_dp+p%AG*GAMMA)*BPE(3) + (1.0_dp+p%AG)*BPA(3) )
+    OM(1)=-DLDS*a_spin_scale*( (1.0_dp+p%AG*GAMMA)*BPE(1) + (1.0_dp+p%AG)*BPA(1) )
+    OM(2)=-DLDS*a_spin_scale*( (1.0_dp+p%AG*GAMMA)*BPE(2) + (1.0_dp+p%AG)*BPA(2) )+OM(2)
+    OM(3)=-DLDS*a_spin_scale*( (1.0_dp+p%AG*GAMMA)*BPE(3) + (1.0_dp+p%AG)*BPA(3) )
 
+
+    beta=root(1.0_dp+2.0_dp*del/p%beta0+del**2)/(1.0_dp/P%BETA0 + del)  ! replaced 
 
 
     DO I=1,3
-       OM(I)=OM(I)+DLDS*beta*gamma*(p%AG+1.0_dp/(1.0_dp+GAMMA))*EB(I)
+       OM(I)=OM(I)+a_spin_scale*DLDS*beta*gamma*(p%AG+1.0_dp/(1.0_dp+GAMMA))*EB(I)
     ENDDO
-    
-   beta=sqrt(1.0_dp+2.0_dp*x(5)/p%beta0+x(5)**2)*P%BETA0/P%GAMMA0I  ! replace  this
+
+   beta=root(1.0_dp+2.0_dp*x(5)/p%beta0+x(5)**2)*P%BETA0/P%GAMMA0I  ! replace  this
 
     om(1)=-DLDS*0.5_dp*e_muon*beta*(ed(2)*BPE(3)-ed(3)*BPE(2)) +  om(1)
     om(2)=-DLDS*0.5_dp*e_muon*beta*(ed(3)*BPE(1)-ed(1)*BPE(3)) +  om(2)
@@ -1072,7 +1079,7 @@ contains
     ENDDO
 
     IF(.not.k%TIME) THEN
-       x(5)=(2.0_dp*x(5)/p%beta0+x(5)**2)/(sqrt(1.0_dp+2.0_dp*x(5)/p%beta0+x(5)**2)+1.0_dp)
+       x(5)=(2.0_dp*x(5)/p%beta0+x(5)**2)/(root(1.0_dp+2.0_dp*x(5)/p%beta0+x(5)**2)+1.0_dp)
     endif
 
     if((k%radiation.or.k%envelope)) then
@@ -1134,45 +1141,35 @@ contains
     xp(1)=x(2)
     xp(2)=x(4)   !  to prevent a crash in monitors, etc... CERN june 2010
     dlds=0.0_dp
-
+    del=x(5)
     CALL get_field(EL,B,E,phi,X,k,POS)
     SELECT CASE(EL%KIND) 
     case(KIND2,kind3,kind5:kind7,kindwiggler) ! Straight for all practical purposes
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,ed,pos=POS)
        IF(k%TIME) THEN
-          DLDS=1.0_dp/SQRT(1.0_dp+2.0_dp*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
+          DLDS=1.0_dp/SQRT(1.0_dp+2.0_dp*del/P%BETA0+del**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
        ELSE
-          DLDS=1.0_dp/SQRT((1.0_dp+X(5))**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
+          DLDS=1.0_dp/SQRT((1.0_dp+del)**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
        ENDIF
-       if(pos>=0) OM(2)=P%b0   ! not fake fringe
+       if(pos>=0) OM(2)=p%dir*P%b0   ! not fake fringe
     case(KIND4) ! CAVITY
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,ed,E,EB,EFD,pos=POS)
        IF(k%TIME) THEN
-          DLDS=1.0_dp/SQRT(1.0_dp+2.0_dp*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
+          DLDS=1.0_dp/SQRT(1.0_dp+2.0_dp*del/P%BETA0+del**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
        ELSE
-          DLDS=1.0_dp/SQRT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)*(1.0_dp+P%b0*X(1))
+          DLDS=1.0_dp/SQRT((1.0_dp+del)**2-X(2)**2-X(4)**2)*(1.0_dp+P%b0*X(1))
        ENDIF
     case(KIND16:kind17,KIND20)
        CALL B_PARA_PERP(k,el,0,X,B,BPA,BPE,XP,XPA,ed,pos=POS)
        IF(k%TIME) THEN
-          DLDS=1.0_dp/SQRT(1.0_dp+2.0_dp*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)
+          DLDS=1.0_dp/SQRT(1.0_dp+2.0_dp*del/P%BETA0+del**2-XPA(2)**2-XPA(1)**2)
        ELSE
-          DLDS=1.0_dp/SQRT((1.0_dp+X(5))**2-XPA(2)**2-XPA(1)**2)
+          DLDS=1.0_dp/SQRT((1.0_dp+del)**2-XPA(2)**2-XPA(1)**2)
        ENDIF
     case(kind10)     ! TEAPOT real curvilinear
+       x(5)=x(5)-phi*EL%P%CHARGE   
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,ed,E,EB,EFD,pos=POS)
-       !       do i=1,3
-       !        call clean_real_8(bpa(i),bpa(i),1.d-8)
-       !        call clean_real_8(bpe(i),bpe(i),1.d-8)
-       !        write(6,*) i
-       !        write(6,*) " B field "
-       !        call print(b(i),6)
-       !        write(6,*) " parallel "
-       !        call print(bpa(i),6)
-       !        write(6,*) " perpendicular "
-       !        call print(bpe(i),6)
-       !        pause 12
-       !       enddo
+       x(5)=x(5)+phi*EL%P%CHARGE   
 
            DEL=x(5)-phi*EL%P%CHARGE
        IF(k%TIME) THEN
@@ -1180,27 +1177,27 @@ contains
        ELSE
           DLDS=1.0_dp/SQRT((1.0_dp+del)**2-XPA(2)**2-XPA(1)**2)*(1.0_dp+P%b0*X(1))
        ENDIF
-       if(pos>=0) OM(2)=P%b0   ! not fake fringe
+       if(pos>=0) OM(2)=p%dir*P%b0   ! not fake fringe
     case(KINDPA)     ! fitted field for real magnet
        CALL B_PARA_PERP(k,EL,1,X,B,BPA,BPE,XP,XPA,ed,pos=POS)
        if(k%time) then
           beta0=p%beta0;GAMMA0I=p%GAMMA0I;
        else
-          beta0=1.0_dp;GAMMA0I=0.0_dp;
+          beta0=1.0_dp;GAMMA0I=0.0_dp;  
        endif
        d1=sqrt(x(2)**2+x(4)**2+(1.0_dp+el%pa%hc*x(1))**2)
-       d2=1.0_dp+2.0_dp*x(5)/beta0+x(5)**2
+       d2=1.0_dp+2.0_dp*del/beta0+del**2
        d2=gamma0I/beta0/d2
-       DLDS=sqrt((1.0_dp+d2**2))*d1/(1.0_dp/BETA0+X(5))
-       OM(2)=el%pa%hc
+       DLDS=sqrt((1.0_dp+d2**2))*d1/(1.0_dp/BETA0+del)
+       OM(2)=p%dir*el%pa%hc
     CASE(KIND21)     ! travelling wave cavity
        WRITE(6,*) EL%KIND,EL%NAME," NOT DONE "
     case(KIND22)
        CALL B_PARA_PERP(k,EL,0,X,B,BPA,BPE,XP,XPA,ed,pos=POS)
        IF(k%TIME) THEN
-          DLDS=1.0_dp/SQRT(1.0_dp+2.0_dp*X(5)/P%BETA0+X(5)**2-XPA(2)**2-XPA(1)**2)
+          DLDS=1.0_dp/SQRT(1.0_dp+2.0_dp*del/P%BETA0+del**2-XPA(2)**2-XPA(1)**2)
        ELSE
-          DLDS=1.0_dp/SQRT((1.0_dp+X(5))**2-XPA(2)**2-XPA(1)**2)
+          DLDS=1.0_dp/SQRT((1.0_dp+del)**2-XPA(2)**2-XPA(1)**2)
        ENDIF
     case default
        OM(1)=0.0_dp
@@ -1209,18 +1206,18 @@ contains
     END SELECT
 
     IF(.not.k%TIME) THEN
-      x(5)=(2*x(5)+x(5)**2)/(sqrt(1.0_dp/p%beta0**2+2.0_dp*x(5)+x(5)**2)+1.0_dp/p%beta0)
+      del=(2*del+del**2)/(sqrt(1.0_dp/p%beta0**2+2.0_dp*del+del**2)+1.0_dp/p%beta0)
     endif
 
     !  MUST ALWAYS COMPUTER GAMMA EVEN IF TIME=FALSE.
-    GAMMA=P%BETA0/P%GAMMA0I*( 1.0_dp/P%BETA0 + X(5) )
+    GAMMA=P%BETA0/P%GAMMA0I*( 1.0_dp/P%BETA0 + del )
 
     OM(1)=-DLDS*a_spin_scale*( (1.0_dp+p%AG*GAMMA)*BPE(1) + (1.0_dp+p%AG)*BPA(1) )
     OM(2)=-DLDS*a_spin_scale*( (1.0_dp+p%AG*GAMMA)*BPE(2) + (1.0_dp+p%AG)*BPA(2) )+OM(2)
     OM(3)=-DLDS*a_spin_scale*( (1.0_dp+p%AG*GAMMA)*BPE(3) + (1.0_dp+p%AG)*BPA(3) )
 
 
-    beta=sqrt(1.0_dp+2.0_dp*x(5)/p%beta0+x(5)**2)/(1.0_dp/P%BETA0 + x(5))  ! replaced 
+    beta=sqrt(1.0_dp+2.0_dp*del/p%beta0+del**2)/(1.0_dp/P%BETA0 + del)  ! replaced 
 
 
     DO I=1,3
@@ -1228,7 +1225,7 @@ contains
     ENDDO
 
     e_muon_scale%r=e_muon
-    beta=sqrt(1.0_dp+2.0_dp*x(5)/p%beta0+x(5)**2)*P%BETA0/P%GAMMA0I 
+    beta=sqrt(1.0_dp+2.0_dp*del/p%beta0+del**2)*P%BETA0/P%GAMMA0I 
 
     om(1)=-DLDS*0.5_dp*e_muon_scale*beta*(ed(2)*BPE(3)-ed(3)*BPE(2)) +  om(1)
     om(2)=-DLDS*0.5_dp*e_muon_scale*beta*(ed(3)*BPE(1)-ed(1)*BPE(3)) +  om(2)
@@ -1239,7 +1236,7 @@ contains
     ENDDO
 
     IF(.not.k%TIME) THEN
-       x(5)=(2.0_dp*x(5)/p%beta0+x(5)**2)/(sqrt(1.0_dp+2.0_dp*x(5)/p%beta0+x(5)**2)+1.0_dp)
+       del=(2.0_dp*del/p%beta0+del**2)/(sqrt(1.0_dp+2.0_dp*del/p%beta0+del**2)+1.0_dp)
     endif
 
     if((k%radiation.or.k%envelope)) then
@@ -1891,17 +1888,17 @@ call kill(e)
     INTEGER, INTENT(IN) :: POS
     TYPE(PANCAKE),  INTENT(INOUT) :: EL
     real(dp) , INTENT(INOUT) ::B(3)
+    real(dp) BE(nbe)
+    Be(1)=X(1);
+    Be(2)=X(3);
+    Be(3)=0.0_dp;
 
-    B(1)=X(1);
-    B(2)=X(3);
-    B(3)=0.0_dp;
+    CALL trackg(EL%B(POS),BE)
 
-    CALL trackg(EL%B(POS),B)
-
-    b(1)=EL%SCALE*b(1)
-    b(2)=EL%SCALE*b(2)
+    b(1)=EL%SCALE*be(1)
+    b(2)=EL%SCALE*be(2)
     !    b(3)=EL%SCALE*el%p%charge*el%p%dir*b(3)
-    b(3)=EL%SCALE*b(3)
+    b(3)=EL%SCALE*be(3)
 
   END subroutine B_PANCAkEr
 
@@ -1911,18 +1908,21 @@ call kill(e)
     INTEGER, INTENT(IN) :: POS
     TYPE(PANCAKEP),  INTENT(INOUT) :: EL
     type(real_8), INTENT(INOUT) ::B(3)
+    type(real_8) be(nbe)
 
-    B(1)=X(1);
-    B(2)=X(3);
-    B(3)=0.0_dp;
+    call alloc(be)
+    Be(1)=X(1);
+    Be(2)=X(3);
+    Be(3)=0.0_dp;
 
-    CALL trackg(EL%B(POS),B)
 
-    b(1)=EL%SCALE*b(1)
-    b(2)=EL%SCALE*b(2)
+    CALL trackg(EL%B(POS),Be)
+
+    b(1)=EL%SCALE*be(1)
+    b(2)=EL%SCALE*be(2)
     !    b(3)=EL%SCALE*el%p%charge*el%p%dir*b(3)
-    b(3)=EL%SCALE*b(3)
-
+    b(3)=EL%SCALE*be(3)
+    call kill(be)
   END subroutine B_PANCAkEp
 
   subroutine B_PARA_PERPr(k,EL,TEAPOT_LIKE,X,B,BPA,BPE,XP,XPA,e,EF,EFB,EFD,POS)
@@ -1941,7 +1941,7 @@ call kill(e)
     !  this routines gives us  B parallel and B perpendicular
     ! Also if EF is present, E perpendicular times beta is return
     
-    call DIRECTION_V(k,EL,TEAPOT_LIKE,X,E,XP,XPA,POS)
+    call DIRECTION_V(k,EL,X,E,XP,XPA,POS)
 
     be=b(1)*e(1)+b(2)*e(2)+b(3)*e(3)
 
@@ -1981,7 +1981,7 @@ call kill(e)
 
      call alloc(be);
 
-    call DIRECTION_V(k,EL,TEAPOT_LIKE,X,E,XP,XPA,POS)
+    call DIRECTION_V(k,EL,X,E,XP,XPA,POS)
 
     be=b(1)*e(1)+b(2)*e(2)+b(3)*e(3)
 
@@ -2007,14 +2007,13 @@ call kill(e)
   END subroutine B_PARA_PERPp
 
 
-  subroutine DIRECTION_VR(k,EL,TEAPOT_LIKE,X,E,XP,XPA,POS)
+  subroutine DIRECTION_VR(k,EL,X,E,XP,XPA,POS)
     IMPLICIT NONE
     REAL(DP),  INTENT(INout) :: X(6),XP(2),XPA(2)
     TYPE(ELEMENT),  pointer :: EL
     TYPE(MAGNET_CHART),  pointer :: P
     REAL(DP),  INTENT(INOUT) ::E(3)
     REAL(DP) N,H,DP1,A,AP,B,BP,z,AV(3)
-    INTEGER TEAPOT_LIKE
     integer, optional,intent(in) :: pos
     type(internal_state) k
 
@@ -2106,22 +2105,21 @@ call kill(e)
 
     ENDIF
 
-    E(1)=EL%P%dir*E(1)
-    E(2)=EL%P%dir*E(2)
+!    E(1)=EL%P%dir*E(1)
+!    E(2)=EL%P%dir*E(2)    etienne 2016_5_9
     E(3)=EL%P%dir*E(3)
 
 
 
   END subroutine DIRECTION_VR
 
-  subroutine DIRECTION_VP(k,EL,TEAPOT_LIKE,X,E,XP,XPA,POS)
+  subroutine DIRECTION_VP(k,EL,X,E,XP,XPA,POS)
     IMPLICIT NONE
     type(real_8), INTENT(INout) :: X(6),XP(2),XPA(2)
     TYPE(ELEMENTP),  pointer :: EL
     TYPE(MAGNET_CHART),  pointer :: P
     type(real_8), INTENT(INOUT) ::E(3)
     type(real_8) N,H,DP1,A,AP,B,BP,z,AV(3)
-    INTEGER TEAPOT_LIKE
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
     integer, optional,intent(in) :: pos
 
@@ -2212,8 +2210,9 @@ call kill(e)
 
     ENDIF
 
-    E(1)=EL%P%dir*E(1)
-    E(2)=EL%P%dir*E(2)
+
+!    E(1)=EL%P%dir*E(1)
+!    E(2)=EL%P%dir*E(2)    etienne 2016_5_9
     E(3)=EL%P%dir*E(3)
 
 
@@ -2925,11 +2924,11 @@ call kill(e)
     endif
     xs%u=.not.check_stable
     if(xs%u) then
-       xs%lost_node=>c
        lost_fibre=>c%parent_fibre
        lost_node=>c
        xlost=xs%x
     endif
+       xs%last_node=>c
   END SUBROUTINE TRACK_NODE_FLAG_probe_R
 
   SUBROUTINE TRACK_NODE_FLAG_probe_P(C,XS,K)
@@ -3058,12 +3057,11 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
 
     xs%u=.not.check_stable
     if(xs%u) then
-       xs%lost_node=>c
        lost_fibre=>c%parent_fibre
        lost_node=>c
        xlost=xs%x
     endif
-
+       xs%last_node=>c
   END SUBROUTINE TRACK_NODE_FLAG_probe_P
 
 
@@ -3244,31 +3242,31 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     SELECT CASE(EL%KIND)
     case(KIND16,KIND10)
        IF(C%CAS==CASE1) THEN
-          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(1))
+          CALL rot_spin_y(p,el%p%dir*C%PARENT_FIBRE%MAG%P%EDGE(1))
        ELSE
-          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(2))
+          CALL rot_spin_y(p,el%p%dir*C%PARENT_FIBRE%MAG%P%EDGE(2))
        ENDIF
     case(KIND20)
        IF(C%CAS==CASE1) THEN
-          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/2.0_dp)
+          CALL rot_spin_y(p,el%p%dir*C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/2.0_dp)
        ELSE
-          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/2.0_dp)
+          CALL rot_spin_y(p,el%p%dir*C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/2.0_dp)
        ENDIF
 
     case(KINDPA)
        if(el%pa%hc==0.0_dp) then
 
             IF(C%CAS==CASE1) THEN
-                CALL rot_spin_y(p,el%pa%angc)
+                CALL rot_spin_y(p,el%p%dir*el%pa%angc)
             else
-                CALL rot_spin_y(p,el%pa%angc)
+                CALL rot_spin_y(p,el%p%dir*el%pa%angc)
             endif
         else
    
             IF(C%CAS==CASE1) THEN
-                CALL rot_spin_y(p,-el%pa%angc)
+                CALL rot_spin_y(p,-el%p%dir*el%pa%angc)
             else
-                CALL rot_spin_y(p,-el%pa%angc)
+                CALL rot_spin_y(p,-el%p%dir*el%pa%angc)
             endif
 
        endif
@@ -3290,29 +3288,29 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     SELECT CASE(EL%KIND)
     case(KIND16,KIND10)
        IF(C%CAS==CASE1) THEN
-          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(1))
+          CALL rot_spin_y(p,el%p%dir*C%PARENT_FIBRE%MAG%P%EDGE(1))
        ELSE
-          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%EDGE(2))
+          CALL rot_spin_y(p,el%p%dir*C%PARENT_FIBRE%MAG%P%EDGE(2))
        ENDIF
     case(KIND20)
        IF(C%CAS==CASE1) THEN
-          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/2.0_dp)
+          CALL rot_spin_y(p,el%p%dir*C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/2.0_dp)
        ELSE
-          CALL rot_spin_y(p,C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/2.0_dp)
+          CALL rot_spin_y(p,el%p%dir*C%PARENT_FIBRE%MAG%P%B0*C%PARENT_FIBRE%MAG%P%LD/2.0_dp)
        ENDIF
        if(el%pa%hc==0.0_dp) then
 
             IF(C%CAS==CASE1) THEN
-                CALL rot_spin_y(p,el%pa%angc)
+                CALL rot_spin_y(p,el%p%dir*el%pa%angc)
             else
-                CALL rot_spin_y(p,el%pa%angc)
+                CALL rot_spin_y(p,el%p%dir*el%pa%angc)
             endif
         else
    
             IF(C%CAS==CASE1) THEN
-                CALL rot_spin_y(p,-el%pa%angc)
+                CALL rot_spin_y(p,-el%p%dir*el%pa%angc)
             else
-                CALL rot_spin_y(p,-el%pa%angc)
+                CALL rot_spin_y(p,-el%p%dir*el%pa%angc)
             endif
 
        endif
@@ -3432,7 +3430,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     ENDIF
 
 
-    CALL DTILT_SPIN(C%DIR,C%MAG%P%TILTD,1,P)
+    CALL DTILT_SPIN(C%MAG%P%TILTD,1,P)
     ! The magnet frame of reference is located here implicitely before misalignments
 
     !      CALL TRACK(C,X,EXACTMIS=K%EXACTMIS)
@@ -3468,7 +3466,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     ENDIF
 
 
-    CALL DTILT_SPIN(C%DIR,C%MAG%P%TILTD,1,P)
+    CALL DTILT_SPIN(C%MAG%P%TILTD,1,P)
     ! The magnet frame of reference is located here implicitely before misalignments
 
     !      CALL TRACK(C,X,EXACTMIS=K%EXACTMIS)
@@ -3515,7 +3513,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        CALL MIS_SPIN(C,P,my_false)
     ENDIF
     ! The magnet frame of reference is located here implicitely before misalignments
-    CALL DTILT_SPIN(C%DIR,C%MAG%P%TILTD,2,P)
+    CALL DTILT_SPIN(C%MAG%P%TILTD,2,P)
 
 
     !    fake back spin snake PATCHG==6
@@ -3563,7 +3561,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        CALL MIS_SPIN(C,P,my_false)
     ENDIF
     ! The magnet frame of reference is located here implicitely before misalignments
-    CALL DTILT_SPIN(C%DIR,C%MAG%P%TILTD,2,P)
+    CALL DTILT_SPIN(C%MAG%P%TILTD,2,P)
 
 
     !    fake back spin snake PATCHG==6
@@ -3590,7 +3588,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     IF(ENTERING) THEN
        da=C%PATCH%A_ANG(1)+((C%PATCH%A_X1-1)/2)*pi
        call rot_spin_x(P,da)
-       call rot_spin_y(P,C%PATCH%A_ANG(2))
+       call rot_spin_y(P,c%dir*C%PATCH%A_ANG(2)) ! 2016_5_9
        call rot_spin_z(P,C%PATCH%A_ANG(3))
        da=((C%PATCH%A_X2-1)/2)*pi
        call rot_spin_x(P,da)
@@ -3599,7 +3597,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        call rot_spin_x(P,da)
        ! error etienne
        !      call rot_spin_y(P,C%PATCH%A_ANG(2))
-       call rot_spin_y(P,C%PATCH%b_ANG(2))
+       call rot_spin_y(P,c%dir*C%PATCH%b_ANG(2)) ! 2016_5_9
        call rot_spin_z(P,C%PATCH%b_ANG(3))
        da=((C%PATCH%B_X2-1)/2)*pi
        call rot_spin_x(P,da)
@@ -3620,7 +3618,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        da=C%PATCH%A_ANG(1)+((C%PATCH%A_X1-1)/2)*pi
 
        call rot_spin_x(P,da)
-       call rot_spin_y(P,C%PATCH%A_ANG(2))
+       call rot_spin_y(P,c%dir*C%PATCH%A_ANG(2)) ! 2016_5_9
        call rot_spin_z(P,C%PATCH%A_ANG(3))
 
 
@@ -3632,7 +3630,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        call rot_spin_x(P,da)
        ! error etienne
        !       call rot_spin_y(P,C%PATCH%A_ANG(2))
-       call rot_spin_y(P,C%PATCH%b_ANG(2))
+       call rot_spin_y(P,c%dir*C%PATCH%b_ANG(2)) ! 2016_5_9
        call rot_spin_z(P,C%PATCH%b_ANG(3))
 
 
@@ -3670,7 +3668,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
              C%CHART%D_OUT(2)=-C%CHART%D_OUT(2)
              C%CHART%ANG_OUT(3)=-C%CHART%ANG_OUT(3)
              call rot_spin_Z(P,C%CHART%ANG_OUT(3))
-             call rot_spin_Y(P,C%CHART%ANG_OUT(2))
+             call rot_spin_Y(P,-C%CHART%ANG_OUT(2))   !2016_5_9
              call rot_spin_X(P,C%CHART%ANG_OUT(1))
              C%CHART%D_OUT(1)=-C%CHART%D_OUT(1)
              C%CHART%D_OUT(2)=-C%CHART%D_OUT(2)
@@ -3680,7 +3678,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
              C%CHART%D_IN(2)=-C%CHART%D_IN(2)
              C%CHART%ANG_IN(3)=-C%CHART%ANG_IN(3)
              call rot_spin_Z(P,C%CHART%ANG_IN(3))
-             call rot_spin_Y(P,C%CHART%ANG_IN(2))
+             call rot_spin_Y(P,-C%CHART%ANG_IN(2))   !2016_5_9
              call rot_spin_X(P,C%CHART%ANG_IN(1))
              C%CHART%D_IN(1)=-C%CHART%D_IN(1)
              C%CHART%D_IN(2)=-C%CHART%D_IN(2)
@@ -3716,7 +3714,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
 
 
              call rot_spin_Z(P,C%CHART%ANG_OUT(3))
-             call rot_spin_Y(P,C%CHART%ANG_OUT(2))
+             call rot_spin_Y(P,-C%CHART%ANG_OUT(2))   !2016_5_9
              call rot_spin_X(P,C%CHART%ANG_OUT(1))
 
              C%CHART%D_OUT(1)=-C%CHART%D_OUT(1)
@@ -3728,7 +3726,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
              C%CHART%ANG_IN(3)=-C%CHART%ANG_IN(3)
 
              call rot_spin_Z(P,C%CHART%ANG_IN(3))
-             call rot_spin_Y(P,C%CHART%ANG_IN(2))
+             call rot_spin_Y(P,-C%CHART%ANG_IN(2))    !2016_5_9
              call rot_spin_X(P,C%CHART%ANG_IN(1))
 
              C%CHART%D_IN(1)=-C%CHART%D_IN(1)
@@ -3740,43 +3738,43 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
   END SUBROUTINE MIS_SPINP
 
 
-  SUBROUTINE DTILTR_SPIN(DIR,TILTD,I,P)
+  SUBROUTINE DTILT_SPINR(TILTD,I,P)
     IMPLICIT NONE
     TYPE(PROBE),INTENT(INOUT):: P
     !    real(dp),INTENT(INOUT):: S(3)
-    INTEGER,INTENT(IN):: I,DIR
+    INTEGER,INTENT(IN):: I
     REAL(DP),INTENT(IN) :: TILTD
     real(dp) YS
 
     IF(TILTD==0.0_dp) RETURN
     IF(I==1) THEN
-       YS=DIR*TILTD
+       YS=TILTD
        call rot_spin_Z(P,YS)
     ELSE
-       YS=-DIR*TILTD
+       YS=-TILTD
        call rot_spin_Z(P,YS)
     ENDIF
 
-  END SUBROUTINE DTILTR_SPIN
+  END SUBROUTINE DTILT_SPINR
 
-  SUBROUTINE DTILTP_SPIN(DIR,TILTD,I,P)
+  SUBROUTINE DTILT_SPINP(TILTD,I,P)
     IMPLICIT NONE
     TYPE(PROBE_8),INTENT(INOUT):: P
     !    TYPE(REAL_8),INTENT(INOUT):: S(3)
-    INTEGER,INTENT(IN):: I,DIR
+    INTEGER,INTENT(IN):: I
     REAL(DP),INTENT(IN) :: TILTD
     real(dp) YS
 
     IF(TILTD==0.0_dp) RETURN
     IF(I==1) THEN
-       YS=DIR*TILTD
+       YS=TILTD
        call rot_spin_Z(P,YS)
     ELSE
-       YS=-DIR*TILTD
+       YS=-TILTD
        call rot_spin_Z(P,YS)
     ENDIF
 
-  END SUBROUTINE DTILTP_SPIN
+  END SUBROUTINE DTILT_SPINP
 
   SUBROUTINE FIND_ORBIT_LAYOUT_noda(RING,FIX,STATE,eps,TURNS,fibre1,node1) ! Finds orbit without TPSA in State or compatible state
     IMPLICIT NONE
@@ -3829,10 +3827,10 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     Nullify(C);
 
     if(.not.ring%closed) then
-       w_p=0
-       w_p%nc=1
-       w_p%fc='((1X,a72))'
-       w_p%c(1)=" This line is not ring : FIND_ORBIT_LAYOUT_noda "
+       !w_p=0
+       !w_p%nc=1
+       !w_p%fc='((1X,a72))'
+       !w_p%c(1)=" This line is not ring : FIND_ORBIT_LAYOUT_noda "
        ! call !write_e(100)
     endif
     dix(:)=0.0_dp
@@ -3989,10 +3987,10 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
           !!       call TRACK_PROBE(Ring,xs,loct,loct+ring%t%n,stat)
           !!       y=xs%x
           !          if(.not.check_stable) then
-          !             w_p=0
-          !             w_p%nc=1
-          !             w_p%fc='((1X,a72))'
-          !             write(w_p%c(1),'(a30,i4)') " Lost in Fixed Point Searcher ",3
+          !             !w_p=0
+          !             !w_p%nc=1
+          !             !w_p%fc='((1X,a72))'
+          !             write(6,'(a30,i4)') " Lost in Fixed Point Searcher ",3
           !             ! call ! WRITE_I
 
           !             return
@@ -4137,10 +4135,10 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     Nullify(C);
 
     if(.not.ring%closed) then
-       w_p=0
-       w_p%nc=1
-       w_p%fc='((1X,a72))'
-       w_p%c(1)=" This line is not ring : FIND_ORBIT_LAYOUT_noda "
+       !w_p=0
+       !w_p%nc=1
+       !w_p%fc='((1X,a72))'
+       !w_p%c(1)=" This line is not ring : FIND_ORBIT_LAYOUT_noda "
        ! call !write_e(100)
     endif
     dix(:)=0.0_dp
@@ -4260,14 +4258,12 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
        !       CALL TRACK(RING,X,LOC,STAT)
        !       trackflag=TRACK_flag(RING,X,LOC,STAT)
        !!       xs%x=x
-       !print*,"Skowron 1 OrbitSearch x_i", x
        call TRACK_probe_X(x,stat,fibre1=fibre1,node1=node1)
        if(.not.check_stable) then
           messagelost(len_trim(messagelost)+1:255)=" -> Unstable tracking guessed orbit "
           c_%APERTURE_FLAG=APERTURE
           return
        endif
-       !print*,"Skowron 1 OrbitSearch x_f", x
        !     write(6,*) item,check_stable
        !!       call TRACK_PROBE(Ring,xs,loct,loct+ring%t%n,stat)
        !!       x=xs%x
@@ -4296,10 +4292,10 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
           !!       call TRACK_PROBE(Ring,xs,loct,loct+ring%t%n,stat)
           !!       y=xs%x
           !          if(.not.check_stable) then
-          !             w_p=0
-          !             w_p%nc=1
-          !             w_p%fc='((1X,a72))'
-          !             write(w_p%c(1),'(a30,i4)') " Lost in Fixed Point Searcher ",3
+          !             !w_p=0
+          !             !w_p%nc=1
+          !             !w_p%fc='((1X,a72))'
+          !             write(6,'(a30,i4)') " Lost in Fixed Point Searcher ",3
           !             ! call ! WRITE_I
 
           !             return
@@ -4344,11 +4340,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     do iu=1,ND2
        xdix=abs(dix(iu))+xdix
     enddo
-    
-   
-    !print*,"Skowron 1 OrbitSearch: Current orbit", fix
-    !write(6,*) "Skowron 1 OrbitSearch Convergence Factor = ",nd2,xdix,deps_tracking
-    
+    !    write(6,*) " Convergence Factor = ",nd2,xdix,deps_tracking
     !    pause 123321
   !  if(verbose) write(6,*) " Convergence Factor = ",xdix
     if(xdix.gt.deps_tracking) then
@@ -4458,14 +4450,17 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
 
 
   ! time tracking
-  SUBROUTINE TRACK_time(xT,DT,K)
+
+
+   SUBROUTINE TRACK_time(xT,DTt,K)
     ! Tracks a single particle   of the beam for a time DT
     implicit none
     TYPE(INTEGRATION_NODE), POINTER:: T
     TYPE(temporal_probe),INTENT(INOUT):: xT
-    REAL(DP), INTENT(IN) :: DT
-    REAL(DP) XTT(6),DT0,YL,DT_BEFORE   !X(6),
+    REAL(DP), INTENT(IN) :: DTt
+    REAL(DP) DT0,DT_BEFORE,X(6),fac,dt
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
+    type(probe) b
     LOGICAL(LP) END_OF_LINE
     END_OF_LINE=.FALSE.
 
@@ -4485,16 +4480,18 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     T%PARENT_FIBRE%MAG%P%CHARGE=>T%PARENT_FIBRE%CHARGE
 
 
-    DT0=XT%xs%X(6)
-    CALL DRIFT_BACK_TO_POSITION(T,XT%Ds,XT%xs%X,k)
-    XT%Ds=0.0_dp
-    DT0=XT%xs%X(6)-DT0
+  
+    XT%r=0.0_dp
+    DT0=0.d0
+    dt=dtt+xt%dt0
+!    XT%xs%X=XT%Xb
 
-    YL=0.0_dp
+    FAC=0.0_dp
 
     DO WHILE(DT0<=DT)
-       XTT=XT%xs%X
+
        DT_BEFORE=DT0
+       b=XT%xs
        !         WRITE(6,*) " POS ",T%s(1),t%pos_in_fibre
        !         WRITE(6,*) " POS ",T%POS,T%CAS,T%PARENT_FIBRE%MAG%NAME
        ! putting spin and radiation
@@ -4504,90 +4501,117 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
 
        !
        !
-       DT0=DT0+(XT%xs%X(6)-XTT(6))
+       DT0=DT0+(XT%xs%X(6)-b%x(6))
+!       write(6,*) dt0,dt,t%pos,t%pos_in_fibre
        T=>T%NEXT
        IF(.NOT.ASSOCIATED(T%NEXT)) THEN
           END_OF_LINE=.TRUE.
           EXIT
        ENDIF
-       if(.not.check_stable) exit
+       if(.not.check_stable.or.XT%xs%u) exit
 
     ENDDO
+       XT%NODE=>T%previous
 
-    IF(.NOT.END_OF_LINE.and.check_stable) THEN
-       IF(DT0/=DT) THEN
-          XT%NODE=>T%PREVIOUS
-          XT%xs%X=XTT
-          DT0=DT-DT_BEFORE
-          !           WRITE(6,*) " DT0 ", DT0
-          CALL DRIFT_TO_TIME(T,YL,DT0,XT%xs%X,k)
-       ELSE
-          XT%NODE=>T
+    IF(.NOT.END_OF_LINE.and.(.not.XT%xs%u)) THEN
+       IF(DT0/=DT.and.check_stable) THEN
+  !        XT%NODE=>T%previous
+          XT%Dt0=dt-DT_BEFORE
+          fac=(dt-DT_BEFORE)/(dt0-DT_BEFORE)
+    !      X=fac*(XT%xs%X-XT%Xb)+XT%Xb
+     !  yl=fac*XT%NODE%parent_fibre%mag%l/XT%NODE%parent_fibre%mag%p%nst
        ENDIF
     ELSE
 
 
-       IF(DT0<DT.and.check_stable) THEN
-          XT%NODE=>T%PREVIOUS
-          XT%xs%X=XTT
-          DT0=DT-DT_BEFORE
-          CALL DRIFT_TO_TIME(T,YL,DT0,XT%xs%X,k)
-       ELSE
-          XT%NODE=>T
+       IF(DT0<DT.and.check_stable.and.(.not.XT%xs%u)) THEN
+  !        XT%NODE=>T%previous
+          XT%Dt0=dt-DT_BEFORE
+          fac=(dt-DT_BEFORE)/(dt0-DT_BEFORE)
+  !        X=fac*(XT%xs%X-XT%Xb)+XT%Xb
+  !     yl=fac*XT%NODE%parent_fibre%mag%l/XT%NODE%parent_fibre%mag%p%nst
        ENDIF
 
     ENDIF
 
 
-    XT%Ds=yl
-    !   xs%x=X
-    !    XT%NODE=>T
-    if(.not.CHECK_STABLE) then
-       !       write(6,*) "unstable "
+    XT%r=FAC
+
+    if(.not.CHECK_STABLE.or.XT%xs%u) then
        lost_fibre=>t%parent_fibre
        lost_node=>t
        XT%xs%u=.true.
     endif
+ 
+    call ptc_global_x_p(xt,b,k)
 
-    call ptc_global_x_p(xt,k)
+!call make_spinor_basis(xt%s(1),xt%s(2),xt%s(3))
 
-  END SUBROUTINE TRACK_time
+!write(6,*) xt%s(1).dot.xt%s(1),xt%s(2).dot.xt%s(2),xt%s(3).dot.xt%s(3)
+!write(6,*) xt%s(1).dot.xt%s(2),xt%s(2).dot.xt%s(3),xt%s(1).dot.xt%s(3)
+    XT%t=b%x(6)+XT%dt0
+    xt%xs=b
+  END SUBROUTINE TRACK_time 
 
-  Subroutine ptc_global_x_p(xt,k)
+  Subroutine ptc_global_x_p(xt,b,k)
     implicit none
     TYPE(temporal_probe),INTENT(INOUT):: xT
     TYPE(INTERNAL_STATE) k !,OPTIONAL :: K
-    integer i
-    real(dp) p(3),pz,betinv
+    integer i,posi
+    type(probe) b
+    real(dp) p(3),pzb,pz,betinv,pos(3),dab(3),xp(2),xpa(2),e(3),eb(3),dal(3)
 
     if(associated(XT%NODE%ENT)) then
        ! computing global position
-
+       call DIRECTION_V(k,xt%node%parent_fibre%mag,xt%xs%x,E,XP,XPA,xt%node%POS_IN_FIBRE-2)
+       call DIRECTION_V(k,xt%node%parent_fibre%mag,b%x,EB,XP,XPA,xt%node%POS_IN_FIBRE-2)
+       if(k%spin) call find_frac_r(xt,b)
+   
        XT%pos=0.0_dp
+       pos=0.0_dp
        DO I=1,3
-          XT%POS(i)=XT%POS(i) + XT%XS%X(1)*XT%NODE%ENT(1,I)     !
-          XT%POS(i)=XT%POS(i) + XT%XS%X(3)*XT%NODE%ENT(2,I)     !
-          XT%POS(i)=XT%POS(i) + XT%Ds*XT%NODE%PARENT_FIBRE%DIR*XT%NODE%ENT(3,I)     !
+          XT%POS(i)=XT%POS(i) + XT%XS%X(1)*XT%NODE%EXI(1,I)     !
+          XT%POS(i)=XT%POS(i) + XT%XS%X(3)*XT%NODE%EXI(2,I)     !
+ 
+          pos(i)=POS(i) + b%x(1)*XT%NODE%ent(1,I)   
+          pos(i)=POS(i) + b%x(3)*XT%NODE%ent(2,I)   
        ENDDO
-       XT%pos(1:3) = XT%pos(1:3) + XT%NODE%A
+       dal(1:3)=pos(1:3)  
+       XT%pos(1:3) = XT%pos(1:3) + XT%NODE%B
+       pos(1:3) = pos(1:3) + XT%NODE%A
+       dab(1:3)=XT%pos(1:3)-pos(1:3)
+ 
+
+
+
+       dab(1:3)=XT%r*dab(1:3)
+
+
+       dal(1:3)=dal(1:3)+dab(1:3)
+   ! pz=dal(1)*XT%NODE%ent(3,1)+dal(2)*XT%NODE%ent(3,2)+dal(3)*XT%NODE%ent(3,3)
+ 
+       call change_basis(dal(1:3),global_frame,xt%ic,XT%NODE%ent)
+ 
+!call ptc_print(XT%NODE%a,XT%NODE%ent,6)
+
+       XT%pos(1:3)=pos(1:3)+dab(1:3)
+
+
+
        ! computing global momentum
        if(k%time) then
           betinv=1.0_dp/XT%NODE%PARENT_FIBRE%beta0
        ELSE
           betinv=1.0_dp
        ENDIF
-       P(1)=XT%XS%X(2)*XT%NODE%PARENT_FIBRE%mag%p%p0c
-       P(2)=XT%XS%X(4)*XT%NODE%PARENT_FIBRE%mag%p%p0c
-       !       pz=XT%NODE%PARENT_FIBRE%mag%p%p0c* &
-       !            (one+two*betinv*XT%XS%X(5)+XT%XS%X(5)**2)-xt%pos(4)**2-xt%pos(5)**2
-       pz=(1.0_dp+2.0_dp*betinv*XT%XS%X(5)+XT%XS%X(5)**2)-XT%XS%X(2)**2-XT%XS%X(4)**2
-       pz=XT%NODE%PARENT_FIBRE%mag%p%p0c*root(pz)*XT%NODE%PARENT_FIBRE%DIR
-       P(3)=PZ
-       DO I=1,3
-          XT%POS(i+3)=XT%POS(i+3) + P(1)*XT%NODE%ENT(1,I)     !
-          XT%POS(i+3)=XT%POS(i+3) + P(2)*XT%NODE%ENT(2,I)     !
-          XT%POS(i+3)=XT%POS(i+3) + P(3)*XT%NODE%ENT(3,I)     !
-       ENDDO
+       pz=sqrt(1.0_dp+2.0_dp*betinv*XT%XS%X(5)+XT%XS%X(5)**2)*XT%NODE%PARENT_FIBRE%mag%p%p0c    
+       pzb=sqrt(1.0_dp+2.0_dp*betinv*b%X(5)+b%X(5)**2)*XT%NODE%PARENT_FIBRE%mag%p%p0c    
+  
+
+       pz=pzb+XT%r*(pz-pzb)
+       e(1:3)=eb(1:3)+XT%r*(e(1:3)-eb(1:3))
+       XT%POS(4:6)=e(1:3)*pz/sqrt(e(1)**2+e(2)**2+e(3)**2)
+
     else
        write(6,*) " FILL_SURVEY_DATA_IN_NODE_LAYOUT "
        write(6,*) " was not called, so no survey data on the nodes "
@@ -4597,24 +4621,643 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     endif
 
   end Subroutine ptc_global_x_p
-  !  type probe
-  !   real(dp) x(6)
-  !   type(spinor) s
-  !   logical u
-  !    type(integration_node),pointer :: lost_node
-  !  end type probe
-  !type TEMPORAL_PROBE
-  !    TYPE(probe)  XS
-  !    TYPE(INTEGRATION_NODE), POINTER :: NODE
-  !    real(DP)  DS,POS(6)
-  !END type TEMPORAL_PROBE
 
-  !type TEMPORAL_BEAM
-  !    TYPE(TEMPORAL_PROBE), pointer :: TP(:)
-  !    real(DP) a(3),ent(3,3),p0c,total_time
-  !    integer n
-  !    type(integration_node),pointer :: c   ! pointer close to a(3)
-  !END type TEMPORAL_BEAM
+  SUBROUTINE  locate_temporal_probe(r,tp,sc) !
+    IMPLICIT NONE
+    TYPE(layout),target,INTENT(INOUT):: r
+    type(temporal_probe),intent(INOUT) ::  tp
+    real(dp), optional :: sc
+    type(integration_node), pointer :: t,tw
+    real(dp) a(3)
+    integer i,j
+    real(dp) norm,d1,p(3),da(3),dal(3)
+
+    type(temporal_probe) tt
+
+    ! locating the closest integration node
+    ! pointing at it using tw
+    norm=mybig
+    t=> tp%node
+    a=tp%pos(1:3)
+    do i=1,r%t%n
+       if(t%cas==case0) then ! 1
+          d1=root((t%a(1)-a(1))**2+(t%a(2)-a(2))**2+(t%a(3)-a(3))**2 )
+
+          if(d1<norm.and.t%parent_fibre%mag%l/=0.0_dp) then
+             norm=d1
+             tw=>t
+          endif
+       endif ! 1
+       t=>t%next
+    enddo
+    !
+    !   Expressing the vector from tw to the particle
+    ! in the entrance frame of tw
+    da=a-tw%a
+    d1=da(1)*tw%ent(3,1)+da(2)*tw%ent(3,2)+da(3)*tw%ent(3,3)
+ 
+    call change_basis(DA,global_frame,dal,tw%ent)
+    !
+    !
+ 
+    !######################################
+    ! some gymnastic if behind the integration node
+
+
+   !    if(dal(3)<0.0_dp) then
+ 
+       do while(dal(3)<0.0_dp)      
+
+          tw=>tw%previous
+          do while(tw%cas/=case0)
+             tw=>tw%previous
+          enddo
+          da=a-tw%a
+          call change_basis(DA,global_frame,dal,tw%ent)
+      enddo   
+ !   endif
+
+   if(present(sc)) then
+    sc=da(1)*tw%ent(3,1)+da(2)*tw%ent(3,2)+da(3)*tw%ent(3,3)
+ !   write(6,*) " a.ent(3)",d1
+    endif
+    p=dal
+    
+ !   b%tp(j)%r=p(3)
+    tp%node=>tw
+!write(6,*) " frame in locate_temporal_probe "
+!call ptc_print(tp%NODE%a,tp%NODE%ent,6)
+  !  call original_p_to_ptc(b,j,p,tw)
+
+  end SUBROUTINE  locate_temporal_probe
+
+SUBROUTINE  fit_temporal_probe(tp,kk,done)
+implicit none
+type(temporal_probe) tp
+type(internal_state) kk
+logical done 
+
+if((tp%node%parent_fibre%mag%kind==kind4.and.(.not.kk%nocavity)).or.kk%radiation.and.(.not.locate_with_no_cavity)) then
+ call fit_temporal_probe_cav(tp,kk,done)
+else
+ call fit_temporal_probe_nocav(tp,kk,done)
+endif
+
+end SUBROUTINE  fit_temporal_probe 
+
+SUBROUTINE  fit_temporal_probe_nocav(tp,kk,done)
+implicit none
+type(temporal_probe) tp,tt
+type(internal_state) k,kk
+real(dp) del,betinv,x(6),eps,d1,d2,r,ma(5,5),mai(5,5),r0,pos0(6),de(5),norm
+real(dp) epsn,normb
+integer i,j,ier,l,m,nit
+type(work) w
+logical done
+nit=1000
+done=.true.
+eps=1.d-8
+epsn=1.d-9
+normb=1.d38
+!write(6,*) " eps "
+!read(5,*) eps
+call alloc_temporal_probe(tt) 
+tt=tp
+
+k=kk+nocavity0
+
+del= (tp%pos(4)**2+tp%pos(5)**2+tp%pos(6)**2)/tp%node%parent_fibre%mag%p%p0c**2-1.0_dp
+       if(k%time) then
+          betinv=1.0_dp/tp%node%parent_fibre%beta0
+       ELSE
+          betinv=1.0_dp
+       ENDIF
+
+d1=0.0_dp;d2=0.0_dp;
+
+do i=1,3
+ d1=d1+(tp%node%a(i)-tp%pos(i))**2;  d2=d2+(tp%node%b(i)-tp%pos(i))**2;
+enddo
+
+!d1=sqrt(d1); d2=sqrt(d2);
+!w=tp%node%parent_fibre
+!r0=d1/(d1+d2)*tp%node%parent_fibre%mag%L/w%beta0/tp%node%parent_fibre%mag%p%nst
+r0=0
+
+
+!write(6,*) "dt initial ",r0
+!write(6,'(3(1x,f20.15))') tp%node%a
+!write(6,'(3(1x,f20.15))') tp%node%b
+!pause 7
+x=0.d0
+
+del=del/( betinv+sqrt(betinv**2+del) )
+
+x(5)=del
+ 
+!write(6,*) del
+do l=1,nit
+!101 continue
+!write(6,'(6(1x,f20.15))') tp%pos
+ 
+!tt=tp
+tt%xs%x=x
+tt%dt0=0
+r=r0
+  call TRACK_time(tt,r,K)
+ !call ptc_global_x_p(tt,b,k)
+pos0=tt%pos
+
+
+
+do i=1,4
+ tt=tp
+ tt%xs%x=x
+ tt%xs%x(i)=x(i)+eps
+ tt%dt0=0
+ r=r0
+ 
+! write(6,'(6(1x,f20.15))')tt%xs%x
+ call TRACK_time(tt,r,K)
+
+! write(6,'(6(1x,f20.15))')tt%xs%x
+ ! call ptc_global_x_p(tt,b,k)
+ 
+! write(6,'(6(1x,f20.15))') tt%pos
+do j=1,5
+ ma(j,i)=(tt%pos(j)-pos0(j))/eps
+enddo
+
+!pause 
+enddo
+ 
+tt%xs%x=x
+tt%dt0=0
+r=r0+eps
+
+ 
+!write(6,'(6(1x,f20.15))')tt%xs%x
+  call TRACK_time(tt,r,K)
+
+
+!write(6,'(6(1x,f20.15))')tt%xs%x
+ !call ptc_global_x_p(tt,b,k)
+
+!write(6,'(6(1x,f20.15))') tt%pos
+do j=1,5
+ ma(j,5)=(tt%pos(j)-pos0(j))/eps
+enddo
+
+!write(6,*) " matrix "
+!do i=1,5
+!write(6,'(5(1x,f20.15))')ma(i,1:5)
+!enddo
+
+call matinv(ma,mai,5,5,ier)
+!write(6,*) " matrix inverse "
+!do i=1,5
+!write(6,'(5(1x,f20.15))')mai(i,1:5)
+!enddo
+
+!ma=matmul(ma,mai)
+!write(6,*) " identity ? "
+!do i=1,5
+!write(6,'(5(1x,f20.15))')ma(i,1:5)
+!enddo
+
+
+de = matmul(mai,(tp%pos(1:5) - pos0(1:5) ))
+
+
+
+
+!write(6,'(5(1x,f20.15))') de
+
+x(1:4)=x(1:4)+de(1:4)
+r0=r0+de(5)
+
+norm=0
+do m=1,6
+ norm=abs(pos0(m)-tp%pos(m))+norm
+enddo
+
+if(norm>epsn.or.l<10) then
+ normb=norm
+else
+ if(normb>=norm) exit
+ normb=norm
+endif
+
+enddo
+
+tt%xs%x=x
+tt%dt0=0
+r=r0
+  call TRACK_time(tt,r,K)
+ !call ptc_global_x_p(tt,b,k)
+pos0=tt%pos
+
+tt%xs%x(6)=tp%t-tt%dt0
+
+!write(6,*) " norm ",norm,l
+!write(6,*) " tp%dt0,tp%r ", tp%dt0,tp%r
+!write(6,'(6(1x,f20.15))') pos0
+!write(6,'(6(1x,f20.15))') tp%pos
+tp=tt
+if(l> nit-10) then 
+ write(6,*) " Could not converge in fit_temporal_probe_nocav. Norm = ",norm
+ done=.false.
+endif
+   end SUBROUTINE  fit_temporal_probe_nocav
+
+SUBROUTINE  fit_temporal_probe_cav(tp,k,done)
+implicit none
+type(temporal_probe) tp,tt
+type(internal_state) k 
+real(dp) del,betinv,x(6),eps,d1,d2,r,ma(7,7),mai(7,7),r0,pos0(6),de(7),norm,t0
+real(dp) epsn,normb
+integer i,j,ier,l,m,nit
+type(work) w
+logical done
+done=.true.
+eps=1.d-8
+epsn=1.d-9
+normb=1.d38
+ nit=1000
+
+call alloc_temporal_probe(tt) 
+tt=tp
+
+ 
+
+del= (tp%pos(4)**2+tp%pos(5)**2+tp%pos(6)**2)/tp%node%parent_fibre%mag%p%p0c**2-1.0_dp
+       if(k%time) then
+          betinv=1.0_dp/tp%node%parent_fibre%beta0
+       ELSE
+          betinv=1.0_dp
+       ENDIF
+
+d1=0.0_dp;d2=0.0_dp;
+
+do i=1,3
+ d1=d1+(tp%node%a(i)-tp%pos(i))**2;  d2=d2+(tp%node%b(i)-tp%pos(i))**2;
+enddo
+
+!d1=sqrt(d1); d2=sqrt(d2);
+!w=tp%node%parent_fibre
+!r0=d1/(d1+d2)*tp%node%parent_fibre%mag%L/w%beta0/tp%node%parent_fibre%mag%p%nst
+r0=0
+ 
+x=0.d0
+del=del/( betinv+sqrt(betinv**2+del) )
+x(6)=tp%t
+x(5)=del
+ 
+ 
+do l=1,nit
+ 
+ 
+ 
+tt%xs%x=x
+tt%dt0=0
+r=r0
+  call TRACK_time(tt,r,K)
+ 
+pos0=tt%pos
+t0=tt%t
+
+
+do i=1,6
+ tt=tp
+ tt%xs%x=x
+ tt%xs%x(i)=x(i)+eps
+ tt%dt0=0
+ r=r0
+ 
+ 
+ call TRACK_time(tt,r,K)
+
+do j=1,6
+
+ ma(j,i)=(tt%pos(j)-pos0(j))/eps
+enddo
+ma(7,i)=(tt%t-t0)/eps
+ 
+enddo
+ 
+tt%xs%x=x
+tt%dt0=0
+r=r0+eps
+
+  call TRACK_time(tt,r,K)
+
+do j=1,6
+ ma(j,7)=(tt%pos(j)-pos0(j))/eps
+enddo
+ ma(7,7)=(tt%t-t0)/eps
+
+call matinv(ma,mai,7,7,ier)
+ 
+de(1:6)=tp%pos(1:6) - pos0(1:6)
+de(7)=tp%t-t0
+
+de = matmul(mai,de)
+
+ 
+x(1:6)=x(1:6)+de(1:6)
+r0=r0+de(7)
+
+norm=abs(t0-tp%t)
+do m=1,6
+ norm=abs(pos0(m)-tp%pos(m))+norm
+enddo
+
+if(norm>epsn.or.l<10) then
+ normb=norm
+ 
+else
+ 
+ if(normb>=norm) exit
+ normb=norm
+endif
+
+enddo
+
+tt%xs%x=x
+tt%dt0=0
+r=r0
+  call TRACK_time(tt,r,K)
+ !call ptc_global_x_p(tt,b,k)
+pos0=tt%pos
+
+ 
+tp=tt
+if(l> nit-10) then 
+ write(6,*) " Could not converge in fit_temporal_probe_cav. Norm = ",norm
+ done=.true.
+endif
+   end SUBROUTINE  fit_temporal_probe_cav
+
+
+
+
+Subroutine ptc_print(a,ent,mf)
+implicit none
+integer i,mf
+real(dp) ent(3,3),a(3)
+
+write(mf,*)"a"
+ write(mf,'(3(1x,g20.13))') a
+write(6,*) 
+write(mf,*)"ent"
+do i=1,3
+ write(mf,'(3(1x,g20.13))') ent(i,1:3)
+enddo
+write(mf,*) 
+end subroutine ptc_print
+
+
+  Subroutine find_frac_r(xt,b)
+    implicit none
+    type(temporal_probe) xt
+    type(probe) b
+    type(spinor)n0
+    real(dp) m1t(3,3),m2(3,3),r(3,3),a(3,3),ai(3,3),m1(3,3),ang,rat,m2out(3,3)
+    integer i,j
+    
+   do i=1,3
+   do j=1,3
+     m1t(i,j)=b%s(i)%x(j)
+     m1(i,j)=b%s(j)%x(i)
+     m2(i,j)=xt%xs%s(j)%x(i)
+   enddo
+   enddo
+     r=matmul(m1t,m2)
+ 
+
+ if(abs(abs(r(1,1))+abs(r(2,2))+abs(r(3,3))-3.0_dp)>1.d-14 ) then
+
+
+call  find_n0(r,n0) 
+call find_as(n0,a,ai) 
+
+    r=matmul(matmul(ai,r),a)
+
+
+   ang=atan2(r(1,3),r(1,1))*xt%r
+   r=0.0_dp
+
+   r(1,1)=cos(ang);r(1,3)=sin(ang);
+   r(3,3)=cos(ang);r(3,1)=-sin(ang);
+   r(2,2)=1.0_dp
+
+
+   r=matmul(matmul(matmul(a,r),ai),m1)
+else
+   r=m2
+endif
+
+
+
+
+   
+   do i=1,3
+   do j=1,3
+     xt%s(j)%x(i)=r(i,j)
+   enddo
+   enddo
+ 
+
+   end Subroutine find_frac_r
+
+
+  subroutine find_as(n22,a,ai) 
+!#general : normal & manipulation
+!# Find the c_spinmatrix "a" such that
+!# e_y = (0,1,0)= a**(-1)*n0
+!# because a*exp(theta n0.L)*a**(-1)= exp(theta (a*n0).L). See Sec.6.5.2.
+
+    implicit none
+    type(spinor), intent(inout) ::  n22 
+    real(dp)   a(3,3) ,  ai(3,3) 
+    type(spinor)  n1 ,n3,n2 
+     real(dp)    s,n
+    real(dp) x
+    integer i,is,j
+
+
+
+    n2=n22
+
+    x=n2.dot.n2
+
+    x=sqrt(x)
+
+    do i=1,3
+     n2%x(i)=n2%x(i)/x
+    enddo
+
+    ! here we find smallest value of n2
+    is=2
+    if(abs(n2%x(1))< abs(n2%x(2))) is=1
+
+    if(is==1) then
+       if(abs(n2%x(3))<abs(n2%x(1))) is=3
+    else
+       if(abs(n2%x(3))<abs(n2%x(2))) is=3
+    endif
+
+    !  put n1 in along that value
+    do i=1,3
+       n1%x(i)=0.0_dp
+    enddo
+    n1%x(is)=1.0_dp
+
+    s=n2%x(is)*n1%x(is)
+
+    n=0.0_dp
+    do i=1,3
+       n1%x(i)=n1%x(i)-s*n2%x(i)
+       n=n1%x(i)**2+n
+    enddo
+    do i=1,3
+       n1%x(i)=n1%x(i)/sqrt(n)
+    enddo
+
+    n3%x(1)=n1%x(2)*n2%x(3)-n1%x(3)*n2%x(2)
+    n3%x(2)=n1%x(3)*n2%x(1)-n1%x(1)*n2%x(3)
+    n3%x(3)=n1%x(1)*n2%x(2)-n1%x(2)*n2%x(1)
+
+    n=0.0_dp
+    do i=1,3
+       n=n3%x(i)**2+n
+    enddo
+    do i=1,3
+       n3%x(i)=n3%x(i)/sqrt(n)
+    enddo
+
+ !   if(spin_normal_position==2) then
+ if(abs(n1%x(1))>abs(n3%x(1))) then
+       do i=1,3
+          a(i,1)=n1%x(i)
+          a(i,2)=n2%x(i)
+          a(i,3)=n3%x(i)
+       enddo
+else
+x=n3%x(1)    !.sub.'0'
+
+if(x<0) then
+       do i=1,3
+          a(i,1)=-n3%x(i)
+          a(i,2)=n2%x(i)
+          a(i,3)=n1%x(i)
+       enddo
+else
+       do i=1,3
+          a(i,1)=n3%x(i)
+          a(i,2)=n2%x(i)
+          a(i,3)=-n1%x(i)
+       enddo
+endif
+
+endif
+
+   do i=1,3
+   do j=1,3
+    ai(i,j)=a(j,i)
+   enddo
+   enddo
+  end subroutine find_as
+
+ subroutine find_n0(s0,n0) 
+
+    implicit none
+    real(dp) ,intent(inout) :: s0(3,3)
+    type(spinor), intent(inout) :: n0
+    real(dp)  norm0
+    real(dp) det,detm
+    real(dp) ss(3,3)
+ 
+    integer i,is,j
+
+   ss=0.0_dp
+    
+!    ss=s0
+
+    
+   do i=1,3
+       do j=1,3
+ 
+         ss(i,j)=s0(i,j)
+ 
+       enddo
+    enddo
+
+
+
+    do i=1,3
+       ss(i,i)=ss(i,i)-1.0_dp
+    enddo
+
+    det=(ss(2,2)*ss(3,3)-ss(2,3)*ss(3,2))
+ 
+    is=1
+    detm=(ss(1,1)*ss(3,3)-ss(1,3)*ss(3,1))
+ 
+    if(abs(detm)>=abs(det)) then
+       det=detm
+       is=2
+    endif
+ 
+    detm=ss(1,1)*ss(2,2)-ss(1,2)*ss(2,1)
+    if(abs(detm)>=abs(det)) then
+       det=detm
+       is=3
+    endif
+ 
+
+    n0%x(is)=1.0_dp
+    if(is==1) then
+       n0%x(2)=(-ss(3,3)*ss(2,1)+ss(2,3)*ss(3,1))/det
+       n0%x(3)=(-ss(2,2)*ss(3,1)+ss(2,1)*ss(3,2))/det
+    elseif(is==2) then
+       n0%x(1)=(-ss(3,3)*ss(1,2)+ss(3,2)*ss(1,3))/det
+       n0%x(3)=(-ss(1,1)*ss(3,2)+ss(1,2)*ss(3,1))/det
+    else
+       n0%x(1)=(-ss(2,2)*ss(1,3)+ss(2,3)*ss(1,2))/det
+       n0%x(2)=(-ss(1,1)*ss(2,3)+ss(1,3)*ss(2,1))/det
+    endif
+
+     norm0=sqrt(n0%x(1)**2+n0%x(2)**2+n0%x(3)**2)
+
+ 
+
+    do i=1,3
+       n0%x(i)=n0%x(i)/norm0
+    enddo
+
+
+
+  end subroutine find_n0
+
+subroutine equal_temporal(xtt,xt)
+implicit none
+type (temporal_probe),INTENT(IN)::xt
+type (temporal_probe), INTENT(inOUT)::xtt
+integer i     
+       xtt%r=xt%r
+       xtt%xs=xt%xs
+       xtt%dt0=xt%dt0
+       xtt%pos=xt%pos
+       xtt%ic=xt%ic
+       xtt%t=xt%t
+    do i=1,3
+       xtt%s(i)%x=xt%s(i)%x
+    enddo
+
+xtt%node=>xt%node
+
+end subroutine equal_temporal
 
   SUBROUTINE  alloc_temporal_beam(b,n,p0c) ! fibre i1 to i2
     IMPLICIT NONE
@@ -4646,170 +5289,20 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     p%xs%s(1)=0
     p%xs%s(2)=0
     p%xs%s(3)=0
-    p%ds=0.0_dp
+    p%r=0.0_dp
     p%pos=0.0_dp
+    p%dt0=0.0_dp
+    p%s(1)%x=0.0_dp
+    p%s(2)%x=0.0_dp
+    p%s(3)%x=0.0_dp
+    p%IC=0.0_dp
+    p%T=0.0_dp
     nullify(p%node)
-    nullify(p%xs%lost_node)
+    nullify(p%xs%last_node)
 
   end SUBROUTINE  alloc_temporal_probe
 
-  SUBROUTINE  position_temporal_beam(r,b,k) ! fibre i1 to i2
-    IMPLICIT NONE
-    TYPE(layout),target,INTENT(INOUT):: r
-    type(temporal_beam),intent(INOUT) ::  b
-    type(integration_node), pointer :: t,tw
-    integer i
-    real(dp) norm,d1
-    type(internal_state) :: k
-
-    if(k%totalpath/=1) then
-       write(6,*) " 1.0_dp must use total path or time "
-       write(6,*) " execution stopped in position_temporal_beam "
-       stop 101
-    endif
-    b%state=k
-
-    norm=mybig
-    t=>r%t%start
-    b%c=>t
-    do i=1,r%t%n
-
-       if(t%cas==case0) then ! 1
-          d1=root((t%a(1)-b%a(1))**2+(t%a(2)-b%a(2))**2+(t%a(3)-b%a(3))**2 )
-
-          if(d1<norm) then
-             norm=d1
-             b%c=>t
-          endif
-       endif ! 1
-       t=>t%next
-    enddo
-
-    do i=1,b%n
-       b%tp(i)%pos(1:3)=0.0_dp
-       !      GEO_TRA(A,ENT,D,I)    ! A= A +I D*ENT     I=1,-1
-       ! puts the particle in the frame ent around the point a
-       call GEO_TRA(b%tp(i)%pos(1:3),b%ent,b%tp(i)%xs%x(1:3),1)
-       b%tp(i)%pos(1:3)=b%tp(i)%pos(1:3)+b%a
-       !  In the array pos(1:3), the particle is in the global frame of PTC
-
-       ! now we must find the local coordinates
-       call locate_temporal_beam(r,b,tw,i)
-
-    enddo
-
-
-  end SUBROUTINE  position_temporal_beam
-
-  SUBROUTINE  locate_temporal_beam(r,b,tw,j) !
-    IMPLICIT NONE
-    TYPE(layout),target,INTENT(INOUT):: r
-    type(temporal_beam),intent(INOUT) ::  b
-    type(integration_node), pointer :: t,tw
-    real(dp) a(3)
-    integer i,j
-    real(dp) norm,d1,p(3),da(3),dal(3)
-
-
-    ! locating the closest integration node
-    ! pointing at it using tw
-    norm=mybig
-    t=> b%c
-    a=b%tp(j)%pos(1:3)
-    do i=1,r%t%n
-       if(t%cas==case0) then ! 1
-          d1=root((t%a(1)-a(1))**2+(t%a(2)-a(2))**2+(t%a(3)-a(3))**2 )
-
-          if(d1<norm) then
-             norm=d1
-             tw=>t
-          endif
-       endif ! 1
-       t=>t%next
-    enddo
-    !
-    !   Expressing the vector from tw to the particle
-    ! in the entrance frame of tw
-    da=a-tw%a
-    call change_basis(DA,global_frame,dal,tw%ent)
-    !
-    !
-
-    !######################################
-    ! some gymnastic if behind the integration node
-    if(tw%parent_fibre%dir>0) then
-
-       if(dal(3)<0.0_dp) then
-          tw=>tw%previous
-          do while(tw%cas/=case0)
-             tw=>tw%previous
-          enddo
-          da=a-tw%a
-          call change_basis(DA,global_frame,dal,tw%ent)
-       endif
-
-    else
-
-       if(dal(3)>0.0_dp) then
-          tw=>tw%previous
-          do while(tw%cas/=case0)
-             tw=>tw%previous
-          enddo
-          da=a-tw%a
-          call change_basis(DA,b%ent,dal,tw%ent)
-       endif
-    endif
-    !######################################
-
-    p=dal
-    b%tp(j)%ds=p(3)
-    b%tp(j)%node=>tw
-
-    call original_p_to_ptc(b,j,p,tw)
-
-  end SUBROUTINE  locate_temporal_beam
-
-  SUBROUTINE original_p_to_ptc(b,j,p,tw) ! fibre i1 to i2
-    IMPLICIT NONE
-    type(temporal_beam),intent(INOUT) ::  b
-    type(integration_node),pointer :: tw
-    integer j
-    real(dp) dal(3),d1,betinv,p(3)
-
-    b%tp(j)%xs%x(4:6)=b%tp(j)%xs%x(4:6)*b%p0c/tw%parent_fibre%mag%p%p0c
-    !    call change_basis(b%tp(j)%xs%x(4:6),global_frame,da,b%ent)
-    ! expressing the momentum in the frame of the node tw
-    call change_basis(b%tp(j)%xs%x(4:6),b%ent,dal,tw%ent)
-!!!!!!!!!!!
-
-
-    ! final setting of the PTC coordinates
-    ! Does not take into acoount vector potential yet
-    ! nor x', y' for pancake
-
-    d1=dal(1)**2+dal(2)**2+dal(3)**2
-    betinv=1.0_dp/tw%parent_fibre%beta0
-
-    if(b%state%time) then
-
-       b%tp(j)%xs%x(5)=(d1-1.0_dp)/ (root(betinv**2-1.0_dp +d1)+betinv)
-       b%tp(j)%xs%x(2)=dal(1)
-       b%tp(j)%xs%x(4)=dal(2)
-       b%tp(j)%xs%x(1)=p(1)
-       b%tp(j)%xs%x(3)=p(2)
-       b%tp(j)%xs%x(6)=b%total_time
-
-    else
-       b%tp(j)%xs%x(5)=root(d1)-1.0_dp
-       b%tp(j)%xs%x(2)=dal(1)
-       b%tp(j)%xs%x(4)=dal(2)
-       b%tp(j)%xs%x(1)=p(1)
-       b%tp(j)%xs%x(3)=p(2)
-       b%tp(j)%xs%x(6)=b%total_time
-    endif
-
-  end SUBROUTINE original_p_to_ptc
-
+ 
   SUBROUTINE TRACK_temporal_beam(b,dt,state) ! fibre i1 to i2
     IMPLICIT NONE
     type(temporal_beam),intent(INOUT) ::  b
@@ -4879,7 +5372,7 @@ call init_all(state,1,0)
 
 call alloc(xs);call alloc(m,mr)
 
- 
+
 ! radiation
  
 xs0=fix0
@@ -4910,6 +5403,7 @@ state=time0
 xs0=fix0
 m=1
 xs=xs0+m
+!write(6,*) t1c%parent_fibre%mag%name,t1c%parent_fibre%mag%p%nst
 call propagate(xs,state,node1=t1c,node2=t2c)
 fix=xs%x
 ! For David
@@ -5044,7 +5538,232 @@ call kill(xs);call kill(m)
  
 end subroutine fill_tree_element
 
+subroutine fill_tree_element_line(f1,f2,f,no,fix0,factor,nocav)   ! fix0 is the initial condition for the maps
+implicit none
+type(fibre), target :: f1,f2,f
+type(layout), pointer :: r
+TYPE(INTEGRATION_NODE),POINTER:: t1c,t2c
+TYPE (NODE_LAYOUT), POINTER :: t
+TYPE (tree_element), POINTER :: arbre(:)
+type(internal_state) state
+real(dp) fixr(6),fixs(6),fix(6),fix0(6),mat(6,6),e_ij(6,6),xn
+type(probe) xs0
+type(probe_8) xs
+type(c_damap) m,mr
+logical :: fact,noca
+logical,optional :: factor,nocav
+integer no,i
+type(fibre), pointer :: p
+ 
 
+fact=.false. 
+noca=.false. 
+
+if(present(factor)) fact=factor
+if(present(factor)) noca=nocav
+
+if(.not.associated(f1%parent_layout)) then
+ write(6,*) " parent layout not associated "
+ stop
+else
+ r=>f1%parent_layout
+endif
+
+if(.not.associated(f%parent_layout%t)) then
+ write(6,*) " parent node layout not associated "
+ stop
+else
+ t=>f1%parent_layout%t
+ t1c=>f1%t1 !%next
+ t2c=>f2%t1
+endif
+
+! Classical radiation with stochastic envelope
+
+state=radiation0+envelope0+time0
+state%NOCAVITY=noca
+
+call init_all(state,1,0)
+
+call alloc(xs);call alloc(m,mr)
+
+
+! radiation
+ 
+xs0=fix0
+mr=1
+xs=xs0+mr
+if(associated(t1c,t2c)) then
+ call propagate(xs,state,node1=t1c)
+else
+ call propagate(xs,state,node1=t1c,node2=t2c)
+endif
+
+! For David
+!!  mr: linear map with radiation would be read here instead of being computed, 
+!! and must be stored in fixr
+
+fixr=xs%x    ! <---
+mr=xs   ! <---
+
+do i=1,6
+ mr%v(i)=mr%v(i)-(mr%v(i).sub.0)   
+enddo
+
+! For David
+!!  The stochastic kicks are stored at e_ij
+
+e_ij=xs%e_ij         ! <---
+! no radiation
+
+
+state=time0
+state%NOCAVITY=noca
+xs0=fix0
+m=1
+
+if(associated(t1c,t2c)) then
+ call propagate(xs,state,node1=t1c)
+else
+ call propagate(xs,state,node1=t1c,node2=t2c)
+endif
+
+fix=xs%x
+! For David
+!!  The same linear map is computed WITHOUT radiation : result put into m, the constant part is removed
+!!  
+m=xs   ! <---   
+do i=1,6
+ m%v(i)=m%v(i)-(m%v(i).sub.0)
+enddo
+
+m=m**(-1)*mr
+
+
+
+mat=m
+
+
+call kill(xs);call kill(m)
+
+state=spin0+time0
+state%NOCAVITY=noca
+call init_all(state,no,0)
+call alloc(xs);call alloc(m,mr)
+ 
+
+
+xs0=fix0
+m=1
+xs=xs0+m
+if(associated(t1c,t2c)) then
+ call propagate(xs,state,node1=t1c)
+else
+ call propagate(xs,state,node1=t1c,node2=t2c)
+endif
+ 
+
+! For David
+!!  The full nonlinear map m is computed and the final orbit
+!!  
+fix=xs%x  ! <---   
+m=xs  ! <---   
+
+m%e_ij=e_ij
+do i=1,6
+ m%v(i)=m%v(i)-(m%v(i).sub.0)
+enddo 
+
+
+
+ 
+if(f%dir==1) then
+ if(.not.associated(f%mag%forward)) then 
+  allocate(f%mag%forward(3))
+ ! allocate(f%mag%usef)
+ else
+  call KILL(f%mag%forward)
+ endif
+
+call SET_TREE_G_complex(f%mag%forward,m,fact)
+ f%mag%do1mapf=.false.
+ f%mag%usef=.true.
+ arbre=>f%mag%forward
+else
+ if(.not.associated(f%mag%backward)) then 
+  allocate(f%mag%backward(3))
+ ! allocate(f%mag%useb)
+ else
+  call KILL(f%mag%backward)
+ endif
+ call SET_TREE_G_complex(f%mag%backward,m,fact)
+ f%mag%do1mapb=.false.
+ f%mag%useb=.true.
+ arbre=>f%mag%backward
+endif
+
+arbre(1)%rad=mat
+arbre(1)%fix0(1:6)=fix0
+arbre(1)%fixr(1:6)=fixr
+arbre(1)%fix(1:6)=fix
+
+ arbre(1)%ds=0.0_dp
+ p=>f1
+ do while(associated(p,f2))
+  arbre(1)%ds=p%mag%p%ld +arbre(1)%ds
+  p=>p%next
+ enddo
+
+arbre(1)%beta0=f1%beta0
+
+if(f%dir==1) then
+ if(.not.associated(f%magp%forward)) then 
+  allocate(f%magp%forward(3))
+!  allocate(f%magp%usef)
+ else
+  call KILL(f%magp%forward)
+ endif
+ !call SET_TREE_G_complex(f%magp%forward,m)
+do i=1,3
+ call alloc_tree(f%magp%forward(i),f%mag%forward(i)%n,f%mag%forward(i)%np)
+ call copy_tree(f%mag%forward(i),f%magp%forward(i))
+enddo
+ f%magp%do1mapf=.false.
+ f%magp%usef=.true.
+ arbre=>f%magp%forward
+else
+
+ if(.not.associated(f%magp%backward)) then 
+  allocate(f%magp%backward(3))
+ ! allocate(f%magp%useb)
+ else
+  call KILL(f%magp%backward)
+ endif
+ !call SET_TREE_G_complex(f%magp%backward,m)
+do i=1,3
+ call alloc_tree(f%magp%backward(i),f%mag%backward(i)%n,f%mag%backward(i)%np)
+ call copy_tree(f%mag%backward(i),f%magp%backward(i))
+enddo
+ f%magp%do1mapb=.false.
+ f%magp%useb=.true.
+ arbre=>f%magp%backward
+endif
+
+arbre(1)%rad=mat
+arbre(1)%fix0(1:6)=fix0
+arbre(1)%fixr(1:6)=fixr
+arbre(1)%fix(1:6)=fix
+ arbre(1)%ds=0.0_dp
+ p=>f1
+ do while(associated(p,f2))
+  arbre(1)%ds=p%mag%p%ld +arbre(1)%ds
+  p=>p%next
+ enddo
+arbre(1)%beta0=f1%beta0
+ 
+call kill(xs);call kill(m)
+ 
+end subroutine fill_tree_element_line
 
 !!! extract moments using initial moment and the probe_8 containing fluctuations and map
   subroutine extract_moments(p8,s_ij_in,s_ij_out)

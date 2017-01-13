@@ -28,27 +28,17 @@ TYPE DRIFT1P
    TYPE(REAL_8) , POINTER ::L => null()
 END  TYPE DRIFT1P
 
-TYPE SUPERDRIFT1
+TYPE SUPERDRIFT
    TYPE(MAGNET_CHART), POINTER :: P => null()
    real(dp) , POINTER ::L => null()                    !  Storage space for computed
-   INTEGER, POINTER :: A_X1 => null(),A_X2 => null()   ! FOR ROTATION OF PI AT ENTRANCE = -1, DEFAULT = 1 ,
-   REAL(DP),DIMENSION(:), POINTER:: A_D => null(),a_ang => null()     ! TRANSLATIONS  A_D(3) and Angles
-   INTEGER(2), POINTER:: ENERGY => null()   ! IF TRUE, ENERGY PATCHES NEEDED
-   INTEGER(2), POINTER:: TIME => null()     ! IF TRUE, TIME PATCHES NEEDED
-   REAL(DP), POINTER:: A_T => null()        ! TIME SHIFT NEEDED SOMETIMES WHEN RELATIVE TIME IS USED
-   REAL(DP), POINTER:: p0b => null(),b0b => null()     ! for bmad patching
-END  TYPE SUPERDRIFT1
+   REAL(DP),DIMENSION(:), POINTER:: D => null(),ang => null()     ! TRANSLATIONS  A_D(3) and Angles
+END  TYPE SUPERDRIFT
 
-TYPE SUPERDRIFT1P
+TYPE SUPERDRIFTP
    TYPE(MAGNET_CHART), POINTER :: P => null()
    TYPE(REAL_8) , POINTER ::L => null()
-   INTEGER, POINTER :: A_X1 => null(),A_X2 => null()   ! FOR ROTATION OF PI AT ENTRANCE = -1, DEFAULT = 1 ,
-   REAL(DP),DIMENSION(:), POINTER:: A_D => null(),a_ang => null()     ! TRANSLATIONS  A_D(3) and Angles
-   INTEGER(2), POINTER:: ENERGY => null()   ! IF TRUE, ENERGY PATCHES NEEDED
-   INTEGER(2), POINTER:: TIME   => null()  ! IF TRUE, TIME PATCHES NEEDED
-   REAL(DP), POINTER:: A_T      => null() ! TIME SHIFT NEEDED SOMETIMES WHEN RELATIVE TIME IS USED
-   REAL(DP), POINTER:: p0b => null(), b0b  => null() ! for bmad patching
-END  TYPE SUPERDRIFT1P
+   REAL(DP),DIMENSION(:), POINTER:: D => null(),ang => null()     ! TRANSLATIONS  A_D(3) and Angles
+END  TYPE SUPERDRIFTP
 
 TYPE DKD2
    TYPE(MAGNET_CHART), POINTER:: P => null()
@@ -388,7 +378,8 @@ TYPE PANCAKE
    TYPE(MAGNET_CHART), POINTER:: P => null()
    real(dp),  POINTER ::L => null()
    type(tree_element),  POINTER :: B(:) => null()
-   REAL(DP), POINTER :: SCALE,angc,dc,hc,xc => null()
+   REAL(DP), POINTER :: SCALE=> null(),angc=> null(),dc=> null(),hc=> null(),xc => null(),vc => null()
+   logical,pointer :: xprime=> null()
 END  TYPE PANCAKE
 
 TYPE PANCAKEP
@@ -396,14 +387,15 @@ TYPE PANCAKEP
    TYPE(REAL_8),  POINTER ::L => null()
    type(tree_element),  POINTER :: B(:) => null()
    TYPE(REAL_8), POINTER :: SCALE => null()
-   real(dp),pointer :: angc,dc,hc,xc => null()
+   real(dp),pointer :: angc=> null(),dc=> null(),hc=> null(),xc => null(),vc => null()
+   logical,pointer :: xprime=> null()
 END  TYPE PANCAKEP
 
 
 TYPE HELICAL_DIPOLE
    TYPE(MAGNET_CHART), POINTER:: P => null()
    real(dp), POINTER ::L => null()
-   real(dp),  DIMENSION(:), POINTER :: AN => null(), BN => null()         !Multipole component
+   real(dp),  DIMENSION(:), POINTER :: AN => null(), BN => null(),fake_shift=> null()         !Multipole component
    real(dp), POINTER :: FREQ => null(), PHAS => null()
    integer, POINTER :: N_BESSEL => null()
 END  TYPE HELICAL_DIPOLE
@@ -412,6 +404,7 @@ TYPE HELICAL_DIPOLEP
    TYPE(MAGNET_CHART), POINTER:: P => null()
    TYPE(REAL_8), POINTER ::L => null()
    TYPE(REAL_8),  DIMENSION(:), POINTER :: AN => null(), BN => null()
+   TYPE(REAL_8),  DIMENSION(:), POINTER :: fake_shift=> null()   
    TYPE(REAL_8),  POINTER :: FREQ => null(), PHAS => null()
    integer, POINTER :: N_BESSEL => null()
 END  TYPE HELICAL_DIPOLEP

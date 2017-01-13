@@ -49,7 +49,6 @@ MAD-X Beam Parameters
           Kinetic Energy : 0.449063E+03
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.450000E+03
-  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy           450.00097817052830     
      method                   2

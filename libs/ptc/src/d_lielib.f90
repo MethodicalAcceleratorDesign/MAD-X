@@ -1287,10 +1287,9 @@ contains
           ! call daprid(t,1,1,20)
           if(xn.lt.epsone) then
              if(lielib_print(3)==1) then
-                w_p=0
-                w_p%nc=1
-                write(w_p%c(1),'(a14,g21.14)') " xn quadratic ",xn
-                w_p%fc='(1((1X,A72)))'
+
+                write(6,'(a14,g21.14)') " xn quadratic ",xn
+
                 ! CALL !WRITE_a
              endif
              call daflod(t,t,w)
@@ -1319,11 +1318,7 @@ contains
           enddo
           xn=xnorm/xnorm1
           if(xn.ge.epsone.and.(lielib_print(3)==1)) then
-             w_p=0
-             w_p%nc=1
-             write(w_p%c(1),'(a11,g21.14)') " xn linear ",xn
-             w_p%fc='(1((1X,A72)))'
-             !CALL !WRITE_a
+             write(6,'(a11,g21.14)') " xn linear ",xn
           endif
           if(xn.lt.eps.or.more) then
              more=.true.
@@ -1345,10 +1340,7 @@ contains
     endif
     if(lielib_print(3)==1) WRITE(6,*) " K ", K,epsone
     if(lielib_print(3)==1) then
-       w_p=0
-       w_p%nc=1
-       write(w_p%c(1),'(a11,i4)') " iteration " , k
-       w_p%fc='(1((1X,A72)))'
+       write(6,'(a11,i4)') " iteration " , k
     endif
     !  if(lielib_print(3)==1) CALL WRITE_a
     call dadal(x,nd2)
@@ -1539,28 +1531,8 @@ contains
     enddo
     stmem=st
     if(ndc.eq.1) p(nd)=angle(nd)
-    if(lielib_print(4)==1) then
-       w_p=1
-       w_p%nc=1
-       w_p%nr=2
-       w_p%c(1)='tune    '
-       do ij=1,nd
-          w_p%r(ij)=p(ij)
-       enddo
-       w_p%fc='((1X,A8))'
-       w_p%fr='(3(1x,g21.14))'
-       !CALL !WRITE_a
-       w_p=1
-       w_p%nc=1
-       w_p%nr=2
-       w_p%c(1)='damping '
-       do ij=1,nd
-          w_p%r(ij)=rad(ij)
-       enddo
-       w_p%fc='((1X,A8))'
-       w_p%fr='(3(1x,g21.14))'
-       !CALL !WRITE_a
-    endif
+
+
     do ij=1,nd       !  -ndc    Frank
        ps(ij)=p(ij)
        rads(ij)=rad(ij)
@@ -1912,11 +1884,9 @@ contains
        ! W = V o X
        call etcct(v,x,w)
        if(lielib_print(5)==1) then
-          w_p=0
-          w_p%nc=1
-          w_p%fc='(1((1X,A72),/))'
-          write(w_p%c(1),'(a13,i4)') ' ORDERFLO K= ', k
-          !CALL !WRITE_a
+
+          write(6,'(a13,i4)') ' ORDERFLO K= ', k
+
        endif
        ! X = EXP(B9) W
        call facflod(b9,w,x,k,k,1.0_dp,1)
@@ -2686,10 +2656,7 @@ contains
 
        xsu=0.0_dp
        do i=1,nd2
-          do j=1,nd2
-             w_p%r(j)=w(i,j)
-          enddo
-          !CALL !WRITE_a
+
 
           do j=1,nd2
              xsu=xsu+abs(w(i,j)-XJ(I,J))
@@ -2698,7 +2665,7 @@ contains
 xsus=(xsu)/ND2
   if(lielib_print(6)==1) then
        !     write(w_p%c(1),'(a29,g23.16,a2)') 'Deviation from symplecticity ',c_100*(xsu)/ND2, ' %'
-      if(lielib_print(9)==1)  write(6,'(a29,g23.16,a2)') 'Deviation from symplecticity ',100.0_dp*(xsu)/ND2, ' %'
+       write(6,'(a29,g23.16,a2)') 'Deviation from symplecticity ',100.0_dp*(xsu)/ND2, ' %'
        !CALL !WRITE_a
     endif
     call eig6(cr,rr,ri,vr,vi)
@@ -2765,30 +2732,21 @@ if(check_krein.and.(.not.hyp)) then
 endif     
            
     if(lielib_print(7)==-1) then
-       w_p=0
-       w_p%nc=3
-       w_p%fc='(2(1X,A120,/),(1X,A120))'
-       w_p%c(2)= '       Index         Real Part         ArcSin(Imaginary Part)/2/pi'
-       write(6,w_p%fc) w_p%c(2)
-       !CALL !WRITE_a
+
        do i=1,nd-ndc
           rd1=SQRT(rr(2*i-1)**2+ri(2*i-1)**2)
           rd=SQRT(rr(2*i)**2+ri(2*i)**2)
    !       write(6,*) "modulus ",rd1,rd
-          w_p=0
-          w_p%nc=3
-          w_p%fc='(2(1X,A120,/),(1X,A120))'
+
           write(6,'(i4,2(1x,g21.14))') 2*i-1,rr(2*i-1),ASIN(ri(2*i-1)/rd1)*twopii
           write(6,'(i4,2(1x,g21.14))') 2*i,rr(2*i),ASIN(ri(2*i)/rd)*twopii
           write(6,'(a8,g21.14)') ' alphas ', LOG(SQRT(rd*rd1))
           !CALL !WRITE_a
        enddo
-       w_p=0
-       w_p%nc=1
-       w_p%fc='((1X,A120))'
+
        !      write(w_p%c(1),'(a8,i4,a40)') ' select ',nd-ndc,' eigenplanes (odd integers <0 real axis)'
        write(6,'(a8,i4,a40)') ' select ',nd-ndc,' eigenplanes (odd integers <0 real axis)'
-       !CALL !WRITE_a
+
        call read(n,nd-ndc)
     elseif(lielib_print(8)==-1) then
        do i=1,nd-ndc
@@ -3208,32 +3166,31 @@ endif
     endif
 
 
-    w_p=0
     i=0
     if(ic.eq.0) then
        call movemul(rt,s,rto,xr)
        i=i+1
-       w_p%c(i)=  " no exchanged"
+!       w_p%c(i)=  " no exchanged"
     elseif(ic.eq.1) then
        call movemul(rt,xy,rto,xr)
        i=i+1
-       w_p%c(i)=  " x-y exchanged"
+!       w_p%c(i)=  " x-y exchanged"
     elseif(ic.eq.2) then
        call movemul(rt,xz,rto,xr)
        i=i+1
-       w_p%c(i)=  " x-z exchanged"
+!       w_p%c(i)=  " x-z exchanged"
     elseif(ic.eq.3) then
        call movemul(rt,yz,rto,xr)
        i=i+1
-       w_p%c(i)= " y-z exchanged"
+!       w_p%c(i)= " y-z exchanged"
     elseif(ic.eq.4) then
        call movemul(rt,xyz,rto,xr)
        i=i+1
-       w_p%c(i)=  " x-y-z permuted"
+ !      w_p%c(i)=  " x-y-z permuted"
     elseif(ic.eq.5) then
        call movemul(rt,xzy,rto,xr)
        i=i+1
-       w_p%c(i)=  " x-z-y permuted"
+ !      w_p%c(i)=  " x-z-y permuted"
     elseif(ic.eq.6) then
        call movemul(rt,xt,rto,xr)
     elseif(ic.eq.7) then
@@ -3325,11 +3282,7 @@ endif
     if(.not.c_%stable_da) return
 
     if(iref.gt.0) then
-       w_p=0
-       w_p%nc=1
-       w_p%fc='((1X,A120))'
-       write(w_p%c(1),'(a19,i4)') " resonance in file ",iref
-       ! call ! WRITE_I
+ 
        read(iref,*) nres
        if(nres.ge.nreso) then
           line= ' NRESO IN LIELIB TOO SMALL '
@@ -3339,11 +3292,7 @@ endif
        nres=0
     endif
     if(nres.ne.0.and.global_verbose) then
-       w_p=0
-       w_p%nc=1
-       w_p%fc='((1X,A120))'
-       w_p%c(1) =' warning resonances left in the map'
-       ! call ! WRITE_I
+
     endif
     if(iref.gt.0) then
        do i=1,nres
@@ -3584,12 +3533,9 @@ endif
     enddo
     do i=1,nd2-ndc2
        if(abs(reval(i)**2+aieval(i)**2 -1.0_dp).gt.1e-10_dp) then
-          w_p=0
-          w_p%nc=1
-          w_p%fc='((1X,A120))'
-          w_p%c(1) =' EIG6: Eigenvalues off the unit circle!'
+ 
           if(lielib_print(4)==1) then
-             !CALL !WRITE_a
+ 
              write(6,*) sqrt(reval(i)**2+aieval(i)**2)
           endif
        endif
@@ -4532,12 +4478,9 @@ endif
     enddo
     do i=1,ndimt2
        if(abs(reval(i)**2+aieval(i)**2 -1.0_dp).gt.1e-10_dp) then
-          w_p=0
-          w_p%nc=1
-          w_p%fc='((1X,A120))'
-          w_p%c(1) =' EIG6: Eigenvalues off the unit circle!'
+ 
           if(lielib_print(4)==1) then
-             !CALL !WRITE_a
+ 
              write(6,*) sqrt(reval(i)**2+aieval(i)**2)
           endif
        endif
@@ -4802,32 +4745,32 @@ endif
     endif
 
 
-    w_p=0
+!    w_p=0
     i=0
     if(ic.eq.0) then
        call movemuls(rt,s,rto,xr)
        i=i+1
-       w_p%c(i)=  " no exchanged"
+ !      w_p%c(i)=  " no exchanged"
     elseif(ic.eq.1) then
        call movemuls(rt,xy,rto,xr)
        i=i+1
-       w_p%c(i)=  " x-y exchanged"
+!       w_p%c(i)=  " x-y exchanged"
     elseif(ic.eq.2) then
        call movemuls(rt,xz,rto,xr)
        i=i+1
-       w_p%c(i)=  " x-z exchanged"
+ !      w_p%c(i)=  " x-z exchanged"
     elseif(ic.eq.3) then
        call movemuls(rt,yz,rto,xr)
        i=i+1
-       w_p%c(i)= " y-z exchanged"
+!       w_p%c(i)= " y-z exchanged"
     elseif(ic.eq.4) then
        call movemuls(rt,xyz,rto,xr)
        i=i+1
-       w_p%c(i)=  " x-y-z permuted"
+!       w_p%c(i)=  " x-y-z permuted"
     elseif(ic.eq.5) then
        call movemuls(rt,xzy,rto,xr)
        i=i+1
-       w_p%c(i)=  " x-z-y permuted"
+!       w_p%c(i)=  " x-z-y permuted"
     elseif(ic.eq.6) then
        call movemuls(rt,xt,rto,xr)
     elseif(ic.eq.7) then

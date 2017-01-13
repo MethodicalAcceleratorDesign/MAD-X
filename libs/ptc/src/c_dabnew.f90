@@ -490,11 +490,7 @@ contains
     do i=1, lda
        if(allvec(i)) ldanow=ldanow+1
     enddo
-    w_p=0
-    w_p%nc=1
-    write(w_p%c(1),'(a11,i8)') ' ALLOCATED ',ldanow
-    w_p%fc='(1((1X,A72)))'
-    !CALL WRITE_i
+
     return
   end subroutine dallsta
   !
@@ -641,15 +637,7 @@ contains
        endif
        !
        if(nst0.gt.lst) then
-          w_p=0
-          w_p%nc=5
-          w_p%fc='(4(1X,a72,/),(1X,a72))'
-          w_p%c(1)= 'ERROR IN DAALL, STACK EXHAUSTED '
-          w_p%c(2)=  ' NST0,LST '
-          write(w_p%c(3),'(i8,1x,i8)') NST0,LST
-          w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
-          write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda_dab,ndanum,nda_dab*ndanum
-          !CALL WRITE_E(125)(125)
+
           call dadeb !(31,'ERR DAALL ',1)
        endif
        !
@@ -751,15 +739,7 @@ contains
           endif
           !
           if(nst0.gt.lst) then
-             w_p=0
-             w_p%nc=5
-             w_p%fc='(4(1X,a72,/),(1X,a72))'
-             w_p%c(1)= 'ERROR IN DAALL, STACK EXHAUSTED '
-             w_p%c(2)=  ' NST,LST '
-             write(w_p%c(3),'(i8,1x,i8)') NST0,LST
-             w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
-             write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda_dab,ndanum,nda_dab*ndanum
-             !CALL WRITE_E(125)(126)
+
              call dadeb !(31,'ERR DAALL ',1)
           endif
           !
@@ -859,15 +839,7 @@ contains
        endif
        !
        if(nst0.gt.lst) then
-          w_p=0
-          w_p%nc=5
-          w_p%fc='(4(1X,a72,/),(1X,a72))'
-          w_p%c(1)= 'ERROR IN DAALL, STACK EXHAUSTED '
-          w_p%c(2)=  ' NST,LST '
-          write(w_p%c(3),'(i8,1x,i8)') NST0,LST
-          w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
-          write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda_dab,ndanum,nda_dab*ndanum
-          !CALL WRITE_E(125)(127)
+
           call dadeb !(31,'ERR DAALL ',1)
        endif
        !
@@ -969,15 +941,7 @@ contains
        endif
        !
        if(nst0.gt.lst) then
-          w_p=0
-          w_p%nc=5
-          w_p%fc='(4(1X,a72,/),(1X,a72))'
-          w_p%c(1)= 'ERROR IN DAALL, STACK EXHAUSTED '
-          w_p%c(2)=  ' NST,LST '
-          write(w_p%c(3),'(i8,1x,i8)') NST0,LST
-          w_p%c(4)=  ' NDA,NDANUM,NDA*NDANUM '
-          write(w_p%c(5),'(i8,1x,i8,1x,i8)') nda_dab,ndanum,nda_dab*ndanum
-          !CALL WRITE_E(125)(127)
+
           call dadeb !(31,'ERR DAALL ',1)
        endif
        !

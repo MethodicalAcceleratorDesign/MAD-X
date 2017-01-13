@@ -4,7 +4,7 @@ module madx_ptc_normal_module
   ! Frank Schmidt (CERN)
   ! updates by Piotr Skowronski (CERN)
   use madx_ptc_module
-  use c_TPSA
+  
 !  use madx_ptc_twiss
   
   !_________________________________________________________________
@@ -27,6 +27,7 @@ contains
     USE madx_ptc_intstate_module
     implicit none
     logical(lp) closed_orbit,normal,maptable
+    integer mft ! debug file handle
     integer no,mynd2,npara,nda,icase,flag_index,why(9)
     integer i,ii,j1,k,l,starti
     integer n_rows,row,n_haml,n_gnfu,nres,mynres,n1,n2
@@ -38,11 +39,12 @@ contains
     integer :: index1(1000,2)
     real(kind(1d0)) get_value,val_ptc,tmp
     character(len = 5) name_var
-    type(real_8) y(6)
+    type(probe_8) theTransferMap
     type(real_8) :: theAscript(6) ! used here to compute dispersion's derivatives
-    type(c_damap)  :: c_Map
-    type(c_vector_field) vf_kernel, vf
-    type(c_taylor)  :: g_io
+    type(c_damap)  :: c_Map, c_Map2, q_Map, a_CS
+    type(c_vector_field) vf_kernel, vf, vf_t2
+    type(c_taylor)  :: g_io, nrmlzdPseudoHam
+    type(fibre), POINTER    :: current
     type(c_normal_form), target :: theNormalForm, theNormalForm_t2 ! normal from type 2 for hamiltonian terms
     
     !--------------------------------------------------------;----------------------
@@ -73,9 +75,9 @@ contains
 
     icase = get_value('ptc_normal ','icase ')
     deltap0 = get_value('ptc_normal ','deltap ')
-    
     !
     deltap = zero
+
     call my_state(icase,deltap,deltap0)
     CALL UPDATE_STATES
 
@@ -126,9 +128,10 @@ contains
     
     c_normal_auto=.true.;
 
-    call alloc(y)
-    y=npara
-    Y=X
+    call alloc(theTransferMap)
+    theTransferMap%u=my_false
+    theTransferMap%x=npara
+    theTransferMap%x=X
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !!
@@ -137,8 +140,36 @@ contains
     !!
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+
     c_%watch_user=.true.
-    call track(my_ring,y,1,default)
+
+    if (getdebug() < 3) then
+      call propagate(my_ring,theTransferMap,default,fibre1=1)
+    else
+       ! in case comparison with pure PTC version needed   
+       !dump the lattice to file
+       call print_new_flat(my_ring,'my_ring.txt')
+       
+       !dump transfer map after each element
+       call kanalnummer(mft,"ham.txt") ! move inside getdubug before commit
+
+       current=>my_ring%start
+       write(mft,*) " Fiber no ",0
+       call print(theTransferMap%x,mft)
+
+       do i=1,my_ring%n
+
+          call TRACK_PROBE(my_ring,theTransferMap,default, fibre1=i,fibre2=i+1)
+          write(mft,*) "  "
+          write(mft,*) " ++++++++++++++++++++++++ "
+          write(mft,*) " Fiber no ",i, " ",current%mag%name
+          call print(theTransferMap%x,mft)   
+
+          current=>current%next
+
+       enddo  
+    endif
+    
     if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
        write(whymsg,*) 'DA got unstable in tracking: PTC msg: ',messagelost
        call fort_warn('ptc_normal: ',whymsg)
@@ -152,7 +183,7 @@ contains
        call fort_warn('ptc_normal: ',whymsg)
        call seterrorflag(10,"ptc_normal ",whymsg)
        
-       CALL kill(y)
+       CALL kill(theTransferMap)
        c_%watch_user=.false.
        return
     endif
@@ -169,12 +200,12 @@ contains
     print77=.false.
     read77 =.false.
 
-    call daprint(y,18)
+    call daprint(theTransferMap%x,18)
 
 
     maptable = get_value('ptc_normal ','maptable ') .ne. 0
     if(maptable) then
-       call makemaptable(y,no)
+       call makemaptable(theTransferMap%x,no)
     endif
 
 
@@ -195,7 +226,7 @@ contains
        call alloc(theNormalForm) 
        call alloc(c_Map)
    
-       c_Map = y;
+       c_Map = theTransferMap;
 
        if (getdebug() > 0) print*,"Normal Form Type 1"
        
@@ -229,12 +260,10 @@ contains
 
 
        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-       !! 
-       !! HERE WE DO NORMAL FORM TYPE 2
-       !!       HAML and GNFU
-       !! It has resonanses left in the normal form
-       !! which are defined with normal%M
-
+       !! In the past, with real DA, special normal form was needed (Type 2) 
+       !! for GENFU (generationg function) and HAML ( hamiltonian terms)
+       !! which kept resonances in the rotation part
+       !! now we just copy the normalform object 
        call alloc(theNormalForm_t2) 
        
        nres = 0       
@@ -258,9 +287,9 @@ contains
              endif
           enddo
 
+          ! not needed now, keep inside if ever needed again
           if (n_haml > 0) then
              
-             !call alloc(pbrh)
              
              do j1 =1,n_haml
                 row = row_haml(j1)
@@ -270,6 +299,7 @@ contains
                 starti = 1
                 
                 if (j1 .eq. 1) then
+                   ! the first one - special treatment
                    k = double_from_table_row("normal_results ", "order1 ", row, doublenum) !ordrer in X
                    indexa(1) = int(doublenum)
                    k = double_from_table_row("normal_results ", "order2 ", row, doublenum) !ordrer in PX
@@ -283,11 +313,9 @@ contains
                    index1(1,2) = indexa(3) - indexa(4)
                    
                    
-                   !n_t2%m(1,1)= index1(1,1)
-                   !n_t2%m(2,1)= index1(1,2)
-                   !if(c_%nd2.eq.6) n_t2%m(3,1)= indexa(3)
-                   call fort_warn('ptc_normal: ',' Hamiltonian terms not yet implemented with the new complex PTC')
-                   
+                   theNormalForm_t2%m(1,1)= index1(1,1)
+                   theNormalForm_t2%m(2,1)= index1(1,2)
+                   if(c_%nd2.eq.6) theNormalForm_t2%m(3,1)= indexa(3)
                    
                    nres = 1
                    starti = 2
@@ -313,43 +341,22 @@ contains
                       nres = nres + 1
                       index1(nres,1) = n1
                       index1(nres,2) = n2
-                      !n_t2%m(1,nres)= n1
-                      !n_t2%m(2,nres)= n2
-                      !if(c_%nd2.eq.6) n_t2%m(3,nres)= indexa(3)
-	  call fort_warn('ptc_normal: ',' Hamiltonian terms not yet implemented with the new complex PTC')
+                      theNormalForm_t2%m(1,nres)= n1
+                      theNormalForm_t2%m(2,nres)= n2
+                      if(c_%nd2.eq.6) theNormalForm_t2%m(3,nres)= indexa(3)
 	  
 100                   continue
                    enddo
                 endif
              enddo
              
-             !n_t2%nres = nres
-             call fort_warn('ptc_normal: ',' Hamiltonian terms not yet implemented with the new complex PTC')
+             theNormalForm_t2%nres = nres
           endif
 
        endif
        !------------------------------------------------------------------------
-       
-       if (n_haml > 0) then
-           
-           if (getdebug() > 0) print*,"Normal Form Type 2 (for Hamiltonian Terms)"
-           
-           call fort_warn('ptc_normal: ',' Hamiltonian terms not yet implemented with the new complex PTC')
-
-           !call alloc(theNormalForm_t2)
-           !call  c_normal(c_Map,theNormalForm)
 
 
-           if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
-              write(whymsg,*) 'DA got unstable in Normal Form: PTC msg: ',messagelost
-              call fort_warn('ptc_normal: ',whymsg)
-              call seterrorflag(10,"ptc_normal ",whymsg)
-              return
-           endif
-
-
-       endif
-       
        if (n_gnfu > 0) then
 
           !!!!!!!!!!!!!!!!!!!!!!
@@ -365,10 +372,108 @@ contains
           
           call equal_c_tayls(g_io,-cgetpb(vf))
           
-          !g_io =-cgetpb(vf)
-          !call putGnormaltable(g_io)
 
        endif
+       
+       if (n_haml > 0) then
+           
+           if (getdebug() > 0) print*,"Normal Form Type 2 (for Hamiltonian Terms)"
+           
+           !print77=.true. ! simpler format
+           ! call print(default, mft)
+           ! write(mft,*) "The C MAP "
+           ! call print(c_Map,mft)
+           ! write(mft,*) "  "
+           ! write(mft,*) " ++++++++++++++++++++++++ "
+           ! write(mft,*) "  "
+
+  
+           theNormalForm_t2 = theNormalForm  
+          ! call  c_normal(c_Map,theNormalForm_t2) ! in the non Complex PTC had to leave resonance in the rotation
+          
+           if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+              write(whymsg,*) 'DA got unstable in Normal Form: PTC msg: ',messagelost
+              call fort_warn('ptc_normal: ',whymsg)
+              call seterrorflag(10,"ptc_normal ",whymsg)
+              return
+           endif
+           
+          call alloc(a_CS)
+          call c_canonise(theNormalForm_t2%a_t,a_CS)
+          ! write(mft,*) "Courant Snyder transfo A_T (full nonlin) "
+          ! call print(a_CS,mft)
+          ! write(mft,*) "  "
+          ! write(mft,*) " ++++++++++++++++++++++++ "
+          ! write(mft,*) "  "
+
+          a_CS = a_CS.sub.1
+          call c_canonise(a_CS,a_CS)
+          
+          ! write(mft,*) "Courant Snyder transfo A_T truncated at 1st order"
+          ! call print(a_CS,mft)
+          ! write(mft,*) "  "
+          ! write(mft,*) " ++++++++++++++++++++++++ "
+          ! write(mft,*) "  "
+
+
+          call alloc(c_Map2)
+          c_Map2 = a_CS**(-1)*c_Map*a_CS
+
+          call alloc(vf_t2)
+          call alloc(q_Map)
+          call c_factor_map(c_Map2,q_Map,vf_t2,dir=1) 
+          ! write(mft,*) "Vector Field "
+          ! call print(vf_t2,mft)
+          ! write(mft,*) "  "
+          ! write(mft,*) " ++++++++++++++++++++++++ "
+          ! write(mft,*) "  "
+
+           ! move from phasor to complex C-S
+          vf_t2=from_phasor()*vf_t2
+           
+          call alloc(nrmlzdPseudoHam)
+          call equal_c_tayls(nrmlzdPseudoHam,cgetpb(vf_t2)) ! nrmlzdPseudoHam=cgetpb(vf_t2)
+         
+         if (getdebug() > 2) then
+           write(mft,*) "-----------------------------------------------------------------"
+           write(mft,*) "HAMILTONIAN in linear complex Courant Snyder (linear phasor)"
+           call print(nrmlzdPseudoHam,mft)
+           write(mft,*) "-----------------------------------------------------------------"
+
+           close(mft)
+
+         endif 
+         
+           ! ALTERNATIVE ALGORITHM, but result starts at ordrer 3
+           !  type(damap)    :: r_Map
+           !  type(DRAGTFINN):: df_Map
+           !  type(pbresonance) pb_Resonance !Poisson Bracket Resonance
+           !
+           !  call alloc(r_Map)
+           !  r_Map = c_Map2
+           !
+           !  !write(mft,*) "RMAP "
+           !  !call print(r_Map,mft)
+           !  !write(mft,*) "  "
+           !  !write(mft,*) " ++++++++++++++++++++++++ "
+           !  !write(mft,*) "  "
+           !
+           !  call alloc(df_Map)
+           !  df_Map = r_Map
+           !
+           !  call alloc(pb_Resonance)
+           !  pb_Resonance = df_Map%pb  ! this is the hamiltonian
+           !
+           !  write(mft,*) "PBR "
+           !  call print(pb_Resonance,mft)
+           !  write(mft,*) "  "
+           !  write(mft,*) " ++++++++++++++++++++++++ "
+           !  write(mft,*) "  "
+           
+           
+
+       endif
+       
        
        !------ get values and store them in the table 'normal_results' ---------
        if (n_rows > 0) then
@@ -392,7 +497,7 @@ contains
        call alloc(theAscript)
        theAscript = X+theNormalForm%A_t;
        
-       call putusertable(1,'$end$ ',dt ,dt,y,theAscript)
+       call putusertable(1,'$end$ ',dt ,dt,theTransferMap%x,theAscript)
        call kill(theAscript)
        
 
@@ -402,9 +507,11 @@ contains
           call kill(vf)
        endif   
 
-       !if (n_haml > 0) then 
+       if (n_haml > 0) then 
          !clean after hamiltonian when implemented
-       !endif  
+          call kill(nrmlzdPseudoHam)
+         ! call kill(vf_t2)
+       endif  
  
 
        call kill(theNormalForm)
@@ -414,7 +521,7 @@ contains
     
 
     
-    CALL kill(y)
+    CALL kill(theTransferMap)
 
     close(18)
     
@@ -434,7 +541,7 @@ contains
        implicit none
        logical(lp) name_l
        integer,intent(IN) ::  row,icase
-       real(dp) double_from_normal_t1, d_val, d_val1, d_val2
+       real(dp) double_from_normal_t1, d_val, d_val1, d_val2, d_factorial
        complex(dp) :: c_val
        integer ii,i1,i2,jj
        integer j,k,ind(6)
@@ -519,7 +626,6 @@ contains
        if (name_l) then
           SELECT CASE (name_var)
           CASE ('anhx')
-             print*, 'anhx'
              k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
              do j = 1,2
                 ind(j) =  int(doublenum)
@@ -536,7 +642,6 @@ contains
              d_val = -aimag(c_val)/(2.*pi)
              ind(1) = ind(1) - 1 ! need to subtract it back to get factorial factor correct
           CASE ('anhy')
-             print*, 'anhy'
              k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
              do j = 1,2
                 ind(j) = int(doublenum)
@@ -586,8 +691,7 @@ contains
               ind(6) = 0
               c_val = g_io.sub.ind
               d_val = -real(c_val)
-              double_from_normal_t1 = d_val
-              RETURN
+              
            CASE ('gnfs')
               k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
               ind(1) = int(doublenum)
@@ -601,8 +705,7 @@ contains
               ind(6) = 0
               c_val = g_io.sub.ind
               d_val = -imag(c_val)
-              double_from_normal_t1 = d_val
-              RETURN
+
            CASE ('gnfa')
               k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
               ind(1) = int(doublenum)
@@ -617,8 +720,8 @@ contains
               c_val = g_io.sub.ind
               d_val1 = imag(c_val)
               d_val2 = real(c_val)
-              double_from_normal_t1 = SQRT(d_val1**2 + d_val2**2)
-              RETURN
+              d_val = SQRT(d_val1**2 + d_val2**2)
+
            CASE ('gnfu')
               double_from_normal_t1 = zero ! should never arrive here
               RETURN
@@ -631,7 +734,8 @@ contains
      !  print*,'Indexes 2 4 6', ind(2), ind(4), ind(6)
      !  print*,'Factria 1 3 5', factorial(ind(1)), factorial(ind(3)), factorial(ind(5))
        
-       double_from_normal_t1 = d_val*(factorial(ind(1))*factorial(ind(3))*factorial(ind(5)))
+       d_factorial = factorial(ind(1))*factorial(ind(3))*factorial(ind(5))
+       double_from_normal_t1 = d_val*d_factorial
      
      END FUNCTION double_from_normal_t1
    !________________________________________________
@@ -649,6 +753,7 @@ contains
        character(len = 4)  name_var
        character(len = 2)  name_var1
        character(len = 3)  name_var2
+       complex(dp) :: c_val
 
        double_from_normal_t2 = zero
 
@@ -668,11 +773,10 @@ contains
           ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
-          !d_val = pbrh%cos%h.sub.ind
-          d_val = zero
-          call fort_warn('double_from_normal_t2: ',' Hamiltonian terms not yet implemented with the new complex PTC')
-          double_from_normal_t2 = d_val
-          RETURN
+          print*, "HAMC want to extract ", ind
+          c_val = nrmlzdPseudoHam.sub.ind
+          d_val = real(c_val)
+
        CASE ('hams')
           k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           ind(1) = int(doublenum)
@@ -684,11 +788,9 @@ contains
           ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
-          !d_val = pbrh%sin%h.sub.ind
-          d_val = zero
-          call fort_warn('double_from_normal_t2: ',' Hamiltonian terms not yet implemented with the new complex PTC')
-          double_from_normal_t2 = d_val
-          RETURN
+          print*, "HAMS want to extract ", ind
+          c_val = nrmlzdPseudoHam.sub.ind
+          d_val = imag(c_val)
        CASE ('hama')
           k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
           ind(1) = int(doublenum)
@@ -700,21 +802,24 @@ contains
           ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
-          !d_val1 = pbrh%cos%h.sub.ind
-          !d_val2 = pbrh%sin%h.sub.ind
-          !double_from_normal_t2 = SQRT(d_val1**2 + d_val2**2)
-          double_from_normal_t2 = zero
-          call fort_warn('double_from_normal_t2: ',' Hamiltonian terms not yet implemented with the new complex PTC')
           
-          RETURN
+          print*, "HAMA want to extract ", ind
+          
+          c_val = nrmlzdPseudoHam.sub.ind
+
+          d_val1 = imag(c_val)
+          d_val2 = real(c_val)
+          d_val = SQRT(d_val1**2 + d_val2**2)
+
        CASE ('haml')
           double_from_normal_t2 = zero
           RETURN
        CASE DEFAULT
           print *,"--Error in the table normal_results-- Unknown input: ",name_var
        END SELECT
-
-       double_from_normal_t2 = d_val*(factorial(ind(1))*factorial(ind(3))*factorial(ind(5)))
+       
+       double_from_normal_t2 = d_val
+       
      END FUNCTION double_from_normal_t2
 
   END subroutine ptc_normal

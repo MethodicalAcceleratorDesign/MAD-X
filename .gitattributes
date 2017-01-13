@@ -1596,7 +1596,6 @@ tests/test-plot/test-plot.cfg -text
 tests/test-plot/test-plot.madx -text
 tests/test-plot/test-plot.ref -text
 tests/test-ptc-normal/Maxwellian_bend_for_ptc.txt.cfg -text
-tests/test-ptc-normal/Maxwellian_bend_for_ptc.txt.ref -text
 tests/test-ptc-normal/fort.18.cfg -text
 tests/test-ptc-normal/fort.18.ref -text
 tests/test-ptc-normal/ptc.nonlin.cfg -text
@@ -1618,8 +1617,6 @@ tests/test-ptc-trackline/test-ptc-trackline.madx -text
 tests/test-ptc-trackline/test-ptc-trackline.ref -text
 tests/test-ptc-trackline/trackone.cfg -text
 tests/test-ptc-trackline/trackone.ref -text
-tests/test-ptc-twiss-1/Maxwellian_bend_for_ptc.txt.cfg -text
-tests/test-ptc-twiss-1/Maxwellian_bend_for_ptc.txt.ref -text
 tests/test-ptc-twiss-1/fort.18.cfg -text
 tests/test-ptc-twiss-1/fort.18.ref -text
 tests/test-ptc-twiss-1/input/fv9.opt -text
@@ -1631,8 +1628,6 @@ tests/test-ptc-twiss-1/test-ptc-twiss-1.madx -text
 tests/test-ptc-twiss-1/test-ptc-twiss-1.ref -text
 tests/test-ptc-twiss-1/twiss-table.cfg -text
 tests/test-ptc-twiss-1/twiss-table.ref -text
-tests/test-ptc-twiss-2/Maxwellian_bend_for_ptc.txt.cfg -text
-tests/test-ptc-twiss-2/Maxwellian_bend_for_ptc.txt.ref -text
 tests/test-ptc-twiss-2/ptc-twiss-table.cfg -text
 tests/test-ptc-twiss-2/ptc-twiss-table.ref -text
 tests/test-ptc-twiss-2/test-ptc-twiss-2.cfg -text
@@ -1640,8 +1635,6 @@ tests/test-ptc-twiss-2/test-ptc-twiss-2.madx -text
 tests/test-ptc-twiss-2/test-ptc-twiss-2.ref -text
 tests/test-ptc-twiss-2/twiss-table.cfg -text
 tests/test-ptc-twiss-2/twiss-table.ref -text
-tests/test-ptc-twiss-3/Maxwellian_bend_for_ptc.txt.cfg -text
-tests/test-ptc-twiss-3/Maxwellian_bend_for_ptc.txt.ref -text
 tests/test-ptc-twiss-3/fort.18.cfg -text
 tests/test-ptc-twiss-3/fort.18.ref -text
 tests/test-ptc-twiss-3/input/fv9.opt -text
@@ -1766,12 +1759,31 @@ tests/test-ptc-twiss-maptable/map_table.tfs.ref -text
 tests/test-ptc-twiss-maptable/test-ptc-twiss-maptable.cfg -text
 tests/test-ptc-twiss-maptable/test-ptc-twiss-maptable.madx -text
 tests/test-ptc-twiss-maptable/test-ptc-twiss-maptable.ref -text
+tests/test-ptc-twiss-normal-5D/leir.5D.ptc.nonlin.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-5D/leir.5D.ptc.summ.twiss.cfg -text
+tests/test-ptc-twiss-normal-5D/leir.5D.ptc.summ.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-5D/leir.5D.ptc.twiss.cfg -text
+tests/test-ptc-twiss-normal-5D/leir.5D.ptc.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-5D/ptc_map_table.tfs.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-5D/ptc_normal_results.tfs.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-5D/test-ptc-twiss-normal-5D.cfg -text
+tests/test-ptc-twiss-normal-5D/test-ptc-twiss-normal-5D.madx -text
+tests/test-ptc-twiss-normal-5D/test-ptc-twiss-normal-5D.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-6D/fort.18.cfg -text
+tests/test-ptc-twiss-normal-6D/fort.18.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-6D/leir.6D.ptc.nonlin.cfg -text
+tests/test-ptc-twiss-normal-6D/leir.6D.ptc.nonlin.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-normal-6D/leir.6D.ptc.summ.twiss.cfg -text
 tests/test-ptc-twiss-normal-6D/leir.6D.ptc.summ.twiss.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-normal-6D/leir.6D.ptc.twiss.cfg -text
 tests/test-ptc-twiss-normal-6D/leir.6D.ptc.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-6D/ptc_map_table.tfs.cfg -text
+tests/test-ptc-twiss-normal-6D/ptc_map_table.tfs.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-6D/ptc_normal_results.tfs.cfg -text
+tests/test-ptc-twiss-normal-6D/ptc_normal_results.tfs.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-normal-6D/test-ptc-twiss-normal-6D.cfg -text
 tests/test-ptc-twiss-normal-6D/test-ptc-twiss-normal-6D.madx -text
+tests/test-ptc-twiss-normal-6D/test-ptc-twiss-normal-6D.out -text
 tests/test-ptc-twiss-normal-6D/test-ptc-twiss-normal-6D.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-normal-genfu/normal.tfs -text
 tests/test-ptc-twiss-normal-genfu/ptc.nonlin.cfg -text

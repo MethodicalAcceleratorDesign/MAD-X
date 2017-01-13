@@ -48,5 +48,4 @@ ptc_create_layout,model=2,method=6,nst=5,exact;
 ptc_twiss,icase=5,no=2,BETA0=TWSSip,file=twiss_ptc_line;
 ptc_end;
 
-removefile, file='Maxwellian_bend_for_ptc.txt';
 stop;

@@ -81,7 +81,6 @@ parameter: energy   double value:                100
           Kinetic Energy : 0.990617E+02
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.999956E+02
-  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy           100.00000000000000     
      method                   6

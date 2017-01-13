@@ -87,6 +87,5 @@ ptc_twiss,icase=5,no=2, initial_matrix_manual,
     file =  twiss_ptc_line;
 ptc_end;
 
-removefile, file='Maxwellian_bend_for_ptc.txt';
 stop;
 

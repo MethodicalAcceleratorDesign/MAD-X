@@ -12,7 +12,3 @@ select flag=ptc_twiss,column=name,s,betx,beta11,bety,beta22,beta12,beta21,mu1,mu
 ptc_twiss, deltap=0.0,closed_orbit,icase=5,file="p4_ptc.tfs",no=3;
 ptc_end;
 
-! ptc cleaning
-removefile, file="Maxwellian_bend_for_ptc.txt";
-removefile, file="Maxwellian_bend_for_ptc_electric.txt";
-removefile, file="internal_mag_pot.txt";

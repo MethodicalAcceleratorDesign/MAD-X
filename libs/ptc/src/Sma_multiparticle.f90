@@ -11,16 +11,16 @@ module ptc_multiparticle
   PRIVATE fuzzy_eq,fuzzy_neq
   PRIVATE TRACK_FIBRE_FRONTR,TRACK_FIBRE_FRONTP
   PRIVATE TRACK_FIBRE_BACKR,TRACK_FIBRE_BACKP
-  PRIVATE TRACKR_NODE_SINGLE,TRACKP_NODE_SINGLE,TRACKV_NODE_SINGLE
+  PRIVATE TRACK_NODE_SINGLER,TRACK_NODE_SINGLEP,TRACK_NODE_SINGLEV
   private DRIFTr_BACK_TO_POSITION,DRIFTp_BACK_TO_POSITION  !,DRIFT_BACK_TO_POSITION
   private MAKE_NODE_LAYOUT_2 !,DRIFT_TO_TIME
   PRIVATE MODULATE_R,MODULATE_P
   PRIVATE TRACK_MODULATION_R,TRACK_MODULATION_P
-
+ LOGICAL :: no_mis=.TRUE.
   !  LOGICAL :: OLD_MOD=.TRUE.
 
   logical(lp),private, parameter :: dobb=.true.
-  logical(lp),private, parameter :: aperture_all_case0=.true.
+  logical(lp),private, parameter :: aperture_all_case0=.false.
  ! type(probe) :: xsm,xsm0
   real(dp) :: xsm0t=0.0_dp,xsmt=0.0_dp
   !real(dp) :: unit_time =1.0e-3_dp
@@ -28,9 +28,9 @@ module ptc_multiparticle
     logical(lp) :: use_bmad_units=.false.
 
   INTERFACE TRACK_NODE_SINGLE
-     MODULE PROCEDURE TRACKR_NODE_SINGLE     !@1  t,x,state,charge
-     MODULE PROCEDURE TRACKP_NODE_SINGLE     !@1  t,y,state,charge
-     MODULE PROCEDURE TRACKV_NODE_SINGLE     !@1  t,v,state,charge
+     MODULE PROCEDURE TRACK_NODE_SINGLER     !@1  t,x,state,charge
+     MODULE PROCEDURE TRACK_NODE_SINGLEP     !@1  t,y,state,charge
+     MODULE PROCEDURE TRACK_NODE_SINGLEV     !@1  t,v,state,charge
   END INTERFACE
 
   INTERFACE convert_bmad_to_ptc
@@ -782,14 +782,14 @@ CONTAINS
              P0=>C%PATCH%P0b
              B0=>C%PATCH%B0b
              b1=b0
-             X(2)=X(2)*P0/C%MAG%P%P0C
-             X(4)=X(4)*P0/C%MAG%P%P0C
-             IF(k%TIME.or.recirculator_cheat)THEN
-                X(5)=root(1.0_dp+2.0_dp*X(5)/B0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
-                X(5)=X(5)*P0/C%MAG%P%P0C-1.0_dp !X(5) = DP/P0C_NEW
-                X(5)=(2.0_dp*X(5)+X(5)**2)/(root(1.0_dp/C%MAG%P%BETA0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/C%MAG%P%BETA0)
+             X(2)=X(2)*C%MAG%P%P0C/P0   ! 8/31/2016
+             X(4)=X(4)*C%MAG%P%P0C/P0   ! 8/31/2016
+             IF(k%TIME.or.recirculator_cheat)THEN   ! 8/31/2016
+              X(5)=root(1.0_dp+2.0_dp*X(5)/C%MAG%P%BETA0+X(5)**2)  !X(5) = 1+DP/P0C_OLD   ! 8/31/2016
+              X(5)=X(5)*C%MAG%P%P0C/P0-1.0_dp !X(5) = DP/P0C_NEW   ! 8/31/2016
+              X(5)=(2.0_dp*X(5)+X(5)**2)/(root(1.0_dp/B0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/B0)   ! 8/31/2016
              ELSE
-                X(5)=(1.0_dp+X(5))*P0/C%MAG%P%P0C-1.0_dp
+               X(5)=(1.0_dp+X(5))*C%MAG%P%P0C/P0-1.0_dp   ! 8/31/2016
              ENDIF      
     endif
 ENDIF
@@ -865,15 +865,15 @@ ENDIF
              P0=>C%PATCH%P0b
              B0=>C%PATCH%B0b
              b1=b0
-             X(2)=X(2)*P0/C%MAGP%P%P0C
-             X(4)=X(4)*P0/C%MAGP%P%P0C
-             IF(k%TIME.or.recirculator_cheat)THEN
-                X(5)=SQRT(1.0_dp+2.0_dp*X(5)/B0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
-                X(5)=X(5)*P0/C%MAGP%P%P0C-1.0_dp !X(5) = DP/P0C_NEW
-                X(5)=(2.0_dp*X(5)+X(5)**2)/(SQRT(1.0_dp/C%MAGP%P%BETA0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/C%MAGP%P%BETA0)
+             X(2)=X(2)*C%MAG%P%P0C/P0   ! 8/31/2016
+             X(4)=X(4)*C%MAG%P%P0C/P0   ! 8/31/2016
+             IF(k%TIME.or.recirculator_cheat)THEN   ! 8/31/2016
+              X(5)=sqrt(1.0_dp+2.0_dp*X(5)/C%MAG%P%BETA0+X(5)**2)  !X(5) = 1+DP/P0C_OLD   ! 8/31/2016
+              X(5)=X(5)*C%MAG%P%P0C/P0-1.0_dp !X(5) = DP/P0C_NEW   ! 8/31/2016
+              X(5)=(2.0_dp*X(5)+X(5)**2)/(sqrt(1.0_dp/B0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/B0)   ! 8/31/2016
              ELSE
-                X(5)=(1.0_dp+X(5))*P0/C%MAGP%P%P0C-1.0_dp
-             ENDIF           
+               X(5)=(1.0_dp+X(5))*C%MAG%P%P0C/P0-1.0_dp   ! 8/31/2016
+             ENDIF               
     ENDIF
 endif
  
@@ -883,7 +883,7 @@ endif
 
   ! thin lens tracking
 
-  SUBROUTINE TRACKV_NODE_SINGLE(T,V,K) !!
+  SUBROUTINE TRACK_NODE_SINGLEV(T,V,K) !!
     implicit none
     TYPE(INTEGRATION_NODE),POINTER :: T
     TYPE(INTERNAL_STATE)  K
@@ -946,9 +946,9 @@ endif
     IF(MAG_OUT%NEXT%CAS/=CASE2) STOP 202
 
 
-  END SUBROUTINE TRACKV_NODE_SINGLE
+  END SUBROUTINE TRACK_NODE_SINGLEV
 
-  SUBROUTINE TRACKR_NODE_SINGLE(T,X,K) !!
+  SUBROUTINE TRACK_NODE_SINGLER(T,X,K) !!
     ! This routines tracks a single thin lens
     ! it is supposed to reproduce plain PTC
     implicit none
@@ -1005,7 +1005,7 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
             call check_S_APERTURE_out(el%p,t%POS_IN_FIBRE-2,x)
 
        SELECT CASE(EL%KIND)
-       CASE(KIND0:KIND1,KIND3,KIND8:KIND9,KIND11:KIND15,KIND18:KIND19,kind22)
+       CASE(KIND0:KIND1,KIND3,KIND8:KIND9,KIND11:KIND15,KIND18:KIND19)
        case(KIND2)
           CALL TRACK_FRINGE(EL=EL%K2,X=X,k=k,J=T%CAS)
        case(KIND4)
@@ -1015,6 +1015,13 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
           ELSE
              CALL FRINGECAV(EL%C4,X,k=k,J=2)
              CALL ADJUST_TIME_CAV4(EL%C4,X,k,2)
+          ENDIF
+       case(KINDhel)
+          IF(T%CAS==CASE2) THEN
+            call fringe_hel(el%he22,x,2)
+            call fake_shift(el%he22,x)
+           else
+            call fringe_hel(el%he22,x,1)
           ENDIF
        case(KIND5)
           CALL TRACK_FRINGE(EL5=EL%S5,X=X,k=k,J=T%CAS)
@@ -1035,6 +1042,9 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
           CALL ADJUST_WI(EL%WI,X,k,T%CAS)   ! ONLY DOES SOMETHING IF J==2
        case(KINDPA)
           CALL ADJUST_PANCAKE(EL%PA,X,k,T%CAS)
+       case(kindsuperdrift)
+        if(el%p%dir==1.and.t%cas==case1) call  PATCH_drift(el%sdr,X,k,el%p%exact,1)
+        if(el%p%dir==-1.and.t%cas==case2) call  PATCH_drift(el%sdr,X,k,el%p%exact,-1)
        CASE DEFAULT
           WRITE(6,*) "NOT IMPLEMENTED ",EL%KIND
           stop 666
@@ -1097,7 +1107,8 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
           CALL TRACK_SLICE(EL%WI,X,k,t%POS_IN_FIBRE-2)
        case(KINDPA)
           CALL TRACK_SLICE(EL%PA,X,k,T%POS_IN_FIBRE-2)
-
+       case(kindsuperdrift)
+          call track_slice(EL%sdr,X,k)
        CASE DEFAULT
           WRITE(6,*) "NOT IMPLEMENTED ",EL%KIND
           stop 999
@@ -1127,10 +1138,10 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     if(wherelost==2.and.(.not.check_stable)) then
        t%lost=t%lost+1
     endif
-  END SUBROUTINE TRACKR_NODE_SINGLE
+  END SUBROUTINE TRACK_NODE_SINGLER
 
 
-  SUBROUTINE TRACKP_NODE_SINGLE(T,X,K) !!
+  SUBROUTINE TRACK_NODE_SINGLEP(T,X,K) !!
     ! This routines tracks a single thin lens
     ! it is supposed to reproduce plain PTC
     implicit none
@@ -1170,14 +1181,16 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     SELECT CASE(T%CAS)
     CASE(CASEP1)
        CALL TRACK_FIBRE_FRONT(T%PARENT_FIBRE,X,K)
-     if(associated(T%PARENT_FIBRE%MAG%p%aperture)) then
-TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==-1.OR.T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==0
-          if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
+     if(associated(T%PARENT_FIBRE%MAGP%p%aperture)) then
+TA=T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==-1.OR.T%PARENT_FIBRE%MAGP%p%dir  &
+*T%PARENT_FIBRE%MAGP%p%aperture%pos==0
+          if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAGP%p%aperture,X)
      endif
     CASE(CASEP2)
-     if(associated(T%PARENT_FIBRE%MAG%p%aperture)) then
-TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==0
-          if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
+     if(associated(T%PARENT_FIBRE%MAGP%p%aperture)) then
+TA=T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==1.OR.T%PARENT_FIBRE%MAGP%p%dir  &
+*T%PARENT_FIBRE%MAGP%p%aperture%pos==0
+          if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAGP%p%aperture,X)
      endif
        CALL TRACK_FIBRE_BACK(T%PARENT_FIBRE,X,K)
 
@@ -1188,7 +1201,7 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
 
 
        SELECT CASE(EL%KIND)
-       CASE(KIND0:KIND1,KIND3,KIND8:KIND9,KIND11:KIND15,KIND18:KIND19,kind22)
+       CASE(KIND0:KIND1,KIND3,KIND8:KIND9,KIND11:KIND15,KIND18:KIND19)
        case(KIND2)
           CALL TRACK_FRINGE(EL=EL%K2,X=X,k=k,J=T%CAS)
        case(KIND4)
@@ -1198,6 +1211,10 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
           ELSE
              CALL FRINGECAV(EL%C4,X,k=k,J=2)
              CALL ADJUST_TIME_CAV4(EL%C4,X,k,2)
+          ENDIF
+       case(KINDhel)
+          IF(T%CAS==CASE2) THEN
+            call fake_shift(el%he22,x)
           ENDIF
        case(KIND5)
           CALL TRACK_FRINGE(EL5=EL%S5,X=X,k=k,J=T%CAS)
@@ -1218,6 +1235,9 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
           CALL ADJUST_WI(EL%WI,X,k,T%CAS)   ! ONLY DOES SOMETHING IF J==2
        case(KINDPA)
           CALL ADJUST_PANCAKE(EL%PA,X,k,T%CAS)   ! ONLY DOES SOMETHING IF J==2
+       case(kindsuperdrift)
+        if(el%p%dir==1.and.t%cas==case1) call  PATCH_drift(el%sdr,X,k,el%p%exact,1)
+        if(el%p%dir==-1.and.t%cas==case2) call  PATCH_drift(el%sdr,X,k,el%p%exact,-1)
        CASE DEFAULT
           WRITE(6,*) "NOT IMPLEMENTED ",EL%KIND
           stop 666
@@ -1304,12 +1324,14 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
           CALL TRACK_SLICE(EL%he22,X,k,t%POS_IN_FIBRE-2)
        case(KINDPA)
           CALL TRACK_SLICE(EL%PA,X,k,T%POS_IN_FIBRE-2)
+       case(kindsuperdrift)
+          call track_slice(EL%sdr,X,k)
        CASE DEFAULT
           WRITE(6,*) "NOT IMPLEMENTED ",EL%KIND
           stop 999
        END SELECT
-       if(associated(T%PARENT_FIBRE%MAG%p%aperture).and.aperture_all_case0) &
-            call CHECK_APERTURE(T%PARENT_FIBRE%MAG%p%aperture,X)
+       if(associated(T%PARENT_FIBRE%MAGP%p%aperture).and.aperture_all_case0) &
+            call CHECK_APERTURE(T%PARENT_FIBRE%MAGP%p%aperture,X)
 
     case(CASET)
        if(associated(t%bb).and.dobb.and.do_beam_beam) then
@@ -1333,7 +1355,7 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     KNOB=.FALSE.
     ! END NEW STUFF WITH KIND=3
 
-  END SUBROUTINE TRACKP_NODE_SINGLE
+  END SUBROUTINE TRACK_NODE_SINGLEP
 
 
 
@@ -1982,10 +2004,15 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
      b0=1
     endif 
 
+     if(tangent) then
+      t=sqrt(1.0_dp+2.0_dp*z(5)/b0+z(5)**2)/sqrt(1.0_dp+z(2)**2+z(4)**2) 
+      z(2)=z(2)*t
+      z(4)=z(4)*t
+     else
      t=z(6)
-     z(6)=-z(5)*sqrt(1.d0/b0**2+2*t+t**2)/(1.d0+t)
-     z(5)=sqrt(1.d0/b0**2+2*t+t**2)-1.d0/b0
-
+     z(6)=-z(5)*sqrt(1.0_dp/b0**2+2*t+t**2)/(1.0_dp+t)
+     z(5)=sqrt(1.0_dp/b0**2+2*t+t**2)-1.0_dp/b0
+     endif
      end subroutine convert_bmad_to_ptcar
 
     subroutine convert_bmad_to_ptcap(z,b1,time)
@@ -2002,11 +2029,17 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     endif 
 
      call alloc(t)
+
+     if(tangent) then
+      t=sqrt(1.0_dp+2.0_dp*z(5)/b0+z(5)**2)/sqrt(1.0_dp+z(2)**2+z(4)**2) 
+      z(2)=z(2)*t
+      z(4)=z(4)*t
+     else
      t=z(6)
 
-     z(6)=-z(5)*sqrt(1.d0/b0**2+2*t+t**2)/(1.d0+t)
-     z(5)=sqrt(1.d0/b0**2+2*t+t**2)-1.d0/b0
-    
+     z(6)=-z(5)*sqrt(1.0_dp/b0**2+2*t+t**2)/(1.0_dp+t)
+     z(5)=sqrt(1.0_dp/b0**2+2*t+t**2)-1.0_dp/b0
+     endif
      call kill(t)
 
      end subroutine convert_bmad_to_ptcap 
@@ -2026,10 +2059,15 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
      b0=1
     endif 
 
-     t=z(5)
+     if(tangent) then
+      t=1.0_dp/sqrt(1.0_dp+2.0_dp*z(5)/b0+z(5)**2-z(2)**2-z(4)**2) 
+      z(2)=z(2)*t
+      z(4)=z(4)*t
+     else
+      t=z(5)
       z(5)=-(z(6)-l)*sqrt(1.d0 +2*t/b0+t**2)/(1.d0/b0+t)
-      z(6)=sqrt(1.d0 +2*t/b0+t**2)-1.d0 
-
+      z(6)=sqrt(1.0_dp +2*t/b0+t**2)-1.d0 
+     endif
      end subroutine convert_ptc_to_bmadar   
 
 
@@ -2052,10 +2090,15 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
 
     
      call alloc(t)
+     if(tangent) then
+      t=1.0_dp/sqrt(1.0_dp+2.0_dp*z(5)/b0+z(5)**2-z(2)**2-z(4)**2) 
+      z(2)=z(2)*t
+      z(4)=z(4)*t
+     else
       t=z(5)
-      z(5)=-(z(6)-l)*sqrt(1.d0 +2*t/b0+t**2)/(1.d0/b0+t)
-      z(6)=sqrt(1.d0 +2*t/b0+t**2)-1.d0 
-    
+      z(5)=-(z(6)-l)*sqrt(1.0_dp+2*t/b0+t**2)/(1.0_dp/b0+t)
+      z(6)=sqrt(1.0_dp +2*t/b0+t**2)-1.0_dp 
+     endif
      call kill(t)
 
      end subroutine convert_ptc_to_bmadap  
@@ -2072,11 +2115,15 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     else
      b0=1
     endif 
-
-     t=z%x(6)
-     z%x(6)=-z%x(5)*sqrt(1.d0/b0**2+2*t+t**2)/(1.d0+t)
-     z%x(5)=sqrt(1.d0/b0**2+2*t+t**2)-1.d0/b0
-
+     if(tangent) then
+      t=sqrt(1.0_dp+2.0_dp*z%x(5)/b0+z%x(5)**2)/sqrt(1.0_dp+z%x(2)**2+z%x(4)**2) 
+      z%x(2)=z%x(2)*t
+      z%x(4)=z%x(4)*t
+     else
+      t=z%x(6)
+      z%x(6)=-z%x(5)*sqrt(1.0_dp/b0**2+2*t+t**2)/(1.0_dp+t)
+      z%x(5)=sqrt(1.0_dp/b0**2+2*t+t**2)-1.0_dp/b0
+     endif
      end subroutine convert_bmad_to_ptcr   
 
 
@@ -2092,11 +2139,18 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
      b0=1
     endif 
      call alloc(t)
+
+     if(tangent) then
+      t=sqrt(1.0_dp+2.0_dp*z%x(5)/b0+z%x(5)**2)/sqrt(1.0_dp+z%x(2)**2+z%x(4)**2) 
+      z%x(2)=z%x(2)*t
+      z%x(4)=z%x(4)*t
+     else
      t=z%x(6)
 
-     z%x(6)=-z%x(5)*sqrt(1.d0/b0**2+2*t+t**2)/(1.d0+t)
-     z%x(5)=sqrt(1.d0/b0**2+2*t+t**2)-1.d0/b0
-    
+     z%x(6)=-z%x(5)*sqrt(1.d0/b0**2+2*t+t**2)/(1.0_dp+t)
+     z%x(5)=sqrt(1.0_dp/b0**2+2*t+t**2)-1.0_dp/b0
+    endif 
+
      call kill(t)
 
      end subroutine convert_bmad_to_ptcp   
@@ -2116,10 +2170,15 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     else
      b0=1
     endif 
+     if(tangent) then
+      t=1.0_dp/sqrt(1.0_dp+2.0_dp*z%x(5)/b0+z%x(5)**2-z%x(2)**2-z%x(4)**2) 
+      z%x(2)=z%x(2)*t
+      z%x(4)=z%x(4)*t
+     else
      t=z%x(5)
-      z%x(5)=-(z%x(6)-l)*sqrt(1.d0 +2*t/b0+t**2)/(1.d0/b0+t)
-      z%x(6)=sqrt(1.d0 +2*t/b0+t**2)-1.d0 
-
+      z%x(5)=-(z%x(6)-l)*sqrt(1.0_dp +2*t/b0+t**2)/(1.0_dp/b0+t)
+      z%x(6)=sqrt(1.0_dp+2*t/b0+t**2)-1.0_dp 
+     endif
      end subroutine convert_ptc_to_bmadr   
 
 
@@ -2141,10 +2200,15 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     endif 
      call alloc(t)
 
+     if(tangent) then
+      t=1.0_dp/sqrt(1.0_dp+2.0_dp*z%x(5)/b0+z%x(5)**2-z%x(2)**2-z%x(4)**2) 
+      z%x(2)=z%x(2)*t
+      z%x(4)=z%x(4)*t
+     else
       t=z%x(5)
-      z%x(5)=-(z%x(6)-l)*sqrt(1.d0 +2*t/b0+t**2)/(1.d0/b0+t)
-      z%x(6)=sqrt(1.d0 +2*t/b0+t**2)-1.d0 
-    
+      z%x(5)=-(z%x(6)-l)*sqrt(1.0_dp +2*t/b0+t**2)/(1.0_dp/b0+t)
+      z%x(6)=sqrt(1.0_dp +2*t/b0+t**2)-1.d0 
+     endif
      call kill(t)
 
 
@@ -2161,5 +2225,527 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
       use_bmad_units=.false.
       ndpt_bmad=0
      end subroutine in_ptc_units
+
+     subroutine in_noncanonical_units
+     implicit none  
+      use_bmad_units=.true.
+      tangent=.true.
+      ndpt_bmad=0
+     end subroutine in_noncanonical_units
+
+     subroutine in_canonical_units
+     implicit none  
+      use_bmad_units=.false.
+      tangent=.false.
+      ndpt_bmad=0
+     end subroutine in_canonical_units
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!   New Survey Routines !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+subroutine survey_integration_layout(p,a0,ent0)
+implicit none
+type(fibre), pointer :: p
+type(fibre),pointer :: p1 
+real(dp), intent(in):: a0(3),ent0(3,3)
+
+call survey_integration_fibre(p,a0,ent0)
+
+p1=>p%next
+
+do while(.not.associated(p,p1))
+write(6,*) p1%previous%mag%name
+write(6,*) p1%previous%chart%f%a
+write(6,*) p1%previous%chart%f%b
+call survey_integration_fibre(p1,p1%previous%chart%f%b,p1%previous%chart%f%exi)
+write(6,*) p1%mag%name
+write(6,*) p1%chart%f%a
+write(6,*) p1%chart%f%b
+!pause
+p1=>p1%next
+enddo
+
+end subroutine survey_integration_layout
+
+
+subroutine survey_integration_fibre(p,b0,exi0)
+implicit none
+type(fibre), target :: p
+type(integration_node), pointer :: t
+integer i
+type(layout), pointer  :: r
+real(dp),intent(in):: b0(3),exi0(3,3) 
+real(dp) a0(3),ent0(3,3) 
+a0=b0
+ent0=exi0
+r=>p%parent_layout
+if(.not.associated(r%t)) then
+ call make_node_layout(r)
+ call survey(r)
+ call FILL_SURVEY_DATA_IN_NODE_LAYOUT(r)
+endif
+if(.not.associated(p%t1%a)) call FILL_SURVEY_DATA_IN_NODE_LAYOUT(r)
+ 
+
+t=>p%t1
+call survey_integration_node_p1(t,a0,ent0)
+t=>t%next
+call survey_integration_fringe(t,a0,ent0)
+
+do i=1,p%mag%p%nst
+ t=>t%next
+ call survey_integration_node_case0(t,a0,ent0)
+ if(i==p%mag%p%nst/2) then
+  p%chart%f%mid=t%exi
+  p%chart%f%o=t%b
+  p%mag%p%f%mid=t%exi
+  p%mag%p%f%o=t%b
+  p%magp%p%f%mid=t%exi
+  p%magp%p%f%o=t%b
+ endif
+enddo
+t=>t%next
+call survey_integration_fringe(t,a0,ent0)
+t=>t%next
+call survey_integration_node_p2(t,a0,ent0)
+
+
+
+end subroutine survey_integration_fibre
+
+
+
+subroutine survey_integration_fringe(t,a0,ent0)
+implicit none
+type(integration_node), target :: t
+real(dp) a0(3),ent0(3,3)
+
+if(associated(t%parent_fibre%mag%sdr)) then
+
+ call survey_integration_special_superdrift(t,a0,ent0)
+else
+ t%a=a0
+ t%ent=ent0
+ t%parent_fibre%chart%f%a=a0
+ t%parent_fibre%chart%f%ent=ent0
+ t%parent_fibre%chart%f%b=a0
+ t%parent_fibre%chart%f%exi=ent0
+ t%b=t%a
+ t%exi=t%ent
+ a0=t%b
+ ent0=t%exi
+! t%next%b=t%a
+! t%next%ent=t%exi
+endif
+end subroutine survey_integration_fringe
+
+
+
+
+subroutine survey_integration_node_case0(t,b0,ent0)
+implicit none
+type(integration_node), target :: t
+type(fibre), pointer :: f
+type(element), pointer :: m
+type(magnet_chart), pointer :: p
+real(dp) h,d(3),ang(3),b0(3),exi0(3,3),ent0(3,3)
+
+f=>t%parent_fibre
+m=>f%mag
+p=>m%p
+
+t%a=b0
+t%ent=ent0
+exi0=t%ent
+ 
+select case(m%kind) 
+
+CASE(KIND0,KIND1,KIND3:KIND5,KIND8:KIND9,KIND11:KIND15,KIND17:KIND22,kindwiggler,kindsuperdrift)
+   h=p%lc/p%nst
+   d=(/0.0_dp,0.0_dp,h/)
+
+   call geo_tra(b0,exi0,d,1)
+CASE(KIND2,KIND6:KIND7,KIND10)
+   h=p%ld/p%nst
+  if(p%b0==0.0_dp) then
+   d=(/0.0_dp,0.0_dp,h/)
+
+   call geo_tra(b0,exi0,d,1)
+  else
+  ang=0.0_dp
+  ang(2)=h*p%b0/2
+  h=2*sin(ang(2))/p%b0
+  d=(/0.0_dp,0.0_dp,h/)
+  call geo_rot(exi0,exi0,ang,exi0)
+  call geo_tra(b0,exi0,d,1)
+  call geo_rot(exi0,exi0,ang,exi0)
+
+  endif
+
+CASE(KINDPA)
+   h=m%l/p%nst
+  if(m%pa%hc==0.0_dp) then
+   d=(/0.0_dp,0.0_dp,h/)
+
+   call geo_tra(b0,exi0,d,1)
+  else
+  ang=0.0_dp
+  ang(2)=h*m%pa%hc/2
+  h=2*sin(ang(2))/m%pa%hc
+  d=(/0.0_dp,0.0_dp,h/)
+  call geo_rot(exi0,exi0,ang,exi0)
+  call geo_tra(b0,exi0,d,1)
+  call geo_rot(exi0,exi0,ang,exi0)
+  endif
+
+
+
+CASE(KIND16)
+   h=m%l/p%nst
+   d=(/0.0_dp,0.0_dp,h/)
+   call geo_tra(b0,exi0,d,1)
+
+CASE default
+ write(6,*) " not supported in survey_integration_node_case0 "
+ stop
+
+end select
+t%b=b0
+t%exi=exi0
+
+ent0=exi0
+!t%next%a=t%b
+!t%next%ent=t%exi
+
+end subroutine survey_integration_node_case0
+
+subroutine survey_integration_node_p1(t,a0,ent0)
+implicit none
+type(integration_node), target :: t
+type(fibre), pointer :: f
+real(dp) pix1(3),pix2(3) ,a0(3),exi0(3,3),ent0(3,3)
+logical(lp) :: ENTERING=my_true
+
+f=>t%parent_fibre
+pix1=0.0_dp;pix2=0.0_dp;
+
+t%a=a0
+t%ent=ent0
+exi0=t%ent
+
+if(f%patch%A_X1==-1) pix1(1)=pi
+if(f%patch%A_X2==-1) pix2(1)=pi
+
+!
+call GEO_ROT(exi0,pix1,1, ent0)
+call GEO_ROT(exi0,f%patch%a_ang,1, exi0)
+call TRANSLATE_point(a0,f%patch%A_D,1,exi0)  
+call GEO_ROT(exi0,pix2,1, exi0)
+
+pix1=0.0_dp
+pix1(3)=f%MAG%P%TILTD
+ call GEO_ROT(exi0,pix1,1, exi0)
+
+    IF(f%MAG%MIS) THEN
+      call MIS_survey(a0,exi0,f,a0,exi0,ENTERING)
+    ENDIF
+ 
+if(f%mag%kind==kindpa) then
+
+call ADJUST_PANCAKE_frame(f%mag%pa,a0,exi0,1)
+!
+write(6,*) " I am here in survey_integration_node_p1 "
+endif 
+t%b=a0
+!t%ent=ent0   ! mistake????
+t%exi=exi0
+
+
+ent0=exi0
+!t%next%a=t%b
+!t%next%ent=t%exi
+ 
+
+end subroutine survey_integration_node_p1
+
+
+subroutine survey_integration_special_superdrift(t,a0,ent0)
+implicit none
+type(integration_node), target :: t
+type(fibre), pointer :: f
+type(superdrift),pointer :: el
+real(dp) pix1(3) ,a0(3),exi0(3,3),ent0(3,3)
+logical(lp) :: ENTERING=my_false
+
+ 
+
+f=>t%parent_fibre
+el=>f%mag%sdr
+
+pix1=0.0_dp; 
+
+t%a=a0
+t%ent=ent0
+exi0=t%ent
+
+
+if(t%cas==case1.and.f%dir==1) then
+if(entering) then
+ f%chart%f%ent=ent0
+ f%chart%f%a=a0
+endif
+  f%mag%p%f%ent=ent0
+  f%mag%p%f%a=a0
+  f%magp%p%f%ent=ent0
+  f%magp%p%f%a=a0
+ pix1(1)=el%ang(1)
+ call GEO_ROT(exi0,pix1,1, ent0)
+ pix1=0
+ pix1(2)=el%ang(2)
+ call GEO_ROT(exi0,pix1,1, exi0)
+ pix1=0
+ pix1(3)=el%ang(3)
+ call GEO_ROT(exi0,pix1,1, exi0)
+call TRANSLATE_point(a0,el%D,1,exi0)  
+if(.not.entering) then
+ f%chart%f%ent=exi0
+ f%chart%f%a=a0
+endif
+
+elseif(t%cas==case1.and.f%dir==-1) then
+  f%chart%f%exi=ent0
+  f%chart%f%b=a0
+  f%mag%p%f%exi=ent0
+  f%mag%p%f%b=a0
+  f%magp%p%f%exi=ent0
+  f%magp%p%f%b=a0
+endif
+
+if(t%cas==case2.and.f%dir==-1) then
+if(entering) then
+ f%chart%f%ent=ent0
+ f%chart%f%a=a0
+endif
+  f%mag%p%f%ent=ent0
+  f%mag%p%f%a=a0
+  f%magp%p%f%ent=ent0
+  f%magp%p%f%a=a0
+ el%D(1)=-el%D(1)
+ el%D(2)=-el%D(2)
+   call TRANSLATE_point(a0,el%D,1,ent0)  
+ el%D(1)=-el%D(1)
+ el%D(2)=-el%D(2)
+ pix1=0
+ pix1(3)=-el%ang(3)
+ call GEO_ROT(ent0,pix1,1, exi0)
+ pix1=0
+ pix1(2)=el%ang(2)
+ call GEO_ROT(exi0,pix1,1, exi0)
+ pix1(1)=el%ang(1)
+ call GEO_ROT(exi0,pix1,1, exi0)
+if(.not.entering) then
+  f%chart%f%ent=exi0
+  f%chart%f%a=a0
+endif
+elseif(t%cas==case2.and.f%dir==1) then
+  f%chart%f%exi=ent0
+  f%chart%f%b=a0
+  f%mag%p%f%exi=ent0
+  f%mag%p%f%b=a0
+  f%magp%p%f%exi=ent0
+  f%magp%p%f%b=a0
+endif
+
+t%b=a0
+!t%ent=ent0   ! mistake????
+t%exi=exi0
+ent0=exi0
+!t%next%a=t%b
+!t%next%ent=t%exi
+
+end subroutine survey_integration_special_superdrift
+
+
+
+ SUBROUTINE ADJUST_PANCAKE_frame(EL,a0,exi0,J)
+    IMPLICIT NONE
+    real(dp), target :: a0(3),exi0(3,3)
+    TYPE(PANCAKE),INTENT(INOUT):: EL
+    INTEGER, INTENT(IN) :: J
+    real(dp) d(3),ang(3)
+    d=0
+    ang=0
+    if(el%hc==0.0_dp) then  !<------ Rectangular geometry
+
+    IF(J==1) then
+    d(1)=el%xc; d(3)=el%dc; d(2)=el%vc; 
+        ang(2)=el%angc
+        call GEO_ROT(exi0,ang,1, exi0)
+        call TRANSLATE_point(a0,D,1,exi0)  
+    else
+    d(1)=-el%xc ;d(3)=el%dc;d(2)=-el%vc;
+        ang(2)=el%angc
+        call TRANSLATE_point(a0,D,1,exi0)  
+        call GEO_ROT(exi0,ang,1, exi0)
+    endif
+    else  !<------ Sector geometry
+    IF(J==1) then
+    d(1)=el%xc; d(3)=el%dc;d(2)=el%vc;
+        ang(2)=el%angc
+        call TRANSLATE_point(a0,D,1,exi0)  
+        call GEO_ROT(exi0,ang,1, exi0)
+    else
+    d(1)=-el%xc; d(3)=el%dc;d(2)=-el%vc;
+         ang(2)=el%angc
+        call GEO_ROT(exi0,ang,1, exi0)
+        call TRANSLATE_point(a0,D,1,exi0)  
+    endif
+    endif
+  END SUBROUTINE ADJUST_PANCAKE_frame
+
+
+subroutine survey_integration_node_p2(t,a0,ent0)
+implicit none
+type(integration_node), target :: t
+type(fibre), pointer :: f
+real(dp) pix1(3),pix2(3),ent0(3,3),a0(3),exi0(3,3)
+logical(lp) :: ENTERING=my_FALSE
+
+f=>t%parent_fibre
+
+ 
+t%a=a0
+t%ent=ent0
+exi0=t%ent
+
+if(f%mag%kind==kindpa) then
+
+call ADJUST_PANCAKE_frame(f%mag%pa,a0,exi0,2)
+!
+write(6,*) " I am here in survey_integration_node_p1 "
+endif 
+
+
+
+    IF(f%MAG%MIS) THEN
+      call MIS_survey(a0,exi0,f,a0,exi0,ENTERING)
+    ENDIF
+
+
+pix1=0.0_dp
+pix1(3)=-f%MAG%P%TILTD
+ call GEO_ROT(exi0,pix1,1, exi0)
+
+pix1=0.0_dp;pix2=0.0_dp;
+if(f%patch%B_X1==-1) pix1(1)=pi
+if(f%patch%B_X2==-1) pix2(1)=pi
+
+!
+call GEO_ROT(exi0,pix1,1, ent0)
+call GEO_ROT(exi0,f%patch%B_ang,1, exi0)
+call TRANSLATE_point(a0,f%patch%b_D,1,exi0)  
+call GEO_ROT(exi0,pix2,1, exi0)
+
+
+!!!!  all missing
+t%b=a0
+!t%ent=ent0   ! mistake????
+t%exi=exi0
+
+ent0=exi0
+!t%next%a=t%b
+!t%next%ent=t%exi
+
+!       X(3)=C%PATCH%B_X1*X(3);X(4)=C%PATCH%B_X1*X(4);
+!       CALL ROT_YZ(C%PATCH%B_ANG(1),X,C%MAG%P%BETA0,PATCH,k%TIME)
+!       CALL ROT_XZ(C%PATCH%B_ANG(2),X,C%MAG%P%BETA0,PATCH,k%TIME)
+!       CALL ROT_XY(C%PATCH%B_ANG(3),X)  !,PATCH)
+!       CALL TRANS(C%PATCH%B_D,X,C%MAG%P%BETA0,PATCH,k%TIME)
+!       X(3)=C%PATCH%B_X2*X(3);X(4)=C%PATCH%B_X2*X(4);
+
+end subroutine survey_integration_node_p2
+
+ SUBROUTINE MIS_survey(a0,ent0,C,b0,exi0,ENTERING)
+    implicit none
+    ! MISALIGNS REAL FIBRES IN PTC ORDER FOR FORWARD AND BACKWARD FIBRES
+    TYPE(FIBRE),target,INTENT(INOUT):: C
+    real(dp), target :: a0(3),ent0(3,3),b0(3),exi0(3,3)
+    real(dp) ang(3),d(3)
+    logical(lp),INTENT(IN)::  ENTERING
+    exi0=ent0
+    b0=a0
+    IF(ASSOCIATED(C%CHART)) THEN
+       IF(C%DIR==1) THEN   ! FORWARD PROPAGATION
+          IF(ENTERING) THEN
+             call GEO_ROT(exi0,c%chart%ANG_IN,1, exi0)
+  !           CALL ROT_YZ(C%CHART%ANG_IN(1),X,C%MAG%P%BETA0,OU,k%TIME)   ! ROTATIONS
+  !           CALL ROT_XZ(C%CHART%ANG_IN(2),X,C%MAG%P%BETA0,OU,k%TIME)
+  !           CALL ROT_XY(C%CHART%ANG_IN(3),X)  !,OU)
+            call TRANSLATE_point(b0,c%chart%D_IN,1,exi0)  
+  !           CALL TRANS(C%CHART%D_IN,X,C%MAG%P%BETA0,OU,k%TIME)         ! TRANSLATION
+          ELSE
+             call GEO_ROT(exi0,c%chart%ANG_OUT,1, exi0)
+  !           CALL ROT_YZ(C%CHART%ANG_OUT(1),X,C%MAG%P%BETA0,OU,k%TIME)  ! ROTATIONS
+  !           CALL ROT_XZ(C%CHART%ANG_OUT(2),X,C%MAG%P%BETA0,OU,k%TIME)
+  !           CALL ROT_XY(C%CHART%ANG_OUT(3),X)  !,OU)
+  !           CALL TRANS(C%CHART%D_OUT,X,C%MAG%P%BETA0,OU,k%TIME)        ! TRANSLATION
+            call TRANSLATE_point(b0,c%chart%D_OUT,1,exi0) 
+          ENDIF
+       ELSE
+          IF(ENTERING) THEN  ! BACKWARD PROPAGATION
+              d=c%chart%D_OUT
+              ang=C%CHART%ANG_OUT
+             C%CHART%D_OUT(1)=-C%CHART%D_OUT(1)
+             C%CHART%D_OUT(2)=-C%CHART%D_OUT(2)
+             C%CHART%ANG_OUT(3)=-C%CHART%ANG_OUT(3)
+
+             call TRANSLATE_point(b0,d,-1,exi0)  
+!             CALL TRANS(C%CHART%D_OUT,X,C%MAG%P%BETA0,OU,k%TIME)        ! TRANSLATION
+!             CALL ROT_XY(C%CHART%ANG_OUT(3),X)  !,OU)
+!             CALL ROT_XZ(C%CHART%ANG_OUT(2),X,C%MAG%P%BETA0,OU,k%TIME)
+!             CALL ROT_YZ(C%CHART%ANG_OUT(1),X,C%MAG%P%BETA0,OU,k%TIME)  ! ROTATIONS
+             d=ang
+             ang=0.d0
+             ang(3)=-d(3)
+             call GEO_ROT(exi0,ang,1, exi0)  
+             ang=0.d0
+             ang(2)=-d(2)
+             call GEO_ROT(exi0,ang,1, exi0)  
+             ang=0.d0
+             ang(1)=-d(1)
+             call GEO_ROT(exi0,ang,1, exi0)
+             C%CHART%D_OUT(1)=-C%CHART%D_OUT(1)
+             C%CHART%D_OUT(2)=-C%CHART%D_OUT(2)
+             C%CHART%ANG_OUT(3)=-C%CHART%ANG_OUT(3)
+          ELSE
+              d=C%CHART%D_IN
+              ang=C%CHART%ANG_IN
+             C%CHART%D_IN(1)=-C%CHART%D_IN(1)
+             C%CHART%D_IN(2)=-C%CHART%D_IN(2)
+             C%CHART%ANG_IN(3)=-C%CHART%ANG_IN(3)
+             call TRANSLATE_point(b0,d,-1,exi0)
+!             CALL TRANS(C%CHART%D_IN,X,C%MAG%P%BETA0,OU,k%TIME)         ! TRANSLATION
+!             CALL ROT_XY(C%CHART%ANG_IN(3),X)  !,OU)
+!             CALL ROT_XZ(C%CHART%ANG_IN(2),X,C%MAG%P%BETA0,OU,k%TIME)
+!             CALL ROT_YZ(C%CHART%ANG_IN(1),X,C%MAG%P%BETA0,OU,k%TIME)   ! ROTATIONS
+             d=ang
+             ang=0.d0
+             ang(3)=-d(3)
+             call GEO_ROT(exi0,ang,1, exi0)  
+             ang=0.d0
+             ang(2)=-d(2)
+             call GEO_ROT(exi0,ang,1, exi0)  
+             ang=0.d0
+             ang(1)=-d(1)
+             call GEO_ROT(exi0,ang,1, exi0)
+             C%CHART%D_IN(1)=-C%CHART%D_IN(1)
+             C%CHART%D_IN(2)=-C%CHART%D_IN(2)
+             C%CHART%ANG_IN(3)=-C%CHART%ANG_IN(3)
+          ENDIF
+       ENDIF
+    ENDIF
+  END SUBROUTINE MIS_survey
 
 end module ptc_multiparticle

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Linux)       +
+  +     MAD-X 5.02.13  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.06.09 10:46:26      +
+  + Release   date: 2016.12.20               +
+  + Execution date: 2017.01.13 16:21:41      +
   ++++++++++++++++++++++++++++++++++++++++++++
 mydrift: drift, l=1;
 
@@ -49,7 +49,7 @@ myline: line:=(l1, l1, l1, l1, m, sx1);
 
 
 
-beam,particle=proton, energy=6500, ex=5e-5, ey=5.E-10, sigt=0.077, sige=1.1E-4;
+beam,particle=electron, energy=6500, ex=5e-5, ey=5.E-10, sigt=0.077, sige=1.1E-4;
 
 use, period=myline;
 
@@ -87,15 +87,14 @@ ptc_create_universe;
 
  MAD-X Beam Parameters
                   Energy : 0.650000E+04
-          Kinetic Energy : 0.649906E+04
-      Particle Rest Mass : 0.938272E+00
+          Kinetic Energy : 0.650000E+04
+      Particle Rest Mass : 0.510999E-03
                 Momentum : 0.650000E+04
-  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy           6500.0000000000000     
      method                   6
      Num. of steps            5
-     charge           1.0000000000000000     
+     charge          -1.0000000000000000     
   Length of machine:    8.8099999999999987     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
@@ -130,14 +129,14 @@ obs_points pro_ptc_setswitch Done
 
   
 
-  ptc_twiss, table=twiss, icase=5, no=4, closed_orbit=false, rmatrix, normal;
+  ptc_twiss, table=twiss, icase=5, no=4, closed_orbit=false, rmatrix, normal, writetmap;
 
  ************ State Summary ****************
  MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
   Rectangular Bend: input arc length (rho alpha) 
   Default integration method     6
   Default integration steps      5
- This is a proton 
+ This is an electron (positron actually if charge=1) 
        EXACT_MODEL =  TRUE 
        TOTALPATH   =     0
        RADIATION   =  FALSE
@@ -154,19 +153,17 @@ obs_points pro_ptc_setswitch Done
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Normal Form Type 1
- Normal Form Type 1 DONE
 
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-              8.81   -1.031551902e-15    -6.25103774e-08           -1000000 
+              8.81   -2.374495826e-17   -1.863955206e-14           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000   -2.083679233e-08                  0       0.3631575976 
+          -1000000   -6.204097726e-15                  0       0.3631575976 
 
                 q2                dq1                dq2                 qs 
-      0.3363625015      -0.3603189292      -0.3583420444                  0 
+      0.3363625015      -0.3603189255      -0.3583420407                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        3.001823401        5.101681112        3.242483729        5.490992493 
@@ -248,12 +245,6 @@ Plot - default table plotted: twiss
 
 
 
-!removefile, file='leir.C';
-
-removefile, file='Maxwellian_bend_for_ptc.txt';
-
-
-
 bx = table(twiss, m, beta11);
 
 by = table(twiss, m, beta22);
@@ -286,6 +277,12 @@ f3000_im = -1*(-na*dd/f3000_de);
 
 
 
+h3000_re = -1*na/48;
+
+
+
+
+
 !1200
 
 dc = 16*(1-cos(-2*pi*qx));
@@ -302,8 +299,6 @@ f1200_im = -1*(-na*dd/f1200_de);
 
 
 
-
-
 ff3000_re = table(nonlin, GNFC_3_0_0_0_0_0,value);
 
 ff3000_im = table(nonlin, GNFS_3_0_0_0_0_0,value);
@@ -312,15 +307,15 @@ ff3000_im = table(nonlin, GNFS_3_0_0_0_0_0,value);
 
 value, f3000_re, ff3000_re, f3000_re - ff3000_re;
 
-f3000_re =   -0.0002382050496 ;
-ff3000_re =   -0.0002366862262 ;
+f3000_re           =   -0.0002382050496 ;
+ff3000_re          =   -0.0002366862262 ;
 f3000_re-ff3000_re =   -1.518823391e-06 ;
 
 
 value, f3000_im, ff3000_im, f3000_im - ff3000_im;
 
-f3000_im =   -0.0008250049825 ;
-ff3000_im =   -0.0008288856879 ;
+f3000_im           =   -0.0008250049825 ;
+ff3000_im          =   -0.0008288856879 ;
 f3000_im-ff3000_im =    3.880705458e-06 ;
 
 
@@ -332,14 +327,32 @@ ff1200_im = table(nonlin, GNFS_1_2_0_0_0_0,value);
 
 value, f1200_re, ff1200_re, f1200_re - ff1200_re;
 
-f1200_re =   -0.0007146151489 ;
-ff1200_re =   -0.0007170484709 ;
+f1200_re           =   -0.0007146151489 ;
+ff1200_re          =   -0.0007170484709 ;
 f1200_re-ff1200_re =    2.433321965e-06 ;
 value, f1200_im, ff1200_im, f1200_im - ff1200_im;
 
-f1200_im =    0.0003276537117 ;
-ff1200_im =    0.0003296206867 ;
+f1200_im           =    0.0003276537117 ;
+ff1200_im          =    0.0003296206867 ;
 f1200_im-ff1200_im =   -1.966974994e-06 ;
+
+
+
+
+hh3000_im = table(nonlin, HAMS_3_0_0_0_0_0, value);
+
+value, hh3000_im;
+
+hh3000_im          =   -1.406821269e-06 ;
+
+
+hh3000_re = table(nonlin, HAMC_3_0_0_0_0_0, value);
+
+value, h3000_re, hh3000_re, h3000_re - hh3000_re;
+
+h3000_re           =   -0.0004764100993 ;
+hh3000_re          =   -0.0004782448704 ;
+h3000_re-hh3000_re =    1.834771152e-06 ;
 
 
 

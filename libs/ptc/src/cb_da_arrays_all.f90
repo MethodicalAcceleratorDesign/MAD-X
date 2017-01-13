@@ -36,7 +36,7 @@ module c_da_arrays
   integer c_nst0,c_nomax,c_nvmax,c_nmmax,c_nocut,c_lfi
  ! real(dp) c_facint(0:c_lno)
   integer c_nhole
-  integer,TARGET :: c_lda_used =30000
+  integer,TARGET :: c_lda_used =1500
 
 contains
 
@@ -274,23 +274,6 @@ c_idall=0
        size=size+REAL(c_lst,kind=DP)*(8.0_dp/1024.0_dp**2+2.0_dp*4.0_dp/1024.0_dp**2)
 
     if(size>c_total_da_size.or.printdainfo) then
-       w_p=0
-       w_p%nc=13
-       w_p%fc='(12(1X,A72,/),(1X,A72))'
-       write(w_p%c(1),'(a10,1x,i4,1x,i4)') " no,nv  = ",no,nv
-       write(w_p%c(2),'(a10,1x,i8)') "    c_lea = ",c_lea
-       write(w_p%c(3),'(a24,1x,i8)') " c_ldamin (with nd2=6)  = ",c_ldamin
-       write(w_p%c(4),'(a8,1x,i8)') " c_lia  = ",c_lia
-       write(w_p%c(5),'(a8,1x,i8)') " c_lda  = ",c_lda
-       write(w_p%c(6),'(a8,1x,i8)') " c_lst  = ",c_lst
-       write(w_p%c(7),'(a14,1x,i8)') " c_ndamaxi    = ",c_ndamaxi
-       write(w_p%c(8),'(a18,1x,g21.14)') " size in Mbytes = ",size
-       write(w_p%c(9),'(a25,1x,g21.14)') " c_total_da_size Allowed = ",c_total_da_size
-       w_p%c(10)=" "
-       w_p%c(11)="************************************"
-       w_p%c(12)="* Execution Continues Nevertheless *"
-       w_p%c(13)="************************************"
-       ! call !write_e(1000)
        call kanalnummer(mf)
        open(unit=mf,file='too_big_da.txt')
        write(mf,*) "no,nv  = ",no,nv

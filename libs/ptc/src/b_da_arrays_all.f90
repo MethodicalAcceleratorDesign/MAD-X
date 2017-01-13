@@ -259,23 +259,6 @@ end subroutine alloc_
        size=size+REAL(lst,kind=DP)*(8.0_dp/1024.0_dp**2+2.0_dp*4.0_dp/1024.0_dp**2)
     endif
     if(size>total_da_size.or.printdainfo) then
-       w_p=0
-       w_p%nc=13
-       w_p%fc='(12(1X,A72,/),(1X,A72))'
-       write(w_p%c(1),'(a10,1x,i4,1x,i4)') " no,nv  = ",no,nv
-       write(w_p%c(2),'(a10,1x,i8)') "    LEA = ",lea
-       write(w_p%c(3),'(a24,1x,i8)') " ldamin (with nd2=6)  = ",ldamin
-       write(w_p%c(4),'(a8,1x,i8)') " lia  = ",lia
-       write(w_p%c(5),'(a8,1x,i8)') " lda  = ",lda
-       write(w_p%c(6),'(a8,1x,i8)') " lst  = ",lst
-       write(w_p%c(7),'(a14,1x,i8)') " ndamaxi    = ",ndamaxi
-       write(w_p%c(8),'(a18,1x,g21.14)') " size in Mbytes = ",size
-       write(w_p%c(9),'(a25,1x,g21.14)') " Total_da_size Allowed = ",Total_da_size
-       w_p%c(10)=" "
-       w_p%c(11)="************************************"
-       w_p%c(12)="* Execution Continues Nevertheless *"
-       w_p%c(13)="************************************"
-       ! call !write_e(1000)
        call kanalnummer(mf)
        open(unit=mf,file='too_big_da.txt')
        write(mf,*) "no,nv  = ",no,nv

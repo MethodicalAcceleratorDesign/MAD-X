@@ -87,7 +87,6 @@ ptc_create_universe;
           Kinetic Energy : 0.906173E+01
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.995588E+01
-  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy           10.000000000000000     
      method                   6

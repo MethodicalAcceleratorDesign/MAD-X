@@ -2930,11 +2930,9 @@ contains
     case(0:ndumt-1)
        master=master+1
     case(ndumt)
-       w_p=0
-       w_p%nc=1
-       w_p=(/" cannot indent anymore "/)
-       w_p%fc='(1((1X,A72),/))'
-       ! call !write_e(100)
+ 
+         write(6,*) " cannot indent anymore assc" 
+ 
     end select
     !    write(26,*) " complex  taylor ",master
 

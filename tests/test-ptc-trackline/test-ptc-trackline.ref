@@ -26,7 +26,6 @@ option,-echo;
           Kinetic Energy : 0.194890E-01
       Particle Rest Mass : 0.510999E-03
                 Momentum : 0.199935E-01
-  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy           2.0000000000000000E-002
      method                   6

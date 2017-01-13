@@ -38,5 +38,4 @@ PTC_CREATE_LAYOUT,model=2,method=6,nst=20,exact;
      ptc_normal,normal,icase=5,no=2;
      write, table=normal_results,file=normal_results; 
 
-removefile, file='Maxwellian_bend_for_ptc.txt';
 stop;

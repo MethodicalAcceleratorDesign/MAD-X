@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  +     MAD-X 5.02.13  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.09.22 10:08:45      +
+  + Release   date: 2016.12.20               +
+  + Execution date: 2017.01.09 15:16:52      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS ';
 
@@ -81,7 +81,6 @@ parameter: energy   double value:                100
           Kinetic Energy : 0.990617E+02
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.999956E+02
-  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy           100.00000000000000     
      method                   6

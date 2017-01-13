@@ -145,7 +145,7 @@ CONTAINS
     !  his survey would have to be "caught" in this interface
 
     SELECT CASE(EL%KIND)
-    case(kind0:kind22,KINDWIGGLER,kindpa)
+    case(kind0:kind22,KINDWIGGLER,kindpa,kindsuperdrift)
        call SURVEY_chart(C,el%p,dir,magnetframe,E_IN)
 
        !    case(kind23)
@@ -448,9 +448,17 @@ CONTAINS
     IMPLICIT NONE
     TYPE (WORK),INTENT(IN):: S1
     TYPE(FIBRE),target,INTENT(INOUT):: S2
-
-    S2%MAG=S1
-    S2%MAGP=S1
+    TYPE (WORK) w
+    if(s2%mag%vorname=="RESCALE".and.force_rescale) then
+     w=s1
+     w%power=1
+     w%rescale=.true.
+     S2%MAG=w
+     S2%MAGP=w
+    else
+     S2%MAG=S1
+     S2%MAGP=S1
+    endif
     if(S1%power/=-1) then       ! just rescaling  -1=ramping
        S2%mass=S1%mass
        S2%BETA0=S1%BETA0
@@ -470,12 +478,12 @@ CONTAINS
     s2%mass=s1%mass
     S2=S1%MAG
     IF(ABS(S1%MAG%P%P0C-S1%MAGP%P%P0C)>1e-10_dp) THEN
-       W_P=0
-       W_P%NC=3
-       W_P%FC='(2(1X,A72,/),(1X,A72))'
-       W_P%C(1)=" BEWARE : ELEMENT AND ELEMENTP SEEM TO HAVE "
-       W_P%C(2)=" DIFFERENT REFERENCE ENERGIES!"
-       WRITE(W_P%C(3),'(1X,G21.14,1X,g21.14)')  S1%MAG%P%P0C,S1%MAGP%P%P0C
+       !w_p=0
+       !w_p%NC=3
+       !w_p%FC='(2(1X,A72,/),(1X,A72))'
+       write(6,*) " BEWARE : ELEMENT AND ELEMENTP SEEM TO HAVE "
+       write(6,*) " DIFFERENT REFERENCE ENERGIES!"
+       write(6,'(1X,G21.14,1X,g21.14)')  S1%MAG%P%P0C,S1%MAGP%P%P0C
        ! call !write_e(100)
     ENDIF
 
@@ -1030,10 +1038,10 @@ CONTAINS
        ENDIF
 
     ELSE
-       W_P=0
-       W_P%NC=1
-       W_P%FC='((1X,A72))'
-       WRITE(W_P%C(1),'(1X,A39,1X,A16)') " CANNOT MISALIGN THIS FIBRE: NO CHARTS ", S2%MAG%NAME
+       !w_p=0
+       !w_p%NC=1
+       !w_p%FC='((1X,A72))'
+       WRITE(6,'(1X,A39,1X,A16)') " CANNOT MISALIGN THIS FIBRE: NO CHARTS ", S2%MAG%NAME
        ! call !write_e(100)
     ENDIF
 
@@ -1849,11 +1857,11 @@ CONTAINS
 
 
     IF((PRESENT(ENT).AND.(.NOT.PRESENT(A))).OR.(PRESENT(A).AND.(.NOT.PRESENT(ENT)))) THEN
-       W_P=0
-       W_P%NC=2
-       W_P%FC='(2(1X,A72,/),(1X,A72))'
-       W_P%C(1)=" BEWARE : ENT AND A  "
-       W_P%C(2)=" MUST BOTH BE PRESENT OR ABSENT"
+       !w_p=0
+       !w_p%NC=2
+       !w_p%FC='(2(1X,A72,/),(1X,A72))'
+       write(6,*) " BEWARE : ENT AND A  "
+       write(6,*) " MUST BOTH BE PRESENT OR ABSENT"
        ! call !write_e(100)
     ELSEIF(PRESENT(ENT)) THEN
        ENTT=ENT

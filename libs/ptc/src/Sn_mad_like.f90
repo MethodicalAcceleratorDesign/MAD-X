@@ -14,7 +14,7 @@ module Mad_like
   private HKICKTILT,VKICKTILT,GKICKTILT
   private GBTILT,SBTILT,pottilt,Set_mad_v
   PRIVATE RFCAVITYL,SMITILT,CHECKSMI,TWCAVITYL
-  PRIVATE rectaETILT,recttilt
+  PRIVATE rectaETILT,recttilt,superdrft
   PRIVATE B1,A1,A2,B2,A3,B3,A4,B4,A5,A6,A7,A8,A9,A10,B5,B6,B7,B8,B9,B10,BLTILT
   private fac
   !  private Taylor_maptilt
@@ -48,9 +48,11 @@ module Mad_like
   integer :: symplectic_order = 0
   REAL(DP) :: symplectic_eps = -1.0_dp
   REAL(DP)  MAD_TREE_LD , MAD_TREE_ANGLE
-  type(tree_element), private, allocatable :: t_e(:) !,t_ax(:),t_ay(:)
+  type(tree_element), allocatable :: t_em(:) !,t_ax(:),t_ay(:)
 
-  real(dp), private ::  angc,xc,dc,hc,LC
+  real(dp), private ::  angc,xc,dc,hc,LC,HD,LD,vc
+  integer, private :: nstc
+  logical ::   xprime_pancake = .true.
    character(vp) , private :: filec
   logical(lp) :: set_ap=my_false
   TYPE EL_LIST
@@ -247,7 +249,7 @@ module Mad_like
      MODULE PROCEDURE SOLTILT
   end  INTERFACE
 
-  INTERFACE SMI
+  INTERFACE SMIsixtract
      MODULE PROCEDURE SMITILT
   end  INTERFACE
 
@@ -257,6 +259,10 @@ module Mad_like
 
   INTERFACE multipole_block
      MODULE PROCEDURE BLTILT
+  end  INTERFACE
+
+  INTERFACE superdrift 
+     MODULE PROCEDURE superdrft
   end  INTERFACE
 
   INTERFACE multipole 
@@ -389,18 +395,18 @@ CONTAINS
     INTEGER,INTENT(IN):: S1
     IF(S2%KIND==KIND8) THEN
        IF(S2%NMUL/=S1) THEN
-          w_p=0
-          w_p%nc=1
-          w_p%fc='((1X,a72))'
-          write(w_p%c(1),'(a24,1x,i4,a21,1x,i4)')  MYTYPE(KIND8),S2%NMUL,' DOES NOT ALLOW POLE ', 2*S1
+          !w_p=0
+          !w_p%nc=1
+          !w_p%fc='((1X,a72))'
+          write(6,'(a24,1x,i4,a21,1x,i4)')  MYTYPE(KIND8),S2%NMUL,' DOES NOT ALLOW POLE ', 2*S1
           ! call !write_e(KIND8)
        ENDIF
     ELSEIF(S2%KIND==KIND9) THEN
        IF(S2%NMUL/=-S1) THEN
-          w_p=0
-          w_p%nc=1
-          w_p%fc='((1X,a72))'
-          write(w_p%c(1),'(a24,1x,i4,a21,1x,i4)') MYTYPE(KIND9),S2%NMUL,' DOES NOT ALLOW POLE ',2*S1
+          !w_p=0
+          !w_p%nc=1
+          !w_p%fc='((1X,a72))'
+          write(6,'(a24,1x,i4,a21,1x,i4)') MYTYPE(KIND9),S2%NMUL,' DOES NOT ALLOW POLE ',2*S1
           ! call !write_e(KIND9)
        ENDIF
     ENDIF
@@ -650,10 +656,10 @@ CONTAINS
     INTEGER I
 
     if(.not.setmad) then
-       w_p=0
-       w_p%nc=1
-       w_p%fc='((1X,a72))'
-       w_p%c(1) =  " Run the Set_mad routine first "
+       !w_p=0
+       !w_p%nc=1
+       !w_p%fc='((1X,a72))'
+       !w_p%c(1) =  " Run the Set_mad routine first "
        ! call !write_e(-1)
     endif
 
@@ -732,10 +738,10 @@ CONTAINS
   !    INTEGER I
   !
   !    if(.not.setmad) then
-  !       w_p=0
-  !       w_p%nc=1
-  !       w_p%fc='((1X,a72))'
-  !       w_p%c(1) =  " Run the Set_mad routine first "
+  !       !w_p=0
+  !       !w_p%nc=1
+  !       !w_p%fc='((1X,a72))'
+  !       !w_p%c(1) =  " Run the Set_mad routine first "
   !       ! call !write_e(-1)
   !    endif
   !
@@ -844,20 +850,20 @@ CONTAINS
           SMITILT%KIND=kind9
           SMITILT%nmul=-NN
        ELSE
-          w_p=0
-          w_p%nc=1
-          w_p%fc='((1X,a72))'
-          write(w_p%c(1),'(a21,1x,i4)') " FORBIDDEN 'SMITILT' ",NN
+          !w_p=0
+          !w_p%nc=1
+          !w_p%fc='((1X,a72))'
+          write(6,'(a21,1x,i4)') " FORBIDDEN 'SMITILT' ",NN
           ! call !write_e(1221)
        ENDIF
        if(present(t)) SMITILT%tilt=t%tilt(0)
 
        IF(LEN(NAME)>nlp) THEN
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72,/),(1x,a72))'
-          w_p%c(1)=name
-          WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+          !w_p=0
+          !w_p%nc=2
+          !w_p%fc='((1X,a72,/),(1x,a72))'
+          !w_p%c(1)=name
+          write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
           ! call ! WRITE_I
           SMITILT%NAME=NAME(1:16)
        ELSE
@@ -878,10 +884,10 @@ CONTAINS
           SMITILT%KIND=kind9
           SMITILT%nmul=-NN
        ELSE
-          w_p=0
-          w_p%nc=1
-          w_p%fc='((1X,a72))'
-          write(w_p%c(1),'(a21,1x,i4)') " FORBIDDEN 'SMITILT' ",NN
+          !w_p=0
+          !w_p%nc=1
+          !w_p%fc='((1X,a72))'
+          write(6,'(a21,1x,i4)') " FORBIDDEN 'SMITILT' ",NN
           ! call !write_e(1221)
        ENDIF
        if(present(t)) then
@@ -895,11 +901,11 @@ CONTAINS
 
 
        IF(LEN(NAME)>nlp) THEN
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72,/),(1x,a72))'
-          w_p%c(1)=name
-          WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+          !w_p=0
+          !w_p%nc=2
+          !w_p%fc='((1X,a72,/),(1x,a72))'
+          !w_p%c(1)=name
+          write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
           ! call ! WRITE_I
           SMITILT%NAME=NAME(1:16)
        ELSE
@@ -946,11 +952,11 @@ CONTAINS
 
 
        IF(LEN(NAME)>nlp) THEN
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72,/),(1x,a72))'
-          w_p%c(1)=name
-          WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+          !w_p=0
+          !w_p%nc=2
+          !w_p%fc='((1X,a72,/),(1x,a72))'
+          !w_p%c(1)=name
+          write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
           ! call ! WRITE_I
           BLTILT%NAME=NAME(1:16)
        ELSE
@@ -981,11 +987,11 @@ CONTAINS
 
 
        IF(LEN(NAME)>nlp) THEN
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72,/),(1x,a72))'
-          w_p%c(1)=name
-          WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+          !w_p=0
+          !w_p%nc=2
+          !w_p%fc='((1X,a72,/),(1x,a72))'
+          !w_p%c(1)=name
+          write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
           ! call ! WRITE_I
           BLTILT%NAME=NAME(1:16)
        ELSE
@@ -1016,11 +1022,11 @@ CONTAINS
 
 
        IF(LEN(NAME)>nlp) THEN
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72,/),(1x,a72))'
-          w_p%c(1)=name
-          WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+          !w_p=0
+          !w_p%nc=2
+          !w_p%fc='((1X,a72,/),(1x,a72))'
+          !w_p%c(1)=name
+          write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
           ! call ! WRITE_I
           BLTILT%NAME=NAME(1:16)
        ELSE
@@ -1068,11 +1074,11 @@ CONTAINS
     ENDIF
 
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        HKICKTILT%NAME=NAME(1:16)
     ELSE
@@ -1115,11 +1121,11 @@ CONTAINS
     ENDIF
 
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        VKICKTILT%NAME=NAME(1:16)
     ELSE
@@ -1177,11 +1183,11 @@ CONTAINS
     ENDIF
 
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        GKICKTILT%NAME=NAME(1:16)
     ELSE
@@ -1230,11 +1236,11 @@ CONTAINS
        ENDIF
     endif
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        QUADTILT%NAME=NAME(1:16)
     ELSE
@@ -1271,11 +1277,11 @@ CONTAINS
        ENDIF
     endif
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        multipoleTILT%NAME=NAME(1:16)
     ELSE
@@ -1326,11 +1332,11 @@ CONTAINS
     HELICALTILT%nmul=1
 
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        HELICALTILT%NAME=NAME(1:16)
     ELSE
@@ -1388,11 +1394,11 @@ CONTAINS
        ENDIF
     endif
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        SOLTILT%NAME=NAME(1:16)
     ELSE
@@ -1441,11 +1447,11 @@ CONTAINS
     endif
 
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        SEXTTILT%NAME=NAME(1:16)
     ELSE
@@ -1493,11 +1499,11 @@ CONTAINS
     endif
     !  call rot(OCTUTILT%tilt,OCTUTILT%K,OCTUTILT%KS,OCTUTILT%C,OCTUTILT%S)
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        OCTUTILT%NAME=NAME(1:16)
     ELSE
@@ -1540,18 +1546,14 @@ CONTAINS
 
     if(present(t))then
        IF(EXACT_MODEL.or.solve_electric) THEN                 ! .and.madkind2==kind2
-          !print*,"Skowron: Making POTTILT (no tilit)"
           SBTILT=POTTILT(NAME,L1,ANG1,E11,E22,T,LIST)
        ELSE
-          !print*,"Skowron: Making GBand  (no tilit)"
           SBTILT=GBEND(NAME,L1,ANG1,E11,E22,T,LIST)
        ENDIF
     else
        IF(EXACT_MODEL.or.solve_electric) THEN                 ! .and.madkind2==kind2
-          !print*,"Skowron: Making POTTILT (with tilit)"
           SBTILT=POTTILT(NAME,L1,ANG1,E11,E22)
        ELSE
-          !print*,"Skowron: Making GBand  (with tilit)"
           SBTILT=GBEND(NAME,L1,ANG1,E11,E22)
        ENDIF
     endif
@@ -1601,11 +1603,11 @@ CONTAINS
        POTTILT%LC=POTTILT%L
     ENDIF
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        POTTILT%NAME=NAME(1:16)
     ELSE
@@ -1636,14 +1638,14 @@ CONTAINS
     real(dp) ,optional, INTENT(IN):: L,angle,e1,e2
     real(dp) L1,ANG1,t11,t21
     if(exact_model) then
-       w_p=0
-       w_p%nc=5
-       w_p%fc='(4(1X,a72,/),(1X,a72))'
-       w_p%c(1)= " *************************************************** "
-       w_p%c(2)= " * In PTC, under the exact option                  * "
-       w_p%c(3)= " * 1.0_dp must distinguish between RBEND and SBEND    * "
-       w_p%c(4)= " * This is call is thus completely forbidden       * "
-       w_p%c(5)= " *************************************************** "
+       !w_p=0
+       !w_p%nc=5
+       !w_p%fc='(4(1X,a72,/),(1X,a72))'
+       !w_p%c(1)= " *************************************************** "
+       !w_p%c(2)= " * In PTC, under the exact option                  * "
+       !w_p%c(3)= " * 1.0_dp must distinguish between RBEND and SBEND    * "
+       !w_p%c(4)= " * This is call is thus completely forbidden       * "
+       !w_p%c(5)= " *************************************************** "
        ! call !write_e(101)
     endif
     L1=0.0_dp
@@ -1674,11 +1676,11 @@ CONTAINS
     ENDIF
     GBTILT%T1=T11 ; GBTILT%T2=T21;
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        GBTILT%NAME=NAME(1:16)
     ELSE
@@ -1732,11 +1734,11 @@ CONTAINS
     !    ELSE
     IF(EXACT_MODEL) THEN
        if(verbose) then
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72,/,1x,a72))'
-          w_p%c(1)= NAME
-          w_p%c(2)= " READ AS TRUE RECTANGULAR BEND "
+          !w_p=0
+          !w_p%nc=2
+          !w_p%fc='((1X,a72,/,1x,a72))'
+          !w_p%c(1)= NAME
+          !w_p%c(2)= " READ AS TRUE RECTANGULAR BEND "
           ! call ! WRITE_I
        endif
        if(ang1==0.0_dp) then
@@ -1773,11 +1775,11 @@ CONTAINS
     ENDIF
     !    ENDIF
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        RECTTILT%NAME=NAME(1:16)
     ELSE
@@ -1819,21 +1821,21 @@ CONTAINS
     IF(PRESENT(ANGLE)) THEN
        if(ANGLE==0.0_dp) then
           madkind2=kind2
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72,/),(1x,a72))'
-          w_p%c(1)=name
-          WRITE(w_p%c(2),'(a12,a16,a23)') ' ANGLE=0 IN ', NAME,' CHANGED TO DRIFT-KICK '
+          !w_p=0
+          !w_p%nc=2
+          !w_p%fc='((1X,a72,/),(1x,a72))'
+          !w_p%c(1)=name
+          if(tempkind/=kind2) write(6,'(a12,a16,a23)') ' ANGLE=0 IN ', NAME,' CHANGED TO DRIFT-KICK '
           ! call ! WRITE_I
 
        endif
     ELSE
        madkind2=kind2
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a12,a16,a23)') ' ANGLE=0 IN ', NAME,' CHANGED TO DRIFT-KICK '
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       if(tempkind/=kind2) write(6,'(a12,a16,a23)') ' ANGLE=0 IN ', NAME,' CHANGED TO DRIFT-KICK '
        ! call ! WRITE_I
     ENDIF
 
@@ -1888,11 +1890,11 @@ CONTAINS
 
        IF(EXACT_MODEL) THEN
           if(verbose) then
-             w_p=0
-             w_p%nc=2
-             w_p%fc='((1X,a72,/,1x,a72))'
-             w_p%c(1)= NAME
-             w_p%c(2)= " READ AS TRUE RECTANGULAR BEND "
+             !w_p=0
+             !w_p%nc=2
+             !w_p%fc='((1X,a72,/,1x,a72))'
+             !w_p%c(1)= NAME
+             !w_p%c(2)= " READ AS TRUE RECTANGULAR BEND "
              ! call ! WRITE_I
           endif
           rectaETILT%K(1)=rectaETILT%B0+rectaETILT%K(1) ! NEW IMPLEMENTATION FOR DIR=-1
@@ -1911,11 +1913,11 @@ CONTAINS
        ENDIF
 
        IF(LEN(NAME)>nlp) THEN
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72,/),(1x,a72))'
-          w_p%c(1)=name
-          WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+          !w_p=0
+          !w_p%nc=2
+          !w_p%fc='((1X,a72,/),(1x,a72))'
+          !w_p%c(1)=name
+          write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
           ! call ! WRITE_I
           rectaETILT%NAME=NAME(1:16)
        ELSE
@@ -1987,11 +1989,11 @@ CONTAINS
     drft%LD=L1
     drft%LC=L1
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        drft%NAME=NAME(1:16)
     ELSE
@@ -2017,24 +2019,24 @@ CONTAINS
     else
        superdrft=0
     endif
-    superdrft%NST=1
+   ! superdrft%NST=1
     superdrft%METHOD=2
 
     superdrft%L=L1
     superdrft%LD=L1
     superdrft%LC=L1
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        superdrft%NAME=NAME(1:16)
     ELSE
        superdrft%NAME=NAME
     ENDIF
-    superdrft%KIND=KIND1
+    superdrft%KIND=kindsuperdrift
 
   END FUNCTION superdrft
 
@@ -2064,11 +2066,11 @@ CONTAINS
     RCOLIT%LD=L1
     RCOLIT%LC=L1
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        RCOLIT%NAME=NAME(1:16)
     ELSE
@@ -2110,11 +2112,11 @@ CONTAINS
     ECOLIT%LD=L1
     ECOLIT%LC=L1
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        ECOLIT%NAME=NAME(1:16)
     ELSE
@@ -2155,11 +2157,11 @@ CONTAINS
     MONIT%LD=L1
     MONIT%LC=L1
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        MONIT%NAME=NAME(1:16)
     ELSE
@@ -2187,11 +2189,11 @@ CONTAINS
     hMONIT%LD=L1
     hMONIT%LC=L1
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        hMONIT%NAME=NAME(1:16)
     ELSE
@@ -2218,11 +2220,11 @@ CONTAINS
     VMONIT%LD=L1
     VMONIT%LC=L1
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        VMONIT%NAME=NAME(1:16)
     ELSE
@@ -2249,11 +2251,11 @@ CONTAINS
     INSTRUMEN%LD=L1
     INSTRUMEN%LC=L1
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        INSTRUMEN%NAME=NAME(1:16)
     ELSE
@@ -2279,11 +2281,11 @@ CONTAINS
     endif
 
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        mark%NAME=NAME(1:16)
     ELSE
@@ -2303,11 +2305,11 @@ CONTAINS
 
     CHANGEREF=0
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        CHANGEREF%NAME=NAME(1:16)
     ELSE
@@ -2357,10 +2359,10 @@ CONTAINS
     IF(PRESENT(VOLT)) THEN
        VOLT1=VOLT
        IF(PRESENT(DELTAE)) THEN
-          w_p=0
-          w_p%nc=1
-          w_p%fc='((1X,a72))'
-          w_p%c(1)= "Use either volt or deltae"
+          !w_p=0
+          !w_p%nc=1
+          !w_p%fc='((1X,a72))'
+          !w_p%c(1)= "Use either volt or deltae"
           ! call !write_e(100)
        ENDIF
     elseIF(PRESENT(DELTAE)) THEN
@@ -2381,10 +2383,10 @@ CONTAINS
           if(volt1==0.0_dp) then
              volt1=LIST%DELTA_E*p0c    ! DELTA_E used for two purposes, but OK
           else
-             w_p=0
-             w_p%nc=1
-             w_p%fc='((1X,a72))'
-             w_p%c(1)= "Use either volt or deltae"
+             !w_p=0
+             !w_p%nc=1
+             !w_p%fc='((1X,a72))'
+             !w_p%c(1)= "Use either volt or deltae"
              ! call !write_e(101)
           endif
        endif
@@ -2398,11 +2400,11 @@ CONTAINS
     RFCAVITYL%KIND=KIND4
     RFCAVITYL%nmul=1
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        RFCAVITYL%NAME=NAME(1:16)
     ELSE
@@ -2437,10 +2439,10 @@ CONTAINS
     IF(PRESENT(VOLT)) THEN
        VOLT1=VOLT
        IF(PRESENT(DELTAE)) THEN
-          w_p=0
-          w_p%nc=1
-          w_p%fc='((1X,a72))'
-          w_p%c(1)= "Use either volt or deltae"
+          !w_p=0
+          !w_p%nc=1
+          !w_p%fc='((1X,a72))'
+          !w_p%c(1)= "Use either volt or deltae"
           ! call !write_e(100)
        ENDIF
     elseIF(PRESENT(DELTAE)) THEN
@@ -2461,10 +2463,10 @@ CONTAINS
           if(volt1==0.0_dp) then
              volt1=LIST%DELTA_E*p0c    ! DELTA_E used for two purposes, but OK
           else
-             w_p=0
-             w_p%nc=1
-             w_p%fc='((1X,a72))'
-             w_p%c(1)= "Use either volt or deltae"
+             !w_p=0
+             !w_p%nc=1
+             !w_p%fc='((1X,a72))'
+             !w_p%c(1)= "Use either volt or deltae"
              ! call !write_e(101)
           endif
        endif
@@ -2481,11 +2483,11 @@ CONTAINS
     TWCAVITYL%LC=L1
     TWCAVITYL%KIND=KIND21
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        TWCAVITYL%NAME=NAME(1:16)
     ELSE
@@ -2544,11 +2546,11 @@ CONTAINS
     ENDIF
 
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        ELSESTILT%NAME=NAME(1:16)
     ELSE
@@ -2583,11 +2585,11 @@ CONTAINS
        WIGGLERL%LC=WIGGLERL%L
     WIGGLERL%KIND=KINDWIGGLER
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        WIGGLERL%NAME=NAME(1:16)
     ELSE
@@ -2844,14 +2846,19 @@ CONTAINS
     if(s2%kind/=kindpa) then
        CALL SETFAMILY(S2)  !,NTOT=ntot,ntot_rad=ntot_rad,NTOT_REV=ntot_REV,ntot_rad_REV=ntot_rad_REV,ND2=6)
     else
-       CALL SETFAMILY(S2,t=T_E)  !,T_ax=T_ax,T_ay=T_ay)
+
+       CALL SETFAMILY(S2,t=t_em)  !,T_ax=T_ax,T_ay=T_ay)
+
        S2%P%METHOD=4
        s2%pa%angc=angc
        s2%pa%xc=xc
        s2%pa%dc=dc
        s2%pa%hc=hc
+       s2%pa%vc=vc
+       s2%pa%xprime=xprime_pancake
        s2%vorname=filec
-       deallocate(T_E)
+       deallocate(t_em)
+
     endif
 
     IF(S2%KIND==KIND4) THEN
@@ -2865,10 +2872,10 @@ CONTAINS
 
     if(LIKEMAD) then
        if(S2%KIND/=KIND16) then
-          w_p=0
-          w_p%nc=1
-          w_p%fc='((1X,a72))'
-          w_p%c(1)= " Likemad is true and element is not STREX "
+          !w_p=0
+          !w_p%nc=1
+          !w_p%fc='((1X,a72))'
+          !w_p%c(1)= " Likemad is true and element is not STREX "
           ! call !write_e(kind16)
        endif
        s2%k16%likemad=LIKEMAD
@@ -2882,11 +2889,11 @@ CONTAINS
        IF(madkind2==kind6.or.madkind2==kind7)   S2%TP10%DRIFTKICK=.FALSE.   ! 2002.11.04
        IF(S2%p%b0==0.0_dp)   then
           S2%TP10%DRIFTKICK=.true.
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72,/),(1x,a72))'
-          w_p%c(1)=S2%name
-          WRITE(w_p%c(2),'(a12,a16,a23)') ' ANGLE=0 IN ', S2%name,' CHANGED TO DRIFT-KICK '
+          !w_p=0
+          !w_p%nc=2
+          !w_p%fc='((1X,a72,/),(1x,a72))'
+          !w_p%c(1)=S2%name
+          if(madkind2/=kind2)write(6,'(a12,a16,a23)') ' ANGLE=0 IN ', S2%name,' CHANGED TO DRIFT-KICK '
           ! call ! WRITE_I
        endif
     endif
@@ -2952,6 +2959,7 @@ CONTAINS
        endif
      set_ap=MY_FALSE
     endif
+
     call copy(s2,s2p)
 
     ! end of machida stuff here
@@ -3365,21 +3373,48 @@ CONTAINS
     MC2=XMC2
   END SUBROUTINE Set_mad_v
 
+   subroutine set_pancake_constants(nst0,angc0,xc0,dc0,vc0,hc0,LC0,hd0,ld0,xprime0,filec0)
+   implicit none
+   real(dp) angc0,xc0,dc0,hc0,LC0,hd0,ld0,vc0
+   integer nst0
+   character(vp) filec0
+   logical xprime0
+   angc=angc0
+   xc=xc0
+   dc=dc0
+   hc=hc0
+   lc=lc0
+   hd=hd0
+   ld=ld0
+   vc=vc0
+   filec=filec0
+   xprime_pancake=xprime0
+   nstc=nst0
+   end subroutine set_pancake_constants 
 
+  
+  ! linked
 
-  FUNCTION  pancake_tilt(NAME,file,no,T)
+ FUNCTION  pancake_tilt(NAME,file,T,br)
     implicit none
     type (EL_LIST) pancake_tilt
-    CHARACTER(*), INTENT(IN):: NAME,file
+    CHARACTER(*),optional, INTENT(IN):: NAME,file
     type (TILTING),optional, INTENT(IN):: T
-    real(dp) L,ANGLE,HD,LD
+    type (taylor),optional, INTENT(INOUT):: br(:,:)
+    real(dp) L,ANGLE,ds,a
     integer mf,nst,I,ORDER,ii
-    integer, optional :: no
-    LOGICAL(LP) REPEAT
-    TYPE(TAYLOR) B(3)  !,ax(2),ay(2)
+!    LOGICAL(LP) REPEAT
+    TYPE(TAYLOR) B(nbe),ba(nbe),bf(nbe),bn(nbe),it  !,ax(2),ay(2)
 
+
+
+    a=0.0_dp
    ! file_fitted=file
+
     pancake_tilt=0
+!    if(present(file)) then
+
+if(present(file)) then
     if(len(file)<=vp) then
      filec=file
     else
@@ -3387,50 +3422,147 @@ CONTAINS
      write(6,*) "warning: pancake name too long for length storage ", vp
     endif
 
+
     call kanalnummer(mf)
     open(unit=mf,file=file)
-    read(mf,*) LD,hD, ORDER,REPEAT   ! L and Hc are geometric
-    read(mf,*) nst,LC,angc 
-    read(mf,*) dc,xc,hc
-      ! s2%pa%angc=angc
-      ! s2%pa%xc=xc
-      ! s2%pa%dc=dc
-      ! s2%pa%h=h
-    if(present(no)) order=no
-    CALL INIT(ORDER,2)
-    CALL ALLOC(B)
-  !  CALL ALLOC(ax)
-   ! CALL ALLOC(ay)
-
-    IF(REPEAT.AND.NST==0) NST=NSTD
-
-    ALLOCATE(T_E(NST))  !,T_ax(NST),T_ay(NST))
-
-    DO I=1,NST
-    read(mf,*) ii 
+    read(mf,*) LD,hD  !,REPEAT   ! L and Hc are geometric
+    read(mf,*) nstc, ORDER 
+    read(mf,*) LC,hc
+    read(mf,*) dc,vc,xc
+    read(mf,*) angc
+endif
+    ds=LC/nstc
+    ii=0
+!    if(present(no)) order=no
  
-       IF(I==1.or.(.not.repeat)) THEN
+
+
+if(.not.present(br)) then
+    order=order+1   
+ CALL INIT(ORDER,1,0,0)
+endif
+
+    CALL ALLOC(B)
+    CALL ALLOC(Bf)
+    CALL ALLOC(Ba)
+    CALL ALLOC(Bn)
+    call alloc(it) 
+bf(1)=0.0_dp;bf(2)=0.0_dp;bf(3)=0.0_dp;
+ba(1)=0.0_dp;ba(2)=0.0_dp;ba(3)=0.0_dp;
+
+
+!    IF(REPEAT.AND.NST==0) NST=NSTD
+
+    ALLOCATE(t_em(NSTc))  
+if(present(br)) then
+ii=ii+1
+bf(1)=br(1,ii)
+bf(2)=br(2,ii)
+bf(3)=br(3,ii)
+else
+    read(mf,*) ii 
+          CALL READ(Bf(1),mf);CALL READ(Bf(2),mf);CALL READ(Bf(3),mf);
+endif
+          Bf(1)=Bf(1)/BRHO
+          Bf(2)=Bf(2)/BRHO
+          Bf(3)=Bf(3)/BRHO
+if(present(br)) then
+ii=ii+1
+ba(1)=br(1,ii)
+ba(2)=br(2,ii)
+ba(3)=br(3,ii)
+else
+    read(mf,*) ii 
+          CALL READ(Ba(1),mf);CALL READ(Ba(2),mf);CALL READ(Ba(3),mf);
+endif
+
+          Ba(1)=Ba(1)/BRHO
+          Ba(2)=Ba(2)/BRHO
+          Ba(3)=Ba(3)/BRHO
+
+    DO I=3,NSTc 
+
+
+if(present(br)) then
+ii=ii+1
+b(1)=br(1,ii)
+b(2)=br(2,ii)
+b(3)=br(3,ii)
+else
+    read(mf,*) ii 
           CALL READ(B(1),mf);CALL READ(B(2),mf);CALL READ(B(3),mf);
-          !          CALL READ(Ax(1),mf);CALL READ(Ay(1),mf);CALL READ(Ax(2),mf);CALL READ(Ay(2),mf);
+endif
+
+ 
           B(1)=B(1)/BRHO
           B(2)=B(2)/BRHO
           B(3)=B(3)/BRHO
-         ! Ax(1)=Ax(1)/BRHO
-         ! Ax(2)=Ax(2)/BRHO
-         ! Ay(1)=Ay(1)/BRHO
-         ! Ay(2)=Ay(2)/BRHO
-       ENDIF
-       CALL SET_TREE_g(T_E(i),B)
-       !       CALL SET_TREE_g(T_ax(i),ax)
-       !       CALL SET_TREE_g(T_ay(i),ay)
+
+         if(i==3) then
+          Bn(1)=Bf(1)
+          Bn(2)=Bf(2)
+          Bn(3)=Bf(3)
+          bn(4)=-(bn(3).i.2)  ! ax
+          it=1.0_dp+hc*(1.0_dp.mono.1)
+          bn(5)=(4*b(4)-ba(4)-3*bf(4))/ds/2-it*bn(2)   !  d/dx (1+hx)A_s 
+          bn(6)= it*bn(1)   !  d/dy (1+hx)A_s  
+          bn(7)=bn(4).d.1   !  d/dx Ax
+          bn(8)=bn(4).d.2   !  d/dy Ax   
+          CALL SET_TREE_g(t_em(1),Bn)
+         elseif(i==nstc) then
+          Bn(1)=B(1)
+          Bn(2)=B(2)
+          Bn(3)=B(3)
+          bn(4)=-(bn(3).i.2)  ! ax
+          it=1.0_dp+hc*(1.0_dp.mono.1)
+          bn(5)=(3*b(4)+bf(4)-4*ba(4))/ds/2-it*bn(2)   !  d/dx (1+hx)A_s 
+          bn(6)= it*bn(1)   !  d/dy (1+hx)A_s  
+          bn(7)=bn(4).d.1   !  d/dx Ax
+          bn(8)=bn(4).d.2   !  d/dy Ax   
+          CALL SET_TREE_g(t_em(i),Bn)
+         endif
+
+          Bn(1)=Ba(1)
+          Bn(2)=Ba(2)
+          Bn(3)=Ba(3)
+          bn(4)=-(bn(3).i.2)  ! ax
+          it=1.0_dp+hc*(1.0_dp.mono.1)
+          bn(5)=(b(4)-bf(4))/ds/2-it*bn(2)   !  d/dx (1+hx)A_s 
+          bn(6)= it*bn(1)   !  d/dy (1+hx)A_s  
+          bn(7)=bn(4).d.1   !  d/dx Ax
+          bn(8)=bn(4).d.2   !  d/dy Ax   
+          CALL SET_TREE_g(t_em(i-1),Bn)
+ 
+          Bf(1)=Ba(1)
+          Bf(2)=Ba(2)
+          Bf(3)=Ba(3)  
+          Bf(4)=Ba(4)
+          Bf(5)=Ba(5)
+          Bf(6)=Ba(6)
+          Bf(7)=Ba(7)
+          Bf(8)=Ba(8)    
+  
+          Ba(1)=B(1)
+          Ba(2)=B(2)
+          Ba(3)=B(3)
+          Ba(4)=B(4)
+          Ba(5)=B(5)
+          Ba(6)=B(6)
+          Ba(7)=B(7)
+          Ba(8)=B(8)
+
     enddo
     call KILL(B)
-  !  CALL KILL(ax)
-  !  CALL KILL(ay)
+    call KILL(Bf)
+    call KILL(Ba)
+    call KILL(Bn)
+    call KILL(it) 
 
-    close(MF)
 
-
+ if(present(file))    close(MF)
+ !  else
+ !    NST=size(t_em)
+ !  endif
     ANGLE=LD*HD
 
 
@@ -3445,22 +3577,22 @@ CONTAINS
     pancake_tilt%L=lc
 
     IF(LEN(NAME)>nlp) THEN
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,a72,/),(1x,a72))'
-       w_p%c(1)=name
-       WRITE(w_p%c(2),'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
        ! call ! WRITE_I
        pancake_tilt%NAME=NAME(1:nlp)
     ELSE
        pancake_tilt%NAME=NAME
     ENDIF
     
-    IF(NST<3.OR.MOD(NST,2)/=1) THEN
-       WRITE(6,*) "NUMBER OF SLICES IN 'pancake'  MUST BE ODD AND >= 3 ",NST
+    IF(NSTc<3.OR.MOD(NSTc,2)/=1) THEN
+       WRITE(6,*) "NUMBER OF SLICES IN 'pancake'  MUST BE ODD AND >= 3 ",NSTc
        STOP 101
     ENDIF
-    pancake_tilt%nst=(NST-1)/2
+    pancake_tilt%nst=(NSTc-1)/2
     pancake_tilt%KIND=KINDPA
     IF(PRESENT(t)) then
        IF(T%NATURAL) THEN
@@ -3471,6 +3603,36 @@ CONTAINS
     ENDIF
   END FUNCTION pancake_tilt
   ! linked
+
+subroutine allocate_for_pancake(br)
+implicit none
+type(taylor), allocatable :: br(:,:)
+integer i,j
+allocate(br(3,nstc))
+ 
+do i=1,3
+do j=1,nstc
+ call alloc(br(i,j))
+enddo
+enddo
+
+end subroutine allocate_for_pancake
+
+subroutine kill_for_pancake(br)
+implicit none
+type(taylor), allocatable :: br(:,:)
+integer i,j
+
+ 
+do i=1,size(br,1)
+do j=1,size(br,2)
+ call kill(br(i,j))
+enddo
+enddo
+
+deallocate(br)
+
+end subroutine kill_for_pancake
 
 
   SUBROUTINE  EQUAL_L(R,S1)

@@ -287,10 +287,8 @@ CONTAINS
        nullify(F%A_X1,F%A_X2,F%B_X1,F%B_X2)
        nullify(F%TIME,F%ENERGY,F%PATCH)
     ELSE
-       w_p=1
-       w_p%nc=1
-       w_p%fc='(1((1X,a72)))'
-       write(w_p%c(1),'(a5,1x,i4,a30)') " R = ",R ," NOT DEFINED IN ZERO_CHART (1)"
+ 
+       write(6,'(a5,1x,i4,a30)') " R = ",R ," NOT DEFINED IN ZERO_CHART (1)"
        ! call !write_e(-1)
     ENDIF
   END SUBROUTINE ZERO_PATCH
@@ -370,10 +368,8 @@ CONTAINS
           F%f%O=GLOBAL_origin
        ENDIF
     ELSE
-       w_p=1
-       w_p%nc=1
-       w_p%fc='(1((1X,a72)))'
-       write(w_p%c(1),'(a5,1x,i4,a30)') " R = ",R ," NOT DEFINED IN ZERO_CHART (2)"
+ 
+       write(6,'(a5,1x,i4,a30)') " R = ",R ," NOT DEFINED IN ZERO_CHART (2)"
        ! call !write_e(-1)
     ENDIF
 

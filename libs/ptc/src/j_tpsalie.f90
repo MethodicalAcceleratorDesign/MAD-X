@@ -2584,10 +2584,9 @@ contains
     ! if(old) then
     do i=1,nd2
        if(s1%v(i)%i==0) then
-          w_p=0
-          w_p%nc=1
-          w_p=(/"Should not be here: Assign variables"/)
-          w_p%fc='(1((1X,A72),/))'
+ 
+            write(6,*) "Should not be here: checkmap" 
+ 
           ! call !write_e(200)
           !             s1%v(i)%i=dummymap(i)
        endif
@@ -2615,12 +2614,9 @@ contains
     ! if(old) then
     do i=1,nd2
        if(s1%v(i)%i==0) then
-          !             s1%v(i)%i=dummymap(i)
-          w_p=0
-          w_p%nc=1
-          w_p=(/"Should not be here: Assign variables"/)
-          w_p%fc='(1((1X,A72),/))'
-          ! call !write_e(202)
+ 
+            write(6,*)  "Should not be here: checkvec" 
+ 
        endif
     enddo
     !    else
@@ -2644,12 +2640,9 @@ contains
 
     ! if(old) then
     if(s1%h%i==0) then
-       w_p=0
-       w_p%nc=1
-       w_p=(/"Should not be here: Assign variables"/)
-       w_p%fc='(1((1X,A72),/))'
-       ! call !write_e(204)
-       !          s1%h%i=dummy
+ 
+         write(6,*) "Should not be here: Assign variables checkbp" 
+ 
     endif
     !    else
     !       if(.NOT. ASSOCIATED(s1%h%J%r)) then
@@ -2668,12 +2661,9 @@ contains
     TYPE (taylor) s1
     ! if(old) then
     if(s1%i==0) then
-       w_p=0
-       w_p%nc=1
-       w_p=(/"Should not be here: Assign variables"/)
-       w_p%fc='(1((1X,A72),/))'
-       ! call !write_e(206)
-       !          s1%i=dummy
+ 
+        write(6,*) "Should not be here: Assign variables checktaylor "
+ 
     endif
     !    else
     !       if(.NOT. ASSOCIATED(s1%J%r)) then
@@ -2697,11 +2687,9 @@ contains
     case(0:ndumt-1)
        master=master+1
     case(ndumt)
-       w_p=0
-       w_p%nc=1
-       w_p=(/" cannot indent anymore "/)
-       w_p%fc='(1((1X,A72),/))'
-       ! call !write_e(100)
+ 
+         write(6,*) " cannot indent anymore " 
+ 
     end select
 
     call ass0(s1%h)
@@ -2717,10 +2705,9 @@ contains
     case(0:ndumt-1)
        master=master+1
     case(ndumt)
-       w_p=0
-       w_p%nc=1
-       w_p=(/" cannot indent anymore "/)
-       w_p%fc='(1((1X,A72),/))'
+ 
+         write(6,*) "cannot indent anymore : asstaylor" 
+ 
        ! call !write_e(100)
     end select
 
@@ -2737,10 +2724,9 @@ contains
     case(0:ndumt-1)
        master=master+1
     case(ndumt)
-       w_p=0
-       w_p%nc=1
-       w_p=(/" cannot indent anymore "/)
-       w_p%fc='(1((1X,A72),/))'
+ 
+         write(6,*) " cannot indent anymore assvec" 
+ 
        ! call !write_e(100)
     end select
 
@@ -2759,10 +2745,9 @@ contains
     case(0:ndumt-1)
        master=master+1
     case(ndumt)
-       w_p=0
-       w_p%nc=1
-       w_p=(/" cannot indent anymore "/)
-       w_p%fc='(1((1X,A72),/))'
+ 
+         write(6,*) " cannot indent anymore assmap " 
+ 
        ! call !write_e(100)
     end select
 
@@ -2781,10 +2766,9 @@ contains
     case(0:ndumt-1)
        master=master+1
     case(ndumt)
-       w_p=0
-       w_p%nc=1
-       w_p=(/" cannot indent anymore "/)
-       w_p%fc='(1((1X,A72),/))'
+ 
+         write(6,*) " cannot indent anymore assgmap" 
+ 
        ! call !write_e(100)
     end select
 

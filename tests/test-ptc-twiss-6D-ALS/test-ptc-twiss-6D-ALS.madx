@@ -56,4 +56,3 @@ ptc_end;
 !plot, table=ptc_twiss, haxis=s, vaxis=x, colour=100;
 
 !removefile, file='ALS.C';
-removefile, file='Maxwellian_bend_for_ptc.txt';

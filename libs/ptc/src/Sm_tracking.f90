@@ -211,7 +211,7 @@ contains
     DO  WHILE(.not.ASSOCIATED(C,c2))
 
        CALL TRACK(C,X,K)
-       
+
        if(.not.check_stable) then
          write(messagelost,*) "Error in tracking ",c%mag%name," ", messagelost(:len_trim(messagelost))
          exit
@@ -261,12 +261,14 @@ contains
     DO  WHILE(.not.ASSOCIATED(C,c2))
 
        CALL TRACK(C,X,K)
+
        if(.not.check_stable) then
          write(messagelost,*) "Error in tracking ",c%mag%name," ", messagelost(:len_trim(messagelost))
          exit
        endif  
 
        C=>C%NEXT
+
     ENDDO
 
     if(associated(last).and.check_stable) then
@@ -599,18 +601,18 @@ contains
           X(5)=(1.0_dp+X(5))*C%MAG%P%P0C/P0-1.0_dp
        ENDIF
     else
-             P0=>C%PATCH%P0b
-             B0=>C%PATCH%B0b
+             P0=>C%PATCH%P0b ! 8/31/2016
+             B0=>C%PATCH%B0b ! 8/31/2016
 
-             X(2)=X(2)*P0/C%MAG%P%P0C
-             X(4)=X(4)*P0/C%MAG%P%P0C
-             IF(k%TIME.or.recirculator_cheat)THEN
-                X(5)=root(1.0_dp+2.0_dp*X(5)/B0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
-                X(5)=X(5)*P0/C%MAG%P%P0C-1.0_dp !X(5) = DP/P0C_NEW
-                X(5)=(2.0_dp*X(5)+X(5)**2)/(root(1.0_dp/C%MAG%P%BETA0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/C%MAG%P%BETA0)
-             ELSE
-                X(5)=(1.0_dp+X(5))*P0/C%MAG%P%P0C-1.0_dp
-             ENDIF         
+             X(2)=X(2)*C%MAG%P%P0C/P0 ! 8/31/2016
+             X(4)=X(4)*C%MAG%P%P0C/P0 ! 8/31/2016
+       IF(k%TIME.or.recirculator_cheat)THEN ! 8/31/2016
+          X(5)=root(1.0_dp+2.0_dp*X(5)/C%MAG%P%BETA0+X(5)**2)  !X(5) = 1+DP/P0C_OLD ! 8/31/2016
+          X(5)=X(5)*C%MAG%P%P0C/P0-1.0_dp !X(5) = DP/P0C_NEW ! 8/31/2016
+          X(5)=(2.0_dp*X(5)+X(5)**2)/(root(1.0_dp/B0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/B0) ! 8/31/2016
+       ELSE
+          X(5)=(1.0_dp+X(5))*C%MAG%P%P0C/P0-1.0_dp ! 8/31/2016
+       ENDIF        
     ENDIF
     endif ! associated
     
@@ -787,18 +789,19 @@ contains
        ENDIF
     
        else ! ASSOCIATED
-             P0=>C%PATCH%P0b
-             B0=>C%PATCH%B0b
+             P0=>C%PATCH%P0b ! 8/31/2016
+             B0=>C%PATCH%B0b ! 8/31/2016
 
-             X(2)=X(2)*P0/C%MAGP%P%P0C
-             X(4)=X(4)*P0/C%MAGP%P%P0C
-             IF(k%TIME.or.recirculator_cheat)THEN
-                X(5)=SQRT(1.0_dp+2.0_dp*X(5)/B0+X(5)**2)  !X(5) = 1+DP/P0C_OLD
-                X(5)=X(5)*P0/C%MAGP%P%P0C-1.0_dp !X(5) = DP/P0C_NEW
-                X(5)=(2.0_dp*X(5)+X(5)**2)/(SQRT(1.0_dp/C%MAGP%P%BETA0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/C%MAGP%P%BETA0)
-             ELSE
-                X(5)=(1.0_dp+X(5))*P0/C%MAGP%P%P0C-1.0_dp
-             ENDIF           
+             X(2)=X(2)*C%MAG%P%P0C/P0 ! 8/31/2016
+             X(4)=X(4)*C%MAG%P%P0C/P0 ! 8/31/2016
+       IF(k%TIME.or.recirculator_cheat)THEN ! 8/31/2016
+          X(5)=sqrt(1.0_dp+2.0_dp*X(5)/C%MAG%P%BETA0+X(5)**2)  !X(5) = 1+DP/P0C_OLD ! 8/31/2016
+          X(5)=X(5)*C%MAG%P%P0C/P0-1.0_dp !X(5) = DP/P0C_NEW ! 8/31/2016
+          X(5)=(2.0_dp*X(5)+X(5)**2)/(sqrt(1.0_dp/B0**2+2.0_dp*X(5)+X(5)**2)+1.0_dp/B0) ! 8/31/2016
+       ELSE
+          X(5)=(1.0_dp+X(5))*C%MAG%P%P0C/P0-1.0_dp ! 8/31/2016
+       ENDIF        
+      
       ENDIF ! ASSOCIATED  
 ENDIF  
     !   endif ! new 2010

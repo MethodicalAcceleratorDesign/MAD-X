@@ -52,7 +52,6 @@ ptc_create_universe;
   
 ptc_end;
 
-removefile, file="Maxwellian_bend_for_ptc.txt";
 
 stop;
 

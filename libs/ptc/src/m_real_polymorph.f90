@@ -1022,13 +1022,10 @@ contains
           IF((S1%t.SUB.'0')>=S2%r) greatereq=.TRUE.
        end select
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in greatereq "
-       w_p%c(2)= "s1%kind ,s2%kind "
-       w_p=(/s1%kind ,s2%kind/)
+  
+         write(6,*) " trouble in greatereq "
+         write(6,*) "s1%kind ,s2%kind ",s1%kind ,s2%kind 
+ 
        ! call !write_e(0)
     end select
 
@@ -1047,13 +1044,10 @@ contains
     case(m2)
        IF((S1%t.SUB.'0')>=S2) dgreatereqsc=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(1((1X,i4)))'
-       w_p%c(1)= " trouble in dgreatereqsc "
-       w_p%c(2)= "s1%kind "
-       w_p=(/s1%kind/)
+ 
+        write(6,*) " trouble in dgreatereqsc "
+        write(6,*) "s1%kind ",s1%kind
+ 
        ! call !write_e(0)
     end select
 
@@ -1073,14 +1067,10 @@ contains
        IF(S2>=(S1%t.SUB.'0')) dscgreatereq=.TRUE.
     case default
 
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(1((1X,i4)))'
-       w_p%c(1)= " trouble in dscgreatereq "
-       w_p%c(2)= "s1%kind "
-       w_p=(/s1%kind/)
-       ! call !write_e(0)
+ 
+      write(6,*)" trouble in dscgreatereq "
+      write(6,*)"s1%kind ",s1%kind 
+ 
     end select
 
   END FUNCTION dscgreatereq
@@ -1099,14 +1089,10 @@ contains
     case(m2)
        IF((S1%t.SUB.'0')>=S2) greatereqsc=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(1((1X,i4)))'
-       w_p%c(1)= " trouble in greatereqsc "
-       w_p%c(2)= "s1%kind "
-       w_p=(/s1%kind/)
-       ! call !write_e(0)
+ 
+       write(6,*) " trouble in greatereqsc "
+       write(6,*)"s1%kind ",s1%kind
+ 
     end select
 
   END FUNCTION greatereqsc
@@ -1125,14 +1111,10 @@ contains
     case(m2)
        IF(S2>=(S1%t.SUB.'0')) scgreatereq=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(1((1X,i4)))'
-       w_p%c(1)= " trouble in scgreatereq "
-       w_p%c(2)= "s1%kind "
-       w_p=(/s1%kind/)
-       ! call !write_e(0)
+ 
+       write(6,*)" trouble in scgreatereq "
+       write(6,*)"s1%kind ",s1%kind
+   
     end select
 
   END FUNCTION scgreatereq
@@ -1150,14 +1132,10 @@ contains
     case(m2)
        IF((S1%t.SUB.'0')>=S2) igreatereqsc=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(1((1X,i4)))'
-       w_p%c(1)= " trouble in igreatereqsc "
-       w_p%c(2)= "s1%kind "
-       w_p=(/s1%kind/)
-       ! call !write_e(0)
+ 
+       write(6,*)" trouble in igreatereqsc "
+       write(6,*)"s1%kind ",s1%kind
+ 
     end select
 
   END FUNCTION igreatereqsc
@@ -1175,13 +1153,10 @@ contains
     case(m2)
        IF(S2>=(S1%t.SUB.'0')) iscgreatereq=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(1((1X,i4)))'
-       w_p%c(1)= " trouble in iscgreatereq "
-       w_p%c(2)= "s1%kind "
-       w_p=(/s1%kind/)
+
+        write(6,*)" trouble in iscgreatereq "
+        write(6,*)"s1%kind ",s1%kind
+ 
        ! call !write_e(0)
     end select
 
@@ -1215,13 +1190,10 @@ contains
           IF((S1%t.SUB.'0')>S2%r) greaterthan=.TRUE.
        end select
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in greaterthan "
-       w_p%c(2)= "s1%kind ,s2%kind "
-       w_p=(/s1%kind ,s2%kind/)
+ 
+ 
+       write(6,*) "s1%kind ,s2%kind ",s1%kind ,s2%kind 
+ 
        ! call !write_e(0)
     end select
 
@@ -1240,14 +1212,11 @@ contains
     case(m2)
        IF((S1%t.SUB.'0')>S2) igreatersc=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(1((1X,i4)))'
-       w_p%c(1)= " trouble in igreatersc "
-       w_p%c(2)= "s1%kind "
-       w_p=(/s1%kind/)
-       ! call !write_e(0)
+ 
+       write(6,*) " trouble in igreatersc "
+       write(6,*)  "s1%kind ",s1%kind
+ 
+ 
     end select
 
   END FUNCTION igreatersc
@@ -1265,14 +1234,11 @@ contains
     case(m2)
        IF(S2>(S1%t.SUB.'0')) iscgreater=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(1((1X,i4)))'
-       w_p%c(1)= " trouble in iscgreater "
-       w_p%c(2)= "s1%kind "
-       w_p=(/s1%kind/)
-       ! call !write_e(0)
+ 
+       write(6,*)" trouble in iscgreater "
+        write(6,*)"s1%kind ",s1%kind
+
+ 
     end select
 
   END FUNCTION iscgreater
@@ -1290,14 +1256,10 @@ contains
     case(m2)
        IF((S1%t.SUB.'0')>S2) dgreatersc=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(1((1X,i4)))'
-       w_p%c(1)= " trouble in dgreatersc "
-       w_p%c(2)= "s1%kind "
-       w_p=(/s1%kind/)
-       ! call !write_e(0)
+ 
+      write(6,*) " trouble in dgreatersc "
+       write(6,*)"s1%kind ",s1%kind
+ 
     end select
 
   END FUNCTION dgreatersc
@@ -1316,15 +1278,10 @@ contains
     case(m2)
        IF(S2>(S1%t.SUB.'0')) dscgreater=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(1((1X,i4)))'
-       w_p%c(1)= " trouble in dscgreater "
-       w_p%c(2)= "s1%kind "
-       w_p=(/s1%kind/)
-       ! call !write_e(0)
-       ipause=mypause(0)
+ 
+           write(6,*)" trouble in dscgreater "
+          write(6,*) "s1%kind ",s1%kind
+ 
     end select
 
   END FUNCTION dscgreater
@@ -1343,14 +1300,10 @@ contains
     case(m2)
        IF((S1%t.SUB.'0')>S2) greatersc=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in greatersc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
-       ! call !write_e(0)
+ 
+        write(6,*)" trouble in greatersc "
+        write(6,*)"s1%kind   ",s1%kind
+ 
     end select
 
   END FUNCTION greatersc
@@ -1369,13 +1322,10 @@ contains
     case(m2)
        IF(S2>(S1%t.SUB.'0')) scgreater=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in scgreater "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+ 
+       write(6,*)" trouble in scgreater "
+       write(6,*)"s1%kind   ",s1%kind 
+ 
        ! call !write_e(0)
     end select
 
@@ -1409,13 +1359,10 @@ contains
           IF((S1%t.SUB.'0')<S2%r) lessthan=.TRUE.
        end select
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in lessthan "
-       w_p%c(2)= "s1%kind ,s2%kind "
-       w_p=(/s1%kind ,s2%kind/)
+ 
+         write(6,*)" trouble in lessthan "
+         write(6,*) "s1%kind ,s2%kind ",s1%kind ,s2%kind
+ 
        ! call !write_e(0)
     end select
 
@@ -1434,14 +1381,10 @@ contains
     case(m2)
        IF((S1%t.SUB.'0')<S2) dlessthansc=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dlessthansc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
-       ! call !write_e(0)
+
+        write(6,*) " trouble in dlessthansc "
+        write(6,*) "s1%kind   ",s1%kind
+ 
     end select
 
   END FUNCTION dlessthansc
@@ -1460,14 +1403,10 @@ contains
     case(m2)
        IF(S2<(S1%t.SUB.'0')) dsclessthan=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dsclessthan "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
-       ! call !write_e(0)
+
+       write(6,*)" trouble in dsclessthan "
+      write(6,*)"s1%kind   ",s1%kind 
+ 
     end select
 
   END FUNCTION dsclessthan
@@ -1486,14 +1425,11 @@ contains
     case(m2)
        IF((S1%t.SUB.'0')<S2) lessthansc=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in lessthansc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
-       ! call !write_e(0)
+       !w_p=0
+
+       write(6,*)" trouble in lessthansc "
+       write(6,*)"s1%kind   ",s1%kind
+ 
     end select
 
   END FUNCTION lessthansc
@@ -1513,14 +1449,10 @@ contains
     case(m2)
        IF(S2<(S1%t.SUB.'0')) sclessthan=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in sclessthan "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
-       ! call !write_e(0)
+ 
+        write(6,*) " trouble in sclessthan "
+        write(6,*)"s1%kind   ",s1%kind
+  
     end select
 
   END FUNCTION sclessthan
@@ -1538,14 +1470,11 @@ contains
     case(m2)
        IF((S1%t.SUB.'0')<S2) ilessthansc=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in ilessthansc "
-       w_p%c(2)= "s1%kind ,s2%kind "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+
+       write(6,*) " trouble in ilessthansc "
+       write(6,*) "s1%kind ,s2  ",s1%kind ,s2 
+ 
+ 
     end select
 
   END FUNCTION ilessthansc
@@ -1564,13 +1493,13 @@ contains
     case(m2)
        IF(S2<(S1%t.SUB.'0')) isclessthan=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in isclessthan "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in isclessthan "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
 
@@ -1604,14 +1533,10 @@ contains
           IF((S1%t.SUB.'0')<=S2%r) lesseq=.TRUE.
        end select
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in lesseq "
-       w_p%c(2)= "s1%kind ,s2%kind "
-       w_p=(/s1%kind ,s2%kind/)
-       ! call !write_e(0)
+
+           write(6,*) " trouble in lesseq "
+           write(6,*)  "s1%kind ,s2%kind ",s1%kind ,s2%kind
+ 
     end select
 
 
@@ -1630,14 +1555,10 @@ contains
     case(m2)
        IF((S1%t.SUB.'0')<=S2) dlesseqsc=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dlesseqsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
-       ! call !write_e(0)
+ 
+        write(6,*) " trouble in dlesseqsc "
+        write(6,*) "s1%kind   ",s1%kind   
+ 
     end select
 
   END FUNCTION dlesseqsc
@@ -1655,14 +1576,10 @@ contains
     case(m2)
        IF(S2<=(S1%t.SUB.'0')) dsclesseq=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dsclesseq "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
-       ! call !write_e(0)
+ 
+         write(6,*) " trouble in dsclesseq "
+         write(6,*) "s1%kind   ",s1%kind
+  
     end select
 
   END FUNCTION dsclesseq
@@ -1681,14 +1598,10 @@ contains
     case(m2)
        IF((S1%t.SUB.'0')<=S2) lesseqsc=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in lesseqsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
-       ! call !write_e(0)
+  
+      write(6,*)" trouble in lesseqsc "
+      write(6,*) "s1%kind   ",s1%kind 
+ 
     end select
 
   END FUNCTION lesseqsc
@@ -1707,14 +1620,10 @@ contains
     case(m2)
        IF(S2<=(S1%t.SUB.'0')) sclesseq=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in sclesseq "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
-       ! call !write_e(0)
+ 
+       write(6,*) " trouble in sclesseq "
+       write(6,*) "s1%kind   ",s1%kind
+ 
     end select
 
   END FUNCTION sclesseq
@@ -1732,13 +1641,10 @@ contains
     case(m2)
        IF((S1%t.SUB.'0')<=S2) ilesseqsc=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in ilesseqsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+
+      write(6,*) " trouble in ilesseqsc "
+      write(6,*) "s1%kind   ",s1%kind
+ 
        ! call !write_e(0)
     end select
 
@@ -1757,14 +1663,10 @@ contains
     case(m2)
        IF(S2<=(S1%t.SUB.'0')) isclesseq=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in isclesseq "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
-       ! call !write_e(0)
+ 
+       write(6,*)" trouble in isclesseq "
+       write(6,*)"s1%kind   ",s1%kind 
+ 
     end select
 
   END FUNCTION isclesseq
@@ -1797,14 +1699,10 @@ contains
           IF((S1%t.SUB.'0')==S2%r) eq=.TRUE.
        end select
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in eq "
-       w_p%c(2)= "s1%kind ,s2%kind "
-       w_p=(/s1%kind ,s2%kind/)
-       ! call !write_e(0)
+
+       write(6,*)" trouble in eq "
+       write(6,*) "s1%kind ,s2%kind ",s1%kind ,s2%kind 
+ 
     end select
 
 
@@ -1823,14 +1721,10 @@ contains
     case(m2)
        IF((S1%t.SUB.'0')==S2) deqsc=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in deqsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
-       ! call !write_e(0)
+ 
+       write(6,*)  " trouble in deqsc "
+       write(6,*) "s1%kind   ",s1%kind
+ 
     end select
 
   END FUNCTION deqsc
@@ -1848,14 +1742,10 @@ contains
     case(m2)
        IF(S2==(S1%t.SUB.'0')) dsceq=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dsceq "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
-       ! call !write_e(0)
+ 
+         write(6,*) " trouble in dsceq "
+         write(6,*) "s1%kind   "
+ 
     end select
 
   END FUNCTION dsceq
@@ -1874,13 +1764,13 @@ contains
     case(m2)
        IF((S1%t.SUB.'0')==S2) eqsc=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in eqsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in eqsc "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
 
@@ -1900,13 +1790,13 @@ contains
     case(m2)
        IF(S2==(S1%t.SUB.'0')) sceq=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in sceq "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in sceq "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
 
@@ -1926,13 +1816,13 @@ contains
     case(m2)
        IF((S1%t.SUB.'0')==S2) ieqsc=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in ieqsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in ieqsc "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
 
@@ -1951,13 +1841,13 @@ contains
     case(m2)
        IF(S2==(S1%t.SUB.'0')) isceq=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in isceq "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in isceq "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
 
@@ -1991,13 +1881,13 @@ contains
           IF((S1%t.SUB.'0')/=S2%r) neq=.TRUE.
        end select
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in neq "
-       w_p%c(2)= "s1%kind ,s2%kind "
-       w_p=(/s1%kind ,s2%kind/)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in neq "
+         write(6,*) "s1%kind ,s2%kind "
+       !w_p=(/s1%kind ,s2%kind/)
        ! call !write_e(0)
     end select
 
@@ -2017,13 +1907,13 @@ contains
     case(m2)
        IF((S1%t.SUB.'0')/=S2) dneqsc=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dneqsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in dneqsc "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
 
@@ -2042,13 +1932,13 @@ contains
     case(m2)
        IF(S2/=(S1%t.SUB.'0')) dscneq=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dscneq "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in dscneq "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
 
@@ -2068,13 +1958,13 @@ contains
     case(m2)
        IF((S1%t.SUB.'0')/=S2) neqsc=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in neqsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in neqsc "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
 
@@ -2094,13 +1984,13 @@ contains
     case(m2)
        IF(S2/=(S1%t.SUB.'0')) scneq=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in scneq "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in scneq "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
 
@@ -2119,13 +2009,13 @@ contains
     case(m2)
        IF((S1%t.SUB.'0')/=S2) ineqsc=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in ineqsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in ineqsc "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
 
@@ -2144,13 +2034,13 @@ contains
     case(m2)
        IF(S2/=(S1%t.SUB.'0')) iscneq=.TRUE.
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in iscneq "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in iscneq "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
 
@@ -2185,13 +2075,13 @@ contains
        endif
 
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dexpt "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in dexpt "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION dexpt
@@ -2227,13 +2117,13 @@ contains
        endif
 
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in I_npp "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in I_npp "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION I_npp
@@ -2250,13 +2140,13 @@ contains
     case(m2)
        abst=abs(s1%t.sub.'0')
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in abst "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in abst "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION abst
@@ -2296,13 +2186,13 @@ contains
           PABS%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in Pabs "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in Pabs "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION Pabs
@@ -2321,13 +2211,13 @@ contains
     case(m2)
        full_abst=full_abs(s1%t)    ! 2002.10.17
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in full_abst "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in full_abst "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION full_abst
@@ -2359,13 +2249,13 @@ contains
           dtant%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dtant "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in dtant "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION dtant
@@ -2397,13 +2287,13 @@ contains
           dtandt%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dtandt "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in dtandt "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION dtandt
@@ -2442,13 +2332,13 @@ contains
           dcost%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dcost "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in dcost "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION dcost
@@ -2480,13 +2370,13 @@ contains
           dcosdt%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dcosdt "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in dcosdt "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION dcosdt
@@ -2526,13 +2416,13 @@ contains
           dsint%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dsint "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in dsint "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION dsint
@@ -2564,13 +2454,13 @@ contains
           dsindt%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dsindt "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in dsindt "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION dsindt
@@ -2610,13 +2500,13 @@ contains
           dlogt%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dlogt "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in dlogt "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION dlogt
@@ -2650,13 +2540,13 @@ contains
           dsqrtt%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dsqrtt "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in dsqrtt "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION dsqrtt
@@ -2691,13 +2581,13 @@ contains
           POW%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in POW "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in POW "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION POW
@@ -2731,13 +2621,13 @@ contains
           POWR%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in POWR "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in POWR "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION POWR
@@ -2770,13 +2660,13 @@ contains
           POWR8%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in POWR8 "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in POWR8 "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION POWR8
@@ -2809,13 +2699,13 @@ contains
           unaryADD%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in POWR8 "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in POWR8 "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION unaryADD
@@ -2847,13 +2737,13 @@ contains
           unarySUB%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in unarySUB "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in unarySUB "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION unarySUB
@@ -2939,13 +2829,13 @@ contains
           endif
        end select
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in add "
-       w_p%c(2)= "s1%kind ,s2%kind "
-       w_p=(/s1%kind ,s2%kind/)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in add "
+         write(6,*) "s1%kind ,s2%kind "
+       !w_p=(/s1%kind ,s2%kind/)
        ! call !write_e(0)
     end select
   END FUNCTION add
@@ -3031,13 +2921,13 @@ contains
           endif
        end select
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in subs "
-       w_p%c(2)= "s1%kind ,s2%kind "
-       w_p=(/s1%kind ,s2%kind/)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in subs "
+         write(6,*) "s1%kind ,s2%kind "
+       !w_p=(/s1%kind ,s2%kind/)
        ! call !write_e(0)
     end select
   END FUNCTION subs
@@ -3070,13 +2960,13 @@ contains
           daddsc%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in daddsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in daddsc "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION daddsc
@@ -3109,13 +2999,13 @@ contains
           dscadd%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dscadd "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in dscadd "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION dscadd
@@ -3148,13 +3038,13 @@ contains
           dsubsc%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dsubsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in dsubsc "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION dsubsc
@@ -3187,13 +3077,13 @@ contains
           dscsub%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dscsub "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in dscsub "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION dscsub
@@ -3227,13 +3117,13 @@ contains
           addsc%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in addsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in addsc "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION addsc
@@ -3267,13 +3157,13 @@ contains
           scadd%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in addsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in addsc "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION scadd
@@ -3307,13 +3197,13 @@ contains
           subsc%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in subsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in subsc "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION subsc
@@ -3347,13 +3237,13 @@ contains
           scsub%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in scsub "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in scsub "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION scsub
@@ -3386,13 +3276,13 @@ contains
           iaddsc%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in iaddsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in iaddsc "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION iaddsc
@@ -3425,13 +3315,13 @@ contains
           iscadd%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in iscadd "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in iscadd "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION iscadd
@@ -3464,13 +3354,13 @@ contains
           isubsc%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in isubsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in isubsc "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION isubsc
@@ -3503,13 +3393,13 @@ contains
           iscsub%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in iscsub "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in iscsub "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION iscsub
@@ -3596,13 +3486,13 @@ contains
           endif
        end select
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in mul "
-       w_p%c(2)= "s1%kind ,s2%kind "
-       w_p=(/s1%kind ,s2%kind/)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in mul "
+         write(6,*) "s1%kind ,s2%kind "
+       !w_p=(/s1%kind ,s2%kind/)
        ! call !write_e(0)
     end select
   END FUNCTION mul
@@ -3688,13 +3578,13 @@ contains
           endif
        end select
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in div "
-       w_p%c(2)= "s1%kind ,s2%kind "
-       w_p=(/s1%kind ,s2%kind/)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in div "
+         write(6,*) "s1%kind ,s2%kind "
+       !w_p=(/s1%kind ,s2%kind/)
        ! call !write_e(0)
     end select
   END FUNCTION div
@@ -3727,13 +3617,13 @@ contains
           dmulmapconcat%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dmulmapconcat "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in dmulmapconcat "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION dmulmapconcat
@@ -3767,13 +3657,13 @@ contains
           dmulsc%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dmulsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in dmulsc "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION dmulsc
@@ -3836,13 +3726,13 @@ contains
           ddivsc%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in ddivsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in ddivsc "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION ddivsc
@@ -3875,13 +3765,13 @@ contains
           dscdiv%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in ddivsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in ddivsc "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION dscdiv
@@ -3915,13 +3805,13 @@ contains
           mulsc%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in mulsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in mulsc "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION mulsc
@@ -3955,13 +3845,13 @@ contains
           scmul%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in scmul "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in scmul "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION scmul
@@ -3995,13 +3885,13 @@ contains
           divsc%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in divsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in divsc "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION divsc
@@ -4035,13 +3925,13 @@ contains
           scdiv%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in scdiv "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in scdiv "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION scdiv
@@ -4074,13 +3964,13 @@ contains
           imulsc%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in imulsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in imulsc "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION imulsc
@@ -4113,13 +4003,13 @@ contains
           iscmul%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in iscmul "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in iscmul "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION iscmul
@@ -4152,13 +4042,13 @@ contains
           idivsc%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in idivsc "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in idivsc "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION idivsc
@@ -4191,13 +4081,13 @@ contains
           iscdiv%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in iscdiv "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in iscdiv "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION iscdiv
@@ -4682,16 +4572,16 @@ contains
              s2%kind=2
              s2%alloc=t
           else
-             w_p=0
-             w_p%nc=5
-             w_p%fc='(4(1X,A72,/),(1X,A72))'
-             write(w_p%c(1),'(A23,I4,A19)') " You are putting kind= ", s1%kind," (TPSA) in a kind=0"
-             w_p%c(2)=  " We do not allow that anymore for safety reasons"
-             w_p%c(3)=  " If you insist on it, modify real_polymorph and complex_polymorph"
-             w_p%c(4)= " at your own insane risk "
-             w_p%c(5)= " Etienne Forest/Frank Schmidt"
+             !w_p=0
+             !w_p%nc=5
+             !w_p%fc='(4(1X,A72,/),(1X,A72))'
+             write(6,'(A23,I4,A19)') " You are putting kind= ", s1%kind," (TPSA) in a kind=0"
+               write(6,*)  " We do not allow that anymore for safety reasons"
+             !w_p%c(3)=  " If you insist on it, modify real_polymorph and complex_polymorph"
+             !w_p%c(4)= " at your own insane risk "
+             !w_p%c(5)= " Etienne Forest/Frank Schmidt"
              ! call !write_e(778)
-             w_p%nc=sqrt(-float(w_p%nc))
+             !w_p%nc=sqrt(-float(!w_p%nc))
           endif
        endif    ! end of what is s1
 
@@ -4722,13 +4612,13 @@ contains
        S2=S1%r
        !       master=localmaster
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in complexreal_8 "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in complexreal_8 "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
 
@@ -4759,13 +4649,13 @@ contains
        S2=S1%r
        !       master=localmaster
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in realEQUAL "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in realEQUAL "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
 
@@ -4794,13 +4684,13 @@ contains
        S2=S1%r
        !       master=localmaster
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in realEQUAL "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in realEQUAL "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
 
@@ -4836,13 +4726,13 @@ contains
        endif
        !       master=localmaster
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in taylorEQUAL "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in taylorEQUAL "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
 
@@ -4929,13 +4819,13 @@ contains
        endif
        !       master=localmaster
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in univreal_8 "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in univreal_8 "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END SUBROUTINE univreal_8
@@ -5215,13 +5105,13 @@ contains
           datant%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in datant "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in datant "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION datant
@@ -5253,13 +5143,13 @@ contains
           datanht%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in datant "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in datant "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION datanht
@@ -5304,13 +5194,13 @@ contains
           datanDt%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in datanDt "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in datanDt "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION datanDt
@@ -5922,13 +5812,13 @@ contains
        endif
 
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dacost "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in dacost "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION dacost
@@ -5970,13 +5860,13 @@ contains
           dcosht%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dcosht "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in dcosht "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION dcosht
@@ -6018,13 +5908,13 @@ contains
        endif
 
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dsinht "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in dsinht "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION dsinht
@@ -6057,13 +5947,13 @@ contains
        endif
 
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in dtanht "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in dtanht "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION dtanht
@@ -6348,13 +6238,13 @@ contains
           sinX_Xt%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in sinX_XT "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in sinX_XT "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION sinX_XT
@@ -6461,13 +6351,13 @@ contains
           sinHX_Xt%kind=1
        endif
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in sinHX_Xt "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in sinHX_Xt "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
   END FUNCTION sinHX_Xt
@@ -6493,13 +6383,13 @@ contains
        Write(6,*) " cannot clean a knob "
        stop 601
     case default
-       w_p=0
-       w_p%nc=2
-       w_p%fc='((1X,A72,/,1x,a72))'
-       w_p%fi='(2((1X,i4)))'
-       w_p%c(1)= " trouble in clean_real_8 "
-       w_p%c(2)= "s1%kind   "
-       w_p=(/s1%kind  /)
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,A72,/,1x,a72))'
+       !w_p%fi='(2((1X,i4)))'
+         write(6,*) " trouble in clean_real_8 "
+         write(6,*) "s1%kind   "
+       !w_p=(/s1%kind  /)
        ! call !write_e(0)
     end select
     s2=t

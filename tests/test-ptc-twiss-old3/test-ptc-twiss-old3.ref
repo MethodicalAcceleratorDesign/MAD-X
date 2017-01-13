@@ -277,7 +277,6 @@ ptc_create_layout,model=2,method=6,nst=10,exact;
           Kinetic Energy : 0.990617E+02
       Particle Rest Mass : 0.938272E+00
                 Momentum : 0.999956E+02
-  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy           100.00000000000000     
      method                   6
@@ -652,8 +651,6 @@ ptc_twiss,icase=5,no=2,initial_matrix_table, file=twiss_ptc_line.orbit0, ignore_
 ptc_end;
 
 
-
-removefile, file='Maxwellian_bend_for_ptc.txt'
 
 stop;
 

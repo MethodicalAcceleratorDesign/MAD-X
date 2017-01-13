@@ -67,7 +67,7 @@ CONTAINS
 
     if (getdebug()==0) global_verbose = .false.
 
-    lielib_print =  (/0,0,0,0,0,0,0,0,0,0,0,0/)
+    lielib_print =  (/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/)
 	 !  lielib_print(1)=1   lieinit prints info
 	 !  lielib_print(2)=1   expflo warning if no convergence
 	 !  lielib_print(3)=1   Shows details in flofacg
@@ -80,6 +80,10 @@ CONTAINS
 	 !  lielib_print(10)=1  print lingyun's checks
 	 !  lielib_print(11)=1  print warning about Teng-Edwards
 	 !  lielib_print(12)=1  print info in make_node_layout
+	 !  lielib_print(13)=1  print info of normal form kernel into file kernel.txt and kernel_spin.txt
+                     !  lielib_print(14)=1  print info about recutting
+                     !  lielib_print(15)=1  print info during flat file reading and printing
+
 
     if (getdebug()>0) then
         lielib_print(9)=1 !prints symplecticity deviation
@@ -87,7 +91,7 @@ CONTAINS
 
     if (getdebug()>1) then
         print*,"Now PTC"
-        lielib_print =  (/1,1,1,1,1,1,1,1,1,1,1,1/)
+        lielib_print =  (/1,1,1,1,1,1,1,1,1,1,1,1,1,1,1/)
     endif
 
     sector_nmul_max = get_value('ptc_create_universe ','sector_nmul_max ')

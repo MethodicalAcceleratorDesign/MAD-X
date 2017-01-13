@@ -1433,26 +1433,7 @@ contains
     ! if(old) then
     call RESET_APERTURE_FLAG
     call LIEINIT(NO1,NV,ND1,NDPT1)   !,0
-    w_p=0
-    w_p%nc=1
-    w_p=(/" Berz's Package  "/)
-    w_p%fc='(1((1X,A72),/))'
-    !       ! call ! WRITE_I
-    !    else
-    !       if(no1>3) then
-    !          w_p=0
-    !          w_p%nc=1
-    !          w_p=(/" No1 is too big: run old=.true."/)
-    !          w_p%fc='(1((1X,A72)))'
-    !          ! call !write_e(-1)
-    !       endif
-    !       w_p=0
-    !       w_p%nc=1
-    !       w_p=(/" Etienne's Experimental Package  "/)
-    !       w_p%fc='(1((1X,A72)))'
-    !       ! call ! WRITE_I
-    !       call newLIEINIT(NO1,NV,ND1,NDPT1,0)
-    !    endif
+   
     call set_in_tpsa( NO,ND,ND2,NP,NDPT,NV,old)
     call set_in_tpsalie( NO,ND,ND2,NP,NDPT,NV,old)
 

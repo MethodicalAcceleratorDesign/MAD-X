@@ -72,7 +72,6 @@ ptc_create_universe;
           Kinetic Energy : 0.199489E+00
       Particle Rest Mass : 0.510999E-03
                 Momentum : 0.199999E+00
-  recomputing with new SECTOR_NMUL and sector_nmul_max            5          10
  Setting MADx with 
      energy          0.20000000000000001     
      method                   6
@@ -80,9 +79,6 @@ ptc_create_universe;
      charge           1.0000000000000000     
   Length of machine:    1.2000000000000002     
  The machine is a LINE
- Total NST due to Bend Closed Orbit            0
- Total NST due to Sextupoles            0
- Biggest ds    5.0000000000000003E-002
  ------------------------------------ PTC Survey ------------------------------------
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     

@@ -69,13 +69,13 @@ contains
   end SUBROUTINE lattice_GET_CHROM
 
 
-  SUBROUTINE lattice_GET_tune(R,my_state,mf)
+  SUBROUTINE lattice_GET_tune(R,my_state,mf,targ)
     IMPLICIT NONE
     TYPE(layout),target,INTENT(INOUT):: r
     TYPE(internal_state), intent(in):: my_state
     TYPE(internal_state) state
     integer mf
-    real(dp) closed(6)
+    real(dp) closed(6),targ(3)
     type(DAMAP) ID
     TYPE(NORMALFORM) NORM
     TYPE(REAL_8) Y(6)
@@ -100,6 +100,7 @@ contains
     CALL TRACK(R,Y,1,STATE)
     NORM=Y
     closed=y
+    targ(1:3)=NORM%tune(1:3)
     WRITE(6,'(6(1x,g21.14),a24)') CLOSED," <-- should be identical"
     if(mf==6) then
      WRITE(6,'(a19,3(1x,g21.14))') "Fractional Tunes = ",norm%tune(1:3)
@@ -1869,10 +1870,10 @@ eta2=0.0_dp
     IF(PRESENT(TURNS)) TURNS0=TURNS
     Nullify(C);
     if(.not.ring%closed) then
-       w_p=0
-       w_p%nc=1
-       w_p%fc='((1X,a72))'
-       w_p%c(1)= " This line is not ring : FIND_ORBIT_LAYOUT "
+       !w_p=0
+       !w_p%nc=1
+       !w_p%fc='((1X,a72))'
+       !w_p%c(1)= " This line is not ring : FIND_ORBIT_LAYOUT "
        ! call !write_e(100)
     endif
     dix(:)=0.0_dp
@@ -1892,11 +1893,11 @@ eta2=0.0_dp
              if(C%magp%kind==kind4.OR.C%magp%kind==kind21) goto 101
              C=>C%NEXT
           enddo
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72,/),(1X,a72))'
-          w_p%c(1)=  " No Cavity in the Line "
-          w_p%c(2)=  " FIND_ORBIT_LAYOUT will crash "
+          !w_p=0
+          !w_p%nc=2
+          !w_p%fc='((1X,a72,/),(1X,a72))'
+          !w_p%c(1)=  " No Cavity in the Line "
+          !w_p%c(2)=  " FIND_ORBIT_LAYOUT will crash "
           ! call !write_e(111)
        ENDIF
     else
@@ -1911,11 +1912,11 @@ eta2=0.0_dp
              if(C%magp%kind==kind4.OR.C%magp%kind==kind21) goto 101
              C=>C%NEXT
           enddo
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72,/),(1X,a72))'
-          w_p%c(1)=  " No Cavity in the Line "
-          w_p%c(2)=  " FIND_ORBIT_LAYOUT will crash "
+          !w_p=0
+          !w_p%nc=2
+          !w_p%fc='((1X,a72,/),(1X,a72))'
+          !w_p%c(1)=  " No Cavity in the Line "
+          !w_p%c(2)=  " FIND_ORBIT_LAYOUT will crash "
           ! call !write_e(112)
        ENDIF
     endif
@@ -1943,11 +1944,11 @@ eta2=0.0_dp
           i=i+1
        enddo
        if(freq==0.0_dp) then
-          w_p=0
-          w_p%nc=2
-          w_p%fc='((1X,a72,/),(1X,a72))'
-          w_p%c(1)=  " No Cavity in the Line or Frequency = 0 "
-          w_p%c(2)=  " FIND_ORBIT_LAYOUT will crash "
+          !w_p=0
+          !w_p%nc=2
+          !w_p%fc='((1X,a72,/),(1X,a72))'
+          !w_p%c(1)=  " No Cavity in the Line or Frequency = 0 "
+          !w_p%c(2)=  " FIND_ORBIT_LAYOUT will crash "
           ! call !write_e(113)
        endif
        IF(RING%HARMONIC_NUMBER>0) THEN
@@ -1984,10 +1985,10 @@ eta2=0.0_dp
           CALL KILL(SX)
           CALL KILL(SXI)
           CALL KILL(IS)
-          w_p=0
-          w_p%nc=1
-          w_p%fc='((1X,a72))'
-          write(w_p%c(1),'(a30,i4)') " Lost in Fixed Point Searcher ",1
+          !w_p=0
+          !w_p%nc=1
+          !w_p%fc='((1X,a72))'
+          write(6,'(a30,i4)') " Lost in Fixed Point Searcher ",1
           messagelost(len_trim(messagelost)+1:255)=" -> Lost in Fixed Point Searcher "
           ! call ! WRITE_I
 
@@ -2018,7 +2019,7 @@ eta2=0.0_dp
        xdix=abs(dix(iu))+xdix
     enddo
 
-    if(verbose) write(w_p%c(1),'(a22,g21.14)') " Convergence Factor = ",xdix
+    if(verbose) write(6,'(a22,g21.14)') " Convergence Factor = ",xdix
     !    if(verbose) ! call ! WRITE_I
     if(xdix.gt.deps_tracking) then
        ite=1
@@ -2181,10 +2182,10 @@ eta2=0.0_dp
           return
        endif
        !       if(.not.check_stable) then
-       !          w_p=0
-       !          w_p%nc=1
-       !          w_p%fc='((1X,a72))'
-       !          write(w_p%c(1),'(a30,i4)') " Lost in Fixed Point Searcher ",2
+       !          !w_p=0
+       !          !w_p%nc=1
+       !          !w_p%fc='((1X,a72))'
+       !          write(6,'(a30,i4)') " Lost in Fixed Point Searcher ",2
        !          ! call ! WRITE_I
 
        !          return
@@ -2650,7 +2651,7 @@ eta2=0.0_dp
 
  end  subroutine point_m_u
 
-  SUBROUTINE  THIN_LENS_resplit(R,THIN,even,lim,lmax0,xbend,sexr,fib,useknob,universe) ! A re-splitting routine
+  SUBROUTINE  THIN_LENS_resplit(R,THIN,even,lim,limit_wiggler,lmax0,xbend,sexr,fib,useknob,universe) ! A re-splitting routine
     IMPLICIT NONE
     INTEGER NTE
     TYPE(layout),target, intent(inout) :: R
@@ -2660,10 +2661,11 @@ eta2=0.0_dp
     real(dp), OPTIONAL, intent(in) ::sexr
     type(fibre), OPTIONAL, target :: fib
     logical(lp), OPTIONAL :: useknob,universe
+    integer, optional :: limit_wiggler(2),lim(2)
     real(dp) gg,RHOI,XL,QUAD,THI,lm,dl,ggbt,xbend1,gf(7),sexr0,quad0,dq
     INTEGER M1,M2,M3, MK1,MK2,MK3,limit(2),parity,inc,nst_tot,ntec,ii,metb,sexk
-    integer incold ,parityold, nt,nsag,lim0(2)
-    integer, optional :: lim(2)
+    integer incold ,parityold, nt,nsag,lim0(2),lims(2),kkk
+
     logical(lp) MANUAL,eject,doit,DOBEND
     TYPE (fibre), POINTER :: C
     logical(lp),optional :: even
@@ -2671,6 +2673,8 @@ eta2=0.0_dp
     logical f1,f2,m_t_pres,uni
     
 !!!! gymnastic for M_u and M_t (these are local m_u and m_t)
+     kkk=lielib_print(12) 
+     lielib_print(12)=0
 
 m_t_pres=my_false
 if(associated(m_u)) then
@@ -2767,6 +2771,7 @@ endif
     limit= limit_int0 
  
     if(present(lim)) limit=lim
+    lims=limit
     if(sixtrack_compatible) then
        limit(1)=1000000
        limit(2)=1000001
@@ -2793,7 +2798,7 @@ endif
        doit=(C%MAG%KIND==kind1.or.C%MAG%KIND==kind2.or.C%MAG%KIND==kind4.or.C%MAG%KIND==kind5)
        doit=DOIT.OR.(C%MAG%KIND==kind6.or.C%MAG%KIND==kind7)
        DOIT=DOIT.OR.(C%MAG%KIND==kind10.or.C%MAG%KIND==kind16)
-       DOIT=DOIT.OR.(C%MAG%KIND==kind17.or.C%MAG%KIND==kindwiggler)
+       DOIT=DOIT.OR.(C%MAG%KIND==kind17.or.C%MAG%KIND==kindwiggler.or.C%MAG%KIND==KINDhel)
        doit=doit.and.C%MAG%recut
 
        if(doit) then
@@ -2818,15 +2823,14 @@ endif
         C=>C%NEXT
        endif
     enddo
-    if (lielib_print(12) > 0) then
-      write(6,*) "Previous of cutable Elements ",r%NTHIN
-      write(6,*) "METHOD 2 ",M1,MK1
-      write(6,*) "METHOD 4 ",M2,MK2
-      write(6,*) "METHOD 6 ",M3,MK3
-      write(6,*)   "number of Slices ", MK1+MK2+MK3
-      write(6,*)   "Total NST ", NST_tot
-    endif
-    
+if(lielib_print(14)==1) then
+    write(6,*) "Previous of cutable Elements ",r%NTHIN
+    write(6,*) "METHOD 2 ",M1,MK1
+    write(6,*) "METHOD 4 ",M2,MK2
+    write(6,*) "METHOD 6 ",M3,MK3
+    write(6,*)   "number of Slices ", MK1+MK2+MK3
+    write(6,*)   "Total NST ", NST_tot
+endif
     if(eject) then
        !      limit(1)=limit0(1)
        !      limit(2)=limit0(2)
@@ -2880,8 +2884,15 @@ endif
           parity=0
           inc=1
        endif
-             if(C%MAG%KIND==kindwiggler)  limit=limit_sag
-
+             if(C%MAG%KIND==kindwiggler)  then
+                if(present(limit_wiggler)) then
+                 limit=limit_wiggler
+                else
+                 limit=limit_sag
+                endif
+             else
+               limit=lims
+             endif
        !       if(doit)  then
 
        select case(resplit_cutting)
@@ -2891,7 +2902,7 @@ endif
           doit=(C%MAG%KIND==kind1.or.C%MAG%KIND==kind2.or.C%MAG%KIND==kind4.or.C%MAG%KIND==kind5)
           doit=DOIT.OR.(C%MAG%KIND==kind6.or.C%MAG%KIND==kind7)
           DOIT=DOIT.OR.(C%MAG%KIND==kind10.or.C%MAG%KIND==kind16)
-          DOIT=DOIT.OR.(C%MAG%KIND==kind17.or.C%MAG%KIND==kindwiggler)
+          DOIT=DOIT.OR.(C%MAG%KIND==kind17.or.C%MAG%KIND==kindwiggler.or.C%MAG%KIND==KINDhel)
           doit=doit.and.C%MAG%recut
           if(doit) then
              xl=C%MAG%L
@@ -2913,6 +2924,11 @@ endif
              ENDIF
              if(C%MAG%KIND==kind5.or.C%MAG%KIND==kind17) then
                 quad=quad+(C%MAG%b_sol)**2/4.0_dp !+abs(C%MAG%b_sol/2.0_dp)
+             endif
+             if(C%MAG%KIND==kind10) then
+               if(associated(c%mag%tp10%ae).and.associated(c%mag%tp10%be)) then
+                quad=quad+SQRT(c%mag%tp10%ae(2)**2+c%mag%tp10%be(2)**2)*volt_c/c%mag%p%p0c  
+              endif
              endif
              if(C%MAG%KIND==kindwiggler) then
                call eval_thin_q(C%MAG%wi,dQ,nsag)
@@ -2997,7 +3013,7 @@ endif
           doit=(C%MAG%KIND==kind1.or.C%MAG%KIND==kind2.or.C%MAG%KIND==kind4.or.C%MAG%KIND==kind5)
           doit=DOIT.OR.(C%MAG%KIND==kind6.or.C%MAG%KIND==kind7)
           DOIT=DOIT.OR.(C%MAG%KIND==kind10.or.C%MAG%KIND==kind16)
-          DOIT=DOIT.OR.(C%MAG%KIND==kind17.or.C%MAG%KIND==kindwiggler)
+          DOIT=DOIT.OR.(C%MAG%KIND==kind17.or.C%MAG%KIND==kindwiggler.or.C%MAG%KIND==KINDhel)
           doit=doit.and.C%MAG%recut
 
           if(doit) then
@@ -3020,6 +3036,11 @@ endif
              ENDIF
              if(C%MAG%KIND==kind5.or.C%MAG%KIND==kind17) then
                 quad=quad+(C%MAG%b_sol)**2/4.0_dp   !+abs(C%MAG%b_sol/2.0_dp)
+             endif
+             if(C%MAG%KIND==kind10) then
+               if(associated(c%mag%tp10%ae).and.associated(c%mag%tp10%be)) then
+                quad=quad+SQRT(c%mag%tp10%ae(2)**2+c%mag%tp10%be(2)**2)*volt_c/c%mag%p%p0c  
+              endif
              endif
              if(C%MAG%KIND==kindwiggler) then
                call eval_thin_q(C%MAG%wi,dQ,nsag)
@@ -3107,13 +3128,14 @@ endif
              !             endif
           endif
 
-       case(2)
+       case(2,-2)
 
+          doit=.not.(resplit_cutting==-2.and.C%MAG%KIND==kind1)
 
           doit=(C%MAG%KIND==kind1.or.C%MAG%KIND==kind2.or.C%MAG%KIND==kind4.or.C%MAG%KIND==kind5)
           doit=DOIT.OR.(C%MAG%KIND==kind6.or.C%MAG%KIND==kind7)
           DOIT=DOIT.OR.(C%MAG%KIND==kind10.or.C%MAG%KIND==kind16)
-          DOIT=DOIT.OR.(C%MAG%KIND==kind17.or.C%MAG%KIND==kindwiggler)
+          DOIT=DOIT.OR.(C%MAG%KIND==kind17.or.C%MAG%KIND==kindwiggler.or.C%MAG%KIND==KINDhel)
           doit=doit.and.C%MAG%recut
 
           if(doit) then
@@ -3136,6 +3158,11 @@ endif
              ENDIF
              if(C%MAG%KIND==kind5.or.C%MAG%KIND==kind17) then
                 quad=quad+(C%MAG%b_sol)**2/4.0_dp   !+abs(C%MAG%b_sol/2.0_dp)
+             endif
+             if(C%MAG%KIND==kind10) then
+               if(associated(c%mag%tp10%ae).and.associated(c%mag%tp10%be)) then
+                quad=quad+SQRT(c%mag%tp10%ae(2)**2+c%mag%tp10%be(2)**2)*volt_c/c%mag%p%p0c  
+              endif
              endif
              if(C%MAG%KIND==kindwiggler) then
                call eval_thin_q(C%MAG%wi,dQ,nsag)
@@ -3239,8 +3266,16 @@ endif
        case default
           stop 988
        end select
-             if(C%MAG%KIND==kindwiggler)  limit=lim0
-             
+ 
+             if(C%MAG%KIND==kindwiggler)  then
+                if(present(limit_wiggler)) then
+                 limit=limit_wiggler
+                else
+                 limit=limit_sag
+                endif
+             else
+               limit=lims
+             endif             
 
        !      endif
        NST_tot=NST_tot+C%MAG%P%nst
@@ -3256,25 +3291,28 @@ endif
 
     enddo   !   end of do   WHILE
 
-
-    if (lielib_print(12) > 0) then
-      write(6,*) "Present of cutable Elements ",r%NTHIN
-      write(6,*) "METHOD 2 ",M1,MK1
-      write(6,*) "METHOD 4 ",M2,MK2
-      write(6,*) "METHOD 6 ",M3,MK3
-      write(6,*)   "number of Slices ", MK1+MK2+MK3
-      write(6,*)   "Total NST ", NST_tot
-    endif
-      
+if(lielib_print(14)==1) then
+    write(6,*) "Present of cutable Elements ",r%NTHIN
+    write(6,*) "METHOD 2 ",M1,MK1
+    write(6,*) "METHOD 4 ",M2,MK2
+    write(6,*) "METHOD 6 ",M3,MK3
+    write(6,*)   "number of Slices ", MK1+MK2+MK3
+    write(6,*)   "Total NST ", NST_tot
+endif
     if(radiation_bend_split) then
+if(lielib_print(14)==1) then
        write(6,*)   "Total NST due to Bend Closed Orbit ", int(ggbt)
        write(6,*)   "Restricted to method=2 for radiation or spin "
+endif
     else
+if(lielib_print(14)==1) then
        write(6,*)   "Total NST due to Bend Closed Orbit ", int(ggbt)
+endif
     endif
+if(lielib_print(14)==1) then
     write(6,*)   "Total NST due to Sextupoles ", sexk
     write(6,*)   "Biggest ds ", max_ds
-
+endif
 
 
     IF(MANUAL) THEN
@@ -3297,9 +3335,20 @@ endif
        ELSE
           GOTO 1001
        ENDIF
+    else
+          if(f1) then
+             l=>r%parent_universe%start
+             do ii=1,r%parent_universe%n
+                call make_node_layout(l)
+                l=>l%next
+             enddo
+          elseif(f2) then
+             call make_node_layout(r)  !!! bug (l) was wrong
+          endif
+
     ENDIF
 
-
+     lielib_print(12)=kkk
     !    limit(1)=limit0(1)
     !    limit(2)=limit0(2)
 
@@ -3551,19 +3600,20 @@ endif
 !idi%v(nn)=idi%v(nn)-idh%v(nn)
 !call print(idi%v(nn),6)
 
-  SUBROUTINE  THIN_LENS_restart(R,fib,useknob,universe) ! A re-splitting routine
+  SUBROUTINE  THIN_LENS_restart(R,fib,useknob,universe,ignore_recut) ! A re-splitting routine
     IMPLICIT NONE
     INTEGER NTE
     TYPE(layout),target, intent(inout) :: R
     INTEGER M1,M2,M3, MK1,MK2,MK3,nst_tot,ii,nt  !,limit0(2)
     type(fibre), OPTIONAL, target :: fib
-    logical(lp), OPTIONAL :: useknob,universe
+    logical(lp), OPTIONAL :: useknob,universe,ignore_recut
     logical(lp) doit,uni,m_t_pres
     TYPE (fibre), POINTER :: C
     TYPE (layout), POINTER :: l
-    !    logical(lp) doneit
+     logical(lp) ignore 
     nullify(C)
-
+ignore=.false.
+if(present(ignore_recut)) ignore=ignore_recut
     !    CALL LINE_L(R,doneit)
 m_t_pres=my_false
 if(associated(m_u)) then
@@ -3640,7 +3690,9 @@ endif
      C=>R%START
     endif
     do  ii=1,nt    ! WHILE(ASSOCIATED(C))
-       doit=.true.
+
+       doit=c%mag%recut.or.(ignore)
+
        if(present(useknob)) then
           if(useknob) then
              doit=c%magp%knob
@@ -3696,15 +3748,14 @@ endif
              endif
     enddo
 
-
-    if (lielib_print(12) > 0) then
-      write(6,*) "Present of cutable Elements ",r%NTHIN
-      write(6,*) "METHOD 2 ",M1,MK1
-      write(6,*) "METHOD 4 ",M2,MK2
-      write(6,*) "METHOD 6 ",M3,MK3
-      write(6,*)   "number of Slices ", MK1+MK2+MK3
-      write(6,*)   "Total NST ", NST_tot
-    endif
+if(lielib_print(14)==1) then
+    write(6,*) "Present of cutable Elements ",r%NTHIN
+    write(6,*) "METHOD 2 ",M1,MK1
+    write(6,*) "METHOD 4 ",M2,MK2
+    write(6,*) "METHOD 6 ",M3,MK3
+    write(6,*)   "number of Slices ", MK1+MK2+MK3
+    write(6,*)   "Total NST ", NST_tot
+endif
 
 
     !    CALL RING_L(R,doneit)
