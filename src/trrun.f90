@@ -4099,7 +4099,7 @@ end subroutine ttrfmult
 subroutine tttquad(track, ktrack)
   use twtrrfi
   use trackfi
-  use math_constfi, only : zero, one, two, half
+  use math_constfi, only : zero, one, two, three, half
   implicit none
   !-------------------------*
   ! Andrea Latina 2012-2013 *
@@ -4129,7 +4129,7 @@ subroutine tttquad(track, ktrack)
   integer :: jtrk
 
   double precision, external :: node_value
-  double precision, parameter ::  sqrt2=1.41421356237310d0, three=3d0
+  double precision, parameter ::  sqrt2=1.41421356237310d0
 
   double precision, external :: get_value
 
@@ -4283,7 +4283,7 @@ end subroutine tttquad
 subroutine tttdipole(track, ktrack)
   use twtrrfi
   use trackfi
-  use math_constfi, only : zero, one, two, three, five, seven, half
+  use math_constfi, only : zero, one, two, three, half
   implicit none
   !-------------------------*
   ! Andrea Latina 2013-2014 *
@@ -4356,8 +4356,8 @@ subroutine tttdipole(track, ktrack)
 
      !---- Radiation effects at entrance.
      if (radiate) then
-        !hx = (-k0 -k1*x + k1s*y  - k2*(x*x - y*y) + k2s*x*y) / delta_plus_1; ! if there were k1s k2 and k2s
-        !hy = (     k1*y + k1s*x  + k2*x*y + k2s*(x*x - y*y)) / delta_plus_1;
+        !hx = (-k0 -k1*x + k1s*y  - k2*(x*x - y*y)/two + k2s*x*y) / delta_plus_1; ! if there were k1s k2 and k2s
+        !hy = (     k1*y + k1s*x  + k2*x*y + k2s*(x*x - y*y)/two) / delta_plus_1;
         hx = (-k0 -k1*x) / delta_plus_1;
         hy = (     k1*y) / delta_plus_1;
         if (quantum) then
@@ -4421,8 +4421,8 @@ subroutine tttdipole(track, ktrack)
 
      !---- Radiation effects at exit.
      if (radiate) then
-        !hx = (-k0 -k1*x + k1s*y  - k2*(x*x - y*y) + k2s*x*y) / delta_plus_1; ! if there were k1s k2 and k2s
-        !hy = (     k1*y + k1s*x  + k2*x*y + k2s*(x*x - y*y)) / delta_plus_1;
+        !hx = (-k0 -k1*x + k1s*y  - k2*(x*x - y*y)/two + k2s*x*y) / delta_plus_1; ! if there were k1s k2 and k2s
+        !hy = (     k1*y + k1s*x  + k2*x*y + k2s*(x*x - y*y)/two) / delta_plus_1;
         hx = (-k0 -k1*x) / delta_plus_1;
         hy = (     k1*y) / delta_plus_1;
         if (quantum) then
