@@ -3,7 +3,7 @@
   +     MAD-X 5.02.13  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2016.12.20               +
-  + Execution date: 2017.01.13 16:21:41      +
+  + Execution date: 2017.01.13 17:31:45      +
   ++++++++++++++++++++++++++++++++++++++++++++
 mydrift: drift, l=1;
 
@@ -206,16 +206,6 @@ obs_points pro_ptc_setswitch Done
 
            pycomin             tcomin            ptcomin 
                  0                 -0                  0 
-!  ptc_twiss, icase=6, no=2, betx=10, bety=10,betz=10;
-
-  
-
-!  plot, table=ptc_twiss, vaxis=beta11,beta22, haxis=s;
-
-!  plot, table=ptc_twiss, vaxis=mu3, haxis=s;
-
-!  plot, table=ptc_twiss, vaxis=energy, haxis=s;
-
   
 
   write, table=twiss, file="ptc.twiss";
@@ -228,30 +218,13 @@ obs_points pro_ptc_setswitch Done
 
 
 
+  bx = table(twiss, m, beta11);
 
+  by = table(twiss, m, beta22);
 
-plot, haxis=s, vaxis=beta11,beta22, colour=100;
+  qx = table(twiss, myline$end, mu1);
 
-Plot - default table plotted: twiss
-
- GXPLOT-X11  1.50 initialized
-
- plot number =            1
-plot, haxis=s, vaxis=disp1, colour=100;
-
-Plot - default table plotted: twiss
- plot number =            2
-!plot, haxis=s, vaxis=x, colour=100;
-
-
-
-bx = table(twiss, m, beta11);
-
-by = table(twiss, m, beta22);
-
-qx = table(twiss, myline$end, mu1);
-
-qy = table(twiss, myline$end, mu2);
+  qy = table(twiss, myline$end, mu2);
 
 
 
@@ -259,78 +232,78 @@ qy = table(twiss, myline$end, mu2);
 
 
 
-na = sx1_k2*sx1_l*sqrt(bx*bx*bx);
+  na = sx1_k2*sx1_l*sqrt(bx*bx*bx);
 
 
 
-dc = 48*(1-cos(2*pi*3*qx));
+  dc = 48*(1-cos(2*pi*3*qx));
 
-dd = -48*sin(2*pi*3*qx);
-
-
-
-f3000_de = dc*dc+dd*dd;
-
-f3000_re = -1*(na*dc/f3000_de);
-
-f3000_im = -1*(-na*dd/f3000_de);
+  dd = -48*sin(2*pi*3*qx);
 
 
 
-h3000_re = -1*na/48;
+  f3000_de = dc*dc+dd*dd;
+
+  f3000_re = -1*(na*dc/f3000_de);
+
+  f3000_im = -1*(-na*dd/f3000_de);
+
+
+
+  h3000_re = -1*na/48;
 
 
 
 
 
-!1200
+  !1200
 
-dc = 16*(1-cos(-2*pi*qx));
+  dc = 16*(1-cos(-2*pi*qx));
 
 ++++++ info: dc redefined
-dd = -16*sin(-2*pi*qx);
+  dd = -16*sin(-2*pi*qx);
 
 ++++++ info: dd redefined
-f1200_de = dc*dc+dd*dd;
+  f1200_de = dc*dc+dd*dd;
 
-f1200_re = -1*(na*dc/f1200_de);
+  f1200_re = -1*(na*dc/f1200_de);
 
-f1200_im = -1*(-na*dd/f1200_de);
-
-
-
-ff3000_re = table(nonlin, GNFC_3_0_0_0_0_0,value);
-
-ff3000_im = table(nonlin, GNFS_3_0_0_0_0_0,value);
+  f1200_im = -1*(-na*dd/f1200_de);
 
 
 
-value, f3000_re, ff3000_re, f3000_re - ff3000_re;
+  ff3000_re = table(nonlin, GNFC_3_0_0_0_0_0,value);
+
+  ff3000_im = table(nonlin, GNFS_3_0_0_0_0_0,value);
+
+
+
+  value, f3000_re, ff3000_re, f3000_re - ff3000_re;
 
 f3000_re           =   -0.0002382050496 ;
 ff3000_re          =   -0.0002366862262 ;
 f3000_re-ff3000_re =   -1.518823391e-06 ;
 
 
-value, f3000_im, ff3000_im, f3000_im - ff3000_im;
+  value, f3000_im, ff3000_im, f3000_im - ff3000_im;
 
 f3000_im           =   -0.0008250049825 ;
 ff3000_im          =   -0.0008288856879 ;
 f3000_im-ff3000_im =    3.880705458e-06 ;
 
 
-ff1200_re = table(nonlin, GNFC_1_2_0_0_0_0,value);
+  ff1200_re = table(nonlin, GNFC_1_2_0_0_0_0,value);
 
-ff1200_im = table(nonlin, GNFS_1_2_0_0_0_0,value);
+  ff1200_im = table(nonlin, GNFS_1_2_0_0_0_0,value);
 
 
 
-value, f1200_re, ff1200_re, f1200_re - ff1200_re;
+  value, f1200_re, ff1200_re, f1200_re - ff1200_re;
 
 f1200_re           =   -0.0007146151489 ;
 ff1200_re          =   -0.0007170484709 ;
 f1200_re-ff1200_re =    2.433321965e-06 ;
-value, f1200_im, ff1200_im, f1200_im - ff1200_im;
+  value, f1200_im, ff1200_im, f1200_im - ff1200_im;
 
 f1200_im           =    0.0003276537117 ;
 ff1200_im          =    0.0003296206867 ;
@@ -339,16 +312,16 @@ f1200_im-ff1200_im =   -1.966974994e-06 ;
 
 
 
-hh3000_im = table(nonlin, HAMS_3_0_0_0_0_0, value);
+  hh3000_im = table(nonlin, HAMS_3_0_0_0_0_0, value);
 
-value, hh3000_im;
+  value, hh3000_im;
 
 hh3000_im          =   -1.406821269e-06 ;
 
 
-hh3000_re = table(nonlin, HAMC_3_0_0_0_0_0, value);
+  hh3000_re = table(nonlin, HAMC_3_0_0_0_0_0, value);
 
-value, h3000_re, hh3000_re, h3000_re - hh3000_re;
+  value, h3000_re, hh3000_re, h3000_re - hh3000_re;
 
 h3000_re           =   -0.0004764100993 ;
 hh3000_re          =   -0.0004782448704 ;

@@ -48,67 +48,57 @@ ptc_create_universe;
 
   
   ptc_twiss, table=twiss, icase=5, no=4, closed_orbit=false, rmatrix, normal, writetmap;
-!  ptc_twiss, icase=6, no=2, betx=10, bety=10,betz=10;
-  
-!  plot, table=ptc_twiss, vaxis=beta11,beta22, haxis=s;
-!  plot, table=ptc_twiss, vaxis=mu3, haxis=s;
-!  plot, table=ptc_twiss, vaxis=energy, haxis=s;
   
   write, table=twiss, file="ptc.twiss";
   write, table=ptc_twiss_summary, file="ptc.summ.twiss";
   write, table=nonlin, file="ptc.nonlin";
 
 
-
-plot, haxis=s, vaxis=beta11,beta22, colour=100;
-plot, haxis=s, vaxis=disp1, colour=100;
-!plot, haxis=s, vaxis=x, colour=100;
-
-bx = table(twiss, m, beta11);
-by = table(twiss, m, beta22);
-qx = table(twiss, myline$end, mu1);
-qy = table(twiss, myline$end, mu2);
+  bx = table(twiss, m, beta11);
+  by = table(twiss, m, beta22);
+  qx = table(twiss, myline$end, mu1);
+  qy = table(twiss, myline$end, mu2);
 
 
 
-na = sx1_k2*sx1_l*sqrt(bx*bx*bx);
+  na = sx1_k2*sx1_l*sqrt(bx*bx*bx);
 
-dc = 48*(1-cos(2*pi*3*qx));
-dd = -48*sin(2*pi*3*qx);
+  dc = 48*(1-cos(2*pi*3*qx));
+  dd = -48*sin(2*pi*3*qx);
 
-f3000_de = dc*dc+dd*dd;
-f3000_re = -1*(na*dc/f3000_de);
-f3000_im = -1*(-na*dd/f3000_de);
+  f3000_de = dc*dc+dd*dd;
+  f3000_re = -1*(na*dc/f3000_de);
+  f3000_im = -1*(-na*dd/f3000_de);
 
-h3000_re = -1*na/48;
-
-
-!1200
-dc = 16*(1-cos(-2*pi*qx));
-dd = -16*sin(-2*pi*qx);
-f1200_de = dc*dc+dd*dd;
-f1200_re = -1*(na*dc/f1200_de);
-f1200_im = -1*(-na*dd/f1200_de);
-
-ff3000_re = table(nonlin, GNFC_3_0_0_0_0_0,value);
-ff3000_im = table(nonlin, GNFS_3_0_0_0_0_0,value);
-
-value, f3000_re, ff3000_re, f3000_re - ff3000_re;
-
-value, f3000_im, ff3000_im, f3000_im - ff3000_im;
-
-ff1200_re = table(nonlin, GNFC_1_2_0_0_0_0,value);
-ff1200_im = table(nonlin, GNFS_1_2_0_0_0_0,value);
-
-value, f1200_re, ff1200_re, f1200_re - ff1200_re;
-value, f1200_im, ff1200_im, f1200_im - ff1200_im;
+  h3000_re = -1*na/48;
 
 
-hh3000_im = table(nonlin, HAMS_3_0_0_0_0_0, value);
-value, hh3000_im;
+  !1200
+  dc = 16*(1-cos(-2*pi*qx));
+  dd = -16*sin(-2*pi*qx);
+  f1200_de = dc*dc+dd*dd;
+  f1200_re = -1*(na*dc/f1200_de);
+  f1200_im = -1*(-na*dd/f1200_de);
 
-hh3000_re = table(nonlin, HAMC_3_0_0_0_0_0, value);
-value, h3000_re, hh3000_re, h3000_re - hh3000_re;
+  ff3000_re = table(nonlin, GNFC_3_0_0_0_0_0,value);
+  ff3000_im = table(nonlin, GNFS_3_0_0_0_0_0,value);
+
+  value, f3000_re, ff3000_re, f3000_re - ff3000_re;
+
+  value, f3000_im, ff3000_im, f3000_im - ff3000_im;
+
+  ff1200_re = table(nonlin, GNFC_1_2_0_0_0_0,value);
+  ff1200_im = table(nonlin, GNFS_1_2_0_0_0_0,value);
+
+  value, f1200_re, ff1200_re, f1200_re - ff1200_re;
+  value, f1200_im, ff1200_im, f1200_im - ff1200_im;
+
+
+  hh3000_im = table(nonlin, HAMS_3_0_0_0_0_0, value);
+  value, hh3000_im;
+
+  hh3000_re = table(nonlin, HAMC_3_0_0_0_0_0, value);
+  value, h3000_re, hh3000_re, h3000_re - hh3000_re;
 
 
 ptc_end;
