@@ -1648,7 +1648,7 @@ tests/test-ptc-twiss-3/twiss-table.cfg -text
 tests/test-ptc-twiss-3/twiss-table.ref -text
 tests/test-ptc-twiss-4/test-ptc-twiss-4.cfg -text
 tests/test-ptc-twiss-4/test-ptc-twiss-4.madx -text
-tests/test-ptc-twiss-4/test-ptc-twiss-4.ref -text
+tests/test-ptc-twiss-4/test-ptc-twiss-4.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-56D/leir.56d.ptc.summ.twiss.cfg -text
 tests/test-ptc-twiss-56D/leir.56d.ptc.summ.twiss.ref -text
 tests/test-ptc-twiss-56D/leir.56d.ptc.twiss.cfg -text
