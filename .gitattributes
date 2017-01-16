@@ -1759,12 +1759,17 @@ tests/test-ptc-twiss-maptable/map_table.tfs.ref -text
 tests/test-ptc-twiss-maptable/test-ptc-twiss-maptable.cfg -text
 tests/test-ptc-twiss-maptable/test-ptc-twiss-maptable.madx -text
 tests/test-ptc-twiss-maptable/test-ptc-twiss-maptable.ref -text
+tests/test-ptc-twiss-normal-5D/fort.18.cfg -text
+tests/test-ptc-twiss-normal-5D/fort.18.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-5D/leir.5D.ptc.nonlin.cfg -text
 tests/test-ptc-twiss-normal-5D/leir.5D.ptc.nonlin.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-normal-5D/leir.5D.ptc.summ.twiss.cfg -text
 tests/test-ptc-twiss-normal-5D/leir.5D.ptc.summ.twiss.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-normal-5D/leir.5D.ptc.twiss.cfg -text
 tests/test-ptc-twiss-normal-5D/leir.5D.ptc.twiss.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-5D/ptc_map_table.tfs.cfg -text
 tests/test-ptc-twiss-normal-5D/ptc_map_table.tfs.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-twiss-normal-5D/ptc_normal_results.tfs.cfg -text
 tests/test-ptc-twiss-normal-5D/ptc_normal_results.tfs.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-normal-5D/test-ptc-twiss-normal-5D.cfg -text
 tests/test-ptc-twiss-normal-5D/test-ptc-twiss-normal-5D.madx -text
