@@ -1788,7 +1788,6 @@ tests/test-ptc-twiss-normal-6D/ptc_normal_results.tfs.cfg -text
 tests/test-ptc-twiss-normal-6D/ptc_normal_results.tfs.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-normal-6D/test-ptc-twiss-normal-6D.cfg -text
 tests/test-ptc-twiss-normal-6D/test-ptc-twiss-normal-6D.madx -text
-tests/test-ptc-twiss-normal-6D/test-ptc-twiss-normal-6D.out -text
 tests/test-ptc-twiss-normal-6D/test-ptc-twiss-normal-6D.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-twiss-normal-genfu/normal.tfs -text
 tests/test-ptc-twiss-normal-genfu/ptc.nonlin.cfg -text
