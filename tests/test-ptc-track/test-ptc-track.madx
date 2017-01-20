@@ -1,0 +1,116 @@
+!Example file showing the usage of PTC_TRACK command 
+!that sets the internal state (i.e switches) of PTC
+!
+!Piotr Skowronski (CERN)
+!
+! examples/ptc_madx_interface/intstate/intstate.ptc.madx
+!
+option,-echo;
+option,-info;
+
+LQL := 0.220; ! length of QL
+LQS := 0.124; ! length of QS
+CAVLENGTH := 0.25;
+QL  : QUADRUPOLE, L=LQL; ! QL quadrupole
+QS  : QUADRUPOLE, L=LQS; ! QS quadrupole
+
+
+RFCAV_LAG := 0/360.;
+
+RFCAV      : RFCAVITY,  L=CAVLENGTH, VOLT=20.0d0, LAG:=RFCAV_LAG, FREQ=300.; !300MHz 25cm long, due to transit time factor max accel is 15MeV 
+
+
+ds_ql     : drift, l=0.25;    ! short drift between quads in Daniels design
+ds_trip   : drift, l=(3.34-CAVLENGTH)/2.; ! long drift between quads in Daniels design
+cell_mrk  : marker;
+cell_q1   : marker;
+cell_q3   : marker;
+beforecav : marker;
+bc : marker;
+aftercav  : marker;
+k_ls1     := -1.53125*.56/LQL; ! weaker foc.
+k_ls2     :=  1.53125/LQL;     ! weaker foc.
+quad_l1   : quadrupole, l=LQL,   k1=k_ls1;
+quad_l2   : quadrupole, l=LQL/2, k1=k_ls2;
+LDLS      :=(LQL-LQS)/2.; ! half L difference of QL and QS
+dls       : DRIFT, L=LDLS; ! 0.048 m
+
+ctfcell  : line=( quad_l2,ds_ql,quad_l1,cell_q1,ds_trip ,cell_mrk,
+                  beforecav, 
+                  RFCAV,
+                  aftercav,
+                  ds_trip,cell_q3,quad_l1,ds_ql,quad_l2);
+
+ctf   : line=(1*ctfcell);
+
+! calculate Twiss parameters for regular cell structure
+beam, PARTICLE=ELECTRON, ENERGY=.12d0;
+
+USE, period=ctf;
+
+
+ptc_create_universe;
+ptc_create_layout, model=1, method=2, nst=10, exact=false, closed_layout=false;
+
+
+Tstart=-0.5;
+while (Tstart < 0.501)
+ {
+   ptc_start, x=0, px=0, y=0, py=0, pt=0, t=Tstart;
+   Tstart = Tstart + 0.05; 
+ }
+
+
+ptc_setswitch, debuglevel=1, maxacceleration=false, exact_mis=true, time=true, totalpath=false, fringe=true;
+
+ptc_track, icase=6, element_by_element, onetable, dump, maxaper={1e6,1e6,1e6,1e6,1e6,1e6};
+
+ptc_track_end;
+
+ptc_end;
+
+renamefile, file="trackone", to="trackoneLag0";
+
+
+RFCAV_LAG := 90/360.;
+
+
+ptc_create_universe;
+ptc_create_layout, model=1, method=2, nst=10, exact=false, closed_layout=false;
+
+
+Tstart=-0.5;
+while (Tstart < 0.501)
+ {
+   ptc_start, x=0, px=0, y=0, py=0, pt=0, t=Tstart;
+   Tstart = Tstart + 0.05; 
+ }
+
+
+ptc_setswitch, debuglevel=1, maxacceleration=false, exact_mis=true, time=true, totalpath=false, fringe=true;
+
+ptc_track, icase=6, element_by_element, onetable, dump, maxaper={1e6,1e6,1e6,1e6,1e6,1e6};
+
+ptc_track_end;
+
+ptc_end;
+
+renamefile, file="trackone", to="trackoneLag90";
+
+
+
+
+
+
+
+ptc_end;
+
+
+stop;
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!  SSSSS  TTTTT   OOO   PPP
+!  S        T    O   O  P  P
+!  SSSSS    T    O   O  PPP
+!      S    T    O   O  P
+!  SSSSS    T     OOO   P
+!
