@@ -749,6 +749,7 @@ char command_def[] =
 "file     = [s, track, track], "
 "extension= [s, none, none], "
 "ffile    = [i, 1], "
+"rootntuple = [l, false, true], "/*writes all the tracks in ROOT NTuple -> works only if program is dynamically linked and RPLOT plugin is present */
 "maxaper= [r, {0.1, 0.01, 0.1, 0.01, 1., 0.1}], "
 "norm_out = [l, false, true], "
 "norm_no  = [i, 1]; "

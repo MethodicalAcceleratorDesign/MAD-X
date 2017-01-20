@@ -211,12 +211,17 @@ CONTAINS
     !hbu
     data vec_names  / 'x', 'px', 'y', 'py', 't', 'pt','s' / ! MADX
     !data vec_names / 'x', 'px', 'y', 'py', 'pt', 't','s' / ! PTC has a reverse order for pt and t
-
+    logical(lp) rplot
     !k    data char_a / ' ' /
     !-------------------------------------------------------------------------
     
     if (getdebug() > 2) then
       ptc_track_debug = .true.
+    endif
+
+    rplot = get_value('ptc_track ','rootntuple ') .ne. 0
+    if (rplot) then
+       call newrplot()
     endif
     
     ! default value
@@ -408,6 +413,8 @@ CONTAINS
     Call Final_Coord_to_tables ! Complete all tables by one subroutine:
     !'trackone' filled before by by tt_puttab_coord, 'track.obs$$$$.p$$$$' by
     ! tt_putone_coord  and, the summary table 'tracksumm'
+    
+    if (rplot) call rplotfinish()
 
 
     Output_observ_with_PTC: IF(closed_orbit .AND. &
@@ -785,6 +792,13 @@ CONTAINS
         call print(MYSTATE,6)
         print *, "after call print(MYSTATE,6)"
       endif
+      
+      if ( MYSTATE%TOTALPATH .gt. 0 ) then 
+        print *, "********************************************************************"
+        print *, "MAXAPER check of T variable not to be done because TOTALPATH is used"
+        print *, "********************************************************************"
+      endif
+      
     END SUBROUTINE Call_my_state_and_update_states
     !=============================================================================
 
@@ -1257,8 +1271,20 @@ CONTAINS
             if (ptc_track_debug) then                                                 !XXXX  !   !
                  print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture !XXXX  !   !
             endif                                                                            !   !
+
             if (abs(current_x_coord_incl_co(1)).ge.maxaper(1).or. &                          !   !
-                abs(current_x_coord_incl_co(3)).ge.maxaper(3)) flag_index_ptc_aperture = 50  !   !
+                abs(current_x_coord_incl_co(2)).ge.maxaper(2).or. &                          !   !
+                abs(current_x_coord_incl_co(3)).ge.maxaper(3).or. &                          !   !
+                abs(current_x_coord_incl_co(4)).ge.maxaper(4)) flag_index_ptc_aperture = 50  !   !
+                
+            if (icase_ptc .gt. 4) then                            !   !
+              if (abs(current_x_coord_incl_co(5)).ge.maxaper(6)) flag_index_ptc_aperture = 50!   !
+            endif 
+
+            if ( (icase_ptc .gt. 5) .and. (MYSTATE%TOTALPATH .eq. 0) ) then                  !   !
+              if (abs(current_x_coord_incl_co(6)).ge.maxaper(5)) flag_index_ptc_aperture = 50!   !
+            endif 
+            
             !                                                                                !   !
             if_ptc_track_unstable: IF (flag_index_ptc_aperture/=0) then ! =========!         +   ^
                ! => particle is lost !!(?)                                         !         +   !
@@ -1456,6 +1482,21 @@ CONTAINS
                !                                                                                 +  ^ !
                call track_probe_x(my_ring,current_x_coord_incl_co,MYSTATE, &                     !  ! !
                     fibre1=i_current_elem,fibre2=i_current_elem+1)                               !  ! !
+               
+               
+               if (rplot) then
+                   call plottrack(j_th_partic, i_current_elem+1, i_th_turn, & 
+                                           current_x_coord_incl_co(1), &
+                                           current_x_coord_incl_co(2), &
+                                           current_x_coord_incl_co(3), &
+                                           current_x_coord_incl_co(4), &
+                                           current_x_coord_incl_co(5), &
+		   sqrt(current%mag%p%p0c**2 + (current%mass)**2), &
+		   current_x_coord_incl_co(6))
+                  !   endif
+               endif
+
+	
 !               call track(my_ring,current_x_coord_incl_co, &                                    !  ! !
 !                    i_current_elem,i_current_elem+1,MYSTATE)                                    !  ! o
                ! The PTC subroutine " To TRACK the MY_RING for X coordinates                     +  ! v
@@ -1511,8 +1552,19 @@ CONTAINS
                if (ptc_track_debug) then                                                 !XXXX   !    !
                   print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture   !XXXX   !    !
                endif                                                                             !    !
-               if (abs(current_x_coord_incl_co(1)).ge.maxaper(1).or. &                           !    !
-                   abs(current_x_coord_incl_co(3)).ge.maxaper(3)) flag_index_ptc_aperture = 50   !    !
+
+               if (abs(current_x_coord_incl_co(1)).ge.maxaper(1).or. &                          !   !
+                   abs(current_x_coord_incl_co(2)).ge.maxaper(2).or. &                          !   !
+                   abs(current_x_coord_incl_co(3)).ge.maxaper(3).or. &                          !   !
+                   abs(current_x_coord_incl_co(4)).ge.maxaper(4)) flag_index_ptc_aperture = 50  !   !
+
+               if (icase_ptc .gt. 4) then                            !   !
+                 if (abs(current_x_coord_incl_co(5)).ge.maxaper(6)) flag_index_ptc_aperture = 50!   !
+               endif 
+
+               if ( (icase_ptc .gt. 5) .and. (MYSTATE%TOTALPATH .eq. 0) ) then                  !   !
+                 if (abs(current_x_coord_incl_co(6)).ge.maxaper(5)) flag_index_ptc_aperture = 50!   !
+               endif 
                ! endof add 2012.09.24                                                           !    !
                !                                                                                 !    !
                if_ptc_track_unstable: IF (flag_index_ptc_aperture/=0) then ! ========!           +  ^ !

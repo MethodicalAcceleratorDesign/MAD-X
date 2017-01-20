@@ -973,9 +973,14 @@ CONTAINS
        key%magnet="rfcavity"
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
-       key%list%lag=node_value('lag ')*twopi
 
-       !print*,"RF frequency " , freq," Hz, lag ", key%list%lag, " [radian]"
+       key%list%lag=node_value('lag ')*twopi 
+       
+       ! correction for time of flight through cavity
+       ! we want particle with t=0 to be not accelerated
+       key%list%lag = key%list%lag + twopi*freq*(l/2d0)/(clight*beta0)
+       
+       !print*,"RF frequency " , freq," Hz, lag ", key%list%lag, " [radian]", node_value('lag ')
 
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
        if(offset_deltap.ne.zero) then

@@ -345,10 +345,13 @@ contains
       real(dp)                 :: de_mev ! delta energy
       real(dp)                 :: arrivtime !time of arrival
 !      type(internal_state)     :: globalis ! internal state to be use in the tracking
-
+      
+      
+      
       arrivtime = x(6)/clight
+      
       if (getdebug()>2) then
-          print *, 'arrivtime = ', arrivtime
+          print *, 'arrivtime = ', arrivtime*1e9, ' ns'
       endif
 
       if( (f%mag%kind/=kind21) .and. (f%mag%kind/=kind4) ) then
@@ -373,19 +376,33 @@ contains
       if(ene) then
 
          if ( getdebug() > 2 ) then
+            print*,"MAX ACCEL MODE"
             de_mev=f%mag%volt*f%mag%l
             write(*,*) '   Max Energy to gain: ', de_mev, ' MeV, x(6)', x(6)
          endif
-
+         ! nunmber of radians from the lauch of the synchr particle to its arrival to the cavity
          f%mag%phas = pi/two - twopi*f%mag%freq*arrivtime - f%mag%lag ! here we tune to be on the crest and then we add the lag
          f%magp%phas= f%mag%phas
          phase_rel=f%mag%phas
 
       else
-
-         f%mag%phas = - f%mag%lag
-         f%magp%phas= f%mag%phas
-         phase_rel=f%mag%phas
+         if ( getdebug() > 2 ) then
+           print*,"REGULAR MODE, not max accel"
+         endif  
+         
+         if( f%mag%kind == kind21  ) then
+         
+           f%mag%phas = - f%mag%lag
+           f%magp%phas= f%mag%phas
+           phase_rel=f%mag%phas
+         
+         else !(f%mag%kind==kind4) 
+          
+           f%mag%phas = - f%mag%lag
+           f%magp%phas= f%mag%phas
+           phase_rel=f%mag%phas
+         
+         endif
 
       endif
 

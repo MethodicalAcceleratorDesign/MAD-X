@@ -56,13 +56,17 @@ loadrplotlib(void)
     return;
   }
 
-
-  handle = dlopen( "libCint.so",   RTLD_GLOBAL | RTLD_LAZY);
-  if (!handle) {
-    fprintf (stderr, "%s\n", dlerror());
-    return;
-  }
-
+  bool root3 = false;
+  
+  if (root3)
+   {
+     handle = dlopen( "libCint.so",   RTLD_GLOBAL | RTLD_LAZY);
+     if (!handle) {
+       fprintf (stderr, "%s\n", dlerror());
+       return;
+     }
+   }
+  
   handle = dlopen( "libCore.so",   RTLD_GLOBAL | RTLD_LAZY);
   if (!handle) {
     fprintf (stderr, "%s\n", dlerror());
