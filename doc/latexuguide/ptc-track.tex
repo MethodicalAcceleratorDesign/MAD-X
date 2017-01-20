@@ -227,6 +227,15 @@ The attributes are:
    \ttitem{MAXAPER} an array defining upper limits for particle
    coordinates, essentially defining the aperture to trigger particle
    loss. \\ (Default: \{0.1, 0.01, 0.1, 0.01, 1.0, 0.1\})
+   Please watch that the check is performed directly on the PTC variables, 
+   therefore the last 2 variables change their meaning depending if 
+   \texttt{TIME} switch of PTC is set to true or false, see 
+   \texttt{PTC_SETSWITCH} command for more details.
+   If \texttt{TOTALPATH} is set to true then check on the 5th coordinate
+   is not done.
+   If \texttt{ELEMENT\_BY\_ELEMENT} is false then the check is performed
+   only at the end of each turn (at the end of the layout). 
+   
 
    \ttitem{NORM\_NO} order of the Normal Form.\\
    \texttt{NORM\_NO=1} makes the Normal Form linear (always true for

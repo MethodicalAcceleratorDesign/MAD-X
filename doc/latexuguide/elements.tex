@@ -914,7 +914,7 @@ The \texttt{RFCAVITY} can also have attributes that only become active in
    \ttitem{NO\_CAVITY\_TOTALPATH} (Default: false): \\
      flag to select whether the transit time factor in the cavity is to be
      considered (\texttt{NO\_CAVITY\_TOTALPATH = false}) or if the particle is
-     kept on the crest of RF voltage (\texttt{NO\_CAVITY\_TOTALPATH = true}).  
+     kept on constant RF phase when passing through cavity. (\texttt{NO\_CAVITY\_TOTALPATH = true}).  
 \end{madlist}
 
 A cavity requires the particle \hyperref[sec:beam]{\texttt{ENERGY}}
@@ -930,6 +930,47 @@ CAVITY: RFCAVITY, L=10.0, VOLT=150.0, LAG=0.0, HARMON=31320;
 
 The \hyperref[subsec:local-straight]{straight reference system} for a
 cavity is a Cartesian coordinate system.  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Travelling Wave Cavity}
+\ttindex{TWcavity}
+\label{sec:tw-cavity}\label{sec:twcavity}
+
+\madbox{
+label: TWCAVITY, \= L=real, VOLT=real, FREQ=real, LAG=real, \\
+                 \> PSI=real, DELTA_LAG=real \\    
+                 \> N\_BESSEL=integer, NO\_CAVITY\_TOTALPATH=logical;
+                 
+                 
+                 
+}
+
+The travelling wave cavities model the accelerating structures of linacs
+where wavefront moves together with the accelerated particles. 
+This element is implemented only by PTC and is treated as drift 
+by native MADX commands. The phase velocity is fixed to speed of light
+and can not be varied. 
+
+\begin{madlist}
+   \ttitem{L} The length of the cavity (DEFAULT: 0 m) 
+
+   \ttitem{VOLT} The peak electrical RF voltage (DEFAULT: 0 MV). 
+
+   \ttitem{FREQ} The frequency [MHz] (no DEFAULT).  \\[3mm]
+
+   \ttitem{LAG} The phase lag [$2\pi$] (DEFAULT: 0). Zero lag means the highest acceleration, 
+                i.e. the reference particle (starting at x=0, px=0, y=0, py=0,t=0, pt=0) 
+                is on the crest of the wave. Please not that it is different from 
+                the \texttt{RFCAVITY} nomenclature.
+
+   \ttitem{PSI}  
+
+   \ttitem{delta_lag}   
+\end{madlist}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 
 \section{Thin Radio-Frequency Multipole}
