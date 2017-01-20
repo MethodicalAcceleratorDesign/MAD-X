@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Linux)       +
+  +     MAD-X 5.02.13  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.06.02 12:34:24      +
+  + Release   date: 2016.12.20               +
+  + Execution date: 2017.01.20 17:20:03      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !Example script showing usage of tracking with PTC
 
@@ -232,7 +232,8 @@ obs_points: 3
   0.0000  0.0000  0.0000  0.0000  0.0000  1.0503
           i=    9 name=      TCAV                      p0c=    0.0200     Current energy     0.0200
   0.0000  0.0000  0.0000  0.0000  0.0000  1.0503
- arrivtime =    3.5035667501207551E-009
+ arrivtime =    3.5035667501207550       ns
+ MAX ACCEL MODE
     Max Energy to gain:    14.000000000000002       MeV, x(6)   1.0503428877857730     
  Cavity settings:
      Name   TCAV                    
@@ -282,7 +283,8 @@ Relative E  0.7182
   0.0000  0.0000  0.0000  0.0000  0.0000  5.5510
           i=   23 name=      TCAV                      p0c=    0.0340     Current energy     0.0340
   0.0000  0.0000  0.0000  0.0000  0.0000  5.5510
- arrivtime =    1.8516280021810799E-008
+ arrivtime =    18.516280021810800       ns
+ MAX ACCEL MODE
     Max Energy to gain:    14.000000000000002       MeV, x(6)   5.5510411007549534     
  Cavity settings:
      Name   TCAV                    
