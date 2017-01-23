@@ -1282,7 +1282,7 @@ contains
        !'===      TRANSFER MAP      ==='
        call kanalnummer(mf2)
        open(unit=mf2,file=tmfile)
-       call print(theTransferMap,mf2)
+       call print(theTransferMap%x,mf2)
        close(mf2)
     endif
     
