@@ -3241,8 +3241,8 @@ contains
          ! to get chromaticities, went to higher order with above "call init_default(default,2,0)"
       else
          ! if icase = 6, delta_p is a phase-space variable and not an external parameter hence we can't compute chromaticies
-         chromaticities(1) = 0.0
-         chromaticities(2) = 0.0
+         chromaticities(1) = zero
+         chromaticities(2) = zero
       endif
 
       ! for debug: check the values by printing the map
@@ -3826,6 +3826,7 @@ contains
    ! write(99,*); 
    ! call print(vf_kernel,99)
    ! write(99,*) "--------------------------------------" 
+
 
     
     call putQnormaltable(vf_kernel%v(1),1) 
@@ -4417,6 +4418,8 @@ contains
 
          if (order == 0 ) then
            nick = parname  ! tune  q1
+           !tune sometimes comes negative, add one in this case
+           if (d_val .lt. zero) d_val = d_val + one
          else
 
            if (mod(sum(ind(1:2)),2) /=  0 ) then
