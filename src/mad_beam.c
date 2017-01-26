@@ -258,7 +258,7 @@ update_beam(struct command* comm)
 
   if (nlc->inform[name_list_pos("ey", nlc)]) {
     ey = command_par_value("ey", comm);
-     eyn = ey * beta * gamma;
+    eyn = ey * beta * gamma;
   }
   else if (nlc->inform[name_list_pos("eyn", nlc)]) {
     eyn = command_par_value("eyn", comm);
@@ -269,7 +269,7 @@ update_beam(struct command* comm)
     eyn = ey * beta * gamma;
   }
 
-  alfa = one / (gamma * gamma);
+  alfa = one / (gamma * gamma); // LD: bug, phase slip factor is missing
 
   // circumference related
   if (nlc->inform[name_list_pos("circ", nlc)]) {
