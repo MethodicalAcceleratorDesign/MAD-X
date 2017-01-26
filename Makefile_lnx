@@ -55,7 +55,9 @@ madx-linux-nagfor:  madx-linux64-nagfor  madx-linux32-nagfor
 .PHONY:  madx-linux32-lahey   madx-linux64-lahey
 .PHONY:  madx-linux32-nagfor  madx-linux64-nagfor
 
-madx-linux%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=yes STATIC=yes USEGC=yes APPENDLD=yes
+LINUX_STATIC := $(if $(call eq,$(PLUGIN),yes),no,yes)
+
+madx-linux%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=yes STATIC=$(LINUX_STATIC) USEGC=yes APPENDLD=yes
 madx-linux%: MAKE_OPTS = -j9 $(MAKEARGS)
 madx-linux%: MAKE_LINK = ln -sf $(DESTDIR)$@ && ln -sf $@
 
