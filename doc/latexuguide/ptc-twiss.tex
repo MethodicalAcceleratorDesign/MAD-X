@@ -153,6 +153,7 @@ PTC\_TWISS, \=ICASE=integer, DELTAP=real, \\
             \>NORMAL=logical, \\
             \>BETX=real, ALFX=real, MUX=real, \\
             \>BETY=real, ALFY=real, MUY=real, \\
+            \>BETZ=real, ALFZ=real,  \\
             \>DX=real,  DPX=real, DY=real, DPY=real, \\
             \>X=real, PX=real, Y=real, PY=real, T=real, PT=real, \\
             \>RE11=real, RE12=real, \ldots , RE16=real, \\
@@ -290,8 +291,8 @@ The attributes are:
 
   \ttitem{BETA0} 
   the name of a \texttt{BETA0} block containing the Twiss
-  parameters to be used as input. When \texttt{ICASE=6}, this information
-  must be complemented by supplying a value for \texttt{BETZ} on the
+  parameters to be used as input. When \texttt{ICASE=6} or \texttt{ICASE=56}, 
+  this information  must be complemented by supplying a value for \texttt{BETZ} on the
   \texttt{PTC\_TWISS} command line. \\
   (Default: beta0)
 
@@ -301,10 +302,10 @@ The attributes are:
   for a subsequent \texttt{PTC\_TWISS}, see \texttt{INITIAL\_MATRIX\_TABLE}
   parameter above. \\ (Default: false)
 
-  \ttitem{BETX, ALFX, MUX, BETY, ALFY, MUY, DX, DPX, DY, DPY} : \\
+  \ttitem{BETX, ALFX, MUX, BETY, ALFY, MUY, BETZ, ALFZ, DX, DPX, DY, DPY} : \\
   Edwards and Teng \cite{edwards1973} 
   \hyperref[chap:twiss]{Twiss and dispersion} parameters:  
-  $\beta_{x,y}$, $\alpha_{x,y}$, $\mu_{x,y}$, $D_{x,y}$, $D_{px,py}$.\\
+  $\beta_{x,y,z}$, $\alpha_{x,y,z}$, $\mu_{x,y}$, $D_{x,y}$, $D_{px,py}$.\\
   (Default: 0) 
 
   \ttitem{RING\_PARAMETERS} a logical flag to force computation of ring
@@ -425,6 +426,7 @@ PTC\_TWISS, \=ICASE=integer, DELTAP=real, \\ %CLOSED\_ORBIT, \\
             \>RANGE=string, FILE[=string], TABLE[=string], \\
             \>BETX=real, ALFX=real, MUX=real, \\
             \>BETY=real, ALFY=real, MUY=real, \\
+            \>BETZ=real, ALFZ=real, \\
             \>DX=real, DPX=real, DY=real, DPY=real, \\
             \>X=real, PX=real, Y=real, PY=real, T=real, PT=real;
 }
