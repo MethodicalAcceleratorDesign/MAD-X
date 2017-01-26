@@ -51,7 +51,9 @@ madx-macosx-intel:  madx-macosx64-intel  madx-macosx32-intel
 .PHONY: madx-macosx32-llvm  madx-macosx64-llvm
 .PHONY: madx-macosx32-intel madx-macosx64-intel
 
-madx-macosx%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=yes USEGC=yes APPENDLD=yes
+MACOSX_STATIC := $(if $(call eq,$(PLUGIN),yes),no,yes)
+
+madx-macosx%: MAKE_ARGS = PRJNAME=$@ DESTDIR=$(DESTDIR) ONLINE=no STATIC=$(MACOSX_STATIC) USEGC=yes APPENDLD=yes
 madx-macosx%: MAKE_OPTS = -j9 $(MAKEARGS)
 madx-macosx%: MAKE_LINK = ln -sf $(DESTDIR)$@ && ln -sf $@
 
