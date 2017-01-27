@@ -134,31 +134,33 @@ contains
     
   end subroutine initIaaMatrix
   
-  subroutine dispesion6D(A_script,disp)
+  subroutine dispersion6D(A_script,disp)
     implicit none
 !    type(probe_8), intent(in)::A_script_probe
     type(real_8) ::A_script(6)
     real(dp), intent(out)  :: disp(4)
-    type(damap)  :: amap 
     real(dp)  :: amatrix(6,6)
     real(dp) ::amatrix_inv(6,6),Ha(6,6,3)
-    integer i
+    integer i,j, inverr
     ! H based dispersion as in Chao-Sands paper
     
-    call alloc(amap)
+    do i=1,6
+      do j=1,6
+        amatrix(i,j) = A_script(i).sub.fo(j,:)
+      enddo
+    enddo
     
-    amap = A_script ! move the transformation to type damap
+    inverr = 0
+    call matinv(amatrix, amatrix_inv,6,6,inverr) ! amap**(-1) ! and invert it and copy to 6:6 matrix
+    if (inverr .ne. 0) then
+      call fort_warn('ptc_twiss::dispersion6D ',' Can not invert A_script linear')
+      disp = zero;
+    endif
     
-    amatrix    =amap       ! now we can copy to simple 6:6 matrix
-    amatrix_inv=amap**(-1) ! and invert it and copy to 6:6 matrixs
     
     do i=1,c_%nd
    
       Ha(1:6,1:6,i)=matmul(matmul(amatrix,Iaa(1:6,1:6,i)),amatrix_inv)  ! (15b)
-     
-      !do ii=1,6
-      !  print*,"        ",Ha(1:6,ii,i)
-      !enddo
      
     enddo
 
@@ -166,14 +168,13 @@ contains
      disp(i) = Ha(i,5,3)/Ha(5,5,3)
    enddo    
     
-   call kill(amap) 
    
-  end subroutine dispesion6D
+  end subroutine dispersion6D
 
  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
   
   !version on polynomials to non-linear dispersion
-  subroutine dispesion6Dp(A_script,disp)
+  subroutine dispersion6Dp(A_script,disp)
     implicit none
 !    type(probe_8), intent(in)::A_script_probe
     type(real_8) ::A_script(6)
@@ -250,7 +251,7 @@ contains
     
    call kill(amap) 
    
-  end subroutine dispesion6Dp
+  end subroutine dispersion6Dp
     
  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
 
@@ -336,7 +337,7 @@ contains
        enddo
     elseif (c_%nd2 == 6) then
       
-      call dispesion6D(A_script,lat(0,1:4,1))
+      call dispersion6D(A_script,lat(0,1:4,1))
     
     else
        do i=1,4
@@ -562,7 +563,9 @@ contains
     character(48)           :: summary_table_name
     character(12)           :: tmfile='transfer.map'
     character(48)           :: charconv !routine
-    
+    !real :: tstart, tfinish, tsum
+    !tsum = 0d0
+     
     if(universe.le.0.or.EXCEPTION.ne.0) then
        call fort_warn('return from ptc_twiss: ',' no universe created')
        call seterrorflag(1,"ptc_twiss ","no universe created till now");
@@ -1173,7 +1176,7 @@ contains
         else
 
            !print*,"Skowron 1 ", current%mag%name,  check_stable, c_%stable_da, A_script_probe%x(1).sub.'100000'
-
+           !call cpu_time(tstart)
            call propagate(my_ring,A_script_probe,default, fibre1=i,fibre2=i+1)
            
            !print*,"Skowron 2 ", current%mag%name,  check_stable, c_%stable_da, A_script_probe%x(1).sub.'100000'
@@ -1185,7 +1188,10 @@ contains
              call propagate(my_ring,theTransferMap,default,fibre1=i,fibre2=i+1)
            endif
            
-           !print*,"Skowron 3 ", current%mag%name, check_stable, c_%stable_da
+           !call cpu_time(tfinish)
+           !print*,"Skowron ",i," ", current%mag%name, tfinish - tstart
+           !tsum = tsum + (tfinish - tstart)
+           
         endif
 
 
@@ -1272,6 +1278,7 @@ contains
 
 100 continue
 
+   ! print*,"Skowron total tracking time", tsum
 
     ! relocated the following here to avoid side-effect
     print77=.false.
@@ -2963,7 +2970,7 @@ contains
       elseif (c_%nd2 == 6) then
         !faster to use the A_script then normal form
         ! because the normal form A_t must be canonised to C-S and moved from cmplx to real_8
-        call dispesion6D(theAscript,dispersion)
+        call dispersion6D(theAscript,dispersion)
         
       else
          do i=1,4
@@ -3083,14 +3090,7 @@ contains
      if ( (icase.eq.5) .and. (default%time .eqv. .true.) ) then 
 
          !print*,"ALPHA_C dp/dp derivatives : 5D TIME ON"
-         
-         if (getdebug() > 2) then
-           call kanalnummer(mf1)
-           open(unit=mf1,file='oneTurnMap%x.5dt.txt')
-           call daprint(oneTurnMap%x,mf1)
-           close(mf1)
-         endif
-         
+        
          ! compute delta-p/p dependency of alpha_c
          ! first order derivatives of the dispersions
          ! assuming icase=5
@@ -3834,14 +3834,14 @@ contains
     
     if (c_%nd2 == 6) then
       ! to be implemented
-      call dispesion6D(theAscript%x,disp1stOrder)
+      call dispersion6D(theAscript%x,disp1stOrder)
       call alloc(tempTaylor)
       do i=1,4
         tempTaylor = disp1stOrder(i)
         call putDnormaltable(tempTaylor,i)
       enddo
       
-     ! call dispesion6Dp(theAscript%x,disp1stOrder)
+     ! call dispersion6Dp(theAscript%x,disp1stOrder)
       
       call kill(tempTaylor)
       
