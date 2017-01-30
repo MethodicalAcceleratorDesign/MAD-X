@@ -1619,6 +1619,11 @@ tests/test-ptc-trackline-2/test-ptc-trackline-2.madx -text
 tests/test-ptc-trackline-2/test-ptc-trackline-2.ref -text
 tests/test-ptc-trackline-2/trackone.cfg -text
 tests/test-ptc-trackline-2/trackone.ref -text
+tests/test-ptc-trackline-rfcav/test-ptc-trackline-rfcav.cfg -text
+tests/test-ptc-trackline-rfcav/test-ptc-trackline-rfcav.madx -text
+tests/test-ptc-trackline-rfcav/test-ptc-trackline-rfcav.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-trackline-rfcav/trackone.cfg -text
+tests/test-ptc-trackline-rfcav/trackone.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-trackline/test-ptc-trackline.cfg -text
 tests/test-ptc-trackline/test-ptc-trackline.madx -text
 tests/test-ptc-trackline/test-ptc-trackline.ref -text

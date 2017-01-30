@@ -1,0 +1,53 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.13  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2016.12.20               +
+  + Execution date: 2017.01.30 19:09:29      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+!Example file showing the usage of PTC_SETSWITCH command 
+
+!that sets the internal state (i.e switches) of PTC
+
+!
+
+!Piotr Skowronski (CERN)
+
+!
+
+! examples/ptc_madx_interface/intstate/intstate.ptc.madx
+
+!
+
+option,-echo;
+
+ MAD-X Beam Parameters
+                  Energy : 0.200000E-01
+          Kinetic Energy : 0.194890E-01
+      Particle Rest Mass : 0.510999E-03
+                Momentum : 0.199935E-01
+ Setting MADx with 
+     energy           2.0000000000000000E-002
+     method                   6
+     Num. of steps           10
+     charge          -1.0000000000000000     
+  Length of machine:    4.5000000000000000     
+ The machine is a LINE
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        4.5000000000000000     
+############################################
+############################################
+##     Tracking with default settings     ##
+############################################
+############################################
+Enforcing onetable=true, current is 0.000000
+Now is 1.000000
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
