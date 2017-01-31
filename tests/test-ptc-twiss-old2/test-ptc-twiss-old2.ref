@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  +     MAD-X 5.02.13  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.09.22 10:09:50      +
+  + Release   date: 2016.12.20               +
+  + Execution date: 2017.01.31 09:35:08      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
@@ -41,8 +41,8 @@ beam, particle = proton, energy =   eg        ,
 
 value,epsx,epsy;
 
-epsx =    3.518520172e-08 ;
-epsy =    3.518520172e-08 ;
+epsx               =    3.518520172e-08 ;
+epsy               =    3.518520172e-08 ;
 option,-echo;
 
 
@@ -309,7 +309,7 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=1;
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-             534.6    0.0004430990797    -0.001890270714           -1000000 
+             534.6    0.0004430990797           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
           -1000000    0.0003550636364        47.50612159       0.2546759882 
@@ -333,10 +333,10 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=1;
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0                  0        2.177407267 
+                 0                  0                  0        2.177311421 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.0296661037      0.02965905227                  0                  0 
+    -0.02966479784      0.02965774672                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0    0.0003260716069 
@@ -509,13 +509,13 @@ ptc_twiss,icase=5,no=1,
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0                  0        2.176592103 
+                 0                  0                  0        2.176576774 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.0296661037      0.02965103639    -0.000375855762    0.0004199633837 
+    -0.02966479784      0.02965082756   -0.0003758531149     0.000419960426 
 
           disp4min           disp4max             deltap            orbit_x 
-  -8.878003536e-06    6.666922433e-06                  0    8.897806712e-05 
+   -8.87794101e-06    6.666875479e-06                  0    8.897806712e-05 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
    7.283918353e-07    5.216050332e-05   -6.748041063e-07                  0 

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Linux)       +
+  +     MAD-X 5.02.13  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.06.02 13:16:47      +
+  + Release   date: 2016.12.20               +
+  + Execution date: 2017.01.31 09:35:08      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Title " Diamond Light Source Lattice 8.1.1";
 
@@ -211,13 +211,13 @@ obs_points pro_ptc_setswitch Done
    0.0005203652667     0.004642849939     4.42179066e-34    2.175437997e-33 
 
          beta33min          beta33max           disp1min           disp1max 
-       2.885127313        2.885971271                  0       0.3117654986 
+       2.885127313        2.885971271                  0       0.3117654941 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.1550570881       0.1550570881   -7.446891715e-16    7.420478414e-16 
+     -0.1550570858       0.1550570858   -7.446891607e-16    7.420478306e-16 
 
           disp4min           disp4max             deltap            orbit_x 
-  -2.476435307e-16    2.463962659e-16                  0   -8.329636574e-14 
+  -2.476435271e-16    2.463962623e-16                  0   -8.329636574e-14 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
    6.446646283e-16                  0                  0   -1.191323247e-12 

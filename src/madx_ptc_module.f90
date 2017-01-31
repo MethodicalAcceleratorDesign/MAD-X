@@ -895,6 +895,10 @@ CONTAINS
           key%list%ks(i)=zero
        enddo
        skew(0)=-skew(0) ! frs error found 30.08.2008
+       
+      ! print*,"multipole normal: ",normal
+      ! print*,"multipole skew: ",skew
+       
        key%list%thin_h_angle=bvk*normal(0)
        key%list%thin_v_angle=bvk*skew(0)
        lrad=node_value('lrad ')
@@ -902,12 +906,21 @@ CONTAINS
           key%list%thin_h_foc=normal(0)*normal(0)/lrad
           key%list%thin_v_foc=skew(0)*skew(0)/lrad
        endif
+       
+       
        if(nn.gt.0) then
+         ! should be like this but apparently for MADX compatibility it was left out
+         ! key%list%k(1)=normal(0)
+          
           do i=1,nn
              key%list%k(i+1)=normal(i)
           enddo
        endif
+
        if(ns.gt.0) then
+         ! should be like this but apparently for MADX compatibility it was left out
+         ! key%list%ks(1)=skew(0)
+         
           do i=1,ns
              key%list%ks(i+1)=skew(i)
           enddo

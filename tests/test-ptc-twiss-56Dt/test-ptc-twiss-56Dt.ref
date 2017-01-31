@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Linux)       +
+  +     MAD-X 5.02.13  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.06.02 09:52:43      +
+  + Release   date: 2016.12.20               +
+  + Execution date: 2017.01.30 18:56:14      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -837,19 +837,19 @@ ptc_create_universe;
 
   
 
-  ptc_twiss, table=twiss, icase=56, no=2, closed_orbit, rmatrix;
+  ptc_twiss, table=twiss, icase=56, no=4, closed_orbit, rmatrix;
 
 
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-       78.54370266       0.1241076135       -41.13733608           -1000000 
+       78.54370266       0.1241076135           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
           -1000000      -0.6258931594        2.838577707       0.8200595696 
 
                 q2                dq1                dq2                 qs 
-      0.7198291917       -4.353246611       -9.482229434                  0 
+      0.7198291917       -2.176619941       -4.741107388                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        3.282154172        15.12420643        1.633285488        20.07025728 
@@ -867,10 +867,10 @@ ptc_create_universe;
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0       -20.60417583     0.001187021032 
+                 0                  0       -10.30207083    0.0005935095314 
 
           disp2min           disp2max           disp3min           disp3max 
-      -9.086229086        9.086229086                  0                  0 
+      -4.543107007        4.543107007                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0    1.662470329e-10 

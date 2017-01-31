@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.12  (64 bit, Linux)       +
+  +     MAD-X 5.02.13  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.10.15               +
-  + Execution date: 2016.11.24 10:51:16      +
+  + Release   date: 2016.12.20               +
+  + Execution date: 2017.01.30 19:00:09      +
   ++++++++++++++++++++++++++++++++++++++++++++
    !                     FODO for MAD-X
 
@@ -343,13 +343,13 @@ obs_points pro_ptc_setswitch Done
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-       19.09998776      0.07360632992     -0.07619005561           -1000000 
+       19.09998776      0.07360632992           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
           -1000000      0.07360629471        3.685890406       0.3642635312 
 
                 q2                dq1                dq2                 qs 
-      0.2988958103      -0.3619743413       -1.355575333                  0 
+      0.2988958103       -0.361974335       -1.355575309                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        2.611589832        36.91316294        4.077530498        34.07505989 
@@ -367,10 +367,10 @@ obs_points pro_ptc_setswitch Done
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0                  0        3.946011124 
+                 0                  0                  0        3.946011054 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.3931624023       0.3699163676                  0                  0 
+     -0.3931623954       0.3699163611                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0                  0 

@@ -545,6 +545,7 @@ contains
     type(fibre), POINTER    :: current
     type(integration_node), pointer :: nodePtr, stopNode
     type(work)              :: startfen !Fibre energy at the start
+    real(dp)                :: relativisticBeta  !current beta0, set by getdeltae()
     real(dp)                :: r,re(ndim2,ndim2),dt
     logical(lp)             :: initial_matrix_manual, initial_matrix_table, initial_map_manual
     logical(lp)             :: initial_distrib_manual, initial_ascript_manual, writetmap
@@ -1617,6 +1618,8 @@ contains
       endif
 
       getdeltae = cfen%energy/startfen%energy
+      
+      relativisticBeta = cfen%beta0
 
       if (getdebug() > 2) then
          write(mf1,'(3(a, f12.6))') "Ref Momentum ",cfen%p0c," Energy ", cfen%energy," DeltaE ",getdeltae
@@ -1827,7 +1830,10 @@ contains
       opt_fun(mu3)=tw%mu(3) !* deltae
 
       ! write(0,*),"DEBUG = ", tw%mu(3) ! should give Qs
-
+      if ( default%time ) then
+        tw%disp(:) = tw%disp(:) * relativisticBeta
+      endif  
+      
       opt_fun(disp1)=tw%disp(1) ! was 31 instead of 57
       opt_fun(disp2)=tw%disp(2) ! was 32 instead of 58
       opt_fun(disp3)=tw%disp(3) ! was 33 instead of 59
@@ -2852,10 +2858,13 @@ contains
       integer :: icase
       integer :: order
       real(dp) :: rdp_mmilion = -1e6
-      type(c_damap) :: yy ! added on November 6th to retreive momemtum compaction without differentiating the formula
+      type(c_damap) :: yy, theA_beta ! added on November 6th to retreive momemtum compaction without differentiating the formula
       type(c_vector_field) :: vf_kernel
       type(c_damap)        :: c_Map
+      type(c_damap)        :: rotationMap, theA_CS, theA_Spin, theA0, theA1, theA2, theRot
+      type(c_taylor)       :: thePhaseAndSlip(3), theNuSpin
       type(c_normal_form)  :: theNormalForm
+      
       
       order = get_value('ptc_twiss ', 'no ')
 
@@ -2957,6 +2966,30 @@ contains
 
       endif
 
+      !********************************************!
+      ! new all-in-ine algorithm to get normal form goodies 
+      ! unstable for 6D 
+!       call alloc(rotationMap)
+! 
+!       rotationMap=theNormalForm%atot**(-1)*c_Map*theNormalForm%atot ! (7a)
+! 
+!       call alloc(theA_CS)
+!       call alloc(theA_Spin)
+!       call alloc(theA0)
+!       call alloc(theA1) 
+!       call alloc(theA2) 
+!       call alloc(theRot)
+!       
+!       call alloc(thePhaseAndSlip)
+!       call alloc(theNuSpin)
+!       
+!       call c_full_canonise(rotationMap,theA_CS,theA_Spin,theA0,theA1,theA2,theRot,phase=thePhaseAndSlip,nu_spin=theNuSpin)  
+! 
+!       call print(thePhaseAndSlip(1),6)
+!       call print(thePhaseAndSlip(2),6)
+!       call print(thePhaseAndSlip(3),6)
+
+      !********************************************!
       !skowron: old ptc
       !print*, "Cplx dispersion A1(1,5)", theNormalForm%A1%v(1).sub.'000010'
       
@@ -3010,8 +3043,9 @@ contains
 
       gamma_tr = zero
       
-      if ( (icase.gt.4)  .and. (default%time) ) then
-         
+      if ( icase.gt.4 ) then
+        if ( default%time ) then
+         ! ALL cases with time=true
          ! Here R56 is dT/ddelta
          ! 5. apply formulas from twiss.F: 
          !sd = r(5,6)+r(5,1)*disp(1)+...+r(5,4)*disp(4)
@@ -3027,175 +3061,193 @@ contains
          !print*,'sd(f)',sd
 
          eta_c = -sd * betaRelativistic**2 / suml 
+         
          alpha_c = one / gammaRelativistic**2 + eta_c
          
-
-         !print*,'eta_c',eta_c,' gamma_tr=',gamma_tr
-
-      elseif( (icase.eq.5)  .and. (default%time .eqv. .false.) ) then
-
-         ! Here R56 is dL/ddelta 
-         ! so we get alpha_c first from transfer matrix
-
-         sd = +1.0*(oneTurnMap%x(6).sub.fo(5,:)) ! 5/6 swap MADX/PTC
-         !print*,'sd(0)',sd
-         do i=1,4
-            !print*, 'Disp',i,'=', dispersion(i)
-            sd = sd + (oneTurnMap%x(6).sub.fo(i,:))*dispersion(i)
-            !print*,'sd(',i,')',sd
-         enddo
-         !print*,'sd(f)',sd
-         alpha_c = sd/suml
-         eta_c = alpha_c - one / gammaRelativistic**2
+        else 
          
-      elseif( (icase.eq.56)  .and. (default%time .eqv. .false.) ) then
+          if (icase.eq.6 .or. icase.eq.5)  then
+            sd = -1.0*(oneTurnMap%x(6).sub.fo(5,:)) ! 5/6 swap MADX/PTC
+            do i=1,4
+               sd = sd - (oneTurnMap%x(6).sub.fo(i,:))*dispersion(i)
+            enddo
+            
+           alpha_c = -sd/suml
+           eta_c = alpha_c - one / gammaRelativistic**2
+        
+        
+        !   do i=1,4
+        !       dispersion_p(i) = 2.0*(theAscript(i).sub.'000020') ! as usual in this file
+        !   enddo
+        !
+        !   sd =   - 2.0*(oneTurnMap%x(6).sub.'000020') 
+        !   ! first dr65/ddeltap
+        !   sd = sd - 1.0*(oneTurnMap%x(6).sub.'100010')*dispersion(1) &
+        !        &  - 1.0*(oneTurnMap%x(6).sub.'010010')*dispersion(2) &
+        !        &  - 1.0*(oneTurnMap%x(6).sub.'001010')*dispersion(3) &
+        !        &  - 1.0*(oneTurnMap%x(6).sub.'000110')*dispersion(4) &
+        !	            ! new
+        !        &  - 1.0*(oneTurnMap%x(6).sub.'000011')*(oneTurnMap%x(6).sub.'000001') &
+        !	            ! then terms dr6i/ddeltap*dispersion(i)
+        !        &  - 2.0*(oneTurnMap%x(6).sub.'200000')*dispersion(1)**2 &
+        !        &  - (oneTurnMap%x(6).sub.'110000')*dispersion(1)*dispersion(2) &
+        !        &  - (oneTurnMap%x(6).sub.'101000')*dispersion(1)*dispersion(3) &
+        !        &  - (oneTurnMap%x(6).sub.'100100')*dispersion(1)*dispersion(4) &
+        !	            ! new
+        !        &  - (oneTurnMap%x(6).sub.'100010')*dispersion(1) &
+        !	            ! dr62/ddeltap*disperion(2)
+        !        &  - (oneTurnMap%x(6).sub.'110000')*dispersion(1)*dispersion(2) &
+        !        &  - 2.0*(oneTurnMap%x(6).sub.'020000')*dispersion(2)**2 &
+        !        &  - (oneTurnMap%x(6).sub.'011000')*dispersion(2)*dispersion(3) &
+        !        &  - (oneTurnMap%x(6).sub.'010100')*dispersion(2)*dispersion(4) &
+        !	            ! new
+        !        &  - (oneTurnMap%x(6).sub.'010010')*dispersion(2) &
+        !	            ! dr63/ddeltap*dispersion(3)
+        !        &  - (oneTurnMap%x(6).sub.'101000')*dispersion(1)*dispersion(3) &
+        !        &  - (oneTurnMap%x(6).sub.'011000')*dispersion(2)*dispersion(3) &
+        !        &  - 2.0*(oneTurnMap%x(6).sub.'002000')*dispersion(3)**2 &
+        !        &  - (oneTurnMap%x(6).sub.'001100')*dispersion(3)*dispersion(4) &
+        !	            ! new
+        !        &  - 1*(oneTurnMap%x(6).sub.'001010')*dispersion(3) &
+        !	            ! dr64/ddeltap*dispersion(4)
+        !        &  - (oneTurnMap%x(6).sub.'100100')*dispersion(1)*dispersion(4) &
+        !        &  - (oneTurnMap%x(6).sub.'010100')*dispersion(2)*dispersion(4) &
+        !        &  - (oneTurnMap%x(6).sub.'001100')*dispersion(3)*dispersion(4) &
+        !        &  - 2.0*(oneTurnMap%x(6).sub.'000200')*dispersion(4)**2 
+        !
+        !   do i=1,4
+        !      sd = sd - (oneTurnMap%x(6).sub.fo(i,:))*dispersion_p(i)
+        !   enddo
+        !   
+        !   alpha_c_p = sd * (betaRelativistic**2) / suml
 
-         !print*,"ALPHA_C, GAMMA TR : 56D TIME OFF"
+          else !5D or 6D
+           
+           !56D
+
+             yy%n = 6
+             call alloc(yy)
+
+             do i=1,6 
+                yy%v(i) = oneTurnMap%x(i)%t
+             enddo
+
+             yy = theNormalForm%A_t**(-1) * yy * theNormalForm%A_t ! takes away all dispersion dependency
+
+             alpha_c    = (yy%v(6).sub.'000010')/suml
+             eta_c = alpha_c - one / gammaRelativistic**2
 
 
-         call alloc(yy)
-         do i=1,c_%nd2 ! c_%nd2 is 6 when icase is 56 or 6 (but 4 when icase=5)
-            yy%v(i) = oneTurnMap%x(i)%t
-         enddo
-         
-         yy = theNormalForm%A1**(-1) * yy * theNormalForm%A1 ! takes away all dispersion dependency
-         
-         !write(0,*) 'for yy, c_%nd2 is ',c_%nd2 ! 0 is stderr
-         alpha_c    = (yy%v(6).sub.'000010')/suml
-         eta_c = alpha_c - one / gammaRelativistic**2
+             if (order.ge.2) then
+                alpha_c_p  = 2.0*(yy%v(6).sub.'000020')/suml
+             endif  
 
-         alpha_c_p  = 2.0*(yy%v(6).sub.'000020')/suml
+             if (order.ge.3) then
+                alpha_c_p2 = 6.0*(yy%v(6).sub.'000030')/suml
+             endif
 
-         if (order.ge.3) then
-            alpha_c_p2 = 3.0*2.0*(yy%v(6).sub.'000030')/suml
-         endif
+             if (order.ge.4) then
+                alpha_c_p3 = 24.0*(yy%v(6).sub.'000040')/suml
+             endif
 
-         if (order.ge.4) then
-            alpha_c_p3 = 4.0*3.0*2.0*(yy%v(6).sub.'000040')/suml
-         endif
+          !   print*,'New 5D algo a_c ', alpha_c,' alpha_c_p ', alpha_c_p ,' e_c ', eta_c
 
+             call kill(yy)
 
-         call kill(yy)
-
-      endif
-
+           endif ! 5D or 56D
+        endif !time=false
+      endif !icase=4
+      
       if (alpha_c .gt. zero) then
         gamma_tr = one / sqrt(alpha_c)
       endif
       
-     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-     !!!! HIGHER ORDERS IN dP/P  !!!!
-     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     !!!! HIGHER ORDERS IN dP/P in time true  !!!!
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+      ! this algorithm does not work, for low energy (beta0 << 1) it 
+      ! obtains 2nd order time slip factor not alpha_c and the conversion is not straight forward
 
-     if ( (icase.eq.5) .and. (default%time .eqv. .true.) ) then 
+ !    if ( (icase.eq.5) .and. (default%time .eqv. .true.) ) then 
+      !
+      !    !print*,"ALPHA_C dp/dp derivatives : 5D TIME ON"
+      !   
+      !    ! compute delta-p/p dependency of alpha_c
+      !    ! first order derivatives of the dispersions
+      !    ! assuming icase=5
+      !    !call daprint(oneTurnMap%x,88)
+      ! 
+      !    ! always assume time=true, so that the fifth phase-space variable is deltap instead of pt!
+      !    ! otherwise should issue a warning or an error!
+      ! 
+      !    ! proceed slightly differently to retreive the dispersion's derivatives
+      !    ! (so far only managed to get the dispersion on the normal form, but not its derivatives)
+      !    
+      !    ! note: should reuse information computed previously than redo this...
+      !    ! if icase=5, Taylor series expansion disp = disp + delta_p
+      !    do i=1,4
+      !       ! apparently, we are up by a factor two
+      !       dispersion_p(i) = 2.0*(theAscript(i).sub.'000020')  ! as usual in this file
+      ! 
+      !    enddo
+      !    
+      !    ! compute derivative of the formula for eta_c
+      ! 
+      !    sd = 0.0
+      !    ! first dr65/ddeltap
+      !    sd = sd - 1.0*(oneTurnMap%x(6).sub.'100010')*dispersion(1) &
+      !         &  - 1.0*(oneTurnMap%x(6).sub.'010010')*dispersion(2) &
+      !         &  - 1.0*(oneTurnMap%x(6).sub.'001010')*dispersion(3) &
+      !         &  - 1.0*(oneTurnMap%x(6).sub.'000110')*dispersion(4) &
+      !         &  - 2.0*(oneTurnMap%x(6).sub.'000020') &
+      !	            ! new
+      !         &  - 1.0*(oneTurnMap%x(6).sub.'000011')*(oneTurnMap%x(6).sub.'000001') &
+      !	            ! then terms dr6i/ddeltap*dispersion(i)
+      !         &  - 2.0*(oneTurnMap%x(6).sub.'200000')*dispersion(1)**2 &
+      !         &  - (oneTurnMap%x(6).sub.'110000')*dispersion(1)*dispersion(2) &
+      !         &  - (oneTurnMap%x(6).sub.'101000')*dispersion(1)*dispersion(3) &
+      !         &  - (oneTurnMap%x(6).sub.'100100')*dispersion(1)*dispersion(4) &
+      !	            ! new
+      !         &  - (oneTurnMap%x(6).sub.'100010')*dispersion(1) &
+      !	            ! dr62/ddeltap*disperion(2)
+      !         &  - (oneTurnMap%x(6).sub.'110000')*dispersion(1)*dispersion(2) &
+      !         &  - 2.0*(oneTurnMap%x(6).sub.'020000')*dispersion(2)**2 &
+      !         &  - (oneTurnMap%x(6).sub.'011000')*dispersion(2)*dispersion(3) &
+      !         &  - (oneTurnMap%x(6).sub.'010100')*dispersion(2)*dispersion(4) &
+      !	            ! new
+      !         &  - (oneTurnMap%x(6).sub.'010010')*dispersion(2) &
+      !	            ! dr63/ddeltap*dispersion(3)
+      !         &  - (oneTurnMap%x(6).sub.'101000')*dispersion(1)*dispersion(3) &
+      !         &  - (oneTurnMap%x(6).sub.'011000')*dispersion(2)*dispersion(3) &
+      !         &  - 2.0*(oneTurnMap%x(6).sub.'002000')*dispersion(3)**2 &
+      !         &  - (oneTurnMap%x(6).sub.'001100')*dispersion(3)*dispersion(4) &
+      !	            ! new
+      !         &  - 1*(oneTurnMap%x(6).sub.'001010')*dispersion(3) &
+      !	            ! dr64/ddeltap*dispersion(4)
+      !         &  - (oneTurnMap%x(6).sub.'100100')*dispersion(1)*dispersion(4) &
+      !         &  - (oneTurnMap%x(6).sub.'010100')*dispersion(2)*dispersion(4) &
+      !         &  - (oneTurnMap%x(6).sub.'001100')*dispersion(3)*dispersion(4) &
+      !         &  - 2.0*(oneTurnMap%x(6).sub.'000200')*dispersion(4)**2 &
+      !	            ! new
+      !         &  - 1*(oneTurnMap%x(6).sub.'000110')*dispersion(4)
+      ! 
+      !    ! terms involving derivatives of the dispersions
+      !    do i=1,4
+      !        print*, 'sd=',sd,' disp=',dispersion_p(i)
+      !       sd = sd - (oneTurnMap%x(6).sub.fo(i,:))*dispersion_p(i)
+      !    enddo
+      ! 
+      !     print*, 'sd=',sd
+      !    alpha_c_p = -sd * (betaRelativistic**2) / suml
 
-         !print*,"ALPHA_C dp/dp derivatives : 5D TIME ON"
-        
-         ! compute delta-p/p dependency of alpha_c
-         ! first order derivatives of the dispersions
-         ! assuming icase=5
-         !call daprint(oneTurnMap%x,88)
-
-         ! always assume time=true, so that the fifth phase-space variable is deltap instead of pt!
-         ! otherwise should issue a warning or an error!
-
-         ! proceed slightly differently to retreive the dispersion's derivatives
-         ! (so far only managed to get the dispersion on the normal form, but not its derivatives)
-         
-         ! note: should reuse information computed previously than redo this...
-         ! if icase=5, Taylor series expansion disp = disp + delta_p
-         do i=1,4
-            ! apparently, we are up by a factor two
-            dispersion_p(i) = 2.0*(theAscript(i).sub.'000020') ! as usual in this file
-
-         enddo
-
-         ! compute derivative of the formula for eta_c
-
-         sd = 0.0
-         ! first dr65/ddeltap
-         sd = sd - 1.0*(oneTurnMap%x(6).sub.'100010')*dispersion(1) &
-              &  - 1.0*(oneTurnMap%x(6).sub.'010010')*dispersion(2) &
-              &  - 1.0*(oneTurnMap%x(6).sub.'001010')*dispersion(3) &
-              &  - 1.0*(oneTurnMap%x(6).sub.'000110')*dispersion(4) &
-              &  - 2.0*(oneTurnMap%x(6).sub.'000020') &
-	            ! new
-              &  - 1.0*(oneTurnMap%x(6).sub.'000011')*(oneTurnMap%x(6).sub.'000001') &
-	            ! then terms dr6i/ddeltap*dispersion(i)
-              &  - 2.0*(oneTurnMap%x(6).sub.'200000')*dispersion(1)**2 &
-              &  - (oneTurnMap%x(6).sub.'110000')*dispersion(1)*dispersion(2) &
-              &  - (oneTurnMap%x(6).sub.'101000')*dispersion(1)*dispersion(3) &
-              &  - (oneTurnMap%x(6).sub.'100100')*dispersion(1)*dispersion(4) &
-	            ! new
-              &  - (oneTurnMap%x(6).sub.'100010')*dispersion(1) &
-	            ! dr62/ddeltap*disperion(2)
-              &  - (oneTurnMap%x(6).sub.'110000')*dispersion(1)*dispersion(2) &
-              &  - 2.0*(oneTurnMap%x(6).sub.'020000')*dispersion(2)**2 &
-              &  - (oneTurnMap%x(6).sub.'011000')*dispersion(2)*dispersion(3) &
-              &  - (oneTurnMap%x(6).sub.'010100')*dispersion(2)*dispersion(4) &
-	            ! new
-              &  - (oneTurnMap%x(6).sub.'010010')*dispersion(2) &
-	            ! dr63/ddeltap*dispersion(3)
-              &  - (oneTurnMap%x(6).sub.'101000')*dispersion(1)*dispersion(3) &
-              &  - (oneTurnMap%x(6).sub.'011000')*dispersion(2)*dispersion(3) &
-              &  - 2.0*(oneTurnMap%x(6).sub.'002000')*dispersion(3)**2 &
-              &  - (oneTurnMap%x(6).sub.'001100')*dispersion(3)*dispersion(4) &
-	            ! new
-              &  - 1*(oneTurnMap%x(6).sub.'001010')*dispersion(3) &
-	            ! dr64/ddeltap*dispersion(4)
-              &  - (oneTurnMap%x(6).sub.'100100')*dispersion(1)*dispersion(4) &
-              &  - (oneTurnMap%x(6).sub.'010100')*dispersion(2)*dispersion(4) &
-              &  - (oneTurnMap%x(6).sub.'001100')*dispersion(3)*dispersion(4) &
-              &  - 2.0*(oneTurnMap%x(6).sub.'000200')*dispersion(4)**2 &
-	            ! new
-              &  - 1*(oneTurnMap%x(6).sub.'000110')*dispersion(4)
-
-         ! terms involving derivatives of the dispersions
-         do i=1,4
-!            print*, 'sd=',sd,' disp=',dispersion_p(i)
-            sd = sd - (oneTurnMap%x(6).sub.fo(i,:))*dispersion_p(i)
-         enddo
-
-!         print*, 'sd=',sd
-         alpha_c_p = sd * (betaRelativistic**2) / suml
-
-         ! eventually, one could differentiate the above formula to obtain alpha_c_p2
-         ! but for the time-being, expect icase to be 56 to compute alpha_c_p2 and alpha_c_p3.
-
-         alpha_c_p2 = rdp_mmilion
-         alpha_c_p3 = rdp_mmilion
-
-
+      !    eventually, one could differentiate the above formula to obtain alpha_c_p2
+      !     but for the time-being, expect icase to be 56 to compute alpha_c_p2 and alpha_c_p3.
              
-     elseif ( (icase.eq.56) .and. (default%time .eqv. .true.) ) then ! here one may obtain the pathlength derivatives from the map
+  !   elseif ( (icase.eq.56) .and. (default%time .eqv. .true.) ) then ! here one may obtain the pathlength derivatives from the map
+       ! here we get directly eta_c with all higher order terms
+       ! converting them to alpha_c is not obvious. Run time false to get higher order alpha_c
 
-         !print*,"ALPHA_C dp/dp derivatives : 56D TIME ON"
-         if (getdebug() > 2) then
-           call kanalnummer(mf1)
-           open(unit=mf1,file='oneTurnMap%x.56dt.txt')
-           call daprint(oneTurnMap%x,mf1)
-           close(mf1)
-         endif
-         
-         call alloc(yy)
-         do i=1,c_%nd2 ! c_%nd2 is 6 when icase is 56 or 6 (but 4 when icase=5)
-            yy%v(i) = oneTurnMap%x(i)%t
-         enddo
-         yy = theNormalForm%A1**(-1)*yy*theNormalForm%A1 ! takes away all dispersion dependency
-
-         alpha_c_p  = -2.0*(yy%v(6).sub.'000020')/suml
-         
-         if (order.ge.3) then
-            alpha_c_p2 = -3.0*2.0*(yy%v(6).sub.'000030')/suml
-         endif
-
-         if (order.ge.4) then
-            alpha_c_p3 = -4.0*3.0*2.0*(yy%v(6).sub.'000040')/suml
-         endif
-
-         call kill(yy)
-
-      endif
+  !   endif
 
       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       !!!!!!!!!!!!                                !!!!!!!!!!!!!!!!
@@ -3238,6 +3290,10 @@ contains
       if (icase.eq.5 .or. icase.eq.56) then
          chromaticities(1) = tuneFromComplexVF(vf_kernel%v(1).sub.'10001') ! as in So_fitting.f90
          chromaticities(2) = tuneFromComplexVF(vf_kernel%v(3).sub.'00101') ! as in So_fitting.f90
+
+         if (default%time) then
+            chromaticities(:) = chromaticities(:) * betaRelativistic
+         endif
          ! to get chromaticities, went to higher order with above "call init_default(default,2,0)"
       else
          ! if icase = 6, delta_p is a phase-space variable and not an external parameter hence we can't compute chromaticies

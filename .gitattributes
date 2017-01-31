@@ -1,6 +1,7 @@
 * text=auto !eol
 /CMakeLists.txt -text
 /CTestConfig.cmake -text
+/ChangeLog.txt -text
 /License.txt -text
 /Makefile -text
 /Makefile_c -text

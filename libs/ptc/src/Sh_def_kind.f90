@@ -1440,6 +1440,7 @@ contains
     TYPE(INTERNAL_STATE) kt !,OPTIONAL :: K
     
     if(el%n_bessel/=-1) then
+     ! print*,"skowron: el%n_bessel/=-1: INTER_CAV4"
      call INTER_CAV4(EL,X,kt)
     else
      call INTER_CAVbmad4(EL,X,kt,zi)
@@ -1675,8 +1676,16 @@ contains
     IF(PRESENT(MID)) CALL XMID(MID,X,0)
 
     DO I=1,EL%P%NST
-       IF(.NOT.PRESENT(MID)) call track_slice(EL,X,k,i)
-       IF(PRESENT(MID)) CALL XMID(MID,X,I)
+       IF(.NOT.PRESENT(MID)) then
+         ! print*,"skowron: .NOT.PRESENT(MID): track_slice"
+         call track_slice(EL,X,k,i)
+       endif
+         
+       IF(PRESENT(MID)) then 
+         ! print*,"skowron: PRESENT(MID): XMID"
+         CALL XMID(MID,X,I)
+       endif  
+       
     ENDDO
 
     !    k%TOTALPATH=TOTALPATH_FLAG
@@ -2875,7 +2884,8 @@ CALL FRINGECAV(EL,X,k,2)
     real(dp) BBYTWT,BBXTW,BBYTW,x1,x3
     integer j,ko
     real(dp) dir
-
+    real(dp) sarg, sval
+    
     IF(k%NOCAVITY.and.(.not.EL%always_on)) RETURN
 
     DIR=EL%P%DIR*EL%P%CHARGE
@@ -2888,7 +2898,10 @@ CALL FRINGECAV(EL,X,k,2)
 
     VL=dir*YL*EL%volt*volt_c/EL%P%P0C
 
+    ! print*,"skowron: KICKCAVR Omega=",O, " EL%phase0=",EL%phase0, " EL%phas=",EL%phas, " EL%T=",EL%T
+
     do ko=1,el%nf    ! over modes
+       ! print*,"skowron:          mode ", ko
 
        DF=0.0_dp
        F=1.0_dp
@@ -2908,8 +2921,11 @@ CALL FRINGECAV(EL,X,k,2)
           X(2)=X(2)-X(1)*el%f(ko)*DF*VL*COS(ko*O*(x(6)+EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)/(ko*O)
           X(4)=X(4)-X(3)*el%f(ko)*DF*VL*COS(ko*O*(x(6)+EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)/(ko*O)
        ENDIF
-
-
+       
+       sarg = ko*O*(x(6)+EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0
+       sval = sin(sarg)
+       ! print*,"skowron: KICKCAVR argument of sinus ",sarg, " its value ", sval 
+       
        x(5)=x(5)-el%f(ko)*F*VL*SIN(ko*O*(x(6)+EL%t)+EL%PHAS+EL%PH(KO)+EL%phase0)
 
 

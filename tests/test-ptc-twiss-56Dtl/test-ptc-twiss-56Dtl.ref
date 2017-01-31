@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Linux)       +
+  +     MAD-X 5.02.13  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.06.02 10:00:52      +
+  + Release   date: 2016.12.20               +
+  + Execution date: 2017.01.30 18:58:03      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -874,13 +874,13 @@ obs_points pro_ptc_setswitch Done
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-       78.54370266        0.124107587       -41.13734187           -1000000 
+       78.54370266        0.124107587           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
           -1000000      -0.6258931859        2.838578011       0.8200596224 
 
                 q2                dq1                dq2                 qs 
-      0.7198292883       -4.353247487       -9.482231049                  0 
+      0.7198292883       -2.176620379       -4.741108195                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        3.282153615        15.12420817        1.633285387        20.07025827 
@@ -898,10 +898,10 @@ obs_points pro_ptc_setswitch Done
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0       -20.60417657     0.001188317943 
+                 0                  0        -10.3020712    0.0005941579859 
 
           disp2min           disp2max           disp3min           disp3max 
-      -9.086229451        9.086229451                  0                  0 
+       -4.54310719         4.54310719                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0    1.068886442e-08 
