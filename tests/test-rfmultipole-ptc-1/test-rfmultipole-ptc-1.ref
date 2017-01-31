@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  +     MAD-X 5.02.13  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.09.22 10:12:06      +
+  + Release   date: 2016.12.20               +
+  + Execution date: 2017.01.31 15:21:07      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, 'RF-Dipole example';
 
@@ -132,7 +132,7 @@ ptc_create_universe;
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-              24.2       0.3931569159       -1.510062195           -1000000 
+              24.2       0.3931569159           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
           -1000000       0.3843533716        1.594839708       0.6356419808 
@@ -156,10 +156,10 @@ ptc_create_universe;
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0                  0        1.834664739 
+                 0                  0                  0         1.82657111 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.3644916491       0.3644916378                  0                  0 
+      -0.362883693       0.3628836818                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0                  0 
@@ -291,8 +291,8 @@ ptc_end;
 
 value, q1, q1ptc;
 
-q1 =       0.6335454166 ;
-q1ptc =       0.6356419808 ;
+q1                 =       0.6335454166 ;
+q1ptc              =       0.6356419808 ;
 stop;
 
 

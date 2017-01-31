@@ -1,0 +1,17 @@
+2017.01.31 skowron r6094
+ 1. ptc_twiss with time=TRUE: scaling of dispersions and chromaticities with
+    relativistic beta such that they are the same as with time=false and in case of relativistic energies.
+    So the vaules follow defintion Dx = dX/dP.
+    This correction is NOT implemented for the values in NONLIN table where the raw values calculated by ptc are stored.
+    With time=TRUE the longitudinal variables are dE/E and dT/T (energy and time offsets). Therefore the chromatic
+    functions are calculated with respect of these variables. For linear variables the conversion is straight forward
+    so implemented it for variables going to twiss and summ tables (and terminal) to meet average user expectations. 
+    On the other hand, the conversion of the higher orders that are present in the NONLIN table is very cumbersome,
+    so the user needs to understand it and eventually rung with time=FALSE.
+ 2. Cleaned higher order compaction factor calculation. These outomatically pop out from PTC for icase=56 and time=FALSE.
+    There was a bug related to change of definition in new PTC for normal_form%A1 variable and it is corrected with this commit.
+    In the code there were algorithms implemented for other cases, however, I discovered that they were failing for extreme situations
+    like very low energy and/or calculation at high dispersion point. Therefore, I removed them so alpha_c_p, alpha_c_p2
+    and alpha_c_p3 are calculated only for icase=56 time=FALSE
+    
+    
