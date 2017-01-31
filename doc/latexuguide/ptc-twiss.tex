@@ -61,28 +61,32 @@ coupling matrix: \texttt{R11, R12, R21} and \texttt{R22}. In absence of
 coupling, the following holds: \texttt{betx = beta11}, \texttt{bety = beta22},
 \texttt{alfx = alfa11} and \texttt{alfy = alfa22}.
 
-\texttt{PTC\_TWISS} can also compute the deltap/p-dependency of the Twiss
-parameters. The column names \texttt{beta11p, ..., beta33p,
+\texttt{PTC\_TWISS} can also compute the deltap/p 
+(or deltaE/E if time=TRUE) dependency 
+of the Twiss parameters. The column names \texttt{beta11p, ..., beta33p,
   alfa11p, ..., alfa33p, gama11p, ..., gama33p} denote the derivatives of
-the optics parameters with respect to deltap/p. 
+the optics parameters with respect to deltap/p (or deltaE/E if time=TRUE). 
 
 In order to evaluate the deltap/p-dependency of the Twiss parameters,
 the order (\texttt{NO}) of the map must set to at least 2.  
 
-The derivatives of the dispersion with respect to deltap/p have column
-names: \texttt{disp1p, ..., disp4p}. 
+The derivatives of the dispersion with respect to deltap/p (or deltaE/E if time=TRUE)
+have column names: \texttt{disp1p, ..., disp4p}. 
 Second and third order derivatives have respective column names:  
 \texttt{disp1p2, ..., disp4p2} for the second order, and 
 \texttt{disp1p3, ..., disp4p3} for the third order.
 
-In addition, \ptc computes the momentum compaction factor $\alpha_c$ up to
-1st order for \texttt{ICASE=5}, or 3rd order (for \texttt{ICASE=56}). The
-values appear in the header of the \texttt{PTC\_TWISS} output file, and a
-value of zero means the value has not been computed.
+In addition, \ptc computes the momentum compaction factor $\alpha_c$ and time 
+slip factor $\eta_c$. Higher order derivatives of compaction factor  
+with respect to deltap/p up to urder 4  ($\alpha_c_p$, $\alpha_c_p2$ and $\alpha_c_p3$)
+are computed  f \texttt{ICASE=56} and \texttt{time=false}, prividing the order of 
+calculation as defined by \texttt{NO} switch is high enough.
+The values appear in the header of the \texttt{PTC\_TWISS} output file, 
+and a value of -1000000 means the value has not been computed.
 
-This feature is currently only available in the development
-version. \\
-\textbf{[To be checked]}
+%This feature is currently only available in the development
+%version. \\
+%\textbf{[To be checked]}
 
 For clarification: in the 4-D case, there is the following
 correspondence between MAD-X and the Ripken's notations:  
@@ -319,7 +323,7 @@ The attributes are:
   \ttitem{NORMAL} a logical flag that triggers saving of the normal form analysis results
   (the closed solution) into dedicated table called \texttt{NONLIN}. It is the same as  \texttt{ptc\_normal}.
    However, the nonlin table has format such that its coefficients can be accessed within the MADX script using 
-   \texttt{table} command. This permits, for example, to perform matching of these parameters or or value extraction to a variable . 
+   \texttt{table} command. This permits, for example, to perform matching of these parameters or or value extraction to a variable. 
    Also, for each all available orders are calculated and 
    no \texttt{select\_ptc\_normal} is required.
    Currently are calculated: tunes (and all their derivatives), 
@@ -329,9 +333,10 @@ The attributes are:
    which is different from  \texttt{ptc\_normal} nomenclature for some variables.
    Therefore, in order to obtain values of the partial derivatives the respective factorials 
    and binomial coefficients need to be factored out by the user. 
-   
-   
-
+   Also, if TIME=true the chromatic variables are NOT transformed into usual deltap/p dependence
+   and in this case they are related to deltaE/E. For example, dispersions and chormaticities will be 
+   different by relativistic beta factor. Similarly, the T coordinate is time times the speed of light 
+   instead of path length times the speed of light.
    
   
 \end{madlist}
