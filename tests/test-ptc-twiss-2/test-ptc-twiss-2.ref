@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Linux)       +
+  +     MAD-X 5.02.13  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.06.02 18:18:29      +
+  + Release   date: 2016.12.20               +
+  + Execution date: 2017.01.31 14:17:52      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, "LHC Version 6.503 -  July 2009" ;
 
@@ -41,10 +41,10 @@ orbit:  -2.000000E-03  1.739113E-11  3.774323E-11  1.700000E-04  0.000000E+00  0
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
- 
+
             nflips 
                  0 
-MAD-X Beam Parameters
+ MAD-X Beam Parameters
                   Energy : 0.450001E+03
           Kinetic Energy : 0.449063E+03
       Particle Rest Mass : 0.938272E+00
@@ -115,13 +115,13 @@ MAD-X Beam Parameters
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0       -2.745605262        2.816166303 
+                 0                  0       -2.745599294        2.816160181 
 
           disp2min           disp2max           disp3min           disp3max 
-    -0.04812306248      0.05033586138      -0.1856652009       0.1450797205 
+    -0.04812295788      0.05033575196      -0.1856647973       0.1450794052 
 
           disp4min           disp4max             deltap            orbit_x 
-   -0.005458863921     0.004780221885                  0    -0.001999999052 
+   -0.005458852055     0.004780211494                  0    -0.001999999052 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
   -5.541023328e-12    -6.47008852e-10    0.0001700000459                  0 

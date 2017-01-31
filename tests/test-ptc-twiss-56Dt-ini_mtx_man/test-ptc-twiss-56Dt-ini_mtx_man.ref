@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Linux)       +
+  +     MAD-X 5.02.13  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.06.02 10:05:09      +
+  + Release   date: 2016.12.20               +
+  + Execution date: 2017.01.31 14:51:17      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! reads the user privided one turn matrix via command parameters
 
@@ -927,13 +927,13 @@ ptc_create_universe;
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-       78.54370266        0.124107593       -41.13734007           -1000000 
+       78.54370266        0.124107593           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
           -1000000      -0.6258931799        2.838577942       0.8200596199 
 
                 q2                dq1                dq2                 qs 
-      0.7198292803       -4.353247388       -9.482230836                  0 
+      0.7198292803       -2.176620329       -4.741108089                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        3.282153606        15.12420824        1.633285386        20.07025827 
@@ -951,10 +951,10 @@ ptc_create_universe;
    2.799154326e-07        129.3455587                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 1        38793.11653        -20.6041753      0.00118704765 
+                 1        38793.11653       -10.30207056    0.0005935228406 
 
           disp2min           disp2max           disp3min           disp3max 
-      -9.086228281        9.086227476                  0                  0 
+      -4.543106605        4.543106202                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0                  0 

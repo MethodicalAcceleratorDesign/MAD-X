@@ -3,7 +3,7 @@
   +     MAD-X 5.02.13  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2016.12.20               +
-  + Execution date: 2017.01.20 17:25:21      +
+  + Execution date: 2017.01.31 14:13:32      +
   ++++++++++++++++++++++++++++++++++++++++++++
 call, file="../share/ALS/als.seqx";
 
@@ -301,13 +301,13 @@ obs_points pro_ptc_setswitch Done
    1.297030059e-07      0.01267018704    1.008008356e-35    2.467023486e-33 
 
          beta33min          beta33max           disp1min           disp1max 
-       69.24624092        71.86113056                  0       0.2383825428 
+       69.24624092        71.86113056                  0        0.238382529 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.1918836889       0.1918826945   -5.905624281e-16    4.432023469e-16 
+     -0.1918836778       0.1918826833   -5.905623938e-16    4.432023212e-16 
 
           disp4min           disp4max             deltap            orbit_x 
-  -3.134991457e-16    3.170233298e-16                  0   -1.915283351e-15 
+  -3.134991275e-16    3.170233114e-16                  0   -1.915283351e-15 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
    1.239206084e-18                  0                  0   -1.588163643e-12 

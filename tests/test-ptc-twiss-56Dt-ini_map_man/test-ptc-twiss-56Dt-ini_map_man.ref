@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Linux)       +
+  +     MAD-X 5.02.13  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.06.02 10:03:52      +
+  + Release   date: 2016.12.20               +
+  + Execution date: 2017.01.31 14:47:36      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! test for ptc_twiss,initial_map_manual=true;
 
@@ -880,10 +880,10 @@ ptc_create_universe;
    2.799089335e-07        129.3455325                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 1        38793.11645       -20.60417504     0.001186533499 
+                 1        38793.11645       -10.30207043    0.0005932657654 
 
           disp2min           disp2max           disp3min           disp3max 
-      -9.086228277        9.086227667                  0                  0 
+      -4.543106603        4.543106298                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0    1.068886484e-08 
@@ -944,10 +944,10 @@ ptc_create_universe;
    2.799089335e-07        129.3455325                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 1        38793.11645       -20.60417504     0.001186533499 
+                 1        38793.11645       -10.30207043    0.0005932657654 
 
           disp2min           disp2max           disp3min           disp3max 
-      -9.086228277        9.086227667                  0                  0 
+      -4.543106603        4.543106298                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0    1.068886484e-08 
@@ -1004,10 +1004,10 @@ ptc_create_universe;
    2.799156765e-07        129.3455324                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 1        38793.11575       -20.60417504     0.001186021459 
+                 1        38793.11575       -10.30207043     0.000593009746 
 
           disp2min           disp2max           disp3min           disp3max 
-      -9.086228277        9.086227678                  0                  0 
+      -4.543106603        4.543106303                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
                  0                  0                  0                  0 

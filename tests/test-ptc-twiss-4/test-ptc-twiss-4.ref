@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.12  (64 bit, Darwin)      +
+  +     MAD-X 5.02.13  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.10.15               +
-  + Execution date: 2016.10.14 14:17:32      +
+  + Release   date: 2016.12.20               +
+  + Execution date: 2017.01.31 14:34:50      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! test case for coupling calculations
 
@@ -278,13 +278,13 @@ ptc_twiss, deltap=0.0,closed_orbit,icase=5,file="p4_ptc.tfs",no=3;
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-       86.33884601    4.357888886e-05     9.70532961e-05           -1000000 
+       86.33884601    4.357888886e-05           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
           -1000000    4.357163553e-05        151.4823115       0.3113833114 
 
                 q2                dq1                dq2                 qs 
-       0.811467693      -0.8460403353      -0.8505154243                  0 
+       0.811467693      -0.8460403322      -0.8505154212                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
     0.006027089961        15.30834683     0.006336267376        27.21066157 
@@ -302,13 +302,13 @@ ptc_twiss, deltap=0.0,closed_orbit,icase=5,file="p4_ptc.tfs",no=3;
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0   -9.639454713e-06       0.0377924083 
+                 0                  0   -9.639454678e-06      0.03779240817 
 
           disp2min           disp2max           disp3min           disp3max 
-    -0.01483622117      0.01483622117    -1.24766566e-05    1.254878668e-05 
+    -0.01483622111      0.01483622111   -1.247665656e-05    1.254878663e-05 
 
           disp4min           disp4max             deltap            orbit_x 
-    -1.2659994e-05    1.265999529e-05                  0                  0 
+  -1.265999396e-05    1.265999524e-05                  0                  0 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
                  0                  0                  0                  0 

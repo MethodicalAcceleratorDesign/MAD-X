@@ -3,7 +3,7 @@
   +     MAD-X 5.02.13  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2016.12.20               +
-  + Execution date: 2017.01.20 17:21:32      +
+  + Execution date: 2017.01.31 14:13:32      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -833,7 +833,7 @@ ptc_create_universe;
 
   
 
-  ptc_twiss, icase=6, no=3, closed_orbit, rmatrix;
+  ptc_twiss, icase=6, no=4, closed_orbit, rmatrix;
 
 
 ++++++ table: ptc_twiss_summary
@@ -863,13 +863,13 @@ ptc_create_universe;
    2.824441214e-07        129.3455882    2.126349489e-29    2.085500424e-28 
 
          beta33min          beta33max           disp1min           disp1max 
-       180788.8351        180788.8869       -20.60417653     0.001188274337 
+       180788.8351        180788.8869       -10.30207118    0.0005941361828 
 
           disp2min           disp2max           disp3min           disp3max 
-      -9.086229432        9.086229432   -1.346519724e-12     8.83242179e-13 
+       -4.54310718         4.54310718   -6.732587452e-13     4.41620357e-13 
 
           disp4min           disp4max             deltap            orbit_x 
-  -5.056973661e-13    4.792047419e-13                  0    9.059200744e-09 
+  -2.528482636e-13    2.396019735e-13                  0    9.059200744e-09 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
    2.157946524e-09                  0                  0    1.856307268e-10 
