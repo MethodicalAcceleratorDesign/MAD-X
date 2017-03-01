@@ -76,9 +76,9 @@ Second and third order derivatives have respective column names:
 \texttt{disp1p2, ..., disp4p2} for the second order, and 
 \texttt{disp1p3, ..., disp4p3} for the third order.
 
-In addition, \ptc computes the momentum compaction factor $\alpha_c$ and time 
+In addition, \ptc computes the momentum compaction factor $\alpha_c$ (\texttt{ALPHA\_C}) and time 
 slip factor $\eta_c$. Higher order derivatives of compaction factor  
-with respect to deltap/p up to urder 4  ($\alpha_c_p$, $\alpha_c_p2$ and $\alpha_c_p3$)
+with respect to deltap/p up to urder 4  (\texttt{ALPHA\_C\_P}, \texttt{ALPHA\_C\_P2} and \texttt{ALPHA\_C\_P3})
 are computed  f \texttt{ICASE=56} and \texttt{time=false}, prividing the order of 
 calculation as defined by \texttt{NO} switch is high enough.
 The values appear in the header of the \texttt{PTC\_TWISS} output file, 
