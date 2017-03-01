@@ -1,0 +1,3 @@
+2017.02.22:
+1) madx job_sample.madx >log.job_sample
+2) sad64 job.sad >log.job.sad

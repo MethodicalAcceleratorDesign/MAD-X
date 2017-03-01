@@ -1,0 +1,181 @@
+
+Warning: Element redefinition of: s.ds.l1.b1
+     may cause problems if previous definition is used to define other elements.     
+     will ignore old definition.     
+     While: Parsing MADX file.
+  At or before line: 15152
+  In Statement: s.ds.l1.b1: omk, at = 0.000000000000000e+00,apertype=rectellipse,aperture:={ 9.999999000000001e+00, 9.999999000000001e+00, 9.999999000000001e+00, 9.999999000000001e+00},aper_tol:={ 0.000000000000000e+00};
+
+Warning: Element redefinition of: bpm.13l1.b1
+     may cause problems if previous definition is used to define other elements.     
+     will ignore old definition.     
+     While: Parsing MADX file.
+  At or before line: 15154
+  In Statement: bpm.13l1.b1: bpm, at = 4.730000000017753e-01,apertype=rectellipse,aperture:={ 2.400000000000000e-02, 2.400000000000000e-02, 2.400000000000000e-02, 2.400000000000000e-02},aper_tol:={ 1.500000000000000e-03},slot_id:= 249325,assembly_id:=
+ 103960,mech_sep:=-1.940000000000000e-01;
+
+Warning: Element redefinition of: mqt.13l1.b1
+     may cause problems if previous definition is used to define other elements.     
+     will ignore old definition.     
+     While: Parsing MADX file.
+  At or before line: 15156
+  In Statement: mqt.13l1.b1: mqt, at = 1.227000000002590e+00,polarity:=-1.000000000000000e+00,k1:=kqt13.l1b1 ,mech_sep:=-1.940000000000000e-01,aperture:={ 2.200000000000000e-02, 1.715000000000000e-02, 2.200000000000000e-02, 2.200000000000000e-02}
+,aper_tol:={ 1.320000000000000e-03, 9.000000000000000e-04},slot_id:= 249326,assembly_id:= 103960,apertype=rectellipse;
+
+Warning: Element redefinition of: mq.13l1.b1
+     may cause problems if previous definition is used to define other elements.     
+     will ignore old definition.     
+     While: Parsing MADX file.
+  At or before line: 15158
+  In Statement: mq.13l1.b1: mq, at = 3.235000000000582e+00,polarity:=-1.000000000000000e+00,k1:=kqd.a81 ,mech_sep:=-1.940000000000000e-01,aperture:={ 2.200000000000000e-02, 1.715000000000000e-02, 2.200000000000000e-02, 2.200000000000000e-02},aper_tol:={
+ 1.140000000000000e-03, 9.000000000000000e-04},slot_id:= 249327,assembly_id:= 103960,apertype=rectellipse;
+
+Warning: Element redefinition of: ms.13l1.b1
+     may cause problems if previous definition is used to define other elements.     
+     will ignore old definition.     
+     While: Parsing MADX file.
+  At or before line: 15160
+  In Statement: ms.13l1.b1: ms, at = 5.130000000001019e+00,polarity:=-1.000000000000000e+00,k2:=ksd1.a81b1 ,mech_sep:=-1.940000000000000e-01,aperture:={ 2.200000000000000e-02, 1.715000000000000e-02, 2.200000000000000e-02, 2.200000000000000e-02},aper_tol:={
+ 1.290000000000000e-03, 9.000000000000000e-04},slot_id:= 253687,assembly_id:= 103960,apertype=rectellipse;
+
+Warning: Element redefinition of: mcbv.13l1.b1
+     may cause problems if previous definition is used to define other elements.     
+     will ignore old definition.     
+     While: Parsing MADX file.
+  At or before line: 15162
+  In Statement: mcbv.13l1.b1: mcbv, at = 5.723000000001775e+00,polarity:= 1.000000000000000e+00,kick:=acbv13.l1b1 ,apertype=rectellipse,aperture:={ 2.200000000000000e-02, 1.715000000000000e-02, 2.200000000000000e-02, 2.200000000000000e-02},aper_tol:={
+ 1.450000000000000e-03, 9.000000000000000e-04},slot_id:= 253689,assembly_id:= 103960,mech_sep:=-1.940000000000000e-01;
+
+Warning: Element redefinition of: mco.b13l1.b1
+     may cause problems if previous definition is used to define other elements.     
+     will ignore old definition.     
+     While: Parsing MADX file.
+  At or before line: 15164
+  In Statement: mco.b13l1.b1: mco, at = 6.814000000002125e+00,polarity:= 1.000000000000000e+00,knl:={ 0.000000000000000e+00, 0.000000000000000e+00, 0.000000000000000e+00,kco.a81b1 * l.mco },apertype=rectellipse,aperture:={ 2.200000000000000e-02,
+ 1.715000000000000e-02, 2.200000000000000e-02, 2.200000000000000e-02},aper_tol:={ 9.000000000000000e-04, 8.000000000000000e-04, 5.000000000000000e-04},slot_id:= 253692,assembly_id:= 103961,mech_sep:=-1.940000000000000e-01;
+
+Warning: Element redefinition of: mcd.b13l1.b1
+     may cause problems if previous definition is used to define other elements.     
+     will ignore old definition.     
+     While: Parsing MADX file.
+  At or before line: 15167
+  In Statement: mcd.b13l1.b1: mcd, at = 6.815500000000611e+00,polarity:= 1.000000000000000e+00,knl:={ 0.000000000000000e+00, 0.000000000000000e+00, 0.000000000000000e+00, 0.000000000000000e+00,kcd.a81b1 * l.mcd },apertype=rectellipse,aperture:={
+ 2.200000000000000e-02, 1.715000000000000e-02, 2.200000000000000e-02, 2.200000000000000e-02},aper_tol:={ 9.000000000000000e-04, 8.000000000000000e-04, 5.000000000000000e-04},slot_id:= 253693,assembly_id:= 103961,mech_sep:=
+-1.940000000000000e-01;
+
+Warning: Element redefinition of: mb.c13l1.b1
+     may cause problems if previous definition is used to define other elements.     
+     will ignore old definition.     
+     While: Parsing MADX file.
+  At or before line: 15169
+  In Statement: mb.c13l1.b1: mb, at = 1.429975265057874e+01,polarity:= 1.000000000000000e+00,angle:=ab.a81 ,k0:=kb.a81 ,mech_sep:=-1.940000000000000e-01,aperture:={ 2.200000000000000e-02, 1.715000000000000e-02, 2.200000000000000e-02, 2.200000000000000e-02}
+,aper_tol:={ 9.000000000000000e-04, 8.000000000000000e-04, 5.000000000000000e-04},slot_id:= 249331,assembly_id:= 103961,apertype=rectellipse;
+
+Warning: Element redefinition of: mcs.c13l1.b1
+     may cause problems if previous definition is used to define other elements.     
+     will ignore old definition.     
+     While: Parsing MADX file.
+  At or before line: 15171
+  In Statement: mcs.c13l1.b1: mcs, at = 2.172350530115727e+01,polarity:= 1.000000000000000e+00,k2:=kcs.a81b1 ,mech_sep:=-1.940000000000000e-01,aperture:={ 2.200000000000000e-02, 1.715000000000000e-02, 2.200000000000000e-02, 2.200000000000000e-02}
+,aper_tol:={ 9.000000000000000e-04, 8.000000000000000e-04, 5.000000000000000e-04},slot_id:= 249333,assembly_id:= 103961,apertype=rectellipse;
+
+Warning: Element redefinition of: mb.b13l1.b1
+     may cause problems if previous definition is used to define other elements.     
+     will ignore old definition.     
+     While: Parsing MADX file.
+  At or before line: 15173
+  In Statement: mb.b13l1.b1: mb, at = 2.995925795173753e+01,polarity:= 1.000000000000000e+00,angle:=ab.a81 ,k0:=kb.a81 ,mech_sep:=-1.940000000000000e-01,aperture:={ 2.200000000000000e-02, 1.715000000000000e-02, 2.200000000000000e-02, 2.200000000000000e-02}
+,aper_tol:={ 9.000000000000000e-04, 8.000000000000000e-04, 5.000000000000000e-04},slot_id:= 249334,assembly_id:= 103962,apertype=rectellipse;
+
+Warning: Element redefinition of: mcs.b13l1.b1
+     may cause problems if previous definition is used to define other elements.     
+     will ignore old definition.     
+     While: Parsing MADX file.
+  At or before line: 15175
+  In Statement: mcs.b13l1.b1: mcs, at = 3.738301060231606e+01,polarity:= 1.000000000000000e+00,k2:=kcs.a81b1 ,mech_sep:=-1.940000000000000e-01,aperture:={ 2.200000000000000e-02, 1.715000000000000e-02, 2.200000000000000e-02, 2.200000000000000e-02}
+,aper_tol:={ 9.000000000000000e-04, 8.000000000000000e-04, 5.000000000000000e-04},slot_id:= 249336,assembly_id:= 103962,apertype=rectellipse;
+
+Warning: Element redefinition of: mco.a13l1.b1
+     may cause problems if previous definition is used to define other elements.     
+     will ignore old definition.     
+     While: Parsing MADX file.
+  At or before line: 15177
+  In Statement: mco.a13l1.b1: mco, at = 3.813301060231606e+01,polarity:= 1.000000000000000e+00,knl:={ 0.000000000000000e+00, 0.000000000000000e+00, 0.000000000000000e+00,kco.a81b1 * l.mco },apertype=rectellipse,aperture:={ 2.200000000000000e-02,
+ 1.715000000000000e-02, 2.200000000000000e-02, 2.200000000000000e-02},aper_tol:={ 9.000000000000000e-04, 8.000000000000000e-04, 5.000000000000000e-04},slot_id:= 253696,assembly_id:= 103963,mech_sep:=-1.940000000000000e-01;
+
+Warning: Element redefinition of: mcd.a13l1.b1
+     may cause problems if previous definition is used to define other elements.     
+     will ignore old definition.     
+     While: Parsing MADX file.
+  At or before line: 15180
+  In Statement: mcd.a13l1.b1: mcd, at = 3.813451060231455e+01,polarity:= 1.000000000000000e+00,knl:={ 0.000000000000000e+00, 0.000000000000000e+00, 0.000000000000000e+00, 0.000000000000000e+00,kcd.a81b1 * l.mcd },apertype=rectellipse,aperture:={
+ 2.200000000000000e-02, 1.715000000000000e-02, 2.200000000000000e-02, 2.200000000000000e-02},aper_tol:={ 9.000000000000000e-04, 8.000000000000000e-04, 5.000000000000000e-04},slot_id:= 253697,assembly_id:= 103963,mech_sep:=
+-1.940000000000000e-01;
+
+Warning: Element redefinition of: mb.a13l1.b1
+     may cause problems if previous definition is used to define other elements.     
+     will ignore old definition.     
+     While: Parsing MADX file.
+  At or before line: 15182
+  In Statement: mb.a13l1.b1: mb, at = 4.561876325289268e+01,polarity:= 1.000000000000000e+00,angle:=ab.a81 ,k0:=kb.a81 ,mech_sep:=-1.940000000000000e-01,aperture:={ 2.200000000000000e-02, 1.715000000000000e-02, 2.200000000000000e-02, 2.200000000000000e-02}
+,aper_tol:={ 9.000000000000000e-04, 8.000000000000000e-04, 5.000000000000000e-04},slot_id:= 249339,assembly_id:= 103963,apertype=rectellipse;
+
+Warning: Element redefinition of: mcs.a13l1.b1
+     may cause problems if previous definition is used to define other elements.     
+     will ignore old definition.     
+     While: Parsing MADX file.
+  At or before line: 15184
+  In Statement: mcs.a13l1.b1: mcs, at = 5.304251590347121e+01,polarity:= 1.000000000000000e+00,k2:=kcs.a81b1 ,mech_sep:=-1.940000000000000e-01,aperture:={ 2.200000000000000e-02, 1.715000000000000e-02, 2.200000000000000e-02, 2.200000000000000e-02}
+,aper_tol:={ 9.000000000000000e-04, 8.000000000000000e-04, 5.000000000000000e-04},slot_id:= 249341,assembly_id:= 103963,apertype=rectellipse;
+
+Warning: Element redefinition of: bpm.12l1.b1
+     may cause problems if previous definition is used to define other elements.     
+     will ignore old definition.     
+     While: Parsing MADX file.
+  At or before line: 15186
+  In Statement: bpm.12l1.b1: bpm, at = 5.392151590347203e+01,apertype=rectellipse,aperture:={ 2.400000000000000e-02, 2.400000000000000e-02, 2.400000000000000e-02, 2.400000000000000e-02},aper_tol:={ 1.500000000000000e-03},slot_id:= 249343,assembly_id:=
+ 103964,mech_sep:=-1.940000000000000e-01;
+
+Warning: Element redefinition of: mqt.12l1.b1
+     may cause problems if previous definition is used to define other elements.     
+     will ignore old definition.     
+     While: Parsing MADX file.
+  At or before line: 15188
+  In Statement: mqt.12l1.b1: mqt, at = 5.467551590347284e+01,polarity:= 1.000000000000000e+00,k1:=kqt12.l1b1 ,mech_sep:=-1.940000000000000e-01,aperture:={ 2.200000000000000e-02, 1.715000000000000e-02, 2.200000000000000e-02, 2.200000000000000e-02}
+,aper_tol:={ 1.320000000000000e-03, 9.000000000000000e-04},slot_id:= 249344,assembly_id:= 103964,apertype=rectellipse;
+
+Warning: Element redefinition of: mq.12l1.b1
+     may cause problems if previous definition is used to define other elements.     
+     will ignore old definition.     
+     While: Parsing MADX file.
+  At or before line: 15190
+  In Statement: mq.12l1.b1: mq, at = 5.668351590347083e+01,polarity:= 1.000000000000000e+00,k1:=kqf.a81 ,mech_sep:=-1.940000000000000e-01,aperture:={ 2.200000000000000e-02, 1.715000000000000e-02, 2.200000000000000e-02, 2.200000000000000e-02},aper_tol:={
+ 1.140000000000000e-03, 9.000000000000000e-04},slot_id:= 249345,assembly_id:= 103964,apertype=rectellipse;
+
+Warning: Element redefinition of: ms.12l1.b1
+     may cause problems if previous definition is used to define other elements.     
+     will ignore old definition.     
+     While: Parsing MADX file.
+  At or before line: 15192
+  In Statement: ms.12l1.b1: ms, at = 5.857851590347127e+01,polarity:= 1.000000000000000e+00,k2:=ksf2.a81b1 ,mech_sep:=-1.940000000000000e-01,aperture:={ 2.200000000000000e-02, 1.715000000000000e-02, 2.200000000000000e-02, 2.200000000000000e-02},aper_tol:={
+ 1.290000000000000e-03, 9.000000000000000e-04},slot_id:= 253699,assembly_id:= 103964,apertype=rectellipse;
+
+Warning: Enough element redefinition warnings. Will print these no more
+     While: Parsing MADX file.
+  At or before line: 15192
+  In Statement: ms.12l1.b1: ms, at = 5.857851590347127e+01,polarity:= 1.000000000000000e+00,k2:=ksf2.a81b1 ,mech_sep:=-1.940000000000000e-01,aperture:={ 2.200000000000000e-02, 1.715000000000000e-02, 2.200000000000000e-02, 2.200000000000000e-02},aper_tol:={
+ 1.290000000000000e-03, 9.000000000000000e-04},slot_id:= 253699,assembly_id:= 103964,apertype=rectellipse;
+
+ERROR: NO CORRESPONDING APERTURE TYPE OF: RACETRACK
+     FOR: <element name = "alicepipe40.l2" class = "marker" apertype = "RACETRACK" aperture = "0.000000000000000e+00, 1.375000000000000e-02, 3.375000000000000e-02" aper_tol = "{5.000000000000000e-03}">     
+     While: Translating from MADX rep to AML rep.
+
+ERROR: NO CORRESPONDING APERTURE TYPE OF: RACETRACK
+     FOR: <element name = "alicepipe31.l2" class = "marker" apertype = "RACETRACK" aperture = "0.000000000000000e+00, 1.375000000000000e-02, 3.375000000000000e-02" aper_tol = "{5.000000000000000e-03}">     
+     While: Translating from MADX rep to AML rep.
+
+ERROR: NO CORRESPONDING APERTURE TYPE OF: RACETRACK
+     FOR: <element name = "btvss.6l2.b1" inherit = "btvss075" at = "3.687437357838047e+03" apertype = "RACETRACK" aperture = "0.000000000000000e+00, 1.700000000000000e-02, 3.300000000000000e-02" aper_tol = "{2.000000000000000e-03,3.600000000000000e-04}" slot_id = "181614" mech_sep = "1.940000000000000e-01">     
+     While: Translating from MADX rep to AML rep.
+
+Output file: lhc_optics_opt2016_coll400_full.bmad

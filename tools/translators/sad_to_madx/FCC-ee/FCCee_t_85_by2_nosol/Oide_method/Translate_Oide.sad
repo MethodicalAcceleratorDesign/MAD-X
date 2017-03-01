@@ -1,0 +1,18 @@
+;
+FFS;
+
+Get["../../../src/SAD2MADX_DZ.n"];
+
+GetMAIN["../FCCee_t_85_by2_nosol.plain.sad"];
+USE RING;
+s2mx=SAD2MADX[fname->"FCCee_t_85_by2_nosol.plain", 
+     dir->"../Oide_method"];
+
+! Create self-contained MAD-X sequence file
+!s2mx@CreateMADX[];
+
+! Save magnet strengths and geometry into separate files
+s2mx@CreateMADXStr[];
+s2mx@CreateMADXGeo[];
+
+abort;

@@ -2,5 +2,9 @@
 Here we start the project of SAD <-> MAD-X translators.
 
 2017, Mar.01:
-New examples for lattice translation are added. Check the READMEs for further information
-in each sub-directory.
+1) New examples for lattice translation are added. Check the READMEs for further 
+  information in each sub-directory.
+2) Note that the examples are for the users' references when they want to do translations
+  for their own projects.
+3) If there are possible copyright violations somewhere in these examples, please feel 
+  free to contact dmzhou@post.kek.jp.

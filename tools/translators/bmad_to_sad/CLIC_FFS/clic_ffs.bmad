@@ -1,0 +1,152 @@
+! Translated from SAD file: clic_ffs.sad
+
+ 
+parameter[geometry] = open
+beginning[p0c] = 1500 * 1e9
+beginning[alpha_b] = 0.0
+beginning[alpha_a] = 0.0
+beginning[beta_a] = 34.142
+beginning[beta_b] = 5.858
+parameter[ptc_exact_model] = true
+bmad_com[use_hard_edge_drifts] = False
+
+kqm4 =        -0.102349732
+kqm3 =        0.1250883665
+kqm2 =      -0.06899568488
+kqm1 =      -0.01144744542
+kqd0 =      -0.1166369489
+kqf1 =       0.1399690995
+khs11 =         4.849274453
+kvs11 =         7.268562037
+khs12 =         1.160870043
+kvs12 =         6.812570012
+khs21 =         1.882723818
+kvs21 =         6.207353801
+khs22 =         3.902097869
+kvs22 =         6.720366912
+khs3 =        0
+kvs3 =       0
+khs4 =         0
+kvs4 =        0
+khs5 =        0
+kvs5 =      0
+khs6 =       0
+kvs6 =      0
+kho1 =                   0
+kvo1 =                   0
+koct3 =        0
+koct2 =        0
+koct1 =         0
+koct0 =        0
+khs7 = 0
+kvs7 = 0
+khs8 = 0
+kvs8 = 0
+khs9 = 0
+kvs9 = 0
+khs10 = 0
+kvs10 = 0
+lfodh =  78.17583
+lfodv =  78.17583
+lq =  0.5
+ls =  0.5
+lbh =  lfodh-2.0*lq
+lbv =  lfodv-2.0*lq
+ldh =  lbh-ls
+ldv =  lbv-ls
+strenh =  0.018167910366
+strenv =  0.01816781291
+ksks4 =  0.0
+ksks3 =  0.0
+ksks2 =  0.0
+ksks1 =  0.0
+actoct = 1
+
+
+beg: marker
+dm1: drift, l = 0.25
+qm1: quadrupole, k1 = kqm1*0.5 / 0.5, fringe_type = hard_edge_only, l = 0.5
+dm2: drift, l = 36.407989041793
+qm2: quadrupole, k1 = kqm2*0.5 / 0.5, fringe_type = hard_edge_only, l = 0.5
+dm3: drift, l = 35.933952375859
+qm3: quadrupole, k1 = kqm3*1.324089066334 / 1.324089066334, fringe_type = hard_edge_only, l = 1.324089066334
+dm4: drift, l = 2.956646
+qm4: quadrupole, k1 = kqm4*2.839104414122 / 2.839104414122, fringe_type = hard_edge_only, l = 2.839104414122
+dm5: drift, l = 2.673538
+
+telem: line = (beg, dm1, qm1, dm2, qm2, dm3, qm3, dm4, qm4, dm5)
+
+
+
+qfh: quadrupole, k1 = strenh*lq / lq, fringe_type = hard_edge_only, l = lq
+bmh: sbend, fringe_type = hard_edge_only, angle = 1.2e-4, l = lbh
+qdh2: quadrupole, k1 = -strenh*2*lq / (2.0*lq), fringe_type = hard_edge_only, l = 2.0*lq
+hs3: multipole, k2l = khs3
+drh: drift, l = ldh
+hs11: sextupole, k2 = khs11*ls / ls, fringe_type = full, l = ls
+qfh2: quadrupole, k1 = strenh*2*lq / (2.0*lq), fringe_type = hard_edge_only, l = 2.0*lq
+sks4: multipole, t2 = -30  * degrees, l = 0.0, k2l = ksks4
+oct3: multipole, k3l = koct3*actoct
+hs12: sextupole, k2 = khs12*ls / ls, fringe_type = full, l = ls
+hs4: multipole, k2l = khs4
+
+dicellh1: line = (qfh, bmh, qdh2, hs3, drh, hs11, qfh2, sks4, oct3, hs12, drh, hs4, qdh2, bmh, qfh2)
+
+hs5: multipole, k2l = khs5
+hs21: sextupole, k2 = khs21*ls / ls, fringe_type = full, l = ls
+hs22: sextupole, k2 = khs22*ls / ls, fringe_type = full, l = ls
+hs6: multipole, k2l = khs6
+
+dicellh2: line = (bmh, qdh2, hs5, drh, hs21, qfh2, hs22, oct3, drh, hs6, qdh2, bmh, qfh)
+
+ccsh: line = (dicellh1, dicellh2)
+
+
+qdv: quadrupole, k1 = -strenv*lq / lq, fringe_type = hard_edge_only, l = lq
+bmv: sbend, fringe_type = hard_edge_only, angle = -1.2e-4, l = lbv
+qfv2: quadrupole, k1 = strenv*2*lq / (2.0*lq), fringe_type = hard_edge_only, l = 2.0*lq
+vs3: multipole, k2l = kvs3
+drv: drift, l = ldv
+vs11: sextupole, k2 = kvs11*ls / ls, fringe_type = full, l = ls
+qdv2: quadrupole, k1 = -strenv*2*lq / (2.0*lq), fringe_type = hard_edge_only, l = 2.0*lq
+sks3: multipole, t2 = -30  * degrees, l = 0.0, k2l = ksks3
+vs12: sextupole, k2 = kvs12*ls / ls, fringe_type = full, l = ls
+oct2: multipole, k3l = koct2*actoct
+vs4: multipole, k2l = kvs4
+
+dicellv1: line = (qdv, bmv, qfv2, vs3, drv, vs11, qdv2, sks3, vs12, oct2, drv, vs4, qfv2, bmv, qdv2)
+
+vs5: multipole, k2l = kvs5
+vs21: sextupole, k2 = kvs21*ls / ls, fringe_type = full, l = ls
+vs22: sextupole, k2 = kvs22*ls / ls, fringe_type = full, l = ls
+vs6: multipole, k2l = kvs6
+
+dicellv2: line = (bmv, qfv2, vs5, drv, vs21, qdv2, vs22, oct2, drv, vs6, qfv2, bmv, qdv)
+
+ccsv: line = (dicellv1, dicellv2)
+
+ccs: line = (ccsh, ccsv)
+
+beg_ft: marker
+d1: drift, l = 0.75
+q1: quadrupole, k1 = 0.029226493037*0.5 / 0.5, fringe_type = hard_edge_only, l = 0.5
+d2: drift, l = 37.579098244904
+q2: quadrupole, k1 = -0.03543343674*0.5 / 0.5, fringe_type = hard_edge_only, l = 0.5
+d3: drift, l = 1.174605684321e2
+
+beg_fl: marker
+oct1: multipole, k3l = koct1*actoct
+qf1: quadrupole, k1 = kqf1*0.882566555984 / 0.882566555984, fringe_type = hard_edge_only, l = 0.882566555984
+d4: drift, l = 5.3
+oct0: multipole, k3l = koct0*actoct
+qd0: quadrupole, k1 = kqd0*2.668981376016 / 2.668981376016, fringe_type = hard_edge_only, l = 2.668981376016
+
+dblt: line = (beg_fl, oct1, qf1, d4, oct0, qd0)
+d5: drift, l = 3.5
+ip: marker
+
+tele: line = (beg_ft, d1, q1, d2, q2, d3, dblt, d5, ip)
+
+ff: line = (telem, ccs, tele)
+
+use, ff

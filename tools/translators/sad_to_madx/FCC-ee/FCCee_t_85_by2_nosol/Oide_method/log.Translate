@@ -1,0 +1,23 @@
+ *** Welcome to SAD Ver.1.1.0.3k64 built at 2017-02-13 21:59:17 +0100 ***
+ *** Today: 19:02:16 Thursday 02/23/2017 ***
+ OFF LOG ECHO;READ 77 ;          23
+ *** SADScript Initialization: /Users/deminzhou/SAD/K64/SAD/Packages/init.n ***
+ *** Run time Environment:     /Users/deminzhou/SAD/K64/SAD/Packages/init.local.n ***
+ RFSW RADCOD RAD   FLUC INTRA  POL   COD  DAPER EMIOU CMPLO FOURI SMEAR
+   F     F     F     T     F     F     T     F     F     F     F     T
+ 
+ Get["~/Myresearch/SAD/Translator/sad_to_madx/src/SAD2MADX_DZ.n"];
+ 
+ GetMAIN["../FCCee_t_85_by2_nosol.plain.sad"];
+ USE RING;
+ s2mx=SAD2MADX[fname->"FCCee_t_85_by2_nosol.plain",
+      dir->"~/Myresearch/SAD/Translator/sad_to_madx/FCC-ee/FCCee_t_85_by2_nosol/Oide_method"];
+ 
+ ! Create self-contained MAD-X sequence file
+ !s2mx@CreateMADX[];
+ 
+ ! Save magnet strengths and geometry into separate files
+ s2mx@CreateMADXStr[];
+ s2mx@CreateMADXGeo[];
+ 
+ abort;

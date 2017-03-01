@@ -1,0 +1,3 @@
+2017.02.05:
+sad64 Translate_lhc.sad >log.Translate_lhc &
+Result: Not successful: New definitions of MAD-X is not supported by Morita's script...

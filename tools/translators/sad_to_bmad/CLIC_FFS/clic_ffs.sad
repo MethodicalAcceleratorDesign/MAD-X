@@ -1,0 +1,199 @@
+! Trying to implement the traditional CLIC FFS lattice in SAD as it is implemented in test.madx as I got it from Brian
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+! Quadrupole
+
+kqm4 =       -0.102349732 ;
+kqm3 =       0.1250883665 ;
+kqm2 =     -0.06899568488 ;
+kqm1 =     -0.01144744542 ;
+
+kqd0=      -0.1166369489 ;
+kqf1=       0.1399690995 ;
+
+! Sextupole
+
+khs11 =        4.849274453 ;
+kvs11 =        7.268562037 ;
+khs12 =        1.160870043 ;
+kvs12 =        6.812570012 ;
+khs21 =        1.882723818 ;
+kvs21 =        6.207353801 ;
+khs22 =        3.902097869 ;
+kvs22 =        6.720366912 ;
+khs3 =       0;!-7.148421828 ;
+kvs3 =      0;!-0.5689865544 ;
+khs4 =        0;!1.075246562 ;
+kvs4 =       0;!-1.349740695 ;
+khs5 =       0;!-3.494285332 ;
+kvs5 =     0;!-0.01453269091 ;
+khs6 =      0;!-0.1310977011 ;
+kvs6 =     0;!0.003351578498 ;
+kho1 =                  0 ;
+kvo1 =                  0 ;
+koct3 =       0;!-660.9689859 ;
+koct2 =       0;!-138.2447917 ;
+koct1 =        0;!1392.175681 ;
+koct0 =       0;!-1471.816752 ;
+
+khs7 =0;
+kvs7 =0;
+khs8 =0;
+kvs8 =0;
+khs9 =0;
+kvs9 =0;
+khs10 =0;
+kvs10 =0;
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+LFODH = 78.17583;
+LFODV = 78.17583;
+LQ = 0.5;
+LS = 0.5;
+LBH = LFODH-2.0*LQ;
+LBV = LFODV-2.0*LQ;
+LDH = LBH-LS;
+LDV = LBV-LS;
+STRENH = 0.018167910366;
+STRENV = 0.01816781291;
+
+DRIFT DM1=(L=0.25)
+      DM2=(L=36.407989041793)
+      DM3=(L=35.933952375859)
+      DM4=(L=2.956646)
+      DM5=(L=2.673538)
+;
+
+QUAD QM1 =(L=0.5 K1=kqm1*0.5)
+     QM2 =(L=0.5 K1=kqm2*0.5)
+     QM3 =(L=1.324089066334 K1=kqm3*1.324089066334)
+     QM4 =(L=2.839104414122 K1=kqm4*2.839104414122)
+;
+
+
+BEND BMH = (L=LBH ANGLE=1.2E-4)
+     BMV = (L=LBV ANGLE=-1.2E-4)
+;
+
+DRIFT DRH = (L=LDH)
+      DRV = (L=LDV) 
+      DQ = (L=LQ)
+;
+
+QUAD QFH = (L=LQ K1=STRENH*LQ)
+     QFH2 = (L=2.0*LQ K1=STRENH*2*LQ)
+     QDH2 = (L=2.0*LQ K1=-STRENH*2*LQ)
+     QDV = (L=LQ K1=-STRENV*LQ)
+     QDV2 = (L=2.0*LQ K1=-STRENV*2*LQ)
+     QFV2 = (L=2.0*LQ K1=STRENV*2*LQ)
+;
+
+KSKS4 = 0.0 ;
+KSKS3 = 0.0 ;
+KSKS2 = 0.0 ;
+KSKS1 = 0.0 ;
+
+!These skew sextupoles are out os service for the moment
+SEXT SKS4 = (L=0.0 K2=KSKS4 ROTATE=-30 DEG)
+     SKS3 = (L=0.0 K2=KSKS3 ROTATE=-30 DEG)
+     SKS2 = (L=0.0 K2=KSKS2 ROTATE=-30 DEG)
+     SKS1 = (L=0.0 K2=KSKS1 ROTATE=-30 DEG)
+
+     HS11 = (L=LS K2=khs11*LS)
+     HS12 = (L=LS K2=khs12*LS)
+     HS21 = (L=LS K2=khs21*LS)
+     HS22 = (L=LS K2=khs22*LS)
+
+     VS11 = (L=LS K2=kvs11*LS)
+     VS12 = (L=LS K2=kvs12*LS)
+     VS21 = (L=LS K2=kvs21*LS)
+     VS22 = (L=LS K2=kvs22*LS)
+;
+
+! Extra sextupoles
+
+SEXT HS3 = (K2=khs3)
+     HS4 = (K2=khs4)
+     HS5 = (K2=khs5)
+     HS6 = (K2=khs6)
+     HS7 = (K2=khs7)
+     HS8 = (K2=khs8)
+     HS9 = (K2=khs9)
+     HS10 = (K2=khs10)
+;
+
+SEXT VS3 = (K2=kvs3)
+     VS4 = (K2=kvs4)
+     VS5 = (K2=kvs5)
+     VS6 = (K2=kvs6)
+     VS7 = (K2=kvs7)
+     VS8 = (K2=kvs8)
+     VS9 = (K2=kvs9)
+     VS10 = (K2=kvs10)
+;
+
+! here I neglect a bulk comment
+
+actoct=1;
+
+
+OCT oct0 = (k3=koct0*actoct)
+    oct1 = (k3=koct1*actoct)
+    oct2 = (k3=koct2*actoct)
+    oct3 = (k3=koct3*actoct)
+;
+
+MARK BEG =(AX=0.0 AY=0.0 BX=34.142 BY=5.858)
+     BEG_FT =()
+     BEG_FL =()
+     IP =()
+;
+
+DRIFT D1 =(L=0.75)
+      D2 =(L=37.579098244904)
+      D3 =(L=1.174605684321E2)
+      D4 =(L=5.3)
+      D5 =(L=3.5)
+;
+
+QUAD Q1 =(L=0.5 K1=0.029226493037*0.5)
+     Q2 =(L=0.5 K1=-0.03543343674*0.5)
+     QF1 =(L=0.882566555984 K1=kqf1*0.882566555984)
+     QD0 =(L=2.668981376016 K1=kqd0*2.668981376016)
+;
+
+LINE TELEM=(BEG,DM1,QM1,DM2,QM2,DM3,QM3,DM4,QM4,DM5)
+     DICELLH1=(QFH,BMH,QDH2,HS3,DRH,HS11,QFH2,SKS4,oct3,HS12,DRH,HS4,QDH2,BMH,QFH2)
+     DICELLH2=(BMH,QDH2,HS5,DRH,HS21,QFH2,HS22,oct3,DRH,HS6,QDH2,BMH,QFH)
+     DICELLV1=(QDV,BMV,QFV2,VS3,DRV,VS11,QDV2,SKS3,VS12,oct2,DRV,VS4,QFV2,BMV,QDV2)
+     DICELLV2=(BMV,QFV2,VS5,DRV,VS21,QDV2,VS22,oct2,DRV,VS6,QFV2,BMV,QDV)
+;
+
+LINE CCSH=(DICELLH1,DICELLH2)
+     CCSV=(DICELLV1,DICELLV2)
+;
+
+LINE CCS = (CCSH,CCSV)
+;
+
+LINE DBLT=(BEG_FL,oct1,QF1,D4,oct0,QD0)
+     TELE=(BEG_FT,D1,Q1,D2,Q2,D3,DBLT,D5,IP)
+;
+
+LINE FF=(TELEM,CCS,TELE);
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+MOMENTUM 1500GEV;
+
+CHARGE -1;
+! Defaults to electron mass and positron charge.
+ON ECHO;	! Echo back to mail level
+OFF CTIME; 	! Gives CPUtime at each main level comand
+ON LOG;
+
+FFS;
+USE FF;

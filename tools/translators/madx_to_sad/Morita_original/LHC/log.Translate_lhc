@@ -1,0 +1,219 @@
+ *** Welcome to SAD Ver.1.1.0.3k64 built at 2017-02-02 09:49:03 +0100 ***
+ *** Today: 19:25:22 Sunday 02/05/2017 ***
+ OFF LOG ECHO;READ 77 ;          23
+ *** SADScript Initialization: /Users/deminzhou/SAD/K64/SAD-master/Packages/init.n ***
+ *** Run time Environment:     /Users/deminzhou/SAD/K64/SAD-master/Packages/init.local.n ***
+ RFSW RADCOD RAD   FLUC INTRA  POL   COD  DAPER EMIOU CMPLO FOURI SMEAR
+   F     F     F     T     F     F     T     F     F     F     F     T
+ 
+ ! Step 1: Load the library for SAD to MADX translation
+  Get["../MADX2SAD.n"];
+ 
+ ! Step 3: Load MAD-X lattice
+  mx2s=MADX2SAD["lhc_optics_opt2016_coll400.madx"];
+Refer undefined symbol[rectellipse]
+Refer undefined element[placeholder] in beamline[_]
+Refer undefined symbol[circle]
+Refer undefined element[tkicker] in beamline[_]
+Refer undefined symbol[racetrack]
+ 
+ ! Step 3: Check beam line list
+  SeqList=mx2s@BeamLineList;
+ 
+ ! Step 4: Do translation and write to file
+  fn=OpenWrite["lhc_optics_opt2016_coll400.sad"];
+  Write[fn,"!\n! MADX2SAD: MAD-X to SAD lattice translator developed by A. Morita.\n!\n"];
+  Do[
+    bline=mx2s@ExportBeamLine[SeqList[[1]]];
+    Do[
+      WriteString[fn,bline[[k]],"\n"]
+      ,{k,Length[bline]}]
+    ,{i,Length[SeqList]}];
+Refer undefined symbol[clight]
+Thick rcollimator is not suppoted!	(tctph.4l1.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->399.2287742161971,"l"->1,"mech_sep"->-.1715,"slot_id"->377649,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tctpv.4l1.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->401.2287742161971,"l"->1,"mech_sep"->-.167,"slot_id"->377650,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tasb.3l1) = {"aper_tol"->{.001},"aperture"->{.024,.0289,.0289,.0289},"apertype"->0,
+ "assembly_id"->103990,"at"->501.8317742161962,"l"->1.2,"mech_sep"->0,"slot_id"->249438,"Type"->"rcollimator","xsize"->1e+35,
+ "ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tas.1l1) = {"aper_tol"->{.001,.0001,.0002},"aperture"->{.017,.017,.017,.017},"apertype"->0,
+ "at"->527.1947742161974,"l"->1.8,"mech_sep"->0,"slot_id"->103993,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tas.1r1) = {"aper_tol"->{.001,.00012,.00012},"aperture"->{.017,.017,.017,.017},"apertype"->0,
+ "at"->567.1237742161975,"l"->1.8,"mech_sep"->0,"slot_id"->102103,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tasb.3r1) = {"aper_tol"->{.001},"aperture"->{.027554,.030101,.030101,.030101},"apertype"->0,
+ "assembly_id"->102106,"at"->592.5157742161973,"l"->1.2,"mech_sep"->0,"slot_id"->241893,"Type"->"rcollimator","xsize"->1e+35,
+ "ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcl.4r1.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->697.2037742161956,"l"->1,"mech_sep"->.176,"slot_id"->6755437,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcl.5r1.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->731.5307742161967,"l"->1,"mech_sep"->.194,"slot_id"->102112,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcl.6r1.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->766.1867742161958,"l"->1,"mech_sep"->.194,"slot_id"->12962634,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tctph.4l2.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->3761.077357838047,"l"->1,"mech_sep"->.1699,"slot_id"->377594,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tctpv.4l2.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->3763.077357838047,"l"->1,"mech_sep"->.1637,"slot_id"->5619143,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tdi.4l2.b1) = {"aper_tol"->{.002},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->3798.777357838047,"l"->4.185,"mech_sep"->.076,"slot_id"->242830,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcdd.4l2) = {"aper_tol"->{0},"aperture"->{.035,.022,.0413,.032},"apertype"->0,
+ "at"->3808.382357838047,"l"->1,"mech_sep"->0,"slot_id"->102334,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tclia.4r2) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->3953.358357838046,"l"->1,"mech_sep"->0,"slot_id"->357146,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tclib.6r2.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->4107.264357838045,"l"->1,"mech_sep"->-.194,"slot_id"->102347,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tclim.6r2.b1) = {"aper_tol"->{.0015},"aperture"->{.021,.016,.021,.021},"apertype"->0,
+ "at"->4114.009357838047,"l"->.5,"mech_sep"->-.194,"slot_id"->357147,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcp.6l3.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->7034.845074216199,"l"->.6,"mech_sep"->-.2055,"slot_id"->102563,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcapa.6l3.b1) = {"aper_tol"->{0},"aperture"->{.015,.026,.015,.026},"apertype"->0,
+ "at"->7043.721574216197,"l"->1,"mech_sep"->-.2156,"slot_id"->691018,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcapd.5l3.b1) = {"aper_tol"->{0},"aperture"->{.015,.026,.015,.026},"apertype"->0,
+ "at"->7058.836574216195,"l"->.618,"mech_sep"->-.224,"slot_id"->6703861,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcsg.5l3.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->7068.166574216197,"l"->1,"mech_sep"->-.224,"slot_id"->297854,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcsg.4r3.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->7254.749574216195,"l"->1,"mech_sep"->-.224,"slot_id"->114804,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcsg.a5r3.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->7266.094574216197,"l"->1,"mech_sep"->-.224,"slot_id"->102571,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcsg.b5r3.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->7271.914574216196,"l"->1,"mech_sep"->-.224,"slot_id"->102573,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcla.a5r3.b1) = {"aper_tol"->{0},"aperture"->{.04,.03,.04,.04},"apertype"->0,
+ "at"->7302.394574216196,"l"->1,"mech_sep"->-.224,"slot_id"->479337,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcla.b5r3.b1) = {"aper_tol"->{0},"aperture"->{.04,.03,.04,.04},"apertype"->0,
+ "at"->7304.394574216196,"l"->1,"mech_sep"->-.224,"slot_id"->479338,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcla.6r3.b1) = {"aper_tol"->{0},"aperture"->{.03,.04,.04,.04},"apertype"->0,
+ "at"->7390.944074216197,"l"->1,"mech_sep"->-.203,"slot_id"->479340,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcla.7r3.b1) = {"aper_tol"->{0},"aperture"->{.03,.04,.04,.04},"apertype"->0,
+ "at"->7462.349574216198,"l"->1,"mech_sep"->-.194,"slot_id"->479341,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tctph.4l5.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->13728.5180069725,"l"->1,"mech_sep"->-.1715,"slot_id"->377606,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tctpv.4l5.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->13730.5180069725,"l"->1,"mech_sep"->-.167,"slot_id"->377607,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tasb.3l5) = {"aper_tol"->{.001},"aperture"->{.0289,.024,.0289,.0289},"apertype"->0,
+ "assembly_id"->103044,"at"->13831.1210069725,"l"->1.2,"mech_sep"->0,"slot_id"->245667,"Type"->"rcollimator","xsize"->1e+35,
+ "ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tas.1l5) = {"aper_tol"->{.001,.00015,.0001},"aperture"->{.017,.017,.017,.017},"apertype"->0,
+ "at"->13856.5130069725,"l"->1.8,"mech_sep"->0,"slot_id"->103047,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tas.1r5) = {"aper_tol"->{.001,.00012,.0002},"aperture"->{.017,.017,.017,.017},"apertype"->0,
+ "at"->13896.4130069725,"l"->1.8,"mech_sep"->0,"slot_id"->103048,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tasb.3r5) = {"aper_tol"->{.001},"aperture"->{.030101,.027554,.030101,.030101},"apertype"->0,
+ "assembly_id"->103051,"at"->13921.8050069725,"l"->1.2,"mech_sep"->0,"slot_id"->245686,"Type"->"rcollimator","xsize"->1e+35,
+ "ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcl.4r5.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->14026.4930069725,"l"->1,"mech_sep"->.176,"slot_id"->103055,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcl.5r5.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->14060.7270069725,"l"->1,"mech_sep"->.194,"slot_id"->103059,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcl.6r5.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->14098.0370069725,"l"->1,"mech_sep"->.194,"slot_id"->12962654,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcdqm.b4l6.b1) = {"aper_tol"->{.0015},"aperture"->{.0215,.0275,.0275,.0275},"apertype"->0,
+ "at"->17042.45159059435,"l"->1.05,"mech_sep"->.194,"slot_id"->377626,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcdqm.a4l6.b1) = {"aper_tol"->{.0015},"aperture"->{.0215,.0275,.0275,.0275},"apertype"->0,
+ "at"->17043.80159059435,"l"->1.05,"mech_sep"->.194,"slot_id"->829888,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcdsa.4l6.b1) = {"aper_tol"->{.001},"aperture"->{.0163,.0219,.0274,.0274},"apertype"->0,
+ "assembly_id"->103279,"at"->17166.52459059435,"l"->3.012,"mech_sep"->.244,"slot_id"->631488,"Type"->"rcollimator","xsize"->1e+35,
+ "ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcdsb.4l6.b1) = {"aper_tol"->{.001},"aperture"->{.0173,.0213,.0275,.0275},"apertype"->0,
+ "assembly_id"->616848,"at"->17170.07459059435,"l"->3.012,"mech_sep"->.2451,"slot_id"->631492,"Type"->"rcollimator",
+ "xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcsp.a4r6.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->17363.14959059435,"l"->1,"mech_sep"->.194,"slot_id"->377638,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcdqm.a4r6.b1) = {"aper_tol"->{.0015},"aperture"->{.0275,.0215,.0275,.0275},"apertype"->0,
+ "at"->17373.99759059435,"l"->1.05,"mech_sep"->.194,"slot_id"->829889,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcdqm.b4r6.b1) = {"aper_tol"->{.0015},"aperture"->{.0275,.0215,.0275,.0275},"apertype"->0,
+ "at"->17375.34759059435,"l"->1.05,"mech_sep"->.194,"slot_id"->377639,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcp.d6l7.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->20336.3581742162,"l"->.6,"mech_sep"->.1995,"slot_id"->103500,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcp.c6l7.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->20338.3581742162,"l"->.6,"mech_sep"->.201,"slot_id"->103501,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcp.b6l7.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->20340.3581742162,"l"->.6,"mech_sep"->.2025,"slot_id"->103502,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcapa.6l7.b1) = {"aper_tol"->{0},"aperture"->{.015,.026,.015,.026},"apertype"->0,
+ "at"->20363.3626742162,"l"->1,"mech_sep"->.222,"slot_id"->820100,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcapb.6l7.b1) = {"aper_tol"->{0},"aperture"->{.0295,.022,.0295,.022},"apertype"->0,
+ "at"->20368.8476742162,"l"->.2,"mech_sep"->.224,"slot_id"->820112,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcsg.a6l7.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->20379.8526742162,"l"->1,"mech_sep"->.224,"slot_id"->103507,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcapc.6l7.b1) = {"aper_tol"->{0},"aperture"->{.015,.026,.015,.026},"apertype"->0,
+ "at"->20396.1751742162,"l"->.6,"mech_sep"->.224,"slot_id"->820154,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcsg.b5l7.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->20439.0801742162,"l"->1,"mech_sep"->.224,"slot_id"->281859,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcsg.a5l7.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->20443.0801742162,"l"->1,"mech_sep"->.224,"slot_id"->281861,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcsg.d4l7.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->20464.4101742162,"l"->1,"mech_sep"->.224,"slot_id"->297882,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcsg.b4l7.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->20534.3361742162,"l"->1,"mech_sep"->.224,"slot_id"->281867,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcsg.a4l7.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->20538.3361742162,"l"->1,"mech_sep"->.224,"slot_id"->281869,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcsg.a4r7.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->20542.3361742162,"l"->1,"mech_sep"->.224,"slot_id"->103518,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcsg.b5r7.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->20633.5921742162,"l"->1,"mech_sep"->.224,"slot_id"->281877,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcsg.d5r7.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->20649.5921742162,"l"->1,"mech_sep"->.224,"slot_id"->281885,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcsg.e5r7.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->20653.5921742162,"l"->1,"mech_sep"->.224,"slot_id"->103525,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcsg.6r7.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->20688.1971742162,"l"->1,"mech_sep"->.224,"slot_id"->281887,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcla.a6r7.b1) = {"aper_tol"->{0},"aperture"->{.04,.03,.04,.04},"apertype"->0,
+ "at"->20695.2631742162,"l"->1,"mech_sep"->.224,"slot_id"->691005,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcla.b6r7.b1) = {"aper_tol"->{0},"aperture"->{.03,.04,.04,.04},"apertype"->0,
+ "at"->20726.1371742162,"l"->1,"mech_sep"->.2148,"slot_id"->691006,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcla.c6r7.b1) = {"aper_tol"->{0},"aperture"->{.04,.03,.04,.04},"apertype"->0,
+ "at"->20759.4061742162,"l"->1,"mech_sep"->.194,"slot_id"->691007,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcla.d6r7.b1) = {"aper_tol"->{0},"aperture"->{.03,.04,.04,.04},"apertype"->0,
+ "at"->20761.4061742162,"l"->1,"mech_sep"->.194,"slot_id"->691008,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcla.a7r7.b1) = {"aper_tol"->{0},"aperture"->{.03,.04,.04,.04},"apertype"->0,
+ "at"->20779.0341742162,"l"->1,"mech_sep"->.194,"slot_id"->691009,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tclim.6l8.b1) = {"aper_tol"->{.0015},"aperture"->{.016,.021,.021,.021},"apertype"->0,
+ "at"->23639.12475783805,"l"->.5,"mech_sep"->.194,"slot_id"->357149,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tctph.4l8.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->23744.31975783805,"l"->1,"mech_sep"->.1689,"slot_id"->377640,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tctpv.4l8.b1) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->23746.31975783805,"l"->1,"mech_sep"->.1629,"slot_id"->6154654,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tclia.4l8) = {"aper_tol"->{0},"aperture"->{.04,.04,.04,.04},"apertype"->0,
+ "at"->23788.80475783805,"l"->1,"mech_sep"->0,"slot_id"->357150,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+Thick rcollimator is not suppoted!	(tcddm.4r8) = {"aper_tol"->{.0015},"aperture"->{.035,.022,.0413,.032},"apertype"->0,
+ "at"->23933.91075783805,"l"->1,"mech_sep"->0,"slot_id"->103763,"Type"->"rcollimator","xsize"->1e+35,"ysize"->1e+35}
+???General::index:  Index  ... out of range in MADX2SAD`oK$[,"lefl.11l1.b1",114.6420318069417,13.7167,0,{"aper_tol"->{0,.0008,
+.0005},"aperture"->{.022,.01715,.022,.022},"apertype"->0,"at"->121.5003818069417,"l"->13.7167,"mech_sep"->-.194,"slot_id"->103969}
+][[7]]
+... in With[{type=#[[1]],name=#[[2]],pos=#[[3]],length=#[[4]],dlength=#[[5]],
+  param=#[[6]],opt=#[[7]]},
+ Which[Abs[offset$1581227+pos+(-current$1581227)]<1e-07,
+ ...
+... in With[{type=#[[1]],name=#[[2]],pos=#[[3]],length=#[[4]],dlength=#[[5]],
+   param=#[[6]],opt=#[[7]]},
+  Which[Abs[offset$1581227+pos+(-current$1581227)]<1e-07,
+ ...
+... in Scan[With[{type=#[[1]],name=#[[2]],pos=#[[3]],length=#[[4]],
+    dlength=#[[5]],param=#[[6]],opt=#[[7]]},
+   Which[Abs[offset$1581227+pos+(-current$1581227)]<1e-07,
+ ...
+... in Module[{new,current,offset,count,total,drifts={},drift},
+ total="length"/.Override[{"name"->"lhcb1","bv"->0,"l"->26658.8832,
+       "length"->0,"refer"->"centre","Type"->"sequence"}/.
+ ...
+... in StandardForm[Module[{new,current,offset,count,total,drifts={},drift},
+  total=
+    "length"/.Override[{"name"->"lhcb1","bv"->0,"l"->26658.8832,"length"->0,
+ ...
+... in MADX2SAD`oG$[{{"name"->"lhcb1","bv"->0,"l"->26658.8832,"length"->0,
+   "refer"->"centre","Type"->"sequence"},
+  {{"MARK","s.ds.l1.b1",0,0,0,{},{}},
+ ...
+... in Module[{name,bl0,bl1,bl2},
+ bl0=MADX2SAD`oF$[{{"name"->"lhcb1","bv"->0,"l"->26658.8832,"length"->0,
+      "refer"->"centre","Type"->"sequence"},
+ ...
+... in MADX2SAD`oD$[{{"name"->"lhcb1","bv"->0,"l"->26658.8832,"length"->0,
+   "refer"->"centre","Type"->"sequence"},
+  {{"s.ds.l1.b1","marker",0,0,
+ ...
+... in MADX2SAD`oD$["lhcb1"]
+... in Do[bline=mx2s@ExportBeamLine[SeqList[[1]]];
+  Do[WriteString[fn,bline[[k]],"\n"],{k,Length[bline]}],
+ {i,Length[SeqList]}]
+  Close[fn];
+  abort;

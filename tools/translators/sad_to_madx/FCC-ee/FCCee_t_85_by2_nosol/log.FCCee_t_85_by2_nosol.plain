@@ -1,0 +1,42 @@
+ *** Welcome to SAD Ver.1.1.0.3k64 built at 2017-02-13 21:59:17 +0100 ***
+ *** Today: 18:55:10 Thursday 02/23/2017 ***
+ OFF LOG ECHO;READ 77 ;          23
+ *** SADScript Initialization: /Users/deminzhou/SAD/K64/SAD/Packages/init.n ***
+ *** Run time Environment:     /Users/deminzhou/SAD/K64/SAD/Packages/init.local.n ***
+ RFSW RADCOD RAD   FLUC INTRA  POL   COD  DAPER EMIOU CMPLO FOURI SMEAR
+   F     F     F     T     F     F     T     F     F     F     F     T
+ 
+ ! Step 1: Load the library for SAD to MADX translation
+  Get["/Users/deminzhou/Myresearch/SAD/Translator/sad_to_madx/src/Morita_Method/SAD2MADX_DZ.n"];
+ 
+ ! Step 2: Load SAD lattice and do basic optics calculation.
+  GetMAIN["FCCee_t_85_by2_nosol.plain.sad"];
+  USE RING;     ! Select beam line
+  CELL;CALC;   ! Optics calculation
+ Matched. (  0.000    ) DP = 0.02000  DP0 = 0.00000  ExponentOfResidual = 2.0  OffMomentumWeight =   1.000
+$$$       f AX    #######  #  1.047E-13 $$$       f BX    #######  #   1.000000 $$$       f NX    #######  #  387.08000
+$$$       f AY    #######  #  4.086E-13 $$$       f BY    #######  #    .002000 $$$       f NY    #######  #  387.14000
+$$$       f LENG  #######  #  99983.864
+ 
+ ! Step 3: Make a copy of SAD2MADX class
+  s2mx=SAD2MADX;
+ 
+ ! Step 4: Set flags for controlling the translation
+ ! s2mx@ExpandSteeringLinearFringe=False;
+ ! s2mx@ExpandQuadrupoleLinearFringe=False;
+ ! s2mx@ExpandMULTwithKicker=False;
+ 
+ ! Step 5: Do lattice translation
+ !begin0=1;end0=begin0+9; ! Test
+  begin0="^^^";end0="$$$"; ! Full beamline
+  bseq=s2mx@ExportBeamLine[begin0,end0];
+ 
+ ! Step 6: Write to file
+  fn=OpenWrite["FCCee_t_85_by2_nosol.plain.seq"];
+  Write[fn,"!\n! SAD2MADX: SAD to MAD-X lattice translator developed by A. Morita.\n!\n"];
+  Do[
+    WriteString[fn,bseq[[i]],"\n"]
+    ,{i,Length[bseq]}];
+  Close[fn];
+ 
+  abort;

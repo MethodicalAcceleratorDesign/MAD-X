@@ -1,0 +1,2528 @@
+ ;
+ OFF CTIME;
+ ;
+ DRIFT  LX097B  =(L =.09741 )       L1PV    =(L =5.3938795219384 )     LZVQF2P2=(L =.3444 ) LX0828  =(L =.0828 )
+        LP1689  =(L =.168865 )      LX097   =(L =.096665 )      L2P     =(L =.7847663371262 )
+        LXB2P   =(L =.014949158814432534 ) L3      =(L =2.6299420554353 )     LX278   =(L =.278 )  LX526   =(L =.5256 )
+        LZHQD3P2=(L =.3444 ) L4P     =(L =2.1375042789852 )     LZVQF4P2=(L =.3444 ) L8P     =(L =3.1954699185894 )
+        LZVQEAP =(L =.3444 ) L5AP    =(L =3.3474699185894 )     L5BP    =(L =.1878 ) LZVQD5P =(L =.3444 )
+        L6P     =(L =.5643677887469 )      L0P     =(L =.5010930775039 )      LZVQF6P2=(L =.3444 ) LP1696  =(L =.16961 )
+        L0M     =(L =.7732930775039 )      LZVQF4P3=(L =.3444 ) LZHQD3P3=(L =.3444 ) LZVQF2P3=(L =.3444 )
+        L1PH    =(L =5.2388795219384 )     LZHQD1P2=(L =.3444 ) LZVQF2P4=(L =.3444 ) LZHQD3P4=(L =.3444 ) LZVQF4P4=(L =.3444 )
+        LZVQF6P3=(L =.3444 ) LZVQF4P5=(L =.3444 ) LZHQD3P5=(L =.3444 ) LZVQF2P5=(L =.3444 ) LZHQD1P3=(L =.3444 )
+        LZVQF2P6=(L =.3444 ) LX541   =(L =.5406 ) LZHQT1TNP1=(L =.3444 )      LT0LP   =(L =1.8227599414397 )
+        LZVQT2TNP1=(L =.3444 )      LTBLVP  =(L =3.3307629370534 )     LZVQTAP =(L =.3444 ) LTBLHP  =(L =3.4827629370534 )
+        LXSF0P  =(L =.1878 ) LZHQT3TNP1=(L =.3444 )      LT2LP   =(L =.7557993507542 )      LT3LP   =(L =1.2347907395161999 )
+        LZVQT4TNP1=(L =.3444 )      LT4LVP  =(L =5.5119079602302 )     LZHQT5TNP=(L =.3444 )       LT4LHP  =(L =5.3569079602302 )
+        LZVQT4TNP2=(L =.3444 )      LZHQT3TNP2=(L =.3444 )      LZVQT2TNP2=(L =.3444 )      LZHQT1TNP2=(L =.3444 )
+        LZVQF2P7=(L =.3444 ) LZHQD1P4=(L =.3444 ) LZVQF2P8=(L =.3444 ) LZHQD3P6=(L =.3444 ) LZVQF4P6=(L =.3444 )
+        LZVQF6P4=(L =.3444 ) LZVQF4P7=(L =.3444 ) LZHQD3P7=(L =.3444 ) LZVQF2P9=(L =.3444 ) LZHQD1P5=(L =.3444 )
+        LZVQF2P10=(L =.3444 )       LZHQD3P8=(L =.3444 ) LZVQF4P8=(L =.3444 ) LZVQF6P5=(L =.3444 ) LZVQF4P9=(L =.3444 )
+        LZHQD3P9=(L =.3444 ) LZVQF2P11=(L =.3444 )       LZHQD1P6=(L =.3444 ) LZVQF2P12=(L =.3444 )       LZHQD3P10=(L =.3444 )
+        LZVQF4P10=(L =.3444 )       LZVQF6P6=(L =.3444 ) LZVQS2NP1=(L =.3444 )       L4NP    =(L =2.6605275605163 )
+        LZVQ    =(L =.3444 ) L3WP    =(L =3.2355275605163 )     LZHQ    =(L =.3444 ) L3WWPN  =(L =.6122822252486 )
+        LB22N   =(L =1.3106364063732496 )  LW8NP   =(L =1.2695544184582999 )  LZVQW8NRP=(L =.3444 )
+        LW7NP   =(L =3.2363632494382 )     LZHQW7NRP=(L =.3444 )       LW6NP   =(L =3.2363632494382 )     LZVQW6NRP=(L =.3444 )
+        LBP1SN  =(L =.867685 )      LBP2N   =(L =3.39277 )      LBP4NP  =(L =2.71777 )      LBP1LN  =(L =1.022635 )
+        LZHQW5NRP=(L =.3444 )       LW4NHP  =(L =4.18140435503088 )    LZHQW4NRP=(L =.3444 )       LWIGNR1 =(L =7.9264 )
+        LZHQW3NRP=(L =.3444 )       LXW4SN2 =(L =.444777 )      LXW3N   =(L =.1846115 )     LXW0N   =(L =.16331600000000004 )
+        LXW1N   =(L =.264272 )      LXW5N   =(L =0 )     LXW2N   =(L =.534054 )      LXW4LN  =(L =.27562699999999996 )
+        LZVQW2NRP=(L =.3444 )       LXW4SN  =(L =.444827 )      LZHQDWNP1=(L =.3444 )       LZVQFWNP1=(L =.3444 )
+        LZHQDWNP2=(L =.3444 )       LZVQFWNP2=(L =.3444 )       LZHQDWNP3=(L =.3444 )       LZVQFWNP3=(L =.3444 )
+        LZHQDWNP4=(L =.3444 )       LZVQFWNP4=(L =.3444 )       LZHQDWNP5=(L =.3444 )       LZVQFWNP5=(L =.3444 )
+        LZHQDWNP6=(L =.3444 )       LZVQW2NLP=(L =.3444 )       LZHQW3NLP=(L =.3444 )       LZVQW4NLP=(L =.3444 )
+        LW4NVP  =(L =6.0264043550310005 )  LZHQW5NLP=(L =.3444 )       LBP2NP  =(L =.89223 )       LBP1NP  =(L =.89223 )
+        LBP3N   =(L =.71777 )       LZVQW6NLP=(L =.3444 )       LZHQW7NLP=(L =.3444 )       LW7NP2  =(L =3.2363132494382 )
+        LZVQW8NLP=(L =.3444 )       L3WP2   =(L =3.2354775605163 )     LZVQS2NP2=(L =.3444 )       LZVQF6P7=(L =.3444 )
+        LZVQF4P11=(L =.3444 )       LZHQD3P11=(L =.3444 )       LZVQF2P13=(L =.3444 )       LZHQD1P7=(L =.3444 )
+        LZVQF2P14=(L =.3444 )       LZHQD3P12=(L =.3444 )       LZVQF4P12=(L =.3444 )       LZVQF6P8=(L =.3444 )
+        LZVQF4P13=(L =.3444 )       LZHQD3P13=(L =.3444 )       LZVQF2P15=(L =.3444 )       LZHQD1P8=(L =.3444 )
+        LZVQF2P16=(L =.3444 )       LZHQD3P14=(L =.3444 )       LZVQF4P14=(L =.3444 )       LZVQF6P9=(L =.3444 )
+        LZVQF4P15=(L =.3444 )       LZHQD3P15=(L =.3444 )       LZVQF2P17=(L =.3444 )       LZHQD1P9=(L =.3444 )
+        LZVQF2P18=(L =.3444 )       LZHQT1NFP1=(L =.3444 )      LZVQT2NFP1=(L =.3444 )      LZHQT3NFP1=(L =.3444 )
+        LZVQT4NFP1=(L =.3444 )      LZHQT5NFP=(L =.3444 )       LZVQT4NFP2=(L =.3444 )      LZHQT3NFP2=(L =.3444 )
+        LZVQT2NFP2=(L =.3444 )      LZHQT1NFP2=(L =.3444 )      LZVQF2P19=(L =.3444 )       LZHQD1P10=(L =.3444 )
+        LZVQF2P20=(L =.3444 )       LZHQD3P16=(L =.3444 )       LZVQF4P16=(L =.3444 )       LZVQF6P10=(L =.3444 )
+        LZVQF4P17=(L =.3444 )       LZHQD3P17=(L =.3444 )       LZVQF2P21=(L =.3444 )       LZHQD1P11=(L =.3444 )
+        LZVQF2P22=(L =.3444 )       LZHQD3P18=(L =.3444 )       LZVQF4P18=(L =.3444 )       LZVQF6P11=(L =.3444 )
+        LZVQF4P19=(L =.3444 )       LZHQD3P19=(L =.3444 )       LZVQF2P23=(L =.3444 )       LZHQD1P12=(L =.3444 )
+        LZVQF2P24=(L =.3444 )       LZHQD3P20=(L =.3444 )       LZVQF4P20=(L =.3444 )       LZVQF6P12=(L =.3444 )
+        LZVQS2FRP=(L =.3444 )       L4FRP   =(L =2.6605275605163 )     L3FRP   =(L =3.2355275605163 )
+        LSFRP   =(L =1.7436934636630885 )  LXBSFR1 =(L =.164755 )      LXBSFR  =(L =.6390705846387928 )
+        LR7FRP  =(L =.17563448503512602 )  LR6FRP  =(L =6.2053264064106 )     LZHQR5P =(L =.3444 ) LR5FRP  =(L =4.4275846297671 )
+        LR4FRP  =(L =6.4738099999839 )     LX086   =(L =.08593 )       LP158   =(L =.15814 )       LX083   =(L =.08279 )
+        LZHQR3P =(L =.34442 )       LXRF0P  =(L =7.23728 )      LZVQL   =(L =.34442 )       LZHQL   =(L =.34442 )
+        LXRF1P  =(L =1.93964 )      LXRF2   =(L =3.093 ) LXRF3P  =(L =2.20464 )      LV0P1   =(L =2.890914999999901 )
+        LV0P1A  =(L =.984000000000031 )    LV0P1B  =(L =.1878000000000677 )   LV1P    =(L =3.057725 )     LV2P    =(L =.8898 )
+        LV4P    =(L =.5897999999999363 )   LV3P    =(L =.7180000000000637 )   LVB1    =(L =2.155128152146129 )   LVB2    =(L =3.9 )
+        LX08279 =(L =.08279 )       LV1PW   =(L =3.057705 )     LV0P2B  =(L =.5697999999998791 )   LV0P2A  =(L =.4999999999999453 )
+        LV0P2   =(L =2.3329150000001753 )  LM3FLP1 =(L =6.07251241582007 )    LM3FLP0A=(L =.5 )
+        LM3FLP0B=(L =1.4008000000002307 )  LM3FLP3 =(L =.0828 ) LXKK1A  =(L =.9136999999999094 )   LXKK1B  =(L =.3150000000000007 )
+        LM4FLPA =(L =.31500000000014206 )  LM4FLPB =(L =1.7790000000001367 )  LM4FLPC =(L =.8191288661018108 )
+        LM5FLP  =(L =6.649497533127707 )   LX80P   =(L =.29714000000009333 )  LX05558 =(L =.05558 )
+        LM6FLP  =(L =6.826218863618112 )   LFAH1   =(L =.21000000000001745 )  LFAH2   =(L =.21000000000037702 )
+        LFAH3   =(L =.7249999999999949 )   LFAV    =(L =.43779999999978503 )  LM7FLPA =(L =1.1033026588692987 )
+        LM7FLPB =(L =.2950000000001025 )   LXKK2A  =(L =.29500000000000004 )  LXKK2B  =(L =.8353000000000134 )
+        LM8FLP  =(L =.6455497344447 )      LXBS    =(L =.4408203691301954 )   LXBSFL1 =(L =.164755 )
+        LSFLP   =(L =1.779080073220004 )   L3FLP   =(L =3.2355275605163 )     L4FLPA  =(L =.17980000000020901 )
+        L4FLPB  =(L =.4289999999997911 )   L4FLPC  =(L =.45 )   L4FLPD  =(L =1.4277925605162158 )  LX773   =(L =.7758 )
+        LX0556  =(L =.0556 ) LZVQS2FLP=(L =.3444 )       L8PAB   =(L =1.6752699185894 )     LZVQF6P13=(L =.3444 )
+        LZVQF4P21=(L =.3444 )       LZHQD3P21=(L =.3444 )       LZVQF2P25=(L =.3444 )       LZHQD1P13=(L =.3444 )
+        LZVQF2P26=(L =.3444 )       LZHQD3P22=(L =.3444 )       LZVQF4P22=(L =.3444 )       LMH1    =(L =1.26759 )
+        L8PMH1  =(L =1.9278799185894 )     L5APMV  =(L =1.7454699185894 )     LMV1    =(L =.2 )    LMV2    =(L =1.402 )
+        LZVQF6P14=(L =.3444 )       LMH2    =(L =1.9273899185894 )     L8PMH2  =(L =1.26808 )      LZVQF4P23=(L =.3444 )
+        LZHQD3P23=(L =.3444 )       LZVQF2P27=(L =.3444 )       LZHQD1P14=(L =.3444 )       LZVQF2P28=(L =.3444 )
+        LZHQD3P24=(L =.3444 )       LZVQF4P24=(L =.3444 )       LZVQF6P15=(L =.3444 )       LZVQF4P25=(L =.3444 )
+        LZHQD3P25=(L =.3444 )       LZVQF2P29=(L =.3444 )       LZHQD1P15=(L =.3444 )       LZVQF2P30=(L =.3444 )
+        LZHQT1FOP1=(L =.3444 )      LT0SP   =(L =1.8228861071304 )     LZVQT2FOP1=(L =.3444 )      LTBSVP  =(L =3.4932267627501 )
+        LPMD06V1A=(L =2.36245 )     LPMD06V1B=(L =1.4705767627500999 ) LT2SP   =(L =.4307455336667 )
+        LT3SP   =(L =.6750448041594 )      LZVQT4FOP1=(L =.3444 )      LT4SVP  =(L =5.6160189769798 )     LZHQT5FOP=(L =.3444 )
+        LT4SHP  =(L =5.4610189769798 )     LZVQT4FOP2=(L =.3444 )      LZVS3B  =(L =.6228 ) LZVS3A  =(L =2.6780267627501 )
+        LZVQT2FOP2=(L =.3444 )      LZHQT1FOP2=(L =.3444 )      LZVQF2P31=(L =.3444 )       LZHQD1P16=(L =.3444 )
+        LZVQF2P32=(L =.3444 )       LZHQD3P26=(L =.3444 )       LZVS2B  =(L =.1436 ) LZVS2A  =(L =1.6495042789852 )
+        LZVQF4P26=(L =.3444 )       LZVS1A  =(L =2.5262699185894 )     LZVS1B  =(L =.4768 ) LZVQF6P16=(L =.3444 )
+        LPMD06V2A=(L =2.3624300000000003 ) LPMD06V2B=(L =1.5150742789851996 ) LZVQF2P33=(L =.3444 )       LZHQD1P17=(L =.3444 )
+        LZVQF2P34=(L =.3444 )       LZHQD3P28=(L =.3444 )       LZVQF4P28=(L =.3444 )       LZVQF6P17=(L =.3444 )
+        LZVQF4P29=(L =.3444 )       LZHQD3P29=(L =.3444 )       LZVQF2P35=(L =.3444 )       LZHQD1P18=(L =.3444 )
+        LZVQF2P36=(L =.3444 )       LZHQD3P30=(L =.3444 )       LZVQF4P30=(L =.3444 )       LZVQF6P18=(L =.3444 )
+        LZVQS2OP1=(L =.3444 )       L4OP    =(L =2.6605275605163 )     L3WWPO  =(L =.6122822252486 )
+        LB22O   =(L =1.3106364063733094 )  LW8OP   =(L =1.2695544184582999 )  LZVQW8ORP=(L =.3444 )
+        LW7OP   =(L =3.2138148495272 )     LZHQW7ORP=(L =.3444 )       LW6OP   =(L =3.2138148495272 )     LZVQW6ORP=(L =.3444 )
+        LW5OP   =(L =10.7455962362428 )    LX09427 =(L =.09427 )       LZSTR   =(L =.3444 ) LXRF3SP =(L =2.27773 )
+        LXRF3LP =(L =2.43273 )      LW3OP   =(L =7.86493 )      LXW4SO2 =(L =.444777 )      LXW3O   =(L =.1846115 )
+        LXW0O   =(L =.16331600000000004 )  LXW1O   =(L =.264272 )      LXW5O   =(L =0 )     LXW2O   =(L =.534054 )
+        LXW4LO  =(L =.27562699999999996 )  LXW4SO  =(L =.444827 )      LW4OHP  =(L =5.6158662362428 )     LZHQW5OLP=(L =.3444 )
+        LBP1LO  =(L =1.022635 )     LBP1OP  =(L =.89223 )       LBP2O   =(L =3.39277 )      LBP2OP  =(L =.89223 )
+        LBP3O   =(L =.71777 )       LBP1SO  =(L =.867685 )      LZVQW6OLP=(L =.3444 )       LZHQW7OLP=(L =.3444 )
+        LW7OP2  =(L =3.2137648495272 )     LZVQW8OLP=(L =.3444 )       LZVQS2OP2=(L =.3444 )       LZVQF6P19=(L =.3444 )
+        LZVQF4P31=(L =.3444 )       LZHQD3P31=(L =.3444 )       LZVQF2P37=(L =.3444 )       LZHQD1P19=(L =.3444 )
+        LZVQF2P38=(L =.3444 )       LZHQD3P32=(L =.3444 )       LZVQF4P32=(L =.3444 )       LZVQF6P20=(L =.3444 )
+        LZVQF4P33=(L =.3444 )       LZHQD3P33=(L =.3444 )       LZVQF2P39=(L =.3444 )       LZHQD1P20=(L =.3444 )
+        LZVQF2P40=(L =.3444 )       LZHQD3P34=(L =.3444 )       LZVQF4P34=(L =.3444 )       LZVQF6P21=(L =.3444 )
+        LZVQF4P35=(L =.3444 )       LZHQD3P35=(L =.3444 )       LZVQF2P41=(L =.3444 )       LZHQD1P21=(L =.3444 )
+        LZVQF2P42=(L =.3444 )       LZHQT1OTP1=(L =.3444 )      LZVQT2OTP1=(L =.3444 )      LTBSVPA =(L =1.26835 )
+        LTBSVPB =(L =2.2248767627501 )     LTBSHP  =(L =3.6452267627501 )     LZVQT4OTP1=(L =.3444 )      LZHQT5OTP=(L =.3444 )
+        LZVQT4OTP2=(L =.3444 )      LTBSVPD =(L =2.2251467627501 )     LTBSVPC =(L =1.26808 )      LZVQT2OTP2=(L =.3444 )
+        LZHQT1OTP2=(L =.3444 )      LZVQF2P43=(L =.3444 )       LZHQD1P22=(L =.3444 )       LZVQF2P44=(L =.3444 )
+        LZHQD3P36=(L =.3444 )       LZVQF4P36=(L =.3444 )       LMHD3   =(L =.6662 ) L8PMHD3 =(L =2.5292699185894 )
+        LPMD03V1A=(L =2.36253 )     LPMD03V1B=(L =1.1727399185894 )    LZVQF6P22=(L =.3444 )       LZVQF4P37=(L =.3444 )
+        LZHQD3P37=(L =.3444 )       LZVQF2P45=(L =.3444 )       LZHQD1P23=(L =.3444 )       LZVQF2P46=(L =.3444 )
+        LZHQD3P38=(L =.3444 )       LZVQF4P38=(L =.3444 )       LPMD03V2A=(L =2.36253 )     LPMD03V2B=(L =1.1727399185894 )
+        LZVQF6P23=(L =.3444 )       LZVQF4P39=(L =.3444 )       LZHQD3P39=(L =.3444 )       LZVQF2P47=(L =.3444 )
+        LZHQD1P24=(L =.3444 )       LZVQF2P48=(L =.3444 )       LXL13039=(L =.278 )  LQLA9RPA=(L =.16961 )
+        LQLA9RPB=(L =.09741 )       LLA10R  =(L =3.926269467026 )      LLA9RA  =(L =7.471620934454999 )   LLA9RB  =(L =.50025 )
+        LLA8R   =(L =4.424652850569486 )   LLA8RA  =(L =1.623308612748 )      LBLA6RP =(L =.01396592754393886 )
+        LXL700B =(L =.53039 )       LXL700  =(L =.7 )    LLA7R   =(L =.725730917418 )       LZHQA3RP=(L =.3444 )
+        LLA6R   =(L =.737080601963 )       LZVQA2RP=(L =.3444 ) LLA5R   =(L =2.009227891458 )
+        LQLA3RP =(L =.0036700000000000066 )       LXL15814=(L =.15814 )       LPMD02H2A=(L =4.115519999999999 )
+        LPMD02H2B=(L =.17967363327303065 ) LLA4R   =(L =1.150806554418 )      LLA1R   =(L =1.662521073547 )
+        LQLA2RP =(L =.0036700000000000066 )       LXL24186=(L =.24186 )       LXL580  =(L =.58 )   LLX1R1  =(L =1.326389373774 )
+        LQLX1RP =(L =.0036700000000000066 )       LXL42186=(L =.42186 )       LBLX4RP =(L =.013965410631709705 )
+        LXL54186=(L =.54186 )       LQLX2RP =(L =.0036700000000000066 )       LXBLB3RP=(L =.014948606506102457 )
+        LLB3R   =(L =5.147509336906 )      LLB3RA  =(L =1.29067 )      LQLB3RP =(L =.0036700000000000066 )
+        LLB2RA  =(L =.398269999999995 )    LLB2RB  =(L =10.255082450600005 )  LLB2RC  =(L =1.29112 )
+        LLB1R   =(L =1.741592056682 )      LX200   =(L =.2 )    L25814  =(L =.25814 )       LXBXS   =(L =.08299999999999999 )
+        LNBX2   =(L =.5 )    LXBLY2RP=(L =.014949851092576625 ) LLY1R   =(L =2.027243779298 )
+        LXBLY5RP=(L =.014950338368797896 ) LX097B3 =(L =.09491 )       L2606   =(L =.26064 )       LXL2428 =(L =.2428 )
+        LXL56467=(L =.56467 )       LXBLC2RP=(L =.01494993699782518 )  LXL12653=(L =.12653 )       LLC2RA  =(L =.5311399999999253 )
+        LLC2RB  =(L =2.248420000000075 )   LLC2RC  =(L =1.0872570297083561 )  LXL13653=(L =.13653 )
+        LLC1RA  =(L =.7474327412856328 )   LLC1RB  =(L =.14280000000002474 )  LBLC1RPA=(L =.31467 )
+        LBLC1RP =(L =.24745183592846806 )  LBLC1RPB=(L =-.17500000000000002 ) LBLCWRPA=(L =.024999999999999994 )
+        LBLCWRP =(L =.3974519528019107 )   LBLCWRPB=(L =.16466999999999998 )  LXL28467=(L =.28467 )
+        LBC1RP  =(L =.031647499999999995 ) LXB1R   =(L =2.9999924235032895 )  LIP2    =(L =.8 )    LIP1    =(L =.2 )
+        LXB1L   =(L =2.999984096297075 )   LBC1LP  =(L =.031647501274725515 ) LBLC1LP1A=(L =.11966999999999994 )
+        LBLC1LP1=(L =.3934186629020389 )   LBLC1LP1B=(L =.027499999999999997 )       LBLC1LP2A=(L =.007499999999999996 )
+        LBLC1LP2=(L =.01745198001007625 )  LBLC1LP2B=(L =.54467 )      LLC1LA  =(L =1.6379100000000004 )
+        LLC1LB  =(L =.9911811095109995 )   LLC2LA  =(L =3.8393042429540003 )  LLC2LB  =(L =.6309099999999999 )
+        LXBLC2LP=(L =.01495022409103348 )  LXBLY2LP=(L =.014950322535081696 ) LLY1L   =(L =4.370065982871 )
+        LXBLY5LP=(L =.014946075945331537 ) LX097B1 =(L =.09641 )       L2592   =(L =.25919 )       LX097B2 =(L =.08991 )
+        L2657   =(L =.26569 )       LLB1L   =(L =3.899280576301 )      LLB2LA  =(L =8.155266792873004 )
+        LLB2LB  =(L =.27796999999999694 )  LQLB3LP =(L =.0036700000000000066 )       LLB3L   =(L =7.455459530142 )
+        LLX1L1  =(L =2.326485756415 )      LQLX1LP =(L =.0036700000000000066 )       LXBLX4LP=(L =.014948167320275506 )
+        LQLX2LP =(L =.0036700000000000066 )       LQLA2LP =(L =.0036700000000000066 )       LBLA1LP =(L =.013964294139123359 )
+        LLA2L   =(L =3.986615247641 )      LQLA3LP =(L =.0036700000000000066 )       LXBLA2LP=(L =.014948554164351709 )
+        LLA6L   =(L =1.241193505808 )      LLA7L   =(L =1.651331524896 )      LZHQA3LP=(L =.3444 ) LLA8L   =(L =1.021228405035 )
+        LLA9LA  =(L =4.1831459932370105 )  LLA9LB  =(L =.500989999999989 )    LLA10L  =(L =5.644229559619 )
+        LLA11L  =(L =1.265986286239 )      L1311   =(L =.278 )  LZVQF2P1=(L =.3444 ) LZHQD1P1=(L =.3444 )
+ ;
+ BEND   ZVQD1P1 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P2 =(L =.3444     ANGLE =0 )
+        B2P     =(L =4.159654  ANGLE =.0560998688141    E1 =.5    E2 =.5    F1 =.2154884   FRINGE =1 )
+        ZVQD3P2 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF4P2 =(L =.3444     ANGLE =0 )
+        ZHQEAP3 =(L =.3444     ANGLE =0 )
+        ZVQD5P3 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P4 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP4 =(L =.3444     ANGLE =0 )
+        ZHQF4P3 =(L =.3444     ANGLE =0 )
+        ZVQD3P3 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P3 =(L =.3444     ANGLE =0 )
+        ZVQD1P2 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P4 =(L =.3444     ANGLE =0 )
+        ZVQD3P4 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF4P4 =(L =.3444     ANGLE =0 )
+        ZHQEAP5 =(L =.3444     ANGLE =0 )
+        ZVQD5P5 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P6 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP6 =(L =.3444     ANGLE =0 )
+        ZHQF4P5 =(L =.3444     ANGLE =0 )
+        ZVQD3P5 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P5 =(L =.3444     ANGLE =0 )
+        ZVQD1P3 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P6 =(L =.3444     ANGLE =0 )
+        ZVQT1TNP1=(L =.3444    ANGLE =0  ROTATE =-90 DEG )
+        ZHQT2TNP1=(L =.3444    ANGLE =0 )
+        ZHQTATNP1=(L =.3444    ANGLE =0 )
+        ZVQT3TNP1=(L =.3444    ANGLE =0  ROTATE =-90 DEG )
+        ZHQT4TNP1=(L =.3444    ANGLE =0 )
+        ZVQT5TNP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQT4TNP2=(L =.3444    ANGLE =0 )
+        ZVQT3TNP2=(L =.3444    ANGLE =0  ROTATE =-90 DEG )
+        ZHQTATNP2=(L =.3444    ANGLE =0 )
+        ZHQT2TNP2=(L =.3444    ANGLE =0 )
+        ZVQT1TNP2=(L =.3444    ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P7 =(L =.3444     ANGLE =0 )
+        ZVQD1P4 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P8 =(L =.3444     ANGLE =0 )
+        ZVQD3P6 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF4P6 =(L =.3444     ANGLE =0 )
+        ZHQEAP7 =(L =.3444     ANGLE =0 )
+        ZVQD5P7 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P8 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP8 =(L =.3444     ANGLE =0 )
+        ZHQF4P7 =(L =.3444     ANGLE =0 )
+        ZVQD3P7 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P9 =(L =.3444     ANGLE =0 )
+        ZVQD1P5 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P10=(L =.3444     ANGLE =0 )
+        ZVQD3P8 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF4P8 =(L =.3444     ANGLE =0 )
+        ZHQEAP9 =(L =.3444     ANGLE =0 )
+        ZVQD5P9 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P10=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP10=(L =.3444     ANGLE =0 )
+        ZHQF4P9 =(L =.3444     ANGLE =0 )
+        ZVQD3P9 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P11=(L =.3444     ANGLE =0 )
+        ZVQD1P6 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P12=(L =.3444     ANGLE =0 )
+        ZVQD3P10=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF4P10=(L =.3444     ANGLE =0 )
+        ZHQEAP11=(L =.3444     ANGLE =0 )
+        ZVQD5P11=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P12=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP12=(L =.3444     ANGLE =0 )
+        ZHQS2NP1=(L =.3444     ANGLE =0 )
+        ZHQSBNP1=(L =.3444     ANGLE =0 )
+        ZVQS1NP1=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        BS2NP   =(L =.89349    ANGLE =.0280499344  E1 =.5    E2 =.5    F1 =.2456 FRINGE =1 )
+        ZHQW8NRP=(L =.3444     ANGLE =0 )
+        ZVQW7NRP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQW6NRP=(L =.3444     ANGLE =0 )
+        BP2NRP  =(L =.89223    ANGLE =0  E2 =1     K0 =-.02746716 F1 =.2456 FRINGE =1 )
+        BP1NRP  =(L =.89223    ANGLE =0  E1 =1     K0 =.02746716  F1 =.2456 FRINGE =1 )
+        ZVQW5NRP=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZHQW4NRP=(L =.3444     ANGLE =0 )
+        ZVQW3NRP=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        BW0NRP  =(L =.215946   ANGLE =0  E2 =1     K0 =.0107248   F1 =.1138 FRINGE =1 )
+        BW1NRP  =(L =.334831   ANGLE =0  E1 =.5    E2 =.5    K0 =-.0219048  F1 =.1138 FRINGE =1 )
+        BW2NRP  =(L =.338537   ANGLE =0  E1 =.5    E2 =.5    K0 =.02236     F1 =.1138 FRINGE =1 )
+        BW3NRP  =(L =.332919   ANGLE =0  E1 =.5    E2 =.5    K0 =-.02236    F1 =.1138 FRINGE =1 )
+        BW0NRMP =(L =.215946   ANGLE =0  E2 =1     K0 =-.0107248  F1 =.1138 FRINGE =1 )
+        BW1NRMP =(L =.334831   ANGLE =0  E1 =.5    E2 =.5    K0 =.0219048   F1 =.1138 FRINGE =1 )
+        BW2NRMP =(L =.338537   ANGLE =0  E1 =.5    E2 =.5    K0 =-.02236    F1 =.1138 FRINGE =1 )
+        BW3NRMP =(L =.332919   ANGLE =0  E1 =.5    E2 =.5    K0 =.02236     F1 =.1138 FRINGE =1 )
+        ZHQW2NRP=(L =.3444     ANGLE =0 )
+        ZVQDWNP1=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZHQFWNP1=(L =.3444     ANGLE =0 )
+        ZVQDWNP2=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZHQFWNP2=(L =.3444     ANGLE =0 )
+        ZVQDWNP3=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZHQFWNP3=(L =.3444     ANGLE =0 )
+        BW0NLP  =(L =.215946   ANGLE =0  E2 =1     K0 =.0107248   F1 =.1138 FRINGE =1 )
+        BW1NLP  =(L =.334831   ANGLE =0  E1 =.5    E2 =.5    K0 =-.0219048  F1 =.1138 FRINGE =1 )
+        BW2NLP  =(L =.338537   ANGLE =0  E1 =.5    E2 =.5    K0 =.02236     F1 =.1138 FRINGE =1 )
+        BW3NLP  =(L =.332919   ANGLE =0  E1 =.5    E2 =.5    K0 =-.02236    F1 =.1138 FRINGE =1 )
+        BW0NLMP =(L =.215946   ANGLE =0  E2 =1     K0 =-.0107248  F1 =.1138 FRINGE =1 )
+        BW1NLMP =(L =.334831   ANGLE =0  E1 =.5    E2 =.5    K0 =.0219048   F1 =.1138 FRINGE =1 )
+        BW2NLMP =(L =.338537   ANGLE =0  E1 =.5    E2 =.5    K0 =-.02236    F1 =.1138 FRINGE =1 )
+        BW3NLMP =(L =.332919   ANGLE =0  E1 =.5    E2 =.5    K0 =.02236     F1 =.1138 FRINGE =1 )
+        ZVQDWNP4=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZHQFWNP4=(L =.3444     ANGLE =0 )
+        ZVQDWNP5=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZHQFWNP5=(L =.3444     ANGLE =0 )
+        ZVQDWNP6=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZHQW2NLP=(L =.3444     ANGLE =0 )
+        ZVQW3NLP=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZHQW4NLP=(L =.3444     ANGLE =0 )
+        ZVQW5NLP=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZHQW6NLP=(L =.3444     ANGLE =0 )
+        ZVQW7NLP=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZHQW8NLP=(L =.3444     ANGLE =0 )
+        ZVQS1NP2=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZHQSBNP2=(L =.3444     ANGLE =0 )
+        ZHQS2NP2=(L =.3444     ANGLE =0 )
+        ZHQEAP13=(L =.3444     ANGLE =0 )
+        ZVQD5P13=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P14=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP14=(L =.3444     ANGLE =0 )
+        ZHQF4P11=(L =.3444     ANGLE =0 )
+        ZVQD3P11=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P13=(L =.3444     ANGLE =0 )
+        ZVQD1P7 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P14=(L =.3444     ANGLE =0 )
+        ZVQD3P12=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF4P12=(L =.3444     ANGLE =0 )
+        ZHQEAP15=(L =.3444     ANGLE =0 )
+        ZVQD5P15=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P16=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP16=(L =.3444     ANGLE =0 )
+        ZHQF4P13=(L =.3444     ANGLE =0 )
+        ZVQD3P13=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P15=(L =.3444     ANGLE =0 )
+        ZVQD1P8 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P16=(L =.3444     ANGLE =0 )
+        ZVQD3P14=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF4P14=(L =.3444     ANGLE =0 )
+        ZHQEAP17=(L =.3444     ANGLE =0 )
+        ZVQD5P17=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P18=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP18=(L =.3444     ANGLE =0 )
+        ZHQF4P15=(L =.3444     ANGLE =0 )
+        ZVQD3P15=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P17=(L =.3444     ANGLE =0 )
+        ZVQD1P9 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P18=(L =.3444     ANGLE =0 )
+        ZVQT1NFP1=(L =.3444    ANGLE =0  ROTATE =-90 DEG )
+        ZHQT2NFP1=(L =.3444    ANGLE =0 )
+        ZHQTANFP1=(L =.3444    ANGLE =0 )
+        ZVQT3NFP1=(L =.3444    ANGLE =0  ROTATE =-90 DEG )
+        ZHQT4NFP1=(L =.3444    ANGLE =0 )
+        ZVQT5NFP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQT4NFP2=(L =.3444    ANGLE =0 )
+        ZVQT3NFP2=(L =.3444    ANGLE =0  ROTATE =-90 DEG )
+        ZHQTANFP2=(L =.3444    ANGLE =0 )
+        ZHQT2NFP2=(L =.3444    ANGLE =0 )
+        ZVQT1NFP2=(L =.3444    ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P19=(L =.3444     ANGLE =0 )
+        ZVQD1P10=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P20=(L =.3444     ANGLE =0 )
+        ZVQD3P16=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF4P16=(L =.3444     ANGLE =0 )
+        ZHQEAP19=(L =.3444     ANGLE =0 )
+        ZVQD5P19=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P20=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP20=(L =.3444     ANGLE =0 )
+        ZHQF4P17=(L =.3444     ANGLE =0 )
+        ZVQD3P17=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P21=(L =.3444     ANGLE =0 )
+        ZVQD1P11=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P22=(L =.3444     ANGLE =0 )
+        ZVQD3P18=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF4P18=(L =.3444     ANGLE =0 )
+        ZHQEAP21=(L =.3444     ANGLE =0 )
+        ZVQD5P21=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P22=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP22=(L =.3444     ANGLE =0 )
+        ZHQF4P19=(L =.3444     ANGLE =0 )
+        ZVQD3P19=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P23=(L =.3444     ANGLE =0 )
+        ZVQD1P12=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P24=(L =.3444     ANGLE =0 )
+        ZVQD3P20=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF4P20=(L =.3444     ANGLE =0 )
+        ZHQEAP23=(L =.3444     ANGLE =0 )
+        ZVQD5P23=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P24=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP24=(L =.3444     ANGLE =0 )
+        ZHQS2FRP=(L =.3444     ANGLE =0 )
+        ZHQSBFRP=(L =.3444     ANGLE =0 )
+        ZVQS1FRP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        BS2FRP  =(L =.89349    ANGLE =.02804993440705   E1 =.5    E2 =.5    F1 =.2456 FRINGE =1 )
+        BSWFRP  =(L =.89349    ANGLE =.0050369430792    E1 =.5    E2 =.5    F1 =.2456 FRINGE =1 )
+        ZHQR6P  =(L =.3444     ANGLE =0 )
+        ZVQR5P  =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQR4P  =(L =.3444     ANGLE =0 )
+        ZVQR3P  =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQR2P  =(L =.34442    ANGLE =0 )
+        ZVQR1P  =(L =.34442    ANGLE =0  ROTATE =-90 DEG )
+        ZHQFRP1 =(L =.34442    ANGLE =0 )
+        ZVQDRP1 =(L =.34442    ANGLE =0  ROTATE =-90 DEG )
+        ZHQFRP2 =(L =.34442    ANGLE =0 )
+        ZVQDRP2 =(L =.34442    ANGLE =0  ROTATE =-90 DEG )
+        ZHQV4P1 =(L =.34442    ANGLE =0 )
+        ZVQV3P1 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQV2P1 =(L =.3444     ANGLE =0 )
+        ZVQV1P1 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        BV2P    =(L =1.4  ANGLE =-.0112  E2 =1     ROTATE =-90 DEG     F1 =.2224 FRINGE =1 )
+        BV1P    =(L =1.4  ANGLE =.0112   E1 =1     ROTATE =-90 DEG     F1 =.2224 FRINGE =1 )
+        ZVQV1P2 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQV2P2 =(L =.34442    ANGLE =0 )
+        ZVQV3P2 =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQV4P2 =(L =.34442    ANGLE =0 )
+        ZVQDRP3 =(L =.34442    ANGLE =0  ROTATE =-90 DEG )
+        ZHQFRP3 =(L =.34442    ANGLE =0 )
+        ZVQDRP4 =(L =.34442    ANGLE =0  ROTATE =-90 DEG )
+        ZHQI2P  =(L =.34442    ANGLE =0 )
+        ZVQI3P  =(L =.34442    ANGLE =0  ROTATE =-90 DEG )
+        ZHQI4P  =(L =.3444     ANGLE =0 )
+        FZHINJ2P1=(L =.225     ANGLE =0 )
+        FZHINJ2P2=(L =.225     ANGLE =0 )
+        FZHINJ2P3=(L =.225     ANGLE =0 )
+        FZVKICKP=(L =.075 ANGLE =0  ROTATE =-90 DEG )
+        ZVQI5P  =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQI6P  =(L =.34442    ANGLE =0 )
+        FZHABP  =(L =.3   ANGLE =0 )
+        ZVQI7P  =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        FZVABP  =(L =.3   ANGLE =0  ROTATE =-90 DEG )
+        FZHINJ11=(L =.225 ANGLE =0 )
+        FZHINJ12=(L =.225 ANGLE =0 )
+        FZHINJ13=(L =.225 ANGLE =0 )
+        ZHQI8P  =(L =.3444     ANGLE =0 )
+        BSWFLP  =(L =.4315     ANGLE =-.005036943051    E1 =.5    E2 =.5    F1 =.2224 FRINGE =1 )
+        BS2FLP  =(L =.89349    ANGLE =.02804993440705   E1 =.5    E2 =.5    F1 =.2456 FRINGE =1 )
+        ZVQS1FLP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQSBFLP=(L =.3444     ANGLE =0 )
+        FZVALP  =(L =1.5  ANGLE =0  ROTATE =-90 DEG )
+        ZHQS2FLP=(L =.3444     ANGLE =0 )
+        ZHQEAP25=(L =.3444     ANGLE =0 )
+        ZVQD5P25=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P26=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP26=(L =.3444     ANGLE =0 )
+        ZHQF4P21=(L =.3444     ANGLE =0 )
+        ZVQD3P21=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P25=(L =.3444     ANGLE =0 )
+        ZVQD1P13=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P26=(L =.3444     ANGLE =0 )
+        ZVQD3P22=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF4P22=(L =.3444     ANGLE =0 )
+        ZHQEAP27=(L =.3444     ANGLE =0 )
+        ZVQD5P27=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P28=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP28=(L =.3444     ANGLE =0 )
+        ZHQF4P23=(L =.3444     ANGLE =0 )
+        ZVQD3P23=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P27=(L =.3444     ANGLE =0 )
+        ZVQD1P14=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P28=(L =.3444     ANGLE =0 )
+        ZVQD3P24=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF4P24=(L =.3444     ANGLE =0 )
+        ZHQEAP29=(L =.3444     ANGLE =0 )
+        ZVQD5P29=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P30=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP30=(L =.3444     ANGLE =0 )
+        ZHQF4P25=(L =.3444     ANGLE =0 )
+        ZVQD3P25=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P29=(L =.3444     ANGLE =0 )
+        ZVQD1P15=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P30=(L =.3444     ANGLE =0 )
+        ZVQT1FOP1=(L =.3444    ANGLE =0  ROTATE =-90 DEG )
+        ZHQT2FOP1=(L =.3444    ANGLE =0 )
+        ZHQTAFOP1=(L =.3444    ANGLE =0 )
+        ZVQT3FOP1=(L =.3444    ANGLE =0  ROTATE =-90 DEG )
+        ZHQT4FOP1=(L =.3444    ANGLE =0 )
+        ZVQT5FOP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQT4FOP2=(L =.3444    ANGLE =0 )
+        ZVQT3FOP2=(L =.3444    ANGLE =0  ROTATE =-90 DEG )
+        ZVS3P   =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQTAFOP2=(L =.3444    ANGLE =0 )
+        ZHQT2FOP2=(L =.3444    ANGLE =0 )
+        ZVQT1FOP2=(L =.3444    ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P31=(L =.3444     ANGLE =0 )
+        ZVQD1P16=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P32=(L =.3444     ANGLE =0 )
+        ZVQD3P26=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVS2P   =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF4P26=(L =.3444     ANGLE =0 )
+        ZHQEAP31=(L =.3444     ANGLE =0 )
+        ZVS1P   =(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P31=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P32=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP32=(L =.3444     ANGLE =0 )
+        ZHQF4P27=(L =.3444     ANGLE =0 )
+        ZVQD3P27=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P33=(L =.3444     ANGLE =0 )
+        ZVQD1P17=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P34=(L =.3444     ANGLE =0 )
+        ZVQD3P28=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF4P28=(L =.3444     ANGLE =0 )
+        ZHQEAP33=(L =.3444     ANGLE =0 )
+        ZVQD5P33=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P34=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP34=(L =.3444     ANGLE =0 )
+        ZHQF4P29=(L =.3444     ANGLE =0 )
+        ZVQD3P29=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P35=(L =.3444     ANGLE =0 )
+        ZVQD1P18=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P36=(L =.3444     ANGLE =0 )
+        ZVQD3P30=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF4P30=(L =.3444     ANGLE =0 )
+        ZHQEAP35=(L =.3444     ANGLE =0 )
+        ZVQD5P35=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P36=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP36=(L =.3444     ANGLE =0 )
+        ZHQS2OP1=(L =.3444     ANGLE =0 )
+        ZHQSBOP1=(L =.3444     ANGLE =0 )
+        ZVQS1OP1=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        BS2OP   =(L =.89349    ANGLE =.0280499344  E1 =.5    E2 =.5    F1 =.2456 FRINGE =1 )
+        ZHQW8ORP=(L =.3444     ANGLE =0 )
+        ZVQW7ORP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQW6ORP=(L =.3444     ANGLE =0 )
+        ZVQW5ORP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQW4ORP=(L =.3444     ANGLE =0 )
+        ZVQW3ORP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQW2ORP=(L =.3444     ANGLE =0 )
+        ZVQDWOP1=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        BW0ORP  =(L =.215946   ANGLE =0  E2 =1     K0 =.0107248   F1 =.1138 FRINGE =1 )
+        BW1ORP  =(L =.334831   ANGLE =0  E1 =.5    E2 =.5    K0 =-.0219048  F1 =.1138 FRINGE =1 )
+        BW2ORP  =(L =.338537   ANGLE =0  E1 =.5    E2 =.5    K0 =.02236     F1 =.1138 FRINGE =1 )
+        BW3ORP  =(L =.332919   ANGLE =0  E1 =.5    E2 =.5    K0 =-.02236    F1 =.1138 FRINGE =1 )
+        BW0ORMP =(L =.215946   ANGLE =0  E2 =1     K0 =-.0107248  F1 =.1138 FRINGE =1 )
+        BW1ORMP =(L =.334831   ANGLE =0  E1 =.5    E2 =.5    K0 =.0219048   F1 =.1138 FRINGE =1 )
+        BW2ORMP =(L =.338537   ANGLE =0  E1 =.5    E2 =.5    K0 =-.02236    F1 =.1138 FRINGE =1 )
+        BW3ORMP =(L =.332919   ANGLE =0  E1 =.5    E2 =.5    K0 =.02236     F1 =.1138 FRINGE =1 )
+        ZHQFWOP1=(L =.3444     ANGLE =0 )
+        ZVQDWOP2=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZHQFWOP2=(L =.3444     ANGLE =0 )
+        ZVQDWOP3=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZHQFWOP3=(L =.3444     ANGLE =0 )
+        BW0OLP  =(L =.215946   ANGLE =0  E2 =1     K0 =.0107248   F1 =.1138 FRINGE =1 )
+        BW1OLP  =(L =.334831   ANGLE =0  E1 =.5    E2 =.5    K0 =-.0219048  F1 =.1138 FRINGE =1 )
+        BW2OLP  =(L =.338537   ANGLE =0  E1 =.5    E2 =.5    K0 =.02236     F1 =.1138 FRINGE =1 )
+        BW3OLP  =(L =.332919   ANGLE =0  E1 =.5    E2 =.5    K0 =-.02236    F1 =.1138 FRINGE =1 )
+        BW0OLMP =(L =.215946   ANGLE =0  E2 =1     K0 =-.0107248  F1 =.1138 FRINGE =1 )
+        BW1OLMP =(L =.334831   ANGLE =0  E1 =.5    E2 =.5    K0 =.0219048   F1 =.1138 FRINGE =1 )
+        BW2OLMP =(L =.338537   ANGLE =0  E1 =.5    E2 =.5    K0 =-.02236    F1 =.1138 FRINGE =1 )
+        BW3OLMP =(L =.332919   ANGLE =0  E1 =.5    E2 =.5    K0 =.02236     F1 =.1138 FRINGE =1 )
+        ZVQDWOP4=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZHQFWOP4=(L =.3444     ANGLE =0 )
+        ZVQDWOP5=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZHQFWOP5=(L =.3444     ANGLE =0 )
+        ZVQDWOP6=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZHQW2OLP=(L =.3444     ANGLE =0 )
+        ZVQW3OLP=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZHQW4OLP=(L =.3444     ANGLE =0 )
+        ZVQW5OLP=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZHQW6OLP=(L =.3444     ANGLE =0 )
+        ZVQW7OLP=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZHQW8OLP=(L =.3444     ANGLE =0 )
+        ZVQS1OP2=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZHQSBOP2=(L =.3444     ANGLE =0 )
+        ZHQS2OP2=(L =.3444     ANGLE =0 )
+        ZHQEAP37=(L =.3444     ANGLE =0 )
+        ZVQD5P37=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P38=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP38=(L =.3444     ANGLE =0 )
+        ZHQF4P31=(L =.3444     ANGLE =0 )
+        ZVQD3P31=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P37=(L =.3444     ANGLE =0 )
+        ZVQD1P19=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P38=(L =.3444     ANGLE =0 )
+        ZVQD3P32=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF4P32=(L =.3444     ANGLE =0 )
+        ZHQEAP39=(L =.3444     ANGLE =0 )
+        ZVQD5P39=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P40=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP40=(L =.3444     ANGLE =0 )
+        ZHQF4P33=(L =.3444     ANGLE =0 )
+        ZVQD3P33=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P39=(L =.3444     ANGLE =0 )
+        ZVQD1P20=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P40=(L =.3444     ANGLE =0 )
+        ZVQD3P34=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF4P34=(L =.3444     ANGLE =0 )
+        ZHQEAP41=(L =.3444     ANGLE =0 )
+        ZVQD5P41=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P42=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP42=(L =.3444     ANGLE =0 )
+        ZHQF4P35=(L =.3444     ANGLE =0 )
+        ZVQD3P35=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P41=(L =.3444     ANGLE =0 )
+        ZVQD1P21=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P42=(L =.3444     ANGLE =0 )
+        ZVQT1OTP1=(L =.3444    ANGLE =0  ROTATE =-90 DEG )
+        ZHQT2OTP1=(L =.3444    ANGLE =0 )
+        ZHQTAOTP1=(L =.3444    ANGLE =0 )
+        ZVQT3OTP1=(L =.3444    ANGLE =0  ROTATE =-90 DEG )
+        ZHQT4OTP1=(L =.3444    ANGLE =0 )
+        ZVQT5OTP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQT4OTP2=(L =.3444    ANGLE =0 )
+        ZVQT3OTP2=(L =.3444    ANGLE =0  ROTATE =-90 DEG )
+        ZHQTAOTP2=(L =.3444    ANGLE =0 )
+        ZHQT2OTP2=(L =.3444    ANGLE =0 )
+        ZVQT1OTP2=(L =.3444    ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P43=(L =.3444     ANGLE =0 )
+        ZVQD1P22=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P44=(L =.3444     ANGLE =0 )
+        ZVQD3P36=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF4P36=(L =.3444     ANGLE =0 )
+        ZHQEAP43=(L =.3444     ANGLE =0 )
+        ZVQD5P43=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P44=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP44=(L =.3444     ANGLE =0 )
+        ZHQF4P37=(L =.3444     ANGLE =0 )
+        ZVQD3P37=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P45=(L =.3444     ANGLE =0 )
+        ZVQD1P23=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P46=(L =.3444     ANGLE =0 )
+        ZVQD3P38=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF4P38=(L =.3444     ANGLE =0 )
+        ZHQEAP45=(L =.3444     ANGLE =0 )
+        ZVQD5P45=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQD5P46=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQEAP46=(L =.3444     ANGLE =0 )
+        ZHQF4P39=(L =.3444     ANGLE =0 )
+        ZVQD3P39=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P47=(L =.3444     ANGLE =0 )
+        ZVQD1P24=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P48=(L =.3444     ANGLE =0 )
+        ZVQLA9RP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQLA8RP=(L =.3444     ANGLE =0 )
+        ZVQLA7RP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        BLA6RP  =(L =3.961671  ANGLE =.0504439544  E1 =.5    E2 =.5    F1 =.20948     FRINGE =1 )
+        ZVQLA5RP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQLA4RP=(L =.3444     ANGLE =0 )
+        ZVQLA3RP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        BLA2RP  =(L =.89349    ANGLE =.012542883934     E1 =.5    E2 =.5    F1 =.2456 FRINGE =1 )
+        BLX2RP  =(L =2.23029   ANGLE =.020872024666     E1 =.5    E2 =.5    F1 =.2496 FRINGE =1 )
+        ZVQLX1RP1=(L =.3444    ANGLE =0  ROTATE =-90 DEG )
+        BLX4RP  =(L =3.961671  ANGLE =.045831818115     E1 =.5    E2 =.5    F1 =.20948     FRINGE =1 )
+        ZVQLX1RP2=(L =.3444    ANGLE =0  ROTATE =-90 DEG )
+        BLB3RP  =(L =4.159654  ANGLE =-.051999894948    E1 =.5    E2 =.5    F1 =.2154884   FRINGE =1 )
+        ZVQLB3RP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQLB2RP=(L =.3444     ANGLE =0 )
+        BLB2RP  =(L =2.23029   ANGLE =-.032996104916    E1 =.5    E2 =.5    F1 =.2496 FRINGE =1 )
+        ZVQLB1RP=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        BLY2RP  =(L =4.159654  ANGLE =.060849539296     E1 =.5    E2 =.5    F1 =.2154884   FRINGE =1 )
+        BLY3RP  =(L =2.23029   ANGLE =-.01871887742     E1 =.5    E2 =.5    F1 =.2496 FRINGE =1 )
+        BLY5RP  =(L =4.159654  ANGLE =-.063981331637    E1 =.5    E2 =.5    F1 =.2154884   FRINGE =1 )
+        ZVQLY1RP=(L =.34445    ANGLE =0  ROTATE =-90 DEG )
+        ZVQLC3RP=(L =.34446    ANGLE =0  ROTATE =-90 DEG )
+        BLC2RP  =(L =4.159654  ANGLE =.0614132794203416 E1 =.5    E2 =.5    F1 =.2154884   FRINGE =1 )
+        ZHQLC2RP=(L =.3444     ANGLE =0 )
+        ZVQLC1RP=(L =.34446    ANGLE =0  ROTATE =-90 DEG )
+        BLC1RP  =(L =2.235386  ANGLE =-.027796300060003793   E1 =.5    E2 =.5    F1 =.217302    FRINGE =1 )
+        BLCWRP  =(L =2.235386  ANGLE =-.016349405690065842   E1 =.5    E2 =.5    F1 =.217302    FRINGE =1
+           AE1 =-.007454530323462836     AE2 =-.008894875366603005 )
+        BC1RP   =(L =.281105   ANGLE =0  E2 =1     ROTATE =-90 DEG     F1 =.177093 )
+        BC1LP   =(L =.281105   ANGLE =0  E1 =1     ROTATE =-90 DEG     F1 =.177093 )
+        BLC1LP1 =(L =1.603162  ANGLE =-.026242385746757774   E1 =.5    E2 =.5    F1 =.219999    FRINGE =1
+           AE1 =-.013846438316999544     AE2 =-.01239594742975823 )
+        BLC1LP2 =(L =2.235386  ANGLE =-.009702723135905122   E1 =.5    E2 =.5    F1 =.217302    FRINGE =1 )
+        ZVQLC1LP=(L =.34446    ANGLE =0  ROTATE =-90 DEG )
+        ZHQLC2LP=(L =.3444     ANGLE =0 )
+        BLC2LP  =(L =4.159654  ANGLE =.06326079250957768     E1 =.5    E2 =.5    F1 =.2154884   FRINGE =1 )
+        ZVQLC3LP=(L =.34446    ANGLE =0  ROTATE =-90 DEG )
+        BLY2LP  =(L =4.159654  ANGLE =.063881983389     E1 =.5    E2 =.5    F1 =.2154884   FRINGE =1 )
+        BLY3LP  =(L =2.23029   ANGLE =-.035987255932    E1 =.5    E2 =.5    F1 =.2496 FRINGE =1 )
+        BLY5LP  =(L =4.159654  ANGLE =-.025938554101    E1 =.5    E2 =.5    F1 =.2154884   FRINGE =1 )
+        ZVQLY1LP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZVQLB1LP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        BLB2LP  =(L =.89349    ANGLE =.013166969342     E1 =.5    E2 =.5    F1 =.2456 FRINGE =1 )
+        ZHQLB2LP=(L =.3444     ANGLE =0 )
+        ZVQLB3LP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        BLB3LP  =(L =.89349    ANGLE =-.002460947938    E1 =.5    E2 =.5    F1 =.2456 FRINGE =1 )
+        BLX2LP  =(L =2.23029   ANGLE =-.032281894571    E1 =.5    E2 =.5    F1 =.2496 FRINGE =1 )
+        ZVQLX1LP1=(L =.3444    ANGLE =0  ROTATE =-90 DEG )
+        BLX4LP  =(L =4.159654  ANGLE =.048492589608     E1 =.5    E2 =.5    F1 =.2154884   FRINGE =1 )
+        ZVQLX1LP2=(L =.3444    ANGLE =0  ROTATE =-90 DEG )
+        BLA1LP  =(L =3.961671  ANGLE =.033783658523     E1 =.5    E2 =.5    F1 =.20948     FRINGE =1 )
+        ZVQLA3LP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        BLA2LP  =(L =4.159654  ANGLE =.051594425739     E1 =.5    E2 =.5    F1 =.2154884   FRINGE =1 )
+        ZHQLA4LP=(L =.3444     ANGLE =0 )
+        ZVQLA5LP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        BLA6LP  =(L =2.23029   ANGLE =.020728487127     E1 =.5    E2 =.5    F1 =.2496 FRINGE =1 )
+        ZVQLA7LP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQLA8LP=(L =.3444     ANGLE =0 )
+        ZVQLA9LP=(L =.3444     ANGLE =0  ROTATE =-90 DEG )
+        ZHQF2P1 =(L =.3444     ANGLE =0 )
+ ;
+ QUAD   QD1P    =(L =.46078    K1 =-.19910618657719067  F1 =.16125     FRINGE =3 )
+        QF2P    =(L =.46227    K1 =.18070217448873868   F1 =.16125     FRINGE =3 )
+        QD3P    =(L =.46227    K1 =-.19296673375762857  F1 =.16125     FRINGE =3 )
+        QF4P    =(L =.46227    K1 =.12026747813771874   F1 =.16125     FRINGE =3 )
+        QEAP    =(L =.46227    K1 =.12448056004686908   F1 =.16125     FRINGE =3 )
+        QD5P    =(L =.46227    K1 =-.19123564744298813  F1 =.16125     FRINGE =3 )
+        QF6P    =(L =.46078    K1 =.19656814316715046   F1 =.16125     FRINGE =3 )
+        QT1TNP  =(L =.46227    K1 =-.252697529660444    F1 =.16125     FRINGE =3 )
+        QT2TNP  =(L =.46227    K1 =.12807442032794233   F1 =.16125     FRINGE =3 )
+        QTATNP  =(L =.46227    K1 =.09501310075702293   F1 =.16125     FRINGE =3 )
+        QT3TNP  =(L =.46227    K1 =-.16328548728323822  F1 =.16125     FRINGE =3 )
+        QT4TNP  =(L =.46227    K1 =.12207899838536446   F1 =.16125     FRINGE =3 )
+        QT5TNP  =(L =.46227    K1 =-.09071214685003799  F1 =.16125     FRINGE =3 )
+        QS2NP   =(L =.46227    K1 =0     F1 =.16125     FRINGE =3 )
+        QSBNP   =(L =.46227    K1 =.15854852801854225   F1 =.16125     FRINGE =3 )
+        QS1NP   =(L =.46227    K1 =-.2668404517907008   F1 =.16125     FRINGE =3 )
+        QW8NRP  =(L =.46078    K1 =.20832659704502515   F1 =.16125     FRINGE =3 )
+        QW7NRP  =(L =.46078    K1 =-.2799831202589858   F1 =.16125     FRINGE =3 )
+        QW6NRP  =(L =.46078    K1 =.17389817031582505   F1 =.16125     FRINGE =3 )
+        QW5NRP  =(L =.46078    K1 =-.10093669825265636  F1 =.16125     FRINGE =3 )
+        QW4NRP  =(L =.46078    K1 =.14922335621136773   F1 =.16125     FRINGE =3 )
+        QW3NRP  =(L =.46078    K1 =-.10449874060439697  F1 =.16125     FRINGE =3 )
+        QW2NRP  =(L =.46078    K1 =.12188859980371636   F1 =.16125     FRINGE =3 )
+        QDWNP   =(L =.46078    K1 =-.12863645998307374  F1 =.16125     FRINGE =3 )
+        QFWNP   =(L =.46078    K1 =.14800407696627316   F1 =.16125     FRINGE =3 )
+        QW2NLP  =(L =.46078    K1 =.14578963905161682   F1 =.16125     FRINGE =3 )
+        QW3NLP  =(L =.46078    K1 =-.13863077013341232  F1 =.16125     FRINGE =3 )
+        QW4NLP  =(L =.46078    K1 =.16455993177053863   F1 =.16125     FRINGE =3 )
+        QW5NLP  =(L =.46078    K1 =-.18979230783341083  F1 =.16125     FRINGE =3 )
+        QW6NLP  =(L =.46078    K1 =.1824702066090653    F1 =.16125     FRINGE =3 )
+        QW7NLP  =(L =.46078    K1 =-.3152255311202984   F1 =.16125     FRINGE =3 )
+        QW8NLP  =(L =.46078    K1 =.1793457463787293    F1 =.16125     FRINGE =3 )
+        QT1NFP  =(L =.46227    K1 =-.25269752966279607  F1 =.16125     FRINGE =3 )
+        QT2NFP  =(L =.46227    K1 =.12807442033151098   F1 =.16125     FRINGE =3 )
+        QTANFP  =(L =.46227    K1 =.09501310075603306   F1 =.16125     FRINGE =3 )
+        QT3NFP  =(L =.46227    K1 =-.163285487282992    F1 =.16125     FRINGE =3 )
+        QT4NFP  =(L =.46227    K1 =.12207899838545838   F1 =.16125     FRINGE =3 )
+        QT5NFP  =(L =.46227    K1 =-.09071214685032485  F1 =.16125     FRINGE =3 )
+        QS2FRP  =(L =.46227    K1 =.016600047919876203  F1 =.16125     FRINGE =3 )
+        QSBFRP  =(L =.46227    K1 =.1279533539861885    F1 =.16125     FRINGE =3 )
+        QS1FRP  =(L =.46227    K1 =-.13704836436483378  F1 =.16125     FRINGE =3 )
+        QR6P    =(L =.46078    K1 =.01747771446399817   F1 =.16125     FRINGE =3 )
+        QR5P    =(L =.46078    K1 =-.017590530858020925 F1 =.16125     FRINGE =3 )
+        QR4P    =(L =.46078    K1 =.12360302290397748   F1 =.16125     FRINGE =3 )
+        QR3P    =(L =.58372    K1 =-.1553946206559668   F1 =.21401     FRINGE =3 )
+        QR2P    =(L =.58372    K1 =.11958854426566277   F1 =.21401     FRINGE =3 )
+        QR1P    =(L =.58372    K1 =-.22738489625326627  F1 =.21401     FRINGE =3 )
+        QFRP    =(L =.58372    K1 =.1843472694767816    F1 =.21401     FRINGE =3 )
+        QDRP    =(L =.58372    K1 =-.20154585043931925  F1 =.21401     FRINGE =3 )
+        QV4P    =(L =.58372    K1 =.13853145366178804   F1 =.21401     FRINGE =3 )
+        QV3P    =(L =.46078    K1 =-.19142594632958532  F1 =.16125     FRINGE =3 )
+        QV2P    =(L =.46078    K1 =.2735982311014381    F1 =.16125     FRINGE =3 )
+        QV1P    =(L =.46078    K1 =-.2255672884539126   F1 =.16125     FRINGE =3 )
+        QI2P    =(L =.58372    K1 =.1667530343524597    F1 =.21401     FRINGE =3 )
+        QI3P    =(L =.58372    K1 =-.21685081104485193  F1 =.21401     FRINGE =3 )
+        QI4P    =(L =.46078    K1 =.25589575226898437   F1 =.16125     FRINGE =3 )
+        QI5P    =(L =.46078    K1 =-.18827037126988547  F1 =.16125     FRINGE =3 )
+        QI6P    =(L =.58372    K1 =.18370673298270102   F1 =.21401     FRINGE =3 )
+        QI7P    =(L =.46078    K1 =-.11037527884984537  F1 =.16125     FRINGE =3 )
+        QI8P    =(L =.46078    K1 =.10426161038699051   F1 =.16125     FRINGE =3 )
+        QS1FLP  =(L =.46227    K1 =-.11703713154007916  F1 =.16125     FRINGE =3 )
+        QSBFLP  =(L =.46227    K1 =.06356459318520856   F1 =.16125     FRINGE =3 )
+        QS2FLP  =(L =.46227    K1 =.06161305430388592   F1 =.16125     FRINGE =3 )
+        QT1FOP  =(L =.46227    K1 =-.2532940669254133   F1 =.16125     FRINGE =3 )
+        QT2FOP  =(L =.46227    K1 =.1311713905568364    F1 =.16125     FRINGE =3 )
+        QTAFOP  =(L =.46227    K1 =.09279154503254038   F1 =.16125     FRINGE =3 )
+        QT3FOP  =(L =.46227    K1 =-.1728396528878389   F1 =.16125     FRINGE =3 )
+        QT4FOP  =(L =.46227    K1 =.1213758221133096    F1 =.16125     FRINGE =3 )
+        QT5FOP  =(L =.46227    K1 =-.0629941796646082   F1 =.16125     FRINGE =3 )
+        QS2OP   =(L =.46078    K1 =0     F1 =.16125     FRINGE =3 )
+        QSBOP   =(L =.46078    K1 =.15854213888683275   F1 =.16125     FRINGE =3 )
+        QS1OP   =(L =.46078    K1 =-.26685395182985333  F1 =.16125     FRINGE =3 )
+        QW8ORP  =(L =.46078    K1 =.17400052109586184   F1 =.16125     FRINGE =3 )
+        QW7ORP  =(L =.46078    K1 =-.2810853858808835   F1 =.16125     FRINGE =3 )
+        QW6ORP  =(L =.46078    K1 =.1546120557751742    F1 =.16125     FRINGE =3 )
+        QW5ORP  =(L =.58372    K1 =-.10173126674429628  F1 =.16125     FRINGE =3 )
+        QW4ORP  =(L =.58372    K1 =.13314143244726565   F1 =.16125     FRINGE =3 )
+        QW3ORP  =(L =.58372    K1 =-.15239180467729516  F1 =.16125     FRINGE =3 )
+        QW2ORP  =(L =.58372    K1 =.17586123027600753   F1 =.16125     FRINGE =3 )
+        QDWOP   =(L =.46078    K1 =-.13052140125017903  F1 =.16125     FRINGE =3 )
+        QFWOP   =(L =.46078    K1 =.15658225892587277   F1 =.16125     FRINGE =3 )
+        QW2OLP  =(L =.46078    K1 =.15045256221909706   F1 =.16125     FRINGE =3 )
+        QW3OLP  =(L =.46078    K1 =-.18234452836141385  F1 =.16125     FRINGE =3 )
+        QW4OLP  =(L =.46078    K1 =.1353109965705456    F1 =.16125     FRINGE =3 )
+        QW5OLP  =(L =.46078    K1 =-.1353028252636933   F1 =.16125     FRINGE =3 )
+        QW6OLP  =(L =.46078    K1 =.15422915953239433   F1 =.16125     FRINGE =3 )
+        QW7OLP  =(L =.46078    K1 =-.2677692281871625   F1 =.16125     FRINGE =3 )
+        QW8OLP  =(L =.46078    K1 =.16904269252093587   F1 =.16125     FRINGE =3 )
+        QT1OTP  =(L =.46227    K1 =-.253294066926852    F1 =.16125     FRINGE =3 )
+        QT2OTP  =(L =.46227    K1 =.13117139055924987   F1 =.16125     FRINGE =3 )
+        QTAOTP  =(L =.46227    K1 =.09279154503255205   F1 =.16125     FRINGE =3 )
+        QT3OTP  =(L =.46227    K1 =-.1728396528882961   F1 =.16125     FRINGE =3 )
+        QT4OTP  =(L =.46227    K1 =.1213758221126502    F1 =.16125     FRINGE =3 )
+        QT5OTP  =(L =.46227    K1 =-.06299417966249923  F1 =.16125     FRINGE =3 )
+        QLA9RP  =(L =.46078    K1 =-.26417205101596136  F1 =.16125     FRINGE =3 )
+        QLA8RP  =(L =.46078    K1 =.22457627595466773   F1 =.16125     FRINGE =3 )
+        QLA7RP  =(L =.46078    K1 =-.19397987737932487  F1 =.16125     FRINGE =3 )
+        QLA6RP  =(L =.46078    K1 =.14831836068709392   F1 =.16125     FRINGE =3 )
+        QLA5RP  =(L =.46078    K1 =-.2887752063804583   F1 =.16125     FRINGE =3 )
+        QLA4RP  =(L =.46078    K1 =.28212492992034854   F1 =.16125     FRINGE =3 )
+        QLA3RP  =(L =.57638    K1 =-.21767301113535645  F1 =.21401     FRINGE =3 )
+        QLA2RP  =(L =.57638    K1 =.2649174160116866    F1 =.21401     FRINGE =3 )
+        QLX1RP  =(L =.57638    K1 =-.3060409243191353   F1 =.21401     FRINGE =3 )
+        QLX2RP  =(L =.57638    K1 =.3097258736945116    F1 =.21401     FRINGE =3 )
+        QLB4RP  =(L =.58372    K1 =.2465165833212072    F1 =.21401     FRINGE =3 )
+        QLB3RP  =(L =.57638    K1 =-.13580125164717566  F1 =.21401     FRINGE =3 )
+        QLB2RP  =(L =.58372    K1 =.18570333992553903   F1 =.21401     FRINGE =3 )
+        QLB1RP  =(L =.58372    K1 =-.19125203103495572  F1 =.21401     FRINGE =3 )
+        QLY2RP  =(L =.58372    K1 =.15084299275763915   F1 =.21401     FRINGE =3 )
+        QLY1RP  =(L =.58372    K1 =-.262437613002929    F1 =.21401     FRINGE =3 )
+        QLC3RP  =(L =.58372    K1 =-.1600856396698284   F1 =.21401     FRINGE =3 )
+        QKERP   =(L =.3444     K1 =0     ROTATE =-45 DEG     F1 =.211  FRINGE =3 )
+        QKDRP   =(L =.3444     K1 =0     ROTATE =-45 DEG     F1 =.211  FRINGE =3 )
+        QLC2RP  =(L =.58372    K1 =.10190707834528367   F1 =.21401     FRINGE =3 )
+        QKCRP   =(L =.3444     K1 =0     ROTATE =-45 DEG     F1 =.211  FRINGE =3 )
+        QLC1RP  =(L =.58372    K1 =-.038108881402525274 F1 =.21401     FRINGE =3 )
+        QKBRP   =(L =.3444     K1 =0     ROTATE =-45 DEG     F1 =.211  FRINGE =3 )
+        QKARP   =(L =.3444     K1 =0     ROTATE =-45 DEG     F1 =.211  FRINGE =3 )
+        QKALP   =(L =.3444     K1 =0     ROTATE =-45 DEG     F1 =.211  FRINGE =3 )
+        QKBLP   =(L =.3444     K1 =0     ROTATE =-45 DEG     F1 =.211  FRINGE =3 )
+        QLC1LP  =(L =.58372    K1 =-.04625890490243528  F1 =.21401     FRINGE =3 )
+        QKCLP   =(L =.3444     K1 =0     ROTATE =-45 DEG     F1 =.211  FRINGE =3 )
+        QLC2LP  =(L =.58372    K1 =.1128019161520446    F1 =.21401     FRINGE =3 )
+        QKDLP   =(L =.3444     K1 =0     ROTATE =-45 DEG     F1 =.211  FRINGE =3 )
+        QKELP   =(L =.3444     K1 =0     ROTATE =-45 DEG     F1 =.211  FRINGE =3 )
+        QLC3LP  =(L =.58372    K1 =-.12833357770489506  F1 =.21401     FRINGE =3 )
+        QLY2LP  =(L =.58372    K1 =.12413542789679755   F1 =.21401     FRINGE =3 )
+        QLY1LP  =(L =.58372    K1 =-.19361876347233237  F1 =.21401     FRINGE =3 )
+        QLB1LP  =(L =.58372    K1 =-.15977985033001563  F1 =.21401     FRINGE =3 )
+        QLB2LP  =(L =.58372    K1 =.19402570219711704   F1 =.21401     FRINGE =3 )
+        QLB3LP  =(L =.57638    K1 =-.1969367100961871   F1 =.21401     FRINGE =3 )
+        QLB4LP  =(L =.58372    K1 =.2161243984656479    F1 =.21401     FRINGE =3 )
+        QLX1LP  =(L =.57638    K1 =-.26515143728475     F1 =.21401     FRINGE =3 )
+        QLX2LP  =(L =.57638    K1 =.26515106471371624   F1 =.21401     FRINGE =3 )
+        QLA2LP  =(L =.57638    K1 =.19788940467741312   F1 =.21401     FRINGE =3 )
+        QLA3LP  =(L =.57638    K1 =-.09985602428692913  F1 =.21401     FRINGE =3 )
+        QLA4LP  =(L =.46078    K1 =.21324470754599723   F1 =.16125     FRINGE =3 )
+        QLA5LP  =(L =.46078    K1 =-.2686193039141188   F1 =.16125     FRINGE =3 )
+        QLA6LP  =(L =.46078    K1 =.19307696855502948   F1 =.16125     FRINGE =3 )
+        QLA7LP  =(L =.46227    K1 =-.3210653936837997   F1 =.16125     FRINGE =3 )
+        QLA8LP  =(L =.46227    K1 =.299853361700757     F1 =.16125     FRINGE =3 )
+        QLA9LP  =(L =.46227    K1 =-.3350925610177282   F1 =.16125     FRINGE =3 )
+ ;
+ OCT    OL2TLP  =(K3 =0 )
+ ;
+ MULT   DB2P    =(K1 =0 )
+        SD3TLP  =(L =.334 K1 =0     K2 =-3.9797135256369733 )
+        SF4TLP  =(L =.334 K1 =0     K2 =1.413551150855803 )
+        SD5TLP  =(L =.334 K1 =0     K2 =-3.9403073308198446 )
+        SF6TLP  =(L =.334 K1 =0     K2 =1.965642583467616 )
+        SD7TLP  =(L =.334 K1 =0     K2 =-8.062669727276154 )
+        SF8TNP  =(L =.334 K1 =0     K2 =2.8595884807922953 )
+        SD7NRP  =(L =.334 K1 =0     K2 =-2.876637423496285 )
+        SF6NRP  =(L =.334 K1 =0     K2 =.7244652855602862 )
+        SD5NRP  =(L =.334 K1 =0     K2 =-.010022771520214257 )
+        SF4NRP  =(L =.334 K1 =0     K2 =.1687163045256379 )
+        SD3NRP  =(L =.334 K1 =0     K2 =-3.6791700625904973 )
+        SF2NRP  =(L =.334 K1 =0     K2 =.9195597651170377 )
+        SF2NLP  =(L =.334 K1 =0     K2 =.011603693263515957 )
+        SD3NLP  =(L =.334 K1 =0     K2 =-4.980834070875526 )
+        SF4NLP  =(L =.334 K1 =0     K2 =1.5274897804250074 )
+        SD5NLP  =(L =.334 K1 =0     K2 =-3.534783982431905 )
+        SF6NLP  =(L =.334 K1 =0     K2 =1.0915487975142242 )
+        SD7NLP  =(L =.334 K1 =0     K2 =-5.881156623011416 )
+        SF8NFP  =(L =.334 K1 =0     K2 =.6951734427821259 )
+        SD7FRP  =(L =.334 K1 =0     K2 =-1.9412206788426842 )
+        SF6FRP  =(L =.334 K1 =0     K2 =.6529554988301087 )
+        SD5FRP  =(L =.334 K1 =0     K2 =-1.6512739146724629 )
+        SF4FRP  =(L =.334 K1 =0     K2 =1.5457925123410705 )
+        SD3FRP  =(L =.334 K1 =0     K2 =-4.921929576944915 )
+        SF2FRP  =(L =.334 K1 =0     K2 =1.6250686845549307 )
+        FZTFBKP1=(L =.55  K1 =0 )
+        FZTFBKP2=(L =.55  K1 =0 )
+        FZLFBKP1=(L =.88  K1 =0 )
+        FZLFBKP2=(L =.88  K1 =0 )
+        SF2FLP  =(L =.334 K1 =0     K2 =.4567267997674127 )
+        SD3FLP  =(L =.334 K1 =0     K2 =-2.186922343307267 )
+        SF4FLP  =(L =.334 K1 =0     K2 =1.692556048051912 )
+        SD5FLP  =(L =.334 K1 =0     K2 =-1.9829830449763128 )
+        SF6FLP  =(L =.334 K1 =0     K2 =.775075505084476 )
+        SD7FLP  =(L =.334 K1 =0     K2 =-3.6919334190903434 )
+        SF8FOP  =(L =.334 K1 =0     K2 =.3742717159976595 )
+        SD7ORP  =(L =.334 K1 =0     K2 =-5.73064824739641 )
+        SF6ORP  =(L =.334 K1 =0     K2 =.6263851007951331 )
+        SD5ORP  =(L =.334 K1 =0     K2 =-1.7523456363879841 )
+        SF4ORP  =(L =.334 K1 =0     K2 =2.131980761332396 )
+        SD3ORP  =(L =.334 K1 =0     K2 =-2.5580189301310554 )
+        SF2ORP  =(L =.334 K1 =0     K2 =1.2017760968208298 )
+        SF2OLP  =(L =.334 K1 =0     K2 =.8820943091971978 )
+        SD3OLP  =(L =.334 K1 =0     K2 =-3.534151734754958 )
+        SF4OLP  =(L =.334 K1 =0     K2 =2.6096309142547964 )
+        SD5OLP  =(L =.334 K1 =0     K2 =-4.1694639739081865 )
+        SF6OLP  =(L =.334 K1 =0     K2 =1.0453538871115284 )
+        SD7OLP  =(L =.334 K1 =0     K2 =-6.4054568842671245 )
+        SF8OTP  =(L =.334 K1 =0     K2 =.07701755974064231 )
+        SD7TRP  =(L =.334 K1 =0     K2 =-2.147640122212141 )
+        SF6TRP  =(L =.334 K1 =0     K2 =.44845959220957843 )
+        SD5TRP  =(L =.334 K1 =0     K2 =-1.7451163943554493 )
+        SF4TRP  =(L =.334 K1 =0     K2 =2.0357581527980004 )
+        SD3TRP  =(L =.334 K1 =0     K2 =-4.816689671395764 )
+        ZDS4RP  =(L =.25  K1 =0 )
+        SLXTRP  =(L =.334 K1 =0 )
+        ZDS3RP  =(L =.25  K1 =0 )
+        SLYTRP  =(L =.334 K1 =0 )
+        ZDS2RP  =(L =.25  K1 =0 )
+        ZDS1RP  =(L =.25  K1 =0 )
+        ZDS1LP  =(L =.25  K1 =0 )
+        ZDS2LP  =(L =.25  K1 =0 )
+        SLYTLP  =(L =.334 K1 =0 )
+        ZDS3LP  =(L =.25  K1 =0 )
+        SLXTLP  =(L =.334 K1 =0 )
+        ZDS4LP  =(L =.25  K1 =0 )
+ ;
+ CAVI   CAFFRP  =(VOLT =367668.2731480037     FREQ =508879784.3998956 )
+        CAEFRP  =(VOLT =367668.2731480037     FREQ =508879784.3998956 )
+        CADFRP  =(VOLT =367668.2731480037     FREQ =508879784.3998956 )
+        CACFRP  =(VOLT =367668.2731480037     FREQ =508879784.3998956 )
+        CABFRP  =(VOLT =367668.2731480037     FREQ =508879784.3998956 )
+        CAAFRP  =(VOLT =367668.2731480037     FREQ =508879784.3998956 )
+        CAAFLP  =(VOLT =367668.2731480037     FREQ =508879784.3998956 )
+        CABFLP  =(VOLT =367668.2731480037     FREQ =508879784.3998956 )
+        CACFLP  =(VOLT =367668.2731480037     FREQ =508879784.3998956 )
+        CADFLP  =(VOLT =367668.2731480037     FREQ =508879784.3998956 )
+        CAEFLP  =(VOLT =367668.2731480037     FREQ =508879784.3998956 )
+        CAFFLP  =(VOLT =367668.2731480037     FREQ =508879784.3998956 )
+        CAFORP  =(VOLT =588269.237036806 FREQ =508879784.3998956 )
+        CAEORP  =(VOLT =588269.237036806 FREQ =508879784.3998956 )
+        CADORP  =(VOLT =588269.237036806 FREQ =508879784.3998956 )
+        CACORP  =(VOLT =588269.237036806 FREQ =508879784.3998956 )
+        CABORP  =(VOLT =588269.237036806 FREQ =508879784.3998956 )
+        CAAORP  =(VOLT =588269.237036806 FREQ =508879784.3998956 )
+ ;
+ APERT  PMD06H1 =(AX =1   AY =1 )
+        PMD06H2 =(AX =1   AY =1 )
+        PMD06H3 =(AX =1   AY =1 )
+        PMD06H4 =(AX =1   AY =1 )
+        PMD03H1 =(AX =1   AY =1 )
+        PMD03H2 =(AX =1   AY =1 )
+        PMD03V1 =(AX =1   AY =1 )
+        PMD03V2 =(AX =1   AY =1 )
+        PMD02H1 =(AX =1   AY =1 )
+        PMD02H2 =(AX =1   AY =1 )
+        PMD02V1 =(AX =1   AY =1 )
+        PMD02H3 =(AX =1   AY =1 )
+        PMD02H4 =(AX =1   AY =1 )
+        APIR    =(AX =.031     AY =.036 )
+ ;
+ MONI   MQF2P2                          =()
+        MQD3P2                          =()
+        MQF4P2                          =()
+        MQEAP3                          =()
+        MQD5P3                          =()
+        MQF6P2                          =()
+        MQD5P4                          =()
+        MQEAP4                          =()
+        MQF4P3                          =()
+        MQD3P3                          =()
+        MQF2P3                          =()
+        MQD1P2                          =()
+        MQF2P4                          =()
+        MQD3P4                          =()
+        MQF4P4                          =()
+        MQEAP5                          =()
+        MQD5P5                          =()
+        MQF6P3                          =()
+        MQD5P6                          =()
+        MQEAP6                          =()
+        MQF4P5                          =()
+        MQD3P5                          =()
+        MQF2P5                          =()
+        MQD1P3                          =()
+        MQF2P6                          =()
+        MQT1TNP1                        =()
+        MQT2TNP1                        =()
+        MQTATNP1                        =()
+        MQT3TNP1                        =()
+        MQT4TNP1                        =()
+        MQT5TNP                         =()
+        MQT4TNP2                        =()
+        MQT3TNP2                        =()
+        MQTATNP2                        =()
+        MQT2TNP2                        =()
+        MQT1TNP2                        =()
+        MQF2P7                          =()
+        MQD1P4                          =()
+        MQF2P8                          =()
+        MQD3P6                          =()
+        MQF4P6                          =()
+        MQEAP7                          =()
+        MQD5P7                          =()
+        MQF6P4                          =()
+        MQD5P8                          =()
+        MQEAP8                          =()
+        MQF4P7                          =()
+        MQD3P7                          =()
+        MQF2P9                          =()
+        MQD1P5                          =()
+        MQF2P10                         =()
+        MQD3P8                          =()
+        MQF4P8                          =()
+        MQEAP9                          =()
+        MQD5P9                          =()
+        MQF6P5                          =()
+        MQD5P10                         =()
+        MQEAP10                         =()
+        MQF4P9                          =()
+        MQD3P9                          =()
+        MQF2P11                         =()
+        MQD1P6                          =()
+        MQF2P12                         =()
+        MQD3P10                         =()
+        MQF4P10                         =()
+        MQEAP11                         =()
+        MQD5P11                         =()
+        MQF6P6                          =()
+        MQD5P12                         =()
+        MQEAP12                         =()
+        MQS2NP1                         =()
+        MQSBNP1                         =()
+        MQS1NP1                         =()
+        MQW8NRP                         =()
+        MQW7NRP                         =()
+        MQW6NRP                         =()
+        MQW5NRP                         =()
+        MQW4NRP                         =()
+        MQW3NRP                         =()
+        MQW2NRP                         =()
+        MQDWNP1                         =()
+        MQFWNP1                         =()
+        MQDWNP2                         =()
+        MQFWNP2                         =()
+        MQDWNP3                         =()
+        MQFWNP3                         =()
+        MQDWNP4                         =()
+        MQFWNP4                         =()
+        MQDWNP5                         =()
+        MQFWNP5                         =()
+        MQDWNP6                         =()
+        MQW2NLP                         =()
+        MQW3NLP                         =()
+        MQW4NLP                         =()
+        MQW5NLP                         =()
+        MQW6NLP                         =()
+        MQW7NLP                         =()
+        MQW8NLP                         =()
+        MQS1NP2                         =()
+        MQSBNP2                         =()
+        MQS2NP2                         =()
+        MQEAP13                         =()
+        MQD5P13                         =()
+        MQF6P7                          =()
+        MQD5P14                         =()
+        MQEAP14                         =()
+        MQF4P11                         =()
+        MQD3P11                         =()
+        MQF2P13                         =()
+        MQD1P7                          =()
+        MQF2P14                         =()
+        MQD3P12                         =()
+        MQF4P12                         =()
+        MQEAP15                         =()
+        MQD5P15                         =()
+        MQF6P8                          =()
+        MQD5P16                         =()
+        MQEAP16                         =()
+        MQF4P13                         =()
+        MQD3P13                         =()
+        MQF2P15                         =()
+        MQD1P8                          =()
+        MQF2P16                         =()
+        MQD3P14                         =()
+        MQF4P14                         =()
+        MQEAP17                         =()
+        MQD5P17                         =()
+        MQF6P9                          =()
+        MQD5P18                         =()
+        MQEAP18                         =()
+        MQF4P15                         =()
+        MQD3P15                         =()
+        MQF2P17                         =()
+        MQD1P9                          =()
+        MQF2P18                         =()
+        MQT1NFP1                        =()
+        MQT2NFP1                        =()
+        MQTANFP1                        =()
+        MQT3NFP1                        =()
+        MQT4NFP1                        =()
+        MQT5NFP                         =()
+        MQT4NFP2                        =()
+        MQT3NFP2                        =()
+        MQTANFP2                        =()
+        MQT2NFP2                        =()
+        MQT1NFP2                        =()
+        MQF2P19                         =()
+        MQD1P10                         =()
+        MQF2P20                         =()
+        MQD3P16                         =()
+        MQF4P16                         =()
+        MQEAP19                         =()
+        MQD5P19                         =()
+        MQF6P10                         =()
+        MQD5P20                         =()
+        MQEAP20                         =()
+        MQF4P17                         =()
+        MQD3P17                         =()
+        MQF2P21                         =()
+        MQD1P11                         =()
+        MQF2P22                         =()
+        MQD3P18                         =()
+        MQF4P18                         =()
+        MQEAP21                         =()
+        MQD5P21                         =()
+        MQF6P11                         =()
+        MQD5P22                         =()
+        MQEAP22                         =()
+        MQF4P19                         =()
+        MQD3P19                         =()
+        MQF2P23                         =()
+        MQD1P12                         =()
+        MQF2P24                         =()
+        MQD3P20                         =()
+        MQF4P20                         =()
+        MQEAP23                         =()
+        MQD5P23                         =()
+        MQF6P12                         =()
+        MQD5P24                         =()
+        MQEAP24                         =()
+        MQS2FRP                         =()
+        MQSBFRP                         =()
+        MQS1FRP                         =()
+        MQR6P                           =()
+        MQR5P                           =()
+        MQR4P                           =()
+        MQR3P                           =()
+        MQR2P                           =()
+        MQR1P                           =()
+        MQFRP1                          =()
+        MQDRP1                          =()
+        MQFRP2                          =()
+        MQDRP2                          =()
+        MQV4P1                          =()
+        MQV3P1                          =()
+        MQV2P1                          =()
+        MQV1P1                          =()
+        MQV1P2                          =()
+        MQV2P2                          =()
+        MQV3P2                          =()
+        MQV4P2                          =()
+        MQDRP3                          =()
+        MQFRP3                          =()
+        MQDRP4                          =()
+        MQI2P                           =()
+        MQI3P                           =()
+        MQI4P                           =()
+        MQI5P                           =()
+        MQI6P                           =()
+        MQI7P                           =()
+        MQI8P                           =()
+        MQS1FLP                         =()
+        MQSBFLP                         =()
+        MQS2FLP                         =()
+        MQEAP25                         =()
+        MQD5P25                         =()
+        MQF6P13                         =()
+        MQD5P26                         =()
+        MQEAP26                         =()
+        MQF4P21                         =()
+        MQD3P21                         =()
+        MQF2P25                         =()
+        MQD1P13                         =()
+        MQF2P26                         =()
+        MQD3P22                         =()
+        MQF4P22                         =()
+        MQEAP27                         =()
+        MQD5P27                         =()
+        MQF6P14                         =()
+        MQD5P28                         =()
+        MQEAP28                         =()
+        MQF4P23                         =()
+        MQD3P23                         =()
+        MQF2P27                         =()
+        MQD1P14                         =()
+        MQF2P28                         =()
+        MQD3P24                         =()
+        MQF4P24                         =()
+        MQEAP29                         =()
+        MQD5P29                         =()
+        MQF6P15                         =()
+        MQD5P30                         =()
+        MQEAP30                         =()
+        MQF4P25                         =()
+        MQD3P25                         =()
+        MQF2P29                         =()
+        MQD1P15                         =()
+        MQF2P30                         =()
+        MQT1FOP1                        =()
+        MQT2FOP1                        =()
+        MQTAFOP1                        =()
+        MQT3FOP1                        =()
+        MQT4FOP1                        =()
+        MQT5FOP                         =()
+        MQT4FOP2                        =()
+        MQT3FOP2                        =()
+        MQTAFOP2                        =()
+        MQT2FOP2                        =()
+        MQT1FOP2                        =()
+        MQF2P31                         =()
+        MQD1P16                         =()
+        MQF2P32                         =()
+        MQD3P26                         =()
+        MQF4P26                         =()
+        MQEAP31                         =()
+        MQD5P31                         =()
+        MQF6P16                         =()
+        MQD5P32                         =()
+        MQEAP32                         =()
+        MQF4P27                         =()
+        MQD3P27                         =()
+        MQF2P33                         =()
+        MQD1P17                         =()
+        MQF2P34                         =()
+        MQD3P28                         =()
+        MQF4P28                         =()
+        MQEAP33                         =()
+        MQD5P33                         =()
+        MQF6P17                         =()
+        MQD5P34                         =()
+        MQEAP34                         =()
+        MQF4P29                         =()
+        MQD3P29                         =()
+        MQF2P35                         =()
+        MQD1P18                         =()
+        MQF2P36                         =()
+        MQD3P30                         =()
+        MQF4P30                         =()
+        MQEAP35                         =()
+        MQD5P35                         =()
+        MQF6P18                         =()
+        MQD5P36                         =()
+        MQEAP36                         =()
+        MQS2OP1                         =()
+        MQSBOP1                         =()
+        MQS1OP1                         =()
+        MQW8ORP                         =()
+        MQW7ORP                         =()
+        MQW6ORP                         =()
+        MQW5ORP                         =()
+        MQW4ORP                         =()
+        MQW3ORP                         =()
+        MQW2ORP                         =()
+        MQDWOP1                         =()
+        MQFWOP1                         =()
+        MQDWOP2                         =()
+        MQFWOP2                         =()
+        MQDWOP3                         =()
+        MQFWOP3                         =()
+        MQDWOP4                         =()
+        MQFWOP4                         =()
+        MQDWOP5                         =()
+        MQFWOP5                         =()
+        MQDWOP6                         =()
+        MQW2OLP                         =()
+        MQW3OLP                         =()
+        MQW4OLP                         =()
+        MQW5OLP                         =()
+        MQW6OLP                         =()
+        MQW7OLP                         =()
+        MQW8OLP                         =()
+        MQS1OP2                         =()
+        MQSBOP2                         =()
+        MQS2OP2                         =()
+        MQEAP37                         =()
+        MQD5P37                         =()
+        MQF6P19                         =()
+        MQD5P38                         =()
+        MQEAP38                         =()
+        MQF4P31                         =()
+        MQD3P31                         =()
+        MQF2P37                         =()
+        MQD1P19                         =()
+        MQF2P38                         =()
+        MQD3P32                         =()
+        MQF4P32                         =()
+        MQEAP39                         =()
+        MQD5P39                         =()
+        MQF6P20                         =()
+        MQD5P40                         =()
+        MQEAP40                         =()
+        MQF4P33                         =()
+        MQD3P33                         =()
+        MQF2P39                         =()
+        MQD1P20                         =()
+        MQF2P40                         =()
+        MQD3P34                         =()
+        MQF4P34                         =()
+        MQEAP41                         =()
+        MQD5P41                         =()
+        MQF6P21                         =()
+        MQD5P42                         =()
+        MQEAP42                         =()
+        MQF4P35                         =()
+        MQD3P35                         =()
+        MQF2P41                         =()
+        MQD1P21                         =()
+        MQF2P42                         =()
+        MQT1OTP1                        =()
+        MQT2OTP1                        =()
+        MQTAOTP1                        =()
+        MQT3OTP1                        =()
+        MQT4OTP1                        =()
+        MQT5OTP                         =()
+        MQT4OTP2                        =()
+        MQT3OTP2                        =()
+        MQTAOTP2                        =()
+        MQT2OTP2                        =()
+        MQT1OTP2                        =()
+        MQF2P43                         =()
+        MQD1P22                         =()
+        MQF2P44                         =()
+        MQD3P36                         =()
+        MQF4P36                         =()
+        MQEAP43                         =()
+        MQD5P43                         =()
+        MQF6P22                         =()
+        MQD5P44                         =()
+        MQEAP44                         =()
+        MQF4P37                         =()
+        MQD3P37                         =()
+        MQF2P45                         =()
+        MQD1P23                         =()
+        MQF2P46                         =()
+        MQD3P38                         =()
+        MQF4P38                         =()
+        MQEAP45                         =()
+        MQD5P45                         =()
+        MQF6P23                         =()
+        MQD5P46                         =()
+        MQEAP46                         =()
+        MQF4P39                         =()
+        MQD3P39                         =()
+        MQF2P47                         =()
+        MQD1P24                         =()
+        MQF2P48                         =()
+        MQLA9RP                         =()
+        MQLA8RP                         =()
+        MQLA7RP                         =()
+        MQLA6RP                         =()
+        MQLA5RP                         =()
+        MQLA4RP                         =()
+        MQLA3RP                         =()
+        MQLA2RP                         =()
+        MQLX1RP1                        =()
+        MQLX2RP                         =()
+        MQLX1RP2                        =()
+        MQLB4RP                         =()
+        MQLB3RP                         =()
+        MQLB2RP                         =()
+        MQLB1RP                         =()
+        MQLY2RP1                        =()
+        MQLY1RP                         =()
+        MQLY2RP2                        =()
+        MQLC3RP                         =()
+        MQLC2RP                         =()
+        MQLC1RP                         =()
+        MQLC1LP                         =()
+        MQLC2LP                         =()
+        MQLC3LP                         =()
+        MQLY2LP1                        =()
+        MQLY1LP                         =()
+        MQLY2LP2                        =()
+        MQLB1LP                         =()
+        MQLB2LP                         =()
+        MQLB3LP                         =()
+        MQLB4LP                         =()
+        MQLX1LP1                        =()
+        MQLX2LP                         =()
+        MQLX1LP2                        =()
+        MQLA2LP                         =()
+        MQLA3LP                         =()
+        MQLA4LP                         =()
+        MQLA5LP                         =()
+        MQLA6LP                         =()
+        MQLA7LP                         =()
+        MQLA8LP                         =()
+        MQLA9LP                         =()
+        MQF2P1                          =()
+        MQD1P1                          =()
+ ;
+ MARK   START   =(AX =.5306566040456415  BX =4.880725823416237    AY =-2.2587996368855636  BY =22.636857467792677
+           EX =.17442295563549037   EPX =-.017248937525162142     DP =.0007776591343472637 EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PSF4TLC =(AX =.07108335199482213 BX =24.36877391708106    PSIX =2.305183409072579  AY =.3763140305984337
+           BY =6.262746280069464    PSIY =2.0873157057648277 EX =.7024592710731186    EPX =-.00490324585063695
+           DP =.0007776591343472637 OFFSET =1.5    EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PQD1C   =(AX =3.1308289294429414e-14  BX =4.763965960111048    PSIX =7.704001680947661  AY =4.440892098500626e-15
+           BY =23.140093142189688   PSIY =7.30619126484963   EX =.17252235575498093   EPX =2.4157759126453016e-14
+           DP =.0007776591343472637 OFFSET =1.5    EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PSDC    =(AX =.2430322112503773  BX =5.318418505454894    PSIX =9.274798007742525  AY =-2.467744656998855
+           BY =28.433363565318203   PSIY =8.87698759164452   EX =.27443553726605524   EPX =.021840191319321516
+           DP =.0007776591343472637 OFFSET =-.5    EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PSFC    =(AX =.07108335199493655 BX =24.368773917079587   PSIX =9.961227299232911  AY =.376314030598438
+           BY =6.262746280069435    PSIY =9.38347417034463   EX =.7024592710750917    EPX =-.004903245850629109
+           DP =.0007776591343472637 OFFSET =-.5    EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PSF8C   =(AX =.002069911758847571     BX =29.23227176003507    PSIX =17.54119428671138  AY =-.03129055250266791
+           BY =1.340337769899647    PSIY =17.46539806906891  EX =.7729350455377715    EPX =-.0006527967058994749
+           DP =.0007776591343472637 OFFSET =-.5    EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PSYMML  =(AX =-3.460082220740901e-11  BX =8.777751907873077    PSIX =19.111990613540215 AY =2.986855207609551e-11
+           BY =104.35445689862011   PSIY =19.03619439586264  EX =.4204652062819036    EPX =-8.960193698115404e-14
+           DP =.0007776591343472637 OFFSET =-.5    EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PNIKRM  =(AX =-1.736702806159433 BX =12.603837899273142   PSIX =45.49037817098061  AY =1.8347814129424753
+           BY =2.399319253797069    PSIY =44.42961969158556  EX =-1.4456769115156476e-12   EPX =-2.145436606149076e-13
+           DP =.0007776591343472637 EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PQDWNC  =(AX =.4256079216185701  BX =6.044166734814944    PSIX =49.96471649237813  AY =-1.8598567879556496
+           BY =29.031126537424022   PSIY =49.82767892978772  EX =3.6617674792474056e-13    EPX =-1.8152757297746222e-13
+           DX =-1.393427560836269e-17    DPX =1.734723475976807e-18    DZ =-.003453071536728708 DP =.0007776591343472637
+           EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PQFWNC  =(AX =-3.2086002743625386e-08 BX =29.86843857089924    PSIX =50.78742616460469  AY =.0016465809652541075
+           BY =6.542216324397681    PSIY =50.558106667241404 EX =-9.801115100571293e-13    EPX =-6.763483430591818e-14
+           DX =-2.879924838606278e-17    DPX =2.1433981223027818e-18   DZ =-.003678848406100862 DP =.0007776591343472637
+           OFFSET =-.5    EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        NMID    =(AX =2.420197375840871e-10   BX =29.86843856633224    PSIX =53.92421719948718  AY =.001644881889497074
+           BY =6.54221942528054     PSIY =53.44837178549924  EX =9.70443737502435e-13 EPX =6.779538042257241e-14
+           DX =3.8941076996130893e-17    DPX =6.022436412249562e-19    DZ =-.004581955883589454 DP =.0007776591343472637
+           OFFSET =1.5    EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PNIKLM  =(AX =1.7367028061488685 BX =12.60383789879226    PSIX =62.43120335917069  AY =-1.8347814129413627
+           BY =2.3993192538729273   PSIY =64.99157012950772  EX =6.618624554602919e-13     EPX =-1.943292013574658e-13
+           DX =1.3515123448385811e-17    DPX =-3.4291278400904977e-18  DZ =-.006388170838566621 DP =.0007776591343472637
+           EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PSOR    =(AX =-1.1447813638560198     BX =8.58312752234067     PSIX =115.19254258627598 AY =1.9185551763956938
+           BY =57.27404232713191    PSIY =115.4133684258842  EX =.0014543130934289773 EPX =-.004029543437879109
+           DX =-1.7265186357682822e-18   DPX =-1.4707443665894363e-23  DZ =-.006388170838566619 DP =.0007776591343472637
+           OFFSET =2.2    EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PSOR1   =(AX =-1.1447813638560198     BX =8.58312752234067     PSIX =115.19254258627598 AY =1.9185551763956938
+           BY =57.27404232713191    PSIY =115.4133684258842  EX =.0014543130934289773 EPX =-.004029543437879109
+           DX =-1.7265186357682822e-18   DPX =-1.4707443665894363e-23  DZ =-.006388170838566619 DP =.0007776591343472637
+           OFFSET =1.2    EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PFUJRM  =(AX =-1.3371117175480487     BX =10.357069282955157   PSIX =115.26842727636728 AY =1.8608409590311084
+           BY =54.573063366898865   PSIY =115.4261540937446  EX =-8.54386006388097e-13     EPX =-5.573059375096889e-14
+           DX =-1.72651513151469e-18     DZ =-.006388170838566619 DP =.0007776591343472637 EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PQDRC   =(AX =-1.9317880628477724e-14 BX =3.7658007995247074   PSIX =118.86003711571227 AY =1.199040866595169e-14
+           BY =37.02875067877856    PSIY =120.73485770182594 EX =3.156544373424066e-13     EPX =-1.4099831523090412e-13
+           DX =3.319159447957369e-19     DPX =-4.5310005811189755e-19  DZ =-.006388170838566619 DP =.0007776591343472637
+           OFFSET =1.5    EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PFZTFBK1=(AX =1.1847502983234968 BX =23.422911761415445   PSIX =121.71055448797485 AY =-1.6616162970645132
+           BY =9.888031489651139    PSIY =124.8370232831526  EX =-1.134163630946198e-12    EPX =1.0187902603723202e-13
+           DX =-2.0142022519959877e-18   DPX =2.6577364082585057e-19   DZ =-.006388170838566619 DP =.0007776591343472637
+           OFFSET =1.5    EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PFZTFBK2=(AX =1.027332916881655  BX =20.029576109290673   PSIX =121.78143596565012 AY =-2.245081875676261
+           BY =15.880906486635606   PSIY =124.9597455806367  EX =-9.77881612701846e-13     EPX =1.0187902603723202e-13
+           DX =-1.6065054869691242e-18   DPX =2.6577364082585057e-19   DZ =-.006388170838566619 DP =.0007776591343472637
+           OFFSET =1.5    EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PFBMON1 =(AX =.8290977325495165  BX =19.452067562654154   PSIX =122.11812823060278 AY =1.3577398649842711
+           BY =20.049411393584275   PSIY =125.50212302375053 EX =-5.722897201848463e-13    EPX =9.029708455663834e-14
+           DX =-2.984954902255351e-19    DPX =2.1523988370859034e-19   DZ =-.006388170838566619 DP =.0007776591343472637
+           SIGZ =.0051128724428908265    EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PMID    =(AX =7.707819739180328e-14   BX =11.502917465236875   PSIX =122.81231579952843 AY =1.384133409321943e-14
+           BY =7.0510676191642085   PSIY =126.43810263343774 EX =2.92454097702941e-13 EPX =9.034523558360758e-14
+           EY =-.03982077617856181  EPY =-1.7347234759768042e-18  R1 =-6.627668508067115e-20    R2 =4.181548778690044e-19
+           R3 =-1.039136466747166e-20    R4 =6.627251598826173e-20     DX =1.761639454136473e-18     DPX =2.151738118092547e-19
+           DY =-1.6940658945086007e-18   DPY =-1.3175595994626936e-35  DZ =-.006388170838566619 DP =.0007776591343472637
+           EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PFBMON2 =(AX =-.8290977325493628 BX =19.452067562651198   PSIX =123.50650336845413 AY =-1.3577398649842436
+           BY =20.049411393583743   PSIY =127.37408224312497 EX =1.156885583709637e-12     EPX =9.019782303798204e-14
+           EY =-1.0408340855860827e-17   EPY =-6.07803516028125e-33    R1 =-1.9858905723175985e-19   R2 =2.722729237087669e-18
+           R3 =-2.076025878090653e-20    R4 =1.9888738256883172e-19    DX =3.819863671898174e-18     DPX =2.146419690072475e-19
+           DY =-2.339240771282092e-34    DPY =-1.3142772043089765e-35  DZ =-.006388170838566619 DP =.0007776591343472637
+           EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PFZLFBK1=(AX =-1.0834654512027522     BX =21.184182816629704   PSIX =123.86975371153291 AY =2.037027331021397
+           BY =13.538592750572738   PSIY =127.95377298979493 EX =1.4234373182677677e-12    EPX =8.917753494756792e-14
+           EY =-7.946522060293845e-19    EPY =1.1832344289438055e-18   R1 =-2.130181239877621e-19    R2 =2.7986546434365452e-18
+           R3 =2.935653234597264e-20     R4 =-4.656247058282868e-19    DX =4.100022124897639e-18     DPX =1.8925940163828396e-19
+           DZ =-.006388170838566619 DP =.0007776591343472637 OFFSET =1.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PFZLFBK2=(AX =-1.2250795231647755     BX =24.369974881256763   PSIX =123.93052704491129 AY =1.5121365236653705
+           BY =8.640746631105191    PSIY =128.08171174318056 EX =1.5465020553174307e-12    EPX =8.917753494756782e-14
+           EY =8.382113059130023e-19     EPY =1.183234428943805e-18    R1 =-1.7250610935032145e-19   R2 =2.394150980296969e-18
+           R3 =2.935653234597264e-20     R4 =-5.061367204657275e-19    DX =4.36120009915846e-18 DPX =1.8925940163828396e-19
+           DZ =-.006388170838566619 DP =.0007776591343472637 OFFSET =1.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PDCCT   =(AX =-2.5260933452154983     BX =29.15775804927528    PSIX =128.81007122244762 AY =.7836570975893608
+           BY =3.277818651891862    PSIY =134.97932902436298 EX =-1.9151036108276604e-14   EPX =5.728781177535117e-14
+           EY =4.5021131903651995e-18    EPY =5.971925425038389e-19    R1 =4.030912470597169e-20     R2 =-9.397165912172151e-19
+           R3 =1.2839123568406132e-20    R4 =1.231127779360944e-19     DX =1.5816711964886503e-18    DPX =2.937952868018219e-19
+           DY =-2.0818383850530207e-36   DPY =3.010834848559275e-35    DZ =-.006388170838566619 DP =.0007776591343472637
+           EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PCT     =(AX =-2.6526659640064945     BX =31.747137703886278   PSIX =128.82650586273826 AY =.5374387099933053
+           BY =2.6172707481005295   PSIY =135.1508769339651  EX =9.492722881755567e-15     EPX =5.72878117753511e-14
+           EY =4.800709461617115e-18     EPY =5.971925425038383e-19    R1 =4.6728686490174755e-20    R2 =-9.015245454942555e-19
+           R3 =1.2839123568406132e-20    R4 =1.1669321615189134e-19    DX =1.7285688398895612e-18    DPX =2.937952868018219e-19
+           DY =1.2972335857743355e-35    DPY =3.010834848559275e-35    DZ =-.006388170838566619 DP =.0007776591343472637
+           EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PKICKER2=(AX =5.257051306824018  BX =19.660672563389415   PSIX =128.94957853214132 AY =-3.0819070966355055
+           BY =10.866374114748789   PSIY =136.51257707076417 EX =1.8068400613106874e-13    EPX =2.288700636145577e-14
+           EY =1.028857803718683e-17     EPY =2.1987045110002326e-18   R1 =-1.2467661123413598e-19   R2 =-8.06967258041631e-19
+           R3 =1.560097931438417e-21     R4 =-1.2647727305502133e-19   DX =1.808105819730862e-18     DPX =-3.035975278565523e-19
+           DZ =-.006388170838566619 DP =.0007776591343472637 OFFSET =1.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        INJECTIO=(AX =-13.375098583346746     BX =100.00000000000757   PSIX =131.71019057162994 AY =1.6437700628532073
+           BY =22.857778652699487   PSIY =136.88506823660435 EX =7.956100312392999e-13     EPX =7.559136964918929e-14
+           EY =9.772954666834079e-18     EPY =-1.4023439431265932e-18  R1 =1.7386154138940173e-19    R2 =-1.8785614770332373e-18
+           R3 =1.9053614886355242e-20    R4 =-1.0793463017252457e-19   DX =-8.198678798079328e-19    DPX =-1.9885739270151986e-19
+           DY =2.438690171449554e-34     DPY =-2.099608510315441e-35   DZ =-.006388170838566619 DP =.0007776591343472637
+           SIGZ =.005062616604682599     EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PKICKER1=(AX =.15608438252024326 BX =18.766972040194087   PSIX =132.0911711857311  AY =4.894914860792367
+           BY =73.71077764411856    PSIY =137.17101707590808 EX =-1.7653248343264532e-13   EPX =-7.140805997044171e-14
+           EY =8.737919423783439e-18     EPY =-1.021151224434955e-18   R1 =-3.62104025032434e-19     R2 =-1.0825464897709601e-19
+           R3 =2.27018384583896e-20 R4 =-4.023740470128998e-20    DX =-1.7665330309485085e-18   DPX =-1.694112054829799e-19
+           DY =3.8010239769360194e-34    DPY =-2.8765151680846305e-35  DZ =-.006388170838566619 DP =.0007776591343472637
+           EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PFUJLM  =(AX =1.5497062693783428 BX =13.213649387972714   PSIX =132.3077523533201  AY =-1.5690337572948265
+           BY =57.8745888745463     PSIY =137.23339602305353 EX =-3.9128005988143185e-13   EPX =-3.6522804310545015e-14
+           EY =5.932397300876639e-18     EPY =-3.441085622877678e-19   R1 =-2.7968773547716415e-19   R2 =8.5735701487596605e-19
+           R3 =-1.3990683396949883e-20   R4 =-1.7993978859223205e-20   DX =-2.070673472418776e-18    DPX =5.2676792432318524e-20
+           DY =3.2180333701273355e-34    DPY =4.3926875181857895e-36   DZ =-.006388170838566619 DP =.0007776591343472637
+           EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PDUMP1  =(AX =-1.1431257904136145     BX =19.15975589787209    PSIX =134.05291500278278 AY =1.5450336772139985
+           BY =12.32110766136681    PSIY =137.59843550846873 EX =.625569498013211     EPX =.03841399694887026
+           EY =-2.238360326720143e-18    EPY =-8.247332549337641e-19   R1 =-1.4321039906198999e-19   R2 =2.8077736850892532e-18
+           R3 =1.240167967800658e-20     R4 =-3.6204644315678167e-19   DX =-6.2441985673687385e-18   DPX =-7.050530354968824e-20
+           DY =9.740452171267177e-35     DPY =-2.5285799545825767e-35  DZ =-.006388170838566619 DP =.0007776591343472637
+           EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PDUMP2  =(AX =-1.1973034878358568     BX =20.21294907308435    PSIX =134.0757836535274  AY =1.421326611212487
+           BY =10.986245531574893   PSIY =137.63712306752132 EX =.6428557966402011    EPX =.03841399694887016
+           EY =-2.609490291440331e-18    EPY =-8.247332549337622e-19   R1 =-1.3762964320688701e-19   R2 =2.7067861251118004e-18
+           R3 =1.240167967800658e-20     R4 =-3.6762719901188464e-19   DX =-6.2759259539660984e-18   DPX =-7.050530354968824e-20
+           DY =8.602591191705018e-35     DPY =-2.5285799545825767e-35  DZ =-.006388170838566619 DP =.0007776591343472637
+           EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PSYMMS  =(AX =-1.73366321298829e-11   BX =9.552697172822338    PSIX =158.64734472200408 AY =1.4666090564219303e-10
+           BY =75.23501135600041    PSIY =162.21516513137075 EX =.41913617105123774   EPX =1.0486229939983775e-13
+           EY =1.1673624063773526e-17    EPY =-4.258793888102302e-19   R1 =-5.848176762966362e-20    R2 =4.7525497384271585e-18
+           R3 =-3.745000694963968e-21    R4 =1.3176693384107063e-20    DX =1.8167268672313777e-22    DPX =-1.439026015839295e-22
+           DZ =-.006388170838566619 DP =.0007776591343472637 OFFSET =-.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PZVS3P  =(AX =-1.6623572404525   BX =14.00453833347427    PSIX =159.8877398263444  AY =10.425149570833605
+           BY =71.23855766355672    PSIY =162.44675513789645 EX =.5022221505241855    EPX =.07280690920350992
+           EY =4.169026574748544e-18     EPY =-1.0712295154632894e-18  R1 =-1.934126655722259e-20    R2 =3.149544053042237e-18
+           R3 =-2.8111804403592116e-21   R4 =-4.2260774859283805e-19   DX =-1.1367885081356217e-21   DPX =-1.5130872012668955e-22
+           DZ =-.006388170838566619 DP =.0007776591343472637 OFFSET =1.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PZVS2P  =(AX =-1.589927374122787 BX =9.699192321087333    PSIX =164.40139763185843 AY =2.7782438657928257
+           BY =21.02286497212909    PSIY =168.33397070450835 EX =.4399365639467881    EPX =.07924605997621015
+           EY =8.818923125460019e-18     EPY =-1.9129053549412242e-18  R1 =-4.670005285905428e-19    R2 =2.0514430874587594e-18
+           R3 =5.267061438999991e-20     R4 =-2.6783368732518382e-19   DX =7.585325235283242e-22     DPX =1.0902429731879486e-22
+           DZ =-.006388170838566619 DP =.0007776591343472637 OFFSET =1.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PZVS1P  =(AX =1.6081081265433024 BX =9.239875381951682    PSIX =165.0544296920242  AY =-2.4588727313665157
+           BY =18.570714340834606   PSIY =169.78771466229617 EX =.38205537689475405   EPX =-.08892700888415993
+           EY =-1.3699738093281244e-17   EPY =-2.3500778190746565e-18  R1 =9.15804681890369e-20 R2 =1.267282990289913e-18
+           R3 =-9.356021939138525e-21    R4 =5.646376781696185e-20     DX =4.99918844019892e-22 DPX =-1.4815450851093694e-22
+           DZ =-.006388170838566619 DP =.0007776591343472637 OFFSET =1.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        POHORM  =(AX =-1.7366935142216018     BX =12.603805386124781   PSIX =185.02522520763642 AY =1.8329120664255814
+           BY =2.394671139572605    PSIY =187.62456224576576 EX =6.192355656020595e-13     EPX =2.1004725736517523e-13
+           EY =4.520602049777645e-19     EPY =-2.8719445913322305e-18  R1 =-9.814622011376677e-21    R2 =5.645748298626219e-19
+           R3 =-2.5918358494209708e-20   R4 =-2.440086752888815e-19    DX =-1.2193731845236412e-25   DY =5.855034740265784e-35
+           DPY =-6.936886278289496e-35   DZ =-.006388170838566619 DP =.0007776591343472637 EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PQDWOC  =(AX =.38947883674672923 BX =5.320116704781754    PSIX =189.27023854535128 AY =-1.933997824003054
+           BY =29.741057731266398   PSIY =193.86945066295067 EX =-1.0930328927715145e-12   EPX =6.103963488800534e-14
+           EY =2.4081321131200385e-18    EPY =-5.575756065253287e-19   R1 =-2.897117346528698e-19    R2 =1.2036143738109873e-18
+           R3 =-2.5843942856962647e-20   R4 =4.8594632740074324e-20    DX =-8.713597422930031e-26    DPX =-1.856655128404736e-26
+           DY =2.1412301382692567e-34    DPY =7.227461406513352e-36    DZ =-.006388170838566619 DP =.0007776591343472637
+           EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PQFWOC  =(AX =2.2446422169863922e-06  BX =30.223574380159874   PSIX =190.15949222193223 AY =.00160958546925416
+           BY =6.389708682801828    PSIY =194.59968856592226 EX =-1.828165073561082e-12    EPX =6.19243033755407e-14
+           EY =-5.73557093023553e-18     EPY =-1.2629837673539028e-18  R1 =-3.7486677572266533e-20   R2 =1.9368091653640372e-18
+           R3 =-3.699170128434495e-21    R4 =-2.631099841973738e-19    DX =-1.503660513122685e-17    DPX =1.1843623527263358e-18
+           DZ =-.006613947707938765 DP =.0007776591343472637 OFFSET =-.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        OMID    =(AX =-3.297611073094231e-10  BX =30.223557756298288   PSIX =193.54142502789568 AY =.0016048364263820947
+           BY =6.389716711230646    PSIY =197.48996718398223 EX =1.3300256007647335e-12    EPX =-7.454025596360005e-14
+           EY =3.546255685418484e-18     EPY =1.4470358140543977e-18   R1 =-1.1480955554010099e-20   R2 =2.446174022509785e-18
+           R3 =-6.312668545348919e-21    R4 =-1.381261286864635e-19    DX =1.6581141215057977e-17    DPX =2.196244910887697e-18
+           DZ =-.007517055185427349 DP =.0007776591343472637 OFFSET =1.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        POHOLM  =(AX =1.7366935142133941 BX =12.603805385865918   PSIX =201.41279788078538 AY =-1.8329120664628153
+           BY =2.3946711399399447   PSIY =208.01201495621393 EX =-1.4691345953848274e-12   EPX =1.3635652586045504e-13
+           EY =-6.030633093565038e-18    EPY =-4.887686493684414e-18   R1 =-7.85603595690958e-20     R2 =-4.893026746907934e-19
+           R3 =-3.307546009980997e-20    R4 =-4.2275286198122883e-19   DX =7.429921679517353e-17     DPX =-1.2781059862395555e-17
+           DY =-5.684022555637381e-35    DPY =-6.875093336499852e-35   DZ =-.009323270140404596 DP =.0007776591343472637
+           EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PENERGY =(AX =.07108335199455477 BX =24.36877391707037    PSIX =203.32833466757822 AY =.37631403060336976
+           BY =6.2627462800988285   PSIY =209.1608482504928  EX =.7024592710728527    EPX =-.004903245850638669
+           EY =-4.987464971012678e-18    EPY =1.6541632857504236e-18   R1 =-5.839694781044581e-20    R2 =-1.60986817281936e-18
+           R3 =5.652770982859895e-21     R4 =-1.3575178080939105e-19   DX =-6.701630724498115e-17    DPX =-3.2988481077475307e-18
+           DZ =-.009323270140404597 DP =.0007776591343472637 OFFSET =1.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PSF4TRC =(AX =.07108335191575153 BX =24.36877392005555    PSIX =244.5969781751534  AY =.3763140308089457
+           BY =6.262746278725032    PSIY =250.38581742642967 EX =.7024592710726415    EPX =-.004903245850557584
+           EY =1.3632428722455703e-18    EPY =1.4660699334385596e-18   R1 =-6.984286553126517e-20    R2 =1.4180109728979815e-18
+           R3 =4.329757208623453e-22     R4 =-2.5259086868262125e-19   DX =5.582191006887878e-17     DPX =1.559476258370649e-18
+           DZ =-.009323270140404594 DP =.0007776591343472637 OFFSET =1.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PSD3TRC =(AX =-.24303221137223024     BX =5.318418505124434    PSIX =248.42500012020898 AY =2.467744657664627
+           BY =28.4333635691141     PSIY =254.03389665874207 EX =.27443553726768005   EPX =-.021840191319217907
+           EY =7.260886518619369e-18     EPY =-1.3181654331274652e-18  R1 =-4.2359888318575657e-19   R2 =5.047525422086858e-19
+           R3 =3.2653250217210095e-20    R4 =-7.910671661630191e-20    DX =-2.1048574165343925e-17   DPX =-6.938893903907228e-18
+           DZ =-.009323270140404589 DP =.0007776591343472637 OFFSET =1.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PTSURM  =(AX =.20977725083419563 BX =5.2427993249359615   PSIX =248.4566313460394  AY =-2.509385546694842
+           BY =29.264544313242133   PSIY =254.03968606325176 EX =.2780828492179876    EPX =.021840191319217748
+           EY =7.481020145951606e-18     EPY =1.3181654331274567e-18   R1 =-4.290519759720308e-19    R2 =-4.463116838962791e-19
+           R3 =-3.265325021721058e-20    R4 =-7.365362383002776e-20    DX =-1.988977888339142e-17    DPX =6.938893903907228e-18
+           DY =-9.717650672200971e-35    DPY =1.0066947716473372e-36   DZ =-.009323270140404589 DP =.0007776591343472637
+           EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PSLXTRC =(AX =1.2219264443201163 BX =6.544534309866509    PSIX =252.87943956180345 AY =-3.17165871863954
+           BY =8.837656065485945    PSIY =261.5373109845764  EX =1.424933587627158    EPX =-.2874561861165215
+           EY =1.1789615826642443e-17    EPY =4.2028020558890574e-18   R1 =1.419649081398382e-19     R2 =2.2472521258736965e-19
+           R3 =7.194225099946529e-20     R4 =2.338249912423103e-19     DX =-1.3560024963139203e-17   DPX =-1.0821427546647348e-18
+           DZ =-.009323270140404597 DP =.0007776591343472637 OFFSET =1.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PQLX2RC =(AX =1.2629401368222606 BX =68.2983284672114     PSIX =254.75838001680123 AY =1.5660433241179716e-05
+           BY =.4857354564186519    PSIY =263.1584832590486  EX =-1.3810801004693047  EPX =-.007848893656817957
+           EY =-1.8966820044513684e-19   EPY =-5.646807487683799e-18   R1 =1.6362878259754315e-20    R2 =3.2887682579016413e-20
+           R3 =1.7915415264788246e-20    R4 =1.076638349530106e-18     DX =-8.263254713652999e-17    DPX =2.3346288373989745e-18
+           DZ =-.009323270140404596 DP =.0007776591343472637 OFFSET =1.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PSLYTRC =(AX =.7303259899032952  BX =7.231568504509038    PSIX =260.3666787773756  AY =5.987925971820186
+           BY =51.975805898748305   PSIY =267.77679072535165 EX =-.650312010115035    EPX =.020551748086866668
+           EY =2.821823480910923e-17     EPY =-3.2398710564030843e-18  R1 =-7.00037076570939e-21     R2 =-1.4506002829130381e-18
+           R3 =1.2751268421444578e-20    R4 =2.0988714400679078e-19    DX =9.865473932804438e-18     DPX =-1.3216310051992649e-17
+           DZ =-.00932327014040459  DP =.0007776591343472637 OFFSET =1.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PQLY1RC =(AX =-1.2474756399864686     BX =10.03410786890708    PSIX =262.5178139939147  AY =.08517834999058671
+           BY =69.99839783146334    PSIY =270.48038772083765 EX =.18300213565025217   EPX =.027283781209577997
+           EY =-2.919013014931557e-17    EPY =-1.7659935229941157e-19  R1 =4.877166579474724e-19     R2 =-2.0366051594125267e-18
+           R3 =-7.641982566162795e-21    R4 =6.68244693798056e-20 DX =-8.581855438484656e-17    DPX =-4.317148934352147e-18
+           DZ =-.009323270140404597 DP =.0007776591343472637 OFFSET =-.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PQLC3RC =(AX =-.11759175432239566     BX =20.008516724107814   PSIX =263.0569654609719  AY =-1.7488413764921171
+           BY =69.41467278867607    PSIY =273.22603116660605 EX =-.2791236413650207   EPX =-.03850741249838738
+           EY =2.0918874022057834e-17    EPY =8.881234669024404e-19    R1 =-1.868392023118645e-20    R2 =5.745206693484983e-18
+           R3 =-3.29555015326444e-21     R4 =1.0200809161157032e-19    DX =-6.090621370628535e-17    DPX =5.445060428878194e-18
+           DZ =-.009323270140404604 DP =.0007776591343472637 OFFSET =-.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PQLC2RC =(AX =-.3590397462711521 BX =55.891836827511746   PSIX =263.28593693063374 AY =.880017781382439
+           BY =25.788072297815965   PSIY =273.404694848077   EX =-.5159032553496204   EPX =.02643172755256615
+           EY =1.552145362417705e-17     EPY =-4.09156796693874e-20    R1 =-2.0356838380456835e-20   R2 =5.193050742133334e-18
+           R3 =-2.139663080810103e-21    R4 =-2.906309266869209e-19    DX =-5.4903626816790055e-17   DPX =2.811484747549801e-18
+           DZ =-.009323270140404601 DP =.0007776591343472637 OFFSET =-.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PQLC1RC =(AX =1.1489302220838296 BX =32.28770770218833    PSIX =263.4218105786962  AY =-.09151094141826954
+           BY =31.705156910810015   PSIY =273.609254383683   EX =-.21733468018139224  EPX =.0481544270631054
+           EY =1.9690361436000264e-17    EPY =3.7816839553615264e-19   R1 =1.4207539799606724e-19    R2 =3.7874708322790076e-18
+           R3 =-7.258023169220816e-21    R4 =-7.363586833713766e-20    DX =-2.3137556842690594e-17   DPX =5.123122643970561e-18
+           DZ =-.009323270140404601 DP =.0007776591343472637 OFFSET =-.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PIRR    =(AX =.15999969694013286 BX =25.639997575523672   PSIX =263.7513005165783  AY =.1599996969401162
+           BY =25.639997575523232   PSIY =273.9394773157675  EX =-1.9721101123570018e-13   EPX =-4.485647964180563e-14
+           EY =1.961452070461104e-17     EPY =-4.056828312943463e-21   R1 =3.2830908384673965e-21    R2 =2.400652475152193e-18
+           R3 =-7.202235506381914e-21    R4 =-7.991211796716537e-20    DX =1.1427392363155093e-17    DPX =3.469446951953614e-18
+           DY =1.7670151722328884e-34    DPY =6.937595139083505e-36    DZ =-.009323270140404601 DP =.0007776591343472637
+           EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        IP      =(AX =3.227211791030665e-15   BX =25.000000000000306   PSIX =263.9099554832695  AY =-1.533785968520131e-14
+           BY =25.000000000000007   PSIY =274.0981322824587  EX =-3.7665046770946483e-13   EPX =-4.485647964180457e-14
+           EY =1.959829342209535e-17     EPY =-4.056828312943364e-21   R1 =-2.5525796619346637e-20   R2 =2.1831076018187032e-18
+           R3 =-7.202235506381914e-21    R4 =-5.110323050935134e-20    DX =2.5305153884716133e-17    DPX =3.469446951953614e-18
+           DY =2.044518452169561e-34     DPY =6.937595139083505e-36    DZ =-.009323270140404601 DP =.0007776591343472637
+           SIGZ =.004371253392063006     GEO =1    EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PIRL    =(AX =-.1599993638518778 BX =25.63999491082545    PSIX =264.0686101251867  AY =-.1599993638518983
+           BY =25.639994910825312   PSIY =274.2567869243759  EX =-5.56089550625174e-13     EPX =-4.4856479641803507e-14
+           EY =1.9582066173361707e-17    EPY =-4.0568283129432645e-21  R1 =-5.433462410266041e-20    R2 =2.196033124800816e-18
+           R3 =-7.202235506381914e-21    R4 =-2.229440302603757e-20    DX =3.918288651547695e-17     DPX =3.469446951953614e-18
+           DY =2.32202115439838e-34 DPY =6.937595139083505e-36    DZ =-.009323270140404601 DP =.0007776591343472637
+           EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PQLC1LC =(AX =-1.3601713114218585     BX =33.60090056566694    PSIX =264.428366381171   AY =.2095233365535636
+           BY =32.54191086489124    PSIY =274.6191362617762  EX =-.26563817087400343  EPX =-.04195482985478412
+           EY =1.9252232563434262e-17    EPY =-4.675366190894131e-19   R1 =-2.0361905334986726e-19   R2 =3.275975590969062e-18
+           R3 =-3.5602633378039866e-21   R4 =-2.6345127689789575e-20   DX =6.347727414233682e-17     DPX =4.9221463285025766e-18
+           DZ =-.0093232701404046   DP =.0007776591343472637 OFFSET =-.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PQLC2LC =(AX =.5592298200443855  BX =66.28405463828446    PSIX =264.5634019459984  AY =-.716624771669439
+           BY =23.260329400420883   PSIY =274.8545089006566  EX =-.5679363939699209   EPX =-.01646356649812044
+           EY =1.362352611745803e-17     EPY =-1.3864628534978645e-19  R1 =-2.050467282043548e-20    R2 =4.2795962018789515e-18
+           R3 =-4.544768288442928e-21    R4 =1.181227017961559e-19     DX =1.0329059855261131e-16    DPX =6.072217817939902e-19
+           DZ =-.0093232701404046   DP =.0007776591343472637 OFFSET =-.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PQLC3LC =(AX =.8935549170469248  BX =19.17539875394648    PSIX =264.7772589197551  AY =.5205863400569726
+           BY =64.51381135912942    PSIY =275.0504626281318  EX =-.205198784896987    EPX =.0650410776662004
+           EY =1.840901019961977e-17     EPY =-5.469023119560196e-19   R1 =3.234003775846135e-20     R2 =4.536405640763243e-18
+           R3 =-4.020137774414247e-21    R4 =-3.739234730910551e-20    DX =4.0668616716485396e-17    DPX =-4.278133441333896e-18
+           DZ =-.009323270140404603 DP =.0007776591343472637 OFFSET =-.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PSLYTLC =(AX =-.3797470100954627 BX =19.412407735453037   PSIX =264.8221183430818  AY =4.385804684393556
+           BY =57.981908112243026   PSIY =275.06440234161187 EX =-.1582544997263333   EPX =.05246498836130333
+           EY =1.711090074262205e-17     EPY =-1.7186314757607912e-18  R1 =-2.491452223680065e-19    R2 =4.471273247579442e-18
+           R3 =1.4954370059271216e-20    R4 =-3.367224132805185e-19    DX =3.8816211519373196e-17    DPX =-1.701242058926863e-18
+           DZ =-.009323270140404603 DP =.0007776591343472637 OFFSET =-.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PQLY1LC =(AX =.5642396879114483  BX =7.891835648313472    PSIX =265.67452648338957 AY =-.6929592470351267
+           BY =22.591077022679197   PSIY =277.3172376669223  EX =.6709097506888937    EPX =-.0078738676814612
+           EY =-1.8680066909800916e-17   EPY =-5.081436912144018e-19   R1 =-1.7243340003887074e-19   R2 =-3.0245090318668215e-19
+           R3 =-1.1439907909461578e-20   R4 =-1.188152424507949e-19    DX =2.2997591311266077e-18    DPX =-3.198273577202591e-18
+           DZ =-.009323270140404604 DP =.0007776591343472637 OFFSET =-.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PSLXTLC =(AX =7.969445045831977  BX =61.56712698652973    PSIX =270.3509764985024  AY =-2.475500222464824
+           BY =9.427802645373031    PSIY =281.9204650781506  EX =.5679642841361059    EPX =-.06252473376690637
+           EY =2.7210761782217717e-19    EPY =-1.2071086534785877e-18  R1 =-1.3302022721864745e-19   R2 =-4.649743440588145e-19
+           R3 =-6.476637475066384e-20    R4 =-3.5440029952672453e-19   DX =9.148877855469348e-17     DPX =-1.223859142103788e-17
+           DZ =-.009323270140404603 DP =.0007776591343472637 OFFSET =-.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PQLX2LC =(AX =-.589048554554106  BX =11.740773798135193   PSIX =272.53447542260346 AY =.47640535249149374
+           BY =.8373629304174062    PSIY =283.1133134965274  EX =-.3079755666794413   EPX =.005618587222938787
+           EY =-3.2874083089297413e-18   EPY =1.8537769721911582e-19   R1 =-2.6723952452450403e-20   R2 =3.2802768822065753e-19
+           R3 =4.243194711956362e-21     R4 =-6.892539992896332e-19    DX =-7.245514724700271e-17    DPX =-4.429599456452474e-18
+           DZ =-.0093232701404046   DP =.0007776591343472637 OFFSET =1.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+        PTSULM  =(AX =-.20977725071628114     BX =5.242799325305741    PSIX =278.235771966871   AY =2.5093855460154373
+           BY =29.26454430922261    PSIY =291.0413868243179  EX =.2780828492167747    EPX =-.021840191319107673
+           EY =-6.814081643404102e-18    EPY =1.272480097140921e-18    R1 =5.4880342608206e-20  R2 =-2.2161246134530938e-18
+           R3 =3.535013483753694e-21     R4 =1.6752219329320486e-19    DX =3.2628843694623766e-18    DPX =-8.869130242807747e-18
+           DY =-2.5001830901511263e-34   DPY =2.646476161259137e-35    DZ =-.009323270140404603 DP =.0007776591343472637
+           EMITX =1.95763554302191e-09   EMITY =1.95763554302191e-10 )
+        PSD3TLC =(AX =-.24303221125039473     BX =5.318418505454176    PSIX =278.26740319269936 AY =2.467744656998962
+           BY =28.433363565319205   PSIY =291.04717622882833 EX =.2744355372664837    EPX =-.021840191319107673
+           EY =-6.601577467181569e-18    EPY =1.272480097140921e-18    R1 =5.547068985999288e-20     R2 =-2.1974120123797474e-18
+           R3 =3.535013483753693e-21     R4 =1.66931846041418e-19 DX =1.781739618913483e-18     DPX =-8.869130242807747e-18
+           DZ =-.009323270140404603 DP =.0007776591343472637 OFFSET =1.5    EMITX =1.95763554302191e-09
+           EMITY =1.95763554302191e-10 )
+ ;
+ ;
+ MULT   SLYTLP  =(L =.334 K2 =.12999999999999998 )
+        SLXTLP  =(L =.334 K2 =.13000000000000006 )
+        SD3TLP  =(L =.334 K2 =-4.505042479671099 )
+        SF4TLP  =(L =.334 K2 =1.2845621548088566 )
+        SD5TLP  =(L =.334 K2 =-1.8286823245744916 )
+        SF6TLP  =(L =.334 K2 =1.2137553358610897 )
+        SD7TLP  =(L =.334 K2 =-4.191839862946305 )
+        SF8TNP  =(L =.334 K2 =2.6003601299547117 )
+        SD7NRP  =(L =.334 K2 =-4.102556613503486 )
+        SF6NRP  =(L =.334 K2 =1.8859412268766884 )
+        SD5NRP  =(L =.334 K2 =-2.6873684960462842 )
+        SF4NRP  =(L =.334 K2 =1.1984490098168592 )
+        SD3NRP  =(L =.334 K2 =-4.029868696991036 )
+        SF2NRP  =(L =.334 K2 =.5871135096615031 )
+        SF2NLP  =(L =.334 K2 =.1358800028758575 )
+        SD3NLP  =(L =.334 K2 =-3.31750126541433 )
+        SF4NLP  =(L =.334 K2 =1.3511743216195962 )
+        SD5NLP  =(L =.334 K2 =-1.5839725255491663 )
+        SF6NLP  =(L =.334 K2 =1.3963953276661005 )
+        SD7NLP  =(L =.334 K2 =-5.185412019443167 )
+        SF8NFP  =(L =.334 K2 =1.268860967091389 )
+        SD7FRP  =(L =.334 K2 =-3.885892503001847 )
+        SF6FRP  =(L =.334 K2 =.41141706470347156 )
+        SD5FRP  =(L =.334 K2 =-5.313740420586572 )
+        SF4FRP  =(L =.334 K2 =.2757313624094125 )
+        SD3FRP  =(L =.334 K2 =-4.237842592447159 )
+        SF2FRP  =(L =.334 K2 =.1511203830417306 )
+        SF2FLP  =(L =.334 K2 =.679233366488266 )
+        SD3FLP  =(L =.334 K2 =-1.510652612967056 )
+        SF4FLP  =(L =.334 K2 =1.5952217406535862 )
+        SD5FLP  =(L =.334 K2 =-3.36945601060947 )
+        SF6FLP  =(L =.334 K2 =1.1793984839034009 )
+        SD7FLP  =(L =.334 K2 =-4.347533863742779 )
+        SF8FOP  =(L =.334 K2 =1.1802700174101703 )
+        SD7ORP  =(L =.334 K2 =-4.495676689968596 )
+        SF6ORP  =(L =.334 K2 =.6038293769395098 )
+        SD5ORP  =(L =.334 K2 =-1.8110528950920868 )
+        SF4ORP  =(L =.334 K2 =2.0766817736091663 )
+        SD3ORP  =(L =.334 K2 =-3.6412692978447807 )
+        SF2ORP  =(L =.334 K2 =1.1129614243409318 )
+        SF2OLP  =(L =.334 K2 =.1498100999487961 )
+        SD3OLP  =(L =.334 K2 =-3.6746594823158976 )
+        SF4OLP  =(L =.334 K2 =1.215560044145138 )
+        SD5OLP  =(L =.334 K2 =-2.352452205030448 )
+        SF6OLP  =(L =.334 K2 =1.392333361684036 )
+        SD7OLP  =(L =.334 K2 =-3.5931152213154416 )
+        SF8OTP  =(L =.334 K2 =1.2115093617778474 )
+        SD7TRP  =(L =.334 K2 =-3.52337227709201 )
+        SF6TRP  =(L =.334 K2 =1.0154221337727762 )
+        SD5TRP  =(L =.334 K2 =-3.4217694624620063 )
+        SF4TRP  =(L =.334 K2 =.3179117114665448 )
+        SD3TRP  =(L =.334 K2 =-4.033846449119317 )
+        SLXTRP  =(L =.334 K2 =.13000000000000003 )
+        SLYTRP  =(L =.334 K2 =.12999999999999998 )
+ ;
+ ;
+ LINE ASC=
+       (IP         LIP1     APIR     LIP2     LXB1L    PIRL     LBC1LP  
+        BC1LP      LBC1LP   LXL28467 QKALP    LBLC1LP1A         LBLC1LP1 BLC1LP1 
+        LBLC1LP1   LBLC1LP1B         LBLC1LP2A         LBLC1LP2 BLC1LP2  LBLC1LP2 LBLC1LP2B        
+        QKBLP      LLC1LA   ZDS1LP   LLC1LB   ZVQLC1LP LX097B   QLC1LP  
+        PQLC1LC    LXL15814 MQLC1LP  LXL13653 QKCLP    LLC2LA   ZDS2LP  
+        LLC2LB     ZHQLC2LP LX097B   QLC2LP   PQLC2LC  LXL15814 MQLC2LP 
+        LXL12653   QKDLP    LXL56467 LXBLC2LP BLC2LP   LXBLC2LP LXL56467
+        QKELP      LXL2428  ZVQLC3LP LX097B   QLC3LP   PQLC3LC  LXL15814
+        MQLC3LP    LXL24186 OL2TLP   SLYTLP   PSLYTLC  LXBXS    LNBX2   
+        LXBLY2LP   BLY2LP   LXBLY2LP LLY1L    BLY3LP   LXL54186 MQLY2LP1
+        LXL15814   QLY2LP   LXL580   LXBLY5LP BLY5LP   LXBLY5LP LX200   
+        LXL54186   MQLY1LP  LXL15814 QLY1LP   PQLY1LC  LX097B1  ZVQLY1LP
+        L2592      LX200    LXBLY5LP BLY5LP   LXBLY5LP LXL42186 LXL15814
+        QLY2LP     LXL15814 MQLY2LP2 LXL54186 BLY3LP   LLY1L    LXBLY2LP
+        BLY2LP     LXBLY2LP LNBX2    LXBXS    SLYTLP   PSLYTLC  LXL24186
+        MQLB1LP    LXL15814 QLB1LP   LX097B2  ZVQLB1LP L2657    LX200   
+        BLB2LP     LLB1L    QLB2LP   LXL15814 MQLB2LP  LX09427  ZHQLB2LP
+        LLB2LA     ZDS3LP   LLB2LB   LXL15814 LQLB3LP  QLB3LP   LQLB3LP 
+        LXL15814   MQLB3LP  LX09427  ZVQLB3LP LLB3L    BLB3LP   LXL580  
+        QLB4LP     LXL15814 MQLB4LP  LXL24186 SLXTLP   PSLXTLC  LXL580  
+        BLX2LP     LLX1L1   ZVQLX1LP1         LX09427  MQLX1LP1 LXL15814 LQLX1LP 
+        QLX1LP     LQLX1LP  LXL15814 LXL42186 LXBLX4LP BLX4LP   LXBLX4LP
+        LXL54186   MQLX2LP  LXL15814 LQLX2LP  PQLX2LC  QLX2LP   LQLX2LP 
+        LXL700     LXBLX4LP BLX4LP   LXBLX4LP LXL42186 LXL15814 LQLX1LP 
+        QLX1LP     LQLX1LP  LXL15814 MQLX1LP2 LX09427  ZVQLX1LP2         LLX1L1  
+        BLX2LP     LXL580   SLXTLP   PSLXTLC  LXL24186 MQLA2LP  LXL15814
+        LQLA2LP    QLA2LP   LQLA2LP  LXL580   LBLA1LP  BLA1LP   LBLA1LP 
+        LLA2L      ZVQLA3LP LX09427  MQLA3LP  LXL15814 LQLA3LP  QLA3LP  
+        LQLA3LP    LXL580   LXBLA2LP BLA2LP   LXBLA2LP LLA6L    ZHQLA4LP
+        -LX0828    -MQLA4LP -LP1696  -QLA4LP  -LX097B  LLA7L    LZHQA3LP
+        -LX0828    -LP1696  -QLA5LP  LP1696   -MQLA5LP LX0828   -ZVQLA5LP        
+        LLA8L      BLA6LP   LXL700B  MQLA6LP  LP1696   -QLA6LP  LXL700  
+        BLA6LP     LLA9LA   ZDS4LP   LLA9LB   MQLA7LP  LP1689   QLA7LP  
+        LX097      ZVQLA7LP LLA10L   MQLA8LP  LP1689   QLA8LP   LX097   
+        ZHQLA8LP   LLA11L   ZVQLA9LP LX097    QLA9LP   LP1689   MQLA9LP 
+        L1311      PTSULM   PSD3TLC  SD3TLP   L3       LXB2P    DB2P    
+        B2P        DB2P     LXB2P    L2P      ZHQF2P1  LX097    QF2P    
+        LP1689     MQF2P1   LX0828   LZVQF2P1 L1PH     LZHQD1P1 LX0828  
+        MQD1P1     LP1696   QD1P     LX097B   ZVQD1P1  L1PV     LZVQF2P2
+        LX0828     MQF2P2   LP1689   QF2P     LX097    ZHQF2P2  L2P     
+        LXB2P      DB2P     B2P      DB2P     LXB2P    L3       SD3TLP  
+        LX278      MQD3P2   LP1689   QD3P     LX097    ZVQD3P2  LX526   
+        LZHQD3P2   L4P      LZVQF4P2 LX526    ZHQF4P2  LX097    QF4P    
+        LP1689     MQF4P2   LX278    PSF4TLC  SF4TLP   L8P      LZVQEAP 
+        LX0828     MQEAP3   LP1689   QEAP     LX097    ZHQEAP3  L5AP    
+        L5BP       ZVQD5P3  LX0828   MQD5P3   LP1689   QD5P     LX097   
+        LZVQD5P    L6P      LXB2P    DB2P     B2P      DB2P     LXB2P   
+        L0P        LZVQF6P2 LX097B   QF6P     LP1696   MQF6P2   L0M     
+        LXB2P      DB2P     B2P      DB2P     LXB2P    L6P      LZVQD5P 
+        LX097      QD5P     LP1689   MQD5P4   LX0828   ZVQD5P4  L5BP    
+        L5AP       ZHQEAP4  LX097    QEAP     LP1689   MQEAP4   LX0828  
+        LZVQEAP    L8P      SF4TLP   LX278    MQF4P3   LP1689   QF4P    
+        LX097      ZHQF4P3  LX526    LZVQF4P3 L4P      LZHQD3P3 LX526   
+        ZVQD3P3    LX097    QD3P     LP1689   MQD3P3   LX278    SD5TLP  
+        L3         LXB2P    DB2P     B2P      DB2P     LXB2P    L2P     
+        ZHQF2P3    LX097    QF2P     LP1689   MQF2P3   LX0828   LZVQF2P3
+        L1PH       LZHQD1P2 LX0828   MQD1P2   LP1696   QD1P     -PQD1C  
+        LX097B     ZVQD1P2  L1PV     LZVQF2P4 LX0828   MQF2P4   LP1689  
+        QF2P       LX097    ZHQF2P4  L2P      LXB2P    DB2P     B2P     
+        DB2P       LXB2P    L3       SD5TLP   PSDC     LX278    MQD3P4  
+        LP1689     QD3P     LX097    ZVQD3P4  LX526    LZHQD3P4 L4P     
+        LZVQF4P4   LX526    ZHQF4P4  LX097    QF4P     LP1689   MQF4P4  
+        LX278      SF6TLP   PSFC     L8P      LZVQEAP  LX0828   MQEAP5  
+        LP1689     QEAP     LX097    ZHQEAP5  L5AP     L5BP     ZVQD5P5 
+        LX0828     MQD5P5   LP1689   QD5P     LX097    LZVQD5P  L6P     
+        LXB2P      DB2P     B2P      DB2P     LXB2P    L0P      LZVQF6P3
+        LX097B     QF6P     LP1696   MQF6P3   L0M      LXB2P    DB2P    
+        B2P        DB2P     LXB2P    L6P      LZVQD5P  LX097    QD5P    
+        LP1689     MQD5P6   LX0828   ZVQD5P6  L5BP     L5AP     ZHQEAP6 
+        LX097      QEAP     LP1689   MQEAP6   LX0828   LZVQEAP  L8P     
+        SF6TLP     PSFC     LX278    MQF4P5   LP1689   QF4P     LX097   
+        ZHQF4P5    LX526    LZVQF4P5 L4P      LZHQD3P5 LX526    ZVQD3P5 
+        LX097      QD3P     LP1689   MQD3P5   LX278    SD7TLP   PSDC    
+        L3         LXB2P    DB2P     B2P      DB2P     LXB2P    L2P     
+        ZHQF2P5    LX097    QF2P     LP1689   MQF2P5   LX0828   LZVQF2P5
+        L1PH       LZHQD1P3 LX0828   MQD1P3   LP1696   PQD1C    QD1P    
+        LX097B     ZVQD1P3  L1PV     LZVQF2P6 LX0828   MQF2P6   LP1689  
+        QF2P       LX097    ZHQF2P6  L2P      LXB2P    DB2P     B2P     
+        DB2P       LXB2P    L3       SD7TLP   PSDC     LX278    MQT1TNP1
+        LP1689     QT1TNP   LX097    ZVQT1TNP1         LX541    LZHQT1TNP1        LT0LP   
+        LZVQT2TNP1 LX541    ZHQT2TNP1         LX097    QT2TNP   LP1689   MQT2TNP1
+        LX278      SF8TNP   PSF8C    LTBLVP   LZVQTAP  LX0828   MQTATNP1
+        LP1689     QTATNP   LX097    ZHQTATNP1         LTBLHP   LXSF0P   LZHQT3TNP1       
+        LX0828     MQT3TNP1 LP1689   QT3TNP   LX097    ZVQT3TNP1         LT2LP   
+        LXB2P      DB2P     B2P      DB2P     LXB2P    LT3LP    ZHQT4TNP1        
+        LX097      QT4TNP   LP1689   MQT4TNP1 LX0828   LZVQT4TNP1        LT4LVP  
+        ZVQT5TNP   LX097    QT5TNP   PSYMML   LP1689   MQT5TNP  LX0828  
+        LZHQT5TNP  LT4LHP   LZVQT4TNP2        LX0828   MQT4TNP2 LP1689   QT4TNP  
+        LX097      ZHQT4TNP2         LT3LP    LXB2P    DB2P     B2P      DB2P    
+        LXB2P      LT2LP    ZVQT3TNP2         LX097    QT3TNP   LP1689   MQT3TNP2
+        LX0828     LZHQT3TNP2        LXSF0P   LTBLHP   ZHQTATNP2         LX097    QTATNP  
+        LP1689     MQTATNP2 LX0828   LZVQTAP  LTBLVP   SF8TNP   PSF8C   
+        LX278      MQT2TNP2 LP1689   QT2TNP   LX097    ZHQT2TNP2         LX541   
+        LZVQT2TNP2 LT0LP    LZHQT1TNP2        LX541    ZVQT1TNP2         LX097    QT1TNP  
+        LP1689     MQT1TNP2 LX278    SD7NRP   L3       LXB2P    DB2P    
+        B2P        DB2P     LXB2P    L2P      ZHQF2P7  LX097    QF2P    
+        LP1689     MQF2P7   LX0828   LZVQF2P7 L1PH     LZHQD1P4 LX0828  
+        MQD1P4     LP1696   QD1P     LX097B   ZVQD1P4  L1PV     LZVQF2P8
+        LX0828     MQF2P8   LP1689   QF2P     LX097    ZHQF2P8  L2P     
+        LXB2P      DB2P     B2P      DB2P     LXB2P    L3       SD7NRP  
+        LX278      MQD3P6   LP1689   QD3P     LX097    ZVQD3P6  LX526   
+        LZHQD3P6   L4P      LZVQF4P6 LX526    ZHQF4P6  LX097    QF4P    
+        LP1689     MQF4P6   LX278    SF6NRP   L8P      LZVQEAP  LX0828  
+        MQEAP7     LP1689   QEAP     LX097    ZHQEAP7  L5AP     L5BP    
+        ZVQD5P7    LX0828   MQD5P7   LP1689   QD5P     LX097    LZVQD5P 
+        L6P        LXB2P    DB2P     B2P      DB2P     LXB2P    L0P     
+        LZVQF6P4   LX097B   QF6P     LP1696   MQF6P4   L0M      LXB2P   
+        DB2P       B2P      DB2P     LXB2P    L6P      LZVQD5P  LX097   
+        QD5P       LP1689   MQD5P8   LX0828   ZVQD5P8  L5BP     L5AP    
+        ZHQEAP8    LX097    QEAP     LP1689   MQEAP8   LX0828   LZVQEAP 
+        L8P        SF6NRP   LX278    MQF4P7   LP1689   QF4P     LX097   
+        ZHQF4P7    LX526    LZVQF4P7 L4P      LZHQD3P7 LX526    ZVQD3P7 
+        LX097      QD3P     LP1689   MQD3P7   LX278    SD5NRP   L3      
+        LXB2P      DB2P     B2P      DB2P     LXB2P    L2P      ZHQF2P9 
+        LX097      QF2P     LP1689   MQF2P9   LX0828   LZVQF2P9 L1PH    
+        LZHQD1P5   LX0828   MQD1P5   LP1696   QD1P     LX097B   ZVQD1P5 
+        L1PV       LZVQF2P10         LX0828   MQF2P10  LP1689   QF2P     LX097   
+        ZHQF2P10   L2P      LXB2P    DB2P     B2P      DB2P     LXB2P   
+        L3         SD5NRP   LX278    MQD3P8   LP1689   QD3P     LX097   
+        ZVQD3P8    LX526    LZHQD3P8 L4P      LZVQF4P8 LX526    ZHQF4P8 
+        LX097      QF4P     LP1689   MQF4P8   LX278    SF4NRP   L8P     
+        LZVQEAP    LX0828   MQEAP9   LP1689   QEAP     LX097    ZHQEAP9 
+        L5AP       L5BP     ZVQD5P9  LX0828   MQD5P9   LP1689   QD5P    
+        LX097      LZVQD5P  L6P      LXB2P    DB2P     B2P      DB2P    
+        LXB2P      L0P      LZVQF6P5 LX097B   QF6P     LP1696   MQF6P5  
+        L0M        LXB2P    DB2P     B2P      DB2P     LXB2P    L6P     
+        LZVQD5P    LX097    QD5P     LP1689   MQD5P10  LX0828   ZVQD5P10
+        L5BP       L5AP     ZHQEAP10 LX097    QEAP     LP1689   MQEAP10 
+        LX0828     LZVQEAP  L8P      SF4NRP   LX278    MQF4P9   LP1689  
+        QF4P       LX097    ZHQF4P9  LX526    LZVQF4P9 L4P      LZHQD3P9
+        LX526      ZVQD3P9  LX097    QD3P     LP1689   MQD3P9   LX278   
+        SD3NRP     L3       LXB2P    DB2P     B2P      DB2P     LXB2P   
+        L2P        ZHQF2P11 LX097    QF2P     LP1689   MQF2P11  LX0828  
+        LZVQF2P11  L1PH     LZHQD1P6 LX0828   MQD1P6   LP1696   QD1P    
+        LX097B     ZVQD1P6  L1PV     LZVQF2P12         LX0828   MQF2P12  LP1689  
+        QF2P       LX097    ZHQF2P12 L2P      LXB2P    DB2P     B2P     
+        DB2P       LXB2P    L3       SD3NRP   LX278    MQD3P10  LP1689  
+        QD3P       LX097    ZVQD3P10 LX526    LZHQD3P10         L4P      LZVQF4P10        
+        LX526      ZHQF4P10 LX097    QF4P     LP1689   MQF4P10  LX278   
+        SF2NRP     L8P      LZVQEAP  LX0828   MQEAP11  LP1689   QEAP    
+        LX097      ZHQEAP11 L5AP     L5BP     ZVQD5P11 LX0828   MQD5P11 
+        LP1689     QD5P     LX097    LZVQD5P  L6P      LXB2P    DB2P    
+        B2P        DB2P     LXB2P    L0P      LZVQF6P6 LX097B   QF6P    
+        LP1696     MQF6P6   L0M      LXB2P    DB2P     B2P      DB2P    
+        LXB2P      L6P      LZVQD5P  LX097    QD5P     LP1689   MQD5P12 
+        LX0828     ZVQD5P12 L5BP     L5AP     ZHQEAP12 LX097    QEAP    
+        LP1689     MQEAP12  LX0828   LZVQEAP  L8P      SF2NRP   LX278   
+        MQS2NP1    LP1689   QS2NP    LX097    ZHQS2NP1 LX541    LZVQS2NP1        
+        L4NP       LZVQ     LX097    QSBNP    LP1689   MQSBNP1  LX0828  
+        ZHQSBNP1   L3WP     ZVQS1NP1 LX0828   MQS1NP1  LP1689   QS1NP   
+        LX097      LZHQ     L3WWPN   BS2NP    LB22N    LB22N    BS2NP   
+        PNIKRM     LW8NP    ZHQW8NRP LX097B   QW8NRP   LP1696   MQW8NRP 
+        LX0828     LZVQW8NRP         LW7NP    ZVQW7NRP LX097B   QW7NRP   LP1696  
+        MQW7NRP    LX0828   LZHQW7NRP         LW6NP    ZHQW6NRP LX097B   QW6NRP  
+        LP1696     MQW6NRP  LX0828   LZVQW6NRP         LBP1SN   BP2NRP   LBP2N   
+        BP1NRP     LBP4NP   -BP1NRP  LBP2N    -BP2NRP  LBP1LN   ZVQW5NRP
+        LX097B     QW5NRP   LP1696   MQW5NRP  LX0828   LZHQW5NRP         LW4NHP  
+        ZHQW4NRP   LX097B   QW4NRP   LP1696   MQW4NRP  LX0828   LZHQW4NRP        
+        LWIGNR1    LZHQW3NRP         LX097B   QW3NRP   LP1696   MQW3NRP  LX0828  
+        ZVQW3NRP   LXW4SN2  BW0NRP   LXW3N    BW1NRP   LXW0N    BW2NRP  
+        LXW1N      BW3NRP   LXW1N    -BW2NRP  LXW0N    -BW1NRP  LXW3N   
+        -BW0NRP    LXW5N    LXW2N    LXW5N    BW0NRMP  LXW3N    BW1NRMP 
+        LXW0N      BW2NRMP  LXW1N    BW3NRMP  LXW1N    -BW2NRMP LXW0N   
+        -BW1NRMP   LXW3N    -BW0NRMP LXW4LN   LZVQW2NRP         LX097B   QW2NRP  
+        LP1696     MQW2NRP  LX0828   ZHQW2NRP LXW4SN   BW0NRP   LXW3N   
+        BW1NRP     LXW0N    BW2NRP   LXW1N    BW3NRP   LXW1N    -BW2NRP 
+        LXW0N      -BW1NRP  LXW3N    -BW0NRP  LXW5N    LXW2N    LXW5N   
+        BW0NRMP    LXW3N    BW1NRMP  LXW0N    BW2NRMP  LXW1N    BW3NRMP 
+        LXW1N      -BW2NRMP LXW0N    -BW1NRMP LXW3N    -BW0NRMP LXW4LN  
+        LZHQDWNP1  LX097B   PQDWNC   QDWNP    LP1696   MQDWNP1  LX0828  
+        ZVQDWNP1   LXW4SN2  BW0NRP   LXW3N    BW1NRP   LXW0N    BW2NRP  
+        LXW1N      BW3NRP   LXW1N    -BW2NRP  LXW0N    -BW1NRP  LXW3N   
+        -BW0NRP    LXW5N    LXW2N    LXW5N    BW0NRMP  LXW3N    BW1NRMP 
+        LXW0N      BW2NRMP  LXW1N    BW3NRMP  LXW1N    -BW2NRMP LXW0N   
+        -BW1NRMP   LXW3N    -BW0NRMP LXW4LN   LZVQFWNP1         LX097B   QFWNP   
+        PQFWNC     LP1696   MQFWNP1  LX0828   ZHQFWNP1 LXW4SN   BW0NRP  
+        LXW3N      BW1NRP   LXW0N    BW2NRP   LXW1N    BW3NRP   LXW1N   
+        -BW2NRP    LXW0N    -BW1NRP  LXW3N    -BW0NRP  LXW5N    LXW2N   
+        LXW5N      BW0NRMP  LXW3N    BW1NRMP  LXW0N    BW2NRMP  LXW1N   
+        BW3NRMP    LXW1N    -BW2NRMP LXW0N    -BW1NRMP LXW3N    -BW0NRMP
+        LXW4LN     LZHQDWNP2         LX097B   PQDWNC   QDWNP    LP1696   MQDWNP2 
+        LX0828     ZVQDWNP2 LXW4SN2  BW0NRP   LXW3N    BW1NRP   LXW0N   
+        BW2NRP     LXW1N    BW3NRP   LXW1N    -BW2NRP  LXW0N    -BW1NRP 
+        LXW3N      -BW0NRP  LXW5N    LXW2N    LXW5N    BW0NRMP  LXW3N   
+        BW1NRMP    LXW0N    BW2NRMP  LXW1N    BW3NRMP  LXW1N    -BW2NRMP
+        LXW0N      -BW1NRMP LXW3N    -BW0NRMP LXW4LN   LZVQFWNP2         LX097B  
+        QFWNP      PQFWNC   LP1696   MQFWNP2  LX0828   ZHQFWNP2 LXW4SN  
+        BW0NRP     LXW3N    BW1NRP   LXW0N    BW2NRP   LXW1N    BW3NRP  
+        LXW1N      -BW2NRP  LXW0N    -BW1NRP  LXW3N    -BW0NRP  LXW5N   
+        LXW2N      LXW5N    BW0NRMP  LXW3N    BW1NRMP  LXW0N    BW2NRMP 
+        LXW1N      BW3NRMP  LXW1N    -BW2NRMP LXW0N    -BW1NRMP LXW3N   
+        -BW0NRMP   LXW4LN   LZHQDWNP3         LX097B   PQDWNC   QDWNP    LP1696  
+        MQDWNP3    LX0828   ZVQDWNP3 LXW4SN2  BW0NRP   LXW3N    BW1NRP  
+        LXW0N      BW2NRP   LXW1N    BW3NRP   LXW1N    -BW2NRP  LXW0N   
+        -BW1NRP    LXW3N    -BW0NRP  LXW5N    LXW2N    LXW5N    BW0NRMP 
+        LXW3N      BW1NRMP  LXW0N    BW2NRMP  LXW1N    BW3NRMP  LXW1N   
+        -BW2NRMP   LXW0N    -BW1NRMP LXW3N    -BW0NRMP LXW4LN   LZVQFWNP3        
+        LX097B     NMID     QFWNP    PQFWNC   LP1696   MQFWNP3  LX0828  
+        ZHQFWNP3   LXW4SN   BW0NLP   LXW3N    BW1NLP   LXW0N    BW2NLP  
+        LXW1N      BW3NLP   LXW1N    -BW2NLP  LXW0N    -BW1NLP  LXW3N   
+        -BW0NLP    LXW5N    LXW2N    LXW5N    BW0NLMP  LXW3N    BW1NLMP 
+        LXW0N      BW2NLMP  LXW1N    BW3NLMP  LXW1N    -BW2NLMP LXW0N   
+        -BW1NLMP   LXW3N    -BW0NLMP LXW4LN   LZHQDWNP4         LX097B   PQDWNC  
+        QDWNP      LP1696   MQDWNP4  LX0828   ZVQDWNP4 LXW4SN2  BW0NLP  
+        LXW3N      BW1NLP   LXW0N    BW2NLP   LXW1N    BW3NLP   LXW1N   
+        -BW2NLP    LXW0N    -BW1NLP  LXW3N    -BW0NLP  LXW5N    LXW2N   
+        LXW5N      BW0NLMP  LXW3N    BW1NLMP  LXW0N    BW2NLMP  LXW1N   
+        BW3NLMP    LXW1N    -BW2NLMP LXW0N    -BW1NLMP LXW3N    -BW0NLMP
+        LXW4LN     LZVQFWNP4         LX097B   QFWNP    PQFWNC   LP1696   MQFWNP4 
+        LX0828     ZHQFWNP4 LXW4SN   BW0NLP   LXW3N    BW1NLP   LXW0N   
+        BW2NLP     LXW1N    BW3NLP   LXW1N    -BW2NLP  LXW0N    -BW1NLP 
+        LXW3N      -BW0NLP  LXW5N    LXW2N    LXW5N    BW0NLMP  LXW3N   
+        BW1NLMP    LXW0N    BW2NLMP  LXW1N    BW3NLMP  LXW1N    -BW2NLMP
+        LXW0N      -BW1NLMP LXW3N    -BW0NLMP LXW4LN   LZHQDWNP5         LX097B  
+        PQDWNC     QDWNP    LP1696   MQDWNP5  LX0828   ZVQDWNP5 LXW4SN2 
+        BW0NLP     LXW3N    BW1NLP   LXW0N    BW2NLP   LXW1N    BW3NLP  
+        LXW1N      -BW2NLP  LXW0N    -BW1NLP  LXW3N    -BW0NLP  LXW5N   
+        LXW2N      LXW5N    BW0NLMP  LXW3N    BW1NLMP  LXW0N    BW2NLMP 
+        LXW1N      BW3NLMP  LXW1N    -BW2NLMP LXW0N    -BW1NLMP LXW3N   
+        -BW0NLMP   LXW4LN   LZVQFWNP5         LX097B   QFWNP    PQFWNC   LP1696  
+        MQFWNP5    LX0828   ZHQFWNP5 LXW4SN   BW0NLP   LXW3N    BW1NLP  
+        LXW0N      BW2NLP   LXW1N    BW3NLP   LXW1N    -BW2NLP  LXW0N   
+        -BW1NLP    LXW3N    -BW0NLP  LXW5N    LXW2N    LXW5N    BW0NLMP 
+        LXW3N      BW1NLMP  LXW0N    BW2NLMP  LXW1N    BW3NLMP  LXW1N   
+        -BW2NLMP   LXW0N    -BW1NLMP LXW3N    -BW0NLMP LXW4LN   LZHQDWNP6        
+        LX097B     PQDWNC   QDWNP    LP1696   MQDWNP6  LX0828   ZVQDWNP6
+        LXW4SN2    BW0NLP   LXW3N    BW1NLP   LXW0N    BW2NLP   LXW1N   
+        BW3NLP     LXW1N    -BW2NLP  LXW0N    -BW1NLP  LXW3N    -BW0NLP 
+        LXW5N      LXW2N    LXW5N    BW0NLMP  LXW3N    BW1NLMP  LXW0N   
+        BW2NLMP    LXW1N    BW3NLMP  LXW1N    -BW2NLMP LXW0N    -BW1NLMP
+        LXW3N      -BW0NLMP LXW4LN   LZVQW2NLP         LX097B   QW2NLP   LP1696  
+        MQW2NLP    LX0828   ZHQW2NLP LXW4SN   BW0NLP   LXW3N    BW1NLP  
+        LXW0N      BW2NLP   LXW1N    BW3NLP   LXW1N    -BW2NLP  LXW0N   
+        -BW1NLP    LXW3N    -BW0NLP  LXW5N    LXW2N    LXW5N    BW0NLMP 
+        LXW3N      BW1NLMP  LXW0N    BW2NLMP  LXW1N    BW3NLMP  LXW1N   
+        -BW2NLMP   LXW0N    -BW1NLMP LXW3N    -BW0NLMP LXW4LN   LZHQW3NLP        
+        LX097B     QW3NLP   LP1696   MQW3NLP  LX0828   ZVQW3NLP LXW4SN2 
+        BW0NLP     LXW3N    BW1NLP   LXW0N    BW2NLP   LXW1N    BW3NLP  
+        LXW1N      -BW2NLP  LXW0N    -BW1NLP  LXW3N    -BW0NLP  LXW5N   
+        LXW2N      LXW5N    BW0NLMP  LXW3N    BW1NLMP  LXW0N    BW2NLMP 
+        LXW1N      BW3NLMP  LXW1N    -BW2NLMP LXW0N    -BW1NLMP LXW3N   
+        -BW0NLMP   LXW4LN   LZVQW4NLP         LX097B   QW4NLP   LP1696   MQW4NLP 
+        LX0828     ZHQW4NLP LW4NVP   LZHQW5NLP         LX0828   MQW5NLP  LP1696  
+        QW5NLP     -LX097B  -ZVQW5NLP         -LBP1LN  LBP2NP   -LBP2N   LBP1NP  
+        -LBP3N     -LBP1NP  -LBP2N   -LBP2NP  -LBP1SN  LZVQW6NLP         -LX0828 
+        -MQW6NLP   -LP1696  QW6NLP   LX097B   ZHQW6NLP LW6NP    LZHQW7NLP        
+        LX0828     MQW7NLP  LP1696   QW7NLP   LX097B   ZVQW7NLP LW7NP2  
+        LZVQW8NLP  LX0828   MQW8NLP  LP1696   QW8NLP   LX097B   ZHQW8NLP
+        LW8NP      PNIKLM   BS2NP    LB22N    LB22N    BS2NP    L3WWPN  
+        LZHQ       LX097    QS1NP    LP1689   MQS1NP2  LX0828   ZVQS1NP2
+        L3WP2      ZHQSBNP2 LX0828   MQSBNP2  LP1689   QSBNP    LX097   
+        LZVQ       L4NP     LZVQS2NP2         LX541    ZHQS2NP2 LX097    QS2NP   
+        LP1689     MQS2NP2  LX278    SF2NLP   L8P      LZVQEAP  LX0828  
+        MQEAP13    LP1689   QEAP     LX097    ZHQEAP13 L5AP     L5BP    
+        ZVQD5P13   LX0828   MQD5P13  LP1689   QD5P     LX097    LZVQD5P 
+        L6P        LXB2P    DB2P     B2P      DB2P     LXB2P    L0P     
+        LZVQF6P7   LX097B   QF6P     LP1696   MQF6P7   L0M      LXB2P   
+        DB2P       B2P      DB2P     LXB2P    L6P      LZVQD5P  LX097   
+        QD5P       LP1689   MQD5P14  LX0828   ZVQD5P14 L5BP     L5AP    
+        ZHQEAP14   LX097    QEAP     LP1689   MQEAP14  LX0828   LZVQEAP 
+        L8P        SF2NLP   LX278    MQF4P11  LP1689   QF4P     LX097   
+        ZHQF4P11   LX526    LZVQF4P11         L4P      LZHQD3P11         LX526    ZVQD3P11
+        LX097      QD3P     LP1689   MQD3P11  LX278    SD3NLP   L3      
+        LXB2P      DB2P     B2P      DB2P     LXB2P    L2P      ZHQF2P13
+        LX097      QF2P     LP1689   MQF2P13  LX0828   LZVQF2P13         L1PH    
+        LZHQD1P7   LX0828   MQD1P7   LP1696   QD1P     -PQD1C   LX097B  
+        ZVQD1P7    L1PV     LZVQF2P14         LX0828   MQF2P14  LP1689   QF2P    
+        LX097      ZHQF2P14 L2P      LXB2P    DB2P     B2P      DB2P    
+        LXB2P      L3       SD3NLP   LX278    MQD3P12  LP1689   QD3P    
+        LX097      ZVQD3P12 LX526    LZHQD3P12         L4P      LZVQF4P12         LX526   
+        ZHQF4P12   LX097    QF4P     LP1689   MQF4P12  LX278    SF4NLP  
+        L8P        LZVQEAP  LX0828   MQEAP15  LP1689   QEAP     LX097   
+        ZHQEAP15   L5AP     L5BP     ZVQD5P15 LX0828   MQD5P15  LP1689  
+        QD5P       LX097    LZVQD5P  L6P      LXB2P    DB2P     B2P     
+        DB2P       LXB2P    L0P      LZVQF6P8 LX097B   QF6P     LP1696  
+        MQF6P8     L0M      LXB2P    DB2P     B2P      DB2P     LXB2P   
+        L6P        LZVQD5P  LX097    QD5P     LP1689   MQD5P16  LX0828  
+        ZVQD5P16   L5BP     L5AP     ZHQEAP16 LX097    QEAP     LP1689  
+        MQEAP16    LX0828   LZVQEAP  L8P      SF4NLP   LX278    MQF4P13 
+        LP1689     QF4P     LX097    ZHQF4P13 LX526    LZVQF4P13         L4P     
+        LZHQD3P13  LX526    ZVQD3P13 LX097    QD3P     LP1689   MQD3P13 
+        LX278      SD5NLP   L3       LXB2P    DB2P     B2P      DB2P    
+        LXB2P      L2P      ZHQF2P15 LX097    QF2P     LP1689   MQF2P15 
+        LX0828     LZVQF2P15         L1PH     LZHQD1P8 LX0828   MQD1P8   LP1696  
+        PQD1C      QD1P     LX097B   ZVQD1P8  L1PV     LZVQF2P16         LX0828  
+        MQF2P16    LP1689   QF2P     LX097    ZHQF2P16 L2P      LXB2P   
+        DB2P       B2P      DB2P     LXB2P    L3       SD5NLP   LX278   
+        MQD3P14    LP1689   QD3P     LX097    ZVQD3P14 LX526    LZHQD3P14        
+        L4P        LZVQF4P14         LX526    ZHQF4P14 LX097    QF4P     LP1689  
+        MQF4P14    LX278    SF6NLP   L8P      LZVQEAP  LX0828   MQEAP17 
+        LP1689     QEAP     LX097    ZHQEAP17 L5AP     L5BP     ZVQD5P17
+        LX0828     MQD5P17  LP1689   QD5P     LX097    LZVQD5P  L6P     
+        LXB2P      DB2P     B2P      DB2P     LXB2P    L0P      LZVQF6P9
+        LX097B     QF6P     LP1696   MQF6P9   L0M      LXB2P    DB2P    
+        B2P        DB2P     LXB2P    L6P      LZVQD5P  LX097    QD5P    
+        LP1689     MQD5P18  LX0828   ZVQD5P18 L5BP     L5AP     ZHQEAP18
+        LX097      QEAP     LP1689   MQEAP18  LX0828   LZVQEAP  L8P     
+        SF6NLP     LX278    MQF4P15  LP1689   QF4P     LX097    ZHQF4P15
+        LX526      LZVQF4P15         L4P      LZHQD3P15         LX526    ZVQD3P15 LX097   
+        QD3P       LP1689   MQD3P15  LX278    SD7NLP   L3       LXB2P   
+        DB2P       B2P      DB2P     LXB2P    L2P      ZHQF2P17 LX097   
+        QF2P       LP1689   MQF2P17  LX0828   LZVQF2P17         L1PH     LZHQD1P9
+        LX0828     MQD1P9   LP1696   QD1P     LX097B   ZVQD1P9  L1PV    
+        LZVQF2P18  LX0828   MQF2P18  LP1689   QF2P     LX097    ZHQF2P18
+        L2P        LXB2P    DB2P     B2P      DB2P     LXB2P    L3      
+        SD7NLP     LX278    MQT1NFP1 LP1689   QT1NFP   LX097    ZVQT1NFP1        
+        LX541      LZHQT1NFP1        LT0LP    LZVQT2NFP1        LX541    ZHQT2NFP1         LX097   
+        QT2NFP     LP1689   MQT2NFP1 LX278    SF8NFP   PSF8C    LTBLVP  
+        LZVQTAP    LX0828   MQTANFP1 LP1689   QTANFP   LX097    ZHQTANFP1        
+        LTBLHP     LXSF0P   LZHQT3NFP1        LX0828   MQT3NFP1 LP1689   QT3NFP  
+        LX097      ZVQT3NFP1         LT2LP    LXB2P    DB2P     B2P      DB2P    
+        LXB2P      LT3LP    ZHQT4NFP1         LX097    QT4NFP   LP1689   MQT4NFP1
+        LX0828     LZVQT4NFP1        LT4LVP   ZVQT5NFP LX097    QT5NFP   PSYMML  
+        LP1689     MQT5NFP  LX0828   LZHQT5NFP         LT4LHP   LZVQT4NFP2        LX0828  
+        MQT4NFP2   LP1689   QT4NFP   LX097    ZHQT4NFP2         LT3LP    LXB2P   
+        DB2P       B2P      DB2P     LXB2P    LT2LP    ZVQT3NFP2         LX097   
+        QT3NFP     LP1689   MQT3NFP2 LX0828   LZHQT3NFP2        LXSF0P   LTBLHP  
+        ZHQTANFP2  LX097    QTANFP   LP1689   MQTANFP2 LX0828   LZVQTAP 
+        LTBLVP     SF8NFP   PSF8C    LX278    MQT2NFP2 LP1689   QT2NFP  
+        LX097      ZHQT2NFP2         LX541    LZVQT2NFP2        LT0LP    LZHQT1NFP2        LX541   
+        ZVQT1NFP2  LX097    QT1NFP   LP1689   MQT1NFP2 LX278    SD7FRP  
+        L3         LXB2P    DB2P     B2P      DB2P     LXB2P    L2P     
+        ZHQF2P19   LX097    QF2P     LP1689   MQF2P19  LX0828   LZVQF2P19        
+        L1PH       LZHQD1P10         LX0828   MQD1P10  LP1696   QD1P     LX097B  
+        ZVQD1P10   L1PV     LZVQF2P20         LX0828   MQF2P20  LP1689   QF2P    
+        LX097      ZHQF2P20 L2P      LXB2P    DB2P     B2P      DB2P    
+        LXB2P      L3       SD7FRP   LX278    MQD3P16  LP1689   QD3P    
+        LX097      ZVQD3P16 LX526    LZHQD3P16         L4P      LZVQF4P16         LX526   
+        ZHQF4P16   LX097    QF4P     LP1689   MQF4P16  LX278    SF6FRP  
+        L8P        LZVQEAP  LX0828   MQEAP19  LP1689   QEAP     LX097   
+        ZHQEAP19   L5AP     L5BP     ZVQD5P19 LX0828   MQD5P19  LP1689  
+        QD5P       LX097    LZVQD5P  L6P      LXB2P    DB2P     B2P     
+        DB2P       LXB2P    L0P      LZVQF6P10         LX097B   QF6P     LP1696  
+        MQF6P10    L0M      LXB2P    DB2P     B2P      DB2P     LXB2P   
+        L6P        LZVQD5P  LX097    QD5P     LP1689   MQD5P20  LX0828  
+        ZVQD5P20   L5BP     L5AP     ZHQEAP20 LX097    QEAP     LP1689  
+        MQEAP20    LX0828   LZVQEAP  L8P      SF6FRP   LX278    MQF4P17 
+        LP1689     QF4P     LX097    ZHQF4P17 LX526    LZVQF4P17         L4P     
+        LZHQD3P17  LX526    ZVQD3P17 LX097    QD3P     LP1689   MQD3P17 
+        LX278      SD5FRP   L3       LXB2P    DB2P     B2P      DB2P    
+        LXB2P      L2P      ZHQF2P21 LX097    QF2P     LP1689   MQF2P21 
+        LX0828     LZVQF2P21         L1PH     LZHQD1P11         LX0828   MQD1P11  LP1696  
+        QD1P       LX097B   ZVQD1P11 L1PV     LZVQF2P22         LX0828   MQF2P22 
+        LP1689     QF2P     LX097    ZHQF2P22 L2P      LXB2P    DB2P    
+        B2P        DB2P     LXB2P    L3       SD5FRP   LX278    MQD3P18 
+        LP1689     QD3P     LX097    ZVQD3P18 LX526    LZHQD3P18         L4P     
+        LZVQF4P18  LX526    ZHQF4P18 LX097    QF4P     LP1689   MQF4P18 
+        LX278      SF4FRP   L8P      LZVQEAP  LX0828   MQEAP21  LP1689  
+        QEAP       LX097    ZHQEAP21 L5AP     L5BP     ZVQD5P21 LX0828  
+        MQD5P21    LP1689   QD5P     LX097    LZVQD5P  L6P      LXB2P   
+        DB2P       B2P      DB2P     LXB2P    L0P      LZVQF6P11         LX097B  
+        QF6P       LP1696   MQF6P11  L0M      LXB2P    DB2P     B2P     
+        DB2P       LXB2P    L6P      LZVQD5P  LX097    QD5P     LP1689  
+        MQD5P22    LX0828   ZVQD5P22 L5BP     L5AP     ZHQEAP22 LX097   
+        QEAP       LP1689   MQEAP22  LX0828   LZVQEAP  L8P      SF4FRP  
+        LX278      MQF4P19  LP1689   QF4P     LX097    ZHQF4P19 LX526   
+        LZVQF4P19  L4P      LZHQD3P19         LX526    ZVQD3P19 LX097    QD3P    
+        LP1689     MQD3P19  LX278    SD3FRP   L3       LXB2P    DB2P    
+        B2P        DB2P     LXB2P    L2P      ZHQF2P23 LX097    QF2P    
+        LP1689     MQF2P23  LX0828   LZVQF2P23         L1PH     LZHQD1P12         LX0828  
+        MQD1P12    LP1696   QD1P     LX097B   ZVQD1P12 L1PV     LZVQF2P24        
+        LX0828     MQF2P24  LP1689   QF2P     LX097    ZHQF2P24 L2P     
+        LXB2P      DB2P     B2P      DB2P     LXB2P    L3       SD3FRP  
+        LX278      MQD3P20  LP1689   QD3P     LX097    ZVQD3P20 LX526   
+        LZHQD3P20  L4P      LZVQF4P20         LX526    ZHQF4P20 LX097    QF4P    
+        LP1689     MQF4P20  LX278    SF2FRP   L8P      LZVQEAP  LX0828  
+        MQEAP23    LP1689   QEAP     LX097    ZHQEAP23 L5AP     L5BP    
+        ZVQD5P23   LX0828   MQD5P23  LP1689   QD5P     LX097    LZVQD5P 
+        L6P        LXB2P    DB2P     B2P      DB2P     LXB2P    L0P     
+        LZVQF6P12  LX097B   QF6P     LP1696   MQF6P12  L0M      LXB2P   
+        DB2P       B2P      DB2P     LXB2P    L6P      LZVQD5P  LX097   
+        QD5P       LP1689   MQD5P24  LX0828   ZVQD5P24 L5BP     L5AP    
+        ZHQEAP24   LX097    QEAP     LP1689   MQEAP24  LX0828   LZVQEAP 
+        L8P        SF2FRP   LX278    MQS2FRP  LP1689   QS2FRP   LX097   
+        ZHQS2FRP   LX541    LZVQS2FRP         L4FRP    LZVQ     LX097    QSBFRP  
+        LP1689     MQSBFRP  LX0828   ZHQSBFRP L3FRP    ZVQS1FRP LX0828  
+        MQS1FRP    LP1689   QS1FRP   LX097    LZVQ     LSFRP    BS2FRP  
+        LXBSFR1    LXBSFR1  BS2FRP   LXBSFR   PSOR     PSOR1    BSWFRP  
+        PFUJRM     LR7FRP   LZHQ     LX097B   QR6P     LP1696   MQR6P   
+        LX0828     ZHQR6P   LR6FRP   ZVQR5P   LX097B   QR5P     LP1696  
+        MQR5P      LX0828   LZHQR5P  LR5FRP   ZHQR4P   LX097B   QR4P    
+        LP1696     MQR4P    LX0828   LZVQ     LR4FRP   ZVQR3P   LX086   
+        QR3P       LP158    MQR3P    LX083    LZHQR3P  LXRF0P   ZHQR2P  
+        LX086      QR2P     LP158    MQR2P    LX083    LZVQL    LXRF0P  
+        ZVQR1P     LX086    QR1P     LP158    MQR1P    LX083    LZHQL   
+        LXRF1P     CAFFRP   LXRF2    CAEFRP   LXRF3P   ZHQFRP1  LX086   
+        QFRP       LP158    MQFRP1   LX083    LZVQL    LXRF1P   CADFRP  
+        LXRF2      CACFRP   LXRF3P   ZVQDRP1  LX086    PQDRC    QDRP    
+        LP158      MQDRP1   LX083    LZHQL    LXRF1P   LXRF2    LXRF3P  
+        ZHQFRP2    LX086    QFRP     LP158    MQFRP2   LX083    LZVQL   
+        LXRF1P     CABFRP   LXRF2    CABFRP   LXRF3P   ZVQDRP2  LX086   
+        QDRP       LP158    MQDRP2   LX083    LZHQL    LXRF1P   CAAFRP  
+        LXRF2      CAAFRP   LXRF3P   ZHQV4P1  LX086    QV4P     LP158   
+        MQV4P1     LX083    LZVQL    LV0P1    PFZTFBK1 FZTFBKP1 LV0P1A  
+        PFZTFBK2   FZTFBKP2 LV0P1B   ZVQV3P1  LX097B   QV3P     LP1696  
+        MQV3P1     LX0828   LZHQ     LV1P     ZHQV2P1  LX0828   MQV2P1  
+        LP1696     QV2P     LX097B   LZVQ     LV2P     MQV1P1   LP1696  
+        QV1P       LX097B   ZVQV1P1  LV4P     PFBMON1  LV3P     BV2P    
+        LVB1       BV1P     LVB2     PMID     LVB2     -BV1P    LVB1    
+        -BV2P      LV3P     PFBMON2  LV4P     ZVQV1P2  LX097B   QV1P    
+        LP1696     MQV1P2   LV2P     LZVQ     LX097B   QV2P     LP1696  
+        MQV2P2     LX08279  ZHQV2P2  LV1PW    LZHQL    LX08279  MQV3P2  
+        LP1696     QV3P     LX097B   ZVQV3P2  LV0P2B   PFZLFBK1 FZLFBKP1
+        LV0P2A     PFZLFBK2 FZLFBKP2 LV0P2    LZVQL    LX083    MQV4P2  
+        LP158      QV4P     LX086    ZHQV4P2  LXRF3P   CAAFLP   LXRF2   
+        CAAFLP     LXRF1P   LZHQL    LX083    MQDRP3   LP158    PQDRC   
+        QDRP       LX086    ZVQDRP3  LXRF3P   CABFLP   LXRF2    CABFLP  
+        LXRF1P     LZVQL    LX083    MQFRP3   LP158    QFRP     LX086   
+        ZHQFRP3    LXRF3P   LXRF2    LXRF1P   LZHQL    LX083    MQDRP4  
+        LP158      QDRP     LX086    ZVQDRP4  LXRF3P   CACFLP   LXRF2   
+        CADFLP     LXRF1P   LZVQL    LX083    MQI2P    LP158    QI2P    
+        LX086      ZHQI2P   LXRF3P   CAEFLP   LXRF2    CAFFLP   LXRF1P  
+        LZHQL      LX083    MQI3P    LP158    QI3P     LX086    ZVQI3P  
+        LM3FLP1    PDCCT    LM3FLP0A PCT      LM3FLP0B ZHQI4P   LM3FLP3 
+        MQI4P      LP1696   QI4P     LX097B   LXKK1A   FZHINJ2P1         LXKK1B  
+        PKICKER2   FZHINJ2P2         LM4FLPA  FZHINJ2P3         LM4FLPB  FZVKICKP LM4FLPC 
+        ZVQI5P     LX0828   MQI5P    LP1696   QI5P     LM5FLP   INJECTIO
+        LX80P      QI6P     LP158    MQI6P    LX083    ZHQI6P   LX05558 
+        LZVQL      LM6FLP   FZHABP   LFAH1    FZHABP   LFAH2    FZHABP  
+        LFAH3      MQI7P    LP1696   QI7P     LX097B   ZVQI7P   LFAV    
+        FZVABP     LM7FLPA  FZHINJ11 LM7FLPB  PKICKER1 FZHINJ12 LXKK2A  
+        FZHINJ13   LXKK2B   LZHQ     LX097B   QI8P     LP1696   MQI8P   
+        LX0828     ZHQI8P   LM8FLP   PFUJLM   BSWFLP   LXBS     BS2FLP  
+        LXBSFL1    LXBSFL1  BS2FLP   LSFLP    LZVQ     LX097    QS1FLP  
+        LP1689     MQS1FLP  LX0828   ZVQS1FLP L3FLP    ZHQSBFLP LX0828  
+        MQSBFLP    LP1689   QSBFLP   LX097    LZVQ     L4FLPA   FZVALP  
+        L4FLPB     PDUMP1   L4FLPC   PDUMP2   L4FLPD   QS2FLP   LP1689  
+        MQS2FLP    LX278    SF2FLP   LX773    ZHQS2FLP LX0556   LZVQS2FLP        
+        L8PAB      LZVQEAP  LX0828   MQEAP25  LP1689   QEAP     LX097   
+        ZHQEAP25   L5AP     L5BP     ZVQD5P25 LX0828   MQD5P25  LP1689  
+        QD5P       LX097    LZVQD5P  L6P      LXB2P    DB2P     B2P     
+        DB2P       LXB2P    L0P      LZVQF6P13         LX097B   QF6P     LP1696  
+        MQF6P13    L0M      LXB2P    DB2P     B2P      DB2P     LXB2P   
+        L6P        LZVQD5P  LX097    QD5P     LP1689   MQD5P26  LX0828  
+        ZVQD5P26   L5BP     L5AP     ZHQEAP26 LX097    QEAP     LP1689  
+        MQEAP26    LX0828   LZVQEAP  L8P      SF2FLP   LX278    MQF4P21 
+        LP1689     QF4P     LX097    ZHQF4P21 LX526    LZVQF4P21         L4P     
+        LZHQD3P21  LX526    ZVQD3P21 LX097    QD3P     LP1689   MQD3P21 
+        LX278      SD3FLP   L3       LXB2P    DB2P     B2P      DB2P    
+        LXB2P      L2P      ZHQF2P25 LX097    QF2P     LP1689   MQF2P25 
+        LX0828     LZVQF2P25         L1PH     LZHQD1P13         LX0828   MQD1P13  LP1696  
+        QD1P       -PQD1C   LX097B   ZVQD1P13 L1PV     LZVQF2P26         LX0828  
+        MQF2P26    LP1689   QF2P     LX097    ZHQF2P26 L2P      LXB2P   
+        DB2P       B2P      DB2P     LXB2P    L3       SD3FLP   LX278   
+        MQD3P22    LP1689   QD3P     LX097    ZVQD3P22 LX526    LZHQD3P22        
+        L4P        LZVQF4P22         LX526    ZHQF4P22 LX097    QF4P     LP1689  
+        MQF4P22    LX278    SF4FLP   LMH1     PMD06H1  L8PMH1   LZVQEAP 
+        LX0828     MQEAP27  LP1689   QEAP     LX097    ZHQEAP27 L5APMV  
+        LMV1       LMV2     L5BP     ZVQD5P27 LX0828   MQD5P27  LP1689  
+        QD5P       LX097    LZVQD5P  L6P      LXB2P    DB2P     B2P     
+        DB2P       LXB2P    L0P      LZVQF6P14         LX097B   QF6P     LP1696  
+        MQF6P14    L0M      LXB2P    DB2P     B2P      DB2P     LXB2P   
+        L6P        LZVQD5P  LX097    QD5P     LP1689   MQD5P28  LX0828  
+        ZVQD5P28   L5BP     L5AP     ZHQEAP28 LX097    QEAP     LP1689  
+        MQEAP28    LX0828   LZVQEAP  LMH2     PMD06H2  L8PMH2   SF4FLP  
+        LX278      MQF4P23  LP1689   QF4P     LX097    ZHQF4P23 LX526   
+        LZVQF4P23  L4P      LZHQD3P23         LX526    ZVQD3P23 LX097    QD3P    
+        LP1689     MQD3P23  LX278    SD5FLP   L3       LXB2P    DB2P    
+        B2P        DB2P     LXB2P    L2P      ZHQF2P27 LX097    QF2P    
+        LP1689     MQF2P27  LX0828   LZVQF2P27         L1PH     LZHQD1P14         LX0828  
+        MQD1P14    LP1696   PQD1C    QD1P     LX097B   ZVQD1P14 L1PV    
+        LZVQF2P28  LX0828   MQF2P28  LP1689   QF2P     LX097    ZHQF2P28
+        L2P        LXB2P    DB2P     B2P      DB2P     LXB2P    L3      
+        SD5FLP     LX278    MQD3P24  LP1689   QD3P     LX097    ZVQD3P24
+        LX526      LZHQD3P24         L4P      LZVQF4P24         LX526    ZHQF4P24 LX097   
+        QF4P       LP1689   MQF4P24  LX278    SF6FLP   LMH1     PMD06H3 
+        L8PMH1     LZVQEAP  LX0828   MQEAP29  LP1689   QEAP     LX097   
+        ZHQEAP29   L5APMV   LMV1     LMV2     L5BP     ZVQD5P29 LX0828  
+        MQD5P29    LP1689   QD5P     LX097    LZVQD5P  L6P      LXB2P   
+        DB2P       B2P      DB2P     LXB2P    L0P      LZVQF6P15         LX097B  
+        QF6P       LP1696   MQF6P15  L0M      LXB2P    DB2P     B2P     
+        DB2P       LXB2P    L6P      LZVQD5P  LX097    QD5P     LP1689  
+        MQD5P30    LX0828   ZVQD5P30 L5BP     L5AP     ZHQEAP30 LX097   
+        QEAP       LP1689   MQEAP30  LX0828   LZVQEAP  LMH2     PMD06H4 
+        L8PMH2     SF6FLP   LX278    MQF4P25  LP1689   QF4P     LX097   
+        ZHQF4P25   LX526    LZVQF4P25         L4P      LZHQD3P25         LX526    ZVQD3P25
+        LX097      QD3P     LP1689   MQD3P25  LX278    SD7FLP   L3      
+        LXB2P      DB2P     B2P      DB2P     LXB2P    L2P      ZHQF2P29
+        LX097      QF2P     LP1689   MQF2P29  LX0828   LZVQF2P29         L1PH    
+        LZHQD1P15  LX0828   MQD1P15  LP1696   QD1P     LX097B   ZVQD1P15
+        L1PV       LZVQF2P30         LX0828   MQF2P30  LP1689   QF2P     LX097   
+        ZHQF2P30   L2P      LXB2P    DB2P     B2P      DB2P     LXB2P   
+        L3         SD7FLP   LX278    MQT1FOP1 LP1689   QT1FOP   LX097   
+        ZVQT1FOP1  LX541    LZHQT1FOP1        LT0SP    LZVQT2FOP1        LX541    ZHQT2FOP1        
+        LX097      QT2FOP   LP1689   MQT2FOP1 LX278    SF8FOP   PSF8C   
+        LTBSVP     LZVQTAP  LX0828   MQTAFOP1 LP1689   QTAFOP   LX097   
+        ZHQTAFOP1  LPMD06V1A         LPMD06V1B         ZVQT3FOP1         LX0828   MQT3FOP1 LP1689  
+        QT3FOP     LX097    LZVQ     LT2SP    LXB2P    DB2P     B2P     
+        DB2P       LXB2P    LT3SP    ZHQT4FOP1         LX097    QT4FOP   LP1689  
+        MQT4FOP1   LX0828   LZVQT4FOP1        LT4SVP   ZVQT5FOP LX097    QT5FOP  
+        PSYMMS     LP1689   MQT5FOP  LX0828   LZHQT5FOP         LT4SHP   LZVQT4FOP2       
+        LX0828     MQT4FOP2 LP1689   QT4FOP   LX097    ZHQT4FOP2         LT3SP   
+        LXB2P      DB2P     B2P      DB2P     LXB2P    LT2SP    LZVQ    
+        LX097      QT3FOP   LP1689   MQT3FOP2 LX0828   ZVQT3FOP2         LXSF0P  
+        LZVS3B     PZVS3P   ZVS3P    LZVS3A   ZHQTAFOP2         LX097    QTAFOP  
+        LP1689     MQTAFOP2 LX0828   LZVQTAP  LTBSVP   SF8FOP   PSF8C   
+        LX278      MQT2FOP2 LP1689   QT2FOP   LX097    ZHQT2FOP2         LX541   
+        LZVQT2FOP2 LT0SP    LZHQT1FOP2        LX541    ZVQT1FOP2         LX097    QT1FOP  
+        LP1689     MQT1FOP2 LX278    SD7ORP   L3       LXB2P    DB2P    
+        B2P        DB2P     LXB2P    L2P      ZHQF2P31 LX097    QF2P    
+        LP1689     MQF2P31  LX0828   LZVQF2P31         L1PH     LZHQD1P16         LX0828  
+        MQD1P16    LP1696   QD1P     LX097B   ZVQD1P16 L1PV     LZVQF2P32        
+        LX0828     MQF2P32  LP1689   QF2P     LX097    ZHQF2P32 L2P     
+        LXB2P      DB2P     B2P      DB2P     LXB2P    L3       SD7ORP  
+        LX278      MQD3P26  LP1689   QD3P     LX097    ZVQD3P26 LX526   
+        LZHQD3P26  LZVS2B   PZVS2P   ZVS2P    LZVS2A   LZVQF4P26         LX526   
+        ZHQF4P26   LX097    QF4P     LP1689   MQF4P26  LX278    SF6ORP  
+        L8P        LZVQEAP  LX0828   MQEAP31  LP1689   QEAP     LX097   
+        ZHQEAP31   LZVS1A   PZVS1P   ZVS1P    LZVS1B   L5BP     ZVQD5P31
+        LX0828     MQD5P31  LP1689   QD5P     LX097    LZVQD5P  L6P     
+        LXB2P      DB2P     B2P      DB2P     LXB2P    L0P      LZVQF6P16        
+        LX097B     QF6P     LP1696   MQF6P16  L0M      LXB2P    DB2P    
+        B2P        DB2P     LXB2P    L6P      LZVQD5P  LX097    QD5P    
+        LP1689     MQD5P32  LX0828   ZVQD5P32 L5BP     L5AP     ZHQEAP32
+        LX097      QEAP     LP1689   MQEAP32  LX0828   LZVQEAP  L8P     
+        SF6ORP     LX278    MQF4P27  LP1689   QF4P     LX097    ZHQF4P27
+        LPMD06V2A  LPMD06V2B         ZVQD3P27 LX097    QD3P     LP1689   MQD3P27 
+        LX278      SD5ORP   L3       LXB2P    DB2P     B2P      DB2P    
+        LXB2P      L2P      ZHQF2P33 LX097    QF2P     LP1689   MQF2P33 
+        LX0828     LZVQF2P33         L1PH     LZHQD1P17         LX0828   MQD1P17  LP1696  
+        QD1P       LX097B   ZVQD1P17 L1PV     LZVQF2P34         LX0828   MQF2P34 
+        LP1689     QF2P     LX097    ZHQF2P34 L2P      LXB2P    DB2P    
+        B2P        DB2P     LXB2P    L3       SD5ORP   LX278    MQD3P28 
+        LP1689     QD3P     LX097    ZVQD3P28 LX526    LZHQD3P28         L4P     
+        LZVQF4P28  LX526    ZHQF4P28 LX097    QF4P     LP1689   MQF4P28 
+        LX278      SF4ORP   L8P      LZVQEAP  LX0828   MQEAP33  LP1689  
+        QEAP       LX097    ZHQEAP33 L5AP     L5BP     ZVQD5P33 LX0828  
+        MQD5P33    LP1689   QD5P     LX097    LZVQD5P  L6P      LXB2P   
+        DB2P       B2P      DB2P     LXB2P    L0P      LZVQF6P17         LX097B  
+        QF6P       LP1696   MQF6P17  L0M      LXB2P    DB2P     B2P     
+        DB2P       LXB2P    L6P      LZVQD5P  LX097    QD5P     LP1689  
+        MQD5P34    LX0828   ZVQD5P34 L5BP     L5AP     ZHQEAP34 LX097   
+        QEAP       LP1689   MQEAP34  LX0828   LZVQEAP  L8P      SF4ORP  
+        LX278      MQF4P29  LP1689   QF4P     LX097    ZHQF4P29 LX526   
+        LZVQF4P29  L4P      LZHQD3P29         LX526    ZVQD3P29 LX097    QD3P    
+        LP1689     MQD3P29  LX278    SD3ORP   L3       LXB2P    DB2P    
+        B2P        DB2P     LXB2P    L2P      ZHQF2P35 LX097    QF2P    
+        LP1689     MQF2P35  LX0828   LZVQF2P35         L1PH     LZHQD1P18         LX0828  
+        MQD1P18    LP1696   QD1P     LX097B   ZVQD1P18 L1PV     LZVQF2P36        
+        LX0828     MQF2P36  LP1689   QF2P     LX097    ZHQF2P36 L2P     
+        LXB2P      DB2P     B2P      DB2P     LXB2P    L3       SD3ORP  
+        LX278      MQD3P30  LP1689   QD3P     LX097    ZVQD3P30 LX526   
+        LZHQD3P30  L4P      LZVQF4P30         LX526    ZHQF4P30 LX097    QF4P    
+        LP1689     MQF4P30  LX278    SF2ORP   L8P      LZVQEAP  LX0828  
+        MQEAP35    LP1689   QEAP     LX097    ZHQEAP35 L5AP     L5BP    
+        ZVQD5P35   LX0828   MQD5P35  LP1689   QD5P     LX097    LZVQD5P 
+        L6P        LXB2P    DB2P     B2P      DB2P     LXB2P    L0P     
+        LZVQF6P18  LX097B   QF6P     LP1696   MQF6P18  L0M      LXB2P   
+        DB2P       B2P      DB2P     LXB2P    L6P      LZVQD5P  LX097   
+        QD5P       LP1689   MQD5P36  LX0828   ZVQD5P36 L5BP     L5AP    
+        ZHQEAP36   LX097    QEAP     LP1689   MQEAP36  LX0828   LZVQEAP 
+        L8P        SF2ORP   LX278    MQS2OP1  LP1696   QS2OP    LX097B  
+        ZHQS2OP1   LX541    LZVQS2OP1         L4OP     LZVQ     LX097B   QSBOP   
+        LP1696     MQSBOP1  LX0828   ZHQSBOP1 L3WP     ZVQS1OP1 LX0828  
+        MQS1OP1    LP1696   QS1OP    LX097B   LZVQ     L3WWPO   BS2OP   
+        LB22O      LB22O    BS2OP    POHORM   LW8OP    ZHQW8ORP LX097B  
+        QW8ORP     LP1696   MQW8ORP  LX0828   LZVQW8ORP         LW7OP    ZVQW7ORP
+        LX097B     QW7ORP   LP1696   MQW7ORP  LX0828   LZHQW7ORP         LW6OP   
+        ZHQW6ORP   LX097B   QW6ORP   LP1696   MQW6ORP  LX0828   LZVQW6ORP        
+        LW5OP      ZVQW5ORP LX097B   QW5ORP   LP158    MQW5ORP  LX09427 
+        LZSTR      LXRF3SP  CAFORP   LXRF2    CAEORP   LXRF3LP  ZHQW4ORP
+        LX097B     QW4ORP   LP158    MQW4ORP  LX09427  LZSTR    LXRF3SP 
+        CADORP     LXRF2    CACORP   LXRF3LP  ZVQW3ORP LX097B   QW3ORP  
+        LP158      MQW3ORP  LX09427  LZSTR    LXRF3SP  CABORP   LXRF2   
+        CAAORP     LXRF3LP  ZHQW2ORP LX097B   QW2ORP   LP158    MQW2ORP 
+        LX09427    LZSTR    LW3OP    LZSTR    LX097B   PQDWOC   QDWOP   
+        LP1696     MQDWOP1  LX0828   ZVQDWOP1 LXW4SO2  BW0ORP   LXW3O   
+        BW1ORP     LXW0O    BW2ORP   LXW1O    BW3ORP   LXW1O    -BW2ORP 
+        LXW0O      -BW1ORP  LXW3O    -BW0ORP  LXW5O    LXW2O    LXW5O   
+        BW0ORMP    LXW3O    BW1ORMP  LXW0O    BW2ORMP  LXW1O    BW3ORMP 
+        LXW1O      -BW2ORMP LXW0O    -BW1ORMP LXW3O    -BW0ORMP LXW4LO  
+        LZSTR      LX097B   QFWOP    PQFWOC   LP1696   MQFWOP1  LX0828  
+        ZHQFWOP1   LXW4SO   BW0ORP   LXW3O    BW1ORP   LXW0O    BW2ORP  
+        LXW1O      BW3ORP   LXW1O    -BW2ORP  LXW0O    -BW1ORP  LXW3O   
+        -BW0ORP    LXW5O    LXW2O    LXW5O    BW0ORMP  LXW3O    BW1ORMP 
+        LXW0O      BW2ORMP  LXW1O    BW3ORMP  LXW1O    -BW2ORMP LXW0O   
+        -BW1ORMP   LXW3O    -BW0ORMP LXW4LO   LZSTR    LX097B   PQDWOC  
+        QDWOP      LP1696   MQDWOP2  LX0828   ZVQDWOP2 LXW4SO2  BW0ORP  
+        LXW3O      BW1ORP   LXW0O    BW2ORP   LXW1O    BW3ORP   LXW1O   
+        -BW2ORP    LXW0O    -BW1ORP  LXW3O    -BW0ORP  LXW5O    LXW2O   
+        LXW5O      BW0ORMP  LXW3O    BW1ORMP  LXW0O    BW2ORMP  LXW1O   
+        BW3ORMP    LXW1O    -BW2ORMP LXW0O    -BW1ORMP LXW3O    -BW0ORMP
+        LXW4LO     LZSTR    LX097B   QFWOP    PQFWOC   LP1696   MQFWOP2 
+        LX0828     ZHQFWOP2 LXW4SO   BW0ORP   LXW3O    BW1ORP   LXW0O   
+        BW2ORP     LXW1O    BW3ORP   LXW1O    -BW2ORP  LXW0O    -BW1ORP 
+        LXW3O      -BW0ORP  LXW5O    LXW2O    LXW5O    BW0ORMP  LXW3O   
+        BW1ORMP    LXW0O    BW2ORMP  LXW1O    BW3ORMP  LXW1O    -BW2ORMP
+        LXW0O      -BW1ORMP LXW3O    -BW0ORMP LXW4LO   LZSTR    LX097B  
+        PQDWOC     QDWOP    LP1696   MQDWOP3  LX0828   ZVQDWOP3 LXW4SO2 
+        BW0ORP     LXW3O    BW1ORP   LXW0O    BW2ORP   LXW1O    BW3ORP  
+        LXW1O      -BW2ORP  LXW0O    -BW1ORP  LXW3O    -BW0ORP  LXW5O   
+        LXW2O      LXW5O    BW0ORMP  LXW3O    BW1ORMP  LXW0O    BW2ORMP 
+        LXW1O      BW3ORMP  LXW1O    -BW2ORMP LXW0O    -BW1ORMP LXW3O   
+        -BW0ORMP   LXW4LO   LZSTR    LX097B   OMID     QFWOP    PQFWOC  
+        LP1696     MQFWOP3  LX0828   ZHQFWOP3 LXW4SO   BW0OLP   LXW3O   
+        BW1OLP     LXW0O    BW2OLP   LXW1O    BW3OLP   LXW1O    -BW2OLP 
+        LXW0O      -BW1OLP  LXW3O    -BW0OLP  LXW5O    LXW2O    LXW5O   
+        BW0OLMP    LXW3O    BW1OLMP  LXW0O    BW2OLMP  LXW1O    BW3OLMP 
+        LXW1O      -BW2OLMP LXW0O    -BW1OLMP LXW3O    -BW0OLMP LXW4LO  
+        LZSTR      LX097B   PQDWOC   QDWOP    LP1696   MQDWOP4  LX0828  
+        ZVQDWOP4   LXW4SO2  BW0OLP   LXW3O    BW1OLP   LXW0O    BW2OLP  
+        LXW1O      BW3OLP   LXW1O    -BW2OLP  LXW0O    -BW1OLP  LXW3O   
+        -BW0OLP    LXW5O    LXW2O    LXW5O    BW0OLMP  LXW3O    BW1OLMP 
+        LXW0O      BW2OLMP  LXW1O    BW3OLMP  LXW1O    -BW2OLMP LXW0O   
+        -BW1OLMP   LXW3O    -BW0OLMP LXW4LO   LZSTR    LX097B   QFWOP   
+        PQFWOC     LP1696   MQFWOP4  LX0828   ZHQFWOP4 LXW4SO   BW0OLP  
+        LXW3O      BW1OLP   LXW0O    BW2OLP   LXW1O    BW3OLP   LXW1O   
+        -BW2OLP    LXW0O    -BW1OLP  LXW3O    -BW0OLP  LXW5O    LXW2O   
+        LXW5O      BW0OLMP  LXW3O    BW1OLMP  LXW0O    BW2OLMP  LXW1O   
+        BW3OLMP    LXW1O    -BW2OLMP LXW0O    -BW1OLMP LXW3O    -BW0OLMP
+        LXW4LO     LZSTR    LX097B   PQDWOC   QDWOP    LP1696   MQDWOP5 
+        LX0828     ZVQDWOP5 LXW4SO2  BW0OLP   LXW3O    BW1OLP   LXW0O   
+        BW2OLP     LXW1O    BW3OLP   LXW1O    -BW2OLP  LXW0O    -BW1OLP 
+        LXW3O      -BW0OLP  LXW5O    LXW2O    LXW5O    BW0OLMP  LXW3O   
+        BW1OLMP    LXW0O    BW2OLMP  LXW1O    BW3OLMP  LXW1O    -BW2OLMP
+        LXW0O      -BW1OLMP LXW3O    -BW0OLMP LXW4LO   LZSTR    LX097B  
+        QFWOP      PQFWOC   LP1696   MQFWOP5  LX0828   ZHQFWOP5 LXW4SO  
+        BW0OLP     LXW3O    BW1OLP   LXW0O    BW2OLP   LXW1O    BW3OLP  
+        LXW1O      -BW2OLP  LXW0O    -BW1OLP  LXW3O    -BW0OLP  LXW5O   
+        LXW2O      LXW5O    BW0OLMP  LXW3O    BW1OLMP  LXW0O    BW2OLMP 
+        LXW1O      BW3OLMP  LXW1O    -BW2OLMP LXW0O    -BW1OLMP LXW3O   
+        -BW0OLMP   LXW4LO   LZSTR    LX097B   PQDWOC   QDWOP    LP1696  
+        MQDWOP6    LX0828   ZVQDWOP6 LXW4SO2  BW0OLP   LXW3O    BW1OLP  
+        LXW0O      BW2OLP   LXW1O    BW3OLP   LXW1O    -BW2OLP  LXW0O   
+        -BW1OLP    LXW3O    -BW0OLP  LXW5O    LXW2O    LXW5O    BW0OLMP 
+        LXW3O      BW1OLMP  LXW0O    BW2OLMP  LXW1O    BW3OLMP  LXW1O   
+        -BW2OLMP   LXW0O    -BW1OLMP LXW3O    -BW0OLMP LXW4LO   LZSTR   
+        LX097B     QW2OLP   LP1696   MQW2OLP  LX0828   ZHQW2OLP LXW4SO  
+        BW0OLP     LXW3O    BW1OLP   LXW0O    BW2OLP   LXW1O    BW3OLP  
+        LXW1O      -BW2OLP  LXW0O    -BW1OLP  LXW3O    -BW0OLP  LXW5O   
+        LXW2O      LXW5O    BW0OLMP  LXW3O    BW1OLMP  LXW0O    BW2OLMP 
+        LXW1O      BW3OLMP  LXW1O    -BW2OLMP LXW0O    -BW1OLMP LXW3O   
+        -BW0OLMP   LXW4LO   LZSTR    LX097B   QW3OLP   LP1696   MQW3OLP 
+        LX0828     ZVQW3OLP LXW4SO2  BW0OLP   LXW3O    BW1OLP   LXW0O   
+        BW2OLP     LXW1O    BW3OLP   LXW1O    -BW2OLP  LXW0O    -BW1OLP 
+        LXW3O      -BW0OLP  LXW5O    LXW2O    LXW5O    BW0OLMP  LXW3O   
+        BW1OLMP    LXW0O    BW2OLMP  LXW1O    BW3OLMP  LXW1O    -BW2OLMP
+        LXW0O      -BW1OLMP LXW3O    -BW0OLMP LXW4LO   LZSTR    LX097B  
+        QW4OLP     LP1696   MQW4OLP  LX0828   ZHQW4OLP LW4OHP   LZHQW5OLP        
+        LX0828     MQW5OLP  LP1696   QW5OLP   -LX097B  -ZVQW5OLP         -LBP1LO 
+        LBP1OP     -LBP2O   LBP2OP   -LBP3O   -LBP2OP  -LBP2O   -LBP1OP 
+        -LBP1SO    LZVQW6OLP         -LX0828  -MQW6OLP -LP1696  QW6OLP   LX097B  
+        ZHQW6OLP   LW6OP    LZHQW7OLP         LX0828   MQW7OLP  LP1696   QW7OLP  
+        LX097B     ZVQW7OLP LW7OP2   LZVQW8OLP         LX0828   MQW8OLP  LP1696  
+        QW8OLP     LX097B   ZHQW8OLP LW8OP    POHOLM   BS2OP    LB22O   
+        LB22O      BS2OP    L3WWPO   LZVQ     LX097B   QS1OP    LP1696  
+        MQS1OP2    LX0828   ZVQS1OP2 L3WP2    ZHQSBOP2 LX0828   MQSBOP2 
+        LP1696     QSBOP    LX097B   LZVQ     L4OP     LZVQS2OP2         LX541   
+        ZHQS2OP2   LX097B   QS2OP    LP1696   MQS2OP2  LX278    PENERGY 
+        SF2OLP     L8P      LZVQEAP  LX0828   MQEAP37  LP1689   QEAP    
+        LX097      ZHQEAP37 L5AP     L5BP     ZVQD5P37 LX0828   MQD5P37 
+        LP1689     QD5P     LX097    LZVQD5P  L6P      LXB2P    DB2P    
+        B2P        DB2P     LXB2P    L0P      LZVQF6P19         LX097B   QF6P    
+        LP1696     MQF6P19  L0M      LXB2P    DB2P     B2P      DB2P    
+        LXB2P      L6P      LZVQD5P  LX097    QD5P     LP1689   MQD5P38 
+        LX0828     ZVQD5P38 L5BP     L5AP     ZHQEAP38 LX097    QEAP    
+        LP1689     MQEAP38  LX0828   LZVQEAP  L8P      PENERGY  SF2OLP  
+        LX278      MQF4P31  LP1689   QF4P     LX097    ZHQF4P31 LX526   
+        LZVQF4P31  L4P      LZHQD3P31         LX526    ZVQD3P31 LX097    QD3P    
+        LP1689     MQD3P31  LX278    SD3OLP   L3       LXB2P    DB2P    
+        B2P        DB2P     LXB2P    L2P      ZHQF2P37 LX097    QF2P    
+        LP1689     MQF2P37  LX0828   LZVQF2P37         L1PH     LZHQD1P19         LX0828  
+        MQD1P19    LP1696   QD1P     LX097B   ZVQD1P19 L1PV     LZVQF2P38        
+        LX0828     MQF2P38  LP1689   QF2P     LX097    ZHQF2P38 L2P     
+        LXB2P      DB2P     B2P      DB2P     LXB2P    L3       SD3OLP  
+        LX278      MQD3P32  LP1689   QD3P     LX097    ZVQD3P32 LX526   
+        LZHQD3P32  L4P      LZVQF4P32         LX526    ZHQF4P32 LX097    QF4P    
+        LP1689     MQF4P32  LX278    SF4OLP   L8P      LZVQEAP  LX0828  
+        MQEAP39    LP1689   QEAP     LX097    ZHQEAP39 L5AP     L5BP    
+        ZVQD5P39   LX0828   MQD5P39  LP1689   QD5P     LX097    LZVQD5P 
+        L6P        LXB2P    DB2P     B2P      DB2P     LXB2P    L0P     
+        LZVQF6P20  LX097B   QF6P     LP1696   MQF6P20  L0M      LXB2P   
+        DB2P       B2P      DB2P     LXB2P    L6P      LZVQD5P  LX097   
+        QD5P       LP1689   MQD5P40  LX0828   ZVQD5P40 L5BP     L5AP    
+        ZHQEAP40   LX097    QEAP     LP1689   MQEAP40  LX0828   LZVQEAP 
+        L8P        SF4OLP   LX278    MQF4P33  LP1689   QF4P     LX097   
+        ZHQF4P33   LX526    LZVQF4P33         L4P      LZHQD3P33         LX526    ZVQD3P33
+        LX097      QD3P     LP1689   MQD3P33  LX278    SD5OLP   L3      
+        LXB2P      DB2P     B2P      DB2P     LXB2P    L2P      ZHQF2P39
+        LX097      QF2P     LP1689   MQF2P39  LX0828   LZVQF2P39         L1PH    
+        LZHQD1P20  LX0828   MQD1P20  LP1696   QD1P     LX097B   ZVQD1P20
+        L1PV       LZVQF2P40         LX0828   MQF2P40  LP1689   QF2P     LX097   
+        ZHQF2P40   L2P      LXB2P    DB2P     B2P      DB2P     LXB2P   
+        L3         SD5OLP   LX278    MQD3P34  LP1689   QD3P     LX097   
+        ZVQD3P34   LX526    LZHQD3P34         L4P      LZVQF4P34         LX526    ZHQF4P34
+        LX097      QF4P     LP1689   MQF4P34  LX278    SF6OLP   L8P     
+        LZVQEAP    LX0828   MQEAP41  LP1689   QEAP     LX097    ZHQEAP41
+        L5AP       L5BP     ZVQD5P41 LX0828   MQD5P41  LP1689   QD5P    
+        LX097      LZVQD5P  L6P      LXB2P    DB2P     B2P      DB2P    
+        LXB2P      L0P      LZVQF6P21         LX097B   QF6P     LP1696   MQF6P21 
+        L0M        LXB2P    DB2P     B2P      DB2P     LXB2P    L6P     
+        LZVQD5P    LX097    QD5P     LP1689   MQD5P42  LX0828   ZVQD5P42
+        L5BP       L5AP     ZHQEAP42 LX097    QEAP     LP1689   MQEAP42 
+        LX0828     LZVQEAP  L8P      SF6OLP   LX278    MQF4P35  LP1689  
+        QF4P       LX097    ZHQF4P35 LX526    LZVQF4P35         L4P      LZHQD3P35        
+        LX526      ZVQD3P35 LX097    QD3P     LP1689   MQD3P35  LX278   
+        SD7OLP     L3       LXB2P    DB2P     B2P      DB2P     LXB2P   
+        L2P        ZHQF2P41 LX097    QF2P     LP1689   MQF2P41  LX0828  
+        LZVQF2P41  L1PH     LZHQD1P21         LX0828   MQD1P21  LP1696   QD1P    
+        LX097B     ZVQD1P21 L1PV     LZVQF2P42         LX0828   MQF2P42  LP1689  
+        QF2P       LX097    ZHQF2P42 L2P      LXB2P    DB2P     B2P     
+        DB2P       LXB2P    L3       SD7OLP   LX278    MQT1OTP1 LP1689  
+        QT1OTP     LX097    ZVQT1OTP1         LX541    LZHQT1OTP1        LT0SP    LZVQT2OTP1       
+        LX541      ZHQT2OTP1         LX097    QT2OTP   LP1689   MQT2OTP1 LX278   
+        SF8OTP     PSF8C    LTBSVPA  PMD03H1  LTBSVPB  LZVQTAP  LX0828  
+        MQTAOTP1   LP1689   QTAOTP   LX097    ZHQTAOTP1         LTBSHP   LXSF0P  
+        ZVQT3OTP1  LX0828   MQT3OTP1 LP1689   QT3OTP   LX097    LZVQ    
+        LT2SP      LXB2P    DB2P     B2P      DB2P     LXB2P    LT3SP   
+        ZHQT4OTP1  LX097    QT4OTP   LP1689   MQT4OTP1 LX0828   LZVQT4OTP1       
+        LT4SVP     ZVQT5OTP LX097    QT5OTP   PSYMMS   LP1689   MQT5OTP 
+        LX0828     LZHQT5OTP         LT4SHP   LZVQT4OTP2        LX0828   MQT4OTP2 LP1689  
+        QT4OTP     LX097    ZHQT4OTP2         LT3SP    LXB2P    DB2P     B2P     
+        DB2P       LXB2P    LT2SP    LZVQ     LX097    QT3OTP   LP1689  
+        MQT3OTP2   LX0828   ZVQT3OTP2         LXSF0P   LTBSHP   ZHQTAOTP2         LX097   
+        QTAOTP     LP1689   MQTAOTP2 LX0828   LZVQTAP  LTBSVPD  PMD03H2 
+        LTBSVPC    SF8OTP   PSF8C    LX278    MQT2OTP2 LP1689   QT2OTP  
+        LX097      ZHQT2OTP2         LX541    LZVQT2OTP2        LT0SP    LZHQT1OTP2        LX541   
+        ZVQT1OTP2  LX097    QT1OTP   LP1689   MQT1OTP2 LX278    SD7TRP  
+        L3         LXB2P    DB2P     B2P      DB2P     LXB2P    L2P     
+        ZHQF2P43   LX097    QF2P     LP1689   MQF2P43  LX0828   LZVQF2P43        
+        L1PH       LZHQD1P22         LX0828   MQD1P22  LP1696   QD1P     -PQD1C  
+        LX097B     ZVQD1P22 L1PV     LZVQF2P44         LX0828   MQF2P44  LP1689  
+        QF2P       LX097    ZHQF2P44 L2P      LXB2P    DB2P     B2P     
+        DB2P       LXB2P    L3       SD7TRP   LX278    MQD3P36  LP1689  
+        QD3P       LX097    ZVQD3P36 LX526    LZHQD3P36         L4P      LZVQF4P36        
+        LX526      ZHQF4P36 LX097    QF4P     LP1689   MQF4P36  LX278   
+        SF6TRP     LMHD3    L8PMHD3  LZVQEAP  LX0828   MQEAP43  LP1689  
+        QEAP       LX097    ZHQEAP43 LPMD03V1A         PMD03V1  LPMD03V1B         ZVQD5P43
+        LX0828     MQD5P43  LP1689   QD5P     LX097    LZVQD5P  L6P     
+        LXB2P      DB2P     B2P      DB2P     LXB2P    L0P      LZVQF6P22        
+        LX097B     QF6P     LP1696   MQF6P22  L0M      LXB2P    DB2P    
+        B2P        DB2P     LXB2P    L6P      LZVQD5P  LX097    QD5P    
+        LP1689     MQD5P44  LX0828   ZVQD5P44 L5BP     L5AP     ZHQEAP44
+        LX097      QEAP     LP1689   MQEAP44  LX0828   LZVQEAP  L8PMHD3 
+        LMHD3      SF6TRP   LX278    MQF4P37  LP1689   QF4P     LX097   
+        ZHQF4P37   LX526    LZVQF4P37         L4P      LZHQD3P37         LX526    ZVQD3P37
+        LX097      QD3P     LP1689   MQD3P37  LX278    SD5TRP   L3      
+        LXB2P      DB2P     B2P      DB2P     LXB2P    L2P      ZHQF2P45
+        LX097      QF2P     LP1689   MQF2P45  LX0828   LZVQF2P45         L1PH    
+        LZHQD1P23  LX0828   MQD1P23  LP1696   PQD1C    QD1P     -LX097B 
+        -ZVQD1P23  -L1PV    LZVQF2P46         -LX0828  -MQF2P46 -LP1689  -QF2P   
+        -LX097     -ZHQF2P46         -L2P     LXB2P    -DB2P    B2P      -DB2P   
+        LXB2P      -L3      -SD5TRP  -LX278   -MQD3P38 -LP1689  -QD3P   
+        -LX097     -ZVQD3P38         -LX526   LZHQD3P38         -L4P     LZVQF4P38         -LX526  
+        -ZHQF4P38  -LX097   -QF4P    -LP1689  -MQF4P38 -LX278   -SF4TRP 
+        -LMHD3     -L8PMHD3 -LZVQEAP -LX0828  -MQEAP45 -LP1689  -QEAP   
+        -LX097     -ZHQEAP45         LPMD03V2A         PMD03V2  LPMD03V2B         -ZVQD5P45         -LX0828 
+        -MQD5P45   -LP1689  -QD5P    -LX097   -LZVQD5P -L6P     LXB2P   
+        -DB2P      B2P      -DB2P    LXB2P    -L0P     LZVQF6P23         -LX097B 
+        -QF6P      -LP1696  -MQF6P23 -L0M     LXB2P    -DB2P    B2P     
+        -DB2P      LXB2P    -L6P     -LZVQD5P -LX097   -QD5P    -LP1689 
+        -MQD5P46   -LX0828  -ZVQD5P46         -L5BP    -L5AP    -ZHQEAP46         -LX097  
+        -QEAP      -LP1689  -MQEAP46 -LX0828  -LZVQEAP -L8PMHD3 -LMHD3  
+        -SF4TRP    -PSF4TRC -LX278   -MQF4P39 -LP1689  -QF4P    -LX097  
+        -ZHQF4P39  -LX526   LZVQF4P39         -L4P     LZHQD3P39         -LX526   -ZVQD3P39        
+        -LX097     -QD3P    -LP1689  -MQD3P39 -LX278   -SD3TRP  -L3     
+        LXB2P      -DB2P    B2P      -DB2P    LXB2P    -L2P     -ZHQF2P47        
+        -LX097     -QF2P    -LP1689  -MQF2P47 -LX0828  LZVQF2P47         -L1PH   
+        LZHQD1P24  -LX0828  -MQD1P24 -LP1696  -QD1P    -LX097B  -ZVQD1P24        
+        -L1PV      LZVQF2P48         -LX0828  -MQF2P48 -LP1689  -QF2P    -LX097  
+        -ZHQF2P48  -L2P     LXB2P    -DB2P    B2P      -DB2P    LXB2P   
+        -L3        -SD3TRP  -PSD3TRC PTSURM   LXL13039 MQLA9RP  LQLA9RPA
+        -QLA9RP    LQLA9RPB ZVQLA9RP LLA10R   MQLA8RP  LP1696   -QLA8RP 
+        LX097B     ZHQLA8RP LLA9RA   ZDS4RP   LLA9RB   MQLA7RP  LP1696  
+        -QLA7RP    LX097B   ZVQLA7RP LLA8R    PMD02H1  LLA8RA   LBLA6RP 
+        -BLA6RP    LBLA6RP  LXL700B  MQLA6RP  LP1696   -QLA6RP  LXL700  
+        LBLA6RP    -BLA6RP  LBLA6RP  LLA7R    ZVQLA5RP LX097B   QLA5RP  
+        LP1696     MQLA5RP  LX0828   LZHQA3RP LLA6R    ZHQLA4RP LX097B  
+        QLA4RP     LP1696   MQLA4RP  LX0828   LZVQA2RP LLA5R    ZVQLA3RP
+        LX097B     LQLA3RP  QLA3RP   LQLA3RP  LXL15814 MQLA3RP  LPMD02H2A        
+        PMD02H2    LPMD02H2B         LLA4R    BLA2RP   LLA1R    LQLA2RP  QLA2RP  
+        LQLA2RP    LXL15814 MQLA2RP  LXL24186 PSLXTRC  SLXTRP   LXL580  
+        BLX2RP     LLX1R1   ZVQLX1RP1         LX09427  MQLX1RP1 LXL15814 LQLX1RP 
+        QLX1RP     LQLX1RP  LXL15814 LXL42186 LBLX4RP  BLX4RP   LBLX4RP 
+        LXL54186   MQLX2RP  LXL15814 LQLX2RP  PQLX2RC  QLX2RP   LQLX2RP 
+        LXL700     LBLX4RP  BLX4RP   LBLX4RP  LXL42186 LXL15814 LQLX1RP 
+        QLX1RP     LQLX1RP  LXL15814 MQLX1RP2 LX09427  ZVQLX1RP2         LLX1R1  
+        BLX2RP     LXL580   PSLXTRC  SLXTRP   LXL24186 MQLB4RP  LXL15814
+        QLB4RP     LXL700   LXBLB3RP BLB3RP   LXBLB3RP LLB3R    PMD02V1 
+        LLB3RA     LQLB3RP  QLB3RP   LQLB3RP  LXL15814 MQLB3RP  LX09427 
+        ZVQLB3RP   LLB2RA   ZDS3RP   LLB2RB   PMD02H3  LLB2RC   QLB2RP  
+        LXL15814   MQLB2RP  LX09427  ZHQLB2RP LLB1R    BLB2RP   LX200   
+        L25814     ZVQLB1RP LX097B   QLB1RP   LXL15814 MQLB1RP  LXL24186
+        PSLYTRC    SLYTRP   LXBXS    LNBX2    LXBLY2RP BLY2RP   LXBLY2RP
+        LLY1R      BLY3RP   LXL54186 MQLY2RP1 LXL15814 QLY2RP   LXL580  
+        LXBLY5RP   BLY5RP   LXBLY5RP LX200    LXL54186 MQLY1RP  LXL15814
+        QLY1RP     PQLY1RC  LX097B3  ZVQLY1RP L2606    LX200    LXBLY5RP
+        BLY5RP     LXBLY5RP LXL42186 LXL15814 QLY2RP   LXL15814 MQLY2RP2
+        LXL54186   BLY3RP   LLY1R    LXBLY2RP BLY2RP   LXBLY2RP LNBX2   
+        LXBXS      PSLYTRC  SLYTRP   LXL24186 MQLC3RP  LXL15814 QLC3RP  
+        PQLC3RC    LX097B   ZVQLC3RP LXL2428  QKERP    LXL56467 LXBLC2RP
+        BLC2RP     LXBLC2RP LXL56467 QKDRP    LXL12653 MQLC2RP  LXL15814
+        QLC2RP     PQLC2RC  LX097B   ZHQLC2RP LLC2RA   ZDS2RP   LLC2RB  
+        PMD02H4    LLC2RC   QKCRP    LXL13653 MQLC1RP  LXL15814 QLC1RP  
+        PQLC1RC    LX097B   ZVQLC1RP LLC1RA   ZDS1RP   LLC1RB   QKBRP   
+        LBLC1RPA   LBLC1RP  BLC1RP   LBLC1RP  LBLC1RPB LBLCWRPA LBLCWRP 
+        BLCWRP     LBLCWRP  LBLCWRPB QKARP    LXL28467 LBC1RP   BC1RP   
+        LBC1RP     PIRR     LXB1R    LIP2     APIR     LIP1     IP      
+)
+ ;
+MOMENTUM = 4e+09;
+PBUNCH =6.28e+10;
+MINCOUP =.1;
+FSHIFT =-3.0909558562055665e-06;
+
+FFS;
+
+USE ASC;
+CELL;
+CALC;

@@ -1,0 +1,4 @@
+2017.03.01:
+Command for running the job:
+sad64 Translate_Morita_Method.sad >log.FCCee_t_85_by2_nosol.plain &
+with "sad64" linked to the SAD binary.

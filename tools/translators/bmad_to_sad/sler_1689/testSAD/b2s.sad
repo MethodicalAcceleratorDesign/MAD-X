@@ -1,0 +1,128 @@
+
+!Defaults to electron mass and positron charge.
+ON ECHO;	! Echo back to mail level
+OFF CTIME; 	! Gives CPUtime at each main level comand
+ON LOG;
+
+FFS;
+
+GetMAIN["../sler_1689.sad"];
+USE LAT;
+!bb=ExtractBeamline[FF];
+Print[LAT];
+
+! To check the flags (global variables) in SAD environment
+! Information printed to the screen
+STAT; 
+
+! Change the relative momentum deviation for the reference particle
+! CALC command will do calculation with MOMENTUM = MOMENTUM * (1+DP0)
+! DP0=0.001;
+
+CELL;CALC;
+
+!CHRO;
+
+Print [Twiss [ "BX", "IP"]];
+Print [Twiss [ "BY", "IP"]]; 
+Print [Twiss [ "EX", "IP"]];
+Print [Twiss [ "EPX", "IP"]];
+Print [Twiss [ "AX", "IP"]];
+Print [Twiss [ "AY", "IP"]];
+
+! Print information
+! Print optics functions to the screen
+!DISP;
+
+
+! Print COD to specific file
+! NOTE that LINE and Twiss commands in SAD display the information at the
+! entrance of an element. This is different from MAD and MAD-X
+Nelement=LINE["POSITION","$$$"];
+fn=OpenWrite["orbit_b2s.txt"];
+Do[
+  WriteString[fn,i,"  ",LINE["NAME",i],"  ",LINE["TYPENAME",i],"  ",LINE["S",i],"  ",
+       Twiss["DX",i],"  ",Twiss["DPX",i],"  ",Twiss["DY",i],"  ",
+       Twiss["DPY",i],"  ",Twiss["DZ",i],"  ",Twiss["DDP",i],"\n"];
+    ,{i,Nelement}];
+Close[fn];
+
+
+! Print twiss functions
+fn=OpenWrite["twiss_b2s.txt"];
+Do[
+  WriteString[fn,i,"   ",LINE["NAME",i],
+             "   ",LINE["TYPENAME",i],"  ", LINE["S",i],
+             "   ",Twiss["BX",i],"   ",Twiss["AX",i],"   ",Twiss["NX",i]/2/Pi,
+             "   ",Twiss["PEX",i],"   ",Twiss["PEPX",i],
+             "   ",Twiss["BY",i],"   ",Twiss["AY",i],"   ",Twiss["NY",i]/2/Pi,
+             "   ",Twiss["PEY",i],"   ",Twiss["PEPY",i],
+             "   ",Twiss["R1",i],"   ",Twiss["R2",i],
+             "   ",Twiss["R3",i],"   ",Twiss["R4",i],
+             "\n"];
+   ,{i,Nelement}];
+Close[fn];
+
+
+! Print matrix element-by-element to file
+With[{e = Emittance[Matrix->True]},
+   $tms = TransferMatrices/.e;
+   tms[i_Real] := $tms[[i+1]].SymplecticInverse[$tms[[i]]];
+   cod = ClosedOrbit/.e;
+   ];
+CODi[i_Real] := cod[[i]];
+Matrix[i_Real] := TableForm[tms[i]];
+fn=OpenWrite["matrix_b2s.txt"];
+Do[
+  WriteString[fn,LINE["NAME",i],"  i=",i,"  s=",LINE["S",i],"\n"];
+  WriteString[fn,
+         Twiss["DX",i],"  ",Twiss["DPX",i],"  ",Twiss["DY",i],"  ",
+         Twiss["DPY",i],"  ",Twiss["DZ",i],"  ",Twiss["DDP",i],"\n"];
+  WriteString[fn,Matrix[i],"\n"];
+!  WriteString[fn,"COD:","\n"];
+!  WriteString[fn,CODi[i],"\n\n"];
+  ,{i,Nelement-1}];
+Close[fn];
+
+
+! Do element-by-element tracking for one particle
+! Useful for checkting transfer maps for various components
+  fs=OpenWrite["tracking_b2s.txt"];
+(*
+Do[
+  If[LINE["TYPENAME",i]=="MARK",
+    If[LINE["OFFSET",i]<>0,
+      Print[LINE["NAME",i],"  ",LINE["OFFSET",i]];
+      LINE["OFFSET",i]=0;
+      Print[LINE["NAME",i],"  ",LINE["OFFSET",i]]
+      ]],
+  {i,Nelement}];
+*)
+  i=2;
+!  beam={1,{{1.e-6},{1.e-4},{1.e-6},{1.e-4},{1.e-3},{1.e-4},{1}}};
+  beam={1,{{1.e-6},{0.},{0.},{0.},{0.},{0.},{1}}};
+  While[i<=Nelement,
+!     beam=TrackParticles[beam,i];
+     beam=TrackParticles[beam,i];
+     pbeam=Flatten[beam[[2]]];pflag=pbeam[[7]];
+     WriteString[fs,i, "  ",LINE["NAME",i],"  ",LINE["S",i],"  ",
+                     pbeam[[1]],"  ",pbeam[[2]],"  ",pbeam[[3]],"  ",
+                     pbeam[[4]],"  ",pbeam[[5]],"  ",pbeam[[6]],"  ",
+                     pflag,"\n"];
+   i+=1];
+  Close[fs];
+
+
+! Stop running here
+abort;
+
+var
+show
+
+dr:=FFS["draw bx by & ex ey q*;"];
+dr;
+TkWait[];
+
+
+end
+

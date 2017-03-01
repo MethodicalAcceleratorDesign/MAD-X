@@ -1,0 +1,112 @@
+SAD2MADX=Class[{},{$Version="V0.2.2",$VersionDate="8/18/2015"},
+  {dir,fname,elms,mdeftype,fnamemx,
+    kdef},
+
+  Constructor[]:=(fnamemx=If[fname[-4,-1]===".sad",fname[1,-5],fname]//".seq";
+    kdef=
+    mdeftype[_]="***");
+
+  MXTYPE["QUAD",___]="QUADRUPOLE";
+  MXTYPE["SEXT",___]="SEXTUPOLE";
+  MXTYPE["BEND",keys_]:=If[("ANGLE"/.keys),"RBEND","***","***"];
+  MXTYPE["MULT",keys_]:=Module[{{l,k}={"L",{"K1","K2","K3","K4"}}/.keys/._String->0},
+    If[l,
+      Switch[k,
+        {_,0,0,0},"QUADRUPOLE",
+        {0,_,0,0},"SEXTUPOLE",
+        {0,0,_,0},"OCTUPOLE",
+        {0,0,0,_},"DECAPOLE",
+        _,"***"],
+      "MULTIPOLE",
+      "***"]];
+  MXTYPE["CAVI",___]="RFCAVITY";
+  MXTYPE["MARK",keys_]:=If["OFFSET"/.keys,
+    "***",
+    "MARKER",
+    "MARKER"];
+  MXTYPE[__]="***";
+
+  MXKEY[_,"ROTATE"]="TILT";
+  MXKEY[_,"PHI"]="LAG";
+  MXKEY["MULTIPOLE",k:("K1"|"K2"|"K3"|"K4"|"K5")]:="KNL";
+  MXKEY[_,x_]:=x;
+
+  MXVALUE["RBEND"|"SBEND","L",keys_,_]:=Module[{{theta,l}={"ANGLE","L"}/.keys},
+    If[theta,
+      2 l/theta*Sin[theta/2],
+      l]];
+  MXVALUE["SBEND",k:"E1"|"E2",keys_,n_]:=(k/.keys)//" * "//"ANGLE"//n;
+  MXVALUE["RBEND",k:"E1"|"E2",keys_,n_]:=((k/.keys)-0.5)//" * "//"ANGLE"//n;
+  MXVALUE["MARKER",__]=0;
+  MXVALUE["RFCAVITY","PHI",keys_,_]:=0.5+("PHI"/.keys)/2/Pi;
+  MXVALUE["RFCAVITY",k:("FREQ"|"VOLT"),keys_,_]:=(k/.keys)/1e6;
+  MXVALUE["MULTIPOLE",k:("K0"|"K1"|"K2"|"K3"|"K4"|"K5"),keys_,_]:=
+    {"K0","K1","K2","K3","K4","K5"}/.keys/.{"K0"->0,"K1"->0,"K2"->0,"K3"->0,"K4"->0,"K5"->0};
+  MXVALUE[_,k:("K1"|"K2"|"K3"|"K4"),keys_,_]:=Module[{{v,l}={k,"L"}/.keys},
+    If[l,
+      v/l,
+      v]];
+  MXVALUE[_,"ROTATE",keys_,_]:=-"ROTATE"/.keys;
+  MXVALUE[_,k_,keys_,_]:=k/.keys;
+
+  ConvElem[elm_]:=Module[{name=Element["NAME",elm],n,keys,type,mxtype,v},
+    {n,type,keys}=DeleteCases[SetElement[name],(_->0)|(_->-0),{2}];
+    If[type==="CAVI",AppendTo[keys,"PHI"->0]];
+    mxtype=MXTYPE[type,keys];
+    mdeftype[name]=mxtype;
+    If[mxtype <=> "***",
+      {n,mxtype,Union[DeleteCases[{MXKEY[mxtype,#],MXVALUE[mxtype,#,keys,n]}&/@(keys[[,1]]),{_,0}]]},
+      Null[]]
+    ];
+
+  ConvertElements[]:=Module[{l=Element["LENGTH"]},
+    el=Table[ConvElem[i],{i,l}]];
+
+  DefineVar[{n_,t_,lk_}]:=Module[{s="",n1=n//" = "},
+    Switch[#[[2]],
+      _String,Null[],
+      _,s=s//#[[1]]//n1//#[[2]]//";\n"]&/@lk;
+    s];
+
+  DefineElement[{n_,t_,lk_}]:=Module[{s=n//" : "//t//", ",n1=n//", "},
+    (s=s//#[[1]]//":= "//
+      Switch[#[[2]],
+        _String,#[[2]]//", ",
+        _List,#[[2]]//", ",
+        _,#[[1]]//n1])&/@lk;
+    s[1,-3]//";\n"];  
+
+  DefineComponent[k_]:=Module[{e=LINE["Element",k],n=LINE["NAME",k],k1=k+1},
+    If[mdeftype[e]<=>"***",
+      While[LINE["TYPENAME",k1]==="MARK",k1++];
+      If[StringPosition[n,"."]==={},n=n//".1"];
+      n//": "//e//", at = "//(LINE["S",k]+LINE["S",k1])/2//";\n",
+      ""]];
+
+  SystemDate[]:=Module[{f=OpenRead["!date"],s},
+    s=ReadString[f];
+    Close[f];s];
+
+  BNConv[n_]:=StringReplace[n,{"$"->""}];
+
+  CreateMADX[]:=Module[{elms=ConvertElements[],str,fn=OpenWrite[fnamemx]},
+    StandardForm[
+      PageWidth=2047;
+      Write[fn,"!\n!SAD2MADX "//$Version//" ("//$VersionDate//")"];
+      Write[fn,"!Conversion of "//fname//" at "//SystemDate[]//"\n!\n"];
+      Write[fn,
+        "AXISAD =",Twiss["AX","^^^"],"; BXISAD =",Twiss["BX","^^^"],
+        "; AYISAD =",Twiss["AY","^^^"],"; BYISAD =",Twiss["BY","^^^"],
+        "; EXISAD =",Twiss["EX","^^^"],"; EPXISAD =",Twiss["EPX","^^^"],
+        "; EYISAD =",Twiss["EY","^^^"],"; EPYISAD =",Twiss["EPY","^^^"],";"];
+      WriteString[fn,#]&/@(DefineVar/@elms);
+      Write[fn,""];
+      WriteString[fn,#]&/@(DefineElement/@elms);
+      Write[fn,""];
+      Write[fn,BNConv[BeamLineName[]],": SEQUENCE, REFER = CENTRE, L = "//LINE["S","$$$"]//";"];
+      Do[WriteString[fn,DefineComponent[k]],{k,LINE["LENGTH"]-1}];
+      Write[fn,"ENDSEQUENCE;"];
+      Close[fn]
+      ]];
+
+  ];

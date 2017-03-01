@@ -1,0 +1,17 @@
+! Job sample for FCC-ee
+option, warn,info, -echo;
+
+! Load sequence file
+call, file="lhc_optics_opt2016_coll400.madx";
+
+! Beam definition
+beam, sequence=lhcb1, bv= 1,
+  particle=proton, charge=1, mass=0.938272046,
+  energy= 6500,   npart=1.2e11,kbunch=2076,
+  ex=5.05223409385e-10,ey=5.05223409385e-10;
+
+use, sequence = lhcb1;
+ptc_create_universe;
+ptc_create_layout, model = 1, method = 2, nst = 1;
+!! ptc_create_layout, model=1, method=2, nst=1, exact; ! Use this if exact is wanted
+ptc_script, file="create_flat.ptc";

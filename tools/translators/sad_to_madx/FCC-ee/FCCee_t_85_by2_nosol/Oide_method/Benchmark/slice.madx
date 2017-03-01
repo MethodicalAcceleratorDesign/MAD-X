@@ -1,0 +1,17 @@
+//     Slicing for FCC-ee
+
+! saved on 2017.02.23 for benchmark
+
+ select, flag=makethin, clear;
+
+ select, flag=makethin, pattern=bs\.,    slice=5;
+ select, flag=makethin, pattern=bi\.,    slice=10;
+ select, flag=makethin, pattern=b1\.,    slice=5;
+ select, flag=makethin, pattern=bd\.,    slice=5;
+
+ select, flag=makethin, pattern=bl\.,     slice=4;
+ select, flag=makethin, pattern=bc\.,     slice=10;
+ select, flag=makethin, pattern=bg\.,     slice=4;
+ select, flag=makethin, pattern=bw\.,      slice=10;
+
+return;

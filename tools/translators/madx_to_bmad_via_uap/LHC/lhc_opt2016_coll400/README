@@ -1,0 +1,20 @@
+2017.02.27:
+1) madx to bmad:
+   Local_Dir/accelerator-ml/uap/trunk/bin/translate_driver -constants_first -bmad lhc_optics_opt2016_coll400_full.madx > log.translate_driver&
+   Results: many errors but looks good.
+2) bmad to sad:
+   Local_Dir/bmad_dist/production/bin/bmad_to_mad_sad_and_xsif -sad lhc_optics_opt2016_coll400_full.bmad > log.bmad_to_mad_sad_and_xsif
+   Results: errors and failed.
+3) cp lhc_optics_opt2016_coll400_full.bmad lhc_optics_opt2016_coll400_full_edit.bmad
+   edit lhc_optics_opt2016_coll400_full_edit.bmad
+   changes made to the file:
+   * change orders of variable definitions
+     on_alice, ad3.lr3, ad3.lr7, on_lhcb, s.ds.l1.b1
+   * add line "use, lhcb1" in the end
+4) Local_Dir/bmad_dist/production/bin/bmad_to_mad_sad_and_xsif -sad lhc_optics_opt2016_coll400_full_edit.bmad > log.bmad_to_mad_sad_and_xsif
+   Results: looks successful!
+5) sad64 lhc_optics_opt2016_coll400_full_edit.sad
+   Results: lots of errors and failed
+   edit lhc_optics_opt2016_coll400_full_edit.sad
+   * Replace ", DISFRIN" by ", DISFRIN"
+   * Add "MARK BEGIN0 = ();" as the first element

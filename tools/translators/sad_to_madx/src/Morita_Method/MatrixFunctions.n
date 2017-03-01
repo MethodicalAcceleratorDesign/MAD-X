@@ -1,0 +1,441 @@
+BeginPackage[MatrixFunctions`];
+
+
+(* MatrixLog
+
+	Author:		Christopher K. Allen
+	Created:	March, 2005
+
+Computes the Logarithm of a matrix to specific tolerance using iterative
+procedure based upon the MatrixLog function.
+
+NOTES:
+  - Not all matrices have logarithms
+  - ||A - I|| < 1 is necessary for convergence 
+
+
+Arguments:
+  F   - matrix to be "logarithmed"
+
+  Optional
+  tolE - final numerical precision in residual norm
+  tolQ - residual error were we switch to quadratic mode
+  tolD - difference in res error where we switch to quadratic mode (plateau-ed) 
+  nMax - maximum number of iterations before we bail
+  nTay - number of Taylor terms we take for Log(X) in quadratic mode  
+
+*)
+
+MatrixLog[F_, tolE_:1e-16, tolQ_:1e-4, tolD_:0.01, nMax_:35, nTay_:4] := Module[
+  {   
+      s,              (* scaling factor *)
+      Fs,             (* scaled argument *)
+      logIs,          (* logarithm of scaled identity matrix *)
+      dims,           (* argument dimensions *)
+      i,              (* current iterate *)
+      Id,             (* identity matrix *)
+      A,              (* current estimate for Log[F] *)
+      eA,             (* exp(-A) *)
+      X,              (* multiplicative residual (w.r.t. 1) *) 
+      W,              (* approximate value of log(X) *)
+      R,              (* additive residual (w.r.t. 0) *)
+      D,              (* search direction *)
+      P,              (* Lie direction perturbational vector *) 
+      PX,             (* the matrix product P.X *)
+      alpha,          (* search length along D *)
+      errRes,         (* norm of the (additive) residual error *)
+      errRsp          (* errRes of the previous iterate *)
+   },
+
+
+ (* Check Matrix Size *)
+  dims = Dimensions[F];
+
+  If[dims[[1]] == dims[[2]],,
+    Print['Error in MatrixLog - Matrix must be square']
+    ];
+
+
+
+  (* Move the argument as close to the Identity matrix using scaling *)
+  Id = IdentityMatrix[ dims[[1]] ];
+  s  = MatrixInnerProd2[Id, F]/MatrixNorm2[F];
+  Fs = s*F;
+  logIs = Log[s]*Id;
+
+!  Print["MatrixLog scaling factor s = ", s];
+ 
+
+  (* Initialize the (super) linear search loop *)
+  A  = Id;
+  eA = MatrixExp[-A];
+  X  = eA.Fs;
+  R  = X - Id;
+  D = R;
+  i = 0;
+
+
+  errRes = MatrixNorm2[R];
+  While[ (errRes > tolQ),
+    P  = D + 0.5*MatrixCommutator[D,A];
+    PX = P.X;
+    alpha = MatrixInnerProd2[R,PX]/MatrixInnerProd2[PX,PX];
+
+    A  = A + alpha*D;
+    eA = MatrixExp[-A];
+    X  = eA.Fs;
+    R  = X - Id;
+    D  = R;
+    i  = i + 1;
+
+    errRsp = errRes;
+    errRes = MatrixNorm2[R];
+
+!    Print['Iterate ', i, ': alpha = ', alpha, ' residual error = ', errRes];
+
+    If[ Abs[errRes - errRsp] < tolD,
+!      Print['Encountered MatrixLog plateau']; 
+      Break[];
+    ];
+
+
+    If[ i > nMax,
+      Print['MatrixLog failed to converge after ', i, ' iterations'];
+      Print['Residual error = ', errRes];
+      Return[];
+    ];
+  ];
+
+
+
+  (* Switch to quadratic mode *)
+!  Print['Achieved accuracy ', errRes, ', switching to quadratic mode.'];
+
+  W = MatrixLogTaylor[X, nTay];
+  While[ (errRes > tolE),
+    A = MatrixZassen[A, W];
+
+    eA = MatrixExp[-A];
+    X  = eA.Fs;
+    R  = X - Id;
+    W  = MatrixLogTaylor[X, nTay];
+    i  = i + 1;
+
+    errRes = MatrixNorm2[R];
+
+    If[ i > nMax,
+      Print['MatrixLog failed to converge after ', i, ' iterations'];
+      Print['Residual error = ', errRes];
+      Return[];
+    ];
+
+  ];
+
+!  Print['Required ', i, ' iterations for residual of ', errRes];
+  Return[A - logIs];
+];
+
+
+
+(* MatrixExp
+
+	Author:		Christoher K. Allen
+	Created: 	March, 2005
+ 
+ Computes matrix exponent to specified tolerance using Taylor
+ expansion and repeated squaring if necessary.
+
+  Arguments:
+  A   - matrix to be exponentiated
+  tol - error tolerance in the summation residual norm
+  nMax - maximum number of iterations
+  l2Max - max l2 norm_2 before squaring, 
+          if ||A||>l2Max we compute exp(A/fac) then square
+*)
+
+MatrixExp[A_,tol_:1e-16,nMax_:25,lMax_:0.1] := Module[
+  {   dims,
+      i,
+      k,
+      B,
+      eA,
+      fac,
+      errRes2
+   },
+
+  dims = Dimensions[A];
+
+  If[dims[[1]] == dims[[2]],,
+    Print['Error in MatrixExp - Matrix must be square']
+    ];
+
+
+ (* If ||A|| is already small just compute the Taylor expansion *)
+   
+  errRes2 = MatrixNorm2[A];
+  
+  If[ errRes2 < lMax , 
+    eA = MatrixExpTaylor[A, tol, nMax]; 
+    Return[eA];
+  ]; 
+
+
+  (* Otherwise compute the Taylor expansion of a scalar reduced matrix *)
+  k   = Log[errRes2/(lMax*lMax)]/(2.0*Log[2.0]);
+  k   = Ceiling[k];
+  fac = 2.0^k;
+  B   = (1.0/fac)*A;
+  eA  = MatrixExpTaylor[B, tol, nMax]; 
+
+  For[i = 0, i < k, i++, eA = eA.eA];
+
+  Return[eA];
+];
+
+
+
+
+
+(* MatrixLogTaylor
+
+	Author:		Christoher K. Allen
+	Created: 	March, 2005
+ 
+Computes matrix logarithm by Taylor expansion out to a specified number of
+terms.  Note that this is used internally by this package and is not meant 
+as a credable method for computing the logarithm of a matrix.  (The log
+Taylor series is notoriously slow in converging.)  However, it may be useful
+for some types of development so it is exposed.
+
+  Arguments:
+  F      - matrix to be exponentiated
+  errMax - the norm of the residual term before we stop
+  nTay   - maximum number of terms to use (before we bail)
+*)
+
+
+MatrixLogTaylor[F_, errMax_:1e-16, nTay_:50] := Module[
+  {   dims,    (* dimensions of F *)
+      n,       (* iteration counter *)
+      sgn,     (* signum - sign of current term *)
+      Id,      (* identity matrix *)
+      Q,       (* the matrix (F-Id) *)
+      S,       (* current matrix power *)
+      T,       (* current matrix term in the series *)
+      A,       (* accumulated sum in the Taylor series *)
+      normRes  (* norm of the current residual term *)
+   },
+
+  dims = Dimensions[F];
+  
+  If[dims[[1]] == dims[[2]],,
+    Print['Error in MatrixLogTaylor: Matrix must be square']
+  ];
+
+
+  n = 1;
+  sgn = 1.0;
+
+  Id = IdentityMatrix[dims[[1]]];
+  Q  = F - Id;
+  S  = Q;
+  T  = S;
+  A  = T;
+
+  While[ (n <= nTay),
+
+    sgn = -1.0*sgn;
+    S   = Q.S;
+    T   = (sgn/(n+1.0))*S;
+
+    A = A + T;
+    n = n + 1;
+
+    normRes = MatrixNorm2[T];
+    If[normRes < errMax, Return[A], ];
+  ];
+
+  Print['MaxtrixLogTaylor: Failed to converge in ',n,' iterations'];
+  Return[A];
+];
+
+
+
+(* MatrixExpTaylor
+
+	Author:		Christoher K. Allen
+	Created: 	March, 2005
+ 
+Computes matrix exponent to specified tolerance using Taylor
+ expansion only.
+
+  Arguments:
+  A   - matrix to be exponentiated
+  tol - error tolerance in the summation residual norm
+  nMax - maximum number of iterations
+*)
+
+
+MatrixExpTaylor[A_,tol_:1e-16, nMax_:25] := Module[
+  {   dims,  (* dimensions of A *)
+      n,     (* current summation index *)
+      fac,   (* factorial function value at summation index n *)
+      T,     (* current matrix power A^n *)
+      S,     (* current value of the summation *)
+      errRes (* norm of the current summation term *)
+   },
+
+  dims = Dimensions[A];
+  
+  If[dims[[1]] == dims[[2]],,
+    Print['Error in MatrixExpTaylor: Matrix must be square']
+  ];
+
+
+
+  n = 1.0;
+  fac = 1.0;
+
+  S = IdentityMatrix[dims[[1]]];
+  T = A;
+
+  errRes = MatrixNorm2[T];
+  While[ (errRes > tol),
+
+    S = S + (1.0/fac)*T;
+
+    n = n + 1;
+    fac = fac*n;
+    T = A.T;
+
+    If[ n > nMax, Break[]];
+    errRes = MatrixNorm2[T]/fac;
+
+(*    Print['Residual error is ', errRes]*)
+  ];
+
+  Return[S];
+];
+
+
+
+
+
+
+
+(*
+MatrixNorm2
+
+	Author  : Christopher K. Allen
+	Created : March, 2005
+
+
+Computes the (square) of l2 norm of a matrix.  Thus, the returned value
+is Sum_ij a_ij^2.
+
+  Arguments:
+  A - Target matrix
+*)
+
+MatrixNorm2[A_] := MatrixInnerProd2[A,A];
+
+
+
+
+(*
+MatrixInnerProd2
+
+	Author  : Christopher K. Allen
+	Created : March, 2005
+
+
+Computes the l2 inner product of two matrices.  Matrices must
+have the same dimensions.
+
+  Returned Value:
+  <A,B> elementwise
+
+*)
+
+MatrixInnerProd2[A_, B_] := Module[
+  {
+   i, j,
+   sum,
+   dimsA,
+   dimsB
+  },
+
+  dimsA = Dimensions[A];
+  dimsB = Dimensions[B];
+
+
+  (* Check the arguments *)
+  If[dimsA[[1]] == dimsB[[1]],, 
+    Print['Error: Matrix dimensions ARE NOT equal']
+  ];  
+  If[dimsA[[2]] == dimsB[[2]],,
+    Print['Error: Matrix dimensions ARE NOT equal']
+  ];
+
+
+  (* Due the l_2 inner product *)
+  sum = 0.0;
+  For [i=0, i<dimsA[[1]],
+    For [j=0, j<dimsA[[2]], 
+      sum = sum + A[i,j]*B[i,j],
+    j++],
+  i++]; 
+
+  Return[sum];
+];
+
+
+
+
+(* 
+MatrixZassen
+
+	Author	:	Christopher K. Allen
+	Created	:	March, 2005
+
+Computes and returns the first few terms in the Zassenhaus formula.
+Currently computing out to second order only.
+*)
+
+MatrixZassen[A_,B_] := Module[ 
+  {T1, T2, Z},
+
+  T1 = MatrixCommutator[A, B];
+  T2 = MatrixCommutator[A, T1] + MatrixCommutator[B,T1];
+
+  Z = A + B + 0.5*T1 + (1./12.)*T2;
+
+  Return[Z];
+];
+
+
+(*
+MatrixCommutator
+
+	Author	:	Christopher K. Allen
+	Created	:	March, 2005
+
+Computes and returns the commutator of two matrices.
+*) 
+
+MatrixCommutator[A_,B_] := Module[
+  {dimsA, dimsB},
+
+  dimsA = Dimensions[A];
+  dimsB = Dimensions[B];
+
+  If [(dimsA[[1]] == dimsA[[2]]) && (dimsB[[1]] == dimsB[[2]]) && (dimsA[[1]] == dimsB[[1]]), 
+    Return[A.B - B.A];
+  ];
+];
+
+
+
+
+Protect[MatrixExp, MatrixExpTaylor, MatrixLog, MatrixLogTaylor, MatrixNorm2, MatrixInnerProd2, MatrixZassen, MatrixCommutator];
+EndPackage[];

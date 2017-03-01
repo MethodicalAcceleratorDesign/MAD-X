@@ -1,0 +1,275 @@
+!!! This SAD script was developed by H. Koiso
+
+FFS;
+
+(* Read MAD INPUT file *)
+
+! Load file
+  file1="Dogbone.madin";
+
+  RADDEG=Pi/180;
+  (SQRT*x_)^:=Sqrt[x];
+  (SIN*x_)^:=Sin[x];
+  (COS*x_)^:=Cos[x];
+  (TAN*x_)^:=Tan[x];
+  (cosinv^x_)^:=1/Cos[x];
+  (sininv^x_)^:=1/Sin[x];
+
+!  (1/SIN)^:=sininv;
+!  (sininv*x_)^:=1/Sin[x];
+
+! Remove comments from the text
+  RemoveComment[x_]:=Module[{p},
+    p=StringPosition[x,"!"];
+    If[p=={},
+      x,
+      x[1,p[[1,1]]-1]]
+    ];
+
+! Replace colon by comma
+  ReplaceColon[x_]:=Module[{p},
+    p=StringPosition[x,":"];
+    If[p=={},
+      x,
+      If[x[p[[1,1]]+1,p[[1,1]]+1]=="=",
+        x,
+        x[1,p[[1,1]]-1]//","//x[p[[1,1]]+1,-1]]]
+    ];
+
+  ListToExp[x_]:=ToExpression["{"//x//"}"];
+
+  SelectType[x_]:=Module[{y},
+   y=x[[1,2]];
+   If[y<=>EndOfFile,
+    Switch[ToUpperCase[y],
+      "DRIFT",AppendTo[dDRIFT,x],
+      "SBEND",AppendTo[dBEND,x],
+      "RBEND",AppendTo[dRBEND,x],
+      "QUAD", AppendTo[dQUAD,x],
+      "QUADRUPOLE", AppendTo[dQUAD,x],
+      "SEXT", AppendTo[dSEXT,x],
+      "SEXTUPOLE", AppendTo[dSEXT,x],
+      "MULTIPOLE", AppendTo[dMULT,x],
+
+      "KICKER",  AppendTo[dKICKER,x],
+      "HKICKER", AppendTo[dHKICKER,x],
+      "VKICKER", AppendTo[dVKICKER,x],
+     
+      "SOLENOID",AppendTo[dSOL,x],
+      "RFCAVITY",AppendTo[dCAVI,x],
+
+      "MONITOR",AppendTo[dMONITOR,x],
+      "HMONITOR",AppendTo[dHMONITOR,x],
+      "VMONITOR",AppendTo[dVMONITOR,x],
+      "MARKER",AppendTo[dMARK,x],
+
+      _,If[ToUpperCase[y][1,4]=="LINE",AppendTo[dLINE,x],AppendTo[dMISC,x]]],AppendTo[dMISC,x]]];  
+
+
+  funlist1={"COS(ANGIP)","COS(ANGIR)","COS(ANGMB)","COS(ANGMB/2)","COS(ANGIR+ANGISPB/2)","COS(ANGIR+ANGISPB)",
+    "SIN(ANGIR)","SIN(ANGMB)","SIN(ANGISPB/2)","SIN(ANGMB/2)","SIN(ANGIR+ANGISPB/2)","SIN(ANGIR+ANGISPB)"};
+  funlist2=(StringReplace[#,{("COS("->"Cos["),("SIN("->"Sin[")}])[1,-2]//"]"&/@funlist1;
+  rules=Join[MapThread[(#1->#2)&,{funlist1,funlist2}],
+ {("K1."->"K1$"),("K2."->"K2$"),("L."->"L$"),("[L]"->"$L"),("/COS"->"cosinv^"),("/SIN"->"sininv^")}];
+! {("K1."->"K1$"),("K2."->"K2$"),("L."->"L$"),("[L]"->"$L"),("SQRT"->"Sqrt"),("/COS"->"cosinv^"),("/SIN"->"sininv^")}];
+!  rules={("K1."->"K1$"),("L."->"L$"),("[L]"->"$L")};
+!  rules={("K1."->"K1$"),("L."->"L$"),("[L]"->"$L"),("/COS"->"cosinv^"),("/SIN"->"sininv^")};
+
+  Misc[x_]:=If[StringMatchQ[x[[1,1]],"BEAM|beam"],
+    ToExpression[x[[1,2]]];ListToExp[x[[1,3]]],
+              ListToExp[StringReplace[ToUpperCase[x[[2]]],rules]]];
+
+! DRIFT dDRIFT1={{Name,L},.....}
+  SetDrift[x_]:=Module[{y},y=StringReplace[ToUpperCase[x[[1,3]]],rules];Print[y];ToExpression[y];y=L;
+    With[{a=Symbol[ToUpperCase[x[[1,1]]]//"$L"]},a=L];
+    {ToUpperCase[x[[1,1]]],y}];
+
+! BEND  dBEND1={{Name, L, ANG, K1, E1, E2},.....}
+  SetBend[x_]:=Module[{y,l,ang,k1,e1,e2},y=StringReplace[ToUpperCase[x[[1,3]]],rules];
+    L=.;ANGLE=.;K1=.;E1=.;E2=.;
+    ListToExp[y];
+    l  =If[NumberQ[L],L,0];
+    ang=If[NumberQ[ANGLE],ANGLE,0];
+    k1 =If[NumberQ[K1],K1,0];
+    e1 =If[NumberQ[E1],E1,0];
+    e2 =If[NumberQ[E2],E2,0];
+    With[{a=Symbol[ToUpperCase[x[[1,1]]]//"$L"]},a=L];
+    {ToUpperCase[x[[1,1]]],l,ang,k1,e1,e2}];
+
+! RBEND  dRBEND1={{Name, L, ANG, K1, E1, E2},.....}
+  SetRBend[x_]:=Module[{y,l,ang,k1,e1,e2},y=StringReplace[ToUpperCase[x[[1,3]]],rules];
+    L=.;ANGLE=.;K1=.;E1=.;E2=.;
+    ListToExp[y];
+    ang=If[NumberQ[ANGLE],ANGLE,0];
+    l  =If[ang<>0,If[NumberQ[L],L/2/Sin[ang/2]*ang,0],If[NumberQ[L],L,0],0];
+    k1 =If[NumberQ[K1],K1,0];
+    e1 =If[NumberQ[E1],E1,0];
+    e2 =If[NumberQ[E2],E2,0];
+    With[{a=Symbol[ToUpperCase[x[[1,1]]]//"$L"]},a=L];
+    {ToUpperCase[x[[1,1]]],l,ang,k1,e1,e2}];
+
+! KICKER  dBEND1={{Name, L, KICK},.....}
+  SetKicker[x_]:=Module[{y,l,k0},y=StringReplace[ToUpperCase[x[[1,3]]],rules];
+    L=.;K0=.;
+    ListToExp[y];
+    l  =If[NumberQ[L],L,0];
+    k0 =If[NumberQ[KICK],KICK,0];
+    With[{a=Symbol[ToUpperCase[x[[1,1]]]//"$L"]},a=L];
+    {ToUpperCase[x[[1,1]]],l,k0}];
+
+! QUAD  dQUAD1={{Name, L, K1,ROTATE},.....}
+  SetQuad[x_]:=Module[{y,l,k1},y=StringReplace[ToUpperCase[x[[1,3]]],rules];
+!    L=.;K1=.;
+    TILT=.;
+    ListToExp[y];
+    l=L;k1=K1;
+    rotate=If[NumberQ[TILT],TILT,0];
+    With[{a=Symbol[ToUpperCase[x[[1,1]]]//"$L"]},a=L];
+    {ToUpperCase[x[[1,1]]],l,k1,rotate}];
+
+! SEXT  dSEXT1={{Name, L, K2},.....}
+  SetSext[x_]:=Module[{y,l,k2},y=StringReplace[ToUpperCase[x[[1,3]]],rules];Print[y];
+!    L=.;K2=.;
+    ListToExp[y];
+    l=L;
+    k2 =If[NumberQ[K2],K2,0];
+    With[{a=Symbol[ToUpperCase[x[[1,1]]]//"$L"]},a=L];
+    {ToUpperCase[x[[1,1]]],l,k2}];
+
+! SEXT  dMULT1={{Name, L, K1L},.....}
+  SetMult[x_]:=Module[{y,l,k1},y=StringReplace[ToUpperCase[x[[1,3]]],rules];Print[y];
+    K1=.;
+    ListToExp[y];
+    l  =0;
+    k1 =If[NumberQ[K1L],K1L,0];
+    With[{a=Symbol[ToUpperCase[x[[1,1]]]//"$L"]},a=L];
+    {ToUpperCase[x[[1,1]]],l,k1}];
+
+! RFCAVITY  dCAVI={{Name, L, VOLT, PHI, HARM},.....}
+  SetCavi[x_]:=Module[{y,l,volt,phi,harm},y=StringReplace[ToUpperCase[x[[1,3]]],rules];
+    L=.;VOLT=.;LAG=.;HARMON=.;
+    ListToExp[y];
+    l=L;
+    volt=VOLT;
+    phi=LAG*2*Pi;
+    harm=HARMON;
+    With[{a=Symbol[ToUpperCase[x[[1,1]]]//"$L"]},a=L];
+    {ToUpperCase[x[[1,1]]],l,volt,phi,harm}];
+
+! Def Beam Line
+  MakeLine[x_]:=Module[{},
+   ToExpression[
+     StringReplace[
+       ToUpperCase[If[x[[1,3]]<=>EndOfFile,
+         If[x[[1,3]][1,1]<>"=",x[[1,2]]//","//x[[1,3]],x[[1,2]]//x[[1,3]]],
+         x[[1,2]]]],
+     {"("->"BeamLine[",")"->"]","_"->"$","LINE"->"TEMPLINE"}]
+     ];
+   ToExpression[ToUpperCase[StringReplace[x[[1,1]],{"_"->"$"}]]//"=BeamLine@@"//TEMPLINE]];
+
+
+  fno1=OpenRead[file1];
+
+  d={};e=0;
+  While[e<=>EndOfFile,e=Read[fno1,String];AppendTo[d,e]];
+  d1=Select[d,#[1,1]<>"!"&];
+
+  d1=RemoveComment/@d1;
+
+  dc1=d1;
+  d1=ReplaceColon/@d1;
+  dc2=d1;
+  d2={};n=1;
+
+!  Do[If[d1[[i]][-1]=="&",d1[[i+1]]=d1[[i]][1,-2]//d1[[i+1]],AppendTo[d2,d1[[i]]]],{i,1,Length[d1]}];
+  Do[If[(pp=StringPosition[d1[[i]],"&"])<=>{},
+    d1[[i+1]]=d1[[i]][1,pp[[1,1]]-1]//d1[[i+1]],AppendTo[d2,d1[[i]]]],{i,1,Length[d1]}];
+  d3=(fno=StringToStream[#];e=Read[fno,{Word,Word,String}];Close[fno];If[e[[1]]<=>EndOfFile,{e,#},Null[]])&/@d2;
+  Scan[(ToExpression["d"//#//"={}"])&,{"DRIFT","BEND","RBEND","QUAD","SEXT","MULT",
+    "KICKER","HKICKER","VKICKER","SOL","CAVI","MARK",
+    "MONITOR","HMONITOR","VMONITOR","LINE","MISC"}];
+
+  Scan[(SelectType[#])&,d3];
+
+  Scan[(Check[Misc[#],])&,dMISC];
+
+  dDRIFT1=SetDrift/@dDRIFT;      
+  dBEND1 =SetBend/@dBEND;      
+  dBEND2 =SetKicker/@Join[dKICKER,dHKICKER,dVKICKER];      
+  dRBEND1 =SetRBend/@dRBEND;
+  dQUAD1 =SetQuad/@dQUAD;      
+  dSEXT1 =SetSext/@dSEXT;  
+  dMULT1 =SetMult/@dMULT;
+  dCAVI1 =SetCavi/@dCAVI;  
+
+
+  dQUAD2=Select[dQUAD1,NumberQ[#[[3]]]&];    
+
+  L=.;K1=.;ANGLE=.;E1=.;E2=.;
+  SetElement[ToString[#],"MARK"]&/@dMARK[[,1,1]];
+  SetElement[ToString[#],"MONI"]&/@dMONITOR[[,1,1]];
+  SetElement[ToString[#],"MONI"]&/@dHMONITOR[[,1,1]];
+  SetElement[ToString[#],"MONI"]&/@dVMONITOR[[,1,1]];
+  SetElement[ToString[#[[1]]],"DRIFT",{"L"->#[[2]]}]&/@dDRIFT1;
+  SetElement[ToString[#[[1]]],"BEND",
+    {"L"->#[[2]],"ANGLE"->#[[3]],"K1"->#[[4]]*#[[2]],
+      "E1"->If[#[[3]]<>0,#[[5]]/#[[3]],0],"E2"->If[#[[3]]<>0,#[[6]]/#[[3]],0]}]&/@dBEND1;
+  SetElement[ToString[#[[1]]],"BEND",
+    {"L"->#[[2]],"ANGLE"->#[[3]],"K1"->#[[4]]*#[[2]],
+      "E1"->If[#[[3]]<>0,#[[5]]/#[[3]],0]+0.5,"E2"->If[#[[3]]<>0,#[[6]]/#[[3]],0]+0.5}]&/@dRBEND1;
+  SetElement[ToString[#[[1]]],"BEND",
+    {"L"->#[[2]],"K0"->#[[3]]}   ]&/@dBEND2;
+  SetElement[ToString[#[[1]]],"QUAD",{"L"->#[[2]],"K1"->#[[3]]*#[[2]],"ROTATE"->#[[4]]}]&/@dQUAD2;
+  SetElement[ToString[#[[1]]],"SEXT",{"L"->#[[2]],"K2"->#[[3]]*#[[2]]}]&/@dSEXT1;
+  SetElement[ToString[#[[1]]],"MULT",{"L"->#[[2]],"K1"->#[[3]]}]&/@dMULT1;
+  SetElement[ToString[#[[1]]],"CAVI",{"L"->#[[2]],"VOLT"->#[[3]],"PHI"->#[[4]],"HARM"->#[[5]]}]&/@dCAVI1;
+
+  SetElement["IN","MARK"];
+ ! MakeLine/@dLINE;
+  templine={};
+  Scan[(MakeLine[#];AppendTo[templine,TEMPLINE])&,dLINE];
+
+
+!use RING
+use RING$ROT;
+!Print[RING$ROT];abort;
+Print[MOMENTUM];abort;
+ cell calc;
+ MOMENTUM=5E9;
+ Element["FREQ","CAV"]=497.28E6;
+ Element["PHI","CAV"]=0;
+ Element["VOLT","CAV"]=25e6;
+ Element["ROTATE","BV"]=Pi/2;
+ Element["ANGLE","BV"]=0;
+ calc save;
+!abort;
+!end
+
+(*
+ dr:=OpticsPlot[{{"BX","BY"},{"EX","EY"}},Names->"R*Q*"];
+
+  w0=KBMainFrame["Temp",fmain,Title->" Temp ",Geometry->ToGeometry[{,,50,30}]];
+  c=Canvas[fmain,Width->1000,Height->600];
+  $DisplayFunction=CanvasDrawer;
+  Canvas$Widget=c;
+*)
+
+ WriteSADDeck[file_,linename_,title_]:=(
+    fno=OpenWrite[file];
+    Write[fno,"!"//title];
+    FFS["t;",fno];
+    Write[fno,"  LINE "//linename//"="];
+    WriteBeamLine[fno,ExtractBeamLine[],Format->"MAIN"];
+    Write[fno,";"];
+    Write[fno,
+              " FFS USE="//linename//";\n",
+              "  MOMENTUM="//MOMENTUM//";\n",
+              "  cell calc;\n",
+              "  end"];
+    Close[fno];
+   );
+
+ WriteSADDeck["Dogbone.sad","RING","TESLA Damping Ring"];
+
+abort;
+end

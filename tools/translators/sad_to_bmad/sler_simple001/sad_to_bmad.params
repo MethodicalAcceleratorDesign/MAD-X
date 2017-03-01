@@ -1,0 +1,39 @@
+# Please see the DOC file for known limitations of this translation script.
+
+sad_lattice_file = "sler_simple001.sad"          # Put here the name of the SAD lattice file.
+bmad_lattice_file = ""              # If blank then add .bmad suffix to the sad lattice file name.
+lattice_geometry = "closed"               # Set to 'open' or 'closed' to set the lattice geometry.
+
+# In tracking, SAD puts an "fshift" to shift a particle's z-position through every element. 
+#   This is done so that the closed orbit will have pz approximately zero.
+#   [pz shifts would show up in SuperKEKB where the reference orbit is through the center 
+#   of the solenoid but the on-energy particle orbit is displaced due to the crossing angle.] 
+#   Bmad patch elements can be inserted just before RF cavities to mimic this.
+
+patch_for_fshift = None    # None => Insert patches only if fshift is defined and nonzero in the sad file.
+													 # Set to True to always insert patches. False to always not insert.
+
+# If there is an "fshift" defined in the sad lattice, the value of this needs to be modified
+# to take into account small variations in tracking between Bmad/PTC and SAD. In this case, the
+# program sad_to_bmad_postprocess needs to be run. 
+
+sad_to_bmad_postprocess_exe = "Local_Dir/bmad_dist/production/bin/sad_to_bmad_postprocess"
+
+# What the time shifts are needed depend upon whether PTC or Bmad will be used for
+# any simulations. 
+
+calc_fshift_for = 'ptc'        # Or 'bmad'
+
+# SAD mark elements which have an offset are translated to a marker element that 
+#   is superimposed on the lattice. The ignore_marker_offsets switch means 
+#   that the offset is ignored and no superposition is done. 
+
+ignore_marker_offsets = False
+
+# Header_lines is for putting in custom stuff into the Bmad lattice file.
+# For example, setting beam_start[...], etc.
+
+header_lines = ''' ''' 
+
+
+

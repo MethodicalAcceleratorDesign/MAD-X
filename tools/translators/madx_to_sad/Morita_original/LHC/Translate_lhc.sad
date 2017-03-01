@@ -1,0 +1,23 @@
+ ;
+ FFS;
+
+! Step 1: Load the library for SAD to MADX translation
+ Get["../MADX2SAD.n"];
+
+! Step 3: Load MAD-X lattice
+ mx2s=MADX2SAD["lhc_optics_opt2016_coll400.madx"];
+
+! Step 3: Check beam line list
+ SeqList=mx2s@BeamLineList;
+
+! Step 4: Do translation and write to file
+ fn=OpenWrite["lhc_optics_opt2016_coll400.sad"];
+ Write[fn,"!\n! MADX2SAD: MAD-X to SAD lattice translator developed by A. Morita.\n!\n"];
+ Do[
+   bline=mx2s@ExportBeamLine[SeqList[[1]]];
+   Do[
+     WriteString[fn,bline[[k]],"\n"]
+     ,{k,Length[bline]}]
+   ,{i,Length[SeqList]}];
+ Close[fn];
+ abort;

@@ -1,0 +1,41 @@
+! Job sample for FCC-ee
+option, warn,info, -echo;
+
+! Load sequence file
+!call, file="../FCCee_t_85_by2_nosol.plain.seq";
+
+! Geometry
+call, file="../FCCee_t_85_by2_nosol.plain.seq";
+! Strengths
+call, file="../FCCee_t_85_by2_nosol.plain.str";
+
+! Beam definition
+beam, sequence=RING, bv= 1, energy=175,  particle=positron,
+  npart=1.7e11,kbunch=81, ex=-5.988064486386255e-15,ey=0.;
+
+use, sequence=RING;
+
+/*
+! Convert to THIN
+option, info,  warn, -echo;
+call,   file="slice.madx";
+option, echo, warn, info;
+makethin, sequence=RING;
+*/
+
+set,format="22.15e";
+select,flag=twiss,clear;
+select,flag=twiss,column=name,s,betx,bety,alfx,alfy,dx,dpx,dy,dpy,mux,muy,x,y,px,py;
+
+use, sequence=RING;
+survey, file=survey_FCCee_t_85_by2_nosol.tfs;
+twiss, file=twiss.tfs;
+
+/*
+! Check thin lens model
+select, flag=makethin, class=rbend, slice=50; ! slice all quadrupoles in 5 slices
+makethin,sequence=RING;
+use,sequence=RING;      ! use the thin sequence
+twiss,file=twiss_thin.tfs;    ! to allow to compare in output if betx,dx max etc agree to some percent with the thick twiss results
+!save,sequence=RING,file="FCCee_t_85_by2_nosol.plain_thin.seq";
+*/

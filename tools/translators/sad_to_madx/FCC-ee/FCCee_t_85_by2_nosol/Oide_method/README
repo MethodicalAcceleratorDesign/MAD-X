@@ -1,0 +1,4 @@
+2017.02.22:
+Use Oide's translator:
+1) edit Translate_Oide.sad [Make relevant changes]
+4) sad64 Translate_Oide.sad >log.Translate

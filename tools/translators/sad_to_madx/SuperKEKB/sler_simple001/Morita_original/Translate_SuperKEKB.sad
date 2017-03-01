@@ -1,0 +1,33 @@
+ ;
+ FFS;
+
+! Step 1: Load the library for SAD to MADX translation
+ Get["SAD2MADX_DZ.n"];
+
+! Step 2: Load SAD lattice and do basic optics calculation.
+ GetMAIN["sler_simple001.sad"];
+ USE ASC;     ! Select beam line
+ CELL;CALC;   ! Optics calculation
+
+! Step 3: Make a copy of SAD2MADX class
+ s2mx=SAD2MADX;
+
+! Step 4: Set flags for controlling the translation
+! s2mx@ExpandSteeringLinearFringe=False;
+! s2mx@ExpandQuadrupoleLinearFringe=False;
+! s2mx@ExpandMULTwithKicker=False;
+
+! Step 5: Do lattice translation
+! begin0=1;end0=begin0+9; ! Test
+ begin0="^^^";end0="$$$"; ! Full beamline
+ bseq=s2mx@ExportBeamLine[begin0,end0];
+
+! Step 6: Write to file
+ fn=OpenWrite["sler_simple001.seq"];
+ Write[fn,"!\n! SAD2MADX: SAD to MAD-X lattice translator developed by A. Morita.\n!\n"];
+ Do[
+   WriteString[fn,bseq[[i]],"\n"]
+   ,{i,Length[bseq]}];
+ Close[fn];
+
+ abort;

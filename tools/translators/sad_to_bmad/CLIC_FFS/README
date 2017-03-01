@@ -1,0 +1,4 @@
+2017.03.01:
+Local_Dir/bmad_dist/util_programs/sad_to_bmad/sad_to_bmad.py sad_to_bmad.params 
+with Local_Dir set to the local directory where Bmad code is installed.
+NOTE: Make relevant change to the input file sad_to_bmad.params

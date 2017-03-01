@@ -1,0 +1,12 @@
+;
+FFS;
+
+Get["SAD2MADX_DZ.n"];
+
+GetMAIN["sler_simple001.sad"];
+USE ASC;
+s2mx=SAD2MADX[fname->"sler_simple001", 
+     dir->"../sler_simple001"];
+s2mx@CreateMADX[];
+
+abort;

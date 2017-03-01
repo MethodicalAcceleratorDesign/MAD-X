@@ -1,0 +1,1547 @@
+!
+! SAD to MADX lattice translator
+!
+! Maintainor: A.Morita(4794)
+! Revision:   $Id: SAD2MADX.n,v 1.66 2008/09/13 12:22:03 amorita Exp $
+! Style:      Class Library
+! Require:
+!
+
+!D.Z., Use MatrixFunctions.n instead of c library
+! Using MatrixFunctions.n may slow the translation down for huge lattice
+!Library@Require["SAD/Math/MatrixFunctions"];
+Get["/Users/deminzhou/Myresearch/SAD/Translator/sad_to_madx/src/Morita_Method/MatrixFunctions.n"];
+
+! <<< SAD2MADX$Translation class >>>
+SAD2MADX$Translation = Class[{}, {},
+  { ExpandSteeringLinearFringe = True,
+    ExpandQuadrupoleLinearFringe = True,
+    ExpandMULTwithKicker = True,
+    ForceExpandRotate = False,
+    MinimumSliceNumber = 5,
+    SliceNumber, ExpandByMatrix 
+    },
+
+  SliceNumber$[type_] := Max[SliceNumber[type], MinimumSliceNumber];
+
+  SliceTable[type_String] := SliceTable[SliceNumber$[type]];
+
+  SliceTable[n$_Real] := With[{n = Max[1, Round[n$]]},
+    Which[
+      n < 6,	GaussLegendreTable[n],
+      True,	Thread[{(Range[n] - 0.5) / n, 1 / n}]]];
+
+  (* Gauss-Legendre weighting table for [0,1] *)
+  GaussLegendreTable[1] := {
+    {1 / 2,				1},
+    Null[]};
+
+  GaussLegendreTable[2] := {
+    {(1 - Sqrt[1/3]) / 2,		1 / 2},
+    {(1 + Sqrt[1/3]) / 2,		1 / 2},
+    Null[]};
+
+  GaussLegendreTable[3] := {
+    {(1 - Sqrt[3/5]) / 2,		5 / 18},
+    {1 / 2,				4 /  9},
+    {(1 + Sqrt[3/5]) / 2,		5 / 18},
+    Null[]};
+
+  GaussLegendreTable[4] := {
+    {(1 - Sqrt[(3 + 2 * Sqrt[6/5]) / 7]) / 2,	(18 - Sqrt[30]) / 72},
+    {(1 - Sqrt[(3 - 2 * Sqrt[6/5]) / 7]) / 2,	(18 + Sqrt[30]) / 72},
+    {(1 + Sqrt[(3 - 2 * Sqrt[6/5]) / 7]) / 2,	(18 + Sqrt[30]) / 72},
+    {(1 + Sqrt[(3 + 2 * Sqrt[6/5]) / 7]) / 2,	(18 - Sqrt[30]) / 72},
+    Null[]};
+
+  GaussLegendreTable[5] := {
+    {(1 - Sqrt[5 + 2 * Sqrt[10/7]] / 3) / 2,	(322 - 13 * Sqrt[70]) / 1800},
+    {(1 - Sqrt[5 - 2 * Sqrt[10/7]] / 3) / 2,	(322 + 13 * Sqrt[70]) / 1800},
+    {1 / 2,					128 / 450},
+    {(1 + Sqrt[5 - 2 * Sqrt[10/7]] / 3) / 2,	(322 + 13 * Sqrt[70]) / 1800},
+    {(1 + Sqrt[5 + 2 * Sqrt[10/7]] / 3) / 2,	(322 - 13 * Sqrt[70]) / 1800},
+    Null[]};
+
+  GaussLegendreTable[n_Real] := GaussLegendreTable[Restrict[Round[n], 1, 5]];
+
+  (* Mix-In class module to define translation rules *)
+  TranslateElement["DRIFT", name_String, pos_Real, length_Real,
+    param_List] := (
+      If[ExpandByMatrix["DRIFT"], Return[TranslateElement["MATRIX",
+	name, pos, length, Override["ROTATE"->0, param]/.{
+	  Rule["transfer", m_List]->Rule["rm", m],
+	  Rule["cod$kick", b_List]->Rule["kick", b],
+	  Null[]}]]];
+
+      {});
+
+  TranslateElement["BEND", name_String, pos_Real, length_Real,
+    param_List] := Module[{rotate, angle, e1, e2, ae1, ae2, f1, k0, k1,
+      hgap, kicker, rotateK, sliceID = 0, posN = pos},
+      If[ExpandByMatrix["BEND"], Return[TranslateElement["MATRIX",
+	name, pos, length, Override["ROTATE"->0, param]/.{
+	  Rule["transfer", m_List]->Rule["rm", m],
+	  Rule["cod$kick", b_List]->Rule["kick", b],
+	  Null[]}]]];
+
+      rotate = If[ForceExpandRotate, 0, "ROTATE"/.Override[param, "ROTATE"->0]];
+      {angle, e1, e2, ae1, ae2, f1, k0, k1} = {
+	"ANGLE", "E1", "E2", "AE1", "AE2", "F1", "K0", "K1"}/.Override[param,
+	  "ANGLE"->0, "E1"->0, "E2"->0, "AE1"->0, "AE2"->0,
+	  "F1"->0, "K0"->0, "K1"->0];
+
+      ae1 += angle * e1;
+      ae2 += angle * e2;
+
+      hgap = If[length > 0, length / 10, 0.1];
+      kicker  =  If[Abs[rotate + Pi/2] < Pi/4, "vkicker",     "hkicker"];
+      rotateK =  If[Abs[rotate + Pi/2] < Pi/4, rotate + Pi/2, rotate];
+
+      Which[
+	Abs[angle] > 0 && length == 0, ( (* Thin BEND *)
+	  {
+	    Null@@TranslateElement["ELEMENT/ENT", name, pos, length,
+	      Override["ExpandRotate"->False, param]],
+
+	    Null@@TranslateElement["MATRIX", name, pos, length, Override[
+	      "kick"->{0, -k0, 0, 0, 0, 0},
+	      "rm"->{
+		{     1, 0, 0, 0, 0, 0},
+		{     0, 1, 0, 0, 0, angle + k0},
+		{     0, 0, 1, 0, 0, 0},
+		{     0, 0, 0, 1, 0, 0},
+		{-angle, 0, 0, 0, 1, 0},
+		{     0, 0, 0, 0, 0, 1}},
+	      param]],
+
+	    Null@@TranslateElement["ELEMENT/EXT", name, pos, length,
+	      Override["ExpandRotate"->False, param]],
+
+	    Null[]}),
+
+	Abs[angle] > 0, Join[
+	  TranslateElement["ELEMENT/ENT", name, pos, length, param],
+	  TranslateElement["STEER/ENT/F1", name, pos, length, param],
+
+	  Which[
+	    k0 == 0, {
+	      {"sbend", name, pos, length,
+		{ "l"->length,
+		  If[rotate == 0, Null[], "tilt"->-rotate],
+		  If[angle == 0, Null[], "angle"->angle],
+		  If[ae1 == 0, Null[], "e1"->ae1],
+		  If[ae2 == 0, Null[], "e2"->ae2],
+		  If[f1 == 0, Null[], "fint"->f1 / hgap / 12],
+		  If[f1 == 0, Null[], "hgap"->hgap],
+		  If[k1 == 0, Null[], "k1"->k1 / length],
+		  Null[]},
+		{
+		  Null[]}},
+
+	      Null[]},
+
+	    True, Append[
+	      Join@@Map[With[{offset = #[[1]], weight = #[[2]], pos0 = posN,
+		name$ = name//"."//sliceID},
+		sliceID += 1; posN = pos + offset * length; {
+
+		  {"sbend", name$, pos0, posN - pos0,
+		    { "l"->posN - pos0,
+		      If[rotate == 0, Null[], "tilt"->-rotate],
+		      If[angle == 0, Null[], "angle"->angle * (posN - pos0) / length],
+		      If[sliceID <> 0 || ae1 == 0, Null[], "e1"->ae1],
+		      If[f1 == 0, Null[], "fint"->f1/hgap/12],
+		      If[f1 == 0, Null[], "hgap"->hgap],
+		      If[k1 == 0, Null[], "k1"->k1 / length],
+		      Null[]},
+		    {
+		      Null[]}},
+
+		  {kicker, name$//".K0", posN, 0,
+		    { If[rotateK == 0, Null[], "tilt"->-rotateK],
+		      If[k0 == 0, Null[], "kick"->-k0 * weight],
+		      Null[]},
+		    {
+		      Null[]}},
+
+		  Null[]}]&, SliceTable["BEND"]],
+
+	      {"sbend", name//"."//sliceID, posN, pos + length - posN,
+		{ "l"->pos + length - posN,
+		  If[rotate == 0, Null[], "tilt"->-rotate],
+		  If[angle == 0, Null[], "angle"->angle * (pos + length - posN) / length],
+		  If[ae2 == 0, Null[], "e2"->ae2],
+		  If[f1 == 0, Null[], "fint"->f1/hgap/12],
+		  If[f1 == 0, Null[], "hgap"->hgap],
+		  If[k1 == 0, Null[], "k1"->k1 / length],
+		  Null[]},
+		{
+		  Null[]}}]],
+
+	  TranslateElement["STEER/EXT/F1", name, pos, length, param],
+	  TranslateElement["ELEMENT/EXT", name, pos, length, param],
+
+	  Null[]],
+
+	(* ANGLE == 0 *)
+	k1 <> 0 && k0 == 0, TranslateElement["QUAD", name, pos, length,
+	  Override["F1"->0, "F2"->0, param]],
+
+	True, Join[
+	  TranslateElement["ELEMENT/ENT", name, pos, length, param],
+	  TranslateElement["STEER/ENT/F1", name, pos, length, param],
+
+	  Join@@Map[With[{offset = #1[[1]], weight = #1[[2]], pos0 = posN,
+	    name$ = name//"."//sliceID},
+	    sliceID += 1; posN = pos + offset * length; {
+	      {kicker, name$, pos0, posN - pos0,
+		{ If[rotateK == 0, Null[], "tilt"->-rotateK],
+		  If[k0 == 0, Null[], "kick"->-k0 * (posN - pos0) / length],
+		  Null[]},
+		{
+		  Null[]}},
+
+	      If[k1 <> 0, {"multipole", name$//".K1", posN, 0,
+		{ If[rotate == 0, Null[], "tilt"->rotate],
+		  "knl"->{0, k1 / length * weight},
+		  Null[]},
+		{
+		  Null[]}}, Null[]],
+
+	      Null@@With[{Fy = If[length > 0,
+		-(k0 / length) * Tan[k0 * weight], 0]},
+		If[Fy <> 0, TranslateElement["MATRIX", name$//".Fy", posN, 0,
+		  Override[
+		    "rm"->{
+		      {1, 0,  0, 0, 0, 0},
+		      {0, 1,  0, 0, 0, 0},
+		      {0, 0,  1, 0, 0, 0},
+		      {0, 0, Fy, 1, 0, 0},
+		      {0, 0,  0, 0, 1, 0},
+		      {0, 0,  0, 0, 0, 1}},
+		    param]], {}]],
+
+	      Null[]}]&, SliceTable["BEND/STEER"]],
+
+	  {
+	    {kicker, name//"."//sliceID, posN, pos + length - posN,
+	      { If[rotateK == 0, Null[], "tilt"->-rotateK],
+		If[k0 == 0, Null[], "kick"->-k0 * (pos + length - posN) / length],
+		Null[]},
+	      {
+		Null[]}},
+
+	    Null[]},
+
+	  TranslateElement["STEER/EXT/F1", name, pos, length, param],
+	  TranslateElement["ELEMENT/EXT", name, pos, length, param],
+
+	  Null[]],
+
+	True,	TranslateElement["MULT", name, pos, length,
+	 Override["F1"->0, "F2"->0, param]]]];
+
+  TranslateElement["QUAD", name_String, pos_Real, length_Real,
+    param_List] := Module[{rotate, k1},
+      If[ExpandByMatrix["QUAD"], Return[TranslateElement["MATRIX",
+	name, pos, length, Override["ROTATE"->0, param]/.{
+	  Rule["transfer", m_List]->Rule["rm", m],
+	  Rule["cod$kick", b_List]->Rule["kick", b],
+	  Null[]}]]];
+
+      {rotate, k1} = {"ROTATE", "K1"}/.Override[param, "ROTATE"->0, "K1"->0];
+
+      If[ForceExpandRotate, rotate = 0];
+
+      Which[
+	length > 0,
+	{
+	  Null@@TranslateElement["ELEMENT/ENT", name, pos, length, param],
+	  Null@@TranslateElement["QUAD/ENT/F1", name, pos, length, param],
+
+	  {"quadrupole", name, pos, length,
+	    { "l"->length,
+	      If[rotate == 0, Null[], "tilt"->-rotate],
+	      If[k1 == 0, Null[], "k1"->(k1 / length)],
+	      Null[]},
+	    {
+	      Null[]}},
+
+	  Null@@TranslateElement["QUAD/EXT/F1", name, pos, length, param],
+	  Null@@TranslateElement["ELEMENT/EXT", name, pos, length, param],
+
+	  Null[]},
+
+	True,	TranslateElement["MULT", name, pos, length, param]]];
+
+  TranslateElement["SEXT", name_String, pos_Real, length_Real,
+    param_List] := Module[{rotate, k2},
+      If[ExpandByMatrix["SEXT"], Return[TranslateElement["MATRIX",
+	name, pos, length, Override["ROTATE"->0, param]/.{
+	  Rule["transfer", m_List]->Rule["rm", m],
+	  Rule["cod$kick", b_List]->Rule["kick", b],
+	  Null[]}]]];
+
+      {rotate, k2} = {"ROTATE", "K2"}/.Override[param, "ROTATE"->0, "K2"->0];
+
+      If[ForceExpandRotate, rotate = 0];
+
+      Which[
+	length > 0,
+	{
+	  Null@@TranslateElement["ELEMENT/ENT", name, pos, length, param],
+
+	  {"sextupole", name, pos, length,
+	    { "l"->length,
+	      If[rotate == 0, Null[], "tilt"->-rotate],
+	      If[k2 == 0, Null[], "k2"->(k2 / length)],
+	      Null[]},
+	    {
+	      Null[]}},
+
+	  Null@@TranslateElement["ELEMENT/EXT", name, pos, length, param],
+
+	  Null[]},
+
+	True,	TranslateElement["MULT", name, pos, length, param]]];
+
+  TranslateElement["OCT", name_String, pos_Real, length_Real,
+    param_List] := Module[{rotate, k3},
+      If[ExpandByMatrix["OCT"], Return[TranslateElement["MATRIX",
+	name, pos, length, Override["ROTATE"->0, param]/.{
+	  Rule["transfer", m_List]->Rule["rm", m],
+	  Rule["cod$kick", b_List]->Rule["kick", b],
+	  Null[]}]]];
+
+      {rotate, k3} = {"ROTATE", "K3"}/.Override[param, "ROTATE"->0, "K3"->0];
+
+      If[ForceExpandRotate, rotate = 0];
+
+      Which[
+	length > 0,
+	{
+	  Null@@TranslateElement["ELEMENT/ENT", name, pos, length, param],
+
+	  {"octupole", name, pos, length,
+	    { "l"->length,
+	      If[rotate == 0, Null[], "tilt"->-rotate],
+	      If[k3 == 0, Null[], "k3"->(k3 / length)],
+	      Null[]},
+	    {
+	      Null[]}},
+
+	  Null@@TranslateElement["ELEMENT/EXT", name, pos, length, param],
+
+	  Null[]},
+
+	True,
+	TranslateElement["MULT", name, pos, length, param]]];
+
+  TranslateElement["DECA", name_String, pos_Real, length_Real,
+    param_List] := Module[{rotate, k4},
+      If[ExpandByMatrix["DECA"], Return[TranslateElement["MATRIX",
+	name, pos, length, Override["ROTATE"->0, param]/.{
+	  Rule["transfer", m_List]->Rule["rm", m],
+	  Rule["cod$kick", b_List]->Rule["kick", b],
+	  Null[]}]]];
+
+      {rotate, k4} = {"ROTATE", "K4"}/.Override[param, "ROTATE"->0, "K4"->0];
+
+      If[ForceExpandRotate, rotate = 0];
+
+      Which[
+	length > 0 && False,
+	{
+	  Null@@TranslateElement["ELEMENT/ENT", name, pos, length, param],
+
+	  {"decapole", name, pos, length,
+	    { "l"->length,
+	      If[rotate == 0, Null[], "tilt"->-rotate],
+	      If[k4 == 0, Null[], "k4"->(k4 / length)],
+	      Null[]},
+	    {
+	      Null[]}},
+
+	  Null@@TranslateElement["ELEMENT/EXT", name, pos, length, param],
+
+	  Null[]},
+
+	True,	TranslateElement["MULT", name, pos, length, param]]];
+
+  TranslateElement["DODECA", name_String, pos_Real, length_Real,
+    param_List] := Module[{rotate, k5},
+      If[ExpandByMatrix["DODECA"], Return[TranslateElement["MATRIX",
+	name, pos, length, Override["ROTATE"->0, param]/.{
+	  Rule["transfer", m_List]->Rule["rm", m],
+	  Rule["cod$kick", b_List]->Rule["kick", b],
+	  Null[]}]]];
+
+      {rotate, k5} = {"ROTATE", "K5"}/.Override[param, "ROTATE"->0, "K5"->0];
+
+      If[ForceExpandRotate, rotate = 0];
+
+      Which[
+	length > 0 && False,
+	{
+	  Null@@TranslateElement["ELEMENT/ENT", name, pos, length, param],
+
+	  {"dodecapole", name, pos, length,
+	    { "l"->length,
+	      If[rotate === 0, Null[], "tilt"->-rotate],
+	      If[k5 === 0, Null[], "k5"->(k5 / length)],
+	      Null[]},
+	    {
+	      Null[]}},
+      
+	  Null@@TranslateElement["ELEMENT/EXT", name, pos, length, param],
+
+	  Null[]},
+
+	True,	TranslateElement["MULT", name, pos, length, param]]];
+
+  TranslateElement["MULT", name_String, pos_Real, length_Real,
+    param_List] := Module[{rotate, knl, ksl, k0, sk0, rotateK},
+      If[ExpandByMatrix["MULT"], Return[TranslateElement["MATRIX",
+	name, pos, length, Override["ROTATE"->0, param]/.{
+	  Rule["transfer", m_List]->Rule["rm", m],
+	  Rule["cod$kick", b_List]->Rule["kick", b],
+	  Null[]}]]];
+
+      rotate = If[ForceExpandRotate, 0, "ROTATE"/.Override[param, "ROTATE"->0]];
+
+      knl = Map[If[RealQ[#], #, 0]&, {
+	"K0",   "K1",   "K2",   "K3",   "K4",
+	"K5",   "K6",   "K7",   "K8",   "K9",
+	"K10",  "K11",  "K12",  "K13",  "K14",
+	"K15",  "K16",  "K17",  "K18",  "K19",
+	"K20",  "K21"}/.param];
+      ksl = Map[If[RealQ[#], #, 0]&, {
+	"SK0",  "SK1",  "SK2",  "SK3",  "SK4",
+	"SK5",  "SK6",  "SK7",  "SK8",  "SK9",
+	"SK10", "SK11", "SK12", "SK13", "SK14",
+	"SK15", "SK16", "SK17",	"SK18", "SK19",
+	"SK20", "SK21"}/.param];
+
+      While[Length[knl] > 0 && Last[knl] == 0, knl = Drop[knl, -1]];
+      While[Length[ksl] > 0 && Last[ksl] == 0, ksl = Drop[ksl, -1]];
+
+      k0 = 0; sk0 = 0;
+      If[ExpandMULTwithKicker,
+	If[Length[knl] > 0,  k0  = First[knl]; knl[[1]] = 0];
+	If[Length[ksl] > 0, sk0  = First[ksl]; ksl[[1]] = 0];
+	rotateK = rotate];
+
+      Which[
+	Max[Length[knl], Length[ksl]] < 2, Join[
+	  TranslateElement["ELEMENT/ENT", name, pos, length, param],
+
+	  If[k0 <> 0 || sk0 <> 0,
+	    {
+	      {"kicker", name, pos, length,
+		{ "l"->length,
+		  If[rotateK == 0, Null[], "tilt"->-rotateK],
+		  If[ k0 == 0, Null[], "hkick"->- k0],
+		  If[sk0 == 0, Null[], "vkick"-> sk0],
+		  Null[]},
+		{
+		  Null[]}},
+
+	      Null[]},
+
+	    With[{tbl = SliceTable["MULT"]},
+	      MapThread[With[{offset = #1[[1]], weight = #1[[2]],
+		name$ = name//"."//#2},
+		{"multipole", name$, pos + offset * length, 0,
+		  { If[rotate == 0, Null[], "tilt"->-rotate],
+		    If[knl === {}, Null[], "knl"->knl * weight],
+		    If[ksl === {}, Null[], "ksl"->ksl * weight],
+		    Null[]},
+		  {
+		    Null[]}}]&, {tbl, Range[Length[tbl]]}]]],
+
+	  TranslateElement["ELEMENT/EXT", name, pos, length, param],
+
+	  Null[]],
+
+	(* Split thick multipole into thin multipoles *)
+	length > 0, With[{tbl = SliceTable["MULT"]}, Join[
+	  TranslateElement["ELEMENT/ENT", name, pos, length, param],
+	  TranslateElement["QUAD/ENT/F1", name, pos, length, param],
+
+	  Join@@MapThread[With[{offset = #1[[1]], weight = #1[[2]],
+	  name$ = name//"."//#2}, {
+
+	    If[k0 <> 0 || sk0 <> 0, {"kicker", name$//".ent.K0", pos + offset * length, 0,
+	      { If[rotateK == 0, Null[], "tilt"->-rotateK],
+		If[ k0 == 0, Null[], "hkick"->-0.5 *  k0 * weight],
+		If[sk0 == 0, Null[], "vkick"-> 0.5 * sk0 * weight],
+		Null[]},
+	      {
+		Null[]}}, Null[]],
+
+	    {"multipole", name$, pos + offset * length, 0,
+	      { If[rotate == 0, Null[], "tilt"->-rotate],
+		If[knl === {}, Null[], "knl"->knl * weight],
+		If[ksl === {}, Null[], "ksl"->ksl * weight],
+		Null[]},
+	      {
+		Null[]}},
+
+	    If[k0 <> 0 || sk0 <> 0, {"kicker", name$//".ext.K0", pos + offset * length, 0,
+	      { If[rotateK == 0, Null[], "tilt"->-rotateK],
+		If[ k0 == 0, Null[], "hkick"->-0.5 *  k0 * weight],
+		If[sk0 == 0, Null[], "vkick"-> 0.5 * sk0 * weight],
+		Null[]},
+	      {
+		Null[]}}, Null[]],
+
+	    Null[]}]&, {tbl, Range[Length[tbl]]}],
+
+	  TranslateElement["QUAD/EXT/F1", name, pos, length, param],
+	  TranslateElement["ELEMENT/EXT", name, pos, length, param],
+
+	  Null[]]],
+
+	True,
+	{
+	  Null@@TranslateElement["ELEMENT/ENT", name, pos, length, param],
+
+	  If[k0 <> 0 || sk0 <> 0, {"kicker", name//".ent.K0", pos, 0,
+	    { If[rotateK == 0, Null[], "tilt"->-rotateK],
+	      If[ k0 == 0, Null[], "hkick"->-0.5 *  k0],
+	      If[sk0 == 0, Null[], "vkick"-> 0.5 * sk0],
+	      Null[]},
+	    {
+	      Null[]}}, Null[]],
+
+	  {"multipole", name, pos + length / 2, 0,
+	    { If[rotate == 0, Null[], "tilt"->-rotate],
+	      If[knl === {}, Null[], "knl"->knl],
+	      If[ksl === {}, Null[], "ksl"->ksl],
+	      Null[]},
+	    {
+	      Null[]}},
+
+	  If[k0 <> 0 || sk0 <> 0, {"kicker", name//".ext.K0", pos + length, 0,
+	    { If[rotateK == 0, Null[], "tilt"->-rotateK],
+	      If[ k0 == 0, Null[], "hkick"->-0.5 *  k0],
+	      If[sk0 == 0, Null[], "vkick"-> 0.5 * sk0],
+	      Null[]},
+	    {
+	      Null[]}}, Null[]],
+
+	  Null@@TranslateElement["ELEMENT/EXT", name, pos, length, param],
+
+	  Null[]}]];
+
+  TranslateElement["CAVI", name_String, pos_Real, length_Real,
+    param_List] := Module[{volt, freq, harm, phi},
+      If[ExpandByMatrix["CAVI"], Return[TranslateElement["MATRIX",
+	name, pos, length, Override["ROTATE"->0, param]/.{
+	  Rule["transfer", m_List]->Rule["rm", m],
+	  Rule["cod$kick", b_List]->Rule["kick", b],
+	  Null[]}]]];
+
+      {volt, freq, harm, phi} = {"VOLT", "FREQ", "HARM", "PHI"}/.Override[param,
+	"VOLT"->0, "FREQ"->0, "HARM"->0, "PHI"->0];
+
+      Which[
+	True,
+	{
+	  Null@@TranslateElement["ELEMENT/ENT", name, pos, length, param],
+
+	  {"rfcavity", name, pos, length,
+	    { "l"->length,
+	      If[volt === 0, Null[], "volt"->volt / 1e6],
+	      If[freq === 0, If[harm === 0, Null[], "harmon"->harm],
+		"freq"->freq / 1e6],
+	      If[phi  === 0, Null[], "lag"->0.5 + phi / 2 / Pi],
+	      Null[]},
+	    {
+	      Null[]}},
+
+	  Null@@TranslateElement["ELEMENT/EXT", name, pos, length, param],
+
+	  Null[]}]];
+
+  TranslateElement["TCAVI", name_String, pos_Real, length_Real,
+    param_List] := Module[{mass, beta, gamma,
+      k0, freq, harm, phi},
+      If[ExpandByMatrix["TCAVI"], Return[TranslateElement["MATRIX",
+	name, pos, length, Override["ROTATE"->0, param]/.{
+	  Rule["transfer", m_List]->Rule["rm", m],
+	  Rule["cod$kick", b_List]->Rule["kick", b],
+	  Null[]}]]];
+
+      {k0, freq, harm, phi} = {"K0", "FREQ", "HARM", "PHI"}/.Override[param,
+	"K0"->0, "FREQ"->0, "HARM"->0, "PHI"->0];
+      {mass, beta, gamma} = {"Mass", "Beta", "Gamma"}/.Override[param,
+	"Mass"->MASS,
+	"Beta"->MOMENTUM / MASS / Sqrt[1+(MOMENTUM/MASS)^2],
+	"Gamma"->Sqrt[1+(MOMENTUM/MASS)^2]];
+
+      Which[
+	True,
+	{
+	  Null@@TranslateElement["ELEMENT/ENT", name, pos, length,
+	    Override["ExpandRotate"->True, param]],
+
+	  {"crabcavity", name, pos, length,
+	    { "l"->length,
+	      If[k0 === 0, Null[], "volt"->k0 * (mass * gamma) / 1e6],
+	      If[freq === 0, If[harm === 0, Null[], "harmon"->harm],
+		"freq"->freq / 1e6],
+	      If[phi  === 0, Null[], "lag"->0.5 + phi / 2 / Pi],
+	      Null[]},
+	    {
+	      Null[]}},
+
+	  Null@@TranslateElement["ELEMENT/EXT", name, pos, length,
+	    Override["ExpandRotate"->True, param]],
+
+	  Null[]}]];
+
+  TranslateElement["SOL/DRIFT", name_String, pos_Real, length_Real,
+    param_List] := Module[{ks},
+      ks = "KS"/.Override[param, "KS"->0];
+
+      If[ks == 0, Return[{}]];
+
+      If[ExpandByMatrix["SOL/DRIFT"], Return[TranslateElement["MATRIX",
+	name, pos, length, Override["ROTATE"->0, param]/.{
+	  Rule["transfer", m_List]->Rule["rm", m],
+	  Rule["cod$kick", b_List]->Rule["kick", b],
+	  Null[]}]]];
+
+      {
+	{"solenoid", name, pos, length,
+	  { "l"->length,
+	    "ks"->ks,
+	    Null[]},
+	  {
+	    Null[]}},
+
+	Null[]}];
+
+  TranslateElement["SOL/MULT", name_String, pos_Real, length_Real,
+    param_List] := Module[{rotate, ks, knl, ksl, k0, sk0, rotateK,
+      sliceID = 0, posN = pos},
+      rotate = If[ForceExpandRotate, 0, "ROTATE"/.Override[param, "ROTATE"->0]];
+      ks = "KS"/.Override[param, "KS"->0];
+
+      If[Not[length > 0] || ks == 0,
+	Return[TranslateElement["MULT", name, pos, length, param]]];
+
+      If[ExpandByMatrix["SOL/MULT"], Return[TranslateElement["MATRIX",
+	name, pos, length, Override["ROTATE"->0, param]/.{
+	  Rule["transfer", m_List]->Rule["rm", m],
+	  Rule["cod$kick", b_List]->Rule["kick", b],
+	  Null[]}]]];
+
+      knl = Map[If[RealQ[#], #, 0]&, {
+	"K0",   "K1",   "K2",   "K3",   "K4",
+	"K5",   "K6",   "K7",   "K8",   "K9",
+	"K10",  "K11",  "K12",  "K13",  "K14",
+	"K15",  "K16",  "K17",  "K18",  "K19",
+	"K20",  "K21"}/.param];
+      ksl = Map[If[RealQ[#], #, 0]&, {
+	"SK0",  "SK1",  "SK2",  "SK3",  "SK4",
+	"SK5",  "SK6",  "SK7",  "SK8",  "SK9",
+	"SK10", "SK11", "SK12", "SK13", "SK14",
+	"SK15", "SK16", "SK17",	"SK18", "SK19",
+	"SK20", "SK21"}/.param];
+
+      While[Length[knl] > 0 && Last[knl] == 0, knl = Drop[knl, -1]];
+      While[Length[ksl] > 0 && Last[ksl] == 0, ksl = Drop[ksl, -1]];
+
+      k0 = 0; sk0 = 0;
+      If[ExpandMULTwithKicker,
+	If[Length[knl] > 0,  k0  = First[knl]; knl[[1]] = 0];
+	If[Length[ksl] > 0, sk0  = First[ksl]; ksl[[1]] = 0];
+	rotateK = rotate];
+
+      With[{tbl = SliceTable["SOL/MULT"]}, Join[
+	Join@@Map[With[{offset = #[[1]], weight = #[[2]], pos0 = posN,
+	  sol$ = name//".sol"//sliceID,
+	  name$ = name//"."//sliceID},
+	  sliceID += 1; posN = pos + offset * length;
+
+	  Which[
+	    Max[Length[knl], Length[ksl]] < 2, {
+	      {"solenoid", sol$, pos0, posN - pos0,
+		{ "l"->posN - pos0,
+		  "ks"->ks,
+		  Null[]},
+		{
+		  Null[]}},
+
+	      Null@@TranslateElement["ELEMENT/ENT", name$, posN, 0, param],
+
+	      If[k0 <> 0 || sk0 <> 0,
+		{"kicker", name$, posN, 0,
+		  { If[rotate == 0, Null[], "tilt"->-rotateK],
+		    If[ k0 == 0, Null[], "hkick"->- k0 * weight],
+		    If[sk0 == 0, Null[], "vkick"-> sk0 * weight],
+		    Null[]},
+		  {
+		    Null[]}},
+		{"multipole", name$, posN, 0,
+		  { If[rotate == 0, Null[], "tilt"->-rotate],
+		    If[knl === {}, Null[], "knl"->knl],
+		    If[ksl === {}, Null[], "ksl"->ksl],
+		    Null[]},
+		  {
+		    Null[]}}],
+
+	      Null@@TranslateElement["ELEMENT/EXT", name$, posN, 0, param],
+
+	      Null[]},
+
+	    True, {
+	      {"solenoid", sol$, pos0, posN - pos0,
+		{ "l"->posN - pos0,
+		  "ks"->ks,
+		  Null[]},
+		{
+		  Null[]}},
+
+	      Null@@TranslateElement["ELEMENT/ENT", name$, posN, 0, param],
+
+	      If[k0 <> 0 || sk0 <> 0, {"kicker", name$//".ent.K0", posN, 0,
+		{ If[rotate == 0, Null[], "tilt"->-rotateK],
+		  If[ k0 == 0, Null[], "hkick"->-0.5 *  k0 * weight],
+		  If[sk0 == 0, Null[], "vkick"-> 0.5 * sk0 * weight],
+		  Null[]},
+		{
+		  Null[]}}, Null[]],
+
+	      {"multipole", name$, posN, 0,
+		{ If[rotate == 0, Null[], "tilt"->-rotate],
+		  If[knl === {}, Null[], "knl"->knl * weight],
+		  If[ksl === {}, Null[], "ksl"->ksl * weight],
+		  Null[]},
+		{
+		  Null[]}},
+
+	      If[k0 <> 0 || sk0 <> 0, {"kicker", name$//".ext.K0", posN, 0,
+		{ If[rotate == 0, Null[], "tilt"->-rotateK],
+		  If[ k0 == 0, Null[], "hkick"->-0.5 *  k0 * weight],
+		  If[sk0 == 0, Null[], "vkick"-> 0.5 * sk0 * weight],
+		  Null[]},
+		{
+		  Null[]}}, Null[]],
+
+	      Null@@TranslateElement["ELEMENT/EXT", name$, posN, 0, param],
+
+	      Null[]}]]&, tbl],
+
+	{
+	  If[pos + length > posN,
+	    {"solenoid", name//".sol"//sliceID,
+	      posN, pos + length - posN,
+	      { "l"->pos + length - posN,
+		"ks"->ks,
+		Null[]},
+	      {
+		Null[]}}, Null[]],
+
+	  Null[]},
+
+	Null[]]]];
+
+  TranslateElement["SOL", name_String, pos_Real, length_Real,
+    param_List] := Module[{insol, bound,
+      dx, dy, dz, dpx, dpy, chi1, chi2, chi3,
+      r11, r12, r13, r21, r22, r23, r31, r32, r33,
+      mass, beta, gamma, cod0, cod, p,
+      xi, yi,     pxi, pyi, pzi,
+      xf, yf, zf, pxf, pyf, pzf, dpzfdpx, dpzfdpy, dpzfdp, dvemit,
+      kick, rm},
+      If[ExpandByMatrix["SOL"], Return[TranslateElement["MATRIX",
+	name, pos, length, Override["ROTATE"->0, param]/.{
+	  Rule["transfer", m_List]->Rule["rm", m],
+	  Rule["cod$kick", b_List]->Rule["kick", b],
+	  Null[]}]]];
+
+      {insol, bound} = {"InSolenoid", "BOUND"}/.Override[param,
+	"InSolenoid"->False, "BOUND"->False];
+
+      If[Not[bound], Return[{}]];
+
+      {mass, beta, gamma} = {"Mass", "Beta", "Gamma"}/.Override[param,
+	"Mass"->MASS,
+	"Beta"->MOMENTUM / MASS / Sqrt[1+(MOMENTUM/MASS)^2],
+	"Gamma"->Sqrt[1+(MOMENTUM/MASS)^2]];
+
+      {dx, dy, dz, dpx, dpy, chi1, chi2, chi3} = {
+	"DX", "DY", "DZ", "DPX", "DPY", "CHI1", "CHI2", "CHI3"}/.Override[param,
+	"DX"->0, "DY"->0, "DZ"->0, "DPX"->0, "DPY"->0,
+	  "CHI1"->0, "CHI2"->0, "CHI3"->0];
+
+      (* Create coordinate translation based on src/tsconv.f *)
+      rm   = IdentityMatrix[6];		(* trans1 *)
+
+      (* Get entrance COD *)
+      cod  = ZeroVector[6];
+      cod0 = "cod"/.Override[param, "cod"->cod];
+
+      p = 1 + cod0[[6]];
+      pxi = cod0[[2]];
+      pyi = cod0[[4]];
+      pzi = p - (pxi^2 + pyi^2) / (p + Sqrt[(p - pyi) * (p + pyi) - pxi^2]);
+      If[insol,
+	( (* Entry *)
+	  xi  = cod0[[1]];
+	  yi  = cod0[[3]]),
+	( (* Exit  *)
+	  xi  = cod0[[1]] - dx;
+	  yi  = cod0[[3]] - dy)];
+
+      { {r11, r12, r13},
+	{r21, r22, r23},
+	{r31, r32, r33}} = With[{
+	c1 = Cos[chi1], s1 = Sin[chi1],
+	c2 = Cos[chi2], s2 = Sin[chi2],
+	c3 = Cos[chi3], s3 = Sin[chi3]}, {
+	  { c1 c3 + s1 s2 s3, -c2 s3, s1 c3 - c1 s2 s3},
+	  { c1 s3 - s1 s2 c3,  c2 c3, s1 s3 + c1 s2 c3},
+	  {-s1 c2,            -s2,            c1 c2},
+	  Null[]}];
+
+      xf  = r11 *  xi + r12 *  yi;
+      yf  = r21 *  xi + r22 *  yi;
+      zf  = r31 *  xi + r32 *  yi;
+
+      pxf = r11 * pxi + r12 * pyi + r13 * pzi;
+      pyf = r21 * pxi + r22 * pyi + r23 * pzi;
+      pzf = r31 * pxi + r32 * pyi + r33 * pzi;
+
+      dpzfdpx = r31 - r33 * pxi / pzi;
+      dpzfdpy = r32 - r33 * pyi / pzi;
+      dpzfdp  =       r33 * p   / pzi;
+
+      dvemit  = 0;
+      If[?RADCOD, With[{	(* Radiation correction *)
+	dp = cod0[[6]],
+	p0 = beta * gamma,
+	p1 = beta * gamma * (1 + cod0[[6]]),
+	h0 = gamma,
+	h1 = Sqrt[1 + (beta * gamma * (1 + cod0[[6]]))^2],
+	},
+	dvemit = -(p1 + p0) / h1 / (p0 * h1 + p1 * h0) * dp]];
+
+      rm[[2,2]] = r11 - r13 * pxi / pzi;
+      rm[[2,4]] = r12 - r13 * pyi / pzi;
+      rm[[2,6]] =       r13 * p   / pzi;
+
+      rm[[4,2]] = r21 - r23 * pxi / pzi;
+      rm[[4,4]] = r22 - r23 * pyi / pzi;
+      rm[[4,6]] =       r23 * p   / pzi;
+
+      rm[[1,1]] = r11 - r31 * pxf / pzf;
+      rm[[1,3]] = r12 - r32 * pxf / pzf;
+
+      rm[[3,1]] = r21 - r31 * pyf / pzf;
+      rm[[3,3]] = r22 - r32 * pyf / pzf;
+
+      rm[[5,1]] =       r31 * p   / pzf;
+      rm[[5,3]] =       r32 * p   / pzf;
+
+      rm[[1,2]] = -zf / pzf * (rm[[2,2]] - pxf / pzf * dpzfdpx);
+      rm[[1,4]] = -zf / pzf * (rm[[2,4]] - pxf / pzf * dpzfdpy);
+      rm[[1,6]] = -zf / pzf * (rm[[2,6]] - pxf / pzf * dpzfdp );
+
+      rm[[3,2]] = -zf / pzf * (rm[[4,2]] - pyf / pzf * dpzfdpx);
+      rm[[3,4]] = -zf / pzf * (rm[[4,4]] - pyf / pzf * dpzfdpy);
+      rm[[3,6]] = -zf / pzf * (rm[[4,6]] - pyf / pzf * dpzfdp );
+
+      rm[[5,2]] =  zf / pzf * (          - p   / pzf * dpzfdpx);
+      rm[[5,4]] =  zf / pzf * (          - p   / pzf * dpzfdpy);
+      rm[[5,6]] =  zf / pzf * (1.0       - p   / pzf * dpzfdp );
+      (* Note: rm[[6,2]] = rm[[6,4]] = 0, rm[[6,6]] = 1 *)
+
+      cod[[2]] = pxf;
+      cod[[4]] = pyf;
+      cod[[6]] = cod0[[6]];
+      If[insol,
+	( (* Entry *)
+	  cod[[1]] = xf        - pxf / pzf * zf + dx;
+	  cod[[3]] = yf        - pyf / pzf * zf + dy;
+	  cod[[5]] = cod0[[5]] + p   / pzf * zf + dz),
+	( (* Exit  *)
+	  cod[[1]] = xf        - pxf / pzf * zf;
+	  cod[[3]] = yf        - pyf / pzf * zf;
+	  cod[[5]] = cod0[[5]] + p   / pzf * zf + dz - dvemit * dz)];
+
+      (* Generate affine translation's displace vector `b': y = T.x + b *)
+      kick = cod - rm.cod0;
+
+      TranslateElement["MATRIX",
+	name//If[insol, ".ent", ".ext"]//".SOL", pos, 0,
+	Override["kick"->kick, "rm"->rm, param]]];
+
+  TranslateElement["APERT", name_String, pos_Real, length_Real,
+    param_List] := Module[{
+      dx1, dx2, dy1, dy2, xsize, ysize},
+      {dx1, dx2, dy1, dy2} = {"DX1", "DX2", "DY1", "DY2"}/.Override[param,
+	Null[]];
+
+      xsize = If[RealQ[dx1] && RealQ[dx2], Abs[dx2 - dx1] / 2, Infinity];
+      ysize = If[RealQ[dy1] && RealQ[dy2], Abs[dy2 - dy1] / 2, Infinity];
+
+      {
+	Null@@TranslateElement["ELEMENT/ENT", name, pos, length,
+	  Override["ExpandRotate"->True, param]],
+
+	{"rcollimator", name, pos, length,
+	  { "l"->length,
+	    If[xsize > 1e10, Null[], "xsize"->xsize],
+	    If[ysize > 1e10, Null[], "ysize"->ysize],
+	    Null[]},
+	  {
+	    Null[]}},
+
+	Null@@TranslateElement["ELEMENT/EXT", name, pos, length,
+	  Override["ExpandRotate"->True, param]],
+
+	Null[]}];
+
+  TranslateElement["SOL/MONI"|"MONI", name_String, pos_Real, length_Real,
+    param_List] := {{"monitor", name, pos, 0, {}, {}}};
+
+  TranslateElement["SOL/MARK"|"MARK", name_String, pos_Real, length_Real,
+    param_List] := {{"marker",  name, pos, 0, {}, {}}};
+
+  (* Special element for internal use *)
+  TranslateElement["ELEMENT/ENT", name_String, pos_Real, length_Real,
+    param_List] := Module[{dx, dy, rotate, expRot},
+      {dx, dy, rotate, expRot} = {
+	"DX", "DY", "ROTATE", "ExpandRotate"}/.Override[param,
+	  "DX"->0, "DY"->0, "ROTATE"->0, "ExpandRotate"->ForceExpandRotate];
+
+      {
+	If[dx <> 0 || dy <> 0,
+	  {"matrix", name//".ent.offset", pos, 0,
+	    {
+	      "kick1"->-dx,
+	      "kick3"->-dy,
+	      Null[]},
+	    {
+	      Null[]}}, Null[]],
+
+	If[expRot && rotate <> 0,
+	  {"matrix", name//".ent.rotate", pos, 0,
+	    {
+	      "rm11"-> Cos[rotate], "rm13"->-Sin[rotate],
+	      "rm31"-> Sin[rotate], "rm33"-> Cos[rotate],
+	      "rm22"-> Cos[rotate], "rm24"->-Sin[rotate],
+	      "rm42"-> Sin[rotate], "rm44"-> Cos[rotate],
+	      Null[]},
+	    {
+	      Null[]}}, Null[]],
+
+	Null[]}];
+
+  TranslateElement["ELEMENT/EXT", name_String, pos_Real, length_Real,
+    param_List] := Module[{dx, dy, rotate, expRot},
+      {dx, dy, rotate, expRot} = {
+	"DX", "DY", "ROTATE", "ExpandRotate"}/.Override[param,
+	  "DX"->0, "DY"->0, "ROTATE"->0, "ExpandRotate"->ForceExpandRotate];
+
+      {
+	If[expRot && rotate <> 0,
+	  {"matrix", name//".ext.rotate", pos + length, 0,
+	    {
+	      "rm11"-> Cos[rotate], "rm13"-> Sin[rotate],
+	      "rm31"->-Sin[rotate], "rm33"-> Cos[rotate],
+	      "rm22"-> Cos[rotate], "rm24"-> Sin[rotate],
+	      "rm42"->-Sin[rotate], "rm44"-> Cos[rotate],
+	      Null[]},
+	    {
+	      Null[]}}, Null[]],
+
+	If[dx <> 0 || dy <> 0,
+	  {"matrix", name//".ext.offset", pos + length, 0,
+	    {
+	      "kick1"-> dx,
+	      "kick3"-> dy,
+	      Null[]},
+	    {
+	      Null[]}}, Null[]],
+
+	Null[]}];
+
+  TranslateElement["STEER/ENT/F1", name_String, pos_Real, length_Real,
+    param_List] := Module[{rotate, k0, f1, fringe, angle, e1, ae1, e2, ae2,
+      al, dxfr, dyfr, rm},
+      If[Not[length > 0], Return[{}]];
+
+      rotate = If[ForceExpandRotate, 0, "ROTATE"/.Override[param, "ROTATE"->0]];
+      {k0, f1, fringe} = {"K0", "F1", "FRINGE"}/.Override[param,
+	"K0"->0, "F1"->0, "FRINGE"->0];
+      {angle, e1, ae1, e2, ae2} = {
+	"ANGLE", "E1", "AE1", "E2", "AE2"}/.Override[param,
+	  "ANGLE"->0, "E1"->0, "AE1"->0, "E2"->0, "AE2"->0];
+
+      ae1 += e1 * angle;
+      ae2 += e2 * angle;
+
+      If[Not[ExpandSteeringLinearFringe], fringe = 0];
+
+      If[k0 == 0, fringe = 0];	! Disable fringe
+
+      al = length;
+      If[angle <> 0,
+	al -= (angle * f1)^2 / length / 24 *
+	  Sin[0.5 * (angle - ae1 - ae2)] / Sin[0.5 * angle]];
+      dxfr = f1^2 * k0 / al / 24;
+      dyfr = f1 * k0^2 / al^2 / 6;
+
+      If[Not[fringe <> 0 && f1 <> 0], {},
+	(* Construct un-rotated fringe field map *)
+	rm = IdentityMatrix[6];
+
+	rm[[1,6]] =  dxfr;
+	rm[[4,3]] = (dyfr - Tan[ae1] * k0 / al);
+	rm[[5,4]] =  dxfr;
+	rm[[5,1]] = -dxfr * Tan[ae1] * k0 / al;
+
+	TranslateElement["MATRIX", name//".ent.F1", pos, 0,
+	  Override["rm"->rm, param]]]];
+
+  TranslateElement["STEER/EXT/F1", name_String, pos_Real, length_Real,
+    param_List] := Module[{rotate, k0, f1, fringe, angle, e1, ae1, e2, ae2,
+      al, dxfr, dyfr, rm},
+      If[Not[length > 0], Return[{}]];
+
+      rotate = If[ForceExpandRotate, 0, "ROTATE"/.Override[param, "ROTATE"->0]];
+      {k0, f1, fringe} = {"K0", "F1", "FRINGE"}/.Override[param,
+	"K0"->0, "F1"->0, "FRINGE"->0];
+      {angle, e1, ae1, e2, ae2} = {
+	"ANGLE", "E1", "AE1", "E2", "AE2"}/.Override[param,
+	  "ANGLE"->0, "E1"->0, "AE1"->0, "E2"->0, "AE2"->0];
+
+      ae1 += e1 * angle;
+      ae2 += e2 * angle;
+
+      If[Not[ExpandSteeringLinearFringe], fringe = 0];
+
+      If[k0 == 0, fringe = 0];	! Disable fringe
+
+      al = length;
+      If[angle <> 0,
+	al -= (angle * f1)^2 / length / 24 *
+	  Sin[0.5 * (angle - ae1 - ae2)] / Sin[0.5 * angle]];
+      dxfr = f1^2 * k0 / al / 24;
+      dyfr = f1 * k0^2 / al^2 / 6;
+
+      If[Not[fringe <> 0 && f1 <> 0], {},
+	(* Construct un-rotated fringe field map *)
+	rm = IdentityMatrix[6];
+
+	rm[[1,6]] = -dxfr;
+	rm[[4,3]] = (dyfr - Tan[ae2] * k0 / al);
+	rm[[5,4]] = -dxfr;
+	rm[[5,1]] = -dxfr * Tan[ae2] * k0 / al;
+
+	TranslateElement["MATRIX", name//".ext.F1", pos + length, 0,
+	  Override["rm"->rm, param]]]];
+
+  TranslateElement["QUAD/ENT/F1", name_String, pos_Real, length_Real,
+    param_List] := Module[{k1, f1, f2, fringe},
+      If[Not[length > 0], Return[{}]];
+
+      {k1, f1, f2, fringe} = {"K1", "F1", "F2", "FRINGE"}/.Override[param,
+	"K1"->0, "F1"->0, "F2"->0, "FRINGE"->0];
+
+      (* Disable dringe *)
+      If[Or[
+	Not[ExpandQuadrupoleLinearFringe],
+	k1 == 0,
+	f1 == 0 && f2 == 0,
+	False], fringe = 0];
+
+      (* Convert F1/F2 into dimensionless parameter f1/f2 *)
+      f1 = -f1 * Abs[f1] / 24;
+      f1 *= k1 / length;
+      f2 *= k1 / length;
+
+      If[Not[BitwiseAnd[fringe, 1]], {},
+	TranslateElement["TQLFRE", name//".ent.F1", pos, 0,
+	  Override["af1"-> f1, "af2"->f2, param]]]];
+
+  TranslateElement["QUAD/EXT/F1", name_String, pos_Real, length_Real,
+    param_List] := Module[{k1, f1, f2, fringe},
+      If[Not[length > 0], Return[{}]];
+
+      {k1, f1, f2, fringe} = {"K1", "F1", "F2", "FRINGE"}/.Override[param,
+	"K1"->0, "F1"->0, "F2"->0, "FRINGE"->0];
+
+      (* Disable dringe *)
+      If[Or[
+	Not[ExpandQuadrupoleLinearFringe],
+	k1 == 0,
+	f1 == 0 && f2 == 0,
+	False], fringe = 0];
+
+      (* Convert F1/F2 into dimensionless parameter f1/f2 *)
+      f1 = -f1 * Abs[f1] / 24;
+      f1 *= k1 / length;
+      f2 *= k1 / length;
+
+      If[Not[BitwiseAnd[fringe, 2]], {},
+	TranslateElement["TQLFRE", name//".ext.F1", pos + length, 0,
+	  Override["af1"->-f1, "af2"->f2, param]]]];
+
+  TranslateElement["TQLFRE", name_String, pos_Real, _Real,
+    param_List] := Module[{af1, af2, ks,
+      cod0, cod, p,
+      a, b, ea, bp, bzph, bb, f, fdp,
+      xf, yf, pxf, pyf,
+      kick, rm},
+      {af1, af2, ks} = {"af1", "af2", "KS"}/.Override[param,
+	"af1"->0, "af2"->0, "KS"->0];
+
+      ks = 0; (* Disable solenoid support at Now *)
+
+      cod = "cod"/.Override[param, "cod"->ZeroVector[6]];
+      cod0 = cod;	(* COD at entrance *)
+
+      (* Create coordinate translation based on src/tqlfre.f *)
+      rm   = IdentityMatrix[6];		(* trans1 *)
+
+      p = 1 + cod0[[6]];
+      a = af1 / p;
+      b = af2 / p;
+      ea = Exp[a];
+      bp = b / p;
+
+      bzph = 0.5 * ks;
+      bb   = bp * bzph;
+      f    = 1 / ((1 - bb) * (1 + bb));
+      fdp  = 2 * f * bb^2 / p;
+
+      xf  = (ea * cod[[1]] + bp * (cod[[2]] + bzph * cod[[3]] / ea - bb * cod[[4]])) * f;
+      yf  = (cod[[3]] / ea - bp * (cod[[4]] - bzph * cod[[1]] * ea - bb * cod[[2]])) * f;
+      pxf = (cod[[2]] + bzph * yf) / ea;
+      pyf = (cod[[4]] - bzph * xf) * ea;
+
+      rm[[1,1]] =  ea * f;
+      rm[[1,2]] =  bp * f;
+      rm[[1,3]] =  bp * f * bzph / ea;
+      rm[[1,4]] = -bp * f * bb;
+      rm[[1,5]] =  0;
+      rm[[1,6]] =  xf * fdp +
+	(   -a * ea * cod[[1]]
+	  - bp * (2 * cod[[2]] + bzph / ea * cod[[3]] * (2 + a)
+            -3 * bb * cod[[4]])) * f / p;
+      rm[[3,1]] =  bp * f * bzph * ea;
+      rm[[3,2]] =  bp * f * bb;
+      rm[[3,3]] =  f / ea;
+      rm[[3,4]] = -bp * f;
+      rm[[3,5]] =  0;
+      rm[[3,6]] =  yf * fdp +
+        (    a / ea * cod[[3]]
+	  + bp * (2 * cod[[4]] - bzph * ea * cod[[1]] * (2 - a)
+            -3 * bb * cod[[2]])) * f / p;
+      rm[[2,1]] =  bzph / ea * rm[[3,1]];
+      rm[[2,2]] =  (1 + bzph * rm[[3,2]]) / ea;
+      rm[[2,3]] =  bzph / ea * rm[[3,3]] - bzph;
+      rm[[2,4]] =  bzph / ea * rm[[3,4]];
+      rm[[2,5]] =  0;
+      rm[[2,6]] =   a / p * pxf + bzph / ea * rm[[3,6]];
+      rm[[4,1]] = -bzph * ea * rm[[1,1]] + bzph;
+      rm[[4,2]] = -bzph * ea * rm[[1,2]];
+      rm[[4,3]] = -bzph * ea * rm[[1,3]];
+      rm[[4,4]] =  (1 - bzph * rm[[1,4]]) * ea;
+      rm[[4,5]] =  0;
+      rm[[4,6]] = -a / p * pyf - bzph * ea * rm[[1,6]];
+      rm[[5,1]] = Plus[
+        -rm[[1,1]] * rm[[2,6]],
+ 	+rm[[2,1]] * rm[[1,6]]
+	-rm[[3,1]] * rm[[4,6]],
+	+rm[[4,1]] * rm[[3,6]]];
+      rm[[5,2]] = Plus[
+        -rm[[1,2]] * rm[[2,6]],
+	+rm[[2,2]] * rm[[1,6]],
+	-rm[[3,2]] * rm[[4,6]],
+	+rm[[4,2]] * rm[[3,6]]];
+      rm[[5,3]] = Plus[
+        -rm[[1,3]] * rm[[2,6]],
+	+rm[[2,3]] * rm[[1,6]],
+        -rm[[3,3]] * rm[[4,6]],
+	+rm[[4,3]] * rm[[3,6]]];
+      rm[[5,4]] =  Plus[
+        -rm[[1,4]] * rm[[2,6]],
+	+rm[[2,4]] * rm[[1,6]],
+        -rm[[3,4]] * rm[[4,6]],
+	+rm[[4,4]] * rm[[3,6]]];
+      rm[[5,5]] =  1;
+      rm[[5,6]] =
+	(  ((2 + a) * a * ea * cod[[1]] - bp * ea * (2 + a / 2) * pxf) / p * pxf
+          -((2 - a) * a / ea * cod[[3]] - bp / ea * (2 - a / 2) * pyf) / p * pyf
+          -(a * ea * cod[[1]] + bp * ea * (2 + a) * pxf) * rm[[2,6]]
+          +(a / ea * cod[[3]] + bp / ea * (2 - a) * pyf) * rm[[4,6]]) / p;
+
+      cod[[2]] = pxf - bzph * cod[[3]];
+      cod[[4]] = pyf + bzph * cod[[1]];
+      cod[[5]] = cod[[5]] -
+	(  (a * ea * cod[[1]] + bp * ea * (1 + a / 2) * pxf) * pxf
+          -(a / ea * cod[[3]] + bp / ea * (1 - a / 2) * pyf) * pyf) / p;
+      cod[[1]] = xf;
+      cod[[3]] = yf;
+
+      (* Generate affine translation's displace vector `b': y = T.x + b *)
+      kick = cod - rm.cod0;
+
+      TranslateElement["MATRIX", name, pos, 0,
+	Override["kick"->kick, "rm"->rm, param]]];
+
+  TranslateElement["MATRIX", name_String, pos_Real, length_Real,
+    param_List] := Module[{rotate, kick, rm, tm, rot, rotT,
+     iVector, iMatrix, iTensor},
+      rotate = If[ForceExpandRotate, 0, "ROTATE"/.Override[param, "ROTATE"->0]];
+      {kick, rm, tm} = {"kick", "rm", "tm"}/.Override[param,
+	"kick"->ZeroVector[6],
+	"rm"->IdentityMatrix[6],
+	"tm"->ZeroTensor[6]];
+
+      (* MADX:PT -> SAD:Pz conversion *)
+      With[{beta = "Beta"/.Override[param,
+	"Beta"->MOMENTUM / MASS / Sqrt[1+(MOMENTUM/MASS)^2]]},
+	rm = DiagonalMatrix[{1, 1, 1, 1, 1 / beta, beta}].rm.DiagonalMatrix[{1, 1, 1, 1, beta, 1 / beta}]];
+
+      If[rotate <> 0,	(* Rotate MATRIX element body *)
+	(* rot:  Map from lab. to element body *)
+	(* rotT: Map from element body to lab. *)
+	rot = With[{c = Cos[rotate], s = Sin[rotate]}, {
+	  { c,  0, -s,  0,  0,  0},
+	  { 0,  c,  0, -s,  0,  0},
+	  { s,  0,  c,  0,  0,  0},
+	  { 0,  s,  0,  c,  0,  0},
+	  { 0,  0,  0,  0,  1,  0},
+	  { 0,  0,  0,  0,  0,  1},
+	  Null[]}];
+	rotT = Transpose[rot];	(* rot^t === rot^{-1} *)
+
+	(*
+	 * Xin_body  = rot.Xin_lab
+	 * Xout_body = kick
+	 *           + rm.Xin_body
+	 *           + Sum_j,k tm[i,j,k] * Xin_body[j] * Xin_body[k]
+	 * Xout_lab  = rotT.Xout_body
+	 *)
+
+	kick = rotT.kick;
+	rm   = rotT.rm.rot;
+	tm   = rotT.Map[rotT.#.rot&, tm];
+	];
+
+      iVector = Range[6];
+      iMatrix = Flatten/@Flatten[Outer[List, iVector, iVector], 1];
+      iTensor = Flatten/@Flatten[Outer[List, iVector, iMatrix], 1];
+
+      {
+	{"matrix", name, pos, length,
+	  Join[
+	    If[length > 0, {"l"->length}, {}],
+
+	    Map[With[{i = #}, If[kick[[i]] == 0, Null[],
+	      "kick"//i->kick[[i]]]]&, iVector],
+
+	    Map[With[{i = #[[1]], j = #[[2]]},
+	      If[rm[[i, j]] == If[i == j, 1, 0], Null[],
+		"rm"//i//j->rm[[i,j]]]]&, iMatrix],
+
+	    Map[With[{i = #[[1]], j = #[[2]], k = #[[3]]},
+	      If[tm[[i, j, k]] == 0, Null[],
+		"tm"//i//j//k->tm[[i,j, k]]]]&, iTensor],
+
+	    Null[]],
+	  {
+	    Null[]}},
+
+	Null[]}];
+
+  (* Unsupported element handler *)
+  TranslateElement[type_String, name_String, pos_Real, length_Real,
+    param_List] := Module[{},
+      Print["Element type[", type,
+	"] is not suppoted!\t(", name, ") = ", param];
+      $Failed];
+
+  (* ZeroVector/Tensor *)
+  ZeroVector[n_Real] := Table[0, {n}];
+  ZeroTensor[n_Real] := Table[Table[Table[0, {n}], {n}], {n}];
+
+  ];
+! >>> SAD2MADX$Translation class <<<
+
+! <<< SAD2MADX class >>>
+SAD2MADX = Class[{SAD2MADX$Translation},
+  {
+    FringeDirectionConversionTable = {
+      ("FRINGE"->1)->("FRINGE"->2), ("FRINGE"->2)->("FRINGE"->1)},
+
+    EdgeDirectionConversionTable = {
+      "AE1"->"AE2", "AE2"->"AE1", "E1"->"E2", "E2"->"E1"},
+
+    ComponentDirectionConversionTable = {},
+
+    BeamLineElementScaleTable = {
+      "K0",  "SK0",  "K1",  "SK1",  "K2",  "SK2",  "K3",  "SK3",
+      "K4",  "SK4",  "K5",  "SK5",  "K6",  "SK6",  "K7",  "SK7",
+      "K8",  "SK8",  "K9",  "SK9",  "K10", "SK10", "K11", "SK11",
+      "K12", "SK12", "K13", "SK13", "K14", "SK14", "K15", "SK15",
+      "K16", "SK16", "K17", "SK17", "K18", "SK18", "K19", "SK19",
+      "K20", "SK20", "K21", "SK21",
+      "VOLT", "V1", "V20", "V11", "V02",
+      "L", "ANGLE"}
+
+    },
+
+  {
+    },
+
+  ExtractBeamLine[begin:(_Real|_String):"^^^", end:(_Real|_String):"$$$"] := Module[{
+    sequence, beamline, fractional, elements,
+    sBegin, sEnd, sBegin0, sEnd0,
+    cod$in, cod$out, transform, $cod, $tm},
+
+    {{sBegin, sBegin0}, {sEnd, sEnd0}} = Map[With[{loc = If[StringQ[#], With[{
+      posP = StringPosition[#, "+"],
+      posN = StringPosition[#, "-"]},
+      Switch[{posP <=> {}, posN <=> {}},
+	{True, _},	LINE["POSITION", #[1,posP[[-1,2]]-1]]
+	+ Check[ToExpression[#[posP[[-1,2]],-1]], 0],
+	{_, True},	LINE["POSITION", #[1,posN[[-1,2]]-1]]
+	+ Check[ToExpression[#[posN[[-1,2]],-1]], 0],
+	_,		LINE["POSITION", #]]],
+      #]},
+      With[{frac = loc - Floor[loc], pos = LINE["POSITION", loc]},
+	{ LINE["S", pos] * (1 - frac) + frac * LINE["S", NextElement$[pos]],
+	  ResolveS[loc],
+	  Null[]}]]&,
+      {begin, end}];
+
+    (* Find fractional lookup position by offseted MARKer or begin/end *)
+    fractional = Union[{sBegin, sEnd}, LINE["S", Flatten[Position[With[{
+      offset = LINE["OFFSET", #]},
+      offset - Floor[offset] > 0]&/@LINE["POSITION"], True]]]];
+
+    (* Create sequence header *)
+    sequence = {
+      "sequence"->BeamLineName[],
+      "refer"->"centre",
+      "l"->sEnd0 - sBegin0,
+      "particle"->Which[
+	Abs[MASS / ProtonMass - 1] < 1e-3,	"proton",
+	True,					"electron"],
+      "pc"->MOMENTUM / 1e9,
+      "energy"->MASS * Sqrt[1+(MOMENTUM/MASS)^2] / 1e9,
+
+      (* For internal use *)
+      "Mass"->MASS,
+      "Momentum"->MOMENTUM,
+      "BetaGamma"->MOMENTUM / MASS,
+      "Gamma"->Sqrt[1+(MOMENTUM/MASS)^2],
+      "Beta"->MOMENTUM / MASS / Sqrt[1+(MOMENTUM/MASS)^2],
+      "Brho"->MOMENTUM / CHARGE / SpeedOfLight,
+      Null[]};
+
+    (* Extracting COD and transfer matrix from Emittance[] *)
+    With[{emit = Emittance[Orbit->True, Matrix->True,
+      ExpandElementValues->False],
+      $identity = IdentityMatrix[6]},
+      $cod = ClosedOrbit/.emit;
+      $tm  = TransferMatrices/.emit;
+
+      transfer[_Real] := $identity;
+
+      Scan[With[{pos = #, next = NextElement$[#]}, Switch[LINE["TYPENAME", #],
+	"MARK",		( (* Identity element *)
+	  cod$in[pos]   = $cod[[pos]];
+	  cod$out[pos]  = cod$in[pos];
+	  ),
+
+	_,		( (* Normal element *)
+!	  transfer[pos] = $tm[[next]].SymplecticInverse[$tm[[pos]]];
+	  transfer[pos] = LinearSolve[Transpose[$tm[[pos]]], $tm[[next]], Tolerance->1e-12];
+	  cod$in[pos]   = $cod[[pos]];
+	  cod$out[pos]  = $cod[[next]];
+	  )]]&, Drop[LINE["POSITION"], -1]];
+      ];
+
+    (* Find involved elements *)
+    elements = Map[With[{pos = #, dir = LINE["DIR", #],
+      name = LINE["NAME", #], type = LINE["TYPENAME", #],
+      sC = LINE["S", #], sN = LINE["S", NextElement$[#]],
+      s  = ResolveS[#], length = LINE["L", #]},
+      If[sC > sEnd || sN < sBegin, Null[], With[{
+	param = Join[
+	  #->LINE[#, pos]&/@Element["KEYWORDS", LINE["ELEMENT", pos]],
+	  {
+	    "transfer"->transfer[pos],
+	    "cod$in"->cod$in[pos], "cod$out"->cod$out[pos],
+	    "cod$kick"->cod$out[pos] - transfer[pos].cod$in[pos],
+	    "cod"->Twiss[{"DX", "DPX", "DY", "DPY", "DZ", "DDP"}, pos],
+	    Null[]}],
+	cut = Select[fractional, sC < # < sN&]},
+	If[Length[cut] > 0,
+	  Null@@FractionalElement$[type, name, s, length, sC, sN, cut,
+	    If[dir > 0, param, ReverseElementParam$[param]]],
+	  {type, name, s, length,
+	    If[dir > 0, param, ReverseElementParam$[param]]}]]]]&,
+      Drop[LINE["POSITION"], -1]];
+
+    beamline = Map[With[{type = #[[1]], name = #[[2]],
+      s = #[[3]], length = #[[4]], param = #[[5]]},
+      {type, name, s - sBegin0, length, param}]&, Sort[Select[elements,
+	Not[#[[3]] + #[[4]] > sEnd0 || #[[3]] < sBegin0]&],
+	#1[[3]] +#1[[4]] / 2 < #2[[3]] + #2[[4]] / 2&]];
+
+    {sequence, beamline}];
+
+  ExportBeamLine[begin:(_Real|_String):"^^^", end:(_Real|_String):"$$$"] := ExportBeamLine[ExtractBeamLine[begin, end]];
+
+  ExportBeamLine[{sequence_List, beamline_List}] := DumpBeamLine$[TranslateBeamLine$[{sequence, beamline}]];
+
+  ResolveS[pos_Real] := Module[{frac = pos - Floor[pos], loc = Floor[pos]},
+    If[LINE["TYPENAME", loc] === "MARK" && LINE["OFFSET", loc] <> 0,
+      ResolveS[loc + If[LINE["DIR", loc] > 0, LINE["OFFSET", loc],
+	1 - LINE["OFFSET", loc]]] * (1 - frac) +
+	ResolveS[loc + 1] * frac,
+      Plus@@LINE["L", Range[loc - 1]] + frac * LINE["L", loc]]];
+
+  NextElement$[pos_Real] := Module[{next = Min[pos + 1, LINE["LENGTH"]]},
+    While[Or[
+      LINE["TYPENAME", next] === "MARK",
+      False], next += 1];
+    next];
+
+  ReverseElementParam$[val_List] := Module[{eval, cval},
+    (* Reverse edge angles *)
+    eval = Map[With[{src = #[[1]], dst = #[[2]]},
+      If[RealQ[src/.val], src->(dst/.val), Null[]]]&,
+      EdgeDirectionConversionTable];
+
+    (* Reverse components *)
+    cval = Map[With[{comp = #},
+      If[RealQ[comp/.val], comp->-(comp/.val), Null[]]]&,
+      ComponentDirectionConversionTable];
+
+    Override[eval, cval, val]/.FringeDirectionConversionTable];
+
+  FractionalElement$[type_String, name_String, pos_Real, length_Real,
+    begin_Real, end_Real, cut:{___Real}, param_List] := Module[{fringe, edge,
+      $tm, $in, $out, $F, $g, $Fi, $I = IdentityMatrix[6]},
+
+      {$tm, $in, $out} = {"transfer", "cod$in", "cod$out"}/.param;
+      $F = MatrixLog[$tm, 1e-14, 1e-12] / (end - begin);
+!      $g = Inverse[$tm - $I, Tolerance->1e-12].$F.($out - $tm.$in);
+      $g = LinearSolve[$tm - $I, $F.($out - $tm.$in), Tolerance->1e-12];
+!      $Fi = Inverse[$F, Tolerance->1e-12];
+
+      MapThread[With[{from = #1, to = #2,
+	offset = (#1 - begin) / (end - begin),
+	scale  = (#2 -    #1) / (end - begin),
+	suffix = StandardForm["."//#3],
+	tm$elm  = MatrixExp[(#2 -    #1) * $F],
+	tm$from = MatrixExp[(#1 - begin) * $F],
+	tm$to   = MatrixExp[(#2 - begin) * $F]},
+	{type, name//suffix, pos + offset * length, scale * length, Override[
+
+	  (* Fractional transfer matrix *)
+	  "transfer"->tm$elm,
+	  "cod$in"->LinearSolve[$F,  (tm$from - $I).$g, Tolerance->1e-12] + tm$from.$in,
+	  "cod$out"->LinearSolve[$F,  (tm$to  - $I).$g, Tolerance->1e-12] + tm$to.$in,
+	  "cod$kick"->LinearSolve[$F, (tm$elm - $I).$g, Tolerance->1e-12],
+
+	  (* Convert fringe parameter *)
+	  Switch[{type, begin <> from, end <> to, "FRINGE"/.param},
+	    {"BEND", _, _, _},		{},
+	    {_, True, True, _},		{"FRINGE"->0},
+
+	    {_, True, False, 3},	{"FRINGE"->2},
+	    {_, True, False, 1},	{"FRINGE"->0},
+
+	    {_, False, True, 3},	{"FRINGE"->1},
+	    {_, False, True, 2},	{"FRINGE"->0},
+
+	    _,				{}],
+
+	  (* Convert edge parameter *)
+	  First[SwitchCases[param,
+	    {Rule["E1"|"E2"|"AE1"|"AE2", _Real]}]]/.Flatten[{
+	      If[begin == from, {},
+		{("E1"->_Real)->("E1"->0),("AE1"->_Real)->("AE1"->0)}],
+	      If[end == to, {},
+		{("E2"->_Real)->("E2"->0),("AE2"->_Real)->("AE2"->0)}],
+	      Null[]}]/.{
+		("E1"->e1_Real)->("E1"->e1/scale),
+		("E2"->e2_Real)->("E2"->e2/scale),
+		Null[]},
+
+	  (* Scale length dependent parameter *)
+	  MapThread[If[RealQ[#2], #1->scale * #2, Null[]]&,
+	    {BeamLineElementScaleTable, BeamLineElementScaleTable/.param}],
+
+	  (* Original parameter *)
+	  param]}]&,
+	{Prepend[cut, begin], Append[cut, end], Range[Length[cut] + 1]}]];
+
+  TranslateBeamLine$[{sequence_List, beamline_List}] := StandardForm[{sequence,
+    Module[{bz = 0, insol = False, pos0 = Null,
+      Brho, opt, translate},
+      Brho = "Brho"/.Override[sequence, "Brho"->MOMENTUM/CHARGE/SpeedOfLight];
+      {opt} = SwitchCases[sequence, {
+	Rule["Mass"|"Gamma"|"Beta"|"BetaGamma", _Real]}];
+
+      With[{type = #[[1]], name = #[[2]], pos = #[[3]], length = #[[4]],
+	bound = "BOUND"/.Override[#[[5]], "BOUND"->False],
+	bz$ = "BZ"/.Override[#[[5]], "BZ"->0],
+	param = #[[5]]},
+	If[type === "SOL",
+	  If[bound, insol = Not[insol]];
+	  bz = bz$];
+	translate = TranslateElement[If[insol && type <=> "SOL",
+	  "SOL/"//type, type], name, pos, length, Override[param,
+	    Null@@opt,
+	    If[insol, "KS"->bz / Brho, Null[]],
+	    "InSolenoid"->insol]];
+	pos0 = pos + length;
+	Which[
+	  Length[translate] < 1,	Null[],
+	  Head[translate[[1]]] <=> List,translate,
+	  True,				Null@@translate]]&/@beamline]}];
+
+  DumpBeamLine$[{sequence_List, beamline_List}] := Module[{header, body,
+    name, param},
+    {name, param} = SwitchCases[sequence,
+      { Rule["sequence", _String],
+	Rule["l", _Real]}];
+
+    name = If[name <=> {}, name[[1,2]], "default"];
+    param = Override[param];
+
+    StandardForm[
+      header = StringJoin[name, " : sequence, refer = centre, ",
+	Null@@Map[With[{key = #[[1]], val = #[[2]]},
+	  StringJoin[key, " = ", val, ", "]]&, param]][1, -3]//";";
+
+      body = With[{type = #[[1]], name = #[[2]], pos = #[[3]], length = #[[4]],
+	param = #[[5]]},
+	StringJoin[name, " : ", type, ", at = ", pos + length / 2, ", ",
+	  Null@@Map[With[{key = #[[1]], val = #[[2]]},
+	    StringJoin[key, " = ", val, ", "]]&, param]][1, -3]//";"]&/@beamline;
+      ];
+
+    Join[{header}, body, {"endsequence;"}]];
+
+  ];
+  SAD2MADX@ExpandByMatrix[_] := False;
+  SAD2MADX@SliceNumber[_] := SAD2MADX@MinimumSliceNumber;
+
+! >>> SAD2MADX class <<<
+
+! End of File

@@ -1,0 +1,14 @@
+! Job sample for FCC-ee
+option, warn,info, -echo;
+
+! Load sequence file
+call, file="../lhc_optics_opt2016_coll400_full.madx";
+
+use, sequence=lhcb1;
+
+set,format="22.15e";
+select,flag=twiss,clear;
+select,flag=twiss,column=name,s,betx,bety,alfx,alfy,dx,dpx,dy,dpy,mux,muy,x,y,px,py;
+
+use, sequence=lhcb1;
+twiss, file=twiss.tfs;

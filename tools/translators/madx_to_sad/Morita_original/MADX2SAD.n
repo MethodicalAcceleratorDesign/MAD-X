@@ -1,0 +1,1011 @@
+!
+! MADX to SAD lattice translator
+!
+! Maintainor: A.Morita(4794)
+! Revision:   $Id: MADX2SAD.n,v 1.24 2008/08/04 13:47:41 amorita Exp $
+! Style:      Class Library
+! Require:
+!
+
+! <<< MADX2SAD$Translation class >>>
+MADX2SAD$Translation = Class[{}, {}, {},
+  (* Mix-In class module to define translation rules *)
+
+  (* Translate implement to do:
+    * solenoid(temporary translation to drift)
+    *)
+
+  TranslateElement["solenoid", name_String,
+    pos_Real, length_Real, bv_Real, param_List] := Module[{
+      ks, ksi},
+      {ks, ksi} = {"ks", "ksi"}/.Override[param,
+	"ks"->0, "ksi"->0];
+
+      If[Not[ks == 0 && ksi == 0],
+	Print["Solenoid",
+	  " is not suppoted!\t(", name, ") = ", param];
+	Return[$Failed]];
+
+      {"DRIFT", name, pos, length, 0,
+	{ "L"->length,
+	  Null[]},
+	{
+	  Null[]}}];
+
+  TranslateElement["rcollimator", name_String,
+    pos_Real, length_Real, bv_Real, param_List] := Module[{
+      xsize, ysize},
+      {xsize, ysize} = {"xsize", "ysize"}/.Override[param,
+	"xsize"->1e35, "ysize"->1e35];
+
+      If[length > 0,
+	Print["Thick rcollimator",
+	  " is not suppoted!\t(", name, ") = ", param];
+	Return[$Failed]];
+
+      {"APERT", name, pos, length, 0,
+	{ "DX1"->-xsize, "DX2"->xsize,
+	  "DY1"->-ysize, "DY2"->ysize,
+	  Null[]},
+	{
+	  Null[]}}];
+
+  TranslateElement["kicker", name_String,
+    pos_Real, length_Real, bv_Real, param_List] := Module[{
+      bv0, rotate, knl, ksl},
+      {bv0, rotate, knl, ksl} = {"bv", "tilt", "hkick", "vkick"}/.Override[
+	param, "bv"->False, "tilt"->0, "hkick"->0, "vkick"->0];
+
+      If[bv && Not[bv0],
+	knl *= -1;
+	ksl *= -1];
+
+      {"MULT", name, pos, length, 0,
+	{ "L"->length,
+	  If[rotate === 0, Null[], "ROTATE"->-rotate],
+	  If[knl === 0, Null[],  "K0"->-knl],
+	  If[ksl === 0, Null[], "SK0"-> ksl],
+	  Null[]},
+	{
+	  Null[]}}];
+
+  TranslateElement[type:"hkicker"|"vkicker", name_String,
+    pos_Real, length_Real, bv_Real, param_List] := Module[{
+      bv0, rotate, knl},
+      {bv0, rotate, knl} = {"bv", "tilt", "kick"}/.Override[param,
+	"bv"->False, "tilt"->0, "kick"->0];
+
+      If[bv && Not[bv0],
+	knl *= -1];
+
+      If[type === "vkicker", rotate += Pi / 2];
+
+      {"BEND", name, pos, length, 0,
+	{ "L"->length,
+	  If[rotate === 0, Null[], "ROTATE"->-rotate],
+	  If[knl === 0, Null[],  "K0"->-knl],
+	  Null[]},
+	{
+	  Null[]}}];
+
+  TranslateElement[type:"rbend"|"sbend", name_String,
+    pos_Real, length$_Real, bv_Real, param_List] := Module[{length = length$,
+      bv0, rotate, angle, k0, k1, k2, k3, e1, e2, h1, h2, fint, fintx, hgap},
+      {bv0, rotate, angle, k0, k1, k2, k3, e1, e2} = {"bv", "tilt", "angle",
+	"k0", "k1", "k2", "k3", "e1", "e2"}/.Override[param,
+	  "bv"->False, "tilt"->0, "angle"->0,
+	  "k0"->0, "k1"->0, "k2"->0, "k3"->0, "e1"->0, "e2"->0];
+      {h1, h2, fint, fintx, hgap} = {
+	"h1", "h2", "fint", "fintx", "hgap"}/.Override[param,
+	  "h1"->0, "h2"->0, "fint"->0, "fintx"->0, "hgap"->0];
+
+      If[bv,
+	angle *= -1;
+	k0 *= -1;
+	k1 *= -1;
+	k2 *= -1;
+	k3 *= -1;
+	If[bv0,
+	  angle *= -1;
+	  k0 *= -1];
+	{e1, e2} = {e2, e1};
+	{h1, h2} = {h2, h1}];
+
+      length = If[type === "rbend" && angle <> 0,
+	length$  * (angle / 2) / Sin[angle / 2], length$];
+
+      If[Abs[Abs[angle] - Abs[k0 * length$]] < 1e-7,
+	k0 = 0];
+
+      {"BEND", name, pos, length, length - length$,
+	{ "L"->length,
+	  If[rotate === 0, Null[], "ROTATE"->-rotate],
+	  If[angle === 0, Null[], "ANGLE"->angle],
+	  If[type <=> "rbend", Null[], Null["E1"->0.5, "E2"->0.5]],
+	  If[e1 === 0, Null[],  "AE1"->e1],
+	  If[e2 === 0, Null[],  "AE2"->e2],
+	  If[k0 === 0, Null[],  "K0"->(k0 * length$)],
+	  If[k1 === 0, Null[],  "K1"->(k1 * length$)],
+	  If[k2 === 0, Null[],  "K2"->(k2 * length$)],
+	  If[k3 === 0, Null[],  "K3"->(k3 * length$)],
+	  If[fint === 0, Null[], "F1"->(fint * 12 * hgap)],
+	  Null[]},
+	{
+	  Null[]}}];
+
+  TranslateElement["quadrupole", name_String,
+    pos_Real, length_Real, bv_Real, param_List] := Module[{
+      rotate, knl, ksl},
+      {rotate, knl, ksl} = {"tilt", "k1", "k1s"}/.Override[param,
+	"tilt"->0, "k1"->0, "k1s"->0];
+
+      If[bv,
+	knl *= -1;
+	ksl *= -1];
+
+      {"QUAD", name, pos, length, 0,
+	{ "L"->length,
+	  If[rotate === 0, Null[], "ROTATE"->-rotate],
+	  If[knl === 0, Null[],  "K1"->(knl * length)],
+	  If[ksl === 0, Null[], "SK1"->(ksl * length)],
+	  Null[]},
+	{
+	  Null[]}}];
+
+  TranslateElement["sextupole", name_String,
+    pos_Real, length_Real, bv_Real, param_List] := Module[{
+      rotate, knl, ksl},
+      {rotate, knl, ksl} = {"tilt", "k2", "k2s"}/.Override[param,
+	"tilt"->0, "k2"->0, "k2s"->0];
+
+      If[bv,
+	knl *= -1;
+	ksl *= -1];
+
+      {"SEXT", name, pos, length, 0,
+	{ "L"->length,
+	  If[rotate === 0, Null[], "ROTATE"->-rotate],
+	  If[knl === 0, Null[],  "K2"->(knl * length)],
+	  If[ksl === 0, Null[], "SK2"->(ksl * length)],
+	  Null[]},
+	{
+	  Null[]}}];
+
+  TranslateElement["octupole", name_String,
+    pos_Real, length_Real, bv_Real, param_List] := Module[{
+      rotate, knl, ksl},
+      {rotate, knl, ksl} = {"tilt", "k3", "k3s"}/.Override[param,
+	"tilt"->0, "k3"->0, "k3s"->0];
+
+      If[bv,
+	knl *= -1;
+	ksl *= -1];
+
+      {"OCT", name, pos, length, 0,
+	{ "L"->length,
+	  If[rotate === 0, Null[], "ROTATE"->-rotate],
+	  If[knl === 0, Null[],  "K3"->(knl * length)],
+	  If[ksl === 0, Null[], "SK3"->(ksl * length)],
+	  Null[]},
+	{
+	  Null[]}}];
+
+  TranslateElement["multipole", name_String,
+    pos_Real, length_Real, bv_Real, param_List] := Module[{
+      rotate, knl, ksl, bv0, mult, angle},
+      {rotate, knl, ksl, bv0} = {"tilt", "knl", "ksl", "bv"}/.Override[param,
+	"tilt"->0, "knl"->{}, "ksl"->{}, "bv"->False];
+
+      If[bv,
+	knl *= -1;
+	ksl *= -1;
+	If[bv0 && Length[knl] > 0 && knl[[1]] <=> 0,
+	  knl[[1]] *= -1];
+	];
+
+      If[Length[knl] > 0 && knl[[1]] <=> 0,
+	angle = knl[[1]]; knl[[1]] = 0,
+	angle = 0];
+
+      While[Length[knl] > 0 && Last[knl] == 0,
+	knl = Drop[knl, -1]];
+
+      While[Length[ksl] > 0 && Last[ksl] == 0,
+	ksl = Drop[ksl, -1]];
+
+      mult = StandardForm[Join[
+	MapThread[With[{order = #1, kn = #2},
+	  If[kn === 0, Null[],  "K"//order->kn]]&,
+	  {Range[0, Length[knl] - 1], knl}],
+
+	MapThread[With[{order = #1, kn = #2},
+	  If[kn === 0, Null[], "SK"//order->kn]]&,
+	  {Range[0, Length[ksl] - 1], ksl}],
+
+	Null[]]];
+
+      If[angle <=> 0 && length == 0 && (Length[knl] > 2 || ksl <=> {}),
+	Print["Thin multipole with ANGLE",
+	  " is not suppoted!\t(", name, ") = ", param];
+	Return[$Failed]];
+
+      {If[angle <=> 0, "BEND", "MULT"], name, pos, length, 0,
+	{ "L"->length,
+	  If[angle === 0, Null[], "ANGLE"->angle],
+	  If[rotate === 0, Null[], "ROTATE"->-rotate],
+	  Null@@mult,
+	  Null[]},
+	{
+!	  If[bv0, "DIR"->-1, Null[]],
+	  Null[]}}];
+
+  TranslateElement["rfcavity", name_String,
+    pos_Real, length_Real, bv_Real, param_List] := Module[{
+      volt, lag, freq, harm},
+      {volt, lag, freq, harm} = {"volt", "lag", "freq", "harmon"}/.Override[
+	param, {"volt"->0, "lag"->0, "freq"->0, "harmon"->0}];
+
+      {"CAVI", name, pos, length, 0,
+	{ "L"->length,
+	  If[volt === 0, Null[], "VOLT"->volt * 1e6],
+	  If[freq === 0, Null[], "FREQ"->freq * 1e6],
+	  If[harm === 0, Null[], "HARM"->harm],
+	  If[lag  === 0, Null[], "PHI"->(lag * 2 * Pi - Pi)],
+	  Null[]},
+	{
+	  Null[]}}];
+
+  TranslateElement["marker", name_String,
+    pos_Real, length_Real, bv_Real, param_List] := {"MARK", name,
+      pos + length / 2, 0, 0, {}, {}};
+
+  TranslateElement["monitor"|"hmonitor"|"vmonitor"|"instrument", name_String,
+    pos_Real, length_Real, bv_Real, param_List] := {"MARK", name,
+      pos + length / 2, 0, 0, {}, {}};
+
+  (* Unsupported element handler *)
+  TranslateElement[type_String, name_String,
+    pos_Real, length_Real, bv_Real, param_List] := Module[{},
+      Print["Element type[", type,
+	"] is not suppoted!\t(", name, ") = ", param];
+      $Failed];
+  ];
+! >>> MADX2SAD$Translation class <<<
+
+! <<< MADX2SAD class >>>
+MADX2SAD = Class[{MADX2SAD$Translation},
+  { FunctionTranslation = {
+    "atan"->"ArcTan",
+    Null[]}
+    },
+  { SymbolType, SymbolExpr, SymbolValue, SymbolList,
+    ElementParam, ElementList, BeamLineList,
+    CurrentBeamLine, CurrentBeamLine0,
+    SourceTree, LexicalTree, SyntaxTree,
+    SourceFile, SourceFile0, SourceLine, SourceLine0, AnalyzeMode,
+    },
+
+  Constructor[fn__String] := Module[{},
+    Initialize[];
+
+    AnalyzeMode = "Analize";
+
+    SourceTree = ReadFromFile/@{fn};
+    LexicalTree = Join@@(LexicalAnalyze/@SourceTree);
+    SyntaxTree = SyntaxAnalyze[LexicalTree];
+
+    SymbolList = Union[SymbolList];
+    BeamLineList = Union[BeamLineList];
+    Scan[(ElementList[#] = Union[ElementList[#]])&, BeamLineList];
+
+    AnalyzeMode = "Evaluate";
+    ];
+
+  (* Public APIs *)
+  BeamLines[] := BeamLineList;
+
+  ExtractBeamLine[beamline_String] := ExtractBeamLine$[beamline];
+
+  ExportBeamLine[beamline_String] := ExportBeamLine[ExtractBeamLine$[beamline]];
+
+  ExportBeamLine[beamline_List] := Module[{name, bl0, bl1, bl2},
+    bl0 = TranslateBeamLine$[beamline];
+    name = "name"/.Override[First[bl0], "name"->"test"];
+    bl1 = DriftFillBeamLine$[bl0];
+    bl2 = DumpBeamLine$[bl1];
+    ExportBeamLine$[name, bl2[[1]]]];
+
+  (* Internal APIs *)
+  Initialize[] := Module[{},
+    Clear[SymbolType, SymbolExpr, SymbolValue, SymbolList];
+    SymbolType[_]  := "Undefined";
+    SymbolExpr[_] := {};
+    SymbolValue[sym_] := Switch[AnalizeMode,
+      "Analize", (
+	Print["Refer undefined symbol[",sym,"] at Column ",
+	  SourceLine0[[2]], " in Line ", SourceLine0[[1]], " @ ", SourceFile0];
+	Exit[]),
+
+      _, (Print["Refer undefined symbol[",sym,"]"];
+	SymbolValue[sym] = "0")];
+    SymbolList = {};
+
+    Clear[ElementParam, ElementList, BeamLineList];
+    ElementParam[bl_, elm_] := Switch[AnalizeMode,
+      "Analize", (
+	Print["Refer undefined element[",elm,"] at Column ",
+	  SourceLine0[[2]], " in Line ", SourceLine0[[1]], " @ ", SourceFile0];
+	Exit[]),
+
+      _, (Print["Refer undefined element[",elm,"] in beamline[", bl, "]"];
+	ElementParam[bl, elm] = {})];
+
+    ElementList[_] := {};
+    BeamLineList = {};
+
+    Initialize$Constant[];
+    Initialize$Element[];
+
+    CurrentBeamLine0 = Null;
+    CurrentBeamLine = _];
+
+  Initialize$Constant[] := StandardForm[
+    Scan[With[{sym = #[[1]], val = #[[2]]},
+      SymbolType[sym] = "Constant";
+      SymbolExpr[sym] = ToString[val];
+      SymbolValue[sym] = ToString[val];
+      ]&, {
+	"true"->True, "false"->False,
+	"twopi"->2*Pi,
+	Null[]}]];
+
+  Initialize$Element[] := Scan[With[{elm = #[[1]], param = #[[2]]},
+    ElementParam[_, elm] = Override["Type"->elm, param];
+    ]&, {
+      (* Beamline element *)
+      "sbend"->{"l"->0, "angle"->0, "tilt"->0,
+	"k0"->0, "k1"->0, "k2"->0, "k3"->0,
+	"e1"->0, "e2"->0, "h1"->0, "h2"->0,
+	"fint"->0, "fintx"->0, "hgap"->0},
+      "rbend"->{"l"->0, "angle"->0, "tilt"->0,
+	"k0"->0, "k1"->0, "k2"->0, "k3"->0,
+	"e1"->0, "e2"->0, "h1"->0, "h2"->0,
+	"fint"->0, "fintx"->0, "hgap"->0},
+
+      "quadrupole"->{"l"->0, "tilt"->0, "k1"->0, "k1s"->0},
+      "sextupole"->{"l"->0, "tilt"->0, "k2"->0, "k2s"->0},
+      "octupole"->{"l"->0, "tilt"->0, "k3"->0, "k3s"->0},
+
+      "multipole"->{"lrad"->0, "tilt"->0, "knl"->{0}, "ksl"->{0}},
+
+      "solenoid"->{"l"->0, "ks"->0, "ksi"->0},
+
+      "kicker"->{ "l"->0, "tilt"->0, "hkick"->0, "vkick"->0},
+      "hkicker"->{"l"->0, "tilt"->0, "kick"->0},
+      "vkicker"->{"l"->0, "tilt"->0, "kick"->0},
+
+      "rfcavity"->{"l"->0, "volt"->0, "lag"->0, "harmon"->0, "freq"->0},
+
+      (* Beamline marker *)
+      "marker"->{},
+
+      (* Beam monitor *)
+      "monitor"->{"l"->0},
+      "hmonitor"->{"l"->0},
+      "vmonitor"->{"l"->0},
+      "instrument"->{"l"->0},
+
+      (* Beam collimator *)
+      "rcollimator"->{"l"->0, "xsize"->1e35, "ysize"->1e35},
+      "ecollimator"->{"l"->0, "xsize"->1e35, "ysize"->1e35},
+
+      (* General transfer *)
+      "matrix"->{},
+
+      (* Special *)
+      "sequence"->{"length"->0, "refer"->"centre"},
+      "beam"->{"bv"->False},
+
+      Null[]}];
+
+  ReadFromFile[_] := $Failed;
+
+  ReadFromFile[fn_String] := Module[{fp, line, next, tree},
+    If[fp = OpenRead[fn]; fp === $Failed, Return[fp]];
+
+    line = 0;
+    tree = Table[next = Read[fp, String];
+      If[next === EndOfFile, Break[]];
+      pos = StringPosition[next, "!"];
+      If[pos <=> {}, next = next[1, pos[[1,1]] - 1]];
+      pos = StringPosition[next, "//"];
+      If[pos <=> {}, next = next[1, pos[[1,1]] - 1]];
+      If[next[-1] === "\r", next = next[1,-2]];
+      {line += 1, next}, {Infinity}];
+
+    Close[fp];
+
+    {fn, tree}];
+
+  LexicalAnalyze[_] := $Failed;
+
+  LexicalAnalyze[{fn_String, tbl0_List}] := Module[{fp, line, next, pos, stack,
+    tbl, tbl1, tbl2},
+
+    tbl1 = Map[With[{index = #[[1]], line = #[[2]]},
+      pos = StringPosition[line, ";"][[,1]];
+      Null@@MapThread[{{index, #1 + 1}, line[#1 + 1, #2]}&,
+	{Prepend[pos, 0], Append[pos, -1]}]]&, tbl0];
+
+    tbl2 = Map[With[{token = Tokenize[#[[2]]]},
+      If[Length[token] > 0, Prepend[token, {"LINE:", #[[1]]}], Null[]]]&, tbl1];
+
+    tbl = {}; stack = {};
+    Scan[With[{line = #}, Scan[With[{token = #},
+      AppendTo[stack, token];
+      If[token === {"OPR:", ";"},
+	AppendTo[tbl, stack]; stack = {}]]&, line]]&, tbl2];
+
+    If[Length[stack] > 0, AppendTo[tbl, stack]];
+    Prepend[tbl, {{"FILE:", fn}}]];
+
+  SyntaxAnalyze[_] := $Failed;
+
+  SyntaxAnalyze[tbl_List] := Module[{stack, syntax, syntax$ = 0},
+    syntax[_] := {};
+    syntax[-1] := syntax[syntax$];
+    SourceFile = "/dev/null";
+    SourceLine = {0, 0};
+    stack = {};
+    Scan[With[{line = #}, Scan[With[{token = #},
+      If[token[[1]] === "FILE:", SourceFile = token[[2]]; Continue[]];
+      If[token[[1]] === "LINE:", SourceLine = token[[2]]; Continue[]];
+      If[Length[stack] == 0,
+	SourceLine0 = SourceLine; SourceFile0 = SourceFile];
+      If[token === {"OPR:", ";"},
+	syntax$ += 1; syntax[syntax$] = SyntaxAnalyze$[stack];
+	If[syntax[-1] === $Failed, Print["Syntax error at Column ",
+	  SourceLine0[[2]], " in Line ", SourceLine0[[1]]]];
+	stack = {}; Continue[]];
+      AppendTo[stack, token]]&, line]]&, tbl];
+    syntax/@Range[syntax$]];
+
+  (* Internal APIs *)
+  SyntaxAnalyze$[stack_List] := Module[{skip},
+    Which[
+      Length[stack] < 1, Return[Null[]],
+
+      stack[[1]] === {"SYM:", "endsequence"}, (
+	CurrentBeamLine0 = Null; CurrentBeamLine = _; {"Ignore", stack}),
+
+      stack[[1,1]] === "SYM:" && Position[{ (* Ignored reserved word *)
+	"option", "select", "twiss", "use", "return",
+	Null[]}, stack[[1,2]]] <=> {}, {"Ignore", stack},
+
+      And[ (* real const sym_ = expr_ *)
+	Length[stack] > 4,
+	stack[[1]] === {"SYM:", "real"},
+	stack[[2]] === {"SYM:", "const"},
+	stack[[3,1]] === "SYM:",
+	stack[[4]] === {"OPR:", "="},
+	True], With[{sym = stack[[3,2]]},
+	  Switch[SymbolType[sym],
+	    "Undefined", (
+	      SymbolType[sym] = "Constant";
+	      SymbolExpr[sym] = Drop[stack, 4];
+	      SymbolValue[sym] = EvalExpression[Drop[stack, 4]];
+	      AppendTo[SymbolList, sym]),
+
+	    "Constant", (
+	      Print["Symbol[", sym, "] is redefined!"];
+	      Return[$Failed]),
+
+	    _, (
+	      Print["Symbol[", sym, "] type is changed(",
+		SymbolType[sym], "->Constant)."];
+	      Return[$Failed])];
+	  {"SetConst", sym->SymbolValue[sym]}],
+
+      And[ (* const sym_ = expr_ *)
+	Length[stack] > 3,
+	stack[[1]] === {"SYM:", "const"},
+	stack[[2,1]] === "SYM:",
+	stack[[3]] === {"OPR:", "="},
+	True], With[{sym = stack[[2,2]]},
+	  Switch[SymbolType[sym],
+	    "Undefined", (
+	      SymbolType[sym] = "Constant";
+	      SymbolExpr[sym] = Drop[stack, 3];
+	      SymbolValue[sym] = EvalExpression[Drop[stack, 3]];
+	      AppendTo[SymbolList, sym]),
+
+	    "Constant", (
+	      Print["Symbol[", sym, "] is redefined!"];
+	      Return[$Failed]),
+
+	    _, (
+	      Print["Symbol[", sym, "] type is changed(",
+		SymbolType[sym], "->Constant)."];
+	      Return[$Failed])];
+	  {"SetConst", sym->SymbolValue[sym]}],
+
+      And[ (* sym_ = expr_ *)
+	Length[stack] > 2,
+	stack[[1,1]] === "SYM:",
+	stack[[2]] === {"OPR:", "="},
+	True], With[{sym = stack[[1,2]]},
+	  Switch[SymbolType[sym],
+	    "Undefined"|"Variable", (
+	      SymbolType[sym] = "Variable";
+	      SymbolExpr[sym] = Drop[stack, 2];
+	      SymbolValue[sym] = EvalExpression[Drop[stack, 2]];
+	      AppendTo[SymbolList, sym]),
+
+	    "Constant", (
+	      Print["Symbol[", sym, "] is redefined!"];
+	      Return[$Failed]),
+
+	    _, (
+	      Print["Symbol[", sym, "] type is changed(",
+		SymbolType[sym], "->Constant)."];
+	      Return[$Failed])];
+	  {"SetVar", sym->SymbolValue[sym]}],
+
+      And[ (* sym_ := expr_ *)
+	Length[stack] > 2,
+	stack[[1,1]] === "SYM:",
+	stack[[2]] === {"OPR:", ":="},
+	True], With[{sym = stack[[1,2]]},
+	  Switch[SymbolType[sym],
+	    "Undefined"|"Variable", (
+	      SymbolType[sym] = "Variable";
+	      SymbolExpr[sym] = Drop[stack, 2];
+	      SymbolValue[sym] = EvalExpression[Drop[stack, 2]];
+	      AppendTo[SymbolList, sym]),
+
+	    "Constant", (
+	      Print["Symbol[", sym, "] is redefined!"];
+	      Return[$Failed]),
+
+	    _, (
+	      Print["Symbol[", sym, "] type is changed(",
+		SymbolType[sym], "->Constant)."];
+	      Return[$Failed])];
+	  {"SetVar", sym->SymbolValue[sym]}],
+
+      And[ (* sym_ : sym0_ *)
+	Length[stack] == 3,
+	stack[[1,1]] === "SYM:",
+	stack[[2]] === {"OPR:", ":"},
+	stack[[3,1]] === "SYM:",
+	True], With[{sym = stack[[1,2]], sym0 = stack[[3,2]]},
+	  AppendTo[ElementList[CurrentBeamLine0], sym];
+	  ElementParam[CurrentBeamLine, sym] =
+	    ElementParam[CurrentBeamLine, sym0];
+	  {"CopyElement", sym->sym0}],
+
+      And[ (* sym_ , param___ *)
+	Length[stack] > 2,
+	stack[[1,1]] === "SYM:",
+	stack[[2]] === {"OPR:", ","},
+	True], With[{sym = stack[[1,2]],
+	  param = EvalElementParam/@ChopElementParam[Drop[stack, 2]]},
+	  If[sym === "beam", With[{beamline = "sequence"/.Override[
+	    param, "sequence"->Null]},
+	    ElementParam[beamline, sym] = Override[param,
+	      ElementParam[beamline, sym]]],
+	    skip = False;
+	    If[CurrentBeamLine0 === Null,
+	      Scan[If[Position[ElementList[#], sym] <=> {}, skip = True;
+		ElementParam[#, sym] = Override[param, ElementParam[#, sym]]]&,
+		BeamLineList]];
+	    If[Position[ElementList[CurrentBeamLine0], sym] <=> {},
+	      ElementParam[CurrentBeamLine, sym] = Override[param, ElementParam[CurrentBeamLine, sym]],
+	      If[Not[skip],
+		If[Position[ElementList[Null], sym] <=> {},
+		  AppendTo[ElementList[CurrentBeamLine0], sym];
+		  ElementParam[CurrentBeamLine, sym] = Override[param, ElementParam[CurrentBeamLine, sym]];
+		  {"CopyAndModifyElement", sym->sym, sym->param},
+		  Print["Element[", sym, "] is defined without proto-type in beamline[", CurrentBeamLine, "]"];
+		  Exit[]]]]];
+	  {"ModifyElement", sym->param}],
+
+      And[ (* sym_ : sym0_ , param___ *)
+	Length[stack] > 4,
+	stack[[1,1]] === "SYM:",
+	stack[[2]] === {"OPR:", ":"},
+	stack[[3,1]] === "SYM:",
+	stack[[4]] === {"OPR:", ","},
+	True], With[{sym = stack[[1,2]], sym0 = stack[[3,2]],
+	  param = EvalElementParam/@ChopElementParam[Drop[stack, 4]]},
+	  If[sym0 === "sequence",
+	    CurrentBeamLine0 = sym; CurrentBeamLine = sym;
+	    AppendTo[BeamLineList, CurrentBeamLine]];
+	  AppendTo[ElementList[CurrentBeamLine0], sym];
+	  ElementParam[CurrentBeamLine, sym] = Override[param,
+	    ElementParam[CurrentBeamLine, sym0]];
+	  {"CopyAndModifyElement", sym->sym0, sym->param}],
+
+      True, Print["Unknown syntax: ", stack, " at Column ",
+	SourceLine0[[2]], " in Line ", SourceLine0[[1]],
+	" @ ", SourceFile0]]];
+
+  ExtractBeamLine$[beamline_String] := Module[{bl, sequence = {},
+    refer, total, bv},
+
+    bl = Map[With[{elm = #,
+      type = "Type"/.Override[ElementParam[beamline, #], "Type"->Null],
+      location = EvalElementLocation[beamline, #]},
+      Which[
+	type === "sequence", sequence = ElementParam[beamline, elm]; Null[],
+
+	Not[RealQ[location]], (
+	  Print["Location of element[", elm, "] is not defined!"];
+	  Return[$Failed]),
+
+	True, {elm, type, location}]]&, ElementList[beamline]];
+
+    If[Length[sequence] < 1,
+      Print["Sequence[", beamline, "] is not defined!"]; Return[$Failed]];
+
+    {refer, total} = SwitchCases[sequence/.{"l"->"length"},
+      {Rule["refer", _String], Rule["length", _Real]}];
+    {bv} = SwitchCases[ElementParam[beamline, "beam"],
+      {Rule["bv", _Real]}];
+
+    refer = If[refer <=> {}, refer[[1,2]], "centre"];
+    total = If[total <=> {}, total[[1,2]], 0];
+    bv    = If[bv    <=> {}, bv[[1,2]], False];
+
+    (* Convert location by "refer" *)
+    bl = Switch[refer,
+      "centre", Map[With[{elm = #[[1]], type = #[[2]], pos = #[[3]],
+	l = "l"/.Override[ElementParam[beamline, #[[1]]], "l"->0]},
+	{elm, type, Max[0, If[bv, total - pos, pos] - l / 2], l,
+	  ElementParam[beamline, elm]/.RuleDelayed->Rule}]&, bl],
+
+      "entry", Map[With[{elm = #[[1]], type = #[[2]], pos = #[[3]],
+	l = "l"/.Override[ElementParam[beamline, #[[1]]], "l"->0]},
+	{elm, type, If[bv, Max[0, total - pos - l], pos], l,
+	  ElementParam[beamline, elm]/.RuleDelayed->Rule}]&, bl],
+
+      "exit", Map[With[{elm = #[[1]], type = #[[2]], pos = #[[3]],
+	l = "l"/.Override[ElementParam[beamline, #[[1]]], "l"->0]},
+	{elm, type, Max[0, If[bv, total - pos, pos - l]], l,
+	  ElementParam[beamline, elm]/.RuleDelayed->Rule}]&, bl],
+
+      _, (
+	Print["refer mode[", refer, "] is not supported!"];
+	Return[$Failed])];
+
+    (* Reorder by entrance position *)
+    bl = Sort[bl, With[{eps = 1e-7,
+      s1 = #1[[3]], s2 = #2[[3]], l1 = #1[[4]], l2 = #2[[4]]},
+      If[Abs[s2 - s1] > eps, s2 > s1, s2 + l2 / 2 > s1 + l1 / 2]]&];
+
+    {Join[{"name"->beamline, "bv"->bv}, sequence], bl}];
+
+  TranslateBeamLine$[{sequence_List, beamline_List}] := Module[{translate, bv},
+    {bv} = SwitchCases[sequence, {Rule["bv", _Real]}];
+    bv = If[bv <=> {}, bv[[1,2]], False];
+
+    {sequence, Map[
+      With[{name = #[[1]], type = #[[2]], pos = #[[3]], length = #[[4]],
+	param = #[[5]]},
+	translate = TranslateElement[type, name, pos, length, bv, param];
+	If[translate === $Failed, Null[], translate]]&,
+      beamline]}];
+
+  DriftFillBeamLine$[{sequence_List, beamline_List}] := StandardForm[Module[{
+    new, current, offset, count, total, drifts = {}, drift},
+    total = "length"/.Override[sequence/.{"l"->"length"}, "length"->0];
+
+    new = {}; current = 0; offset = 0; count = 0;
+
+    Scan[With[{type = #[[1]], name = #[[2]], pos = #[[3]], length = #[[4]],
+      dlength = #[[5]], param = #[[6]], opt = #[[7]]},
+      Which[
+	Abs[(pos + offset) - current] < 1e-7, (
+	  AppendTo[new, {type, name, pos, length, param, opt}];
+	  current = (pos + offset) + length),
+
+	(pos + offset) > current, (
+	  If[drift = ((pos + offset) - current)/.drifts; RealQ[drift],
+	    drift = "LDummy"//count; count += 1;
+	    AppendTo[drifts, ((pos + offset) - current)->drift]];
+	  AppendTo[new, {"DRIFT", drift, current, (pos + offset) - current,
+	    {"L"->((pos + offset) - current)}, {}}];
+	  AppendTo[new, {type, name, pos, length, param, opt}];
+	  current = (pos + offset) + length),
+
+	True, (
+	  Print["Invalid order at element[", name,
+	    "]: {current, pos, offset} = ", {current, pos, offset}];
+	  Return[$Failed];
+	  )];
+      offset += dlength;
+      ]&, Sort[beamline, With[{eps = 1e-7,
+	s1 = #1[[3]], s2 = #2[[3]], l1 = #1[[4]], l2 = #2[[4]]},
+	If[Abs[s2 - s1] > eps, s2 > s1, s2 + l2 / 2 > s1 + l1 / 2]]&]];
+
+    Which[
+      Abs[(total + offset) - current] < 1e-7, (* legnth matched *),
+
+      (total + offset) > current, (
+	If[drift = ((total + offset) - current)/.drifts; RealQ[drift],
+	  drift = "LDummy"//count; count += 1;
+	  AppendTo[drifts, ((total + offset)- current)->drift]];
+	AppendTo[new, {"DRIFT", drift, current, (total + offset) - current,
+	  {"L"->((total + offset) - current)}, {}}]; count += 1;
+	),
+
+      True, (
+	Print["Beamline is overruned ", current, "/", (total + offset)];
+	Return[$Failed])];
+
+    new]];
+
+  DumpBeamLine$[beamline_List] := Module[{ElementMap, ElementMapped = {},
+    translate, name},
+    ElementMap[_, _] = Null;
+    translate = Map[With[{type = #[[1]], name$ = #[[2]],
+      pos = #[[3]], length = #[[4]], param = #[[5]], opt = #[[6]]},
+      name = ElementMap[name$, 1];
+      If[Not[StringQ[name]], (* Register new name *)
+	name = StringReplace[name$, {"."->"_"}];
+	While[ElementMap[name, -1] <=> Null,
+	  name = name//"_"];
+	ElementMap[name$, 1] = name;
+	ElementMap[name, -1] = name$;
+	AppendTo[ElementMapped, name$]];
+      {type, name, param, opt}]&, beamline];
+
+    {translate, Map[(#->ElementMap[#, 1])&, ElementMapped]}];
+
+  ExportBeamLine$[bl_String, beamline_List] := Module[{prefix, tmp}, Flatten[{
+    Module[{particle, energy, momentum, mass, charge},
+      {particle, energy, momentum} = SwitchCases[ElementParam[bl, "beam"],
+	{ Rule["particle", _], Rule["energy", _Real], Rule["pc", _Real]}];
+      If[particle === {}, particle = {"particle"->"electron"}];
+      {charge, mass} = Switch["particle"/.particle,
+	"proton",	{1, 938.271998e6},
+	"electron",	{1, 510.998902e3},
+	_,		{1, 510.998902e3}];
+      energy = If[energy <=> {}, energy[[1,2]] * 1e9, 100 * mass];
+      momentum = If[momentum <=> {}, momentum[[1,2]] * 1e9,
+	mass * Sqrt[(1 + energy / mass)^2 - 1]];
+      energy = mass * Sqrt[1 + (momentum / mass)^2];
+      StandardForm[{
+	StringJoin["! Particle: ", "particle"/.particle],
+	StringJoin["! Beam Energy: ", If[energy =< 0, "Undefined", energy]],
+	StringJoin["CHARGE = ", charge, ";"],
+	StringJoin["MASS   = ", mass,   ";"],
+	StringJoin["MOMENTUM = ", momentum, ";"],
+	Null[]}]],
+    Map[With[{type = #}, {type, Map[With[{name = #[[2]],
+      param = #[[3]], opt = #[[4]],
+      fill = "\t"//StringFill["", " ", StringLength[#[[2]]//" = ("]]},
+      prefix = StringJoin["\t", name, " = ("];
+      tmp = Map[With[{prefix$ = prefix}, prefix = fill;
+	StringJoin[prefix$, #[[1]], " = ", #[[2]]]]&, param];
+      If[Length[tmp] > 0,
+	tmp[[-1]] = tmp[[-1]]//")",
+	tmp = StringJoin["\t", name, " = ()"]];
+      tmp]&, Union[Select[beamline, #[[1]] === type&]]],
+	";"}]&, Union[beamline[[,1]]]],
+    {StringJoin["LINE ", bl, " = ("],
+      Map[With[{name = #[[2]], opt = #[[4]]},
+	If[("DIR"/.Override[opt, "DIR"->+1]) < 0,
+	  "-"//name, name]]&, beamline],
+      ");"},
+    Null[]}]];
+
+  (* MADX parameter evaluator *)
+  EvalElementParam[param_List] := Module[{},
+    Which[
+      And[ (* reserved_ = string_ *)
+	Length[param] == 3,
+	param[[1,1]] === "SYM:",
+	Position[{
+	  "sequence", "period", "particle", "refer", "from",
+	  Null[]}, param[[1,2]]] <=> {},
+	param[[2]] === {"OPR:", "="},
+	param[[3,1]] === "SYM:",
+	True], With[{sym = param[[1,2]], str = param[[3,2]]},
+	  sym->str],
+
+      And[ (* sym_ := expr_ *)
+	Length[param] > 2,
+	param[[1,1]] === "SYM:",
+	param[[2]] === {"OPR:", ":="},
+	True], With[{sym = param[[1,2]], expr = EvalExpression[Drop[param, 2]]},
+	  sym:>ToExpression[expr]],
+
+      And[ (* sym_ = expr_ *)
+	Length[param] > 2,
+	param[[1,1]] === "SYM:",
+	param[[2]] === {"OPR:", "="},
+	True], With[{sym = param[[1,2]], expr = EvalExpression[Drop[param, 2]]},
+	  sym->ToExpression[expr]],
+
+      And[ (* flag_ *)
+	Length[param] == 1,
+	param[[1,1]] === "SYM:",
+	True], With[{flag = param[[1,2]]},
+	  Switch[flag,
+	    "bv", flag->True,
+
+	    _, (
+	      Print["Syntax error[unknown flag in parameters] at Column ",
+		SourceLine0[[2]], " in Line ", SourceLine0[[1]],
+		" @ ", SourceFile0];
+	      Exit[])]],
+
+      True, (
+	Print["Syntax error[parameter style] at Column ",
+	  SourceLine0[[2]], " in Line ", SourceLine0[[1]],
+	  " @ ", SourceFile0];
+	Exit[])]];
+
+  EvalElementLocation[bl_String, elm_String] := Module[{location, from, type},
+    {location, from, type} = SwitchCases[ElementParam[bl, elm],
+      {Rule["at", _Real], Rule["from", _String], Rule["Type", _String]}];
+
+    type = If[type <=> {}, type[[1,2]], "undefined"];
+
+    If[location === {}, (
+      Switch[type,
+	"sequence", (* Nothing to warn *),
+	_, Print["Location of element[", elm, "] is not defined! param = ", ElementParam[bl, elm]]];
+      Return[$Failed])];
+
+    location[[1,2]] + If[from <=> {},
+      EvalElementLocation[bl, from[[1,2]]], 0]];
+
+  ChopElementParam[param_List] := Module[{chopped, stack, buffer},
+    chopped = {}; stack = {}; buffer = {};
+    Scan[With[{term = #},
+      Switch[term,
+	{"OPR:", ","}, If[Length[stack] == 0,
+	  If[Length[buffer] > 0, AppendTo[chopped, buffer]]; buffer = {},
+	  AppendTo[buffer, term]],
+
+	{"OPR:", "("|"{"}, (
+	  AppendTo[stack, term[[2]]];
+	  AppendTo[buffer, term]),
+
+	{"OPR:", ")"}, (
+	  If[Length[stack] > 0 && Last[stack] === "(",
+	    stack = Drop[stack, -1]; AppendTo[buffer, term],
+	    Print["Syntax error[invalid \")\"] at Column ",
+	      SourceLine0[[2]], " in Line ", SourceLine0[[1]],
+	      " @ ", SourceFile0];
+	    Exit[]]),
+
+	{"OPR:", "}"}, (
+	  If[Length[stack] > 0 && Last[stack] === "{",
+	    stack = Drop[stack, -1]; AppendTo[buffer, term],
+	    Print["Syntax error[invalid \"}\"] at Column ",
+	      SourceLine0[[2]], " in Line ", SourceLine0[[1]],
+	      " @ ", SourceFile0];
+	    Exit[]]),
+
+	_, AppendTo[buffer, term]]]&, param];
+
+    If[Length[buffer] > 0,
+      If[Length[stack] == 0, AppendTo[chopped, buffer],
+	Print["Syntax error[invalid parenthesis] at Column ",
+	  SourceLine0[[2]], " in Line ", SourceLine0[[1]],
+	  " @ ", SourceFile0];
+	Exit[]]];
+
+    chopped];
+
+  (* MADX expression evaluator *)
+  EvalExpression[expr_List] := Module[{eval},
+    eval = StandardForm[Map[With[{type = #[[1]], val = #[[2]]},
+      Switch[type,
+	"SYM:", StringJoin["ToExpression[",
+	  This ,"@SymbolValue[\"", val, "\"]]"],
+
+	"FUN:"|"OPR:"|"NUM:", val,
+
+	_, (
+	  Print["Unknown term ", {type, val}, " is found in evaluating ", expr];
+	  Exit[])]]&, TranslateExpression[expr]]];
+    StringJoin@@eval];
+
+  TranslateExpression[expr_List] := Module[{stack, parenthesis, pos},
+    stack = {}; parenthesis = {};
+    Scan[With[{type = #[[1]], val = #[[2]], token = #},
+      Switch[type,
+	"OPR:", Switch[val,
+	  ")", If[Length[parenthesis] > 0, (
+	    If[parenthesis[[1, 1]] === "FUN:",
+	      AppendTo[stack, {"OPR:", "]"}],
+	      AppendTo[stack, {"OPR:", ")"}]];
+	    parenthesis = Rest[parenthesis]),
+	    Print["Parenthesis balance is broken in evaluating ", expr];
+	    Exit[]],
+
+	  "(", If[Length[stack] < 1,
+	    PrependTo[parenthesis, token]; AppendTo[stack, token],
+	    With[{type0 = stack[[-1, 1]], val0 = stack[[-1, 2]]},
+	      If[Or[type0 <=> "SYM:",
+		(pos = Position[FunctionTranslation[[,1]], val0]) === {}],
+		PrependTo[parenthesis, token]; AppendTo[stack, token],
+		pos = pos[[1,1]];
+		stack[[-1, 1]] = "FUN:";
+		stack[[-1, 2]] = FunctionTranslation[[pos, 2]];
+		PrependTo[parenthesis, {"FUN:", "("}];
+		AppendTo[stack, {"OPR:", "["}];
+		]]],
+
+	  _, AppendTo[stack, token]],
+
+	_, AppendTo[stack, token]]]&, expr];
+
+    If[Length[parenthesis] > 0,
+      Print["Parenthesis balance is broken in evaluating ", expr];
+      Exit[]];
+
+    stack];
+
+  (* Token reader *)
+  Tokenize[line_String] := Module[{pos, split},
+    (* Split by white-spaces *)
+    pos = Union@@Map[StringPosition[line, #][[,1]]&, {" ", "\t"}];
+    split = Select[MapThread[line[#1 + 1, #2 - 1]&,
+      {Prepend[pos, 0], Append[pos, 0]}], StringLength[#] > 0&];
+
+    Flatten[Tokenize$/@split, 1]];
+
+  Tokenize$[line_String] := Module[{c},
+    c = line[1];
+    Switch[c,
+      "",  Return[{}],
+      ":", If[line[2] === "=",
+	Return[Prepend[Tokenize$[line[3,-1]], {"OPR:", ":="}]],
+	Return[Prepend[Tokenize$[line[2,-1]], {"OPR:", ":"}]]],
+      ";"|","|"="|"+"|"-"|"*"|"/"|"("|")"|"{"|"}",
+      Return[Prepend[Tokenize$[line[2,-1]], {"OPR:", c}]],
+      _, Which[
+	Or[
+          StringPosition["abcdefghijklmnopqrstuvwxyz", c] <=> {},
+          StringPosition["ABCDEFGHIJKLMNOPQRSTUVWXYZ", c] <=> {},
+          False], Return[Tokenize$Symbol[line]],
+	Or[
+          StringPosition["0123456789.", c] <=> {},
+          False], Return[Tokenize$Number[line]],
+	True, Return[Prepend[Tokenize$[line[2,-1]], {"OPR:", c}]]]]];
+
+  Tokenize$Symbol[line_String] := Module[{c, pos = 2},
+    While[c = line[pos];
+      Or[
+	StringPosition["abcdefghijklmnopqrstuvwxyz", c] <=> {},
+	StringPosition["ABCDEFGHIJKLMNOPQRSTUVWXYZ", c] <=> {},
+	StringPosition["0123456789", c] <=> {},
+	StringPosition["_.", c] <=> {},
+	False],
+      pos += 1];
+    Prepend[Tokenize$[line[pos, -1]], {"SYM:", ToLowerCase[line[1, pos - 1]]}]];
+
+  Tokenize$Number[line_String] := Module[{c, pos = 1},
+    While[c = line[pos];
+      StringPosition["0123456789", c] <=> {},
+      pos += 1];
+    If[line[pos] === ".", pos += 1;
+      While[c = line[pos];
+	StringPosition["0123456789", c] <=> {},
+	pos += 1]];
+    If[StringPosition["eEdD", line[pos]] <=> {}, pos += 1;
+      If[StringPosition["+-", line[pos]] <=> {}, pos += 1];
+      While[c = line[pos];
+	StringPosition["0123456789", c] <=> {},
+	pos += 1]];
+
+    Prepend[Tokenize$[line[pos, -1]], {"NUM:", line[1, pos - 1]}]];
+  ];
+! >>> MADX2SAD class <<<
+
+! End of File
