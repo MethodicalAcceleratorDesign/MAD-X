@@ -2329,6 +2329,7 @@ tools/numdiff/tests/test-register/test-register.nd.lhs -text
 tools/numdiff/tests/test-register/test-register.nd.rhs -text
 tools/numdiff/tests/test-register/test-register.ref -text
 tools/translators/MEMO -text
+tools/translators/README -text
 win/tpsa.dll -text svneol=unset#unset
 win/tpsa.lib -text svneol=unset#unset
 win/win32calls.fi -text
