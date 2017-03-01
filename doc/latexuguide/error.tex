@@ -461,10 +461,14 @@ The attributes are:
   (2i+2) poles. (Default:~0~m$^{-i}$).  
 
   \ttitem{DKNR(i)} Relative error for the normal multipole strength with
-  (2i+2) poles. (Default:~0~m$^{-i}$).  
+  (2i+2) poles. (Default:~0). The absolute error is computed from \texttt{DKNR(i)} using the following formula
+  $$\Delta K_{i}=\texttt{DKNR(i)}\cdot\left(k_{ref}\right)\cdot R^{n-j}\cdot\frac{j!}{n!}$$
+  where $n$ is the order of the reference strength, $k_{ref}$, specified in \texttt{ORDER}, and $R$ is the \texttt{RADIUS}.
 
   \ttitem{DKSR(i)} Relative error for the skewed multipole strength with
-  (2i+2) poles. (Default:~0~m$^{-i}$).  
+  (2i+2) poles. (Default:~0). The absolute error is computed from \texttt{DKSR(i)} using the following formula
+  $$\Delta K_{i}=\texttt{DKSR(i)}\cdot\left(k_{ref}\right)\cdot |R|^{n-j}\cdot\frac{j!}{n!}$$
+  where $n$ is the order of the reference strength, $k_{ref}$, specified in \texttt{ORDER}, and $R$ is the \texttt{RADIUS}. 
 \end{madlist}
 
  Please note that even though that any order of field errors can be specified 
