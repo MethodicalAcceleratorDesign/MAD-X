@@ -41,7 +41,7 @@ contains
     character(len = 5) name_var
     type(probe_8) theTransferMap
     type(real_8) :: theAscript(6) ! used here to compute dispersion's derivatives
-    type(c_damap)  :: c_Map, c_Map2, q_Map, a_CS
+    type(c_damap)  :: c_Map, c_Map2, q_Map, a_CS, a_CS_1
     type(c_vector_field) vf_kernel, vf, vf_t2
     type(c_taylor)  :: g_io, nrmlzdPseudoHam
     type(fibre), POINTER    :: current
@@ -227,8 +227,6 @@ contains
        call alloc(c_Map)
    
        c_Map = theTransferMap;
-
-       if (getdebug() > 0) print*,"Normal Form Type 1"
        
        call  c_normal(c_Map,theNormalForm)       ! (4) !! HERE WE DO NORMAL FORM TYPE 1
        
@@ -365,28 +363,27 @@ contains
           !n%g is the vecotor field for the transformation 
           !from resonance basis (action angle coordinate system, (x+ipx),(x-ipx)) back to cartesion X,Y
           !the ndim polynomials need to be flattened to get RDT's
-          call alloc(vf);
-          call flatten_c_factored_lie(theNormalForm%G,vf)
-          
           call alloc(g_io);
+          call alloc(vf);
+          call alloc(a_CS)
+          call alloc(a_CS_1)
+
+          call c_canonise(theNormalForm%atot,a_CS)
+
+          a_CS=to_phasor()*a_CS*from_phasor()
+          call c_factor_map(a_CS,a_CS_1,vf,0) 
+
+          call equal_c_tayls(g_io,cgetpb(vf))
           
-          call equal_c_tayls(g_io,-cgetpb(vf))
-          
+
+          call kill(vf)
+          call kill(a_CS)
+          call kill(a_CS_1)
 
        endif
        
        if (n_haml > 0) then
            
-           if (getdebug() > 0) print*,"Normal Form Type 2 (for Hamiltonian Terms)"
-           
-           !print77=.true. ! simpler format
-           ! call print(default, mft)
-           ! write(mft,*) "The C MAP "
-           ! call print(c_Map,mft)
-           ! write(mft,*) "  "
-           ! write(mft,*) " ++++++++++++++++++++++++ "
-           ! write(mft,*) "  "
-
   
            theNormalForm_t2 = theNormalForm  
           ! call  c_normal(c_Map,theNormalForm_t2) ! in the non Complex PTC had to leave resonance in the rotation
@@ -443,6 +440,14 @@ contains
            close(mft)
 
          endif 
+         
+         call kill(a_CS)
+         call kill(c_Map2)
+         
+         call kill(vf_t2)
+         call kill(q_Map)
+         
+         
          
            ! ALTERNATIVE ALGORITHM, but result starts at ordrer 3
            !  type(damap)    :: r_Map
@@ -504,18 +509,14 @@ contains
 
        if (n_gnfu > 0) then
           call kill(g_io)
-          call kill(vf)
        endif   
 
        if (n_haml > 0) then 
-         !clean after hamiltonian when implemented
           call kill(nrmlzdPseudoHam)
-         ! call kill(vf_t2)
        endif  
  
 
        call kill(theNormalForm)
-       !call kill(n_t2)
 
     endif
     
@@ -773,7 +774,6 @@ contains
           ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
-          print*, "HAMC want to extract ", ind
           c_val = nrmlzdPseudoHam.sub.ind
           d_val = real(c_val)
 
@@ -788,7 +788,6 @@ contains
           ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
-          print*, "HAMS want to extract ", ind
           c_val = nrmlzdPseudoHam.sub.ind
           d_val = imag(c_val)
        CASE ('hama')
@@ -802,8 +801,6 @@ contains
           ind(4) = int(doublenum)
           ind(5) = 0
           ind(6) = 0
-          
-          print*, "HAMA want to extract ", ind
           
           c_val = nrmlzdPseudoHam.sub.ind
 

@@ -2852,6 +2852,7 @@ contains
       real(dp) :: chromaticities(2)
       integer :: i,j
       real(dp) :: sd ! as in twiss.F
+      real(dp) :: b,t1,t2,t3,t4 ! stuff needed for calculating high order compaction factor out of time slip factor
       real(dp) :: dispersion(4)
       real(dp) :: dispersion_p(4) ! derivative of the dispersion w.r.t delta-p/p
       integer :: debugFiles, mf
@@ -3063,6 +3064,58 @@ contains
          eta_c = -sd * betaRelativistic**2 / suml 
          
          alpha_c = one / gammaRelativistic**2 + eta_c
+
+         if (icase.eq.56) then
+           
+           ! non lin way
+        
+           yy%n = 6
+           call alloc(yy)
+
+           do i=1,6 
+              yy%v(i) = oneTurnMap%x(i)%t
+           enddo
+
+           yy = theNormalForm%A_t**(-1) * yy * theNormalForm%A_t ! takes away all dispersion dependency
+        
+        
+           t1 = yy%v(6).sub.'000010'
+           t2 = yy%v(6).sub.'000020'
+           t3 = yy%v(6).sub.'000030'
+           t4 = yy%v(6).sub.'000040'
+           
+           call kill(yy)
+           
+           b = betaRelativistic
+             
+          !   print*, 'First order alpha_c ',alpha_c 
+
+             alpha_c = (suml - b**2*suml + b**2*t1)/suml
+             
+         !    print*, 'New alpha_c ',alpha_c 
+             
+             ! algorithm from F.Schmidt
+             
+             alpha_c_p = b**2*(3*(-1 + b**2)*suml - 3*(-1 + b**2)*t1 + 2*b*t2)
+           
+             alpha_c_p2 = 3*b**2*((-1 + 6*b**2 - 5*b**4)*suml + t1 - 6*b**2*t1 + 5*b**4*t1 + &
+                          4*b*t2 - 4*b**3*t2 + 2*b**2*t3)
+            
+             alpha_c_p3 = 3*b**3*(35*b**5*(suml - t1) + 10*t2 + 30*b**4*t2 - &
+                           10*b**3*(5*suml - 5*t1 + 2*t3) + 5*b*(3*suml - 3*t1 + 4*t3) + &
+                          8*b**2*(-5*t2 + t4))
+                  
+             alpha_c_p  =alpha_c_p/suml
+             alpha_c_p2 =alpha_c_p2/suml
+             alpha_c_p3 =alpha_c_p3/suml
+             
+            ! l5= (-15*b**3*(63*b**7*(suml - t1) - 2*t2 + 56*b**6*t2 - &
+            !     21*b**5*(5*suml - 5*t1 + 2*t3) - 3*b*(suml - t1 + 6*t3) + &
+            !     12*b**2*(3*t2 - 2*t4) + b**4*(-90*t2 + 24*t4) + &
+            !     b**3*(45*suml - 45*t1 + 60*t3 - 8*t5)))/120d0
+           
+
+         endif
          
         else 
          
@@ -3076,53 +3129,9 @@ contains
            eta_c = alpha_c - one / gammaRelativistic**2
         
         
-        !   do i=1,4
-        !       dispersion_p(i) = 2.0*(theAscript(i).sub.'000020') ! as usual in this file
-        !   enddo
-        !
-        !   sd =   - 2.0*(oneTurnMap%x(6).sub.'000020') 
-        !   ! first dr65/ddeltap
-        !   sd = sd - 1.0*(oneTurnMap%x(6).sub.'100010')*dispersion(1) &
-        !        &  - 1.0*(oneTurnMap%x(6).sub.'010010')*dispersion(2) &
-        !        &  - 1.0*(oneTurnMap%x(6).sub.'001010')*dispersion(3) &
-        !        &  - 1.0*(oneTurnMap%x(6).sub.'000110')*dispersion(4) &
-        !	            ! new
-        !        &  - 1.0*(oneTurnMap%x(6).sub.'000011')*(oneTurnMap%x(6).sub.'000001') &
-        !	            ! then terms dr6i/ddeltap*dispersion(i)
-        !        &  - 2.0*(oneTurnMap%x(6).sub.'200000')*dispersion(1)**2 &
-        !        &  - (oneTurnMap%x(6).sub.'110000')*dispersion(1)*dispersion(2) &
-        !        &  - (oneTurnMap%x(6).sub.'101000')*dispersion(1)*dispersion(3) &
-        !        &  - (oneTurnMap%x(6).sub.'100100')*dispersion(1)*dispersion(4) &
-        !	            ! new
-        !        &  - (oneTurnMap%x(6).sub.'100010')*dispersion(1) &
-        !	            ! dr62/ddeltap*disperion(2)
-        !        &  - (oneTurnMap%x(6).sub.'110000')*dispersion(1)*dispersion(2) &
-        !        &  - 2.0*(oneTurnMap%x(6).sub.'020000')*dispersion(2)**2 &
-        !        &  - (oneTurnMap%x(6).sub.'011000')*dispersion(2)*dispersion(3) &
-        !        &  - (oneTurnMap%x(6).sub.'010100')*dispersion(2)*dispersion(4) &
-        !	            ! new
-        !        &  - (oneTurnMap%x(6).sub.'010010')*dispersion(2) &
-        !	            ! dr63/ddeltap*dispersion(3)
-        !        &  - (oneTurnMap%x(6).sub.'101000')*dispersion(1)*dispersion(3) &
-        !        &  - (oneTurnMap%x(6).sub.'011000')*dispersion(2)*dispersion(3) &
-        !        &  - 2.0*(oneTurnMap%x(6).sub.'002000')*dispersion(3)**2 &
-        !        &  - (oneTurnMap%x(6).sub.'001100')*dispersion(3)*dispersion(4) &
-        !	            ! new
-        !        &  - 1*(oneTurnMap%x(6).sub.'001010')*dispersion(3) &
-        !	            ! dr64/ddeltap*dispersion(4)
-        !        &  - (oneTurnMap%x(6).sub.'100100')*dispersion(1)*dispersion(4) &
-        !        &  - (oneTurnMap%x(6).sub.'010100')*dispersion(2)*dispersion(4) &
-        !        &  - (oneTurnMap%x(6).sub.'001100')*dispersion(3)*dispersion(4) &
-        !        &  - 2.0*(oneTurnMap%x(6).sub.'000200')*dispersion(4)**2 
-        !
-        !   do i=1,4
-        !      sd = sd - (oneTurnMap%x(6).sub.fo(i,:))*dispersion_p(i)
-        !   enddo
-        !   
-        !   alpha_c_p = sd * (betaRelativistic**2) / suml
-
+             
           else !5D or 6D
-           
+           !!!!!!!!!!!!!!!!!!!!1
            !56D
 
              yy%n = 6
@@ -3795,7 +3804,7 @@ contains
     integer     :: i,o ! output file
     character(len=250)   :: fmt
     integer     	:: io,r, myn1,myn2,indexa(mnres,4),mynres,ind(10)
-    type(c_damap)  :: c_Map, c_Map2, q_Map, a_cs
+    type(c_damap)  :: c_Map, c_Map2, q_Map, a_cs, a_cs_1
     type(c_taylor)  :: nrmlzdPseudoHam, g_io
     type(c_vector_field) vf, vf_kernel
      
@@ -3930,13 +3939,30 @@ contains
         !    n%a2=a2
         !    n%a_t=a1*a2*from_phasor()*texp(n%g)*from_phasor(-1)
 
-    call alloc(vf);
-    call alloc(g_io);
+
+    !!!!!!!!!!!!!!!!!!!
+    ! 
+    ! the OLD algoritm
+    ! call alloc(vf);
+    ! call alloc(g_io);
+    ! call flatten_c_factored_lie(theNormalForm%G,vf)
+    ! g_io =-cgetpb(vf)
+    !  
+    !!!!!!!!!!!!!!!!!!!  
     
+    call alloc(vf)
+    call alloc(g_io)
+    call alloc(a_CS)
+    call alloc(a_CS_1)
     
-      call flatten_c_factored_lie(theNormalForm%G,vf)
-      g_io =-cgetpb(vf)
-      call putGnormaltable(g_io)
+    call c_canonise(theNormalForm%atot,a_CS)
+    
+    a_CS=to_phasor()*a_CS*from_phasor()
+    call c_factor_map(a_CS,a_CS_1,vf,0) 
+
+    g_io = cgetpb(vf)
+
+    call putGnormaltable(g_io)
     
   !  write(99,*); write(99,*) " Normalised Generating Function  ";write(99,*); 
   !      call print(g_io,99)
@@ -3946,8 +3972,6 @@ contains
     !!!!!!!!!!!!!!!!!!!!!!
     !HAMILTONIAN
     !!!!!!!!!!!!!! Normalised Pseudo-Hamiltonian !!!!!!!!!!!!!!!        
-
-    call alloc(a_CS)
 
     call c_canonise(theNormalForm%a_t,a_CS)
 
@@ -3982,7 +4006,9 @@ contains
     call kill(c_Map)
     call kill(c_Map2)
     call kill(q_Map)
-    call kill(a_CS)    
+    call kill(a_CS) 
+    call kill(a_CS_1) 
+       
     call kill(nrmlzdPseudoHam)
     
     call kill(theNormalForm)
