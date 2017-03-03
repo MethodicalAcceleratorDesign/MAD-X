@@ -191,7 +191,6 @@ parameter: energy   double value:                100
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
  Closed orbit:    8.8928289351356365E-005   7.2772925748185414E-007   0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Normal Form Type 1
 
   Number of warnings: 0
 

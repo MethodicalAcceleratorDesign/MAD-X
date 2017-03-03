@@ -264,7 +264,6 @@ obs_points pro_ptc_setswitch Done
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Normal Form Type 1
      write, table=normal_results,file=normal_results; 
 
 

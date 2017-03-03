@@ -308,7 +308,6 @@ obs_points pro_ptc_setswitch Done
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
  Closed orbit:    0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
- Normal Form Type 1
    write, table=normal_results,file="ptc_normal_results.tfs"; 
 
    write, table=map_table, file=ptc_map_table.tfs;
