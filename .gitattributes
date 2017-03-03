@@ -2446,10 +2446,6 @@ tools/translators/sad_to_bmad/sler_simple001/sler_simple001.bmad.digested190 -te
 tools/translators/sad_to_bmad/sler_simple001/sler_simple001.sad -text
 tools/translators/sad_to_madx/FCC-ee/FCCee_t_85_by2_nosol/FCCee_t_85_by2_nosol.plain.sad -text
 tools/translators/sad_to_madx/FCC-ee/FCCee_t_85_by2_nosol/FCCee_t_85_by2_nosol.plain.seq -text
-tools/translators/sad_to_madx/FCC-ee/FCCee_t_85_by2_nosol/Oide_method/Benchmark/._README -text
-tools/translators/sad_to_madx/FCC-ee/FCCee_t_85_by2_nosol/Oide_method/Benchmark/._job.sad -text
-tools/translators/sad_to_madx/FCC-ee/FCCee_t_85_by2_nosol/Oide_method/Benchmark/._job_sample.madx -text
-tools/translators/sad_to_madx/FCC-ee/FCCee_t_85_by2_nosol/Oide_method/Benchmark/._slice.madx -text
 tools/translators/sad_to_madx/FCC-ee/FCCee_t_85_by2_nosol/Oide_method/Benchmark/README -text
 tools/translators/sad_to_madx/FCC-ee/FCCee_t_85_by2_nosol/Oide_method/Benchmark/job.sad -text
 tools/translators/sad_to_madx/FCC-ee/FCCee_t_85_by2_nosol/Oide_method/Benchmark/job_sample.madx -text
