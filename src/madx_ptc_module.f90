@@ -895,10 +895,7 @@ CONTAINS
           key%list%ks(i)=zero
        enddo
        skew(0)=-skew(0) ! frs error found 30.08.2008
-       
-      ! print*,"multipole normal: ",normal
-      ! print*,"multipole skew: ",skew
-       
+        
        key%list%thin_h_angle=bvk*normal(0)
        key%list%thin_v_angle=bvk*skew(0)
        lrad=node_value('lrad ')
