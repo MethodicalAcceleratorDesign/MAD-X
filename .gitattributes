@@ -124,6 +124,7 @@ doc/latexuguide/touschek.tex -text
 doc/latexuguide/trackchanges.sty -text
 doc/latexuguide/twiss.tex -text
 doc/latexuguide/twiss_mad8.tex -text
+doc/latexuguide/uguide.pdf -text svneol=unset#application/pdf
 doc/latexuguide/uguide.tex -text
 doc/mad8usrguide/maduser.tex -text
 doc/physguide/cern-art.cls -text
