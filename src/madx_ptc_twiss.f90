@@ -4249,7 +4249,7 @@ contains
       
       integer     	:: i,r, myn1,myn2,indexa(mnres,4),mynres
       complex(dp)   :: c_val
-      real(dp)    :: im_val, re_val, d_val, eps=1e-12
+      real(dp)    :: im_val, re_val, d_val, eps=1e-6
       
       ind(:) = 0
       myn1 = 0
@@ -4343,7 +4343,7 @@ contains
       logical skew
       integer     	:: r, myn1,myn2,indexa(mnres,4),mynres, illa
       complex(dp)   :: c_val
-      real(dp)    :: im_val, re_val, d_val,  eps=1e-12
+      real(dp)    :: im_val, re_val, d_val,  eps=1e-6
 
       ind(:) = 0
       myn1 = 0
