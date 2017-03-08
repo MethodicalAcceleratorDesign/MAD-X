@@ -4252,10 +4252,13 @@ contains
       character(len=17):: hamiltsin='hamilt_sin'
       character(len=17):: hamiltcos='hamilt_cos'
       character(len=17):: hamiltamp='hamilt_amp'
-      
       integer     	:: i,r, myn1,myn2,indexa(mnres,4),mynres
       complex(dp)   :: c_val
       real(dp)    :: im_val, re_val, d_val, eps=1e-6
+      integer     :: maxorder,o 
+      double precision :: get_value ! C-function
+      
+      maxorder = get_value('ptc_twiss ', 'no ')
       
       ind(:) = 0
       myn1 = 0
@@ -4264,9 +4267,17 @@ contains
       i=1
       call c_taylor_cycle(nrmlzdPseudoHam,size=mynres)
 
+    do o=1,maxorder !print order by order, I don't know how to sort c_taylor (piotr)
+
       do r=1,mynres
         
         call c_taylor_cycle(nrmlzdPseudoHam,ii=r,value=c_val,j=ind(1:c_%nv))
+ 
+        order = sum(ind(1:6))
+
+        if ( order .ne. o) then
+          cycle
+        endif
         
         re_val = real(c_val)
         im_val = imag(c_val)
@@ -4283,7 +4294,6 @@ contains
         
         endif
 
-        order = sum(ind(1:6))
 
         !print*,"HAML order ",order, ind(:)
         !print*,'       im=',im_val , ' re=',re_val  , ' amp=', d_val
@@ -4330,7 +4340,7 @@ contains
         call puttonormaltable(nn,nick,hamiltcos,re_val,order,ind)
 
       enddo
-    
+     enddo
     end subroutine putHnormaltable
 
 
@@ -4350,6 +4360,10 @@ contains
       integer     	:: r, myn1,myn2,indexa(mnres,4),mynres, illa
       complex(dp)   :: c_val
       real(dp)    :: im_val, re_val, d_val,  eps=1e-6
+      integer     :: maxorder,o 
+      double precision :: get_value ! C-function
+      
+      maxorder = get_value('ptc_twiss ', 'no ')
 
       ind(:) = 0
       myn1 = 0
@@ -4359,11 +4373,19 @@ contains
       call c_taylor_cycle(gen,size=mynres)
 
       !print*,"GNFU mynres ",mynres
-
+    
+    do o=1,maxorder !print order by order, I don't know how to sort c_taylor (piotr)
+      
       do r=1,mynres
         
         call c_taylor_cycle(gen,ii=r,value=c_val,j=ind(1:c_%nv))
 
+        order = sum(ind(1:6))
+        
+        if ( order .ne. o) then
+          cycle
+        endif
+        
         !print*,"GNFU ",ind(1:6)
         
         im_val = imag(c_val)
@@ -4376,7 +4398,6 @@ contains
           cycle
         endif
         
-        order = sum(ind(1:6))
         
         write(nn,'(a4,6(a1,i1))') 'gnfa','_',ind(1),'_',ind(2),'_',ind(3), &
                                         '_',ind(4),'_',ind(5),'_',ind(6)
@@ -4412,6 +4433,7 @@ contains
         call puttonormaltable(nn,nick,genfuncos,re_val,order,ind)
         
       enddo
+    enddo
       
       myn1 = 0
       myn2 = 0
