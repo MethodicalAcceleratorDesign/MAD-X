@@ -637,7 +637,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   use name_lenfi
   use twisscfi
   use spch_bbfi
-  use matrices, only : EYE, symp_thrd, symp_thrd_orbit
+  use matrices, only : EYE, symp_thrd  ! , symp_thrd_orbit
   use math_constfi, only : zero
   use code_constfi
   implicit none
@@ -767,14 +767,14 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
     call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
     RT = matmul(RE,RT)
     !--- IT check if RT is symplectic
-    if (debug .ne. zero) then
+    if (thr_on .gt. 0 .and. debug .ne. zero) then
       call m66symp(rt,nrm)
-      if ((nrm-nrm0) .gt. symp_thrd_orbit) then
-        nrm0 = nrm
+      if ((nrm-nrm0) .gt. symp_thrd) then
         call element_name(el_name,len(el_name))
         write (warnstr,'(a,e13.6,a,a)') "Symplectic deviation: ", nrm, " in element ", el_name
         call fort_warn('THREADER-1: ', warnstr)
       endif
+      nrm0 = nrm
     endif
   endif
 
@@ -786,14 +786,14 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
     call tmcat(.true.,re,te,rt,tt,rt,tt)
     suml = suml + el
     !--- IT check if RT is symplectic
-    if (debug .ne. zero) then
+    if (thr_on .gt. 0 .and. debug .ne. zero) then
       call m66symp(rt,nrm)
-      if ((nrm-nrm0) .gt. symp_thrd_orbit) then
-        nrm0 = nrm
+      if ((nrm-nrm0) .gt. symp_thrd) then
         call element_name(el_name,len(el_name))
         write (warnstr,'(a,e13.6,a,a)') "Symplectic deviation: ", nrm, " in element ", el_name
         call fort_warn('THREADER-M: ', warnstr)
       endif
+      nrm0 = nrm
     endif
   endif
 
@@ -802,14 +802,14 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
     call tmali2(el,orbit2,al_errors,beta,gamma,orbit,re)
     RT = matmul(RE,RT)
     !--- IT check if RT is symplectic
-    if (debug .ne. zero) then
+    if (thr_on .gt. 0 .and. debug .ne. zero) then
       call m66symp(rt,nrm)
-      if ((nrm-nrm0) .gt. symp_thrd_orbit) then
-        nrm0 = nrm
+      if ((nrm-nrm0) .gt. symp_thrd) then
         call element_name(el_name,len(el_name))
         write (warnstr,'(a,e13.6,a,a)') "Symplectic deviation: ", nrm, " in element ", el_name
         call fort_warn('THREADER-2: ', warnstr)
       endif
+      nrm0 = nrm
     endif
   endif
 
@@ -1095,8 +1095,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   C = RA(3:4,1:2) ; D = RA(3:4,3:4)
 
   !---- Initial dispersion.
-  !--should we change to RA?????
-  call twdisp_ini(rt, disp0) !-- LD: 2016.04.18
+  call twdisp_ini(RA, disp0) !-- LD: 2016.04.18
 
   !---- Matrix C + B(bar) and its determinant (for R_A)
   BBAR = matmul(matmul(-SMAT,transpose(B)),SMAT)

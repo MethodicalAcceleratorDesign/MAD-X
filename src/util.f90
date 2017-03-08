@@ -67,7 +67,7 @@ module matrices
   double precision, parameter :: SMATINV(2,2) = -SMAT
   double precision, parameter :: SMATT(2,2)   = -SMAT
 
-  double precision, parameter :: symp_thrd = 1d-12, symp_thrd_orbit = 1d-10 ! threshold during closed orbit search
+  double precision, parameter :: symp_thrd = 1d-12 !, symp_thrd_orbit = 1d-10 ! threshold during closed orbit search
 end module matrices
 
 module code_constfi
