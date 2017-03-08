@@ -1077,7 +1077,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
 
   call m66symp(rt,nrm)
   if (nrm .gt. symp_thrd) then
-     write (warnstr,'(a, e13.6, a)') "One-turn map R symplectic deviation: ",
+     write (warnstr,'(a, e13.6, a)') "One-turn map R symplectic deviation: ", &
                                      nrm, " (symplectifying R)"
      call fort_warn('TWCPIN: ', warnstr)
   endif
