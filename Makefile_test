@@ -145,9 +145,9 @@ onwin    = $(if       $(call eq,$(OSTYPE),Windows),$1,$2)
 onlxplus = $(if $(and $(call eq,$(OSTYPE),Linux),\
                       $(findstring lxplus,$(HOSTNAME)),\
                       $(wildcard /afs/cern.ch/eng/lhc/optics),yes),$1,$2)
-onlxi64  = $(if $(and $(call eq,$(OSTYPE),Linux),\
-                      $(call eq,$(COMP),gnu),\
+onlxi64  = $(if $(and $(call eq,$(COMP),gnu),\
                       $(call eq,$(ARCH),64),\
+                      $(call eq,$(OSTYPE),Linux),\
                       $(findstring lxplus,$(HOSTNAME)),\
                       $(wildcard /afs/cern.ch/eng/lhc/optics),yes),$1,$2)
 
@@ -159,6 +159,8 @@ endif
 
 TESTCMD = $(TIMER) $(MADX) $(@F).madx
 
-$(info on lxplus with gnu64? $(call onlxi64, will run $(user-cases), no))
+ifneq ($(filter tests%,$(MAKECMDGOALS)),)
+$(info on lxplus with gnu64? $(call onlxi64,will run tests: $(user-cases),no))
+endif
 
 # end of makefile
