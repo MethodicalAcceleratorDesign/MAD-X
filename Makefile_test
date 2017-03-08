@@ -93,6 +93,7 @@ test-match-6 test-match-7 \
 test-ptc-twiss-2 \
 test-ptc-twiss-old6 test-ptc-twiss-old7 \
 test-touschek test-touschek-2 \
+\
 $(call onlxi64,$(user-cases),)
 
 # user-cases are run only with tests-all on Lxplus + AFS + Gnu 64 bit
@@ -108,7 +109,7 @@ test-lhc test-hllhc
 # lexicographical order
 tests-to-setup =
 
-# testsuite titles (attached to first test of the suite, lex. order)
+# testsuite titles (attached to first test of the suite, lexi. order)
 test-aperture:       TESTSUITE := Aperture testsuite
 test-beam:           TESTSUITE := Beam testsuite
 test-c6t:            TESTSUITE := SixTrack Conversion testsuite
@@ -157,5 +158,7 @@ MADX    := $(if $(MADXCMD),..$/..$/$(MADXCMD),$(PROJECT)_dev$(ARCH)$(BINARY_EXT)
 endif
 
 TESTCMD = $(TIMER) $(MADX) $(@F).madx
+
+$(info on lxplus? $(call onlxi64, will run $(user-cases), no))
 
 # end of makefile
