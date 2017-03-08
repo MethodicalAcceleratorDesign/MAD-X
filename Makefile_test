@@ -159,6 +159,6 @@ endif
 
 TESTCMD = $(TIMER) $(MADX) $(@F).madx
 
-$(info on lxplus? $(call onlxi64, will run $(user-cases), no))
+$(info on lxplus with gnu64? $(call onlxi64, will run $(user-cases), no))
 
 # end of makefile
