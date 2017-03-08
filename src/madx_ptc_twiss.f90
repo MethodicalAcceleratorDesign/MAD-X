@@ -3080,9 +3080,6 @@ contains
         
         
            t1 = yy%v(6).sub.'000010'
-           t2 = yy%v(6).sub.'000020'
-           t3 = yy%v(6).sub.'000030'
-           t4 = yy%v(6).sub.'000040'
            
            call kill(yy)
            
@@ -3094,20 +3091,29 @@ contains
              
          !    print*, 'New alpha_c ',alpha_c 
              
-             ! algorithm from F.Schmidt
+           ! algorithm from F.Schmidt
              
+
+           if (order.ge.2) then
+             t2 = yy%v(6).sub.'000020'
              alpha_c_p = b**2*(3*(-1 + b**2)*suml - 3*(-1 + b**2)*t1 + 2*b*t2)
+             alpha_c_p = alpha_c_p / suml
+           endif
            
+           if (order.ge.3) then
+             t3 = yy%v(6).sub.'000030'
              alpha_c_p2 = 3*b**2*((-1 + 6*b**2 - 5*b**4)*suml + t1 - 6*b**2*t1 + 5*b**4*t1 + &
                           4*b*t2 - 4*b**3*t2 + 2*b**2*t3)
-            
+             alpha_c_p2 = alpha_c_p2 / suml
+           endif
+           
+           if (order.ge.4) then
+             t4 = yy%v(6).sub.'000040'
              alpha_c_p3 = 3*b**3*(35*b**5*(suml - t1) + 10*t2 + 30*b**4*t2 - &
-                           10*b**3*(5*suml - 5*t1 + 2*t3) + 5*b*(3*suml - 3*t1 + 4*t3) + &
+                          10*b**3*(5*suml - 5*t1 + 2*t3) + 5*b*(3*suml - 3*t1 + 4*t3) + &
                           8*b**2*(-5*t2 + t4))
-                  
-             alpha_c_p  =alpha_c_p/suml
-             alpha_c_p2 =alpha_c_p2/suml
-             alpha_c_p3 =alpha_c_p3/suml
+             alpha_c_p3 = alpha_c_p3 / suml
+           endif       
              
             ! l5= (-15*b**3*(63*b**7*(suml - t1) - 2*t2 + 56*b**6*t2 - &
             !     21*b**5*(5*suml - 5*t1 + 2*t3) - 3*b*(suml - t1 + 6*t3) + &
