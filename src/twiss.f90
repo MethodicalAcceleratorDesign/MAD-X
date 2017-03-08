@@ -637,7 +637,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   use name_lenfi
   use twisscfi
   use spch_bbfi
-  use matrices, only : EYE, symp_thrd
+  use matrices, only : EYE, symp_thrd, symp_thrd_orbit
   use math_constfi, only : zero
   use code_constfi
   implicit none
@@ -672,7 +672,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   integer :: kpro, corr_pick(2), enable, coc_cnt(2), lastnb, rep_cnt(2)
   double precision :: orbit2(6), ek(6), re(6,6), te(6,6,6)
   double precision :: al_errors(align_max)
-  double precision :: el, cick, err, nrm
+  double precision :: el, cick, err, nrm, nrm0
   double precision :: parvec(26),  vector(10), reforb(6)
   double precision :: restsum(2), restorb(6,2), restm(6,6,2), restt(6,6,6,2)
   double precision :: cmatr(6,6,2), pmatr(6,6), dorb(6)
@@ -692,7 +692,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   CORR_PICK = 0
   REP_CNT = 0
   RESTSUM = zero
-
+  nrm0    = zero
   if (thr_on .gt. 0)  then
      VECTOR = zero
      j = get_vector('threader ', 'vector ', vector)
@@ -769,7 +769,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
     !--- IT check if RT is symplectic
     if (debug .ne. zero) then
       call m66symp(rt,nrm)
-      if (nrm .gt. symp_thrd) then
+      if ((nrm-nrm0) .gt. symp_thrd_orbit) then
+        nrm0 = nrm
         call element_name(el_name,len(el_name))
         write (warnstr,'(a,e13.6,a,a)') "Symplectic deviation: ", nrm, " in element ", el_name
         call fort_warn('THREADER-1: ', warnstr)
@@ -787,7 +788,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
     !--- IT check if RT is symplectic
     if (debug .ne. zero) then
       call m66symp(rt,nrm)
-      if (nrm .gt. symp_thrd) then
+      if ((nrm-nrm0) .gt. symp_thrd_orbit) then
+        nrm0 = nrm
         call element_name(el_name,len(el_name))
         write (warnstr,'(a,e13.6,a,a)') "Symplectic deviation: ", nrm, " in element ", el_name
         call fort_warn('THREADER-M: ', warnstr)
@@ -802,7 +804,8 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
     !--- IT check if RT is symplectic
     if (debug .ne. zero) then
       call m66symp(rt,nrm)
-      if (nrm .gt. symp_thrd) then
+      if ((nrm-nrm0) .gt. symp_thrd_orbit) then
+        nrm0 = nrm
         call element_name(el_name,len(el_name))
         write (warnstr,'(a,e13.6,a,a)') "Symplectic deviation: ", nrm, " in element ", el_name
         call fort_warn('THREADER-2: ', warnstr)

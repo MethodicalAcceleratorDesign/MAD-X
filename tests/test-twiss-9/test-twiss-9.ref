@@ -5530,6 +5530,7 @@ orbit:   2.502626E-06  2.178362E-05 -1.992044E-05 -5.056846E-06  0.000000E+00  0
   
 iteration:   2 error:   6.136233E-11 deltap:   0.000000E+00
 orbit:   2.502581E-06  2.178362E-05 -1.992047E-05 -5.056848E-06  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.226443E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -5558,7 +5559,8 @@ orbit:   2.502581E-06  2.178362E-05 -1.992047E-05 -5.056848E-06  0.000000E+00  0
 stop;
 
 
-  Number of warnings: 0
+  Number of warnings: 1
+0 in C and 1 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

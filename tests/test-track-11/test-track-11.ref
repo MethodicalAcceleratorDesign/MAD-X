@@ -86,6 +86,7 @@ enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.139710E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -114,6 +115,7 @@ enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.139710E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -141,6 +143,7 @@ enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.139710E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -483,6 +486,7 @@ enter Twiss module
   
 iteration:   1 error:   2.225376E-21 deltap:   0.000000E+00
 orbit:   8.908674E-22 -2.255121E-23 -9.785071E-22 -1.701329E-23 -1.456529E-17 -1.927238E-25
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.220725E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -521,7 +525,8 @@ orbit:  -5.149685E-70 -6.582024E-72  3.585969E-82  3.004261E-84 -4.073446E-17  2
 exit TRACK module
 
 
-  Number of warnings: 0
+  Number of warnings: 4
+0 in C and 4 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +
