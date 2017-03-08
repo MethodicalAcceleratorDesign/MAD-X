@@ -3081,7 +3081,6 @@ contains
         
            t1 = yy%v(6).sub.'000010'
            
-           call kill(yy)
            
            b = betaRelativistic
              
@@ -3089,7 +3088,7 @@ contains
 
              alpha_c = (suml - b**2*suml + b**2*t1)/suml
              
-         !    print*, 'New alpha_c ',alpha_c 
+           !  print*, 'New alpha_c ',alpha_c 
              
            ! algorithm from F.Schmidt
              
@@ -3114,12 +3113,15 @@ contains
                           8*b**2*(-5*t2 + t4))
              alpha_c_p3 = alpha_c_p3 / suml
            endif       
-             
+
+ 
+            
             ! l5= (-15*b**3*(63*b**7*(suml - t1) - 2*t2 + 56*b**6*t2 - &
             !     21*b**5*(5*suml - 5*t1 + 2*t3) - 3*b*(suml - t1 + 6*t3) + &
             !     12*b**2*(3*t2 - 2*t4) + b**4*(-90*t2 + 24*t4) + &
             !     b**3*(45*suml - 45*t1 + 60*t3 - 8*t5)))/120d0
            
+           call kill(yy)
 
          endif
          
@@ -3803,6 +3805,7 @@ contains
     type(probe_8),target :: oneTurnMap,theAscript
     real(dp),    target :: startorbit(6) 
     real(dp) :: suml ! cumulative length along the ring
+    real(dp)  :: prec ! for printing in files
     real(dp) :: disp1stOrder(4) ! for 6D algo
     type(c_taylor) :: tempTaylor ! for 6D algo
     type(c_normal_form) theNormalForm
@@ -3960,12 +3963,31 @@ contains
     call alloc(g_io)
     call alloc(a_CS)
     call alloc(a_CS_1)
+
+    open(unit=99,file='debug.ptc')
+    prec=1.d-9
+    write(99,*) "--------------------------------------" 
+    write(99,*); write(99,*) " c_normal atot  ";write(99,*); 
+        call print(theNormalForm%atot,99,prec)
+    write(99,*) "--------------------------------------" 
     
     call c_canonise(theNormalForm%atot,a_CS)
+
+
+    write(99,*) "--------------------------------------" 
+    write(99,*); write(99,*) " c_canonise  ";write(99,*); 
+        call print(a_CS,99,prec)
+    write(99,*) "--------------------------------------" 
     
     a_CS=to_phasor()*a_CS*from_phasor()
     call c_factor_map(a_CS,a_CS_1,vf,0) 
 
+    write(99,*) "--------------------------------------" 
+    write(99,*); write(99,*) " c_factor_map  ";write(99,*); 
+        call print(vf,99,prec)
+    write(99,*) "--------------------------------------" 
+    close(99)
+    
     g_io = cgetpb(vf)
 
     call putGnormaltable(g_io)
