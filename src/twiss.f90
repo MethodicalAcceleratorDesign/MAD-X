@@ -637,7 +637,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   use name_lenfi
   use twisscfi
   use spch_bbfi
-  use matrices, only : EYE
+  use matrices, only : EYE, symp_thrd
   use math_constfi, only : zero
   use code_constfi
   implicit none
@@ -679,7 +679,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
 
   integer, external :: restart_sequ, advance_node, node_al_errors, get_vector, get_option
   double precision, external :: node_value
-  double precision, parameter :: orb_limit=1d1, symp_thrd=1d-11 ! FCC2 needs a bit more than 1e-12
+  double precision, parameter :: orb_limit=1d1
   integer, parameter :: max_rep=100
 
   debug = get_option('debug ')
@@ -771,7 +771,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
       call m66symp(rt,nrm)
       if (nrm .gt. symp_thrd) then
         call element_name(el_name,len(el_name))
-        write (warnstr,'(a,e13.6,a,a)') "The column norm is ", nrm, " in element ", el_name
+        write (warnstr,'(a,e13.6,a,a)') "Symplectic deviation: ", nrm, " in element ", el_name
         call fort_warn('THREADER-1: ', warnstr)
       endif
     endif
@@ -789,7 +789,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
       call m66symp(rt,nrm)
       if (nrm .gt. symp_thrd) then
         call element_name(el_name,len(el_name))
-        write (warnstr,'(a,e13.6,a,a)') "The column norm is ", nrm, " in element ", el_name
+        write (warnstr,'(a,e13.6,a,a)') "Symplectic deviation: ", nrm, " in element ", el_name
         call fort_warn('THREADER-M: ', warnstr)
       endif
     endif
@@ -804,7 +804,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
       call m66symp(rt,nrm)
       if (nrm .gt. symp_thrd) then
         call element_name(el_name,len(el_name))
-        write (warnstr,'(a,e13.6,a,a)') "The column norm is ", nrm, " in element ", el_name
+        write (warnstr,'(a,e13.6,a,a)') "Symplectic deviation: ", nrm, " in element ", el_name
         call fort_warn('THREADER-2: ', warnstr)
       endif
     endif
@@ -1027,7 +1027,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
   use twiss0fi
   use twisscfi
   use twissbeamfi, only : deltap
-  use matrices, only : EYE, SMAT
+  use matrices, only : EYE, SMAT, symp_thrd
   use math_constfi, only : zero, one, two, quarter
   implicit none
   !----------------------------------------------------------------------*
@@ -1055,7 +1055,7 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
 
   integer, external :: get_option
   double precision, external :: get_value
-  double precision, parameter :: eps=1d-8, diff_cos = 1d-5, symp_thrd=1d-11 ! FCC2 needs a bit more than 1e-12
+  double precision, parameter :: eps=1d-8, diff_cos = 1d-5
 
   double precision  :: em(6,6),  cosmu1_eig, cosmu2_eig, nrm
   double precision  :: reval(6), aival(6) ! re and im parts
@@ -1077,11 +1077,13 @@ SUBROUTINE twcpin(rt,disp0,r0mat,eflag)
 
   call m66symp(rt,nrm)
   if (nrm .gt. symp_thrd) then
-     eflag = 1
-     write (warnstr,'(a, e13.6)') "One-turn map can't be  simplectified! nrm = ", nrm
+     write (warnstr,'(a, e13.6, a)') "One-turn map R symplectic deviation: ",
+                                     nrm, " (symplectifying R)"
      call fort_warn('TWCPIN: ', warnstr)
-  else
-     call tmsymp(RA)
+  endif
+
+  if (nrm .gt. zero) then
+    call tmsymp(RA)
   endif
 
   ! RA(1:4,1:4) = ( A , B

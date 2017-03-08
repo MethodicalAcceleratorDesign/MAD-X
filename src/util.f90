@@ -1,4 +1,4 @@
-module math_constfi ! 2015-Aug-06 Ghislain 
+module math_constfi ! 2015-Aug-06 Ghislain
   implicit none
   public
   !--- Definition of useful mathematical constants
@@ -30,19 +30,19 @@ module phys_constfi
   double precision, parameter :: hbar   = 6.58211951440e-25  !     Reduced Plack's constant [GeV*s]
   double precision, parameter :: amu0   = 4d-7 * pi          !     Permeability of vacuum [V*s/A*m]
   ! Rest Mass [GeV]
-  !double precision, parameter :: emass  = 0.510998928d-3    
-  !double precision, parameter :: mumass = 0.1056583715d0    
-  !double precision, parameter :: nmass  = 0.931494061d0     
+  !double precision, parameter :: emass  = 0.510998928d-3
+  !double precision, parameter :: mumass = 0.1056583715d0
+  !double precision, parameter :: nmass  = 0.931494061d0
   !double precision, parameter :: pmass  = 0.938272046d0
   double precision, parameter ::  emass  = 0.510998946131d-3 ! GeV
   double precision, parameter ::  pmass  = 0.938272081358    ! GeV
   double precision, parameter ::  nmass  = 0.939565413358    ! GeV
   double precision, parameter ::  mumass = 0.105658374524    ! GeV
-  
+
   ! Classical radius [m]
-  !double precision, parameter :: erad   = 2.8179403267d-15  
-  double precision, parameter :: erad   = 2.817940322719d-15 
-  double precision, parameter :: prad   = erad*emass/pmass  
+  !double precision, parameter :: erad   = 2.8179403267d-15
+  double precision, parameter :: erad   = 2.817940322719d-15
+  double precision, parameter :: prad   = erad*emass/pmass
 end module phys_constfi
 
 module matrices
@@ -67,6 +67,7 @@ module matrices
   double precision, parameter :: SMATINV(2,2) = -SMAT
   double precision, parameter :: SMATT(2,2)   = -SMAT
 
+  double precision, parameter :: symp_thrd = 1d-12
 end module matrices
 
 module code_constfi
@@ -76,7 +77,7 @@ module code_constfi
   integer, parameter :: code_drift = 1
   integer, parameter :: code_rbend = 2
   integer, parameter :: code_sbend = 3
-  integer, parameter :: code_matrix = 4  
+  integer, parameter :: code_matrix = 4
   integer, parameter :: code_quadrupole = 5
   integer, parameter :: code_sextupole = 6
   integer, parameter :: code_octupole = 7
@@ -111,7 +112,7 @@ module code_constfi
   integer, parameter :: code_translation = 36
   integer, parameter :: code_crabcavity = 37
   integer, parameter :: code_placeholder = 38
-  integer, parameter :: code_tkicker = 39 
+  integer, parameter :: code_tkicker = 39
   integer, parameter :: code_hacdipole = 40
   integer, parameter :: code_vacdipole = 41
   integer, parameter :: code_nllens = 42
@@ -119,7 +120,7 @@ module code_constfi
   integer, parameter :: code_collimator = 44
 end module code_constfi
 
-  
+
 module Inf_NaN_Detection
 
   !!     Inf_NaN_Detection module
@@ -214,7 +215,7 @@ contains
   end function sisnan
 
   ! Double precision test for NaN
-!DEC$ ATTRIBUTES FORCEINLINE :: disnan 
+!DEC$ ATTRIBUTES FORCEINLINE :: disnan
   elemental function disnan(d) result(res)
     implicit none
     real(dp), intent(in) :: d
@@ -334,7 +335,7 @@ module twisslfi
   logical :: mode_flip=.false.
   logical :: ele_body=.false.
   logical :: flipping=.true.
-  
+
 end module twisslfi
 
 module twisscfi
@@ -354,7 +355,7 @@ module twisscfi
   double precision :: wx=0.d0, phix=0.d0, dmux=0.d0, xix=0.d0, wy=0.d0, phiy=0.d0, dmuy=0.d0, xiy=0.d0
   double precision :: synch_1=0.d0, synch_2=0.d0, synch_3=0.d0, synch_4=0.d0, synch_5=0.d0
   double precision :: gammacp=1.d0
-  integer :: nmode_flip=0  
+  integer :: nmode_flip=0
 end module twisscfi
 
 module twissotmfi
@@ -504,14 +505,14 @@ module spch_bbfi
   implicit none
   public
   logical :: lost_in_turn = .false., is_lost = .false.
-  integer, save :: i_turn, N_macro_surv, N_for_I, N_spch, i_spch 
+  integer, save :: i_turn, N_macro_surv, N_for_I, N_spch, i_spch
   integer, parameter :: N_macro_max=16000
   double precision, save :: Ex_rms, Ey_rms, sigma_p, sigma_z
   double precision, save :: Ix_array(N_macro_max), Iy_array(N_macro_max)
   double precision, save :: dpi_array(N_macro_max), z_part_array(N_macro_max)
   double precision :: alpha, I_div_E_sum_max
 !  parameter(alpha=0.0, I_div_E_sum_max=7.0)
-  double precision, save :: betx_bb(bbd_max), bety_bb(bbd_max), & 
+  double precision, save :: betx_bb(bbd_max), bety_bb(bbd_max), &
                             alfx_bb(bbd_max), alfy_bb(bbd_max), &
                             gamx_bb(bbd_max), gamy_bb(bbd_max), &
                             dx_bb(bbd_max),   dy_bb(bbd_max)
@@ -556,7 +557,7 @@ module plotfi
   integer, parameter :: mplred = 46, mplout = 47
 
   integer, parameter :: maxseql = 50000, mtwcol = 46, mpparm = 10
-  integer, parameter :: mxcurv = 10, mopt = 60, mfile = 120, marg = 60 
+  integer, parameter :: mxcurv = 10, mopt = 60, mfile = 120, marg = 60
   integer, parameter :: maxarg = 1000, mxdp = 25, mxplot = 100
 
   integer, parameter :: mintpl = 18
@@ -649,14 +650,14 @@ module gxx11_common
   real, parameter :: toleps=1.e-5, versio=1.50
 
   integer :: normt
-  integer, parameter :: madim1=500, madim2=100, maxset=20, mconid=7, merrun=10 
+  integer, parameter :: madim1=500, madim2=100, maxset=20, mconid=7, merrun=10
   integer, parameter :: metaun=11, miunit=5, mmetat=4, mounit=6, mpaxs=23, mpcurv=10
   integer, parameter :: mtermt=101, mtick=10, mtmeta=2, mtterm=1, mtfont=12
   integer, parameter :: mxaxs=4, mxpix=1000, mxsize=27, myaxs=4, mypix=1000, mysize=19
   integer, parameter :: mnormt=2, mx11pr=10, mx11tf=10, mxxpix=1200, mxypix=1000
   integer, parameter :: mcolor=6, mpspro=8, meppro=8, mdict=24, mlpro=68, mpsep=3, mepep=2
   integer, parameter :: mhead=4, mline=72, msfact=4, mlbb1=17, mlbb2=30, mubb1=573, mubb2=790
-  integer, parameter :: mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2  
+  integer, parameter :: mwid1 = mubb1 - mlbb1, mwid2 = mubb2 - mlbb2
 
 
   integer :: itermt=0, interm=0, inmeta=0, ierrun=0, imetun=0, inunit=0, iounit=0, ipage=0
@@ -666,14 +667,14 @@ module gxx11_common
   integer :: lsfflg=0, lsqflg=0, lwtflg=0, lclflg=0, lnormt=0, lmetax=0, lmetay=0, lmetnm=0
   integer :: lerrnm=0, ldefnl=0, lerrop=0, lmetop=0, ltotin=0, lacttm=0, lpseps=0, lundef=0
   integer :: lttime=0, ldinit=0, ltseop=0
-  
+
   integer :: ixapar(mpaxs,mxaxs)=0, iyapar(mpaxs,myaxs)=0, icvpar(mpcurv ,maxset)=0
-  
-  integer :: nxpix=0, nypix=0, lxpix=0, lypix=0, icucol=0, iorips=0 
-  integer :: iutlps=0, ibbox(4)=0, ix11pr(mx11pr)=0, ix11tf(mx11tf)=0, ix11op(mx11tf)=0  
-  
+
+  integer :: nxpix=0, nypix=0, lxpix=0, lypix=0, icucol=0, iorips=0
+  integer :: iutlps=0, ibbox(4)=0, ix11pr(mx11pr)=0, ix11tf(mx11tf)=0, ix11op(mx11tf)=0
+
   real :: fxpix=0., fypix=0., rx11pr(mx11pr)=0., rgbcol(3,mcolor)=0.
-  
+
   real :: xmetaf=0., ymetaf=0., xsterm=0., ysterm=0., wfact=0., wttime=0., wxfact=0., wyfact=0.
   real :: vpfacx=0., vpfacy=0., vptdef(4)=0., vploc(4)=0., actwnd(4)=0.
   real :: rangex(2,mxaxs)=0., rangey(2 ,myaxs)=0.
@@ -688,7 +689,7 @@ module gxx11_common
   character(len=20)  :: sxform(mxaxs)=" ", syform(myaxs)=" ", stortx=" "
   character(len=1)   :: sdefnl=" "
   character(len=16)  :: colour(mcolor)=" "
-  character(len=60)  :: pshead(mhead)=" " 
+  character(len=60)  :: pshead(mhead)=" "
   character(len=maxset) :: splotc=" "
 end module gxx11_common
 
@@ -825,7 +826,7 @@ subroutine dcopy(in,out,n)
   integer, intent(IN) :: n
   double precision, intent(IN)  :: in(*)
   double precision, intent(OUT) :: out(*)
-  
+
   OUT(1:n) = IN(1:n)
 
 end subroutine dcopy
@@ -1171,7 +1172,7 @@ subroutine laseig(fm,reeig,aieig,am)
 
   !---- Compute eigenvalues and vectors.
   TM = FM
-  AM = EYE 
+  AM = EYE
   call orthes(mdim,nn,ilo,ihi,tm,d)
   call ortran(mdim,nn,ilo,ihi,tm,d,am)
   call hqr2(mdim,nn,ilo,ihi,tm,reval,aival,am,info)
@@ -1235,7 +1236,7 @@ subroutine laseig(fm,reeig,aieig,am)
   aieig(6) = zero
 
   !---- Rephase the result.
-  TM = EYE 
+  TM = EYE
   dx = sqrt(am(1,1)**2 + am(1,2)**2)
   tm(1,1) = am(1,1) / dx
   tm(2,1) = am(1,2) / dx
@@ -1247,7 +1248,7 @@ subroutine laseig(fm,reeig,aieig,am)
   tm(3,4) = - tm(4,3)
   tm(4,4) = tm(3,3)
 
-  AM = matmul(AM,TM) 
+  AM = matmul(AM,TM)
 
 end subroutine laseig
 
@@ -1267,7 +1268,7 @@ subroutine ladeig(fm,reeig,aieig,am)
   !----------------------------------------------------------------------*
   double precision, intent(IN)  :: fm(6,6)
   double precision, intent(OUT) :: reeig(6), aieig(6), am(6,6)
-  
+
   integer i, info, j, k, kpnt(6)
   double precision :: aival(6), d(6), reval(6), tm(6,6)
   double precision :: big, c, dt, dx, dy, pb, s
@@ -1344,7 +1345,7 @@ subroutine ladeig(fm,reeig,aieig,am)
      enddo
   enddo
   !---- Rephase the result.
-  TM = EYE 
+  TM = EYE
   dx = sqrt(am(1,1)**2 + am(1,2)**2)
   tm(1,1) = am(1,1) / dx
   tm(2,1) = am(1,2) / dx
@@ -1360,7 +1361,7 @@ subroutine ladeig(fm,reeig,aieig,am)
   tm(6,5) = am(5,6) / dt
   tm(5,6) = - tm(6,5)
   tm(6,6) = tm(5,5)
-  AM = matmul(AM,TM) 
+  AM = matmul(AM,TM)
 
 end subroutine ladeig
 
@@ -1460,11 +1461,11 @@ subroutine ortran(ndim,n,ilow,iupp,h,d,v)
   !----------------------------------------------------------------------*
   integer, intent(IN) :: ndim, n, ilow, iupp
   double precision, intent(IN)  :: h(ndim,n)
-  double precision, intent(OUT) :: d(n), v(ndim,n) 
+  double precision, intent(OUT) :: d(n), v(ndim,n)
 
   integer :: i, j, k, m
   double precision :: x, y
-  
+
   !---- Initialize V to identity matrix.
   V(:n,:n) = zero
   do i = 1, n
@@ -1520,14 +1521,14 @@ subroutine hqr2(ndim,n,ilow,iupp,h,wr,wi,vecs,ierr)
   !   VECS(NDIM,N) (real) The unnormalized eigenvectors of A.            *
   !                       Complex vectors are stored as pairs of reals.  *
   !----------------------------------------------------------------------*
-  integer, intent(IN)  :: ndim, n, ilow, iupp 
+  integer, intent(IN)  :: ndim, n, ilow, iupp
   integer, intent(OUT) :: ierr
   double precision, intent(OUT) :: h(ndim,n), wi(n), wr(n), vecs(ndim,n)
-  
+
   integer :: i, j, k, l, m, na, ien, its
   double precision :: den, hnorm, p, q, r, ra, s, sa, t, temp, tempi
   double precision :: tempr, vi, vr, w, x, y, z
-  
+
   double precision, parameter :: epsmch=1d-16, triqua=.75d0, fac1=.4375d0
 
   !Initialize
@@ -1887,7 +1888,7 @@ subroutine f77flush(i, option)
   character(len=20) :: faccess, fform
   character(len=255) :: fname
   character(len=1) :: c
-  real :: a ! dp ? 
+  real :: a ! dp ?
 
   inquire( err=5, iostat=ios, unit=i, opened=ostat, exist=fexist)
   if (.not.ostat .or. .not.fexist) return
@@ -1909,7 +1910,7 @@ subroutine f77flush(i, option)
 4    backspace i
 1    continue
   endif
-  
+
   return
 
 100 format (a1)
