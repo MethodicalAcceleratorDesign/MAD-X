@@ -719,7 +719,10 @@ end subroutine c_get_indices
     localmaster=master
     call ass(scdadd%AC%x(1))
     !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
-     d=s1%V(C_%ND2-1) +addclock*s2%AC%x(1)
+    
+    
+    d= s1%V(C_%ND2-1) + addclock*s2%AC%x(1)
+    
     scdadd%ac%x(1)=d
     master=localmaster
     localmaster=master
@@ -10096,6 +10099,7 @@ prec=1.d-8
     
     if(.not.c_stable_da) return
 
+    jj = 0
     jj(1)=1
     !
     xy%n=xy0%n
