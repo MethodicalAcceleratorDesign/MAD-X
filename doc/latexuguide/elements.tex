@@ -1,4 +1,3 @@
-%  Last change by: Irina Tecker, 11-OCT-2016 
 \chapter{Element Types}
 \label{chap:elements}
 
@@ -1080,18 +1079,20 @@ is equivalent to
 \label{sec:crab-cavity}\label{sec:crabcavity}
 
 \madbox{
-label: CRABCAVITY, \=L=real, VOLT=real, LAG=real, \\
+label: CRABCAVITY, \=L=real, TILT=real, VOLT=real, LAG=real, \\
                    \>FREQ=real, HARMON=integer, \\
                    \>RV1=integer, RV2=integer, \\
                    \>RV3=integer, RV4=integer, \\
                    \>RPH1=integer, RPH2=integer, LAGF=real ;
 }
 
-A \texttt{CRABCAVITY} has five attributes describing its steady state 
+A \texttt{CRABCAVITY} has six attributes describing its steady state 
 and seven attributes to describe dynamic behaviour: 
 
 \begin{madlist}
   \ttitem{L} The length of the cavity (default: 0 m) 
+
+  \ttitem{TILT} The tilt of the cavity in radian (default: 0 m). If the tilt is $\pi/2$, then the export to sixtrack will automatically convert it to a vertical cravity (default is horizontal).
 
   \ttitem{VOLT} The peak RF voltage (default: 0 MV). 
 
