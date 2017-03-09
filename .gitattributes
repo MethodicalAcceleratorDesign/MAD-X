@@ -862,6 +862,7 @@ src/mad_ibs.h -text
 src/mad_inif_f.F90 -text
 src/mad_inter.c -text
 src/mad_inter.h -text
+src/mad_mac.h -text
 src/mad_macro.c -text
 src/mad_macro.h -text
 src/mad_main.c -text
