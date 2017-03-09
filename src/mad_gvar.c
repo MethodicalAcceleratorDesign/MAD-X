@@ -14,7 +14,7 @@ struct char_array* c_join;
 struct char_array* work;
 struct char_array* l_wrk;
 
-struct char_array_list* char_buff; /* buffer for all sorts of strings */
+// struct char_array_list* char_buff; /* buffer for all sorts of strings */
 
 struct char_p_array* tmp_p_array;  /* temporary buffer for splits */
 struct char_p_array* tmp_l_array;  /* temporary buffer for special commands */

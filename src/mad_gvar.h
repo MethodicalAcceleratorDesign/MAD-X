@@ -15,7 +15,7 @@ extern struct char_array* c_join;
 extern struct char_array* work;
 extern struct char_array* l_wrk;
 
-extern struct char_array_list* char_buff; /* buffer for all sorts of strings */
+// extern struct char_array_list* char_buff; /* buffer for all sorts of strings */
 
 extern struct char_p_array* tmp_p_array;  /* temporary buffer for splits */
 extern struct char_p_array* tmp_l_array;  /* temporary buffer for special commands */
@@ -195,7 +195,7 @@ extern char blank[];
 extern char none[];
 extern char one_string[];
 // 2015-Jul-31  11:41:59  ghislain: aperture twiss file for output of twiss table ! not needed
-//extern char aptwfile[FNAME_L]; 
+//extern char aptwfile[FNAME_L];
 extern char* aux_char_pt;               /* for debug purposes */
 extern char* exx;
 extern char* current_link_group;
@@ -213,7 +213,7 @@ extern double penalty;
 extern double match_tol;
 extern double orbit0[6];
 extern double disp0[6];
-extern double sxf_suml;    
+extern double sxf_suml;
 extern double track_deltap;
 extern double oneturnmat[36];
 extern double fintx_plot;    /* to save the value of fintx for the reset_interpolation routine */

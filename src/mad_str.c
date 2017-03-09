@@ -125,14 +125,17 @@ mysplit(char* buf, struct char_p_array* list)
 char*
 buffer(const char* string)  /* replaced by permbuff */
 {
-  return permbuff(string);
+  return tmpbuff(string);
+//  return permbuff(string);
 }
 
 char*
 permbuff(const char* string)  /* string -> general buffer, returns address */
 {
+  return tmpbuff(string);
+#if 0
+  if (string == NULL) return NULL;
   int n, k = char_buff->ca[char_buff->curr-1]->curr;
-  if (string == NULL)  return NULL;
   n = strlen(string)+1;
   if (k + n >= char_buff->ca[char_buff->curr-1]->max)
   {
@@ -143,6 +146,7 @@ permbuff(const char* string)  /* string -> general buffer, returns address */
   strcpy(&char_buff->ca[char_buff->curr-1]->c[k], string);
   char_buff->ca[char_buff->curr-1]->curr += n;
   return &char_buff->ca[char_buff->curr-1]->c[k];
+#endif
 }
 
 char*
@@ -150,6 +154,7 @@ tmpbuff(const char* string)
   /* buffers string in a temporary (i.e. allocated) buffer */
   // aka strdup
 {
+  if (string == NULL) return NULL;
   size_t len = strlen(string)+1;
   char* p = mycalloc_atomic("tmpbuff", len, sizeof *p);
   strcpy(p, string);
@@ -162,9 +167,9 @@ conv_char(const char* string, struct int_array* tint)
 {
   int i, l = strlen(string);
   int n = (l < tint->max-1) ? l : tint->max-1;
-  
+
   tint->i[0] = n;
-  for (i = 0; i < n; i++) 
+  for (i = 0; i < n; i++)
     tint->i[i+1] = (unsigned char) string[i];
 }
 
@@ -185,10 +190,10 @@ stolower_nq(char* s)
     {
       toggle = 1; quote = *c;
     }
-    else 
+    else
     {
       *c = (char) tolower((int) *c);
-    }  
+    }
     c++;
   }
 }

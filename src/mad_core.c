@@ -35,8 +35,8 @@ mad_init_c(void)
   c_join = new_char_array(AUX_LG);
   work = new_char_array(AUX_LG);
   l_wrk = new_char_array(AUX_LG);
-  char_buff = new_char_array_list(100); /* list of character arrays, dynamic */
-  char_buff->ca[char_buff->curr++] = new_char_array(CHAR_BUFF_SIZE);
+//  char_buff = new_char_array_list(100); /* list of character arrays, dynamic */
+//  char_buff->ca[char_buff->curr++] = new_char_array(CHAR_BUFF_SIZE);
   aux_buff = new_char_array(AUX_LG);  /* dynamic temporary buffer */
   drift_list = new_el_list(1000); /* dynamic list for internal drifts */
   variable_list = new_var_list(2000); /* dynamic list of variables */
@@ -150,7 +150,7 @@ madx_start(void)
   const char *pad[] = { "", " ", "  ", "    " };
   const int pad_sz = sizeof pad/sizeof *pad;
   int pad_idx = strlen("Windows")-strlen(version_ostype);
-  if (pad_idx >= pad_sz) pad_idx = pad_sz-1; 
+  if (pad_idx >= pad_sz) pad_idx = pad_sz-1;
 
 //  int version_is_pro = !strcmp(strrchr(version_name, '.'), ".00");
 
@@ -209,7 +209,7 @@ madx_finish(void)
   /* write the termination message  */
 {
   int warn_numb, warn_numbf, nwarnings;
-  
+
   /* should work with Lahey on windows 24.03.2004 */
 
   match2_delete_expressions();

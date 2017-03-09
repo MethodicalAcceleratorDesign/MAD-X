@@ -1,14 +1,17 @@
 #ifndef MAD_MAC_H
 #define MAD_MAC_H
 
+#include <assert.h>
+#include <limits.h>
 #include <string.h>
 
 static inline char*
 mad_strncpy(char *dst, const char *src, size_t siz)
 {
+  assert(dst && src && siz < INT_MAX);
   if (siz > 0) {
-    strncpy(dst, src, siz-1);
-    dst[siz-1] = '\0';
+    dst[0] = '\0';
+    strncat(dst, src, siz-1);
   }
   return dst;
 }
@@ -16,12 +19,8 @@ mad_strncpy(char *dst, const char *src, size_t siz)
 static inline char*
 mad_strncat(char *dst, const char *src, size_t siz)
 {
-  if (siz > 0) {
-    size_t len = strlen(dst);
-    strncat(dst, src, siz-1);
-    dst[len+siz-1] = '\0';
-  }
-  return dst;
+  assert(dst && src && siz < INT_MAX);
+  return strncat(dst, src, siz);
 }
 
 #undef  strncpy
