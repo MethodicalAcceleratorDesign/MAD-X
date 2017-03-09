@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  +     MAD-X 5.03.00  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.09.21 16:06:11      +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.09 08:43:43      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2012
 
@@ -15,71 +15,71 @@
 
 Option,  -warn,-info, -echo;
 
-postas =              20.15 ;
-posq1 =            26.8425 ;
-posq2a =            37.5335 ;
-posq2b =            46.0255 ;
-posq3 =            56.7165 ;
-posmcbxda =             33.005 ;
-posmcbxda =             33.005 ;
-posmcbxdb =             50.554 ;
-posmcbxdb =             50.554 ;
-posbpmw =             21.475 ;
-posbpm1 =             31.385 ;
-posbpm2a =             41.522 ;
-posbpm2b =             51.934 ;
-posbpm3 =             61.259 ;
-posmcbxc =             63.099 ;
-posmcbxc =             63.099 ;
-posmqsx3 =             64.929 ;
-posmcossx3 =             65.904 ;
-posmcossx3 =             65.904 ;
-posmcossx3 =             65.904 ;
-posmcstx3 =             66.754 ;
-posmcstx3 =             66.754 ;
-posmcdtsx3 =             67.604 ;
-posmcdtsx3 =             67.604 ;
-posmcdtsx3 =             67.604 ;
-posbpmwc =             76.989 ;
-posd1 =             72.839 ;
-posdfbxi =             78.999 ;
-posd1 =             72.839 ;
-posd2 =              142.9 ;
-posd2-posd1 =             70.061 ;
-ad1.lr1 =     0.001384506901 ;
-l.mbxa =                6.5 ;
+postas             =              20.15 ;
+posq1              =            26.8425 ;
+posq2a             =            37.5335 ;
+posq2b             =            46.0255 ;
+posq3              =            56.7165 ;
+posmcbxda          =             33.005 ;
+posmcbxda          =             33.005 ;
+posmcbxdb          =             50.554 ;
+posmcbxdb          =             50.554 ;
+posbpmw            =             21.475 ;
+posbpm1            =             31.385 ;
+posbpm2a           =             41.522 ;
+posbpm2b           =             51.934 ;
+posbpm3            =             61.259 ;
+posmcbxc           =             63.099 ;
+posmcbxc           =             63.099 ;
+posmqsx3           =             64.929 ;
+posmcossx3         =             65.904 ;
+posmcossx3         =             65.904 ;
+posmcossx3         =             65.904 ;
+posmcstx3          =             66.754 ;
+posmcstx3          =             66.754 ;
+posmcdtsx3         =             67.604 ;
+posmcdtsx3         =             67.604 ;
+posmcdtsx3         =             67.604 ;
+posbpmwc           =             76.989 ;
+posd1              =             72.839 ;
+posdfbxi           =             78.999 ;
+posd1              =             72.839 ;
+posd2              =              142.9 ;
+posd2-posd1        =             70.061 ;
+ad1.lr1            =     0.001384506901 ;
+l.mbxa             =                6.5 ;
 ad1.lr1/l.mbxa*scale =        4.973340335 ;
-ad2.l1 =     0.001384506901 ;
-l.mbrd =                 10 ;
+ad2.l1             =     0.001384506901 ;
+l.mbrd             =                 10 ;
 ad2.l1/l.mbrd*scale =        3.232671218 ;
-postan =             128.75 ;
-postcth =             133.52 ;
-postctva =             131.84 ;
-postclp =             135.73 ;
-posd2 =              142.9 ;
-posbpmwd =           137.0945 ;
-posmcbrdh =             149.05 ;
-posmcbrdv =             150.95 ;
-posbpmyy.4 =            172.247 ;
-posq4 =            169.553 ;
-posmcbyy.b4 =            167.031 ;
-posmcbyy.4 =            165.735 ;
-posmcbyy.a4 =            164.439 ;
-posmqyl.5 =             207.49 ;
-posmqml.6 =             228.39 ;
-posmsq10 =              2.745 ;
-posmcbq10 =              3.338 ;
-on_cutms.10 =                  0 ;
-on_cutms.14 =                  0 ;
-posbpmq5ir6 =            212.318 ;
-posq5ir6 =              208.9 ;
-posmcbyq5ir6 =            211.947 ;
-poscraba1 =                160 ;
-poscraba2 =              158.7 ;
-poscrabb1 =              157.4 ;
-poscrabb2 =              156.1 ;
-poscrabc1 =              154.8 ;
-poscrabc2 =              153.5 ;
+postan             =             128.75 ;
+postcth            =             133.52 ;
+postctva           =             131.84 ;
+postclp            =             135.73 ;
+posd2              =              142.9 ;
+posbpmwd           =           137.0945 ;
+posmcbrdh          =             149.05 ;
+posmcbrdv          =             150.95 ;
+posbpmyy.4         =            172.247 ;
+posq4              =            169.553 ;
+posmcbyy.b4        =            167.031 ;
+posmcbyy.4         =            165.735 ;
+posmcbyy.a4        =            164.439 ;
+posmqyl.5          =             207.49 ;
+posmqml.6          =             228.39 ;
+posmsq10           =              2.745 ;
+posmcbq10          =              3.338 ;
+on_cutms.10        =                  0 ;
+on_cutms.14        =                  0 ;
+posbpmq5ir6        =            212.318 ;
+posq5ir6           =              208.9 ;
+posmcbyq5ir6       =            211.947 ;
+poscraba1          =                160 ;
+poscraba2          =              158.7 ;
+poscrabb1          =              157.4 ;
+poscrabb2          =              156.1 ;
+poscrabc1          =              154.8 ;
+poscrabc2          =              153.5 ;
 makethin: style chosen : hybrid
 makethin: slicing sequence : lhcb1
 enter Twiss module
@@ -110,7 +110,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
             nflips 
                  0 
-beta.ip1 =                  0 ;
+beta.ip1           =                  0 ;
 enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
@@ -167,17 +167,17 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
 
             nflips 
                  0 
-on_x1 =                  0 ;
-on_x2 =                  0 ;
-on_x5 =                  0 ;
-on_x8 =                  0 ;
-on_sep1 =                  0 ;
-on_sep2 =                  0 ;
-on_sep5 =                  0 ;
-on_sep8 =                  0 ;
-on_alice =                  0 ;
-on_lhcb =                  0 ;
-on_disp =                  0 ;
+on_x1              =                  0 ;
+on_x2              =                  0 ;
+on_x5              =                  0 ;
+on_x8              =                  0 ;
+on_sep1            =                  0 ;
+on_sep2            =                  0 ;
+on_sep5            =                  0 ;
+on_sep8            =                  0 ;
+on_alice           =                  0 ;
+on_lhcb            =                  0 ;
+on_disp            =                  0 ;
 START MATCHING
 
 number of sequences: 1
@@ -484,26 +484,26 @@ END MATCH SUMMARY
 VARIABLE "TAR" SET TO   0.00000000e+00
 enter Twiss module
   
-iteration:   1 error:   2.225376E-21 deltap:   0.000000E+00
-orbit:   8.908674E-22 -2.255121E-23 -9.785071E-22 -1.701329E-23 -1.456529E-17 -1.927238E-25
+iteration:   1 error:   2.225302E-21 deltap:   0.000000E+00
+orbit:   8.908379E-22 -2.255047E-23 -9.784747E-22 -1.701273E-23 -1.456480E-17 -1.927174E-25
 ++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.220725E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-        26658.8832    1.456528548e-17    0.0003463029846        53.73681013 
+        26658.8832    1.456480445e-17    0.0003463029846        53.73681013 
 
                 q1                dq1            betxmax              dxmax 
        62.30999994         2.00009678        19393.42999        2.716682579 
 
              dxrms             xcomax             xcorms                 q2 
-       1.451766607    5.617475226e-20    6.733253261e-21         60.3200002 
+       1.451766607    5.617486565e-20    6.733257594e-21         60.3200002 
 
                dq2            betymax              dymax              dyrms 
-       2.000000582        19393.42412    3.637658887e-18    6.130931513e-19 
+       2.000000582        19393.42412    3.637707972e-18    6.131004512e-19 
 
             ycomax             ycorms             deltap            synch_1 
-   3.700000598e-20    4.371669696e-21                  0                  0 
+   3.700001736e-20    4.371659447e-21                  0                  0 
 
            synch_2            synch_3            synch_4            synch_5 
                  0                  0                  0                  0 
@@ -512,16 +512,16 @@ orbit:   8.908674E-22 -2.255121E-23 -9.785071E-22 -1.701329E-23 -1.456529E-17 -1
                  0 
 enter TRACK module
   
-iteration:   1 error:   2.225376E-21 deltap:   0.000000E+00
-orbit:   8.908674E-22 -2.255121E-23 -9.785071E-22 -1.701329E-23 -1.456529E-17 -1.927238E-25
+iteration:   1 error:   2.225302E-21 deltap:   0.000000E+00
+orbit:   8.908379E-22 -2.255047E-23 -9.784747E-22 -1.701273E-23 -1.456480E-17 -1.927174E-25
 
 Full 6D closed orbit search.
 Initial value of 6-D closed orbit from Twiss: 
-orbit0   8.908674E-22 -2.255121E-23 -9.785071E-22 -1.701329E-23 -1.456529E-17 -1.927238E-25
+orbit0   8.908379E-22 -2.255047E-23 -9.784747E-22 -1.701273E-23 -1.456480E-17 -1.927174E-25
 
 6D closed orbit found by subroutine trclor 
 iteration:  11 error:   2.799193E-22 deltap:   0.000000E+00
-orbit:  -5.149685E-70 -6.582024E-72  3.585969E-82  3.004261E-84 -4.073446E-17  2.797265E-22
+orbit:  -5.863578E-70 -7.494480E-72 -2.171336E-82 -3.154657E-84 -4.073398E-17  2.797266E-22
 exit TRACK module
 
 
