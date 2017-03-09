@@ -21,12 +21,11 @@ void  stolower_nq(char* s);
 char* strip(char* name);
 int   supp_lt(char* inbuf, int flag);
 void  supp_mul_char(char c, char* string);
-char* supp_tb(char* string);      /* suppress trailing blanks in string */
-int   zero_string(char* string);  /* returns 1 if string defaults to '0', else 0 */
-char* buffer(const char* string);       /* obsolete, replaced by permbuff */
-char* permbuff(const char* string);     /* copy string to permanent buffer */
-char* tmpbuff(const char* string);      /* copy string to temporary allocated buffer */
-// int   compare_no_case(char* string_1, char* string_2); // replaced by string_icmp
+char* supp_tb(char* string);        /* suppress trailing blanks in string */
+int   zero_string(char* string);    /* returns 1 if string defaults to '0', else 0 */
+char* buffer(const char* string);   /* obsolete, replaced by permbuff */
+char* permbuff(const char* string); /* obsolete, replaced by tmpbuff */
+char* tmpbuff(const char* string);  /* copy string to allocated buffer, aka strdup */
 int   is_token(char* pb, char* string, int slen);
 char* join(char** it_list, int n);
 char* join_b(char** it_list, int n);
@@ -150,7 +149,7 @@ str2path(char *path)
     if (path[i] == '/') path[i] = '\\';
 #else // UNIXES
   for (int i = 0; path[i]; i++)
-    if (path[i] == '\\') path[i] = '/';  
+    if (path[i] == '\\') path[i] = '/';
 #endif
   return path;
 }

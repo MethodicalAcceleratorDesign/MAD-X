@@ -123,42 +123,24 @@ mysplit(char* buf, struct char_p_array* list)
 }
 
 char*
-buffer(const char* string)  /* replaced by permbuff */
-{
-  return tmpbuff(string);
-//  return permbuff(string);
-}
-
-char*
-permbuff(const char* string)  /* string -> general buffer, returns address */
-{
-  return tmpbuff(string);
-#if 0
-  if (string == NULL) return NULL;
-  int n, k = char_buff->ca[char_buff->curr-1]->curr;
-  n = strlen(string)+1;
-  if (k + n >= char_buff->ca[char_buff->curr-1]->max)
-  {
-    if (char_buff->curr == char_buff->max) grow_char_array_list(char_buff);
-    char_buff->ca[char_buff->curr++] = new_char_array(CHAR_BUFF_SIZE);
-    k = 0;
-  }
-  strcpy(&char_buff->ca[char_buff->curr-1]->c[k], string);
-  char_buff->ca[char_buff->curr-1]->curr += n;
-  return &char_buff->ca[char_buff->curr-1]->c[k];
-#endif
-}
-
-char*
 tmpbuff(const char* string)
-  /* buffers string in a temporary (i.e. allocated) buffer */
-  // aka strdup
 {
   if (string == NULL) return NULL;
   size_t len = strlen(string)+1;
   char* p = mycalloc_atomic("tmpbuff", len, sizeof *p);
-  strcpy(p, string);
-  return p;
+  return strcpy(p, string);
+}
+
+char*
+permbuff(const char* string) /* replaced by tmpbuff */
+{
+  return tmpbuff(string);
+}
+
+char*
+buffer(const char* string)  /* replaced by permbuff */
+{
+  return tmpbuff(string);
 }
 
 void

@@ -15,8 +15,6 @@ extern struct char_array* c_join;
 extern struct char_array* work;
 extern struct char_array* l_wrk;
 
-// extern struct char_array_list* char_buff; /* buffer for all sorts of strings */
-
 extern struct char_p_array* tmp_p_array;  /* temporary buffer for splits */
 extern struct char_p_array* tmp_l_array;  /* temporary buffer for special commands */
 extern struct char_p_array* line_buffer;  /* buffer for line expansion */
@@ -36,8 +34,8 @@ extern struct command* current_command; /* current command clone */
 extern struct command* current_gweight; /* current gweight clone */
 extern struct command* current_weight;  /* current weight clone */
 extern struct command* current_match;   /* current match comm. */
-extern struct command* current_eopt ;   /* to keep eoption command */
-extern struct command* threader_par ;   /* threader parameters */
+extern struct command* current_eopt;    /* to keep eoption command */
+extern struct command* threader_par;    /* threader parameters */
 
 extern struct command_list* beam_list;         /* list of all beam commands */
 extern struct command_list* beta0_list;        /* list of user defined beta0s */
