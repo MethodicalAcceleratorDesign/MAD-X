@@ -99,7 +99,7 @@ in_spec_list(char* string)
 {
   char* cp;
   int i = 0, n = imin((int)strlen(string), 100);
-  strncpy(c_dum->c, string, n); c_dum->c[n] = '\0'; stolower(c_dum->c);
+  strncpy(c_dum->c, string, n); stolower(c_dum->c);
   supp_char(' ', c_dum->c);
   while (special_comm_cnt[i])
   {

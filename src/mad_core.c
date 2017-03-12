@@ -1,5 +1,4 @@
 #include <signal.h>
-
 #include "madx.h"
 
 // private functions

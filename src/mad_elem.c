@@ -191,9 +191,9 @@ par_out_flag(char* base_name, char* par_name)
   if (strcmp(par_name,"at") == 0 || strcmp(par_name,"from") == 0) return 0;
   if (strcmp(base_name, "multipole") == 0
       && strcmp(par_name,"l") == 0) return 0;
-  if ( (strcmp(base_name, "collimator") == 0 || 
-	strcmp(base_name, "ecollimator") == 0 || 
-	strcmp(base_name, "rcollimator") == 0) 
+  if ( (strcmp(base_name, "collimator") == 0 ||
+	strcmp(base_name, "ecollimator") == 0 ||
+	strcmp(base_name, "rcollimator") == 0)
       && strcmp(par_name,"lrad") == 0) return 0;
   return 1;
 }
@@ -471,11 +471,7 @@ element_name(char* name, int* l)
   /* returns current node element name in Fortran format */
   /* l is max. allowed length in name */
 {
-  int ename_l = strlen(current_node->p_elem->name);
-  int i, ncp = ename_l < *l ? ename_l : *l;
-  int nbl = *l - ncp;
-  for (i = 0; i < ncp; i++) name[i] = current_node->p_elem->name[i];
-  for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
+  strfcpy(name, current_node->p_elem->name, *l);
 }
 
 double
@@ -485,14 +481,14 @@ element_value(const struct node* node, const char* par)
 {
   double e_val;
 
-  if (node == 0) { 
+  if (node == 0) {
      error("element_value","node parameter is NULL.");
      return 0.0;
    }
 
   const struct element* el = node->p_elem;
 
-   if (el == 0) { 
+   if (el == 0) {
      error("element_value","node has NULL element pointer.");
      return 0.0;
    }
@@ -504,7 +500,7 @@ element_value(const struct node* node, const char* par)
 
    const struct command* def = el->def;
 
-   if (def == 0) { 
+   if (def == 0) {
      error("element_value","element has NULL defintion pointer.");
      return 0.0;
    }
@@ -561,13 +557,13 @@ get_node_vector(const char* par, int* length, double* vector)
       copy_double(current_node->orbit_ref->a, vector, *length);
     }
   }
-  else if (strcmp(lpar, "surv_data") == 0) 
+  else if (strcmp(lpar, "surv_data") == 0)
     {
      copy_double(current_node->surv_data, vector, 7);
      *length = 7;
     }
   else
-   { 
+   {
 //     printf("get_node_vector: going to element_vector\n");
      *length = element_vector(current_node->p_elem, lpar, vector);
 /*     printf("get_node_vector: got %d elements\n",*length);
@@ -577,7 +573,7 @@ get_node_vector(const char* par, int* length, double* vector)
         printf("%f ",vector[i]);
       }
      printf("\n"); */
-   }  
+   }
 }
 
 double
@@ -594,7 +590,7 @@ el_par_value(const char* par, const struct element* el)
   {
     if ((l = command_par_value("l", el->def)) == zero) {
 //      printf("*** el_par_value(mad_elem): %s, %s, %s, %g\n", el->name, el->def->name, el->base_type->name, l);
-      fatal_error("bend with zero length:",el->name);      
+      fatal_error("bend with zero length:",el->name);
     }
 
     angle = command_par_value("angle", el->def);
@@ -688,7 +684,7 @@ return_param(const char* par, const struct element* elem)
   int index;
   /* don't return base type definitions */
   if (elem==elem->parent) return NULL;
-  
+
   if ((index = name_list_pos(par,elem->def->par_names))>-1
       && elem->def->par_names->inform[index] > 0)
     return elem->def->par->parameters[index];
@@ -701,7 +697,7 @@ return_param_recurse(const char* par, const struct element* elem)
 {
   struct command_parameter* param;
   param = return_param(par,elem);
-  
+
   if (param) return param;
   if (elem!=elem->parent)
     return return_param_recurse(par,elem->parent);

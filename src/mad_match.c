@@ -1,5 +1,4 @@
 #include "madx.h"
-#include <float.h>
 
 // private interface
 
@@ -1087,7 +1086,7 @@ next_vary(char* name, int* name_l, double* lower, double* upper, double* step, i
   /* returns the next variable to be varied during match;
      0 = none, else count */
 {
-  int i, pos, ncp, nbl, len;
+  int pos;
   double l_step;
   const char* v_name;
   struct name_list* nl;
@@ -1102,11 +1101,7 @@ next_vary(char* name, int* name_l, double* lower, double* upper, double* step, i
   pl = comm->par;
   pos = name_list_pos("name", nl);
   v_name = (pos>=0)?pl->parameters[pos]->string:"";
-  len = strlen(v_name);
-  ncp = len < *name_l ? len : *name_l; // min(len, *name_l)
-  nbl = *name_l - ncp;
-  strncpy(name, v_name, ncp);
-  for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
+  strfcpy(name, v_name, *name_l);
   *lower = command_par_value("lower", comm);
   *upper = command_par_value("upper", comm);
   if ((l_step = command_par_value("step", comm)) < ten_m_12) l_step = ten_m_12;

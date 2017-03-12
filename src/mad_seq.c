@@ -138,10 +138,10 @@ all_node_pos(struct sequence* sequ)
     else fatal_error("node is neither element nor sequence:",
                      node->name);
 
-    // 2014-Mar-19  16:27:15  ghislain: 
+    // 2014-Mar-19  16:27:15  ghislain:
     // The following assumes that the sequence is circular!!!!
     // this also conflicts with the insertion of sequences where a refpos is given.
-    //if ((node->position = get_node_pos(node, sequ)) < zero) 
+    //if ((node->position = get_node_pos(node, sequ)) < zero)
     //  node->position += sequence_length(sequ);
     node->position = get_node_pos(node, sequ);
 
@@ -184,7 +184,7 @@ extract_sequence(char* name, struct sequence* sequ, struct node* from, struct no
   current_sequ->l_expr = NULL;
   current_sequ->length = end_value - start_value;
 
-  // 2014-Mar-21  20:42:19  ghislain: 
+  // 2014-Mar-21  20:42:19  ghislain:
   // this might be dangerous for non-circular sequences!!!
   // if (current_sequ->length < zero) current_sequ->length += sequ->length;
 
@@ -293,7 +293,7 @@ fill_sequ_var_list(struct sequence_list* sql, struct el_list* ell, struct var_li
   }
 }
 
-static void 
+static void
 seq_edit_ex(struct sequence* seq)
 {
   edit_sequ = seq;
@@ -324,7 +324,7 @@ static void
 expand_line(struct char_p_array* l_buff)
   /* expands a beam line, applies rep. count and inversion */
 {
-  
+
   int add=0, i=0, j=0, k=0, n=0, number=0, dummy=0, rep=-1, pos=0;
   int level = 0, l_max = 0, b_cnt = 0;
   char* p = blank;
@@ -393,17 +393,17 @@ expand_line(struct char_p_array* l_buff)
         l_buff->p[j+n] = l_buff->p[j];
 
       l_buff->curr += n;
-      
-      j = pos+1;
-      for (k = 1; k <= add; k++) l_buff->p[j+k] = tmpbuff(l_buff->p[j]); 
 
-      for (j = 0; j < b_cnt; j++) {  /* reset bracket pointers */      
+      j = pos+1;
+      for (k = 1; k <= add; k++) l_buff->p[j+k] = tmpbuff(l_buff->p[j]);
+
+      for (j = 0; j < b_cnt; j++) {  /* reset bracket pointers */
         if (lbpos->i[j] > pos + 1) lbpos->i[j] += n;
         if (rbpos->i[j] > pos + 1) rbpos->i[j] += n;
       }
 
-      // 2014-Aug-18  19:56:34  ghislain: in case of single element with rep_count, 
-      // l_buff->p[pos-1] points to the rep_count 
+      // 2014-Aug-18  19:56:34  ghislain: in case of single element with rep_count,
+      // l_buff->p[pos-1] points to the rep_count
       // and l_buff->p[pos-2] the previous element which is then lost!!!
       // l_buff->p[pos-1] = l_buff->p[pos-2] = blank;
       l_buff->p[pos-1] = blank;
@@ -476,7 +476,7 @@ expand_sequence(struct sequence* sequ, int flag)
   if (sequ->length < 0)
     fatal_error("trying to expand sequence with negative length:", sequ->name);
 
-  if (debug) 
+  if (debug)
     printf("\n\nTOP Expand_sequence name %s with length %e, ref_flag %d\n",
 	   sequ->name, sequ->length, sequ->ref_flag);
 
@@ -492,22 +492,22 @@ expand_sequence(struct sequence* sequ, int flag)
 
     if (p->p_sequ == NULL) { // simple element, not a subsequence
       // 2015-Jun-09  14:14:24  ghislain: guard added for negative element length
-      if (p->length < 0) 
+      if (p->length < 0)
 	fatal_error("trying to add node with negative length to current sequence:", p->name);
-			  
+
       add_to_node_list(p, 0, sequ->ex_nodes);
-    } 
+    }
     else { // subsequence
       if (p->p_sequ->refpos != NULL) { // REFPOS given for subsequence, ignore REFER of current sequence
-	if (debug) 
+	if (debug)
 	  printf("\n\n Expand sub-sequence %s with initial position %e, final position %e, length %e, ref_flag %d, refpos '%s'\n",
-		 p->name, p->position, p->position - sequ->ref_flag*p->p_sequ->length/2., 
-		 p->length, sequ->ref_flag, p->p_sequ->refpos);	
+		 p->name, p->position, p->position - sequ->ref_flag*p->p_sequ->length/2.,
+		 p->length, sequ->ref_flag, p->p_sequ->refpos);
 	p = expand_node(p, sequ, sequ, p->position - sequ->ref_flag*p->p_sequ->length/2. );
 	if (debug) printf("\n\n");
-      } 
+      }
       else { // no REFPOS given
-	if (debug) 
+	if (debug)
 	  printf("\n\n Expand sub-sequence %s with position %e, length %e, ref_flag %d\n",
 		 p->name, p->position, p->length, sequ->ref_flag);
 	p = expand_node(p, sequ, sequ, p->position);
@@ -531,7 +531,7 @@ expand_sequence(struct sequence* sequ, int flag)
     Attempt to discard attached twiss table not anymore valid...
     note: it cannot be done properly as table_register keep references
           on-pointer-to-table (address of address) not to-table itself...
-          hence 
+          hence
           if (sequ->tw_table) sequ->tw_table = NULL;
           breaks the list of table_register used everywhere,
           leading to bus error in many places (pointers are almost never checked)
@@ -628,7 +628,7 @@ make_sequ_from_line(char* name)
   line = line_list->macros[pos];
   line->dead = 1;   /* prevent line from further conversion to sequence */
   line_buffer = new_char_p_array(1000);
-  
+
   replace_lines(line, 0, tmp); /* replaces all referenced lines */
   expand_line(line_buffer); /* act on '-' and rep. count */
 
@@ -647,10 +647,10 @@ make_sequ_from_line(char* name)
   current_node = NULL;
   make_elem_node(el, 1);
   current_sequ->start = current_node;
-  
+
 
   current_sequ->length = line_nodes(line_buffer);
-  
+
   sprintf(c_dum->c, "%s$end", current_sequ->name);
   el = make_element(c_dum->c, "marker", clone, 0);
   make_elem_node(el, 1);
@@ -779,7 +779,7 @@ export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
       }
       else if ((sq = c_node->p_sequ) != NULL) strcat(c_dum->c, sq->name);
       else fatal_error("save error: node without link:", c_node->name);
-      
+
       strcat(c_dum->c, ", at = ");
       if (c_node->at_expr != NULL) strcat(c_dum->c, c_node->at_expr->string);
       else {
@@ -932,16 +932,16 @@ seq_install(struct in_cmd* cmd)
         add_to_el_list(&el, cl->def->mad8_type, element_list, 2);
       }
     } else if ((el = find_element(name_e, element_list)) == NULL) {
-      warning("ignored, unknown command or element:", name_c); 
+      warning("ignored, unknown command or element:", name_c);
       return;
     }
   } else {
-    warning("no element specified,","ignored"); 
+    warning("no element specified,","ignored");
     return;
   }
 
   if (nl->inform[name_list_pos("at", nl)] == 0) {
-    warning("no 'at':", "ignored"); 
+    warning("no 'at':", "ignored");
     return;
   }
 
@@ -954,9 +954,9 @@ seq_install(struct in_cmd* cmd)
 
     if (strcmp(from_name, "selected") == 0) {
       if (seqedit_select->curr == 0) {
-        warning("no active select commands:", "ignored"); 
+        warning("no active select commands:", "ignored");
 	return;
-      } 
+      }
       if (get_select_ranges(edit_sequ, seqedit_select, selected_ranges) == 0) any = 1;
       c_node = edit_sequ->start;
       while (c_node != NULL) {
@@ -976,7 +976,7 @@ seq_install(struct in_cmd* cmd)
 	if (c_node == edit_sequ->end) break;
 	c_node = c_node->next;
       }
-      
+
     } else {
       from_name = permbuff(pl->parameters[pos]->string);
       if ((from = hidden_node_pos(from_name, edit_sequ)) == INVALID) {
@@ -1215,11 +1215,11 @@ seq_replace(struct in_cmd* cmd)
     warning("no element specified, ","ignored");
     return;
   }
-  
+
   if (strcmp(name, "selected") == 0) { // replace selected elements
     if (seqedit_select->curr == 0) {
-      warning("no active select commands:", "ignored"); 
-      return; 
+      warning("no active select commands:", "ignored");
+      return;
     }
 
     pos = name_list_pos("by", nl);
@@ -1232,7 +1232,7 @@ seq_replace(struct in_cmd* cmd)
       warning("ignoring unknown 'by' element:",name);
       return;
     }
- 
+
     rep_nodes = mymalloc("seq_replace", count*sizeof *rep_nodes);
     rep_els = mymalloc("seq_replace", count*sizeof *rep_els);
 
@@ -1255,7 +1255,7 @@ seq_replace(struct in_cmd* cmd)
       if (c_node == edit_sequ->end) break;
       c_node = c_node->next;
     }
-  }  
+  }
 
   else { // replace named elements
     rep_nodes = mymalloc("seq_replace", count*sizeof *rep_nodes);
@@ -1278,28 +1278,15 @@ seq_replace(struct in_cmd* cmd)
     }
     else warning("ignored because of unknown element: ", name);
   }
-  
+
   for (k = 0; k < rep_cnt; k++)  replace_one(rep_nodes[k], rep_els[k]);
-  
+
   seqedit_replace = rep_cnt;
 
   if (rep_nodes) myfree("seq_replace", rep_nodes);
   if (rep_els)   myfree("seq_replace", rep_els);
-  
-}
 
-#if 0 // not used...
-static void
-sequence_name(char* name, int* l)
-  /* returns current sequence name in Fortran format */
-{
-  int sname_l = strlen(current_sequ->name);
-  int i, ncp = sname_l < *l ? sname_l : *l;
-  int nbl = *l - ncp;
-  for (i = 0; i < ncp; i++) name[i] = current_sequ->name[i];
-  for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
 }
-#endif
 
 static struct element*
 get_drift(double length)
@@ -1328,8 +1315,8 @@ static int
 add_drifts(struct node* c_node, struct node* end)
 {
   const double tol = 1e-6;
-  int cnt; 
-  
+  int cnt;
+
   char buf[256];
 
   int debug;
@@ -1341,16 +1328,16 @@ add_drifts(struct node* c_node, struct node* end)
     double drift_beg = c_node->position + c_node->length / 2;
     double drift_end = c_node->next->position - c_node->next->length / 2;
     double drift_len = drift_end-drift_beg;
- 
+
     if (drift_len < -tol) {
       // implicit drift with negative length
       sprintf(buf, " %s and %s, length %e", c_node->name, c_node->next->name, drift_len);
- 
+
       if (debug) {
-	printf("\ncurrent node name %s position: %e length %e \n", 
+	printf("\ncurrent node name %s position: %e length %e \n",
 	       c_node->name, c_node->position, c_node->length);
-	printf("next    node name %s position: %e length %e \n\n", 
-	       c_node->next->name, c_node->next->position, c_node->next->length);    
+	printf("next    node name %s position: %e length %e \n\n",
+	       c_node->next->name, c_node->next->position, c_node->next->length);
       }
 
      fatal_error("negative drift between elements", buf);
@@ -1363,11 +1350,11 @@ add_drifts(struct node* c_node, struct node* end)
       drift_node->position = drift_beg + drift_len / 2;
       if (debug) printf("inserting a drift of length %e at position %e \n \n",
 			drift_len,drift_beg + drift_len / 2);
-      cnt++; 
+      cnt++;
     }
-    else 
+    else
       // length in [-tol, tol], nothing to do (no drift inserted)
-      // 2014-Feb-04  11:52:07  ghislain: tghought of adding a warning that a very short drift was ignored. 
+      // 2014-Feb-04  11:52:07  ghislain: tghought of adding a warning that a very short drift was ignored.
       // but the number of warnings explodes VERY quicky so leave it out for now.
       // sprintf(buf, " Length of drift: %e vs. tolerance: %e", drift_len, tol);
       // warning("Drift length below tolerance level was ignored.", buf);
@@ -1397,7 +1384,7 @@ use_sequ(struct in_cmd* cmd)
 
   if (nl->inform[pos]) {  /* parameter has been read */
     if (current_range != NULL) {
-      myfree(rout_name, current_range); 
+      myfree(rout_name, current_range);
       current_range = NULL;
     }
 
@@ -1553,7 +1540,7 @@ sequence_length(struct sequence* sequ)
   double val = 0;
   if (sequ)
   {
-    if (sequ->l_expr)  
+    if (sequ->l_expr)
       val = sequ->length = expression_value(sequ->l_expr,2);
     else val = sequ->length;
   }
@@ -1808,7 +1795,7 @@ exec_save(struct in_cmd* cmd)
     }
   }
 
-  for (i = sql->curr-1; i >= 0; i--) { /* loop over sequences, get elements */  
+  for (i = sql->curr-1; i >= 0; i--) { /* loop over sequences, get elements */
     /* set export name for sequence (newname in SAVE) HG 15.10.07 */
     if (new_name == NULL)
       strcpy(sql->sequs[i]->export_name, sql->sequs[i]->name);
@@ -1830,7 +1817,7 @@ exec_save(struct in_cmd* cmd)
 
   if (all_sequ == 0) {
     while (prev < ell->curr) { /* loop over elements, get variables -
-                                  recursive, since elements may be added */    
+                                  recursive, since elements may be added */
       prev = ell->curr;
       for (i = n; i < ell->curr; i++)
         fill_elem_var_list(ell->elem[i], ell, varl);
@@ -1920,7 +1907,7 @@ exec_extract(struct in_cmd* cmd)
   }
   if (strchr(pl->parameters[i]->string, '$'))
   {
-    warning("extract: use of internal markers forbidden:", 
+    warning("extract: use of internal markers forbidden:",
             pl->parameters[i]->string);
     warning("sequence extraction aborted"," ");
     return;
@@ -1976,7 +1963,7 @@ expand_curr_sequ(int flag)
 
     if (current_sequ->all_nodes != NULL) myfree(rout_name, current_sequ->all_nodes);
     current_sequ->all_nodes = mymalloc(rout_name, current_sequ->n_nodes * sizeof *current_sequ->all_nodes);
-    
+
     c_node = current_sequ->ex_start;
     for (j = 0; j < current_sequ->n_nodes; j++) {
       current_sequ->all_nodes[j] = c_node;
@@ -2029,7 +2016,7 @@ add_to_sequ_list(struct sequence* sequ, struct sequence_list* sql)
       firstfreeslot = i;
       continue;
     }
-   
+
     if (strcmp(sql->sequs[i]->name, sequ->name) == 0)
     {
       /*printf("add_to_sequ_list sequence with this name is already in: %s \n",sequ->name);*/
@@ -2038,21 +2025,21 @@ add_to_sequ_list(struct sequence* sequ, struct sequence_list* sql)
       return;
     }
   }
-  
+
   if (firstfreeslot >= 0)
   {/*This protects agains problems sequence redefinition*/
     /*printf("add_to_sequ_list: adding at found free slot\n");*/
     sql->sequs[firstfreeslot] = sequ;
   }
   else
-  { 
+  {
     /*printf("add_to_sequ_list: adding at new slot\n");*/
     if (sql->curr == sql->max) grow_sequence_list(sql);
     sql->sequs[sql->curr++] = sequ;
-  }  
+  }
 
   add_to_name_list(sequ->name, 0, sql->list);
-  
+
 }
 
 void
@@ -2096,7 +2083,7 @@ seq_edit_main(struct in_cmd* cmd)
     else if (strcmp(toks[k], "move") == 0)     seq_move(cmd);
     else if (strcmp(toks[k], "remove") == 0)   seq_remove(cmd);
     else if (strcmp(toks[k], "cycle") == 0)    seq_cycle(cmd);
-    else if (strcmp(toks[k], "flatten") == 0)  seq_flatten(edit_sequ);      
+    else if (strcmp(toks[k], "flatten") == 0)  seq_flatten(edit_sequ);
     else if (strcmp(toks[k], "reflect") == 0)  seq_reflect(cmd);
     else if (strcmp(toks[k], "replace") == 0)  seq_replace(cmd);
     else if (strcmp(toks[k], "endedit") == 0)  seq_end(cmd);

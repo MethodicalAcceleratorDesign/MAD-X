@@ -1,3 +1,7 @@
+// this define prevent special version of strncpy and strncat
+// here it is assumed that one know how C strings are working...
+#define MAD_MAC_H
+
 #include "madx.h"
 
 // public interface
@@ -7,8 +11,8 @@ mystrcpy(struct char_array* target, char* source)
 {
   /* string copy to char_array with size adjustment */
   int len = strlen(source);
-  while (len > target->max) grow_char_array(target);
-  strcpy(target->c, source);
+  while (len >= target->max) grow_char_array(target);
+  strncat((*target->c=0, target->c), source, len);
 }
 
 char*

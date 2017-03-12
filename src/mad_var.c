@@ -27,14 +27,6 @@ grow_var_list(struct var_list* p)
   myfree(rout_name, v_loc);
 }
 
-#if 0 // not used...
-static void
-dump_variable(struct variable* v)
-{
-  fprintf(prt_file, "=== dumping variable %s\n", v->name);
-}
-#endif
-
 static void
 export_variable(struct variable* var, FILE* file, int noexpr)
   /* exports variable in mad-X format */
@@ -470,66 +462,6 @@ set_stringvar(const char* name, char* string)
     }
   }
 }
-
-#if 0 // not used
-int
-vary_name(char* name, int* name_l, int* index)
-  /* returns the variable name */
-{
-  int pos, ncp, nbl, len;
-  char* v_name;
-  struct name_list* nl;
-  struct command* comm;
-  struct command_parameter_list* pl;
-  comm = stored_match_var->commands[*index];
-  nl = comm->par_names;
-  pl = comm->par;
-  pos = name_list_pos("name", nl);
-  v_name = pl->parameters[pos]->string;
-  len = strlen(v_name);
-  ncp = len < *name_l ? len : *name_l; // min(len, *name_l)
-  nbl = *name_l - ncp;
-  strncpy(name, v_name, ncp);
-  return 1;
-}
-#endif
-
-#if 0 // not used...
-double
-sss_variable(char* name)
-{
-  char comm[NAME_L];
-  char par[NAME_L];
-  double val = zero;
-  struct variable* var;
-  struct element* el;
-  struct command* cmd;
-  char *p, *n = c_dum->c, *q = comm;
-  mycpy(c_dum->c, name);
-  if ((p = strstr(c_dum->c, "->")) == NULL) // variable
-  {
-    if ((var = find_variable(c_dum->c, variable_list)) != NULL)
-      val = variable_value(var);
-  }
-  else // element or command parameter
-  {
-    while (n < p)  *(q++) = *(n++);
-    *q = '\0';
-    q = par; n++; n++;
-    while (*n != '\0')  *(q++) = *(n++);
-    *q = '\0';
-    if ((el = find_element(comm, element_list)) != NULL)
-      val = command_par_value(par, el->def);
-    else if ((cmd = find_command(comm, stored_commands)) != NULL)
-      val = command_par_value(par, cmd);
-    else if ((cmd = find_command(comm, beta0_list)) != NULL)
-      val = command_par_value(par, cmd);
-    else if ((cmd = find_command(comm, defined_commands)) != NULL)
-      val = command_par_value(par, cmd);
-  }
-  return val;
-}
-#endif
 
 // public interface (used by Fortran)
 

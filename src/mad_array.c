@@ -45,7 +45,7 @@ new_char_p_array(int length)
   return il;
 }
 
-int 
+int
 addto_char_p_array(struct char_p_array* ch_p_arr, struct char_array* ch_arr)
 {
 
@@ -60,17 +60,17 @@ addto_char_p_array(struct char_p_array* ch_p_arr, struct char_array* ch_arr)
      printf("addto_char_p_array: argument ch_arr is NULL\n");
      return 2;
    }
-  
+
   if( ch_p_arr->curr >= ch_p_arr->max )
    {
      printf("addto_char_p_array: No more space in the array.\n");
      return 3;
    }
-  
+
   ch_p_arr->p[ch_p_arr->curr++] = tmpbuff(ch_arr->c);
-  
+
   return 0;
-   
+
 }
 
 struct int_array*
@@ -164,7 +164,7 @@ delete_char_p_array(struct char_p_array* pa, int flag)
      {
        myfree(rout_name, pa->p[i]);
      }
-     
+
   if (pa->p != NULL)  myfree(rout_name, pa->p);
   myfree(rout_name, pa);
   return NULL;
@@ -228,7 +228,7 @@ dump_int_array(struct int_array* ia)
   if (ia->curr%10 != 0) fprintf(prt_file, "\n");
 }
 
-void 
+void
 grow_char_array(struct char_array* p)
 {
   const char *rout_name = "grow_char_array";
@@ -274,7 +274,7 @@ ftoi_array(struct double_array* da, struct int_array* ia)
 {
   int l = da->curr;
   while (l >= ia->max) grow_int_array(ia);
-  for (int i = 0; i < l; i++) 
+  for (int i = 0; i < l; i++)
     ia->i[i] = da->a[i];
   ia->curr = l;
 }

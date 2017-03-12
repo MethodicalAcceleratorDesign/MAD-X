@@ -1,4 +1,5 @@
 #include "madx.h"
+#include "mad_mac.h"
 
 static void
 remove_from_node_list(struct node* node, struct node_list* nodes)
@@ -7,24 +8,6 @@ remove_from_node_list(struct node* node, struct node_list* nodes)
   if ((i = remove_from_name_list(node->name, nodes->list)) > -1)
     nodes->nodes[i] = nodes->nodes[--nodes->curr];
 }
-
-#if 0 // not used...
-static double
-spec_node_value(char* par, int* number)
-  /* returns value for parameter par of specified node (start = 1 !!) */
-{
-  double value = zero;
-  struct node* node = current_node;
-  int n = *number + current_sequ->start_node - 1;
-  if (0 <= n && n < current_sequ->n_nodes)
-  {
-    current_node = current_sequ->all_nodes[n];
-    value = node_value(par);
-    current_node = node;
-  }
-  return value;
-}
-#endif
 
 // public interface
 
@@ -46,10 +29,10 @@ clone_node(struct node* p, int flag)
      this is needed for SXF input  */
   struct node* clone = new_node(p->name);
   strcpy(clone->name,p->name);
-  
+
   /*clone->base_name = p->base_name;*/
   clone->base_name = permbuff(p->base_name);
-  
+
   clone->occ_cnt = p->occ_cnt;
   clone->sel_err = p->sel_err;
   clone->position = p->position;
@@ -73,7 +56,7 @@ clone_node(struct node* p, int flag)
   clone->rfm_freq = p->rfm_freq;
   clone->rfm_volt = p->rfm_volt;
   clone->rfm_harmon = p->rfm_harmon;
-  //  
+  //
   return clone;
 }
 
@@ -134,14 +117,14 @@ delete_node_ring(struct node* start)
   q = start->next;
   while (q != NULL && q != start)
   {
-    p = q; q = q->next; 
+    p = q; q = q->next;
     /*printf("delete_node_ring deleting node %#x %s\n",p,p->base_name);*/
     delete_node(p);
   }
-  
+
   /*printf("delete_node_ring deleting start node %#x %s\n",start,start->base_name);*/
   start = delete_node(start);
-  
+
   return NULL;
 }
 
@@ -157,14 +140,14 @@ void
 dump_node(struct node* node)
 {
   int i;
-  char pname[NAME_L] = "NULL", nname[NAME_L] = "NULL", 
+  char pname[NAME_L] = "NULL", nname[NAME_L] = "NULL",
     from_name[NAME_L] = "NULL";
   if (node->previous != NULL) strcpy(pname, node->previous->name);
   if (node->next != NULL) strcpy(nname, node->next->name);
   if (node->from_name != NULL) strcpy(from_name, node->from_name);
-  fprintf(prt_file, 
+  fprintf(prt_file,
           v_format("name: %S  occ: %I base: %S  from_name: %S at_value: %F  position: %F\n"),
-          node->name, node->occ_cnt, node->base_name, from_name, 
+          node->name, node->occ_cnt, node->base_name, from_name,
           node->at_value, node->position);
   fprintf(prt_file, v_format("  names of - previous: %S  next: %S\n"),
           pname, nname);
@@ -187,9 +170,9 @@ expand_node(struct node* node, struct sequence* top_sequ, struct sequence* sequ,
   debug=get_option("debug");
 
   p = clone_node(q, 0);
-  
-  if (debug) 
-    printf("\n Entering expand_node with node->name: %s and position %e\n",node->name,position); 
+
+  if (debug)
+    printf("\n Entering expand_node with node->name: %s and position %e\n",node->name,position);
 
   if ((i = name_list_pos(p->p_elem->name, occ_list)) < 0)
     i = add_to_name_list(p->p_elem->name, 1, occ_list);
@@ -202,9 +185,9 @@ expand_node(struct node* node, struct sequence* top_sequ, struct sequence* sequ,
   if (debug) {
     node_pos = get_node_pos(p, nodesequ);
     refpos = get_refpos(nodesequ);
-    p->position = position + node_pos - refpos;    
+    p->position = position + node_pos - refpos;
     printf("  elem_name %s at position %e + get_node_pos %e - get_refpos %e = p->position %e \n",
-	   p->p_elem->name, position, node_pos, refpos, p->position); 
+	   p->p_elem->name, position, node_pos, refpos, p->position);
   } else
     p->position = position + get_node_pos(p, nodesequ) - get_refpos(nodesequ);
 
@@ -223,29 +206,29 @@ expand_node(struct node* node, struct sequence* top_sequ, struct sequence* sequ,
     if (debug) {
       node_pos = get_node_pos(p, nodesequ);
       refpos = get_refpos(nodesequ);
-      p->position = position + node_pos - refpos;    
+      p->position = position + node_pos - refpos;
       printf("  elem name %s at position %e + get_node_pos %e - get_refpos %e = p->position %e \n",
-	     p->p_elem->name, position, node_pos, refpos, p->position); 
+	     p->p_elem->name, position, node_pos, refpos, p->position);
     } else
       p->position = position + get_node_pos(p, nodesequ) - get_refpos(nodesequ);
-    
 
-    if (p->p_sequ == NULL){ // simple element, not a subsequence 
+
+    if (p->p_sequ == NULL){ // simple element, not a subsequence
       p->share = top_sequ->share;
       add_to_node_list(p, 0, top_sequ->ex_nodes);
-    } 
+    }
 
     else { // subsequence
       if (p->p_sequ->refpos != NULL) { // REFPOS given for subsequence, ignore REFER of current sequence
-	if (debug) 
+	if (debug)
 	  printf("\n\n Recursively expand sub-sequence %s with initial position %e, final position %e, length %e, ref_flag %d, refpos '%s'\n",
-		 p->name, p->position, p->position - nodesequ->ref_flag*p->p_sequ->length/2., 
-		 p->length, nodesequ->ref_flag, p->p_sequ->refpos);	
+		 p->name, p->position, p->position - nodesequ->ref_flag*p->p_sequ->length/2.,
+		 p->length, nodesequ->ref_flag, p->p_sequ->refpos);
 	p = expand_node(p, top_sequ, p->p_sequ, p->position - nodesequ->ref_flag*p->p_sequ->length/2. );
 	if (debug) printf("\n\n");
-      } 
+      }
       else { // no REFPOS given
-	if (debug) 
+	if (debug)
 	  printf("\n\n Recursively expand sub_sequence  %s with position %e, length %e, ref_flag %d\n",
 		 p->name, p->position, p->length, sequ->ref_flag);
 	p = expand_node(p, top_sequ, p->p_sequ, p->position);
@@ -259,7 +242,7 @@ expand_node(struct node* node, struct sequence* top_sequ, struct sequence* sequ,
 }
 
 double
-get_node_pos(struct node* node, struct sequence* sequ) 
+get_node_pos(struct node* node, struct sequence* sequ)
   /* recursive via call of hidden_node_pos */
   /* returns node position from declaration for expansion */
 {
@@ -269,10 +252,10 @@ get_node_pos(struct node* node, struct sequence* sequ)
   if (node->at_expr == NULL) pos = node->at_value;
   else                       pos = expression_value(node->at_expr, 2);
 
-  if (get_option("debug")) 
+  if (get_option("debug"))
     printf("   in get_node_pos: name: %s, pos: %e, fact: %e, length: %e, from_name: %s\n",
-	   node->p_elem->name, pos, fact, node->length, node->from_name); 
-  
+	   node->p_elem->name, pos, fact, node->length, node->from_name);
+
   pos += fact * node->length; /* make centre position */
 
   if (node->from_name != NULL) {
@@ -282,8 +265,8 @@ get_node_pos(struct node* node, struct sequence* sequ)
 
   pos += from;
 
-  if (get_option("debug")) 
-    printf("\t in get_node_pos: name: %s, from: %e\t\t\t  ---> final pos: %e \n", 
+  if (get_option("debug"))
+    printf("\t in get_node_pos: name: %s, from: %e\t\t\t  ---> final pos: %e \n",
 	   node->p_elem->name, from, pos);
 
   return pos;
@@ -294,16 +277,16 @@ get_refpos(struct sequence* sequ)
   /* returns the position of a refpos element of a sequence, or the sequence half-length */
 {
   int i;
-  if (sequ != NULL && sequ->refpos != NULL) { 
+  if (sequ != NULL && sequ->refpos != NULL) {
     sprintf(c_dum->c, "%s:1", sequ->refpos);
     if ((i = name_list_pos(c_dum->c, sequ->nodes->list)) < 0)
       fatal_error("'refpos' reference to unknown element:", sequ->refpos);
     return get_node_pos(sequ->nodes->nodes[i], sequ);
   }
 
-  /* 2013-Jul-19  20:54:49  ghislain: if no element was specified for the refpos, 
-     the ref position has to be the middle of the sequence and get_refpos should 
-     therefore return half the sequence length. (TRAC ticket #206) */ 
+  /* 2013-Jul-19  20:54:49  ghislain: if no element was specified for the refpos,
+     the ref position has to be the middle of the sequence and get_refpos should
+     therefore return half the sequence length. (TRAC ticket #206) */
   // else return zero;
   else return sequ->length/2.;
 }
@@ -315,13 +298,13 @@ node_value(const char* par)
 {
   double value;
   char lpar[NAME_L];
-  
+
   if (current_node == 0x0)
    {
      warning("node_value","current_node pointer in NULL. Sequence not set?");
      return 0.0;
    }
-  
+
   mycpy(lpar, par);
   if (strcmp(lpar, "l") == 0) value = current_node->length;
 /*  else if (strcmp(lpar, "dipole_bv") == 0) value = current_node->dipole_bv;*/
@@ -361,7 +344,7 @@ hidden_node_pos(char* name, struct sequence* sequ) /*recursive */
   struct node* c_node;
   char tmp[2*NAME_L];
   int i;
-  
+
   strcpy(tmp, name);
   square_to_colon(tmp);
 
@@ -564,12 +547,10 @@ count_nodes(struct sequence* sequ)
 }
 
 void
-current_node_name(char* name, int* lg)
-/* returns node_name blank padded up to lg */
+current_node_name(char* name, int* l)
+/* returns node_name blank padded up to l */
 {
-  int i;
-  strncpy(name, current_node->name, *lg);
-  for (i = strlen(current_node->name); i < *lg; i++)  name[i] = ' ';
+  strfcpy(name, current_node->name, *l);
 }
 
 void
@@ -577,11 +558,8 @@ node_name(char* name, int* l)
   /* returns current node name in Fortran format */
   /* l is max. allowed length in name */
 {
-  int ename_l = strlen(current_node->name);
-  int i, ncp = ename_l < *l ? ename_l : *l;
-  int nbl = *l - ncp;
-  for (i = 0; i < ncp; i++) name[i] = toupper(current_node->name[i]);
-  for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
+  strfcpy(name, current_node->name, *l);
+  stoupper(name);
 }
 
 int
@@ -618,7 +596,7 @@ store_node_vector(char* par, int* length, double* vector)
     copy_double(vector, current_node->orbit_ref->a, *length);
     current_node->orbit_ref->curr = *length;
   }
-  else if (strcmp(lpar, "surv_data") == 0)  
+  else if (strcmp(lpar, "surv_data") == 0)
         copy_double(vector, current_node->surv_data, *length);
 
 }
@@ -704,18 +682,12 @@ node_string(const char* key, char* string, int* l)
   /* returns current node string value for "key" in Fortran format */
   /* l is max. allowed length in string */
 {
-  char tmp[2*NAME_L];
+  char tmp[2*NAME_L]; mycpy(tmp, key);
   char* p;
-  int i, l_p, nbl, ncp = 0;
-  mycpy(tmp, key);
   if ((p = command_par_string(tmp, current_node->p_elem->def)))
-  {
-    l_p = strlen(p);
-    ncp = l_p < *l ? l_p : *l;
-  }
-  nbl = *l - ncp;
-  for (i = 0; i < ncp; i++) string[i] = p[i];
-  for (i = 0; i < nbl; i++) string[ncp+i] = ' ';
+    strfcpy(string, p, *l);
+  else
+    memset(string, ' ', *l);
 }
 
 int
@@ -748,10 +720,10 @@ replace_one(struct node* node, struct element* el)
   strcpy(node->name, compound(el->name, k));
   add_to_node_list(node, 0, edit_sequ->nodes);
   node->p_elem = el;
-  
+
   /*node->base_name = el->base_type->name;*/
   strcpy(node->base_name, el->base_type->name);
-   
+
   node->length = el->length;
   if (strcmp(el->base_type->name, "rfcavity") == 0 &&
       find_element(el->name, edit_sequ->cavities) == NULL)

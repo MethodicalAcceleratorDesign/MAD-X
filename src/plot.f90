@@ -99,7 +99,7 @@ subroutine pecurv (ncc, spname, annh, usex, sych, ippar, np, xval, yval, window,
   data winnor /0., 1., 0., 1./
 
   iecub = 0
-  zero_suppr = get_value('plot ','zero_suppr ') .ne. 0.d0 
+  zero_suppr = get_value('plot ','zero_suppr ') .ne. 0.d0
   marker_plot = get_value('plot ','marker_plot ') .ne. 0.d0
 
   !--- Output initialisation
@@ -179,7 +179,7 @@ subroutine pecurv (ncc, spname, annh, usex, sych, ippar, np, xval, yval, window,
               call gxpl (npt, xreal, yreal, actwin)
               if (ilb .gt. 0) then
                  !--- get y pos. on curve for label
-                 ywpos = yreal(ilb-1) + & 
+                 ywpos = yreal(ilb-1) + &
                       (yreal(ilb) - yreal(ilb-1)) * (xwpos - xreal(ilb-1)) &
                        / (xreal(ilb) - xreal(ilb-1))
                  ilb = -2
@@ -226,8 +226,8 @@ subroutine pecurv (ncc, spname, annh, usex, sych, ippar, np, xval, yval, window,
         call jsmk (isymb)
         call gxpmsw (np, xval, yval, actwin)
      elseif (isymb .eq. 100)  then
-        if (istyl .ne. 0)  then           
-           !--- use current curve count           
+        if (istyl .ne. 0)  then
+           !--- use current curve count
            write (symloc, '(I1)')  mod (ncc, 10)
         endif
         !--- set marker colour
@@ -243,7 +243,7 @@ subroutine pecurv (ncc, spname, annh, usex, sych, ippar, np, xval, yval, window,
         call gxqrvp (xf)
         call jschxp (xf)
         do j = 1, np
-           if (isymb .eq. 100 .and. istyl .eq. 0)  then            
+           if (isymb .eq. 100 .and. istyl .eq. 0)  then
               !--- use current point number
               write (symloc, '(I1)')  mod (j, 10)
            endif
@@ -313,7 +313,7 @@ subroutine pefill(ierr)
   integer :: i, j, k, l, nint, new1, new2, currtyp, crow, pltyp, pos_flag
   integer :: ilist(mtype), p(mxplot), proc_n(2, mxcurv)
   double precision :: fact, d_val, d_val1
-  double precision :: currpos, currleng, currtilt 
+  double precision :: currpos, currleng, currtilt
   double precision :: currk1l, currk1sl, currk2l, currk2sl, currk3l, currk3sl
   real :: tval, step, mystep
   logical :: machp, rselect, marker_plot, range_plot
@@ -386,7 +386,7 @@ subroutine pefill(ierr)
   if (k .lt. 0)  then
      select case (k)
        case (-1)
-          write (warnstr,'(3a)') 'table ',tabname,' not found' 
+          write (warnstr,'(3a)') 'table ',tabname,' not found'
        case (-2)
           write (warnstr,'(4a)') 'hor. variable ',horname,' not in table ',tabname
        case default
@@ -459,7 +459,7 @@ subroutine pefill(ierr)
         !--- get element parameters & build up pltyp (to be used by the routine peschm)
         currleng = node_value('l ')
         ! for codes 1 to 8 only and elements with length
-        if (currleng.gt.0.d0 .and. currtyp.gt.1 .and. currtyp.lt.8) then 
+        if (currleng.gt.0.d0 .and. currtyp.gt.1 .and. currtyp.lt.8) then
            currtilt = node_value('tilt ')
            k = double_from_table_row(tabname, 'k1l ' , j, currk1l);  currk1l  = currk1l /currleng
            k = double_from_table_row(tabname, 'k1sl ', j, currk1sl); currk1sl = currk1sl/currleng
@@ -490,7 +490,7 @@ subroutine pefill(ierr)
         if (machp .and. j.gt.nrrang(1) .and. currleng.gt.zero     &
              .and. interf.gt.0 .and. step.gt.zero .and. .not.ptc_flag) then
 
-           nint = currleng / step ! implicit type promotion 
+           nint = currleng / step ! implicit type promotion
            if (nint .lt. 2) nint = 2
            call peintp(crow, nint, proc_n, currleng, ierr)
 
@@ -579,7 +579,7 @@ subroutine pegacn(ncc, window, act, xreal, yreal, np, usex, xwpos, xpos, ypos, i
   real :: xdiag(2,2), ydiag(2,2)
 
   integer, external :: iucomp
-  
+
   !--- Initialisation of local variables
   save kapos
 
@@ -679,7 +679,7 @@ subroutine pegaxn (nax, vax, sax, ns)
   !----------------------------------------------------------------------*
 
   !--- type definition of the routine arguments
-  character(len=mcnam) :: vax(*), sax(*) 
+  character(len=mcnam) :: vax(*), sax(*)
   integer :: nax, ns
 
   !--- type definitions of local variables
@@ -952,7 +952,7 @@ subroutine pegetn (iflag, svar, it, ipflg, sovar, reqann)
        0, 0, 0, 0, 0, &
        0, 0, 0, &
        0, &
-       0/ 
+       0/
 
   data (intpo(j), j = 33, mnvar) /                                  &
        1, 101,                                                           &
@@ -1127,7 +1127,7 @@ subroutine pegetn (iflag, svar, it, ipflg, sovar, reqann)
        6, 6, 6,                                                          &
        69, 70,                                                           &
        71, 72, 73, 74 /
- 
+
  data (ivdep(j,2,3), j = 33, mnvar) /                              &
        0, 0,                                                             &
        0, 0, 0,                                                          &
@@ -1185,7 +1185,7 @@ subroutine pegetn (iflag, svar, it, ipflg, sovar, reqann)
         if (ivdep(iref,j,it) .ne. 0) &
              sovar(j) = svname(ivdep(iref,j,it))
        enddo
-     
+
     case (1)
        reqann = svlabl(iref)
        if (svar .ne. svname(iref))  then
@@ -1211,7 +1211,7 @@ subroutine pegetn (iflag, svar, it, ipflg, sovar, reqann)
        reqann = svar
 
   end select
-   
+
 end subroutine pegetn
 
 subroutine peiact(kact, np, x, y, ac, kf, kl)
@@ -1342,13 +1342,13 @@ subroutine peintp(crow, nint, proc, length, ierr)
      ex = get_value('beam ','ex ')
      ey = get_value('beam ','ey ')
 
-     !---  xn, pxn, yn, pyn 
+     !---  xn, pxn, yn, pyn
      xn1 = zero
      if (ex*tw1(1) .ne. zero) xn1 = tw1(11) / sqrt(ex*tw1(1))
      yn1 = zero
      if (ey*tw1(6) .ne. zero) yn1 = tw1(13) / sqrt(ey*tw1(6))
 
-     ! 2015-Aug-09  10:56:43  ghislain: added initialisation of gamx gamy 
+     ! 2015-Aug-09  10:56:43  ghislain: added initialisation of gamx gamy
      gamx = zero
      if (tw1(1).ne.zero) gamx = (one + tw1(2)**2) / tw1(1)
      gamy = zero
@@ -1382,7 +1382,7 @@ subroutine peintp(crow, nint, proc, length, ierr)
            ipparm(2,j) = 0
         endif
      enddo
- 
+
     return
   endif ! crow .eq. 1
 
@@ -1484,7 +1484,7 @@ subroutine pemima
   character(len=mtitl) :: s
   character(len=mxlabl) :: slab
   character(len=mcnam) :: sdum(mxcurv), saxis(mxcurv), vaxis(mxcurv,4)
-  
+
   !--- Initialisation of variables in common peaddi
   numax = 0
 
@@ -1523,8 +1523,8 @@ subroutine pemima
 
   do j = 1, nivvar ! loop over all variables to be plotted
      k = naxref(j)
-     do i = 1, nqval(j) 
-        ! find overall hmin and hmax 
+     do i = 1, nqval(j)
+        ! find overall hmin and hmax
         hmima(1) = min(hmima(1), qhval(i,j))
         hmima(2) = max(hmima(2), qhval(i,j))
         ! find vmin and vmax for each axis
@@ -1554,18 +1554,18 @@ subroutine pemima
         call gxpnbl (slab, k1, k2) ! extract indices for first and last non-blank characters in string
         s  = '<#>' // slab
         k2 = k2 + 3
-        
+
         do i = 2, ns ! extract the labels for other variables
            call pegetn (1, saxis(i), itbv, idum, sdum, slab)
-           call gxpnbl (slab, i1, i2)           
-           if (k2+i2+2 .gt. mtitl) then 
+           call gxpnbl (slab, i1, i2)
+           if (k2+i2+2 .gt. mtitl) then
               call fort_warn('PLOT: ','Array index larger than array limit; label is truncated')
               goto 100 ! stop building label
            endif
            if (index(s(:k2),slab(:i2)) .eq. 0)  then
               s(k2+1:) = ', ' // slab(:i2)
               k2 = k2 + i2 + 2
-           endif          
+           endif
         enddo
 
 100     axlabel(iv) = s
@@ -1606,7 +1606,7 @@ subroutine peplot
   integer :: ipar(50), nptval(4), ipxval(4), ipyval(4), icvref(4)
   integer :: lastnb, iaxseq(4)
   integer :: idum, k1dum, k2dum, k3dum, vdum(2)
-  integer :: i, j, k, npar, ivvar, nvax, ivax, ierr 
+  integer :: i, j, k, npar, ivvar, nvax, ivax, ierr
   double precision :: deltap
   real :: prmach, symch, tmpval, yvtop, fdum, chh
   real :: vpt(4), window(4,4), actwin(4,4), range(2), xax(2), yax(8)
@@ -1614,7 +1614,7 @@ subroutine peplot
   character(len=mcnam)  :: svar
   character(len=mxlabl) :: slocn, slname
   character(len=mtitl)  :: stemp
-  character(len=300)    :: stext 
+  character(len=300)    :: stext
   character(len=20)     :: sform
   character(len=mcnam)  :: sdum(mxdep)
   character(len=1)      :: ssymb
@@ -1676,7 +1676,7 @@ subroutine peplot
   !--- set top of viewport - leave space to plot machine if required
   yvtop = 1.
   if (fpmach) yvtop = 1. - prmach
-  
+
   !--- set line width scale factor
   tmpval = plot_option('lwidth ')
   if (tmpval .eq. 0.) tmpval = 1.
@@ -1973,7 +1973,7 @@ subroutine peschm (nel, ityp, hr, es, ee, actwin)
   do i = 1, nel
      call jsln(1)
      it = mod(ityp(i), 20)
-     if (it .eq. 0) goto 10 
+     if (it .eq. 0) goto 10
 
      j_nodrift = j_nodrift + 1
      i_nodrift(j_nodrift) = i
@@ -1992,8 +1992,8 @@ subroutine peschm (nel, ityp, hr, es, ee, actwin)
            call gvpl (2, txp, typz)
         endif
      endif
-     if (es(i) .gt. actwin(2)) goto 50 
-     if (ee(i) .ge. actwin(1)) then 
+     if (es(i) .gt. actwin(2)) goto 50
+     if (ee(i) .ge. actwin(1)) then
         txp(1) = es(i) + shapex(npst(it)) * ell
         typ(1) = shapey(npst(it))
         do  j = npst(it)+1, npnd(it)
@@ -2010,15 +2010,15 @@ subroutine peschm (nel, ityp, hr, es, ee, actwin)
 10   continue
   enddo
 
-50 continue 
+50 continue
 
   call jsln(1)
 
   if (j_nodrift .lt. 1) then
-   print*, "plot.f90 peschm j_nodrift must be > 0 and it is ", j_nodrift 
+   print*, "plot.f90 peschm j_nodrift must be > 0 and it is ", j_nodrift
    stop;
   endif
-  
+
   j = i_nodrift(j_nodrift)
   if (ee(j) .lt. hr(2))  then
      txp(1) = ee(j)
@@ -2088,7 +2088,7 @@ subroutine pesopt(ierr)
   tabname = ' '
   toptitle = ' '
   SNAME = ' '
-  
+
   !--- Initialisation of variables in common peotcl
   fpmach = .false.
   ptc_flag = .false.
@@ -2213,14 +2213,14 @@ subroutine pesopt(ierr)
    call fort_warn('PLOT: ','no interpolation available with PTC.')
    return
   endif
-  !--- Spline is obsolete 
+  !--- Spline is obsolete
   call comm_para('spline ', nint,ndble,k,int_arr,d_arr, char_a,char_l)
   if (int_arr(1) .eq. 1) call fort_warn('PLOT: ', &
        'SPLINE attribute is obsolete, no action taken; use INTERPOLATE attribute instead.')
 
-  !--- Interpolate: priority is given to the SETOPT option. 
+  !--- Interpolate: priority is given to the SETOPT option.
   !  If False, the option of the PLOT command will be considered.
-  !  If True, the option of the PLOT command is ignored. 
+  !  If True, the option of the PLOT command is ignored.
   ipparm(2,1) = plot_option('interpolate ')
   if (ipparm(2,1) .eq. 0) call comm_para('interpolate ', nint, ndble, k, ipparm(2,1), d_arr,char_a, char_l)
 
@@ -2237,9 +2237,9 @@ subroutine pesopt(ierr)
   !--- First test the variables on vaxis
   char_a = ' '
   call comm_para('vaxis ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
-  if (k .gt. 0)  then 
+  if (k .gt. 0)  then
      nivaxs = 1
-     !--- 2014-May-05  16:34:59  ghislain: in order to avoid creating spurious ps files 
+     !--- 2014-May-05  16:34:59  ghislain: in order to avoid creating spurious ps files
      ! with basename equal to the first ignored variable (eg dy.ps), it is better to discard the whole plot
      ! and let the user fix the problem (for now at least...)
      if (k .gt. mxcurv) then
@@ -2253,7 +2253,7 @@ subroutine pesopt(ierr)
      NAXREF(1:nivvar) = 1
      !--- Do not even look further for variables on vaxis_i.
   else
-     !--- Look for variables on vaxis_i 
+     !--- Look for variables on vaxis_i
      do i = 1, 4
         write (vaxisi,'("vaxis",i1," ")') i
         char_a = ' '
@@ -2263,10 +2263,10 @@ subroutine pesopt(ierr)
            if (nivvar+k .gt. mxcurv) then
               write (warnstr,'(i2,a,i1,a,i2,a)') k," variables on VAXIS",i,&
                    " would overflow max number(",mxcurv,"). all variables ignored."
-              call fort_warn('PLOT: ',warnstr)             
+              call fort_warn('PLOT: ',warnstr)
               goto 110
            endif
-           nivaxs = nivaxs + 1        
+           nivaxs = nivaxs + 1
            call pesplit(k, char_a, char_l, slabl(nivvar+1))
            do j = 1, k
               nivvar = nivvar + 1
@@ -2284,13 +2284,13 @@ subroutine pesopt(ierr)
 
 110 continue
 
-  if (nivvar .eq. 0) then 
+  if (nivvar .eq. 0) then
      !--- nothing to be plotted, probably because of too many variables on a single axis
      call fort_warn('PLOT: ','no vertical plot variables, plot skipped')
      ierr=1
      return
   endif
-  
+
   do j = 1, nivvar
      call pegetn (0, slabl(j), itbv, proc_flag(1,j), sname(j), sdum(1))
      if (slabl(j) .eq. 'rbetx')  then
@@ -2375,7 +2375,7 @@ subroutine plginit
   call comm_para('file ', nint, ndble, k, int_arr, d_arr, char_a, char_l)
   plfnam = 'madx'
   if (k .gt. 0)  plfnam = char_a(:char_l(1))
- 
+
   ipseps = plot_option('post ')
   if (ipseps .eq. 0 .and. .not.intrac()) ipseps = 2
 

@@ -9,17 +9,19 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <errno.h>
+#include <float.h>
 #include <math.h>
 #include <time.h>
 
 // defines
 
-// #include "mad_mac.h"
+#include "mad_mac.h"
 #include "mad_def.h"
 #include "mad_main.h"
 
@@ -57,7 +59,6 @@
 #include "mad_str.h"
 #include "mad_vec.h"
 #include "mad_core.h"
-#include "mad_math.h"
 #include "mad_rand.h"
 #include "mad_plot.h"
 #include "mad_time.h"

@@ -165,16 +165,14 @@ int
 next_constraint(char* name, int* name_l, int* type, double* value, double* c_min, double* c_max, double* weight)
   /* returns the parameters of the next constraint; 0 = none, else count */
 {
-  int i, ncp, nbl;
   struct constraint* c_c;
-  int j,k;/* RDM fork */
   char s, takenextmacro, nomore; /* RDM fork */
 
   /* RDM fork */
   if (match_is_on==2) {
-    i=match2_cons_curr[0];
-    j=match2_cons_curr[1];
-    k=match2_cons_curr[2];
+    int i=match2_cons_curr[0];
+    int j=match2_cons_curr[1];
+    int k=match2_cons_curr[2];
 
     if(match2_cons_name[i][j] == NULL) {
       j++;
@@ -198,7 +196,7 @@ next_constraint(char* name, int* name_l, int* type, double* value, double* c_min
 
         if(nomore == 0) {
           name = match2_cons_name[i][j];
-          *name_l = strlen(name);
+          *name_l = strlen(name)+1;
           *type = 2; /* to be changed according to s or <,=,>*/
           *value = match2_cons_value[i][j];
           s = match2_cons_sign[i][j];
@@ -222,8 +220,6 @@ next_constraint(char* name, int* name_l, int* type, double* value, double* c_min
     }
   }
   else { /* RDM old match */
-    int len;
-
     if (current_node->cl == NULL) return 0;
 
     if (current_node->con_cnt == current_node->cl->curr) {
@@ -232,14 +228,7 @@ next_constraint(char* name, int* name_l, int* type, double* value, double* c_min
     }
 
     c_c = current_node->cl->constraints[current_node->con_cnt];
-    len = strlen(c_c->name);
-    ncp = len < *name_l ? len : *name_l;
-    nbl = *name_l - ncp;
-    strncpy(name, c_c->name, ncp);
-
-    for (i = 0; i < nbl; i++)
-      name[ncp+i] = ' ';
-
+    strfcpy(name, c_c->name, *name_l);
     *type = c_c->type;
 
     if (c_c->ex_value == NULL) *value = c_c->value;
@@ -261,7 +250,7 @@ next_constraint(char* name, int* name_l, int* type, double* value, double* c_min
 
 int
 next_constr_namepos(char* name)
-/* returns the Fortran (!) position of the named variable 
+/* returns the Fortran (!) position of the named variable
    in the opt_fun array of twiss (LD: weak!) */
 {
   int pos = 0;
@@ -356,7 +345,6 @@ next_global(char* name, int* name_l, int* type, double* value, double* c_min, do
   /* returns the parameters of the next global constraint;
      0 = none, else count */
 {
-  int i, ncp, nbl, len;
   struct constraint* c_c;
   if (current_sequ->cl == NULL) return 0;
   if (current_sequ->con_cnt == current_sequ->cl->curr)
@@ -364,11 +352,7 @@ next_global(char* name, int* name_l, int* type, double* value, double* c_min, do
     current_sequ->con_cnt = 0; return 0;
   }
   c_c = current_sequ->cl->constraints[current_sequ->con_cnt];
-  len = strlen(c_c->name);
-  ncp = len < *name_l ? len : *name_l;
-  nbl = *name_l - ncp;
-  strncpy(name, c_c->name, ncp);
-  for (i = 0; i < nbl; i++) name[ncp+i] = ' ';
+  strfcpy(name, c_c->name, *name_l);
   *type = c_c->type;
   if (c_c->ex_value == NULL) *value = c_c->value;
   else                       *value = expression_value(c_c->ex_value,2);

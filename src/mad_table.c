@@ -1,25 +1,10 @@
 #include "madx.h"
-#include <strings.h>
 
 #ifndef _WIN32
 #include <sys/utsname.h> // for uname
 #endif
 
 // private functions
-
-#if 0 // not used...
-static int
-table_org(char* table)
-  /* returns origin: 0  this job, 1 read or unknown */
-{
-  int pos;
-  int org = 1;
-  mycpy(c_dum->c, table);
-  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
-    org = table_register->tables[pos]->origin;
-  return org;
-}
-#endif
 
 static char*
 get_table_string(char* left, char* right)
@@ -1518,9 +1503,6 @@ table_range(char* table, char* range, int* rows)
 
   rows[0] = rows[1] = 0;
   stolower(mycpy(buf, table));
-
-//  fprintf(stderr, "table_range: table='%s'\n", buf);
-
   if ((pos = name_list_pos(buf, table_register->names)) > -1) {
     t = table_register->tables[pos];
     mycpy(buf, range);

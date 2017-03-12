@@ -200,7 +200,7 @@ act_special(int type, char* statement)
   loc_w = new_char_array(ls);
   get_bracket_range(statement, '{', '}', &rs, &re);
   if (re < 0) fatal_error("missing '{' or '}' in statement:",statement);
-  cnt_1 = rs; start_2 = rs + 1;
+  cnt_1 = rs+1; start_2 = rs + 1;
   mystrcpy(loc_buff, statement); loc_buff->c[re] =  '\0';
   while(aux_buff->max < cnt_1) grow_char_array(aux_buff);
   strncpy(aux_buff->c, statement, cnt_1); aux_buff->c[cnt_1] = '\0';

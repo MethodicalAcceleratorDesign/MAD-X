@@ -1,5 +1,15 @@
 #include "madx.h"
 
+static double
+fact(int i)
+{
+  if (i < 0) return -1;
+
+  double nfact = 1;
+  for (int k=2; k <= i; k++) nfact *= k;
+  return nfact;
+}
+
 static int
 find_index_in_table(const char * const cols[], const char *name )
 {
@@ -89,7 +99,7 @@ error_seterr(struct in_cmd* cmd)
 {
 
 /* read the errors from a named table  and stores
-   them in the nodes of the sequence.       
+   them in the nodes of the sequence.
    Subsequent Twiss will use them correctly.
    ===> Must be preceded by a call to "read_table"
    ===> (unless table exists in memory !)
@@ -138,20 +148,20 @@ error_seterr(struct in_cmd* cmd)
       exit(-77);
     }
   }
- 
+
   err = table_register->tables[t1];
 
   /* check that the table has all the columns that we expect*/
   from_col = find_index_in_table(efield_table_cols, "k0l");
   to_col   = find_index_in_table(efield_table_cols, "p20sl");
-  
+
   int idx = 0;
   char errmsg[1200];
   for ( i=from_col; i<=to_col; i++ )
    {
      /*printf("Check if %d  %s exists \n", i, efield_table_cols[i]);*/
      idx = find_index_in_table2(err->columns->names, err->num_cols, efield_table_cols[i]);
-     
+
      if (idx <= 0 )
       {/* did not find this column in the input table*/
         if (i < err->num_cols)
@@ -163,7 +173,7 @@ error_seterr(struct in_cmd* cmd)
         else
          {/*The table is truncated (column wise), which is OK for the current algorithm*/
            continue;
-         }  
+         }
       }
 
      if (idx != i)
@@ -172,10 +182,10 @@ error_seterr(struct in_cmd* cmd)
         warning(errmsg, "bailing out");
         return;
       }
-     
+
    }
 
-  for (row = 1; row <= err->curr; row++) 
+  for (row = 1; row <= err->curr; row++)
    {
     if (string_from_table_row(namtab, "name", &row, name)) break;
 
@@ -193,8 +203,8 @@ error_seterr(struct in_cmd* cmd)
 
       if(strcmp(slname, slnname) == 0) break;
     }
-    
-    
+
+
     /* We have now the input and the node, generate array and selection flag */
     if (!strcmp(slname, slnname)) {
       node->sel_err = 1;
@@ -208,15 +218,15 @@ error_seterr(struct in_cmd* cmd)
       node->p_ph_err = new_double_array(RFPHASE_MAX); // zero initialized
       node->p_ph_err->curr = RFPHASE_MAX;
 
-      
+
       from_col = find_index_in_table(efield_table_cols, "k0l");
       to_col   = find_index_in_table(efield_table_cols, "k20sl");
-      
+
       if (from_col > 0 && to_col > 0)
         for (i=0, col=from_col; col <= to_col && (col < err->num_cols) ; col++, i++)
          {
            node->p_fd_err->a[i] = err->d_cols[col][row-1];
-         }  
+         }
 
       from_col = find_index_in_table(efield_table_cols, "dx");
       to_col   = find_index_in_table(efield_table_cols, "mscaly");
@@ -332,7 +342,7 @@ error_eprint(struct in_cmd* cmd)
   nextnode = mysequ->ex_start;
 
   mycount = 0;
- 
+
   fll = command_par_value("full", cmd->clone);
 
   while (nextnode != ndexe) {
@@ -346,7 +356,7 @@ error_eprint(struct in_cmd* cmd)
                   pln_alig[4], pln_alig[5],pln_alig[6],pln_alig[7],
                   pln_alig[8], pln_alig[9],pln_alig[10],pln_alig[11],
                   pln_alig[12],pln_alig[13]);
-         for(i=0;i<nextnode->p_al_err->curr;i++) { 
+         for(i=0;i<nextnode->p_al_err->curr;i++) {
             fprintf(prt_file, "%10.6f ",alig_fact[i]*nextnode->p_al_err->a[i]);
          }
          fprintf(prt_file, "\n");
@@ -394,7 +404,7 @@ error_efcomp(struct in_cmd* cmd)
 {
   //  struct name_list* nl;
   //  int pos;
-  
+
   //  struct node *ndexe;
   //  struct node *nextnode;
   //  int    lvec;
@@ -416,7 +426,7 @@ error_efcomp(struct in_cmd* cmd)
   //  double *hco_n;
   //  double *hco_s;
   //  double *nvec;
-  //  double deer;  
+  //  double deer;
   //  double ref_str;
   //  double ref_strn;
   //  double ref_len;
@@ -429,16 +439,16 @@ error_efcomp(struct in_cmd* cmd)
   const size_t atts_len = sizeof atts/sizeof *atts;
   int iattv[attv_len];
   struct sequence* mysequ = current_sequ;
-  
+
   // double *nvec = mycalloc_atomic("error_efcomp", 1000, sizeof *nvec);
 
   struct node *ndexe = mysequ->ex_end;
   struct node *nextnode = mysequ->ex_start;
-  
+
   struct name_list* nl = cmd->clone->par_names;
 
   const int opt_debug = get_option("debug");
-  
+
   /* here comes a kludge, check which of the assignment vectors is there */
   /*
     i = 0;
@@ -458,14 +468,14 @@ error_efcomp(struct in_cmd* cmd)
       iattv[k] = 1;
     }
   }
-  
+
   for(int i=0;i<FIELD_MAX/2;i++) {
     for(int j=0;j<4;j++) {
       h_co_n[i][j] = 0.0;
       h_co_s[i][j] = 0.0;
     }
   }
-  
+
   while (nextnode != ndexe) { /*loop over elements and get strengths in vector*/
     current_node = nextnode;
     int flgmgt = node_value("magnet");
@@ -477,10 +487,10 @@ error_efcomp(struct in_cmd* cmd)
       } else {
 	      if(add_error_opt == 1) chcount[2]++; else chcount[1]++;
       }
-      
+
       if (opt_debug)
         fprintf(prt_file, "field for %s %s %d\n", nextnode->name, nextnode->base_name, nextnode->sel_err);
-      
+
       /* now get order (n), radius (rr) and hyster flag (hyst) from command, if any */
       /* AL: added 'freq' option for RF-Multipoles */
       for(unsigned int i=0; i<atts_len; i++) {
@@ -525,7 +535,7 @@ error_efcomp(struct in_cmd* cmd)
             fatal_error("invalid attribute", atts[i]);
         }
       }
-      
+
       /* now get coefficients for time memory effects in magnets */
       {
 	      struct double_array *pcoef = command_par_array("hcoeffn",cmd->clone);
@@ -564,7 +574,7 @@ error_efcomp(struct in_cmd* cmd)
       // double ref_len = nlength; // never used
       if (opt_debug)
 	      fprintf(prt_file, "original length is %f\n",nlength);
-      
+
       if(strcmp(nextnode->base_name,"multipole") == 0 && order >= 0 && rr > 0) {
       	double nvec[100];
         int lvec;
@@ -627,23 +637,23 @@ error_efcomp(struct in_cmd* cmd)
 	      ref_str = nvec3*nlength;
 	      ref_strn = fabs(nvec3);
       }
-      
+
       /*  edbug print out field components , not done for production version
        */
-      
+
       /* normal components -> 2j, skew components 2j+1 */
       /* AL: the following 'if' is not necessary */
       if(flgmgt == 1) {
-	
+
 	      for(unsigned i=0;i<attv_len;i++)  {   /* loop over possible commands */
-	        
+
 	        if (opt_debug) fprintf(prt_file, "%s %d\n",attv[i],iattv[i]);
-	        
+
 	        struct double_array *ptr = command_par_array(attv[i],cmd->clone);
 	        if((ptr != NULL) && (iattv[i] == 1))  { /* command [i] found ? */
-	          
+
 	          for(int j=0;j<ptr->curr;j++)  { /* loop over all parameters */
-	            
+
 	            /* start field error assignment */
 	            /* NORMAL COMPONENTS, ABSOLUTE ERRORS */
 	            if(i==0)  {
@@ -651,7 +661,7 @@ error_efcomp(struct in_cmd* cmd)
 		              nextnode->p_fd_err->a[2*j]   += ptr->a[j];
 		            } else {
 		              nextnode->p_fd_err->a[2*j]    = ptr->a[j];
-		            }		
+		            }
               } else
 
 		      /* SKEW COMPONENTS, ABSOLUTE ERRORS */
@@ -662,66 +672,66 @@ error_efcomp(struct in_cmd* cmd)
 		              nextnode->p_fd_err->a[2*j+1]  = ptr->a[j];
 		            }
               } else
-		
+
 		      /* NORMAL COMPONENTS, RELATIVE ERRORS, MAY BE CORRECTED FOR MEMORY EFFECTS */
               if(i==2) {
 		            if(rr < 1.0E-6) {
 		              error("trying to assign relative field errors with no or zero reference radius specified","");
 		            }
 		            double norfac = pow(rr,(order-j)) * (fact(j)/fact(order));
-		
+
 			          /* if flag for hysteresis correction is set, use coefficients for correction */
       			    double deer = 0.0 ;
       			    if(hyst == 1) {
       			      deer = h_co_n[j][3]*pow(ref_strn,3) + h_co_n[j][2]*pow(ref_strn,2) + h_co_n[j][1]*pow(ref_strn,1) + h_co_n[j][0];
-      			      if (opt_debug) 
+      			      if (opt_debug)
       				      printf("after correction (n): %d %e %e %e %e\n", j,ref_strn,ptr->a[j],deer,(ptr->a[j] + deer));
       			    }
-      			    
+
       			    if (opt_debug)
       			      fprintf(prt_file, "norm(n): %d %d %f %f\n",order,j,rr,norfac);
-      			    
+
       			    if(add_error_opt == 1) {
       			      nextnode->p_fd_err->a[2*j]   += (ptr->a[j]+deer)*ref_str*norfac;
       			    } else {
       			      nextnode->p_fd_err->a[2*j]    = (ptr->a[j]+deer)*ref_str*norfac;
       			    }
               } else
-      			    
+
   		    /* SKEW COMPONENTS, RELATIVE ERRORS, MAY BE CORRECTED FOR MEMORY EFFECTS */
               if(i==3) {
                 if(rr < 1.0E-6) {
                   error("trying to assign relative field errors with no or zero reference radius specified","");
       		      }
 		            double norfac = pow(rr,(order-j)) * (fact(j)/fact(order));
-		
+
       		      /* if flag for hysteresis correction is set, use coefficients for correction */
       		      double deer = 0.0;
       		      if(hyst == 1) {
             			deer = h_co_s[j][3]*pow(ref_strn,3) + h_co_s[j][2]*pow(ref_strn,2) + h_co_s[j][1]*pow(ref_strn,1) + h_co_s[j][0];
-            			if (opt_debug) 
+            			if (opt_debug)
             			  printf("after correction (s): %d %e %e %e %e\n",j,ref_strn,ptr->a[j],deer,(ptr->a[j] + deer));
           		  }
-          		      
+
        		      if (opt_debug)
             			fprintf(prt_file, "norm(s): %d %d %f %f\n",order,j,rr,norfac);
-          		      
+
         	      if(add_error_opt == 1) {
             			nextnode->p_fd_err->a[2*j+1] += (ptr->a[j]+deer)*ref_str*norfac;
                 } else {
           	 		  nextnode->p_fd_err->a[2*j+1]  = (ptr->a[j]+deer)*ref_str*norfac;
           		  }
               } else
-		      
+
           /* RF-PHASE OF NORMAL COMPONENTS */
               if(i==4) {
-      		      nextnode->p_ph_err->a[2*j] = ptr->a[j];     
+      		      nextnode->p_ph_err->a[2*j] = ptr->a[j];
               } else
 
           /* RF-PHASE OF SKEW COMPONENTS */
               if(i==5) {
-      		      nextnode->p_ph_err->a[2*j+1] = ptr->a[j];     
-		          } /*  end  of field error assignment */ 
+      		      nextnode->p_ph_err->a[2*j+1] = ptr->a[j];
+		          } /*  end  of field error assignment */
 	          }
 	        }
 	      }
@@ -773,7 +783,7 @@ error_eoption(struct in_cmd* cmd)
   static  int  ia_seen = 0;
 
   is = 0; ia = 0;
-  
+
   i = 0;
   while(cmd->tok_list->p[i] != NULL) {
      if(strcmp("add",cmd->tok_list->p[i]) == 0) {

@@ -1,5 +1,4 @@
 #include "madx.h"
-#include <assert.h>
 
 // public variables
 

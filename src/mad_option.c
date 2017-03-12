@@ -4,9 +4,9 @@ int
 get_option(const char* str)
 {
 /* This function is called by fortran to get option of a command */
-  int i; // , k; not used
+  int i;
   mycpy(c_dum->c, str);
-  if (options != NULL && (i = name_list_pos(c_dum->c, options->par_names)) > -1) 
+  if (options != NULL && (i = name_list_pos(c_dum->c, options->par_names)) > -1)
     return options->par->parameters[i]->double_value; // (k = not used
   else if (strcmp(c_dum->c, "warn") == 0) return init_warn;
   else return 0;
@@ -17,7 +17,7 @@ set_option(const char* str, int* opt)
   /* sets an (old or new) option with name "str",
      value *opt (0 false, 1 true) */
 {
-  int i, k; //, j not used
+  int i, k;
   char* bc;
   mycpy(c_dum->c, str); bc = permbuff(c_dum->c);
   if ((i = name_list_pos(bc, options->par_names)) < 0)

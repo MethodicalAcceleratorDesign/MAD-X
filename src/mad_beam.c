@@ -1,30 +1,5 @@
 #include "madx.h"
 
-#if 0 // not used...
-static double
-get_beam_value(char* name, char* par)
-  /* this function is used by fortran to get the parameters values of beams;
-     returns parameter value "par" for beam of sequence "name" if present,
-     where "name" may be "current", or "default", or the name of a sequence;
-     else returns INVALID */
-{
-  struct command* cmd;
-  mycpy(c_dum->c, name);
-  mycpy(aux_buff->c, par);
-  if (strcmp(c_dum->c, "current") == 0 && current_beam != NULL)
-    return get_value("beam", par);
-  else if (strcmp(c_dum->c, "default") == 0)
-  {
-    cmd = find_command("default_beam", beam_list);
-    return command_par_value(aux_buff->c, cmd);
-  }
-  else if ((cmd = find_command(c_dum->c, beam_list)) != NULL)
-    return command_par_value(aux_buff->c, cmd);
-  else return INVALID;
-}
-#endif
-
-
 static double
 rfc_slope(void)
   /* calculates the accumulated "slope" of all cavities */

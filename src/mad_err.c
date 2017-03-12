@@ -1,4 +1,3 @@
-#include <stdarg.h>
 #include "madx.h"
 
 // private globals
@@ -12,8 +11,8 @@ static int errorflag = 0;
 void
 mad_err_getwarn(int* cwarn, int* fwarn)
 {
-  if (cwarn) *cwarn = warn_numb; 
-  if (fwarn) *fwarn = warn_numbf; 
+  if (cwarn) *cwarn = warn_numb;
+  if (fwarn) *fwarn = warn_numbf;
 }
 
 void

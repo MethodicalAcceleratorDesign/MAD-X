@@ -2,34 +2,6 @@
 
 // public interface
 
-#if 0
-void
-set_command_par_string(char* parameter, struct command* cmd, char* val)
-{
-  const char *rout_name = "set_command_par_string";
-  struct command_parameter* cp;
-  int i, new_len;
-
-  if ((i = name_list_pos(parameter, cmd->par_names)) > -1) {
-    cp = cmd->par->parameters[i];
-    if (cp->type == 3) {
-      int len = strlen(cp->string);
-      new_len = strlen(val);
-
-      if(len < new_len) {
-        myfree(rout_name,cp->string);
-        cp->string = mymalloc_atomic(rout_name, new_len * sizeof *cp->string);
-      }
-
-      strcpy(cp->string,val);
-
-      if (cp->expr != NULL) cp->expr = delete_expression(cp->expr);
-      cmd->par_names->inform[i] = 1; /* mark as set */
-    }
-  }
-}
-#endif
-
 struct command_parameter*
 clone_command_parameter(const struct command_parameter* p)
 {
@@ -385,7 +357,7 @@ command_par_value(const char* parameter, const struct command* cmd)
   /* returns a command parameter value if found, else zero */
 {
   /*printf("command_par_value par = >>%s<<, c=%p\n",parameter,cmd);*/
-  
+
   const struct command_parameter* cp;
   double val = zero;
   int i;
@@ -692,7 +664,8 @@ par_present(const char* par, struct command* cmd, struct command_list* c_list)
 }
 
 void
-comm_para(const char* name, int* n_int, int* n_double, int* n_string, int* int_array, double* double_array, char* strings, int* string_lengths)
+comm_para(const char* name, int* n_int, int* n_double, int* n_string,
+  int* int_array, double* double_array, char* strings, int* string_lengths)
   /* returns the value for command parameter "name" being either
      one or several integers (including logicals),
      one or several doubles,
@@ -718,6 +691,7 @@ comm_para(const char* name, int* n_int, int* n_double, int* n_string, int* int_a
   *n_int = *n_double = *n_string = 0;
 
   mycpy(buf, name);
+//  printf("comm_para: name(buf)='%s'\n", buf);
 
   if (this_cmd != NULL && this_cmd->clone != NULL) {
     if ((pos = name_list_pos(buf, this_cmd->clone->par_names)) > -1) {
@@ -741,8 +715,9 @@ comm_para(const char* name, int* n_int, int* n_double, int* n_string, int* int_a
       case 3:
 	if (cp->string != NULL) {
 	  *n_string = 1;
-	  l = *string_lengths = strlen(cp->string);
-	  strncpy(strings, cp->string, l);
+	  strfcpy(strings, cp->string, NAME_L);
+          l = *string_lengths = imin(strlen(cp->string), NAME_L);
+//          printf("comm_para3: strings='%s'[%d]\n", strings, l);
 	}
 	break;
       case 11:
@@ -759,8 +734,9 @@ comm_para(const char* name, int* n_int, int* n_double, int* n_string, int* int_a
 	break;
       case 13:
 	for (i = 0; i < cp->m_string->curr; i++) {
-	  string_lengths[i] = l = strlen(cp->m_string->p[i]);
-	  strncpy(strings, cp->m_string->p[i], l);
+	  strfcpy(strings, cp->m_string->p[i], NAME_L);
+          l = string_lengths[i] = imin(strlen(cp->m_string->p[i]), NAME_L);
+//          printf("comm_para13: strings='%s'[%d]\n", strings, l);
 	  strings += l;
 	}
 	*n_string = cp->m_string->curr;
@@ -1079,23 +1055,23 @@ get_value(const char* name, const char* par)
 {
   int tmpi;
   double tmpd;
-  
+
   struct name_list* nl = NULL;
   mycpy(c_dum->c, name);
   mycpy(aux_buff->c, par);
-  
+
   if (strcmp(c_dum->c, "beam") == 0)
     return command_par_value(aux_buff->c, current_beam);
   else if (strcmp(c_dum->c, "probe") == 0)
    {
     /*printf("Getting probe beam => %p\n", probe_beam);*/
-    if (probe_beam == 0x0) 
+    if (probe_beam == 0x0)
      {
        printf("\n\n PROBE IS NULL!!!!!!\n\n\n");
        return 0.0;
-     }  
+     }
     return command_par_value(aux_buff->c, probe_beam);
-   } 
+   }
   else if (strcmp(c_dum->c, "survey") == 0)
   {
     if (current_survey != NULL) nl = current_survey->par_names;
@@ -1120,19 +1096,19 @@ get_value(const char* name, const char* par)
       return ((double)current_sequ->add_pass);
     else return INVALID;
   }
-  else 
+  else
    {
    tmpi =  strcmp(c_dum->c, current_command->name);
    if (current_command != NULL &&  tmpi == 0)
-     { 
+     {
        tmpd = command_par_value(aux_buff->c, current_command);
        return tmpd;
      }
-    else 
+    else
      {
        return INVALID;
-     }  
-   } 
+     }
+   }
 }
 
 int

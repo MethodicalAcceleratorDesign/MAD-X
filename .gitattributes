@@ -871,8 +871,6 @@ src/mad_match.c -text
 src/mad_match.h -text
 src/mad_match2.c -text
 src/mad_match2.h -text
-src/mad_math.c -text
-src/mad_math.h -text
 src/mad_mem.c -text
 src/mad_mem.h -text
 src/mad_mkthin.cpp -text
