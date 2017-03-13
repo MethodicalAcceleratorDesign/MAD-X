@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.13  (64 bit, Linux)       +
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.12.20               +
-  + Execution date: 2017.01.31 09:35:08      +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.13 16:23:08      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8
 
@@ -498,9 +498,9 @@ START LMDIF:
 Initial Penalty Function =   0.80418022E+02
 
 
-call:       4   Penalty function =   0.65047048E-13
+call:       4   Penalty function =   0.65047630E-13
  ++++++++++ LMDIF ended: converged successfully
-call:       4   Penalty function =   0.65047048E-13
+call:       4   Penalty function =   0.65047630E-13
 endmatch;
 
 
@@ -508,11 +508,11 @@ MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         dq1          4     2.00000000E+00     2.00000025E+00     6.31150424E-14
-Global constraint:         dq2          4     2.00000000E+00     1.99999996E+00     1.93200578E-15
+Global constraint:         dq1          4     2.00000000E+00     2.00000025E+00     6.31154875E-14
+Global constraint:         dq2          4     2.00000000E+00     1.99999996E+00     1.93214219E-15
 
 
-Final Penalty Function =   6.50470482e-14
+Final Penalty Function =   6.50476297e-14
 
 
 
@@ -525,7 +525,7 @@ ksd.b1                   -1.09468e-01 -1.07933e-01 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   6.50470482e-14
+VARIABLE "TAR" SET TO   6.50476297e-14
 value, KSF.B1;
 
 ksf.b1             =      0.06179867339 ;
@@ -562,13 +562,13 @@ total constraints:      2
 
 START LMDIF:
 
-Initial Penalty Function =   0.10397791E-10
+Initial Penalty Function =   0.10397788E-10
 
 
-call:       4   Penalty function =   0.27045066E-18
-call:       7   Penalty function =   0.11410084E-22
+call:       4   Penalty function =   0.27056545E-18
+call:       7   Penalty function =   0.14424164E-22
  ++++++++++ LMDIF ended: converged successfully
-call:       7   Penalty function =   0.11410084E-22
+call:       7   Penalty function =   0.14424164E-22
 endmatch;
 
 
@@ -576,11 +576,11 @@ MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-lhcb1$end:1                mux          4     6.42800000E+01     6.42800000E+01     1.63578197E-24
-lhcb1$end:1                muy          4     5.93100000E+01     5.93100000E+01     9.77430216E-24
+lhcb1$end:1                mux          4     6.42800000E+01     6.42800000E+01     1.29246971E-24
+lhcb1$end:1                muy          4     5.93100000E+01     5.93100000E+01     1.31316942E-23
 
 
-Final Penalty Function =   1.14100841e-23
+Final Penalty Function =   1.44241639e-23
 
 
 
@@ -588,18 +588,18 @@ Final Penalty Function =   1.14100841e-23
 
 Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
 --------------------------------------------------------------------------------
-kqtf.b1                  -4.41054e-10  0.00000e+00 -1.00000e+20  1.00000e+20
+kqtf.b1                  -4.41055e-10  0.00000e+00 -1.00000e+20  1.00000e+20
 kqtd.b1                   1.18989e-09  0.00000e+00 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.14100841e-23
+VARIABLE "TAR" SET TO   1.44241639e-23
 value, KQTF.B1;
 
-kqtf.b1            =   -4.410540527e-10 ;
+kqtf.b1            =   -4.410547347e-10 ;
 value, KQTD.B1;
 
-kqtd.b1            =    1.189889776e-09 ;
+kqtd.b1            =    1.189890282e-09 ;
 
 
 VRF400=16;
@@ -763,16 +763,16 @@ ptc_twiss,closed_orbit,icase=6,file="twiss_lhc",summary_file="summaryMomentumCom
        9.999904668        623.4144429        9.819046446        639.6111434 
 
          beta11min          beta11max          beta12min          beta12max 
-       9.999904664        623.4144426    3.584980767e-09    3.803559117e-07 
+       9.999904664        623.4144426    3.584982338e-09    3.803561277e-07 
 
          beta13min          beta13max          beta21min          beta21max 
-     3.9248237e-09      0.04761849512    2.791548794e-09    3.686520462e-07 
+   3.924823705e-09      0.04761849512    2.791550128e-09    3.686522683e-07 
 
          beta22min          beta22max          beta23min          beta23max 
-       9.819046446         639.611143    6.372986178e-10    0.0001425093961 
+       9.819046446         639.611143    6.372986179e-10    0.0001425093961 
 
          beta31min          beta31max          beta32min          beta32max 
-   9.522710013e-09      0.04963273962    3.544337466e-07    6.257025164e-05 
+   9.522709543e-09      0.04963273962    3.544337465e-07    6.257025164e-05 
 
          beta33min          beta33max           disp1min           disp1max 
        166.9905597        167.0946713       -2.819829429        2.814765446 
@@ -784,22 +784,22 @@ ptc_twiss,closed_orbit,icase=6,file="twiss_lhc",summary_file="summaryMomentumCom
    -0.003875644313      0.00299433977                  0     -0.00250001517 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-  -3.567729086e-09   -7.649116932e-08    0.0001600066423    8.804809945e-07 
+  -3.567728988e-09   -7.649116711e-08    0.0001600066423    8.804813599e-07 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-  -1.141438624e-05    0.0009316851209    0.0009604958264    3.079876774e-05 
+   -1.14143849e-05    0.0009316851209    0.0009604958264    3.079876774e-05 
 
            pycorms             tcorms            ptcorms             xcomax 
-   3.139702411e-05    5.315968583e-06    8.804809945e-07     0.007226400175 
+   3.139702411e-05    5.315965887e-06    8.804813594e-07     0.007226400175 
 
             ycomax            pxcomax            pycomax             tcomax 
-    0.007641671572    0.0003940871055    0.0004529212793     1.28582806e-05 
+    0.007641671572    0.0003940871055    0.0004529212793    1.285827584e-05 
 
            ptcomax             xcomin             ycomin            pxcomin 
-   8.804809945e-07    -0.008235647056    -0.008512310964   -0.0004423489589 
+   8.804813599e-07    -0.008235647056    -0.008512310964   -0.0004423489589 
 
            pycomin             tcomin            ptcomin 
-  -0.0003835866478   -2.529664684e-06    8.804809876e-07 
+  -0.0003835866478   -2.529667782e-06    8.804813526e-07 
 
 
 select_ptc_normal, dq1,dq2;
@@ -830,7 +830,7 @@ ptc_normal,closed_orbit,normal,icase=5,no=2;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:   -2.4999927550805393E-003  -3.8031143108321521E-009  -8.1822966979554137E-008   1.6000806167850031E-004   0.0000000000000000     
+ Closed orbit:   -2.4999927550805427E-003  -3.8031143108790656E-009  -8.1822966978213760E-008   1.6000806167850104E-004   0.0000000000000000     
 write, table=normal_results,file="normal_results";
 
 
