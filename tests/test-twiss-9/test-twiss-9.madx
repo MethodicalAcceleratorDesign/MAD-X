@@ -36,7 +36,7 @@ select, flag=error, pattern="qd";
 parameter = 1;
 ealign, dx:=tgauss(3)*0.150e-3*parameter, dy:=tgauss(3)*0.150e-3*parameter;
 
-option, threader, debug;
+option, threader;
 threader, vector = .0001, .0001, 1. ;
 twiss, save, centre; 
 
