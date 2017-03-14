@@ -60,7 +60,7 @@ cleanbuild: cleanarch
 	$E "** Removing" $(DESTDIR)
 	$_ $(RMDIR) $(DESTDIR)
 
-cleanall: cleandir cleanbuild cleantest
+cleanall: cleandir cleanbuild cleantest cleantex
 
 cleantest:
 	$E "** Cleaning tests files"
@@ -68,5 +68,9 @@ cleantest:
 	$_ $(RM) $(wildcard $(patsubst %.ref,%,$(wildcard tests$/test-*$/*.ref)))
 	$_ $(RM) $(wildcard $(patsubst %.ref.gz,%,$(wildcard tests$/test-*$/*.ref.gz)))
 	$_ $(RM) $(wildcard $(addprefix tests$/test-*$/,$(files-to-rm))) # extra files
+
+cleantex:
+	$E "** Cleaning LaTeX files"
+	$_ $(RM) $(wildcard $(addprefix doc/latexuguide/,*.aux *.log))
 
 # end of makefile
