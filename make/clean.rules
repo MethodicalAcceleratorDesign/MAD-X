@@ -67,10 +67,11 @@ cleantest:
 	$_ $(RM) $(wildcard tests$/test-*$/*.out tests$/$(NDSUM))
 	$_ $(RM) $(wildcard $(patsubst %.ref,%,$(wildcard tests$/test-*$/*.ref)))
 	$_ $(RM) $(wildcard $(patsubst %.ref.gz,%,$(wildcard tests$/test-*$/*.ref.gz)))
-	$_ $(RM) $(wildcard $(addprefix tests$/test-*$/,$(files-to-rm))) # extra files
+	$_ $(RM) $(wildcard $(addprefix tests$/test-*$/,$(files-to-rm)))
+	$_ $(RM) -r $(wildcard $(addprefix tests$/test-*$/,temp$/* tmp$/*))
 
 cleantex:
 	$E "** Cleaning LaTeX files"
-	$_ $(RM) $(wildcard $(addprefix doc/latexuguide/,*.aux *.log))
+	$_ $(RM) $(wildcard $(addprefix doc$/latexuguide$/,*.aux *.log))
 
 # end of makefile
