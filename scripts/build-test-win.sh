@@ -48,6 +48,7 @@ fi
 
 echo -e "\n===== Start of build and tests ====="
 echo "Date  : `date`"
+echo "UserId: `whoami`"
 echo "System: `uname -m -n -r -s`"
 echo "Script: $0 $@"
 
