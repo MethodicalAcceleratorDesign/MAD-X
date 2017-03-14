@@ -767,7 +767,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
     call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
     RT = matmul(RE,RT)
     !--- IT check if RT is symplectic
-    if (thr_on .eq. 0 .and. debug .ne. zero) then
+    if (thr_on .eq. 0 .and. debug .ne. 0) then
       call m66symp(rt,nrm)
       if ((nrm-nrm0) .gt. symp_thrd) then
         call element_name(el_name,len(el_name))
@@ -786,7 +786,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
     call tmcat(.true.,re,te,rt,tt,rt,tt)
     suml = suml + el
     !--- IT check if RT is symplectic
-    if (thr_on .eq. 0 .and. debug .ne. zero) then
+    if (thr_on .eq. zero .and. debug .ne. 0) then
       call m66symp(rt,nrm)
       if ((nrm-nrm0) .gt. symp_thrd) then
         call element_name(el_name,len(el_name))
@@ -802,7 +802,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
     call tmali2(el,orbit2,al_errors,beta,gamma,orbit,re)
     RT = matmul(RE,RT)
     !--- IT check if RT is symplectic
-    if (thr_on .eq. 0 .and. debug .ne. zero) then
+    if (thr_on .eq. 0 .and. debug .ne. 0) then
       call m66symp(rt,nrm)
       if ((nrm-nrm0) .gt. symp_thrd) then
         call element_name(el_name,len(el_name))
