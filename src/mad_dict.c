@@ -2880,7 +2880,7 @@ char command_def[] =
 "table = [s, none], "
 "knob = [s, none], "
 "row = [i, -1], "
-"append = [l, false, true];"
+"noappend = [l, false, true];"
 " "
 "fill_knob: control none 0 0 "
 "table = [s, none], "
