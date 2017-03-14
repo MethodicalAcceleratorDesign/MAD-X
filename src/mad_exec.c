@@ -652,7 +652,7 @@ exec_setvars_knob_table(struct in_cmd* cmd)
   char expr[10000];
   char subexpr[100];
   int pos, row;
-  int append;
+  int noappend;
 
   if ((pos = name_list_pos("table", nl)) < 0 || nl->inform[pos] == 0 ||
       (name = pl->parameters[pos]->string) == NULL) {
@@ -671,8 +671,8 @@ exec_setvars_knob_table(struct in_cmd* cmd)
   row  = pos >= 0 ? (int) pl->parameters[pos]->double_value : t->curr;
   pos  = name_list_pos("knob", nl);
   knob = pos >= 0 ? pl->parameters[pos]->string : NULL;
-  pos  = name_list_pos("append",nl);
-  append= pos >= 0 ? pl->parameters[pos]->double_value : 1;
+  pos  = name_list_pos("noappend",nl);
+  noappend= pl->parameters[pos]->double_value;
 
   if (abs(row) > t->curr || row == 0) {
     warning("row index out of bounds:", " ignored");
@@ -696,7 +696,7 @@ exec_setvars_knob_table(struct in_cmd* cmd)
       const char *colname = t->columns->names[i];
       double val = t->d_cols[i][row-1];
       sprintf(subexpr,"%+20.16g*%s", val, knob);
-      if (append && (var = find_variable(colname, variable_list))) {
+      if ((noappend==0) && (var = find_variable(colname, variable_list))) {
         if (var->expr)
           sprintf(expr, "%s := %s %s;", colname, var->expr->string, subexpr);
         else
