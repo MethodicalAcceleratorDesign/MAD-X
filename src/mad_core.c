@@ -59,6 +59,13 @@ mad_init_c(void)
   tmp_l_array = new_char_p_array(1000); /* dynamic */
   sxf_list = new_name_list("sxf_list", 50); /* dynamic */
   all_table_lists = new_table_list_list(10); /* dynamic */
+
+  /* make dynamic copies to avoid sbrk calls on load disliked by Valgrind */
+  constant_def = mymalloc_atomic("mad_init_c", strlen(const_constant_def)+1);
+  command_def  = mymalloc_atomic("mad_init_c", strlen(const_command_def )+1);
+  strcpy(constant_def, const_constant_def);
+  strcpy(command_def , const_command_def );
+
   deco_init();
   get_defined_constants();
   get_defined_commands();

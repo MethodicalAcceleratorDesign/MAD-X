@@ -19,9 +19,12 @@
 "const erad = 2.8179402894e-15; "
 "const prad = erad*emass/pmass; "; */
 
+char *constant_def = 0;
+char *command_def  = 0;
+
 /*  J. Beringer et al. (Particle Data Group), Phys. Rev. D86, 010001 (2012). = PDG 2012 */
 /*  K.A. Olive et al. (Particle Data Group), Chin. Phys. C, 38, 090001 (2014). = PDG2014 */
-char constant_def[] =
+const char *const_constant_def =
 
 #define mkstr(a)  mkstr_(a)
 #define mkstr_(a) #a
@@ -92,7 +95,7 @@ char constant_def[] =
    threader is switched on; att: attenuation factor for kicks.
 */
 /* FS 15.03.2004: initial matrix for ptc_twiss, preparation of Touschek */
-char command_def[] =
+const char *const_command_def =
 "antiproton: data none 0 0 "  /* comment allowed outside quotes */
 "mass     = [r, pmass], "
 "charge   = [r, -1]; "
