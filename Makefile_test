@@ -100,6 +100,13 @@ $(call onlxi64,$(user-cases),)
 user-cases = \
 test-lhc test-hllhc
 
+# extra files to remove in cleantest
+files-to-rm = \
+Maxwellian_bend_for_ptc.txt Maxwellian_bend_for_ptc_electric.txt \
+internal_mag_pot.txt sychrpart.txt twcavsettings.txt \
+p4_ptc.tfs normal.tfs transfer.map debug.ptc leir.56dt.ptc.noorb.twiss \
+*.ps *.pdf
+
 # tests dependencies
 #test-c6t:     test-makethin-2
 #test-track-2: test-makethin-2
