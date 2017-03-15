@@ -1,7 +1,16 @@
-2017.01.31 skowron r6094
+
+r6108 | skowron | 2017-03-03
+   Higher order alpha_c with ptc_twiss, time=true, icase=56;
+
+r6092 | skowron | 2017-01-27 
+   ptc_twiss: fix of issue TRAC #417 (big slow down of ptc_twiss in high order): 
+   converted 6D dispersion calculation to matrices instead of taylor maps, 
+   which were extremely slow at high orders
+
+
+r6094 skowron    2017.01.31 
  1. ptc_twiss with time=TRUE: scaling of dispersions and chromaticities with
-    relativistic beta such that they are the same as with time=false and in case of relativistic energies.
-    So the vaules follow defintion Dx = dX/dP.
+    relativistic beta such that they are the same as with time=false and in case of non-relativistic energies.
     This correction is NOT implemented for the values in NONLIN table where the raw values calculated by ptc are stored.
     With time=TRUE the longitudinal variables are dE/E and dT/T (energy and time offsets). Therefore the chromatic
     functions are calculated with respect of these variables. For linear variables the conversion is straight forward
@@ -15,3 +24,25 @@
     and alpha_c_p3 are calculated only for icase=56 time=FALSE
     
     
+r6082 | skowron | 2017-01-20 
+    Fixed bug #402 (T and PT not checked if within user specified box).
+    Added check of all coordinates with exception of T in case of totalpath=true, 
+    in which case it prints an info. Added rootntuple option to ptc_track command what allows to save 
+    all the data to ROOT ntuple; For think RF cavity added LAG adjustment in MADX to PTC translation such that 
+    particles with zero T coordinate has no net acceleration in a cavity with LAG=0
+
+r6061 | skowron | 2017-01-13 
+
+    Bug fix to get Hamiltonian terms from ptc_normal with the new PTC; 
+    ptc_twiss does not fill EIGN vectors as now these columns are for sigma matrix; 
+    Hamiltonian in ptc_twiss, normal; clean-up of unnecessary messages and files (Maxwellian_bend_for_ptc_electric.txt)
+
+r6013 | skowron | 2016-11-22 
+    Bug correction for factorials of anharmonicities in ptc_normal
+
+r5947 | skowron | 2016-10-03 
+    Bug fix trac #394: check error table columns
+
+r5894 | skowron | 2016-06-06 
+    New PTC into trunk
+
