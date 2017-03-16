@@ -70,7 +70,7 @@ void    check_tabindex(char* string);
 void    check_tabstring(char* string);
 double  table_value(void);
 void    add_to_table_list(struct table*, struct table_list*);
-void    add_vars_to_table(struct table*);
+void    add_vars_to_table(struct table*, double scale);
 void    set_vars_from_table(struct table*);
 void    double_table(char* table);
 void    grow_table(struct table*); /* doubles number of rows */

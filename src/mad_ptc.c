@@ -1790,7 +1790,7 @@ augmentcountmomtabs(double* s)
     t = moments_tables->tables[i];
     t->s_cols[0][t->curr] = tmpbuff(current_node->name);
     t->d_cols[1][t->curr] = *s;
-    if (t->num_cols > t->org_cols)  add_vars_to_table(t);
+    if (t->num_cols > t->org_cols)  add_vars_to_table(t,1);
     if (++t->curr == t->max) grow_table(t);
   }
 }

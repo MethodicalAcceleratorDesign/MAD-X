@@ -266,7 +266,8 @@ const char *const_command_def =
 " "
 "fill: control none 0 0 "
 "table = [s, none], "
-"row = [i, 0]; "
+"row = [i, 0], "
+"scale = [r, 1]; "
 " "
 "shrink: control none 0 0 "
 "table = [s, none], "
@@ -2888,6 +2889,7 @@ const char *const_command_def =
 "fill_knob: control none 0 0 "
 "table = [s, none], "
 "knob = [s, none], "
+"scale = [r, 1], "
 "row = [i, 0]; "
 " "
 ;

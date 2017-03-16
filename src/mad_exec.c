@@ -433,6 +433,7 @@ exec_fill_table(struct in_cmd* cmd)
   struct name_list* nl = cmd->clone->par_names;
   char* name = NULL;
   int pos, row;
+  double scale;
 
   if ((pos = name_list_pos("table", nl)) < 0 || nl->inform[pos] == 0 ||
       (name = pl->parameters[pos]->string) == NULL) {
@@ -457,9 +458,12 @@ exec_fill_table(struct in_cmd* cmd)
       return;
     }
   }
+  pos =  name_list_pos("scale", nl);
+  scale =  pl->parameters[pos]->double_value;
+
   int cols = t->org_cols, curr = t->curr;
   t->org_cols = 0;    t->curr = row - 1;
-  add_vars_to_table(t);
+  add_vars_to_table(t,scale);
   t->org_cols = cols; t->curr = curr;
 
 //   printf("table fill: %s [%d/%d]\n", name, t->curr, t->max);
@@ -476,6 +480,7 @@ exec_fill_knob_table(struct in_cmd* cmd)
   struct name_list* nl = cmd->clone->par_names;
   const char* name = NULL, *knob = NULL;
   int pos, row;
+  double scale;
 
   if ((pos = name_list_pos("table", nl)) < 0 || nl->inform[pos] == 0 ||
       (name = pl->parameters[pos]->string) == NULL) {
@@ -509,6 +514,9 @@ exec_fill_knob_table(struct in_cmd* cmd)
     return;
   }
 
+  pos = name_list_pos("scale", nl);
+  scale =  pl->parameters[pos]->double_value;
+
   double varvalue[t->num_cols];
   for (int i = 0; i < t->num_cols; i++) {
     if (t->columns->inform[i] < 3) {
@@ -525,7 +533,8 @@ exec_fill_knob_table(struct in_cmd* cmd)
   t->org_cols = 0;    t->curr = row - 1;
   for (int i = 0; i < t->num_cols; i++) {
     if (t->columns->inform[i] < 3) {
-      t->d_cols[i][row-1] = get_variable(t->columns->names[i]) - varvalue[i];
+      t->d_cols[i][row-1] = scale *
+                   (get_variable(t->columns->names[i]) - varvalue[i]);
       //printf("%d\n",row-1);
     }
   }
@@ -695,15 +704,18 @@ exec_setvars_knob_table(struct in_cmd* cmd)
     if (t->columns->inform[i] < 3) {
       const char *colname = t->columns->names[i];
       double val = t->d_cols[i][row-1];
-      sprintf(subexpr,"%+20.16g*%s", val, knob);
+      sprintf(subexpr,"%+24.16g*%s", val, knob);
       if ((noappend==0) && (var = find_variable(colname, variable_list))) {
         if (var->expr)
           sprintf(expr, "%s := %s %s;", colname, var->expr->string, subexpr);
         else
-          sprintf(expr, "%s := %+20.16g %s;", colname, var->value, subexpr);
+          if (var->value==0){
+            sprintf(expr, "%s := %s;", colname, subexpr);
+          } else {
+            sprintf(expr, "%s := %+24.16g %s;", colname, var->value, subexpr);
+          };
       } else
           sprintf(expr, "%s := %s;", colname, subexpr);
-
       pro_input(expr);
     }
   }

@@ -850,7 +850,7 @@ augment_count(const char* table) /* increase table occ. by 1, fill missing */
 
   if (strcmp(t->type, "twiss") == 0) complete_twiss_table(t);
 
-  if (t->num_cols > t->org_cols)  add_vars_to_table(t);
+  if (t->num_cols > t->org_cols)  add_vars_to_table(t,1);
 
   if (t->p_nodes != NULL) t->p_nodes[t->curr] = current_node;
 
@@ -876,7 +876,7 @@ augmentcountonly(const char* table) /* increase table occ. by 1 */
     return;
   }
 
-  if (t->num_cols > t->org_cols)  add_vars_to_table(t);
+  if (t->num_cols > t->org_cols)  add_vars_to_table(t,1);
 
   if (++t->curr == t->max) grow_table(t);
 }
@@ -931,7 +931,7 @@ remove_table_from_table_list(const char *name, struct table_list* tl)
 }
 
 void
-add_vars_to_table(struct table* t)
+add_vars_to_table(struct table* t, double scale)
   /* fills user-defined variables into current table_row) */
 {
 
@@ -944,7 +944,7 @@ add_vars_to_table(struct table* t)
       else if (strstr(t->columns->names[i], "aptol_"))
         t->d_cols[i][t->curr] = get_apertol(current_node, t->columns->names[i]);
       else {
-        t->d_cols[i][t->curr] = get_variable(t->columns->names[i]);
+        t->d_cols[i][t->curr] = get_variable(t->columns->names[i])*scale;
       }
     }
     else if (current_node)
