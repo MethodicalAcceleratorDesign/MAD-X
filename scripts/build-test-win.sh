@@ -51,7 +51,10 @@ echo "Date  : `date`"
 echo "UserId: `whoami`"
 echo "System: `uname -m -n -r -s`"
 echo "Script: $0 $@"
-echo "Env   : `env`"
+echo "Shell : `echo $SHELL`"
+echo "User  : `echo $USER`"
+echo "Home  : `echo $HOME`"
+echo "Lang  : `echo $LANG`"
 
 echo -e "\n===== SVN update ====="
 svn update
