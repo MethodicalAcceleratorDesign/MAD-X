@@ -1,23 +1,5 @@
 #include "mad_dict.h"
 
-/* constants (pre-defined variables)  PDG 2010
-   nmass is the unified atomic mass unit [GeV/(c**2)] */
-/*char constant_def[] =
-"const pi = 4 * atan(1.); "
-"const twopi = 2 * pi; "
-"const degrad = 180 / pi; "
-"const raddeg = pi / 180; "
-"const e = exp(1.); "
-"const amu0 = 4.e-7 * pi; "
-"const emass = 0.510998910e-3; "
-"const mumass = 0.1056583668; "
-"const nmass = 0.931494028; "
-"const pmass = 0.938272013; "
-"const clight = 299792458.; "
-"const qelect = 1.602176487e-19; "
-"const hbar = 6.58211899e-25; "
-"const erad = 2.8179402894e-15; "
-"const prad = erad*emass/pmass; "; */
 
 char *constant_def = 0;
 char *command_def  = 0;
@@ -34,20 +16,23 @@ const char *const_constant_def =
 #undef mkstr
 #undef mkstr_
 
+/* constants (pre-defined variables)  PDG 2014
+   nmass is the unified atomic mass unit [GeV/(c**2)] */
+
 "const pi = 4 * atan(1.); "
 "const twopi = 2 * pi; "
 "const degrad = 180 / pi; "
 "const raddeg = pi / 180; "
 "const e = exp(1.); "
 "const amu0 = 4.e-7 * pi; "
-"const emass = 0.510998928e-3; "
-"const mumass = 0.1056583715; "
-"const nmass = 0.931494061; "
-"const pmass = 0.938272046; "
+"const emass = 5.10998946131e-4; "
+"const mumass = 0.105658374524; "
+"const nmass = 0.939565413358; "
+"const pmass = 0.938272081358; "
 "const clight = 299792458.; "
-"const qelect = 1.602176565e-19; "
-"const hbar = 6.58211928e-25; " // GeV.s
-"const erad = 2.8179403267e-15; "
+"const qelect = 1.602176620898e-19; "
+"const hbar = 6.58211951440e-25; "
+"const erad = 2.817940322719e-15; "
 "const prad = erad*emass/pmass; ";
 
 /* mods HG090508 - speed-up twiss
