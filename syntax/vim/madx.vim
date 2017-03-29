@@ -9,14 +9,10 @@
 " au BufNewFile,BufRead *.madx,*.seq,*.str,*.mask setf madx
 "
 
-set ignorecase
-
 syntax clear
 syntax case ignore
-set iskeyword=a-z,A-Z,48-57,_,.
-
-
-
+setlocal ignorecase
+setlocal iskeyword=a-z,A-Z,48-57,_,.
 
 syntax match madxComment ?//.*$?
 syntax match madxComment /!.*$/
@@ -42,8 +38,6 @@ syntax region madxLineReg start=/[^!]/ end=/;/ contains=madxCommandReg,madxPunt,
 syntax region madxCommandReg contained start=/[A-z]/ end=/;/ contains=madxPunt,madxNumber,madxFunc,madxType,madxConstant,madxVariables,madxString,madxCommandReg,madxAttribute,madxComment,madxCommand, madxElements
 
 
-
-
 "highlight link madxCommandReg Todo
 
 syntax match madxPunt contained /+[^+]/me=e-1
@@ -67,10 +61,7 @@ syntax keyword madxType contained REAL CONST shared
 
 syntax keyword madxConstant contained proton CIRCLE 1 radius  ELLIPSE RECTANGLE LHCSCREEN MARGUERITE RECTELLIPSE RACETRACK POSITRON ELECTRON PROTON ANTIPROTON POSMUON NEGMUON TWOPI
 
-
 syntax keyword madxElements BEAMBEAM DRIFT ECOLLIMATOR ELSEPARATOR EUROPEAN FOR HKICKER HMONITOR INSTRUMENT KICKER MARKER MATRIX MONITOR MULTIPOLE NUCLEAR OCTUPOLE ORGANIZATION QUADRUPOLE RBEND RCOLLIMATOR RESEARCH RFCAVITY SBEND SEXTUPOLE SOLENOID SROTATION VKICKER VMONITOR YROTATION
-
-
 
 syntax keyword madxCommand contained ASSIGN CALL COGUESS CREATE DUMPSEQU EXEC EXIT FILL HELP OPTION PRINT QUIT READTABLE RETURN SAVE SAVEBETA SELECT SET SHOW STOP SYSTEM TITLE USE VALUE WRITE BEAM RESBEAM PLOT RESPLOT SETPLOT SEQEDIT FLATTEN INSTALL MOVE REMOVE CYCLE REFLECT ENDEDIT SEQUENCE ENDSEQUENCE APERTURE SURVEY MAKETHIN
 
@@ -85,7 +76,7 @@ syntax keyword madxVariables contained betx bety dx dy x y px py s mux muy alfx 
 syntax keyword madxAttribute  contained save -echo echo -info info warn clear full vaxis1 vaxis2 format spec
 
 syntax keyword madxAttribute  contained class column default echo file flag label length level pattern period place pmass range sequence slice table text tolerance
-syntax keyword madxAttribute  contained BCURRENT BUNCHED BV CHARGE ENERGY ET ETA EX EXN EY EYN GAMMA KBUNCH MASS NPART PARTICLE PC RADIATE SEQUENCE SIGE SIGT 
+syntax keyword madxAttribute  contained BCURRENT BUNCHED BV CHARGE ENERGY ET ETA EX EXN EY EYN GAMMA KBUNCH MASS NPART PARTICLE PC RADIATE SEQUENCE SIGE SIGT
 
 syntax keyword madxAttribute  contained ascale bars colour default file font haxis hmax hmin If interpolate lscale lwidth multiple noline notitle noversion particle post ptc range rscale sscale style symbol table title trackfile vaxis vmax vmin xsize ysize interval
 
@@ -93,7 +84,7 @@ syntax keyword madxAttribute  contained at by class element flag from pattern ra
 
 syntax keyword madxAttribute  contained KICK L
 
-"syntax keyword madxAttribute  contained 
+"syntax keyword madxAttribute  contained
 
 "syntax match madxAttribute  contained /, *[A-z0-9]\{-} *=/hs=s+1,me=e-1 contains=madxPunt
 "syntax match madxAttribute  contained /, *[A-z0-9]\{-} *:=/hs=s+1,me=e-2 contains=madxPunt
@@ -101,12 +92,6 @@ syntax keyword madxAttribute  contained KICK L
 
 
 "element at from angle L sequence KNL L Lrad flag clear particle energy file column echo info warn refer REFPOS range vaxis label place period KICK KSL save bv warn style title haxis VAXIS1 VAXIS2 step upper lower calls tolerance
-
-
-
-
-
-
 
 "defined by the language"
 highlight link madxCommand Statement
