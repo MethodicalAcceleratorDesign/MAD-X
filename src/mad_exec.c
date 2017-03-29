@@ -722,6 +722,43 @@ exec_setvars_knob_table(struct in_cmd* cmd)
 }
 
 void
+exec_setvars_const_table(struct in_cmd* cmd)
+  /* add knob to variables with weights from a table*/
+{
+  struct command_parameter_list* pl = cmd->clone->par;
+  struct name_list* nl = cmd->clone->par_names;
+  int pos;
+  const char* name = NULL;
+  double constant;
+
+  if ((pos = name_list_pos("table", nl)) < 0 || nl->inform[pos] == 0 ||
+      (name = pl->parameters[pos]->string) == NULL) {
+    warning("no table name:", "ignored");
+    return;
+  }
+
+  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+    warning("table not found:", "ignored");
+    return;
+  }
+
+  struct table* t = table_register->tables[pos];
+
+  pos  = name_list_pos("const", nl);
+  constant = pl->parameters[pos]->double_value;
+
+  current_node = NULL; /* to distinguish from other table fills, remament! */
+
+  for (int i = 0; i < t->num_cols; i++) {
+    if (t->columns->inform[i] < 3) {
+      const char *colname = t->columns->names[i];
+      set_variable(colname,&constant);
+    }
+  }
+}
+
+
+void
 exec_print(struct in_cmd* cmd)
   /* prints text from "print" command to current output unit */
 {

@@ -82,6 +82,7 @@ control(struct in_cmd* cmd)
   else if (strcmp(toks[k], "setvars")     == 0) exec_setvars_table(cmd);
   else if (strcmp(toks[k], "setvars_lin") == 0) exec_setvars_lin_table(cmd);
   else if (strcmp(toks[k], "setvars_knob")== 0) exec_setvars_knob_table(cmd);
+  else if (strcmp(toks[k], "setvars_const")== 0) exec_setvars_const_table(cmd);
   else if (strcmp(toks[k], "fill_knob")   == 0) exec_fill_knob_table(cmd);
   else if (strcmp(toks[k], "help")        == 0) ;
   else if (strcmp(toks[k], "option")      == 0) exec_option();
