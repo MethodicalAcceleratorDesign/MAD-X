@@ -14,7 +14,7 @@ static int
 find_index_in_table(const char * const cols[], const char *name )
 {
   for (int i = 0; strcmp(cols[i], " "); i++)
-    if (string_icmp(cols[i], name) == 0)
+    if (stricmp(cols[i], name) == 0)
       return i;
 
   return -1; // not found
@@ -24,7 +24,7 @@ static int
 find_index_in_table2(const char * const cols[], int ncols, const char *name )
 {
   for (int i = 0; i<ncols; i++)
-    if (string_icmp(cols[i], name) == 0)
+    if (stricmp(cols[i], name) == 0)
       return i;
 
   return -1; // not found

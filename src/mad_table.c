@@ -60,7 +60,7 @@ get_table_index(char* left, char* right)
     int row = ntok == 4 ? atoi(toks[2]) : 1; // row may or may not be present
     if (col > -1 && row > 0 && table->s_cols[col]) {
       for (; row <= table->curr; row++) {
-        if (strncasecmp(table->s_cols[col][row-1], name, len) == 0) {
+        if (strnicmp(table->s_cols[col][row-1], name, len) == 0) {
           sprintf(c_dum->c, "%d", row);
           return permbuff(c_dum->c);
         }
@@ -784,7 +784,7 @@ table_value(void)
         else if(ntok == 2)
          {
           strncpy(temp, toks[1], NAME_L);
-          if (strcasecmp(temp, "tablelength") == 0)
+          if (stricmp(temp, "tablelength") == 0)
            {
              val = table->curr;
            }
@@ -1939,7 +1939,7 @@ table_header_exists(const char* table, const char *name)
   if (tbl->header) {
     for (hdr = 0; hdr < tbl->header->curr; hdr++) {
       strcpy(buf, &tbl->header->p[hdr][1]);
-      if ((p=strtok(buf, " \"\n")) && string_icmp(p, hdr_s) == 0)
+      if ((p=strtok(buf, " \"\n")) && stricmp(p, hdr_s) == 0)
         return 1;
     }
   }
@@ -1974,7 +1974,7 @@ double_from_table_header(const char* table, const char* name, double* val)
   if (tbl->header) {
     for (hdr = 0; hdr < tbl->header->curr; hdr++) {
       strcpy(buf, &tbl->header->p[hdr][1]);
-      if ((p=strtok(buf, " \"\n")) && string_icmp(p, hdr_s) == 0) {
+      if ((p=strtok(buf, " \"\n")) && stricmp(p, hdr_s) == 0) {
         if (strstr(strtok(NULL, " \"\n"), "%le") == NULL) {
           warning("double_from_table_header: parameter without value in table header:", (sprintf(buf,"%s->%s",tbl_s,hdr_s),buf));
           return -3;

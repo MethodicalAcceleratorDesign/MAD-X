@@ -727,9 +727,8 @@ exec_setvars_const_table(struct in_cmd* cmd)
 {
   struct command_parameter_list* pl = cmd->clone->par;
   struct name_list* nl = cmd->clone->par_names;
-  int pos;
   const char* name = NULL;
-  double constant;
+  int pos;
 
   if ((pos = name_list_pos("table", nl)) < 0 || nl->inform[pos] == 0 ||
       (name = pl->parameters[pos]->string) == NULL) {
@@ -744,19 +743,18 @@ exec_setvars_const_table(struct in_cmd* cmd)
 
   struct table* t = table_register->tables[pos];
 
-  pos  = name_list_pos("const", nl);
-  constant = pl->parameters[pos]->double_value;
+  pos = name_list_pos("const", nl);
+  double constant = pl->parameters[pos]->double_value;
 
   current_node = NULL; /* to distinguish from other table fills, remament! */
 
   for (int i = 0; i < t->num_cols; i++) {
     if (t->columns->inform[i] < 3) {
       const char *colname = t->columns->names[i];
-      set_variable(colname,&constant);
+      set_variable(colname, &constant);
     }
   }
 }
-
 
 void
 exec_print(struct in_cmd* cmd)

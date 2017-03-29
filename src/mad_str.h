@@ -90,7 +90,7 @@ stolower(char* s)  /* converts string to lower in place */
 }
 
 static inline char*
-stoupper(char* s)  /* converts string to upper in place */
+stoupper(char* s) /* converts string to upper in place */
 {
   int j;
   for (j = 0; s[j]; j++) {
@@ -100,21 +100,35 @@ stoupper(char* s)  /* converts string to upper in place */
   return s;
 }
 
-static inline int
-string_icmp(const char* s1, const char *s2)  /* case insitive string compare */
+static inline int /* case insitive string compare */
+stricmp(const char *s1, const char *s2)
 {
-  int j;
-  for (j = 0; s1[j] && s2[j]; j++) {
-    unsigned char c1 = s1[j], c2 = s2[j];
-    int ic1 = tolower(c1), ic2 = tolower(c2);
-    if (ic1 != ic2) return ic2-ic1;
+  const unsigned char *us1 = (const unsigned char *)s1;
+  const unsigned char *us2 = (const unsigned char *)s2;
+
+  while (tolower(*us1) == tolower(*us2)) {
+    if (*us1 == '\0') return 0;
+    us1++, us2++;
   }
-  return s2[j]-s1[j];
+  return tolower(*us1) - tolower(*us2);
+}
+
+static inline int /* case insitive string compare */
+strnicmp(const char *s1, const char *s2, size_t n)
+{
+  const unsigned char *us1 = (const unsigned char *)s1;
+  const unsigned char *us2 = (const unsigned char *)s2;
+
+  while (tolower(*us1) == tolower(*us2)) {
+    if (*us1 == '\0' || n <= 1) return 0;
+    us1++, us2++, n--;
+  }
+  return tolower(*us1) - tolower(*us2);
 }
 
 static inline int
 string_cnt(char c, int n, char* toks[])
-  /* returns number of strings in toks starting with character c */
+/* returns number of strings in toks starting with character c */
 {
   int i, k = 0;
   for (i = 0; i < n; i++)
