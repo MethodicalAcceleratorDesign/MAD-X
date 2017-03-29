@@ -15,3 +15,9 @@ show, a,b,c;
 
 setvars_knob, table=test, knob=k3,row=2;
 show, a,b,c;
+
+setvars_const, table=test;
+show, a,b,c;
+
+setvars_const, table=test,const=4;
+show, a,b,c;

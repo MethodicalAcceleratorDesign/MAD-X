@@ -1,4 +1,13 @@
 
+r6173 | rdemaria | 2017-03-29
+  Adding setvars_const command
+
+r6168 | rdemaria | 2017-03-16
+  Adding scale parameter to fill command
+
+r6151-r6154 | rdemaria | 2017-03-14 
+  Adding fill_knob, setvars_knob commands
+
 r6108 | skowron | 2017-03-03
    Higher order alpha_c with ptc_twiss, time=true, icase=56;
 

@@ -170,6 +170,46 @@ WHILE \=(i < len) \{ \\
       \>i = i + 1; \};
 }
 
+
+\section{SETVARS\_KNOB}
+\label{sec:setvars-knob}
+
+The \texttt{SETVARS\_KNOB} command creates or manipulates the expression for the variables by adding a term \texttt{"+ val * knob"} where val is  extracted from the row of a table and knob from the command.
+
+\madbox{
+SETVARS, TABLE=tabname, ROW=integer, KNOB=knobname;
+}
+
+The attributes of \texttt{SETVARS} are:
+\begin{madlist}
+  \ttitem{TABLE} the name of the table. (Default: none)
+  \ttitem{ROW} the row number containing the values. (Default: -1)
+  \ttitem{KNOB} the name of the knob. (Default: none)
+  \ttitem{NOAPPEND} when true the term is not appended but replace the exisint value or expression.
+\end{madlist}
+
+Negative \texttt{ROW} values are allowed and count the row numbers from
+the last row, allowing access to the table in reverse order of rows:
+\texttt{ROW~=~-1} accesses the last row of the table,
+\texttt{ROW~=~-2} accesses the penultimate (one before last) row,
+etc\ldots  
+
+
+\section{SETVARS\_CONST}
+\label{sec:setvars-const}
+
+The \texttt{SETVARS\_CONST} sets the value for the variables to constant.
+
+\madbox{
+	SETVARS, TABLE=tabname, CONST=value;
+}
+
+The attributes of \texttt{SETVARS} are:
+\begin{madlist}
+	\ttitem{TABLE} the name of the table. (Default: none)
+	\ttitem{CONST} the value used to set the variables. (Default: 0)
+\end{madlist}
+
 \section{FILL} 
 \label{sec:fill}
 The \texttt{FILL} command fills a row of a table with the current values 
@@ -217,6 +257,31 @@ table using the variable \madxmp{TABLE(tablenanme, TABLELENGTH)}
 
 %% See as well the \href{../Introduction/select.html#ucreate}{user
 %% table} example.   
+\section{FILL\_KNOB} 
+\label{sec:fill-knob}
+The \texttt{FILL\_KNOB} command fills a row of a table with the variation (multiplied by scaling factor) of all declared column variables of the table when the knob value change by 1.
+\madbox{
+FILL, TABLE=tabname, ROW=integer, KNOB=knobname, SCALE=scaling;
+}
+
+The \texttt{FILL} command takes two arguments:
+\begin{madlist}
+  \ttitem{TABLE} is the name of the table to be filled. The table must
+  have been \hyperref[sec:create]{created} beforehand.
+
+  \ttitem{ROW} is the row number to be filled with the current values of 
+  all column variables. \\ 
+  \texttt{ROW=0}, or \texttt{ROW=nrow + 1}, where \texttt{nrow} is the
+  current number of rows in the table, causes \texttt{FILL} to add a row at
+  the end of the table and fill it with the current values of all
+  column variables. \\ (Default: 0) 
+
+  \ttitem{KNOB} the name of the variable that is varied to calculate the values to fill a table.
+
+  \ttitem{SCALE} scaling factor applied to all the variation calculated by varying the knob.
+
+\end{madlist}
+
 
 \section{SHRINK} 
 \label{sec:shrink}
