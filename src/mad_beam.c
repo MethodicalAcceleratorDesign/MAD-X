@@ -527,6 +527,7 @@ print_probe(void)
   double bcurrent = get_value("probe", "bcurrent");
   double npart = get_value("probe", "npart");
   double energy = get_value("probe", "energy");
+  double dtbyds = get_value("probe", "dtbyds");
   int kbunch = get_value("probe", "kbunch");
   int rad = get_value("probe", "radiate");
   double gamtr = zero, t0 = zero, eta;
@@ -548,5 +549,6 @@ print_probe(void)
   printf(v_format(" Bcurrent  %F A/bunch    Kbunch    %I \n"), bcurrent, kbunch);
   printf(v_format(" Npart     %F /bunch     Energy    %F GeV \n"), npart,energy);
   printf(v_format(" gamma     %F            beta      %F\n"), gamma, beta);
+  printf(v_format(" dtbyds    %F\n"), dtbyds);
 }
 
