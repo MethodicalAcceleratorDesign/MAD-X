@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.02.01  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2014.04.25      +
-  + Execution Time Stamp: 10.06.14 21.16.59 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.30 14:32:14      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 TITLE,'Transferline matching with MAD-X';
 
 
@@ -323,13 +323,13 @@ orbit:  -2.556193E-05 -3.552790E-07  2.948751E-03 -1.098197E-04 -2.419989E-07 -1
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-             534.6    2.419989214e-07    0.0004498974988        47.14582183 
+             534.6    2.419989213e-07    0.0004498974988        47.14582183 
 
                 q1                dq1            betxmax              dxmax 
        1.256622886       -1.709613092        186.0593755        2.235741425 
 
              dxrms             xcomax             xcorms                 q2 
-       1.711709766    2.558118442e-05    1.957039146e-05        1.468423245 
+       1.711709766    2.558118444e-05    1.957039147e-05        1.468423245 
 
                dq2            betymax              dymax              dyrms 
       -1.988647234        185.2849056      0.05539960915      0.02099810508 
@@ -397,11 +397,11 @@ call:      25   Penalty function =   0.33085625E+02
 call:      28   Penalty function =   0.12655064E+02
 call:      31   Penalty function =   0.33603728E+00
 call:      34   Penalty function =   0.15458514E-03
-call:      37   Penalty function =   0.16536767E-08
-call:      40   Penalty function =   0.64177073E-14
-call:      43   Penalty function =   0.96815184E-19
+call:      37   Penalty function =   0.16536766E-08
+call:      40   Penalty function =   0.64176485E-14
+call:      43   Penalty function =   0.96795614E-19
  ++++++++++ LMDIF ended: converged successfully
-call:      43   Penalty function =   0.96815184E-19
+call:      43   Penalty function =   0.96795614E-19
 endmatch;
 
 
@@ -409,11 +409,11 @@ MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-fivecell$end:1             betx         4     1.80000000E+02     1.80000000E+02     9.66796421E-20
-fivecell$end:1             bety         4     3.00000000E+01     3.00000000E+01     1.35541816E-22
+fivecell$end:1             betx         4     1.80000000E+02     1.80000000E+02     9.66619684E-20
+fivecell$end:1             bety         4     3.00000000E+01     3.00000000E+01     1.33645861E-22
 
 
-Final Penalty Function =   9.68151840e-20
+Final Penalty Function =   9.67956143e-20
 
 
 
@@ -426,18 +426,18 @@ kqd                      -9.19086e-03 -9.70000e-03 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   9.68151840e-20
+VARIABLE "TAR" SET TO   9.67956143e-20
 
 
 value, kqf;
 
-kqf =     0.008721034577 ;
+kqf                =     0.008721034577 ;
 value, kqd;
 
-kqd =    -0.009190855083 ;
+kqd                =    -0.009190855083 ;
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.01 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.09.21 16:07:47      +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.30 14:30:08      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option, -echo,-warn,-info;
 
@@ -81,7 +81,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0 
 ibs,file="ibs-table.tfs";
 
- sige    4.6800203460575546E-004
+ sige    4.6800203460590887E-004
  Twiss was calculated at the exit of the elements.
  Twiss functions at the center of the elements are calculated through linear interpolation
 
@@ -92,7 +92,7 @@ radiate = F:
      C           26658.883200 m              f0              0.011245 MHz            T0             88.924656 microseconds
      alfa            0.321634E-03            eta             0.317287E-03            gamma(tr)      55.759505
      Bcurrent        0.000198 A/bunch        Kbunch         1                        Npart           0.110000E+12 per bunch
-     E             450.000000 GeV            gamma         479.605038                beta            0.999998
+     E             450.000000 GeV            gamma         479.605020                beta            0.999998
 
  Emittances:
 
@@ -115,7 +115,7 @@ acsca.b5r4.b1   1.09500       0.00000       400.789       0.00000       0.00000
 acsca.c5r4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
 acsca.d5r4.b1   1.09500       0.00000       400.789       0.00000       0.00000    
 
-     CONST               =   4.122769E-07
+     CONST               =   4.122770E-07
 
      ENERGY              =     450.000000 GeV
      BETA                =       0.999998
@@ -138,14 +138,14 @@ acsca.d5r4.b1   1.09500       0.00000       400.789       0.00000       0.00000
      1/betx =   1.44932E-02    1/bety =   1.34416E-02
 
      (Weighted) average rates (1/sec):
-     Longitudinal=    8.208516E-06
+     Longitudinal=    8.208517E-06
      Horizontal  =    5.074061E-06
-     Vertical    =   -3.693279E-08
+     Vertical    =   -3.693280E-08
 
      (Weighted) average lifetimes (sec):
      Longitudinal=    1.218247E+05
      Horizontal  =    1.970808E+05
-     Vertical    =   -2.707621E+07
+     Vertical    =   -2.707620E+07
 
 
 

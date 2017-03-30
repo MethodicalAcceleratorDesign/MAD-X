@@ -2,11 +2,11 @@
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %06s "GANTRY"
 @ PARTICLE         %08s "POSITRON"
-@ MASS             %le      0.000510998928
+@ MASS             %le     0.0005109989461
 @ CHARGE           %le                   1
 @ ENERGY           %le                   1
 @ PC               %le        0.9999998694
-@ GAMMA            %le         1956.951268
+@ GAMMA            %le         1956.951198
 @ KBUNCH           %le                   1
 @ BCURRENT         %le                   0
 @ SIGE             %le                0.03
@@ -40,9 +40,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %35s "Triplet lattice for gantry - dec17i"
-@ ORIGIN           %17s "5.02.09 Darwin 64"
-@ DATE             %08s "18/04/16"
-@ TIME             %08s "18.19.27"
+@ ORIGIN           %17s "5.03.00 Darwin 64"
+@ DATE             %08s "30/03/17"
+@ TIME             %08s "14.29.30"
 * NAME                                S               BETX               ALFX                MUX                 DX                DPX               BETY               ALFY                MUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "GANTRY$START"                       0        0.743975239                  0                  0                  0                  0        0.743975239                  0                  0

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.09.22 10:12:51      +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.30 14:40:43      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -56,14 +56,14 @@ sps6length = QDA.61910.S->at - QF.60010.E->at;
 
 VALUE, sps6length;
 
-sps6length =           611.3944 ;
+sps6length         =           611.3944 ;
 
 
 refpointpos = REFPOINT->AT - QF.60010.E->AT;
 
 value, refpointpos;
 
-refpointpos =              3.085 ;
+refpointpos        =              3.085 ;
 
 
 // ------------- combine with TI 2 -----------------
@@ -105,14 +105,14 @@ ti2length = TI2.END->AT-TI2.START->at; // reference ti2length =  3188.384281;
 
 VALUE, ti2length;
 
-ti2length =        3188.384281 ;
+ti2length          =        3188.384281 ;
 
 
 LFULL = ti2length + sps6length + 0.00457; //=  3188.384281 + 611.3944 + 0.00457     
 
 value, lfull;
 
-lfull =        3799.783251 ;
+lfull              =        3799.783251 ;
 
 
 all: SEQUENCE, refer=entry,  L= LFULL; 
@@ -2641,23 +2641,24 @@ enter Twiss module
  Found 6 initial orbit vector values from twiss command. 
  Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
 Twiss pre-init: adjusting probe and oneturnmat (fix point)
-updating probe_beam for deltap=0 => ds=   -2.42421663108115526
-  parameters: freq0=  0.0788970808426955883, alfa=0.000642332772159945374
-              beta=    0.99999782629243994, gamma=    479.606080229025906, dtbyds=                      0
+updating probe_beam for deltap=0 => ds=   -2.42421662983691899
+  parameters: freq0=  0.0788970808426826681, alfa=0.000642332772159944073
+              beta=   0.999997826292276071, gamma=    479.606062155549807, dtbyds=                      0
 Twiss pre-init: iteration 1, delta ds = -2.42421663e+00 (fix point)
-updating probe_beam for deltap=0 => ds=   -2.42421663108115526
-  parameters: freq0=  0.0788970808426955883, alfa=0.000642332772159945374
-              beta=    0.99999782629243994, gamma=    479.606080229025906, dtbyds=                      0
+updating probe_beam for deltap=0 => ds=   -2.42421662983691899
+  parameters: freq0=  0.0788970808426826681, alfa=0.000642332772159944073
+              beta=   0.999997826292276071, gamma=    479.606062155549807, dtbyds=                      0
 Twiss pre-init: iteration 2, delta ds = 0.00000000e+00 (fix point)
  
  Global parameters for protons, radiate = F:
 
  C                3799.783251 m          f0             0.07889708084 MHz
  T0               12.67474017 musecs     alfa         0.0006423327722 
- eta          0.0006379853618            gamma(tr)        39.45662731 
+ eta          0.0006379853614            gamma(tr)        39.45662731 
  Bcurrent                   0 A/bunch    Kbunch             1 
  Npart                      0 /bunch     Energy           450.0009782 GeV 
- gamma            479.6060802            beta            0.9999978263
+ gamma            479.6060622            beta            0.9999978263
+ dtbyds                     0
   
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00

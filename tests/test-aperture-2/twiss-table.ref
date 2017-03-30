@@ -2,18 +2,18 @@
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB1"
 @ PARTICLE         %06s "PROTON"
-@ MASS             %le         0.938272046
+@ MASS             %le        0.9382720814
 @ CHARGE           %le                   1
 @ ENERGY           %le         450.0009782
 @ PC               %le                 450
-@ GAMMA            %le         479.6060802
+@ GAMMA            %le         479.6060622
 @ KBUNCH           %le                   1
 @ BCURRENT         %le                   0
 @ SIGE             %le               0.001
 @ SIGT             %le                   1
 @ NPART            %le                   0
-@ EX               %le     7.818933717e-09
-@ EY               %le     7.818933717e-09
+@ EX               %le     7.818934011e-09
+@ EY               %le     7.818934011e-09
 @ ET               %le               0.001
 @ LENGTH           %le          26658.8832
 @ ALFA             %le     0.0003216328248
@@ -40,9 +40,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %58s "LHC Version 6.503 -  July 2009 - version with RCOLLIMATORs"
-@ ORIGIN           %17s "5.02.09 Darwin 64"
-@ DATE             %08s "18/04/16"
-@ TIME             %08s "18.23.01"
+@ ORIGIN           %17s "5.03.00 Darwin 64"
+@ DATE             %08s "30/03/17"
+@ TIME             %08s "14.32.54"
 * NAME                                S               BETX               BETY                  X                 PX                  Y                 PY APERTYPE                       APER_1            ON_ELEM 
 $ %s                                %le                %le                %le                %le                %le                %le                %le %s                                %le                %le 
  "TAS.1R1"                       20.915         50.7670143        50.76701097    -0.001999999345    1.739113385e-11     0.003555549899    0.0001699999934 "CIRCLE"                             0                  0

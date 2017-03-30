@@ -1,9 +1,9 @@
 @ NAME             %09s "MAP_TABLE"
 @ TYPE             %07s "MAP_TAB"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.02.10 Linux 64"
-@ DATE             %08s "02/06/16"
-@ TIME             %08s "12.28.17"
+@ ORIGIN           %17s "5.03.00 Darwin 64"
+@ DATE             %08s "30/03/17"
+@ TIME             %08s "14.35.08"
 * NAME                             COEF   N_VECTOR         NV      ORDER         NX        NXP         NY        NYP    NDELTAP         NT 
 $ %s                                %le         %d         %d         %d         %d         %d         %d         %d         %d         %d 
  "C1_000000"            8.892809092e-05          1          5          0          0          0          0          0          0          0

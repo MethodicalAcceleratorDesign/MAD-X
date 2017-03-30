@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.09.22 10:08:44      +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.30 14:33:41      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -319,7 +319,7 @@ APERTURE LIMIT: col.pu_qf4:2, n1: 28.4063, at: 42.0422
 
 Value, beam->n1min;
 
-beam->n1min =        28.40633601 ;
+beam->n1min        =        28.40633601 ;
 
 
 

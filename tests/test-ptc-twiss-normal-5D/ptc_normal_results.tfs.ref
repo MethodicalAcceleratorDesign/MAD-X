@@ -1,9 +1,9 @@
 @ NAME             %14s "NORMAL_RESULTS"
 @ TYPE             %10s "NORMAL_RES"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %16s "5.02.13 Linux 64"
-@ DATE             %08s "03/03/17"
-@ TIME             %08s "15.08.08"
+@ ORIGIN           %17s "5.03.00 Darwin 64"
+@ DATE             %08s "30/03/17"
+@ TIME             %08s "14.39.21"
 * NAME                   ORDER1     ORDER2     ORDER3     ORDER4              VALUE 
 $ %s                         %d         %d         %d         %d                %le 
  "GNFC"                       2          0          1          0       -0.211198277

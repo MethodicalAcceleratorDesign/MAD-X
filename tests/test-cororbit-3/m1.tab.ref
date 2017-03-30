@@ -1,9 +1,9 @@
 @ NAME             %03s "MON"
 @ TYPE             %03s "MON"
 @ TITLE            %01s "s"
-@ ORIGIN           %17s "5.02.05 Darwin 64"
-@ DATE             %08s "16/06/15"
-@ TIME             %08s "11.49.10"
+@ ORIGIN           %17s "5.03.00 Darwin 64"
+@ DATE             %08s "30/03/17"
+@ TIME             %08s "14.29.51"
 * NAME                            X.OLD              Y.OLD                  X                  Y 
 $ %s                                %le                %le                %le                %le 
  "BPHA"                  0.002426736553                  0    0.0002303400868                  0

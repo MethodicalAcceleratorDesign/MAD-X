@@ -2,11 +2,11 @@
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %08s "FIVECELL"
 @ PARTICLE         %08s "POSITRON"
-@ MASS             %le      0.000510998928
+@ MASS             %le     0.0005109989461
 @ CHARGE           %le                   1
 @ ENERGY           %le                   2
 @ PC               %le         1.999999935
-@ GAMMA            %le         3913.902536
+@ GAMMA            %le         3913.902397
 @ KBUNCH           %le                   1
 @ BCURRENT         %le                   0
 @ SIGE             %le               0.001
@@ -40,9 +40,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %17s "5.02.09 Darwin 64"
-@ DATE             %08s "18/04/16"
-@ TIME             %08s "18.19.19"
+@ ORIGIN           %17s "5.03.00 Darwin 64"
+@ DATE             %08s "30/03/17"
+@ TIME             %08s "14.29.24"
 * NAME                                X                 PX                  Y                 PY 
 $ %s                                %le                %le                %le                %le 
  "FIVECELL$START"          0.1302334892     0.001974438728      0.02736299854      0.00129431605

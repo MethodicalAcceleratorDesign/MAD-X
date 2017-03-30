@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.09.21 16:07:06      +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.30 14:29:29      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! Test for MADX to calculate chromatic functions
 
@@ -181,13 +181,13 @@ Want to make named table: twiss2
 
       Setvars, table=twiss1, row=n;
 
-      bx1=betx; by1=bety; ax1=alfx; ay1=alfy; mux1=mux; muy1=muy; 
+      bx1=betx; by1=bety; ax1=alfx; ay1=alfy; mux1=mux; muy1=muy;
 
 
 
       Setvars, table=twiss2, row=n;
 
-      bx2=betx; by2=bety; ax2=alfx; ay2=alfy; mux2=mux; muy2=muy; 
+      bx2=betx; by2=bety; ax2=alfx; ay2=alfy; mux2=mux; muy2=muy;
 
 
 
@@ -199,7 +199,7 @@ Want to make named table: twiss2
 
       chrombx = (bx2-bx1)/(bx1*dpt);
 
-      wx = sqrt(chromax^2 + chrombx^2); 
+      wx = sqrt(chromax^2 + chrombx^2);
 
       phix = atan(chromax/chrombx);
 
@@ -215,11 +215,11 @@ Want to make named table: twiss2
 
       phiy = atan(chromay/chromby);
 
-      dmuy = (muy2-muy1)/dpt; 
+      dmuy = (muy2-muy1)/dpt;
 
 
 
-      Fill, table=chromatic;      
+      Fill, table=chromatic;
 
     }
 
@@ -231,7 +231,7 @@ Want to make named table: twiss2
 
 
 
- Write, table=chromatic, file=chromatic.tfs;
+Write, table=chromatic, file=chromatic.tfs;
 
 
 

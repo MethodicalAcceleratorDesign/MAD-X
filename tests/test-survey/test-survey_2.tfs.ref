@@ -1,9 +1,9 @@
 @ NAME             %06s "SURVEY"
 @ TYPE             %06s "SURVEY"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %17s "5.02.03 Darwin 64"
-@ DATE             %08s "27/10/14"
-@ TIME             %08s "11.17.05"
+@ ORIGIN           %17s "5.03.00 Darwin 64"
+@ DATE             %08s "30/03/17"
+@ TIME             %08s "14.26.50"
 * NAME               KEYWORD                             L              ANGLE                  X                  Z              THETA 
 $ %s                 %s                                %le                %le                %le                %le                %le 
  "MUSR$START"        "MARKER"                             0                  0                  0                  0                  0

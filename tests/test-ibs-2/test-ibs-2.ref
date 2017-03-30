@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.13  (64 bit, Darwin)      +
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.12.20               +
-  + Execution date: 2017.01.10 15:13:03      +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.30 14:30:07      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !! **************************************************************************************
 
@@ -107,8 +107,8 @@ twiss,sequence=TME,file=tme-twiss.tfs;
 
 enter Twiss module
   
-iteration:   1 error:   6.253859E-07 deltap:   0.000000E+00
-orbit:  -8.359839E-07 -1.313307E-07  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+iteration:   1 error:   6.253858E-07 deltap:   0.000000E+00
+orbit:  -8.359838E-07 -1.313306E-07  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 ++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
 
 ++++++ table: summ
@@ -120,7 +120,7 @@ orbit:  -8.359839E-07 -1.313307E-07  0.000000E+00  0.000000E+00  0.000000E+00  0
        0.294117647      -0.2485530769        4.004112697       0.3322876002 
 
              dxrms             xcomax             xcorms                 q2 
-      0.2845484323    1.170021581e-06    9.749734683e-07       0.1764705882 
+      0.2845484323    1.170021455e-06    9.749733639e-07       0.1764705882 
 
                dq2            betymax              dymax              dyrms 
      -0.3357680436        9.503633189                  0                  0 
@@ -153,8 +153,8 @@ twiss,centre;
 
 enter Twiss module
   
-iteration:   1 error:   6.253859E-07 deltap:   0.000000E+00
-orbit:  -8.359839E-07 -1.313307E-07  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+iteration:   1 error:   6.253858E-07 deltap:   0.000000E+00
+orbit:  -8.359838E-07 -1.313306E-07  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 ++++++ warning: TWCPGO:  TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.
 
 ++++++ table: summ
@@ -166,7 +166,7 @@ orbit:  -8.359839E-07 -1.313307E-07  0.000000E+00  0.000000E+00  0.000000E+00  0
        0.294117647      -0.2485530769        4.004112697        0.335514865 
 
              dxrms             xcomax             xcorms                 q2 
-      0.2845484323    1.178865066e-06    9.749734683e-07       0.1764705882 
+      0.2845484323     1.17886494e-06    9.749733639e-07       0.1764705882 
 
                dq2            betymax              dymax              dyrms 
      -0.3357680436        9.503633189                  0                  0 
@@ -181,7 +181,7 @@ orbit:  -8.359839E-07 -1.313307E-07  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0 
 ibs,file=ibs-table.tfs;
 
- sige    1.5000000478849657E-002
+ sige    1.5000000478849695E-002
  Twiss was calculated at the center of the elements. No interpolation is used
 
  Global parameters for the machine: 
@@ -191,7 +191,7 @@ radiate = T:
      C               5.314466 m              f0             56.410642 MHz            T0              0.017727 microseconds
      alfa            0.786658E-02            eta             0.786655E-02            gamma(tr)      11.274754
      Bcurrent        4.067091 A/bunch        Kbunch       312                        Npart           0.450000E+12 per bunch
-     E               2.860000 GeV            gamma        5596.880626                beta            1.000000
+     E               2.860000 GeV            gamma        5596.880427                beta            1.000000
 
  Emittances:
 
@@ -202,11 +202,11 @@ radiate = T:
 sequence name: tme
 
 
-     CONST               =   5.177148E-12
+     CONST               =   5.177149E-12
 
      ENERGY              =       2.860000 GeV
      BETA                =       1.000000
-     GAMMA               =       5596.881
+     GAMMA               =       5596.880
      COULOMB LOG         =         25.168
 
      X-emittance         =   1.250699E-06 m*rad
@@ -232,7 +232,7 @@ sequence name: tme
      (Weighted) average lifetimes (sec):
      Longitudinal=    2.138169E+08
      Horizontal  =    3.601849E+07
-     Vertical    =   -5.160033E+15
+     Vertical    =   -5.160032E+15
 
 
 

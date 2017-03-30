@@ -1,19 +1,19 @@
 @ NAME             %04s "CORR"
 @ TYPE             %04s "CORR"
 @ TITLE            %51s "LHC 6.5 with errors and orbit correction using MADX"
-@ ORIGIN           %17s "5.02.05 Darwin 64"
-@ DATE             %08s "23/06/15"
-@ TIME             %08s "17.57.54"
+@ ORIGIN           %17s "5.03.00 Darwin 64"
+@ DATE             %08s "30/03/17"
+@ TIME             %08s "14.30.03"
 * NAME                           PX.OLD             PY.OLD      PX.CORRECTION      PY.CORRECTION 
 $ %s                                %le                %le                %le                %le 
- "MCBXH.1R1"                          0                  0    5.062448161e-16                  0
+ "MCBXH.1R1"                          0                  0    5.529079231e-16                  0
  "MCBXV.1R1"                          0                  0                  0                  0
- "MCBXH.2R1"                          0                  0   -3.257714965e-10                  0
+ "MCBXH.2R1"                          0                  0   -3.257715431e-10                  0
  "MCBXV.2R1"                          0                  0                  0                  0
- "MCBXH.3R1"                          0                  0    4.588218944e-10                  0
+ "MCBXH.3R1"                          0                  0    4.588219142e-10                  0
  "MCBXV.3R1"                          0                  0                  0                  0
  "MCBYV.A4R1.B1"                      0                  0                  0                  0
- "MCBYH.4R1.B1"                       0                  0   -1.872421168e-09                  0
+ "MCBYH.4R1.B1"                       0                  0   -1.872421167e-09                  0
  "MCBYV.B4R1.B1"                      0                  0                  0                  0
  "MCBCH.5R1.B1"                       0                  0                  0                  0
  "MCBCV.6R1.B1"                       0                  0                  0                  0
@@ -73,35 +73,35 @@ $ %s                                %le                %le                %le   
  "MCBCV.8L2.B1"                       0                  0                  0                  0
  "MCBCH.7L2.B1"                       0                  0   -1.216637569e-08                  0
  "MCBCV.6L2.B1"                       0                  0                  0                  0
- "MCBYH.B5L2.B1"                      0                  0    2.916913032e-08                  0
+ "MCBYH.B5L2.B1"                      0                  0    2.916913017e-08                  0
  "MCBYV.5L2.B1"                       0                  0                  0                  0
- "MCBYH.A5L2.B1"                      0                  0   -2.678161829e-08                  0
+ "MCBYH.A5L2.B1"                      0                  0   -2.678161814e-08                  0
  "MCBYV.B4L2.B1"                      0                  0                  0                  0
- "MCBYH.4L2.B1"                       0                  0    2.957852944e-12                  0
+ "MCBYH.4L2.B1"                       0                  0    2.957855986e-12                  0
  "MCBYV.A4L2.B1"                      0                  0                  0                  0
- "MCBXH.3L2"                          0                  0    -1.43247177e-12                  0
+ "MCBXH.3L2"                          0                  0   -1.432330396e-12                  0
  "MCBXV.3L2"                          0                  0                  0                  0
- "MCBXH.2L2"                          0                  0    8.949832374e-13                  0
+ "MCBXH.2L2"                          0                  0    8.944164397e-13                  0
  "MCBXV.2L2"                          0                  0                  0                  0
- "MCBXH.1L2"                          0                  0   -1.758596318e-16                  0
+ "MCBXH.1L2"                          0                  0     1.33480314e-16                  0
  "MCBXV.1L2"                          0                  0                  0                  0
  "MBXWT.1L2"                          0                  0                  0                  0
  "MBWMD.1L2"                          0                  0                  0                  0
  "MBAW.1R2"                           0                  0                  0                  0
  "MBXWT.1R2"                          0                  0                  0                  0
- "MCBXH.1R2"                          0                  0   -8.787715916e-17                  0
+ "MCBXH.1R2"                          0                  0   -4.006871422e-16                  0
  "MCBXV.1R2"                          0                  0                  0                  0
- "MCBXH.2R2"                          0                  0    3.222862963e-13                  0
+ "MCBXH.2R2"                          0                  0    3.226129557e-13                  0
  "MCBXV.2R2"                          0                  0                  0                  0
- "MCBXH.3R2"                          0                  0   -2.029414967e-13                  0
+ "MCBXH.3R2"                          0                  0   -2.031123102e-13                  0
  "MCBXV.3R2"                          0                  0                  0                  0
- "MCBYH.A4R2.B1"                      0                  0   -3.960928878e-09                  0
+ "MCBYH.A4R2.B1"                      0                  0   -3.960928411e-09                  0
  "MCBYV.4R2.B1"                       0                  0                  0                  0
- "MCBYH.B4R2.B1"                      0                  0    4.981340317e-09                  0
+ "MCBYH.B4R2.B1"                      0                  0    4.981339846e-09                  0
  "MCBCV.A5R2.B1"                      0                  0                  0                  0
- "MCBCH.5R2.B1"                       0                  0   -3.667440756e-09                  0
+ "MCBCH.5R2.B1"                       0                  0   -3.667440728e-09                  0
  "MCBCV.B5R2.B1"                      0                  0                  0                  0
- "MCBCH.6R2.B1"                       0                  0    8.120317876e-09                  0
+ "MCBCH.6R2.B1"                       0                  0    8.120317874e-09                  0
  "MCBCV.7R2.B1"                       0                  0                  0                  0
  "MCBCH.8R2.B1"                       0                  0   -4.231364333e-08                  0
  "MCBCV.9R2.B1"                       0                  0                  0                  0
@@ -219,7 +219,7 @@ $ %s                                %le                %le                %le   
  "MCBCV.8L4.B1"                       0                  0                  0                  0
  "MCBCH.7L4.B1"                       0                  0    1.508315901e-08                  0
  "MCBYV.6L4.B1"                       0                  0                  0                  0
- "MCBYH.5L4.B1"                       0                  0   -9.206788973e-10                  0
+ "MCBYH.5L4.B1"                       0                  0    -9.20678898e-10                  0
  "MCBYV.5R4.B1"                       0                  0                  0                  0
  "MCBYH.6R4.B1"                       0                  0   -7.094022652e-09                  0
  "MCBCV.7R4.B1"                       0                  0                  0                  0
@@ -279,20 +279,20 @@ $ %s                                %le                %le                %le   
  "MCBCV.7L5.B1"                       0                  0                  0                  0
  "MCBCH.6L5.B1"                       0                  0   -3.995354761e-05                  0
  "MCBCV.5L5.B1"                       0                  0                  0                  0
- "MCBYH.B4L5.B1"                      0                  0    2.380183697e-06                  0
+ "MCBYH.B4L5.B1"                      0                  0    2.380183698e-06                  0
  "MCBYV.4L5.B1"                       0                  0                  0                  0
  "MCBYH.A4L5.B1"                      0                  0    1.738862936e-06                  0
- "MCBXH.3L5"                          0                  0   -2.484170559e-12                  0
+ "MCBXH.3L5"                          0                  0   -2.483967743e-12                  0
  "MCBXV.3L5"                          0                  0                  0                  0
- "MCBXH.2L5"                          0                  0    4.908142872e-13                  0
+ "MCBXH.2L5"                          0                  0    4.903607729e-13                  0
  "MCBXV.2L5"                          0                  0                  0                  0
  "MCBXH.1L5"                          0                  0              1e-05                  0
  "MCBXV.1L5"                          0                  0                  0                  0
- "MCBXH.1R5"                          0                  0   -9.999999999e-06                  0
+ "MCBXH.1R5"                          0                  0             -1e-05                  0
  "MCBXV.1R5"                          0                  0                  0                  0
- "MCBXH.2R5"                          0                  0    2.401565982e-08                  0
+ "MCBXH.2R5"                          0                  0    2.401566216e-08                  0
  "MCBXV.2R5"                          0                  0                  0                  0
- "MCBXH.3R5"                          0                  0   -2.204718183e-08                  0
+ "MCBXH.3R5"                          0                  0   -2.204718245e-08                  0
  "MCBXV.3R5"                          0                  0                  0                  0
  "MCBYV.A4R5.B1"                      0                  0                  0                  0
  "MCBYH.4R5.B1"                       0                  0    1.420644068e-06                  0
@@ -441,7 +441,7 @@ $ %s                                %le                %le                %le   
  "MCBV.28R7.B1"                       0                  0                  0                  0
  "MCBH.29R7.B1"                       0                  0   -7.646424679e-07                  0
  "MCBV.30R7.B1"                       0                  0                  0                  0
- "MCBH.31R7.B1"                       0                  0    4.436572367e-09                  0
+ "MCBH.31R7.B1"                       0                  0    4.436572369e-09                  0
  "MCBV.32R7.B1"                       0                  0                  0                  0
  "MCBH.33R7.B1"                       0                  0    2.058168437e-06                  0
  "MCBV.34L8.B1"                       0                  0                  0                  0
@@ -471,12 +471,12 @@ $ %s                                %le                %le                %le   
  "MCBCV.10L8.B1"                      0                  0                  0                  0
  "MCBCH.9L8.B1"                       0                  0   -4.140220432e-08                  0
  "MCBCV.8L8.B1"                       0                  0                  0                  0
- "MCBCH.7L8.B1"                       0                  0    8.355732077e-09                  0
+ "MCBCH.7L8.B1"                       0                  0    8.355732132e-09                  0
  "MCBCV.6L8.B1"                       0                  0                  0                  0
- "MCBCH.B5L8.B1"                      0                  0   -3.026159908e-06                  0
+ "MCBCH.B5L8.B1"                      0                  0   -3.026159918e-06                  0
  "MCBCV.5L8.B1"                       0                  0                  0                  0
- "MCBCH.A5L8.B1"                      0                  0    2.819023218e-05                  0
- "MCBWH.5L8.B1"                       0                  0   -2.671951846e-06                  0
+ "MCBCH.A5L8.B1"                      0                  0    2.819023219e-05                  0
+ "MCBWH.5L8.B1"                       0                  0   -2.671951848e-06                  0
  "MCBYV.B4L8.B1"                      0                  0                  0                  0
  "MCBYH.4L8.B1"                       0                  0   -1.322644661e-05                  0
  "MCBYV.A4L8.B1"                      0                  0                  0                  0
@@ -558,14 +558,14 @@ $ %s                                %le                %le                %le   
  "MCBCV.9L1.B1"                       0                  0                  0                  0
  "MCBCH.8L1.B1"                       0                  0    -1.44979884e-07                  0
  "MCBCV.7L1.B1"                       0                  0                  0                  0
- "MCBCH.6L1.B1"                       0                  0    2.334712401e-08                  0
+ "MCBCH.6L1.B1"                       0                  0      2.3347124e-08                  0
  "MCBCV.5L1.B1"                       0                  0                  0                  0
- "MCBYH.B4L1.B1"                      0                  0   -2.908680035e-09                  0
+ "MCBYH.B4L1.B1"                      0                  0   -2.908680032e-09                  0
  "MCBYV.4L1.B1"                       0                  0                  0                  0
  "MCBYH.A4L1.B1"                      0                  0                  0                  0
- "MCBXH.3L1"                          0                  0     7.87207075e-10                  0
+ "MCBXH.3L1"                          0                  0    7.872072599e-10                  0
  "MCBXV.3L1"                          0                  0                  0                  0
- "MCBXH.2L1"                          0                  0   -3.162879191e-10                  0
+ "MCBXH.2L1"                          0                  0   -3.162883384e-10                  0
  "MCBXV.2L1"                          0                  0                  0                  0
- "MCBXH.1L1"                          0                  0    -1.50492454e-15                  0
+ "MCBXH.1L1"                          0                  0    -1.06472747e-15                  0
  "MCBXV.1L1"                          0                  0                  0                  0

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:20:15      +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.30 14:30:12      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Title, "Compiling Optics for the LHC 6.5 lattice with MADX";
 
@@ -74,16 +74,16 @@ parameter: particle   string: proton
 parameter: sequence   string: lhcb1
 parameter: bunched   logical: true
 parameter: radiate   logical: false
-parameter: mass   double value:        0.938272046
+parameter: mass   double value:       0.9382720814
 parameter: charge   double value:                  1
 parameter: energy   double value:               7000
 parameter: pc   double value:        6999.999937
-parameter: gamma   double value:        7460.522809
+parameter: gamma   double value:        7460.522528
 parameter: beta   double value:        0.999999991
 parameter: brho   double value:        23349.48645
-parameter: ex   double value:    5.026457389e-10
+parameter: ex   double value:    5.026457579e-10
 parameter: exn   double value:    3.749999966e-06
-parameter: ey   double value:    5.026457389e-10
+parameter: ey   double value:    5.026457579e-10
 parameter: eyn   double value:    3.749999966e-06
 parameter: et   double value:              0.001
 parameter: sigt   double value:              0.075
@@ -95,10 +95,10 @@ parameter: freq0   double value:                  0
 parameter: circ   double value:                  0
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: alfa   double value:    1.796641699e-08
+parameter: alfa   double value:    1.796641834e-08
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
-parameter: arad   double value:    1.534698269e-18
+parameter: arad   double value:    1.534698265e-18
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
 parameter: n1min   double value:                 -1

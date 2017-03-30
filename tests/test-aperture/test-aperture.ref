@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.09.22 10:08:10      +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.30 14:32:51      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title,'LHC Cell APERTURE example';
 
@@ -31,7 +31,7 @@ len_half_cell = l.MQ+drift1+3*l.MB+2*drift2+drift3;
 
 Value, len_half_cell;
 
-len_half_cell =              53.45 ;
+len_half_cell      =              53.45 ;
 
 
 !!!! apertures
@@ -172,7 +172,7 @@ APERTURE LIMIT: mq1:1, n1: 4.85602, at: 3.1
 
 Value, beam->n1min;
 
-beam->n1min =   4.85602 ;
+beam->n1min        =   4.85602 ;
 
 
 !-----
@@ -418,10 +418,10 @@ option, debug=false;
 
 value, aperture->nco;
 
-aperture->nco =   5.00000 ;
+aperture->nco      =   5.00000 ;
 value, beam->n1min;
 
-beam->n1min = 999999.00000 ;
+beam->n1min        = 999999.00000 ;
 
 
 stop;

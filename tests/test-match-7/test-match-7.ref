@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 13.02.13 22.59.48 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.30 14:32:31      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8;
 
 Option,  warn,info;
@@ -127,11 +127,11 @@ START LMDIF:
 Initial Penalty Function =   0.10000310E+00
 
 
-call:       4   Penalty function =   0.22508176E-08
-call:       7   Penalty function =   0.14544945E-18
-call:      10   Penalty function =   0.31150539E-23
+call:       4   Penalty function =   0.22508175E-08
+call:       7   Penalty function =   0.14653192E-18
+call:      10   Penalty function =   0.32160281E-23
  ++++++++++ LMDIF ended: converged successfully
-call:      10   Penalty function =   0.31150539E-23
+call:      10   Penalty function =   0.32160281E-23
 endmatch;
 
 
@@ -139,11 +139,11 @@ MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42800000E+01     6.42800000E+01     1.29246971E-24
-Global constraint:         q2           4     5.93100000E+01     5.93100000E+01     1.82258424E-24
+Global constraint:         q1           4     6.42800000E+01     6.42800000E+01     9.89547120E-25
+Global constraint:         q2           4     5.93100000E+01     5.93100000E+01     2.22648102E-24
 
 
-Final Penalty Function =   3.11505394e-24
+Final Penalty Function =   3.21602814e-24
 
 
 
@@ -156,7 +156,7 @@ kqd                      -8.59912e-03 -8.60096e-03 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   3.11505394e-24
+VARIABLE "TAR" SET TO   3.21602814e-24
 
 
 Title, " Chromaticity correction";
@@ -186,9 +186,9 @@ START LMDIF:
 Initial Penalty Function =   0.83427511E-01
 
 
-call:       4   Penalty function =   0.32817134E-21
+call:       4   Penalty function =   0.33471262E-23
  ++++++++++ LMDIF ended: converged successfully
-call:       4   Penalty function =   0.32817134E-21
+call:       4   Penalty function =   0.33471262E-23
 endmatch;
 
 
@@ -196,11 +196,11 @@ MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         dq1          4     2.00000000E+00     2.00000000E+00     1.76789693E-23
-Global constraint:         dq2          4     2.00000000E+00     2.00000000E+00     3.10492371E-22
+Global constraint:         dq1          4     2.00000000E+00     2.00000000E+00     1.95066073E-24
+Global constraint:         dq2          4     2.00000000E+00     2.00000000E+00     1.39646544E-24
 
 
-Final Penalty Function =   3.28171340e-22
+Final Penalty Function =   3.34712617e-24
 
 
 
@@ -213,7 +213,7 @@ ksd.b1                   -1.70566e-01 -1.70877e-01 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   3.28171340e-22
+VARIABLE "TAR" SET TO   3.34712617e-24
 
 
 ! Generate a twiss table:
@@ -233,7 +233,7 @@ iteration:   2 error:   1.715078E-05 deltap:   0.000000E+00
 orbit:  -4.999997E-04 -1.118293E-09 -3.195106E-11  1.424988E-04  0.000000E+00  0.000000E+00
   
 iteration:   3 error:   1.757368E-09 deltap:   0.000000E+00
-orbit:  -4.999999E-04  2.133986E-10  8.054964E-12  1.425000E-04  0.000000E+00  0.000000E+00
+orbit:  -4.999999E-04  2.133986E-10  8.054966E-12  1.425000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -265,5 +265,5 @@ stop;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

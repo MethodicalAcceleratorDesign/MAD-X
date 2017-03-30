@@ -2,11 +2,11 @@
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "MYSEQ"
 @ PARTICLE         %08s "POSITRON"
-@ MASS             %le          0.000510998928
+@ MASS             %le       0.000510998946131
 @ CHARGE           %le                       1
 @ ENERGY           %le                 1000000
 @ PC               %le                 1000000
-@ GAMMA            %le       1956951267.811662
+@ GAMMA            %le        1956951198.37613
 @ KBUNCH           %le                       1
 @ BCURRENT         %le                       0
 @ SIGE             %le                   0.001
@@ -40,9 +40,9 @@
 @ SYNCH_4          %le                       0
 @ SYNCH_5          %le                       0
 @ TITLE            %26s "thin_foc with edge effects"
-@ ORIGIN           %17s "5.02.09 Darwin 64"
-@ DATE             %08s "18/04/16"
-@ TIME             %08s "18.22.08"
+@ ORIGIN           %17s "5.03.00 Darwin 64"
+@ DATE             %08s "30/03/17"
+@ TIME             %08s "14.32.06"
 * NAME                                    S                      L                      X                     PX                  HKICK                   BETX                   ALFX                    MUX                     DX                    DPX                   BETY                   ALFY                     DY                    DPY                    MUY                  ANGLE                    K0L                    K1L                    K2L                   TILT                      Y                     PY                   RE11                   RE12                   RE13                   RE14                   RE15                   RE16                   RE21                   RE22                   RE23                   RE24                   RE25                   RE26                   RE31                   RE32                   RE33                   RE34                   RE35                   RE36                   RE41                   RE42                   RE43                   RE44                   RE45                   RE46                   RE51                   RE52                   RE53                   RE54                   RE55                   RE56                   RE61                   RE62                   RE63                   RE64                   RE65                   RE66 
 $ %s                                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le 
  "MYSEQ$START"                            0                      0                      0                      0                      0                      1                      0                      0                      0                      0                      1                      0                      0                      0                      0                      0                      0                      0                      0                      0                      0                      0                      1                      0                      0                      0                      0                      0                      0                      1                      0                      0                      0                      0                      0                      0                      1                      0                      0                      0                      0                      0                      0                      1                      0                      0                      0                      0                      0                      0                      1                      0                      0                      0                      0                      0                      0                      1

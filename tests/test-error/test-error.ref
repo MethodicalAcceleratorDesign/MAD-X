@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.09  (64 bit, Darwin)      +
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.06               +
-  + Execution date: 2016.04.18 18:20:15      +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.30 14:30:12      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option,debug;
 
@@ -68,16 +68,16 @@ parameter: particle   string: electron
 parameter: sequence   string: default_beam
 parameter: bunched   logical: true
 parameter: radiate   logical: false
-parameter: mass   double value:     0.000510998928
+parameter: mass   double value:    0.0005109989461
 parameter: charge   double value:                 -1
 parameter: energy   double value:                 10
 parameter: pc   double value:        9.999999987
-parameter: gamma   double value:        19569.51268
+parameter: gamma   double value:        19569.51198
 parameter: beta   double value:       0.9999999987
 parameter: brho   double value:        33.35640948
-parameter: ex   double value:    3.515672629e-10
+parameter: ex   double value:    3.515672754e-10
 parameter: exn   double value:           6.88e-06
-parameter: ey   double value:    1.916245983e-10
+parameter: ey   double value:     1.91624605e-10
 parameter: eyn   double value:           3.75e-06
 parameter: et   double value:              0.001
 parameter: sigt   double value:                  1
@@ -89,19 +89,19 @@ parameter: freq0   double value:                  0
 parameter: circ   double value:                  0
 parameter: dtbyds   double value:                  0
 parameter: deltap   double value:                  0
-parameter: alfa   double value:    2.611199044e-09
+parameter: alfa   double value:    2.611199229e-09
 parameter: u0   double value:                  0
 parameter: qs   double value:                  0
-parameter: arad   double value:    2.817940325e-15
+parameter: arad   double value:    2.817940323e-15
 parameter: bv   double value:                  1
 parameter: pdamp   double array: 1.000000e+00 1.000000e+00 2.000000e+00 
 parameter: n1min   double value:                 -1
 option,-debug,-echo;
 
 bed__________1->k0 =                  0 ;
-bed->k0 =                  0 ;
+bed->k0            =                  0 ;
 bed__________1->k0l =                  0 ;
-bed->k0l =                  0 ;
+bed->k0l           =                  0 ;
 Assigned alignment errors to 24 elements
 Assigned alignment errors to 24 elements
 Assigned field errors to 2 elements

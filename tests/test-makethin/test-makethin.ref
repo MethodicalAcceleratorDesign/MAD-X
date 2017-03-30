@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.09.21 16:04:27      +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.30 14:26:40      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! H. Burkhardt.  Updated for improved makethin select in summer 2005
 
@@ -58,8 +58,8 @@ qxref = table(summ,q1); qyref = table(summ,q2);
 
 value, qxref, qyref;
 
-qxref =        1.248722214 ;
-qyref =        1.260064776 ;
+qxref              =        1.248722214 ;
+qyref              =        1.260064776 ;
 
 
 select, flag=makethin, class=quadrupole, slice=5; ! slice all quadrupoles in 5 slices
@@ -141,8 +141,8 @@ qx = table(summ,q1); qy = table(summ,q2);
 
 value, qx-qxref, qy-qyref;
 
-qx-qxref =      0.01261568198 ;
-qy-qyref =     -0.01005506231 ;
+qx-qxref           =      0.01261568198 ;
+qy-qyref           =     -0.01005506231 ;
 
 
 !---- TEAPOT
@@ -269,8 +269,8 @@ qx = table(summ,q1); qy = table(summ,q2);
 ++++++ info: qy redefined
 value, qx-qxref, qy-qyref;
 
-qx-qxref =      0.01132721352 ;
-qy-qyref =     -0.01135278006 ;
+qx-qxref           =      0.01132721352 ;
+qy-qyref           =     -0.01135278006 ;
 
 
 !---- SIMPLE
@@ -397,8 +397,8 @@ qx = table(summ,q1); qy = table(summ,q2);
 ++++++ info: qy redefined
 value, qx-qxref, qy-qyref;
 
-qx-qxref =      0.01261568198 ;
-qy-qyref =     -0.01005506231 ;
+qx-qxref           =      0.01261568198 ;
+qy-qyref           =     -0.01005506231 ;
 
 
 !---- COLLIM
@@ -492,8 +492,8 @@ qx = table(summ,q1); qy = table(summ,q2);
 ++++++ info: qy redefined
 value, qx-qxref, qy-qyref;
 
-qx-qxref =     0.004882333044 ;
-qy-qyref =     -0.01784430244 ;
+qx-qxref           =     0.004882333044 ;
+qy-qyref           =     -0.01784430244 ;
 
 
 !---- Default with other options activated 
@@ -587,8 +587,8 @@ qx = table(summ,q1); qy = table(summ,q2);
 ++++++ info: qy redefined
 value, qx-qxref, qy-qyref;
 
-qx-qxref =     0.001284860298 ;
-qy-qyref =     0.001275753479 ;
+qx-qxref           =     0.001284860298 ;
+qy-qyref           =     0.001275753479 ;
 
 
 stop;

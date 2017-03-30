@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.18  (32 bit, Linux)       +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.09.26      +
-  + Execution Time Stamp: 13.11.12 18.21.57 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.30 14:27:00      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 ! Simple tracking test for LHC racetrack type element.
 
 ! tstTrack_ap_racetrack.madx
@@ -17,12 +17,12 @@ enter TRACK module
 one pass is on
 aperture tracking is on
 particle #    19 lost turn      1  at pos. s =      1.00 element=qd                                               aperture =racetrack                                       
-    X=  2.790805224000000E-003   Y=  1.213134870000000E-003   T=  0.000000000000000E+000
+    X=   2.7908052240000003E-003   Y=   1.2131348700000003E-003   T=   0.0000000000000000     
 exit TRACK module
 
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.18 (32 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.09.21 16:06:54      +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.30 14:29:17      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for MAD-X';
 
@@ -37,8 +37,8 @@ beam, particle = proton, energy =   eg        ,
 
 value,epsx,epsy;
 
-epsx =    3.518520172e-08 ;
-epsy =    3.518520172e-08 ;
+epsx               =    3.518520305e-08 ;
+epsy               =    3.518520305e-08 ;
 option,-echo;
 
 

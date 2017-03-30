@@ -1,9 +1,9 @@
 @ NAME             %06s "SURVEY"
 @ TYPE             %06s "SURVEY"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %17s "5.02.04 Darwin 64"
-@ DATE             %08s "06/03/15"
-@ TIME             %08s "19.25.40"
+@ ORIGIN           %17s "5.03.00 Darwin 64"
+@ DATE             %08s "30/03/17"
+@ TIME             %08s "14.40.44"
 * NAME               KEYWORD                             S                  L              ANGLE                  X                  Y                  Z              THETA                PHI                PSI         GLOBALTILT    SLOT_ID ASSEMBLY_ID           MECH_SEP              V_POS 
 $ %s                 %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le         %d         %d                %le                %le 
  "ALL$START"         "MARKER"                             0                  0                  0                  0                  0                  0                  0                  0                  0                  0          0          0                  0                  0

@@ -1,10 +1,10 @@
 
-  +++++++++++++++++++++++++++++++++++++++++++
-  +    MAD-X 5.00.19  (64 bit, Darwin)      +
-  +    DEBUG Version - use at own risk!     +
-  + Code Modification Date: 2012.12.11      +
-  + Execution Time Stamp: 13.02.13 22.05.40 +
-  +++++++++++++++++++++++++++++++++++++++++++
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.30 14:32:14      +
+  ++++++++++++++++++++++++++++++++++++++++++++
 TITLE,'CELL matching with MAD-X';
 
 
@@ -26,21 +26,21 @@ START LMDIF:
 Initial Penalty Function =   0.24356070E-01
 
 
-call:       4   Penalty function =   0.26743394E-08
-call:       7   Penalty function =   0.81289032E-17
-call:      10   Penalty function =   0.18749745E-24
+call:       4   Penalty function =   0.26743395E-08
+call:       7   Penalty function =   0.81290653E-17
+call:      10   Penalty function =   0.20135675E-24
  ++++++++++ LMDIF ended: converged successfully
-call:      10   Penalty function =   0.18749745E-24
+call:      10   Penalty function =   0.20135675E-24
 
 MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-fivecell$end:1             mux          4     1.27000000E+00     1.27000000E+00     1.97215226E-29
-fivecell$end:1             muy          4     1.77000000E+00     1.77000000E+00     1.87477725E-25
+fivecell$end:1             mux          4     1.27000000E+00     1.27000000E+00     1.77493704E-28
+fivecell$end:1             muy          4     1.77000000E+00     1.77000000E+00     2.01179252E-25
 
 
-Final Penalty Function =   1.87497446e-25
+Final Penalty Function =   2.01356746e-25
 
 
 
@@ -53,12 +53,12 @@ kqd                      -1.09178e-02 -1.09257e-02 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   1.87497446e-25
-kqf =     0.009138327024 ;
-kqd =      -0.0109177935 ;
+VARIABLE "TAR" SET TO   2.01356746e-25
+kqf                =     0.009138327024 ;
+kqd                =      -0.0109177935 ;
 
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.00.19 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

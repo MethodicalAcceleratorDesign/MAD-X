@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.02  (64 bit, Darwin)      +
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2014.07.04               +
-  + Execution date: 2014.08.18 20:01:23      +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.30 14:40:45      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Title, "test of line expansion in MAD-X"; 
 
@@ -131,5 +131,5 @@ Exit;
   Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  + MAD-X 5.02.02 (64 bit) finished normally +
+  +          MAD-X finished normally         +
   ++++++++++++++++++++++++++++++++++++++++++++

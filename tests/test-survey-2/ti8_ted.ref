@@ -1,9 +1,9 @@
 @ NAME             %06s "SURVEY"
 @ TYPE             %06s "SURVEY"
 @ TITLE            %22s "TI8 test of globaltilt"
-@ ORIGIN           %23s "MAD-X 5.00.19 Darwin 32"
-@ DATE             %08s "14/02/13"
-@ TIME             %08s "10.29.35"
+@ ORIGIN           %17s "5.03.00 Darwin 64"
+@ DATE             %08s "30/03/17"
+@ TIME             %08s "14.26.50"
 * NAME                                S                  L              ANGLE                  X                  Y                  Z              THETA                PHI                PSI         GLOBALTILT 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "TED.87765"                2493.121241                4.3                  0       -2821.820435        2472.780842        2478.653179       -3.997612047     0.002909487331      0.06662467182    0.0003457263602

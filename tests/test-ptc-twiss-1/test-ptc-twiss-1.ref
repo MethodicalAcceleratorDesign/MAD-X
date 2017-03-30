@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.13  (64 bit, Linux)       +
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.12.20               +
-  + Execution date: 2017.01.31 14:17:52      +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.30 14:33:42      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS ';
 
@@ -119,10 +119,10 @@ parameter: energy   double value:                100
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-             534.6    0.0004431145052           -1000000           -1000000 
+             534.6    0.0004431145119           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000     0.000355079062         47.5052947       0.2546195015 
+          -1000000     0.000355079062        47.50529435       0.2546195015 
 
                 q2                dq1                dq2                 qs 
       0.2546003528        1.051123466        1.046912007                  0 

@@ -1,9 +1,9 @@
 @ NAME             %19s "TRACK.OBS0001.P0001"
 @ TYPE             %08s "TRACKOBS"
 @ TITLE            %19s "Plot test for MAD-X"
-@ ORIGIN           %23s "MAD-X 5.01.04 Darwin 64"
-@ DATE             %08s "17/12/13"
-@ TIME             %08s "17.00.49"
+@ ORIGIN           %17s "5.03.00 Darwin 64"
+@ DATE             %08s "30/03/17"
+@ TIME             %08s "14.40.54"
 *     NUMBER       TURN                  X                 PX                  Y                 PY                  T                 PT                  S                  E 
 $         %d         %d                %le                %le                %le                %le                %le                %le                %le                %le 
           1          0              0.002                  0              0.002                  0                  0                  0                  0                450

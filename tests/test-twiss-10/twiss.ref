@@ -2,11 +2,11 @@
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %12s "TLEPMINIBETA"
 @ PARTICLE         %08s "ELECTRON"
-@ MASS             %le      0.000510998928
+@ MASS             %le     0.0005109989461
 @ CHARGE           %le                  -1
 @ ENERGY           %le                 175
 @ PC               %le                 175
-@ GAMMA            %le         342466.4719
+@ GAMMA            %le         342466.4597
 @ KBUNCH           %le                   1
 @ BCURRENT         %le                   0
 @ SIGE             %le               0.001
@@ -40,9 +40,9 @@
 @ SYNCH_4          %le     1.254698259e-11
 @ SYNCH_5          %le     3.188233667e-14
 @ TITLE            %08s "no-title"
-@ ORIGIN           %17s "5.02.09 Darwin 64"
-@ DATE             %08s "18/04/16"
-@ TIME             %08s "18.19.26"
+@ ORIGIN           %17s "5.03.00 Darwin 64"
+@ DATE             %08s "30/03/17"
+@ TIME             %08s "14.29.29"
 * NAME                                S               BETX               BETY               ALFX               ALFY                MUX                MUY                 WX                 WY               PHIX               PHIY               DMUX               DMUY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "IP1"                                0                  1              0.001                  0                  0                  0                  0                  0                  0                  0                  0                  0                  0

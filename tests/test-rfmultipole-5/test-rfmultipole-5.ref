@@ -1,18 +1,18 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.09.22 10:08:45      +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.30 14:33:42      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title, 'test of rf-multipole';
 
 option, -debug, -echo;
 
-rfm1->l =                  0 ;
-rfm1->freq =                 12 ;
-rfm1->knl =                  0 ;
-rfm1->pnl =                  0 ;
+rfm1->l            =                  0 ;
+rfm1->freq         =                 12 ;
+rfm1->knl          =                  0 ;
+rfm1->pnl          =                  0 ;
 enter Twiss module
   
 open line - error with deltap:   0.000000E+00

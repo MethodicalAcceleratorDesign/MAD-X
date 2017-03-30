@@ -1,9 +1,9 @@
 @ NAME             %04s "SUMM"
 @ TYPE             %04s "SUMM"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %17s "5.02.10 Darwin 64"
-@ DATE             %08s "22/09/16"
-@ TIME             %08s "14.20.05"
+@ ORIGIN           %17s "5.03.00 Darwin 64"
+@ DATE             %08s "30/03/17"
+@ TIME             %08s "14.36.48"
 *             LENGTH             ORBIT5               ALFA            GAMMATR                 Q1                DQ1            BETXMAX              DXMAX              DXRMS             XCOMAX             XCORMS                 Q2                DQ2            BETYMAX              DYMAX              DYRMS             YCOMAX             YCORMS             DELTAP            SYNCH_1            SYNCH_2            SYNCH_3            SYNCH_4            SYNCH_5             NFLIPS 
 $                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
-        78.54370266                 -0       0.1241075638        2.838578276        1.820059621       -5.030192681        15.12421277         20.6041956        9.639962105                  0                  0         2.71982919       -10.39500532        20.07025727                  0                  0                  0                  0                  0        9.747887059        1.526297364       0.3728165258       0.5042000294        4.147872957                  0
+        78.54370266                 -0       0.1241075638        2.838578276        1.820059621       -5.030192642        15.12421277        20.60419793        9.639963195                  0                  0         2.71982919       -10.39500524        20.07025727                  0                  0                  0                  0                  0        9.747887059        1.526297364       0.3728165258       0.5042000294        4.147872957                  0

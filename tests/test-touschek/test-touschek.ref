@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.12  (64 bit, Darwin)      +
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.10.15               +
-  + Execution date: 2016.11.30 14:49:43      +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.30 14:39:51      +
   ++++++++++++++++++++++++++++++++++++++++++++
 option, -info, warn, -echo;
 
@@ -27,7 +27,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
     0.005493743187                  0                  0        35.41801892 
 
                dq2            betymax              dymax              dyrms 
-       1.615600929        9.214102536                  0                  0 
+       1.615600944        9.214102536                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0      0.02643257988 
@@ -42,33 +42,33 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
  
  particle positron
  charge      1.0000000000000000     
- gammas      4743.6498731754673     
- gamma       4743.6498731754673     
+ gammas      4743.6497048637393     
+ gamma       4743.6497048637393     
  energy      2.4239999999999999     
- mass        5.1099892800000001E-004
+ mass        5.1099894613099996E-004
  Ex          1.2000000000000000E-010
  Ey          6.7499999999999995E-013
  Et          1.5999999999999999E-006
- sigt        1.1463607962467371E-003
- sige        1.3957211422778136E-003
- parnum      3100000000.0000000     
+ sigt        1.1463607962344975E-003
+ sige        1.3957211422927157E-003
+ parnum      3100000000.0000005     
  circ        357.45742721005882     
- currnt      4.1655123582736467E-004
- betas      0.99999997777996408     
- beta       0.99999997777996408     
+ currnt      4.1655125036033135E-004
+ betas      0.99999997777996252     
+ beta       0.99999997777996252     
  clight      299792458.00000000     
- arad        2.8179403246116313E-015
- alfa        7.3943296536604659E-005
- freq0      0.83868015746230029     
+ arad        2.8179403229414538E-015
+ alfa        7.3943296536602422E-005
+ freq0      0.83868015746229863     
  kbunch           1386
  deltap      0.0000000000000000     
  
   TOUSCHEK will use optical functions at entrance and end of element
   
- Energy radiated per turn     2.1912083614567726      [MeV]
- Touschek Inverse Lifetime    7.1942759742717622E-003 [seconds-1]
- Touschek Lifetime            138.99939390373811      [seconds]   
-                              3.8610942751038366E-002 [hours]
+ Energy radiated per turn     2.1912081269160937      [MeV]
+ Touschek Inverse Lifetime    7.1942706584671315E-003 [seconds-1]
+ Touschek Lifetime            138.99949660957958      [seconds]   
+                              3.8610971280438770E-002 [hours]
 enter Twiss module
   
 iteration:   1 error:   2.781148E-08 deltap:   1.000000E-06
@@ -83,13 +83,13 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
        357.4574272                 -0    7.394308645e-05        116.2923677 
 
                 q1                dq1            betxmax              dxmax 
-       72.69004215       0.4282248511        30.68877756      0.01253122876 
+       72.69004215       0.4282248369        30.68877756      0.01253122876 
 
              dxrms             xcomax             xcorms                 q2 
     0.005493743187                  0                  0        35.41801892 
 
                dq2            betymax              dymax              dyrms 
-       1.615600958        9.354203391                  0                  0 
+       1.615600965        9.354203391                  0                  0 
 
             ycomax             ycorms             deltap            synch_1 
                  0                  0                  0      0.02643257988 
@@ -104,33 +104,33 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
  
  particle positron
  charge      1.0000000000000000     
- gammas      4743.6498731754673     
- gamma       4743.6498731754673     
+ gammas      4743.6497048637393     
+ gamma       4743.6497048637393     
  energy      2.4239999999999999     
- mass        5.1099892800000001E-004
+ mass        5.1099894613099996E-004
  Ex          1.2000000000000000E-010
  Ey          6.7499999999999995E-013
  Et          1.5999999999999999E-006
- sigt        1.1463607962467371E-003
- sige        1.3957211422778136E-003
- parnum      3100000000.0000000     
+ sigt        1.1463607962344975E-003
+ sige        1.3957211422927157E-003
+ parnum      3100000000.0000005     
  circ        357.45742721005882     
- currnt      4.1655123582736467E-004
- betas      0.99999997777996408     
- beta       0.99999997777996408     
+ currnt      4.1655125036033135E-004
+ betas      0.99999997777996252     
+ beta       0.99999997777996252     
  clight      299792458.00000000     
- arad        2.8179403246116313E-015
- alfa        7.3943296536604659E-005
- freq0      0.83868015746230029     
+ arad        2.8179403229414538E-015
+ alfa        7.3943296536602422E-005
+ freq0      0.83868015746229863     
  kbunch           1386
  deltap      0.0000000000000000     
  
   TOUSCHEK will use optical functions at center of elements.
   
- Energy radiated per turn     2.1912083614567726      [MeV]
- Touschek Inverse Lifetime    6.7227256554821466E-003 [seconds-1]
- Touschek Lifetime            148.74919061802487      [seconds]   
-                              4.1319219616118022E-002 [hours]
+ Energy radiated per turn     2.1912081269160937      [MeV]
+ Touschek Inverse Lifetime    6.7227205095261797E-003 [seconds-1]
+ Touschek Lifetime            148.74930447918925      [seconds]   
+                              4.1319251244219236E-002 [hours]
 
   Number of warnings: 0
 

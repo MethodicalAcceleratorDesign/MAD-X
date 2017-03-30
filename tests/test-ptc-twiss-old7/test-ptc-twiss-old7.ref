@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.13  (64 bit, Linux)       +
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.12.20               +
-  + Execution date: 2017.01.31 14:10:01      +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.30 14:36:17      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
@@ -41,8 +41,8 @@ beam, particle = proton, energy =   eg        ,
 
 value,epsx,epsy;
 
-epsx               =    3.518520172e-08 ;
-epsy               =    3.518520172e-08 ;
+epsx               =    3.518520305e-08 ;
+epsy               =    3.518520305e-08 ;
 option,-echo;
 
 
@@ -323,10 +323,10 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,summary_file=twiss_ptc_summar
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-             534.6    0.0004430990797           -1000000           -1000000 
+             534.6    0.0004430990863           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000    0.0003550636364        47.50612159       0.2546759882 
+          -1000000    0.0003550636364        47.50612124       0.2546759882 
 
                 q2                dq1                dq2                 qs 
        0.254674956        1.051019373        1.046713362                  0 
@@ -400,10 +400,10 @@ ptc_twiss,closed_orbit,icase=5,slice_magnets,file=twiss_ptc_ring_slices,no=4;
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-             534.6    0.0004430990797           -1000000           -1000000 
+             534.6    0.0004430990863           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000    0.0003550636364        47.50612159       0.2546759882 
+          -1000000    0.0003550636364        47.50612124       0.2546759882 
 
                 q2                dq1                dq2                 qs 
        0.254674956        1.051019373        1.046713362                  0 

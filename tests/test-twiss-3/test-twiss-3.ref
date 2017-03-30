@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.02.10  (64 bit, Darwin)      +
+  +     MAD-X 5.03.00  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2016.04.23               +
-  + Execution date: 2016.09.21 16:06:54      +
+  + Release   date: 2017.03.09               +
+  + Execution date: 2017.03.30 14:29:17      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for MAD-X';
 
@@ -37,8 +37,8 @@ beam, particle = proton, energy =   eg        ,
 
 value,epsx,epsy;
 
-epsx =    3.518520172e-08 ;
-epsy =    3.518520172e-08 ;
+epsx               =    3.518520305e-08 ;
+epsy               =    3.518520305e-08 ;
 option,-echo,-warn;
 
 
@@ -106,10 +106,10 @@ MUYY1:=MUYY/360.;! changed on request of Oliver Bruening
 
 value, muxx,muyy,muxx1,muyy1;
 
-muxx =       0.2508919342 ;
-muyy =       0.2509048982 ;
-muxx1 =    0.0006969220396 ;
-muyy1 =    0.0006969580507 ;
+muxx               =       0.2508919342 ;
+muyy               =       0.2509048982 ;
+muxx1              =    0.0006969220396 ;
+muyy1              =    0.0006969580507 ;
 
 
 R111:=cos(MUXX1)+ALFAXX1*sin(MUXX1);
@@ -138,14 +138,14 @@ R144:=cos(MUYY1)-ALFAYY1*sin(MUYY1);
 
 value,DXX1,DXXP1,R111,R112,R116,R121,R122,R126;
 
-dxx1 =       -1.068609366 ;
-dxxp1 =      0.01435393984 ;
-r111 =        1.000334108 ;
-r112 =      0.02234147261 ;
-r116 =    3.634277553e-05 ;
-r121 =   -2.674356997e-05 ;
-r122 =       0.9996654063 ;
-r126 =   -2.377569164e-05 ;
+dxx1               =       -1.068609366 ;
+dxxp1              =      0.01435393984 ;
+r111               =        1.000334108 ;
+r112               =      0.02234147261 ;
+r116               =    3.634277553e-05 ;
+r121               =   -2.674356997e-05 ;
+r122               =       0.9996654063 ;
+r126               =   -2.377569164e-05 ;
 
 
 MATSUP1 : MATRIX,RM11=R111,RM12=R112,RM21=R121,RM22=R122,
