@@ -101,7 +101,7 @@ stoupper(char* s) /* converts string to upper in place */
 }
 
 static inline int /* case insitive string compare */
-stricmp(const char *s1, const char *s2)
+mystricmp(const char *s1, const char *s2)
 {
   const unsigned char *us1 = (const unsigned char *)s1;
   const unsigned char *us2 = (const unsigned char *)s2;
@@ -114,7 +114,7 @@ stricmp(const char *s1, const char *s2)
 }
 
 static inline int /* case insitive string compare */
-strnicmp(const char *s1, const char *s2, size_t n)
+mystrnicmp(const char *s1, const char *s2, size_t n)
 {
   const unsigned char *us1 = (const unsigned char *)s1;
   const unsigned char *us2 = (const unsigned char *)s2;
