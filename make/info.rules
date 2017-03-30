@@ -65,8 +65,16 @@ infotestdep:
 	$E "** Computing tests pointless files"
 	$_ $(foreach f, \
 	   	$(patsubst %.out,%,$(filter-out %$/README %$/input %$/temp %.madx %.cfg %.ref %.ref.gz,$(wildcard tests$/test-*$/*))), \
-		$(if $(wildcard $f.ref $f.ref.gz),,echo $f &&)) \
-		echo "** End of pointless files"
+	    $(if $(wildcard $f.ref $f.ref.gz),,echo $f &&)) \
+		 echo "** End of pointless files"
+
+infoupdatetest:
+	$E "** Computing tests update"
+	$_ $(foreach f, \
+	   	$(patsubst %.ref.gz,%,$(wildcard tests$/test-*$/*.ref.gz)), \
+	    $(if $(wildcard $f $f.out),cp -v $(wildcard $f $f.out) $f.ref &&,)) \
+		 echo "** End of tests update"
+	$_ echo "** Finalize with gzip --force tests/test-*/*.ref"
 
 # platform dependent rule
 
