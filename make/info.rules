@@ -68,6 +68,13 @@ infotestdep:
 	    $(if $(wildcard $f.ref $f.ref.gz),,echo $f &&)) \
 		 echo "** End of pointless files"
 
+infotestcfg:
+	$E "** Computing tests config files"
+	$_ $(foreach f, \
+	   	$(patsubst %.ref.gz,%,$(wildcard tests$/test-*$/*.ref.gz)), \
+	    $(if $(wildcard $f.cfg),,echo "No .cfg file for $f.ref.gz" &&)) \
+		 echo "** End of tests config files"
+
 infoupdatetest:
 	$E "** Computing tests update"
 	$_ $(foreach f, \
