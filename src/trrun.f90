@@ -3963,6 +3963,8 @@ subroutine ttrfmult(track, ktrack, turn)
   double precision :: x, y, z, px, py, pt, dpx, dpy, dpt
   double precision :: freq, volt, lag, harmon
   double precision :: beta, bvk, deltap, elrad
+  double precision :: rpx1, rpy1, rpt1
+  double precision :: rpx2, rpy2, rpt2
 
   ! LD: 2016.03.04 - use complex declaration compatible with Lahey
   integer, parameter:: dp=kind(0.d0)
@@ -4061,9 +4063,20 @@ subroutine ttrfmult(track, ktrack, turn)
        else
           rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
        endif
-       px = px - rfac * (one + pt) * px
-       py = py - rfac * (one + pt) * py
-       pt = pt - rfac * (one + pt) ** 2
+       if (damp) then
+          px = px - rfac * (one + pt) * px
+          py = py - rfac * (one + pt) * py
+          pt = pt - rfac * (one + pt) ** 2
+       else
+          if (jtrk.eq.1) then
+             rpx1 = rfac * (one + pt) * px
+             rpy1 = rfac * (one + pt) * py
+             rpt1 = rfac * (one + pt) ** 2
+          endif
+          px = px - rpx1;
+          py = py - rpy1;
+          pt = pt - rpt1;
+       endif
     endif
 
     !---- Apply the kick
@@ -4079,9 +4092,20 @@ subroutine ttrfmult(track, ktrack, turn)
        else
           rfac = arad * gammas**3 * (dpx**2+dpy**2) / (three*elrad)
        endif
-       px = px - rfac * (one + pt) * px
-       py = py - rfac * (one + pt) * py
-       pt = pt - rfac * (one + pt) ** 2
+       if (damp) then
+          px = px - rfac * (one + pt) * px
+          py = py - rfac * (one + pt) * py
+          pt = pt - rfac * (one + pt) ** 2
+       else
+          if (jtrk.eq.1) then
+             rpx2 = rfac * (one + pt) * px
+             rpy2 = rfac * (one + pt) * py
+             rpt2 = rfac * (one + pt) ** 2
+          endif
+          px = px - rpx2;
+          py = py - rpy2;
+          pt = pt - rpt2;
+        endif
     endif
 
     ! apply the transformation P: (-1, 1, 1, -1, -1, 1) * X
@@ -4125,6 +4149,8 @@ subroutine tttquad(track, ktrack)
   double precision :: ct, st
   double precision :: tmp
   double precision :: hx, hy, rfac, gamma, curv
+  double precision :: rpx1, rpy1, rpt1
+  double precision :: rpx2, rpy2, rpt2
   logical :: skew
   integer :: jtrk
 
@@ -4191,9 +4217,20 @@ subroutine tttquad(track, ktrack)
         else
            rfac = (arad * gamma**3 * length / three) * (hx**2 + hy**2);
         endif
-        px = px - rfac * (one + pt) * px
-        py = py - rfac * (one + pt) * py
-        pt = pt - rfac * (one + pt) ** 2
+        if (damp) then
+           px = px - rfac * (one + pt) * px
+           py = py - rfac * (one + pt) * py
+           pt = pt - rfac * (one + pt) ** 2
+        else
+           if (jtrk.eq.1) then
+              rpx1 = rfac * (one + pt) * px
+              rpy1 = rfac * (one + pt) * py
+              rpt1 = rfac * (one + pt) ** 2
+           endif
+           px = px - rpx1;
+           py = py - rpy1;
+           pt = pt - rpt1;
+        endif
      endif
      
      !---- Computes the kick
@@ -4251,9 +4288,20 @@ subroutine tttquad(track, ktrack)
         else
            rfac = (arad * gamma**3 * length / three) * (hx**2 + hy**2);
         endif
-        px = px - rfac * (one + pt) * px
-        py = py - rfac * (one + pt) * py
-        pt = pt - rfac * (one + pt) ** 2
+        if (damp) then
+           px = px - rfac * (one + pt) * px
+           py = py - rfac * (one + pt) * py
+           pt = pt - rfac * (one + pt) ** 2
+        else
+           if (jtrk.eq.1) then
+              rpx2 = rfac * (one + pt) * px
+              rpy2 = rfac * (one + pt) * py
+              rpt2 = rfac * (one + pt) ** 2
+           endif
+           px = px - rpx2;
+           py = py - rpy2;
+           pt = pt - rpt2;
+        endif
      endif
 
      !---- If SKEW rotates by +45 degrees
@@ -4311,6 +4359,8 @@ subroutine tttdipole(track, ktrack)
   double precision :: bet0sqr, kx_sqr, ky_sqr
   double precision :: e1, e2, h1, h2, hgap, fint, fintx
   double complex :: kx, ky
+  double precision :: rpx1, rpy1, rpt1
+  double precision :: rpx2, rpy2, rpt2
 
   double precision, external :: node_value, get_value
 
@@ -4366,9 +4416,20 @@ subroutine tttdipole(track, ktrack)
         else
            rfac = (arad * gamma**3 * L / three) * (hx**2 + hy**2) * (one + h*x) * (one - tan(e1)*x)
         endif
-        px = px - rfac * (one + pt) * px
-        py = py - rfac * (one + pt) * py
-        pt = pt - rfac * (one + pt) ** 2
+        if (damp) then
+           px = px - rfac * (one + pt) * px
+           py = py - rfac * (one + pt) * py
+           pt = pt - rfac * (one + pt) ** 2
+        else
+           if (jtrk.eq.1) then
+              rpx1 = rfac * (one + pt) * px
+              rpy1 = rfac * (one + pt) * py
+              rpt1 = rfac * (one + track(6,1)) ** 2
+           endif
+           px = px - rpx1;
+           py = py - rpy1;
+           pt = pt - rpt1;
+        endif
      endif
 
      kx_sqr = (k0*h+k1) / delta_plus_1; ! 1/m^2
@@ -4431,9 +4492,20 @@ subroutine tttdipole(track, ktrack)
         else
            rfac = (arad * gamma**3 * L / three) * (hx**2 + hy**2) * (one + h*x) * (one - tan(e2)*x)
         endif
-        px = px - rfac * (one + pt) * px
-        py = py - rfac * (one + pt) * py
-        pt = pt - rfac * (one + pt) ** 2
+        if (damp) then
+           px = px - rfac * (one + pt) * px
+           py = py - rfac * (one + pt) * py
+           pt = pt - rfac * (one + pt) ** 2
+        else
+           if (jtrk.eq.1) then
+              rpx2 = rfac * (one + pt) * px
+              rpy2 = rfac * (one + pt) * py
+              rpt2 = rfac * (one + pt) ** 2
+           endif
+           px = px - rpx2;
+           py = py - rpy2;
+           pt = pt - rpt2;
+        endif
      endif
 
      !---- Applies the kick
