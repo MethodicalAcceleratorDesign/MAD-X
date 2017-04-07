@@ -4626,7 +4626,8 @@ subroutine trphot(el,curv,rfac,deltap)
   !---- AMEAN is the average number of photons emitted.,
   !     NPHOT is the integer number generated from Poisson's law.
   amean = five * sqrt(three) / (twelve * hbar * clight) * abs(arad * pc * (one+deltap) * el * curv)
-  rfac = zero
+  ucrit = three/two * hbar * clight * gamma**3 * abs(curv)
+  sumxi = zero
   if (amean .gt. zero) then
      call dpoissn(amean, nphot, ierror)
 
@@ -4637,16 +4638,12 @@ subroutine trphot(el,curv,rfac,deltap)
 
      !---- For all photons, sum the radiated photon energy in units of UCRIT
      if (nphot .ne. 0) then
-        ucrit = three/two * hbar * clight * gamma**3 * abs(curv)
-
-        sumxi = zero
         do i = 1, nphot
 
            !---- Find a uniform random number in the range [ 0,3.256223 ].
            !     Note that the upper limit is not exactly 15*sqrt(3)/8
            !     because of imprecision in the integration of F.
            dlogr = log(fac1 * frndm())
-
            !---- Now look for the energy of the photon in the table TABY/TABXI
            do j = 2, maxtab
               if (dlogr .le. taby(j) ) go to 20
@@ -4662,7 +4659,7 @@ subroutine trphot(el,curv,rfac,deltap)
   endif
 
   ! normalize rfac to beam energy
-  rfac = sumxi * ucrit * curv**2 / (gamma*amass)
+  rfac = sumxi * ucrit / (gamma*amass)
 
 end subroutine trphot
 

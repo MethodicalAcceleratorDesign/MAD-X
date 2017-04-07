@@ -31,7 +31,7 @@ const char *const_constant_def =
 "const pmass = 0.938272081358; "
 "const clight = 299792458.; "
 "const qelect = 1.602176620898e-19; "
-"const hbar = 6.58211951440e-25; "
+"const hbar = 6.58211951440e-25; " /* GeV*s */
 "const erad = 2.817940322719e-15; "
 "const prad = erad*emass/pmass; ";
 
