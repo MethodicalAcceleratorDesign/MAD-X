@@ -4424,7 +4424,7 @@ subroutine tttdipole(track, ktrack)
            if (jtrk.eq.1) then
               rpx1 = rfac * (one + pt) * px
               rpy1 = rfac * (one + pt) * py
-              rpt1 = rfac * (one + track(6,1)) ** 2
+              rpt1 = rfac * (one + pt) ** 2
            endif
            px = px - rpx1;
            py = py - rpy1;
