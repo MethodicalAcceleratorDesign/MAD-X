@@ -55,6 +55,13 @@ static void mad_num_randseed (int seed)
 
 // private functions
 
+#define MAX_RAND 1000000000        /* for random generator */
+#define NR_RAND 55                 /* for random generator */
+#define NJ_RAND 24                 /* for random generator */
+#define ND_RAND 21                 /* for random generator */
+
+static int irn_rand[NR_RAND];      /* for random generator */
+
 static void
 madx_irngen(void)
   /* creates random number for frndm() */
@@ -102,10 +109,22 @@ madx_frndm(void)
   return scale*irn_rand[next_rand++];
 }
 
-// -- MAD-X RNG ---------------------------------------------------------------o
+// -- Public ------------------------------------------------------------------o
 
 static void   (*init55_p) (int seed) = madx_init55;
 static double (*frndm_p ) (void)     = madx_frndm;
+
+void init55 (int seed)
+{
+  init55_p(seed);
+}
+
+double frndm (void)
+{
+  return frndm_p();
+}
+
+// -- Select RNG --------------------------------------------------------------o
 
 void setrnd (const char *kind)
 {
@@ -134,23 +153,16 @@ void setrnd (const char *kind)
     fprintf(prt_file, "random number generator set to '%s'\n", kind);
 }
 
-void init55 (int seed)
-{
-  init55_p(seed);
-}
-
-double frndm (void)
-{
-  return frndm_p();
-}
+// -- Gaussian distribution ---------------------------------------------------o
 
 double grndm(void)
   /* returns random number x from normal distribution */
 {
-  double xi1 = 2*frndm()-one, xi2=2*frndm()-one, zzr;
-  while ((zzr = xi1*xi1+xi2*xi2) > one)
-  {
-    xi1 = 2*frndm()-one; xi2=2*frndm()-one;
+  double xi1 = 2*frndm()-one,
+         xi2 = 2*frndm()-one, zzr;
+  while ((zzr = xi1*xi1+xi2*xi2) > one) {
+    xi1 = 2*frndm()-one;
+    xi2 = 2*frndm()-one;
   }
   zzr = sqrt(-2*log(zzr)/zzr);
   return xi1*zzr;
@@ -160,10 +172,9 @@ double tgrndm(double cut)
   /* returns random variable from normal distribution cat at 'cut' sigmas */
 {
   double ret = zero;
-  if (cut > zero)
-  {
+  if (cut > zero) {
     ret = grndm();
-    while (fabs(ret) > fabs(cut))  ret = grndm();
+    while (fabs(ret) > fabs(cut)) ret = grndm();
   }
   return ret;
 }

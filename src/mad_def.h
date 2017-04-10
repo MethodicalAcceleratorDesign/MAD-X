@@ -17,9 +17,7 @@
 #define PTC_NAMES_L 13      /* Number of ptc variables treated in select_ptc_normal */
 #define MAX_ROWS 101        /* Initial size of ptc_normal table */
 #define FNAME_L 240         /* for file names */
-
 #define INVALID 1.e20       /* used for erroneous value requests */
-
 #define AUX_LG 50000        /* initial size for ancillary buffers */
 #define MAX_ITEM  1000      /* initial # of items in tok_list etc. */
 #define MAX_D_ITEM 30000    /* initial storage size for doubles */
@@ -33,10 +31,6 @@
 #define LINE_FILL 240        /* max. line length -2 for "save" output */
 #define LINE_F_MAD8 70      /* the same, for mad-8 format */
 #define MADX_LINE_MAX 78         /* for SXF output */
-#define MAX_RAND 1000000000 /* for random generator */
-#define NR_RAND 55          /* for random generator */
-#define NJ_RAND 24          /* for random generator */
-#define ND_RAND 21          /* for random generator */
 #define MATCH_WORK 10       /* no. of work spaces in matching */
 #define USER_TABLE_LENGTH 100 /* initial length of user defined tables */
 #define MAXARRAY 1000       /* max. length of apex tables in aperture module*/

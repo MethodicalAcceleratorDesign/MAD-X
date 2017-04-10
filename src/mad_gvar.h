@@ -255,7 +255,6 @@ extern int in_stop;                /* input buffer stop flag */
 extern int inbuf_level;            /* input buffer level */
 extern int init_warn;              /* intialisation warning level */
 extern int interactive;            /* non-zero if interactive */
-extern int irn_rand[NR_RAND];      /* for random generator */
 extern int keep_tw_print;          /* previous twiss print flag (match) */
 // extern int loop_cnt;               /* used to detect infinite loops ; removed 2014-Mar-20  16:20:13  ghislain */
 extern int match_calls;            /* command call limit in match */
