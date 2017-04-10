@@ -274,6 +274,7 @@ const char *const_command_def =
 "debug      = [l, false, true], "
 "verbose    = [l, false, true], " /*hbu */
 "rbarc      = [l, true, true], "
+"rand       = [s, default, best], "
 "cfsbend    = [l, true, true], " /* combined function sbend */
 "thin_foc   = [l, true, true], "
 "sympl      = [l, true, true], "

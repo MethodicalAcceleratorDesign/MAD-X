@@ -39,11 +39,15 @@ exec_delete_table(const char* name)
 // public interface
 
 void
-exec_option(void)
+exec_option(struct in_cmd* cmd)
 {
   if (get_option("reset")) set_defaults("option");
-  if (get_option("tell")) print_command(options);
+  if (get_option("tell"))  print_command(options);
 
+  struct name_list* nl = cmd->clone->par_names;
+  struct command_parameter_list* pl = cmd->clone->par;
+  int pos = name_list_pos("rand", nl);
+  if (nl->inform[pos]) setrnd(pl->parameters[pos]->string);
 }
 
 void

@@ -7,7 +7,7 @@ struct in_cmd;
 
 // interface
 
-void exec_option(void);
+void exec_option(struct in_cmd*);
 void exec_help(struct in_cmd*);
 void exec_assign(struct in_cmd*);
 void exec_call(struct in_cmd*);
