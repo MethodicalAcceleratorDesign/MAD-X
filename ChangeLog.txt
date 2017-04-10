@@ -1,3 +1,8 @@
+r6182 | alatina | 2017-04-07
+1. Fixed bug(s) in quantum radiation: Incorrect initialization of
+  variables; Error in the calculation of rfac.
+2. Tracking option 'damp' was not implemented in the thick-quadrupole,
+thick-dipole, rf-multipole. Now it's there.
 
 r6173 | rdemaria | 2017-03-29
   Adding setvars_const command
@@ -17,7 +22,7 @@ r6092 | skowron | 2017-01-27
    which were extremely slow at high orders
 
 
-r6094 skowron    2017.01.31 
+r6094 | skowron | 2017.01.31 
  1. ptc_twiss with time=TRUE: scaling of dispersions and chromaticities with
     relativistic beta such that they are the same as with time=false and in case of non-relativistic energies.
     This correction is NOT implemented for the values in NONLIN table where the raw values calculated by ptc are stored.
