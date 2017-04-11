@@ -189,10 +189,13 @@ track_track(struct in_cmd* cmd)
   set_option("damp", &k);
 
   if ((k = get_value(current_command->name,"quantum")) != 0) {
-    int seed;
-    if ((seed = get_value(current_command->name, "seed")) != 0) {
-      init55(seed);
-      fprintf(prt_file, "quantum is on with seed %d\n", seed);
+    if ((pos = name_list_pos("seed", nl)) > -1) {
+      if (nl->inform[pos]) {
+        int seed = command_par_value("seed", cmd->clone);
+        init55(seed);
+        fprintf(prt_file, "quantum is on with seed %d\n", seed);
+      } else
+      fprintf(prt_file, "quantum is on\n");
     } else
       fprintf(prt_file, "quantum is on\n");
   }
