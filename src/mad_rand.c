@@ -10,8 +10,8 @@
 
 static struct {
   uint64_t s[N];
-  int p;
-} st[1];
+  int p, id;
+} st_array[10], *st;
 
 union numbit {
   uint64_t u;
@@ -38,6 +38,32 @@ static double mad_num_rand (void)
   return n.d - 1.0;                  // number within [0.,1.)
 }
 
+static void mad_num_randjump (void)
+{
+  static const uint64_t jump[N] = {
+    0x84242f96eca9c41dULL, 0xa3c65b8776f96855ULL, 0x5b34a39f070b5837ULL,
+    0x4489affce4f31a1eULL, 0x2ffeeb0a48316f40ULL, 0xdc2d9891fe68c022ULL,
+    0x3659132bb12fea70ULL, 0xaac17d8efa43cab8ULL, 0xc4cb815590989b13ULL,
+    0x5ee975283d71c93bULL, 0x691548c86c1bd540ULL, 0x7910c41d10a1e6a5ULL,
+    0x0b5fc64563b3e2a8ULL, 0x047f7684e9fc949dULL, 0xb99181f2d8f685caULL,
+    0x284600e3f30e38c3ULL
+  };
+
+  int p = st->p;
+  uint64_t *s = st->s;
+  uint64_t t[N] = { 0 };
+
+  for(int i = 0; i < N; i++)
+    for(int b = 0; b < 64; b++) {
+      if (jump[i] & 1ULL << b)
+        for(int j = 0; j < N; j++)
+          t[j] ^= s[(j + p) & (N - 1)];
+      mad_num_irand();
+    }
+  for(int j = 0; j < N; j++)
+    s[(j + p) & (N - 1)] = t[j];
+}
+
 static void mad_num_randseed (int seed)
 {
   uint64_t *s = st->s;
@@ -47,6 +73,8 @@ static void mad_num_randseed (int seed)
     s[i] = s[i-1] * 33;
   for (int i = 0; i < N; i++)
     mad_num_irand();
+
+  mad_num_randjump();
 }
 
 #undef N
@@ -126,31 +154,38 @@ double frndm (void)
 
 // -- Select RNG --------------------------------------------------------------o
 
-void setrnd (const char *kind)
+void setrand (const char *kind, int rng_id)
 {
+  int info = get_option("info");
 
   if (!strcmp(kind,"best") || !strcmp(kind,"xorshift1024star")) {
     init55_p = mad_num_randseed;
     frndm_p  = mad_num_rand;
-    static int do_init = 1;
-    if (do_init) { // first time?
-      mad_num_randseed(0);
-      do_init = 0;
-    }
+    if (rng_id > 0) { // stream id provided
+      rng_id = (rng_id-1)%10;
+      st = st_array + rng_id;
+      if (st->id == 0) {
+        st->id = rng_id;
+        mad_num_randseed(0);
+        for (int i = 0; i < st->id; i++)
+          mad_num_randjump(); // ensure no overlap
+      }
+      if (info)
+        fprintf(prt_file, "random number generator set to '%s[%d]'\n", kind, rng_id+1);
+    } else
+      if (info)
+        fprintf(prt_file, "random number generator set to '%s'\n", kind);
   }
   else
   if (!strcmp(kind,"default")) {
     init55_p = madx_init55;
     frndm_p  = madx_frndm;
     // default, already initialized
+    if (info)
+      fprintf(prt_file, "random number generator set to '%s'\n", kind);
   }
-  else {
+  else
     warning("invalid kind of random generator (ignored): ", kind);
-    kind = NULL;
-  }
-
-  if (kind && get_option("info"))
-    fprintf(prt_file, "random number generator set to '%s'\n", kind);
 }
 
 // -- Gaussian distribution ---------------------------------------------------o
