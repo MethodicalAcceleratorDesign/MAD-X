@@ -187,10 +187,15 @@ track_track(struct in_cmd* cmd)
   if ((k = get_value(current_command->name,"damp")) != 0)
     fprintf(prt_file, "damp is on\n");
   set_option("damp", &k);
-  if ((k = get_value(current_command->name,"quantum")) != 0)
-    fprintf(prt_file, "quantum is on\n");
-  set_option("quantum", &k);
 
+  if ((k = get_value(current_command->name,"quantum")) != 0) {
+    fprintf(prt_file, "quantum is on\n");
+    int seed;
+    if ((seed = get_value(current_command->name,"seed")) != 0) {
+      init55(seed);
+    }
+  }
+  set_option("quantum", &k);
 
   if ((k = get_value(current_command->name,"aperture")) != 0)
     fprintf(prt_file, "aperture tracking is on\n");

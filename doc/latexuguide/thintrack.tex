@@ -83,9 +83,9 @@ Several commands are actually required to complete a tracking run:
 \madbox{
 xxxxxxx\= \kill
 TRACK, \>DELTAP=real, ONEPASS=logical, DAMP=logical; \\
-       \>QUANTUM=logical, DUMP=logical, APERTURE=logical, \\
-       \>ONETABLE=logical, RECLOSS=logical, FILE=filename,\\
-       \>UPDATE=logical;\\
+      \>QUANTUM=logical, DAMP=logical, SEED=real, \\
+      \>ONETABLE=logical, RECLOSS=logical, FILE=filename, \\
+      \>APERTURE=logical, UPDATE=logical; \\
 xxxx\=xxxxxxx\= \kill
   \>\ldots \\
   \>START, X=real, PX=real, Y=real, PY=real, T=real, PT=real;  \\
@@ -159,9 +159,9 @@ thin-lens tracking module.
 \madbox{
 xxxxxxx\= \kill
 TRACK, \>DELTAP=real, ONEPASS=logical, DAMP=logical; \\
-       \>QUANTUM=logical, DAMP=logical, APERTURE=logical, \\
+       \>QUANTUM=logical, DAMP=logical, SEED=real, \\
        \>ONETABLE=logical, RECLOSS=logical, FILE=filename, \\
-       \>UPDATE=logical;
+       \>APERTURE=logical, UPDATE=logical;
 }
 
 The attributes of the TRACK command are:
@@ -195,6 +195,10 @@ The attributes of the TRACK command are:
 
   \ttitem{QUANTUM} flag to introduce quantum excitation via random
   number generator and tables for photon emission. \\ (Default:~false)
+
+  \ttitem{SEED} If \texttt{QUANTUM} is true, it selects a particular sequence of random values. 
+A \texttt{SEED} value is an integer in the range [0...999999999] (default:
+123456789). Note that the seed set with this command is shared with the \hyperref[sec:coption]{\texttt{COPTION}} and \hyperref[sec:coption]{\texttt{EOPTION}} commands. See also: \hyperref[subsubsec:random]{Random Values}.
 
   \ttitem{DUMP} flag to write the particle coordinates in files, whose
   names are generated automatically. \\ (Default:~false)

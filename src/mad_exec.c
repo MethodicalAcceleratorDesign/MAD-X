@@ -47,7 +47,12 @@ exec_option(struct in_cmd* cmd)
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
   int pos = name_list_pos("rand", nl);
-  if (nl->inform[pos]) setrnd(pl->parameters[pos]->string);
+  if (nl->inform[pos]) {
+    const char *kind = pl->parameters[pos]->string;
+    pos = name_list_pos("randid", nl);
+    int rng_id = pl->parameters[pos]->double_value;
+    setrand(kind, rng_id);
+  }
 }
 
 void

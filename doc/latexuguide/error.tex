@@ -569,8 +569,8 @@ EOPTION, SEED=real, ADD=logical;
 \begin{madlist}
   \ttitem{SEED} Selects a particular sequence of random values. 
   A \texttt{SEED} value is an integer in the range [0...999999999] (default:
-  123456789). \texttt{SEED} alone continues with the current sequence See
-  also: \hyperref[subsubsec:random]{Random Values}. \texttt{SEED} may be an expression.  
+  123456789). Note that the seed set with this command is shared with the \hyperref[sec:track]{\texttt{TRACK}} and \hyperref[sec:coption]{\texttt{COPTION}} commands. See
+  also: \hyperref[subsubsec:random]{Random Values}. 
 
   \ttitem{ADD} If this logical flag is set, an \texttt{EALIGN} or \texttt{EFCOMP} 
   causes the errors to be added on top of existing ones. If it is not set,

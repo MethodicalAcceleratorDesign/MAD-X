@@ -93,14 +93,13 @@ fill_twiss_header(struct table* t)
   int i, pos, h_length = 39; /* change adding header lines ! */
   double dtmp;
   struct table* s;
-  static const int max_name_len = 16;
-  char tmp[max_name_len];
+  char tmp[NAME_L];
 
   if (t == NULL) return;
   /* ATTENTION: if you add header lines, augment h_length accordingly */
   if (t->header == NULL)  t->header = new_char_p_array(h_length);
 
-  strncpy(tmp, t->org_sequ->name,max_name_len);
+  strncpy(tmp, t->org_sequ->name, NAME_L);
   sprintf(c_dum->c, v_format("@ SEQUENCE         %%%02ds \"%s\""),
           strlen(tmp),stoupper(tmp));
   t->header->p[t->header->curr++] = tmpbuff(c_dum->c);

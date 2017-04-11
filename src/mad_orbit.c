@@ -3139,8 +3139,7 @@ static int pro_correct_getactive(int ip, int *nm, int *nx, int *nc,
 
 static void correct_option(struct in_cmd* cmd) {
   struct name_list* nl = cmd->clone->par_names;
-  int i;
-  int pos, seed;
+  int i, pos;
 
   int debug = get_option("debug");
 
@@ -3153,7 +3152,7 @@ static void correct_option(struct in_cmd* cmd) {
 
   if ((pos = name_list_pos("seed", nl)) > -1) {
     if (nl->inform[pos]) {
-      seed = command_par_value("seed", cmd->clone);
+      int seed = command_par_value("seed", cmd->clone);
       init55(seed);
     }
   }

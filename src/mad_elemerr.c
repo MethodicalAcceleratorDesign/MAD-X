@@ -778,9 +778,9 @@ error_eoption(struct in_cmd* cmd)
 {
   struct name_list* nl = cmd->clone->par_names;
   int i, debug;
-  int val, pos, seed;
+  int val, pos;
   int is, ia;
-  static  int  ia_seen = 0;
+  static int ia_seen = 0;
 
   is = 0; ia = 0;
 
@@ -803,14 +803,12 @@ error_eoption(struct in_cmd* cmd)
      }
   }
 
-  if ((pos = name_list_pos("seed", nl)) > -1)
-    {
-     if (nl->inform[pos])
-       {
-        seed = command_par_value("seed", cmd->clone);
-        init55(seed);
-       }
+  if ((pos = name_list_pos("seed", nl)) > -1) {
+    if (nl->inform[pos]) {
+      int seed = command_par_value("seed", cmd->clone);
+      init55(seed);
     }
+  }
 
   /* change only if present in command or not yet set */
   if ((ia == 1) || (ia_seen != 1))
@@ -828,8 +826,8 @@ error_eoption(struct in_cmd* cmd)
 
   if(ia == 1) ia_seen = 1;
 
-  if ((debug=get_option("debug"))) printf("err_add eoption: %d seen: %d\n",add_error_opt,ia_seen);
-
+  if ((debug=get_option("debug")))
+    printf("err_add eoption: %d seen: %d\n",add_error_opt,ia_seen);
 }
 
 // public interface

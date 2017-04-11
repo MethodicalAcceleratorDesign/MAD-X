@@ -109,19 +109,20 @@ set_sub_variable(char* comm, char* par, struct in_cmd* cmd)
   struct command *command, *keep_beam = current_beam;
   int end, start = cmd->decl_start, t_num, exp_type;
   double val = 0;
+
   for (t_num = start; t_num < cmd->tok_list->curr; t_num++)
     if (*(cmd->tok_list->p[t_num]) == ',') break;
-  exp_type = loc_expr(cmd->tok_list->p, t_num,
-                      start, &end);
+
+  exp_type = loc_expr(cmd->tok_list->p, t_num, start, &end);
+
   if (exp_type == 1) /* literal constant */
     val = simple_double(cmd->tok_list->p, start, end);
   else if (polish_expr(end + 1 - start, &cmd->tok_list->p[start]) == 0)
     val = polish_value(deco, join(&cmd->tok_list->p[start], end + 1 - start));
-  if (strncmp(comm, "beam", 4) == 0)
-  {
+
+  if (strncmp(comm, "beam", 4) == 0) {
     command = current_beam = find_command("default_beam", beam_list);
-    if ((p = strchr(comm, '%')) != NULL)
-    {
+    if ((p = strchr(comm, '%')) != NULL) {
       if ((current_beam = find_command(++p, beam_list)) == NULL)
         current_beam = command;
     }

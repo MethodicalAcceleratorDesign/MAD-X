@@ -399,13 +399,13 @@ option command specifies different seeds for random values:
    \ttitem{SEED} Selects a particular seed for the sequence of random values. 
      The attribute value is an integer in the range [0...999999999], or
      an expression that evaluates to an integer in the same range 
-     (Default: 123456789). 
-     \texttt{SEED} alone with no attribute value continues with the current sequence.
-     \\ See also: \hyperref[subsubsec:random]{Random values}. 
+     (Default: 123456789). Note that the seed set with this command is shared with the \hyperref[sec:track]{\texttt{TRACK}} and \hyperref[sec:eoption]{\texttt{EOPTION}} commands.
+     See also: \hyperref[subsubsec:random]{Random values}.
+     
    \ttitem{PRINT} A flag taking integer values to control the printout. 
      \\ In general: the higher the value the more printout is produced.  
-     \\ For \texttt{PRINT=0} no output is produced. 
-     \\ The default value is 1 (Correction summary is given). 
+     For \texttt{PRINT=0} no output is produced. 
+     The default value is 1 (Correction summary is given). 
 \end{madlist}
 
 \textbf{Example:}
