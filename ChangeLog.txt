@@ -1,8 +1,14 @@
+r6188 | ldeniau | 2017-04-11
+  Allow Track to set a new seed in combination to the quantum option.
+
+r6187 | ldeniau | 2017-04-11
+  New random number generator with 10 independent streams.
+
 r6182 | alatina | 2017-04-07
 1. Fixed bug(s) in quantum radiation: Incorrect initialization of
-  variables; Error in the calculation of rfac.
+   variables; Error in the calculation of rfac.
 2. Tracking option 'damp' was not implemented in the thick-quadrupole,
-thick-dipole, rf-multipole. Now it's there.
+   thick-dipole, rf-multipole. Now it's there.
 
 r6173 | rdemaria | 2017-03-29
   Adding setvars_const command
@@ -10,25 +16,24 @@ r6173 | rdemaria | 2017-03-29
 r6168 | rdemaria | 2017-03-16
   Adding scale parameter to fill command
 
-r6151-r6154 | rdemaria | 2017-03-14 
+r6151-r6154 | rdemaria | 2017-03-14
   Adding fill_knob, setvars_knob commands
 
 r6108 | skowron | 2017-03-03
    Higher order alpha_c with ptc_twiss, time=true, icase=56;
 
-r6092 | skowron | 2017-01-27 
-   ptc_twiss: fix of issue TRAC #417 (big slow down of ptc_twiss in high order): 
-   converted 6D dispersion calculation to matrices instead of taylor maps, 
+r6092 | skowron | 2017-01-27
+   ptc_twiss: fix of issue TRAC #417 (big slow down of ptc_twiss in high order):
+   converted 6D dispersion calculation to matrices instead of taylor maps,
    which were extremely slow at high orders
 
-
-r6094 | skowron | 2017.01.31 
+r6094 | skowron | 2017.01.31
  1. ptc_twiss with time=TRUE: scaling of dispersions and chromaticities with
     relativistic beta such that they are the same as with time=false and in case of non-relativistic energies.
     This correction is NOT implemented for the values in NONLIN table where the raw values calculated by ptc are stored.
     With time=TRUE the longitudinal variables are dE/E and dT/T (energy and time offsets). Therefore the chromatic
     functions are calculated with respect of these variables. For linear variables the conversion is straight forward
-    so implemented it for variables going to twiss and summ tables (and terminal) to meet average user expectations. 
+    so implemented it for variables going to twiss and summ tables (and terminal) to meet average user expectations.
     On the other hand, the conversion of the higher orders that are present in the NONLIN table is very cumbersome,
     so the user needs to understand it and eventually rung with time=FALSE.
  2. Cleaned higher order compaction factor calculation. These outomatically pop out from PTC for icase=56 and time=FALSE.
@@ -36,27 +41,27 @@ r6094 | skowron | 2017.01.31
     In the code there were algorithms implemented for other cases, however, I discovered that they were failing for extreme situations
     like very low energy and/or calculation at high dispersion point. Therefore, I removed them so alpha_c_p, alpha_c_p2
     and alpha_c_p3 are calculated only for icase=56 time=FALSE
-    
-    
-r6082 | skowron | 2017-01-20 
+
+
+r6082 | skowron | 2017-01-20
     Fixed bug #402 (T and PT not checked if within user specified box).
-    Added check of all coordinates with exception of T in case of totalpath=true, 
-    in which case it prints an info. Added rootntuple option to ptc_track command what allows to save 
-    all the data to ROOT ntuple; For think RF cavity added LAG adjustment in MADX to PTC translation such that 
+    Added check of all coordinates with exception of T in case of totalpath=true,
+    in which case it prints an info. Added rootntuple option to ptc_track command what allows to save
+    all the data to ROOT ntuple; For think RF cavity added LAG adjustment in MADX to PTC translation such that
     particles with zero T coordinate has no net acceleration in a cavity with LAG=0
 
-r6061 | skowron | 2017-01-13 
+r6061 | skowron | 2017-01-13
 
-    Bug fix to get Hamiltonian terms from ptc_normal with the new PTC; 
-    ptc_twiss does not fill EIGN vectors as now these columns are for sigma matrix; 
+    Bug fix to get Hamiltonian terms from ptc_normal with the new PTC;
+    ptc_twiss does not fill EIGN vectors as now these columns are for sigma matrix;
     Hamiltonian in ptc_twiss, normal; clean-up of unnecessary messages and files (Maxwellian_bend_for_ptc_electric.txt)
 
-r6013 | skowron | 2016-11-22 
+r6013 | skowron | 2016-11-22
     Bug correction for factorials of anharmonicities in ptc_normal
 
-r5947 | skowron | 2016-10-03 
+r5947 | skowron | 2016-10-03
     Bug fix trac #394: check error table columns
 
-r5894 | skowron | 2016-06-06 
+r5894 | skowron | 2016-06-06
     New PTC into trunk
 
