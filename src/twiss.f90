@@ -569,8 +569,8 @@ SUBROUTINE tmclor(guess,fsec,ftrk,opt_fun0,rt,tt,eflag)
 
      !---- Track orbit and transfer matrix.
      call tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,0,0,thr_on)
-     if (eflag.ne.0)  return
 
+     if (eflag.ne.0) return
      ! turn off threader immediately after first iteration, ie after first turn
      thr_on = 0
 

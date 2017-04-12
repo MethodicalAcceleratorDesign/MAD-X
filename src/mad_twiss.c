@@ -757,6 +757,17 @@ complete_twiss_table(struct table* t)
   }
 }
 
+#if 0 // for debugging
+void disp_beam_(void);
+void disp_beam_(void)
+{
+  static int i = 0;
+  i++;
+  fprintf(stdout, "%d:current_sequ = %p '%s'\n"    , i, (void*)current_sequ, current_sequ->name);
+  fprintf(stdout, "%d:current_beam = %p '%s%%%s'\n", i, (void*)current_beam, current_beam->name, current_beam->par->parameters[name_list_pos("sequence", current_beam->par_names)]->string);
+}
+#endif
+
 void
 pro_twiss(void)
   /* controls twiss module */
@@ -798,11 +809,10 @@ pro_twiss(void)
     return;
   }
 
-
   nl = current_twiss->par_names;
   pl = current_twiss->par;
 
-  if (match_is_on)  k_save = 0;  /* match gets its own variable transfer -
+  if (match_is_on) k_save = 0;  /* match gets its own variable transfer -
 				    this can be overridden with option "slow"
                                     on match command */
 
@@ -823,7 +833,9 @@ pro_twiss(void)
     return;
   }
 
-  if(get_option("twiss_print")) fprintf(prt_file, "enter Twiss module\n");
+  if(get_option("twiss_print"))
+    fprintf(prt_file, "enter Twiss module\n");
+
   if (attach_beam(current_sequ) == 0)
     fatal_error("TWISS - sequence without beam:", current_sequ->name);
 

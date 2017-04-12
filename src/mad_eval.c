@@ -32,15 +32,14 @@ act_value(int pos, const struct name_list* chunks)
     q = par; n++; n++;
     while (*n != '\0')  *(q++) = *(n++);
     *q = '\0';
-    if (strncmp(comm, "beam", 4) == 0)
-    {
-      cmd = current_beam = find_command("default_beam", beam_list);
-      if ((p = strchr(comm, '%')) != NULL)
-      {
-        if ((current_beam = find_command(++p, beam_list)) == NULL)
-          current_beam = cmd;
+    if (strncmp(comm, "beam", 4) == 0) {
+      // LD 2017.04.11: remove current_beam side effect!
+      struct command* cmd2 = cmd = find_command("default_beam", beam_list);
+      if ((p = strchr(comm, '%')) != NULL) {
+        if ((cmd = find_command(++p, beam_list)) == NULL)
+          cmd = cmd2;
       }
-      val = command_par_value(par, current_beam);
+      val = command_par_value(par, cmd);
     }
     else if ((el = find_element(comm, element_list)) != NULL)
       val = el_par_value(par, el);

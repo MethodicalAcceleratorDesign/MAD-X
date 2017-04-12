@@ -838,14 +838,12 @@ match_match(struct in_cmd* cmd)
 
   if(chrom_flg) /* chrom specified */
   {
-    for (i = 0; i < match_num_seqs; i++)
-    {
+    for (i = 0; i < match_num_seqs; i++) {
       /* START adding chrom to TWISS input command for each sequence */
       tnl = local_twiss[i]->cmd_def->par_names;
       tpos = name_list_pos("chrom", tnl);
       local_twiss[i]->cmd_def->par_names->inform[tpos] = 1;
-      local_twiss[i]->cmd_def->par->parameters[tpos]->double_value
-        = 1;
+      local_twiss[i]->cmd_def->par->parameters[tpos]->double_value = 1;
       set_option("twiss_chrom",&ione);
       /* END adding chrom to TWISS input command for each sequence */
     }
