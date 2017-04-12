@@ -1796,7 +1796,7 @@ contains
          opt_fun(beta11p)= tw%beta_p(1,1) * deltae
          opt_fun(beta12p)= tw%beta_p(1,2) * deltae
          opt_fun(beta13p)= tw%beta_p(1,3) * deltae
-         opt_fun(beta22p)= tw%beta_p(2,1) * deltae
+         opt_fun(beta21p)= tw%beta_p(2,1) * deltae
          opt_fun(beta22p)= tw%beta_p(2,2) * deltae
          opt_fun(beta23p)= tw%beta_p(2,3) * deltae
          opt_fun(beta32p)= tw%beta_p(3,2) * deltae
