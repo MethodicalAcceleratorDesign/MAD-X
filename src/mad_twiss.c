@@ -656,9 +656,9 @@ set_twiss_deltas(struct command* comm)
 // public interface
 
 void
-copy_twiss_data(double* twiss_data)
+copy_twiss_data(double* twiss_data, int* offset, int* nval)
 {
-  copy_double(twiss_data, current_node->match_data, 74);
+  copy_double(twiss_data + *offset, current_node->match_data + *offset, *nval);
 }
 
 void

@@ -404,7 +404,7 @@ SUBROUTINE twprep(save,case,opt_fun,position)
      opt5 = opt_fun(5) ; opt_fun(5) = opt_fun(5) / twopi
      opt8 = opt_fun(8) ; opt_fun(8) = opt_fun(8) / twopi
      if (save .ne. 0) call twfill(case,opt_fun,position)
-     if (match_is_on) call copy_twiss_data(opt_fun)
+     if (match_is_on) call copy_twiss_data(opt_fun, 0, 74)
      opt_fun(5) = opt5
      opt_fun(8) = opt8
 
@@ -415,7 +415,7 @@ SUBROUTINE twprep(save,case,opt_fun,position)
      opt23 = opt_fun(23) ; opt_fun(23) = opt_fun(23) / twopi
      opt24 = opt_fun(24) ; opt_fun(24) = opt_fun(24) / twopi
      if (save .ne. 0) call twfill(case,opt_fun,position)
-     if (match_is_on) call copy_twiss_data(opt_fun)
+     if (match_is_on) call copy_twiss_data(opt_fun, 18, 10)! fill 10 values starting with wx
      opt_fun(20) = opt20
      opt_fun(21) = opt21
      opt_fun(23) = opt23
@@ -2914,7 +2914,7 @@ SUBROUTINE twchgo
   if (centre) then
      pos0 = currpos
      currpos = currpos + el/two
-     call twprep(save,2,opt_fun,currpos)
+     call twprep(save,2,opt_fun,zero)
   endif
 
   centre_bttk = .false.
