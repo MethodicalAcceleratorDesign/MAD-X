@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.03.04  (32 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.03.09               +
-  + Execution date: 2017.03.30 14:32:07      +
+  + Release   date: 2017.04.12               +
+  + Execution date: 2017.04.19 16:02:18      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! 2011/11/22 R. De Maria Generate optimized triplet layouts
 
@@ -18,73 +18,36 @@ total constraints:      5
 START JACOBIAN:
 
  JACOBIAN Strategy =           3
-Initial Penalty Function =   0.2761043129903641E+14
+Initial Penalty Function =   0.2761043129903642E+14
 
 
- Solve system with            5 con,           3 var
- Rank             3   Condition number    4432574.7747109057     
- Step length   0.19559931602617581     
-call:     2 Dx =   0.19559932E+00  Penalty function =  0.7893445719796419E+13
- Solve system with            4 con,           3 var
- Rank             3   Condition number    2594168.4878282053     
- Step length    1.6219882361729939E-002
-call:     3 Dx =   0.16219882E-01  Penalty function =  0.1859293186125150E+12
- Solve system with            4 con,           3 var
- Rank             3   Condition number    1729329.2079946620     
- Step length    1.0173518187788010E-002
-call:     4 Dx =   0.10173518E-01  Penalty function =  0.3077420519806152E+09
- Solve system with            4 con,           3 var
- Rank             3   Condition number    1564605.3285091086     
- Step length    7.1320418491275909E-004
-call:     5 Dx =   0.71320418E-03  Penalty function =  0.4344042706025608E+07
- Solve system with            4 con,           3 var
- Rank             3   Condition number    197499.18805219050     
- Step length    5.0110416220838755E-002
-call:     6 Dx =   0.50110416E-01  Penalty function =  0.1237299897960293E+06
- Solve system with            3 con,           3 var
- Rank             3   Condition number    2367.6358016369099     
- Step length    7.7146678715954787E-003
-call:     7 Dx =   0.77146679E-02  Penalty function =  0.8976907997685504E+02
- Solve system with            3 con,           3 var
- Rank             3   Condition number    2190.1942391777479     
- Step length    1.5296892431053647E-004
-call:     8 Dx =   0.15296892E-03  Penalty function =  0.7894938946366810E-04
- Solve system with            3 con,           3 var
- Rank             3   Condition number    2185.5698674799387     
- Step length    2.0267011287283144E-008
-call:     9 Dx =   0.20267011E-07  Penalty function =  0.8548429571644388E-12
- Solve system with            3 con,           3 var
- Rank             3   Condition number    2185.5686737217025     
- Step length    2.0554032044874245E-011
-call:    10 Dx =   0.20554032E-10  Penalty function =  0.3001549446728427E-18
- ++++++++++ JACOBIAN ended: converged successfully
- Final difference norm:   1.4329527729214486     
+ Final difference norm:   1.43295277292145
 
 MATCH SUMMARY
 
 --------------------------------------------------------------------
 macro: calc_triplet(0.60,0.60)
-  constraint: bq3max=imbmax*bq2max                    
+  constraint: bq3max=imbmax*bq2max
   values:     +4.61716e+03=+4.61716e+03
   weight:     +1.00000e+00
   penalty:    +1.90994e-11
 
-  constraint: betxend=1913                            
+  constraint: betxend=1913
   values:     +1.91300e+03=+1.91300e+03
   weight:     +1.00000e+00
   penalty:    +1.39153e-10
 
-  constraint: betyend=1234                            
+  constraint: betyend=1234
   values:     +1.23400e+03=+1.23400e+03
   weight:     +1.00000e+00
   penalty:    +5.29553e-10
 
-  constraint: 1e5*alfxend>2e5                         
+  constraint: 1e5*alfxend>2e5
   values:     +1.70840e+06>+2.00000e+05
   weight:     +1.00000e+00
   penalty:    +0.00000e+00
 
-  constraint: 1e5*alfyend>2e5                         
+  constraint: 1e5*alfyend>2e5
   values:     +4.48212e+05>+2.00000e+05
   weight:     +1.00000e+00
   penalty:    +0.00000e+00
@@ -95,7 +58,7 @@ Final Penalty Function =   3.00154945e-19
 
 
 
-Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit
 --------------------------------------------------------------------------------
 l1                        8.81900e+00  7.14500e+00 -1.00000e+20  1.00000e+20
 l2                        7.92411e+00  6.73500e+00 -1.00000e+20  1.00000e+20
@@ -111,64 +74,47 @@ total constraints:      5
 START JACOBIAN:
 
  JACOBIAN Strategy =           3
-Initial Penalty Function =   0.5874896254425154E+06
+Initial Penalty Function =   0.5874896254425155E+06
 
 
- Solve system with            3 con,           3 var
- Rank             3   Condition number    1622.0058094377368     
- Step length    1.9259073251248690E-002
-call:     2 Dx =   0.19259073E-01  Penalty function =  0.4694768189278951E+04
- Solve system with            3 con,           3 var
- Rank             3   Condition number    1807.8259331825027     
- Step length    2.2695293165806594E-003
-call:     3 Dx =   0.22695293E-02  Penalty function =  0.1696255654291065E+00
- Solve system with            3 con,           3 var
- Rank             3   Condition number    1815.0022387858041     
- Step length    1.6797426675029054E-005
-call:     4 Dx =   0.16797427E-04  Penalty function =  0.2247062060432640E-07
- Solve system with            3 con,           3 var
- Rank             3   Condition number    1815.0873221466031     
- Step length    4.4906558491748838E-009
-call:     5 Dx =   0.44906558E-08  Penalty function =  0.5323335438957254E-14
- ++++++++++ JACOBIAN ended: converged successfully
- Final difference norm:  0.50234178109606453     
+ Final difference norm:  0.502341781096061
 
 MATCH SUMMARY
 
 --------------------------------------------------------------------
 macro: calc_triplet(0.60,0.60)
-  constraint: bq3max=imbmax*bq2max                    
+  constraint: bq3max=imbmax*bq2max
   values:     +4.67075e+03=+4.67075e+03
   weight:     +1.00000e+00
-  penalty:    +6.59384e-10
+  penalty:    +6.48470e-10
 
-  constraint: betxend=1913                            
+  constraint: betxend=1913
   values:     +1.91300e+03=+1.91300e+03
   weight:     +1.00000e+00
-  penalty:    +2.55848e-08
+  penalty:    +2.55916e-08
 
-  constraint: betyend=1234                            
+  constraint: betyend=1234
   values:     +1.23400e+03=+1.23400e+03
   weight:     +1.00000e+00
-  penalty:    +6.83251e-08
+  penalty:    +6.83349e-08
 
-  constraint: 1e5*alfxend>2e5                         
+  constraint: 1e5*alfxend>2e5
   values:     +1.74658e+06>+2.00000e+05
   weight:     +1.00000e+00
   penalty:    +0.00000e+00
 
-  constraint: 1e5*alfyend>2e5                         
+  constraint: 1e5*alfyend>2e5
   values:     +4.55025e+05>+2.00000e+05
   weight:     +1.00000e+00
   penalty:    +0.00000e+00
 
 
 
-Final Penalty Function =   5.32333544e-15
+Final Penalty Function =   5.32500638e-15
 
 
 
-Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit
 --------------------------------------------------------------------------------
 l1                        9.06594e+00  8.81900e+00 -1.00000e+20  1.00000e+20
 l2                        7.87215e+00  7.92411e+00 -1.00000e+20  1.00000e+20
@@ -176,7 +122,7 @@ k1                        6.20742e-03  6.42412e-03 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   5.32333544e-15
+VARIABLE "TAR" SET TO   5.32500638e-15
 number of variables:    3
 user given constraints: 0
 total constraints:      5
@@ -184,56 +130,47 @@ total constraints:      5
 START JACOBIAN:
 
  JACOBIAN Strategy =           3
-Initial Penalty Function =   0.1627896413764916E+01
+Initial Penalty Function =   0.1627896413800455E+01
 
 
- Solve system with            3 con,           3 var
- Rank             3   Condition number    5.0404809615343060     
- Step length    1.3280096386694982E-005
-call:     2 Dx =   0.13280096E-04  Penalty function =  0.1168798761107236E-08
- Solve system with            3 con,           3 var
- Rank             3   Condition number    5.0387088281924290     
- Step length    4.9507235611165327E-010
-call:     3 Dx =   0.49507236E-09  Penalty function =  0.3232046622799020E-16
- ++++++++++ JACOBIAN ended: converged successfully
- Final difference norm:   3.8225812536398602E-004
+ Final difference norm:  3.822581253636962E-004
 
 MATCH SUMMARY
 
 --------------------------------------------------------------------
 macro: calc_triplet(0.60,0.60)
-  constraint: bq3max=imbmax*bq2max                    
+  constraint: bq3max=imbmax*bq2max
   values:     +4.67073e+03=+4.67073e+03
   weight:     +1.00000e+00
-  penalty:    +6.54836e-11
+  penalty:    +6.73026e-11
 
-  constraint: betxend=1913                            
+  constraint: betxend=1913
   values:     +1.91300e+03=+1.91300e+03
   weight:     +1.00000e+00
-  penalty:    -5.48653e-10
+  penalty:    -5.45924e-10
 
-  constraint: betyend=1234                            
+  constraint: betyend=1234
   values:     +1.23400e+03=+1.23400e+03
   weight:     +1.00000e+00
-  penalty:    +5.65819e-09
+  penalty:    +5.66183e-09
 
-  constraint: 1e5*alfxend>2e5                         
+  constraint: 1e5*alfxend>2e5
   values:     +1.74656e+06>+2.00000e+05
   weight:     +1.00000e+00
   penalty:    +0.00000e+00
 
-  constraint: 1e5*alfyend>2e5                         
+  constraint: 1e5*alfyend>2e5
   values:     +4.55020e+05>+2.00000e+05
   weight:     +1.00000e+00
   penalty:    +0.00000e+00
 
 
 
-Final Penalty Function =   3.23204662e-17
+Final Penalty Function =   3.23589032e-17
 
 
 
-Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit
 --------------------------------------------------------------------------------
 k1                        6.20737e-03  6.20742e-03 -1.00000e+20  1.00000e+20
 k2                        6.42426e-03  6.42412e-03 -1.00000e+20  1.00000e+20
@@ -241,35 +178,35 @@ k3                        6.42410e-03  6.42412e-03 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   3.23204662e-17
+VARIABLE "TAR" SET TO   3.23589032e-17
 enter Twiss module
-  
+
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 final orbit vector:     0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
-            length             orbit5               alfa            gammatr 
-               120                 -0                  0                  0 
+            length             orbit5               alfa            gammatr
+               120                 -0                  0                  0
 
-                q1                dq1            betxmax              dxmax 
-      0.2528460961                  0        4645.856607                  0 
+                q1                dq1            betxmax              dxmax
+      0.2528460961                  0        4645.856607                  0
 
-             dxrms             xcomax             xcorms                 q2 
-                 0                  0                  0        0.254714201 
+             dxrms             xcomax             xcorms                 q2
+                 0                  0                  0        0.254714201
 
-               dq2            betymax              dymax              dyrms 
-                 0        4651.450012                  0                  0 
+               dq2            betymax              dymax              dyrms
+                 0        4651.450012                  0                  0
 
-            ycomax             ycorms             deltap            synch_1 
-                 0                  0                  0                  0 
+            ycomax             ycorms             deltap            synch_1
+                 0                  0                  0                  0
 
-           synch_2            synch_3            synch_4            synch_5 
-                 0                  0                  0                  0 
+           synch_2            synch_3            synch_4            synch_5
+                 0                  0                  0                  0
 
-            nflips 
-                 0 
+            nflips
+                 0
 g1                 =        144.9389938 ;
 g2                 =        150.0032153 ;
 g3                 =        149.9994359 ;

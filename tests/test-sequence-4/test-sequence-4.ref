@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.03.04  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.03.09               +
-  + Execution date: 2017.03.30 14:40:43      +
+  + Release   date: 2017.04.12               +
+  + Execution date: 2017.04.19 16:40:21      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -2641,12 +2641,12 @@ enter Twiss module
  Found 6 initial orbit vector values from twiss command. 
  Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
 Twiss pre-init: adjusting probe and oneturnmat (fix point)
-updating probe_beam for deltap=0 => ds=   -2.42421662983691899
-  parameters: freq0=  0.0788970808426826681, alfa=0.000642332772159944073
+updating probe_beam for deltap=0 => ds=   -2.42421662983691988
+  parameters: freq0=  0.0788970808426826681, alfa= 0.00064233277215994429
               beta=   0.999997826292276071, gamma=    479.606062155549807, dtbyds=                      0
 Twiss pre-init: iteration 1, delta ds = -2.42421663e+00 (fix point)
-updating probe_beam for deltap=0 => ds=   -2.42421662983691899
-  parameters: freq0=  0.0788970808426826681, alfa=0.000642332772159944073
+updating probe_beam for deltap=0 => ds=   -2.42421662983691988
+  parameters: freq0=  0.0788970808426826681, alfa= 0.00064233277215994429
               beta=   0.999997826292276071, gamma=    479.606062155549807, dtbyds=                      0
 Twiss pre-init: iteration 2, delta ds = 0.00000000e+00 (fix point)
  
