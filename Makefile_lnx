@@ -24,13 +24,13 @@ all-linux-llvm:    all-linux64-llvm   all-linux32-llvm
 all-linux-intel:   all-linux64-intel  all-linux32-intel
 
 all-linux32-gnu:   madx-linux32-gnu numdiff-linux32-gnu # libptc-linux32-gnu libmadx-linux32-gnu
-all-linux64-gnu:   madx-linux64-gnu numdiff-linux64-gnu libptc-linux64-gnu libmadx-linux64-gnu
+all-linux64-gnu:   madx-linux64-gnu numdiff-linux64-gnu # libptc-linux64-gnu libmadx-linux64-gnu
 
 all-linux32-llvm:  madx-linux32-llvm numdiff-linux32-llvm # libmadx-linux32-llvm libptc-linux32-llvm
-all-linux64-llvm:  madx-linux64-llvm numdiff-linux64-llvm libmadx-linux64-llvm libptc-linux64-llvm
+all-linux64-llvm:  madx-linux64-llvm numdiff-linux64-llvm # libmadx-linux64-llvm libptc-linux64-llvm
 
 all-linux32-intel: madx-linux32-intel numdiff-linux32-intel # libmadx-linux32-intel libptc-linux32-intel
-all-linux64-intel: madx-linux64-intel numdiff-linux64-intel libmadx-linux64-intel libptc-linux64-intel
+all-linux64-intel: madx-linux64-intel numdiff-linux64-intel # libmadx-linux64-intel libptc-linux64-intel
 
 #
 # cleanbuild platform specific

@@ -23,14 +23,14 @@ all-macosx-gnu:     all-macosx64-gnu    all-macosx32-gnu
 all-macosx-llvm:    all-macosx64-llvm   all-macosx32-llvm
 all-macosx-intel:   all-macosx64-intel  all-macosx32-intel
 
-all-macosx32-gnu:   madx-macosx32-gnu numdiff-macosx32-gnu libmadx-macosx32-gnu libptc-macosx32-gnu
-all-macosx64-gnu:   madx-macosx64-gnu numdiff-macosx64-gnu libmadx-macosx64-gnu libptc-macosx64-gnu
+all-macosx32-gnu:   madx-macosx32-gnu numdiff-macosx32-gnu # libmadx-macosx32-gnu libptc-macosx32-gnu
+all-macosx64-gnu:   madx-macosx64-gnu numdiff-macosx64-gnu # libmadx-macosx64-gnu libptc-macosx64-gnu
 
-all-macosx32-llvm:  madx-macosx32-llvm numdiff-macosx32-llvm libmadx-macosx32-llvm libptc-macosx32-llvm
-all-macosx64-llvm:  madx-macosx64-llvm numdiff-macosx64-llvm libmadx-macosx64-llvm libptc-macosx64-llvm
+all-macosx32-llvm:  madx-macosx32-llvm numdiff-macosx32-llvm # libmadx-macosx32-llvm libptc-macosx32-llvm
+all-macosx64-llvm:  madx-macosx64-llvm numdiff-macosx64-llvm # libmadx-macosx64-llvm libptc-macosx64-llvm
 
-all-macosx32-intel: madx-macosx32-intel numdiff-macosx32-intel libmadx-macosx32-intel libptc-macosx32-intel
-all-macosx64-intel: madx-macosx64-intel numdiff-macosx64-intel libmadx-macosx64-intel libptc-macosx64-intel
+all-macosx32-intel: madx-macosx32-intel numdiff-macosx32-intel # libmadx-macosx32-intel libptc-macosx32-intel
+all-macosx64-intel: madx-macosx64-intel numdiff-macosx64-intel # libmadx-macosx64-intel libptc-macosx64-intel
 
 #
 # cleanbuild platform specific
