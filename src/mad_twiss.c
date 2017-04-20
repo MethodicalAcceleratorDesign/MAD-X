@@ -326,7 +326,9 @@ pro_embedded_twiss(struct command* current_global_twiss)
     twiss_tb = table_register->tables[pos];
     if (twiss_tb->origin ==1) return; /* table is read, has no node pointers */
     for (jt = 0; jt < twiss_tb->curr; jt++) {
-      if (twiss_tb->p_nodes[jt] == current_sequ->range_start) break;
+      // need `->previous` since the start node itself may be replaced in
+      // `interpolate_node`:
+      if (twiss_tb->p_nodes[jt]->previous == current_sequ->range_start->previous) break;
     }
   }
 

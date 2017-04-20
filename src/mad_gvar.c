@@ -211,7 +211,6 @@ double disp0[6];
 double sxf_suml = 0;
 double track_deltap=0;
 double oneturnmat[36];
-double fintx_plot;          /* to save the value of fintx for the reset_interpolation routine */
 
 const double zero = 0;
 const double one = 1;
