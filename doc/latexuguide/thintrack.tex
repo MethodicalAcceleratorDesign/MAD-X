@@ -83,9 +83,9 @@ Several commands are actually required to complete a tracking run:
 \madbox{
 xxxxxxx\= \kill
 TRACK, \>DELTAP=real, ONEPASS=logical, DAMP=logical; \\
-      \>QUANTUM=logical, DAMP=logical, SEED=real, \\
+      \>QUANTUM=logical, SEED=real, UPDATE=logical, \\
       \>ONETABLE=logical, RECLOSS=logical, FILE=filename, \\
-      \>APERTURE=logical, UPDATE=logical; \\
+      \>APERTURE=logical; \\
 xxxx\=xxxxxxx\= \kill
   \>\ldots \\
   \>START, X=real, PX=real, Y=real, PY=real, T=real, PT=real;  \\
@@ -148,8 +148,6 @@ controlled through several options of \madx (see
 section specific to space charge options and particularities appears
 below.
 
-
-
 \section{TRACK}
 \label{sec:track}
 
@@ -159,9 +157,9 @@ thin-lens tracking module.
 \madbox{
 xxxxxxx\= \kill
 TRACK, \>DELTAP=real, ONEPASS=logical, DAMP=logical; \\
-       \>QUANTUM=logical, DAMP=logical, SEED=real, \\
+       \>QUANTUM=logical, SEED=real, UPDATE=logical, \\
        \>ONETABLE=logical, RECLOSS=logical, FILE=filename, \\
-       \>APERTURE=logical, UPDATE=logical;
+       \>APERTURE=logical;
 }
 
 The attributes of the TRACK command are:
