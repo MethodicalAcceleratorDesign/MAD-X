@@ -161,10 +161,9 @@
       else if(local) then
         j=restart_sequ()
  21     continue
-        call get_twiss_data(opt_fun)
- 22     continue
         i=next_constraint(name,name_len,type,valhg,c_min,c_max,weight)
-        if(i.ne.0)  then
+        if (i .ne. 0) call get_twiss_data(opt_fun)
+        do while (i .ne. 0)
           n_pos = next_constr_namepos(name)
           if (n_pos.eq.0) then
             print *, ' +-+-+- fatal error'
@@ -198,8 +197,8 @@
      &write(*,830) node_name,name,type,c_min,val,f_val**2
           if(psum .and. type.eq.3)                                    &
      &write(*,832) node_name,name,type,c_min,c_max,val,f_val**2
-          goto 22
-        endif
+          i=next_constraint(name,name_len,type,valhg,c_min,c_max,weight)
+        end do
       if(advance_node() .ne. 0) goto 21
       endif
  30   continue
