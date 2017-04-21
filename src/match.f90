@@ -129,30 +129,31 @@
           do while (next_constraint(                                    &
      &                  name,name_len,type, valhg,c_min,c_max,weight,   &
      &                  slow_match,pos,val,node_name,name_len).ne.0)
-            if (type.eq.1) then
-              f_val =weight*dim(c_min,val)
-              if(fprt) write(*,880) name,weight,val,c_min,f_val**2
-            elseif(type.eq.2) then
-              f_val=weight*dim(val,c_max)
-              if(fprt) write(*,890) name,weight,val,c_max,f_val**2
-            elseif(type.eq.3) then
-              f_val=weight*dim(c_min,val)+weight*dim(val,c_max)
-              if(fprt) write(*,840) name,weight,val,c_min,c_max,f_val**2
-            elseif(type.eq.4) then
-              f_val=weight*(val-valhg)
-              if(fprt) write(*,840) name,weight,val,valhg,valhg,f_val**2
-            endif
+            select case(type)
+              case(1); f_val=weight*dim(c_min,val)
+              case(2); f_val=weight*dim(val,c_max)
+              case(3); f_val=weight*dim(c_min,val)+weight*dim(val,c_max)
+              case(4); f_val=weight*(val-valhg)
+            end select
             ncon=ncon+1
             fvect(ncon)=f_val
             fsum=fsum+f_val**2
-            if(psum .and. type.eq.4)                                    &
-     &write(*,830) node_name,name,type,valhg,val,f_val**2
-            if(psum .and. type.eq.2)                                    &
-     &write(*,830) node_name,name,type,c_max,val,f_val**2
-            if(psum .and. type.eq.1)                                    &
-     &write(*,830) node_name,name,type,c_min,val,f_val**2
-            if(psum .and. type.eq.3)                                    &
-     &write(*,832) node_name,name,type,c_min,c_max,val,f_val**2
+            if(fprt) then ;
+              select case(type)
+                case(1); write(*,880) name,weight,val,c_min,f_val**2
+                case(2); write(*,890) name,weight,val,c_max,f_val**2
+                case(3); write(*,840) name,weight,val,c_min,c_max,f_val**2
+                case(4); write(*,840) name,weight,val,valhg,valhg,f_val**2
+              end select
+            endif
+            if(psum) then
+              select case(type)
+                case(4); write(*,830) node_name,name,type,valhg,val,f_val**2
+                case(2); write(*,830) node_name,name,type,c_max,val,f_val**2
+                case(1); write(*,830) node_name,name,type,c_min,val,f_val**2
+                case(3); write(*,832) node_name,name,type,c_min,c_max,val,f_val**2
+              end select
+            endif
           end do
           j=advance_node()
           pos=pos+1
@@ -163,23 +164,23 @@
       if(i.ne.0)  then
         pos=1
         flag=double_from_table_row('summ ',name,pos,val)
-        if(type.eq.1) then
-          f_val=weight*dim(c_min,val)
-          if(fprt) write(*,880) name,weight,val,c_min,f_val**2
-        elseif(type.eq.2) then
-          f_val=weight*dim(val,c_max)
-          if(fprt) write(*,890) name,weight,val,c_max,f_val**2
-        elseif(type.eq.3) then
-          f_val=weight*dim(c_min,val)+ weight*dim(val,c_max)
-          if(fprt) write(*,840) name,weight,val,c_min,c_max,f_val**2
-        elseif(type.eq.4) then
-          f_val=weight*(val-valhg)
-          if(fprt) write(*,840) name,weight,val,valhg,valhg,f_val**2
+        select case(type)
+          case(1); f_val=weight*dim(c_min,val)
+          case(2); f_val=weight*dim(val,c_max)
+          case(3); f_val=weight*dim(c_min,val)+ weight*dim(val,c_max)
+          case(4); f_val=weight*(val-valhg)
+        end select
+        if (fprt) then
+          select case(type)
+            case(1); write(*,880) name,weight,val,c_min,f_val**2
+            case(2); write(*,890) name,weight,val,c_max,f_val**2
+            case(3); write(*,840) name,weight,val,c_min,c_max,f_val**2
+            case(4); write(*,840) name,weight,val,valhg,valhg,f_val**2
+          end select
         endif
         ncon=ncon+1
         fvect(ncon)=f_val
         fsum=fsum+f_val**2
-
         if(psum)                                                        &
      &write(*,830) "Global constraint:      ",name,type,valhg,val,      &
      &f_val**2
