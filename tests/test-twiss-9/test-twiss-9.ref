@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.03.04  (32 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.03.09               +
-  + Execution date: 2017.03.30 14:29:24      +
+  + Release   date: 2017.04.12               +
+  + Execution date: 2017.04.21 14:19:06      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -2807,9 +2807,8 @@ enter Twiss module
 iteration:   1 error:   4.919639E-04 deltap:   0.000000E+00
 orbit:   2.502626E-06  2.178362E-05 -1.992044E-05 -5.056846E-06  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   6.136233E-11 deltap:   0.000000E+00
+iteration:   2 error:   6.136162E-11 deltap:   0.000000E+00
 orbit:   2.502581E-06  2.178362E-05 -1.992047E-05 -5.056848E-06  0.000000E+00  0.000000E+00
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.159808E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -2838,8 +2837,7 @@ orbit:   2.502581E-06  2.178362E-05 -1.992047E-05 -5.056848E-06  0.000000E+00  0
 stop;
 
 
-  Number of warnings: 1
-0 in C and 1 in Fortran
+  Number of warnings: 0
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.03.04  (32 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.03.09               +
-  + Execution date: 2017.03.30 14:28:26      +
+  + Release   date: 2017.04.12               +
+  + Execution date: 2017.04.21 13:56:07      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! S. Fartoukh March 2012
 
@@ -86,7 +86,6 @@ enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.139710E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -115,7 +114,6 @@ enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.139710E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -143,7 +141,6 @@ enter Twiss module
   
 iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
 orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.139710E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -486,7 +483,7 @@ enter Twiss module
   
 iteration:   1 error:   2.225376E-21 deltap:   0.000000E+00
 orbit:   8.908674E-22 -2.255121E-23 -9.785071E-22 -1.701329E-23 -1.456529E-17 -1.927238E-25
-++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.210299E-11 (symplectifying R)                                                                                                               
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.126901E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
@@ -521,12 +518,12 @@ orbit0   8.908674E-22 -2.255121E-23 -9.785071E-22 -1.701329E-23 -1.456529E-17 -1
 
 6D closed orbit found by subroutine trclor 
 iteration:  11 error:   2.799193E-22 deltap:   0.000000E+00
-orbit:  -5.824447E-70 -7.444465E-72  6.535955E-82  7.395786E-84 -4.073446E-17  2.797265E-22
+orbit:   3.386767E-53  4.328766E-55 -4.269978E-68 -1.695414E-71 -4.073446E-17  2.797265E-22
 exit TRACK module
 
 
-  Number of warnings: 4
-0 in C and 4 in Fortran
+  Number of warnings: 1
+0 in C and 1 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +
