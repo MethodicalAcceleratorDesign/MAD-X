@@ -161,9 +161,14 @@ fill_constraint_list(int type /* 1 node, 2 global */,
   }
 }
 
+// fetch info about one constraint and advance to the next
 int
-next_constraint(char* name, int* name_l, int* type, double* value, double* c_min, double* c_max, double* weight)
+next_constraint(char* name, int* name_l, int* type, double* value,
+                double* c_min, double* c_max, double* weight,
+                int* slow_match, int* pos, double* val, char* node_name, int* nn_len)
   /* returns the parameters of the next constraint; 0 = none, else count */
+  // NOTE: does NOT set `val` for match2: match2 seems to invoke this function
+  // only via `jacob_print` where `val` is not needed.
 {
   struct constraint* c_c;
   char s, takenextmacro, nomore; /* RDM fork */
@@ -205,6 +210,7 @@ next_constraint(char* name, int* name_l, int* type, double* value, double* c_min
           c_min = value; /* unknown use */
           c_max = value; /* unknown use */
           *weight = 1; /*hardcode no weight with this interface */
+          string_from_table_row("twiss ", "name ", pos, node_name);
           k++;
           match2_cons_curr[0]=i;
           match2_cons_curr[1]=j;
@@ -241,6 +247,23 @@ next_constraint(char* name, int* name_l, int* type, double* value, double* c_min
     else                       *c_max = expression_value(c_c->ex_c_max,2);
 
     *weight = c_c->weight;
+
+    if (*slow_match) {
+      string_from_table_row("twiss ", "name ", pos, node_name);
+      double_from_table_row("twiss ",  name,   pos, val);
+    }
+    else {
+      int n_pos = next_constr_namepos(name);
+      if (n_pos == 0)
+        fatal_error(
+            " +-+-+- fatal error\n"
+            "match - collect: illegal name\n"
+            "      - try with the \"slow\" option\n"
+            "      - name = ", name
+        );
+      *val = current_node->match_data[n_pos-1];
+      current_node_name(node_name, nn_len);
+    }
 
     return ++current_node->con_cnt;
   }

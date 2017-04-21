@@ -16,7 +16,6 @@ int   twiss_input(struct command*);
 
 void  get_disp0(double* disp);
 void  copy_twiss_data(double* twiss_data, int* offset, int* nval);
-void  get_twiss_data(double* twiss_data);
 void  complete_twiss_table(struct table*);
 int   embedded_twiss(void);
 

@@ -571,12 +571,6 @@ copy_twiss_data(double* twiss_data, int* offset, int* nval)
 }
 
 void
-get_twiss_data(double* twiss_data)
-{
-  copy_double(current_node->match_data, twiss_data, 74);
-}
-
-void
 get_disp0(double* disp)
 {
   copy_double(disp0, disp, 6);

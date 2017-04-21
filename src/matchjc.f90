@@ -500,9 +500,9 @@
       integer ncon,next_constraint,next_global,i,j,pos,type,range(2),   &
      &flag,get_option,restart_sequ,advance_to_pos,string_from_table_row
 !      integer double_from_table_row
-      double precision value,c_min,c_max,weight
+      double precision value,c_min,c_max,weight,val
       character*(name_len) namevar,name,node_name
-      integer next_vary,slope
+      integer next_vary,slope,slow
       double precision step,opt
       integer oldpos,nnode,mtputconsname,void
 
@@ -519,14 +519,14 @@
           do pos=range(1),range(2)
             j=advance_to_pos('twiss ',pos)
  20         continue
-            i=next_constraint(name,name_len,type,value,c_min,c_max,weight)
+            i=next_constraint(name,name_len,type,value,c_min,c_max,weight, &
+     &                        slow,pos,val,node_name,name_len)
             if(i.ne.0)  then
               if (pos.ne.oldpos) then
                 nnode=nnode+1
                 ncon=1
                 oldpos=pos
               endif
-              flag=string_from_table_row('twiss ','name ',pos,node_name)
               do nvar=1,n
  22             ivar=next_vary(namevar,name_len,c_min,c_max,step,slope,opt)
                 if (ivar.eq.0) then
