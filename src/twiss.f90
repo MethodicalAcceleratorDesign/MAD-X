@@ -777,7 +777,7 @@ SUBROUTINE tmfrst(orbit0,orbit,fsec,ftrk,rt,tt,eflag,kobs,save,thr_on)
   endif
 
   !---- Element matrix
-  call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
+  call tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,.false.,el)
 
   !--- if element has a map, concatenate
   if (fmap) then
@@ -1653,9 +1653,10 @@ SUBROUTINE twcpgo(rt,orbit0)
   !----------------------------------------------------------------------*
   double precision :: rt(6,6), orbit0(6)
 
-  logical :: fmap, cplxy, cplxt, sector_sel, mycentre_cptk
+  logical :: fmap, cplxy, cplxt, sector_sel
   integer :: i, i1, i2, iecnt, code, save, n_align, elpar_vl
   double precision :: ek(6), re(6,6), rwi(6,6), rc(6,6), te(6,6,6)
+  double precision :: orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   double precision :: orbit(6), orbit2(6)
   double precision :: bvk, sumloc, pos0, sd, el
   double precision :: al_errors(align_max)
@@ -1758,18 +1759,22 @@ SUBROUTINE twcpgo(rt,orbit0)
      ele_body = .false.
      ORBIT2 = ORBIT
      call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
-     mycentre_cptk = centre_cptk
-     centre_cptk = .false.
      call twcptk(re,orbit)
-     centre_cptk = mycentre_cptk
      if (sectormap) SRMAT = matmul(RE,SRMAT)
   endif
 
-  if (centre) centre_cptk = .true.
-
-  call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te)
-
   if (centre) then
+    ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
+    call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te,.true.,el/two)
+
+    centre_cptk = .true.
+    ! TG: the `fmap` condition is only an approximation of the previous
+    ! behaviour of the `centre` option - which was handled inconsistently
+    ! across different elements (some never called twcptk, some always did,
+    ! some only in certain cases):
+    if (fmap) call twcptk(re,orbit)
+    centre_cptk = .false.
+
      pos0 = currpos
      currpos = currpos + el/two
      sd = rt(5,6) + dot_product(RT(5,1:4), DISP(1:4))
@@ -1777,9 +1782,12 @@ SUBROUTINE twcpgo(rt,orbit0)
      alfa = one / gamma**2 + eta
      opt_fun(74) = alfa
      call twprep(save,1,opt_fun,currpos)
+
+    ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
   endif
 
-  centre_cptk = .false.
+  ! now do exact calculation with full length:
+  call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te,.false.,el)
 
   if (fmap) then
      call twcptk(re,orbit)
@@ -1792,10 +1800,7 @@ SUBROUTINE twcpgo(rt,orbit0)
      ele_body = .false.
      ORBIT2 = ORBIT
      call tmali2(el,orbit2,al_errors,beta,gamma,orbit,re)
-     mycentre_cptk = centre_cptk
-     centre_cptk = .false.
      call twcptk(re,orbit)
-     centre_cptk = mycentre_cptk
      if (sectormap) SRMAT = matmul(RE,SRMAT)
   endif
 
@@ -2844,9 +2849,10 @@ SUBROUTINE twchgo
   !     Purpose:                                                         *
   !     Track Chromatic functions.                                       *
   !----------------------------------------------------------------------*
-  logical :: fmap, cplxy, cplxt, mycentre_bttk
+  logical :: fmap, cplxy, cplxt
   integer :: i, code, save, n_align
   double precision :: orbit(6), orbit2(6), ek(6), re(6,6), te(6,6,6)
+  double precision :: orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   double precision :: al_errors(align_max), el, pos0
   character(len=130) :: msg
 
@@ -2902,33 +2908,30 @@ SUBROUTINE twchgo
   if (n_align .ne. 0)  then
      ORBIT2 = ORBIT
      call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
-     mycentre_bttk = centre_bttk
-     centre_bttk = .false.
      call twbttk(re,te)
-     centre_bttk = mycentre_bttk
   endif
 
-  if (centre) centre_bttk = .true.
-
-  call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te)
-
   if (centre) then
+     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
+     call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te,.true.,el/two)
+     centre_bttk = .true.
+     ! TG: same comment as in twchgo (inconsistent center behaviour) applies here:
+     if (fmap) call twbttk(re,te)
+     centre_bttk = .false.
      pos0 = currpos
      currpos = currpos + el/two
      call twprep(save,2,opt_fun,zero)
+     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
   endif
 
-  centre_bttk = .false.
+  call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te,.false.,el)
 
   if (fmap) call twbttk(re,te)
 
   if (n_align.ne.0)  then
      ORBIT2 = ORBIT
      call tmali2(el,orbit2,al_errors,beta,gamma,orbit,re)
-     mycentre_bttk = centre_bttk
-     centre_bttk = .false.
      call twbttk(re,te)
-     centre_bttk = mycentre_bttk
   endif
 
   if (.not.centre) then
@@ -3327,7 +3330,7 @@ SUBROUTINE tw_summ(rt,tt)
 end SUBROUTINE tw_summ
 
 
-SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
+SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
   use twtrrfi
   use name_lenfi
   use time_varfi
@@ -3343,6 +3346,8 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
   !     code                element type code                            *
   !     fsec      (logical) if true, return second order terms.          *
   !     ftrk      (logical) if true, track orbit.                        *
+  !     fcentre   (logical) legacy centre behaviour (no exit effects).   *
+  !     dl        (double)  slice length.                                *
   !     input/output:                                                    *
   !     orbit(6)  (double)  closed orbit.                                *
   !     output:                                                          *
@@ -3354,7 +3359,8 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
   integer :: code
-  logical :: fsec, ftrk, fmap
+  logical :: fsec, ftrk, fmap, fcentre
+  double precision :: dl
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
   double precision :: plot_tilt, el
@@ -3376,34 +3382,34 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
      case (code_drift, code_hmonitor:code_rcollimator, code_instrument, code_twcavity, &
         code_slmonitor:code_imonitor, code_placeholder, code_collimator)
         !---- Drift space, monitors and derivatives, collimators, instrument
-        call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
+        call tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
      case (code_rbend, code_sbend)
-        call tmbend(ftrk,orbit,fmap,el,ek,re,te)
+        call tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
 
      case (code_matrix)
         call tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
 
      case (code_quadrupole)
-        call tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
+        call tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
 
      case (code_sextupole)
-        call tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
+        call tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
 
      case (code_octupole)
-        call tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
+        call tmoct(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
 
      case (code_multipole)
         call tmmult(fsec,ftrk,orbit,fmap,re,te)
 
      case (code_solenoid)
-        call tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
+        call tmsol(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
      case (code_rfcavity)
-        call tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
+        call tmrf(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
 
      case (code_elseparator)
-        call tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
+        call tmsep(fsec,ftrk,fcentre,orbit,fmap,dl,ek,re,te)
 
      case (code_srotation)
         call tmsrot(ftrk,orbit,fmap,ek,re,te)
@@ -3412,7 +3418,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
         call tmyrot(ftrk,orbit,fmap,ek,re,te)
 
      case (code_hkicker, code_vkicker, code_kicker, code_tkicker)
-        call tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
+        call tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
 
      case (code_beambeam)
         !---- (Particles/bunch taken for the opposite beam).
@@ -3434,7 +3440,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
         ! nothing for now...
 
      case (code_crabcavity)
-        call tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
+        call tmcrab(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
      case (code_hacdipole, code_vacdipole)
         ! nothing in MAD-X only used for conversion to sixtrack
@@ -3452,7 +3458,7 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te)
 
 end SUBROUTINE tmmap
 
-SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
+SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
@@ -3466,28 +3472,29 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
   !     TRANSPORT map for sector bending magnets                         *
   !     Input:                                                           *
   !     ftrk      (logical) if true, track orbit.                        *
+  !     fcentre   (logical) legacy centre behaviour (no exit effects).   *
+  !     el        (double)  element length.                              *
+  !     dl        (double)  slice length.                                *
   !     Input/output:                                                    *
   !     orbit(6)  (double)  closed orbit.                                *
   !     Output:                                                          *
   !     fmap      (logical) if true, element has a map.                  *
-  !     el        (double)  element length.                              *
   !     ek(6)     (double)  kick due to element.                         *
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical :: ftrk, fmap
-  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6), el
+  logical :: ftrk, fmap, fcentre
+  double precision :: orbit(6), ek(6), re(6,6), te(6,6,6), el, dl
 
   logical :: cplxy
   logical :: kill_ent_fringe, kill_exi_fringe
   integer :: elpar_vl
   integer :: nd, n_ferr, code
   double precision :: f_errors(0:maxferr)
-  double precision :: rw(6,6), tw(6,6,6), ek0(6), orbit0(6)
+  double precision :: rw(6,6), tw(6,6,6), ek0(6)
   double precision :: x, y
   double precision :: an, sk1, sk2, sks, tilt, e1, e2, h, h1, h2, hgap, fint, fintx, rhoinv, blen, bvk
-  double precision :: dh, corr, ct, st, hx, hy, rfac, pt, el0
-  double precision :: orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
+  double precision :: dh, corr, ct, st, hx, hy, rfac, pt
 
   integer, external :: el_par_vector, node_fd_errors
   double precision, external :: node_value
@@ -3555,39 +3562,8 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
      endif
 
      !---- Body of the dipole.
-     !---- centre option
-     if (centre_cptk .or. centre_bttk) then
-        ORBIT00 = ORBIT
-        EK00 = EK
-        RE00 = RE
-        TE00 = TE
-        el0=el/two
-        call tmsect(.true.,el0,h,dh,sk1,sk2,ek,re,te)
-        !---- Fringe fields.
-        if (.not.kill_ent_fringe) then
-           corr = (h + h) * hgap * fint
-           call tmfrng(.true.,h,sk1,e1,h1,one,corr,rw,tw)
-           call tmcat1(.true.,ek,re,te,ek0,rw,tw,ek,re,te)
-        endif
-        !---- Apply tilt.
-        if (tilt .ne. zero) then
-           call tmtilt(.true.,tilt,ek,re,te)
-           cplxy = .true.
-        endif
-        !---- Track orbit.
-        ORBIT0 = ORBIT
-        if (ftrk) call tmtrak(ek,re,te,orbit0,orbit0)
-        if (centre_cptk) call twcptk(re,orbit0)
-        if (centre_bttk) call twbttk(re,te)
-        ORBIT = ORBIT00
-        EK = EK00
-        RE = RE00
-        TE = TE00
-     endif
-     !---- End
-
      !---- Get map for body section
-     call tmsect(.true.,el,h,dh,sk1,sk2,ek,re,te)
+     call tmsect(.true.,dl,h,dh,sk1,sk2,ek,re,te)
 
      !---- Get map for entrance fringe field and concatenate
      if (.not.kill_ent_fringe) then
@@ -3597,12 +3573,14 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
      endif
 
    !---- Get map for exit fringe fields and concatenate
+   if (.not. fcentre) then
      if (.not.kill_exi_fringe) then
         if (fintx .lt. 0) fintx = fint
         corr = (h + h) * hgap * fintx
         call tmfrng(.true.,h,sk1,e2,h2,-one,corr,rw,tw)
         call tmcat1(.true.,ek0,rw,tw,ek,re,te,ek,re,te)
      endif
+   endif
 
      !---- Apply tilt.
      if (tilt .ne. zero) then
@@ -3613,6 +3591,7 @@ SUBROUTINE tmbend(ftrk,orbit,fmap,el,ek,re,te)
      !---- Track orbit.
      if (ftrk) then
         call tmtrak(ek,re,te,orbit,orbit)
+        if (fcentre) return
 
         !---- Half radiation effects at exit.
         if (ftrk .and. radiate) then
@@ -4022,7 +4001,7 @@ SUBROUTINE tmtilt(fsec,tilt,ek,r,t)
 
 end SUBROUTINE tmtilt
 
-SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
+SUBROUTINE tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   use twtrrfi
   use math_constfi, only : zero, one, three, half
   use twissbeamfi, only : radiate, deltap, gamma, arad
@@ -4034,18 +4013,19 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !     Input:                                                           *
   !     fsec      (logical) if true, return second order terms.          *
   !     ftrk      (logical) if true, track orbit.                        *
+  !     fcentre   (logical) legacy centre behaviour (no exit effects).   *
+  !     el        (double)  element length.                              *
   !     Input/output:                                                    *
   !     orbit(6)  (double)  closed orbit.                                *
   !     Output:                                                          *
   !     fmap      (logical) if true, element has a map.                  *
-  !     el        (double)  element length.                              *
   !     ek(6)     (double)  kick due to element.                         *
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical, intent(IN) :: fsec, ftrk
+  logical, intent(IN) :: fsec, ftrk, fcentre
   logical, intent(OUT) :: fmap
-  double precision, intent(IN OUT) :: orbit(6), el
+  double precision, intent(IN OUT) :: orbit(6), el, dl
   double precision, intent(OUT) :: ek(6), re(6,6), te(6,6,6)
 
   logical :: cplxy
@@ -4062,7 +4042,7 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   if ( .not. ftrk) then
      !---- No orbit track desired, use drift map.
-     call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
+     call tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
   else
      !---- Tracking desired, use corrector map.
@@ -4122,7 +4102,10 @@ SUBROUTINE tmcorr(fsec,ftrk,orbit,fmap,el,ek,re,te)
      endif
 
      !---- Drift to end.
-     if (el .ne. zero) call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
+     if (el .ne. zero) then
+       call tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
+       if (fcentre) return
+     endif
 
      !---- Half radiation effects at exit.
      if (radiate  .and.  el.ne.zero) then
@@ -4168,7 +4151,6 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   double precision :: normal(0:maxmul), skew(0:maxmul)
   double precision :: bi, pt, rfac, bvk, elrad, tilt, angle
   double precision :: x, y, dbr, dbi, dipr, dipi, dr, di, drt, dpx, dpy, dpxr, dpyr, dtmp
-  double precision :: orbit0(6), orbit00(6), re00(6,6), te00(6,6,6)
 
   integer, external :: get_option, node_fd_errors
   double precision, external :: node_value
@@ -4348,20 +4330,9 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
      endif
   endif
 
-  !---- centre option
-  if (centre_cptk .or. centre_bttk) then
-     ORBIT00 = ORBIT ; RE00 = RE ; TE00 = TE
-     if (centre_cptk) then
-        ORBIT0 = ORBIT
-        call twcptk(re,orbit0)
-     endif
-     if (centre_bttk) call twbttk(re,te)
-     ORBIT = ORBIT00 ; RE = RE00 ; TE = TE00
-  endif
-
 end SUBROUTINE tmmult
 
-SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
+SUBROUTINE tmoct(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
@@ -4375,6 +4346,7 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !     Input:                                                           *
   !     fsec      (logical) if true, return second order terms.          *
   !     ftrk      (logical) if true, track orbit.                        *
+  !     fcentre   (logical) legacy centre behaviour (no exit effects).   *
   !     Input/output:                                                    *
   !     orbit(6)  (double)  closed orbit.                                *
   !     Remark: the orbit is NOT rotated before and after this routine   *
@@ -4385,17 +4357,17 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical, intent(IN) :: fsec, ftrk
+  logical, intent(IN) :: fsec, ftrk, fcentre
   logical, intent(OUT) :: fmap
-  double precision, intent(IN OUT) :: orbit(6), el
+  double precision, intent(IN) :: el, dl
+  double precision, intent(IN OUT) :: orbit(6)
   double precision, intent(OUT) :: ek(6), re(6,6), te(6,6,6)
 
   logical :: cplxy
   integer :: i, n_ferr, elpar_vl
   double precision :: f_errors(0:maxferr)
-  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   double precision :: rw(6,6), tw(6,6,6)
-  double precision :: sk3, sk3l, sk3s, octr, octi, posr, posi, cr, ci, el0
+  double precision :: sk3, sk3l, sk3s, octr, octi, posr, posi, cr, ci
   double precision :: rfac, pt, bvk, tilt4
 
   integer, external :: node_fd_errors, el_par_vector
@@ -4406,7 +4378,7 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   if ( .not. ftrk) then
      !---- No orbit track requested, use drift map and return
-     call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
+     call tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
      return
   endif
 
@@ -4486,19 +4458,9 @@ SUBROUTINE tmoct(fsec,ftrk,orbit,fmap,el,ek,re,te)
   endif
 
   !---- Concatenate with drift map.
-  !---- centre option
-  if (centre_cptk .or. centre_bttk) then
-     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
-     el0 = el/two
-     ORBIT0 = ORBIT
-     call tmdrf0(fsec,ftrk,orbit0,fmap,el0,ek,re,te)
-     call tmcat(fsec,re,te,rw,tw,re,te)
-     if (centre_cptk) call twcptk(re,orbit0)
-     if (centre_bttk) call twbttk(re,te)
-     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
-  endif
-  call tmdrf0(fsec,ftrk,orbit,fmap,el,ek,re,te)
+  call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   call tmcat(fsec,re,te,rw,tw,re,te)
+  if (fcentre) return
 
   !---- Half kick at exit.
   posr = orbit(1) * (orbit(1)**2 - three*orbit(3)**2) / six
@@ -4949,7 +4911,7 @@ SUBROUTINE tmarb(fsec,ftrk,orbit,fmap,ek,re,te)
 
 end SUBROUTINE tmarb
 
-SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
+SUBROUTINE tmquad(fsec,ftrk,fcentre,plot_tilt,orbit,fmap,el,dl,ek,re,te)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
@@ -4962,28 +4924,29 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
   !     Input:                                                           *
   !     fsec      (logical) if true, return second order terms.          *
   !     ftrk      (logical) if true, track orbit.                        *
+  !     fcentre   (logical) legacy centre behaviour (no exit effects).   *
   !     plot_tilt (double)  external tilt needed for plot                *
+  !     el        (double)  element length.                              *
+  !     dl        (double)  slice length.                                *
   !     Input/output:                                                    *
   !     orbit(6)  (double)  closed orbit.                                *
   !     Remark: the orbit is rotated (in tmmap) before and after this    *
   !     routine                                                          *
   !     Output:                                                          *
   !     fmap      (logical) if true, element has a map.                  *
-  !     el        (double)  element length.                              *
   !     ek(6)     (double)  kick due to element.                         *
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical :: fsec, ftrk, fmap
-  double precision :: plot_tilt, el
+  logical :: fsec, ftrk, fmap, fcentre
+  double precision :: plot_tilt, el, dl
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
   logical :: cplxy
   integer :: i, j, n_ferr, elpar_vl
   double precision :: ct, st, tmp
-  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   double precision :: f_errors(0:maxferr)
-  double precision :: el0, tilt, sk1, pt, sk1s, bvk, rfac
+  double precision :: tilt, sk1, pt, sk1s, bvk, rfac
 
   integer, external :: node_fd_errors
   integer, external :: el_par_vector
@@ -5036,17 +4999,8 @@ SUBROUTINE tmquad(fsec,ftrk,plot_tilt,orbit,fmap,el,ek,re,te)
      orbit(6) = orbit(6) - rfac * (one + pt) ** 2
   endif
 
-  !---- centre option
-  if (centre_cptk .or. centre_bttk) then
-     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
-     el0 = el/two
-     ORBIT0 = ORBIT
-     call qdbody(fsec,ftrk,tilt,sk1,orbit0,el0,ek,re,te)
-     if (centre_cptk) call twcptk(re,orbit0)
-     if (centre_bttk) call twbttk(re,te)
-     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
-  endif
-  call qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
+  call qdbody(fsec,ftrk,tilt,sk1,orbit,dl,ek,re,te)
+  if (fcentre) return
 
   !---- Half radiation effect at exit.
   if (radiate .and. ftrk) then
@@ -5170,7 +5124,7 @@ SUBROUTINE qdbody(fsec,ftrk,tilt,sk1,orbit,el,ek,re,te)
 
 end SUBROUTINE qdbody
 
-SUBROUTINE tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
+SUBROUTINE tmsep(fsec,ftrk,fcentre,orbit,fmap,dl,ek,re,te)
   use twisslfi
   use twiss_elpfi
   use twissbeamfi, only : deltap, pc, charge
@@ -5182,25 +5136,25 @@ SUBROUTINE tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !     Input:                                                           *
   !     fsec      (logical) if true, return second order terms.          *
   !     ftrk      (logical) if true, track orbit.                        *
+  !     fcentre   (logical) legacy centre behaviour (no exit effects).   *
+  !     dl        (double)  slice length.                                *
   !     Input/output:                                                    *
   !     orbit(6)  (double)  closed orbit.                                *
   !     Remark: the orbit is rotated (in tmmap) before and after this    *
   !     routine                                                          *
   !     Output:                                                          *
   !     fmap      (logical) if true, element has a map.                  *
-  !     el        (double)  element length.                              *
   !     ek(6)     (double)  kick due to element.                         *
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical :: fsec, ftrk, fmap
-  double precision :: el
+  logical :: fsec, ftrk, fmap, fcentre
+  double precision :: dl
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
   logical :: cplxy
   integer :: elpar_vl
-  double precision :: el0, tilt, ekick, efield, exfld, eyfld
-  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
+  double precision :: tilt, ekick, efield, exfld, eyfld
   double precision :: ct, st, tmp
 
   integer, external :: el_par_vector
@@ -5211,7 +5165,7 @@ SUBROUTINE tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
   ct = zero
   cplxy = .false.
 
-  fmap = el .ne. zero
+  fmap = dl .ne. zero
   if (.not. fmap) return
 
   if (ftrk) then
@@ -5250,18 +5204,8 @@ SUBROUTINE tmsep(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   ekick  = efield * ten3m * charge / (pc * (one + deltap))
 
-  !---- centre option
-  if (centre_cptk .or. centre_bttk) then
-     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
-     el0 = el/two
-     ORBIT0 = ORBIT
-     call spbody(fsec,ftrk,tilt,ekick,orbit0,el0,ek,re,te)
-     if (centre_cptk) call twcptk(re,orbit0)
-     if (centre_bttk) call twbttk(re,te)
-     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
-  endif
-
-  call spbody(fsec,ftrk,tilt,ekick,orbit,el,ek,re,te)
+  call spbody(fsec,ftrk,tilt,ekick,orbit,dl,ek,re,te)
+  if (fcentre) return
 
   if (tilt .ne. zero)  then
      !---  rotate orbit at exit
@@ -5375,7 +5319,7 @@ SUBROUTINE spbody(fsec,ftrk,tilt,ekick,orbit,el,ek,re,te)
 
 end SUBROUTINE spbody
 
-SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
+SUBROUTINE tmsext(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   use twtrrfi
   use twisslfi
   use twiss_elpfi
@@ -5388,27 +5332,28 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !     Input:                                                           *
   !     fsec      (logical) if true, return second order terms.          *
   !     ftrk      (logical) if true, track orbit.                        *
+  !     fcentre   (logical) legacy centre behaviour (no exit effects).   *
+  !     el        (double)  element length.                              *
+  !     dl        (double)  slice length.                                *
   !     Input/output:                                                    *
   !     orbit(6)  (double)  closed orbit.                                *
   !     Remark: the orbit is rotated (in tmmap) before and after this    *
   !     routine                                                          *
   !     Output:                                                          *
   !     fmap      (logical) if true, element has a map.                  *
-  !     el        (double)  element length.                              *
   !     ek(6)     (double)  kick due to element.                         *
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical :: fsec, ftrk, fmap
-  double precision :: el
+  logical :: fsec, ftrk, fmap, fcentre
+  double precision :: el, dl
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
   logical :: cplxy
   integer :: i, j, n_ferr, elpar_vl
   double precision :: ct, st, tmp
-  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   double precision :: f_errors(0:maxferr)
-  double precision :: el0, tilt, sk2, pt, sk2s, bvk, rfac
+  double precision :: tilt, sk2, pt, sk2s, bvk, rfac
 
   integer, external :: el_par_vector, node_fd_errors
   double precision, external :: node_value
@@ -5459,18 +5404,8 @@ SUBROUTINE tmsext(fsec,ftrk,orbit,fmap,el,ek,re,te)
      orbit(6) = orbit(6) - rfac * (one + pt) ** 2
   endif
 
-  !---- centre option
-  if (centre_cptk.or.centre_bttk) then
-     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
-     el0 = el/two
-     ORBIT0 = ORBIT
-     call sxbody(fsec,ftrk,tilt,sk2,orbit0,el0,ek,re,te)
-     if (centre_cptk) call twcptk(re,orbit0)
-     if (centre_bttk) call twbttk(re,te)
-     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
-  endif
-
-  call sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
+  call sxbody(fsec,ftrk,tilt,sk2,orbit,dl,ek,re,te)
+  if (fcentre) return
 
   !---- Half radiation effects at exit.
   if (ftrk) then
@@ -5571,7 +5506,7 @@ SUBROUTINE sxbody(fsec,ftrk,tilt,sk2,orbit,el,ek,re,te)
 
 end SUBROUTINE sxbody
 
-SUBROUTINE tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
+SUBROUTINE tmsol(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   use twisslfi
   use math_constfi, only : zero, two
   implicit none
@@ -5581,38 +5516,25 @@ SUBROUTINE tmsol(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !     Input:                                                           *
   !     fsec      (logical) if true, return second order terms.          *
   !     ftrk      (logical) if true, track orbit.                        *
+  !     dl        (double)  slice length.                                *
   !     Input/output:                                                    *
   !     orbit(6)  (double)  closed orbit.                                *
   !     Output:                                                          *
   !     fmap      (logical) if true, element has a map.                  *
-  !     el        (double)  element length.                              *
   !     ek(6)     (double)  kick due to element.                         *
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
   logical :: fsec, ftrk, fmap
-  double precision :: el
+  double precision :: dl
   double precision :: orbit(6), ek(6),re(6,6),te(6,6,6)
 
-  double precision :: el0
-  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
-
-  if (el .eq. zero) then
+  if (dl .eq. zero) then
      call tmsol_th(ftrk,orbit,fmap,ek,re,te)
      return
   endif
 
-  !---- centre option
-  if (centre_cptk .or. centre_bttk) then
-     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
-     el0 = el/two
-     ORBIT0 = ORBIT
-     call tmsol0(fsec,ftrk,orbit0,fmap,el0,ek,re,te)
-     if (centre_cptk) call twcptk(re,orbit0)
-     if (centre_bttk) call twbttk(re,te)
-     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
-  endif
-  call tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
+  call tmsol0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
 end SUBROUTINE tmsol
 
@@ -5751,7 +5673,6 @@ SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
 
   logical :: cplxy
   double precision :: psi, ct, st
-  double precision :: orbit0(6), orbit00(6),ek00(6),re00(6,6),te00(6,6,6)
 
   double precision, external :: node_value
 
@@ -5777,16 +5698,6 @@ SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
-  !---- centre option
-  if (centre_cptk.or.centre_bttk) then
-     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
-     if (centre_cptk) then
-        ORBIT0 = ORBIT
-        call twcptk(re,orbit0)
-     endif
-     if (centre_bttk) call twbttk(re,te)
-     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
-  endif
 end SUBROUTINE tmsrot
 
 SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
@@ -5812,7 +5723,6 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
   double precision :: phi, cosphi, sinphi, tanphi
-  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
 
   double precision, external :: node_value
 
@@ -5835,17 +5745,6 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
 
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
-
-  !---- centre option
-  if (centre_cptk.or.centre_bttk) then
-     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
-     if (centre_cptk) then
-        ORBIT0 = ORBIT
-        call twcptk(re,orbit0)
-     endif
-     if (centre_bttk) call twbttk(re,te)
-     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
-  endif
 
 end SUBROUTINE tmyrot
 
@@ -5872,19 +5771,6 @@ SUBROUTINE tmdrf(fsec,ftrk,orbit,fmap,dl,ek,re,te)
   double precision :: dl
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
-  double precision :: dl0
-  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
-
-  !---- centre option
-  if (centre_cptk .or. centre_bttk) then
-     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
-     dl0=dl/two
-     ORBIT0 = ORBIT
-     call tmdrf0(fsec,ftrk,orbit0,fmap,dl0,ek,re,te)
-     if (centre_cptk) call twcptk(re,orbit0)
-     if (centre_bttk) call twbttk(re,te)
-     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
-  endif
   call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
 end SUBROUTINE tmdrf
@@ -5942,7 +5828,7 @@ SUBROUTINE tmdrf0(fsec,ftrk,orbit,fmap,dl,ek,re,te)
 
 end SUBROUTINE tmdrf0
 
-SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
+SUBROUTINE tmrf(fsec,ftrk,fcentre,orbit,fmap,el,ds,ek,re,te)
   use twisslfi
   use twiss_elpfi
   use twissbeamfi, only : deltap, pc
@@ -5956,23 +5842,24 @@ SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
   !     Input:                                                           *
   !     fsec      (logical) if true, return second order terms.          *
   !     ftrk      (logical) if true, track orbit.                        *
+  !     fcentre   (logical) legacy centre behaviour (no exit effects).   *
+  !     el        (double)  element length.                              *
+  !     ds        (double)  slice length.                                *
   !     Input/output:                                                    *
   !     orbit(6)  (double)  closed orbit.                                *
   !     Output:                                                          *
   !     fmap      (logical) if true, element has a map.                  *
-  !     el        (double)  element length.                              *
   !     ek(6)     (double)  kick due to element.                         *
   !     re(6,6)   (double)  transfer matrix.                             *
   !     te(6,6,6) (double)  second-order terms.                          *
   !----------------------------------------------------------------------*
-  logical :: fsec, ftrk, fmap
-  double precision :: el
+  logical :: fsec, ftrk, fmap, fcentre
+  double precision :: el, ds
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
   integer :: elpar_vl
   double precision :: rfv, rff, rfl, dl, omega, vrf, phirf, bvk
   double precision :: ek0(6), rw(6,6), tw(6,6,6)
-  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   double precision :: c0, c1, c2
 
   double precision, external :: node_value
@@ -5986,7 +5873,7 @@ SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   !---- Cavity not excited, use drift map.
   if (rfv .eq. zero) then
-    call tmdrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
+    call tmdrf(fsec,ftrk,orbit,fmap,ds,ek,re,te)
     return
   endif
 
@@ -6030,18 +5917,11 @@ SUBROUTINE tmrf(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   !---- Sandwich cavity between two drifts.
   if (el .ne. zero) then
+    ! TODO: generalize for ds!=0.5
     dl = el / two
     call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
     call tmcat(fsec,re,te,rw,tw,re,te)
-    if (centre_cptk .or. centre_bttk) then
-       ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
-       if (centre_cptk) then
-          ORBIT0 = ORBIT
-          call twcptk(re,orbit0)
-       endif
-       if (centre_bttk) call twbttk(re,te)
-       ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
-    endif
+    if (fcentre) return
     call tmdrf0(fsec,ftrk,orbit,fmap,dl,ek0,rw,tw)
     call tmcat(fsec,rw,tw,re,te,re,te)
   endif
@@ -6651,7 +6531,6 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
   double precision :: phix, phiy, rho4, phixx, phixy, phiyy, rho6, rk, exkc
   double precision :: xb, yb, phixxx, phixxy, phixyy, phiyyy, crx, cry, xr
   double precision :: yr, r, r2, cbx, cby
-  double precision :: orbit0(6), orbit00(6), re00(6,6), te00(6,6,6)
   character(len=20) :: text
   character(len=name_len) :: name
 
@@ -6899,17 +6778,6 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
         re(2,1) = fk / (sx * (sx + sy))
         re(4,3) = fk / (sy * (sx + sy))
      endif
-
-     !---- centre option
-     if (centre_cptk.or.centre_bttk) then
-        ORBIT00 = ORBIT ; RE00 = RE ; TE00 = TE
-        if (centre_cptk) then
-           ORBIT0 = ORBIT
-           call twcptk(re,orbit0)
-        endif
-        if (centre_bttk) call twbttk(re,te)
-        ORBIT = ORBIT00 ; RE = RE00 ; TE = TE00
-     endif
   endif
 
 end SUBROUTINE tmbb_gauss
@@ -6926,7 +6794,6 @@ SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
 
   logical :: bborbit
   logical, save :: firstflag=.true.
-  double precision :: orbit0(6), orbit00(6), re00(6,6), te00(6,6,6)
   double precision :: r0x, r0y, xm, ym, r0x2, r0y2, xs, ys, rho2
   double precision :: phix, phiy, phixx, phixy, phiyy, phixxx, phixxy, phixyy, phiyyy
   double precision :: wi, rho, wx, wy, norm, phir, phirr, phirrr, zz
@@ -7094,17 +6961,6 @@ SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)
         re(2,1) = phixx*fk
         re(4,3) = phiyy*fk
      endif
-
-     !---- centre option
-     if (centre_cptk.or.centre_bttk) then
-        ORBIT00 = ORBIT ; RE00 = RE ; TE00 = TE
-        if (centre_cptk) then
-           ORBIT0 = ORBIT
-           call twcptk(re,orbit0)
-        endif
-        if (centre_bttk) call twbttk(re,te)
-        ORBIT = ORBIT00 ; RE = RE00 ; TE = TE00
-     endif
   endif
 
 end SUBROUTINE tmbb_flattop
@@ -7121,7 +6977,6 @@ SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
 
   logical :: bborbit
   logical, save :: firstflag=.true.
-  double precision :: orbit0(6), orbit00(6), re00(6,6), te00(6,6,6)
   double precision :: r0x, r0y, xm, ym, r0x2, r0y2, xs, ys, rho2
   double precision :: phix, phiy, phixx, phixy, phiyy, phixxx, phixxy, phixyy, phiyyy
   double precision :: wi, rho, wx, wy, phir, phirr, phirrr, zz
@@ -7284,17 +7139,6 @@ SUBROUTINE tmbb_hollowparabolic(fsec,ftrk,orbit,fmap,re,te,fk)
         !---- no tracking desired.
         re(2,1) = zero
         re(4,3) = zero
-     endif
-
-     !---- centre option
-     if (centre_cptk.or.centre_bttk) then
-        ORBIT00 = ORBIT ; RE00 = RE ; TE00 = TE
-        if (centre_cptk) then
-           ORBIT0 = ORBIT
-           call twcptk(re,orbit0)
-        endif
-        if (centre_bttk) call twbttk(re,te)
-        ORBIT = ORBIT00 ; RE = RE00 ; TE = TE00
      endif
   endif
 
@@ -7699,7 +7543,6 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
 
   integer :: nord, i, j, nn, ns, n_ferr, dummyi, ii, jj, kk
   double precision :: elrad, rfac, bvk, tilt, angle
-  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   double precision :: f_errors(0:maxferr)
   double precision :: normal(0:maxmul), skew(0:maxmul)
   double precision :: cangle, sangle, dtmp
@@ -7919,17 +7762,6 @@ SUBROUTINE tmrfmult(fsec,ftrk,orbit,fmap,ek,re,te)
     enddo
   endif
 
-  !---- centre option
-  if (centre_cptk .or. centre_bttk) then
-     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
-     if (centre_cptk) then
-        ORBIT0 = ORBIT
-        call twcptk(re,orbit0)
-     endif
-     if (centre_bttk) call twbttk(re,te)
-     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
-  endif
-
 end SUBROUTINE tmrfmult
 
 SUBROUTINE calcsyncint(rhoinv,blen,k1,e1,e2,betxi,alfxi,dxi,dpxi,I)
@@ -8113,7 +7945,6 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
   integer :: j, ii, jj, kk, dummyi, n_ferr
   double precision :: elrad, rfac, bvk, tilt, cangle, sangle, dtmp
-  double precision :: orbit0(6), orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
   double precision :: f_errors(0:maxferr)
   double precision :: ed(6), rd(6,6), td(6,6,6)
 
@@ -8288,17 +8119,6 @@ SUBROUTINE tmcrab(fsec,ftrk,orbit,fmap,el,ek,re,te)
   call tmcat1(fsec,ed,rd,td,ek,re,te,ek,re,te);
   call tmdrf(fsec,ftrk,orbit,fmap,el/two,ed,rd,td);
   call tmcat1(fsec,ek,re,te,ed,rd,td,ek,re,te);
-
-  !---- centre option
-  if (centre_cptk .or. centre_bttk) then
-     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
-     if (centre_cptk) then
-        ORBIT0 = ORBIT
-        call twcptk(re,orbit0)
-     endif
-     if (centre_bttk) call twbttk(re,te)
-     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
-  endif
 
 end SUBROUTINE tmcrab
 SUBROUTINE twcpin_print(rt,r0mat )

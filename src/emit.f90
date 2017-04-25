@@ -139,7 +139,7 @@ subroutine emit(deltap, tol, orbit0, disp0, rt, u0, emit_v, nemit_v, &
   ORBIT1 = ORBIT 
 
   !---- Element matrix and length.
-  call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te)
+  call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te,.false.,el)
 
   if (fmap) then
      !---- Advance dispersion.
