@@ -865,7 +865,7 @@ aper_header(struct table* aper_t, struct aper_node *lim)
   /* puts beam and aperture parameters at start of the aperture table */
 {
   int i, h_length = 26; // not used, nint=1;
-  double dtmp, vtmp[4]; // not used, deltap_twiss;
+  double vtmp[4]; // not used, deltap_twiss;
   char tmp[NAME_L], name[NAME_L], *stmp;
 
   strncpy(name, lim->name, sizeof name);
@@ -888,102 +888,60 @@ aper_header(struct table* aper_t, struct aper_node *lim)
   /* beam properties */
   if (aper_t->header == NULL)  aper_t->header = new_char_p_array(h_length);
   strncpy(tmp, current_sequ->name, sizeof tmp);
-  sprintf(c_dum->c, v_format("@ SEQUENCE         %%%02ds \"%s\""),strlen(tmp),stoupper(tmp));
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+  table_add_header(aper_t, "@ SEQUENCE         %%%02ds \"%s\"", strlen(tmp),stoupper(tmp));
   i = get_string("beam", "particle", tmp);
-  sprintf(c_dum->c, v_format("@ PARTICLE         %%%02ds \"%s\""),i,stoupper(tmp));
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "mass");
-  sprintf(c_dum->c, v_format("@ MASS             %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "energy");
-  sprintf(c_dum->c, v_format("@ ENERGY           %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "pc");
-  sprintf(c_dum->c, v_format("@ PC               %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "gamma");
-  sprintf(c_dum->c, v_format("@ GAMMA            %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+  table_add_header(aper_t, "@ PARTICLE         %%%02ds \"%s\"",i,stoupper(tmp));
+  table_add_header(aper_t, "@ MASS             %%le  %F", get_value("beam", "mass"));
+  table_add_header(aper_t, "@ ENERGY           %%le  %F", get_value("beam", "energy"));
+  table_add_header(aper_t, "@ PC               %%le  %F", get_value("beam", "pc"));
+  table_add_header(aper_t, "@ GAMMA            %%le  %F", get_value("beam", "gamma"));
   // 2015-Mar-03  12:05:58  ghislain: added
-  dtmp = get_value("beam", "beta");
-  sprintf(c_dum->c, v_format("@ BETA             %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+  table_add_header(aper_t, "@ BETA             %%le  %F", get_value("beam", "beta"));
   // end addition
   // 2015-Mar-11  15:30:15  ghislain: changed to get emittances from BEAM command, not from input parameters.
-  dtmp = get_value("beam", "exn");
-  sprintf(c_dum->c, v_format("@ EXN              %%le  %G"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = get_value("beam", "eyn");
-  sprintf(c_dum->c, v_format("@ EYN              %%le  %G"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = command_par_value("dqf", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ DQF              %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = command_par_value("betaqfx", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ BETAQFX          %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = command_par_value("dparx", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ PARAS_DX         %%le    %g"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = command_par_value("dpary", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ PARAS_DY         %%le    %g"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = command_par_value("dp", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ DP_BUCKET_SIZE   %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+  table_add_header(aper_t, "@ EXN              %%le  %G", get_value("beam", "exn"));
+  table_add_header(aper_t, "@ EYN              %%le  %G", get_value("beam", "eyn"));
+  table_add_header(aper_t, "@ DQF              %%le  %F", command_par_value("dqf", this_cmd->clone));
+  table_add_header(aper_t, "@ BETAQFX          %%le  %F", command_par_value("betaqfx", this_cmd->clone));
+  table_add_header(aper_t, "@ PARAS_DX         %%le    %g", command_par_value("dparx", this_cmd->clone));
+  table_add_header(aper_t, "@ PARAS_DY         %%le    %g", command_par_value("dpary", this_cmd->clone));
+  table_add_header(aper_t, "@ DP_BUCKET_SIZE   %%le  %F", command_par_value("dp", this_cmd->clone));
 
   // LD: summary table is corrupted by embedded twiss, use saved value
   // double_from_table_row("summ","deltap",&nint,&deltap_twiss);
-  sprintf(c_dum->c, v_format("@ TWISS_DELTAP     %%le  %F"), lim->deltap_twiss);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+  table_add_header(aper_t, "@ TWISS_DELTAP     %%le  %F", lim->deltap_twiss);
 
-  dtmp = command_par_value("cor", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ CO_RADIUS        %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = command_par_value("bbeat", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ BETA_BEATING     %%le  %F"), dtmp);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-  dtmp = command_par_value("nco", this_cmd->clone);
-  sprintf(c_dum->c, v_format("@ NB_OF_ANGLES     %%d       %g"), dtmp*4);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+  table_add_header(aper_t, "@ CO_RADIUS        %%le  %F", command_par_value("cor", this_cmd->clone));
+  table_add_header(aper_t, "@ BETA_BEATING     %%le  %F", command_par_value("bbeat", this_cmd->clone));
+  table_add_header(aper_t, "@ NB_OF_ANGLES     %%d       %g", command_par_value("nco", this_cmd->clone)*4);
 
   /* if a filename with halo coordinates is given, need not show halo */
   stmp = command_par_string("halofile", this_cmd->clone);
   if (stmp)
   {
     strncpy(tmp, stmp, sizeof tmp);
-    sprintf(c_dum->c, v_format("@ HALOFILE         %%%02ds \"%s\""),strlen(tmp),stoupper(tmp));
-    aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+    table_add_header(aper_t, "@ HALOFILE         %%%02ds \"%s\"",strlen(tmp),stoupper(tmp));
   }
   else
   {
     i = command_par_vector("halo", this_cmd->clone, vtmp);
-    sprintf(c_dum->c, v_format("@ HALO_PRIM        %%le       %g"),vtmp[0]);
-    aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-    sprintf(c_dum->c, v_format("@ HALO_R           %%le       %g"),vtmp[1]);
-    aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-    sprintf(c_dum->c, v_format("@ HALO_H           %%le       %g"),vtmp[2]);
-    aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
-    sprintf(c_dum->c, v_format("@ HALO_V           %%le       %g"),vtmp[3]);
-    aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+    table_add_header(aper_t, "@ HALO_PRIM        %%le       %g",vtmp[0]);
+    table_add_header(aper_t, "@ HALO_R           %%le       %g",vtmp[1]);
+    table_add_header(aper_t, "@ HALO_H           %%le       %g",vtmp[2]);
+    table_add_header(aper_t, "@ HALO_V           %%le       %g",vtmp[3]);
   }
   /* show filename with pipe coordinates if given */
   stmp = command_par_string("pipefile", this_cmd->clone);
   if (stmp)
   {
     strncpy(tmp, stmp, sizeof tmp);
-    sprintf(c_dum->c, v_format("@ PIPEFILE         %%%02ds \"%s\""), strlen(tmp), stoupper(tmp) );
-    aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+    table_add_header(aper_t, "@ PIPEFILE         %%%02ds \"%s\"", strlen(tmp), stoupper(tmp) );
   }
 
   /* 2013-Nov-18  13:49:45  ghislain: changed n1min and at_element strings to uppercase in output to TFS */
-  sprintf(c_dum->c, v_format("@ N1MIN            %%le   %g"), lim->n1);
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+  table_add_header(aper_t, "@ N1MIN            %%le   %g", lim->n1);
   set_value("beam","n1min",&lim->n1);
-
-  sprintf(c_dum->c, v_format("@ AT_ELEMENT       %%%02ds  \"%s\""), strlen(name), stoupper(name) );
-  aper_t->header->p[aper_t->header->curr++] = tmpbuff(c_dum->c);
+  table_add_header(aper_t, "@ AT_ELEMENT       %%%02ds  \"%s\"", strlen(name), stoupper(name));
 }
 
 static void

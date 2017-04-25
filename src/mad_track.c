@@ -327,7 +327,6 @@ track_pteigen(double* eigen)
 {
   int i, j, pos;
   struct table* t;
-  double tmp;
 
   if ((pos = name_list_pos("trackone", table_register->names)) > -1) {
     t = table_register->tables[pos];
@@ -340,31 +339,18 @@ track_pteigen(double* eigen)
       return;
     }
 
-    sprintf(c_dum->c, v_format("@ XC               %%le  %F"), orbit0[0]);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-    sprintf(c_dum->c, v_format("@ PXC              %%le  %F"), orbit0[1]);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-    sprintf(c_dum->c, v_format("@ YC               %%le  %F"), orbit0[2]);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-    sprintf(c_dum->c, v_format("@ PYC              %%le  %F"), orbit0[3]);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-    sprintf(c_dum->c, v_format("@ TC               %%le  %F"), orbit0[4]);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-    sprintf(c_dum->c, v_format("@ PTC              %%le  %F"), orbit0[5]);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-    tmp = get_value("beam", "ex");
-    sprintf(c_dum->c, v_format("@ EX               %%le  %F"), tmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-    tmp = get_value("beam", "ey");
-    sprintf(c_dum->c, v_format("@ EY               %%le  %F"), tmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
-    tmp = get_value("beam", "et");
-    sprintf(c_dum->c, v_format("@ ET               %%le  %F"), tmp);
-    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+    table_add_header(t, "@ XC               %%le  %F", orbit0[0]);
+    table_add_header(t, "@ PXC              %%le  %F", orbit0[1]);
+    table_add_header(t, "@ YC               %%le  %F", orbit0[2]);
+    table_add_header(t, "@ PYC              %%le  %F", orbit0[3]);
+    table_add_header(t, "@ TC               %%le  %F", orbit0[4]);
+    table_add_header(t, "@ PTC              %%le  %F", orbit0[5]);
+    table_add_header(t, "@ EX               %%le  %F", get_value("beam", "ex"));
+    table_add_header(t, "@ EY               %%le  %F", get_value("beam", "ey"));
+    table_add_header(t, "@ ET               %%le  %F", get_value("beam", "et"));
     for (i = 0; i < 6; i++) {
       for (j = 0; j < 6; j++) {
-        sprintf(c_dum->c, v_format("@ E%d%d              %%le  %F"), i+1, j+1, eigen[6*j+i]);
-        t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+        table_add_header(t, "@ E%d%d              %%le  %F", i+1, j+1, eigen[6*j+i]);
       }
     }
   }

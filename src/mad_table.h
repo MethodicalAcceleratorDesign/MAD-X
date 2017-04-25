@@ -69,6 +69,7 @@ void    check_table(char* string);
 void    check_tabindex(char* string);
 void    check_tabstring(char* string);
 double  table_value(void);
+void    table_add_header(struct table*, const char* format, ...);
 void    add_to_table_list(struct table*, struct table_list*);
 void    add_vars_to_table(struct table*, double scale);
 void    set_vars_from_table(struct table*);

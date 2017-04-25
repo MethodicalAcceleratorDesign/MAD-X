@@ -37,7 +37,6 @@ sdds_get_parm(SDDS_TABLE *SDDS_table, struct table *tfs_table)
   char    **parvalstr;
 
   int     h_length;
-  char    s_dum[1000];
 
   char    **cpar;
 
@@ -57,32 +56,27 @@ sdds_get_parm(SDDS_TABLE *SDDS_table, struct table *tfs_table)
          if(pardef->type == SDDS_LONG) {
            parvall = (long *)parval;
            if (get_option("debug")) printf("Parameter: %s, value: %ld\n",cpar[i2],*parvall);
-           sprintf(s_dum, v_format("@ %-16s %%ld  %ld"), cpar[i2],*parvall);
-           tfs_table->header->p[tfs_table->header->curr++] = tmpbuff(s_dum);
+           table_add_header(tfs_table, "@ %-16s %%ld  %ld", cpar[i2],*parvall);
          }
          if(pardef->type == SDDS_SHORT) {
            parvals = (short *)parval;
            if (get_option("debug")) printf("Parameter: %s, value: %ld\n",cpar[i2],(long)*parvals);
-           sprintf(s_dum, v_format("@ %-16s %%ld  %ld"), cpar[i2],(long)*parvals);
-           tfs_table->header->p[tfs_table->header->curr++] = tmpbuff(s_dum);
+           table_add_header(tfs_table, "@ %-16s %%ld  %ld", cpar[i2],(long)*parvals);
          }
          if(pardef->type == SDDS_FLOAT) {
            parvalf = (float *)parval;
            if (get_option("debug")) printf("Parameter: %s, value: %e\n",cpar[i2],(double)*parvalf);
-           sprintf(s_dum, v_format("@ %-16s %%e  %e"), cpar[i2],(double)*parvalf);
-           tfs_table->header->p[tfs_table->header->curr++] = tmpbuff(s_dum);
+           table_add_header(tfs_table, "@ %-16s %%e  %e", cpar[i2],(double)*parvalf);
          }
          if(pardef->type == SDDS_DOUBLE) {
            parvald = (double *)parval;
            if (get_option("debug")) printf("Parameter: %s, value: %e\n",cpar[i2],*parvald);
-           sprintf(s_dum, v_format("@ %-16s %%le  %le"), cpar[i2],*parvald);
-           tfs_table->header->p[tfs_table->header->curr++] = tmpbuff(s_dum);
+           table_add_header(tfs_table, "@ %-16s %%le  %le", cpar[i2],*parvald);
          }
          if(pardef->type == SDDS_STRING) {
            parvalstr = SDDS_GetParameter(SDDS_table,cpar[i2],NULL);
            if (get_option("debug")) printf("Parameter: %s, value: %s \n",cpar[i2],*parvalstr);
-           sprintf(s_dum, v_format("@ %-16s %%%02ds \"%s\""), cpar[i2],strlen(*parvalstr),*parvalstr);
-           tfs_table->header->p[tfs_table->header->curr++] = tmpbuff(s_dum);
+           table_add_header(tfs_table, "@ %-16s %%%02ds \"%s\"", cpar[i2],strlen(*parvalstr),*parvalstr);
          }
 
       }

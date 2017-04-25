@@ -2338,6 +2338,16 @@ rename_table(struct table *tbl, const char *name )
   tbl->name[NAME_L-1] = '\0';
 }
 
+void
+table_add_header(struct table* t, const char* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    vsprintf(c_dum->c, v_format(format), args);
+    t->header->p[t->header->curr++] = tmpbuff(c_dum->c);
+    va_end(args);
+}
+
 #if 0 // not used...
 /*
   LD: 2012.11.29
