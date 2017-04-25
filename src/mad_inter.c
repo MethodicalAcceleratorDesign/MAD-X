@@ -16,7 +16,6 @@ interpolate_node(int *nint)
   int j;
   double bvk, angle, e1, e2, h1, h2, fint, fintx, hgap;
   double zero = 0.0;
-  char *elem_name;
   int rbend_flag, bend_flag = 0;
 
   /* Set up length, angle and e2 of the first slice
@@ -31,9 +30,8 @@ interpolate_node(int *nint)
 
 
   el = current_node->p_elem;
-  elem_name = el->base_type->name;
-  rbend_flag = strcmp(elem_name, "rbend") == 0;
-   bend_flag = strcmp(elem_name, "sbend") == 0 || rbend_flag;
+  rbend_flag = strcmp(el->base_type->name, "rbend") == 0;
+  bend_flag  = strcmp(el->base_type->name, "sbend") == 0 || rbend_flag;
 
   backup.bend_flag = bend_flag;
   backup.rbend_flag = rbend_flag;
@@ -63,7 +61,7 @@ interpolate_node(int *nint)
     if (rbend_flag) {
       e1 += bvk * angle / 2.0;
       e2 += bvk * angle / 2.0;
-      strcpy(elem_name,"sbend");
+      el->base_type = find_element("sbend", base_type_list);
       el->def->mad8_type = 3;
     }
 
@@ -168,10 +166,6 @@ reset_interpolation(int *nint)
   current_node = backup.current_node;
   current_node->next->previous = current_node;
   current_node->previous->next = current_node;
-
-  if (backup.rbend_flag) {
-    strcpy(current_node->p_elem->base_type->name, "rbend");
-  }
 
   backup.current_node = 0;
   return 0;
