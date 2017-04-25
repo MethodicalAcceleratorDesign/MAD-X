@@ -1659,9 +1659,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   double precision :: orbit(6), orbit2(6)
   double precision :: bvk, sumloc, pos0, sd, el
   double precision :: al_errors(align_max)
-  character(len=name_len) :: bxmax_name='nil ', bymax_name='nil '
-  character(len=name_len) :: dxmax_name='nil ', dymax_name='nil '
-  character(len=name_len) :: xcomax_name='nil ', ycomax_name='nil ', el_name
+  ! character(len=name_len) el_name
   character(len=130) :: msg
 
   integer, external :: el_par_vector, advance_node, restart_sequ, get_option, node_al_errors
@@ -1747,7 +1745,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   if ( el .gt. eps) ele_body = .true.
 
   !--- 2013-Nov-14  10:34:00  ghislain: add acquisition of name of element here.
-  call element_name(el_name,len(el_name))
+  !call element_name(el_name,len(el_name))
 
   opt_fun(70) = g_elpar(g_kmax)
   opt_fun(71) = g_elpar(g_kmin)
@@ -1821,12 +1819,12 @@ SUBROUTINE twcpgo(rt,orbit0)
   iecnt=iecnt+1
 
   !--- save maxima and name of elements where they occur
-  if (betx .gt. bxmax) bxmax = betx; bxmax_name = el_name
-  if (bety .gt. bymax) bymax = bety; bymax_name = el_name
-  if (abs(disp(1)) .gt. dxmax) dxmax = abs(disp(1)); dxmax_name = el_name
-  if (abs(disp(3)) .gt. dymax) dymax = abs(disp(3)); dymax_name = el_name
-  if (abs(orbit(1)) .gt. xcomax) xcomax = abs(orbit(1)); xcomax_name = el_name
-  if (abs(orbit(3)) .gt. ycomax) ycomax = abs(orbit(3)); ycomax_name = el_name
+  bxmax  = max(bxmax,  betx)
+  bymax  = max(bymax,  bety)
+  dxmax  = max(dxmax,  abs(disp(1)))
+  dymax  = max(dymax,  abs(disp(3)))
+  xcomax = max(xcomax, abs(orbit(1)))
+  ycomax = max(ycomax, abs(orbit(3)))
 
 
   !--- 2013-Nov-14  14:18:07  ghislain: should only calculate the RMS values for active elements,
