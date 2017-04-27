@@ -1765,7 +1765,9 @@ SUBROUTINE twcpgo(rt,orbit0)
   endif
 
   if (centre) then
+    ! backup optical functions
     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
+
     call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te,.true.,el/two)
 
      betx0=betx; alfx0=alfx; amux0=amux
@@ -1779,25 +1781,14 @@ SUBROUTINE twcpgo(rt,orbit0)
     ! some only in certain cases):
     if (fmap) call twcptk(re,orbit)
 
-  bxmax  = max(bxmax,  betx)
-  bymax  = max(bymax,  bety)
-  dxmax  = max(dxmax,  abs(disp(1)))
-  dymax  = max(dymax,  abs(disp(3)))
-  xcomax = max(xcomax, abs(orbit(1)))
-  ycomax = max(ycomax, abs(orbit(3)))
+    call save_opt_fun()
+    call twprep(save,1,opt_fun,currpos+el/two)
 
-     betx=betx0; alfx=alfx0; amux=amux0
-     bety=bety0; alfy=alfy0; amuy=amuy0
-     RMAT = RMAT0 ; disp = disp00
-     if (rmatrix) RW = RW0
-
-     ! AFTER DISP RESTORE:
-     sd = rt(5,6) + dot_product(RT(5,1:4), DISP(1:4))
-     eta = - sd * beta**2 / circ
-     alfa = one / gamma**2 + eta
-     opt_fun(74) = alfa
-     call twprep(save,1,opt_fun,currpos+el/two)
-
+    ! restore optical functions
+    betx=betx0; alfx=alfx0; amux=amux0
+    bety=bety0; alfy=alfy0; amuy=amuy0
+    RMAT = RMAT0 ; disp = disp00
+    if (rmatrix) RW = RW0
     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
   endif
 
@@ -1821,22 +1812,9 @@ SUBROUTINE twcpgo(rt,orbit0)
 
   sumloc = sumloc + el
   if (sector_sel) call twwmap(sumloc, orbit)
-  ! AFTER DISP UPDATE:
-  sd = rt(5,6) + dot_product(RT(5,1:4),DISP(1:4))
-  eta = - sd * beta**2 / circ
-  alfa = one / gamma**2 + eta
-  opt_fun(74) = alfa
+
   currpos=currpos+el
   iecnt=iecnt+1
-
-  !--- save maxima and name of elements where they occur
-  bxmax  = max(bxmax,  betx)
-  bymax  = max(bymax,  bety)
-  dxmax  = max(dxmax,  abs(disp(1)))
-  dymax  = max(dymax,  abs(disp(3)))
-  xcomax = max(xcomax, abs(orbit(1)))
-  ycomax = max(ycomax, abs(orbit(3)))
-
 
   !--- 2013-Nov-14  14:18:07  ghislain: should only calculate the RMS values for active elements,
   !                           skipping markers(25), beambeam(22), changeref(35), translation(36),
@@ -1847,6 +1825,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   sigdx  = sigdx  + disp(1)**2
   sigdy  = sigdy  + disp(3)**2
 
+  call save_opt_fun()
   if (.not. centre) then
      call twprep(save,1,opt_fun,currpos)
   endif
@@ -1867,6 +1846,47 @@ SUBROUTINE twcpgo(rt,orbit0)
   if (cplxt .or. radiate) &
        call fort_warn('TWCPGO: ','TWISS uses the RF system or synchrotron radiation only '// &
                        'to find the closed orbit, for optical calculations it ignores both.')
+
+contains
+
+subroutine save_opt_fun()
+    integer :: i1, i2
+
+  !--- save maxima and name of elements where they occur
+  bxmax  = max(bxmax,  betx)
+  bymax  = max(bymax,  bety)
+  dxmax  = max(dxmax,  abs(disp(1)))
+  dymax  = max(dymax,  abs(disp(3)))
+  xcomax = max(xcomax, abs(orbit(1)))
+  ycomax = max(ycomax, abs(orbit(3)))
+
+     opt_fun(3) = betx
+     opt_fun(4) = alfx
+     opt_fun(5) = amux
+     opt_fun(6) = bety
+     opt_fun(7) = alfy
+     opt_fun(8) = amuy
+     OPT_FUN(9:14) = ORBIT
+     OPT_FUN(15:18) = disp(1:4)
+
+     opt_fun(29) = rmat(1,1)
+     opt_fun(30) = rmat(1,2)
+     opt_fun(31) = rmat(2,1)
+     opt_fun(32) = rmat(2,2)
+
+     ! !IT sigma matrix(1:6, 1:6) = opt_fun(75:110)
+     do i1=1,6
+        do i2=1,6
+           opt_fun(74 + (i1-1)*6 + i2) = sigmat(i1,i2)
+        enddo
+     enddo
+
+  sd = rt(5,6) + dot_product(RT(5,1:4),DISP(1:4))
+  eta = - sd * beta**2 / circ
+  alfa = one / gamma**2 + eta
+  opt_fun(74) = alfa
+end subroutine save_opt_fun
+
 end SUBROUTINE twcpgo
 
 SUBROUTINE twcptk(re,orbit)
@@ -1922,11 +1942,6 @@ SUBROUTINE twcptk(re,orbit)
 
   !---- Dispersion.
   DT = matmul(RE, DISP)
-
-  OPT_FUN(15:18) = DT(1:4)
-     DISP(1:4) = DT(1:4)
-     disp(5) = zero
-     disp(6) = one
 
   ! RE(1:4,1:4) = ( A , B
   !                 C , D)
@@ -2118,25 +2133,9 @@ SUBROUTINE twcptk(re,orbit)
      endif
   endif
 
-     opt_fun(3) = betx
-     opt_fun(4) = alfx
-     opt_fun(5) = amux
-     opt_fun(6) = bety
-     opt_fun(7) = alfy
-     opt_fun(8) = amuy
-     OPT_FUN(9:14) = ORBIT
-
-     opt_fun(29) = rmat(1,1)
-     opt_fun(30) = rmat(1,2)
-     opt_fun(31) = rmat(2,1)
-     opt_fun(32) = rmat(2,2)
-
-     ! !IT sigma matrix(1:6, 1:6) = opt_fun(75:110)
-     do i1=1,6
-     do i2=1,6
-       opt_fun(74 + (i1-1)*6 + i2) = sigmat(i1,i2)
-     enddo
-     enddo
+     DISP(1:4) = DT(1:4)
+     disp(5) = zero
+     disp(6) = one
 
   if (rmatrix) then
     do i1=1,6
@@ -2460,10 +2459,6 @@ SUBROUTINE twcptk_sagan(re,orbit) ! new, RD matrix, talman, sagan
   call element_name(name,len(name))
   !---- Dispersion.
   DT = matmul(RE, DISP)
-  OPT_FUN(15:18) = DT(1:4)
-     DISP(1:4) = DT(1:4)
-     disp(5) = zero
-     disp(6) = one
 
   ! RE(1:4,1:4) = ( A , B
   !                 C , D)
@@ -2637,18 +2632,6 @@ SUBROUTINE twcptk_sagan(re,orbit) ! new, RD matrix, talman, sagan
         RC = matmul(RW,matmul(ROTM,RWI))
      endif
   endif
-
-     opt_fun(3) = betx
-     opt_fun(4) = alfx
-     opt_fun(5) = amux
-     opt_fun(6) = bety
-     opt_fun(7) = alfy
-     opt_fun(8) = amuy
-
-     opt_fun(29) = rmat(1,1)
-     opt_fun(30) = rmat(1,2)
-     opt_fun(31) = rmat(2,1)
-     opt_fun(32) = rmat(2,2)
 
   if (rmatrix) then
      do i1=1,6
