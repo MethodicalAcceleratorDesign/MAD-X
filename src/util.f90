@@ -344,7 +344,7 @@ module twisscfi
   double precision :: bxmax=0.d0, dxmax=0.d0, bymax=0.d0, dymax=0.d0
   double precision :: xcomax=0.d0, ycomax=0.d0, sigxco=0.d0, sigyco=0.d0
   double precision :: sigdx=0.d0, sigdy=0.d0
-  double precision :: wgt=0.d0, suml=0.d0, circ=0.d0, eta=0.d0, alfa=0.d0, gamtr=0.d0, currpos=0.d0
+  double precision :: wgt=0.d0, suml=0.d0, circ=0.d0, eta=0.d0, alfa=0.d0, gamtr=0.d0
   double precision :: wx=0.d0, phix=0.d0, dmux=0.d0, xix=0.d0, wy=0.d0, phiy=0.d0, dmuy=0.d0, xiy=0.d0
   double precision :: synch_1=0.d0, synch_2=0.d0, synch_3=0.d0, synch_4=0.d0, synch_5=0.d0
   double precision :: gammacp=1.d0
