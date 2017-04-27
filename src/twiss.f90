@@ -1656,12 +1656,12 @@ SUBROUTINE twcpgo(rt,orbit0)
   logical :: fmap, cplxy, cplxt, sector_sel
   integer :: i, i1, i2, iecnt, code, save, n_align, elpar_vl
   double precision :: ek(6), re(6,6), rwi(6,6), rc(6,6), te(6,6,6)
-  double precision :: orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
+  double precision :: orbit00(6), ek00(6), re00(6,6), te00(6,6,6), disp00(6)
   double precision :: rw0(6,6), rmat0(2,2)
   double precision :: alfx0, betx0, amux0
   double precision :: alfy0, bety0, amuy0
   double precision :: orbit(6), orbit2(6)
-  double precision :: bvk, sumloc, pos0, sd, el
+  double precision :: bvk, sumloc, sd, el
   double precision :: al_errors(align_max)
   ! character(len=name_len) el_name
   character(len=130) :: msg
@@ -1672,7 +1672,6 @@ SUBROUTINE twcpgo(rt,orbit0)
 
   !---- Initialization
   sumloc=zero
-  pos0=zero
   amux=zero
   amuy=zero
   currpos=zero
@@ -1771,30 +1770,33 @@ SUBROUTINE twcpgo(rt,orbit0)
 
      betx0=betx; alfx0=alfx; amux0=amux
      bety0=bety; alfy0=alfy; amuy0=amuy
-     RMAT0 = RMAT
+     RMAT0 = RMAT ; disp00 = disp
      if (rmatrix) RW0 = RW
 
-    centre_cptk = .true.
     ! TG: the `fmap` condition is only an approximation of the previous
     ! behaviour of the `centre` option - which was handled inconsistently
     ! across different elements (some never called twcptk, some always did,
     ! some only in certain cases):
     if (fmap) call twcptk(re,orbit)
-    centre_cptk = .false.
 
-     OPT_FUN(9:14) = ORBIT
+  bxmax  = max(bxmax,  betx)
+  bymax  = max(bymax,  bety)
+  dxmax  = max(dxmax,  abs(disp(1)))
+  dymax  = max(dymax,  abs(disp(3)))
+  xcomax = max(xcomax, abs(orbit(1)))
+  ycomax = max(ycomax, abs(orbit(3)))
+
      betx=betx0; alfx=alfx0; amux=amux0
      bety=bety0; alfy=alfy0; amuy=amuy0
-     RMAT = RMAT0
+     RMAT = RMAT0 ; disp = disp00
      if (rmatrix) RW = RW0
 
-     pos0 = currpos
-     currpos = currpos + el/two
+     ! AFTER DISP RESTORE:
      sd = rt(5,6) + dot_product(RT(5,1:4), DISP(1:4))
      eta = - sd * beta**2 / circ
      alfa = one / gamma**2 + eta
      opt_fun(74) = alfa
-     call twprep(save,1,opt_fun,currpos)
+     call twprep(save,1,opt_fun,currpos+el/two)
 
     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
   endif
@@ -1819,21 +1821,12 @@ SUBROUTINE twcpgo(rt,orbit0)
 
   sumloc = sumloc + el
   if (sector_sel) call twwmap(sumloc, orbit)
+  ! AFTER DISP UPDATE:
   sd = rt(5,6) + dot_product(RT(5,1:4),DISP(1:4))
   eta = - sd * beta**2 / circ
   alfa = one / gamma**2 + eta
   opt_fun(74) = alfa
-  if (centre) then
-     bxmax  = max(opt_fun(3)      ,bxmax)
-     bymax  = max(opt_fun(6)      ,bymax)
-     dxmax  = max(abs(opt_fun(15)),dxmax)
-     dymax  = max(abs(opt_fun(17)),dymax)
-     xcomax = max(abs(opt_fun(9 )),xcomax)
-     ycomax = max(abs(opt_fun(11)),ycomax)
-  else
-     OPT_FUN(9:14) = ORBIT
-     currpos=currpos+el
-  endif
+  currpos=currpos+el
   iecnt=iecnt+1
 
   !--- save maxima and name of elements where they occur
@@ -1856,24 +1849,6 @@ SUBROUTINE twcpgo(rt,orbit0)
 
   if (.not. centre) then
      call twprep(save,1,opt_fun,currpos)
-  else
-     currpos = pos0 + el
-
-     opt_fun(2) = currpos
-     opt_fun(3) = betx
-     opt_fun(4) = alfx
-     opt_fun(5) = amux
-     opt_fun(6) = bety
-     opt_fun(7) = alfy
-     opt_fun(8) = amuy
-
-     OPT_FUN(9:14) = ORBIT
-     OPT_FUN(15:18) = DISP(1:4)
-
-     opt_fun(29) = rmat(1,1)
-     opt_fun(30) = rmat(1,2)
-     opt_fun(31) = rmat(2,1)
-     opt_fun(32) = rmat(2,2)
   endif
 
   if (advance_node() .ne. 0) goto 10
@@ -1948,12 +1923,10 @@ SUBROUTINE twcptk(re,orbit)
   !---- Dispersion.
   DT = matmul(RE, DISP)
 
-  if (.not.centre .or. centre_cptk) OPT_FUN(15:18) = DT(1:4)
-  if (.not.centre_cptk) then
+  OPT_FUN(15:18) = DT(1:4)
      DISP(1:4) = DT(1:4)
      disp(5) = zero
      disp(6) = one
-  endif
 
   ! RE(1:4,1:4) = ( A , B
   !                 C , D)
@@ -2145,13 +2118,13 @@ SUBROUTINE twcptk(re,orbit)
      endif
   endif
 
-  if (.not.centre.or.centre_cptk) then
      opt_fun(3) = betx
      opt_fun(4) = alfx
      opt_fun(5) = amux
      opt_fun(6) = bety
      opt_fun(7) = alfy
      opt_fun(8) = amuy
+     OPT_FUN(9:14) = ORBIT
 
      opt_fun(29) = rmat(1,1)
      opt_fun(30) = rmat(1,2)
@@ -2164,7 +2137,6 @@ SUBROUTINE twcptk(re,orbit)
        opt_fun(74 + (i1-1)*6 + i2) = sigmat(i1,i2)
      enddo
      enddo
-  endif
 
   if (rmatrix) then
     do i1=1,6
@@ -2488,12 +2460,10 @@ SUBROUTINE twcptk_sagan(re,orbit) ! new, RD matrix, talman, sagan
   call element_name(name,len(name))
   !---- Dispersion.
   DT = matmul(RE, DISP)
-  if (.not.centre .or. centre_cptk) OPT_FUN(15:18) = DT(1:4)
-  if (.not.centre_cptk) then
+  OPT_FUN(15:18) = DT(1:4)
      DISP(1:4) = DT(1:4)
      disp(5) = zero
      disp(6) = one
-  endif
 
   ! RE(1:4,1:4) = ( A , B
   !                 C , D)
@@ -2668,7 +2638,6 @@ SUBROUTINE twcptk_sagan(re,orbit) ! new, RD matrix, talman, sagan
      endif
   endif
 
-  if (.not.centre.or.centre_cptk) then
      opt_fun(3) = betx
      opt_fun(4) = alfx
      opt_fun(5) = amux
@@ -2680,7 +2649,6 @@ SUBROUTINE twcptk_sagan(re,orbit) ! new, RD matrix, talman, sagan
      opt_fun(30) = rmat(1,2)
      opt_fun(31) = rmat(2,1)
      opt_fun(32) = rmat(2,2)
-  endif
 
   if (rmatrix) then
      do i1=1,6
