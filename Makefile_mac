@@ -33,6 +33,14 @@ all-macosx32-intel: madx-macosx32-intel numdiff-macosx32-intel # libmadx-macosx3
 all-macosx64-intel: madx-macosx64-intel numdiff-macosx64-intel # libmadx-macosx64-intel libptc-macosx64-intel
 
 #
+# minimum backward compatibility (may trig warnings with macport libs > 10.8)
+#
+
+ifeq ($(MACOSX_DEPLOYMENT_TARGET),)
+  export MACOSX_DEPLOYMENT_TARGET=10.8
+endif
+
+#
 # cleanbuild platform specific
 #
 cleanarch:
