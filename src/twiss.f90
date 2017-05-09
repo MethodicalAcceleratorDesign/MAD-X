@@ -137,7 +137,9 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
 
   !IT: SIGMA MATRIX
   ! tmsigma - based on standard [b -a ; -a gamma] matrix;
-  call tmsigma( opt_fun0(3), opt_fun0(6), opt_fun0(4), opt_fun0(7), s0mat)
+  !call tmsigma( opt_fun0(3), opt_fun0(6), opt_fun0(4), opt_fun0(7), s0mat)
+  ! tmsigma_emit - based on eigenvalues;
+  call tmsigma_emit( rt, s0mat)
 
   ! sigma matrix
   do i= 1,6
