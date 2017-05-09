@@ -2821,10 +2821,12 @@ SUBROUTINE twchgo
   logical :: fmap, cplxy, cplxt
   integer :: i, code, save, n_align
   double precision :: orbit(6), orbit2(6), ek(6), re(6,6), te(6,6,6)
-  double precision :: orbit00(6), ek00(6), re00(6,6), te00(6,6,6)
+  double precision :: orbit00(6), ek00(6), re00(6,6), te00(6,6,6), disp00(6)
+  double precision :: rmat0(2,2)
   double precision :: al_errors(align_max), el, pos0
   character(len=130) :: msg
-
+  double precision :: betx0, alfx0, amux0, wx0, dmux0, phix0
+  double precision :: bety0, alfy0, amuy0, wy0, dmuy0, phiy0
   integer, external :: restart_sequ, advance_node, get_option, node_al_errors
   double precision, external :: node_value, get_value
 
@@ -2859,7 +2861,6 @@ SUBROUTINE twchgo
   synch_1 = zero; synch_2 = zero; synch_3 = zero; synch_4 = zero; synch_5 = zero
 
   !---- Loop over positions.
-  centre_bttk = .false.
   i = restart_sequ()
   if (centre) currpos = zero
   i_spch=0
@@ -2881,7 +2882,12 @@ SUBROUTINE twchgo
   endif
 
   if (centre) then
+     ! backup optical functions
      ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
+     betx0=betx; alfx0=alfx; amux0=amux; wx0=wx; dmux0=dmux; phix0=phix
+     bety0=bety; alfy0=alfy; amuy0=amuy; wy0=wy; dmuy0=dmuy; phiy0=phiy
+     RMAT0 = RMAT ; disp00 = disp
+
      call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te,.true.,el/two)
      centre_bttk = .true.
      ! TG: same comment as in twchgo (inconsistent center behaviour) applies here:
@@ -2890,6 +2896,11 @@ SUBROUTINE twchgo
      pos0 = currpos
      currpos = currpos + el/two
      call twprep(save,2,opt_fun,zero)
+
+     ! restore optical functions
+     betx=betx0; alfx=alfx0; amux=amux0; wx=wx0; dmux=dmux0; phix=phix0
+     bety=bety0; alfy=alfy0; amuy=amuy0; wy=wy0; dmuy=dmuy0; phiy=phiy0
+     RMAT = RMAT0 ; disp = disp00
      ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
   endif
 
@@ -2968,11 +2979,8 @@ SUBROUTINE twbttk(re,te)
 
   integer :: i,j,k,save
   double precision :: aux(6), auxp(6), rep(6,6), fre(6,6), frep(6,6)
-  double precision :: rmat0(2,2)
   double precision :: ax1, ax2, ay1, ay2, bx1, bx2, by1, by2
   double precision :: t2, ta, tb, temp, tg
-  double precision :: alfx0, alfy0, betx0, bety0, amux0, amuy0
-  double precision :: wx0, wy0, dmux0, dmuy0, phix0, phiy0
   double precision :: an, e1, e2, sk1, curlyh, detl, f, rhoinv, blen
   double precision :: syncint(5)
 
@@ -2984,8 +2992,6 @@ SUBROUTINE twbttk(re,te)
   save = get_option('twiss_save ')
 
   !---- Initialisation
-  alfx0=0.d0; alfy0=0.d0; betx0=0.d0; bety0=0.d0; amux0=0.d0; amuy0=0.d0
-  wx0=0.d0; wy0=0.d0; dmux0=0.d0; dmuy0=0.d0; phix0=0.d0; phiy0=0.d0
   blen = node_value('blen ')
   rhoinv = node_value('rhoinv ')
   sk1 = node_value('k1 ')
@@ -3024,20 +3030,6 @@ SUBROUTINE twbttk(re,te)
   if (.not.centre_bttk) then
      DISP = AUX
      DDISP = AUXP
-  else
-     alfx0 = alfx
-     alfy0 = alfy
-     betx0 = betx
-     bety0 = bety
-     amux0 = amux
-     amuy0 = amuy
-     wx0 = wx
-     wy0 = wy
-     dmux0 = dmux
-     dmuy0 = dmuy
-     phix0 = phix
-     phiy0 = phiy
-     RMAT0(:2,:2) = RMAT(:2,:2)
   endif
 
   !---- Tor: modified to cancel energy change
@@ -3111,22 +3103,6 @@ SUBROUTINE twbttk(re,te)
      opt_fun(24) = dmuy
 
      OPT_FUN(25:28) = AUXP(1:4)
-  endif
-
-  if (centre_bttk) then
-     alfx = alfx0
-     alfy = alfy0
-     betx = betx0
-     bety = bety0
-     amux = amux0
-     amuy = amuy0
-     wx = wx0
-     wy = wy0
-     dmux = dmux0
-     dmuy = dmuy0
-     phix = phix0
-     phiy = phiy0
-     RMAT(:2,:2) = RMAT0(:2,:2)
   endif
 
 end SUBROUTINE twbttk
