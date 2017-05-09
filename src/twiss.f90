@@ -2789,7 +2789,7 @@ SUBROUTINE twchgo
   logical :: fmap, cplxy, cplxt
   integer :: i, code, save, n_align
   double precision :: orbit(6), orbit2(6), ek(6), re(6,6), te(6,6,6)
-  double precision :: orbit00(6), ek00(6), re00(6,6), te00(6,6,6), disp00(6)
+  double precision :: orbit00(6), ek00(6), re00(6,6), te00(6,6,6), disp00(6), ddisp00(6)
   double precision :: rmat0(2,2)
   double precision :: al_errors(align_max), el, pos0
   character(len=130) :: msg
@@ -2854,21 +2854,21 @@ SUBROUTINE twchgo
      ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
      betx0=betx; alfx0=alfx; amux0=amux; wx0=wx; dmux0=dmux; phix0=phix
      bety0=bety; alfy0=alfy; amuy0=amuy; wy0=wy; dmuy0=dmuy; phiy0=phiy
-     RMAT0 = RMAT ; disp00 = disp
+     RMAT0 = RMAT ; disp00 = disp ; ddisp00 = ddisp
 
      call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te,.true.,el/two)
-     centre_bttk = .true.
      ! TG: same comment as in twchgo (inconsistent center behaviour) applies here:
      if (fmap) call twbttk(re,te)
-     centre_bttk = .false.
      pos0 = currpos
      currpos = currpos + el/two
+
+     call save_opt_fun()
      call twprep(save,2,opt_fun,zero)
 
      ! restore optical functions
      betx=betx0; alfx=alfx0; amux=amux0; wx=wx0; dmux=dmux0; phix=phix0
      bety=bety0; alfy=alfy0; amuy=amuy0; wy=wy0; dmuy=dmuy0; phiy=phiy0
-     RMAT = RMAT0 ; disp = disp00
+     RMAT = RMAT0 ; disp = disp00 ; ddisp = ddisp00
      ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
   endif
 
@@ -2882,6 +2882,7 @@ SUBROUTINE twchgo
      call twbttk(re,te)
   endif
 
+  call save_opt_fun()
   if (.not.centre) then
      call twprep(save,2,opt_fun,zero)
   else
@@ -2894,23 +2895,6 @@ SUBROUTINE twchgo
      opt_fun(6) = bety
      opt_fun(7) = alfy
      opt_fun(8) = amuy
-
-     OPT_FUN(9:14)  = ORBIT
-     OPT_FUN(15:18) = DISP(1:4)
-
-     opt_fun(19) = wx
-     opt_fun(20) = phix
-     opt_fun(21) = dmux
-     opt_fun(22) = wy
-     opt_fun(23) = phiy
-     opt_fun(24) = dmuy
-
-     OPT_FUN(25:28) = DDISP(1:4)
-
-     opt_fun(29) = rmat(1,1)
-     opt_fun(30) = rmat(1,2)
-     opt_fun(31) = rmat(2,1)
-     opt_fun(32) = rmat(2,2)
   endif
 
   if (advance_node() .ne. 0)  goto 10
@@ -2926,6 +2910,28 @@ SUBROUTINE twchgo
                  'only to find the closed orbit, for optical calculations it '// &
                  'ignores both.')
   endif
+
+contains
+
+subroutine save_opt_fun()
+
+     OPT_FUN(9:14)  = ORBIT
+     OPT_FUN(15:18) = DISP(1:4)
+
+     opt_fun(19) = wx
+     opt_fun(20) = phix
+     opt_fun(21) = dmux
+     opt_fun(22) = wy
+     opt_fun(23) = phiy
+     opt_fun(24) = dmuy
+
+     OPT_FUN(25:28) = ddisp(1:4)
+
+     opt_fun(29) = rmat(1,1)
+     opt_fun(30) = rmat(1,2)
+     opt_fun(31) = rmat(2,1)
+     opt_fun(32) = rmat(2,2)
+end subroutine
 
 end SUBROUTINE twchgo
 
@@ -2995,10 +3001,8 @@ SUBROUTINE twbttk(re,te)
      enddo
   enddo
 
-  if (.not.centre_bttk) then
-     DISP = AUX
-     DDISP = AUXP
-  endif
+  DISP = AUX
+  DDISP = AUXP
 
   !---- Tor: modified to cancel energy change
   disp(6) = one
@@ -3060,18 +3064,6 @@ SUBROUTINE twbttk(re,te)
   if (wy.gt.eps) phiy = proxim(atan2(ay2, by2), phiy)
   dmuy = dmuy + fre(3,4)*(fre(3,4)*ay1 - tb*by1) / t2               &
        + (fre(3,3)*frep(3,4) - fre(3,4)*frep(3,3)) / bety
-
-  !---- Fill optics function array
-  if (.not.centre .or. centre_bttk) then
-     opt_fun(19) = wx
-     opt_fun(20) = phix
-     opt_fun(21) = dmux
-     opt_fun(22) = wy
-     opt_fun(23) = phiy
-     opt_fun(24) = dmuy
-
-     OPT_FUN(25:28) = AUXP(1:4)
-  endif
 
 end SUBROUTINE twbttk
 

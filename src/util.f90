@@ -323,7 +323,7 @@ end module twissafi
 module twisslfi
   implicit none
   public
-  logical :: centre=.false., centre_bttk=.false., first
+  logical :: centre=.false., first
   logical :: rmatrix=.false., sectormap=.false., ripken=.false.
   logical :: mode_flip=.false.
   logical :: ele_body=.false.
