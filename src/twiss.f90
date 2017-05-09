@@ -2835,6 +2835,7 @@ SUBROUTINE twchgo
   if (n_align .ne. 0)  then
      ORBIT2 = ORBIT
      call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
+     call tw_synch_int()
      call twbttk(re,te)
   endif
 
@@ -2853,11 +2854,15 @@ SUBROUTINE twchgo
 
   call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te,.false.,el)
 
-  if (fmap) call twbttk(re,te)
+  if (fmap) then
+      call tw_synch_int()
+      call twbttk(re,te)
+  endif
 
   if (n_align.ne.0)  then
      ORBIT2 = ORBIT
      call tmali2(el,orbit2,al_errors,beta,gamma,orbit,re)
+     call tw_synch_int()
      call twbttk(re,te)
   endif
 
@@ -2917,6 +2922,49 @@ end subroutine
 
 end SUBROUTINE twchgo
 
+SUBROUTINE tw_synch_int()
+  use twiss0fi
+  use twisslfi
+  use twisscfi
+  use twissbeamfi, only : beta
+  use math_constfi, only : two
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     Compute and add synchrotron radiation integral                   *
+  !----------------------------------------------------------------------*
+  double precision :: an, e1, e2, sk1, rhoinv, blen
+  double precision :: syncint(5)
+
+  double precision, external :: node_value
+
+  !---- Initialisation
+  blen = node_value('blen ')
+  rhoinv = node_value('rhoinv ')
+  sk1 = node_value('k1 ')
+  e1 = node_value('e1 ')
+  e2 = node_value('e2 ')
+  an = node_value('angle ')
+  if (node_value('mad8_type ') .eq. 2) then ! RBEND
+     e1 = e1 + an / two
+     e2 = e2 + an / two
+  endif
+
+  !---- Synchrotron radiation integrals through bending magnets.
+  if (rhoinv .ne. 0.d0) then
+     ! Note that calcsyncint expects dx and dpx as derivatives wrt deltap.
+     ! since MAD take disp(1) and disp(2) as derivatives wrt pt, they must be
+     ! multiplied by beta before the call to calcsyncint.
+     call calcsyncint(rhoinv,blen,sk1,e1,e2,betx,alfx,disp(1)*beta,disp(2)*beta,syncint)
+     synch_1 = synch_1 + syncint(1)
+     synch_2 = synch_2 + syncint(2)
+     synch_3 = synch_3 + syncint(3)
+     synch_4 = synch_4 + syncint(4)
+     synch_5 = synch_5 + syncint(5)
+  endif
+end subroutine tw_synch_int
+
+
 SUBROUTINE twbttk(re,te)
   use twiss0fi
   use twisslfi
@@ -2933,45 +2981,16 @@ SUBROUTINE twbttk(re,te)
   !----------------------------------------------------------------------*
   double precision :: re(6,6), te(6,6,6)
 
-  integer :: i,j,k,save
+  integer :: i,k
   double precision :: aux(6), auxp(6), rep(6,6), fre(6,6), frep(6,6)
   double precision :: ax1, ax2, ay1, ay2, bx1, bx2, by1, by2
   double precision :: t2, ta, tb, temp, tg
-  double precision :: an, e1, e2, sk1, curlyh, detl, f, rhoinv, blen
-  double precision :: syncint(5)
+  double precision :: detl, f
 
-  integer, external :: get_option
-  double precision, external :: proxim, node_value
+  double precision, external :: proxim
   double precision, parameter :: eps=1d-8
 
-  !---- Create internal table for lattice functions if requested
-  save = get_option('twiss_save ')
-
   !---- Initialisation
-  blen = node_value('blen ')
-  rhoinv = node_value('rhoinv ')
-  sk1 = node_value('k1 ')
-  e1 = node_value('e1 ')
-  e2 = node_value('e2 ')
-  an = node_value('angle ')
-  if (node_value('mad8_type ') .eq. 2) then ! RBEND
-     e1 = e1 + an / two
-     e2 = e2 + an / two
-  endif
-
-  !---- Synchrotron radiation integrals through bending magnets.
-  if (.not.centre_bttk .and. rhoinv .ne. 0.d0) then
-     ! Note that calcsyncint expects dx and dpx as derivatives wrt deltap.
-     ! since MAD take disp(1) and disp(2) as derivatives wrt pt, they must be
-     ! multiplied by beta before the call to calcsyncint.
-     call calcsyncint(rhoinv,blen,sk1,e1,e2,betx,alfx,disp(1)*beta,disp(2)*beta,syncint)
-     synch_1 = synch_1 + syncint(1)
-     synch_2 = synch_2 + syncint(2)
-     synch_3 = synch_3 + syncint(3)
-     synch_4 = synch_4 + syncint(4)
-     synch_5 = synch_5 + syncint(5)
-  endif
-
   AUX = zero
   AUXP = zero
   do i = 1, 6
