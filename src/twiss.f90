@@ -2982,7 +2982,7 @@ SUBROUTINE twbttk(re,te)
   double precision :: re(6,6), te(6,6,6)
 
   integer :: i,k
-  double precision :: aux(6), auxp(6), rep(6,6), fre(6,6), frep(6,6)
+  double precision :: auxp(6), rep(6,6), fre(6,6), frep(6,6)
   double precision :: ax1, ax2, ay1, ay2, bx1, bx2, by1, by2
   double precision :: t2, ta, tb, temp, tg
   double precision :: detl, f
@@ -2991,18 +2991,16 @@ SUBROUTINE twbttk(re,te)
   double precision, parameter :: eps=1d-8
 
   !---- Initialisation
-  AUX = zero
   AUXP = zero
   do i = 1, 6
      do k = 1, 6
         temp = dot_product(TE(i,:,k),DISP(:))
-        aux(i) = aux(i) + re(i,k)*disp(k)
         auxp(i) = auxp(i) + temp*disp(k) + re(i,k)*ddisp(k)
         rep(i,k) = two*temp
      enddo
   enddo
 
-  DISP = AUX
+  DISP = matmul(re, disp)
   DDISP = AUXP
 
   !---- Tor: modified to cancel energy change
