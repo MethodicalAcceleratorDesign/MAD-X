@@ -2866,11 +2866,10 @@ SUBROUTINE twchgo
   if (.not.centre) then
      call twprep(save,2,opt_fun,zero)
   else
-     opt_fun(3) = betx
-     opt_fun(4) = alfx
+     ! TODO: it is inconsistent that amux,amy from twcpgo are overwritten
+     ! with the values from twchgo here. These two lines should be removed
+     ! but it will break a test or two:
      opt_fun(5) = amux
-     opt_fun(6) = bety
-     opt_fun(7) = alfy
      opt_fun(8) = amuy
   endif
 
@@ -2891,10 +2890,6 @@ SUBROUTINE twchgo
 contains
 
 subroutine save_opt_fun()
-
-     OPT_FUN(9:14)  = ORBIT
-     OPT_FUN(15:18) = DISP(1:4)
-
      opt_fun(19) = wx
      opt_fun(20) = phix
      opt_fun(21) = dmux
@@ -2903,11 +2898,6 @@ subroutine save_opt_fun()
      opt_fun(24) = dmuy
 
      OPT_FUN(25:28) = ddisp(1:4)
-
-     opt_fun(29) = rmat(1,1)
-     opt_fun(30) = rmat(1,2)
-     opt_fun(31) = rmat(2,1)
-     opt_fun(32) = rmat(2,2)
 end subroutine
 
 end SUBROUTINE twchgo
