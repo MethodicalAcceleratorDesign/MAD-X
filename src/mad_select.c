@@ -374,9 +374,29 @@ get_range(char* range, struct sequence* sequ, struct node** nodes)
 }
 
 static int
-store_select_command(struct in_cmd* cmd, struct command_list** plist, const char* name)
+par_defined(const char* str, const char* none)
 {
-  if (log_val("clear", cmd->clone)) {
+  return str && strcmp(str, "") != 0 && strcmp(str, none) != 0;
+}
+
+static int
+has_filter_condition(struct command* cmd)
+{
+  return par_defined(command_par_string("sequence", cmd), none)
+      || par_defined(command_par_string("range",    cmd), "#s/#e")
+      || par_defined(command_par_string("class",    cmd), none)
+      || par_defined(command_par_string("pattern",  cmd), "any");
+}
+
+static int
+store_select_command(struct in_cmd* cmd, struct command_list** plist, const char* name, int clear_all)
+{
+  // TG: `clear_all` forces unqualified clear (old behaviour). With `!clear_all`,
+  // behave like a DESELECT.
+  if (strcmp(cmd->clone->name, "select") == 0 &&        // !deselect
+      log_val("clear", cmd->clone) &&
+      (clear_all || !has_filter_condition(cmd->clone)))
+  {
     delete_command_list(*plist);
     *plist = new_command_list(name, 10);
   }
@@ -460,14 +480,14 @@ store_select(struct in_cmd* cmd)
   }
   if (strcmp(flag_name, "seqedit") == 0)
   {
-    if (store_select_command(cmd, &seqedit_select, "seqedit_select") == 0) {
+    if (store_select_command(cmd, &seqedit_select, "seqedit_select", 1) == 0) {
       selected_ranges->curr = 0;
       selected_ranges->list->curr = 0;
     }
   }
   else if (strcmp(flag_name, "error") == 0)
   {
-    if (store_select_command(cmd, &error_select, "error_select") == 0) {
+    if (store_select_command(cmd, &error_select, "error_select", 1) == 0) {
       selected_ranges->curr = 0;
       selected_ranges->list->curr = 0;
       reset_errors(current_sequ);
@@ -501,16 +521,16 @@ store_select(struct in_cmd* cmd)
 
   else if (strcmp(flag_name, "makethin") == 0)
   {
-    store_select_command(cmd, &slice_select, "slice_select");
+    store_select_command(cmd, &slice_select, "slice_select", 1);
   }
   else if (strcmp(flag_name, "save") == 0)
   {
-    store_select_command(cmd, &save_select, "save_select");
+    store_select_command(cmd, &save_select, "save_select", 1);
   }
   else if (strcmp(flag_name, "sectormap") == 0)
   {
     if (sector_ranges == NULL)   sector_ranges = new_node_list(10000);
-    if (store_select_command(cmd, &sector_select, "sector_select") == 0) {
+    if (store_select_command(cmd, &sector_select, "sector_select", 1) == 0) {
       sector_ranges->curr = 0;
       sector_ranges->list->curr = 0;
     }
