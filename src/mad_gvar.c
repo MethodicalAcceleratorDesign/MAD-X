@@ -50,6 +50,7 @@ struct command_list* stored_commands;   /* list of stored commands */
 struct command_list* stored_match_var;  /* list of match vary commands */
 struct command_list* stored_track_start;/* list of track start commands */
 struct command_list* sector_select;     /* current sectormap select commands */
+struct command_list* interp_select;     /* current interpolate select commands */
 
 struct command_list_list* table_deselect; /* list of table deselect lists */
 struct command_list_list* table_select;   /* list of all table select lists */

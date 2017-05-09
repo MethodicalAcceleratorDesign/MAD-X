@@ -395,6 +395,7 @@ store_deselect(struct in_cmd* cmd)
   }
   else if (strcmp(flag_name, "interpolate") == 0)
   {
+    store_select_command(cmd, &interp_select, "interp_select", 0);
     select_interp(cmd->clone);
   }
   else /* store deselect for all tables */
@@ -495,6 +496,7 @@ store_select(struct in_cmd* cmd)
   }
   else if (strcmp(flag_name, "interpolate") == 0)
   {
+    store_select_command(cmd, &interp_select, "interp_select", 0);
     select_interp(cmd->clone);
   }
   else /* store select for all tables */

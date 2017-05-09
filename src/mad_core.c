@@ -102,6 +102,8 @@ mad_init_c(void)
     new_command_list("slice_select", 10);
   sector_select = /* dynamic - for "select sectormap" commands */
     new_command_list("sector_select", 10);
+  interp_select = /* dynamic - for "select sectormap" commands */
+    new_command_list("interp_select", 10);
   s_range = new_int_array(10); /* dynamic */
   e_range = new_int_array(10); /* dynamic */
   sd_range = new_int_array(10); /* dynamic */
