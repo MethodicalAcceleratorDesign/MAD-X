@@ -1765,15 +1765,9 @@ SUBROUTINE twcpgo(rt,orbit0)
   endif
 
   if (centre) then
-    ! backup optical functions
-    ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
+    call backup_optics()
 
     call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te,.true.,el/two)
-
-     betx0=betx; alfx0=alfx; amux0=amux
-     bety0=bety; alfy0=alfy; amuy0=amuy
-     RMAT0 = RMAT ; disp00 = disp
-     if (rmatrix) RW0 = RW
 
     ! TG: the `fmap` condition is only an approximation of the previous
     ! behaviour of the `centre` option - which was handled inconsistently
@@ -1784,12 +1778,7 @@ SUBROUTINE twcpgo(rt,orbit0)
     call save_opt_fun()
     call twprep(save,1,opt_fun,currpos+el/two)
 
-    ! restore optical functions
-    betx=betx0; alfx=alfx0; amux=amux0
-    bety=bety0; alfy=alfy0; amuy=amuy0
-    RMAT = RMAT0 ; disp = disp00
-    if (rmatrix) RW = RW0
-    ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
+    call restore_optics()
   endif
 
   ! now do exact calculation with full length:
@@ -1848,6 +1837,22 @@ SUBROUTINE twcpgo(rt,orbit0)
                        'to find the closed orbit, for optical calculations it ignores both.')
 
 contains
+
+subroutine backup_optics()
+  ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
+  betx0=betx; alfx0=alfx; amux0=amux
+  bety0=bety; alfy0=alfy; amuy0=amuy
+  RMAT0 = RMAT ; disp00 = disp
+  if (rmatrix) RW0 = RW
+end subroutine backup_optics
+
+subroutine restore_optics()
+  ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
+  betx=betx0; alfx=alfx0; amux=amux0
+  bety=bety0; alfy=alfy0; amuy=amuy0
+  RMAT = RMAT0 ; disp = disp00
+  if (rmatrix) RW = RW0
+end subroutine restore_optics
 
 subroutine save_opt_fun()
     integer :: i1, i2
@@ -2832,11 +2837,7 @@ SUBROUTINE twchgo
   endif
 
   if (centre) then
-     ! backup optical functions
-     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
-     betx0=betx; alfx0=alfx; amux0=amux; wx0=wx; dmux0=dmux; phix0=phix
-     bety0=bety; alfy0=alfy; amuy0=amuy; wy0=wy; dmuy0=dmuy; phiy0=phiy
-     RMAT0 = RMAT ; disp00 = disp ; ddisp00 = ddisp
+     call backup_optics()
 
      call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te,.true.,el/two)
      ! TG: same comment as in twchgo (inconsistent center behaviour) applies here:
@@ -2845,11 +2846,7 @@ SUBROUTINE twchgo
      call save_opt_fun()
      call twprep(save,2,opt_fun,zero)
 
-     ! restore optical functions
-     betx=betx0; alfx=alfx0; amux=amux0; wx=wx0; dmux=dmux0; phix=phix0
-     bety=bety0; alfy=alfy0; amuy=amuy0; wy=wy0; dmuy=dmuy0; phiy=phiy0
-     RMAT = RMAT0 ; disp = disp00 ; ddisp = ddisp00
-     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
+     call restore_optics()
   endif
 
   call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te,.false.,el)
@@ -2888,6 +2885,20 @@ SUBROUTINE twchgo
   endif
 
 contains
+
+subroutine backup_optics()
+     ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
+     betx0=betx; alfx0=alfx; amux0=amux; wx0=wx; dmux0=dmux; phix0=phix
+     bety0=bety; alfy0=alfy; amuy0=amuy; wy0=wy; dmuy0=dmuy; phiy0=phiy
+     RMAT0 = RMAT ; disp00 = disp ; ddisp00 = ddisp
+end subroutine backup_optics
+
+subroutine restore_optics()
+     betx=betx0; alfx=alfx0; amux=amux0; wx=wx0; dmux=dmux0; phix=phix0
+     bety=bety0; alfy=alfy0; amuy=amuy0; wy=wy0; dmuy=dmuy0; phiy=phiy0
+     RMAT = RMAT0 ; disp = disp00 ; ddisp = ddisp00
+     ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
+end subroutine restore_optics
 
 subroutine save_opt_fun()
      opt_fun(19) = wx
