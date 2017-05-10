@@ -1607,6 +1607,11 @@ tests/test-ptc-normal/ptc_normal_results.tfs.ref -text
 tests/test-ptc-normal/test-ptc-normal.cfg -text
 tests/test-ptc-normal/test-ptc-normal.madx -text
 tests/test-ptc-normal/test-ptc-normal.ref -text
+tests/test-ptc-track-3/test-ptc-track-3.cfg -text
+tests/test-ptc-track-3/test-ptc-track-3.madx -text
+tests/test-ptc-track-3/test-ptc-track-3.ref -text
+tests/test-ptc-track-3/trackone.cfg -text
+tests/test-ptc-track-3/trackone.ref -text
 tests/test-ptc-track/test-ptc-track.cfg -text
 tests/test-ptc-track/test-ptc-track.madx -text
 tests/test-ptc-track/test-ptc-track.ref -text svneol=unset#application/x-gzip
@@ -1619,6 +1624,11 @@ tests/test-ptc-trackline-2/test-ptc-trackline-2.madx -text
 tests/test-ptc-trackline-2/test-ptc-trackline-2.ref -text
 tests/test-ptc-trackline-2/trackone.cfg -text
 tests/test-ptc-trackline-2/trackone.ref -text
+tests/test-ptc-trackline-3/test-ptc-trackline-3.cfg -text
+tests/test-ptc-trackline-3/test-ptc-trackline-3.madx -text
+tests/test-ptc-trackline-3/test-ptc-trackline-3.ref -text
+tests/test-ptc-trackline-3/trackone.cfg -text
+tests/test-ptc-trackline-3/trackone.ref -text
 tests/test-ptc-trackline-rfcav/test-ptc-trackline-rfcav.cfg -text
 tests/test-ptc-trackline-rfcav/test-ptc-trackline-rfcav.madx -text
 tests/test-ptc-trackline-rfcav/test-ptc-trackline-rfcav.ref -text svneol=unset#application/x-gzip

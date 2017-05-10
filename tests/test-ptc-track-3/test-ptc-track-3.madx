@@ -1,0 +1,86 @@
+!Example script showing usage of tracking with PTC
+! sequence setup identical to test-twiss/test-twiss.madx
+!author: Piotr Skowronski (CERN)
+
+TITLE, "LHC Version 6.503 -  July 2009" ;
+
+REAL CONST L.TANAL = 0;
+REAL CONST L.TANAR = 0;
+REAL CONST L.TANC = 0;
+REAL CONST L.TCDQA = 0;
+REAL CONST L.TCP   = 0.0;
+
+REAL CONST L.MBXWT = 0.0;
+REAL CONST L.MBLS2 = 0.0;
+REAL CONST L.TASB  = 0.0;
+REAL CONST L.BTVSS075 = 0.0;
+REAL CONST L.MBLW = 0.0;
+
+REAL CONST L.TCTVB = 0;
+REAL CONST L.X5ZDC002 = 0;
+REAL CONST L.TCDDM = 0;
+
+OPTION, -ECHO, -WARN, INFO;
+CALL, FILE="../share/LHC/LHCRing/V6.503/V6.5.seq";
+CALL, FILE="../share/LHC/LHCRing/V6.503/V6.5.inj.str";
+OPTION, ECHO, WARN, -INFO, -VERIFY;
+
+BEAM, SEQUENCE=LHCB1, PARTICLE=PROTON, PC=450;
+BEAM, SEQUENCE=LHCB2, PARTICLE=PROTON, PC=450, BV=-1;
+
+ON_X1:=1;
+ON_SEP1:=1;
+ON_ATLAS:=0;
+ON_X2:=1;
+ON_SEP2:=1;
+ON_ALICE:=0;
+ON_X5:=1;
+ON_SEP5:=1;
+ON_CMS  :=0;
+ON_X8:=1;
+ON_SEP8:=1;
+ON_LHCB :=0;
+
+SELECT, FLAG=TWISS, CLEAR;
+SELECT, FLAG=TWISS, PATTERN=IP, COLUMN=NAME,S,BETX,BETY;
+SELECT, FLAG=TWISS, PATTERN=S.DS.L;
+SELECT, FLAG=TWISS, PATTERN=E.DS.R;
+
+USE, SEQUENCE=LHCB1;
+
+
+ptc_create_universe;
+ptc_create_layout, model=2, method=6, nst=20, exact=true, closed_layout=true;
+
+ptc_setswitch, debuglevel=0, nocavity=true, 
+               exact_mis=true, time=true,
+               totalpath=false, fringe=true;
+
+
+
+PTC_OBSERVE, place=LHCB1$end;
+
+
+
+ptc_start, x=0.001, px=0.0, y=0.0, py=0.0, t=0.0;
+
+PTC_OBSERVE, place=lhcb1$end;
+ptc_track, icase=5, turns=20, element_by_element, onetable, dump, maxaper={1e6,1e6,1e6,1e6,1e6,1e6};
+
+
+ptc_track_end;
+
+
+
+ptc_end;
+
+
+
+stop;
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!  SSSSS  TTTTT   OOO   PPP
+!  S        T    O   O  P  P
+!  SSSSS    T    O   O  PPP
+!      S    T    O   O  P
+!  SSSSS    T     OOO   P
+!
