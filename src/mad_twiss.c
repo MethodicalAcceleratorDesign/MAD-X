@@ -565,11 +565,13 @@ set_twiss_deltas(struct command* comm)
 // public interface
 
 void
-copy_twiss_data(double* twiss_data, int* offset, int* nval)
+copy_twiss_data(double* twiss_data, int* offset, int* nval, int* interp_index)
 {
   if (!current_node->cl) return;
   for (int i = 0; i < current_node->cl->curr; ++i) {
     struct constraint* c = current_node->cl->constraints[i];
+    if (c->index != *interp_index-1)
+      continue;
     int n_pos = c->n_pos - 1;
     if (n_pos >= *offset && n_pos < *offset + *nval)
       c->evaluated = twiss_data[n_pos];

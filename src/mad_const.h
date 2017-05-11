@@ -16,7 +16,7 @@ struct constraint /* contains one constraint */
                                 /* 3 both 1 + 2 */
                                 /* 4 value */
   int stamp;
-  int n_pos;
+  int n_pos, index;
   double value, c_min, c_max, weight, evaluated;
   struct expression *ex_value, *ex_c_min, *ex_c_max;
 };
@@ -42,7 +42,7 @@ struct constraint_list* delete_constraint_list(struct constraint_list*);
 
 void fill_constraint_list(int type, struct command*, struct constraint_list*);
 void update_sequ_constraints(struct sequence*, struct constraint_list*);
-void update_node_constraints(struct node*, struct constraint_list*);
+void update_node_constraints(struct node*, struct constraint_list*, int index);
 
 int  constraint_name(char* name, int* name_l, int* index);
 int  next_constr_namepos(char* name);

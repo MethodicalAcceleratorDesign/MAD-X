@@ -2620,6 +2620,7 @@ const char *const_command_def =
 "name    = [s, none, none], "
 "weight   = [r, 1.0], "
 "range    = [s, #s/#e, none], "
+"iindex   = [r, -1, -1], "
 "class    = [s, none, none], "
 "pattern  = [s, any, none], "
 "betx     = [c, 0], alfx     = [c, 0], mux      = [c, 0], "

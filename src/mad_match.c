@@ -313,6 +313,16 @@ match_cell(struct in_cmd* cmd)
 }
 #endif
 
+// if negative, cycle at high boundary and clamp in interval [lo, hi)
+static int
+cclamp(int num, int lo, int hi)
+{
+  if (num <   0) num += hi;
+  if (num <  lo) num = lo;
+  if (num >= hi) num = hi-1;
+  return num;
+}
+
 static void
 match_constraint(struct in_cmd* cmd)
 {
@@ -328,12 +338,16 @@ match_constraint(struct in_cmd* cmd)
   }
   else
   { /* old match */
-    // TODO: use all sequences!
+    double index = command_par_value("iindex", cmd->clone);
+
     comm_constraints->curr=0;
     fill_constraint_list(1, cmd->clone, comm_constraints);
     struct select_iter* it = start_iter_select(cmd->clone, match_sequs, NULL);
+
     while (fetch_node_select(it, &c_node, NULL)) {
-      update_node_constraints(c_node, comm_constraints);
+      int num_slice = c_node->interp_at ? c_node->interp_at->curr : 1;
+      int x = cclamp(index, 0, num_slice);
+      update_node_constraints(c_node, comm_constraints, x);
     }
   }
 }
