@@ -21,7 +21,7 @@ grow_constraint_list(struct constraint_list* p)
 }
 
 static struct constraint*
-make_constraint(int type, struct command_parameter* par)
+make_constraint(int type, int find_npos, struct command_parameter* par)
   /* makes + stores a constraint from command parameter */
 {
   struct constraint* new = new_constraint(par->c_type);
@@ -56,6 +56,17 @@ make_constraint(int type, struct command_parameter* par)
   }
   if (type == 1) new->weight = command_par_value(new->name, current_weight);
   else           new->weight = command_par_value(new->name, current_gweight);
+
+  new->n_pos = find_npos ? next_constr_namepos(new->name) : 0;
+  if (find_npos && new->n_pos == 0) {
+    fatal_error(
+        " +-+-+- fatal error\n"
+        "match - collect: illegal name\n"
+        "      - try with the \"slow\" option\n"
+        "      - name = ", new->name
+    );
+  }
+
   return new;
 }
 
@@ -150,12 +161,12 @@ fill_constraint_list(int type /* 1 node, 2 global */,
   struct command_parameter_list* pl = cd->par;
   struct name_list* nl = cd->par_names;
   struct constraint* l_cons;
-  int j;
+  int j, find_npos = type == 1 && !get_option("slow");
   for (j = 0; j < pl->curr; j++)
   {
     if (nl->inform[j] && pl->parameters[j]->type == 4)
     {
-      l_cons = make_constraint(type, pl->parameters[j]);
+      l_cons = make_constraint(type, find_npos, pl->parameters[j]);
       add_to_constraint_list(l_cons, cl);
     }
   }
@@ -253,15 +264,7 @@ next_constraint(char* name, int* name_l, int* type, double* value,
       double_from_table_row("twiss ",  name,   pos, val);
     }
     else {
-      int n_pos = next_constr_namepos(name);
-      if (n_pos == 0)
-        fatal_error(
-            " +-+-+- fatal error\n"
-            "match - collect: illegal name\n"
-            "      - try with the \"slow\" option\n"
-            "      - name = ", name
-        );
-      *val = current_node->match_data[n_pos-1];
+      *val = current_node->match_data[c_c->n_pos-1];
       current_node_name(node_name, nn_len);
     }
 
