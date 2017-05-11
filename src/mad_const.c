@@ -95,6 +95,16 @@ new_constraint_list(int length)
 }
 
 struct constraint*
+clone_constraint(struct constraint* cst)
+  // flat copy
+{
+  const char* rout_name = "clone_constraint";
+  struct constraint* clone = mymalloc(rout_name, sizeof(*clone));
+  memcpy(clone, cst, sizeof(*clone));
+  return clone;
+}
+
+struct constraint*
 delete_constraint(struct constraint* cst)
 {
   const char *rout_name = "delete_constraint";
@@ -264,7 +274,7 @@ next_constraint(char* name, int* name_l, int* type, double* value,
       double_from_table_row("twiss ",  name,   pos, val);
     }
     else {
-      *val = current_node->match_data[c_c->n_pos-1];
+      *val = c_c->evaluated;
       current_node_name(node_name, nn_len);
     }
 
@@ -398,20 +408,24 @@ update_node_constraints(struct node* c_node, struct constraint_list* cl)
   if (c_node->cl == NULL) c_node->cl = new_constraint_list(cl->curr);
   for (j = 0; j < cl->curr; j++)
   {
-    k = -1;
+    // copy constraint, so it can hold individual `evaluated` value (we could
+    // do with a smaller data structure, but let's do it like this for now).
+    struct constraint* c_new = clone_constraint(cl->constraints[j]);
+
     for (i = 0; i < c_node->cl->curr; i++)
     {
-      if (strcmp(cl->constraints[j]->name,
-                 c_node->cl->constraints[i]->name) == 0) k = i;
+      struct constraint* c_old = c_node->cl->constraints[i];
+      if (strcmp(c_new->name, c_old->name) == 0) {
+        c_node->cl->constraints[i] = c_new;
+        break;
+      }
     }
-    if (k < 0)
-    {
+    if (i == c_node->cl->curr) {
       if (c_node->cl->curr == c_node->cl->max)
         grow_constraint_list(c_node->cl);
-      c_node->cl->constraints[c_node->cl->curr++] = cl->constraints[j];
+      c_node->cl->constraints[c_node->cl->curr++] = c_new;
       total_const++;
     }
-    else c_node->cl->constraints[k] = cl->constraints[j];
   }
 }
 

@@ -567,7 +567,13 @@ set_twiss_deltas(struct command* comm)
 void
 copy_twiss_data(double* twiss_data, int* offset, int* nval)
 {
-  copy_double(twiss_data + *offset, current_node->match_data + *offset, *nval);
+  if (!current_node->cl) return;
+  for (int i = 0; i < current_node->cl->curr; ++i) {
+    struct constraint* c = current_node->cl->constraints[i];
+    int n_pos = c->n_pos - 1;
+    if (n_pos >= *offset && n_pos < *offset + *nval)
+      c->evaluated = twiss_data[n_pos];
+  }
 }
 
 void
