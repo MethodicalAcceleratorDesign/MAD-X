@@ -176,7 +176,7 @@ fill_constraint_list(int type /* 1 node, 2 global */,
 int
 next_constraint(char* name, int* name_l, int* type, double* value,
                 double* c_min, double* c_max, double* weight,
-                int* slow_match, int* pos, double* val, char* node_name, int* nn_len)
+                int* pos, double* val, char* node_name, int* nn_len)
   /* returns the parameters of the next constraint; 0 = none, else count */
   // NOTE: does NOT set `val` for match2: match2 seems to invoke this function
   // only via `jacob_print` where `val` is not needed.
@@ -259,7 +259,7 @@ next_constraint(char* name, int* name_l, int* type, double* value,
 
     *weight = c_c->weight;
 
-    if (*slow_match) {
+    if (c_c->n_pos == 0) {
       string_from_table_row("twiss ", "name ", pos, node_name);
       double_from_table_row("twiss ",  name,   pos, val);
     }

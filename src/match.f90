@@ -128,7 +128,7 @@
           if (slow_match) j=advance_to_pos('twiss ',pos) ! (expensive) NOP?
           do while (next_constraint(                                    &
      &                  name,name_len,type, valhg,c_min,c_max,weight,   &
-     &                  slow_match,pos,val,node_name,name_len).ne.0)
+     &                  pos,val,node_name,name_len).ne.0)
             select case(type)
               case(1); f_val=weight*dim(c_min,val)
               case(2); f_val=weight*dim(val,c_max)

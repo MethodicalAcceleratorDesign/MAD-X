@@ -45,7 +45,7 @@ void update_node_constraints(struct node*, struct constraint_list*);
 
 int  constraint_name(char* name, int* name_l, int* index);
 int  next_constr_namepos(char* name);
-int  next_constraint(char* name, int* name_l, int* type, double* value, double* c_min, double* c_max, double* weight, int* slow, int* pos, double* evaluated, char* node_name, int* nn_len);
+int  next_constraint(char* name, int* name_l, int* type, double* value, double* c_min, double* c_max, double* weight, int* pos, double* evaluated, char* node_name, int* nn_len);
 int  next_global(char* name, int* name_l, int* type, double* value, double* c_min, double* c_max, double* weight);
 
 #endif // MAD_CONST_H
