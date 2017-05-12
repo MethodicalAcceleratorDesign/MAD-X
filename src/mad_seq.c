@@ -1292,15 +1292,9 @@ static struct element*
 get_drift(double length)
   /* makes a drift space with the required length */
 {
-  const double tol = 1e-12; // length tolerance for sharing implicit drift
   struct element *p, *bt;
   struct command* clone;
   char key[NAME_L];
-
-  for (int i = 0; i < drift_list->curr; i++) {
-    p = drift_list->elem[i];
-    if (fabs(p->length - length) < tol) return p;
-  }
 
   sprintf(key, "drift_%d", drift_list->curr);
   bt = find_element("drift", base_type_list);
