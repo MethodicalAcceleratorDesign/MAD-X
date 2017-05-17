@@ -135,7 +135,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
      STMAT = zero
   endif
 
-  !IT: SIGMA MATRIX
+  ! IT: SIGMA MATRIX
   ! tmsigma - based on standard [b -a ; -a gamma] matrix;
   !call tmsigma( opt_fun0(3), opt_fun0(6), opt_fun0(4), opt_fun0(7), s0mat)
   ! tmsigma_emit - based on eigenvalues;
@@ -143,9 +143,9 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
 
   ! sigma matrix
   do i= 1,6
-     do j= 1,6
-        opt_fun0(74 + (i-1)*6 + j) = s0mat(i,j)
-     enddo
+  do j= 1,6
+    opt_fun0(74 + (i-1)*6 + j) = s0mat(i,j)
+  enddo
   enddo
   sigmat = s0mat
 
@@ -1658,7 +1658,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   double precision :: rt(6,6), orbit0(6)
 
   logical :: fmap, cplxy, cplxt, sector_sel, mycentre_cptk
-  integer :: i, iecnt, code, save, n_align, elpar_vl
+  integer :: i, i1, i2, iecnt, code, save, n_align, elpar_vl
   double precision :: ek(6), re(6,6), rwi(6,6), rc(6,6), te(6,6,6)
   double precision :: orbit(6), orbit2(6)
   double precision :: bvk, sumloc, pos0, sd, el
@@ -1707,6 +1707,13 @@ SUBROUTINE twcpgo(rt,orbit0)
   rmat(1,2) = opt_fun(30)
   rmat(2,1) = opt_fun(31)
   rmat(2,2) = opt_fun(32)
+
+  ! IT sigma matrix(1:6, 1:6) = opt_fun(75:110)
+  do i1=1,6
+  do i2=1,6
+    sigmat(i1,i2) = opt_fun(74 + (i1-1)*6 + i2)
+  enddo
+  enddo
 
   !--- 2014-May-30  15:19:52  ghislain: if initial values are provided, copy the initial orbit
   !                 because opt_fun contains only the values given on the twiss command itself
@@ -1974,7 +1981,7 @@ SUBROUTINE twcptk(re,orbit)
      ! symplectic conjugate of E = S*E^T*S^T
      EBAR = matmul(SMAT, matmul(transpose(E),SMATT))
      edet = e(1,1) * e(2,2) - e(1,2) * e(2,1)
-     CD   =  - matmul(F, RMAT)
+     CD   = - matmul(F, RMAT)
      RMAT = - matmul(CD, EBAR) / edet
 
   else
@@ -2029,7 +2036,6 @@ SUBROUTINE twcptk(re,orbit)
            write (warnstr, '( a, e13.6, a, e13.6)') ' g = ', gammacp, '; trace of decoupled matrix is ', trace_tmp
            call fort_warn('TWCPTK: ', warnstr)
         endif
-
      endif
   endif
 
@@ -2126,8 +2132,6 @@ SUBROUTINE twcptk(re,orbit)
      !   call fort_warn('TWCPTK: ','twiss parameter might be unphysical (split element)')
      ! endif
 
-
-
   !---- Cumulative R matrix and one-turn map at element location.
   if (rmatrix) then
      RW = matmul(RE,RW)
@@ -2154,19 +2158,18 @@ SUBROUTINE twcptk(re,orbit)
 
      ! !IT sigma matrix(1:6, 1:6) = opt_fun(75:110)
      do i1=1,6
-        do i2=1,6
-           opt_fun(74 + (i1-1)*6 + i2) = sigmat(i1,i2)
-        enddo
+     do i2=1,6
+       opt_fun(74 + (i1-1)*6 + i2) = sigmat(i1,i2)
      enddo
-
+     enddo
   endif
 
   if (rmatrix) then
-     do i1=1,6
-        do i2=1,6
-           opt_fun(33 + (i1-1)*6 + i2) = rc(i1,i2)
-        enddo
-     enddo
+    do i1=1,6
+    do i2=1,6
+      opt_fun(33 + (i1-1)*6 + i2) = rc(i1,i2)
+    enddo
+    enddo
   endif
 
   if (centre_cptk) then
