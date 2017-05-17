@@ -1611,7 +1611,7 @@ tests/test-ptc-track-3/test-ptc-track-3.cfg -text
 tests/test-ptc-track-3/test-ptc-track-3.madx -text
 tests/test-ptc-track-3/test-ptc-track-3.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-track-3/trackone.cfg -text
-tests/test-ptc-track-3/trackone.ref -text
+tests/test-ptc-track-3/trackone.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-track/test-ptc-track.cfg -text
 tests/test-ptc-track/test-ptc-track.madx -text
 tests/test-ptc-track/test-ptc-track.ref -text svneol=unset#application/x-gzip
