@@ -204,12 +204,23 @@ contains
        ! GET NEW ENERGY AFTER THE CAVITY
        prevbeta0 = nfen%beta0
 
-       nfen= x(5)*nfen%p0c
+
+       if (localis%time) then
+         if ( getdebug() > 2 ) print*,"x(5) = dE = (E-E0)/p0c so (E-E0) = x(5)*p0c = ", x(5)*nfen%p0c * 1e3, "MeV"
+         FEED_P0C = .false.
+         nfen = x(5)*nfen%p0c
+       else
+         if ( getdebug() > 2 ) print*,"x(5) = dp = (pc-p0c)/p0c so (pc-p0c) = x(5)*p0c = ", x(5)*nfen%p0c * 1e3, "MeV"
+         FEED_P0C = .true.
+         nfen = x(5)*nfen%p0c
+       endif  
+        
 
        if ( getdebug() > 2 ) then
           write(6,100) 'New Fibre: energy=',nfen%energy,' momentum=',nfen%p0c,' kinetic=',nfen%kinetic
           write(6,110) nfen
-          write(6,'(a10, f8.4)') 'Relative E increase', (nfen%energy-startfen%energy)/startfen%kinetic
+          !  in x(5) units
+          write(6,'(a10, f8.4)') 'Relative E increase', (nfen%energy-startfen%energy)/startfen%p0c
        endif
 
        if (getdebug()>1) write (6,*) 'beta0 ', prevbeta0, ' oldpos ', position, ' newpos ', x(6), ' Current energy ',nfen%energy
@@ -226,6 +237,7 @@ contains
 
        !from this point on we do not need to calculate TOF cause there is no further cavs to set
     enddo
+    
 
     if ( getdebug() > 2 ) then
        write (*,*) 'Loop over cavities done'
@@ -235,6 +247,7 @@ contains
 
     do i=i,my_ring%n !setting beam energies to the end of line
        p = nfen
+
        call track(my_ring,x,i,i+1,localis)
 
        if ( .not. c_%stable_da) then
@@ -376,7 +389,7 @@ contains
       if(ene) then
 
          if ( getdebug() > 2 ) then
-            print*,"MAX ACCEL MODE"
+            print*,"MAX ACCEL MODE" ! ptc stores gradient not total voltage
             de_mev=f%mag%volt*f%mag%l
             write(*,*) '   Max Energy to gain: ', de_mev, ' MeV, x(6)', x(6)
          endif
