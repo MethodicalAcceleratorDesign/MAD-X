@@ -1,3 +1,19 @@
+5.03.06 | ldeniau | 2017-05-29
+  Bug fix for the dipedge element e1 and bv flag
+  Add P_s definition in the manual
+
+5.03.05 | itecker | 2017-05-17
+  Bug fix for sigma matrix initialisation.
+
+5.03.04 | Andrea, Laurent | 2017-04-14
+  Radiation bux fixes (including quantum), now working properly [Andrea].
+  Matching bux fixes, now working with the chrom option (ticket #414) [Laurent].
+  Beam attribute access bufg fix (nasty side effect, ticket #422) [Laurent].
+  New random number generator with support for 10 streams [Laurent].
+  New track quantum seed option added [Laurent].
+
+-- new release numbering scheme, minor number = bug fix in current release
+
 r6188 | ldeniau | 2017-04-11
   Allow Track to set a new seed in combination to the quantum option.
 
