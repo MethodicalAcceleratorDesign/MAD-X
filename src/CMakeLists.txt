@@ -109,7 +109,7 @@ target_link_libraries(madx  ${CMAKE_THREAD_LIBS_INIT} ${STDCPP_LIBS})
 
 # Garbage collector:
 if(USE_GC)
-   include_directories(${CMAKE_SOURCE_DIR}/libs/gc/gc/include)
+   include_directories(${CMAKE_SOURCE_DIR}/libs/gc/gc-7.2f/include)
 endif()
 
 # Defining specific stuff for packaging:

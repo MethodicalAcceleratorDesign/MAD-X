@@ -74,11 +74,6 @@ ndiff_test(test-thick-quad 0)
 ndiff_test(test-thick-quad-2 0)
 ndiff_test(test-thick-quad-3 0)
 
-if(USE_GC)
-   ndiff_test(test-memory 1)
-   set_tests_properties(test-memory_LONG PROPERTIES TIMEOUT 60)
-endif()
-
 ndiff_test(test-survey-2 0)
 
 ndiff_test(test-cororbit 1)
@@ -150,6 +145,7 @@ ndiff_test(test-table 0)
 ndiff_test(test-line 0)
 
 ndiff_test(test-memory 1)
+# set_tests_properties(test-memory_LONG PROPERTIES TIMEOUT 60)
 ndiff_test(test-beam 0)
 set_tests_properties(test-beam PROPERTIES WILL_FAIL 1)
 

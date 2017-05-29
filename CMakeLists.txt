@@ -42,7 +42,8 @@ include(setupOptions)
 # We add libraries before setting up compilers because
 # some of our options are incompatible with e.g. GC
 if(USE_GC)
-   add_subdirectory(libs/gc/gc)
+   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+   add_subdirectory(libs/gc/gc-7.2f)
 endif()
 
 # 
