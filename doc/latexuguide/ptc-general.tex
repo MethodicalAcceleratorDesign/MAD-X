@@ -238,6 +238,73 @@ The attributes are:
   (Default:~true)
 \end{madlist}
 
+\section{PTC\_SETSWITCH}
+\label{sec:ptc-setswitch}
+
+The \texttt{PTC\_SETSWITCH} command allows to set some global \ptc states and to configure the interface between {\madx} and {\ptc}, adapting the behavior of the program to the needs.   
+
+\madbox{
+	PTC\_SETSWITCH, \=DEBUGLEVEL=integer, \\
+	\>MAXACCELERATION=logical,\\
+	\>EXACT\_MIS=logical,\\
+	\>TOTALPATH=logical,\\
+	\>RADIATION=logical,\\
+	\>FRINGE=logical,\\
+	\>TIME=logical;
+}
+
+The command parameters and switches are:
+\begin{madlist}
+	\ttitem{DEBUGLEVEL} (Default: 1)\\
+	Sets the level of debugging printout: 0 prints none, 4 prints everything   
+	
+	\ttitem{MAXACCELERATION} (Default: true)\\
+	Switch to set cavities phases so the reference orbit is always on
+	the crest, i.e. gains max energy    
+	
+	\ttitem{EXACT\_MIS} (Default: false)\\
+	Switch ensures exact misalignment treatment.   
+	
+	\ttitem{TOTALPATH} (Default: false)\\
+	If true, the 6th variable of PTC, i.e. 5th of MAD-X, is the total
+	path.  \\
+	If false it is deviation from the reference particle,
+	which is normally the closed orbit for closed layouts.    
+	
+	\ttitem{RADIATION} (Default: false)\\    
+	Sets the radiation switch/internal state of PTC.   
+	
+	\ttitem{FRINGE} (Default: false)\\    
+	Sets the fringe switch/internal state of PTC. \\ 
+	If true the influence of the fringe fields is evaluated for all
+	elements. \\       
+	Please note that currently fringe fields are always taken into
+	account for some elements (e.g. traveling wave cavities) even if
+	this flag is set to false. The detailed list of elements
+	will be provided later, when the situation in this matter will be
+	definitely settled.    
+	
+	\ttitem{TIME} (Default: true)\\  
+	If true, Selects time of flight (\textit{cT} to be precise) rather
+	than path length as the 6th variable of PTC, i.e. 5th of MAD-X.     
+	
+\end{madlist}
+
+%% \textbf{PROGRAMMERS MANUAL}   
+%% Values of the switches are stored in Fortran 90 module
+%% mad\_ptc\_intstate (mad\_ptc\_intstate.f90). The command is processed by
+%% pro\_ptc\_setswitch C function, in file madxn.c, that calls appropriate
+%% routines of the Fortran module to set each of the switches:   
+%% \begin{itemize}
+%%    \item  ptc\_setdebuglevel 
+%%    \item  ptc\_setaccel\_method 
+%%    \item  ptc\_setexactmis 
+%%    \item  ptc\_setradiation 
+%%    \item  ptc\_settotalpath 
+%%    \item  ptc\_settime 
+%%    \item  ptc\_setfringe  
+%% \end{itemize}
+
 \section{PTC\_MOVE\_TO\_LAYOUT}
 \label{sec:ptc-move-to-layout}
 
