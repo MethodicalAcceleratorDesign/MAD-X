@@ -1657,7 +1657,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   integer :: i, i1, i2, iecnt, code, save, n_align, elpar_vl
   double precision :: ek(6), re(6,6), rwi(6,6), rc(6,6), te(6,6,6)
   double precision :: orbit00(6), ek00(6), re00(6,6), te00(6,6,6), disp00(6)
-  double precision :: rw0(6,6), rmat0(2,2)
+  double precision :: rw0(6,6), rmat0(2,2), sigmat00(6,6)
   double precision :: alfx0, betx0, amux0
   double precision :: alfy0, bety0, amuy0
   double precision :: orbit(6), orbit2(6)
@@ -1844,6 +1844,7 @@ subroutine backup_optics()
   bety0=bety; alfy0=alfy; amuy0=amuy
   RMAT0 = RMAT ; disp00 = disp
   if (rmatrix) RW0 = RW
+  sigmat00 = sigmat
 end subroutine backup_optics
 
 subroutine restore_optics()
@@ -1852,6 +1853,7 @@ subroutine restore_optics()
   bety=bety0; alfy=alfy0; amuy=amuy0
   RMAT = RMAT0 ; disp = disp00
   if (rmatrix) RW = RW0
+  sigmat = sigmat00
 end subroutine restore_optics
 
 subroutine save_opt_fun()
@@ -2778,7 +2780,7 @@ SUBROUTINE twchgo
   integer :: i, code, save, n_align
   double precision :: orbit(6), orbit2(6), ek(6), re(6,6), te(6,6,6)
   double precision :: orbit00(6), ek00(6), re00(6,6), te00(6,6,6), disp00(6), ddisp00(6)
-  double precision :: rmat0(2,2)
+  double precision :: rmat0(2,2), sigmat00(6,6)
   double precision :: al_errors(align_max), el, pos0, currpos
   character(len=130) :: msg
   double precision :: betx0, alfx0, amux0, wx0, dmux0, phix0
@@ -2891,6 +2893,7 @@ subroutine backup_optics()
      betx0=betx; alfx0=alfx; amux0=amux; wx0=wx; dmux0=dmux; phix0=phix
      bety0=bety; alfy0=alfy; amuy0=amuy; wy0=wy; dmuy0=dmuy; phiy0=phiy
      RMAT0 = RMAT ; disp00 = disp ; ddisp00 = ddisp
+     sigmat00 = sigmat
 end subroutine backup_optics
 
 subroutine restore_optics()
@@ -2898,6 +2901,7 @@ subroutine restore_optics()
      bety=bety0; alfy=alfy0; amuy=amuy0; wy=wy0; dmuy=dmuy0; phiy=phiy0
      RMAT = RMAT0 ; disp = disp00 ; ddisp = ddisp00
      ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
+     sigmat = sigmat00
 end subroutine restore_optics
 
 subroutine save_opt_fun()
