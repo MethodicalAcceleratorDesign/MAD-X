@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.03.05  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.03.09               +
-  + Execution date: 2017.03.30 14:39:50      +
+  + Release   date: 2017.05.17               +
+  + Execution date: 2017.05.29 12:34:49      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !Example script showing usage of tracking with PTC
 
@@ -248,9 +248,10 @@ obs_points: 3
         P0c      0.01999     GeV/c
  Track parameters after cavity   0.00000000  0.00000000  0.00000000  0.00000000  0.70010343  3.45080385
   Old Fibre: energy=    0.0200 momentum=    0.0200  kinetic=    0.0195
+ x(5) = dE = (E-E0)/p0c so (E-E0) = x(5)*p0c =    13.997497646681616      MeV
   New Fibre: energy=    0.0340 momentum=    0.0340  kinetic=    0.0335
     0.9999    0.0340    0.0335    0.0340    0.1134    0.0150    0.0002    0.0005 F  0
-Relative E  0.7182
+Relative E  0.7001
  beta0   0.99967354681047382       oldpos    0.0000000000000000       newpos    3.4508038492390041       Current energy    3.3997497646681613E-002
  Finding patch for j=           1  TCAV                    
  Current cavity no is j=           2
@@ -299,9 +300,10 @@ Relative E  0.7182
         P0c      0.03399     GeV/c
  Track parameters after cavity   0.00000000  0.00000000  0.00000000  0.00000000  0.41182975  7.95123315
   Old Fibre: energy=    0.0340 momentum=    0.0340  kinetic=    0.0335
+ x(5) = dE = (E-E0)/p0c so (E-E0) = x(5)*p0c =    13.999599334343433      MeV
   New Fibre: energy=    0.0480 momentum=    0.0480  kinetic=    0.0475
     0.9999    0.0480    0.0475    0.0480    0.1601    0.0106    0.0001    0.0005 F  0
-Relative E  1.4366
+Relative E  1.4003
  beta0   0.99988703584994565       oldpos    3.4508038492390041       newpos    7.9512331495870727       Current energy    4.7997096981025042E-002
  Finding patch for j=           2  TCAV                    
  Loop over cavities done
