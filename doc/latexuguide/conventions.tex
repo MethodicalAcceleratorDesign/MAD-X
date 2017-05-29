@@ -805,24 +805,24 @@ between square brackets, where [1] denotes a dimensionless variable.
 	referred to the ideal orbit [m].    
 	\ttitem{PX} Horizontal canonical momentum $p_x$ of the
 	(closed) orbit referred to the ideal orbit, divided by the
-	reference momentum: $\textrm{PX} = p_x / p_0$, [1].   
+	reference momentum: $\textrm{PX} = p_x / p_0$, \cite{slac75}.   
 	\ttitem{Y} Vertical position $y$ of the (closed) orbit, referred
 	to the ideal orbit [m].   
 	\ttitem{PY} Vertical canonical momentum $p_y$ of the (closed)
 	orbit referred to the ideal orbit, divided by the reference
-	momentum: $\textrm{PY} = p_y / p_0$, [1].   
+	momentum: $\textrm{PY} = p_y / p_0$, \cite{slac75}.   
 	\ttitem{T} Velocity of light times the negative time difference with
 	respect to the reference particle: $\textrm{T} =  - c t$, [m]. A
 	positive T means that the particle arrives ahead of the reference
 	particle.   
 	\ttitem{PT} Energy error, divided by the reference momentum times the
-	velocity of light: $\textrm{PT} = \Delta E / p_s c$, [1]. 
+	velocity of light: $\textrm{PT} = \Delta E / p_s c$ where $p_s = p_0 (1+$DELTAP), \cite{slac75}. 
 	This value is only non-zero when synchrotron motion is
 	present. It describes the deviation of the particle from the orbit
 	of a particle with the momentum error DELTAP.   
 	\ttitem{DELTAP} \textbf{Difference between the reference momentum and the design
 	momentum, divided by the design momentum: DELTAP =
-	$\Delta p / p_0$, [1].} This quantity is used to
+	$\Delta p / p_0$, \cite{slac75}.} This quantity is used to
 	\hyperref[chap:differences]{normalize} all element strengths.   
 \end{madlist} 
 
@@ -833,7 +833,7 @@ The independent variable is:
 \end{madlist} 
 
 In the limit of fully relativistic particles ($\gamma \gg 1$, $v = c$,
-$p c = E$), the variables T, PT used here agree with the
+$p c = E$), the variables T and PT used here agree with the
 longitudinal variables used in \cite{TRANSPORT}. This means that T
 becomes the negative path length difference, while PT becomes the
 fractional momentum error. The reference momentum $p_s$ must be
@@ -865,7 +865,7 @@ constant in order to keep the system canonical.
   \ttitem{WT} The longitudinal invariant, [m]\\
   WT = $t_n^2 + p_{tn}^2$
   \ttitem{PHIT} The longitudinal phase, [1]\\
-  $\phi_t = - atan ( p_{tn} / t_n ) / 2 \pi$
+  $\phi_t = - \arctan ( p_{tn} / t_n ) / 2 \pi$
 \end{madlist} 
 
 In the above formulas the vectors \(E_i\) are the three complex
