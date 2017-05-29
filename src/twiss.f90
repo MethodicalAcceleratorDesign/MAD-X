@@ -7500,7 +7500,7 @@ SUBROUTINE tmdpdg(ftrk,orbit,fmap,ek,re,te)
   TW = zero
 
   bvk  = node_value('other_bv ')
-  e1   = node_value('e1 ')
+  e1   = bvk * node_value('e1 ')
   h    = bvk * node_value('h ')
   hgap = node_value('hgap ')
   fint = node_value('fint ')
