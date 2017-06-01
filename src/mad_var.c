@@ -489,14 +489,12 @@ get_variable(const char* name)
     q = par; n++; n++;
     while (*n != '\0')  *(q++) = *(n++);
     *q = '\0';
-    if ((el = find_element(comm, element_list)) != NULL)
-      val = command_par_value(par, el->def);
-    else if ((cmd = find_command(comm, stored_commands)) != NULL)
+    if ((el = find_element(comm, element_list)) && (cmd = el->def)
+            || (cmd = find_command(comm, stored_commands))
+            || (cmd = find_command(comm, beta0_list))
+            || (cmd = find_command(comm, defined_commands))) {
       val = command_par_value(par, cmd);
-    else if ((cmd = find_command(comm, beta0_list)) != NULL)
-      val = command_par_value(par, cmd);
-    else if ((cmd = find_command(comm, defined_commands)) != NULL)
-      val = command_par_value(par, cmd);
+    }
   }
   return val;
 }
@@ -539,14 +537,12 @@ set_variable(const char* name, double* value)
     q = par; n++; n++;
     while (*n != '\0')  *(q++) = *(n++);
     *q = '\0';
-    if ((el = find_element(comm, element_list)) != NULL)
-      set_command_par_value(par, el->def, val);
-    else if ((cmd = find_command(comm, stored_commands)) != NULL)
+    if ((el = find_element(comm, element_list)) && (cmd = el->def)
+            || (cmd = find_command(comm, stored_commands))
+            || (cmd = find_command(comm, beta0_list))
+            || (cmd = find_command(comm, defined_commands))) {
       set_command_par_value(par, cmd, val);
-    else if ((cmd = find_command(comm, beta0_list)) != NULL)
-      set_command_par_value(par, cmd, val);
-    else if ((cmd = find_command(comm, defined_commands)) != NULL)
-      set_command_par_value(par, cmd, val);
+    }
   }
 }
 
