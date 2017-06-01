@@ -403,7 +403,7 @@ SUBROUTINE twprep(save,case,opt_fun,position)
      opt5 = opt_fun(5) ; opt_fun(5) = opt_fun(5) / twopi
      opt8 = opt_fun(8) ; opt_fun(8) = opt_fun(8) / twopi
      if (save .ne. 0) call twfill(case,opt_fun,position)
-     if (match_is_on) call copy_twiss_data(opt_fun, 0, 74)
+     if (match_is_on) call copy_twiss_data(opt_fun, 0, 110)
      opt_fun(5) = opt5
      opt_fun(8) = opt8
 

@@ -290,6 +290,7 @@ next_constr_namepos(char* name)
    in the opt_fun array of twiss (LD: weak!) */
 {
   int pos = 0;
+  char c1, c2;
   switch (*name) {
     case 'a':
            if (name[3] == 'x') pos = 4;       // a??x
@@ -353,6 +354,15 @@ next_constr_namepos(char* name)
       else if (name[1] == 'e')
         /* start mod HG 10.10.2010 - trying to be ascii-independent */
         pos = (name[2]-'1')*6 + name[3]-'1' + 34;  // re11-re66, no range check...
+      break;
+
+    case 's':
+      if (strncmp(name, "sig", 3) != 0)
+        break;
+      c1 = name[3]; if (c1 < '1' || c1 > '6') break;
+      c2 = name[4]; if (c2 < '1' || c2 > '6') break;
+      if (name[5] != '\0') break;
+      pos = 75 + (c1-'1')*6 + (c2-'1');
       break;
 
     case 't':
