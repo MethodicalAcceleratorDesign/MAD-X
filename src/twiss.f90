@@ -117,16 +117,19 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
      call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on); if (eflag.ne.0) go to 900
      if (get_option('twiss_print ') .ne. 0) &
         print '(''final orbit vector:   '', 1p,6e14.6)', orbit
+     call tmsigma(s0mat) !-- from initial conditions in opt_fun0
   else
      !---- Initial values from periodic solution.
      call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag);          if (eflag.ne.0) go to 900
-!     call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on); if (eflag.ne.0) go to 900
+!    LD: useless, identical to last call to tmfrst in tmclor...
+!    call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,0,0,ithr_on); if (eflag.ne.0) go to 900
      call twcpin(rt,disp0,r0mat,eflag);                               if (eflag.ne.0) go to 900
      !----IrinaTecker: For Sagan-Rubin and Talman versions of coupling
-     !call twcpin_sagan(rt,disp0,r0mat, eflag);                       if (eflag.ne.0) go to 900
-     !call twcpin_talman(rt,disp0,r0mat, eflag);                       if (eflag.ne.0) go to 900
+!    call twcpin_sagan(rt,disp0,r0mat,eflag);                         if (eflag.ne.0) go to 900
+!    call twcpin_talman(rt,disp0,r0mat,eflag);                        if (eflag.ne.0) go to 900
      !---- Initialize opt_fun0
      call twinifun(opt_fun0,rt)
+     call tmsigma_emit(rt,s0mat)
   endif
 
   if (sectormap)  then
@@ -135,13 +138,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
      STMAT = zero
   endif
 
-  ! IT: SIGMA MATRIX
-  ! tmsigma - based on standard [b -a ; -a gamma] matrix;
-  !call tmsigma( opt_fun0(3), opt_fun0(6), opt_fun0(4), opt_fun0(7), s0mat)
-  ! tmsigma_emit - based on eigenvalues;
-  call tmsigma_emit( rt, s0mat)
-
-  ! sigma matrix
+  ! save sigma matrix
   do i= 1,6
   do j= 1,6
     opt_fun0(74 + (i-1)*6 + j) = s0mat(i,j)
@@ -449,11 +446,10 @@ SUBROUTINE twfill(case,opt_fun,position)
   ripken = get_value('twiss ','ripken ') .ne. zero
 
   if (case .eq. 1) then
-     call vector_to_table_curr(table_name, 's ',    opt_fun(2), 17) ! fill 17 values starting with s
-     call vector_to_table_curr(table_name, 'r11 ',  opt_fun(29), 5) ! fill 5 values starting with r11
-     !IT
+     call vector_to_table_curr(table_name, 's '    , opt_fun( 2), 17) ! fill 17 values starting with s
+     call vector_to_table_curr(table_name, 'r11 '  , opt_fun(29), 5 ) ! fill 5  values starting with r11
      call vector_to_table_curr(table_name, 'sig11 ', opt_fun(75), 36) ! fill 36 values starting with sigmat11
-     call vector_to_table_curr(table_name, 'kmax ', opt_fun(70), 5) ! fill 5 values starting with kmax
+     call vector_to_table_curr(table_name, 'kmax ' , opt_fun(70), 5 ) ! fill 5  values starting with kmax
      if (rmatrix) call vector_to_table_curr(table_name, 're11 ', opt_fun(34), 36) ! fill Rmatrix
      if (ripken)  call twfill_ripken(opt_fun)
   elseif (case .eq. 2) then
@@ -2288,8 +2284,9 @@ SUBROUTINE twcptk_twiss(matx, maty, error)
   endif
 
   error = .false.
-end SUBROUTINE twcptk_twiss
-SUBROUTINE tmsigma(betx0, bety0, alfx0, alfy0, s0mat)
+END SUBROUTINE twcptk_twiss
+
+SUBROUTINE tmsigma(s0mat)
   use twiss0fi
   use twisslfi
   use twisscfi
@@ -2300,22 +2297,23 @@ SUBROUTINE tmsigma(betx0, bety0, alfx0, alfy0, s0mat)
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Calculation of sigma (beam) by Irina Tecker                      *
-  !     Input:                                                           *
-  !     betx,bety, alfx,alfy  (double)   decoupled twiss parameters      *
   !     Output:                                                          *
   !     sigma(6,6)  - initial sigma beam matrix                          *
-  !     sigma(6,6)  - [(beta, -alpha) (-alpha, gamma)]                   *
+  !                 = [(beta, -alpha) (-alpha, gamma)]                   *
   !                   where beta*gamma-alpha**2 =1                       *
   !----------------------------------------------------------------------*
-  double precision, intent (IN) :: betx0, alfx0
-  double precision, intent (IN) :: bety0, alfy0
   double precision, intent (OUT) :: s0mat(6, 6)
   double precision, external :: get_value
   double precision :: e1, e2
+  double precision :: betx0, alfx0, bety0, alfy0
 
   e1 = get_value('probe ','ex ')!BEAM->Ex
   e2 = get_value('probe ','ey ')!BEAM->Ey
 
+  betx0 = opt_fun0(3)
+  bety0 = opt_fun0(6)
+  alfx0 = opt_fun0(4)
+  alfy0 = opt_fun0(7)
 
   s0mat(1, 1) =  e1*betx0
   s0mat(2, 2) =  e1*(1 + alfx0**2)/betx0
@@ -2326,10 +2324,9 @@ SUBROUTINE tmsigma(betx0, bety0, alfx0, alfy0, s0mat)
   s0mat(4, 4) =  e2*(1 + alfy0**2)/bety0
   s0mat(4, 3) =  -e2*alfy0
   s0mat(3, 4) = s0mat(4, 3)
+END SUBROUTINE tmsigma
 
-end SUBROUTINE tmsigma
 SUBROUTINE tmsigma_emit(rt, s0mat)
-!subroutine emce2i(stabt, em, ex, ey, et, sigma)
   use twiss0fi
   use twisslfi
   use twisscfi
@@ -2368,16 +2365,17 @@ SUBROUTINE tmsigma_emit(rt, s0mat)
   et = get_value('probe ','et ')!BEAM->Ez
 
   do j = 1, 6
-     do k = 1, 6
-        s0mat(j,k) = ex * (em(j,1)*em(k,1) + em(j,2)*em(k,2)) + &
-                     ey * (em(j,3)*em(k,3) + em(j,4)*em(k,4))
-!        if (stabt) &
-        if (.not.m66sta(rt)) &
-             s0mat(j,k) = s0mat(j,k) + et * (em(j,5)*em(k,5) + em(j,6)*em(k,6))         !---- Solve for dynamic case
-     enddo
+    do k = 1, 6
+      s0mat(j,k) = ex * (em(j,1)*em(k,1) + em(j,2)*em(k,2)) + &
+                   ey * (em(j,3)*em(k,3) + em(j,4)*em(k,4))
+      !---- Solve for dynamic case
+      if (.not.m66sta(rt)) then
+        s0mat(j,k) = s0mat(j,k) + et * (em(j,5)*em(k,5) + em(j,6)*em(k,6))
+      endif
+    enddo
   enddo
+END SUBROUTINE tmsigma_emit
 
-end SUBROUTINE tmsigma_emit
 SUBROUTINE twcptk_twiss_new(matx, maty, error)
   use twiss0fi
   use twisslfi
