@@ -36,9 +36,9 @@ all-macosx64-intel: madx-macosx64-intel numdiff-macosx64-intel # libmadx-macosx6
 # minimum backward compatibility (may trig warnings with macport libs > 10.8)
 #
 
-ifeq ($(MACOSX_DEPLOYMENT_TARGET),)
-  export MACOSX_DEPLOYMENT_TARGET=10.8
-endif
+# ifeq ($(MACOSX_DEPLOYMENT_TARGET),)
+#   export MACOSX_DEPLOYMENT_TARGET=10.8
+# endif
 
 #
 # cleanbuild platform specific
