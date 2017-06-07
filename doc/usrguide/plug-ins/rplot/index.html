@@ -9,7 +9,7 @@
 <meta name=Generator content="NEdit">
 <meta name=Originator content="Skowron">
 <link rel="stylesheet" type="text/css" href="madxdoc_ps.css" />
-<title>RLOT</title>
+<title>RPLOT</title>
 <style>
 </style>
 </head>
@@ -63,7 +63,7 @@ It contains several tools
     the plotted functions are immediately drawn for the new value. 
     
     <p>
-    In order to run RVIEWER simpy issue "rviewer;" command
+    In order to run RVIEWER simpy issue <tt>rviewer;</tt> command
     
   </dd>
 
@@ -80,14 +80,16 @@ It contains several tools
       ZIP data compression that is transparent for the user algorithms.  
       Morover, ROOT provides wide set of very comfortable tools
       for advanced analysis and plotting of the data stored in Trees.
+  <!--    
   <p>   
       Addtionally, we plan to extend RVIEWER functionality that would provide 
       intuitive graphical user interface to most commonly used
       features in particle tracking in accelerators. Thanks to that,
       the user is not forced to learn how to use the ROOT package.
+      -->    
   <p> 
       Currently the feature is enabled only for tracking using 
-      the ptc_trackline command, however, it will be extended to
+      the <tt>ptc_trackline</tt> command, however, it will be extended to
       other tracking modes.
       
   </dd>
@@ -100,8 +102,10 @@ It contains several tools
 
 
 <h4> Download </h4>
-
+<p>
 The newest version is available <a href="download/"> here </a>
+<p>
+RPLOT is tested with ROOT version 6.08/00.
 
 <h4> Installation </h4>
 
@@ -127,9 +131,140 @@ To install RPLOT
    make install
    </pre>
   </li> 
+
+  <li>Add location of your librplot.so (it is displayed by 'make install') to LD_LIBRARY_PATH.
+      Open your shell configuration file, for example ~/.bashrc and add
+   <pre>
+      export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:DIR_OF_YOUR_LIBRPLOT
+   </pre>
+     Alternatively, the command above needs to be ran in your shell before MADX execution
+   <p>
+  </li> 
+
+  <li> Download MADX 
+   <pre>
+      svn co svn+ssh://svn.cern.ch/reps/madx/trunk/madX/
+   </pre>
+  </li> 
+
+   <li>  Compile MADX with plugin support 
+   <pre>
+      make madx-linux64-gnu PLUGIN=yes
+   </pre>
+  </li> 
+  
 </ol>
 
-<h4> Examples</h4>
+
+
+
+<h3> Examples</h3>
+<h4> Using RPLOT from ROOT</h4>
+<p>
+
+
+<ol>
+   <li> Add option <tt> rootntuple </tt> to <tt> ptc_trackline </tt>
+   <pre>
+      ptc_trackline, onetable, rootntuple;
+   </pre>
+   It should display message about loading librplot.so and produce rplot.root file.
+   <p>
+   </li>
+   
+
+   <li> Open rplot.root file with ROOT. You may need to first issue this command to configure root
+    <pre>
+      source $ROOTSYS/bin/thisroot.sh
+    </pre>
+
+    <pre>
+       root rplot.root
+    </pre>
+   </li>
+
+   <li> See the list of columns 
+    <pre>
+       Tracking1->Print();
+    </pre>
+    It should display <a href="rootout.txt">table with NTuple summary </a>
+    <p>
+   </li>
+
+   <li> Plot your data
+   <p> Draw histogram of x
+    <pre>
+       Tracking1->Draw("x");
+    </pre>
+
+   <p> Draw graph x vs xp
+    <pre>
+       Tracking1->Draw("x:xp");
+    </pre>
+
+   <p> Draw graph x vs xp at observation point 1
+    <pre>
+       Tracking1->Draw("x:xp","obspoint==1");
+    </pre>
+
+   <p> Draw y trajectory along the machine for track number 3 plotted as line
+    <pre>
+       Tracking1->Draw("y:obspoint","trackno==3","L");
+    </pre>
+
+   <p> Add the trajectory for track number 5
+    <pre>
+       Tracking1->Draw("y:obspoint","trackno==5","LSAME");
+    </pre>
+    
+    <p>
+   </li>
+
+   
+</ol>
+
+
+<H4> Using RPLOT file (or any ROOT file) from Python </H4>
+<p>
+
+ First you need to install root_pandas
+<ol>
+   <li> Login as root. Assure that root is on your path:
+   <pre>
+      source $ROOTSYS/bin/thisroot.sh
+   </pre>
+
+   <li> Install root_pandas in Python:
+   <pre>
+      pip install root_pandas
+   </pre>
+
+   <p>
+
+   </li>
+</ol>
+
+If root_pandas is already installed
+<ol>
+   <li> Assure that root is on your path
+   <pre>
+      source $ROOTSYS/bin/thisroot.sh
+   </pre>
+
+   <li> Run python and load the reader from root_pandas:
+   <pre>
+      from root_pandas import read_root
+   </pre>
+
+   <li> Get the data as DataFrame:
+   <pre>
+      df = read_root('rplot.root')
+   </pre>
+
+   <p>
+
+   </li>
+</ol>
 
 
 

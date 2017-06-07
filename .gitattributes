@@ -312,6 +312,7 @@ doc/usrguide/plug-ins/rplot/download/rplot-1.09.tgz -text svneol=unset#applicati
 doc/usrguide/plug-ins/rplot/index.html -text
 doc/usrguide/plug-ins/rplot/index.tex -text
 doc/usrguide/plug-ins/rplot/madxdoc_ps.css -text
+doc/usrguide/plug-ins/rplot/rootout.txt -text
 doc/usrguide/ptc_auxiliaries/Match_WithPTCKnobs.html -text
 doc/usrguide/ptc_auxiliaries/PTC_DumpMaps.html -text
 doc/usrguide/ptc_auxiliaries/PTC_EPlacement.html -text

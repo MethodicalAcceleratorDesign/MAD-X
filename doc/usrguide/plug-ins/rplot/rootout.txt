@@ -1,0 +1,49 @@
+root [0] 
+Attaching file rplot.root as _file0...
+(TFile *) 0x3249ba0
+root [1] Tracking1->Print();
+******************************************************************************
+*Tree    :Tracking1 : Tracking1                                              *
+*Entries :   276840 : Total =        11110239 bytes  File  Size =    3090376 *
+*        :          : Tree compression factor =   3.60                       *
+******************************************************************************
+*Br    0 :trackno   : Float_t                                                *
+*Entries :   276840 : Total  Size=    1111125 bytes  File Size  =      10894 *
+*Baskets :       35 : Basket Size=      32000 bytes  Compression= 101.90     *
+*............................................................................*
+*Br    1 :obspoint  : Float_t                                                *
+*Entries :   276840 : Total  Size=    1111164 bytes  File Size  =     318200 *
+*Baskets :       35 : Basket Size=      32000 bytes  Compression=   3.49     *
+*............................................................................*
+*Br    2 :turn      : Float_t                                                *
+*Entries :   276840 : Total  Size=    1111008 bytes  File Size  =       9367 *
+*Baskets :       35 : Basket Size=      32000 bytes  Compression= 118.50     *
+*............................................................................*
+*Br    3 :x         : Float_t                                                *
+*Entries :   276840 : Total  Size=    1110891 bytes  File Size  =     748445 *
+*Baskets :       35 : Basket Size=      32000 bytes  Compression=   1.48     *
+*............................................................................*
+*Br    4 :xp        : Float_t                                                *
+*Entries :   276840 : Total  Size=    1110930 bytes  File Size  =     284800 *
+*Baskets :       35 : Basket Size=      32000 bytes  Compression=   3.90     *
+*............................................................................*
+*Br    5 :y         : Float_t                                                *
+*Entries :   276840 : Total  Size=    1110891 bytes  File Size  =     736843 *
+*Baskets :       35 : Basket Size=      32000 bytes  Compression=   1.51     *
+*............................................................................*
+*Br    6 :yp        : Float_t                                                *
+*Entries :   276840 : Total  Size=    1110930 bytes  File Size  =     282409 *
+*Baskets :       35 : Basket Size=      32000 bytes  Compression=   3.93     *
+*............................................................................*
+*Br    7 :dPoverP   : Float_t                                                *
+*Entries :   276840 : Total  Size=    1111125 bytes  File Size  =       9612 *
+*Baskets :       35 : Basket Size=      32000 bytes  Compression= 115.49     *
+*............................................................................*
+*Br    8 :p         : Float_t                                                *
+*Entries :   276840 : Total  Size=    1110891 bytes  File Size  =       9401 *
+*Baskets :       35 : Basket Size=      32000 bytes  Compression= 118.06     *
+*............................................................................*
+*Br    9 :l         : Float_t                                                *
+*Entries :   276840 : Total  Size=    1110891 bytes  File Size  =     676986 *
+*Baskets :       35 : Basket Size=      32000 bytes  Compression=   1.64     *
+*............................................................................*
