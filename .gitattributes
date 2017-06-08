@@ -305,10 +305,7 @@ doc/usrguide/match/match_xmpl.html -text
 doc/usrguide/plot/plot.html -text
 doc/usrguide/plug-ins/index.html -text
 doc/usrguide/plug-ins/madxdoc_ps.css -text
-doc/usrguide/plug-ins/rplot/download/rplot-1.06.tgz -text
-doc/usrguide/plug-ins/rplot/download/rplot-1.07.tgz -text
-doc/usrguide/plug-ins/rplot/download/rplot-1.08.tgz -text
-doc/usrguide/plug-ins/rplot/download/rplot-1.09.tgz -text svneol=unset#application/x-gzip
+doc/usrguide/plug-ins/rplot/download/rplot-1.10.tgz -text svneol=unset#application/x-gzip
 doc/usrguide/plug-ins/rplot/index.html -text
 doc/usrguide/plug-ins/rplot/index.tex -text
 doc/usrguide/plug-ins/rplot/madxdoc_ps.css -text
