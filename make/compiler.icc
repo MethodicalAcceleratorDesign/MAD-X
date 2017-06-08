@@ -67,7 +67,7 @@ CFLAGS += -fPIC
 endif
 
 ifeq ($(OPENMP),yes)
-CFLAGS += -openmp
+CFLAGS += -qopenmp
 endif
 
 #
@@ -119,7 +119,7 @@ CXXFLAGS += -fPIC
 endif
 
 ifeq ($(OPENMP),yes)
-CXXFLAGS += -openmp
+CXXFLAGS += -qopenmp
 endif
 
 #

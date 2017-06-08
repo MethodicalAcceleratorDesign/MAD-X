@@ -55,7 +55,7 @@ LDLIBS  += -ldl
 endif
 
 ifeq ($(OPENMP),yes)
-LDFLAGS += -openmp $(if $(call eq,$(STATIC),yes),-openmp-link static,)
+LDFLAGS += -qopenmp $(if $(call eq,$(STATIC),yes),-qopenmp-link static,)
 endif
 
 endif # Unix Settings

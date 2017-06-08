@@ -63,7 +63,7 @@ FFLAGS += -fPIC
 endif
 
 ifeq ($(OPENMP),yes)
-FFLAGS += -openmp
+FFLAGS += -qopenmp
 endif
 
 #
