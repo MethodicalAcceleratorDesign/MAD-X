@@ -54,6 +54,7 @@ ptc_create_universe;
   write, table=nonlin, file="ptc.nonlin";
 
 
+  ! analitical formula from A. Franchi
   bx = table(twiss, m, beta11);
   by = table(twiss, m, beta22);
   qx = table(twiss, myline$end, mu1);
@@ -87,6 +88,8 @@ ptc_create_universe;
 
   value, f3000_im, ff3000_im, f3000_im - ff3000_im;
 
+
+
   ff1200_re = table(nonlin, GNFC_1_2_0_0_0_0,value);
   ff1200_im = table(nonlin, GNFS_1_2_0_0_0_0,value);
 
@@ -101,4 +104,31 @@ ptc_create_universe;
   value, h3000_re, hh3000_re, h3000_re - hh3000_re;
 
 
+
 ptc_end;
+
+
+match, use_macro;
+ 
+ vary, name
+ 
+ m1: macro = 
+  {
+    ptc_create_universe;
+      ptc_create_layout, model=1, method=6, nst=5, exact=true, closed_layout=true;
+      !!!!!       T I M E   T R U E ,   T O T P A T H  F A L S E
+      ptc_setswitch, debuglevel=1, exact_mis=true, time=true, totalpath=false;
+
+      ptc_twiss, table=twiss, icase=5, no=4, closed_orbit=false, rmatrix, normal, writetmap;
+
+      myRDTno7100 table(nonlin, GNFC_7_1_0_0_0_0,value);
+      
+      
+    
+     ptc_end;
+     
+  }
+  
+  
+endmatch;
+

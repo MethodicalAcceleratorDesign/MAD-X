@@ -737,6 +737,7 @@ const char *const_command_def =
 "beam_envelope = [l, false, true], "
 "dump     = [l, false, true], "
 "onetable = [l, false, true], "
+"recloss  = [l, false, true], "
 "file     = [s, track, track], "
 "extension= [s, none, none], "
 "ffile    = [i, 1], "
