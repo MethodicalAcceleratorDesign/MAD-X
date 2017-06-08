@@ -1223,6 +1223,20 @@ CONTAINS
                endif !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX    +   !
                !                                                             !               +   !
             end do !---------------------------------------------------------!               !   ^
+
+
+            if (rplot) then
+                call plottrack(j_particle, my_ring%n, i_th_turn, & 
+                                        current_x_coord_incl_co(1), &
+                                        current_x_coord_incl_co(2), &
+                                        current_x_coord_incl_co(3), &
+                                        current_x_coord_incl_co(4), &
+                                        current_x_coord_incl_co(5), &
+		sqrt(MY_RING%end%mag%p%p0c**2 + (MY_RING%end%mass)**2), &
+		current_x_coord_incl_co(6))
+               !   endif
+            endif
+
             !                                                                                !   !
             if (ptc_track_debug) then ! debug printing ----------------------------!         !   !
                Print *,'DO j_particle=n_temp, jmax_numb_particl_at_i_th_turn:'     !         !   !
@@ -3267,3 +3281,4 @@ CONTAINS
 END MODULE madx_ptc_track_run_module
 !==============================================================================
 !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
