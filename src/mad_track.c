@@ -508,6 +508,21 @@ getcurrentcmdname(char* string)
 
 }
 
+const char* getcurrentelementname()
+{
+/*returns name of the current element 
+  Used in rviewer plugin
+*/
+
+  if (current_node == 0x0)
+  {
+    return 0x0;
+  }
+
+  return current_node->name;
+
+}
+
 int
 gettrack(int* nt, double* x,double* px,double* y,double* py,double* t,double* pt)
 {

@@ -30,5 +30,11 @@ int   gettrack(int* nt, double* x, double* px, double* y, double* py, double* t,
 int   next_start(double* x, double* px, double* y, double* py, double* t, double* deltae,
                  double* fx,double* phix, double* fy, double* phiy, double* ft,double* phit);
 
+
+/**
+ * Used in RPLOT plugin
+ */
+const char* getcurrentelementname(void);
+
 #endif // MAD_TRACK_H
 

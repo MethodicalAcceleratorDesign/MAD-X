@@ -212,17 +212,22 @@ CONTAINS
     data vec_names  / 'x', 'px', 'y', 'py', 't', 'pt','s' / ! MADX
     !data vec_names / 'x', 'px', 'y', 'py', 'pt', 't','s' / ! PTC has a reverse order for pt and t
     logical(lp) rplot
+    integer   mft ! debug output file
     !k    data char_a / ' ' /
     !-------------------------------------------------------------------------
     
     if (getdebug() > 2) then
       ptc_track_debug = .true.
+      call kanalnummer(mft)
+      open(unit=mft,file='ptc_track.log')
+      
     endif
 
     rplot = get_value('ptc_track ','rootntuple ') .ne. 0
     if (rplot) then
        call newrplot()
     endif
+    
     
     ! default value
     return_from_subr_ptc_track=.FALSE. ! used to RETURN from this subr.
@@ -1268,9 +1273,6 @@ CONTAINS
             !                                                                                !   !
             ! added 2012.09.24                                                               !   !
             if (NaN_coord_after_track_VK) flag_index_ptc_aperture=100 !VK20070328 XXXXXXXXX  !   !
-            if (ptc_track_debug) then                                                 !XXXX  !   !
-                 print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture !XXXX  !   !
-            endif                                                                            !   !
 
             if (abs(current_x_coord_incl_co(1)).ge.maxaper(1).or. &                          !   !
                 abs(current_x_coord_incl_co(2)).ge.maxaper(2).or. &                          !   !
@@ -1284,6 +1286,10 @@ CONTAINS
             if ( (icase_ptc .gt. 5) .and. (MYSTATE%TOTALPATH .eq. 0) ) then                  !   !
               if (abs(current_x_coord_incl_co(6)).ge.maxaper(5)) flag_index_ptc_aperture = 50!   !
             endif 
+
+            if (ptc_track_debug) then                                                 !XXXX  !   !
+                 print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture !XXXX  !   !
+            endif                                                                            !   !
             
             !                                                                                !   !
             if_ptc_track_unstable: IF (flag_index_ptc_aperture/=0) then ! =========!         +   ^
@@ -1483,7 +1489,11 @@ CONTAINS
                call track_probe_x(my_ring,current_x_coord_incl_co,MYSTATE, &                     !  ! !
                     fibre1=i_current_elem,fibre2=i_current_elem+1)                               !  ! !
                
-               
+               if (ptc_track_debug) then
+                 write(mft,*) "t ", i_th_turn, " el ",i_current_elem+1," ",name_curr_elem," track ", j_th_partic, &
+                              " : ", current_x_coord_incl_co
+               endif  
+                
                if (rplot) then
                    call plottrack(j_th_partic, i_current_elem+1, i_th_turn, & 
                                            current_x_coord_incl_co(1), &
@@ -1569,6 +1579,12 @@ CONTAINS
                !                                                                                 !    !
                if_ptc_track_unstable: IF (flag_index_ptc_aperture/=0) then ! ========!           +  ^ !
                   ! => particle is lost !!(?)                                        !           +  ! !
+
+                  if (ptc_track_debug) then
+                    write(mft,*) "Track ", j_th_partic , " hits maxaper at ", i_current_elem, " turn ", i_th_turn
+                    write(mft,*) "maxaper : ", maxaper
+                  endif
+
                   n_temp=j_last_particle_buffer                                      !           +  ! l
                   !                                                                  !           +  ! o
                   CALL kill_ptc_track &                                              !           +  ! o
@@ -2866,6 +2882,8 @@ CONTAINS
             X_MAD(3)=y_input; X_MAD(4)=py_input                               ! i   a   !
             X_MAD(5)=t_input; X_MAD(6)=deltae_input                           ! t   r   !
             !                                                                 ! c   t   f
+            
+            ! Very dodgy
             IF(icase_ptc.eq.5 .AND. (.NOT.closed_orbit)) THEN !--!            ! h   i   o
                if(mytime) then !----------------------!          !              !
                   call Convert_dp_to_dt (deltap, dt)  !          !              !
@@ -2874,6 +2892,7 @@ CONTAINS
                endif !--------------------------------!          !              !
                X_MAD(6)=X_MAD(6)+dt                              !              !   l   !
             ENDIF !----------------------------------------------!              !   e   !
+            
             !                                                                   !   !   p
             CALL Coord_MAD_to_PTC(X_MAD,X_PTC) ! convert coordinates          ! c   t   a
             DO k_th_coord=1,6                                                 ! h   i   r
@@ -3064,9 +3083,11 @@ CONTAINS
     !=============================================================================
 
     !=============================================================================
-
+    
     SUBROUTINE Coord_MAD_to_PTC(X_MAD,X_PTC)
       ! Convert coordinates from MAD to PTC
+      ! only swap 5 with 6
+      ! and than sign of 6
       IMPLICIT NONE
       REAL(dp), INTENT(IN)  :: X_MAD(6)
       REAL(dp), INTENT(OUT) :: X_PTC(6)
@@ -3102,10 +3123,13 @@ CONTAINS
       endif
 
       IF (icase_ptc.eq.6) THEN
-         X_MAD(5)=X_PTC(6); X_MAD(6)=X_PTC(5);
+         X_MAD(5)=X_PTC(6); 
+         X_MAD(6)=X_PTC(5);
          if (mytime) X_MAD(5)=-X_MAD(5) ! reverse sign
+         
       elseif(icase_ptc.eq.5) THEN
-         X_MAD(5)=X_PTC(6); X_MAD(6)=X_PTC(5)
+         X_MAD(5)=X_PTC(6); 
+         X_MAD(6)=X_PTC(5)
          if (mytime) X_MAD(5)=-X_MAD(5) ! reverse sign
       elseif(icase_ptc.eq.4) THEN
          X_MAD(5)=zero; X_MAD(6)=zero
