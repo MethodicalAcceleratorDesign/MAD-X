@@ -50,7 +50,6 @@ FC_DIR := $(FC_DIR_MAD) $(FC_DIR_PTC)
 FC_SRC := $(filter-out $(FC_SRC_RM),$(FC_SRC_MAD) $(FC_SRC_PTC))
 
 # files for OPENMP (only trrun.f90 has OMP directives)
-# note: added to solve problem between sodd.f90 and OMP
 OPENMPFILES += trrun.f90
 
 # files specific compiler flag (i.e. "internal compiler error" message)
