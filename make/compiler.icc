@@ -67,7 +67,7 @@ CFLAGS += -fPIC
 endif
 
 ifeq ($(OPENMP),yes)
-CFLAGS += -qopenmp
+CFLAGS += $(if $(filter $(<F),$(OPENMPFILES)),-qopenmp,)
 endif
 
 #
@@ -119,7 +119,7 @@ CXXFLAGS += -fPIC
 endif
 
 ifeq ($(OPENMP),yes)
-CXXFLAGS += -qopenmp
+CXXFLAGS += $(if $(filter $(<F),$(OPENMPFILES)),-qopenmp,)
 endif
 
 #

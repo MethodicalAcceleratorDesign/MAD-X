@@ -63,7 +63,7 @@ FFLAGS += -fPIC
 endif
 
 ifeq ($(OPENMP),yes)
-FFLAGS += -qopenmp
+FFLAGS += $(if $(filter $(<F),$(OPENMPFILES)),-qopenmp,)
 endif
 
 #
@@ -109,7 +109,7 @@ FFLAGS += /Qprof-use
 endif
 
 ifeq ($(OPENMP),yes)
-FFLAGS += /Qopenmp
+FFLAGS += $(if $(filter $(<F),$(OPENMPFILES)),/Qopenmp,)
 endif
 
 #

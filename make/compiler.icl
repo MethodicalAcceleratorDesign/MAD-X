@@ -75,7 +75,7 @@ CFLAGS += /Qprof-use
 endif
 
 ifeq ($(OPENMP),yes)
-CFLAGS += /Qopenmp
+CFLAGS += $(if $(filter $(<F),$(OPENMPFILES)),/Qopenmp,)
 endif
 
 #
@@ -134,11 +134,7 @@ CXXFLAGS += /Qprof-use
 endif
 
 ifeq ($(OPENMP),yes)
-CXXFLAGS += /Qopenmp
-endif
-
-ifeq ($(OPENMP),yes)
-CXXFLAGS += /Qopenmp
+CXXFLAGS += $(if $(filter $(<F),$(OPENMPFILES)),/Qopenmp,)
 endif
 
 #

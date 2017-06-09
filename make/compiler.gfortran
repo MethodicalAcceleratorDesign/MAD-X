@@ -56,11 +56,11 @@ FFLAGS += -fPIC
 endif
 
 ifeq ($(OPENMP),yes)
-FFLAGS += -fopenmp
+FFLAGS += $(if $(filter $(<F),$(OPENMPFILES)),-fopenmp,)
 endif
 
 ifeq ($(SANITIZE),yes)
-FFLAGS += -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined 
+FFLAGS += -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
 endif
 
 #

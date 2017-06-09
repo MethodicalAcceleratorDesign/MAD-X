@@ -51,7 +51,7 @@ CFLAGS += -fPIC
 endif
 
 ifeq ($(OPENMP),yes)
-CFLAGS += -fopenmp
+CFLAGS += $(if $(filter $(<F),$(OPENMPFILES)),-fopenmp,)
 endif
 
 ifeq ($(SANITIZE),yes)

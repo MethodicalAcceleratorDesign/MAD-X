@@ -79,8 +79,9 @@ STATIC   := no
 # plugin dynamic loading: yes/no (default is no)
 PLUGIN   := no
 
-# OpenMP activation: yes/no (default is no, GCC and Intel only)
+# OpenMP activation: yes/no (default is no, GCC, Intel and LLVM only)
 OPENMP   := no
+# OPENMPFILES := $(wildcard src/*)  # set in Makefile_f90 for MAD-X
 
 # Sanitizer activation: yes/no (default is no, requires GCC >= 4.8)
 # to visualize the ouput, use scripts/asan_symbolize.py

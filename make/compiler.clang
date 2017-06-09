@@ -39,7 +39,7 @@ CFLAGS = -m$(ARCH) -O$(NOPT) -std=c99 -Wall -W -Wextra -pedantic -c
 #
 
 ifeq ($(DEBUG),yes)
-CFLAGS += -g -ggdb 
+CFLAGS += -g -ggdb
 endif
 
 ifeq ($(PROFILE),yes)
@@ -51,7 +51,7 @@ CFLAGS += -fPIC
 endif
 
 ifeq ($(OPENMP),yes)
-CFLAGS += -fopenmp
+CFLAGS += $(if $(filter $(<F),$(OPENMPFILES)),-fopenmp,)
 endif
 
 ifeq ($(SANITIZE),yes)
@@ -63,7 +63,7 @@ endif
 #
 
 CFLAGS += -pipe
- 
+
 #
 # diagnostics (gcc is the reference)
 #
