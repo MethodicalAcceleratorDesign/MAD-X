@@ -51,7 +51,11 @@ FFLAGS = -m$(ARCH) -O$(NOPT) -warn all -warn nounused -warn nointerfaces -c
 #
 
 ifeq ($(DEBUG),yes)
-FFLAGS += -g -gdwarf-2 -debug full -debug extended -traceback -check all
+FFLAGS += -g -gdwarf-2 -debug full -debug extended -traceback
+endif
+
+ifeq ($(DCHECK),yes)
+FFLAGS += -check all
 endif
 
 ifeq ($(PROFILE),yes)
@@ -101,7 +105,11 @@ FFLAGS = /O$(NOPT) /stand:f95 /warn:all /warn:nounused /c
 #
 
 ifeq ($(DEBUG),yes)
-FFLAGS += /Z7 /debug:full /traceback /check:all /debug-parameters:all /RTCu
+FFLAGS += /Z7 /debug:full /traceback /debug-parameters:all /RTCu
+endif
+
+ifeq ($(DCHECK),yes)
+FFLAGS += /check:all
 endif
 
 ifeq ($(PROFILE),yes)

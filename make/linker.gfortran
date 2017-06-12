@@ -28,7 +28,11 @@ LDLIBS  =
 #
 
 ifeq ($(DEBUG),yes)
-LDFLAGS += -g -ggdb 
+LDFLAGS += -g -ggdb
+endif
+
+ifeq ($(DCHECK),yes)
+LDLAGS += -fbounds-check -Warray-bounds
 endif
 
 ifeq ($(PROFILE),yes)
@@ -55,7 +59,7 @@ LDFLAGS += -fopenmp
 endif
 
 ifeq ($(SANITIZE),yes)
-LDFLAGS += -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined 
+LDFLAGS += -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
 endif
 
 # end of makefile

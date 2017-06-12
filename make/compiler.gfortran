@@ -44,7 +44,11 @@ FFLAGS = -m$(ARCH) -O$(NOPT) -c
 #
 
 ifeq ($(DEBUG),yes)
-FFLAGS += -g -ggdb -fbounds-check -Warray-bounds
+FFLAGS += -g -ggdb
+endif
+
+ifeq ($(DCHECK),yes)
+FFLAGS += -fbounds-check -Warray-bounds
 endif
 
 ifeq ($(PROFILE),yes)
