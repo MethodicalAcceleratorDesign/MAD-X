@@ -54,13 +54,11 @@ ptc_create_universe;
   write, table=nonlin, file="ptc.nonlin";
 
 
-  ! analitical formula from A. Franchi
+  ! analitical formulas from A. Franchi https://arxiv.org/abs/1402.1461
   bx = table(twiss, m, beta11);
   by = table(twiss, m, beta22);
   qx = table(twiss, myline$end, mu1);
   qy = table(twiss, myline$end, mu2);
-
-
 
   na = sx1_k2*sx1_l*sqrt(bx*bx*bx);
 
@@ -81,6 +79,10 @@ ptc_create_universe;
   f1200_re = -1*(na*dc/f1200_de);
   f1200_im = -1*(-na*dd/f1200_de);
 
+
+  ! comparisons of PTC values with analitical 
+  !    ( in fact the analitical formulas are not exact 
+  !      because they neglect higher order contributions )
   ff3000_re = table(nonlin, GNFC_3_0_0_0_0_0,value);
   ff3000_im = table(nonlin, GNFS_3_0_0_0_0_0,value);
 
@@ -104,31 +106,5 @@ ptc_create_universe;
   value, h3000_re, hh3000_re, h3000_re - hh3000_re;
 
 
-
 ptc_end;
-
-
-match, use_macro;
- 
- vary, name
- 
- m1: macro = 
-  {
-    ptc_create_universe;
-      ptc_create_layout, model=1, method=6, nst=5, exact=true, closed_layout=true;
-      !!!!!       T I M E   T R U E ,   T O T P A T H  F A L S E
-      ptc_setswitch, debuglevel=1, exact_mis=true, time=true, totalpath=false;
-
-      ptc_twiss, table=twiss, icase=5, no=4, closed_orbit=false, rmatrix, normal, writetmap;
-
-      myRDTno7100 table(nonlin, GNFC_7_1_0_0_0_0,value);
-      
-      
-    
-     ptc_end;
-     
-  }
-  
-  
-endmatch;
 
