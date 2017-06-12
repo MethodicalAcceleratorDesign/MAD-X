@@ -1899,6 +1899,8 @@ pro_ptc_track(struct in_cmd* cmd)
   set_option("aperture", &k);
   k = get_value(current_command->name,"dump");
   set_option("track_dump", &k);
+  k = get_value(current_command->name,"recloss");
+  set_option("recloss", &k);
   k = get_value(current_command->name,"onetable");
   set_option("onetable", &k);
   track_deltap=get_value(current_command->name,"deltap");

@@ -2395,6 +2395,12 @@ CONTAINS
        else
           default = default - delta0 - only_4d0 - NOCAVITY0 !enforcing nocavity to false
        endif
+       
+    endif
+
+    if (i==6 .and. (default%time .eqv. .false. )) then
+      call fort_warn("my_state ",  &
+            "TIME=false with RF cavities gives approximative results valid only for fully relativistic beams (beta~1)")
     endif
 
 

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.04  (64 bit, Linux)       +
+  +     MAD-X 5.03.06  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.04.12               +
-  + Execution date: 2017.05.10 10:49:56      +
+  + Release   date: 2017.05.29               +
+  + Execution date: 2017.06.12 16:36:07      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !Example script showing usage of tracking with PTC
 
@@ -144,19 +144,19 @@ PTC_OBSERVE, place=LHCB1$end;
 obs_points: 2 
 
 
-
-
-
-
 ptc_start, x=0.001, px=0.0, y=0.0, py=0.0, t=0.0;
 
 
 
-PTC_OBSERVE, place=lhcb1$end;
+ptc_track, icase=5, turns=20, onetable, dump, maxaper={1e6,1e6,1e6,1e6,1e6,1e6};
 
-obs_points: 3 
-ptc_track, icase=5, turns=20, element_by_element, onetable, dump, maxaper={1e6,1e6,1e6,1e6,1e6,1e6};
-
+  
+ ====================================================================
+ To perform tracking with observation points the option
+ ELEMENT_BY_ELEMENT must be ON, if the option CLOSED_ORBIT is OFF
+++++++ warning:  ELEMENT_BY_ELEMENT  has been switched ON by the code
+ ====================================================================
+  
 
 
 
@@ -180,7 +180,8 @@ ptc_end;
 stop;
 
 
-  Number of warnings: 0
+  Number of warnings: 1
+0 in C and 1 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +

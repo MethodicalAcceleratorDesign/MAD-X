@@ -1,0 +1,44 @@
+!TITLE,' Example 1 for for MAD-X with PTC_TRACK_RUN';
+
+
+ eg   :=  100;
+ bg   :=  eg/pmass;
+ en   := 3.75e-06;
+ epsx := en/bg;
+ epsy := en/bg;
+beam, particle = proton, energy =   eg        , 
+                         sigt=      0.077     , 
+                         sige=      1.1e-4    , 
+                         npart=     1.05e11   , 
+                         exn=4*en,  eyn=4*en  , 
+                         kbunch = 10,
+                         et = 0.002, bv = 1,
+                         ex=epsx,   ey=epsy;
+value,epsx,epsy;
+option,-echo;
+call file="../share/fivecell/fivecell.seq";
+option,echo;
+
+use,period=fivecell;
+
+ptc_create_universe;
+ptc_create_layout,model=2,method=6,nst=10,exact;
+
+ptc_setswitch, debuglevel=1, time=true, totalpath=false;
+
+ptc_start, x= 1e-4, px=0, y= 3e-3, py=0, t= 0;
+ptc_start, x= 2e-4, px=0, y= 1e-3, py=0, t= 0;
+ptc_start, x= 1e-4, px=0, y= 0   , py=0, t= 2.00,  pt=0.02; ! lost at the start because of the T>1
+ptc_start, x= 1e-4, px=0, y= 0   , py=0, t= 0.05,  pt=0.02;
+ptc_start, x= 0 ,   px=0, y= 0   , py=0, t= 0.0 ,  pt=0.0024;
+ptc_start, x= 0 ,   px=0, y= 0   , py=0, t= 0.0 ,  pt=0.0023;
+
+ptc_track,icase=56,element_by_element, turns=10, file="tfv9", recloss ; 
+
+
+ptc_track_end;
+ptc_end;
+
+write, table=trackloss, file="tfv9recloss.tfs";
+stop;
+

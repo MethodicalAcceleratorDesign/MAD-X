@@ -1606,6 +1606,15 @@ tests/test-ptc-normal/ptc_normal_results.tfs.ref -text
 tests/test-ptc-normal/test-ptc-normal.cfg -text
 tests/test-ptc-normal/test-ptc-normal.madx -text
 tests/test-ptc-normal/test-ptc-normal.ref -text
+tests/test-ptc-track-2/test-ptc-track-2.madx -text
+tests/test-ptc-track-2/test-ptc-track-2.out.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-track-2/tfv9.obs0001.p0001.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-track-2/tfv9.obs0001.p0002.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-track-2/tfv9.obs0001.p0003.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-track-2/tfv9.obs0001.p0004.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-track-2/tfv9.obs0001.p0005.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-track-2/tfv9.obs0001.p0006.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-track-2/tfv9recloss.tfs.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-track-3/test-ptc-track-3.cfg -text
 tests/test-ptc-track-3/test-ptc-track-3.madx -text
 tests/test-ptc-track-3/test-ptc-track-3.ref -text svneol=unset#application/x-gzip

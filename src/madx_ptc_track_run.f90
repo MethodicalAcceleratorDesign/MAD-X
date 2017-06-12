@@ -21,7 +21,7 @@ MODULE madx_ptc_track_run_module
   !  Variables from input files and probably corrected by this code: !
   !------------------------------------------------------------------!
   INTEGER, PUBLIC :: icase_ptc    ! Phase-space (4, 5 or 6) in input command
-  !                               ! is NOT actul number of variables
+  INTEGER, PUBLIC :: nvariables   !  actul number of variables
   INTEGER, PUBLIC :: turns        ! The current turn and Total number of turns
 
   LOGICAL(lp), PUBLIC :: &
@@ -33,6 +33,7 @@ MODULE madx_ptc_track_run_module
        Radiation_Quad, &
        Space_Charge, &
        beam_envelope, &
+       recloss, &
        NORM_OUT              ! IF true THEN output tables with normalizad coord,
   !                       ELSE (default) => output tables with standard coord.
 
@@ -94,21 +95,23 @@ MODULE madx_ptc_track_run_module
   CHARACTER(name_len), ALLOCATABLE  :: name_el_at_obsrv(:) ! the name of an element at observation point
   !                                                  ! contrary to <character(16)> in c-code
 
+  character(1000), private  :: whymsg
+
   !real(KIND(1d0)) :: dble_num_C  ! to use as a temprorary double number for I/O with C-procedures
 
 CONTAINS
 
   SUBROUTINE ptc_track_run(max_obs)
 
-    !USE MADX_PTC_MODULE ==================================================================!
-    USE  madx_ptc_module, ONLY: universe, EXCEPTION, my_ring, default, index_mad, c_       !
-    !                                                                                      !
-    USE  madx_ptc_module, ONLY: &  ! "LAYOUT type (ring) => double linked list,            !
-         FIBRE, &                  !  whose nodes (elements=magnets) of type FIBRE"        !
-         NORMALFORM, & ! type for normalform                                               !
-         REAL_8, &     ! type for map                                                      !
-         damap, &      ! type for diff algebra                                             !
-         RADIATION ! STOCH_IN_REC, & ! type for radiation with quadrupoles in PTC       !
+    !USE MADX_PTC_MODULE ====================================================================!
+    USE  madx_ptc_module, ONLY: universe, EXCEPTION, my_ring, default, index_mad, c_         !
+    !                                                                                        !
+    USE  madx_ptc_module, ONLY: &  ! "LAYOUT type (ring) => double linked list,              !
+         FIBRE, &                  !  whose nodes (elements=magnets) of type FIBRE"          !
+         NORMALFORM, & ! type for normalform                                                 !
+         REAL_8, &     ! type for map                                                        !
+         damap, &      ! type for diff algebra                                               !
+         RADIATION ! STOCH_IN_REC, & ! type for radiation with quadrupoles in PTC            !
     ! ======== functions ==================================================================!
     USE  madx_ptc_module, ONLY: &                                                          !
          print, find_orbit,FIND_ORBIT_x, track,track_probe_x,UPDATE_STATES, my_state, &    !
@@ -259,10 +262,11 @@ CONTAINS
     if (getdebug() > 1) then
       Print *;  Print *,'  ================================================================'
       Print *, '  ptc_track: The current dimensionality of the problem is icase=', icase_ptc
+      Print *, '  ptc_track: nvariables=', nvariables
       Print *,'  ================================================================'; Print *;
     endif
     
-    warn_coordinate_system_changed: IF((.NOT. mytime) .AND.(icase_ptc.gt.4) ) THEN
+    warn_coordinate_system_changed: IF((.NOT. mytime) .AND.(nvariables.gt.4) ) THEN
        CALL FORT_WARN('time=false => coord. system: {-pathlength, delta_p} ', &
             'the table headers mean:  PT -> delta_p, T -> pathlength')
     ENDIF warn_coordinate_system_changed
@@ -338,6 +342,7 @@ CONTAINS
     ALLOCATE ( last_turn_of_lost_particle(1:j_tot_numb_starting_particles), &
          last_position_of_lost_particle(1:j_tot_numb_starting_particles), &
          last_orbit_of_lost_particle (1:6,1:j_tot_numb_starting_particles))
+    
     last_turn_of_lost_particle=zero
     last_position_of_lost_particle=zero
     last_orbit_of_lost_particle=zero
@@ -414,22 +419,29 @@ CONTAINS
        !
     end do Loop_over_turns !===========loop over turn ============================!
 
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+    !!
+    !!  WRITE DOWN
+    !!
 
     Call Final_Coord_to_tables ! Complete all tables by one subroutine:
-    !'trackone' filled before by by tt_puttab_coord, 'track.obs$$$$.p$$$$' by
-    ! tt_putone_coord  and, the summary table 'tracksumm'
+    !'trackone' filled before  by   tt_puttab_coord, 
+    !'track.obs$$$$.p$$$$'     by   tt_putone_coord  
+    !summary table             by  'tracksumm'
     
-    if (rplot) call rplotfinish()
-
 
     Output_observ_with_PTC: IF(closed_orbit .AND. &
          (.NOT.element_by_element).AND.(.NOT. Radiation_PTC)) THEN !-!
+       
+       
        debug_print_5: if (ptc_track_debug) then !----------------!                         !
           Print *, 'element_by_element=', element_by_element, &  !                         !
                ' Radiation_PTC=',Radiation_PTC                   !                         !
           Print *, ' Call Observation_with_PTC'                  !                         !
        end if debug_print_5 !------------------------------------!                         !
+       
        Call Observation_with_PTC(max_obs, x_coord_co, Map_Y)                               !
+
     ENDIF Output_observ_with_PTC !---------------------------------------------------------!
 
 
@@ -438,10 +450,12 @@ CONTAINS
     endif
 
 
+    if (rplot) call rplotfinish()
 
-     Beam_envelope_with_PTC: IF (beam_envelope) THEN 
-         call fort_warn('ptc_track: ',' For the time being not available, please contact mad.support@cern.ch if you need it')
-     endif Beam_envelope_with_PTC
+
+    Beam_envelope_with_PTC: IF (beam_envelope) THEN 
+        call fort_warn('ptc_track: ',' For the time being not available, please contact mad.support@cern.ch if you need it')
+    endif Beam_envelope_with_PTC
 
 !     Beam_envelope_with_PTC: IF (beam_envelope) THEN !###############################!
 !        Radiat_PTC: IF ( Radiation_PTC) THEN !====================================!  !
@@ -525,11 +539,11 @@ CONTAINS
       USE madx_ptc_intstate_module, ONLY: getdebug  ! new debug control by PS (from 2006.03.20)
       implicit none
       ! local variables
-      !real(dp) :: maxaper(1:6) move to HOST
       character(4) text
       character(12) tol_a, char_a
       integer :: nint,ndble, nchar, int_arr(1),char_l
       data tol_a,char_a / 'maxaper ', ' ' /
+      real(dp) :: tmpr
       !defaults
       int_arr(:)=1; char_l=1
       ! Values of "ptc_track" command: (PTC thick lens tracking module)
@@ -570,10 +584,10 @@ CONTAINS
 
 
       icase_ptc    = get_value('ptc_track ','icase ')
-      if(icase_ptc.eq.56) icase_ptc=5
-      if(icase_ptc.ne.4.and.icase_ptc.ne.5.and.icase_ptc.ne.6) then
+      if(icase_ptc.eq.56) nvariables=5
+      if(icase_ptc.ne.4.and.icase_ptc.ne.5.and.icase_ptc.ne.6.and.icase_ptc.ne.56) then
          write(text, '(i4)') icase_ptc
-         call aafail('Values_from_ptc_track_command: ',' ICASE not 4, 5 or 6 found: ' // text)
+         call aafail('Values_from_ptc_track_command: ',' ICASE not 4, 5, 6 or 56 found: ' // text)
       endif
       turns        = get_value('ptc_track ','turns ')
 
@@ -614,6 +628,8 @@ CONTAINS
       Radiation_Quad = get_value('ptc_track ','radiation_quad ') .ne. 0
 
       Space_Charge = get_value('ptc_track ','space_charge ') .ne. 0
+      
+      recloss      = get_value('ptc_track ','recloss ') .ne. 0
 
       IF (radiation_model1_FZ .OR. Space_Charge ) THEN 
          IF(.NOT.element_by_element) THEN
@@ -666,42 +682,11 @@ CONTAINS
 
       !--- get vector of six coordinate maxapers (both RUN and DYNAP)
       call comm_para(tol_a, nint, ndble, nchar, int_arr, maxaper,char_a, char_l)
-      !
-      ! INPUT:  name     parameter name
-      !        HERE: tol_a <= data tol_a,char_a / 'maxaper ', ' ' / (in this file)
-      !
-      !      EXAMPLES: RUN,maxaper=double array,turns=integer,ffile=integer;
-      !                    maxaper upper limits for the six coordinates
-      !                    default=(0.1, 0.01, 0.1, 0.01,1.0, 0.1)
-      !              DYNAP,TURNS=real, FASTUNE=logical,LYAPUNOV=real,
-      !                    MAXAPER:={..,..,..,..,..,..},ORBIT=logical;
-      ! OUTPUT:
-      !   (n_int # integers)                 HERE:  nint      USED later: no
-      !   (n_double # doubl)                        ndbl                  no
-      !   (n_string # string)                       nchar                 no
-      !   (int_array := array for integer)          int_arr               no
-      !   (double_array := array for double)        maxaper               Yes
-      !   (strings :=
-      !          one string for all, packed)        char_a                no
-      !   (string_lengths:=
-      !       length of each string in char)        char_l                no
-      !
-      ! comm_para
-      ! madxd.h: /* C routines called from Fortran and C */
-      !          void comm_para(char*, int*, int*, int*, int*, double*, char*, int*);
-      ! madxn.c:
-      ! void comm_para(char* name, int* n_int, int* n_double, int* n_string,
-      !                int* int_array, double* double_array, char* strings,
-      !        int* string_lengths)
-      !  returns the value for command parameter "name" being either
-      !  one or several integers (including logicals),
-      !  one or several doubles,
-      !  one or several strings (packed in one, with length array)
-      !
-      !    ATTENTION: no check on sufficient array sizes
-
-
-      !    call comm_para('coord ',nint,ndble,nchar,int_arr,x,char_a,char_l)
+      
+      !swap 5 and 6
+      tmpr = maxaper(5)
+      maxaper(5) = maxaper(6)
+      maxaper(6) = tmpr
 
       debug_print_2: if (ptc_track_debug) then
          print *; print *, "<subr. Values_from_ptc_track_command>:"
@@ -715,6 +700,7 @@ CONTAINS
          print *, " Radiation_Energy_Loss =", Radiation_Energy_Loss
          print *, " Radiation_Quad =", Radiation_Quad
          print *, " Space_Charge =", Space_Charge
+         print *, " recloss =",  recloss
          print *, " maxaper =",  maxaper
          print *, " ptc_onetable =",  ptc_onetable
          print *, " ptc_ffile    =",  ptc_ffile
@@ -766,12 +752,13 @@ CONTAINS
          print *, 'deltap0=', deltap0 ; print *
          print*, 'my_state printing:'
       end if debug_print_1
+      
       call my_state(icase_ptc,deltap,deltap0)
-      if(icase_ptc.eq.56) icase_ptc=5
-      if(icase_ptc.ne.4.and.icase_ptc.ne.5.and.icase_ptc.ne.6) then
-         write(text, '(i4)') icase_ptc
-         call aafail('Call_my_state_and_update_states: ',' ICASE not 4, 5 or 6 found: ' // text)
-      endif
+      
+      nvariables = icase_ptc
+      !icase 56: 
+      if (nvariables .gt.6 ) nvariables = 6
+      
       IF (Radiation_PTC) DEFAULT=DEFAULT+RADIATION0
       
       if(getdebug() > 1) then
@@ -781,7 +768,7 @@ CONTAINS
       debug_print_2: if (ptc_track_debug) then
          print *, &
               "after call my_state(icase,deltap,deltap0)"
-         print *, '=',icase_ptc, 'deltap=', deltap
+         print *, 'icase_ptc=',icase_ptc, 'deltap=', deltap
          print *, 'deltap0=', deltap0
          print *; print*, '----------------------------------'
          print *, "before CALL UPDATE_STATES"
@@ -804,6 +791,7 @@ CONTAINS
         print *, "********************************************************************"
       endif
       
+      
     END SUBROUTINE Call_my_state_and_update_states
     !=============================================================================
 
@@ -818,10 +806,10 @@ CONTAINS
       x_coord_co(:)=zero                                                   !
       if (ptc_track_debug) THEN !---------------------------!              !
          print *, " x_coord_co(:)=zero = "                  !              !
-         CALL write_closed_orbit(icase_ptc,x_coord_co)      !              !
+         CALL write_closed_orbit(nvariables,x_coord_co)      !              !
       end if !----------------------------------------------!              !
       !                                                                    !
-      if(icase_ptc.eq.5) THEN !------------------------!                   !
+      if(nvariables.ge.5) THEN !------------------------!                   !
          if(mytime) then !----------------------!      !                   !
             call Convert_dp_to_dt (deltap, dt)  !      !                   !
          else                                   !      !                   !
@@ -840,7 +828,7 @@ CONTAINS
          CALL FIND_ORBIT_x(my_ring,x_coord_co,MYSTATE,c_1d_7,fibre1=1)     !
          !         call find_orbit(my_ring,x_coord_co,1,MYSTATE,c_1d_7)    !
          print*,"===== ptc_track ============================"   !         !
-         CALL write_closed_orbit(icase_ptc,x_coord_co)           !         !
+         CALL write_closed_orbit(nvariables,x_coord_co)           !         !
          print*,"============================================"   !         !
       endif  !---------------------------------------------------!         !
       !                                                                    !
@@ -956,7 +944,7 @@ CONTAINS
                Print*,j_th_particle, k_th_coord, &
                     x_coord_incl_co(k_th_coord,j_th_particle)
             END DO
-            CALL write_closed_orbit(icase_ptc,x_coord_co)
+            CALL write_closed_orbit(nvariables,x_coord_co)
          end Do
          Print *, '================================================'
          Print *, ' '
@@ -1119,11 +1107,10 @@ CONTAINS
             !                                                                       !  !
             do j_th_particle = 1, & !++++++loop over surviving particles +++++++!   !  !
                  jmax_numb_particl_at_i_th_turn                                 !   !  !
-               !hbu                                                             !   !  !
-               !call tt_puttab(part_id(i),   0,   1, z(1,i), orbit0,spos)       !   !  !
+
                call tt_puttab_coord(particle_ID(j_th_particle),   0,   1, &     !   !  !
-                    x_coord_incl_co(1,j_th_particle), &                         !   !  !
-                    x_coord_co, spos_current_position)                          !   !  !
+                                    x_coord_incl_co(1,j_th_particle), &         !   !  !
+                                    x_coord_co, spos_current_position)          !   !  !
                !SUBR.tt_puttab(     npart,turn,nobs,  orbit, orbit0,spos)       !   !  !
                !(in this file) - purpose: enter particle coordinates in table * !   !  !
                !    input:                                                    * !   !  !
@@ -1187,7 +1174,8 @@ CONTAINS
       end if
 
       n_temp=1 ! start particle loop with the first not-examined particle
-
+      
+      
       Exam_all_particles: DO ! ====<=======<========DO Exam_all_particles ====<===<=======<======!
          !(instead of <10 continue> in trrun.f)                                                  !
          !                                                                                       !
@@ -1254,10 +1242,9 @@ CONTAINS
             if (ptc_track_debug) then                                                        !   !
                print*,"ready for printing aperture flag!!!!!!!",flag_index_ptc_aperture      !   !
                print*,"real aperture flag: ",c_%aperture_flag                                !   !
-            end if                                                                           !   !
             ! Sa_extend_poly.f90:98:  SUBROUTINE PRODUCE_APERTURE_FLAG(I)                    !   !
             !                                                                                !   !
-            if (ptc_track_debug) then ! debug printing ----------------------------!         !   ^
+                            ! debug printing ----------------------------!         !   ^
                print *, 'PTC: <PRODUCE_APERTURE_FLAG> => flag_index', &            !         +   !
                     flag_index_ptc_aperture                                        !         +   !
                !                                                                   !         +   !
@@ -1279,14 +1266,14 @@ CONTAINS
             if (abs(current_x_coord_incl_co(1)).ge.maxaper(1).or. &                          !   !
                 abs(current_x_coord_incl_co(2)).ge.maxaper(2).or. &                          !   !
                 abs(current_x_coord_incl_co(3)).ge.maxaper(3).or. &                          !   !
-                abs(current_x_coord_incl_co(4)).ge.maxaper(4)) flag_index_ptc_aperture = 50  !   !
+                abs(current_x_coord_incl_co(4)).ge.maxaper(4)) flag_index_ptc_aperture = 51  !   !
                 
-            if (icase_ptc .gt. 4) then                            !   !
-              if (abs(current_x_coord_incl_co(5)).ge.maxaper(6)) flag_index_ptc_aperture = 50!   !
+            if (nvariables .gt. 4) then                            !   !
+              if (abs(current_x_coord_incl_co(5)).ge.maxaper(5)) flag_index_ptc_aperture = 52!   !
             endif 
 
-            if ( (icase_ptc .gt. 5) .and. (MYSTATE%TOTALPATH .eq. 0) ) then                  !   !
-              if (abs(current_x_coord_incl_co(6)).ge.maxaper(5)) flag_index_ptc_aperture = 50!   !
+            if ( (nvariables .gt. 5) .and. (MYSTATE%TOTALPATH .eq. 0) ) then                  !   !
+              if (abs(current_x_coord_incl_co(6)).ge.maxaper(6)) flag_index_ptc_aperture = 53!   !
             endif 
 
             if (ptc_track_debug) then                                                 !XXXX  !   !
@@ -1294,29 +1281,55 @@ CONTAINS
             endif                                                                            !   !
             
             !                                                                                !   !
-            if_ptc_track_unstable: IF (flag_index_ptc_aperture/=0) then ! =========!         +   ^
-               ! => particle is lost !!(?)                                         !         +   !
-               n_temp=j_last_particle_buffer                                       !         +   !
-               !                                                                   !         +   !
-               CALL kill_ptc_track &                                               !         +   !
-                    (n_temp,i_th_turn,zero,jmax_numb_particl_at_i_th_turn, &       !         +   !
-                    particle_ID, last_turn_of_lost_particle, &                     !         +   ^
-                    last_position_of_lost_particle, last_orbit_of_lost_particle, & !         !   !
-                    x_coord_incl_co)                                               !         +   !
-               EXIT  Particle_loop !+++++>++++++++>+++++++++>+++++++++++>+++++++>++++++!     +   !
-               !                                                                   !   V     +   ^
-            ELSE
+            if_ptc_track_unstable: IF (flag_index_ptc_aperture==0) then ! =========!         +   ^
               if (rplot) then
                 call plottrack(j_particle, my_ring%n, i_th_turn, & 
-                                        current_x_coord_incl_co(1), &
-                                        current_x_coord_incl_co(2), &
-                                        current_x_coord_incl_co(3), &
-                                        current_x_coord_incl_co(4), &
-                                        current_x_coord_incl_co(5), &
-		sqrt(MY_RING%end%mag%p%p0c**2 + (MY_RING%end%mass)**2), &
-		current_x_coord_incl_co(6))
+                                     current_x_coord_incl_co(1), &
+                                     current_x_coord_incl_co(2), &
+                                     current_x_coord_incl_co(3), &
+                                     current_x_coord_incl_co(4), &
+                                     current_x_coord_incl_co(5), &
+	                 sqrt(MY_RING%end%mag%p%p0c**2 + (MY_RING%end%mass)**2), &
+	                 current_x_coord_incl_co(6))
                !   endif
               endif
+            ELSE
+
+               if (getdebug()>0) then
+               
+                 write(6,*) "Track ", particle_ID(j_particle) , " is lost at turn ", i_th_turn, &
+		             " flag ", flag_index_ptc_aperture
+               
+
+                 if (getdebug() > 1) then
+
+                   write(6,'(a,6(f9.6,1x))') "Track last coordinates ", current_x_coord_incl_co
+
+                   if (flag_index_ptc_aperture < 50) then
+                     write(6,*) "         PTC message :", messagelost
+                   else
+	 write(6,'(a,6(f9.6,1x))') "       lost on maxaper ", maxaper
+                   endif
+
+                 endif
+
+               endif
+
+               ! => particle is lost !!(?)                                         
+               n_temp=j_last_particle_buffer
+               !
+                                                              
+               CALL kill_ptc_track(n_temp,i_th_turn, zero ,jmax_numb_particl_at_i_th_turn,        &       
+                                   particle_ID, last_turn_of_lost_particle,                     &                     
+                                   last_position_of_lost_particle, last_orbit_of_lost_particle, & 
+                                   x_coord_incl_co,MY_RING%end%mag%name,                        &
+	               sqrt(MY_RING%end%mag%p%p0c**2 + (MY_RING%end%mass)**2))
+               
+               
+               
+               EXIT  Particle_loop !+++++>++++++++>+++++++++>+++++++++++>+++++++>++++++!     +   !
+               !                                                                   !   V     +   ^
+
             END IF if_ptc_track_unstable ! === ptc_track unstable ===>=======>=====!   V     !   !
             !                                                                          V     !   !
          END DO  Particle_loop !+++++++++++++++++++++++++++++++++++++++++++++++++++++++!+++++!   !
@@ -1343,63 +1356,6 @@ CONTAINS
 
     END SUBROUTINE One_turn_track_with_PTC
 
-    !=============================================================================
-
-    SUBROUTINE kill_ptc_track &
-         (n_particle_kill,i_th_turn_kill,sum_accum_length_kill,j_max_kill, &
-         part_ID_kill, last_turn_kill, last_position_of_kill,last_orbit_of_kill, &
-         x_coord_incl_co_kill)
-      implicit none
-
-      ! the next variables are local
-      Integer, intent (IN)    :: n_particle_kill, & ! number of particle to be kill
-           i_th_turn_kill
-      real(dp), &
-           intent (IN)    :: sum_accum_length_kill ! input as 0
-
-      Integer, intent (INOUT) :: j_max_kill, &   ! number surviving particles (here, j=j-1)
-           part_ID_kill(*) ! particle number is reodered(1:N_particle_max)
-
-      Integer, intent (OUT) :: last_turn_kill(*) ! last_turn_of_lost_particle (1:N_particle_max)
-
-      real(dp), intent (OUT) :: last_position_of_kill(*), &
-           last_orbit_of_kill(1:6,*)
-
-      real(dp), intent (INOUT) :: x_coord_incl_co_kill(1:6,*)
-
-      Integer :: j_th_kill, k_th_kill
-
-      last_turn_kill(part_ID_kill(n_particle_kill))=i_th_turn_kill
-      ! Save Number of this turn for n_particle_kill
-
-      last_position_of_kill(part_ID_kill(n_particle_kill))=sum_accum_length_kill
-      ! Save Position of n_particle_kill
-
-      DO  k_th_kill=1,6
-         last_orbit_of_kill(k_th_kill,part_ID_kill(n_particle_kill)) = &
-              x_coord_incl_co_kill(k_th_kill,part_ID_kill(n_particle_kill))
-      END DO
-
-      ! Renumbering arrays
-      Renumbering_loop: do j_th_kill = n_particle_kill+1, j_max_kill !=======!
-         !                                                                   !
-         part_ID_kill(j_th_kill-1) = part_ID_kill(j_th_kill)                 !
-         !                                                                   !
-         do k_th_kill = 1, 6 !--coords loop ----------------------!          !
-            x_coord_incl_co_kill(k_th_kill,j_th_kill-1) = &       !          !
-                 x_coord_incl_co_kill(k_th_kill,j_th_kill)        !          !
-         enddo !--coords loop ------------------------------------!          !
-         !                                                                   !
-         save_ID_for_all_turns: IF (.NOT.element_by_element) THEN !== !      !
-            part_ID_turns(i_th_turn,j_th_kill-1)= &                   !      !
-                 part_ID_kill(j_th_kill-1)                            !      !
-         END IF save_ID_for_all_turns !===============================!      !
-         !                                                                   !
-      enddo Renumbering_loop ! ==============================================!
-
-      j_max_kill = j_max_kill - 1
-
-    END SUBROUTINE kill_ptc_track
     !=============================================================================
 
 
@@ -1473,7 +1429,7 @@ CONTAINS
                  'i_current_elem=', i_current_elem, &   !                   !                         o
                  ' Entry_not_exit=', Entry_not_exit, &  !                   !                         o
                  ' name_curr_elem=', name_curr_elem, &  !                   !                         p
-                 ' sum_length=',sum_length, &           !                   !                         !
+                 ' sum_length=',sum_length, &           !kill_ptc_track                   !                         !
                  ' length_curr_elem=',length_curr_elem  !                   !                         !
             !Print *,'name=',current%MAG%name, &        !                   !                         e
             !        'l=',current%MAG%P%ld              !                   !                         l
@@ -1484,6 +1440,10 @@ CONTAINS
          !                                                                  !                         t
          ! at element ENTRY ================================================!                         s
          !                                                                                            !
+         
+         ! length is needed here to report lost particles
+         sum_length=sum_length+current%MAG%P%ld                                                       !
+         
          n_temp=1 ! start particle loop with the first not-examined particle                          *
          !                                                                                            *
          Exam_all_particles: DO ! ===<=======<========DO Exam_all_particles ====<============<======! *
@@ -1503,56 +1463,28 @@ CONTAINS
                call track_probe_x(my_ring,current_x_coord_incl_co,MYSTATE, &                     !  ! !
                     fibre1=i_current_elem,fibre2=i_current_elem+1)                               !  ! !
                
+
                if (ptc_track_debug) then
                  write(mft,*) "t ", i_th_turn, " el ",i_current_elem+1," ",name_curr_elem," track ", j_th_partic, &
                               " : ", current_x_coord_incl_co
                endif  
-                
-               if (rplot) then
-                   call plottrack(j_th_partic, i_current_elem+1, i_th_turn, & 
-                                           current_x_coord_incl_co(1), &
-                                           current_x_coord_incl_co(2), &
-                                           current_x_coord_incl_co(3), &
-                                           current_x_coord_incl_co(4), &
-                                           current_x_coord_incl_co(5), &
-		   sqrt(current%mag%p%p0c**2 + (current%mass)**2), &
-		   current_x_coord_incl_co(6))
-                  !   endif
-               endif
-
 	
-!               call track(my_ring,current_x_coord_incl_co, &                                    !  ! !
-!                    i_current_elem,i_current_elem+1,MYSTATE)                                    !  ! o
-               ! The PTC subroutine " To TRACK the MY_RING for X coordinates                     +  ! v
-               ! throughout the element in the DEFAULT state (citation, p. 25).                  +  ! e
-               !Print *, 'x=', current_x_coord_incl_co                                           +  ! r
-               !                                                                                 !  ! !
-               do k_th_coord=1,6 ! save coordinates for the current particle ---!                +  ! !
-                  if (ISNAN(current_x_coord_incl_co(k_th_coord))) then !VK20070328 XXXXXXXXX     +  ! !
+
+               ! save coordinates for the current particle ---!
+               do k_th_coord=1,6 
+                  if (ISNAN(current_x_coord_incl_co(k_th_coord))) then 
                      ! BUG !? Aperture does not work, if lattice with spread multipoles XXXX     +  ! !
-                     NaN_coord_after_track_VK=.TRUE.                            !XXXXXXXXXXX     +  ! !
-                     x_coord_incl_co(k_th_coord,j_th_partic)=999                !XXXXXXXXXXX     +  ! !
-                  else  !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX     +  ! !
-                     x_coord_incl_co(k_th_coord,j_th_partic)=  &                !                +  ! !
-                          current_x_coord_incl_co(k_th_coord)                   !                +  ! !
-                  endif !XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX     +  ! !
-                  !                                                             !                +  ! !
-               end do !---------------------------------------------------------!                !  ^ !
-               !                                                                                 !  ! !
-               !if (ptc_track_debug) &                                                           !  ! !
-               !     print*,"before printing aperture flag!!!!!!!!",flag_index_ptc_aperture      !  ! !
+                     NaN_coord_after_track_VK=.TRUE.                           
+                     x_coord_incl_co(k_th_coord,j_th_partic)=999               
+                  else  
+                     x_coord_incl_co(k_th_coord,j_th_partic)=  &     
+                          current_x_coord_incl_co(k_th_coord)        
+                  endif 
+               end do 
+
+
                call PRODUCE_APERTURE_FLAG(flag_index_ptc_aperture)                               !  ! e
-               ! Sa_extend_poly.f90:98:  SUBROUTINE PRODUCE_APERTURE_FLAG(I)                     !  ! l
-               !if (ptc_track_debug) then                                                        !  ! e
-               !     print*,"ready for printing aperture flag!!!!!!!",flag_index_ptc_aperture    !  ! m
-               !     print*,"real aperture flag: ",c_%aperture_flag                              !  ! e
-               !end if                                                                           !  ! n
-               !                                                                                 +  ^ t
-!               if (NaN_coord_after_track_VK) flag_index_ptc_aperture=100 !VK20070328 XXXXXXXXX  +  ! s
-!               if (ptc_track_debug) then                                                 !XXXX  +  ! !
-!                    print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture !XXXX  !  ! !
-!               endif                                                                            !  ! !
-               !                                                                                 !  ! !
+
                if(flag_index_ptc_aperture/=0) c_%watch_user=.false. !VK20070709 XXXXXXXXXXXXXX   !  ! !
                !                                                                                 !  ! !
                if (ptc_track_debug) then ! debug printing ----------------------------!          !  ^ !
@@ -1562,51 +1494,81 @@ CONTAINS
                   if(flag_index_ptc_aperture/=0) then !=== print diagnostics ======!  !          !  ! !
                      call ANALYSE_APERTURE_FLAG &                                  !  !          !  ! !
                           (flag_index_ptc_aperture,why_ptc_aperture)               !  !          +  ^ !
-                     !Sa_extend_poly.f90:79:  SUBROUTINE ANALYSE_APERTURE_FLAG(I,R)!  !          +  ! !
                      Write(6,*) "ptc_track unstable (tracking)-programs continues "!  !          +  ! !
                      Write(6,*) "why_ptc_aperture:", why_ptc_aperture              !  !          +  ! !
-                     ! See produce aperture flag routine in sd_frame               !  !          +  ! !
-                     ! goto 100 ! EXIT from the turns loop                         !  !          +  ^ !
                   endif !=== print diagnostics ====================================!  !          +  ! !
                   !                                                                   !          +  ! !
                endif ! debug printing ------------------------------------------------!          !  ! !
-               !                                                                                 !  ! !
-               ! added 2012.09.24                                                                !    !
+
+
                if (NaN_coord_after_track_VK) flag_index_ptc_aperture=100 !VK20070328 XXXXXXXXX   !    !
+               
                if (ptc_track_debug) then                                                 !XXXX   !    !
                   print *,'flag_index_ptc_aperture is set to', flag_index_ptc_aperture   !XXXX   !    !
                endif                                                                             !    !
+               
+               if (flag_index_ptc_aperture == 0) then
+                 if (abs(current_x_coord_incl_co(1)).ge.maxaper(1) .or. &                          !   !
+	 abs(current_x_coord_incl_co(2)).ge.maxaper(2) .or. &                          !   !
+	 abs(current_x_coord_incl_co(3)).ge.maxaper(3) .or. &                          !   !
+	 abs(current_x_coord_incl_co(4)).ge.maxaper(4)) flag_index_ptc_aperture = 51  !   !
 
-               if (abs(current_x_coord_incl_co(1)).ge.maxaper(1).or. &                          !   !
-                   abs(current_x_coord_incl_co(2)).ge.maxaper(2).or. &                          !   !
-                   abs(current_x_coord_incl_co(3)).ge.maxaper(3).or. &                          !   !
-                   abs(current_x_coord_incl_co(4)).ge.maxaper(4)) flag_index_ptc_aperture = 50  !   !
+                 if (nvariables .gt. 4) then                            !   !
+                   if (abs(current_x_coord_incl_co(5)).ge.maxaper(5)) flag_index_ptc_aperture = 52!   !
+                 endif 
 
-               if (icase_ptc .gt. 4) then                            !   !
-                 if (abs(current_x_coord_incl_co(5)).ge.maxaper(6)) flag_index_ptc_aperture = 50!   !
+                 if ( (nvariables .gt. 5) .and. (MYSTATE%TOTALPATH .eq. 0) ) then                  !   !
+                   if (abs(current_x_coord_incl_co(6)).ge.maxaper(6)) flag_index_ptc_aperture = 53!   !
+                 endif 
                endif 
 
-               if ( (icase_ptc .gt. 5) .and. (MYSTATE%TOTALPATH .eq. 0) ) then                  !   !
-                 if (abs(current_x_coord_incl_co(6)).ge.maxaper(5)) flag_index_ptc_aperture = 50!   !
-               endif 
-               ! endof add 2012.09.24                                                           !    !
-               !                                                                                 !    !
-               if_ptc_track_unstable: IF (flag_index_ptc_aperture/=0) then ! ========!           +  ^ !
+               if_ptc_track_unstable: IF (flag_index_ptc_aperture==0) then ! ========!           +  ^ !
+                  if (rplot) then
+	  call plottrack(j_th_partic, i_current_elem+1, i_th_turn, & 
+                                              current_x_coord_incl_co(1), &
+                                              current_x_coord_incl_co(2), &
+                                              current_x_coord_incl_co(3), &
+                                              current_x_coord_incl_co(4), &
+                                              current_x_coord_incl_co(5), &
+		      sqrt(current%mag%p%p0c**2 + (current%mass)**2), &
+		      current_x_coord_incl_co(6))
+                  endif
+               else
                   ! => particle is lost !!(?)                                        !           +  ! !
-
                   if (ptc_track_debug) then
-                    write(mft,*) "Track ", j_th_partic , " hits maxaper at ", i_current_elem, " turn ", i_th_turn
+                    write(mft,*) "Track ", particle_ID(j_th_partic) , " is lost at ", i_current_elem, " turn ", i_th_turn
                     write(mft,*) "maxaper : ", maxaper
                   endif
 
+                  if (getdebug() > 0) then
+                    write(6,*) "Track ", particle_ID(j_th_partic) , " is lost at ", i_current_elem, &
+	                                   " turn ", i_th_turn, &
+		               " flag ", flag_index_ptc_aperture
+	if (getdebug() > 1) then
+                      
+	  write(6,'(a,6(f9.6,1x))') "Track last coordinates ", current_x_coord_incl_co
+	  
+	  if (flag_index_ptc_aperture < 50) then
+                        write(6,*) "         PTC message :", messagelost
+	  else
+	    write(6,'(a,6(f9.6,1x))') "       lost on maxaper ", maxaper
+	  endif
+	
+	endif
+
+                  endif
+
+
+                  
+                  
                   n_temp=j_last_particle_buffer                                      !           +  ! l
-                  !                                                                  !           +  ! o
-                  CALL kill_ptc_track &                                              !           +  ! o
-                       (n_temp,i_th_turn,sum_length, &                               !           +  ! p
-                       jmax_numb_particl_at_i_th_turn, &                             !           +  ! !
-                       particle_ID, last_turn_of_lost_particle, &                    !           +  ^ !
-                       last_position_of_lost_particle, last_orbit_of_lost_particle, &!           !  ! o
-                       x_coord_incl_co)                                              !           +  ! v
+                  !                                                                                 !           +  ! o
+                  CALL kill_ptc_track(n_temp,i_th_turn, sum_length, &                               !           +  ! p
+                                      jmax_numb_particl_at_i_th_turn, &                             !           +  ! !
+                                      particle_ID, last_turn_of_lost_particle, &                    !           +  ^ !
+                                      last_position_of_lost_particle, last_orbit_of_lost_particle, &!           !  ! o
+                                      x_coord_incl_co, current%mag%name, &
+	                  sqrt(current%mag%p%p0c**2 + (current%mass)**2))                                              !           +  ! v
                   EXIT  Particle_loop !+++++>++++++++>+++++++++>+++++++++++>+++++++>++++++!      +  ! e
                   !                                                                  !    v      +  ^ r
                END IF if_ptc_track_unstable ! === ptc_track unstable ===>=======>====!    V      !  ! !
@@ -1622,7 +1584,6 @@ CONTAINS
          !                                                                                            !
          !<============<===============<===============<===============<=========V                    !
          !                                                                                            !
-         sum_length=sum_length+current%MAG%P%ld                                                       !
          !                                                                                            !
          ! at element EXITY ================================================!                         *
          Entry_not_Exit=.FALSE. ! interaction at the entry of the curent    !                         *
@@ -1658,15 +1619,19 @@ CONTAINS
                ! set the last turns = OK                                          !    #              *
                !                                                                  !    #              *
                extract_CO_at_observ_point: DO k_th_coord=1,6                      !    #              *
+               
                   x_coord_co_temp(k_th_coord)= &                                  !    #              *
                        x_co_at_all_observ(k_th_coord,number_observation_point)    !    #              *
+               
                ENDDO extract_CO_at_observ_point                                   !    #              *
+               
                if (ptc_track_debug) THEN !+++debug print+++++++!                  !    #              *
                   Print *,'obs.No=',number_observation_point   !                  !    #              *
                   Print *,'CO=', x_coord_co_temp               !                  !    #              *
                   Print *,'x_coord_incl_co=', x_coord_incl_co  !                  !    #              *
                endif !+++++++++++++++++++++++++++++++++++++++++!                  !    #              *
                !                                                                  !    #              *
+               
                if (ptc_onetable) then !>>>>> onetable=.TRUE.>>>>>>>>>>>>>>>>!     !    #              *
                   !                                                         !     !    #              *
                   !hbu                                                      !     !    #              *
@@ -1812,36 +1777,25 @@ CONTAINS
       sum_length =zero
       turn_final=min(turns,i_th_turn) ! the FORTRAN bad feature:
       ! if DO-loop ends, turn > turns
+
       debug_Final_Coord: if (ptc_track_debug) then
          Print *, ' Start SUBR. <<Final_Coord_to_tables>>:'
          Print *, ' jmax=', jmax_numb_particl_at_i_th_turn
          Print *, 'Total number of turns: turns=', turns
          Print *, 'The current turn number: turn=', i_th_turn
          Print *, 'The actual final turn number: turn_final=', turn_final
-         Print *, 'The dimensionality of the task: icase_ptc=',icase_ptc
+         Print *, 'The dimensionality of the task: nvariables=',nvariables
       ENDIF  debug_Final_Coord
 
-      !do i         =1,jmax !++loop over surviving particles ++++!
-      do j_part_tmp=1,jmax_numb_particl_at_i_th_turn             !
+        
+!      particle_ID contains list of particles that survived
+      do j_part_tmp=1,jmax_numb_particl_at_i_th_turn             
+         last_turn_of_lost_particle(particle_ID(j_part_tmp))= turn_final		                 !
+         last_position_of_lost_particle(particle_ID(j_part_tmp))= sum_length              
+         ! remember last turn and position of particles          
+          last_orbit_of_lost_particle(:, particle_ID(j_part_tmp))= x_coord_incl_co(:, j_part_tmp)
          !                                                       !
-         !last_turn(part_id(i)) = min(turns, turn)               !
-         last_turn_of_lost_particle(particle_ID(j_part_tmp))= &  !
-              turn_final                                         !
-         !last_pos(part_id(i)) = sum                             !
-         last_position_of_lost_particle &                        !
-              (particle_ID(j_part_tmp))= sum_length              !
-         ! remember last turn and position of particles          !
-         !                                                       !
-         !do j = 1, 6 !>>> loop over coord. components >>>>>>>!  !
-         do i_coord = 1, 6! icase_ptc                         !  !
-            !last_orbit(j,part_id(i)) = z(j,i)                !  !
-            last_orbit_of_lost_particle(i_coord,    &         !  !
-                 particle_ID(j_part_tmp))=  &                 !  !
-                 x_coord_incl_co(i_coord, j_part_tmp)         !  !
-            ! last orbit => to finalize tables                !  !
-         enddo ! END loop over coord. components >>>>>>>>>>>> !  !
-         !                                                       !
-      enddo ! ++ END loop over surviving particles ++++++++++++++!
+      enddo 
 
       !turn = min(turn, turns)  => turn_final (see above)
 
@@ -2202,7 +2156,7 @@ CONTAINS
             name_el_at_obsrv(number_obs) = local_name
 
             save_CO_for_el_by_el: IF (element_by_element) THEN
-               DO i_coord=1,icase_ptc
+               DO i_coord=1,nvariables
                   x_co_at_all_observ(i_coord,number_obs)=x_coord_co_temp(i_coord)
                ENDDO
             ENDIF save_CO_for_el_by_el
@@ -2255,29 +2209,18 @@ CONTAINS
       ! "ptc_observe,place=mark";
       REAL (dp),     INTENT( IN) :: x_coord_co_at_START(1:6) ! => x0(1:6) in ptc_track at START
       TYPE (real_8), intent (INOUT) :: Map_Y_obs(6) !  y => Map_Y_obs - local name
-
       TYPE(damap) :: Map_damap
-
       INTEGER ::  iii_c_code, i_obs_point, i_coord, &
-           i_from, i_till, i_dummy, i_turn_tmp, j_part_tmp, ielem
-      !INTEGER :: nda, NormOrder, npara, mynd2
-      INTEGER :: flag_index,why(9)
-
+                  i_from, i_till, i_dummy, i_turn_tmp, j_part_tmp, ielem
+      INTEGER ::  flag_index,why(9)
       INTEGER, ALLOCATABLE :: Temp_particle_ID(:)
-
-      ! type(fibre), POINTER :: current ! advance node in PTC - global in <PTC_TRACK_RUN>
       integer  :: mf1,mf2,mf(max_obs)
-
       REAL(dp) :: spos
-
-      !TYPE (real_8) :: Map_Y_obs(6) !  y => Map_Y_obs - local name
       real(dp) :: X_co_temp (6) ! (36) !(6) !(lnv)
-
       real(dp), allocatable ::  X_co_observe(:,:) ! (i_coord, i_obs_point)
-      integer, allocatable :: J(:) ! for extracting CO from the map
+      integer,  allocatable :: J(:) ! for extracting CO from the map
       REAL(dp),  allocatable :: Temp_X_incl_co_at_obs(:,:)
       Real(dp):: X_lnv_START(lnv), X_lnv_OBSRV(lnv)
-
       character(8) ch,ch1
 
       segment_one_table=0 ! for Printing to tables
@@ -2310,13 +2253,13 @@ CONTAINS
          write(mf2,*) 'Map_Y_obs=x_coord_co_at_START: '; call daprint(Map_Y_obs,mf2);
       endif
 
-      Allocate (X_co_observe(1:6,1:max_obs), &
-           Temp_particle_ID(1:j_tot_numb_starting_particles))
-      X_co_observe(:,:)=zero; Temp_particle_ID=0
+      Allocate (X_co_observe(1:6,1:max_obs), Temp_particle_ID(1:j_tot_numb_starting_particles))
+      X_co_observe(:,:)=zero; 
+      Temp_particle_ID=0
 
-      assign_co_at_start_ring: DO i_coord=1,icase_ptc
+      DO i_coord=1,nvariables
          X_co_observe(i_coord,1)=x_coord_co_at_START(i_coord)
-      END DO assign_co_at_start_ring
+      END DO 
 
       CALL Alloc(Map_damap)
 
@@ -2349,6 +2292,20 @@ CONTAINS
 
 
          Map_damap=Map_Y_obs
+         
+
+         if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+            write(whymsg,*) 'DA got unstable. ', &
+	        ', PTC msg: ',messagelost(1:LEN_TRIM(messagelost))
+
+            call fort_warn('ptc_track: ',whymsg(1:LEN_TRIM(whymsg))) 
+            whymsg(LEN_TRIM(whymsg)+1:LEN_TRIM(whymsg)+1) = char(0)
+            call seterrorflag(10,"ptc_trackline ",whymsg);
+
+          endif
+
+         
+         
          if (ptc_track_debug) then
             write(mf(i_obs_point),*) 'i_Unit=', mf(i_obs_point); Call daprint(Map_Y_obs,mf(i_obs_point));
          endif
@@ -2370,9 +2327,9 @@ CONTAINS
          ielem=elem_number_at_observ(i_obs_point+1)
 
          ! Call Extract_CO_from_Map (icase_PTC, Map_Y_obs, X_co_temp) - subr. removed
-         allocate(J(icase_ptc)); J(:)=0
+         allocate(J(nvariables)); J(:)=0
          X_co_temp(:)=zero
-         DO i_coord=1, icase_ptc
+         DO i_coord=1, nvariables
             X_co_temp(i_coord) = (Map_Y_obs(i_coord)%T.sub.J) ! take line with all zero-order
             if (ptc_track_debug) then
                 Print *,'CO extracted: i_coord=', i_coord, &
@@ -2380,7 +2337,7 @@ CONTAINS
             endif
          ENDDO
          deallocate(J)
-         Save_co_in_X_co_observe: DO i_coord=1, icase_ptc !icase_PTC
+         Save_co_in_X_co_observe: DO i_coord=1, nvariables
             X_co_observe(i_coord,i_obs_point+1)= X_co_temp(i_coord)
          END DO Save_co_in_X_co_observe
 
@@ -2404,7 +2361,7 @@ CONTAINS
                !X_lnv_OBSRV=Map_Y_obs*X_lnv_START
                !             X_lnv_OBSRV=Map_Y_obs%T*X_lnv_START
                !Error: Operands of binary numeric operator '*' at (1) are TYPE(taylor)/real(dp)
-               Read_START_coord: DO i_coord=1,icase_ptc
+               Read_START_coord: DO i_coord=1,nvariables
                   X_lnv_START(i_coord)= x_all_incl_co_at0(i_coord, i_turn_tmp, j_part_tmp) - &
                        x_coord_co_at_START(i_coord) ! X_out=M(x0,x)*x_in, where X=x0+x !
                ENDDO Read_START_coord
@@ -2414,7 +2371,7 @@ CONTAINS
                !             X_lnv_OBSRV=Map_Y_obs%T*X_lnv_START
                !Error: Operands of binary numeric operator '*' at (1) are TYPE(taylor)/real(dp)
 
-               Loop_coord: DO i_coord=1,icase_ptc
+               Loop_coord: DO i_coord=1,nvariables
                   !X_lnv_OBSRV(i_coord)=Map_Y_obs(i_coord)%T*X_lnv_START(i_coord)
                   !X_lnv_OBSRV(i_coord)=Map_Y_obs(i_coord)*X_lnv_START(i_coord)
                   !X_lnv_OBSRV(i_coord)=Map_damap*X_lnv_START(i_coord)
@@ -2564,7 +2521,6 @@ CONTAINS
 
          do j = 1, 6
             tmp=zero
-            !IF (j.LE.icase_ptc) tmp = z(j,i) - orbit0(j)
             tmp = z(j,i) - orbit0(j)
             tmp_coord_array(j)=tmp ! make array of coordinates
             X_PTC(j)=tmp
@@ -2583,7 +2539,7 @@ CONTAINS
 
             DO j = 1, 6
                X_PTC(j)=zero
-               IF (j.LE.icase_ptc) X_PTC(j)=tmp_norm_array(j)
+               IF (j.LE.nvariables) X_PTC(j)=tmp_norm_array(j)
             ENDDO
             CALL Coord_PTC_to_MAD(X_PTC,X_MAD) ! convert coordinates
             DO j = 1, 6
@@ -2603,6 +2559,7 @@ CONTAINS
 
     !==============================================================================
     SUBROUTINE tt_puttab_coord (npart,turn,nobs,orbit,orbit0,spos)
+      ! save to table of this particular track (trackone == false)
       ! copied from TRRUN.F( tt_puttab) and renamed to tt_puttab_coord
       !
       ! USE  madx_ptc_module, ONLY: dp, lnv, zero, operator(*), assignment(=)
@@ -2636,6 +2593,7 @@ CONTAINS
       !data vec_names / 'x', 'px', 'y', 'py', 'pt', 't','s' / ! PTC has a reverse order for pt and t
       data table_puttab / 'track.obs$$$$.p$$$$' /
 
+      !print*,"skowron: tt_puttab_coord"
       tmp_coord_array=zero; tmp_norm_array=zero
 
       !tt = turn; !tn = npart
@@ -2651,7 +2609,6 @@ CONTAINS
       call double_to_table_curr(table_puttab, 'turn ', doublenum)   ! the number of the current turn
       do j = 1, 6
          tmp=zero
-         !IF (j.LE.icase_ptc) tmp = orbit(j) - orbit0(j)
          tmp = orbit(j) - orbit0(j)
          tmp_coord_array(j)=tmp ! make array of coordinates
          X_PTC(j)=tmp
@@ -2661,7 +2618,7 @@ CONTAINS
          tmp_norm_array=A_t_map_rev*tmp_coord_array
          DO j = 1, 6
             X_PTC(j)=zero
-            IF (j.LE.icase_ptc) X_PTC(j)=tmp_norm_array(j)
+            IF (j.LE.nvariables) X_PTC(j)=tmp_norm_array(j)
          ENDDO
 
       ENDIF
@@ -2683,7 +2640,7 @@ CONTAINS
       call augment_count(table_puttab)
     END SUBROUTINE tt_puttab_coord
     !==============================================================================
-
+    
 
 !Do not know how to implement it with new PTC, need to ask Etienne
     !==============================================================================
@@ -2797,44 +2754,20 @@ CONTAINS
       !   coords      dp(6,0:turns,npart) (only switch > 1) particle coords. *
       !----------------------------------------------------------------------*
 
-      !k      use bbfi: ---------------------------------------------!
-      !k      integer bbd_loc,bbd_cnt,bbd_flag,bbd_pos,bbd_max       !
-      !k      parameter(bbd_max=200)                                 !
-      !k      real(dp) bb_kick                                       !
-      !k      common/bbi/bbd_loc(bbd_max),bbd_cnt,bbd_flag,bbd_pos   !
-      !k      common/bbr/bb_kick(2,bbd_max !-------------------------!
-      !k
-      !k      logical zgiv,zngiv
-      !k      integer j,jend,k,kp,kq,next_start,itype(23),switch,turns
       INTEGER ::  j_particle_line_counter,kq,kp
       INTEGER ::  next_start ! int. function
-      !k      real(dp) phi,track(12),zstart(12),twopi,z(6,1000),zn(6),  &
-      !k     &ex,ey,et,orbit0(6),eigen(6,6),x,px,y,py,t,deltae,fx,phix,fy,phiy, &
-      !k     &ft,phit,zero,deltax,coords(6,0:turns,*)
-      !k      real(KIND(1d0)) get_value,get_variable
-      !real(dp) :: twoPi, Ex_horz_emi_m, Ey_vert_emi_m, Et_long_emi_m
-      REAL(KIND(1d0))  :: x_input,px_input,y_input,py_input,t_input,deltae_input, &
-           fx_input,phix_input,fy_input,phiy_input,ft_input,phit_input
+      REAL(KIND(1d0))  :: x_input,px_input,y_input,py_input,t_input,deltae_input
+      REAL(KIND(1d0))  :: fx_input,phix_input,fy_input,phiy_input,ft_input,phit_input
       REAL(dp)  :: phi_n
-
-      ! real(KIND(1d0)) :: get_value,get_variable ! dble c-functions in the HOST routine
-      ! local temprorary variables
-      INTEGER :: k_th_coord,  j_th_particle, & ! local
-           itype_non_zero_flag(12) ! not itype(23)
-      ! =1 for non-zero coordinates, =0 for zero
-      real(dp) :: track_temp(12), z_start_sum(6)
-
+      INTEGER :: k_th_coord,  j_th_particle ! local
+      INTEGER :: itype_non_zero_flag(12) ! not itype(23)
+      real(dp) :: track_temp(12), z_start_sum(6) ! =1 for non-zero coordinates, =0 for zero
       real(dp),allocatable :: x_coord_incl_co_temp(:,:) ! copy of array
-
       Real (dp) :: Z_norm_temp(lnv), Z_stdt_temp(lnv) ! Z_stdt=A_t_map*Z_norm
-
       REAL (dp) :: X_MAD(6), X_PTC(6)
-
       logical(lp) :: zgiv_exist, zngiv_exist ! existence of non-zero input for action-angle
-
-      !k      parameter(zero=0d0)
       character(120) msg(2) ! text stings for messages
-      !k
+
       debug_print_1: if (ptc_track_debug) then
          print *; print *, "<subr. ptc_track_ini_conditions>:"
          print *,'  Initialise orbit, emittances and eigenvectors etc.'
@@ -2851,26 +2784,19 @@ CONTAINS
 
 1     continue  ! <---- loop for particle reading -----<--------<-------<-------<-------!
       !                                                                                 !
-      !k      j  =  next_start(x,px,y,py,t,deltae,fx,phix,fy,phiy,ft,phit)              !
-      ! read command line from input file :                                             !
-      ! ptc_start,x=0.001,px=4.492437849e-06;                                           l
-      ! madxdict.h:415:"ptc_start: ptc_start none 0 0 "                                 o
-      ! madxn.c:3384:                                                                   o
-      !      int next_start(xx,pxx,yx,pyx,tx,deltaex,fxx,phixx,fyx,phiyx,ftx,phitx)     p
-      !/* returns the parameters of the next particle to track;                         !
-      !        0 = none (there is no any more particles),                               !
-      !        else = count the particle number */                                      f
+
       j_particle_line_counter  =  &                                                   ! o
            next_start(x_input,px_input,y_input,py_input,t_input,deltae_input, &       ! r
-           fx_input,phix_input,fy_input,phiy_input,ft_input,phit_input)                 !
-      debug_print_3: if (ptc_track_debug) then                                          !
+                      fx_input,phix_input,fy_input,phiy_input,ft_input,phit_input)    !
+
+      if (ptc_track_debug) then                                          !
          print *, "The next command line from input file is read."                    ! p
          print *, "The keyword <ptc_start> provides the following data:"              ! a
          print *, "j_particle_line_counter=",j_particle_line_counter                  ! r
          print *, "x,px,y,py,t,deltae,fx,phix,fy,phiy,ft,phit=", &                    ! t
               x_input,px_input,y_input,py_input,t_input,deltae_input, &               ! i
               fx_input,phix_input,fy_input,phiy_input,ft_input,phit_input             ! c
-      end if debug_print_3                                                            ! l
+      endif                                                             ! l
       !                                                                               ! e
       !     the particle counter is inside <next_start> c-code                          !
       !                                                                                 !
@@ -2896,9 +2822,14 @@ CONTAINS
             X_MAD(3)=y_input; X_MAD(4)=py_input                               ! i   a   !
             X_MAD(5)=t_input; X_MAD(6)=deltae_input                           ! t   r   !
             !                                                                 ! c   t   f
+
+            if (getdebug() > 2) then
+               print*, 'X_MAD: ', X_MAD
+            endif
             
             ! Very dodgy
-            IF(icase_ptc.eq.5 .AND. (.NOT.closed_orbit)) THEN !--!            ! h   i   o
+            ! add momentum offset defined by 'deltap' to all tracks 
+            IF(nvariables.gt.4 .AND. (.NOT.closed_orbit)) THEN !--!            ! h   i   o
                if(mytime) then !----------------------!          !              !
                   call Convert_dp_to_dt (deltap, dt)  !          !              !
                else                                   !          !              !
@@ -2909,9 +2840,15 @@ CONTAINS
             
             !                                                                   !   !   p
             CALL Coord_MAD_to_PTC(X_MAD,X_PTC) ! convert coordinates          ! c   t   a
+            
+            if (getdebug() > 2) then
+               print*, 'X_PTC: ', X_PTC
+            endif
+            
             DO k_th_coord=1,6                                                 ! h   i   r
                track_temp(k_th_coord)=X_PTC(k_th_coord)                         !   c   t
             END DO                                                              !   l   i
+            
             track_temp(7) = fx_input                                            !   e   c
             track_temp(8) = phix_input                                          !   !   l
             track_temp(9) = fy_input                                          ! O   !   e
@@ -2938,7 +2875,7 @@ CONTAINS
             !k    direction for rotation (Y moves to X)                         !   r   !
             !                                                                   !   t   !
             Z_norm_temp(:)=zero                                                 !   i   !
-            polar_cart: do kq = 1, icase_ptc-1, 2 ! --------------!             !   c   !
+            polar_cart: do kq = 1, nvariables-1, 2 ! --------------!             !   c   !
                !do kq = 1, 5, 2                                   !             !   l   !
                !             !  kq=1,3,5 - coord                  !             !   e   !
                kp = kq + 1   ! kp=2,4,6 - momentum                !             !   !   !
@@ -2957,7 +2894,7 @@ CONTAINS
             enddo polar_cart !------------------------------------!             !   !   !
             !k                                                                  !   p   !
             debug_print_5:if (ptc_track_debug) then !----------------------!    !   a   !
-               Print *,'Z_norm_temp(k_th_coord)=', Z_norm_temp(:icase_ptc) !    !   r   !
+               Print *,'Z_norm_temp(k_th_coord)=', Z_norm_temp(:nvariables) !    !   r   !
             end if debug_print_5 !-----------------------------------------!    !   t   !
             !                                                                   !   i   !
             !-- Transform to unnormalized coordinates and refer to closed orbit.!   c   !
@@ -2967,7 +2904,7 @@ CONTAINS
             !                     ! ANY ORDER !!!                               !   !   !
             debug_print_6: if (ptc_track_debug) then ! --------!                !   !   !
                Print *, 'Z_stdt_temp=A_t_map*Z_norm_temp=', &  !                !   !   !
-                    Z_stdt_temp(:icase_ptc)                    !                !   !   !
+                    Z_stdt_temp(:nvariables)                    !                !   !   !
             end if debug_print_6 !-----------------------------!                !   !   !
             !                                                                   !   !   !
             zgiv_exist = .false. ! there is no non-zero                         !   !   !
@@ -2985,7 +2922,7 @@ CONTAINS
             !k    enddo !----------------------------------------------------!  !   !   !
             !                                                                   !   !   !
             z_start_sum(:)=zero                                                 !   !   !
-            SumDO: DO k_th_coord = 1,icase_ptc ! not 6 !----------------------! !   !   !
+            SumDO: DO k_th_coord = 1,6 ! not 6 !----------------------! !   !   !
                IF (itype_non_zero_flag(k_th_coord).ne.0) zgiv_exist =.true.   ! !   !   !
                IF (itype_non_zero_flag(k_th_coord+6).ne.0) zngiv_exist =.true.! !   !   !
                z_start_sum(k_th_coord)=track_temp(k_th_coord)+ &              ! !   !   !
@@ -3012,38 +2949,24 @@ CONTAINS
             endif Warn !----------------------------------------------!         !   !   !
             !                                                                   !   !   !
             ! fill a previous particles                                         !   !   !
-            previous: IF (jmax_numb_particl_at_i_th_turn.GE.2) THEN !*********! !   !   !
-               DO j_th_particle=1,jmax_numb_particl_at_i_th_turn-1 !=======!  ! !   !   !
-                  DO k_th_coord = 1, icase_ptc ! not 6 !----------------!  !  ! !   !   !
-                     x_coord_incl_co(k_th_coord, j_th_particle)= &      !  !  ! !   !   !
-                          x_coord_incl_co_temp(k_th_coord,j_th_particle)!  !  ! !   !   !
-                  END DO !----------------------------------------------!  !  ! !   !   !
-               END DO !====================================================!  ! !   !   !
+            IF (jmax_numb_particl_at_i_th_turn.GE.2) THEN !*********! !   !   !
+
+               x_coord_incl_co(:,1:jmax_numb_particl_at_i_th_turn-1) = & 
+                    x_coord_incl_co_temp(:,1:jmax_numb_particl_at_i_th_turn-1)
+               
+               
                DEALLOCATE (x_coord_incl_co_temp)                              ! !   !   !
-            END IF previous !*************************************************! !   !   !
+            END IF 
             !                                                                   !   !   !
             ! fill current particle                                             !   !   !
-            current: do k_th_coord = 1, icase_ptc !6 !-------------!            !   !   !
-               ! z(6,1:jend) - Transformed cartesian coordinates   !            !   !   !
-               !               including closed orbit ( c.o.)      !            !   !   !
-               !k            z(k,j) = orbit0(k) + zstart(k)        !            !   !   !
-               x_coord_incl_co(k_th_coord,             &           !            !   !   !
-                    jmax_numb_particl_at_i_th_turn)=   &           !            !   !   !
-                    x_coord_co(k_th_coord)+z_start_sum(k_th_coord) !            !   !   !
-            enddo current !----------------------------------------!            !   !   !
+            x_coord_incl_co(:,jmax_numb_particl_at_i_th_turn)=x_coord_co(:)+z_start_sum(:) 
             !                                                                   !   !   !
             ! save already-read particles in the array                          !   !   !
-            ALLOCATE &                                                          !   n   !
-                 (x_coord_incl_co_temp(1:6,1:jmax_numb_particl_at_i_th_turn))   !   e   !
+            
+            ALLOCATE(x_coord_incl_co_temp(1:6,1:jmax_numb_particl_at_i_th_turn))!   e   !
             x_coord_incl_co_temp=zero                                           !   w   !
-            !                                                                   !   !   !
-            save: DO j_th_particle=1,jmax_numb_particl_at_i_th_turn !==!        !   !   !
-               DO k_th_coord = 1, icase_ptc ! not 6 !----------------! !        !   !   !
-                  x_coord_incl_co_temp(k_th_coord, j_th_particle)= & ! !        !   !   !
-                       x_coord_incl_co(k_th_coord,j_th_particle)     ! !        !   p   !
-               END DO !----------------------------------------------! !        !   a   !
-            END DO save !==============================================!        !   r   !
-            DEALLOCATE (x_coord_incl_co)                                        !   t   !
+            x_coord_incl_co_temp(:,:)= x_coord_incl_co(:,:)    
+            DEALLOCATE (x_coord_incl_co)             !   t   !
             !                                                                   !   i   i
          END IF if_switch_or_j !++++++++++++++++++++++++++++++++++++++++++++++++!   c   n
          ! if switch = 1,2 (RUN, DYNAP fastune) OR                              !   l   g
@@ -3053,6 +2976,8 @@ CONTAINS
          goto 1  ! -->-- loop for particle reading ----->-------->------->----------!---!
          !                                                                          !
       endif new_particle ! ======END IF (new particle) =============================!
+      
+      
       ALLOCATE &
            (x_coord_incl_co(1:6,1:jmax_numb_particl_at_i_th_turn))
       x_coord_incl_co=zero
@@ -3062,7 +2987,7 @@ CONTAINS
          ALLOCATE (x_all_incl_co_at0(1:6,0:turns,1:jmax_numb_particl_at_i_th_turn)) !
          x_all_incl_co_at0=zero                                                     !
          DO j_th_particle=1,jmax_numb_particl_at_i_th_turn !===========!            !
-            DO k_th_coord = 1, icase_ptc   !------------------------!  !            !
+            DO k_th_coord = 1, nvariables   !------------------------!  !            !
                x_all_incl_co_at0(k_th_coord, 0, j_th_particle)=  &  !  !            !
                     x_coord_incl_co(k_th_coord,    j_th_particle)   !  !            !
             END DO !------------------------------------------------!  !            !
@@ -3109,18 +3034,30 @@ CONTAINS
       X_PTC=X_MAD ! for all elements
 
       if (ptc_track_debug) then
-          print *, &
-           'Coord_MAD_to_PTC icase_ptc=', icase_ptc, ' mytimec=', mytime
+          print *,'Coord_MAD_to_PTC icase_ptc=', icase_ptc, ' mytimec=', mytime
+          
       endif
 
-      if (icase_ptc.eq.6) THEN
-         X_PTC(5)=X_MAD(6); X_PTC(6)=X_MAD(5);
-         if (mytime) X_PTC(6)=-X_PTC(6) ! reverse sign
-      elseif(icase_ptc.eq.5) THEN
-         X_PTC(5)=X_MAD(6); X_PTC(6)=zero
-      elseif(icase_ptc.eq.4) THEN
-         X_PTC(5)=zero; X_PTC(6)=zero
+      !write(6,'(a10,1x,6(f9.6,1x))') 'X_MAD  ',X_MAD
+
+      if (nvariables.gt.5) THEN ! 6 and 56
+         
+         X_PTC(5)=X_MAD(6); 
+         X_PTC(6)=X_MAD(5);
+         X_PTC(6)=-X_PTC(6) ! reverse sign
+         
+      elseif(nvariables.eq.5) THEN
+      
+         X_PTC(5)=X_MAD(6); 
+         X_PTC(6)=zero
+      
+      elseif(nvariables.eq.4) THEN
+         X_PTC(5)=zero; 
+         X_PTC(6)=zero
       ENDIF
+
+      !write(6,'(a10,1x,6(f9.6,1x))') 'X_PTC  ',X_PTC
+      
     END SUBROUTINE Coord_MAD_to_PTC
 
     SUBROUTINE Coord_PTC_to_MAD(X_PTC,X_MAD)
@@ -3129,31 +3066,49 @@ CONTAINS
       REAL(dp), INTENT(IN)  :: X_PTC(6)
       REAL(dp), INTENT(OUT) :: X_MAD(6)
 
-      X_MAD=X_PTC ! for all elements
+      X_MAD(1:4)=X_PTC(1:4) ! for transverse
 
       if (ptc_track_debug) then
           print *, &
            'Coord_PTC_to_MAD icase_ptc=', icase_ptc, ' mytime=', mytime
       endif
 
-      IF (icase_ptc.eq.6) THEN
+      IF (nvariables.gt.5) THEN
          X_MAD(5)=X_PTC(6); 
          X_MAD(6)=X_PTC(5);
-         if (mytime) X_MAD(5)=-X_MAD(5) ! reverse sign
+         X_MAD(5)=-X_MAD(5) ! reverse sign
          
-      elseif(icase_ptc.eq.5) THEN
-         X_MAD(5)=X_PTC(6); 
+      elseif(nvariables.eq.5) THEN
+      
+         X_MAD(5)=zero; 
          X_MAD(6)=X_PTC(5)
-         if (mytime) X_MAD(5)=-X_MAD(5) ! reverse sign
-      elseif(icase_ptc.eq.4) THEN
-         X_MAD(5)=zero; X_MAD(6)=zero
+      
+      elseif(nvariables.eq.4) THEN
+         X_MAD(5)=zero; 
+         X_MAD(6)=zero
       ENDIF
+      
     END SUBROUTINE Coord_PTC_to_MAD
     !=============================================================================
 
   END subroutine ptc_track_run
   !==============================================================================
+  !==============================================================================
+  !==============================================================================
+  !==============================================================================
+  !==============================================================================
+  !==============================================================================
+  !==============================================================================
+  !==============================================================================
+  !==============================================================================
+  !==============================================================================
   !%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+
+
 
 
   ! INDEPENTENT  SUBROUTINES of this module
@@ -3234,6 +3189,17 @@ CONTAINS
     ! Normal_Form_N=0 !Error: Can't convert INTEGER(4) to TYPE(normalform)
 
     Normal_Form_N=Map_Y ! n=y
+    
+    if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
+
+       write(whymsg,*) 'DA got unstable when calculating the closed solution ', &
+	   ', PTC msg: ',messagelost(1:LEN_TRIM(messagelost))
+
+       call fort_warn('ptc_track: ',whymsg(1:LEN_TRIM(whymsg)))
+       whymsg(LEN_TRIM(whymsg)+1:LEN_TRIM(whymsg)+1) = char(0)
+       call seterrorflag(10,"ptc_track ",whymsg);
+       call aafail("ptc_track","Fatal Error: Requested closed orbit but closed solution does not exist! program stops")
+    endif
 
     call alloc(A_t_map)
 
@@ -3256,11 +3222,13 @@ CONTAINS
     end if
 
     !EigenVectors
-    !allocate (d_val(1:icase_ptc))
-    Number_of_eigenvectors=icase_ptc
-    if (icase_ptc .eq. 5) Number_of_eigenvectors=4
-    do i_vec=1,Number_of_eigenvectors ! icase_ptc
-       do i_comp=1,6 !icase_ptc
+
+    Number_of_eigenvectors=nvariables
+    if (icase_ptc .eq. 5)  Number_of_eigenvectors=4
+    if (icase_ptc .eq. 56) Number_of_eigenvectors=4
+    
+    do i_vec=1,Number_of_eigenvectors 
+       do i_comp=1,nvariables 
           ind(:)=0; ind(i_comp)=1
           d_val(i_comp)=Normal_Form_N%A_t%V(i_vec).sub.ind
        enddo
@@ -3276,6 +3244,114 @@ CONTAINS
     endif
   END subroutine Get_map_from_NormalForm
   !==============================================================================
+
+    SUBROUTINE kill_ptc_track (n_particle,       &
+                               i_th_turn,        &
+	           sum_accum_length, &
+	           j_max,            &
+                               part_ID,          &
+	           last_turn,        &
+	           last_position_of, &
+	           last_orbit_of,    &
+                               x_coord_incl_co, el_name,en )
+      implicit none
+      ! the next variables are local
+      Integer, intent (IN)     :: n_particle  ! number of particle to be kill
+      Integer, intent (IN)     :: i_th_turn
+      real(dp),intent (IN)     :: sum_accum_length, en ! input as 0
+      Integer, intent (INOUT)  :: j_max    ! number surviving particles (here, j=j-1)
+      Integer, intent (INOUT)  :: part_ID(*) ! particle number is reodered(1:N_particle_max)
+      Integer, intent (OUT)    :: last_turn(*) ! last_turn_of_lost_particle (1:N_particle_max)
+      real(dp), intent (OUT)   :: last_position_of(*), last_orbit_of(1:6,*)
+      real(dp), intent (INOUT) :: x_coord_incl_co(1:6,*)
+      character(len=24), intent (IN) :: el_name ! PTC has longer names
+      character(len=name_len) :: madx_name
+      Integer :: j_th, k_th, np, namelen
+      
+      np = part_ID(n_particle)
+      
+      last_turn(np)=i_th_turn
+      ! Save Number of this turn for n_particle
+
+      last_position_of(np)=sum_accum_length
+      ! Save Position of n_particle
+
+      last_orbit_of(:,np) = x_coord_incl_co(:,np)
+
+      if (recloss) then
+        namelen = LEN_TRIM(el_name)
+        if (namelen > name_len) namelen = name_len
+        madx_name = el_name(1:namelen)
+        call tp_ploss(np,i_th_turn, sum_accum_length, x_coord_incl_co(:,np), madx_name, en)
+      endif 
+      
+      ! Renumbering arrays
+      do j_th = n_particle+1, j_max 
+
+         part_ID(j_th-1) = part_ID(j_th)              
+         x_coord_incl_co(:,j_th-1) = x_coord_incl_co(:,j_th)  
+         
+         IF (.NOT.element_by_element) THEN 
+            part_ID_turns(i_th_turn,j_th-1) = part_ID(j_th-1) 
+         END IF
+         
+      enddo 
+
+      j_max = j_max - 1
+
+    END SUBROUTINE kill_ptc_track
+    !=============================================================================
+
+
+subroutine tp_ploss(npart,turn,spos,orbit,el_name, energy)
+  use name_lenfi
+  implicit none
+  !----------------------------------------------------------------------*
+  !--- purpose: enter lost particle coordinates in table                 *
+  !    input:                                                            *
+  !    npart  (int)           particle number                            *
+  !    turn   (int)           turn number                                *
+  !    spos    (double)       s-coordinate when loss happens             *
+  !    orbit  (double array)  particle orbit                             *
+  !    orbit0 (double array)  reference orbit                            *
+  !----------------------------------------------------------------------*
+  integer :: npart, turn
+  double precision :: spos, orbit(6)
+  character(len=name_len) :: el_name
+
+  integer :: j
+  double precision :: tmp, tt, tn, energy
+  character(len=120) :: table='trackloss'
+  character(len=4) :: vec_names(6)
+  data vec_names / 'x', 'px', 'y', 'py', 'pt', 't'/
+
+  double precision, external :: get_value
+
+  tn = npart
+  tt = turn
+
+  ! energy = get_value('probe ','energy ')
+
+  ! the number of the current particle
+  call double_to_table_curr(table, 'number ', tn)
+  ! the number of the current turn
+  call double_to_table_curr(table, 'turn ', tt)
+
+
+  do j = 1, 6
+     tmp = orbit(j)
+     call double_to_table_curr(table, vec_names(j), tmp)
+  enddo
+
+  tmp = spos
+  call double_to_table_curr(table,'s ',tmp)
+
+  call double_to_table_curr(table, 'e ', energy)
+  call string_to_table_curr(table, 'element ', el_name)
+
+  call augment_count(table)
+end subroutine tp_ploss
+
 
 
 END MODULE madx_ptc_track_run_module

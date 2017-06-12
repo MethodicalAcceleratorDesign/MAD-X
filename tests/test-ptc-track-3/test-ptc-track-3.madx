@@ -60,12 +60,9 @@ ptc_setswitch, debuglevel=0, nocavity=true,
 
 PTC_OBSERVE, place=LHCB1$end;
 
-
-
 ptc_start, x=0.001, px=0.0, y=0.0, py=0.0, t=0.0;
 
-PTC_OBSERVE, place=lhcb1$end;
-ptc_track, icase=5, turns=20, element_by_element, onetable, dump, maxaper={1e6,1e6,1e6,1e6,1e6,1e6};
+ptc_track, icase=5, turns=20, onetable, dump, maxaper={1e6,1e6,1e6,1e6,1e6,1e6};
 
 
 ptc_track_end;
