@@ -1607,7 +1607,7 @@ tests/test-ptc-normal/test-ptc-normal.cfg -text
 tests/test-ptc-normal/test-ptc-normal.madx -text
 tests/test-ptc-normal/test-ptc-normal.ref -text
 tests/test-ptc-track-2/test-ptc-track-2.madx -text
-tests/test-ptc-track-2/test-ptc-track-2.out.ref -text svneol=unset#application/x-gzip
+tests/test-ptc-track-2/test-ptc-track-2.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-track-2/tfv9.obs0001.p0001.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-track-2/tfv9.obs0001.p0002.ref -text svneol=unset#application/x-gzip
 tests/test-ptc-track-2/tfv9.obs0001.p0003.ref -text svneol=unset#application/x-gzip
