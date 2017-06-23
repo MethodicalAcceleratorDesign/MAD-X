@@ -101,6 +101,9 @@ $(call onlxi64,$(user-cases),)
 user-cases = \
 test-lhc test-hllhc
 
+# tests to remove (e.g. that relies on external resources)
+tests-to-rm =
+
 # extra files to remove in cleantest
 files-to-rm = \
 Maxwellian_bend_for_ptc.txt Maxwellian_bend_for_ptc_electric.txt \

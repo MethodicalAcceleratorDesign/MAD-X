@@ -50,12 +50,13 @@ if [ "$1" = "update" ] ; then
 	shift
 	update="update"
   git fetch && \
+	git checkout origin/master && \
   git reset --hard origin/master && \
-  git diff --name-status last-test
   check_error "git update failed"
 else
 	echo "Skipped (no explicit request)."
 fi
+git diff --name-status last-test
 
 echo -e "\n===== Release number ====="
 cat VERSION
