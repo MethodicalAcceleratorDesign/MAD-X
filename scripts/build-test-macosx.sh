@@ -1,6 +1,6 @@
 #! /bin/bash
 # run:
-# bash scripts/build-test-macosx.sh [noecho] [cleanall] [notest]
+# bash scripts/build-test-macosx.sh [noecho] [cleanall] [update] [notest]
 
 # env settings
 export PATH="`pwd`:/opt/local/bin:$PATH"
@@ -36,20 +36,6 @@ echo "User  : `echo $USER`"
 echo "Home  : `echo $HOME`"
 echo "Lang  : `echo $LANG`"
 
-echo -e "\n===== SVN update ====="
-svn update
-if [ "$?" != "0" ] ; then
-	echo -e "\n===== SVN cleanup & update ====="
-	svn cleanup
-	svn update
-	check_error "svn update failed"
-fi
-# ensure that scripts are executable after an update
-chmod u+x scripts/build-test-report.sh $0
-
-echo -e "\n===== Release number ====="
-cat VERSION
-
 echo -e "\n===== Clean build ====="
 if [ "$1" = "cleanall" ] ; then
 	shift
@@ -58,6 +44,21 @@ if [ "$1" = "cleanall" ] ; then
 else
 	echo "Skipped (no explicit request)."
 fi
+
+echo -e "\n===== Git update ====="
+if [ "$1" = "update" ] ; then
+	shift
+	update="update"
+  git fetch && \
+  git reset --hard origin/master && \
+  git diff --name-status last-test
+  check_error "git update failed"
+else
+	echo "Skipped (no explicit request)."
+fi
+
+echo -e "\n===== Release number ====="
+cat VERSION
 
 echo -e "\n===== Gnu build ====="
 gcc      --version
@@ -119,3 +120,7 @@ check_error "unable to restore the default version"
 # date & end marker
 echo -e "\nFinish: `date`"
 echo -e "\n===== End of build and tests ====="
+
+# mark the test as last success
+[ "$update" == "update" ] && git branch -f last-test HEAD
+
