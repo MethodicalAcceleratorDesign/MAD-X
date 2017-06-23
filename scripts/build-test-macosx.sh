@@ -56,6 +56,9 @@ if [ "$1" = "update" ] ; then
 else
 	echo "Skipped (no explicit request)."
 fi
+
+git show --summary
+git log --format="Previous tests: %H" -1 last-test
 git diff --name-status last-test
 
 echo -e "\n===== Release number ====="
