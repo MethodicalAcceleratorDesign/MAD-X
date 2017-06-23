@@ -57,8 +57,9 @@ else
 	echo "Skipped (no explicit request)."
 fi
 
-git show --summary
-git log --format="Previous tests: %H" -1 last-test
+echo -e "\n===== Git info ====="
+git log -1 --format="Commit:   %H%nAuthor:   %an <%ae>%nDate:     %ad (%ar)%nSubject:  %s"
+git log -1 --format="LastTest: %H" last-test
 git diff --name-status last-test
 
 echo -e "\n===== Release number ====="
