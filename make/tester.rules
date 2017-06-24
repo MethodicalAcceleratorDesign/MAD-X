@@ -21,12 +21,12 @@
 #
 # all tests
 #
-tests-all: init-test $(if $(TESTS),$(TESTS),$(filter-out $(test-to-rm),$(tests-all))) fini-test
+tests-all: init-test $(if $(TESTS),$(TESTS),$(filter-out $(tests-to-rm),$(tests-all))) fini-test
 
 #
 # fast tests only
 #
-tests: init-test $(if $(TESTS),$(TESTS),$(filter-out $(tests-long) $(test-to-rm),$(tests-all))) fini-test
+tests: init-test $(if $(TESTS),$(TESTS),$(filter-out $(tests-long) $(tests-to-rm),$(tests-all))) fini-test
 
 #
 # rule for one test
