@@ -153,7 +153,6 @@
 #define copy_twiss_data copy_twiss_data_
 #define embedded_twiss embedded_twiss_
 #define get_disp0 get_disp0_
-#define get_twiss_data get_twiss_data_
 
 // from mad_util.c
 #define intrac intrac_

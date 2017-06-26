@@ -16,7 +16,8 @@ struct constraint /* contains one constraint */
                                 /* 3 both 1 + 2 */
                                 /* 4 value */
   int stamp;
-  double value, c_min, c_max, weight;
+  int n_pos;
+  double value, c_min, c_max, weight, evaluated;
   struct expression *ex_value, *ex_c_min, *ex_c_max;
 };
 
@@ -31,6 +32,7 @@ struct constraint_list /* contains list of constraints */
 
 // interface
 
+struct constraint* clone_constraint(struct constraint*);
 struct constraint* delete_constraint(struct constraint*);   // used by mad_match.c
 void               dump_constraint(struct constraint*);     // used by mad_node.c
 
@@ -44,7 +46,7 @@ void update_node_constraints(struct node*, struct constraint_list*);
 
 int  constraint_name(char* name, int* name_l, int* index);
 int  next_constr_namepos(char* name);
-int  next_constraint(char* name, int* name_l, int* type, double* value, double* c_min, double* c_max, double* weight);
+int  next_constraint(char* name, int* name_l, int* type, double* value, double* c_min, double* c_max, double* weight, int* pos, double* evaluated, char* node_name, int* nn_len);
 int  next_global(char* name, int* name_l, int* type, double* value, double* c_min, double* c_max, double* weight);
 
 #endif // MAD_CONST_H

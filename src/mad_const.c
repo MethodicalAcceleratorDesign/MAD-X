@@ -21,7 +21,7 @@ grow_constraint_list(struct constraint_list* p)
 }
 
 static struct constraint*
-make_constraint(int type, struct command_parameter* par)
+make_constraint(int type, int find_npos, struct command_parameter* par)
   /* makes + stores a constraint from command parameter */
 {
   struct constraint* new = new_constraint(par->c_type);
@@ -56,6 +56,17 @@ make_constraint(int type, struct command_parameter* par)
   }
   if (type == 1) new->weight = command_par_value(new->name, current_weight);
   else           new->weight = command_par_value(new->name, current_gweight);
+
+  new->n_pos = find_npos ? next_constr_namepos(new->name) : 0;
+  if (find_npos && new->n_pos == 0) {
+    fatal_error(
+        " +-+-+- fatal error\n"
+        "match - collect: illegal name\n"
+        "      - try with the \"slow\" option\n"
+        "      - name = ", new->name
+    );
+  }
+
   return new;
 }
 
@@ -81,6 +92,16 @@ new_constraint_list(int length)
   il->max = length;
   il->constraints = mycalloc(rout_name, length, sizeof *il->constraints);
   return il;
+}
+
+struct constraint*
+clone_constraint(struct constraint* cst)
+  // flat copy
+{
+  const char* rout_name = "clone_constraint";
+  struct constraint* clone = mymalloc(rout_name, sizeof(*clone));
+  memcpy(clone, cst, sizeof(*clone));
+  return clone;
 }
 
 struct constraint*
@@ -150,20 +171,25 @@ fill_constraint_list(int type /* 1 node, 2 global */,
   struct command_parameter_list* pl = cd->par;
   struct name_list* nl = cd->par_names;
   struct constraint* l_cons;
-  int j;
+  int j, find_npos = type == 1 && !get_option("slow");
   for (j = 0; j < pl->curr; j++)
   {
     if (nl->inform[j] && pl->parameters[j]->type == 4)
     {
-      l_cons = make_constraint(type, pl->parameters[j]);
+      l_cons = make_constraint(type, find_npos, pl->parameters[j]);
       add_to_constraint_list(l_cons, cl);
     }
   }
 }
 
+// fetch info about one constraint and advance to the next
 int
-next_constraint(char* name, int* name_l, int* type, double* value, double* c_min, double* c_max, double* weight)
+next_constraint(char* name, int* name_l, int* type, double* value,
+                double* c_min, double* c_max, double* weight,
+                int* pos, double* val, char* node_name, int* nn_len)
   /* returns the parameters of the next constraint; 0 = none, else count */
+  // NOTE: does NOT set `val` for match2: match2 seems to invoke this function
+  // only via `jacob_print` where `val` is not needed.
 {
   struct constraint* c_c;
   char s, takenextmacro, nomore; /* RDM fork */
@@ -205,6 +231,7 @@ next_constraint(char* name, int* name_l, int* type, double* value, double* c_min
           c_min = value; /* unknown use */
           c_max = value; /* unknown use */
           *weight = 1; /*hardcode no weight with this interface */
+          string_from_table_row("twiss ", "name ", pos, node_name);
           k++;
           match2_cons_curr[0]=i;
           match2_cons_curr[1]=j;
@@ -241,6 +268,15 @@ next_constraint(char* name, int* name_l, int* type, double* value, double* c_min
     else                       *c_max = expression_value(c_c->ex_c_max,2);
 
     *weight = c_c->weight;
+
+    if (c_c->n_pos == 0) {
+      string_from_table_row("twiss ", "name ", pos, node_name);
+      double_from_table_row("twiss ",  name,   pos, val);
+    }
+    else {
+      *val = c_c->evaluated;
+      current_node_name(node_name, nn_len);
+    }
 
     return ++current_node->con_cnt;
   }
@@ -372,20 +408,24 @@ update_node_constraints(struct node* c_node, struct constraint_list* cl)
   if (c_node->cl == NULL) c_node->cl = new_constraint_list(cl->curr);
   for (j = 0; j < cl->curr; j++)
   {
-    k = -1;
+    // copy constraint, so it can hold individual `evaluated` value (we could
+    // do with a smaller data structure, but let's do it like this for now).
+    struct constraint* c_new = clone_constraint(cl->constraints[j]);
+
     for (i = 0; i < c_node->cl->curr; i++)
     {
-      if (strcmp(cl->constraints[j]->name,
-                 c_node->cl->constraints[i]->name) == 0) k = i;
+      struct constraint* c_old = c_node->cl->constraints[i];
+      if (strcmp(c_new->name, c_old->name) == 0) {
+        c_node->cl->constraints[i] = c_new;
+        break;
+      }
     }
-    if (k < 0)
-    {
+    if (i == c_node->cl->curr) {
       if (c_node->cl->curr == c_node->cl->max)
         grow_constraint_list(c_node->cl);
-      c_node->cl->constraints[c_node->cl->curr++] = cl->constraints[j];
+      c_node->cl->constraints[c_node->cl->curr++] = c_new;
       total_const++;
     }
-    else c_node->cl->constraints[k] = cl->constraints[j];
   }
 }
 
