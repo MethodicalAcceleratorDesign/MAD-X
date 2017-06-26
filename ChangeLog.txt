@@ -1,4 +1,4 @@
-skowron |  2017-06-12
+skowron | 2017-06-12
   Added warning for PTC codes about 6D TIME=false
   ptc_track RECLOSS option implemented
   ptc_track ROOTNTUPLE implemented
