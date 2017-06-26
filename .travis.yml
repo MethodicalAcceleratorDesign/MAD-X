@@ -1,0 +1,51 @@
+# ----------------------------------------
+# Build/test script
+# ----------------------------------------
+
+language: c
+
+install:
+  - make madx-linux64-gnu
+  - make numdiff-linux64-gnu
+
+script:
+  # Temporarily exclude test-plot until we can install gnuplot on the travis
+  # docker container, see:
+  # https://github.com/travis-ci/apt-package-whitelist/issues/3866
+  - >-
+    make tests tests-to-rm=test-plot &&
+    NUM_FAILED=$(<tests/tests-summary.txt grep -o 'FAILED.*' | awk '{print $2}') &&
+    [[ $NUM_FAILED = 0 ]]
+
+
+# ----------------------------------------
+# Travis settings:
+# ----------------------------------------
+
+# Build on Ubuntu 14.04 LTS Server Edition 64 bit (Trusty Tahr) which is
+# currently on beta (instead of precise which is current default):
+dist: trusty
+
+# Build inside docker containers instead of virtual machines. These are
+# faster, start quicker and support caching. Downside: sudo is not supported
+sudo: false
+
+# We cannot use 'sudo apt-get' to install missing apt-packages, see:
+#   - https://docs.travis-ci.com/user/installing-dependencies/
+#   - https://github.com/travis-ci/apt-package-whitelist
+addons:
+  apt:
+    packages:
+    - gfortran
+
+git:
+  # Travis CI clones repositories to a depth of 50 commits, which is only
+  # really useful if you are performing git operations.
+  # We restrict to just top level commit, because we are not interested in git
+  # operations and fetching the history could be quite large.
+  # Please note that if you use a depth of 1 and have a queue of jobs, Travis
+  # CI won’t build commits that are in the queue when you push a new commit.
+  depth: 1
+
+  # Don't clone the `examples/` submodule:
+  submodules: false
