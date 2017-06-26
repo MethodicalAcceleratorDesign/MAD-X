@@ -1,8 +1,7 @@
 skowron | 2017-06-12
   Added warning for PTC codes about 6D TIME=false
   ptc_track RECLOSS option implemented
-  ptc_track ROOTNTUPLE implemented
-  
+  ptc_track ROOTNTUPLE implemented  
 
 5.03.06 | ldeniau | 2017-05-29
   Bug fix for the dipedge element e1 and bv flag
