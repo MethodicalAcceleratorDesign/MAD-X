@@ -214,7 +214,6 @@ extern double disp0[6];
 extern double sxf_suml;
 extern double track_deltap;
 extern double oneturnmat[36];
-extern double fintx_plot;    /* to save the value of fintx for the reset_interpolation routine */
 
 extern const double zero;
 extern const double one;
