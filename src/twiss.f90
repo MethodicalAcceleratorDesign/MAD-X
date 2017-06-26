@@ -1743,8 +1743,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   bvk = node_value('other_bv ')
   elpar_vl = el_par_vector(g_polarity, g_elpar)
   el = node_value('l ')
-  ele_body = .false.
-  if ( el .gt. eps) ele_body = .true.
+  ele_body = el .gt. eps
 
   !--- 2013-Nov-14  10:34:00  ghislain: add acquisition of name of element here.
   !call element_name(el_name,len(el_name))
@@ -1758,7 +1757,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   if (n_align .ne. 0)  then
      !print*, "coupl1: Element = ", el_name
      ele_body = .false.
-     ORBIT2 = ORBIT
+     orbit2 = orbit
      call tmali1(orbit2,al_errors,beta,gamma,orbit,re)
      call twcptk(re,orbit)
      if (sectormap) SRMAT = matmul(RE,SRMAT)
@@ -1793,7 +1792,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   if (n_align .ne. 0)  then
      !print*, "coupl2: Element = ", el_name
      ele_body = .false.
-     ORBIT2 = ORBIT
+     orbit2 = orbit
      call tmali2(el,orbit2,al_errors,beta,gamma,orbit,re)
      call twcptk(re,orbit)
      if (sectormap) SRMAT = matmul(RE,SRMAT)
@@ -1839,25 +1838,25 @@ SUBROUTINE twcpgo(rt,orbit0)
 contains
 
 subroutine backup_optics()
-  ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
+  orbit00 = orbit ; ek00 = ek ; re00 = re ; te00 = te
   betx0=betx; alfx0=alfx; amux0=amux
   bety0=bety; alfy0=alfy; amuy0=amuy
-  RMAT0 = RMAT ; disp00 = disp
-  if (rmatrix) RW0 = RW
+  rmat0 = rmat ; disp00 = disp
+  if (rmatrix) rw0 = rw
   sigmat00 = sigmat
 end subroutine backup_optics
 
 subroutine restore_optics()
-  ORBIT = ORBIT00 ; EK = EK00 ; RE = RE00 ; TE = TE00
+  orbit = orbit00 ; ek = ek00 ; re = re00 ; te = te00
   betx=betx0; alfx=alfx0; amux=amux0
   bety=bety0; alfy=alfy0; amuy=amuy0
-  RMAT = RMAT0 ; disp = disp00
-  if (rmatrix) RW = RW0
+  rmat = rmat0 ; disp = disp00
+  if (rmatrix) rw = rw0
   sigmat = sigmat00
 end subroutine restore_optics
 
 subroutine save_opt_fun()
-    integer :: i1, i2
+  integer :: i1, i2
 
   !--- save maxima and name of elements where they occur
   bxmax  = max(bxmax,  betx)
@@ -1873,8 +1872,8 @@ subroutine save_opt_fun()
      opt_fun(6) = bety
      opt_fun(7) = alfy
      opt_fun(8) = amuy
-     OPT_FUN(9:14) = ORBIT
-     OPT_FUN(15:18) = disp(1:4)
+     opt_fun(9:14) = ORBIT
+     opt_fun(15:18) = disp(1:4)
 
      opt_fun(29) = rmat(1,1)
      opt_fun(30) = rmat(1,2)
@@ -3411,12 +3410,12 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
 
   code = node_value('mad8_type ')
   kill_ent_fringe = node_value('kill_ent_fringe ') .ne. 0d0
-  kill_exi_fringe = node_value('kill_exi_fringe ') .ne. 0d0
+  kill_exi_fringe = node_value('kill_exi_fringe ') .ne. 0d0 .or. fcentre
 
   !---- Test for non-zero length.
   fmap = el .ne. zero
+  if (.not. fmap) return
 
-  if (fmap) then
      !-- get element parameters
      elpar_vl = el_par_vector(b_k3s, g_elpar)
      bvk = node_value('other_bv ')
@@ -3477,14 +3476,12 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      endif
 
    !---- Get map for exit fringe fields and concatenate
-   if (.not. fcentre) then
      if (.not.kill_exi_fringe) then
         if (fintx .lt. 0) fintx = fint
         corr = (h + h) * hgap * fintx
         call tmfrng(.true.,h,sk1,e2,h2,-one,corr,rw,tw)
         call tmcat1(.true.,ek0,rw,tw,ek,re,te,ek,re,te)
      endif
-   endif
 
      !---- Apply tilt.
      if (tilt .ne. zero) then
@@ -3495,7 +3492,9 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      !---- Track orbit.
      if (ftrk) then
         call tmtrak(ek,re,te,orbit,orbit)
-        if (fcentre) return
+     endif
+
+  if (fcentre) return
 
         !---- Half radiation effects at exit.
         if (ftrk .and. radiate) then
@@ -3510,8 +3509,6 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
            orbit(4) = orbit(4) - rfac * (one + pt) * orbit(4)
            orbit(6) = orbit(6) - rfac * (one + pt) ** 2
         endif
-     endif
-  endif
 
 end SUBROUTINE tmbend
 
