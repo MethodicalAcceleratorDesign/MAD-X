@@ -2154,4 +2154,10 @@ set_enable(const char* type, struct in_cmd* cmd)
   return count;
 }
 
-
+struct sequence* find_sequence(const char* name, struct sequence_list* sequs)
+{
+  if (!sequs)
+    sequs = sequences;
+  int pos = name_list_pos(name, sequs->list);
+  return pos >= 0 ? sequs->sequs[pos] : NULL;
+}

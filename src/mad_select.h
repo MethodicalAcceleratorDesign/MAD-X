@@ -9,6 +9,9 @@ struct table;
 struct sequence;
 struct command;
 struct command_list;
+struct select_iter;
+struct sequence;
+struct sequence_list;
 
 // interface
 
@@ -25,6 +28,9 @@ void  set_selected_errors(void);
 void  set_selected_columns(struct table*, struct command_list*);
 void  set_range(char* range, struct sequence*);
 void  set_sector(void);
+
+struct select_iter* start_iter_select(struct command*, struct sequence_list*, struct sequence*);
+int                 fetch_node_select(struct select_iter*, struct node**, struct sequence**);
 
 #endif // MAD_SELECT_H
 

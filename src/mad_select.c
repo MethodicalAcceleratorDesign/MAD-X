@@ -1,5 +1,80 @@
 #include "madx.h"
 
+// TG: start_iter_select/fetch_node_select can be used to replace/implement
+// get_select_ex_ranges and the same pattern in a few other places.
+struct select_iter
+{
+  int i_seq, full;
+  struct command* cmd;
+  struct sequence* sequ;
+  struct sequence_list* sequs;
+  const char* range;
+  struct node *node, *range_end;
+};
+
+struct select_iter*
+start_iter_select(struct command* cmd, struct sequence_list* sequs, struct sequence* sequ)
+{
+  const char* name;
+
+  if (!sequs)
+    sequs = sequences;
+
+  if (sequs && !sequ && (name = command_par_string("sequence", cmd))) {
+    sequ = find_sequence(name, sequs);
+    sequs = NULL;
+    if (!sequ) {
+      warning("unknown sequence, skipped select: ", name);
+      return NULL;
+    }
+  }
+
+  struct select_iter* it = mycalloc("start_iter_select", 1, sizeof(struct select_iter));
+  it->cmd = cmd;
+  it->sequ = sequ ? sequ : sequs->sequs[0];
+  it->full = log_val("full", cmd);    // `full` means "unfiltered"
+  it->sequs = sequs;
+  it->range = it->full ? NULL : command_par_string("range", cmd);
+
+  return it;
+}
+
+int
+fetch_node_select(struct select_iter* it, struct node** node, struct sequence** seq)
+{
+  struct node* nodes[2];
+
+  if (!it)
+    return 0;
+
+  for (;;) {
+    if (it->node) {
+      it->node = it->node == it->range_end ? NULL : it->node->next;
+    }
+    else if (it->range) {
+      if (get_ex_range(it->range, it->sequ, nodes)) {
+        it->node = nodes[0];
+        it->range_end = nodes[1];
+      }
+    }
+    else {
+      it->node = it->sequ->ex_start;
+      it->range_end = it->sequ->ex_end;
+    }
+
+    if (!it->node && it->sequs && it->i_seq != it->sequs->curr) {
+      it->sequ = it->sequs->sequs[++it->i_seq];
+      continue;
+    }
+
+    if (!it->node || it->full || pass_select(it->node->p_elem->name, it->cmd)) {
+      if (seq) *seq = it->sequ;
+      if (node) *node = it->node;
+      return it->node != NULL;
+    }
+  }
+}
+
 static int
 get_select_ex_ranges(struct sequence* sequ, struct command_list* select, struct node_list* s_ranges)
   /* makes a list of nodes of an expanded sequence that pass the range
@@ -7,44 +82,17 @@ get_select_ex_ranges(struct sequence* sequ, struct command_list* select, struct 
 {
   /*returns 0 if invalid sequence pointer
     1 if nodes in s_ranges (including 0) */
-  struct name_list* nl;
-  struct command* cd;
-  struct command_parameter_list* pl;
-  char* name;
-  int full = 0, i, pos; // k, // not used
   struct node* c_node;
-  struct node* nodes[2];
   if (sequ == NULL) return 0;
   s_ranges->curr = 0;
   s_ranges->list->curr = 0;
-  for (i = 0; i < select->curr; i++)
+  for (int i = 0; i < select->curr; i++)
   {
-    cd = select->commands[i];
-    nl = cd->par_names;
-    pl = cd->par;
-    pos = name_list_pos("full", nl);
-    if ((pos = name_list_pos("full", nl)) > -1 && nl->inform[pos]
-        && command_par_value("full", cd) != zero) full = 1;
-    if (full == 0 && (pos = name_list_pos("range", nl)) > -1
-        && nl->inform[pos])
-    {
-      name = pl->parameters[pos]->string;
-      if (get_ex_range(name, sequ, nodes) == 0) return 0; // (k = not used
+    struct select_iter* it = start_iter_select(select->commands[i], NULL, sequ);
+    while (fetch_node_select(it, &c_node, NULL)) {
+      add_to_node_list(c_node, 0, s_ranges);
     }
-    else
-    {
-      if ((nodes[0] = sequ->ex_start) == NULL ||
-          (nodes[1] = sequ->ex_end) == NULL) return 0;
-    }
-    c_node = nodes[0];
-    while (c_node != NULL)
-    {
-      if (full != 0 || pass_select(c_node->p_elem->name, cd) != 0)
-        add_to_node_list(c_node, 0, s_ranges);
-      if (c_node == nodes[1]) break;
-      c_node = c_node->next;
-    }
-    if (full != 0) break;
+    if (it->full) break;
   }
   return 1;
 }

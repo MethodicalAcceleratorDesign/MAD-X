@@ -69,6 +69,7 @@ struct node*     new_sequ_node(struct sequence*, int occ_cnt);
 struct sequence* new_sequence(const char* name, int ref);
 struct sequence* delete_sequence(struct sequence*);
 struct sequence_list* new_sequence_list(int length);
+struct sequence* find_sequence(const char* name, struct sequence_list*);
 
 void    use_sequ(struct in_cmd*);
 void    remove_from_sequ_list(struct sequence*, struct sequence_list*);
