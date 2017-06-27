@@ -1669,7 +1669,7 @@ aperture(char *table, struct node* use_range[], struct table* tw_cp, int *tw_cnt
 	} // if is_zero_len
       } // for jslice
 
-      reset_interpolation(&nint);
+      reset_interpolation();
 
       /* insert minimum node value into Twiss table */
       double_to_table_row(tw_cp->name, "n1", tw_cnt, &node_n1);

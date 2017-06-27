@@ -1461,7 +1461,7 @@ subroutine peintp(crow, nint, proc, length, ierr)
      enddo
 
   enddo ! loop over nint
-  k = reset_interpolation(nint)
+  k = reset_interpolation()
 
 end subroutine peintp
 

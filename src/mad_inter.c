@@ -5,6 +5,7 @@ static struct backup {
               *first_node, *last_node,
               *range_start, *range_end;
   int bend_flag, rbend_flag;
+  int nint;
 } backup;
 
 // Creates interpolating nodes for the plotting routine
@@ -27,6 +28,7 @@ interpolate_node(int *nint)
   backup.current_node = current_node;
   backup.range_start = current_sequ->range_start;
   backup.range_end = current_sequ->range_end;
+  backup.nint = *nint;
 
 
   el = current_node->p_elem;
@@ -125,7 +127,7 @@ interpolate_node(int *nint)
 
 // Deletes the interpolating nodes expanded by the routine interp_node
 int
-reset_interpolation(int *nint)
+reset_interpolation(void)
 {
   struct node *curr, *next;
 
@@ -137,17 +139,17 @@ reset_interpolation(int *nint)
   current_node              = backup.current_node;
 
   if (backup.bend_flag) {
-    if (*nint >= 1) {
+    if (backup.nint >= 1) {
         curr = backup.first_node;
         delete_command(curr->p_elem->def);
         delete_element(curr->p_elem);
     }
-    if (*nint >= 2) {
+    if (backup.nint >= 2) {
       curr = backup.first_node->next;
       delete_command(curr->p_elem->def);
       delete_element(curr->p_elem);
     }
-    if (*nint >= 3) {
+    if (backup.nint >= 3) {
       curr = backup.last_node;
       delete_command(curr->p_elem->def);
       delete_element(curr->p_elem);

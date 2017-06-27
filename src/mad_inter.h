@@ -9,7 +9,7 @@
    that must be restored. Hence, node iteration are forbidden between their call.
 */
 int interpolate_node(int *nint);
-int reset_interpolation(int *nint);
+int reset_interpolation(void);
 
 #endif // MAD_INTER_H
 
