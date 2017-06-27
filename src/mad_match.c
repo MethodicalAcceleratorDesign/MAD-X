@@ -316,14 +316,7 @@ match_cell(struct in_cmd* cmd)
 static void
 match_constraint(struct in_cmd* cmd)
 {
-  char* name;
-  struct command_parameter* cp;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  struct sequence* sequ;
-  struct node* nodes[2];
   struct node* c_node;
-  int pos, n, low, up; // , k // not used
 
   if(match_is_on==2)
   {
@@ -335,45 +328,12 @@ match_constraint(struct in_cmd* cmd)
   }
   else
   { /* old match */
-    pos = name_list_pos("sequence", nl);
-    if((pos>=0)?nl->inform[pos]:0) { /* sequence specified */
-      cp = cmd->clone->par->parameters[pos];
-      for (n = 0; n < match_sequs->curr; n++)
-        if (strcmp(cp->string, match_sequs->sequs[n]->name) == 0)
-          break;
-
-      if (n == match_sequs->curr) {
-        warning(cp->string," :sequence not selected by MATCH, skipped");
-        return;
-      }
-
-      low = up = n;
-    }
-    else {
-      low = 0; up = match_sequs->curr - 1;
-    }
-
-    for (n = low; n <= up; n++) {
-      sequ = match_sequs->sequs[n];
-      pos = name_list_pos("range", nl);
-      if ((pos>=0)?nl->inform[pos]:0) { /* parameter has been read */
-        name = pl->parameters[pos]->string;
-        if (get_ex_range(name, sequ, nodes) == 0)  return; // (k = not used
-      }
-      else {
-        nodes[0] = sequ->ex_start; nodes[1] = sequ->ex_end;
-      }
-      c_node = nodes[0];
-      comm_constraints->curr=0;
-      fill_constraint_list(1, cmd->clone, comm_constraints);
-
-      while (c_node)
-      {
-        if (pass_select(c_node->p_elem->name, cmd->clone) != 0)
-          update_node_constraints(c_node, comm_constraints);
-        if (c_node == nodes[1]) break;
-        c_node = c_node->next;
-      }
+    // TODO: use all sequences!
+    comm_constraints->curr=0;
+    fill_constraint_list(1, cmd->clone, comm_constraints);
+    struct select_iter* it = start_iter_select(cmd->clone, match_sequs, NULL);
+    while (fetch_node_select(it, &c_node, NULL)) {
+      update_node_constraints(c_node, comm_constraints);
     }
   }
 }
@@ -485,6 +445,7 @@ match_end(struct in_cmd* cmd)
   match_is_on = 0;
   set_option("match_is_on", &izero);
   match_sequs->curr = 0;
+  match_sequs->list->curr = 0;
   current_call_lim = 0;
   current_calls = 0;
   total_const = 0;
@@ -625,6 +586,7 @@ match_match(struct in_cmd* cmd)
           return;
         }
         match_sequs->sequs[match_sequs->curr++] = sequ;
+        add_to_name_list(sequ->name, 0, match_sequs->list);
       }
     }
     if (match_sequs->curr == 0)
@@ -634,7 +596,10 @@ match_match(struct in_cmd* cmd)
       return;
     }
   }
-  else match_sequs->sequs[match_sequs->curr++] = current_sequ;
+  else {
+    match_sequs->sequs[match_sequs->curr++] = current_sequ;
+    add_to_name_list(current_sequ->name, 0, match_sequs->list);
+  }
   pos = name_list_pos("vlength", nl);
   if((pos>=0)?nl->inform[pos]:0) i = pl->parameters[pos]->double_value;
   else i = 0;
