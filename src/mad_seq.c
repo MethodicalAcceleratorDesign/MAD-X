@@ -1418,6 +1418,12 @@ use_sequ(struct in_cmd* cmd)
   }
 
   current_beam = keep_beam;
+
+  // replay interpolate selections:
+  if (interp_select) {
+    for (int i = 0; i < interp_select->curr; ++i)
+      select_interp(interp_select->commands[i]);
+  }
 }
 
 int

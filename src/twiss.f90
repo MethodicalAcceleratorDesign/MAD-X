@@ -1661,12 +1661,13 @@ SUBROUTINE twcpgo(rt,orbit0)
   double precision :: alfx0, betx0, amux0
   double precision :: alfy0, bety0, amuy0
   double precision :: orbit(6), orbit2(6)
-  double precision :: bvk, sumloc, sd, el, currpos
+  double precision :: bvk, sumloc, sd, el, dl, currpos
   double precision :: al_errors(align_max)
   ! character(len=name_len) el_name
   character(len=130) :: msg
 
   integer, external :: el_par_vector, advance_node, restart_sequ, get_option, node_al_errors
+  integer, external :: start_interp_node, fetch_interp_node
   double precision, external :: node_value, get_value
   double precision, parameter :: eps=1d-16
 
@@ -1734,7 +1735,30 @@ SUBROUTINE twcpgo(rt,orbit0)
   i = restart_sequ()
   i_spch = 0
 
-10 continue
+  i = 1
+  do while (i .ne. 0)
+    el = node_value('l ')
+    if (start_interp_node(i) .ne. 0) then
+      do while (fetch_interp_node(i, dl) .ne. 0)
+        call backup_optics()
+        call track_one_element(dl, .true.)
+        call restore_optics()
+      end do
+      call track_one_element(el, .false.)
+    else
+      i = 1
+      call track_one_element(el, .not. centre)
+    endif
+    i = advance_node()
+  end do
+
+  call compute_summary()
+
+contains
+
+subroutine track_one_element(el, fexit)
+  double precision, intent(in) :: el
+  logical :: fexit
 
   sector_sel = node_value('sel_sector ') .ne. zero .and. sectormap
   code = node_value('mad8_type ')
@@ -1742,7 +1766,6 @@ SUBROUTINE twcpgo(rt,orbit0)
   if (code .eq. code_placeholder) code = code_instrument
   bvk = node_value('other_bv ')
   elpar_vl = el_par_vector(g_polarity, g_elpar)
-  el = node_value('l ')
   ele_body = el .gt. eps
 
   !--- 2013-Nov-14  10:34:00  ghislain: add acquisition of name of element here.
@@ -1814,13 +1837,12 @@ SUBROUTINE twcpgo(rt,orbit0)
   sigdy  = sigdy  + disp(3)**2
 
   call save_opt_fun()
-  if (.not. centre) then
+  if (fexit) then
      call twprep(save,1,opt_fun,currpos)
   endif
+end subroutine track_one_element
 
-  if (advance_node() .ne. 0) goto 10
-
-  !---- Compute summary.
+subroutine compute_summary
   wgt    = max(iecnt, 1)
   sigxco = sqrt(sigxco / wgt)
   sigyco = sqrt(sigyco / wgt)
@@ -1834,8 +1856,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   if (cplxt .or. radiate) &
        call fort_warn('TWCPGO: ','TWISS uses the RF system or synchrotron radiation only '// &
                        'to find the closed orbit, for optical calculations it ignores both.')
-
-contains
+end subroutine compute_summary
 
 subroutine backup_optics()
   orbit00 = orbit ; ek00 = ek ; re00 = re ; te00 = te
@@ -2782,11 +2803,12 @@ SUBROUTINE twchgo
   double precision :: orbit(6), orbit2(6), ek(6), re(6,6), te(6,6,6)
   double precision :: orbit00(6), ek00(6), re00(6,6), te00(6,6,6), disp00(6), ddisp00(6)
   double precision :: rmat0(2,2), sigmat00(6,6)
-  double precision :: al_errors(align_max), el
+  double precision :: al_errors(align_max), el, dl
   character(len=130) :: msg
   double precision :: betx0, alfx0, amux0, wx0, dmux0, phix0
   double precision :: bety0, alfy0, amuy0, wy0, dmuy0, phiy0
   integer, external :: restart_sequ, advance_node, get_option, node_al_errors
+  integer, external :: start_interp_node, fetch_interp_node
   double precision, external :: node_value, get_value
 
   !---- If save requested reset table
@@ -2822,9 +2844,28 @@ SUBROUTINE twchgo
   i = restart_sequ()
   i_spch=0
 
-10 continue
+  i = 1
+  do while (i .ne. 0)
+    el = node_value('l ')
+    if (start_interp_node(i) .ne. 0) then
+      do while (fetch_interp_node(i, dl) .ne. 0)
+        call backup_optics()
+        call track_one_element(dl, .true.)
+        call restore_optics()
+      end do
+      call track_one_element(el, .false.)
+    else
+      i = 1
+      call track_one_element(el, .not. centre)
+    endif
+    i = advance_node()
+  end do
 
-  el = node_value('l ')
+contains
+
+subroutine track_one_element(el, fexit)
+  double precision, intent(in) :: el
+  logical :: fexit
 
   code = node_value('mad8_type ')
 !  if (code .eq. code_tkicker)     code = code_kicker ! TKICKER is a KICKER
@@ -2876,9 +2917,9 @@ SUBROUTINE twchgo
      opt_fun(5) = amux
      opt_fun(8) = amuy
   endif
+end subroutine track_one_element
 
-  if (advance_node() .ne. 0)  goto 10
-
+subroutine check_summary()
   !---- Warning, if system is coupled.
   if (cplxy) then
      write (msg,'(a,f12.6,a)') "TWISS found transverse coupling for delta(p)/p =",deltap, &
@@ -2890,8 +2931,7 @@ SUBROUTINE twchgo
                  'only to find the closed orbit, for optical calculations it '// &
                  'ignores both.')
   endif
-
-contains
+end subroutine check_summary
 
 subroutine backup_optics()
      ORBIT00 = ORBIT ; EK00 = EK ; RE00 = RE ; TE00 = TE
@@ -3440,6 +3480,12 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      fintx = g_elpar(b_fintx)
      sks = g_elpar(b_k1s)
      h = an / el
+
+     !---  calculate body slice from start (no exit fringe field):
+     if (dl .lt. el .and. .not. fcentre) then
+       el = dl
+       kill_exi_fringe = .true.
+     endif
 
      !---- Apply field errors and change coefficients using DELTAP.
      F_ERRORS = zero

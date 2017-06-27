@@ -29,6 +29,7 @@ struct sequence
   int stamp;
   int line;                     /* set to 1 if origin is a line */
   int add_pass;                 /* number of additional passes */
+  int num_interp;               /* number of additonal rows in the twiss table */
   double length;                /* length as in declaration */
   struct expression* l_expr;    /* length expression as in declaration */
   struct node* start;           /* first node in sequence */

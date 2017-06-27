@@ -689,5 +689,34 @@ Knowing $V_1$ and $M_{12}$  (transfer matrix of the element), we can calculate $
   
 For weakly coupled lattice MAD-X always uses \textbf{block-diagonal} solution, i.e. large tune (mode1) is associated with x-plane, and smaller tune (mode2) is associated with y-plane by convention. For a highly coupled lattice, it may happen at some places in the lattice that mode1 is associated with y-plane, and mode2 with x-plane. Switching the association of mode1 and mode2 with x and y-planes as one propagates the twiss parameters through the lattice is called "modes flip" (use \textbf{off-block diagonal} solution for $W_{12}$). In case the modes flip is triggered, there is an additional stability check, either the calculation of twiss parameters can be done with modes flip or not. 
 
+\section{Intermediate values}
+
+The \texttt{SELECT, FLAG=interpolate} command allows to select locations for
+output of intermediate values for the \texttt{TWISS} command. If interpolation
+points have been selected for an element, the \texttt{TWISS} command will add
+the values at these locations to the TFS table rather than at the end of the
+element.
+
+\madbox{
+SELECT, \=FLAG=interpolate, SEQUENCE=string, RANGE=string, CLASS=string, \\
+        \>CLEAR, \\
+        \>SLICE=integer, \\
+        \>STEP=real, \\
+        \>AT=\{real, \ldots \};
+}
+
+\textbf{Note:} This feature may behave unexpectecly with \texttt{CENTRE}.
+
+Selected elements can optionally be filtered based on sequence, range and
+class. Every selection specifies exactly one of the following actions which
+overrides previous selections for the matching elements:
+
+\begin{madlist}
+  \ttitem{CLEAR} remove interpolation positions.
+  \ttitem{SLICE} slice using a fixed number of slices.
+  \ttitem{STEP} slice at every \texttt{STEP} meters.
+  \ttitem{AT} slice at given locations (as fraction of the node length).
+\end{madlist}
+
 
 %% EOF

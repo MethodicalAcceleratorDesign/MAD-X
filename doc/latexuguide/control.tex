@@ -332,7 +332,8 @@ subsequent commands.
 \madbox{
 SELECT, \=FLAG=string, RANGE=string, CLASS=string, PATTERN=string, \\
         \>SEQUENCE=string, FULL=logical, CLEAR=logical,\\
-        \>COLUMN=string\{,string\},  SLICE=integer, THICK=logical;
+        \>COLUMN=string\{,string\},  SLICE=integer, THICK=logical, \\
+        \>STEP=real, AT=\{real, \ldots \};
 } 
 
 The attributes to the \texttt{SELECT} command are:
@@ -356,7 +357,10 @@ The attributes to the \texttt{SELECT} command are:
     
     \ttitem{SAVE} selection of elements for the
     \hyperref[sec:save]{\texttt{SAVE}} command.
-    
+
+    \ttitem{INTERPOLATE} selection of interpolation points for the
+    \hyperref[chap:twiss]{\texttt{TWISS}} command.
+
     \ttitem{tablename} is a table name such as \texttt{twiss}, 
     \texttt{track} etc., and the rows and columns to be written are
     selected.
@@ -400,7 +404,8 @@ SELECT, FLAG=twiss, FULL, COLUMN= var1;
 
   \ttitem{SLICE} is the number of slices into which the selected
   elements have to be cut and is only used by
-  \hyperref[chap:makethin]{\texttt{MAKETHIN}}. (Default = 1). 
+  \hyperref[chap:makethin]{\texttt{MAKETHIN}} and
+  \hyperref[chap:twiss]{\texttt{FLAG=INTERPOLATE}}. (Default = 1).
 
   \ttitem{THICK} is a logical flag to indicate  whether the selected
   elements are treated as thick elements by the
@@ -409,6 +414,14 @@ SELECT, FLAG=twiss, FULL, COLUMN= var1;
   \hyperref[sec:quadrupole]{\texttt{QUADRUPOLE}}s and
   \hyperref[sec:bend]{\texttt{BEND}}s for which thick maps
   have been explicitely derived. 
+
+  \ttitem{STEP} output intermediate values every \texttt{STEP} meters
+  in the \hyperref[chap:twiss]{\texttt{TWISS}} command.
+
+  \ttitem{AT} manual specification of interpolation points for the
+  \hyperref[chap:twiss]{\texttt{TWISS}} command. Specified as a
+  fraction of the node length, i.e. a value of 0.5 slices at
+  the centre of the element.
 \end{madlist}
 
 \vskip 5mm

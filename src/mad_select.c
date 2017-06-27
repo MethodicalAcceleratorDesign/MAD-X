@@ -393,6 +393,11 @@ store_deselect(struct in_cmd* cmd)
   else if (strcmp(flag_name, "sectormap") == 0)
   {
   }
+  else if (strcmp(flag_name, "interpolate") == 0)
+  {
+    store_select_command(cmd, &interp_select, "interp_select", 0);
+    select_interp(cmd->clone);
+  }
   else /* store deselect for all tables */
   {
     if ((dscl = find_command_list(flag_name, table_deselect)) == NULL)
@@ -488,6 +493,11 @@ store_select(struct in_cmd* cmd)
       sector_ranges->curr = 0;
       sector_ranges->list->curr = 0;
     }
+  }
+  else if (strcmp(flag_name, "interpolate") == 0)
+  {
+    store_select_command(cmd, &interp_select, "interp_select", 0);
+    select_interp(cmd->clone);
   }
   else /* store select for all tables */
   {
