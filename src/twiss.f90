@@ -1657,7 +1657,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   integer :: i, i1, i2, iecnt, code, save, n_align, elpar_vl
   double precision :: ek(6), re(6,6), rwi(6,6), rc(6,6), te(6,6,6)
   double precision :: orbit00(6), ek00(6), re00(6,6), te00(6,6,6), disp00(6)
-  double precision :: rw0(6,6), rmat0(2,2), sigmat00(6,6)
+  double precision :: rw0(6,6), rmat0(2,2), sigmat00(6,6), pos0
   double precision :: alfx0, betx0, amux0
   double precision :: alfy0, bety0, amuy0
   double precision :: orbit(6), orbit2(6)
@@ -1839,6 +1839,7 @@ contains
 
 subroutine backup_optics()
   orbit00 = orbit ; ek00 = ek ; re00 = re ; te00 = te
+  pos0=currpos
   betx0=betx; alfx0=alfx; amux0=amux
   bety0=bety; alfy0=alfy; amuy0=amuy
   rmat0 = rmat ; disp00 = disp
@@ -1848,6 +1849,7 @@ end subroutine backup_optics
 
 subroutine restore_optics()
   orbit = orbit00 ; ek = ek00 ; re = re00 ; te = te00
+  currpos = pos0
   betx=betx0; alfx=alfx0; amux=amux0
   bety=bety0; alfy=alfy0; amuy=amuy0
   rmat = rmat0 ; disp = disp00
@@ -2780,7 +2782,7 @@ SUBROUTINE twchgo
   double precision :: orbit(6), orbit2(6), ek(6), re(6,6), te(6,6,6)
   double precision :: orbit00(6), ek00(6), re00(6,6), te00(6,6,6), disp00(6), ddisp00(6)
   double precision :: rmat0(2,2), sigmat00(6,6)
-  double precision :: al_errors(align_max), el, pos0, currpos
+  double precision :: al_errors(align_max), el
   character(len=130) :: msg
   double precision :: betx0, alfx0, amux0, wx0, dmux0, phix0
   double precision :: bety0, alfy0, amuy0, wy0, dmuy0, phiy0
@@ -2794,7 +2796,6 @@ SUBROUTINE twchgo
   centre = get_value('twiss ','centre ').ne.zero
 
   !---- Initial values for lattice functions.
-  pos0 = zero
   amux = zero
   amuy = zero
   ORBIT = OPT_FUN0(9:14)
