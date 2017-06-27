@@ -173,3 +173,51 @@ reset_interpolation(void)
   return 0;
 }
 
+
+// interpolation without creating intermediate nodes:
+
+int
+start_interp_node(int* i)
+{
+  *i = 0;
+  return current_node->interp_at && current_node->interp_at->curr > 0;
+}
+
+int
+fetch_interp_node(int* i, double* dl)
+{
+  *dl = current_node->interp_at->a[*i] * current_node->length;
+  return ++*i <= current_node->interp_at->curr;
+}
+
+void
+select_interp(struct command* cmd)
+{
+  struct select_iter* iter = start_iter_select(cmd, NULL, NULL);
+
+  int clear = log_val("clear", cmd) || strcmp(cmd->name, "deselect") == 0;
+  int nint = command_par_value("slice", cmd);
+  double step = command_par_value("step", cmd);
+  struct double_array* at = command_par_array("at", cmd);
+
+  at = clear || !at || at->curr == 0 ? NULL : clone_double_array(at);
+  int fixed_at = clear || at;
+
+  struct node* node;
+  while (fetch_node_select(iter, &node, NULL)) {
+    if (node->length == 0)
+      continue;
+    if (step > 0)
+      nint = node->length / step;
+    // allocate new `at` only if needed:
+    if (!fixed_at && nint > 1 && (!at || at->curr != nint)) {
+      at = new_double_array(nint);
+      at->curr = nint;
+      for (int i = 0; i < nint; ++i)
+        at->a[i] = (double) (i+1) / nint;
+    }
+    if (fixed_at || nint > 1) {
+      node->interp_at = at;
+    }
+  }
+}

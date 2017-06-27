@@ -45,6 +45,7 @@ struct node                /* the sequence is a linked list of nodes */
   struct constraint_list* cl; /* pointer to constraint list during match */
   struct double_array* obs_orbit; /* for track observation point */
   struct double_array* orbit_ref; /* for threader orbit + cum. matrix */
+  struct double_array* interp_at; /* array of positions for intermediate values */
   /* RF-Multipole errors (EFCOMP) */
   struct double_array* p_ph_err; /* pointer to rf-multipole phase error array AL: */
   /* RF-Multipoles */

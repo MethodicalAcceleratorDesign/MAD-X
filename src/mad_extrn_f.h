@@ -62,6 +62,8 @@
 // from mad_inter.c
 #define interpolate_node interpolate_node_
 #define reset_interpolation reset_interpolation_
+#define start_interp_node start_interp_node_
+#define fetch_interp_node fetch_interp_node_
 
 // from mad_match.c
 #define mtcond mtcond_
