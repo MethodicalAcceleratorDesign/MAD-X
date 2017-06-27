@@ -270,6 +270,9 @@ next_constraint(char* name, int* name_l, int* type, double* value,
     *weight = c_c->weight;
 
     if (c_c->n_pos == 0) {
+      // (in order to move constraint evaluation for "slow matching" to be
+      // during the twiss call –and hence make the slow option work with
+      // interpolation– we need to fuse `twchgo` and `twcpgo` first)
       string_from_table_row("twiss ", "name ", pos, node_name);
       double_from_table_row("twiss ",  name,   pos, val);
     }
@@ -411,7 +414,7 @@ next_global(char* name, int* name_l, int* type, double* value, double* c_min, do
 }
 
 void
-update_node_constraints(struct node* c_node, struct constraint_list* cl)
+update_node_constraints(struct node* c_node, struct constraint_list* cl, int index)
 {
   int i, j, k;
   k = 1; set_option("match_local", &k); /* flag */
@@ -421,11 +424,11 @@ update_node_constraints(struct node* c_node, struct constraint_list* cl)
     // copy constraint, so it can hold individual `evaluated` value (we could
     // do with a smaller data structure, but let's do it like this for now).
     struct constraint* c_new = clone_constraint(cl->constraints[j]);
-
+    c_new->index = index;
     for (i = 0; i < c_node->cl->curr; i++)
     {
       struct constraint* c_old = c_node->cl->constraints[i];
-      if (strcmp(c_new->name, c_old->name) == 0) {
+      if (c_old->index == index && strcmp(c_new->name, c_old->name) == 0) {
         c_node->cl->constraints[i] = c_new;
         break;
       }
