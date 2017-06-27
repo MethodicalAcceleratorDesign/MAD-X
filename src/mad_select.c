@@ -327,6 +327,43 @@ get_range(const char* range, struct sequence* sequ, struct node** nodes)
       sequ->start, sequ->end) : 0;
 }
 
+static int
+par_defined(const char* str, const char* none)
+{
+  return str && strcmp(str, "") != 0 && strcmp(str, none) != 0;
+}
+
+static int
+has_filter_condition(struct command* cmd)
+{
+  return par_defined(command_par_string("sequence", cmd), none)
+      || par_defined(command_par_string("range",    cmd), "#s/#e")
+      || par_defined(command_par_string("class",    cmd), none)
+      || par_defined(command_par_string("pattern",  cmd), "any");
+}
+
+static int
+store_select_command(struct in_cmd* cmd, struct command_list** plist, const char* name, int clear_all)
+{
+  // TG: `clear_all` forces unqualified clear (old behaviour). With `!clear_all`,
+  // behave like a DESELECT.
+  if (strcmp(cmd->clone->name, "select") == 0 &&        // !deselect
+      log_val("clear", cmd->clone) &&
+      (clear_all || !has_filter_condition(cmd->clone)))
+  {
+    delete_command_list(*plist);
+    *plist = new_command_list(name, 10);
+  }
+  else {
+    if ((*plist)->curr == (*plist)->max) {
+      grow_command_list(*plist);
+    }
+    (*plist)->commands[(*plist)->curr++] = cmd->clone;
+    cmd->clone_flag = 1;
+  }
+  return (*plist)->curr;
+}
+
 void
 store_deselect(struct in_cmd* cmd)
 {
@@ -397,37 +434,17 @@ store_select(struct in_cmd* cmd)
   }
   if (strcmp(flag_name, "seqedit") == 0)
   {
-    if (log_val("clear", cmd->clone))
-    {
-      delete_command_list(seqedit_select);
-      seqedit_select = new_command_list("seqedit_select", 10);
+    if (store_select_command(cmd, &seqedit_select, "seqedit_select", 1) == 0) {
       selected_ranges->curr = 0;
       selected_ranges->list->curr = 0;
-    }
-    else
-    {
-      if (seqedit_select->curr == seqedit_select->max)
-        grow_command_list(seqedit_select);
-      seqedit_select->commands[seqedit_select->curr++] = cmd->clone;
-      cmd->clone_flag = 1; /* do not drop */
     }
   }
   else if (strcmp(flag_name, "error") == 0)
   {
-    if (log_val("clear", cmd->clone))
-    {
-      delete_command_list(error_select);
-      error_select = new_command_list("error_select", 10);
+    if (store_select_command(cmd, &error_select, "error_select", 1) == 0) {
       selected_ranges->curr = 0;
       selected_ranges->list->curr = 0;
       reset_errors(current_sequ);
-    }
-    else
-    {
-      if (error_select->curr == error_select->max)
-        grow_command_list(error_select);
-      error_select->commands[error_select->curr++] = cmd->clone;
-      cmd->clone_flag = 1; /* do not drop */
     }
   }
   else if (strcmp(flag_name, "sdds") == 0)
@@ -458,48 +475,18 @@ store_select(struct in_cmd* cmd)
 
   else if (strcmp(flag_name, "makethin") == 0)
   {
-    if (log_val("clear", cmd->clone))
-    {
-      slice_select->curr = 0;
-    }
-    else
-    {
-      if (slice_select->curr == slice_select->max)
-        grow_command_list(slice_select);
-      slice_select->commands[slice_select->curr++] = cmd->clone;
-      cmd->clone_flag = 1; /* do not drop */
-    }
+    store_select_command(cmd, &slice_select, "slice_select", 1);
   }
   else if (strcmp(flag_name, "save") == 0)
   {
-    if (log_val("clear", cmd->clone))
-    {
-      save_select->curr = 0;
-    }
-    else
-    {
-      if (save_select->curr == save_select->max)
-        grow_command_list(save_select);
-      save_select->commands[save_select->curr++] = cmd->clone;
-      cmd->clone_flag = 1; /* do not drop */
-    }
+    store_select_command(cmd, &save_select, "save_select", 1);
   }
   else if (strcmp(flag_name, "sectormap") == 0)
   {
     if (sector_ranges == NULL)   sector_ranges = new_node_list(10000);
-    if (log_val("clear", cmd->clone))
-    {
-      delete_command_list(sector_select);
-      sector_select = new_command_list("sector_select", 10);
+    if (store_select_command(cmd, &sector_select, "sector_select", 1) == 0) {
       sector_ranges->curr = 0;
       sector_ranges->list->curr = 0;
-    }
-    else
-    {
-      if (sector_select->curr == sector_select->max)
-        grow_command_list(sector_select);
-      sector_select->commands[sector_select->curr++] = cmd->clone;
-      cmd->clone_flag = 1; /* do not drop */
     }
   }
   else /* store select for all tables */
