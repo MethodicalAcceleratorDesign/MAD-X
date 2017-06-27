@@ -222,7 +222,7 @@ set_sector(void)
 }
 
 int
-get_ex_range(char* range, struct sequence* sequ, struct node** nodes)
+get_ex_range(const char* range, struct sequence* sequ, struct node** nodes)
   /* returns start and end node (nodes[0] and nodes[1])
      of a range in the full expanded sequence */
 // LD: Same function as get_table_range
@@ -271,7 +271,7 @@ get_ex_range(char* range, struct sequence* sequ, struct node** nodes)
 }
 
 int
-get_sub_range(char* range, struct sequence* sequ, struct node** nodes)
+get_sub_range(const char* range, struct sequence* sequ, struct node** nodes)
 {
   /* returns start and end node (nodes[0] and nodes[1])
      of a range between range_start and range_end of an expanded sequence */
@@ -326,7 +326,7 @@ get_sub_range(char* range, struct sequence* sequ, struct node** nodes)
 }
 
 int
-get_range(char* range, struct sequence* sequ, struct node** nodes)
+get_range(const char* range, struct sequence* sequ, struct node** nodes)
   /* returns start and end node (nodes[0] and nodes[1])
      of a range in the non-expanded sequence */
 // LD: Same function as get_table_range
