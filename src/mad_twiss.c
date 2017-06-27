@@ -452,7 +452,7 @@ pro_embedded_twiss(struct command* current_global_twiss)
       conv_char("dummy",dummy_arr);
 
       twiss_table = make_table(table_embedded_name, "twiss", twiss_table_cols,
-                               twiss_table_types, current_sequ->n_nodes);
+                               twiss_table_types, current_sequ->n_nodes + current_sequ->num_interp);
       twiss_table->dynamic = 1; /* flag for table row access to current row */
       add_to_table_list(twiss_table, table_register);
 
@@ -933,7 +933,7 @@ pro_twiss(void)
     conv_char(table_name, tarr);
 
     if (chrom_flg) { /* calculate chromaticity from tune difference - HG 6.2.09*/
-      twiss_table = make_table(table_name, "twiss", twiss_table_cols, twiss_table_types, current_sequ->n_nodes);
+      twiss_table = make_table(table_name, "twiss", twiss_table_cols, twiss_table_types, current_sequ->n_nodes + current_sequ->num_interp);
       twiss_table->dynamic = 1; /* flag for table row access to current row */
       add_to_table_list(twiss_table, table_register);
       current_sequ->tw_table = twiss_table;
@@ -953,7 +953,7 @@ pro_twiss(void)
     }
 
     if (k_save) {
-      twiss_table = make_table(table_name, "twiss", twiss_table_cols, twiss_table_types, current_sequ->n_nodes);
+      twiss_table = make_table(table_name, "twiss", twiss_table_cols, twiss_table_types, current_sequ->n_nodes + current_sequ->num_interp);
       twiss_table->dynamic = 1; /* flag for table row access to current row */
       add_to_table_list(twiss_table, table_register);
       current_sequ->tw_table = twiss_table;

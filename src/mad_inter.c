@@ -194,6 +194,7 @@ void
 select_interp(struct command* cmd)
 {
   struct select_iter* iter = start_iter_select(cmd, NULL, NULL);
+  struct sequence* sequ;
 
   int clear = log_val("clear", cmd) || strcmp(cmd->name, "deselect") == 0;
   int nint = command_par_value("slice", cmd);
@@ -204,7 +205,7 @@ select_interp(struct command* cmd)
   int fixed_at = clear || at;
 
   struct node* node;
-  while (fetch_node_select(iter, &node, NULL)) {
+  while (fetch_node_select(iter, &node, &sequ)) {
     if (node->length == 0)
       continue;
     if (step > 0)
@@ -217,6 +218,8 @@ select_interp(struct command* cmd)
         at->a[i] = (double) (i+1) / nint;
     }
     if (fixed_at || nint > 1) {
+      if (node->interp_at) sequ->num_interp -= node->interp_at->curr-1;
+      if (at)              sequ->num_interp +=              at->curr-1;
       node->interp_at = at;
     }
   }
