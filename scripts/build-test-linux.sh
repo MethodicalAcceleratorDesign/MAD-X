@@ -1,6 +1,6 @@
 #! /bin/bash
 # run:
-# bash scripts/build-test-linux.sh [noecho] [cleanall] [notest]
+# bash scripts/build-test-linux.sh [noecho] [clone|update] [cleanall] [notest]
 
 # env settings
 export PATH="`pwd`:/opt/intel/bin:$PATH"
@@ -35,17 +35,35 @@ echo "Shell : `echo $SHELL`"
 echo "User  : `echo $USER`"
 echo "Home  : `echo $HOME`"
 echo "Lang  : `echo $LANG`"
+echo "PWD   : `echo $PWD`"
 
-echo -e "\n===== SVN update ====="
-svn update
-if [ "$?" != "0" ] ; then
-	echo -e "\n===== SVN cleanup & update ====="
-	svn cleanup
-	svn update
-	check_error "svn update failed"
+echo -e "\n===== Git clone/update ====="
+if [ "$1" = "clone" ] ; then
+	shift
+	update="clone"
+	rm -rf madx-nightly && \
+  git clone https://github.com/MethodicalAcceleratorDesign/MAD-X.git madx-nightly && \
+  cd madx-nightly
+  check_error "git clone failed"
+elif [ "$1" = "update" ] ; then
+	shift # faster "clone"
+	update="update"
+	[ -d madx-nightly ] && cd madx-nightly && echo "moving down to madx-nightly"
+  git fetch --tags && \
+	git reset --hard origin/master && \
+	git clean -xdf
+  check_error "git update failed"
+else
+	update=""
+	echo "Skipped (no explicit request)."
 fi
-# ensure that scripts are executable after an update
-chmod u+x scripts/build-test-report.sh $0
+
+echo -e "\n===== Git info ====="
+git log -1 --format="Branch:  %d%nCommit:   %H%nAuthor:   %an <%ae>%nDate:     %ad (%ar)%nSubject:  %s"
+
+lasttest=`git for-each-ref refs/tags --sort=-committerdate --format='%(refname)' --count=1`
+echo -e "\nFiles changed since (last) release: ${lasttest##*/}"
+git diff --name-status $lasttest
 
 echo -e "\n===== Release number ====="
 cat VERSION

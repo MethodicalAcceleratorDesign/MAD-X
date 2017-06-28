@@ -1,6 +1,6 @@
 #! /bin/bash
 # run:
-# bash scripts/build-test-macosx.sh [noecho] [cleanall] [update] [notest]
+# bash scripts/build-test-macosx.sh [noecho] [clone|update] [cleanall] [notest]
 
 # env settings
 export PATH="`pwd`:/opt/local/bin:$PATH"
@@ -35,6 +35,38 @@ echo "Shell : `echo $SHELL`"
 echo "User  : `echo $USER`"
 echo "Home  : `echo $HOME`"
 echo "Lang  : `echo $LANG`"
+echo "PWD   : `echo $PWD`"
+
+echo -e "\n===== Git clone/update ====="
+if [ "$1" = "clone" ] ; then
+	shift
+	update="clone"
+	rm -rf madx-nightly && \
+  git clone https://github.com/MethodicalAcceleratorDesign/MAD-X.git madx-nightly && \
+  cd madx-nightly
+  check_error "git clone failed"
+elif [ "$1" = "update" ] ; then
+	shift # faster "clone"
+	update="update"
+	[ -d madx-nightly ] && cd madx-nightly && echo "moving down to madx-nightly"
+  git fetch --tags && \
+	git reset --hard origin/master && \
+	git clean -xdf
+  check_error "git update failed"
+else
+	update=""
+	echo "Skipped (no explicit request)."
+fi
+
+echo -e "\n===== Git info ====="
+git log -1 --format="Branch:  %d%nCommit:   %H%nAuthor:   %an <%ae>%nDate:     %ad (%ar)%nSubject:  %s"
+
+lasttest=`git for-each-ref refs/tags --sort=-committerdate --format='%(refname)' --count=1`
+echo -e "\nFiles changed since (last) release: ${lasttest##*/}"
+git diff --name-status $lasttest
+
+echo -e "\n===== Release number ====="
+cat VERSION
 
 echo -e "\n===== Clean build ====="
 if [ "$1" = "cleanall" ] ; then
@@ -44,26 +76,6 @@ if [ "$1" = "cleanall" ] ; then
 else
 	echo "Skipped (no explicit request)."
 fi
-
-echo -e "\n===== Git update ====="
-if [ "$1" = "update" ] ; then
-	shift
-	update="update"
-  git fetch && \
-	git checkout origin/master && \
-  git reset --hard origin/master && \
-  check_error "git update failed"
-else
-	echo "Skipped (no explicit request)."
-fi
-
-echo -e "\n===== Git info ====="
-git log -1 --format="Commit:   %H%nAuthor:   %an <%ae>%nDate:     %ad (%ar)%nSubject:  %s"
-git log -1 --format="LastTest: %H" last-test
-git diff --name-status last-test
-
-echo -e "\n===== Release number ====="
-cat VERSION
 
 echo -e "\n===== Gnu build ====="
 gcc      --version
@@ -125,7 +137,3 @@ check_error "unable to restore the default version"
 # date & end marker
 echo -e "\nFinish: `date`"
 echo -e "\n===== End of build and tests ====="
-
-# mark the test as last success
-[ "$update" == "update" ] && git branch -f last-test HEAD
-
