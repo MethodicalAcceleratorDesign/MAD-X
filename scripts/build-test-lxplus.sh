@@ -1,6 +1,6 @@
 #! /bin/bash
 # run:
-# bash scripts/build-test-lxplus.sh [noecho] [clone|update] [cleanall] [notest]
+# bash scripts/build-test-lxplus.sh [noecho] [clone|update] [nobuild] [cleanall] [notest]
 
 # env settings
 export PATH="`pwd`:$PATH"
@@ -70,6 +70,16 @@ git diff --name-status $lasttest
 
 echo -e "\n===== Release number ====="
 cat VERSION
+
+################################################################################
+if [ "$1" = "nobuild" ] ; then
+	echo -e "\nBuild and tests skipped (explicit request)."
+  echo -e "\nFinish: `date`"
+  echo -e "\n===== End ====="
+	rm -f build-test-lxplus.run
+	exit
+fi
+################################################################################
 
 echo -e "\n===== Clean build ====="
 if [ "$1" = "cleanall" ] ; then

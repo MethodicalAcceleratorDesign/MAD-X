@@ -1,6 +1,6 @@
 #! /bin/bash
 # run:
-# bash scripts/build-test-win.sh [noecho] [clone|update] [cleanall] [notest]
+# bash scripts/build-test-win.sh [noecho] [clone|update] [nobuild] [cleanall] [notest]
 
 # env settings
 export PATH="`pwd`:/c/Program Files/gnuplot/bin:$PATH"
@@ -16,8 +16,8 @@ check_error ()
 
 # change directory
 if [ "$PWD" != "$HOME/madx-nightly" ] ; then
-  cd "$HOME/madx-nightly"
-  check_error "unable to move to madx-nightly directory"
+  [ -d "$HOME/madx-nightly" ] && cd "$HOME/madx-nightly"
+  check_error "unable to move to madx-nightly directory" "no-exit"
   export PATH="`pwd`:$PATH"
 fi
 
@@ -87,6 +87,15 @@ git diff --name-status $lasttest
 
 echo -e "\n===== Release number ====="
 cat VERSION
+
+################################################################################
+if [ "$1" = "nobuild" ] ; then
+  echo -e "\nBuild and tests skipped (explicit request)."
+  echo -e "\nFinish: `date`"
+  echo -e "\n===== End ====="
+  exit
+fi
+################################################################################
 
 echo -e "\n===== Clean build ====="
 if [ "$1" = "cleanall" ] ; then
