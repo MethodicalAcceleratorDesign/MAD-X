@@ -68,8 +68,8 @@ check_error ()
 readonly repdir="mad@lxplus.cern.ch:madx/madx-reports"
 readonly thedate=`date "+%Y-%m-%d"`
 
-readonly winsrc="mad@macserv15865W10.cern.ch:"
-readonly linuxsrc="mad@macserv15865LX.cern.ch:"
+readonly winsrc="mad@macserv15865w10.cern.ch:"
+readonly linuxsrc="mad@macserv15865lx.cern.ch:"
 readonly macosxsrc="mad@macserv15865.cern.ch:"
 readonly lxplussrc="mad@lxplus.cern.ch:madx/"
 
@@ -101,16 +101,16 @@ build_test_completed ()
   return 0
 }
 
-build_test_check ()
-{
-  [ "$force" != "force" ] && build_test_completed "$@" || die
-  return 0
-}
-
 build_test_local ()
 {
   [ -s ../build-test-$1.out ] && cp -a ../build-test-$1.out . || die
   build_test_check "$@"
+  return 0
+}
+
+build_test_check ()
+{
+  [ "$force" != "force" ] && build_test_completed "$@" || die
   return 0
 }
 
@@ -125,14 +125,18 @@ build_test_remote ()
     if [ -s build-test-$arch.out ] ; then
       cat build-test-$arch.out | tr -d '\r' > build-test-$arch.tr
       mv -f build-test-$arch.tr build-test-$arch.out
+      # convert lxplus to linux
+      if [ "$arch" = "lxplus" ] ; then
+        arch="linux"
+      fi
       # remove local copies to ensure proper scp (no -force option)
       rm -f madx-${arch}64-gnu* madx-${arch}32-gnu*
       rm -f numdiff-${arch}64-gnu* numdiff-${arch}32-gnu*
       # retrieve binaries for download of last builds
-      scp -q -p "${src}madx-nightly/madx-${arch}64-gnu*" .
-      scp -q -p "${src}madx-nightly/madx-${arch}32-gnu*" .
-      scp -q -p "${src}madx-nightly/numdiff-${arch}64-gnu*" .
-      scp -q -p "${src}madx-nightly/numdiff-${arch}32-gnu*" .
+      scp -q -p "${src}madx-nightly/madx-${arch}64-*" .
+      scp -q -p "${src}madx-nightly/madx-${arch}32-*" .
+      scp -q -p "${src}madx-nightly/numdiff-${arch}64-*" .
+      scp -q -p "${src}madx-nightly/numdiff-${arch}32-*" .
     fi
   done
   return 0
@@ -206,7 +210,7 @@ clean_tmp
 build_test_local  lxplus
 
 # retrieve remote reports
-build_test_remote lxplus macosx linux win
+build_test_remote        macosx linux win
 
 # check if reports are finished
 build_test_check  lxplus macosx linux win
