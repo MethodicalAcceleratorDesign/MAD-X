@@ -93,18 +93,14 @@ build_test_completed ()
 
   for arch in "$@" ; do
     if [ -s build-test-$arch.out ] ; then
+      cat build-test-$arch.out | tr -d '\r' > build-test-$arch.tr
+      mv -f build-test-$arch.tr build-test-$arch.out
+
       marker=`perl -ne '/===== End of build and tests =====/ && print "found"' build-test-$arch.out`
       check_error "unable to search for end marker (perl)" "no-exit"
     fi
     [ "$marker" != "found" ] && incomplete="incomplete, " && return 1
   done
-  return 0
-}
-
-build_test_local ()
-{
-  [ -s ../build-test-$1.out ] && cp -a ../build-test-$1.out . || die
-  build_test_check "$@"
   return 0
 }
 
@@ -114,7 +110,14 @@ build_test_check ()
   return 0
 }
 
-# retrieve remote report [lxplus | macosx | linux | win]
+build_test_local ()
+{
+  [ -s ../build-test-$1.out ] && cp -a ../build-test-$1.out .
+  build_test_check "$@"
+  return 0
+}
+
+# retrieve remote report [macosx | linux | win]
 build_test_remote ()
 {
   local src
@@ -122,13 +125,8 @@ build_test_remote ()
     eval src=\$${arch}src
     scp -q -p "${src}build-test-$arch.out" build-test-$arch.out
     check_error "unable to retrieve $arch remote report (scp)" "no-exit"
+
     if [ -s build-test-$arch.out ] ; then
-      cat build-test-$arch.out | tr -d '\r' > build-test-$arch.tr
-      mv -f build-test-$arch.tr build-test-$arch.out
-      # convert lxplus to linux
-      if [ "$arch" = "lxplus" ] ; then
-        arch="linux"
-      fi
       # remove local copies to ensure proper scp (no -force option)
       rm -f madx-${arch}64-gnu* madx-${arch}32-gnu*
       rm -f numdiff-${arch}64-gnu* numdiff-${arch}32-gnu*
