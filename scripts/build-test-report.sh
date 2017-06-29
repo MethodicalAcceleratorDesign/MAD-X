@@ -103,6 +103,7 @@ build_test_completed ()
 
 build_test_check ()
 {
+  [ -s ../build-test-$1.out ] && cp ../build-test-$1.out . || die
   [ "$force" != "force" ] && build_test_completed "$@" || die
   return 0
 }
@@ -195,14 +196,14 @@ build_test_send ()
 # cleaning
 clean_tmp
 
-# check if local reports are finished
+# check if local report is finished
 build_test_check  lxplus
 
 # retrieve remote reports
-build_test_remote        macosx linux win
+build_test_remote lxplus macosx linux win
 
-# check if non-local reports are finished
-build_test_check         macosx linux win
+# check if reports are finished
+build_test_check  lxplus macosx linux win
 
 # build the final report
 build_test_report lxplus macosx linux win
