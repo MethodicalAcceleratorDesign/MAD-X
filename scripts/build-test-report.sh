@@ -71,7 +71,7 @@ readonly thedate=`date "+%Y-%m-%d"`
 readonly winsrc="mad@macserv15865W10.cern.ch:"
 readonly linuxsrc="mad@macserv15865LX.cern.ch:"
 readonly macosxsrc="mad@macserv15865.cern.ch:"
-readonly lxplussrc="mad@lxplus.cern.ch:madx"
+readonly lxplussrc="mad@lxplus.cern.ch:madx/"
 
 # clean tempory files
 clean_tmp ()
@@ -103,8 +103,14 @@ build_test_completed ()
 
 build_test_check ()
 {
-  [ -s ../build-test-$1.out ] && cp ../build-test-$1.out . || die
   [ "$force" != "force" ] && build_test_completed "$@" || die
+  return 0
+}
+
+build_test_local ()
+{
+  [ -s ../build-test-$1.out ] && cp -a ../build-test-$1.out . || die
+  build_test_check "$@"
   return 0
 }
 
@@ -114,7 +120,7 @@ build_test_remote ()
   local src
   for arch in "$@" ; do
     eval src=\$${arch}src
-    scp -q -p "$src/build-test-$arch.out" build-test-$arch.out
+    scp -q -p "${src}build-test-$arch.out" build-test-$arch.out
     check_error "unable to retrieve $arch remote report (scp)" "no-exit"
     if [ -s build-test-$arch.out ] ; then
       cat build-test-$arch.out | tr -d '\r' > build-test-$arch.tr
@@ -123,10 +129,10 @@ build_test_remote ()
       rm -f madx-${arch}64-gnu* madx-${arch}32-gnu*
       rm -f numdiff-${arch}64-gnu* numdiff-${arch}32-gnu*
       # retrieve binaries for download of last builds
-      scp -q -p "$src/madx-${arch}64-gnu*" .
-      scp -q -p "$src/madx-${arch}32-gnu*" .
-      scp -q -p "$src/numdiff-${arch}64-gnu*" .
-      scp -q -p "$src/numdiff-${arch}32-gnu*" .
+      scp -q -p "${src}madx-nightly/madx-${arch}64-gnu*" .
+      scp -q -p "${src}madx-nightly/madx-${arch}32-gnu*" .
+      scp -q -p "${src}madx-nightly/numdiff-${arch}64-gnu*" .
+      scp -q -p "${src}madx-nightly/numdiff-${arch}32-gnu*" .
     fi
   done
   return 0
@@ -197,7 +203,7 @@ build_test_send ()
 clean_tmp
 
 # check if local report is finished
-build_test_check  lxplus
+build_test_local  lxplus
 
 # retrieve remote reports
 build_test_remote lxplus macosx linux win
