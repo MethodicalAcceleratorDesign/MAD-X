@@ -65,9 +65,9 @@ check_error ()
 readonly thedate=`date "+%Y-%m-%d"`
 readonly webdir="http://cern.ch/madx/madX"
 
-readonly windir="mad@macserv15865W10.cern.ch:madX"
-readonly linuxdir="mad@macserv15865LX.cern.ch:madX"
-readonly macosxdir="mad@macserv15865.cern.ch:madX"
+readonly windir="mad@macserv15865W10.cern.ch"
+readonly linuxdir="mad@macserv15865LX.cern.ch"
+readonly macosxdir="mad@macserv15865.cern.ch"
 
 # clean tempory files
 clean_tmp ()

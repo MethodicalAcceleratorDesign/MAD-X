@@ -1,6 +1,6 @@
 #! /bin/bash
 # run:
-# bash scripts/build-test-lxplus.sh [noecho] [clone|update] [nobuild] [cleanall] [notest]
+# bash scripts/build-test-lxplus.sh [noecho] [clone|update|clean] [nobuild] [notest]
 
 # env settings
 export PATH="`pwd`:$PATH"
@@ -8,10 +8,10 @@ export PATH="`pwd`:$PATH"
 # error handler
 check_error ()
 {
-	if [ "$?" != "0" ] ; then
-		echo -e "\nERROR: $1"
-		[ "$2" != "no-exit" ] && exit 1
-	fi
+  if [ "$?" != "0" ] ; then
+    echo -e "\nERROR: $1"
+    [ "$2" != "no-exit" ] && exit 1
+  fi
 }
 
 # store lxplus node name in a file
@@ -20,12 +20,12 @@ uname -n > build-test-lxplus.run
 # I/O redirection
 rm -f build-test-lxplus.out
 if [ "$1" = "noecho" ] ; then
-	shift
-	exec > build-test-lxplus.out 2>&1
-	check_error "redirection with noecho failed"
+  shift
+  exec > build-test-lxplus.out 2>&1
+  check_error "redirection with noecho failed"
 else
-	exec > >(tee build-test-lxplus.out) 2>&1
-	check_error "redirection with tee failed"
+  exec > >(tee build-test-lxplus.out) 2>&1
+  check_error "redirection with tee failed"
 fi
 
 echo -e "\n===== Start of build and tests ====="
@@ -39,26 +39,31 @@ echo "Home  : `echo $HOME`"
 echo "Lang  : `echo $LANG`"
 echo "PWD   : `echo $PWD`"
 
-echo -e "\n===== Git clone/update ====="
+echo -e "\n===== Git clone/update/clean ====="
 if [ "$1" = "clone" ] ; then
-	shift
-	update="clone"
-	rm -rf madx-nightly && \
+  shift # git clone
+  rm -rf madx-nightly && \
   git clone https://github.com/MethodicalAcceleratorDesign/MAD-X.git madx-nightly && \
   cd madx-nightly
   check_error "git clone failed"
+
 elif [ "$1" = "update" ] ; then
-	shift # faster "clone", may need to fetch twice for old git version on lxplus.
-	update="update"
-	[ -d madx-nightly ] && cd madx-nightly && echo "moving down to madx-nightly"
-  git fetch && \
+  shift # faster "clone" + git cleanup
+  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to madx-nightly"
   git fetch --tags && \
-	git reset --hard origin/master && \
-	git clean -xdf
+  git reset --hard origin/master
   check_error "git update failed"
+  git clean -dfqx
+  check_error "git cleanup failed" "no-exit"
+
+elif [ "$1" = "clean" ] ; then
+  shift # git cleanup
+  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to madx-nightly"
+  git clean -fqx
+  check_error "git cleanup failed" "no-exit"
+
 else
-	update=""
-	echo "Skipped (no explicit request)."
+  echo "Skipped (no explicit request)."
 fi
 
 echo -e "\n===== Git info ====="
@@ -68,27 +73,18 @@ lasttest=`git for-each-ref refs/tags --sort=-committerdate --format='%(refname)'
 echo -e "\nFiles changed since (last) release: ${lasttest##*/}"
 git diff --name-status $lasttest
 
-echo -e "\n===== Release number ====="
-cat VERSION
-
 ################################################################################
 if [ "$1" = "nobuild" ] ; then
-	echo -e "\nBuild and tests skipped (explicit request)."
+  echo -e "\nBuild and tests skipped (explicit request)."
   echo -e "\nFinish: `date`"
   echo -e "\n===== End ====="
-	rm -f build-test-lxplus.run
-	exit
+  rm -f build-test-lxplus.run
+  exit
 fi
 ################################################################################
 
-echo -e "\n===== Clean build ====="
-if [ "$1" = "cleanall" ] ; then
-	shift
-	make cleanall
-	check_error "make cleanall failed"
-else
-	echo "Skipped (no explicit request)."
-fi
+echo -e "\n===== Release number ====="
+cat VERSION
 
 echo -e "\n===== Gnu build ====="
 source /afs/cern.ch/sw/lcg/contrib/gcc/max/i686-slc6/setup.sh
@@ -153,26 +149,26 @@ check_error "make infotestdep failed" "no-exit"
 
 echo -e "\n===== Running tests (long) ====="
 if [ "$1" = "notest" ] ; then
-	shift
-	echo "Skipped (explicit request)."
+  shift
+  echo "Skipped (explicit request)."
 else
-	echo ""
+  echo ""
 
-	echo -e "\n===== Testing madx-linux32-intel ====="
-	make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=yes
-	check_error "make tests-all for madx-linux32-intel failed"  "no-exit"
+  echo -e "\n===== Testing madx-linux32-intel ====="
+  make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=yes
+  check_error "make tests-all for madx-linux32-intel failed"  "no-exit"
 
-	echo -e "\n===== Testing madx-linux64-intel ====="
-	make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=yes
-	check_error "make tests-all for madx-linux64-intel failed" "no-exit"
+  echo -e "\n===== Testing madx-linux64-intel ====="
+  make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=yes
+  check_error "make tests-all for madx-linux64-intel failed" "no-exit"
 
-	echo -e "\n===== Testing madx-linux32-gnu ====="
-	make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=yes
-	check_error "make tests-all for madx-linux32-gnu failed"  "no-exit"
+  echo -e "\n===== Testing madx-linux32-gnu ====="
+  make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=yes
+  check_error "make tests-all for madx-linux32-gnu failed"  "no-exit"
 
-	echo -e "\n===== Testing madx-linux64-gnu ====="
-	make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=yes
-	check_error "make tests-all for madx-linux64-gnu failed"  "no-exit"
+  echo -e "\n===== Testing madx-linux64-gnu ====="
+  make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=yes
+  check_error "make tests-all for madx-linux64-gnu failed"  "no-exit"
 fi
 
 # restore the default version
