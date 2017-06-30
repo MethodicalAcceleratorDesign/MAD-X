@@ -14,19 +14,6 @@ check_error ()
   fi
 }
 
-# set env 32 or 64 bit
-set_env ()
-{
-    local lo="s/mingw(32|64)/mingw$1/g"
-    local up="s/MINGW(32|64)/MINGW$1/g"
-
-    export PATH=`echo "$PATH"                       | sed -r -e "$lo"`
-    export MANPATH=`echo $MANPATH                   | sed -r -e "$lo"`
-    export MSYSTEM=`echo "$MSYSTEM"                 | sed -r -e "$up"`
-    export ACLOCAL_PATH=`echo "$ACLOCAL_PATH"       | sed -r -e "$lo"`
-    export PKG_CONFIG_PATH=`echo "$PKG_CONFIG_PATH" | sed -r -e "$lo"`
-}
-
 # I/O redirection
 rm -f build-test-win.out
 if [ "$1" = "noecho" ] ; then
@@ -54,13 +41,13 @@ echo -e "\n===== Git clone/update/clean ====="
 if [ "$1" = "clone" ] ; then
   shift # git clone
   rm -rf madx-nightly && \
-  git clone https://github.com/MethodicalAcceleratorDesign/MAD-X.git madx-nightly && \
-  cd madx-nightly
+  git clone https://github.com/MethodicalAcceleratorDesign/MAD-X.git madx-nightly
   check_error "git clone failed"
+  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to cloned madx-nightly"
 
 elif [ "$1" = "update" ] ; then
   shift # faster "clone" + git cleanup
-  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to madx-nightly"
+  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to updated madx-nightly"
   git fetch --tags && \
   git reset --hard origin/master
   check_error "git update failed"
@@ -69,7 +56,7 @@ elif [ "$1" = "update" ] ; then
 
 elif [ "$1" = "clean" ] ; then
   shift # git cleanup
-  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to madx-nightly"
+  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to cleaned madx-nightly"
   git clean -fqx
   check_error "git cleanup failed" "no-exit"
 
@@ -93,6 +80,19 @@ if [ "$1" = "nobuild" ] ; then
 fi
 ################################################################################
 
+# set env 32 or 64 bit
+set_env ()
+{
+  local lo="s/mingw(32|64)/mingw$1/g"
+  local up="s/MINGW(32|64)/MINGW$1/g"
+
+  export PATH=`echo "$PATH"                       | sed -r -e "$lo"`
+  export MANPATH=`echo $MANPATH                   | sed -r -e "$lo"`
+  export MSYSTEM=`echo "$MSYSTEM"                 | sed -r -e "$up"`
+  export ACLOCAL_PATH=`echo "$ACLOCAL_PATH"       | sed -r -e "$lo"`
+  export PKG_CONFIG_PATH=`echo "$PKG_CONFIG_PATH" | sed -r -e "$lo"`
+}
+
 echo -e "\n===== Release number ====="
 cat VERSION
 
@@ -112,11 +112,11 @@ check_error "make all-win64-gnu failed" "no-exit"
 
 echo -e "\n===== Binaries dependencies ====="
 make infobindep
-check_error "make infobindep failed"
+check_error "make infobindep failed" "no-exit"
 
 echo -e "\n===== Tests pointless files ====="
 make cleantest && make infotestdep
-check_error "make infotestdep failed"
+check_error "make infotestdep failed" "no-exit"
 
 echo -e "\n===== Running tests (long) ====="
 if [ "$1" = "notest" ] ; then
@@ -136,7 +136,7 @@ fi
 
 # restore the default version
 make madx-win32-gnu > /dev/null && make madx-win64-gnu > /dev/null
-check_error "unable to restore the default version"
+check_error "unable to restore the default version" "no-exit"
 
 # date & end marker
 echo -e "\nFinish: `date`"

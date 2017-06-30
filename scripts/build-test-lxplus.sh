@@ -14,19 +14,20 @@ check_error ()
   fi
 }
 
-# store lxplus node name in a file
-uname -n > build-test-lxplus.run
-
 # I/O redirection
 rm -f build-test-lxplus.out
 if [ "$1" = "noecho" ] ; then
   shift
+  export NOCOLOR=yes
   exec > build-test-lxplus.out 2>&1
   check_error "redirection with noecho failed"
 else
   exec > >(tee build-test-lxplus.out) 2>&1
   check_error "redirection with tee failed"
 fi
+
+# store lxplus node name in a file for cross platform debugging
+uname -n > build-test-lxplus.run
 
 echo -e "\n===== Start of build and tests ====="
 echo "Date  : `date`"
@@ -43,13 +44,13 @@ echo -e "\n===== Git clone/update/clean ====="
 if [ "$1" = "clone" ] ; then
   shift # git clone
   rm -rf madx-nightly && \
-  git clone https://github.com/MethodicalAcceleratorDesign/MAD-X.git madx-nightly && \
-  cd madx-nightly
+  git clone https://github.com/MethodicalAcceleratorDesign/MAD-X.git madx-nightly
   check_error "git clone failed"
+  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to cloned madx-nightly"
 
 elif [ "$1" = "update" ] ; then
   shift # faster "clone" + git cleanup
-  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to madx-nightly"
+  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to updated madx-nightly"
   git fetch --tags && \
   git reset --hard origin/master
   check_error "git update failed"
@@ -58,7 +59,7 @@ elif [ "$1" = "update" ] ; then
 
 elif [ "$1" = "clean" ] ; then
   shift # git cleanup
-  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to madx-nightly"
+  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to cleaned madx-nightly"
   git clean -fqx
   check_error "git cleanup failed" "no-exit"
 
@@ -78,7 +79,6 @@ if [ "$1" = "nobuild" ] ; then
   echo -e "\nBuild and tests skipped (explicit request)."
   echo -e "\nFinish: `date`"
   echo -e "\n===== End ====="
-  rm -f build-test-lxplus.run
   exit
 fi
 ################################################################################
@@ -155,25 +155,25 @@ else
   echo ""
 
   echo -e "\n===== Testing madx-linux32-intel ====="
-  make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=yes
+  make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=$NOCOLOR
   check_error "make tests-all for madx-linux32-intel failed"  "no-exit"
 
   echo -e "\n===== Testing madx-linux64-intel ====="
-  make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=yes
+  make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=$NOCOLOR
   check_error "make tests-all for madx-linux64-intel failed" "no-exit"
 
   echo -e "\n===== Testing madx-linux32-gnu ====="
-  make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=yes
+  make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=$NOCOLOR
   check_error "make tests-all for madx-linux32-gnu failed"  "no-exit"
 
   echo -e "\n===== Testing madx-linux64-gnu ====="
-  make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=yes
+  make madx-linux64-gnu && ls -l madx64 && make cleantest && make tests-all COMP=gnu ARCH=64 NOCOLOR=$NOCOLOR
   check_error "make tests-all for madx-linux64-gnu failed"  "no-exit"
 fi
 
 # restore the default version
 make madx-linux32-gnu > /dev/null && make madx-linux64-gnu > /dev/null
-check_error "unable to restore the default version"
+check_error "unable to restore the default version" "no-exit"
 
 # date & end marker
 echo -e "\nFinish: `date`"

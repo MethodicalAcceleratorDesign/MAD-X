@@ -2,18 +2,28 @@
 # run:
 # bash scripts/build-test-report.sh [noecho] [clean] [force] [doreport] [nomail]
 
-# set -x
-
 # env settings
 export PATH="`pwd`:$PATH"
+
+# error handler
+check_error ()
+{
+  if [ "$?" != "0" ] ; then
+    echo -e "\nERROR: $1"
+    [ "$2" != "no-exit" ] && exit 1
+  fi
+}
 
 # I/O redirection
 rm -f build-test-report.log
 if [ "$1" = "noecho" ] ; then
   shift
+  export NOCOLOR=yes
   exec > build-test-report.log 2>&1
+  check_error "redirection with noecho failed"
 else
   exec > >(tee build-test-report.log) 2>&1
+  check_error "redirection with tee failed"
 fi
 
 # parse arguments
@@ -46,15 +56,6 @@ done
 die ()
 {
   [ "$force" != "force" ] && exit 1
-}
-
-# error handler
-check_error ()
-{
-  if [ "$?" != "0" ] ; then
-    echo -e "\nERROR: $1"
-    [ "$2" != "no-exit" ] && die
-  fi
 }
 
 # go to madx reports directory

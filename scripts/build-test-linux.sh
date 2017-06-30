@@ -41,13 +41,13 @@ echo -e "\n===== Git clone/update/clean ====="
 if [ "$1" = "clone" ] ; then
   shift # git clone
   rm -rf madx-nightly && \
-  git clone https://github.com/MethodicalAcceleratorDesign/MAD-X.git madx-nightly && \
-  cd madx-nightly
+  git clone https://github.com/MethodicalAcceleratorDesign/MAD-X.git madx-nightly
   check_error "git clone failed"
+  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to cloned madx-nightly"
 
 elif [ "$1" = "update" ] ; then
   shift # faster "clone" + git cleanup
-  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to madx-nightly"
+  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to updated madx-nightly"
   git fetch --tags && \
   git reset --hard origin/master
   check_error "git update failed"
@@ -56,7 +56,7 @@ elif [ "$1" = "update" ] ; then
 
 elif [ "$1" = "clean" ] ; then
   shift # git cleanup
-  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to madx-nightly"
+  [ -d madx-nightly ] && cd madx-nightly && echo "moving down to cleaned madx-nightly"
   git clean -fqx
   check_error "git cleanup failed" "no-exit"
 
@@ -110,11 +110,11 @@ check_error "make all-linux64-intel failed" "no-exit"
 
 echo -e "\n===== Binaries dependencies ====="
 make infobindep
-check_error "make infobindep failed"
+check_error "make infobindep failed" "no-exit"
 
 echo -e "\n===== Tests pointless files ====="
 make cleantest && make infotestdep
-check_error "make infotestdep failed"
+check_error "make infotestdep failed" "no-exit"
 
 echo -e "\n===== Running tests (long) ====="
 if [ "$1" = "notest" ] ; then
@@ -142,7 +142,7 @@ fi
 
 # restore the default version
 make madx-linux32-gnu > /dev/null && make madx-linux64-gnu > /dev/null
-check_error "unable to restore the default version"
+check_error "unable to restore the default version" "no-exit"
 
 # date & end marker
 echo -e "\nFinish: `date`"
