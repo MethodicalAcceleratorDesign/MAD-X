@@ -179,5 +179,4 @@ check_error "unable to restore the default version"
 echo -e "\nFinish: `date`"
 echo -e "\n===== End of build and tests ====="
 
-# cleanup lxplus node
-rm -f build-test-lxplus.run
+exit

@@ -141,3 +141,5 @@ check_error "unable to restore the default version"
 # date & end marker
 echo -e "\nFinish: `date`"
 echo -e "\n===== End of build and tests ====="
+
+exit
