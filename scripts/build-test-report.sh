@@ -2,6 +2,8 @@
 # run:
 # bash scripts/build-test-report.sh [noecho] [clean] [force] [doreport] [nomail]
 
+# set -x
+
 # env settings
 export PATH="`pwd`:$PATH"
 
@@ -9,9 +11,9 @@ export PATH="`pwd`:$PATH"
 rm -f build-test-report.log
 if [ "$1" = "noecho" ] ; then
   shift
-  exec &> build-test-report.log
+  exec > build-test-report.log 2>&1
 else
-  exec 2>&1 | tee build-test-report.log
+  exec > >(tee build-test-report.log) 2>&1
 fi
 
 # parse arguments
@@ -56,7 +58,8 @@ check_error ()
 }
 
 # go to madx reports directory
-[ -d madx-reports ] && cd madx-reports && echo "moving down to madx-reports"
+[ -d madx-reports ] && cd madx-reports
+check_error "Unable to move down to madx-reports"
 
 # clean all and die
 [ "$clean" == "clean" ] && rm -f build-test-*.tmp build-test-*.out && die
@@ -65,9 +68,8 @@ check_error ()
 [ "$doreport" != "doreport" -a -s "build-test-report.out" ] && exit
 
 # general settings
-readonly repdir="mad@lxplus.cern.ch:madx/madx-reports"
 readonly thedate=`date "+%Y-%m-%d"`
-
+readonly repsrc="http://cern.ch/madx/madx-reports/db/"
 readonly winsrc="mad@macserv15865w10.cern.ch:"
 readonly linuxsrc="mad@macserv15865lx.cern.ch:"
 readonly macosxsrc="mad@macserv15865.cern.ch:"
@@ -89,9 +91,10 @@ clear_old_reports ()
 # check for completed jobs [lxplus | macosx | linux | win]
 build_test_completed ()
 {
-  local marker="not found"
+  local marker
 
   for arch in "$@" ; do
+    marker="not found"
     if [ -s build-test-$arch.out ] ; then
       cat build-test-$arch.out | tr -d '\r' > build-test-$arch.tr
       mv -f build-test-$arch.tr build-test-$arch.out
@@ -107,14 +110,12 @@ build_test_completed ()
 build_test_check ()
 {
   [ "$force" != "force" ] && build_test_completed "$@" || die
-  return 0
 }
 
 build_test_local ()
 {
   [ -s ../build-test-$1.out ] && cp -a ../build-test-$1.out .
-  build_test_check "$@"
-  return 0
+  build_test_check $1
 }
 
 # retrieve remote report [macosx | linux | win]
@@ -125,19 +126,24 @@ build_test_remote ()
     eval src=\$${arch}src
     scp -q -p "${src}build-test-$arch.out" build-test-$arch.out
     check_error "unable to retrieve $arch remote report (scp)" "no-exit"
-
-    if [ -s build-test-$arch.out ] ; then
-      # remove local copies to ensure proper scp (no -force option)
-      rm -f madx-${arch}64-gnu* madx-${arch}32-gnu*
-      rm -f numdiff-${arch}64-gnu* numdiff-${arch}32-gnu*
-      # retrieve binaries for download of last builds
-      scp -q -p "${src}madx-nightly/madx-${arch}64-*" .
-      scp -q -p "${src}madx-nightly/madx-${arch}32-*" .
-      scp -q -p "${src}madx-nightly/numdiff-${arch}64-*" .
-      scp -q -p "${src}madx-nightly/numdiff-${arch}32-*" .
-    fi
   done
-  return 0
+}
+
+# retrieve remote binaries [macosx | linux | win]
+build_test_binary ()
+{
+  local src
+  for arch in "$@" ; do
+    eval src=\$${arch}src
+    # remove local copies to ensure proper scp (no -force option for scp)
+    rm -f madx-${arch}64-gnu* madx-${arch}32-gnu*
+    rm -f numdiff-${arch}64-gnu* numdiff-${arch}32-gnu*
+    # retrieve binaries for download of last builds
+    scp -q -p "${src}madx-nightly/madx-${arch}64-*" .
+    scp -q -p "${src}madx-nightly/madx-${arch}32-*" .
+    scp -q -p "${src}madx-nightly/numdiff-${arch}64-*" .
+    scp -q -p "${src}madx-nightly/numdiff-${arch}32-*" .
+  done
 }
 
 # look for failed tests [lxplus | macosx | linux | win]
@@ -147,7 +153,7 @@ build_test_report ()
 
   for arch in "$@" ; do
     build_test_completed $arch && completed="" || completed=" (not found or incomplete)"
-    echo -e "\n=====\n$repdir/db/${thedate}_build-test-$arch.out$completed" >> build-test-result.tmp
+    echo -e "\n=====\n${repsrc}${thedate}_build-test-$arch.out$completed" >> build-test-result.tmp
 
     if [ -s build-test-$arch.out ] ; then
       cp -f build-test-$arch.out db/${thedate}_build-test-$arch.out
@@ -163,7 +169,15 @@ build_test_report ()
       echo "ERROR: report build-test-$arch.out not found (or empty) for platform $arch"
     fi
   done
-  return 0
+}
+
+build_test_summary ()
+{
+  cd ../madx-nightly
+  git fetch
+  git log -1 --format="Branch:  %d%nCommit:   %H%nAuthor:   %an <%ae>%nDate:     %ad (%ar)%nSubject:  %s" \
+      >> ../madx-reports/build-test-report.out
+  cd ../madx-reports
 }
 
 # send daily reports summary by email [lxplus | macosx | linux | win]
@@ -181,21 +195,20 @@ build_test_send ()
     status="passed"
   fi
 
-  git fetch
-
-  echo "===== Tests $status ====="                                > build-test-report.out
-  date                                                           >> build-test-report.out
-  git show --summary origin/master                               >> build-test-report.out
-#    svn info svn+ssh://svn.cern.ch/reps/madx/trunk/madX         >> build-test-report.out
-  echo "For details, see report files:"                          >> build-test-report.out
-  echo "$repdir/db/${thedate}_build-test-report.out (this file)" >> build-test-report.out
-  cat build-test-result.tmp                                      >> build-test-report.out
+  echo "===== Tests $status ====="                              > build-test-report.out
+  date                                                         >> build-test-report.out
+  build_test_summary
+  echo "For details, see report files:"                        >> build-test-report.out
+  echo "${repsrc}"                                             >> build-test-report.out
+  echo "${repsrc}${thedate}_build-test-report.out (this file)" >> build-test-report.out
+  cat build-test-result.tmp                                    >> build-test-report.out
 
   cp -f build-test-report.out db/${thedate}_build-test-report.out
   check_error "backup of build-test-report.out failed (cp)" "no-exit"
 
   if [ "$nomail" != "nomail" ] ; then
-    cat -v build-test-report.out | mail -s "MAD-X builds and tests report ${thedate}: $status" mad-src@cern.ch
+    cat -v build-test-report.out | \
+    mail -s "MAD-X builds and tests report ${thedate}: $status" mad-src@cern.ch
     check_error "unable to email report summary (mail)" "no-exit"
   fi
   return 0
@@ -210,8 +223,11 @@ build_test_local  lxplus
 # retrieve remote reports
 build_test_remote        macosx linux win
 
-# check if reports are finished
+# check if all reports are finished
 build_test_check  lxplus macosx linux win
+
+# retrieve local and remote binaries
+build_test_binary        macosx linux win
 
 # build the final report
 build_test_report lxplus macosx linux win
@@ -221,7 +237,8 @@ build_test_send   lxplus macosx linux win
 
 # report errors by email if any
 if [ "$nomail" != "nomail" -a -s build-test-report.log ] ; then
-  cat -v build-test-report.log | mail -s "MAD-X builds and tests report errors (${thedate})" mad@cern.ch
+  cat -v build-test-report.log | \
+  mail -s "MAD-X builds and tests report errors (${thedate})" mad@cern.ch
   check_error "unable to email report errors (check mail)" "no-exit"
 fi
 
@@ -232,3 +249,5 @@ fi
 
 clear_old_reports
 clean_tmp
+
+exit
