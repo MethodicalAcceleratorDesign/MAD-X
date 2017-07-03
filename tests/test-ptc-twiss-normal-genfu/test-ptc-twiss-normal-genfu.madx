@@ -105,6 +105,10 @@ ptc_create_universe;
   hh3000_re = table(nonlin, HAMC_3_0_0_0_0_0, value);
   value, h3000_re, hh3000_re, h3000_re - hh3000_re;
 
+  select_ptc_normal, gnfu=3,0,0;
+  ptc_normal,closed_orbit=false,normal,icase=5,no=4;
+  write, table=normal_results,file="ptc_normal_results.tfs";
+
 
 ptc_end;
 

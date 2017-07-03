@@ -4434,68 +4434,67 @@ contains
       i=1
       call c_taylor_cycle(gen,size=mynres)
 
-      print*,"GNFU mynres ",mynres
     
-    do o=1,maxorder !print order by order, I don't know how to sort c_taylor (piotr)
-      
-      do r=1,mynres
-        
-        call c_taylor_cycle(gen,ii=r,value=c_val,j=ind(1:c_%nv))
+      do o=1,maxorder !print order by order, I don't know how to sort c_taylor (piotr)
 
-        order = sum(ind(1:6))
-        
-        if ( order .ne. o) then
-          cycle
-        endif
-        
-        !print*,"GNFU ",ind(1:6)
-        
-        im_val = imag(c_val)
-        re_val = real(c_val)
-        d_val  = hypot(re_val, im_val)
+        do r=1,mynres
 
-        ! if amplitude is close to zero then it is not worth to output
-        if (d_val .lt. eps) then
-          if (getdebug()>2) print*,"putGnormaltable idx=",r," ",d_val," smaller then eps=",eps, " skipping "
-          cycle
-        endif
-        
-        
-        write(nn,'(a4,6(a1,i1))') 'gnfa','_',ind(1),'_',ind(2),'_',ind(3), &
-                                        '_',ind(4),'_',ind(5),'_',ind(6)
-        
-        write(nick,'(a2,6(i1))') 'f_',ind(1),ind(2),ind(3), &
-                                      ind(4),ind(5),ind(6)
-        !
-        !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
-        !               d_val, order, ind(1:6)
+          call c_taylor_cycle(gen,ii=r,value=c_val,j=ind(1:c_%nv))
 
-        !write (fmt,'(a,i1,a)')  '(a2,2(a16,1x),ES16.8,',7,'(1x,i16))'
-        !write(6,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
-        !               d_val, order, ind(1:6)
-        
-        call puttonormaltable(nn,nick,genfunamp,d_val,order,ind)
+          order = sum(ind(1:6))
+
+          if ( order .ne. o) then
+            cycle
+          endif
+
+          !print*,"GNFU ",ind(1:6)
+
+          im_val = imag(c_val)
+          re_val = real(c_val)
+          d_val  = hypot(re_val, im_val)
+
+          ! if amplitude is close to zero then it is not worth to output
+          if (d_val .lt. eps) then
+            if (getdebug()>2) print*,"putGnormaltable idx=",r," ",d_val," smaller then eps=",eps, " skipping "
+            cycle
+          endif
 
 
-        
-        write(nn,'(a4,6(a1,i1))') 'gnfs','_',ind(1),'_',ind(2),'_',ind(3), &
-                                        '_',ind(4),'_',ind(5),'_',ind(6)
-        write(nick,'(a2,6(i1),a3)') 'f_',ind(1),ind(2),ind(3), &
-                                         ind(4),ind(5),ind(6),'_im'
-        !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
-        !               im_val, order, ind(1:6)
-        call puttonormaltable(nn,nick,genfunsin,im_val,order,ind)
+          write(nn,'(a4,6(a1,i1))') 'gnfa','_',ind(1),'_',ind(2),'_',ind(3), &
+                                          '_',ind(4),'_',ind(5),'_',ind(6)
 
-        write(nn,'(a4,6(a1,i1))') 'gnfc','_',ind(1),'_',ind(2),'_',ind(3), &
-                                        '_',ind(4),'_',ind(5),'_',ind(6)
-        write(nick,'(a2,6(i1),a3)') 'f_',ind(1),ind(2),ind(3), &
-                                         ind(4),ind(5),ind(6),'_re'
-        !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
-        !               re_val, order, ind(1:6)
-        call puttonormaltable(nn,nick,genfuncos,re_val,order,ind)
-        
+          write(nick,'(a2,6(i1))') 'f_',ind(1),ind(2),ind(3), &
+                    	ind(4),ind(5),ind(6)
+          !
+          !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
+          !               d_val, order, ind(1:6)
+
+          !write (fmt,'(a,i1,a)')  '(a2,2(a16,1x),ES16.8,',7,'(1x,i16))'
+          !write(6,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
+          !               d_val, order, ind(1:6)
+
+          call puttonormaltable(nn,nick,genfunamp,d_val,order,ind)
+
+
+
+          write(nn,'(a4,6(a1,i1))') 'gnfs','_',ind(1),'_',ind(2),'_',ind(3), &
+                                          '_',ind(4),'_',ind(5),'_',ind(6)
+          write(nick,'(a2,6(i1),a3)') 'f_',ind(1),ind(2),ind(3), &
+                                           ind(4),ind(5),ind(6),'_im'
+          !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
+          !               im_val, order, ind(1:6)
+          call puttonormaltable(nn,nick,genfunsin,im_val,order,ind)
+
+          write(nn,'(a4,6(a1,i1))') 'gnfc','_',ind(1),'_',ind(2),'_',ind(3), &
+                                          '_',ind(4),'_',ind(5),'_',ind(6)
+          write(nick,'(a2,6(i1),a3)') 'f_',ind(1),ind(2),ind(3), &
+                                           ind(4),ind(5),ind(6),'_re'
+          !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
+          !               re_val, order, ind(1:6)
+          call puttonormaltable(nn,nick,genfuncos,re_val,order,ind)
+
+        enddo
       enddo
-    enddo
       
       myn1 = 0
       myn2 = 0
