@@ -896,7 +896,7 @@ pro_ptc_setswitch(struct in_cmd* cmd)
 
   nl = cmd->clone->par_names;
 
-  /*DEBUG LEVEL SWITCH*/
+  /*DEBUG DEBUG LEVEL*/
   if ( name_list_pos("debuglevel", nl) >=0 )
   {
     command_par_value2("debuglevel", cmd->clone, &switchvalue);
@@ -922,6 +922,19 @@ pro_ptc_setswitch(struct in_cmd* cmd)
     if (debuglevel > 0) printf("maxaccel is not present\n");
   }
 
+  /*EXACT_MIS SWITCH*/
+  if ( name_list_pos("exact_mis", nl) >=0 )
+  {
+    command_par_value2("exact_mis", cmd->clone, &switchvalue);
+    if (debuglevel > 0) printf("exact_mis is found and its value is %f\n", switchvalue);
+    i = (int)switchvalue;
+    w_ptc_setexactmis_(&i);
+  }
+  else
+  {
+    if (debuglevel > 0)  printf("exact_mis is not present\n");
+  }
+
 
   /*radiation SWITCH*/
   if ( name_list_pos("radiation", nl) >=0 )
@@ -934,19 +947,6 @@ pro_ptc_setswitch(struct in_cmd* cmd)
   else
   {
     if (debuglevel > 0) printf("radiation is not present\n");
-  }
-
-  /*EXACT_MIS SWITCH*/
-  if ( name_list_pos("exact_mis", nl) >=0 )
-  {
-    command_par_value2("exact_mis", cmd->clone, &switchvalue);
-    if (debuglevel > 0) printf("exact_mis is found and its value is %f\n", switchvalue);
-    i = (int)switchvalue;
-    w_ptc_setexactmis_(&i);
-  }
-  else
-  {
-    if (debuglevel > 0)  printf("exact_mis is not present\n");
   }
 
   /*stochastic SWITCH*/
