@@ -1,0 +1,101 @@
+!MADX-PTC test case for radiation 
+!FODO cell with bend, cavity, sextupole and a kicker to make non-zero orbit
+!Piotr Skowronski 2017
+
+mydrift: drift, l=0.2;
+mydrift_2: drift, l=0.1;
+qfk1 := 2.08623 + 0.05;
+qdk1 := 5.08623 - 0.05;
+qf: quadrupole, l=0.1, k1:= qfk1;
+qd: quadrupole, l=0.1, k1:=-qdk1;
+
+rfcav: rfcavity, l=0.2, volt=5000., freq=3000, lag=0.0;
+
+kck1: kicker, hkick=2e-2, l=0.01;
+
+sb: sbend, l=0.2, angle=6e-2;
+
+
+
+mrf_ent: marker;
+mrf_exi: marker;
+mqd_ent: marker;
+mqd_exi: marker;
+mqf_ent: marker;
+mqf_exi: marker;
+mkc_ent: marker;
+mkc_exi: marker;
+mb_ent: marker;
+mb_exi: marker;
+ms_ent: marker;
+ms_exi: marker;
+
+sx1_l = 0.1;
+sx1_k2 = -400.0;
+
+sx1: sextupole, l:=sx1_l, k2:=sx1_k2;
+
+myline: line:=(                                                         mydrift_2,
+               mqf_ent, qf   , mqf_exi,  mydrift, ms_ent, sx1, ms_exi,  mydrift,  
+               mrf_ent, rfcav, mrf_exi,  mydrift,                       mydrift, 
+               mqd_ent, qd   , mqd_exi,  mydrift,                       mydrift,  
+               mb_ent,  sb   , mb_exi,   mydrift, mkc_ent,kck1,mkc_exi, mydrift_2 );
+
+
+
+
+
+beam,particle=electron, energy=8, ex=5e-5, ey=5.E-10, sigt=0.077, sige=1.1E-4;
+use, period=myline;
+
+
+
+select,flag=twiss,clear;
+select, flag=twiss, column=name,s,Energy,x,t,beta11,beta22,beta33,alfa11,alfa22,mu1,mu2,mu3,disp1,disp2;
+
+
+
+ptc_create_universe;
+  ptc_create_layout, model=1, method=6, nst=5, exact=true, closed_layout=true;
+  
+  !!!!!       T I M E   T R U E ,   T O T P A T H  F A L S E
+  ptc_setswitch, debuglevel=1, exact_mis=true, time=true, totalpath=false, radiation=true, envelope=true;
+
+
+  ptc_twiss, table=twiss, icase=6, no=3, closed_orbit=true, rmatrix, normal, writetmap;
+  
+ ! plot, notitle, haxis=s, vaxis=x, colour=100;
+ ! plot, notitle, haxis=s, vaxis=pt, colour=100;
+ ! plot, notitle, haxis=s, vaxis=disp1;
+ ! plot, notitle, haxis=s, vaxis=beta11, beta22, colour=100;
+  
+  
+  write, table=twiss, file="ptc.twiss";
+  write, table=ptc_twiss_summary, file="ptc.summ.twiss";
+  write, table=nonlin, file="ptc.nonlin";
+  
+  value, table(twiss, myline$end, t), table(twiss, myline$end, x);
+
+  option, -echo;
+  
+  print, text="Equilibrium horizontal emittance";
+  value, table(nonlin, EMIT1, value);
+  print, text="Horizontal damping decrement";
+  value, table(nonlin, DAMPING1, value);
+  print, text="   ";
+  print, text="Energy gain in cavity";
+  value, table(twiss, mrf_exi, pt) - table(twiss, mrf_ent, pt);
+  print, text="Energy loss in QD";
+  value, table(twiss, mqd_exi, pt) - table(twiss, mqd_ent, pt);
+  print, text="Energy loss in QF";
+  value, table(twiss, mqf_exi, pt) - table(twiss, mqf_ent, pt);
+  print, text="Energy loss in bend";
+  value, table(twiss, mb_exi, pt) - table(twiss, mb_ent, pt);
+  print, text="Energy loss in kicker";
+  value, table(twiss, mkc_exi, pt) - table(twiss, mkc_ent, pt);
+  print, text="Energy loss in sextupole";
+  value, table(twiss, ms_exi, pt) - table(twiss, ms_ent, pt);
+
+
+ptc_end;
+
