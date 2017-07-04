@@ -22,6 +22,11 @@ numdiff-*-*
 numdiff32
 numdiff64
 
+# Coverage
+*.gcda
+*.gcno
+*.gcov
+
 # GC build:
 libs/gc/**/*.log
 libs/gc/**/*.lo
