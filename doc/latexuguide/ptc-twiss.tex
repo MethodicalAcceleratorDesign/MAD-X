@@ -324,13 +324,16 @@ The attributes are:
   (the closed solution) into dedicated table called \texttt{NONLIN}. It is the same as  \texttt{ptc\_normal}.
    However, the nonlin table has format such that its coefficients can be accessed within the MADX script using 
    \texttt{table} command. This permits, for example, to perform matching of these parameters or or value extraction to a variable. 
-   Also, for each all available orders are calculated and 
+   Also, all available orders are calculated and 
    no \texttt{select\_ptc\_normal} is required.
-   Currently are calculated: tunes (and all their derivatives), 
+   Currently the following parameters are calculated: tunes (and all their derivatives), 
    dipsersions (and all their derivatives), eigen values, transfer map, 
    resonance driving terms (generating function) and the pseudo Hamiltonian.
+   If radiation and envelope is switched on with \hyperref[sec:ptc-setswitch]{\texttt{PTC\_SETSWITCH}}
+   then damping decrements, equilibrium emittances and beam sizes are calculated.
    Attention: the results are always the plain polynomial coefficients, 
-   which is different from  \texttt{ptc\_normal} nomenclature for some variables.
+   which is different from  \texttt{ptc\_normal} nomenclature for some variables, 
+   which in turn always gives values of the partial derivatives.
    Therefore, in order to obtain values of the partial derivatives the respective factorials 
    and binomial coefficients need to be factored out by the user. 
    Also, if TIME=true the chromatic variables are NOT transformed into usual deltap/p dependence
