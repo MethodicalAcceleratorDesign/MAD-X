@@ -2302,13 +2302,20 @@ SUBROUTINE tmsigma(s0mat)
   double precision :: e1, e2
   double precision :: betx0, alfx0, bety0, alfy0
 
-  e1 = get_value('probe ','ex ')!BEAM->Ex
-  e2 = get_value('probe ','ey ')!BEAM->Ey
+
+  double precision ::gamx0, kappa, gamy0
+  double precision ::r11, r12, r21, r22, u, v1, v2, r11new
 
   betx0 = opt_fun0(3)
   bety0 = opt_fun0(6)
   alfx0 = opt_fun0(4)
   alfy0 = opt_fun0(7)
+  r11 =  opt_fun0(29);  r12 =  opt_fun0(30);  r21 =  opt_fun0(31);  r22 =  opt_fun0(32)
+
+  e1 = get_value('probe ','ex ')!BEAM->Ex
+  e2 = get_value('probe ','ey ')!BEAM->Ey
+
+
 
   s0mat(1, 1) =  e1*betx0
   s0mat(2, 2) =  e1*(1 + alfx0**2)/betx0
@@ -2319,6 +2326,55 @@ SUBROUTINE tmsigma(s0mat)
   s0mat(4, 4) =  e2*(1 + alfy0**2)/bety0
   s0mat(4, 3) =  -e2*alfy0
   s0mat(3, 4) = s0mat(4, 3)
+
+  kappa = one/(one + (r11*r22 - r12*r21))
+
+  u = one - kappa
+  gamx0 = (one + alfx0**2) / betx0;  gamy0 = (one + alfy0**2) / bety0
+  sumrelement = abs(r11)+abs(r12)+abs(r21)+abs(r22)
+  if(sumrelement < 1e-16) then
+  beta11 = kappa * betx0
+  beta22 = kappa * bety0
+  beta12 = kappa * ( r22**2*bety0 + two*r12*r22*alfy0 + r12**2*gamy0 )
+  beta21 = kappa * ( r11**2*betx0 - two*r12*r11*alfx0 + r12**2*gamx0 )
+  alfa11 =  kappa * alfx0
+  alfa22 =  kappa * alfy0
+  alfa12 =  kappa * ( r21*r22*bety0 + (r12*r21 + r11*r22)*alfy0 + r11*r12*gamy0 )
+  alfa21 = -kappa * ( r21*r11*betx0 - (r12*r21 + r11*r22)*alfx0 + r12*r22*gamx0 )
+
+  else
+
+  v2 = asin(r12 * (1-u) / sqrt(beta11*beta21))
+  r11new = sqrt(beta22/beta12)*(alfa12*sin(v2) + u*cos(v2))/(1-u)
+
+  if(abs(r11-r11new) < abs(r11+r11new)) then
+  v2 = v2
+  else
+  v2 = v2 + twopi/2
+  end if
+  v1 = v2
+
+  s0mat(1, 1) =  e1 * beta11 + e2 * beta12
+  s0mat(2, 2) =  e1 * ((one-u)**2+alfa11**2) / beta11 + e2 * (u**2+alfa12**2) / beta12
+  s0mat(1, 2) =  -e1*alfa11-e2*alfa12
+  s0mat(2, 1) = s0mat(1, 2)
+  s0mat(1, 3) = e1*sqrt(beta11*beta21)*cos(v1)-e2*sqrt(beta12*beta22)*cos(v2)
+  s0mat(3, 1) = s0mat(1, 3)
+  s0mat(2, 1) = s0mat(1, 2)
+  s0mat(3, 4) = -e1*alfa21 - e2*alfa22
+  s0mat(4, 3) = s0mat(3, 4)
+  s0mat(3, 3) =  e1*beta21 + e2*beta22
+
+  s0mat(4, 4) =  e1*(u**2+alfa21**2)/beta21+e2*((1-u)**2+alfa22**2)/beta22
+
+  s0mat(1, 4) = e1*sqrt(beta11 / beta21)*(u*sin(v1) -alfa21*cos(v1)) - e2*sqrt(beta12 / beta22)*((1-u)*sin(v2) -alfa22*cos(v2))
+  s0mat(4, 1) = s0mat(1, 4)
+  s0mat(2, 3) = -e1*sqrt(beta21 / beta11)*((1-u)*sin(v1)+ alfa11*cos(v1))-e2*sqrt(beta22 / beta12)*((u)*sin(v2) -alfa12*cos(v2))
+  s0mat(3, 2) = s0mat(2, 3)
+  s0mat(2, 4) = e1 * ((alfa21*(1-u)-alfa12*u)*sin(v1)+(u*(1-u)+alfa11*alfa21)*cos(v1))/sqrt(beta11*beta21) &
+  - e2 * ((alfa12*(1-u)-alfa22*u)*sin(v2)+(u*(1-u)+alfa12*alfa22)*cos(v2)) / sqrt(beta12*beta22)
+  s0mat(4, 2) = s0mat(2, 4)
+endif
 END SUBROUTINE tmsigma
 
 SUBROUTINE tmsigma_emit(rt, s0mat)
