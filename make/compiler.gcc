@@ -75,4 +75,8 @@ CFLAGS += -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations \
 
 #         -Winline -Wfloat-equal -Wformat-nonliteral # not compatible with ugly MAD-X code...
 
+ifeq ($(COVERAGE),yes)
+CFLAGS += -fprofile-arcs -ftest-coverage
+endif
+
 # end of makefile

@@ -90,6 +90,9 @@ OPENMP   := no
 # to visualize the ouput, use scripts/asan_symbolize.py
 SANITIZE := no
 
+# Build with coverage support
+COVERAGE := no
+
 #############################
 # Compilers, Linkers, Testers settings
 # see make/compiler.* for supported compilers

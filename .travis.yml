@@ -2,10 +2,15 @@
 # Build/test script
 # ----------------------------------------
 
-language: c
+language: cpp
+compiler:
+  - gcc
+
+before_install:
+  - pip install --user cpp-coveralls
 
 install:
-  - make madx-linux64-gnu
+  - make madx-linux64-gnu COVERAGE=yes
   - make numdiff-linux64-gnu
 
 script:
@@ -17,6 +22,8 @@ script:
     NUM_FAILED=$(<tests/tests-summary.txt grep -o 'FAILED.*' | awk '{print $2}') &&
     [[ $NUM_FAILED = 0 ]]
 
+after_success:
+  - coveralls --include src -x .c -x .cpp
 
 # ----------------------------------------
 # Travis settings:

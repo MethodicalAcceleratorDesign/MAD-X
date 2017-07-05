@@ -73,4 +73,8 @@ CXXFLAGS += -Wpointer-arith -Wcast-align -Wcast-qual -Winline \
 
 #           -Wfloat-equal -Wformat-nonliteral # not compatible with ugly MAD-X code...
 
+ifeq ($(COVERAGE),yes)
+CXXFLAGS += -fprofile-arcs -ftest-coverage
+endif
+
 # end of makefile
