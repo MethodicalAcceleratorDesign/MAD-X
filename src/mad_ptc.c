@@ -896,7 +896,7 @@ pro_ptc_setswitch(struct in_cmd* cmd)
 
   nl = cmd->clone->par_names;
 
-  /*DEBUG LEVEL SWITCH*/
+  /*DEBUG DEBUG LEVEL*/
   if ( name_list_pos("debuglevel", nl) >=0 )
   {
     command_par_value2("debuglevel", cmd->clone, &switchvalue);
@@ -922,8 +922,7 @@ pro_ptc_setswitch(struct in_cmd* cmd)
     if (debuglevel > 0) printf("maxaccel is not present\n");
   }
 
-
-  /*EXACT SWITCH*/
+  /*EXACT_MIS SWITCH*/
   if ( name_list_pos("exact_mis", nl) >=0 )
   {
     command_par_value2("exact_mis", cmd->clone, &switchvalue);
@@ -950,6 +949,32 @@ pro_ptc_setswitch(struct in_cmd* cmd)
     if (debuglevel > 0) printf("radiation is not present\n");
   }
 
+  /*stochastic SWITCH*/
+  if ( name_list_pos("stochastic", nl) >=0 )
+  {
+    command_par_value2("stochastic", cmd->clone, &switchvalue);
+    if (debuglevel > 0) printf("stochastic is found and its value is %f\n", switchvalue);
+    i = (int)switchvalue;
+    w_ptc_setstochastic_(&i);
+  }
+  else
+  {
+    if (debuglevel > 0) printf("stochastic is not present\n");
+  }
+
+  /*envelope SWITCH*/
+  if ( name_list_pos("envelope", nl) >=0 )
+  {
+    command_par_value2("envelope", cmd->clone, &switchvalue);
+    if (debuglevel > 0) printf("envelope is found and its value is %f\n", switchvalue);
+    i = (int)switchvalue;
+    w_ptc_setenvelope_(&i);
+  }
+  else
+  {
+    if (debuglevel > 0) printf("envelope is not present\n");
+  }
+
   /*fringe SWITCH*/
   if ( name_list_pos("fringe", nl) >=0 )
   {
@@ -962,7 +987,6 @@ pro_ptc_setswitch(struct in_cmd* cmd)
   {
     if (debuglevel > 0) printf("fringe is not present\n");
   }
-
 
 
   /*totalpath SWITCH*/

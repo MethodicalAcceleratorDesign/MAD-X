@@ -170,7 +170,8 @@ The Normal Form calculation is controlled through options of the
 \madbox{
 PTC\_TRACK, \=ICASE=integer, DELTAP=real, CLOSED\_ORBIT=logical,\\ 
             \>ELEMENT\_BY\_ELEMENT=logical, TURNS=integer, \\
-            \>DUMP=logical, ONETABLE=logical, MAXAPER=real\_array, \\
+            \>DUMP=logical, ONETABLE=logical, RECLOSS=logical, \\
+            \>MAXAPER=real\_array, \\
             \>NORM=integer, NORM\_OUT=logical, \\
             \>FILE[=string], EXTENSION=string, FFILE=integer, \\
             \>RADIATION=logical, RADIATION\_MODEL1=logical, \\
@@ -221,12 +222,30 @@ The attributes are:
    (Default: false)
 
    \ttitem{ONETABLE}\label{opt:onetable} a logical switch to write all 
-	particle coordinates to a single file instead of separate files. \\
-   (Default: false)
+	particle coordinates to a single file instead of separate files.\\
+	(Default: false) \\
+	Tracks are reported at the defined observation points
+	(see \hyperref[sec:ptc-observe]{\texttt{PTC\_OBSERVE}} command)
+	plus at the end of each turn and at the start.
+	In order to make the file more readable each reported location (file segment)
+	is marked by comment line like \\
+	\texttt{\#segment s\_no nobsp npart ielem el\_name}, \\ where 
+	\texttt{s\_no} is sequential number of the reported segment, 
+	\texttt{nobsp} is total number of the user defined observation points, 
+	\texttt{npart} is number of particles reported at the observation point.
+	\texttt{ielem} is index of the element and 
+	\texttt{el\_name} is name of the element.
+	\\
+
+   \ttitem{RECLOSS} flag to create in memory a table named "trackloss"
+   containing the coordinates of lost particles.\\
+   (Default:~false) \\
+   See \hyperref[sec:track]{\texttt{TRACK}} section for the details.
 
    \ttitem{MAXAPER} an array defining upper limits for particle
    coordinates, essentially defining the aperture to trigger particle
-   loss. \\ (Default: \{0.1, 0.01, 0.1, 0.01, 1.0, 0.1\})
+   loss. \\ 
+   (Default: \{0.1, 0.01, 0.1, 0.01, 1.0, 0.1\}) \\
    Please watch that the check is performed directly on the PTC variables, 
    therefore the last 2 variables change their meaning depending if 
    \texttt{TIME} switch of PTC is set to true or false, see 
