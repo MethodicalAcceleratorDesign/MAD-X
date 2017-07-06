@@ -2289,12 +2289,14 @@ SUBROUTINE tmsigma(s0mat)
   use twisslfi
   use twisscfi
   use twissotmfi
-  use math_constfi, only : zero, twopi
+  use math_constfi, only : zero, twopi, one, two
   use name_lenfi
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
   !     Calculation of sigma (beam) by Irina Tecker                      *
+  !     Couling is also included into the calculation following          *
+  !     Lebedev's approach                                               *
   !     Output:                                                          *
   !     sigma(6,6)  - initial sigma beam matrix                          *
   !                 = [(beta, -alpha) (-alpha, gamma)]                   *
@@ -2304,24 +2306,94 @@ SUBROUTINE tmsigma(s0mat)
   double precision, external :: get_value
   double precision :: e1, e2
   double precision :: betx0, alfx0, bety0, alfy0
+  double precision :: beta1x, beta2x, beta1y, beta2y, &
+                      alfa1x, alfa2x, alfa1y, alfa2y
 
-  e1 = get_value('probe ','ex ')!BEAM->Ex
-  e2 = get_value('probe ','ey ')!BEAM->Ey
-
+  double precision ::gamx0, kappa, gamy0
+  double precision ::r11, r12, r21, r22, u, v1, v2, r11new, sumrelement
+  double precision, parameter :: eps=1d-36
   betx0 = opt_fun0(3)
   bety0 = opt_fun0(6)
   alfx0 = opt_fun0(4)
   alfy0 = opt_fun0(7)
+  r11 =  opt_fun0(29);  r12 =  opt_fun0(30);  r21 =  opt_fun0(31);  r22 =  opt_fun0(32)
 
-  s0mat(1, 1) =  e1*betx0
-  s0mat(2, 2) =  e1*(1 + alfx0**2)/betx0
-  s0mat(1, 2) =  -e1*alfx0
-  s0mat(2, 1) = s0mat(1, 2)
+  e1 = get_value('probe ','ex ')!BEAM->Ex
+  e2 = get_value('probe ','ey ')!BEAM->Ey
 
-  s0mat(3, 3) =  e2*bety0
-  s0mat(4, 4) =  e2*(1 + alfy0**2)/bety0
-  s0mat(4, 3) =  -e2*alfy0
-  s0mat(3, 4) = s0mat(4, 3)
+  ! We have to check if there is any coupling. If not the coupled formula fails
+  ! since we devide by 0. If you go to the limit the formula works but since 0/0 is undefined it doesn't work.
+
+  sumrelement = abs(r11) + abs(r12) + abs(r21) + abs(r22)
+  !Uncoupled case
+  if ( sumrelement < eps ) then
+      s0mat(1, 1) =  e1*betx0
+      s0mat(2, 2) =  e1*(1 + alfx0**2)/betx0
+      s0mat(1, 2) =  -e1*alfx0
+      s0mat(2, 1) = s0mat(1, 2)
+
+      s0mat(3, 3) =  e2*bety0
+      s0mat(4, 4) =  e2*(1 + alfy0**2)/bety0
+      s0mat(4, 3) =  -e2*alfy0
+      s0mat(3, 4) = s0mat(4, 3)
+  ! Coupled case
+  else
+
+      kappa = one/(one + (r11*r22 - r12*r21))
+      u = one - kappa
+      gamx0 = (one + alfx0**2) / betx0;  gamy0 = (one + alfy0**2) / bety0
+
+
+      beta1x = kappa * betx0
+      beta2y = kappa * bety0
+      beta2x = kappa * ( r22**2*bety0 + two*r12*r22*alfy0 + r12**2*gamy0 )
+      beta1y = kappa * ( r11**2*betx0 - two*r12*r11*alfx0 + r12**2*gamx0 )
+      alfa1x =  kappa * alfx0
+      alfa2y =  kappa * alfy0
+      alfa2x =  kappa * ( r21*r22*bety0 + (r12*r21 + r11*r22)*alfy0 + r11*r12*gamy0 )
+      alfa1y = -kappa * ( r21*r11*betx0 - (r12*r21 + r11*r22)*alfx0 + r12*r22*gamx0 )
+
+      ! There are two choises of eigenvectors and this is to chose the correspondent one.
+      v2 = asin( r12 * (1-u) / sqrt(beta1x*beta1y) )
+      r11new = sqrt( beta2y / beta2x ) * ( alfa2x*sin(v2) + u*cos(v2) ) / (1-u)
+
+      if ( abs(r11-r11new) < abs(r11+r11new) ) then
+        v2 = v2 + twopi/2
+        v1 = asin ( sqrt(beta2x* beta2y)* sin(v2) / sqrt(beta1x*beta1y) ) + twopi/2
+      else
+        v2 = v2
+        v1 = asin ( sqrt(beta2x* beta2y)* sin(v2) / sqrt(beta1x*beta1y) )
+      end if
+
+      ! This is the element-by-element of the matrix multiplication V*Sigma(uncoupled)*V^T
+      s0mat(1, 1) =  e1 * beta1x + e2 * beta2x
+      s0mat(2, 2) =  e1 * ((one-u)**2+alfa1x**2) / beta1x + e2 * (u**2+alfa2x**2) / beta2x
+      s0mat(3, 3) =  e1 * beta1y + e2 * beta2y
+      s0mat(4, 4) =  e1 * (u**2+alfa1y**2)/beta1y+e2 * ((1-u)**2+alfa2y**2) / beta2y
+
+      s0mat(1, 2) =  -e1*alfa1x - e2*alfa2x
+      s0mat(2, 1) = s0mat(1, 2)
+
+      s0mat(1, 3) = e1 * sqrt(beta1x*beta1y) * cos(v1)-e2 * sqrt(beta2x*beta2y)*cos(v2)
+      s0mat(3, 1) = s0mat(1, 3)
+
+      s0mat(3, 4) = -e1 * alfa1y - e2 * alfa2y
+      s0mat(4, 3) = s0mat(3, 4)
+
+      s0mat(1, 4) =  e1 * sqrt(beta1x / beta1y) * ( u*sin(v1) -alfa1y*cos(v1) ) &
+      - e2 * sqrt(beta2x / beta2y)*( (1-u)*sin(v2) -alfa2y*cos(v2) )
+      s0mat(4, 1) = s0mat(1, 4)
+
+      s0mat(2, 3) = -e1*sqrt(beta1y / beta1x)*( (1-u)*sin(v1)+ alfa1x*cos(v1) ) &
+      -e2*sqrt(beta2y / beta2x) * ( (u)*sin(v2) -alfa2x*cos(v2) )
+      s0mat(3, 2) = s0mat(2, 3)
+
+      s0mat(2, 4) = e1 * ( (alfa1y*(1-u)-alfa2x*u)*sin(v1)+(u*(1-u)+alfa1x*alfa1y) * cos(v1) ) / sqrt(beta2x*beta1y) &
+      - e2 * ( (alfa2x*(1-u) - alfa2y*u) * sin(v2) + (u*(1-u)+alfa2x*alfa2y)*cos(v2) ) / sqrt(beta2x*beta2y)
+      s0mat(4, 2) = s0mat(2, 4)
+
+    endif
+
 END SUBROUTINE tmsigma
 
 SUBROUTINE tmsigma_emit(rt, s0mat)
