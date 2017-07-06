@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.03.06  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.03.09               +
-  + Execution date: 2017.03.30 14:37:40      +
+  + Release   date: 2017.05.29               +
+  + Execution date: 2017.07.03 14:46:48      +
   ++++++++++++++++++++++++++++++++++++++++++++
 call, file="../share/ALS/als.seqx";
 
@@ -238,10 +238,12 @@ ptc_create_universe;
 maxaccel is found and its value is 1.000000
 exact_mis is found and its value is 1.000000
 radiation is found and its value is 0.000000
+stochastic is found and its value is 0.000000
+envelope is found and its value is 0.000000
 fringe is found and its value is 0.000000
 totalpath is found and its value is 0.000000
 time is found and its value is 1.000000
-nocavity is found and its value is 1.000000
+nocavity is found and its value is 0.000000
 obs_points pro_ptc_setswitch Done
   
 
@@ -283,49 +285,49 @@ obs_points pro_ptc_setswitch Done
           -1000000     0.001596945515        25.02298817       0.2902020029 
 
                 q2                dq1                dq2                 qs 
-      0.2991179256                  0                  0    1.936694291e-15 
+      0.2991179256                  0                  0   -2.202796528e-16 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
       0.8243387341        12.21021571        1.344962581        22.46553103 
 
          beta11min          beta11max          beta12min          beta12max 
-      0.8243387341        12.21021571    1.759864028e-36    1.580686393e-33 
+      0.8243387341        12.21021571    5.739876688e-37    5.153364127e-34 
 
          beta13min          beta13max          beta21min          beta21max 
-   2.217631001e-08      0.01473606455    1.799651428e-37    8.860326179e-36 
+   2.217631001e-08      0.01473606455    4.124270595e-37     7.99591529e-36 
 
          beta22min          beta22max          beta23min          beta23max 
-       1.344962581        22.46553103    6.619539322e-35    1.023473519e-27 
+       1.344962581        22.46553103    1.152442475e-34    7.506076663e-30 
 
          beta31min          beta31max          beta32min          beta32max 
-   1.297030058e-07      0.01267018704    2.360559825e-33    6.819936432e-33 
+   1.297030058e-07      0.01267018704    5.145345528e-33    8.300004726e-33 
 
          beta33min          beta33max           disp1min           disp1max 
        69.24624092        71.86113056                  0        0.238382529 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.1918836778       0.1918826833   -1.163712646e-15    1.135525184e-15 
+     -0.1918836778       0.1918826833   -2.470959451e-16    2.747581508e-16 
 
           disp4min           disp4max             deltap            orbit_x 
-  -6.382125033e-16     6.09978459e-16                  0   -1.788240139e-15 
+  -1.497267434e-16    1.470785405e-16                  0   -1.788233631e-15 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-  -1.414930203e-18                  0                  0    -1.48599789e-12 
+  -1.414084109e-18                  0                  0   -1.485988564e-12 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-   2.412072154e-13    1.733523005e-13                  0     1.63966232e-13 
+   2.412089691e-13    1.733523005e-13                  0     1.63966232e-13 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0    1.284320719e-13    1.485997651e-12   -4.351107016e-16 
+                 0     1.28432084e-13    1.485988326e-12   -4.351126538e-16 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    2.851568949e-13                  0    1.861844012e-13 
+                 0    2.851568901e-13                  0    1.861844012e-13 
 
            ptcomax             xcomin             ycomin            pxcomin 
-  -1.485933072e-12   -3.542574505e-13                  0   -2.851539325e-13 
+   -1.48592375e-12   -3.542574443e-13                  0   -2.851539375e-13 
 
            pycomin             tcomin            ptcomin 
-                 0   -2.972899704e-13    -1.48599789e-12 
+                 0   -2.972899704e-13   -1.485988564e-12 
 !  ptc_twiss, icase=6, no=2, betx=10, bety=10,betz=10;
 
   

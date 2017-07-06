@@ -1659,6 +1659,7 @@ SUBROUTINE twcpgo(rt,orbit0)
   double precision :: ek(6), re(6,6), rwi(6,6), rc(6,6), te(6,6,6)
   double precision :: orbit00(6), ek00(6), re00(6,6), te00(6,6,6), disp00(6)
   double precision :: rw0(6,6), rmat0(2,2), sigmat00(6,6), pos0
+  double precision :: srmat0(6,6)
   double precision :: alfx0, betx0, amux0
   double precision :: alfy0, bety0, amuy0
   double precision :: orbit(6), orbit2(6)
@@ -1865,6 +1866,7 @@ subroutine backup_optics()
   betx0=betx; alfx0=alfx; amux0=amux
   bety0=bety; alfy0=alfy; amuy0=amuy
   rmat0 = rmat ; disp00 = disp
+  if (sectormap) srmat0 = srmat
   if (rmatrix) rw0 = rw
   sigmat00 = sigmat
 end subroutine backup_optics
@@ -1875,6 +1877,7 @@ subroutine restore_optics()
   betx=betx0; alfx=alfx0; amux=amux0
   bety=bety0; alfy=alfy0; amuy=amuy0
   rmat = rmat0 ; disp = disp00
+  if (sectormap) srmat = srmat0
   if (rmatrix) rw = rw0
   sigmat = sigmat00
 end subroutine restore_optics

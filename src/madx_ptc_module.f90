@@ -729,8 +729,16 @@ CONTAINS
        key%magnet="sbend"
        !VK
        CALL SUMM_MULTIPOLES_AND_ERRORS (l, key, normal_0123,skew_0123,ord_max)
-       if(sector_nmul_max.lt.ord_max.and.EXACT_MODEL) call aafail('the order of multipoles in a sbend in exact mode cannot be ',&
+       
+       if( (sector_nmul_max.lt.ord_max) .and. EXACT_MODEL) then
+         
+         sector_nmul_max =  ord_max;
+         sector_nmul =  ord_max;
+         
+         call aafail('the order of multipoles in a sbend in exact mode cannot be ',&
             &'larger than sector_mul_max: check your ptc_create_universe input')
+            
+       endif
 
        tempdp=sqrt(normal_0123(0)*normal_0123(0)+skew_0123(0)*skew_0123(0))
        key%list%b0=bvk*(node_value('angle ')+ tempdp*l)

@@ -74,4 +74,8 @@ LDLIBS += -lstdc++ -lm
 endif
 endif
 
+ifeq ($(COVERAGE),yes)
+LDLIBS += -lgcov
+endif
+
 # end of makefile

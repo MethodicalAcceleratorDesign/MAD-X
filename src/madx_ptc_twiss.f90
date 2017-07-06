@@ -63,7 +63,7 @@ module madx_ptc_twiss_module
   real(dp), private, dimension(ndim2)   :: dicu
   integer,  private, parameter          :: ndd=ndim2
   integer,  private, dimension(4)       :: iia,icoast
-  integer,  private                     :: np
+  integer,  private                     :: np, no
 
   !new lattice function
   real(dp), private, dimension(3)       :: testold
@@ -233,9 +233,9 @@ contains
    
    dispMap = dispMap * (1.0_dp /  Ha(5,5,3));
 
-    print*,"++++++++++++++"
-    print*, "dispMap"
-    call print(dispMap,6)
+   ! print*,"++++++++++++++"
+   ! print*, "dispMap"
+   !call print(dispMap,6)
    
 
    do i=1,4
@@ -243,9 +243,11 @@ contains
      
      dispT(i) = dispMap%v(i).par.fo(5,:)
      
-     print*, 'Disp ', i, ' R', disp(i) , ' Map ', dispMap%v(i).sub.fo(5,:)
-     print*, "Taylor "
-     call print(dispT(i),6)
+     if (getdebug() > 2) then
+       print*, 'Disp ', i, ' R', disp(i) , ' Map ', dispMap%v(i).sub.fo(5,:)
+       print*, "Taylor "
+       call print(dispT(i),6)
+     endif
      
    enddo    
     
@@ -530,7 +532,7 @@ contains
     implicit none
     logical(lp)             :: closed_orbit,beta_flg, slice, goslice
     integer                 :: k,i,ii
-    integer                 :: no,mynd2,npara,nda,icase,flag_index,why(9),my_nv,nv_min
+    integer                 :: mynd2,npara,nda,icase,flag_index,why(9),my_nv,nv_min
     integer                 :: ioptfun,iii,restart_sequ,advance_node,mf1,mf2
     integer                 :: tab_name(*)
     integer                 :: summary_tab_name(*)
@@ -3888,23 +3890,42 @@ contains
                                       '%le','%le'
     endif
     
-   ! write(99,*); write(99,*) " KERNEL  ";write(99,*); 
-   !     call print(theNormalForm%ker,99)
-   ! write(99,*) "--------------------------------------" 
+   
+   !!!!!!!!!!!!!!!!!!!!!!!!!!
+   !! TUNES 
+
+   if (no > 1) then
+     ! this algorithm cuts one order of magnitude so for order 1 does not work at all
+     
+     ! write(99,*); write(99,*) " KERNEL  ";write(99,*); 
+     !     call print(theNormalForm%ker,99)
+     ! write(99,*) "--------------------------------------" 
+
+      call alloc(vf_kernel)
+      vf_kernel=0
+      call flatten_c_factored_lie(theNormalForm%ker,vf_kernel)
+
+     ! write(99,*) " KERNEL Flattened  ";
+     ! write(99,*); 
+     ! call print(vf_kernel,99)
+     ! write(99,*) "--------------------------------------" 
+
+      call putQnormaltable(vf_kernel%v(1),1) 
+      call putQnormaltable(vf_kernel%v(3),2)
+      if (c_%nd2 == 6) then
+        call putQnormaltable(vf_kernel%v(5),3)
+      endif
     
-    call alloc(vf_kernel)
-    vf_kernel=0
-    call flatten_c_factored_lie(theNormalForm%ker,vf_kernel)
-
-   ! write(99,*) " KERNEL Flattened  ";
-   ! write(99,*); 
-   ! call print(vf_kernel,99)
-   ! write(99,*) "--------------------------------------" 
-
-
+      call kill(vf_kernel)
     
-    call putQnormaltable(vf_kernel%v(1),1) 
-    call putQnormaltable(vf_kernel%v(3),2)
+    else
+      ! This puts only the linear part
+      call putTunesNormalTable(theNormalForm%tune)
+      
+    endif
+    
+   !!!!!!!!!!!!!!!!!!!!!!!!!!
+   !! DISPERSION 
     
     if (c_%nd2 == 6) then
       ! to be implemented
@@ -3919,15 +3940,33 @@ contains
       
       call kill(tempTaylor)
       
-      
-      
-      
     else
       !this does not work with 6D dispersion 
       do i=1,4
         call putDnormaltable(theNormalForm%A_t%V(i),i)
       enddo
     endif
+
+   !!!!!!!!!!!!!!!!!!!!!!!!!!
+   !! EQUILIBRIUM EMITTANCE
+   !! only if radiation present
+   
+   if ( default%radiation .and. default%envelope) then
+
+     !Emittances
+     call putEmiNormalTable(theNormalForm%s_ijr)
+     !Equilibrium Beam Sizes (Sigmas)
+     call putESigNormalTable(theNormalForm%s_ij0) 
+     !Damping decrements
+     call putDampingNormalTable(theNormalForm%damping) 
+     
+   endif  
+   
+
+
+   !!!!!!!!!!!!!!!!!!!!!!!!!!
+   !! EIGEN VALUES
+
     !EIGN
     do i=1,c_%nd2 !from damap type def: Ndim2=6 but allocated to nd2=2,4,6
       call putEnormaltable(theNormalForm%A_t%V(i),i)
@@ -4028,7 +4067,6 @@ contains
     !CLEANING
     
     call kill(vf)  
-    call kill(vf_kernel)
     call kill(g_io)
     
     call kill(c_Map)
@@ -4212,6 +4250,8 @@ contains
          call c_taylor_cycle(v,ii=i,value=c_val,j=ind(1:c_%nv))
          d_val = real(c_val)
 
+         if (abs(d_val) < 1.e-15_dp) cycle ! skip this component, it is basically zero
+
          order = sum(ind(1:cnv))
          
          !print*, 'putDnormaltable, plane=',planei,' i=',i,' order=',order,' ind(5)=',ind(5)
@@ -4394,68 +4434,67 @@ contains
       i=1
       call c_taylor_cycle(gen,size=mynres)
 
-      !print*,"GNFU mynres ",mynres
     
-    do o=1,maxorder !print order by order, I don't know how to sort c_taylor (piotr)
-      
-      do r=1,mynres
-        
-        call c_taylor_cycle(gen,ii=r,value=c_val,j=ind(1:c_%nv))
+      do o=1,maxorder !print order by order, I don't know how to sort c_taylor (piotr)
 
-        order = sum(ind(1:6))
-        
-        if ( order .ne. o) then
-          cycle
-        endif
-        
-        !print*,"GNFU ",ind(1:6)
-        
-        im_val = imag(c_val)
-        re_val = real(c_val)
-        d_val  = hypot(re_val, im_val)
+        do r=1,mynres
 
-        ! if amplitude is close to zero then it is not worth to output
-        if (d_val .lt. eps) then
-          if (getdebug()>2) print*,"putGnormaltable idx=",r," ",d_val," smaller then eps=",eps, " skipping "
-          cycle
-        endif
-        
-        
-        write(nn,'(a4,6(a1,i1))') 'gnfa','_',ind(1),'_',ind(2),'_',ind(3), &
-                                        '_',ind(4),'_',ind(5),'_',ind(6)
-        
-        write(nick,'(a2,6(i1))') 'f_',ind(1),ind(2),ind(3), &
-                                      ind(4),ind(5),ind(6)
-        !
-        !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
-        !               d_val, order, ind(1:6)
+          call c_taylor_cycle(gen,ii=r,value=c_val,j=ind(1:c_%nv))
 
-        !write (fmt,'(a,i1,a)')  '(a2,2(a16,1x),ES16.8,',7,'(1x,i16))'
-        !write(6,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
-        !               d_val, order, ind(1:6)
-        
-        call puttonormaltable(nn,nick,genfunamp,d_val,order,ind)
+          order = sum(ind(1:6))
+
+          if ( order .ne. o) then
+            cycle
+          endif
+
+          !print*,"GNFU ",ind(1:6)
+
+          im_val = imag(c_val)
+          re_val = real(c_val)
+          d_val  = hypot(re_val, im_val)
+
+          ! if amplitude is close to zero then it is not worth to output
+          if (d_val .lt. eps) then
+            if (getdebug()>2) print*,"putGnormaltable idx=",r," ",d_val," smaller then eps=",eps, " skipping "
+            cycle
+          endif
 
 
-        
-        write(nn,'(a4,6(a1,i1))') 'gnfs','_',ind(1),'_',ind(2),'_',ind(3), &
-                                        '_',ind(4),'_',ind(5),'_',ind(6)
-        write(nick,'(a2,6(i1),a3)') 'f_',ind(1),ind(2),ind(3), &
-                                         ind(4),ind(5),ind(6),'_im'
-        !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
-        !               im_val, order, ind(1:6)
-        call puttonormaltable(nn,nick,genfunsin,im_val,order,ind)
+          write(nn,'(a4,6(a1,i1))') 'gnfa','_',ind(1),'_',ind(2),'_',ind(3), &
+                                          '_',ind(4),'_',ind(5),'_',ind(6)
 
-        write(nn,'(a4,6(a1,i1))') 'gnfc','_',ind(1),'_',ind(2),'_',ind(3), &
-                                        '_',ind(4),'_',ind(5),'_',ind(6)
-        write(nick,'(a2,6(i1),a3)') 'f_',ind(1),ind(2),ind(3), &
-                                         ind(4),ind(5),ind(6),'_re'
-        !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
-        !               re_val, order, ind(1:6)
-        call puttonormaltable(nn,nick,genfuncos,re_val,order,ind)
-        
+          write(nick,'(a2,6(i1))') 'f_',ind(1),ind(2),ind(3), &
+                    	ind(4),ind(5),ind(6)
+          !
+          !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
+          !               d_val, order, ind(1:6)
+
+          !write (fmt,'(a,i1,a)')  '(a2,2(a16,1x),ES16.8,',7,'(1x,i16))'
+          !write(6,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
+          !               d_val, order, ind(1:6)
+
+          call puttonormaltable(nn,nick,genfunamp,d_val,order,ind)
+
+
+
+          write(nn,'(a4,6(a1,i1))') 'gnfs','_',ind(1),'_',ind(2),'_',ind(3), &
+                                          '_',ind(4),'_',ind(5),'_',ind(6)
+          write(nick,'(a2,6(i1),a3)') 'f_',ind(1),ind(2),ind(3), &
+                                           ind(4),ind(5),ind(6),'_im'
+          !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
+          !               im_val, order, ind(1:6)
+          call puttonormaltable(nn,nick,genfunsin,im_val,order,ind)
+
+          write(nn,'(a4,6(a1,i1))') 'gnfc','_',ind(1),'_',ind(2),'_',ind(3), &
+                                          '_',ind(4),'_',ind(5),'_',ind(6)
+          write(nick,'(a2,6(i1),a3)') 'f_',ind(1),ind(2),ind(3), &
+                                           ind(4),ind(5),ind(6),'_re'
+          !write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
+          !               re_val, order, ind(1:6)
+          call puttonormaltable(nn,nick,genfuncos,re_val,order,ind)
+
+        enddo
       enddo
-    enddo
       
       myn1 = 0
       myn2 = 0
@@ -4467,6 +4506,85 @@ contains
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 
+    subroutine putEmiNormalTable(va)
+    !gets Emittances 
+      implicit none
+      complex(dp) :: va(6,6), v
+      integer     :: ind(10), i ! ind has 10 elements for extension to knobs and clocks
+      real(dp)    :: d_val, emi(3)
+      character(len=17):: nn
+      character(len=17):: bv = 'emi'
+      
+
+      do i=1,3
+
+        ind(:) = 0
+        ind(2*i-1) = 1
+        ind(2*i  ) = 1
+
+        d_val = abs(real(va(2*i-1,2*i)))/2.0_dp
+
+        write(nn,'(a4,i1)') 'emit',i
+
+        if (getdebug() > 2) then
+           write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
+                         d_val, 2, ind(1:6)
+        endif
+
+
+        call puttonormaltable(nn,nn,bv,d_val,2,ind)
+
+        ind(:) = 0
+
+      enddo
+      
+    end subroutine putEmiNormalTable
+
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+
+    subroutine putESignormaltable(va)
+    !gets Equilibrium Beam sizes
+      implicit none
+      complex(dp) :: va(6,6), v
+      integer     :: ind(10), i,j ! ind has 10 elements for extension to knobs and clocks
+      real(dp)    :: d_val
+      character(len=17):: nn
+      character(len=17):: bv = 'EquilSigma'
+
+      
+      do j=1,c_%nd2
+
+      ind(:) = 0
+      ind(j) = 1
+
+        do i=1,c_%nv
+
+          ind(i) = ind(i) + 1
+
+          v= va(j,i)
+
+          if (abs(v) < 1.e-15_dp) cycle ! skip this component, it is basically zero
+
+          d_val = real(v)
+
+          write(nn,'(a10,2i1)') 'EquilSigma',j,i
+
+          if (getdebug() > 2) then
+             write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
+                           d_val, 2, ind(1:6)
+          endif
+
+
+          call puttonormaltable(nn,nn,bv,d_val,2,ind)
+
+          ind(:) = 0
+         
+        enddo
+      enddo
+      
+    end subroutine putESignormaltable
+
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
     
     subroutine putEnormaltable(v,planei)
     !gets eigenvectors that are the linear part of A_t
@@ -4497,6 +4615,68 @@ contains
       enddo
       
     end subroutine putEnormaltable
+
+
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    subroutine putDampingNormalTable(va)
+    !gets Emittances 
+      implicit none
+      real(dp) :: va(3)
+      integer     :: ind(10), i ! ind has 10 elements for extension to knobs and clocks
+      real(dp)    :: d_val, emi(3)
+      character(len=17):: nn
+      character(len=17):: bv = 'damping'
+
+      ind(:) = 0
+      
+      do i=1,c_%nd
+
+        d_val = va(i)
+
+        write(nn,'(a7,i1)') 'damping',i
+
+        if (getdebug() > 2) then
+           write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
+                         d_val, 0, ind(1:6)
+        endif
+
+        call puttonormaltable(nn,nn,bv,d_val,0,ind)
+
+      enddo
+      
+    end subroutine putDampingNormalTable
+
+    subroutine putTunesNormalTable(va)
+    !gets Emittances 
+      implicit none
+      real(dp) :: va(3)
+      integer     :: ind(10), i ! ind has 10 elements for extension to knobs and clocks
+      real(dp)    :: d_val, emi(3)
+      character(len=17):: nn
+      character(len=17):: bv = 'q'
+
+      ind(:) = 0
+      
+      do i=1,c_%nd
+
+        d_val = va(i)
+
+        write(nn,'(a1,i1)') 'q',i
+
+        if (getdebug() > 2) then
+           write(mf,fmt) '  ',ch16lft(nn),  ch16lft(nn), &
+                         d_val, 0, ind(1:6)
+        endif
+
+        call puttonormaltable(nn,nn,bv,d_val,0,ind)
+
+      enddo
+      
+    end subroutine putTunesNormalTable
+
+
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 
     ! when switched to real table from file mf, move it out of "contains"
     subroutine putQnormaltable(v,planei)
@@ -4535,10 +4715,11 @@ contains
       bv = ch16lft(q//planec)
      !!!!!!!!!!!!!!!!!!!!!
       
-
+      N=-1
+      
       i=1
       call c_taylor_cycle(v,size=N)
-      
+
       do i=1,N
         call c_taylor_cycle(v,ii=i,value=c_val,j=ind(1:c_%nv))
          !print*, 'Value=',d_val,  ind(1:c_%nv)

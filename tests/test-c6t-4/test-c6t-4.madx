@@ -19,6 +19,8 @@ REAL CONST l.MBLW              =0 ; REAL CONST l.MBWMD             =0 ;
 REAL CONST l.MBXWH             =0 ; REAL CONST l.MBXWS             =0 ;
 REAL CONST l.MBXWT             =0 ;
 
+system, "mkdir -p temp";
+
 call, file="input/lhc_as-built.seq";
 call, file="input/aperture/aperture_as-built.b1.madx";
 call, file="input/aperture/aper_tol_as-built.b1.madx";

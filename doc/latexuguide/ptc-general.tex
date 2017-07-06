@@ -249,6 +249,7 @@ The \texttt{PTC\_SETSWITCH} command allows to set some global \ptc states and to
 	\>EXACT\_MIS=logical,\\
 	\>TOTALPATH=logical,\\
 	\>RADIATION=logical,\\
+	\>ENVELOPE=logical,\\
 	\>FRINGE=logical,\\
 	\>TIME=logical;
 }
@@ -272,7 +273,14 @@ The command parameters and switches are:
 	which is normally the closed orbit for closed layouts.    
 	
 	\ttitem{RADIATION} (Default: false)\\    
-	Sets the radiation switch/internal state of PTC.   
+	Sets the radiation switch/internal state of PTC. In PTC basically all the elements
+	radiate including sextupoles, solenoids and orbit correctors.
+
+	\ttitem{ENVELOPE} (Default: false)\\    
+	Sets the envelope switch/internal state of PTC. It allows to calculate 
+	dumping due to radiation and stochastic effects. 
+	Warning: this makes the tracking approximately twice slower, so low order
+	should be used. 
 	
 	\ttitem{FRINGE} (Default: false)\\    
 	Sets the fringe switch/internal state of PTC. \\ 

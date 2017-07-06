@@ -20,6 +20,8 @@ module madx_ptc_intstate_module
   public                            :: ptc_settotalpath
   public                            :: ptc_settime
   public                            :: ptc_setnocavity
+  public                            :: ptc_setstochastic
+  public                            :: ptc_setenvelope
   public                            :: ptc_setfringe
   public                            :: printintstate
 
@@ -172,12 +174,10 @@ contains
            print *, "Switching ON exact missaligment"
        end if
        always_exactmis=.true.
-     !  intstate = intstate + EXACTMIS0
     else
        if (getdebug() > 1) then 
            print *, "Switching OFF exact missaligment"
        end if
-     !  intstate = intstate - EXACTMIS0
        always_exactmis=.false.
     endif
     default = intstate
@@ -195,17 +195,64 @@ contains
        if (getdebug() > 1) then
            print *, "Switching ON radiation"
        end if
-       intstate = intstate + radiation0
+       intstate = intstate + radiation0 
     else
        if (getdebug() > 1) then
            print *, "Switching OFF radiation"
        end if
-       intstate = intstate - radiation0
+       intstate = intstate - radiation0 
     endif
     default = intstate
     call update_states
     if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
   end subroutine ptc_setradiation
+  !____________________________________________________________________________________________
+
+  subroutine ptc_setstochastic(flag)
+    implicit none
+    integer    :: flag
+
+    if (flag == 1) then
+       if (getdebug() > 1) then
+           print *, "Switching ON stochastic"
+       end if
+       intstate = intstate + stochastic0
+    else
+       if (getdebug() > 1) then 
+           print *, "Switching OFF stochastic"
+       end if
+       intstate = intstate - stochastic0
+    endif
+
+    default = intstate
+    call update_states
+    if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
+  end subroutine ptc_setstochastic
+
+
+  !____________________________________________________________________________________________
+
+  subroutine ptc_setenvelope(flag)
+    implicit none
+    integer    :: flag
+
+    if (flag == 1) then
+       if (getdebug() > 1) then
+           print *, "Switching ON envelope"
+       end if
+       intstate = intstate + envelope0
+    else
+       if (getdebug() > 1) then 
+           print *, "Switching OFF envelope"
+       end if
+       intstate = intstate - envelope0
+    endif
+
+    default = intstate
+    call update_states
+    if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
+  end subroutine ptc_setenvelope
+
   !____________________________________________________________________________________________
 
   subroutine ptc_setfringe(flag)
@@ -228,6 +275,7 @@ contains
     call update_states
     if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
   end subroutine ptc_setfringe
+
   !____________________________________________________________________________________________
 
   subroutine ptc_settotalpath(flag)

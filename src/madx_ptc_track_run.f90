@@ -454,7 +454,7 @@ CONTAINS
 
 
     Beam_envelope_with_PTC: IF (beam_envelope) THEN 
-        call fort_warn('ptc_track: ',' For the time being not available, please contact mad.support@cern.ch if you need it')
+        call fort_warn('ptc_track: ',' Calculation of Equilibrim emittance was moved to ptc_twiss')
     endif Beam_envelope_with_PTC
 
 !     Beam_envelope_with_PTC: IF (beam_envelope) THEN !###############################!

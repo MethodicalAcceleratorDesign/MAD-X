@@ -38,7 +38,7 @@ contains
     integer :: row_haml(101)
     integer :: index1(1000,2)
     real(kind(1d0)) get_value,val_ptc,tmp
-    character(len = 5) name_var
+    character(len = 16) name_var
     type(probe_8) theTransferMap
     type(real_8) :: theAscript(6) ! used here to compute dispersion's derivatives
     type(c_damap)  :: c_Map, c_Map2, q_Map, a_CS, a_CS_1
@@ -547,7 +547,8 @@ contains
        integer ii,i1,i2,jj
        integer j,k,ind(6)
        integer double_from_table_row
-       character(len = 4)  name_var
+       character(len = 16)  name_var
+       character(len = 4)  name_var4
        character(len = 2)  name_var1
        character(len = 3)  name_var2
 
@@ -584,6 +585,7 @@ contains
        CASE DEFAULT
           name_l = .true.
        END SELECT
+       
        if (name_l) then
           name_l = .false.
           name_var2 = name_var
@@ -624,8 +626,44 @@ contains
              name_l = .true.
           END SELECT
        endif
+
+
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
        if (name_l) then
-          SELECT CASE (name_var)
+          name_l = .false.
+          name_var2 = name_var
+          SELECT CASE (name_var2)
+          CASE ('emit1')
+             d_val = theNormalForm%emittance(1)
+          CASE ('emit2')
+             d_val = theNormalForm%emittance(2)
+          CASE ('emit3')
+             d_val = theNormalForm%emittance(3)
+             
+          CASE ('esig11')
+             d_val = theNormalForm%s_ij0(1,1)
+             
+          CASE ('damp1')
+             d_val = theNormalForm%damping(1)
+          CASE ('damp2')
+             d_val = theNormalForm%damping(2)
+          CASE ('damp3')
+             d_val = theNormalForm%damping(3)
+             
+          CASE DEFAULT
+             name_l = .true.
+          END SELECT
+       endif
+      
+      
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+       
+       if (name_l) then
+          name_var4 = name_var
+          SELECT CASE (name_var4)
           CASE ('anhx')
              k = double_from_table_row("normal_results ", "order1 ", row, doublenum)
              do j = 1,2
