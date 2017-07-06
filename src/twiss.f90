@@ -2308,7 +2308,7 @@ SUBROUTINE tmsigma(s0mat)
 
   double precision ::gamx0, kappa, gamy0
   double precision ::r11, r12, r21, r22, u, v1, v2, r11new, sumrelement
-
+  double precision, parameter :: eps=1d-36
   betx0 = opt_fun0(3)
   bety0 = opt_fun0(6)
   alfx0 = opt_fun0(4)
@@ -2323,7 +2323,7 @@ SUBROUTINE tmsigma(s0mat)
 
   sumrelement = abs(r11) + abs(r12) + abs(r21) + abs(r22)
   !Uncoupled case
-  if ( sumrelement < 1e-12 ) then
+  if ( sumrelement < eps ) then
       s0mat(1, 1) =  e1*betx0
       s0mat(2, 2) =  e1*(1 + alfx0**2)/betx0
       s0mat(1, 2) =  -e1*alfx0
