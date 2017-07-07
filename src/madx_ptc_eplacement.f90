@@ -48,7 +48,7 @@ contains
     real(kind(1d0))      :: get_value
     type(fibre), pointer :: p
     real(dp),target      :: a(3), ange(3)
-    real(dp)             :: phi, theta, eta
+    real(dp)             :: phi, theta, psi
     real(dp),target      :: idm(3,3),ent(3,3)
     real(dp),pointer     :: base(:,:)
     logical              :: onlyposition, onlyorientation, autoplace, surveyall
@@ -141,7 +141,7 @@ contains
 
        phi   = get_value('ptc_eplacement ','phi ')
        theta = get_value('ptc_eplacement ','theta ')
-       eta   = zero
+       psi   = get_value('ptc_eplacement ','psi ')
        if (getdebug() > 2 ) then
           write(6,'(a20, 2f8.4)') 'Read rotations ',phi, theta
        endif
@@ -161,7 +161,7 @@ contains
 
        ange(1) = theta
        ange(2) = phi
-       ange(3) = eta
+       ange(3) = psi
 
        CALL ROTATE_Fibre(p,p%chart%f%a,ange,1,base)
 
@@ -701,39 +701,41 @@ contains
 
   end function rotm
   !____________________________________________________________________________________________
-
-  subroutine rotmatrixfromeuler(phi, theta, eta, ent)
-    implicit none
-    real(dp)             :: phi, theta, eta
-    real(dp)             :: ent(3,3)
-    real(dp)             :: sinphi, cosphi, sintheta, costheta
-
-    eta = zero ! we do not support rotations around the magnet axis yet
-
-
-    sinphi = sin(phi)
-    cosphi = cos(phi)
-    sintheta = sin(theta)
-    costheta = cos(theta)
-
-    ent(1,1) = cosphi
-    ent(1,2) = 0
-    ent(1,3) = sinphi
-
-    ent(2,1) =  sintheta*sinphi
-    ent(2,2) =  costheta
-    ent(2,3) = -sintheta*cosphi
-
-    ent(3,1) = -costheta*sinphi
-    ent(3,2) =  sintheta
-    ent(3,3) =  costheta*cosphi
-
-    write(6,*) " Rotation MATRIX  "
-    write(6,'(3f8.4)') ent(1,:)
-    write(6,'(3f8.4)') ent(2,:)
-    write(6,'(3f8.4)') ent(3,:)
-  end subroutine rotmatrixfromeuler
-
+! nowhere used
+!   subroutine rotmatrixfromeuler(phi, theta, psi, ent)
+!     implicit none
+!     real(dp)             :: phi, theta, psi
+!     real(dp)             :: ent(3,3)
+!     real(dp)             :: sinphi, cosphi, sintheta, costheta, sinpsi, cospsi
+! 
+!     psi = zero ! we do not support rotations around the magnet axis yet
+! 
+! 
+!     sinphi = sin(phi)
+!     cosphi = cos(phi)
+!     sintheta = sin(theta)
+!     costheta = cos(theta)
+!     sinpsi = sin(psi)
+!     cospsi = cos(psi)
+! 
+!     ent(1,1) = cosphi*cospsi    ! cosphi
+!     ent(1,2) = cospsi*sinpsi    ! 0
+!     ent(1,3) = sinphi           ! sinphi
+! 
+!     ent(2,1) =  sintheta*sinphi*cospsi  - sinpsi*costheta   !-?         ! sintheta*sinphi
+!     ent(2,2) =  costheta*cospsi         + sinpsi*sintheta*sinphi ! -?   ! costheta 
+!     ent(2,3) = -sintheta*cosphi                                         !-sintheta*cosphi
+! 
+!     ent(3,1) = -costheta*sinphi*cospsi  + sinpsi*costheta    !-?        !-costheta*sinphi  
+!     ent(3,2) =  sintheta*cospsi         + sinpsi*costheta*sinphi  !-?   ! sintheta
+!     ent(3,3) =  costheta*cosphi                                         ! costheta*cosphi
+! 
+!     write(6,*) " Rotation MATRIX  "
+!     write(6,'(3f8.4)') ent(1,:)
+!     write(6,'(3f8.4)') ent(2,:)
+!     write(6,'(3f8.4)') ent(3,:)
+!   end subroutine rotmatrixfromeuler
+! 
 
 end module madx_ptc_eplacement_module
 !____________________________________________________________________________________________
