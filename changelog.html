@@ -1,0 +1,342 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+<link href="_style.css" rel="stylesheet" type="text/css">
+<title>MAD - Methodical Accelerator Design</title>
+</head>
+
+<body>
+<p><a class=home href="http://cern.ch/madx" onclick="target='_top'">[home]</a>
+<h1>Changelog</h1>
+<hr class="h1">
+
+<!-- -------- -->
+<h3>MAD-X release 5.03.06 (2017.05.29)</h3>
+
+<ul>
+<li> Bug fix in dipedge element map [Laurent].
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.03.05 (2017.05.17)</h3>
+
+<ul>
+<li> Bug fix in sigma matrix initialization [Irina].
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.03.04 (2017.04.14)</h3>
+
+<ul>
+<li> Radiation bux fixes (including quantum), now working properly [Andrea].
+<li> Matching bux fixes, now working with the chrom option (ticket #414) [Laurent].
+<li> Beam attribute access bufg fix (nasty side effect, ticket #422) [Laurent].
+<li> New random number generator with support for 10 streams [Laurent].
+<li> New track quantum seed option added [Laurent].
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.03.00 (2017.04.14)</h3>
+
+<ul>
+<li> Adding setvars_const, setvars_knob, fill_knob commands and fill->scale parameter [Riccardo].
+<li> Computation of higher order alpha_c with ptc_twiss, time=true, icase=56 [Piotr].
+<li> Fix of issue in ptc_twiss big slow down (ticket #417) [Piotr].
+<li> Scaling of dispersions and chromaticities with beta for ptc_twiss with time=true [Piotr].
+<li> Cleaner higher order compaction factor calculation [Piotr].
+<li> Bug fix bug (ticket #402) where T and PT were not checked if within user specified box [Piotr].
+<li> Bug fix to get Hamiltonian terms from ptc_normal with the new PTC [Piotr].
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.02.13 (2016.12.20)</h3>
+
+<ul>
+<li> Setvars_knob and fill_knob new commands plus testsuite [Riccardo]
+<li> Documentation updates for tickets overcome and answers [Irina, Andrea, Laurent]
+<li> KSL0 error added to kickers implementation (ticket #339) [Irina, Andrea]
+<li> Track maxaper limits checks enabled and extended to longitudinal [Irina]
+<li> Update of cosmux and cosmuy checks (now 3 methods are implemented for xchecks) [Irina]
+<li> Twiss chrom bug fix in case of failure with first deltap trial (wrong chromaticity) [Irina]
+<li> Inaccurate chromatic functions calculation for coupled lattice, warning added in Twiss [Irina]
+<li> Update of tests to follow bugs fixes and cleanup [Irina, Laurent]
+<li> Bug fix in factorial for anharmonicities in ptc_normal [Piotr]
+<li> Bug fix (ticket #394) in TFS table for error (unchecked column access) [Piotr]
+<li> K1 implemented in thick sbend in track [Andrea]
+<li> Makethin does not share anymore last slice of thick quad to allow proper name (ticket #329) [Andrea]
+<li> Bug fix and gards added in setvars/fill commands familly [Laurent]
+<li> Bug fix for angles and bv flag in Survey command, update of TI8 sequence [Laurent]
+<li> Update formula for multipole angle and tilt calculation, update documentation [Laurent]
+<li> Survey command updated for pitfalls in documentation [Laurent]
+<li> Lrad and tilt added to monitors (not used, ticket #361) [Laurent]
+<li> Bug fix about invalid use of TKicker by Track and Twiss (ticket #398) [Laurent]
+<li> Space charge final update in Track and Twiss [Frank, Laurent]
+<li> Bug fix in dipedge tilt in Track and translation to PTC [Frank, Laurent]
+<li> Bug fix in beam parameter, relativistic beta missing in one update case [Frank, Laurent]
+<li> Ongoing integration of general multipole (was Combined Function Magnet) TBC [Malte, Laurent]
+<li> libmadx-linux32 not built anymore due dependencies to missing libX11.so 32 bit [Laurent]
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.02.12 (2016.10.15)</h3>
+
+<ul>
+<li> Bug fix for wrong logic in coupling [Irina]
+<li> Bug fix in Track command [Laurent]
+<li> Bug fix in parser [Laurent]
+<li> Keeptrack option for Run command [Laurent]
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.02.11 (2016.10.11)</h3>
+
+<ul>
+<li> Coupling fixes (<a href="https://indico.cern.ch/event/565330/contributions/2283643/attachments/1341133/2019861/coupling_summary_laurent.pdf">see slides</a>) [Irina]
+<li> Secondary method to cross-check fractional part of the tunes (<a href="https://indico.cern.ch/event/565330/contributions/2283643/attachments/1341133/2019861/coupling_summary_laurent.pdf">see slides</a>) [Irina]
+<!-- Test-twiss-12 is added for sigma matrix (Irina) -->
+<li> Sigma matrix in twiss (i.e. sig11..sig66) [Irina]
+<li> Correction of a logic error in max_mult_ord settings in c6t [Laurent]
+<li> New PTC and PTC tests update [Piotr]
+<li> Bug fixes caused by all variables initialized within declaration in Fortran 95 (#389) [Laurent,Irina,Andrea]
+<li> Committing F. Schmidt's Space-Charge update [Andrea]
+<li> Minor improvement of the build system [Laurent]
+<li> Improvement of the CMake build system [Yngve]
+<li> Add flag to export all markers to Sixtrack (#391) [Laurent]
+<li> Some bug fixes (e.g. #388, #394) [Laurent, Piotr]
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.02.10 (2016.04.23)</h3>
+
+<ul>
+<li> New Twiss command attribute 'sectoracc' to twiss command for saving composed maps in sectormap [Laurent]
+<li> Bug fix in coupling for phase advance computation [Laurent, Irina]
+<li> Default beam 'et', 'sigt', 'sige' set in dictionnary instead of beam update [Laurent]
+<li> New fix point for probe initialization (affected if RF and/or dp) (#385) [Laurent]
+<li> Cleaning of modules initialization: twiss, track, emit, touschek, dynap, plot, ibs [Laurent]
+<li> New 'tabindex' feature to find the index of a string in a table column [Laurent]
+<li> More attributes copied by makethin to generated thin sequence [Helmut]
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.02.09 (2016.04.06)</h3>
+
+<ul>
+<li> Many bug fixes.
+<li> Bug fix for one turn map initialization in many modules (see
+<a href="https://indico.cern.ch/event/504773/contribution/6/attachments/1238537/1819869/ld_1603-madx_bug_slides.pdf">slides</a>) [Laurent]
+<li> Bug fix for RF initialization [Laurent]
+<li> Bug fix in coupling [Irina]
+<li> Bug fix in micado [Ghislain]
+<li> Flip mode implementation for strong coupling [Irina]
+<li> New scheme to synchronize C vs Fortran I/O [Laurent]
+<li> New Windows (10) build using msys2+mingw32+mingw64 platforms [Laurent]
+<li> New Linux (Ubuntu 14.04) build for standalone linux [Laurent]
+<li> Garbage collector natively build and tested on Windows [Laurent]
+<li> Default release set to GNU 64 bit [Laurent]
+<li> ...
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.02.08 (2015.11.23)</h3>
+
+<ul>
+<li> Release for stabilization before pro-release.
+<li> Policy changes for release delivery.
+<li> LHC and HLHC user-cases added to the test system.
+<li> Backward compatibility checks with LHC/HLLHC studies (see
+	<a href="https://dfsweb.web.cern.ch/dfsweb/Services/DFS/DFSBrowser.aspx/Users/l/ldeniau/public/2015/ld_1511-madx_hss_slides.pdf">slides</a>).
+<li> Some bug fixes and new feature (see <a href="http://svnweb.cern.ch/trac/madx/report/6?asc=0&sort=ticket">tickets</a>).
+<li> Makethin thick slices improved, default teapot and makedipedge [Helmut]
+<li> Documentation correction and improvement [Ghislain].
+<li> ...
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.02.07 (2015.09.25)</h3>
+
+<ul>
+<li> Many bug fixes.
+<li> Makethin thick slices improved, default teapot [Helmut, Laurent]
+<li> Documentation correction and improvement [Ghislain].
+<li> ...
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.02.06 (2015.06.26)</h3>
+
+<ul>
+<li> Many bug fixes.
+<li> New makethin [Helmut, Laurent]
+<li> Documentation correction and improvement [Ghislain].
+<li> ...
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.02.05 (2015.04.10)</h3>
+
+<ul>
+<li> Minor release with some bug fix.
+<li> Documentation correction and improvement [Ghislain].
+<li> ...
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.02.04 (2014.11.14)</h3>
+
+<ul>
+<li> Minor release with some bug fix.
+<li> Documentation with some correction, including figure 24.3 [Ghislain].
+<li> Portable commanded copyfile, renamefile, removefile added and unified [Laurent].
+<li> Column "Keyword" added to survey table for consistency with twiss table (#308) [Laurent].
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.02.03 (2014.10.15)</h3>
+
+<ul>
+<li> New Latex/PDF MAD-X userguide (draft) [Ghislain].
+<li> Add support for sanitizer (#305) [Laurent].
+<li> Add support for openmp (#299) [Laurent].
+<li> Bug fix in element management (#296) [Laurent, Piotr].
+<li> Bug fix in garbage collector with Intel (#307) [Laurent].
+<li> Bug fix in survey to process skew component in multipole (#306) [Laurent].
+<li> Bug fix in the initial orbit input for twiss (#271) [Ghislain].
+<li> Bug fix in use_macro on MacOSX 10.9 (#298) [Piotr].
+<li> Bug fix in ptc_twiss to handle beam-beam and space charge correctly (#295) [Piotr].
+<li> Bug fix to remove dummy CELL command (#303) [Laurent].
+<li> Bug fix in seqedit cycle after makethin (#286) [Ghislain].
+<li> Bug fix in LINE with multiplied elements (#290) [Ghislain, Piotr].
+<li> Bug fix in ptc_create_universe crashing ptc_create_layout (#287) [Piotr].
+<li> Bug fix and improvement in synchrotron radiation calculation (#266) [Ghislain].
+<li> Bug fix in ptc_normal crashing MAD-X (#282) [Laurent].
+<li> Error reporting improvement when PTC does not find the closed orbit (#152) [Piotr].
+<li> Improvement of makethin module (#283) [Helmut].
+<li> Many minor bugs fix.
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.02.02 (2014.07.04)</h3>
+
+<ul>
+<li> Many bugs fix.
+<!--<li> Bug fix (#258) in table_column_exists [Laurent].
+<li> Bug quick fix (#187) in seqedit, need more work [Ghislain].
+-->
+<li> ...
+<li> See also the slides of MAD-X meeting on <a href="https://indico.cern.ch/event/326627/">indico</a>.
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.02.01 (2014.04.25)</h3>
+
+<ul>
+<li> Minor bugs fix.
+<li> Bug fix in plot (#261) [Laurent, Ghislain].
+<li> Bug fix in table ranges (#262) [Laurent].
+<li> Bug fix in numdiff [Laurent].
+<li> Bug fix in refpos (#257) [Ghislain].
+<li> Bug fix in circular sequence [Ghislain].
+<li> Bug fix in threader (#260) [Ghislain].
+<li> Bug fix in beam update (#259) [Ghislain].
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release <i>5.02.00</i> (2014.03.05)</h3>
+
+<ul>
+<li> 2nd production release since 2011.06.
+<li> Minor bugs fix.
+<li> Major bug fix in aperture when loading offset (ticket #254) [Laurent, Ghilain]
+<li> New printf-like command [Laurent].
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.01.06 (2014.01.31)</h3>
+
+<ul>
+<li> Minor bugs fix.
+<li> Summary of orbit correction changed (bug fix) [Ghislain].
+<li> ptc_twiss: [Piotr]
+	<br>implementation of map_table in ptc_twiss the same way as in ptc_normal.
+	<br>support for initial condition specification (map table).
+	<br>implementation of min and max for betas and dispersion, and min, max and rms for the orbit.
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.01.05 (2013.12.20)</h3>
+
+<ul>
+<li> Minor bugs fix.
+<li> Upgrade to last PTC release [Laurent].
+<li> Random crash corrected (thanks to new win-gnu arch) [Laurent].
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.01.04 (2013.12.13)</h3>
+
+<ul>
+<li> Minor bugs fix.
+<li> Nightly tests and build fully operational [Laurent].
+<li> Cross platforms build and test reports completed [Laurent].
+<li> Update of the physical constants published by the PDG in 2012 [Ghislain].
+<li> New support for platform Gnu windows (11 platforms supported now) [Laurent].
+<li> Fixed numerical instability in Touschek module and improved parameter handling for integration [Ghislain].
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.01.03 (2013.11.05)</h3>
+
+<ul>
+<li> Many bugs fix.
+<li> Nested
+	 <a ref="http://cern.ch/madx/madX/doc/usrguide/Introduction/sequence_bug.html">sequence bug</a> corrected [Ghislain].
+<li> New thick quadrupole element for tracking [Andrea].
+<li> New makethin module (in C++) [Helmut, Laurent].
+<li> New static space charge code in track (expert only) [Frank, Laurent].
+<li> MAD-X on <a ref="https://indico.cern.ch/categoryDisplay.py?categId=5177">indico</a> [Laurent].
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.01.02 (2013.05.30)</h3>
+
+<ul>
+<li> Minor bugs fix.
+<li> Numdiff manual added [Laurent].
+<li> New multi-pass tracking feature [Frank, Laurent].
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release 5.01.01 (2013.05.10)</h3>
+
+<ul>
+<li> Minor bugs fix.
+<li> Garbage collector to fix memory leaks [Laurent].
+<li> Full 64 bit support (better than 32 bit now) [Laurent].
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release <i>5.01.00</i> (2013.03.13)</h3>
+
+<ul>
+<li> 1st production release since 2011.06.
+<li> Minor bugs fix.
+<li> New numdiff [Laurent].
+<li> Input script as argument (input redirection no more needed) [Laurent].
+</ul>
+
+<!-- -------- -->
+<h3>MAD-X release <b>5.00.20</b> (2013.02.20)</h3>
+
+<ul>
+<li> Many bugs fix.
+<li> New table API (major bug fix) [Laurent].
+<li> Upgrade to last PTC release [Laurent].
+<li> New removefile, renamefile, appendfile commands for script portability [Laurent].
+<li> Tests system completed for Windows, Linux and MacOSX in 32 and 64 bit (234 tests) [Laurent, Andrea, Piotr].
+</ul>
+
+</body>
+</html>

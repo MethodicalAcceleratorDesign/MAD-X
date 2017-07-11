@@ -1,0 +1,513 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+<link href="_style.css" rel="stylesheet" type="text/css">
+<title>MAD - Methodical Accelerator Design</title>
+</head>
+
+<body>
+<p><a class=home href="http://cern.ch/madx" onclick="target='_top'">[home]</a>
+<h1>MAD-X Roadmap <small>(2011-2013)</small></h1>
+<hr class="h1">
+
+<!--
+<p>
+<img src="_construction.gif" alt="Under Construction"/>
+-->
+
+<p>
+The aim of phase 1 was to bring the source code architecture of MAD-X back to a situation "close to normal", allowing better debugging and maintenance, avoiding regression and saving resources. Most of phase-1 tasks were prerequisite to other tasks and required advanced expertise in computer science to deal efficiently with the legacy code. This phase started in October 2011 and took about two years. It was completely transparent to the MAD-X users with no observable behavior change except for some small speed improvement (30-50%) and bugs correction.
+
+<p>
+The roadmap details describe the list of tasks ordered by priority. Each task is tagged as <em>todo</em> (no tag), <em>ongoing</em>, <em>done</em> and <em>closed</em> corresponding respectively to foreseen, started, achieved (with the approximative end date), and partially archieved (superseded or postponed by another task or project). It is possible that tasks with high priority (appearing first) are not yet started while tasks with low priority (appearing last) are already <em>ongoing</em>. This is because the latter are background tasks that can take benefit of other <em>ongoing</em> tasks running in parallel. Each task has 4-5 sections (Objective, Movitation, Dependency, Appeared, Note), which describe respectively the goal, the task, its dependencies and the first release in which it appears followed by some optional notes.
+
+<!-- -------- -->
+<hr class="sep">
+
+<h3>Split the Monolith (done, 2011.11.21)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Increase the cohesion of the code by splitting the monolithic file <tt>madxp.c</tt>, which contains 40000+ effective lines of code, into smaller files (modules).
+
+<dt>Motivation:</dt>
+<dd>A single monolithic file including all other C files is an uncomfortable situation for both compilers and maintainers: (<b>i</b>) compilation time cannot be reduced (always recompile everything); (<b>ii</b>) functions signatures are difficult to cross-check; (<b>iii</b>) functions signatures duplications (no API) lead to inconsistency between caller and callee (stack frame corruption); (<b>iv</b>) the lack of cohesion implies the need of tools like grep, awk or perl to find the information; (<b>v</b>) static analysis tools fail to parse and analyze the code; (<b>vi</b>) build systems are inefficient and brittle on such code architecture.
+
+<dt>Dependency:</dt>
+<dd> None. Most other tasks hereafter depend on this reorganization.
+
+<dt>Appeared:</dt>
+<dd>5.00.09. After the split into 66 modules, some tests proved the expected unchanged behavior digit by digit even after this huge restructuration.
+</dl>
+
+<!-- -------- -->
+<h3>Cleanup I/O synchronization (done, 2011.11.09)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Replace wrappers and generators by something simpler and more robust.
+
+<dt>Motivation:</dt>
+<dd>Python scripts are used to parse all the C and Fortran files and generate wrappers to ensure proper I/O synchronization. The solely role of wrappers is to flush the standard output stream when crossing the border line between C and Fortran worlds. This solution is brittle and does not work on the new files structure. The wrappers and generators should be removed from the project, the code should be cleaned and adapted, and stdout should be configured as unbuffered to solve the problem correctly.
+
+<dt>Dependency:</dt>
+<dd> None.
+
+<dt>Appeared:</dt>
+<dd>5.00.09. Results showed perfect synchronization and no performance loss with unbuffered I/O on stdout.
+</dl>
+
+<!-- -------- -->
+<h3>Make a build system (done, 2011.11.28; improved, 2012.06.22)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Make a new build system more efficient and robust with the new files structure.
+
+<dt>Motivation:</dt>
+<dd>The build system of MAD-X is difficult to modify, brittle to code changes (no dependency management) and not portable (another build system is provided for Windows). Many settings are incompletely supported or confusing and changes in project configuration is error prone. The new system should allow better management of releases, compilers and platform configuration, cross-compilation, parallel compilation, and being multi-platforms. This build system should also allow generic files selections, calculate files dependencies and be easily extensible to perform regression tests in the future.
+
+<dt>Dependency:</dt>
+<dd> 'Split the Monolith'. Better after 'Cleanup I/O synchronization' to remove the management of wrappers generators first.
+
+<dt>Appeared:</dt>
+<dd>5.00.09. The new build system fulfill all the requirements and supports 12 compilers (C, C++, F90, F77), 5+ platforms (including native Windows) and 32 &amp; 64 bit architectures. It requires only GNU make and is pretty flexible. This system will be extended in the coming months to perform MAD-X regression tests.
+</dl>
+
+<!-- -------- -->
+<h3>Speed up string manipulation (done, 2011.10.21)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Improve the speed of intensively used string manipulation functions.
+
+<dt>Motivation:</dt>
+<dd>Many string manipulation functions use algorithms with complexity of O(N^2) instead of O(N). Rewriting these functions should improve the speed of MAD-X since strings are used for (suboptimal) data representation in many places. A much better improvement (robustness &amp; speed) will be to convert all these strings into properly typed objects (phase 2).
+
+<dt>Dependency:</dt>
+<dd> None. This task was not prioritary but appeared to be relatively simple after 'Split the Monolith'. 
+
+<dt>Appeared:</dt>
+<dd>5.00.09. Results showed a 15-30% speed-up with typical MAD-X scripts.
+</dl>
+
+<!-- -------- -->
+<h3>Make access to program arguments (done, 2011.10.13)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Provide access to the program command line arguments.
+
+<dt>Motivation:</dt>
+<dd>Command line arguments are convenient to setup programs on a per-run basis without recompiling the code or modifying the scripts. Extending options this way is also simpler than modifying the options supported by the scripting langage. This is of particular importance for improving MAD-X: arguments can setup options for higher debug level, to activate a piece of code for evaluation or to substitute some behavior by another (algorithms, models) before user level integration.
+
+<dt>Dependency:</dt>
+<dd> 'Make a build system'. This task was not prioritary but appeared to be relatively simple after 'Split the Monolith'.
+
+<dt>Appeared:</dt>
+<dd>5.00.09.
+</dl>
+
+<!-- -------- -->
+<h3>Cleanup C/Fortan API (done, 2011.11.23)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Cleanup the functions signatures shared by C and Fortran.
+
+<dt>Motivation:</dt>
+<dd>The functions provided by C and Fortran are spread over many places and their signatures are often unspecified. The observation of stack frame corruption due to inconsistent signatures makes such bug tracking a high-priority. This task is also a good opportunity to exhibit the minimum API provided and required by the two worlds.
+
+<dt>Dependency:</dt>
+<dd> 'Split the Monolith' and 'Make a build system' to speed-up compilation time.
+
+<dt>Appeared:</dt>
+<dd>5.00.10.
+</dl>
+
+<!-- -------- -->
+<h3>Cleanup C warnings (done, 2011.12.15)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Remove thousands warnings reported by C compilers.
+
+<dt>Motivation:</dt>
+<dd>Compilers are one of the primary tools that developers should use for tracking bugs. It is important to correct compilers warnings as they appear since most of them are meaningful. At this stage, MAD-X generates thousands of warning from the C code that should be corrected. The Fortran code should also be process, but lately since even more warnings arose.
+
+<dt>Dependency:</dt>
+<dd> 'Split the Monolith' and 'Make a build system' for proper use of compilers.
+
+<dt>Appeared:</dt>
+<dd>5.00.10.
+</dl>
+
+<!-- -------- -->
+<h3>Create MAD repository (done, 2011.12.16)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Collect all the materials related to MAD and put it in a single clean place.
+
+<dt>Motivation:</dt>
+<dd>The mad account has enough space to hold madx, mad9 and mad8 repositories and websites. As any user account, it has a day-to-day backup easily accessible which allows to repair quickly manipulation errors. On the other hand, the actual repository (<tt>/afs/cern.ch/group/si/slap</tt>) contains many things collected over the past two decades and not always related to MAD-X. This should be a good opportunity to cleanup the content of the imported directories with some care for HTML and symbolic links.
+
+<dt>Dependency:</dt>
+<dd> None.
+
+<dt>Appeared:</dt>
+<dd> 5.00.10.
+</dl>
+
+<!-- -------- -->
+<h3>Restore the communication (done, 2011.11.21)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Provide tools to enhance the communication within the MAD community.
+
+<dt>Motivation:</dt>
+<dd>The communication within the MAD community should be shared and archived for the benefit of the users. The aim is to move from person centric communication (personal emails) to project services (mailing lists, generic email). This should be done by creating <a href="support.html">e-groups</a> targeting different audience (and bandwidth) and a generic email service <a href="mailto:mad@cern.ch?subject=[MAD]">mad support</a>.
+
+<dt>Dependency:</dt>
+<dd> 'Create MAD repository' for the mad account and email.
+
+<dt>Appeared:</dt>
+<dd> 5.00.09.
+</dl>
+
+<!-- -------- -->
+<h3>Make a website (done, 2011.12.08)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Provide rapid and easy access to information and materials related to MAD.
+
+<dt>Motivation:</dt>
+<dd>The MAD community is lacking a descent website that helps new comers to rapidly access to useful materials and regular users to be informed about evolutions. It should also be the front-end for <a href="releases.html">releases</a> distribution and <a href="support.html">e-groups</a> access.
+
+<dt>Dependency:</dt>
+<dd> 'Create MAD repository' for the mad account and www access.
+
+<dt>Appeared:</dt>
+<dd> 5.00.10.
+</dl>
+
+<!-- -------- -->
+<h3>Close modules for functions (done, 2012.01.13)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Increase the cohesion and reduce the coupling by exporting only functions part of the module programming interface.
+
+<dt>Motivation:</dt>
+<dd>Well designed modules should only export abstract data types and a small set of orthogonal functions (MPI). The monolithic structure of the legacy code has made everything global and shared (worst possible architecture), which favored the use freaky function names to avoid name collisions and spread the implementation of the modules over the entire code (functions must be declared or defined before being used in C). This task will improve the decision taken during the split of the monolith, leading to some extra modules split or merge.
+
+<dt>Dependency:</dt>
+<dd> 'Split the Monolith' and 'Make a build system' because this task will require to compile MAD-X about a thousand time.
+
+<dt>Appeared:</dt>
+<dd>5.00.11. This significant task has not affected the name of the exported functions and leave their semantic unchanged. The MPI are often suboptimal and confusing but redesigning them require a major rewrite of MAD-X postponed to phase 2. 
+</dl>
+
+<!-- -------- -->
+<h3>Synchronize documentation (done, 2012.01.18)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Synchronize the documentation with the MAD-X releases.
+
+<dt>Motivation:</dt>
+<dd>The documentation is currently provided in HTML format and it is not part of the versioning system of the MAD-X source code. Hence there is a risk of discrepancy between the documented features and the implemented features with no trace of history. Some attention should be put on the HTML links in the documentation before moving the files to SVN.
+
+<dt>Dependency:</dt>
+<dd> 'Make a website' to provide easy access to the table of content and index (shortcuts). 'Create MAD repository' for storage.
+
+<dt>Appeared:</dt>
+<dd>5.00.11. The documentation on the website is updated nightly from SVN.
+</dl>
+
+<!-- -------- -->
+<h3>Setup a trac system (done, 2012.02.01)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Provide rapid and easy access to registered defects and requests.
+
+<dt>Motivation:</dt>
+<dd>Bug reports and feature requests from users contain information and scripts that must be archived and classified. The archives can be queried for correlated bugs and history and help to find better solutions quicker. The users scripts can be the basis for new regression tests.
+
+<dt>Dependency:</dt>
+<dd> 'Split the Monolith' to classify the component that bug belongs to. Better after 'Restore the communication' since bugs reports should be posted on the e-groups or to the generic mad email.
+
+<dt>Appeared:</dt>
+<dd>5.00.12. It was a significant task which allowed to trace back missed bug reports.
+</dl>
+
+<!-- -------- -->
+<h3>Synchronize examples (done, 2012.03.05)</h3>
+ 
+<dl>
+<dt>Objective:</dt>
+<dd>Synchronize the examples with the MAD-X releases.
+
+<dt>Motivation:</dt>
+<dd>The examples are currently provided in another trunk of the versioning system not synchronized with MAD-X source code. Hence there is a risk of discrepancy between the examples and the releases with no trace of history.
+
+<dt>Dependency:</dt>
+<dd> 'Create MAD repository' for storage. Better after 'Provide regression tests' for better complementarity.
+
+<dt>Appeared:</dt>
+<dd> 5.00.12. The repository size increases significantly (x10) and needs some file cleaning and sharing. It was the occasion to move all the repository to the new project workspace <tt>/afs/cern.ch/project/mad</tt>.
+</dl>
+
+<!-- -------- -->
+<h3>PTC as a library (done, 2012.03.14; improved 2012.10.05)</h3>
+ 
+<dl>
+<dt>Objective:</dt>
+<dd>Provide PTC as a standalone static library on lxplus.
+
+<dt>Motivation:</dt>
+<dd>The PTC source code is used by few projects at CERN, including MAD-X and PTC-ORBIT. The aim is to have only one single source for PTC at CERN and to use the same version in all projects. The MAD-X team proposed to provide a standalone static library (32 bit and 64 bit) for PTC on lxplus in the same way it is done for MAD-X. Other platforms (e.g. Windows, MacOSX) can be supported on demand.
+
+<dt>Dependency:</dt>
+<dd> 'Create MAD repository' for storage and 'Make a build system' for building PTC and MAD-X consistently.
+
+<dt>Appeared:</dt>
+<dd> 5.00.13. This task demonstrated that the new build system of MAD-X is easily extendable.
+</dl>
+
+<!-- -------- -->
+<h3>Make numdiff (done, 2012.05.30; improved 2012.09.25; extended 2013.04.15)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Make a new tool to compare files with numerical content.
+
+<dt>Motivation:</dt>
+<dd>The future test system will require to compare files with numerical content. The only portable way to do this in the context of MAD-X is to provide test specific constraints on the potential differences of the results (e.g. cross-platform, cross-compiler). These constraints will be based on the knowledge of the test to ensure that outputs are consistent with references. The comparison will be easy to customize through a configuration file with relative, absolute or input driven (relative) precisions.
+
+<dt>Dependency:</dt>
+<dd> 'Make a build system' to build numdiff itself.
+
+<dt>Appeared:</dt>
+<dd> 5.00.17.
+</dl>
+
+<!-- -------- -->
+<h3>Make a test system (done, 2012.06.08; improved, 2012.06.22, 2012.09.25)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Make a new test system more efficient and robust.
+
+<dt>Motivation:</dt>
+<dd>The rapid evolution of the project require hundreds of code compilation per months, which must be tested quickly and accurately to avoid the accumulation of pending bugs. A set of scripts should be run frequently and compared to reference results in order to report defect as quickly as possible. The new test system will be an extension of the new build system and it will require a special tool able to compare numerical results within some customizable precision (relative, absolute or input driven).
+
+<dt>Dependency:</dt>
+<dd> 'Split the Monolith', 'Make a build system' and 'Make numdiff'. Better after 'Setup a trac system' to get an overview of bugs history and future requirements.
+
+<dt>Appeared:</dt>
+<dd> 5.00.17.
+</dl>
+
+<!-- -------- -->
+<h3>MAD-X as a library (done, 2012.06.22; improved 2012.10.05)</h3>
+ 
+<dl>
+<dt>Objective:</dt>
+<dd>Provide MAD-X as a standalone shared library on lxplus.
+
+<dt>Motivation:</dt>
+<dd>MAD-X is often used by other projects as a low-level application to build lattices, to compute survey and twiss functions and to perform matching and tracking. Most of these projects use scripting languages like Python to build the necessary glue around MAD-X. The simplest approach is to load libmadx as a shared library and to run MAD-X script using its external interface (mad_init, mad_run, mad_fini) and retrieve the data by direct access to internal variable and tables. <em>Notes that this requires a deep understanding of the MAD-X data structures and internal states (i.e. experts only).</em>
+
+<dt>Dependency:</dt>
+<dd> 'Create MAD repository' for storage and 'Make a build system' for building MAD-X and libmadx consistently.
+
+<dt>Appeared:</dt>
+<dd> 5.00.17. This task demonstrated once more that the new build system of MAD-X is easily extendable.
+</dl>
+
+<!-- -------- -->
+<h3>Synchronize tests (done, 2012.09.11)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Synchronize the tests with the MAD-X releases.
+
+<dt>Motivation:</dt>
+<dd>The examples used for testing are currently provided in another trunk of the versioning system not synchronized with MAD-X source code. Hence there is a risk of discrepancy between the tests and the implementation with no trace of history.
+
+<dt>Dependency:</dt>
+<dd> 'Create MAD repository' for storage. 'Provide regression tests' for the testsuite.
+
+<dt>Appeared:</dt>
+<dd>5.00.18.
+</dl>
+
+<!-- -------- -->
+<h3>Provide regression tests (done, 2012.09.26; improved 2013.02.20)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Provide a set of fast and accurate scripts for regression tests
+
+<dt>Motivation:</dt>
+<dd>The new test system must be fed with many regression tests, which should run quickly and test in depth specific features of the implementation. The regression test suite should be run daily and therefore should be efficient, but still accurate. More complicated user tests could be run less often to ensure that large simulations are still consistent with the expected results. This task requires a permanent improvement process.
+
+<dt>Dependency:</dt>
+<dd> 'Split the Monolith' and 'Make a test system'. Better after 'Setup a bug tracker' to get an overview of bugs history and future requirements.
+
+<dt>Appeared:</dt>
+<dd>5.00.18.
+</dl>
+
+<!-- -------- -->
+<h3>Close modules for states (closed, 2013.02.20)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Increase the cohesion and reduce the coupling by removing global variables.
+
+<dt>Motivation:</dt>
+<dd>Well designed modules should not use or export global variables. Global variables are dangerous since they create unexpected side effects. Shared global variables creates an implicit states machine with uncontrolled states transitions leading to many bugs hard to reproduce and very hard to correct since part of the code rely on the side effects. MAD-X use thousands of global variables, most of them being shared. Due to the very high coupling existing in the legacy code, this task will be achievable to some moderate level only (25-50%) and completed only in <a href="roadmap-p2.html">phase-2</a>.
+
+<dt>Dependency:</dt>
+<dd> 'Split the Monolith' and 'Make a build system' because this task will require to compile MAD-X about a thousand time. 'Provide regression tests' to detect unexpected changes in the observable behavior. Better after 'Close modules for functions' since some modules split could be reorganized.
+
+<dt>Appeared:</dt>
+<dd> This task is partially completed, and superseded by the new MAD project.
+</dl>
+
+<!-- -------- -->
+<h3>Close modules for types (closed, 2013.02.20)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Increase the cohesion and reduce the coupling by only exporting abstract data type.
+
+<dt>Motivation:</dt>
+<dd>Well designed modules should only export abstract data types (ADT) and a small set of orthogonal functions (MPI) to work with them. This removes any coupling to the data structure and allows to improve or even substitute the latter by more appropriate data type internally to the module. ADT are essential for module rewrite or substitution. Due to the very high coupling existing in the legacy code, this task will be achievable to some moderate level only (25-50%) and completed in <a href="roadmap-p2.html">phase-2</a>.
+
+<dt>Dependency:</dt>
+<dd> 'Split the Monolith' and 'Make a build system' because this task will require to compile MAD-X about a thousand time. 'Provide regression tests' to detect unexpected changes in the observable behavior. Better after 'Close modules for functions' since some modules split could be reorganized and after 'Close modules for states' since some global variables should disappear.
+
+<dt>Appeared:</dt>
+<dd> This task is partially completed, and superseded by the new MAD project.
+</dl>
+
+<!-- -------- -->
+<h3>Setup test environment (closed, 2013.03.13)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Automatize builds and tests for all supported platforms and architectures.
+
+<dt>Motivation:</dt>
+<dd>The build and test process is a long and tedious process that requires to connect to different servers (one per platforms), setup the appropriate environment and run the build and test system manually. In order to avoid long period without testing the validity of the code, a dedicated test environment should be configured for all the supported platforms (Linux, MacOSX and Windows), 32 and 64 bit architecture and easy access through virtualization. Cross-compilation should allow to build and test 32 bit versions on properly configured 64 bit platforms.
+
+<dt>Dependency:</dt>
+<dd> 'Make a build system' and 'Make a test system' to run builds and tests automatically.
+
+<dt>Appeared:</dt>
+<dd> 5.01.00, this task is partially completed, and will be superseded by the new build and test infrastructure.
+</dl>
+
+<!-- -------- -->
+<h3>64 bit compliance (closed, 2013.03.13)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Makes MAD-X portable on 64 bit architectures.
+
+<dt>Motivation:</dt>
+<dd>64 bit architectures offer more computational power than 32 bit architectures and are nowadays the <i>de facto</i> standard architecture for the supported platforms. Many technical details must solved before one can guarantee that MAD-X is 64 bit compliant, including portability problem also present on 32 bit architectures. This is a background task that may require rewriting significant parts of MAD-X to be completed and hence be postponed to phases 2 and 3.
+
+<dt>Dependency:</dt>
+<dd> 'Make a build system' for the many compilations. 'Provide regression tests' to detect any changes in the semantic.
+
+<dt>Appeared:</dt>
+<dd> Starting from 5.01.00, MAD-X has a much better compliance with 64 bits.
+</dl>
+
+<!-- -------- -->
+<h3>Setup garbage collector (done, 2013.05.10)</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Include a garbage collector in MAD to cure memory leaks.
+
+<dt>Motivation:</dt>
+<dd>The core of MAD-X is known to leak a lot of memory when interpreting scripts, editing sequence, executing commands or updating element properties. This has been proved to be very penalizing for some studies (e.g. large lattice with versatile parametization) and considered to be impossible to solve without a complete rewrite of the core. The other choosen approach was finally to include a garbage collector to manage the dynamic allocation made by the C code and solve undecidable bugs. The C++ and Fortran code are not supported, but they were not identified as leaking (any?) memory and such support would make the portability of the code much more complex. This major improvement became possible only recently after the test system of MAD-X became mature enough to detect the many instability problems that arose across platforms.
+
+<dt>Dependency:</dt>
+<dd> 'Make a test system' to run tests frequently and identify problem arising with the GC.
+
+<dt>Appeared:</dt>
+<dd> 5.01.01. This is a major task that would not have been possible without the many test suites.
+
+<dt>Note:</dt>
+<dd> The inclusion of a garbage collector in MAD-X is the milestone marking the beginning of a better observable stability of the 64 bit architecture versus the 32 bit architecture (as expected).
+</dl>
+
+<!-- -------- -->
+<h3>Improve the user's guide (ongoing)</h3>
+ 
+<dl>
+<dt>Objective:</dt>
+<dd>Reorganize and improve the MAD-X documentation. Check for undocumented and untested features in the source code.
+
+<dt>Motivation:</dt>
+<dd>The MAD-X documentation is extremely important for the users. But the current documentation is not optimally structured, the style is minimalistic and very heterogeneous, and the content is incomplete comparing to the implementation of MAD-X. Beside the significant editorial work, it is also important to check for completeness and test uncovered codes and features. This huge task can be combined with the <i>check of code coverity</i> and will only be performed if dedicated resources are assigned to it.
+
+<dt>Dependency:</dt>
+<dd> 'Make a website' for easy access to the documentation. 'Check code coverity' for detecting untested and undocumented features.
+
+<dt>Appeared:</dt>
+<dd> N/A.
+</dl>
+
+<!-- -------- -->
+<hr class="sep">
+
+<h2>The tasks below are postponed until MAD-X undergoes a significant refactoring</h2>
+
+<!-- -------- -->
+<h3>Check code coverity</h3>
+ 
+<dl>
+<dt>Objective:</dt>
+<dd>Configure analysis tools to help code quality steering and avoid untested code.
+
+<dt>Motivation:</dt>
+<dd>The code of MAD-X has a long history with very heterogeneous programming styles and complexity. Some coding styles are error prone and a source of bugs that are difficult to track and with corrections that require to rewrite significant part of the code (see <a href="roadmap-p2.html">phase-2</a>). Moreover, many parts of the code have been developed without being systematically tested. Analysis tools help to measure the quality of the code, detect numerous sources of bugs and report code uncovered by tests. This task can only be performed if dedicated resources are assigned to it.
+
+<dt>Dependency:</dt>
+<dd> 'Split the Monolith' and 'Set-up test environment' because Coverity needs properly set-up builds and tests.
+
+<dt>Appeared:</dt>
+<dd> N/A.
+</dl>
+
+<!-- -------- -->
+<h3>Parallelization compliance</h3>
+
+<dl>
+<dt>Objective:</dt>
+<dd>Makes MAD-X portable on multi-core processors and multi-cpu architectures.
+
+<dt>Motivation:</dt>
+<dd>Multi-core processors and multi-cpu architectures architectures offer much more computational power as soon as the code is parallelizable. Many technical details must solved before one can guarantee that MAD-X is parallelizable. This is a long term task that may require rewriting large parts of MAD-X and hence be postponed to phases 2 and 3.
+
+<dt>Dependency:</dt>
+<dd> 'Make a build system' for the many compilations. 'Provide regression tests' to detect any changes in the observable behavior. 'Close modules for states' to enable reentrancy mandatory for parallel execution.
+
+<dt>Appeared:</dt>
+<dd> N/A.
+</dl>
+
+</body>
+</html>

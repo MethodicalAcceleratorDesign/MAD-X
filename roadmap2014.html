@@ -1,0 +1,125 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+<link href="_style.css" rel="stylesheet" type="text/css">
+<title>MAD - Methodical Accelerator Design</title>
+</head>
+
+<body>
+<p><a class=home href="http://cern.ch/madx" onclick="target='_top'">[home]</a>
+<h1>MAD-X Roadmap <small>(2014+)</small></h1>
+<hr class="h1">
+
+<p>
+Disclaimer: this roadmap does not include the development of the MAD 'next-generation' as the process development is more complex and does not involve the MAD-team for the time being <i>(only partial time of LD)</i>. Still, some items hereafter must take into account that their main objective is to better serve the transition to the MAD-NG.
+
+<p>
+Each item description of the roadmap is ending with a tag where 'D:' stands for 'depends on' <i>(i.e. items that must be achieved before)</i>, and 'A:' stands for 'assigned to' <i>(i.e. person in charge of the item)</i>.
+
+<!-- -------- -->
+<hr class="sep">
+
+<h3>Management</h3>
+
+<ol start="1">
+<li>Define and agree on this roadmap <small>[D:_, A:_]</small>.
+<li>Define and agree on a lightweight but efficient procedure for code review <small>[D:_, A:_]</small>.
+<li>Define and agree on a procedure for collaborative developement using branching <small>[D:_, A:_]</small>.
+<li>Define and agree on a procedure to handle and follow-up tickets sent to mad support <small>[D:_, A:_]</small>.
+<li>Define and agree on a procedure to assign and handle items in trac <small>[D:_, A:_]</small>.
+<li>Define and agree on a procedure for updating the website <i>(e.g. using svn)</i> <small>[D:_, A:_]</small>.
+<li>Establish the list of reference persons to contact in case important changes are envisaged in MAD-X <small>[D:_, A:_]</small>.
+<!--	<ul><i>
+		<li>optics, matching, beta-beating, squeeze, aperture, collimation, ibs.
+	</i></ul>
+-->
+</ol>
+
+<h3>Documentation</h3>
+
+<ol start="11">
+<li>Provide a new structure and table of content for the refactoring of the users' guide <small>[D:_, A:_]</small>.
+<li>Complete the switch from html to Latex for online documentation <small>[D: 11., A:_]</small>.
+<li>Define a strategy to export latex to html for alternative online documentation update <small>[D: 11., A:_]</small>.
+<li>Provide online access to all reference documents <small>[D: 11. 12., A:_]</small>.
+<li>Improve the users' guide content <small>[D: 11. 12. 13., A:_]</small>.
+<li>Create an Administation webpage with restricted access to the MAD team <small>[D:_, A:_]</small>.
+<li>Improve the Development webpage to include the documentation and procedures for developpers <small>[D:_, A:_]</small>.
+<li>Simplify the Release webpage for users <small>[D: 17., A:_]</small>.
+<li>Provide clear and simple coding recommendations <small>[D: 17., A:_]</small>.
+	<ul><i>
+		<li>avoid C++ and limit the use of Fortran, always close your modules, use meaningful names, ensure compliance with standards.
+	</i></ul>
+</ol>
+
+<h3>Development and testing</h3>
+
+<ol start="21">
+<li>Add more <i>“user case”</i> tests <small>[D:_, A:_]</small>.
+	<ul><i>
+		<li>time consuming, risk/chance of finding more bugs.
+	</i></ul>
+<li>Remove code duplication and replace known algorithms by external libs/apps <small>[D:_, A:_]</small>.
+<li>Define a benchmarking protocol of the elements, include the benchmarks in the tests <small>[D:_, A:_]</small>.
+</ol>
+
+<h3>MAD-X legacy physics</h3>
+
+<ol start="31">
+<li>Twiss+Track (+Survey) physics recovery, documentation and benchmarking <small>[D:_, A:_]</small>.
+	<ul><i>
+		<li>clarify the canonical variables and transformations.
+		<li>clarify the calculation of the chromaticity.
+		<li>review implementation of closed opbit finder and threader (TLEP).
+		<li>review implementation of field and alignment errors.
+		<li>review implementation of </i>bv<i> flag.
+		<li>record the dependencies from other modules.
+	</i></ul>
+<li>Cororbit physics recovery, documentation and benchmarking <small>[D:_, A:_]</small>.
+	<ul><i>
+		<li>find and possibly cure the unstability observed in the tests for gnu32 on lxplus.
+		<li>simplify the code and remove duplication, prepare for the MAD-NG transition.
+	</i></ul>
+<li>Review consistency between Embedded Twiss and Twiss <small>[D: 31., A:_]</small>.
+	<ul><i>
+		<li>review its use by Aperture and Plot modules.
+	</i></ul>	
+<li>Review implementation of Aperture, parameters inheritance and collimators <small>[D:_, A:_]</small>. 
+<li>Review implementation of Plot for transition to MAD-NG <small>[D:_, A:_]</small>. 
+<li>Implement and benchmark Thick Dipole in Track  <small>[D: 31., A:_]</small>.
+<li>Review (or implement) and benchmark radiation for lepton machines <i>(TLEP)</i> <small>[D: 31., A:_]</small>.
+</ol>
+
+<h3>MAD-X/PTC connexion and physics</h3>
+
+<ol start="41">
+<li>Review and improve MAD-X to PTC connection <small>[D:_, A:_]</small>.
+	<ul><i>
+		<li>missing terms in maps, missing (MAD-X) features.
+		<li>check 4D, 5D, 6D consistency in ptc_track, ptc_twiss, ptc_normal.
+		<li>review ptc_setswitch behavior.
+		<li>provide more tests for exisiting features.
+	</i></ul>
+<li>Review (or implement) and benchmark physics of fringe fields for bends and quads <small>[D:_, A:_]</small>.
+	<ul><i>
+		<li>review models, benchmark results, implement missing features.
+	</i></ul>	
+<li>Review (or implement) and benchmark physics of combined magnets <i>(frs for PS, Keil for Emma)</i> <small>[D:_, A:_]</small>.
+	<ul><i>
+		<li>review (the 3) models, benchmark results, implement missing features.
+	</i></ul>	
+<li>Implement moments for beam distributions >4D <small>[D:_, A:_]</small>.
+<li>Implement beam-beam element for insertion in thick elements <small>[D:_, A:_]</small>.
+<li>Handle pending users' requests <small>[D:_, A:_]</small>.
+	<ul><i>
+		<li>EALIGN DPSI errors on MB gives wrong tunes in ptc_align.
+		<li>Cavity defined via harmonic number not process by ptc_twiss.
+		<li>Add chromatic components to ptc_twiss.
+	</i></ul>
+
+</ol>
+
+</body>
+</html>
