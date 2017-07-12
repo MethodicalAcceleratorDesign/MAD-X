@@ -1,0 +1,130 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+<link href="_style.css" rel="stylesheet" type="text/css">
+<title>MAD - Methodical Accelerator Design</title>
+</head>
+
+<body>
+<p><a class=home href="http://cern.ch/madx" onclick="target='_top'">[home]</a>
+<h1>Resources</h1>
+<hr class="h1">
+
+<h3>MAD-X examples</h3>
+
+<p>
+The examples of the current release can be downloaded from the
+<a href="http://svnweb.cern.ch/world/wsvn/madx/trunk/madX/examples/" onclick="target='_top'">svn repository</a>,
+or simply browsed or downloaded in the
+<a href="http://cern.ch/madx/madX/examples">source code repository</a>.
+MAD-X examples for specific releases (starting from 5.00.12) can be browsed or downloaded from the
+<a href="http://svnweb.cern.ch/world/wsvn/madx/tags/" onclick="target='_top'">svn web interface</a> (tags).
+
+<p>
+The following repositories contains many examples and tests:
+<ul>
+<li> <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/MAD-X/tree/master/tests">MAD-X test suites and examples</a>.
+</ul>
+
+<ul>
+<li> <a target="_blank" href="https://github.com/MethodicalAcceleratorDesign/madx-examples">MAD-X old examples</a>.
+<li> <a href="http://cern.ch/madx/tests_old/test_suite">MAD-X old test suites</a>.
+<li> <a href="http://cern.ch/madx/tests_old/test_runs">MAD-X old test runs</a>.
+<li> <a href="http://cern.ch/keil/MadX">E. Keil repository</a>.
+</ul>
+
+
+<!-- -------- -->
+<hr class="sep">
+
+<h3>MAD-X optics files</h3>
+
+<p>
+MAD-X reference optics files for CERN accelerators can be found on the
+<a href="http://cern.ch/cern-accelerators-optics" onclick="target='_top'">accelerator optics</a>
+web page.
+
+<p>
+MAD-X reference
+<a href="http://lhc-optics.web.cern.ch/lhc-optics/www/">optics scenarios</a>
+for LHC and HLLHC can be found on the
+<a href="http://cern.ch/lhc-optics">optics repository</a>.
+
+<p>
+Relevant links for the LHC optics files (thick magnets) are:
+<ul>
+<li> The sequence files
+<a href="http://cern.ch/lhc-optics/lhc_current/lhc_as-built.seq">as used</a>.
+
+<li> The strength files at injection
+<a href="http://cern.ch/lhc-optics/lhc_current/opt_inj.madx">as used</a>.
+
+<li> The strength files at collision opt_ip1_ip2_ip5_ip8.madx
+<a href="http://cern.ch/lhc-optics/lhc_current/">as used</a>.
+
+<li> The individual settings for the experiments at
+<a href="http://cern.ch/lhc-optics/lhc_current/IR1">IR1</a>,
+<a href="http://cern.ch/lhc-optics/lhc_current/IR2">IR2</a>,
+<a href="http://cern.ch/lhc-optics/lhc_current/IR3">IR3</a>,
+<a href="http://cern.ch/lhc-optics/lhc_current/IR4">IR4</a>,
+<a href="http://cern.ch/lhc-optics/lhc_current/IR5">IR5</a>,
+<a href="http://cern.ch/lhc-optics/lhc_current/IR6">IR6</a>,
+<a href="http://cern.ch/lhc-optics/lhc_current/IR7">IR7</a> and
+<a href="http://cern.ch/lhc-optics/lhc_current/IR8">IR8</a>.
+</ul>
+
+<p>
+MAD-X reference optics files for CERN accelerators can also be found on <tt>lxplus.cern.ch</tt> (AFS) at the absolute path
+<pre>
+  /afs/cern.ch/eng/lhc/optics
+</pre>
+<p>
+This repository contains reference optics for the AD, LEIR, PSB, PS, SPS, TIs, LHC, etc, as well as optics for other projects under development like the HL-LHC (High Luminosity LHC) and the FCC (Future Circular Collider).
+
+<!-- -------- -->
+<hr class="sep">
+
+<h3>MAD-X interactive command line editing</h3>
+
+<p>
+For interactive use of MAD-X, it is convenient to wrap <tt>madx</tt> into the <tt><a href="http://utopia.knoware.nl/~hlub/uck/rlwrap/#rlwrap">rlwrap</a></tt> application (available on lxplus). This gives the line edition flexibility provided by the <a href="http://www.gnu.org/s/readline/" onclick="target='_top'">readline library</a> with deletion, history and history completion of commands.
+<pre>
+  rlwrap madx script.madx
+</pre>
+For more information on available features, please refer to the <a href="http://cnswww.cns.cwru.edu/php/chet/readline/rluserman.html" onclick="target='_top'">readline user manual</a>.
+
+<!-- -------- -->
+<hr class="sep">
+
+<h3>MAD syntax highlighting</h3>
+
+<p>
+Users of the Vim, Emacs, Kate and other editors can benefit from syntax highlighting (Courtesy to R. De Maria and Y. Inntjore Levinsen) by using the files provided with the MAD-X distribution in the <a href="http://cern.ch/madx/madX/syntax"><tt>syntax/<i>editor</i></tt></a> subdirectories. For more informations, see the README files in these directories.
+
+<!--
+<p>
+Vim users can benefit from syntax highlighting (Courtesy to R. De Maria) by adding MAD files extensions in their <tt>.vimrc</tt>&nbsp;:
+<pre>
+  au BufNewFile,BufRead *.madx,*.seq,*.str,*.mask setf madx
+</pre>
+and copy the file <a href="http://cern.ch/madx/doc/madx.vim">madx.vim</a> to <tt>.vim/syntax/madx.vim</tt>. This file is included in the source code releases.
+-->
+
+<!-- -------- -->
+<hr class="sep">
+
+<h3>Ndiff tool</h3>
+
+<p>
+Ndiff is a tool written specifically for testing MAD-X using the black box testing approach. This tool is able to compute the differences of files with numerical contents, taking into account user-defined constraints on the numerical values. Hence, it allows to build portable tests across platforms, compilers and settings.
+
+<p>
+<tt>ndiff</tt> is distributed with MAD-X <a href="releases.html">releases</a> and can be run on <tt>lxplus.cern.ch</tt> (AFS) at the absolute path
+<pre>
+/afs/cern.ch/user/m/mad/bin
+</pre>
+(shortcut <tt>~mad/bin</tt>) or by adding it to your <tt>PATH</tt> environment variable.
+</body>
+</html>

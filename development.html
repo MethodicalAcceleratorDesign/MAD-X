@@ -1,0 +1,94 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+<link href="_style.css" rel="stylesheet" type="text/css">
+<title>MAD - Methodical Accelerator Design</title>
+</head>
+
+<body>
+<p><a class=home href="http://cern.ch/madx" onclick="target='_top'">[home]</a>
+<h1>Development</h1>
+<hr class="h1">
+
+<p>
+MAD-X is improved continuously by the MAD team as well as other contributors. This webpage is dedicated to developers who want to participate to the improvement of the application, as mentioned in the <a href="roadmap.html">roadmap</a>.
+
+<p>
+<b>Note: every new development (or important modifications) must be done on a separate branch of the source code (<a href="releases.html">see releases</a>) and pass all the tests before being merged back to the main trunk. All developpers should subscribe to mad-dev and mad-src e-groups (<a href="support.html">see support</a>) to be informed of ongoing releases, to follow changes on the trunk, and to be able to check nightly builds and tests reports (<a href="resources.html">see resources</a> or hereafter) and correct tests failing on other platforms.</b>
+
+<!-- -------- -->
+<hr class="sep">
+
+<h3>MAD-X nightly builds and tests</h3>
+
+<p>
+MAD-X is built and tested each night to ensure that new developments do not break the proper functioning of the application. If some tests appear to be failing, a report summary containing the list of failing tests and the corresponding architectures is sent to the e-group <tt>mad-src</tt> (see <a href="support.html">support</a>). The complete reports of the builts and the tests for each supported architecture can be browsed from the <a href="http://cern.ch/madx/madX/tests/reports">reports repository</a>, where the history is rotated over 50 days.
+
+<p>
+The scripts used to make the nightly reports can be found in the directory <tt>scripts</tt> and seen as examples of proper usage of the builds and tests system.
+
+<!-- -------- -->
+<hr class="sep">
+
+<h3>MAD-X builds</h3>
+
+<p>
+To build MAD-X, you will need a set of tools usually available on Unixes by default (<i>but not on Windows</i>): GNU make (>=3.81), GNU gcc, g++, gfortran compilers (>=4.4, 32/64 bit on Darwin) and Intel icc, icl, ifort compilers (>=14, optional), as well as Xorg X11 (32/64 bit on Darwin). Lahey, Nagfor and g95 are also used from time to time but not actively supported.
+
+<ul>
+<li> In a terminal, the following command from the root directory of MAD-X (square brackets means optional):
+<pre>
+make &lt;<i>package</i>&gt;-&lt;<i>platform</i>&gt;[&lt;<i>arch</i>&gt;]-&lt;<i>compiler</i>&gt; [<i>mad-options</i>] [<i>build-options</i>]
+</pre>
+
+where possible target name components are (135 possible targets):
+
+<ul>
+<li><i>package</i> = <tt> all | madx | libmadx | libptc | numdiff </tt>
+<li><i>platform</i> = <tt> linux | macosx | win </tt>
+<li><i>arch</i> = <tt> _ | 32 | 64 </tt> (if missing compiles for both archs)
+<li><i>compiler</i> = <tt> _ | gnu | intel </tt>
+</ul>
+
+and possible options are:
+
+<ul>
+<li><i>mad-options:</i> <tt> ONLINE=yes|no NTPSA=yes|no USEGC=yes|no OPENMP=yes|no</tt> (see <tt>Makefile</tt> for defaults)
+<li><i>build-options-1:</i> <tt> SHOW=yes|no COMP=gnu|intel ARCH=32|64|detect DESTDIR=</tt><i>path</i>
+<li><i>build-options-2:</i> <tt> NOPT=0|1|2|3 DEBUG=yes|no PROFILE=yes|no STATIC=yes|no </tt>
+</ul>
+</ul>
+
+<p>
+The build system supports tens of targets to clean, report, debug and trace what it's going on. For example, to clean everything and restart from scratch, you can run <tt>make cleanall</tt>. The system is also highly configurable through tens of variables (like options above). For more details, look at the project <tt>Makefile[_xxx]</tt> or at the build system makefiles in the directory <tt>make</tt>.
+
+<p>
+Notes: the option <tt>ONLINE=yes</tt> works only on linux platforms (e.g. lxplus) and the default for <tt>DESTDIR</tt> is <tt>./build</tt>.
+
+<!-- -------- -->
+<hr class="sep">
+
+<h3>MAD-X test suites</h3>
+
+<p>
+The following instructions assume that you downloaded the source release from the SVN repository or the development release repository, and that <tt>madx</tt> and <tt>numdiff</tt> are in your <tt>PATH</tt> or in the <tt>madX</tt> directory.
+
+<ul>
+<li> In a terminal, execute <em>one</em> of the following commands (square brackets means optional)
+<pre>
+make tests-all      [ARCH=32|64]
+make tests          [ARCH=32|64]
+make tests          [ARCH=32|64] TESTS="<i>test-name-list</i>"
+make tests          [ARCH=32|64] TESTS=detect
+make <i>test-name-list</i> [ARCH=32|64]
+</pre>
+</ul>
+The <tt>ARCH</tt> option forces to run the tests for a specific architecture (e.g. 32 bit or 64 bit) instead of the detected one. The commands based on <tt><i>test-name-list</i></tt> are useful to run only few tests, or to run tests that are not yet registered in the file <tt>Makefile_test</tt>. A <tt><i>test-name</i></tt> is the name of the test directory in <tt>madX/tests</tt> (e.g. <tt>test-twiss</tt>). If <tt>TESTS</tt> is set to <tt>detect</tt>, it will run all the tests in <tt>madX/tests/test-*</tt>. The last command is equivalent to the third one, but it will report an obscur error if the tests does not exists, and it will not display the trailing summary. To trace what is going on during the tests, you can add the option <tt>SHOW=yes</tt> to any of the commands above. To see the available test name, look at the file <tt>Makefile_test</tt>.
+
+<p>
+Note that on Windows platforms, you will need to download and install <a href="http://gnuwin32.sourceforge.net/packages/make.htm">GNU make</a> to run the tests.
+
+</body>
+</html>

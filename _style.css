@@ -1,0 +1,35 @@
+body        { font-size: 11pt; font-family: Arial, Helvetica, sans-serif }
+body.title  { font-size: 12pt; font-family: sans-serif }
+
+h1          { font-size: 20pt; font-family: sans-serif }
+h2          { font-size: 16pt; font-family: sans-serif }
+h2.link     { font-size: 18pt; font-family: normal     }
+h3          { font-size: 12pt; font-family: sans-serif }
+h3.link     { font-size: 14pt; font-weight: normal     }
+h4          { font-size: 11pt; font-family: sans-serif; padding-left: 1em }
+h4.link     { font-size: 12pt; font-weight: normal    ; padding-left: 1em }
+
+a:link      { text-decoration: none; color: #004488 }
+a:visited   { text-decoration: none; color: #004488 }
+a:active    { text-decoration: none; color: #004488 }
+a:hover     { font-weight:     bold; color: #004488 }
+a.home      { margin-right:0; text-align:right; float:right }
+a.menuitem  { font-size: 12pt }
+
+hr.sep      { width: 250px; margin-top: 30px; margin-bottom: 20px }
+hr.h1       { width: 300px; margin-top: 10px; margin-bottom: 40px;
+              margin-left:0; text-align:left }
+
+dt          { font-style: italic }
+
+img         { border: 0 }
+
+span.counter { color: #FF0000 }
+
+.menuinfo  { margin-left:4px; font-size: 10pt; font-style: italic }
+
+.newyear   { background-image: url('yr2013.jpg');
+             background-repeat: no-repeat;
+             background-position: top left;
+             height: 212px; margin-top: -100px; margin-left: 340px; }
+
