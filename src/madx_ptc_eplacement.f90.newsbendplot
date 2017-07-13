@@ -48,7 +48,7 @@ contains
     real(kind(1d0))      :: get_value
     type(fibre), pointer :: p
     real(dp),target      :: a(3), ange(3)
-    real(dp)             :: phi, theta, eta
+    real(dp)             :: phi, theta, psi
     real(dp),target      :: idm(3,3),ent(3,3)
     real(dp),pointer     :: base(:,:)
     logical              :: onlyposition, onlyorientation, autoplace, surveyall
@@ -141,7 +141,7 @@ contains
 
        phi   = get_value('ptc_eplacement ','phi ')
        theta = get_value('ptc_eplacement ','theta ')
-       eta   = zero
+       psi   = get_value('ptc_eplacement ','psi ')
        if (getdebug() > 2 ) then
           write(6,'(a20, 2f8.4)') 'Read rotations ',phi, theta
        endif
@@ -161,7 +161,7 @@ contains
 
        ange(1) = theta
        ange(2) = phi
-       ange(3) = eta
+       ange(3) = psi
 
        CALL ROTATE_Fibre(p,p%chart%f%a,ange,1,base)
 
