@@ -37,10 +37,10 @@ const char* const vrai = "true";        /* to avoid local in routine alias */
 const char* const faux = "false";       /* to avoid local in routine alias */
 const int n_match = 17;                 /* # of match token lists in cmd_match_base */
 const int s_match[] =              /* position of first token of command below */
-{0, 1, 4, 8, 13, 17, 22, 25, 29, 32, 36, 39, 43, 45, 48, 50, 52, 56};
+{0, 1, 4, 8, 13, 17, 22, 25, 29, 32, 36, 39, 43, 45, 48, 50, 52, 56, 60};
 
 const int t_match[] = /* order in which the commands are matched */
-{0, 1, 16, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+{0, 1, 16, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 17, 14, 15};
 
 const char* const cmd_match_base[] =
 { /*  0 */ "@cmd",
@@ -59,7 +59,8 @@ const char* const cmd_match_base[] =
   /* 13 */ "@name", ":", "=",
   /* 14 */ "@name", ":",
   /* 15 */ "@name", "@name",
-  /* 16 */ "shared", "@name", ":", "@cmd" };
+  /* 16 */ "shared", "@name", ":", "@cmd",
+  /* 17 */ "@name", ":","+","=" };
 
 /* aperture types and # of parameters, needed for twiss table */
 
