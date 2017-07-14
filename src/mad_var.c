@@ -381,11 +381,9 @@ enter_variable(struct in_cmd* cmd) /* stores variable contained in cmd */
       if (pos > -1 && type == 17) {
         struct variable* this_var = variable_list->vars[pos];
         struct expression* old_expr = this_var->expr;
-//printf("OLDVAL %f, NEWVAL %f\n", this_var->value, val);
         const char * operator = (val < 0) ? " - " : " + "; //handle :+=-
         val = expr_combine(old_expr, this_var->value, operator, NULL, abs(val), &expr);
         type = (expr == NULL) ? 1 : 2;
-//printf("VAL %f; TYPE %i\n", val, type);
       }
       var = new_variable(name, val, val_type, type, expr, NULL);
       add_to_var_list(var, variable_list, 1);
@@ -404,13 +402,6 @@ enter_variable(struct in_cmd* cmd) /* stores variable contained in cmd */
           {
             struct variable* this_var = variable_list->vars[pos];
 
-//printf("CHECK variable name: %s\n", this_var->name);
-//printf("CHECK variable status: %d\n", this_var->status);
-//printf("CHECK variable type: %d\n", this_var->type);
-//printf("CHECK variable expr ptr: %ld\n", (long int) this_var->expr);
-//printf("CHECK expr name: %s\n"    , this_var->expr->name);
-//printf("CHECK expr status: %d\n"  , this_var->expr->status);
-
             struct expression* old_expr = this_var->expr;
             struct expression* new_expr = NULL;
 
@@ -419,18 +410,8 @@ enter_variable(struct in_cmd* cmd) /* stores variable contained in cmd */
             const char* operator = ( strchr("+-",expr->string[0]) == NULL ) ? " + " : " "; //handle :+=-
             expr_combine(old_expr, this_var->value, operator, expr, val, &new_expr);
 
-//dump_expression(old_expr);
-//dump_expression(expr);
-//dump_expression(new_expr);
-
             delete_expression(expr);
             expr = new_expr; //transfer ownership
-/*
-printf("CHECK expr polish:");
-print_int_array(expr->polish);
-printf("CHECK old_expr polish:");
-print_int_array(old_expr->polish);
-*/
           }
           type = 2; //set deferred in case type was 17
         }
