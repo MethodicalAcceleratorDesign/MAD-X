@@ -5,6 +5,9 @@
 
 int intrac(void);
 
+///similar to strstr but rejects matchings inside words
+const char * strword(const char * str, const char * word); 
+
 // inliners
 
 static inline int

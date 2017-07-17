@@ -401,13 +401,17 @@ enter_variable(struct in_cmd* cmd) /* stores variable contained in cmd */
           if (pos > -1 && type == 17) /* concat deferred: expression kept */
           {
             struct variable* this_var = variable_list->vars[pos];
-
             struct expression* old_expr = this_var->expr;
             struct expression* new_expr = NULL;
 
             pre_split(expr->string, c_dum, 0);
             strcpy(expr->string, c_dum->c);
-            const char* operator = ( strchr("+-",expr->string[0]) == NULL ) ? " + " : " "; //handle :+=-
+
+            //Check for circulars:
+            if ( strword(expr->string, this_var->name) )
+              fatal_error("circular assignment in", expr->string);
+
+            const char* operator = strchr("+-",expr->string[0]) ? " " : " + "; //handle :+=-
             expr_combine(old_expr, this_var->value, operator, expr, val, &new_expr);
 
             delete_expression(expr);
