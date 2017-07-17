@@ -133,6 +133,7 @@ grow_node_list(struct node_list* p)
 {
   const char *rout_name = "grow_node_list";
   p->max *= 2;
+  if (p->max == 0) p->max++;
   p->nodes = myrecalloc(rout_name, p->nodes, p->curr * sizeof *p->nodes, p->max * sizeof *p->nodes);
 }
 

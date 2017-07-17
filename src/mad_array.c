@@ -233,6 +233,7 @@ grow_char_array(struct char_array* p)
 {
   const char *rout_name = "grow_char_array";
   p->max *= 2;
+  if (p->max == 0) p->max++;
   p->c = myrecalloc(rout_name, p->c, p->curr * sizeof *p->c, p->max * sizeof *p->c);
 }
 
@@ -241,6 +242,7 @@ grow_char_p_array(struct char_p_array* p)
 {
   const char *rout_name = "grow_char_p_array";
   p->max *= 2;
+  if (p->max == 0) p->max++;
   p->p = myrecalloc(rout_name, p->p, p->curr * sizeof *p->p, p->max * sizeof *p->p);
 }
 
@@ -249,6 +251,7 @@ grow_int_array(struct int_array* p)
 {
   const char *rout_name = "grow_int_array";
   p->max *= 2;
+  if (p->max == 0) p->max++;
   p->i = myrecalloc(rout_name, p->i, p->curr * sizeof *p->i, p->max * sizeof *p->i);
 }
 
@@ -257,6 +260,7 @@ grow_double_array(struct double_array* p)
 {
   const char *rout_name = "grow_double_array";
   p->max *= 2;
+  if (p->max == 0) p->max++;
   p->a = myrecalloc(rout_name, p->a, p->curr * sizeof *p->a, p->max * sizeof *p->a);
 }
 
@@ -265,6 +269,7 @@ grow_char_array_list(struct char_array_list* p)
 {
   const char *rout_name = "grow_char_array_list";
   p->max *= 2;
+  if (p->max == 0) p->max++;
   p->ca = myrecalloc(rout_name, p->ca, p->curr * sizeof *p->ca, p->max * sizeof *p->ca);
 }
 

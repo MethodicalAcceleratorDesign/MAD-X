@@ -109,6 +109,7 @@ grow_name_list(struct name_list* p)
 {
   const char *rout_name = "grow_name_list";
   p->max *= 2;
+  if (p->max == 0) p->max++;
   p->names  = myrecalloc(rout_name, p->names,  p->curr * sizeof *p->names,  p->max * sizeof *p->names);
   p->index  = myrecalloc(rout_name, p->index,  p->curr * sizeof *p->index,  p->max * sizeof *p->index);
   p->inform = myrecalloc(rout_name, p->inform, p->curr * sizeof *p->inform, p->max * sizeof *p->inform);
@@ -120,6 +121,7 @@ grow_vector_list(struct vector_list* p)
   const char *rout_name = "grow_vector_list";
   struct double_array** v_loc = p->vectors;
   int new = 2*p->max;
+  if (new == 0) new++;
 
   p->max = new;
 //  p->vectors = myrealloc(rout_name, p->vectors, new * sizeof *p->vectors);
