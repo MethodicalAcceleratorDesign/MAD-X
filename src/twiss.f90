@@ -1743,13 +1743,13 @@ SUBROUTINE twcpgo(rt,orbit0)
     if (start_interp_node(i) .ne. 0) then
       do while (fetch_interp_node(i, dl) .ne. 0)
         call backup_optics()
-        call track_one_element(dl, .true.)
+        call track_one_element(dl, .true., .true.)
         call restore_optics()
       end do
-      call track_one_element(el, .false.)
+      call track_one_element(el, .false., .false.)
     else
       i = 1
-      call track_one_element(el, .not. centre)
+      call track_one_element(el, .not. centre, .true.)
     endif
     i = advance_node()
   end do
@@ -1758,9 +1758,10 @@ SUBROUTINE twcpgo(rt,orbit0)
 
 contains
 
-subroutine track_one_element(el, fexit)
+subroutine track_one_element(el, fexit, contrib_rms)
   double precision, intent(in) :: el
   logical :: fexit
+  logical :: contrib_rms
 
   sector_sel = node_value('sel_sector ') .ne. zero .and. sectormap
   code = node_value('mad8_type ')
@@ -1827,16 +1828,20 @@ subroutine track_one_element(el, fexit)
   if (sector_sel) call twwmap(sumloc, orbit)
 
   currpos=currpos+el
-  iecnt=iecnt+1
 
-  !--- 2013-Nov-14  14:18:07  ghislain: should only calculate the RMS values for active elements,
-  !                           skipping markers(25), beambeam(22), changeref(35), translation(36),
-  !                           srotation(12), yrotation(13) etc...
-  !                           But leave drifts(1) in for now. They are the most numerous elements in machines
-  sigxco = sigxco + orbit(1)**2
-  sigyco = sigyco + orbit(3)**2
-  sigdx  = sigdx  + disp(1)**2
-  sigdy  = sigdy  + disp(3)**2
+  ! Avoid adding the same value at the exit twice end when interpolate is on:
+  if (contrib_rms) then
+    iecnt=iecnt+1
+
+    !--- 2013-Nov-14  14:18:07  ghislain: should only calculate the RMS values for active elements,
+    !                           skipping markers(25), beambeam(22), changeref(35), translation(36),
+    !                           srotation(12), yrotation(13) etc...
+    !                           But leave drifts(1) in for now. They are the most numerous elements in machines
+    sigxco = sigxco + orbit(1)**2
+    sigyco = sigyco + orbit(3)**2
+    sigdx  = sigdx  + disp(1)**2
+    sigdy  = sigdy  + disp(3)**2
+  endif
 
   call save_opt_fun()
   if (fexit) then
