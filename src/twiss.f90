@@ -3312,11 +3312,6 @@ SUBROUTINE tw_summ(rt,tt)
 
   !---- Adjust values
   orbit5 = -opt_fun0(13)
-  ! ghislain : ???
-  xcomax = xcomax
-  sigxco = sigxco
-  ycomax = ycomax
-  sigyco = sigyco
 
   ! if (opt_fun0(29).ne.zero.or.opt_fun0(30).ne.zero.or.             &
   !     opt_fun0(31).ne.zero.or.opt_fun0(32).ne.zero) then
