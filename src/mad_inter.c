@@ -186,8 +186,11 @@ start_interp_node(int* i)
 int
 fetch_interp_node(int* i, double* dl)
 {
+  if (*i >= current_node->interp_at->curr)
+    return 0;
   *dl = current_node->interp_at->a[*i] * current_node->length;
-  return ++*i <= current_node->interp_at->curr;
+  ++*i;
+  return 1;
 }
 
 void
