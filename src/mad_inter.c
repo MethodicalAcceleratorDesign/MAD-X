@@ -200,6 +200,7 @@ select_interp(struct command* cmd)
   int nint = command_par_value("slice", cmd);
   double step = command_par_value("step", cmd);
   struct double_array* at = command_par_array("at", cmd);
+  struct double_array* _at = NULL; // current
 
   at = clear || !at || at->curr == 0 ? NULL : clone_double_array(at);
   int fixed_at = clear || at;
@@ -210,17 +211,21 @@ select_interp(struct command* cmd)
       continue;
     if (step > 0)
       nint = node->length / step;
+    if (fixed_at)
+      _at = at;
+    // optimization for single slice:
+    else if (nint <= 1)
+      _at = NULL;
     // allocate new `at` only if needed:
-    if (!fixed_at && nint > 1 && (!at || at->curr != nint)) {
-      at = new_double_array(nint);
+    else if (!at || at->curr != nint) {
+      _at = at = new_double_array(nint);
       at->curr = nint;
       for (int i = 0; i < nint; ++i)
         at->a[i] = (double) (i+1) / nint;
     }
-    if (fixed_at || nint > 1) {
-      if (node->interp_at) sequ->num_interp -= node->interp_at->curr-1;
-      if (at)              sequ->num_interp +=              at->curr-1;
-      node->interp_at = at;
-    }
+
+    if (node->interp_at) sequ->num_interp -= node->interp_at->curr-1;
+    if (_at)             sequ->num_interp +=             _at->curr-1;
+    node->interp_at = _at;
   }
 }
