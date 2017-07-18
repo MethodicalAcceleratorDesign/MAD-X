@@ -1,0 +1,130 @@
+
+beam,
+	mass=  11.177929,    ! 12u = 12*931.494095457e-3
+	energy=16.337929,    ! 12u + 12*430MeV
+	charge=6.0,
+	ex=1.77616e-06,
+	ey=3e-06,
+	sigt=0.001,
+	sige=0.001,
+	radiate=false,
+	sequence=hht3;
+call, file="hht3.str";
+call, file="hht3.seq";
+rot_angle= -pi/2;
+use, sequence="hht3";
+
+ibetx=44.404075;
+ibety=3.8548009;
+ialfx=-7.2739282;
+ialfy=-0.23560719;
+
+
+//---------------------------------------
+// single slice at exit end (should all be the same)
+//---------------------------------------
+
+! uninterpolated, normal run
+twiss, sequence="hht3", file="twiss-0-basic.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+! explicit at end
+select, flag=interpolate, clear;
+select, flag=interpolate, at={1};
+twiss, sequence="hht3", file="twiss-0-at.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+! single slice
+select, flag=interpolate, clear;
+select, flag=interpolate, slice=1;
+twiss, sequence="hht3", file="twiss-0-slice.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+! big step (bigger than any element)
+select, flag=interpolate, clear;
+select, flag=interpolate, step=100;
+twiss, sequence="hht3", file="twiss-0-bigfoot.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+
+//---------------------------------------
+// centre+end for quadrupole
+//---------------------------------------
+
+! centre+end for quadrupole
+select, flag=interpolate, clear;
+select, flag=interpolate, class=quadrupole, at={0.5,1};
+twiss, sequence="hht3", file="twiss-1-centre_quad-at.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+! centre+end for quadrupole
+select, flag=interpolate, clear;
+select, flag=interpolate, class=quadrupole, slice=2;
+twiss, sequence="hht3", file="twiss-1-centre_quad-slice.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+
+//---------------------------------------
+// fixed number of slices
+//---------------------------------------
+
+! five-slice for quadrupole
+select, flag=interpolate, clear;
+select, flag=interpolate, class=quadrupole, slice=5;
+twiss, sequence="hht3", file="twiss-2-5slice_quad-slice.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+! five-slice for quadrupole
+select, flag=interpolate, clear;
+select, flag=interpolate, class=quadrupole, at={1/5,2/5,3/5,4/5,5/5};
+twiss, sequence="hht3", file="twiss-2-5slice_quad-at.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+
+//---------------------------------------
+// uniform step
+//---------------------------------------
+
+! curve with uniform sampling/step
+select, flag=interpolate, clear;
+select, flag=interpolate, step=0.2;
+twiss, sequence="hht3", file="twiss-3-step_uniform.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+
+//---------------------------------------
+// suppress drift/monitor from output table
+//---------------------------------------
+
+select, flag=interpolate, clear;
+select, flag=interpolate, class=drift, slice=0;
+select, flag=interpolate, class=monitor, slice=0;
+twiss, sequence="hht3", file="twiss-4-nodriftmon-slice.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+select, flag=interpolate, clear;
+select, flag=interpolate, class=drift, at={};
+select, flag=interpolate, class=monitor, at={};
+twiss, sequence="hht3", file="twiss-4-nodriftmon-at.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+
+//---------------------------------------
+// deselect
+//---------------------------------------
+select, flag=interpolate, clear;
+select, flag=interpolate, slice=5, class=quadrupole;
+deselect, flag=interpolate, range=h3qd11/h3qd22;
+twiss, sequence="hht3", file="twiss-5-deselect.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+select, flag=interpolate, clear;
+select, flag=interpolate, slice=5, class=quadrupole;
+select, flag=interpolate, clear, range=h3qd11/h3qd22;
+twiss, sequence="hht3", file="twiss-5-clear.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+
+//---------------------------------------
+// multiple definitions
+//---------------------------------------
+
+! multiple selections (later definition overrides earlier definition)
+select, flag=interpolate, clear;
+select, flag=interpolate, at={0.5};
+select, flag=interpolate, step=0.1, class=quadrupole;
+select, flag=interpolate, slice=1, range=h3qd11/h3qd22;
+select, flag=interpolate, slice=0, range=h3qd11/h3qd22, class=drift;
+deselect, flag=interpolate, range=b3dk1;
+twiss, sequence="hht3", file="twiss-6-multiple_defs.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+! selection stays intact after USE
+use, sequence="hht3";
+twiss, sequence="hht3", file="twiss-6-multiple_defs_after_use.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
