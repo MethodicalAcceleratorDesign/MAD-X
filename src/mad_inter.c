@@ -180,7 +180,7 @@ int
 start_interp_node(int* i)
 {
   *i = 0;
-  return current_node->interp_at && current_node->interp_at->curr > 0;
+  return current_node->interp_at != NULL;
 }
 
 int
@@ -205,19 +205,20 @@ select_interp(struct command* cmd)
   struct double_array* at = command_par_array("at", cmd);
   struct double_array* _at = NULL; // current
 
-  at = clear || !at || at->curr == 0 ? NULL : clone_double_array(at);
+  at = clear || !at || !par_present("at", cmd, NULL) ? NULL : clone_double_array(at);
+
   int fixed_at = clear || at;
 
   struct node* node;
   while (fetch_node_select(iter, &node, &sequ)) {
-    if (node->length == 0)
-      continue;
-    if (step > 0)
+    if (step > 0) {
       nint = node->length / step;
-    if (fixed_at)
+      if (nint == 0) nint = 1;
+    }
+    if (fixed_at && (node->length > 0 || !at || at->curr == 0))
       _at = at;
     // optimization for single slice:
-    else if (nint <= 1)
+    else if (nint == 1 || (node->length == 0 && nint > 1))
       _at = NULL;
     // allocate new `at` only if needed:
     else if (!at || at->curr != nint) {
