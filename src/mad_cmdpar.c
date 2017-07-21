@@ -197,6 +197,7 @@ grow_command_parameter_list(struct command_parameter_list* p)
 {
   const char *rout_name = "grow_command_parameter_list";
   p->max *= 2;
+  if (p->max == 0) p->max++;
   p->parameters = myrecalloc(rout_name, p->parameters, p->curr * sizeof *p->parameters, p->max * sizeof *p->parameters);
 }
 

@@ -183,6 +183,7 @@ grow_expr_list(struct expr_list* p)
 {
   const char *rout_name = "grow_expr_list";
   p->max *= 2;
+  if (p->max == 0) p->max++;
   p->list = myrecalloc(rout_name, p->list, p->curr * sizeof *p->list, p->max * sizeof *p->list);
 }
 
