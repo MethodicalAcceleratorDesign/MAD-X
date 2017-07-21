@@ -1,0 +1,1046 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.03.06  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2017.05.29               +
+  + Execution date: 2017.07.18 13:32:30      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+
+
+beam,
+
+	mass=  11.177929,    ! 12u = 12*931.494095457e-3
+
+	energy=16.337929,    ! 12u + 12*430MeV
+
+	charge=6.0,
+
+	ex=1.77616e-06,
+
+	ey=3e-06,
+
+	sigt=0.001,
+
+	sige=0.001,
+
+	radiate=false,
+
+	sequence=hht3;
+
+call, file="hht3.str";
+
+! -BEGIN- definition of K- and KL-values
+
+
+
+kL_S0QG1F :=   0.76173027E+00;
+
+kL_S0QG2F :=   0.82664609E+00;
+
+kL_S0QG3D :=  -0.74242487E+00;
+
+kL_S0QG4D :=  -0.76375766E+00;
+
+ax_S3ME2E :=  -0.63000000E-02;
+
+ay_S3MS1V_COC_EXTR := 0.00000000E+00;
+
+ax_S3MU1A_COC_EXTR := 0.00000000E+00;
+
+axgeo_S4MU2E := 13.5 * raddeg;
+
+dax_S4MU2E := 0;
+
+ay_H1MS1 :=      0.00000000E+00;
+
+kL_H1QD11 :=  -0.91836726E+00;
+
+kL_H1QD12 :=   0.81632653E+00;
+
+ax_H1MS2 :=      0.50000000E-02;
+
+ax_H1MB1 :=    -0.10000000E-01;
+
+ax_H1MS3 :=      0.50000000E-02;
+
+ay_H1MS4 :=      0.00000000E+00;
+
+kL_H2QT11 :=  -0.19591840E+00;
+
+kL_H2QT12 :=   0.75918373E+00;
+
+kL_H2QT13 :=  -0.77142863E+00;
+
+ay_H2MS1 :=      0.00000000E+00;
+
+ax_H3MS1 :=      0.00000000E+00;
+
+ay_H3MS2 :=      0.00000000E+00;
+
+kL_H3QD11 :=  -0.44285711E+00;
+
+kL_H3QD12 :=   0.55918360E+00;
+
+ax_H3MS3 :=      0.00000000E+00;
+
+ay_H3MS4 :=      0.00000000E+00;
+
+kL_H3QD21 :=  -0.10816327E+01;
+
+kL_H3QD22 :=   0.10530612E+01;
+
+kL_B3QD11 :=   0.19655174E+01;
+
+kL_B3QD12 :=  -0.15862070E+01;
+
+kL_B3QK2 :=   0.00000000E+00;
+
+ax_B3MS1 :=      0.00000000E+00;
+
+ay_B3MS2 :=      0.00000000E+00;
+
+kL_G3QD11 :=  -0.13275863E+01;
+
+kL_G3QD12 :=   0.12862069E+01;
+
+kL_G3QD21 :=   0.22965517E+01;
+
+ay_G3MS1 :=      0.00000000E+00;
+
+kL_G3QD22 :=  -0.14482758E+01;
+
+kL_G3QD31 :=  -0.11724138E+01;
+
+ax_G3MS2 :=      0.00000000E+00;
+
+kL_G3QD32 :=   0.28000002E+01;
+
+kL_G3QD41 :=  -0.17448275E+01;
+
+kL_G3QD42 :=   0.23586208E+01;
+
+ay_G3MW1 :=      0.00000000E+00;
+
+ax_G3MW2 :=      0.00000000E+00;
+
+
+
+! -END- definition of K- and KL-values
+
+call, file="hht3.seq";
+
+degree = PI/180;
+
+BAMS:  MONITOR;
+
+
+
+hht3: sequence, refer=centre, L=80.4047359;
+
+
+
+  ! sync
+
+  s3me2ess_1:   COLLIMATOR, L=1.26/2, APERTYPE=rectangle, APERTURE={0.05,1}, at=0.63/2;
+
+  S3ME2E:       MULTIPOLE, KNL:={ax_S3ME2E}, at=0.63;
+
+  s3me2ess_2:   COLLIMATOR, L=1.26/2, APERTYPE=rectangle, APERTURE={0.05,1}, at=0.63+0.63/2;
+
+  s3me2ed2:     INSTRUMENT, L=0.12, at=1.32;
+
+  S0QG1F:       QUADRUPOLE, L=0.479, k1:=kL_S0QG1F, at=2.11;
+
+  S3MS1V:       VKICKER, KICK:=ay_S3MS1V_COC_EXTR, at=2.81;
+
+  S0QG4D:       QUADRUPOLE, L=0.479, k1:=kL_S0QG4D, at=3.51;
+
+  s.mu1m1:      SBEND, KILL_EXI_FRINGE, L=2.3237864, ANGLE=30*degree, HGAP=0.0295, E1=15*degree, FINT=0.35, E2=0, FINTX=0.00, at=5.7998932;
+
+  S3MU1A:       HKICKER, KICK:=ax_S3MU1A_COC_EXTR, at=6.9617864;
+
+  s.mu1m2:      SBEND, KILL_ENT_FRINGE, L=2.3237864, ANGLE=30*degree, HGAP=0.0295, E1=0, FINT=0.00, E2=15*degree, FINTX=0.35, at=8.1236796;
+
+  S4MU1E:       SBEND, L=1.0527826, ANGLE=-6.5*degree, HGAP=0.02935, E1=-0.056723201, FINT=0.35, E2=-0.056723201, FINTX=0.35, at=10.5389641;
+
+  S4DF1:        MONITOR, at=11.3555554;
+
+  S4MU2E_X:     SBEND, L=1.728033, ANGLE:=-(axgeo_S4MU2E+dax_S4MU2E), HGAP=0.03325, E1=-0.11780972, FINT=0.35, E2=-0.11780972, FINTX=0.35, at=12.5097719;
+
+  Flansch:      DRIFT, L=0.36742, at=13.7934984;
+
+
+
+  ! H1
+
+  H1DK1:        DRIFT, L=0.22, at=14.0872084;
+
+  H1DG1G:       MONITOR, at=14.1972084;
+
+  H1MS1V:       VKICKER, KICK:=ay_H1MS1, at=14.7297084;
+
+  H1QD11:       QUADRUPOLE, L=0.49, K1:=kL_H1QD11, at=15.4210884;
+
+  H1QD12:       QUADRUPOLE, L=0.49, K1:=kL_H1QD12, at=16.2960884;
+
+  H1MS2H:       HKICKER, KICK:=ax_H1MS2, at=16.9965884;
+
+  H1MB1:        HKICKER, KICK:=ax_H1MB1, at=17.5916484;
+
+  H1MS3H:       HKICKER, KICK:=ax_H1MS3, at=18.1866484;
+
+  Scraper:      COLLIMATOR, L=0.07, APERTYPE=rectangle, APERTURE={0.4,1}, at=19.7766484;
+
+  H1DK2:        DRIFT, L=0.22, at=19.9467241;
+
+  H1DG2G:       MONITOR, at=20.0567241;
+
+  H1MS4V:       VKICKER, KICK:=ay_H1MS4, at=20.3867241;
+
+
+
+  ! H2
+
+  SLIT:         RCOLLIMATOR, L=2.247, APERTYPE=rectangle, APERTURE={0.055, 0.0385}, at=22.1287241;
+
+  H2QT11:       QUADRUPOLE, L=0.49, K1:=kL_H2QT11, at=25.0998384;
+
+  H2QT12:       QUADRUPOLE, L=0.49, K1:=kL_H2QT12, at=25.9748384;
+
+  H2QT13:       QUADRUPOLE, L=0.49, K1:=kL_H2QT13, at=26.8508384;
+
+  H2DK2:        DRIFT, L=0.22, at=27.4553384;
+
+  H2DG2G:       MONITOR, at=27.5653384;
+
+  H2MS1V:       VKICKER, KICK:=ay_H2MS1, at=28.0977241;
+
+
+
+  ! H3
+
+  B2MU1:        RCOLLIMATOR, L=2.247, YSIZE=0.0385, at=29.8397241;
+
+  H3MS1H:       HKICKER, KICK:=ax_H3MS1, at=32.2537541;
+
+  H3MS2V:       VKICKER, KICK:=ay_H3MS2, at=32.7637541;
+
+  H3QD11:       QUADRUPOLE, L=0.49, K1:=kL_H3QD11, at=33.4557684;
+
+  H3QD12:       QUADRUPOLE, L=0.49, K1:=kL_H3QD12, at=34.3307684;
+
+  H3MS3H:       HKICKER, KICK:=ax_H3MS3, at=38.7291684;
+
+  H3MS4V:       VKICKER, KICK:=ay_H3MS4, at=39.2391684;
+
+  H3QD21:       QUADRUPOLE, L=0.49, K1:=kL_H3QD21, at=39.9316784;
+
+  H3QD22:       QUADRUPOLE, L=0.49, K1:=kL_H3QD22, at=40.8066784;
+
+  H3DK3:        DRIFT, L=0.22, at=41.4116784;
+
+  H3DG3G:       MONITOR, L=0, at=41.5216784;
+
+
+
+  ! B3
+
+  B3MU1_in:     SBEND, KILL_EXI_FRINGE, L=3.436117/2, ANGLE=22.5*degree, HGAP=0.0385, E1=15.*degree, FINT=0.35, E2=0, FINTX=0, at=43.28110335;
+
+  B3MU1_corr:   HKICKER, KICK:=dax_B3MU1, at=44.1401326;
+
+  B3MU1_out:    SBEND, KILL_ENT_FRINGE, L=3.436117/2, ANGLE=22.5*degree, HGAP=0.0385, E1=0*degree, FINT=0, E2=0, FINTX=0.35, at=44.99916185;
+
+  B3DK1:        DRIFT, L=0.12, at=46.3031911;
+
+  B3DF1:        MONITOR, L=0, at=46.3631911;
+
+  B3MU2_in:     SBEND, KILL_EXI_FRINGE, L=3.436117/2, ANGLE=22.5*degree, HGAP=0.0385, E1=0, FINT=0.35, E2=0, FINTX=0, at=47.76322035;
+
+  B3MU2_corr:   HKICKER, KICK:=dax_B3MU2, at=48.6222496;
+
+  B3MU2_out:    SBEND, KILL_ENT_FRINGE, L=3.436117/2, ANGLE=22.5*degree, HGAP=0.0385, E1=0, FINT=0, E2=15.*degree, FINTX=0.35, at=49.48127885;
+
+  B3DK2:        DRIFT, L=0.12, at=50.9463081;
+
+  B3DG2G:       MONITOR, L=0, at=51.0063081;
+
+  B3QD11:       QUADRUPOLE, L=0.29, K1:=kL_B3QD11, at=51.4698081;
+
+  B3QD12:       QUADRUPOLE, L=0.29, K1:=kL_B3QD12, at=52.0418081;
+
+! 0  11                    45.0000000000                       0
+
+  B3QK2:        QUADRUPOLE, L=0.29, K1:=kL_B3QK2, at=52.6138081;
+
+! 0  11                   -45.0000000000                       0
+
+  B3MS1H:       HKICKER, KICK:=ax_B3MS1, at=53.1498081;
+
+  B3MS2V:       VKICKER, KICK:=ay_B3MS2, at=53.6648081;
+
+  B3DK3:        DRIFT, L=0.12, at=54.0373081;
+
+  B3DG3G:       MONITOR, L=0, at=54.0973081;
+
+  GANT_ROT:     SROTATION, ANGLE:=rot_angle, at=54.4273196;
+
+! GANT_ROT: CHANGEREF, patch_ang={0,0,-PI/2};
+
+! GANT_ROT   0  11                     0.0000000000                       0
+
+  G3QD11:       QUADRUPOLE, L=0.29, K1:=kL_G3QD11, at=55.0183196;
+
+  G3QD12:       QUADRUPOLE, L=0.29, K1:=kL_G3QD12, at=55.6083196;
+
+  G3MU1_in:     SBEND, KILL_EXI_FRINGE, L=2.8667033/2, ANGLE=-22.5*degree, HGAP=0.0385, FINT=0.35, FINTX=0, at=57.207495425;
+
+  G3MU1_corr:   HKICKER, KICK:=dax_G3MU1, at=57.92417125;
+
+  G3MU1_out:    SBEND, KILL_ENT_FRINGE, L=2.8667033/2, ANGLE=-22.5*degree, HGAP=0.0385, FINT=0, FINTX=0.35, at=58.640847075;
+
+  G3QD21:       QUADRUPOLE, L=0.29, K1:=kL_G3QD21, at=60.1900229;
+
+  G3MS1V:       VKICKER, KICK:=k0sl_G3MS1V, at=60.7345229;
+
+  G3QD22:       QUADRUPOLE, L=0.29, K1:=kL_G3QD22, at=61.2790229;
+
+  G3DK3:        DRIFT, L=0.12, at=61.6915229;
+
+  G3DG3G:       MONITOR, L=0, at=61.7515229;
+
+  G3QD31:       QUADRUPOLE, L=0.29, K1:=kL_G3QD31, at=62.2240229;
+
+  G3MS2H:       HKICKER, KICK:=ax_G3MS2, at=62.7685229;
+
+  G3QD32:       QUADRUPOLE, L=0.29, K1:=kL_G3QD32, at=63.3130229;
+
+  G3MU2_in:     SBEND, KILL_EXI_FRINGE, L=2.8667033/2, ANGLE=22.5*degree, HGAP=0.0385, FINT=0.35, FINTX=0, at=64.912198725;
+
+  G3MU2_corr:   HKICKER, KICK:=dax_G3MU2, at=65.62887455;
+
+  G3MU2_out:    SBEND, KILL_ENT_FRINGE, L=2.8667033/2, ANGLE=22.5*degree, HGAP=0.0385, FINT=0, FINTX=0.35, at=66.345550375;
+
+  G3QD41:       QUADRUPOLE, L=0.29, K1:=kL_G3QD41, at=67.6547262;
+
+  G3QD42:       QUADRUPOLE, L=0.29, K1:=kL_G3QD42, at=68.5393262;
+
+  G3DK5:        DRIFT, L=0.22, at=69.0018262;
+
+  G3DG5G:       MONITOR, L=0, at=69.1118262;
+
+  G3MW1V:       VKICKER, KICK:=ay_G3MW1, at=69.7431262;
+
+  G3MW2H:       HKICKER, KICK:=ax_G3MW2, at=70.4331262;
+
+  G3MU3_in:     SBEND, KILL_EXI_FRINGE, L=5.7334066/2, ANGLE=45*degree, HGAP=0.11, E1=30*degree, FINT=0.35, E2=0*degree, FINTX=0, at=73.19557785;
+
+  G3MU3_corr:   HKICKER, KICK:=dax_G3MU2, at=74.6289295;
+
+  G3MU3_out:    SBEND, KILL_ENT_FRINGE, L=5.7334066/2, ANGLE=45*degree, HGAP=0.11, E1=0*degree, FINT=0, E2=21*degree, FINTX=0.35, at=76.06228115;
+
+  T3DG2G:       BAMS, L=0, at=78.0467359;
+
+  T3DG1G:       BAMS, L=0, at=78.2587359;
+
+  Luft:         DRIFT, L=1.146, at=78.8317359;
+
+  T3DF1:        MONITOR, L=0, at=79.4047359;
+
+  Patient:      DRIFT, L=1, at=79.9047359;
+
+
+
+endsequence;
+
+rot_angle= -pi/2;
+
+use, sequence="hht3";
+
+
+
+ibetx=44.404075;
+
+ibety=3.8548009;
+
+ialfx=-7.2739282;
+
+ialfy=-0.23560719;
+
+
+
+
+
+//---------------------------------------
+
+// single slice at exit end (should all be the same)
+
+//---------------------------------------
+
+
+
+! uninterpolated, normal run
+
+twiss, sequence="hht3", file="twiss-0-basic.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.573019357          0.0029753    0.0003358118319         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        277.6712894         3.95659478        1.287746856 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.154135105e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 1 
+
+
+! explicit at end
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, at={1};
+
+twiss, sequence="hht3", file="twiss-0-at.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.573019357          0.0029753    0.0003358118319         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        277.6712894         3.95659478        1.287746856 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.154135105e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 1 
+
+
+! single slice
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, slice=1;
+
+twiss, sequence="hht3", file="twiss-0-slice.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.573019357          0.0029753    0.0003358118319         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        277.6712894         3.95659478        1.287746856 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.154135105e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 1 
+
+
+! big step (bigger than any element)
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, step=100;
+
+twiss, sequence="hht3", file="twiss-0-bigfoot.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.573019357          0.0029753    0.0003358118319         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        277.6712894         3.95659478        1.287746856 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.154135105e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 1 
+
+
+
+
+//---------------------------------------
+
+// centre+end for quadrupole
+
+//---------------------------------------
+
+
+
+! centre+end for quadrupole
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, class=quadrupole, at={0.5,1};
+
+twiss, sequence="hht3", file="twiss-1-centre_quad-at.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.621236349          0.0029753    0.0003144990333         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        283.3334145         3.95659478        1.252051915 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.446182179e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 1 
+
+
+! centre+end for quadrupole
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, class=quadrupole, slice=2;
+
+twiss, sequence="hht3", file="twiss-1-centre_quad-slice.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.621236349          0.0029753    0.0003144990333         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        283.3334145         3.95659478        1.252051915 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.446182179e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 1 
+
+
+
+
+//---------------------------------------
+
+// fixed number of slices
+
+//---------------------------------------
+
+
+
+! five-slice for quadrupole
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, class=quadrupole, slice=5;
+
+twiss, sequence="hht3", file="twiss-2-5slice_quad-slice.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+        7.71049489          0.0029753     0.000268820769         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        284.8706012         3.95659478        1.180270399 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.978683058e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 1 
+
+
+! five-slice for quadrupole
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, class=quadrupole, at={1/5,2/5,3/5,4/5,5/5};
+
+twiss, sequence="hht3", file="twiss-2-5slice_quad-at.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+        7.71049489          0.0029753     0.000268820769         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        284.8706012         3.95659478        1.180270399 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.978683058e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 1 
+
+
+
+
+//---------------------------------------
+
+// uniform step
+
+//---------------------------------------
+
+
+
+! curve with uniform sampling/step
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, step=0.2;
+
+twiss, sequence="hht3", file="twiss-3-step_uniform.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.990012919          0.0029753    0.0002374548656         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        277.6712894         3.95659478        1.403600132 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    7.400653901e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 1 
+
+
+
+
+//---------------------------------------
+
+// suppress drift/monitor from output table
+
+//---------------------------------------
+
+
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, class=drift, slice=0;
+
+select, flag=interpolate, class=monitor, slice=0;
+
+twiss, sequence="hht3", file="twiss-4-nodriftmon-slice.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.278528529          0.0029753    0.0003581840674         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        277.6712894         3.95659478        1.251316003 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.583728987e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 1 
+
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, class=drift, at={};
+
+select, flag=interpolate, class=monitor, at={};
+
+twiss, sequence="hht3", file="twiss-4-nodriftmon-at.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.278528529          0.0029753    0.0003581840674         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        277.6712894         3.95659478        1.251316003 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.583728987e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 1 
+
+
+
+
+//---------------------------------------
+
+// deselect
+
+//---------------------------------------
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, slice=5, class=quadrupole;
+
+deselect, flag=interpolate, range=h3qd11/h3qd22;
+
+twiss, sequence="hht3", file="twiss-5-deselect.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.418185545          0.0029753    0.0002780533304         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        284.8706012         3.95659478        1.220806454 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    9.287053396e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 1 
+
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, slice=5, class=quadrupole;
+
+select, flag=interpolate, clear, range=h3qd11/h3qd22;
+
+twiss, sequence="hht3", file="twiss-5-clear.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+       7.418185545          0.0029753    0.0002780533304         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        284.8706012         3.95659478        1.220806454 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    9.287053396e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 1 
+
+
+
+
+//---------------------------------------
+
+// multiple definitions
+
+//---------------------------------------
+
+
+
+! multiple selections (later definition overrides earlier definition)
+
+select, flag=interpolate, clear;
+
+select, flag=interpolate, at={0.5};
+
+select, flag=interpolate, step=0.1, class=quadrupole;
+
+select, flag=interpolate, slice=1, range=h3qd11/h3qd22;
+
+select, flag=interpolate, slice=0, range=h3qd11/h3qd22, class=drift;
+
+deselect, flag=interpolate, range=b3dk1;
+
+twiss, sequence="hht3", file="twiss-6-multiple_defs.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+        7.69914458          0.0029753    0.0002686425904         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        283.3334145         3.95659478        1.226649618 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.389262002e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 1 
+
+
+! selection stays intact after USE
+
+use, sequence="hht3";
+
+twiss, sequence="hht3", file="twiss-6-multiple_defs_after_use.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
+
+enter Twiss module
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -2.040718E-05  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element gant_rot                                        , nflips up to now =   1                                                                                                       
+ Total number of modes flips is not even! Nflips =            1
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+        80.4047359                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       1.021243875                  0        557.6544683        14.30092684 
+
+             dxrms             xcomax             xcorms                 q2 
+        7.69914458          0.0029753    0.0002686425904         2.60421013 
+
+               dq2            betymax              dymax              dyrms 
+                 0        283.3334145         3.95659478        1.226649618 
+
+            ycomax             ycorms             deltap            synch_1 
+     2.4544614e-07    8.389262002e-08                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 1 
+
+  Number of warnings: 15
+0 in C and 15 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
