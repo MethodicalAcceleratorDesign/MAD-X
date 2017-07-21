@@ -1,7 +1,22 @@
+Thomas Gläßle | 2017-06-23 - 2017-07-05
+  Fix INTERPOLATE option of PLOT/APERTURE erasing expressions (#377,#404) [1e698ee1]
+  Decrease node size and avoid needless copies during matching [4e89853b]
+  Refactor/simplify code for CENTRE [d028e6c5]
+  Refactor/simplify code for SELECT [201cfbdc]
+  Interpolate: can SELECT positions for intermediate TWISS values [4d400c4c]
+  Can use sigma matrix elements as constraints [92a1be1a]
+
+  Migrate MAD-X from SVN to github
+  Add Travis CI for automatic tests on push [5f19cb7a]
+  Add automatic coverage reports [4956189d]
+
 skowron | 2017-06-12
   Added warning for PTC codes about 6D TIME=false
   ptc_track RECLOSS option implemented
   ptc_track ROOTNTUPLE implemented  
+
+Thomas Gläßle | 2017-05-29
+  Fix cmake config for GC (win32+linux)
 
 5.03.06 | ldeniau | 2017-05-29
   Bug fix for the dipedge element e1 and bv flag
