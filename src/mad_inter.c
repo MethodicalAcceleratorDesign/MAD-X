@@ -227,6 +227,8 @@ select_interp(struct command* cmd)
       for (int i = 0; i < nint; ++i)
         at->a[i] = (double) (i+1) / nint;
     }
+    else
+      _at = at;
 
     if (node->interp_at) sequ->num_interp -= node->interp_at->curr-1;
     if (_at)             sequ->num_interp +=             _at->curr-1;
