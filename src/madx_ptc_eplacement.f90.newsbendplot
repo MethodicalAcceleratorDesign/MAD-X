@@ -325,10 +325,10 @@ contains
        write(mf,*) '//cout<<',i,'<<" ',p%mag%name,'"<<endl;'
 
        !print*, i,p%mag%name
-       if (getdebug() > 2) then
+      ! if (getdebug() > 2) then
           print*, i,p%mag%name,' of kind ',p%mag%kind
           print*, 'Edges: ', p%mag%P%EDGE(1), p%mag%P%EDGE(2)
-       endif
+       !endif
 
 
        if (p%mag%l == zero) then
@@ -358,13 +358,15 @@ contains
           call drawtube(p,mf,0.05_dp,magenta)
 
        case(kind10) !SBEND
+          print*,"This is kind10 ",kind10," : SBEND "
           call drawsbend(p,mf)
 
        case(32) !SBEND (Multipole) with model 1 ( Kick Drift Kick) and NON-exact
-          !print*,"This is type 32"
+          print*,"This is type 32 : SBEND "
           call drawsbend(p,mf)
 
        case(kind20) !stright exact bend
+          print*,"This is kind20 ",kind20," : RBEND "
           call drawboxm(p,mf,magenta)
 
        case(kind15)!septum (electric)
@@ -389,10 +391,10 @@ contains
           nmul = p%mag%p%nmul
           if (p%mag%bn(1) /= zero ) then
              !BEND
-             a(1)= P%mag%p%f%ent(3,1)*p%mag%l/two + P%mag%p%f%a(1)
-             a(2)= P%mag%p%f%ent(3,2)*p%mag%l/two + P%mag%p%f%a(2)
-             a(3)= P%mag%p%f%ent(3,3)*p%mag%l/two + P%mag%p%f%a(3)
-             call drawbox(p,mf,P%mag%p%f%ent,a,blue)
+             a(1)= P%mag%p%f%mid(3,1)*p%mag%l/two + P%mag%p%f%a(1)
+             a(2)= P%mag%p%f%mid(3,2)*p%mag%l/two + P%mag%p%f%a(2)
+             a(3)= P%mag%p%f%mid(3,3)*p%mag%l/two + P%mag%p%f%a(3)
+             call drawbox(p,mf,P%mag%p%f%mid,a,blue)
           elseif (nmul < 2)  then
              !not powered element or very high order multipole
              call drawboxm(p,mf,color_of_ghost)
@@ -464,9 +466,35 @@ contains
       character(10) :: fname
       character(9) :: nodname
       character(8) :: mtxname
-      real(dp)     :: x,y,z,r, phi
+      real(dp)     :: a(3), b(3), o(3) 
+      real(dp)     :: ent(3,3), exi(3,3), mid(3,3), m(3,3)
+      real(dp)     :: x,y,z,l,t,r, phi
+      real(dp)     :: x0, y0, z0
+      real(dp)     :: tan_Rent, tan_Rexi, alph_perp, b_Rent, b_Rexi
+      real(dp)     :: tanbend, tanbend_perp
+      
+      ! ROOT draws normal tube with main axis in z direction
+      ! so we have to
+      ! 1. displace center so the the wall is on 0,0,0
+      ! 2. rotate main axis 90 deg around x axis
+      !     - now we have a sbend starting in 0,0,0
+      ! 3. translate center by translation on ent of the sbend
+      ! 4. rotate the center of the tube around ent by angle specified in ent
+      
       !To be finished - need more information about SBEND frames in PTC
 
+      print*,"Draw Sbend Transverse  1,1   svector rotation", asin(P%mag%p%f%exi(1,1)) - asin(P%mag%p%f%ent(1,1))
+      print*,"Draw Sbend Transverse  1,2   svector rotation", asin(P%mag%p%f%exi(1,2)) - asin(P%mag%p%f%ent(1,2))
+      print*,"Draw Sbend Transverse  1,3   svector rotation", asin(P%mag%p%f%exi(1,3)) - asin(P%mag%p%f%ent(1,3))
+
+      print*,"Draw Sbend Transverse  2,1   svector rotation", asin(P%mag%p%f%exi(2,1)) - asin(P%mag%p%f%ent(2,1))
+      print*,"Draw Sbend Transverse  2,2   svector rotation", asin(P%mag%p%f%exi(2,2)) - asin(P%mag%p%f%ent(2,2))
+      print*,"Draw Sbend Transverse  2,3   svector rotation", asin(P%mag%p%f%exi(2,3)) - asin(P%mag%p%f%ent(2,3))
+
+      print*,"Draw Sbend Transverse  3,1   svector rotation", asin(P%mag%p%f%exi(3,1)) - asin(P%mag%p%f%ent(3,1))
+      print*,"Draw Sbend Transverse  3,2   svector rotation", asin(P%mag%p%f%exi(3,2)) - asin(P%mag%p%f%ent(3,2))
+      print*,"Draw Sbend Transverse  3,3   svector rotation", asin(P%mag%p%f%exi(3,3)) - asin(P%mag%p%f%ent(3,3))
+      
 
       if (P%mag%p%f%a(2) .ne. P%mag%p%f%b(2) ) then
          print*, "Not able yet to draw horizonthally skewed SBEND. DRAWING AS RBEND"
@@ -474,50 +502,129 @@ contains
          return
       endif
 
+      a = P%mag%p%f%a
+      o = P%mag%p%f%o
+      b = P%mag%p%f%b
+      exi = P%mag%p%f%exi
+      ent = P%mag%p%f%ent
+      
+       
+      phi = asin(P%mag%p%f%exi(1,3)) - asin(P%mag%p%f%ent(1,3))
+      print*,"Draw Sbend phi=",phi
+      
+      if (abs(phi) .lt. 1e-3) then
+         print*,i,p%mag%name, "Angle very small. DRAWING AS RBEND"
+         call drawboxm(p,mf,color)
+         return
+      endif
+       
       x = P%mag%p%f%b(1) - P%mag%p%f%a(1)
-      y = P%mag%p%f%b(3) - P%mag%p%f%a(3)
+      y = P%mag%p%f%b(2) - P%mag%p%f%a(2)
+      z = P%mag%p%f%b(3) - P%mag%p%f%a(3)  !square of the half of distance between ent and exi
 
-      z = (x*x + y*y)/four !square of the half of distance between ent and exi
+      print*,"Draw Sbend Offsets between ent and exi x,y,z",x,y,z
 
-      x = P%mag%p%f%a(1) + x/two !x coord of the half of distance between ent and exi
-      y = P%mag%p%f%a(3) + y/two !z coord of the half of distance between ent and exi
+      l = sqrt(x*x + y*y + z*z) !total length
+      t = sqrt(x*x + y*y) ! transverse offset
+      
+      print*,"Draw Sbend Straigh Length between ent and exi l=",l
+      print*,"Draw Sbend Transverse     between ent and exi t=",t
 
-!!!!!!!!!!!!!!!!!!!
-
-      x = x - P%mag%p%f%o(1)
-      y = y - P%mag%p%f%o(3)
-
-      y = sqrt(x*x + y*y)
-
-      if (y == 0) then
+      
+      if (t .lt. 1e-7) then
          print*,i,p%mag%name, "All three reference frames are inline. DRAWING AS RBEND"
          call drawboxm(p,mf,color)
          return
       endif
 
-      r = (z + y*y)/(two*y)
-      if (r > 100000) then
+      r = (l/2)/sin(phi/2)      
+      
+      print*,"Draw Sbend  r=",r," threshold 1e5"
+      if (r > 1e5) then
+      
          print*,i,p%mag%name, "SBEND curvature is almost null. DRAWING AS RBEND"
          call drawboxm(p,mf,color)
          return
       endif
 
-      phi = two*arcsin(z/r)
-      print*, "R is ", r," phi is ", phi," z is ", z," y ",y
+      
+      
+      !calculate origin of the bends circle
+      
+      !tangent of the line between ent and exi
+      tanbend = (P%mag%p%f%b(1) - P%mag%p%f%a(1))/(P%mag%p%f%b(3) - P%mag%p%f%a(3))
+      print*,"tan between ent and exi", tanbend 
+      if (abs(tanbend) .gt. 1e-6) then
+        
+        !line equations of bend radius  
+        !  y = tan_Rent*x + b_Rent
+        tanbend_perp = -1/tanbend
+        
+        print*,"tan perp to bend center", tanbend_perp
+        
+        alph_perp = atan(tanbend_perp)
+        !tangent of radius to ent
+        tan_Rent = tan(alph_perp + phi/2)
+        !a(1) = tan_Rent*a(3) + b
+        b_Rent = P%mag%p%f%a(1) -P%mag%p%f%a(3)*tan_Rent
+
+        tan_Rexi = tan(alph_perp - phi/2)
+        !a(1) = tan_Rent*a(3) + b
+        b_Rexi = P%mag%p%f%b(1) -P%mag%p%f%b(3)*tan_Rexi
+        
+        !the crossing of the 2 lines defines orgin
+        ! x = tan_Rent*s + b_Rent
+        ! x = tan_Rexi*s + b_Rexi
+        ! 0 = (tan_Rent - tan_Rexi)*s + (b_Rent - b_Rexi)
+        ! s = (-b_Rent + b_Rexi)/(tan_Rent - tan_Rexi)
+        
+        z0 = (b_Rexi - b_Rent)/(tan_Rent - tan_Rexi)
+        y0 = P%mag%p%f%a(2)
+        x0 = tan_Rent*z0 + b_Rent
+        
+        print*," RAW OR  ", x0, y0, z0
+        print*," ENT ", a
+        print*," EXI ", b
+        
+        
+      endif
+
+       print*, "r2 = ", r*r
+       print*, "oR ent = ",(x0-a(1))*(x0-a(1)) + (z0-a(3))*(z0-a(3))
+       print*, "oR exi = ",(x0-b(1))*(x0-b(1)) + (z0-b(3))*(z0-b(3))
+       print*, "oR o   = ",(x0-o(1))*(x0-o(1)) + (z0-o(3))*(z0-o(3))
+       
+       !bend is drawn in x-y, and then rotated, so offset needs to be translated 
+      ! x0 = P%mag%p%f%a(1) + x0
+      ! y0 = P%mag%p%f%a(2) + y0
+      ! z0 = P%mag%p%f%a(3) + z0
+       
+       print*," OR  ", x0, y0, z0
+       
+          
+       
+ 
+      !print*, "R is ", r," phi is ", phi," z is ", z," y ",y
 
       write(fname,'(a5,i5.5)') 'SBEND',i
       write(mf,*) 's = new TTUBS("',fname, '","',  fname,'","void",',&
-           &  r-0.25_dp,',',r+0.25_dp,',0.25,0,',phi,');'
+           &  r-0.5_dp,',',r+0.5_dp,',0.5,0,',phi*180/pi,');'
       write(mf,*) 's->SetLineColor(',color,');'
 
       write(mtxname,'(a3,i5.5)') 'mtx',i
       !      print*, fname, " ",mtxname
-
-      call setmatrix(P%mag%p%f%mid,mtxname,mf)
-
+      
+      m(1,:) = ent(1,:)
+      m(2,:) = ent(3,:)
+      m(3,:) = ent(2,:)
+      
+      
+      call setmatrix(m,mtxname,mf)
+      
+     ! z0 = z0 - 0.25 ! vertical alignment
       write(nodname,'(a4,i5.5)') 'NODE',i
       write(mf,*) 'n = new TNode("',nodname,'","',  nodname,'",s,', &
-           & x,',',y, ',',z,',m);'
+           & x0,',',y0, ',',z0,',m);'
 
     end subroutine  drawsbend
 
@@ -635,13 +742,13 @@ contains
     write(6,*) P%mag%p%f%ent(3,:)
     write(6,*) " Middle origin O(3) "
     write(6,*) P%mag%p%f%o
-    write(6,*) " Middle frame (i,j,k) basis in the ent(3,3) array "
+    write(6,*) " Middle frame (i,j,k) basis in the mid(3,3) array "
     write(6,*) P%mag%p%f%mid(1,:)
     write(6,*) P%mag%p%f%mid(2,:)
     write(6,*) P%mag%p%f%mid(3,:)
     write(6,*) " Exit origin B(3) "
     write(6,*) P%mag%p%f%B
-    write(6,*) " Exit frame (i,j,k) basis in the ent(3,3) array "
+    write(6,*) " Exit frame (i,j,k) basis in the exi(3,3) array "
     write(6,*) P%mag%p%f%exi(1,:)
     write(6,*) P%mag%p%f%exi(2,:)
     write(6,*) P%mag%p%f%exi(3,:)
@@ -701,41 +808,39 @@ contains
 
   end function rotm
   !____________________________________________________________________________________________
-! nowhere used
-!   subroutine rotmatrixfromeuler(phi, theta, psi, ent)
-!     implicit none
-!     real(dp)             :: phi, theta, psi
-!     real(dp)             :: ent(3,3)
-!     real(dp)             :: sinphi, cosphi, sintheta, costheta, sinpsi, cospsi
-! 
-!     psi = zero ! we do not support rotations around the magnet axis yet
-! 
-! 
-!     sinphi = sin(phi)
-!     cosphi = cos(phi)
-!     sintheta = sin(theta)
-!     costheta = cos(theta)
-!     sinpsi = sin(psi)
-!     cospsi = cos(psi)
-! 
-!     ent(1,1) = cosphi*cospsi    ! cosphi
-!     ent(1,2) = cospsi*sinpsi    ! 0
-!     ent(1,3) = sinphi           ! sinphi
-! 
-!     ent(2,1) =  sintheta*sinphi*cospsi  - sinpsi*costheta   !-?         ! sintheta*sinphi
-!     ent(2,2) =  costheta*cospsi         + sinpsi*sintheta*sinphi ! -?   ! costheta 
-!     ent(2,3) = -sintheta*cosphi                                         !-sintheta*cosphi
-! 
-!     ent(3,1) = -costheta*sinphi*cospsi  + sinpsi*costheta    !-?        !-costheta*sinphi  
-!     ent(3,2) =  sintheta*cospsi         + sinpsi*costheta*sinphi  !-?   ! sintheta
-!     ent(3,3) =  costheta*cosphi                                         ! costheta*cosphi
-! 
-!     write(6,*) " Rotation MATRIX  "
-!     write(6,'(3f8.4)') ent(1,:)
-!     write(6,'(3f8.4)') ent(2,:)
-!     write(6,'(3f8.4)') ent(3,:)
-!   end subroutine rotmatrixfromeuler
-! 
+
+  subroutine rotmatrixfromeuler(phi, theta, eta, ent)
+    implicit none
+    real(dp)             :: phi, theta, eta
+    real(dp)             :: ent(3,3)
+    real(dp)             :: sinphi, cosphi, sintheta, costheta
+
+    eta = zero ! we do not support rotations around the magnet axis yet
+
+
+    sinphi = sin(phi)
+    cosphi = cos(phi)
+    sintheta = sin(theta)
+    costheta = cos(theta)
+
+    ent(1,1) = cosphi
+    ent(1,2) = 0
+    ent(1,3) = sinphi
+
+    ent(2,1) =  sintheta*sinphi
+    ent(2,2) =  costheta
+    ent(2,3) = -sintheta*cosphi
+
+    ent(3,1) = -costheta*sinphi
+    ent(3,2) =  sintheta
+    ent(3,3) =  costheta*cosphi
+
+    write(6,*) " Rotation MATRIX  "
+    write(6,'(3f8.4)') ent(1,:)
+    write(6,'(3f8.4)') ent(2,:)
+    write(6,'(3f8.4)') ent(3,:)
+  end subroutine rotmatrixfromeuler
+
 
 end module madx_ptc_eplacement_module
 !____________________________________________________________________________________________
@@ -770,3 +875,4 @@ subroutine w_ptc_getelname(n)
   endif
 
 end subroutine w_ptc_getelname
+

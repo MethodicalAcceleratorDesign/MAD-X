@@ -570,6 +570,7 @@ const char *const_command_def =
 "range = [s, none] , "/* */
 "x        = [r, 0], y       = [r, 0], z       = [r, 0], " /*position of the front face*/
 "phi      = [r, 0], " /**/
+"psi      = [r, 0], " /**/
 "theta   = [r, 0], "
 "surveyall    = [l, true, true] , "
 "onlyposition    = [l, false, true] , "/* if true changes only position and, leaves orinetation untouched */
