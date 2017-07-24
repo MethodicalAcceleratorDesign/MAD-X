@@ -50,6 +50,7 @@ grow_command_list_list(struct command_list_list* p)
   const char *rout_name = "grow_command_list_list";
 //  struct command_list** c_loc = p->command_lists;
   p->max *= 2;
+  if (p->max == 0) p->max++;
   p->command_lists = myrecalloc(rout_name, p->command_lists, p->curr * sizeof *p->command_lists, p->max * sizeof *p->command_lists);
 //  p->command_lists = mycalloc(rout_name, new, sizeof *p->command_lists);
 //  for (int j = 0; j < p->curr; j++) p->command_lists[j] = c_loc[j];

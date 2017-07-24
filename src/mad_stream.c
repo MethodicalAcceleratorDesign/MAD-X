@@ -34,6 +34,7 @@ grow_in_buff_list(struct in_buff_list* p)
   struct in_buffer** e_loc = p->buffers;
   FILE** f_loc = p->input_files;
   int j, new = 2*p->max;
+  if (new == 0) new++;
   p->max = new;
   p->buffers = mycalloc(rout_name, new, sizeof *p->buffers);
   for (j = 0; j < p->curr; j++) p->buffers[j] = e_loc[j];

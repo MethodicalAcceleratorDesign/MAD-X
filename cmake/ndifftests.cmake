@@ -166,3 +166,5 @@ set_tests_properties(test-beam PROPERTIES WILL_FAIL 1)
 ndiff_test(test-match-9 0)
 ndiff_test(test-setknob 0)
 ndiff_test(test-fillknob 0)
+
+ndiff_test(test-interpolate 0)

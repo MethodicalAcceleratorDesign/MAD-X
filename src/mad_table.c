@@ -164,6 +164,7 @@ grow_table_list(struct table_list* tl)
   const char *rout_name = "grow_table_list";
   struct table** t_loc = tl->tables;
   int new = 2*tl->max;
+  if (new == 0) new++;
 
   grow_name_list(tl->names);
   tl->max = new;
@@ -178,6 +179,7 @@ grow_table_list_list(struct table_list_list* tll)
   const char *rout_name = "grow_table_list_list";
   struct table_list** t_loc = tll->table_lists;
   int new = 2*tll->max;
+  if (new == 0) new++;
 
   tll->max = new;
   tll->table_lists = mycalloc(rout_name, new, sizeof *tll->table_lists);
@@ -1051,6 +1053,7 @@ grow_table(struct table* t) /* doubles number of rows */
   double* d_loc;
   struct node** p_loc = t->p_nodes;
   struct char_p_array** pa_loc = t->l_head;
+  if (new == 0) new++;
 
   t->max = new;
   t->p_nodes = mycalloc(rout_name, new, sizeof *t->p_nodes);
