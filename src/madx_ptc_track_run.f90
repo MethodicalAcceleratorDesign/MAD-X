@@ -117,7 +117,7 @@ CONTAINS
          print, find_orbit,FIND_ORBIT_x, track,track_probe_x,UPDATE_STATES, my_state, &    !
          PRODUCE_APERTURE_FLAG, ANALYSE_APERTURE_FLAG, &                                   !
          kill, daprint, alloc, Get_one, &                                                  !
-         assignment(=), operator(+), operator(*), operator(.sub.), &                       !
+         assignment(=), operator(+),operator(-), operator(*), operator(.sub.), &                       !
          ! Coord_MAD_to_PTC, Coord_PTC_to_MAD,  & => at the end of this module             !
          write_closed_orbit,Convert_dp_to_dt,mytime                                        !
     !======================================================================================!
@@ -753,13 +753,18 @@ CONTAINS
          print*, 'my_state printing:'
       end if debug_print_1
       
-      call my_state(icase_ptc,deltap,deltap0)
+      call my_state(icase_ptc,deltap,deltap0, silent=my_true)
       
       nvariables = icase_ptc
       !icase 56: 
       if (nvariables .gt.6 ) nvariables = 6
       
-      IF (Radiation_PTC) DEFAULT=DEFAULT+RADIATION0
+      IF (Radiation_PTC) then 
+        DEFAULT = DEFAULT + RADIATION0
+      else  
+        DEFAULT = DEFAULT - RADIATION0 ! switch off RADIATION even if true in ptc_setswitch
+      endif
+      
       
       if(getdebug() > 1) then
         Print *, ' Radiation_PTC    =     ', Radiation_PTC
@@ -777,12 +782,8 @@ CONTAINS
       CALL UPDATE_STATES
       MYSTATE=DEFAULT
       
-      if (getdebug()>1) then
-        print *, "after CALL UPDATE_STATES"
-        print *; print*, '----------------------------------'
-        print *, "Printing by <call print(default,6)>:"
+      if (getdebug()>0) then
         call print(MYSTATE,6)
-        print *, "after call print(MYSTATE,6)"
       endif
       
       if ( MYSTATE%TOTALPATH .gt. 0 ) then 
@@ -790,6 +791,7 @@ CONTAINS
         print *, "MAXAPER check of T variable not to be done because TOTALPATH is used"
         print *, "********************************************************************"
       endif
+      
       
       
     END SUBROUTINE Call_my_state_and_update_states

@@ -2346,18 +2346,28 @@ CONTAINS
   end subroutine set_PARAMETERS
   !______________________________________________________________________
 
-  subroutine my_state(icase,deltap,deltap0)
+  subroutine my_state(icase,deltap,deltap0, silent)
     implicit none
     integer icase,i
     real(dp) deltap0,deltap
-
+    logical, optional :: silent
+    logical :: verbose
+    
+    ! force no printout, ugly work around of ugly ptc_track
+    if (present(silent)) then
+      verbose = .not. silent
+    else
+      verbose = .true.
+    endif
+     
+    
     default = getintstate()
 
-    if (getdebug()>1) then
+    if (getdebug()>1 .and. verbose) then
        print*, "icase=",icase," deltap=",deltap," deltap0=",deltap0
     endif
 
-    if (getdebug()>3) then
+    if (getdebug()>3 .and. verbose) then
        print*, "Input State"
        call print(default,6)
     endif
@@ -2365,20 +2375,20 @@ CONTAINS
     deltap = zero
     select case(icase)
     CASE(4)
-       if (getdebug()>1) then
+       if (getdebug()>1 .and. verbose) then
            print*, "my_state: Enforcing ONLY_4D+NOCAVITY and NO DELTA"
        endif
        default = default - delta0 + only_4d0 + NOCAVITY0
        i=4
     CASE(5)
-       if (getdebug()>1) then
+       if (getdebug()>1 .and. verbose) then
            print*, "my_state: Enforcing DELTA"
        endif
        default = default + delta0
        deltap = deltap0
        i=5
     CASE(56)
-       if (getdebug()>1) then
+       if (getdebug()>1 .and. verbose) then
            print*, "my_state: Enforcing coasting beam"
        endif
        default = default - delta0 - only_4d0 + NOCAVITY0
@@ -2392,7 +2402,7 @@ CONTAINS
     END SELECT
 
     if (i==6) then
-       if (getdebug()>2) then
+       if (getdebug()>2 .and. verbose) then
          print*,"icav=",icav," my_ring%closed=",my_ring%closed," getenforce6D()=",getenforce6D()
        endif
 
@@ -2415,7 +2425,7 @@ CONTAINS
     call setintstate(default)
     CALL UPDATE_STATES
 
-    if (getdebug()>0) then
+    if (getdebug()>0 .and. verbose) then
       !print*, "Resulting state"
       call print(default,6)
     endif
