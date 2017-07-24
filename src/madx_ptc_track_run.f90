@@ -108,7 +108,7 @@ CONTAINS
     !                                                                                        !
     USE  madx_ptc_module, ONLY: &  ! "LAYOUT type (ring) => double linked list,              !
          FIBRE, &                  !  whose nodes (elements=magnets) of type FIBRE"          !
-         NORMALFORM, & ! type for normalform                                                 !
+         C_NORMAL_FORM, & ! type for normalform                                                 !
          REAL_8, &     ! type for map                                                        !
          damap, &      ! type for diff algebra                                               !
          RADIATION ! STOCH_IN_REC, & ! type for radiation with quadrupoles in PTC            !
@@ -195,7 +195,7 @@ CONTAINS
 
     TYPE(fibre), POINTER :: current ! F90 pointer to the CURRENT beamline (fibre) element
 
-    TYPE(normalform) :: Normal_Form_N  !  n =>  Normal_Form_N - local name
+    TYPE(c_normal_form) :: Normal_Form_N  !  n =>  Normal_Form_N - local name
     TYPE(real_8)     :: Map_Y(6)       !  y => Map_Y - local name
     TYPE (damap)     :: A_t_map        ! x_stdt=A_t_map*x_norm
     TYPE (damap)     :: A_t_map_rev    ! x_norm=A_t_map_rev*x_norm
@@ -3118,8 +3118,9 @@ CONTAINS
        (ptc_track_debug, Normal_Order_n0, x_coord_co, &
        Map_Y, Normal_Form_N, A_t_map, A_t_map_rev)
 
-    USE  madx_ptc_module, ONLY: dp, real_8, normalform, damap,   &
+    USE  madx_ptc_module, ONLY: dp, real_8, c_normal_form, damap, c_damap,  &
          my_ring, default, BERZ, daprint, &
+         c_normal, i_piotr, c_normal_auto, c_verbose, &
          assignment(=), operator(**), operator(.sub.), &
          track, track_probe_x, init, alloc, kill, &
          PRODUCE_APERTURE_FLAG,  ANALYSE_APERTURE_FLAG
@@ -3127,12 +3128,13 @@ CONTAINS
     implicit none
 
     LOGICAL(lp),           INTENT(IN) :: ptc_track_debug
-    INTEGER,           INTENT(IN) :: Normal_Order_n0   ! =1 for Linear
-    REAL (dp),         INTENT(IN)  ::  x_coord_co(1:6) ! => x0(1:6) in ptc_track
-    TYPE (real_8),     INTENT(OUT)  :: Map_Y(6)        !  y => Map_Y - local name
-    TYPE (normalform), INTENT(OUT) :: Normal_Form_N    !  n =>  Normal_Form_N - local name
-    TYPE (damap),      INTENT(OUT) :: A_t_map          ! x_stdt=A_t_map*x_norm
-    TYPE (damap),      INTENT(OUT) :: A_t_map_rev      ! x_norm=A_t_map_rev*x_norm
+    INTEGER,               INTENT(IN) :: Normal_Order_n0   ! =1 for Linear
+    REAL (dp),             INTENT(IN)  ::  x_coord_co(1:6) ! => x0(1:6) in ptc_track
+    TYPE (real_8),         INTENT(OUT)  :: Map_Y(6)        !  y => Map_Y - local name
+    type(c_damap)                       :: c_Map
+    TYPE (c_normal_form),  INTENT(OUT) :: Normal_Form_N    !  n =>  Normal_Form_N - local name
+    TYPE (damap),          INTENT(OUT) :: A_t_map          ! x_stdt=A_t_map*x_norm
+    TYPE (damap),          INTENT(OUT) :: A_t_map_rev      ! x_norm=A_t_map_rev*x_norm
     ! A_t_map_rev=A_t_map^(-1)
 
     integer :: mynd2,nda, flag_index,why(9) ! icase,
@@ -3185,10 +3187,17 @@ CONTAINS
     endif
     !    c_%watch_user=.false.
 
-    call alloc(Normal_Form_N) ! call alloc(n)
-    ! Normal_Form_N=0 !Error: Can't convert INTEGER(4) to TYPE(normalform)
+    call alloc(c_Map)
+    c_Map = Map_Y
 
-    Normal_Form_N=Map_Y ! n=y
+    call alloc(Normal_Form_N) ! call alloc(n)
+
+    i_piotr(:) = 0
+    i_piotr(1)=1; i_piotr(2)=3; i_piotr(3)=5;
+    c_verbose = .false.
+    c_normal_auto=.true.;
+    call  c_normal(c_Map,Normal_Form_N)       ! (4)
+
     
     if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
 
@@ -3213,7 +3222,7 @@ CONTAINS
        call kanalnummer(mf3)
        OPEN (UNIT=mf3,FILE='normal_form_a.txt', STATUS='UNKNOWN')
        write(mf3,'(/a/)') 'Map_Y: '; call daprint(Map_Y,mf3);
-       write(mf3,'(/a/)') 'Linear Normal_Form_N%A: '; call daprint(Normal_Form_N%A,mf3);     !
+       write(mf3,'(/a/)') 'Linear Normal_Form_N%A1: '; call daprint(Normal_Form_N%A1,mf3);     !
        write(mf3,'(/a/)') 'Linear Normal_Form_N%A_t: '; call daprint(Normal_Form_N%A_t,mf3); !
        write(mf3,'(/a/)') 'Linear A_t_map: '; call daprint(A_t_map,mf3);                     !
        write(mf3,'(/a/)') 'Linear A_t_map_rev: '; call daprint(A_t_map_rev,mf3);             !
