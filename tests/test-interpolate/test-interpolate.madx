@@ -79,7 +79,7 @@ twiss, sequence="hht3", file="twiss-2-5slice_quad-at.tfs", betx=ibetx, bety=ibet
 
 ! curve with uniform sampling/step
 select, flag=interpolate, clear;
-select, flag=interpolate, step=0.2;
+select, flag=interpolate, step=0.199999995; ! below 0.2 to avoid variation in slice count between platforms
 twiss, sequence="hht3", file="twiss-3-step_uniform.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
 
 
@@ -119,7 +119,7 @@ twiss, sequence="hht3", file="twiss-5-clear.tfs", betx=ibetx, bety=ibety, alfx=i
 ! multiple selections (later definition overrides earlier definition)
 select, flag=interpolate, clear;
 select, flag=interpolate, at={0.5};
-select, flag=interpolate, step=0.1, class=quadrupole;
+select, flag=interpolate, step=0.099999995, class=quadrupole;
 select, flag=interpolate, slice=1, range=h3qd11/h3qd22;
 select, flag=interpolate, slice=0, range=h3qd11/h3qd22, class=drift;
 deselect, flag=interpolate, range=b3dk1;

@@ -3,7 +3,7 @@
   +     MAD-X 5.03.06  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.05.29               +
-  + Execution date: 2017.07.22 11:12:44      +
+  + Execution date: 2017.07.24 11:13:13      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -729,7 +729,7 @@ final orbit vector:     5.369940E-15  7.410464E-16 -1.211907E-08  1.778903E-08 -
 
 select, flag=interpolate, clear;
 
-select, flag=interpolate, step=0.2;
+select, flag=interpolate, step=0.199999995; ! below 0.2 to avoid variation in slice count between platforms
 
 twiss, sequence="hht3", file="twiss-3-step_uniform.tfs", betx=ibetx, bety=ibety, alfx=ialfx, alfy=ialfy;
 
@@ -959,7 +959,7 @@ select, flag=interpolate, clear;
 
 select, flag=interpolate, at={0.5};
 
-select, flag=interpolate, step=0.1, class=quadrupole;
+select, flag=interpolate, step=0.099999995, class=quadrupole;
 
 select, flag=interpolate, slice=1, range=h3qd11/h3qd22;
 
