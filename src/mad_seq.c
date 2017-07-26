@@ -1289,19 +1289,25 @@ seq_replace(struct in_cmd* cmd)
 }
 
 static struct element*
-get_drift(double length)
+get_drift(double length, int count)
   /* makes a drift space with the required length */
 {
   struct element *p, *bt;
   struct command* clone;
   char key[NAME_L];
 
-  sprintf(key, "drift_%d", drift_list->curr);
+  sprintf(key, "drift_%d", count);
   bt = find_element("drift", base_type_list);
   clone = clone_command(bt->def);
   store_comm_par_value("l", length, clone);
-  p = make_element(key, "drift", clone, 0);
-  add_to_el_list(&p, 1, drift_list, 0);
+  // NOTE: can't add implicit drifts to `element_list`, since different
+  // sequences can have the same element name for a drift with different
+  // length. This means that implicit drifts can currently not be used in any
+  // command based on `element_list`!
+  p = clone_element(bt);
+  p->def = clone;
+  p->length = length;
+  strcpy(p->name, key);
   return p;
 }
 
@@ -1310,6 +1316,7 @@ add_drifts(struct node* c_node, struct node* end)
 {
   const double tol = 1e-6;
   int cnt;
+  int implicit_drift_count = 0;
 
   char buf[256];
 
@@ -1338,7 +1345,7 @@ add_drifts(struct node* c_node, struct node* end)
     }
     else if (drift_len > tol) {
       // create or share 'long-enough' implicit drift
-      struct element *drift = get_drift(drift_len);
+      struct element *drift = get_drift(drift_len, implicit_drift_count++);
       struct node *drift_node = new_elem_node(drift, 0);
       link_in_front(drift_node, c_node->next);
       drift_node->position = drift_beg + drift_len / 2;

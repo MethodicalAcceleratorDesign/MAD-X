@@ -64,7 +64,6 @@ struct double_array* vary_dvect;     /* for matching */
 struct double_array* fun_vect;       /* for matching */
 struct double_array* match_work[MATCH_WORK];/* work space for matching */
 
-struct el_list* drift_list;
 struct el_list* element_list;
 struct el_list* base_type_list;
 struct el_list* selected_elements;

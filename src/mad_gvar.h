@@ -65,8 +65,7 @@ extern struct double_array* vary_dvect;     /* for matching */
 extern struct double_array* fun_vect;       /* for matching */
 extern struct double_array* match_work[MATCH_WORK];/* work space for matching */
 
-extern struct el_list* drift_list;
-extern struct el_list* element_list;
+extern struct el_list* element_list;        /* Explicitly defined elems. No implicit drifts! */
 extern struct el_list* base_type_list;
 extern struct el_list* selected_elements;
 

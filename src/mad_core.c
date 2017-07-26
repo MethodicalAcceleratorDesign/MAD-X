@@ -37,7 +37,6 @@ mad_init_c(void)
 //  char_buff = new_char_array_list(100); /* list of character arrays, dynamic */
 //  char_buff->ca[char_buff->curr++] = new_char_array(CHAR_BUFF_SIZE);
   aux_buff = new_char_array(AUX_LG);  /* dynamic temporary buffer */
-  drift_list = new_el_list(1000); /* dynamic list for internal drifts */
   variable_list = new_var_list(2000); /* dynamic list of variables */
   comm_constraints = new_constraint_list(10); /* dynamic constraint list */
   beam_list = new_command_list("beam_list", 10); /* dynamic beam list */
