@@ -638,7 +638,7 @@ advance_to_pos(char* table, int* t_pos)
   {
     ret = 1;
     t = table_register->tables[pos];
-    if (t->origin == 1)  return 0; /* table is read, has no node pointers */
+    if (t->origin == 1)  return 1; /* table is read, has no node pointers */
     while (current_node)
     {
       if (current_node == t->p_nodes[*t_pos-1]) break;

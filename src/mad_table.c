@@ -164,6 +164,7 @@ grow_table_list(struct table_list* tl)
   const char *rout_name = "grow_table_list";
   struct table** t_loc = tl->tables;
   int new = 2*tl->max;
+  if (new == 0) new++;
 
   grow_name_list(tl->names);
   tl->max = new;
@@ -178,6 +179,7 @@ grow_table_list_list(struct table_list_list* tll)
   const char *rout_name = "grow_table_list_list";
   struct table_list** t_loc = tll->table_lists;
   int new = 2*tll->max;
+  if (new == 0) new++;
 
   tll->max = new;
   tll->table_lists = mycalloc(rout_name, new, sizeof *tll->table_lists);
@@ -205,7 +207,6 @@ write_table(struct table* t, const char* filename)
   struct int_array* col = t->col_out;
   struct int_array* row = t->row_out;
   int i, j, k, tmp, n;
-  int isHeaderDouble=0;
   time_t now;
   struct tm* tm;
 #if 0
@@ -226,49 +227,44 @@ write_table(struct table* t, const char* filename)
   {
     warning("cannot open output file:", filename); return;
   }
-  if (t->header != NULL && t->header->curr >= 1 && strncmp(t->header->p[0], "@ NAME ", 7) == 0){
-		  isHeaderDouble =1;
-
   if (t != NULL)
   {
-	  if (t->header != NULL && t->header->curr >= 1 && strncmp(t->header->p[0], "@ NAME ", 7) == 0){
-		  isHeaderDouble =1;
-	  }
 
-	//for (j = 0; j < *len (t->header->p); j++){
-	//printf(t->header->p[j]);
-	//  }
-	if(isHeaderDouble==0)
-	{
-		strcpy(l_name, t->name);
-		n = strlen(t->name);
-		fprintf(out_file,
-				"@ NAME             %%%02ds \"%s\"\n", n,
-				stoupper(l_name));
-
-		strcpy(l_name, t->type);
-		n = strlen(t->type);
-		fprintf(out_file,
-				"@ TYPE             %%%02ds \"%s\"\n", n,
-				stoupper(l_name));
-	}
-
+    if (t->header != NULL && t->header->curr >= 1 && strncmp(t->header->p[0], "@ NAME ", 7) != 0)
+    {
+    strcpy(l_name, t->name);
+    n = strlen(t->name);
+    fprintf(out_file,
+            "@ NAME             %%%02ds \"%s\"\n", n,
+            stoupper(l_name));
+    }
+    strcpy(l_name, t->type);
+    n = strlen(t->type);
+    if (t->header != NULL && t->header->curr >= 2 && strncmp(t->header->p[1], "@ TYPE ", 7) != 0)
+    {
+    fprintf(out_file,
+            "@ TYPE             %%%02ds \"%s\"\n", n,
+            stoupper(l_name));
+    }
     if (t->header != NULL)
     {
-    	//43 or something is good
-      for (j = 0; j < t->header->curr; j++){
-        fprintf(out_file, "%s\n", t->header->p[j]);
-      }
+      for (j = 0; j < t->header->curr; j++)
+    	if(strncmp(t->header->p[j], "@ TITLE ", 8) != 0
+    	&& strncmp(t->header->p[j], "@ ORIGIN ", 8) != 0
+		&& strncmp(t->header->p[j], "@ DATE ", 6) != 0
+		&& strncmp(t->header->p[j], "@ TIME ", 6) != 0
+		&& strncmp(t->header->p[j], "* NAME ", 6) != 0)
+    	{
+    		fprintf(out_file, "%s\n", t->header->p[j]);
+    	}
 
     }
-
     if (title != NULL)
     {
-
       n = strlen(title);
       fprintf(out_file,
               "@ TITLE            %%%02ds \"%s\"\n", n, title);
-
+    }
 
     n = strlen(version_name)+strlen(version_ostype)+strlen(version_arch)+2;
     fprintf(out_file,
@@ -283,7 +279,7 @@ write_table(struct table* t, const char* filename)
             "@ TIME             %%08s \"%02d.%02d.%02d\"\n",
             tm->tm_hour, tm->tm_min, tm->tm_sec);
     fprintf(out_file, "* ");
-    }
+
     for (i = 0; i < col->curr; i++)
     {
       strcpy(l_name, t->columns->names[col->i[i]]);
@@ -369,10 +365,8 @@ result_from_normal(char* name_var, int* order, double* val)
   char string[AUX_LG],n_var[AUX_LG];
   double d_val=zero;
   struct table* t;
-
   pos = name_list_pos("normal_results", table_register->names);
   t = table_register->tables[pos];
-
   *val = zero;
   found = 0;
   mycpy(n_var, name_var);
@@ -414,7 +408,6 @@ read_his_table(struct in_cmd* cmd)
   int pos = name_list_pos("file", nl);
   int i, k, error = 0;
   char *cc, *filename, *type = NULL, *tmp, *name;
-
   if(nl->inform[pos] && (filename = pl->parameters[pos]->string) != NULL)
   {
     if ((tab_file = fopen(filename, "r")) == NULL)
@@ -1070,6 +1063,7 @@ grow_table(struct table* t) /* doubles number of rows */
   double* d_loc;
   struct node** p_loc = t->p_nodes;
   struct char_p_array** pa_loc = t->l_head;
+  if (new == 0) new++;
 
   t->max = new;
   t->p_nodes = mycalloc(rout_name, new, sizeof *t->p_nodes);
@@ -1451,8 +1445,7 @@ read_table(struct in_cmd* cmd)
       int len = strlen(aux_buff->c)+1;
       t->header->p[t->header->curr] = mymalloc_atomic("read_table", len * sizeof *t->header->p[0]);
       strncpy(t->header->p[t->header->curr], aux_buff->c,len * sizeof *(aux_buff->c)-1);
-
-	  t->header->curr++;
+      t->header->curr++;
     }
   }
   fclose(tab_file);
@@ -1798,7 +1791,6 @@ str_from_table(char* table, char* name, int* row, char* val)
 {
   int pos;
   struct table* t;
-
   strcpy(val,"No-Name");
   mycpy(c_dum->c, table);
   if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
@@ -1813,7 +1805,6 @@ str_from_table(char* table, char* name, int* row, char* val)
   val[NAME_L-1] = '\0';
   return 0;
 }
-
 int
 str_from_tablet(struct table *t, char* name, int* row, char* val)
      /* WH 22.06.2004, corrected from: char_from_table */
@@ -1826,7 +1817,6 @@ str_from_tablet(struct table *t, char* name, int* row, char* val)
      */
 {
   int pos;
-
   strcpy(val,"No-Name");
   mycpy(c_dum->c, name);
   if ((pos = name_list_pos(c_dum->c, t->columns)) < 0) return -2;
@@ -1837,7 +1827,6 @@ str_from_tablet(struct table *t, char* name, int* row, char* val)
   val[NAME_L-1] = '\0';
   return 0;
 }
-
 // dangerous function that uses table->node_nm sometimes corrupted or unmaintained
 int
 nodename_from_table_row(const char* table, const int* row, char* string)
@@ -1852,9 +1841,7 @@ nodename_from_table_row(const char* table, const int* row, char* string)
   char buf[NAME_L];
   struct table* tbl;
   int pos;
-
   *string = '\0';
-
   mycpy(buf, table);
   if ((pos = name_list_pos(buf, table_register->names)) < 0 ||
      !(tbl = table_register->tables[pos])) {
@@ -1865,11 +1852,9 @@ nodename_from_table_row(const char* table, const int* row, char* string)
     warning("nodename_from_table_row: row out of range", "");
     return -3;
   }
-
   strcpy(string, tbl->node_nm->p[*row-1]);
   return 0;
 }
-
 #endif
 
 int
@@ -2381,49 +2366,38 @@ static int
 get_table_row(const struct table* tbl, const char* name)
 {
   int col, row = tbl->curr;
-
   for (col = 0; col < tbl->num_cols; col++)
     if(tbl->columns->inform[col] == 3) break;
-
   if (col < tbl->num_cols)
     for (row = 0; row < tbl->curr; row++)
       if (!strcmp(name, tbl->s_cols[col][row])) break;
-
   return row == tbl->curr ? -1 : row;
 }
-
 double
 get_table_value(const char* tbl_s, const char *row_s, const char *col_s)
 {
   int pos, row, col;
-
   if ((pos = name_list_pos(tbl_s, table_register->names)) > -1) {
     const struct table *tbl = table_register->tables[pos];
     if ((col = name_list_pos(col_s, tbl->columns)) > -1) {
       if ((row = get_table_row(tbl, row_s)) > -1)
         return tbl->d_cols[col][row];
-
       else warning("get_table_value: name of row not found:"   , row_s);
     } else warning("get_table_value: name of column not found:", col_s);
   }   else warning("get_table_value: name of table not found:" , tbl_s);
-
   return 0;
 }
-
 void
 set_table_value(const char* tbl_s, const char *row_s, const char *col_s, double *val)
 {
   int pos, row, col;
-
   if ((pos = name_list_pos(tbl_s, table_register->names)) > -1) {
     const struct table *tbl = table_register->tables[pos];
     if ((col = name_list_pos(col_s, tbl->columns)) > -1) {
       if ((row = get_table_row(tbl, row_s)) > -1)
         tbl->d_cols[col][row] = *val;
-
       else warning("get_table_value: name of row not found:"   , row_s);
     } else warning("get_table_value: name of column not found:", col_s);
   }   else warning("get_table_value: name of table not found:" , tbl_s);
 }
-
 #endif
