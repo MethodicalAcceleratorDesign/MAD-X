@@ -964,7 +964,7 @@ seq_install(struct in_cmd* cmd)
 	  for (k = 0; k < seqedit_select->curr; k++) {
 	    myrepl(":", "[", c_node->name, name);
 	    strcat(name, "]");
-	    if (strchr(name, '$') == NULL && pass_select(c_node->name, seqedit_select->commands[k])) break;
+	    if (strchr(name, '$') == NULL && pass_select_el(c_node->p_elem, seqedit_select->commands[k])) break;
 	  }
 	  if (k < seqedit_select->curr) {
 	    from = get_node_pos(c_node, edit_sequ);
@@ -1040,7 +1040,7 @@ seq_move(struct in_cmd* cmd)
               {
                 if (node->p_elem != NULL) name = node->p_elem->name;
                 if (name != NULL && strchr(name, '$') == NULL &&
-                    pass_select(name,
+                    pass_select_el(node->p_elem,
                                 seqedit_select->commands[k])) break;
               }
               if (k < seqedit_select->curr)
@@ -1169,7 +1169,7 @@ seq_remove(struct in_cmd* cmd)
             {
               if (c_node->p_elem != NULL) name = c_node->p_elem->name;
               if (name != NULL && strchr(name, '$') == NULL &&
-                  pass_select(name,
+                  pass_select_el(c_node->p_elem,
                               seqedit_select->commands[k])) break;
             }
             if (k < seqedit_select->curr)
@@ -1245,7 +1245,7 @@ seq_replace(struct in_cmd* cmd)
 	for (k = 0; k < seqedit_select->curr; k++) {
 	  if (c_node->p_elem != NULL) name = c_node->p_elem->name;
 	  if (name != NULL && strchr(name, '$') == NULL &&
-	      pass_select(name, seqedit_select->commands[k]) ) break;
+	      pass_select_el(c_node->p_elem, seqedit_select->commands[k]) ) break;
 	}
 	if (k < seqedit_select->curr) {
 	  rep_els[rep_cnt] = el;
@@ -2150,7 +2150,7 @@ set_enable(const char* type, struct in_cmd* cmd)
   while (c_node)
   {
     if (strstr(c_node->base_name, type) &&
-        pass_select(c_node->p_elem->name, cmd->clone) != 0)
+        pass_select_el(c_node->p_elem, cmd->clone) != 0)
     {
       c_node->enable = status; count++;
     }

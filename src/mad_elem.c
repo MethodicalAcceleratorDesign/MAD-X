@@ -322,7 +322,7 @@ write_elems(struct el_list* ell, struct command_list* cl, FILE* file, int noexpr
   int i;
   for (i = 0; i < ell->curr; i++)
   {
-    if (pass_select_list(ell->elem[i]->name, cl))
+    if (pass_select_list_el(ell->elem[i], cl))
       export_element(ell->elem[i], ell, file, noexpr);
   }
 }
@@ -333,7 +333,7 @@ write_elems_8(struct el_list* ell, struct command_list* cl, FILE* file)
   int i;
   for (i = 0; i < ell->curr; i++)
   {
-    if (pass_select_list(ell->elem[i]->name, cl))
+    if (pass_select_list_el(ell->elem[i], cl))
       export_elem_8(ell->elem[i], ell, file);
   }
 }

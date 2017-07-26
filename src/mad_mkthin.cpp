@@ -1328,7 +1328,7 @@ static int set_selected_elements() //  result in global  element_list     used i
           element* el_j = c_node->p_elem;
           const int el_j_slice_pos = name_list_pos("slice",el_j->def->par_names); // position of slice parameter in element list
           const int el_j_thick_pos = name_list_pos("thick",el_j->def->par_names); // position of thick flag      in element list
-          if (pass_select(el_j->name, slice_select->commands[i]) != 0) // selection on class and pattern done in pass_select. element el_j selected
+          if (pass_select_el(el_j, slice_select->commands[i]) != 0) // selection on class and pattern done in pass_select. element el_j selected
           { // the element el_j passes the selection
             if(el_j_slice_pos > -1) el_j->def->par->parameters[el_j_slice_pos]->double_value=slice; // Set the element slice number to the number of slices given in the select statement.
             if(el_j_thick_pos > -1) el_j->def->par->parameters[el_j_thick_pos]->double_value=pl->parameters[pos_thick]->double_value; // Set the element thick flag to what is given in the select statement
@@ -1344,7 +1344,7 @@ static int set_selected_elements() //  result in global  element_list     used i
           element* el_j = element_list->elem[j];
           const int el_j_slice_pos = name_list_pos("slice",el_j->def->par_names);
           const int el_j_thick_pos = name_list_pos("thick",el_j->def->par_names); // position of thick flag      in element list
-          if (pass_select(el_j->name, slice_select->commands[i]) != 0) // selection on class and pattern done in pass_select. element el_j selected
+          if (pass_select_el(el_j, slice_select->commands[i]) != 0) // selection on class and pattern done in pass_select. element el_j selected
           { // the element el_j passes the selection
             if(el_j_slice_pos > -1) el_j->def->par->parameters[el_j_slice_pos]->double_value=slice; // Set the element slice number to the number of slices given in the select statement.
             if(el_j_thick_pos > -1) el_j->def->par->parameters[el_j_thick_pos]->double_value=pl->parameters[pos_thick]->double_value; // Set the element thick flag to what is given in the select statement

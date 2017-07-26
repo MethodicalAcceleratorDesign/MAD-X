@@ -520,10 +520,12 @@ set_selected_rows(struct table* t, struct command_list* select, struct command_l
     for (i = 0; i < select->curr; i++) {
       for (j = s_range->i[i]; j <= e_range->i[i]; j++) {
         if (t->row_out->i[j] == 0) {
-          if (!t->s_cols[0])
-            warning("Invalid column type (string expected)", t->name);
-          else
+          if (t->p_nodes[j])
+            t->row_out->i[j] = pass_select_el(t->p_nodes[j]->p_elem, select->commands[i]);
+          else if (t->s_cols[0])
             t->row_out->i[j] = pass_select(t->s_cols[0][j], select->commands[i]);
+          else
+            warning("Invalid column type (string expected)", t->name);
         }
       }
     }
@@ -532,10 +534,12 @@ set_selected_rows(struct table* t, struct command_list* select, struct command_l
     for (i = 0; i < deselect->curr; i++) {
       for (j = sd_range->i[i]; j <= ed_range->i[i]; j++) {
         if (t->row_out->i[j] == 1) {
-          if (!t->s_cols[0])
-            warning("Invalid column type (string expected)", t->name);
-          else
+          if (t->p_nodes[j])
+            t->row_out->i[j] = 1 - pass_select_el(t->p_nodes[j]->p_elem, select->commands[i]);
+          else if (t->s_cols[0])
             t->row_out->i[j] = 1 - pass_select(t->s_cols[0][j], deselect->commands[i]);
+          else
+            warning("Invalid column type (string expected)", t->name);
         }
       }
     }

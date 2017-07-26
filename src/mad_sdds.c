@@ -518,6 +518,7 @@ sdds_writet_sel(char *filename, struct table *tfstab)
   return(0);
 }
 
+/* TODO: can be replaced with `set_selected_rows` from mad_table.c? */
 static void
 set_selected_rows_tab(struct table* t, struct command_list* select, struct command_list* deselect)
 {
@@ -531,7 +532,7 @@ set_selected_rows_tab(struct table* t, struct command_list* select, struct comma
       for (j = 0; j < t->curr; j++)
       {
         if (t->row_out->i[j] == 0) t->row_out->i[j]
-                                     = pass_select(t->s_cols[0][j], select->commands[i]);
+                                     = pass_select_el(t->p_nodes[j]->p_elem, select->commands[i]);
         if (t->row_out->i[j] == 1) n++;
       }
     }
