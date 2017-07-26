@@ -205,6 +205,7 @@ write_table(struct table* t, const char* filename)
   struct int_array* col = t->col_out;
   struct int_array* row = t->row_out;
   int i, j, k, tmp, n;
+  int isHeaderDouble=0;
   time_t now;
   struct tm* tm;
 #if 0
@@ -225,31 +226,49 @@ write_table(struct table* t, const char* filename)
   {
     warning("cannot open output file:", filename); return;
   }
+  if (t->header != NULL && t->header->curr >= 1 && strncmp(t->header->p[0], "@ NAME ", 7) == 0){
+		  isHeaderDouble =1;
+
   if (t != NULL)
   {
-    strcpy(l_name, t->name);
-    n = strlen(t->name);
-    fprintf(out_file,
-            "@ NAME             %%%02ds \"%s\"\n", n,
-            stoupper(l_name));
+	  if (t->header != NULL && t->header->curr >= 1 && strncmp(t->header->p[0], "@ NAME ", 7) == 0){
+		  isHeaderDouble =1;
+	  }
 
-    strcpy(l_name, t->type);
-    n = strlen(t->type);
-    fprintf(out_file,
-            "@ TYPE             %%%02ds \"%s\"\n", n,
-            stoupper(l_name));
+	//for (j = 0; j < *len (t->header->p); j++){
+	//printf(t->header->p[j]);
+	//  }
+	if(isHeaderDouble==0)
+	{
+		strcpy(l_name, t->name);
+		n = strlen(t->name);
+		fprintf(out_file,
+				"@ NAME             %%%02ds \"%s\"\n", n,
+				stoupper(l_name));
+
+		strcpy(l_name, t->type);
+		n = strlen(t->type);
+		fprintf(out_file,
+				"@ TYPE             %%%02ds \"%s\"\n", n,
+				stoupper(l_name));
+	}
 
     if (t->header != NULL)
     {
-      for (j = 0; j < t->header->curr; j++)
+    	//43 or something is good
+      for (j = 0; j < t->header->curr; j++){
         fprintf(out_file, "%s\n", t->header->p[j]);
+      }
+
     }
+
     if (title != NULL)
     {
+
       n = strlen(title);
       fprintf(out_file,
               "@ TITLE            %%%02ds \"%s\"\n", n, title);
-    }
+
 
     n = strlen(version_name)+strlen(version_ostype)+strlen(version_arch)+2;
     fprintf(out_file,
@@ -264,7 +283,7 @@ write_table(struct table* t, const char* filename)
             "@ TIME             %%08s \"%02d.%02d.%02d\"\n",
             tm->tm_hour, tm->tm_min, tm->tm_sec);
     fprintf(out_file, "* ");
-
+    }
     for (i = 0; i < col->curr; i++)
     {
       strcpy(l_name, t->columns->names[col->i[i]]);
@@ -1431,8 +1450,9 @@ read_table(struct in_cmd* cmd)
       if (t->header->curr == t->header->max) grow_char_p_array(t->header);
       int len = strlen(aux_buff->c)+1;
       t->header->p[t->header->curr] = mymalloc_atomic("read_table", len * sizeof *t->header->p[0]);
-      strcpy(t->header->p[t->header->curr], aux_buff->c);
-      t->header->curr++;
+      strncpy(t->header->p[t->header->curr], aux_buff->c,len * sizeof *(aux_buff->c)-1);
+
+	  t->header->curr++;
     }
   }
   fclose(tab_file);
