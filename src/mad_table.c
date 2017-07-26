@@ -514,14 +514,6 @@ set_selected_rows(struct table* t, struct command_list* select, struct command_l
 {
   int i, j;
 
-  if (!current_sequ) {
-    warning("No current selection available, skipping select", t->name);
-    return;
-  }
-
-  c_range_start = get_node_count(current_sequ->range_start);
-  c_range_end = get_node_count(current_sequ->range_end);
-
   get_select_t_ranges(select, deselect, t);
   if (select != NULL) {
     for (j = 0; j < t->curr; j++)  t->row_out->i[j] = 0;
