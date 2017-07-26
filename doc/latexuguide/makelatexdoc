@@ -1,21 +1,10 @@
 #!/bin/sh
 echo 'building documentation for MAD-X. Be patient...'
-step=1
-echo "building $step"
+set -x
 lualatex uguide.tex > makelatexdoc.log
-step=$(( step + 1 ))
-echo "building $step"
 lualatex uguide.tex >> makelatexdoc.log
-step=$(( step + 1 ))
-echo "building $step"
 makeindex uguide >> makelatexdoc.log  2&>1
-step=$(( step + 1 ))
-echo "building $step"
 bibtex uguide >> makelatexdoc.log
-step=$(( step + 1 ))
-echo "building $step"
 lualatex uguide.tex >> makelatexdoc.log
-step=$(( step + 1 ))
-echo "building $step"
 lualatex uguide.tex >> makelatexdoc.log
 echo 'all done. See report in makelatexdoc.log'
