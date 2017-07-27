@@ -1298,7 +1298,8 @@ get_drift(double length, int count)
 
   sprintf(key, "drift_%d", count);
   bt = find_element("drift", base_type_list);
-  clone = clone_command(bt->def);
+  clone = clone_command_flat(bt->def);
+  renew_command_parameter(clone, "l");
   store_comm_par_value("l", length, clone);
   // NOTE: can't add implicit drifts to `element_list`, since different
   // sequences can have the same element name for a drift with different
