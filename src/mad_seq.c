@@ -1350,6 +1350,7 @@ add_drifts(struct node* c_node, struct node* end)
       drift_node->position = drift_beg + drift_len / 2;
       if (debug) printf("inserting a drift of length %e at position %e \n \n",
 			drift_len,drift_beg + drift_len / 2);
+      c_node = c_node->next;    // avoid double counting implicit drifts
       cnt++;
     }
     else
