@@ -229,35 +229,33 @@ write_table(struct table* t, const char* filename)
   }
   if (t != NULL)
   {
-
-    if (t->header != NULL && t->header->curr >= 1 && strncmp(t->header->p[0], "@ NAME ", 7) != 0)
-    {
     strcpy(l_name, t->name);
     n = strlen(t->name);
     fprintf(out_file,
             "@ NAME             %%%02ds \"%s\"\n", n,
             stoupper(l_name));
-    }
     strcpy(l_name, t->type);
     n = strlen(t->type);
-    if (t->header != NULL && t->header->curr >= 2 && strncmp(t->header->p[1], "@ TYPE ", 7) != 0)
-    {
+
     fprintf(out_file,
             "@ TYPE             %%%02ds \"%s\"\n", n,
             stoupper(l_name));
-    }
     if (t->header != NULL)
     {
       for (j = 0; j < t->header->curr; j++)
-    	if(strncmp(t->header->p[j], "@ TITLE ", 8) != 0
-    	&& strncmp(t->header->p[j], "@ ORIGIN ", 8) != 0
-		&& strncmp(t->header->p[j], "@ DATE ", 6) != 0
-		&& strncmp(t->header->p[j], "@ TIME ", 6) != 0
-		&& strncmp(t->header->p[j], "* NAME ", 6) != 0)
-    	{
+    	if(t->header->curr < 30){ // this number here is just to prevent from removing title which is put into the header..
     		fprintf(out_file, "%s\n", t->header->p[j]);
     	}
-
+    	else {
+			if(strncmp(t->header->p[j], "@ TITLE ", 8) != 0
+			&& strncmp(t->header->p[j], "@ ORIGIN ", 8) != 0
+			&& strncmp(t->header->p[j], "@ DATE ", 6) != 0
+			&& strncmp(t->header->p[j], "@ TIME ", 6) != 0
+			&& strncmp(t->header->p[j], "* NAME ", 6) != 0)
+			{
+				fprintf(out_file, "%s\n", t->header->p[j]);
+    	    }
+    	}
     }
     if (title != NULL)
     {
@@ -265,12 +263,11 @@ write_table(struct table* t, const char* filename)
       fprintf(out_file,
               "@ TITLE            %%%02ds \"%s\"\n", n, title);
     }
-
     n = strlen(version_name)+strlen(version_ostype)+strlen(version_arch)+2;
     fprintf(out_file,
             "@ ORIGIN           %%%02ds \"%s %s %s\"\n",
             n, version_name, version_ostype, version_arch);
-
+    
     fprintf(out_file,
             "@ DATE             %%08s \"%02d/%02d/%02d\"\n",
             tm->tm_mday, tm->tm_mon+1, tm->tm_year%100);
@@ -1445,6 +1442,7 @@ read_table(struct in_cmd* cmd)
       int len = strlen(aux_buff->c)+1;
       t->header->p[t->header->curr] = mymalloc_atomic("read_table", len * sizeof *t->header->p[0]);
       strncpy(t->header->p[t->header->curr], aux_buff->c,len * sizeof *(aux_buff->c)-1);
+      //strcpy(t->header->p[t->header->curr], aux_buff->c);
       t->header->curr++;
     }
   }
