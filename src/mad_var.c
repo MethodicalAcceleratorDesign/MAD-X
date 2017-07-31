@@ -404,6 +404,9 @@ enter_variable(struct in_cmd* cmd) /* stores variable contained in cmd */
             struct expression* old_expr = this_var->expr;
             struct expression* new_expr = NULL;
 
+            pre_split(old_expr->string, c_dum, 0);
+            strcpy(old_expr->string, c_dum->c);
+
             pre_split(expr->string, c_dum, 0);
             strcpy(expr->string, c_dum->c);
 
@@ -411,8 +414,12 @@ enter_variable(struct in_cmd* cmd) /* stores variable contained in cmd */
             if ( strword(expr->string, this_var->name) )
               fatal_error("circular assignment in", expr->string);
 
+printf(" Old Expr: %s\n     Expr: %s\n", old_expr->string, expr->string);
+
             const char* operator = strchr("+-",expr->string[0]) ? " " : " + "; //handle :+=-
             expr_combine(old_expr, this_var->value, operator, expr, val, &new_expr);
+
+printf(" Old Expr: %s\n     Expr: %s\n New Expr: %s\n", old_expr->string, expr->string, new_expr->string);
 
             delete_expression(expr);
             expr = new_expr; //transfer ownership
