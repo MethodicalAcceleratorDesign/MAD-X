@@ -63,6 +63,20 @@ new_command_parameter_list(int length)
 }
 
 struct command_parameter*
+renew_command_parameter(struct command* cmd, const char* par)
+/* Clone the given command parameter in the commands parameter list. This is
+   useful for only replacing few writable parameters after clone_command_flat
+   while sharing the other parameters. */
+{
+  int i = name_list_pos(par, cmd->par_names);
+  if (i > -1) {
+    return cmd->par->parameters[i] =
+      clone_command_parameter(cmd->par->parameters[i]);
+  }
+  return NULL;
+}
+
+struct command_parameter*
 delete_command_parameter(struct command_parameter* par)
 {
   const char *rout_name = "delete_command_parameter";

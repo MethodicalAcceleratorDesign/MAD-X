@@ -50,6 +50,7 @@ struct command_parameter_list /* contains list of command parameter pointers */
 struct command_parameter*       new_command_parameter(const char* name, int type);
 struct command_parameter_list*  new_command_parameter_list(int length);
 struct command_parameter*       clone_command_parameter(const struct command_parameter*);
+struct command_parameter*       renew_command_parameter(struct command* cmd, const char* par);
 struct command_parameter*       delete_command_parameter(struct command_parameter*);
 struct command_parameter_list*  delete_command_parameter_list(struct command_parameter_list*);
 struct command_parameter*       store_comm_par_def(char* toks[], int start, int end);

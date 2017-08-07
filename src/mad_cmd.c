@@ -539,6 +539,20 @@ clone_command(struct command* p)
 }
 
 struct command*
+clone_command_flat(struct command* p)
+{
+  int i;
+  struct command* clone = new_command(p->name, 0, p->par->curr,
+                                      p->module, p->group, p->link_type,
+                                      p->mad8_type);
+  copy_name_list(clone->par_names, p->par_names);
+  clone->par->curr = p->par->curr;
+  for (i = 0; i < p->par->curr; i++)
+    clone->par->parameters[i] = p->par->parameters[i];
+  return clone;
+}
+
+struct command*
 new_command(const char* name, int nl_length, int pl_length, const char* module, const char* group, int link, int mad_8)
 {
   const char *rout_name = "new_command";
