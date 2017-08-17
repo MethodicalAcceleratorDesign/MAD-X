@@ -4120,6 +4120,96 @@ subroutine ttrfmult(track, ktrack, turn)
 
 end subroutine ttrfmult
 
+subroutine ttthick(x, px, y, py, z, pt, h, k0_, k1_, length)
+
+  use trackfi
+  use math_constfi, only : zero, half, one, two, three, six
+  implicit none
+  
+  !-------------------------*
+  ! Andrea Latina 2017      *
+  !-------------------------*
+  !----------------------------------------------------------------------------*
+  ! Purpose:                                                                   *
+  !    Track a particle through a general thick element.                       *
+  ! Input:                                                                     *
+  !   h (double)                     curvature of the reference orbit, 1/rho0  *
+  !   k0 (double)                    bending strength (in a sbend k0 == h) 1/m *
+  !   k1 (double)                    focusing strength 1/m^2                   *
+  ! Input/output:                                                              *
+  !   (X, PX, Y, PY, T, PT)(double)  Track coordinates.                        *
+  !----------------------------------------------------------------------------*
+
+  double precision :: x_, px_, y_, py_, z_, length_
+  double precision :: x, px, y, py, z, pt, xp, yp
+  double precision :: h, k0_, k1_, length, Kx, Ky
+  double precision :: A, B, C, D, k0, k1
+  double precision :: delta_plus_1, bet
+  double precision :: Cx, Sx, Cy, Sy
+  double complex :: sqrt_Kx, sqrt_Ky
+  
+  delta_plus_1 = sqrt(pt*pt + two*pt/bet0 + one);
+  bet = delta_plus_1/(one/bet0+pt);
+  
+  k0 = k0_ / delta_plus_1;
+  k1 = k1_ / delta_plus_1;
+     
+  Kx =  k0*h + k1; ! 1/m^2
+  Ky =        -k1; ! 1/m^2
+  sqrt_Kx = cdsqrt(DCMPLX(Kx)); ! 1/m
+  sqrt_Ky = cdsqrt(DCMPLX(Ky)); ! 1/m
+  Cx = dreal(cdcos(sqrt_Kx*length)); ! 1
+  Cy = dreal(cdcos(sqrt_Ky*length)); ! 1
+  if (Kx.ne.zero) then ; Sx = dreal(cdsin(sqrt_Kx*length) / sqrt_Kx); else ; Sx = length; endif; ! m
+  if (Ky.ne.zero) then ; Sy = dreal(cdsin(sqrt_Ky*length) / sqrt_Ky); else ; Sy = length; endif; ! m
+        
+  xp = px/delta_plus_1;
+  yp = py/delta_plus_1;
+     
+  ! useful constants
+  A = -Kx*x-k0+h; ! 1/m
+  B = xp;
+  C = -Ky*y; ! 1/m
+  D = yp;
+  
+  ! transverse map
+  x_ = x*Cx + xp*Sx;
+  y_ = y*Cy + yp*Sy;
+  px_ = (A*Sx + B*Cx) * delta_plus_1;
+  py_ = (C*Sy + D*Cy) * delta_plus_1;
+
+  if (Kx.ne.zero) then
+     x_ = x_ + (k0-h)*(Cx-one)/Kx;
+  else
+     x_ = x_ - (k0-h)*half*length**2;
+  endif
+  
+  ! longitudinal map
+  length_ = length; ! will be the total path length traveled by the particle
+  if (Kx.ne.zero) then
+     length_ = length_ - (h*((Cx-one)*xp+Sx*A+length*(k0-h)))/Kx;
+     length_ = length_ + half*(-(A**2*Cx*Sx)/(two*Kx)+(B**2*Cx*Sx)/two+&
+          (A**2*length)/(two*Kx)+(B**2*length)/two-(A*B*Cx**2)/Kx+(A*B)/Kx);
+  else
+     length_ = length_ + h*length*(three*length*xp+six*x+(-k0+h)*length**2)/six;
+     length_ = length_ + half*(B**2+(A*length)**2/three+A*B*length)*length;
+  endif
+  if (Ky.ne.zero) then
+     length_ = length_ + half*(-(C**2*Cy*Sy)/(two*Ky)+(D**2*Cy*Sy)/two+&
+          (C**2*length)/(two*Ky)+(D**2*length)/two-(C*D*Cy**2)/Ky+(C*D)/Ky);
+  else
+     length_ = length_ + half*(D**2)*length;
+  endif
+  z_ = z + length/bet0 - length_/bet;
+  
+  x  = x_;
+  px = px_;
+  y  = y_;
+  py = py_;
+  z  = z_;
+
+end subroutine ttthick
+
 subroutine tttquad(track, ktrack)
   use twtrrfi
   use trackfi
@@ -4138,16 +4228,12 @@ subroutine tttquad(track, ktrack)
   double precision :: track(6,*)
   integer :: ktrack
 
-  double precision :: k1, k1s, length
-  double precision :: kk0, kk, ksqrt ! kk0 for the design momentum, kk for this particle's momentum
+  double precision :: k1, k1s, length, kk0
   double precision :: x, px, y, py, z, pt
-  double precision :: x_, px_, y_, py_, z_, pt_
-  double precision :: C,  S,  ksqrt_S,  S_over_ksqrt
-  double precision :: Ch, Sh, ksqrt_Sh, Sh_over_ksqrt
-  double precision :: delta_p1
-  double precision :: bet0sqr
+  double precision :: delta_plus_1
   double precision :: ct, st
   double precision :: tmp
+  
   double precision :: hx, hy, rfac, gamma, curv
   double precision :: rpx1, rpy1, rpt1
   double precision :: rpx2, rpy2, rpt2
@@ -4162,7 +4248,6 @@ subroutine tttquad(track, ktrack)
   gamma   = get_value('probe ','gamma ')
   
   !---- Read-in the parameters
-  bet0sqr = bet0*bet0;
   k1 = node_value('k1 ');
   k1s = node_value('k1s ');
   length = node_value('l ');
@@ -4203,14 +4288,13 @@ subroutine tttquad(track, ktrack)
         py = ct * py  - st * tmp
      endif
 
-     !---- Computes 1+delta and kk
-     delta_p1 = sqrt(pt*pt + two*pt/bet0 + one);
-     kk = kk0 / delta_p1;
+     !---- Computes 1+delta
+     delta_plus_1 = sqrt(pt*pt + two*pt/bet0 + one);
 
      !---- Radiation effects at entrance
      if (radiate) then
-        hx = (-kk*x);
-        hy = ( kk*y);
+        hx = (-kk0*x) / delta_plus_1;
+        hy = ( kk0*y) / delta_plus_1;
         if (quantum) then
            curv = sqrt(hx**2+hy**2);
            call trphot(length,curv,rfac,deltas)
@@ -4233,55 +4317,12 @@ subroutine tttquad(track, ktrack)
         endif
      endif
      
-     !---- Computes the kick
-     if (kk .gt. zero) then
-        ksqrt = sqrt(kk);
-        C = cos(ksqrt*length);
-        S = sin(ksqrt*length);
-        Ch = cosh(ksqrt*length);
-        Sh = sinh(ksqrt*length);
-        ksqrt_S  =  ksqrt*S;
-        ksqrt_Sh = -ksqrt*Sh;
-        S_over_ksqrt  =  S/ksqrt;
-        Sh_over_ksqrt = Sh/ksqrt;
-     else
-        ksqrt = sqrt(-kk);
-        C = cosh(ksqrt*length);
-        S = sinh(ksqrt*length);
-        Ch = cos(ksqrt*length);
-        Sh = sin(ksqrt*length);
-        ksqrt_S  = -ksqrt*S;
-        ksqrt_Sh =  ksqrt*Sh;
-        S_over_ksqrt  =  S/ksqrt;
-        Sh_over_ksqrt = Sh/ksqrt;
-     endif
-
-     !---- Equations of motion
-     !---- X
-     x_  = C * x + S_over_ksqrt * px / delta_p1;
-     px_ = -ksqrt_S * delta_p1 * x + C * px;
-     !---- Y
-     y_  = Ch * y + Sh_over_ksqrt * py / delta_p1;
-     py_ = -ksqrt_Sh * delta_p1 * y + Ch * py;
-     !---- Z
-     z_ = z + pt*length*(one-bet0sqr)/bet0sqr - &
-          half * (bet0*pt+one)/bet0/(delta_p1*delta_p1) * &
-          (half * kk0 * ((x*x)*(length-C*S_over_ksqrt) - (y*y)*(length-Ch*Sh_over_ksqrt)) + &
-          half * ((px*px)*(length+C*S_over_ksqrt) + (py*py)*(length+Ch*Sh_over_ksqrt)) / delta_p1 - &
-          (x*px*(one-C*C)+y*py*(one-Ch*Ch)));
-     !pt_ = pt; ! unchanged
-
-     x = x_;
-     y = y_;
-     z = z_;
-     px = px_;
-     py = py_;
-     !pt = pt_; ! unchanged
-
+     call ttthick(x, px, y, py, z, pt, 0d0, 0d0, kk0, length);
+     
      !---- Radiation effects at exit
      if (radiate) then
-        hx = (-kk*x);
-        hy = ( kk*y);
+        hx = (-kk0*x) / delta_plus_1;
+        hy = ( kk0*y) / delta_plus_1;
         if (quantum) then
            curv = sqrt(hx**2+hy**2);
            call trphot(length,curv,rfac,deltas)
@@ -4348,17 +4389,10 @@ subroutine tttdipole(track, ktrack)
   integer :: ktrack
 
   integer :: jtrk
-  double precision :: L, angle, rho, h, k0, k1
-  double precision :: x, px, y, py, z, pt
-  double precision :: x_, px_, y_, py_, z_
-  double precision :: delta_plus_1, delta_plus_1_sqr, sqrt_delta_plus_1
-  double precision :: Cx, Sx
-  double precision :: Cy, Sy
-  double precision :: A, B, C, D
+  double precision :: length, angle, rho, h, k0, k1
+  double precision :: x, px, y, py, z, pt, delta_plus_1
   double precision :: gamma, hx, hy, rfac, curv
-  double precision :: bet0sqr, kx_sqr, ky_sqr
   double precision :: e1, e2, h1, h2, hgap, fint, fintx
-  double complex :: kx, ky
   double precision :: rpx1, rpy1, rpt1
   double precision :: rpx2, rpy2, rpt2
 
@@ -4382,14 +4416,13 @@ subroutine tttdipole(track, ktrack)
        call ttdpdg_map(track, ktrack, e1, h1, hgap, fint, zero)
 
   !---- Read-in the parameters
-  bet0sqr = bet0*bet0;
-  L = node_value('l ');
+  length = node_value('l ');
   angle = node_value('angle ');
-  rho = abs(L/angle);
-  h = angle/L;
+  rho = abs(length/angle);
+  h = angle/length;
   k0 = h;
   k1 = node_value('k1 ');
-
+  
   !---- Prepare to calculate the kick and the matrix elements
   do jtrk = 1,ktrack
      !---- The particle position
@@ -4400,9 +4433,7 @@ subroutine tttdipole(track, ktrack)
      z  = track(5,jtrk);
      pt = track(6,jtrk);
 
-     delta_plus_1_sqr = pt*pt + two*pt/bet0 + one;
-     delta_plus_1 = sqrt(delta_plus_1_sqr);
-     sqrt_delta_plus_1 = sqrt(delta_plus_1);
+     delta_plus_1 = sqrt(pt*pt + two*pt/bet0 + one);
 
      !---- Radiation effects at entrance.
      if (radiate) then
@@ -4412,9 +4443,9 @@ subroutine tttdipole(track, ktrack)
         hy = (     k1*y) / delta_plus_1;
         if (quantum) then
            curv = sqrt(hx**2+hy**2);
-           call trphot(L * (one + h*x) * (one - tan(e1)*x), curv, rfac, deltas);
+           call trphot(length * (one + h*x) * (one - tan(e1)*x), curv, rfac, deltas);
         else
-           rfac = (arad * gamma**3 * L / three) * (hx**2 + hy**2) * (one + h*x) * (one - tan(e1)*x)
+           rfac = (arad * gamma**3 * length / three) * (hx**2 + hy**2) * (one + h*x) * (one - tan(e1)*x)
         endif
         if (damp) then
            px = px - rfac * (one + pt) * px
@@ -4431,55 +4462,9 @@ subroutine tttdipole(track, ktrack)
            pt = pt - rpt1;
         endif
      endif
-
-     kx_sqr = (k0*h+k1) / delta_plus_1; ! 1/m^2
-     ky_sqr = -k1 / delta_plus_1; ! 1/m^2
-     kx = cdsqrt(DCMPLX(kx_sqr)); ! 1/m
-     ky = cdsqrt(DCMPLX(ky_sqr)); ! 1/m
-     Cx = dreal(cdcos(kx*L)); ! 1
-     Cy = dreal(cdcos(ky*L)); ! 1
-     if (kx_sqr.ne.zero) then ; Sx = dreal(cdsin(kx*L) / kx); else ; Sx = L; endif;
-     if (ky_sqr.ne.zero) then ; Sy = dreal(cdsin(ky*L) / ky); else ; Sy = L; endif;
-
-     ! useful constants
-     A = ((delta_plus_1-k0*x)*h-k1*x-k0)/delta_plus_1;
-     B = px;
-     C = -(k1*y)/delta_plus_1;
-     D = py;
-
-     ! transverse map
-     x_ = x*Cx + px*Sx + ((k0-delta_plus_1*h)*(Cx-one))/(k1+h*k0);
-     y_ = y*Cy + py*Sy;
-     px_ = A*Sx + B*Cx;
-     py_ = C*Sy + D*Cy;
-     !px_ = -x*Sx*(k0*h+k1) / delta_plus_1 + px*Cx -((k0-delta_plus_1*h)*Sx) / delta_plus_1;
-     !py_ = -y*Sy*k1        / delta_plus_1 + py*Cy;
-
-     z_ = z + pt*(one-bet0sqr)/bet0sqr*L + (pt+one/bet0)/delta_plus_1*h*x;
-     if (kx_sqr.ne.zero) then
-        z_ = z_ -half*(pt+one/bet0)/(delta_plus_1**3) * &
-             (((kx_sqr*B**2-A**2)*Cx*Sx)/(two*kx_sqr) - &
-             (A*B*Cx**2)/kx_sqr+(B**2*L)*half+(A**2*L)/(two*kx_sqr)+(A*B)/kx_sqr);
-     else
-        z_ = z_ -half*(pt+one/bet0)/(delta_plus_1**3) * &
-             (A**2*L**3+three*A*B*L**2+three*B**2*L)/three;
-     endif
-     if (ky_sqr.ne.zero) then
-        z_ = z_ -half*(pt+one/bet0)/(delta_plus_1**3) * &
-             (((ky_sqr*D**2-C**2)*Cy*Sy)/(two*ky_sqr) - &
-             (two*C*D*Cx**2+(-ky_sqr*D**2-C**2)*L-two*C*D)/(two*ky_sqr));
-     else
-        z_ = z_ -half*(pt+one/bet0)/(delta_plus_1**3) * &
-             (C**2*L**3+three*C*D*L**2+three*D**2*L)/three;
-     endif
-
-     x = x_;
-     px = px_;
-     y = y_;
-     py = py_;
-     z = z_;
-     ! pt = pt; ! unchanged
-
+     
+     call ttthick(x, px, y, py, z, pt, h, k0, k1, length);
+     
      !---- Radiation effects at exit.
      if (radiate) then
         !hx = (-k0 -k1*x + k1s*y  - k2*(x*x - y*y)/two + k2s*x*y) / delta_plus_1; ! if there were k1s k2 and k2s
@@ -4488,9 +4473,9 @@ subroutine tttdipole(track, ktrack)
         hy = (     k1*y) / delta_plus_1;
         if (quantum) then
            curv = sqrt(hx**2+hy**2);
-           call trphot(L * (one + h*x) * (one - tan(e2)*x), curv, rfac, deltas);
+           call trphot(length * (one + h*x) * (one - tan(e2)*x), curv, rfac, deltas);
         else
-           rfac = (arad * gamma**3 * L / three) * (hx**2 + hy**2) * (one + h*x) * (one - tan(e2)*x)
+           rfac = (arad * gamma**3 * length / three) * (hx**2 + hy**2) * (one + h*x) * (one - tan(e2)*x)
         endif
         if (damp) then
            px = px - rfac * (one + pt) * px
