@@ -65,8 +65,7 @@ extern struct double_array* vary_dvect;     /* for matching */
 extern struct double_array* fun_vect;       /* for matching */
 extern struct double_array* match_work[MATCH_WORK];/* work space for matching */
 
-extern struct el_list* drift_list;
-extern struct el_list* element_list;
+extern struct el_list* element_list;        /* Explicitly defined elems. No implicit drifts! */
 extern struct el_list* base_type_list;
 extern struct el_list* selected_elements;
 
@@ -240,8 +239,6 @@ extern int print_correct_opt;      /* PRINT options for orbit correction */
 extern int assign_start;           /* flag for multiple assign statements */
 extern int aux_count;              /* for debug purposes */
 extern int beam_info;              /* flag to print beam information once */
-extern int c_range_end;            /* node count of current range end */
-extern int c_range_start;          /* node count of current range start */
 extern int curr_obs_points;        /* current number of observation points */
 extern int current_calls;          /* call counter in match */
 extern int current_call_lim;       /* current call limit in match */

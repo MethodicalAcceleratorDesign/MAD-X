@@ -6,6 +6,9 @@ module madx_ptc_normal_module
   use madx_ptc_module
   
 !  use madx_ptc_twiss
+  ! Algorithm to get binomial coeffs 
+  !https://wikimedia.org/api/rest_v1/media/math/render/svg/d4145e0326f57f563b59c943642928342a5a6b18
+  ! from https://en.wikipedia.org/wiki/Binomial_coefficient
   
   !_________________________________________________________________
   implicit none

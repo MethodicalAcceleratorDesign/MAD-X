@@ -64,7 +64,6 @@ struct double_array* vary_dvect;     /* for matching */
 struct double_array* fun_vect;       /* for matching */
 struct double_array* match_work[MATCH_WORK];/* work space for matching */
 
-struct el_list* drift_list;
 struct el_list* element_list;
 struct el_list* base_type_list;
 struct el_list* selected_elements;
@@ -235,8 +234,6 @@ int print_correct_opt = 1;  /* PRINT options for orbit correction */
 int assign_start = 0;       /* flag for multiple assign statements */
 int aux_count = 0;          /* for debug purposes */
 int beam_info = -1;         /* flag to print beam information once */
-int c_range_end;            /* node count of current range end */
-int c_range_start;          /* node count of current range start */
 int curr_obs_points;        /* current number of observation points */
 int current_calls = 0;      /* call counter in match */
 int current_call_lim = 0;   /* current call limit in match */

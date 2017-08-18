@@ -50,6 +50,7 @@ grow_command_list_list(struct command_list_list* p)
   const char *rout_name = "grow_command_list_list";
 //  struct command_list** c_loc = p->command_lists;
   p->max *= 2;
+  if (p->max == 0) p->max++;
   p->command_lists = myrecalloc(rout_name, p->command_lists, p->curr * sizeof *p->command_lists, p->max * sizeof *p->command_lists);
 //  p->command_lists = mycalloc(rout_name, new, sizeof *p->command_lists);
 //  for (int j = 0; j < p->curr; j++) p->command_lists[j] = c_loc[j];
@@ -534,6 +535,20 @@ clone_command(struct command* p)
   clone->par->curr = p->par->curr;
   for (i = 0; i < p->par->curr; i++)
     clone->par->parameters[i] = clone_command_parameter(p->par->parameters[i]);
+  return clone;
+}
+
+struct command*
+clone_command_flat(struct command* p)
+{
+  int i;
+  struct command* clone = new_command(p->name, 0, p->par->curr,
+                                      p->module, p->group, p->link_type,
+                                      p->mad8_type);
+  copy_name_list(clone->par_names, p->par_names);
+  clone->par->curr = p->par->curr;
+  for (i = 0; i < p->par->curr; i++)
+    clone->par->parameters[i] = p->par->parameters[i];
   return clone;
 }
 

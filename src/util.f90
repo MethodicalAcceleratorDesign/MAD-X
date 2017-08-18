@@ -370,7 +370,7 @@ end module twissbeamfi
 module max_iterate
   implicit none
   public
-  integer, parameter :: maxiter=150
+  integer, parameter :: maxiter=250
 end module max_iterate
 
 module twiss_elpfi

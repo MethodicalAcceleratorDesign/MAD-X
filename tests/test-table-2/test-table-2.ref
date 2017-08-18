@@ -25,13 +25,13 @@ use period=cell;
 
 survey;
 
-a=tabindex(survey, name, 1, drift_1);
+a=tabindex(survey, name, 1, drift_3);
 
-b=tabindex(survey, name,    drift_0); ! default row is one
+b=tabindex(survey, name,    drift_); ! default row is one
 
-c=tabindex(survey, name, 4, drift_0);
+c=tabindex(survey, name, 4, drift_);
 
-d=tabindex(survey, name, 7, drift_0);
+d=tabindex(survey, name, 7, drift_);
 
 f=tabindex(survey, keyword, 2, marker);
 

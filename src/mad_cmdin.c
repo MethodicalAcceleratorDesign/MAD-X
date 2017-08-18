@@ -96,6 +96,7 @@ grow_in_cmd_list(struct in_cmd_list* p)
 {
   const char *rout_name = "grow_in_cmd_list";
   p->max *= 2;
+  if (p->max == 0) p->max++;
   p->in_cmds = myrecalloc(rout_name, p->in_cmds, p->curr * sizeof *p->in_cmds, p->max * sizeof *p->in_cmds);
 }
 

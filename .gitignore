@@ -4,6 +4,7 @@
 *.blg
 *.idx
 *.lof
+*.log
 *.lot
 *.out
 *.dvi
