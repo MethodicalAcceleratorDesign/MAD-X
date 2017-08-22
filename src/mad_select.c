@@ -67,7 +67,7 @@ fetch_node_select(struct select_iter* it, struct node** node, struct sequence** 
       continue;
     }
 
-    if (!it->node || it->full || pass_select(it->node->p_elem->name, it->cmd)) {
+    if (!it->node || it->full || pass_select_el(it->node->p_elem, it->cmd)) {
       if (seq) *seq = it->sequ;
       if (node) *node = it->node;
       return it->node != NULL;
@@ -104,17 +104,29 @@ pass_select(char* name, struct command* sc)
   /* checks name against class (if element) and pattern that may
      (but need not) be contained in command sc;
      0: does not pass, 1: passes */
+  /* Don't use for selecting elements. It may not find all elements. */
+{
+  struct element* el = find_element(strip(name), element_list);
+  return pass_select_el(el, sc);
+}
+
+
+int
+pass_select_el(struct element* el, struct command* sc)
+  /* checks name against class (if element) and pattern that may
+     (but need not) be contained in command sc;
+     0: does not pass, 1: passes */
+  /* Should use this function in favor of `pass_select` where possible. It
+     works for all elements and is faster if knowing the element in advance. */
 {
   struct name_list* nl = sc->par_names;
   struct command_parameter_list* pl = sc->par;
-  struct element* el = find_element(strip(name), element_list);
   int pos, in = 0, any = 0;
   char *class, *pattern;
 
   pos = name_list_pos("class", nl);
   if (pos > -1 && nl->inform[pos])  /* parameter has been read */
   {
-    el = find_element(strip(name), element_list);
     if (el != NULL)
     {
       class = pl->parameters[pos]->string;
@@ -128,7 +140,7 @@ pass_select(char* name, struct command* sc)
   {
     any = 1;
     pattern = stolower(pl->parameters[pos]->string);
-    if(myregex(pattern, strip(name)) == 0)  in = 1;
+    if(myregex(pattern, strip(el->name)) == 0)  in = 1;
   }
   if (any == 0) return 1;
   else return in;
@@ -137,12 +149,24 @@ pass_select(char* name, struct command* sc)
 int
 pass_select_list(char* name, struct command_list* cl)
   /* returns 0 (does not pass) or 1 (passes) for a list of selects */
+  /* Don't use for selecting elements. It may not find all elements. */
+{
+  struct element* el = find_element(strip(name), element_list);
+  return pass_select_list_el(el, cl);
+}
+
+
+int
+pass_select_list_el(struct element* el, struct command_list* cl)
+  /* returns 0 (does not pass) or 1 (passes) for a list of selects */
+  /* Should use this function in favor of `pass_select_list` where possible. It
+     works for all elements and is faster if knowing the element in advance. */
 {
   int i, ret = 0;
   if (cl->curr == 0)  return 1;
   for (i = 0; i < cl->curr; i++)
   {
-    if ((ret = pass_select(name, cl->commands[i]))) break;
+    if ((ret = pass_select_el(el, cl->commands[i]))) break;
   }
   return ret;
 }

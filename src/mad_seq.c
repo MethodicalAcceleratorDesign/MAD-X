@@ -964,7 +964,7 @@ seq_install(struct in_cmd* cmd)
 	  for (k = 0; k < seqedit_select->curr; k++) {
 	    myrepl(":", "[", c_node->name, name);
 	    strcat(name, "]");
-	    if (strchr(name, '$') == NULL && pass_select(c_node->name, seqedit_select->commands[k])) break;
+	    if (strchr(name, '$') == NULL && pass_select_el(c_node->p_elem, seqedit_select->commands[k])) break;
 	  }
 	  if (k < seqedit_select->curr) {
 	    from = get_node_pos(c_node, edit_sequ);
@@ -1040,7 +1040,7 @@ seq_move(struct in_cmd* cmd)
               {
                 if (node->p_elem != NULL) name = node->p_elem->name;
                 if (name != NULL && strchr(name, '$') == NULL &&
-                    pass_select(name,
+                    pass_select_el(node->p_elem,
                                 seqedit_select->commands[k])) break;
               }
               if (k < seqedit_select->curr)
@@ -1169,7 +1169,7 @@ seq_remove(struct in_cmd* cmd)
             {
               if (c_node->p_elem != NULL) name = c_node->p_elem->name;
               if (name != NULL && strchr(name, '$') == NULL &&
-                  pass_select(name,
+                  pass_select_el(c_node->p_elem,
                               seqedit_select->commands[k])) break;
             }
             if (k < seqedit_select->curr)
@@ -1245,7 +1245,7 @@ seq_replace(struct in_cmd* cmd)
 	for (k = 0; k < seqedit_select->curr; k++) {
 	  if (c_node->p_elem != NULL) name = c_node->p_elem->name;
 	  if (name != NULL && strchr(name, '$') == NULL &&
-	      pass_select(name, seqedit_select->commands[k]) ) break;
+	      pass_select_el(c_node->p_elem, seqedit_select->commands[k]) ) break;
 	}
 	if (k < seqedit_select->curr) {
 	  rep_els[rep_cnt] = el;
@@ -1289,25 +1289,26 @@ seq_replace(struct in_cmd* cmd)
 }
 
 static struct element*
-get_drift(double length)
+get_drift(double length, int count)
   /* makes a drift space with the required length */
 {
-  const double tol = 1e-12; // length tolerance for sharing implicit drift
   struct element *p, *bt;
   struct command* clone;
   char key[NAME_L];
 
-  for (int i = 0; i < drift_list->curr; i++) {
-    p = drift_list->elem[i];
-    if (fabs(p->length - length) < tol) return p;
-  }
-
-  sprintf(key, "drift_%d", drift_list->curr);
+  sprintf(key, "drift_%d", count);
   bt = find_element("drift", base_type_list);
-  clone = clone_command(bt->def);
+  clone = clone_command_flat(bt->def);
+  renew_command_parameter(clone, "l");
   store_comm_par_value("l", length, clone);
-  p = make_element(key, "drift", clone, 0);
-  add_to_el_list(&p, 1, drift_list, 0);
+  // NOTE: can't add implicit drifts to `element_list`, since different
+  // sequences can have the same element name for a drift with different
+  // length. This means that implicit drifts can currently not be used in any
+  // command based on `element_list`!
+  p = clone_element(bt);
+  p->def = clone;
+  p->length = length;
+  strcpy(p->name, key);
   return p;
 }
 
@@ -1316,6 +1317,7 @@ add_drifts(struct node* c_node, struct node* end)
 {
   const double tol = 1e-6;
   int cnt;
+  int implicit_drift_count = 0;
 
   char buf[256];
 
@@ -1344,12 +1346,13 @@ add_drifts(struct node* c_node, struct node* end)
     }
     else if (drift_len > tol) {
       // create or share 'long-enough' implicit drift
-      struct element *drift = get_drift(drift_len);
+      struct element *drift = get_drift(drift_len, implicit_drift_count++);
       struct node *drift_node = new_elem_node(drift, 0);
       link_in_front(drift_node, c_node->next);
       drift_node->position = drift_beg + drift_len / 2;
       if (debug) printf("inserting a drift of length %e at position %e \n \n",
 			drift_len,drift_beg + drift_len / 2);
+      c_node = c_node->next;    // avoid double counting implicit drifts
       cnt++;
     }
     else
@@ -2150,7 +2153,7 @@ set_enable(const char* type, struct in_cmd* cmd)
   while (c_node)
   {
     if (strstr(c_node->base_name, type) &&
-        pass_select(c_node->p_elem->name, cmd->clone) != 0)
+        pass_select_el(c_node->p_elem, cmd->clone) != 0)
     {
       c_node->enable = status; count++;
     }

@@ -518,40 +518,7 @@ sdds_writet_sel(char *filename, struct table *tfstab)
   return(0);
 }
 
-static int
-pass_select_tab(char* name, struct command* sc)
-  /* checks name against class (if element) and pattern that may
-     (but need not) be contained in command sc;
-     0: does not pass, 1: passes */
-{
-  struct name_list* nl = sc->par_names;
-  struct command_parameter_list* pl = sc->par;
-  struct element* el = find_element(strip(name), element_list);
-  int pos, in = 0, any = 0;
-  char *class, *pattern;
-  pos = name_list_pos("class", nl);
-  if (pos > -1 && nl->inform[pos])  /* parameter has been read */
-  {
-    el = find_element(strip(name), element_list);
-    if (el != NULL)
-    {
-      class = pl->parameters[pos]->string;
-      in = belongs_to_class(el, class);
-      if (in == 0) return 0;
-    }
-  }
-  any = in = 0;
-  pos = name_list_pos("pattern", nl);
-  if (pos > -1 && nl->inform[pos])  /* parameter has been read */
-  {
-    any = 1;
-    pattern = stolower(pl->parameters[pos]->string);
-    if(myregex(pattern, strip(name)) == 0)  in = 1;
-  }
-  if (any == 0) return 1;
-  else return in;
-}
-
+/* TODO: can be replaced with `set_selected_rows` from mad_table.c? */
 static void
 set_selected_rows_tab(struct table* t, struct command_list* select, struct command_list* deselect)
 {
@@ -565,7 +532,7 @@ set_selected_rows_tab(struct table* t, struct command_list* select, struct comma
       for (j = 0; j < t->curr; j++)
       {
         if (t->row_out->i[j] == 0) t->row_out->i[j]
-                                     = pass_select_tab(t->s_cols[0][j], select->commands[i]);
+                                     = pass_select_el(t->p_nodes[j]->p_elem, select->commands[i]);
         if (t->row_out->i[j] == 1) n++;
       }
     }
@@ -577,7 +544,7 @@ set_selected_rows_tab(struct table* t, struct command_list* select, struct comma
       for (j = 0; j < t->curr; j++)
       {
         if (t->row_out->i[j] == 1) t->row_out->i[j]
-                                     = 1 - pass_select_tab(t->s_cols[0][j], deselect->commands[i]);
+                                     = 1 - pass_select(t->s_cols[0][j], deselect->commands[i]);
         if (t->row_out->i[j] == 1) n++;
       }
     }

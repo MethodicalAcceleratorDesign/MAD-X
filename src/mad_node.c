@@ -639,7 +639,7 @@ advance_to_pos(char* table, int* t_pos)
   {
     ret = 1;
     t = table_register->tables[pos];
-    if (t->origin == 1)  return 0; /* table is read, has no node pointers */
+    if (t->origin == 1)  return 1; /* table is read, has no node pointers */
     while (current_node)
     {
       if (current_node == t->p_nodes[*t_pos-1]) break;
@@ -752,5 +752,18 @@ find_node_by_name(const char* name, struct node_list* nl, struct node* start, st
   // - sometimes a node outside the range is requested (test-track-11).
   // - start/stop may not even be registered into the node list (test-dynap).
   int pos = name_list_pos(tmp, nl->list);
-  return pos >= 0 ? nl->nodes[pos] : NULL;
+  if (pos >= 0)
+      return nl->nodes[pos];
+
+  // This fallback is required for selecting implicit DRIFTs which are
+  // currently not registered in the node list:
+  struct node* n = start;
+  while (n && strcmp(n->name, tmp)) {
+    // TG: note that `stop->next=start` is possible, therefore, have to compare
+    // against `stop` itself - in the loop body:
+    if (n == stop)
+      return NULL;
+    n = n->next;
+  }
+  return n;
 }
