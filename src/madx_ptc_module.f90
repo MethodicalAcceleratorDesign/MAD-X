@@ -614,11 +614,13 @@ CONTAINS
     endif
     call append_empty(my_ring)
 
-   ! print *,'Element code is ',code
+  !  print *,'Element ',key%list%name,' code is ',code
 
     select case(code)
-    case(0,4,25)
+    case(0,25)
        key%magnet="marker"
+    case(4)
+       call aafail('ptc_input:','PTC does not accept matrix elements. Program stops.')
     case(22)
        call fort_warn('ptc_input: ','Element Beam-Beam, must use slice tracking to get effect')
        key%magnet="marker"
@@ -671,7 +673,7 @@ CONTAINS
           fintx=node_value('fintx ')
           if((fintx.ne.fint).and.(fintx.gt.zero.and.fint.gt.zero)) then
              print*," The fint and fintx must be the same at each end or each might be zero"
-             call aafail('ptc_input:','The fint and fintx must be the same at each end or each might be zero. Program stops')
+             call aafail('ptc_input:','The fint and fintx must be the same at each end or each might be zero. Program stops.')
           endif
           if(fint.gt.zero) then
              key%list%fint=fint
