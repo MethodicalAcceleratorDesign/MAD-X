@@ -1,0 +1,107 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.03.06  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2017.05.29               +
+  + Execution date: 2017.08.30 17:02:39      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+circum=60.;
+
+lcell=20.;
+
+f=lcell/sin(pi/4)/4;
+
+k=1.0/f;
+
+sk=0.5;
+
+qf: multipole, knl={0, k};
+
+qd: multipole, knl={0, -k};
+
+qd2: multipole, knl={0, -k};
+
+sq1:  multipole, ksl={0, sk};
+
+sq2: multipole, ksl={0, -sk};
+
+
+
+
+
+
+
+seq: sequence, refer=center, l=circum;
+
+qf: qf, at = 0 ;
+
+sq1: sq1, at = 0;
+
+qd: qd, at = 0.5 * lcell;
+
+qf: qf, at = 1.0 * lcell;
+
+qd: qd, at = 1.5 * lcell;
+
+qf: qf, at = 2.0 * lcell;
+
+sq2: sq2, at=2.0 * lcell;
+
+d2: qd, at = 2.5 * lcell;
+
+endsequence;
+
+
+
+beam;
+
+use, sequence=seq;
+
+
+
+select, flag=twiss, column=name, s, betx, bety, dx, mux, muy, r11, r12, r21, r22, alfx, alfy;
+
+
+
+
+
+twiss, file="minusIbumb.tfs";
+
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+++++++ warning: TWCPTK:  Mode flip in the element sq1                                             , nflips up to now =   1                                                                                                       
+++++++ warning: TWCPTK:  Mode flip in the element sq2                                             , nflips up to now =   2                                                                                                       
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                60                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+              0.75       -16.87042617        818.7036245                  0 
+
+             dxrms             xcomax             xcorms                 q2 
+                 0                  0                  0               0.75 
+
+               dq2            betymax              dymax              dyrms 
+      -16.87042617        1564.278536                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 2 
+stop;
+
+
+  Number of warnings: 2
+0 in C and 2 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
