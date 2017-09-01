@@ -1,0 +1,32 @@
+circum=60.;
+lcell=20.;
+f=lcell/sin(pi/4)/4;
+k=1.0/f;
+sk=0.1;
+qf: multipole, knl={0, k};
+qd: multipole, knl={0, -k};
+qd2: multipole, knl={0, -k};
+sq1:  multipole, ksl={0, sk};
+sq2: multipole, ksl={0, -sk*0.5};
+
+
+
+seq: sequence, refer=center, l=circum;
+qf: qf, at = 0 ;
+sq1: sq1, at = 0;
+qd: qd, at = 0.5 * lcell;
+qf: qf, at = 1.0 * lcell;
+qd: qd, at = 1.5 * lcell;
+qf: qf, at = 2.0 * lcell;
+sq2: sq2, at=2.0 * lcell;
+d2: qd, at = 2.5 * lcell;
+endsequence;
+
+beam;
+use, sequence=seq;
+
+select, flag=twiss, column=name, s, betx, bety, dx, mux, muy, r11, r12, r21, r22, alfx, alfy;
+
+
+twiss, file="twoSkewQuads.tfs";
+stop;
