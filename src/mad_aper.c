@@ -417,6 +417,7 @@ static int
 aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4, int* pipelength, double pipex[], double pipey[])
 {
   int i, quarterlength=0;
+  double aperture_vec[4];
 
   /* 2013-03-21 -- ghislain: changed name from aper_bs;
      the same function is referenced as build_pipe in the documentation of Ivar Waarum */
@@ -435,12 +436,15 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
 
   (*ap1) = (*ap2) = (*ap3) = (*ap4) = 0;
 
+  element_vector(current_node->p_elem, "aperture", aperture_vec);
+
+
   int debug = get_option("debug");
   if (debug)
     printf("+++ aper_build_screen; apertype = '%s' quarterlength = %d\n",apertype, quarterlength);
 
   if (!strcmp(apertype,"circle")) {
-    *ap3 = get_aperture(current_node, "var1"); /*radius circle*/
+    *ap3 = aperture_vec[0]; /*radius circle*/
     if ( (*ap3) <= 0. ) {
       if (debug)
 	printf("+++ aper_build screen, circle parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4);
@@ -455,8 +459,8 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
   }
 
   else if (!strcmp(apertype,"ellipse")) {
-    *ap3 = get_aperture(current_node, "var1"); /*half hor axis ellipse*/
-    *ap4 = get_aperture(current_node, "var2"); /*half ver axis ellipse*/
+    *ap3 = aperture_vec[0]; /*half hor axis ellipse*/
+    *ap4 = aperture_vec[1]; /*half ver axis ellipse*/
     if ( (*ap3) <= 0 || (*ap4) <= 0) {
       if (debug)
 	printf("+++ aper_build screen, ellipse parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4);
@@ -471,8 +475,8 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
   }
 
   else if (!strcmp(apertype,"rectangle")) {
-    *ap1 = get_aperture(current_node, "var1");      /*half width rect*/
-    *ap2 = get_aperture(current_node, "var2");      /*half height rect*/
+    *ap1 = aperture_vec[0];      /*half width rect*/
+    *ap2 = aperture_vec[1];      /*half height rect*/
     if ( (*ap1) <= 0 || (*ap2) <= 0) {
       if (debug)
 	printf("+++ aper_build screen, rectangle parameters: %10.5f %10.5f %10.5f %10.5f  -- exiting 0\n", *ap1, *ap2, *ap3, *ap4);
@@ -488,9 +492,9 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
 
   else if (!strcmp(apertype,"lhcscreen") || !strcmp(apertype, "rectcircle")) {
     // the type lhcscreen should be deprecated at some point to keep MAD agnostic...
-    *ap1=get_aperture(current_node, "var1"); /*half width rect*/
-    *ap2=get_aperture(current_node, "var2"); /*half height rect*/
-    *ap3=get_aperture(current_node, "var3"); /*radius circle*/
+    *ap1=aperture_vec[0]; /*half width rect*/
+    *ap2=aperture_vec[1]; /*half height rect*/
+    *ap3=aperture_vec[2]; /*radius circle*/
 
     if ( (*ap1) <= 0 || (*ap2) <= 0 || (*ap3) <= 0) {
       if (debug)
@@ -506,10 +510,10 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
   }
 
   else if (!strcmp(apertype,"rectellipse")) {
-    *ap1=get_aperture(current_node, "var1"); /*half width rect*/
-    *ap2=get_aperture(current_node, "var2"); /*half height rect*/
-    *ap3=get_aperture(current_node, "var3"); /*half hor axis ellipse*/
-    *ap4=get_aperture(current_node, "var4"); /*half ver axis ellipse*/
+    *ap1=aperture_vec[0]; /*half width rect*/
+    *ap2=aperture_vec[1]; /*half height rect*/
+    *ap3=aperture_vec[2]; /*half hor axis ellipse*/
+    *ap4=aperture_vec[3]; /*half ver axis ellipse*/
 
     if ( (*ap1) <= 0 || (*ap2) <= 0 || (*ap3) <= 0 || (*ap4) <= 0) {
       if (debug)
@@ -522,10 +526,10 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
   }
 
   else if (!strcmp(apertype,"racetrack")) {
-    *ap1=get_aperture(current_node, "var1"); /*half width extension*/
-    *ap2=get_aperture(current_node, "var2"); /*half height extension*/
-    *ap3=get_aperture(current_node, "var3"); /*horizontal semi-axis*/
-    *ap4=get_aperture(current_node, "var4"); /*vertical semi-axis*/
+    *ap1=aperture_vec[0]; /*half width extension*/
+    *ap2=aperture_vec[1]; /*half height extension*/
+    *ap3=aperture_vec[2]; /*horizontal semi-axis*/
+    *ap4=aperture_vec[3]; /*vertical semi-axis*/
 
     // 2014-Jun-27  11:14:27  ghislain:
     // change check from ap1 or ap2<=0  to ap1 or ap2 or ap3 < 0
@@ -552,10 +556,10 @@ aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double*
 
   // 2015-Feb-05  18:35:01  ghislain: adding octagon aperture type
   else if (!strcmp(apertype,"octagon")) {
-    *ap1=get_aperture(current_node, "var1"); /*half width rect ; >= 0 */
-    *ap2=get_aperture(current_node, "var2"); /*half height rect ; >=0 */
-    *ap3=get_aperture(current_node, "var3"); /*first angle ; >=0, <=pi/2 */
-    *ap4=get_aperture(current_node, "var4"); /*second angle ; >=0, <=pi/2, >= *ap3*/
+    *ap1=aperture_vec[0]; /*half width rect ; >= 0 */
+    *ap2=aperture_vec[1]; /*half height rect ; >=0 */
+    *ap3=aperture_vec[2]; /*first angle ; >=0, <=pi/2 */
+    *ap4=aperture_vec[3]; /*second angle ; >=0, <=pi/2, >= *ap3*/
 
     if ( (*ap1) < 0 || (*ap2) < 0 || (*ap3) < 0 || (*ap4) < 0 || (*ap3) > pi/2 || (*ap4) > pi/2 || (*ap4) < (*ap3))  {
       if (debug)
@@ -1162,7 +1166,7 @@ aper_calc(double p, double q, double* minhl,
 // public interface
 
 double
-get_apertol(struct node* node, const char* par)
+get_aperattr(struct node* node, const char* attrname, const char* par)
   /* returns aper_tol parameter 'i' where i is integer at the end of par;
      e.g. aptol_1 gives i = 1 etc. (count starts at 1) */
 {
@@ -1171,21 +1175,7 @@ get_apertol(struct node* node, const char* par)
   for (i = 0; i < n; i++)  if (isdigit(par[i])) break;
   if (i == n) return val;
   sscanf(&par[i], "%d", &k); k--;
-  if ((n = element_vector(node->p_elem, "aper_tol", vec)) > k)  val = vec[k];
-  return val;
-}
-
-double
-get_aperture(struct node* node, const char* par)
-  /* returns aperture parameter 'i' where i is integer at the end of par;
-     e.g. aper_1 gives i = 1 etc. (count starts at 1) */
-{
-  int i, k, n = strlen(par);
-  double val = zero, vec[100];
-  for (i = 0; i < n; i++)  if (isdigit(par[i])) break;
-  if (i == n) return val;
-  sscanf(&par[i], "%d", &k); k--;
-  if ((n = element_vector(node->p_elem, "aperture", vec)) > k)  val = vec[k];
+  if ((n = element_vector(node->p_elem, attrname, vec)) > k)  val = vec[k];
   return val;
 }
 
