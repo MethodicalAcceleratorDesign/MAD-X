@@ -327,7 +327,7 @@ module twisslfi
   logical :: rmatrix=.false., sectormap=.false., ripken=.false.
   logical :: mode_flip=.false.
   logical :: ele_body=.false.
-  logical :: flipping=.true.
+
 
 end module twisslfi
 

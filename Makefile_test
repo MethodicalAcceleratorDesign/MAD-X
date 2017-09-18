@@ -73,7 +73,6 @@ test-ptc-twiss-old1 test-ptc-twiss-old2 test-ptc-twiss-old3 test-ptc-twiss-old4 
 test-ptc-twiss-5D test-ptc-twiss-5Dt test-ptc-twiss-56D test-ptc-twiss-56Dt test-ptc-twiss-56Dl test-ptc-twiss-56Dtl test-ptc-twiss-6D test-ptc-twiss-6D-ALS \
 test-ptc-twiss-accel-56D test-ptc-twiss-56Dt-ini_map_man test-ptc-twiss-56Dt-ini_mtx_man test-ptc-twiss-56Dt-ini_mtx_tbl \
 test-ptc-normal test-ptc-twiss-normal-genfu test-ptc-twiss-normal-5D test-ptc-twiss-normal-6D test-ptc-twiss-maptable \
-test-ptc-twiss-normal-radiation \
 test-ptc-track test-ptc-track-2 test-ptc-track-3 \
 test-ptc-trackline test-ptc-trackline-2 test-ptc-trackline-3 \
 test-rfmultipole-ptc-1 \
@@ -82,6 +81,7 @@ test-sequence test-sequence-2 test-sequence-3 test-sequence-4 test-sequence-5 te
 test-line \
 test-plot test-plot-2 \
 test-setknob test-fillknob\
+test-coupling test-coupling-2\
 \
 $(call onlxi64,$(user-cases),)
 
@@ -126,6 +126,7 @@ tests-to-setup =
 test-aperture:       TESTSUITE := Aperture testsuite
 test-beam:           TESTSUITE := Beam testsuite
 test-c6t:            TESTSUITE := SixTrack Conversion testsuite
+test-coupling:       TESTSUITE := Coupling testsuite
 test-cororbit:       TESTSUITE := Orbit Correction testsuite
 test-dynap:          TESTSUITE := Dynamic Aperture testsuite
 test-emit:           TESTSUITE := Emit testsuite
@@ -144,7 +145,7 @@ test-ptc-twiss:      TESTSUITE := PTC Twiss testsuite
 test-rfmultipole:    TESTSUITE := RF Multipole testsuite
 test-sequence:	     TESTSUITE := Sequence testsuite
 test-survey:         TESTSUITE := Survey testsuite
-test-table:	         TESTSUITE := Table testsuite
+test-table:	     TESTSUITE := Table testsuite
 test-thick-quad:     TESTSUITE := Thick Element testsuite
 test-touschek:       TESTSUITE := Touschek testsuite
 test-track:          TESTSUITE := Track testsuite

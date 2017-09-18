@@ -148,11 +148,7 @@ SUBROUTINE twiss(rt,disp0,tab_name,sector_tab_name)
 
   !---- Build table of lattice functions, coupled.
   call twcpgo(rt,orbit0)
-  if(.not. flipping) then
-     write (warnstr, '(a)') 'Modes flip is not possible for this lattice'
-     call fort_warn('TWISS: ', warnstr)
-     goto 900
-  endif
+
 
   !---- List chromatic functions.
   if (chrom .ne. 0) then
@@ -1965,7 +1961,7 @@ SUBROUTINE twcptk(re,orbit)
   logical :: mode_flip_ele
   logical :: cp_error
 
-  double precision :: trace_e, trace_f, trace_tmp
+  double precision :: trace_e, trace_f
   integer eflag
   integer, parameter :: izero = 0
   !---- Initialization
@@ -2014,7 +2010,8 @@ SUBROUTINE twcptk(re,orbit)
 
   else
 
-     ! invert symplectic matrix
+
+     ! R is not simplectic but this RMAT_BAr is correct
      RMAT_BAR  = matmul(SMAT, matmul(transpose(RMAT),SMATT))
      TMP       = gammacp*(A -  matmul(B,RMAT))
      det       = tmp(1,1) * tmp(2,2) - tmp(1,2) * tmp(2,1)
@@ -2056,14 +2053,6 @@ SUBROUTINE twcptk(re,orbit)
 
         trace_e = E(1,1)+E(2,2)
         trace_f = F(1,1)+F(2,2)
-        trace_tmp = ( TMP(1,1)+ TMP(2,2))/gammacp**2
-        if ( abs (trace_tmp) .ge. 2.0001 .and. gammacp .ge. 1.001) then
-           flipping = .false.
-           write (warnstr, '(a, a, a)') ' Lattice is unstable due to ', name, '.  Twiss parameter might be unphysical!'
-           call fort_warn('TWCPTK: ', warnstr)
-           write (warnstr, '( a, e13.6, a, e13.6)') ' g = ', gammacp, '; trace of decoupled matrix is ', trace_tmp
-           call fort_warn('TWCPTK: ', warnstr)
-        endif
      endif
   endif
 
