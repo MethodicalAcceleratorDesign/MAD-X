@@ -104,40 +104,46 @@ make all-linux64-gnu
 check_error "make all-linux64-gnu failed" "no-exit"
 
 echo -e "\n===== Intel build ====="
-source /afs/cern.ch/sw/lcg/contrib/gcc/max/i686-slc6/setup.sh
-source /afs/cern.ch/sw/IntelSoftware/linux/all-setup.sh ia32
-icc      --version
-ifort    --version
+echo -e "\nNo more supported on AFS, skipped..."
 
-make all-linux32-intel
-check_error "make all-linux32-intel failed" "no-exit"
+#source /afs/cern.ch/sw/lcg/contrib/gcc/max/i686-slc6/setup.sh
+#source /afs/cern.ch/sw/IntelSoftware/linux/all-setup.sh ia32
+#icc      --version
+#ifort    --version
 
-source /afs/cern.ch/sw/lcg/contrib/gcc/max/x86_64-slc6/setup.sh
-source /afs/cern.ch/sw/IntelSoftware/linux/all-setup.sh intel64
-icc      --version
-ifort    --version
+#make all-linux32-intel
+#check_error "make all-linux32-intel failed" "no-exit"
 
-make all-linux64-intel
-check_error "make all-linux64-intel failed" "no-exit"
+#source /afs/cern.ch/sw/lcg/contrib/gcc/max/x86_64-slc6/setup.sh
+#source /afs/cern.ch/sw/IntelSoftware/linux/all-setup.sh intel64
+#icc      --version
+#ifort    --version
+
+#make all-linux64-intel
+#check_error "make all-linux64-intel failed" "no-exit"
 
 echo -e "\n===== NagFor build ====="
-export PATH="${PATH}:/afs/cern.ch/sw/fortran/nag2012/bin"
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/afs/cern.ch/sw/fortran/nag2012/lib"
-export NAG_KUSARI_FILE="/afs/cern.ch/sw/fortran/nag2012/lib/nag.licence.5.2,lxlicen04.cern.ch:"
+echo -e "\nNo more supported on AFS, skipped..."
 
-make madx-linux32-nagfor
-check_error "make madx-linux32-nagfor failed" "no-exit"
+#export PATH="${PATH}:/afs/cern.ch/sw/fortran/nag2012/bin"
+#export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/afs/cern.ch/sw/fortran/nag2012/lib"
+#export NAG_KUSARI_FILE="/afs/cern.ch/sw/fortran/nag2012/lib/nag.licence.5.2,lxlicen04.cern.ch:"
 
-make madx-linux65-nagfor
-check_error "make madx-linux64-nagfor failed" "no-exit"
+#make madx-linux32-nagfor
+#check_error "make madx-linux32-nagfor failed" "no-exit"
+
+#make madx-linux65-nagfor
+#check_error "make madx-linux64-nagfor failed" "no-exit"
 
 echo -e "\n===== Lahey 32 build ====="
-source /afs/cern.ch/sw/lcg/contrib/gcc/max/i686-slc6/setup.sh
-export PATH="${PATH}:/afs/cern.ch/sw/fortran/lahey/lf9562e/bin"
-export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/afs/cern.ch/sw/fortran/lahey/lf9562e/lib"
+echo -e "\nNo more supported on AFS, skipped..."
 
-make madx-linux32-lahey
-check_error "make madx-linux32-lahey failed" "no-exit"
+#source /afs/cern.ch/sw/lcg/contrib/gcc/max/i686-slc6/setup.sh
+#export PATH="${PATH}:/afs/cern.ch/sw/fortran/lahey/lf9562e/bin"
+#export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/afs/cern.ch/sw/fortran/lahey/lf9562e/lib"
+
+#make madx-linux32-lahey
+#check_error "make madx-linux32-lahey failed" "no-exit"
 
 echo -e "\n===== Binaries dependencies ====="
 make infobindep
@@ -154,13 +160,13 @@ if [ "$1" = "notest" ] ; then
 else
   echo ""
 
-  echo -e "\n===== Testing madx-linux32-intel ====="
-  make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=$NOCOLOR
-  check_error "make tests-all for madx-linux32-intel failed"  "no-exit"
+#  echo -e "\n===== Testing madx-linux32-intel ====="
+#  make madx-linux32-intel && ls -l madx32 && make cleantest && make tests-all COMP=intel ARCH=32 NOCOLOR=$NOCOLOR
+#  check_error "make tests-all for madx-linux32-intel failed"  "no-exit"
 
-  echo -e "\n===== Testing madx-linux64-intel ====="
-  make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=$NOCOLOR
-  check_error "make tests-all for madx-linux64-intel failed" "no-exit"
+#  echo -e "\n===== Testing madx-linux64-intel ====="
+#  make madx-linux64-intel && ls -l madx64 && make cleantest && make tests-all COMP=intel ARCH=64 NOCOLOR=$NOCOLOR
+#  check_error "make tests-all for madx-linux64-intel failed" "no-exit"
 
   echo -e "\n===== Testing madx-linux32-gnu ====="
   make madx-linux32-gnu && ls -l madx32 && make cleantest && make tests-all COMP=gnu ARCH=32 NOCOLOR=$NOCOLOR
