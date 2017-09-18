@@ -417,7 +417,7 @@ static int
 aper_build_screen(char* apertype, double* ap1, double* ap2, double* ap3, double* ap4, int* pipelength, double pipex[], double pipey[])
 {
   int i, quarterlength=0;
-  double aperture_vec[4];
+  double aperture_vec[15];
 
   /* 2013-03-21 -- ghislain: changed name from aper_bs;
      the same function is referenced as build_pipe in the documentation of Ivar Waarum */
