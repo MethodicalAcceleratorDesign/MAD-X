@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.03.06  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.03.09               +
-  + Execution date: 2017.03.30 14:32:06      +
+  + Release   date: 2017.05.29               +
+  + Execution date: 2017.07.27 16:24:41      +
   ++++++++++++++++++++++++++++++++++++++++++++
 title, 'test of rf-multipole';
 
@@ -20,7 +20,7 @@ one pass is on
 
                  y                 py                  t                 pt 
                  0                  0                  0              0.001 
-                 0                  0   -1.431911939e-07              0.001 
+                 0                  0   -1.432043815e-07              0.001 
 
                  s                  e 
                  0                  0 
