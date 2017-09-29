@@ -4120,7 +4120,7 @@ subroutine ttrfmult(track, ktrack, turn)
 
 end subroutine ttrfmult
 
-subroutine ttthick(x, px, y, py, z, pt, h, k0_, k1_, length)
+subroutine ttcfd(x, px, y, py, z, pt, h, k0_, k1_, length)
 
   use trackfi
   use math_constfi, only : zero, half, one, two, three, six
@@ -4131,7 +4131,7 @@ subroutine ttthick(x, px, y, py, z, pt, h, k0_, k1_, length)
   !-------------------------*
   !----------------------------------------------------------------------------*
   ! Purpose:                                                                   *
-  !    Track a particle through a general thick element.                       *
+  !    Track a particle through a combined function dipole.                    *
   ! Input:                                                                     *
   !   h (double)                     curvature of the reference orbit, 1/rho0  *
   !   k0 (double)                    bending strength (in a sbend k0 == h) 1/m *
@@ -4146,7 +4146,8 @@ subroutine ttthick(x, px, y, py, z, pt, h, k0_, k1_, length)
   double precision :: A, B, C, D, k0, k1
   double precision :: delta_plus_1, bet
   double precision :: Cx, Sx, Cy, Sy
-  double complex :: sqrt_Kx, sqrt_Ky
+  integer, parameter:: dp=kind(0.d0)
+  complex(kind=dp) :: sqrt_Kx, sqrt_Ky
   
   delta_plus_1 = sqrt(pt*pt + two*pt/bet0 + one);
   bet = delta_plus_1/(one/bet0+pt);
@@ -4208,7 +4209,7 @@ subroutine ttthick(x, px, y, py, z, pt, h, k0_, k1_, length)
   py = py_;
   z  = z_;
 
-end subroutine ttthick
+end subroutine ttcfd
 
 subroutine tttquad(track, ktrack)
   use twtrrfi
@@ -4317,7 +4318,7 @@ subroutine tttquad(track, ktrack)
         endif
      endif
      
-     call ttthick(x, px, y, py, z, pt, 0d0, 0d0, kk0, length);
+     call ttcfd(x, px, y, py, z, pt, 0d0, 0d0, kk0, length);
      
      !---- Radiation effects at exit
      if (radiate) then
@@ -4463,7 +4464,7 @@ subroutine tttdipole(track, ktrack)
         endif
      endif
      
-     call ttthick(x, px, y, py, z, pt, h, k0, k1, length);
+     call ttcfd(x, px, y, py, z, pt, h, k0, k1, length);
      
      !---- Radiation effects at exit.
      if (radiate) then
