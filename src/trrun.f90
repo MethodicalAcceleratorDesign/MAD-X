@@ -4131,7 +4131,7 @@ subroutine ttcfd(x, px, y, py, z, pt, h, k0_, k1_, length)
   !-------------------------*
   !----------------------------------------------------------------------------*
   ! Purpose:                                                                   *
-  !    Track a particle through a general thick element.                       *
+  !    Track a particle through a combined function dipole.                    *
   ! Input:                                                                     *
   !   h (double)                     curvature of the reference orbit, 1/rho0  *
   !   k0 (double)                    bending strength (in a sbend k0 == h) 1/m *
