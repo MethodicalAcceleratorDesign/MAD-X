@@ -4121,7 +4121,7 @@ subroutine ttrfmult(track, ktrack, turn)
 end subroutine ttrfmult
 
 subroutine ttcfd(x, px, y, py, z, pt, h, k0_, k1_, length)
-
+  
   use trackfi
   use math_constfi, only : zero, half, one, two, three, six
   implicit none
@@ -4139,7 +4139,7 @@ subroutine ttcfd(x, px, y, py, z, pt, h, k0_, k1_, length)
   ! Input/output:                                                              *
   !   (X, PX, Y, PY, T, PT)(double)  Track coordinates.                        *
   !----------------------------------------------------------------------------*
-
+  
   double precision :: x_, px_, y_, py_, z_, length_
   double precision :: x, px, y, py, z, pt, xp, yp
   double precision :: h, k0_, k1_, length, Kx, Ky
@@ -4152,21 +4152,32 @@ subroutine ttcfd(x, px, y, py, z, pt, h, k0_, k1_, length)
   delta_plus_1 = sqrt(pt*pt + two*pt/bet0 + one);
   bet = delta_plus_1/(one/bet0+pt);
   
-  k0 = k0_ / delta_plus_1;
-  k1 = k1_ / delta_plus_1;
-     
-  Kx =  k0*h + k1; ! 1/m^2
-  Ky =        -k1; ! 1/m^2
-  sqrt_Kx = cdsqrt(DCMPLX(Kx)); ! 1/m
-  sqrt_Ky = cdsqrt(DCMPLX(Ky)); ! 1/m
-  Cx = dreal(cdcos(sqrt_Kx*length)); ! 1
-  Cy = dreal(cdcos(sqrt_Ky*length)); ! 1
-  if (Kx.ne.zero) then ; Sx = dreal(cdsin(sqrt_Kx*length) / sqrt_Kx); else ; Sx = length; endif; ! m
-  if (Ky.ne.zero) then ; Sy = dreal(cdsin(sqrt_Ky*length) / sqrt_Ky); else ; Sy = length; endif; ! m
-        
+  k0 = k0_ / delta_plus_1; ! 1/m
+  k1 = k1_ / delta_plus_1; ! 1/m^2
+  Kx = k0*h + k1; ! 1/m^2
+  Ky =       -k1; ! 1/m^2
+  if (Kx.ne.zero) then
+     sqrt_Kx = cdsqrt(DCMPLX(Kx)); ! 1/m
+     Sx = dreal(cdsin(sqrt_Kx*length) / sqrt_Kx); ! m
+     Cx = dreal(cdcos(sqrt_Kx*length)); ! 1
+  else
+     sqrt_Kx = zero; ! 1/m
+     Sx = length; ! m
+     Cx = one; ! 1
+  endif
+  if (Ky.ne.zero) then ;
+     sqrt_Ky = cdsqrt(DCMPLX(Ky)); ! 1/m
+     Sy = dreal(cdsin(sqrt_Ky*length) / sqrt_Ky); ! m
+     Cy = dreal(cdcos(sqrt_Ky*length)); ! 1
+  else
+     sqrt_Ky = zero; ! 1/m
+     Sy = length; ! m
+     Cy = one; ! 1
+  endif
+  
   xp = px/delta_plus_1;
   yp = py/delta_plus_1;
-     
+  
   ! useful constants
   A = -Kx*x-k0+h; ! 1/m
   B = xp;
@@ -4178,7 +4189,7 @@ subroutine ttcfd(x, px, y, py, z, pt, h, k0_, k1_, length)
   y_ = y*Cy + yp*Sy;
   px_ = (A*Sx + B*Cx) * delta_plus_1;
   py_ = (C*Sy + D*Cy) * delta_plus_1;
-
+  
   if (Kx.ne.zero) then
      x_ = x_ + (k0-h)*(Cx-one)/Kx;
   else
@@ -4192,7 +4203,7 @@ subroutine ttcfd(x, px, y, py, z, pt, h, k0_, k1_, length)
      length_ = length_ + half*(-(A**2*Cx*Sx)/(two*Kx)+(B**2*Cx*Sx)/two+&
           (A**2*length)/(two*Kx)+(B**2*length)/two-(A*B*Cx**2)/Kx+(A*B)/Kx);
   else
-     length_ = length_ + h*length*(three*length*xp+six*x+(-k0+h)*length**2)/six;
+     length_ = length_ + h*length*(three*length*xp+six*x-(k0-h)*length**2)/six;
      length_ = length_ + half*(B**2+(A*length)**2/three+A*B*length)*length;
   endif
   if (Ky.ne.zero) then
