@@ -87,7 +87,7 @@ echo -e "\n===== Release number ====="
 cat VERSION
 
 echo -e "\n===== Gnu build ====="
-source /afs/cern.ch/sw/lcg/contrib/gcc/max/i686-slc6/setup.sh
+source /afs/cern.ch/sw/lcg/contrib/gcc/4.8.1/i686-slc6/setup.sh
 gcc      --version
 g++      --version
 gfortran --version
@@ -95,7 +95,7 @@ gfortran --version
 make all-linux32-gnu
 check_error "make all-linux32-gnu failed" "no-exit"
 
-source /afs/cern.ch/sw/lcg/contrib/gcc/max/x86_64-slc6/setup.sh
+source /afs/cern.ch/sw/lcg/contrib/gcc/4.8.1/x86_64-slc6/setup.sh
 gcc      --version
 g++      --version
 gfortran --version
@@ -134,7 +134,7 @@ echo -e "\nNo more supported on AFS, skipped..."
 echo -e "\n===== Lahey 32 build ====="
 echo -e "\nNo more supported on AFS, skipped..."
 
-#source /afs/cern.ch/sw/lcg/contrib/gcc/max/i686-slc6/setup.sh
+#source /afs/cern.ch/sw/lcg/contrib/gcc/4.8.1/i686-slc6/setup.sh
 #export PATH="${PATH}:/afs/cern.ch/sw/fortran/lahey/lf9562e/bin"
 #export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/afs/cern.ch/sw/fortran/lahey/lf9562e/lib"
 
