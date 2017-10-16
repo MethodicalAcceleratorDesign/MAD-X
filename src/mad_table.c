@@ -945,9 +945,11 @@ add_vars_to_table(struct table* t, double scale)
     if (t->columns->inform[i] < 3)
     {
       if (strstr(t->columns->names[i], "aper_"))
-        t->d_cols[i][t->curr] = get_aperture(current_node, t->columns->names[i]);
+        t->d_cols[i][t->curr] = get_aperattr(current_node, "aperture", t->columns->names[i]);
       else if (strstr(t->columns->names[i], "aptol_"))
-        t->d_cols[i][t->curr] = get_apertol(current_node, t->columns->names[i]);
+        t->d_cols[i][t->curr] = get_aperattr(current_node, "aper_tol", t->columns->names[i]);
+      else if (strstr(t->columns->names[i], "apoff_"))
+        t->d_cols[i][t->curr] = get_aperattr(current_node, "aper_offset", t->columns->names[i]);
       else {
         t->d_cols[i][t->curr] = get_variable(t->columns->names[i])*scale;
       }
