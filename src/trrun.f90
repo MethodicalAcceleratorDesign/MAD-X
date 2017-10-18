@@ -2016,15 +2016,13 @@ subroutine ttbb_gauss(track,ktrack,fk)
            endif
         endif
 
-        if (bborbit) then
-          if (ipos .ne. 0)  then
-             !--- subtract closed orbit kick
-             phix = phix - bb_kick(1,ipos)
-             phiy = phiy - bb_kick(2,ipos)
-          endif
-          track(2,i) = track(2,i) + phix
-          track(4,i) = track(4,i) + phiy
+        if (ipos .ne. 0) then
+           !--- subtract closed orbit kick
+           phix = phix - bb_kick(1,ipos)
+           phiy = phiy - bb_kick(2,ipos)
         endif
+        track(2,i) = track(2,i) + phix
+        track(4,i) = track(4,i) + phiy
      enddo
 !$OMP END DO
 !$OMP END PARALLEL
@@ -2069,14 +2067,12 @@ subroutine ttbb_gauss(track,ktrack,fk)
         do i = 1, ktrack
            phixv(i) = rkv(i) * (cryv(i) - exp(-tkv(i)) * cbyv(i))
            phiyv(i) = rkv(i) * (crxv(i) - exp(-tkv(i)) * cbxv(i))
-           if (bborbit) then
-             track(2,i) = track(2,i) + phixv(i) * sign(one,xsv(i))
-             track(4,i) = track(4,i) + phiyv(i) * sign(one,ysv(i))
-             if (ipos .ne. 0)  then
-                !--- subtract closed orbit kick
-                track(2,i) = track(2,i) - bb_kick(1,ipos)
-                track(4,i) = track(4,i) - bb_kick(2,ipos)
-             endif
+           track(2,i) = track(2,i) + phixv(i) * sign(one,xsv(i))
+           track(4,i) = track(4,i) + phiyv(i) * sign(one,ysv(i))
+           if (ipos .ne. 0)  then
+              !--- subtract closed orbit kick
+              track(2,i) = track(2,i) - bb_kick(1,ipos)
+              track(4,i) = track(4,i) - bb_kick(2,ipos)
            endif
         enddo
 !$OMP END DO
@@ -2108,14 +2104,12 @@ subroutine ttbb_gauss(track,ktrack,fk)
               phix = rk * (cry - exp(-tk) * cby)
               phiy = rk * (crx - exp(-tk) * cbx)
            endif
-           if (bborbit) then
-             track(2,i) = track(2,i) + phix * sign(one,xs)
-             track(4,i) = track(4,i) + phiy * sign(one,ys)
-             if (ipos .ne. 0)  then
-                !--- subtract closed orbit kick
-                track(2,i) = track(2,i) - bb_kick(1,ipos)
-                track(4,i) = track(4,i) - bb_kick(2,ipos)
-             endif
+           track(2,i) = track(2,i) + phix * sign(one,xs)
+           track(4,i) = track(4,i) + phiy * sign(one,ys)
+           if (ipos .ne. 0)  then
+              !--- subtract closed orbit kick
+              track(2,i) = track(2,i) - bb_kick(1,ipos)
+              track(4,i) = track(4,i) - bb_kick(2,ipos)
            endif
         enddo
 !$OMP END DO
@@ -2167,14 +2161,12 @@ subroutine ttbb_gauss(track,ktrack,fk)
            phix = rk * (cry - exp(-tk) * cby)
            phiy = rk * (crx - exp(-tk) * cbx)
         endif
-        if (bborbit) then
-           track(2,i) = track(2,i) + phix * sign(one,xs)
-           track(4,i) = track(4,i) + phiy * sign(one,ys)
-          if (ipos .ne. 0)  then
-             !--- subtract closed orbit kick
-             track(2,i) = track(2,i) - bb_kick(1,ipos)
-             track(4,i) = track(4,i) - bb_kick(2,ipos)
-          endif
+        track(2,i) = track(2,i) + phix * sign(one,xs)
+        track(4,i) = track(4,i) + phiy * sign(one,ys)
+        if (ipos .ne. 0)  then
+           !--- subtract closed orbit kick
+           track(2,i) = track(2,i) - bb_kick(1,ipos)
+           track(4,i) = track(4,i) - bb_kick(2,ipos)
         endif
      enddo
 !$OMP END DO
@@ -2260,10 +2252,8 @@ subroutine ttbb_flattop(track,ktrack,fk)
         phix = xs*phir
         phiy = ys*phir
      endif
-     if (bborbit) then
-       track(2,i) = track(2,i)+phix*fk
-       track(4,i) = track(4,i)+phiy*fk
-     endif
+     track(2,i) = track(2,i)+phix*fk
+     track(4,i) = track(4,i)+phiy*fk
   end do
 !$OMP END DO
 !$OMP END PARALLEL
@@ -2349,10 +2339,8 @@ subroutine ttbb_hollowparabolic(track,ktrack,fk)
         phix = xs*phir
         phiy = ys*phir
      endif
-     if (bborbit) then
-       track(2,i) = track(2,i) + phix*fk
-       track(4,i) = track(4,i) + phiy*fk
-     endif
+     track(2,i) = track(2,i) + phix*fk
+     track(4,i) = track(4,i) + phiy*fk
   end do
 !$OMP END DO
 !$OMP END PARALLEL

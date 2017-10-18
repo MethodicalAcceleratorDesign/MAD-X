@@ -6523,7 +6523,6 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
   integer, external ::  get_option
   double precision, external :: node_value
 
-
   !---- initialize.
   bborbit = get_option('bborbit ') .ne. 0
   if (bbd_flag.ne.0 .and. .not.bborbit)  then
