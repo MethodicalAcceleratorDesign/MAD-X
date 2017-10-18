@@ -6456,12 +6456,12 @@ SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
   q = charge
   q_prime = node_value('charge ')
   parvec(5) = arad
-  parvec(6) = node_value('charge ') * npart
+  parvec(6) = q_prime * npart
   parvec(7) = gamma
 
   !---- Calculate momentum deviation and according changes
   !     of the relativistic factor beta0
-  dp  = get_variable('track_deltap ')
+  dp = get_variable('track_deltap ')
   gamma0 = parvec(7)
   beta0 = sqrt(one-one/gamma0**2)
   ptot = beta0*gamma0*(one+dp)
@@ -6478,10 +6478,10 @@ SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
      fk = two*parvec(5)*parvec(6)/parvec(7)/beta0/(one+dp)/q*          &
        (one-beta0*beta_dp*b_dir)/(beta_dp+0.5*(b_dir-one)*b_dir*beta0)
   endif
+  ! if (fk .eq. zero) return ! LD: why in Track and not in Twiss?
 
-  !---- chose beamshape
+  !---- choose beamshape: 1-Gaussian (default), 2-flattop=trapezoidal, 3-hollow-parabolic
   beamshape = node_value('bbshape ')
-
   select case (beamshape)
   case (1)
      call tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
