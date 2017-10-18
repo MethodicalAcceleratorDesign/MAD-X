@@ -78,9 +78,9 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
   character(len=20) :: text
 
 !VVK 20100321 -------------------------------------------------
-      integer :: i_part                     ! local counter
-      double precision  :: Summ_t_mean      ! local for mean value
-      double precision  :: Summ_t_square    ! local for rms value
+  integer :: i_part                     ! local counter
+  double precision  :: Summ_t_mean      ! local for mean value
+  double precision  :: Summ_t_square    ! local for rms value
 !-------------------------------------------------------------------
 
   integer, external :: restart_sequ, advance_node, get_option, node_al_errors
@@ -723,7 +723,6 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
   double precision :: ct, tmp, st, theta
   double precision :: ap1, ap2, ap3, ap4, aperture(maxnaper)
   double precision :: offset(2), offx, offy
-  double precision :: parvec(26)
   double precision :: ek(6), re(6,6), te(6,6,6), craporb(6)
   character(len=name_len) :: aptype
 
@@ -833,10 +832,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
        call fort_warn('TRRUN: ','found deprecated RCOLLIMATOR element; should be replaced by COLLIMATOR')
 
     case (code_beambeam)
-       parvec(5) = get_value('probe ', 'arad ')
-       parvec(6) = node_value('charge ') * get_value('probe ', 'npart ')
-       parvec(7) = get_value('probe ','gamma ')
-       call ttbb(track, ktrack, parvec)
+       call ttbb(track, ktrack)
 
     case (code_twcavity)
        ! call ttlcav(el, track, ktrack)
@@ -1837,7 +1833,7 @@ subroutine ttcorr(el,track,ktrack,turn)
 
 end subroutine ttcorr
 
-subroutine ttbb(track,ktrack,parvec)
+subroutine ttbb(track,ktrack)
   use bbfi, only : explim
   use math_constfi, only : zero, one, two, half
   implicit none
@@ -1850,14 +1846,14 @@ subroutine ttbb(track,ktrack,parvec)
   !   track(6,*)(double)  track coordinates: (x, px, y, py, t, pt).      *
   !   ktrack    (integer) number of tracks.                              *
   !----------------------------------------------------------------------*
-  double precision :: track(6,*), parvec(*)
+  double precision :: track(6,*)
   integer :: ktrack
 
   integer :: beamshape, b_dir_int
-  double precision :: fk, dp, q, q_prime
-  double precision :: gamma0, beta0, beta_dp, ptot, b_dir
-  logical :: bb_ultra_relati
   logical, save :: first=.true.
+  logical :: bb_ultra_relati
+  double precision :: parvec(26), fk, q, q_prime, dp
+  double precision :: gamma0, beta0, beta_dp, ptot, b_dir
 
   integer :: get_option
   double precision :: get_value, node_value, get_variable
@@ -1865,9 +1861,13 @@ subroutine ttbb(track,ktrack,parvec)
 
   !---- Calculate momentum deviation and according changes
   !     of the relativistic factor beta0
-  dp  = get_variable('track_deltap ')
   q = get_value('probe ','charge ')
   q_prime = node_value('charge ')
+  parvec(5) = get_value('probe ', 'arad ')
+  parvec(6) = node_value('charge ') * get_value('probe ', 'npart ')
+  parvec(7) = get_value('probe ','gamma ')
+
+  dp = get_variable('track_deltap ')
   gamma0 = parvec(7)
   beta0 = sqrt(one - one/gamma0**2)
   ptot = beta0*gamma0*(one+dp)
@@ -1884,9 +1884,9 @@ subroutine ttbb(track,ktrack,parvec)
      fk = two*parvec(5)*parvec(6)/parvec(7)/beta0/(one+dp)/q*          &
        (one-beta0*beta_dp*b_dir)/(beta_dp+half*(b_dir-one)*b_dir*beta0)
   endif
-  if (fk .eq. zero)  return
+  if (fk .eq. zero) return
 
-  !---- choose beamshape: 1-Gaussian, 2-flattop=trapezoidal, 3-hollow-parabolic
+  !---- choose beamshape: 1-Gaussian (default), 2-flattop=trapezoidal, 3-hollow-parabolic
   beamshape = node_value('bbshape ')
   select case (beamshape)
     case (1)
@@ -1896,8 +1896,10 @@ subroutine ttbb(track,ktrack,parvec)
     case (3)
        call ttbb_hollowparabolic(track,ktrack,fk)
     case default
-       if (first)  call fort_warn('TTBB: ','beamshape out of range, set to default=1')
-       first = .false.
+       if (first) then
+         first = .false.
+         call fort_warn('TTBB: ','beamshape out of range, set to default=1')
+       endif
        call ttbb_gauss(track,ktrack,fk)
   end select
 
@@ -2014,13 +2016,15 @@ subroutine ttbb_gauss(track,ktrack,fk)
            endif
         endif
 
-        if (ipos .ne. 0)  then
-           !--- subtract closed orbit kick
-           phix = phix - bb_kick(1,ipos)
-           phiy = phiy - bb_kick(2,ipos)
+        if (bborbit) then
+          if (ipos .ne. 0)  then
+             !--- subtract closed orbit kick
+             phix = phix - bb_kick(1,ipos)
+             phiy = phiy - bb_kick(2,ipos)
+          endif
+          track(2,i) = track(2,i) + phix
+          track(4,i) = track(4,i) + phiy
         endif
-        track(2,i) = track(2,i) + phix
-        track(4,i) = track(4,i) + phiy
      enddo
 !$OMP END DO
 !$OMP END PARALLEL
@@ -2065,12 +2069,14 @@ subroutine ttbb_gauss(track,ktrack,fk)
         do i = 1, ktrack
            phixv(i) = rkv(i) * (cryv(i) - exp(-tkv(i)) * cbyv(i))
            phiyv(i) = rkv(i) * (crxv(i) - exp(-tkv(i)) * cbxv(i))
-           track(2,i) = track(2,i) + phixv(i) * sign(one,xsv(i))
-           track(4,i) = track(4,i) + phiyv(i) * sign(one,ysv(i))
-           if (ipos .ne. 0)  then
-              !--- subtract closed orbit kick
-              track(2,i) = track(2,i) - bb_kick(1,ipos)
-              track(4,i) = track(4,i) - bb_kick(2,ipos)
+           if (bborbit) then
+             track(2,i) = track(2,i) + phixv(i) * sign(one,xsv(i))
+             track(4,i) = track(4,i) + phiyv(i) * sign(one,ysv(i))
+             if (ipos .ne. 0)  then
+                !--- subtract closed orbit kick
+                track(2,i) = track(2,i) - bb_kick(1,ipos)
+                track(4,i) = track(4,i) - bb_kick(2,ipos)
+             endif
            endif
         enddo
 !$OMP END DO
@@ -2102,12 +2108,14 @@ subroutine ttbb_gauss(track,ktrack,fk)
               phix = rk * (cry - exp(-tk) * cby)
               phiy = rk * (crx - exp(-tk) * cbx)
            endif
-           track(2,i) = track(2,i) + phix * sign(one,xs)
-           track(4,i) = track(4,i) + phiy * sign(one,ys)
-           if (ipos .ne. 0)  then
-              !--- subtract closed orbit kick
-              track(2,i) = track(2,i) - bb_kick(1,ipos)
-              track(4,i) = track(4,i) - bb_kick(2,ipos)
+           if (bborbit) then
+             track(2,i) = track(2,i) + phix * sign(one,xs)
+             track(4,i) = track(4,i) + phiy * sign(one,ys)
+             if (ipos .ne. 0)  then
+                !--- subtract closed orbit kick
+                track(2,i) = track(2,i) - bb_kick(1,ipos)
+                track(4,i) = track(4,i) - bb_kick(2,ipos)
+             endif
            endif
         enddo
 !$OMP END DO
@@ -2159,12 +2167,14 @@ subroutine ttbb_gauss(track,ktrack,fk)
            phix = rk * (cry - exp(-tk) * cby)
            phiy = rk * (crx - exp(-tk) * cbx)
         endif
-        track(2,i) = track(2,i) + phix * sign(one,xs)
-        track(4,i) = track(4,i) + phiy * sign(one,ys)
-        if (ipos .ne. 0)  then
-           !--- subtract closed orbit kick
-           track(2,i) = track(2,i) - bb_kick(1,ipos)
-           track(4,i) = track(4,i) - bb_kick(2,ipos)
+        if (bborbit) then
+           track(2,i) = track(2,i) + phix * sign(one,xs)
+           track(4,i) = track(4,i) + phiy * sign(one,ys)
+          if (ipos .ne. 0)  then
+             !--- subtract closed orbit kick
+             track(2,i) = track(2,i) - bb_kick(1,ipos)
+             track(4,i) = track(4,i) - bb_kick(2,ipos)
+          endif
         endif
      enddo
 !$OMP END DO
@@ -2250,8 +2260,10 @@ subroutine ttbb_flattop(track,ktrack,fk)
         phix = xs*phir
         phiy = ys*phir
      endif
-     track(2,i) = track(2,i)+phix*fk
-     track(4,i) = track(4,i)+phiy*fk
+     if (bborbit) then
+       track(2,i) = track(2,i)+phix*fk
+       track(4,i) = track(4,i)+phiy*fk
+     endif
   end do
 !$OMP END DO
 !$OMP END PARALLEL
@@ -2337,8 +2349,10 @@ subroutine ttbb_hollowparabolic(track,ktrack,fk)
         phix = xs*phir
         phiy = ys*phir
      endif
-     track(2,i) = track(2,i) + phix*fk
-     track(4,i) = track(4,i) + phiy*fk
+     if (bborbit) then
+       track(2,i) = track(2,i) + phix*fk
+       track(4,i) = track(4,i) + phiy*fk
+     endif
   end do
 !$OMP END DO
 !$OMP END PARALLEL
@@ -2747,7 +2761,7 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
      endif
 
 
-     
+
      lost = .false.
 
      x = abs(z(1,i) - al_errors(11) - offset(1))
@@ -2795,8 +2809,8 @@ subroutine trcoll(apertype, aperture, offset, al_errors, maxaper, &
                 abs(z(3, i)) .gt. maxaper(3) .or.  abs(z(4, i)) .gt. maxaper(4) .or. &
                 abs(z(5, i)) .gt. maxaper(5) .or.  abs(z(6, i)) .gt. maxaper(6)
      endif
-     
-     
+
+
      ! lose particle if it is outside aperture
 99   if (lost) then
         n = i
@@ -4121,11 +4135,11 @@ subroutine ttrfmult(track, ktrack, turn)
 end subroutine ttrfmult
 
 subroutine ttcfd(x, px, y, py, z, pt, h, k0_, k1_, length)
-  
+
   use trackfi
   use math_constfi, only : zero, half, one, two, three, six
   implicit none
-  
+
   !-------------------------*
   ! Andrea Latina 2017      *
   !-------------------------*
@@ -4139,7 +4153,7 @@ subroutine ttcfd(x, px, y, py, z, pt, h, k0_, k1_, length)
   ! Input/output:                                                              *
   !   (X, PX, Y, PY, T, PT)(double)  Track coordinates.                        *
   !----------------------------------------------------------------------------*
-  
+
   double precision :: x_, px_, y_, py_, z_, length_
   double precision :: x, px, y, py, z, pt, xp, yp
   double precision :: h, k0_, k1_, length, Kx, Ky
@@ -4148,10 +4162,10 @@ subroutine ttcfd(x, px, y, py, z, pt, h, k0_, k1_, length)
   double precision :: Cx, Sx, Cy, Sy
   integer, parameter:: dp=kind(0.d0)
   complex(kind=dp) :: sqrt_Kx, sqrt_Ky
-  
+
   delta_plus_1 = sqrt(pt*pt + two*pt/bet0 + one);
   bet = delta_plus_1/(one/bet0+pt);
-  
+
   k0 = k0_ / delta_plus_1; ! 1/m
   k1 = k1_ / delta_plus_1; ! 1/m^2
   Kx = k0*h + k1; ! 1/m^2
@@ -4174,28 +4188,28 @@ subroutine ttcfd(x, px, y, py, z, pt, h, k0_, k1_, length)
      Sy = length; ! m
      Cy = one; ! 1
   endif
-  
+
   xp = px/delta_plus_1;
   yp = py/delta_plus_1;
-  
+
   ! useful constants
   A = -Kx*x-k0+h; ! 1/m
   B = xp;
   C = -Ky*y; ! 1/m
   D = yp;
-  
+
   ! transverse map
   x_ = x*Cx + xp*Sx;
   y_ = y*Cy + yp*Sy;
   px_ = (A*Sx + B*Cx) * delta_plus_1;
   py_ = (C*Sy + D*Cy) * delta_plus_1;
-  
+
   if (Kx.ne.zero) then
      x_ = x_ + (k0-h)*(Cx-one)/Kx;
   else
      x_ = x_ - (k0-h)*half*length**2;
   endif
-  
+
   ! longitudinal map
   length_ = length; ! will be the total path length traveled by the particle
   if (Kx.ne.zero) then
@@ -4213,7 +4227,7 @@ subroutine ttcfd(x, px, y, py, z, pt, h, k0_, k1_, length)
      length_ = length_ + half*(D**2)*length;
   endif
   z_ = z + length/bet0 - length_/bet;
-  
+
   x  = x_;
   px = px_;
   y  = y_;
@@ -4245,7 +4259,7 @@ subroutine tttquad(track, ktrack)
   double precision :: delta_plus_1
   double precision :: ct, st
   double precision :: tmp
-  
+
   double precision :: hx, hy, rfac, gamma, curv
   double precision :: rpx1, rpy1, rpt1
   double precision :: rpx2, rpy2, rpt2
@@ -4258,7 +4272,7 @@ subroutine tttquad(track, ktrack)
   double precision, external :: get_value
 
   gamma   = get_value('probe ','gamma ')
-  
+
   !---- Read-in the parameters
   k1 = node_value('k1 ');
   k1s = node_value('k1s ');
@@ -4328,9 +4342,9 @@ subroutine tttquad(track, ktrack)
            pt = pt - rpt1;
         endif
      endif
-     
+
      call ttcfd(x, px, y, py, z, pt, 0d0, 0d0, kk0, length);
-     
+
      !---- Radiation effects at exit
      if (radiate) then
         hx = (-kk0*x) / delta_plus_1;
@@ -4434,7 +4448,7 @@ subroutine tttdipole(track, ktrack)
   h = angle/length;
   k0 = h;
   k1 = node_value('k1 ');
-  
+
   !---- Prepare to calculate the kick and the matrix elements
   do jtrk = 1,ktrack
      !---- The particle position
@@ -4474,9 +4488,9 @@ subroutine tttdipole(track, ktrack)
            pt = pt - rpt1;
         endif
      endif
-     
+
      call ttcfd(x, px, y, py, z, pt, h, k0, k1, length);
-     
+
      !---- Radiation effects at exit.
      if (radiate) then
         !hx = (-k0 -k1*x + k1s*y  - k2*(x*x - y*y)/two + k2s*x*y) / delta_plus_1; ! if there were k1s k2 and k2s
