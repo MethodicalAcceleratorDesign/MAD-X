@@ -191,7 +191,7 @@ SUBROUTINE tmrefe(rt)
   !     Purpose:                                                         *
   !     Transfer matrix w.r.t. ideal orbit for one period.               *
   !     Ignores cavities, radiation, and imperfections.                  *
-  !     entry point for mad_twiss and mad_emit                           *
+  !     entry point for mad_twiss, mad_emit and mad_beam                 *
   !     Output:                                                          *
   !     rt(6,6) (double) transfer matrix.                                *
   !----------------------------------------------------------------------*
@@ -216,9 +216,9 @@ SUBROUTINE tmrefe(rt)
 
   ithr_on = 0
   ORBIT0 = zero ; ORBIT = zero ; TT = zero
+
   !---- Get transfer matrix.
   call tmfrst(orbit0,orbit,.false.,.false.,rt,tt,eflag,0,0,ithr_on)
-
 end SUBROUTINE tmrefe
 
 SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
@@ -263,10 +263,7 @@ SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
   ORBIT0 = zero
   !---- Get closed orbit and coupled transfer matrix.
   call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
-  call set_option('bbd_flag ', ione)
   call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,kobs,0,ithr_on)
-  call set_option('bbd_flag ', izero)
-
 end SUBROUTINE tmrefo
 
 SUBROUTINE twinifun(opt_fun0,rt)
@@ -6478,7 +6475,6 @@ SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
      fk = two*parvec(5)*parvec(6)/parvec(7)/beta0/(one+dp)/q*          &
        (one-beta0*beta_dp*b_dir)/(beta_dp+0.5*(b_dir-one)*b_dir*beta0)
   endif
-  ! if (fk .eq. zero) return ! LD: why in Track and not in Twiss?
 
   !---- choose beamshape: 1-Gaussian (default), 2-flattop=trapezoidal, 3-hollow-parabolic
   beamshape = node_value('bbshape ')
@@ -6765,6 +6761,9 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
      endif
   endif
 
+!  print *, 'bborbit=', bborbit, 'bbd_flag=', bbd_flag, ', fk=', fk, &
+!    ', bbd_pos=', bbd_pos, ', bbd_cnt=', bbd_cnt, &
+!    ', bb_kick_x=', bb_kick(1,bbd_cnt), ', bb_kick_y=', bb_kick(2,bbd_cnt)
 end SUBROUTINE tmbb_gauss
 
 SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)

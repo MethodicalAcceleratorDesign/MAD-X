@@ -1976,6 +1976,10 @@ subroutine ttbb_gauss(track,ktrack,fk)
 1    continue
   endif
 
+!  print *, 'bborbit=', bborbit, &
+!         ', ipos=', ipos, ', bbd_pos=', bbd_pos, ', bbd_cnt=', bbd_cnt, &
+!         ', bb_kick_x=', bb_kick(1,ipos), ', bb_kick_y=', bb_kick(2,ipos)
+
   sx2 = sx*sx
   sy2 = sy*sy
   !---- limit formulae for sigma(x) = sigma(y).
