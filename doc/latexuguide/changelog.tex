@@ -6,127 +6,129 @@
 \textbf{since version 5.02.00}
 \end{center}
 
-The following changes have been made to the code and documentation since
+The following changes have been made to the documentation since
 August 15th, 2014 in version 5.02.02
 
 The changes are indexed by date (most recent first) and provide the \madx 
-version number where the change applies as well as the SVN 
-release number for the change. 
+version number where the change applies. 
 
 \begin{madlist}
-  \ttitem{2017-Aug-7} version 5.03.06, \texttt{2a65d00c} \\
-   Removed sharing of implicit drifts. The drifts do not have globally unique names anymore and are only accessible within the context of a sequence. The objects are now created using a shallow copy.
+  \ttitem{2017-Oct-20} version 5.03.07 \\
+Added a comment about the relation between \hyperref[sec:track]{\texttt{ONEPASS}} and \hyperref[sec:option]{\texttt{BBORBIT}} for \hyperref[chap:thintrack]{\texttt{TRACK}}.
 
-  \ttitem{2017-Jun-27} version 5.03.06, \texttt{92a1be1a} \\
-  Can use sigma matrix elements as constraints.
+%  \ttitem{2017-Aug-7} version 5.03.06, \texttt{2a65d00c} \\
+%   Removed sharing of implicit drifts. The drifts do not have globally unique names anymore and are only accessible within the context of a sequence. The objects are now created using a shallow copy.
 
-  \ttitem{2017-Jun-27} version 5.03.06, \texttt{4d400c4c} \\
+%  \ttitem{2017-Jun-27} version 5.03.06, \texttt{92a1be1a} \\
+%  Can use sigma matrix elements as constraints.
+
+  \ttitem{2017-Jun-27} version 5.03.07 \\
   Add \texttt{SELECT, flag=interpolate} option to select positions for
   intermediate values during \texttt{TWISS}.
 
-  \ttitem{2017-Jun-26} version 5.03.06, \texttt{d028e6c5} \\
-  Refactor and simplify \texttt{TWISS} code for \texttt{CENTRE}.
+%  \ttitem{2017-Jun-26} version 5.03.06, \texttt{d028e6c5} \\
+%  Refactor and simplify \texttt{TWISS} code for \texttt{CENTRE}.
 
-  \ttitem{2017-Jun-26} version 5.03.06, \texttt{73dc378b} \\
-  Decrease node size and avoid needless copies during matching.
+%  \ttitem{2017-Jun-26} version 5.03.06, \texttt{73dc378b} \\
+%  Decrease node size and avoid needless copies during matching.
 
-  \ttitem{2017-Jun-26} version 5.03.06, \texttt{1e698ee1} \\
-  Fix \texttt{INTERPOLATE} option of \texttt{PLOT}/\texttt{APERTURE} erasing expressions in elements (resolves issues \#377, \#404).
+%  \ttitem{2017-Jun-26} version 5.03.06, \texttt{1e698ee1} \\
+%  Fix \texttt{INTERPOLATE} option of \texttt{PLOT}/\texttt{APERTURE} erasing expressions in elements (resolves issues \#377, \#404).
 
-  \ttitem{2017-Jun-23} version 5.03.06, r6315, \texttt{f80b9ac9} \\
-  Migrate MAD-X to github: \\
-  \url{https://github.com/MethodicalAcceleratorDesign/MAD-X}
+%  \ttitem{2017-Jun-23} version 5.03.06, r6315, \texttt{f80b9ac9} \\
+%  Migrate MAD-X to github: \\
+%  \url{https://github.com/MethodicalAcceleratorDesign/MAD-X}
 
-  \ttitem{2017-May-29} version 5.03.06, r6285, r6286, r6288 \\
-  Fix cmake config for building with GC on windows.
+%  \ttitem{2017-May-29} version 5.03.06, r6285, r6286, r6288 \\
+%  Fix cmake config for building with GC on windows.
 
-  \ttitemn{2017-May-29} version 5.03.06, r6282 \\
+  \ttitemn{2017-May-29} version 5.03.06 \\
   Add $p_s$ definition and (local) phase slip factor. \\
  Move \texttt{PTC\_SETSWITCH} description right after \texttt{PTC\_CREATE\_LAYOUT}.
 
-  \ttitemn{2017-Apr-11} version 5.03.00, r6188 \\
+  \ttitemn{2017-Apr-11} version 5.03.00 \\
   Allow Track to specify a new seed for the quantum attribute.
 
-  \ttitemn{2017-Apr-11} version 5.03.00, r6187 \\
+  \ttitemn{2017-Apr-11} version 5.03.00 \\
   New random number generator with independent streams.
 
-  \ttitemn{2016-Dec-21} version 5.02.13, r6053 \\
-  New dev release.
+%  \ttitemn{2016-Dec-21} version 5.02.13, r6053 \\
+%  New dev release.
 
   \ttitemn{2016-Dec-20} version 5.02.13, r6049 \\
   Lrad and tilt added to monitors for users' convenience, but not used internally.
 
-  \ttitemn{2016-Dec-20} version 5.02.13, r6048, r6051 \\
-  Bug fix in Survey, BV flags now affects angles, including TILT, update of TI8 sequence.
+%  \ttitemn{2016-Dec-20} version 5.02.13, r6048, r6051 \\
+%  Bug fix in Survey, BV flags now affects angles, including TILT, update of TI8 sequence.
   
-  \ttitemn{2016-Dec-12} version 5.02.13, r6037 \\
-  Makethin updated to not share exit slice of thick quadrupole.
+%  \ttitemn{2016-Dec-12} version 5.02.13, r6037 \\
+%  Makethin updated to not share exit slice of thick quadrupole.
  
   \ttitemn{2016-Dec-9} version 5.02.13, r6031, r6032 \\
   New command setvars\_knob and fill\_knob.
   
-  \ttitemn{2016-Dec-2} version 5.02.13, r6024 \\
-  Added maxaper checks in Track (was partially ignored).
+%  \ttitemn{2016-Dec-2} version 5.02.13, r6024 \\
+%  Added maxaper checks in Track (was partially ignored).
 
-  \ttitemn{2016-Nov-29} version 5.02.13, r6019 \\
-  Space charge finalization, bug fix in tilt for dipedge, bux fix in relativistic beta.
+%  \ttitemn{2016-Nov-29} version 5.02.13, r6019 \\
+%  Space charge finalization, bug fix in tilt for dipedge, bux fix in relativistic beta.
 
   \ttitemn{2016-Nov-28} version 5.02.13, r6018 \\
   K1 implementation in thick sbend in track.
 
-  \ttitemn{2016-Nov-15} version 5.02.13, r6005 \\
-  Bug fix in chrom option when twiss fails.
+%  \ttitemn{2016-Nov-15} version 5.02.13, r6005 \\
+%  Bug fix in chrom option when twiss fails.
 
   \ttitemn{2016-Nov-14} version 5.02.13, r6003 \\
   Field errors ksl0 added to kickers.
 
-  \ttitemn{2016-Nov-2} version 5.02.13, r5992 \\
-  TKicker restored in Track and Twiss and disabled to orbit correction.
+%  \ttitemn{2016-Nov-2} version 5.02.13, r5992 \\
+%  TKicker restored in Track and Twiss and disabled to orbit correction.
 
-  \ttitemn{2016-Oct-15} version 5.02.12, r5969 \\
-  New dev release: Bug fix in coupling logic, bug fix in Track command, bug fix in parser (i.e. extra ')'). New keeptrack option for Run command. Minor improvement to build system. New tests on Petra IV strongly coupled lattice.
+%  \ttitemn{2016-Oct-15} version 5.02.12, r5969 \\
+%  New dev release: Bug fix in coupling logic, bug fix in Track command, bug fix in parser (i.e. extra ')'). New keeptrack option for Run command. Minor improvement to build system. New tests on Petra IV strongly coupled lattice.
 
-  \ttitemn{2016-Oct-12} version 5.02.11, r5952 \\
-  New dev release
+%  \ttitemn{2016-Oct-12} version 5.02.11, r5952 \\
+%  New dev release
 
-  \ttitemn{2016-Oct-07} version 5.02.10, r5950, 5947, 5945\\
-    some bugs fixes: bug in parser, bug in \texttt{SETERR} command for number of colums in the table , bug in arrays dimension of POL\_BLOCK\_sagan, etc 
+%  \ttitemn{2016-Oct-07} version 5.02.10, r5950, 5947, 5945\\
+%    some bugs fixes: bug in parser, bug in \texttt{SETERR} command for number of colums in the table , bug in arrays dimension of POL\_BLOCK\_sagan, etc 
 
   \ttitemn{2016-Sep-30} version 5.02.10, r5946 \\
    add flag to export all markers to Sixtrack
 
-  \ttitemn{2016-Sep-24} version 5.02.10, r5942, 5936, 5928 \\
-    \hyperref[sec:coupling]{coupling} fixes. Modes flip and stability checkes, as well as simplecticity checks, were added to the coupling calculation.  
+%  \ttitemn{2016-Sep-24} version 5.02.10, r5942, 5936, 5928 \\
+%    \hyperref[sec:coupling]{coupling} fixes. Modes flip and stability checkes, as well as simplecticity checks, were added to the coupling calculation.  
   
-  \ttitemn{2016-Sep-21} version 5.02.10, r5937 \\
-    improvement of the CMake build system 
+%  \ttitemn{2016-Sep-21} version 5.02.10, r5937 \\
+%    improvement of the CMake build system 
   
-  \ttitemn{2016-Jul-06}version 5.02.11, r5913, 5915\\
-    bug fixes caused by all variables initialized within declaration in Fortran 95 
+%  \ttitemn{2016-Jul-06}version 5.02.11, r5913, 5915\\
+%    bug fixes caused by all variables initialized within declaration in Fortran 95 
 
   \ttitemn{2016-Jun-15} version 5.02.10, r5909 \\
    sigma matrix added to \hyperref[chap:twiss]{Twiss table}:  sig11...sig66. 
 
-  \ttitemn{2016-Jun-15 } version 5.02.10, r5909 \\ 
-    secondary method to cross-check fractional part of the tunes 
+%  \ttitemn{2016-Jun-15 } version 5.02.10, r5909 \\ 
+%    secondary method to cross-check fractional part of the tunes 
   
-  \ttitemn{2016-Jun-10} version 5.02.10, r5905 \\
-    F. Schmidt's Space-Charge update 
+%  \ttitemn{2016-Jun-10} version 5.02.10, r5905 \\
+%    F. Schmidt's Space-Charge update 
 
-  \ttitemn{2016-Jun-06} version 5.02.10, r5894 \\
-    new PTC and PTC tests update.
+%  \ttitemn{2016-Jun-06} version 5.02.10, r5894 \\
+%    new PTC and PTC tests update.
  
-  \ttitemn{2016-Apr-25} version 5.02.10, r5845 \\
-    minor improvement of the build system
+%  \ttitemn{2016-Apr-25} version 5.02.10, r5845 \\
+%    minor improvement of the build system
   
-  \ttitemn{2016-Apr-25} version 5.02.10, r5844  \\
-    correction of a logic error in max\_mult\_ord settings in c6t. 
+%  \ttitemn{2016-Apr-25} version 5.02.10, r5844  \\
+%    correction of a logic error in max\_mult\_ord settings in c6t. 
 
   \ttitemn{2016-Apr-22} version 5.02.10, r5833\\
   the function \hyperref[subsubsec:table]{TABINDEX} has been introduced and the section has been reschuffled.
 
-  \ttitemn{2016-Apr-19} version 5.02.10, r5816, r5817\\
-  the intialization of modules twiss, track, emit, touschek, dynap, plot, ibs has been reviewed with the introduction of the new fix point search for proper beam initialization. This affected the physics in the presence of RF with HARMON attributes or changes in deltap.
+%  \ttitemn{2016-Apr-19} version 5.02.10, r5816, r5817\\
+%  the intialization of modules twiss, track, emit, touschek, dynap, plot, ibs has been reviewed with the introduction of the new fix point search for proper beam initialization. This affected the physics in the presence of RF with HARMON attributes or changes in deltap.
 
   \ttitemn{2016-Apr-19} version 5.02.10, r5816\\
   the defaults for \hyperref[sec:beam]{\texttt{BEAM}} attributes \texttt{ET, SIGT, SIGE} have been set to the values $10^{-3}, 1, 10^{-3}$ respectively (were $1, 0, 0$).
