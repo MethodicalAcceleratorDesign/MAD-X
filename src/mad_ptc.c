@@ -131,18 +131,11 @@ pro_ptc_select_checkpushtable(struct in_cmd* cmd, struct int_array** tabnameIA, 
   {
     return -1; /*This means that table name was not specified at all*/
   }
-  pos = name_list_pos(tablename, table_register->names);
-  if (pos < 0)
+  aTable = find_table(tablename);
+  if (!aTable)
   {
     printf("mad_ptc.c: pro_ptc_select: table <<%s>> does not exist: Create table first\n",tablename);
     return 3;
-  }
-
-  aTable = table_register->tables[pos];
-  if (aTable == 0x0)
-  {
-    printf("mad_ptc.c: pro_ptc_select: table <<%s>> is NULL: \n",tablename);
-    return 4;
   }
 
 
@@ -183,16 +176,8 @@ minimum_acceptable_order(void)
 int
 select_ptc_idx(void)
 {
-  struct table* t;
-  int pos;
-
-  if ((pos = name_list_pos("normal_results", table_register->names)) > -1)
-  {
-    t = table_register->tables[pos];
-    return t->curr;
-  }
-  else
-    return pos;
+  struct table* t = find_table("normal_results");;
+  return t ? t->curr : -1;
 }
 
 void
@@ -473,7 +458,7 @@ pro_ptc_create_layout(void)
   probe_beam = clone_command(current_beam);
   adjust_probe_fp(0);
 
-  if (name_list_pos("errors_dipole", table_register->names) <= -1) // (pos = not used
+  if (!table_exists("errors_dipole"))
   {
     errors_dipole = make_table("errors_dipole", "efield", efield_table_cols,
                                efield_table_types, 10000);
@@ -484,7 +469,7 @@ pro_ptc_create_layout(void)
     reset_count("errors_dipole");
   }
 
-  if (name_list_pos("errors_field", table_register->names) <= -1) // (pos = not used
+  if (!table_exists("errors_field"))
   {
     errors_field = make_table("errors_field", "efield", efield_table_cols,
                               efield_table_types, 10000);
@@ -495,7 +480,7 @@ pro_ptc_create_layout(void)
     reset_count("errors_field");
   }
 
-  if (name_list_pos("errors_total", table_register->names) <= -1) // (pos = not used
+  if (!table_exists("errors_total"))
   {
     errors_total = make_table("errors_total", "efield", efield_table_cols,
                               efield_table_types, 10000);
@@ -573,10 +558,10 @@ select_ptc_normal(struct in_cmd* cmd)
     mynres = 0;
     skew = 0;
     reset_count("normal_results");
-/*    if ((pos = name_list_pos("normal_results", table_register->names)) > -1) delete_table(table_register->tables[pos]);*/
+/*    if (t = find_table("normal_results")) delete_table(t);*/
     return;
   }
-  if ((pos = name_list_pos("normal_results", table_register->names)) <= -1)
+  if (!(t = find_table("normal_results")))
   {
     /* initialise table */
     normal_results = make_table("normal_results", "normal_res", normal_res_cols,
@@ -584,11 +569,10 @@ select_ptc_normal(struct in_cmd* cmd)
     normal_results->dynamic = 1;
     add_to_table_list(normal_results, table_register);
     reset_count("normal_results");
-    pos = name_list_pos("normal_results", table_register->names);
+    t = find_table("normal_results");
     min_order = 1;
     min_req_order = 1;
   }
-  t = table_register->tables[pos];
 
   /* initialise order array */
   order[0] = zero;
@@ -1966,7 +1950,7 @@ pro_ptc_track(struct in_cmd* cmd)
    }
   
   w_ptc_track_(&curr_obs_points);
-  t = table_register->tables[name_list_pos("tracksumm", table_register->names)];
+  t = find_table("tracksumm");
   if (get_option("info"))  print_table(t);
   if (get_option("track_dump")) track_tables_dump();
   

@@ -634,10 +634,9 @@ advance_to_pos(char* table, int* t_pos)
   struct table* t;
   int pos, cnt = 0, ret = 0;
   mycpy(c_dum->c, table);
-  if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1)
+  if ((t = find_table(c_dum->c)))
   {
     ret = 1;
-    t = table_register->tables[pos];
     if (t->origin == 1)  return 1; /* table is read, has no node pointers */
     while (current_node)
     {

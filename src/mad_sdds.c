@@ -609,9 +609,7 @@ sdds_iow(struct in_cmd* cmd)
     }
 
     mycpy(c_dum->c, tfs_table_name);
-    if ((pos = name_list_pos(c_dum->c, table_register->names)) > -1) {
-      tfs_table = table_register->tables[pos];
-    }
+    tfs_table = find_table(c_dum->c);
 
     printf("create SDDS table: %s %d\n",sdds_table_file,pos);
     sel_table(tfs_table_name, tfs_table);

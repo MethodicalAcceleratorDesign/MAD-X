@@ -116,7 +116,6 @@ error_seterr(struct in_cmd* cmd)
   char   slnname[NAME_L];
 
   char    *namtab, namtab_buf[NAME_L];
-  int      t1;
 
   struct   table *err;
 
@@ -127,7 +126,7 @@ error_seterr(struct in_cmd* cmd)
 
   if ((namtab = command_par_string("table",cmd->clone)) != NULL) {
     printf("Want to use named table: %s\n",namtab);
-    if ((t1 = name_list_pos(namtab, table_register->names)) > -1)
+    if ((err = find_table(namtab)))
       printf("The table ==> %s <=== was found \n",namtab);
     else {
       warning("No such error table in memory:", namtab);
@@ -141,15 +140,13 @@ error_seterr(struct in_cmd* cmd)
     }
 
     strcpy(namtab=namtab_buf,"error");
-    if ((t1 = name_list_pos(namtab, table_register->names)) > -1)
+    if ((err = find_table(namtab)))
       printf("The default table ==> %s <=== was found \n",namtab);
     else {
       warning("No default error table in memory:", namtab);
       exit(-77);
     }
   }
-
-  err = table_register->tables[t1];
 
   /* check that the table has all the columns that we expect*/
   from_col = find_index_in_table(efield_table_cols, "k0l");

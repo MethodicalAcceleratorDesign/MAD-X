@@ -365,7 +365,7 @@ static void correct_setcorr(struct in_cmd* cmd) {
 
   if ((namtab = command_par_string("table", cmd->clone)) != NULL ) {
     printf("Want to use named table: %s\n", namtab);
-    if (name_list_pos(namtab, table_register->names) > -1) {
+    if (table_exists(namtab)) {
       printf("The table ==> %s <=== was found \n", namtab);
     } else {
       /* fatal_error("Corrector table requested, but not existing:",namtab); */
@@ -802,7 +802,6 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
   char* orbtab1;
   char* orbtab2;
 
-  int t1, t2;
   int ebl1, ebl2;
 
   int j, k;
@@ -823,9 +822,7 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
   /* Get access to tables, for orbit and model the default is twiss_table */
   if ((orbtab1 = command_par_string("beam1tab", cmd->clone)) != NULL ) {
     printf("Want to use orbit from: %s\n", orbtab1);
-    if ((t1 = name_list_pos(orbtab1, table_register->names)) > -1) {
-      b1 = table_register->tables[t1];
-    } else {
+    if (!(b1 = find_table(orbtab1))) {
       fatal_error("Beam 1 ORBIT table requested, but not provided:", orbtab1);
     }
   } else {
@@ -834,9 +831,7 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
 
   if ((orbtab2 = command_par_string("beam2tab", cmd->clone)) != NULL ) {
     printf("Want to use orbit from: %s\n", orbtab2);
-    if ((t2 = name_list_pos(orbtab2, table_register->names)) > -1) {
-      b2 = table_register->tables[t2];
-    } else {
+    if (!(b2 = find_table(orbtab2))) {
       fatal_error("Beam 2 ORBIT table requested, but not provided:", orbtab2);
     }
   } else {
@@ -1929,7 +1924,6 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
   char* modtab;
 
   int j;
-  int pps, ppt;
 
   int cntm = { 0 };
   int cntc = { 0 };
@@ -1948,9 +1942,7 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
 
   if ((orbtab = command_par_string("orbit", cmd->clone)) != NULL ) {
     printf("Want to use orbit from: %s\n", orbtab);
-    if ((pps = name_list_pos(orbtab, table_register->names)) > -1) {
-      orbin_table = table_register->tables[pps];
-    } else {
+    if (!(orbin_table = find_table(orbtab))) {
       fatal_error("ORBIT table for correction requested, but not provided:", orbtab);
     }
   } else { // the orbit table is the twiss table
@@ -1965,9 +1957,7 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
 
   if ((tartab = command_par_string("target", cmd->clone)) != NULL ) {
     printf("Want to use target orbit from: %s\n", tartab);
-    if ((ppt = name_list_pos(tartab, table_register->names)) > -1) {
-      target_table = table_register->tables[ppt];
-    } else {
+    if (!(target_table = find_table(tartab))) {
       fatal_error("TARGET table for correction requested, but not provided:", tartab);
     }
   } else {
@@ -1977,9 +1967,7 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
 
   if ((modtab = command_par_string("model", cmd->clone)) != NULL ) {
     printf("Want to use model orbit from: %s\n", modtab);
-    if ((ppt = name_list_pos(modtab, table_register->names)) > -1) {
-      model_table = table_register->tables[ppt];
-    } else {
+    if (!(model_table = find_table(modtab))) {
       fatal_error("MODEL table for correction requested, but not provided:", modtab);
     }
   } else {
