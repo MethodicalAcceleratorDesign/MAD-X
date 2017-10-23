@@ -49,6 +49,7 @@ interpolate_node(int *nint)
 
   backup.first_node = clone;
   current_node      = clone;
+  clone->master     = backup.current_node;
 
   if (bend_flag) {
     angle = command_par_value("angle", el->def);
@@ -82,6 +83,7 @@ interpolate_node(int *nint)
     clone = clone_node(current_node, 0);
     current_node->next = clone;
     clone->previous = current_node;
+    clone->master = backup.current_node;
     current_node = clone;
     current_node->other_bv = bvk;
   }
