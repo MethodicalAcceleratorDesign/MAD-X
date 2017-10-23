@@ -215,7 +215,6 @@ expand_node(struct node* node, struct sequence* top_sequ, struct sequence* sequ,
 
 
     if (p->p_sequ == NULL){ // simple element, not a subsequence
-      p->share = top_sequ->share;
       add_to_node_list(p, 0, top_sequ->ex_nodes);
     }
 

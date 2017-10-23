@@ -18,7 +18,6 @@ struct node                /* the sequence is a linked list of nodes */
   struct node* previous;
   struct node* next;
   struct node* master;     /* ancestor for interpolated nodes */
-  int share;               /* 0 normal, 1 if shared */
   int occ_cnt;             /* element occurrence count at node */
   int obs_point;           /* observation point number (tracking) */
   int sel_err;             /* error select flag */
