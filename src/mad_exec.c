@@ -295,7 +295,7 @@ exec_create_table(struct in_cmd* cmd)
     return;
   }
 
-  if ((pos = name_list_pos(name, table_register->names)) > -1) {
+  if (table_exists(name)) {
     warning("table already exists: ", "ignored");
     return;
   }
@@ -385,12 +385,12 @@ exec_dump(struct in_cmd* cmd)
     strcpy(filename,f);
 
   // get table from registered tables
-  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+  struct table* t = find_table(name);
+  if (!t) {
     warning("table not found:", "ignored");
     return;
   }
 
-  struct table* t = table_register->tables[pos];
   out_table(name, t, filename);
 
   return;
@@ -417,12 +417,12 @@ exec_shrink_table(struct in_cmd* cmd)
     return;
   }
 
-  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+  t = find_table(name);
+  if (!t) {
     warning("table name not found:", "ignored");
     return;
   }
 
-  t = table_register->tables[pos];
   pos = name_list_pos("row", nl);
   row = pos >= 0 ? pl->parameters[pos]->double_value : t->curr - 1;
 
@@ -450,12 +450,12 @@ exec_fill_table(struct in_cmd* cmd)
     return;
   }
 
-  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+  struct table* t = find_table(name);
+  if (!t) {
     warning("table not found:", "ignored");
     return;
   }
 
-  struct table* t = table_register->tables[pos];
 
   if ((pos = name_list_pos("row", nl)) < 0)
     row = t->curr+1;
@@ -497,12 +497,11 @@ exec_fill_knob_table(struct in_cmd* cmd)
     return;
   }
 
-  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+  struct table* t = find_table(name);
+  if (!t) {
     warning("table not found:", "ignored");
     return;
   }
-
-  struct table* t = table_register->tables[pos];
 
   if ((pos = name_list_pos("row", nl)) < 0)
     row = t->curr+1;
@@ -570,12 +569,11 @@ exec_setvars_table(struct in_cmd* cmd)
     return;
   }
 
-  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+  struct table* t = find_table(name);
+  if (!t) {
     warning("table not found:", "ignored");
     return;
   }
-
-  struct table* t = table_register->tables[pos];
 
   if ((pos = name_list_pos("row", nl)) < 0)
     row = t->curr;
@@ -612,12 +610,11 @@ exec_setvars_lin_table(struct in_cmd* cmd)
     return;
   }
 
-  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+  struct table* t = find_table(name);
+  if (!t) {
     warning("table not found:", "ignored");
     return;
   }
-
-  struct table* t = table_register->tables[pos];
 
   pos  = name_list_pos("row1", nl);
   row1 = pos >= 0 ? (int) pl->parameters[pos]->double_value : t->curr;
@@ -678,12 +675,11 @@ exec_setvars_knob_table(struct in_cmd* cmd)
     return;
   }
 
-  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+  struct table* t = find_table(name);
+  if (!t) {
     warning("table not found:", "ignored");
     return;
   }
-
-  struct table* t = table_register->tables[pos];
 
   pos  = name_list_pos("row", nl);
   row  = pos >= 0 ? (int) pl->parameters[pos]->double_value : t->curr;
@@ -745,12 +741,11 @@ exec_setvars_const_table(struct in_cmd* cmd)
     return;
   }
 
-  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+  struct table* t = find_table(name);
+  if (!t) {
     warning("table not found:", "ignored");
     return;
   }
-
-  struct table* t = table_register->tables[pos];
 
   pos = name_list_pos("const", nl);
   double constant = pl->parameters[pos]->double_value;

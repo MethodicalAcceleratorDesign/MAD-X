@@ -97,7 +97,7 @@ static void
 fill_twiss_header(struct table* t)
   /* puts beam parameters etc. at start of twiss table */
 {
-  int i, pos, h_length = 39; /* change adding header lines ! */
+  int i, h_length = 39; /* change adding header lines ! */
   struct table* s;
   char tmp[NAME_L];
 
@@ -124,9 +124,8 @@ fill_twiss_header(struct table* t)
   table_add_header(t, "@ EY               %%le  %F", get_value("beam", "ey"));
   table_add_header(t, "@ ET               %%le  %F", get_value("beam", "et"));
 
-  if ((pos = name_list_pos("summ", table_register->names)) > -1)
+  if ((s = find_table("summ")))
   {
-    s = table_register->tables[pos];
     table_add_header(t, "@ LENGTH           %%le  %F", col_data(s, "length")[0]);
     table_add_header(t, "@ ALFA             %%le  %F", col_data(s, "alfa")[0]);
     table_add_header(t, "@ ORBIT5           %%le  %F", col_data(s, "orbit5")[0]);
@@ -229,8 +228,7 @@ pro_embedded_twiss(struct command* current_global_twiss)
 
   /* Find index to the twiss table */
 
-  if((pos = name_list_pos(table_name, table_register->names)) > -1) {
-    twiss_tb = table_register->tables[pos];
+  if((twiss_tb = find_table(table_name))) {
     if (twiss_tb->origin ==1) return; /* table is read, has no node pointers */
     for (jt = 0; jt < twiss_tb->curr; jt++) {
       // need `->previous` since the start node itself may be replaced in

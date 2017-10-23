@@ -99,7 +99,7 @@ track_run(struct in_cmd* cmd)
          buf_dxt, buf_dyt, buf3, buf4, &buf5, &e_flag, ibuf3, buf6);
 
   // summary
-  t = table_register->tables[name_list_pos("tracksumm", table_register->names)];
+  t = find_table("tracksumm");
   if (get_option("info")) print_table(t);
   if (get_option("track_dump")) track_tables_dump();
 
@@ -328,9 +328,7 @@ track_pteigen(double* eigen)
   int i, j, pos;
   struct table* t;
 
-  if ((pos = name_list_pos("trackone", table_register->names)) > -1) {
-    t = table_register->tables[pos];
-
+  if ((t = find_table("trackone"))) {
     if (t->header == NULL)
       t->header = new_char_p_array(45);
     else {
@@ -375,7 +373,7 @@ track_start(struct command* comm)
 void
 track_tables_create(struct in_cmd* cmd)
 {
-  int i, j, pos;
+  int i, j;
   char tab_name[NAME_L];
   struct table* t;
   int t_size;
@@ -384,9 +382,8 @@ track_tables_create(struct in_cmd* cmd)
   if (ffile <= 0) ffile = 1;
   t_size = turns / ffile + 10;
 
-  if ((pos = name_list_pos("tracksumm", table_register->names)) > -1) {
+  if (table_exists("tracksumm")) {
     printf("Table tracksumm does exist already\n");
-
   }
   else {
     t = make_table("tracksumm", "tracksumm", tracksumm_table_cols,
@@ -395,7 +392,7 @@ track_tables_create(struct in_cmd* cmd)
   }
   if (get_option("recloss"))
   {
-    if ((pos = name_list_pos("trackloss", table_register->names)) > -1) {
+    if (table_exists("trackloss")) {
       printf("Table trackloss does exist already\n");
     }
     else {
@@ -406,7 +403,7 @@ track_tables_create(struct in_cmd* cmd)
   }
   if (get_option("onetable"))
   {
-    if ((pos = name_list_pos("trackone", table_register->names)) > -1) {
+    if (table_exists("trackone")) {
       printf("Table trackone does exist already\n");
     }
     else {

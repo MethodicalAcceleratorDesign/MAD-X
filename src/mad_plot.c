@@ -373,17 +373,11 @@ exec_plot(struct in_cmd* cmd)
     //        name_list_pos(table_name, table_register->names));
 
     /* HG 21.10.09 allow plot from external table, part1 */
-    if ((pos = name_list_pos(table_name, table_register->names)) > -1) {
-      p_table = table_register->tables[pos];
-      if (!p_table) {
-	warning("Plot - potentially already destroyed table:", table_name);
-	return;
-      }
-    } else {
+    p_table = find_table(table_name);
+    if (!p_table) {
       /* fatal_error("Plot - non-existing table:", table_name); return; */
       warning("Plot - potentially non-existing table:", table_name);
       return;
-      /*p_table = table_register->tables[pos];*/
     }
     /* HG 21.10.09 allow plot from external table, end part1 */
 

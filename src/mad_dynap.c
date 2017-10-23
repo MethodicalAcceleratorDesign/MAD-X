@@ -90,7 +90,7 @@ track_dynap(struct in_cmd* cmd)
   trrun_(&flag, &turns,orbit0, oneturnmat, ibuf1, ibuf2, buf1, buf2,
          buf_dxt, buf_dyt, buf3, buf4, buf5, &e_flag, ibuf3, buf6);
 
-  t = table_register->tables[name_list_pos("tracksumm", table_register->names)];
+  t = find_table("tracksumm");
   print_table(t);
   if (e_flag) {
     warning("track_dynap: particle lost before last turn,", "ignored");
@@ -99,7 +99,7 @@ track_dynap(struct in_cmd* cmd)
   
   trdynrun_(buf4, buf5, &turns, &npart, buf7, buf8, buf10, buf11, buf9);
 
-  /* table_register->tables[name_list_pos("dynapsumm", table_register->names)];
+  /* t = find_table("dynapsumm");
      print_table(t);
      if (get_option("dynap_dump")) dynap_tables_dump();  */
 
