@@ -857,7 +857,8 @@ augment_count(const char* table) /* increase table occ. by 1, fill missing */
 
   if (t->num_cols > t->org_cols)  add_vars_to_table(t,1);
 
-  if (t->p_nodes != NULL) t->p_nodes[t->curr] = current_node;
+  if (t->p_nodes != NULL)
+    t->p_nodes[t->curr] = current_node->master ? current_node->master : current_node;
 
   if (t->node_nm != NULL)
   {
