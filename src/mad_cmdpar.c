@@ -1094,7 +1094,6 @@ get_value(const char* name, const char* par)
   int tmpi;
   double tmpd;
 
-  struct name_list* nl = NULL;
   mycpy(c_dum->c, name);
   mycpy(aux_buff->c, par);
 
@@ -1112,17 +1111,11 @@ get_value(const char* name, const char* par)
    }
   else if (strcmp(c_dum->c, "survey") == 0)
   {
-    if (current_survey != NULL) nl = current_survey->par_names;
-    if (nl != NULL && nl->inform[name_list_pos(aux_buff->c, nl)])
-      return command_par_value(aux_buff->c, current_survey);
-    else return zero;
+    return command_par_value(aux_buff->c, current_survey);
   }
   else if (strcmp(c_dum->c, "twiss") == 0)
   {
-    if (current_twiss != NULL) nl = current_twiss->par_names;
-    if (nl != NULL && nl->inform[name_list_pos(aux_buff->c, nl)])
-      return command_par_value(aux_buff->c, current_twiss);
-    else return zero;
+    return command_par_value(aux_buff->c, current_twiss);
   }
   else if (strcmp(c_dum->c, "sequence") == 0)
   {
@@ -1166,7 +1159,6 @@ get_string(const char* name, const char* par, char* string)
   /* returns string for  value "par" of command or store "name" if present,
      length = string length, else length = 0 if not present */
 {
-  struct name_list* nl = NULL;
   struct command* cmd;
   char* p;
   int length = 0;
@@ -1190,8 +1182,7 @@ get_string(const char* name, const char* par, char* string)
   else if (strcmp(c_dum->c, "survey") == 0)
   {
     mycpy(c_dum->c, par);
-    if (current_survey != NULL) nl = current_survey->par_names;
-    if (nl != NULL && nl->inform[name_list_pos(c_dum->c, nl)])
+    if (par_present(c_dum->c, current_survey))
     {
       if ((p = command_par_string(c_dum->c, current_survey)) != NULL)
       {
@@ -1214,8 +1205,7 @@ get_string(const char* name, const char* par, char* string)
   else if (strcmp(c_dum->c, "twiss") == 0)
   {
     mycpy(c_dum->c, par);
-    if (current_twiss != NULL) nl = current_twiss->par_names;
-    if (nl != NULL && nl->inform[name_list_pos(c_dum->c, nl)])
+    if (par_present(c_dum->c, current_twiss))
     {
       if ((p = command_par_string(c_dum->c, current_twiss)) != NULL)
       {

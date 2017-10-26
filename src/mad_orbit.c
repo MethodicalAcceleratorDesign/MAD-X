@@ -3201,13 +3201,12 @@ static void correct_usemonitor(struct in_cmd* cmd) {
 // public interface
 
 void store_orbit(struct command* comm, double* orbit) {
-  struct name_list* nl = comm->par_names;
-  if (nl->inform[name_list_pos("x",  nl)]) orbit[0] = command_par_value("x",  comm);
-  if (nl->inform[name_list_pos("px", nl)]) orbit[1] = command_par_value("px", comm);
-  if (nl->inform[name_list_pos("y",  nl)]) orbit[2] = command_par_value("y",  comm);
-  if (nl->inform[name_list_pos("py", nl)]) orbit[3] = command_par_value("py", comm);
-  if (nl->inform[name_list_pos("t",  nl)]) orbit[4] = command_par_value("t",  comm);
-  if (nl->inform[name_list_pos("pt", nl)]) orbit[5] = command_par_value("pt", comm);
+  if (par_present("x",  comm)) orbit[0] = command_par_value("x",  comm);
+  if (par_present("px", comm)) orbit[1] = command_par_value("px", comm);
+  if (par_present("y",  comm)) orbit[2] = command_par_value("y",  comm);
+  if (par_present("py", comm)) orbit[3] = command_par_value("py", comm);
+  if (par_present("t",  comm)) orbit[4] = command_par_value("t",  comm);
+  if (par_present("pt", comm)) orbit[5] = command_par_value("pt", comm);
 }
 
 void pro_correct(struct in_cmd* cmd) {

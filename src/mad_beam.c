@@ -143,7 +143,7 @@ update_beam(struct command* comm)
       }
     }
   }
-  else if (nlc->inform[name_list_pos("mass", nlc)]) {
+  else if (par_present("mass", comm)) {
     mass = command_par_value("mass", comm);
     pl->parameters[pos]->string = name = permbuff("default");
     pos = name_list_pos("charge", nlc);
@@ -170,7 +170,7 @@ update_beam(struct command* comm)
   arad = ten_m_16 * charge * charge * get_variable("qelect") * clight * clight / mass;
 
   // energy related
-  if ((pos = name_list_pos("energy", nlc)) > -1 && nlc->inform[pos]) {
+  if (par_present("energy", comm)) {
     energy = command_par_value("energy", comm);
     if (energy <= mass) fatal_error("energy must be","> mass");
     pc = sqrt(energy*energy - mass*mass);
@@ -178,28 +178,28 @@ update_beam(struct command* comm)
     beta = pc / energy;
     brho = pc / ( fabs(charge) * clight * 1.e-9);
   }
-  else if((pos = name_list_pos("pc", nlc)) > -1 && nlc->inform[pos]) {
+  else if(par_present("pc", comm)) {
     pc = command_par_value("pc", comm);
     energy = sqrt(pc*pc + mass*mass);
     gamma = energy / mass;
     beta = pc / energy;
     brho = pc / ( fabs(charge) * clight * 1.e-9);
   }
-  else if((pos = name_list_pos("gamma", nlc)) > -1 && nlc->inform[pos]) {
+  else if(par_present("gamma", comm)) {
     if ((gamma = command_par_value("gamma", comm)) <= one) fatal_error("gamma must be","> 1");
     energy = gamma * mass;
     pc = sqrt(energy*energy - mass*mass);
     beta = pc / energy;
     brho = pc / ( fabs(charge) * clight * 1.e-9);
   }
-  else if((pos = name_list_pos("beta", nlc)) > -1 && nlc->inform[pos]) {
+  else if(par_present("beta", comm)) {
     if ((beta = command_par_value("beta", comm)) >= one) fatal_error("beta must be","< 1");
     gamma = one / sqrt(one - beta*beta);
     energy = gamma * mass;
     pc = sqrt(energy*energy - mass*mass);
     brho = pc / ( fabs(charge) * clight * 1.e-9);
   }
-  else if((pos = name_list_pos("brho", nlc)) > -1 && nlc->inform[pos]) {
+  else if(par_present("brho", comm)) {
     if ((brho = command_par_value("brho", comm)) < zero) fatal_error("brho must be","> 0");
     pc = brho * fabs(charge) * clight * 1.e-9;
     energy = sqrt(pc*pc + mass*mass);
@@ -218,11 +218,11 @@ update_beam(struct command* comm)
   // emittance related
   // 2015-Mar-11  15:27:31  ghislain: changed emittance definition:
   //                        was exn = ex * 4 * beta * gamma
-  if (nlc->inform[name_list_pos("ex", nlc)]) {
+  if (par_present("ex", comm)) {
     ex = command_par_value("ex", comm);
     exn = ex * beta * gamma;
   }
-  else if (nlc->inform[name_list_pos("exn", nlc)]) {
+  else if (par_present("exn", comm)) {
     exn = command_par_value("exn", comm);
     ex = exn / (beta * gamma);
   }
@@ -231,11 +231,11 @@ update_beam(struct command* comm)
     exn = ex * beta * gamma;
   }
 
-  if (nlc->inform[name_list_pos("ey", nlc)]) {
+  if (par_present("ey", comm)) {
     ey = command_par_value("ey", comm);
     eyn = ey * beta * gamma;
   }
-  else if (nlc->inform[name_list_pos("eyn", nlc)]) {
+  else if (par_present("eyn", comm)) {
     eyn = command_par_value("eyn", comm);
     ey = eyn / (beta * gamma);
   }
@@ -247,13 +247,13 @@ update_beam(struct command* comm)
   alfa = one / (gamma * gamma); // LD: bug, phase slip factor is missing
 
   // circumference related
-  if (nlc->inform[name_list_pos("circ", nlc)]) {
+  if (par_present("circ", comm)) {
     circ = command_par_value("circ", comm);
     if (circ > zero) freq0 = (beta * clight) / (ten_p_6 * circ);
     store_comm_par_value("freq0", freq0, current_beam);
     store_comm_par_value("circ", circ, current_beam);
   }
-  else if (nlc->inform[name_list_pos("freq0", nlc)]) {
+  else if (par_present("freq0", comm)) {
     freq0 = command_par_value("freq0", comm);
     if (freq0 > zero) circ = (beta * clight) / (ten_p_6 * freq0);
     store_comm_par_value("freq0", freq0, current_beam);
@@ -261,16 +261,16 @@ update_beam(struct command* comm)
   }
 
   // intensity related
-  if (nlc->inform[name_list_pos("bcurrent", nlc)]) {
+  if (par_present("bcurrent", comm)) {
     bcurrent = command_par_value("bcurrent", comm);
     if (bcurrent > zero && freq0 > zero)
       npart = bcurrent / (beta * freq0 * ten_p_6 * get_variable("qelect"));
-    else if (nlc->inform[name_list_pos("npart", nlc)]) {
+    else if (par_present("npart", comm)) {
       npart = command_par_value("npart", comm);
       bcurrent = npart * beta * freq0 * ten_p_6 * get_variable("qelect");
     }
   }
-  else if (nlc->inform[name_list_pos("npart", nlc)]) {
+  else if (par_present("npart", comm)) {
     npart = command_par_value("npart", comm);
     bcurrent = npart * beta * freq0 * ten_p_6 * get_variable("qelect");
   }
@@ -328,7 +328,6 @@ void
 adjust_beam(void)
   /* adjusts beam parameters to current beta, gamma, bcurrent, npart */
 {
-  struct name_list* nl = current_beam->par_names;
   double circ = one, freq0, alfa, beta, gamma, bcurrent = zero, npart = 0;
 
   if (current_sequ != NULL && sequence_length(current_sequ) != zero)
@@ -340,10 +339,10 @@ adjust_beam(void)
 
   freq0 = (beta * clight * ten_m_6) / circ;
 
-  if (nl->inform[name_list_pos("bcurrent", nl)] &&
+  if (par_present("bcurrent", current_beam) &&
       (bcurrent = command_par_value("bcurrent", current_beam)) > zero)
     npart = bcurrent / (beta * freq0 * ten_p_6 * get_variable("qelect")); // frs add-on
-  else if (nl->inform[name_list_pos("npart", nl)] &&
+  else if (par_present("npart", current_beam) &&
            (npart = command_par_value("npart", current_beam)) > zero)
     bcurrent = npart * beta * freq0 * ten_p_6 * get_variable("qelect"); // frs add-on
 

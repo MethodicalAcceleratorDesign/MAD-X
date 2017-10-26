@@ -167,7 +167,7 @@ enter_elm_reference(struct in_cmd* cmd, struct element* el, int flag)
   if (strcmp(el->base_type->name, "rfcavity") == 0 &&
       find_element(el->name, current_sequ->cavities) == NULL)
     add_to_el_list(&el, 0, current_sequ->cavities, 0);
-  if (nl->inform[name_list_pos("at", nl)] == 0)
+  if (!par_present("at", cmd->clone))
     fatal_error("element reference without 'at':",
                 join(cmd->tok_list->p, cmd->tok_list->curr));
   at = command_par_value("at", cmd->clone);

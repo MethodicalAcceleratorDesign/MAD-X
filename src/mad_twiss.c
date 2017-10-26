@@ -1211,7 +1211,7 @@ twiss_input(struct command* tw)
       do
       {
         i++;
-        if (nl->inform[name_list_pos(nl->names[i], nl)] == 0) /* not read */
+        if (!par_present(nl->names[i], tw)) /* not read */
         {
           if (beta->par->parameters[i]->expr != NULL)
             val = expression_value(beta->par->parameters[i]->expr, 2);
@@ -1226,8 +1226,8 @@ twiss_input(struct command* tw)
   }
   if (ret) return ret;
   /* if no beta0 given, betx and bety together set inval */
-  if (nl->inform[name_list_pos("betx", nl)]) sb++;
-  if (nl->inform[name_list_pos("bety", nl)]) sb++;
+  if (par_present("betx", tw)) sb++;
+  if (par_present("bety", tw)) sb++;
   if (sb)
   {
     if (sb < 2)  return -2;

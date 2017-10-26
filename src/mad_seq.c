@@ -940,7 +940,7 @@ seq_install(struct in_cmd* cmd)
     return;
   }
 
-  if (nl->inform[name_list_pos("at", nl)] == 0) {
+  if (!par_present("at", cmd->clone)) {
     warning("no 'at':", "ignored");
     return;
   }
@@ -1014,7 +1014,7 @@ seq_move(struct in_cmd* cmd)
       }
       else
       {
-        if (nl->inform[name_list_pos("by", nl)] == 0)
+        if (!par_present("by", cmd->clone))
         {
           warning("no 'by' given,", "ignored"); return;
         }
@@ -1067,9 +1067,9 @@ seq_move(struct in_cmd* cmd)
       if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
       {
         node = edit_sequ->nodes->nodes[pos];
-        if (nl->inform[name_list_pos("by", nl)] == 0)
+        if (!par_present("by", cmd->clone))
         {
-          if (nl->inform[name_list_pos("to", nl)] == 0)
+          if (!par_present("to", cmd->clone))
           {
             warning("no position given,", "ignored"); return;
           }
@@ -1678,7 +1678,7 @@ enter_sequ_reference(struct in_cmd* cmd, struct sequence* sequ)
   struct command_parameter_list* pl = cmd->clone->par;
   int i, pos, k = 1;
   double at;
-  if (nl->inform[name_list_pos("at", nl)] == 0)
+  if (!par_present("at", cmd->clone))
     fatal_error("sequence reference without 'at':",
                 join(cmd->tok_list->p, cmd->tok_list->curr));
   at = command_par_value("at", cmd->clone);
