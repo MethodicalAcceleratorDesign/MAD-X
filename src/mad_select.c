@@ -99,6 +99,8 @@ get_select_ex_ranges(struct sequence* sequ, struct command_list* select, struct 
 
 // public interface
 
+static int _pass_select_pat(const char* name, struct command* sc);
+
 int
 pass_select(char* name, struct command* sc)
   /* checks name against class (if element) and pattern that may
@@ -133,14 +135,27 @@ pass_select_el(struct element* el, struct command* sc)
       if (in == 0) return 0;
     }
   }
-  return pass_select_str(el->name, sc);
+  return _pass_select_pat(el->name, sc);
 }
 
 int pass_select_str(const char* name, struct command* sc)
 {
   /* checks name against pattern that may
      (but need not) be contained in command sc;
+     considers only SELECT commands *without CLASS*!
      0: does not pass, 1: passes */
+  struct name_list* nl = sc->par_names;
+  int pos;
+  // if the command has CLASS attribute, it is supposed to match elements:
+  pos = name_list_pos("class", nl);
+  if (pos > -1 && nl->inform[pos])  /* parameter has been read */
+    return 0;
+  return _pass_select_pat(name, sc);
+}
+
+int _pass_select_pat(const char* name, struct command* sc)
+{
+  /* used internally. */
   struct name_list* nl = sc->par_names;
   struct command_parameter_list* pl = sc->par;
   int pos, in = 0, any = 0;
