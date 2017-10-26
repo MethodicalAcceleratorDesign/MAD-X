@@ -102,7 +102,7 @@ get_select_ex_ranges(struct sequence* sequ, struct command_list* select, struct 
 static int _pass_select_pat(const char* name, struct command* sc);
 
 int
-pass_select(char* name, struct command* sc)
+pass_select(const char* name, struct command* sc)
   /* checks name against class (if element) and pattern that may
      (but need not) be contained in command sc;
      0: does not pass, 1: passes */
@@ -122,18 +122,12 @@ pass_select_el(struct element* el, struct command* sc)
 {
   struct name_list* nl = sc->par_names;
   struct command_parameter_list* pl = sc->par;
-  int pos, in = 0, any = 0;
-  char *class, *pattern;
-
-  pos = name_list_pos("class", nl);
+  int pos = name_list_pos("class", nl);
   if (pos > -1 && nl->inform[pos])  /* parameter has been read */
   {
-    if (el != NULL)
-    {
-      class = pl->parameters[pos]->string;
-      in = belongs_to_class(el, class);
-      if (in == 0) return 0;
-    }
+    char* class = pl->parameters[pos]->string;
+    if (!belongs_to_class(el, class))
+      return 0;
   }
   return _pass_select_pat(el->name, sc);
 }
@@ -144,11 +138,8 @@ int pass_select_str(const char* name, struct command* sc)
      (but need not) be contained in command sc;
      considers only SELECT commands *without CLASS*!
      0: does not pass, 1: passes */
-  struct name_list* nl = sc->par_names;
-  int pos;
   // if the command has CLASS attribute, it is supposed to match elements:
-  pos = name_list_pos("class", nl);
-  if (pos > -1 && nl->inform[pos])  /* parameter has been read */
+  if (par_present("class", sc, NULL))  /* parameter has been read */
     return 0;
   return _pass_select_pat(name, sc);
 }
@@ -158,19 +149,13 @@ int _pass_select_pat(const char* name, struct command* sc)
   /* used internally. */
   struct name_list* nl = sc->par_names;
   struct command_parameter_list* pl = sc->par;
-  int pos, in = 0, any = 0;
-  char *pattern;
-
-  any = in = 0;
-  pos = name_list_pos("pattern", nl);
+  int pos = name_list_pos("pattern", nl);
   if (pos > -1 && nl->inform[pos])  /* parameter has been read */
   {
-    any = 1;
-    pattern = stolower(pl->parameters[pos]->string);
-    if(myregex(pattern, strip(name)) == 0)  in = 1;
+    char* pattern = stolower(pl->parameters[pos]->string);
+    return myregex(pattern, strip(name)) == 0;
   }
-  if (any == 0) return 1;
-  else return in;
+  return 1;
 }
 
 int
@@ -191,13 +176,11 @@ pass_select_list_el(struct element* el, struct command_list* cl)
   /* Should use this function in favor of `pass_select_list` where possible. It
      works for all elements and is faster if knowing the element in advance. */
 {
-  int i, ret = 0;
-  if (cl->curr == 0)  return 1;
-  for (i = 0; i < cl->curr; i++)
-  {
-    if ((ret = pass_select_el(el, cl->commands[i]))) break;
+  for (int i = 0; i < cl->curr; i++) {
+    if (pass_select_el(el, cl->commands[i]))
+        return 1;
   }
-  return ret;
+  return cl->curr == 0;
 }
 
 int

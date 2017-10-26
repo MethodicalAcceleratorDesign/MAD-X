@@ -18,7 +18,7 @@ struct element;
 
 void  store_select(struct in_cmd*);
 void  store_deselect(struct in_cmd*);
-int   pass_select(char* name, struct command*);                         // deprecated
+int   pass_select(const char* name, struct command*);                   // deprecated
 int   pass_select_str(const char* name, struct command*);               // not for elements!
 int   pass_select_el(struct element* el, struct command*);
 int   pass_select_list_str(const char* name, struct command_list*);     // not for elements!
