@@ -107,13 +107,12 @@ pass_select(char* name, struct command* sc)
   /* Don't use for selecting elements. It may not find all elements. */
 {
   struct element* el = find_element(strip(name), element_list);
-  return pass_select_el(el, sc);
+  return el ? pass_select_el(el, sc) : pass_select_str(name, sc);
 }
-
 
 int
 pass_select_el(struct element* el, struct command* sc)
-  /* checks name against class (if element) and pattern that may
+  /* checks element against class and pattern that may
      (but need not) be contained in command sc;
      0: does not pass, 1: passes */
   /* Should use this function in favor of `pass_select` where possible. It
@@ -134,13 +133,26 @@ pass_select_el(struct element* el, struct command* sc)
       if (in == 0) return 0;
     }
   }
+  return pass_select_str(el->name, sc);
+}
+
+int pass_select_str(const char* name, struct command* sc)
+{
+  /* checks name against pattern that may
+     (but need not) be contained in command sc;
+     0: does not pass, 1: passes */
+  struct name_list* nl = sc->par_names;
+  struct command_parameter_list* pl = sc->par;
+  int pos, in = 0, any = 0;
+  char *pattern;
+
   any = in = 0;
   pos = name_list_pos("pattern", nl);
   if (pos > -1 && nl->inform[pos])  /* parameter has been read */
   {
     any = 1;
     pattern = stolower(pl->parameters[pos]->string);
-    if(myregex(pattern, strip(el->name)) == 0)  in = 1;
+    if(myregex(pattern, strip(name)) == 0)  in = 1;
   }
   if (any == 0) return 1;
   else return in;
@@ -149,12 +161,14 @@ pass_select_el(struct element* el, struct command* sc)
 int
 pass_select_list(char* name, struct command_list* cl)
   /* returns 0 (does not pass) or 1 (passes) for a list of selects */
-  /* Don't use for selecting elements. It may not find all elements. */
+  /* Don't use for selecting elements! It may not find all elements. */
 {
-  struct element* el = find_element(strip(name), element_list);
-  return pass_select_list_el(el, cl);
+  for (int i = 0; i < cl->curr; i++) {
+    if (pass_select(name, cl->commands[i]))
+        return 1;
+  }
+  return cl->curr == 0;
 }
-
 
 int
 pass_select_list_el(struct element* el, struct command_list* cl)
