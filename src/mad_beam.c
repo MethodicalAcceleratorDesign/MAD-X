@@ -35,13 +35,10 @@ exec_beam(struct in_cmd* cmd, int flag)
   char* name;
   char name_def[] = "default_beam";
   struct command* keep_beam = current_beam;
-  struct command_parameter_list* pl = cmd->clone->par;
-  struct name_list* nl = cmd->clone->par_names;
-  int pos = name_list_pos("sequence", nl);
   int bpos = name_list_pos("sequence", current_beam->par_names);
 
-  if (nl->inform[pos]) {
-    name = pl->parameters[pos]->string;
+  name = command_par_string_user("sequence", cmd->clone);
+  if (name) {
     if ((current_beam = find_command(name, beam_list)) == NULL) {
       set_defaults("beam");
       add_to_command_list(name, current_beam, beam_list, 0);
@@ -129,14 +126,12 @@ update_beam(struct command* comm)
       charge = command_par_value("charge", defined_commands->commands[lp]);
     }
     else { /* unknown particle, then mass and charge must be given as well */
-      pos = name_list_pos("mass", nlc);
-      if (nlc->inform[pos]) mass = command_par_value("mass", comm);
+      if (par_present("mass", comm)) mass = command_par_value("mass", comm);
       else { // default is emass
 	warning("emass given to unknown particle:", name);
 	mass = get_variable("emass");
       }
-      pos = name_list_pos("charge", nlc);
-      if (nlc->inform[pos]) charge = command_par_value("charge", comm);
+      if (par_present("charge", comm)) charge = command_par_value("charge", comm);
       else { //default is charge +1
 	warning("charge +1 given to unknown particle:", name);
 	charge = 1;
@@ -146,8 +141,7 @@ update_beam(struct command* comm)
   else if (par_present("mass", comm)) {
     mass = command_par_value("mass", comm);
     pl->parameters[pos]->string = name = permbuff("default");
-    pos = name_list_pos("charge", nlc);
-    if (nlc->inform[pos]) charge = command_par_value("charge", comm);
+    if (par_present("charge", comm)) charge = command_par_value("charge", comm);
     else {
       warning("charge +1 given to user particle:", name);
       charge = 1;
@@ -156,10 +150,8 @@ update_beam(struct command* comm)
   else name = pl->parameters[pos]->string;
 
   if (strcmp(name, "ion") == 0) {
-    pos = name_list_pos("mass", nlc);
-    if (nlc->inform[pos]) mass = command_par_value("mass", comm);
-    pos = name_list_pos("charge", nlc);
-    if (nlc->inform[pos]) charge = command_par_value("charge", comm);
+    if (par_present("mass", comm)) mass = command_par_value("mass", comm);
+    if (par_present("charge", comm)) charge = command_par_value("charge", comm);
     else charge = command_par_value("charge", current_beam);
   }
 
