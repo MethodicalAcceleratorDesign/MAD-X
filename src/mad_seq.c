@@ -754,7 +754,7 @@ export_sequ_8(struct sequence* sequ, struct command_list* cl, FILE* file)
 
   seqref = sequ->ref_flag;  /* uncomment line to get entry or exit */
 
-  if (pass_select_list(sequ->name, cl) == 0)  return;
+  if (pass_select_list_str(sequ->name, cl) == 0)  return;
 
   *c_dum->c = '\0';
   strcat(c_dum->c, sequ->export_name);
@@ -820,7 +820,7 @@ write_sequs(struct sequence_list* sql,struct command_list* cl, FILE* file, int n
     for (i = 0; i < sql->curr; i++)
       if(sql->sequs[i]->nested == j)
       {
-        if (pass_select_list(sql->sequs[i]->name, cl))
+        if (pass_select_list_str(sql->sequs[i]->name, cl))
           export_sequence(sql->sequs[i], file, noexpr);
       }
   }
