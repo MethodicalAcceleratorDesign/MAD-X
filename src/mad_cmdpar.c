@@ -1182,13 +1182,10 @@ get_string(const char* name, const char* par, char* string)
   else if (strcmp(c_dum->c, "survey") == 0)
   {
     mycpy(c_dum->c, par);
-    if (par_present(c_dum->c, current_survey))
-    {
-      if ((p = command_par_string(c_dum->c, current_survey)) != NULL)
+      if ((p = command_par_string_user(c_dum->c, current_survey)) != NULL)
       {
         strcpy(string, p); length = strlen(p);
       }
-    }
   }
   /*else if (strcmp(c_dum->c, "ptc") == 0)
     {
@@ -1205,13 +1202,10 @@ get_string(const char* name, const char* par, char* string)
   else if (strcmp(c_dum->c, "twiss") == 0)
   {
     mycpy(c_dum->c, par);
-    if (par_present(c_dum->c, current_twiss))
-    {
-      if ((p = command_par_string(c_dum->c, current_twiss)) != NULL)
+      if ((p = command_par_string_user(c_dum->c, current_twiss)) != NULL)
       {
         strcpy(string, p); length = strlen(p);
       }
-    }
   }
   else if (strcmp(c_dum->c, "sequence") == 0)
   {
