@@ -830,12 +830,10 @@ static void
 seq_cycle(struct in_cmd* cmd)
   /* cycles a sequence */
 {
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
   struct node *node, *clone;
-  char* name = NULL;
-  int pos = name_list_pos("start", nl);
-  if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
+  int pos;
+  char* name = command_par_string_user("start", cmd->clone);
+  if (name)
   {
     sprintf(c_dum->c, "%s:1", name);
     if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1)
@@ -870,14 +868,11 @@ static void
 seq_edit(struct in_cmd* cmd)
   /* executes seqedit command */
 {
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
   char* name = NULL;
   int pos;
 
-  pos = name_list_pos("sequence", nl);
-
-  if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL) {
+  name = command_par_string_user("sequence", cmd->clone);
+  if (name) {
     if ((pos = name_list_pos(name, sequences->list)) >= 0) {
       if (sequences->sequs[pos]->line)
         warning("sequence originates from line,","edit ignored");
@@ -909,20 +904,18 @@ static void
 seq_install(struct in_cmd* cmd)
   /* executes install command */
 {
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
   struct element *cl, *el;
   struct node* c_node;
   struct expression* expr = NULL;
   double at, from = zero;
   char name[NAME_L], *pname, *name_e = NULL, *name_c = NULL, *from_name = NULL;
-  int k, pos, any = 0;
+  int k, any = 0;
 
-  int pos_e = name_list_pos("element", nl);
-  int pos_c = name_list_pos("class", nl);
+  name_e = command_par_string_user("element", cmd->clone);
+  name_c = command_par_string_user("class", cmd->clone);
 
-  if (nl->inform[pos_e] && (name_e = pl->parameters[pos_e]->string) != NULL) {
-    if (nl->inform[pos_c] && (name_c = pl->parameters[pos_c]->string) != NULL) {
+  if (name_e) {
+    if (name_c) {
       if ((cl = find_element(name_c, element_list)) == NULL) {
         warning("ignored, unknown class:", name_c);
         return;
@@ -948,9 +941,8 @@ seq_install(struct in_cmd* cmd)
   at = command_par_value("at", cmd->clone);
   expr = clone_expression(command_par_expr("at", cmd->clone));
 
-  pos = name_list_pos("from", nl);
-  if (nl->inform[pos]) {
-    from_name = pl->parameters[pos]->string;
+  from_name = command_par_string_user("from", cmd->clone);
+  if (from_name) {
 
     if (strcmp(from_name, "selected") == 0) {
       if (seqedit_select->curr == 0) {
@@ -978,7 +970,7 @@ seq_install(struct in_cmd* cmd)
       }
 
     } else {
-      from_name = permbuff(pl->parameters[pos]->string);
+      from_name = permbuff(from_name);
       if ((from = hidden_node_pos(from_name, edit_sequ)) == INVALID) {
         warning("ignoring 'from' reference to unknown element:", from_name);
         return;
@@ -1001,10 +993,9 @@ seq_move(struct in_cmd* cmd)
   int any = 0, k;
   struct node *node, *next;
   struct element* el;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  int pos = name_list_pos("element", nl);
-  if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL)
+  int pos;
+  name = command_par_string_user("element", cmd->clone);
+  if (name)
   {
     if (strcmp(name, "selected") == 0)
     {
@@ -1074,10 +1065,9 @@ seq_move(struct in_cmd* cmd)
             warning("no position given,", "ignored"); return;
           }
           to = command_par_value("to", cmd->clone);
-          pos = name_list_pos("from", nl);
-          if (nl->inform[pos])
+          from_name = command_par_string_user("from", cmd->clone);
+          if (from_name)
           {
-            from_name = pl->parameters[pos]->string;
             if ((from = hidden_node_pos(from_name, edit_sequ)) == INVALID)
             {
               warning("ignoring 'from' reference to unknown element:",
@@ -1140,13 +1130,11 @@ static void
 seq_remove(struct in_cmd* cmd)
   /* executes remove command */
 {
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
   struct node *c_node;
-  char *name;
   int k, any = 0;
-  int pose = name_list_pos("element", nl);
-  if (nl->inform[pose] && (name = pl->parameters[pose]->string) != NULL)
+  int pose;
+  char *name = command_par_string_user("element", cmd->clone);
+  if (name)
   {
     if (strcmp(name, "selected") == 0)
     {
@@ -1200,8 +1188,6 @@ static void
 seq_replace(struct in_cmd* cmd)
   /* executes replace command */
 {
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
   struct node** rep_nodes = NULL;
   struct element** rep_els = NULL;
   struct node *node, *c_node;
@@ -1210,8 +1196,8 @@ seq_replace(struct in_cmd* cmd)
   int count = count_nodes(edit_sequ);
   int any = 0, k, rep_cnt = 0, pos;
 
-  pos = name_list_pos("element", nl);
-  if ( !(nl->inform[pos]) || (name = pl->parameters[pos]->string) == NULL) {
+  name = command_par_string_user("element", cmd->clone);
+  if (!name) {
     warning("no element specified, ","ignored");
     return;
   }
@@ -1222,8 +1208,8 @@ seq_replace(struct in_cmd* cmd)
       return;
     }
 
-    pos = name_list_pos("by", nl);
-    if ( !(nl->inform[pos]) || (name = pl->parameters[pos]->string) == NULL) {
+    name = command_par_string_user("by", cmd->clone);
+    if (!name) {
       warning("'by' missing, ","ignored");
       return;
     }
@@ -1266,8 +1252,8 @@ seq_replace(struct in_cmd* cmd)
 
     if ((pos = name_list_pos(c_dum->c, edit_sequ->nodes->list)) > -1) {
       node = edit_sequ->nodes->nodes[pos];
-      pos = name_list_pos("by", nl);
-      if (nl->inform[pos] && (name = pl->parameters[pos]->string) != NULL) {
+      name = command_par_string_user("by", cmd->clone);
+      if (name) {
 	if ((el = find_element(name, element_list)) != NULL) {
 	  rep_els[rep_cnt] = el;
 	  rep_nodes[rep_cnt++] = node;
@@ -1372,8 +1358,6 @@ void
 use_sequ(struct in_cmd* cmd)
 {
   const char *rout_name = "use_sequ";
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
   struct command* keep_beam = current_beam;
   int pos, lp;
   char* name;
@@ -1382,16 +1366,15 @@ use_sequ(struct in_cmd* cmd)
     fatal_error("no endsequence yet for sequence:", current_sequ->name);
 
   // YIL: calling use screws up any twiss table calculated.. this is a "quick fix"
-  pos = name_list_pos("period", nl);
-  if (nl->inform[pos] == 0) pos = name_list_pos("sequence", nl);
+  name = command_par_string_user("period", cmd->clone);
+  if (!name) name = command_par_string_user("sequence", cmd->clone);
 
-  if (nl->inform[pos]) {  /* parameter has been read */
+  if (name) {  /* parameter has been read */
     if (current_range != NULL) {
       myfree(rout_name, current_range);
       current_range = NULL;
     }
 
-    name = pl->parameters[pos]->string;
     if ((pos = name_list_pos(name, line_list->list)) > -1 && line_list->macros[pos]->dead == 0)
       make_sequ_from_line(name); /* only if not disabled */
 
@@ -1402,18 +1385,16 @@ use_sequ(struct in_cmd* cmd)
         fatal_error("USE - sequence without beam:", current_sequ->name);
 
       current_sequ->beam = current_beam;
-      pos = name_list_pos("range", nl);
-      if (nl->inform[pos])  /* parameter has been read */
-        current_range = tmpbuff(pl->parameters[pos]->string);
+      char* range = command_par_string_user("range", cmd->clone);
+      if (range)  /* parameter has been read */
+        current_range = tmpbuff(range);
 
       current_sequ->tw_valid = 0;
       expand_curr_sequ(0);
 
-      pos = name_list_pos("survey", nl);
-      if (nl->inform[pos]) {  /* parameter has been read */
+      if (par_present("survey", cmd->clone)) {  /* parameter has been read */
          pro_use_survey();
-         pos = name_list_pos("survtest", nl);
-         if (nl->inform[pos]) survtest_();
+         if (par_present("survtest", cmd->clone)) survtest_();
          exec_delete_table("survey");
      	}
     }
@@ -1560,10 +1541,9 @@ void
 enter_sequence(struct in_cmd* cmd)
   /* handles sequence start and end on input */
 {
-  struct name_list* nl;
-  struct command_parameter_list* pl;
   int i, k = 0, pos, aux_pos;
   char** toks = cmd->tok_list->p;
+  char* tmp;
   struct element* el;
   struct command* clone;
 
@@ -1607,8 +1587,6 @@ enter_sequence(struct in_cmd* cmd)
 
     cmd->clone = clone_command(cmd->cmd_def);
     scan_in_cmd(cmd);
-    nl = cmd->clone->par_names;
-    pl = cmd->clone->par;
     current_sequ->l_expr = command_par_expr("l", cmd->clone);
     current_sequ->length = command_par_value("l", cmd->clone);
     current_sequ->add_pass = command_par_value("add_pass", cmd->clone);
@@ -1616,13 +1594,11 @@ enter_sequence(struct in_cmd* cmd)
     if (current_sequ->l_expr == NULL && sequence_length(current_sequ) == zero)
       fatal_error("missing length for sequence:", toks[aux_pos]);
 
-    pos = name_list_pos("refpos", nl);
-    if (nl->inform[pos])
-      current_sequ->refpos = permbuff(pl->parameters[pos]->string);
+    if ((tmp = command_par_string_user("refpos", cmd->clone)))
+      current_sequ->refpos = permbuff(tmp);
 
-    pos = name_list_pos("next_sequ", nl);
-    if (nl->inform[pos])
-      current_sequ->next_sequ = permbuff(pl->parameters[pos]->string);
+    if ((tmp = command_par_string_user("next_sequ", cmd->clone)))
+      current_sequ->next_sequ = permbuff(tmp);
 
     current_node = NULL;
 
@@ -1674,9 +1650,7 @@ void
 enter_sequ_reference(struct in_cmd* cmd, struct sequence* sequ)
   /* enters a sequence in a sequence */
 {
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  int i, pos, k = 1;
+  int i, k = 1;
   double at;
   if (!par_present("at", cmd->clone))
     fatal_error("sequence reference without 'at':",
@@ -1688,9 +1662,9 @@ enter_sequ_reference(struct in_cmd* cmd, struct sequence* sequ)
   make_sequ_node(sequ, k);
   current_node->at_value = at;
   current_node->at_expr = command_par_expr("at", cmd->clone);
-  pos = name_list_pos("from", nl);
-  if (nl->inform[pos])
-    current_node->from_name = permbuff(pl->parameters[pos]->string);
+  char* from_name = command_par_string_user("from", cmd->clone);
+  if (from_name)
+    current_node->from_name = permbuff(from_name);
   if (current_sequ->nested <= sequ->nested)
     current_sequ->nested = sequ->nested + 1;
 }
@@ -1699,21 +1673,16 @@ void
 exec_dumpsequ(struct in_cmd* cmd)
   /* writes a sequence out */
 {
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  int level, spos, pos = name_list_pos("sequence", nl);
+  int level, spos;
   struct sequence* sequ = NULL;
-  char* name = NULL;
-  if (nl->inform[pos] == 0)  sequ = current_sequ;
+  char* name = command_par_string_user("sequence", cmd->clone);
+  if (!name)  sequ = current_sequ;
   else
   {
-    name = pl->parameters[pos]->string;
     if ((spos = name_list_pos(name, sequences->list)) >= 0)
       sequ = sequences->sequs[spos];
   }
-  pos = name_list_pos("level", nl);
-  if (nl->inform[pos] > 0) level = pl->parameters[pos]->double_value;
-  else level = 0;
+  level = command_par_value("level", cmd->clone);
   if (sequ != NULL) dump_exp_sequ(sequ, level);
 }
 
@@ -1734,34 +1703,27 @@ exec_save(struct in_cmd* cmd)
   struct sequence* sequ;
   struct sequence_list *sql, *sqo;
   struct var_list* varl;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
   struct command_parameter* clp;
   default_beam_saved = 0;
-  i = name_list_pos("file", nl);
 
-  if (nl->inform[i] == 0) {
+  filename = command_par_string_user("file", cmd->clone);
+  if (!filename) {
     warning("save without file:", "ignored");
     return;
   }
 
-  filename = pl->parameters[i]->string;
   if ((out_file = fopen(filename, "w")) == NULL) {
     warning("cannot open output file:", filename);
     return;
   }
 
 /* get export name for sequence (newname in SAVE) HG 15.10.07 */
-  i = name_list_pos("newname", nl);
-  if (nl->inform[i] != 0) new_name = pl->parameters[i]->string;
+  new_name = command_par_string_user("newname", cmd->clone);
 /* end -- export name for sequence (newname in SAVE) HG 15.10.07 */
 
   warning("SAVE makes all previous USE invalid !", " ");
 
-  pos = name_list_pos("sequence", nl);
-  clp = cmd->clone->par->parameters[pos];
-
-  if (nl->inform[pos] == 0) {  /* no sequence given, all sequences saved */
+  if (!command_par("sequence", cmd->clone, &clp)) {  /* no sequence given, all sequences saved */
     sqo = sequences; all_sequ = 1;
   }
   else {
@@ -1869,20 +1831,17 @@ void
 exec_extract(struct in_cmd* cmd)
   /* "extract" command - extract part of  sequence from marker_1 to marker_2 */
 {
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
   struct sequence *split_sequ = NULL, *part;
-  int i, j;
+  int j;
   char *name = NULL, *refpos = NULL;
   char newname[NAME_L];
   struct node *from, *to;
   /*
     start command decoding
   */
-  i = name_list_pos("sequence", nl);
-  if(nl->inform[i]) /* sequence specified */
+  name = command_par_string_user("sequence", cmd->clone);
+  if(name) /* sequence specified */
   {
-    name = pl->parameters[i]->string;
     if ((j = name_list_pos(name, sequences->list)) > -1)
       split_sequ = sequences->sequs[j];
     else
@@ -1891,46 +1850,45 @@ exec_extract(struct in_cmd* cmd)
       return;
     }
   }
-  i = name_list_pos("newname", nl);
-  if (nl->inform[i] == 0) sprintf(newname, "%s_1", name);
-  else strcpy(newname, pl->parameters[i]->string);
-  i = name_list_pos("from", nl);
-  if (nl->inform[i] == 0)
+  char* tmp = command_par_string_user("newname", cmd->clone);
+  if (!tmp) sprintf(newname, "%s_1", name);
+  else strcpy(newname, tmp);
+  char* from_name = command_par_string_user("from", cmd->clone);
+  if (!from_name)
   {
     warning("no 'from' marker given", " ");
     return;
   }
-  sprintf(c_dum->c, "%s:1", pl->parameters[i]->string);
+  sprintf(c_dum->c, "%s:1", from_name);
   if ((j = name_list_pos(c_dum->c, split_sequ->nodes->list)) > -1)
     from = split_sequ->nodes->nodes[j];
   else
   {
-    warning("not in sequence:", pl->parameters[i]->string);
+    warning("not in sequence:", from_name);
     return;
   }
-  i = name_list_pos("to", nl);
-  if (nl->inform[i] == 0)
+  char* to_name = command_par_string_user("to", cmd->clone);
+  if (!to_name)
   {
     warning("no 'to' marker given", " ");
     return;
   }
-  if (strchr(pl->parameters[i]->string, '$'))
+  if (strchr(to_name, '$'))
   {
     warning("extract: use of internal markers forbidden:",
-            pl->parameters[i]->string);
+            to_name);
     warning("sequence extraction aborted"," ");
     return;
   }
-  sprintf(c_dum->c, "%s:1", pl->parameters[i]->string);
+  sprintf(c_dum->c, "%s:1", to_name);
   if ((j = name_list_pos(c_dum->c, split_sequ->nodes->list)) > -1)
     to = split_sequ->nodes->nodes[j];
   else
   {
-    warning("not in sequence:", pl->parameters[i]->string);
+    warning("not in sequence:", to_name);
     return;
   }
-  i = name_list_pos("refpos", nl);
-  if (nl->inform[i]) refpos = pl->parameters[i]->string;
+  refpos = command_par_string_user("refpos", cmd->clone);
   /*
     end of command decoding - action!
   */
@@ -2104,22 +2062,18 @@ int
 set_enable(const char* type, struct in_cmd* cmd)
 {
   char* name;
-  struct command_parameter* cp;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
   struct sequence* sequ;
   struct node* nodes[2];
   struct node* c_node;
-  int pos, n, status, count = 0; // k, // not used
-  pos = name_list_pos("sequence", nl);
-  if(nl->inform[pos]) /* sequence specified */
+  int n, status, count = 0; // k, // not used
+  name = command_par_string_user("sequence", cmd->clone);
+  if(name) /* sequence specified */
   {
-    cp = cmd->clone->par->parameters[pos];
-    if ((n = name_list_pos(cp->string, sequences->list)) >= 0)
+    if ((n = name_list_pos(name, sequences->list)) >= 0)
       sequ = sequences->sequs[n];
     else
     {
-      warning(cp->string," :sequence not found, skipped");
+      warning(name," :sequence not found, skipped");
       return 0;
     }
   }
@@ -2129,17 +2083,15 @@ set_enable(const char* type, struct in_cmd* cmd)
     warning(sequ->name," :sequence not USEed, skipped");
     return 0;
   }
-  pos = name_list_pos("status", nl);
-  if (pos > -1 && nl->inform[pos])  /* parameter has been read */
+  name = command_par_string_user("status", cmd->clone);
+  if (name)  /* parameter has been read */
   {
-    name = pl->parameters[pos]->string;
     status = strcmp(name, "on") == 0 ? 1 : 0;
   }
   else status = 1;
-  pos = name_list_pos("range", nl);
-  if (pos > -1 && nl->inform[pos])  /* parameter has been read */
+  name = command_par_string_user("range", cmd->clone);
+  if (name)  /* parameter has been read */
   {
-    name = pl->parameters[pos]->string;
     if (get_ex_range(name, sequ, nodes) == 0) // (k = // not used
     {
       nodes[0] = NULL; nodes[1] = NULL;
