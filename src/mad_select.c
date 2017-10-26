@@ -339,18 +339,12 @@ get_range(const char* range, struct sequence* sequ, struct node** nodes)
 }
 
 static int
-par_defined(const char* str, const char* none)
-{
-  return str && strcmp(str, "") != 0 && strcmp(str, none) != 0;
-}
-
-static int
 has_filter_condition(struct command* cmd)
 {
-  return par_defined(command_par_string("sequence", cmd), none)
-      || par_defined(command_par_string("range",    cmd), "#s/#e")
-      || par_defined(command_par_string("class",    cmd), none)
-      || par_defined(command_par_string("pattern",  cmd), "any");
+  return par_present("sequence", cmd)
+      || par_present("range",    cmd)
+      || par_present("class",    cmd)
+      || par_present("pattern",  cmd);
 }
 
 static int
