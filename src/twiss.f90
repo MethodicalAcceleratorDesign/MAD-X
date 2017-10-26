@@ -3423,6 +3423,9 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
      case (code_yrotation)
         call tmyrot(ftrk,orbit,fmap,ek,re,te)
 
+     case (code_xrotation)
+        !-- TODO call tmxrot(ftrk,orbit,fmap,ek,re,te)
+
      case (code_hkicker, code_vkicker, code_kicker, code_tkicker)
         call tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
 
@@ -5713,7 +5716,6 @@ end SUBROUTINE tmsrot
 SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   use twisslfi
   use twissbeamfi, only : beta
-  use math_constfi, only : zero, one
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -5732,26 +5734,27 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   logical :: ftrk, fmap
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
-  double precision :: phi, cosphi, sinphi, tanphi
-
-  double precision, external :: node_value
+  double precision :: angle, ca, sa, ta
+  double precision :: node_value
 
   !---- Initialize.
-  phi = node_value('angle ')
-  fmap = phi .ne. zero
-  if (.not. fmap) return
+  angle = node_value('angle ')
+  if (angle .eq. 0) return
+
+  angle = angle * node_value('other_bv ')
 
   !---- Kick.
-  cosphi = cos(phi)
-  sinphi = sin(phi)
-  tanphi = sinphi / cosphi
-  ek(2) = - sinphi
+  ca = cos(angle)
+  sa = sin(angle)
+  ta = tan(angle)
+
+  ek(2) = sa
 
   !---- Transfer matrix.
-  re(1,1) = one / cosphi
-  re(2,2) = cosphi
-  re(2,6) = - sinphi / beta
-  re(5,1) = tanphi / beta
+  re(1,1) = 1/ca
+  re(2,2) =   ca
+  re(2,6) =   sa/beta
+  re(5,1) =  -ta/beta
 
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)

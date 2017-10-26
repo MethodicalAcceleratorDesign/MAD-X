@@ -820,7 +820,10 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
        call ttsrot(track, ktrack)
 
     case (code_yrotation)
-       ! call ttyrot(track, ktrack)
+       call ttyrot(track, ktrack)
+
+    case (code_xrotation)
+       call ttxrot(track, ktrack)
 
     case (code_hkicker, code_vkicker, code_kicker, code_tkicker)
        call ttcorr(el, track, ktrack, turn)
@@ -1166,6 +1169,48 @@ subroutine ttsrot(track,ktrack)
   enddo
 end subroutine ttsrot
 
+subroutine ttxrot(track,ktrack)
+  use trackfi
+  implicit none
+  !----------------------------------------------------------------------*
+  ! Purpose:                                                             *
+  !   Coordinate change due to rotation about y axis                     *
+  ! Input/output:                                                        *
+  !   TRACK(6,*)(double)    Track coordinates: (X, PX, Y, PY, T, PT).    *
+  !   KTRACK    (integer) number of surviving tracks.        tmsrot      *
+  !----------------------------------------------------------------------*
+  double precision :: track(6,*)
+  integer :: ktrack
+
+  integer :: i
+  double precision :: angle, ca, sa, ta
+  double precision :: x, px, y, py, t, pt, pz, ptt
+  double precision :: node_value
+
+  angle = node_value('angle ')
+  if (angle .eq. 0) return
+
+  angle = angle * node_value('other_bv ')
+  ca = cos(angle)
+  sa = sin(angle)
+  ta = tan(angle)
+  do i = 1, ktrack
+    x  = TRACK(1,i)
+    px = TRACK(2,i)
+    y  = TRACK(3,i)
+    py = TRACK(4,i)
+    t  = TRACK(5,i)
+    pt = TRACK(6,i)
+    pz = 1 / sqrt(1 + 2*pt*bet0i + pt**2 - px**2 - py**2)
+    ptt = 1 - ta*py/pz
+
+    track(3,i) = y/(ca*ptt)
+    track(4,i) = ca*py + sa*pz
+    track(1,i) = x + ta*y*px/(pz*ptt)
+    track(6,i) = t - ta*y   /(pz*ptt)*(bet0i+pt)
+  enddo
+end subroutine ttxrot
+
 subroutine ttyrot(track,ktrack)
   use trackfi
   implicit none
@@ -1180,19 +1225,32 @@ subroutine ttyrot(track,ktrack)
   integer :: ktrack
 
   integer :: i
-  double precision :: theta, ct, st, trb(6)
-
+  double precision :: angle, ca, sa, ta
+  double precision :: x, px, y, py, t, pt, pz, ptt
   double precision :: node_value
 
-  theta = node_value('angle ')
-  ct = cos(theta)
-  st = -sin(theta)
-  do  i = 1, ktrack
-     TRB = TRACK(1:6,i)
-     track(1,i) = trb(1)*ct - trb(5)*st
-     track(2,i) = trb(2)*ct - trb(6)*st
-     track(5,i) = trb(1)*st + trb(5)*ct
-     track(6,i) = trb(2)*st + trb(6)*ct
+  angle = node_value('angle ')
+  if (angle .eq. 0) return
+
+  angle = angle * node_value('other_bv ')
+  ca = cos(angle)
+  sa = sin(angle)
+  ta = tan(angle)
+
+  do i = 1, ktrack
+    x  = TRACK(1,i)
+    px = TRACK(2,i)
+    y  = TRACK(3,i)
+    py = TRACK(4,i)
+    t  = TRACK(5,i)
+    pt = TRACK(6,i)
+    pz = 1 / sqrt(1 + 2*pt*bet0i + pt**2 - px**2 - py**2)
+    ptt = 1 - ta*px/pz
+
+    track(1,i) = x/(ca*ptt)
+    track(2,i) = ca*px + sa*pz
+    track(5,i) = y + ta*x*py/(pz*ptt)
+    track(6,i) = t - ta*x   /(pz*ptt)*(bet0i+pt)
   enddo
 end subroutine ttyrot
 
