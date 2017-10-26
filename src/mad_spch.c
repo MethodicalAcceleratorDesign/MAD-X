@@ -5,7 +5,7 @@ static struct table* bb6d_ixy;
 void
 make_bb6d_ixy(int* bb6d_ixy_max_rows)
 {
-  int k, pos;
+  int k;
   struct table* table = find_table("bb6d_ixy");
 
   if (table)

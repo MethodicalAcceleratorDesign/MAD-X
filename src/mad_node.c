@@ -632,7 +632,7 @@ advance_to_pos(char* table, int* t_pos)
   /* advances current_node to node at t_pos in table */
 {
   struct table* t;
-  int pos, cnt = 0, ret = 0;
+  int cnt = 0, ret = 0;
   mycpy(c_dum->c, table);
   if ((t = find_table(c_dum->c)))
   {

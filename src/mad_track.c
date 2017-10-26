@@ -325,7 +325,7 @@ pro_track(struct in_cmd* cmd)
 void
 track_pteigen(double* eigen)
 {
-  int i, j, pos;
+  int i, j;
   struct table* t;
 
   if ((t = find_table("trackone"))) {
@@ -493,7 +493,7 @@ getcurrentcmdname(char* string)
 
 const char* getcurrentelementname()
 {
-/*returns name of the current element 
+/*returns name of the current element
   Used in rviewer plugin
 */
 

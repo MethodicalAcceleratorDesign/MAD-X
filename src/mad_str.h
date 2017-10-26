@@ -18,7 +18,7 @@ int   mysplit(char* buf, struct char_p_array* list);
 
 void  conv_char(const char* string, struct int_array* tint);
 void  stolower_nq(char* s);
-char* strip(char* name);
+char* strip(const char* name);      /* warning: use permanent local buffer, make copies! */
 int   supp_lt(char* inbuf, int flag);
 void  supp_mul_char(char c, char* string);
 char* supp_tb(char* string);        /* suppress trailing blanks in string */
