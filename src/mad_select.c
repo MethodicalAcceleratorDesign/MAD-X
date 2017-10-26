@@ -159,12 +159,12 @@ int pass_select_str(const char* name, struct command* sc)
 }
 
 int
-pass_select_list(char* name, struct command_list* cl)
+pass_select_list_str(const char* name, struct command_list* cl)
   /* returns 0 (does not pass) or 1 (passes) for a list of selects */
   /* Don't use for selecting elements! It may not find all elements. */
 {
   for (int i = 0; i < cl->curr; i++) {
-    if (pass_select(name, cl->commands[i]))
+    if (pass_select_str(name, cl->commands[i]))
         return 1;
   }
   return cl->curr == 0;
