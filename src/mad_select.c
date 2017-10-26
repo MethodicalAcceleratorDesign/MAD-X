@@ -139,7 +139,7 @@ int pass_select_str(const char* name, struct command* sc)
      considers only SELECT commands *without CLASS*!
      0: does not pass, 1: passes */
   // if the command has CLASS attribute, it is supposed to match elements:
-  if (par_present("class", sc, NULL))  /* parameter has been read */
+  if (par_present("class", sc))  /* parameter has been read */
     return 0;
   return _pass_select_pat(name, sc);
 }

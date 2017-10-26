@@ -655,25 +655,25 @@ fill_par_var_list(struct el_list* ell, struct command_parameter* par, struct var
 }
 
 int
-par_present(const char* par, struct command* cmd, struct command_list* c_list)
-  /* returns 1 if in cmd or in c_list par is read, else returns 0 */
+par_present(const char* par, struct command* cmd)
+  /* returns 1 if in cmd par is read, else returns 0 */
 {
   struct name_list* nl;
-  int i, pos;
-  if (cmd != NULL)
-  {
-    nl = cmd->par_names;
-    pos = name_list_pos(par, nl);
-    if (pos > -1 && nl->inform[pos] > 0)  return 1;
-  }
-  if (c_list != NULL)
-  {
-    for (i = 0; i < c_list->curr; i++)
-    {
-      nl = c_list->commands[i]->par_names;
-      pos = name_list_pos(par, nl);
-      if (pos > -1 && nl->inform[pos] > 0)  return 1;
-    }
+  int pos;
+  return cmd && (nl = cmd->par_names) &&
+    (pos = name_list_pos(par, nl)) > -1 &&
+    nl->inform[pos] > 0;
+}
+
+int
+par_present_list(const char* par, struct command_list* c_list)
+  /* returns 1 if in c_list par is read, else returns 0 */
+{
+  if (!c_list)
+    return 0;
+  for (int i = 0; i < c_list->curr; i++) {
+    if (par_present(par, c_list->commands[i]))
+      return 1;
   }
   return 0;
 }

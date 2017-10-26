@@ -207,7 +207,7 @@ select_interp(struct command* cmd)
   struct double_array* at = command_par_array("at", cmd);
   struct double_array* _at = NULL; // current
 
-  at = clear || !at || !par_present("at", cmd, NULL) ? NULL : clone_double_array(at);
+  at = clear || !at || !par_present("at", cmd) ? NULL : clone_double_array(at);
 
   int fixed_at = clear || at;
 

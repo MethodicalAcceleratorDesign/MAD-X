@@ -1235,7 +1235,7 @@ out_table(const char* tname, struct table* t, const char* filename)
     grow_int_array(t->row_out);
 
   t->row_out->curr = t->curr;
-  if (par_present("full", NULL, scl))
+  if (par_present_list("full", scl))
     put_info("obsolete option 'full'"," ignored on 'select'");
 
   for (int j = 0; j < t->curr    ; j++) t->row_out->i[j] = 1;
@@ -1677,7 +1677,7 @@ set_selected_columns(struct table* t, struct command_list* select)
   char* p;
   struct name_list* nl;
   struct command_parameter_list* pl;
-  if (select && par_present("column", NULL, select))
+  if (select && par_present_list("column", select))
   {
     for (j = 0; j < t->num_cols; j++)  /* deselect all columns */
       t->col_out->i[j] = 0;
