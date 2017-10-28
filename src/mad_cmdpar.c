@@ -302,6 +302,21 @@ export_comm_par(struct command_parameter* par, char* string, int noexpr)
   }
 }
 
+int
+command_par(const char* parameter, const struct command* cmd, struct command_parameter** cp)
+  /* returns inform and the command parameter if found, else 0, NULL */
+{
+  if (cmd && cmd->par_names) {
+    int i = name_list_pos(parameter, cmd->par_names);
+    if (i > -1) {
+      *cp = cmd->par->parameters[i];
+      return cmd->par_names->inform[i];
+    }
+  }
+  *cp = NULL;
+  return 0;
+}
+
 struct expression*
 command_par_expr(const char* parameter, struct command* cmd)
   /* returns a command parameter expression if found, else NULL */
@@ -343,6 +358,14 @@ command_par_string(const char* parameter, const struct command* cmd)
     if (cp->type == 3) p = cp->string;
   }
   return p;
+}
+
+char*
+command_par_string_user(const char* parameter, const struct command* cmd)
+  /* returns a command parameter string if explicitly set, else NULL */
+{
+  struct command_parameter* cp;
+  return command_par(parameter, cmd, &cp) && cp && cp->type == 3 ? cp->string : NULL;
 }
 
 void

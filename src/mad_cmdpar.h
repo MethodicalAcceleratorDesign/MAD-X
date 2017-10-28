@@ -56,8 +56,10 @@ struct command_parameter_list*  delete_command_parameter_list(struct command_par
 struct command_parameter*       store_comm_par_def(char* toks[], int start, int end);
 
 struct expression* command_par_expr(const char* parameter, struct command*);
+int     command_par(const char* parameter, const struct command*, struct command_parameter**);
 double  command_par_special(const char* parameter, const struct element*);
 char*   command_par_string(const char* parameter, const struct command*);
+char*   command_par_string_user(const char* parameter, const struct command*);
 double  command_par_value(const char* parameter, const struct command*);
 int     command_par_value2(const char* parameter, const struct command*, double* val);
 struct double_array* command_par_array(const char* parameter, struct command*);

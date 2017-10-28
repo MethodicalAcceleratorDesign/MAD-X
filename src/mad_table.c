@@ -1429,7 +1429,7 @@ read_table(struct in_cmd* cmd)
 }
 
 int
-get_table_range(char* range, struct table* table, int* rows)
+get_table_range(const char* range, struct table* table, int* rows)
   /* returns start and end row (rows[0] and rows[1])
      of a range in a table; 0 if not found, 1 (1 row) or 2 (> 1) */
 {
