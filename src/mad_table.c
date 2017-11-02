@@ -125,7 +125,7 @@ add_table_vars(struct name_list* cols, struct command_list* select)
 {
   int i, j, k, n, pos;
   char* var_name;
-  char tmp[12];
+  char tmp[16];
   struct name_list* nl;
   struct command_parameter_list* pl;
   for (i = 0; i < select->curr; i++)

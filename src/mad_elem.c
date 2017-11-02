@@ -79,7 +79,7 @@ export_el_par_8(struct command_parameter* par, char* string)
   /* exports an element parameter in mad-8 format */
 {
   int i, k, last, vtilt = 0;
-  char num[2*NAME_L], tmp[8], tmpt[8];
+  char num[2*NAME_L], tmp[16], tmpt[16];
   switch(par->type)
   {
     case 0:
