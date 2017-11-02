@@ -775,24 +775,22 @@ void
 pro_sxf(struct in_cmd* cmd)
   /* controls reading and writing of SXF format files */
 {
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  int pos = name_list_pos("file", nl);
+  struct command_parameter* cp;
   char* filename = NULL;
   FILE* inout;
 
-  if (nl->inform[pos])
+  if (command_par("file", cmd->clone, &cp))
   {
-    if ((filename = pl->parameters[pos]->string) == NULL)
+    if ((filename = cp->string) == NULL)
     {
-      if (pl->parameters[pos]->call_def != NULL)
-        filename = pl->parameters[pos]->call_def->string;
+      if (cp->call_def != NULL)
+        filename = cp->call_def->string;
     }
   }
   else
   {
-    if (pl->parameters[pos]->call_def != NULL)
-      filename = pl->parameters[pos]->call_def->string;
+    if (cp->call_def != NULL)
+      filename = cp->call_def->string;
   }
   if (filename == NULL) filename = permbuff("dummy");
   if (strcmp(cmd->tok_list->p[0], "sxfread") == 0)
