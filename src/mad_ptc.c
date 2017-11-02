@@ -709,7 +709,7 @@ pro_ptc_trackline(struct in_cmd* cmd)
   /*Does PTC tracking taking to the account acceleration */
   /*it is basically wrapper to subroutine ptc_trackline() in madx_ptc_trackline.f90*/
 
-  int one;
+  int one = 1;
   struct command_parameter* cp;
   int parexist = -1;
   double value = 0;
