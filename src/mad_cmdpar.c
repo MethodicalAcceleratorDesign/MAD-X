@@ -321,11 +321,9 @@ struct expression*
 command_par_expr(const char* parameter, struct command* cmd)
   /* returns a command parameter expression if found, else NULL */
 {
-  struct expression* expr = NULL;
-  int i;
-  if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
-    expr = cmd->par->parameters[i]->expr;
-  return expr;
+  struct command_parameter* cp;
+  command_par(parameter, cmd, &cp);
+  return cp ? cp->expr : NULL;
 }
 
 double
@@ -350,14 +348,8 @@ command_par_string(const char* parameter, const struct command* cmd)
   /* returns a command parameter string if found, else NULL */
 {
   struct command_parameter* cp;
-  char* p = NULL;
-  int i;
-  if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
-  {
-    cp = cmd->par->parameters[i];
-    if (cp->type == 3) p = cp->string;
-  }
-  return p;
+  command_par(parameter, cmd, &cp);
+  return cp && cp->type == 3 ? cp->string : NULL;
 }
 
 char*
@@ -396,19 +388,9 @@ command_par_value(const char* parameter, const struct command* cmd)
 {
   /*printf("command_par_value par = >>%s<<, c=%p\n",parameter,cmd);*/
 
-  const struct command_parameter* cp;
-  double val = zero;
-  int i;
-  if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
-  {
-    cp = cmd->par->parameters[i];
-    if (cp->type < 3)
-    {
-      if (cp->expr == NULL)  val = cp->double_value;
-      else val = expression_value(cp->expr, 2);
-    }
-  }
-  return val;
+  double value;
+  command_par_value2(parameter, cmd, &value);
+  return value;
 }
 
 int
@@ -416,41 +398,28 @@ command_par_value2(const char* parameter, const struct command* cmd, double* val
   /* returns a command parameter value val
      if found returns 1, else 0 */
 {
-  const struct command_parameter* cp;
-  int i;
-  int ret = 0;
-
-  *val = zero;
-  if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
-  {
-    cp = cmd->par->parameters[i];
-    if (cp->type < 3)
-    {
-      if (cp->expr == NULL)  *val = cp->double_value;
-      else *val = expression_value(cp->expr, 2);
-      ret = 1;
-    }
+  struct command_parameter* cp;
+  command_par(parameter, cmd, &cp);
+  if (cp && cp->type < 3) {
+    *val = cp->expr ? expression_value(cp->expr, 2) : cp->double_value;
+    return 1;
   }
-
-  return ret;
+  *val = 0;
+  return 0;
 }
 
 struct double_array*
 command_par_array(const char* parameter, struct command* cmd)
   /* returns an updated command parameter array if found, else NULL */
 {
-  struct double_array* arr = NULL;
-  int i;
-  if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
-  {
-    struct command_parameter* cp = cmd->par->parameters[i];
-    if (cp->type == 11 || cp->type == 12)
-    {
-      arr = cp->double_array;
-      if (cp->expr_list != NULL) update_vector(cp->expr_list, arr);
-    }
+  struct command_parameter* cp;
+  command_par(parameter, cmd, &cp);
+  if (cp && (cp->type == 11 || cp->type == 12)) {
+    if (cp->expr_list)
+      update_vector(cp->expr_list, cp->double_array);
+    return cp->double_array;
   }
-  return arr;
+  return NULL;
 }
 
 int
@@ -459,21 +428,10 @@ command_par_vector(const char* parameter, struct command* cmd, double* vector)
      if found, else 0 */
 
 {
-  int i;
-  if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
-  {
-    struct command_parameter* cp = cmd->par->parameters[i];
-    if (cp->double_array != NULL)
-    {
-      if (cp->expr_list != NULL)
-        update_vector(cp->expr_list, cp->double_array);
-      if (vector) {
-        copy_double(cp->double_array->a, vector, cp->double_array->curr);
-      }
-      return cp->double_array->curr;
-    }
-  }
-  return 0;
+  struct double_array* array = command_par_array(parameter, cmd);
+  if (!array) return 0;
+  if (vector) copy_double(array->a, vector, array->curr);
+  return array->curr;
 }
 
 void
@@ -606,10 +564,8 @@ void
 store_comm_par_value(const char* parameter, double val, struct command* cmd)
 {
   struct command_parameter* cp;
-  int i;
-  if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
-  {
-    cp = cmd->par->parameters[i];
+  command_par(parameter, cmd, &cp);
+  if (cp) {
     cp->type = 2;
     if(cp->expr != NULL) cp->expr = delete_expression(cp->expr);
     cp->double_value = val;
@@ -622,13 +578,10 @@ store_set(struct command* comm, int flag)
   char* p;
   char* name;
   struct command_parameter* cp;
-  struct name_list* nl = comm->par_names;
-  int i, lp, n = 0, posf = name_list_pos("format", nl),
-    poss = name_list_pos("sequence", nl);
-  if (flag == 0 || (posf > -1 && nl->inform[posf]))
+  int i, lp, n = 0;
+  if (command_par("format", comm, &cp) || !flag)
   {
     n++;
-    cp = comm->par->parameters[posf];
     for (i = 0; i < cp->m_string->curr; i++)
     {
       p = noquote(cp->m_string->p[i]);
@@ -637,10 +590,10 @@ store_set(struct command* comm, int flag)
       else if (strpbrk(p, "feEgG")) strcpy(float_format, p);
     }
   }
-  if (flag != 0 && poss > -1 && nl->inform[poss])
+  if (flag && command_par("sequence", comm, &cp))
   {
     n++;
-    name = comm->par->parameters[poss]->string;
+    name = cp->string;
     if ((lp = name_list_pos(name, sequences->list)) > -1
         && sequences->sequs[lp]->ex_start != NULL)
       current_sequ = sequences->sequs[lp];
@@ -681,11 +634,8 @@ int
 par_present(const char* par, struct command* cmd)
   /* returns 1 if in cmd par is read, else returns 0 */
 {
-  struct name_list* nl;
-  int pos;
-  return cmd && (nl = cmd->par_names) &&
-    (pos = name_list_pos(par, nl)) > -1 &&
-    nl->inform[pos] > 0;
+  struct command_parameter* cp;
+  return command_par(par, cmd, &cp);
 }
 
 int
@@ -723,7 +673,7 @@ comm_para(const char* name, int* n_int, int* n_double, int* n_string,
   */
 {
   char buf[NAME_L];
-  int i, l, pos;
+  int i, l;
   struct command_parameter* cp;
   struct double_array* arr = NULL;
   *n_int = *n_double = *n_string = 0;
@@ -732,8 +682,8 @@ comm_para(const char* name, int* n_int, int* n_double, int* n_string,
 //  printf("comm_para: name(buf)='%s'\n", buf);
 
   if (this_cmd != NULL && this_cmd->clone != NULL) {
-    if ((pos = name_list_pos(buf, this_cmd->clone->par_names)) > -1) {
-      cp = this_cmd->clone->par->parameters[pos];
+    command_par(buf, this_cmd->clone, &cp);
+    if (cp) {
 
       switch (cp->type) {
       case 0:
@@ -787,16 +737,11 @@ void
 store_comm_par_vector(const char* parameter, double* val, struct command* cmd)
 {
   struct command_parameter* cp;
-  int i;
-  if ((i = name_list_pos(parameter, cmd->par_names)) > -1)
-  {
-    cp = cmd->par->parameters[i];
-    if (cp->double_array != NULL)
-    {
+  command_par(parameter, cmd, &cp);
+  if (cp && cp->double_array) {
       copy_double(val, cp->double_array->a, cp->double_array->curr);
       if (cp->expr_list != NULL)
         cp->expr_list = delete_expr_list(cp->expr_list);
-    }
   }
 }
 
@@ -1075,12 +1020,8 @@ int
 log_val(const char* name, struct command* cmd)
   /* returns 0 = false, 1 = true for a logical command parameter */
 {
-  struct name_list* nl = cmd->par_names;
-  struct command_parameter_list* pl = cmd->par;
-  int pos = name_list_pos(name, nl);
-  if (pos > -1 && nl->inform[pos]) /* "name" has beem read */
-    return pl->parameters[pos]->double_value == zero ? 0 : 1;
-  else return 0;
+  struct command_parameter* cp;
+  return command_par(name, cmd, &cp) && cp->double_value != 0;
 }
 
 // public interface (used by Fortran)
