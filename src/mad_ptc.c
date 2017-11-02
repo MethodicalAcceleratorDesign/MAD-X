@@ -218,13 +218,10 @@ ptc_track_end(void)
 void
 ptc_track_observe(struct in_cmd* cmd)
 {
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
   struct node* nodes[2];
-  int pos;
 
-  pos = name_list_pos("place", nl);
-  if (get_ex_range(pl->parameters[pos]->string, current_sequ, nodes))
+  const char* place = command_par_string("place", cmd->clone);
+  if (get_ex_range(place, current_sequ, nodes))
   {
     nodes[0]->obs_point = ++curr_obs_points;
     printf("obs_points: %d \n",curr_obs_points);
@@ -267,8 +264,7 @@ pro_ptc_twiss(void)
   /* controls ptc_twiss module */
 {
   struct command* keep_beam = current_beam;
-  struct name_list* nl = current_twiss->par_names;
-  struct command_parameter_list* pl = current_twiss->par;
+  struct command_parameter* cp;
   struct int_array* tarr;
   int ptc_twiss_summary = 0 ; /* set to 1 when a summary-table is filled-in */
   struct int_array* summary_tarr; /* to pass summary-table name to Fortran */
@@ -276,7 +272,7 @@ pro_ptc_twiss(void)
   double ptc_deltap;
   const char *table_name = NULL, *summary_table_name = NULL;
   char *filename = NULL, *summary_filename = NULL; /* for summary table */
-  int j, pos, w_file,beta_def;
+  int j, w_file,beta_def;
   int w_file_summary; /* toggle to write the summary table into a file */
   struct table* nonlin_table = 0;
   
@@ -287,14 +283,15 @@ pro_ptc_twiss(void)
   use_range[0] = current_sequ->range_start;
   use_range[1] = current_sequ->range_end;
 
-  if ((pos = name_list_pos("range", nl)) > -1 && nl->inform[pos])
+  const char* range = command_par_string_user("range", current_twiss);
+  if (range)
   {
-    if (get_sub_range(pl->parameters[pos]->string, current_sequ, nodes))
+    if (get_sub_range(range, current_sequ, nodes))
     {
       current_sequ->range_start = nodes[0];
       current_sequ->range_end = nodes[1];
     }
-    else warning("illegal range ignored:", pl->parameters[pos]->string);
+    else warning("illegal range ignored:", range);
   }
   for (j = 0; j < current_sequ->n_nodes; j++)
   {
@@ -304,13 +301,12 @@ pro_ptc_twiss(void)
   if (attach_beam(current_sequ) == 0)
     fatal_error("PTC_TWISS - sequence without beam:", current_sequ->name);
 
-  pos = name_list_pos("table", nl);
-  if(nl->inform[pos]) /* table name specified - overrides save */
+  if(command_par("table", current_twiss, &cp)) /* table name specified - overrides save */
   {
-    table_name = pl->parameters[pos]->string;
+    table_name = cp->string;
     if (table_name == NULL)
     {
-      table_name = pl->parameters[pos]->call_def->string;
+      table_name = cp->call_def->string;
     }
   }
   else
@@ -321,11 +317,10 @@ pro_ptc_twiss(void)
 
   /* --- */
   /* do the same as above for the table holding summary data after one-turn */
-  pos = name_list_pos("summary_table",nl);
-  if (nl->inform[pos]){ /* summary-table's name specified */
-    summary_table_name = pl->parameters[pos]->string;
+  if (command_par("summary_table", current_twiss, &cp)){ /* summary-table's name specified */
+    summary_table_name = cp->string;
     if (summary_table_name == NULL){
-      summary_table_name = pl->parameters[pos]->call_def->string;
+      summary_table_name = cp->call_def->string;
     }
   }
   else {
@@ -333,13 +328,12 @@ pro_ptc_twiss(void)
   }
   /* --- */
 
-  pos = name_list_pos("file", nl);
-  if (nl->inform[pos])
+  if (command_par("file", current_twiss, &cp))
   {
-    if ((filename = pl->parameters[pos]->string) == NULL)
+    if ((filename = cp->string) == NULL)
     {
-      if (pl->parameters[pos]->call_def != NULL)
-        filename = pl->parameters[pos]->call_def->string;
+      if (cp->call_def != NULL)
+        filename = cp->call_def->string;
     }
     if (filename == NULL) filename = permbuff("dummy");
     w_file = 1;
@@ -348,11 +342,10 @@ pro_ptc_twiss(void)
 
   /* --- */
   /* do the same as above for the file to hold the summary-table */
-  pos = name_list_pos("summary_file",nl);
-  if (nl->inform[pos]){
-    if ((summary_filename = pl->parameters[pos]->string) == NULL){
-      if (pl->parameters[pos]->call_def != NULL)
-        summary_filename = pl->parameters[pos]->call_def->string;
+  if (command_par("summary_file", current_twiss, &cp)){
+    if ((summary_filename = cp->string) == NULL){
+      if (cp->call_def != NULL)
+        summary_filename = cp->call_def->string;
     }
     if (summary_filename == NULL) summary_filename = permbuff("dummy");
     w_file_summary = 1;
@@ -539,18 +532,14 @@ void
 select_ptc_normal(struct in_cmd* cmd)
   /* sets up all columns of the table normal_results except the last one (value) */
 {
-  struct name_list* nl;
-  struct command_parameter_list* pl;
   struct table* t;
-  int pos;
+  struct command_parameter* cp;
   int i, j, jj, curr;
   int skew, mynorder,myn1,myn2,mynres,indexa[4][1000];
   char* order_list;
   int min_req_order;
   double order[4],n1,n2,n3,n4;
 
-  nl = this_cmd->clone->par_names;
-  pl = this_cmd->clone->par;
   if (log_val("clear", cmd->clone))
   {
     min_order = 1;
@@ -585,15 +574,14 @@ select_ptc_normal(struct in_cmd* cmd)
   {
     /* Treat each ptc variable */
 
-    pos = name_list_pos(names[j], nl);
-    if (pos > -1 && nl->inform[pos])
+    if (command_par(names[j], this_cmd->clone, &cp))
     {
-      curr = pl->parameters[pos]->m_string->curr;
+      curr = cp->m_string->curr;
       if (curr > 4)
         printf("Too many values for the attribute %s. Only the first four are retained.\n",names[j]);
       for (i = 0; i < curr; i++)
       {
-        order_list = pl->parameters[pos]->m_string->p[i];
+        order_list = cp->m_string->p[i];
         order[i] = atoi(order_list);
       }
 
@@ -721,9 +709,8 @@ pro_ptc_trackline(struct in_cmd* cmd)
   /*Does PTC tracking taking to the account acceleration */
   /*it is basically wrapper to subroutine ptc_trackline() in madx_ptc_trackline.f90*/
 
-  int pos, one;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
+  int one;
+  struct command_parameter* cp;
   int parexist = -1;
   double value = 0;
   int ivalue = 0;
@@ -734,18 +721,16 @@ pro_ptc_trackline(struct in_cmd* cmd)
     fatal_error("PTC_TRACKLINE - sequence without beam:", current_sequ->name);
   
 
-  pos = name_list_pos("file", nl);
-
-  if (nl->inform[pos])
+  if (command_par("file", cmd->clone, &cp))
   {
     set_option("track_dump", &one);
   }
 
-  if ((track_filename = pl->parameters[pos]->string) == NULL)
+  if ((track_filename = cp->string) == NULL)
   {
-    if (pl->parameters[pos]->call_def != NULL)
+    if (cp->call_def != NULL)
     {
-      track_filename = pl->parameters[pos]->call_def->string;
+      track_filename = cp->call_def->string;
     }
     else
     {
@@ -753,14 +738,13 @@ pro_ptc_trackline(struct in_cmd* cmd)
     }
   }
   track_filename = permbuff(track_filename);
-  track_fileext = NULL;
-  pos = name_list_pos("extension", nl);
 
-  if ((track_fileext = pl->parameters[pos]->string) == NULL)
+  command_par("extension", cmd->clone, &cp);
+  if ((track_fileext = cp->string) == NULL)
   {
-    if (pl->parameters[pos]->call_def != NULL)
+    if (cp->call_def != NULL)
     {
-      track_fileext = pl->parameters[pos]->call_def->string;
+      track_fileext = cp->call_def->string;
     }
     if (track_fileext == NULL)
     {
@@ -1160,8 +1144,6 @@ pro_ptc_eplacement(struct in_cmd* cmd)
 {/*
    Sets a parameter
  */
-  struct command_parameter_list* c_parameters= cmd->clone->par;
-  struct name_list*              c_parnames  = cmd->clone->par_names;
   int                            pos         = 0;
   int                            k         = 0;
   struct node*                   nodes[2]={0x0,0x0};
@@ -1169,55 +1151,34 @@ pro_ptc_eplacement(struct in_cmd* cmd)
   char*                          element;
   int                            refframe=0;/*0 global, 1 current position, 2 end face if the previous element*/
 
-
-  pos   = name_list_pos("refframe", c_parnames);
-  if (pos < 0)
-  {
-    printf("mad_ptc.c: pro_ptc_eplacement: refframe parameter does not exist.\n");
-    return;
-  }
-
-  if ( c_parnames->inform[pos] != 0 )
+  const char* s_refframe = command_par_string_user("refframe", cmd->clone);
+  if (s_refframe)
   {
     /*if it is zero it is not specified*/
 
-    if ( c_parameters->parameters[pos]->string == 0x0 )
+    if ( !refframe )
     {
       warning("mad_ptc.c: pro_ptc_eplacement: string describing refframe is null: ", "using default");
       refframe = 0;
     }
     else
     {
-      /*printf("refframe is %s.\n", c_parameters->parameters[pos]->string );*/
+      /*printf("refframe is %s.\n", s_refframe );*/
 
-      if ( strcmp(c_parameters->parameters[pos]->string,"current")  == 0 )
+      if ( strcmp(s_refframe,"current")  == 0 )
       {
         refframe = 1;
       }
 
-      if ( strcmp(c_parameters->parameters[pos]->string,"previouselement") == 0 )
+      if ( strcmp(s_refframe,"previouselement") == 0 )
       {
         refframe = 2;
       }
     }
   }
 
-
-  pos   = name_list_pos("range", c_parnames);
-  if (pos < 0)
-  {
-    printf("mad_ptc.c: pro_ptc_eplacement: range parameter does not exist.\n");
-    return;
-  }
-
-  if ( c_parnames->inform[pos] == 0 )
-  {
-    printf("mad_ptc.c: pro_ptc_eplacement: inform for range is 0.\n");
-    return;
-  }
-
-  element  = c_parameters->parameters[pos]->string;
-  if ( element == 0x0 )
+  element = command_par_string_user("range", cmd->clone);
+  if ( !element )
   {
     warning("mad_ptc.c: pro_ptc_eplacement: no element name: ", "ignored");
     return;
@@ -1421,31 +1382,14 @@ pro_ptc_setfieldcomp(struct in_cmd* cmd)
 {/*
    Sets a parameter value
  */
-  struct command_parameter_list* c_parameters= cmd->clone->par;
-  struct name_list*              c_parnames  = cmd->clone->par_names;
   int                            pos         = 0;
   int                            k         = 0;
   struct node*                   nodes[2]={0x0,0x0};
   struct node*                   anode=0x0;
   char*                          element;
 
-
-
-  pos   = name_list_pos("element", c_parnames);
-  if (pos < 0)
-  {
-    printf("mad_ptc.c: pro_ptc_setfieldcomp: range parameter does not exist.\n");
-    return;
-  }
-
-  if ( c_parnames->inform[pos] == 0 )
-  {
-    printf("mad_ptc.c: pro_ptc_setfieldcomp: inform for range is 0.\n");
-    return;
-  }
-
-  element  = c_parameters->parameters[pos]->string;
-  if ( element == 0x0 )
+  element  = command_par_string_user("element", cmd->clone);
+  if ( !element )
   {
     warning("mad_ptc.c: pro_ptc_setfieldcomp: no element name: ", "ignored");
     return;
@@ -1581,6 +1525,7 @@ pro_ptc_select_moment(struct in_cmd* cmd)
   struct int_array*              mdefIA      = 0x0;
   struct command_parameter_list* c_parameters= cmd->clone->par;
   struct name_list*              c_parnames  = cmd->clone->par_names;
+  struct command_parameter*      cp;
   int                            parametric = 0;
   int                            int_arr[100];
 
@@ -1616,13 +1561,13 @@ pro_ptc_select_moment(struct in_cmd* cmd)
     return 1;
   }
 
-  if (c_parnames->inform[pos])
+  if (command_par("moment_s", cmd->clone, &cp))
   {
-    for (j = 0; j < c_parameters->parameters[pos]->m_string->curr; j++)
+    for (j = 0; j < cp->m_string->curr; j++)
     {
       strcpy(colname,"mu000000");
 
-      mdefin = c_parameters->parameters[pos]->m_string->p[j];
+      mdefin = cp->m_string->p[j];
 
       /*printf("String no %d is %s\n", j, mdefin);*/
 
@@ -1875,9 +1820,8 @@ pro_ptc_open_gino(struct in_cmd* cmd)
 void
 pro_ptc_track(struct in_cmd* cmd)
 {
-  int k=0, pos, one = 1;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
+  int k=0, one = 1;
+  struct command_parameter* cp;
 /*  const char *rout_name = "ptc_track"; */
   int npart = stored_track_start->curr;
   struct table* t;
@@ -1915,21 +1859,20 @@ pro_ptc_track(struct in_cmd* cmd)
   set_variable("track_deltap", &track_deltap);
   if(track_deltap != 0) fprintf(prt_file, v_format("track_deltap: %F\n"),
                                 track_deltap);
-  pos = name_list_pos("file", nl);
-  if (nl->inform[pos]) set_option("track_dump", &one);
-  if ((track_filename = pl->parameters[pos]->string) == NULL)
+  if (command_par("file", cmd->clone, &cp)) set_option("track_dump", &one);
+  if ((track_filename = cp->string) == NULL)
   {
-    if (pl->parameters[pos]->call_def != NULL)
-      track_filename = pl->parameters[pos]->call_def->string;
+    if (cp->call_def != NULL)
+      track_filename = cp->call_def->string;
     else track_filename = permbuff("dummy");
   }
   track_filename = permbuff(track_filename);
   track_fileext = NULL;
-  pos = name_list_pos("extension", nl);
-  if ((track_fileext = pl->parameters[pos]->string) == NULL)
+  command_par("extension", cmd->clone, &cp);
+  if ((track_fileext = cp->string) == NULL)
   {
-    if (pl->parameters[pos]->call_def != NULL)
-      track_fileext = pl->parameters[pos]->call_def->string;
+    if (cp->call_def != NULL)
+      track_fileext = cp->call_def->string;
     if (track_fileext == NULL)  track_fileext = permbuff("\0");
   }
   track_fileext = permbuff(track_fileext);
