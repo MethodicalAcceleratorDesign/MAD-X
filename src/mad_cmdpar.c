@@ -357,7 +357,11 @@ command_par_string_user(const char* parameter, const struct command* cmd)
   /* returns a command parameter string if explicitly set, else NULL */
 {
   struct command_parameter* cp;
-  return command_par(parameter, cmd, &cp) && cp && cp->type == 3 ? cp->string : NULL;
+  if (command_par(parameter, cmd, &cp) && cp && cp->type == 3) {
+    if (cp->string)   return cp->string;
+    if (cp->call_def) return cp->call_def->string;
+  }
+  return NULL;
 }
 
 void
