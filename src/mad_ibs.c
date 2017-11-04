@@ -5,9 +5,8 @@ pro_ibs(struct in_cmd* cmd)
   /* control for IBS module */
 {
   struct command* keep_beam = current_beam;
-  struct command_parameter* cp;
   char *filename = NULL, *table_name = NULL;
-  int pos, w_file;
+  int w_file;
 
   (void)cmd;
   
@@ -18,15 +17,10 @@ pro_ibs(struct in_cmd* cmd)
     if ((current_beam = find_command(twiss_table->org_sequ->name, beam_list)) == NULL)
       current_beam = find_command("default_beam", beam_list);
 
-    if (command_par("file", current_ibs, &cp)) {
-      if ((filename = cp->string) == NULL) {
-        if (cp->call_def != NULL)
-          filename = cp->call_def->string;
-      }
-      if (filename == NULL) filename = permbuff("dummy");
-      w_file = 1;
+    w_file = command_par_string_user2("file", current_ibs, &filename);
+    if (w_file && !filename) {      // TG: should be impossible
+      filename = permbuff("dummy");
     }
-    else w_file = 0;
 
     set_option("ibs_table", &w_file); /* fill only if output */
 

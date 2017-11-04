@@ -354,14 +354,49 @@ command_par_string(const char* parameter, const struct command* cmd)
 
 char*
 command_par_string_user(const char* parameter, const struct command* cmd)
-  /* returns a command parameter string if explicitly set, else NULL */
+  /* get command parameter string if explicitly set, call_def if passed
+   * as bareword, else NULL. This will never return the DEFAULT value. */
 {
+  char* str;
+  command_par_string_user2(parameter, cmd, &str);
+  return str;
+}
+
+int
+command_par_string_user2(const char* parameter, const struct command* cmd, char** str)
+  /* get a command parameter string if explicitly set, call_def if passed
+   * as bareword, else NULL. This will never return the DEFAULT value.
+   * Returns `inform`, i.e. whether the parameter was specified explicitly.
+   * This can be `1` even if `*str = NULL`, but `0` implies `*str=NULL` */
+{
+  *str = NULL;
   struct command_parameter* cp;
-  if (command_par(parameter, cmd, &cp) && cp && cp->type == 3) {
-    if (cp->string)   return cp->string;
-    if (cp->call_def) return cp->call_def->string;
+  int inf = command_par(parameter, cmd, &cp);
+  if (inf && cp && cp->type == 3) {
+    if (cp->string)        *str = cp->string;
+    else if (cp->call_def) *str = cp->call_def->string;
   }
-  return NULL;
+  return inf;
+}
+
+int
+command_par_string_or_calldef(const char* parameter, const struct command* cmd, char** str)
+  /* returns command parameter string if explicitly set, otherwise call_def. */
+  /* this function is only needed because mad_dict.c is not populated properly
+   * and because the command decoding prefers
+   *      `cp->string = DEFAULT`    over    `cp->string = NULL`
+   * if the parameter is specified as bareword and DEFAULT is non-null
+   * (which is IMO a bug).
+   */
+{
+  *str = NULL;
+  struct command_parameter* cp;
+  int inf = command_par(parameter, cmd, &cp);
+  if (cp && cp->type == 3) {
+    if (inf && cp->string) *str = cp->string;
+    else if (cp->call_def) *str = cp->call_def->string;
+  }
+  return inf;
 }
 
 void

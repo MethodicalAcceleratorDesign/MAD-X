@@ -17,18 +17,9 @@ pro_touschek(struct in_cmd* cmd)
   if ((current_beam = find_command(twiss_table->org_sequ->name, beam_list)) == NULL)
     current_beam = find_command("default_beam", beam_list);
 
-  struct command_parameter* cp;
-  if (command_par("file", current_touschek, &cp))
-    {
-      if ((filename = cp->string) == NULL)
-	{
-	  if (cp->call_def != NULL)
-	    filename = cp->call_def->string;
-	}
-      if (filename == NULL) filename = permbuff("dummy");
-      w_file = 1;
-    }
-  else w_file = 0;
+  w_file = command_par_string_user2("file", current_touschek, &filename);
+  if (w_file && !filename)
+    filename = permbuff("dummy");
 
   set_option("touschek_table", &w_file); /* fill only if output */
 

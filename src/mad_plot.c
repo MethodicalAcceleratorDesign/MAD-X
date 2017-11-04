@@ -160,17 +160,14 @@ exec_plot(struct in_cmd* cmd)
   nointerp = !par_present("interpolation", this_cmd->clone); // TG: should be "interpolate"?!
 
   /* get haxis_name & s_haxis flag */
-  if(command_par("haxis", this_cmd->clone, &cp)) {
-    if ((haxis_name = cp->string) == NULL)
-      haxis_name = cp->call_def->string;
+  haxis_name = command_par_string_user("haxis", this_cmd->clone);
+  if (haxis_name) {
     s_haxis = strcmp(haxis_name,"s");
   }
 
   /* get table_name & track_flag */
-  if(command_par("table", this_cmd->clone, &cp)) { /* table name specified */
-    if ((table_name = cp->string) == NULL)
-      table_name = cp->call_def->string;
-
+  table_name = command_par_string_user("table", this_cmd->clone);
+  if(table_name) {
     if(strncmp(table_name,"track",5) == 0)
       track_flag = 1;
 
@@ -183,11 +180,8 @@ exec_plot(struct in_cmd* cmd)
   }
 
   /* get file_name */
-  if(command_par("file", this_cmd->clone, &cp)) { /* file name specified */
-    if ((file_name = cp->string) == NULL)
-      file_name = cp->call_def->string;
-  }
-  else {
+  file_name = command_par_string_user("file", this_cmd->clone);
+  if(!file_name) {
     if (track_flag) file_name = "madx_track";
     else file_name = "madx";
   }

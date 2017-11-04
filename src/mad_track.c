@@ -158,7 +158,6 @@ static void
 track_track(struct in_cmd* cmd)
 {
   int k=0, one = 1;
-  struct command_parameter* cp;
 
   if (current_sequ == NULL || current_sequ->ex_start == NULL)
   {
@@ -212,22 +211,13 @@ track_track(struct in_cmd* cmd)
   if(track_deltap != 0) fprintf(prt_file, v_format("track_deltap: %F\n"),
                                 track_deltap);
   curr_obs_points = 1;  /* default: always observe at machine end */
-  if (command_par("file", cmd->clone, &cp)) set_option("track_dump", &one);
-  if ((track_filename = cp->string) == NULL)
-  {
-    if (cp->call_def != NULL)
-      track_filename = cp->call_def->string;
-    else track_filename = permbuff("dummy");
-  }
+  if (command_par_string_or_calldef("file", cmd->clone, &track_filename))
+    set_option("track_dump", &one);
+  if (!track_filename) track_filename = permbuff("dummy");
   track_filename = permbuff(track_filename);
   track_fileext = NULL;
-  command_par("extension", cmd->clone, &cp);
-  if ((track_fileext = cp->string) == NULL)
-  {
-    if (cp->call_def != NULL)
-      track_fileext = cp->call_def->string;
-    if (track_fileext == NULL)  track_fileext = permbuff("\0");
-  }
+  command_par_string_or_calldef("extension", cmd->clone, &track_fileext);
+  if (!track_fileext) track_fileext = permbuff("\0");
   track_fileext = permbuff(track_fileext);
 }
 

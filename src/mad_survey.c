@@ -4,7 +4,6 @@ void
 pro_survey(struct in_cmd* cmd)
   /* calls survey module */
 {
-  struct command_parameter* cp;
   struct sequence* keep_current;
   char *filename = NULL, *table_name;
   int w_file;
@@ -19,23 +18,11 @@ pro_survey(struct in_cmd* cmd)
   if (debuglevel > 1) fprintf(prt_file, "enter Survey module\n");
   keep = get_option("rbarc");
   set_option("rbarc", &iarc);
-  if (command_par("file", current_survey, &cp))
-  {
-    if ((filename = cp->string) == NULL)
-    {
-      if (cp->call_def != NULL)
-        filename = cp->call_def->string;
-    }
-    if (filename == NULL) filename = permbuff("dummy");
-    w_file = 1;
-  }
-  else w_file = 0;
-  if(command_par("table", current_survey, &cp)) /* table name specified - overrides save */
-  {
-    if ((table_name = cp->string) == NULL)
-      table_name = cp->call_def->string;
-  }
-  else table_name = permbuff("survey");
+  w_file = command_par_string_user2("file", current_survey, &filename);
+  if (w_file && !filename)
+    filename = permbuff("dummy");
+  table_name = command_par_string_user("table", current_survey);
+  if(!table_name) table_name = permbuff("survey");
   survey_table = make_table(table_name, "survey", survey_table_cols,
                             survey_table_types, current_sequ->n_nodes);
   add_to_table_list(survey_table, table_register);

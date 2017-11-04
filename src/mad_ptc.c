@@ -264,7 +264,6 @@ pro_ptc_twiss(void)
   /* controls ptc_twiss module */
 {
   struct command* keep_beam = current_beam;
-  struct command_parameter* cp;
   struct int_array* tarr;
   int ptc_twiss_summary = 0 ; /* set to 1 when a summary-table is filled-in */
   struct int_array* summary_tarr; /* to pass summary-table name to Fortran */
@@ -301,56 +300,27 @@ pro_ptc_twiss(void)
   if (attach_beam(current_sequ) == 0)
     fatal_error("PTC_TWISS - sequence without beam:", current_sequ->name);
 
-  if(command_par("table", current_twiss, &cp)) /* table name specified - overrides save */
-  {
-    table_name = cp->string;
-    if (table_name == NULL)
-    {
-      table_name = cp->call_def->string;
-    }
-  }
-  else
-  {
-    /*strcpy(table_name,"ptc_twiss");*/
+  table_name = command_par_string_user("table", current_twiss);
+  if(!table_name)
     table_name = "ptc_twiss";
-  }
 
   /* --- */
   /* do the same as above for the table holding summary data after one-turn */
-  if (command_par("summary_table", current_twiss, &cp)){ /* summary-table's name specified */
-    summary_table_name = cp->string;
-    if (summary_table_name == NULL){
-      summary_table_name = cp->call_def->string;
-    }
-  }
-  else {
+  summary_table_name = command_par_string_user("summary_table", current_twiss);
+  if (!summary_table_name)
     summary_table_name = "ptc_twiss_summary";
-  }
+
   /* --- */
 
-  if (command_par("file", current_twiss, &cp))
-  {
-    if ((filename = cp->string) == NULL)
-    {
-      if (cp->call_def != NULL)
-        filename = cp->call_def->string;
-    }
-    if (filename == NULL) filename = permbuff("dummy");
-    w_file = 1;
-  }
-  else w_file = 0;
+  w_file = command_par_string_user2("file", current_twiss, &filename);
+  if (w_file && !filename)                      // TG: should be impossible?
+    filename = permbuff("dummy");
 
   /* --- */
   /* do the same as above for the file to hold the summary-table */
-  if (command_par("summary_file", current_twiss, &cp)){
-    if ((summary_filename = cp->string) == NULL){
-      if (cp->call_def != NULL)
-        summary_filename = cp->call_def->string;
-    }
-    if (summary_filename == NULL) summary_filename = permbuff("dummy");
-    w_file_summary = 1;
-  }
-  else w_file_summary = 0;
+  w_file_summary = command_par_string_user2("summary_file", current_twiss, &summary_filename);
+  if (w_file_summary && !summary_filename)      // TG: should be impossible?
+    summary_filename = permbuff("dummy");
 
   /*
     end of command decoding
@@ -710,7 +680,6 @@ pro_ptc_trackline(struct in_cmd* cmd)
   /*it is basically wrapper to subroutine ptc_trackline() in madx_ptc_trackline.f90*/
 
   int one = 1;
-  struct command_parameter* cp;
   int parexist = -1;
   double value = 0;
   int ivalue = 0;
@@ -719,39 +688,16 @@ pro_ptc_trackline(struct in_cmd* cmd)
 
   if (attach_beam(current_sequ) == 0)
     fatal_error("PTC_TRACKLINE - sequence without beam:", current_sequ->name);
-  
 
-  if (command_par("file", cmd->clone, &cp))
-  {
+  if (command_par_string_or_calldef("file", cmd->clone, &track_filename))
     set_option("track_dump", &one);
-  }
-
-  if ((track_filename = cp->string) == NULL)
-  {
-    if (cp->call_def != NULL)
-    {
-      track_filename = cp->call_def->string;
-    }
-    else
-    {
-      track_filename = permbuff("dummy");
-    }
-  }
+  if (!track_filename)
+    track_filename = permbuff("dummy");
   track_filename = permbuff(track_filename);
 
-  command_par("extension", cmd->clone, &cp);
-  if ((track_fileext = cp->string) == NULL)
-  {
-    if (cp->call_def != NULL)
-    {
-      track_fileext = cp->call_def->string;
-    }
-    if (track_fileext == NULL)
-    {
-      track_fileext = permbuff("\0");
-    }
-  }
-
+  command_par_string_or_calldef("extension", cmd->clone, &track_fileext);
+  if (!track_fileext)
+    track_fileext = permbuff("\0");
   track_fileext = permbuff(track_fileext);
 
   if (command_par_value("everystep",cmd->clone) != 0)
@@ -1821,7 +1767,6 @@ void
 pro_ptc_track(struct in_cmd* cmd)
 {
   int k=0, one = 1;
-  struct command_parameter* cp;
 /*  const char *rout_name = "ptc_track"; */
   int npart = stored_track_start->curr;
   struct table* t;
@@ -1859,22 +1804,15 @@ pro_ptc_track(struct in_cmd* cmd)
   set_variable("track_deltap", &track_deltap);
   if(track_deltap != 0) fprintf(prt_file, v_format("track_deltap: %F\n"),
                                 track_deltap);
-  if (command_par("file", cmd->clone, &cp)) set_option("track_dump", &one);
-  if ((track_filename = cp->string) == NULL)
-  {
-    if (cp->call_def != NULL)
-      track_filename = cp->call_def->string;
-    else track_filename = permbuff("dummy");
-  }
+
+  if (command_par_string_or_calldef("file", cmd->clone, &track_filename))
+      set_option("track_dump", &one);
+  if (!track_filename) track_filename = permbuff("dummy");
   track_filename = permbuff(track_filename);
-  track_fileext = NULL;
-  command_par("extension", cmd->clone, &cp);
-  if ((track_fileext = cp->string) == NULL)
-  {
-    if (cp->call_def != NULL)
-      track_fileext = cp->call_def->string;
-    if (track_fileext == NULL)  track_fileext = permbuff("\0");
-  }
+
+  command_par_string_or_calldef("extension", cmd->clone, &track_fileext);
+  if (!track_fileext)
+    track_fileext = permbuff("\0");
   track_fileext = permbuff(track_fileext);
 
   if (npart == 0)

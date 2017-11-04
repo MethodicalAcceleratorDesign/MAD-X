@@ -156,7 +156,6 @@ pro_embedded_twiss(struct command* current_global_twiss)
   struct command* keep_beam = current_beam;
   struct command* keep_twiss;
   struct name_list* nl = current_twiss->par_names;
-  struct command_parameter* cp;
   struct table* twiss_tb;
   struct table* keep_table = NULL;
   char *filename = NULL, *name, *sector_name;
@@ -210,11 +209,9 @@ pro_embedded_twiss(struct command* current_global_twiss)
 
   if (get_value(current_command->name,"sectormap") != 0) { // (ks = not used
     set_option("twiss_sector", &k);
-    if(command_par("sectorfile", current_twiss, &cp)) {
-      if ((sector_name = cp->string) == NULL)
-        sector_name = cp->call_def->string;
-    }
-    else  sector_name = cp->call_def->string;
+
+    command_par_string_or_calldef("sectorfile", current_twiss, &sector_name);
+
     if ((sec_file = fopen(sector_name, "w")) == NULL)
       fatal_error("cannot open output file:", sector_name);
   }
@@ -254,15 +251,9 @@ pro_embedded_twiss(struct command* current_global_twiss)
     set_option("keeporbit", &k);
   }
 
-  if (command_par("file", current_twiss, &cp)) {
-    if ((filename = cp->string) == NULL) {
-      if (cp->call_def != NULL)
-        filename = cp->call_def->string;
-    }
-    if (filename == NULL) filename = permbuff("dummy");
-    w_file = 1;
-  }
-  else w_file = 0;
+  w_file = command_par_string_user2("file", current_twiss, &filename);
+  if (w_file && !filename)
+    filename = permbuff("dummy");
 
   tol_keep = get_variable("twiss_tol");
   if (par_present("tolerance", current_twiss)) {
@@ -699,8 +690,6 @@ pro_twiss(void)
     return;
   }
 
-  struct command_parameter* cp;
-
   if (match_is_on) k_save = 0;  /* match gets its own variable transfer -
 				    this can be overridden with option "slow"
                                     on match command */
@@ -727,32 +716,16 @@ pro_twiss(void)
   if (attach_beam(current_sequ) == 0)
     fatal_error("TWISS - sequence without beam:", current_sequ->name);
 
-  if(command_par("table", current_twiss, &cp)) { /* table name specified - overrides save */
-    if ((table_name = cp->string) == NULL)
-      table_name = cp->call_def->string;
-  }
-  else if(command_par("save", current_twiss, &cp)) { /* save name specified */
+  if ((table_name = command_par_string_user("table", current_twiss))) { }
+  else if ((table_name = command_par_string_user("save", current_twiss))) {
     k_save = 1;
-    if ((table_name = cp->string) == NULL)
-      table_name = cp->call_def->string;
   }
   else table_name = "twiss";
 
   if ((k_sect = get_value(current_command->name,"sectormap")) != 0) {
     set_option("twiss_sector", &k_sect);
-    /* sector_table - start */
-    if (command_par("sectortable", current_twiss, &cp)) {
-      if ((sector_table_name = cp->string) == NULL)
-        sector_table_name = cp->call_def->string;
-    }
-    else sector_table_name = cp->call_def->string;
-
-    /* sector_table - end */
-    if(command_par("sectorfile", current_twiss, &cp)) {
-      if ((sector_name = cp->string) == NULL)
-        sector_name = cp->call_def->string;
-    }
-    else  sector_name = cp->call_def->string; /* filename for sector file */
+    command_par_string_or_calldef("sectortable", current_twiss, &sector_table_name);
+    command_par_string_or_calldef("sectorfile", current_twiss, &sector_name);
   }
 
   use_range[0] = current_sequ->range_start;
@@ -799,15 +772,9 @@ pro_twiss(void)
     set_option("keeporbit", &k);
   }
 
-  if (command_par("file", current_twiss, &cp)) {
-    if ((filename = cp->string) == NULL) {
-      if (cp->call_def != NULL)
-        filename = cp->call_def->string;
-    }
-    if (filename == NULL) filename = permbuff("dummy");
-    w_file = 1;
-  }
-  else w_file = 0;
+  w_file = command_par_string_user2("file", current_twiss, &filename);
+  if (w_file && !filename)
+    filename = permbuff("dummy");
 
   tol_keep = get_variable("twiss_tol");
   if (par_present("tolerance", current_twiss)) {
