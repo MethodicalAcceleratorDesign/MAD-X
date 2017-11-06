@@ -3241,21 +3241,32 @@ subroutine trsol(track,ktrack)
         onedp = sqrt(one + two*pt_/bet0 + pt_**2);
         bet = onedp / (one/bet0 + pt_);
 
-        ! set up constants
-        cosTh = cos(two*skl/onedp)
-        sinTh = sin(two*skl/onedp)
-        omega = sk/onedp;
+        if (skl.ne.zero) then
 
-        ! total path length traveled by the particle
-        length_ = length - half/(onedp**2)*(omega*(sinTh-two*length*omega)*(x_**2+y_**2)+&
-             two*(one-cosTh)*(px_*x_+py_*y_)-(sinTh/omega+two*length)*(px_**2+py_**2))/four;
+           ! set up constants                                                                                                                                                                                           
+           cosTh = cos(two*skl/onedp)
+           sinTh = sin(two*skl/onedp)
+           omega = sk/onedp;
 
-        track(1,i) = ((one+cosTh)*x_+sinTh*y_+(px_*sinTh-py_*(cosTh-one))/omega)/two;
-        track(3,i) = ((one+cosTh)*y_-sinTh*x_+(py_*sinTh+px_*(cosTh-one))/omega)/two;
-        track(2,i) = (omega*((cosTh-one)*y_-sinTh*x_)+py_*sinTh+px_*(one+cosTh))/two;
-        track(4,i) = (omega*((one-cosTh)*x_-sinTh*y_)-px_*sinTh+py_*(one+cosTh))/two;
-        track(5,i) = z_ + length/bet0 - length_/bet;
+           ! total path length traveled by the particle                                                                                                                                                                 
+           length_ = length - half/(onedp**2)*(omega*(sinTh-two*length*omega)*(x_**2+y_**2)+&
+                two*(one-cosTh)*(px_*x_+py_*y_)-(sinTh/omega+two*length)*(px_**2+py_**2))/four;
 
+           track(1,i) = ((one+cosTh)*x_+sinTh*y_+(px_*sinTh-py_*(cosTh-one))/omega)/two;
+           track(3,i) = ((one+cosTh)*y_-sinTh*x_+(py_*sinTh+px_*(cosTh-one))/omega)/two;
+           track(2,i) = (omega*((cosTh-one)*y_-sinTh*x_)+py_*sinTh+px_*(one+cosTh))/two;
+           track(4,i) = (omega*((one-cosTh)*x_-sinTh*y_)-px_*sinTh+py_*(one+cosTh))/two;
+           track(5,i) = z_ + length/bet0 - length_/bet;
+
+        else
+
+           length_ = length/sqrt(onedp**2-px_**2-py_**2); ! length/pz                                                                                                                                                   
+           track(1,i) = x_ + px_*length_;
+           track(3,i) = y_ + py_*length_;
+           track(5,i) = z_ + length/bet0 - (one/bet0+pt_)*length_;
+
+        endif
+        
      enddo
   endif
 end subroutine trsol
