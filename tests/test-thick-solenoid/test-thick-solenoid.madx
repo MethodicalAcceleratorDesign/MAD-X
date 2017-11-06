@@ -27,6 +27,9 @@ use, sequence=myseq;
 select, flag=makethin, class=solenoid, thick=false, slice=50;
 makethin, sequence=myseq, style=teapot;
 
+!save, sequence= myseq,file= "myseq_thin.seq";
+!call, file= "myseq_thin.seq";
+
 use, sequence=myseq;
 track, onepass, dump, file= "madx-thin";
 start, x=1e-3, y=0, px=0, py=0, t=0, pt=-1e-3;
