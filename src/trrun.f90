@@ -3176,11 +3176,8 @@ subroutine trsol(track,ktrack)
   double precision :: x_, y_, z_, px_, py_, pt_
   
   !---- Initialize.
-  ! dtbyds  = get_value('probe ','dtbyds ')
-  ! gamma   = get_value('probe ','gamma ')
   bet0 = get_value('probe ','beta ')
-  ! deltap  = get_value('probe ','deltap ')
-  !
+
   !---- Get solenoid parameters
   ! elrad   = node_value('lrad ')
   bvk = node_value('other_bv ')
@@ -3222,33 +3219,30 @@ subroutine trsol(track,ktrack)
         track(5,i) =  (sigf + (xf*pyf - yf*pxf)*Z) / bet0
         ! track(6,i) =  psigf*bet0
      enddo
-
   else
+     if (sk.ne.zero) then
+        skl = sk*length
 
-     skl = sk*length
+        !---- Loop over particles
+        do  i = 1, ktrack
+           ! initial phase space coordinates
+           x_  = track(1,i)
+           y_  = track(3,i)
+           px_ = track(2,i)
+           py_ = track(4,i)
+           z_  = track(5,i)
+           pt_ = track(6,i)
 
-     !---- Loop over particles
-     do  i = 1, ktrack
-        ! initial phase space coordinates
-        x_  = track(1,i)
-        y_  = track(3,i)
-        px_ = track(2,i)
-        py_ = track(4,i)
-        z_  = track(5,i)
-        pt_ = track(6,i)
+           ! set up constants
+           onedp = sqrt(one + two*pt_/bet0 + pt_**2);
+           bet = onedp / (one/bet0 + pt_);
 
-        ! set up constants
-        onedp = sqrt(one + two*pt_/bet0 + pt_**2);
-        bet = onedp / (one/bet0 + pt_);
-
-        if (skl.ne.zero) then
-
-           ! set up constants                                                                                                                                                                                           
+           ! set up constants
            cosTh = cos(two*skl/onedp)
            sinTh = sin(two*skl/onedp)
            omega = sk/onedp;
 
-           ! total path length traveled by the particle                                                                                                                                                                 
+           ! total path length traveled by the particle
            length_ = length - half/(onedp**2)*(omega*(sinTh-two*length*omega)*(x_**2+y_**2)+&
                 two*(one-cosTh)*(px_*x_+py_*y_)-(sinTh/omega+two*length)*(px_**2+py_**2))/four;
 
@@ -3257,17 +3251,10 @@ subroutine trsol(track,ktrack)
            track(2,i) = (omega*((cosTh-one)*y_-sinTh*x_)+py_*sinTh+px_*(one+cosTh))/two;
            track(4,i) = (omega*((one-cosTh)*x_-sinTh*y_)-px_*sinTh+py_*(one+cosTh))/two;
            track(5,i) = z_ + length/bet0 - length_/bet;
-
-        else
-
-           length_ = length/sqrt(onedp**2-px_**2-py_**2); ! length/pz                                                                                                                                                   
-           track(1,i) = x_ + px_*length_;
-           track(3,i) = y_ + py_*length_;
-           track(5,i) = z_ + length/bet0 - (one/bet0+pt_)*length_;
-
-        endif
-        
-     enddo
+        enddo
+     else
+        call ttdrf(length,track,ktrack);
+     endif
   endif
 end subroutine trsol
 
