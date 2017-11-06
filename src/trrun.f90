@@ -3150,7 +3150,7 @@ end subroutine ttdpdg
 
 subroutine trsol(track,ktrack)
 
-  use math_constfi, only : zero, one, two, half
+  use math_constfi, only : zero, one, two, half, four
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -3166,7 +3166,7 @@ subroutine trsol(track,ktrack)
 
   integer :: i
   double precision :: bet0, bet
-  double precision :: sk, skl, sks, sksl, cosTh, sinTh, Q, R, Z
+  double precision :: sk, skl, cosTh, sinTh, Q, R, Z
   double precision :: xf, yf, pxf, pyf, sigf, psigf, bvk
   double precision :: onedp, fpsig, fppsig
 
@@ -3183,21 +3183,14 @@ subroutine trsol(track,ktrack)
   !
   !---- Get solenoid parameters
   ! elrad   = node_value('lrad ')
-  sksl = node_value('ksi ')
-  sks  = node_value('ks ')
-  length = node_value('l ');
-
-  !---- BV flag
   bvk = node_value('other_bv ')
-  sks  = sks  * bvk
-  sksl = sksl * bvk
-  
-  !---- Set up strengths
-  ! sk    = sks / two / (one + deltap)
-  sk    = sks / two
-  skl   = sksl / two
+  sk  = bvk * node_value('ks ') / two
+  length = node_value('l ')
   
   if (length.eq.zero) then
+     
+     skl = bvk * node_value('ksi ') / two
+
      !---- Loop over particles
      do  i = 1, ktrack
         !     Ripken formulae p.28 (3.35 and 3.36)
@@ -3229,40 +3222,41 @@ subroutine trsol(track,ktrack)
         track(5,i) =  (sigf + (xf*pyf - yf*pxf)*Z) / bet0
         ! track(6,i) =  psigf*bet0
      enddo
+
   else
+
+     skl = sk*length
+
      !---- Loop over particles
      do  i = 1, ktrack
         ! initial phase space coordinates
-        x_  = track(1,i);
-        y_  = track(3,i);
-        px_ = track(2,i);
-        py_ = track(4,i);
-        z_  = track(5,i);
-        pt_ = track(6,i);
+        x_  = track(1,i)
+        y_  = track(3,i)
+        px_ = track(2,i)
+        py_ = track(4,i)
+        z_  = track(5,i)
+        pt_ = track(6,i)
 
         ! set up constants
         onedp = sqrt(one + two*pt_/bet0 + pt_**2);
         bet = onedp / (one/bet0 + pt_);
 
         ! set up constants
-        cosTh = cos(skl/onedp)
-        sinTh = sin(skl/onedp)
+        cosTh = cos(two*skl/onedp)
+        sinTh = sin(two*skl/onedp)
         omega = sk/onedp;
 
         ! total path length traveled by the particle
-        length_ = length -half/(onedp**2)*(&
-             omega**2*(cosTh*sinTh-length*omega)*(x_**2+y_**2)+&
-             omega*(one-(cosTh**2-sinTh**2))*(px_*x_+py_*y_)+&
-             (-cosTh*sinTh-length*omega)*(px_**2+py_**2))/(two*omega);
+        length_ = length - half/(onedp**2)*(omega*(sinTh-two*length*omega)*(x_**2+y_**2)+&
+             two*(one-cosTh)*(px_*x_+py_*y_)-(sinTh/omega+two*length)*(px_**2+py_**2))/four;
 
-        track(1,i) = cosTh*sinTh*y_+cosTh**2*x_+(py_*sinTh**2)/omega+(px_*cosTh*sinTh)/omega;
-        track(2,i) = -omega*sinTh**2*y_-omega*cosTh*sinTh*x_+cosTh*sinTh*py_+cosTh**2*px_;
-        track(3,i) = cosTh**2*y_-cosTh*sinTh*x_-(px_*sinTh**2)/omega+(py_*cosTh*sinTh)/omega;
-        track(4,i) = -omega*cosTh*sinTh*y_+omega*sinTh**2*x_+cosTh**2*py_-cosTh*sinTh*px_;
+        track(1,i) = ((one+cosTh)*x_+sinTh*y_+(px_*sinTh-py_*(cosTh-one))/omega)/two;
+        track(3,i) = ((one+cosTh)*y_-sinTh*x_+(py_*sinTh+px_*(cosTh-one))/omega)/two;
+        track(2,i) = (omega*((cosTh-one)*y_-sinTh*x_)+py_*sinTh+px_*(one+cosTh))/two;
+        track(4,i) = (omega*((one-cosTh)*x_-sinTh*y_)-px_*sinTh+py_*(one+cosTh))/two;
         track(5,i) = z_ + length/bet0 - length_/bet;
 
      enddo
-
   endif
 end subroutine trsol
 
