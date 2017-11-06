@@ -3134,7 +3134,6 @@ subroutine trsol(track,ktrack)
   skl   = sksl / two
   
   if (length.eq.zero) then
-     
      !---- Loop over particles
      do  i = 1, ktrack
         !     Ripken formulae p.28 (3.35 and 3.36)
@@ -3166,7 +3165,8 @@ subroutine trsol(track,ktrack)
         track(5,i) =  (sigf + (xf*pyf - yf*pxf)*Z) / bet0
         ! track(6,i) =  psigf*bet0
      enddo
-  else     
+  else
+     !---- Loop over particles
      do  i = 1, ktrack
         ! initial phase space coordinates
         x_  = track(1,i);
