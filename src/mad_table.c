@@ -123,21 +123,18 @@ add_table_vars(struct name_list* cols, struct command_list* select)
   /* 1: adds user selected variables to table - always type 2 = double
      2: adds aperture variables apertype (string) + aper_1, aper_2 etc. */
 {
-  int i, j, k, n, pos;
+  int i, j, k, n;
   char* var_name;
-  char tmp[12];
-  struct name_list* nl;
-  struct command_parameter_list* pl;
+  char tmp[16];
   for (i = 0; i < select->curr; i++)
   {
-    nl = select->commands[i]->par_names;
-    pl = select->commands[i]->par;
-    pos = name_list_pos("column", nl);
-    if (nl->inform[pos])
+    struct command* cmd = select->commands[i];
+    struct command_parameter* cp;
+    if (command_par("column", cmd, &cp))
     {
-      for (j = 0; j < pl->parameters[pos]->m_string->curr; j++)
+      for (j = 0; j < cp->m_string->curr; j++)
       {
-        var_name = pl->parameters[pos]->m_string->p[j];
+        var_name = cp->m_string->p[j];
         if (strcmp(var_name, "apertype") == 0)
         {
           if ((n = aperture_count(current_sequ)) > 0)
@@ -398,12 +395,9 @@ read_his_table(struct in_cmd* cmd)
   struct table* t = NULL;
   struct char_p_array* tcpa = NULL;
   struct name_list* tnl = NULL;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  int pos = name_list_pos("file", nl);
   int i, k, error = 0;
   char *cc, *filename, *type = NULL, *tmp, *name;
-  if(nl->inform[pos] && (filename = pl->parameters[pos]->string) != NULL)
+  if((filename = command_par_string_user("file", cmd->clone)) != NULL)
   {
     if ((tab_file = fopen(filename, "r")) == NULL)
     {
@@ -1235,7 +1229,7 @@ out_table(const char* tname, struct table* t, const char* filename)
     grow_int_array(t->row_out);
 
   t->row_out->curr = t->curr;
-  if (par_present("full", NULL, scl))
+  if (par_present_list("full", scl))
     put_info("obsolete option 'full'"," ignored on 'select'");
 
   for (int j = 0; j < t->curr    ; j++) t->row_out->i[j] = 1;
@@ -1257,9 +1251,6 @@ read_table(struct in_cmd* cmd)
   struct table* t = NULL;
   struct char_p_array* tcpa = NULL;
   struct name_list* tnl = NULL;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  int pos = name_list_pos("file", nl);
   short sk;
   int i, k, error = 0;
   char *cc, *filename, *type = NULL, *tmp, *name;
@@ -1278,7 +1269,7 @@ read_table(struct in_cmd* cmd)
     namtab = NULL;
   }
 
-  if(nl->inform[pos] && (filename = pl->parameters[pos]->string) != NULL)
+  if((filename = command_par_string_user("file", cmd->clone)))
   {
     if ((tab_file = fopen(filename, "r")) == NULL)
     {
@@ -1429,7 +1420,7 @@ read_table(struct in_cmd* cmd)
 }
 
 int
-get_table_range(char* range, struct table* table, int* rows)
+get_table_range(const char* range, struct table* table, int* rows)
   /* returns start and end row (rows[0] and rows[1])
      of a range in a table; 0 if not found, 1 (1 row) or 2 (> 1) */
 {
@@ -1507,9 +1498,6 @@ read_my_table(struct in_cmd* cmd)
   struct table* t = NULL;
   struct char_p_array* tcpa = NULL;
   struct name_list* tnl = NULL;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  int pos = name_list_pos("file", nl);
   int i, k, error = 0;
   short  sk;
   char *cc, *filename, *type = NULL, *tmp, *name;
@@ -1526,7 +1514,7 @@ read_my_table(struct in_cmd* cmd)
        namtab = NULL;
   }
 
-  if(nl->inform[pos] && (filename = pl->parameters[pos]->string) != NULL)
+  if((filename = command_par_string_user("file", cmd->clone)))
     {
      if ((tab_file = fopen(filename, "r")) == NULL)
        {
@@ -1673,25 +1661,22 @@ read_my_table(struct in_cmd* cmd)
 void
 set_selected_columns(struct table* t, struct command_list* select)
 {
-  int i, j, pos, k, n = 0;
-  char* p;
-  struct name_list* nl;
-  struct command_parameter_list* pl;
-  if (select && par_present("column", NULL, select))
+  int i, j, k, n = 0;
+  if (select && par_present_list("column", select))
   {
     for (j = 0; j < t->num_cols; j++)  /* deselect all columns */
       t->col_out->i[j] = 0;
     t->col_out->curr = 0;
     for (i = 0; i < select->curr; i++)
     {
-      nl = select->commands[i]->par_names;
-      pl = select->commands[i]->par;
-      pos = name_list_pos("column", nl);
-      if (nl->inform[pos])
+      struct command* cmd = select->commands[i];
+      struct command_parameter* cp;
+      if (command_par("column", cmd, &cp))
       {
-        for (j = 0; j < pl->parameters[pos]->m_string->curr; j++)
+        for (j = 0; j < cp->m_string->curr; j++)
         {
-          if (strcmp(pl->parameters[pos]->m_string->p[j], "re") == 0)
+          char* p = cp->m_string->p[j];
+          if (strcmp(p, "re") == 0)
           {
             for (k = 0; k < t->num_cols; k++)
             {
@@ -1703,7 +1688,7 @@ set_selected_columns(struct table* t, struct command_list* select)
               }
             }
           }
-          else if (strcmp(pl->parameters[pos]->m_string->p[j], "eign") == 0)
+          else if (strcmp(p, "eign") == 0)
           {
             for (k = 0; k < t->num_cols; k++)
             {
@@ -1715,8 +1700,7 @@ set_selected_columns(struct table* t, struct command_list* select)
               }
             }
           }
-          else if (strcmp(pl->parameters[pos]->m_string->p[j],
-                          "apertype") == 0)
+          else if (strcmp(p, "apertype") == 0)
           {
             for (k = 0; k < t->num_cols; k++)
             {
@@ -1730,7 +1714,6 @@ set_selected_columns(struct table* t, struct command_list* select)
           }
           else
           {
-            p = pl->parameters[pos]->m_string->p[j];
             if ((k = name_list_pos(p, t->columns)) > -1)
             {
               if (k <  t->num_cols

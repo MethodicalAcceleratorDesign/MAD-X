@@ -1081,9 +1081,6 @@ static int pro_correct2_gettables(int iplane, struct in_cmd* cmd) {
 }
 
 static int pro_correct2_getorbit(struct in_cmd* cmd) {
-  struct name_list* nl;
-  int pos;
-
   struct id_mic2 *m; /* access to tables for monitors and correctors */
   double **da1;
   double **da2;
@@ -1098,8 +1095,6 @@ static int pro_correct2_getorbit(struct in_cmd* cmd) {
 
   da1 = twiss_table_beam1->d_cols;
   da2 = twiss_table_beam2->d_cols;
-
-  nl = cmd->clone->par_names;
 
   m = correct_orbit12->mon_table;
 
@@ -1135,8 +1130,7 @@ static int pro_correct2_getorbit(struct in_cmd* cmd) {
       fatal_error("Unforeseen case in pro_correct2_getorbit", ", MAD-X terminates ");
     }
 
-    pos = name_list_pos("monon", nl);
-    if (nl->inform[pos] > 0) {
+    if (par_present("monon", cmd->clone)) {
       xlimit = command_par_value("monon", cmd->clone);
       if (frndm() > xlimit) {
 	m->enable = 0;
@@ -1847,9 +1841,8 @@ static void correct_correct(struct in_cmd* cmd)
 #if 0 // not used...
 static void pro_correct_option(struct in_cmd* cmd)
 {
-  struct name_list* nl = cmd->clone->par_names;
   int i;
-  int val, pos, seed;
+  int val, seed;
 
   int debug = get_option("debug");
 
@@ -1860,13 +1853,10 @@ static void pro_correct_option(struct in_cmd* cmd)
     }
   }
 
-  if ((pos = name_list_pos("seed", nl)) > -1)
+  if (par_present("seed", cmd->clone))
     {
-      if (nl->inform[pos])
-  {
     seed = command_par_value("seed", cmd->clone);
     init55(seed);
-  }
     }
 
   val = command_par_value("print", cmd->clone);
@@ -2076,9 +2066,6 @@ static int pro_correct_gettables(int iplane, struct in_cmd* cmd) {
 }
 
 static int pro_correct_getorbit(struct in_cmd* cmd) {
-  struct name_list* nl;
-
-  int pos;
   struct id_mic *m; /* access to tables for monitors and correctors */
   struct table *ttb;
   struct table *tar = NULL;
@@ -2104,8 +2091,6 @@ static int pro_correct_getorbit(struct in_cmd* cmd) {
     tar = target_table;
     da2 = tar->d_cols;
   }
-
-  nl = cmd->clone->par_names;
 
   m = correct_orbit->mon_table;
 
@@ -2158,8 +2143,7 @@ static int pro_correct_getorbit(struct in_cmd* cmd) {
     }
 
     /* monon=xlimit determines the fraction of available monitors */
-    pos = name_list_pos("monon", nl);
-    if (nl->inform[pos] > 0) {
+    if (par_present("monon", cmd->clone)) {
       xlimit = command_par_value("monon", cmd->clone);
       if (frndm() > xlimit) {
 	m->enable = 0;
@@ -2168,8 +2152,7 @@ static int pro_correct_getorbit(struct in_cmd* cmd) {
     }
 
     /* scaling error should come first, monitor alignment not scaled ... */
-    pos = name_list_pos("monscale", nl);
-    if (nl->inform[pos] > 0) {
+    if (par_present("monscale", cmd->clone)) {
       if ((command_par_value("monscale", cmd->clone)) == 1) {
 	if (m->p_node->p_al_err != NULL ) {
 	  if (debug) {
@@ -2183,8 +2166,7 @@ static int pro_correct_getorbit(struct in_cmd* cmd) {
     }
 
     /* monitor misalignment after all other reading manipulations ! */
-    pos = name_list_pos("monerror", nl);
-    if (nl->inform[pos] > 0) {
+    if (par_present("monerror", cmd->clone)) {
       if ((command_par_value("monerror", cmd->clone)) == 1) {
 	if (m->p_node->p_al_err != NULL ) {
 	  if (debug) {
@@ -2212,10 +2194,8 @@ static int pro_correct_getorbit(struct in_cmd* cmd) {
 }
 
 static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
-  struct name_list* nl;
   int j;
 
-  int pos;
   struct id_mic *m; /* access to tables for monitors and correctors */
   struct table *ttb;
   struct table *tar = NULL;
@@ -2255,8 +2235,6 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
     tar = target_table;
     da2 = tar->d_cols;
   }
-
-  nl = cmd->clone->par_names;
 
   m = correct_orbit->mon_table;
 
@@ -2395,8 +2373,7 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
       }
 
       /* monon=xlimit determines the fraction of available monitors */
-      pos = name_list_pos("monon", nl);
-      if (nl->inform[pos] > 0) {
+      if (par_present("monon", cmd->clone)) {
         xlimit = command_par_value("monon", cmd->clone);
         if (frndm() > xlimit) {
           m->enable = 0;
@@ -2405,8 +2382,7 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
       }
 
       /* scaling error should come first, monitor alignment not scaled ... */
-      pos = name_list_pos("monscale", nl);
-      if (nl->inform[pos] > 0) {
+      if (par_present("monscale", cmd->clone)) {
         if ((command_par_value("monscale", cmd->clone)) == 1) {
           if (m->p_node->p_al_err != NULL ) {
 
@@ -2422,8 +2398,7 @@ static int pro_correct_getorbit_ext(struct in_cmd* cmd) {
       }
 
       /* monitor misalignment after all other reading manipulations ! */
-      pos = name_list_pos("monerror", nl);
-      if (nl->inform[pos] > 0) {
+      if (par_present("monerror", cmd->clone)) {
         if ((command_par_value("monerror", cmd->clone)) == 1) {
           if (m->p_node->p_al_err != NULL ) {
 
@@ -3126,8 +3101,7 @@ static int pro_correct_getactive(int ip, int *nm, int *nx, int *nc,
 }
 
 static void correct_option(struct in_cmd* cmd) {
-  struct name_list* nl = cmd->clone->par_names;
-  int i, pos;
+  int i;
 
   int debug = get_option("debug");
 
@@ -3138,11 +3112,9 @@ static void correct_option(struct in_cmd* cmd) {
     }
   }
 
-  if ((pos = name_list_pos("seed", nl)) > -1) {
-    if (nl->inform[pos]) {
+  if (par_present("seed", cmd->clone)) {
       int seed = command_par_value("seed", cmd->clone);
       init55(seed);
-    }
   }
 
   print_correct_opt = command_par_value("print", cmd->clone);
@@ -3201,13 +3173,12 @@ static void correct_usemonitor(struct in_cmd* cmd) {
 // public interface
 
 void store_orbit(struct command* comm, double* orbit) {
-  struct name_list* nl = comm->par_names;
-  if (nl->inform[name_list_pos("x",  nl)]) orbit[0] = command_par_value("x",  comm);
-  if (nl->inform[name_list_pos("px", nl)]) orbit[1] = command_par_value("px", comm);
-  if (nl->inform[name_list_pos("y",  nl)]) orbit[2] = command_par_value("y",  comm);
-  if (nl->inform[name_list_pos("py", nl)]) orbit[3] = command_par_value("py", comm);
-  if (nl->inform[name_list_pos("t",  nl)]) orbit[4] = command_par_value("t",  comm);
-  if (nl->inform[name_list_pos("pt", nl)]) orbit[5] = command_par_value("pt", comm);
+  if (par_present("x",  comm)) orbit[0] = command_par_value("x",  comm);
+  if (par_present("px", comm)) orbit[1] = command_par_value("px", comm);
+  if (par_present("y",  comm)) orbit[2] = command_par_value("y",  comm);
+  if (par_present("py", comm)) orbit[3] = command_par_value("py", comm);
+  if (par_present("t",  comm)) orbit[4] = command_par_value("t",  comm);
+  if (par_present("pt", comm)) orbit[5] = command_par_value("pt", comm);
 }
 
 void pro_correct(struct in_cmd* cmd) {

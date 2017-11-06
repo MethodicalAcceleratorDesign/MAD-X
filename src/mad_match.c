@@ -481,21 +481,18 @@ match_fix(struct in_cmd* cmd)
 static void
 match_global(struct in_cmd* cmd)
 {
-  struct command_parameter* cp;
-  struct name_list* nl = cmd->clone->par_names;
   struct sequence* sequ;
-  int pos, n, low, up;
-  pos = name_list_pos("sequence", nl);
-  if((pos>=0)?nl->inform[pos]:0) /* sequence specified */
+  int n, low, up;
+  const char* name = command_par_string_user("sequence", cmd->clone);
+  if(name) /* sequence specified */
   {
-    cp = cmd->clone->par->parameters[pos];
     for (n = 0; n < match_sequs->curr; n++)
     {
-      if (strcmp(cp->string, match_sequs->sequs[n]->name) == 0) break;
+      if (strcmp(name, match_sequs->sequs[n]->name) == 0) break;
     }
     if (n == match_sequs->curr)
     {
-      warning(cp->string," :sequence not selected by MATCH, skipped");
+      warning(name," :sequence not selected by MATCH, skipped");
       return;
     }
     low = up = n;
@@ -548,9 +545,8 @@ match_match(struct in_cmd* cmd)
   struct command* comm;
   struct command_parameter* cp;
   struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
   struct sequence* sequ;
-  int i, j, pos, n, spos, tpos, chrom_flg;
+  int i, j, pos, n, spos, tpos;
   int izero = 0, ione = 1, slow;
   char *dpp;
 
@@ -563,24 +559,20 @@ match_match(struct in_cmd* cmd)
   keep_tw_print = get_option("twiss_print");
   set_option("twiss_print", &izero);
 
-  pos=name_list_pos("use_macro", nl);
-  if((pos>=0)?nl->inform[pos]:0) {
+  if(par_present("use_macro", cmd->clone)) {
     match2_match(cmd);
     return;
   }
-  pos=name_list_pos("use_ptcknob", nl);
-  if((pos>=0)?nl->inform[pos]:0) {
+  if(par_present("use_ptcknob", cmd->clone)) {
     match_is_on = kMatch_PTCknobs;
     madx_mpk_prepare();
     return;
   }
   match_is_on = 1;
-  pos = name_list_pos("sequence", nl);
   fprintf(prt_file, "START MATCHING\n\n");
 
-  if((pos>=0)?nl->inform[pos]:0) /* sequence specified */
+  if(command_par("sequence", cmd->clone, &cp)) /* sequence specified */
   {
-    cp = cmd->clone->par->parameters[pos];
     if ((n = cp->m_string->curr) > match_sequs->max)
     {
       warning("excess sequence names", "skipped");
@@ -614,24 +606,18 @@ match_match(struct in_cmd* cmd)
     match_sequs->sequs[match_sequs->curr++] = current_sequ;
     add_to_name_list(current_sequ->name, 0, match_sequs->list);
   }
-  pos = name_list_pos("vlength", nl);
-  if((pos>=0)?nl->inform[pos]:0) i = pl->parameters[pos]->double_value;
-  else i = 0;
+  i = command_par_value("vlength", cmd->clone);
   set_option("varylength", &i);
 
   /* START SLOW-CHECK */
-  pos = name_list_pos("slow", nl);
-  if((pos>=0)?nl->inform[pos]:0) slow = pl->parameters[pos]->double_value;
-  else slow = 0;
+  slow = command_par_value("slow", cmd->clone);
   set_option("slow_match", &slow);
   /* END SLOW-CHECK */
 
   /* START CHK-SEQ */
   current_match = cmd->clone;
-  pos = name_list_pos("sequence", nl);
-  if((pos>=0)?nl->inform[pos]:0) /* sequence specified */
+  if(command_par("sequence", cmd->clone, &cp)) /* sequence specified */
   {
-    cp = cmd->clone->par->parameters[pos];
     match_num_seqs = cp->m_string->curr;
     fprintf(prt_file, "number of sequences: %d\n", match_num_seqs);
     for (i = 0; i < match_num_seqs; i++)
@@ -710,10 +696,8 @@ match_match(struct in_cmd* cmd)
 
   /* START CHK-BETA-INPUT */
   /* START CHK-BETA0 */
-  pos = name_list_pos("beta0", nl);
-  if((pos>=0)?nl->inform[pos]:0) /* beta0 specified */
+  if(command_par("beta0", cmd->clone, &cp)) /* beta0 specified */
   {
-    cp = cmd->clone->par->parameters[pos];
     match_num_beta = cp->m_string->curr;
     fprintf(prt_file, "number of beta0s: %d\n", match_num_beta);
     for (i = 0; i < match_num_beta; i++)
@@ -731,10 +715,8 @@ match_match(struct in_cmd* cmd)
   /* END CHK-BETA0 */
 
   /* START CHK-RANGE */
-  pos = name_list_pos("range", nl);
-  if((pos>=0)?nl->inform[pos]:0) /* range specified */
+  if(command_par("range", cmd->clone, &cp)) /* range specified */
   {
-    cp = cmd->clone->par->parameters[pos];
     match_num_range = cp->m_string->curr;
     for (i = 0; i < match_num_range; i++)
     {
@@ -751,10 +733,8 @@ match_match(struct in_cmd* cmd)
   /* END CHK-RANGE */
 
   /* START CHK-USEORBIT */
-  pos = name_list_pos("useorbit", nl);
-  if((pos>=0)?nl->inform[pos]:0) /* useorbit specified */
+  if(command_par("useorbit", cmd->clone, &cp)) /* useorbit specified */
   {
-    cp = cmd->clone->par->parameters[pos];
     for (i = 0; i < cp->m_string->curr; i++)
     {
       /* START adding useorbit to TWISS input command for each sequence */
@@ -769,10 +749,8 @@ match_match(struct in_cmd* cmd)
   /* END CHK-USEORBIT */
 
   /* START CHK-KEEPORBIT */
-  pos = name_list_pos("keeporbit", nl);
-  if((pos>=0)?nl->inform[pos]:0) /* keeporbit specified */
+  if(command_par("keeporbit", cmd->clone, &cp)) /* keeporbit specified */
   {
-    cp = cmd->clone->par->parameters[pos];
     for (i = 0; i < cp->m_string->curr; i++)
     {
       /* START adding keeporbit to TWISS input command for each sequence */
@@ -787,10 +765,8 @@ match_match(struct in_cmd* cmd)
   /* END CHK-KEEPORBIT */
 
   /* START CHK-R-MATRIX */
-  pos = name_list_pos("rmatrix", nl);
-  if((pos>=0)?nl->inform[pos]:0) /* rmatrix specified */
+  if(par_present("rmatrix", cmd->clone)) /* rmatrix specified */
   {
-    cp = cmd->clone->par->parameters[pos];
     for (i = 0; i < match_num_seqs; i++)
     {
       /* START adding rmatrix to TWISS input command for each sequence */
@@ -805,17 +781,7 @@ match_match(struct in_cmd* cmd)
   /* END CHK-R-MATRIX */
 
   /* START CHK-CHROM */
-  pos = name_list_pos("chrom", nl);
-  if (pos > 0)
-   {
-     chrom_flg = cmd->clone->par->parameters[pos]->double_value;
-   }
-  else
-   {
-     chrom_flg = 0;
-   }
-
-  if(chrom_flg) /* chrom specified */
+  if(log_val("chrom", cmd->clone)) /* chrom specified */
   {
     for (i = 0; i < match_num_seqs; i++) {
       /* START adding chrom to TWISS input command for each sequence */
@@ -831,10 +797,8 @@ match_match(struct in_cmd* cmd)
   /* END CHK-CHROM */
 
   /* START CHK-SECTORMAP */
-  pos = name_list_pos("sectormap", nl);
-  if((pos>=0)?nl->inform[pos]:0) /* sectormap specified */
+  if(par_present("sectormap", cmd->clone)) /* sectormap specified */
   {
-    cp = cmd->clone->par->parameters[pos];
     for (i = 0; i < match_num_seqs; i++)
     {
       /* START adding sectormap to TWISS input command for each sequence */
@@ -849,10 +813,8 @@ match_match(struct in_cmd* cmd)
   /* END CHK-CHROM */
 
   /* START CHK-DELTAP */
-  pos = name_list_pos("deltap", nl);
-  if((pos>=0)?nl->inform[pos]:0) /* deltap specified */
+  if(command_par("deltap", cmd->clone, &cp)) /* deltap specified */
   {
-    cp = cmd->clone->par->parameters[pos];
     for (i = 0; i < match_num_seqs; i++)
     {
       /* START adding deltap to TWISS input command for each sequence */
@@ -945,20 +907,16 @@ match_tmatrix(struct in_cmd* cmd)
 static void
 match_vary(struct in_cmd* cmd)
 {
-  int pos;
   double value;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
 
   if (stored_match_var == NULL) stored_match_var = new_command_list("vary", 100);
-  pos = name_list_pos("name", nl);
-  if ((pos>=0)?nl->inform[pos]:0)
+  const char* name = command_par_string_user("name", cmd->clone);
+  if (name)
   {
-    value=get_variable(pl->parameters[pos]->string);
+    value=get_variable(name);
     set_value("vary","init",&value);
     cmd->clone_flag = 1;
-    add_to_command_list(pl->parameters[pos]->string,
-                        cmd->clone, stored_match_var, 1);
+    add_to_command_list(name, cmd->clone, stored_match_var, 1);
   }
 }
 

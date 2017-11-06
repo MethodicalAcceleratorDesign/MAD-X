@@ -157,9 +157,7 @@ track_ripple(struct in_cmd* cmd)
 static void
 track_track(struct in_cmd* cmd)
 {
-  int k=0, pos, one = 1;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
+  int k=0, one = 1;
 
   if (current_sequ == NULL || current_sequ->ex_start == NULL)
   {
@@ -189,13 +187,10 @@ track_track(struct in_cmd* cmd)
   set_option("damp", &k);
 
   if ((k = get_value(current_command->name,"quantum")) != 0) {
-    if ((pos = name_list_pos("seed", nl)) > -1) {
-      if (nl->inform[pos]) {
+    if (par_present("seed", cmd->clone)) {
         int seed = command_par_value("seed", cmd->clone);
         init55(seed);
         fprintf(prt_file, "quantum is on with seed %d\n", seed);
-      } else
-      fprintf(prt_file, "quantum is on\n");
     } else
       fprintf(prt_file, "quantum is on\n");
   }
@@ -216,23 +211,13 @@ track_track(struct in_cmd* cmd)
   if(track_deltap != 0) fprintf(prt_file, v_format("track_deltap: %F\n"),
                                 track_deltap);
   curr_obs_points = 1;  /* default: always observe at machine end */
-  pos = name_list_pos("file", nl);
-  if (nl->inform[pos]) set_option("track_dump", &one);
-  if ((track_filename = pl->parameters[pos]->string) == NULL)
-  {
-    if (pl->parameters[pos]->call_def != NULL)
-      track_filename = pl->parameters[pos]->call_def->string;
-    else track_filename = permbuff("dummy");
-  }
+  if (command_par_string_or_calldef("file", cmd->clone, &track_filename))
+    set_option("track_dump", &one);
+  if (!track_filename) track_filename = permbuff("dummy");
   track_filename = permbuff(track_filename);
   track_fileext = NULL;
-  pos = name_list_pos("extension", nl);
-  if ((track_fileext = pl->parameters[pos]->string) == NULL)
-  {
-    if (pl->parameters[pos]->call_def != NULL)
-      track_fileext = pl->parameters[pos]->call_def->string;
-    if (track_fileext == NULL)  track_fileext = permbuff("\0");
-  }
+  command_par_string_or_calldef("extension", cmd->clone, &track_fileext);
+  if (!track_fileext) track_fileext = permbuff("\0");
   track_fileext = permbuff(track_fileext);
 }
 

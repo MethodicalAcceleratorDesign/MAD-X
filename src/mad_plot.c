@@ -122,7 +122,7 @@ plot_option(char* name)
 void
 exec_plot(struct in_cmd* cmd)
 {
-  int i, j, k, ierr, pos, notitle = strcmp(title,"no-title") == 0 ? 1 : 0;
+  int i, j, k, ierr, notitle = strcmp(title,"no-title") == 0 ? 1 : 0;
   int nointerp = 0, multiple = 0, noversion = 0, nolegend = 0, s_haxis = 1, track_flag = 0;
   int tsm1 = TITLE_SIZE - 1, tsm2 = TITLE_SIZE - 2;
   int part_idx[100], curr, track_cols_length, haxis_idx = 0, vaxis_idx = 0;
@@ -130,14 +130,13 @@ exec_plot(struct in_cmd* cmd)
   int *title_length = &size_plot_title, *version_length = &size_version;
   char* pt = title, *haxis_name = NULL, *vaxis_name = NULL;
   char* particle_list;
-  struct name_list* nl_plot = NULL;
-  struct command_parameter_list* pl_plot = NULL;
   struct table* p_table = NULL;
   const char *table_name = NULL, *file_name = NULL;
   char *last_twiss_table, *trackfile;
   char track_file_name[NAME_L], ps_file_name[NAME_L];
   char plot_title[TITLE_SIZE], version[TITLE_SIZE];
   FILE *gpu;
+  struct command_parameter* cp;
 
   int debug = get_option("debug");
 
@@ -152,38 +151,23 @@ exec_plot(struct in_cmd* cmd)
     fatal_error("Plot "," - non existing command");
 
   /* Check table name is the same as in the last twiss command */
-  nl_plot = this_cmd->clone->par_names;
-  pl_plot = this_cmd->clone->par;
 
   /* get vaxis_name */
-  pos = name_list_pos("vaxis", nl_plot);
-  vaxis_name = pl_plot->parameters[pos]->m_string->p[0];
+  command_par("vaxis", this_cmd->clone, &cp);
+  vaxis_name = cp->m_string->p[0];
 
   /* get interpolation */
-  pos = name_list_pos("interpolation", nl_plot);
-  if (pos > -1)
-   {
-     nointerp = 1 - nl_plot->inform[pos];
-   }
-  else
-   {
-     nointerp = 1;
-   }
+  nointerp = !par_present("interpolation", this_cmd->clone); // TG: should be "interpolate"?!
 
   /* get haxis_name & s_haxis flag */
-  pos = name_list_pos("haxis", nl_plot);
-  if(nl_plot->inform[pos]) {
-    if ((haxis_name = pl_plot->parameters[pos]->string) == NULL)
-      haxis_name = pl_plot->parameters[pos]->call_def->string;
+  haxis_name = command_par_string_user("haxis", this_cmd->clone);
+  if (haxis_name) {
     s_haxis = strcmp(haxis_name,"s");
   }
 
   /* get table_name & track_flag */
-  pos = name_list_pos("table", nl_plot);
-  if(nl_plot->inform[pos]) { /* table name specified */
-    if ((table_name = pl_plot->parameters[pos]->string) == NULL)
-      table_name = pl_plot->parameters[pos]->call_def->string;
-
+  table_name = command_par_string_user("table", this_cmd->clone);
+  if(table_name) {
     if(strncmp(table_name,"track",5) == 0)
       track_flag = 1;
 
@@ -196,12 +180,8 @@ exec_plot(struct in_cmd* cmd)
   }
 
   /* get file_name */
-  pos = name_list_pos("file", nl_plot);
-  if(nl_plot->inform[pos]) { /* file name specified */
-    if ((file_name = pl_plot->parameters[pos]->string) == NULL)
-      file_name = pl_plot->parameters[pos]->call_def->string;
-  }
-  else {
+  file_name = command_par_string_user("file", this_cmd->clone);
+  if(!file_name) {
     if (track_flag) file_name = "madx_track";
     else file_name = "madx";
   }
@@ -216,24 +196,16 @@ exec_plot(struct in_cmd* cmd)
     // now trackfile contains the basis name from which we will get the real file names
 
     /* get particle */
-    pos = name_list_pos("particle", nl_plot);
-    curr = pl_plot->parameters[pos]->m_string->curr;
+    command_par("particle", this_cmd->clone, &cp);
+    curr = cp->m_string->curr;
     for (i = 0; i < curr; i++) {
-      particle_list = pl_plot->parameters[pos]->m_string->p[i];
+      particle_list = cp->m_string->p[i];
       part_idx[i] = atoi(particle_list);
     }
 
-    /* get multiple */
-    pos = name_list_pos("multiple", nl_plot);
-    multiple = nl_plot->inform[pos];
-
-    /* get noversion */
-    pos = name_list_pos("noversion", nl_plot);
-    noversion = nl_plot->inform[pos];
-
-    /* get nolegend */
-    pos = name_list_pos("nolegend", nl_plot);
-    nolegend = nl_plot->inform[pos];
+    multiple  = par_present("multiple",  this_cmd->clone);
+    noversion = par_present("noversion", this_cmd->clone);
+    nolegend  = par_present("nolegend",  this_cmd->clone);
 
     /* find the column numbers corresponding to haxis_name & vaxis_name */
     track_cols_length = track_table_cols_len-1;
@@ -362,8 +334,8 @@ exec_plot(struct in_cmd* cmd)
 	if(strcmp(table_name,last_twiss_table) != 0) {
 	  printf("Only allowed table attribute in plot command is \"aperture\"."
 		 " Else, table name is automatically changed to %s \n", last_twiss_table);
-	  if ((pl_plot->parameters[pos]->string = last_twiss_table) == NULL)
-	    pl_plot->parameters[pos]->call_def->string =last_twiss_table ;
+	  if ((cp->string = last_twiss_table) == NULL)
+	    cp->call_def->string =last_twiss_table ;
 	}
       }
     }

@@ -564,7 +564,7 @@ sel_table(char* tname, struct table* t)
   while (t->curr > t->row_out->max)
     grow_int_array(t->row_out);
   t->row_out->curr = t->curr;
-  if (par_present("full", NULL, scl))
+  if (par_present_list("full", scl))
     put_info("obsolete option 'full'"," ignored on 'select'");
   for (j = 0; j < t->curr; j++) t->row_out->i[j] = 1;
   for (j = 0; j < t->num_cols; j++) t->col_out->i[j] = j;
