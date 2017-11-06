@@ -191,7 +191,7 @@ SUBROUTINE tmrefe(rt)
   !     Purpose:                                                         *
   !     Transfer matrix w.r.t. ideal orbit for one period.               *
   !     Ignores cavities, radiation, and imperfections.                  *
-  !     entry point for mad_twiss and mad_emit                           *
+  !     entry point for mad_twiss, mad_emit and mad_beam                 *
   !     Output:                                                          *
   !     rt(6,6) (double) transfer matrix.                                *
   !----------------------------------------------------------------------*
@@ -216,9 +216,9 @@ SUBROUTINE tmrefe(rt)
 
   ithr_on = 0
   ORBIT0 = zero ; ORBIT = zero ; TT = zero
+
   !---- Get transfer matrix.
   call tmfrst(orbit0,orbit,.false.,.false.,rt,tt,eflag,0,0,ithr_on)
-
 end SUBROUTINE tmrefe
 
 SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
@@ -263,10 +263,7 @@ SUBROUTINE tmrefo(kobs,orbit0,orbit,rt)
   ORBIT0 = zero
   !---- Get closed orbit and coupled transfer matrix.
   call tmclor(orbit0,.true.,.true.,opt_fun0,rt,tt,eflag)
-  call set_option('bbd_flag ', ione)
   call tmfrst(orbit0,orbit,.true.,.true.,rt,tt,eflag,kobs,0,ithr_on)
-  call set_option('bbd_flag ', izero)
-
 end SUBROUTINE tmrefo
 
 SUBROUTINE twinifun(opt_fun0,rt)
@@ -3426,6 +3423,9 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
      case (code_yrotation)
         call tmyrot(ftrk,orbit,fmap,ek,re,te)
 
+     case (code_xrotation)
+        !-- TODO call tmxrot(ftrk,orbit,fmap,ek,re,te)
+
      case (code_hkicker, code_vkicker, code_kicker, code_tkicker)
         call tmcorr(fsec,ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
 
@@ -5716,7 +5716,6 @@ end SUBROUTINE tmsrot
 SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   use twisslfi
   use twissbeamfi, only : beta
-  use math_constfi, only : zero, one
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
@@ -5735,26 +5734,27 @@ SUBROUTINE tmyrot(ftrk,orbit,fmap,ek,re,te)
   logical :: ftrk, fmap
   double precision :: orbit(6), ek(6), re(6,6), te(6,6,6)
 
-  double precision :: phi, cosphi, sinphi, tanphi
-
-  double precision, external :: node_value
+  double precision :: angle, ca, sa, ta
+  double precision :: node_value
 
   !---- Initialize.
-  phi = node_value('angle ')
-  fmap = phi .ne. zero
-  if (.not. fmap) return
+  angle = node_value('angle ')
+  if (angle .eq. 0) return
+
+  angle = angle * node_value('other_bv ')
 
   !---- Kick.
-  cosphi = cos(phi)
-  sinphi = sin(phi)
-  tanphi = sinphi / cosphi
-  ek(2) = - sinphi
+  ca = cos(angle)
+  sa = sin(angle)
+  ta = tan(angle)
+
+  ek(2) = sa
 
   !---- Transfer matrix.
-  re(1,1) = one / cosphi
-  re(2,2) = cosphi
-  re(2,6) = - sinphi / beta
-  re(5,1) = tanphi / beta
+  re(1,1) = 1/ca
+  re(2,2) =   ca
+  re(2,6) =   sa/beta
+  re(5,1) =  -ta/beta
 
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
@@ -6456,12 +6456,12 @@ SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
   q = charge
   q_prime = node_value('charge ')
   parvec(5) = arad
-  parvec(6) = node_value('charge ') * npart
+  parvec(6) = q_prime * npart
   parvec(7) = gamma
 
   !---- Calculate momentum deviation and according changes
   !     of the relativistic factor beta0
-  dp  = get_variable('track_deltap ')
+  dp = get_variable('track_deltap ')
   gamma0 = parvec(7)
   beta0 = sqrt(one-one/gamma0**2)
   ptot = beta0*gamma0*(one+dp)
@@ -6479,9 +6479,8 @@ SUBROUTINE tmbb(fsec,ftrk,orbit,fmap,re,te)
        (one-beta0*beta_dp*b_dir)/(beta_dp+0.5*(b_dir-one)*b_dir*beta0)
   endif
 
-  !---- chose beamshape
+  !---- choose beamshape: 1-Gaussian (default), 2-flattop=trapezoidal, 3-hollow-parabolic
   beamshape = node_value('bbshape ')
-
   select case (beamshape)
   case (1)
      call tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
@@ -6522,7 +6521,6 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
 
   integer, external ::  get_option
   double precision, external :: node_value
-
 
   !---- initialize.
   bborbit = get_option('bborbit ') .ne. 0
@@ -6766,6 +6764,9 @@ SUBROUTINE tmbb_gauss(fsec,ftrk,orbit,fmap,re,te,fk)
      endif
   endif
 
+!  print *, 'bborbit=', bborbit, 'bbd_flag=', bbd_flag, ', fk=', fk, &
+!    ', bbd_pos=', bbd_pos, ', bbd_cnt=', bbd_cnt, &
+!    ', bb_kick_x=', bb_kick(1,bbd_cnt), ', bb_kick_y=', bb_kick(2,bbd_cnt)
 end SUBROUTINE tmbb_gauss
 
 SUBROUTINE tmbb_flattop(fsec,ftrk,orbit,fmap,re,te,fk)

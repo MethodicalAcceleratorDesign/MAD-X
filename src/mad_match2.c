@@ -509,14 +509,10 @@ match2_end(struct in_cmd* cmd)
 void
 match2_macro(struct in_cmd* cmd)
 {
-  int pos;
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
   int i, idx = -1;
 
-
-  pos = name_list_pos("name", nl);
-  if (nl->inform[pos]) {
+  const char* name = command_par_string_user("name", cmd->clone);
+  if (name) {
     for(i=0; i < MAX_MATCH_MACRO;i++) {
       if (match2_macro_name[i]==NULL) {
         idx = i;
@@ -530,9 +526,9 @@ match2_macro(struct in_cmd* cmd)
       idx = MAX_MATCH_MACRO -1;
     }
 /*    printf("%d\n",i);*/
-    match2_macro_name[idx]=pl->parameters[pos]->string;
+    match2_macro_name[idx]=name;
 /*
-  printf("%d: exec, %s;\n",idx,pl->parameters[pos]->string);
+  printf("%d: exec, %s;\n",idx,name);
   printf("%s\n", execute);*/
     /*      pro_input(execute);*/
   }

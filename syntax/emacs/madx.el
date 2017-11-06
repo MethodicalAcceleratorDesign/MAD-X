@@ -1,11 +1,15 @@
 ;;; madx-mode -- Major mode for editing MAD-X files in Emacs
-;;; FEATURES (v 1.2)
-;;; -Highlights special variable names and commands
-;;; -Automatically highlights '.madx' files,
-;;;  any other buffer can be highlighted with this major mode doing :
-;;;      M+X madx-mode
-;;;  where M is the META character in Emacs (M seems to be ALT ???)
-;;; - Update to MAD-X 5.2.XX command list
+;;; FEATURES (v 1.3)
+;; * Highlights commands, parameters and special operators in MAD-X 5.2.XX 
+;; * If the file extension is '.madx' then the buffer is automatically highlighted,
+;;   but any buffer can be highlighted by doing :
+;;       `M+X madx-mode`
+;;   where `M` is the **META** character in Emacs (`M` seems to be **ALT** in Linux)
+;; * If the line is more than 80 characters long, the extra characters are
+;;   highlighted differently.
+;;   If you dont want this limit, comment/delete the line
+;;       (setq whitespace-line-column 80) ;; limit line length
+;;   in this file.
 
 ;;; LICENCE
 ;;    Copyright (C) 2016  Oscar BLANCO
@@ -28,14 +32,12 @@
 ;;      c)  ~/                ---> (Emacs v21.X.X)
 ;;    i.e.
 ;;      $ cp madx.el ~/.emacs.d/lisp/ 
-;; 2. Edit/create your .emacs file, typically in ~/, adding
-;;    the following block :
+;; 2. Edit or create your .emacs file, typically in ~/ 
+;;      adding the following block where the load-path must match point 1.
 ;;      ;;;; START OF BLOCK TO COPY AND UNCOMMENT 
-;;      ;; Enable syntax highlighting
-;;      (global-font-lock-mode t)
+;;      (global-font-lock-mode t);; Enable syntax highlighting
 ;;      (setq font-lock-maximum-decoration t)
-;;      ;; add madx highlighting
-;;      (add-to-list 'load-path "~/.emacs.d")
+;;      (add-to-list 'load-path "~/.emacs.d");; <--- edit according to 1.
 ;;      (autoload 'madx-mode "madx" "MADX-mode" t)
 ;;      (setq auto-mode-alist (append '(("\\.madx$" . madx-mode))
 ;;        auto-mode-alist))
@@ -43,20 +45,20 @@
 ;; 3. You should now restart emacs in order to reload the environment variables.
 
 ;;;INFO
-;; Author: Oscar Roberto BLANCO GARCIA
-;; email : oscar.blancogarcia@lnf.infn.it
-;; version: 1.2
-;; Created: XX052016 (ddmmyyyy)
-;; Keywords: MAD-X major-mode
-;;-New code available at
-;; https://github.com/orblancog/mad-x_syntax.git
-;;-For mad instructions, visit
-;; mad.web.cern.ch/mad/
-;;-Other syntax highlightings could be found inside the
-;; mad sources. Check the 'syntax' folder in the madx dir !
-;; Write me to the email address above about any bug including an example.
-;;-One good example to modify this mode :
-;; http://renormalist.net/Renormalist/EmacsLanguageModeCreationTutorial
+;; * Author: Oscar Roberto BLANCO GARCIA
+;;   email : oscar.blancogarcia@lnf.infn.it
+;;   version: 1.3
+;;   Created: XX102017 (ddmmyyyy)
+;;   Keywords: MAD-X major-mode
+;; * New code available at
+;;   https://github.com/orblancog/mad-x_syntax.git
+;; * For mad instructions, visit
+;;   mad.web.cern.ch/mad/
+;; * Other syntax highlightings could be found inside the
+;;   mad sources. Check the 'syntax' folder in the madx dir !
+;;   Write me to the email address above about any bug including an example.
+;; * One good example to modify this mode :
+;;   http://ergoemacs.org/emacs/elisp_syntax_coloring.html
 
 ;;;HISTORY
 ;; v 1.0 First release at CERN. File is also available in the 
@@ -66,6 +68,7 @@
 ;; v 1.2 Adding some variables from MAD-X 5.02.10 manual
 ;;       Cleaning up faces 8D
 ;;       when exceeding 80 chars->extra chars in red
+;; v 1.3 adding color to numbers and ;
 
 ;;; ... Finally the Code :
 
@@ -131,7 +134,7 @@
 (defconst madx-font-lock-special_operators
   ;; madx-font-lock-special_operators
   (list
-   '("\\(->\\|:=\\)"
+   '("\\(;\\|->\\|:=\\)"
   . font-lock-warning-face)
   )
   "Highlighting expressions for MAD-X mode (special-operators).")
@@ -176,6 +179,14 @@
    )
   "Highlighting expressions for MAD-X mode (variable-name-all).")
 
+(defconst madx-font-lock-intfp-name-face-all
+  ;; madx- fonts for integers and floating point numbers
+  (list
+   '("\\<\\(\\([0-9]+\\.?[0-9]*\\|\\.[0-9]+\\)\\([eE][+-]?\\([0-9]+\\.?[0-9]*\\|[0-9]*\\.[0-9]+\\)\\)?\\)\\>"
+     . font-lock-keyword-face)
+   )
+  "Highlighting expresssions for MAD-X mode (integers and floats)")
+
 (defconst madx-font-lock-keywords-4
   (append
    madx-font-lock-special_constants
@@ -187,7 +198,8 @@
    madx-font-lock-variable-name-face-all
    madx-font-lock-builtin-face-all
    madx-font-lock-warning-face-all
-   madx-font-lock-doc-face-all   
+   madx-font-lock-doc-face-all
+   madx-font-lock-intfp-name-face-all
   )
  "Balls-out highlighting in MAD-X mode.")
 
@@ -197,11 +209,11 @@
 (defvar madx-mode-syntax-table
   (let ((madx-mode-syntax-table (make-syntax-table)))
 	
-    ; This is added so entity names with underscores can be more easily parsed
+    ; This is added so entity names with underscores and dots can be more easily parsed
 	(modify-syntax-entry ?_ "w" madx-mode-syntax-table)
 	(modify-syntax-entry ?. "w" madx-mode-syntax-table)
 	
-	;  Comment styles are same as C++
+	;  Comment styles are similar to C++
 	(modify-syntax-entry ?/ ". 124 b" madx-mode-syntax-table)
 	(modify-syntax-entry ?* ". 23" madx-mode-syntax-table)
 	(modify-syntax-entry ?\n "> b" madx-mode-syntax-table)

@@ -64,6 +64,7 @@ struct table_list_list* new_table_list_list(int size);
 struct table*           delete_table(struct table*);
 struct table*           read_table(struct in_cmd*);
 struct table*           read_my_table(struct in_cmd*);
+struct table*           find_table(const char* name);
 
 void    check_table(char* string);
 void    check_tabindex(char* string);
@@ -77,7 +78,7 @@ void    double_table(char* table);
 void    grow_table(struct table*); /* doubles number of rows */
 void    print_table(struct table*);
 void    make_map_table(int* map_table_max_rows);
-int     get_table_range(char* range, struct table*, int* rows);
+int     get_table_range(const char* range, struct table*, int* rows);
 void    out_table(const char* tname, struct table*, const char* filename);
 void    reset_count(const char* table); /* resets table counter to zero */
 void    sector_out(char* sector_table_name, double* pos, double* kick, double* rmatrix, double* tmatrix);

@@ -5,13 +5,13 @@ static struct table* bb6d_ixy;
 void
 make_bb6d_ixy(int* bb6d_ixy_max_rows)
 {
-  int k, pos;
+  int k;
+  struct table* table = find_table("bb6d_ixy");
 
-  if ((pos = name_list_pos("bb6d_ixy", table_register->names)) > -1)
+  if (table)
   {
-    delete_table(table_register->tables[pos]);
-    k = remove_from_name_list(table_register->tables[pos]->name,
-                              table_register->names);
+    delete_table(table);
+    k = remove_from_name_list(table->name, table_register->names);
     table_register->tables[k] = table_register->tables[--table_register->curr];
   }
   /* initialise table */

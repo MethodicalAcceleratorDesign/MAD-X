@@ -51,6 +51,7 @@ if [ "$1" = "clone" ] ; then
 elif [ "$1" = "update" ] ; then
   shift # faster "clone" + git cleanup
   [ -d madx-nightly ] && cd madx-nightly && echo "moving down to updated madx-nightly"
+  git fetch && \
   git fetch --tags && \
   git reset --hard origin/master
   check_error "git update failed"

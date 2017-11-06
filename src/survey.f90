@@ -205,7 +205,7 @@ subroutine suelem(el, ve, we, tilt)
   double precision, intent(OUT) :: ve(3), we(3,3), tilt
 
   integer :: code, nn, ns
-  double precision :: angle, cospsi, costhe, sinpsi, sinthe,  ds, dx, bv
+  double precision :: angle, cospsi, costhe, sinpsi, sinthe, ds, dx, dy, bv
   double precision :: normal(0:maxmul), skew(0:maxmul)
 
   double precision, external :: node_value
@@ -285,27 +285,23 @@ subroutine suelem(el, ve, we, tilt)
      case (code_srotation) !---- Rotation around S-axis. SPECIAL CASE
         tilt = node_value('angle ') * bv
         we(1,1) =  cos(tilt)
-        we(2,1) =  sin(tilt)
-        we(3,1) = zero
-        we(1,2) = -sin(tilt)
-        we(2,2) = cos(tilt)
-        we(3,2) = zero
-        we(1,3) = zero
-        we(2,3) = zero
-        we(3,3) = one
+        we(2,1) = -sin(tilt) !was - ?
+        we(1,2) =  sin(tilt) !was + ?
+        we(2,2) =  cos(tilt)
 
      case (code_yrotation) !---- Rotation around Y-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!
         dx = node_value('angle ') * bv
-        we(1,1) = cos(dx)
-        we(2,1) = zero
-        we(3,1) = sin(dx)
-        we(1,2) = zero
-        we(2,2) = zero
-        we(3,2) = one
-        we(1,3) = -sin(dx)
-        we(2,3) = zero
-        we(3,3) = cos(dx)
+        we(1,1) =  cos(dx)
+        we(3,1) = -sin(dx)
+        we(1,3) =  sin(dx)
+        we(3,3) =  cos(dx)
 
+     case (code_xrotation) !---- Rotation around X-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!
+        dy = node_value('angle ') * bv
+        we(2,2) =  cos(dy)
+        we(3,2) =  sin(dy)
+        we(1,3) = -sin(dy)
+        we(3,3) =  cos(dy)
 
      case default ! all straight elements and catch all; use default VE and WE
         !---- get tilt attribute

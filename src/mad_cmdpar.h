@@ -56,8 +56,12 @@ struct command_parameter_list*  delete_command_parameter_list(struct command_par
 struct command_parameter*       store_comm_par_def(char* toks[], int start, int end);
 
 struct expression* command_par_expr(const char* parameter, struct command*);
+int     command_par(const char* parameter, const struct command*, struct command_parameter**);
 double  command_par_special(const char* parameter, const struct element*);
 char*   command_par_string(const char* parameter, const struct command*);
+char*   command_par_string_user(const char* parameter, const struct command*);
+int     command_par_string_user2(const char* parameter, const struct command*, char**);
+int     command_par_string_or_calldef(const char* par, const struct command*, char**);
 double  command_par_value(const char* parameter, const struct command*);
 int     command_par_value2(const char* parameter, const struct command*, double* val);
 struct double_array* command_par_array(const char* parameter, struct command*);
@@ -72,7 +76,8 @@ void    dump_command_parameter(struct command_parameter*);
 void    export_comm_par(struct command_parameter*, char* string, int noexpr);
 void    grow_command_parameter_list(struct command_parameter_list*);
 void    print_command_parameter(struct command_parameter*);
-int     par_present(const char* par, struct command*, struct command_list*);
+int     par_present(const char* par, struct command*);
+int     par_present_list(const char* par, struct command_list*);
 void    store_comm_par_vector(const char* parameter, double* val, struct command*);
 void    add_cmd_parameter_clone(struct command*, const struct command_parameter*, const char* par_name, int inf);
 void    add_cmd_parameter_new(struct command*,double par_value, const char* par_name, int inf);

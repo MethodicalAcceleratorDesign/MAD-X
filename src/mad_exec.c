@@ -1,7 +1,7 @@
 #include "madx.h"
 
 static void
-exec_delete_sequ(char* name)
+exec_delete_sequ(const char* name)
 {
   struct sequence* keep = current_sequ;
   int spos;
@@ -44,13 +44,9 @@ exec_option(struct in_cmd* cmd)
   if (get_option("reset")) set_defaults("option");
   if (get_option("tell"))  print_command(options);
 
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  int pos = name_list_pos("rand", nl);
-  if (nl->inform[pos]) {
-    const char *kind = pl->parameters[pos]->string;
-    pos = name_list_pos("randid", nl);
-    int rng_id = pl->parameters[pos]->double_value;
+  const char* kind = command_par_string_user("rand", cmd->clone);
+  if (kind) {
+    int rng_id = command_par_value("randid", cmd->clone);
     setrand(kind, rng_id);
   }
 }
@@ -99,14 +95,10 @@ exec_assign(struct in_cmd* cmd)
 {
   char* p;
   char tmp[FNAME_L];
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  int pos = name_list_pos("echo", nl);
-  int cut = name_list_pos("truncate", nl);
 
   if (prt_file != stdout)  fclose(prt_file);
-  if (nl->inform[pos]) {
-    p = pl->parameters[pos]->string; strcpy(tmp, p);
+  if ((p = command_par_string_user("echo", cmd->clone))) {
+    strcpy(tmp, p);
     if (strcmp(stolower(tmp), "terminal") == 0)
       prt_file = stdout;
     else {
@@ -115,7 +107,7 @@ exec_assign(struct in_cmd* cmd)
         assign_start = 1;
         prt_file = fopen(p, "w");
       }
-      else if (!nl->inform[cut] || !pl->parameters[cut]->double_value)
+      else if (!log_val("truncate", cmd->clone))
         prt_file = fopen(p, "a");
       else
         prt_file = fopen(p, "w");
@@ -132,28 +124,22 @@ exec_assign(struct in_cmd* cmd)
 void
 exec_removefile(struct in_cmd* cmd)
 {
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  int pos = name_list_pos("file", nl);
-
-  if (nl->inform[pos]) {
-    char *src = str2path(pl->parameters[pos]->string);
-    if (remove(src))
-      warning("unable to remove file: ", pl->parameters[pos]->string);
+  char* file = command_par_string_user("file", cmd->clone);
+  if (file) {
+    file = str2path(file);
+    if (remove(file))
+      warning("unable to remove file: ", file);
   }
 }
 
 void
 exec_renamefile(struct in_cmd* cmd)
 {
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  int pos = name_list_pos("file", nl);
-  int new = name_list_pos("to", nl);
-
-  if (nl->inform[pos] && nl->inform[new]) {
-    char *src = str2path(pl->parameters[pos]->string);
-    char *dst = str2path(pl->parameters[new]->string);
+  char* src = command_par_string_user("file", cmd->clone);
+  char* dst = command_par_string_user("to", cmd->clone);
+  if (src && dst) {
+    src = str2path(src);
+    dst = str2path(dst);
     if (rename(src,dst)) warning("unable to rename file: ", src);
   }
 }
@@ -161,15 +147,13 @@ exec_renamefile(struct in_cmd* cmd)
 void
 exec_copyfile(struct in_cmd* cmd)
 {
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  int pos = name_list_pos("file", nl);
-  int new = name_list_pos("to", nl);
-  int flg = name_list_pos("append", nl);
+  char* src = command_par_string_user("file", cmd->clone);
+  char* dst = command_par_string_user("to", cmd->clone);
+  int flg = log_val("append", cmd->clone);
 
-  if (nl->inform[pos] && nl->inform[new]) {
-    char *src_s = str2path(pl->parameters[pos]->string);
-    char *dst_s = str2path(pl->parameters[new]->string);
+  if (src && dst) {
+    char *src_s = str2path(src);
+    char *dst_s = str2path(dst);
 
     FILE *src = fopen(src_s, "r");
     if (!src) {
@@ -177,9 +161,7 @@ exec_copyfile(struct in_cmd* cmd)
       return;
     }
 
-    const char *mode = "w";
-    if (nl->inform[flg] && pl->parameters[flg]->double_value)
-      mode = "a";
+    const char *mode = flg ? "a" : "w";
 
     FILE *dst = fopen(dst_s, mode);
     if (!dst) {
@@ -203,13 +185,10 @@ void
 exec_call(struct in_cmd* cmd)
   /* handles calling external files */
 {
-  struct command_parameter_list* pl = cmd->clone->par;
-  struct name_list* nl = cmd->clone->par_names;
-  int pos = name_list_pos("file", nl);
   int top = in->curr;
-
-  if (nl->inform[pos]) {
-    if (down_unit(pl->parameters[pos]->string)) madx_input(top);
+  char* file = command_par_string_user("file", cmd->clone);
+  if (file) {
+    if (down_unit(file)) madx_input(top);
   }
   else warning("call without filename:", "ignored");
 }
@@ -218,20 +197,15 @@ void
 exec_cmd_delete(struct in_cmd* cmd)
 /* handles all delete request through "delete" command */
 {
-  struct name_list* nl = cmd->clone->par_names;
-  struct command_parameter_list* pl = cmd->clone->par;
-  int pos;
   char* name;
 
-  pos = name_list_pos("sequence", nl);
-  if (nl->inform[pos]) {
-    name = pl->parameters[pos]->string;
+  name = command_par_string_user("sequence", cmd->clone);
+  if (name) {
     exec_delete_sequ(name);
   }
 
-  pos = name_list_pos("table", nl);
-  if (nl->inform[pos]) {
-    name = pl->parameters[pos]->string;
+  name = command_par_string_user("table", cmd->clone);
+  if (name) {
     exec_delete_table(name);
   }
 }
@@ -281,21 +255,17 @@ exec_create_table(struct in_cmd* cmd)
   struct command_parameter_list* pl = cmd->clone->par;
   struct char_p_array* m;
   const char**t_c;
-  int j, pos = name_list_pos("table", nl);
+  int j, pos;
   char* name = NULL;
   int  ncols = 0;  /*number of columns*/
 
-  if (nl->inform[pos] == 0) {
+  name = command_par_string_user("table", cmd->clone);
+  if (!name) {
     warning("no table name:", "ignored");
     return;
   }
 
-  if ((name = pl->parameters[pos]->string) == NULL) {
-    warning("no table name: ", "ignored");
-    return;
-  }
-
-  if ((pos = name_list_pos(name, table_register->names)) > -1) {
+  if (table_exists(name)) {
     warning("table already exists: ", "ignored");
     return;
   }
@@ -338,11 +308,9 @@ void
 exec_store_coguess(struct in_cmd* cmd)
   /* stores the initial orbit guess of the user */
 {
-  struct name_list* nl = cmd->clone->par_names;
   double tol, toldefault=1.e-6;
 
-  int pos = name_list_pos("tolerance", nl);
-  if (nl->inform[pos])  {
+  if (par_present("tolerance", cmd->clone))  {
     tol = command_par_value("tolerance", cmd->clone);
     set_variable("twiss_tol", &tol);
   }
@@ -369,8 +337,8 @@ exec_dump(struct in_cmd* cmd)
   int pos;
 
   // get "table" command parameter
-  if ((pos = name_list_pos("table", nl) < 0) || nl->inform[pos] == 0 ||
-      (name = pl->parameters[pos]->string) == NULL) {
+  name = command_par_string_user("table", cmd->clone);
+  if (!name) {
     warning("dump without table name:", "ignored");
     return;
   }
@@ -385,12 +353,12 @@ exec_dump(struct in_cmd* cmd)
     strcpy(filename,f);
 
   // get table from registered tables
-  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+  struct table* t = find_table(name);
+  if (!t) {
     warning("table not found:", "ignored");
     return;
   }
 
-  struct table* t = table_register->tables[pos];
   out_table(name, t, filename);
 
   return;
@@ -403,26 +371,21 @@ exec_shrink_table(struct in_cmd* cmd)
   struct table* t;
   struct name_list* nl = cmd->clone->par_names;
   struct command_parameter_list* pl = cmd->clone->par;
-  int pos = name_list_pos("table", nl);
-  char* name = NULL;
+  int pos;
+  char* name = command_par_string_user("table", cmd->clone);
   int row;
 
-  if (nl->inform[pos] == 0) {
+  if (!name) {
     warning("no table name:", "ignored");
     return;
   }
 
-  if ((name = pl->parameters[pos]->string) == NULL) {
-    warning("no table name: ", "ignored");
-    return;
-  }
-
-  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+  t = find_table(name);
+  if (!t) {
     warning("table name not found:", "ignored");
     return;
   }
 
-  t = table_register->tables[pos];
   pos = name_list_pos("row", nl);
   row = pos >= 0 ? pl->parameters[pos]->double_value : t->curr - 1;
 
@@ -444,18 +407,18 @@ exec_fill_table(struct in_cmd* cmd)
   int pos, row;
   double scale;
 
-  if ((pos = name_list_pos("table", nl)) < 0 || nl->inform[pos] == 0 ||
-      (name = pl->parameters[pos]->string) == NULL) {
+  name = command_par_string_user("table", cmd->clone);
+  if (!name) {
     warning("no table name:", "ignored");
     return;
   }
 
-  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+  struct table* t = find_table(name);
+  if (!t) {
     warning("table not found:", "ignored");
     return;
   }
 
-  struct table* t = table_register->tables[pos];
 
   if ((pos = name_list_pos("row", nl)) < 0)
     row = t->curr+1;
@@ -467,8 +430,7 @@ exec_fill_table(struct in_cmd* cmd)
       return;
     }
   }
-  pos =  name_list_pos("scale", nl);
-  scale =  pl->parameters[pos]->double_value;
+  scale = command_par_value("scale", cmd->clone);
 
   int cols = t->org_cols, curr = t->curr;
   t->org_cols = 0;    t->curr = row - 1;
@@ -491,18 +453,17 @@ exec_fill_knob_table(struct in_cmd* cmd)
   int pos, row;
   double scale;
 
-  if ((pos = name_list_pos("table", nl)) < 0 || nl->inform[pos] == 0 ||
-      (name = pl->parameters[pos]->string) == NULL) {
+  name = command_par_string_user("table", cmd->clone);
+  if (!name) {
     warning("no table name:", "ignored");
     return;
   }
 
-  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+  struct table* t = find_table(name);
+  if (!t) {
     warning("table not found:", "ignored");
     return;
   }
-
-  struct table* t = table_register->tables[pos];
 
   if ((pos = name_list_pos("row", nl)) < 0)
     row = t->curr+1;
@@ -564,18 +525,17 @@ exec_setvars_table(struct in_cmd* cmd)
   const char* name = NULL;
   int pos, row;
 
-  if ((pos = name_list_pos("table", nl)) < 0 || nl->inform[pos] == 0 ||
-      (name = pl->parameters[pos]->string) == NULL) {
+  name = command_par_string_user("table", cmd->clone);
+  if (!name) {
     warning("no table name:", "ignored");
     return;
   }
 
-  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+  struct table* t = find_table(name);
+  if (!t) {
     warning("table not found:", "ignored");
     return;
   }
-
-  struct table* t = table_register->tables[pos];
 
   if ((pos = name_list_pos("row", nl)) < 0)
     row = t->curr;
@@ -606,18 +566,17 @@ exec_setvars_lin_table(struct in_cmd* cmd)
   char expr[10*NAME_L];
   int pos, row1, row2;
 
-  if ((pos = name_list_pos("table", nl)) < 0 || nl->inform[pos] == 0 ||
-      (name = pl->parameters[pos]->string) == NULL) {
+  name = command_par_string_user("table", cmd->clone);
+  if (!name) {
     warning("no table name:", "ignored");
     return;
   }
 
-  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+  struct table* t = find_table(name);
+  if (!t) {
     warning("table not found:", "ignored");
     return;
   }
-
-  struct table* t = table_register->tables[pos];
 
   pos  = name_list_pos("row1", nl);
   row1 = pos >= 0 ? (int) pl->parameters[pos]->double_value : t->curr;
@@ -672,18 +631,17 @@ exec_setvars_knob_table(struct in_cmd* cmd)
   int pos, row;
   int noappend;
 
-  if ((pos = name_list_pos("table", nl)) < 0 || nl->inform[pos] == 0 ||
-      (name = pl->parameters[pos]->string) == NULL) {
+  name = command_par_string_user("table", cmd->clone);
+  if (!name) {
     warning("no table name:", "ignored");
     return;
   }
 
-  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+  struct table* t = find_table(name);
+  if (!t) {
     warning("table not found:", "ignored");
     return;
   }
-
-  struct table* t = table_register->tables[pos];
 
   pos  = name_list_pos("row", nl);
   row  = pos >= 0 ? (int) pl->parameters[pos]->double_value : t->curr;
@@ -739,18 +697,17 @@ exec_setvars_const_table(struct in_cmd* cmd)
   const char* name = NULL;
   int pos;
 
-  if ((pos = name_list_pos("table", nl)) < 0 || nl->inform[pos] == 0 ||
-      (name = pl->parameters[pos]->string) == NULL) {
+  name = command_par_string_user("table", cmd->clone);
+  if (!name) {
     warning("no table name:", "ignored");
     return;
   }
 
-  if ((pos = name_list_pos(name, table_register->names)) < 0) {
+  struct table* t = find_table(name);
+  if (!t) {
     warning("table not found:", "ignored");
     return;
   }
-
-  struct table* t = table_register->tables[pos];
 
   pos = name_list_pos("const", nl);
   double constant = pl->parameters[pos]->double_value;
@@ -769,26 +726,20 @@ void
 exec_print(struct in_cmd* cmd)
   /* prints text from "print" command to current output unit */
 {
-  struct command_parameter_list* pl = cmd->clone->par;
-  struct name_list* nl = cmd->clone->par_names;
-  int pos = name_list_pos("text", nl);
-  if (nl->inform[pos]) fprintf(prt_file,"%s\n", pl->parameters[pos]->string);
+  const char* text = command_par_string_user("text", cmd->clone);
+  if (text) fprintf(prt_file,"%s\n", text);
 }
 
 void // this function extend print_value from mad_eval.c
 exec_printf(struct in_cmd* cmd)
 {
-  struct command_parameter_list* pl = cmd->clone->par;
-  struct name_list* nl = cmd->clone->par_names;
-
   // retrieve output format from text=""
-  int txt_pos = name_list_pos("text", nl);
-  if (!nl->inform[txt_pos]) { warning("missing text=:",""); return; }
-  char *txt_str = v_format(pl->parameters[txt_pos]->string);
+  const char* text = command_par_string_user("text", cmd->clone);
+  if (!text) { warning("missing text=:",""); return; }
+  char *txt_str = v_format(text);
 
   // check for value=...
-  int val_pos = name_list_pos("value", nl);
-  if (!nl->inform[val_pos]) { warning("missing value=:",""); return; }
+  if (!par_present("value", cmd->clone)) { warning("missing value=:",""); return; }
 
   // retrieve vector of values from value=...
   int val_n = command_par_vector("value", cmd->clone, NULL);
