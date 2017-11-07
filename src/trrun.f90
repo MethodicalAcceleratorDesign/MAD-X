@@ -469,8 +469,12 @@ subroutine trrun(switch, turns, orbit0, rt, part_id, last_turn, last_pos, &
            l_buf(nlm+1) = el
            call element_name(el_name,len(el_name))
 
-           if ( code.ne.code_drift .and. code.ne.code_quadrupole .and. code.ne.code_sbend &
-                .and. code.ne.code_matrix .and. el.ne.zero ) then ! rbend missing ?
+           if ( code.ne.code_drift .and. &
+                code.ne.code_quadrupole .and. &
+                code.ne.code_sbend .and. &
+                code.ne.code_matrix .and. &
+                code.ne.code_solenoid .and. &
+                el.ne.zero ) then ! rbend missing ?
               !if (.not. (is_drift() .or. is_thin() .or. is_quad() .or. is_dipole() .or. is_matrix()) ) then
               print *," "
               print *,"code: ",code," el: ",el,"   THICK ELEMENT FOUND"
@@ -3145,7 +3149,8 @@ subroutine ttdpdg(track, ktrack)
 end subroutine ttdpdg
 
 subroutine trsol(track,ktrack)
-  use math_constfi, only : one, two, half
+
+  use math_constfi, only : zero, one, two, half, four
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -3160,66 +3165,97 @@ subroutine trsol(track,ktrack)
   integer :: ktrack
 
   integer :: i
-  double precision :: beta
-  double precision :: sk, skl, sks, sksl, cosTh, sinTh, Q, R, Z
+  double precision :: bet0, bet
+  double precision :: sk, skl, cosTh, sinTh, Q, R, Z
   double precision :: xf, yf, pxf, pyf, sigf, psigf, bvk
   double precision :: onedp, fpsig, fppsig
 
   double precision :: get_value, node_value
 
+  double precision :: omega, length, length_
+  double precision :: x_, y_, z_, px_, py_, pt_
+  
   !---- Initialize.
-  ! dtbyds  = get_value('probe ','dtbyds ')
-  ! gamma   = get_value('probe ','gamma ')
-  beta = get_value('probe ','beta ')
-  ! deltap  = get_value('probe ','deltap ')
-  !
+  bet0 = get_value('probe ','beta ')
+
   !---- Get solenoid parameters
   ! elrad   = node_value('lrad ')
-  sksl = node_value('ksi ')
-  sks  = node_value('ks ')
-
-  !---- BV flag
   bvk = node_value('other_bv ')
-  sks  = sks  * bvk
-  sksl = sksl * bvk
+  sk  = bvk * node_value('ks ') / two
+  length = node_value('l ')
+  
+  if (length.eq.zero) then
+     
+     skl = bvk * node_value('ksi ') / two
 
-  !---- Set up strengths
-  ! sk    = sks / two / (one + deltap)
-  sk    = sks / two
-  skl   = sksl / two
+     !---- Loop over particles
+     do  i = 1, ktrack
+        !     Ripken formulae p.28 (3.35 and 3.36)
+        xf    = track(1,i)
+        yf    = track(3,i)
+        psigf = track(6,i) / bet0
 
-  !---- Loop over particles
-  do  i = 1, ktrack
-     !     Ripken formulae p.28 (3.35 and 3.36)
-     xf    = track(1,i)
-     yf    = track(3,i)
-     psigf = track(6,i) / beta
+        !     We do not use a constant deltap!!!!! WE use full 6D formulae!
+        onedp   = sqrt( one + two*psigf + (bet0**2)*(psigf**2) )
+        fpsig   = onedp - one
+        fppsig  = ( one + (bet0**2)*psigf ) / onedp
 
-     !     We do not use a constant deltap!!!!! WE use full 6D formulae!
-     onedp   = sqrt( one + 2*psigf + (beta**2)*(psigf**2) )
-     fpsig   = onedp - one
-     fppsig  = ( one + (beta**2)*psigf ) / onedp
+        !     Set up C,S, Q,R,Z
+        cosTh = cos(skl/onedp)
+        sinTh = sin(skl/onedp)
+        Q = -skl * sk / onedp
+        R = fppsig / (onedp**2) * skl * sk
+        Z = fppsig / (onedp**2) * skl
 
-     !     Set up C,S, Q,R,Z
-     cosTh = cos(skl/onedp)
-     sinTh = sin(skl/onedp)
-     Q = -skl * sk / onedp
-     R = fppsig / (onedp**2) * skl * sk
-     Z = fppsig / (onedp**2) * skl
+        pxf  = track(2,i) + xf*Q
+        pyf  = track(4,i) + yf*Q
+        sigf = track(5,i)*bet0 - half*(xf**2 + yf**2)*R
 
-     pxf  = track(2,i) + xf*Q
-     pyf  = track(4,i) + yf*Q
-     sigf = track(5,i)*beta - half*(xf**2 + yf**2)*R
+        !       Ripken formulae p.29 (3.37)
+        track(1,i) =  xf  * cosTh  +  yf  * sinTh
+        track(2,i) =  pxf * cosTh  +  pyf * sinTh
+        track(3,i) = -xf  * sinTh  +  yf  * cosTh
+        track(4,i) = -pxf * sinTh  +  pyf * cosTh
+        track(5,i) =  (sigf + (xf*pyf - yf*pxf)*Z) / bet0
+        ! track(6,i) =  psigf*bet0
+     enddo
+  else
+     if (sk.ne.zero) then
+        skl = sk*length
 
-     !       Ripken formulae p.29 (3.37)
-     track(1,i) =  xf  * cosTh  +  yf  * sinTh
-     track(2,i) =  pxf * cosTh  +  pyf * sinTh
-     track(3,i) = -xf  * sinTh  +  yf  * cosTh
-     track(4,i) = -pxf * sinTh  +  pyf * cosTh
-     track(5,i) =  (sigf + (xf*pyf - yf*pxf)*Z) / beta
-     ! track(6,i) =  psigf*beta
+        !---- Loop over particles
+        do  i = 1, ktrack
+           ! initial phase space coordinates
+           x_  = track(1,i)
+           y_  = track(3,i)
+           px_ = track(2,i)
+           py_ = track(4,i)
+           z_  = track(5,i)
+           pt_ = track(6,i)
 
-  enddo
+           ! set up constants
+           onedp = sqrt(one + two*pt_/bet0 + pt_**2);
+           bet = onedp / (one/bet0 + pt_);
+
+           ! set up constants
+           cosTh = cos(two*skl/onedp)
+           sinTh = sin(two*skl/onedp)
+           omega = sk/onedp;
+
+           ! total path length traveled by the particle
+           length_ = length - half/(onedp**2)*(omega*(sinTh-two*length*omega)*(x_**2+y_**2)+&
+                two*(one-cosTh)*(px_*x_+py_*y_)-(sinTh/omega+two*length)*(px_**2+py_**2))/four;
+
+           track(1,i) = ((one+cosTh)*x_+sinTh*y_+(px_*sinTh-py_*(cosTh-one))/omega)/two;
+           track(3,i) = ((one+cosTh)*y_-sinTh*x_+(py_*sinTh+px_*(cosTh-one))/omega)/two;
+           track(2,i) = (omega*((cosTh-one)*y_-sinTh*x_)+py_*sinTh+px_*(one+cosTh))/two;
+           track(4,i) = (omega*((one-cosTh)*x_-sinTh*y_)-px_*sinTh+py_*(one+cosTh))/two;
+           track(5,i) = z_ + length/bet0 - length_/bet;
+        enddo
+     else
+        call ttdrf(length,track,ktrack);
+     endif
+  endif
 end subroutine trsol
 
 subroutine tttrans(track,ktrack)
@@ -4689,6 +4725,11 @@ subroutine trphot(el,curv,rfac,deltap)
   amean = five * sqrt(three) / (twelve * hbar * clight) * abs(arad * pc * (one+deltap) * el * curv)
   ucrit = three/two * hbar * clight * gamma**3 * abs(curv)
   sumxi = zero
+  if (amean.gt.3d-1) then
+     print *,"More than 0.3 photons emitted in element."
+     print *,"You might want to consider increasing the number of slices to reduce this number."
+  endif
+     
   if (amean .gt. zero) then
      call dpoissn(amean, nphot, ierror)
 
