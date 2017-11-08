@@ -6,7 +6,7 @@ L_sol := 10.;
 Ks_sol := 0.2;
 
 sol1: solenoid, l=L_sol, KS=Ks_sol, KSI=Ks_sol*L_sol;
-sol2: solenoid, l=L_sol, KS=-Ks_sol, KSI=Ks_sol*L_sol;
+sol2: solenoid, l=L_sol, KS=-Ks_sol, KSI=-Ks_sol*L_sol;
 
 myseq: sequence, l=2*L_sol;
 sol1, at:= L_sol/2;

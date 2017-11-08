@@ -2,9 +2,9 @@
 @ TYPE             %08s "TRACKOBS"
 @ TITLE            %28s "thick-solenoid tracking test"
 @ ORIGIN           %17s "5.03.07 Darwin 64"
-@ DATE             %08s "06/11/17"
-@ TIME             %08s "18.38.10"
+@ DATE             %08s "08/11/17"
+@ TIME             %08s "19.12.15"
 *     NUMBER       TURN                  X                 PX                  Y                 PY                  T                 PT                  S                  E 
 $         %d         %d                %le                %le                %le                %le                %le                %le                %le                %le 
           1          0              0.001                  0                  0                  0                  0             -0.001                  0                  1
-          1          1   -0.0004179664169   -9.093718502e-05                  0                  0   -6.495195848e-08             -0.001                  0                  1
+          1          1   -0.0004179664169   -9.093718502e-05                  0                  0   -1.054305469e-07             -0.001                  0                  1
