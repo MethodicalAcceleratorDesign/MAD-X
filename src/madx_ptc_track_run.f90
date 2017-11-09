@@ -1468,7 +1468,7 @@ CONTAINS
 
                if (ptc_track_debug) then
                  write(mft,*) "t ", i_th_turn, " el ",i_current_elem+1," ",name_curr_elem," track ", j_th_partic, &
-                              " : ", current_x_coord_incl_co
+                              " : ", current_x_coord_incl_co, "<<"
                endif  
 	
 
