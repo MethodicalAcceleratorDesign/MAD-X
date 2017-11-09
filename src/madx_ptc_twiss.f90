@@ -636,6 +636,7 @@ contains
     if ( no .lt. 1 ) then
        call fort_warn('madx_ptc_twiss.f90 <ptc_twiss>:','Order in twiss is smaller then 1')
        print*, "Order is ", no
+       call tidy()
        return
     endif
 
@@ -716,6 +717,7 @@ contains
     if( closed_orbit .and. (icav .gt. 0) .and. (my_ring%closed .eqv. .false.)) then
        call fort_warn('return from ptc_twiss: ',' Closed orbit requested on not closed layout.')
        call seterrorflag(3,"ptc_twiss ","Closed orbit requested on not closed layout.")
+       call tidy()
        return
     endif
 
@@ -751,6 +753,7 @@ contains
           write(whymsg,*) 'DA got unstable during closed orbit search: PTC msg: ',messagelost(:len_trim(messagelost))
           call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
           call seterrorflag(10,"ptc_twiss ",whymsg);
+          call tidy()
           return
        endif
        
@@ -818,6 +821,7 @@ contains
 
        call setcavities(my_ring,maxaccel)
        if (geterrorflag() /= 0) then
+          call tidy()
           return
        endif
     endif
@@ -851,6 +855,7 @@ contains
 
     if (geterrorflag() /= 0) then
        !if arror occured then return
+       call tidy()
        return
     endif
 
@@ -859,6 +864,7 @@ contains
                        messagelost(:len_trim(messagelost))
       call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
       call seterrorflag(10,"ptc_twiss INIT CHECK",whymsg)
+      call tidy()
       return
     endif
     
@@ -924,6 +930,7 @@ contains
     tw = A_script_probe%x
     if (geterrorflag() /= 0) then
        call fort_warn('ptc_twiss: ','equaltwiss at the begining of the line returned with error')
+       call tidy()
        return
     endif
    
@@ -975,6 +982,7 @@ contains
                        messagelost(:len_trim(messagelost))
       call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
       call seterrorflag(10,"ptc_twiss INIT CHECK",whymsg)
+      call tidy()
       return
     endif
     
@@ -983,6 +991,7 @@ contains
     
     if (geterrorflag() /= 0) then
        call fort_warn('ptc_twiss: ','equaltwiss at the beginning of the line returned with error')
+       call tidy()
        return
     endif
 
@@ -1084,6 +1093,7 @@ contains
              call seterrorflag(10,"ptc_twiss ",whymsg);
              
              if (getdebug() > 2) close(mf1)
+             call tidy()
              return
           endif
 
@@ -1206,6 +1216,7 @@ contains
            call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
            call seterrorflag(10,"ptc_twiss ",whymsg);
            if (getdebug() > 2) close(mf1)
+           call tidy()
            return
         endif
 
@@ -1246,6 +1257,7 @@ contains
         tw = A_script_probe%x
         if (geterrorflag() /= 0) then
            call fort_warn('ptc_twiss: ','equaltwiss at ' // current%mag%name // ' returned with error')
+           call tidy()
            return
         endif
 
@@ -1271,6 +1283,7 @@ contains
 	    ' PTC msg: ',  messagelost(:len_trim(messagelost))
         call fort_warn('ptc_twiss: ',whymsg(:len_trim(whymsg)))
         call seterrorflag(10,"ptc_twiss end of loop check",whymsg)
+        call tidy()
         return
       endif
 
@@ -1356,14 +1369,6 @@ contains
 
     c_%watch_user=.false.
 
-    call kill(tw)
-    CALL kill(A_script_probe)
-
-    CALL kill(theTransferMap)
-
-    do i=1,6
-       call kill(unimap(i))
-    enddo
 
     call finishknobs()
 
@@ -1373,8 +1378,9 @@ contains
        if (getnmoments() > 0) call ptc_moments(no*2) !calcualate moments with the maximum available order
     endif
 
-    deallocate(j)
-    if (allocated(savedTM)) deallocate(savedTM)
+    
+    call tidy()
+       
 ! f90flush is not portable, and useless...
 !    call f90flush(20,my_false)
 
@@ -1388,6 +1394,27 @@ contains
   contains  ! what follows are internal subroutines of ptc_twiss
     !____________________________________________________________________________________________
 
+    subroutine tidy()
+      ! deallocates all the variables 
+      implicit none
+
+      call kill(tw)
+      CALL kill(A_script_probe)
+
+      CALL kill(theTransferMap)
+
+      do i=1,6
+         call kill(unimap(i))
+      enddo
+    
+
+      if (allocated(j)) deallocate(j)
+
+      if (allocated(savedTM)) deallocate(savedTM)
+    
+    end subroutine tidy
+
+    !____________________________________________________________________________________________
     subroutine initmap(dt,slice)
       implicit none
       integer     :: double_from_table_row
@@ -1447,7 +1474,6 @@ contains
             endif
             
             call seterrorflag(10,"ptc_twiss initmap","Can not read NV from map_table. Exiting. ");
-            
             return
          endif
       endif

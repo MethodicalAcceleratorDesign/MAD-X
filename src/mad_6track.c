@@ -666,8 +666,8 @@ att_beambeam(struct c6t_element* el)
     warning("c6t: beambeam element not found in twiss table","");
   }
   el->out_1 = 20;
-  el->out_2 = c1p3*(el->value[12] - beamx);
-  el->out_3 = c1p3*(el->value[13] - beamy);
+  el->out_2 = - c1p3*(el->value[12] - beamx);
+  el->out_3 = - c1p3*(el->value[13] - beamy);
   el->out_4 = el->value[16];
   el->out_5 = pow(c1p3*el->value[14], 2);
   el->out_6 = pow(c1p3*el->value[15], 2);

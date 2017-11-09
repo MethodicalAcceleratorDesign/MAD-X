@@ -1,0 +1,10 @@
+@ NAME             %19s "TRACK.OBS0001.P0001"
+@ TYPE             %08s "TRACKOBS"
+@ TITLE            %28s "thick-solenoid tracking test"
+@ ORIGIN           %17s "5.03.07 Darwin 64"
+@ DATE             %08s "06/11/17"
+@ TIME             %08s "18.38.10"
+*     NUMBER       TURN                  X                 PX                  Y                 PY                  T                 PT                  S                  E 
+$         %d         %d                %le                %le                %le                %le                %le                %le                %le                %le 
+          1          0              0.001                  0                  0                  0                  0             -0.001                  0                  1
+          1          1   -0.0004179968082   -9.084288303e-05   -2.711952481e-19   -3.599890026e-20   -1.054344426e-07             -0.001                  0                  1

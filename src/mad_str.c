@@ -185,7 +185,7 @@ stolower_nq(char* s)
 }
 
 char*
-strip(char* name)
+strip(const char* name)
   /* strip ':' and following off */
 {
   static char tmp_key[10*NAME_L];

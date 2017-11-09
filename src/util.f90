@@ -100,7 +100,7 @@ module code_constfi
   integer, parameter :: code_blmonitor = 31
   integer, parameter :: code_imonitor = 32
   integer, parameter :: code_dipedge = 33
-  ! code 34 is missing
+  integer, parameter :: code_xrotation = 34
   integer, parameter :: code_changeref = 35
   integer, parameter :: code_translation = 36
   integer, parameter :: code_crabcavity = 37
@@ -327,7 +327,7 @@ module twisslfi
   logical :: rmatrix=.false., sectormap=.false., ripken=.false.
   logical :: mode_flip=.false.
   logical :: ele_body=.false.
-  logical :: flipping=.true.
+
 
 end module twisslfi
 

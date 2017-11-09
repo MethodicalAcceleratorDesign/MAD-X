@@ -3,8 +3,7 @@
 void
 exec_sodd(struct in_cmd* cmd)
 {
-  struct name_list* nl_sodd = NULL;
-  int ierr,pos,nosixtrack;
+  int ierr;
 
   /* use correct beam for sequence to be plotted - HG 031127 */
   struct command* keep_beam = current_beam;
@@ -23,16 +22,10 @@ exec_sodd(struct in_cmd* cmd)
 
   /* get nosixtrack */
 
-  if (this_cmd != NULL && this_cmd->clone != NULL)
-  {
-    nl_sodd = this_cmd->clone->par_names;
-  }
-  else
+  if (!this_cmd || !this_cmd->clone)
     fatal_error("SODD "," - No existing command");
 
-  pos = name_list_pos("nosixtrack", nl_sodd);
-  nosixtrack = nl_sodd->inform[pos];
-  if(nosixtrack == 0)
+  if(!par_present("nosixtrack", this_cmd->clone))
   {
     printf("Build-up of input file fc.34 by call to program sixtrack. \n");
     conv_sixtrack(cmd);

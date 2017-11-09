@@ -11,3 +11,8 @@ Kate: Kate is a text editor for KDE, popular on Linux platforms. To use this fil
    ~/.kde3/share/apps/katepart/syntax
    ~/.kde4/share/apps/katepart/syntax
 
+Emacs : Emacs is a text editor based on lisp. Check the file madx.el to load the madx highlighting mode (madx-mode).
+   By default, any file with extension .madx will be automatically highlighted,
+     but any buffer can be highlighted by doing in emacs "META-x", typing "madx-mode", and RETURN.
+     NOTE: META is the emacs meta-character, it seems that in linux META is the same as ALT.
+

@@ -11,7 +11,7 @@
 static struct {
   uint64_t s[N];
   int p, id;
-} st_array[10], *st;
+} st_array[10], *st = st_array;
 
 union numbit {
   uint64_t u;
@@ -116,8 +116,7 @@ madx_init55(int seed)
 {
   int i, ii, k = 1, j = abs(seed)%MAX_RAND;
   irn_rand[NR_RAND-1] = j;
-  for (i = 0; i < NR_RAND-1; i++)
-  {
+  for (i = 0; i < NR_RAND-1; i++) {
     ii = (ND_RAND*(i+1))%NR_RAND;
     irn_rand[ii-1] = k;
     if ((k = j - k) < 0) k += MAX_RAND;
@@ -161,31 +160,36 @@ void setrand (const char *kind, int rng_id)
   if (!strcmp(kind,"best") || !strcmp(kind,"xorshift1024star")) {
     init55_p = mad_num_randseed;
     frndm_p  = mad_num_rand;
+
+    if (rng_id < 0) rng_id = 0;
     if (rng_id > 0) { // stream id provided
       rng_id = (rng_id-1)%10;
       st = st_array + rng_id;
-      if (st->id == 0) {
-        st->id = rng_id;
-        mad_num_randseed(0);
-        for (int i = 0; i < st->id; i++)
-          mad_num_randjump(); // ensure no overlap
-      }
-      if (info)
-        fprintf(prt_file, "random number generator set to '%s[%d]'\n", kind, rng_id+1);
-    } else
-      if (info)
-        fprintf(prt_file, "random number generator set to '%s'\n", kind);
+    }
+    if (st->id == 0) { // stream not yet initialized
+      st->id = rng_id+1;
+      mad_num_randseed(0);
+      for (int i = 0; i < st->id; i++)
+        mad_num_randjump(); // ensure no overlap
+    }
+    if (info)
+      fprintf(prt_file, "random number generator set to '%s[%d]'\n", kind, st->id);
+
+    return;
   }
-  else
+
   if (!strcmp(kind,"default")) {
     init55_p = madx_init55;
     frndm_p  = madx_frndm;
+
     // default, already initialized
     if (info)
       fprintf(prt_file, "random number generator set to '%s'\n", kind);
+
+    return;
   }
-  else
-    warning("invalid kind of random generator (ignored): ", kind);
+
+  warning("invalid kind of random generator (ignored): ", kind);
 }
 
 // -- Gaussian distribution ---------------------------------------------------o
