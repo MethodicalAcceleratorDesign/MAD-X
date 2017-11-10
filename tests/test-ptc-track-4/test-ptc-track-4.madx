@@ -1,0 +1,49 @@
+!TITLE,' Example 4 for MAD-X with PTC_TRACK;
+! Testing:
+!   mode element_by_element=false 
+!   closed_orbit=true with
+!   with defined observation points
+!   non-zero closed orbit
+!   norm_no different from default
+
+
+ eg   :=  100;
+ bg   :=  eg/pmass;
+ en   := 3.75e-06;
+ epsx := en/bg;
+ epsy := en/bg;
+beam, particle = proton, energy =   eg        , 
+                         sigt=      0.077     , 
+                         sige=      1.1e-4    , 
+                         npart=     1.05e11   , 
+                         exn=4*en,  eyn=4*en  , 
+                         kbunch = 10,
+                         et = 0.002, bv = 1,
+                         ex=epsx,   ey=epsy;
+value,epsx,epsy;
+option,-echo;
+call file="../share/fivecell/fivecell.seq";
+option,echo;
+
+!activate one corrector to get a non-zero closed orbit
+acbh1 = 1.e-6;
+
+use,period=fivecell;
+
+ptc_create_universe;
+ptc_create_layout,model=2,method=6,nst=10,exact;
+
+ptc_setswitch, debuglevel=1, time=true, totalpath=false;
+
+ptc_observe, place=bb;
+
+ptc_start, x= 1e-4, px=0, y=3e-3, py=0, t= 0;
+
+ptc_track, icase=56,closed_orbit, turns=10, file="tfv9", norm_no=3; 
+
+
+ptc_track_end;
+ptc_end;
+
+stop;
+

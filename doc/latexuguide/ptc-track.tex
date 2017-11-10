@@ -154,8 +154,12 @@ in two different ways:
 The \texttt{PTC\_TRACK} command initiates trajectory tracking by
 entering the thick-lens tracking module.  
 
-The tracking can be done element-by-element or "turn-by-turn" with
-coordinate transformations over the whole turn.  
+The tracking can be done "element-by-element" or "turn-by-turn".
+In the first case particle coordinates are tracked from element to element,
+and if an element is an observation point than the coordinates are saved in a table.
+In the second case particle coordinates are always tracked over full turn (from start to start) 
+and afterwards these coordinates are transformed using Transfer Map from the start to a given observation point.
+The order of the transfer map is defined by \texttt{NORMAL\_NO} switch.
 
 Tracking is done in parallel, i.e. the coordinates of all particles are
 transformed through each beam element, or over full turns. 
@@ -172,7 +176,7 @@ PTC\_TRACK, \=ICASE=integer, DELTAP=real, CLOSED\_ORBIT=logical,\\
             \>ELEMENT\_BY\_ELEMENT=logical, TURNS=integer, \\
             \>DUMP=logical, ONETABLE=logical, RECLOSS=logical, \\
             \>MAXAPER=real\_array, \\
-            \>NORM=integer, NORM\_OUT=logical, \\
+            \>NORM\_NO=integer, NORM\_OUT=logical, \\
             \>FILE[=string], EXTENSION=string, FFILE=integer, \\
             \>RADIATION=logical, RADIATION\_MODEL1=logical, \\
             \>RADIATION\_ENERGY\_LOSS=logical, \\
@@ -256,9 +260,12 @@ The attributes are:
    only at the end of each turn (at the end of the layout). 
    
 
-   \ttitem{NORM\_NO} order of the Normal Form.\\
-   \texttt{NORM\_NO=1} makes the Normal Form linear (always true for
-   \madx). \\ (Default: 1)
+   \ttitem{NORM\_NO} order of the internally used Transfer Maps and Normal Forms.\\
+   \texttt{NORM\_NO=1} makes them linear (always true for \madx). \\
+   The Transfer Maps are used to transform track coordinates from \texttt{START} to given observation point
+   if \texttt{ELEMENT\_BY\_ELEMENT} is false.
+   The Normal Form is used to transform coordinates between Cartesian and action-angle variables.
+   \\ (Default: 1)
 
    \ttitem{NORM\_OUT} a logical switch to transform canonical variables
    to action-angle variables. \\ (Default: false) 

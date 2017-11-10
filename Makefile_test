@@ -74,7 +74,7 @@ test-ptc-twiss-old1 test-ptc-twiss-old2 test-ptc-twiss-old3 test-ptc-twiss-old4 
 test-ptc-twiss-5D test-ptc-twiss-5Dt test-ptc-twiss-56D test-ptc-twiss-56Dt test-ptc-twiss-56Dl test-ptc-twiss-56Dtl test-ptc-twiss-6D test-ptc-twiss-6D-ALS \
 test-ptc-twiss-accel-56D test-ptc-twiss-56Dt-ini_map_man test-ptc-twiss-56Dt-ini_mtx_man test-ptc-twiss-56Dt-ini_mtx_tbl \
 test-ptc-normal test-ptc-twiss-normal-genfu test-ptc-twiss-normal-5D test-ptc-twiss-normal-6D test-ptc-twiss-maptable \
-test-ptc-track test-ptc-track-2 test-ptc-track-3 \
+test-ptc-track test-ptc-track-2 test-ptc-track-3 test-ptc-track-4 \
 test-ptc-trackline test-ptc-trackline-2 test-ptc-trackline-3 \
 test-rfmultipole-ptc-1 \
 test-touschek test-touschek-2 \
