@@ -285,8 +285,8 @@ subroutine suelem(el, ve, we, tilt)
      case (code_srotation) !---- Rotation around S-axis. SPECIAL CASE
         tilt = node_value('angle ') * bv
         we(1,1) =  cos(tilt)
-        we(2,1) = -sin(tilt) !was - ?
-        we(1,2) =  sin(tilt) !was + ?
+        we(2,1) =  sin(tilt) !should be - according to convention in MAD8 PhysG. or MADX manual?
+        we(1,2) = -sin(tilt) !should be + according to convention in MAD8 PhysG. or MADX manual?
         we(2,2) =  cos(tilt)
 
      case (code_yrotation) !---- Rotation around Y-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!

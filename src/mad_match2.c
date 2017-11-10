@@ -511,7 +511,7 @@ match2_macro(struct in_cmd* cmd)
 {
   int i, idx = -1;
 
-  const char* name = command_par_string_user("name", cmd->clone);
+  char* name = command_par_string_user("name", cmd->clone);
   if (name) {
     for(i=0; i < MAX_MATCH_MACRO;i++) {
       if (match2_macro_name[i]==NULL) {
