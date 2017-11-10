@@ -1,3 +1,22 @@
+!Comments from Piotr
+! The module was not documented by FRS & Kapin, below my comments from reverse engineering
+!
+! The loop over turns is in the main routine ptc_track_run
+!
+! There 2 modes it operates with:
+!
+!   mode1: element_by_element=TRUE  - normal ray tracking of PTC element to element
+!                                     if an element is an observation point coordinates are stored in a table
+!                                     implemented in routine One_turn_track_with_PTC
+!
+!   mode2: element_by_element=FALSE - ray tracking over one turn 
+!                                     if other than START observation points are present then 
+!                                     the coordinates are transformed with transfer map that is calculated at the end (routine Observation_with_PTC)
+!                                     implemented in track_beam_elementwise_with_PTC
+
+!END Comments from Piotr
+
+
 MODULE madx_ptc_track_run_module
   ! This module serve as a COMMON block as in  F77
   ! It contains variables which exchange data between
@@ -280,6 +299,7 @@ CONTAINS
     ! Closed_orbit_at_START:
     IF(closed_orbit) CALL Find_Closed_Orbit   ! Calculates x_coord_co(1:6)
 
+    ! needed to transfrom coordinates in case closed_orbit=true AND element_by_element=false
     Normal_forms: IF(closed_orbit) THEN  !-----------------------!
        !                                                         !
        !                                                         !
@@ -1136,15 +1156,14 @@ CONTAINS
 
       ! variables from the HOST subroutine (no need to be declared in int.subr !):
 
-      ! real(dp), intent(INOUT) :: x_coord_incl_co(1:6,1:N_particle_max)
-      ! integer,  intent(INOUT) :: jmax_number_tracking_particles
-      ! number surviving particles
-      ! DBLE,     intent(IN)    :: sum_length
-      ! integer,  intent(IN)    :: i_th_turn    :: The number of the current turn
-      ! INTEGER,  intent(INOUT) :: particle_ID (1:N_particle_max) ! numbers of surviving particles
-      ! Integer,  intent(OUT)   :: last_turn_of_lost_particle (1:N_particle_max)
-      ! DBLE,     intent(OUT)   :: last_position_of_lost_particle (1:N_particle_max)
-      ! DBLE,     intent(OUT)   :: last_orbit_of_lost_particle (1:6,1:N_particle_max)
+      ! real(dp), intent(INOUT) :: x_coord_incl_co(1:6,1:N_particle_max)               particle coordinates
+      ! INTEGER,  intent(INOUT) :: jmax_number_tracking_particles                      number surviving particles
+      ! DBLE,     intent(IN)    :: sum_length                                          s pos up to current element
+      ! INTEGER,  intent(IN)    :: i_th_turn                                           the number of the current turn (iterator)
+      ! INTEGER,  intent(INOUT) :: particle_ID (1:N_particle_max)                      numbers of surviving particles
+      ! INTEGER,  intent(OUT)   :: last_turn_of_lost_particle (1:N_particle_max)       self descriptive; filled by routine kill_ptc_track 
+      ! DBLE,     intent(OUT)   :: last_position_of_lost_particle (1:N_particle_max)   self descriptive; filled by routine kill_ptc_track 
+      ! DBLE,     intent(OUT)   :: last_orbit_of_lost_particle (1:6,1:N_particle_max)  self descriptive; filled by routine kill_ptc_track 
       !
       ! Usual tracking steps (pseudocode) in TRRUN (VK)
       !
@@ -1319,7 +1338,7 @@ CONTAINS
                n_temp=j_last_particle_buffer
                !
                                                               
-               CALL kill_ptc_track(n_temp,i_th_turn, zero ,jmax_numb_particl_at_i_th_turn,        &       
+               CALL kill_ptc_track(n_temp,i_th_turn, zero ,jmax_numb_particl_at_i_th_turn,      &       
                                    particle_ID, last_turn_of_lost_particle,                     &                     
                                    last_position_of_lost_particle, last_orbit_of_lost_particle, & 
                                    x_coord_incl_co,MY_RING%end%mag%name,                        &
@@ -2131,8 +2150,8 @@ CONTAINS
       ! to the starting point of the beamline
 
       element_number: DO i_ring_element=1, my_ring%n
-         number_obs=node_value('obs_point ')
-         IF (i_ring_element.EQ.1) number_obs=1 ! node_value gives 0 for 1st (?)
+         number_obs=node_value('obs_point ')   ! returns number of the observation point
+         IF (i_ring_element.EQ.1) number_obs=1 ! the first element is $START marker, this is always the 1st obs_point
 
          length_current_element_f90=current%MAG%P%ld
          length_current_element_c=node_value('l ')
@@ -2155,7 +2174,7 @@ CONTAINS
             call element_name(local_name,name_len)
             name_el_at_obsrv(number_obs) = local_name
 
-            save_CO_for_el_by_el: IF (element_by_element) THEN
+            save_CO_for_el_by_el: IF (element_by_element) THEN    !save closed orbit to the array
                DO i_coord=1,nvariables
                   x_co_at_all_observ(i_coord,number_obs)=x_coord_co_temp(i_coord)
                ENDDO
@@ -2197,19 +2216,13 @@ CONTAINS
 
     !==============================================================================
     SUBROUTINE Observation_with_PTC(max_obs, x_coord_co_at_START, Map_Y_obs)
-      !USE  madx_ptc_module, ONLY: my_ring, kill, default, REAL_8, alloc,  & !BERZ,
-      !                            assignment(=), track, lnv, zero,  & !print, sub,
-      !                            PRODUCE_APERTURE_FLAG, ANALYSE_APERTURE_FLAG, &
-      !                            fibre, daprint, operator(*), operator(.sub.)
       implicit none
 
       integer, intent (IN) :: max_obs ! the maximum number of observation points >=1
-      ! one point at the end (beginning) plus
-      ! the points given in input file by the command
-      ! "ptc_observe,place=mark";
-      REAL (dp),     INTENT( IN) :: x_coord_co_at_START(1:6) ! => x0(1:6) in ptc_track at START
-      TYPE (real_8), intent (INOUT) :: Map_Y_obs(6) !  y => Map_Y_obs - local name
-      TYPE(damap) :: Map_damap
+                                      ! one point at the end (beginning) plus the points given in input file by the command "ptc_observe,place=mark";
+      REAL (dp),     INTENT( IN)    :: x_coord_co_at_START(1:6) !closed orbit at START
+      TYPE (real_8), intent (INOUT) :: Map_Y_obs(6)   !  One Turn Map, the input values are always ignored and it is initialized to identity + closed_orbit
+      TYPE (damap)                  :: Map_damap      ! the tracked map is tranformed to this object to perform multiplication of track vectors
       INTEGER ::  iii_c_code, i_obs_point, i_coord, &
                   i_from, i_till, i_dummy, i_turn_tmp, j_part_tmp, ielem
       INTEGER ::  flag_index,why(9)
@@ -2234,10 +2247,6 @@ CONTAINS
       ENDDO
 
 
-      ! Define maps between the beginning of the ring and the current observation point
-
-      ! nda=0; NormOrder=1 npara=0;mynd2=0;
-      ! call init(default,NormOrder,nda,BERZ,mynd2,npara) - already known
       if (ptc_track_debug) then
          call kanalnummer(mf1)
          call kanalnummer(mf2)
@@ -2245,6 +2254,8 @@ CONTAINS
          open(unit=mf2,file='map_y_obs.txt')
          write(mf1,*) 'Map_Y_obs IN: '; call daprint(Map_Y_obs,mf1);
       endif
+
+      !One Turn Map initialization: identity + closed_orbit
       Map_Y_obs=npara
       Map_Y_obs=x_coord_co_at_START  ! Y=X
 
@@ -2254,6 +2265,7 @@ CONTAINS
       endif
 
       Allocate (X_co_observe(1:6,1:max_obs), Temp_particle_ID(1:j_tot_numb_starting_particles))
+      
       X_co_observe(:,:)=zero; 
       Temp_particle_ID=0
 
@@ -2277,8 +2289,8 @@ CONTAINS
             open(unit=mf(i_obs_point),file="obs_point_"//ch1(:len_trim(ch1)))
          endif
 
-         i_from=elem_number_at_observ(i_obs_point)
-         i_till=elem_number_at_observ(i_obs_point+1)
+         i_from=elem_number_at_observ(i_obs_point)           !current observation point
+         i_till=elem_number_at_observ(i_obs_point+1)         !next    observation point
 
          if (ptc_track_debug) then
             Print *, 'i_obs_point=', i_obs_point, ' name_f90=', current%MAG%name
@@ -2287,9 +2299,8 @@ CONTAINS
             Print *, 'Track from i_from=', i_from, 'i_till =',i_till
          end if
 
+         !Track the map to the next observation point, element i_till
          call track_probe_x(my_ring,Map_Y_obs,MYSTATE,fibre1=i_from,fibre2=i_till)
-         !call track(my_ring,Map_Y_obs,1,MYSTATE)
-
 
          Map_damap=Map_Y_obs
          
@@ -2304,8 +2315,6 @@ CONTAINS
 
           endif
 
-         
-         
          if (ptc_track_debug) then
             write(mf(i_obs_point),*) 'i_Unit=', mf(i_obs_point); Call daprint(Map_Y_obs,mf(i_obs_point));
          endif
@@ -2324,10 +2333,11 @@ CONTAINS
             return
          endif
 
-         ielem=elem_number_at_observ(i_obs_point+1)
+         ielem=elem_number_at_observ(i_obs_point+1) !identical to i_till
 
          ! Call Extract_CO_from_Map (icase_PTC, Map_Y_obs, X_co_temp) - subr. removed
-         allocate(J(nvariables)); J(:)=0
+         allocate(J(nvariables)); 
+         J(:)=0
          X_co_temp(:)=zero
          DO i_coord=1, nvariables
             X_co_temp(i_coord) = (Map_Y_obs(i_coord)%T.sub.J) ! take line with all zero-order
@@ -2337,6 +2347,7 @@ CONTAINS
             endif
          ENDDO
          deallocate(J)
+         
          Save_co_in_X_co_observe: DO i_coord=1, nvariables
             X_co_observe(i_coord,i_obs_point+1)= X_co_temp(i_coord)
          END DO Save_co_in_X_co_observe
@@ -2356,25 +2367,18 @@ CONTAINS
                    Print *, '   the current particle j_part_tmp= ', j_part_tmp
                endif
 
-
-
-               !X_lnv_OBSRV=Map_Y_obs*X_lnv_START
-               !             X_lnv_OBSRV=Map_Y_obs%T*X_lnv_START
-               !Error: Operands of binary numeric operator '*' at (1) are TYPE(taylor)/real(dp)
+               !get all particle coordinates at START for turn=i_turn_tmp
+               
                Read_START_coord: DO i_coord=1,nvariables
                   X_lnv_START(i_coord)= x_all_incl_co_at0(i_coord, i_turn_tmp, j_part_tmp) - &
                        x_coord_co_at_START(i_coord) ! X_out=M(x0,x)*x_in, where X=x0+x !
                ENDDO Read_START_coord
-               ! Transform from START to observation point
+
+               ! Transform from START to current observation point
                X_lnv_OBSRV=Map_damap*X_lnv_START
-               !X_lnv_OBSRV=Map_Y_obs*X_lnv_START
-               !             X_lnv_OBSRV=Map_Y_obs%T*X_lnv_START
-               !Error: Operands of binary numeric operator '*' at (1) are TYPE(taylor)/real(dp)
+
 
                Loop_coord: DO i_coord=1,nvariables
-                  !X_lnv_OBSRV(i_coord)=Map_Y_obs(i_coord)%T*X_lnv_START(i_coord)
-                  !X_lnv_OBSRV(i_coord)=Map_Y_obs(i_coord)*X_lnv_START(i_coord)
-                  !X_lnv_OBSRV(i_coord)=Map_damap*X_lnv_START(i_coord)
                   if (ptc_track_debug) then
                       Print *, 'i_coord=',i_coord, &
                        'X_lnv_START/OBSRV=', X_lnv_START(i_coord), X_lnv_OBSRV(i_coord)
@@ -3181,7 +3185,7 @@ CONTAINS
        ! c_%watch_user=.false.
        IF (ptc_track_debug) then
           close(mf1)
-          close(mf1)
+          close(mf2)
        endif
        return
     endif
