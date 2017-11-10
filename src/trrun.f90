@@ -3165,7 +3165,7 @@ subroutine trsol(track,ktrack)
   integer :: ktrack
 
   integer :: i
-  double precision :: bet0, bet
+  double precision :: bet0
   double precision :: sk, skl, cosTh, sinTh, Q, R, Z
   double precision :: xf, yf, pxf, pyf, sigf, psigf, bvk
   double precision :: onedp, fpsig, fppsig
@@ -3174,7 +3174,8 @@ subroutine trsol(track,ktrack)
 
   double precision :: omega, length
   double precision :: x_, y_, z_, px_, py_, pt_
-  
+!!$  double precision :: bet, length_
+
   !---- Initialize.
   bet0 = get_value('probe ','beta ')
 
@@ -3235,7 +3236,6 @@ subroutine trsol(track,ktrack)
 
            ! set up constants
            onedp = sqrt(one + two*pt_/bet0 + pt_**2);
-           bet = onedp / (one/bet0 + pt_);
 
            ! set up constants
            cosTh = cos(two*skl/onedp)
@@ -3253,6 +3253,7 @@ subroutine trsol(track,ktrack)
 
 !!$           ! longitudinal phase space evolution from the path length
 !!$           ! total path length traveled by the particle
+!!$           bet = onedp / (one/bet0 + pt_);
 !!$           length_ = length - half/(onedp**2)*(omega*(sinTh-two*length*omega)*(x_**2+y_**2)+&
 !!$                two*(one-cosTh)*(px_*x_+py_*y_)-(sinTh/omega+two*length)*(px_**2+py_**2))/four;
 !!$           track(5,i) = z_ + length/bet0 - length_/bet;
