@@ -1,0 +1,235 @@
+'comment': 'MadX'
+'name': 'MadX'
+'scopeName': 'source.madx'
+'fileTypes': [
+  'madx'
+  'seq'
+]
+'patterns': [
+  { 'include': '#comments' }
+  { 'include': '#numbers' }
+  {
+    'match': '==|<>|<|>|<=|=>'
+    'name': 'keyword.operator.comparison.c'
+  }
+  {
+    'match': '(?i)\\b(?<!\\.)(const)\\b'
+    'name': 'storage.modifier.madx'
+  }
+  {
+    'match': '(?i)\\b(?<!\\.)(real|int)\\b'
+    'name': 'storage.type.madx'
+  }
+  {
+    'match': '(?i)\\b(?<!\\.)(if|elseif|else|while|macro)\\b'
+    'name': 'keyword.control.madx'
+  }
+  {
+    'begin': '''(?xi)\\b(?<!\\.)
+      (table|tabindex|tabstring|gettab|getidx)
+      (\\s*\\()
+    '''
+    'beginCaptures' :
+      '1': 'name': 'support.function.madx'
+      '2': 'name': 'punctuation.madx'
+    'patterns': [
+      { 'include': '#internals' }
+      { 'include': '#numbers' }
+      { 'include': '#strings' }
+    ]
+    'end': '\\)'
+    'endCaptures' :
+      '0': 'name': 'punctuation.madx'
+  }
+  {
+    'begin': '''(?xi)\\b(?<!\\.)
+      (
+        assign|
+        beam|
+        call|coguess|constraint|copyfile|clear|create|cycle|
+        delete|dumpsequ|
+        exec|extract|
+        fill|fill_knob|
+        global|gweight|
+        help|
+        install|
+        migrad|move|
+        option|
+        plot|print|printf|
+        readmytable|readtable|remove|removefile|renamefile|replace|resbeam|resplot|
+        save|select|set|setvars|setvars_const|setvars_knob|setvars_lin|seqedit|
+        show|shrink|sixtrack|sxfread|sxfwrite|survey|system|
+        title|twiss|
+        use|write|
+        value|vary|
+        weight
+      )
+      (\\s*\\,)
+    '''
+    'beginCaptures' :
+      '1': 'name': 'keyword.control.madx'
+      '2': 'name': 'punctuation.madx'
+    'patterns': [
+      { 'include': '#attributes' }
+      { 'include': '#flags' }
+      { 'include': '#internals' }
+      { 'include': '#particles' }
+      { 'include': '#numbers' }
+      { 'include': '#strings' }
+    ]
+    'end': ';'
+    'endCaptures' :
+      '0': 'name': 'punctuation.madx'
+  }
+  {
+    'match': '(?i)\\b(?<!\\.)(exit|quit|stop|flatten|reflect|endedit|clear|twiss)\\b'
+    'name': 'keyword.control.madx'
+  }
+  { 'include': '#internals' }
+  { 'include': '#math' }
+  { 'include': '#strings' }
+  {
+    'match': ';'
+    'name': 'punctuation.terminator.statement.madx'
+  }
+  {
+    'match': ','
+    'name': 'punctuation.separator.delimiter.madx'
+  }
+]
+'repository':
+  'attributes':
+    'patterns': [
+      {
+        'match': '(?xi)\\b([a-zA-Z_]+)\\s*(=)'
+        'captures':
+          '1': 'name': 'variable.other.madx'
+          '2': 'name': 'punctuation.madx'
+      }
+      { 'include' : '#attributes-singular' }
+    ]
+  'attributes-singular':
+    'match': '''(?xi)\\b(?<!\\.)
+      (
+        bborbit|bunched|
+        cavall|clear|
+        debug|
+        echo|echomacro|
+        full|
+        info|
+        no_fatal_stop|
+        radiate|rbarc|reset|
+        sympl|
+        tell|thick|thin_foc|threader|trace|truncate|twiss_print|
+        verbose|verify|
+        warn
+      )\\b
+    '''
+    'name': 'variable.other.madx'
+  'internals':
+    'patterns': [
+      {
+        'match': '''(?xi)\\b(?<!\\.)
+          (pi|twopi|degrad|raddeg|e|emass|pmass|nmass|mumass|clight|qelect|hbar|erad|prad)
+          (?!\\.)\\b
+        '''
+        'name': 'constant.language.madx'
+      }
+      {
+        'match': '''(?xi)\\b(?<!\\.)
+          (twiss|beam)
+          \\b
+        '''
+        'name': 'variable.language.madx'
+      }
+    ]
+  'flags':
+    'match': '''(?xi)\\b(?<!\\.)
+      (error|makethin|save|sectormap|seqedit)
+      \\b
+    '''
+    'name': 'constant.flag.madx'
+  'particles':
+    'match': '''(?xi)\\b(?<!\\.)
+      (positron|electron|proton|antiproton|posmuon|negmuon|ion)
+      \\b
+    '''
+    'name': 'constant.flag.madx'
+  'math':
+    'match': '''(?xi)\\b(?<!\\.)
+      (sqrt|log|log10|exp|sin|cos|tan|asin|acos|atan|sinh|cosh|tanh|sinc|abs|erf|erfc|
+      floor|ceil|round|frac|ranf|gauss|tgauss)
+      \\b
+    '''
+    'name': 'support.function.madx'
+  'comments':
+    'patterns': [
+      {
+        'begin': '!'
+        'end': '\\n'
+        'name': 'comment.line.madx'
+      }
+      {
+        'begin': '//'
+        'end': '\\n'
+        'name': 'comment.line.madx'
+      }
+      {
+        'begin': '/\\*'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.comment.begin.madx'
+        'end': '\\*/'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.comment.end.madx'
+        'name': 'comment.block.madx'
+      }
+    ]
+  'strings':
+    'patterns': [
+      {
+        'begin': '"'
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.string.begin.madx'
+        'end': '"'
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.string.end.madx'
+        'name': 'string.quoted.double.madx'
+        'patterns': [
+          {
+            'match': '\\\\.'
+            'name': 'constant.character.escape.madx'
+          }
+        ]
+      }
+      {
+        'begin': '\''
+        'beginCaptures':
+          '0':
+            'name': 'punctuation.definition.string.begin.madx'
+        'end': '\''
+        'endCaptures':
+          '0':
+            'name': 'punctuation.definition.string.end.madx'
+        'name': 'string.quoted.single.madx'
+        'patterns': [
+          {
+            'match': '\\\\.'
+            'name': 'constant.character.escape.madx'
+          }
+        ]
+      }
+    ]
+  'numbers':
+    'match': '\\b(?<!\\.)([0-9]+\\.?[0-9]*[eE]?[\\+\\-]?)\\b'
+    'name': 'constant.numeric.madx'
+    'captures':
+      '1':
+        'name': 'punctuation.separator.decimal.period.madx'
+      '2':
+        'name': 'punctuation.separator.decimal.period.madx'
+    
+    

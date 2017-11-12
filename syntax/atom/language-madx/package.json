@@ -1,0 +1,17 @@
+{
+  "name": "language-madx",
+  "version": "0.1.1",
+  "description": "MadX language support in Atom",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "homepage": "https://github.com/vkbo/languageMadX",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vkbo/languageMadX"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/vkbo/languageMadX/issues"
+  }
+}
