@@ -4,22 +4,13 @@
 'fileTypes': [
   'madx'
   'seq'
+  'mask'
 ]
 'patterns': [
   { 'include': '#comments' }
   { 'include': '#numbers' }
-  {
-    'match': '==|<>|<|>|<=|=>'
-    'name': 'keyword.operator.comparison.c'
-  }
-  {
-    'match': '(?i)\\b(?<!\\.)(const)\\b'
-    'name': 'storage.modifier.madx'
-  }
-  {
-    'match': '(?i)\\b(?<!\\.)(real|int)\\b'
-    'name': 'storage.type.madx'
-  }
+  { 'include': '#types' }
+  { 'include': '#operators' }
   {
     'match': '(?i)\\b(?<!\\.)(if|elseif|else|while|macro)\\b'
     'name': 'keyword.control.madx'
@@ -231,5 +222,21 @@
         'name': 'punctuation.separator.decimal.period.madx'
       '2':
         'name': 'punctuation.separator.decimal.period.madx'
-    
-    
+  'types':
+    'patterns': [
+      {
+        'match': '(?i)\\b(?<!\\.)(const)\\b'
+        'name': 'storage.modifier.madx'
+      }
+      {
+        'match': '(?i)\\b(?<!\\.)(real|int)\\b'
+        'name': 'storage.type.madx'
+      }
+    ]
+  'operators':
+    'patterns': [
+      {
+        'match': '==|<>|<|>|<=|=>'
+        'name': 'keyword.operator.comparison.madx'
+      }
+    ]
