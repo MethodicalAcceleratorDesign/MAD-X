@@ -1,0 +1,129 @@
+<!doctype html public "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=UTF-8">
+<link href="../_style.css" rel="stylesheet" type="text/css">
+<title>MAD - Methodical Accelerator Design</title>
+</head>
+
+<body>
+<p><a class=home href="http://cern.ch/mad" onclick="target='_top'">[home]</a>
+<h1>Administration</h1>
+<hr class="h1">
+
+<p>
+This webpage contains raw information about the administration of the MAD project. It is not intended to be read by non-member of the MAD-team.
+
+<!-- -------- -->
+<hr class="sep">
+
+
+<h3>Contact persons</h3>
+
+<p>
+Send an email to the
+<a href="mailto:grd@bnl.gov,valishev@fnal.gov,catia.milardi@lnf.infn.it,andrea.franchi@esrf.fr,o.boine-frankenheim@gsi.de,zhangy@ihep.ac.cn">
+contact persons</a>.
+
+<ul>
+<li>BNL:      <a href="mailto:grd@bnl.gov">Guillaume Robert-Demolaize</a>
+<li>Desy:
+<li>ESRF:     <a href="mailto:andrea.franchi@esrf.fr">Andrea Franchi</a>
+<li>Fermilab: <a href="mailto:valishev@fnal.gov">Alexander Valishev</a>
+<li>IHEP:     <a href="mailto:zhangy@ihep.ac.cn">Yuan Zhang</a>
+<li>LNF:      <a href="mailto:catia.milardi@lnf.infn.it">Catia Milardi</a>
+<li>GSI:      <a href="mailto:o.boine-frankenheim@gsi.de">Oliver Boine-Frankenheim</a>
+<li>KEK:
+<li>SLAC:
+</ul>
+
+<!-- -------- -->
+<hr class="sep">
+
+<h3>Releases</h3>
+
+<p><i>
+To rollback a MAD-X release (dev or pro), change the symbolic links last-dev or last-pro on lxplus in ~mad/madx/releases. Do not change anything else because many external links use these symbolic links to select the path to the proper releases.
+</i>
+
+<!-- -------- -->
+<hr class="sep">
+
+<h3>E-mail &amp; E-groups</h3>
+
+<ul>
+<li>mad@cern.ch (alias for support), mad.support@cern.ch
+</ul>
+
+<ul>
+<li>mad-pub@cern.ch: public announcement (~250 persons, archived)
+<li>mad-usr@cern.ch: users mailing list (~100 persons, archived)
+<li>mad-dev@cern.ch: developpers mailing list (~15 persons, archived)
+<li>mad-trc@cern.ch: dispatch ticket reports from Trac
+<li>mad-src@cern.ch: dispatch commit reports from SVN
+<li>mad-sup@cern.ch: archive mad@cern.ch <b>incoming</b> emails
+</ul>
+
+<i>Note: when replying with the mad@cern.ch email account, don't forget to put <b>mad in CC</b> to your reply, otherwise other MAD-team members will not see your post and it will <b>not be archived</b> (only incoming emails are archived).</i>
+
+<!-- -------- -->
+<hr class="sep">
+
+<h3>Accounts &amp; Links</h3>
+
+<ul>
+<li>AFS: mad (/afs/cern.ch/user/m/mad, volume u.sl.mad0)
+<li>MAC: mad (macserv15865@cern.ch), admin (variant of mad passwd)
+<li>WIN: mad (Windows 7 VM on macserv15865@cern.ch)
+<li>SVN: mad, cvsmadx@lxsvn.cern.ch (svn admin and server)
+<li>WWW: http://cern.ch/mad (alias for madx), http://cern.ch/madx (/afs/cern.ch/user/m/mad/madx/www)
+<li>Trac: http://svnweb.cern.ch/trac/madx
+<li>Indico: MAD project http://indico.cern.ch/category/5177
+</ul>
+
+<!-- -------- -->
+<hr class="sep">
+
+<h3>AFS Workspace</h3>
+
+<ul>
+<li>Project: mad
+<li>Volume: p.mad.root
+<li>Mount point: /afs/cern.ch/project/mad
+<li>Administrators: ldeniau, ghislain
+<li>Admin guide: http://information-technology.web.cern.ch/book/afs-administrator-guide
+<li>Occupancy 2014.03.13 (sizes are in kB)
+<small><pre>
+sh$ afs_admin list_project mad
+Project         Quota        Alloc
+-------         -----        -----
+mad             50000000     12000000
+
+Project         administrators
+-------         --------------
+mad             ldeniau ghislain
+
+Project         Mount point / Volume patterns                 Pool
+-------         -----------------------------                 ----
+mad             /afs/\.?cern.ch/project/mad
+                ^s\.mad\.([a-z][\w\-]+)\.(\d+)$               $1
+                ^Z\.mad\.([a-z][\w\-]+)\.(\d+)$               $1
+                ^s\.mad\b                                     $1
+                ^u\.mad\b                                     std
+                ^u\.mad\.([a-z][\w\-]+)\.(\d+)$               std
+                ^Y\.mad\.([a-z][\w\-]+)\.(\d+)$               std
+                ^project\.mad$                                std
+                ^q\.mad\b                                     std
+                ^p\.mad\b                                     std
+
+mad Volumes     Pool          Used      Quota         Percent  Accesses  Disk
+----------------------------------------------------------------------------------
+p.mad.root      std           9643078   12000000      80       157165    afs240/ag
+----------------------------------------------------------------------------------
+Totals for mad: 1 volumes     9643078   12000000      80       157165
+</pre></small>
+</ul>
+
+</body>
+</html>

@@ -1,0 +1,110 @@
+<head>
+<title>BUG in SEQUENCE and fix</title>
+<!-- 2013-Oct-21  18:03:30  ghislain -->
+</head>
+
+<body bgcolor="#ffffff">
+
+<center>
+EUROPEAN ORGANIZATION FOR NUCLEAR RESEARCH
+<IMG SRC="http://cern.ch/madx/icons/mx7_25.gif" align=right>
+<h2>Bug in Sequences and how it might affect you</h2>
+</center>
+
+A bug was reported in July 2013 in the <a href="sequence.html">sequence</a> 
+expansion in MAD-X. 
+<p>
+In some cases of expanding a sequence within a sequence, 
+MAD-X ignored the implicit "REFER=centre" 
+or any explicit "REFER= " instructions 
+and was attempting to expand the sequence such that 
+the entry was always at the location specified by the "at= " instruction,
+thereby attempting to create negative drifts in some cases, 
+either before or after the inserted sub-sequence.
+<p>
+This caused MAD-X to stop with an error.
+<p>
+A fix has been implemented from version 5.01.03 onwards and tested to work well.
+<p>
+
+<h3> Problem with "adapted" sequences</h3>
+<p>
+We have also discovered that this bug has been present for quite some time 
+and that some users have taken the habit of circumventing it by 
+writing sequence files that do not conform to the rules of sequence expansions.
+<p>
+<b>The expansion of these "adapted" sequences will fail now that the bug has been fixed.</b>   
+<p>
+
+<h3>Example of an "adapted" sequence</h3>
+Here is one simple example of a sub-sequence in a sequence that was "adapted" to the bug: 
+<pre>
+SEC1 : SEQUENCE, L = 10.00; // sub-sequence
+  …
+ENDSEQUENCE;
+</pre>
+
+and later
+
+<pre>
+MACH : SEQUENCE, L = 100.00; //main sequence
+  SEC1,  at =   0.0;
+  …
+ENDSEQUENCE;
+</pre>
+
+Following the rules of sequence expansion, 
+and in particular the implicit "REFER=centre" when no explicit "REFER= " is specified,  
+the sequence SEC1 would be placed with its center at position 0.0 in the main sequence. 
+Logically a negative drift of 5m would have to be created 
+between the marker at the start of MACH 
+and the marker at the start of SEC1.
+<p>
+The bug made that sequence expandable with no negative drift produced, 
+i.e. with the marker at the start of SEC1 at position 0.0 in the MACH sequence. 
+<p>
+With the bugfix implemented, the expansion of the MACH sequence as written above will fail with the following error message:
+<pre> +=+=+= fatal: negative drift between elements  mach$start:1 and sec1$start:1, length -5.00e+00 </pre>
+
+<h3>Fix to "adapted" sequences</h3>
+In order to be conforming to the sequence expansion rules, 
+the MACH sequence could simply be rewritten with an explicit 
+"REFER= " statement as: 
+<pre>
+MACH : SEQUENCE, REFER=entry, L = 100.00;
+  SEC1,  at =   0.0;
+  …
+ENDSEQUENCE;
+</pre>
+
+<p>
+<b>CAUTION:</b>
+The simple introduction of "REFER=entry" above is not universal. 
+It will not work in particular if the main sequence mixes 
+sub-sequences and simple elements. 
+<p>
+In that case it would be more appropriate to rewrite the MACH example 
+as follows to insert the quadrupole just at the end of sub-sequence SEC1. 
+<pre>
+MACH : SEQUENCE, REFER=centre, L = 100.00;
+  SEC1,  at =   5.0;
+  QD: QUADRUPOLE, L=1, at= 10.5
+  …
+ENDSEQUENCE;
+</pre>
+ 
+Some cases can be more intricate and require further manual editing.
+
+<h3>Further help</h3>
+We are sorry for the inconvenience that this might cause if you have sequences 
+that had been "adapted" to the bug and that now need to be fixed. 
+<p>
+In case you need assistance with this process, you can send an 
+email to <a href="mailto:mad.support@cern.ch?subject=Sequence Fix">
+MAD-X Support</a> and we will work out the best solution with you.
+<p>
+<address>
+Last updated: Ghislain Roy, 22 October 2013
+</address>
+
+</body>
