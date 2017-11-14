@@ -1,0 +1,8 @@
+SSLRequireSSL # The modules only work using HTTPS
+AuthType shibboleth
+ShibRequireSession On
+ShibRequireAll On
+ShibExportAssertion Off
+
+Require valid-user
+Require ADFS_GROUP "mad-sup"
