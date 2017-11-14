@@ -2977,12 +2977,6 @@ subroutine track_one_element(el, fexit)
   call save_opt_fun()
   if (.not.centre) then
      call twprep(save,2,opt_fun,zero,i)
-  else
-     ! TODO: it is inconsistent that amux,amy from twcpgo are overwritten
-     ! with the values from twchgo here. These two lines should be removed
-     ! but it will break a test or two:
-     opt_fun(5) = amux
-     opt_fun(8) = amuy
   endif
 end subroutine track_one_element
 
