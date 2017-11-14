@@ -44,7 +44,7 @@ contact persons</a>.
 <h3>Releases</h3>
 
 <p><i>
-To rollback a MAD-X release (dev or pro), change the symbolic links last-dev or last-pro on lxplus in ~mad/madx/releases. Do not change anything else because many external links use these symbolic links to select the path to the proper releases.
+To rollback a MAD-X release, change the symbolic links last-rel to prev-rel on lxplus in <tt>~mad/madx/releases</tt>. Do not change anything else because many external links use these symbolic links to select the path to the proper releases.
 </i>
 
 <!-- -------- -->
@@ -60,9 +60,8 @@ To rollback a MAD-X release (dev or pro), change the symbolic links last-dev or 
 <li>mad-pub@cern.ch: public announcement (~250 persons, archived)
 <li>mad-usr@cern.ch: users mailing list (~100 persons, archived)
 <li>mad-dev@cern.ch: developpers mailing list (~15 persons, archived)
-<li>mad-trc@cern.ch: dispatch ticket reports from Trac
-<li>mad-src@cern.ch: dispatch commit reports from SVN
-<li>mad-sup@cern.ch: archive mad@cern.ch <b>incoming</b> emails
+<li>mad-src@cern.ch: dispatch nightly reports
+<li>mad-sup@cern.ch: archive mad@cern.ch <i>incoming</i> emails
 </ul>
 
 <i>Note: when replying with the mad@cern.ch email account, don't forget to put <b>mad in CC</b> to your reply, otherwise other MAD-team members will not see your post and it will <b>not be archived</b> (only incoming emails are archived).</i>
@@ -75,11 +74,11 @@ To rollback a MAD-X release (dev or pro), change the symbolic links last-dev or 
 <ul>
 <li>AFS: mad (/afs/cern.ch/user/m/mad, volume u.sl.mad0)
 <li>MAC: mad (macserv15865@cern.ch), admin (variant of mad passwd)
-<li>WIN: mad (Windows 7 VM on macserv15865@cern.ch)
-<li>SVN: mad, cvsmadx@lxsvn.cern.ch (svn admin and server)
-<li>WWW: http://cern.ch/mad (alias for madx), http://cern.ch/madx (/afs/cern.ch/user/m/mad/madx/www)
-<li>Trac: http://svnweb.cern.ch/trac/madx
-<li>Indico: MAD project http://indico.cern.ch/category/5177
+<li>LNX: mad (Linux Ubuntu 16.4 VM on macserv15865lx@cern.ch)
+<li>WIN: mad (Windows 10 VM on macserv15865w10@cern.ch)
+<li>WWW: http://cern.ch/madx (location: /afs/cern.ch/user/m/mad/madx/www)
+<li>Github: http://github.com/MethodicalAcceleratorDesign/MAD-X  (account madcern)
+<li>Indico: http://indico.cern.ch/category/5177
 </ul>
 
 <!-- -------- -->
@@ -91,18 +90,22 @@ To rollback a MAD-X release (dev or pro), change the symbolic links last-dev or 
 <li>Project: mad
 <li>Volume: p.mad.root
 <li>Mount point: /afs/cern.ch/project/mad
-<li>Administrators: ldeniau, ghislain
+<li>Administrators: ldeniau
 <li>Admin guide: http://information-technology.web.cern.ch/book/afs-administrator-guide
-<li>Occupancy 2014.03.13 (sizes are in kB)
+<li>Occupancy 2017.11.14 (sizes are in kB)
 <small><pre>
-sh$ afs_admin list_project mad
-Project         Quota        Alloc
--------         -----        -----
-mad             50000000     12000000
+sh$ fs listquota
+Volume Name                    Quota       Used %Used   Partition
+p.mad.root                  20000000   13884611   69%          0%
 
-Project         administrators
--------         --------------
-mad             ldeniau ghislain
+sh$ afs_admin list_project mad
+Project                Quota        Alloc
+-------                -----        -----
+mad                 50000000     20000000
+
+Project    administrators
+_______    ______________
+mad        ldeniau
 
 Project         Mount point / Volume patterns                 Pool
 -------         -----------------------------                 ----
@@ -117,11 +120,11 @@ mad             /afs/\.?cern.ch/project/mad
                 ^q\.mad\b                                     std
                 ^p\.mad\b                                     std
 
-mad Volumes     Pool          Used      Quota         Percent  Accesses  Disk
-----------------------------------------------------------------------------------
-p.mad.root      std           9643078   12000000      80       157165    afs240/ag
-----------------------------------------------------------------------------------
-Totals for mad: 1 volumes     9643078   12000000      80       157165
+mad Volumes              Pool          Used      Quota Percent  Accesses Disk
+--------------------------------------------------------------------------------
+p.mad.root               std        13884611  20000000      69     70965 afs281/bi
+--------------------------------------------------------------
+Totals for mad     :    1 volumes     13884611    20000000      69     70965
 </pre></small>
 </ul>
 
