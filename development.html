@@ -13,10 +13,10 @@
 <hr class="h1">
 
 <p>
-MAD-X is improved continuously by the MAD team as well as other contributors. This webpage is dedicated to developers who want to participate to the improvement of the application, as mentioned in the <a href="roadmap.html">roadmap</a>.
+MAD-X is improved continuously by the MAD team as well as other collaborators. This webpage is dedicated to developers who want to participate to the improvement of the application.
 
 <p>
-<b>Note: every new development (or important modifications) must be done on a separate branch of the source code (<a href="releases.html">see releases</a>) and pass all the tests before being merged back to the main trunk. All developpers should subscribe to mad-dev and mad-src e-groups (<a href="support.html">see support</a>) to be informed of ongoing releases, to follow changes on the trunk, and to be able to check nightly builds and tests reports (<a href="resources.html">see resources</a> or hereafter) and correct tests failing on other platforms.</b>
+<b>Note: every development must be done on a separate branch from the master (see <a href="releases.html">releases</a>) and pass all the tests before being merged through a Pull Request (mandatory). All developpers should subscribe to notifications and mad-dev e-group (see <a href="support.html">support</a>) to be informed about what is ongoing on in the repository.</b>
 
 <!-- -------- -->
 <hr class="sep">
@@ -24,7 +24,7 @@ MAD-X is improved continuously by the MAD team as well as other contributors. Th
 <h3>MAD-X nightly builds and tests</h3>
 
 <p>
-MAD-X is built and tested each night to ensure that new developments do not break the proper functioning of the application. If some tests appear to be failing, a report summary containing the list of failing tests and the corresponding architectures is sent to the e-group <tt>mad-src</tt> (see <a href="support.html">support</a>). The complete reports of the builts and the tests for each supported architecture can be browsed from the <a href="http://cern.ch/madx/madX/tests/reports">reports repository</a>, where the history is rotated over 50 days.
+MAD-X is built and tested each night to ensure that new developments do not break the proper functioning of the application on all supported platforms. If some tests appear to be failing, a report summary containing the list of failing tests and the corresponding architectures is sent to the e-group <tt>mad-src</tt> (see <a href="support.html">support</a>). The complete reports of the builts and the tests for each supported architecture can be browsed from the <a href="http://cern.ch/madx/madx-reports">reports repository</a>, where the history is kept for one year.
 
 <p>
 The scripts used to make the nightly reports can be found in the directory <tt>scripts</tt> and seen as examples of proper usage of the builds and tests system.
@@ -86,6 +86,9 @@ make <i>test-name-list</i> [ARCH=32|64]
 </pre>
 </ul>
 The <tt>ARCH</tt> option forces to run the tests for a specific architecture (e.g. 32 bit or 64 bit) instead of the detected one. The commands based on <tt><i>test-name-list</i></tt> are useful to run only few tests, or to run tests that are not yet registered in the file <tt>Makefile_test</tt>. A <tt><i>test-name</i></tt> is the name of the test directory in <tt>madX/tests</tt> (e.g. <tt>test-twiss</tt>). If <tt>TESTS</tt> is set to <tt>detect</tt>, it will run all the tests in <tt>madX/tests/test-*</tt>. The last command is equivalent to the third one, but it will report an obscur error if the tests does not exists, and it will not display the trailing summary. To trace what is going on during the tests, you can add the option <tt>SHOW=yes</tt> to any of the commands above. To see the available test name, look at the file <tt>Makefile_test</tt>.
+
+<p>
+<b>To speed-up the tests setup</b> for <tt>numdiff</tt> constraints (i.e. <tt>.cfg</tt> files), you can run the above <tt>make</tt> commands with the option <tt>TESTCMD=</tt> (i.e. force empty option) that will run only <tt>numdiff</tt> (very fast) and not <tt>madx</tt> (may be slow).
 
 <p>
 Note that on Windows platforms, you will need to download and install <a href="http://gnuwin32.sourceforge.net/packages/make.htm">GNU make</a> to run the tests.

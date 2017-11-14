@@ -12,49 +12,30 @@
 <h1>Releases</h1>
 <hr class="h1">
 
-<p>
-MAD-X binaries are released for the Linux, Mac OS X and Windows platforms for 32 bit (on demand) and 64 bit architectures.
-<p>
-To quickly know the latest release numbers, see <a href="changes.html">Changes</a>.
-<p>
-To quickly know a sketchy list of changes between releases, see <a href="changelog.html">Changelog</a>.
-
-<!-- -------- -->
-<hr class="sep">
-
 <h3>MAD-X releases</h3>
 
-<p>
-MAD-X releases are numbered <tt>m.ff.bb</tt> where the bug fix <tt>bb</tt> (or minor) number follows the features <tt>ff</tt> (or major) release number. Bug fix releases are delivered when needed to include last changes and bugs correction. Major releases are delivered when significant new features are added.
-
-<p>
-The last release can be downloaded from the
+<ul>
+<li>MAD-X current release <b><a href="changes.html">5.03.07</a></b> is available from the
 <a href="http://cern.ch/madx/releases/last-rel">releases repository</a>.
 
-<!-- -------- -->
-<hr class="sep">
+<li>
+The source code is avalaible on
+<a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X">GitHub</a>, and includes a <a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/wiki/Git">Wiki</a>
+on Git.
 
-<h3>MAD-X source releases</h3>
-
-<p>
-MAD-X source code can be browsed or downloaded from the
-<a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X">GitHub</a> web interface.
-
-<p>
-MAD-X source code can be checkout using Git commands, see the
-<a target="_blank" href="http://github.com/MethodicalAcceleratorDesign/MAD-X/wiki/Git">Wiki</a>
-for more information.
+<li> To be informed about new releases, you must subscribe to mad-pub (see <a href="support.html">support</a>).
+</ul>
 
 <!-- -------- -->
 <hr class="sep">
 
 <h3>MAD-X previous releases</h3>
 
-<p>
-MAD-X previous releases can be downloaded from the <a href="http://cern.ch/madx/releases/">releases repository</a>.
+<ul>
+<li>Previous releases can be downloaded from the <a href="http://cern.ch/madx/releases/">releases repository</a>.
 
-<p>
-MAD-X old releases (releases pre-5.00.00) can be accessed on <tt>lxplus.cern.ch</tt> from the directory <tt>~mad/madx/releases/old</tt>.
+<li>Older releases (pre 5.00.00) can be accessed from <tt>lxplus.cern.ch:~mad/madx/releases/old</tt>.
+</ul>
 
 <!-- -------- -->
 <hr class="sep">
@@ -62,13 +43,13 @@ MAD-X old releases (releases pre-5.00.00) can be accessed on <tt>lxplus.cern.ch<
 <h3>MAD-X local install</h3>
 
 <p>
-The following instructions assume that you downloaded the 64 bit development release from the development release repository.
+The following instructions assume that you downloaded the last 64 bit release from the release repository.
 
 <h4>On Linux <small>(all distributions)</small></h4>
 <ul>
 <li> In a terminal, execute the commands
 <pre>
-mv madx-linux64 madx
+mv madx-linux64-xxx madx
 chmod u+x madx
 ./madx
 </pre>
@@ -78,7 +59,7 @@ chmod u+x madx
 <ul>
 <li> In a terminal, execute the commands
 <pre>
-mv madx-macosx64 madx
+mv madx-macosx64-xxx madx
 chmod u+x madx
 ./madx
 </pre>
@@ -88,13 +69,13 @@ chmod u+x madx
 <ul>
 <li> In a terminal, execute the commands
 <pre>
-move madx-win64.exe madx.exe
+move madx-win64-xxx.exe madx.exe
 ./madx.exe
 </pre>
 </ul>
 
 <p>
-The same instructions can be followed for installing 32 bit releases or the <tt>numdiff</tt> tool required for running MAD-X tests.
+The same instructions can be followed for installing 32 bit releases and the <tt>numdiff</tt> tool (required to run MAD-X tests suites).
 
 <!-- -------- -->
 <hr class="sep">
@@ -113,8 +94,9 @@ MAD-X releases can be run on <tt>lxplus.cern.ch</tt> (AFS) by specifying the abs
 The following binaries and aliases are provided:
 <pre>
 madx          <i>current release</i>
-madx_old      <i>previous major release</i>
-madx_build    <i>last nightly build release (at your own risk)</i>
+madx_prev     <i>previous release</i>
+madx_build    <i>nightly release (at your own risk)</i>
+madx_old      <i>older stable release</i>
 </pre>
 
 <p>
@@ -134,76 +116,7 @@ The alternate paths for MAD versions are deprecated but should still work (unmod
 </pre>
 
 <p>
-For interactive use of MAD-X on lxplus, it is convenient to wrap <tt>madx</tt> into the <tt><a href="http://utopia.knoware.nl/~hlub/uck/rlwrap/#rlwrap">rlwrap</a></tt> application (see <a href="resources.html">Resources</a>).
-
-<!--  --------
-<hr class="sep">
-
-<h3>libMADX on lxplus.cern.ch</h3>
-
-<p>
-MAD-X is also provided as a standalone static and dynamic libraries on <tt>lxplus.cern.ch</tt> (AFS) at the absolute path
-<pre>
-/afs/cern.ch/user/m/mad/lib
-</pre>
-<p>
-(shortcut <tt>~mad/lib</tt>), which can be added to the search paths of your project linker.
-
-<p>
-The following librarries and aliases are provided (same nomenclature as for MAD-X):
-<pre>
-libmadx.a         <i>alias for last production release (libmadx64)</i>
-libmadx32.a       <i>last 32 bit production release</i>
-libmadx64.a       <i>last 64 bit production release</i>
-
-libmadx_dev.a     <i>alias for last development release (libmadx_dev64)</i>
-libmadx_dev32.a   <i>last 32 bit development release</i>
-libmadx_dev64.a   <i>last 64 bit development release</i>
-</pre>
-For dynamic (i.e. shared) versions of the libraries, replace the <tt>.a</tt> by <tt>.so</tt>.
-
-<p>
-libMADX previous releases (starting from 5.00.17) can be found by specifying the version number <tt>m.pp.dd</tt> (e.g. 5.00.17) after the releases path
-<pre>
-~mad/lib/rel/m.pp.dd/libmadx-linux32
-~mad/lib/rel/m.pp.dd/libmadx-linux64
-</pre>
- -->
-
-<!-- --------
-<hr class="sep">
-
-<h3>libPTC on lxplus.cern.ch</h3>
-
-<p>
-PTC is provided as a standalone static and dynamic libraries on <tt>lxplus.cern.ch</tt> (AFS) at the absolute path
-<pre>
-/afs/cern.ch/user/m/mad/lib
-</pre>
-<p>
-(shortcut <tt>~mad/lib</tt>), which can be added to the search paths of your project linker.
-
-<p>
-The following libraries and aliases are provided (same nomenclature as for MAD-X):
-<pre>
-libptc.a          <i>alias for last production release (libptc64)</i>
-libptc32.a        <i>last 32 bit production release</i>
-libptc64.a        <i>last 64 bit production release</i>
-
-libptc_dev.a      <i>alias for last dwvelopment release (libptc_dev64)</i>
-libptc_dev32.a    <i>last 32 bit development release</i>
-libptc_dev64.a    <i>last 64 bit development release</i>
-</pre>
-For dynamic (i.e. shared) versions of the libraries, replace the <tt>.a</tt> by <tt>.so</tt>.
-
-<p>
-PTC previous releases (starting from 5.00.13) can be found by specifying the version number <tt>m.pp.dd</tt> (e.g. 5.00.13) after the releases path
-<pre>
-~mad/lib/rel/m.pp.dd/libptc-linux32
-~mad/lib/rel/m.pp.dd/libptc-linux64
-</pre>
-
- -->
+For interactive use of MAD-X on lxplus, it is convenient to wrap <tt>madx</tt> into the <tt><a href="http://utopia.knoware.nl/~hlub/uck/rlwrap/#rlwrap">rlwrap</a></tt> application (see <a href="resources.html">resources</a>).
 
 <!-- -------- -->
 <hr class="sep">
@@ -218,9 +131,6 @@ The old versions of MAD, namely <tt>mad8</tt> and <tt>mad9</tt>, are available i
 
 <p>
 <tt>mad8</tt> requires a dictionnary file named <tt>dict</tt> that can be copied from the file <tt>mad8.dict</tt> from this repository.
-
-<p>
-All the MAD versions can be launched through the front-end script <tt>mad</tt> which supports various options.
 
 <p>
 The unsupported old releases of MAD can be downloaded from the
