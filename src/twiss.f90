@@ -1787,10 +1787,6 @@ subroutine track_one_element(el, fexit, contrib_rms)
 
     call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te,.true.,el/two)
 
-    ! TG: the `fmap` condition is only an approximation of the previous
-    ! behaviour of the `centre` option - which was handled inconsistently
-    ! across different elements (some never called twcptk, some always did,
-    ! some only in certain cases):
     if (fmap) call twcptk(re,orbit)
 
     call save_opt_fun()
@@ -2951,7 +2947,7 @@ subroutine track_one_element(el, fexit)
      call backup_optics()
 
      call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te,.true.,el/two)
-     ! TG: same comment as in twchgo (inconsistent center behaviour) applies here:
+
      if (fmap) call twbttk(re,te)
 
      call save_opt_fun()
