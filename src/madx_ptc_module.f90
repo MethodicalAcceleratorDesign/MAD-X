@@ -542,35 +542,50 @@ CONTAINS
     APERTURE = zero
     call get_node_vector('aperture ',nn,aperture)
 
+    if (getdebug() > 2) then
+       print*,' Aperture type: >',aptype,'< ',nn,' parameters:'
+       do i=1,nn
+         print*,'             ',i,' : ',aperture(i)
+       enddo
+    endif
     !print*, name,'madx_ptc_module: Got for aperture nn=',nn, aperture(1), aperture(2)
 
     if(.not.((aptype.eq."circle".and.aperture(1).eq.zero).or.aptype.eq." ")) then
 
-       c_%APERTURE_FLAG=.true.
-       select case(aptype)
-       case("circle")
+      c_%APERTURE_FLAG=.true.
+      select case(aptype)
+        case("circle")
           key%list%aperture_on=.true.
           key%list%aperture_kind=1
           key%list%aperture_r(1)=aperture(1)
           key%list%aperture_r(2)=aperture(1)
-       case("ellipse")
+          if (getdebug() > 2) then
+             print*,' Aperture: circle with ',aperture(1),' radius'
+          endif
+        case("ellipse")
           key%list%aperture_on=.true.
           key%list%aperture_kind=1
           key%list%aperture_r(1)=aperture(1)
           key%list%aperture_r(2)=aperture(2)
-       case("rectangle")
+          if (getdebug() > 2) then
+             print*,' Aperture: ellipse with ',aperture(1),' ',aperture(2),' radii'
+          endif
+        case("rectangle")
           key%list%aperture_on=.true.
           key%list%aperture_kind=2
           key%list%aperture_x=aperture(1)
           key%list%aperture_y=aperture(2)
-       case("lhcscreen") ! 2015-Mar-10  14:28:41  ghislain: added
+          if (getdebug() > 2) then
+             print*,' Aperture: rectangle with ',aperture(1),' ',aperture(2),' XY'
+          endif
+        case("lhcscreen") ! 2015-Mar-10  14:28:41  ghislain: added
           key%list%aperture_on=.true.
           key%list%aperture_kind=3
           key%list%aperture_x=aperture(1)
           key%list%aperture_y=aperture(2)
           key%list%aperture_r(1)=aperture(3)
           key%list%aperture_r(2)=aperture(3)
-       case("rectcircle") ! 2015-Mar-10  14:28:41  ghislain: added
+        case("rectcircle") ! 2015-Mar-10  14:28:41  ghislain: added
           key%list%aperture_on=.true.
           key%list%aperture_kind=3
           key%list%aperture_x=aperture(1)
@@ -584,24 +599,28 @@ CONTAINS
           key%list%aperture_y=aperture(2)
           key%list%aperture_r(1)=aperture(3)
           key%list%aperture_r(2)=aperture(4)
-       case("racetrack") ! 2015-Mar-10  14:25:24  ghislain: generalized racetrack
+        case("racetrack") ! 2015-Mar-10  14:25:24  ghislain: generalized racetrack
           key%list%aperture_on=.true.
           key%list%aperture_kind=5
           key%list%aperture_x=aperture(1)
           key%list%aperture_y=aperture(2)
           key%list%aperture_r(1)=aperture(3)
           key%list%aperture_r(2)=aperture(4)
-       case("octagon") ! 2015-Mar-10  14:25:37  ghislain: added octagon
+        case("octagon") ! 2015-Mar-10  14:25:37  ghislain: added octagon
           key%list%aperture_on=.true.
           key%list%aperture_kind=6
           key%list%aperture_x=aperture(1)
           key%list%aperture_y=aperture(2)
           key%list%aperture_r(1)=aperture(3)
           key%list%aperture_r(2)=aperture(4)
-       case("general") ! 2015-Mar-10  14:25:48  ghislain: kind was 6
+        case("general") ! 2015-Mar-10  14:25:48  ghislain: kind was 6
           key%list%aperture_kind=7
           print*,"General aperture not implemented"
           call aafail('ptc_input:','General aperture not implemented. Program stops')
+        case DEFAULT
+          write(whymsg,*) 'Aperture: <<',aptype,'>> at magnet ',name(:len_trim(name)),' is not recognized by PTC'
+          call fort_warn('ptc_createlayout: ',whymsg(:len_trim(whymsg)))
+          call aafail('ptc_input:','Aperture type not implemented. Program stops')
        end select
   !  else
   !   if( .not. ((code.eq.1) .or. (code.eq.4)) ) then
@@ -614,7 +633,10 @@ CONTAINS
     endif
     call append_empty(my_ring)
 
-  !  print *,'Element ',key%list%name,' code is ',code
+    if (getdebug() > 2) then
+       print *,'Element ',key%list%name,' code is ',code
+    endif
+  
 
     select case(code)
     case(0,25)
