@@ -3426,9 +3426,6 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
      case (code_marker)
         ! nothing on purpose!
 
-     case (code_gbend)
-        ! nothing for now...
-
      case (code_wire)
         ! nothing for now...
 
