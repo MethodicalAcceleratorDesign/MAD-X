@@ -224,7 +224,7 @@ subroutine suelem(el, ve, we, tilt)
 
   select case (code)
 
-     case (code_rbend, code_sbend, code_gbend) !---- RBEND, SBEND, GBEND
+     case (code_rbend, code_sbend) !---- RBEND, SBEND
         angle = node_value('angle ') * bv
         if (abs(angle) .ge. 1d-13) then
            dx = el * (cos(angle)-one)/angle

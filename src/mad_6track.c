@@ -264,7 +264,6 @@ struct object
 /*#define FIELD_MAX 40*/        /* field error array length */
 #define KEY_LENGTH 48       /* from DOOM */
 #define MM_KEEP 2           /* no. of element name starts to keep */
-#define N_TYPES 39          /* no. of valid element types */
 #define MULTI_MAX 24        /* element array length for multipoles */
 #define NT34 5              /* no. of element types in special fort.34 */
 #define LINES_MAX 3         /* structure output line max. names */
@@ -382,8 +381,6 @@ static int my_table_row(struct table*, char*);
 /* routines used from makethin.c */
 static struct li_list types;
 
-static struct type_info* t_info[N_TYPES];
-
 static struct block   *first_block; //, *last_block; not used
 static struct block*   prev_block;
 static struct block*   current_block = NULL;
@@ -401,7 +398,7 @@ static struct object *p_err_zero;  /* pointer to error object with all zeroes */
 
 static int last_row = 0;
 
-static char el_info[N_TYPES][60] = /* see type_info definition */
+static char el_info[][60] = /* see type_info definition */
 /*           l=0 l>0,normal l>0,skew ->drift make_k*l split */
 {"aperture     2       2       2       0       0       0",
  "beambeam     2       2       2       0       0       0",
@@ -411,7 +408,6 @@ static char el_info[N_TYPES][60] = /* see type_info definition */
  "decapole     2       2       2       0       1       2",
  "ecollimator  2       1       1       0       0       0",
  "elseparator  0       1       1       1       0       0",
- "gbend        1       1       1       2       1       1",
  "hkicker      5       5       5       1       0       3",
  "hmonitor     0       1       1       1       0       0",
  "instrument   0       1       1       1       0       0",
@@ -443,6 +439,11 @@ static char el_info[N_TYPES][60] = /* see type_info definition */
  "rfsextupole  2       0       2       0       0       2",
  "rfoctupole   2       0       2       0       0       2"
 };
+
+/* no. of valid element types */
+enum { N_TYPES = sizeof el_info / sizeof *el_info };
+
+static struct type_info* t_info[N_TYPES];
 
 static char mpole_names[][16] = {"dipole", "quadrupole", "sextupole",
                           "octupole", "decapole", "multipole"};
