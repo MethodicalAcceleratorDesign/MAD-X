@@ -15,3 +15,24 @@ intrac(void)
   fstat(0, &stats);
   return (in->input_files[0] == stdin && S_ISFIFO(stats.st_mode)) || isatty(0);
 }
+
+const char * 
+strword(const char * str, const char * word)
+{
+  const char * p = str;
+  for(;;) {
+    p = strstr(p, word);
+    if (p == NULL) break;
+
+    if ((p==str) || !isalnum((unsigned char)p[-1])) {
+      p += strlen(word);
+      if (!isalnum((unsigned char)*p)) {
+        break;  // found, quit
+      }
+    }
+    // substring was found, but no word match, move by 1 char and retry
+    p+=1;
+  }
+  return p;
+}
+

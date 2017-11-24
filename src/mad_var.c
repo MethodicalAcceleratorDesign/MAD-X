@@ -343,6 +343,11 @@ enter_variable(struct in_cmd* cmd) /* stores variable contained in cmd */
       type = 2;
       name_pos = 0;
       break;
+    case 17:
+      val_type = 1;
+      type = 17;
+      name_pos = 0;
+      break;
     default:
       fatal_error("illegal command sub_type in:",
                   join(cmd->tok_list->p, cmd->tok_list->curr));
@@ -372,17 +377,50 @@ enter_variable(struct in_cmd* cmd) /* stores variable contained in cmd */
     else if (exp_type == 1) /* literal constant */
     {
       val = simple_double(cmd->tok_list->p, start, end);
-      var = new_variable(name, val, val_type, type, NULL, NULL);
+      const int pos = name_list_pos(name, variable_list->list);
+      if (pos > -1 && type == 17) {
+        struct variable* this_var = variable_list->vars[pos];
+        struct expression* old_expr = this_var->expr;
+        const char * operator = (val < 0) ? " - " : " + "; //handle :+=-
+        val = expr_combine(old_expr, this_var->value, operator, NULL, abs(val), &expr);
+        type = (expr == NULL) ? 1 : 2;
+      }
+      var = new_variable(name, val, val_type, type, expr, NULL);
       add_to_var_list(var, variable_list, 1);
     }
     else
     {
       if (polish_expr(end + 1 - start, &cmd->tok_list->p[start]) == 0)
       {
-        if (type == 2) /* deferred: expression kept */
+        if (type == 2 || type == 17) /* deferred: expression kept */
         {
           expr = new_expression(join(&cmd->tok_list->p[start], end + 1 - start), deco);
           val = 0; // LD 2012.10.16: drop warning due to expression_value(expr, type);
+
+          const int pos = name_list_pos(name, variable_list->list);
+          if (pos > -1 && type == 17) /* concat deferred: expression kept */
+          {
+            struct variable* this_var = variable_list->vars[pos];
+            struct expression* old_expr = this_var->expr;
+            struct expression* new_expr = NULL;
+
+            pre_split(old_expr->string, c_dum, 0);
+            strcpy(old_expr->string, c_dum->c);
+
+            pre_split(expr->string, c_dum, 0);
+            strcpy(expr->string, c_dum->c);
+
+            //Check for circulars:
+            if ( strword(expr->string, this_var->name) )
+              fatal_error("circular assignment in", expr->string);
+
+            const char* operator = strchr("+-",expr->string[0]) ? " " : " + "; //handle :+=-
+            expr_combine(old_expr, this_var->value, operator, expr, val, &new_expr);
+
+            delete_expression(expr);
+            expr = new_expr; //transfer ownership
+          }
+          type = 2; //set deferred in case type was 17
         }
         else
         {
