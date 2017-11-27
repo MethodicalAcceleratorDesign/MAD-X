@@ -1,0 +1,36 @@
+TITLE, "test elseparator";
+Option, -echo, -info, -warn;
+
+
+testseq	:	SEQUENCE	,	L	=	9	;
+QD11	:	QUADRUPOLE	,	L	=	1.3		,	K1	:=	-0.204516332	,	at	=	1	;
+QD12	:	QUADRUPOLE	,	L	=	1.3		,	K1	:=	0.202793439		,	at	=	3	;
+LP2		:	ELSEPARATOR	,	L	=	0.5		,	EX=0.0001,	EY	=	0.000	,	at	=	5, tilt=0	;
+LP3		:	ELSEPARATOR	,	L	=	0.5		,	EX=0.0001,	EY	=	0.000	,	at	=	5.5, tilt=-pi/2	;
+after : MARKER , at=6.1;
+QD21	:	QUADRUPOLE	,	L	=	1.3		,	K1	:=	-0.204516332	,	at	=	7	;
+endsequence;
+
+
+Option, -echo, -info, -warn;
+Beam,sequence=testseq, particle = proton, energy=10;
+
+use, sequence=testseq;
+
+select, flag=twiss, clear;
+select, flag=twiss, column=name,keyword,s,x,px,y,py, betx, bety,mux,muy;
+twiss, file="elseparator.twiss", BETX=1, BETY=1;
+
+SELECT, FLAG=makethin, class=quadrupole, SLICE=10;
+makethin, sequence=testseq;
+save, sequence=testseq, file="testseq_thin.seq";
+
+use, sequence=testseq;
+Beam,sequence=testseq, particle = proton, energy=10;
+
+
+TRACK, FILE="ELSEPARATOR", ONEPASS	;
+START, X=0.000, Y=0.000;
+OBSERVE, PLACE=after;
+RUN, TURNS=1;
+
