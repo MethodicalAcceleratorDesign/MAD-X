@@ -1200,14 +1200,16 @@ An \texttt{ELSEPARATOR} element has four real attributes:
      A positive field increases \textit{p$_y$} for positive particles.  
    \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
      rad). A positive angle represents a clockwise of the electrostatic
-     separator.  
+     separator.
+   \ttitem{EX\_L} The integrated vertical electric field strength (default: 0 MV).
+    This parameter is only used in \hyperref[sec:trackoverview]{\texttt{THINTRACK}} and ignored by \hyperref[chap:twiss]{\texttt{TWISS}}. 
+   \ttitem{EY\_L}  The integrated horizontal electric field strength (default: 0 MV).
+    This parameter is only used in \hyperref[sec:trackoverview]{\texttt{THINTRACK}} and ignored by \hyperref[chap:twiss]{\texttt{TWISS}}.
 \end{madlist}
-
 An electrostatic separator requires the particle \texttt{ENERGY} and the
 particle \texttt{CHARGE} to be set by a
 \hyperref[sec:beam]{\texttt{BEAM}} command before any calculation is
-performed.
-
+performed. Note that no thin elseparator currently exists in \hyperref[chap:twiss]{\texttt{TWISS}}. 
 Example: 
 \madxmp{
 BEAM, PARTICLE=positron, ENERGY=50.0;\\

@@ -5172,8 +5172,8 @@ SUBROUTINE tmsep(fsec,ftrk,fcentre,orbit,fmap,dl,ek,re,te)
      !-- get element parameters
      elpar_vl = el_par_vector(e_ey, g_elpar)
      !---- Strength and tilt.
-     exfld = g_elpar(e_ex)
-     eyfld = g_elpar(e_ey)
+     exfld = g_elpar(e_ey) !--This is a correct. Needs to be like this because of how the tilt is defined.
+     eyfld = g_elpar(e_ex) !--This is a correct. Needs to be like this because of how the tilt is defined.
      tilt = g_elpar(e_tilt)
      if (eyfld.ne.zero) then
         tilt = -atan2(eyfld, exfld) + tilt
