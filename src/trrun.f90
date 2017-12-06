@@ -4562,7 +4562,7 @@ subroutine tttdipole(track, ktrack)
         hy = (     k1*y) / delta_plus_1;
         if (quantum) then
            curv = sqrt(hx**2+hy**2);
-           call trphot(length / two * (one + h*x) - tan(e1)*x, curv, rfac, deltas);
+           call trphot(length * (one + h*x) - two * tan(e1)*x, curv, rfac, deltas);
         else
            rfac = (arad * gamma**3 * two / three) * (hx**2 + hy**2) * (length / two * (one + h*x) - tan(e1)*x)
         endif
@@ -4592,7 +4592,7 @@ subroutine tttdipole(track, ktrack)
         hy = (     k1*y) / delta_plus_1;
         if (quantum) then
            curv = sqrt(hx**2+hy**2);
-           call trphot(length / two * (one + h*x) - tan(e2)*x, curv, rfac, deltas);
+           call trphot(length * (one + h*x) - two * tan(e2)*x, curv, rfac, deltas);
         else
            rfac = (arad * gamma**3 * two / three) * (hx**2 + hy**2) * (length / two * (one + h*x) - tan(e2)*x)
         endif
@@ -4729,6 +4729,7 @@ subroutine trphot(el,curv,rfac,deltap)
 
   !---- AMEAN is the average number of photons emitted.,
   !     NPHOT is the integer number generated from Poisson's law.
+  !-AL- AMEAN implicitly takes el / 2 (half the element length)
   amean = five * sqrt(three) / (twelve * hbar * clight) * abs(arad * pc * (one+deltap) * el * curv)
   ucrit = three/two * hbar * clight * gamma**3 * abs(curv)
   sumxi = zero
