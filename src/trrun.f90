@@ -4562,9 +4562,9 @@ subroutine tttdipole(track, ktrack)
         hy = (     k1*y) / delta_plus_1;
         if (quantum) then
            curv = sqrt(hx**2+hy**2);
-           call trphot(length * (one + h*x) * (one - tan(e1)*x), curv, rfac, deltas);
+           call trphot(length / two * (one + h*x) - tan(e1)*x, curv, rfac, deltas);
         else
-           rfac = (arad * gamma**3 * length / three) * (hx**2 + hy**2) * (one + h*x) * (one - tan(e1)*x)
+           rfac = (arad * gamma**3 * two / three) * (hx**2 + hy**2) * (length / two * (one + h*x) - tan(e1)*x)
         endif
         if (damp) then
            px = px - rfac * (one + pt) * px
@@ -4592,9 +4592,9 @@ subroutine tttdipole(track, ktrack)
         hy = (     k1*y) / delta_plus_1;
         if (quantum) then
            curv = sqrt(hx**2+hy**2);
-           call trphot(length * (one + h*x) * (one - tan(e2)*x), curv, rfac, deltas);
+           call trphot(length / two * (one + h*x) - tan(e2)*x, curv, rfac, deltas);
         else
-           rfac = (arad * gamma**3 * length / three) * (hx**2 + hy**2) * (one + h*x) * (one - tan(e2)*x)
+           rfac = (arad * gamma**3 * two / three) * (hx**2 + hy**2) * (length / two * (one + h*x) - tan(e2)*x)
         endif
         if (damp) then
            px = px - rfac * (one + pt) * px
