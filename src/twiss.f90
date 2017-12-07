@@ -1787,10 +1787,6 @@ subroutine track_one_element(el, fexit, contrib_rms)
 
     call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te,.true.,el/two)
 
-    ! TG: the `fmap` condition is only an approximation of the previous
-    ! behaviour of the `centre` option - which was handled inconsistently
-    ! across different elements (some never called twcptk, some always did,
-    ! some only in certain cases):
     if (fmap) call twcptk(re,orbit)
 
     call save_opt_fun()
@@ -2951,7 +2947,7 @@ subroutine track_one_element(el, fexit)
      call backup_optics()
 
      call tmmap(code,.true.,.true.,orbit,fmap,ek,re,te,.true.,el/two)
-     ! TG: same comment as in twchgo (inconsistent center behaviour) applies here:
+
      if (fmap) call twbttk(re,te)
 
      call save_opt_fun()
@@ -2977,12 +2973,6 @@ subroutine track_one_element(el, fexit)
   call save_opt_fun()
   if (.not.centre) then
      call twprep(save,2,opt_fun,zero,i)
-  else
-     ! TODO: it is inconsistent that amux,amy from twcpgo are overwritten
-     ! with the values from twchgo here. These two lines should be removed
-     ! but it will break a test or two:
-     opt_fun(5) = amux
-     opt_fun(8) = amuy
   endif
 end subroutine track_one_element
 
@@ -3435,9 +3425,6 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
 
      case (code_marker)
         ! nothing on purpose!
-
-     case (code_gbend)
-        ! nothing for now...
 
      case (code_wire)
         ! nothing for now...
@@ -5185,8 +5172,8 @@ SUBROUTINE tmsep(fsec,ftrk,fcentre,orbit,fmap,dl,ek,re,te)
      !-- get element parameters
      elpar_vl = el_par_vector(e_ey, g_elpar)
      !---- Strength and tilt.
-     exfld = g_elpar(e_ex)
-     eyfld = g_elpar(e_ey)
+     exfld = g_elpar(e_ey) !--This is a correct. Needs to be like this because of how the tilt is defined.
+     eyfld = g_elpar(e_ex) !--This is a correct. Needs to be like this because of how the tilt is defined.
      tilt = g_elpar(e_tilt)
      if (eyfld.ne.zero) then
         tilt = -atan2(eyfld, exfld) + tilt

@@ -2268,8 +2268,8 @@ element* SeqElList::create_thin_elseparator(const element* thick_elem, int slice
     add_cmd_parameter_clone(cmd,return_param("from",thick_elem),"from",1);
     add_lrad(cmd,length_param,slices);
   }
-  add_cmd_parameter_clone(cmd,ex_param,"ex",1); // keep ex
-  add_cmd_parameter_clone(cmd,ey_param,"ey",1); // keep ey
+  //add_cmd_parameter_clone(cmd,ex_param,"ex",1); // keep ex
+  //add_cmd_parameter_clone(cmd,ey_param,"ey",1); // keep ey
   add_cmd_parameter_clone(cmd,tilt_param,"tilt",1); // keep tilt
   if(!minimizefl)
   { // create ex_l from ex

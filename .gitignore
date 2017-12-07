@@ -84,6 +84,7 @@ tests/**/*.txt
 tests/**/resultb[0-9]
 tests/**/result[0-9]
 tests/**/*.tab[0-9]
+tests/**/dummyone
 
 tests/test-cororbit-2/cx12.tab_1
 tests/test-cororbit-2/cx12.tab_2

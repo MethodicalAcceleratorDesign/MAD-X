@@ -89,12 +89,12 @@ module code_constfi
   integer, parameter :: code_ecollimator = 20
   integer, parameter :: code_rcollimator = 21
   integer, parameter :: code_beambeam = 22
-  ! code 23 is missing
+  ! code 23 is free
   integer, parameter :: code_instrument = 24
   integer, parameter :: code_marker = 25
-  integer, parameter :: code_gbend = 26
+  ! code 26 is free
   integer, parameter :: code_twcavity = 27
-  ! code 28 is missing
+  ! code 28 is free
   integer, parameter :: code_wire = 29
   integer, parameter :: code_slmonitor = 30
   integer, parameter :: code_blmonitor = 31
