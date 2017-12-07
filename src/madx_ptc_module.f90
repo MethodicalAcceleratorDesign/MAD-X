@@ -920,6 +920,7 @@ CONTAINS
          ! key%list%k(1)=normal(0)
           
           do i=1,nn
+             !print*, "multipole normal ", i, " = ", normal(i)
              key%list%k(i+1)=normal(i)
           enddo
        endif
@@ -929,6 +930,7 @@ CONTAINS
          ! key%list%ks(1)=skew(0)
          
           do i=1,ns
+             !print*, "multipole skew ", i, " = ", skew(i)
              key%list%ks(i+1)=skew(i)
           enddo
        endif
@@ -969,6 +971,8 @@ CONTAINS
              call augment_count('errors_total ')
           endif
        endif
+       
+       
     case(9) ! PTC accepts mults
        key%magnet="solenoid"
        ks=node_value('ks ')
