@@ -259,9 +259,10 @@ subroutine suelem(el, ve, we, tilt)
 !       if (angle .eq. 1d20) then
           normal(0) = 0
           call get_node_vector('knl ', nn, normal)
-          angle = normal(0) * bv
+          angle = normal(0)
 !       endif
 
+        angle = angle * bv
         cospsi = cos(tilt);  sinpsi = sin(tilt)
         costhe = cos(angle); sinthe = sin(angle)
 
