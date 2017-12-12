@@ -14,7 +14,7 @@ endsequence;
 use, sequence=seq;
 select, flag=twiss, column=name, s, x,px, y, py, PT, T;
 twiss,X=-0.0,Y=0.000, BETX=1, BETY=1, file="translation.twiss";
-
+SURVEY, SEQUENCE=seq, FILE= survey.out, x0=0.01;
 
 
 seq_notrans: sequence, refer=center, l=circum;
