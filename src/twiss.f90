@@ -3432,8 +3432,11 @@ SUBROUTINE tmmap(code,fsec,ftrk,orbit,fmap,ek,re,te,fcentre,dl)
      case (code_dipedge)
         call tmdpdg(ftrk,orbit,fmap,ek,re,te)
 
-     case (code_changeref, code_translation)
-        ! nothing for now...
+     case (code_translation)
+        call tmtrans(ftrk,orbit)
+
+      case(code_changeref)
+        call fort_warn('TWISS: ','Changeref is nto implemented for MAD-X twiss.')
 
      case (code_crabcavity)
         call tmcrab(fsec,ftrk,orbit,fmap,dl,ek,re,te)
@@ -5651,6 +5654,54 @@ SUBROUTINE tmsol0(fsec,ftrk,orbit,fmap,el,ek,re,te)
 
 end SUBROUTINE tmsol0
 
+SUBROUTINE tmtrans(ftrk,orbit)
+  use twisslfi
+  use twissbeamfi, only : beta
+  implicit none
+  !----------------------------------------------------------------------*
+  !     Purpose:                                                         *
+  !     TRANSPORT map for translation.                         *
+  !     Treated in a purely linear way.                                  *
+  !     Input:                                                           *
+  !     ftrk      (logical) if true, track orbit.                        *
+  !     Input/output:                                                    *
+  !     orbit(6)  (double)  closed orbit.                                *
+  !     Output:                                                          *
+  !     fmap      (logical) if true, element has a map.                  *
+  !     ek(6)     (double)  kick due to element.                         *
+  !     re(6,6)   (double)  transfer matrix.                             *
+  !     te(6,6,6) (double)  second-order terms.                          *
+  !----------------------------------------------------------------------*
+  logical :: ftrk, fmap
+  double precision :: orbit(6);
+
+  double precision :: x, px, y, py, t, pt
+  double precision :: node_value
+
+
+ !---- Get translation parameters
+ x    = node_value('x ')
+ px   = node_value('px ')
+ y    = node_value('y ')
+ py   = node_value('py ')
+ t    = node_value('t ')
+ pt   = node_value('pt ')
+
+ !re(1,1) =  t_x
+ orbit(1) = orbit(1) + x
+ orbit(2) = orbit(2) + px
+ orbit(3) = orbit(3) + y
+ orbit(4) = orbit(4) + py
+ orbit(5) = orbit(5) + t
+ orbit(6) = orbit(6) + pt
+
+ print *, "output", orbit(1)
+  
+  !---- Track orbit.
+  !if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
+
+end SUBROUTINE tmtrans
+
 SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
   use twisslfi
   use math_constfi, only : zero
@@ -5694,6 +5745,7 @@ SUBROUTINE tmsrot(ftrk,orbit,fmap,ek,re,te)
   re(2,4) = st
   re(4,2) = -st
   re(4,4) = ct
+
 
   !---- Track orbit.
   if (ftrk) call tmtrak(ek,re,te,orbit,orbit)

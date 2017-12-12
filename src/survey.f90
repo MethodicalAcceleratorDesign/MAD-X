@@ -205,7 +205,7 @@ subroutine suelem(el, ve, we, tilt)
   double precision, intent(OUT) :: ve(3), we(3,3), tilt
 
   integer :: code, nn, ns
-  double precision :: angle, cospsi, costhe, sinpsi, sinthe, ds, dx, dy, bv
+  double precision :: angle, cospsi, costhe, sinpsi, sinthe, ds, dx, dy, bv,x_t,y_t
   double precision :: normal(0:maxmul), skew(0:maxmul)
 
   double precision, external :: node_value
@@ -297,6 +297,12 @@ subroutine suelem(el, ve, we, tilt)
         we(3,2) =  sin(dy)
         we(1,3) = -sin(dy)
         we(3,3) =  cos(dy)
+     case(code_translation) !  Translation of the reference system.  
+        x_t = node_value('x ')
+        y_t = node_value('y ')
+        ve(1) = -x_t
+        ve(2) = -y_t
+        
 
      case default
        ! all straight elements and catch all; use default VE and WE
