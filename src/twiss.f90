@@ -7292,37 +7292,19 @@ SUBROUTINE twwmap(pos, orbit)
   
   sectorpure = get_value('twiss ','sectorpure ') .ne. zero
  
-  accmap=.false.
-  if(sectorpure) then
-    do i = 1, 6
-       sum2 = orbit(i)
-       do k = 1, 6
-          sum1 = zero
-          do l = 1, 6
-             sum1 = sum1 + stmat(i,k,l) * sorb(l)
-          enddo
-          sum2 = sum2 - (srmat(i,k) - sum1) * sorb(k)
-          srmat(i,k) = srmat(i,k) - two * sum1
-       enddo
-       ek(i) = sum2
-    enddo
-  else
-  !---- Track ORBIT0 using zero kick.
-    do i = 1, 6
-       sum2 = orbit(i)
-       do k = 1, 6
-          sum1 = zero
-          do l = 1, 6
-             sum1 = sum1 + stmat(i,k,l) * sorb(l)
-          enddo
-          sum2 = sum2 - (srmat(i,k) - sum1) * sorb(k)
-          !srmat(i,k) = srmat(i,k) - two * sum1
-          
-       enddo
-       ek(i) = sum2
-    enddo
-  endif
-    SORB = ORBIT
+  do i = 1, 6
+     sum2 = orbit(i)
+     do k = 1, 6
+        sum1 = zero
+        do l = 1, 6
+           sum1 = sum1 + stmat(i,k,l) * sorb(l)
+        enddo
+        sum2 = sum2 - (srmat(i,k) - sum1) * sorb(k)
+        if(sectorpure) srmat(i,k) = srmat(i,k) - two * sum1
+     enddo
+     ek(i) = sum2
+  enddo
+  SORB = ORBIT
 
   !---  jluc: note that twiss can be called through madxn.c's (1)
   !     pro_twiss or (2) pro_embedded_twiss
