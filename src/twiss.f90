@@ -7288,11 +7288,10 @@ SUBROUTINE twwmap(pos, orbit)
   integer :: i, k, l
   double precision :: sum1, sum2, ek(6)
   double precision, external :: get_value
-  logical :: accmap
-
-  accmap=.false.
-
-  !---- Track ORBIT0 using zero kick.
+  logical :: accmap, sectorpure
+  
+  sectorpure = get_value('twiss ','sectorpure ') .ne. zero
+ 
   do i = 1, 6
      sum2 = orbit(i)
      do k = 1, 6
@@ -7301,7 +7300,7 @@ SUBROUTINE twwmap(pos, orbit)
            sum1 = sum1 + stmat(i,k,l) * sorb(l)
         enddo
         sum2 = sum2 - (srmat(i,k) - sum1) * sorb(k)
-        !     srmat(i,k) = srmat(i,k) - two * sum1
+        if(sectorpure) srmat(i,k) = srmat(i,k) - two * sum1
      enddo
      ek(i) = sum2
   enddo
