@@ -7291,7 +7291,7 @@ SUBROUTINE twwmap(pos, orbit)
   logical :: accmap, sectorpure
   
   sectorpure = get_value('twiss ','sectorpure ') .ne. zero
-  print *, "This is sectorpure", sectorpure
+ 
   accmap=.false.
   if(sectorpure) then
     do i = 1, 6
@@ -7315,9 +7315,8 @@ SUBROUTINE twwmap(pos, orbit)
           do l = 1, 6
              sum1 = sum1 + stmat(i,k,l) * sorb(l)
           enddo
-          !sum2 = sum2 - (srmat(i,k) - sum1) * sorb(k)
-          
-           ! srmat(i,k) = srmat(i,k) - two * sum1
+          sum2 = sum2 - (srmat(i,k) - sum1) * sorb(k)
+          !srmat(i,k) = srmat(i,k) - two * sum1
           
        enddo
        ek(i) = sum2
