@@ -25,14 +25,14 @@ const char *const_constant_def =
 "const raddeg = pi / 180; "
 "const e = exp(1.); "
 "const amu0 = 4.e-7 * pi; "
-"const emass = 5.10998946131e-4; "
-"const mumass = 0.105658374524; "
-"const nmass = 0.939565413358; "
-"const pmass = 0.938272081358; "
-"const clight = 299792458.; "
-"const qelect = 1.602176620898e-19; "
-"const hbar = 6.58211951440e-25; " /* GeV*s */
-"const erad = 2.817940322719e-15; "
+"const emass = 0.5109989461e-3; "
+"const mumass = 0.1056583745; "
+"const nmass = 0.9395654133; "
+"const pmass = 0.9382720813; "
+"const clight = 299792458; "
+"const qelect = 1.6021766208e-19; "
+"const hbar = 6.582119514e-25; " /* GeV*s */
+"const erad = 2.8179403227e-15; "
 "const prad = erad*emass/pmass; ";
 
 /* mods HG090508 - speed-up twiss
