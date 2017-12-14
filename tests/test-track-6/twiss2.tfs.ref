@@ -2,11 +2,11 @@
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %06s "SMACH2"
 @ PARTICLE         %06s "PROTON"
-@ MASS             %le        0.9382720814
+@ MASS             %le        0.9382720813
 @ CHARGE           %le                   1
 @ ENERGY           %le                 450
 @ PC               %le         449.9990218
-@ GAMMA            %le         479.6050196
+@ GAMMA            %le         479.6050197
 @ KBUNCH           %le                   1
 @ BCURRENT         %le                   0
 @ SIGE             %le               0.001
@@ -40,9 +40,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %08s "no-title"
-@ ORIGIN           %17s "5.03.00 Darwin 64"
-@ DATE             %08s "30/03/17"
-@ TIME             %08s "14.27.01"
+@ ORIGIN           %17s "5.03.07 Darwin 64"
+@ DATE             %08s "14/12/17"
+@ TIME             %08s "17.54.31"
 * NAME                                S                  X                 PX                  Y                 PY                  T                 PT                  L 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le 
  "ENDMK"                             50       0.0956993052    0.0003268034491                  0                  0     -0.04821911066                  0                  0

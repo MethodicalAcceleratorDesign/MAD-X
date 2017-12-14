@@ -13,7 +13,7 @@
 @ SIGT             %le               0.006
 @ NPART            %le               2e+10
 @ EX               %le     8.175983138e-10
-@ EY               %le     2.043995785e-12
+@ EY               %le     2.043995784e-12
 @ ET               %le               0.001
 @ LENGTH           %le                   1
 @ ALFA             %le                   0
@@ -40,9 +40,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %20s "test of rf-multipole"
-@ ORIGIN           %17s "5.03.00 Darwin 64"
-@ DATE             %08s "30/03/17"
-@ TIME             %08s "14.33.42"
+@ ORIGIN           %17s "5.03.07 Darwin 64"
+@ DATE             %08s "14/12/17"
+@ TIME             %08s "18.01.19"
 * NAME                                S               BETX               ALFX                MUX               BETY               ALFY                MUY                 DX                 DY 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "TEST_LINE$START"                    0                  1                  0                  0                0.5                  0                  0                  0                  0

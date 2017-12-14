@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.04  (32 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.04.12               +
-  + Execution date: 2017.04.21 14:19:06      +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2017.12.14 17:56:48      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -2807,19 +2807,20 @@ enter Twiss module
 iteration:   1 error:   4.919639E-04 deltap:   0.000000E+00
 orbit:   2.502626E-06  2.178362E-05 -1.992044E-05 -5.056846E-06  0.000000E+00  0.000000E+00
   
-iteration:   2 error:   6.136162E-11 deltap:   0.000000E+00
+iteration:   2 error:   6.136238E-11 deltap:   0.000000E+00
 orbit:   2.502581E-06  2.178362E-05 -1.992047E-05 -5.056848E-06  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map R symplectic deviation:  0.125523E-11 (symplectifying R)                                                                                                               
 
 ++++++ table: summ
 
             length             orbit5               alfa            gammatr 
-           79896.4                 -0   -8.705207901e-06       -338.9303236 
+           79896.4                 -0   -8.705207895e-06       -338.9303237 
 
                 q1                dq1            betxmax              dxmax 
-       396.9519583        -516.505924        1935.229343        83.58653736 
+       396.9519583        -516.505924        1935.229343        83.58653734 
 
              dxrms             xcomax             xcorms                 q2 
-       10.06105273     0.009272132203     0.000936857887        274.5513551 
+       10.06105273     0.009272132202    0.0009368578869        274.5513551 
 
                dq2            betymax              dymax              dyrms 
       -3406.072522        18543.86421        16.28298408        0.845665949 
@@ -2837,7 +2838,8 @@ orbit:   2.502581E-06  2.178362E-05 -1.992047E-05 -5.056848E-06  0.000000E+00  0
 stop;
 
 
-  Number of warnings: 0
+  Number of warnings: 1
+0 in C and 1 in Fortran
 
   ++++++++++++++++++++++++++++++++++++++++++++
   +          MAD-X finished normally         +
