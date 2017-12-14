@@ -10,33 +10,33 @@ TITLE, "test elseparator";
 Option, -echo, -info, -warn;
 
 enter Twiss module
-  
+
 open line - error with deltap:   0.000000E+00
 initial orbit vector:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
 final orbit vector:     2.557183E-08  7.858251E-09 -1.396904E-08 -3.122029E-09 -1.080614E-16  0.000000E+00
 
 ++++++ table: summ
 
-            length             orbit5               alfa            gammatr 
-                 9                 -0                  0                  0 
+            length             orbit5               alfa            gammatr
+                 9                 -0                  0                  0
 
-                q1                dq1            betxmax              dxmax 
-      0.2221110103                  0        79.24476707    3.155206939e-08 
+                q1                dq1            betxmax              dxmax
+      0.2221110103                  0        79.24476707    3.155206939e-08
 
-             dxrms             xcomax             xcorms                 q2 
-   1.309490747e-08    2.557182584e-08    1.087458442e-08       0.2545684634 
+             dxrms             xcomax             xcorms                 q2
+   1.309490747e-08    2.557182584e-08    1.087458442e-08       0.2545684634
 
-               dq2            betymax              dymax              dyrms 
-                 0         61.8331595    1.059840463e-08    4.940207106e-09 
+               dq2            betymax              dymax              dyrms
+                 0         61.8331595    1.059840463e-08    4.940207106e-09
 
-            ycomax             ycorms             deltap            synch_1 
-   1.396903778e-08     6.11620029e-09                  0                  0 
+            ycomax             ycorms             deltap            synch_1
+   1.396903778e-08     6.11620029e-09                  0                  0
 
-           synch_2            synch_3            synch_4            synch_5 
-                 0                  0                  0                  0 
+           synch_2            synch_3            synch_4            synch_5
+                 0                  0                  0                  0
 
-            nflips 
-                 0 
+            nflips
+                 0
 makethin: slicing sequence : testseq
 enter TRACK module
 one pass is on
