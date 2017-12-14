@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.04  (64 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.04.12               +
-  + Execution date: 2017.04.19 16:40:21      +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2017.12.14 18:08:42      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -180,7 +180,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
          6911.5038                 -0     0.001928024863        22.77422909 
 
                 q1                dq1            betxmax              dxmax 
-       26.12999969    -0.001155831315        103.5088351        4.769309974 
+       26.12999969    -0.001155831316        103.5088351        4.769309974 
 
              dxrms             xcomax             xcorms                 q2 
        2.299396138                  0                  0        26.17999991 
@@ -2641,14 +2641,14 @@ enter Twiss module
  Found 6 initial orbit vector values from twiss command. 
  Initial orbit: 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
 Twiss pre-init: adjusting probe and oneturnmat (fix point)
-updating probe_beam for deltap=0 => ds=   -2.42421662983691988
-  parameters: freq0=  0.0788970808426826681, alfa= 0.00064233277215994429
-              beta=   0.999997826292276071, gamma=    479.606062155549807, dtbyds=                      0
+updating probe_beam for deltap=0 => ds=   -2.42421662983890096
+  parameters: freq0=   0.078897080842682682, alfa=0.000642332772159928352
+              beta=   0.999997826292276182, gamma=     479.60606218519689, dtbyds=                      0
 Twiss pre-init: iteration 1, delta ds = -2.42421663e+00 (fix point)
-updating probe_beam for deltap=0 => ds=   -2.42421662983691988
-  parameters: freq0=  0.0788970808426826681, alfa= 0.00064233277215994429
-              beta=   0.999997826292276071, gamma=    479.606062155549807, dtbyds=                      0
-Twiss pre-init: iteration 2, delta ds = 0.00000000e+00 (fix point)
+updating probe_beam for deltap=0 => ds=   -2.42421662983890007
+  parameters: freq0=   0.078897080842682682, alfa=0.000642332772159928136
+              beta=   0.999997826292276182, gamma=     479.60606218519689, dtbyds=                      0
+Twiss pre-init: iteration 2, delta ds = 8.88178420e-16 (fix point)
  
  Global parameters for protons, radiate = F:
 

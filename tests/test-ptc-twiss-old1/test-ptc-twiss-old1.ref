@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.03.09               +
-  + Execution date: 2017.03.30 14:35:01      +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2017.12.14 18:02:33      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,'Test input for PTC_TWISS';
 
@@ -264,13 +264,13 @@ ptc_create_layout,model=2,method=6,nst=10,exact;
      method                   6
      Num. of steps           10
      charge           1.0000000000000000     
-  Length of machine:    534.59999999999991     
+  Length of machine:    534.59999999999957     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -40.580758467025781        0.0000000000000000        532.53346053079656     
+ After    end:   -40.580758467025717        0.0000000000000000        532.53346053079565     
 !ptc_align;
 
 
@@ -309,7 +309,7 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,no=2;
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-             534.6    0.0004431145119           -1000000           -1000000 
+             534.6    0.0004431145118           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
           -1000000     0.000355079062        47.50529435       0.2546195015 
@@ -384,7 +384,7 @@ PTC_NORMAL,closed_orbit,maptable,icase=5,no=2;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    8.8928289351356365E-005   7.2772925748185414E-007   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Closed orbit:    8.8928289351365526E-005   7.2772925748203054E-007   0.0000000000000000        0.0000000000000000        0.0000000000000000     
 
 
 ptc_end;
@@ -434,13 +434,13 @@ ptc_create_layout,model=2,method=6,nst=5,exact;
      method                   6
      Num. of steps            5
      charge          -1.0000000000000000     
-  Length of machine:    534.59999999999991     
+  Length of machine:    534.59999999999957     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -40.580758467025781        0.0000000000000000        532.53346053079656     
+ After    end:   -40.580758467025717        0.0000000000000000        532.53346053079565     
 
 
 ! Example 1: BETA0 block  ================================================
@@ -471,7 +471,7 @@ ptc_twiss,icase=5,no=2,BETA0=TWSSip,file=twiss_ptc_line;
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
- Closed orbit:    3.2607162420835340E-004   2.5963466741128304E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Closed orbit:    3.2607162420835497E-004   2.5963466741128546E-006   0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Reduced SUMM Table (Inital parameters specified)
 
 ++++++ table: ptc_twiss_summary

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.03.09               +
-  + Execution date: 2017.03.30 14:32:50      +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2017.12.14 18:00:28      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE,'FIVECELL matching with MAD-X. Vlength option';
 
@@ -323,90 +323,91 @@ START JACOBIAN:
 
  reset parameter:mq->l                                           from   3.1000000000000001      to   2.9499980000000003     
  JACOBIAN Strategy =           3
-Initial Penalty Function =   0.8571976411661970E+02
+Initial Penalty Function =   0.8571976411662916E+02
 
 
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    3.3507441737540890E-004
-call:     2 Dx =   0.33507442E-03  Penalty function =  0.1234185653821427E+02
+ Step length    3.3507441744625967E-004
+call:     2 Dx =   0.33507442E-03  Penalty function =  0.1234185654269677E+02
  Solve system with            3 con,           3 var
  Rank             2   Condition number                  -Infinity
- Step length    9.7056937024037708E-005
-call:     3 Dx =   0.97056937E-04  Penalty function =  0.8737660271551146E+01
+ Step length    9.7056937140593277E-005
+call:     3 Dx =   0.97056937E-04  Penalty function =  0.8737660271284874E+01
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    2.7283158444322620E-004
+ Step length    2.7283158437869600E-004
  Bisec iteration            1
-call:     4 Dx =   0.27283144E-03  Penalty function =  0.2107071322165560E+02
+call:     4 Dx =   0.27283144E-03  Penalty function =  0.2107071319635884E+02
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    1.3532680079310989E-004
-call:     5 Dx =   0.13532680E-03  Penalty function =  0.7232243935001982E+01
+ Step length    1.3532680073402088E-004
+call:     5 Dx =   0.13532680E-03  Penalty function =  0.7232243920913150E+01
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    5.5977797761677230E-005
-call:     6 Dx =   0.55977798E-04  Penalty function =  0.5025520768687492E+01
+ Step length    5.5977797725587182E-005
+call:     6 Dx =   0.55977798E-04  Penalty function =  0.5025520750024346E+01
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    2.8710609645094144E-005
-call:     7 Dx =   0.28710610E-04  Penalty function =  0.4318498031446548E+01
+ Step length    2.8710609302193750E-005
+call:     7 Dx =   0.28710609E-04  Penalty function =  0.4318498031407400E+01
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    6.9148198370105808E-007
-call:     8 Dx =   0.69148198E-06  Penalty function =  0.4317998027646516E+01
+ Step length    6.9148180679602402E-007
+call:     8 Dx =   0.69148181E-06  Penalty function =  0.4317998027649040E+01
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    1.6780982850169825E-007
-call:     9 Dx =   0.16780983E-06  Penalty function =  0.4317994194935265E+01
+ Step length    1.6780997655873195E-007
+call:     9 Dx =   0.16780998E-06  Penalty function =  0.4317994194933886E+01
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    2.0140474250592209E-008
-call:    10 Dx =   0.20140474E-07  Penalty function =  0.4317994090482493E+01
+ Step length    2.0140333245264267E-008
+call:    10 Dx =   0.20140333E-07  Penalty function =  0.4317994090479923E+01
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    2.5070052218984352E-009
-call:    11 Dx =   0.25070052E-08  Penalty function =  0.4317994083222585E+01
+ Step length    2.5072710247677046E-009
+call:    11 Dx =   0.25072710E-08  Penalty function =  0.4317994083220671E+01
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    3.1082857836409238E-010
-call:    12 Dx =   0.31082858E-09  Penalty function =  0.4317994082408263E+01
+ Step length    3.1058587613026774E-010
+call:    12 Dx =   0.31058588E-09  Penalty function =  0.4317994082408038E+01
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    3.8598897370951095E-011
-call:    13 Dx =   0.38598897E-10  Penalty function =  0.4317994082310700E+01
+ Step length    3.8571867339619009E-011
+call:    13 Dx =   0.38571867E-10  Penalty function =  0.4317994082309604E+01
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    4.6429129292221117E-012
-call:    14 Dx =   0.46429129E-11  Penalty function =  0.4317994082297908E+01
+ Step length    4.6543499767132811E-012
+call:    14 Dx =   0.46543500E-11  Penalty function =  0.4317994082295565E+01
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    6.3614468126583975E-013
-call:    15 Dx =   0.63614468E-12  Penalty function =  0.4317994082296034E+01
+ Step length    7.6821171881904333E-013
+call:    15 Dx =   0.76821172E-12  Penalty function =  0.4317994082293422E+01
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    4.2374953874555608E-014
-call:    16 Dx =   0.42374954E-13  Penalty function =  0.4317994082293256E+01
- Solve system with            3 con,           3 var
- Rank             2   Condition number                   Infinity
- Step length    2.1748958480140164E-013
+ Step length    1.4270979945553059E-013
  Bisec iteration            1
-call:    17 Dx =   0.21748958E-12  Penalty function =  0.4317994082297123E+01
+call:    16 Dx =   0.14270980E-12  Penalty function =  0.4317994082295435E+01
  Solve system with            3 con,           3 var
  Rank             2   Condition number                   Infinity
- Step length    1.5423036864538977E-013
-call:    18 Dx =   0.15423037E-12  Penalty function =  0.4317994082295712E+01
- Solve system with            3 con,           3 var
- Rank             2   Condition number                   Infinity
- Step length    9.7283444599715904E-014
-call:    19 Dx =   0.97283445E-13  Penalty function =  0.4317994082294703E+01
- Solve system with            3 con,           3 var
- Rank             2   Condition number                   Infinity
- Step length    3.7237407826172758E-014
+ Step length    6.7804699082765448E-014
  Bisec iteration            1
-call:    20 Dx =   0.37237408E-13  Penalty function =  0.4317994082296079E+01
+call:    17 Dx =   0.67804699E-13  Penalty function =  0.4317994082292794E+01
+ Solve system with            3 con,           3 var
+ Rank             2   Condition number                   Infinity
+ Step length    1.4032466723683672E-013
+ Bisec iteration            1
+call:    18 Dx =   0.14032467E-12  Penalty function =  0.4317994082294416E+01
+ Solve system with            3 con,           3 var
+ Rank             2   Condition number                   Infinity
+ Step length    1.0290692511317495E-013
+call:    19 Dx =   0.10290693E-12  Penalty function =  0.4317994082293648E+01
+ Solve system with            3 con,           3 var
+ Rank             2   Condition number                   Infinity
+ Step length    3.9333335670688860E-014
+call:    20 Dx =   0.39333336E-13  Penalty function =  0.4317994082293573E+01
  ++++++++++ JACOBIAN ended: call limit
- Final difference norm:   3.0112485695195250E-002
+ Final difference norm:   3.0112485695086236E-002
 endmatch;
 
 
@@ -414,9 +415,9 @@ MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-fivecell$end:1             betx         4     2.05900000E+02     2.05619799E+02     7.85127878E-02
+fivecell$end:1             betx         4     2.05900000E+02     2.05619799E+02     7.85127877E-02
 fivecell$end:1             mux          4     1.27000000E+00     1.45955488E+00     3.59310524E+00
-fivecell$end:1             muy          4     1.77000000E+00     1.85039752E+00     6.46376052E-01
+fivecell$end:1             muy          4     1.77000000E+00     1.85039752E+00     6.46376053E-01
 
 
 Final Penalty Function =   4.31799408e+00

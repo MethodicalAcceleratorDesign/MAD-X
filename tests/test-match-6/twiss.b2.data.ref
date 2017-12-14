@@ -2,11 +2,11 @@
 @ TYPE             %05s "TWISS"
 @ SEQUENCE         %05s "LHCB2"
 @ PARTICLE         %06s "PROTON"
-@ MASS             %le        0.9382720814
+@ MASS             %le        0.9382720813
 @ CHARGE           %le                   1
 @ ENERGY           %le                 450
 @ PC               %le         449.9990218
-@ GAMMA            %le         479.6050196
+@ GAMMA            %le         479.6050197
 @ KBUNCH           %le                   1
 @ BCURRENT         %le     0.0001891805798
 @ SIGE             %le             0.00045
@@ -40,16 +40,16 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %74s "Matching chromaticity for beam1 and beam2 of the LHC 6.4 lattice with MADX"
-@ ORIGIN           %17s "5.03.00 Darwin 64"
-@ DATE             %08s "30/03/17"
-@ TIME             %08s "14.32.31"
+@ ORIGIN           %17s "5.03.07 Darwin 64"
+@ DATE             %08s "14/12/17"
+@ TIME             %08s "18.00.11"
 * NAME                                S               BETX               BETY 
 $ %s                                %le                %le                %le 
  "IP1"                                0       0.5499996287       0.5500000209
  "IP2"                      3332.284216        9.999994907        10.00000062
  "IP3"                        6664.7208        121.5671551        218.5844598
  "IP4"                      9997.157384        164.2544594        267.7258632
- "IP5"                      13329.59397       0.5500002522       0.5499999924
+ "IP5"                      13329.59397       0.5500002523       0.5499999924
  "IP6"                      16661.87818        187.7491471        178.3685807
  "IP7"                       19994.1624        120.8133685        149.4304466
  "IP8"                      23315.22662        9.999989639        9.999998483

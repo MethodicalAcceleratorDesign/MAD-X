@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.03.09               +
-  + Execution date: 2017.03.30 14:30:08      +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2017.12.14 17:57:37      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Option, -echo,-warn,-info;
 
@@ -81,7 +81,7 @@ orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0
                  0 
 ibs,file="ibs-table.tfs";
 
- sige    4.6800203460590887E-004
+ sige    4.6800203460590855E-004
  Twiss was calculated at the exit of the elements.
  Twiss functions at the center of the elements are calculated through linear interpolation
 

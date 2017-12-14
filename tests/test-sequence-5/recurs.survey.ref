@@ -1,72 +1,72 @@
 @ NAME             %06s "SURVEY"
 @ TYPE             %06s "SURVEY"
 @ TITLE            %24s "test sequence expansions"
-@ ORIGIN           %17s "5.03.00 Darwin 64"
-@ DATE             %08s "30/03/17"
-@ TIME             %08s "14.40.44"
+@ ORIGIN           %17s "5.03.07 Darwin 64"
+@ DATE             %08s "14/12/17"
+@ TIME             %08s "18.08.43"
 * NAME                                S                  L 
 $ %s                                %le                %le 
  "RECURS$START"                       0                  0
- "DRIFT_6"                            6                  6
+ "DRIFT_0"                            6                  6
  "S1$START"                           6                  0
- "DRIFT_0"                            7                  1
+ "DRIFT_1"                            7                  1
  "IP1"                                7                  0
- "DRIFT_0"                            8                  1
+ "DRIFT_2"                            8                  1
  "QF"                                 9                  1
- "DRIFT_0"                           10                  1
+ "DRIFT_3"                           10                  1
  "S11"                               10                  0
- "DRIFT_1"                         11.5                1.5
+ "DRIFT_4"                         11.5                1.5
  "QD"                              13.5                  2
- "DRIFT_2"                           16                2.5
+ "DRIFT_5"                           16                2.5
  "S1$END"                            16                  0
  "DRIFT_6"                           22                  6
  "MKR"                               22                  0
- "DRIFT_4"                           25                  3
+ "DRIFT_7"                           25                  3
  "S5$START"                          25                  0
- "DRIFT_3"                           27                  2
+ "DRIFT_8"                           27                  2
  "IP5"                               27                  0
- "DRIFT_0"                           28                  1
+ "DRIFT_9"                           28                  1
  "S1$START"                          28                  0
- "DRIFT_0"                           29                  1
+ "DRIFT_10"                          29                  1
  "IP1"                               29                  0
- "DRIFT_0"                           30                  1
+ "DRIFT_11"                          30                  1
  "QF"                                31                  1
- "DRIFT_0"                           32                  1
+ "DRIFT_12"                          32                  1
  "S11"                               32                  0
- "DRIFT_1"                         33.5                1.5
+ "DRIFT_13"                        33.5                1.5
  "QD"                              35.5                  2
- "DRIFT_2"                           38                2.5
+ "DRIFT_14"                          38                2.5
  "S1$END"                            38                  0
- "DRIFT_1"                         39.5                1.5
+ "DRIFT_15"                        39.5                1.5
  "QF"                              40.5                  1
- "DRIFT_10"                          45                4.5
+ "DRIFT_16"                          45                4.5
  "S5$END"                            45                  0
- "DRIFT_11"                          65                 20
+ "DRIFT_17"                          65                 20
  "S6$START"                          65                  0
- "DRIFT_3"                           67                  2
+ "DRIFT_18"                          67                  2
  "IP6"                               67                  0
- "DRIFT_4"                           70                  3
+ "DRIFT_19"                          70                  3
  "S5$START"                          70                  0
- "DRIFT_3"                           72                  2
+ "DRIFT_20"                          72                  2
  "IP5"                               72                  0
- "DRIFT_0"                           73                  1
+ "DRIFT_21"                          73                  1
  "S1$START"                          73                  0
- "DRIFT_0"                           74                  1
+ "DRIFT_22"                          74                  1
  "IP1"                               74                  0
- "DRIFT_0"                           75                  1
+ "DRIFT_23"                          75                  1
  "QF"                                76                  1
- "DRIFT_0"                           77                  1
+ "DRIFT_24"                          77                  1
  "S11"                               77                  0
- "DRIFT_1"                         78.5                1.5
+ "DRIFT_25"                        78.5                1.5
  "QD"                              80.5                  2
- "DRIFT_2"                           83                2.5
+ "DRIFT_26"                          83                2.5
  "S1$END"                            83                  0
- "DRIFT_1"                         84.5                1.5
+ "DRIFT_27"                        84.5                1.5
  "QF"                              85.5                  1
- "DRIFT_10"                          90                4.5
+ "DRIFT_28"                          90                4.5
  "S5$END"                            90                  0
- "DRIFT_4"                           93                  3
+ "DRIFT_29"                          93                  3
  "QD"                                95                  2
  "S6$END"                            95                  0
- "DRIFT_12"                         100                  5
+ "DRIFT_30"                         100                  5
  "RECURS$END"                       100                  0

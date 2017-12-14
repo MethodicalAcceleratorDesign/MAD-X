@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.03.09               +
-  + Execution date: 2017.03.30 14:37:54      +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2017.12.14 18:05:16      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -798,7 +798,7 @@ ptc_create_universe;
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -6.2727600891321345E-015   0.0000000000000000        8.4376949871511897E-015
+ After    end:    9.2703622556200571E-015   0.0000000000000000       -7.5495165674510645E-015
 
 
   !!!!!       T I M E   F A L S E,   T O T P A T H  F A L S E
@@ -881,16 +881,16 @@ ptc_create_universe;
        3.282153615        15.12420817                  0                  0 
 
          beta13min          beta13max          beta21min          beta21max 
-   6.330855018e-07        424.5320923                  0                  0 
+   6.330855019e-07        424.5320923                  0                  0 
 
          beta22min          beta22max          beta23min          beta23max 
        1.633285387        20.07025827                  0                  0 
 
          beta31min          beta31max          beta32min          beta32max 
-   2.824649412e-07        129.3455891                  0                  0 
+   2.824649411e-07        129.3455891                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 1        38793.12618        -10.3020712    0.0005941579861 
+                 1        38793.12618        -10.3020712    0.0005941579859 
 
           disp2min           disp2max           disp3min           disp3max 
        -4.54310719         4.54310719                  0                  0 
@@ -945,16 +945,16 @@ ptc_create_universe;
        3.282153615        15.12420817                  0                  0 
 
          beta13min          beta13max          beta21min          beta21max 
-   6.330855018e-07        424.5320923                  0                  0 
+   6.330855019e-07        424.5320923                  0                  0 
 
          beta22min          beta22max          beta23min          beta23max 
        1.633285387        20.07025827                  0                  0 
 
          beta31min          beta31max          beta32min          beta32max 
-   2.824649412e-07        129.3455891                  0                  0 
+   2.824649411e-07        129.3455891                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 1        38793.12618        -10.3020712    0.0005941579861 
+                 1        38793.12618        -10.3020712    0.0005941579859 
 
           disp2min           disp2max           disp3min           disp3max 
        -4.54310719         4.54310719                  0                  0 
@@ -1005,7 +1005,7 @@ ptc_create_universe;
        3.282153606        15.12420824                  0                  0 
 
          beta13min          beta13max          beta21min          beta21max 
-   6.325075944e-07        424.5320939                  0                  0 
+   6.325075941e-07        424.5320939                  0                  0 
 
          beta22min          beta22max          beta23min          beta23max 
        1.633285387        20.07025827                  0                  0 
