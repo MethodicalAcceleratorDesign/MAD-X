@@ -2539,6 +2539,7 @@ const char *const_command_def =
 "ripken   = [l, false, true], "
 "sectormap= [l, false, true], "
 "sectoracc= [l, false, true], "
+"sectorpure= [l, false, true], "
 "sectortable= [s, none, sectortable], "
 "sectorfile= [s, sectormap, sectormap], "
 "rmatrix  = [l, false, true], "
