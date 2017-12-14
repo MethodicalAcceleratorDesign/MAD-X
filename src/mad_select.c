@@ -62,7 +62,7 @@ fetch_node_select(struct select_iter* it, struct node** node, struct sequence** 
       it->range_end = it->sequ->ex_end;
     }
 
-    if (!it->node && it->sequs && it->i_seq != it->sequs->curr) {
+    if (!it->node && it->sequs && 1+it->i_seq < it->sequs->curr) {
       it->sequ = it->sequs->sequs[++it->i_seq];
       continue;
     }

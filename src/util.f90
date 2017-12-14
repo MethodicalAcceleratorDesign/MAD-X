@@ -24,17 +24,17 @@ module phys_constfi
   ! J. Beringer et al. (Particle Data Group), Phys. Rev. D86, 010001 (2012). = PDG 2012
   ! K.A. Olive et al. (Particle Data Group), Chin. Phys. C, 38, 090001 (2014). = PDG 2014
   double precision, parameter :: clight = 299792458d0        ! Speed of light in vacuum [m/s]
-  double precision, parameter :: qelect = 1.602176620898d-19 ! Elementary charge [A*s]
-  double precision, parameter :: hbar   = 6.58211951440e-25  ! Reduced Plack's constant [GeV*s]
+  double precision, parameter :: qelect = 1.6021766208d-19   ! Elementary charge [A*s]
+  double precision, parameter :: hbar   = 6.582119514e-25    ! Reduced Plack's constant [GeV*s]
   double precision, parameter :: amu0   = 4d-7 * pi          ! Permeability of vacuum [V*s/A*m]
   ! Rest Mass [GeV]
-  double precision, parameter ::  emass  = 0.510998946131d-3 ! GeV CODATA 2014
-  double precision, parameter ::  pmass  = 0.938272081358    ! GeV CODATA 2014
-  double precision, parameter ::  nmass  = 0.939565413358    ! GeV CODATA 2014
-  double precision, parameter ::  mumass = 0.105658374524    ! GeV CODATA 2014
+  double precision, parameter ::  emass  = 0.5109989461d-3   ! GeV CODATA 2014
+  double precision, parameter ::  pmass  = 0.9382720813      ! GeV CODATA 2014
+  double precision, parameter ::  nmass  = 0.9395654133      ! GeV CODATA 2014
+  double precision, parameter ::  mumass = 0.1056583745      ! GeV CODATA 2014
 
   ! Classical radius [m]
-  double precision, parameter :: erad   = 2.817940322719d-15
+  double precision, parameter :: erad   = 2.8179403227d-15
   double precision, parameter :: prad   = erad*emass/pmass
 end module phys_constfi
 

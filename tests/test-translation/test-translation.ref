@@ -1,0 +1,132 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2017.12.12 14:39:45      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+circum=2;
+
+beam, particle=proton, energy = 5500;
+
+
+
+
+
+newquad:  MULTIPOLE, KNL={0.00, 0.001};
+
+trans: TRANSLATION, X=0.01, Y=0.002, PX=0.001, PY=0.001, T=0.0001, PT = 0.0002;
+
+
+
+seq: sequence, refer=center, l=circum;
+
+trans:trans, at=1.000;
+
+newquad: newquad at=1.5;
+
+endsequence;
+
+
+
+
+
+use, sequence=seq;
+
+select, flag=twiss, column=name, s, x,px, y, py, PT, T;
+
+twiss,X=-0.0,Y=0.000, BETX=1, BETY=1, file="translation.twiss";
+
+enter Twiss module
+ Found 2 initial orbit vector values from twiss command. 
+ output   1.0000000000000000E-002
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:  -0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+ output   1.0000000000000000E-002
+final orbit vector:     1.099455E-02  9.895001E-04  3.001050E-03  1.002500E-03  9.900398E-05  2.000000E-04
+ output   1.0000000000000000E-002
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                 2                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.1762097835                  0        4.995202152    0.0009945001145 
+
+             dxrms             xcomax             xcorms                 q2 
+   0.0005949863108       0.0109945511      0.00896227098       0.1761938718 
+
+               dq2            betymax              dymax              dyrms 
+                 0        5.003199552     0.001001499915    0.0005983315102 
+
+            ycomax             ycorms             deltap            synch_1 
+      0.0030010497     0.002220411758                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+SURVEY, SEQUENCE=seq, FILE= survey.out, x0=0.01;
+
+
+
+
+
+seq_notrans: sequence, refer=center, l=circum;
+
+newquad: newquad at=1.5;
+
+endsequence;
+
+
+
+use, sequence=seq_notrans;
+
+select, flag=twiss, column=name, s, x,px, y, py, PT, T;
+
+twiss,X=0.01, Y=0.002, PX=0.001, PY=0.001, T=0.0001, PT = 0.0002, BETX=1, BETY=1, file="offset.twiss";
+
+enter Twiss module
+ Found 6 initial orbit vector values from twiss command. 
+  
+open line - error with deltap:   0.000000E+00
+initial orbit vector:   1.000000E-02  1.000000E-03  2.000000E-03  1.000000E-03  1.000000E-04  2.000000E-04
+final orbit vector:     1.199385E-02  9.885003E-04  4.001350E-03  1.003500E-03  9.800398E-05  2.000000E-04
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                 2            -0.0001                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+       0.176203417                  0        4.994402972     0.001993500329 
+
+             dxrms             xcomax             xcorms                 q2 
+    0.001577852164       0.0119938513      0.01142095564       0.1761875028 
+
+               dq2            betymax              dymax              dyrms 
+                 0        5.002398972     0.002002499729     0.001582403897 
+
+            ycomax             ycorms             deltap            synch_1 
+      0.0040013495     0.003479005485                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+
+
+
+
+stop;
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

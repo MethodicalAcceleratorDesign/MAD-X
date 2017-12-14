@@ -131,10 +131,12 @@ The  attributes of the \texttt{TWISS} command are:
   \texttt{"COLUMN, REij"} one gets all or the component "ij" respectively.    
 
   \ttitem{SECTORMAP} a logical flag to initiate the calculation of a 
-  \hyperref[sec:sectormap]{sector map}.
+  \hyperref[sec:sectormap]{sector map}. Default the Rij contains feed-down from higher order maps. In order to turn it off use the flag SECTORPURE. 
   
   \ttitem{SECTORACC} a logical flag to save composition of maps instead of individual maps of a
   \hyperref[sec:sectormap]{sector map}.
+
+  \item{SECTORPURE} a logical flag to save the transfer map Rij without effects from higher order map (Tijk). This option should be used to get it in the correct format for TRAIN.
 
   \ttitem{SECTORTABLE} the name of the table containing the \texttt{SECTORMAP}
   values. The elements (lines) and parameters (columns) 
@@ -567,8 +569,9 @@ The maps are the accumulated maps between the selected elements. They
 contain both the alignment, and field errors present. Together with the
 starting value of the closed orbit (which can be obtained from the
 standard twiss file) this allows the user to track particles over larger
-sectors, rather than element per element. A typical usage therefore lies
-in the interface to other programs, such as TRAIN.  
+sectors, rather than element per element. Note that effects of the higher order
+are included in the Rij. In order to disable this use the flag SECTORPURE. 
+This flag should be activated when used to interface TRAIN.  
 
 
 %\input{threader/threader}

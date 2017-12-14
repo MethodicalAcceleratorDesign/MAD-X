@@ -29,10 +29,11 @@ with the deleted sequence.
 \section{READTABLE}
 \label{sec:readtable}
 \madbox{
-READTABLE, FILE="filename";
+READTABLE, FILE="filename", TABLE=tabname;
 }
 reads the \texttt{TFS} file \texttt{filename} containing a \mad table
-and loads the table into memory with the name specified in the
+loads the table into memory with the name \texttt{tabname}. If the table
+name is not specified, use the name specified in the
 information section of the TFS file. The table can then be manipulated
 as any other table, \textsl{i.e.} its values can be accessed, its data
 can be plotted or changed, and it can be written out again. 
@@ -42,17 +43,7 @@ can be plotted or changed, and it can be written out again.
 \madbox{
 READMYTABLE, FILE="filename", TABLE=tabname;
 }
-reads a \texttt{TFS} file \texttt{filename} containing a \mad table and
-loads the table into memory with the name \texttt{tabname}. The table
-can then be manipulated as any other table, \textsl{i.e.} its values can
-be accessed, its data can be plotted or changed, and it can be written
-out again. 
-
-An internal name for the table can be freely assigned, while for the
-command \hyperref[sec:readtable]{\texttt{READTABLE}} the table name is
-taken from the information section of the table itself.  
-This feature allows to store multiple tables of the same type in memory
-without overwriting existing ones.   
+deprecated alias for \texttt{READTABLE}.
 
 \section{WRITE}
 \label{sec:write}
@@ -295,8 +286,7 @@ The \texttt{SHRINK} command takes two arguments:
   \ttitem{TABLE} is the name of the table from which rows should be removed. 
   The table must have been previously \hyperref[sec:create]{created} and 
   \hyperref[sec:fill]{filled} or read from file with
-  \hyperref[sec:readtable]{\texttt{READTABLE}}
-  or \hyperref[sec:readmytable]{\texttt{READMYTABLE}}.
+  \hyperref[sec:readtable]{\texttt{READTABLE}}.
 	   
   \ttitem{ROW} is the number of the last row to be kept in the table. 
   All rows beyond the given row number are removed. \\
