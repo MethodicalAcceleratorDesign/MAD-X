@@ -1,0 +1,46 @@
+
+d1_1: drift, l=1;
+d1_2: drift, l=1;
+mb: marker;
+mrot: marker;
+ma: marker;
+
+b: rbend, l=0.1, angle=30*pi/180;
+q: quadrupole, l=0.5, k1=0.3;
+
+
+myline: line=(d1_1,b,d1_1, mb, mrot, ma, d1_2, q, d1_2);
+
+beam;
+
+use, period=myline;
+
+
+select, flag=twiss, clear;
+select, flag=twiss, column=name,s,x,px,y,py, t, pt, 
+                           disp1,disp2,disp3,disp4, 
+	       beta11,beta22,beta12,beta13,beta21,beta23, 
+	       alfa11,alfa22,alfa12,alfa13,alfa21,alfa23;
+
+
+ptc_create_universe;
+ ptc_create_layout,model=2, method=6, nst=5, exact=true, closed_layout=false;
+
+ ptc_setswitch, debuglevel=0, nocavity=true, fringe=true, exact_mis=true, time=false, totalpath=false;
+
+ ! psi   -> S rotation
+ ! theta -> X rotation
+ ! phi   -> Y rotation 
+ ptc_eplacement, range=mrot, phi=0, psi=30*pi/180, theta=0,  onlyorientation, refframe=previouselement, autoplacedownstream=true;
+
+ ptc_printframes, file="srot.C",format=rootmacro;
+
+ 
+ PTC_TWISS, table=twiss, icase=56, no=1, betx=10, bety=10, betz=10, x=0.1, y=0, t=0.0, pt=0.0;
+ write, table=twiss, file="twiss.ptc.tfs";
+
+ptc_end;
+
+
+
+
