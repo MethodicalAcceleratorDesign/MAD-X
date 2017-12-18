@@ -10,11 +10,11 @@
 @ KBUNCH           %le                   1
 @ BCURRENT         %le                   0
 @ SIGE             %le      0.001115467778
-@ SIGT             %le     0.0008578396945
+@ SIGT             %le     0.0008578396946
 @ NPART            %le                   0
 @ EX               %le     1.125932202e-09
-@ EY               %le     1.700272873e-38
-@ ET               %le     9.569041559e-07
+@ EY               %le     1.195003214e-37
+@ ET               %le     9.569041561e-07
 @ LENGTH           %le           67.200074
 @ ALFA             %le     0.0008829339349
 @ ORBIT5           %le      0.002156959202
@@ -24,15 +24,15 @@
 @ DQ1              %le        0.3280484114
 @ DQ2              %le        0.1526852468
 @ DXMAX            %le        0.2344520764
-@ DYMAX            %le      5.96433342e-16
+@ DYMAX            %le      5.99260945e-16
 @ XCOMAX           %le     1.388447428e-05
-@ YCOMAX           %le     4.581586166e-20
+@ YCOMAX           %le     2.573962149e-20
 @ BETXMAX          %le         17.73701544
 @ BETYMAX          %le          19.3658027
-@ XCORMS           %le     5.588625491e-06
-@ YCORMS           %le     2.246314957e-20
+@ XCORMS           %le     5.588625492e-06
+@ YCORMS           %le     1.282327637e-20
 @ DXRMS            %le        0.1455152745
-@ DYRMS            %le     3.027851444e-16
+@ DYRMS            %le     3.065494471e-16
 @ DELTAP           %le                   0
 @ SYNCH_1          %le                   0
 @ SYNCH_2          %le                   0
@@ -40,9 +40,9 @@
 @ SYNCH_4          %le                   0
 @ SYNCH_5          %le                   0
 @ TITLE            %33s "ALBA-24                          "
-@ ORIGIN           %17s "5.03.00 Darwin 64"
-@ DATE             %08s "30/03/17"
-@ TIME             %08s "14.30.06"
+@ ORIGIN           %17s "5.03.07 Darwin 64"
+@ DATE             %08s "14/12/17"
+@ TIME             %08s "17.57.34"
 * NAME                                S               BETX               BETY 
 $ %s                                %le                %le                %le 
  "QD1"                            4.215        14.01022269        8.121167257

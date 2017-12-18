@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.06  (64 bit, Linux)       +
+  +     MAD-X 5.03.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.05.29               +
-  + Execution date: 2017.07.03 14:46:33      +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2017.12.14 18:07:18      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,' Example 1 for for MAD-X with PTC_TRACK_RUN';
 
@@ -63,13 +63,13 @@ ptc_create_layout,model=2,method=6,nst=10,exact;
      method                   6
      Num. of steps           10
      charge           1.0000000000000000     
-  Length of machine:    534.60000000000025     
+  Length of machine:    534.59999999999968     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -40.580758467102171        2.5811541980762588E-017   532.53346053179314     
+ After    end:   -40.580758467102171        2.5811541980762600E-017   532.53346053179223     
 
 
 ptc_setswitch, debuglevel=1, time=true, totalpath=false;
