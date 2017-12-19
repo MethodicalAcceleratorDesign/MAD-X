@@ -42,7 +42,7 @@ ifneq ($(OSTYPE),Windows)
 # compiler flags
 #
 
-FFLAGS = -m$(ARCH) -O$(NOPT) -no-wrap-margin -warn all -warn nounused -warn nointerfaces -c  
+FFLAGS = -m$(ARCH) -O$(NOPT) -warn all -warn nounused -warn nointerfaces -c  
 
 #FFLAGS += -std95 -diag-disable 7342,7346
 
