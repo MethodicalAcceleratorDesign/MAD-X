@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  +     MAD-X 5.03.07  (32 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.18 14:03:19      +
+  + Execution date: 2017.12.19 09:39:13      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -96,8 +96,6 @@ ptc_create_universe;
 
 mad_ptc.c: pro_ptc_printframes: format is rootmacro.
            3 B                       All three reference frames are inline. DRAWING AS RBEND
-
-
  
 
  PTC_TWISS, table=twiss, icase=56, no=1, betx=10, bety=10, betz=10, x=0.1, y=0, t=0.0, pt=0.0;
@@ -134,7 +132,7 @@ mad_ptc.c: pro_ptc_printframes: format is rootmacro.
                 10        10.00206737                  0        0.562663259 
 
           disp2min           disp2max           disp3min           disp3max 
-                 0       0.1694659491     -0.07588333292                  0 
+                 0       0.1694659491     -0.07588333292    1.083589652e-17 
 
           disp4min           disp4max             deltap            orbit_x 
                  0        0.158113883                  0                0.1 
@@ -149,7 +147,7 @@ mad_ptc.c: pro_ptc_printframes: format is rootmacro.
       0.4022719498       0.2673769008                  0                0.1 
 
             ycomax            pxcomax            pycomax             tcomax 
-        1.65795586                  0       0.5859607317                 -0 
+        1.65795586    8.032196993e-17       0.5859607317                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
                  0      0.06893416287                  0     -0.02037476552 
