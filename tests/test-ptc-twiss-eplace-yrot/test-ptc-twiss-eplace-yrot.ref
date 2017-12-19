@@ -1,0 +1,178 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2017.12.18 14:26:12      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+
+
+d1_1: drift, l=1;
+
+d1_2: drift, l=1;
+
+mb: marker;
+
+mrot: marker;
+
+ma: marker;
+
+
+
+b: rbend, l=0.1, angle=30*pi/180;
+
+q: quadrupole, l=0.5, k1=0.3;
+
+
+
+
+
+myline: line=(d1_1,b,d1_1, mb, mrot, ma, d1_2, q, d1_2);
+
+
+
+beam;
+
+
+
+use, period=myline;
+
+
+
+
+
+select, flag=twiss, clear;
+
+select, flag=twiss, column=name,s,x,px,y,py, t, pt, 
+
+                           disp1,disp2,disp3,disp4, 
+
+	       beta11,beta22,beta12,beta13,beta21,beta23, 
+
+	       alfa11,alfa22,alfa12,alfa13,alfa21,alfa23;
+
+
+
+
+
+ptc_create_universe;
+
+ ptc_create_layout,model=2, method=6, nst=5, exact=true, closed_layout=false;
+
+ MAD-X Beam Parameters
+                  Energy : 0.100000E+01
+          Kinetic Energy : 0.999489E+00
+      Particle Rest Mass : 0.510999E-03
+                Momentum : 0.100000E+01
+ Setting MADx with 
+     energy           1.0000000000000000     
+     method                   6
+     Num. of steps            5
+     charge           1.0000000000000000     
+  Length of machine:    4.6011515159927461     
+ The machine is a LINE
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -1.7758819045102521        0.0000000000000000        4.1276814958744419     
+
+
+ ptc_setswitch, debuglevel=0, nocavity=true, fringe=true, exact_mis=true, time=false, totalpath=false;
+
+
+
+ ! psi   -> S rotation
+
+ ! theta -> X rotation
+
+ ! phi   -> Y rotation 
+
+ ptc_eplacement, range=mrot, phi=30*pi/180, psi=0, theta=0,  onlyorientation, refframe=previouselement, autoplacedownstream=true;
+
+
+
+ ptc_printframes, file="yrot.C",format=rootmacro;
+
+mad_ptc.c: pro_ptc_printframes: format is rootmacro.
+           3 B                       All three reference frames are inline. DRAWING AS RBEND
+
+
+ 
+
+ PTC_TWISS, table=twiss, icase=56, no=1, betx=10, bety=10, betz=10, x=0.1, y=0, t=0.0, pt=0.0;
+
+ Reduced SUMM Table (Inital parameters specified)
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+       4.601151516           -1000000           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000           -1000000           -1000000      0.07900420751 
+
+                q2                dq1                dq2                 qs 
+       0.510315583           -1000000           -1000000           -1000000 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+       8.222491423        14.84095996        6.337876234        1074.572388 
+
+         beta11min          beta11max          beta12min          beta12max 
+       8.222491423        14.84095996                  0                  0 
+
+         beta13min          beta13max          beta21min          beta21max 
+                 0       0.4292932324                  0                  0 
+
+         beta22min          beta22max          beta23min          beta23max 
+       6.337876234        1074.572388                  0                  0 
+
+         beta31min          beta31max          beta32min          beta32max 
+                 0        13.02703047                  0                  0 
+
+         beta33min          beta33max           disp1min           disp1max 
+                10         10.0949961                  0       0.6552047255 
+
+          disp2min           disp2max           disp3min           disp3max 
+                 0          0.3048757                  0                  0 
+
+          disp4min           disp4max             deltap            orbit_x 
+                 0                  0                  0                0.1 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+                 0                  0                  0                  0 
+
+         orbit_-cT             xcorms             ycorms            pxcorms 
+                -0       0.6700013003                  0       0.3292491389 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0       0.2174239381                  0        1.331109305 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0                0.5                  0                 -0 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+                 0                0.1                  0                  0 
+
+           pycomin             tcomin            ptcomin 
+                 0      -0.3979246157                  0 
+ write, table=twiss, file="twiss.ptc.tfs";
+
+
+
+ptc_end;
+
+
+
+
+
+
+
+
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

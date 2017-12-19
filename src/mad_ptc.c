@@ -1095,7 +1095,7 @@ pro_ptc_eplacement(struct in_cmd* cmd)
   struct node*                   nodes[2]={0x0,0x0};
   struct node*                   anode=0x0;
   char*                          element;
-  int                            refframe=0;/*0 global, 1 current position, 2 end face if the previous element*/
+  int                            refframe=-1;/*0 global, 1 current position, 2 end face if the previous element*/
 
   const char* s_refframe = command_par_string_user("refframe", cmd->clone);
   if (s_refframe)
@@ -1120,6 +1120,12 @@ pro_ptc_eplacement(struct in_cmd* cmd)
       {
         refframe = 2;
       }
+      
+      if (refframe < 0)
+       {
+         warning("mad_ptc.c: pro_ptc_eplacement: did not recognize string describing refframe, using default  ", s_refframe);
+         refframe = 0;
+       }
     }
   }
 
