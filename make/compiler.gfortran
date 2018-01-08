@@ -67,6 +67,10 @@ ifeq ($(SANITIZE),yes)
 FFLAGS += -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
 endif
 
+ifeq ($(COVERAGE),yes)
+FFLAGS += -fprofile-arcs -ftest-coverage
+endif
+
 #
 # extra flags
 #
