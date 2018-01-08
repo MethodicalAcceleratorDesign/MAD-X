@@ -33,9 +33,6 @@ endif()
 # Some initializations specific for Mad-X
 include(madxInit)
 
-# predefined macros...
-include(install_macros)
-
 # Defining project options:
 include(setupOptions)
 
