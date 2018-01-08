@@ -39,7 +39,7 @@ if(MADX_NTPSA)
    message(STATUS "NTPSA turned on")
    file(GLOB ntpsa_remove c_dabnew.f90)
 else()
-   file(GLOB ntpsa_remove c_dabnew_berz.f90 c_tpsa_interface.f90 tpsa.cpp)
+   file(GLOB ntpsa_remove c_dabnew_berz.f90 c_tpsa_interface.F90 tpsa.cpp)
 endif()
 
 set(remove_list ${gxx_remove} ${sdds_remove} ${mkthin_remove} ${ntpsa_remove} ${lapack_remove})
