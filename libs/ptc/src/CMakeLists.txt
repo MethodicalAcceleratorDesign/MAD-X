@@ -19,8 +19,4 @@ if(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU" AND
 endif()
 
 
-add_library(ptc ${src_files})
-
-set_target_properties(ptc PROPERTIES VERSION ${MADX_VERSION} SOVERSION 1)
-
-madx_install_targets(ptc)
+add_library(ptc STATIC ${src_files})
