@@ -863,6 +863,20 @@ pro_ptc_setswitch(struct in_cmd* cmd)
     if (debuglevel > 0) printf("radiation is not present\n");
   }
 
+
+  /*modulation SWITCH*/
+  if ( name_list_pos("modulation", nl) >=0 )
+  {
+    command_par_value2("modulation", cmd->clone, &switchvalue);
+    if (debuglevel > 0) printf("modulation is found and its value is %f\n", switchvalue);
+    i = (int)switchvalue;
+    w_ptc_setmodulation_(&i);
+  }
+  else
+  {
+    if (debuglevel > 0) printf("modulation is not present\n");
+  }
+
   /*stochastic SWITCH*/
   if ( name_list_pos("stochastic", nl) >=0 )
   {

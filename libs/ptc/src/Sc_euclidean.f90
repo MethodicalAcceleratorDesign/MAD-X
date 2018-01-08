@@ -9,6 +9,8 @@ module S_euclidean
   PRIVATE       ROT_XZR,ROT_XZP !,ROT_XZP_P
   PRIVATE       ROT_YZR,ROT_YZP !,ROT_YZP_P
   PRIVATE       ROT_XYR,ROT_XYP !,ROT_XYP_P
+  private zero_r_z,zero_r_xy,zero_T_XYZ,zero_E_GENERAL,zero_E_GENERAL_s
+
   INTERFACE TRANS
      MODULE PROCEDURE transR
      MODULE PROCEDURE transp
@@ -60,7 +62,96 @@ module S_euclidean
      TYPE(T_XYZ) T3
   END TYPE E_GENERAL
 
+  INTERFACE init
+     MODULE PROCEDURE zero_r_xy
+     MODULE PROCEDURE zero_r_z
+     MODULE PROCEDURE zero_T_XYZ
+     MODULE PROCEDURE zero_E_GENERAL
+     MODULE PROCEDURE zero_E_GENERAL_s
+  END INTERFACE
+
+
 CONTAINS
+
+
+  subroutine print_e_general(e,mf)
+    IMPLICIT NONE
+    type(e_general) e
+    integer mf
+
+    if(e%kind==1) then
+      write(mf,*) " kind 1: x and y angle "
+      write(mf,*) e%t1%a
+    endif
+
+    if(e%kind==2) then
+      write(mf,*) " kind 2 : y angle "
+      write(mf,*) e%t2%a
+    endif
+
+    if(e%kind==3) then
+      write(mf,*) " kind 3 : dx,dy,dz  "
+      write(mf,*) e%t3%d
+      write(mf,*) " coeff of (1+delta)  "
+      write(mf,*) e%t3%dl
+      if(e%t3%SIXTRACK ) then
+       write(mf,*) " L_DESIGN, DL_SIXTRACK  " 
+       write(mf,*) e%t3%L_DESIGN , e%t3%DL_SIXTRACK
+      else
+       write(mf,*) " L_DESIGN  " 
+       write(mf,*) e%t3%L_DESIGN  
+      endif
+    endif
+
+  end subroutine print_e_general
+
+
+subroutine zero_r_xy(t)
+ implicit none
+ TYPE(R_XY) t
+ t%a=0
+end subroutine zero_r_xy
+
+subroutine zero_r_z(t)
+ implicit none
+ TYPE(R_Z) t
+ t%a=0
+end subroutine zero_r_z
+
+subroutine zero_T_XYZ(t)
+ implicit none
+ TYPE(T_XYZ) t
+     t%SIXTRACK=.false.
+      t%L_DESIGN=0
+      t%DL_SIXTRACK=0
+      t%DL=0
+      t%D=0
+end subroutine zero_T_XYZ
+ 
+
+subroutine zero_E_GENERAL(t,i)
+ implicit none
+ TYPE(E_GENERAL) t
+ integer i
+
+  t%kind=i
+   call init(t%t1)
+   call init(t%t2)
+   call init(t%t3)
+
+end subroutine zero_E_GENERAL
+
+subroutine zero_E_GENERAL_s(t)
+ implicit none
+ TYPE(E_GENERAL) t(:)
+ integer i 
+
+do i=1,size(t)
+   call init(t(i),0)
+enddo
+
+end subroutine zero_E_GENERAL_s
+
 
   SUBROUTINE TRANS_dl(A,dl,LD,X,b,ctime,DL_SIXTRACK,SIXTRACK)   ! for sixtrack recombination
     IMPLICIT NONE
@@ -72,7 +163,7 @@ CONTAINS
     X(1)=X(1)-A(1)
     X(3)=X(3)-A(2)
     if(ctime) then     ! THIS IS SIXTRACK HERE
-       PZ=ROOT(1.0_dp+2.0_dp*X(5)/b+x(5)**2)
+       PZ=sqrt(1.0_dp+2.0_dp*X(5)/b+x(5)**2)
        X(1)=X(1)+A(3)*X(2)/pz
        X(3)=X(3)+A(3)*X(4)/pz
        IF(SIXTRACK) THEN
@@ -337,7 +428,7 @@ CONTAINS
        endif
     ELSE
        if(ctime) then     ! THIS IS SIXTRACK HERE
-          PZ=ROOT(1.0_dp+2.0_dp*X(5)/b+x(5)**2)
+          PZ=sqrt(1.0_dp+2.0_dp*X(5)/b+x(5)**2)
           X(1)=X(1)+A(3)*X(2)/pz
           X(3)=X(3)+A(3)*X(4)/pz
           X(6)=X(6)+((X(2)*X(2)+X(4)*X(4))/2.0_dp/pz**2+1.0_dp)*(1.0_dp/b+x(5))*A(3)/pz
@@ -470,7 +561,7 @@ CONTAINS
        X(6)=XN(6)
     ELSE
        if(ctime) then   ! SIXTRACK
-          PZ=ROOT(1.0_dp+2.0_dp*x(5)/b+X(5)**2)
+          PZ=sqrt(1.0_dp+2.0_dp*x(5)/b+X(5)**2)
           X(2)=X(2)+A*PZ
           X(6)=X(6)+A*X(1)*(1.0_dp/b+x(5))/PZ
        else

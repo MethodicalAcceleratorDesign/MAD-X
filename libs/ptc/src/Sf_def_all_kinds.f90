@@ -496,7 +496,7 @@ contains
              CALL GEO_TRA(A,MID,D,1)
              CALL XFRAME(E_IN,MID,A,start)
           ENDDO
-       CASE(KIND2,KIND6:KIND7,KIND10,KINDPA)
+       CASE(KIND2,KIND6:KIND7,KIND10,KINDPA,KINDabell)
           IF(P%B0==0.0_dp) THEN
              LH=P%LC/2.0_dp
              A=O
@@ -593,7 +593,7 @@ contains
              start=start+E_IN%F%dir
              E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
           ENDDO
-       CASE(KIND2,KIND6:KIND7,KIND10,KINDPA)
+       CASE(KIND2,KIND6:KIND7,KIND10,KINDPA,kindabell)
           IF(P%B0==0.0_dp) THEN
              E_IN%L(start)=start*P%LD/nst    +E_IN%L(-1)
              DO I=1,NST

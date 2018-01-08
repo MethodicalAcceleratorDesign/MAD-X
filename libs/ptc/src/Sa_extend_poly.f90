@@ -49,13 +49,13 @@ CONTAINS
     IF((ABS(X)>hyperbolic_aperture).AND.ROOT_CHECK) THEN
        SINEHX_X=0.0_dp
        CHECK_STABLE=.FALSE.
-       messagelost="Sa_extend_poly.f90 SINEHX_X : argument out of range" !Skowron
+       messagelost="Sa_extend_poly.f90 SINEXHX_X : argument out of range" !CERN
     ELSEIF(ABS(X)<=hyperbolic_aperture) THEN
        sinehx_x = sinhx_x(x)
     ELSE      !  IF X IS NOT A NUMBER
        sinehx_x=1.0_dp
        CHECK_STABLE=.FALSE.
-       messagelost="Sa_extend_poly.f90 SINEHX_X : should never happen" !Skowron
+       messagelost="Sa_extend_poly.f90 SINEXHX_X : should never happen" !CERN
     ENDIF
 
   END FUNCTION SINEHX_X

@@ -47,11 +47,37 @@ MODULE madx_ptc_module
   integer                   :: mapsorder = 0  !order of the buffered maps, if 0 maps no maps buffered
   integer                   :: mapsicase = 0
 
+  type clockdef
+     real(dp)                :: freq = -1 ! negative means inactive
+     real(dp)                :: lag = 0
+     integer                 :: rampupstart = 0,  rampupstop = 0, rampdownstart = 0,  rampdownstop = 0
+     type(fibre), pointer    :: element
+  end type clockdef
+  
+  integer, private, parameter:: nmaxclocks = 1  !will be 3 soon
+  type(clockdef),  dimension(nmaxclocks) :: clocks ! 3 pointers 
+  integer                                :: nclocks = 0  
+
 
   character(1000), private  :: whymsg
 
 CONTAINS
-
+  
+  subroutine resetclocks()
+    implicit none
+    integer i
+    
+    do i=1,nmaxclocks
+      clocks(i)%freq = -1 ! negative means inactive
+      clocks(i)%lag = 0 
+      clocks(i)%rampupstart = 0 
+      clocks(i)%rampupstop = 0 
+      clocks(i)%rampdownstart = 0 
+      clocks(i)%rampdownstop = 0 
+    enddo
+    nclocks = 0  
+  end subroutine resetclocks
+  
   subroutine ptc_create_universe()
     implicit none
     real(kind(1d0)) get_value
@@ -446,6 +472,8 @@ CONTAINS
         print *, 'MADx is set'
     endif
 
+    call resetclocks() ! clocks for modulation
+    
     icav=0
     j=restart_sequ()
     nt=0
@@ -1223,6 +1251,39 @@ CONTAINS
        if(key%list%k(1).ne.zero.and.key%list%freq0.ne.zero) icav=1
 
     !RFMULTIPOLE, crab also falls here, but is made with special case where volt defines BN(1)
+    
+    case(40)
+       
+       print*,""
+       print*," HORIZONTAL AC DIPOLE"
+       print*,""
+       key%magnet="hkicker"
+       do i=1,NMAX
+          key%list%k(i)=zero
+          key%list%ks(i)=zero
+       enddo
+       
+        key%list%n_ac = 1 ! only dipole
+        key%list%d_bn(1) = node_value('volt ')
+        key%list%d_an(1) = zero
+        
+        key%list%D_ac = one ! extrac factor for amplitude; we use it for ramping
+        
+        ! parameters to modulate the nominal parameters. No modulation in MADX implemented.
+        key%list%DC_ac = zero
+        key%list%A_ac = zero
+        key%list%theta_ac = zero
+        
+        nclocks = 1
+        clocks(nclocks)%freq = node_value('freq ')
+        clocks(nclocks)%lag  = node_value('lag ')
+
+        clocks(nclocks)%rampupstart = node_value('ramp1 ')
+        clocks(nclocks)%rampupstop = node_value('ramp2 ')
+        clocks(nclocks)%rampdownstart = node_value('ramp3 ')
+        clocks(nclocks)%rampdownstop = node_value('ramp4 ')
+        
+       
     case(43)
        key%magnet="rfcavity"
        key%list%volt=bvk*node_value('volt ')
@@ -1346,7 +1407,12 @@ CONTAINS
 
 !    endif
     call create_fibre(my_ring%end,key,EXCEPTION) !in ../libs/ptc/src/Sp_keywords.f90
-
+    
+    if(code.eq.40) then
+     clocks(1)%element=>my_ring%end
+     print*,"Setting element to clock ",clocks(1)%element%mag%name
+    endif
+    
     if(advance_node().ne.0)  goto 10
 
 

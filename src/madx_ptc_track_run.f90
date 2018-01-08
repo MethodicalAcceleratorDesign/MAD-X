@@ -25,7 +25,8 @@ MODULE madx_ptc_track_run_module
   use file_handler
   USE madx_ptc_module , ONLY: dp, lp, lnv, &
                                 ! shorts for <double precision>, <logical>, 0D0 etc.
-       doublenum ! am temprorary double number for I/O with C-procedures
+       doublenum, & ! am temprorary double number for I/O with C-procedures
+       propagate, clocks, nclocks, get_length
   USE madx_ptc_intstate_module, ONLY: getdebug  ! new debug control by PS (from 2006.03.20)
   use name_lenfi
   use definition
@@ -115,7 +116,11 @@ MODULE madx_ptc_track_run_module
   !                                                  ! contrary to <character(16)> in c-code
 
   character(1000), private  :: whymsg
-
+  
+  type(probe), private     :: savedProbe ! probe at last step 
+                                          ! the tracking loop logic is inversed, so need to do cumbersome gymnastic with probes
+		  
+		  
   !real(KIND(1d0)) :: dble_num_C  ! to use as a temprorary double number for I/O with C-procedures
 
 CONTAINS
@@ -233,6 +238,7 @@ CONTAINS
     !hbu
     data vec_names  / 'x', 'px', 'y', 'py', 't', 'pt','s' / ! MADX
     !data vec_names / 'x', 'px', 'y', 'py', 'pt', 't','s' / ! PTC has a reverse order for pt and t
+    real(dp)  circumference
     logical(lp) rplot
     integer   mft ! debug output file
     !k    data char_a / ' ' /
@@ -322,40 +328,17 @@ CONTAINS
     ! getting parameters  at observation points and
     ! finding the closed orbits at observations for element_by_element tracking
 
-    ! START TRACKING WITH PTC !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!    change_default: IF(Radiation_PTC) THEN
-!       MYSTATE=DEFAULT+RADIATION
-!       IF (Radiation_Quad) STOCH_IN_REC=.TRUE.
-!       !element_by_element=.FALSE. ! make PTC one-turn tracking
-!       print *, "################################################################"
-!       print *, "The PTC parameter DEFAULT before the tracking with the turn-loop"
-!       call print(MYSTATE,6)
-!       CALL Find_Closed_Orbit ! Calculates x_coord_co(1:6)
-!    END IF change_default
-
-    !============================================================================!
-    ! getting inial particle coordinates ========================================!
-    !    uses: call comm_para('coord ',nint,ndble,nchar,int_arr,x,char_a,char_l)
-    !          returns the value for command parameter "name"
 
     call ptc_track_ini_conditions
 
-    ! call trinicmd(switch,orbit0,eigen,jmax,z,turns,coords)
-    !SUBR trinicmd(switch,orbit0,eigen,jend,z,turns,coords) - in this file
-    !----------------------------------------------------------------------*
-    ! Purpose: Define initial conditions for all particles to be tracked   *
-    ! input:                                                               *
-    !   switch (int)  1: run, 2: dynap fastune, 3: dynap aperture          *
-    !   orbit0(6) - closed orbit                                           *
-    !   x, px, y, py, t, deltap, fx, phix, fy, phiy, ft, phit              *
-    !             - raw coordinates from start list                        *
-    !   eigen     - Eigenvectors                                           *
-    ! output:                                                              *
-    !   jend      - number of particles to track                           *
-    !   z(6,jend) - Transformed cartesian coordinates incl. c.o.           *
-    !   coords      dp(6,0:turns,npart) (only switch > 1) particle coords. *
-    !----------------------------------------------------------------------*
-
+    if (clocks(1)%freq > 0) then
+      !call get_length(my_ring,circumference)
+      !savedProbe%ac%om = twopi*clocks(1)%freq / circumference
+      !omega of the the modulation
+      savedProbe%ac%om = twopi*clocks(1)%freq
+      savedProbe%ac%x(1)  = one  ! initial clock vector
+      savedProbe%ac%x(2)  = zero
+    endif
 
     Call Set_initial_particle_ID ! Int.subr. below in this subr.
 
@@ -400,7 +383,9 @@ CONTAINS
        debug_print_2: IF (ptc_track_debug) then                                   !
           print *; print*, 'start ',i_th_turn, '-th turn  '                       !
        end if debug_print_2 !                                                     !
-       !                                                                          !
+       !
+       call acdipoleramping(i_th_turn)
+                                                                          !
        track_over_total_ring: if ( .NOT.element_by_element) then !++++++++++++!   t
           !                                                                   !   u
           call One_turn_track_with_PTC                                        !   r
@@ -437,6 +422,10 @@ CONTAINS
        IF (jmax_numb_particl_at_i_th_turn.eq.0) EXIT Loop_over_turns              !
        ! all particles are lost                                                   !
        !
+       
+       
+       
+       
     end do Loop_over_turns !===========loop over turn ============================!
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
@@ -1155,7 +1144,7 @@ CONTAINS
 
     SUBROUTINE One_turn_track_with_PTC  ! int.subroutine
       implicit none
-
+      type(probe)   :: theProbe
       ! variables from the HOST subroutine (no need to be declared in int.subr !):
 
       ! real(dp), intent(INOUT) :: x_coord_incl_co(1:6,1:N_particle_max)               particle coordinates
@@ -1206,19 +1195,24 @@ CONTAINS
             !                                                                                !   !
             jmax_at_loop_start = jmax_numb_particl_at_i_th_turn                              !   ^
             j_last_particle_buffer=j_particle ! remember index value after END DO            !   !
-            !                                                                                !   !
-            do k_th_coord=1,6 ! extract coords for the current particle -----!               +   ^
-               current_x_coord_incl_co(k_th_coord)= &                        !               +   !
-                    x_coord_incl_co(k_th_coord,j_particle)                   !               +   !
-            end do !---------------------------------------------------------!               +   !
-            !                                                                                !   !
-            call track_probe_x(my_ring,current_x_coord_incl_co,MYSTATE,fibre1=1)             !   !
-!            call track(my_ring,current_x_coord_incl_co,1,MYSTATE)                           !   !
+            
+            theProbe = savedProbe
+            theProbe%ac =  savedProbe%ac
+            theProbe = x_coord_incl_co(:,j_particle)
+            call propagate(my_ring,theProbe,MYSTATE,fibre1=1)             !   !
+            current_x_coord_incl_co = theProbe%x
+
+           ! v2: do k_th_coord=1,6 ! extract coords for the current particle -----!               +   ^
+           ! v2:    current_x_coord_incl_co(k_th_coord)= &                        !               +   !
+           ! v2:         x_coord_incl_co(k_th_coord,j_particle)                   !               +   !
+           ! v2: end do !---------------------------------------------------------!               +   !
+           ! v2: call track_probe_x(my_ring,current_x_coord_incl_co,MYSTATE,fibre1=1)             !   !
+           !
+           ! v1:  call track(my_ring,current_x_coord_incl_co,1,MYSTATE)                           !   !
             ! The PTC subroutine " To TRACK the MY_RING for X coordinates                    +   !
             ! over one-turn in the DEFAULT state (citation, p. 25).                          +   !
             ! there is no any other an explicit description in KEK 2002-3 report             +   !
             !                                                                                !   ^
-            
             
             
             do k_th_coord=1,6 ! save coordinates for the current particle ---!               +   !
@@ -1354,6 +1348,10 @@ CONTAINS
             END IF if_ptc_track_unstable ! === ptc_track unstable ===>=======>=====!   V     !   !
             !                                                                          V     !   !
          END DO  Particle_loop !+++++++++++++++++++++++++++++++++++++++++++++++++++++++!+++++!   !
+         ! hopefully the last one is not lost
+         savedProbe = theProbe
+         savedProbe%ac =  theProbe%ac
+
          !                                                                             !         !
          !++++++++<+++++++++++<+++++++++++++<+++++++++++++++<+++++++++++<++++++++<+++++!         ^
          !                                                                                       !
@@ -1383,6 +1381,7 @@ CONTAINS
     !=============================================================================
     SUBROUTINE track_beam_elementwise_with_PTC ! int.subroutine
       implicit none
+      type(probe)   :: theProbe
 
       ! variables from the HOST subroutine (no need to be declared in int.subr !):
 
@@ -1475,14 +1474,24 @@ CONTAINS
                !                                                                                 !  ! !
                jmax_at_loop_start = jmax_numb_particl_at_i_th_turn                               !  ^ !
                j_last_particle_buffer=j_th_partic   ! remember index value after END DO          !  ! !
+               
+               
+               theProbe = savedProbe
+               theProbe%ac =  savedProbe%ac
+               theProbe = x_coord_incl_co(:,j_th_partic)
+               call propagate(my_ring,theProbe,MYSTATE, &                     !  ! !
+                              fibre1=i_current_elem,fibre2=i_current_elem+1)       
+               current_x_coord_incl_co = theProbe%x
+
+               
                !                                                                                 !  ! l
-               do k_th_coord=1,6 ! extract coords for the current particle -----!                +  ^ o
-                  current_x_coord_incl_co(k_th_coord)= &                        !                +  ! o
-                       x_coord_incl_co(k_th_coord,j_th_partic)                  !                +  ! p
-               end do !---------------------------------------------------------!                +  ! !
-               !                                                                                 +  ^ !
-               call track_probe_x(my_ring,current_x_coord_incl_co,MYSTATE, &                     !  ! !
-                    fibre1=i_current_elem,fibre2=i_current_elem+1)                               !  ! !
+               ! v1: do k_th_coord=1,6 ! extract coords for the current particle -----!                +  ^ o
+               ! v1:    current_x_coord_incl_co(k_th_coord)= &                        !                +  ! o
+               ! v1:         x_coord_incl_co(k_th_coord,j_th_partic)                  !                +  ! p
+               ! v1: end do !---------------------------------------------------------!                +  ! !
+               ! v1: call track_probe_x(my_ring,current_x_coord_incl_co,MYSTATE, &                     !  ! !
+               ! v1:      fibre1=i_current_elem,fibre2=i_current_elem+1)                               !  ! !
+               
                
 
                if (ptc_track_debug) then
@@ -1595,6 +1604,9 @@ CONTAINS
                END IF if_ptc_track_unstable ! === ptc_track unstable ===>=======>====!    V      !  ! !
                !                                                                          v      !  ! !
             END DO  Particle_loop !+++++++++++++++++++++++++++++++++++++++++++++++++++++++v++++++!  ! e
+            
+            savedProbe = theProbe
+            savedProbe%ac =  theProbe%ac
             !                                                                             V         ! l
             !++++++++<+++++++++++<+++++++++++++<+++++++++++++++<+++++++++++<++++++++<+++++!         ^ e
             !                                                                                       ! m
@@ -3367,6 +3379,43 @@ subroutine tp_ploss(npart,turn,spos,orbit,el_name, energy)
   call augment_count(table)
 end subroutine tp_ploss
 
+subroutine acdipoleramping(t)
+  implicit none
+  !----------------------------------------------------------------------*
+  !--- ramp up and down of the ac dipols 
+  !--- Adjust amplitudes in function of turns                          *
+  integer  t
+  integer  n
+  real(dp) r
+  
+  do n=1,nclocks
+   
+   
+   if (clocks(n)%rampupstop < 1) then
+     ! no ramping, always full amplitude 
+     clocks(n)%element%mag%d_ac = one
+     continue
+   endif
+     
+   if (t < clocks(n)%rampupstart) then
+     clocks(n)%element%mag%d_ac = zero
+   elseif (t < clocks(n)%rampupstop) then
+     r = (t - clocks(n)%rampupstart)
+     clocks(n)%element%mag%d_ac = r/(clocks(n)%rampupstop - clocks(n)%rampupstart)
+   elseif (t < clocks(n)%rampdownstart) then
+     clocks(n)%element%mag%d_ac = one 
+   elseif (t < clocks(n)%rampdownstop) then
+     r = (clocks(n)%rampdownstop - t)
+     clocks(n)%element%mag%d_ac = r/(clocks(n)%rampdownstop - clocks(n)%rampdownstart)
+   else
+     clocks(n)%element%mag%d_ac = zero
+   endif
+
+  ! print*,"Setting ramp to clock ",n," element ", clocks(1)%element%mag%name, " to ", clocks(n)%element%mag%d_ac
+  
+  enddo
+ 
+end subroutine acdipoleramping
 
 
 END MODULE madx_ptc_track_run_module

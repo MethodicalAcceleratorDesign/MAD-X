@@ -145,7 +145,7 @@ CONTAINS
     !  his survey would have to be "caught" in this interface
 
     SELECT CASE(EL%KIND)
-    case(kind0:kind22,KINDWIGGLER,kindpa,kindsuperdrift)
+    case(kind0:kind22,KINDWIGGLER,kindpa,kindsuperdrift,kindabell)
        call SURVEY_chart(C,el%p,dir,magnetframe,E_IN)
 
        !    case(kind23)

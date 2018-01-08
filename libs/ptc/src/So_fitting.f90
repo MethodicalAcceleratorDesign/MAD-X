@@ -746,9 +746,11 @@ eta2=0.0_dp
 
     SET_TPSAFIT=.FALSE.
 
+
     DO I=1,NPOLY
        R=POLY(i)
     ENDDO
+
     CLOSED(:)=0.0_dp
     it=0
 100 continue
@@ -773,6 +775,8 @@ eta2=0.0_dp
     write(6,*) c_%no,c_%nv,c_%nd,c_%nd2
     write(6,*) "c_%ndpt,c_%npara,c_%npara,c_%np_pol"
     write(6,*)  c_%ndpt,c_%npara,c_%npara,c_%np_pol
+
+
     NORM=Y
     gam(1)=(norm%a_t%v(2).sub.'1')**2+(norm%a_t%v(2).sub.'01')**2
     gam(2)=(norm%a_t%v(4).sub.'001')**2+(norm%a_t%v(4).sub.'0001')**2

@@ -137,6 +137,14 @@ subroutine w_ptc_setradiation(method)
   call ptc_setradiation(method)
 end subroutine w_ptc_setradiation
 
+subroutine w_ptc_setmodulation(method)
+  use precision_constants
+  use madx_ptc_intstate_module
+  implicit none
+  integer method
+  call ptc_setmodulation(method)
+end subroutine w_ptc_setmodulation
+
 subroutine w_ptc_setexactmis(method)
   use precision_constants
   use madx_ptc_intstate_module

@@ -76,29 +76,31 @@ module precision_constants
   real(dp),parameter::RAD_TO_DEG_=180.0_dp/pi,DEG_TO_RAD_=pi/180.0_dp
   !Physical Constants
   real(dp),parameter::A_ELECTRON=1.1596521809126e-3_dp ! NIST CODATA 2014
-  real(dp),parameter::A_MUON=1.1659208963e-3_dp        ! NIST CODATA 2014
-  real(dp),parameter::A_PROTON=1.79284735e-0_dp        !
-  real(dp),parameter::pmaMUON=105.658374524E-3_dp      ! NIST CODATA 2014
-  real(dp) :: e_muon = 0.d0, volt_c=1.0e-3_dp, volt_i=1.0_dp
-  !  real(dp),parameter:: pmadt = 1.875612793e0_dp     ! sateesh
-  !  real(dp),parameter:: pmah3 = 2.808391e0_dp        ! sateesh
-  !  real(dp),parameter:: A_dt = -0.142987272e0_dp     ! sateesh
-  !  real(dp),parameter:: a_h3 =-4.183963e0_dp         ! sateesh
+   real(dp),parameter::A_MUON=1.1659208963e-3_dp        ! NIST CODATA 2014
+   real(dp),parameter::A_PROTON=1.79284735e-0_dp        !
+   real(dp),parameter::pmaMUON=105.658374524E-3_dp      ! NIST CODATA 2014
+   real(dp) :: e_muon = 0.d0, volt_c=1.0e-3_dp, volt_i=1.0_dp
+ !  real(dp),parameter:: pmadt = 1.875612793e0_dp    ! sateesh
+  !  real(dp),parameter:: pmah3 = 2.808391e0_dp    ! sateesh
+  !  real(dp),parameter:: A_dt = -0.142987272e0_dp    ! sateesh
+  !  real(dp),parameter:: a_h3 =-4.183963e0_dp    ! sateesh
   logical(lp),  public :: longprint = my_true
 
-  real(dp) :: A_particle=A_ELECTRON
-  real(dp),parameter::pmae=5.10998946131e-4_dp     ! NIST CODATA 2014
-  real(dp),parameter::pmae_amu=5.4461702177e-4_dp  ! NIST CODATA 2014 [GeV]
-  real(dp),parameter::pmap=0.938272081358e0_dp     ! NIST CODATA 2014 [GeV]
-  real(dp),parameter::CLIGHT=2.99792458e8_dp       ! exact [m/s]
-  real(dp),parameter::hbar=6.58211951440e-25_dp    ! NIST CODATA 2014 [GeV*s]
-  real(dp),parameter::dhbar=1.05457180013e-34_dp   ! NIST CODATA 2014 [J*s]
-  real(dp),parameter::qelect=1.602176620898e-19_dp ! NIST CODATA 2014 [A*s]
-  real(dp),parameter::eps_0=8.854187817e-12_dp     ! exact [A*S/V*m]
-  real(dp),parameter::class_e_radius=qelect/4.0_dp/pi/eps_0/pmae/1e9_dp ![m]
-  real(dp),parameter::CGAM=4.0_dp*pi/3.0_dp*class_e_radius/pmae**3 ![m/Gev^3] old: 8.846056192e-5_dp
-  real(dp),parameter::HBC=hbar*CLIGHT              ![GeV*m] old: HBC=1.9732858e-16_dp
+   real(dp) :: A_particle=A_ELECTRON
+   real(dp),parameter::pmae=5.109989461e-4_dp     ! NIST CODATA 2014
+   real(dp),parameter::pmae_amu=5.4461702177e-4_dp  ! NIST CODATA 2014 [GeV]
+   real(dp),parameter::pmap=0.9382720813e0_dp     ! NIST CODATA 2014 [GeV]
+   real(dp),parameter::CLIGHT=2.99792458e8_dp       ! exact [m/s]
+   real(dp),parameter::hbar=6.582119514e-25_dp    ! NIST CODATA 2014 [GeV*s]
+   real(dp),parameter::dhbar=1.054571800e-34_dp   ! NIST CODATA 2014 [J*s]
+   real(dp),parameter::qelect=1.6021766208e-19_dp ! NIST CODATA 2014 [A*s]
+   real(dp),parameter::eps_0=8.854187817e-12_dp     ! exact [A*S/V*m]
+   real(dp),parameter::class_e_radius=qelect/4.0_dp/pi/eps_0/pmae/1e9_dp ![m]
+   real(dp),parameter::CGAM=4.0_dp*pi/3.0_dp*class_e_radius/pmae**3 ![m/Gev^3] old: 8.846056192e-5_dp
+   real(dp),parameter::HBC=hbar*CLIGHT              ![GeV*m] old: HBC=1.9732858e-16_dp
+  ![GeV*m] old: HBC=1.9732858e-16_dp
   !Smallness Parameters
+   !Smallness Parameters
   real(dp),parameter::epsmac=1e-7_dp,c_1d_20=1e-20_dp,c_1d_37=1e-37_dp
   real(dp) :: epsflo=1.e-10_dp
   real(dp),parameter::mybig=1e38_dp
@@ -186,7 +188,8 @@ module precision_constants
   DATA lielib_print /0,0,0,0,0,0,0,0,0,0,0,1,0,1,1/
   integer :: SECTOR_NMUL_MAX=22
   INTEGER, target :: SECTOR_NMUL = 11
-!  integer, parameter :: no_e=5  !  electric
+ 
+!  integer, parameter :: no_e=5  !  electric 
   logical(lp) :: use_complex_in_ptc=.false.
   logical(lp) :: change_sector=my_true
   real(dp) :: xlost(6)=0.0_dp
@@ -299,13 +302,13 @@ module precision_constants
      real(dp),pointer :: phase0  => null()! default phase in cavity
      logical(lp), pointer :: global_verbose => null()
      logical(lp), pointer :: no_hyperbolic_in_normal_form => null()! unstable produces exception
-     integer, pointer :: ndpt_bmad => null()
+     integer, pointer :: ndpt_bmad => null() 
   end type CONTROL
 
   type(control) c_
+ 
 
-
-
+ 
 
 contains
 
@@ -434,11 +437,11 @@ contains
     n=ncar
   end subroutine  get_ncar
 
+ 
 
 
 
-
-
+ 
 
 !!!!!!!!!!!!!!!!!! old   special for lielib: others in sa_extend_poly
   REAL(DP) FUNCTION  ARCCOS_lielib(X)  ! REPLACES ACOS(X)
@@ -451,11 +454,13 @@ contains
     IF((ABS(X)>1.0_dp).AND.c_%ROOT_CHECK) THEN
        ARCCOS_lielib=0.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="a_scratch_size.f90 ARCCOS_lielib: abs(x)>1"
     ELSEIF(ABS(X)<=1.0_dp) THEN
        ARCCOS_lielib=ACOS(X)
     ELSE      !  IF X IS NOT A NUMBER
        ARCCOS_lielib=0.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="a_scratch_size.f90 ARCCOS_lielib: x is NaN"
     ENDIF
 
   END FUNCTION ARCCOS_lielib
@@ -471,6 +476,7 @@ contains
     IF(X<=0.0_dp.AND.c_%ROOT_CHECK) THEN
        LOGE_lielib=0.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="a_scratch_size.f90 LOGE_lielib: x<0"
     ELSE
        LOGE_lielib=LOG(X)
     ENDIF
@@ -487,21 +493,21 @@ contains
 ! qvar = variance of measured tune
 !
       implicit none
-
+      
       ! Input parameters
       integer nt, dt
       real(dp) :: xlist(1:nt), pxlist(1:nt)
-      real(dp) q0
-
+      real(dp) q0 
+      
       ! Output
       real(dp) qmean, qvar
-
+      
       ! Local
       real(dp) qmin, qmax, afind, bfind, stepfind, find, findnu, xnu
       real(dp) sumr, sumi, tw, rr, sumnorm
       real(dp), allocatable :: nulist(:)
       integer np, nwindow, iw, ik, ik1, i
-
+      
       ! Preparations
       qmin = floor(q0*2.0)/2.0+0.001
       qmax = qmin + 0.498
@@ -510,7 +516,7 @@ contains
       allocate(nulist(1:nwindow))
       qmean = 0.0
       qvar = 0.0
-
+      
       ! FMA calculation, Ref. D. Shatilov, Phys. Rev. ST Accel. Beams 14, 014001 (2011)
       do iw = 0, nwindow-1
         afind = qmax
@@ -535,7 +541,7 @@ contains
             sumnorm = sqrt((sumr*sumr+sumi*sumi)/np)
             if(find < sumnorm) then
               find = sumnorm
-              findnu = xnu
+              findnu = xnu  
             end if
             xnu = xnu - stepfind
           enddo
@@ -545,19 +551,19 @@ contains
         enddo
         nulist(iw+1) = findnu
       enddo
-
+      
       do i = 1, nwindow
         qmean = qmean + nulist(i)
       enddo
       qmean = qmean/nwindow
-
+      
       do i = 1, nwindow
         qvar = qvar + (nulist(i)-qmean) * (nulist(i)-qmean)
       enddo
       qvar = sqrt(qvar/nwindow)
 
       return
-
+      
    end subroutine dofma
 end module precision_constants
 
@@ -565,7 +571,7 @@ end module precision_constants
 module scratch_size
   implicit none
   public
-  integer,parameter::ndumt=10
+  integer,parameter::ndumt=10 
   integer,parameter::c_ndumt=10                   !  Number of scratch level
 end module scratch_size
 
@@ -1178,7 +1184,7 @@ contains
 
   FUNCTION DSQRTT( S1 )
     implicit none
-    type (my_1D_taylor) DSQRTT
+    type (my_1D_taylor) DSQRTT 
     type (my_1D_taylor), INTENT (IN) :: S1
     ! WRITE(6,*) " MARDE "
     ! STOP 666
@@ -1279,8 +1285,8 @@ contains
 
 end module gauss_dis
 
-
-
+ 
+ 
 integer function mypause(i)
   use precision_constants
   implicit none
@@ -1289,12 +1295,12 @@ integer function mypause(i)
   !
   integer i
   !
-
+ 
 write(6,*) ' ipause=mypause(0)  '
 
    read(5,*) I
   mypause=i
-
+ 
 end function mypause
 
 integer function mypauses(i,string)
@@ -1306,10 +1312,10 @@ integer function mypauses(i,string)
   integer i,l,n
   character(*) string
   !
-
+ 
  write(6,*) string
-write(6,*) ' ipause=mypause(0)  '
+write(6,*) ' ipause=mypause(0)  ' 
  read(*,*) I
   mypauses=i
-
+ 
 end function mypauses
