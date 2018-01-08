@@ -34,15 +34,7 @@ else()
    set_source_files_properties(matchlib2.f90 PROPERTIES COMPILE_FLAGS "-O0")
 endif()
 
-# remove source files according to NTPSA option...
-if(MADX_NTPSA)
-   message(STATUS "NTPSA turned on")
-   file(GLOB ntpsa_remove c_dabnew.f90)
-else()
-   file(GLOB ntpsa_remove c_dabnew_berz.f90 c_tpsa_interface.F90 tpsa.cpp)
-endif()
-
-set(remove_list ${gxx_remove} ${sdds_remove} ${mkthin_remove} ${ntpsa_remove} ${lapack_remove})
+set(remove_list ${gxx_remove} ${sdds_remove} ${mkthin_remove} ${lapack_remove})
 list(REMOVE_ITEM src_files ${remove_list})
 
 # header files...
