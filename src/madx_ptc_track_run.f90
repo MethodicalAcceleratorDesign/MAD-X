@@ -26,7 +26,7 @@ MODULE madx_ptc_track_run_module
   USE madx_ptc_module , ONLY: dp, lp, lnv, &
                                 ! shorts for <double precision>, <logical>, 0D0 etc.
        doublenum, & ! am temprorary double number for I/O with C-procedures
-       propagate, clocks, nclocks, get_length
+       propagate, clocks, nclocks, acdipoleramping
   USE madx_ptc_intstate_module, ONLY: getdebug  ! new debug control by PS (from 2006.03.20)
   use name_lenfi
   use definition
@@ -332,12 +332,12 @@ CONTAINS
     call ptc_track_ini_conditions
 
     if (clocks(1)%freq > 0) then
-      !call get_length(my_ring,circumference)
+      !call get_length(my_ring,circumference) ! need to specify in use at the top
       !savedProbe%ac%om = twopi*clocks(1)%freq / circumference
       !omega of the the modulation
       savedProbe%ac%om = twopi*clocks(1)%freq
-      savedProbe%ac%x(1)  = one  ! initial clock vector
-      savedProbe%ac%x(2)  = zero
+      savedProbe%ac%x(1)  = zero  
+      savedProbe%ac%x(2)  = one  ! initial clock vector (sin like)
     endif
 
     Call Set_initial_particle_ID ! Int.subr. below in this subr.
@@ -3378,44 +3378,6 @@ subroutine tp_ploss(npart,turn,spos,orbit,el_name, energy)
 
   call augment_count(table)
 end subroutine tp_ploss
-
-subroutine acdipoleramping(t)
-  implicit none
-  !----------------------------------------------------------------------*
-  !--- ramp up and down of the ac dipols 
-  !--- Adjust amplitudes in function of turns                          *
-  integer  t
-  integer  n
-  real(dp) r
-  
-  do n=1,nclocks
-   
-   
-   if (clocks(n)%rampupstop < 1) then
-     ! no ramping, always full amplitude 
-     clocks(n)%element%mag%d_ac = one
-     continue
-   endif
-     
-   if (t < clocks(n)%rampupstart) then
-     clocks(n)%element%mag%d_ac = zero
-   elseif (t < clocks(n)%rampupstop) then
-     r = (t - clocks(n)%rampupstart)
-     clocks(n)%element%mag%d_ac = r/(clocks(n)%rampupstop - clocks(n)%rampupstart)
-   elseif (t < clocks(n)%rampdownstart) then
-     clocks(n)%element%mag%d_ac = one 
-   elseif (t < clocks(n)%rampdownstop) then
-     r = (clocks(n)%rampdownstop - t)
-     clocks(n)%element%mag%d_ac = r/(clocks(n)%rampdownstop - clocks(n)%rampdownstart)
-   else
-     clocks(n)%element%mag%d_ac = zero
-   endif
-
-  ! print*,"Setting ramp to clock ",n," element ", clocks(1)%element%mag%name, " to ", clocks(n)%element%mag%d_ac
-  
-  enddo
- 
-end subroutine acdipoleramping
 
 
 END MODULE madx_ptc_track_run_module

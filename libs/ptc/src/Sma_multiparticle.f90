@@ -115,7 +115,7 @@ CONTAINS
     if( K%MODULATION .and. ASSOCIATED(EL%slow_ac2) .and. EL%slow_ac2 ) THEN
     
        V=zero
-       DV=el%D_ac*XS%AC%X(1)
+       DV=el%D_ac*XS%AC%X(2)
      !  print*, "Skowron: ",EL%name," slow_ac ",EL%slow_ac, " ", EL%slow_ac2
      !  print*, "Skowron: Fast Modulation V=",V," DV=",DV
 

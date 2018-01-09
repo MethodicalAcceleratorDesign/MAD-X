@@ -1264,8 +1264,39 @@ CONTAINS
        enddo
        
         key%list%n_ac = 1 ! only dipole
-        key%list%d_bn(1) = node_value('volt ')
+        key%list%d_bn(1) =  0.3 * node_value('volt ')  / get_value('beam ','pc ')
         key%list%d_an(1) = zero
+        
+        key%list%D_ac = one ! extrac factor for amplitude; we use it for ramping
+        
+        ! parameters to modulate the nominal parameters. No modulation in MADX implemented.
+        key%list%DC_ac = zero
+        key%list%A_ac = zero
+        key%list%theta_ac = zero
+        
+        nclocks = 1
+        clocks(nclocks)%freq = node_value('freq ')
+        clocks(nclocks)%lag  = node_value('lag ')
+
+        clocks(nclocks)%rampupstart = node_value('ramp1 ')
+        clocks(nclocks)%rampupstop = node_value('ramp2 ')
+        clocks(nclocks)%rampdownstart = node_value('ramp3 ')
+        clocks(nclocks)%rampdownstop = node_value('ramp4 ')
+
+    case(41)
+       
+       print*,""
+       print*," HORIZONTAL AC DIPOLE"
+       print*,""
+       key%magnet="hkicker"
+       do i=1,NMAX
+          key%list%k(i)=zero
+          key%list%ks(i)=zero
+       enddo
+       
+        key%list%n_ac = 1 ! only dipole
+        key%list%d_an(1) = 0.3 * node_value('volt ')  / get_value('beam ','pc ')
+        key%list%d_bn(1) = zero
         
         key%list%D_ac = one ! extrac factor for amplitude; we use it for ramping
         
@@ -1408,7 +1439,8 @@ CONTAINS
 !    endif
     call create_fibre(my_ring%end,key,EXCEPTION) !in ../libs/ptc/src/Sp_keywords.f90
     
-    if(code.eq.40) then
+    if(code.eq.40 .or. code.eq.41 ) then
+     !save pointer to the AC dipole element for ramping in tracking
      clocks(1)%element=>my_ring%end
      print*,"Setting element to clock ",clocks(1)%element%mag%name
     endif
@@ -2151,6 +2183,7 @@ CONTAINS
 
 
   end subroutine ptc_dumpmaps
+  !________________________________________________________________________________________________
 
   RECURSIVE FUNCTION FACTORIAL (N) &
        RESULT (FACTORIAL_RESULT)
@@ -2162,6 +2195,7 @@ CONTAINS
        FACTORIAL_RESULT = N * FACTORIAL (N-1)
     END IF
   END FUNCTION FACTORIAL
+  !________________________________________________________________________________________________
 
   subroutine ptc_track()
     implicit none
@@ -2247,9 +2281,6 @@ CONTAINS
     print*,"  Last Coordinates: ",x," after: ",i," turn(s)"
 
   END subroutine ptc_track
-
-
-
   !________________________________________________________________________________
 
 
@@ -2527,8 +2558,7 @@ CONTAINS
     icase = i
 
   end subroutine my_state
-
-  !______________________________________________________________________
+  !________________________________________________________________________________________________
 
   subroutine f90flush(i,option)
     implicit none
@@ -2570,6 +2600,7 @@ CONTAINS
          ' F90FLUSH RE-OPEN FAILED with IOSTAT ',ios,' on UNIT ',i
     stop
   end subroutine f90flush
+  !________________________________________________________________________________________________
 
   SUBROUTINE write_closed_orbit(icase,x)
     implicit none
@@ -2583,6 +2614,7 @@ CONTAINS
        print*,"Closed orbit: ",x(1),x(2),x(3),x(4),-x(6),x(5)
     endif
   ENDSUBROUTINE write_closed_orbit
+  !________________________________________________________________________________________________
 
   SUBROUTINE Convert_dp_to_dt(deltap, dt)
     implicit none
@@ -2752,17 +2784,10 @@ CONTAINS
        enddo
     enddo
 
-
-
-
-
     deallocate(j)
 
 
-
   end subroutine makemaptable
-
-
   !_________________________________________________________________
 
   subroutine killsavedmaps
@@ -2886,6 +2911,7 @@ CONTAINS
     return
 
   end SUBROUTINE ptc_read_errors
+  !________________________________________________________________________________________________
 
   subroutine ptc_refresh_k()
     use twtrrfi
@@ -2972,6 +2998,7 @@ CONTAINS
     return
 
   END subroutine ptc_refresh_k
+  !________________________________________________________________________________________________
 
   subroutine getfk(fk)
   !returns FK factor for Beam-Beam effect
@@ -3017,9 +3044,7 @@ CONTAINS
          (one-beta0*beta_dp*b_dir)/(beta_dp+0.5*(b_dir-one)*b_dir*beta0)
 
   end subroutine getfk
-
-
-
+  !________________________________________________________________________________________________
 
   subroutine putbeambeam()
     implicit none
@@ -3090,10 +3115,61 @@ CONTAINS
       call fort_warn('getBeamBeam: ','Bad node case for BeamBeam')
     endif
 
-
     !N.B. If nothing else is done, the beam-beam kick is placed at the entrance of the node.
     !The call FIND_PATCH(t%a,t%ent,o ,mid,D,ANG) needs to be invoked to place the beam-beam kick
 
   end subroutine putbeambeam
+  !________________________________________________________________________________________________
+  
+  subroutine acdipoleramping(t)
+    implicit none
+    !---------------------------------------    *
+    !--- ramp up and down of the ac dipols      *
+    !--- Adjust amplitudes in function of turns *
+    integer  t
+    integer  n
+    real(dp) r
+
+    do n=1,nclocks
+
+
+     if (clocks(n)%rampupstop < 1) then
+       ! no ramping, always full amplitude 
+       clocks(n)%element%mag%d_ac = one
+       cycle
+     endif
+
+     if (t < clocks(n)%rampupstart) then
+       clocks(n)%element%mag%d_ac = zero
+       cycle
+     endif
+
+     if (t < clocks(n)%rampupstop) then
+       r = (t - clocks(n)%rampupstart)
+       clocks(n)%element%mag%d_ac = r/(clocks(n)%rampupstop - clocks(n)%rampupstart)
+       cycle
+     endif
+
+     if (t < clocks(n)%rampdownstart) then
+       clocks(n)%element%mag%d_ac = one 
+       cycle
+     endif
+
+     if (t < clocks(n)%rampdownstop) then
+       r = (clocks(n)%rampdownstop - t)
+       clocks(n)%element%mag%d_ac = r/(clocks(n)%rampdownstop - clocks(n)%rampdownstart)
+       cycle
+     endif
+
+     clocks(n)%element%mag%d_ac = zero
+
+    ! print*,"Setting ramp to clock ",n," element ", clocks(1)%element%mag%name, " to ", clocks(n)%element%mag%d_ac
+
+    enddo
+
+  end subroutine acdipoleramping
+
+
+
 
 END MODULE madx_ptc_module
