@@ -45,7 +45,7 @@ get_val_num(char* in_string, int start, int end)
 
 char*
 v_format(const char* string)
-  /* copies string to gloval variable var_form
+  /* copies string to global variable var_form
      replacing  %S, %I, and %F by the user defined formats;
      %NF and %NI are replaced by the field lengths (!) of the defined formats */
 {

@@ -714,6 +714,7 @@ const char *const_command_def =
 "exact_mis = [l, false, true], " /* switch to ensure exact misaligment treatment */
 "totalpath = [l, false, true], "      /* switch to use totalpath, modifies PTC states by adding totalpath0 flag */
 "radiation = [l, false, true], "  /*sets the radiation switch/internal state of PTC */
+"modulation = [l, false, true], "  /*sets the modulation switch/internal state of PTC */
 "stochastic = [l, false, true], "  /*sets the stochastic switch/internal state of PTC */
 "envelope = [l, false, true], "  /*sets the envelope switch/internal state of PTC */
 "fringe = [l, false, true], "  /*sets the fringe switch/internal state of PTC */

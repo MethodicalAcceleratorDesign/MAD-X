@@ -1,9 +1,9 @@
 @ NAME             %14s "NORMAL_RESULTS"
 @ TYPE             %10s "NORMAL_RES"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %17s "5.03.07 Darwin 64"
-@ DATE             %08s "14/12/17"
-@ TIME             %08s "18.05.40"
+@ ORIGIN           %16s "5.03.07 Linux 64"
+@ DATE             %08s "09/01/18"
+@ TIME             %08s "16.23.44"
 * NAME                   ORDER1     ORDER2     ORDER3     ORDER4              VALUE 
 $ %s                         %d         %d         %d         %d                %le 
  "DX"                         1          0          0          0        3.582458221
@@ -23,13 +23,13 @@ $ %s                         %d         %d         %d         %d                
  "ANHX"                       0          1          0          0        6.070226235
  "ANHY"                       1          0          0          0        6.070226235
  "ANHX"                       2          0          0          0      -0.4193243091
- "ANHX"                       3          0          0          0                 -0
+ "ANHX"                       3          0          0          0       -149.9229749
  "ANHX"                       1          1          0          0         1767.94813
  "ANHX"                       0          2          0          0        3285.175861
  "ANHY"                       0          2          0          0        1192.161832
  "ANHY"                       1          1          0          0        3285.175861
  "ANHY"                       2          0          0          0         1767.94813
- "ANHY"                       3          0          0          0                 -0
+ "ANHY"                       3          0          0          0         1692255.09
  "GNFC"                       4          0          1          0          2.7708777
  "GNFS"                       4          0          1          0        4.416394593
  "GNFA"                       4          0          1          0        5.213665162

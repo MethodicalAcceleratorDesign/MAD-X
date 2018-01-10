@@ -51,6 +51,7 @@ module definition
   integer, target :: nb_ =0   ! global group index
   integer, parameter :: ndim2t=10   ! maximum complex size
   integer, parameter :: wiggler_suntao=24
+  real(dp) :: global_e =0
   integer :: bmadparser = 0
   logical :: tangent = .false.,force_rescale=.false.   ! force_rescale for vorname=HELICAL see fibre_work routine
   TYPE sub_taylor
@@ -303,6 +304,7 @@ module definition
      type(spinor) s(3)
      logical u
      type(integration_node),pointer :: last_node=>null()
+      real(dp) e
   end type probe
   !@3 ---------------------------------------------</br>
   type probe_8
@@ -313,6 +315,7 @@ module definition
      !   stuff for exception
      logical u
      type(integration_node),pointer :: last_node=>null()
+      real(dp) e
   end type probe_8
   !@3 ---------------------------------------------</br>
   type TEMPORAL_PROBE
@@ -362,7 +365,10 @@ module definition
   end type c_spinor
   !@3 ---------------------------------------------</br>
 
-
+type c_yu_w
+ type (c_taylor),pointer :: w(:,:)=> null() !@1 orbital part of the map 
+ integer :: n=0 !@1 of non zero w
+end type c_yu_w
 
 type c_damap
  type (c_taylor) v(lnv) !@1 orbital part of the map 
@@ -534,12 +540,13 @@ contains
     IF((X<0.0_dp).AND.c_%ROOT_CHECK) THEN
        ROOT=1.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Root undefined "
+       messagelost="h_definition.f90 root : negative argument "
     ELSEIF(X>=0.0_dp) THEN
        ROOT=SQRT(X)
     ELSE      !  IF X IS NOT A NUMBER
        ROOT=1.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="h_definition.f90 root : NaN argument "
     ENDIF
 
   END FUNCTION ROOT
@@ -554,12 +561,13 @@ contains
     IF((ABS(X)>1.0_dp).AND.c_%ROOT_CHECK) THEN
        ARCSIN=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Arcsin undefined "
+       messagelost="h_definition.f90 arcsin : abs(x)>1 "
     ELSEIF(ABS(X)<=1.0_dp) THEN
        ARCSIN=ASIN(X)
     ELSE      !  IF X IS NOT A NUMBER
        ARCSIN=0.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="h_definition.f90 arcsin : x is NaN "
     ENDIF
 
   END FUNCTION ARCSIN
@@ -574,12 +582,13 @@ contains
     IF((ABS(X)>1.0_dp).AND.c_%ROOT_CHECK) THEN
        ARCCOS=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Arccos undefined "
+       messagelost="h_definition.f90 arccos : abs(x)>1 "
     ELSEIF(ABS(X)<=1.0_dp) THEN
        ARCCOS=ACOS(X)
     ELSE      !  IF X IS NOT A NUMBER
        ARCCOS=0.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="h_definition.f90 arccos : x is NaN "
     ENDIF
 
   END FUNCTION ARCCOS
@@ -595,7 +604,7 @@ contains
     IF(X<=0.0_dp.AND.c_%ROOT_CHECK) THEN
        LOGE=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Log undefined "
+       messagelost="h_definition.f90 loge : negative argument "
     ELSE
        LOGE=LOG(X)
     ENDIF
@@ -615,12 +624,13 @@ contains
     IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
        COSEH=1.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Coseh undefined "
+       messagelost="h_definition.f90 coseh : abs(x)>hyperbolic_aperture "
     ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
        COSEH=COSH(X)
     ELSE      !  IF X IS NOT A NUMBER
        COSEH=1.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="h_definition.f90 coseh : x is NaN "
     ENDIF
 
   END FUNCTION COSEH
@@ -636,12 +646,13 @@ contains
     IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
        SINEH=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Sineh undefined "
+       messagelost="h_definition.f90 sineh : abs(x)>hyperbolic_aperture "
     ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
        SINEH=SINH(X)
     ELSE      !  IF X IS NOT A NUMBER
        SINEH=0.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="h_definition.f90 sineh : x is NaN "
     ENDIF
 
   END FUNCTION SINEH
@@ -657,12 +668,13 @@ contains
     IF((ABS(X)>c_%hyperbolic_aperture).AND.c_%ROOT_CHECK) THEN
        arctan=0.0_dp
        c_%CHECK_STABLE=.FALSE.
-       messagelost="Arctan undefined "
+       messagelost="h_definition.f90 arctan : abs(x)>hyperbolic_aperture "
     ELSEIF(ABS(X)<=c_%hyperbolic_aperture) THEN
        arctan=atan(X)
     ELSE      !  IF X IS NOT A NUMBER
        arctan=0.0_dp
        c_%CHECK_STABLE=.FALSE.
+       messagelost="h_definition.f90 arctan : x is NaN "
     ENDIF
 
   END FUNCTION arctan
