@@ -26,7 +26,7 @@ MODULE madx_ptc_track_run_module
   USE madx_ptc_module , ONLY: dp, lp, lnv, &
                                 ! shorts for <double precision>, <logical>, 0D0 etc.
        doublenum, & ! am temprorary double number for I/O with C-procedures
-       propagate, clocks, nclocks, acdipoleramping
+       propagate, clocks, nclocks, acdipoleramping, get_length
   USE madx_ptc_intstate_module, ONLY: getdebug  ! new debug control by PS (from 2006.03.20)
   use name_lenfi
   use definition
@@ -238,7 +238,6 @@ CONTAINS
     !hbu
     data vec_names  / 'x', 'px', 'y', 'py', 't', 'pt','s' / ! MADX
     !data vec_names / 'x', 'px', 'y', 'py', 'pt', 't','s' / ! PTC has a reverse order for pt and t
-    real(dp)  circumference
     logical(lp) rplot
     integer   mft ! debug output file
     !k    data char_a / ' ' /
@@ -331,14 +330,7 @@ CONTAINS
 
     call ptc_track_ini_conditions
 
-    if (clocks(1)%freq > 0) then
-      !call get_length(my_ring,circumference) ! need to specify in use at the top
-      !savedProbe%ac%om = twopi*clocks(1)%freq / circumference
-      !omega of the the modulation
-      savedProbe%ac%om = twopi*clocks(1)%freq
-      savedProbe%ac%x(1)  = zero  
-      savedProbe%ac%x(2)  = one  ! initial clock vector (sin like)
-    endif
+    call ptc_track_ini_modulation
 
     Call Set_initial_particle_ID ! Int.subr. below in this subr.
 
@@ -3272,113 +3264,132 @@ CONTAINS
   END subroutine Get_map_from_NormalForm
   !==============================================================================
 
-    SUBROUTINE kill_ptc_track (n_particle,       &
-                               i_th_turn,        &
-	           sum_accum_length, &
-	           j_max,            &
-                               part_ID,          &
-	           last_turn,        &
-	           last_position_of, &
-	           last_orbit_of,    &
-                               x_coord_incl_co, el_name,en )
-      implicit none
-      ! the next variables are local
-      Integer, intent (IN)     :: n_particle  ! number of particle to be kill
-      Integer, intent (IN)     :: i_th_turn
-      real(dp),intent (IN)     :: sum_accum_length, en ! input as 0
-      Integer, intent (INOUT)  :: j_max    ! number surviving particles (here, j=j-1)
-      Integer, intent (INOUT)  :: part_ID(*) ! particle number is reodered(1:N_particle_max)
-      Integer, intent (OUT)    :: last_turn(*) ! last_turn_of_lost_particle (1:N_particle_max)
-      real(dp), intent (OUT)   :: last_position_of(*), last_orbit_of(1:6,*)
-      real(dp), intent (INOUT) :: x_coord_incl_co(1:6,*)
-      character(len=24), intent (IN) :: el_name ! PTC has longer names
-      character(len=name_len) :: madx_name
-      Integer :: j_th, k_th, np, namelen
-      
-      np = part_ID(n_particle)
-      
-      last_turn(np)=i_th_turn
-      ! Save Number of this turn for n_particle
+  SUBROUTINE kill_ptc_track (n_particle,       &
+                             i_th_turn,        &
+	         sum_accum_length, &
+	         j_max,            &
+                             part_ID,          &
+	         last_turn,        &
+	         last_position_of, &
+	         last_orbit_of,    &
+                             x_coord_incl_co, el_name,en )
+    implicit none
+    ! the next variables are local
+    Integer, intent (IN)     :: n_particle  ! number of particle to be kill
+    Integer, intent (IN)     :: i_th_turn
+    real(dp),intent (IN)     :: sum_accum_length, en ! input as 0
+    Integer, intent (INOUT)  :: j_max    ! number surviving particles (here, j=j-1)
+    Integer, intent (INOUT)  :: part_ID(*) ! particle number is reodered(1:N_particle_max)
+    Integer, intent (OUT)    :: last_turn(*) ! last_turn_of_lost_particle (1:N_particle_max)
+    real(dp), intent (OUT)   :: last_position_of(*), last_orbit_of(1:6,*)
+    real(dp), intent (INOUT) :: x_coord_incl_co(1:6,*)
+    character(len=24), intent (IN) :: el_name ! PTC has longer names
+    character(len=name_len) :: madx_name
+    Integer :: j_th, k_th, np, namelen
 
-      last_position_of(np)=sum_accum_length
-      ! Save Position of n_particle
+    np = part_ID(n_particle)
 
-      last_orbit_of(:,np) = x_coord_incl_co(:,np)
+    last_turn(np)=i_th_turn
+    ! Save Number of this turn for n_particle
 
-      if (recloss) then
-        namelen = LEN_TRIM(el_name)
-        if (namelen > name_len) namelen = name_len
-        madx_name = el_name(1:namelen)
-        call tp_ploss(np,i_th_turn, sum_accum_length, x_coord_incl_co(:,np), madx_name, en)
-      endif 
-      
-      ! Renumbering arrays
-      do j_th = n_particle+1, j_max 
+    last_position_of(np)=sum_accum_length
+    ! Save Position of n_particle
 
-         part_ID(j_th-1) = part_ID(j_th)              
-         x_coord_incl_co(:,j_th-1) = x_coord_incl_co(:,j_th)  
-         
-         IF (.NOT.element_by_element) THEN 
-            part_ID_turns(i_th_turn,j_th-1) = part_ID(j_th-1) 
-         END IF
-         
-      enddo 
+    last_orbit_of(:,np) = x_coord_incl_co(:,np)
 
-      j_max = j_max - 1
+    if (recloss) then
+      namelen = LEN_TRIM(el_name)
+      if (namelen > name_len) namelen = name_len
+      madx_name = el_name(1:namelen)
+      call tp_ploss(np,i_th_turn, sum_accum_length, x_coord_incl_co(:,np), madx_name, en)
+    endif 
 
-    END SUBROUTINE kill_ptc_track
-    !=============================================================================
+    ! Renumbering arrays
+    do j_th = n_particle+1, j_max 
+
+       part_ID(j_th-1) = part_ID(j_th)              
+       x_coord_incl_co(:,j_th-1) = x_coord_incl_co(:,j_th)  
+
+       IF (.NOT.element_by_element) THEN 
+          part_ID_turns(i_th_turn,j_th-1) = part_ID(j_th-1) 
+       END IF
+
+    enddo 
+
+    j_max = j_max - 1
+
+  END SUBROUTINE kill_ptc_track
+  !=============================================================================
+
+  subroutine tp_ploss(npart,turn,spos,orbit,el_name, energy)
+    use name_lenfi
+    implicit none
+    !----------------------------------------------------------------------*
+    !--- purpose: enter lost particle coordinates in table                 *
+    !    input:                                                            *
+    !    npart  (int)           particle number                            *
+    !    turn   (int)           turn number                                *
+    !    spos    (double)       s-coordinate when loss happens             *
+    !    orbit  (double array)  particle orbit                             *
+    !    orbit0 (double array)  reference orbit                            *
+    !----------------------------------------------------------------------*
+    integer :: npart, turn
+    double precision :: spos, orbit(6)
+    character(len=name_len) :: el_name
+
+    integer :: j
+    double precision :: tmp, tt, tn, energy
+    character(len=120) :: table='trackloss'
+    character(len=4) :: vec_names(6)
+    data vec_names / 'x', 'px', 'y', 'py', 'pt', 't'/
+
+    double precision, external :: get_value
+
+    tn = npart
+    tt = turn
+
+    ! energy = get_value('probe ','energy ')
+
+    ! the number of the current particle
+    call double_to_table_curr(table, 'number ', tn)
+    ! the number of the current turn
+    call double_to_table_curr(table, 'turn ', tt)
 
 
-subroutine tp_ploss(npart,turn,spos,orbit,el_name, energy)
-  use name_lenfi
-  implicit none
-  !----------------------------------------------------------------------*
-  !--- purpose: enter lost particle coordinates in table                 *
-  !    input:                                                            *
-  !    npart  (int)           particle number                            *
-  !    turn   (int)           turn number                                *
-  !    spos    (double)       s-coordinate when loss happens             *
-  !    orbit  (double array)  particle orbit                             *
-  !    orbit0 (double array)  reference orbit                            *
-  !----------------------------------------------------------------------*
-  integer :: npart, turn
-  double precision :: spos, orbit(6)
-  character(len=name_len) :: el_name
+    do j = 1, 6
+       tmp = orbit(j)
+       call double_to_table_curr(table, vec_names(j), tmp)
+    enddo
 
-  integer :: j
-  double precision :: tmp, tt, tn, energy
-  character(len=120) :: table='trackloss'
-  character(len=4) :: vec_names(6)
-  data vec_names / 'x', 'px', 'y', 'py', 'pt', 't'/
+    tmp = spos
+    call double_to_table_curr(table,'s ',tmp)
 
-  double precision, external :: get_value
+    call double_to_table_curr(table, 'e ', energy)
+    call string_to_table_curr(table, 'element ', el_name)
 
-  tn = npart
-  tt = turn
+    call augment_count(table)
+  end subroutine tp_ploss
 
-  ! energy = get_value('probe ','energy ')
+  !=============================================================================
+  subroutine ptc_track_ini_modulation
+    USE  madx_ptc_module, ONLY: my_ring, get_one
+    implicit none
+    integer i
+    real(dp)  circumference
+    real(dp) ::  MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet
+    Call GET_ONE(MASS_GeV,ENERGY,KINETIC,BRHO,BETA0,P0C,gamma0I,gambet)        !
 
-  ! the number of the current particle
-  call double_to_table_curr(table, 'number ', tn)
-  ! the number of the current turn
-  call double_to_table_curr(table, 'turn ', tt)
-
-
-  do j = 1, 6
-     tmp = orbit(j)
-     call double_to_table_curr(table, vec_names(j), tmp)
-  enddo
-
-  tmp = spos
-  call double_to_table_curr(table,'s ',tmp)
-
-  call double_to_table_curr(table, 'e ', energy)
-  call string_to_table_curr(table, 'element ', el_name)
-
-  call augment_count(table)
-end subroutine tp_ploss
-
+    call get_length(my_ring,circumference) 
+    
+    do i=1,nclocks
+      savedProbe%ac%om = twopi*clocks(1)%tune * BETA0 / circumference
+      !omega of the the modulation
+      !savedProbe%ac%om = twopi*clocks(1)%tune
+      savedProbe%ac%x(1)  = one
+      savedProbe%ac%x(2)  = zero  ! initial clock vector (sin like)
+    enddo
+       
+  end subroutine ptc_track_ini_modulation
 
 END MODULE madx_ptc_track_run_module
 !==============================================================================

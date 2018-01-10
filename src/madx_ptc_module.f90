@@ -48,7 +48,7 @@ MODULE madx_ptc_module
   integer                   :: mapsicase = 0
 
   type clockdef
-     real(dp)                :: freq = -1 ! negative means inactive
+     real(dp)                :: tune = -1 ! negative means inactive, in fact it is tune, left like this for backward compatibility, can be changed during LS2
      real(dp)                :: lag = 0
      integer                 :: rampupstart = 0,  rampupstop = 0, rampdownstart = 0,  rampdownstop = 0
      type(fibre), pointer    :: element
@@ -68,7 +68,7 @@ CONTAINS
     integer i
     
     do i=1,nmaxclocks
-      clocks(i)%freq = -1 ! negative means inactive
+      clocks(i)%tune = -1 ! negative means inactive
       clocks(i)%lag = 0 
       clocks(i)%rampupstart = 0 
       clocks(i)%rampupstop = 0 
@@ -869,7 +869,7 @@ CONTAINS
        key%tiltd=tilt  !==========================================!
 
        !================================================================
-! dipole component not active in MAD-X proper
+       ! dipole component not active in MAD-X proper
        key%list%k(1)=key%list%k(1)+bvk*node_value('k0 ')
 
     case(6)
@@ -1254,9 +1254,6 @@ CONTAINS
     
     case(40)
        
-       print*,""
-       print*," HORIZONTAL AC DIPOLE"
-       print*,""
        key%magnet="hkicker"
        do i=1,NMAX
           key%list%k(i)=zero
@@ -1264,7 +1261,13 @@ CONTAINS
        enddo
        
         key%list%n_ac = 1 ! only dipole
-        key%list%d_bn(1) =  0.3 * node_value('volt ')  / get_value('beam ','pc ')
+        ! need to convert voltage (E field) to corresponding B field
+        if (L .gt. 0) then
+          key%list%d_bn(1) =  0.3 * node_value('volt ')  / ( L * beta0 * get_value('beam ','pc '))
+          !print*,"HACD bn(1)=", key%list%d_bn(1), "b0=",beta0, " pc=",get_value('beam ','pc '), " L=",L
+        else
+          key%list%d_bn(1) =  0.3 * node_value('volt ')  / (beta0 * get_value('beam ','pc '))
+        endif
         key%list%d_an(1) = zero
         
         key%list%D_ac = one ! extrac factor for amplitude; we use it for ramping
@@ -1275,7 +1278,10 @@ CONTAINS
         key%list%theta_ac = zero
         
         nclocks = 1
-        clocks(nclocks)%freq = node_value('freq ')
+      ! frequency is in fact tune
+      ! kept like this on Rogelio request not to break the codes before LS2
+      ! afterwards "freq" should be changed to "tune" in definition of the AC_DIPOLE
+        clocks(nclocks)%tune = node_value('freq ')
         clocks(nclocks)%lag  = node_value('lag ')
 
         clocks(nclocks)%rampupstart = node_value('ramp1 ')
@@ -1285,9 +1291,6 @@ CONTAINS
 
     case(41)
        
-       print*,""
-       print*," HORIZONTAL AC DIPOLE"
-       print*,""
        key%magnet="hkicker"
        do i=1,NMAX
           key%list%k(i)=zero
@@ -1295,7 +1298,12 @@ CONTAINS
        enddo
        
         key%list%n_ac = 1 ! only dipole
-        key%list%d_an(1) = 0.3 * node_value('volt ')  / get_value('beam ','pc ')
+        if (L .gt. 0) then
+          key%list%d_an(1) =  0.3 * node_value('volt ') / ( L * beta0 * get_value('beam ','pc '))
+          !print*,"HACD bn(1)=", key%list%d_bn(1), "b0=",beta0, " pc=",get_value('beam ','pc '), " L=",L
+        else
+          key%list%d_an(1) =  0.3 * node_value('volt ')  / (beta0 * get_value('beam ','pc '))
+        endif
         key%list%d_bn(1) = zero
         
         key%list%D_ac = one ! extrac factor for amplitude; we use it for ramping
@@ -1306,7 +1314,10 @@ CONTAINS
         key%list%theta_ac = zero
         
         nclocks = 1
-        clocks(nclocks)%freq = node_value('freq ')
+      ! frequency is in fact tune
+      ! kept like this on Rogelio request not to break the codes before LS2
+      ! afterwards "freq" should be changed to "tune" in definition of the AC_DIPOLE
+        clocks(nclocks)%tune = node_value('freq ')
         clocks(nclocks)%lag  = node_value('lag ')
 
         clocks(nclocks)%rampupstart = node_value('ramp1 ')
@@ -1442,7 +1453,7 @@ CONTAINS
     if(code.eq.40 .or. code.eq.41 ) then
      !save pointer to the AC dipole element for ramping in tracking
      clocks(1)%element=>my_ring%end
-     print*,"Setting element to clock ",clocks(1)%element%mag%name
+     !print*,"Setting element to clock ",clocks(1)%element%mag%name
     endif
     
     if(advance_node().ne.0)  goto 10

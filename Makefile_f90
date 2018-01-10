@@ -76,8 +76,8 @@ b_da_arrays_all.o:          $(FC_DIR_PTC)/b_da_arrays_all.f90         a_scratch_
 cb_da_arrays_all.o:         $(FC_DIR_PTC)/cb_da_arrays_all.f90        b_da_arrays_all.o
 c_dabnew.o:                 $(FC_DIR_PTC)/c_dabnew.f90                b_da_arrays_all.o
 cc_dabnew.o:                $(FC_DIR_PTC)/cc_dabnew.f90               cb_da_arrays_all.o
-c_dabnew_berz.o:            $(FC_DIR_MAD)/c_dabnew_berz.f90           b_da_arrays_all.o
-c_tpsa_interface.o:         $(FC_DIR_MAD)/c_tpsa_interface.F90        c_dabnew_berz.o
+c_dabnew_berz.o:            $(FC_DIR_PTC)/c_dabnew_berz.f90           b_da_arrays_all.o
+c_tpsa_interface.o:         $(FC_DIR_PTC)/c_tpsa_interface.F90        c_dabnew_berz.o
 d_lielib.o:                 $(FC_DIR_PTC)/d_lielib.f90                $(if $(call eq,$(NTPSA),yes),c_tpsa_interface.o,c_dabnew.o)
 h_definition.o:             $(FC_DIR_PTC)/h_definition.f90            cc_dabnew.o  d_lielib.o
 i_tpsa.o:                   $(FC_DIR_PTC)/i_tpsa.f90                  h_definition.o

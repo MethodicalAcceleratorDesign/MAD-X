@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 18:07:29      +
+  + Execution date: 2018.01.09 16:27:59      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,' Example 4 for MAD-X with PTC_TRACK;
 
@@ -96,6 +96,7 @@ ptc_setswitch, debuglevel=1, time=true, totalpath=false;
 maxaccel is found and its value is 1.000000
 exact_mis is found and its value is 0.000000
 radiation is found and its value is 0.000000
+modulation is found and its value is 0.000000
 stochastic is found and its value is 0.000000
 envelope is found and its value is 0.000000
 fringe is found and its value is 0.000000
@@ -139,18 +140,18 @@ ptc_track, icase=56,closed_orbit, turns=10, file="tfv9", norm_no=3;
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
  ===== ptc_track ============================
- Closed orbit:    8.7365660318529620E-005   7.0629626755241025E-007   2.5683584348903723E-006  -3.3520428033277651E-008  -0.0000000000000000        0.0000000000000000     
+ Closed orbit:    8.7365645974933986E-005   7.0629628668029482E-007   2.5683576653149827E-006  -3.3520417984914773E-008  -0.0000000000000000        0.0000000000000000     
  ============================================
 
 ++++++ table: tracksumm
 
     number       turn                  x                 px 
          1          0             0.0001                  0 
-         1         10    0.0002211599571   -1.117696865e-05 
+         1         10    0.0002211598671   -1.117696988e-05 
 
                  y                 py                  t                 pt 
              0.003                  0                 -0                  0 
-   -0.003112253138    3.256795644e-05   -4.039167981e-05                  0 
+    -0.00311225314    3.256795643e-05   -4.039167912e-05                  0 
 
                  s                  e 
                  0                100 

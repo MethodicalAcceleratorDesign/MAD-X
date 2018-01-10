@@ -116,20 +116,18 @@ CONTAINS
     
        V=zero
        DV=el%D_ac*XS%AC%X(2)
-     !  print*, "Skowron: ",EL%name," slow_ac ",EL%slow_ac, " ", EL%slow_ac2
-     !  print*, "Skowron: Fast Modulation V=",V," DV=",DV
-
+       !print*, "Skowron: ",EL%name," ", EL%KIND ," slow_ac ",EL%slow_ac, " ", EL%slow_ac2
+       !print*, "Skowron: Fast Modulation V=",V," DV=",DV, " ", XS%AC%X
     elseif(K%MODULATION .and. EL%slow_ac) THEN
     
        DV=(XS%AC%X(1)*COS(EL%theta_ac)-XS%AC%X(2)*SIN(EL%theta_ac))
        V=EL%DC_ac+EL%A_ac*DV
        DV=el%D_ac*DV
-       
        !V   defines amplitude of the original field modulation 
        !DV  defines amplitude of the spacial field modulation 
-     !  print*, "Skowron: ",EL%name," slow_ac ",EL%slow_ac, " ", EL%slow_ac2
-     !  print*, "Skowron: Modulation el%theta_ac=",EL%theta_ac," XS%AC%X=",XS%AC%X
-     !  print*, "Skowron: Modulation V=",V," DV=",DV
+       !  print*, "Skowron: ",EL%name," ", EL%KIND ," slow_ac ",EL%slow_ac, " ", EL%slow_ac2
+       !  print*, "Skowron: Modulation el%theta_ac=",EL%theta_ac," XS%AC%X=",XS%AC%X
+       !  print*, "Skowron: Modulation V=",V," DV=",DV
 
      else
        V=0.0_dp

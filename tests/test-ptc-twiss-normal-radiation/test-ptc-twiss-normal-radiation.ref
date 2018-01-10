@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.06  (64 bit, Linux)       +
+  +     MAD-X 5.03.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.05.29               +
-  + Execution date: 2017.07.03 15:28:26      +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2018.01.09 14:43:31      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !MADX-PTC test case for radiation 
 
@@ -150,6 +150,7 @@ ptc_create_universe;
 maxaccel is found and its value is 1.000000
 exact_mis is found and its value is 1.000000
 radiation is found and its value is 1.000000
+modulation is found and its value is 0.000000
 stochastic is found and its value is 0.000000
 envelope is found and its value is 1.000000
 fringe is found and its value is 0.000000
@@ -195,49 +196,49 @@ obs_points pro_ptc_setswitch Done
           -1000000     0.002177303994        21.43088266       0.1873654695 
 
                 q2                dq1                dq2                 qs 
-       0.116888617                  0                  0    4.732763868e-33 
+       0.116888617                  0                  0    6.185568583e-17 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        1.235323962        3.201062686        2.115153644        5.179530846 
 
          beta11min          beta11max          beta12min          beta12max 
-       1.235323962        3.201062686     1.33274226e-32    3.559172288e-32 
+       1.235323962        3.201062686    7.491995874e-34    2.095634512e-33 
 
          beta13min          beta13max          beta21min          beta21max 
-     0.01770956003      0.05330089385    1.022989038e-33     7.27574138e-33 
+     0.01770956003      0.05330089385    7.096279604e-34    1.934894217e-33 
 
          beta22min          beta22max          beta23min          beta23max 
-       2.115153644        5.179530846    1.960173364e-31    4.993861915e-31 
+       2.115153644        5.179530846    1.326766501e-31    3.925761891e-31 
 
          beta31min          beta31max          beta32min          beta32max 
-    0.003874842046     0.004800212728    6.195514531e-33     6.45521295e-33 
+    0.003874842046     0.004800212728     1.36016377e-33    1.375856736e-33 
 
          beta33min          beta33max           disp1min           disp1max 
-      0.2941922624       0.2972538202                  0       0.1887781758 
+      0.2941922625       0.2972538202                  0       0.1887781758 
 
           disp2min           disp2max           disp3min           disp3max 
-    -0.05074532204      0.06264353894                  0    5.168779763e-16 
+    -0.05074532204      0.06264353894   -5.409750018e-16   -3.069143726e-16 
 
           disp4min           disp4max             deltap            orbit_x 
-  -1.597114505e-16    1.062846539e-16                  0     -0.01121090106 
+  -1.150322741e-16    1.632741058e-16                  0     -0.01121090106 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   7.140154581e-05                  0                  0      -0.3752835677 
+    7.14015458e-05                  0                  0      -0.3752835677 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-     0.00595904114     0.008589444546                  0       0.0079264535 
+    0.005959041141     0.008589444546                  0       0.0079264535 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0     0.005960404717       0.3752118129    -0.001897893587 
+                 0     0.005960404719       0.3752118129    -0.001897893587 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0     0.004434650404                  0    -0.005855527189 
+                 0     0.004434650404                  0    -0.005855527191 
 
            ptcomax             xcomin             ycomin            pxcomin 
      -0.3751202633     -0.01122233049                  0     -0.01993038775 
 
            pycomin             tcomin            ptcomin 
-                 0    -0.005986813193      -0.3752838378 
+                 0    -0.005986813194      -0.3752838378 
   
 
  ! plot, notitle, haxis=s, vaxis=x, colour=100;
@@ -262,7 +263,7 @@ obs_points pro_ptc_setswitch Done
 
   value, table(twiss, myline$end, t), table(twiss, myline$end, x);
 
-table( twiss  myline$end  t ) =     -0.00595904114 ;
+table( twiss  myline$end  t ) =    -0.005959041141 ;
 table( twiss  myline$end  x ) =     -0.01121090106 ;
 
 
@@ -280,9 +281,9 @@ table( twiss  mqd_exi  pt )-table( twiss  mqd_ent  pt ) =    -1.01843585e-07 ;
 Energy loss in QF
 table( twiss  mqf_exi  pt )-table( twiss  mqf_ent  pt ) =   -1.590094199e-07 ;
 Energy loss in bend
-table( twiss  mb_exi  pt )-table( twiss  mb_ent  pt ) =   -5.062879886e-05 ;
+table( twiss  mb_exi  pt )-table( twiss  mb_ent  pt ) =   -5.062879887e-05 ;
 Energy loss in kicker
-table( twiss  mkc_exi  pt )-table( twiss  mkc_ent  pt ) =   -0.0001125737944 ;
+table( twiss  mkc_exi  pt )-table( twiss  mkc_ent  pt ) =   -0.0001125737945 ;
 Energy loss in sextupole
 table( twiss  ms_exi  pt )-table( twiss  ms_ent  pt ) =   -1.110020847e-07 ;
 

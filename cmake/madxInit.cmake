@@ -35,13 +35,6 @@ message(STATUS "Mad-X version: ${MADX_VERSION}")
 message(STATUS "Version num: ${VERSION_NUM}")
 message(STATUS "Version date: ${VERSION_DATE}")
 
-# Append _dev/-dev to binary/package name
-if(NOT MADX_PATCH_LEVEL EQUAL 00)
-    message(STATUS "Building a development version")
-    set (BINARY_POSTFIX "_dev")
-    set (PKG_POSTFIX "-dev")
-endif()
-
 # add 32 to the name for 32bit binaries..
 if(IS32BIT)
    set(BINARY_POSTFIX "${BINARY_POSTFIX}32")

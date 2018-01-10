@@ -1,0 +1,34 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2018.01.10 16:54:57      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+!Example file showing the usage of PTC_TRACK command 
+
+!that sets the internal state (i.e switches) of PTC
+
+!
+
+!Piotr Skowronski (CERN)
+
+!
+
+! examples/ptc_madx_interface/intstate/intstate.ptc.madx
+
+!
+
+option,-echo;
+
+makethin: slicing sequence : ctf
+enter TRACK module
+one pass is on
+exit TRACK module
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

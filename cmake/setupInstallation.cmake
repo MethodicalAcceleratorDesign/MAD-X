@@ -1,10 +1,23 @@
 # Installation:
 
-madx_install_targets(madxbin madx)
+install(TARGETS madxbin madx
+    BUNDLE DESTINATION .
+    COMPONENT Runtime
+    RUNTIME DESTINATION bin
+    COMPONENT Runtime
+    LIBRARY DESTINATION lib
+    COMPONENT Libraries
+    ARCHIVE DESTINATION lib
+    COMPONENT Libraries
+)
 
-madx_install_headers(${headerfiles})
+install(
+    FILES ${headerfiles}
+    DESTINATION "include/${PROJECT_NAME}"
+    COMPONENT Files)
 
-INSTALL(FILES ${CMAKE_SOURCE_DIR}/License.txt 
+install(
+    FILES ${CMAKE_SOURCE_DIR}/License.txt
     DESTINATION "share/doc/${PROJECT_NAME}${PKG_POSTFIX}"
     COMPONENT Files)
 

@@ -3122,7 +3122,7 @@ CONTAINS
 
       do i=1,s1%n_ac
       
-         print*,S2%NAME, " ACD ", i, " AN ",s1%d_an(i), " BN ", s1%d_bn(i)
+         !print*,"skowron: ", S2%NAME, " ACD ", i, " AN ",s1%d_an(i), " BN ", s1%d_bn(i)
          S2%d_an(i) =s1%d_an(i)
          S2%d_bn(i) =s1%d_bn(i)
 

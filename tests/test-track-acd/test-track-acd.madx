@@ -1,0 +1,75 @@
+!Example file showing the usage of PTC_TRACK command 
+!that sets the internal state (i.e switches) of PTC
+!
+!Piotr Skowronski (CERN)
+!
+! examples/ptc_madx_interface/intstate/intstate.ptc.madx
+!
+option,-echo;
+option,-info;
+
+LQL := 0.220; ! length of QL
+LQS := 0.124; ! length of QS
+QL  : QUADRUPOLE, L=LQL; ! QL quadrupole
+QS  : QUADRUPOLE, L=LQS; ! QS quadrupole
+
+
+HACD: hACdipole, L= 0.0, volt=0.001, freq=0.01, 
+                 ramp1=100,
+                 ramp2=200,
+                 ramp3=800,
+                 ramp4=900; 
+
+ds_ac     : drift, l=0.25/2;
+
+ds_ql     : drift, l=0.25;    ! short drift between quads in Daniels design
+ds_trip   : drift, l=(3.34-CAVLENGTH)/2.; ! long drift between quads in Daniels design
+cell_mrk  : marker;
+cell_q1   : marker;
+cell_q3   : marker;
+beforecav : marker;
+bc : marker;
+aftercav  : marker;
+k_ls1     := -1.53125*.56/LQL; ! weaker foc.
+k_ls2     :=  1.53125/LQL;     ! weaker foc.
+quad_l1   : quadrupole, l=LQL,   k1=k_ls1;
+quad_l2   : quadrupole, l=LQL/2, k1=k_ls2;
+LDLS      :=(LQL-LQS)/2.; ! half L difference of QL and QS
+dls       : DRIFT, L=LDLS; ! 0.048 m
+
+ctfcell  : line=( quad_l2,ds_ql,quad_l1,cell_q1,ds_trip ,cell_mrk,
+                  beforecav, 
+                  aftercav,
+                  ds_trip,cell_q3,quad_l1,ds_ql,quad_l2,
+                  ds_ac,HACD,ds_ac);
+
+ctf   : line=(1*ctfcell);
+
+! calculate Twiss parameters for regular cell structure
+beam, PARTICLE=ELECTRON, ENERGY=5d0;
+
+USE, period=ctf;
+
+select, flag= makethin, class= quadrupole, slice= 5;
+makethin, sequence= ctf;
+USE, period=ctf;
+
+track, onepass,  dump;
+ start, x=0, px=0, y=0, py=0, pt=0, t=0.0;  
+ run, turns=1000, ffile=1; 
+endtrack;
+
+
+
+!renamefile, file="trackone", to="trackoneLag0";
+
+
+
+stop;
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!  SSSSS  TTTTT   OOO   PPP
+!  S        T    O   O  P  P
+!  SSSSS    T    O   O  PPP
+!      S    T    O   O  P
+!  SSSSS    T     OOO   P
+!

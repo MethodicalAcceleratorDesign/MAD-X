@@ -30,7 +30,7 @@ module phys_constfi
   ! Rest Mass [GeV]
   double precision, parameter ::  emass  = 0.5109989461d-3   ! GeV CODATA 2014
   double precision, parameter ::  pmass  = 0.9382720813      ! GeV CODATA 2014
-  double precision, parameter ::  nmass  = 0.9395654133      ! GeV CODATA 2014
+  double precision, parameter ::  nmass  = 0.9314940954      ! GeV CODATA 2014
   double precision, parameter ::  mumass = 0.1056583745      ! GeV CODATA 2014
 
   ! Classical radius [m]
