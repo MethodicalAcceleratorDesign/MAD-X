@@ -3087,7 +3087,7 @@ SET_TPSAFIT=.FALSE.
     INTEGER TURNS0,trackflag
     type(damap) id
     type(real_8) yy(6)
-
+    tot=0
     !    fixed_found=my_true
     !!    type(probe) xs
     if(.not.associated(RING%t)) call MAKE_NODE_LAYOUT(ring)
@@ -3195,7 +3195,7 @@ SET_TPSAFIT=.FALSE.
            else
              tot=RING%HARMONIC_NUMBER*CLIGHT/FREQ
            endif
-           if(present(total_time)) total_time=tot
+           if(present(total_time)) tot=total_time
        endif
     
 
@@ -3336,7 +3336,7 @@ call kill(yy); call kill(id);
     type(damap) id
     type(real_8) yy(6)
     type(layout), pointer :: ring
- 
+    tot=0
     if(present(fibre1)) then
      ring=>fibre1%parent_layout
     else
@@ -3452,7 +3452,7 @@ call kill(yy); call kill(id);
            else
              tot=RING%HARMONIC_NUMBER*CLIGHT/FREQ
            endif
-           if(present(total_time)) total_time=tot
+           if(present(total_time)) tot=total_time
        endif
     
 
@@ -3590,7 +3590,7 @@ call kill(yy); call kill(id);
     TYPE (integration_node), POINTER :: t
     logical(lp) APERTURE,use_bmad_units_temp
     INTEGER TURNS0,trackflag
-
+    tot=0
     !    fixed_found=my_true
     !!    type(probe) xs
     if(.not.associated(RING%t)) call MAKE_NODE_LAYOUT(ring)
@@ -3698,7 +3698,7 @@ call kill(yy); call kill(id);
            else
              tot=RING%HARMONIC_NUMBER*CLIGHT/FREQ
            endif
-           if(present(total_time)) total_time=tot
+           if(present(total_time))tot= total_time
        endif
     
 
@@ -3921,7 +3921,7 @@ call kill(yy); call kill(id);
     TYPE (integration_node), POINTER :: t
     logical(lp) APERTURE,use_bmad_units_temp
     INTEGER TURNS0,trackflag
-    
+    tot=0
     if(present(fibre1)) then
      ring=>fibre1%parent_layout
     else
@@ -4030,7 +4030,7 @@ call kill(yy); call kill(id);
            else
              tot=RING%HARMONIC_NUMBER*CLIGHT/FREQ
            endif
-           if(present(total_time)) total_time=tot
+           if(present(total_time)) tot=total_time
        endif
     
 
