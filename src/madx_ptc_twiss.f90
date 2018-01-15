@@ -13,8 +13,8 @@ module madx_ptc_twiss_module
   implicit none
 
   save
-  
-  
+
+
     
   !============================================================================================
   !  PUBLIC INTERFACE
@@ -3865,21 +3865,6 @@ contains
         return
      endif
      
- !     call daprint(oneTurnMap,99)
-
- !    write(99,'(/a/)') '%A1 Dispersion, First and Higher Orders'
- !    call daprint(theNormalForm%A1,99)
- !    write(99,'(/a/)') '%Tunes, Chromaticities and Anharmonicities'
- !
- !    write(99,'(/ES16.8/)') theNormalForm%tune
- !
- !
- !    write(99,'(/a/)') '%A_t Eigen vectors'
- !    call daprint(theNormalForm%a_t,99) ! orig one
- !    
- !    write(99,'(/a/)') '%N ???'
- !    call daprint(theNormalForm%n,99) ! orig one
-
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
     !!
     if (getdebug()>2) then
@@ -3923,18 +3908,9 @@ contains
    if (no > 1) then
      ! this algorithm cuts one order of magnitude so for order 1 does not work at all
      
-     ! write(99,*); write(99,*) " KERNEL  ";write(99,*); 
-     !     call print(theNormalForm%ker,99)
-     ! write(99,*) "--------------------------------------" 
-
       call alloc(vf_kernel)
       vf_kernel=0
       call flatten_c_factored_lie(theNormalForm%ker,vf_kernel)
-
-     ! write(99,*) " KERNEL Flattened  ";
-     ! write(99,*); 
-     ! call print(vf_kernel,99)
-     ! write(99,*) "--------------------------------------" 
 
       call putQnormaltable(vf_kernel%v(1),1) 
       call putQnormaltable(vf_kernel%v(3),2)
@@ -3993,13 +3969,21 @@ contains
    !!!!!!!!!!!!!!!!!!!!!!!!!!
    !! EIGEN VALUES
 
-    !EIGN
-    do i=1,c_%nd2 !from damap type def: Ndim2=6 but allocated to nd2=2,4,6
-      call putEnormaltable(theNormalForm%A_t%V(i),i)
-    enddo
 
-  
-    
+    call alloc(a_CS) 
+
+    ! raw transformation are subject to random rotations due to numerical instabilities
+    ! c_canonise fixes them straight to fit the Courant Snyder format
+    call c_canonise(theNormalForm%a_t,a_CS)
+
+    do i=1,c_%nd2 !from damap type def: Ndim2=6 but allocated to nd2=2,4,6
+      
+      !call putEnormaltable(theNormalForm%A_t%V(i),i)
+      call putEnormaltable(a_CS%V(i),i)
+      
+    enddo
+    call kill(a_CS) 
+
     
     !!!!!!!!!!!!!!!!!!!!!!
     !Generating functions
@@ -4029,39 +4013,16 @@ contains
     call alloc(a_CS)
     call alloc(a_CS_1)
 
-    open(unit=99,file='debug.ptc')
-    prec=1.d-9
-    write(99,*) "--------------------------------------" 
-    write(99,*); write(99,*) " c_normal atot  ";write(99,*); 
-        call print(theNormalForm%atot,99,prec)
-    write(99,*) "--------------------------------------" 
     
     call c_canonise(theNormalForm%atot,a_CS)
-
-
-    write(99,*) "--------------------------------------" 
-    write(99,*); write(99,*) " c_canonise  ";write(99,*); 
-        call print(a_CS,99,prec)
-    write(99,*) "--------------------------------------" 
     
     a_CS=to_phasor()*a_CS*from_phasor()
     call c_factor_map(a_CS,a_CS_1,vf,0) 
 
-    write(99,*) "--------------------------------------" 
-    write(99,*); write(99,*) " c_factor_map  ";write(99,*); 
-        call print(vf,99,prec)
-    write(99,*) "--------------------------------------" 
-    close(99)
-    
     g_io = cgetpb(vf)
 
     call putGnormaltable(g_io)
     
-  !  write(99,*); write(99,*) " Normalised Generating Function  ";write(99,*); 
-  !      call print(g_io,99)
-  !  write(99,*) "--------------------------------------" 
-
-
     !!!!!!!!!!!!!!!!!!!!!!
     !HAMILTONIAN
     !!!!!!!!!!!!!! Normalised Pseudo-Hamiltonian !!!!!!!!!!!!!!!        
@@ -4626,6 +4587,13 @@ contains
       do i=1,c_%nv
          ind(i)=1
          d_val = real(v.sub.ind(1:6))
+         
+        ! if (planei == 3 .and. i == 3) then
+        !   call print(v,6)
+        !   print*, "skowron 33 real 1 ", d_val
+        !   print*, "skowron 33 complex 1 ", v.sub.'001000'
+        ! endif
+         
          write(nn,'(a4,2i1)') 'eign',planei,i
          
          if (getdebug() > 2) then
