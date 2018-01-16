@@ -1,9 +1,9 @@
 @ NAME             %06s "NONLIN"
 @ TYPE             %06s "NONLIN"
 @ TITLE            %08s "no-title"
-@ ORIGIN           %17s "5.03.07 Darwin 64"
-@ DATE             %08s "14/12/17"
-@ TIME             %08s "18.06.40"
+@ ORIGIN           %16s "5.03.07 Linux 64"
+@ DATE             %08s "12/01/18"
+@ TIME             %08s "17.03.29"
 * NAME               NICKNAME           BASEVARIABLE                    VALUE      ORDER    ORDER_X   ORDER_PX    ORDER_Y   ORDER_PY   ORDER_PT    ORDER_T 
 $ %s                 %s                 %s                                %le         %d         %d         %d         %d         %d         %d         %d 
  "Q1"                "Q1"                "Q1"                      0.3631575976          0          0          0          0          0          0          0
@@ -26,13 +26,13 @@ $ %s                 %s                 %s                                %le   
  "DISP2"             "DPX"               "PX"                                 0          1          0          0          0          0          1          0
  "DISP3"             "DY"                "Y"                                  0          1          0          0          0          0          1          0
  "DISP4"             "DPY"               "PY"                                 0          1          0          0          0          0          1          0
- "EIGN11"            "EIGN11"            "A_T"                     -2.258626414          1          1          0          0          0          0          0
+ "EIGN11"            "EIGN11"            "A_T"                      2.258626414          1          1          0          0          0          0          0
  "EIGN12"            "EIGN12"            "A_T"                                0          1          0          1          0          0          0          0
  "EIGN13"            "EIGN13"            "A_T"                                0          1          0          0          1          0          0          0
  "EIGN14"            "EIGN14"            "A_T"                                0          1          0          0          0          1          0          0
  "EIGN15"            "EIGN15"            "A_T"                                0          1          0          0          0          0          1          0
- "EIGN21"            "EIGN21"            "A_T"                    -0.5788767053          1          1          0          0          0          0          0
- "EIGN22"            "EIGN22"            "A_T"                    -0.4427469695          1          0          1          0          0          0          0
+ "EIGN21"            "EIGN21"            "A_T"                     0.5788767053          1          1          0          0          0          0          0
+ "EIGN22"            "EIGN22"            "A_T"                     0.4427469695          1          0          1          0          0          0          0
  "EIGN23"            "EIGN23"            "A_T"                                0          1          0          0          1          0          0          0
  "EIGN24"            "EIGN24"            "A_T"                                0          1          0          0          0          1          0          0
  "EIGN25"            "EIGN25"            "A_T"                                0          1          0          0          0          0          1          0
