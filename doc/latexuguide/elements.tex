@@ -1188,45 +1188,78 @@ cavity is a Cartesian coordinate system.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-\section{AD Dipoles}
+\section{AC Dipole}
 \ttindex{acdipole}\index{ac dipole}
 \label{sec:acdipole}
 
-Alternating Current (AC) dipole (orbit corrector) is implemented with: 
+Alternating Current (AC) dipole is implemented with: 
 \begin{madlist}
-   \ttitem{HACDIPOLE} an AC orbit corrector for the horizontal plane, 
-   \ttitem{VACDIPOLE} an AC orbit corrector for the vertical plane, 
+   \ttitem{HACDIPOLE} an AC dipole for the horizontal plane, 
+   \ttitem{VACDIPOLE} an AC dipole for the vertical plane, 
 \end{madlist}
 
 \madbox{
 xxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxx\= \kill
-label: HACDIPOLE, L=real, VOLT=real,  FREQ=real, 
-               \> RAMP1=integer, RAMP2=integer, RAMP3=integer, RAMP4=integer; \\
-label: VACDIPOLE, L=real, VOLT=real,  FREQ=real, 
-               \> RAMP1=integer, RAMP2=integer, RAMP3=integer, RAMP4=integer; \\
+label: HACDIPOLE, L=real, VOLT=real,  FREQ=real, LAG=real, \\
+                  \> RAMP1=integer, RAMP2=integer, \\ 
+                  \> RAMP3=integer, RAMP4=integer; \\
+label: VACDIPOLE, L=real, VOLT=real,  FREQ=real, LAG=real, \\
+                  \> RAMP1=integer, RAMP2=integer, \\
+                  \> RAMP3=integer, RAMP4=integer; 
 }
-
-\textbf{The type \texttt{KICKER} should not be used when an orbit corrector
-  kicks only in one plane.}
+In fact this element is rather oscilating (time varying) orbit corrector (kicker) rather than dipole
+because it does not change the reference frame. The oscillation is assumed to be slow
+compared with bunch length and the kick is constant along the bunch. 
+These devices are used for beam excitations in circular machines for optics measurements.
+They are linearly ramped up to the full amplitude (and ramped down)
+to avoid emittance growth.
 
 The attributes have the following meaning: 
 \begin{madlist}
-   \ttitem{L} The length of the closed orbit corrector (default: 0 m). 
-   \ttitem{VOLT} The 
+   \ttitem{L} The length of the device (default: 0 m). 
+   \ttitem{VOLT} The amplitude of the kick
      (default: 0).  
-   \ttitem{FREQ} The 
+   \ttitem{FREQ} Tune of the oscillation in $2\pi$ units. \\
+     \textbf{The name of the parameter is misleading and will be changed in the future for TUNE.} \\
      (default: 0).  
-   \ttitem{RAMP1} The 
+   \ttitem{RAMP1} Starting turn of amplitude ramp-up. \\ 
      (default: 0).  
-   \ttitem{RAMP2} The 
+   \ttitem{RAMP2} Last turn of amplitude ramp-up. \\
      (default: 0).  
-   \ttitem{RAMP3} The 
+   \ttitem{RAMP3} Starting turn of amplitude ramp-down. \\ 
      (default: 0).  
-   \ttitem{RAMP4} The 
+   \ttitem{RAMP4} Last turn of amplitude ramp-down. \\
      (default: 0).  
 \end{madlist}
 
-A positive kick increases $p_x$ or $p_y$ respectively. This
+
+AC dipole is not implemented in \texttt{TWISS}.
+
+In \texttt{TRACK} it is implemented as a zero-length element
+changing transverse momentum by $(0.3 \cdot VOLT / p0c) \cdot sin(2\pi \cdot FREQ  \cdot turn)$,
+where $turn$ is turn number. If ramp settings are left with default values (all zero)
+AC dipole has no effect in \texttt{TRACK}.
+
+PTC requires that \texttt{MODULATION} flag is set to true 
+via \texttt{PTC\_SETSWITCH} command to enable AC dipole, 
+otherwise it is treated as a drift. 
+
+For computation of the maps in \texttt{PTC\_TWISS} and \texttt{PTC\_NORMAL}
+the phasespace is than extended by extra dimensions corresponding to
+the frequency clocks defined with AC dipoles. 
+Maximum of three distinct frequencies are allowed.
+There can be more then three AC dipoles but than some of them need to have
+the same frequencies. 
+\texttt{PTC\_TWISS}, when invoked with \texttt{NORMAL=true}, calculates
+dependence of optical paramters on amplitudes of the clocks.
+Results of \texttt{PTC\_TRACK} and \texttt{PTC\_TRACKLINE}
+may be slightly different from \texttt{TRACK} because of some implementation details,
+in particular for not fully relativistic beams.
+PTC internaly uses frequency so time of flight effects are taken into account
+and kick amplitude is inversely proportional to relativistic beta function.
+Please note that at the moment \texttt{LAG} parameter is ignored 
+in translation to PTC. If ramp settings are left with default values (all zero)
+PTC tracking will assume maximum amplitude.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
