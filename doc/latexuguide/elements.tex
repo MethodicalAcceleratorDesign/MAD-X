@@ -853,6 +853,7 @@ For further information on element type \texttt{TKICKER} and its attributes, loo
 at the documentation of the orbit corrector type
 \hyperref[sec:kicker]{\texttt{KICKER}}.   
 
+
 \section{RF Cavity}
 \ttindex{RFcavity}
 \label{sec:rf-cavity}\label{sec:rfcavity}
@@ -1181,6 +1182,88 @@ The \hyperref[subsec:local-straight]{straight reference system} for a
 cavity is a Cartesian coordinate system.  
  
 %\href{http://www.cern.ch/rcalaga}{R. Calaga}, September 2010
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{AC Dipole}
+\ttindex{acdipole}\index{ac dipole}
+\label{sec:acdipole}
+
+Alternating Current (AC) dipole is implemented with: 
+\begin{madlist}
+   \ttitem{HACDIPOLE} an AC dipole for the horizontal plane, 
+   \ttitem{VACDIPOLE} an AC dipole for the vertical plane, 
+\end{madlist}
+
+\madbox{
+xxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxx\= \kill
+label: HACDIPOLE, L=real, VOLT=real,  FREQ=real, LAG=real, \\
+                  \> RAMP1=integer, RAMP2=integer, \\ 
+                  \> RAMP3=integer, RAMP4=integer; \\
+label: VACDIPOLE, L=real, VOLT=real,  FREQ=real, LAG=real, \\
+                  \> RAMP1=integer, RAMP2=integer, \\
+                  \> RAMP3=integer, RAMP4=integer; 
+}
+In fact this element is rather oscilating (time varying) orbit corrector (kicker) rather than dipole
+because it does not change the reference frame. The oscillation is assumed to be slow
+compared with bunch length and the kick is constant along the bunch. 
+These devices are used for beam excitations in circular machines for optics measurements.
+They are linearly ramped up to the full amplitude (and ramped down)
+to avoid emittance growth.
+
+The attributes have the following meaning: 
+\begin{madlist}
+   \ttitem{L} The length of the device (default: 0 m). 
+   \ttitem{VOLT} The amplitude of the kick
+     (default: 0).  
+   \ttitem{FREQ} Tune of the oscillation in $2\pi$ units. \\
+     \textbf{The name of the parameter is misleading and will be changed in the future for TUNE.} \\
+     (default: 0).  
+   \ttitem{RAMP1} Starting turn of amplitude ramp-up. \\ 
+     (default: 0).  
+   \ttitem{RAMP2} Last turn of amplitude ramp-up. \\
+     (default: 0).  
+   \ttitem{RAMP3} Starting turn of amplitude ramp-down. \\ 
+     (default: 0).  
+   \ttitem{RAMP4} Last turn of amplitude ramp-down. \\
+     (default: 0).  
+\end{madlist}
+
+
+AC dipole is not implemented in \texttt{TWISS}.
+
+In \texttt{TRACK} it is implemented as a zero-length element
+changing transverse momentum by $(0.3 \cdot VOLT / p0c) \cdot sin(2\pi \cdot FREQ  \cdot turn)$,
+where $turn$ is turn number. If ramp settings are left with default values (all zero)
+AC dipole has no effect in \texttt{TRACK}.
+
+PTC requires that \texttt{MODULATION} flag is set to true 
+via \texttt{PTC\_SETSWITCH} command to enable AC dipole, 
+otherwise it is treated as a drift. 
+
+For computation of the maps in \texttt{PTC\_TWISS} and \texttt{PTC\_NORMAL}
+the phasespace is than extended by extra dimensions corresponding to
+the frequency clocks defined with AC dipoles. 
+Maximum of three distinct frequencies are allowed.
+There can be more then three AC dipoles but than some of them need to have
+the same frequencies. 
+\texttt{PTC\_TWISS}, when invoked with \texttt{NORMAL=true}, calculates
+dependence of optical paramters on amplitudes of the clocks.
+Results of \texttt{PTC\_TRACK} and \texttt{PTC\_TRACKLINE}
+may be slightly different from \texttt{TRACK} because of some implementation details,
+in particular for not fully relativistic beams.
+PTC internaly uses frequency so time of flight effects are taken into account
+and kick amplitude is inversely proportional to relativistic beta function.
+Please note that at the moment \texttt{LAG} parameter is ignored 
+in translation to PTC. If ramp settings are left with default values (all zero)
+PTC tracking will assume maximum amplitude.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 
 \section{Electrostatic Separator}
