@@ -853,6 +853,7 @@ For further information on element type \texttt{TKICKER} and its attributes, loo
 at the documentation of the orbit corrector type
 \hyperref[sec:kicker]{\texttt{KICKER}}.   
 
+
 \section{RF Cavity}
 \ttindex{RFcavity}
 \label{sec:rf-cavity}\label{sec:rfcavity}
@@ -1181,6 +1182,55 @@ The \hyperref[subsec:local-straight]{straight reference system} for a
 cavity is a Cartesian coordinate system.  
  
 %\href{http://www.cern.ch/rcalaga}{R. Calaga}, September 2010
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{AD Dipoles}
+\ttindex{acdipole}\index{ac dipole}
+\label{sec:acdipole}
+
+Alternating Current (AC) dipole (orbit corrector) is implemented with: 
+\begin{madlist}
+   \ttitem{HACDIPOLE} an AC orbit corrector for the horizontal plane, 
+   \ttitem{VACDIPOLE} an AC orbit corrector for the vertical plane, 
+\end{madlist}
+
+\madbox{
+xxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxx\= \kill
+label: HACDIPOLE, L=real, VOLT=real,  FREQ=real, 
+               \> RAMP1=integer, RAMP2=integer, RAMP3=integer, RAMP4=integer; \\
+label: VACDIPOLE, L=real, VOLT=real,  FREQ=real, 
+               \> RAMP1=integer, RAMP2=integer, RAMP3=integer, RAMP4=integer; \\
+}
+
+\textbf{The type \texttt{KICKER} should not be used when an orbit corrector
+  kicks only in one plane.}
+
+The attributes have the following meaning: 
+\begin{madlist}
+   \ttitem{L} The length of the closed orbit corrector (default: 0 m). 
+   \ttitem{VOLT} The 
+     (default: 0).  
+   \ttitem{FREQ} The 
+     (default: 0).  
+   \ttitem{RAMP1} The 
+     (default: 0).  
+   \ttitem{RAMP2} The 
+     (default: 0).  
+   \ttitem{RAMP3} The 
+     (default: 0).  
+   \ttitem{RAMP4} The 
+     (default: 0).  
+\end{madlist}
+
+A positive kick increases $p_x$ or $p_y$ respectively. This
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 
 \section{Electrostatic Separator}

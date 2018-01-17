@@ -281,6 +281,18 @@ The command parameters and switches are:
 	dumping due to radiation and stochastic effects. 
 	Warning: this makes the tracking approximately twice slower, so low order
 	should be used. 
+
+	\ttitem{STOCHASTIC} (Default: false)\\    
+	Sets the stochastic switch/internal state of PTC. 
+	It enables stochastic emission of photons in ray tracking,  
+                    it only affects \ttitem{PTC\_TRACK} and \ttitem{PTC\_TRACKLINE}.
+	The emission is calculated during map tracking therefore 
+	\ttitem{PTC\_TWISS} or \ttitem{PTC\_NORMAL} needs to be invoked before 
+	launching the tracking. Every tracked ray will receive the same stochastic kicks.
+
+	\ttitem{MODULATION} (Default: false)\\    
+	Sets the modulation switch/internal state of PTC. 
+	It needs to be set to true to observe effect of AD dipoles.
 	
 	\ttitem{FRINGE} (Default: false)\\    
 	Sets the fringe switch/internal state of PTC. \\ 
