@@ -9,7 +9,7 @@ namelist / fibrename / fib0
 
  TYPE patchlist
      integer  A_X1,A_X2,B_X1,B_X2
-     real(dp) A_D(3),B_D(3),A_ANG(3),B_ANG(3), A_T,B_T 
+     real(dp) A_D(3),B_D(3),A_ANG(3),B_ANG(3), A_L,B_L , A_T,B_T 
      INTEGER(2)  ENERGY,TIME,GEOMETRY
   END TYPE patchlist
 type(patchlist) patch0
@@ -44,9 +44,10 @@ namelist / MAGLname / MAGL0
 	LOGICAL(LP) THIN 
     real(dp) fint_hgap_h1_h2_va_vs(6)
 	logical(lp) slowac_recut_even_electric_MIS(5)  
-     logical(lp) usebf_skipptcbf_do1bf(6)
+     logical(lp) usebf_do1bf(4)
+	 integer skipptcbf(2)
      character(120) filef
-      character(120) fileb
+     character(120) fileb
   END TYPE ele_list
 type(ele_list) ELE0
 namelist / ELEname / ELE0
@@ -93,6 +94,16 @@ namelist / sol50name / sol50
 type(tp10_list) tp100
 namelist / tp100name / tp100
 
+  TYPE ab_list
+    integer n_m(2)
+	complex(dp) b(nmul_max,nmul_max) 
+	complex(dp) E(nmul_max,nmul_max)  
+	real(dp) dz_t_te(3*nmul_max+3)  
+	real(dp) scale_angc_xc_vc_dc_hc(6)
+  END TYPE ab_list
+type(ab_list) ab0
+namelist / ab0name / ab0
+ 
   TYPE k16_list
    logical(lp) DRIFTKICK,LIKEMAD
   END TYPE k16_list
@@ -132,14 +143,19 @@ namelist / siamname / siam0
   integer, private, parameter :: mode_max=200  
 
   TYPE wig_list
-   integer n
    real(dp) offset
    real(dp) internal(6)
+   real(dp) ex(wiggler_suntao),ey(wiggler_suntao)
+   integer n
    real(dp) a(mode_max)
    real(dp) f(mode_max)   
    integer form(mode_max)
    real(dp) k(3,mode_max)
-   real(dp) ex(wiggler_suntao),ey(wiggler_suntao)
+   integer ne
+   real(dp) ae(mode_max)
+   real(dp) fe(mode_max)   
+   integer forme(mode_max)
+   real(dp) ke(3,mode_max)
   END TYPE wig_list
 type(wig_list) wig0
 namelist / wigname / wig0

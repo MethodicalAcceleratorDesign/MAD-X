@@ -47,11 +47,37 @@ MODULE madx_ptc_module
   integer                   :: mapsorder = 0  !order of the buffered maps, if 0 maps no maps buffered
   integer                   :: mapsicase = 0
 
+  type clockdef
+     real(dp)                :: tune = -1 ! negative means inactive, in fact it is tune, left like this for backward compatibility, can be changed during LS2
+     real(dp)                :: lag = 0
+     integer                 :: rampupstart = 0,  rampupstop = 0, rampdownstart = 0,  rampdownstop = 0
+     type(fibre), pointer    :: element
+  end type clockdef
+  
+  integer, private, parameter:: nmaxclocks = 1  !will be 3 soon
+  type(clockdef),  dimension(nmaxclocks) :: clocks ! 3 pointers 
+  integer                                :: nclocks = 0  
+
 
   character(1000), private  :: whymsg
 
 CONTAINS
-
+  
+  subroutine resetclocks()
+    implicit none
+    integer i
+    
+    do i=1,nmaxclocks
+      clocks(i)%tune = -1 ! negative means inactive
+      clocks(i)%lag = 0 
+      clocks(i)%rampupstart = 0 
+      clocks(i)%rampupstop = 0 
+      clocks(i)%rampdownstart = 0 
+      clocks(i)%rampdownstop = 0 
+    enddo
+    nclocks = 0  
+  end subroutine resetclocks
+  
   subroutine ptc_create_universe()
     implicit none
     real(kind(1d0)) get_value
@@ -446,6 +472,8 @@ CONTAINS
         print *, 'MADx is set'
     endif
 
+    call resetclocks() ! clocks for modulation
+    
     icav=0
     j=restart_sequ()
     nt=0
@@ -841,7 +869,7 @@ CONTAINS
        key%tiltd=tilt  !==========================================!
 
        !================================================================
-! dipole component not active in MAD-X proper
+       ! dipole component not active in MAD-X proper
        key%list%k(1)=key%list%k(1)+bvk*node_value('k0 ')
 
     case(6)
@@ -942,6 +970,7 @@ CONTAINS
          ! key%list%k(1)=normal(0)
           
           do i=1,nn
+             !print*, "multipole normal ", i, " = ", normal(i)
              key%list%k(i+1)=normal(i)
           enddo
        endif
@@ -951,6 +980,7 @@ CONTAINS
          ! key%list%ks(1)=skew(0)
          
           do i=1,ns
+             !print*, "multipole skew ", i, " = ", skew(i)
              key%list%ks(i+1)=skew(i)
           enddo
        endif
@@ -991,6 +1021,8 @@ CONTAINS
              call augment_count('errors_total ')
           endif
        endif
+       
+       
     case(9) ! PTC accepts mults
        key%magnet="solenoid"
        ks=node_value('ks ')
@@ -1219,6 +1251,81 @@ CONTAINS
        if(key%list%k(1).ne.zero.and.key%list%freq0.ne.zero) icav=1
 
     !RFMULTIPOLE, crab also falls here, but is made with special case where volt defines BN(1)
+    
+    case(40)
+       
+       key%magnet="hkicker"
+       do i=1,NMAX
+          key%list%k(i)=zero
+          key%list%ks(i)=zero
+       enddo
+       
+        key%list%n_ac = 1 ! only dipole
+        ! need to convert voltage (E field) to corresponding B field
+        if (L .gt. 0) then
+          key%list%d_bn(1) =  0.3 * node_value('volt ')  / ( L * beta0 * get_value('beam ','pc '))
+          !print*,"HACD bn(1)=", key%list%d_bn(1), "b0=",beta0, " pc=",get_value('beam ','pc '), " L=",L
+        else
+          key%list%d_bn(1) =  0.3 * node_value('volt ')  / (beta0 * get_value('beam ','pc '))
+        endif
+        key%list%d_an(1) = zero
+        
+        key%list%D_ac = one ! extrac factor for amplitude; we use it for ramping
+        
+        ! parameters to modulate the nominal parameters. No modulation in MADX implemented.
+        key%list%DC_ac = zero
+        key%list%A_ac = zero
+        key%list%theta_ac = zero
+        
+        nclocks = 1
+      ! frequency is in fact tune
+      ! kept like this on Rogelio request not to break the codes before LS2
+      ! afterwards "freq" should be changed to "tune" in definition of the AC_DIPOLE
+        clocks(nclocks)%tune = node_value('freq ')
+        clocks(nclocks)%lag  = node_value('lag ')
+
+        clocks(nclocks)%rampupstart = node_value('ramp1 ')
+        clocks(nclocks)%rampupstop = node_value('ramp2 ')
+        clocks(nclocks)%rampdownstart = node_value('ramp3 ')
+        clocks(nclocks)%rampdownstop = node_value('ramp4 ')
+
+    case(41)
+       
+       key%magnet="hkicker"
+       do i=1,NMAX
+          key%list%k(i)=zero
+          key%list%ks(i)=zero
+       enddo
+       
+        key%list%n_ac = 1 ! only dipole
+        if (L .gt. 0) then
+          key%list%d_an(1) =  0.3 * node_value('volt ') / ( L * beta0 * get_value('beam ','pc '))
+          !print*,"HACD bn(1)=", key%list%d_bn(1), "b0=",beta0, " pc=",get_value('beam ','pc '), " L=",L
+        else
+          key%list%d_an(1) =  0.3 * node_value('volt ')  / (beta0 * get_value('beam ','pc '))
+        endif
+        key%list%d_bn(1) = zero
+        
+        key%list%D_ac = one ! extrac factor for amplitude; we use it for ramping
+        
+        ! parameters to modulate the nominal parameters. No modulation in MADX implemented.
+        key%list%DC_ac = zero
+        key%list%A_ac = zero
+        key%list%theta_ac = zero
+        
+        nclocks = 1
+      ! frequency is in fact tune
+      ! kept like this on Rogelio request not to break the codes before LS2
+      ! afterwards "freq" should be changed to "tune" in definition of the AC_DIPOLE
+        clocks(nclocks)%tune = node_value('freq ')
+        clocks(nclocks)%lag  = node_value('lag ')
+
+        clocks(nclocks)%rampupstart = node_value('ramp1 ')
+        clocks(nclocks)%rampupstop = node_value('ramp2 ')
+        clocks(nclocks)%rampdownstart = node_value('ramp3 ')
+        clocks(nclocks)%rampdownstop = node_value('ramp4 ')
+        
+       
     case(43)
        key%magnet="rfcavity"
        key%list%volt=bvk*node_value('volt ')
@@ -1342,7 +1449,13 @@ CONTAINS
 
 !    endif
     call create_fibre(my_ring%end,key,EXCEPTION) !in ../libs/ptc/src/Sp_keywords.f90
-
+    
+    if(code.eq.40 .or. code.eq.41 ) then
+     !save pointer to the AC dipole element for ramping in tracking
+     clocks(1)%element=>my_ring%end
+     !print*,"Setting element to clock ",clocks(1)%element%mag%name
+    endif
+    
     if(advance_node().ne.0)  goto 10
 
 
@@ -2081,6 +2194,7 @@ CONTAINS
 
 
   end subroutine ptc_dumpmaps
+  !________________________________________________________________________________________________
 
   RECURSIVE FUNCTION FACTORIAL (N) &
        RESULT (FACTORIAL_RESULT)
@@ -2092,6 +2206,7 @@ CONTAINS
        FACTORIAL_RESULT = N * FACTORIAL (N-1)
     END IF
   END FUNCTION FACTORIAL
+  !________________________________________________________________________________________________
 
   subroutine ptc_track()
     implicit none
@@ -2177,9 +2292,6 @@ CONTAINS
     print*,"  Last Coordinates: ",x," after: ",i," turn(s)"
 
   END subroutine ptc_track
-
-
-
   !________________________________________________________________________________
 
 
@@ -2370,18 +2482,28 @@ CONTAINS
   end subroutine set_PARAMETERS
   !______________________________________________________________________
 
-  subroutine my_state(icase,deltap,deltap0)
+  subroutine my_state(icase,deltap,deltap0, silent)
     implicit none
     integer icase,i
     real(dp) deltap0,deltap
-
+    logical, optional :: silent
+    logical :: verbose
+    
+    ! force no printout, ugly work around of ugly ptc_track
+    if (present(silent)) then
+      verbose = .not. silent
+    else
+      verbose = .true.
+    endif
+     
+    
     default = getintstate()
 
-    if (getdebug()>1) then
+    if (getdebug()>1 .and. verbose) then
        print*, "icase=",icase," deltap=",deltap," deltap0=",deltap0
     endif
 
-    if (getdebug()>3) then
+    if (getdebug()>3 .and. verbose) then
        print*, "Input State"
        call print(default,6)
     endif
@@ -2389,20 +2511,20 @@ CONTAINS
     deltap = zero
     select case(icase)
     CASE(4)
-       if (getdebug()>1) then
+       if (getdebug()>1 .and. verbose) then
            print*, "my_state: Enforcing ONLY_4D+NOCAVITY and NO DELTA"
        endif
        default = default - delta0 + only_4d0 + NOCAVITY0
        i=4
     CASE(5)
-       if (getdebug()>1) then
+       if (getdebug()>1 .and. verbose) then
            print*, "my_state: Enforcing DELTA"
        endif
        default = default + delta0
        deltap = deltap0
        i=5
     CASE(56)
-       if (getdebug()>1) then
+       if (getdebug()>1 .and. verbose) then
            print*, "my_state: Enforcing coasting beam"
        endif
        default = default - delta0 - only_4d0 + NOCAVITY0
@@ -2416,7 +2538,7 @@ CONTAINS
     END SELECT
 
     if (i==6) then
-       if (getdebug()>2) then
+       if (getdebug()>2 .and. verbose) then
          print*,"icav=",icav," my_ring%closed=",my_ring%closed," getenforce6D()=",getenforce6D()
        endif
 
@@ -2439,7 +2561,7 @@ CONTAINS
     call setintstate(default)
     CALL UPDATE_STATES
 
-    if (getdebug()>0) then
+    if (getdebug()>0 .and. verbose) then
       !print*, "Resulting state"
       call print(default,6)
     endif
@@ -2447,8 +2569,7 @@ CONTAINS
     icase = i
 
   end subroutine my_state
-
-  !______________________________________________________________________
+  !________________________________________________________________________________________________
 
   subroutine f90flush(i,option)
     implicit none
@@ -2490,6 +2611,7 @@ CONTAINS
          ' F90FLUSH RE-OPEN FAILED with IOSTAT ',ios,' on UNIT ',i
     stop
   end subroutine f90flush
+  !________________________________________________________________________________________________
 
   SUBROUTINE write_closed_orbit(icase,x)
     implicit none
@@ -2503,6 +2625,7 @@ CONTAINS
        print*,"Closed orbit: ",x(1),x(2),x(3),x(4),-x(6),x(5)
     endif
   ENDSUBROUTINE write_closed_orbit
+  !________________________________________________________________________________________________
 
   SUBROUTINE Convert_dp_to_dt(deltap, dt)
     implicit none
@@ -2672,17 +2795,10 @@ CONTAINS
        enddo
     enddo
 
-
-
-
-
     deallocate(j)
 
 
-
   end subroutine makemaptable
-
-
   !_________________________________________________________________
 
   subroutine killsavedmaps
@@ -2806,6 +2922,7 @@ CONTAINS
     return
 
   end SUBROUTINE ptc_read_errors
+  !________________________________________________________________________________________________
 
   subroutine ptc_refresh_k()
     use twtrrfi
@@ -2892,6 +3009,7 @@ CONTAINS
     return
 
   END subroutine ptc_refresh_k
+  !________________________________________________________________________________________________
 
   subroutine getfk(fk)
   !returns FK factor for Beam-Beam effect
@@ -2937,9 +3055,7 @@ CONTAINS
          (one-beta0*beta_dp*b_dir)/(beta_dp+0.5*(b_dir-one)*b_dir*beta0)
 
   end subroutine getfk
-
-
-
+  !________________________________________________________________________________________________
 
   subroutine putbeambeam()
     implicit none
@@ -3010,10 +3126,61 @@ CONTAINS
       call fort_warn('getBeamBeam: ','Bad node case for BeamBeam')
     endif
 
-
     !N.B. If nothing else is done, the beam-beam kick is placed at the entrance of the node.
     !The call FIND_PATCH(t%a,t%ent,o ,mid,D,ANG) needs to be invoked to place the beam-beam kick
 
   end subroutine putbeambeam
+  !________________________________________________________________________________________________
+  
+  subroutine acdipoleramping(t)
+    implicit none
+    !---------------------------------------    *
+    !--- ramp up and down of the ac dipols      *
+    !--- Adjust amplitudes in function of turns *
+    integer  t
+    integer  n
+    real(dp) r
+
+    do n=1,nclocks
+
+
+     if (clocks(n)%rampupstop < 1) then
+       ! no ramping, always full amplitude 
+       clocks(n)%element%mag%d_ac = one
+       cycle
+     endif
+
+     if (t < clocks(n)%rampupstart) then
+       clocks(n)%element%mag%d_ac = zero
+       cycle
+     endif
+
+     if (t < clocks(n)%rampupstop) then
+       r = (t - clocks(n)%rampupstart)
+       clocks(n)%element%mag%d_ac = r/(clocks(n)%rampupstop - clocks(n)%rampupstart)
+       cycle
+     endif
+
+     if (t < clocks(n)%rampdownstart) then
+       clocks(n)%element%mag%d_ac = one 
+       cycle
+     endif
+
+     if (t < clocks(n)%rampdownstop) then
+       r = (clocks(n)%rampdownstop - t)
+       clocks(n)%element%mag%d_ac = r/(clocks(n)%rampdownstop - clocks(n)%rampdownstart)
+       cycle
+     endif
+
+     clocks(n)%element%mag%d_ac = zero
+
+    ! print*,"Setting ramp to clock ",n," element ", clocks(1)%element%mag%name, " to ", clocks(n)%element%mag%d_ac
+
+    enddo
+
+  end subroutine acdipoleramping
+
+
+
 
 END MODULE madx_ptc_module

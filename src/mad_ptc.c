@@ -282,7 +282,7 @@ pro_ptc_twiss(void)
   use_range[0] = current_sequ->range_start;
   use_range[1] = current_sequ->range_end;
 
-  const char* range = command_par_string_user("range", current_twiss);
+  char* range = command_par_string_user("range", current_twiss);
   if (range)
   {
     if (get_sub_range(range, current_sequ, nodes))
@@ -863,6 +863,20 @@ pro_ptc_setswitch(struct in_cmd* cmd)
     if (debuglevel > 0) printf("radiation is not present\n");
   }
 
+
+  /*modulation SWITCH*/
+  if ( name_list_pos("modulation", nl) >=0 )
+  {
+    command_par_value2("modulation", cmd->clone, &switchvalue);
+    if (debuglevel > 0) printf("modulation is found and its value is %f\n", switchvalue);
+    i = (int)switchvalue;
+    w_ptc_setmodulation_(&i);
+  }
+  else
+  {
+    if (debuglevel > 0) printf("modulation is not present\n");
+  }
+
   /*stochastic SWITCH*/
   if ( name_list_pos("stochastic", nl) >=0 )
   {
@@ -1095,33 +1109,37 @@ pro_ptc_eplacement(struct in_cmd* cmd)
   struct node*                   nodes[2]={0x0,0x0};
   struct node*                   anode=0x0;
   char*                          element;
-  int                            refframe=0;/*0 global, 1 current position, 2 end face if the previous element*/
+  int                            refframe=-1;/*0 global, 1 current position, 2 end face if the previous element*/
 
-  const char* s_refframe = command_par_string_user("refframe", cmd->clone);
+  char* s_refframe = command_par_string_user("refframe", cmd->clone);
   if (s_refframe)
   {
     /*if it is zero it is not specified*/
+    /*printf("refframe is %s.\n", s_refframe );*/
 
-    if ( !refframe )
+    if ( strcmp(s_refframe,"current")  == 0 )
+     {
+       refframe = 1;
+     }
+
+    if ( strcmp(s_refframe,"previouselement") == 0 )
+     {
+       refframe = 2;
+     }
+
+    if (refframe < 0)
+     {
+       warning("mad_ptc.c: pro_ptc_eplacement: did not recognize string describing refframe, using default  ", s_refframe);
+       refframe = 0;
+     }
+    
+  }
+    else
     {
       warning("mad_ptc.c: pro_ptc_eplacement: string describing refframe is null: ", "using default");
       refframe = 0;
     }
-    else
-    {
-      /*printf("refframe is %s.\n", s_refframe );*/
-
-      if ( strcmp(s_refframe,"current")  == 0 )
-      {
-        refframe = 1;
-      }
-
-      if ( strcmp(s_refframe,"previouselement") == 0 )
-      {
-        refframe = 2;
-      }
-    }
-  }
+  
 
   element = command_par_string_user("range", cmd->clone);
   if ( !element )

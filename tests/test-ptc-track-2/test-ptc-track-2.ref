@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 18:07:18      +
+  + Execution date: 2018.01.09 16:27:15      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !TITLE,' Example 1 for for MAD-X with PTC_TRACK_RUN';
 
@@ -78,6 +78,7 @@ ptc_setswitch, debuglevel=1, time=true, totalpath=false;
 maxaccel is found and its value is 1.000000
 exact_mis is found and its value is 0.000000
 radiation is found and its value is 0.000000
+modulation is found and its value is 0.000000
 stochastic is found and its value is 0.000000
 envelope is found and its value is 0.000000
 fringe is found and its value is 0.000000
@@ -152,11 +153,11 @@ ptc_track,icase=56,element_by_element, turns=10, file="tfv9", recloss ;
                  0                  0               0.05               0.02 
                  0                  0                 -0             0.0024 
                  0                  0                 -0             0.0023 
-    -0.00311135335    3.238436512e-05     -1.8973919e-05                  0 
-   -0.001097781795    1.132710343e-05    1.047618668e-06                  0 
+    -0.00311135335    3.238436512e-05   -1.897391913e-05                  0 
+   -0.001097781795    1.132710343e-05    1.047618555e-06                  0 
                  0                  0                  2               0.02 
-                 0                  0    8.054090654e-06             0.0024 
-                 0                  0    7.720682375e-06             0.0023 
+                 0                  0    8.054090652e-06             0.0024 
+                 0                  0    7.720682373e-06             0.0023 
     0.000491932416    1.388568308e-05     -0.00439113305             0.0023 
 
                  s                  e 

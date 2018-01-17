@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 18:07:18      +
+  + Execution date: 2018.01.09 16:26:36      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !Example file showing the usage of PTC_TRACK command 
 
@@ -42,6 +42,7 @@ option,-echo;
 maxaccel is found and its value is 0.000000
 exact_mis is found and its value is 1.000000
 radiation is found and its value is 0.000000
+modulation is found and its value is 0.000000
 stochastic is found and its value is 0.000000
 envelope is found and its value is 0.000000
 fringe is found and its value is 1.000000
@@ -92,6 +93,7 @@ obs_points pro_ptc_setswitch Done
 maxaccel is found and its value is 0.000000
 exact_mis is found and its value is 1.000000
 radiation is found and its value is 0.000000
+modulation is found and its value is 0.000000
 stochastic is found and its value is 0.000000
 envelope is found and its value is 0.000000
 fringe is found and its value is 1.000000

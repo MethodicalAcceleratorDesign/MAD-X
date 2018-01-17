@@ -17,6 +17,7 @@ module madx_ptc_intstate_module
   public                            :: ptc_setaccel_method
   public                            :: ptc_setexactmis
   public                            :: ptc_setradiation
+  public                            :: ptc_setmodulation
   public                            :: ptc_settotalpath
   public                            :: ptc_settime
   public                            :: ptc_setnocavity
@@ -206,6 +207,28 @@ contains
     call update_states
     if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
   end subroutine ptc_setradiation
+  !____________________________________________________________________________________________
+
+  subroutine ptc_setmodulation(flag)
+    implicit none
+    integer    :: flag
+
+
+    if (flag == 1) then
+       if (getdebug() > 1) then
+           print *, "Switching ON modulation"
+       end if
+       intstate = intstate + modulation0 
+    else
+       if (getdebug() > 1) then
+           print *, "Switching OFF modulation"
+       end if
+       intstate = intstate - modulation0 
+    endif
+    default = intstate
+    call update_states
+    if (associated(c_%no) .and. getdebug() > 1) call print(intstate,6)
+  end subroutine ptc_setmodulation
   !____________________________________________________________________________________________
 
   subroutine ptc_setstochastic(flag)

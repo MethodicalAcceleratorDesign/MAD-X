@@ -5,7 +5,7 @@
 @ DATE             %08s "14/12/17"
 @ TIME             %08s "18.07.28"
 *     NUMBER       TURN                  X                 PX                  Y                 PY                  T                 PT                  S                  E 
-$         %d         %d                %le                %le                %le                %le                %le                %le                %le                %le 
+$         %le         %le                %le                %le                %le                %le                %le                %le                %le                %le 
 #segment       1      21       1       0 start                                          
           1          0              0.001                  0                  0                  0                  0                  0                  0        450.0009782
 #segment       2      21       1   13209 LHCB1$END                                      

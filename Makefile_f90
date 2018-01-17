@@ -76,8 +76,8 @@ b_da_arrays_all.o:          $(FC_DIR_PTC)/b_da_arrays_all.f90         a_scratch_
 cb_da_arrays_all.o:         $(FC_DIR_PTC)/cb_da_arrays_all.f90        b_da_arrays_all.o
 c_dabnew.o:                 $(FC_DIR_PTC)/c_dabnew.f90                b_da_arrays_all.o
 cc_dabnew.o:                $(FC_DIR_PTC)/cc_dabnew.f90               cb_da_arrays_all.o
-c_dabnew_berz.o:            $(FC_DIR_MAD)/c_dabnew_berz.f90           b_da_arrays_all.o
-c_tpsa_interface.o:         $(FC_DIR_MAD)/c_tpsa_interface.F90        c_dabnew_berz.o
+c_dabnew_berz.o:            $(FC_DIR_PTC)/c_dabnew_berz.f90           b_da_arrays_all.o
+c_tpsa_interface.o:         $(FC_DIR_PTC)/c_tpsa_interface.F90        c_dabnew_berz.o
 d_lielib.o:                 $(FC_DIR_PTC)/d_lielib.f90                $(if $(call eq,$(NTPSA),yes),c_tpsa_interface.o,c_dabnew.o)
 h_definition.o:             $(FC_DIR_PTC)/h_definition.f90            cc_dabnew.o  d_lielib.o
 i_tpsa.o:                   $(FC_DIR_PTC)/i_tpsa.f90                  h_definition.o
@@ -96,9 +96,9 @@ Sc_euclidean.o:             $(FC_DIR_PTC)/Sc_euclidean.f90            Sb_sagan_p
 Sd_frame.o:                 $(FC_DIR_PTC)/Sd_frame.f90                Sc_euclidean.o
 Se_status.o:                $(FC_DIR_PTC)/Se_status.f90               Sd_frame.o Ci_tpsa.o
 Sf_def_all_kinds.o:         $(FC_DIR_PTC)/Sf_def_all_kinds.f90        Se_status.o
-Sg_sagan_wiggler.o:         $(FC_DIR_PTC)/Sg_sagan_wiggler.f90        Sf_def_all_kinds.o
-Sh_def_kind.o:              $(FC_DIR_PTC)/Sh_def_kind.f90             Sg_sagan_wiggler.o
-Si_def_element.o:           $(FC_DIR_PTC)/Si_def_element.f90          Sh_def_kind.o
+Sh_def_kind.o:              $(FC_DIR_PTC)/Sh_def_kind.f90             Sf_def_all_kinds.o
+Sg_sagan_wiggler.o:         $(FC_DIR_PTC)/Sg_sagan_wiggler.f90        Sh_def_kind.o
+Si_def_element.o:           $(FC_DIR_PTC)/Si_def_element.f90          Sg_sagan_wiggler.o
 Sk_link_list.o:             $(FC_DIR_PTC)/Sk_link_list.f90            Si_def_element.o
 Sl_family.o:                $(FC_DIR_PTC)/Sl_family.f90               Sk_link_list.o
 Sm_tracking.o:              $(FC_DIR_PTC)/Sm_tracking.f90             Sl_family.o

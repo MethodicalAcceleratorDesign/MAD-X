@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 18:04:50      +
+  + Execution date: 2018.01.09 10:27:43      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -837,6 +837,7 @@ ptc_create_universe;
 maxaccel is found and its value is 1.000000
 exact_mis is found and its value is 1.000000
 radiation is found and its value is 0.000000
+modulation is found and its value is 0.000000
 stochastic is found and its value is 0.000000
 envelope is found and its value is 0.000000
 fringe is found and its value is 0.000000
@@ -876,13 +877,13 @@ obs_points pro_ptc_setswitch Done
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-       78.54370266       0.1241077844        3.171382484           -1000000 
+       78.54370266       0.1241077847        3.171382482           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000       -0.625893045        2.838575753       0.8200596224 
+          -1000000      -0.6258930447         2.83857575       0.8200596224 
 
                 q2                dq1                dq2                 qs 
-      0.7198292883       -2.176620134       -4.741107661                  0 
+      0.7198292883       -2.176620133        -4.74110766                  0 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
        3.282153615        15.12420817        1.633285387        20.07025827 
@@ -900,28 +901,28 @@ obs_points pro_ptc_setswitch Done
                  0                  0                  0                  0 
 
          beta33min          beta33max           disp1min           disp1max 
-                 0                  0        -10.3020712    0.0005941579859 
+                 0                  0        -10.3020712    0.0005941579858 
 
           disp2min           disp2max           disp3min           disp3max 
        -4.54310719         4.54310719                  0                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-                 0                  0                  0    1.068886442e-08 
+                 0                  0                  0    1.068886242e-08 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   2.546139122e-09                  0                  0                  0 
+   2.546139572e-09                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                -0    1.168573391e-08                  0    3.059593852e-09 
+                -0    1.168573367e-08                  0    3.059593786e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0        92.00347452                  0    2.508646064e-08 
+                 0        92.00347451                  0    2.508645904e-08 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.106287025e-08                  0         157.087666 
+                 0    1.106286966e-08                  0        157.0876659 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0   -1.449191389e-12                  0   -1.106286975e-08 
+                 0   -1.447405766e-12                  0   -1.106286976e-08 
 
            pycomin             tcomin            ptcomin 
                  0                  0                  0 

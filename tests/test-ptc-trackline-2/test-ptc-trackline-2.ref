@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.14 18:07:32      +
+  + Execution date: 2018.01.09 16:28:42      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !Example script showing usage of tracking with PTC
 
@@ -61,6 +61,30 @@ exact_mis is found and its value is 1.000000
        ACCELERATE  =  FALSE
 radiation is found and its value is 0.000000
  Switching OFF radiation
+ ************ State Summary ****************
+ MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     6
+  Default integration steps     20
+ This is an electron (positron actually if charge=1) 
+       EXACT_MODEL =  FALSE
+       TOTALPATH   =     1
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  FALSE
+       TIME        =  TRUE 
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
+       ONLY_4D     =  FALSE
+       DELTA       =  FALSE
+       SPIN        =  FALSE
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+modulation is found and its value is 0.000000
+ Switching OFF modulation
  ************ State Summary ****************
  MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
   Rectangular Bend: input arc length (rho alpha) 
@@ -261,28 +285,28 @@ obs_points: 3
  c_%feed_p0c =  F
  START TRACKING TILL THE FIRST CAVITY
  Current cavity no is j=           1
- Setting beam momentum AND tracking    1.9993470936209477E-002  till the cavity (           9 )
-  i=           1  name=CTF$START                beta0   0.99967354681047382       newpos    0.0000000000000000       Current energy    2.0000000000000000E-002
+ Setting beam momentum AND tracking    1.9993470936210268E-002  till the cavity (           9 )
+  i=           1  name=CTF$START                beta0   0.99967354681051335       newpos    0.0000000000000000       Current energy    2.0000000000000000E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  0.0000
-  i=           2  name=QUAD_L2                  beta0   0.99967354681047382       newpos   0.11003592157756163       Current energy    2.0000000000000000E-002
+  i=           2  name=QUAD_L2                  beta0   0.99967354681051335       newpos   0.11003592157755729       Current energy    2.0000000000000000E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  0.1100
-  i=           3  name=DS_QL                    beta0   0.99967354681047382       newpos   0.36011756152656493       Current energy    2.0000000000000000E-002
+  i=           3  name=DS_QL                    beta0   0.99967354681051335       newpos   0.36011756152655072       Current energy    2.0000000000000000E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  0.3601
-  i=           4  name=QUAD_L1                  beta0   0.99967354681047382       newpos   0.58018940468168867       Current energy    2.0000000000000000E-002
+  i=           4  name=QUAD_L1                  beta0   0.99967354681051335       newpos   0.58018940468166535       Current energy    2.0000000000000000E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  0.5802
-  i=           5  name=CELL_Q1                  beta0   0.99967354681047382       newpos   0.58018940468168867       Current energy    2.0000000000000000E-002
+  i=           5  name=CELL_Q1                  beta0   0.99967354681051335       newpos   0.58018940468166535       Current energy    2.0000000000000000E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  0.5802
-  i=           6  name=DS_TRIP                  beta0   0.99967354681047382       newpos    1.0503428877858147       Current energy    2.0000000000000000E-002
+  i=           6  name=DS_TRIP                  beta0   0.99967354681051335       newpos    1.0503428877857730       Current energy    2.0000000000000000E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  1.0503
-  i=           7  name=CELL_MRK                 beta0   0.99967354681047382       newpos    1.0503428877858147       Current energy    2.0000000000000000E-002
+  i=           7  name=CELL_MRK                 beta0   0.99967354681051335       newpos    1.0503428877857730       Current energy    2.0000000000000000E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  1.0503
-  i=           8  name=BEFORECAV                beta0   0.99967354681047382       newpos    1.0503428877858147       Current energy    2.0000000000000000E-002
+  i=           8  name=BEFORECAV                beta0   0.99967354681051335       newpos    1.0503428877857730       Current energy    2.0000000000000000E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  1.0503
           i=    9 name=      TCAV                      p0c=    0.0200     Current energy     0.0200
   0.0000  0.0000  0.0000  0.0000  0.0000  1.0503
- arrivtime =    3.5035667501208945       ns
+ arrivtime =    3.5035667501207550       ns
  MAX ACCEL MODE
-    Max Energy to gain:    14.000000000000002       MeV, x(6)   1.0503428877858147     
+    Max Energy to gain:    14.000000000000002       MeV, x(6)   1.0503428877857730     
  Cavity settings:
      Name   TCAV                    
      Charge     -1.00000 max ene? T
@@ -296,45 +320,45 @@ obs_points: 3
         P0c      0.01999     GeV/c
  Track parameters after cavity   0.00000000  0.00000000  0.00000000  0.00000000  0.70010343  3.45080385
   Old Fibre: energy=    0.0200 momentum=    0.0200  kinetic=    0.0195
- x(5) = dE = (E-E0)/p0c so (E-E0) = x(5)*p0c =    13.997497646681616      MeV
+ x(5) = dE = (E-E0)/p0c so (E-E0) = x(5)*p0c =    13.997497646682215      MeV
   New Fibre: energy=    0.0340 momentum=    0.0340  kinetic=    0.0335
     0.9999    0.0340    0.0335    0.0340    0.1134    0.0150    0.0002    0.0005 F  0
 Relative E  0.7001
- beta0   0.99967354681047382       oldpos    0.0000000000000000       newpos    3.4508038492390041       Current energy    3.3997497646681613E-002
+ beta0   0.99967354681051335       oldpos    0.0000000000000000       newpos    3.4508038492389064       Current energy    3.3997497646682216E-002
  Finding patch for j=           1  TCAV                    
  Current cavity no is j=           2
- Setting beam momentum AND tracking    3.3993657148255980E-002  till the cavity (          23 )
-  i=          10  name=AFTERCAV                 beta0   0.99988703584994565       newpos    3.4508038492390041       Current energy    3.3997497646681613E-002
+ Setting beam momentum AND tracking    3.3993657148257049E-002  till the cavity (          23 )
+  i=          10  name=AFTERCAV                 beta0   0.99988703584995930       newpos    3.4508038492389064       Current energy    3.3997497646682216E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  3.4508
-  i=          11  name=DS_TRIP                  beta0   0.99988703584994565       newpos    3.9208569483878297       Current energy    3.3997497646681613E-002
+  i=          11  name=DS_TRIP                  beta0   0.99988703584995930       newpos    3.9208569483877258       Current energy    3.3997497646682216E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  3.9209
-  i=          12  name=CELL_Q3                  beta0   0.99988703584994565       newpos    3.9208569483878297       Current energy    3.3997497646681613E-002
+  i=          12  name=CELL_Q3                  beta0   0.99988703584995930       newpos    3.9208569483877258       Current energy    3.3997497646682216E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  3.9209
-  i=          13  name=QUAD_L1                  beta0   0.99988703584994565       newpos    4.1408818033085675       Current energy    3.3997497646681613E-002
+  i=          13  name=QUAD_L1                  beta0   0.99988703584995930       newpos    4.1408818033084343       Current energy    3.3997497646682216E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  4.1409
-  i=          14  name=DS_QL                    beta0   0.99988703584994565       newpos    4.3909100475366660       Current energy    3.3997497646681613E-002
+  i=          14  name=DS_QL                    beta0   0.99988703584995930       newpos    4.3909100475365292       Current energy    3.3997497646682216E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  4.3909
-  i=          15  name=QUAD_L2                  beta0   0.99988703584994565       newpos    4.5009224749970347       Current energy    3.3997497646681613E-002
+  i=          15  name=QUAD_L2                  beta0   0.99988703584995930       newpos    4.5009224749969334       Current energy    3.3997497646682216E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  4.5009
-  i=          16  name=QUAD_L2                  beta0   0.99988703584994565       newpos    4.6109349024574033       Current energy    3.3997497646681613E-002
+  i=          16  name=QUAD_L2                  beta0   0.99988703584995930       newpos    4.6109349024573376       Current energy    3.3997497646682216E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  4.6109
-  i=          17  name=DS_QL                    beta0   0.99988703584994565       newpos    4.8609631466855019       Current energy    3.3997497646681613E-002
+  i=          17  name=DS_QL                    beta0   0.99988703584995930       newpos    4.8609631466854326       Current energy    3.3997497646682216E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  4.8610
-  i=          18  name=QUAD_L1                  beta0   0.99988703584994565       newpos    5.0809880016062392       Current energy    3.3997497646681613E-002
+  i=          18  name=QUAD_L1                  beta0   0.99988703584995930       newpos    5.0809880016061344       Current energy    3.3997497646682216E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  5.0810
-  i=          19  name=CELL_Q1                  beta0   0.99988703584994565       newpos    5.0809880016062392       Current energy    3.3997497646681613E-002
+  i=          19  name=CELL_Q1                  beta0   0.99988703584995930       newpos    5.0809880016061344       Current energy    3.3997497646682216E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  5.0810
-  i=          20  name=DS_TRIP                  beta0   0.99988703584994565       newpos    5.5510411007550653       Current energy    3.3997497646681613E-002
+  i=          20  name=DS_TRIP                  beta0   0.99988703584995930       newpos    5.5510411007549534       Current energy    3.3997497646682216E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  5.5510
-  i=          21  name=CELL_MRK                 beta0   0.99988703584994565       newpos    5.5510411007550653       Current energy    3.3997497646681613E-002
+  i=          21  name=CELL_MRK                 beta0   0.99988703584995930       newpos    5.5510411007549534       Current energy    3.3997497646682216E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  5.5510
-  i=          22  name=BEFORECAV                beta0   0.99988703584994565       newpos    5.5510411007550653       Current energy    3.3997497646681613E-002
+  i=          22  name=BEFORECAV                beta0   0.99988703584995930       newpos    5.5510411007549534       Current energy    3.3997497646682216E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  5.5510
           i=   23 name=      TCAV                      p0c=    0.0340     Current energy     0.0340
   0.0000  0.0000  0.0000  0.0000  0.0000  5.5510
- arrivtime =    18.516280021811173       ns
+ arrivtime =    18.516280021810800       ns
  MAX ACCEL MODE
-    Max Energy to gain:    14.000000000000002       MeV, x(6)   5.5510411007550653     
+    Max Energy to gain:    14.000000000000002       MeV, x(6)   5.5510411007549534     
  Cavity settings:
      Name   TCAV                    
      Charge     -1.00000 max ene? T
@@ -348,28 +372,28 @@ Relative E  0.7001
         P0c      0.03399     GeV/c
  Track parameters after cavity   0.00000000  0.00000000  0.00000000  0.00000000  0.41182975  7.95123315
   Old Fibre: energy=    0.0340 momentum=    0.0340  kinetic=    0.0335
- x(5) = dE = (E-E0)/p0c so (E-E0) = x(5)*p0c =    13.999599334343433      MeV
+ x(5) = dE = (E-E0)/p0c so (E-E0) = x(5)*p0c =    13.999599334343529      MeV
   New Fibre: energy=    0.0480 momentum=    0.0480  kinetic=    0.0475
     0.9999    0.0480    0.0475    0.0480    0.1601    0.0106    0.0001    0.0005 F  0
 Relative E  1.4003
- beta0   0.99988703584994565       oldpos    3.4508038492390041       newpos    7.9512331495870727       Current energy    4.7997096981025042E-002
+ beta0   0.99988703584995930       oldpos    3.4508038492389064       newpos    7.9512331495869368       Current energy    4.7997096981025750E-002
  Finding patch for j=           2  TCAV                    
  Loop over cavities done
  Current element is AFTERCAV                
  Doing loop from the first element after the last cavity to the END
-  i=          24  name=AFTERCAV                 beta0   0.99994332488905069       newpos    7.9512331495870727       Current energy    4.7997096981025042E-002
+  i=          24  name=AFTERCAV                 beta0   0.99994332488905735       newpos    7.9512331495869368       Current energy    4.7997096981025750E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  7.9512
-  i=          25  name=DS_TRIP                  beta0   0.99994332488905069       newpos    8.4212597883989773       Current energy    4.7997096981025042E-002
+  i=          25  name=DS_TRIP                  beta0   0.99994332488905735       newpos    8.4212597883988369       Current energy    4.7997096981025750E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  8.4213
-  i=          26  name=CELL_Q3                  beta0   0.99994332488905069       newpos    8.4212597883989773       Current energy    4.7997096981025042E-002
+  i=          26  name=CELL_Q3                  beta0   0.99994332488905735       newpos    8.4212597883988369       Current energy    4.7997096981025750E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  8.4213
-  i=          27  name=QUAD_L1                  beta0   0.99994332488905069       newpos    8.6412722576300851       Current energy    4.7997096981025042E-002
+  i=          27  name=QUAD_L1                  beta0   0.99994332488905735       newpos    8.6412722576299448       Current energy    4.7997096981025750E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  8.6413
-  i=          28  name=DS_QL                    beta0   0.99994332488905069       newpos    8.8912864272108845       Current energy    4.7997096981025042E-002
+  i=          28  name=DS_QL                    beta0   0.99994332488905735       newpos    8.8912864272107424       Current energy    4.7997096981025750E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  8.8913
-  i=          29  name=QUAD_L2                  beta0   0.99994332488905069       newpos    9.0012926618265094       Current energy    4.7997096981025042E-002
+  i=          29  name=QUAD_L2                  beta0   0.99994332488905735       newpos    9.0012926618263673       Current energy    4.7997096981025750E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  9.0013
-  i=          30  name=CTF$END                  beta0   0.99994332488905069       newpos    9.0012926618265094       Current energy    4.7997096981025042E-002
+  i=          30  name=CTF$END                  beta0   0.99994332488905735       newpos    9.0012926618263673       Current energy    4.7997096981025750E-002
   0.0000  0.0000  0.0000  0.0000  0.0000  9.0013
  PARAMETERS AT THE END OF LINE:
  Track parameters   0.0000  0.0000  0.0000  0.0000  0.0000  9.0013
@@ -386,7 +410,7 @@ Relative E  1.4366
  Name: CELL_MRK                 Kind:           30
  Name: BEFORECAV                Kind:           30
  Name: TCAV                     Kind:           51
- Cavity            9  name TCAV                     phase   -64.469881054452713       Volt    5.8333333333333339       length    2.3999999999999999     
+ Cavity            9  name TCAV                     phase   -64.469881054450084       Volt    5.8333333333333339       length    2.3999999999999999     
  DELTAE    0.0000000000000000     
  Name: AFTERCAV                 Kind:           30
  Name: DS_TRIP                  Kind:           31
@@ -402,7 +426,7 @@ Relative E  1.4366
  Name: CELL_MRK                 Kind:           30
  Name: BEFORECAV                Kind:           30
  Name: TCAV                     Kind:           51
- Cavity           23  name TCAV                     phase   -347.45285940320571       Volt    5.8333333333333339       length    2.3999999999999999     
+ Cavity           23  name TCAV                     phase   -347.45285940319866       Volt    5.8333333333333339       length    2.3999999999999999     
  DELTAE    0.0000000000000000     
  Name: AFTERCAV                 Kind:           30
  Name: DS_TRIP                  Kind:           31

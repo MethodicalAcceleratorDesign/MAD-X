@@ -183,6 +183,8 @@ CONTAINS
 
        B%A_T=A%A_T
        B%B_T=A%B_T
+       B%A_L=A%A_L
+       B%B_L=A%B_L
        B%b0b=A%b0b
        B%p0b=A%p0b
        B%A_X1=A%A_X1
@@ -257,16 +259,18 @@ CONTAINS
     !   endif
 
     IF(R==0.or.R==1) THEN    !
-       NULLIFY(F%A_T,F%B_T,F%A_D,  F%B_D,   F%A_ANG,F%B_ANG)
+       NULLIFY(F%A_T,F%B_T,F%A_L,F%B_L,F%A_D,  F%B_D,   F%A_ANG,F%B_ANG)
        NULLIFY(F%A_X1,F%A_X2,F%B_X1,F%B_X2,F%p0b,F%B0b)
 
        NULLIFY(F%TIME,F%ENERGY,F%PATCH)
        ALLOCATE(F%A_D(3),F%B_D(3),F%A_ANG(3),F%B_ANG(3))
-       ALLOCATE(F%A_T,F%B_T)
+       ALLOCATE(F%A_T,F%B_T,F%A_L,F%B_L)
        ALLOCATE(F%A_X1,F%A_X2,F%B_X1,F%B_X2)
        ALLOCATE(F%TIME,F%ENERGY,F%PATCH,F%p0b,F%B0b)
        F%A_T=0.0_dp
        F%B_T=0.0_dp
+       F%A_L=0.0_dp
+       F%B_L=0.0_dp
        F%A_X1=1; F%A_X2=1; F%B_X1=1; F%B_X2=1;
        F%A_D=0.0_dp
        F%B_D=0.0_dp
@@ -279,11 +283,11 @@ CONTAINS
        f%TIME=0
     ELSEIF(R==-1) THEN
        DEALLOCATE(F%A_D,F%B_D,F%A_ANG,F%B_ANG,F%p0b,F%B0b)
-       DEALLOCATE(F%A_T,F%B_T)
+       DEALLOCATE(F%A_T,F%B_T,F%A_L,F%B_L)
        DEALLOCATE(F%A_X1,F%A_X2,F%B_X1,F%B_X2)
        DEALLOCATE(F%TIME,F%ENERGY,F%PATCH)
        nullify(F%A_D,F%B_D,F%A_ANG,F%B_ANG,F%p0b,F%B0b)
-       nullify(F%A_T,F%B_T)
+       nullify(F%A_T,F%B_T,F%A_L,F%B_L)
        nullify(F%A_X1,F%A_X2,F%B_X1,F%B_X2)
        nullify(F%TIME,F%ENERGY,F%PATCH)
     ELSE
