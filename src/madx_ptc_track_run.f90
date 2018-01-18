@@ -1470,6 +1470,7 @@ CONTAINS
                
                theProbe = savedProbe
                theProbe%ac =  savedProbe%ac
+
                theProbe = x_coord_incl_co(:,j_th_partic)
                call propagate(my_ring,theProbe,MYSTATE, &                     !  ! !
                               fibre1=i_current_elem,fibre2=i_current_elem+1)       
@@ -1599,6 +1600,7 @@ CONTAINS
             
             savedProbe = theProbe
             savedProbe%ac =  theProbe%ac
+            
             !                                                                             V         ! l
             !++++++++<+++++++++++<+++++++++++++<+++++++++++++++<+++++++++++<++++++++<+++++!         ^ e
             !                                                                                       ! m
@@ -3372,7 +3374,7 @@ CONTAINS
 
   !=============================================================================
   subroutine ptc_track_ini_modulation
-    USE  madx_ptc_module, ONLY: my_ring, get_one
+    USE  madx_ptc_module, ONLY: my_ring, get_one, n_rf
     implicit none
     integer i
     real(dp)  circumference
@@ -3381,12 +3383,14 @@ CONTAINS
 
     call get_length(my_ring,circumference) 
     
+    n_rf = nclocks
+    
     do i=1,nclocks
-      savedProbe%ac%om = twopi*clocks(1)%tune * BETA0 / circumference
+      savedProbe%ac(i)%om = twopi*clocks(i)%tune * BETA0 / circumference
       !omega of the the modulation
       !savedProbe%ac%om = twopi*clocks(1)%tune
-      savedProbe%ac%x(1)  = one
-      savedProbe%ac%x(2)  = zero  ! initial clock vector (sin like)
+      savedProbe%ac(i)%x(1)  = one
+      savedProbe%ac(i)%x(2)  = zero  ! initial clock vector (sin like)
     enddo
        
   end subroutine ptc_track_ini_modulation

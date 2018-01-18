@@ -796,7 +796,7 @@ contains
     !call init(default,no,nda,BERZ,mynd2,npara)
     
     !new complex PTC
-    call init_all(default,no,nda,BERZ,mynd2,npara) ! need to add number of clocks
+    call init_all(default,no,nda,BERZ,mynd2,npara,nclocks) ! need to add number of clocks
     c_verbose=.false.
     
     i_piotr(:) = 0

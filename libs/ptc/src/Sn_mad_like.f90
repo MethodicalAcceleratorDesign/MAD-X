@@ -79,8 +79,12 @@ module Mad_like
      REAL(DP) DPHAS,PSI,dvds
      logical(lp) usethin
      INTEGER N_BESSEL
-     INTEGER n_ac
-     REAL(DP) d_bn(NMAX), d_an(NMAX), D_ac, DC_ac, A_ac, theta_ac
+     INTEGER n_ac  ! number of oscillating multipoles 
+     REAL(DP) d_bn(NMAX), d_an(NMAX) ! oscillation amplitudes of multipoles
+     REAL(DP) D_ac        ! factor for oscillation amplitude set by d_bn and d_an
+     REAL(DP) DC_ac, A_ac ! factors for base field oscillation (D0_BN) : BN(N) = (DC_AC+A_AC*clock)*D0_BN(N) + D_AC*clock*D_BN(N)
+     INTEGER  clockno_ac ! number (index) of the clock that this element is driven by
+     REAL(DP) theta_ac   ! lag wrt the oscillation clock
   END TYPE EL_LIST
 
   INTERFACE OPERATOR (+)
@@ -3076,16 +3080,13 @@ CONTAINS
       S2%DC_ac    = s1%DC_ac
       S2%A_ac     = s1%A_ac
       S2%theta_ac = s1%theta_ac*twopi
-      S2%slow_ac  = .true.
-      allocate(S2%slow_ac2)
-      S2%slow_ac2 = .true.
-
-
+      S2%slow_ac  = s1%clockno_ac
+      
       s2p%D_ac     = s1%D_ac
       s2p%DC_ac    = s1%DC_ac
       s2p%A_ac     = s1%A_ac
       s2p%theta_ac = s1%theta_ac*twopi
-      s2p%slow_ac  = .true.
+      s2p%slow_ac  = s1%clockno_ac
 
 
       !may need to move after s2 to s2p copy
@@ -3132,8 +3133,8 @@ CONTAINS
       enddo
       !
     else
-     S2%slow_ac  = .false.   
-     S2p%slow_ac = .false.   
+     S2%slow_ac  = 0
+     S2p%slow_ac = 0
     endif
 
 

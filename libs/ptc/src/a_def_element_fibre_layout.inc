@@ -189,7 +189,8 @@ TYPE ELEMENT
    real(dp), POINTER :: VOLT => null(), FREQ => null(),PHAS => null(),DELTA_E => null(),LAG => null()       ! Cavity information
    real(dp), POINTER :: DC_ac => null(),A_ac => null(),theta_ac => null(),D_AC => null()      ! slow RF: amplitude and phase
    real(dp),   DIMENSION(:), POINTER:: D_AN => null(),D_BN => null(),D0_AN => null(),D0_BN => null()  !Multipole component
-   logical(lp), POINTER :: THIN => null(),slow_ac => null(),slow_ac2 => null()
+   logical(lp), POINTER :: THIN => null()
+   integer(2), pointer :: slow_ac => null()
    real(dp), POINTER ::  B_SOL  => null()
    !  misalignements and rotation
    logical(lp), POINTER ::  MIS => null()
@@ -257,8 +258,8 @@ TYPE ELEMENTP
    TYPE(REAL_8),   DIMENSION(:), POINTER:: D_AN => null(),D_BN => null(),D0_AN => null(),D0_BN => null()         !Multipole component
    !
    TYPE(REAL_8), POINTER :: B_SOL => null()
-   logical(lp), POINTER :: THIN => null(),slow_ac => null(),slow_ac2 => null()
-
+   logical(lp), POINTER :: THIN => null() 
+   integer(2), pointer :: slow_ac => null()
    !  MISALIGNEMENTS AND ROTATION
    logical(lp), POINTER ::  MIS => null()
    !   real(dp),  DIMENSION(:), POINTER :: D,R

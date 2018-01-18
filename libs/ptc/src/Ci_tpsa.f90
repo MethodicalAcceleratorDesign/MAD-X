@@ -682,7 +682,6 @@ endif
 
 end subroutine c_get_indices
 
-
   subroutine c_count_taylor(n,ns,ne)
 !#restricted : information
 !# Counts number of c_taylor allocated;
@@ -710,9 +709,10 @@ end subroutine c_get_indices
     !   call ass(scdadd)
     scdadd%u=my_false
     scdadd%E_ij=0.0_dp
-
+    scdadd%nac=s2%nac
+      
     if(doing_ac_modulation_in_ptc) then
-       dc=2
+       dc=2*rf
     else
        dc=0
     endif
@@ -755,26 +755,29 @@ end subroutine c_get_indices
     endif       ! 1
 
 
-
+ do i=1,scdadd%nac
     localmaster=master
-    call ass(scdadd%AC%x(1))
+    call ass(scdadd%AC(i)%x(1))
     !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
-     d=s1%V(C_%ND2-1) +addclock*s2%AC%x(1)
-    scdadd%ac%x(1)=d
+     j=2*scdadd%nac-(2*i-1)
+     d=s1%V(C_%ND2-j) +addclock*s2%AC(i)%x(1)
+    scdadd%ac(i)%x(1)=d
     master=localmaster
     localmaster=master
-    call ass(scdadd%AC%x(2))
+     j=2*scdadd%nac-(2*i)
+    call ass(scdadd%AC(i)%x(2))
     !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
-    d=s1%V(C_%ND2) +addclock*s2%AC%x(2)
-    scdadd%ac%x(2)=d
+    d=s1%V(C_%ND2-j) +addclock*s2%AC(i)%x(2)
+    scdadd%ac(i)%x(2)=d
     master=localmaster
     localmaster=master
-    call ass(scdadd%AC%om)
+    call ass(scdadd%AC(i)%om)
 !    call ass(scdadd%AC%t)
     !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
-    scdadd%AC%om=s2%AC%om
-    scdadd%AC%t=s2%AC%t
+    scdadd%AC(i)%om=s2%AC(i)%om
+    scdadd%AC(i)%t=s2%AC(i)%t
     master=localmaster
+enddo
     !    endif
 
     DO I=1,3
@@ -809,9 +812,9 @@ end subroutine c_get_indices
     !   call ass(daddsc)
     daddsc%u=my_false
     daddsc%E_ij=0.0_dp
-
+    daddsc%nac=s2%nac
     if(doing_ac_modulation_in_ptc) then
-       dc=2
+       dc=2*rf
     else
        dc=0
     endif
@@ -854,28 +857,30 @@ end subroutine c_get_indices
     endif       ! 1
 
 
-
+do i=1,daddsc%nac
     localmaster=master
-    call ass(daddsc%AC%x(1))
+    call ass(daddsc%AC(i)%x(1))
     !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
-     d=s1%V(C_%ND2-1) +addclock*s2%AC%x(1)
-    daddsc%ac%x(1)=d
+     j=2*daddsc%nac-(2*i-1)
+     d=s1%V(C_%ND2-j) +addclock*s2%AC(i)%x(1)
+    daddsc%ac(i)%x(1)=d
     master=localmaster
     localmaster=master
-    call ass(daddsc%AC%x(2))
+     j=2*daddsc%nac-(2*i)
+    call ass(daddsc%AC(i)%x(2))
     !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
-    d=s1%V(C_%ND2) +addclock*s2%AC%x(2)
-    daddsc%ac%x(2)=d
+    d=s1%V(C_%ND2-j) +addclock*s2%AC(i)%x(2)
+    daddsc%ac(i)%x(2)=d
     master=localmaster
     localmaster=master
-    call ass(daddsc%AC%om)
+    call ass(daddsc%AC(i)%om)
 !    call ass(daddsc%AC%t)
     !       scdadd%x(i)=s1%m%v(i)+s2%x(i)
-    daddsc%AC%om=s2%AC%om
-    daddsc%AC%t=s2%AC%t
+    daddsc%AC(i)%om=s2%AC(i)%om
+    daddsc%AC(i)%t=s2%AC(i)%t
     master=localmaster
     !    endif
-
+enddo
     DO I=1,3
        !          call ass(scdadd%s%x(i))
        DO J=1,3
@@ -2082,10 +2087,11 @@ end subroutine c_get_indices
 
     call alloc(t)
 
-    nd2t1=C_%ND2
-    if(doing_ac_modulation_in_ptc) then
-       nd2t1=C_%ND2-2
-    endif
+     nd2t1=c_%nd2-2*rf 
+ !   nd2t1=C_%ND2
+ !   if(doing_ac_modulation_in_ptc) then
+ !      nd2t1=C_%ND2-2
+ !   endif
 
 
 
@@ -2093,10 +2099,22 @@ end subroutine c_get_indices
        t=R%X(I)
        DS%V(I)=t
     ENDDO
-    DO I=nd2t1+1,C_%ND2
-       t=R%ac%x(i-nd2t1)
+
+ !   DO I=nd2t1+1,C_%ND2
+ !      t=R%ac%x(i-nd2t1)
+ !      DS%V(I)=t
+ !   ENDDO
+
+    j=1
+    DO I=nd2t1+1,C_%ND2,2
+       t=R%ac(j)%x(1)
        DS%V(I)=t
+       t=R%ac(j)%x(2)
+       DS%V(I+1)=t
+       j=j+1
     ENDDO
+
+
 
     DO I=1,3
        DO J=1,3
@@ -2135,10 +2153,21 @@ end subroutine c_get_indices
        R%X(I)= t  
     ENDDO
 
-      do i=nd2t1+1,c_%nd2
+ !     do i=nd2t1+1,c_%nd2
+ !      t=DS%V(I)
+ !      r%ac%x(i-nd2t1) =  t
+ !     enddo
+
+    j=1
+    DO I=nd2t1+1,C_%ND2,2
        t=DS%V(I)
-       r%ac%x(i-nd2t1) =  t
-      enddo
+       R%ac(j)%x(1)=t
+       t=DS%V(I+1) 
+       R%ac(j)%x(2)=t
+       j=j+1
+    ENDDO
+
+
 
     DO J=1,3
        DO I=1,3
@@ -9906,7 +9935,7 @@ end subroutine c_full_factorise
 !# This routine creates a random kick 
     implicit none
     type(c_damap) , intent(inout) :: m
-    real(dp), intent(out) :: ait(6,6),ki(3)
+    real(dp), intent(out) :: ait(6,6),ki(6)
     real(dp), intent(in) :: eps
     integer i,j
     real(dp) norm,f(6,6),s(6,6), at(6,6),ai(6,6)
@@ -9984,18 +10013,21 @@ end subroutine c_full_factorise
     b=matmul(b,a)
 
 
-    do i=1,3
-     ki(i)=b(2*i,2*i)
+    do i=1,6
+     ki(i)=sqrt(b(i,i))
     enddo
-!write(6,*) ki
-!pause 887
-!    do i=1,6
-!    do j=1,6
-!    if(b(i,j)/=0.d0) then
-!     write(6,*) i,j,b(i,j)
-!    endif
-!    enddo
-!    enddo
+    
+    write(6,*) ki
+    
+    !pause 887
+    
+    do i=1,6
+    do j=1,6
+    if(b(i,j)/=0.d0) then
+     write(6,*) i,j,b(i,j)
+    endif
+    enddo
+    enddo
 
     ai=-matmul(matmul(s,at),s)
     ait=transpose(ai)
@@ -11820,7 +11852,7 @@ endif
     !  the eigenvectors 2 ,4, and 6 have the opposite normalization.
     !  written by F. Neri, Feb 26 1986.
     !
-    integer jet,nn,i,i1,ilo,ihi,mdim,info,j
+    integer jet,nn,i,i1,ilo,ihi,mdim,info
     real(dp),dimension(ndim2t)::reval,aieval,ort
     real(dp),dimension(ndim2t,ndim2t)::revec,aievec,fm,aa,vv
 

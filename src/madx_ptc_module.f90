@@ -38,23 +38,30 @@ MODULE madx_ptc_module
   real(dp) my_thin,my_xbend
 
   type mapbuffer
-     type(universal_taylor)  :: unimap(6)
-     real(dp)                :: s
-     character(nlp+1)        :: name
+     type(universal_taylor) :: unimap(6)
+     real(dp)               :: s
+     character(nlp+1)       :: name
   end type mapbuffer
 
   type(mapbuffer), pointer  :: maps(:) !buffered maps from the last twiss
   integer                   :: mapsorder = 0  !order of the buffered maps, if 0 maps no maps buffered
   integer                   :: mapsicase = 0
 
+
+  type fibreptr
+    type(fibre), pointer    :: p => null()
+  end type fibreptr
+  
+  integer, private, parameter:: maxelperclock = 10 ! maximum 10 ac dipols with given clock
   type clockdef
      real(dp)                :: tune = -1 ! negative means inactive, in fact it is tune, left like this for backward compatibility, can be changed during LS2
      real(dp)                :: lag = 0
      integer                 :: rampupstart = 0,  rampupstop = 0, rampdownstart = 0,  rampdownstop = 0
-     type(fibre), pointer    :: element
+     integer                 :: nelements = 0
+     type(fibreptr)          :: elements(maxelperclock)
   end type clockdef
   
-  integer, private, parameter:: nmaxclocks = 1  !will be 3 soon
+  integer, private, parameter:: nmaxclocks = 2  
   type(clockdef),  dimension(nmaxclocks) :: clocks ! 3 pointers 
   integer                                :: nclocks = 0  
 
@@ -432,6 +439,8 @@ CONTAINS
        print *, ''
     endif
 
+    modulationtype = 1 ! simpler and faster modulation 
+    
     !  call Set_Up(MY_RING)
 
     if (getdebug() > 0) then
@@ -1275,19 +1284,16 @@ CONTAINS
         ! parameters to modulate the nominal parameters. No modulation in MADX implemented.
         key%list%DC_ac = zero
         key%list%A_ac = zero
-        key%list%theta_ac = zero
+        key%list%theta_ac = node_value('lag ') ! it is ignored with fast modulationtype = 1
         
-        nclocks = 1
-      ! frequency is in fact tune
-      ! kept like this on Rogelio request not to break the codes before LS2
-      ! afterwards "freq" should be changed to "tune" in definition of the AC_DIPOLE
-        clocks(nclocks)%tune = node_value('freq ')
-        clocks(nclocks)%lag  = node_value('lag ')
-
-        clocks(nclocks)%rampupstart = node_value('ramp1 ')
-        clocks(nclocks)%rampupstop = node_value('ramp2 ')
-        clocks(nclocks)%rampdownstart = node_value('ramp3 ')
-        clocks(nclocks)%rampdownstop = node_value('ramp4 ')
+        
+        key%list%clockno_ac = getclockidx()
+        
+        if (key%list%clockno_ac .lt. 0) then
+          call aafail('ptc_input:', &
+          'Too many AC Dipole clocks, PTC can accept max 2 clocks with given tune and ramp. Program stops.')
+        endif
+        
 
     case(41)
        
@@ -1311,19 +1317,14 @@ CONTAINS
         ! parameters to modulate the nominal parameters. No modulation in MADX implemented.
         key%list%DC_ac = zero
         key%list%A_ac = zero
-        key%list%theta_ac = zero
+        key%list%theta_ac = node_value('lag ')
         
-        nclocks = 1
-      ! frequency is in fact tune
-      ! kept like this on Rogelio request not to break the codes before LS2
-      ! afterwards "freq" should be changed to "tune" in definition of the AC_DIPOLE
-        clocks(nclocks)%tune = node_value('freq ')
-        clocks(nclocks)%lag  = node_value('lag ')
-
-        clocks(nclocks)%rampupstart = node_value('ramp1 ')
-        clocks(nclocks)%rampupstop = node_value('ramp2 ')
-        clocks(nclocks)%rampdownstart = node_value('ramp3 ')
-        clocks(nclocks)%rampdownstop = node_value('ramp4 ')
+        key%list%clockno_ac = getclockidx()
+        
+        if (key%list%clockno_ac .lt. 0) then
+          call aafail('ptc_input:', &
+          'Too many AC Dipole clocks, PTC can accept max 2 clocks with given tune and ramp. Program stops.')
+        endif
         
        
     case(43)
@@ -1452,8 +1453,8 @@ CONTAINS
     
     if(code.eq.40 .or. code.eq.41 ) then
      !save pointer to the AC dipole element for ramping in tracking
-     clocks(1)%element=>my_ring%end
-     !print*,"Setting element to clock ",clocks(1)%element%mag%name
+     call addelementtoclock(my_ring%end,key%list%clockno_ac)
+     
     endif
     
     if(advance_node().ne.0)  goto 10
@@ -3131,49 +3132,130 @@ CONTAINS
 
   end subroutine putbeambeam
   !________________________________________________________________________________________________
+
+  ! if clock with such freqency exists it returns its index
+  ! if not, returns index of the next free slot 
+  ! if there is no free slots, returns -1
+  integer function getclockidx()
+    implicit none
+    real(dp) f ! frequency to search
+    integer i, r1, r2, r3, r4
+    logical fits
+    real(kind(1d0)) node_value    
+    getclockidx = -1
+    
+    ! frequency is in fact tune
+    ! kept like this on Rogelio request not to break the codes before LS2
+    ! afterwards "freq" should be changed to "tune" in definition of the AC_DIPOLE
+    f= node_value('freq ')
+
+    r1 = node_value('ramp1 ')
+    r2 = node_value('ramp2 ')
+    r3 = node_value('ramp3 ')
+    r4 = node_value('ramp4 ')
+    
+    do i=1,nclocks
+     
+     if ( abs(clocks(i)%tune - f) .gt. c_1d_10 )   cycle
+     if (r1 .ne.  clocks(i)%rampupstart )          cycle
+     if (r2 .ne.  clocks(i)%rampupstop )           cycle
+     if (r3 .ne.  clocks(i)%rampdownstart )        cycle
+     if (r4 .ne.  clocks(i)%rampdownstop )         cycle
+     
+     ! this is the good clock
+     getclockidx = i 
+     return
+     
+    enddo
+
+
+    if (nclocks == nmaxclocks) then 
+      getclockidx = -1 ! repeated for code clarity
+      return  
+    endif  
+    
+    nclocks = nclocks + 1
+    
+    clocks(nclocks)%tune          = f
+    clocks(nclocks)%rampupstart   = r1
+    clocks(nclocks)%rampupstop    = r2 
+    clocks(nclocks)%rampdownstart = r3
+    clocks(nclocks)%rampdownstop  = r4
+    
+    getclockidx = nclocks
+    
+    clocks(nclocks)%nelements = 0
+    
   
+  end function getclockidx
+  !________________________________________________________________________________________________
+
+  subroutine addelementtoclock(p,c)
+    implicit none
+    type(fibre), pointer :: p
+    integer c  ! clock index
+    integer elidx
+    
+     if (clocks(c)%nelements .ge. maxelperclock) then
+       call aafail('ptc_input:addelementtoclock:', &
+        'Buffer for AC dipoles is too small. Contact MADX support to make it bigger.')
+     endif
+    
+     clocks(c)%nelements = clocks(c)%nelements + 1
+     elidx = clocks(c)%nelements
+     
+     clocks(c)%elements(elidx)%p=>p
+    
+  end subroutine addelementtoclock
+
+  !________________________________________________________________________________________________
   subroutine acdipoleramping(t)
     implicit none
     !---------------------------------------    *
     !--- ramp up and down of the ac dipols      *
     !--- Adjust amplitudes in function of turns *
     integer  t
-    integer  n
+    integer  n,i
     real(dp) r
-
+    type(fibre), pointer :: p
+    
     do n=1,nclocks
 
+      do i=1,clocks(n)%nelements
+        
+        p => clocks(n)%elements(i)%p
+        
+        if (clocks(n)%rampupstop < 1) then
+          ! no ramping, always full amplitude 
+          p%mag%d_ac = one
+          cycle
+        endif
 
-     if (clocks(n)%rampupstop < 1) then
-       ! no ramping, always full amplitude 
-       clocks(n)%element%mag%d_ac = one
-       cycle
-     endif
+        if (t < clocks(n)%rampupstart) then
+          p%mag%d_ac = zero
+          cycle
+        endif
 
-     if (t < clocks(n)%rampupstart) then
-       clocks(n)%element%mag%d_ac = zero
-       cycle
-     endif
+        if (t < clocks(n)%rampupstop) then
+          r = (t - clocks(n)%rampupstart)
+          p%mag%d_ac = r/(clocks(n)%rampupstop - clocks(n)%rampupstart)
+          cycle
+        endif
 
-     if (t < clocks(n)%rampupstop) then
-       r = (t - clocks(n)%rampupstart)
-       clocks(n)%element%mag%d_ac = r/(clocks(n)%rampupstop - clocks(n)%rampupstart)
-       cycle
-     endif
+        if (t < clocks(n)%rampdownstart) then
+          p%mag%d_ac = one 
+          cycle
+        endif
 
-     if (t < clocks(n)%rampdownstart) then
-       clocks(n)%element%mag%d_ac = one 
-       cycle
-     endif
+        if (t < clocks(n)%rampdownstop) then
+          r = (clocks(n)%rampdownstop - t)
+          p%mag%d_ac = r/(clocks(n)%rampdownstop - clocks(n)%rampdownstart)
+          cycle
+        endif
 
-     if (t < clocks(n)%rampdownstop) then
-       r = (clocks(n)%rampdownstop - t)
-       clocks(n)%element%mag%d_ac = r/(clocks(n)%rampdownstop - clocks(n)%rampdownstart)
-       cycle
-     endif
-
-     clocks(n)%element%mag%d_ac = zero
-
+        p%mag%d_ac = zero
+        
+      enddo
     ! print*,"Setting ramp to clock ",n," element ", clocks(1)%element%mag%name, " to ", clocks(n)%element%mag%d_ac
 
     enddo
