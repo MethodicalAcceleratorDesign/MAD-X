@@ -6914,10 +6914,14 @@ end   SUBROUTINE  c_clean_yu_w
     integer, intent(in) :: NO1,NV1
     integer, optional :: np1,ndpt1,AC_RF
     logical(lp), optional :: ptc  !spin,
-    integer ndpt_ptc
+    integer ndpt_ptc,i
 
    ! order_gofix=no1
-
+     if(associated(dx_)) then
+      call kill(dx_)
+      deallocate(dx_)
+      nullify(dx_)
+     endif
      call set_da_pointers()
 
      C_STABLE_DA=.true.
@@ -6994,7 +6998,12 @@ endif
     c_master=0  !  master=1   2002.12.2
 
     CALL c_ASSIGN
+    allocate(dx_(nv))
+    call alloc(dx_)
 
+    do i=1,nv
+     dx_(i)=1.0_dp.cmono.i   
+    enddo
 
   end subroutine c_init
 
@@ -9939,7 +9948,7 @@ end subroutine c_full_factorise
     real(dp), intent(in) :: eps
     integer i,j
     real(dp) norm,f(6,6),s(6,6), at(6,6),ai(6,6)
-    real(dp) b(6,6),a(6,6)
+    real(dp) b(6,6),a(6,6),d(6,6)
     type(c_vector_field) vf
     type(c_damap) id
     type(c_normal_form) n
@@ -9957,7 +9966,6 @@ end subroutine c_full_factorise
     enddo
     enddo
     
- !   write(6,*) " norm ",norm
     norm=norm/10
     f=0
     s=0
@@ -9969,9 +9977,6 @@ end subroutine c_full_factorise
     do j=1,6
      b(i,j)=m%e_ij(i,j)
      f(i,j)=m%e_ij(i,j)/norm
- !   if(f(i,j)/=0.d0) then
- !    write(6,*) i,j,f(i,j)
- !   endif
     enddo
     enddo
 
@@ -9990,41 +9995,40 @@ end subroutine c_full_factorise
      f=matmul(f,s)
     do i=1,6
     do j=1,6
-!    if(f(i,j)/=0.d0) then
-!     write(6,*) i,j,f(i,j)
-!    endif
      vf%v(i)=vf%v(i)+ f(j,i) * (1.0_dp.cmono.j)
     enddo
     enddo
 
     id=exp(vf)
     call c_normal(id,n)
-!    write(6,*) n%tune(1:3)
-!    id=n%a_t**(-1)*id*n%a_t
-!call print(id)
-!pause 324
-!    a=n%a_t**(-1)
-!    a=transpose(a)
+
     a=n%a_t
     at=transpose(a)
 
- 
-    b=matmul(at,b)
-    b=matmul(b,a)
+!!!!  initially  !!!!
+!sigma_f= M sigma M^t + B
+!
+!
+!  D=  A^t B A 
+    d=matmul(at,b)
+    d=matmul(d,a)
 
-
+! D = is diagonal
+!  consider  a random variable r_i (i=1,6)  where <r_i>=0 and <r_i r_j>=delta_ij
+! then  
+  
     do i=1,6
-     ki(i)=sqrt(b(i,i))
+     ki(i)=sqrt(d(i,i))
     enddo
-    
-    write(6,*) ki
-    
-    !pause 887
-    
+
+!  construct    z_i =ki(i) * r_i
+! then x= 
+
+
     do i=1,6
     do j=1,6
-    if(b(i,j)/=0.d0) then
-     write(6,*) i,j,b(i,j)
+    if(d(i,j)/=0.d0) then
+     write(6,*) i,j,d(i,j)
     endif
     enddo
     enddo
@@ -10032,10 +10036,8 @@ end subroutine c_full_factorise
     ai=-matmul(matmul(s,at),s)
     ait=transpose(ai)
 
-!  B= ait*beta*ai
+!  B= ait*d*ai
 
-
-!pause 888
     call kill(vf)
     call kill(id)
     call kill(n)
