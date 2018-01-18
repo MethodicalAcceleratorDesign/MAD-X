@@ -2538,7 +2538,7 @@ do while(.true.)
   read(mf,NML=patchname,end=999)    ! patch read if present
  endif
 
-if(ele0%slowac_recut_even_electric_MIS(5)) then
+if(ele0%recut_even_electric_MIS(4)) then
  call zero_CHART0
  read(mf,NML=CHARTname)  ! reading misalignment
 endif
@@ -2602,7 +2602,7 @@ ENDIF
        !s22%PATCH%patch=fib0%patch
       call patch_patch0(s22%patch,my_false)
     endif
-   if(ele0%slowac_recut_even_electric_MIS(5)) call CHART_CHART0(s22%chart,my_false)
+   if(ele0%recut_even_electric_MIS(4)) call CHART_CHART0(s22%chart,my_false)
 
 
 
@@ -2932,11 +2932,11 @@ endif
  if(associated(f%THIN)) ele0%THIN=f%THIN
 
 
-ele0%slowac_recut_even_electric_MIS(1) = f%slow_ac
-ele0%slowac_recut_even_electric_MIS(2) = f%recut
-ele0%slowac_recut_even_electric_MIS(3) = f%even
-ele0%slowac_recut_even_electric_MIS(4) = f%electric
-ele0%slowac_recut_even_electric_MIS(5) = f%MIS
+ele0%slow_ac= f%slow_ac
+ele0%recut_even_electric_MIS(1) = f%recut
+ele0%recut_even_electric_MIS(2) = f%even
+ele0%recut_even_electric_MIS(3) = f%electric
+ele0%recut_even_electric_MIS(4) = f%MIS
  ele0%usebf_do1bf(1)=f%useb
  ele0%usebf_do1bf(2)=f%usef 
  ele0%skipptcbf(1)=f%skip_ptc_b 
@@ -3027,11 +3027,11 @@ endif
        f%PHAS=ele0%VOLT_FREQ_PHAS(3)
     endif
 
- f%slow_ac = ele0%slowac_recut_even_electric_MIS(1)
- f%recut = ele0%slowac_recut_even_electric_MIS(2)
- f%even = ele0%slowac_recut_even_electric_MIS(3)
- f%electric = ele0%slowac_recut_even_electric_MIS(4)
- f%MIS = ele0%slowac_recut_even_electric_MIS(5)
+ f%slow_ac = ele0%slow_ac
+ f%recut = ele0%recut_even_electric_MIS(1)
+ f%even = ele0%recut_even_electric_MIS(2)
+ f%electric = ele0%recut_even_electric_MIS(3)
+ f%MIS = ele0%recut_even_electric_MIS(4)
  solve_electric=f%electric
    F%L=ele0%L
 
@@ -3668,8 +3668,7 @@ comt='REWIND'
 if(present(com)) comt=com
 
 call kanalnummer(mf)
-open(unit=mf,file=filename,position=comt,recl=200)
-
+open(unit=mf,file=filename,position=comt,recl=4000)
 
 call TIE_MAD_UNIVERSE(ud)
 
@@ -3981,7 +3980,8 @@ implicit none
     ele0%VOLT_FREQ_PHAS=0
     ele0%THIN=.false. 
     ele0%fint_hgap_h1_h2_va_vs=0
-	ele0%slowac_recut_even_electric_MIS=.false.
+	ele0%recut_even_electric_MIS=.false.
+    ele0%slow_ac=0
     ele0%usebf_do1bf=.false.
     ele0%skipptcbf=0
     ele0%filef=' '
