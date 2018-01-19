@@ -233,13 +233,13 @@ obs_points pro_ptc_setswitch Done
                  0      0.02997564577    1.919507155e-13     8.88277323e-15 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    3.970875595e-14                  0     -0.02997564577 
+                 0    3.970875595e-14                  0      0.02997564577 
 
            ptcomax             xcomin             ycomin            pxcomin 
   -1.919493351e-13   -7.964686334e-14                  0   -3.910073641e-14 
 
            pycomin             tcomin            ptcomin 
-                 0     -0.02997564577   -1.934776267e-13 
+                 0      0.02997564577   -1.934776267e-13 
 
 
      select_ptc_normal, dq1,dq2;

@@ -513,7 +513,7 @@ ptc_twiss,icase=5,no=2,BETA0=TWSSip,file=twiss_ptc_line;
    2.596346674e-06                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-   1.662096185e-05    0.0001830427635                  0     3.84701909e-06 
+  -1.662096185e-05    0.0001830427635                  0     3.84701909e-06 
 
            pycorms             tcorms            ptcorms             xcomax 
                  0                  0                  0    0.0003354862904 

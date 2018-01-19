@@ -2,11 +2,6 @@ call, file="../share/ALS/als.seqx";
 
 beam, particle = electron, energy = sqrt(1.5*1.5+emass*emass);  use, period=ALS;
 
-!twiss;
-!mux_tw = table(twiss, ALS$end, mux);
-!muy_tw = table(twiss, ALS$end, muy);
-!value, mux_tw, muy_tw;
-
 select,flag=ptc_twiss,clear;
 select, flag=ptc_twiss, column=name,s,Energy,x,y,pt,t,
                           beta11,beta22,beta33,mu1,mu2,mu3,disp1,disp2,
@@ -29,7 +24,7 @@ ptc_create_universe;
   
 !  ptc_script, file="printflatfile.txt";
   
-  ptc_twiss, icase=6, no=3, closed_orbit=true, rmatrix;
+  ptc_twiss, icase=6, no=3, closed_orbit=true, rmatrix, x=0, y=0, t=0.15;
 !  ptc_twiss, icase=6, no=2, betx=10, bety=10,betz=10;
   
 !  plot, table=ptc_twiss, vaxis=beta11,beta22, haxis=s;
