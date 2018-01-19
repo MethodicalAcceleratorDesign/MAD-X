@@ -902,7 +902,7 @@ ptc_create_universe;
    2.546139162e-09                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-   3.650255092e-08    1.168573408e-08                  0    3.059593903e-09 
+  -3.650255092e-08    1.168573408e-08                  0    3.059593903e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
                  0    5.340227225e-08                  0    2.508646069e-08 
@@ -966,7 +966,7 @@ ptc_create_universe;
    2.546139162e-09                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-   3.650255092e-08    1.168573408e-08                  0    3.059593903e-09 
+  -3.650255092e-08    1.168573408e-08                  0    3.059593903e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
                  0    5.340227225e-08                  0    2.508646069e-08 

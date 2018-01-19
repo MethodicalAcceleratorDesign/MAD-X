@@ -3439,13 +3439,14 @@ call kill(yy); call kill(id);
     TYPE (fibre), POINTER :: C
     TYPE (integration_node), POINTER :: t
     logical(lp) APERTURE,use_bmad_units_temp
-    logical isStableFixPoint
+    logical isStableFixPoint, didPhaseJump
     INTEGER TURNS0,trackflag
 
 
     fix=fix0
 
-
+    didPhaseJump = .false.
+    
     tot=0
     if(present(fibre1)) then
      ring=>fibre1%parent_layout
@@ -3734,15 +3735,26 @@ call kill(yy); call kill(id);
 
     if (ND2 == 6.and.check_longitudinal) then
       isStableFixPoint = is_ORBIT_STABLE(FIX,EPS,STAT,fibre1,node1)
-      if (isStableFixPoint .eqv. .false.) then
+      
+      if (isStableFixPoint .eqv. .false. ) then
+        if (didPhaseJump ) then
+
+          messagelost= "Found unstable fixed point"
+          xlost=fix
+          check_stable=my_false
+
+        else
         
          if(global_verbose) print*,"Orbit seemed to be unstable in longitudinal"
-   
-         fix = fix0
-         fix(6)= fix(6)+ clight/freqmin/2
 
-         goto 1111
+           fix = fix0
+           fix(6)= fix(6)+ clight/freqmin/2
 
+           didPhaseJump = .true.  ! it is protection against 
+
+           goto 1111
+         endif
+        
        endif
     endif
 

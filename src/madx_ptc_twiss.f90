@@ -3459,7 +3459,7 @@ contains
       call double_to_table_curr( summary_table_name,'orbit_y ',  startorbit(3))
       call double_to_table_curr( summary_table_name,'orbit_py ', startorbit(4))
       call double_to_table_curr( summary_table_name,'orbit_pt ', startorbit(5))
-      call double_to_table_curr( summary_table_name,'orbit_-cT ',startorbit(6))
+      call double_to_table_curr( summary_table_name,'orbit_-cT ',-startorbit(6))
 
       xrms = sqrt(sum2Orbit / nobsOrbit)
       

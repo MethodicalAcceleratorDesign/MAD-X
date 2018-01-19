@@ -1057,7 +1057,7 @@ CONTAINS
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
 
-       key%list%lag=node_value('lag ')*twopi 
+       key%list%lag = -node_value('lag ')*twopi
        
        ! correction for time of flight through cavity
        ! we want particle with t=0 to be not accelerated
@@ -1210,7 +1210,7 @@ CONTAINS
        key%magnet="twcavity"
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
-       key%list%lag=node_value('lag ')*twopi
+       key%list%lag=-node_value('lag ')*twopi
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
        default=default+totalpath0 !fringe field calculation vitally relies on it!!!!
        if(offset_deltap.ne.zero) then
@@ -1245,7 +1245,7 @@ CONTAINS
        !       key%list%ks(1)= (+/-)  node_value('volt ')*c_1d_3
        !
        freq=c_1d6*node_value('freq ')
-       key%list%lag=node_value('lag ')*twopi+pih
+       key%list%lag=-node_value('lag ')*twopi+pih
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
        if(offset_deltap.ne.zero) then
           default = getintstate()
@@ -1284,7 +1284,7 @@ CONTAINS
         ! parameters to modulate the nominal parameters. No modulation in MADX implemented.
         key%list%DC_ac = zero
         key%list%A_ac = zero
-        key%list%theta_ac = node_value('lag ') ! it is ignored with fast modulationtype = 1
+        key%list%theta_ac = -node_value('lag ') ! it is ignored with fast modulationtype = 1
         
         
         key%list%clockno_ac = getclockidx()
@@ -1317,7 +1317,7 @@ CONTAINS
         ! parameters to modulate the nominal parameters. No modulation in MADX implemented.
         key%list%DC_ac = zero
         key%list%A_ac = zero
-        key%list%theta_ac = node_value('lag ')
+        key%list%theta_ac = -node_value('lag ')
         
         key%list%clockno_ac = getclockidx()
         
@@ -1331,7 +1331,7 @@ CONTAINS
        key%magnet="rfcavity"
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
-       key%list%lag=node_value('lag ')*twopi
+       key%list%lag=-node_value('lag ')*twopi
 
        print*,"RF frequency " , freq," Hz, lag ", key%list%lag, " [radian]"
 

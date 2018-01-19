@@ -3,7 +3,7 @@
   +     MAD-X 5.03.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.10.20               +
-  + Execution date: 2018.01.18 16:36:46      +
+  + Execution date: 2018.01.19 15:25:17      +
   ++++++++++++++++++++++++++++++++++++++++++++
 call, file="../share/ALS/als.seqx";
 
@@ -115,7 +115,7 @@ CAVM:MARKER;
 
 rfvolt = 0.2d0;
 
-CAV:RFCAVITY,L=0.2000,VOLT:=rfvolt,FREQ=500.;
+CAV:RFCAVITY,L=0.2000,VOLT:=rfvolt,FREQ=500., LAG=0.25;
 
 
 
@@ -166,16 +166,6 @@ ALS: line = (SSTART + 11*sup1 + supb);
 
 
 beam, particle = electron, energy = sqrt(1.5*1.5+emass*emass);  use, period=ALS;
-
-
-
-!twiss;
-
-!mux_tw = table(twiss, ALS$end, mux);
-
-!muy_tw = table(twiss, ALS$end, muy);
-
-!value, mux_tw, muy_tw;
 
 
 
@@ -252,7 +242,7 @@ obs_points pro_ptc_setswitch Done
 
   
 
-  ptc_twiss, icase=6, no=3, closed_orbit=true, rmatrix;
+  ptc_twiss, icase=6, no=3, closed_orbit=true, rmatrix, x=0, y=0, t=0.15;
 
  ************ State Summary ****************
  MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
@@ -292,43 +282,43 @@ obs_points pro_ptc_setswitch Done
       0.8243387316        12.21021568        1.344962596        22.46553125 
 
          beta11min          beta11max          beta12min          beta12max 
-      0.8243387316        12.21021568    1.500235789e-36    1.349010514e-33 
+      0.8243387316        12.21021568    4.720496314e-37    4.244782869e-34 
 
          beta13min          beta13max          beta21min          beta21max 
-    5.33500918e-09     0.003445478433    6.048153575e-37    1.321573772e-35 
+    5.33500918e-09     0.003445478433    4.742867677e-37    9.260174994e-36 
 
          beta22min          beta22max          beta23min          beta23max 
-       1.344962596        22.46553125    1.406586889e-33    2.655479859e-29 
+       1.344962596        22.46553125    2.625382144e-33    9.730328758e-31 
 
          beta31min          beta31max          beta32min          beta32max 
-   1.297134175e-07      0.01267018466    5.973203019e-33    1.168818846e-32 
+   1.297134175e-07      0.01267018466    5.068911176e-34    2.270415387e-33 
 
          beta33min          beta33max           disp1min           disp1max 
        16.49298388        16.49448224                  0       0.2383825039 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.1918836552       0.1918826607   -5.956801219e-16    5.259702229e-16 
+     -0.1918836552       0.1918826607   -8.044166648e-16    8.034882229e-16 
 
           disp4min           disp4max             deltap            orbit_x 
-  -3.259797717e-16    3.248938117e-16                  0    1.841137833e-15 
+  -4.384115746e-16     4.34170616e-16                  0     1.84931325e-15 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-  -5.452247616e-19                  0                  0    1.537334526e-12 
+  -9.806347113e-20                  0                  0    1.540436433e-12 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-       0.299792458    1.793212512e-13                  0    1.696119819e-13 
+      -0.149896229    1.796834153e-13                  0    1.699545599e-13 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0        0.299792458    1.537334427e-12     3.66466649e-13 
+                 0        0.149896229    1.540436312e-12    3.671968951e-13 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    2.949784588e-13                  0       -0.299792458 
+                 0    2.955696519e-13                  0       -0.149896229 
 
            ptcomax             xcomin             ycomin            pxcomin 
-   1.537334526e-12    4.452153499e-16                  0   -2.949823675e-13 
+   1.540436433e-12    4.521846686e-16                  0   -2.955710265e-13 
 
            pycomin             tcomin            ptcomin 
-                 0       -0.299792458    1.537307818e-12 
+                 0       -0.149896229    1.540403378e-12 
 !  ptc_twiss, icase=6, no=2, betx=10, bety=10,betz=10;
 
   

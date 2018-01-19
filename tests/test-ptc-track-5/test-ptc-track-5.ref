@@ -1,0 +1,176 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2018.01.19 16:07:34      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+!MADX test for rf lag handling in PTC
+
+! to be compared with test-track-9 that does the same for MADX track
+
+option,-echo,-info;
+
+enter Twiss module
+  
+iteration:   1 error:   4.021246E-07 deltap:   0.000000E+00
+orbit:   1.839784E-06  5.524609E-13  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+               6.5                 -0    0.0006278008505         39.9106729 
+
+                q1                dq1            betxmax              dxmax 
+      0.1072458631      -0.1135571289        13.83023176        0.299880421 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.2679119522    1.839784269e-06    1.643654689e-06       0.1058719085 
+
+               dq2            betymax              dymax              dyrms 
+     -0.1107430802        13.59506758                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+makethin: style chosen : hybrid
+++++++ warning: makethin: no selection list, slicing all to one thin lens.
+makethin: slicing sequence : c314
+ MAD-X Beam Parameters
+                  Energy : 0.163000E+02
+          Kinetic Energy : 0.161943E+02
+      Particle Rest Mass : 0.105658E+00
+                Momentum : 0.162997E+02
+ Setting MADx with 
+     energy           16.300000000000001     
+     method                   2
+     Num. of steps            5
+     charge           1.0000000000000000     
+  Length of machine:    2040.9999999999332     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        2040.9999999999445     
+ Setting debug level to           1
+maxaccel is found and its value is 0.000000
+exact_mis is found and its value is 1.000000
+radiation is found and its value is 0.000000
+modulation is found and its value is 0.000000
+stochastic is found and its value is 0.000000
+envelope is found and its value is 0.000000
+fringe is found and its value is 1.000000
+totalpath is found and its value is 0.000000
+time is found and its value is 1.000000
+nocavity is found and its value is 0.000000
+obs_points pro_ptc_setswitch Done
+ ************ State Summary ****************
+ MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     2
+  Default integration steps      5
+ This a particle with    206.76828260879     times the electron mass 
+       EXACT_MODEL =  FALSE
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  FALSE
+       TIME        =  TRUE 
+       FRINGE      =  TRUE 
+       PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
+       ONLY_4D     =  FALSE
+       DELTA       =  FALSE
+       SPIN        =  FALSE
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+              2041    0.0005895756913           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000    0.0005475579559        41.18416029       0.2048692657 
+
+                q2                dq1                dq2                 qs 
+      0.1462918506                  0                  0      0.02056478692 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+       6.836712715        13.61411602        6.885900951        13.77102758 
+
+         beta11min          beta11max          beta12min          beta12max 
+       6.836712715        13.61411602    3.395162299e-34     6.70607447e-32 
+
+         beta13min          beta13max          beta21min          beta21max 
+    0.004250828635     0.009538941926     1.43713695e-32    9.540496885e-32 
+
+         beta22min          beta22max          beta23min          beta23max 
+       6.885900951        13.77102758    1.926252268e-32    4.039368119e-29 
+
+         beta31min          beta31max          beta32min          beta32max 
+    0.006077299655     0.006077299675    1.830675568e-32     9.83195337e-32 
+
+         beta33min          beta33max           disp1min           disp1max 
+       8.673544247        8.673544278                  0       0.2876332587 
+
+          disp2min           disp2max           disp3min           disp3max 
+    -0.02976572802      0.02976572802   -3.931084846e-15     3.75481145e-15 
+
+          disp4min           disp4max             deltap            orbit_x 
+   -4.90182381e-16    5.002399941e-16                  0   -5.771726222e-14 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+  -1.390249328e-19                  0                  0   -2.006478505e-13 
+
+         orbit_-cT             xcorms             ycorms            pxcorms 
+          -0.40625     5.07246919e-14                  0    5.340409383e-15 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0            0.40625    2.006451925e-13   -3.850057828e-14 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0    5.977999117e-15                  0           -0.40625 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+  -2.005933626e-13   -5.776118533e-14                  0   -5.977999107e-15 
+
+           pycomin             tcomin            ptcomin 
+                 0           -0.40625   -2.006796431e-13 
+ ************ State Summary ****************
+ MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     2
+  Default integration steps      5
+ This a particle with    206.76828260879     times the electron mass 
+       EXACT_MODEL =  FALSE
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  FALSE
+       TIME        =  TRUE 
+       FRINGE      =  TRUE 
+       PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
+       ONLY_4D     =  FALSE
+       DELTA       =  FALSE
+       SPIN        =  FALSE
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+
+  Number of warnings: 1
+1 in C and 0 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++
