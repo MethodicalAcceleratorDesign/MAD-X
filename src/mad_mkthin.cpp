@@ -6,10 +6,11 @@
  2005 : Standard selection SELECT,FLAG=makethin,RANGE=range,CLASS=class,PATTERN=pattern[,FULL][,CLEAR];
         Implementation of slicing for solenoids
  2012 : Extension of TEAPOT slicing to n>4
- 2013 : Keep thick elements if slice number <1, Code now ter,
+ 2013 : Keep thick elements if slice number <1, Code now C++,
         Thick slicing for quadrupoles
         Automatic generation of dipedge elements for dipoles
  2014 : Thick bend slicing, with or without dipedge
+ 2018 : Thick solenoid slicing, angle in multipole
 
  Early versions in 2001, 2002 by Mark Hayes
  */
