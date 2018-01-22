@@ -5757,7 +5757,7 @@ SUBROUTINE tmxrot(ftrk,orbit,fmap,ek,re,te)
   implicit none
   !----------------------------------------------------------------------*
   !     Purpose:                                                         *
-  !     TRANSPORT map for rotation about Y-axis.                         *
+  !     TRANSPORT map for rotation about X-axis.                         *
   !     Treated in a purely linear way.                                  *
   !     Input:                                                           *
   !     ftrk      (logical) if true, track orbit.                        *

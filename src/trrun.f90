@@ -1175,6 +1175,7 @@ end subroutine ttsrot
 
 subroutine ttxrot(track,ktrack)
   use trackfi
+  use math_constfi, only : one, two
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1205,7 +1206,7 @@ subroutine ttxrot(track,ktrack)
     py = TRACK(4,i)
     t  = TRACK(5,i)
     pt = TRACK(6,i)
-    pz = sqrt(1d0 + 2d0*pt/bet0i + pt**2 - px**2 - py**2)
+    pz = sqrt(one + two*pt/bet0i + pt**2 - px**2 - py**2)
     ptt = 1 - ta*py/pz
 
     track(3,i) = y/(ca*ptt)
@@ -1217,6 +1218,7 @@ end subroutine ttxrot
 
 subroutine ttyrot(track,ktrack)
   use trackfi
+  use math_constfi, only : one, two
   implicit none
   !----------------------------------------------------------------------*
   ! Purpose:                                                             *
@@ -1249,7 +1251,7 @@ subroutine ttyrot(track,ktrack)
     t  = TRACK(5,i)
     pt = TRACK(6,i)
     !pz = 1 / sqrt(1 + 2*pt*bet0i + pt**2 - px**2 - py**2)
-    pz = sqrt(1d0 + 2d0*pt/bet0i + pt**2 - px**2 - py**2)
+    pz = sqrt(one + two*pt/bet0i + pt**2 - px**2 - py**2)
     ptt = 1 - ta*px/pz
     print *, track(1,i), "is x"
     track(1,i) = x/(ca*ptt)
