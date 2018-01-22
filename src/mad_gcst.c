@@ -669,7 +669,7 @@ const char* const summ_table_cols[] =
 
 const int trackone_table_types[] =
 {
-  1, 1, 2, 2, 2, 2, 2, 2, 2, 2
+  2, 2, 2, 2, 2, 2, 2, 2, 2, 2
 };
 
 const char* const trackone_table_cols[] =

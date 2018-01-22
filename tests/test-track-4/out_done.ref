@@ -50,7 +50,7 @@
 @ DATE             %08s "14/12/17"
 @ TIME             %08s "17.54.31"
 *     NUMBER       TURN                  X                 PX                  Y                 PY                  T                 PT                  S                  E 
-$         %d         %d                %le                %le                %le                %le                %le                %le                %le                %le 
+$         %le         %le                %le                %le                %le                %le                %le                %le                %le                %le 
 #segment       1       2      20       0 start                                                                         
           1          0     0.000297785514                  0     0.000464083977                  0                  0                  0                  0                  0
           2          0     -0.00034393308                  0     0.001485303372                  0                  0                  0                  0                  0
