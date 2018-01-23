@@ -46,7 +46,7 @@ extern "C" {
 #include <assert.h>
 
 // LD: variables local to module that control makethin behavior (was pushed in option before)
-static int iMakeDipedge, iMakeEndMarkers, iMinimizeParents;
+static int iMakeDipedge, iMakeEndMarkers, iMinimizeParents, iMoreExpressions;
 
 //------------------------------- forward declarations --------------
 
@@ -58,6 +58,9 @@ public:
   void Print() const;
   double delta;
   double Delta;
+  //
+  std::string delta_str,delta_half_str; // string expression
+  std::string Delta_str,Delta_half_str;; // string expression
 private:
   int n; // number of slices
   bool teapot_fl;
@@ -808,9 +811,9 @@ scale_and_slice(command_parameter* kn_param,const command_parameter* length_para
           kn_i_expr = compound_expr(kn_i_expr, kn_i_val, "*", length_param->expr, length_param->double_value); // multiply expression with length
         else kn_i_val *= length_param->double_value; // multiply value with length
       }
-      if (slices > 1) // give the correct weight by slice (multiply with the inverse of the number of slices)
+      if (slices > 1) // give the correct weight by slice (divide by the number of slices)
       {
-        if (kn_i_expr) kn_i_expr = compound_expr(kn_i_expr,kn_i_val,"*",NULL,1./slices);
+        if (kn_i_expr) kn_i_expr = compound_expr(kn_i_expr,kn_i_val,"/",NULL,slices);
         else kn_i_val *= 1./slices;
       }
       if(verbose_fl()) { printf("verbose %s %s line %d  kn_i_val=%f  kl_flag=%d\n",__FILE__,__FUNCTION__,__LINE__,kn_i_val,kl_flag); if(kn_i_expr) std::cout << my_dump_expression(kn_i_expr) << '\n'; }
@@ -1124,10 +1127,13 @@ static void place_thin_slice(const node* node, sequence* to_sequ, element* slice
 {
   if(node->p_elem)
   {
+    if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " iMoreExpressions=" << iMoreExpressions<< '\n';
     double at = node->at_value;
     expression* length_param_expr=my_get_param_expression(node->p_elem, "l"); // get expression or create new from constant
+    expression* at_expr;
     if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " sliced_elem=" << sliced_elem->name << " node->p_elem=" << node->p_elem->name << " length_param_expr " << my_dump_expression(length_param_expr) << " node->at_expr " << my_dump_expression(node->at_expr) << '\n';
-    expression* at_expr = compound_expr(node->at_expr, at, "+", scale_expr(length_param_expr,rel_shift),  0 ); // this also updates the value
+    if( iMoreExpressions<1 ) at_expr = compound_expr(node->at_expr, at, "+",  NULL, my_get_expression_value(length_param_expr) *rel_shift );  // use length and shift values, no expressions
+    else at_expr = compound_expr(node->at_expr, at, "+", scale_expr(length_param_expr,rel_shift),  0 ); // use length expression and rel_shift value, this also updates the value
     place_node_at(node,to_sequ,sliced_elem,at_expr);
   }
   else
@@ -1144,32 +1150,56 @@ static void place_thick_slice(element* thick_elem,const node* node, sequence* to
   SliceDistPos SP(n, slice_style==std::string("teapot") ); //
   if(verbose_fl())
   {
-    std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " sliced_elem->name=" << sliced_elem->name << " n_thick_slices=" << n_thick_slices << " n=" << n << " start from thick_elem " << thick_elem->name;
+    std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " sliced_elem->name=" << sliced_elem->name << " n_thick_slices=" << n_thick_slices << " n=" << n << " start from thick_elem " << thick_elem->name << " iMoreExpressions=" << iMoreExpressions;
     std::cout << my_dump_element(thick_elem); SP.Print();
   }
 
   expression* l_par_expr=my_get_param_expression(thick_elem, "l"); // with this l_par_expr should not be NULL
   expression* at_expr = clone_expression(node->at_expr);
   double at = node->at_value;
-
+  
+  //old
   double rel_shift;
-  if(n_thick_slices==1)       rel_shift=0; // single thick piece remains in centre
-  else if(i==1)               rel_shift=-0.5 + SP.delta/2.; // entry
-  else if(i==n_thick_slices)  rel_shift= 0.5 - SP.delta/2.; // exit
-  else                        rel_shift=-0.5 + SP.delta + (i-1.5)*SP.Delta; // body
 
-  at_expr = compound_expr(at_expr,at, "+", scale_expr(l_par_expr,rel_shift),  0 ); // this also updates the value
-  place_node_at(node,to_sequ,sliced_elem,at_expr);
-  if(verbose_fl())
-  { // compare with teapot_at_shift which gives the thin slice center, which is here the endpos of thick
-    double                endpos=rel_shift+SP.Delta/2;
-    if(i==1)              endpos=rel_shift+SP.delta/2;
-    if(i==n_thick_slices) endpos=rel_shift+SP.delta/2;
-    std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " done with place_thick_slice n=" << n << " i=" << i << " rel_shift=" << std::setw(7) << rel_shift
-    << " endpos=" << std::setw(7) << endpos
-    << " teapot_at_shift 0.5*n*(1-2*i+n)/(1.0-n*n)=" << 0.5*n*(1-2*i+n)/(1.0-n*n)  // teapot_at_shift, agrees with endpos, but fails for end piece
-    << '\n';
+  if(iMoreExpressions<2)
+  { // use double value for shift, no expression
+    if(n_thick_slices==1)       rel_shift=0; // single thick piece remains in centre
+    else if(i==1)               rel_shift=-0.5 + SP.delta/2.; // entry
+    else if(i==n_thick_slices)  rel_shift= 0.5 - SP.delta/2.; // exit
+    else                        rel_shift=-0.5 + SP.delta + (i-1.5)*SP.Delta; // body
+    if(verbose_fl()) std::cout << __FILE__<< " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " rel_shift=" << rel_shift << '\n';
+    if(iMoreExpressions<1) at_expr = compound_expr(at_expr,at, "+", NULL, el_par_value("l",thick_elem) *rel_shift );  // use length and shift values, no expressions
+    else at_expr = compound_expr(at_expr,at, "+", scale_expr(l_par_expr,rel_shift),  0 ); // iMoreExpressions==1, use length expression and shift value
   }
+  else
+  { //
+    expression* rel_shift_expr;
+    if(n_thick_slices==1)
+    {
+      rel_shift_expr = new_expression("0", NULL); // single thick piece remains in centre
+    }
+    else if(i==1) // entry piece -1/2 + 1./(2.*SP.delta_inv)
+    {
+      std::string tstr1="-1/2";
+      rel_shift_expr = compound_expr(new_expression(tstr1.c_str(),NULL), 0., "+", new_expression(SP.delta_half_str.c_str(),NULL), 0); // entry
+    }
+    else if(i==n_thick_slices) // 0.5 - 1./(2.*SP.delta_inv); // exit
+    {
+      std::string tstr1="1/2";
+      rel_shift_expr = compound_expr(new_expression(tstr1.c_str(),NULL), 0., "-", new_expression(SP.delta_half_str.c_str(),NULL), 0); // exit
+    }
+    else // -0.5 + 1./SP.delta_inv + (i-1.5)*SP.Delta; // body
+    {
+      std::string tstr1="-1/2";
+      std::string tstr2=SP.delta_str+"+"+std::to_string(2*i-3)+"*"+SP.Delta_half_str;
+      rel_shift_expr = compound_expr(new_expression(tstr1.c_str(),NULL), 0., "+", new_expression(tstr2.c_str(),NULL), 0); // entry
+    }
+    // multiply with lpar
+    rel_shift_expr=compound_expr(l_par_expr,at, "*", rel_shift_expr,  0 );
+    if(verbose_fl()) std::cout << __FILE__<< " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " rel_shift_expr " << my_dump_expression(rel_shift_expr) << '\n';
+    at_expr = compound_expr(at_expr,at, "+", rel_shift_expr,  0 ); // this also updates the value
+  }
+  place_node_at(node,to_sequ,sliced_elem,at_expr);
 }
 
 static void place_end_marker(sequence* to_sequ,const node* thick_node,const bool at_start)
@@ -1414,9 +1444,15 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
   if( ipos_md > -1 && nl->inform[ipos_md])
     iMakeDipedge=pl->parameters[ipos_md]->double_value;
   else iMakeDipedge = 1; // default is true in mad_dict.c
-
+  
   if (verbose_fl()) std::cout << "makethin makedipedge flag ipos_md=" << ipos_md << " iMakeDipedge=" << iMakeDipedge << '\n';
-
+  
+  const int ipos_mx = name_list_pos("moreexpressions", nl);
+  if( ipos_mx > -1 && nl->inform[ipos_mx])
+    iMoreExpressions=pl->parameters[ipos_mx]->double_value;
+  else iMoreExpressions = 0; // default is 0 mad_dict.c
+  if (verbose_fl()) std::cout << "makethin iMoreExpressions flag ipos_mx=" << ipos_md << " iMoreExpressions=" << iMoreExpressions << '\n';
+  
   if (slice_select->curr > 0)
   {
     int iret=set_selected_elements(); // makethin selection
@@ -1450,7 +1486,7 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
 }
 
 //--------  SliceDistPos
-SliceDistPos::SliceDistPos(const int n,const bool teapot_fl) : delta(0.5), Delta(0)
+SliceDistPos::SliceDistPos(const int n,const bool teapot_fl) : delta(0.5), Delta(0),delta_str("1/2"),delta_half_str("1/4"),Delta_str("0"),Delta_half_str("0")
 { // note that n = number of cuts = number of thin slices = number of thick slices -1
   // called for thick slices, positions of thin slices are calculated with simple_at_shift teapot_at_shift
   this->n=n;
@@ -1463,12 +1499,41 @@ SliceDistPos::SliceDistPos(const int n,const bool teapot_fl) : delta(0.5), Delta
   {
     if(teapot_fl) Delta=n/(n*n-1.); else Delta=1./n;
   }
+  
+  //new same with expression
+  if(n>1)
+  {
+    if(teapot_fl)
+    {
+      delta_str     ="1/"+std::to_string(2*(1+n));
+      delta_half_str="1/"+std::to_string(4*(1+n));
+    }
+    else
+    {
+      delta_str     ="1/"+std::to_string(2*n);
+      delta_half_str="1/"+std::to_string(4*n);
+    }
+  }
+  if(n>1)
+  {
+    if(teapot_fl)
+    {
+      Delta_str     =std::to_string(n)+"/"+std::to_string(n*n-1);
+      Delta_half_str=std::to_string(n)+"/"+std::to_string(2*(n*n-1));
+    }
+    else
+    {
+      Delta_str     ="1/"+std::to_string(n);
+      Delta_half_str="1/"+std::to_string(2*n);
+    }
+  }
   if(verbose_fl()) Print();
 }
 
 void SliceDistPos::Print() const
 {
-  std::cout << "SliceDistPos::Print teapot_fl=" << teapot_fl << " n=" << n << " delta=" << delta << " Delta=" << Delta << '\n';
+  std::cout << "SliceDistPos::Print teapot_fl=" << teapot_fl << " n=" << n << " delta=" << delta << " Delta=" << Delta
+  << " delta_str=" << delta_str << " delta_half_str=" << delta_half_str << " Delta_str=" << Delta_str << " Delta_half_str=" << Delta_half_str << '\n';
 }
 
 //--------  OneElementWithSlices
@@ -2539,7 +2604,9 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
     expression* thin_at_expr=NULL;
     if (fabs(at_shift(nslices,i,local_slice_style))>0.0)
     {
-      thin_at_expr = compound_expr(at_expr,thick_node->at_value,"+",scale_expr(l_expr,at_shift(nslices,i,local_slice_style)),length*at_shift(nslices,i,local_slice_style));
+      
+      if( iMoreExpressions<1 ) thin_at_expr = compound_expr(at_expr,thick_node->at_value,"+",  NULL, length*at_shift(nslices,i,local_slice_style) );  // use length and shift values, no expressions
+      else thin_at_expr = compound_expr(at_expr,thick_node->at_value,"+",scale_expr(l_expr,at_shift(nslices,i,local_slice_style)),length*at_shift(nslices,i,local_slice_style)); // use length expressions
     }
     else
     {

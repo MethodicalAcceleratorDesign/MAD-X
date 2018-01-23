@@ -2495,7 +2495,8 @@ const char *const_command_def =
   /* "verbose = [l, false, true], " will replace the "option, verbose" used only by makethin */
 "makeconsistent = [l, false, true],  " /*hbu */
 "minimizeparents = [l, true, false], " /*hbu */
-"makeendmarkers = [l, false, true];  " /*hbu */
+"makeendmarkers = [l, false, true],  " /*hbu */
+"moreexpressions = [i, 1]; " /*hbu */
 
 " "
 "survey: survey none 0 0 "
