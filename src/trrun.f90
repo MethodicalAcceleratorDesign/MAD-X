@@ -1212,7 +1212,7 @@ subroutine ttxrot(track,ktrack)
     track(3,i) = y/(ca*ptt)
     track(4,i) = ca*py + sa*pz
     track(1,i) = x + ta*y*px/(pz*ptt)
-    track(5,i) = t - ta*y   /(pz*ptt)*(bet0i+pt)
+    track(5,i) = t - ta*y*(one/bet0i+pt)/(pz*ptt)
   enddo
 end subroutine ttxrot
 
@@ -1242,7 +1242,6 @@ subroutine ttyrot(track,ktrack)
   ca = cos(angle)
   sa = sin(angle)
   ta = tan(angle)
-  print *, "This is the yrotation"
   do i = 1, ktrack
     x  = TRACK(1,i)
     px = TRACK(2,i)
@@ -1250,14 +1249,13 @@ subroutine ttyrot(track,ktrack)
     py = TRACK(4,i)
     t  = TRACK(5,i)
     pt = TRACK(6,i)
-    !pz = 1 / sqrt(1 + 2*pt*bet0i + pt**2 - px**2 - py**2)
+    
     pz = sqrt(one + two*pt/bet0i + pt**2 - px**2 - py**2)
     ptt = 1 - ta*px/pz
-    print *, track(1,i), "is x"
     track(1,i) = x/(ca*ptt)
     track(2,i) = ca*px + sa*pz
     track(3,i) = y + ta*x*py/(pz*ptt)
-    track(5,i) = t - ta*x   /(pz*ptt)*(bet0i+pt)
+    track(5,i) = t - ta*x*(one/bet0i+pt)/(pz*ptt)
   enddo
 end subroutine ttyrot
 
