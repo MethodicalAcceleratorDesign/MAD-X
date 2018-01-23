@@ -1,11 +1,11 @@
-
 # project options
 
 option( MADX_STATIC "Turn on for static linking" OFF)
 option( MADX_DEBUG "Turn on debug output" OFF)
+option( USE_GC "Use Garbage Collector" ON)
+option( MADX_NTPSA "Build with NTPSA" ON)
+option( MADX_FORCE_32 "Force 32bit build" OFF)
 
-# We need to specify what kind of library suffixes we search for in case
-# for static linking:
 if(MADX_STATIC)
     if(WIN32)
         set(CMAKE_FIND_LIBRARY_SUFFIXES .lib)
@@ -18,18 +18,11 @@ if(MADX_STATIC)
        message(FATAL_ERROR "Cannot build shared libs with MADX_STATIC on")
     endif()
     if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-       # We need to make sure we find libX11.a
-       if(IS32BIT)
-          link_directories(${CMAKE_SOURCE_DIR}/lib32/)
-       else()
-          link_directories(${CMAKE_SOURCE_DIR}/lib64/)
-       endif()
+       link_directories(${CMAKE_SOURCE_DIR}/lib${ARCH}/)    # for libX11.a
     endif()
 endif()
 
 #Mad-X specific options (arch. specific options can be added in similar manner):
-option( MADX_NTPSA "Build with NTPSA" ON)
-option( MADX_FORCE_32 "Force 32bit build" OFF )
 if(APPLE)
  option( MADX_BUNDLE "Create bundle on OSX" OFF)
 endif()
@@ -38,21 +31,11 @@ endif()
 # then if MADX_ONLINE is on without sdds found, we throw fatal error.
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-#include our specific folders:
-   if(IS32BIT)
-       set(SDDS_SEARCH_DIRS  ${CMAKE_SOURCE_DIR}/lib32/)
-   else()
-       set(SDDS_SEARCH_DIRS  ${CMAKE_SOURCE_DIR}/lib64/)
-   endif()
+    set(SDDS_SEARCH_DIRS  ${CMAKE_SOURCE_DIR}/lib${ARCH}/)
 endif()
-# normal search:
 find_package(SDDS)
 
-if(SDDS_FOUND)
-    option( MADX_ONLINE "Build with Online model" ON)
-else()
-    option( MADX_ONLINE "Build with Online model" OFF)
-endif()
+option( MADX_ONLINE "Build with Online model" ${SDDS_FOUND})
 if(MADX_ONLINE AND NOT SDDS_FOUND)
     message(FATAL_ERROR "SDDS is not found, required for the online model!")
 endif()
@@ -68,7 +51,6 @@ if(MADX_NTPSA)
     add_definitions("-D_NTPSA")
 endif()
 
-option(USE_GC "Use Garbage Collector" OFF)
 if(USE_GC)
    add_definitions("-D_USEGC")
 endif()
