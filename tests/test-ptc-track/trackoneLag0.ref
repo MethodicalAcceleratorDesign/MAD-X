@@ -5,7 +5,7 @@
 @ DATE             %08s "14/12/17"
 @ TIME             %08s "18.07.18"
 *     NUMBER       TURN                  X                 PX                  Y                 PY                  T                 PT                  S                  E 
-$         %d         %d                %le                %le                %le                %le                %le                %le                %le                %le 
+$         %le         %le                %le                %le                %le                %le                %le                %le                %le                %le 
 #segment       1       2      21       0 start                                          
           1          0                  0                  0                  0                  0               -0.5                  0                  0               0.12
           2          0                  0                  0                  0                  0              -0.45                  0                  0               0.12
