@@ -1,15 +1,17 @@
-
+! test for s-rotation with ptc_eplacement
+! results are output in frame of the rotated magnets
 d1_1: drift, l=1;
-d1_2: drift, l=1;
+d1_2: drift, l=0.5;
 mb: marker;
 mrot: marker;
+mrot2: marker;
 ma: marker;
 
 b: rbend, l=0.1, angle=30*pi/180;
 q: quadrupole, l=0.5, k1=0.3;
 
 
-myline: line=(d1_1,b,d1_1, mb, mrot, ma, d1_2, q, d1_2);
+myline: line=(d1_1,b,d1_1, mb, mrot, ma, d1_1, q, d1_2,mrot2,ma,d1_2);
 
 beam;
 
@@ -31,7 +33,10 @@ ptc_create_universe;
  ! psi   -> S rotation
  ! theta -> X rotation
  ! phi   -> Y rotation 
- ptc_eplacement, range=mrot, phi=0, psi=30*pi/180, theta=0,  onlyorientation, refframe=previouselement, autoplacedownstream=true;
+ ptc_eplacement, range=mrot,  phi=0, psi=+30*pi/180, theta=0,  onlyorientation, refframe=previouselement, autoplacedownstream=true;
+
+ !invert the rotation to bring the end of the line into usual frame
+ ptc_eplacement, range=mrot2, phi=0, psi=-30*pi/180, theta=0,  onlyorientation, refframe=previouselement, autoplacedownstream=true;
 
  ptc_printframes, file="srot.C",format=rootmacro;
 

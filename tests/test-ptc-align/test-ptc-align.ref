@@ -3,11 +3,19 @@
   +     MAD-X 5.03.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.10.20               +
-  + Execution date: 2018.01.24 14:44:23      +
+  + Execution date: 2018.01.24 14:47:45      +
   ++++++++++++++++++++++++++++++++++++++++++++
-! test for s-rotation with ptc_eplacement
+!test for element misalignment in ptc twiss
 
-! results are output in frame of the rotated magnets
+! results are output in the original frame
+
+! to be compared with test-ptc-twiss-eplace-srot, shoud give the same result
+
+
+
+option, -info;
+
+
 
 d1_1: drift, l=1;
 
@@ -40,6 +48,22 @@ beam;
 
 
 use, period=myline;
+
+
+
+
+
+ ! psi   -> S rotation
+
+ ! theta -> X rotation
+
+ ! phi   -> Y rotation 
+
+select, flag=error, PATTERN = "Q";
+
+ang_err =30*pi/180;
+
+ealign, dx=0, dpsi=ang_err;
 
 
 
@@ -82,36 +106,56 @@ ptc_create_universe;
  After    end:   -1.7758819045102521        0.0000000000000000        4.1276814958744428     
 
 
- ptc_setswitch, debuglevel=0, nocavity=true, fringe=true, exact_mis=true, time=false, totalpath=false;
+ ptc_setswitch, debuglevel=1, nocavity=true, fringe=true, exact_mis=true, time=false, totalpath=false;
+
+ Setting debug level to           1
+maxaccel is found and its value is 1.000000
+exact_mis is found and its value is 1.000000
+radiation is found and its value is 0.000000
+modulation is found and its value is 0.000000
+stochastic is found and its value is 0.000000
+envelope is found and its value is 0.000000
+fringe is found and its value is 1.000000
+totalpath is found and its value is 0.000000
+time is found and its value is 0.000000
+nocavity is found and its value is 1.000000
+obs_points pro_ptc_setswitch Done
 
 
-
- ! psi   -> S rotation
-
- ! theta -> X rotation
-
- ! phi   -> Y rotation 
-
- ptc_eplacement, range=mrot,  phi=0, psi=+30*pi/180, theta=0,  onlyorientation, refframe=previouselement, autoplacedownstream=true;
-
-
-
- !invert the rotation to bring the end of the line into usual frame
-
- ptc_eplacement, range=mrot2, phi=0, psi=-30*pi/180, theta=0,  onlyorientation, refframe=previouselement, autoplacedownstream=true;
-
-
-
- ptc_printframes, file="srot.C",format=rootmacro;
-
-mad_ptc.c: pro_ptc_printframes: format is rootmacro.
-           3 B                       All three reference frames are inline. DRAWING AS RBEND
-
+  ptc_align;
 
  
 
- PTC_TWISS, table=twiss, icase=56, no=1, betx=10, bety=10, betz=10, x=0.1, y=0, t=0.0, pt=0.0;
+  ptc_printframes, file="srot.C",format=rootmacro;
 
+mad_ptc.c: pro_ptc_printframes: format is rootmacro.
+           3 B                       All three reference frames are inline. DRAWING AS RBEND
+  
+
+  PTC_TWISS, table=twiss, icase=56, no=1, betx=10, bety=10, betz=10, x=0.1, y=0, t=0.0, pt=0.0;
+
+ ************ State Summary ****************
+ MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     6
+  Default integration steps      5
+ This is an electron (positron actually if charge=1) 
+       EXACT_MODEL =  TRUE 
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  TRUE 
+       TIME        =  FALSE
+       FRINGE      =  TRUE 
+       PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
+       ONLY_4D     =  FALSE
+       DELTA       =  FALSE
+       SPIN        =  FALSE
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
  Reduced SUMM Table (Inital parameters specified)
 
 ++++++ table: ptc_twiss_summary
@@ -126,16 +170,16 @@ mad_ptc.c: pro_ptc_printframes: format is rootmacro.
       0.5102474144           -1000000           -1000000           -1000000 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-       9.314295707        10.99236493        6.337876234        762.8568652 
+                10        10.99236493        6.337876234        762.8568652 
 
          beta11min          beta11max          beta12min          beta12max 
-       6.985677004        10.49077569                  0        102.7318424 
+                10        10.99236493                  0         6.54120245 
 
          beta13min          beta13max          beta21min          beta21max 
-                 0       0.3276990409                  0        3.610602502 
+                 0       0.3276990409                  0       0.2932293365 
 
          beta22min          beta22max          beta23min          beta23max 
-       6.337876234        762.6419387                  0      0.07885199923 
+       6.337876234        762.6419387                  0     0.003411304693 
 
          beta31min          beta31max          beta32min          beta32max 
                  0        2.933237045                  0      0.01785709264 
@@ -144,29 +188,29 @@ mad_ptc.c: pro_ptc_printframes: format is rootmacro.
                 10        10.00000208                  0       0.5724500336 
 
           disp2min           disp2max           disp3min           disp3max 
-                 0       0.1694659491      -0.2808059815                  0 
+                 0       0.1694659491     -0.05840637545                  0 
 
           disp4min           disp4max             deltap            orbit_x 
-     -0.1143873227                  0                  0                0.1 
+    -0.05111140259                  0                  0                0.1 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
                  0                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                 0      0.09247275046      0.03163205211     0.006242382862 
+                 0      0.09743242902     0.007662771932     0.004804238866 
 
            pycorms             tcorms            ptcorms             xcomax 
-    0.007507895427      0.04965352215                  0                0.1 
+    0.008500301551      0.04965352215                  0                0.1 
 
             ycomax            pxcomax            pycomax             tcomax 
                  0                  0                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0      0.07695042622     -0.05567315849     -0.01284762319 
+                 0      0.09080789695     -0.01623209122    -0.007338596086 
 
            pycomin             tcomin            ptcomin 
      -0.0129844251      -0.0537203337                  0 
- write, table=twiss, file="twiss.ptc.tfs";
+  write, table=twiss, file="twiss.ptc.tfs";
 
 
 
