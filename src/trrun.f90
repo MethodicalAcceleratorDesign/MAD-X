@@ -912,7 +912,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   logical, save :: first=.true.
   logical ::  time_var
   integer :: iord, jtrk, nd, nord, i, j, n_ferr, nn, ns, noisemax, nn1, in, mylen
-  double precision :: curv, dbi, dbr, dipi, dipr, dx, dy, elrad
+  double precision :: curv, dbi, dbr, dipi, dipr, dx, dy, elrad, hkick, vkick
   double precision :: pt, px, py, rfac, rpt1, rpt2, rpx1, rpx2, rpy1, rpy2
   double precision :: f_errors(0:maxferr)
   double precision :: field(2,0:maxmul)
@@ -946,6 +946,8 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   !---- Multipole components.
   NORMAL(0:maxmul) = zero ; call get_node_vector('knl ',nn,normal)
   SKEW(0:maxmul) = zero   ; call get_node_vector('ksl ',ns,skew)
+  hkick = node_value('hkick ')
+  vkick = node_value('vkick ')
 
   nd = 2 * max(nn, ns, n_ferr/2-1)
 
@@ -1006,8 +1008,8 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   !---- Dipole error.
   !      dbr = bvk * field(1,0) / (one + deltas)
   !      dbi = bvk * field(2,0) / (one + deltas)
-  dbr = bvk * f_errors(0) !field(1,0)
-  dbi = bvk * f_errors(1) !field(2,0)
+  dbr = bvk * (f_errors(0) + hkick) !field(1,0)
+  dbi = bvk * (f_errors(1) + vkick) !field(2,0)
 
   !---- Nominal dipole strength.
   !      dipr = bvk * vals(1,0) / (one + deltas)
@@ -4493,7 +4495,7 @@ subroutine tttdipole(track, ktrack)
   integer :: ktrack
 
   integer :: jtrk
-  double precision :: length, angle, rho, h, k0, k1
+  double precision :: length, angle, rho, h, k0, k1, hkick
   double precision :: x, px, y, py, z, pt, delta_plus_1
   double precision :: gamma, hx, hy, rfac, curv
   double precision :: e1, e2, h1, h2, hgap, fint, fintx
@@ -4514,6 +4516,7 @@ subroutine tttdipole(track, ktrack)
   hgap  = node_value('hgap ')
   fint  = node_value('fint ')
   fintx = node_value('fintx ')
+  hkick = node_value('hkick ')
 
   !---- Apply entrance dipole edge effect
   if (node_value('kill_ent_fringe ') .eq. zero) &
@@ -4524,7 +4527,7 @@ subroutine tttdipole(track, ktrack)
   angle = node_value('angle ');
   rho = abs(length/angle);
   h = angle/length;
-  k0 = h;
+  k0 = h + hkick/length;
   k1 = node_value('k1 ');
 
   !---- Prepare to calculate the kick and the matrix elements

@@ -385,6 +385,7 @@ module twiss_elpfi
   integer, parameter :: b_k1=11, b_k1s=12, b_e1=13 , b_e2=14, b_k2=15
   integer, parameter :: b_k2s=16, b_h1=17, b_h2=18, b_hgap=19
   integer, parameter :: b_fint=20, b_fintx=21, b_k3=22, b_k3s=23
+  integer, parameter :: b_hkick=24, b_vkick=25
   !-quad
   integer, parameter :: q_tilt=7, q_k1=8, q_k1s=9
   !-sext

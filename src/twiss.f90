@@ -3492,7 +3492,7 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   double precision :: f_errors(0:maxferr)
   double precision :: rw(6,6), tw(6,6,6), ek0(6)
   double precision :: x, y
-  double precision :: an, sk1, sk2, sks, tilt, e1, e2, h, h1, h2, hgap, fint, fintx, rhoinv, blen, bvk
+  double precision :: an, sk1, sk2, sks, tilt, e1, e2, h, h1, h2, hgap, fint, fintx, rhoinv, blen, bvk, hkick
   double precision :: dh, corr, ct, st, hx, hy, rfac, pt
 
   integer, external :: el_par_vector, node_fd_errors
@@ -3534,6 +3534,7 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      fint = g_elpar(b_fint)
      fintx = g_elpar(b_fintx)
      sks = g_elpar(b_k1s)
+     hkick = g_elpar(b_hkick)
      h = an / el
 
      !---  calculate body slice from start (no exit fringe field):
@@ -3545,7 +3546,7 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      !---- Apply field errors and change coefficients using DELTAP.
      F_ERRORS = zero
      n_ferr = node_fd_errors(f_errors)
-     dh = (- h * deltap + bvk * f_errors(0) / el) / (one + deltap) ! dipole term
+     dh = (- h * deltap + bvk * (f_errors(0) + hkick) / el) / (one + deltap) ! dipole term
      sk1 = bvk * (sk1 + f_errors(2) / el) / (one + deltap) ! quad term
      sk2 = bvk * (sk2 + f_errors(4) / el) / (one + deltap) ! sext term
      sks = bvk * (sks + f_errors(3) / el) / (one + deltap) ! skew quad term
@@ -4153,7 +4154,7 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   double precision :: f_errors(0:maxferr)
   double precision :: normal(0:maxmul), skew(0:maxmul)
   double precision :: bi, pt, rfac, bvk, elrad, tilt, angle
-  double precision :: x, y, dbr, dbi, dipr, dipi, dr, di, drt, dpx, dpy, dpxr, dpyr, dtmp
+  double precision :: x, y, dbr, dbi, dipr, dipi, dr, di, drt, dpx, dpy, dpxr, dpyr, dtmp, hkick, vkick
 
   integer, external :: get_option, node_fd_errors
   double precision, external :: node_value
@@ -4166,6 +4167,8 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
 
   !---- Multipole length for radiation.
   elrad = node_value('lrad ')
+  hkick = node_value('hkick ')
+  vkick = node_value('vkick ')
 
   bi = one / beta
 
@@ -4179,8 +4182,8 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
   nd = 2 * max(nn, ns, n_ferr/2-1)
 
   !---- Dipole error.
-  dbr = f_errors(0) / (one + deltap)
-  dbi = f_errors(1) / (one + deltap)
+  dbr = (f_errors(0) + hkick) / (one + deltap)
+  dbi = (f_errors(1) + vkick) / (one + deltap)
 
   !---- Nominal dipole strength.
   dipr = normal(0) / (one + deltap)
