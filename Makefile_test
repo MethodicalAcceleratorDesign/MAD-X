@@ -78,6 +78,7 @@ test-ptc-normal test-ptc-twiss-normal-genfu test-ptc-twiss-normal-5D test-ptc-tw
 test-ptc-track test-ptc-track-2 test-ptc-track-3 test-ptc-track-4 test-ptc-track-5 \
 test-ptc-track-acd test-ptc-track-acd-2 \
 test-ptc-trackline test-ptc-trackline-2 test-ptc-trackline-3 \
+test-ptc-align test-ptc-align-2 \
 test-rfmultipole-ptc-1 \
 test-touschek test-touschek-2 \
 test-sequence test-sequence-2 test-sequence-3 test-sequence-4 test-sequence-5 test-sequence-6 \

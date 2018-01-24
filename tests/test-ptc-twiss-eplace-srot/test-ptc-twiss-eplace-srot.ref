@@ -1,19 +1,23 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  +     MAD-X 5.03.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.10.20               +
-  + Execution date: 2017.12.18 14:33:20      +
+  + Execution date: 2018.01.24 14:44:23      +
   ++++++++++++++++++++++++++++++++++++++++++++
+! test for s-rotation with ptc_eplacement
 
+! results are output in frame of the rotated magnets
 
 d1_1: drift, l=1;
 
-d1_2: drift, l=1;
+d1_2: drift, l=0.5;
 
 mb: marker;
 
 mrot: marker;
+
+mrot2: marker;
 
 ma: marker;
 
@@ -27,7 +31,7 @@ q: quadrupole, l=0.5, k1=0.3;
 
 
 
-myline: line=(d1_1,b,d1_1, mb, mrot, ma, d1_2, q, d1_2);
+myline: line=(d1_1,b,d1_1, mb, mrot, ma, d1_1, q, d1_2,mrot2,ma,d1_2);
 
 
 
@@ -75,7 +79,7 @@ ptc_create_universe;
  Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
  After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
- After    end:   -1.7758819045102521        0.0000000000000000        4.1276814958744419     
+ After    end:   -1.7758819045102521        0.0000000000000000        4.1276814958744428     
 
 
  ptc_setswitch, debuglevel=0, nocavity=true, fringe=true, exact_mis=true, time=false, totalpath=false;
@@ -88,7 +92,13 @@ ptc_create_universe;
 
  ! phi   -> Y rotation 
 
- ptc_eplacement, range=mrot, phi=0, psi=30*pi/180, theta=0,  onlyorientation, refframe=previouselement, autoplacedownstream=true;
+ ptc_eplacement, range=mrot,  phi=0, psi=+30*pi/180, theta=0,  onlyorientation, refframe=previouselement, autoplacedownstream=true;
+
+
+
+ !invert the rotation to bring the end of the line into usual frame
+
+ ptc_eplacement, range=mrot2, phi=0, psi=-30*pi/180, theta=0,  onlyorientation, refframe=previouselement, autoplacedownstream=true;
 
 
 
@@ -110,31 +120,31 @@ mad_ptc.c: pro_ptc_printframes: format is rootmacro.
        4.601151516           -1000000           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000           -1000000           -1000000      0.07301177485 
+          -1000000           -1000000           -1000000      0.07094972713 
 
                 q2                dq1                dq2                 qs 
-      0.5102239815           -1000000           -1000000           -1000000 
+      0.5102474144           -1000000           -1000000           -1000000 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-       8.239999255        10.99236493        6.337876234        846.3910315 
+       9.314295707        10.99236493        6.337876234        762.8568652 
 
          beta11min          beta11max          beta12min          beta12max 
-       6.179907814        10.46232844                  0        134.3992793 
+       6.985677004        10.49077569                  0        102.7318424 
 
          beta13min          beta13max          beta21min          beta21max 
-                 0         0.21767178                  0          4.2301535 
+                 0       0.3276990409                  0        3.610602502 
 
          beta22min          beta22max          beta23min          beta23max 
-       6.337876234        634.7838619                  0       0.1134385657 
+       6.337876234        762.6419387                  0      0.07885199923 
 
          beta31min          beta31max          beta32min          beta32max 
                  0        2.933237045                  0      0.01785709264 
 
          beta33min          beta33max           disp1min           disp1max 
-                10        10.00000208                  0       0.4665530838 
+                10        10.00000208                  0       0.5724500336 
 
           disp2min           disp2max           disp3min           disp3max 
-                 0       0.1694659491      -0.3368064217                  0 
+                 0       0.1694659491      -0.2808059815                  0 
 
           disp4min           disp4max             deltap            orbit_x 
      -0.1143873227                  0                  0                0.1 
@@ -143,19 +153,19 @@ mad_ptc.c: pro_ptc_printframes: format is rootmacro.
                  0                  0                  0                  0 
 
          orbit_-cT             xcorms             ycorms            pxcorms 
-                -0      0.09015097833      0.03961560107     0.006709452387 
+                 0      0.09247275046      0.03163205211     0.006242382862 
 
            pycorms             tcorms            ptcorms             xcomax 
-    0.003956198797      0.04850202224                  0                0.1 
+    0.007507895427      0.04965352215                  0                0.1 
 
             ycomax            pxcomax            pycomax             tcomax 
                  0                  0                  0                 -0 
 
            ptcomax             xcomin             ycomin            pxcomin 
-                 0      0.07052590001     -0.05946135183     -0.01284762319 
+                 0      0.07695042622     -0.05567315849     -0.01284762319 
 
            pycomin             tcomin            ptcomin 
-   -0.007575543943      -0.0537203337                  0 
+     -0.0129844251      -0.0537203337                  0 
  write, table=twiss, file="twiss.ptc.tfs";
 
 

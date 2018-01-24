@@ -1889,8 +1889,54 @@ CONTAINS
     j=j+1
     n_align = node_al_errors(al_errors)
     if (n_align.ne.0)  then
-        !write(6,'(6f11.8)')  al_errors(1:6)
-       call mad_misalign_fibre(f,al_errors(1:6))
+      if (getdebug() > 3) then 
+        write(6,*) f%mag%name," Translation Error "
+        write(6,'(3f11.8)') al_errors(1:3)
+        write(6,*) f%mag%name," Rotation Error "
+        write(6,'(3f11.8)') al_errors(4:6)
+      
+        write(6,*) 
+        write(6,*) "Ac:", f%chart%f%a
+        write(6,*) "Oc:", f%chart%f%o
+        write(6,*) "Bc:", f%chart%f%b
+        write(6,*) "Am:", f%mag%p%f%a
+        write(6,*) "Om:", f%mag%p%f%o
+        write(6,*) "Bc:", f%mag%p%f%b
+        write(6,*) 
+        write(6,*) f%mag%p%f%ent(1,:)
+        write(6,*) f%mag%p%f%ent(2,:)
+        write(6,*) f%mag%p%f%ent(3,:) 
+            
+      endif
+      
+      ! this routine is buggy
+      ! call mad_misalign_fibre(f,al_errors(1:6))
+      
+      ! this is PTC original, but it shifts in frame after roations
+      ! call misalign_fibre(f,al_errors(1:6))
+      
+      !our new routine
+      call misalign_element(f,al_errors)
+      
+      if (getdebug() > 3) then 
+      
+        write(6,*) 
+        write(6,*) "Ac:", f%chart%f%a
+        write(6,*) "Oc:", f%chart%f%o
+        write(6,*) "Bc:", f%chart%f%b
+
+        write(6,*) "Am:", f%mag%p%f%a
+        write(6,*) "Om:", f%mag%p%f%o
+        write(6,*) "Bc:", f%mag%p%f%b
+        
+        
+        write(6,*) 
+        write(6,*) f%mag%p%f%ent(1,:)
+        write(6,*) f%mag%p%f%ent(2,:)
+        write(6,*) f%mag%p%f%ent(3,:) 
+            
+      endif
+
     endif
     f=>f%next
     if(advance_node().ne.0)  goto 10
@@ -1898,6 +1944,27 @@ CONTAINS
   END subroutine ptc_align
   !_________________________________________________________________
 
+  subroutine misalign_element(f,al_errors)
+    use twiss0fi, only: align_max
+    TYPE(FIBRE),target,INTENT(INOUT):: f
+    REAL(DP),INTENT(IN) :: al_errors(align_max)
+    REAL(DP)             :: mis(align_max), omegat(3), basist(3,3)
+  
+      mis=0
+      mis(4:6)=al_errors(4:6)
+      mis(4:5)=-mis(4:5)
+
+      OMEGAT=f%mag%p%f%a
+      basist=f%mag%p%f%ent
+      CALL MISALIGN_FIBRE(f,mis,OMEGAT,BASIST,ADD=.false.) ! false to remove previous alignment
+      
+      mis=0
+      mis(1:3)=al_errors(1:3)
+      CALL MISALIGN_FIBRE(f,mis,OMEGAT,BASIST,ADD=.true.)
+  
+  end subroutine misalign_element
+  !_________________________________________________________________
+  
   subroutine ptc_dumpmaps()
     !Dumps to file maps and/or matrixes (i.e. first order maps)
     implicit none
