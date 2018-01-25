@@ -28,6 +28,7 @@ module madx_ptc_twiss_module
 
   !PSk 2011.01.05 goes global to the modules so the slice tracking produces it for the summ table
   type(probe_8)            :: theTransferMap
+  type(probe_8)            :: theRDTs
   type(universal_taylor)   :: unimap(6)
 
   type twiss
@@ -176,7 +177,6 @@ contains
   !version on polynomials to non-linear dispersion
   subroutine dispersion6Dp(A_script,disp)
     implicit none
-!    type(probe_8), intent(in)::A_script_probe
     type(real_8) ::A_script(6)
     real(dp), intent(out)  :: disp(4)
     type(taylor)  dispT(4)
@@ -554,6 +554,10 @@ contains
     logical(lp)             :: maptable
     logical(lp)             :: ring_parameters  !! forces isRing variable to true, i.e. calclulation of closed solution
     logical(lp)             :: doNormal         !! do normal form analysis
+    logical(lp)             :: doRDTtracking    !! 
+    type(c_damap)           :: AscriptInPhasor, dummyMap  !! maps for RDTs calculations
+    type(c_vector_field)    :: vectorField                !! defined here to avoid every step alloc and kill
+    type(c_taylor)          :: theRDTs                    !!
     real(dp)                :: emi(3)
     logical(lp)             :: isputdata  ! in everystep mode (node by node) switch deciding if data are to be put in twiss table for a give node
     logical(lp)             :: rmatrix  ! flag to mark that transfer matrix should be saved (otherwise we might not track theTransferMap)
@@ -868,6 +872,59 @@ contains
       return
     endif
     
+    !############################################################################
+    !############################################################################
+    !############################################################################
+
+
+    !must be after initmap that sets the isRing
+    ring_parameters = get_value('ptc_twiss ','ring_parameters ') .ne. 0
+    if (ring_parameters) then
+      if (getdebug() > 1) then
+        write(6,*) "User forces ring parameters calculation"
+      endif
+      isRing = .true.
+    endif
+
+    ! Normal
+    doNormal = get_value('ptc_twiss ','normal ') .ne. 0
+
+    if(isRing .and. doNormal) then
+    
+       doRDTtracking = get_value('ptc_twiss ','trackrdts ') .ne. 0
+       if (doRDTtracking) then
+          call alloc(theRDTs)
+          call alloc(vectorField)
+          call alloc(AscriptInPhasor)
+          call alloc(dummyMap)
+       endif
+       
+       call normalFormAnalysis(theTransferMap ,A_script_probe, orbit, doRDTtracking)
+
+    else
+    
+      doRDTtracking = .false.
+    
+    endif
+
+
+    maptable = get_value('ptc_twiss ','maptable ') .ne. 0
+    if(maptable) then
+       call makemaptable(theTransferMap%x,no)
+    endif
+
+
+    call set_option('ptc_twiss_summary ',1)
+    
+
+     
+
+    !############################################################################
+    !############################################################################
+    !############################################################################
+    
+    
+    
     ! assume that we track the transfer map
     doTMtrack = .true.
     
@@ -1066,23 +1123,10 @@ contains
              write(6,*) "##### SLICE MAGNETS NODE ",&
                       & nodePtr%pos," => ",nodePtr%pos+1," s=",s
           endif
-
-         if (nda > 0) then
-            call propagate(my_ring,A_script_probe,+default, & ! +default in case of extra parameters !?
-                 & node1=nodePtr%pos,node2=nodePtr%pos+1)
-            
-            if (doTMtrack) then
-               call propagate(my_ring,theTransferMap,+default, & ! +default in case of extra parameters !?
-	& node1=nodePtr%pos,node2=nodePtr%pos+1)
-            endif
-          else
-            call propagate(my_ring,A_script_probe,default, &
-                 & node1=nodePtr%pos,node2=nodePtr%pos+1)
-            if (doTMtrack) then
-               call propagate(my_ring,theTransferMap,default, &
-	& node1=nodePtr%pos,node2=nodePtr%pos+1)
-            endif
-          endif
+          
+          ! CALL PROPAGATE WITH PROPER OPTIONS
+          call propagateswy()
+          
 
           if (( .not. check_stable ) .or. ( .not. c_%stable_da )) then
              
@@ -1151,6 +1195,7 @@ contains
             suml = s; 
 
             call puttwisstable(theTransferMap%x)
+            if(doRDTtracking)   call putrdttable()
             if(usertableActive) call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x, A_script_probe%x)
 
           !else
@@ -1173,6 +1218,7 @@ contains
           endif
 
           call puttwisstable(theTransferMap%x)
+          if(doRDTtracking)   call putrdttable()
           if(usertableActive) call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x, A_script_probe%x)
 
         endif
@@ -1180,30 +1226,15 @@ contains
       else
         ! ELEMENT AT ONCE MODE
         if (nda > 0) then
-           !         if (getnknobis() > 0) c_%knob = my_true
-           !print*, "parametric",i,c_%knob
            call propagate(my_ring,A_script_probe,+default,fibre1=i,fibre2=i+1)
            if (doTMtrack) then
              call propagate(my_ring,theTransferMap,+default,fibre1=i,fibre2=i+1)
            endif
         else
-
-           !print*,"Skowron 1 ", current%mag%name,  check_stable, c_%stable_da, A_script_probe%x(1).sub.'100000'
-           !call cpu_time(tstart)
            call propagate(my_ring,A_script_probe,default, fibre1=i,fibre2=i+1)
-           
-           !print*,"Skowron 2 ", current%mag%name,  check_stable, c_%stable_da, A_script_probe%x(1).sub.'100000'
-           !print*,"Skowron 2 ", current%mag%name,  check_stable, c_%stable_da, &
-           !                    'x=',  A_script_probe%x(1).sub.'000000', ' ', &
-!	           'dp=', A_script_probe%x(5).sub.'000000', ' ', & 
-!                               't=' , A_script_probe%x(6).sub.'000000'
            if (doTMtrack) then
              call propagate(my_ring,theTransferMap,default,fibre1=i,fibre2=i+1)
            endif
-           
-           !call cpu_time(tfinish)
-           !print*,"Skowron ",i," ", current%mag%name, tfinish - tstart
-           !tsum = tsum + (tfinish - tstart)
            
         endif
 
@@ -1268,9 +1299,10 @@ contains
         else
           call puttwisstable(theTransferMap%x)
         endif 
-
+        
         !print*,"Skowron 6 ", current%mag%name,  check_stable, c_%stable_da, A_script_probe%x(1).sub.'100000'
         
+        if(doRDTtracking)   call putrdttable()
         if(usertableActive) call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x,A_script_probe%x)
 
         !print*,"Skowron 7 ", current%mag%name,  check_stable, c_%stable_da, A_script_probe%x(1).sub.'100000'
@@ -1328,20 +1360,7 @@ contains
     endif
 
 
-    !must be after initmap that sets the isRing
-    ring_parameters = get_value('ptc_twiss ','ring_parameters ') .ne. 0
-    if (ring_parameters) then
-      if (getdebug() > 1) then
-        write(6,*) "User forces ring parameters calculation"
-      endif
-      isRing = .true.
-    endif
-
-    doNormal = get_value('ptc_twiss ','normal ') .ne. 0
-
-
     if(isRing .eqv. .true.) then
-       if (doNormal) call normalFormAnalysis(theTransferMap ,A_script_probe, orbit, suml)
        call oneTurnSummary(theTransferMap ,A_script_probe%x, orbit, suml)
     else
        print*, "Reduced SUMM Table (Inital parameters specified)"
@@ -1349,14 +1368,6 @@ contains
     endif
 
 
-    maptable = get_value('ptc_twiss ','maptable ') .ne. 0
-    if(maptable) then
-       call makemaptable(theTransferMap%x,no)
-    endif
-
-
-    call set_option('ptc_twiss_summary ',1)
-    
 
     if (getdebug() > 1) then
        write(6,*) "##########################################"
@@ -1394,6 +1405,29 @@ contains
   contains  ! what follows are internal subroutines of ptc_twiss
     !____________________________________________________________________________________________
 
+    subroutine propagateswy()
+      implicit none
+    
+       if (nda > 0) then
+          call propagate(my_ring,A_script_probe,+default, & ! +default in case of extra parameters !?
+               & node1=nodePtr%pos,node2=nodePtr%pos+1)
+
+          if (doTMtrack) then
+             call propagate(my_ring,theTransferMap,+default, & ! +default in case of extra parameters !?
+                  & node1=nodePtr%pos,node2=nodePtr%pos+1)
+          endif
+        else
+          call propagate(my_ring,A_script_probe,default, &
+               & node1=nodePtr%pos,node2=nodePtr%pos+1)
+          if (doTMtrack) then
+             call propagate(my_ring,theTransferMap,default, &
+                  & node1=nodePtr%pos,node2=nodePtr%pos+1)
+          endif
+        endif
+    
+    end subroutine propagateswy
+    
+    !____________________________________________________________________________________________
     subroutine tidy()
       ! deallocates all the variables 
       implicit none
@@ -2070,6 +2104,55 @@ contains
       !---
 
     end subroutine puttwisstable
+    !____________________________________________________________________________________________
+    
+    subroutine putrdttable()
+      implicit none
+      complex(dp)   :: c_val
+      real(dp)    :: im_val, re_val, d_val,  eps=1e-6
+      integer     :: ind(10), i, mynres, order,rrr
+      character(len=17):: nick
+        
+        AscriptInPhasor=A_script_probe%x
+        AscriptInPhasor=to_phasor() * AscriptInPhasor * from_phasor()
+        call c_factor_map(AscriptInPhasor,dummyMap,vectorField,0) 
+
+        theRDTs = cgetpb(vectorField)
+   
+ 
+        call c_taylor_cycle(theRDTs,size=mynres)
+
+    
+
+          do rrr=1,mynres
+
+            call c_taylor_cycle(theRDTs,ii=rrr,value=c_val,j=ind(1:c_%nv))
+
+            order = sum(ind(1:6))
+
+
+            !print*,"GNFU ",ind(1:6)
+
+            im_val = imag(c_val)
+            re_val = real(c_val)
+            d_val  = hypot(re_val, im_val)
+
+            ! if amplitude is close to zero then it is not worth to output
+            if (d_val .lt. eps) then
+              if (getdebug()>2) print*,"putGnormaltable idx=",rrr," ",d_val," smaller then eps=",eps, " skipping "
+              cycle
+            endif
+           
+           write(nick,'(a2,6(i1))') 'f_',ind(1),ind(2),ind(3), &
+                    	ind(4),ind(5),ind(6)
+           write(*,*) nick, " = ", d_val
+         
+        enddo
+        
+        write(*,*)
+   
+    end subroutine putrdttable
+    
     !____________________________________________________________________________________________
 
     subroutine readrematrix
@@ -3827,12 +3910,12 @@ contains
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
         
-  subroutine normalFormAnalysis(oneTurnMap,theAscript,startorbit,suml)
+  subroutine normalFormAnalysis(oneTurnMap,theAscript,startorbit,saverdtmap)
     use resindexfi
     implicit none
     type(probe_8),target :: oneTurnMap,theAscript
     real(dp),    target :: startorbit(6) 
-    real(dp) :: suml ! cumulative length along the ring
+    logical             :: saverdtmap
     real(dp)  :: prec ! for printing in files
     real(dp) :: disp1stOrder(4) ! for 6D algo
     type(c_taylor) :: tempTaylor ! for 6D algo
@@ -4023,6 +4106,7 @@ contains
 
     call putGnormaltable(g_io)
     
+      
     !!!!!!!!!!!!!!!!!!!!!!
     !HAMILTONIAN
     !!!!!!!!!!!!!! Normalised Pseudo-Hamiltonian !!!!!!!!!!!!!!!        
@@ -4409,7 +4493,7 @@ contains
       integer     	:: r, myn1,myn2,indexa(mnres,4),mynres, illa
       complex(dp)   :: c_val
       real(dp)    :: im_val, re_val, d_val,  eps=1e-6
-      integer     :: maxorder,o 
+      integer     :: maxorder
       double precision :: get_value ! C-function
       
       maxorder = get_value('ptc_twiss ', 'no ')

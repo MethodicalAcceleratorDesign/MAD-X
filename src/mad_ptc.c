@@ -360,9 +360,15 @@ pro_ptc_twiss(void)
   current_sequ->tw_table = twiss_table;
   twiss_table->org_sequ = current_sequ;
   twiss_table->curr= 0;
+  
+  
   current_node = current_sequ->ex_start;
   /* w_ptc_twiss_(tarr->i); */
-
+  
+  if (command_par_value("trackrdts",cmd->clone) != 0)
+   {
+     makerdtstwisstable();
+   }
   /* --- */
   /* create additional table to hold summary data after one-turn */
   /* such as momentum compaction factor, tune and chromaticities */
@@ -1859,3 +1865,16 @@ pro_ptc_track(struct in_cmd* cmd)
   }  
 }
 
+/*____________________*/
+void makerdtstwisstable()
+{
+
+  twiss_table = make_table("twissrdt", "twissrdt", twiss_table_cols,
+                           twiss_table_types, current_sequ->n_nodes);
+
+  twiss_table->dynamic = 1;
+  add_to_table_list(twiss_table, table_register);
+  current_sequ->tw_table = twiss_table;
+  twiss_table->org_sequ = current_sequ;
+  twiss_table->curr= 0;
+}
