@@ -1,8 +1,9 @@
 /* mad_mkthin.cpp
-
+ 
  Thick to thin lens converter makethin. Helmut Burkhardt
-
+ 
  Major steps
+ 2001, 2002 early versions by Mark Hayes
  2005 : Standard selection SELECT,FLAG=makethin,RANGE=range,CLASS=class,PATTERN=pattern[,FULL][,CLEAR];
         Implementation of slicing for solenoids
  2012 : Extension of TEAPOT slicing to n>4
@@ -10,9 +11,8 @@
         Thick slicing for quadrupoles
         Automatic generation of dipedge elements for dipoles
  2014 : Thick bend slicing, with or without dipedge
- 2018 : Thick solenoid slicing, angle in multipole
-
- Early versions in 2001, 2002 by Mark Hayes
+ 2018 : Thick solenoid slicing, write bend angle to multipole if different from k0*l
+ 
  */
 
 #include <iostream>
@@ -35,8 +35,8 @@ extern "C" {
 // --- macros helper
 
 #define ARRSIZE(a) \
-  ((const void*)(a) == (const void*)&(a) ? sizeof (a)/sizeof *(a) : \
-    (assert(!"invalid use of ARRSIZE in " __FILE__ " line " mkstring(__LINE__)), 0))
+((const void*)(a) == (const void*)&(a) ? sizeof (a)/sizeof *(a) : \
+(assert(!"invalid use of ARRSIZE in " __FILE__ " line " mkstring(__LINE__)), 0))
 
 #define mkstring(s) mkstring_(s)
 #define mkstring_(s) #s
@@ -102,12 +102,13 @@ public:
   void slice_node();
   node* thick_node; // current node
 private:
-  double simple_at_shift(const int slices, const int slice_no);
-  double teapot_at_shift(const int slices, const int slice_no);
-  double collim_at_shift(const int slices, const int slice_no);
-  double hybrid_at_shift(const int slices, const int slice_no);
-  double at_shift(const int slices, const int slice_no,const std::string& local_slice_style); // return at relative shifts from centre of unsliced magnet
-  int translate_k(command_parameter* *kparam, command_parameter* *ksparam,const command_parameter* angle_param, command_parameter* kn_param, command_parameter* ks_param);
+  double simple_at_shift(const int slices, const int slice_no) const;
+  double teapot_at_shift(const int slices, const int slice_no) const;
+  double collim_at_shift(const int slices, const int slice_no) const;
+  double hybrid_at_shift(const int slices, const int slice_no) const;
+  double at_shift(const int slices, const int slice_no,const std::string& local_slice_style) const; // return at relative shifts from centre of unsliced magnet
+  void kn_ks_from_thick_elem(const element* thick_elem,command_parameter* kn_pars[4],command_parameter* ks_pars[4]) const; // read k0-k3, k0s-k3s in thick_elem and put them in kn_pars, ks_pars
+  command_parameter* make_k_list(const char* parnam,command_parameter* k_pars[4],command_parameter* k_param) const; // from k values 0-3 to  expr lists
   element* sbend_from_rbend(const element* rbend_el);
   element* create_thick_slice(element* thick_elem,const int slice_type);
   element* create_sliced_magnet(const element* thick_elem, int slice_no,bool ThickSLice);
@@ -437,7 +438,7 @@ static std::string Check_command_parameter_consistence(const command* cmd)
   //-- at this point cmdpar and name_list exist and have at least one name,  see if they match
   std::vector<std::string> cl_names(cl->curr);
   for(int i=0;i < cl->curr; ++i) cl_names[i]=cl->parameters[i]->name;
-
+  
   std::vector<std::string> nl_names(nl->curr);
   for (int i = 0; i < nl->curr; ++i) nl_names[i]=nl->names[i];
   unsigned int imax = (unsigned int) cl_names.size();
@@ -493,7 +494,7 @@ static bool copy_cmd_par(const char* from_name,const char* to_name,const element
 {
   const struct command_parameter* p = return_param_recurse(from_name, from_el);
   if (!p) return false;
-
+  
   command_parameter* to_param = clone_command_parameter(p); // clone to allow for changes in copy, uses my const clone_command_parameter which checks for NULL
   bool found=false;
   double value      =my_get_int_or_double_value(from_el           ,from_name,found);
@@ -501,7 +502,7 @@ static bool copy_cmd_par(const char* from_name,const char* to_name,const element
   const double eps=1.e-20; // used to check if strength is compatible with zero
   bool Meaningful_value= (found && fabs(value-default_val)>eps);
   if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " found=" << found << " Meaningful_value=" << Meaningful_value << " to_param " << my_dump_command_parameter(to_param);
-
+  
   if(Meaningful_value) // expression defined and non-trivial value
   {
     if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " from_name=" << from_name << " to_name=" << to_name << " cloned to_param=" << to_param << " before strcpy " << my_dump_command_parameter(to_param);
@@ -510,7 +511,7 @@ static bool copy_cmd_par(const char* from_name,const char* to_name,const element
     add_cmd_parameter_clone(cmd, to_param, to_name, 1);
     return true;
   }
-
+  
   if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << from_name << " parameter not defined or on default values, do not copy " << my_dump_command_parameter(to_param) << '\n';
   return false;
 }
@@ -734,7 +735,7 @@ static void dump_slices() // Loops over all current elements and prints the numb
       {
         printf(" %15s %2d",el_i->name,slices);
         if(thick_fl(el_i)) printf(" thick"); else printf(" thin ");
-
+        
         if(el_i != el_i->parent) {
           printf("%18s %2d",parent_name,slices_parent); // show also parent if not same as child
           if(thick_fl(el_i->parent)) printf(" thick"); else printf(" thin ");
@@ -792,12 +793,12 @@ static char* make_thin_name(const char* e_name,const int slice) // make a node n
 }
 
 static command_parameter*
-scale_and_slice(command_parameter* kn_param,const command_parameter* length_param,const int slices,const int angle_conversion,const int kl_flag) // multiply the k by length and divide by slice
+scale_and_slice(command_parameter* kn_param,const command_parameter* length_param,const int slices,const bool mult_with_length,const int kl_flag) // multiply the k by length and divide by slice
 {
   int last_non_zero=-1;
-  if (kn_param == NULL) return NULL;
+  if (kn_param == nullptr) return nullptr;
   const double eps=1.e-15; // used to check if strength is compatible with zero
-
+  
   for (int i=0; i<kn_param->expr_list->curr; ++i)
   {
     expression* kn_i_expr = kn_param->expr_list->list[i];
@@ -805,7 +806,7 @@ scale_and_slice(command_parameter* kn_param,const command_parameter* length_para
     if ((kn_i_expr != NULL && zero_string(kn_i_expr->string)==0) || fabs(kn_i_val)>eps )
     {
       last_non_zero=i;
-      if (kl_flag == 0 && (angle_conversion==0||i>0)) //hbu apply the angle_conversion==0 check only to zero order multipole
+      if (kl_flag == 0 && (mult_with_length||i>0)) // apply mult_with_length only to zero order multipole
       {
         if (length_param->expr || kn_i_expr)
           kn_i_expr = compound_expr(kn_i_expr, kn_i_val, "*", length_param->expr, length_param->double_value); // multiply expression with length
@@ -824,7 +825,7 @@ scale_and_slice(command_parameter* kn_param,const command_parameter* length_para
   if (last_non_zero==-1)
   {
     delete_command_parameter(kn_param);
-    kn_param=NULL;
+    kn_param=nullptr;
   }
   return kn_param;
 }
@@ -856,17 +857,17 @@ static element* new_element(const char* el_type, const char* el_name,
   command* cmd = new_command(p->name, mx, mx, p->module, p->group, p->link_type,p->mad8_type);
   for(unsigned int i=0; i<size; ++i)
     add_cmd_parameter_clone(cmd,
-      return_param_recurse(ParList[i], thick_el), ParList[i], 1); // copy specified attributes from thick_el
-
+                            return_param_recurse(ParList[i], thick_el), ParList[i], 1); // copy specified attributes from thick_el
+  
   return make_element(el_name, el_type, cmd,-1);
 }
 
 static element* new_marker_element(const char* el_type,const char* el_name,const element* thick_el)
 {
-  const char *ParList[] = { 
+  const char *ParList[] = {
     "at","kmax","kmin","polarity","calib","type","apertype","aperture","aper_offset","aper_tol","mech_sep","v_pos","from"
   };
-
+  
   return new_element(el_type, el_name, ARRSIZE(ParList), ParList, thick_el);
 }
 
@@ -913,9 +914,9 @@ static void add_node_at_end_of_sequence(node* node,sequence* sequ) // position i
     node->previous  = sequ->end;
   }
   sequ->end = node;
-
+  
   // node->at_expr=NULL; // use this to only write at values, no expressions
-
+  
   if(verbose_fl())
   {
     std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << std::left << std::setw(20) << node->name << " " << std::setw(20) << node->base_name << std::right
@@ -974,7 +975,7 @@ static void add_half_angle_to(const element* rbend_el,element* to_el,const char*
 }
 
 static const char *CheckBendParams[] = {
-    "polarity", "tilt", "hgap", "mech_sep", "v_pos", "magnet", "model", "method", "exact", "nst" };
+  "polarity", "tilt", "hgap", "mech_sep", "v_pos", "magnet", "model", "method", "exact", "nst" };
 
 static element* create_bend_dipedge_element(element* thick_elem,const bool Entry) // using Dipedge  http://mad.web.cern.ch/mad/madx.old/Introduction/dipedge.html
 {
@@ -993,14 +994,14 @@ static element* create_bend_dipedge_element(element* thick_elem,const bool Entry
   unsigned int verbose=0;
   if(debug_fl()) verbose=1;
   if(verbose_fl()) verbose=2;
-
+  
   // verbose=3; // extra debug - print element definitions
   element* dipedge=NULL;
   if (thick_elem)
   {
     std::string dipedge_name=std::string(thick_elem->name);
     if(Entry) dipedge_name+="_den"; else dipedge_name+="_dex"; // dipedge entry or exit
-
+    
     command* dipedge_def = defined_commands->commands[ name_list_pos("dipedge", defined_commands->list) ]; // access to dipedge structure as defined in mad_dict.h
     if(verbose>1)
     {
@@ -1016,15 +1017,15 @@ static element* create_bend_dipedge_element(element* thick_elem,const bool Entry
     }
     int mx=dipedge_def->par->curr; // maximum number of par names and parvalues -- take from definition
     if(verbose>1) std::cout << " dipedge_def->par->curr=" << dipedge_def->par->curr << '\n';
-
+    
     std::string dipedge_cmd_name=std::string(dipedge_def->name);
     if(Entry) dipedge_cmd_name+="_l_"; else dipedge_cmd_name+="_r_";
     dipedge_cmd_name+="cmd";
     command* dipedge_cmd = new_command(dipedge_cmd_name.c_str(), mx, mx, dipedge_def->module, dipedge_def->group, dipedge_def->link_type, dipedge_def->mad8_type); // new command, used here to define dipedge
-
+    
     const double eps=1.e-15;
     const bool generate_h=true;
-
+    
     expression* l_par_expr=NULL;
     if(generate_h) // from length and angle
     {
@@ -1056,16 +1057,16 @@ static element* create_bend_dipedge_element(element* thick_elem,const bool Entry
       hparam->expr=compound_expr(angle_par_expr,0.,"/",l_par_expr,0); // this also updates the value
       add_cmd_parameter_clone(dipedge_cmd,hparam,"h",1);
     }
-
+    
     if(dipedge_h1_h2_fl)
     {
       if(Entry) copy_cmd_par("h1","h1",thick_elem,dipedge_cmd); // at entry, copy h1 from thick bend as dipedge h1
       else      copy_cmd_par("h2","h2",thick_elem,dipedge_cmd); // at  exit, copy h2 from thick bend as dipedge h2
     }
-
+    
     if(Entry) copy_cmd_par("e1","e1",thick_elem,dipedge_cmd); // at entry, copy e1 from thick sbend as dipedge e1
     else      copy_cmd_par("e2","e1",thick_elem,dipedge_cmd); // at  exit, copy e2 from thick sbend as dipedge e1
-
+    
     if(Entry)
     {
       copy_cmd_par("fint","fint",thick_elem,dipedge_cmd); // at entry, copy fint from thick bend as dipedge fint
@@ -1077,11 +1078,11 @@ static element* create_bend_dipedge_element(element* thick_elem,const bool Entry
       else copy_cmd_par("fint" ,"fint",thick_elem,dipedge_cmd); // use fint
       if(verbose>1) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << my_dump_command_parameter(fintxparam) << '\n';
     }
-
+    
     if(verbose>1) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << my_dump_command(dipedge_cmd) << '\n';
-
+    
     bool found=false;
-
+    
     for(unsigned int i=0; i<ARRSIZE(CheckBendParams); ++i) // copy other nontrivial parameters given in CheckParams from thick bend  -- only gets here with nontrivial e1 or e2     -- otherwise already returned NULL before
     {
       const char* parnam = CheckBendParams[i];
@@ -1099,7 +1100,7 @@ static element* create_bend_dipedge_element(element* thick_elem,const bool Entry
       }
     }
     dipedge=make_element(dipedge_name.c_str(), "dipedge", dipedge_cmd,-1); // make the element and put it in global element_list, using the command dipedge_cmd, -1 means avoid warnings,  1 means delete and warn, 2 means warn and ignore if already present  see  add_to_el_list  mad_elem.c
-
+    
     if(verbose>2)
     {
       std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << std::setw(12) << thick_elem->name << " after ";
@@ -1153,14 +1154,14 @@ static void place_thick_slice(element* thick_elem,const node* node, sequence* to
     std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " sliced_elem->name=" << sliced_elem->name << " n_thick_slices=" << n_thick_slices << " n=" << n << " start from thick_elem " << thick_elem->name << " iMoreExpressions=" << iMoreExpressions;
     std::cout << my_dump_element(thick_elem); SP.Print();
   }
-
+  
   expression* l_par_expr=my_get_param_expression(thick_elem, "l"); // with this l_par_expr should not be NULL
   expression* at_expr = clone_expression(node->at_expr);
   double at = node->at_value;
   
   //old
   double rel_shift;
-
+  
   if(iMoreExpressions<2)
   { // use double value for shift, no expression
     if(n_thick_slices==1)       rel_shift=0; // single thick piece remains in centre
@@ -1209,23 +1210,23 @@ static void place_end_marker(sequence* to_sequ,const node* thick_node,const bool
   // LD: from the request, the markers should be always added
   // if(aperture_param) // only write marker when aperture information available
   // {
-    if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " thick_node " << thick_node->name << " at_start=" << at_start
-      << " aperture_param=" << aperture_param << " " << my_dump_command_parameter(aperture_param) << '\n';
-    
-    std::string AddToName;
-    double rel_shift;
-    if(at_start)
-    {
-      AddToName="_mken"; // for marker at entry
-      rel_shift=-0.5;    // -0.5 length from centre
-    }
-    else
-    {
-      AddToName="_mkex"; // for marker at exit
-      rel_shift= 0.5;    // +0.5 length from centre
-    }
-    element* start_end_marker=new_marker_element("marker",std::string(thick_elem->name+AddToName).c_str(),thick_elem);
-    place_thin_slice(thick_node,to_sequ,start_end_marker,rel_shift);
+  if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " thick_node " << thick_node->name << " at_start=" << at_start
+    << " aperture_param=" << aperture_param << " " << my_dump_command_parameter(aperture_param) << '\n';
+  
+  std::string AddToName;
+  double rel_shift;
+  if(at_start)
+  {
+    AddToName="_mken"; // for marker at entry
+    rel_shift=-0.5;    // -0.5 length from centre
+  }
+  else
+  {
+    AddToName="_mkex"; // for marker at exit
+    rel_shift= 0.5;    // +0.5 length from centre
+  }
+  element* start_end_marker=new_marker_element("marker",std::string(thick_elem->name+AddToName).c_str(),thick_elem);
+  place_thin_slice(thick_node,to_sequ,start_end_marker,rel_shift);
   // }
 }
 
@@ -1244,12 +1245,12 @@ static sequence* slice_sequence(const std::string& slice_style,sequence* thick_s
     if(verbose_fl()) sliced_seqlist.Print();
     return sliced_seq; // do nothing if the sequence was already sliced
   }
-
+  
   const char* name = thick_sequ->name;
   fprintf(prt_file, "makethin: slicing sequence : %s\n",name);
-
+  
   if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " my_dump_sequence thick_sequ " << my_dump_sequence(thick_sequ,2) << '\n'; // dump level 2, without nodes/elements
-
+  
   sliced_seq = new_sequence(name, thick_sequ->ref_flag);
   sliced_seq->start = NULL;
   sliced_seq->share = thick_sequ->share;
@@ -1261,7 +1262,7 @@ static sequence* slice_sequence(const std::string& slice_style,sequence* thick_s
   else sliced_seq->cavities = new_el_list(100);
   if (sliced_seq->crabcavities != NULL)  sliced_seq->crabcavities->curr = 0;
   else sliced_seq->crabcavities = new_el_list(100);
-
+  
   SeqElList theSeqElList(name,slice_style,thick_sequ,sliced_seq,thick_sequ->start);
   while(theSeqElList.thick_node != NULL) // loop over current sequence, the nodes are added to the sequence in add_node_at_end_of_sequence()
   {
@@ -1271,9 +1272,9 @@ static sequence* slice_sequence(const std::string& slice_style,sequence* thick_s
     theSeqElList.thick_node = theSeqElList.thick_node->next;
   }
   sliced_seq->end->next = sliced_seq->start;
-
+  
   if(verbose_fl())  std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << '\n' << '\n' << '\n' << " my_dump_sequence sliced_seq " << my_dump_sequence(sliced_seq,2)  << '\n'; // dump level 2, without nodes/elements
-
+  
   int pos=0;
   if ((pos = name_list_pos(name, sequences->list)) < 0) // move the pointer in the sequences list to point to our thin sequence
   {
@@ -1332,17 +1333,17 @@ static int set_selected_elements() //  result in global  element_list     used i
     command_parameter_list* pl = slice_select->commands[i]->par;
     const int pos_full   = name_list_pos("full", nl);
     const bool full_fl   = pos_full  > -1 && nl->inform[pos_full];  // selection with full
-
+    
     const int pos_range  = name_list_pos("range", nl);
     const bool range_fl  = pos_range > -1 && nl->inform[pos_range]; // selection with range
-
+    
     const int pos_slice  = name_list_pos("slice", nl);              // position of slice parameter in select command list
     const bool slice_fl  = pos_slice > -1 && nl->inform[pos_slice]; // selection with slice
     if (slice_fl) slice  = pl->parameters[pos_slice]->double_value; // Parameter has been read. Slice number from select command, if given overwrites slice number which may have been defined by element definition
-
+    
     const int pos_thick  = name_list_pos("thick", nl);              // position of thick flag in select command list
     const bool thick_fl  = pos_slice > -1 && nl->inform[pos_thick]; // selection with slice
-
+    
     if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " i=" << std::setw(2) << i  << " nl->name=" << nl->name << " full_fl=" << full_fl << " range_fl=" << range_fl
       << " slice_fl=" << slice_fl << " slice=" << slice << " thick_fl=" << thick_fl << '\n';
     if(full_fl) // use full sequence from start to end, the default
@@ -1408,25 +1409,25 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
   double CPU_start=clock();
   name_list* nl = cmd->clone->par_names;
   command_parameter_list* pl = cmd->clone->par;
-
+  
   const int ipos_style = name_list_pos("style", nl);
   std::string slice_style;
-
+  
   if (nl->inform[ipos_style] &&  pl->parameters[ipos_style]->string )
   {
     slice_style = pl->parameters[ipos_style]->string ;
     std::cout << "makethin: style chosen : " << slice_style << '\n';
   } else slice_style = "teapot"; // Should be "hybrid" for backward compatibility
-
+  
   if(debug_fl() && kill_fringe_fl)   std::cout << "kill_fringe_fl="   << kill_fringe_fl   << " is on. Flags kill_ent_fringe kill_exi_fringe will be set to true for thick bend body slices" << '\n';
   if(debug_fl() && dipedge_h1_h2_fl) std::cout << "dipedge_h1_h2_fl=" << dipedge_h1_h2_fl << " is on. Higher order h1, h2 parameters will be kept. Tracking may become non-simplectic" << '\n';
-
+  
   // first check makethin parameters which influence the selection
   const int ipos_mp = name_list_pos("minimizeparents", nl);
   if( ipos_mp > -1 && nl->inform[ipos_mp] )
     iMinimizeParents = pl->parameters[ipos_mp]->double_value;
   else iMinimizeParents = 1; // default is true in mad_dict.c
-
+  
   int iMakeConsistent;
   const int ipos_mk = name_list_pos("makeconsistent", nl);
   if( ipos_mk > -1 && nl->inform[ipos_mk])
@@ -1437,9 +1438,9 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
   if( ipos_me > -1 && nl->inform[ipos_me])
     iMakeEndMarkers = pl->parameters[ipos_me]->double_value;
   else iMakeEndMarkers = 0; // default is false in mad_dict.c
-
+  
   if (verbose_fl()) std::cout << "makethin makeendmarkers flag ipos_me=" << ipos_me << " iMakeEndMarkers=" << iMakeEndMarkers << '\n';
-
+  
   const int ipos_md = name_list_pos("makedipedge", nl);
   if( ipos_md > -1 && nl->inform[ipos_md])
     iMakeDipedge=pl->parameters[ipos_md]->double_value;
@@ -1459,9 +1460,9 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
     if (debug_fl() && iret) std::cout << "set_selected_elements iret=" << iret << '\n';
   }
   else  warning("makethin: no selection list,","slicing all to one thin lens.");
-
+  
   if(iMakeConsistent) force_consistent_slices();
-
+  
   const int ipos_seq = name_list_pos("sequence", nl);
   char* name = NULL;
   if (nl->inform[ipos_seq] && (name = pl->parameters[ipos_seq]->string))
@@ -1472,7 +1473,7 @@ void makethin(in_cmd* cmd) // public interface to slice sequence, called by exec
       sequence* thick_sequ = sequences->sequs[ipos2];
       sequence* sliced_seq = slice_sequence(slice_style,thick_sequ); // slice the sequence
       disable_line(sliced_seq->name, line_list);
-
+      
       // 2014-Jul-31  18:13:06  ghislain: make the sequence circular for closed machine by default
       sliced_seq->start->previous = sliced_seq->end;
       if (debug_fl()) std::cout << "makethin: sliced_seq->start->name '" << sliced_seq->start->name << "', sliced_seq->end->name '" << sliced_seq->end->name << "'" << '\n';
@@ -1625,7 +1626,7 @@ int ElementListWithSlices::find_thick(const element* thick_elem) // find thick_e
 element* ElementListWithSlices::find_slice(const element* thick_elem,const int slice) // find address of thin slice by slice number for thick_elem
 {
   element* result=NULL;
-
+  
   const int iel=find_thick(thick_elem);
   if(iel<0)
   {
@@ -1635,7 +1636,7 @@ element* ElementListWithSlices::find_slice(const element* thick_elem,const int s
   // thick element found, now check if slice already defined
   int islice=slice-1;
   int nslices = (int) VecElemWithSlices[iel]->theSlices.size();
-
+  
   if(islice < nslices)
   {
     result=VecElemWithSlices[iel]->theSlices[islice]; // already done
@@ -1648,7 +1649,7 @@ element* ElementListWithSlices::find_slice(const element* thick_elem,const int s
 element* ElementListWithSlices::find_slice(const element* thick_elem,const std::string& name) // find address of thin slice by slice name for thick_elem
 {
   element* result=NULL;
-
+  
   const int iel=find_thick(thick_elem);
   if(iel<0)
   {
@@ -1730,7 +1731,7 @@ void ElementListWithSlices::Print() const
 
 //--------  SeqElList
 SeqElList::SeqElList(const std::string& seqname,const std::string& slice_style,sequence* thick_sequ,sequence* sliced_seq,node* thick_node)
-  : verbose(0), eps(1.e-15), MakeDipedge(iMakeDipedge) // SeqElList constructor, eps used to check if values are is compatible with zero
+: verbose(0), eps(1.e-15), MakeDipedge(iMakeDipedge) // SeqElList constructor, eps used to check if values are is compatible with zero
 {
   this->seqname=seqname;
   this->slice_style=slice_style;
@@ -1754,14 +1755,14 @@ SeqElList::~SeqElList() // destructor
   delete theBendEdgeList;
 }
 
-double SeqElList::simple_at_shift(const int slices,const int slice_no) // return at relative shifts from centre of unsliced magnet
+double SeqElList::simple_at_shift(const int slices,const int slice_no) const // return at relative shifts from centre of unsliced magnet
 {
   const int n = slices;
   const int i = slice_no;
   return n>1 ? (2.0*i-1)/(2.0*n)-0.5 : 0.0;
 }
 
-double SeqElList::teapot_at_shift(int slices, int slice_no)
+double SeqElList::teapot_at_shift(int slices, int slice_no) const
 {
   const int n = slices; // number of cuts or thin slices, gives n+1 thick slices
   const int i = slice_no;
@@ -1770,19 +1771,19 @@ double SeqElList::teapot_at_shift(int slices, int slice_no)
   return shift;
 }
 
-double SeqElList::collim_at_shift(const int slices,const int slice_no)
+double SeqElList::collim_at_shift(const int slices,const int slice_no) const
 {
   const int n = slices;
   const int i = slice_no;
   return n>1 ? (i-1.0)/(n-1.0)-0.5 : 0.0;
 }
 
-double SeqElList::hybrid_at_shift(const int slices, const int slice_no)
+double SeqElList::hybrid_at_shift(const int slices, const int slice_no) const
 {
   return slices>4 ? simple_at_shift(slices, slice_no) : teapot_at_shift(slices, slice_no); // old for backwards compatibility, should be removed in future
 }
 
-double SeqElList::at_shift(const int slices,const int slice_no,const std::string& local_slice_style) // return relative shifts from centre of unsliced magnet
+double SeqElList::at_shift(const int slices,const int slice_no,const std::string& local_slice_style) const// return relative shifts from centre of unsliced magnet
 {
   double shift=0;
   if (!slices || !slice_no) fatal_error("makethin: invalid slicing for zero slices",local_slice_style.c_str());
@@ -1798,61 +1799,69 @@ double SeqElList::at_shift(const int slices,const int slice_no,const std::string
 void SeqElList::Print() const
 {
   std::cout << "SeqElList::Print seqname=" << seqname << " theSliceList->VecElemWithSlices.size()=" << theSliceList->VecElemWithSlices.size() << " slice_style=\"" << slice_style << "\"" << '\n';
-
+  
   std::cout << '\n' << "   theSliceList:" << '\n'; theSliceList->Print();
   if(verbose) theSliceList->PrintCounter();
-
+  
   std::cout << '\n' << "   RbendList:" << '\n'; RbendList->Print();
   if(verbose) RbendList->PrintCounter();
-
+  
   std::cout << '\n' << "theBendEdgeList:" << '\n'; theBendEdgeList->Print();
   if(verbose) theBendEdgeList->PrintCounter();
 }
 
-//--- temporary globals just for first tests
-bool TestMultipoleAngle_fl=false; //TME 22/12/2017 -- set ture to test extra angle parameter
-command_parameter* multipole_angle_param=NULL; //TME
-
-int SeqElList::translate_k(command_parameter* *kparam, command_parameter* *ksparam,const command_parameter* angle_param, command_parameter* kn_param, command_parameter* ks_param)
-// translate k0,k1,k2,k3 & k0s,k1s,k2s,k3s to kn{} and ks{}
+command_parameter* k0_from_angle(const command_parameter* angle_param)
 {
-  int angle_conversion=0;
+  command_parameter* k0cmdptr=new_command_parameter("k0", k_double);
+  if (angle_param->expr) k0cmdptr->expr =  clone_expression(angle_param->expr);
+  k0cmdptr->double_value = angle_param->double_value;
+  if ( verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << my_dump_command_parameter(k0cmdptr)  << std::endl;
+  return k0cmdptr;
+}
 
-  if ((kparam == NULL) && (ksparam == NULL)) fatal_error("translate_k: no kparams to convert","");
-
-  if (angle_param) // if we have an angle we ignore any given k0
+void SeqElList::kn_ks_from_thick_elem(const element* thick_elem,command_parameter* kn_pars[4],command_parameter* ks_pars[4]) const
+{ // read k0-k3, k0s-k3s in thick_elem and put them in kn_pars, ks_pars;  clone to allow for changes in copy
+  const struct command_parameter* p;
+  kn_pars[0] = (p=return_param_recurse("k0",thick_elem))  ? clone_command_parameter(p) : nullptr;
+  kn_pars[1] = (p=return_param_recurse("k1",thick_elem))  ? clone_command_parameter(p) : nullptr;
+  kn_pars[2] = (p=return_param_recurse("k2",thick_elem))  ? clone_command_parameter(p) : nullptr;
+  kn_pars[3] = (p=return_param_recurse("k3",thick_elem))  ? clone_command_parameter(p) : nullptr;
+  ks_pars[0] = (p=return_param_recurse("k0s",thick_elem)) ? clone_command_parameter(p) : nullptr;
+  ks_pars[1] = (p=return_param_recurse("k1s",thick_elem)) ? clone_command_parameter(p) : nullptr;
+  ks_pars[2] = (p=return_param_recurse("k2s",thick_elem)) ? clone_command_parameter(p) : nullptr;
+  ks_pars[3] = (p=return_param_recurse("k3s",thick_elem)) ? clone_command_parameter(p) : nullptr;
+  if(verbose>1)
   {
-    kparam[0] =  new_command_parameter("k0", k_double);
-    angle_conversion=1; // note we do not divide by length, just to multiply again afterwards
-    if (angle_param->expr) kparam[0]->expr =  clone_expression(angle_param->expr);
-    kparam[0]->double_value = angle_param->double_value;
+    std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " kn_pars=";
+    for(int i=0;i<4;++i) std::cout << " :" << kn_pars[i];
+    std::cout << " ks_pars=";
+    for(int i=0;i<4;++i) std::cout << " :" << ks_pars[i];
+    std::cout << std::endl;
+  }
+}
+
+command_parameter* SeqElList::make_k_list(const char* parnam,command_parameter* k_pars[4],command_parameter* k_param) const
+{ // from k values 0-3 to  expr lists with these values
+  if ( k_pars[0] || k_pars[1] || k_pars[2] || k_pars[3] )
+  {
+    k_param = new_command_parameter(parnam, k_double_array);
+    k_param->expr_list = new_expr_list(10);
+    k_param->double_array = new_double_array(10);
     
-    if(TestMultipoleAngle_fl) //TME -- begin insert
-    { //TME
-      multipole_angle_param=new_command_parameter("angle", k_double); //TME
-      if (angle_param->expr) multipole_angle_param->expr  =  clone_expression(angle_param->expr); //TME
-      multipole_angle_param->double_value = angle_param->double_value; //TME
-    }  //TME -- end insert
-  }
-
-  for(int i=0; i<4; ++i) // initialize the parameters with NULL for expression and 0 for the value
-  {
-    kn_param->expr_list->list[i] = NULL; kn_param->double_array->a[i] = 0;
-    ks_param->expr_list->list[i] = NULL; ks_param->double_array->a[i] = 0;
-    if (kparam[i]) // copy existing k's
-    {
-      if (kparam[i]->expr) kn_param->expr_list->list[i] = clone_expression(kparam[i]->expr);
-      kn_param->double_array->a[i] = kparam[i]->double_value;
+    for(int i=0; i<4; ++i) // set k_param, ks_param with expr_list
+    { // initialize the parameters with nullptr for expression and 0 for the value
+      k_param->expr_list->list[i] = nullptr; k_param->double_array->a[i] = 0;
+      if (k_pars[i]) // copy existing k's
+      {
+        if (k_pars[i]->expr) k_param->expr_list->list[i] = clone_expression(k_pars[i]->expr);
+        k_param->double_array->a[i] = k_pars[i]->double_value;
+      }
+      k_param->expr_list->curr++; k_param->double_array->curr++; // update the number of k's in our arrays
     }
-    if (ksparam[i])
-    {
-      if (ksparam[i]->expr) ks_param->expr_list->list[i] = clone_expression(ksparam[i]->expr);
-      ks_param->double_array->a[i] = ksparam[i]->double_value;
-    }
-    kn_param->expr_list->curr++; kn_param->double_array->curr++; // update the number of k's in our arrays
-    ks_param->expr_list->curr++; ks_param->double_array->curr++;
+    
+    if(verbose>2) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " parnam=" << parnam << " k_param=" << k_param << '\n';
   }
-  return angle_conversion;
+  return k_param;
 }
 
 element* SeqElList::sbend_from_rbend(const element* rbend_el)
@@ -1864,13 +1873,13 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
   // new_element in older makethin did not do this as needed here, rather construct a new command and then use make_element similar to what is done here for other new elements like dipege
   // leave the rbend thick_elem as they were, just do not place them
   // give sbend new name by appending _s to rbend name
-
+  
   const std::string rbend_name=rbend_el->name;
   const std::string sbend_name=rbend_name;
   element* sbend_el = RbendList->find_slice(rbend_el,sbend_name);
   if(verbose>1) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__  << " rbend_name=" << rbend_name << " sbend_el=" << sbend_el << '\n';
   if(sbend_el) return sbend_el; // was already done
-
+  
   command* sbend_def = defined_commands->commands[ name_list_pos("sbend", defined_commands->list) ];
   if(verbose>1)
   {
@@ -1885,10 +1894,10 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
     << '\n';
     if(verbose>2) std::cout << " where sbend defined :" << my_dump_command(sbend_def) << '\n';   //  count the number of parameters,  seems  47 ?
   }
-
+  
   command* sbend_cmd=NULL;
   const bool CloneCommand=false; //---  with false  no diff thin and thin2
-
+  
   if(CloneCommand) // only for tests may result in mismatch - check both thin and thin2
   {
     sbend_cmd = clone_command(rbend_el->def); // start from clone of rbend defining command
@@ -1901,7 +1910,7 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
     sbend_cmd = new_command((std::string(sbend_def->name)+"_cmd").c_str(), mx, mx, sbend_def->module, sbend_def->group, sbend_def->link_type,sbend_def->mad8_type); // new command, used here to define sbend
     if(verbose>1) std::cout  << '\n' << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " mx=" << mx << " new sbend_cmd " << my_dump_command(sbend_cmd) << '\n';
   }
-
+  
   static const char *LogParListToCopy[] = {"thick","kill_ent_fringe","kill_exi_fringe"}; // define the logical flags in this list
   
   if(rbend_el && rbend_el->def && rbend_el->def->par)
@@ -1932,7 +1941,7 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
       {
         bool found=false;
         double default_val=my_get_int_or_double_value(rbend_el->base_type,parnam,found); // return the default values, works for int and double parameters
-
+        
         if(verbose_fl()) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " rbend " << rbend_el->name << " parnam " << std::setw(12) << parnam << " " << std::setw(12) << sbend_name
           << " cmdi=" << cmdi << " value=" << value << " found=" << found << '\n';
         if( !strcmp(parnam, "l") && rbarc_fl() )
@@ -1951,7 +1960,7 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
             if(inform) std::cout << " differs from default, set inform=" << inform;
             std::cout << '\n';
           }
-
+          
           add_cmd_parameter_new(sbend_cmd,value,parnam,inform);
         }
       }
@@ -1971,12 +1980,12 @@ element* SeqElList::sbend_from_rbend(const element* rbend_el)
   if(verbose>2) std::cout << '\n' << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << my_dump_command(sbend_cmd) << '\n';
   if(verbose>2) std::cout << '\n' << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " just before element *sbend_el=make_element  sbend_name=" << sbend_name << " sbend_el=" << sbend_el << '\n';
   // now define sbend element using the sbend_cmd, and add the half surface angle to e1, e2
-
+  
   sbend_el=make_element(sbend_name.c_str(), "sbend", sbend_cmd,-1);
   if(verbose>2) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " just after  element *sbend_el=make_element sbend_name=" << sbend_name << " sbend_el=" << sbend_el << '\n';
   add_half_angle_to(rbend_el,sbend_el,"e1");
   add_half_angle_to(rbend_el,sbend_el,"e2");
-
+  
   for(unsigned int i=0; i<ARRSIZE(LogParListToCopy); ++i) // define as attributes in LogParListToCopy as logical and use value of rbend_el
   {
     const char* parnam=LogParListToCopy[i];
@@ -2003,14 +2012,14 @@ element* SeqElList::create_thick_slice(element* thick_elem,const int slice_type)
   if      (entry_fl)  slice_name=std::string(thick_elem->name)+"_en"; // entry
   else if (exit_fl)   slice_name=std::string(thick_elem->name)+"_ex"; // exit
   else                slice_name=std::string(thick_elem->name)+"_bo"; // body  slice
-
+  
   element* sliced_elem;
   if( (sliced_elem = theSliceList->find_slice(thick_elem,slice_name)))
   {
     if(verbose>1) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " slice_name already exists, use it" << '\n';
     return sliced_elem;
   }
-
+  
   SliceDistPos SP(n, slice_style==std::string("teapot") );
   if(verbose>1)
   {
@@ -2021,25 +2030,25 @@ element* SeqElList::create_thick_slice(element* thick_elem,const int slice_type)
     << " " << my_dump_element(thick_elem); SP.Print();
     if(thick_elem->parent) std::cout << " dump also parent " << thick_elem->parent->name << my_dump_element(thick_elem->parent);
   }
-
+  
   expression* l_par_expr=my_get_param_expression(thick_elem, "l"); // get length expression
   expression* angle_par_expr = my_get_param_expression(thick_elem, "angle"); // get angle expressions - relevant for bends
-
+  
   if(l_par_expr==NULL) // compound_expr with scaling will fail   -- should never happen
   {
     std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " *** error *** l_par_expr=" << l_par_expr << '\n';
     exit(1);
   }
-
+  
   double LengthFraction;
   if(entry_fl || exit_fl) LengthFraction=SP.delta; // start / end slice
   else                    LengthFraction=SP.Delta; // the middle or body piece
-
+  
   l_par_expr                        = compound_expr(l_par_expr,    0, "*", NULL,LengthFraction); // multiply length parameter expression with LengthFraction
   if(angle_par_expr) angle_par_expr = compound_expr(angle_par_expr,0, "*", NULL,LengthFraction); // multiply angle  parameter expression with LengthFraction, only relevant for bends
-
+  
   command* cmd = clone_command(thick_elem->def);    // clone existing command to define the new element, result something like  mqxa.1r1_s: quadrupole,polarity:= 1,k1:=kqx.r1 + ktqx1.r1 ;
-
+  
   if(verbose>1)
   {
     std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " create_thick_slice after clone for " << thick_elem->name << " ";
@@ -2048,7 +2057,7 @@ element* SeqElList::create_thick_slice(element* thick_elem,const int slice_type)
     if(angle_par_expr) std::cout << " scaled angle_par_expr " << my_dump_expression(angle_par_expr);
     std::cout << '\n';
   }
-
+  
   // now use the scaled length and if relevant angle parameters to set up the new sliced_elem via cmd
   const int length_i = name_list_pos("l", cmd->par_names);
   if(length_i > -1)
@@ -2066,20 +2075,20 @@ element* SeqElList::create_thick_slice(element* thick_elem,const int slice_type)
   {
     cmd->par->parameters[angle_i]->expr=angle_par_expr; // use the scaled angle_par_expr in cmd to set up sliced_elem
   }
-
+  
   if (verbose>1) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " done slice_style=\"" << slice_style << "\"" << " slice_type=" << slice_type << " new cmd for sliced_elem : " << my_dump_command(cmd);
-
+  
   sliced_elem = make_element(slice_name.c_str(), eltype,cmd,-1); // make new element (without parent) using the command cmd, -1 means avoid warnings
   if (verbose>1) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ <<  my_dump_element(sliced_elem) << '\n';
-
+  
   ParametersActiveOn(sliced_elem); // Activate attributes, important when derived from parents -- turns also slice number on - not wanted
-
+  
   ParameterRemove("slice", sliced_elem); // slicing done, no reason to leave the slice parameter
-
+  
   SetParameterValue("thick", sliced_elem, true, k_logical);
   ParameterTurnOn("thick", sliced_elem); //-- so that thick=true is written  to signal this for thick tracking
   if (verbose>1) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " done create_thick_slice slice_name=" << slice_name << " from thick element " << thick_elem->name << " n=" << n  << " : " << my_dump_element(sliced_elem) << '\n';
-
+  
   if(IsBend) {
     if(entry_fl) { // bend entry,  remove/turn off exit parameters
       ParameterRemove("e2"   ,sliced_elem);
@@ -2123,8 +2132,8 @@ element* SeqElList::create_sliced_magnet(const element* thick_elem, int slice_no
   element *sliced_elem_parent;
   int slices = get_slices_from_elem(thick_elem);
   if(verbose>1) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << thick_elem->name << " slices=" << slices << " ThickSLice=" << ThickSLice << " slice_no=" << slice_no << '\n';
-
-  if (thick_elem == thick_elem->parent) return NULL; // no further parent to consider
+  
+  if (thick_elem == thick_elem->parent) return nullptr; // no further parent to consider
   else
   {
     if(verbose>1) printf("recursively slice parent:");
@@ -2138,57 +2147,79 @@ element* SeqElList::create_sliced_magnet(const element* thick_elem, int slice_no
   }
   if(slice_no > slices && thick_elem!=thick_elem->parent ) slice_no=1; // check, but not for base classes
   if(verbose>1) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " creating new kn_param, ks_param expr_list" << '\n';
-
+  
   element *sliced_elem;
   if( (sliced_elem = theSliceList->find_slice(thick_elem,slice_no)) ) return sliced_elem; // already done
   const command_parameter* length_param = return_param_recurse("l",thick_elem);
   const command_parameter* angle_param  = return_param_recurse("angle",thick_elem);
-  const struct command_parameter* p;
-  command_parameter* kparam[4]; // clone to allow for changes in copy, use my clone version which does not crash if called with NULL
-  kparam[0]    = (p=return_param_recurse("k0",thick_elem)) ? clone_command_parameter(p) : 0;
-  kparam[1]    = (p=return_param_recurse("k1",thick_elem)) ? clone_command_parameter(p) : 0;
-  kparam[2]    = (p=return_param_recurse("k2",thick_elem)) ? clone_command_parameter(p) : 0;
-  kparam[3]    = (p=return_param_recurse("k3",thick_elem)) ? clone_command_parameter(p) : 0;
-  command_parameter* ksparam[4];
-  ksparam[0]   = (p=return_param_recurse("k0s",thick_elem)) ? clone_command_parameter(p) : 0;
-  ksparam[1]   = (p=return_param_recurse("k1s",thick_elem)) ? clone_command_parameter(p) : 0;
-  ksparam[2]   = (p=return_param_recurse("k2s",thick_elem)) ? clone_command_parameter(p) : 0;
-  ksparam[3]   = (p=return_param_recurse("k3s",thick_elem)) ? clone_command_parameter(p) : 0;
-  command_parameter* kn_param = return_param_recurse("knl",thick_elem);
-  command_parameter* ks_param = return_param_recurse("ksl",thick_elem);
-
-  int knl_flag = 0, ksl_flag = 0;
-  if (kn_param) { kn_param = clone_command_parameter(kn_param); knl_flag++; }
-  if (ks_param) { ks_param = clone_command_parameter(ks_param); ksl_flag++; }
-
-  int angle_conversion = 0;
-  if ((kparam [0] || kparam [1] || kparam [2] || kparam [3] || angle_param ||
-       ksparam[0] || ksparam[1] || ksparam[2] || ksparam[3])
-      && (kn_param==NULL && ks_param==NULL))    // translate k0,k1,k2,k3,angles
+  command_parameter *kn_pars[4],*ks_pars[4];
+  kn_ks_from_thick_elem(thick_elem,kn_pars,ks_pars); // get kn_pars[0-3] and ks_pars[0-3] from thick_elem, as first step to construct kn_l ks_l lists
+  
+  bool mult_with_length = true;
+  command_parameter* multipole_angle_param = nullptr;
+  
+  if(angle_param) // use angle to generate k0, if k0 non existing
   {
-    if(verbose>1) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " creating new kn_param, ks_param expr_list" << '\n';
-    kn_param = new_command_parameter("knl", k_double_array);
-    kn_param->expr_list = new_expr_list(10);
-    kn_param->double_array = new_double_array(10);
-    ks_param = new_command_parameter("ksl", k_double_array);
-    ks_param->expr_list = new_expr_list(10);
-    ks_param->double_array = new_double_array(10);
-    angle_conversion = translate_k(kparam,ksparam,angle_param,kn_param,ks_param);
+    double k0val=0,angleval=0,lenval=0;
+    if(kn_pars[0]) // angle_param and k0 defined
+    {
+      if(length_param)
+      {
+        if(length_param->expr) lenval=my_get_expression_value(length_param->expr);
+        else lenval=length_param->double_value;
+      }
+      if(angle_param->expr) angleval=my_get_expression_value(angle_param->expr);
+      else angleval=angle_param->double_value;
+      if(kn_pars[0]->expr) k0val=my_get_expression_value(kn_pars[0]->expr);
+      else k0val=kn_pars[0]->double_value;
+      if(verbose>1) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " angleval=" << angleval << " k0val=" << k0val << " lenval=" << lenval << " k0val*lenval=" << k0val*lenval << std::endl;
+      if( fabs(k0val)>0 && fabs(k0val*lenval-angleval)>eps )
+      { // both angle and k0 with different information
+        if(verbose>1) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " angle and k0 both given and not equal, write also angle to multipole" << std::endl;
+        multipole_angle_param=new_command_parameter("angle", k_double);
+        if (angle_param->expr) multipole_angle_param->expr = clone_expression(angle_param->expr);
+        multipole_angle_param->double_value = angle_param->double_value;
+      }
+    }
+    else // k0 not defined, angle given, generate k0
+    {
+      kn_pars[0]=k0_from_angle(angle_param); // k0 generated from angle
+      mult_with_length = false; // angle is already  k0 * length
+    }
+    if(verbose>1) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " has angle_param,  kn_pars[0] " << my_dump_command_parameter(kn_pars[0]) << std::endl;
   }
-
-  kn_param = scale_and_slice(kn_param,length_param,slices,angle_conversion,knl_flag+ksl_flag);
-  ks_param = scale_and_slice(ks_param,length_param,slices,angle_conversion,knl_flag+ksl_flag);
-  if(TestMultipoleAngle_fl && multipole_angle_param) if (angle_param->expr) multipole_angle_param->expr  =  compound_expr(angle_param->expr,0.,"/",NULL,slices); //TME
-  if(verbose>1) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << thick_elem->name << '\n';
-
-  if(ThickSLice)
+  
+  command_parameter *kn_param = nullptr, *ks_param = nullptr;
+  if( ThickSLice )
   { // from  knl:={amb ,( kmb ) * ( lmb ) };   to
     if(verbose>1) printf("debug %s %s line %d ThickSLice=%d set kn, ks to zero\n",__FILE__,__FUNCTION__,__LINE__,ThickSLice);
-    kn_param=NULL;
-    ks_param=NULL;
   }
-
-  // set up new multipole command
+  else // thin, make knl, ksl lists      like  knl:={k0l,k1l,k2l,k3l};  , where k0l normally the same as the angle
+  {
+    kn_param = return_param_recurse("knl",thick_elem);
+    ks_param = return_param_recurse("ksl",thick_elem);
+    int knl_flag = 0, ksl_flag = 0;
+    if (kn_param) { kn_param = clone_command_parameter(kn_param); ++knl_flag; }
+    if (ks_param) { ks_param = clone_command_parameter(ks_param); ++ksl_flag; }
+    
+    kn_param=make_k_list("knl",kn_pars,kn_param); // if any kn 0,1,2,3 given, make make new knl list
+    ks_param=make_k_list("ksl",ks_pars,ks_param); // if any ks 0,1,2,3 given, make make new ksl list
+    
+    if(verbose>2) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " kn_param=" << kn_param << " ks_param=" << ks_param << '\n';
+    
+    // multiply the k by length and divide by slice
+    kn_param = scale_and_slice(kn_param,length_param,slices,mult_with_length,knl_flag+ksl_flag);
+    ks_param = scale_and_slice(ks_param,length_param,slices,mult_with_length,knl_flag+ksl_flag);
+    
+    if(multipole_angle_param && slices>1) // case of angle different from k0l
+    {
+      if (angle_param->expr) multipole_angle_param->expr  =  compound_expr(angle_param->expr,0.,"/",NULL,slices);
+      else multipole_angle_param->double_value /= slices;
+    }
+    if(verbose>2) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << thick_elem->name << " knl_flag=" << knl_flag << " ksl_flag=" << knl_flag << '\n';
+  }
+  
+  // set up new multipole
   command* cmd = new_command("thin_multipole", 20, 20, "element", "none", 0, 8); // 0 is link, multipole is 8, see "multipole: element none 0 8 " in mad_dict.c
   add_cmd_parameter_new(cmd,1.,"magnet",0); // parameter magnet with value of 1 and inf=0         not really needed ?   is the default, see mad_dict.c
   if(!minimizefl)
@@ -2198,7 +2229,7 @@ element* SeqElList::create_sliced_magnet(const element* thick_elem, int slice_no
     add_lrad(cmd,length_param,slices); // add l, lrad
     add_cmd_parameter_clone(cmd,(const command_parameter*)kn_param,"knl",1);
     add_cmd_parameter_clone(cmd,(const command_parameter*)ks_param,"ksl",1);
-    if(TestMultipoleAngle_fl && multipole_angle_param) add_cmd_parameter_clone(cmd,multipole_angle_param,"angle",1); //TME
+    if(multipole_angle_param) add_cmd_parameter_clone(cmd,multipole_angle_param,"angle",1);
   }
   if(verbose>1) std::cout << my_dump_command(cmd) << '\n'; // magnet, l, lrad defined
   copy_params_from_thick(cmd,thick_elem);
@@ -2260,12 +2291,12 @@ element* SeqElList::create_thin_solenoid(const element* thick_elem, int slice_no
   // get parameters from the thick solenoid element
   const command_parameter* length_param  = return_param_recurse("l",thick_elem);
   const command_parameter* ks_param      = return_param_recurse("ks",thick_elem);
-
+  
   // set up new solenoid command
   command* cmd = new_command("thin_solenoid", 20, 20, // max num names, max num param
                              "element", "none", 0, 9); // 0 is link, solenoid is 9
   add_cmd_parameter_new(cmd,1.,"magnet",0); // parameter magnet with value of 1 and inf=0
-
+  
   if(!minimizefl)
   {
     add_cmd_parameter_clone(cmd,return_param("at"  ,thick_elem),"at"  ,1);
@@ -2322,26 +2353,26 @@ element* SeqElList::create_thin_elseparator(const element* thick_elem, int slice
   else sliced_elem_parent = create_thin_elseparator(thick_elem->parent,slice_no); // recursively slice parent
   element *sliced_elem;
   if((sliced_elem = theSliceList->find_slice(thick_elem,slice_no))) return sliced_elem; // check to see if we've already done this one
-
+  
   // get parameters from the thick elseparator element
   const command_parameter* length_param  = return_param_recurse("l",thick_elem);
   const command_parameter* ex_param      = return_param_recurse("ex",thick_elem);
   const command_parameter* ey_param      = return_param_recurse("ey",thick_elem);
   const command_parameter* tilt_param    = return_param_recurse("tilt",thick_elem);
   const command_parameter* at_param      = return_param("at",thick_elem);
-
+  
   int slices = get_slices_from_elem(thick_elem);
   const int minimizefl=iMinimizeParents && !at_param && thick_elem == thick_elem->parent;
   if(minimizefl)
   {
     slice_no=slices=1; /* do not slice this one */
   }
-
+  
   // set up new elseparator command
   command* cmd = new_command("thin_elseparator", 20, 20, // max num names, max num param
                              "element", "none", 0, 11); // 0 is link, elseparator is 11
   add_cmd_parameter_new(cmd,1.,"magnet",0); // parameter magnet with value of 1 and inf=0
-
+  
   if(!minimizefl)
   {
     add_cmd_parameter_clone(cmd,return_param("at"  ,thick_elem),"at"  ,1);
@@ -2406,24 +2437,24 @@ element* SeqElList::create_thin_elseparator(const element* thick_elem, int slice
 void SeqElList::slice_this_node() // main stearing what to do.   called in loop over nodes which can be sliced, makes slices, adds them to  sliced_seq
 {
   bool UseDipedges=true; // Normally true.   For tests set false, to see the result without dipedges, dipedges will then be created but not written
-
+  
   element* thick_elem=thick_node->p_elem; // work directly on this element  --  to do translaton only once, element maybe used several times in sequence
-
+  
   int nslices=get_slices_from_elem(thick_elem);
-
+  
   if(strcmp(thick_node->base_name, "rbend") == 0 && nslices>0 ) // rbend translation to sbend
   {
     thick_elem=sbend_from_rbend(thick_elem); // translate any rbend to sbend right away --  then no need to deal any more with rbend in rest of makethin
     thick_node->p_elem=thick_elem;
     thick_node->base_name=permbuff("sbend");
   } // done with any rbend, for the rest all bends will be sbend
-
-
+  
+  
   const bool ThickSLice=thick_fl(thick_elem);
   const bool IsQuad     = ! strcmp(thick_node->base_name, "quadrupole");
   const bool IsSolenoid = ! strcmp(thick_node->base_name, "solenoid");
   const bool IsBend     = ! strcmp(thick_node->base_name, "sbend"); // or any bend, since rbend have been translated to sbend
-
+  
   // verbose=3; // CSPE enable to get extra debug info
   if(ThickSLice && nslices>1 && !IsQuad && !IsBend && !IsSolenoid)
   {
@@ -2435,16 +2466,16 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
     }
     nslices=1;
   }
-
+  
   if(nslices<1 || (nslices==1 && ThickSLice && !IsBend) )
   {
     if(verbose>1) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << thick_elem->name << " ThickSLice=" << ThickSLice << " nslices=" << nslices << " place thick_node " << thick_node->name << " without slicing" << '\n';
     add_node_at_end_of_sequence(thick_node,sliced_seq); // straight copy
     return;
   }
-
+  
   //--- done with initial checks, prepare for actual slicing
-
+  
   if(verbose>1)
   {
     std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " " << thick_elem->name << " " << thick_node->base_name << " slice_style=\"" << slice_style << "\""
@@ -2452,10 +2483,10 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
     if(thick_node->from_name) std::cout << thick_node->from_name; else std::cout << "NULL ";
     std::cout << '\n' << my_dump_element(thick_elem) << '\n';
   }
-
+  
   element *EntryDipedge=NULL, *ExitDipedge=NULL, *sbend_el=NULL;
   element *en = NULL, *bo = NULL, *ex = NULL; // pointers to thick  entry, body, exit
-
+  
   if( IsBend && MakeDipedge) // find any existing EntryDipedge, sbend_el, ExitDipedge    and use them
   {
     EntryDipedge=theBendEdgeList->find_slice(thick_elem,std::string(thick_elem->name)+"_den"); // dipedge entry, NULL if not yet known or e1=0
@@ -2468,15 +2499,15 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
       if(sbend_el)     std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__  << "     sbend_el=" << std::setw(20) <<     sbend_el->name << " already exists " << EntryDipedge << '\n';
     }
   }
-
+  
   if( IsBend && MakeDipedge && EntryDipedge==NULL) // create new EntryDipedge for this bend
   { // first look if e1 or h1 are there
     const command_parameter   *e1param = return_param("e1"  ,(const element*) thick_elem);
-//    const command_parameter   *h1param = return_param("h1"  ,(const element*) thick_elem);
-//    const command_parameter *fintparam = return_param("fint",(const element*) thick_elem);
+    //    const command_parameter   *h1param = return_param("h1"  ,(const element*) thick_elem);
+    //    const command_parameter *fintparam = return_param("fint",(const element*) thick_elem);
     if(verbose>1) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " e1param=" << e1param << " cmd_par_val(e1param)=" << cmd_par_val(e1param) << '\n';
-
-//    if((fabs(cmd_par_val(e1param))>eps) || (fabs(cmd_par_val(h1param))>eps) || (fabs(cmd_par_val(fintparam))>eps)) // has entrance fringe fields
+    
+    //    if((fabs(cmd_par_val(e1param))>eps) || (fabs(cmd_par_val(h1param))>eps) || (fabs(cmd_par_val(fintparam))>eps)) // has entrance fringe fields
     if (command_par_value("kill_ent_fringe",thick_elem->def) == false)
     {
       EntryDipedge=create_bend_dipedge_element(thick_elem,true); // make new StartEdge element and remove e1 from thick_elem
@@ -2484,30 +2515,30 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
       if(verbose>1) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__  << " now EntryDipedge=" << EntryDipedge << '\n';
     }
   }
-
+  
   if( IsBend && MakeDipedge && ExitDipedge==NULL) // create new ExitDipedge for this bend
   { // first look if e2 or h2 are there
-//    const command_parameter *e2param    = return_param("e2",(const element*) thick_elem);
-//    const command_parameter *h2param    = return_param("h2",(const element*) thick_elem);
-//    const command_parameter *fintparam  = return_param("fint",(const element*) thick_elem);
-//    const command_parameter *fintxparam = return_param("fintx",(const element*) thick_elem);
-
-//    if((fabs(cmd_par_val(e2param))>eps) || (fabs(cmd_par_val(h2param))>eps) || (fabs(cmd_par_val(fintparam))>eps) || (cmd_par_val(fintxparam)>eps))  // has exit fringe fields
-   if (command_par_value("kill_exi_fringe",thick_elem->def) == false)
-   {
+    //    const command_parameter *e2param    = return_param("e2",(const element*) thick_elem);
+    //    const command_parameter *h2param    = return_param("h2",(const element*) thick_elem);
+    //    const command_parameter *fintparam  = return_param("fint",(const element*) thick_elem);
+    //    const command_parameter *fintxparam = return_param("fintx",(const element*) thick_elem);
+    
+    //    if((fabs(cmd_par_val(e2param))>eps) || (fabs(cmd_par_val(h2param))>eps) || (fabs(cmd_par_val(fintparam))>eps) || (cmd_par_val(fintxparam)>eps))  // has exit fringe fields
+    if (command_par_value("kill_exi_fringe",thick_elem->def) == false)
+    {
       ExitDipedge=create_bend_dipedge_element(thick_elem,false); // make new ExitDipedge element and remove e2 from thick_elem
       theBendEdgeList->put_slice(thick_elem,ExitDipedge);   // to remember this has been translated
       if(verbose>1) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__  << " now  ExitDipedge=" << EntryDipedge << " " << my_dump_element(ExitDipedge) << '\n';
     }
   } // new ExitDipedge
-
+  
   if(IsBend && MakeDipedge) Remove_All_Fringe_Field_Parameters(thick_elem); // remove what is now taken care of by dipedges
   // LD: Old logic, changed by HB in 2015.06 to the test above.
   // if(EntryDipedge || ExitDipedge) Remove_All_Fringe_Field_Parameters(thick_elem); // remove from body what is now taken care of by dipedges
-
+  
   // prepare for slicing
   element *sliced_elem=NULL;                  // pointer to new sliced element
-
+  
   std::string local_slice_style=slice_style; // work here with a copy of slice_style that can be modified for collim
   if (strstr(thick_node->base_name,"collimator"))
   {
@@ -2518,7 +2549,7 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
   else // magnet which can be sliced, thick or to multipole
   {
     if(verbose>2) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << '\n';
-
+    
     if (IsSolenoid && !ThickSLice) sliced_elem = create_thin_solenoid(thick_elem,1); // create the initial solenoid slice
     else sliced_elem = create_sliced_magnet(thick_elem,1,ThickSLice); // create the initial magnet slice
     if(ThickSLice) // create entry, body, exit pieces,  for bends, quadrupoles, solenoids  --- if not yet existing
@@ -2537,7 +2568,7 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
       }
     }
   } // done with create_thin or create_thick.  Next is positioning slices as node
-
+  
   if(verbose>1)
   {
     std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ <<  " thick " << thick_elem->name  << " of type " << thick_node->base_name << " done with element slice generation ";
@@ -2547,10 +2578,10 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
     if(ex)          std::cout << " ex->name=" << ex->name; else std::cout << " ex=" << ex;
     std::cout << '\n';
   }
-
+  
   if(verbose>2) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << '\n';
   command_parameter* length_param = return_param_recurse("l",thick_elem); // get original length, value or expression
-
+  
   expression* at_expr = thick_node->at_expr;
   double at = thick_node->at_value;
   if(at_expr==NULL) // then make a new expression from the value
@@ -2561,26 +2592,26 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
     at_expr = compound_expr( at_expr,0,"+",0,0); // trick to update value
     if(verbose>1) std::cout << __FILE__<< " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " from at value=" << std::setw(8) << at << " new at_expr " << my_dump_expression(at_expr) << '\n';
   }
-
+  
   double length = thick_node->length; // direct curved thick_elem->length
-
+  
   if(verbose>2) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << '\n';
   expression* l_expr = NULL;
-//  double l_expr_val = length; // unused...
-
+  //  double l_expr_val = length; // unused...
+  
   if (length_param)
   {
     l_expr  = length_param->expr;
-//    if(l_expr) l_expr_val = my_get_expression_value(l_expr); // unused
+    //    if(l_expr) l_expr_val = my_get_expression_value(l_expr); // unused
   }
-
+  
   if(verbose>2) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << '\n';
-
+  
   int middle=-1;
   if (nslices>1) middle = nslices/2+1; // used to determine after which slide to place the central marker in case of thin slicing
-
+  
   if(EntryDipedge && UseDipedges) place_thin_slice(thick_node,sliced_seq,EntryDipedge,-0.5); // subtract half of the length to be at start
-
+  
   bool at_start;
   if(iMakeEndMarkers) place_end_marker(sliced_seq, thick_node, at_start=true);
   
@@ -2612,9 +2643,9 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
     {
       if (at_expr) thin_at_expr = clone_expression(at_expr);
     }
-
+    
     if(verbose>1) std::cout << __FILE__<< " " << __PRETTY_FUNCTION__ << " line " << std::setw(4) << __LINE__ << " thick_node->base_name=" << thick_node->base_name << " i=" << i << " middle=" << middle << " nslices=" << nslices << " slice_i->name=" << slice_i->name << " at_expr " << my_dump_expression(at_expr) << " l_expr " << my_dump_expression(l_expr) << '\n';
-
+    
     if (i==middle && !ThickSLice) // create and place new marker with name of thick_elem  in the middle = poition of thick_elem
     {
       element* middle_marker=new_marker_element("marker",thick_elem->name,thick_elem);
@@ -2624,16 +2655,16 @@ void SeqElList::slice_this_node() // main stearing what to do.   called in loop 
     }
     if(slice_i && !ThickSLice) place_node_at(thick_node, sliced_seq, slice_i,thin_at_expr);
   }
-
+  
   if(iMakeEndMarkers) place_end_marker(sliced_seq, thick_node, at_start=false);
-
+  
   if(ExitDipedge && UseDipedges) place_thin_slice(thick_node,sliced_seq,ExitDipedge,0.5);  // write end dipedge for dipoles
 } // SeqElList::slice_this_node()
 
 element* SeqElList::create_thin_obj(const element* thick_elem, int slice_no) // creates the thin non-magnetic element - recursively, keeps original l as lrad
 {
   element *sliced_elem_parent = NULL;
-
+  
   if (thick_elem == thick_elem->parent)
   {
     return NULL;
@@ -2642,10 +2673,10 @@ element* SeqElList::create_thin_obj(const element* thick_elem, int slice_no) // 
   {
     sliced_elem_parent = create_thin_obj(thick_elem->parent,slice_no);
   }
-
+  
   element *sliced_elem;
   if( (sliced_elem = theSliceList->find_slice(thick_elem,slice_no)) ) return sliced_elem; // check to see if we've already done this one
-
+  
   command* cmd = clone_command(thick_elem->def); // set up new multipole command
   const command_parameter* length_param = return_param_recurse(("l"),thick_elem);
   const int length_i = name_list_pos("l",thick_elem->def->par_names);
@@ -2678,29 +2709,29 @@ element* SeqElList::create_thin_obj(const element* thick_elem, int slice_no) // 
       }
     }
   }
-
+  
   if (length_i > -1)
   {
     cmd->par->parameters[length_i]->double_value = 0;
-    cmd->par->parameters[length_i]->expr = NULL;
+    cmd->par->parameters[length_i]->expr = nullptr;
   }
   int slices=1;
   if (strstr(thick_elem->base_type->name,"collimator")) slices = get_slices_from_elem(thick_elem);
   const char* thin_name = NULL;
   if (slices==1 && slice_no==1) thin_name=thick_elem->name;
   else thin_name=make_thin_name(thick_elem->name,slice_no);
-
+  
   if (sliced_elem_parent) sliced_elem = make_element(thin_name,sliced_elem_parent->name,cmd,-1);
   else  sliced_elem = make_element(thin_name, thick_elem->base_type->name, cmd, -1);
-
+  
   sliced_elem->length = 0;
   sliced_elem->bv = el_par_value("bv",sliced_elem);
-
+  
   theSliceList->put_slice(thick_elem,sliced_elem);
   return sliced_elem;
 }
 
-node* SeqElList::copy_thin(node* thick_node) // this copies an element node and sets the length to zero and radiation length to the length to be used for "copying" optically neutral elements
+node* SeqElList::copy_thin(node* thick_node) // this copies an element node and sets the length to zero and lrad to the length to be used for "copying" optically neutral elements
 {
   node* thin_node = NULL;
   thin_node = clone_node(thick_node, 0);
@@ -2732,7 +2763,7 @@ void SeqElList::slice_node() // this decides how to split an individual node and
       static const char* name_elist2[] = {
         "rbend", "sbend", "quadrupole", "sextupole", "octupole", "solenoid", "multipole", "rcollimator", "ecollimator", "collimator", "elseparator"
       };
-
+      
       if (NameIsInList(thick_node->base_name, ARRSIZE(name_elist1), name_elist1))
       {
         if(verbose>1) std::cout << __FILE__<< " " << __FUNCTION__ << " line " << std::setw(4) << __LINE__ << " place copy of thick_node " << thick_node->name << '\n';
@@ -2754,7 +2785,7 @@ void SeqElList::slice_node() // this decides how to split an individual node and
       else // new elements not yet implemented for slicing - write a message and do a reasonable default action
       {
         warningnew("Element not yet supported for slicing", "copy type '%s' with length set to zero.\n",thick_node->base_name);
-//        fprintf(prt_file, "Element not yet supported for slicing, copy type '%s' with length set to zero.\n",thick_node->base_name);
+        //        fprintf(prt_file, "Element not yet supported for slicing, copy type '%s' with length set to zero.\n",thick_node->base_name);
         add_node_at_end_of_sequence(copy_thin(thick_node),sliced_seq);
       }
     }
