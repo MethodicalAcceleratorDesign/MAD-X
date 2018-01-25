@@ -14,6 +14,7 @@ module madx_ptc_intstate_module
   public                            :: getenforce6D
   public                            :: setenforce6D
   public                            :: ptc_setdebuglevel
+  public                            :: ptc_setseed
   public                            :: ptc_setaccel_method
   public                            :: ptc_setexactmis
   public                            :: ptc_setradiation
@@ -120,6 +121,22 @@ contains
     debug = level
 
   end subroutine ptc_setdebuglevel
+  !____________________________________________________________________________________________
+
+
+  subroutine ptc_setseed(seed)
+    USE gauss_dis
+    implicit none
+    integer     :: seed
+
+    if (getdebug() > 0) then
+        print *, "Setting seed to", seed
+    end if
+    
+     CALL gaussian_seed(seed)
+
+  end subroutine ptc_setseed
+
   !____________________________________________________________________________________________
 
   subroutine setenforce6D(flag)

@@ -47,7 +47,8 @@ ptc_create_universe;
 
 
   
-  ptc_twiss, table=twiss, icase=5, no=4, closed_orbit=false, rmatrix, normal, writetmap;
+  ptc_twiss, table=twiss, icase=5, no=4, closed_orbit=false, rmatrix, normal, writetmap, trackrdts;
+  
   
   write, table=twiss, file="ptc.twiss";
   write, table=ptc_twiss_summary, file="ptc.summ.twiss";
@@ -106,5 +107,11 @@ ptc_create_universe;
   value, h3000_re, hh3000_re, h3000_re - hh3000_re;
 
 
+  write, table="twissrdt",file="twissrdt.tfs";
+
+  value, table(twissrdt,QF[2],GNFC300000);
+  
+  plot, table=twissrdt, haxis=s,vaxis=gnfc300000;
+  
 ptc_end;
 

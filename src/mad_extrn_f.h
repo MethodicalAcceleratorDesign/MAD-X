@@ -306,6 +306,7 @@ void w_ptc_refreshtables_(void);
 void w_ptc_script_(F_INTEGER scriptname);
 void w_ptc_setaccel_method_(F_INTEGER method);
 void w_ptc_setdebuglevel_(F_INTEGER level);
+void w_ptc_setseed_(F_INTEGER level);
 void w_ptc_setstochastic_(F_INTEGER method);
 void w_ptc_setfieldcomp_(F_INTEGER fibreidx);
 void w_ptc_setexactmis_(F_INTEGER method);

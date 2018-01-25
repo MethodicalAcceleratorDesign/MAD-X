@@ -113,6 +113,7 @@ module madx_ptc_twiss_module
   character(2000), private  :: whymsg
   
   character(48)           :: nl_table_name='nonlin'
+  character(48)           :: rdt_table_name='twissrdt'
   
   !============================================================================================
   !  PRIVATE
@@ -750,8 +751,10 @@ contains
          call print(default,6)
        endif
        
+       
        current=>my_ring%start
-       call FIND_ORBIT_x(orbit,default,c_1d_8,fibre1=current)
+       !global_verbose = .true.
+       call FIND_ORBIT_x(orbit,default,1e-6_dp,fibre1=current)
        
        if ( .not. check_stable) then
           write(whymsg,*) 'DA got unstable during closed orbit search: PTC msg: ',messagelost(:len_trim(messagelost))
@@ -877,20 +880,6 @@ contains
     !############################################################################
 
 
-    !must be after initmap that sets the isRing
-    ring_parameters = get_value('ptc_twiss ','ring_parameters ') .ne. 0
-    if (ring_parameters) then
-      if (getdebug() > 1) then
-        write(6,*) "User forces ring parameters calculation"
-      endif
-      isRing = .true.
-    endif
-
-    ! Normal
-    doNormal = get_value('ptc_twiss ','normal ') .ne. 0
-
-    if(isRing .and. doNormal) then
-    
        doRDTtracking = get_value('ptc_twiss ','trackrdts ') .ne. 0
        if (doRDTtracking) then
           call alloc(theRDTs)
@@ -899,23 +888,6 @@ contains
           call alloc(dummyMap)
        endif
        
-       call normalFormAnalysis(theTransferMap ,A_script_probe, orbit, doRDTtracking)
-
-    else
-    
-      doRDTtracking = .false.
-    
-    endif
-
-
-    maptable = get_value('ptc_twiss ','maptable ') .ne. 0
-    if(maptable) then
-       call makemaptable(theTransferMap%x,no)
-    endif
-
-
-    call set_option('ptc_twiss_summary ',1)
-    
 
      
 
@@ -1359,14 +1331,35 @@ contains
 
     endif
 
+    !must be after initmap that sets the isRing
+    ring_parameters = get_value('ptc_twiss ','ring_parameters ') .ne. 0
+    if (ring_parameters) then
+      if (getdebug() > 1) then
+        write(6,*) "User forces ring parameters calculation"
+      endif
+      isRing = .true.
+    endif
+
+    ! Normal
+    doNormal = get_value('ptc_twiss ','normal ') .ne. 0
 
     if(isRing .eqv. .true.) then
+       if (doNormal) call normalFormAnalysis(theTransferMap ,A_script_probe, orbit)
        call oneTurnSummary(theTransferMap ,A_script_probe%x, orbit, suml)
     else
        print*, "Reduced SUMM Table (Inital parameters specified)"
        call onePassSummary(theTransferMap%x , orbit, suml)
     endif
 
+
+    maptable = get_value('ptc_twiss ','maptable ') .ne. 0
+    if(maptable) then
+       call makemaptable(theTransferMap%x,no)
+    endif
+
+
+    call set_option('ptc_twiss_summary ',1)
+    
 
 
     if (getdebug() > 1) then
@@ -2119,6 +2112,9 @@ contains
 
         theRDTs = cgetpb(vectorField)
    
+        call string_to_table_curr(rdt_table_name,"name ","name ")
+        call double_to_table_curr(rdt_table_name, 's ', suml)
+   
  
         call c_taylor_cycle(theRDTs,size=mynres)
 
@@ -2143,13 +2139,20 @@ contains
               cycle
             endif
            
-           write(nick,'(a2,6(i1))') 'f_',ind(1),ind(2),ind(3), &
-                    	ind(4),ind(5),ind(6)
-           write(*,*) nick, " = ", d_val
+           write(nick,'(a4,6(i1))') 'gnfc',ind(1),ind(2),ind(3), &
+                    	   ind(4),ind(5),ind(6)
+           
+           call double_to_table_curr(rdt_table_name, nick, re_val )
+           nick(4:4) = 's'
+           call double_to_table_curr(rdt_table_name, nick, im_val )
+           
+
+          ! write(*,*) nick, " = ", d_val
          
         enddo
         
-        write(*,*)
+        call augment_count(rdt_table_name)
+       ! write(*,*)
    
     end subroutine putrdttable
     
@@ -3542,7 +3545,7 @@ contains
       call double_to_table_curr( summary_table_name,'orbit_y ',  startorbit(3))
       call double_to_table_curr( summary_table_name,'orbit_py ', startorbit(4))
       call double_to_table_curr( summary_table_name,'orbit_pt ', startorbit(5))
-      call double_to_table_curr( summary_table_name,'orbit_-cT ',-startorbit(6))
+      call double_to_table_curr( summary_table_name,'orbit_t ',-startorbit(6))
 
       xrms = sqrt(sum2Orbit / nobsOrbit)
       
@@ -3910,12 +3913,11 @@ contains
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
         
-  subroutine normalFormAnalysis(oneTurnMap,theAscript,startorbit,saverdtmap)
+  subroutine normalFormAnalysis(oneTurnMap,theAscript,startorbit)
     use resindexfi
     implicit none
     type(probe_8),target :: oneTurnMap,theAscript
     real(dp),    target :: startorbit(6) 
-    logical             :: saverdtmap
     real(dp)  :: prec ! for printing in files
     real(dp) :: disp1stOrder(4) ! for 6D algo
     type(c_taylor) :: tempTaylor ! for 6D algo

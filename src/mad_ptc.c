@@ -1,5 +1,8 @@
 #include "madx.h"
 
+void  makerdtstwisstable(void);
+void printpoly(int*, int );
+
 static void
 fill_twiss_header_ptc(struct table* t, double ptc_deltap)
   /* puts beam parameters etc. at start of twiss table */
@@ -30,7 +33,7 @@ fill_twiss_header_ptc(struct table* t, double ptc_deltap)
 		 "disp2min","disp2max",
 		 "disp3min","disp3max",
 		 "disp4min","disp4max",
-		 "orbit_x", "orbit_px","orbit_y","orbit_py","orbit_pt","orbit_-cT",
+		 "orbit_x", "orbit_px","orbit_y","orbit_py","orbit_pt","orbit_t",
 		 "xcorms",  "pxcorms","ycorms","pycorms","tcorms","ptcorms",
 		 "xcomin",  "xcomax",
 		 "pxcomin", "pxcomax",
@@ -364,8 +367,9 @@ pro_ptc_twiss(void)
   
   current_node = current_sequ->ex_start;
   /* w_ptc_twiss_(tarr->i); */
+
   
-  if (command_par_value("trackrdts",cmd->clone) != 0)
+  if (command_par_value("trackrdts",current_twiss) != 0)
    {
      makerdtstwisstable();
    }
@@ -795,6 +799,7 @@ pro_ptc_setswitch(struct in_cmd* cmd)
   int i;
   double switchvalue;
   struct name_list* nl;
+  int found;
 
   if (cmd == 0x0)
   {
@@ -819,149 +824,163 @@ pro_ptc_setswitch(struct in_cmd* cmd)
   /*DEBUG DEBUG LEVEL*/
   if ( name_list_pos("debuglevel", nl) >=0 )
   {
-    command_par_value2("debuglevel", cmd->clone, &switchvalue);
+    found = command_par_value2("debuglevel", cmd->clone, &switchvalue);
     debuglevel = (int)switchvalue;
     w_ptc_setdebuglevel_(&debuglevel);
   }
   else
   {
-    printf("debuglevel is not present\n");
+    printf("debuglevel is not present (keeping current value)\n");
   }
 
 
   /*ACCELERATION SWITCH*/
-  if ( name_list_pos("maxacceleration", nl) >=0 )
-  {
-    command_par_value2("maxacceleration", cmd->clone, &switchvalue);
-    if (debuglevel > 0) printf("maxaccel is found and its value is %f\n", switchvalue);
-    i = (int)switchvalue;
-    w_ptc_setaccel_method_(&i);
-  }
+  found = command_par_value_user2("maxacceleration", cmd->clone, &switchvalue);
+  if (found)
+   {
+     if (debuglevel > 0) printf("maxaccel is found and its value is %f\n", switchvalue);
+     i = (int)switchvalue;
+     w_ptc_setaccel_method_(&i);
+   }
   else
-  {
-    if (debuglevel > 0) printf("maxaccel is not present\n");
-  }
+   {
+     if (debuglevel > 0) printf("maxaccel is not present (keeping current value)\n");
+   }  
 
   /*EXACT_MIS SWITCH*/
-  if ( name_list_pos("exact_mis", nl) >=0 )
-  {
-    command_par_value2("exact_mis", cmd->clone, &switchvalue);
-    if (debuglevel > 0) printf("exact_mis is found and its value is %f\n", switchvalue);
-    i = (int)switchvalue;
-    w_ptc_setexactmis_(&i);
-  }
+  found = command_par_value_user2("exact_mis", cmd->clone, &switchvalue);
+  if (found)
+   {
+     if (debuglevel > 0) printf("exact_mis is found and its value is %f\n", switchvalue);
+     i = (int)switchvalue;
+     w_ptc_setexactmis_(&i);
+   }
   else
-  {
-    if (debuglevel > 0)  printf("exact_mis is not present\n");
-  }
+   {
+     if (debuglevel > 0)  printf("exact_mis is not present (keeping current value)\n");
+   }
 
 
   /*radiation SWITCH*/
-  if ( name_list_pos("radiation", nl) >=0 )
-  {
-    command_par_value2("radiation", cmd->clone, &switchvalue);
+  found = command_par_value_user2("radiation", cmd->clone, &switchvalue);
+  if (found)
+   {
     if (debuglevel > 0) printf("radiation is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setradiation_(&i);
-  }
+   }
   else
-  {
-    if (debuglevel > 0) printf("radiation is not present\n");
-  }
+   {
+    if (debuglevel > 0) printf("radiation is not present (keeping current value)\n");
+   }
 
 
   /*modulation SWITCH*/
-  if ( name_list_pos("modulation", nl) >=0 )
-  {
-    command_par_value2("modulation", cmd->clone, &switchvalue);
+  found = command_par_value_user2("modulation", cmd->clone, &switchvalue);
+  if (found)
+   {
     if (debuglevel > 0) printf("modulation is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setmodulation_(&i);
-  }
+   }
   else
-  {
-    if (debuglevel > 0) printf("modulation is not present\n");
-  }
+   {
+    if (debuglevel > 0) printf("modulation is not present (keeping current value)\n");
+   }
 
   /*stochastic SWITCH*/
-  if ( name_list_pos("stochastic", nl) >=0 )
-  {
-    command_par_value2("stochastic", cmd->clone, &switchvalue);
+  found = command_par_value_user2("stochastic", cmd->clone, &switchvalue);
+  if (found)
+   {
     if (debuglevel > 0) printf("stochastic is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setstochastic_(&i);
-  }
+   }
   else
-  {
-    if (debuglevel > 0) printf("stochastic is not present\n");
-  }
+   {
+    if (debuglevel > 0) printf("stochastic is not present (keeping current value)\n");
+   }
 
   /*envelope SWITCH*/
-  if ( name_list_pos("envelope", nl) >=0 )
-  {
-    command_par_value2("envelope", cmd->clone, &switchvalue);
+  found = command_par_value_user2("envelope", cmd->clone, &switchvalue);
+  if (found)
+   {
     if (debuglevel > 0) printf("envelope is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setenvelope_(&i);
-  }
+   }
   else
-  {
-    if (debuglevel > 0) printf("envelope is not present\n");
-  }
+   {
+    if (debuglevel > 0) printf("envelope is not present (keeping current value)\n");
+   }
 
   /*fringe SWITCH*/
-  if ( name_list_pos("fringe", nl) >=0 )
-  {
-    command_par_value2("fringe", cmd->clone, &switchvalue);
+  found = command_par_value_user2("fringe", cmd->clone, &switchvalue);
+  if (found)
+   {
     if (debuglevel > 0) printf("fringe is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setfringe_(&i);
-  }
+   }
   else
-  {
-    if (debuglevel > 0) printf("fringe is not present\n");
-  }
+   {
+    if (debuglevel > 0) printf("fringe is not present (keeping current value)\n");
+   }
 
 
   /*totalpath SWITCH*/
-  if ( name_list_pos("totalpath", nl) >=0 )
-  {
-    command_par_value2("totalpath", cmd->clone, &switchvalue);
+  found = command_par_value_user2("totalpath", cmd->clone, &switchvalue);
+  if (found)
+   {
     if (debuglevel > 0) printf("totalpath is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_settotalpath_(&i);
-  }
+   }
   else
-  {
-    if (debuglevel > 0) printf("totalpath is not present\n");
-  }
+   {
+    if (debuglevel > 0) printf("totalpath is not present (keeping current value)\n");
+   }
 
 
   /*TIME SWITCH*/
-  if ( name_list_pos("time", nl) >=0 )
-  {
-    command_par_value2("time", cmd->clone, &switchvalue);
+  found = command_par_value_user2("time", cmd->clone, &switchvalue);
+  if (found)
+   {
     if (debuglevel > 0) printf("time is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_settime_(&i);
-  }
+   }
   else
-  {
-    if (debuglevel > 0) printf("time is not present\n");
-  }
+   {
+    if (debuglevel > 0) printf("time is not present (keeping current value)\n");
+   }
 
   /*NOCAVITY SWITCH*/
-  if ( name_list_pos("nocavity", nl) >=0 )
-  {
-    command_par_value2("nocavity", cmd->clone, &switchvalue);
+  found = command_par_value_user2("nocavity", cmd->clone, &switchvalue);
+  if (found)
+   {
     if (debuglevel > 0) printf("nocavity is found and its value is %f\n", switchvalue);
     i = (int)switchvalue;
     w_ptc_setnocavity_(&i);
-  }
+   }
   else
-  {
-    if (debuglevel > 0) printf("nocavity is not present\n");
-  }
+   {
+    if (debuglevel > 0) printf("nocavity is not present (keeping current value)\n");
+   }
+
+  /*SEED SETTING*/
+  found = command_par_value_user2("seed", cmd->clone, &switchvalue);
+  if (found)
+   {
+    if (debuglevel > 0) printf("seed is found and its value is %f\n", switchvalue);
+    i = (int)switchvalue;
+    w_ptc_setseed_(&i);
+   }
+  else
+   {
+    if (debuglevel > 0) printf("seed is not present (keeping current value)\n");
+   }
+
 
   if (debuglevel > 0) printf("obs_points pro_ptc_setswitch Done\n");
 }
@@ -1864,17 +1883,102 @@ pro_ptc_track(struct in_cmd* cmd)
     fprintf(prt_file, "\n*****  end of ptc_run  *****\n");
   }  
 }
+/*_______________________________________________________*/
 
-/*____________________*/
+void printpoly(int p[6], int dim )
+{
+ int i;
+ 
+ printf("f"); /*icase*/
+ 
+ for (i=0; i<dim; i++)
+  {
+    printf("%1d",p[i]); /*icase*/
+  }
+
+ printf("\n");
+
+}
+
+/*_______________________________________________________*/
 void makerdtstwisstable()
 {
+  int i,j,n,no, icase;
+  int ind[6],poly[6];
 
-  twiss_table = make_table("twissrdt", "twissrdt", twiss_table_cols,
-                           twiss_table_types, current_sequ->n_nodes);
+  struct table* rdts_table;
+  char** table_cols;
+  int*  table_type;
+  
+  
+  table_cols = mymalloc_atomic("",7*sizeof(char*));
+  table_type = mymalloc_atomic("",7*sizeof(int));
+  
+  for (i=0; i<7; i++)
+  {   
+    table_cols[i] = mymalloc_atomic("",10*sizeof(char));
+    table_type[i] = 2;
+  }  
+  table_type[0] = 3;
 
-  twiss_table->dynamic = 1;
-  add_to_table_list(twiss_table, table_register);
-  current_sequ->tw_table = twiss_table;
-  twiss_table->org_sequ = current_sequ;
-  twiss_table->curr= 0;
+  strcpy(table_cols[0], "name");
+  strcpy(table_cols[1], "s"); /*can not be s becuase it will not plot than*/
+  strcpy(table_cols[2], "gnfc300000");
+  strcpy(table_cols[3], "gnfs300000");
+  strcpy(table_cols[4], "gnfc210000");
+  strcpy(table_cols[5], "gnfs210000");
+  strcpy(table_cols[6], " ");
+
+  
+  char name[] = "twissrdt";
+
+  rdts_table = make_table2(name, name, table_cols,
+                           table_type, current_sequ->n_nodes);
+
+  rdts_table->dynamic = 1;
+  add_to_table_list(rdts_table, table_register);
+  rdts_table->org_sequ = current_sequ;
+  rdts_table->curr= 0;
+  
+  
+  return;
+  
+  icase = command_par_value("icase",current_twiss);
+  if (icase == 56) icase=5;
+  no = command_par_value("no",current_twiss);
+  
+  printf("makerdtstwisstable no=%d \n",no);
+  
+  for (n=3; n<=no; n++)
+   {
+     memset(ind, 0, 6 * sizeof(ind[0]));
+     
+     ind[0] = n;
+     
+     for (i=0;i<n; i++)
+      {
+       
+
+        for (j=0;j<icase; j++)
+         {
+
+            memset(poly, 0, 6 * sizeof(ind[0]));
+            poly[j] = ind[0];
+
+            printpoly(poly,icase);
+            
+            
+           
+         }
+        
+       
+       ind[0]--; 
+       ind[1]++; 
+        
+      }
+      
+   }
+  
+  
+  
 }

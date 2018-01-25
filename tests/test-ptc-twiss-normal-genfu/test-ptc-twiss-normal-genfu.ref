@@ -195,7 +195,7 @@ obs_points pro_ptc_setswitch Done
           orbit_px            orbit_y           orbit_py           orbit_pt 
                  0                  0                  0                  0 
 
-         orbit_-cT             xcorms             ycorms            pxcorms 
+           orbit_t             xcorms             ycorms            pxcorms 
                  0                  0                  0                  0 
 
            pycorms             tcorms            ptcorms             xcomax 

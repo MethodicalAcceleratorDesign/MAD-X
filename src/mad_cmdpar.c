@@ -380,6 +380,23 @@ command_par_string_user2(const char* parameter, const struct command* cmd, char*
 }
 
 int
+command_par_value_user2(const char* parameter, const struct command* cmd, double* val)
+  /* returns a command parameter value val
+     if found returns 1, else 0 */
+{
+  struct command_parameter* cp;
+  int inf=command_par(parameter, cmd, &cp);
+  if (inf && cp && cp->type < 3) {
+    *val = cp->expr ? expression_value(cp->expr, 2) : cp->double_value;
+  }
+  else
+   {
+    *val = 0;
+   } 
+  return inf;
+}
+
+int
 command_par_string_or_calldef(const char* parameter, const struct command* cmd, char** str)
   /* returns command parameter string if explicitly set, otherwise call_def. */
   /* this function is only needed because mad_dict.c is not populated properly
@@ -446,6 +463,7 @@ command_par_value2(const char* parameter, const struct command* cmd, double* val
   *val = 0;
   return 0;
 }
+
 
 struct double_array*
 command_par_array(const char* parameter, struct command* cmd)

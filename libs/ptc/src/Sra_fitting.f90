@@ -3554,6 +3554,9 @@ call kill(yy); call kill(id);
 
 
     if((stat%totalpath==1).and.(.not.stat%nocavity)) then
+    
+       if(global_verbose) print*,"Totpath and cavity: Looking for Frequency"
+    
        C=>RING%START
        freq=0.0_dp
        i=1
@@ -3572,8 +3575,10 @@ call kill(yy); call kill(id);
      
            if(freq_redefine) then
              tot=RING%HARMONIC_NUMBER*twopi/FREQ
+             if(global_verbose) print*,"Totpath and cavity: f_redefine TOT=",TOT
            else
              tot=RING%HARMONIC_NUMBER*CLIGHT/FREQ
+             if(global_verbose) print*,"Totpath and cavity: TOT=",TOT
            endif
        endif
     
@@ -3593,6 +3598,9 @@ call kill(yy); call kill(id);
        !       CALL TRACK(RING,X,LOC,STAT)
        !       trackflag=TRACK_flag(RING,X,LOC,STAT)
        !!       xs%x=x
+       
+       if(global_verbose) print*,"ITEM=",ITEM," x=",x
+       
        call TRACK_probe_X(x,stat,fibre1=fibre1,node1=node1)
 
        if(.not.check_stable) then
@@ -3631,7 +3639,8 @@ call kill(yy); call kill(id);
        do i=1,ND2
          if(i==6) then
             MX(I,J)=Y(i)/2/eps+MX(I,J)   
-          ! MX(I,J)=(Y(i)-tot-X(i))/eps
+           
+            MX(I,J)=(Y(i)-tot-X(i))/eps
          else
           ! MX(I,J)=(Y(i)-X(i))/eps
           MX(I,J)=Y(i)/2/eps+MX(I,J)

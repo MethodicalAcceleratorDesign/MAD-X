@@ -58,6 +58,7 @@ struct table_list_list
 // interface
 
 struct table*           make_table(const char* name, const char* type, const char* const *table_cols, const int* table_types, int rows);
+struct table*           make_table2(char* name, char* type, char** table_cols, int* table_types, int rows);
 struct table*           new_table(const char* name, const char* type, int rows, struct name_list* cols);
 struct table_list*      new_table_list(int size);
 struct table_list_list* new_table_list_list(int size);

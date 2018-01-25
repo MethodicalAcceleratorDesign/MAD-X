@@ -1156,6 +1156,30 @@ make_table(const char* name, const char* type, const char* const* table_cols, co
   return t;
 }
 
+
+struct table*
+make_table2(char* name, char* type, char** table_cols, int* table_types, int rows)
+{
+  struct table* t;
+  struct name_list *cols;
+  struct command_list* scl;
+  int i, n = 0;
+  while (*table_cols[n] != ' ')
+  {
+/*     printf("make table %s col %d %s\n",name, n, table_cols[n]);*/
+    n++;
+  }
+  cols = new_name_list("columns", n);
+  for (i = 0; i < n; i++)
+    add_to_name_list(table_cols[i], table_types[i], cols);
+  if ((scl = find_command_list(name, table_select)) != NULL && scl->curr > 0)
+    add_table_vars(cols, scl);
+  t = new_table(name, type, rows, cols);
+  t->org_cols = n;
+  return t;
+}
+
+
 void
 reset_count(const char* table) /* resets table counter to zero */
 {
