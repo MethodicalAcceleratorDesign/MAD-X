@@ -3639,8 +3639,7 @@ call kill(yy); call kill(id);
        do i=1,ND2
          if(i==6) then
             MX(I,J)=Y(i)/2/eps+MX(I,J)   
-           
-            MX(I,J)=(Y(i)-tot-X(i))/eps
+          ! MX(I,J)=(Y(i)-tot-X(i))/eps
          else
           ! MX(I,J)=(Y(i)-X(i))/eps
           MX(I,J)=Y(i)/2/eps+MX(I,J)
