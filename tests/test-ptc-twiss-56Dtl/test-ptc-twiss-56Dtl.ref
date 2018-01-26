@@ -3,7 +3,7 @@
   +     MAD-X 5.03.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.10.20               +
-  + Execution date: 2018.01.09 10:27:43      +
+  + Execution date: 2018.01.26 12:08:33      +
   ++++++++++++++++++++++++++++++++++++++++++++
 
 
@@ -834,16 +834,17 @@ ptc_create_universe;
   ptc_setswitch, debuglevel=1, exact_mis=true, time=true, totalpath=true;
 
  Setting debug level to           1
-maxaccel is found and its value is 1.000000
+maxaccel is not present (keeping current value)
 exact_mis is found and its value is 1.000000
-radiation is found and its value is 0.000000
-modulation is found and its value is 0.000000
-stochastic is found and its value is 0.000000
-envelope is found and its value is 0.000000
-fringe is found and its value is 0.000000
+radiation is not present (keeping current value)
+modulation is not present (keeping current value)
+stochastic is not present (keeping current value)
+envelope is not present (keeping current value)
+fringe is not present (keeping current value)
 totalpath is found and its value is 1.000000
 time is found and its value is 1.000000
-nocavity is found and its value is 0.000000
+nocavity is not present (keeping current value)
+seed is not present (keeping current value)
 obs_points pro_ptc_setswitch Done
   
 
@@ -913,7 +914,7 @@ obs_points pro_ptc_setswitch Done
    2.546139572e-09                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                -0    1.168573367e-08                  0    3.059593786e-09 
+                 0    1.168573367e-08                  0    3.059593786e-09 
 
            pycorms             tcorms            ptcorms             xcomax 
                  0        92.00347451                  0    2.508645904e-08 

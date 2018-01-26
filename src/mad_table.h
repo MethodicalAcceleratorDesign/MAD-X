@@ -110,6 +110,7 @@ int     double_to_table_row  (const char* table, const char* name, const int* ro
 int     string_to_table_row  (const char* table, const char* name, const int* row, const char* string);
 
 int     double_to_table_curr (const char* table, const char* name, const double* val);
+int     double_to_table_curr2(const char* table, const char* name, const double* val);
 int     vector_to_table_curr (const char* table, const char* name, const double* vals, const int* nval);
 int     string_to_table_curr (const char* table, const char* name, const char* string);
 int     comment_to_table_curr(const char* table, const char* comment, const int* length);

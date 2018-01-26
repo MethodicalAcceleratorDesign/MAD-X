@@ -1954,6 +1954,81 @@ string_to_table_row(const char* table, const char* name, const int *row, const c
 }
 
 int
+double_to_table_curr2(const char* table, const char* name, const double* val)
+ /* the same as double_to_table_curr but adds column if it does not exist
+ */
+{
+  const char *rout_name = "double_to_table_curr2";
+  char tbl_s[NAME_L], col_s[NAME_L], buf[5*NAME_L];
+  struct table* tbl;
+  int col;
+  double** d_cols;
+
+  mycpy(tbl_s, table);
+  if (!(tbl = find_table(tbl_s))) {
+    warning("double_to_table_curr2: table not found:", tbl_s);
+    return -1;
+  }
+  mycpy(col_s, name);
+  if ((col = name_list_pos(col_s, tbl->columns)) < 0) {
+    
+    /*limit to a reasonable number of columns*/
+    if (tbl->num_cols > 10000)
+     {
+      warning("double_to_table_curr: Did not find the column and and can not add more (>10000):", 
+              (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
+      return -2;
+     }
+     
+   /* put_info("double_to_table_curr: column not found, creating one:", col_s);*/
+    
+    add_to_name_list(permbuff(col_s), 2, tbl->columns );
+    
+    /*Copy the old columns*/
+    d_cols = mycalloc(rout_name, tbl->num_cols, sizeof *tbl->d_cols);
+    for (int i=0; i<tbl->num_cols; i++)
+     {
+       d_cols[i] = tbl->d_cols[i];
+     }
+    
+    /*Create the new column*/
+    d_cols[tbl->num_cols] = mycalloc_atomic(rout_name, tbl->max - 1, sizeof *d_cols[0]);
+    /*zero the new array to assure previous rows are not random*/
+    memset(d_cols[tbl->num_cols], 0, (tbl->max - 1)* (sizeof *d_cols[0])); 
+    
+    myfree(rout_name,tbl->d_cols);
+    tbl->d_cols = d_cols;
+    tbl->num_cols++;
+    tbl->org_cols++;
+
+    while (tbl->num_cols > tbl->col_out->max)
+      grow_int_array(tbl->col_out);
+
+    
+    if ((col = name_list_pos(col_s, tbl->columns)) < 0) {
+      warning("double_to_table_curr2: Failed to add column:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
+      return -2;
+    }
+    
+  }
+  
+  if (tbl->columns->inform[col] >= 3) {
+    warning("double_to_table_curr2: invalid column type:", (sprintf(buf,"%s->%s",tbl_s,col_s),buf));
+    return -2;
+  }
+  if (tbl->curr >= tbl->max) {
+    warning("double_to_table_curr2: row out of range (need expansion):", (sprintf(buf,"%s->%s[%d<%d]",tbl_s,col_s,tbl->curr,tbl->max),buf));
+    return -3;
+  }
+
+  tbl->d_cols[col][tbl->curr] = *val;
+  
+
+  return 0;
+}
+
+
+int
 double_to_table_curr(const char* table, const char* name, const double* val)
   /* puts val at current position in column with name "name".
      The table count is increased separately with "augment_count"

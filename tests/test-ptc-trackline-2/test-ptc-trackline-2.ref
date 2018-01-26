@@ -3,7 +3,7 @@
   +     MAD-X 5.03.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.10.20               +
-  + Execution date: 2018.01.09 16:28:42      +
+  + Execution date: 2018.01.26 12:11:05      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !Example script showing usage of tracking with PTC
 
@@ -59,102 +59,10 @@ exact_mis is found and its value is 1.000000
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
-radiation is found and its value is 0.000000
- Switching OFF radiation
- ************ State Summary ****************
- MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
-  Rectangular Bend: input arc length (rho alpha) 
-  Default integration method     6
-  Default integration steps     20
- This is an electron (positron actually if charge=1) 
-       EXACT_MODEL =  FALSE
-       TOTALPATH   =     1
-       RADIATION   =  FALSE
-       STOCHASTIC  =  FALSE
-       ENVELOPE    =  FALSE
-       NOCAVITY    =  FALSE
-       TIME        =  TRUE 
-       FRINGE      =  FALSE
-       PARA_IN     =  FALSE
-       ONLY_2D     =  FALSE
-       ONLY_4D     =  FALSE
-       DELTA       =  FALSE
-       SPIN        =  FALSE
-       MODULATION  =  FALSE
-       RAMPING     =  FALSE
-       ACCELERATE  =  FALSE
-modulation is found and its value is 0.000000
- Switching OFF modulation
- ************ State Summary ****************
- MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
-  Rectangular Bend: input arc length (rho alpha) 
-  Default integration method     6
-  Default integration steps     20
- This is an electron (positron actually if charge=1) 
-       EXACT_MODEL =  FALSE
-       TOTALPATH   =     1
-       RADIATION   =  FALSE
-       STOCHASTIC  =  FALSE
-       ENVELOPE    =  FALSE
-       NOCAVITY    =  FALSE
-       TIME        =  TRUE 
-       FRINGE      =  FALSE
-       PARA_IN     =  FALSE
-       ONLY_2D     =  FALSE
-       ONLY_4D     =  FALSE
-       DELTA       =  FALSE
-       SPIN        =  FALSE
-       MODULATION  =  FALSE
-       RAMPING     =  FALSE
-       ACCELERATE  =  FALSE
-stochastic is found and its value is 0.000000
- Switching OFF stochastic
- ************ State Summary ****************
- MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
-  Rectangular Bend: input arc length (rho alpha) 
-  Default integration method     6
-  Default integration steps     20
- This is an electron (positron actually if charge=1) 
-       EXACT_MODEL =  FALSE
-       TOTALPATH   =     1
-       RADIATION   =  FALSE
-       STOCHASTIC  =  FALSE
-       ENVELOPE    =  FALSE
-       NOCAVITY    =  FALSE
-       TIME        =  TRUE 
-       FRINGE      =  FALSE
-       PARA_IN     =  FALSE
-       ONLY_2D     =  FALSE
-       ONLY_4D     =  FALSE
-       DELTA       =  FALSE
-       SPIN        =  FALSE
-       MODULATION  =  FALSE
-       RAMPING     =  FALSE
-       ACCELERATE  =  FALSE
-envelope is found and its value is 0.000000
- Switching OFF envelope
- ************ State Summary ****************
- MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
-  Rectangular Bend: input arc length (rho alpha) 
-  Default integration method     6
-  Default integration steps     20
- This is an electron (positron actually if charge=1) 
-       EXACT_MODEL =  FALSE
-       TOTALPATH   =     1
-       RADIATION   =  FALSE
-       STOCHASTIC  =  FALSE
-       ENVELOPE    =  FALSE
-       NOCAVITY    =  FALSE
-       TIME        =  TRUE 
-       FRINGE      =  FALSE
-       PARA_IN     =  FALSE
-       ONLY_2D     =  FALSE
-       ONLY_4D     =  FALSE
-       DELTA       =  FALSE
-       SPIN        =  FALSE
-       MODULATION  =  FALSE
-       RAMPING     =  FALSE
-       ACCELERATE  =  FALSE
+radiation is not present (keeping current value)
+modulation is not present (keeping current value)
+stochastic is not present (keeping current value)
+envelope is not present (keeping current value)
 fringe is found and its value is 0.000000
  Switching OFF fringe
  ************ State Summary ****************
@@ -251,6 +159,7 @@ nocavity is found and its value is 0.000000
        MODULATION  =  FALSE
        RAMPING     =  FALSE
        ACCELERATE  =  FALSE
+seed is not present (keeping current value)
 obs_points pro_ptc_setswitch Done
 obs_points: 2 
 obs_points: 3 
@@ -314,9 +223,9 @@ obs_points: 3
      DELTAE      0.00000      GeV 
      Length      2.40000         m
       Phase      -64.470      rad 
-     Old Ph       -0.000      rad 
+     Old Ph        0.000      rad 
        Freq  3000000000.       Hz 
-        Lag      0.00000      deg       0.0000      rad 
+        Lag     -0.00000      deg      -0.0000      rad 
         P0c      0.01999     GeV/c
  Track parameters after cavity   0.00000000  0.00000000  0.00000000  0.00000000  0.70010343  3.45080385
   Old Fibre: energy=    0.0200 momentum=    0.0200  kinetic=    0.0195
@@ -366,9 +275,9 @@ Relative E  0.7001
      DELTAE      0.00000      GeV 
      Length      2.40000         m
       Phase     -347.453      rad 
-     Old Ph       -0.000      rad 
+     Old Ph        0.000      rad 
        Freq  3000000000.       Hz 
-        Lag      0.00000      deg       0.0000      rad 
+        Lag     -0.00000      deg      -0.0000      rad 
         P0c      0.03399     GeV/c
  Track parameters after cavity   0.00000000  0.00000000  0.00000000  0.00000000  0.41182975  7.95123315
   Old Fibre: energy=    0.0340 momentum=    0.0340  kinetic=    0.0335

@@ -1911,10 +1911,10 @@ void makerdtstwisstable()
   int*  table_type;
   
   
-  table_cols = mymalloc_atomic("",7*sizeof(char*));
-  table_type = mymalloc_atomic("",7*sizeof(int));
+  table_cols = mymalloc_atomic("",9*sizeof(char*));
+  table_type = mymalloc_atomic("",9*sizeof(int));
   
-  for (i=0; i<7; i++)
+  for (i=0; i<9; i++)
   {   
     table_cols[i] = mymalloc_atomic("",10*sizeof(char));
     table_type[i] = 2;
@@ -1923,11 +1923,13 @@ void makerdtstwisstable()
 
   strcpy(table_cols[0], "name");
   strcpy(table_cols[1], "s"); /*can not be s becuase it will not plot than*/
-  strcpy(table_cols[2], "gnfc300000");
-  strcpy(table_cols[3], "gnfs300000");
-  strcpy(table_cols[4], "gnfc210000");
-  strcpy(table_cols[5], "gnfs210000");
-  strcpy(table_cols[6], " ");
+  strcpy(table_cols[2], "k1l"); 
+  strcpy(table_cols[3], "k1sl"); 
+  strcpy(table_cols[4], "k2l"); 
+  strcpy(table_cols[5], "k2sl"); 
+  strcpy(table_cols[6], "k3l"); 
+  strcpy(table_cols[7], "k3sl"); 
+  strcpy(table_cols[8], " ");
 
   
   char name[] = "twissrdt";

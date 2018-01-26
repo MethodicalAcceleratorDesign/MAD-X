@@ -3,7 +3,7 @@
   +     MAD-X 5.03.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.10.20               +
-  + Execution date: 2018.01.09 14:42:52      +
+  + Execution date: 2018.01.26 14:49:19      +
   ++++++++++++++++++++++++++++++++++++++++++++
 mydrift: drift, l=1;
 
@@ -115,24 +115,21 @@ ptc_create_universe;
   ptc_setswitch, debuglevel=1, exact_mis=true, time=true, totalpath=false;
 
  Setting debug level to           1
-maxaccel is found and its value is 1.000000
+maxaccel is not present (keeping current value)
 exact_mis is found and its value is 1.000000
-radiation is found and its value is 0.000000
-modulation is found and its value is 0.000000
-stochastic is found and its value is 0.000000
-envelope is found and its value is 0.000000
-fringe is found and its value is 0.000000
+radiation is not present (keeping current value)
+modulation is not present (keeping current value)
+stochastic is not present (keeping current value)
+envelope is not present (keeping current value)
+fringe is not present (keeping current value)
 totalpath is found and its value is 0.000000
 time is found and its value is 1.000000
-nocavity is found and its value is 0.000000
+nocavity is not present (keeping current value)
+seed is not present (keeping current value)
 obs_points pro_ptc_setswitch Done
 
 
-
-
-  
-
-  ptc_twiss, table=twiss, icase=5, no=4, closed_orbit=false, rmatrix, normal, writetmap;
+  ptc_twiss, table=twiss, icase=5, no=4, closed_orbit=false, rmatrix, normal, writetmap, trackrdts;
 
  ************ State Summary ****************
  MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
@@ -196,7 +193,7 @@ obs_points pro_ptc_setswitch Done
                  0                  0                  0                  0 
 
            orbit_t             xcorms             ycorms            pxcorms 
-                 0                  0                  0                  0 
+                -0                  0                  0                  0 
 
            pycorms             tcorms            ptcorms             xcomax 
                  0                  0                  0                  0 
@@ -210,6 +207,8 @@ obs_points pro_ptc_setswitch Done
            pycomin             tcomin            ptcomin 
                  0                 -0                  0 
   
+
+  write, table="twissrdt",file="twissrdt.tfs";
 
   write, table=twiss, file="ptc.twiss";
 
@@ -341,7 +340,26 @@ hh3000_re          =   -0.0004782448704 ;
 h3000_re-hh3000_re =    1.834771152e-06 ;
 
 
+  
 
+  ! the values at 2nd QF quad
+
+  value, table(twissrdt,QF[2],GNFC_3_0_0_0_0_0);
+
+table( twissrdt qf [ 2  ]  gnfc_3_0_0_0_0_0 ) =   -0.0002366862262 ;
+  value, table(twissrdt,QF[2],GNFC_3_0_0_0_0_0);
+
+table( twissrdt qf [ 2  ]  gnfc_3_0_0_0_0_0 ) =   -0.0002366862262 ;
+  value, table(twissrdt,QF[2],GNFC_3_0_0_0_0_0);
+
+table( twissrdt qf [ 2  ]  gnfc_3_0_0_0_0_0 ) =   -0.0002366862262 ;
+  
+
+ ! to plot the RDTs
+
+ ! plot, colour=100,table=twissrdt, haxis=s,vaxis=gnfa_3_0_0_0_0_0,gnfc_3_0_0_0_0_0,gnfs_3_0_0_0_0_0;
+
+  
 
 ptc_end;
 

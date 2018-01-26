@@ -3,7 +3,7 @@
   +     MAD-X 5.03.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.10.20               +
-  + Execution date: 2018.01.19 15:25:17      +
+  + Execution date: 2018.01.26 14:45:42      +
   ++++++++++++++++++++++++++++++++++++++++++++
 call, file="../share/ALS/als.seqx";
 
@@ -225,16 +225,17 @@ ptc_create_universe;
   ptc_setswitch, debuglevel=1, exact_mis=true, time=true, totalpath=false;
 
  Setting debug level to           1
-maxaccel is found and its value is 1.000000
+maxaccel is not present (keeping current value)
 exact_mis is found and its value is 1.000000
-radiation is found and its value is 0.000000
-modulation is found and its value is 0.000000
-stochastic is found and its value is 0.000000
-envelope is found and its value is 0.000000
-fringe is found and its value is 0.000000
+radiation is not present (keeping current value)
+modulation is not present (keeping current value)
+stochastic is not present (keeping current value)
+envelope is not present (keeping current value)
+fringe is not present (keeping current value)
 totalpath is found and its value is 0.000000
 time is found and its value is 1.000000
-nocavity is found and its value is 0.000000
+nocavity is not present (keeping current value)
+seed is not present (keeping current value)
 obs_points pro_ptc_setswitch Done
   
 

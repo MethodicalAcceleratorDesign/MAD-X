@@ -133,6 +133,7 @@
 #define double_to_table_row double_to_table_row_
 #define string_to_table_row string_to_table_row_
 #define double_to_table_curr double_to_table_curr_ // **
+#define double_to_table_curr2 double_to_table_curr2_ // **
 #define vector_to_table_curr vector_to_table_curr_
 #define string_to_table_curr string_to_table_curr_
 #define comment_to_table_curr comment_to_table_curr_

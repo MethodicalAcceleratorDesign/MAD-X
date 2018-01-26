@@ -754,7 +754,8 @@ contains
        
        current=>my_ring%start
        !global_verbose = .true.
-       call FIND_ORBIT_x(orbit,default,1e-6_dp,fibre1=current)
+       call FIND_ORBIT_x(orbit,default,c_1d_8,fibre1=current)
+       !global_verbose = .false.
        
        if ( .not. check_stable) then
           write(whymsg,*) 'DA got unstable during closed orbit search: PTC msg: ',messagelost(:len_trim(messagelost))
@@ -1167,7 +1168,7 @@ contains
             suml = s; 
 
             call puttwisstable(theTransferMap%x)
-            if(doRDTtracking)   call putrdttable()
+            if(doRDTtracking)   call putrdttable(current)
             if(usertableActive) call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x, A_script_probe%x)
 
           !else
@@ -1190,7 +1191,7 @@ contains
           endif
 
           call puttwisstable(theTransferMap%x)
-          if(doRDTtracking)   call putrdttable()
+          if(doRDTtracking)   call putrdttable(current)
           if(usertableActive) call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x, A_script_probe%x)
 
         endif
@@ -1274,7 +1275,7 @@ contains
         
         !print*,"Skowron 6 ", current%mag%name,  check_stable, c_%stable_da, A_script_probe%x(1).sub.'100000'
         
-        if(doRDTtracking)   call putrdttable()
+        if(doRDTtracking)   call putrdttable(current)
         if(usertableActive) call putusertable(i,current%mag%name,suml,getdeltae(),theTransferMap%x,A_script_probe%x)
 
         !print*,"Skowron 7 ", current%mag%name,  check_stable, c_%stable_da, A_script_probe%x(1).sub.'100000'
@@ -2099,12 +2100,13 @@ contains
     end subroutine puttwisstable
     !____________________________________________________________________________________________
     
-    subroutine putrdttable()
+    subroutine putrdttable(fib)
       implicit none
+      type(fibre), POINTER    :: fib
       complex(dp)   :: c_val
       real(dp)    :: im_val, re_val, d_val,  eps=1e-6
       integer     :: ind(10), i, mynres, order,rrr
-      character(len=17):: nick
+      character(len=18):: nick
         
         AscriptInPhasor=A_script_probe%x
         AscriptInPhasor=to_phasor() * AscriptInPhasor * from_phasor()
@@ -2114,14 +2116,13 @@ contains
    
         call string_to_table_curr(rdt_table_name,"name ","name ")
         call double_to_table_curr(rdt_table_name, 's ', suml)
-   
+           
  
         call c_taylor_cycle(theRDTs,size=mynres)
 
-    
-
-          do rrr=1,mynres
-
+        do rrr=1,mynres
+            
+            ind = 0
             call c_taylor_cycle(theRDTs,ii=rrr,value=c_val,j=ind(1:c_%nv))
 
             order = sum(ind(1:6))
@@ -2139,19 +2140,37 @@ contains
               cycle
             endif
            
-           write(nick,'(a4,6(i1))') 'gnfc',ind(1),ind(2),ind(3), &
-                    	   ind(4),ind(5),ind(6)
+           write(nick,'(a4,6(a1,i1))') 'gnfa','_',ind(1),'_',ind(2),'_',ind(3), &
+                    	      '_',ind(4),'_',ind(5),'_',ind(6)
+           call double_to_table_curr2(rdt_table_name, nick, d_val )
            
-           call double_to_table_curr(rdt_table_name, nick, re_val )
+           nick(4:4) = 'c'
+           call double_to_table_curr2(rdt_table_name, nick, re_val )
            nick(4:4) = 's'
-           call double_to_table_curr(rdt_table_name, nick, im_val )
+           call double_to_table_curr2(rdt_table_name, nick, im_val )
            
 
           ! write(*,*) nick, " = ", d_val
          
-        enddo
+       enddo
         
-        call augment_count(rdt_table_name)
+
+       if (fib%mag%p%nmul > 0) then
+         call double_to_table_curr2(rdt_table_name,'k1l ', fib%mag%bn(1))
+         call double_to_table_curr2(rdt_table_name,'k1sl ',fib%mag%an(1))
+       endif  
+
+       if (fib%mag%p%nmul > 1) then
+         call double_to_table_curr(rdt_table_name,'k2l ', fib%mag%bn(2))
+         call double_to_table_curr(rdt_table_name,'k2sl ',fib%mag%an(2))
+       endif  
+
+       if (fib%mag%p%nmul > 2) then
+         call double_to_table_curr(rdt_table_name,'k3l ', fib%mag%bn(3))
+         call double_to_table_curr(rdt_table_name,'k3sl ',fib%mag%an(3))
+       endif  
+
+       call augment_count(rdt_table_name)
        ! write(*,*)
    
     end subroutine putrdttable
@@ -2675,9 +2694,10 @@ contains
 
       !use Courant Snyder
       call alloc(a_cs)
-      call c_full_canonise(theNormalForm%a_t,a_cs)   ! (0)
+      call c_full_canonise(theNormalForm%atot,a_cs)   ! (0)
       A_script_probe = orbit_probe +  a_cs
-      !A_script_probe =  orbit_probe + theNormalForm%a_t
+      
+     ! A_script_probe =  orbit_probe + theNormalForm%a_t
 
       if (getdebug() > 2) then
 
@@ -4059,7 +4079,7 @@ contains
 
     ! raw transformation are subject to random rotations due to numerical instabilities
     ! c_canonise fixes them straight to fit the Courant Snyder format
-    call c_canonise(theNormalForm%a_t,a_CS)
+    call c_canonise(theNormalForm%atot,a_CS)
 
     do i=1,c_%nd2 !from damap type def: Ndim2=6 but allocated to nd2=2,4,6
       
@@ -4067,7 +4087,6 @@ contains
       call putEnormaltable(a_CS%V(i),i)
       
     enddo
-    call kill(a_CS) 
 
     
     !!!!!!!!!!!!!!!!!!!!!!
@@ -4095,11 +4114,9 @@ contains
     
     call alloc(vf)
     call alloc(g_io)
-    call alloc(a_CS)
     call alloc(a_CS_1)
 
     
-    call c_canonise(theNormalForm%atot,a_CS)
     
     a_CS=to_phasor()*a_CS*from_phasor()
     call c_factor_map(a_CS,a_CS_1,vf,0) 
