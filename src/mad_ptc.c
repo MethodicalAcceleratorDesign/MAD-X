@@ -1903,8 +1903,7 @@ void printpoly(int p[6], int dim )
 /*_______________________________________________________*/
 void makerdtstwisstable()
 {
-  int i,j,n,no, icase;
-  int ind[6],poly[6];
+  int i;
 
   struct table* rdts_table;
   char** table_cols;
@@ -1941,46 +1940,6 @@ void makerdtstwisstable()
   add_to_table_list(rdts_table, table_register);
   rdts_table->org_sequ = current_sequ;
   rdts_table->curr= 0;
-  
-  
-  return;
-  
-  icase = command_par_value("icase",current_twiss);
-  if (icase == 56) icase=5;
-  no = command_par_value("no",current_twiss);
-  
-  printf("makerdtstwisstable no=%d \n",no);
-  
-  for (n=3; n<=no; n++)
-   {
-     memset(ind, 0, 6 * sizeof(ind[0]));
-     
-     ind[0] = n;
-     
-     for (i=0;i<n; i++)
-      {
-       
-
-        for (j=0;j<icase; j++)
-         {
-
-            memset(poly, 0, 6 * sizeof(ind[0]));
-            poly[j] = ind[0];
-
-            printpoly(poly,icase);
-            
-            
-           
-         }
-        
-       
-       ind[0]--; 
-       ind[1]++; 
-        
-      }
-      
-   }
-  
   
   
 }
