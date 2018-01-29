@@ -3,7 +3,7 @@
   +     MAD-X 5.03.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.10.20               +
-  + Execution date: 2018.01.09 16:16:59      +
+  + Execution date: 2018.01.26 11:59:10      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Title " Diamond Light Source Lattice 8.1.1";
 
@@ -150,16 +150,17 @@ PTC_CREATE_LAYOUT,model=2,method=6,nst=20,exact;
      ptc_setswitch, debuglevel=1, exact_mis=true, time=true, totalpath=false;
 
  Setting debug level to           1
-maxaccel is found and its value is 1.000000
+maxaccel is not present (keeping current value)
 exact_mis is found and its value is 1.000000
-radiation is found and its value is 0.000000
-modulation is found and its value is 0.000000
-stochastic is found and its value is 0.000000
-envelope is found and its value is 0.000000
-fringe is found and its value is 0.000000
+radiation is not present (keeping current value)
+modulation is not present (keeping current value)
+stochastic is not present (keeping current value)
+envelope is not present (keeping current value)
+fringe is not present (keeping current value)
 totalpath is found and its value is 0.000000
 time is found and its value is 1.000000
-nocavity is found and its value is 0.000000
+nocavity is not present (keeping current value)
+seed is not present (keeping current value)
 obs_points pro_ptc_setswitch Done
      
 
@@ -191,55 +192,55 @@ obs_points pro_ptc_setswitch Done
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-             561.6    0.0001708147611           -1000000           -1000000 
+             561.6    0.0001708147612           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000    0.0001707857478        76.51336477       0.2256227262 
+          -1000000    0.0001707857478        76.51336476       0.2256227262 
 
                 q2                dq1                dq2                 qs 
       0.3631521852                  0                  0      0.00529039829 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-      0.6702574752        22.59047529        1.532193729        26.58355135 
+      0.6702574752         22.5904753        1.532193729        26.58355136 
 
          beta11min          beta11max          beta12min          beta12max 
-      0.6702574752        22.59047529    9.630681092e-37    1.026689723e-32 
+      0.6702574752         22.5904753    1.489650887e-36    1.608798131e-32 
 
          beta13min          beta13max          beta21min          beta21max 
-   1.355372216e-05      0.03369210324    1.997847742e-34    6.547600645e-33 
+   1.355372216e-05      0.03369210324    4.868139726e-35    2.322761238e-33 
 
          beta22min          beta22max          beta23min          beta23max 
-       1.532193729        26.58355135    3.697561281e-33    1.672832995e-29 
+       1.532193729        26.58355136    3.183731072e-34    3.912532822e-30 
 
          beta31min          beta31max          beta32min          beta32max 
-   0.0005203652666      0.00464284994    1.488281191e-33    2.142664816e-33 
+   0.0005203652666      0.00464284994    2.263262971e-33    3.319059684e-33 
 
          beta33min          beta33max           disp1min           disp1max 
        2.885127313        2.885971271                  0       0.3117654941 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.1550570858       0.1550570858   -3.712129857e-16    3.593610441e-16 
+     -0.1550570858       0.1550570858   -5.816120915e-16    5.814478711e-16 
 
           disp4min           disp4max             deltap            orbit_x 
-  -1.228668285e-16    1.250070673e-16                  0   -1.435362989e-14 
+  -1.974438256e-16    1.936071245e-16                  0    2.418029085e-14 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-     4.3099685e-16                  0                  0   -1.919493351e-13 
+  -3.350489751e-17                  0                  0    2.852890811e-13 
 
-         orbit_-cT             xcorms             ycorms            pxcorms 
-     0.02997564577    3.062590162e-14                  0    1.525337395e-14 
+           orbit_t             xcorms             ycorms            pxcorms 
+     0.02997564577    4.336655369e-14                  0    2.160584043e-14 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0      0.02997564577    1.919507155e-13     8.88277323e-15 
+                 0      0.02997564577    2.852885328e-13    1.058854137e-13 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    3.970875595e-14                  0      0.02997564577 
+                 0    5.276679103e-14                  0      0.02997564577 
 
            ptcomax             xcomin             ycomin            pxcomin 
-  -1.919493351e-13   -7.964686334e-14                  0   -3.910073641e-14 
+   2.852890811e-13   -1.639562542e-15                  0    -5.23797433e-14 
 
            pycomin             tcomin            ptcomin 
-                 0      0.02997564577   -1.934776267e-13 
+                 0      0.02997564577    2.846789469e-13 
 
 
      select_ptc_normal, dq1,dq2;

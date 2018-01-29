@@ -495,6 +495,7 @@ CONTAINS
     ! it is safe for MADX because default for all magnets is 1m
     ! so if user defines it otherwise it means it knows what he is doing
     absolute_aperture = 1e6_dp
+    t_aperture = 1e30;
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !!!  ELEMENTS LOOP    !!!
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

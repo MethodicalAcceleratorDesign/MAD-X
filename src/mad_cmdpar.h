@@ -61,6 +61,7 @@ double  command_par_special(const char* parameter, const struct element*);
 char*   command_par_string(const char* parameter, const struct command*);
 char*   command_par_string_user(const char* parameter, const struct command*);
 int     command_par_string_user2(const char* parameter, const struct command*, char**);
+int     command_par_value_user2(const char* parameter, const struct command*, double* val);
 int     command_par_string_or_calldef(const char* par, const struct command*, char**);
 double  command_par_value(const char* parameter, const struct command*);
 int     command_par_value2(const char* parameter, const struct command*, double* val);

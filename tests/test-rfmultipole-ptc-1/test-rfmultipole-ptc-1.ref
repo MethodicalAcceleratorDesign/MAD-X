@@ -3,7 +3,7 @@
   +     MAD-X 5.03.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.10.20               +
-  + Execution date: 2018.01.09 16:31:53      +
+  + Execution date: 2018.01.26 12:11:13      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE, 'RF-Dipole example';
 
@@ -92,7 +92,7 @@ ptc_create_universe;
      method                   6
      Num. of steps            5
      charge           1.0000000000000000     
- RF frequency    12333467.886365037       Hz, lag    0.0000000000000000       [radian]
+ RF frequency    12333467.886365037       Hz, lag   -0.0000000000000000       [radian]
   Length of machine:    24.200000000000006     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
@@ -167,8 +167,8 @@ ptc_create_universe;
           orbit_px            orbit_y           orbit_py           orbit_pt 
                  0                  0                  0                  0 
 
-         orbit_-cT             xcorms             ycorms            pxcorms 
-                 0    6.655669633e-08                  0    1.905024369e-08 
+           orbit_t             xcorms             ycorms            pxcorms 
+                -0    6.655669633e-08                  0    1.905024369e-08 
 
            pycorms             tcorms            ptcorms             xcomax 
                  0                  0                  0                  0 
@@ -209,7 +209,7 @@ ptc_create_universe;
      method                   6
      Num. of steps            5
      charge           1.0000000000000000     
- RF frequency    7813812.0507672187       Hz, lag    0.0000000000000000       [radian]
+ RF frequency    7813812.0507672187       Hz, lag   -0.0000000000000000       [radian]
   Length of machine:    24.200000000000006     
  The machine is a RING
  ------------------------------------ PTC Survey ------------------------------------
@@ -223,15 +223,16 @@ ptc_create_universe;
 
  Setting debug level to           1
 maxaccel is found and its value is 0.000000
-exact_mis is found and its value is 0.000000
-radiation is found and its value is 0.000000
-modulation is found and its value is 0.000000
-stochastic is found and its value is 0.000000
-envelope is found and its value is 0.000000
-fringe is found and its value is 0.000000
+exact_mis is not present (keeping current value)
+radiation is not present (keeping current value)
+modulation is not present (keeping current value)
+stochastic is not present (keeping current value)
+envelope is not present (keeping current value)
+fringe is not present (keeping current value)
 totalpath is found and its value is 1.000000
 time is found and its value is 0.000000
-nocavity is found and its value is 0.000000
+nocavity is not present (keeping current value)
+seed is not present (keeping current value)
 obs_points pro_ptc_setswitch Done
 
 

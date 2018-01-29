@@ -3,7 +3,7 @@
   +     MAD-X 5.03.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
   + Release   date: 2017.10.20               +
-  + Execution date: 2018.01.19 16:07:34      +
+  + Execution date: 2018.01.26 14:54:13      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !MADX test for rf lag handling in PTC
 
@@ -61,14 +61,15 @@ makethin: slicing sequence : c314
  Setting debug level to           1
 maxaccel is found and its value is 0.000000
 exact_mis is found and its value is 1.000000
-radiation is found and its value is 0.000000
+radiation is not present (keeping current value)
 modulation is found and its value is 0.000000
-stochastic is found and its value is 0.000000
-envelope is found and its value is 0.000000
+stochastic is not present (keeping current value)
+envelope is not present (keeping current value)
 fringe is found and its value is 1.000000
 totalpath is found and its value is 0.000000
 time is found and its value is 1.000000
-nocavity is found and its value is 0.000000
+nocavity is not present (keeping current value)
+seed is not present (keeping current value)
 obs_points pro_ptc_setswitch Done
  ************ State Summary ****************
  MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
@@ -131,7 +132,7 @@ obs_points pro_ptc_setswitch Done
           orbit_px            orbit_y           orbit_py           orbit_pt 
   -1.390249328e-19                  0                  0   -2.006478505e-13 
 
-         orbit_-cT             xcorms             ycorms            pxcorms 
+           orbit_t             xcorms             ycorms            pxcorms 
           -0.40625     5.07246919e-14                  0    5.340409383e-15 
 
            pycorms             tcorms            ptcorms             xcomax 

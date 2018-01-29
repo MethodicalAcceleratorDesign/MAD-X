@@ -109,6 +109,13 @@ subroutine w_ptc_setdebuglevel(level)
   call ptc_setdebuglevel(level)
 end subroutine w_ptc_setdebuglevel
 
+subroutine w_ptc_setseed(seed)
+  use madx_ptc_intstate_module
+  implicit none
+  integer seed
+  call ptc_setseed(seed)
+end subroutine w_ptc_setseed
+
 subroutine w_ptc_enforce6D(level)
   use madx_ptc_intstate_module
   implicit none

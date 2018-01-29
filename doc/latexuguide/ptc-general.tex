@@ -277,8 +277,10 @@ The command parameters and switches are:
 	It enables stochastic emission of photons in ray tracking,  
                     it only affects \texttt{PTC\_TRACK} and \texttt{PTC\_TRACKLINE}.
 	The emission is calculated during map tracking therefore 
-	\texttt{PTC\_TWISS} or \texttt{PTC\_NORMAL} needs to be invoked before 
-	launching the tracking. Every tracked ray will receive the same stochastic kicks.
+	\texttt{PTC\_TWISS} or \texttt{PTC\_NORMAL} 
+	needs to be invoked before launching the tracking 
+	(also with \ttitem{RADIATION}, \ttitem{ENVELOPE} and \ttitem{STOCHASTIC} set to true). 
+	Every tracked ray will receive the same stochastic kicks.
 
 	\ttitem{MODULATION} (Default: false)\\    
 	Sets the modulation switch/internal state of PTC. 

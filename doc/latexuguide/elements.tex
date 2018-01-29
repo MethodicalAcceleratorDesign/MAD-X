@@ -1003,7 +1003,14 @@ performed.
 Contrary to the regular multipole, where the dipole
 component has an effect on the reference orbit, an RF-Multipole that
 includes a dipole component does not bend the reference orbit.      
- 
+
+In PTC there must be at least one cavity with non-zero voltage,
+otherwise all RF elements, including RF multipoles, are disabled.
+Concerning RF behaviour of cavities in PTC
+please refer to \hyperref[sec:ptc-setswitch]{\texttt{PTC\_SETSWITCH}} command,
+in particular to \texttt{TIME} and \texttt{TOTALPATH} switches.
+
+
 \begin{madlist}
    \ttitem{VOLT} The peak voltage of the RF accelerating mode (DEFAULT: 0 MV).
    \ttitem{LAG} The phase lag [$2\pi$] (DEFAULT: 0) 
