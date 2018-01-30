@@ -135,7 +135,73 @@ MODULE S_DEF_ELEMENT
 
 
 CONTAINS
+  
+  SUBROUTINE decode_element(EL)
+    IMPLICIT NONE
+    TYPE(ELEMENT),INTENT(INOUT):: EL
 
+    SELECT CASE(EL%KIND)
+    CASE(KIND0)
+       print*,"this is KIND0"
+    case(KIND1)
+       print*,"this is KIND1"
+    case(KIND2)
+       print*,"this is KIND2"
+    case(KIND3)
+       print*,"this is KIND3"
+    case(KIND4)
+       print*,"this is KIND4"
+    case(KIND5)
+       print*,"this is KIND5"
+    case(KIND6)
+       print*,"this is KIND6"
+    case(KIND7)
+       print*,"this is KIND7"
+    case(KIND8)
+       print*,"this is KIND8"
+    case(KIND9)
+       print*,"this is KIND9"
+    case(KIND10)
+       print*,"this is KIND11"
+    CASE(KIND11)
+       print*,"this is KIND12"
+    CASE(KIND12)
+       print*,"this is KIND13"
+    CASE(KIND13)
+       print*,"this is KIND14"
+    CASE(KIND14)
+       print*,"this is KIND11"
+    CASE(KIND15)
+       print*,"this is KIND15"
+    CASE(KIND16)
+       print*,"this is KIND16"
+    CASE(KIND18)
+       print*,"this is KIND18"
+    CASE(KIND19)
+       print*,"this is KIND19"
+    CASE(KIND20)
+       print*,"this is KIND20"
+    CASE(KIND21)
+       print*,"this is KIND21"
+    CASE(KIND22)
+       print*,"this is KIND22"
+    case(KINDWIGGLER)
+       print*,"this is KINDWIGGLER"
+    case(KINDPA)
+       print*,"this is KINDPA"
+    case(kindsuperdrift)
+       print*,"this is KINDSUPERDRIFT"
+    case(KINDABELL)
+       print*,"this is KINDABELL"
+
+    case default
+ 
+       write(6,'(1x,i4,a21)') el%kind," not supported decode_element"
+       ! call !write_e(0)
+    END SELECT
+     
+    
+  end SUBROUTINE decode_element
 
   SUBROUTINE TRACKR(EL,X,K,MID)
     IMPLICIT NONE
