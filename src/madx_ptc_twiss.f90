@@ -1043,8 +1043,8 @@ contains
          write(6,'(a, f15.6, a)') "Ref Momentum ",current%mag%p%p0c," GeV/c"
          !          if (associated(current%mag%BN)) write(6,*) "k1=", current%mag%BN(2)
       endif
-      
-      
+
+
       ! Can not do this trick because beam beam can be defined within those elements
       ! so even stupid markers will occur at least twice in the twiss table
       ! skowron 2012.07.03
