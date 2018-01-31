@@ -1,4 +1,7 @@
+!example of 6D calculation on ALS (synchrotron light source)
+option, -echo;
 call, file="../share/ALS/als.seqx";
+option, echo;
 
 beam, particle = electron, energy = sqrt(1.5*1.5+emass*emass);  use, period=ALS;
 

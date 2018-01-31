@@ -547,23 +547,27 @@ end subroutine zero_E_GENERAL_s
     real(dp),INTENT(INOUT):: X(6)
     real(dp) XN(6),PZ,PT
     real(dp),INTENT(IN):: A,b
+    real(dp) sina, cosa, tana
     LOGICAL(lp),INTENT(IN):: EXACT,ctime
 
     IF(EXACT) THEN
+       COSA = COS(A)
+       SINA = SIN(A)
+       TANA = TAN(A)
        if(ctime) then
           PZ=ROOT(1.0_dp+2.0_dp*x(5)/b+X(5)**2-X(2)**2-X(4)**2)
-          PT=1.0_dp-X(2)*TAN(A)/PZ
-          XN(1)=X(1)/COS(A)/PT
-          XN(2)=X(2)*COS(A)+SIN(A)*PZ
-          XN(3)=X(3)+X(4)*X(1)*TAN(A)/PZ/PT
-          XN(6)=X(6)+X(1)*TAN(A)/PZ/PT*(1.0_dp/b+x(5))
+          PT=1.0_dp-X(2)*TANA/PZ
+          XN(1)=X(1)/COSA/PT
+          XN(2)=X(2)*COSA+SINA*PZ
+          XN(3)=X(3)+X(4)*X(1)*TANA/PZ/PT
+          XN(6)=X(6)+X(1)*TANA/PZ/PT*(1.0_dp/b+x(5))
        else
           PZ=ROOT((1.0_dp+X(5))**2-X(2)**2-X(4)**2)
-          PT=1.0_dp-X(2)*TAN(A)/PZ
-          XN(1)=X(1)/COS(A)/PT
-          XN(2)=X(2)*COS(A)+SIN(A)*PZ
-          XN(3)=X(3)+X(4)*X(1)*TAN(A)/PZ/PT
-          XN(6)=X(6)+(1.0_dp+X(5))*X(1)*TAN(A)/PZ/PT
+          PT=1.0_dp-X(2)*TANA/PZ
+          XN(1)=X(1)/COSA/PT
+          XN(2)=X(2)*COSA+SINA*PZ
+          XN(3)=X(3)+X(4)*X(1)*TANA/PZ/PT
+          XN(6)=X(6)+(1.0_dp+X(5))*X(1)*TANA/PZ/PT
        endif
        X(1)=XN(1)
        X(2)=XN(2)

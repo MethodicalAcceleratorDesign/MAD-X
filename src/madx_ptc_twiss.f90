@@ -566,7 +566,6 @@ contains
     logical(lp)             :: doTMtrack ! true if rmatrix==true .and. isRing==true . do not track theTransferMap and save time
                                            !      .or. already tracked form closed solution search
     logical(lp)             :: usertableActive = .false.  ! flag to mark that there was something requested with ptc_select 
-    
     integer                 :: countSkipped
     character(48)           :: summary_table_name
     character(12)           :: tmfile='transfer.map'
@@ -1035,7 +1034,7 @@ contains
 
     do i=1,MY_RING%n
 
-      if (getdebug() > 1) then
+      if (getdebug() > 2) then
          write(6,*) ""
          write(6,*) "##########################################"
          write(6,'(i4, 1x,a, f10.6)') i,current%mag%name, suml
