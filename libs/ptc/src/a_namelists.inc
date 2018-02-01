@@ -42,7 +42,7 @@ namelist / MAGLname / MAGL0
 	real(dp) bn(nmul_max)  
     real(dp) VOLT_FREQ_PHAS(3)   ! alg not used 
 	LOGICAL(LP) THIN 
-    real(dp) fint_hgap_h1_h2_va_vs(6)
+    real(dp) fint_hgap_h1_h2_va_vs(8)
 	logical(lp) recut_even_electric_MIS(4) 
 	integer(2) slow_ac 
      logical(lp) usebf_do1bf(4)
