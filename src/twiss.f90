@@ -4178,6 +4178,11 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
 
   nd = 2 * max(nn, ns, n_ferr/2-1)
 
+  !---- Angle
+  angle = node_value('angle ')
+  if (angle .eq. 0) angle = normal(0)
+  f_errors(0) = f_errors(0) + angle - normal(0)
+
   !---- Dipole error.
   dbr = f_errors(0) / (one + deltap)
   dbi = f_errors(1) / (one + deltap)
@@ -5696,7 +5701,7 @@ SUBROUTINE tmtrans(ftrk,orbit)
  orbit(6) = orbit(6) + pt
 
  print *, "output", orbit(1)
-  
+
   !---- Track orbit.
   !if (ftrk) call tmtrak(ek,re,te,orbit,orbit)
 
@@ -7289,9 +7294,9 @@ SUBROUTINE twwmap(pos, orbit)
   double precision :: sum1, sum2, ek(6)
   double precision, external :: get_value
   logical :: accmap, sectorpure
-  
+
   sectorpure = get_value('twiss ','sectorpure ') .ne. zero
- 
+
   do i = 1, 6
      sum2 = orbit(i)
      do k = 1, 6
