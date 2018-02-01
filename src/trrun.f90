@@ -952,7 +952,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   !---- Angle
   angle = node_value('angle ')
   if (angle .eq. 0) angle = normal(0)
-  f_errors(0) = f_errors(0) + angle - normal(0)
+  f_errors(0) = f_errors(0) + normal(0) - angle
 
   !----
   if (noise .eq. 1)   then

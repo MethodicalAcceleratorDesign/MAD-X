@@ -3492,7 +3492,7 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
   double precision :: f_errors(0:maxferr)
   double precision :: rw(6,6), tw(6,6,6), ek0(6)
   double precision :: x, y
-  double precision :: an, sk1, sk2, sks, tilt, e1, e2, h, h1, h2, hgap, fint, fintx, rhoinv, blen, bvk
+  double precision :: an, k0, sk1, sk2, sks, tilt, e1, e2, h, h1, h2, hgap, fint, fintx, rhoinv, blen, bvk
   double precision :: dh, corr, ct, st, hx, hy, rfac, pt
 
   integer, external :: el_par_vector, node_fd_errors
@@ -3519,6 +3519,8 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      tilt = g_elpar(b_tilt)
      e1 = g_elpar(b_e1)
      e2 = g_elpar(b_e2)
+     k0 = bvk * node_value('k0 ')
+     if (k0 .eq. 0) k0 = an/el
 
      if (code .eq. code_rbend) then
         e1 = e1 + an / two
@@ -3545,6 +3547,8 @@ SUBROUTINE tmbend(ftrk,fcentre,orbit,fmap,el,dl,ek,re,te)
      !---- Apply field errors and change coefficients using DELTAP.
      F_ERRORS = zero
      n_ferr = node_fd_errors(f_errors)
+     f_errors(0) = f_errors(0) + bvk*(k0*el - an)
+
      dh = (- h * deltap + bvk * f_errors(0) / el) / (one + deltap) ! dipole term
      sk1 = bvk * (sk1 + f_errors(2) / el) / (one + deltap) ! quad term
      sk2 = bvk * (sk2 + f_errors(4) / el) / (one + deltap) ! sext term
@@ -4178,10 +4182,10 @@ SUBROUTINE tmmult(fsec,ftrk,orbit,fmap,re,te)
 
   nd = 2 * max(nn, ns, n_ferr/2-1)
 
-  !---- Angle
+  !---- Angle (bvk applied later)
   angle = node_value('angle ')
   if (angle .eq. 0) angle = normal(0)
-  f_errors(0) = f_errors(0) + angle - normal(0)
+  f_errors(0) = f_errors(0) + normal(0) - angle
 
   !---- Dipole error.
   dbr = f_errors(0) / (one + deltap)
