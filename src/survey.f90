@@ -255,12 +255,12 @@ subroutine suelem(el, ve, we, tilt)
         ! Must stay compatible with SBEND (makethin!), i.e. ignore ks0l
         ! LD 2017.11.20, attempt to add angle attribute precedence,
         ! require more work on twiss, track, emit and makethin...
-!       angle = node_value('angle ')
-!       if (angle .eq. 1d20) then
+        angle = node_value('angle ')
+        if (angle .eq. 0) then
           normal(0) = 0
           call get_node_vector('knl ', nn, normal)
           angle = normal(0)
-!       endif
+        endif
 
         angle = angle * bv
         cospsi = cos(tilt);  sinpsi = sin(tilt)
@@ -298,12 +298,12 @@ subroutine suelem(el, ve, we, tilt)
         we(3,2) =  sin(dy)
         we(1,3) = -sin(dy)
         we(3,3) =  cos(dy)
-     case(code_translation) !  Translation of the reference system.  
+     case(code_translation) !  Translation of the reference system.
         x_t = node_value('x ')
         y_t = node_value('y ')
         ve(1) = -x_t
         ve(2) = -y_t
-        
+
 
      case default
        ! all straight elements and catch all; use default VE and WE
