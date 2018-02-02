@@ -20,3 +20,7 @@ endif()
 
 
 add_library(ptc STATIC ${src_files})
+
+if (NOT BUILD_SHARED_LIBS)
+    install(TARGETS ptc ARCHIVE DESTINATION lib)
+endif ()
