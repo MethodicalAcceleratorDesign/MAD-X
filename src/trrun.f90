@@ -917,7 +917,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   double precision :: f_errors(0:maxferr)
   double precision :: field(2,0:maxmul)
   !double precision :: vals(2,0:maxmul)
-  double precision :: normal(0:maxmul), skew(0:maxmul), angle
+  double precision :: normal(0:maxmul), skew(0:maxmul), an
   double precision, save :: ordinv(maxmul), const
   double precision :: bvk, node_value, ttt
   double precision :: npeak(100), nlag(100), ntune(100), temp, noise
@@ -949,10 +949,9 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
 
   nd = 2 * max(nn, ns, n_ferr/2-1)
 
-  !---- Angle
-  angle = node_value('angle ')
-  if (angle .eq. 0) angle = normal(0)
-  f_errors(0) = f_errors(0) + normal(0) - angle
+  !---- Angle (no bvk in track)
+  an = node_value('angle ')
+  if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
 
   !----
   if (noise .eq. 1)   then

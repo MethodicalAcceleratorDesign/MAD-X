@@ -254,7 +254,6 @@ subroutine suelem(el, ve, we, tilt)
      case (code_multipole) !---- MULTIPOLE (thin, no length)
         ! Must stay compatible with SBEND (makethin!), i.e. ignore ks0l
         ! LD 2017.11.20, attempt to add angle attribute precedence,
-        ! require more work on twiss, track, emit and makethin...
         angle = node_value('angle ')
         if (angle .eq. 0) then
           normal(0) = 0
