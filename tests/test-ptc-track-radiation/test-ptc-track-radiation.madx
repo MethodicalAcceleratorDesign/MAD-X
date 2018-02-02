@@ -1,0 +1,28 @@
+!MADX-PTC test case for radiation 
+!ALS
+!Piotr Skowronski 2017
+
+call, file="../share/ALS/als.seqx";
+beam, particle = electron, energy = sqrt(2.5*2.5+emass*emass);  
+use, period=ALS;
+
+rfvolt=2;
+
+
+ptc_create_universe;
+  ptc_create_layout, model=1, method=2, nst=5, exact=false, closed_layout=false;
+
+
+  ptc_start, x=1e-3,   px=0, y=1e-3, py=0, pt=2e-3, t=-0.1;
+
+
+  ptc_setswitch, debuglevel=1, maxacceleration=false, exact_mis=true, 
+                 time=true, totalpath=false, fringe=true, modulation=false,
+                 radiation=false, stochastic=false;
+
+  ptc_track, icase=6, element_by_element,  dump, maxaper={1e6,1e6,1e6,1e6,1e6,1e6}, turns=3e4, ffile=1, 
+             radiation=true;
+
+  ptc_track_end;
+
+ptc_end;

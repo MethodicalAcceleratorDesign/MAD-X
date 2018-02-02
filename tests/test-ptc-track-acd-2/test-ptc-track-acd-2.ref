@@ -1,0 +1,81 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2018.01.26 14:54:16      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+!Example file showing the usage of PTC_TRACK command 
+
+!that sets the internal state (i.e switches) of PTC
+
+!
+
+!Piotr Skowronski (CERN)
+
+!
+
+! examples/ptc_madx_interface/intstate/intstate.ptc.madx
+
+!
+
+option,-echo;
+
+ MAD-X Beam Parameters
+                  Energy : 0.500000E+01
+          Kinetic Energy : 0.499949E+01
+      Particle Rest Mass : 0.510999E-03
+                Momentum : 0.500000E+01
+ Setting MADx with 
+     energy           5.0000000000000000     
+     method                   2
+     Num. of steps            5
+     charge          -1.0000000000000000     
+  Length of machine:    5.0000000000000000     
+ The machine is a LINE
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:    0.0000000000000000        0.0000000000000000        5.0000000000000000     
+ Setting debug level to           1
+maxaccel is found and its value is 0.000000
+exact_mis is found and its value is 1.000000
+radiation is not present (keeping current value)
+modulation is found and its value is 1.000000
+stochastic is not present (keeping current value)
+envelope is not present (keeping current value)
+fringe is found and its value is 1.000000
+totalpath is found and its value is 0.000000
+time is found and its value is 1.000000
+nocavity is not present (keeping current value)
+seed is not present (keeping current value)
+obs_points pro_ptc_setswitch Done
+ ************ State Summary ****************
+ MADTHICK=>KIND =   32  DRIFT-KICK-DRIFT       
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     2
+  Default integration steps      5
+ This is an electron (positron actually if charge=1) 
+       EXACT_MODEL =  FALSE
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  FALSE
+       TIME        =  TRUE 
+       FRINGE      =  TRUE 
+       PARA_IN     =  FALSE
+       ONLY_2D     =  FALSE
+       ONLY_4D     =  FALSE
+       DELTA       =  FALSE
+       SPIN        =  FALSE
+       MODULATION  =  TRUE 
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

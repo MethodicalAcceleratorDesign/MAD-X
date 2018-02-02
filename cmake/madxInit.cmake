@@ -9,11 +9,14 @@
 
 if ( MADX_FORCE_32 OR ${CMAKE_SIZEOF_VOID_P} EQUAL 4 )
     set(IS32BIT TRUE)
+    set(ARCH 32)
 elseif (${CMAKE_SIZEOF_VOID_P} EQUAL 8)
     set(IS32BIT FALSE)
+    set(ARCH 64)
 else()
     message(WARNING "Could not determine 32/64bit, assuming 32bit")
     set(IS32BIT TRUE)
+    set(ARCH 32)
 endif()
 
 # project version

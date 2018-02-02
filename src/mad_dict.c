@@ -621,6 +621,7 @@ const char *const_command_def =
 "rmatrix  = [l, false, true], "
 "ring_parameters  = [l, false, true], "   /* forces ring parametersd (skowron on 140120)*/
 "normal  = [l, false, true], "   /* runs normal form analysis (skowron on 150903)*/
+"trackrdts  = [l, false, true], "   /* track RDTs (GnFu) (skowron on 180124)*/
 "initial_matrix_table = [l, false, true], " /* reads table map_table cooked by ptc_normal */
 "initial_matrix_manual = [l, false, true], "
 "initial_map_manual = [l, false, true], "
@@ -710,6 +711,7 @@ const char *const_command_def =
 " "
 "ptc_setswitch: ptc_setswitch none 0 0 "
 "debuglevel = [i,1], "/*sets the level of debugging printout 0 none, 4 everything */
+"seed     = [i, 123456789], "
 "maxacceleration = [l, true, true], " /*switch saying to set cavities phases so the reference orbit is always on the crest, i.e. gains max energy*/
 "exact_mis = [l, false, true], " /* switch to ensure exact misaligment treatment */
 "totalpath = [l, false, true], "      /* switch to use totalpath, modifies PTC states by adding totalpath0 flag */

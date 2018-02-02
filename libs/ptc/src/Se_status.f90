@@ -1404,27 +1404,29 @@ CONTAINS
 
   END FUNCTION PARA_REMA
 
-  subroutine init_all(STATE,NO1,NP1,pack,ND2,NPARA)
+  subroutine init_all(STATE,NO1,NP1,pack,ND2,NPARA,number_of_clocks)
     !  subroutine S_init(STATE,NO1,NP1,PACKAGE,MAPINT,ND2,NPARA)
     implicit none
     TYPE (INTERNAL_STATE), INTENT(IN):: STATE
     LOGICAL(lp), optional, INTENT(IN):: pack
     INTEGER, INTENT(IN):: NO1,NP1
-    INTEGER,optional :: ND2,NPARA
+    INTEGER,optional :: ND2,NPARA,number_of_clocks
+
     use_complex_in_ptc=my_true
-    call S_init(STATE,NO1,NP1,pack,ND2,NPARA)
+    call S_init(STATE,NO1,NP1,pack,ND2,NPARA,number_of_clocks)
    end subroutine init_all
 
-  subroutine S_init(STATE,NO1,NP1,pack,ND2,NPARA)
+  subroutine S_init(STATE,NO1,NP1,pack,ND2,NPARA,number_of_clocks)
     !  subroutine S_init(STATE,NO1,NP1,PACKAGE,MAPINT,ND2,NPARA)
     implicit none
     TYPE (INTERNAL_STATE), INTENT(IN):: STATE
     LOGICAL(lp), optional, INTENT(IN):: pack
     INTEGER, INTENT(IN):: NO1,NP1
     INTEGER ND1,NDEL,NDPT1
-    INTEGER,optional :: ND2,NPARA
+    INTEGER,optional :: ND2,NPARA,number_of_clocks
     INTEGER  ND2l,NPARAl,n_acc,no1c
     LOGICAL(lp) package
+    n_rf=0
 !    call dd_p !valishev
     doing_ac_modulation_in_ptc=.false.
     package=my_true
@@ -1466,11 +1468,13 @@ CONTAINS
        NDPT1=0
        !       MAPINT=6
     ENDIF
-
+ n_acc=0
     IF(STATE%modulation)  then
        doing_ac_modulation_in_ptc=.true.
-       ND1=ND1+1
-       n_acc=1
+      n_acc=1
+     !  ND1=ND1+1
+     if(present(number_of_clocks)) n_acc=number_of_clocks 
+        !1
     endif
 
    ! IF(STATE%spin.or.STATE%modulation.or.STATE%radiation.or.STATE%envelope)  then
@@ -1478,9 +1482,9 @@ CONTAINS
    ! endif
     !    write(6,*) NO1,ND1,NP1,NDEL,NDPT1
     !pause 678
-    CALL INIT(NO1,ND1,NP1+NDEL,NDPT1,PACKAGE)
+    CALL INIT(NO1,ND1,NP1+NDEL+2*n_acc,NDPT1,PACKAGE)
 
-    ND2l=ND1*2
+    ND2l=ND1*2+2*n_acc
     NPARAl=ND2l+NDEL
     C_%NPARA=NPARAl
     C_%ND2=ND2l
@@ -1492,7 +1496,9 @@ CONTAINS
     if(present(npara)) npara=nparal
 ! etienne
 no1c=no1+complex_extra_order
+ND1=ND1+n_acc
     if(use_complex_in_ptc) call c_init(NO1c,nd1,np1+ndel,ndpt1,n_acc,ptc=my_false)  ! PTC false because we will not use the real FPP for acc modulation
+    n_rf=n_acc
 !call c_init(c_%NO,c_%nd,c_%np,c_%ndpt,number_of_ac_plane,ptc=my_true)  
 !  subroutine c_init(NO1,NV1,np1,ndpt1,AC_rf,ptc)  !,spin
 !    implicit none

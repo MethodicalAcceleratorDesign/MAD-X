@@ -108,27 +108,23 @@ CONTAINS
     TYPE(ELEMENT),POINTER :: EL
     TYPE(ELEMENTP),POINTER :: ELp
     REAL(DP) v,dv
+    integer(2) n
 
     EL=>C%PARENT_FIBRE%MAG
     ELP=>C%PARENT_FIBRE%MAGP
 
-    if( K%MODULATION .and. ASSOCIATED(EL%slow_ac2) .and. EL%slow_ac2 ) THEN
-    
-       V=zero
-       DV=el%D_ac*XS%AC%X(2)
-       !print*, "Skowron: ",EL%name," ", EL%KIND ," slow_ac ",EL%slow_ac, " ", EL%slow_ac2
-       !print*, "Skowron: Fast Modulation V=",V," DV=",DV, " ", XS%AC%X
-    elseif(K%MODULATION .and. EL%slow_ac) THEN
-    
-       DV=(XS%AC%X(1)*COS(EL%theta_ac)-XS%AC%X(2)*SIN(EL%theta_ac))
-       V=EL%DC_ac+EL%A_ac*DV
-       DV=el%D_ac*DV
-       !V   defines amplitude of the original field modulation 
-       !DV  defines amplitude of the spacial field modulation 
-       !  print*, "Skowron: ",EL%name," ", EL%KIND ," slow_ac ",EL%slow_ac, " ", EL%slow_ac2
-       !  print*, "Skowron: Modulation el%theta_ac=",EL%theta_ac," XS%AC%X=",XS%AC%X
-       !  print*, "Skowron: Modulation V=",V," DV=",DV
+    IF(K%MODULATION) THEN
+      n=el%slow_ac
+      
+      if (modulationtype == 1) then
+         V=zero
+         DV=el%D_ac*XS%AC(n)%X(2)
+      else 
 
+         DV=(XS%AC(n)%X(1)*COS(EL%theta_ac)-XS%AC(n)%X(2)*SIN(EL%theta_ac))
+         V=EL%DC_ac+EL%A_ac*DV
+         DV=el%D_ac*DV
+      endif   
      else
        V=0.0_dp
        DV=0.0_dp
@@ -317,6 +313,7 @@ CONTAINS
     TYPE(ELEMENT),POINTER :: EL
     TYPE(ELEMENTP),POINTER :: ELP
     TYPE(REAL_8) V,DV
+    integer(2) n
 
     EL=>C%PARENT_FIBRE%MAG
     ELP=>C%PARENT_FIBRE%MAGP
@@ -325,14 +322,20 @@ CONTAINS
     CALL ALLOC(DV)
 
     IF(K%MODULATION) THEN
-       DV=(XS%AC%X(1)*COS(ELP%theta_ac)-XS%AC%X(2)*SIN(ELP%theta_ac))
-       V=ELP%DC_ac+ELP%A_ac*DV
-       DV=elp%D_ac*DV
-
-       else  ! ramp
-          V=0.0_dp
-          DV=0.0_dp
-       endif
+      n=el%slow_ac
+      if (modulationtype == 1) then
+        V=zero
+        DV=el%D_ac*XS%AC(n)%X(2)
+      else
+        DV=(XS%AC(n)%X(1)*COS(ELP%theta_ac)-XS%AC(n)%X(2)*SIN(ELP%theta_ac))
+        V=ELP%DC_ac+ELP%A_ac*DV
+        DV=elp%D_ac*DV
+      endif
+      
+    else  ! ramp
+      V=0.0_dp
+      DV=0.0_dp
+    endif
  
     CALL transfer_ANBN(EL,ELP,VP=V,DVP=DV)
 
@@ -350,20 +353,22 @@ CONTAINS
     TYPE(INTERNAL_STATE) K
     real(dp) xt
     real(dp),pointer :: beta0
-
-    if(k%time) then
-       beta0=>C%PARENT_FIBRE%beta0
-       xs%ac%t=c%DS_AC/beta0+xs%ac%t
-       xt = cos(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(1) + sin(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(2)
-       XS%AC%X(2) = -sin(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(1) + cos(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(2)
-       XS%AC%X(1) = xt
-    else
-       xt = cos(XS%AC%om * c%DS_AC) *XS%AC%X(1) + sin(XS%AC%om * c%DS_AC) *XS%AC%X(2)
-       XS%AC%X(2) = -sin(XS%AC%om * c%DS_AC) *XS%AC%X(1) + cos(XS%AC%om * c%DS_AC) *XS%AC%X(2)
-       XS%AC%X(1) = xt
-       xs%ac%t=c%DS_AC+xs%ac%t
-    endif
-
+    integer(2) n
+    if(xs%nac==0) return
+    do n=1,xs%nac
+      if(k%time) then
+         beta0=>C%PARENT_FIBRE%beta0
+         xs%ac%t=c%DS_AC/beta0+xs%ac(n)%t
+         xt = cos(XS%AC(n)%om * c%DS_AC/beta0) *XS%AC(n)%X(1) + sin(XS%AC(n)%om * c%DS_AC/beta0) *XS%AC(n)%X(2)
+         XS%AC(n)%X(2) = -sin(XS%AC(n)%om * c%DS_AC/beta0) *XS%AC(n)%X(1) + cos(XS%AC(n)%om * c%DS_AC/beta0) *XS%AC(n)%X(2)
+         XS%AC(n)%X(1) = xt
+      else
+         xt = cos(XS%AC(n)%om * c%DS_AC) *XS%AC(n)%X(1) + sin(XS%AC(n)%om * c%DS_AC) *XS%AC(n)%X(2)
+         XS%AC(n)%X(2) = -sin(XS%AC(n)%om * c%DS_AC) *XS%AC(n)%X(1) + cos(XS%AC(n)%om * c%DS_AC) *XS%AC(n)%X(2)
+         XS%AC(n)%X(1) = xt
+         xs%ac(n)%t=c%DS_AC+xs%ac(n)%t
+      endif
+    enddo
   END   SUBROUTINE TRACK_MODULATION_R
 
   SUBROUTINE TRACK_MODULATION_P(C,XS,K)
@@ -373,22 +378,23 @@ CONTAINS
     TYPE(INTERNAL_STATE) K
     TYPE(REAL_8) xt
     real(dp),pointer :: beta0
-
+    integer(2) n
+    if(xs%nac==0) return
     CALL ALLOC(XT)
-
-    if(k%time) then
-       beta0=>C%PARENT_FIBRE%beta0
-       xs%ac%t=c%DS_AC/beta0+xs%ac%t
-       xt = cos(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(1) + sin(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(2)
-       XS%AC%X(2) = -sin(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(1) + cos(XS%AC%om * c%DS_AC/beta0) *XS%AC%X(2)
-       XS%AC%X(1) = xt
-    else
-       xt = cos(XS%AC%om * c%DS_AC) *XS%AC%X(1) + sin(XS%AC%om * c%DS_AC) *XS%AC%X(2)
-       XS%AC%X(2) = -sin(XS%AC%om * c%DS_AC) *XS%AC%X(1) + cos(XS%AC%om * c%DS_AC) *XS%AC%X(2)
-       XS%AC%X(1) = xt
-       xs%ac%t=c%DS_AC+xs%ac%t
-    endif
-
+    do n=1,xs%nac
+        if(k%time) then
+           beta0=>C%PARENT_FIBRE%beta0
+           xs%ac(n)%t=c%DS_AC/beta0+xs%ac(n)%t
+           xt = cos(XS%AC(n)%om * c%DS_AC/beta0) *XS%AC(n)%X(1) + sin(XS%AC(n)%om * c%DS_AC/beta0) *XS%AC(n)%X(2)
+           XS%AC(n)%X(2) = -sin(XS%AC(n)%om * c%DS_AC/beta0) *XS%AC(n)%X(1) + cos(XS%AC(n)%om * c%DS_AC/beta0) *XS%AC(n)%X(2)
+           XS%AC(n)%X(1) = xt
+        else
+           xt = cos(XS%AC(n)%om * c%DS_AC) *XS%AC(n)%X(1) + sin(XS%AC(n)%om * c%DS_AC) *XS%AC(n)%X(2)
+           XS%AC(n)%X(2) = -sin(XS%AC(n)%om * c%DS_AC) *XS%AC(n)%X(1) + cos(XS%AC(n)%om * c%DS_AC) *XS%AC(n)%X(2)
+           XS%AC(n)%X(1) = xt
+           xs%ac(n)%t=c%DS_AC+xs%ac(n)%t
+        endif
+    enddo
     CALL KILL(XT)
 
   END   SUBROUTINE TRACK_MODULATION_P
@@ -827,12 +833,12 @@ ENDIF
        PATCHT=0 ; PATCHE=0 ;PATCHG=0;
     ENDIF
 
- 
-
     IF(C%MAGP%MIS) THEN
        ou = ALWAYS_EXACTMIS   !K%EXACTMIS.or.
        CALL MIS_FIB(C,X,k,OU,DONEITF)
     ENDIF
+
+    
     ! The magnet frame of reference is located here implicitely before misalignments
     CALL DTILTD(C%MAGP%P%TILTD,2,X)
 
@@ -852,6 +858,7 @@ ENDIF
     ! The CHART frame of reference is located here implicitely
     b1=C%BETA0
     IF(PATCHE/=0.AND.PATCHE/=1.AND.PATCHE/=4) THEN
+
        NULLIFY(P0);NULLIFY(B0);
        CN=>C%NEXT
 !       IF(.NOT.ASSOCIATED(CN)) CN=>C
@@ -885,6 +892,7 @@ ENDIF
                X(5)=(1.0_dp+X(5))*C%MAG%P%P0C/P0-1.0_dp   ! 8/31/2016
              ENDIF               
     ENDIF
+    
 endif
  
 
@@ -1212,7 +1220,7 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     IF(.NOT.CHECK_STABLE) return
     !       CALL RESET_APERTURE_FLAG
     !    endif
-
+    
     if(abs(x(1))+abs(x(3))>absolute_aperture.or.abs(x(6))>t_aperture) then
        messageLOST="exceed absolute_aperture in TRACKP_NODE_SINGLE"
        lost_node=>t
@@ -1236,20 +1244,25 @@ TA=T%PARENT_FIBRE%MAG%p%dir*T%PARENT_FIBRE%MAG%p%aperture%pos==1.OR.T%PARENT_FIB
     SELECT CASE(T%CAS)
     CASE(CASEP1)
        CALL TRACK_FIBRE_FRONT(T%PARENT_FIBRE,X,K)
-     if(associated(T%PARENT_FIBRE%MAGP%p%aperture)) then
-TA=T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==-1.OR.T%PARENT_FIBRE%MAGP%p%dir  &
-*T%PARENT_FIBRE%MAGP%p%aperture%pos==0
+       if(associated(T%PARENT_FIBRE%MAGP%p%aperture)) then
+          TA=T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==-1 .OR.  &
+             T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==0
           if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAGP%p%aperture,X)
-     endif
-        global_e= x(5)*el%p%p0c
+       endif
+          global_e= x(5)*el%p%p0c
     CASE(CASEP2)
-     if(associated(T%PARENT_FIBRE%MAGP%p%aperture)) then
-TA=T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==1.OR.T%PARENT_FIBRE%MAGP%p%dir  &
-*T%PARENT_FIBRE%MAGP%p%aperture%pos==0
+    
+  
+       if(associated(T%PARENT_FIBRE%MAGP%p%aperture)) then
+          TA=T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==1 .OR.  &
+                 T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==0
           if(TA) call CHECK_APERTURE(T%PARENT_FIBRE%MAGP%p%aperture,X)
-     endif
+       endif
+
        CALL TRACK_FIBRE_BACK(T%PARENT_FIBRE,X,K)
-        global_e= x(5)*el%p%p0c
+       global_e= x(5)*el%p%p0c
+
+  
     CASE(CASE1,CASE2)
 !       el=>T%PARENT_FIBRE%MAGP
        if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE.and.t%cas==case2) &
@@ -1318,6 +1331,7 @@ TA=T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==1.OR.T%PARENT_F
        END SELECT
         global_e= x(5)*el%p%p0c
     CASE(CASE0)
+
  !      el=>T%PARENT_FIBRE%MAGP
        if(s_aperture_CHECK.and.associated(el%p%A).AND.CHECK_MADX_APERTURE) &
             call check_S_APERTURE(el%p,t%POS_IN_FIBRE-2,x)
@@ -1431,6 +1445,7 @@ TA=T%PARENT_FIBRE%MAGP%p%dir*T%PARENT_FIBRE%MAGP%p%aperture%pos==1.OR.T%PARENT_F
             call CHECK_APERTURE(T%PARENT_FIBRE%MAGP%p%aperture,X)
 
     case(CASET)
+
        if(associated(t%bb).and.dobb.and.do_beam_beam) then
 
           if(t%bb%patch) call PATCH_BB(t%bb,X,k,EL%p%BETA0,ALWAYS_EXACT_PATCHING.or.EL%P%EXACT,my_true)

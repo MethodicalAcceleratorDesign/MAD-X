@@ -53,6 +53,7 @@ module definition
   integer, parameter :: wiggler_suntao=24
   real(dp) :: global_e =0
   integer :: bmadparser = 0
+  integer,parameter :: nacmax = 3
   logical :: tangent = .false.,force_rescale=.false.   ! force_rescale for vorname=HELICAL see fibre_work routine
   TYPE sub_taylor
      INTEGER j(lnv)
@@ -300,7 +301,8 @@ module definition
   !@3 ---------------------------------------------</br>
   type probe
      real(dp) x(6)
-     type(rf_phasor) AC
+     type(rf_phasor)  AC(nacmax)
+     integer:: nac=0
      type(spinor) s(3)
      logical u
      type(integration_node),pointer :: last_node=>null()
@@ -309,7 +311,8 @@ module definition
   !@3 ---------------------------------------------</br>
   type probe_8
      type(real_8) x(6)     ! Polymorphic orbital ray
-     type(rf_phasor_8) AC  ! Modulation of magnet
+     type(rf_phasor_8)  ac(nacmax)  ! Modulation of magnet
+     integer:: nac=0 !  number of modulated clocks <=nacmax
      real(dp) E_ij(6,6)   !  Envelope for stochastic radiation
      type(spinor_8) s(3)   ! Polymorphic spin s(1:3)
      !   stuff for exception
@@ -338,6 +341,7 @@ module definition
   TYPE C_taylor
      INTEGER I !@1  integer I is a pointer to the complexified Berz package
   END TYPE C_taylor
+  type(c_taylor),pointer :: dx_(:)=>null()
   !@3 ---------------------------------------------</br>
   type c_dascratch
      type(c_taylor), pointer :: t

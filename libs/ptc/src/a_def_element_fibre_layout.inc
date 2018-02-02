@@ -182,14 +182,15 @@ TYPE ELEMENT
    real(dp), POINTER ::  L  => null()                              ! Length of integration often same as LD
    !
    real(dp),   DIMENSION(:), POINTER:: AN => null(),BN => null()         !Multipole component
-   real(dp),   POINTER:: FINT => null(),HGAP => null()         !FRINGE FUDGE FOR MAD
+   real(dp), DIMENSION(:),   POINTER:: FINT => null(),HGAP => null()         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1 => null(),H2 => null()         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: VA => null(),VS => null()         ! use in quad fringe from sad
    !
    real(dp), POINTER :: VOLT => null(), FREQ => null(),PHAS => null(),DELTA_E => null(),LAG => null()       ! Cavity information
    real(dp), POINTER :: DC_ac => null(),A_ac => null(),theta_ac => null(),D_AC => null()      ! slow RF: amplitude and phase
    real(dp),   DIMENSION(:), POINTER:: D_AN => null(),D_BN => null(),D0_AN => null(),D0_BN => null()  !Multipole component
-   logical(lp), POINTER :: THIN => null(),slow_ac => null(),slow_ac2 => null()
+   logical(lp), POINTER :: THIN => null()
+   integer(2), pointer :: slow_ac => null()
    real(dp), POINTER ::  B_SOL  => null()
    !  misalignements and rotation
    logical(lp), POINTER ::  MIS => null()
@@ -247,7 +248,7 @@ TYPE ELEMENTP
    !
    TYPE(REAL_8), POINTER ::  L    => null() ! LENGTH OF INTEGRATION OFTEN SAME AS LD, CAN BE ZERO
    TYPE(REAL_8),  DIMENSION(:), POINTER :: AN => null(),BN   => null()       !MULTIPOLE COMPONENT
-   TYPE(REAL_8),   POINTER:: FINT => null(),HGAP  => null()        !FRINGE FUDGE FOR MAD
+   TYPE(REAL_8), DIMENSION(:),   POINTER:: FINT => null(),HGAP  => null()        !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1 => null(),H2 => null()         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),    POINTER:: VA => null(),VS => null()         !valishev-like multipole
    !
@@ -257,8 +258,8 @@ TYPE ELEMENTP
    TYPE(REAL_8),   DIMENSION(:), POINTER:: D_AN => null(),D_BN => null(),D0_AN => null(),D0_BN => null()         !Multipole component
    !
    TYPE(REAL_8), POINTER :: B_SOL => null()
-   logical(lp), POINTER :: THIN => null(),slow_ac => null(),slow_ac2 => null()
-
+   logical(lp), POINTER :: THIN => null() 
+   integer(2), pointer :: slow_ac => null()
    !  MISALIGNEMENTS AND ROTATION
    logical(lp), POINTER ::  MIS => null()
    !   real(dp),  DIMENSION(:), POINTER :: D,R
@@ -341,7 +342,8 @@ END TYPE FIBRE
 
 TYPE LAYOUT
    CHARACTER(120), POINTER ::  NAME  => null()! IDENTIFICATION
-   INTEGER, POINTER ::  INDEX,HARMONIC_NUMBER  => null()! IDENTIFICATION, CHARGE SIGN
+   INTEGER, POINTER ::  INDEX  => null()! IDENTIFICATION, CHARGE SIGN
+   REAL(DP),  POINTER :: HARMONIC_NUMBER  => null()!
    logical(lp),POINTER ::CLOSED  => null()
    INTEGER,  POINTER :: N   => null()   ! TOTAL ELEMENT IN THE CHAIN
    INTEGER,POINTER ::NTHIN  => null() ! NUMBER IF THIN LENSES IN COLLECTION  (FOR SPEED ESTIMATES)

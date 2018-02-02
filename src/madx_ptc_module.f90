@@ -38,23 +38,31 @@ MODULE madx_ptc_module
   real(dp) my_thin,my_xbend
 
   type mapbuffer
-     type(universal_taylor)  :: unimap(6)
-     real(dp)                :: s
-     character(nlp+1)        :: name
+     type(universal_taylor) :: unimap(6)
+     real(dp)               :: s
+     character(nlp+1)       :: name
   end type mapbuffer
 
   type(mapbuffer), pointer  :: maps(:) !buffered maps from the last twiss
   integer                   :: mapsorder = 0  !order of the buffered maps, if 0 maps no maps buffered
   integer                   :: mapsicase = 0
 
+
+  type fibreptr
+    type(fibre), pointer    :: p => null()
+  end type fibreptr
+  
+  
+  integer, private, parameter:: maxelperclock = 10 ! maximum 10 ac dipols with given clock
   type clockdef
      real(dp)                :: tune = -1 ! negative means inactive, in fact it is tune, left like this for backward compatibility, can be changed during LS2
      real(dp)                :: lag = 0
      integer                 :: rampupstart = 0,  rampupstop = 0, rampdownstart = 0,  rampdownstop = 0
-     type(fibre), pointer    :: element
+     integer                 :: nelements = 0
+     type(fibreptr)          :: elements(maxelperclock)
   end type clockdef
   
-  integer, private, parameter:: nmaxclocks = 1  !will be 3 soon
+  integer, private, parameter:: nmaxclocks = 2  
   type(clockdef),  dimension(nmaxclocks) :: clocks ! 3 pointers 
   integer                                :: nclocks = 0  
 
@@ -432,6 +440,8 @@ CONTAINS
        print *, ''
     endif
 
+    modulationtype = 1 ! simpler and faster modulation 
+    
     !  call Set_Up(MY_RING)
 
     if (getdebug() > 0) then
@@ -486,6 +496,7 @@ CONTAINS
     ! it is safe for MADX because default for all magnets is 1m
     ! so if user defines it otherwise it means it knows what he is doing
     absolute_aperture = 1e6_dp
+    t_aperture = 1e30;
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !!!  ELEMENTS LOOP    !!!
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -774,7 +785,10 @@ CONTAINS
           endif
        endif
     case(3) ! PTC accepts mults watch out sector_nmul defaulted to 4
+       
+       if (getdebug()>2) print*,"Translating SBEND"
        if(l.eq.zero) then
+          if (getdebug()>2) print*,"Length zero -> translating as MARKER"
           key%magnet="marker"
           goto 100
        endif
@@ -836,6 +850,18 @@ CONTAINS
              call augment_count('errors_dipole ')
           endif
        endif
+       
+       if (getdebug()>2) then 
+         print*,"B0=", key%list%b0
+         print*,"K=", key%list%k
+         print*,"KS=", key%list%ks
+         print*,"TILT=", key%tiltd
+         print*,"T1=", key%list%t1
+         print*,"T2=", key%list%t2
+         print*,"H1=", key%list%h1
+         print*,"H2=", key%list%h2
+       endif
+       
     case(5)
        key%magnet="quadrupole"
        !VK
@@ -940,6 +966,7 @@ CONTAINS
        !================================================================
 
     case(8)
+       if (getdebug()>2) print*,"Translating MULTIPOLE"
        key%magnet="multipole"
        !---- Multipole components.
        F_ERRORS = zero
@@ -1022,6 +1049,14 @@ CONTAINS
           endif
        endif
        
+       if (getdebug()>2) then 
+         print*,"thin_h_angle=", key%list%thin_h_angle
+         print*,"thin_v_angle=", key%list%thin_v_angle
+         print*,"K=", key%list%k
+         print*,"KS=", key%list%ks
+         print*,"TILT=", key%tiltd
+       endif
+       
        
     case(9) ! PTC accepts mults
        key%magnet="solenoid"
@@ -1048,7 +1083,7 @@ CONTAINS
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
 
-       key%list%lag=node_value('lag ')*twopi 
+       key%list%lag = -node_value('lag ')*twopi
        
        ! correction for time of flight through cavity
        ! we want particle with t=0 to be not accelerated
@@ -1201,7 +1236,7 @@ CONTAINS
        key%magnet="twcavity"
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
-       key%list%lag=node_value('lag ')*twopi
+       key%list%lag=-node_value('lag ')*twopi
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
        default=default+totalpath0 !fringe field calculation vitally relies on it!!!!
        if(offset_deltap.ne.zero) then
@@ -1236,7 +1271,7 @@ CONTAINS
        !       key%list%ks(1)= (+/-)  node_value('volt ')*c_1d_3
        !
        freq=c_1d6*node_value('freq ')
-       key%list%lag=node_value('lag ')*twopi+pih
+       key%list%lag=-node_value('lag ')*twopi+pih
        offset_deltap=get_value('ptc_create_layout ','offset_deltap ')
        if(offset_deltap.ne.zero) then
           default = getintstate()
@@ -1275,19 +1310,16 @@ CONTAINS
         ! parameters to modulate the nominal parameters. No modulation in MADX implemented.
         key%list%DC_ac = zero
         key%list%A_ac = zero
-        key%list%theta_ac = zero
+        key%list%theta_ac = -node_value('lag ') ! it is ignored with fast modulationtype = 1
         
-        nclocks = 1
-      ! frequency is in fact tune
-      ! kept like this on Rogelio request not to break the codes before LS2
-      ! afterwards "freq" should be changed to "tune" in definition of the AC_DIPOLE
-        clocks(nclocks)%tune = node_value('freq ')
-        clocks(nclocks)%lag  = node_value('lag ')
-
-        clocks(nclocks)%rampupstart = node_value('ramp1 ')
-        clocks(nclocks)%rampupstop = node_value('ramp2 ')
-        clocks(nclocks)%rampdownstart = node_value('ramp3 ')
-        clocks(nclocks)%rampdownstop = node_value('ramp4 ')
+        
+        key%list%clockno_ac = getclockidx()
+        
+        if (key%list%clockno_ac .lt. 0) then
+          call aafail('ptc_input:', &
+          'Too many AC Dipole clocks, PTC can accept max 2 clocks with given tune and ramp. Program stops.')
+        endif
+        
 
     case(41)
        
@@ -1311,26 +1343,21 @@ CONTAINS
         ! parameters to modulate the nominal parameters. No modulation in MADX implemented.
         key%list%DC_ac = zero
         key%list%A_ac = zero
-        key%list%theta_ac = zero
+        key%list%theta_ac = -node_value('lag ')
         
-        nclocks = 1
-      ! frequency is in fact tune
-      ! kept like this on Rogelio request not to break the codes before LS2
-      ! afterwards "freq" should be changed to "tune" in definition of the AC_DIPOLE
-        clocks(nclocks)%tune = node_value('freq ')
-        clocks(nclocks)%lag  = node_value('lag ')
-
-        clocks(nclocks)%rampupstart = node_value('ramp1 ')
-        clocks(nclocks)%rampupstop = node_value('ramp2 ')
-        clocks(nclocks)%rampdownstart = node_value('ramp3 ')
-        clocks(nclocks)%rampdownstop = node_value('ramp4 ')
+        key%list%clockno_ac = getclockidx()
+        
+        if (key%list%clockno_ac .lt. 0) then
+          call aafail('ptc_input:', &
+          'Too many AC Dipole clocks, PTC can accept max 2 clocks with given tune and ramp. Program stops.')
+        endif
         
        
     case(43)
        key%magnet="rfcavity"
        key%list%volt=bvk*node_value('volt ')
        freq=c_1d6*node_value('freq ')
-       key%list%lag=node_value('lag ')*twopi
+       key%list%lag=-node_value('lag ')*twopi
 
        print*,"RF frequency " , freq," Hz, lag ", key%list%lag, " [radian]"
 
@@ -1452,9 +1479,10 @@ CONTAINS
     
     if(code.eq.40 .or. code.eq.41 ) then
      !save pointer to the AC dipole element for ramping in tracking
-     clocks(1)%element=>my_ring%end
-     !print*,"Setting element to clock ",clocks(1)%element%mag%name
+     call addelementtoclock(my_ring%end,key%list%clockno_ac)
+     
     endif
+    
     
     if(advance_node().ne.0)  goto 10
 
@@ -1501,7 +1529,7 @@ CONTAINS
        write(6,*) "Before start: ",my_ring%start%chart%f%a
        write(6,*) "Before   end: ",my_ring%end%chart%f%b
     endif
-
+    
     call survey(my_ring)
 
     if (getdebug() > 0) then
@@ -1880,6 +1908,7 @@ CONTAINS
     type(fibre), pointer :: f
     !---------------------------------------------------------------
 
+
     j=restart_sequ()
     j=0
     f=>my_ring%start
@@ -1888,15 +1917,172 @@ CONTAINS
     j=j+1
     n_align = node_al_errors(al_errors)
     if (n_align.ne.0)  then
-        !write(6,'(6f11.8)')  al_errors(1:6)
-       call mad_misalign_fibre(f,al_errors(1:6))
+      if (getdebug() > 3) then 
+        write(6,*) " ----------------------------------------------- "
+        write(6,*) f%mag%name," Translation Error "
+        write(6,'(3f11.8)') al_errors(1:3)
+        write(6,*) f%mag%name," Rotation Error "
+        write(6,'(3f11.8)') al_errors(4:6)
+        call print_elframes(f)
+      endif
+      
+      ! this routine is buggy -> fixed by Etienne on 2018.01.29
+      ! call mad_misalign_fibre(f,al_errors(1:6))
+      
+      ! this is PTC original, but it first rotates and than shifts (in frame after rotations)
+      ! call misalign_fibre(f,al_errors(1:6))
+      
+      !our new routine
+      call misalign_element(f,al_errors)
+      
+      !a workaround to handle misaligment of thin dipoles that is not handled by PTC
+      call misalign_thindipole(f,al_errors)
+      
+      
+      if (getdebug() > 3) then 
+      
+        write(6,*) " vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv "
+        call print_elframes(f)
+      endif
+
     endif
     f=>f%next
     if(advance_node().ne.0)  goto 10
 
+
   END subroutine ptc_align
   !_________________________________________________________________
+  
+  subroutine print_elframes(f)
+    implicit none
+    TYPE(FIBRE),target,INTENT(INOUT):: f
+  
+        write(6,*) "Ac:", f%chart%f%a
+        write(6,*) "Oc:", f%chart%f%o
+        write(6,*) "Bc:", f%chart%f%b
+        write(6,*) 
+        write(6,*) "Am:", f%mag%p%f%a
+        write(6,*) "Om:", f%mag%p%f%o
+        write(6,*) "Bm:", f%mag%p%f%b
+        write(6,*) 
+        write(6,*) "entm(1,:) :", f%mag%p%f%ent(1,:)
+        write(6,*) "entm(2,:) :", f%mag%p%f%ent(2,:)
+        write(6,*) "entm(3,:) :", f%mag%p%f%ent(3,:) 
+        write(6,*) 
+        write(6,*) "midm(1,:) :", f%mag%p%f%mid(1,:)
+        write(6,*) "midm(2,:) :", f%mag%p%f%mid(2,:)
+        write(6,*) "midm(3,:) :", f%mag%p%f%mid(3,:) 
+        write(6,*) 
+        write(6,*) "exim(1,:) :", f%mag%p%f%exi(1,:)
+        write(6,*) "exim(2,:) :", f%mag%p%f%exi(2,:)
+        write(6,*) "exim(3,:) :", f%mag%p%f%exi(3,:) 
+        write(6,*) 
+        write(6,*) "ang_in    :", f%CHART%ang_in
+        write(6,*) "ang_out   :", f%CHART%ang_out        
+        
+  end subroutine print_elframes
 
+  !_____________________________________________________
+  ! Routine to handle thin dipole misalignments
+  ! Etienne says that KIND3 is "highly illigal" and he does not support it
+  ! therefore we need to tweak ut ourselves
+  ! Patching from rotation errors is done using FIBRE%CHART%ANG_OUT and FIBRE%CHART%ANG_OUT
+  ! Here we calculate these angles  
+  subroutine misalign_thindipole(f,al_errors)
+    use twiss0fi, only: align_max
+    TYPE(FIBRE),target,INTENT(INOUT):: f
+    REAL(DP),INTENT(IN) :: al_errors(align_max)
+    REAL(DP) :: Fent(3,3), F0ent(3,3), Fexi(3,3), F0exi(3,3), A
+    REAL(DP) :: F1(3,3), F2(3,3), F3(3,3)
+    
+    if (f%mag%kind /= kind3 ) return
+    
+    !in MADX vertical bend is tilted horizontal bend, so thin_v_angle is always zero
+    if ( abs(f%mag%K3%thin_h_angle) .lt. 1e-12 ) return;
+    
+    if (getdebug() > 2) then
+      write(6,*) "misalign_thindipole angle = ",f%mag%K3%thin_h_angle
+    endif
+    
+    
+    A = f%mag%K3%thin_h_angle
+    ! identity
+    F0ent = zero
+    F0ent(1,1) =  1
+    F0ent(2,2) =  1
+    F0ent(3,3) =  1
+
+    !!!!!!!!!!!!!    
+    ! depends only on the bend angle
+    F0exi = zero
+    F0exi(1,1) =  cos(A)
+    F0exi(1,3) =  sin(A)
+    F0exi(2,2) =  1
+    F0exi(3,1) = -sin(A)
+    F0exi(3,3) =  cos(A)
+
+    
+    !!!!!!!!!!!!!
+    ! Lumped error matrix    
+    f1 = zero
+    f2 = zero
+    f3 = zero
+
+    f1(1,1) = 1
+    f1(2,2) = cos(al_errors(4))
+    f1(2,3) =-sin(al_errors(4))
+    f1(3,2) = sin(al_errors(4))
+    f1(3,3) = cos(al_errors(4))
+
+    f2(1,1) = cos(al_errors(5))
+    f2(1,3) =-sin(al_errors(5))
+    f2(2,2) = 1
+    f2(3,1) = sin(al_errors(5))
+    f2(3,3) = cos(al_errors(5))
+    
+    ! change of sign
+    f3(1,1) = cos(-al_errors(6))
+    f3(1,2) =-sin(-al_errors(6))
+    f3(2,1) = sin(-al_errors(6))
+    f3(2,2) = cos(-al_errors(6))
+    f3(3,3) = 1
+    
+    Fent = matmul(f2,  f1)
+    Fent = matmul(f3,Fent)
+    
+    !____________________________________
+
+    !lumped bend rot with alignment rotation    
+    Fexi = matmul(F0exi,Fent)
+    
+    ! Calculate athe angles needed for tracking (a PTC routine)
+    CALL COMPUTE_ENTRANCE_ANGLE(F0ENT,FENT,f%CHART%ANG_IN)
+    CALL COMPUTE_ENTRANCE_ANGLE(FEXI,F0EXI,f%CHART%ANG_OUT)
+    
+  end subroutine misalign_thindipole
+
+  !_____________________________________________________
+  subroutine misalign_element(f,al_errors)
+    use twiss0fi, only: align_max
+    TYPE(FIBRE),target,INTENT(INOUT):: f
+    REAL(DP),INTENT(IN) :: al_errors(align_max)
+    REAL(DP)             :: mis(align_max), omegat(3), basist(3,3)
+  
+      mis=0
+      mis(4:6)=al_errors(4:6)
+      mis(4:5)=-mis(4:5)
+
+      OMEGAT=f%mag%p%f%a
+      basist=f%mag%p%f%ent
+      CALL MISALIGN_FIBRE(f,mis,OMEGAT,BASIST,ADD=.false.) ! false to remove previous alignment
+      
+      mis=0
+      mis(1:3)=al_errors(1:3)
+      CALL MISALIGN_FIBRE(f,mis,OMEGAT,BASIST,ADD=.true.)
+  
+  end subroutine misalign_element
+  !_________________________________________________________________
+  
   subroutine ptc_dumpmaps()
     !Dumps to file maps and/or matrixes (i.e. first order maps)
     implicit none
@@ -3131,56 +3317,135 @@ CONTAINS
 
   end subroutine putbeambeam
   !________________________________________________________________________________________________
+
+  ! if clock with such freqency exists it returns its index
+  ! if not, returns index of the next free slot 
+  ! if there is no free slots, returns -1
+  integer function getclockidx()
+    implicit none
+    real(dp) f ! frequency to search
+    integer i, r1, r2, r3, r4
+    logical fits
+    real(kind(1d0)) node_value    
+    getclockidx = -1
+    
+    ! frequency is in fact tune
+    ! kept like this on Rogelio request not to break the codes before LS2
+    ! afterwards "freq" should be changed to "tune" in definition of the AC_DIPOLE
+    f= node_value('freq ')
+
+    r1 = node_value('ramp1 ')
+    r2 = node_value('ramp2 ')
+    r3 = node_value('ramp3 ')
+    r4 = node_value('ramp4 ')
+    
+    do i=1,nclocks
+     
+     if ( abs(clocks(i)%tune - f) .gt. c_1d_10 )   cycle
+     if (r1 .ne.  clocks(i)%rampupstart )          cycle
+     if (r2 .ne.  clocks(i)%rampupstop )           cycle
+     if (r3 .ne.  clocks(i)%rampdownstart )        cycle
+     if (r4 .ne.  clocks(i)%rampdownstop )         cycle
+     
+     ! this is the good clock
+     getclockidx = i 
+     return
+     
+    enddo
+
+
+    if (nclocks == nmaxclocks) then 
+      getclockidx = -1 ! repeated for code clarity
+      return  
+    endif  
+    
+    nclocks = nclocks + 1
+    
+    clocks(nclocks)%tune          = f
+    clocks(nclocks)%rampupstart   = r1
+    clocks(nclocks)%rampupstop    = r2 
+    clocks(nclocks)%rampdownstart = r3
+    clocks(nclocks)%rampdownstop  = r4
+    
+    getclockidx = nclocks
+    
+    clocks(nclocks)%nelements = 0
+    
   
+  end function getclockidx
+  !________________________________________________________________________________________________
+
+  subroutine addelementtoclock(p,c)
+    implicit none
+    type(fibre), pointer :: p
+    integer c  ! clock index
+    integer elidx
+    
+     if (clocks(c)%nelements .ge. maxelperclock) then
+       call aafail('ptc_input:addelementtoclock:', &
+        'Buffer for AC dipoles is too small. Contact MADX support to make it bigger.')
+     endif
+    
+     clocks(c)%nelements = clocks(c)%nelements + 1
+     elidx = clocks(c)%nelements
+     
+     clocks(c)%elements(elidx)%p=>p
+    
+  end subroutine addelementtoclock
+
+  !________________________________________________________________________________________________
   subroutine acdipoleramping(t)
     implicit none
     !---------------------------------------    *
     !--- ramp up and down of the ac dipols      *
     !--- Adjust amplitudes in function of turns *
     integer  t
-    integer  n
+    integer  n,i
     real(dp) r
-
+    type(fibre), pointer :: p
+    
     do n=1,nclocks
 
+      do i=1,clocks(n)%nelements
+        
+        p => clocks(n)%elements(i)%p
+        
+        if (clocks(n)%rampupstop < 1) then
+          ! no ramping, always full amplitude 
+          p%mag%d_ac = one
+          cycle
+        endif
 
-     if (clocks(n)%rampupstop < 1) then
-       ! no ramping, always full amplitude 
-       clocks(n)%element%mag%d_ac = one
-       cycle
-     endif
+        if (t < clocks(n)%rampupstart) then
+          p%mag%d_ac = zero
+          cycle
+        endif
 
-     if (t < clocks(n)%rampupstart) then
-       clocks(n)%element%mag%d_ac = zero
-       cycle
-     endif
+        if (t < clocks(n)%rampupstop) then
+          r = (t - clocks(n)%rampupstart)
+          p%mag%d_ac = r/(clocks(n)%rampupstop - clocks(n)%rampupstart)
+          cycle
+        endif
 
-     if (t < clocks(n)%rampupstop) then
-       r = (t - clocks(n)%rampupstart)
-       clocks(n)%element%mag%d_ac = r/(clocks(n)%rampupstop - clocks(n)%rampupstart)
-       cycle
-     endif
+        if (t < clocks(n)%rampdownstart) then
+          p%mag%d_ac = one 
+          cycle
+        endif
 
-     if (t < clocks(n)%rampdownstart) then
-       clocks(n)%element%mag%d_ac = one 
-       cycle
-     endif
+        if (t < clocks(n)%rampdownstop) then
+          r = (clocks(n)%rampdownstop - t)
+          p%mag%d_ac = r/(clocks(n)%rampdownstop - clocks(n)%rampdownstart)
+          cycle
+        endif
 
-     if (t < clocks(n)%rampdownstop) then
-       r = (clocks(n)%rampdownstop - t)
-       clocks(n)%element%mag%d_ac = r/(clocks(n)%rampdownstop - clocks(n)%rampdownstart)
-       cycle
-     endif
-
-     clocks(n)%element%mag%d_ac = zero
-
+        p%mag%d_ac = zero
+        
+      enddo
     ! print*,"Setting ramp to clock ",n," element ", clocks(1)%element%mag%name, " to ", clocks(n)%element%mag%d_ac
 
     enddo
 
   end subroutine acdipoleramping
-
-
 
 
 END MODULE madx_ptc_module

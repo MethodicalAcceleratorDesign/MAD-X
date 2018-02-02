@@ -1,0 +1,474 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.03.07  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2018.01.31 13:24:42      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+!tests for closed orbit search with totalpath=true
+
+! produces table with dependence of orbit and tune on rf frequency
+
+
+
+option,-echo;
+
+
+
+eg :=  1.5; !  ... in GeV 
+
+
+
+beam, particle = electron, energy = eg;  
+
+
+
+use, period=ALS;
+
+
+
+select,flag=twiss,clear;
+
+select, flag=twiss, column=name,s,Energy,beta11,beta22,beta33,alfa11,alfa22,mu1,mu2,mu3,disp1,disp2,
+
+                          re11,re12,re13,re14,re15,re16,
+
+                          re21,re22,re23,re24,re25,re26,
+
+                          re31,re32,re33,re34,re35,re36,
+
+                          re41,re42,re43,re44,re45,re46,
+
+                          re51,re52,re53,re54,re55,re56,
+
+                          re61,re62,re63,re64,re65,re66;
+
+
+
+
+
+create,table=orbitvsfreq,column=rffreq,
+
+                              orbit_hidisp_x, orbit_hidisp_px,
+
+                              orbit_x, orbit_px,
+
+	          orbit_y, orbit_py,
+
+	          orbit_t, orbit_pt,
+
+	          q1,q2;
+
+
+
+! set rf frequency at harmonic 328
+
+rffreq0 = 1e-6 * clight / (196.8781358/328) ;
+
+
+
+rffreq_min =  rffreq0 - 10e-3;
+
+rffreq_max =  rffreq0 + 10e-3;
+
+
+
+rffreq = rffreq_min;
+
+++++++ info: rffreq redefined
+
+
+option, -info;
+
+
+
+while(rffreq <= rffreq_max)
+
+{
+
+
+
+   ptc_create_universe;
+
+     ptc_create_layout, model=1, method=6, nst=5, exact=true, closed_layout=true;
+
+
+
+     !!!!!       T I M E   T R U E ,   T O T P A T H  T R U E
+
+     ptc_setswitch, debuglevel=0, exact_mis=true, time=true, totalpath=true;
+
+
+
+     ptc_twiss, table=twiss, icase=6, no=2, closed_orbit, t=0.0;
+
+     
+
+     if (abs(rffreq - rffreq0) < 1e-8)
+
+      {
+
+        write, table=twiss, file="ALS.6Dl.ptc.twiss";
+
+        write, table=ptc_twiss_summary, file="ALS.6Dl.ptc.summ.twiss";
+
+      }
+
+   !  plot, haxis=s, vaxis=beta11, beta22, colour=100;
+
+   !  plot, haxis=s, vaxis=x;
+
+   !  plot, haxis=s, vaxis=pt;
+
+
+
+     value, rffreq, table(ptc_twiss_summary, orbit_pt);
+
+
+
+   ptc_end;
+
+   
+
+   orbit_x  = table(ptc_twiss_summary, orbit_x);
+
+   orbit_px = table(ptc_twiss_summary, orbit_px);
+
+   orbit_y  = table(ptc_twiss_summary, orbit_y);
+
+   orbit_py = table(ptc_twiss_summary, orbit_py);
+
+   orbit_t  = table(ptc_twiss_summary, orbit_t);
+
+   orbit_pt = table(ptc_twiss_summary, orbit_pt);
+
+
+
+   orbit_hidisp_x   = table(twiss, sd[1], x);
+
+   orbit_hidisp_px  = table(twiss, sd[1], px);
+
+   
+
+   q1  = table(ptc_twiss_summary, q1);
+
+   q2  = table(ptc_twiss_summary, q2);
+
+
+
+   fill,table=orbitvsfreq;
+
+
+
+   rffreq = rffreq + 5e-3;
+
+ 
+
+}
+
+ MAD-X Beam Parameters
+                  Energy : 0.150000E+01
+          Kinetic Energy : 0.149949E+01
+      Particle Rest Mass : 0.510999E-03
+                Momentum : 0.150000E+01
+ Setting MADx with 
+     energy           1.50000000000000     
+     method                   6
+     Num. of steps            5
+     charge          -1.00000000000000     
+  Length of machine:    196.878135791546     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:   5.691967490256688E-014  0.000000000000000E+000 -7.716050021144838E-015
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+       196.8781358     0.001729351475           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000     0.001729235421        24.04685949       0.1425517468 
+
+                q2                dq1                dq2                 qs 
+      0.1158261479                  0                  0    1.430968409e-15 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+      0.7636381463        12.71516307        1.378431911        22.24656037 
+
+         beta11min          beta11max          beta12min          beta12max 
+      0.7636381463        12.71516307    3.646694213e-36    9.509426979e-33 
+
+         beta13min          beta13max          beta21min          beta21max 
+   2.700200793e-06      0.01551984512    1.503651492e-35    5.732951785e-34 
+
+         beta22min          beta22max          beta23min          beta23max 
+       1.378431911        22.24656037    3.992812801e-33    3.921290173e-28 
+
+         beta31min          beta31max          beta32min          beta32max 
+    1.38645209e-05      0.01408417867    7.914663118e-32    1.303735995e-31 
+
+         beta33min          beta33max           disp1min           disp1max 
+       75.85458312        78.84253286     -0.01266974753       0.2431106698 
+
+          disp2min           disp2max           disp3min           disp3max 
+     -0.2002293809       0.2002396187   -1.454371762e-15    1.059105004e-15 
+
+          disp4min           disp4max             deltap            orbit_x 
+  -7.824950768e-16    8.015754625e-16                  0   -7.002040108e-05 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+  -2.293958944e-08                  0                  0      0.01197996488 
+
+           orbit_t             xcorms             ycorms            pxcorms 
+    -0.04993745222      0.00141359501                  0     0.001341471876 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0        113.8171696      0.01197996488     0.002886491633 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0     0.002350251111                  0        196.9320152 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+     0.01197996488   -7.009698953e-05                  0    -0.002350191666 
+
+           pycomin             tcomin            ptcomin 
+                 0      0.04993745222      0.01197996488 
+rffreq             =         499.445797 ;
+table( ptc_twiss_summary  orbit_pt ) =      0.01197996488 ;
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+       196.8781358     0.001667931226           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000     0.001667815173        24.48561013        0.211325224 
+
+                q2                dq1                dq2                 qs 
+      0.2000295772                  0                  0   -5.664289474e-16 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+      0.7927774519        12.45621734        1.362571056        22.34153608 
+
+         beta11min          beta11max          beta12min          beta12max 
+      0.7927774519        12.45621734    1.197734848e-35     3.09053707e-33 
+
+         beta13min          beta13max          beta21min          beta21max 
+   5.543989896e-07       0.0151487613    7.255646038e-35    1.421217226e-33 
+
+         beta22min          beta22max          beta23min          beta23max 
+       1.362571056        22.34153608    1.417528572e-34    5.987590688e-28 
+
+         beta31min          beta31max          beta32min          beta32max 
+   3.023365505e-06      0.01340285245    6.734081948e-33    9.445664641e-33 
+
+         beta33min          beta33max           disp1min           disp1max 
+        72.7828328         75.5946791     -0.01266974753       0.2409656258 
+
+          disp2min           disp2max           disp3min           disp3max 
+     -0.2002293809        0.196216849   -1.454371762e-15    4.865944574e-16 
+
+          disp4min           disp4max             deltap            orbit_x 
+  -7.824950768e-16    3.441442786e-16                  0   -1.578443247e-05 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+  -5.059145711e-09                  0                  0     0.006086513405 
+
+           orbit_t             xcorms             ycorms            pxcorms 
+    -0.04993895456    0.0007147196235                  0    0.0006770741555 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0        113.8160335     0.006086513405     0.001460107466 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0     0.001182107296                  0        196.9300457 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+    0.006086513405   -1.580142238e-05                  0    -0.001182093052 
+
+           pycomin             tcomin            ptcomin 
+                 0      0.04993895456     0.006086513405 
+rffreq             =         499.450797 ;
+table( ptc_twiss_summary  orbit_pt ) =     0.006086513405 ;
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+       196.8781358     0.001601852477           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000     0.001601736423        24.98554008       0.2850155217 
+
+                q2                dq1                dq2                 qs 
+      0.2899356071                  0                  0    4.990795441e-16 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+      0.8237186047        12.21197209        1.345841425        22.45962306 
+
+         beta11min          beta11max          beta12min          beta12max 
+      0.8237186047        12.21197209    1.372059155e-36    1.483914646e-33 
+
+         beta13min          beta13max          beta21min          beta21max 
+    5.83073881e-09      0.01478775256    2.568656572e-36    4.498374765e-35 
+
+         beta22min          beta22max          beta23min          beta23max 
+       1.345841425        22.45962306    5.495026477e-34    1.093489841e-28 
+
+         beta31min          beta31max          beta32min          beta32max 
+   3.412435247e-08      0.01272208834    9.262381442e-34    3.830358607e-33 
+
+         beta33min          beta33max           disp1min           disp1max 
+       69.52390355        72.15210234     -0.01266974753       0.2388148938 
+
+          disp2min           disp2max           disp3min           disp3max 
+     -0.2002293809       0.1922264921   -1.454371762e-15    6.710188717e-16 
+
+          disp4min           disp4max             deltap            orbit_x 
+  -7.824950768e-16    3.815918619e-16                  0   -2.184359285e-08 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+  -9.430944837e-12                  0                  0   -3.651800452e-05 
+
+           orbit_t             xcorms             ycorms            pxcorms 
+    -0.04994045688    4.264130835e-06                  0    4.032271997e-06 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0        113.8148973    3.651800452e-05   -5.385724995e-09 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0    7.013918265e-06                  0        196.9280763 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+  -3.651800452e-05   -8.713643604e-06                  0   -7.013901921e-06 
+
+           pycomin             tcomin            ptcomin 
+                 0      0.04994045688   -3.651800452e-05 
+rffreq             =         499.455797 ;
+table( ptc_twiss_summary  orbit_pt ) =   -3.651800452e-05 ;
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+       196.8781358     0.001530277276           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000     0.001530161223        25.56318337       0.3646002497 
+
+                q2                dq1                dq2                 qs 
+      0.3866198816                  0                  0     7.08875382e-16 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+      0.8568874903        11.98225313         1.32801152         22.6070463 
+
+         beta11min          beta11max          beta12min          beta12max 
+      0.8568874903        11.98225313    2.382402938e-35    2.383495764e-33 
+
+         beta13min          beta13max          beta21min          beta21max 
+   6.699697551e-07       0.0144343301    6.819083962e-36    1.396378785e-34 
+
+         beta22min          beta22max          beta23min          beta23max 
+        1.32801152         22.6070463    3.409838446e-33    4.076287574e-29 
+
+         beta31min          beta31max          beta32min          beta32max 
+   4.240799633e-06      0.01215609465    8.108639899e-34    2.691280264e-33 
+
+         beta33min          beta33max           disp1min           disp1max 
+         66.046073        68.48206793     -0.01266974753       0.2366242854 
+
+          disp2min           disp2max           disp3min           disp3max 
+     -0.2002293809       0.1892674937   -1.454371762e-15    1.037828203e-15 
+
+          disp4min           disp4max             deltap            orbit_x 
+  -7.824950768e-16    5.626952004e-16                  0   -2.413409991e-05 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+  -8.783907535e-09                  0                  0    -0.006428394227 
+
+           orbit_t             xcorms             ycorms            pxcorms 
+    -0.04994195917    0.0007477488896                  0    0.0007057827705 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0        113.8137612     0.006428394227   -5.827783839e-06 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0     0.001226195327                  0        196.9261069 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+   -0.006428394227     -0.00152817024                  0    -0.001226173082 
+
+           pycomin             tcomin            ptcomin 
+                 0      0.04994195917    -0.006428394227 
+rffreq             =         499.460797 ;
+table( ptc_twiss_summary  orbit_pt ) =    -0.006428394227 ;
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+       196.8781358     0.001452138279           -1000000           -1000000 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+          -1000000     0.001452022226        26.24194452       0.4513854284 
+
+                q2                dq1                dq2                 qs 
+      0.4915229686                  0                  0   -6.735480089e-16 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+      0.8928744324        11.76728357        1.308764104         22.7928545 
+
+         beta11min          beta11max          beta12min          beta12max 
+      0.8928744324        11.76728357    2.341877293e-35     1.40395047e-32 
+
+         beta13min          beta13max          beta21min          beta21max 
+    2.20115622e-06      0.01407125555    5.880415246e-38    1.435861276e-34 
+
+         beta22min          beta22max          beta23min          beta23max 
+       1.308764104         22.7928545    3.482277227e-34    3.523148097e-29 
+
+         beta31min          beta31max          beta32min          beta32max 
+   1.518939503e-05      0.01159673391    1.016575375e-32    1.218791375e-32 
+
+         beta33min          beta33max           disp1min           disp1max 
+       62.30877134        64.54279898     -0.01266974753       0.2343403597 
+
+          disp2min           disp2max           disp3min           disp3max 
+     -0.2002293809       0.1862845988   -1.454371762e-15    4.361743775e-16 
+
+          disp4min           disp4max             deltap            orbit_x 
+  -7.824950768e-16    2.488576214e-16                  0   -9.065453753e-05 
+
+          orbit_px            orbit_y           orbit_py           orbit_pt 
+  -3.294885416e-08                  0                  0     -0.01314083149 
+
+           orbit_t             xcorms             ycorms            pxcorms 
+    -0.04994346144     0.001521286045                  0     0.001433180103 
+
+           pycorms             tcorms            ptcorms             xcomax 
+                 0         113.812625      0.01314083149   -2.138446807e-05 
+
+            ycomax            pxcomax            pycomax             tcomax 
+                 0     0.002486632254                  0        196.9241375 
+
+           ptcomax             xcomin             ycomin            pxcomin 
+    -0.01314083149    -0.003108825814                  0     -0.00248654338 
+
+           pycomin             tcomin            ptcomin 
+                 0      0.04994346144     -0.01314083149 
+rffreq             =         499.465797 ;
+table( ptc_twiss_summary  orbit_pt ) =     -0.01314083149 ;
+
+
+write, table=orbitvsfreq, file="orbitvsfreq.tfs";
+
+
+
+
+
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

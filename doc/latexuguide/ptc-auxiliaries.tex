@@ -276,11 +276,11 @@ accordingly.
 \section{PTC\_PRINTPARAMETRIC}
 \label{sec:ptc-printparametric}
 
-\textbf{Editor's Note:} This command exists but was not properly documented.\\
-The file PTC\_PrintParametric.html contains the same content as
-PTC\_Knob.html. I presume the original file has been lost and overwritten...
+Prints parametric results obtained with \texttt{PTC\_TWISS} 
+after defining paramteters (knobs) with \texttt{PTC\_KNOB} command 
+(see \hyperref{sec:ptc-knob}). 
+The resulting optical functions are represented as polynomials of the knobs.
 
-Prints parametric results obtained after issuing a ptc_knob command (see \hyperref{sec:ptc-knob}).
 
 \madbox{
 PTC\_PRINTPARAMETRIC, \=FORMAT=string, FILENAME=string;
@@ -291,6 +291,7 @@ Command parameters and switches:
    \ttitem{FORMAT} output file format. Valid entries are 'tex' and 'txt'.
    \ttitem{FILENAME} the name of the output file.
 \end{madlist}
+
 
 \section{PTC\_EPLACEMENT}
 \label{sec:ptc-eplacement}
@@ -327,11 +328,14 @@ Command parameters and switches:
         \ttitem{previouselement}  end face of the previous element
      \end{madlist}
 
-   \ttitem{X, Y, Z} coordinates of the front face of the
+   \ttitem{X, Y, Z} shifs of the front face of the
    magnet. \\ (Default: 0.0)
 
-   \ttitem{PHI, THETA} polar (in xz plane, around z axis) and azimuthal (around x axis)
-     rotation angles respectively. \\ (Default: 0.0)
+   \ttitem{THETA} pitch angle, rotation around x axis. \\ (Default: 0.0)
+
+   \ttitem{PHI} yaw angle, rotation around y axis. \\ (Default: 0.0)
+
+   \ttitem{PSI} roll angle, rotation around s axis. \\ (Default: 0.0)
 
    \ttitem{ONLYPOSITION} a flag to perform only translation changes, and
    orientation of element is left unchanged. \\ (Default: false)
@@ -345,7 +349,7 @@ Command parameters and switches:
    (Default: true)
 
    \ttitem{SURVEYALL} a logical flag used essentially for debugging.
-     If true, a survey of the entire line is performed after element
+     If true, an internal survey of the entire line is performed after element
      placement at new position and orientation. \\
      (Default: true)
 \end{madlist}

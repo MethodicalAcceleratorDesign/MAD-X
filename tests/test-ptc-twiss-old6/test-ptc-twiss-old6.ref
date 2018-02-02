@@ -787,8 +787,8 @@ ptc_twiss,closed_orbit,icase=6,file="twiss_lhc",summary_file="summaryMomentumCom
           orbit_px            orbit_y           orbit_py           orbit_pt 
   -3.567729055e-09   -7.649116664e-08    0.0001600066423    8.804813591e-07 
 
-         orbit_-cT             xcorms             ycorms            pxcorms 
-  -1.141438601e-05    0.0009316851209    0.0009604958264    3.079876774e-05 
+           orbit_t             xcorms             ycorms            pxcorms 
+   1.141438601e-05    0.0009316851209    0.0009604958264    3.079876774e-05 
 
            pycorms             tcorms            ptcorms             xcomax 
    3.139702411e-05    5.315969295e-06    8.804813591e-07     0.007226400175 

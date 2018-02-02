@@ -3278,7 +3278,7 @@ write_struct(void)
     {
       fprintf(f2,"\n"); lc = 1;
     }
-    fprintf(f2, "%-18s", name);
+    fprintf(f2, "%-17s ", name);
     p = p->next;
   }
   if (lc > 0)

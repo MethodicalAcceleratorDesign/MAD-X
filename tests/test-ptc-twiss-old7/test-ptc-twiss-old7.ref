@@ -358,7 +358,7 @@ ptc_twiss,closed_orbit,icase=5,file=twiss_ptc_ring,summary_file=twiss_ptc_summar
           orbit_px            orbit_y           orbit_py           orbit_pt 
    2.596346497e-06                  0                  0                  0 
 
-         orbit_-cT             xcorms             ycorms            pxcorms 
+           orbit_t             xcorms             ycorms            pxcorms 
                 -0    0.0002136648539                  0    3.396649362e-06 
 
            pycorms             tcorms            ptcorms             xcomax 
@@ -435,7 +435,7 @@ ptc_twiss,closed_orbit,icase=5,slice_magnets,file=twiss_ptc_ring_slices,no=4;
           orbit_px            orbit_y           orbit_py           orbit_pt 
    2.596346497e-06                  0                  0                  0 
 
-         orbit_-cT             xcorms             ycorms            pxcorms 
+           orbit_t             xcorms             ycorms            pxcorms 
                 -0    0.0002072674695                  0    3.347072467e-06 
 
            pycorms             tcorms            ptcorms             xcomax 
@@ -583,7 +583,7 @@ call, file = "../share/line_lattice/line.seq";
           orbit_px            orbit_y           orbit_py           orbit_pt 
    7.283918353e-07    5.216050332e-05   -6.748041063e-07                  0 
 
-         orbit_-cT             xcorms             ycorms            pxcorms 
+           orbit_t             xcorms             ycorms            pxcorms 
                 -0    7.160177351e-05    6.445516048e-05     8.58579163e-07 
 
            pycorms             tcorms            ptcorms             xcomax 

@@ -3058,11 +3058,10 @@ call kill(vm,phi,z)
       call convert_bmad_to_ptc(xs,C%PARENT_FIBRE%beta0,k%time)
     endif
 
-    IF(K%MODULATION) THEN !modulate
-       if(c%parent_fibre%mag%slow_ac) CALL MODULATE(C,XS,K) !modulate
+    IF(K%MODULATION.and.xs%nac/=0) THEN !modulate
+       if(c%parent_fibre%mag%slow_ac/=0) CALL MODULATE(C,XS,K) !modulate
        CALL TRACK_MODULATION(C,XS,K) !modulate
     ENDIF !modulate
-    
 
 
  
@@ -3108,7 +3107,7 @@ call kill(vm,phi,z)
      ENDIF
 
     endif
-    IF((K%MODULATION).and.c%parent_fibre%mag%slow_ac) THEN  !modulate
+    IF(K%MODULATION.and.xs%nac/=0.and.c%parent_fibre%mag%slow_ac/=0) then!modulate
        CALL restore_ANBN_SINGLE(C%PARENT_FIBRE%MAG,C%PARENT_FIBRE%MAGP)
     ENDIF  !modulate
   !  IF((K%MODULATION.or.ramp).and.c%parent_fibre%mag%slow_ac) THEN  !modulate
@@ -3205,8 +3204,8 @@ endif ! full_way
       call convert_bmad_to_ptc(xs,C%PARENT_FIBRE%beta0,k%time)
     endif
 
-    IF(K%MODULATION) THEN !modulate
-       if(c%parent_fibre%magp%slow_ac) CALL MODULATE(C,XS,K) !modulate
+    IF(K%MODULATION.and.xs%nac/=0) then
+       if(c%parent_fibre%mag%slow_ac/=0)  CALL MODULATE(C,XS,K) !modulate
        CALL TRACK_MODULATION(C,XS,K) !modulate
     ENDIF !modulate
 
@@ -3267,7 +3266,7 @@ if(ki==kind10)CALL UNMAKEPOTKNOB(c%parent_fibre%MAGp%TP10,CHECK_KNOB,AN,BN,k)
     endif
 
 
-    IF((K%MODULATION).and.c%parent_fibre%mag%slow_ac) THEN  !modulate
+    IF(K%MODULATION.and.xs%nac/=0.and.c%parent_fibre%mag%slow_ac/=0) then
        CALL restore_ANBN_SINGLE(C%PARENT_FIBRE%MAG,C%PARENT_FIBRE%MAGP)
     ENDIF  !modulate
 
@@ -5492,14 +5491,15 @@ call kill(xs);call kill(m)
 end subroutine fill_tree_element_line
 
 !!!!!!!!!!!!!!!!!!!!   stuff for Zhe  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-subroutine fill_tree_element_line_zhe(state,f1,f2,no,fix0,filef)   ! fix0 is the initial condition for the maps
+subroutine fill_tree_element_line_zhe(state,f1,f2,no,fix0,filef,stochprec)   ! fix0 is the initial condition for the maps
 implicit none
 type(fibre), target :: f1,f2 
 type(layout), pointer :: r
 TYPE(INTEGRATION_NODE),POINTER:: t1c,t2c
 TYPE (NODE_LAYOUT), POINTER :: t
 type(internal_state), intent(in):: state
-real(dp) fixr(6),fixs(6),fix(6),fix0(6),mat(6,6),xn
+real(dp) fixr(6),fixs(6),fix(6),fix0(6),mat(6,6),xn,stoch
+real(dp), optional :: stochprec
 type(probe) xs0
 type(probe_8) xs
 type(c_damap) m,mr
@@ -5547,19 +5547,25 @@ endif
 !!  
 fix=xs%x  ! <---   
 m=xs  ! <---   
-
+ 
 do i=1,6
  m%v(i)=m%v(i)-(m%v(i).sub.0)
 enddo 
 
- 
+
+
 
   allocate(forward(3))
 
 
 call SET_TREE_G_complex_zhe(forward,m)
 
- 
+  stoch=-1.0_dp
+if(present(stochprec)) stoch=stochprec
+
+if(stoch>=0) then
+  call c_stochastic_kick(m,forward(2)%rad,forward(2)%fix0,stoch)  
+endif
 
  
 forward(1)%rad=mat
@@ -5690,7 +5696,7 @@ end subroutine fill_tree_element_line_zhe
  
 
        mat=ma**(-1)
-       t(1)%e_ij=matmul(matmul(mat,ma%e_ij),transpose(mat))
+       t(1)%e_ij=ma%e_ij     !matmul(matmul(mat,ma%e_ij),transpose(mat))  not necessary I think
  
     call kill(m); call kill(mg);
     deallocate(M);    deallocate(Mg);

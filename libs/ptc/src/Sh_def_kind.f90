@@ -4911,7 +4911,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
     IMPLICIT NONE
     logical(lp) :: doneitt=.true.
     real(dp),INTENT(INOUT):: X(6)
-    real(dp),INTENT(IN)::FINT,HGAP,H1,H2
+    real(dp),INTENT(IN)::FINT(2),HGAP(2),H1,H2
     real(dp),INTENT(IN),dimension(:)::BN
     TYPE(MAGNET_CHART),INTENT(IN):: EL
     INTEGER, INTENT(IN) :: I
@@ -4924,7 +4924,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
              call ROT_XZ(EL%EDGE(1),X,EL%BETA0,DONEITT,k%TIME)
              CALL FACE(EL,BN,H1,X,k)
           endif
-          CALL FRINGE_dipole(EL,BN,FINT,HGAP,I,X,k)
+          CALL FRINGE_dipole(EL,BN,FINT(I),HGAP(I),I,X,k)
           IF(I==2) then                !doubling exit angle if second half
              CALL FACE(EL,BN,H2,X,k)
              x(1)=x(1)+EL%LC*SIN((EL%EDGE(2)-EL%EDGE(1))*0.5_dp)
@@ -4936,7 +4936,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
              x(1)=x(1)+EL%DIR*EL%LC*SIN((EL%EDGE(2)-EL%EDGE(1))*0.5_dp)
              CALL FACE(EL,BN,H2,X,k)
           endif
-          CALL FRINGE_dipole(EL,BN,FINT,HGAP,I,X,k)
+          CALL FRINGE_dipole(EL,BN,FINT(I),HGAP(I),I,X,k)
           IF(I==1) then                !doubling entrance angle if first half  (1/2 magnet for designer)
              CALL FACE(EL,BN,H1,X,k)
              call ROT_XZ(EL%EDGE(1),X,EL%BETA0,DONEITT,k%TIME)
@@ -4959,14 +4959,14 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
 
           IF(EL%BEND_FRINGE.and.(.NOT.((I==1.AND.EL%KILL_ENT_FRINGE).OR.(I==2.AND.EL%KILL_EXI_FRINGE)))) THEN
  
-             X(4)=X(4)-TAN(EL%EDGE(I)-EL%DIR*EL%CHARGE*2.0_dp*FINT*HGAP*(1.0_dp+SIN(EL%EDGE(I))**2)*BN(1)/COS(EL%EDGE(I))) &
+             X(4)=X(4)-TAN(EL%EDGE(I)-EL%DIR*EL%CHARGE*2.0_dp*FINT(I)*HGAP(I)*(1.0_dp+SIN(EL%EDGE(I))**2)*BN(1)/COS(EL%EDGE(I))) &
                    & *EL%DIR*EL%CHARGE*BN(1)*X(3)   ! SECTOR WEDGE (PROT) + FRINGE
  
 !!! coming to you with sadistic delight
 
                  fsad=0.0_dp
-                 if(fint*hgap/=0.0_dp) then
-                        fsad=1.d0/(fint*hgap*2)/36.0_dp
+                 if(fint(i)*hgap(i)/=0.0_dp) then
+                        fsad=1.d0/(fint(i)*hgap(I)*2)/36.0_dp
                  endif
                  c3=bn(1)**2*fsad 
                  x(4)=x(4)-4*c3*x(3)**3
@@ -4976,11 +4976,11 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
        else
           IF(EL%BEND_FRINGE.and.(.NOT.((I==1.AND.EL%KILL_ENT_FRINGE).OR.(I==2.AND.EL%KILL_EXI_FRINGE)))) THEN
  
-             CALL FRINGE_dipole(EL,BN,FINT,HGAP,I,X,k)
+             CALL FRINGE_dipole(EL,BN,FINT(I),HGAP(I),I,X,k)
  
                  fsad=0.0_dp
-                 if(fint*hgap/=0.0_dp) then
-                        fsad=1.d0/(fint*hgap*2)/36.0_dp
+                 if(fint(I)*hgap(I)/=0.0_dp) then
+                        fsad=1.d0/(fint(I)*hgap(I)*2)/36.0_dp
                  endif
                  c3=bn(1)**2*fsad 
                  x(4)=x(4)-4*c3*x(3)**3
@@ -5003,7 +5003,7 @@ SUBROUTINE KICKCAVP(EL,YL,X,k)
   SUBROUTINE EDGEP(EL,BN,H1,H2,FINT,HGAP,I,X,k)
     IMPLICIT NONE
     TYPE(REAL_8),INTENT(INOUT):: X(6)
-    TYPE(REAL_8),INTENT(IN)::FINT,HGAP,H1,H2
+    TYPE(REAL_8),INTENT(IN)::FINT(2),HGAP(2),H1,H2
     TYPE(REAL_8),INTENT(IN),dimension(:)::BN
     TYPE(MAGNET_CHART),INTENT(IN):: EL
     INTEGER, INTENT(IN) :: I
@@ -5016,7 +5016,7 @@ integer :: kkk=0
              !   call ROT_XZ(EL%EDGE(1),X,EL%BETA0,DONEITT,k%TIME)       !DONE IN TRUE_PARALLEL ROUTINE!!!!!
              CALL FACE(EL,BN,H1,X,k)
           endif
-          CALL FRINGE_dipole(EL,BN,FINT,HGAP,I,X,k)
+          CALL FRINGE_dipole(EL,BN,FINT(I),HGAP(I),I,X,k)
           IF(I==2) then                !doubling exit angle if second half
              CALL FACE(EL,BN,H2,X,k)
              !   x(1)=x(1)+EL%LC*SIN((EL%EDGE(2)-EL%EDGE(1))*half)
@@ -5028,7 +5028,7 @@ integer :: kkk=0
              !   x(1)=x(1)+EL%DIR*EL%LC*SIN((EL%EDGE(2)-EL%EDGE(1))*half)
              CALL FACE(EL,BN,H2,X,k)
           endif
-          CALL FRINGE_dipole(EL,BN,FINT,HGAP,I,X,k)
+          CALL FRINGE_dipole(EL,BN,FINT(I),HGAP(I),I,X,k)
           IF(I==1) then                !doubling entrance angle if first half  (1/2 magnet for designer)
              CALL FACE(EL,BN,H1,X,k)
              !   call ROT_XZ(EL%EDGE(1),X,EL%BETA0,DONEITT,k%TIME)
@@ -5050,14 +5050,14 @@ integer :: kkk=0
 
           IF(EL%BEND_FRINGE.and.(.NOT.((I==1.AND.EL%KILL_ENT_FRINGE).OR.(I==2.AND.EL%KILL_EXI_FRINGE)))) THEN
  
-             X(4)=X(4)-TAN(EL%EDGE(I)-EL%DIR*EL%CHARGE*2.0_dp*FINT*HGAP*(1.0_dp+SIN(EL%EDGE(I))**2)*BN(1)/COS(EL%EDGE(I))) &
+             X(4)=X(4)-TAN(EL%EDGE(I)-EL%DIR*EL%CHARGE*2.0_dp*FINT(I)*HGAP(I)*(1.0_dp+SIN(EL%EDGE(I))**2)*BN(1)/COS(EL%EDGE(I))) &
                    & *EL%DIR*EL%CHARGE*BN(1)*X(3)   ! SECTOR WEDGE (PROT) + FRINGE
  
 !!! coming to you with sadistic delight
             call alloc(fsad,c3)
                  fsad=0.0_dp
-                 if(fint*hgap/=0.0_dp) then
-                        fsad=1.d0/(fint*hgap*2)/36.0_dp
+                 if(fint(I)*hgap(I)/=0.0_dp) then
+                        fsad=1.d0/(fint(I)*hgap(I)*2)/36.0_dp
                  endif
                  c3=bn(1)**2*fsad 
                  x(4)=x(4)-4*c3*x(3)**3
@@ -5067,11 +5067,11 @@ integer :: kkk=0
        else
           IF(EL%BEND_FRINGE.and.(.NOT.((I==1.AND.EL%KILL_ENT_FRINGE).OR.(I==2.AND.EL%KILL_EXI_FRINGE)))) THEN
              call alloc(fsad,c3)
-             CALL FRINGE_dipole(EL,BN,FINT,HGAP,I,X,k)
+             CALL FRINGE_dipole(EL,BN,FINT(I),HGAP(I),I,X,k)
  
                  fsad=0.0_dp
-                 if(fint*hgap/=0.0_dp) then
-                        fsad=1.d0/(fint*hgap*2)/36.0_dp
+                 if(fint(I)*hgap(I)/=0.0_dp) then
+                        fsad=1.d0/(fint(I)*hgap(I)*2)/36.0_dp
                  endif
                  c3=bn(1)**2*fsad 
                  x(4)=x(4)-4*c3*x(3)**3
@@ -11565,7 +11565,7 @@ integer :: kkk=0
           IF(EL%P%EDGE(1)/=0.0_dp) THEN
              CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,k%TIME)
              CALL FACE(EL%P,EL%BN,EL%H1,X,k)
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(1),EL%HGAP(1),1,X,k)
              IF(k%FRINGE.or.EL%P%permfringe/=0) then
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k) 
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,1,X,k)
@@ -11579,7 +11579,7 @@ integer :: kkk=0
              CALL WEDGE(-EL%P%EDGE(1),X,k,EL2=EL)
           ELSE
              CALL FACE(EL%P,EL%BN,EL%H1,X,k)
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(1),EL%HGAP(1),1,X,k)
              IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
              IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,1,X,k)
           ENDIF
@@ -11597,13 +11597,13 @@ integer :: kkk=0
                 x(2)=x(2)+EL%P%EDGE(2)*el%bn(2)*(x(1)**2-x(3)**2)
                 x(4)=x(4)-EL%P%EDGE(2)*el%bn(2)*(2.0_dp*x(1)*x(3))
              endif
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(2),EL%HGAP(2),2,X,k)
              CALL FACE(EL%P,EL%BN,EL%H2,X,k)
              CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,k%TIME)
           ELSE
              IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,2,X,k)
              IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(2),EL%HGAP(2),2,X,k)
              CALL FACE(EL%P,EL%BN,EL%H2,X,k)
           ENDIF
        ENDIF ! J=2
@@ -11615,7 +11615,7 @@ integer :: kkk=0
           IF(EL%P%EDGE(2)/=0.0_dp) THEN
              CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,k%TIME)
              CALL FACE(EL%P,EL%BN,EL%H2,X,k)
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(2),EL%HGAP(2),2,X,k)
              IF(k%FRINGE.or.EL%P%permfringe/=0) then
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,2,X,k)
@@ -11628,7 +11628,7 @@ integer :: kkk=0
              CALL WEDGE(-EL%P%EDGE(2),X,k,EL2=EL)
           ELSE
              CALL FACE(EL%P,EL%BN,EL%H2,X,k)
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(2),EL%HGAP(2),2,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
              IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,2,X,k)
           ENDIF
@@ -11646,13 +11646,13 @@ integer :: kkk=0
                 x(2)=x(2)-EL%P%EDGE(1)*el%bn(2)*(x(1)**2-x(3)**2)
                 x(4)=x(4)+EL%P%EDGE(1)*el%bn(2)*(2.0_dp*x(1)*x(3))
              endif
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(1),EL%HGAP(1),1,X,k)
              CALL FACE(EL%P,EL%BN,EL%H1,X,k)
              CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,k%TIME)
           ELSE
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,1,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(1),EL%HGAP(1),1,X,k)
              CALL FACE(EL%P,EL%BN,EL%H1,X,k)
           ENDIF
 
@@ -11678,7 +11678,7 @@ integer :: kkk=0
           IF(EL%P%EDGE(1)/=0.0_dp) THEN
              CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,k%TIME)
              CALL FACE(EL%P,EL%BN,EL%H1,X,k)
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(1),EL%HGAP(1),1,X,k)
              IF(k%FRINGE.or.EL%P%permfringe/=0) then
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k) 
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,1,X,k)
@@ -11692,7 +11692,7 @@ integer :: kkk=0
              CALL WEDGE(-EL%P%EDGE(1),X,k,EL2=EL)
           ELSE
              CALL FACE(EL%P,EL%BN,EL%H1,X,k)
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(1),EL%HGAP(1),1,X,k)
              IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
              IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,1,X,k)
           ENDIF
@@ -11710,13 +11710,13 @@ integer :: kkk=0
                 x(2)=x(2)+EL%P%EDGE(2)*el%bn(2)*(x(1)**2-x(3)**2)
                 x(4)=x(4)-EL%P%EDGE(2)*el%bn(2)*(2.0_dp*x(1)*x(3))
              endif
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(2),EL%HGAP(2),2,X,k)
              CALL FACE(EL%P,EL%BN,EL%H2,X,k)
              CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,k%TIME)
           ELSE
              IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,2,X,k)
              IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(2),EL%HGAP(2),2,X,k)
              CALL FACE(EL%P,EL%BN,EL%H2,X,k)
           ENDIF
        ENDIF ! J=2
@@ -11728,7 +11728,7 @@ integer :: kkk=0
           IF(EL%P%EDGE(2)/=0.0_dp) THEN
              CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,k%TIME)
              CALL FACE(EL%P,EL%BN,EL%H2,X,k)
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(2),EL%HGAP(2),2,X,k)
              IF(k%FRINGE.or.EL%P%permfringe/=0) then
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,2,X,k)
@@ -11741,7 +11741,7 @@ integer :: kkk=0
              CALL WEDGE(-EL%P%EDGE(2),X,k,EL2=EL)
           ELSE
              CALL FACE(EL%P,EL%BN,EL%H2,X,k)
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(2),EL%HGAP(2),2,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
              IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,2,X,k)
           ENDIF
@@ -11759,13 +11759,13 @@ integer :: kkk=0
                 x(2)=x(2)-EL%P%EDGE(1)*el%bn(2)*(x(1)**2-x(3)**2)
                 x(4)=x(4)+EL%P%EDGE(1)*el%bn(2)*(2.0_dp*x(1)*x(3))
              endif
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(1),EL%HGAP(1),1,X,k)
              CALL FACE(EL%P,EL%BN,EL%H1,X,k)
              CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,k%TIME)
           ELSE
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,1,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(1),EL%HGAP(1),1,X,k)
              CALL FACE(EL%P,EL%BN,EL%H1,X,k)
           ENDIF
 
@@ -12956,13 +12956,13 @@ integer :: kkk=0
              ANGH=EL%P%B0*EL%P%LD*0.5_dp-EL%P%EDGE(1)
              CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,k%TIME)
              CALL FACE(EL%P,EL%BN,EL%H1,X,k)
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(1),EL%HGAP(1),1,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,1,X,k)
              CALL  WEDGE(ANGH,X,k,EL1=EL)
 
           ELSE
-             CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,1,X,k)
+             CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT(1),EL%HGAP(1),1,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,1,X,k)
           ENDIF
@@ -12975,13 +12975,13 @@ integer :: kkk=0
              CALL  WEDGE(ANGH,X,k,EL1=EL)
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,2,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(2),EL%HGAP(2),2,X,k)
              CALL FACE(EL%P,EL%BN,EL%H2,X,k)
              CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,k%TIME)
           ELSE
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,2,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
-             CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,2,X,k)
+             CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT(2),EL%HGAP(2),2,X,k)
           ENDIF
 
        ENDIF ! J
@@ -12995,12 +12995,12 @@ integer :: kkk=0
              ANGH=EL%P%B0*EL%P%LD*0.5_dp-EL%P%EDGE(2)
              CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,k%TIME)
              CALL FACE(EL%P,EL%BN,EL%H2,X,k)
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(2),EL%HGAP(2),2,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,2,X,k)
              CALL  WEDGE(ANGH,X,k,EL1=EL)
           ELSE
-             CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,2,X,k)
+             CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT(2),EL%HGAP(2),2,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,2,X,k)
           ENDIF
@@ -13013,13 +13013,13 @@ integer :: kkk=0
              CALL  WEDGE(ANGH,X,k,EL1=EL)
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,1,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(1),EL%HGAP(1),1,X,k)
              CALL FACE(EL%P,EL%BN,EL%H1,X,k)
              CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,k%TIME)
           ELSE
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,1,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
-             CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,1,X,k)
+             CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT(1),EL%HGAP(1),1,X,k)
           ENDIF
 
        ENDIF ! J
@@ -13047,13 +13047,13 @@ integer :: kkk=0
              ANGH=EL%P%B0*EL%P%LD*0.5_dp-EL%P%EDGE(1)
              CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,k%TIME)
              CALL FACE(EL%P,EL%BN,EL%H1,X,k)
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(1),EL%HGAP(1),1,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,1,X,k)
              CALL  WEDGE(ANGH,X,k,EL1=EL)
 
           ELSE
-             CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,1,X,k)
+             CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT(1),EL%HGAP(1),1,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3) CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,1,X,k)
           ENDIF
@@ -13066,13 +13066,13 @@ integer :: kkk=0
              CALL  WEDGE(ANGH,X,k,EL1=EL)
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,2,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(2),EL%HGAP(2),2,X,k)
              CALL FACE(EL%P,EL%BN,EL%H2,X,k)
              CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,k%TIME)
           ELSE
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,2,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
-             CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,2,X,k)
+             CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT(2),EL%HGAP(2),2,X,k)
           ENDIF
 
        ENDIF ! J
@@ -13086,12 +13086,12 @@ integer :: kkk=0
              ANGH=EL%P%B0*EL%P%LD*0.5_dp-EL%P%EDGE(2)
              CALL ROT_XZ(EL%P%EDGE(2),X,EL%P%BETA0,DONEITT,k%TIME)
              CALL FACE(EL%P,EL%BN,EL%H2,X,k)
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,2,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(2),EL%HGAP(2),2,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,2,X,k)
              CALL  WEDGE(ANGH,X,k,EL1=EL)
           ELSE
-             CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,2,X,k)
+             CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT(2),EL%HGAP(2),2,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,2,X,k)
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,2,X,k)
           ENDIF
@@ -13104,13 +13104,13 @@ integer :: kkk=0
              CALL  WEDGE(ANGH,X,k,EL1=EL)
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,1,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
-             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT,EL%HGAP,1,X,k)
+             CALL FRINGE_dipole(EL%P,EL%BN,EL%FINT(1),EL%HGAP(1),1,X,k)
              CALL FACE(EL%P,EL%BN,EL%H1,X,k)
              CALL ROT_XZ(EL%P%EDGE(1),X,EL%P%BETA0,DONEITT,k%TIME)
           ELSE
                 IF(el%p%permfringe==2.or.el%p%permfringe==3) CALL FRINGE2QUAD(EL%P,EL%bn(2),EL%an(2),EL%VA,EL%VS,1,X,k)
                 IF(k%FRINGE.or.el%p%permfringe==1.or.el%p%permfringe==3)CALL MULTIPOLE_FRINGE(EL%P,EL%AN,EL%BN,1,X,k)
-             CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT,EL%HGAP,1,X,k)
+             CALL EDGE_TRUE_PARALLEL(EL%P,EL%BN,EL%H1,EL%H2,EL%FINT(1),EL%HGAP(1),1,X,k)
           ENDIF
 
        ENDIF ! J

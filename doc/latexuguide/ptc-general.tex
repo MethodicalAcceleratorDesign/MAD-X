@@ -134,32 +134,8 @@ The attributes are:
 
   \ttitem{TIME} a logical flag to control which coordinate system 
   is being used. \\ (Default=~true) \\ \\
-  This option changes the canonical coordinate system depending
-  whether the calculation is done in 5D or 6D: 
-  \begin{madlist}
-    \ttitem{5D} if \texttt{TIME} is true, the fifth coordinate is
-    \hyperref[subsec:tables-canon]{\texttt{PT}},
-    $p_t = \Delta E / p_0 c$ \\  
-    if \texttt{TIME} is false, the fifth coordinate is
-    \hyperref[subsec:tables-canon]{\texttt{DELTAP}},
-    $\delta_p = \Delta p / p_0$
-    
-    \ttitem{6D} if \texttt{TIME} is true, the
-    \hyperref[subsec:tables-canon]{\madx coordinate system}
-    \{$-ct$, $p_t$\} is used. \\    
-    if \texttt{TIME} is false, the second \ptc coordinate system
-    \{-pathlength, $\delta_p$\} is used. 
-  \end{madlist}
-  
- \textbf{Note:} at small energy ($\beta_0 << 1$),
- momentum-dependent variables like dispersion will depend  strongly on
- the choice of  the logical input variable "time".  In fact, the
- derivative ($\frac{\partial}{\partial \delta_p}$)  and
- ($\frac{\partial}{\partial p_t}$)  are different by the
- factor $\beta_0$. One would  therefore typically  choose
- the option "time=false",  which sets the fifth variable to
- the relative momentum deviation $\delta_p$.
-
+  Please see \texttt{TIME} of \hyperref[sec:ptc-setswitch]{\texttt{PTC\_SETSWITCH}}
+  command for more details.
    
   \ttitem{MODEL} an integer to switch between models:\\
   1 for "Drift-Kick-Drift";  (Default value)\\ 
@@ -267,10 +243,24 @@ The command parameters and switches are:
 	Switch ensures exact misalignment treatment.   
 	
 	\ttitem{TOTALPATH} (Default: false)\\
-	If true, the 6th variable of PTC, i.e. 5th of MAD-X, is the total
-	path.  \\
+	If true, the 6th variable of PTC, i.e. 5th of MAD-X, is the total path.  \\
 	If false it is deviation from the reference particle,
-	which is normally the closed orbit for closed layouts.    
+	which is normally the closed orbit for closed layouts. \\
+	This switch changes behaviour of the RF cavities, 
+	including RF multipoles and crab cavities. 
+	If it is false, the time of flight effect between the cavities
+	(or the ring length) is ignored because the kick is proportional to \\
+	$sin(2\pi \cdot \rm{FREQ} \cdot t/c + \rm{LAG})$, where $t$ is the time coodinate.
+	So only distance from the synchronous particle plays a role.
+	For example, changing ring length will not affect the cavity.
+	On the other hand, it gurantees that the defined LAG is observed.
+	Conversely, if \texttt{TOTALPATH} is true then $t$ becomes the total time of flight
+	so its effect is accounted for. In the case when cavity is detuned 
+	the closed orbit momentum will change and in ray tracking phase slippage from turn
+	to turn will be seen. However, \texttt{LAG} of cavities needs to be 
+	carefuly calculated because its phasing will depend on its position. 
+	Naturally, in cases with only one RF cavity the closed orbit search will automatically
+	determine the offset. 
 	
 	\ttitem{RADIATION} (Default: false)\\    
 	Sets the radiation switch/internal state of PTC. In PTC basically all the elements
@@ -281,6 +271,20 @@ The command parameters and switches are:
 	dumping due to radiation and stochastic effects. 
 	Warning: this makes the tracking approximately twice slower, so low order
 	should be used. 
+
+	\ttitem{STOCHASTIC} (Default: false)\\    
+	Sets the stochastic switch/internal state of PTC. 
+	It enables stochastic emission of photons in ray tracking,  
+                    it only affects \texttt{PTC\_TRACK} and \texttt{PTC\_TRACKLINE}.
+	The emission is calculated during map tracking therefore 
+	\texttt{PTC\_TWISS} or \texttt{PTC\_NORMAL} 
+	needs to be invoked before launching the tracking 
+	(also with \ttitem{RADIATION}, \ttitem{ENVELOPE} and \ttitem{STOCHASTIC} set to true). 
+	Every tracked ray will receive the same stochastic kicks.
+
+	\ttitem{MODULATION} (Default: false)\\    
+	Sets the modulation switch/internal state of PTC. 
+	It needs to be set to true to observe effect of AD dipoles.
 	
 	\ttitem{FRINGE} (Default: false)\\    
 	Sets the fringe switch/internal state of PTC. \\ 
@@ -294,7 +298,33 @@ The command parameters and switches are:
 	
 	\ttitem{TIME} (Default: true)\\  
 	If true, Selects time of flight (\textit{cT} to be precise) rather
-	than path length as the 6th variable of PTC, i.e. 5th of MAD-X.     
+	than path length as the 6th variable of PTC, i.e. 5th of MAD-X. \\
+                    This option changes the canonical coordinate system depending
+	whether the calculation is done in 5D or 6D: 
+	 \begin{madlist}
+	   \ttitem{5D} if \texttt{TIME} is true, the fifth coordinate is
+	   \hyperref[subsec:tables-canon]{\texttt{PT}},
+	   $p_t = \Delta E / p_0 c$ \\  
+	   if \texttt{TIME} is false, the fifth coordinate is
+	   \hyperref[subsec:tables-canon]{\texttt{DELTAP}},
+	   $\delta_p = \Delta p / p_0$
+
+	   \ttitem{6D} if \texttt{TIME} is true, the
+	   \hyperref[subsec:tables-canon]{\madx coordinate system}
+	   \{$-ct$, $p_t$\} is used. \\    
+	   if \texttt{TIME} is false, the second \ptc coordinate system
+	   \{-pathlength, $\delta_p$\} is used. 
+	 \end{madlist}
+
+	\textbf{Note:} at small energy ($\beta_0 << 1$),
+	momentum-dependent variables like dispersion will depend  strongly on
+	the choice of  the logical input variable \ttitem{TIME}.  In fact, the
+	derivative ($\frac{\partial}{\partial \delta_p}$)  and
+	($\frac{\partial}{\partial p_t}$)  are different by the
+	factor $\beta_0$. One would  therefore typically  choose
+	the option \ttitem{TIME=false},  which sets the fifth variable to
+	the relative momentum deviation $\delta_p$.
+
 	
 \end{madlist}
 

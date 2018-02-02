@@ -47,7 +47,8 @@ module tree_element_MODULE
   integer, private, parameter :: nfac=20
   real(dp), private :: fac(0:nfac)
   integer :: nbe=8
-
+  integer :: n_rf=0  !number of modulation clocks in the simulation
+  integer :: modulationtype=0 ! 0 is the full blown and internal anf externa field, 1 is simple one on external field only without cos(theta)
   INTERFACE assignment (=)
      !
      MODULE PROCEDURE REAL_8REAL6
@@ -768,9 +769,10 @@ CONTAINS
        !       s1%x(i)%kind=1
        !       s1%x(i)%i=0
     enddo
-
+    do j=1,s1%nac
     do i=1,2  !
-       call assp_no_master(s1%AC%x(i))
+       call assp_no_master(s1%AC(j)%x(i))
+    enddo
     enddo
 
 
@@ -864,7 +866,7 @@ CONTAINS
     enddo
     P%X=X
     P%ac%t=0.0_dp
-
+    p%nac=n_rf
   END    subroutine EQUAL_PROBE_REAL6
 
   subroutine EQUAL_PROBE8_REAL6 (P,X)
@@ -887,7 +889,7 @@ CONTAINS
     DO I=1,6
        P%X(i)=X(i)
     enddo
-
+    p%nac=n_rf
     P%AC%X(1)=0.0_dp
     P%AC%X(2)=0.0_dp
     P%AC%t=0.0_dp
@@ -914,11 +916,14 @@ CONTAINS
     DO I=1,3
        P8%S(i)=P%S(i)
     enddo
-    P8%AC=P%AC
-
+     P8%nac=P%nac
+    do i=1,P%nac
+    P8%AC(i)=P%AC(i)
+    enddo
     P8%u=P%u
 
     P8%e=P%e
+
 
   END subroutine EQUAL_PROBE8_PROBE8
 
@@ -985,8 +990,13 @@ CONTAINS
     do I=1,ISPIN1R
        P8%S(I)=P%s(I)
     enddo
+    P8%nac=P%nac
+!!!new 2018.1.4
+    do I=1,P%nac
+       P8%ac(i)=P%ac(i)
+    enddo
 
-
+!!!!
     P8%e=P%e
     P8%u=P%u
     P8%e_ij=0.0_dp
@@ -1006,7 +1016,11 @@ CONTAINS
     ENDDO
     P%u=P8%u
     P%e=P8%e
-
+!!!new 2018.1.4
+    p%nac=P8%nac
+    do I=1,P8%nac
+       P%ac(i)=P8%ac(i)
+    enddo
   END subroutine EQUAL_PROBE_PROBE8
 
   subroutine EQUAL_PROBE_PROBE (P,P8)
@@ -1023,7 +1037,11 @@ CONTAINS
     ENDDO
     P%u=P8%u
     P%e=P8%e
-
+!!!new 2018.1.4
+    p%nac=P8%nac
+    do I=1,P8%nac
+       P%ac(i)=P8%ac(i)
+    enddo
 
   END subroutine EQUAL_PROBE_PROBE
 
@@ -1131,7 +1149,7 @@ CONTAINS
     implicit none
     TYPE(probe_8), INTENT(IN) :: R
     TYPE(damap), INTENT(INOUT) :: DS
-    INTEGER I,nd2t
+    INTEGER I,nd2t,j
 
     nd2t=C_%ND2
     if(doing_ac_modulation_in_ptc) then
@@ -1143,8 +1161,11 @@ CONTAINS
     DO I=1,nd2t
        DS%V(I)=R%X(I)
     ENDDO
-    DO I=nd2t+1,C_%ND2
-       DS%V(I)=R%ac%x(i-nd2t)
+    j=1
+    DO I=nd2t+1,C_%ND2,2
+       DS%V(I)=R%ac(j)%x(1)
+       DS%V(I+1)=R%ac(j)%x(2)
+       j=j+1
     ENDDO
 
   END subroutine EQUAL_DAMAP_RAY8
@@ -1236,7 +1257,10 @@ CONTAINS
 
     endif
     if(doing_ac_modulation_in_ptc) then
-       call print(ds%ac,mfi)
+      write(mfi,*) ds%nac, " clocks "
+       do i=1,ds%nac
+        call print(ds%ac(i),mfi)
+       enddo
     else
        WRITE(MFi,*) "NO MODULATION  "
 
@@ -1359,11 +1383,13 @@ CONTAINS
   END    subroutine ALLOC_SPINOR_8
 
 
-  subroutine ALLOC_probe_8(R)
+  subroutine ALLOC_probe_8(R,n)
     implicit none
     TYPE(probe_8), INTENT(INOUT) :: R
-    INTEGER I !,J
-
+    INTEGER I,nac
+    integer, optional :: n
+     nac=1
+     if(present(n)) nac=n
     !    CALL ALLOC(R%S)
     DO I=1,3
        CALL ALLOC(R%S(I))
@@ -1373,7 +1399,10 @@ CONTAINS
     DO I=1,3
        R%S(I)=0
     ENDDO
-    CALL ALLOC(R%ac)
+    r%nac=nac
+    do i=1,nac
+     CALL ALLOC(R%ac(i))
+    enddo
     r%e_ij=0.0_dp
     r%u=.false.
     r%e=0
@@ -1413,8 +1442,10 @@ CONTAINS
        CALL KILL(R%S(I))
     ENDDO
     CALL KILL(R%X,6)
-
-    CALL KILL(R%ac)
+    do i=1,r%nac
+     CALL KILL(R%ac(i))
+    enddo
+    r%nac=0
     r%e_ij=0.0_dp
     r%u=.false.
     r%e=0
