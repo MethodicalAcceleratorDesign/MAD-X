@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.03.09               +
-  + Execution date: 2017.03.30 14:32:14      +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2017.12.14 17:59:52      +
   ++++++++++++++++++++++++++++++++++++++++++++
 TITLE,'Global tune matching with MAD-X';
 
@@ -59,9 +59,9 @@ Initial Penalty Function =   0.22435097E+02
 call:       4   Penalty function =   0.42285798E+00
 call:       7   Penalty function =   0.27630545E-04
 call:      10   Penalty function =   0.25761513E-12
-call:      13   Penalty function =   0.90731330E-23
+call:      13   Penalty function =   0.91636548E-23
  ++++++++++ LMDIF ended: converged successfully
-call:      13   Penalty function =   0.90731330E-23
+call:      13   Penalty function =   0.91636548E-23
 endmatch;
 
 
@@ -69,11 +69,11 @@ MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     1.27000000E+00     1.27000000E+00     5.73309593E-25
-Global constraint:         q2           4     1.30000000E+00     1.30000000E+00     8.49982341E-24
+Global constraint:         q1           4     1.27000000E+00     1.27000000E+00     5.59938401E-25
+Global constraint:         q2           4     1.30000000E+00     1.30000000E+00     8.60371639E-24
 
 
-Final Penalty Function =   9.07313301e-24
+Final Penalty Function =   9.16365479e-24
 
 
 
@@ -86,7 +86,7 @@ kqd                      -8.94863e-03 -1.09257e-02 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   9.07313301e-24
+VARIABLE "TAR" SET TO   9.16365479e-24
 
 
 value, kqf;

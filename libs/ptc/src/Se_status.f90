@@ -46,6 +46,7 @@ module S_status
   !  integer, parameter :: KINDmu      = KIND23+3
   integer, parameter :: KINDpa     = KIND23+3
   integer, parameter :: kindsuperdrift = KIND23+4
+  integer, parameter :: kindabell= KIND23+5
   integer, parameter :: drift_kick_drift = kind2
   integer, parameter :: matrix_kick_matrix = kind7
   integer, parameter :: kick_sixtrack_kick = kind6
@@ -74,7 +75,7 @@ module S_status
 
   LOGICAL(lp) :: firsttime_coef=.true.,read_sector_info=my_true
 
-  PRIVATE EQUALt,ADD,PARA_REMA,EQUALtilt
+  PRIVATE EQUALt,ADD,PARA_REMA,EQUALtilt,EQUALi
   !PRIVATE DTILTR,DTILTP,DTILTS
   PRIVATE DTILTR_EXTERNAL,DTILTP_EXTERNAL,orthonormaliser,orthonormalisep
   PRIVATE CHECK_APERTURE_R,CHECK_APERTURE_P !,CHECK_APERTURE_S
@@ -88,19 +89,19 @@ module S_status
   !  !!  include "a_def_arbitrary.inc"
   !  !  include "a_def_user2.inc"
 
-  TYPE(INTERNAL_STATE),PARAMETER::DEFAULT0=INTERNAL_STATE   (0,f,f,f,f,f,f,f,f,f,f,f,f)
-  TYPE(INTERNAL_STATE),PARAMETER::TOTALPATH0=INTERNAL_STATE (1,f,f,f,f,f,f,f,f,f,f,f,f)
-  TYPE(INTERNAL_STATE),PARAMETER::TIME0=INTERNAL_STATE      (0,t,f,f,f,f,f,f,f,f,f,f,f)
-  TYPE(INTERNAL_STATE),PARAMETER::RADIATION0=INTERNAL_STATE (0,f,t,f,f,f,f,f,f,f,f,f,f)
-  TYPE(INTERNAL_STATE),PARAMETER::NOCAVITY0=INTERNAL_STATE  (0,f,f,t,f,f,f,f,f,f,f,f,f)
-  TYPE(INTERNAL_STATE),PARAMETER::FRINGE0=INTERNAL_STATE    (0,f,f,f,t,f,f,f,f,f,f,f,f)
-  TYPE(INTERNAL_STATE),PARAMETER::STOCHASTIC0=INTERNAL_STATE(0,f,f,f,f,t,f,f,f,f,f,f,f)
-  TYPE(INTERNAL_STATE),PARAMETER::ENVELOPE0=INTERNAL_STATE  (0,f,f,f,f,f,t,f,f,f,f,f,f)
-  TYPE(INTERNAL_STATE),PARAMETER::ONLY_4d0=INTERNAL_STATE   (0,f,f,t,f,f,f,f,t,f,f,f,f)
-  TYPE(INTERNAL_STATE),PARAMETER::DELTA0=INTERNAL_STATE     (0,f,f,t,f,f,f,f,t,t,f,f,f)
-  TYPE(INTERNAL_STATE),PARAMETER::SPIN0=INTERNAL_STATE      (0,f,f,f,f,f,f,f,f,f,t,f,f)
-  TYPE(INTERNAL_STATE),PARAMETER::MODULATION0=INTERNAL_STATE(0,f,f,f,f,f,f,f,f,f,f,t,f)
-  TYPE(INTERNAL_STATE),PARAMETER::only_2d0=INTERNAL_STATE(0,f,f,t,f,f,f,f,f,f,f,f,t)
+  TYPE(INTERNAL_STATE),PARAMETER::DEFAULT0=INTERNAL_STATE   (0,f,f,f,f,f,f,f,f,f,f,f,f,F)
+  TYPE(INTERNAL_STATE),PARAMETER::TOTALPATH0=INTERNAL_STATE (1,f,f,f,f,f,f,f,f,f,f,f,f,F)
+  TYPE(INTERNAL_STATE),PARAMETER::TIME0=INTERNAL_STATE      (0,t,f,f,f,f,f,f,f,f,f,f,f,F)
+  TYPE(INTERNAL_STATE),PARAMETER::RADIATION0=INTERNAL_STATE (0,f,t,f,f,f,f,f,f,f,f,f,f,t)
+  TYPE(INTERNAL_STATE),PARAMETER::NOCAVITY0=INTERNAL_STATE  (0,f,f,t,f,f,f,f,f,f,f,f,f,t)
+  TYPE(INTERNAL_STATE),PARAMETER::FRINGE0=INTERNAL_STATE    (0,f,f,f,t,f,f,f,f,f,f,f,f,t)
+  TYPE(INTERNAL_STATE),PARAMETER::STOCHASTIC0=INTERNAL_STATE(0,f,f,f,f,t,f,f,f,f,f,f,f,F)
+  TYPE(INTERNAL_STATE),PARAMETER::ENVELOPE0=INTERNAL_STATE  (0,f,f,f,f,f,t,f,f,f,f,f,f,F)
+  TYPE(INTERNAL_STATE),PARAMETER::ONLY_4d0=INTERNAL_STATE   (0,f,f,t,f,f,f,f,t,f,f,f,f,t)
+  TYPE(INTERNAL_STATE),PARAMETER::DELTA0=INTERNAL_STATE     (0,f,f,t,f,f,f,f,t,t,f,f,f,t)
+  TYPE(INTERNAL_STATE),PARAMETER::SPIN0=INTERNAL_STATE      (0,f,f,f,f,f,f,f,f,f,t,f,f,F)
+  TYPE(INTERNAL_STATE),PARAMETER::MODULATION0=INTERNAL_STATE(0,f,f,f,f,f,f,f,f,f,f,t,f,F)
+  TYPE(INTERNAL_STATE),PARAMETER::only_2d0   =INTERNAL_STATE(0,f,f,t,f,f,f,f,f,f,f,f,t,t)
 
   TYPE(INTERNAL_STATE), target ::  DEFAULT=DEFAULT0
   TYPE(INTERNAL_STATE), target ::  TOTALPATH=TOTALPATH0
@@ -138,11 +139,12 @@ module S_status
   logical(lp) :: accelerate=my_false, first_particle=my_false
   logical(lp) :: automatic_complex = my_true
   integer :: aperture_pos_default=0
-  private track_TREE_G_complexr,track_TREE_G_complexp,track_TREE_probe_complexr,track_TREE_probe_complexp
+  private track_TREE_G_complexr,track_TREE_G_complexp,track_TREE_probe_complexr,track_TREE_probe_complexp_new
   integer :: size_tree=15
   integer :: ind_spin(3,3),k1_spin(9),k2_spin(9)
   real(dp),TARGET ::INITIAL_CHARGE=1
   logical :: mcmillan=.false.
+  real(dp) :: radfac=1   ! to fudge radiation (lower it)
   TYPE B_CYL
      integer firsttime
      integer, POINTER ::  nmul,n_mono   !,nmul_e,n_mono_e
@@ -160,6 +162,7 @@ module S_status
 
   INTERFACE assignment (=)
      MODULE PROCEDURE EQUALt
+     MODULE PROCEDURE EQUALi
      MODULE PROCEDURE EQUALtilt
      MODULE PROCEDURE equal_p
      MODULE PROCEDURE equal_A
@@ -239,7 +242,7 @@ module S_status
 
   INTERFACE track_TREE_probe_complex
      MODULE PROCEDURE track_TREE_probe_complexr
-     MODULE PROCEDURE track_TREE_probe_complexp       ! EXTERNAL
+     MODULE PROCEDURE track_TREE_probe_complexp_new
   END INTERFACE 
 
 CONTAINS
@@ -247,7 +250,7 @@ CONTAINS
   real(dp) function cradf(p)
     implicit none
     type (MAGNET_CHART), pointer:: P
-    cradf=crad*p%p0c**3
+    cradf=radfac*crad*p%p0c**3
   end function cradf
 
   real(dp) function cflucf(p)
@@ -1192,8 +1195,52 @@ CONTAINS
     S2%DELTA=       S1%DELTA
     S2%SPIN=       S1%SPIN
     S2%MODULATION=       S1%MODULATION
+    S2%FULL_WAY=       S1%FULL_WAY
     !    S2%spin_dim=       S1%spin_dim
   END SUBROUTINE EQUALt
+
+
+
+
+
+  SUBROUTINE  EQUALi(S2,i)
+    implicit none
+    type (INTERNAL_STATE),INTENT(OUT)::S2
+    integer, intent(in) :: i
+    
+    S2=default0
+    select case(i) 
+     case(0)
+      S2=default0
+    case(1)
+         S2=TOTALPATH0
+    case(2)
+         S2=TIME0
+    case(3)
+         S2=RADIATION0
+    case(4)
+         S2=NOCAVITY0
+    case(5)
+         S2=FRINGE0
+    case(6)
+         S2=STOCHASTIC0
+    case(7)
+         S2=ENVELOPE0
+    case(9)
+         S2=ONLY_4d0
+    case(10)
+         S2=DELTA0
+    case(11)
+         S2=SPIN0
+    case(12)
+         S2=MODULATION0
+    case(13)
+         S2=only_2d0
+    case default
+      S2%TOTALPATH = -1
+    end select
+ 
+  END SUBROUTINE EQUALi
 
 
 
@@ -1202,7 +1249,14 @@ CONTAINS
     TYPE (INTERNAL_STATE) add
     TYPE (INTERNAL_STATE), INTENT (IN) :: S1, S2
 
-
+    if(s2%totalpath/=0.and.s2%totalpath/=1) then 
+      add=s1
+      return
+    endif
+    if(s1%totalpath/=0.and.s1%totalpath/=1) then 
+      add=s1
+      return
+    endif
     add%TOTALPATH=0
     if((S1%TOTALPATH==1).OR.(S2%TOTALPATH==1)) add%TOTALPATH=1
 
@@ -1249,6 +1303,21 @@ CONTAINS
        add%ENVELOPE   =  F
     ENDIF
     if(add%only_4d.and.add%only_2d) add%only_4d=my_false
+
+    add%RADIATION  =  S1%RADIATION.OR.S2%RADIATION
+    add%NOCAVITY =  S1%NOCAVITY.OR.S2%NOCAVITY
+    add%TIME     =  S1%TIME.OR.S2%TIME
+    add%FRINGE   =       S1%FRINGE.OR.S2%FRINGE
+    add%stochastic   =       S1%stochastic.OR.S2%stochastic
+    add%ENVELOPE   =       S1%ENVELOPE.OR.S2%ENVELOPE
+    add%ONLY_2D  =       S1%ONLY_2D.OR.S2%ONLY_2D
+    add%ONLY_4D  =       S1%ONLY_4D.OR.S2%ONLY_4D
+    add%DELTA  =       S1%DELTA.OR.S2%DELTA
+    add%SPIN  =       S1%SPIN.OR.S2%SPIN
+    add%MODULATION  =       S1%MODULATION.OR.S2%MODULATION
+    add%PARA_IN  =       S1%PARA_IN.OR.S2%PARA_IN.or.ALWAYS_knobs
+
+    ADD%FULL_WAY=ADD%RADIATION.OR.ADD%stochastic.OR.ADD%ENVELOPE.OR.ADD%SPIN.OR.ADD%MODULATION
   END FUNCTION add
 
   FUNCTION sub( S1, S2 )
@@ -1256,6 +1325,15 @@ CONTAINS
     TYPE (INTERNAL_STATE) sub
     TYPE (INTERNAL_STATE), INTENT (IN) :: S1, S2
     logical(lp) dum1,dum2,tt1,tt2
+
+    if(s2%totalpath/=0.and.s2%totalpath/=1) then 
+      sub=s1
+      return
+    endif
+    if(s1%totalpath/=0.and.s1%totalpath/=1) then 
+      sub=s1
+      return
+    endif
 
     tt1=s1%only_2d
     tt2=s2%only_2d
@@ -1313,6 +1391,7 @@ CONTAINS
        sub%NOCAVITY =  T
        sub%stochastic   =  F
     ENDIF
+    sub%FULL_WAY=sub%RADIATION.OR.sub%stochastic.OR.sub%ENVELOPE.OR.sub%SPIN.OR.sub%MODULATION
   END FUNCTION sub
 
   FUNCTION PARA_REMA(S1)   ! UNARY +
@@ -1325,27 +1404,29 @@ CONTAINS
 
   END FUNCTION PARA_REMA
 
-  subroutine init_all(STATE,NO1,NP1,pack,ND2,NPARA)
+  subroutine init_all(STATE,NO1,NP1,pack,ND2,NPARA,number_of_clocks)
     !  subroutine S_init(STATE,NO1,NP1,PACKAGE,MAPINT,ND2,NPARA)
     implicit none
     TYPE (INTERNAL_STATE), INTENT(IN):: STATE
     LOGICAL(lp), optional, INTENT(IN):: pack
     INTEGER, INTENT(IN):: NO1,NP1
-    INTEGER,optional :: ND2,NPARA
+    INTEGER,optional :: ND2,NPARA,number_of_clocks
+
     use_complex_in_ptc=my_true
-    call S_init(STATE,NO1,NP1,pack,ND2,NPARA)
+    call S_init(STATE,NO1,NP1,pack,ND2,NPARA,number_of_clocks)
    end subroutine init_all
 
-  subroutine S_init(STATE,NO1,NP1,pack,ND2,NPARA)
+  subroutine S_init(STATE,NO1,NP1,pack,ND2,NPARA,number_of_clocks)
     !  subroutine S_init(STATE,NO1,NP1,PACKAGE,MAPINT,ND2,NPARA)
     implicit none
     TYPE (INTERNAL_STATE), INTENT(IN):: STATE
     LOGICAL(lp), optional, INTENT(IN):: pack
     INTEGER, INTENT(IN):: NO1,NP1
     INTEGER ND1,NDEL,NDPT1
-    INTEGER,optional :: ND2,NPARA
+    INTEGER,optional :: ND2,NPARA,number_of_clocks
     INTEGER  ND2l,NPARAl,n_acc,no1c
     LOGICAL(lp) package
+    n_rf=0
 !    call dd_p !valishev
     doing_ac_modulation_in_ptc=.false.
     package=my_true
@@ -1387,11 +1468,13 @@ CONTAINS
        NDPT1=0
        !       MAPINT=6
     ENDIF
-
+ n_acc=0
     IF(STATE%modulation)  then
        doing_ac_modulation_in_ptc=.true.
-       ND1=ND1+1
-       n_acc=1
+      n_acc=1
+     !  ND1=ND1+1
+     if(present(number_of_clocks)) n_acc=number_of_clocks 
+        !1
     endif
 
    ! IF(STATE%spin.or.STATE%modulation.or.STATE%radiation.or.STATE%envelope)  then
@@ -1399,9 +1482,9 @@ CONTAINS
    ! endif
     !    write(6,*) NO1,ND1,NP1,NDEL,NDPT1
     !pause 678
-    CALL INIT(NO1,ND1,NP1+NDEL,NDPT1,PACKAGE)
+    CALL INIT(NO1,ND1,NP1+NDEL+2*n_acc,NDPT1,PACKAGE)
 
-    ND2l=ND1*2
+    ND2l=ND1*2+2*n_acc
     NPARAl=ND2l+NDEL
     C_%NPARA=NPARAl
     C_%ND2=ND2l
@@ -1413,7 +1496,9 @@ CONTAINS
     if(present(npara)) npara=nparal
 ! etienne
 no1c=no1+complex_extra_order
+ND1=ND1+n_acc
     if(use_complex_in_ptc) call c_init(NO1c,nd1,np1+ndel,ndpt1,n_acc,ptc=my_false)  ! PTC false because we will not use the real FPP for acc modulation
+    n_rf=n_acc
 !call c_init(c_%NO,c_%nd,c_%np,c_%ndpt,number_of_ac_plane,ptc=my_true)  
 !  subroutine c_init(NO1,NV1,np1,ndpt1,AC_rf,ptc)  !,spin
 !    implicit none
@@ -10020,19 +10105,21 @@ endif
      stop
     endif
     np=size_tree
-    ind_spin(1,1)=1+ma%n;ind_spin(1,2)=2+ma%n;ind_spin(1,3)=3+ma%n;
-    ind_spin(2,1)=4+ma%n;ind_spin(2,2)=5+ma%n;ind_spin(2,3)=6+ma%n;
-    ind_spin(3,1)=7+ma%n;ind_spin(3,2)=8+ma%n;ind_spin(3,3)=9+ma%n;    
-    k1_spin(1)=1;k2_spin(1)=1;
-    k1_spin(2)=1;k2_spin(2)=2;
-    k1_spin(3)=1;k2_spin(3)=3;
-    k1_spin(4)=2;k2_spin(4)=1;
-    k1_spin(5)=2;k2_spin(5)=2;
-    k1_spin(6)=2;k2_spin(6)=3;
-    k1_spin(7)=3;k2_spin(7)=1;
-    k1_spin(8)=3;k2_spin(8)=2;
-    k1_spin(9)=3;k2_spin(9)=3;
+! initialized in ptc ini
+ !   ind_spin(1,1)=1+ma%n;ind_spin(1,2)=2+ma%n;ind_spin(1,3)=3+ma%n;
+ !   ind_spin(2,1)=4+ma%n;ind_spin(2,2)=5+ma%n;ind_spin(2,3)=6+ma%n;
+ !   ind_spin(3,1)=7+ma%n;ind_spin(3,2)=8+ma%n;ind_spin(3,3)=9+ma%n;    
+ !   k1_spin(1)=1;k2_spin(1)=1;
+ !   k1_spin(2)=1;k2_spin(2)=2;
+ !   k1_spin(3)=1;k2_spin(3)=3;
+ !   k1_spin(4)=2;k2_spin(4)=1;
+ !   k1_spin(5)=2;k2_spin(5)=2;
+ !   k1_spin(6)=2;k2_spin(6)=3;
+ !   k1_spin(7)=3;k2_spin(7)=1;
+ !   k1_spin(8)=3;k2_spin(8)=2;
+ !   k1_spin(9)=3;k2_spin(9)=3;
 
+   
     ALLOCATE(M(NP))
     CALL ALLOC(M,NP)
     ALLOCATE(Mg(NP))
@@ -10042,7 +10129,7 @@ endif
      mg(i)=0.e0_dp
     enddo
      do i=1,ma%n
-      m(i)=ma%v(i)
+      m(i)=ma%v(i)   ! orbital part
      enddo
 
     call c_full_norm_spin(Ma%s,k,norm)
@@ -10102,7 +10189,8 @@ endif
        mat=ma**(-1)
        t(1)%e_ij=matmul(matmul(mat,ma%e_ij),transpose(mat))
  
-    deallocate(M)
+     call kill(m); call kill(mg);
+    deallocate(M);    deallocate(Mg);
 
   END SUBROUTINE SET_TREE_G_complex
 
@@ -10404,245 +10492,7 @@ endif ! jumpnot
     endif 
   end SUBROUTINE orthonormaliser
 
-  SUBROUTINE track_TREE_probe_complexp_old(T,xs,dofix0,dofix,sta)
-    use da_arrays
-    IMPLICIT NONE
-    TYPE(TREE_ELEMENT), INTENT(IN) :: T(:)
-    type(probe_8) xs
-    type(probe) xs0
-    type(real_8) x(size_tree),x0(size_tree),s0(3,3),r(3,3),dx6,beta
-    real(dp) m(6,6),xi(6),norm
-    type(damap) dm,md,iq
-    integer i,j,k
-    type(internal_state) sta
-    logical dofix0,dofix
-    integer, allocatable :: js(:)
- 
-    call alloc(x,size_tree)
-    call alloc(x0,size_tree)
-    call alloc(dx6)
-    do i=1,3
-    do j=1,3
-     call alloc(s0(i,j))
-     call alloc(r(i,j))
-    enddo
-    enddo
- 
-
-
-    if(sta%envelope.and.c_%no>1) then
-    call alloc(dm)
-     dm=xs
-     m=(dm.sub.1)**(-1)
-        xs%e_ij=xs%e_ij+matmul(matmul(m,t(1)%e_ij),transpose(m))
-    call kill(dm)
-     endif
-
-    do i=1,6
-      x(i)=xs%x(i)
-      x0(i)=xs%x(i)
-      x(i+6)=x(i)
-    enddo
-
-
-     if(.not.sta%time) then
-     dx6=x(6)
-     x(5)=(2*x(5)+x(5)**2)/(sqrt(1.0_dp/t(1)%beta0**2+2.0_dp*x(5)+x(5)**2)+1.0_dp/t(1)%beta0)
-     x(11)=x(5)
-     x0(5)=x(5)
-    endif
-
-
-    if(dofix0) then
-
-     do i=1,6
-      x(i)=x(i)-t(1)%fix0(i)
-      x0(i)=x0(i)-t(1)%fix0(i)
-      x(i+6)=x(i)
-     enddo
-    endif
-
-    if(sta%radiation) then
-     do i=1,6
-      x(i)=0.0_dp
-     enddo
-
-     do i=1,6
-     do j=1,6
-      x(i)=t(1)%rad(i,j)*x(j+6)+x(i)
-     enddo
-     enddo
-
-
-      do i=1,6
-       x0(i)=x(i)
-       x(i+6)=x(i)
-     enddo
-
-    endif
-
- 
-    if(t(3)%symptrack) then
-     xs0=0
-     do i=1,6
-      xs0%x(i)=x0(i)
-      xi(i)=x0(i)
-     enddo
-      call  track_TREE_probe_complexr(T,xs0,.false.,.false.,sta,jump=.true.)
-
-!!! compute map  for speed up
-     norm=0.d0
-     do i=1,6
-      norm=norm+abs(x(1).sub.'1')
-     enddo
-!     write(6,*) "norm = ",norm
-     if(norm>0) then
-     call alloc(dm,md,iq)
-     allocate(js(c_%nd2))
-      do i=1,3   !c_%nd
-       xi(2*i-1)=xs0%x(2*i-1)
-      enddo
-
-      do i=1,c_%nd2
-      x0(i)=xi(i)+(1.0_dp.mono.i)
-      enddo
-      if(c_%nd2==4.and.C_%NPARA==5) then
-     !  x0(5)=xi(5)+(1.0_dp.mono.5)
-       x0(6)=0.0_dp !xi(6)
-      elseif(C_%NPARA==4) then
-       write(6,*) C_%NPARA
-       x0(5)=xi(5)
-       x0(6)=0.0_dp !xi(6)       
-      endif
-          call track_TREE_G_complex(T(3),X0(1:15))
-       js=0
-      do i=1,c_%nd2
-       if(mod(i,2)==1) js(i)=1
-       dm%v(i)=x0(i)-(x0(i).sub.'0') 
-      enddo
-       dm=dm**(js)
-        do i=1,c_%nd2
-          md%v(i)=x(i)-(x(i).sub.'0') 
-        enddo 
-      if(c_%nd2==4) then
-        do i=1,c_%nd
-          iq%v(2*i-1)=dm%v(2*i-1) 
-          iq%v(2*i)=1.0_dp.mono.(2*i)
-        enddo 
-        x0(6)=x0(6)*iq  ! partial invertion undone
-        x0(6)=x0(6)*md  ! previous line concatenated
-       endif
-          md=dm*md
-        do i=1,c_%nd2
-         x(i)=md%v(i)+xs0%x(i)
-        enddo
-
-      if(c_%nd2==4) then
-       x(6)=x0(6)+x(6)
-      endif
-
-     call kill(dm,md,iq)
-     deallocate(js)
-     else
-       do i=1,6  !c_%nd2
-         x(i)=xs0%x(i)
-        enddo
-     endif
-       do i=1,6
-        x0(i)=0.0_dp
-       enddo
-       do i=1,6
-        do j=1,6
-       x0(i)=t(3)%rad(i,j)*x(j)+x0(i)
-       enddo
-      enddo
-        do i=1,6
-         x(i)=x0(i)
-        enddo
-     else
-       call track_TREE_G_complex(T(1),X(1:6))
-     endif
- 
-
-
-
-
-
- 
-    if(sta%spin) then  ! spin
-    call track_TREE_G_complex(T(2),X(7:15))
- 
-
-    do i=1,3
-    do j=1,3
-     r(i,j)=x(ind_spin(i,j))
-    enddo
-    enddo
-
-    call orthonormalise(r)
-
-    do k=1,3
-     do i=1,3
-     do j=1,3
-       s0(k,i)=r(i,j)*xs%s(k)%x(j)+s0(k,i)
-     enddo
-    enddo
-    enddo
-
-    do k=1,3
-     do j=1,3
-       xs%s(k)%x(j)=s0(k,j)
-     enddo
-    enddo   
-endif ! spin
-
-
-
-    if(dofix) then
-       if(sta%radiation) then
-         do i=1,6
-           x(i)=x(i)+t(1)%fixr(i)
-         enddo
-       else
-         do i=1,6
-           x(i)=x(i)+t(1)%fix(i)
-         enddo
-       endif
-    endif
-
-
-    if(.not.sta%time) then
-     dx6=X(6)-dx6
-      beta=sqrt(1.0_dp+2.0_dp*x(5)/t(1)%beta0+x(5)**2)/(1.0_dp/t(1)%BETA0 + x(5))
-      x(6)=x(6)-dx6+beta*dx6 +  (beta/t(1)%beta0-1.0_dp)*t(1)%ds
-      x(5)=(2.0_dp*x(5)/t(1)%beta0+x(5)**2)/(sqrt(1.0_dp+2.0_dp*x(5)/t(1)%beta0+x(5)**2)+1.0_dp)
-       if(sta%totalpath==1) then
-        x(6)=x(6)+t(1)%ds
-       endif
-    call kill(dx6)
-    else
-        if(sta%totalpath==1) then
-        x(6)=x(6)+t(1)%ds/t(1)%beta0 
-       endif     
-    endif
-
-    do i=1,6
-      xs%x(i)=x(i)
-    enddo
-
-    call kill(dx6)
-    call kill(x0,size_tree)
-    call kill(x,size_tree)  
-    do i=1,3
-    do j=1,3
-     call kill(s0(i,j))
-     call kill(r(i,j))
-    enddo
-    enddo
-
-  end SUBROUTINE track_TREE_probe_complexp_old
-
-  SUBROUTINE track_TREE_probe_complexp(T,xs,dofix0,dofix,sta)
+SUBROUTINE track_TREE_probe_complexp_new(T,xs,dofix0,dofix,sta)
     use da_arrays
     IMPLICIT NONE
     TYPE(TREE_ELEMENT), INTENT(IN) :: T(:)
@@ -10652,29 +10502,32 @@ endif ! spin
     real(dp) m(6,6),xi(6),norm,z0(6)
     type(damap) dm,md,iq
     type(c_damap) m0,mt
-    integer i,j,k
+    integer i,j,k,o
     type(internal_state) sta
     logical dofix0,dofix
     integer, allocatable :: js(:)
  
     call alloc(x,size_tree)
     call alloc(x0,size_tree)
-    call alloc(dx6)
+    call alloc(dx6,beta)
     do i=1,3
     do j=1,3
      call alloc(s0(i,j))
      call alloc(r(i,j))
     enddo
     enddo
- 
 
-   if(c_%nd2/=6) then
-    write(6,*) " problem in track_TREE_probe_complexp for the moment if nd2/=6 "
-    stop
-   else
+
+  ! if(c_%nd2/=6) then
+  !  write(6,*) " problem in track_TREE_probe_complexp for the moment if nd2/=6 "
+  !  stop
+  ! else
     call alloc(m0,mt)
     m0=xs
-    z0=xs%x
+
+    do o=1,6
+     z0(o)=xs%x(o)
+     enddo
  !   call print(m0,6)
  !   write(6,*) z0
     call KILL(xs)
@@ -10683,7 +10536,7 @@ endif ! spin
     xs0=0
     xs0=z0
     xs=mt+xs0
-   endif
+ !  endif
 
 
     if(sta%envelope.and.c_%no>1) then
@@ -10700,14 +10553,12 @@ endif ! spin
       x(i+6)=x(i)
     enddo
 
-
      if(.not.sta%time) then
      dx6=x(6)
      x(5)=(2*x(5)+x(5)**2)/(sqrt(1.0_dp/t(1)%beta0**2+2.0_dp*x(5)+x(5)**2)+1.0_dp/t(1)%beta0)
      x(11)=x(5)
      x0(5)=x(5)
     endif
-
 
     if(dofix0) then
 
@@ -10744,6 +10595,7 @@ endif ! spin
       xs0%x(i)=x0(i)
       xi(i)=x0(i)
      enddo
+
       call  track_TREE_probe_complexr(T,xs0,.false.,.false.,sta,jump=.true.)
 
 !!! compute map  for speed up
@@ -10766,10 +10618,10 @@ endif ! spin
      !  x0(5)=xi(5)+(1.0_dp.mono.5)
        x0(6)=0.0_dp !xi(6)
       elseif(C_%NPARA==4) then
-       write(6,*) C_%NPARA
        x0(5)=xi(5)
        x0(6)=0.0_dp !xi(6)       
       endif
+
           call track_TREE_G_complex(T(3),X0(1:15))
        js=0
       do i=1,c_%nd2
@@ -10869,6 +10721,7 @@ endif ! spin
 
     if(.not.sta%time) then
      dx6=X(6)-dx6
+
       beta=sqrt(1.0_dp+2.0_dp*x(5)/t(1)%beta0+x(5)**2)/(1.0_dp/t(1)%BETA0 + x(5))
       x(6)=x(6)-dx6+beta*dx6 +  (beta/t(1)%beta0-1.0_dp)*t(1)%ds
       x(5)=(2.0_dp*x(5)/t(1)%beta0+x(5)**2)/(sqrt(1.0_dp+2.0_dp*x(5)/t(1)%beta0+x(5)**2)+1.0_dp)
@@ -10897,7 +10750,7 @@ endif ! spin
 
 
     call kill(m0,mt)
-    call kill(dx6)
+    call kill(dx6,beta)
     call kill(x0,size_tree)
     call kill(x,size_tree)  
     do i=1,3
@@ -10907,7 +10760,7 @@ endif ! spin
     enddo
     enddo
 
-  end SUBROUTINE track_TREE_probe_complexp
+  end SUBROUTINE track_TREE_probe_complexp_new
 
   SUBROUTINE orthonormalisep(r)
    implicit none

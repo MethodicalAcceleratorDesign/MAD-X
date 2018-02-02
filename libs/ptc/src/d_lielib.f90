@@ -2680,6 +2680,7 @@ xsus=(xsu)/ND2
              hyp=.true.
              c_%stable_da=.false.
              c_%check_stable=.false.
+             messagelost="d_lielib.f90 mapflol : one of ri components is 0"
           endif
        enddo       
 
@@ -2699,13 +2700,13 @@ xsus=(xsu)/ND2
          endif
     endif  ! no_hyperbolic_in_normal_form
     
-!  checking for Krein    
-
-if(check_krein.and.(.not.hyp)) then
+    !  checking for Krein    
+    if(check_krein.and.(.not.hyp)) then
    
      if(.not.hyp.and.nd2>2) then
-      xsu=0.0_dp
-      xd=0.0_dp
+       xsu=0.0_dp
+       xd=0.0_dp
+ 
        do i=1,4
         xsu=log(rr(i)**2+ri(i)**2)+xsu
         xd=abs(log(rr(i)**2+ri(i)**2))+xd
@@ -2714,18 +2715,22 @@ if(check_krein.and.(.not.hyp)) then
        if(xsu>=0.and.xd>size_krein.and.xsus<=size_krein) then
          write(6,*) " A Krein collision seemed to have happened "
          write(6,*) " All calculations interrupted "
-       do i=1,nd2-ndc
-        write(6,*)"damping ", log(rr(i)**2+ri(i)**2) 
-       enddo
-       do i=1,nd2-ndc
-        write(6,*)"tunes ",  atan2(ri(i),rr(i))/twopi
-       enddo
-       do i=1,nd2
-        write(6,*)"eigenvalues ",  rr(i),ri(i)
-       enddo
-          c_%stable_da=.false.
-          c_%check_stable=.false.
-       
+         
+         do i=1,nd2-ndc
+           write(6,*)"damping ", log(rr(i)**2+ri(i)**2) 
+         enddo
+         
+         do i=1,nd2-ndc
+           write(6,*)"tunes ",  atan2(ri(i),rr(i))/twopi
+         enddo
+         
+         do i=1,nd2
+           write(6,*)"eigenvalues ",  rr(i),ri(i)
+         enddo
+         c_%stable_da=.false.
+         c_%check_stable=.false.
+          
+         messagelost="d_lielib.f90: mapflol: A Krein collision seemed to have happened" 
        endif
        
      endif  

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.03.09               +
-  + Execution date: 2017.03.30 14:32:31      +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2017.12.14 18:00:11      +
   ++++++++++++++++++++++++++++++++++++++++++++
 !---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8;
 
@@ -73,10 +73,10 @@ iteration:   1 error:   8.714678E-04 deltap:   0.000000E+00
 orbit:  -4.929560E-04  8.092901E-06  2.107938E-06  1.445684E-04  0.000000E+00  0.000000E+00
   
 iteration:   2 error:   2.297756E-05 deltap:   0.000000E+00
-orbit:  -4.999995E-04 -1.916166E-09 -1.671521E-10  1.424984E-04  0.000000E+00  0.000000E+00
+orbit:  -4.999995E-04 -1.916165E-09 -1.671518E-10  1.424984E-04  0.000000E+00  0.000000E+00
   
 iteration:   3 error:   2.548596E-09 deltap:   0.000000E+00
-orbit:  -4.999999E-04  1.982147E-10  8.002226E-12  1.425000E-04  0.000000E+00  0.000000E+00
+orbit:  -4.999999E-04  1.982153E-10  8.002531E-12  1.425000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 
@@ -127,11 +127,11 @@ START LMDIF:
 Initial Penalty Function =   0.10000310E+00
 
 
-call:       4   Penalty function =   0.22508175E-08
-call:       7   Penalty function =   0.14653192E-18
-call:      10   Penalty function =   0.32160281E-23
+call:       4   Penalty function =   0.22508160E-08
+call:       7   Penalty function =   0.14402081E-18
+call:      10   Penalty function =   0.25849394E-23
  ++++++++++ LMDIF ended: converged successfully
-call:      10   Penalty function =   0.32160281E-23
+call:      10   Penalty function =   0.25849394E-23
 endmatch;
 
 
@@ -139,11 +139,11 @@ MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         q1           4     6.42800000E+01     6.42800000E+01     9.89547120E-25
-Global constraint:         q2           4     5.93100000E+01     5.93100000E+01     2.22648102E-24
+Global constraint:         q1           4     6.42800000E+01     6.42800000E+01     1.29246971E-24
+Global constraint:         q2           4     5.93100000E+01     5.93100000E+01     1.29246971E-24
 
 
-Final Penalty Function =   3.21602814e-24
+Final Penalty Function =   2.58493941e-24
 
 
 
@@ -156,7 +156,7 @@ kqd                      -8.59912e-03 -8.60096e-03 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   3.21602814e-24
+VARIABLE "TAR" SET TO   2.58493941e-24
 
 
 Title, " Chromaticity correction";
@@ -186,9 +186,9 @@ START LMDIF:
 Initial Penalty Function =   0.83427511E-01
 
 
-call:       4   Penalty function =   0.33471262E-23
+call:       4   Penalty function =   0.56033725E-22
  ++++++++++ LMDIF ended: converged successfully
-call:       4   Penalty function =   0.33471262E-23
+call:       4   Penalty function =   0.56033725E-22
 endmatch;
 
 
@@ -196,11 +196,11 @@ MATCH SUMMARY
 
 Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
 --------------------------------------------------------------------------------------------------
-Global constraint:         dq1          4     2.00000000E+00     2.00000000E+00     1.95066073E-24
-Global constraint:         dq2          4     2.00000000E+00     2.00000000E+00     1.39646544E-24
+Global constraint:         dq1          4     2.00000000E+00     2.00000000E+00     5.60337241E-23
+Global constraint:         dq2          4     2.00000000E+00     2.00000000E+00     7.88860905E-31
 
 
-Final Penalty Function =   3.34712617e-24
+Final Penalty Function =   5.60337249e-23
 
 
 
@@ -213,7 +213,7 @@ ksd.b1                   -1.70566e-01 -1.70877e-01 -1.00000e+20  1.00000e+20
 
 END MATCH SUMMARY
 
-VARIABLE "TAR" SET TO   3.34712617e-24
+VARIABLE "TAR" SET TO   5.60337249e-23
 
 
 ! Generate a twiss table:
@@ -230,10 +230,10 @@ iteration:   1 error:   9.132144E-04 deltap:   0.000000E+00
 orbit:  -4.940097E-04  5.441415E-06  2.134811E-06  1.443832E-04  0.000000E+00  0.000000E+00
   
 iteration:   2 error:   1.715078E-05 deltap:   0.000000E+00
-orbit:  -4.999997E-04 -1.118293E-09 -3.195106E-11  1.424988E-04  0.000000E+00  0.000000E+00
+orbit:  -4.999997E-04 -1.118293E-09 -3.195076E-11  1.424988E-04  0.000000E+00  0.000000E+00
   
 iteration:   3 error:   1.757368E-09 deltap:   0.000000E+00
-orbit:  -4.999999E-04  2.133986E-10  8.054966E-12  1.425000E-04  0.000000E+00  0.000000E+00
+orbit:  -4.999999E-04  2.133993E-10  8.055264E-12  1.425000E-04  0.000000E+00  0.000000E+00
 
 ++++++ table: summ
 

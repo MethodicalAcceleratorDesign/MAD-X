@@ -8,7 +8,7 @@ module Mad_like
   IMPLICIT NONE
   public
 
-  private QUADTILT, SOLTILT, EL_Q,EL_0,pancake_tilt
+  private QUADTILT, SOLTILT, EL_Q,EL_0,pancake_tilt,abellTILT
   private drft,r_r !,rot,mark
   PRIVATE SEXTTILT,OCTUTILT
   private HKICKTILT,VKICKTILT,GKICKTILT
@@ -50,9 +50,9 @@ module Mad_like
   REAL(DP)  MAD_TREE_LD , MAD_TREE_ANGLE
   type(tree_element), allocatable :: t_em(:) !,t_ax(:),t_ay(:)
 
-  real(dp), private ::  angc,xc,dc,hc,LC,HD,LD,vc
+  real(dp), private ::  angc=0,xc=0,dc=0,hc=0,LC=0,HD=0,LD=0,vc=0
   integer, private :: nstc
-  logical ::   xprime_pancake = .true.
+  logical ::   xprime_pancake = .true.,xprime_abell=.true.
    character(vp) , private :: filec
   logical(lp) :: set_ap=my_false
   TYPE EL_LIST
@@ -63,7 +63,7 @@ module Mad_like
      real(dp) T1,T2,B0
      real(dp) volt,freq0,harmon,lag,DELTA_E,BSOL
      real(dp) tilt
-     real(dp) FINT,hgap,h1,h2,X_COL,Y_COL
+     real(dp) FINT,hgap,FINT2,hgap2,h1,h2,X_COL,Y_COL
      real(dp) thin_h_foc,thin_v_foc,thin_h_angle,thin_v_angle,hf,vf,ls  ! highly illegal additions by frs
      CHARACTER(120) file
      CHARACTER(120) file_rev
@@ -79,7 +79,12 @@ module Mad_like
      REAL(DP) DPHAS,PSI,dvds
      logical(lp) usethin
      INTEGER N_BESSEL
-     !     logical(lp) in,out
+     INTEGER n_ac  ! number of oscillating multipoles 
+     REAL(DP) d_bn(NMAX), d_an(NMAX) ! oscillation amplitudes of multipoles
+     REAL(DP) D_ac        ! factor for oscillation amplitude set by d_bn and d_an
+     REAL(DP) DC_ac, A_ac ! factors for base field oscillation (D0_BN) : BN(N) = (DC_AC+A_AC*clock)*D0_BN(N) + D_AC*clock*D_BN(N)
+     INTEGER  clockno_ac ! number (index) of the clock that this element is driven by
+     REAL(DP) theta_ac   ! lag wrt the oscillation clock
   END TYPE EL_LIST
 
   INTERFACE OPERATOR (+)
@@ -347,6 +352,11 @@ module Mad_like
   INTERFACE pancake
      MODULE PROCEDURE pancake_tilt
   end  INTERFACE
+
+  INTERFACE abell_dragt
+     MODULE PROCEDURE abellTILT
+  end  INTERFACE
+
 
   !  Taylor map
   !  INTERFACE Taylor_map
@@ -727,7 +737,13 @@ CONTAINS
        s2%dvds=0.0_dp
        s2%N_BESSEL=0
        s2%usethin=my_true
-
+       s2%n_ac = 0
+       s2%d_bn(:) = 0.0_dp
+       s2%d_an(:) = 0.0_dp
+       s2%D_ac  = 0.0_dp 
+       s2%DC_ac = 0.0_dp
+       s2%A_ac  = 0.0_dp
+       s2%theta_ac  = 0.0_dp
     ENDIF
   END SUBROUTINE EL_0
 
@@ -1181,7 +1197,8 @@ CONTAINS
           GKICKTILT%tilt=t%tilt(0)
        ENDIF
     ENDIF
-
+    
+    
     IF(LEN(NAME)>nlp) THEN
        !w_p=0
        !w_p%nc=2
@@ -1560,6 +1577,69 @@ CONTAINS
 
   END FUNCTION SBTILT
 
+  FUNCTION  abellTILT(NAME,L,T,LIST)
+    implicit none
+    type (EL_LIST) abellTILT
+    type (EL_LIST),optional, INTENT(IN)::list
+    type (TILTING),optional, INTENT(IN):: T
+    CHARACTER(*),optional, INTENT(IN):: NAME
+    real(dp),optional , INTENT(IN):: L
+    real(dp) E11,E22,L1,ANG1
+
+    E11=0.0_dp
+    E22=0.0_dp
+    L1=0.0_dp
+    ang1=0.0_dp
+
+    IF(PRESENT(L)) L1=L ;
+    if(present(list)) then
+       abellTILT=list
+       l1=list%L
+       ANG1=LIST%B0
+       E11=LIST%T1
+       E22=LIST%T2
+    else
+       abellTILT=0
+    endif
+
+
+
+    abellTILT%B0=ANG1/L1
+    abellTILT%L=L1
+    abellTILT%LD=L1
+    abellTILT%T1=E11;
+    abellTILT%T2=E22;
+
+    IF(ANG1/=0.0_dp) THEN
+       abellTILT%LC=2.0_dp*SIN(ANG1/2.0_dp)/abellTILT%B0
+    ELSE
+       abellTILT%LC=abellTILT%L
+    ENDIF
+    IF(LEN(NAME)>nlp) THEN
+       !w_p=0
+       !w_p%nc=2
+       !w_p%fc='((1X,a72,/),(1x,a72))'
+       !w_p%c(1)=name
+       write(6,'(a17,1x,a16)') ' IS TRUNCATED TO ', NAME(1:16)
+       ! call ! WRITE_I
+       abellTILT%NAME=NAME(1:16)
+    ELSE
+       abellTILT%NAME=NAME
+    ENDIF
+
+    if(present(t)) then
+       IF(T%NATURAL) THEN
+          abellTILT%tilt=t%tilt(1)
+       ELSE
+          abellTILT%tilt=t%tilt(0)
+       ENDIF
+    endif
+
+    abellTILT%KIND=kindabell
+    abellTILT%K(1)=abellTILT%B0+abellTILT%K(1)
+    abellTILT%nmul=0
+
+  END FUNCTION abellTILT
 
   FUNCTION  POTTILT(NAME,L,ANG,E1,E2,T,LIST)
     implicit none
@@ -1597,8 +1677,8 @@ CONTAINS
     POTTILT%T1=E11;
     POTTILT%T2=E22;
 
-    IF(ANG/=0.0_dp) THEN
-       POTTILT%LC=2.0_dp*SIN(ANG/2.0_dp)/POTTILT%B0
+    IF(ANG1/=0.0_dp) THEN
+       POTTILT%LC=2.0_dp*SIN(ANG1/2.0_dp)/POTTILT%B0
     ELSE
        POTTILT%LC=POTTILT%L
     ENDIF
@@ -2649,6 +2729,7 @@ CONTAINS
     type(element),pointer :: s2
     type(elementp), pointer :: s2p
     type(fibre), pointer::el
+
     !    integer ntot,ntot_rad,ntot_REV,ntot_rad_REV
 
     nullify(el);
@@ -2843,10 +2924,10 @@ CONTAINS
     !    endif
 
     !    CALL SETFAMILY(S2,ntot,ntot_rad,ntot_REV,ntot_rad_REV,6)
-    if(s2%kind/=kindpa) then
+    if(s2%kind/=kindpa.and.s2%kind/=kindabell) then
        CALL SETFAMILY(S2)  !,NTOT=ntot,ntot_rad=ntot_rad,NTOT_REV=ntot_REV,ntot_rad_REV=ntot_rad_REV,ND2=6)
     else
-
+        if(s2%kind==kindpa) then
        CALL SETFAMILY(S2,t=t_em)  !,T_ax=T_ax,T_ay=T_ay)
 
        S2%P%METHOD=4
@@ -2858,7 +2939,17 @@ CONTAINS
        s2%pa%xprime=xprime_pancake
        s2%vorname=filec
        deallocate(t_em)
+        else  ! abell
+       CALL SETFAMILY(S2)  !,T_ax=T_ax,T_ay=T_ay)
 
+       s2%ab%angc=angc
+       s2%ab%xc=xc
+       s2%ab%dc=dc
+       s2%ab%hc=hc
+       s2%ab%vc=vc
+       s2%ab%xprime=xprime_abell
+
+        endif
     endif
 
     IF(S2%KIND==KIND4) THEN
@@ -2918,6 +3009,7 @@ CONTAINS
  !      S2%ECOL19%A%R(2)=ABSOLUTE_APERTURE
     ENDIF
 
+
     IF(MADX) then
        s2%fint=s1%FINT
        s2%hgap=s1%hgap
@@ -2961,6 +3053,90 @@ CONTAINS
     endif
 
     call copy(s2,s2p)
+
+
+
+    ! SLOW AC MODULATION this must be after copy
+    !print*,S2%NAME, " N_AC ", s1%n_ac
+    if(s1%n_ac > 0) then
+      !print*, "EL_Q ", s1%n_ac       
+      allocate(S2%DC_ac)
+      allocate(S2%A_ac)
+      allocate(S2%theta_ac)
+      allocate(S2%D_ac)
+
+
+      allocate(s2p%DC_ac)
+      allocate(s2p%A_ac)
+      allocate(s2p%theta_ac)
+      CALL alloc(s2p%DC_ac)
+      CALL alloc(s2p%A_ac)
+      CALL alloc(s2p%theta_ac)
+      allocate(s2p%D_ac)
+      CALL alloc(s2p%D_ac)
+
+
+      S2%D_ac     = s1%D_ac
+      S2%DC_ac    = s1%DC_ac
+      S2%A_ac     = s1%A_ac
+      S2%theta_ac = s1%theta_ac*twopi
+      S2%slow_ac  = s1%clockno_ac
+      
+      s2p%D_ac     = s1%D_ac
+      s2p%DC_ac    = s1%DC_ac
+      s2p%A_ac     = s1%A_ac
+      s2p%theta_ac = s1%theta_ac*twopi
+      s2p%slow_ac  = s1%clockno_ac
+
+
+      !may need to move after s2 to s2p copy
+      if(s1%n_ac > S2%p%nmul) then
+         CALL ADD(S22,s1%n_ac,0,0.0_dp)
+      endif
+
+      allocate(S2%d_an(S2%p%nmul))
+      allocate(S2%d_bn(S2%p%nmul))
+      allocate(S2%d0_an(S2%p%nmul))
+      allocate(S2%d0_bn(S2%p%nmul))
+
+      allocate(s2p%d_an(S2%p%nmul))
+      allocate(s2p%d_bn(S2%p%nmul))
+      allocate(s2p%d0_an(S2%p%nmul))
+      allocate(s2p%d0_bn(S2%p%nmul))
+
+      S2%d_an=0.0_dp
+      S2%d_bn=0.0_dp
+
+      call alloc(s2p%d_an,S2%p%nmul)
+      call alloc(s2p%d_bn,S2%p%nmul)
+      call alloc(s2p%d0_an,S2%p%nmul)
+      call alloc(s2p%d0_bn,S2%p%nmul)
+
+      ! copy of original values from the base setting (unmodulated)
+      do i=1,S2%p%nmul
+         S2%d0_bn(i)=S2%bn(i)
+         S2%d0_an(i)=S2%an(i)
+
+         s2p%d0_bn(i)=S2%bn(i)
+         s2p%d0_an(i)=S2%an(i)
+      enddo
+
+      do i=1,s1%n_ac
+      
+         !print*,"skowron: ", S2%NAME, " ACD ", i, " AN ",s1%d_an(i), " BN ", s1%d_bn(i)
+         S2%d_an(i) =s1%d_an(i)
+         S2%d_bn(i) =s1%d_bn(i)
+
+         S2p%d_an(i) =s1%d_an(i)
+         S2p%d_bn(i) =s1%d_bn(i)
+         
+      enddo
+      !
+    else
+     S2%slow_ac  = 0
+     S2p%slow_ac = 0
+    endif
+
 
     ! end of machida stuff here
     ! Default survey stuff here
@@ -3359,7 +3535,8 @@ CONTAINS
     beta0i=1.0_dp/beta0
     GAMMA=erg/XMC2
 
-    CON=3.0_dp*CU*CGAM*HBC/2.0_dp*TWOPII/XMC2**3
+!    CON=3.0_dp*CU*CGAM*HBC/2.0_dp*TWOPII/XMC2**3
+    CON=3.0_dp*CU*CGAM*HBC/2.0_dp*TWOPII/pmae**3
     CRAD=CGAM*TWOPII   !*ERG**3
     CFLUC=CON  !*ERG**5
     GAMMA2=erg**2/XMC2**2
@@ -3392,6 +3569,20 @@ CONTAINS
    nstc=nst0
    end subroutine set_pancake_constants 
 
+   subroutine set_abell_constants(angc0,xc0,dc0,vc0,hc0,xprime0,m_abell0,n_abell0)
+   implicit none
+   real(dp) angc0,xc0,dc0,hc0,hd0,ld0,vc0
+   logical xprime0
+   integer m_abell0,n_abell0
+   angc=angc0
+   xc=xc0
+   dc=dc0
+   hc=hc0
+   vc=vc0
+   xprime_pancake=xprime0
+   m_abell=m_abell0
+   n_abell=n_abell0
+   end subroutine set_abell_constants 
   
   ! linked
 

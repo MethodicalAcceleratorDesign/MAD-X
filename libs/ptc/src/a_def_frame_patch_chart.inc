@@ -29,6 +29,7 @@ TYPE PATCH
    INTEGER(2), POINTER:: ENERGY => null()    ! IF TRUE, ENERGY PATCHES NEEDED
    INTEGER(2), POINTER:: TIME => null()      ! IF TRUE, TIME PATCHES NEEDED
    REAL(DP), POINTER:: A_T => null() ,B_T => null()      ! TIME SHIFT NEEDED SOMETIMES WHEN RELATIVE TIME IS USED
+   REAL(DP), POINTER:: A_L => null() ,B_L => null() 
    REAL(DP), POINTER:: p0b => null() ,b0b => null()      ! for bmad patching
 END TYPE PATCH
 

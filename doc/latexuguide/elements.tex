@@ -172,7 +172,7 @@ Bending magnets have the following attributes:
    \ttitem{KILL\_ENT\_FRINGE} If this logical flag is set to true the fringe fields on the entrance of the element are not taken into account (not calculated). \\
    (Default: false)
 
-   \ttitem{KILL\_EXT\_FRINGE} If this logical flag is set to true the fringe fields on the exit of the element are not taken into account (not calculated). \\
+   \ttitem{KILL\_EXI\_FRINGE} If this logical flag is set to true the fringe fields on the exit of the element are not taken into account (not calculated). \\
    (Default: false)
 \end{madlist}
 
@@ -853,6 +853,7 @@ For further information on element type \texttt{TKICKER} and its attributes, loo
 at the documentation of the orbit corrector type
 \hyperref[sec:kicker]{\texttt{KICKER}}.   
 
+
 \section{RF Cavity}
 \ttindex{RFcavity}
 \label{sec:rf-cavity}\label{sec:rfcavity}
@@ -898,7 +899,11 @@ An \texttt{RFCAVITY} has eight real attributes and one integer attribute:
     of non-zero dispersion may not close as expected. Therefore, it is best
     to perform \texttt{TWISS} in 4D only, \textsl{i.e.} with cavities
     switched off. If 6D is needed one has to use the
-    \hyperref[sec:ptc-twiss]{\texttt{PTC\_TWISS}} command.  
+    \hyperref[sec:ptc-twiss]{\texttt{PTC\_TWISS}} command. 
+    Please refer to \hyperref[sec:ptc-setswitch]{\texttt{PTC\_SETSWITCH}} command,
+    in particular to \texttt{TIME} and \texttt{TOTALPATH} switches,
+    concerning RF behaviour of cavities in PTC.
+    
 \end{itemize}
 
 The \texttt{RFCAVITY} can also have attributes that only become active in 
@@ -998,7 +1003,14 @@ performed.
 Contrary to the regular multipole, where the dipole
 component has an effect on the reference orbit, an RF-Multipole that
 includes a dipole component does not bend the reference orbit.      
- 
+
+In PTC there must be at least one cavity with non-zero voltage,
+otherwise all RF elements, including RF multipoles, are disabled.
+Concerning RF behaviour of cavities in PTC
+please refer to \hyperref[sec:ptc-setswitch]{\texttt{PTC\_SETSWITCH}} command,
+in particular to \texttt{TIME} and \texttt{TOTALPATH} switches.
+
+
 \begin{madlist}
    \ttitem{VOLT} The peak voltage of the RF accelerating mode (DEFAULT: 0 MV).
    \ttitem{LAG} The phase lag [$2\pi$] (DEFAULT: 0) 
@@ -1183,6 +1195,88 @@ cavity is a Cartesian coordinate system.
 %\href{http://www.cern.ch/rcalaga}{R. Calaga}, September 2010
 
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{AC Dipole}
+\ttindex{acdipole}\index{ac dipole}
+\label{sec:acdipole}
+
+Alternating Current (AC) dipole is implemented with: 
+\begin{madlist}
+   \ttitem{HACDIPOLE} an AC dipole for the horizontal plane, 
+   \ttitem{VACDIPOLE} an AC dipole for the vertical plane, 
+\end{madlist}
+
+\madbox{
+xxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxx\= \kill
+label: HACDIPOLE, L=real, VOLT=real,  FREQ=real, LAG=real, \\
+                  \> RAMP1=integer, RAMP2=integer, \\ 
+                  \> RAMP3=integer, RAMP4=integer; \\
+label: VACDIPOLE, L=real, VOLT=real,  FREQ=real, LAG=real, \\
+                  \> RAMP1=integer, RAMP2=integer, \\
+                  \> RAMP3=integer, RAMP4=integer; 
+}
+In fact this element is rather oscilating (time varying) orbit corrector (kicker) rather than dipole
+because it does not change the reference frame. The oscillation is assumed to be slow
+compared with bunch length and the kick is constant along the bunch. 
+These devices are used for beam excitations in circular machines for optics measurements.
+They are linearly ramped up to the full amplitude (and ramped down)
+to avoid emittance growth.
+
+The attributes have the following meaning: 
+\begin{madlist}
+   \ttitem{L} The length of the device (default: 0 m). 
+   \ttitem{VOLT} The amplitude of the kick
+     (default: 0).  
+   \ttitem{FREQ} Tune of the oscillation in $2\pi$ units. \\
+     \textbf{The name of the parameter is misleading and will be changed in the future for TUNE.} \\
+     (default: 0).  
+   \ttitem{RAMP1} Starting turn of amplitude ramp-up. \\ 
+     (default: 0).  
+   \ttitem{RAMP2} Last turn of amplitude ramp-up. \\
+     (default: 0).  
+   \ttitem{RAMP3} Starting turn of amplitude ramp-down. \\ 
+     (default: 0).  
+   \ttitem{RAMP4} Last turn of amplitude ramp-down. \\
+     (default: 0).  
+\end{madlist}
+
+
+AC dipole is not implemented in \texttt{TWISS}.
+
+In \texttt{TRACK} it is implemented as a zero-length element
+changing transverse momentum by $(0.3 \cdot VOLT / p0c) \cdot sin(2\pi \cdot FREQ  \cdot turn)$,
+where $turn$ is turn number. If ramp settings are left with default values (all zero)
+AC dipole has no effect in \texttt{TRACK}.
+
+PTC requires that \texttt{MODULATION} flag is set to true 
+via \texttt{PTC\_SETSWITCH} command to enable AC dipole, 
+otherwise it is treated as a drift. 
+
+For computation of the maps in \texttt{PTC\_TWISS} and \texttt{PTC\_NORMAL}
+the phasespace is than extended by extra dimensions corresponding to
+the frequency clocks defined with AC dipoles. 
+Maximum of three distinct frequencies are allowed.
+There can be more then three AC dipoles but than some of them need to have
+the same frequencies. 
+\texttt{PTC\_TWISS}, when invoked with \texttt{NORMAL=true}, calculates
+dependence of optical paramters on amplitudes of the clocks.
+Results of \texttt{PTC\_TRACK} and \texttt{PTC\_TRACKLINE}
+may be slightly different from \texttt{TRACK} because of some implementation details,
+in particular for not fully relativistic beams.
+PTC internaly uses frequency so time of flight effects are taken into account
+and kick amplitude is inversely proportional to relativistic beta function.
+Please note that at the moment \texttt{LAG} parameter is ignored 
+in translation to PTC. If ramp settings are left with default values (all zero)
+PTC tracking will assume maximum amplitude.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
 \section{Electrostatic Separator}
 \ttindex{elseparator}
 \label{sec:separator}\label{sec:elseparator}
@@ -1200,14 +1294,16 @@ An \texttt{ELSEPARATOR} element has four real attributes:
      A positive field increases \textit{p$_y$} for positive particles.  
    \ttitem{TILT} The roll angle about the longitudinal axis (default: 0
      rad). A positive angle represents a clockwise of the electrostatic
-     separator.  
+     separator.
+   \ttitem{EX\_L} The integrated vertical electric field strength (default: 0 MV).
+    This parameter is only used in \hyperref[sec:trackoverview]{\texttt{THINTRACK}} and ignored by \hyperref[chap:twiss]{\texttt{TWISS}}. 
+   \ttitem{EY\_L}  The integrated horizontal electric field strength (default: 0 MV).
+    This parameter is only used in \hyperref[sec:trackoverview]{\texttt{THINTRACK}} and ignored by \hyperref[chap:twiss]{\texttt{TWISS}}.
 \end{madlist}
-
 An electrostatic separator requires the particle \texttt{ENERGY} and the
 particle \texttt{CHARGE} to be set by a
 \hyperref[sec:beam]{\texttt{BEAM}} command before any calculation is
-performed.
-
+performed. Note that no thin elseparator currently exists in \hyperref[chap:twiss]{\texttt{TWISS}}. 
 Example: 
 \madxmp{
 BEAM, PARTICLE=positron, ENERGY=50.0;\\

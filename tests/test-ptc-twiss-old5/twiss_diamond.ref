@@ -63,7 +63,7 @@
 @ ORBIT_Y          %le                   0
 @ ORBIT_PY         %le                   0
 @ ORBIT_PT         %le     -1.16472385e-12
-@ ORBIT_-CT        %le       0.02997564577
+@ ORBIT_T        %le       0.02997564577
 @ XCORMS           %le     1.747823028e-13
 @ PXCORMS          %le     8.707938038e-14
 @ YCORMS           %le                   0
@@ -78,14 +78,14 @@
 @ YCOMAX           %le                   0
 @ PYCOMIN          %le                   0
 @ PYCOMAX          %le                   0
-@ TCOMIN           %le      -0.02997564577
-@ TCOMAX           %le      -0.02997564577
+@ TCOMIN           %le       0.02997564577
+@ TCOMAX           %le       0.02997564577
 @ PTCOMIN          %le    -1.165034804e-12
 @ PTCOMAX          %le     -1.16472385e-12
 @ TITLE            %35s " Diamond Light Source Lattice 8.1.1"
-@ ORIGIN           %17s "5.03.00 Darwin 64"
-@ DATE             %08s "30/03/17"
-@ TIME             %08s "14.35.41"
+@ ORIGIN           %17s "5.03.07 Darwin 64"
+@ DATE             %08s "14/12/17"
+@ TIME             %08s "18.03.11"
 * NAME                                S               BETX               BETY             BETA11             BETA22              DISP1              DISP3                MU1                MU2                  X                  Y 
 $ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le 
  "DIAMOND$START"                      0        9.978753864        5.831556552        9.978753864        5.831556552      0.07214748532    3.529919512e-17                  0                  0   -9.237083396e-14                  0

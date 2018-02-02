@@ -1,0 +1,52 @@
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %11s "SEQ_NOTRANS"
+@ PARTICLE         %06s "PROTON"
+@ MASS             %le        0.9382720813
+@ CHARGE           %le                   1
+@ ENERGY           %le                5500
+@ PC               %le          5499.99992
+@ GAMMA            %le         5861.839129
+@ KBUNCH           %le                   1
+@ BCURRENT         %le                   0
+@ SIGE             %le               0.001
+@ SIGT             %le                   1
+@ NPART            %le                   0
+@ EX               %le                   1
+@ EY               %le                   1
+@ ET               %le               0.001
+@ LENGTH           %le                   2
+@ ALFA             %le                   0
+@ ORBIT5           %le             -0.0001
+@ GAMMATR          %le                   0
+@ Q1               %le         0.176203417
+@ Q2               %le        0.1761875028
+@ DQ1              %le                   0
+@ DQ2              %le                   0
+@ DXMAX            %le      0.001993500329
+@ DYMAX            %le      0.002002499729
+@ XCOMAX           %le        0.0119938513
+@ YCOMAX           %le        0.0040013495
+@ BETXMAX          %le         4.994402972
+@ BETYMAX          %le         5.002398972
+@ XCORMS           %le       0.01142095564
+@ YCORMS           %le      0.003479005485
+@ DXRMS            %le      0.001577852164
+@ DYRMS            %le      0.001582403897
+@ DELTAP           %le                   0
+@ SYNCH_1          %le                   0
+@ SYNCH_2          %le                   0
+@ SYNCH_3          %le                   0
+@ SYNCH_4          %le                   0
+@ SYNCH_5          %le                   0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %17s "5.03.07 Darwin 64"
+@ DATE             %08s "14/12/17"
+@ TIME             %08s "17.56.54"
+* NAME                                S                  X                 PX                  Y                 PY                 PT                  T 
+$ %s                                %le                %le                %le                %le                %le                %le                %le 
+ "SEQ_NOTRANS$START"                   0               0.01              0.001              0.002              0.001             0.0002             0.0001
+ "DRIFT_0"                          1.5          0.0114997              0.001          0.0034997              0.001             0.0002    9.850000871e-05
+ "NEWQUAD"                          1.5          0.0114997       0.0009885003          0.0034997       0.0010034997             0.0002    9.850000871e-05
+ "DRIFT_1"                            2       0.0119938513       0.0009885003       0.0040013495       0.0010034997             0.0002    9.800397549e-05
+ "SEQ_NOTRANS$END"                    2       0.0119938513       0.0009885003       0.0040013495       0.0010034997             0.0002    9.800397549e-05

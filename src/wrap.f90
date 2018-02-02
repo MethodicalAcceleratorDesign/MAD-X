@@ -109,6 +109,13 @@ subroutine w_ptc_setdebuglevel(level)
   call ptc_setdebuglevel(level)
 end subroutine w_ptc_setdebuglevel
 
+subroutine w_ptc_setseed(seed)
+  use madx_ptc_intstate_module
+  implicit none
+  integer seed
+  call ptc_setseed(seed)
+end subroutine w_ptc_setseed
+
 subroutine w_ptc_enforce6D(level)
   use madx_ptc_intstate_module
   implicit none
@@ -136,6 +143,14 @@ subroutine w_ptc_setradiation(method)
   integer method
   call ptc_setradiation(method)
 end subroutine w_ptc_setradiation
+
+subroutine w_ptc_setmodulation(method)
+  use precision_constants
+  use madx_ptc_intstate_module
+  implicit none
+  integer method
+  call ptc_setmodulation(method)
+end subroutine w_ptc_setmodulation
 
 subroutine w_ptc_setexactmis(method)
   use precision_constants

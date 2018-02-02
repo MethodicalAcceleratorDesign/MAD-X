@@ -25,6 +25,7 @@ CXX_SRC := $(notdir $(wildcard src/mad_*.cpp))
 ifeq ($(NTPSA),yes)
   CXX_HDR += tpsa.h 
   CXX_SRC += tpsa.cpp
+  vpath tpsa.cpp libs/ptc/src
 endif
 
 #######################

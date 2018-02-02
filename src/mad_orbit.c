@@ -3187,7 +3187,7 @@ void pro_correct(struct in_cmd* cmd) {
   else if (strcmp(cmd->tok_list->p[0], "usemonitor") == 0) correct_usemonitor(cmd);
   else if (strcmp(cmd->tok_list->p[0], "getorbit") == 0)   correct_getorbit(cmd); // FIXME obsolete command; should be flagged and not call anything...
   else if (strcmp(cmd->tok_list->p[0], "putorbit") == 0)   correct_putorbit(cmd); // FIXME obsolete command; should be flagged and not call anything...
-  else if (strcmp(cmd->tok_list->p[0], "readmytable") == 0) read_my_table(cmd);
+  else if (strcmp(cmd->tok_list->p[0], "readmytable") == 0) read_table(cmd);
   else if (strcmp(cmd->tok_list->p[0], "readcorr") == 0)   correct_readcorr(cmd); //FIXME not documented
   else if (strcmp(cmd->tok_list->p[0], "setcorr") == 0)    correct_setcorr(cmd); // FIXME not documented
   // else if (strcmp(cmd->tok_list->p[0], "prtcorr") == 0)    correct_prtcorr(cmd); // FIXME not documented

@@ -721,25 +721,56 @@ print_value(struct in_cmd* cmd)
   char** toks = &cmd->tok_list->p[cmd->decl_start];
   int n = cmd->tok_list->curr - cmd->decl_start;
   int start=0, end, j;
+  char* val_spec;
+  char* val_format;
+  char* val_exprstring;
+  double val_value;
+  
   while (start < n)
   {
     for (j = start; j < n; j++)
-      if (*toks[j] == ',') break;
-    if (loc_expr(toks, j, start, &end) > 0) {
+     {
+      if (*toks[j] == ',') 
+       {
+         break;
+       } 
+     } 
+     
+    if (loc_expr(toks, j, start, &end) > 0) 
+    {
       int nitem = end - start + 1;
-      if (polish_expr(nitem, &toks[start]) == 0) {
-        fprintf(prt_file, v_format("%S = %F ;\n"),
-                spec_join(&toks[start], nitem),
-                polish_value(deco, join(&toks[start], nitem)));
-      }
-      else {
+      if (polish_expr(nitem, &toks[start]) == 0) 
+       {
+        
+        val_format = v_format("%S = %F ;\n");
+        val_spec = spec_join(&toks[start], nitem);
+        /*need to copy the string otherwise it is modified with the value extraction with Intel compiler*/
+        int bufflen = strlen(val_spec)+1;
+        char  lbuff_local_tmp__[bufflen < 8192 ? bufflen : 1]; 
+        char *lbuff = bufflen < 8192 ? lbuff_local_tmp__ : mymalloc_atomic("print_value",bufflen);
+
+        /*val_spec_cpy = mymalloc_atomic("print_value",(strlen(val_spec)+1) * sizeof(char));*/
+        
+        strcpy(lbuff, val_spec);
+
+        val_exprstring = join(&toks[start], nitem); /*val_spec is modified by this line because it works on the same buffer as spec_join*/
+        val_value = polish_value(deco, val_exprstring);
+        
+        fprintf(prt_file, val_format , lbuff,  val_value);
+        
+        if (lbuff != lbuff_local_tmp__) myfree("print_value",lbuff);
+        
+       }
+      else 
+      {
         warning("invalid expression:", spec_join(&toks[start], nitem));
         return;
       }
       start = end+1;
       if (start < n-1 && *toks[start] == ',') start++;
     }
-    else {
+    else 
+    {
       warning("invalid expression:", spec_join(&toks[start], n-start));
       return;
     }

@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.00  (64 bit, Darwin)      +
+  +     MAD-X 5.03.07  (64 bit, Darwin)      +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.03.09               +
-  + Execution date: 2017.03.30 14:34:54      +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2017.12.14 18:02:26      +
   ++++++++++++++++++++++++++++++++++++++++++++
 ! test case for coupling calculations
 
@@ -313,7 +313,7 @@ ptc_twiss, deltap=0.0,closed_orbit,icase=5,file="p4_ptc.tfs",no=3;
           orbit_px            orbit_y           orbit_py           orbit_pt 
                  0                  0                  0                  0 
 
-         orbit_-cT             xcorms             ycorms            pxcorms 
+           orbit_t             xcorms             ycorms            pxcorms 
                 -0                  0                  0                  0 
 
            pycorms             tcorms            ptcorms             xcomax 

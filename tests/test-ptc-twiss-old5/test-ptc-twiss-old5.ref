@@ -1,9 +1,9 @@
 
   ++++++++++++++++++++++++++++++++++++++++++++
-  +     MAD-X 5.03.06  (64 bit, Linux)       +
+  +     MAD-X 5.03.07  (64 bit, Linux)       +
   + Support: mad@cern.ch, http://cern.ch/mad +
-  + Release   date: 2017.05.29               +
-  + Execution date: 2017.07.03 14:20:03      +
+  + Release   date: 2017.10.20               +
+  + Execution date: 2018.01.26 11:59:10      +
   ++++++++++++++++++++++++++++++++++++++++++++
 Title " Diamond Light Source Lattice 8.1.1";
 
@@ -87,21 +87,21 @@ enter EMIT module
                                                   M o d e   1         M o d e   2         M o d e   3
  Fractional tunes            undamped              0.22562273          0.36315219          0.00529040
  
- beta* [m]                   x                 0.99787539E+01      0.89550342E-40      0.52163791E-03
-                             y                 0.92118311E-32      0.58315566E+01      0.23668980E-31
-                             t                 0.18036549E-02      0.11659128E-29      0.28859713E+01
+ beta* [m]                   x                 0.99787539E+01      0.12861331E-39      0.52163791E-03
+                             y                 0.38290399E-32      0.58315566E+01      0.61832509E-32
+                             t                 0.18036549E-02      0.73444478E-30      0.28859713E+01
  
- gamma* [1/m]                px                0.10021362E+00      0.80027332E-41      0.40838536E-07
-                             py                0.10980056E-35      0.17148080E+00      0.23816100E-31
-                             pt                0.68064820E-08      0.10419267E-30      0.34660196E+00
+ gamma* [1/m]                px                0.10021362E+00      0.13499381E-40      0.40838536E-07
+                             py                0.98707753E-35      0.17148080E+00      0.44606999E-30
+                             pt                0.68064820E-08      0.13725764E-31      0.34660196E+00
  
- beta(max) [m]               x                 0.22590475E+02      0.16254586E-38      0.46428499E-02
-                             y                 0.26101550E-31      0.26583551E+02      0.24134839E-31
-                             t                 0.33692103E-01      0.21162880E-28      0.28859713E+01
+ beta(max) [m]               x                 0.22590475E+02      0.24377578E-38      0.46428499E-02
+                             y                 0.57480845E-31      0.26583551E+02      0.61832791E-32
+                             t                 0.33692103E-01      0.53687255E-29      0.28859713E+01
  
- gamma(max) [1/m]            px                0.57593183E+01      0.18183469E-39      0.40838536E-07
-                             py                0.64549679E-32      0.29767840E+01      0.24030205E-31
-                             pt                0.83341187E-02      0.23674214E-29      0.34660196E+00
+ gamma(max) [1/m]            px                0.57593183E+01      0.27445993E-39      0.40838536E-07
+                             py                0.14247979E-31      0.29767840E+01      0.44727260E-30
+                             pt                0.83341187E-02      0.60808328E-30      0.34660196E+00
 ++++++ warning: EMIT: beam not updated, RADIATE is false or longitudinal stability not ensured. 
 
  RF system: 
@@ -150,15 +150,17 @@ PTC_CREATE_LAYOUT,model=2,method=6,nst=20,exact;
      ptc_setswitch, debuglevel=1, exact_mis=true, time=true, totalpath=false;
 
  Setting debug level to           1
-maxaccel is found and its value is 1.000000
+maxaccel is not present (keeping current value)
 exact_mis is found and its value is 1.000000
-radiation is found and its value is 0.000000
-stochastic is found and its value is 0.000000
-envelope is found and its value is 0.000000
-fringe is found and its value is 0.000000
+radiation is not present (keeping current value)
+modulation is not present (keeping current value)
+stochastic is not present (keeping current value)
+envelope is not present (keeping current value)
+fringe is not present (keeping current value)
 totalpath is found and its value is 0.000000
 time is found and its value is 1.000000
-nocavity is found and its value is 0.000000
+nocavity is not present (keeping current value)
+seed is not present (keeping current value)
 obs_points pro_ptc_setswitch Done
      
 
@@ -190,55 +192,55 @@ obs_points pro_ptc_setswitch Done
 ++++++ table: ptc_twiss_summary
 
             length            alpha_c          alpha_c_p         alpha_c_p2 
-             561.6    0.0001708147611           -1000000           -1000000 
+             561.6    0.0001708147612           -1000000           -1000000 
 
         alpha_c_p3              eta_c           gamma_tr                 q1 
-          -1000000    0.0001707857478        76.51336477       0.2256227263 
+          -1000000    0.0001707857478        76.51336476       0.2256227262 
 
                 q2                dq1                dq2                 qs 
       0.3631521852                  0                  0      0.00529039829 
 
         beta_x_min         beta_x_max         beta_y_min         beta_y_max 
-      0.6702574753        22.59047529        1.532193729        26.58355135 
+      0.6702574752         22.5904753        1.532193729        26.58355136 
 
          beta11min          beta11max          beta12min          beta12max 
-      0.6702574753        22.59047529    2.214372989e-36    2.350981308e-32 
+      0.6702574752         22.5904753    1.489650887e-36    1.608798131e-32 
 
          beta13min          beta13max          beta21min          beta21max 
-   1.355372216e-05      0.03369210324    6.334820643e-35    3.884174255e-33 
+   1.355372216e-05      0.03369210324    4.868139726e-35    2.322761238e-33 
 
          beta22min          beta22max          beta23min          beta23max 
-       1.532193729        26.58355135     1.09938822e-32    8.106956721e-30 
+       1.532193729        26.58355136    3.183731072e-34    3.912532822e-30 
 
          beta31min          beta31max          beta32min          beta32max 
-   0.0005203652667     0.004642849939     4.42179066e-34    2.175437997e-33 
+   0.0005203652666      0.00464284994    2.263262971e-33    3.319059684e-33 
 
          beta33min          beta33max           disp1min           disp1max 
        2.885127313        2.885971271                  0       0.3117654941 
 
           disp2min           disp2max           disp3min           disp3max 
-     -0.1550570858       0.1550570858   -7.446891607e-16    7.420478306e-16 
+     -0.1550570858       0.1550570858   -5.816120915e-16    5.814478711e-16 
 
           disp4min           disp4max             deltap            orbit_x 
-  -2.476435271e-16    2.463962623e-16                  0   -8.329636574e-14 
+  -1.974438256e-16    1.936071245e-16                  0    2.418029085e-14 
 
           orbit_px            orbit_y           orbit_py           orbit_pt 
-   6.446646283e-16                  0                  0   -1.191323247e-12 
+  -3.350489751e-17                  0                  0    2.852890811e-13 
 
-         orbit_-cT             xcorms             ycorms            pxcorms 
-     0.02997564577    1.797167734e-13                  0    8.960733943e-14 
+           orbit_t             xcorms             ycorms            pxcorms 
+     0.02997564577    4.336655369e-14                  0    2.160584043e-14 
 
            pycorms             tcorms            ptcorms             xcomax 
-                 0      0.02997564577    1.191323591e-12   -2.601057849e-15 
+                 0      0.02997564577    2.852885328e-13    1.058854137e-13 
 
             ycomax            pxcomax            pycomax             tcomax 
-                 0    1.950359067e-13                  0     -0.02997564577 
+                 0    5.276679103e-14                  0      0.02997564577 
 
            ptcomax             xcomin             ycomin            pxcomin 
-  -1.191323247e-12   -3.920810629e-13                  0   -1.945752454e-13 
+   2.852890811e-13   -1.639562542e-15                  0    -5.23797433e-14 
 
            pycomin             tcomin            ptcomin 
-                 0     -0.02997564577   -1.191705522e-12 
+                 0      0.02997564577    2.846789469e-13 
 
 
      select_ptc_normal, dq1,dq2;

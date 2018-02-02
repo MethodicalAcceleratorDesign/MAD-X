@@ -16,3 +16,4 @@ Emacs : Emacs is a text editor based on lisp. Check the file madx.el to load the
      but any buffer can be highlighted by doing in emacs "META-x", typing "madx-mode", and RETURN.
      NOTE: META is the emacs meta-character, it seems that in linux META is the same as ALT.
 
+Atom: Syntax highlighting for MadX can either be installed by copying the folder language-madx to $HOME/.atom/packages/ (on Linux), or by searching for language-madx in the Atom package manager. The highlighting is automatically enabled for *.madx and *.seq files.

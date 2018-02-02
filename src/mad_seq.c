@@ -618,7 +618,6 @@ make_sequ_from_line(char* name)
 {
   char** tmp = NULL;
   int pos = name_list_pos(name, line_list->list);
-  int spos;
   struct sequence* old_sequ = NULL;
   struct macro* line;
   int mpos = name_list_pos("marker", defined_commands->list);
@@ -633,8 +632,7 @@ make_sequ_from_line(char* name)
   expand_line(line_buffer); /* act on '-' and rep. count */
 
   current_sequ = new_sequence(name, 0); /* node positions = centre */
-  if ((spos = name_list_pos(name, sequences->list)) >= 0)
-    old_sequ = sequences->sequs[spos];
+  old_sequ = find_sequence(name, sequences);
   add_to_sequ_list(current_sequ, sequences);
   if (old_sequ) old_sequ = delete_sequence(old_sequ);
   if (current_sequ->cavities != NULL)  current_sequ->cavities->curr = 0;
@@ -869,14 +867,14 @@ seq_edit(struct in_cmd* cmd)
   /* executes seqedit command */
 {
   char* name = NULL;
-  int pos;
+  struct sequence* seq;
 
   name = command_par_string_user("sequence", cmd->clone);
   if (name) {
-    if ((pos = name_list_pos(name, sequences->list)) >= 0) {
-      if (sequences->sequs[pos]->line)
+    if ((seq = find_sequence(name, sequences))) {
+      if (seq->line)
         warning("sequence originates from line,","edit ignored");
-      else  seq_edit_ex(sequences->sequs[pos]);
+      else  seq_edit_ex(seq);
     }
     else warning("unknown sequence:", "ignored");
   }
@@ -1430,13 +1428,10 @@ set_cont_sequence(void)
 void
 set_sequence(char* name)
 {
-  int lp;
   struct sequence* t_sequ;
   mycpy(c_dum->c, name);
   /* makes sequence "name" the current sequence */
-  if ((lp = name_list_pos(c_dum->c, sequences->list)) > -1)
-    t_sequ = sequences->sequs[lp];
-  else
+  if (!(t_sequ = find_sequence(c_dum->c, sequences)))
   {
     warning("unknown sequence ignored:", name);
     return;
@@ -1496,7 +1491,7 @@ struct sequence*
 delete_sequence(struct sequence* sequ)
 {
   const char *rout_name = "delete_sequence";
-  int lp;
+  struct sequence* seq;
   if (sequ->ex_start != NULL)
   {
     sequ->ex_nodes = delete_node_list(sequ->ex_nodes);
@@ -1504,8 +1499,8 @@ delete_sequence(struct sequence* sequ)
     sequ->orbits = delete_vector_list(sequ->orbits);
     myfree(rout_name, sequ->all_nodes);
   }
-  if ((lp = name_list_pos(sequ->name, sequences->list)) > -1)
-    remove_from_sequ_list(sequences->sequs[lp], sequences);
+  if ((seq = find_sequence(sequ->name, sequences)))
+    remove_from_sequ_list(seq, sequences);
   if (sequ->l_expr) sequ->l_expr = delete_expression(sequ->l_expr);
   sequ->nodes = delete_node_list(sequ->nodes);
   sequ->start = delete_node_ring(sequ->start);

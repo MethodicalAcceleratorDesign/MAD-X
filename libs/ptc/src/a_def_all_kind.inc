@@ -32,19 +32,21 @@ TYPE SUPERDRIFT
    TYPE(MAGNET_CHART), POINTER :: P => null()
    real(dp) , POINTER ::L => null()                    !  Storage space for computed
    REAL(DP),DIMENSION(:), POINTER:: D => null(),ang => null()     ! TRANSLATIONS  A_D(3) and Angles
+   INTEGER, POINTER :: A_X1 => null() ,A_X2 => null()
 END  TYPE SUPERDRIFT
 
 TYPE SUPERDRIFTP
    TYPE(MAGNET_CHART), POINTER :: P => null()
    TYPE(REAL_8) , POINTER ::L => null()
    REAL(DP),DIMENSION(:), POINTER:: D => null(),ang => null()     ! TRANSLATIONS  A_D(3) and Angles
+   INTEGER, POINTER :: A_X1 => null() ,A_X2 => null()
 END  TYPE SUPERDRIFTP
 
 TYPE DKD2
    TYPE(MAGNET_CHART), POINTER:: P => null()
    real(dp), POINTER ::L => null()
    real(dp),  DIMENSION(:), POINTER :: AN => null(),BN => null()         !Multipole component
-   real(dp),   POINTER:: FINT => null(),HGAP => null()         !FRINGE FUDGE FOR MAD
+   real(dp), DIMENSION(:),   POINTER:: FINT => null(),HGAP => null()         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1 => null(),H2 => null()             !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: VA => null(),VS => null()         !valishev-like multipole
    integer, pointer :: f => null()
@@ -54,7 +56,7 @@ TYPE DKD2P
    TYPE(MAGNET_CHART), POINTER:: P => null()
    TYPE(REAL_8), POINTER ::L => null()
    TYPE(REAL_8),  DIMENSION(:), POINTER :: AN => null(),BN => null()         !Multipole component
-   TYPE(REAL_8),   POINTER:: FINT => null(),HGAP => null()         !FRINGE FUDGE FOR MAD
+   TYPE(REAL_8), DIMENSION(:),   POINTER:: FINT => null(),HGAP => null()         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1 => null(),H2 => null()             !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: VA => null(),VS => null()         !valishev-like multipole
    integer, pointer :: f => null()
@@ -81,6 +83,31 @@ TYPE KICKT3P
    real(dp),   POINTER::  ls => null()
    real(dp),   POINTER:: dx => null(),dy => null(),pitch_x => null(),pitch_y => null()   ! SADISTIC
 END  TYPE KICKT3P
+
+TYPE ABELL
+   logical(lp), POINTER :: THIN => null()
+   TYPE(MAGNET_CHART), POINTER:: P => null()
+   real(dp) , POINTER ::L => null()                    !  Storage space for computed
+   real(dp),  DIMENSION(:), POINTER :: AN => null(),BN => null()                 ! MULTIPLICATIVE FACTOR USUALLY 1
+   real(dp), POINTER :: DZ(:) => null(), T(:) => null(), TE(:) => null() !, phi0(:) => null()
+   complex(dp), POINTER :: B(:,:) => null(),E(:,:) => null()
+   INTEGER , POINTER :: N,M => null()  
+   REAL(DP), POINTER :: SCALE=> null(),angc=> null(),dc=> null(),hc=> null(),xc => null(),vc => null()
+   logical,pointer :: xprime=> null()
+END  TYPE ABELL
+
+TYPE ABELLP
+   logical(lp), POINTER :: THIN => null()
+   TYPE(MAGNET_CHART), POINTER:: P => null()
+   TYPE(REAL_8), POINTER ::L => null()                    !  Storage space for computed
+   TYPE(REAL_8),  DIMENSION(:), POINTER :: AN => null(),BN => null()  
+   real(dp), POINTER :: DZ(:) => null(),T(:) => null(), TE(:) => null()  !, phi0(:) => null()
+   complex(dp), POINTER :: B(:,:) => null(),E(:,:) => null()
+   INTEGER , POINTER :: N,M => null()  
+   real(dp),  POINTER :: angc=> null(),dc=> null(),hc=> null(),xc => null(),vc => null()
+   TYPE(REAL_8),  POINTER :: SCALE=> null()
+   logical,pointer :: xprime=> null()
+END  TYPE ABELLP
 
 TYPE CAV4
    logical(lp), POINTER :: THIN => null()
@@ -143,7 +170,7 @@ TYPE SOL5
    real(dp), POINTER ::L => null()
    real(dp), POINTER ::B_SOL => null()
    real(dp),  DIMENSION(:), POINTER :: AN => null(),BN => null()         !Multipole component
-   real(dp),   POINTER:: FINT => null(),HGAP => null()        !FRINGE FUDGE FOR MAD
+   real(dp), DIMENSION(:),    POINTER:: FINT => null(),HGAP => null()        !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1 => null(),H2 => null()             !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: VA => null(),VS  => null()        ! sad f1,f2
    real(dp),   POINTER:: dx => null(),dy => null(),pitch_x => null(),pitch_y => null()   ! SADISTIC
@@ -154,7 +181,7 @@ TYPE SOL5P
    TYPE(REAL_8),  DIMENSION(:), POINTER :: AN => null(), BN => null()         !Multipole component
    TYPE(REAL_8), POINTER ::L => null()
    TYPE(REAL_8), POINTER ::B_SOL => null()
-   TYPE(REAL_8),   POINTER:: FINT => null(), HGAP => null()         !FRINGE FUDGE FOR MAD
+   TYPE(REAL_8), DIMENSION(:),   POINTER:: FINT => null(), HGAP => null()         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1 => null(), H2 => null()             !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: VA => null(), VS => null()         !valishev-like multipole
    real(dp),   POINTER:: dx => null(),dy => null(),pitch_x => null(),pitch_y => null()   ! SADISTIC
@@ -168,7 +195,7 @@ TYPE KTK
    real(dp),  DIMENSION(:,:), POINTER :: MATX => null(), MATY => null() !LINEAR MATRIX
    !frs     real(dp),  DIMENSION(:), POINTER :: lx(:) => null(), ly(:) => null()
    real(dp),  DIMENSION(:), POINTER :: lx => null(), ly => null()
-   real(dp),   POINTER:: FINT => null(), HGAP => null()         !FRINGE FUDGE FOR MAD
+   real(dp), DIMENSION(:),   POINTER:: FINT => null(), HGAP => null()         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1 => null(), H2 => null()             !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: VA => null(), VS => null()         !valishev-like multipole
 END  TYPE KTK
@@ -180,7 +207,7 @@ TYPE KTKP
    TYPE(REAL_8),  DIMENSION(:,:), POINTER :: MATX => null(), MATY => null() !LINEAR MATRIX
    !frs     TYPE(REAL_8), DIMENSION(:), POINTER :: lx(:) => null(), ly(:) => null()
    TYPE(REAL_8), DIMENSION(:), POINTER :: lx => null(), ly => null()
-   TYPE(REAL_8),   POINTER:: FINT => null(), HGAP => null()         !FRINGE FUDGE FOR MAD
+   TYPE(REAL_8), DIMENSION(:),   POINTER:: FINT => null(), HGAP => null()         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1 => null(), H2 => null()             !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: VA => null(), VS => null()         !valishev-like multipole
 END  TYPE KTKP
@@ -198,7 +225,7 @@ TYPE TKTF
    real(dp), DIMENSION(:), POINTER ::   Rlx => null()
    !     real(dp), DIMENSION(:), POINTER ::   dx(:) => null()
    !     real(dp), DIMENSION(:), POINTER ::   dy(:) => null()
-   real(dp),   POINTER:: FINT => null(), HGAP => null()         !FRINGE FUDGE FOR MAD
+   real(dp), DIMENSION(:),   POINTER:: FINT => null(), HGAP => null()         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1 => null(), H2 => null()             !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: VA => null(), VS => null()         !valishev-like multipole
    integer, pointer :: f => null()
@@ -217,7 +244,7 @@ TYPE TKTFP
    TYPE(REAL_8), DIMENSION(:),   POINTER :: Rlx => null()
    !     real(dp), DIMENSION(:), POINTER ::   dx(:) => null()
    !     real(dp), DIMENSION(:), POINTER ::   dy(:) => null()
-   TYPE(REAL_8),   POINTER:: FINT => null(), HGAP => null()         !FRINGE FUDGE FOR MAD
+   TYPE(REAL_8), DIMENSION(:),   POINTER:: FINT => null(), HGAP => null()         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1 => null(), H2 => null()             !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: VA => null(), VS => null()         !valishev-like multipole
    integer, pointer :: f => null()
@@ -251,7 +278,7 @@ TYPE TEAPOT
    real(dp),  DIMENSION(:), POINTER :: bf_x => null(),bf_y => null()     ! B field polynomial
    !     INTEGER,POINTER :: SECTOR_NMUL => null()
    logical(lp),   POINTER :: DRIFTKICK => null()                ! Split flag
-   real(dp),   POINTER:: FINT => null(), HGAP => null()         !FRINGE FUDGE FOR MAD
+   real(dp), DIMENSION(:),   POINTER:: FINT => null(), HGAP => null()         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1 => null(), H2 => null()             !FRINGE FUDGE FOR MAD
    integer, pointer :: f => null()
    real(dp),   POINTER:: VA => null(), VS => null()         !valishev-like multipole
@@ -268,7 +295,7 @@ TYPE TEAPOTP
    TYPE(REAL_8),  DIMENSION(:), POINTER :: bf_x => null(),bf_y => null()     ! B field polynomial
    !     INTEGER,POINTER :: SECTOR_NMUL => null()
    logical(lp),   POINTER :: DRIFTKICK => null()
-   TYPE(REAL_8),   POINTER:: FINT => null(), HGAP => null()         !FRINGE FUDGE FOR MAD
+   TYPE(REAL_8), DIMENSION(:),   POINTER:: FINT => null(), HGAP => null()         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1 => null(), H2 => null()             !FRINGE FUDGE FOR MAD
    integer, pointer :: f => null()
    TYPE(REAL_8),   POINTER:: VA => null(), VS => null()         !valishev-like multipole
@@ -333,7 +360,7 @@ TYPE STREX
    real(dp), POINTER ::L => null()
    real(dp),  DIMENSION(:), POINTER :: AN => null(), BN => null()         !Multipole component
    logical(lp), POINTER :: DRIFTKICK => null(), LIKEMAD => null()
-   real(dp),   POINTER:: FINT => null(), HGAP => null()         !FRINGE FUDGE FOR MAD
+   real(dp), DIMENSION(:),   POINTER:: FINT => null(), HGAP => null()         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1 => null(), H2 => null()             !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: VA => null(), VS => null()         !valishev-like multipole
    integer, pointer :: f => null()
@@ -344,7 +371,7 @@ TYPE STREXP
    TYPE(REAL_8), POINTER ::L => null()
    TYPE(REAL_8),  DIMENSION(:), POINTER :: AN => null(), BN => null()         !Multipole component
    logical(lp),  POINTER :: DRIFTKICK => null(), LIKEMAD => null()
-   TYPE(REAL_8),   POINTER:: FINT => null(), HGAP => null()         !FRINGE FUDGE FOR MAD
+   TYPE(REAL_8), DIMENSION(:),   POINTER:: FINT => null(), HGAP => null()         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1 => null(), H2 => null()             !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: VA => null(), VS => null()         !valishev-like multipole
    integer, pointer :: f => null()

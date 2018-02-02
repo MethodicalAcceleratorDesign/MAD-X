@@ -3,13 +3,10 @@ module madx_ptc_module
   use S_fitting_new
   implicit none
   public
-  
   TYPE(INTERNAL_STATE),POINTER :: my_state
   TYPE(layout),POINTER :: my_ring,bmadl
   type(mad_universe), pointer :: m_u=>null(),m_t=>null();
-  
-  public ptc_ini_no_append
-  
+
 contains
 
   subroutine ptc_INI()
@@ -26,6 +23,18 @@ contains
     bmadl%NAME='BMAD REUSED FIBRE LAYOUT'
 
     call point_m_u(m_u,m_t)
+    ind_spin(1,1)=1+6;ind_spin(1,2)=2+6;ind_spin(1,3)=3+6;
+    ind_spin(2,1)=4+6;ind_spin(2,2)=5+6;ind_spin(2,3)=6+6;
+    ind_spin(3,1)=7+6;ind_spin(3,2)=8+6;ind_spin(3,3)=9+6;    
+    k1_spin(1)=1;k2_spin(1)=1;
+    k1_spin(2)=1;k2_spin(2)=2;
+    k1_spin(3)=1;k2_spin(3)=3;
+    k1_spin(4)=2;k2_spin(4)=1;
+    k1_spin(5)=2;k2_spin(5)=2;
+    k1_spin(6)=2;k2_spin(6)=3;
+    k1_spin(7)=3;k2_spin(7)=1;
+    k1_spin(8)=3;k2_spin(8)=2;
+    k1_spin(9)=3;k2_spin(9)=3;
   END subroutine ptc_ini
 
   subroutine ptc_ini_no_append()
@@ -39,6 +48,18 @@ contains
     call set_up(bmadl)
     bmadl%NAME='BMAD REUSED FIBRE LAYOUT'
     call point_m_u(m_u,m_t)
+    ind_spin(1,1)=1+6;ind_spin(1,2)=2+6;ind_spin(1,3)=3+6;
+    ind_spin(2,1)=4+6;ind_spin(2,2)=5+6;ind_spin(2,3)=6+6;
+    ind_spin(3,1)=7+6;ind_spin(3,2)=8+6;ind_spin(3,3)=9+6;    
+    k1_spin(1)=1;k2_spin(1)=1;
+    k1_spin(2)=1;k2_spin(2)=2;
+    k1_spin(3)=1;k2_spin(3)=3;
+    k1_spin(4)=2;k2_spin(4)=1;
+    k1_spin(5)=2;k2_spin(5)=2;
+    k1_spin(6)=2;k2_spin(6)=3;
+    k1_spin(7)=3;k2_spin(7)=1;
+    k1_spin(8)=3;k2_spin(8)=2;
+    k1_spin(9)=3;k2_spin(9)=3;
   END subroutine ptc_ini_no_append
 
   subroutine ptc_end(graphics_maybe,flat_file,file_m_u,file_m_t)

@@ -1,0 +1,165 @@
+ #ifndef __MAKECINT__
+  #ifndef __CINT__
+ 
+  #include "TROOT.h"
+  #include "TCanvas.h"
+  #include "Riostream.h"
+ 
+  #include "TBRIK.h"
+  #include "TShape.h"
+  #include "TNode.h"
+  #include "TCanvas.h"
+  #include "TGLViewer.h"
+  #include "TPoints3DABC.h"
+  #include "TTUBE.h"
+  #include "TRotMatrix.h"
+ 
+  #endif
+ #endif
+ 
+ 
+ void srot                                            ()
+ {
+ TShape* s;
+ TNode* mn;
+ TNode* n;
+ Double_t rotmatrix[9];
+ TRotMatrix* m;
+ 
+ gSystem->Load("libGed");
+ gSystem->Load("libRGL");
+ 
+ TCanvas* c = new TCanvas("c","PTC Layout",10,10,800,600);
+ 
+ s = new TBRIK("START","START","void",0.01,0.01,0.01);
+ s->SetLineColor(2);
+ mn = new TNode("NODE1","NODE1","START");
+ mn->cd();
+ 
+ 
+ c->Range(          -2 ,          -1 ,           1 ,           5 );
+ 
+
+ //cout<<           1 <<" MYLINE$START            "<<endl;
+
+ //cout<<           2 <<" D1_1                    "<<endl;
+ s = new TTUBE("DRIFT00002","DRIFT00002","void",   5.0000000000000003E-002 ,  0.50000000000000000      );
+ s->SetLineColor(          18 );
+ rotmatrix[0] =    1.0000000000000000      ;
+ rotmatrix[1] =    0.0000000000000000      ;
+ rotmatrix[2] =    0.0000000000000000      ;
+ rotmatrix[3] =    0.0000000000000000      ;
+ rotmatrix[4] =    1.0000000000000000      ;
+ rotmatrix[5] =    0.0000000000000000      ;
+ rotmatrix[6] =    0.0000000000000000      ;
+ rotmatrix[7] =    0.0000000000000000      ;
+ rotmatrix[8] =    1.0000000000000000      ;
+ m = new TRotMatrix("mtx00002","mtx00002",rotmatrix);
+ n = new TNode("NODE00002","NODE00002",s,   0.0000000000000000      ,   0.0000000000000000      ,  0.50000000000000000      ,m);
+
+ //cout<<           3 <<" B                       "<<endl;
+ s = new TBRIK("RECTA00003","RECTA00003","void",0.5,0.5,   5.0575757996373129E-002 );
+ s->SetLineColor(           4 );
+ rotmatrix[0] =   0.96592582628906831      ;
+ rotmatrix[1] =    0.0000000000000000      ;
+ rotmatrix[2] =   0.25881904510252074      ;
+ rotmatrix[3] =    0.0000000000000000      ;
+ rotmatrix[4] =    1.0000000000000000      ;
+ rotmatrix[5] =    0.0000000000000000      ;
+ rotmatrix[6] =  -0.25881904510252074      ;
+ rotmatrix[7] =    0.0000000000000000      ;
+ rotmatrix[8] =   0.96592582628906831      ;
+ m = new TRotMatrix("mtx00003","mtx00003",rotmatrix);
+ n = new TNode("NODE00003","NODE00003",s,  -1.2940952255126037E-002 ,   0.0000000000000000      ,   1.0482962913144533      ,m);
+
+ //cout<<           4 <<" D1_1                    "<<endl;
+ s = new TTUBE("DRIFT00004","DRIFT00004","void",   5.0000000000000003E-002 ,  0.50000000000000000      );
+ s->SetLineColor(          18 );
+ rotmatrix[0] =   0.86602540378443871      ;
+ rotmatrix[1] =    0.0000000000000000      ;
+ rotmatrix[2] =   0.49999999999999994      ;
+ rotmatrix[3] =    0.0000000000000000      ;
+ rotmatrix[4] =    1.0000000000000000      ;
+ rotmatrix[5] =    0.0000000000000000      ;
+ rotmatrix[6] =  -0.49999999999999994      ;
+ rotmatrix[7] =    0.0000000000000000      ;
+ rotmatrix[8] =   0.86602540378443871      ;
+ m = new TRotMatrix("mtx00004","mtx00004",rotmatrix);
+ n = new TNode("NODE00004","NODE00004",s, -0.27588190451025207      ,   0.0000000000000000      ,   1.5296052845211261      ,m);
+
+ //cout<<           5 <<" MB                      "<<endl;
+
+ //cout<<           6 <<" MROT                    "<<endl;
+
+ //cout<<           7 <<" MA                      "<<endl;
+
+ //cout<<           8 <<" D1_1                    "<<endl;
+ s = new TTUBE("DRIFT00008","DRIFT00008","void",   5.0000000000000003E-002 ,  0.50000000000000000      );
+ s->SetLineColor(          18 );
+ rotmatrix[0] =   0.75000000000000022      ;
+ rotmatrix[1] =   0.49999999999999967      ;
+ rotmatrix[2] =   0.43301270189221935      ;
+ rotmatrix[3] =  -0.43301270189221913      ;
+ rotmatrix[4] =   0.86602540378443882      ;
+ rotmatrix[5] =  -0.24999999999999972      ;
+ rotmatrix[6] =  -0.49999999999999989      ;
+ rotmatrix[7] =   -8.7364505262526148E-017 ;
+ rotmatrix[8] =   0.86602540378443871      ;
+ m = new TRotMatrix("mtx00008","mtx00008",rotmatrix);
+ n = new TNode("NODE00008","NODE00008",s, -0.77588190451025207      ,  -9.4859732794884232E-018 ,   2.3956306883055647      ,m);
+
+ //cout<<           9 <<" Q                       "<<endl;
+ s = new TBRIK("RECTA00009","RECTA00009","void",0.5,0.5,  0.25000000000000000      );
+ s->SetLineColor(           2 );
+ rotmatrix[0] =   0.75000000000000044      ;
+ rotmatrix[1] =   0.49999999999999967      ;
+ rotmatrix[2] =   0.43301270189221924      ;
+ rotmatrix[3] =  -0.43301270189221913      ;
+ rotmatrix[4] =   0.86602540378443893      ;
+ rotmatrix[5] =  -0.24999999999999964      ;
+ rotmatrix[6] =  -0.49999999999999967      ;
+ rotmatrix[7] =   -2.2543826057763121E-017 ;
+ rotmatrix[8] =   0.86602540378443893      ;
+ m = new TRotMatrix("mtx00009","mtx00009",rotmatrix);
+ n = new TNode("NODE00009","NODE00009",s,  -1.1508819045102521      ,  -8.9056189051841375E-017 ,   3.0451497411438937      ,m);
+
+ //cout<<          10 <<" D1_2                    "<<endl;
+ s = new TTUBE("DRIFT00010","DRIFT00010","void",   5.0000000000000003E-002 ,  0.25000000000000000      );
+ s->SetLineColor(          18 );
+ rotmatrix[0] =   0.75000000000000033      ;
+ rotmatrix[1] =   0.49999999999999950      ;
+ rotmatrix[2] =   0.43301270189221908      ;
+ rotmatrix[3] =  -0.43301270189221908      ;
+ rotmatrix[4] =   0.86602540378443893      ;
+ rotmatrix[5] =  -0.24999999999999958      ;
+ rotmatrix[6] =  -0.49999999999999961      ;
+ rotmatrix[7] =   -4.2117592846498749E-017 ;
+ rotmatrix[8] =   0.86602540378443882      ;
+ m = new TRotMatrix("mtx00010","mtx00010",rotmatrix);
+ n = new TNode("NODE00010","NODE00010",s,  -1.4008819045102521      ,  -1.1240930560215260E-016 ,   3.4781624430361133      ,m);
+
+ //cout<<          11 <<" MROT2                   "<<endl;
+
+ //cout<<          12 <<" MA                      "<<endl;
+
+ //cout<<          13 <<" D1_2                    "<<endl;
+ s = new TTUBE("DRIFT00013","DRIFT00013","void",   5.0000000000000003E-002 ,  0.25000000000000000      );
+ s->SetLineColor(          18 );
+ rotmatrix[0] =   0.86602540378443893      ;
+ rotmatrix[1] =   -3.7470027081099053E-016 ;
+ rotmatrix[2] =   0.49999999999999961      ;
+ rotmatrix[3] =    3.4971795302765759E-016 ;
+ rotmatrix[4] =    1.0000000000000000      ;
+ rotmatrix[5] =    1.4367127865909201E-016 ;
+ rotmatrix[6] =  -0.49999999999999961      ;
+ rotmatrix[7] =    5.0435999400861842E-017 ;
+ rotmatrix[8] =   0.86602540378443893      ;
+ m = new TRotMatrix("mtx00013","mtx00013",rotmatrix);
+ n = new TNode("NODE00013","NODE00013",s,  -1.6508819045102521      ,  -1.1039281417345163E-016 ,   3.9111751449283330      ,m);
+
+ //cout<<          14 <<" MYLINE$END              "<<endl;
+ 
+ mn->Draw("ogl");
+ TGLViewer * v = (TGLViewer *)c->GetViewer3D();
+ 
+ }

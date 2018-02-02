@@ -485,7 +485,7 @@ const char* const ptc_twiss_summary_table_cols[] = {
   "disp4min","disp4max",
   "deltap",
   "orbit_x","orbit_px","orbit_y",
-  "orbit_py","orbit_pt","orbit_-cT",
+  "orbit_py","orbit_pt","orbit_t",
   "xcorms","ycorms","pxcorms","pycorms","tcorms","ptcorms",
   "xcomax","ycomax","pxcomax","pycomax","tcomax","ptcomax",
   "xcomin","ycomin","pxcomin","pycomin","tcomin","ptcomin",
@@ -669,7 +669,7 @@ const char* const summ_table_cols[] =
 
 const int trackone_table_types[] =
 {
-  1, 1, 2, 2, 2, 2, 2, 2, 2, 2
+  2, 2, 2, 2, 2, 2, 2, 2, 2, 2
 };
 
 const char* const trackone_table_cols[] =

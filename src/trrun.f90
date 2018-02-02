@@ -818,7 +818,7 @@ subroutine ttmap(switch,code,el,track,ktrack,dxt,dyt,sum,turn,part_id, &
             call ttrfloss(turn,sum,part_id,last_turn,last_pos,last_orbit,track,ktrack)
 
     case (code_elseparator)
-       call ttsep(el, track, ktrack)
+       call ttsep(track, ktrack)
 
     case (code_srotation)
        call ttsrot(track, ktrack)
@@ -1630,8 +1630,8 @@ subroutine ttvacdip(track,ktrack,turn)
 
 end subroutine ttvacdip
 
-!FIXME Unused dummy argument 'el'
-subroutine ttsep(el,track,ktrack)
+
+subroutine ttsep(track,ktrack)
   use twtrrfi
   use trackfi
   use math_constfi, only : one, ten3m
@@ -1652,7 +1652,7 @@ subroutine ttsep(el,track,ktrack)
 
   integer :: i
   double precision :: el, ex, ey, tilt, charge, mass, pc, beta, deltap, kick0
-  double precision :: cos_tilt, sin_tilt, efieldx, efieldy, pt
+  double precision :: pt
 
   double precision :: node_value, get_value
 
@@ -1660,24 +1660,16 @@ subroutine ttsep(el,track,ktrack)
   ey = node_value('ey_l ')
 
   charge = get_value('probe ','charge ')
-  !mass   = get_value('probe ','mass ')
   pc     = get_value('probe ','pc ')
   beta   = get_value('probe ','beta ')
 
-  ! 2016-Mar-17  09:16:12  ghislain: TILT was already taken into account before entrance of element!!!
-  tilt = node_value('tilt ')
-  cos_tilt = cos(tilt)
-  sin_tilt = sin(tilt)
-
-  efieldx =  ex*cos_tilt + ey*sin_tilt
-  efieldy = -ex*sin_tilt + ey*cos_tilt
-  ! end comment
+  !Before there was rotation here. This made rotation not work because any rotation was later cancelled.
 
   do i = 1, ktrack
      deltap = sqrt(one - one/beta/beta + (track(6,i)+one/beta)**2) - one
      kick0 = charge * ten3m / pc / (one+deltap) / beta
-     track(2,i) = track(2,i) + kick0*efieldx
-     track(4,i) = track(4,i) + kick0*efieldy
+     track(2,i) = track(2,i) + kick0*ex
+     track(4,i) = track(4,i) + kick0*ey
   end do
 
 end subroutine ttsep

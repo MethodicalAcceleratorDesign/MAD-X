@@ -1,9 +1,9 @@
 @ NAME             %14s "NORMAL_RESULTS"
 @ TYPE             %10s "NORMAL_RES"
 @ TITLE            %24s " Chromaticity correction"
-@ ORIGIN           %17s "5.03.04 Darwin 64"
-@ DATE             %08s "19/04/17"
-@ TIME             %08s "16.18.58"
+@ ORIGIN           %17s "5.03.07 Darwin 64"
+@ DATE             %08s "14/12/17"
+@ TIME             %08s "18.03.45"
 * NAME                   ORDER1     ORDER2     ORDER3     ORDER4              VALUE 
 $ %s                         %d         %d         %d         %d                %le 
  "DQ1"                        1          0          0          0        2.000002171

@@ -17,10 +17,10 @@ module tree_element_MODULE
   private EQUAL_IDENTITY_SPINOR,EQUAL_PROBE_REAL6
   PRIVATE EQUAL_SPINOR8_SPINOR,EQUAL_PROBE8_PROBE,EQUAL_PROBE8_REAL6
   private EQUAL_IDENTITY_SPINOR_8_r3 ,EQUAL_SPINOR_SPINOR8
-  private ALLOC_rf_phasor_8,KILL_rf_phasor_8,realdp_spinor
+  private ALLOC_rf_phasor_8,KILL_rf_phasor_8,realdp_spinor,cross_real
   private sub_spinor
   private EQUAL_PROBE_PROBE
-  private dot_spinor_8,dot_spinor
+  private dot_spinor_8,dot_spinor,dot_real
   private  read_spinor_8
   !  private smatp,smatmulp
 
@@ -47,7 +47,8 @@ module tree_element_MODULE
   integer, private, parameter :: nfac=20
   real(dp), private :: fac(0:nfac)
   integer :: nbe=8
-
+  integer :: n_rf=0  !number of modulation clocks in the simulation
+  integer :: modulationtype=0 ! 0 is the full blown and internal anf externa field, 1 is simple one on external field only without cos(theta)
   INTERFACE assignment (=)
      !
      MODULE PROCEDURE REAL_8REAL6
@@ -80,8 +81,13 @@ module tree_element_MODULE
 
 
   INTERFACE OPERATOR (.dot.)
+     MODULE PROCEDURE dot_real
      MODULE PROCEDURE dot_spinor
      MODULE PROCEDURE dot_spinor_8
+  END  INTERFACE
+
+  INTERFACE OPERATOR (.cross.)
+     MODULE PROCEDURE cross_real
   END  INTERFACE
 
   INTERFACE OPERATOR (*)
@@ -265,7 +271,8 @@ CONTAINS
   SUBROUTINE  print6(S1,mf)
     implicit none
     type (real_8),INTENT(INout)::S1(:)
-    integer        mf,i
+    integer,optional :: mf
+    integer        i
     
  !   if(size(s1)==6) then
  !    do i=1,ndd
@@ -339,8 +346,9 @@ CONTAINS
     !IF(N==0) RETURN
 
 
-    ALLOCATE(T%CC(N),T%fix0(np),T%fix(np),T%fixr(np),T%JL(N),T%JV(N),T%N,T%ds,T%beta0,T%np,T%no, & 
-    t%e_ij(c_%nd2,c_%nd2),T%rad(c_%nd2,c_%nd2),t%usenonsymp, t%symptrack, t%eps)  !,t%file)
+    ALLOCATE(T%CC(N),T%fix0(6),T%fix(6),T%fixr(6),T%JL(N),T%JV(N),T%N,T%ds,T%beta0,T%np,T%no, & 
+  !  t%e_ij(c_%nd2,c_%nd2),T%rad(c_%nd2,c_%nd2),t%usenonsymp, t%symptrack, t%eps)  !,t%file)
+     t%e_ij(6,6),T%rad(6,6),t%usenonsymp, t%symptrack, t%eps)  !,t%file)
     t%cc=0
     t%jl=0
     t%jv=0
@@ -355,7 +363,7 @@ CONTAINS
     T%beta0=0.0_dp
     T%rad=0.0_dp
 !    T%file=' '
-    do i=1,c_%nd2
+    do i=1,6
      T%rad(i,i)=1.0_dp
     enddo
     t%eps=1.d-7
@@ -580,6 +588,7 @@ CONTAINS
        if(abs(xi(1))>c_%absolute_aperture.or.abs(xi(3))>c_%absolute_aperture) then
           c_%CHECK_STABLE=.FALSE.
           xlost=xi
+          messagelost="o_tree_element.f90 track_tree : aperture exeeded"
        endif
     enddo
 
@@ -760,9 +769,10 @@ CONTAINS
        !       s1%x(i)%kind=1
        !       s1%x(i)%i=0
     enddo
-
+    do j=1,s1%nac
     do i=1,2  !
-       call assp_no_master(s1%AC%x(i))
+       call assp_no_master(s1%AC(j)%x(i))
+    enddo
     enddo
 
 
@@ -856,7 +866,7 @@ CONTAINS
     enddo
     P%X=X
     P%ac%t=0.0_dp
-
+    p%nac=n_rf
   END    subroutine EQUAL_PROBE_REAL6
 
   subroutine EQUAL_PROBE8_REAL6 (P,X)
@@ -879,7 +889,7 @@ CONTAINS
     DO I=1,6
        P%X(i)=X(i)
     enddo
-
+    p%nac=n_rf
     P%AC%X(1)=0.0_dp
     P%AC%X(2)=0.0_dp
     P%AC%t=0.0_dp
@@ -906,9 +916,14 @@ CONTAINS
     DO I=1,3
        P8%S(i)=P%S(i)
     enddo
-    P8%AC=P%AC
-
+     P8%nac=P%nac
+    do i=1,P%nac
+    P8%AC(i)=P%AC(i)
+    enddo
     P8%u=P%u
+
+    P8%e=P%e
+
 
   END subroutine EQUAL_PROBE8_PROBE8
 
@@ -975,8 +990,14 @@ CONTAINS
     do I=1,ISPIN1R
        P8%S(I)=P%s(I)
     enddo
+    P8%nac=P%nac
+!!!new 2018.1.4
+    do I=1,P%nac
+       P8%ac(i)=P%ac(i)
+    enddo
 
-
+!!!!
+    P8%e=P%e
     P8%u=P%u
     P8%e_ij=0.0_dp
   END subroutine EQUAL_PROBE8_PROBE
@@ -994,7 +1015,12 @@ CONTAINS
        P%S(I)=P8%S(I)
     ENDDO
     P%u=P8%u
-
+    P%e=P8%e
+!!!new 2018.1.4
+    p%nac=P8%nac
+    do I=1,P8%nac
+       P%ac(i)=P8%ac(i)
+    enddo
   END subroutine EQUAL_PROBE_PROBE8
 
   subroutine EQUAL_PROBE_PROBE (P,P8)
@@ -1010,6 +1036,12 @@ CONTAINS
        P%S(I)=P8%S(I)
     ENDDO
     P%u=P8%u
+    P%e=P8%e
+!!!new 2018.1.4
+    p%nac=P8%nac
+    do I=1,P8%nac
+       P%ac(i)=P8%ac(i)
+    enddo
 
   END subroutine EQUAL_PROBE_PROBE
 
@@ -1037,7 +1069,8 @@ CONTAINS
     else
        STOP 100
     ENDIF
-
+    r%u=.false.
+    r%e=0
   END    subroutine EQUAL_IDENTITY_probe
 
   subroutine EQUAL_IDENTITY_probe_8(R,S)
@@ -1071,6 +1104,8 @@ CONTAINS
        STOP 100
     ENDIF
     R%e_ij=0.0_dp
+    r%u=.false.
+    r%e=0
   END    subroutine EQUAL_IDENTITY_probe_8
 
 
@@ -1114,7 +1149,7 @@ CONTAINS
     implicit none
     TYPE(probe_8), INTENT(IN) :: R
     TYPE(damap), INTENT(INOUT) :: DS
-    INTEGER I,nd2t
+    INTEGER I,nd2t,j
 
     nd2t=C_%ND2
     if(doing_ac_modulation_in_ptc) then
@@ -1126,8 +1161,11 @@ CONTAINS
     DO I=1,nd2t
        DS%V(I)=R%X(I)
     ENDDO
-    DO I=nd2t+1,C_%ND2
-       DS%V(I)=R%ac%x(i-nd2t)
+    j=1
+    DO I=nd2t+1,C_%ND2,2
+       DS%V(I)=R%ac(j)%x(1)
+       DS%V(I+1)=R%ac(j)%x(2)
+       j=j+1
     ENDDO
 
   END subroutine EQUAL_DAMAP_RAY8
@@ -1135,23 +1173,26 @@ CONTAINS
    subroutine print_probe(DS,MF)
     implicit none
     TYPE(probe), INTENT(INOUT) :: DS
-    INTEGER MF,I
- 
+    INTEGER I,mfi
+     integer,optional :: mf
 
-    WRITE(MF,*) " ORBIT "
+     mfi=6
+     if(present(mf)) mfi=mf
+
+    WRITE(MFi,*) " ORBIT "
     do i=1,6
-       write(mf,*) ' Variable ',i
-       write(mf,'(6(1X,G20.13))') ds%x(i) 
+       write(mfi,*) ' Variable ',i
+       write(mfi,'(6(1X,G20.13))') ds%x(i) 
     enddo
  
-    WRITE(MF,*) " SPIN X "
-       write(mf,'(3(1X,G20.13))') ds%s(1)%x 
+    WRITE(MFi,*) " SPIN X "
+       write(mfi,'(3(1X,G20.13))') ds%s(1)%x 
  
-    WRITE(MF,*) " SPIN Y "
-       write(mf,'(3(1X,G20.13))') ds%s(2)%x 
+    WRITE(MFi,*) " SPIN Y "
+       write(mfi,'(3(1X,G20.13))') ds%s(2)%x 
  
-    WRITE(MF,*) " SPIN Z "
-       write(mf,'(3(1X,G20.13))') ds%s(3)%x 
+    WRITE(MFi,*) " SPIN Z "
+       write(mfi,'(3(1X,G20.13))') ds%s(3)%x 
 
  
 
@@ -1161,33 +1202,36 @@ CONTAINS
   subroutine print_probe8(DS,MF)
     implicit none
     TYPE(probe_8), INTENT(INOUT) :: DS
-    INTEGER MF,I,j
+    INTEGER MFi,I,j
     logical(lp) rad_in
+    integer,optional :: mf
+     mfi=6
+     if(present(mf)) mfi=mf
 
-    WRITE(MF,*) " ORBIT "
+    WRITE(MFi,*) " ORBIT "
     do i=1,6
-       write(mf,*) ' Variable ',i
-       call print(ds%x(i),mf)
+       write(mfi,*) ' Variable ',i
+       call print(ds%x(i),mfi)
     enddo
     !    WRITE(MF,*) " SPIN 0 "
     !    do i=1,3
     !       write(mf,*) ' Spin Variable ',i
     !       call print(ds%s(0)%x(i),mf)
     !    enddo
-    WRITE(MF,*) " SPIN X "
-    call print(ds%s(1),mf)
+    WRITE(MFi,*) " SPIN X "
+    call print(ds%s(1),mfi)
     !    do i=1,3
     !       write(mf,*) ' Spin Variable ',i
     !       call print(ds%s(1)%x(i),mf)
     !    enddo
-    WRITE(MF,*) " SPIN Y "
-    call print(ds%s(2),mf)
+    WRITE(MFi,*) " SPIN Y "
+    call print(ds%s(2),mfi)
     !    do i=1,3
     !       write(mf,*) ' Spin Variable ',i
     !       call print(ds%s(2)%x(i),mf)
     !    enddo
-    WRITE(MF,*) " SPIN Z "
-    call print(ds%s(3),mf)
+    WRITE(MFi,*) " SPIN Z "
+    call print(ds%s(3),mfi)
     !    do i=1,3
     !       write(mf,*) ' Spin Variable ',i
     !       call print(ds%s(3)%x(i),mf)
@@ -1200,22 +1244,25 @@ CONTAINS
 
     if(rad_in) then
 
-       WRITE(MF,*) " STOCHASTIC KICK  "
+       WRITE(MFi,*) " STOCHASTIC KICK  "
 
        do i=1,6
           do j=1,6
-             write(mf,*) i,j,ds%e_ij(i,j)
+             write(mfi,*) i,j,ds%e_ij(i,j)
           enddo
        enddo
     else
 
-       WRITE(MF,*) "NO STOCHASTIC KICK  "
+       WRITE(MFi,*) "NO STOCHASTIC KICK  "
 
     endif
     if(doing_ac_modulation_in_ptc) then
-       call print(ds%ac,mf)
+      write(mfi,*) ds%nac, " clocks "
+       do i=1,ds%nac
+        call print(ds%ac(i),mfi)
+       enddo
     else
-       WRITE(MF,*) "NO MODULATION  "
+       WRITE(MFi,*) "NO MODULATION  "
 
     endif
 
@@ -1224,13 +1271,16 @@ CONTAINS
   subroutine print_rf_phasor_8(S,MF)
     implicit none
     TYPE(rf_phasor_8), INTENT(INOUT) :: s
-    INTEGER MF,I
+    INTEGER MFi,I
+    integer,optional :: mf
+     mfi=6
+     if(present(mf)) mfi=mf
 
-    write(mf,*) ' AC INFORMATION : omega, pseudo-time, hands of the clock'
-    call print(s%om,mf)
-    call print(s%t,mf)
+    write(mfi,*) ' AC INFORMATION : omega, pseudo-time, hands of the clock'
+    call print(s%om,mfi)
+    call print(s%t,mfi)
     do i=1,2
-       call print(s%x(i),mf)
+       call print(s%x(i),mfi)
     enddo
 
   END subroutine print_rf_phasor_8
@@ -1239,11 +1289,14 @@ CONTAINS
   subroutine print_spinor_8(S,MF)
     implicit none
     TYPE(spinor_8), INTENT(INOUT) :: s
-    INTEGER MF,I
+    INTEGER MFi,I
+    integer,optional :: mf
+     mfi=6
+     if(present(mf)) mfi=mf
 
     do i=1,3
-       write(mf,*) ' Spin Variable ',i
-       call print(s%x(i),mf)
+       write(mfi,*) ' Spin Variable ',i
+       call print(s%x(i),mfi)
     enddo
 
   END subroutine print_spinor_8
@@ -1330,11 +1383,13 @@ CONTAINS
   END    subroutine ALLOC_SPINOR_8
 
 
-  subroutine ALLOC_probe_8(R)
+  subroutine ALLOC_probe_8(R,n)
     implicit none
     TYPE(probe_8), INTENT(INOUT) :: R
-    INTEGER I !,J
-
+    INTEGER I,nac
+    integer, optional :: n
+     nac=1
+     if(present(n)) nac=n
     !    CALL ALLOC(R%S)
     DO I=1,3
        CALL ALLOC(R%S(I))
@@ -1344,9 +1399,13 @@ CONTAINS
     DO I=1,3
        R%S(I)=0
     ENDDO
-    CALL ALLOC(R%ac)
+    r%nac=nac
+    do i=1,nac
+     CALL ALLOC(R%ac(i))
+    enddo
     r%e_ij=0.0_dp
-
+    r%u=.false.
+    r%e=0
   END    subroutine ALLOC_probe_8
 
   subroutine ALLOC_rf_phasor_8(R)
@@ -1383,9 +1442,13 @@ CONTAINS
        CALL KILL(R%S(I))
     ENDDO
     CALL KILL(R%X,6)
-
-    CALL KILL(R%ac)
+    do i=1,r%nac
+     CALL KILL(R%ac(i))
+    enddo
+    r%nac=0
     r%e_ij=0.0_dp
+    r%u=.false.
+    r%e=0
   END    subroutine KILL_probe_8
 
   subroutine kill_rf_phasor_8(R)
@@ -1421,6 +1484,24 @@ CONTAINS
 
   END FUNCTION dot_spinor
   
+
+  FUNCTION dot_real( S1, S2 )
+    implicit none
+    real(dp) dot_real
+    real(dp), INTENT (IN) :: S1(:),S2(:)
+
+    INTEGER I
+
+    dot_real=0.0_dp
+   
+    DO I=1,min(size(s1),size(s2))
+       dot_real=dot_real+s1(i)*s2(i)
+    ENDDO
+
+  END FUNCTION dot_real
+
+
+
   subroutine make_spinor_basis(s1,s2,s3)
   implicit none
     TYPE (SPINOR) s1,s2,s3
@@ -1473,15 +1554,22 @@ CONTAINS
     TYPE (SPINOR) cross_spinor
     TYPE (SPINOR), INTENT (IN) :: S1,S2
 
- 
- 
-
        cross_spinor%x(1)= s1%x(2)*s2%x(3)-s1%x(3)*s2%x(2)
        cross_spinor%x(2)= -s1%x(1)*s2%x(3)+s1%x(3)*s2%x(1)
        cross_spinor%x(3)= s1%x(1)*s2%x(2)-s1%x(2)*s2%x(1)
     
-
   END FUNCTION cross_spinor
+
+  FUNCTION cross_real( S1, S2 )
+    implicit none
+    real(dp) cross_real(3)
+    real(dp), INTENT (IN) :: S1(3),S2(3)
+
+       cross_real(1)= s1(2)*s2(3)-s1(3)*s2(2)
+       cross_real(2)=-s1(1)*s2(3)+s1(3)*s2(1)
+       cross_real(3)= s1(1)*s2(2)-s1(2)*s2(1)
+    
+  END FUNCTION cross_real
 
   FUNCTION cross_spinor8( S1, S2 )
     implicit none

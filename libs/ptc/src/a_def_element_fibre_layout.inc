@@ -74,6 +74,7 @@ TYPE INTERNAL_STATE
    LOGICAL(LP) SPIN  ! Spin is tracked
    LOGICAL(LP) MODULATION !  One modulated family tracked by probe
    LOGICAL(LP) ONLY_2D  !  REAL_8 Taylor in (x,p_x)
+   LOGICAL(LP) FULL_WAY  ! 
 END TYPE INTERNAL_STATE
 
 
@@ -181,14 +182,15 @@ TYPE ELEMENT
    real(dp), POINTER ::  L  => null()                              ! Length of integration often same as LD
    !
    real(dp),   DIMENSION(:), POINTER:: AN => null(),BN => null()         !Multipole component
-   real(dp),   POINTER:: FINT => null(),HGAP => null()         !FRINGE FUDGE FOR MAD
+   real(dp), DIMENSION(:),   POINTER:: FINT => null(),HGAP => null()         !FRINGE FUDGE FOR MAD
    real(dp),   POINTER:: H1 => null(),H2 => null()         !FRINGE FUDGE FOR MAD
-   real(dp),   POINTER:: VA => null(),VS => null()         !valishev-like multipole
+   real(dp),   POINTER:: VA => null(),VS => null()         ! use in quad fringe from sad
    !
    real(dp), POINTER :: VOLT => null(), FREQ => null(),PHAS => null(),DELTA_E => null(),LAG => null()       ! Cavity information
    real(dp), POINTER :: DC_ac => null(),A_ac => null(),theta_ac => null(),D_AC => null()      ! slow RF: amplitude and phase
    real(dp),   DIMENSION(:), POINTER:: D_AN => null(),D_BN => null(),D0_AN => null(),D0_BN => null()  !Multipole component
-   logical(lp), POINTER :: THIN => null(),slow_ac => null(),slow_ac2 => null()
+   logical(lp), POINTER :: THIN => null()
+   integer(2), pointer :: slow_ac => null()
    real(dp), POINTER ::  B_SOL  => null()
    !  misalignements and rotation
    logical(lp), POINTER ::  MIS => null()
@@ -215,6 +217,7 @@ TYPE ELEMENT
    TYPE(CAV_TRAV), POINTER :: CAV21 => null()            ! CAVITY TRAVELLING WAVE
    TYPE(SAGAN), POINTER :: WI   => null()              ! USER DEFINED
    TYPE(PANCAKE), POINTER :: PA => null()          ! GENERAL B
+   TYPE(ABELL), POINTER :: AB    => null()            ! TYPE ABELL 
    TYPE(HELICAL_DIPOLE), POINTER :: HE22  => null()         !  
    TYPE(SUPERDRIFT), POINTER :: SDR      => null()     ! GENERAL DRIFT
    TYPE(FIBRE), POINTER :: PARENT_FIBRE => null()
@@ -228,8 +231,9 @@ TYPE ELEMENT
    type(ramping), pointer :: ramp => null()
    type(tree_element), pointer :: forward(:)=> null(),backward(:)=> null()
    logical, pointer :: usef=> null(),useb=> null()
-   logical, pointer :: skip_ptc_f=> null(),skip_ptc_b=> null()
+   integer, pointer :: skip_ptc_f=> null(),skip_ptc_b=> null()
    logical, pointer :: do1mapf=> null(),do1mapb=> null()
+   real(dp), pointer :: ene   ! for tapering
 END TYPE  ELEMENT
 
 
@@ -244,7 +248,7 @@ TYPE ELEMENTP
    !
    TYPE(REAL_8), POINTER ::  L    => null() ! LENGTH OF INTEGRATION OFTEN SAME AS LD, CAN BE ZERO
    TYPE(REAL_8),  DIMENSION(:), POINTER :: AN => null(),BN   => null()       !MULTIPOLE COMPONENT
-   TYPE(REAL_8),   POINTER:: FINT => null(),HGAP  => null()        !FRINGE FUDGE FOR MAD
+   TYPE(REAL_8), DIMENSION(:),   POINTER:: FINT => null(),HGAP  => null()        !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),   POINTER:: H1 => null(),H2 => null()         !FRINGE FUDGE FOR MAD
    TYPE(REAL_8),    POINTER:: VA => null(),VS => null()         !valishev-like multipole
    !
@@ -254,8 +258,8 @@ TYPE ELEMENTP
    TYPE(REAL_8),   DIMENSION(:), POINTER:: D_AN => null(),D_BN => null(),D0_AN => null(),D0_BN => null()         !Multipole component
    !
    TYPE(REAL_8), POINTER :: B_SOL => null()
-   logical(lp), POINTER :: THIN => null(),slow_ac => null(),slow_ac2 => null()
-
+   logical(lp), POINTER :: THIN => null() 
+   integer(2), pointer :: slow_ac => null()
    !  MISALIGNEMENTS AND ROTATION
    logical(lp), POINTER ::  MIS => null()
    !   real(dp),  DIMENSION(:), POINTER :: D,R
@@ -284,12 +288,13 @@ TYPE ELEMENTP
    TYPE(SUPERDRIFTP), POINTER :: SDR  => null()         ! GENERAL DRIFT
    TYPE(SAGANP), POINTER :: WI         => null()        ! USER DEFINED
    TYPE(PANCAKEP), POINTER :: PA       => null()    ! GENERAL B
+      TYPE(ABELLP), POINTER :: AB    => null()            ! TYPE ABELL 
    TYPE(FIBRE), POINTER :: PARENT_FIBRE => null()
    !   TYPE(fibre_appearance), POINTER :: doko
    type(ramping), pointer :: ramp => null()
    type(tree_element), pointer :: forward(:)=> null(),backward(:)=> null()
    logical, pointer :: usef=> null(),useb=> null()
-   logical, pointer :: skip_ptc_f=> null(),skip_ptc_b=> null()
+   integer, pointer :: skip_ptc_f=> null(),skip_ptc_b=> null()
    logical, pointer :: do1mapf=> null(),do1mapb=> null()
 END TYPE  ELEMENTP
 
@@ -337,7 +342,8 @@ END TYPE FIBRE
 
 TYPE LAYOUT
    CHARACTER(120), POINTER ::  NAME  => null()! IDENTIFICATION
-   INTEGER, POINTER ::  INDEX,HARMONIC_NUMBER  => null()! IDENTIFICATION, CHARGE SIGN
+   INTEGER, POINTER ::  INDEX  => null()! IDENTIFICATION, CHARGE SIGN
+   REAL(DP),  POINTER :: HARMONIC_NUMBER  => null()!
    logical(lp),POINTER ::CLOSED  => null()
    INTEGER,  POINTER :: N   => null()   ! TOTAL ELEMENT IN THE CHAIN
    INTEGER,POINTER ::NTHIN  => null() ! NUMBER IF THIN LENSES IN COLLECTION  (FOR SPEED ESTIMATES)
