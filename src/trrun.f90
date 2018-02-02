@@ -3166,7 +3166,7 @@ subroutine trsol(track,ktrack)
 
   double precision :: omega, length
   double precision :: x_, y_, z_, px_, py_, pt_
-!!$  double precision :: bet, length_
+  double precision :: bet, length_
 
   !---- Initialize.
   bet0 = get_value('probe ','beta ')
@@ -3233,22 +3233,17 @@ subroutine trsol(track,ktrack)
            cosTh = cos(two*skl/onedp)
            sinTh = sin(two*skl/onedp)
            omega = sk/onedp;
-
+           
+           ! total path length traveled by the particle
+           bet = onedp / (one/bet0 + pt_);
+           length_ = length - half/(onedp**2)*(omega*(sinTh-two*length*omega)*(x_**2+y_**2)+&
+                two*(one-cosTh)*(px_*x_+py_*y_)-(sinTh/omega+two*length)*(px_**2+py_**2))/four;
+           
            track(1,i) = ((one+cosTh)*x_+sinTh*y_+(px_*sinTh-py_*(cosTh-one))/omega)/two;
            track(3,i) = ((one+cosTh)*y_-sinTh*x_+(py_*sinTh+px_*(cosTh-one))/omega)/two;
            track(2,i) = (omega*((cosTh-one)*y_-sinTh*x_)+py_*sinTh+px_*(one+cosTh))/two;
            track(4,i) = (omega*((one-cosTh)*x_-sinTh*y_)-px_*sinTh+py_*(one+cosTh))/two;
-           track(5,i) = z_+&
-                length*omega**2*(-y_**2-x_**2)/(2*bet0)+&
-                length*omega*((py_*x_)-(px_*y_))/bet0+&
-                length*((-py_**2-px_**2+(3*pt_**2)*(one-one/bet0**2))/(2*bet0)+pt_/bet0**2-pt_);
-
-!!$           ! longitudinal phase space evolution from the path length
-!!$           ! total path length traveled by the particle
-!!$           bet = onedp / (one/bet0 + pt_);
-!!$           length_ = length - half/(onedp**2)*(omega*(sinTh-two*length*omega)*(x_**2+y_**2)+&
-!!$                two*(one-cosTh)*(px_*x_+py_*y_)-(sinTh/omega+two*length)*(px_**2+py_**2))/four;
-!!$           track(5,i) = z_ + length/bet0 - length_/bet;
+           track(5,i) = z_ + length/bet0 - length_/bet;
 
         enddo
      else
