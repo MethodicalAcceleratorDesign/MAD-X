@@ -76,7 +76,8 @@ subroutine survey
      code = node_value('mad8_type ')
      !if (code.eq.39) code=15 ! 2015-Aug-06  21:50:12  ghislain: not required here
      !if (code.eq.38) code=24
-      !**** el is the arc length for all bends  ********
+     !**** el is the arc length for all bends  ********
+     ! LD: 2018.02.01, survey should consider rbarc...
      el = node_value('l ')
      call suelem(el, ve, we, tilt)
      suml = suml + el
