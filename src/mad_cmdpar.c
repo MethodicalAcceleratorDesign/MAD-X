@@ -10,27 +10,28 @@ clone_command_parameter(const struct command_parameter* p)
   clone->call_def = p->call_def;
   switch (p->type)
   {
-    case 4:
+    case 4: // constraint
       clone->c_min = p->c_min;
       clone->c_max = p->c_max;
       clone->min_expr = clone_expression(p->min_expr);
       clone->max_expr = clone_expression(p->max_expr);
-    case 0:
-    case 1:
-    case 2:
+      __attribute__ ((fallthrough));
+    case 0: // logical (not supported...)
+    case 1: // integer (not supported...)
+    case 2: // double
       clone->double_value = p->double_value;
       clone->expr = clone_expression(p->expr);
       break;
-    case 3:
+    case 3: // string
       clone->string = permbuff(p->string);
       clone->expr = NULL;
       break;
-    case 11:
-    case 12:
+    case 11: // array of integers (not supported...)
+    case 12: // array if doubles
       clone->double_array = clone_double_array(p->double_array);
       clone->expr_list = clone_expr_list(p->expr_list);
       break;
-    case 13:
+    case 13: // array of strings
       clone->m_string = clone_char_p_array(p->m_string);
   }
   return clone;
@@ -392,7 +393,7 @@ command_par_value_user2(const char* parameter, const struct command* cmd, double
   else
    {
     *val = 0;
-   } 
+   }
   return inf;
 }
 
