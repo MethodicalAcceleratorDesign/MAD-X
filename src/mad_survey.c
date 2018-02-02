@@ -7,7 +7,7 @@ pro_survey(struct in_cmd* cmd)
   struct sequence* keep_current;
   char *filename = NULL, *table_name;
   int w_file;
-  int iarc = 1, keep;
+//  int iarc = 1, keep;
 
   (void)cmd;
   if (current_sequ == NULL)
