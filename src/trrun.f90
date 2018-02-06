@@ -917,7 +917,7 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
   double precision :: f_errors(0:maxferr)
   double precision :: field(2,0:maxmul)
   !double precision :: vals(2,0:maxmul)
-  double precision :: normal(0:maxmul), skew(0:maxmul)
+  double precision :: normal(0:maxmul), skew(0:maxmul), an
   double precision, save :: ordinv(maxmul), const
   double precision :: bvk, node_value, ttt
   double precision :: npeak(100), nlag(100), ntune(100), temp, noise
@@ -949,6 +949,11 @@ subroutine ttmult(track,ktrack,dxt,dyt,turn)
 
   nd = 2 * max(nn, ns, n_ferr/2-1)
 
+  !---- Angle (no bvk in track)
+  an = node_value('angle ')
+  if (an .ne. 0) f_errors(0) = f_errors(0) + normal(0) - an
+
+  !----
   if (noise .eq. 1)   then
      nn1 = name_len
      noisemax = node_value('noisemax ')
@@ -3176,9 +3181,9 @@ subroutine trsol(track,ktrack)
   bvk = node_value('other_bv ')
   sk  = bvk * node_value('ks ') / two
   length = node_value('l ')
-  
+
   if (length.eq.zero) then
-     
+
      skl = bvk * node_value('ksi ') / two
 
      !---- Loop over particles
@@ -4724,7 +4729,7 @@ subroutine trphot(el,curv,rfac,deltap)
      print *,"More than 0.3 photons emitted in element."
      print *,"You might want to consider increasing the number of slices to reduce this number."
   endif
-     
+
   if (amean .gt. zero) then
      call dpoissn(amean, nphot, ierror)
 

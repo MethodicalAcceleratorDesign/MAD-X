@@ -16,8 +16,10 @@ pro_survey(struct in_cmd* cmd)
     return;
   }
   if (debuglevel > 1) fprintf(prt_file, "enter Survey module\n");
-  keep = get_option("rbarc");
-  set_option("rbarc", &iarc);
+//  LD: why is Survey blocking the RBARC option?
+//  RBARC is used by el_par_value in mad_elem.c
+//  keep = get_option("rbarc");
+//  set_option("rbarc", &iarc);
   w_file = command_par_string_user2("file", current_survey, &filename);
   if (w_file && !filename)
     filename = permbuff("dummy");
@@ -30,13 +32,13 @@ pro_survey(struct in_cmd* cmd)
   survey_();
   current_sequ = keep_current;
   if (w_file) out_table(table_name, survey_table, filename);
-  set_option("rbarc", &keep);
+// set_option("rbarc", &keep);
 }
 
 void
 pro_use_survey(void)
 {
-  /* Constructs artificial survey command for USE,SURVEY. 
+  /* Constructs artificial survey command for USE,SURVEY.
      The survey data are stored at the nodes. */
   /* 2013-Jul-18  19:17:06  ghislain: DOC undocumented feature ? */
   struct in_cmd* pro_use = new_in_cmd(10);
