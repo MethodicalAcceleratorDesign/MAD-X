@@ -20,7 +20,7 @@ module ptc_multiparticle
   !  LOGICAL :: OLD_MOD=.TRUE.
 
   logical(lp),private, parameter :: dobb=.true.
-  logical(lp),private, parameter :: aperture_all_case0=.false.
+  logical(lp),private            :: aperture_all_case0=.false.
  ! type(probe) :: xsm,xsm0
   real(dp) :: xsm0t=0.0_dp,xsmt=0.0_dp
   !real(dp) :: unit_time =1.0e-3_dp
@@ -3075,5 +3075,12 @@ end subroutine survey_integration_node_p2
     ENDIF
   END SUBROUTINE MIS_survey
 
+  subroutine set_aperture_all_case0(flag)
+    implicit none
+    logical flag 
+    
+    aperture_all_case0 = flag
+    
+  end subroutine set_aperture_all_case0
 
 end module ptc_multiparticle
