@@ -288,15 +288,15 @@ subroutine suelem(el, ve, we, tilt)
      case (code_yrotation) !---- Rotation around Y-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!
         dx = node_value('angle ') * bv
         we(1,1) =  cos(dx)
-        we(3,1) = -sin(dx)
-        we(1,3) =  sin(dx)
+        we(3,1) =  sin(dx)
+        we(1,3) =  -sin(dx)
         we(3,3) =  cos(dx)
 
      case (code_xrotation) !---- Rotation around X-axis.  QUESTIONABLE USEFULNESS  !!!!!!!!!!!!!
         dy = node_value('angle ') * bv
         we(2,2) =  cos(dy)
         we(3,2) =  sin(dy)
-        we(1,3) = -sin(dy)
+        we(2,3) = -sin(dy)
         we(3,3) =  cos(dy)
      case(code_translation) !  Translation of the reference system.  
         x_t = node_value('x ')
