@@ -10,7 +10,7 @@ module S_fitting_new
   integer:: m_turn,m_skip=0
   integer :: with_c=1
   integer ::  other_fix=0
-  logical :: check_longitudinal=.true.
+  logical :: check_longitudinal=.true.,piotr_fix=.true.
 
   TYPE fibre_monitor_data
      type(fibre), pointer :: p    ! fibre location
@@ -3435,13 +3435,21 @@ call kill(yy); call kill(id);
       do i=1,fibre1-1
          object_fibre1=>object_fibre1%next
       enddo   
+      if(piotr_fix) then
       call FIND_ORBIT_LAYOUT_noda_object(FIX,STATE,eps,TURNS,fibre1=object_fibre1,total=total)
+       else
+      call FIND_ORBIT_LAYOUT_noda_object_orig(FIX,STATE,eps,TURNS,fibre1=object_fibre1,total=total)
+      endif
      else
        object_node1=>ring%t%start
       do i=1,node1-1
          object_node1=>object_node1%next
       enddo 
-      call FIND_ORBIT_LAYOUT_noda_object(FIX,STATE,eps,TURNS,node1=object_node1,total=total)
+      if(piotr_fix) then
+       call FIND_ORBIT_LAYOUT_noda_object(FIX,STATE,eps,TURNS,fibre1=object_fibre1,total=total)
+       else
+       call FIND_ORBIT_LAYOUT_noda_object_orig(FIX,STATE,eps,TURNS,node1=object_node1,total=total)
+      endif
      endif
 
   end SUBROUTINE FIND_ORBIT_LAYOUT_noda

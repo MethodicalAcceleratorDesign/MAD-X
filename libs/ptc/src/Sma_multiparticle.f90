@@ -20,7 +20,7 @@ module ptc_multiparticle
   !  LOGICAL :: OLD_MOD=.TRUE.
 
   logical(lp),private, parameter :: dobb=.true.
-  logical(lp),private, parameter :: aperture_all_case0=.false.
+  logical(lp),private            :: aperture_all_case0=.false.
  ! type(probe) :: xsm,xsm0
   real(dp) :: xsm0t=0.0_dp,xsmt=0.0_dp
   !real(dp) :: unit_time =1.0e-3_dp
@@ -3074,6 +3074,76 @@ end subroutine survey_integration_node_p2
        ENDIF
     ENDIF
   END SUBROUTINE MIS_survey
+
+  subroutine set_aperture_all_case0(flag)
+    implicit none
+    logical flag 
+    
+    aperture_all_case0 = flag
+    
+  end subroutine set_aperture_all_case0
+
+!!!!!!!!!!!!!!!!!!!
+
+
+subroutine survey_integration_fibre_no_patch(p,b0,exi0)
+implicit none
+type(fibre), target :: p
+type(integration_node), pointer :: t
+integer i
+type(layout), pointer  :: r
+real(dp),intent(in):: b0(3),exi0(3,3) 
+real(dp) a0(3),ent0(3,3),ang(3)
+a0=b0
+ent0=exi0
+r=>p%parent_layout
+if(.not.associated(r%t)) then
+ call make_node_layout(r)
+ call survey(r)
+    CALL  allocate_node_frame( R)
+! call FILL_SURVEY_DATA_IN_NODE_LAYOUT(r)
+endif
+if(.not.associated(p%t1%a))     CALL  allocate_node_frame( R)   !call FILL_SURVEY_DATA_IN_NODE_LAYOUT(r)
+ 
+
+
+!t=>p%t1
+!call survey_integration_node_p1(t,a0,ent0)
+t=>t%next
+call survey_integration_fringe(t,a0,ent0)
+
+do i=1,p%mag%p%nst
+ t=>t%next
+ call survey_integration_node_case0(t,a0,ent0)
+enddo
+t=>t%next
+call survey_integration_fringe(t,a0,ent0)
+!t=>t%next
+!call survey_integration_node_p2(t,a0,ent0)
+
+ 
+!!! entrance chart
+ CALL COMPUTE_ENTRANCE_ANGLE(p%chart%f%ent,p%chart%f%exi,ANG)
+p%chart%f%mid=p%chart%f%ent
+!write(6,*) p%mag%name
+!write(6,*) ang
+ang=ang/2
+p%chart%f%o=0.5_dp*(p%chart%f%a+p%chart%f%b)
+CALL GEO_ROT(p%chart%f%mid,ANG,1,basis=p%chart%f%ent)
+ 
+CALL COMPUTE_ENTRANCE_ANGLE(p%mag%p%f%ent,p%mag%p%f%exi,ANG)
+p%mag%p%f%mid=p%mag%p%f%ent
+ang=ang/2
+p%mag%p%f%o=0.5_dp*(p%mag%p%f%a+p%mag%p%f%b)
+CALL GEO_ROT(p%mag%p%f%mid,ANG,1,basis=p%mag%p%f%ent)
+p%magp%p%f%mid=p%mag%p%f%mid
+p%magp%p%f%o=p%mag%p%f%o
+
+ 
+! I am here 
+!etienne
+
+end subroutine survey_integration_fibre_no_patch
 
 
 end module ptc_multiparticle
